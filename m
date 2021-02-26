@@ -2,28 +2,28 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2C14732628B
+	by mail.lfdr.de (Postfix) with ESMTP id E984A32628C
 	for <lists+kvm@lfdr.de>; Fri, 26 Feb 2021 13:17:56 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230230AbhBZMR1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 26 Feb 2021 07:17:27 -0500
-Received: from mga09.intel.com ([134.134.136.24]:44787 "EHLO mga09.intel.com"
+        id S230211AbhBZMR3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 26 Feb 2021 07:17:29 -0500
+Received: from mga09.intel.com ([134.134.136.24]:44724 "EHLO mga09.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230400AbhBZMQb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 26 Feb 2021 07:16:31 -0500
-IronPort-SDR: wdp8aa9v6szWzFU5lnBS5pRTY6UPQ+ZUigCXPDPTVvyCgaKi9SkJ1b86iSlzXMBop+lPIN86kH
- 0QrKc5BACacA==
-X-IronPort-AV: E=McAfee;i="6000,8403,9906"; a="185979994"
+        id S230402AbhBZMQg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 26 Feb 2021 07:16:36 -0500
+IronPort-SDR: omurD7Tk9FKZ0v+3uRnLf5I5JD8ruf9+df3OWZ084bY2oEJFx9eMDYA5tR8Fl22UN0lyvYOBdQ
+ K8pd6KgGVkhg==
+X-IronPort-AV: E=McAfee;i="6000,8403,9906"; a="185980011"
 X-IronPort-AV: E=Sophos;i="5.81,208,1610438400"; 
-   d="scan'208";a="185979994"
+   d="scan'208";a="185980011"
 Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Feb 2021 04:15:47 -0800
-IronPort-SDR: JdwojIdNjWQ1cUfNxYWw8p0J2ikSQm0cdqXfH6fy90xCxCiptekWcZRmHItqLZwlLuqTKba21I
- BgButHM0Hpbg==
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Feb 2021 04:15:51 -0800
+IronPort-SDR: 2TSK1okdrKleIEdBUqrjUF9JKO1kHd+DdLNqV8gnEnOkuAeYjrza1h5Dg+No/8pqJiVWXhKFv0
+ mRI031Xij1bQ==
 X-IronPort-AV: E=Sophos;i="5.81,208,1610438400"; 
-   d="scan'208";a="598420597"
+   d="scan'208";a="598420606"
 Received: from ciparjol-mobl.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.255.230.175])
-  by fmsmga005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Feb 2021 04:15:44 -0800
+  by fmsmga005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Feb 2021 04:15:47 -0800
 From:   Kai Huang <kai.huang@intel.com>
 To:     linux-sgx@vger.kernel.org, kvm@vger.kernel.org, x86@kernel.org
 Cc:     seanjc@google.com, jarkko@kernel.org, luto@kernel.org,
@@ -31,9 +31,9 @@ Cc:     seanjc@google.com, jarkko@kernel.org, luto@kernel.org,
         haitao.huang@intel.com, pbonzini@redhat.com, bp@alien8.de,
         tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com,
         Kai Huang <kai.huang@intel.com>
-Subject: [RFC PATCH v6 13/25] x86/sgx: Add helpers to expose ECREATE and EINIT to KVM
-Date:   Sat, 27 Feb 2021 01:15:12 +1300
-Message-Id: <14908104a7ff5724b6fb4e4c7df6e675adafe5a7.1614338774.git.kai.huang@intel.com>
+Subject: [RFC PATCH v6 14/25] x86/sgx: Move provisioning device creation out of SGX driver
+Date:   Sat, 27 Feb 2021 01:15:13 +1300
+Message-Id: <684c77211acfa1b162d8fbcf507b17d84da5ac11.1614338774.git.kai.huang@intel.com>
 X-Mailer: git-send-email 2.29.2
 In-Reply-To: <cover.1614338774.git.kai.huang@intel.com>
 References: <cover.1614338774.git.kai.huang@intel.com>
@@ -45,23 +45,28 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Sean Christopherson <sean.j.christopherson@intel.com>
 
-The host kernel must intercept ECREATE to be able to impose policies on
-guests.  When it does this, the host kernel runs ECREATE against the
-userspace mapping of the virtualized EPC.
+And extract sgx_set_attribute() out of sgx_ioc_enclave_provision() and
+export it as symbol for KVM to use.
 
-Provide wrappers around __ecreate() and __einit() to hide the ugliness
-of overloading the ENCLS return value to encode multiple error formats
-in a single int.  KVM will trap-and-execute ECREATE and EINIT as part
-of SGX virtualization, and on an exception, KVM needs the trapnr so that
-it can inject the correct fault into the guest.
+Provisioning key is sensitive. SGX driver only allows to create enclave
+which can access provisioning key when enclave creator has permission to
+open /dev/sgx_provision.  It should apply to VM as well, as provisioning
+key is platform specific, thus unrestricted VM can also potentially
+compromise provisioning key.
+
+Move provisioning device creation out of sgx_drv_init() to sgx_init() as
+preparation for adding SGX virtualization support, so that even SGX
+driver is not enabled due to flexible launch control is not available,
+SGX virtualization can still be enabled, and use it to restrict VM's
+capability of being able to access provisioning key.
 
 Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+Reviewed-by: Jarkko Sakkinen <jarkko@kernel.org>
 Signed-off-by: Kai Huang <kai.huang@intel.com>
 ---
 v5->v6:
 
- - Code change due to sgx_arch.h merged to sgx.h.
- - Added a new empty line before return in __sgx_virt_einit() per Jarkko.
+ - Code change (rebase) due to sgx_arch.h merged to sgx.h.
 
 v4->v5:
 
@@ -69,137 +74,211 @@ v4->v5:
 
 v3->v4:
 
- - Added one new line before last return in sgx_virt_einit(), per Jarkko.
+ - No code change. Added Jarkko's Reviewed-by.
 
 v2->v3:
 
- - Added kdoc for sgx_virt_ecreate() and sgx_virt_einit(), per Jarkko.
- - Changed to use CONFIG_X86_SGX_KVM.
+ - Added kdoc for sgx_set_attribute(), per Jarkko.
+
 
 ---
- arch/x86/include/asm/sgx.h     |  7 +++
- arch/x86/kernel/cpu/sgx/virt.c | 95 ++++++++++++++++++++++++++++++++++
- 2 files changed, 102 insertions(+)
+ arch/x86/include/asm/sgx.h       |  3 ++
+ arch/x86/kernel/cpu/sgx/driver.c | 17 ----------
+ arch/x86/kernel/cpu/sgx/ioctl.c  | 16 ++-------
+ arch/x86/kernel/cpu/sgx/main.c   | 57 +++++++++++++++++++++++++++++++-
+ 4 files changed, 61 insertions(+), 32 deletions(-)
 
 diff --git a/arch/x86/include/asm/sgx.h b/arch/x86/include/asm/sgx.h
-index 0db1e47a90c5..d2e1f9a6dd4d 100644
+index d2e1f9a6dd4d..c20df3b37f6c 100644
 --- a/arch/x86/include/asm/sgx.h
 +++ b/arch/x86/include/asm/sgx.h
-@@ -365,4 +365,11 @@ struct sgx_sigstruct {
-  * line!
-  */
+@@ -372,4 +372,7 @@ int sgx_virt_einit(void __user *sigstruct, void __user *token,
+ 		   void __user *secs, u64 *lepubkeyhash, int *trapnr);
+ #endif
  
-+#ifdef CONFIG_X86_SGX_KVM
-+int sgx_virt_ecreate(struct sgx_pageinfo *pageinfo, void __user *secs,
-+		     int *trapnr);
-+int sgx_virt_einit(void __user *sigstruct, void __user *token,
-+		   void __user *secs, u64 *lepubkeyhash, int *trapnr);
-+#endif
++int sgx_set_attribute(unsigned long *allowed_attributes,
++		      unsigned int attribute_fd);
 +
  #endif /* _ASM_X86_SGX_H */
-diff --git a/arch/x86/kernel/cpu/sgx/virt.c b/arch/x86/kernel/cpu/sgx/virt.c
-index d206d81280cf..2ffa4ecb92c7 100644
---- a/arch/x86/kernel/cpu/sgx/virt.c
-+++ b/arch/x86/kernel/cpu/sgx/virt.c
-@@ -258,3 +258,98 @@ int __init sgx_vepc_init(void)
+diff --git a/arch/x86/kernel/cpu/sgx/driver.c b/arch/x86/kernel/cpu/sgx/driver.c
+index f2eac41bb4ff..4f3241109bda 100644
+--- a/arch/x86/kernel/cpu/sgx/driver.c
++++ b/arch/x86/kernel/cpu/sgx/driver.c
+@@ -133,10 +133,6 @@ static const struct file_operations sgx_encl_fops = {
+ 	.get_unmapped_area	= sgx_get_unmapped_area,
+ };
  
- 	return misc_register(&sgx_vepc_dev);
+-const struct file_operations sgx_provision_fops = {
+-	.owner			= THIS_MODULE,
+-};
+-
+ static struct miscdevice sgx_dev_enclave = {
+ 	.minor = MISC_DYNAMIC_MINOR,
+ 	.name = "sgx_enclave",
+@@ -144,13 +140,6 @@ static struct miscdevice sgx_dev_enclave = {
+ 	.fops = &sgx_encl_fops,
+ };
+ 
+-static struct miscdevice sgx_dev_provision = {
+-	.minor = MISC_DYNAMIC_MINOR,
+-	.name = "sgx_provision",
+-	.nodename = "sgx_provision",
+-	.fops = &sgx_provision_fops,
+-};
+-
+ int __init sgx_drv_init(void)
+ {
+ 	unsigned int eax, ebx, ecx, edx;
+@@ -184,11 +173,5 @@ int __init sgx_drv_init(void)
+ 	if (ret)
+ 		return ret;
+ 
+-	ret = misc_register(&sgx_dev_provision);
+-	if (ret) {
+-		misc_deregister(&sgx_dev_enclave);
+-		return ret;
+-	}
+-
+ 	return 0;
  }
+diff --git a/arch/x86/kernel/cpu/sgx/ioctl.c b/arch/x86/kernel/cpu/sgx/ioctl.c
+index 1bae754268d1..4714de12422d 100644
+--- a/arch/x86/kernel/cpu/sgx/ioctl.c
++++ b/arch/x86/kernel/cpu/sgx/ioctl.c
+@@ -2,6 +2,7 @@
+ /*  Copyright(c) 2016-20 Intel Corporation. */
+ 
+ #include <asm/mman.h>
++#include <asm/sgx.h>
+ #include <linux/mman.h>
+ #include <linux/delay.h>
+ #include <linux/file.h>
+@@ -664,24 +665,11 @@ static long sgx_ioc_enclave_init(struct sgx_encl *encl, void __user *arg)
+ static long sgx_ioc_enclave_provision(struct sgx_encl *encl, void __user *arg)
+ {
+ 	struct sgx_enclave_provision params;
+-	struct file *file;
+ 
+ 	if (copy_from_user(&params, arg, sizeof(params)))
+ 		return -EFAULT;
+ 
+-	file = fget(params.fd);
+-	if (!file)
+-		return -EINVAL;
+-
+-	if (file->f_op != &sgx_provision_fops) {
+-		fput(file);
+-		return -EINVAL;
+-	}
+-
+-	encl->attributes_mask |= SGX_ATTR_PROVISIONKEY;
+-
+-	fput(file);
+-	return 0;
++	return sgx_set_attribute(&encl->attributes_mask, params.fd);
+ }
+ 
+ long sgx_ioctl(struct file *filep, unsigned int cmd, unsigned long arg)
+diff --git a/arch/x86/kernel/cpu/sgx/main.c b/arch/x86/kernel/cpu/sgx/main.c
+index 276220d0e4b5..c70bcdb9ef14 100644
+--- a/arch/x86/kernel/cpu/sgx/main.c
++++ b/arch/x86/kernel/cpu/sgx/main.c
+@@ -1,14 +1,17 @@
+ // SPDX-License-Identifier: GPL-2.0
+ /*  Copyright(c) 2016-20 Intel Corporation. */
+ 
++#include <linux/file.h>
+ #include <linux/freezer.h>
+ #include <linux/highmem.h>
+ #include <linux/kthread.h>
++#include <linux/miscdevice.h>
+ #include <linux/pagemap.h>
+ #include <linux/ratelimit.h>
+ #include <linux/sched/mm.h>
+ #include <linux/sched/signal.h>
+ #include <linux/slab.h>
++#include <asm/sgx.h>
+ #include "driver.h"
+ #include "encl.h"
+ #include "encls.h"
+@@ -711,6 +714,51 @@ void sgx_update_lepubkeyhash(u64 *lepubkeyhash)
+ 		wrmsrl(MSR_IA32_SGXLEPUBKEYHASH0 + i, lepubkeyhash[i]);
+ }
+ 
++const struct file_operations sgx_provision_fops = {
++	.owner			= THIS_MODULE,
++};
++
++static struct miscdevice sgx_dev_provision = {
++	.minor = MISC_DYNAMIC_MINOR,
++	.name = "sgx_provision",
++	.nodename = "sgx_provision",
++	.fops = &sgx_provision_fops,
++};
 +
 +/**
-+ * sgx_virt_ecreate() - Run ECREATE on behalf of guest
-+ * @pageinfo:	Pointer to PAGEINFO structure
-+ * @secs:	Userspace pointer to SECS page
-+ * @trapnr:	trap number injected to guest in case of ECREATE error
++ * sgx_set_attribute() - Update allowed attributes given file descriptor
++ * @allowed_attributes: 	Pointer to allowed enclave attributes
++ * @attribute_fd:		File descriptor for specific attribute
 + *
-+ * Run ECREATE on behalf of guest after KVM traps ECREATE for the purpose
-+ * of enforcing policies of guest's enclaves, and return the trap number
-+ * which should be injected to guest in case of any ECREATE error.
++ * Append enclave attribute indicated by file descriptor to allowed
++ * attributes. Currently only SGX_ATTR_PROVISIONKEY indicated by
++ * /dev/sgx_provision is supported.
 + *
 + * Return:
-+ * - 0: 	ECREATE was successful.
-+ * - -EFAULT:	ECREATE returned error.
++ * -0:		SGX_ATTR_PROVISIONKEY is appended to allowed_attributes
++ * -EINVAL:	Invalid, or not supported file descriptor
 + */
-+int sgx_virt_ecreate(struct sgx_pageinfo *pageinfo, void __user *secs,
-+		     int *trapnr)
++int sgx_set_attribute(unsigned long *allowed_attributes,
++		      unsigned int attribute_fd)
 +{
-+	int ret;
++	struct file *file;
 +
-+	/*
-+	 * @secs is userspace address, and it's not guaranteed @secs points at
-+	 * an actual EPC page. It's also possible to generate a kernel mapping
-+	 * to physical EPC page by resolving PFN but using __uaccess_xx() is
-+	 * simpler.
-+	 */
-+	__uaccess_begin();
-+	ret = __ecreate(pageinfo, (void *)secs);
-+	__uaccess_end();
++	file = fget(attribute_fd);
++	if (!file)
++		return -EINVAL;
 +
-+	if (encls_faulted(ret)) {
-+		*trapnr = ENCLS_TRAPNR(ret);
-+		return -EFAULT;
++	if (file->f_op != &sgx_provision_fops) {
++		fput(file);
++		return -EINVAL;
 +	}
 +
-+	/* ECREATE doesn't return an error code, it faults or succeeds. */
-+	WARN_ON_ONCE(ret);
++	*allowed_attributes |= SGX_ATTR_PROVISIONKEY;
++
++	fput(file);
 +	return 0;
 +}
-+EXPORT_SYMBOL_GPL(sgx_virt_ecreate);
++EXPORT_SYMBOL_GPL(sgx_set_attribute);
 +
-+static int __sgx_virt_einit(void __user *sigstruct, void __user *token,
-+			    void __user *secs)
-+{
-+	int ret;
+ static int __init sgx_init(void)
+ {
+ 	int ret;
+@@ -727,6 +775,10 @@ static int __init sgx_init(void)
+ 		goto err_page_cache;
+ 	}
+ 
++	ret = misc_register(&sgx_dev_provision);
++	if (ret)
++		goto err_kthread;
 +
-+	__uaccess_begin();
-+	ret =  __einit((void *)sigstruct, (void *)token, (void *)secs);
-+	__uaccess_end();
+ 	/*
+ 	 * Always try to initialize the native *and* KVM drivers.
+ 	 * The KVM driver is less picky than the native one and
+@@ -737,10 +789,13 @@ static int __init sgx_init(void)
+ 	 */
+ 	ret = !!sgx_drv_init() & !!sgx_vepc_init();
+ 	if (ret)
+-		goto err_kthread;
++		goto err_provision;
+ 
+ 	return 0;
+ 
++err_provision:
++	misc_deregister(&sgx_dev_provision);
 +
-+	return ret;
-+}
-+
-+/**
-+ * sgx_virt_einit() - Run EINIT on behalf of guest
-+ * @sigstruct:		Userspace pointer to SIGSTRUCT structure
-+ * @token:		Userspace pointer to EINITTOKEN structure
-+ * @secs:		Userspace pointer to SECS page
-+ * @lepubkeyhash:	Pointer to guest's *virtual* SGX_LEPUBKEYHASH MSR
-+ * 			values
-+ * @trapnr:		trap number injected to guest in case of EINIT error
-+ *
-+ * Run EINIT on behalf of guest after KVM traps EINIT. If SGX_LC is available
-+ * in host, SGX driver may rewrite the hardware values at wish, therefore KVM
-+ * needs to update hardware values to guest's virtual MSR values in order to
-+ * ensure EINIT is executed with expected hardware values.
-+ *
-+ * Return:
-+ * - 0: 	EINIT was successful.
-+ * - -EFAULT:	EINIT returned error.
-+ */
-+int sgx_virt_einit(void __user *sigstruct, void __user *token,
-+		   void __user *secs, u64 *lepubkeyhash, int *trapnr)
-+{
-+	int ret;
-+
-+	if (!boot_cpu_has(X86_FEATURE_SGX_LC)) {
-+		ret = __sgx_virt_einit(sigstruct, token, secs);
-+	} else {
-+		preempt_disable();
-+
-+		sgx_update_lepubkeyhash(lepubkeyhash);
-+
-+		ret = __sgx_virt_einit(sigstruct, token, secs);
-+		preempt_enable();
-+	}
-+
-+	if (encls_faulted(ret)) {
-+		*trapnr = ENCLS_TRAPNR(ret);
-+		return -EFAULT;
-+	}
-+
-+	return ret;
-+}
-+EXPORT_SYMBOL_GPL(sgx_virt_einit);
+ err_kthread:
+ 	kthread_stop(ksgxd_tsk);
+ 
 -- 
 2.29.2
 
