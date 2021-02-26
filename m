@@ -2,22 +2,21 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 356BC32663C
-	for <lists+kvm@lfdr.de>; Fri, 26 Feb 2021 18:20:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B8F3F32663B
+	for <lists+kvm@lfdr.de>; Fri, 26 Feb 2021 18:20:53 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230081AbhBZRUR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 26 Feb 2021 12:20:17 -0500
-Received: from www.sr71.net ([198.145.64.142]:37568 "EHLO blackbird.sr71.net"
+        id S230070AbhBZRUP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 26 Feb 2021 12:20:15 -0500
+Received: from www.sr71.net ([198.145.64.142]:37575 "EHLO blackbird.sr71.net"
         rhost-flags-OK-FAIL-OK-OK) by vger.kernel.org with ESMTP
-        id S229571AbhBZRUL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 26 Feb 2021 12:20:11 -0500
-X-Greylist: delayed 629 seconds by postgrey-1.27 at vger.kernel.org; Fri, 26 Feb 2021 12:20:10 EST
+        id S229823AbhBZRUK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 26 Feb 2021 12:20:10 -0500
 Received: from [0.0.0.0] (unknown [50.53.169.119])
         (Authenticated sender: dave)
-        by blackbird.sr71.net (Postfix) with ESMTPSA id 0B467FA87F;
-        Fri, 26 Feb 2021 09:08:56 -0800 (PST)
-Subject: Re: [RFC PATCH v6 03/25] x86/sgx: Wipe out EREMOVE from
- sgx_free_epc_page()
+        by blackbird.sr71.net (Postfix) with ESMTPSA id 8122AFA881;
+        Fri, 26 Feb 2021 09:09:57 -0800 (PST)
+Subject: Re: [RFC PATCH v6 08/25] x86/sgx: Expose SGX architectural
+ definitions to the kernel
 To:     Kai Huang <kai.huang@intel.com>, linux-sgx@vger.kernel.org,
         kvm@vger.kernel.org, x86@kernel.org
 Cc:     seanjc@google.com, jarkko@kernel.org, luto@kernel.org,
@@ -25,7 +24,7 @@ Cc:     seanjc@google.com, jarkko@kernel.org, luto@kernel.org,
         pbonzini@redhat.com, bp@alien8.de, tglx@linutronix.de,
         mingo@redhat.com, hpa@zytor.com
 References: <cover.1614338774.git.kai.huang@intel.com>
- <308bd5a53199d1bf520d488f748e11ce76156a33.1614338774.git.kai.huang@intel.com>
+ <caaffe4375099b939dbdb5fa04302dd44c7881e2.1614338774.git.kai.huang@intel.com>
 From:   Dave Hansen <dave@sr71.net>
 Autocrypt: addr=dave@sr71.net; keydata=
  xsFNBE6HMP0BEADIMA3XYkQfF3dwHlj58Yjsc4E5y5G67cfbt8dvaUq2fx1lR0K9h1bOI6fC
@@ -70,62 +69,33 @@ Autocrypt: addr=dave@sr71.net; keydata=
  OPsw5tV/LmQ5GXH0JQ/TZXWygyRFyyI2FqNTx4WHqUn3yFj8rwTAU1tluRUYyeLy0ayUlKBH
  ybj0N71vWO936MqP6haFERzuPAIpxj2ezwu0xb1GjTk4ynna6h5GjnKgdfOWoRtoWndMZxbA
  z5cecg==
-Message-ID: <746450bb-917d-ab6c-9a6a-671112cd203e@sr71.net>
-Date:   Fri, 26 Feb 2021 09:08:54 -0800
+Message-ID: <f52411bc-d18c-895e-a950-c9fa00611399@sr71.net>
+Date:   Fri, 26 Feb 2021 09:09:56 -0800
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <308bd5a53199d1bf520d488f748e11ce76156a33.1614338774.git.kai.huang@intel.com>
+In-Reply-To: <caaffe4375099b939dbdb5fa04302dd44c7881e2.1614338774.git.kai.huang@intel.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2/26/21 4:14 AM, Kai Huang wrote:
-> +/*
-> + * Place the page in uninitialized state.  Only usable by callers that
-> + * know the page is in a clean state in which EREMOVE will succeed.
-> + */
-> +static int sgx_reset_epc_page(struct sgx_epc_page *epc_page)
-> +{
-> +	int ret;
-> +
-> +	WARN_ON_ONCE(epc_page->flags & SGX_EPC_PAGE_RECLAIMER_TRACKED);
-> +
-> +	ret = __eremove(sgx_get_epc_virt_addr(epc_page));
-> +	WARN_ONCE(ret, "EREMOVE returned %d (0x%x)", ret, ret);
-> +
-> +	return ret;
-> +}
-> +
->  /**
->   * sgx_encl_release - Destroy an enclave instance
->   * @kref:	address of a kref inside &sgx_encl
-> @@ -404,7 +421,8 @@ void sgx_encl_release(struct kref *ref)
->  			if (sgx_unmark_page_reclaimable(entry->epc_page))
->  				continue;
->  
-> -			sgx_free_epc_page(entry->epc_page);
-> +			if (!sgx_reset_epc_page(entry->epc_page))
-> +				sgx_free_epc_page(entry->epc_page);
+On 2/26/21 4:15 AM, Kai Huang wrote:
+> From: Sean Christopherson <sean.j.christopherson@intel.com>
+> 
+> Expose SGX architectural structures, as KVM will use many of the
+> architectural constants and structs to virtualize SGX.
+> 
+> Name the new header file as asm/sgx.h, rather than asm/sgx_arch.h, to
+> have single header to provide SGX facilities to share with other kernel
+> componments.
+> 
+> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> Co-developed-by: Kai Huang <kai.huang@intel.com>
+> Signed-off-by: Kai Huang <kai.huang@intel.com>
 
-Won't this leak the page?
-
-I think that's fine; the page *IS* unusable if this happens.  But, the
-error message that will show up isn't super informative.  If this
-happened to a bunch of EPC pages, we'd be out of EPC with nothing to
-show for it.
-
-We must give a more informative message saying that the page is leaked.
- Ideally, we'd also make this debuggable by dumping out how many of
-these pages there have been somewhere.  That can wait, though, until we
-have some kind of stats coming out of the code (there's nothing now).  A
-comment to remind us to do this would be nice.
-
-Anyway, these are in decent shape and only getting better.  It's time to
-get some more eyeballs on them and get the RFC tag off, so assuming that
-a better error message gets stuck in here:
+Looks fine:
 
 Acked-by: Dave Hansen <dave.hansen@intel.com>
