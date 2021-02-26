@@ -2,128 +2,102 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 99AC532686A
-	for <lists+kvm@lfdr.de>; Fri, 26 Feb 2021 21:21:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AA3C4326868
+	for <lists+kvm@lfdr.de>; Fri, 26 Feb 2021 21:21:53 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231358AbhBZUQu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 26 Feb 2021 15:16:50 -0500
-Received: from mga17.intel.com ([192.55.52.151]:35678 "EHLO mga17.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231150AbhBZUOC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 26 Feb 2021 15:14:02 -0500
-IronPort-SDR: VxfR5jkt3HFxkn681jJcDta0X1KeYqEP8rBlGLR3rNCUxrT7N/VncmFDF1QYT1WzgTA0JcUM2m
- Ykl42Q2WsRvQ==
-X-IronPort-AV: E=McAfee;i="6000,8403,9907"; a="165846919"
-X-IronPort-AV: E=Sophos;i="5.81,209,1610438400"; 
-   d="scan'208";a="165846919"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Feb 2021 12:11:15 -0800
-IronPort-SDR: nb0fcvfHHm0m8Hdy1+xls3a8hEnYNqDlXOEEWSI1luFshB5X1P5oXgEgsXgT8eoI0Qn46ShK9E
- yLC1P6ZemW2g==
-X-IronPort-AV: E=Sophos;i="5.81,209,1610438400"; 
-   d="scan'208";a="405109464"
-Received: from megha-z97x-ud7-th.sc.intel.com ([143.183.85.154])
-  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-SHA; 26 Feb 2021 12:11:15 -0800
-From:   Megha Dey <megha.dey@intel.com>
-To:     tglx@linutronix.de
-Cc:     linux-kernel@vger.kernel.org, dave.jiang@intel.com,
-        ashok.raj@intel.com, kevin.tian@intel.com, dwmw@amazon.co.uk,
-        x86@kernel.org, tony.luck@intel.com, dan.j.williams@intel.com,
-        megha.dey@intel.com, jgg@mellanox.com, kvm@vger.kernel.org,
-        iommu@lists.linux-foundation.org, alex.williamson@redhat.com,
-        bhelgaas@google.com, maz@kernel.org, linux-pci@vger.kernel.org,
-        baolu.lu@linux.intel.com, ravi.v.shankar@intel.com
-Subject: [Patch V2 13/13] genirq/msi: Provide helpers to return Linux IRQ/dev_msi hw IRQ number
-Date:   Fri, 26 Feb 2021 12:11:17 -0800
-Message-Id: <1614370277-23235-14-git-send-email-megha.dey@intel.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1614370277-23235-1-git-send-email-megha.dey@intel.com>
-References: <1614370277-23235-1-git-send-email-megha.dey@intel.com>
+        id S231132AbhBZUQg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 26 Feb 2021 15:16:36 -0500
+Received: from www.sr71.net ([198.145.64.142]:38897 "EHLO blackbird.sr71.net"
+        rhost-flags-OK-FAIL-OK-OK) by vger.kernel.org with ESMTP
+        id S230492AbhBZUNu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 26 Feb 2021 15:13:50 -0500
+Received: from [0.0.0.0] (unknown [50.53.169.119])
+        (Authenticated sender: dave)
+        by blackbird.sr71.net (Postfix) with ESMTPSA id 32237FA8AA;
+        Fri, 26 Feb 2021 12:12:58 -0800 (PST)
+Subject: Re: [RFC PATCH v6 03/25] x86/sgx: Wipe out EREMOVE from
+ sgx_free_epc_page()
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Kai Huang <kai.huang@intel.com>, linux-sgx@vger.kernel.org,
+        kvm@vger.kernel.org, x86@kernel.org, jarkko@kernel.org,
+        luto@kernel.org, rick.p.edgecombe@intel.com,
+        haitao.huang@intel.com, pbonzini@redhat.com, bp@alien8.de,
+        tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com
+References: <cover.1614338774.git.kai.huang@intel.com>
+ <308bd5a53199d1bf520d488f748e11ce76156a33.1614338774.git.kai.huang@intel.com>
+ <746450bb-917d-ab6c-9a6a-671112cd203e@sr71.net> <YDlRgtnVS4+KkzUW@google.com>
+From:   Dave Hansen <dave@sr71.net>
+Autocrypt: addr=dave@sr71.net; keydata=
+ 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
+ z5cecg==
+Message-ID: <55e0f003-ca2b-24d2-5a23-31a77c5b943d@sr71.net>
+Date:   Fri, 26 Feb 2021 12:12:56 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
+MIME-Version: 1.0
+In-Reply-To: <YDlRgtnVS4+KkzUW@google.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Dave Jiang <dave.jiang@intel.com>
+On 2/26/21 11:52 AM, Sean Christopherson wrote:
+>> We must give a more informative message saying that the page is leaked.
+>>  Ideally, we'd also make this debuggable by dumping out how many of
+>> these pages there have been somewhere.  That can wait, though, until we
+>> have some kind of stats coming out of the code (there's nothing now).  A
+>> comment to remind us to do this would be nice.
+> Eh, having debugged these several times, the WARN_ONCE in sgx_reset_epc_page()
+> is probably sufficient.  IIRC, when I hit this, things were either laughably
+> broken and every page was failing, or there was another ENCLS failure somewhere
+> else that provided additional info.  Not saying don't add more debug info,
+> rather that it's probably not a priority.
 
-Add new helpers to get the Linux IRQ number and device specific index
-for given device-relative vector so that the drivers don't need to
-allocate their own arrays to keep track of the vectors and hwirq for
-the multi vector device MSI case.
+Minimally, I just want a warning that says, "Whoops, I leaked a page".
+Or EREMOVE could even say, "whoops, this *MIGHT* leak a page".
 
-Reviewed-by: Tony Luck <tony.luck@intel.com>
-Signed-off-by: Dave Jiang <dave.jiang@intel.com>
-Signed-off-by: Megha Dey <megha.dey@intel.com>
----
- include/linux/msi.h |  2 ++
- kernel/irq/msi.c    | 44 ++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 46 insertions(+)
-
-diff --git a/include/linux/msi.h b/include/linux/msi.h
-index 24abec0..d60a6ba 100644
---- a/include/linux/msi.h
-+++ b/include/linux/msi.h
-@@ -451,6 +451,8 @@ struct irq_domain *platform_msi_create_irq_domain(struct fwnode_handle *fwnode,
- int platform_msi_domain_alloc_irqs(struct device *dev, unsigned int nvec,
- 				   irq_write_msi_msg_t write_msi_msg);
- void platform_msi_domain_free_irqs(struct device *dev);
-+int msi_irq_vector(struct device *dev, unsigned int nr);
-+int dev_msi_hwirq(struct device *dev, unsigned int nr);
- 
- /* When an MSI domain is used as an intermediate domain */
- int msi_domain_prepare_irqs(struct irq_domain *domain, struct device *dev,
-diff --git a/kernel/irq/msi.c b/kernel/irq/msi.c
-index 047b59d..f2a8f55 100644
---- a/kernel/irq/msi.c
-+++ b/kernel/irq/msi.c
-@@ -581,4 +581,48 @@ struct msi_domain_info *msi_get_domain_info(struct irq_domain *domain)
- 	return (struct msi_domain_info *)domain->host_data;
- }
- 
-+/**
-+ * msi_irq_vector - Get the Linux IRQ number of a device vector
-+ * @dev: device to operate on
-+ * @nr: device-relative interrupt vector index (0-based).
-+ *
-+ * Returns the Linux IRQ number of a device vector.
-+ */
-+int msi_irq_vector(struct device *dev, unsigned int nr)
-+{
-+	struct msi_desc *entry;
-+	int i = 0;
-+
-+	for_each_msi_entry(entry, dev) {
-+		if (i == nr)
-+			return entry->irq;
-+		i++;
-+	}
-+	WARN_ON_ONCE(1);
-+	return -EINVAL;
-+}
-+EXPORT_SYMBOL_GPL(msi_irq_vector);
-+
-+/**
-+ * dev_msi_hwirq - Get the device MSI hw IRQ number of a device vector
-+ * @dev: device to operate on
-+ * @nr: device-relative interrupt vector index (0-based).
-+ *
-+ * Return the dev_msi hw IRQ number of a device vector.
-+ */
-+int dev_msi_hwirq(struct device *dev, unsigned int nr)
-+{
-+	struct msi_desc *entry;
-+	int i = 0;
-+
-+	for_each_msi_entry(entry, dev) {
-+		if (i == nr)
-+			return entry->device_msi.hwirq;
-+		i++;
-+	}
-+	WARN_ON_ONCE(1);
-+	return -EINVAL;
-+}
-+EXPORT_SYMBOL_GPL(dev_msi_hwirq);
-+
- #endif /* CONFIG_GENERIC_MSI_IRQ_DOMAIN */
--- 
-2.7.4
-
+My beef is mostly that "EREMOVE failed" doesn't tell and end user squat
+about what this means for their system.  At least if we say "leaked",
+they have some inclination that they've got to reboot to get the page back.
