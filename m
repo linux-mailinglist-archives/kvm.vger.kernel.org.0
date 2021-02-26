@@ -2,94 +2,218 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 51804325B78
-	for <lists+kvm@lfdr.de>; Fri, 26 Feb 2021 03:11:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 465D7325BBE
+	for <lists+kvm@lfdr.de>; Fri, 26 Feb 2021 03:50:09 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230071AbhBZCKl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 25 Feb 2021 21:10:41 -0500
-Received: from mga03.intel.com ([134.134.136.65]:38815 "EHLO mga03.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229946AbhBZCKk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 25 Feb 2021 21:10:40 -0500
-IronPort-SDR: nmv1+Q10UMgi96fmVub3EZcwpZwqhuvBkBtkIOeIYE/+unUFViVzxkwSOWjrWGIr8tJTEE/jua
- VMrM8zlg/wEA==
-X-IronPort-AV: E=McAfee;i="6000,8403,9906"; a="185801057"
-X-IronPort-AV: E=Sophos;i="5.81,207,1610438400"; 
-   d="scan'208";a="185801057"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Feb 2021 18:09:40 -0800
-IronPort-SDR: wStmTtDX93fdampCzql84sre2j4URVf8d/sD4BMi2z7RCR0l6gO3bB84MWA3sTVRSV0/SDqp3v
- if4FVIWtiHRg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.81,207,1610438400"; 
-   d="scan'208";a="404680191"
-Received: from unknown (HELO local-michael-cet-test.sh.intel.com) ([10.239.159.166])
-  by orsmga008.jf.intel.com with ESMTP; 25 Feb 2021 18:09:37 -0800
-From:   Yang Weijiang <weijiang.yang@intel.com>
-To:     pbonzini@redhat.com, richard.henderson@linaro.org,
-        ehabkost@redhat.com, mtosatti@redhat.com,
-        sean.j.christopherson@intel.com, qemu-devel@nongnu.org,
-        kvm@vger.kernel.org
-Cc:     Yang Weijiang <weijiang.yang@intel.com>
-Subject: [PATCH v7 6/6] target/i386: Advise CET bits in CPU/MSR feature words
-Date:   Fri, 26 Feb 2021 10:20:58 +0800
-Message-Id: <20210226022058.24562-7-weijiang.yang@intel.com>
-X-Mailer: git-send-email 2.17.2
-In-Reply-To: <20210226022058.24562-1-weijiang.yang@intel.com>
-References: <20210226022058.24562-1-weijiang.yang@intel.com>
+        id S230121AbhBZCuE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 25 Feb 2021 21:50:04 -0500
+Received: from szxga01-in.huawei.com ([45.249.212.187]:2589 "EHLO
+        szxga01-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229491AbhBZCuB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 25 Feb 2021 21:50:01 -0500
+Received: from dggeme710-chm.china.huawei.com (unknown [172.30.72.55])
+        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4DmvDw2zpfzWDpK;
+        Fri, 26 Feb 2021 10:46:40 +0800 (CST)
+Received: from [10.174.187.128] (10.174.187.128) by
+ dggeme710-chm.china.huawei.com (10.1.199.106) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.2106.2; Fri, 26 Feb 2021 10:49:16 +0800
+Subject: Re: [RFC PATCH v2 2/7] KVM: selftests: Use flag CLOCK_MONOTONIC_RAW
+ for timing
+To:     Andrew Jones <drjones@redhat.com>
+CC:     <kvm@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Ben Gardon <bgardon@google.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Arnaldo Carvalho de Melo <acme@redhat.com>,
+        Ingo Molnar <mingo@kernel.org>, Peter Xu <peterx@redhat.com>,
+        Marc Zyngier <maz@kernel.org>, <wanghaibin.wang@huawei.com>,
+        <yuzenghui@huawei.com>
+References: <20210225055940.18748-1-wangyanan55@huawei.com>
+ <20210225055940.18748-3-wangyanan55@huawei.com>
+ <20210225185430.fgafepkqo42u2yci@kamzik.brq.redhat.com>
+From:   "wangyanan (Y)" <wangyanan55@huawei.com>
+Message-ID: <eca23409-21fc-b6d9-31b3-cab5eb703c98@huawei.com>
+Date:   Fri, 26 Feb 2021 10:49:16 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.4.0
+MIME-Version: 1.0
+In-Reply-To: <20210225185430.fgafepkqo42u2yci@kamzik.brq.redhat.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-Originating-IP: [10.174.187.128]
+X-ClientProxiedBy: dggeme702-chm.china.huawei.com (10.1.199.98) To
+ dggeme710-chm.china.huawei.com (10.1.199.106)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-CET SHSTK and IBT feature are enumerated via CPUID.(EAX=07H,ECX=0H):ECX[bit 7]
-and EDX[bit 20]. CET state load/restore at vmentry/vmexit are enabled via
-VMX_ENTRY_CTLS[bit 20] and VMX_EXIT_CTLS[bit 28].
 
-Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
----
- target/i386/cpu.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+On 2021/2/26 2:54, Andrew Jones wrote:
+> On Thu, Feb 25, 2021 at 01:59:35PM +0800, Yanan Wang wrote:
+>> In addition to function of CLOCK_MONOTONIC, flag CLOCK_MONOTONIC_RAW can
+>> also shield possiable impact of NTP, which can provide more robustness.
+> IIRC, this should include
+>
+> Suggested-by: Vitaly Kuznetsov <vkuznets@redhat.com>
 
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index ef786b920e..d1dcc7210d 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -954,7 +954,7 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
-         .type = CPUID_FEATURE_WORD,
-         .feat_names = {
-             NULL, "avx512vbmi", "umip", "pku",
--            NULL /* ospke */, "waitpkg", "avx512vbmi2", NULL,
-+            NULL /* ospke */, "waitpkg", "avx512vbmi2", "shstk",
-             "gfni", "vaes", "vpclmulqdq", "avx512vnni",
-             "avx512bitalg", NULL, "avx512-vpopcntdq", NULL,
-             "la57", NULL, NULL, NULL,
-@@ -977,7 +977,7 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
-             "avx512-vp2intersect", NULL, "md-clear", NULL,
-             NULL, NULL, "serialize", NULL,
-             "tsx-ldtrk", NULL, NULL /* pconfig */, NULL,
--            NULL, NULL, NULL, NULL,
-+            "ibt", NULL, NULL, NULL,
-             NULL, NULL, "spec-ctrl", "stibp",
-             NULL, "arch-capabilities", "core-capability", "ssbd",
-         },
-@@ -1239,7 +1239,7 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
-             "vmx-exit-save-efer", "vmx-exit-load-efer",
-                 "vmx-exit-save-preemption-timer", "vmx-exit-clear-bndcfgs",
-             NULL, "vmx-exit-clear-rtit-ctl", NULL, NULL,
--            NULL, NULL, NULL, NULL,
-+            "vmx-exit-save-cet-ctl", NULL, NULL, NULL,
-         },
-         .msr = {
-             .index = MSR_IA32_VMX_TRUE_EXIT_CTLS,
-@@ -1254,7 +1254,7 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
-             NULL, "vmx-entry-ia32e-mode", NULL, NULL,
-             NULL, "vmx-entry-load-perf-global-ctrl", "vmx-entry-load-pat", "vmx-entry-load-efer",
-             "vmx-entry-load-bndcfgs", NULL, "vmx-entry-load-rtit-ctl", NULL,
--            NULL, NULL, NULL, NULL,
-+            "vmx-entry-load-cet-ctl", NULL, NULL, NULL,
-             NULL, NULL, NULL, NULL,
-             NULL, NULL, NULL, NULL,
-         },
--- 
-2.26.2
+Oh, sorry for my rashness. I will include it in v3.
 
+Thanks,
+
+Yanan
+
+>> Signed-off-by: Yanan Wang <wangyanan55@huawei.com>
+>> ---
+>>   tools/testing/selftests/kvm/demand_paging_test.c  |  8 ++++----
+>>   tools/testing/selftests/kvm/dirty_log_perf_test.c | 14 +++++++-------
+>>   tools/testing/selftests/kvm/lib/test_util.c       |  2 +-
+>>   tools/testing/selftests/kvm/steal_time.c          |  4 ++--
+>>   4 files changed, 14 insertions(+), 14 deletions(-)
+>>
+>> diff --git a/tools/testing/selftests/kvm/demand_paging_test.c b/tools/testing/selftests/kvm/demand_paging_test.c
+>> index 5f7a229c3af1..efbf0c1e9130 100644
+>> --- a/tools/testing/selftests/kvm/demand_paging_test.c
+>> +++ b/tools/testing/selftests/kvm/demand_paging_test.c
+>> @@ -53,7 +53,7 @@ static void *vcpu_worker(void *data)
+>>   	vcpu_args_set(vm, vcpu_id, 1, vcpu_id);
+>>   	run = vcpu_state(vm, vcpu_id);
+>>   
+>> -	clock_gettime(CLOCK_MONOTONIC, &start);
+>> +	clock_gettime(CLOCK_MONOTONIC_RAW, &start);
+>>   
+>>   	/* Let the guest access its memory */
+>>   	ret = _vcpu_run(vm, vcpu_id);
+>> @@ -86,7 +86,7 @@ static int handle_uffd_page_request(int uffd, uint64_t addr)
+>>   	copy.len = perf_test_args.host_page_size;
+>>   	copy.mode = 0;
+>>   
+>> -	clock_gettime(CLOCK_MONOTONIC, &start);
+>> +	clock_gettime(CLOCK_MONOTONIC_RAW, &start);
+>>   
+>>   	r = ioctl(uffd, UFFDIO_COPY, &copy);
+>>   	if (r == -1) {
+>> @@ -123,7 +123,7 @@ static void *uffd_handler_thread_fn(void *arg)
+>>   	struct timespec start;
+>>   	struct timespec ts_diff;
+>>   
+>> -	clock_gettime(CLOCK_MONOTONIC, &start);
+>> +	clock_gettime(CLOCK_MONOTONIC_RAW, &start);
+>>   	while (!quit_uffd_thread) {
+>>   		struct uffd_msg msg;
+>>   		struct pollfd pollfd[2];
+>> @@ -336,7 +336,7 @@ static void run_test(enum vm_guest_mode mode, void *arg)
+>>   
+>>   	pr_info("Finished creating vCPUs and starting uffd threads\n");
+>>   
+>> -	clock_gettime(CLOCK_MONOTONIC, &start);
+>> +	clock_gettime(CLOCK_MONOTONIC_RAW, &start);
+>>   
+>>   	for (vcpu_id = 0; vcpu_id < nr_vcpus; vcpu_id++) {
+>>   		pthread_create(&vcpu_threads[vcpu_id], NULL, vcpu_worker,
+>> diff --git a/tools/testing/selftests/kvm/dirty_log_perf_test.c b/tools/testing/selftests/kvm/dirty_log_perf_test.c
+>> index 04a2641261be..6cff4ccf9525 100644
+>> --- a/tools/testing/selftests/kvm/dirty_log_perf_test.c
+>> +++ b/tools/testing/selftests/kvm/dirty_log_perf_test.c
+>> @@ -50,7 +50,7 @@ static void *vcpu_worker(void *data)
+>>   	while (!READ_ONCE(host_quit)) {
+>>   		int current_iteration = READ_ONCE(iteration);
+>>   
+>> -		clock_gettime(CLOCK_MONOTONIC, &start);
+>> +		clock_gettime(CLOCK_MONOTONIC_RAW, &start);
+>>   		ret = _vcpu_run(vm, vcpu_id);
+>>   		ts_diff = timespec_elapsed(start);
+>>   
+>> @@ -141,7 +141,7 @@ static void run_test(enum vm_guest_mode mode, void *arg)
+>>   	iteration = 0;
+>>   	host_quit = false;
+>>   
+>> -	clock_gettime(CLOCK_MONOTONIC, &start);
+>> +	clock_gettime(CLOCK_MONOTONIC_RAW, &start);
+>>   	for (vcpu_id = 0; vcpu_id < nr_vcpus; vcpu_id++) {
+>>   		vcpu_last_completed_iteration[vcpu_id] = -1;
+>>   
+>> @@ -162,7 +162,7 @@ static void run_test(enum vm_guest_mode mode, void *arg)
+>>   		ts_diff.tv_sec, ts_diff.tv_nsec);
+>>   
+>>   	/* Enable dirty logging */
+>> -	clock_gettime(CLOCK_MONOTONIC, &start);
+>> +	clock_gettime(CLOCK_MONOTONIC_RAW, &start);
+>>   	vm_mem_region_set_flags(vm, PERF_TEST_MEM_SLOT_INDEX,
+>>   				KVM_MEM_LOG_DIRTY_PAGES);
+>>   	ts_diff = timespec_elapsed(start);
+>> @@ -174,7 +174,7 @@ static void run_test(enum vm_guest_mode mode, void *arg)
+>>   		 * Incrementing the iteration number will start the vCPUs
+>>   		 * dirtying memory again.
+>>   		 */
+>> -		clock_gettime(CLOCK_MONOTONIC, &start);
+>> +		clock_gettime(CLOCK_MONOTONIC_RAW, &start);
+>>   		iteration++;
+>>   
+>>   		pr_debug("Starting iteration %d\n", iteration);
+>> @@ -189,7 +189,7 @@ static void run_test(enum vm_guest_mode mode, void *arg)
+>>   		pr_info("Iteration %d dirty memory time: %ld.%.9lds\n",
+>>   			iteration, ts_diff.tv_sec, ts_diff.tv_nsec);
+>>   
+>> -		clock_gettime(CLOCK_MONOTONIC, &start);
+>> +		clock_gettime(CLOCK_MONOTONIC_RAW, &start);
+>>   		kvm_vm_get_dirty_log(vm, PERF_TEST_MEM_SLOT_INDEX, bmap);
+>>   
+>>   		ts_diff = timespec_elapsed(start);
+>> @@ -199,7 +199,7 @@ static void run_test(enum vm_guest_mode mode, void *arg)
+>>   			iteration, ts_diff.tv_sec, ts_diff.tv_nsec);
+>>   
+>>   		if (dirty_log_manual_caps) {
+>> -			clock_gettime(CLOCK_MONOTONIC, &start);
+>> +			clock_gettime(CLOCK_MONOTONIC_RAW, &start);
+>>   			kvm_vm_clear_dirty_log(vm, PERF_TEST_MEM_SLOT_INDEX, bmap, 0,
+>>   					       host_num_pages);
+>>   
+>> @@ -212,7 +212,7 @@ static void run_test(enum vm_guest_mode mode, void *arg)
+>>   	}
+>>   
+>>   	/* Disable dirty logging */
+>> -	clock_gettime(CLOCK_MONOTONIC, &start);
+>> +	clock_gettime(CLOCK_MONOTONIC_RAW, &start);
+>>   	vm_mem_region_set_flags(vm, PERF_TEST_MEM_SLOT_INDEX, 0);
+>>   	ts_diff = timespec_elapsed(start);
+>>   	pr_info("Disabling dirty logging time: %ld.%.9lds\n",
+>> diff --git a/tools/testing/selftests/kvm/lib/test_util.c b/tools/testing/selftests/kvm/lib/test_util.c
+>> index 906c955384e2..c7c0627c6842 100644
+>> --- a/tools/testing/selftests/kvm/lib/test_util.c
+>> +++ b/tools/testing/selftests/kvm/lib/test_util.c
+>> @@ -89,7 +89,7 @@ struct timespec timespec_elapsed(struct timespec start)
+>>   {
+>>   	struct timespec end;
+>>   
+>> -	clock_gettime(CLOCK_MONOTONIC, &end);
+>> +	clock_gettime(CLOCK_MONOTONIC_RAW, &end);
+>>   	return timespec_sub(end, start);
+>>   }
+>>   
+>> diff --git a/tools/testing/selftests/kvm/steal_time.c b/tools/testing/selftests/kvm/steal_time.c
+>> index fcc840088c91..5bc582d3f2a2 100644
+>> --- a/tools/testing/selftests/kvm/steal_time.c
+>> +++ b/tools/testing/selftests/kvm/steal_time.c
+>> @@ -237,11 +237,11 @@ static void *do_steal_time(void *arg)
+>>   {
+>>   	struct timespec ts, stop;
+>>   
+>> -	clock_gettime(CLOCK_MONOTONIC, &ts);
+>> +	clock_gettime(CLOCK_MONOTONIC_RAW, &ts);
+>>   	stop = timespec_add_ns(ts, MIN_RUN_DELAY_NS);
+>>   
+>>   	while (1) {
+>> -		clock_gettime(CLOCK_MONOTONIC, &ts);
+>> +		clock_gettime(CLOCK_MONOTONIC_RAW, &ts);
+>>   		if (timespec_to_ns(timespec_sub(ts, stop)) >= 0)
+>>   			break;
+>>   	}
+>> -- 
+>> 2.19.1
+>>
+> .
