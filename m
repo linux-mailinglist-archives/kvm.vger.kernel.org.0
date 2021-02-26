@@ -2,218 +2,60 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 465D7325BBE
-	for <lists+kvm@lfdr.de>; Fri, 26 Feb 2021 03:50:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 71752325D41
+	for <lists+kvm@lfdr.de>; Fri, 26 Feb 2021 06:39:18 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230121AbhBZCuE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 25 Feb 2021 21:50:04 -0500
-Received: from szxga01-in.huawei.com ([45.249.212.187]:2589 "EHLO
-        szxga01-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229491AbhBZCuB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 25 Feb 2021 21:50:01 -0500
-Received: from dggeme710-chm.china.huawei.com (unknown [172.30.72.55])
-        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4DmvDw2zpfzWDpK;
-        Fri, 26 Feb 2021 10:46:40 +0800 (CST)
-Received: from [10.174.187.128] (10.174.187.128) by
- dggeme710-chm.china.huawei.com (10.1.199.106) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
- 15.1.2106.2; Fri, 26 Feb 2021 10:49:16 +0800
-Subject: Re: [RFC PATCH v2 2/7] KVM: selftests: Use flag CLOCK_MONOTONIC_RAW
- for timing
-To:     Andrew Jones <drjones@redhat.com>
-CC:     <kvm@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Ben Gardon <bgardon@google.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Arnaldo Carvalho de Melo <acme@redhat.com>,
-        Ingo Molnar <mingo@kernel.org>, Peter Xu <peterx@redhat.com>,
-        Marc Zyngier <maz@kernel.org>, <wanghaibin.wang@huawei.com>,
-        <yuzenghui@huawei.com>
-References: <20210225055940.18748-1-wangyanan55@huawei.com>
- <20210225055940.18748-3-wangyanan55@huawei.com>
- <20210225185430.fgafepkqo42u2yci@kamzik.brq.redhat.com>
-From:   "wangyanan (Y)" <wangyanan55@huawei.com>
-Message-ID: <eca23409-21fc-b6d9-31b3-cab5eb703c98@huawei.com>
-Date:   Fri, 26 Feb 2021 10:49:16 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.4.0
+        id S229599AbhBZFjC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 26 Feb 2021 00:39:02 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50780 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229526AbhBZFjA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 26 Feb 2021 00:39:00 -0500
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 66C62C061574;
+        Thu, 25 Feb 2021 21:38:20 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=B81HiCHH2Umn9d439xCfrrLYHKIefOnMbAaD6qr9ZCE=; b=D7hlFC7jcVerLgiOAWjsfkgpqc
+        gitm/z4uPHTsIx3IJVtJjv1+yAIY/xA21guaaDUMhBuCQL/7TPJ5sPimXQEX7hsu7d5rFw3ReZXQd
+        sTDcQ44OWARIV1JwdZVr2/rFeGCAMdOjeHcAUcsOnPPPqbGKCNf68V02RqxjfTc6Qp19+K2EiezWw
+        PtdO/H1RV/7jzPzUPQ9riqOc5zvJBcE6JR4nE5Y8VNabYZrhBB51alur+Q/XnxHrAVvPVV2VgN72N
+        IkwYvbwNg2Y7qq/jeWsASIFEyOhv3f8pIuRZkVcjtSGsVvZt+YAUk1dY/A42W19FaiSK/Rcpp0J22
+        4+xYnnnA==;
+Received: from hch by casper.infradead.org with local (Exim 4.94 #2 (Red Hat Linux))
+        id 1lFVpE-00BbQP-7q; Fri, 26 Feb 2021 05:38:05 +0000
+Date:   Fri, 26 Feb 2021 05:38:04 +0000
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     cohuck@redhat.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, jgg@nvidia.com, peterx@redhat.com,
+        viro@zeniv.linux.org.uk
+Subject: Re: [RFC PATCH 01/10] vfio: Create vfio_fs_type with inode per device
+Message-ID: <20210226053804.GA2764758@infradead.org>
+References: <161401167013.16443.8389863523766611711.stgit@gimli.home>
+ <161401263517.16443.7534035240372538844.stgit@gimli.home>
 MIME-Version: 1.0
-In-Reply-To: <20210225185430.fgafepkqo42u2yci@kamzik.brq.redhat.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-Originating-IP: [10.174.187.128]
-X-ClientProxiedBy: dggeme702-chm.china.huawei.com (10.1.199.98) To
- dggeme710-chm.china.huawei.com (10.1.199.106)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <161401263517.16443.7534035240372538844.stgit@gimli.home>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Mon, Feb 22, 2021 at 09:50:35AM -0700, Alex Williamson wrote:
+> By linking all the device fds we provide to userspace to an
+> address space through a new pseudo fs, we can use tools like
+> unmap_mapping_range() to zap all vmas associated with a device.
+> 
+> Suggested-by: Jason Gunthorpe <jgg@nvidia.com>
+> Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
 
-On 2021/2/26 2:54, Andrew Jones wrote:
-> On Thu, Feb 25, 2021 at 01:59:35PM +0800, Yanan Wang wrote:
->> In addition to function of CLOCK_MONOTONIC, flag CLOCK_MONOTONIC_RAW can
->> also shield possiable impact of NTP, which can provide more robustness.
-> IIRC, this should include
->
-> Suggested-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+Adding Al:
 
-Oh, sorry for my rashness. I will include it in v3.
-
-Thanks,
-
-Yanan
-
->> Signed-off-by: Yanan Wang <wangyanan55@huawei.com>
->> ---
->>   tools/testing/selftests/kvm/demand_paging_test.c  |  8 ++++----
->>   tools/testing/selftests/kvm/dirty_log_perf_test.c | 14 +++++++-------
->>   tools/testing/selftests/kvm/lib/test_util.c       |  2 +-
->>   tools/testing/selftests/kvm/steal_time.c          |  4 ++--
->>   4 files changed, 14 insertions(+), 14 deletions(-)
->>
->> diff --git a/tools/testing/selftests/kvm/demand_paging_test.c b/tools/testing/selftests/kvm/demand_paging_test.c
->> index 5f7a229c3af1..efbf0c1e9130 100644
->> --- a/tools/testing/selftests/kvm/demand_paging_test.c
->> +++ b/tools/testing/selftests/kvm/demand_paging_test.c
->> @@ -53,7 +53,7 @@ static void *vcpu_worker(void *data)
->>   	vcpu_args_set(vm, vcpu_id, 1, vcpu_id);
->>   	run = vcpu_state(vm, vcpu_id);
->>   
->> -	clock_gettime(CLOCK_MONOTONIC, &start);
->> +	clock_gettime(CLOCK_MONOTONIC_RAW, &start);
->>   
->>   	/* Let the guest access its memory */
->>   	ret = _vcpu_run(vm, vcpu_id);
->> @@ -86,7 +86,7 @@ static int handle_uffd_page_request(int uffd, uint64_t addr)
->>   	copy.len = perf_test_args.host_page_size;
->>   	copy.mode = 0;
->>   
->> -	clock_gettime(CLOCK_MONOTONIC, &start);
->> +	clock_gettime(CLOCK_MONOTONIC_RAW, &start);
->>   
->>   	r = ioctl(uffd, UFFDIO_COPY, &copy);
->>   	if (r == -1) {
->> @@ -123,7 +123,7 @@ static void *uffd_handler_thread_fn(void *arg)
->>   	struct timespec start;
->>   	struct timespec ts_diff;
->>   
->> -	clock_gettime(CLOCK_MONOTONIC, &start);
->> +	clock_gettime(CLOCK_MONOTONIC_RAW, &start);
->>   	while (!quit_uffd_thread) {
->>   		struct uffd_msg msg;
->>   		struct pollfd pollfd[2];
->> @@ -336,7 +336,7 @@ static void run_test(enum vm_guest_mode mode, void *arg)
->>   
->>   	pr_info("Finished creating vCPUs and starting uffd threads\n");
->>   
->> -	clock_gettime(CLOCK_MONOTONIC, &start);
->> +	clock_gettime(CLOCK_MONOTONIC_RAW, &start);
->>   
->>   	for (vcpu_id = 0; vcpu_id < nr_vcpus; vcpu_id++) {
->>   		pthread_create(&vcpu_threads[vcpu_id], NULL, vcpu_worker,
->> diff --git a/tools/testing/selftests/kvm/dirty_log_perf_test.c b/tools/testing/selftests/kvm/dirty_log_perf_test.c
->> index 04a2641261be..6cff4ccf9525 100644
->> --- a/tools/testing/selftests/kvm/dirty_log_perf_test.c
->> +++ b/tools/testing/selftests/kvm/dirty_log_perf_test.c
->> @@ -50,7 +50,7 @@ static void *vcpu_worker(void *data)
->>   	while (!READ_ONCE(host_quit)) {
->>   		int current_iteration = READ_ONCE(iteration);
->>   
->> -		clock_gettime(CLOCK_MONOTONIC, &start);
->> +		clock_gettime(CLOCK_MONOTONIC_RAW, &start);
->>   		ret = _vcpu_run(vm, vcpu_id);
->>   		ts_diff = timespec_elapsed(start);
->>   
->> @@ -141,7 +141,7 @@ static void run_test(enum vm_guest_mode mode, void *arg)
->>   	iteration = 0;
->>   	host_quit = false;
->>   
->> -	clock_gettime(CLOCK_MONOTONIC, &start);
->> +	clock_gettime(CLOCK_MONOTONIC_RAW, &start);
->>   	for (vcpu_id = 0; vcpu_id < nr_vcpus; vcpu_id++) {
->>   		vcpu_last_completed_iteration[vcpu_id] = -1;
->>   
->> @@ -162,7 +162,7 @@ static void run_test(enum vm_guest_mode mode, void *arg)
->>   		ts_diff.tv_sec, ts_diff.tv_nsec);
->>   
->>   	/* Enable dirty logging */
->> -	clock_gettime(CLOCK_MONOTONIC, &start);
->> +	clock_gettime(CLOCK_MONOTONIC_RAW, &start);
->>   	vm_mem_region_set_flags(vm, PERF_TEST_MEM_SLOT_INDEX,
->>   				KVM_MEM_LOG_DIRTY_PAGES);
->>   	ts_diff = timespec_elapsed(start);
->> @@ -174,7 +174,7 @@ static void run_test(enum vm_guest_mode mode, void *arg)
->>   		 * Incrementing the iteration number will start the vCPUs
->>   		 * dirtying memory again.
->>   		 */
->> -		clock_gettime(CLOCK_MONOTONIC, &start);
->> +		clock_gettime(CLOCK_MONOTONIC_RAW, &start);
->>   		iteration++;
->>   
->>   		pr_debug("Starting iteration %d\n", iteration);
->> @@ -189,7 +189,7 @@ static void run_test(enum vm_guest_mode mode, void *arg)
->>   		pr_info("Iteration %d dirty memory time: %ld.%.9lds\n",
->>   			iteration, ts_diff.tv_sec, ts_diff.tv_nsec);
->>   
->> -		clock_gettime(CLOCK_MONOTONIC, &start);
->> +		clock_gettime(CLOCK_MONOTONIC_RAW, &start);
->>   		kvm_vm_get_dirty_log(vm, PERF_TEST_MEM_SLOT_INDEX, bmap);
->>   
->>   		ts_diff = timespec_elapsed(start);
->> @@ -199,7 +199,7 @@ static void run_test(enum vm_guest_mode mode, void *arg)
->>   			iteration, ts_diff.tv_sec, ts_diff.tv_nsec);
->>   
->>   		if (dirty_log_manual_caps) {
->> -			clock_gettime(CLOCK_MONOTONIC, &start);
->> +			clock_gettime(CLOCK_MONOTONIC_RAW, &start);
->>   			kvm_vm_clear_dirty_log(vm, PERF_TEST_MEM_SLOT_INDEX, bmap, 0,
->>   					       host_num_pages);
->>   
->> @@ -212,7 +212,7 @@ static void run_test(enum vm_guest_mode mode, void *arg)
->>   	}
->>   
->>   	/* Disable dirty logging */
->> -	clock_gettime(CLOCK_MONOTONIC, &start);
->> +	clock_gettime(CLOCK_MONOTONIC_RAW, &start);
->>   	vm_mem_region_set_flags(vm, PERF_TEST_MEM_SLOT_INDEX, 0);
->>   	ts_diff = timespec_elapsed(start);
->>   	pr_info("Disabling dirty logging time: %ld.%.9lds\n",
->> diff --git a/tools/testing/selftests/kvm/lib/test_util.c b/tools/testing/selftests/kvm/lib/test_util.c
->> index 906c955384e2..c7c0627c6842 100644
->> --- a/tools/testing/selftests/kvm/lib/test_util.c
->> +++ b/tools/testing/selftests/kvm/lib/test_util.c
->> @@ -89,7 +89,7 @@ struct timespec timespec_elapsed(struct timespec start)
->>   {
->>   	struct timespec end;
->>   
->> -	clock_gettime(CLOCK_MONOTONIC, &end);
->> +	clock_gettime(CLOCK_MONOTONIC_RAW, &end);
->>   	return timespec_sub(end, start);
->>   }
->>   
->> diff --git a/tools/testing/selftests/kvm/steal_time.c b/tools/testing/selftests/kvm/steal_time.c
->> index fcc840088c91..5bc582d3f2a2 100644
->> --- a/tools/testing/selftests/kvm/steal_time.c
->> +++ b/tools/testing/selftests/kvm/steal_time.c
->> @@ -237,11 +237,11 @@ static void *do_steal_time(void *arg)
->>   {
->>   	struct timespec ts, stop;
->>   
->> -	clock_gettime(CLOCK_MONOTONIC, &ts);
->> +	clock_gettime(CLOCK_MONOTONIC_RAW, &ts);
->>   	stop = timespec_add_ns(ts, MIN_RUN_DELAY_NS);
->>   
->>   	while (1) {
->> -		clock_gettime(CLOCK_MONOTONIC, &ts);
->> +		clock_gettime(CLOCK_MONOTONIC_RAW, &ts);
->>   		if (timespec_to_ns(timespec_sub(ts, stop)) >= 0)
->>   			break;
->>   	}
->> -- 
->> 2.19.1
->>
-> .
+I hate how we're are growing these tiny file systems just to allocate an
+anonymous inode all over.  Shouldn't we allow to enhance fs/anon_inodes.c
+to add a new API to allocate a new specific inode from anon_inodefs
+instead?
