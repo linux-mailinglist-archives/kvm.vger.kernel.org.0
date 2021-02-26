@@ -2,60 +2,145 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3BE9B325D4D
-	for <lists+kvm@lfdr.de>; Fri, 26 Feb 2021 06:50:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A8857325D50
+	for <lists+kvm@lfdr.de>; Fri, 26 Feb 2021 06:50:26 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229751AbhBZFsK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 26 Feb 2021 00:48:10 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52734 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229541AbhBZFsJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 26 Feb 2021 00:48:09 -0500
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D01DEC061574;
-        Thu, 25 Feb 2021 21:47:28 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=YBiFSDizlRMVTmEdyIEkyqkMLhTn9prNOG6rrFQE2J4=; b=umC7SAICAGE71YCZpGPH6Pfahr
-        2+CUegdTb+ewFmKnZSo4FkyQcMxEL2oY29PR+92pQtCPOSripw52M6Dw8s+zzB80p1kN30kPqro6l
-        Ut57H3NQChAM0dQgEkuychkeLKirhqeob/Bzyyq5VuWtsd6g7vBTWvJFuyheGE0CoYXgH6QzWB7V4
-        nVzCePK1EV5QIKX0XQ0qxGeqA51QuDY01QyHewd3dn4UM6KEWEmJLrt4ehIahOZ/4q3nxr0MxRfzl
-        jkbNLyM6MmoP5ZIxTLLk2C5TAdXHEHIVPHGL5K1zurU5394182F92CZndhjsCUckS1/3L83vieNCP
-        pGIF2+Iw==;
-Received: from hch by casper.infradead.org with local (Exim 4.94 #2 (Red Hat Linux))
-        id 1lFVxy-00BbrF-HE; Fri, 26 Feb 2021 05:47:10 +0000
-Date:   Fri, 26 Feb 2021 05:47:06 +0000
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     Alex Williamson <alex.williamson@redhat.com>, cohuck@redhat.com,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        peterx@redhat.com
-Subject: Re: [RFC PATCH 10/10] vfio/type1: Register device notifier
-Message-ID: <20210226054706.GB2764758@infradead.org>
-References: <161401167013.16443.8389863523766611711.stgit@gimli.home>
- <161401275279.16443.6350471385325897377.stgit@gimli.home>
- <20210222175523.GQ4247@nvidia.com>
+        id S229795AbhBZFta (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 26 Feb 2021 00:49:30 -0500
+Received: from szxga01-in.huawei.com ([45.249.212.187]:2590 "EHLO
+        szxga01-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229482AbhBZFt2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 26 Feb 2021 00:49:28 -0500
+Received: from dggeme711-chm.china.huawei.com (unknown [172.30.72.57])
+        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4DmzD02MpYzWCW0;
+        Fri, 26 Feb 2021 13:46:08 +0800 (CST)
+Received: from [10.174.187.128] (10.174.187.128) by
+ dggeme711-chm.china.huawei.com (10.1.199.107) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.2106.2; Fri, 26 Feb 2021 13:48:44 +0800
+Subject: Re: [RFC PATCH v2 6/7] KVM: selftests: Adapt
+ vm_userspace_mem_region_add to new helpers
+To:     Ben Gardon <bgardon@google.com>
+CC:     kvm <kvm@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Arnaldo Carvalho de Melo <acme@redhat.com>,
+        Ingo Molnar <mingo@kernel.org>,
+        Andrew Jones <drjones@redhat.com>,
+        Peter Xu <peterx@redhat.com>, Marc Zyngier <maz@kernel.org>,
+        <wanghaibin.wang@huawei.com>, <yuzenghui@huawei.com>
+References: <20210225055940.18748-1-wangyanan55@huawei.com>
+ <20210225055940.18748-7-wangyanan55@huawei.com>
+ <CANgfPd9EF6Yc_SAR9sRY7oXMx3um+6phb71yNL=AsHDV4+tCRA@mail.gmail.com>
+From:   "wangyanan (Y)" <wangyanan55@huawei.com>
+Message-ID: <cb2cc0d3-2914-435c-ad7c-e637ef66e213@huawei.com>
+Date:   Fri, 26 Feb 2021 13:48:44 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.4.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210222175523.GQ4247@nvidia.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <CANgfPd9EF6Yc_SAR9sRY7oXMx3um+6phb71yNL=AsHDV4+tCRA@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-Originating-IP: [10.174.187.128]
+X-ClientProxiedBy: dggeme706-chm.china.huawei.com (10.1.199.102) To
+ dggeme711-chm.china.huawei.com (10.1.199.107)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Feb 22, 2021 at 01:55:23PM -0400, Jason Gunthorpe wrote:
-> > +static bool strict_mmio_maps = true;
-> > +module_param_named(strict_mmio_maps, strict_mmio_maps, bool, 0644);
-> > +MODULE_PARM_DESC(strict_mmio_maps,
-> > +		 "Restrict to safe DMA mappings of device memory (true).");
-> 
-> I think this should be a kconfig, historically we've required kconfig
-> to opt-in to unsafe things that could violate kernel security. Someone
-> building a secure boot trusted kernel system should not have an
-> options for userspace to just turn off protections.
 
-Agreed, but I'd go one step further:  Why should we allow the unsafe
-mode at all?
+On 2021/2/26 7:44, Ben Gardon wrote:
+> On Wed, Feb 24, 2021 at 10:03 PM Yanan Wang <wangyanan55@huawei.com> wrote:
+>> With VM_MEM_SRC_ANONYMOUS_THP specified in vm_userspace_mem_region_add(),
+>> we have to get the transparent hugepage size for HVA alignment. With the
+>> new helpers, we can use get_backing_src_pagesz() to check whether THP is
+>> configured and then get the exact configured hugepage size.
+>>
+>> As different architectures may have different THP page sizes configured,
+>> this can get the accurate THP page sizes on any platform.
+>>
+>> Signed-off-by: Yanan Wang <wangyanan55@huawei.com>
+>> ---
+>>   tools/testing/selftests/kvm/lib/kvm_util.c | 27 +++++++---------------
+>>   1 file changed, 8 insertions(+), 19 deletions(-)
+>>
+>> diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
+>> index b91c8e3a7ee1..0105fbfed036 100644
+>> --- a/tools/testing/selftests/kvm/lib/kvm_util.c
+>> +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
+>> @@ -18,7 +18,6 @@
+>>   #include <unistd.h>
+>>   #include <linux/kernel.h>
+>>
+>> -#define KVM_UTIL_PGS_PER_HUGEPG 512
+>>   #define KVM_UTIL_MIN_PFN       2
+>>
+>>   /* Aligns x up to the next multiple of size. Size must be a power of 2. */
+>> @@ -686,7 +685,7 @@ void vm_userspace_mem_region_add(struct kvm_vm *vm,
+>>   {
+>>          int ret;
+>>          struct userspace_mem_region *region;
+>> -       size_t huge_page_size = KVM_UTIL_PGS_PER_HUGEPG * vm->page_size;
+>> +       size_t backing_src_pagesz = get_backing_src_pagesz(src_type);
+>>          size_t alignment;
+>>
+>>          TEST_ASSERT(vm_adjust_num_guest_pages(vm->mode, npages) == npages,
+>> @@ -748,7 +747,7 @@ void vm_userspace_mem_region_add(struct kvm_vm *vm,
+>>   #endif
+>>
+>>          if (src_type == VM_MEM_SRC_ANONYMOUS_THP)
+>> -               alignment = max(huge_page_size, alignment);
+>> +               alignment = max(backing_src_pagesz, alignment);
+>>
+>>          /* Add enough memory to align up if necessary */
+>>          if (alignment > 1)
+>> @@ -767,22 +766,12 @@ void vm_userspace_mem_region_add(struct kvm_vm *vm,
+>>          region->host_mem = align(region->mmap_start, alignment);
+>>
+>>          /* As needed perform madvise */
+>> -       if (src_type == VM_MEM_SRC_ANONYMOUS || src_type == VM_MEM_SRC_ANONYMOUS_THP) {
+>> -               struct stat statbuf;
+>> -
+>> -               ret = stat("/sys/kernel/mm/transparent_hugepage", &statbuf);
+>> -               TEST_ASSERT(ret == 0 || (ret == -1 && errno == ENOENT),
+>> -                           "stat /sys/kernel/mm/transparent_hugepage");
+>> -
+>> -               TEST_ASSERT(ret == 0 || src_type != VM_MEM_SRC_ANONYMOUS_THP,
+>> -                           "VM_MEM_SRC_ANONYMOUS_THP requires THP to be configured in the host kernel");
+>> -
+>> -               if (ret == 0) {
+>> -                       ret = madvise(region->host_mem, npages * vm->page_size,
+>> -                                     src_type == VM_MEM_SRC_ANONYMOUS ? MADV_NOHUGEPAGE : MADV_HUGEPAGE);
+>> -                       TEST_ASSERT(ret == 0, "madvise failed, addr: %p length: 0x%lx src_type: %x",
+>> -                                   region->host_mem, npages * vm->page_size, src_type);
+>> -               }
+>> +       if (src_type <= VM_MEM_SRC_ANONYMOUS_THP && thp_configured()) {
+> This check relies on an unstated property of the backing src type
+> enums where VM_MEM_SRC_ANONYMOUS and VM_MEM_SRC_ANONYMOUS_THP are
+> declared first.
+> It would probably be more readable for folks if the check was explicit:
+> if ((src_type == VM_MEM_SRC_ANONYMOUS || src_type ==
+> VM_MEM_SRC_ANONYMOUS_THP) && thp_configured()) {
+>
+Yes, this makes sense, I will fix it.
+
+Thanks,
+
+Yanan
+
+>> +               ret = madvise(region->host_mem, npages * vm->page_size,
+>> +                             src_type == VM_MEM_SRC_ANONYMOUS ? MADV_NOHUGEPAGE : MADV_HUGEPAGE);
+>> +               TEST_ASSERT(ret == 0, "madvise failed, addr: %p length: 0x%lx src_type: %s",
+>> +                           region->host_mem, npages * vm->page_size,
+>> +                           vm_mem_backing_src_alias(src_type)->name);
+>>          }
+>>
+>>          region->unused_phy_pages = sparsebit_alloc();
+>> --
+>> 2.19.1
+>>
+> .
