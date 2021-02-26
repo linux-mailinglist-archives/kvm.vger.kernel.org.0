@@ -2,149 +2,121 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 34FE9326059
-	for <lists+kvm@lfdr.de>; Fri, 26 Feb 2021 10:44:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EF3B7326077
+	for <lists+kvm@lfdr.de>; Fri, 26 Feb 2021 10:50:41 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230401AbhBZJmW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 26 Feb 2021 04:42:22 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:37195 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230437AbhBZJkZ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 26 Feb 2021 04:40:25 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1614332338;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=C/g8o8uK4e+SnXcWE/NkM7/ygwSQ3LN2AhyHaIpuq5w=;
-        b=Y7JcH1xaI6Xz/C9+oe/HeF977+ebrF6c60M7vQYN1VEYB+oOyP4pQo40O85VsRMiJMCuXT
-        pYs7ovSoeaTpS1gnn2DjC0/rNK2JqxZnfd9MTpxhc9EYNWHatJbC+XvQek41VndUe80QKg
-        BmnW/BE9nOzkye7kA4RXu9NQqRAlb3Q=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-292--TS8c3Y6PTS02N_T3xp-Xw-1; Fri, 26 Feb 2021 04:38:56 -0500
-X-MC-Unique: -TS8c3Y6PTS02N_T3xp-Xw-1
-Received: by mail-wr1-f72.google.com with SMTP id u15so4445553wrn.3
-        for <kvm@vger.kernel.org>; Fri, 26 Feb 2021 01:38:56 -0800 (PST)
+        id S230314AbhBZJtF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 26 Feb 2021 04:49:05 -0500
+Received: from mail-io1-f72.google.com ([209.85.166.72]:48885 "EHLO
+        mail-io1-f72.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229915AbhBZJs7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 26 Feb 2021 04:48:59 -0500
+Received: by mail-io1-f72.google.com with SMTP id c4so6708069ioq.15
+        for <kvm@vger.kernel.org>; Fri, 26 Feb 2021 01:48:44 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=C/g8o8uK4e+SnXcWE/NkM7/ygwSQ3LN2AhyHaIpuq5w=;
-        b=eM7p6lCNTFqvXnPObd839HSwHoctZXNNPSvmHt27PoPWlnfd/kSv3LcMXlOojKwM2E
-         9Bhq09kVexicBVIxEGtPRl7N3g7rb9rA8txblnlhTBbRANJfLoJu0nvZ8Cs3z2wgNSOx
-         mCgOxRDjLGRMJkClsjLbolSXhGOAUqYPZY1Dha4JNNnmub15nuHJdoNDUC5y7VgCuHms
-         LnowzJvUTQZeMLijBj5evjDr6t5Rwi74qreXt1BPTT83CR9sPK59RUoDymFkrWGrRWWW
-         9aqdwhOtxaSDcfh5+1eUaYV1kREDlLLXsmYFaqba5Lth5+KgQsIk79bv9eMEOx43KkvD
-         LUkg==
-X-Gm-Message-State: AOAM532UKEz3wk7p/oBOnc1/T7R01uxtDIoS/A3O+ujlhZ+IoxyIyAI0
-        Gxoj8MTu6D08IcNvx49XRxexqqDFaOB7aAikNTSPkrxJ2CTM/yIX9w8xOIj6tXM/RlAVSE7ffOv
-        2bdTHkoFs5qqJ
-X-Received: by 2002:a5d:6342:: with SMTP id b2mr1390883wrw.421.1614332335243;
-        Fri, 26 Feb 2021 01:38:55 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJzHAcXIEpeKoC/43txGCct46GRjcVNlj/dx1/fWoaoFmEXYCtVIBXwLVni8w3cKlbOQyeX79A==
-X-Received: by 2002:a5d:6342:: with SMTP id b2mr1390868wrw.421.1614332335074;
-        Fri, 26 Feb 2021 01:38:55 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id s23sm10619916wmc.35.2021.02.26.01.38.53
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 26 Feb 2021 01:38:54 -0800 (PST)
-Subject: Re: [PATCH 00/24] KVM: x86/mmu: Introduce MMU_PRESENT and fix bugs
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Ben Gardon <bgardon@google.com>
-References: <20210225204749.1512652-1-seanjc@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <cac684b9-b195-1b7b-0557-d5d62659b3b3@redhat.com>
-Date:   Fri, 26 Feb 2021 10:38:52 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.7.0
+        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
+        bh=KcVZgP/9WVkxwlU+PRBupSfcDLAJUgmUyhz3DYtEh1Y=;
+        b=F5iSgoW3Bfg1jIQyVu7xUG8momHxp1knlcPIEGv8KgjgOvZCm3xKKUx9oMEGk5IKVA
+         wjLrWgKzTg9G6scvu3AGNWvtPbbg+6lBpaisdqw7QuQ5octDYr9rSA8eUrLFoRR19s0d
+         xG9RqYIttny7ZEDe3b+smKOUDvSxiexFauNHSUSmTGx6QeDFdMV2aiiAT5sFwUI82OyS
+         LqgOOUGKAW7ZK4/Q2O7C5OUfSq4uUVQwjXPiox92Jj776SkrtB+9HHyrx6G3uemoDoEh
+         zFJNzIRR+ytwrimyHL0OQ4NZTR8h1NOrEgjsqkgwwjK+xNQHKlurYq8DHngTB6AaXQvk
+         j2+Q==
+X-Gm-Message-State: AOAM530BR1fOfmi0u5BCdv4+7uku+OciqccbLEHiunL5QcfCHRsamAa6
+        aOgTzn6n1gzXvQZMImEDB7mtFIVxMmBy9GLQEXTrnl9F3Q9S
+X-Google-Smtp-Source: ABdhPJwvgIyYjmC3Vw9wU7/ZzmPGYs58pcSwZNJKFq8ywF+Z2rzQIC2/zBK79ypmJ3BW1d61WYHn3HOoD5i4zK8gDnQVhFHvSVTb
 MIME-Version: 1.0
-In-Reply-To: <20210225204749.1512652-1-seanjc@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+X-Received: by 2002:a92:6403:: with SMTP id y3mr1715148ilb.90.1614332899174;
+ Fri, 26 Feb 2021 01:48:19 -0800 (PST)
+Date:   Fri, 26 Feb 2021 01:48:19 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <00000000000001316d05bc3a2bea@google.com>
+Subject: general protection fault in synic_get
+From:   syzbot <syzbot+0182764296ab74754c77@syzkaller.appspotmail.com>
+To:     bp@alien8.de, hpa@zytor.com, jmattson@google.com, joro@8bytes.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        mingo@redhat.com, pbonzini@redhat.com, seanjc@google.com,
+        syzkaller-bugs@googlegroups.com, tglx@linutronix.de,
+        vkuznets@redhat.com, wanpengli@tencent.com, x86@kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 25/02/21 21:47, Sean Christopherson wrote:
-> This series adds the simple idea of tagging shadow-present SPTEs with
-> a single bit, instead of looking for non-zero SPTEs that aren't MMIO and
-> aren't REMOVED.  Doing so reduces KVM's code footprint by 2k bytes on
-> x86-64, and presumably adds a tiny performance boost in related paths.
-> 
-> But, actually adding MMU_PRESENT without breaking one flow or another is
-> a bit of a debacle.  The main issue is that EPT doesn't have many low
-> available bits, and PAE doesn't have any high available bits.  And, the
-> existing MMU_WRITABLE and HOST_WRITABLE flags aren't optional, i.e. are
-> needed for all flavors of paging.  The solution I settled on is to let
-> make the *_WRITABLE bit configurable so that EPT can use high available
-> bits.
-> 
-> Of course, I forgot the above PAE restriction multiple times, and
-> journeyed down several dead ends.  The most notable failed idea was
-> using the AD_* masks in bits 52 and 53 to denote shadow-present SPTEs.
-> That would have been quite clever as it would provide the same benefits
-> without burning another available bit.
-> 
-> Along the many failed attempts, I collected a variety of bug fixes and
-> cleanups, mostly things found by inspection after doing a deep dive to
-> figure out what I broke.
-> 
-> Sean Christopherson (24):
->    KVM: x86/mmu: Set SPTE_AD_WRPROT_ONLY_MASK if and only if PML is
->      enabled
->    KVM: x86/mmu: Check for shadow-present SPTE before querying A/D status
->    KVM: x86/mmu: Bail from fast_page_fault() if SPTE is not
->      shadow-present
->    KVM: x86/mmu: Disable MMIO caching if MMIO value collides with L1TF
->    KVM: x86/mmu: Retry page faults that hit an invalid memslot
->    KVM: x86/mmu: Don't install bogus MMIO SPTEs if MMIO caching is
->      disabled
->    KVM: x86/mmu: Handle MMIO SPTEs directly in mmu_set_spte()
->    KVM: x86/mmu: Drop redundant trace_kvm_mmu_set_spte() in the TDP MMU
->    KVM: x86/mmu: Rename 'mask' to 'spte' in MMIO SPTE helpers
->    KVM: x86/mmu: Stop using software available bits to denote MMIO SPTEs
->    KVM: x86/mmu: Add module param to disable MMIO caching (for testing)
->    KVM: x86/mmu: Rename and document A/D scheme for TDP SPTEs
->    KVM: x86/mmu: Use MMIO SPTE bits 53 and 52 for the MMIO generation
->    KVM: x86/mmu: Document dependency bewteen TDP A/D type and saved bits
->    KVM: x86/mmu: Move initial kvm_mmu_set_mask_ptes() call into MMU
->      proper
->    KVM: x86/mmu: Co-locate code for setting various SPTE masks
->    KVM: x86/mmu: Move logic for setting SPTE masks for EPT into the MMU
->      proper
->    KVM: x86/mmu: Make Host-writable and MMU-writable bit locations
->      dynamic
->    KVM: x86/mmu: Use high bits for host/mmu writable masks for EPT SPTEs
->    KVM: x86/mmu: Use a dedicated bit to track shadow/MMU-present SPTEs
->    KVM: x86/mmu: Tweak auditing WARN for A/D bits to !PRESENT (was MMIO)
->    KVM: x86/mmu: Use is_removed_spte() instead of open coded equivalents
->    KVM: x86/mmu: Use low available bits for removed SPTEs
->    KVM: x86/mmu: Dump reserved bits if they're detected on non-MMIO SPTE
-> 
->   Documentation/virt/kvm/locking.rst |  49 +++++----
->   arch/x86/include/asm/kvm_host.h    |   3 -
->   arch/x86/kvm/mmu.h                 |  15 +--
->   arch/x86/kvm/mmu/mmu.c             |  87 +++++++---------
->   arch/x86/kvm/mmu/mmu_internal.h    |  16 +--
->   arch/x86/kvm/mmu/paging_tmpl.h     |   2 +-
->   arch/x86/kvm/mmu/spte.c            | 157 ++++++++++++++++++++---------
->   arch/x86/kvm/mmu/spte.h            | 135 +++++++++++++++++--------
->   arch/x86/kvm/mmu/tdp_mmu.c         |  22 ++--
->   arch/x86/kvm/svm/svm.c             |   2 +-
->   arch/x86/kvm/vmx/vmx.c             |  24 +----
->   arch/x86/kvm/x86.c                 |   3 -
->   12 files changed, 290 insertions(+), 225 deletions(-)
-> 
+Hello,
 
-Queued (patch 1 for 5.12, the rest for 5.13).
+syzbot found the following issue on:
 
-Paolo
+HEAD commit:    a99163e9 Merge tag 'devicetree-for-5.12' of git://git.kern..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=11564f12d00000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=49116074dd53b631
+dashboard link: https://syzkaller.appspot.com/bug?extid=0182764296ab74754c77
+compiler:       Debian clang version 11.0.1-2
 
+Unfortunately, I don't have any reproducer for this issue yet.
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+0182764296ab74754c77@syzkaller.appspotmail.com
+
+general protection fault, probably for non-canonical address 0xdffffc0000000028: 0000 [#1] PREEMPT SMP KASAN
+KASAN: null-ptr-deref in range [0x0000000000000140-0x0000000000000147]
+CPU: 0 PID: 13202 Comm: syz-executor.2 Not tainted 5.11.0-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
+RIP: 0010:synic_get+0x37f/0x450 arch/x86/kvm/hyperv.c:165
+Code: 74 08 48 89 ef e8 e1 d7 a4 00 48 8b 6d 00 48 8d 5d 20 48 81 c5 40 01 00 00 48 89 e8 48 c1 e8 03 48 b9 00 00 00 00 00 fc ff df <8a> 04 08 84 c0 0f 85 8b 00 00 00 0f b6 6d 00 45 31 f6 31 ff 89 ee
+RSP: 0018:ffffc90002937be0 EFLAGS: 00010206
+RAX: 0000000000000028 RBX: 0000000000000020 RCX: dffffc0000000000
+RDX: ffffc9000d3e8000 RSI: 000000000000122d RDI: 000000000000122e
+RBP: 0000000000000140 R08: ffffffff81177c28 R09: fffff5200052133e
+R10: fffff5200052133e R11: 0000000000000000 R12: ffff888013658028
+R13: ffffc900029099e8 R14: 1ffff9200052133d R15: 0000000000000000
+FS:  00007f9eefe5e700(0000) GS:ffff8880b9c00000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 000000000053e038 CR3: 0000000064691000 CR4: 00000000001526f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ kvm_hv_synic_set_irq+0x31/0x300 arch/x86/kvm/hyperv.c:452
+ kvm_set_irq+0x159/0x260 arch/x86/kvm/../../../virt/kvm/irqchip.c:89
+ kvm_vm_ioctl_irq_line+0x8d/0x130 arch/x86/kvm/x86.c:5230
+ kvm_vm_ioctl+0x729/0x2c40 arch/x86/kvm/../../../virt/kvm/kvm_main.c:3918
+ vfs_ioctl fs/ioctl.c:48 [inline]
+ __do_sys_ioctl fs/ioctl.c:753 [inline]
+ __se_sys_ioctl+0xfb/0x170 fs/ioctl.c:739
+ do_syscall_64+0x2d/0x70 arch/x86/entry/common.c:46
+ entry_SYSCALL_64_after_hwframe+0x44/0xae
+RIP: 0033:0x465ef9
+Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 bc ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007f9eefe5e188 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+RAX: ffffffffffffffda RBX: 000000000056c008 RCX: 0000000000465ef9
+RDX: 0000000020000000 RSI: 00000000c008ae67 RDI: 0000000000000004
+RBP: 00000000004bcd1c R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 000000000056c008
+R13: 00007ffe57cd4f8f R14: 00007f9eefe5e300 R15: 0000000000022000
+Modules linked in:
+---[ end trace f15602d881a9aa88 ]---
+RIP: 0010:synic_get+0x37f/0x450 arch/x86/kvm/hyperv.c:165
+Code: 74 08 48 89 ef e8 e1 d7 a4 00 48 8b 6d 00 48 8d 5d 20 48 81 c5 40 01 00 00 48 89 e8 48 c1 e8 03 48 b9 00 00 00 00 00 fc ff df <8a> 04 08 84 c0 0f 85 8b 00 00 00 0f b6 6d 00 45 31 f6 31 ff 89 ee
+RSP: 0018:ffffc90002937be0 EFLAGS: 00010206
+RAX: 0000000000000028 RBX: 0000000000000020 RCX: dffffc0000000000
+RDX: ffffc9000d3e8000 RSI: 000000000000122d RDI: 000000000000122e
+RBP: 0000000000000140 R08: ffffffff81177c28 R09: fffff5200052133e
+R10: fffff5200052133e R11: 0000000000000000 R12: ffff888013658028
+R13: ffffc900029099e8 R14: 1ffff9200052133d R15: 0000000000000000
+FS:  00007f9eefe5e700(0000) GS:ffff8880b9c00000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 000055a3cceb4a38 CR3: 0000000064691000 CR4: 00000000001526f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
