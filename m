@@ -2,189 +2,436 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 54CEF326123
-	for <lists+kvm@lfdr.de>; Fri, 26 Feb 2021 11:18:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 95081326122
+	for <lists+kvm@lfdr.de>; Fri, 26 Feb 2021 11:18:50 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230472AbhBZKRf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 26 Feb 2021 05:17:35 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:22008 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231127AbhBZKPx (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 26 Feb 2021 05:15:53 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1614334466;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=Z39kMRj5F+w7GwQjo6RQskikMPrjcYP4QGKdBa2Y9ZQ=;
-        b=COk74D9pqSVmR6Ib7jcHiEQcYm0cabb8o7eKyCgsuzNgcAT3bZ+Jwv2uqhkBzRQnVDTWNO
-        rWLzIRbLfd5DNRxMYsPlJrywmevbM60dZT3XipKGM75gBEFJDDUEOZ+t2xOVIBR1342gl4
-        bbF25uFrzhPRZesgSukvTwFB+ucVURA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-599-HEX_cppGMKGDue7hqzoQyg-1; Fri, 26 Feb 2021 05:14:24 -0500
-X-MC-Unique: HEX_cppGMKGDue7hqzoQyg-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 94BC918B9ECA;
-        Fri, 26 Feb 2021 10:14:22 +0000 (UTC)
-Received: from virtlab511.virt.lab.eng.bos.redhat.com (virtlab511.virt.lab.eng.bos.redhat.com [10.19.152.198])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 0DB4C1001281;
-        Fri, 26 Feb 2021 10:14:21 +0000 (UTC)
-From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     Christoph Hellwig <hch@lst.de>, David Woodhouse <dwmw@amazon.co.uk>
-Subject: [PATCH] KVM: x86: allow compiling out the Xen hypercall interface
-Date:   Fri, 26 Feb 2021 05:14:21 -0500
-Message-Id: <20210226101421.81535-1-pbonzini@redhat.com>
+        id S229835AbhBZKRZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 26 Feb 2021 05:17:25 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:32134 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231126AbhBZKPO (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 26 Feb 2021 05:15:14 -0500
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 11QA3Fm2004028
+        for <kvm@vger.kernel.org>; Fri, 26 Feb 2021 05:14:32 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=nqKG569Sx8amURz5A5dtTVx5uDAFp4akbiVTna0m9vM=;
+ b=Pr6NhsR9x/ym23e05MM5NuZwv3r62MQWzLDa/0rwzVRaDUaaJHKEj/ApE3q7ufRlyiOT
+ 3VylT2ZUFta9a/BdLU6jwV8DutxLvPMas09IkOgBSvipV5Ow6XajcAoGeJOSu9ObhX0z
+ A38r7lEod44alidMiSCgu+m9AYpTraytkyPEBGo/+5UQzIXNm1bQ38qgHm+WKezuuitR
+ u/Zm/DRucIv1tCkgQedpA87bGHEbkpgYemkrGaRCGvZT7hrKMEvwhfl97hI3seILDfK8
+ c4ZpinRcxtifjIaE+p7Z+TdaWSIqZZo40NvrdNm/z2/OplqFN5oQKmZq5pfDyDYfk/ht gA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 36xn107db6-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Fri, 26 Feb 2021 05:14:31 -0500
+Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 11QA3jU0006067
+        for <kvm@vger.kernel.org>; Fri, 26 Feb 2021 05:14:31 -0500
+Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 36xn107dam-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 26 Feb 2021 05:14:31 -0500
+Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
+        by ppma04fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 11QADKOf027307;
+        Fri, 26 Feb 2021 10:14:29 GMT
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
+        by ppma04fra.de.ibm.com with ESMTP id 36tt28aqs2-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 26 Feb 2021 10:14:29 +0000
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 11QAEQEQ24904126
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 26 Feb 2021 10:14:26 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 2B5874C044;
+        Fri, 26 Feb 2021 10:14:26 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id C0BF64C046;
+        Fri, 26 Feb 2021 10:14:25 +0000 (GMT)
+Received: from ibm-vm (unknown [9.145.10.194])
+        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Fri, 26 Feb 2021 10:14:25 +0000 (GMT)
+Date:   Fri, 26 Feb 2021 11:14:23 +0100
+From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
+To:     Janosch Frank <frankja@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, david@redhat.com, thuth@redhat.com,
+        cohuck@redhat.com, pmorel@linux.ibm.com, borntraeger@de.ibm.com
+Subject: Re: [kvm-unit-tests PATCH v2 2/2] s390x: mvpg: simple test
+Message-ID: <20210226111423.10f9338f@ibm-vm>
+In-Reply-To: <2a723010-9806-f5b9-7960-7860cdd14dff@linux.ibm.com>
+References: <20210223142429.256420-1-imbrenda@linux.ibm.com>
+        <20210223142429.256420-3-imbrenda@linux.ibm.com>
+        <2a723010-9806-f5b9-7960-7860cdd14dff@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.761
+ definitions=2021-02-26_02:2021-02-24,2021-02-26 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ suspectscore=0 mlxscore=0 phishscore=0 clxscore=1015 priorityscore=1501
+ malwarescore=0 impostorscore=0 mlxlogscore=999 spamscore=0 adultscore=0
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2102260076
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The Xen hypercall interface adds to the attack surface of the hypervisor
-and will be used quite rarely.  Allow compiling it out.
+On Fri, 26 Feb 2021 10:24:13 +0100
+Janosch Frank <frankja@linux.ibm.com> wrote:
 
-Suggested-by: Christoph Hellwig <hch@lst.de>
-Cc: David Woodhouse <dwmw@amazon.co.uk>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- arch/x86/kvm/Kconfig  |  9 ++++++++
- arch/x86/kvm/Makefile |  3 ++-
- arch/x86/kvm/x86.c    |  2 ++
- arch/x86/kvm/xen.h    | 49 ++++++++++++++++++++++++++++++++++++++++++-
- 4 files changed, 61 insertions(+), 2 deletions(-)
+> On 2/23/21 3:24 PM, Claudio Imbrenda wrote:
+> > A simple unit test for the MVPG instruction.
+> > 
+> > The timeout is set to 10 seconds because the test should complete
+> > in a fraction of a second even on busy machines. If the test is run
+> > in VSIE and the host of the host is not handling MVPG properly, the
+> > test will probably hang.
+> > 
+> > Testing MVPG behaviour in VSIE is the main motivation for this test.
+> > 
+> > Anything related to storage keys is not tested.
+> > 
+> > Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+> > Acked-by: Janosch Frank <frankja@linux.ibm.com>
+> > ---
+> >  s390x/Makefile      |   1 +
+> >  s390x/mvpg.c        | 266
+> > ++++++++++++++++++++++++++++++++++++++++++++ s390x/unittests.cfg |
+> >  4 + 3 files changed, 271 insertions(+)
+> >  create mode 100644 s390x/mvpg.c
+> > 
+> > diff --git a/s390x/Makefile b/s390x/Makefile
+> > index 08d85c9f..770eaa0b 100644
+> > --- a/s390x/Makefile
+> > +++ b/s390x/Makefile
+> > @@ -20,6 +20,7 @@ tests += $(TEST_DIR)/sclp.elf
+> >  tests += $(TEST_DIR)/css.elf
+> >  tests += $(TEST_DIR)/uv-guest.elf
+> >  tests += $(TEST_DIR)/sie.elf
+> > +tests += $(TEST_DIR)/mvpg.elf
+> >  
+> >  tests_binary = $(patsubst %.elf,%.bin,$(tests))
+> >  ifneq ($(HOST_KEY_DOCUMENT),)
+> > diff --git a/s390x/mvpg.c b/s390x/mvpg.c
+> > new file mode 100644
+> > index 00000000..7a89a462
+> > --- /dev/null
+> > +++ b/s390x/mvpg.c
+> > @@ -0,0 +1,266 @@
+> > +/* SPDX-License-Identifier: GPL-2.0-only */
+> > +/*
+> > + * Move Page instruction tests
+> > + *
+> > + * Copyright (c) 2020 IBM Corp  
+> 
+> 2021
+> 
+> I'd like to queue these patches soonish, can I fix that up or do you
+> want to send a new version for me to queue?
 
-diff --git a/arch/x86/kvm/Kconfig b/arch/x86/kvm/Kconfig
-index 7ac592664c52..5a0d704581bd 100644
---- a/arch/x86/kvm/Kconfig
-+++ b/arch/x86/kvm/Kconfig
-@@ -103,6 +103,15 @@ config KVM_AMD_SEV
- 	  Provides support for launching Encrypted VMs (SEV) and Encrypted VMs
- 	  with Encrypted State (SEV-ES) on AMD processors.
- 
-+config KVM_XEN
-+	bool "Support for Xen hypercall interface"
-+	depends on KVM && IA32_FEAT_CTL
-+	help
-+	  Provides KVM support for the Xen shared information page and
-+	  for passing Xen hypercalls to userspace.
-+
-+	  If in doubt, say "N".
-+
- config KVM_MMU_AUDIT
- 	bool "Audit KVM MMU"
- 	depends on KVM && TRACEPOINTS
-diff --git a/arch/x86/kvm/Makefile b/arch/x86/kvm/Makefile
-index aeab168c5711..1b4766fe1de2 100644
---- a/arch/x86/kvm/Makefile
-+++ b/arch/x86/kvm/Makefile
-@@ -14,11 +14,12 @@ kvm-y			+= $(KVM)/kvm_main.o $(KVM)/coalesced_mmio.o \
- 				$(KVM)/dirty_ring.o
- kvm-$(CONFIG_KVM_ASYNC_PF)	+= $(KVM)/async_pf.o
- 
--kvm-y			+= x86.o emulate.o i8259.o irq.o lapic.o xen.o \
-+kvm-y			+= x86.o emulate.o i8259.o irq.o lapic.o \
- 			   i8254.o ioapic.o irq_comm.o cpuid.o pmu.o mtrr.o \
- 			   hyperv.o debugfs.o mmu/mmu.o mmu/page_track.o \
- 			   mmu/spte.o
- kvm-$(CONFIG_X86_64) += mmu/tdp_iter.o mmu/tdp_mmu.o
-+kvm-$(CONFIG_KVM_XEN)	+= xen.o
- 
- kvm-intel-y		+= vmx/vmx.o vmx/vmenter.o vmx/pmu_intel.o vmx/vmcs12.o \
- 			   vmx/evmcs.o vmx/nested.o vmx/posted_intr.o
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index bfc928495bd4..9727295b7817 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -8039,8 +8039,10 @@ void kvm_arch_exit(void)
- 	kvm_mmu_module_exit();
- 	free_percpu(user_return_msrs);
- 	kmem_cache_destroy(x86_fpu_cache);
-+#ifdef CONFIG_KVM_XEN
- 	static_key_deferred_flush(&kvm_xen_enabled);
- 	WARN_ON(static_branch_unlikely(&kvm_xen_enabled.key));
-+#endif
- }
- 
- static int __kvm_vcpu_halt(struct kvm_vcpu *vcpu, int state, int reason)
-diff --git a/arch/x86/kvm/xen.h b/arch/x86/kvm/xen.h
-index b66a921776f4..6abdbebb029b 100644
---- a/arch/x86/kvm/xen.h
-+++ b/arch/x86/kvm/xen.h
-@@ -9,6 +9,7 @@
- #ifndef __ARCH_X86_KVM_XEN_H__
- #define __ARCH_X86_KVM_XEN_H__
- 
-+#ifdef CONFIG_KVM_XEN
- #include <linux/jump_label_ratelimit.h>
- 
- extern struct static_key_false_deferred kvm_xen_enabled;
-@@ -18,7 +19,6 @@ int kvm_xen_vcpu_set_attr(struct kvm_vcpu *vcpu, struct kvm_xen_vcpu_attr *data)
- int kvm_xen_vcpu_get_attr(struct kvm_vcpu *vcpu, struct kvm_xen_vcpu_attr *data);
- int kvm_xen_hvm_set_attr(struct kvm *kvm, struct kvm_xen_hvm_attr *data);
- int kvm_xen_hvm_get_attr(struct kvm *kvm, struct kvm_xen_hvm_attr *data);
--int kvm_xen_hypercall(struct kvm_vcpu *vcpu);
- int kvm_xen_write_hypercall_page(struct kvm_vcpu *vcpu, u64 data);
- int kvm_xen_hvm_config(struct kvm *kvm, struct kvm_xen_hvm_config *xhc);
- void kvm_xen_destroy_vm(struct kvm *kvm);
-@@ -38,6 +38,53 @@ static inline int kvm_xen_has_interrupt(struct kvm_vcpu *vcpu)
- 
- 	return 0;
- }
-+#else
-+static inline int kvm_xen_vcpu_set_attr(struct kvm_vcpu *vcpu, struct kvm_xen_vcpu_attr *data)
-+{
-+	return -EINVAL;
-+}
-+
-+static inline int kvm_xen_vcpu_get_attr(struct kvm_vcpu *vcpu, struct kvm_xen_vcpu_attr *data)
-+{
-+	return -EINVAL;
-+}
-+
-+static inline int kvm_xen_hvm_set_attr(struct kvm *kvm, struct kvm_xen_hvm_attr *data)
-+{
-+	return -EINVAL;
-+}
-+
-+static inline int kvm_xen_hvm_get_attr(struct kvm *kvm, struct kvm_xen_hvm_attr *data)
-+{
-+	return -EINVAL;
-+}
-+
-+static inline int kvm_xen_write_hypercall_page(struct kvm_vcpu *vcpu, u64 data)
-+{
-+	return 1;
-+}
-+
-+static inline int kvm_xen_hvm_config(struct kvm *kvm, struct kvm_xen_hvm_config *xhc)
-+{
-+	return -EINVAL;
-+}
-+
-+static inline void kvm_xen_destroy_vm(struct kvm *kvm)
-+{
-+}
-+
-+static inline bool kvm_xen_hypercall_enabled(struct kvm *kvm)
-+{
-+	return false;
-+}
-+
-+static inline int kvm_xen_has_interrupt(struct kvm_vcpu *vcpu)
-+{
-+	return 0;
-+}
-+#endif
-+
-+int kvm_xen_hypercall(struct kvm_vcpu *vcpu);
- 
- /* 32-bit compatibility definitions, also used natively in 32-bit build */
- #include <asm/pvclock-abi.h>
--- 
-2.26.2
+you can fix it :)
+
+> > + *
+> > + * Authors:
+> > + *  Claudio Imbrenda <imbrenda@linux.ibm.com>
+> > + */
+> > +#include <libcflat.h>
+> > +#include <asm/asm-offsets.h>
+> > +#include <asm-generic/barrier.h>
+> > +#include <asm/interrupt.h>
+> > +#include <asm/pgtable.h>
+> > +#include <mmu.h>
+> > +#include <asm/page.h>
+> > +#include <asm/facility.h>
+> > +#include <asm/mem.h>
+> > +#include <asm/sigp.h>
+> > +#include <smp.h>
+> > +#include <alloc_page.h>
+> > +#include <bitops.h>
+> > +
+> > +/* Used to build the appropriate test values for register 0 */
+> > +#define KFC(x) ((x) << 10)
+> > +#define CCO 0x100
+> > +
+> > +/* How much memory to allocate for the test */
+> > +#define MEM_ORDER 12
+> > +/* How many iterations to perform in the loops */
+> > +#define ITER 8
+> > +
+> > +/* Used to generate the simple pattern */
+> > +#define MAGIC 42
+> > +
+> > +static uint8_t source[PAGE_SIZE]
+> > __attribute__((aligned(PAGE_SIZE))); +static uint8_t
+> > buffer[PAGE_SIZE] __attribute__((aligned(PAGE_SIZE))); +
+> > +/* Keep track of fresh memory */
+> > +static uint8_t *fresh;
+> > +
+> > +static inline int mvpg(unsigned long r0, void *dest, void *src)
+> > +{
+> > +	register unsigned long reg0 asm ("0") = r0;
+> > +	int cc;
+> > +
+> > +	asm volatile("	mvpg    %1,%2\n"
+> > +		     "	ipm     %0\n"
+> > +		     "	srl     %0,28"
+> > +		: "=&d" (cc) : "a" (dest), "a" (src), "d" (reg0)
+> > +		: "memory", "cc");
+> > +	return cc;
+> > +}
+> > +
+> > +/*
+> > + * Initialize a page with a simple pattern
+> > + */
+> > +static void init_page(uint8_t *p)
+> > +{
+> > +	int i;
+> > +
+> > +	for (i = 0; i < PAGE_SIZE; i++)
+> > +		p[i] = i + MAGIC;
+> > +}
+> > +
+> > +/*
+> > + * Check if the given page contains the simple pattern
+> > + */
+> > +static int page_ok(const uint8_t *p)
+> > +{
+> > +	int i;
+> > +
+> > +	for (i = 0; i < PAGE_SIZE; i++)
+> > +		if (p[i] != (uint8_t)(i + MAGIC))
+> > +			return 0;
+> > +	return 1;
+> > +}
+> > +
+> > +static void test_exceptions(void)
+> > +{
+> > +	int i, expected;
+> > +
+> > +	report_prefix_push("exceptions");
+> > +
+> > +	/*
+> > +	 * Key Function Control values 4 and 5 are allowed only in
+> > supervisor
+> > +	 * state, and even then, only if the move-page-and-set-key
+> > facility
+> > +	 * is present (STFLE bit 149)
+> > +	 */
+> > +	report_prefix_push("privileged");
+> > +	if (test_facility(149)) {
+> > +		expected = PGM_INT_CODE_PRIVILEGED_OPERATION;
+> > +		for (i = 4; i < 6; i++) {
+> > +			expect_pgm_int();
+> > +			enter_pstate();
+> > +			mvpg(KFC(i), buffer, source);
+> > +			report(clear_pgm_int() == expected, "Key
+> > Function Control value %d", i);
+> > +		}
+> > +	} else {
+> > +		report_skip("Key Function Control value %d", 4);
+> > +		report_skip("Key Function Control value %d", 5);
+> > +		i = 4;
+> > +	}
+> > +	report_prefix_pop();
+> > +
+> > +	/*
+> > +	 * Invalid values of the Key Function Control, or setting
+> > the
+> > +	 * reserved bits, should result in a specification
+> > exception
+> > +	 */
+> > +	report_prefix_push("specification");
+> > +	expected = PGM_INT_CODE_SPECIFICATION;
+> > +	expect_pgm_int();
+> > +	mvpg(KFC(3), buffer, source);
+> > +	report(clear_pgm_int() == expected, "Key Function Control
+> > value 3");
+> > +	for (; i < 32; i++) {
+> > +		expect_pgm_int();
+> > +		mvpg(KFC(i), buffer, source);
+> > +		report(clear_pgm_int() == expected, "Key Function
+> > Control value %d", i);
+> > +	}
+> > +	report_prefix_pop();
+> > +
+> > +	/* Operands outside memory result in addressing
+> > exceptions, as usual */
+> > +	report_prefix_push("addressing");
+> > +	expected = PGM_INT_CODE_ADDRESSING;
+> > +	expect_pgm_int();
+> > +	mvpg(0, buffer, (void *)PAGE_MASK);
+> > +	report(clear_pgm_int() == expected, "Second operand
+> > outside memory"); +
+> > +	expect_pgm_int();
+> > +	mvpg(0, (void *)PAGE_MASK, source);
+> > +	report(clear_pgm_int() == expected, "First operand outside
+> > memory");
+> > +	report_prefix_pop();
+> > +
+> > +	report_prefix_pop();
+> > +}
+> > +
+> > +static void test_success(void)
+> > +{
+> > +	int cc;
+> > +
+> > +	report_prefix_push("success");
+> > +	/* Test successful scenarios, both in supervisor and
+> > problem state */
+> > +	cc = mvpg(0, buffer, source);
+> > +	report(page_ok(buffer) && !cc, "Supervisor state MVPG
+> > successful"); +
+> > +	enter_pstate();
+> > +	cc = mvpg(0, buffer, source);
+> > +	leave_pstate();
+> > +	report(page_ok(buffer) && !cc, "Problem state MVPG
+> > successful"); +
+> > +	report_prefix_pop();
+> > +}
+> > +
+> > +static void test_small_loop(const void *string)
+> > +{
+> > +	uint8_t *dest;
+> > +	int i, cc;
+> > +
+> > +	/* Looping over cold and warm pages helps catch VSIE bugs
+> > */
+> > +	report_prefix_push(string);
+> > +	dest = fresh;
+> > +	for (i = 0; i < ITER; i++) {
+> > +		cc = mvpg(0, fresh, source);
+> > +		report(page_ok(fresh) && !cc, "cold: %p, %p",
+> > source, fresh);
+> > +		fresh += PAGE_SIZE;
+> > +	}
+> > +
+> > +	for (i = 0; i < ITER; i++) {
+> > +		memset(dest, 0, PAGE_SIZE);
+> > +		cc = mvpg(0, dest, source);
+> > +		report(page_ok(dest) && !cc, "warm: %p, %p",
+> > source, dest);
+> > +		dest += PAGE_SIZE;
+> > +	}
+> > +	report_prefix_pop();
+> > +}
+> > +
+> > +static void test_mmu_prot(void)
+> > +{
+> > +	int cc;
+> > +
+> > +	report_prefix_push("protection");
+> > +	report_prefix_push("cco=0");
+> > +
+> > +	/* MVPG should still succeed when the source is read-only
+> > */
+> > +	protect_page(source, PAGE_ENTRY_P);
+> > +	cc = mvpg(0, fresh, source);
+> > +	report(page_ok(fresh) && !cc, "source read only");
+> > +	unprotect_page(source, PAGE_ENTRY_P);
+> > +	fresh += PAGE_SIZE;
+> > +
+> > +	/*
+> > +	 * When the source or destination are invalid, a page
+> > translation
+> > +	 * exception should be raised; when the destination is
+> > read-only,
+> > +	 * a protection exception should be raised.
+> > +	 */
+> > +	protect_page(fresh, PAGE_ENTRY_P);
+> > +	expect_pgm_int();
+> > +	mvpg(0, fresh, source);
+> > +	report(clear_pgm_int() == PGM_INT_CODE_PROTECTION,
+> > "destination read only");
+> > +	fresh += PAGE_SIZE;
+> > +
+> > +	protect_page(source, PAGE_ENTRY_I);
+> > +	expect_pgm_int();
+> > +	mvpg(0, fresh, source);
+> > +	report(clear_pgm_int() == PGM_INT_CODE_PAGE_TRANSLATION,
+> > "source invalid");
+> > +	unprotect_page(source, PAGE_ENTRY_I);
+> > +	fresh += PAGE_SIZE;
+> > +
+> > +	protect_page(fresh, PAGE_ENTRY_I);
+> > +	expect_pgm_int();
+> > +	mvpg(0, fresh, source);
+> > +	report(clear_pgm_int() == PGM_INT_CODE_PAGE_TRANSLATION,
+> > "destination invalid");
+> > +	fresh += PAGE_SIZE;
+> > +
+> > +	report_prefix_pop();
+> > +	report_prefix_push("cco=1");
+> > +	/*
+> > +	 * Setting the CCO bit should suppress page translation
+> > exceptions,
+> > +	 * but not protection exceptions.
+> > +	 */
+> > +	protect_page(fresh, PAGE_ENTRY_P);
+> > +	expect_pgm_int();
+> > +	mvpg(CCO, fresh, source);
+> > +	report(clear_pgm_int() == PGM_INT_CODE_PROTECTION,
+> > "destination read only");
+> > +	fresh += PAGE_SIZE;
+> > +
+> > +	protect_page(fresh, PAGE_ENTRY_I);
+> > +	cc = mvpg(CCO, fresh, source);
+> > +	report(cc == 1, "destination invalid");
+> > +	fresh += PAGE_SIZE;
+> > +
+> > +	protect_page(source, PAGE_ENTRY_I);
+> > +	cc = mvpg(CCO, fresh, source);
+> > +	report(cc == 2, "source invalid");
+> > +	fresh += PAGE_SIZE;
+> > +
+> > +	protect_page(fresh, PAGE_ENTRY_I);
+> > +	cc = mvpg(CCO, fresh, source);
+> > +	report(cc == 2, "source and destination invalid");
+> > +	fresh += PAGE_SIZE;
+> > +
+> > +	unprotect_page(source, PAGE_ENTRY_I);
+> > +	report_prefix_pop();
+> > +	report_prefix_pop();
+> > +}
+> > +
+> > +int main(void)
+> > +{
+> > +	report_prefix_push("mvpg");
+> > +
+> > +	init_page(source);
+> > +	fresh = alloc_pages_flags(MEM_ORDER, FLAG_DONTZERO |
+> > FLAG_FRESH);
+> > +	assert(fresh);
+> > +
+> > +	test_exceptions();
+> > +	test_success();
+> > +	test_small_loop("nommu");
+> > +
+> > +	setup_vm();
+> > +
+> > +	test_small_loop("mmu");
+> > +	test_mmu_prot();
+> > +
+> > +	report_prefix_pop();
+> > +	return report_summary();
+> > +}
+> > diff --git a/s390x/unittests.cfg b/s390x/unittests.cfg
+> > index 2298be6c..9f81a608 100644
+> > --- a/s390x/unittests.cfg
+> > +++ b/s390x/unittests.cfg
+> > @@ -99,3 +99,7 @@ file = uv-guest.elf
+> >  
+> >  [sie]
+> >  file = sie.elf
+> > +
+> > +[mvpg]
+> > +file = mvpg.elf
+> > +timeout = 10
+> >   
+> 
 
