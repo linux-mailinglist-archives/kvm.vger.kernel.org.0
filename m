@@ -2,130 +2,408 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7FE68325F95
-	for <lists+kvm@lfdr.de>; Fri, 26 Feb 2021 10:01:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EBF30326001
+	for <lists+kvm@lfdr.de>; Fri, 26 Feb 2021 10:27:24 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230001AbhBZI7w (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 26 Feb 2021 03:59:52 -0500
-Received: from szxga06-in.huawei.com ([45.249.212.32]:12953 "EHLO
-        szxga06-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229537AbhBZI7p (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 26 Feb 2021 03:59:45 -0500
-Received: from DGGEMS411-HUB.china.huawei.com (unknown [172.30.72.60])
-        by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4Dn3Sx46yyzjRhZ;
-        Fri, 26 Feb 2021 16:57:37 +0800 (CST)
-Received: from [10.174.184.135] (10.174.184.135) by
- DGGEMS411-HUB.china.huawei.com (10.3.19.211) with Microsoft SMTP Server id
- 14.3.498.0; Fri, 26 Feb 2021 16:58:48 +0800
-Subject: Re: [PATCH v3 0/4] KVM: arm64: Add VLPI migration support on GICv4.1
-To:     Marc Zyngier <maz@kernel.org>, Eric Auger <eric.auger@redhat.com>,
-        "Will Deacon" <will@kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>,
-        <kvmarm@lists.cs.columbia.edu>, <kvm@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>
-CC:     Alex Williamson <alex.williamson@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
-        <wanghaibin.wang@huawei.com>, <yuzenghui@huawei.com>
-References: <20210127121337.1092-1-lushenming@huawei.com>
-From:   Shenming Lu <lushenming@huawei.com>
-Message-ID: <4c2fdcc3-4189-6515-3a68-7bdf26e31973@huawei.com>
-Date:   Fri, 26 Feb 2021 16:58:37 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.2.2
+        id S230375AbhBZJ1J (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 26 Feb 2021 04:27:09 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:36428 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230210AbhBZJZC (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 26 Feb 2021 04:25:02 -0500
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 11Q93Bew057150
+        for <kvm@vger.kernel.org>; Fri, 26 Feb 2021 04:24:20 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=jaLAOSitclx0LZ2mFhd5J4QfBd21ztRDLpOdWGamLiI=;
+ b=fUY2+r5XHb+8uDVyswEb7TvMttxKQcITZ6XkXIGf3oLl+252TZk4LhA5LyczV6TcgKAf
+ yk4Dq8srH/OWA04pEWJrgigB+8QsG3fbr7+oWK9xu5NY+RKFC1MNzIf1hsl9gVPJnKAM
+ EPCo2MsSGYPy2vz2bzWmfTvNun9LIlRilEaPf/ER1uTQyh1oQzIIhEbJIl/OSo0gJiKo
+ faMtkcBCNLWa+WULy9aBcUqUudAa4U1E/fVLuoj6iWyHJvGROUhcq+FSaEIrAR5bpxeR
+ jDDnynxzuQi9Y418apoNp2zUfGKV86jVk6iPqlFZbICLzzcrBfI+CO+smYuUt6SQNiUx yA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 36xphukpdg-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Fri, 26 Feb 2021 04:24:20 -0500
+Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 11Q9HupO116661
+        for <kvm@vger.kernel.org>; Fri, 26 Feb 2021 04:24:19 -0500
+Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 36xphukpcj-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 26 Feb 2021 04:24:19 -0500
+Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
+        by ppma04fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 11Q9ND2h020485;
+        Fri, 26 Feb 2021 09:24:17 GMT
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
+        by ppma04fra.de.ibm.com with ESMTP id 36tt28aq59-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 26 Feb 2021 09:24:17 +0000
+Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 11Q9OEQd34734456
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 26 Feb 2021 09:24:14 GMT
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 8BD2711C04C;
+        Fri, 26 Feb 2021 09:24:14 +0000 (GMT)
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 2218511C04A;
+        Fri, 26 Feb 2021 09:24:14 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.145.91.176])
+        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Fri, 26 Feb 2021 09:24:14 +0000 (GMT)
+Subject: Re: [kvm-unit-tests PATCH v2 2/2] s390x: mvpg: simple test
+To:     Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     david@redhat.com, thuth@redhat.com, cohuck@redhat.com,
+        pmorel@linux.ibm.com, borntraeger@de.ibm.com
+References: <20210223142429.256420-1-imbrenda@linux.ibm.com>
+ <20210223142429.256420-3-imbrenda@linux.ibm.com>
+From:   Janosch Frank <frankja@linux.ibm.com>
+Message-ID: <2a723010-9806-f5b9-7960-7860cdd14dff@linux.ibm.com>
+Date:   Fri, 26 Feb 2021 10:24:13 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.7.0
 MIME-Version: 1.0
-In-Reply-To: <20210127121337.1092-1-lushenming@huawei.com>
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <20210223142429.256420-3-imbrenda@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.174.184.135]
-X-CFilter-Loop: Reflected
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.761
+ definitions=2021-02-26_02:2021-02-24,2021-02-26 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 mlxlogscore=999
+ malwarescore=0 suspectscore=0 priorityscore=1501 phishscore=0 spamscore=0
+ bulkscore=0 mlxscore=0 impostorscore=0 clxscore=1015 lowpriorityscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
+ definitions=main-2102260070
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Marc,
+On 2/23/21 3:24 PM, Claudio Imbrenda wrote:
+> A simple unit test for the MVPG instruction.
+> 
+> The timeout is set to 10 seconds because the test should complete in a
+> fraction of a second even on busy machines. If the test is run in VSIE
+> and the host of the host is not handling MVPG properly, the test will
+> probably hang.
+> 
+> Testing MVPG behaviour in VSIE is the main motivation for this test.
+> 
+> Anything related to storage keys is not tested.
+> 
+> Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+> Acked-by: Janosch Frank <frankja@linux.ibm.com>
+> ---
+>  s390x/Makefile      |   1 +
+>  s390x/mvpg.c        | 266 ++++++++++++++++++++++++++++++++++++++++++++
+>  s390x/unittests.cfg |   4 +
+>  3 files changed, 271 insertions(+)
+>  create mode 100644 s390x/mvpg.c
+> 
+> diff --git a/s390x/Makefile b/s390x/Makefile
+> index 08d85c9f..770eaa0b 100644
+> --- a/s390x/Makefile
+> +++ b/s390x/Makefile
+> @@ -20,6 +20,7 @@ tests += $(TEST_DIR)/sclp.elf
+>  tests += $(TEST_DIR)/css.elf
+>  tests += $(TEST_DIR)/uv-guest.elf
+>  tests += $(TEST_DIR)/sie.elf
+> +tests += $(TEST_DIR)/mvpg.elf
+>  
+>  tests_binary = $(patsubst %.elf,%.bin,$(tests))
+>  ifneq ($(HOST_KEY_DOCUMENT),)
+> diff --git a/s390x/mvpg.c b/s390x/mvpg.c
+> new file mode 100644
+> index 00000000..7a89a462
+> --- /dev/null
+> +++ b/s390x/mvpg.c
+> @@ -0,0 +1,266 @@
+> +/* SPDX-License-Identifier: GPL-2.0-only */
+> +/*
+> + * Move Page instruction tests
+> + *
+> + * Copyright (c) 2020 IBM Corp
 
-Gentle ping. Does this series need any further modification? Wish you can pick it up. :-)
+2021
 
-Thanks,
-Shenming
+I'd like to queue these patches soonish, can I fix that up or do you
+want to send a new version for me to queue?
 
-On 2021/1/27 20:13, Shenming Lu wrote:
-> Hi Marc, sorry for the late commit.
+> + *
+> + * Authors:
+> + *  Claudio Imbrenda <imbrenda@linux.ibm.com>
+> + */
+> +#include <libcflat.h>
+> +#include <asm/asm-offsets.h>
+> +#include <asm-generic/barrier.h>
+> +#include <asm/interrupt.h>
+> +#include <asm/pgtable.h>
+> +#include <mmu.h>
+> +#include <asm/page.h>
+> +#include <asm/facility.h>
+> +#include <asm/mem.h>
+> +#include <asm/sigp.h>
+> +#include <smp.h>
+> +#include <alloc_page.h>
+> +#include <bitops.h>
+> +
+> +/* Used to build the appropriate test values for register 0 */
+> +#define KFC(x) ((x) << 10)
+> +#define CCO 0x100
+> +
+> +/* How much memory to allocate for the test */
+> +#define MEM_ORDER 12
+> +/* How many iterations to perform in the loops */
+> +#define ITER 8
+> +
+> +/* Used to generate the simple pattern */
+> +#define MAGIC 42
+> +
+> +static uint8_t source[PAGE_SIZE]  __attribute__((aligned(PAGE_SIZE)));
+> +static uint8_t buffer[PAGE_SIZE] __attribute__((aligned(PAGE_SIZE)));
+> +
+> +/* Keep track of fresh memory */
+> +static uint8_t *fresh;
+> +
+> +static inline int mvpg(unsigned long r0, void *dest, void *src)
+> +{
+> +	register unsigned long reg0 asm ("0") = r0;
+> +	int cc;
+> +
+> +	asm volatile("	mvpg    %1,%2\n"
+> +		     "	ipm     %0\n"
+> +		     "	srl     %0,28"
+> +		: "=&d" (cc) : "a" (dest), "a" (src), "d" (reg0)
+> +		: "memory", "cc");
+> +	return cc;
+> +}
+> +
+> +/*
+> + * Initialize a page with a simple pattern
+> + */
+> +static void init_page(uint8_t *p)
+> +{
+> +	int i;
+> +
+> +	for (i = 0; i < PAGE_SIZE; i++)
+> +		p[i] = i + MAGIC;
+> +}
+> +
+> +/*
+> + * Check if the given page contains the simple pattern
+> + */
+> +static int page_ok(const uint8_t *p)
+> +{
+> +	int i;
+> +
+> +	for (i = 0; i < PAGE_SIZE; i++)
+> +		if (p[i] != (uint8_t)(i + MAGIC))
+> +			return 0;
+> +	return 1;
+> +}
+> +
+> +static void test_exceptions(void)
+> +{
+> +	int i, expected;
+> +
+> +	report_prefix_push("exceptions");
+> +
+> +	/*
+> +	 * Key Function Control values 4 and 5 are allowed only in supervisor
+> +	 * state, and even then, only if the move-page-and-set-key facility
+> +	 * is present (STFLE bit 149)
+> +	 */
+> +	report_prefix_push("privileged");
+> +	if (test_facility(149)) {
+> +		expected = PGM_INT_CODE_PRIVILEGED_OPERATION;
+> +		for (i = 4; i < 6; i++) {
+> +			expect_pgm_int();
+> +			enter_pstate();
+> +			mvpg(KFC(i), buffer, source);
+> +			report(clear_pgm_int() == expected, "Key Function Control value %d", i);
+> +		}
+> +	} else {
+> +		report_skip("Key Function Control value %d", 4);
+> +		report_skip("Key Function Control value %d", 5);
+> +		i = 4;
+> +	}
+> +	report_prefix_pop();
+> +
+> +	/*
+> +	 * Invalid values of the Key Function Control, or setting the
+> +	 * reserved bits, should result in a specification exception
+> +	 */
+> +	report_prefix_push("specification");
+> +	expected = PGM_INT_CODE_SPECIFICATION;
+> +	expect_pgm_int();
+> +	mvpg(KFC(3), buffer, source);
+> +	report(clear_pgm_int() == expected, "Key Function Control value 3");
+> +	for (; i < 32; i++) {
+> +		expect_pgm_int();
+> +		mvpg(KFC(i), buffer, source);
+> +		report(clear_pgm_int() == expected, "Key Function Control value %d", i);
+> +	}
+> +	report_prefix_pop();
+> +
+> +	/* Operands outside memory result in addressing exceptions, as usual */
+> +	report_prefix_push("addressing");
+> +	expected = PGM_INT_CODE_ADDRESSING;
+> +	expect_pgm_int();
+> +	mvpg(0, buffer, (void *)PAGE_MASK);
+> +	report(clear_pgm_int() == expected, "Second operand outside memory");
+> +
+> +	expect_pgm_int();
+> +	mvpg(0, (void *)PAGE_MASK, source);
+> +	report(clear_pgm_int() == expected, "First operand outside memory");
+> +	report_prefix_pop();
+> +
+> +	report_prefix_pop();
+> +}
+> +
+> +static void test_success(void)
+> +{
+> +	int cc;
+> +
+> +	report_prefix_push("success");
+> +	/* Test successful scenarios, both in supervisor and problem state */
+> +	cc = mvpg(0, buffer, source);
+> +	report(page_ok(buffer) && !cc, "Supervisor state MVPG successful");
+> +
+> +	enter_pstate();
+> +	cc = mvpg(0, buffer, source);
+> +	leave_pstate();
+> +	report(page_ok(buffer) && !cc, "Problem state MVPG successful");
+> +
+> +	report_prefix_pop();
+> +}
+> +
+> +static void test_small_loop(const void *string)
+> +{
+> +	uint8_t *dest;
+> +	int i, cc;
+> +
+> +	/* Looping over cold and warm pages helps catch VSIE bugs */
+> +	report_prefix_push(string);
+> +	dest = fresh;
+> +	for (i = 0; i < ITER; i++) {
+> +		cc = mvpg(0, fresh, source);
+> +		report(page_ok(fresh) && !cc, "cold: %p, %p", source, fresh);
+> +		fresh += PAGE_SIZE;
+> +	}
+> +
+> +	for (i = 0; i < ITER; i++) {
+> +		memset(dest, 0, PAGE_SIZE);
+> +		cc = mvpg(0, dest, source);
+> +		report(page_ok(dest) && !cc, "warm: %p, %p", source, dest);
+> +		dest += PAGE_SIZE;
+> +	}
+> +	report_prefix_pop();
+> +}
+> +
+> +static void test_mmu_prot(void)
+> +{
+> +	int cc;
+> +
+> +	report_prefix_push("protection");
+> +	report_prefix_push("cco=0");
+> +
+> +	/* MVPG should still succeed when the source is read-only */
+> +	protect_page(source, PAGE_ENTRY_P);
+> +	cc = mvpg(0, fresh, source);
+> +	report(page_ok(fresh) && !cc, "source read only");
+> +	unprotect_page(source, PAGE_ENTRY_P);
+> +	fresh += PAGE_SIZE;
+> +
+> +	/*
+> +	 * When the source or destination are invalid, a page translation
+> +	 * exception should be raised; when the destination is read-only,
+> +	 * a protection exception should be raised.
+> +	 */
+> +	protect_page(fresh, PAGE_ENTRY_P);
+> +	expect_pgm_int();
+> +	mvpg(0, fresh, source);
+> +	report(clear_pgm_int() == PGM_INT_CODE_PROTECTION, "destination read only");
+> +	fresh += PAGE_SIZE;
+> +
+> +	protect_page(source, PAGE_ENTRY_I);
+> +	expect_pgm_int();
+> +	mvpg(0, fresh, source);
+> +	report(clear_pgm_int() == PGM_INT_CODE_PAGE_TRANSLATION, "source invalid");
+> +	unprotect_page(source, PAGE_ENTRY_I);
+> +	fresh += PAGE_SIZE;
+> +
+> +	protect_page(fresh, PAGE_ENTRY_I);
+> +	expect_pgm_int();
+> +	mvpg(0, fresh, source);
+> +	report(clear_pgm_int() == PGM_INT_CODE_PAGE_TRANSLATION, "destination invalid");
+> +	fresh += PAGE_SIZE;
+> +
+> +	report_prefix_pop();
+> +	report_prefix_push("cco=1");
+> +	/*
+> +	 * Setting the CCO bit should suppress page translation exceptions,
+> +	 * but not protection exceptions.
+> +	 */
+> +	protect_page(fresh, PAGE_ENTRY_P);
+> +	expect_pgm_int();
+> +	mvpg(CCO, fresh, source);
+> +	report(clear_pgm_int() == PGM_INT_CODE_PROTECTION, "destination read only");
+> +	fresh += PAGE_SIZE;
+> +
+> +	protect_page(fresh, PAGE_ENTRY_I);
+> +	cc = mvpg(CCO, fresh, source);
+> +	report(cc == 1, "destination invalid");
+> +	fresh += PAGE_SIZE;
+> +
+> +	protect_page(source, PAGE_ENTRY_I);
+> +	cc = mvpg(CCO, fresh, source);
+> +	report(cc == 2, "source invalid");
+> +	fresh += PAGE_SIZE;
+> +
+> +	protect_page(fresh, PAGE_ENTRY_I);
+> +	cc = mvpg(CCO, fresh, source);
+> +	report(cc == 2, "source and destination invalid");
+> +	fresh += PAGE_SIZE;
+> +
+> +	unprotect_page(source, PAGE_ENTRY_I);
+> +	report_prefix_pop();
+> +	report_prefix_pop();
+> +}
+> +
+> +int main(void)
+> +{
+> +	report_prefix_push("mvpg");
+> +
+> +	init_page(source);
+> +	fresh = alloc_pages_flags(MEM_ORDER, FLAG_DONTZERO | FLAG_FRESH);
+> +	assert(fresh);
+> +
+> +	test_exceptions();
+> +	test_success();
+> +	test_small_loop("nommu");
+> +
+> +	setup_vm();
+> +
+> +	test_small_loop("mmu");
+> +	test_mmu_prot();
+> +
+> +	report_prefix_pop();
+> +	return report_summary();
+> +}
+> diff --git a/s390x/unittests.cfg b/s390x/unittests.cfg
+> index 2298be6c..9f81a608 100644
+> --- a/s390x/unittests.cfg
+> +++ b/s390x/unittests.cfg
+> @@ -99,3 +99,7 @@ file = uv-guest.elf
+>  
+>  [sie]
+>  file = sie.elf
+> +
+> +[mvpg]
+> +file = mvpg.elf
+> +timeout = 10
 > 
-> In GICv4.1, migration has been supported except for (directly-injected)
-> VLPI. And GICv4.1 Spec explicitly gives a way to get the VLPI's pending
-> state (which was crucially missing in GICv4.0). So we make VLPI migration
-> capable on GICv4.1 in this patch set.
-> 
-> In order to support VLPI migration, we need to save and restore all
-> required configuration information and pending states of VLPIs. But
-> in fact, the configuration information of VLPIs has already been saved
-> (or will be reallocated on the dst host...) in vgic(kvm) migration.
-> So we only have to migrate the pending states of VLPIs specially.
-> 
-> Below is the related workflow in migration.
-> 
-> On the save path:
-> 	In migration completion:
-> 		pause all vCPUs
-> 				|
-> 		call each VM state change handler:
-> 			pause other devices (just keep from sending interrupts, and
-> 			such as VFIO migration protocol has already realized it [1])
-> 					|
-> 			flush ITS tables into guest RAM
-> 					|
-> 			flush RDIST pending tables (also flush VLPI state here)
-> 				|
-> 		...
-> On the resume path:
-> 	load each device's state:
-> 		restore ITS tables (include pending tables) from guest RAM
-> 				|
-> 		for other (PCI) devices (paused), if configured to have VLPIs,
-> 		establish the forwarding paths of their VLPIs (and transfer
-> 		the pending states from kvm's vgic to VPT here)
-> 
-> We have tested this series in VFIO migration, and found some related
-> issues in QEMU [2].
-> 
-> Links:
-> [1] vfio: UAPI for migration interface for device state:
->     https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=a8a24f3f6e38103b77cf399c38eb54e1219d00d6
-> [2] vfio: Some fixes and optimizations for VFIO migration:
->     https://patchwork.ozlabs.org/cover/1413263/
-> 
-> History:
-> 
-> v2 -> v3
->  - Add the vgic initialized check to ensure that the allocation and enabling
->    of the doorbells have already been done before unmapping the vPEs.
->  - Check all get_vlpi_state related conditions in save_pending_tables in one place.
->  - Nit fixes.
-> 
-> v1 -> v2:
->  - Get the VLPI state from the KVM side.
->  - Nit fixes.
-> 
-> Thanks,
-> Shenming
-> 
-> 
-> Shenming Lu (3):
->   KVM: arm64: GICv4.1: Add function to get VLPI state
->   KVM: arm64: GICv4.1: Try to save hw pending state in
->     save_pending_tables
->   KVM: arm64: GICv4.1: Give a chance to save VLPI's pending state
-> 
-> Zenghui Yu (1):
->   KVM: arm64: GICv4.1: Restore VLPI's pending state to physical side
-> 
->  .../virt/kvm/devices/arm-vgic-its.rst         |  2 +-
->  arch/arm64/kvm/vgic/vgic-its.c                |  6 +-
->  arch/arm64/kvm/vgic/vgic-v3.c                 | 61 +++++++++++++++++--
->  arch/arm64/kvm/vgic/vgic-v4.c                 | 33 ++++++++++
->  arch/arm64/kvm/vgic/vgic.h                    |  1 +
->  5 files changed, 93 insertions(+), 10 deletions(-)
-> 
+
