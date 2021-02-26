@@ -2,112 +2,107 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 19610325E91
-	for <lists+kvm@lfdr.de>; Fri, 26 Feb 2021 09:05:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 55878325E98
+	for <lists+kvm@lfdr.de>; Fri, 26 Feb 2021 09:05:08 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230104AbhBZIBC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 26 Feb 2021 03:01:02 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52784 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229541AbhBZIAu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 26 Feb 2021 03:00:50 -0500
-Received: from mail-pf1-x42a.google.com (mail-pf1-x42a.google.com [IPv6:2607:f8b0:4864:20::42a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C028C06174A;
-        Fri, 26 Feb 2021 00:00:10 -0800 (PST)
-Received: by mail-pf1-x42a.google.com with SMTP id j24so5744922pfi.2;
-        Fri, 26 Feb 2021 00:00:10 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id;
-        bh=SGKC+JVft3JHE0DGY/zfVH90D0jA8OCfIOyzcJ20Wcc=;
-        b=XffIAJbzfF4FyjDlJxNDHc5mU8K/77RZLqJY5xBu0uRny+QbYcdpYFDPREhFxOlqix
-         lrGIs9z2Y2XGFmY6pm7B9DKLyHjhLkZTRFW/wwFhQIrcuAZT6mW0O7jYWZOIB9acIbhw
-         9xxaiFwOG7UgnRoSU5z3nCsTGLdKJlPdgYMeLg7OE1fAh+xw/iLBKELLpcPM2i0JfSQY
-         UhZzSfahv/u/+IXT2AVo4DwVQ0V5Xyl3kvqIV7wex8wLiI0TfAZfp8V4X3/6qk3pOpOK
-         IpyvdF87hkmFEKDg5oUm4Th4TZ4uNgSYlLdTCSOCFCZgzL/knheRrii92UXoBIcoCwrL
-         Mfcw==
+        id S230101AbhBZIEy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 26 Feb 2021 03:04:54 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:20923 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229954AbhBZIEx (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 26 Feb 2021 03:04:53 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1614326606;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=CPnOIjDZYXeNRWYCqamKS1PZpsu8x/uzl+V1b5s0iw8=;
+        b=BP63UJqjgWegagGVJfq31u9OXBUlrsYoqNKh9OMOoIvU1j65hf6HFddXd8liL3DXfD1krf
+        aei4JxOf1kFjb37oqf8fOZ2BIkKn/s4qkki90kr03iliEiEQdznZSxDJ8d6eSRZNQYtIpt
+        G244bXMbC8xPUxP/rM6gTdhqb+IpW1k=
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
+ [209.85.218.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-376-jq0Yhso6NcOjCaB4LYJ5KA-1; Fri, 26 Feb 2021 03:03:24 -0500
+X-MC-Unique: jq0Yhso6NcOjCaB4LYJ5KA-1
+Received: by mail-ej1-f72.google.com with SMTP id v10so3866362ejh.15
+        for <kvm@vger.kernel.org>; Fri, 26 Feb 2021 00:03:24 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id;
-        bh=SGKC+JVft3JHE0DGY/zfVH90D0jA8OCfIOyzcJ20Wcc=;
-        b=aTn5ca/Oh7muRoFzdWffcev9wcBBJwJdtWhxcqAkQbsymNxg0m27aeUavRYJfmPZd7
-         wQcmg8VtHxpYUqw1nBXzlEJlmpodwuSdm57R5ObC6E8v4lw6R1etIiwUOUQpb1tImZlB
-         WN1PHOPKLcwyQPcXFH5JUFuaziJx4cWAhPHlxuvypiZWJ7iCGdemfVJf6wCf+GoZAUSO
-         T4Q3ao53/t8OotikLTzgSx52GjcMoCPn2TLGrnIyiYrS2zoMfj5CDGlOHhziQY3ZmsR4
-         EkB7j4dXaS1HAqKRo/jVgKV2mv/q+ujN+bRsveKH2qGO4T2Ld460aAy1Q+oIEwZucatz
-         QEBw==
-X-Gm-Message-State: AOAM533TyF6yxy49uXEbGErwLc6SpEo0vFFJVZigvZ6sgs4erqMa5hTf
-        rteIlZshMCIyTv3XsFygKi/taxBlheXhcw==
-X-Google-Smtp-Source: ABdhPJxawGKZ4ZgAsRE/UqeSM6fJzqrwWfMq6XhqheJIZuUgfWr+DWX8mVWgINCwXXDMPA8ZxrbQPw==
-X-Received: by 2002:a63:dd49:: with SMTP id g9mr1900154pgj.175.1614326409597;
-        Fri, 26 Feb 2021 00:00:09 -0800 (PST)
-Received: from localhost.localdomain ([103.7.29.6])
-        by smtp.googlemail.com with ESMTPSA id b18sm8785961pfi.173.2021.02.26.00.00.07
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 26 Feb 2021 00:00:09 -0800 (PST)
-From:   Wanpeng Li <kernellwp@gmail.com>
-X-Google-Original-From: Wanpeng Li <wanpengli@tencent.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>
-Subject: [PATCH] KVM: x86: hyper-v: Fix Hyper-V context null-ptr-deref
-Date:   Fri, 26 Feb 2021 15:59:59 +0800
-Message-Id: <1614326399-5762-1-git-send-email-wanpengli@tencent.com>
-X-Mailer: git-send-email 2.7.4
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=CPnOIjDZYXeNRWYCqamKS1PZpsu8x/uzl+V1b5s0iw8=;
+        b=CTn1hZrrdX4SgCGUJasmnJHNOJO0LT9T0YOdSNEyeBVXsm545Ka8nay8nQlziPXrLy
+         ahsZUfosBJ3/nBk6DgtDJVmrGpqmi2/WKuycu6ztWGPEtMjY+qIfAVCzc/GM6AgDXesM
+         flv5fFmYEamcOKtCJpDDTBG3qtOZVcXy09CNVMdMHHZ6vT4pEQgqHZ2DGEmOAcpqP+kO
+         tMf+sdXSed6RE2e4He8Q61Qdum5LK4zLiNZtaZJC8wG1eEIXfL+zOYdZ+94gY4JA4anj
+         4XZncmCm70vxjsAY5UAu4PE8z16ALq1FvXVfGJ9bVnX4xPoPYemK9YlBuOiT0jRvMzD/
+         iidA==
+X-Gm-Message-State: AOAM533ds3k0S8KGfRwEPrfKqNUZzGO2De9I+rjBhyiQrv5gcKp8Lvup
+        cBCLFAnjC9YgrnEnoIheIxcEVBIgdcp6HdvBIuQJXSntohcUXwaT+qTgrsP4QLQhVty/iMIJG64
+        nuVKkh/FGkVUh
+X-Received: by 2002:a17:906:bc85:: with SMTP id lv5mr1985198ejb.412.1614326603148;
+        Fri, 26 Feb 2021 00:03:23 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJzx4ypKh5EdCVtEubF3HXKELpdlAIDE42Z3LFmZxc9/XlfnJVuK8HdKXKabBE/JYJ4o3+hSJw==
+X-Received: by 2002:a17:906:bc85:: with SMTP id lv5mr1985186ejb.412.1614326603008;
+        Fri, 26 Feb 2021 00:03:23 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id i7sm5113867edq.87.2021.02.26.00.03.21
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 26 Feb 2021 00:03:22 -0800 (PST)
+Subject: Re: [PATCH] KVM: Documentation: rectify rst markup in kvm_run->flags
+To:     Chenyi Qiang <chenyi.qiang@intel.com>
+Cc:     Stephen Rothwell <sfr@canb.auug.org.au>,
+        Jonathan Corbet <corbet@lwn.net>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20210226075541.27179-1-chenyi.qiang@intel.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <3461a412-f214-fb75-3b82-97466aca03f4@redhat.com>
+Date:   Fri, 26 Feb 2021 09:03:21 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.7.0
+MIME-Version: 1.0
+In-Reply-To: <20210226075541.27179-1-chenyi.qiang@intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Wanpeng Li <wanpengli@tencent.com>
+On 26/02/21 08:55, Chenyi Qiang wrote:
+> Commit c32b1b896d2a ("KVM: X86: Add the Document for
+> KVM_CAP_X86_BUS_LOCK_EXIT") added a new flag in kvm_run->flags
+> documentation, and caused warning in make htmldocs:
+> 
+>    Documentation/virt/kvm/api.rst:5004: WARNING: Unexpected indentation
+>    Documentation/virt/kvm/api.rst:5004: WARNING: Inline emphasis start-string without end-string
+> 
+> Fix this rst markup issue.
+> 
+> Signed-off-by: Chenyi Qiang <chenyi.qiang@intel.com>
+> ---
+>   Documentation/virt/kvm/api.rst | 3 ++-
+>   1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> index aed52b0fc16e..0717bf523034 100644
+> --- a/Documentation/virt/kvm/api.rst
+> +++ b/Documentation/virt/kvm/api.rst
+> @@ -5000,7 +5000,8 @@ local APIC is not used.
+>   	__u16 flags;
+>   
+>   More architecture-specific flags detailing state of the VCPU that may
+> -affect the device's behavior. Current defined flags:
+> +affect the device's behavior. Current defined flags::
+> +
+>     /* x86, set if the VCPU is in system management mode */
+>     #define KVM_RUN_X86_SMM     (1 << 0)
+>     /* x86, set if bus lock detected in VM */
+> 
 
-Reported by syzkaller:
+Queued, thanks.
 
-    KASAN: null-ptr-deref in range [0x0000000000000140-0x0000000000000147]
-    CPU: 1 PID: 8370 Comm: syz-executor859 Not tainted 5.11.0-syzkaller #0
-    RIP: 0010:synic_get arch/x86/kvm/hyperv.c:165 [inline]
-    RIP: 0010:kvm_hv_set_sint_gsi arch/x86/kvm/hyperv.c:475 [inline]
-    RIP: 0010:kvm_hv_irq_routing_update+0x230/0x460 arch/x86/kvm/hyperv.c:498
-    Call Trace:
-     kvm_set_irq_routing+0x69b/0x940 arch/x86/kvm/../../../virt/kvm/irqchip.c:223
-     kvm_vm_ioctl+0x12d0/0x2800 arch/x86/kvm/../../../virt/kvm/kvm_main.c:3959
-     vfs_ioctl fs/ioctl.c:48 [inline]
-     __do_sys_ioctl fs/ioctl.c:753 [inline]
-     __se_sys_ioctl fs/ioctl.c:739 [inline]
-     __x64_sys_ioctl+0x193/0x200 fs/ioctl.c:739
-     do_syscall_64+0x2d/0x70 arch/x86/entry/common.c:46
-     entry_SYSCALL_64_after_hwframe+0x44/0xae
-
-Hyper-V context is lazily allocated until Hyper-V specific MSRs are accessed 
-or SynIC is enabled. However, the syzkaller testcase sets irq routing table 
-directly w/o enabling SynIC. This results in null-ptr-deref when accessing 
-SynIC Hyper-V context. This patch fixes it.
-     
-syzkaller source: https://syzkaller.appspot.com/x/repro.c?x=163342ccd00000
-
-Reported-by: syzbot+6987f3b2dbd9eda95f12@syzkaller.appspotmail.com
-Fixes: 8f014550dfb1 ("KVM: x86: hyper-v: Make Hyper-V emulation enablement conditional")
-Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
----
- arch/x86/kvm/hyperv.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
-index 7d2dae9..58fa8c0 100644
---- a/arch/x86/kvm/hyperv.c
-+++ b/arch/x86/kvm/hyperv.c
-@@ -159,7 +159,7 @@ static struct kvm_vcpu_hv_synic *synic_get(struct kvm *kvm, u32 vpidx)
- 	struct kvm_vcpu_hv_synic *synic;
- 
- 	vcpu = get_vcpu_by_vpidx(kvm, vpidx);
--	if (!vcpu)
-+	if (!vcpu || !to_hv_vcpu(vcpu))
- 		return NULL;
- 	synic = to_hv_synic(vcpu);
- 	return (synic->active) ? synic : NULL;
--- 
-2.7.4
+Paolo
 
