@@ -2,73 +2,73 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 09C4732636D
-	for <lists+kvm@lfdr.de>; Fri, 26 Feb 2021 14:36:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3786D326372
+	for <lists+kvm@lfdr.de>; Fri, 26 Feb 2021 14:40:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229864AbhBZNfO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 26 Feb 2021 08:35:14 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:3894 "EHLO
+        id S229571AbhBZNk5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 26 Feb 2021 08:40:57 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:36632 "EHLO
         mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229554AbhBZNfM (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 26 Feb 2021 08:35:12 -0500
+        by vger.kernel.org with ESMTP id S229554AbhBZNky (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 26 Feb 2021 08:40:54 -0500
 Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 11QDYOQv010280
-        for <kvm@vger.kernel.org>; Fri, 26 Feb 2021 08:34:30 -0500
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 11QDYO7s010274
+        for <kvm@vger.kernel.org>; Fri, 26 Feb 2021 08:40:13 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
  references : from : message-id : date : mime-version : in-reply-to :
  content-type : content-transfer-encoding; s=pp1;
- bh=bJYQ9p9kpDti/puJPsPLZx/hHwTQz9jfxXRxivB1xY0=;
- b=KA4yNGID2p19q+zCp3ynhawFhKVSqmWugjswqjFOcCtOFRIKVyk0juwAxKkrovRKYqm6
- Kqw2YRzM9kTlwHzMScrA8gaxndB1odGvdZvwZ1u8eqZroF5cQ/Xo0xM5/m2bdns8Ewhl
- CIXnREdHzox7G0GJ1V7z1I1BUwrzhYAhfH/7E9BlmFlk0wIR06AWHTnuk7yWPdyFMOVP
- V6itk9MDxwGij8Aut5pkz9p4ydm4vd9jMsr0beeaObKLCXUgv5Bhchglba5ez5fkvpH6
- H57rOyYHpDGVANY99xe2jSvY3oWp12jyB1O/hrJnHYTBsVNw2qwSOMVnCO9oL8VJYWhZ 2g== 
+ bh=hsgjqBWvj/TaMQNYXjHOWhm3mGFd9jLViTVoGF0p0eg=;
+ b=moBOJJfpa+2TNjrm1kqccTjhwhR58MTvHuPTPLnhDXiN5LFo9aLu1pjNpZqM1dVsfzlL
+ ek44eZMpXASnzI72IYrD44Tt3+8Lv09k1OjNq50EqeFwEHWNxoCmfEHiNcytbiG9EDJh
+ uQV6UhYLb/bJezQWfTp+jZHZ2fEtEOQkf/xE2+a5vcv4Rg3AnqHugcnHm4ndbMW1c/Xg
+ BGKypbiJwUZ+tUBqj5o4KJBs7WeLFSAcQzRthxV2Rmab/akzFuWe+esTZz6I9hVF7Ltm
+ pSVIUACk4XAtBCQxN/hvJSRniEdDJgJZ1tOJLdzFjAxfEKPRMUVcBGJSMOe60ccTLjFq oQ== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 36y02suuum-1
+        by mx0a-001b2d01.pphosted.com with ESMTP id 36y02sv1b5-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Fri, 26 Feb 2021 08:34:29 -0500
+        for <kvm@vger.kernel.org>; Fri, 26 Feb 2021 08:40:13 -0500
 Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 11QDYTve010650
-        for <kvm@vger.kernel.org>; Fri, 26 Feb 2021 08:34:29 -0500
-Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 36y02suuty-1
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 11QDYXlD010822
+        for <kvm@vger.kernel.org>; Fri, 26 Feb 2021 08:40:12 -0500
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 36y02sv1ae-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 26 Feb 2021 08:34:29 -0500
-Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
-        by ppma02fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 11QDVxgR015192;
-        Fri, 26 Feb 2021 13:34:27 GMT
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
-        by ppma02fra.de.ibm.com with ESMTP id 36tt28atgp-1
+        Fri, 26 Feb 2021 08:40:12 -0500
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 11QDcLUf024054;
+        Fri, 26 Feb 2021 13:40:10 GMT
+Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
+        by ppma03ams.nl.ibm.com with ESMTP id 36tt285c00-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 26 Feb 2021 13:34:27 +0000
+        Fri, 26 Feb 2021 13:40:10 +0000
 Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
-        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 11QDYO5t42402114
+        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 11QDcdpJ32440804
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 26 Feb 2021 13:34:24 GMT
+        Fri, 26 Feb 2021 13:38:39 GMT
 Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 8A06711C04A;
-        Fri, 26 Feb 2021 13:34:24 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id D642F11C050;
+        Fri, 26 Feb 2021 13:38:52 +0000 (GMT)
 Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 3E21F11C050;
-        Fri, 26 Feb 2021 13:34:24 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 883CD11C04C;
+        Fri, 26 Feb 2021 13:38:52 +0000 (GMT)
 Received: from oc3016276355.ibm.com (unknown [9.145.145.240])
         by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Fri, 26 Feb 2021 13:34:24 +0000 (GMT)
-Subject: Re: [kvm-unit-tests PATCH v3 5/5] s390x: css: testing measurement
- block format 1
+        Fri, 26 Feb 2021 13:38:52 +0000 (GMT)
+Subject: Re: [kvm-unit-tests PATCH v3 1/5] s390x: css: Store CSS
+ Characteristics
 To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
 Cc:     david@redhat.com, thuth@redhat.com, cohuck@redhat.com,
         imbrenda@linux.ibm.com
 References: <1613669204-6464-1-git-send-email-pmorel@linux.ibm.com>
- <1613669204-6464-6-git-send-email-pmorel@linux.ibm.com>
- <3041cee9-a5b8-1745-5455-f7728ae4d232@linux.ibm.com>
+ <1613669204-6464-2-git-send-email-pmorel@linux.ibm.com>
+ <6577ebb9-5f61-e70a-cf72-4f428b9db4f4@linux.ibm.com>
 From:   Pierre Morel <pmorel@linux.ibm.com>
-Message-ID: <47029f68-2bdc-a5ed-f3be-2573b5989899@linux.ibm.com>
-Date:   Fri, 26 Feb 2021 14:34:23 +0100
+Message-ID: <c9935059-35d7-c995-d95d-de6a91049eeb@linux.ibm.com>
+Date:   Fri, 26 Feb 2021 14:38:52 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.7.0
 MIME-Version: 1.0
-In-Reply-To: <3041cee9-a5b8-1745-5455-f7728ae4d232@linux.ibm.com>
+In-Reply-To: <6577ebb9-5f61-e70a-cf72-4f428b9db4f4@linux.ibm.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -86,117 +86,97 @@ X-Mailing-List: kvm@vger.kernel.org
 
 
 
-On 2/26/21 11:02 AM, Janosch Frank wrote:
+On 2/26/21 10:50 AM, Janosch Frank wrote:
 > On 2/18/21 6:26 PM, Pierre Morel wrote:
->> Measurement block format 1 is made available by the extended
->> measurement block facility and is indicated in the SCHIB by
->> the bit in the PMCW.
 
-...
-
->> +void msch_with_wrong_fmt1_mbo(unsigned int schid, uint64_t mb)
->> +{
->> +	struct pmcw *pmcw = &schib.pmcw;
->> +	int cc;
->> +
->> +	/* Read the SCHIB for this subchannel */
->> +	cc = stsch(schid, &schib);
->> +	if (cc) {> +		report(0, "stsch: sch %08x failed with cc=%d", schid, cc);
->> +		return;
->> +	}
->> +
->> +	/* Update the SCHIB to enable the measurement block */
->> +	pmcw->flags |= PMCW_MBUE;
->> +	pmcw->flags2 |= PMCW_MBF1;
->> +	schib.mbo = mb;
->> +
->> +	/* Tell the CSS we want to modify the subchannel */
->> +	expect_pgm_int();
->> +	cc = msch(schid, &schib);
->> +	check_pgm_int_code(PGM_INT_CODE_OPERAND);
-> 
-> Why would you expect a PGM in a library function are PGMs normal for IO
-> instructions? oO
-> 
-> Is this a test function which should be part of your test file in
-> s390x/*.c or is it part of the IO library which should:
-> 
->   - Abort if an initialization failed and we can assume that future tests
-> are now useless
->   - Return an error so the test can report an error
->   - Return success
-
-
-
-Now it looks clear to me that this test belongs to the tests and not the 
-lib.
-I put it there to avoid exporting the SCHIB, but after all, why not 
-exporting the SCHIB, we may need access to it from other tests again in 
-the future.
-
-
-
-> 
->> +}
->> diff --git a/s390x/css.c b/s390x/css.c
->> index b65aa89..576df48 100644
->> --- a/s390x/css.c
->> +++ b/s390x/css.c
->> @@ -257,6 +257,58 @@ end:
->>   	report_prefix_pop();
->>   }
 >>   
 >> +/*
->> + * test_schm_fmt1:
->> + * With measurement block format 1 the mesurement block is
->> + * dedicated to a subchannel.
+>> + * CHSC definitions
 >> + */
->> +static void test_schm_fmt1(void)
+>> +struct chsc_header {
+>> +	u16 len;
+>> +	u16 code;
+> 
+> uint*_t types please
+
+OK
+
+> 
+>> +};
+
+>> +static int check_response(void *p)
 >> +{
->> +	struct measurement_block_format1 *mb1;
+>> +	struct chsc_header *h = p;
 >> +
->> +	report_prefix_push("Format 1");
->> +
->> +	if (!test_device_sid) {
->> +		report_skip("No device");
->> +		goto end;
+>> +	if (h->code == CHSC_RSP_OK) {
+>> +		report(1, "CHSC command completed.");
+> 
+> I'm not a big fan of using integer constants for boolean type arguments.
+
+hum, right, I will rework all these reports that should not appear here
+anyway
+
+> 
+>> +		return 0;
 >> +	}
-
-...
-
->> +	report(start_measure((u64)mb1, 0, true) &&
->> +	       mb1->ssch_rsch_count == SCHM_UPDATE_CNT,
->> +	       "SSCH measured %d", mb1->ssch_rsch_count);
->> +	report_prefix_pop();
->> +
->> +	schm(NULL, 0); /* Stop the measurement */
->> +	free_io_mem(mb1, sizeof(struct measurement_block_format1));
->> +end:
->> +	report_prefix_pop();
+>> +	if (h->code > CHSC_RSP_MAX)
+>> +		h->code = 0;
+>> +	report(0, "Response code %04x: %s", h->code, chsc_rsp_description[h->code]);
+>> +	return -1;
 >> +}
 >> +
+>> +int chsc(void *p, uint16_t code, uint16_t len)
+>> +{
+>> +	struct chsc_header *h = p;
+>> +	int cc;
+>> +
+>> +	report_prefix_push("Channel Subsystem Call");
+>> +	h->code = code;
+>> +	h->len = len;
+>> +	cc = _chsc(p);
+>> +	switch (cc) {
+>> +	case 3:
+>> +		report(0, "Subchannel invalid or not enabled.");
+>> +		break;
+>> +	case 2:
+>> +		report(0, "CHSC subchannel busy.");
+>> +		break;
+>> +	case 1:
+>> +		report(0, "Subchannel invalid or not enabled.");
+>> +		break;
+> 
+> I don't think that this is how we want to handle error reporting in lib
+> files.
+> 
+> Please don't use report for library error reporting if it's not needed.
+> 
+> Most of the times you should return an error code or simply
+> abort()/assert() if for instance a library init function fails and you
+> can assume that most of the test code is dependent on that librarie's
+> initialization. Sometimes report_abort() is also ok.
+> 
+> Test code should not be part of the library if possible!
+
+Yes, will take care of that.
+
 >>   static struct {
 >>   	const char *name;
 >>   	void (*func)(void);
->> @@ -268,6 +320,7 @@ static struct {
+>>   } tests[] = {
+>> +	/* The css_init test is needed to initialize the CSS Characteristics */
+>> +	{ "initialize CSS (chsc)", css_init },
+> 
+> Is css_init() really a test or does it only setup state for further tests?
+
+Yes it is a test too
+I rework that.
+
+> 
+>>   	{ "enumerate (stsch)", test_enumerate },
+>>   	{ "enable (msch)", test_enable },
 >>   	{ "sense (ssch/tsch)", test_sense },
->>   	{ "measurement block (schm)", test_schm },
->>   	{ "measurement block format0", test_schm_fmt0 },
->> +	{ "measurement block format1", test_schm_fmt1 },
+>>
 > 
-> Output will then be:
-> "measurement block format1: Format 1: Report message"
-> 
-> Wouldn't it make more sense to put the format 0 and 1 tests into
-> test_schm() so we'd have:
-> "measurement block (schm): Format 0: Report message" ?
-
-too much prefix push...
-rationalizing will make the goto disapear...
-
-Thanks for review
-Regards,
-Pierre
 
 -- 
 Pierre Morel
