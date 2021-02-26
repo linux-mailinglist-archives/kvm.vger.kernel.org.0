@@ -2,357 +2,259 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 08F49326088
-	for <lists+kvm@lfdr.de>; Fri, 26 Feb 2021 10:53:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 530613260CE
+	for <lists+kvm@lfdr.de>; Fri, 26 Feb 2021 11:03:45 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230409AbhBZJwA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 26 Feb 2021 04:52:00 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:33580 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S230446AbhBZJvB (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 26 Feb 2021 04:51:01 -0500
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 11Q9WxZP162987
-        for <kvm@vger.kernel.org>; Fri, 26 Feb 2021 04:50:20 -0500
+        id S230471AbhBZKDk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 26 Feb 2021 05:03:40 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:27706 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230421AbhBZKDC (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 26 Feb 2021 05:03:02 -0500
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 11Q9X8qW026108
+        for <kvm@vger.kernel.org>; Fri, 26 Feb 2021 05:02:21 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=to : cc : references :
  from : subject : message-id : date : mime-version : in-reply-to :
  content-type : content-transfer-encoding; s=pp1;
- bh=5t27a+6o//nI3H2Z4aN4OUjKi2Yk/b9VXDPYzhaK4MA=;
- b=ttR4ARquenCXC/vusCsvA5N7tdyHOUJlJrDAkx5FVXk92XT13NBSCTHrf3gdgJC+vHw9
- d2aabqWyEIdKxKPRMvxTM6qDSATmtnU7tkhR+yBMk303CxUvfIB7BYQueVajOlxlUofK
- nYqJl3HTKKq2Q5AcvYjgUJ4FanwY+1lJ3Zxd/kxw1TY2wTe4df6Si18o5gUzOgGHbPWt
- BrvQ37Xe7uyTnryO/zwak61S7eCMIKKdHv6G3wxwqqvam+Ly55+hFGd0rH89nM0JMVtK
- widW2BRplPEUHxfbgNCwtLK9xgdcODId7v5VqSSJNyQwV/ZX8reqzQGt13VPEutJkVr8 xw== 
+ bh=LuM3iSasXJRVOIyGXYeegA4P+EbcUsj+z0ijOGnVLVA=;
+ b=azIVq8QvbmyyODzT4Jmwgd4yQ2dsq9CjHrt5rWMhKrcUhH+3yFaWHd2Cl1pxCmDnNNg5
+ s8fgNePTmJpi5d3757kFYtdRY7wIcEr28LwUSjbpdji+SFejEMURXRL4FtgrCFyFtAYP
+ Rrw5b75979AYHlft6DIDgVWFfN6V+jg021TpUcJX/pyDWNhZZQDjYDq7+Sn5iQhKpP8Z
+ 7Y7pSLvNiCUJizXDJsFADiNAQ/h9wIMu/o/XogSYz1AiLeTdGBu8ilcdGc5DQIv0zYN9
+ s9TbAz5hsTJ6ch1BAHpyZKrAhy35uTpWnN3o/Ve9U3s0LbBz7XlDNmKAePaCiGdgmgOk /w== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 36xtfyf0ya-1
+        by mx0a-001b2d01.pphosted.com with ESMTP id 36xphumst1-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Fri, 26 Feb 2021 04:50:20 -0500
-Received: from m0098414.ppops.net (m0098414.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 11Q9XAgG164293
-        for <kvm@vger.kernel.org>; Fri, 26 Feb 2021 04:50:20 -0500
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 36xtfyf0xk-1
+        for <kvm@vger.kernel.org>; Fri, 26 Feb 2021 05:02:21 -0500
+Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 11Q9XZ2e026879
+        for <kvm@vger.kernel.org>; Fri, 26 Feb 2021 05:02:20 -0500
+Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 36xphumsrq-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 26 Feb 2021 04:50:20 -0500
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 11Q9mXu3016122;
-        Fri, 26 Feb 2021 09:50:18 GMT
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
-        by ppma04ams.nl.ibm.com with ESMTP id 36tt28d5aa-1
+        Fri, 26 Feb 2021 05:02:20 -0500
+Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
+        by ppma01fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 11Q9swYW006933;
+        Fri, 26 Feb 2021 10:02:18 GMT
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
+        by ppma01fra.de.ibm.com with ESMTP id 36tt28aqan-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 26 Feb 2021 09:50:18 +0000
+        Fri, 26 Feb 2021 10:02:18 +0000
 Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 11Q9oFal35520890
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 11QA2F6T61735378
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 26 Feb 2021 09:50:15 GMT
+        Fri, 26 Feb 2021 10:02:15 GMT
 Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 85E4911C04C;
-        Fri, 26 Feb 2021 09:50:15 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 495FC11C04A;
+        Fri, 26 Feb 2021 10:02:15 +0000 (GMT)
 Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 26B7711C052;
-        Fri, 26 Feb 2021 09:50:15 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id E723711C058;
+        Fri, 26 Feb 2021 10:02:14 +0000 (GMT)
 Received: from localhost.localdomain (unknown [9.145.91.176])
         by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Fri, 26 Feb 2021 09:50:15 +0000 (GMT)
+        Fri, 26 Feb 2021 10:02:14 +0000 (GMT)
 To:     Pierre Morel <pmorel@linux.ibm.com>, kvm@vger.kernel.org
 Cc:     david@redhat.com, thuth@redhat.com, cohuck@redhat.com,
         imbrenda@linux.ibm.com
 References: <1613669204-6464-1-git-send-email-pmorel@linux.ibm.com>
- <1613669204-6464-2-git-send-email-pmorel@linux.ibm.com>
+ <1613669204-6464-6-git-send-email-pmorel@linux.ibm.com>
 From:   Janosch Frank <frankja@linux.ibm.com>
-Subject: Re: [kvm-unit-tests PATCH v3 1/5] s390x: css: Store CSS
- Characteristics
-Message-ID: <6577ebb9-5f61-e70a-cf72-4f428b9db4f4@linux.ibm.com>
-Date:   Fri, 26 Feb 2021 10:50:14 +0100
+Subject: Re: [kvm-unit-tests PATCH v3 5/5] s390x: css: testing measurement
+ block format 1
+Message-ID: <3041cee9-a5b8-1745-5455-f7728ae4d232@linux.ibm.com>
+Date:   Fri, 26 Feb 2021 11:02:14 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.7.0
 MIME-Version: 1.0
-In-Reply-To: <1613669204-6464-2-git-send-email-pmorel@linux.ibm.com>
+In-Reply-To: <1613669204-6464-6-git-send-email-pmorel@linux.ibm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.761
  definitions=2021-02-26_02:2021-02-24,2021-02-26 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
- mlxlogscore=999 adultscore=0 spamscore=0 suspectscore=0 lowpriorityscore=0
- mlxscore=0 clxscore=1015 impostorscore=0 phishscore=0 bulkscore=0
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2102260072
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 mlxlogscore=999
+ malwarescore=0 suspectscore=0 priorityscore=1501 phishscore=0 spamscore=0
+ bulkscore=0 mlxscore=0 impostorscore=0 clxscore=1015 lowpriorityscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
+ definitions=main-2102260072
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On 2/18/21 6:26 PM, Pierre Morel wrote:
-> CSS characteristics exposes the features of the Channel SubSystem.
-> Let's use Store Channel Subsystem Characteristics to retrieve
-> the features of the CSS.
+> Measurement block format 1 is made available by the extended
+> measurement block facility and is indicated in the SCHIB by
+> the bit in the PMCW.
+> 
+> The MBO is specified in the SCHIB of each channel and the MBO
+> defined by the SCHM instruction is ignored.
+> 
+> The test of the MB format 1 is just skipped if the feature is
+> not available.
 > 
 > Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
-> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
 > ---
->  lib/s390x/css.h     |  67 +++++++++++++++++++++++++++
->  lib/s390x/css_lib.c | 110 +++++++++++++++++++++++++++++++++++++++++++-
->  s390x/css.c         |  12 +++++
->  3 files changed, 188 insertions(+), 1 deletion(-)
+>  lib/s390x/css.h     | 16 ++++++++++++++
+>  lib/s390x/css_lib.c | 25 ++++++++++++++++++++-
+>  s390x/css.c         | 53 +++++++++++++++++++++++++++++++++++++++++++++
+>  3 files changed, 93 insertions(+), 1 deletion(-)
 > 
 > diff --git a/lib/s390x/css.h b/lib/s390x/css.h
-> index 3e57445..49daecd 100644
+> index dabe54a..1e5e4b5 100644
 > --- a/lib/s390x/css.h
 > +++ b/lib/s390x/css.h
-> @@ -288,4 +288,71 @@ int css_residual_count(unsigned int schid);
->  void enable_io_isc(uint8_t isc);
->  int wait_and_check_io_completion(int schid);
+> @@ -387,4 +387,20 @@ struct measurement_block_format0 {
+>  	uint32_t initial_cmd_resp_time;
+>  };
 >  
-> +/*
-> + * CHSC definitions
-> + */
-> +struct chsc_header {
-> +	u16 len;
-> +	u16 code;
-
-uint*_t types please
-
+> +struct measurement_block_format1 {
+> +	uint32_t ssch_rsch_count;
+> +	uint32_t sample_count;
+> +	uint32_t device_connect_time;
+> +	uint32_t function_pending_time;
+> +	uint32_t device_disconnect_time;
+> +	uint32_t cu_queuing_time;
+> +	uint32_t device_active_only_time;
+> +	uint32_t device_busy_time;
+> +	uint32_t initial_cmd_resp_time;
+> +	uint32_t irq_delay_time;
+> +	uint32_t irq_prio_delay_time;
 > +};
 > +
-> +/* Store Channel Subsystem Characteristics */
-> +struct chsc_scsc {
-> +	struct chsc_header req;
-> +	u16 req_fmt;
-> +	u8 cssid;
-> +	u8 res_03;
-> +	u32 res_04[2];
-> +	struct chsc_header res;
-> +	u32 res_fmt;
-> +	u64 general_char[255];
-> +	u64 chsc_char[254];
-> +};
-> +
-> +extern struct chsc_scsc *chsc_scsc;
-> +#define CHSC_SCSC	0x0010
-> +#define CHSC_SCSC_LEN	0x0010
-> +
-> +int get_chsc_scsc(void);
-> +
-> +#define CSS_GENERAL_FEAT_BITLEN	(255 * 64)
-> +#define CSS_CHSC_FEAT_BITLEN	(254 * 64)
-> +
-> +#define CHSC_SCSC	0x0010
-> +#define CHSC_SCSC_LEN	0x0010
-> +
-> +#define CHSC_ERROR	0x0000
-> +#define CHSC_RSP_OK	0x0001
-> +#define CHSC_RSP_INVAL	0x0002
-> +#define CHSC_RSP_REQERR	0x0003
-> +#define CHSC_RSP_ENOCMD	0x0004
-> +#define CHSC_RSP_NODATA	0x0005
-> +#define CHSC_RSP_SUP31B	0x0006
-> +#define CHSC_RSP_EFRMT	0x0007
-> +#define CHSC_RSP_ECSSID	0x0008
-> +#define CHSC_RSP_ERFRMT	0x0009
-> +#define CHSC_RSP_ESSID	0x000A
-> +#define CHSC_RSP_EBUSY	0x000B
-> +#define CHSC_RSP_MAX	0x000B
-> +
-> +static inline int _chsc(void *p)
-> +{
-> +	int cc;
-> +
-> +	asm volatile(" .insn   rre,0xb25f0000,%2,0\n"
-> +		     " ipm     %0\n"
-> +		     " srl     %0,28\n"
-> +		     : "=d" (cc), "=m" (p)
-> +		     : "d" (p), "m" (p)
-> +		     : "cc");
-> +
-> +	return cc;
-> +}
-> +
-> +int chsc(void *p, uint16_t code, uint16_t len);
-> +
-> +#include <bitops.h>
-> +#define css_general_feature(bit) test_bit_inv(bit, chsc_scsc->general_char)
-> +#define css_chsc_feature(bit) test_bit_inv(bit, chsc_scsc->chsc_char)
+> +void msch_with_wrong_fmt1_mbo(unsigned int schid, uint64_t mb);
 > +
 >  #endif
 > diff --git a/lib/s390x/css_lib.c b/lib/s390x/css_lib.c
-> index 3c24480..64560a2 100644
+> index 4c8a6ae..1f09f93 100644
 > --- a/lib/s390x/css_lib.c
 > +++ b/lib/s390x/css_lib.c
-> @@ -15,11 +15,119 @@
->  #include <asm/arch_def.h>
->  #include <asm/time.h>
->  #include <asm/arch_def.h>
-> -
-> +#include <alloc_page.h>
->  #include <malloc_io.h>
->  #include <css.h>
+> @@ -298,7 +298,7 @@ static bool schib_update_mb(int schid, uint64_t mb, uint16_t mbi,
+>  			pmcw->flags2 &= ~PMCW_MBF1;
 >  
->  static struct schib schib;
-> +struct chsc_scsc *chsc_scsc;
+>  		pmcw->mbi = mbi;
+> -		schib.mbo = mb;
+> +		schib.mbo = mb & ~0x3f;
+>  	} else {
+>  		pmcw->flags &= ~(PMCW_MBUE | PMCW_DCTME);
+>  	}
+> @@ -527,3 +527,26 @@ void enable_io_isc(uint8_t isc)
+>  	value = (uint64_t)isc << 24;
+>  	lctlg(6, value);
+>  }
 > +
-> +static const char * const chsc_rsp_description[] = {
-> +	"CHSC unknown error",
-> +	"Command executed",
-> +	"Invalid command",
-> +	"Request-block error",
-> +	"Command not installed",
-> +	"Data not available",
-> +	"Absolute address of channel-subsystem communication block exceeds 2G - 1.",
-> +	"Invalid command format",
-> +	"Invalid channel-subsystem identification (CSSID)",
-> +	"The command-request block specified an invalid format for the command response block.",
-> +	"Invalid subchannel-set identification (SSID)",
-> +	"A busy condition precludes execution.",
-> +};
-> +
-> +static int check_response(void *p)
+> +void msch_with_wrong_fmt1_mbo(unsigned int schid, uint64_t mb)
 > +{
-> +	struct chsc_header *h = p;
-> +
-> +	if (h->code == CHSC_RSP_OK) {
-> +		report(1, "CHSC command completed.");
-
-I'm not a big fan of using integer constants for boolean type arguments.
-
-> +		return 0;
-> +	}
-> +	if (h->code > CHSC_RSP_MAX)
-> +		h->code = 0;
-> +	report(0, "Response code %04x: %s", h->code, chsc_rsp_description[h->code]);
-> +	return -1;
-> +}
-> +
-> +int chsc(void *p, uint16_t code, uint16_t len)
-> +{
-> +	struct chsc_header *h = p;
+> +	struct pmcw *pmcw = &schib.pmcw;
 > +	int cc;
 > +
-> +	report_prefix_push("Channel Subsystem Call");
-> +	h->code = code;
-> +	h->len = len;
-> +	cc = _chsc(p);
-> +	switch (cc) {
-> +	case 3:
-> +		report(0, "Subchannel invalid or not enabled.");
-> +		break;
-> +	case 2:
-> +		report(0, "CHSC subchannel busy.");
-> +		break;
-> +	case 1:
-> +		report(0, "Subchannel invalid or not enabled.");
-> +		break;
-
-I don't think that this is how we want to handle error reporting in lib
-files.
-
-Please don't use report for library error reporting if it's not needed.
-
-Most of the times you should return an error code or simply
-abort()/assert() if for instance a library init function fails and you
-can assume that most of the test code is dependent on that librarie's
-initialization. Sometimes report_abort() is also ok.
-
-Test code should not be part of the library if possible!
-
-
-> +	case 0:
-> +		cc = check_response(p + len);
-> +		break;
+> +	/* Read the SCHIB for this subchannel */
+> +	cc = stsch(schid, &schib);
+> +	if (cc) {> +		report(0, "stsch: sch %08x failed with cc=%d", schid, cc);
+> +		return;
 > +	}
 > +
-> +	report_prefix_pop();
-> +	return cc;
+> +	/* Update the SCHIB to enable the measurement block */
+> +	pmcw->flags |= PMCW_MBUE;
+> +	pmcw->flags2 |= PMCW_MBF1;
+> +	schib.mbo = mb;
+> +
+> +	/* Tell the CSS we want to modify the subchannel */
+> +	expect_pgm_int();
+> +	cc = msch(schid, &schib);
+> +	check_pgm_int_code(PGM_INT_CODE_OPERAND);
+
+Why would you expect a PGM in a library function are PGMs normal for IO
+instructions? oO
+
+Is this a test function which should be part of your test file in
+s390x/*.c or is it part of the IO library which should:
+
+ - Abort if an initialization failed and we can assume that future tests
+are now useless
+ - Return an error so the test can report an error
+ - Return success
+
 > +}
-> +
-> +int get_chsc_scsc(void)
-> +{
-> +	int i, n;
-> +	int ret = 0;
-> +	char buffer[510];
-> +	char *p;
-> +
-> +	report_prefix_push("Channel Subsystem Call");
-> +
-> +	if (chsc_scsc) {
-> +		report_info("chsc_scsc already initialized");
-> +		goto end;
-> +	}
-> +
-> +	chsc_scsc = alloc_page();
-> +	report_info("scsc_scsc at: %016lx", (u64)chsc_scsc);
-> +	if (!chsc_scsc) {
-> +		ret = -1;
-> +		report(0, "could not allocate chsc_scsc page!");
-> +		goto end;
-> +	}
-> +
-> +	report_info("scsc format %x\n", chsc_scsc->req_fmt);
-> +	ret = chsc(chsc_scsc, CHSC_SCSC, CHSC_SCSC_LEN);
-> +	if (ret) {
-> +		report(0, "chsc: CC %d", ret);
-> +		goto end;
-> +	}
-> +
-> +	for (i = 0, p = buffer; i < CSS_GENERAL_FEAT_BITLEN; i++) {
-> +		if (css_general_feature(i)) {
-> +			n = snprintf(p, sizeof(buffer) - ret, "%d,", i);
-> +			p += n;
-> +		}
-> +	}
-> +	report_info("General features: %s", buffer);
-> +
-> +	for (i = 0, p = buffer, ret = 0; i < CSS_CHSC_FEAT_BITLEN; i++) {
-> +		if (css_chsc_feature(i)) {
-> +			n = snprintf(p, sizeof(buffer) - ret, "%d,", i);
-> +			p += n;
-> +		}
-> +	}
-> +	report_info("CHSC features: %s", buffer);
-> +
-> +end:
-> +	report_prefix_pop();
-> +	return ret;
-> +}
->  
->  /*
->   * css_enumerate:
 > diff --git a/s390x/css.c b/s390x/css.c
-> index 1a61a5c..18dbf01 100644
+> index b65aa89..576df48 100644
 > --- a/s390x/css.c
 > +++ b/s390x/css.c
-> @@ -14,6 +14,7 @@
->  #include <string.h>
->  #include <interrupt.h>
->  #include <asm/arch_def.h>
-> +#include <alloc_page.h>
->  
->  #include <malloc_io.h>
->  #include <css.h>
-> @@ -140,10 +141,21 @@ error_senseid:
->  	unregister_io_int_func(css_irq_io);
+> @@ -257,6 +257,58 @@ end:
+>  	report_prefix_pop();
 >  }
 >  
-> +static void css_init(void)
+> +/*
+> + * test_schm_fmt1:
+> + * With measurement block format 1 the mesurement block is
+> + * dedicated to a subchannel.
+> + */
+> +static void test_schm_fmt1(void)
 > +{
-> +	int ret;
+> +	struct measurement_block_format1 *mb1;
 > +
-> +	ret = get_chsc_scsc();
-> +	if (!ret)
-> +		report(1, " ");
+> +	report_prefix_push("Format 1");
+> +
+> +	if (!test_device_sid) {
+> +		report_skip("No device");
+> +		goto end;
+> +	}
+> +
+> +	if (!css_general_feature(CSSC_EXTENDED_MEASUREMENT_BLOCK)) {
+> +		report_skip("Extended measurement block not available");
+> +		goto end;
+> +	}
+> +
+> +	/* Allocate zeroed Measurement block */
+> +	mb1 = alloc_io_mem(sizeof(struct measurement_block_format1), 0);
+> +	if (!mb1) {
+> +		report_abort("measurement_block_format1 allocation failed");
+> +		goto end;
+> +	}
+> +
+> +	schm(NULL, 0); /* Stop any previous measurement */
+> +	schm(0, SCHM_MBU);
+> +
+> +	/* Expect error for non aligned MB */
+> +	report_prefix_push("Unaligned MB origin");
+> +	msch_with_wrong_fmt1_mbo(test_device_sid, (uint64_t)mb1 + 1);
+> +	report_prefix_pop();
+> +
+> +	/* Clear the measurement block for the next test */
+> +	memset(mb1, 0, sizeof(*mb1));
+> +
+> +	/* Expect success */
+> +	report_prefix_push("Valid MB address and index");
+> +	report(start_measure((u64)mb1, 0, true) &&
+> +	       mb1->ssch_rsch_count == SCHM_UPDATE_CNT,
+> +	       "SSCH measured %d", mb1->ssch_rsch_count);
+> +	report_prefix_pop();
+> +
+> +	schm(NULL, 0); /* Stop the measurement */
+> +	free_io_mem(mb1, sizeof(struct measurement_block_format1));
+> +end:
+> +	report_prefix_pop();
 > +}
 > +
 >  static struct {
 >  	const char *name;
 >  	void (*func)(void);
->  } tests[] = {
-> +	/* The css_init test is needed to initialize the CSS Characteristics */
-> +	{ "initialize CSS (chsc)", css_init },
-
-Is css_init() really a test or does it only setup state for further tests?
-
->  	{ "enumerate (stsch)", test_enumerate },
->  	{ "enable (msch)", test_enable },
+> @@ -268,6 +320,7 @@ static struct {
 >  	{ "sense (ssch/tsch)", test_sense },
+>  	{ "measurement block (schm)", test_schm },
+>  	{ "measurement block format0", test_schm_fmt0 },
+> +	{ "measurement block format1", test_schm_fmt1 },
+
+Output will then be:
+"measurement block format1: Format 1: Report message"
+
+Wouldn't it make more sense to put the format 0 and 1 tests into
+test_schm() so we'd have:
+"measurement block (schm): Format 0: Report message" ?
+
+>  	{ NULL, NULL }
+>  };
+>  
 > 
 
