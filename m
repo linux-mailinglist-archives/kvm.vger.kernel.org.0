@@ -2,126 +2,130 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B063A326606
-	for <lists+kvm@lfdr.de>; Fri, 26 Feb 2021 18:04:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 356BC32663C
+	for <lists+kvm@lfdr.de>; Fri, 26 Feb 2021 18:20:54 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229791AbhBZRDy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 26 Feb 2021 12:03:54 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:28207 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229598AbhBZRDw (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 26 Feb 2021 12:03:52 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1614358945;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=g3BvVTqRZcHNF2bumxV68Pob+1+419O+zr+luXDJ/Hw=;
-        b=Lti730L46J4eckU8bFO0nzJD0/hJ+tR9WKPp2KOCKmiSYuadjGKP6ksA+0qL/9mDgSmwjj
-        ofINtrMNhCdH53CYoHA/RyRyYTQJ2zCMXfimeDijk+dLJcoN/a+gdqXVsJsVEa8NzoTJmz
-        EM9wFuOSngSF5rQsa8a5VYZS/Ab1xNM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-502-3BbK47cxMPiVi7l1ogcxdQ-1; Fri, 26 Feb 2021 12:02:23 -0500
-X-MC-Unique: 3BbK47cxMPiVi7l1ogcxdQ-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CDC081005501
-        for <kvm@vger.kernel.org>; Fri, 26 Feb 2021 17:02:22 +0000 (UTC)
-Received: from virtlab511.virt.lab.eng.bos.redhat.com (virtlab511.virt.lab.eng.bos.redhat.com [10.19.152.198])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 99E0560875
-        for <kvm@vger.kernel.org>; Fri, 26 Feb 2021 17:02:22 +0000 (UTC)
-From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     kvm@vger.kernel.org
-Subject: [PATCH kvm-unit-tests] KVM: svm: add a test to observe the gain from clean bits
-Date:   Fri, 26 Feb 2021 12:02:22 -0500
-Message-Id: <20210226170222.227577-1-pbonzini@redhat.com>
+        id S230081AbhBZRUR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 26 Feb 2021 12:20:17 -0500
+Received: from www.sr71.net ([198.145.64.142]:37568 "EHLO blackbird.sr71.net"
+        rhost-flags-OK-FAIL-OK-OK) by vger.kernel.org with ESMTP
+        id S229571AbhBZRUL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 26 Feb 2021 12:20:11 -0500
+X-Greylist: delayed 629 seconds by postgrey-1.27 at vger.kernel.org; Fri, 26 Feb 2021 12:20:10 EST
+Received: from [0.0.0.0] (unknown [50.53.169.119])
+        (Authenticated sender: dave)
+        by blackbird.sr71.net (Postfix) with ESMTPSA id 0B467FA87F;
+        Fri, 26 Feb 2021 09:08:56 -0800 (PST)
+Subject: Re: [RFC PATCH v6 03/25] x86/sgx: Wipe out EREMOVE from
+ sgx_free_epc_page()
+To:     Kai Huang <kai.huang@intel.com>, linux-sgx@vger.kernel.org,
+        kvm@vger.kernel.org, x86@kernel.org
+Cc:     seanjc@google.com, jarkko@kernel.org, luto@kernel.org,
+        rick.p.edgecombe@intel.com, haitao.huang@intel.com,
+        pbonzini@redhat.com, bp@alien8.de, tglx@linutronix.de,
+        mingo@redhat.com, hpa@zytor.com
+References: <cover.1614338774.git.kai.huang@intel.com>
+ <308bd5a53199d1bf520d488f748e11ce76156a33.1614338774.git.kai.huang@intel.com>
+From:   Dave Hansen <dave@sr71.net>
+Autocrypt: addr=dave@sr71.net; keydata=
+ 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
+ z5cecg==
+Message-ID: <746450bb-917d-ab6c-9a6a-671112cd203e@sr71.net>
+Date:   Fri, 26 Feb 2021 09:08:54 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
+In-Reply-To: <308bd5a53199d1bf520d488f748e11ce76156a33.1614338774.git.kai.huang@intel.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- x86/svm.h       | 24 +++++++++++++++++++++---
- x86/svm_tests.c |  9 +++++++++
- 2 files changed, 30 insertions(+), 3 deletions(-)
+On 2/26/21 4:14 AM, Kai Huang wrote:
+> +/*
+> + * Place the page in uninitialized state.  Only usable by callers that
+> + * know the page is in a clean state in which EREMOVE will succeed.
+> + */
+> +static int sgx_reset_epc_page(struct sgx_epc_page *epc_page)
+> +{
+> +	int ret;
+> +
+> +	WARN_ON_ONCE(epc_page->flags & SGX_EPC_PAGE_RECLAIMER_TRACKED);
+> +
+> +	ret = __eremove(sgx_get_epc_virt_addr(epc_page));
+> +	WARN_ONCE(ret, "EREMOVE returned %d (0x%x)", ret, ret);
+> +
+> +	return ret;
+> +}
+> +
+>  /**
+>   * sgx_encl_release - Destroy an enclave instance
+>   * @kref:	address of a kref inside &sgx_encl
+> @@ -404,7 +421,8 @@ void sgx_encl_release(struct kref *ref)
+>  			if (sgx_unmark_page_reclaimable(entry->epc_page))
+>  				continue;
+>  
+> -			sgx_free_epc_page(entry->epc_page);
+> +			if (!sgx_reset_epc_page(entry->epc_page))
+> +				sgx_free_epc_page(entry->epc_page);
 
-diff --git a/x86/svm.h b/x86/svm.h
-index a0863b8..593e3b0 100644
---- a/x86/svm.h
-+++ b/x86/svm.h
-@@ -51,6 +51,22 @@ enum {
- 	INTERCEPT_MWAIT_COND,
- };
- 
-+enum {
-+        VMCB_CLEAN_INTERCEPTS = 1, /* Intercept vectors, TSC offset, pause filter count */
-+        VMCB_CLEAN_PERM_MAP = 2,   /* IOPM Base and MSRPM Base */
-+        VMCB_CLEAN_ASID = 4,       /* ASID */
-+        VMCB_CLEAN_INTR = 8,       /* int_ctl, int_vector */
-+        VMCB_CLEAN_NPT = 16,       /* npt_en, nCR3, gPAT */
-+        VMCB_CLEAN_CR = 32,        /* CR0, CR3, CR4, EFER */
-+        VMCB_CLEAN_DR = 64,        /* DR6, DR7 */
-+        VMCB_CLEAN_DT = 128,       /* GDT, IDT */
-+        VMCB_CLEAN_SEG = 256,      /* CS, DS, SS, ES, CPL */
-+        VMCB_CLEAN_CR2 = 512,      /* CR2 only */
-+        VMCB_CLEAN_LBR = 1024,     /* DBGCTL, BR_FROM, BR_TO, LAST_EX_FROM, LAST_EX_TO */
-+        VMCB_CLEAN_AVIC = 2048,    /* APIC_BAR, APIC_BACKING_PAGE,
-+				      PHYSICAL_TABLE pointer, LOGICAL_TABLE pointer */
-+        VMCB_CLEAN_ALL = 4095,
-+};
- 
- struct __attribute__ ((__packed__)) vmcb_control_area {
- 	u16 intercept_cr_read;
-@@ -83,12 +99,14 @@ struct __attribute__ ((__packed__)) vmcb_control_area {
- 	u32 event_inj_err;
- 	u64 nested_cr3;
- 	u64 lbr_ctl;
--	u64 reserved_5;
-+	u32 clean;
-+	u32 reserved_5;
- 	u64 next_rip;
--	u8 reserved_6[816];
-+	u8 insn_len;
-+	u8 insn_bytes[15];
-+	u8 reserved_6[800];
- };
- 
--
- #define TLB_CONTROL_DO_NOTHING 0
- #define TLB_CONTROL_FLUSH_ALL_ASID 1
- 
-diff --git a/x86/svm_tests.c b/x86/svm_tests.c
-index 29a0b59..8b6fbd5 100644
---- a/x86/svm_tests.c
-+++ b/x86/svm_tests.c
-@@ -1020,6 +1020,12 @@ static bool latency_finished(struct svm_test *test)
-     return runs == 0;
- }
- 
-+static bool latency_finished_clean(struct svm_test *test)
-+{
-+    vmcb->control.clean = VMCB_CLEAN_ALL;
-+    return latency_finished(test);
-+}
-+
- static bool latency_check(struct svm_test *test)
- {
-     printf("    Latency VMRUN : max: %ld min: %ld avg: %ld\n", latvmrun_max,
-@@ -2458,6 +2464,9 @@ struct svm_test svm_tests[] = {
-     { "latency_run_exit", default_supported, latency_prepare,
-       default_prepare_gif_clear, latency_test,
-       latency_finished, latency_check },
-+    { "latency_run_exit_clean", default_supported, latency_prepare,
-+      default_prepare_gif_clear, latency_test,
-+      latency_finished_clean, latency_check },
-     { "latency_svm_insn", default_supported, lat_svm_insn_prepare,
-       default_prepare_gif_clear, null_test,
-       lat_svm_insn_finished, lat_svm_insn_check },
--- 
-2.26.2
+Won't this leak the page?
 
+I think that's fine; the page *IS* unusable if this happens.  But, the
+error message that will show up isn't super informative.  If this
+happened to a bunch of EPC pages, we'd be out of EPC with nothing to
+show for it.
+
+We must give a more informative message saying that the page is leaked.
+ Ideally, we'd also make this debuggable by dumping out how many of
+these pages there have been somewhere.  That can wait, though, until we
+have some kind of stats coming out of the code (there's nothing now).  A
+comment to remind us to do this would be nice.
+
+Anyway, these are in decent shape and only getting better.  It's time to
+get some more eyeballs on them and get the RFC tag off, so assuming that
+a better error message gets stuck in here:
+
+Acked-by: Dave Hansen <dave.hansen@intel.com>
