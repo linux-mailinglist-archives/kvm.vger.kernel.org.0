@@ -2,100 +2,160 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B8F3F32663B
-	for <lists+kvm@lfdr.de>; Fri, 26 Feb 2021 18:20:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C99A732666C
+	for <lists+kvm@lfdr.de>; Fri, 26 Feb 2021 18:45:34 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230070AbhBZRUP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 26 Feb 2021 12:20:15 -0500
-Received: from www.sr71.net ([198.145.64.142]:37575 "EHLO blackbird.sr71.net"
-        rhost-flags-OK-FAIL-OK-OK) by vger.kernel.org with ESMTP
-        id S229823AbhBZRUK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 26 Feb 2021 12:20:10 -0500
-Received: from [0.0.0.0] (unknown [50.53.169.119])
-        (Authenticated sender: dave)
-        by blackbird.sr71.net (Postfix) with ESMTPSA id 8122AFA881;
-        Fri, 26 Feb 2021 09:09:57 -0800 (PST)
-Subject: Re: [RFC PATCH v6 08/25] x86/sgx: Expose SGX architectural
- definitions to the kernel
-To:     Kai Huang <kai.huang@intel.com>, linux-sgx@vger.kernel.org,
-        kvm@vger.kernel.org, x86@kernel.org
-Cc:     seanjc@google.com, jarkko@kernel.org, luto@kernel.org,
-        rick.p.edgecombe@intel.com, haitao.huang@intel.com,
-        pbonzini@redhat.com, bp@alien8.de, tglx@linutronix.de,
-        mingo@redhat.com, hpa@zytor.com
-References: <cover.1614338774.git.kai.huang@intel.com>
- <caaffe4375099b939dbdb5fa04302dd44c7881e2.1614338774.git.kai.huang@intel.com>
-From:   Dave Hansen <dave@sr71.net>
-Autocrypt: addr=dave@sr71.net; keydata=
- xsFNBE6HMP0BEADIMA3XYkQfF3dwHlj58Yjsc4E5y5G67cfbt8dvaUq2fx1lR0K9h1bOI6fC
- oAiUXvGAOxPDsB/P6UEOISPpLl5IuYsSwAeZGkdQ5g6m1xq7AlDJQZddhr/1DC/nMVa/2BoY
- 2UnKuZuSBu7lgOE193+7Uks3416N2hTkyKUSNkduyoZ9F5twiBhxPJwPtn/wnch6n5RsoXsb
- ygOEDxLEsSk/7eyFycjE+btUtAWZtx+HseyaGfqkZK0Z9bT1lsaHecmB203xShwCPT49Blxz
- VOab8668QpaEOdLGhtvrVYVK7x4skyT3nGWcgDCl5/Vp3TWA4K+IofwvXzX2ON/Mj7aQwf5W
- iC+3nWC7q0uxKwwsddJ0Nu+dpA/UORQWa1NiAftEoSpk5+nUUi0WE+5DRm0H+TXKBWMGNCFn
- c6+EKg5zQaa8KqymHcOrSXNPmzJuXvDQ8uj2J8XuzCZfK4uy1+YdIr0yyEMI7mdh4KX50LO1
- pmowEqDh7dLShTOif/7UtQYrzYq9cPnjU2ZW4qd5Qz2joSGTG9eCXLz5PRe5SqHxv6ljk8mb
- ApNuY7bOXO/A7T2j5RwXIlcmssqIjBcxsRRoIbpCwWWGjkYjzYCjgsNFL6rt4OL11OUF37wL
- QcTl7fbCGv53KfKPdYD5hcbguLKi/aCccJK18ZwNjFhqr4MliQARAQABzShEYXZpZCBDaHJp
- c3RvcGhlciBIYW5zZW4gPGRhdmVAc3I3MS5uZXQ+wsF7BBMBAgAlAhsDBgsJCAcDAgYVCAIJ
- CgsEFgIDAQIeAQIXgAUCTo3k0QIZAQAKCRBoNZUwcMmSsMO2D/421Xg8pimb9mPzM5N7khT0
- 2MCnaGssU1T59YPE25kYdx2HntwdO0JA27Wn9xx5zYijOe6B21ufrvsyv42auCO85+oFJWfE
- K2R/IpLle09GDx5tcEmMAHX6KSxpHmGuJmUPibHVbfep2aCh9lKaDqQR07gXXWK5/yU1Dx0r
- VVFRaHTasp9fZ9AmY4K9/BSA3VkQ8v3OrxNty3OdsrmTTzO91YszpdbjjEFZK53zXy6tUD2d
- e1i0kBBS6NLAAsqEtneplz88T/v7MpLmpY30N9gQU3QyRC50jJ7LU9RazMjUQY1WohVsR56d
- ORqFxS8ChhyJs7BI34vQusYHDTp6PnZHUppb9WIzjeWlC7Jc8lSBDlEWodmqQQgp5+6AfhTD
- kDv1a+W5+ncq+Uo63WHRiCPuyt4di4/0zo28RVcjtzlGBZtmz2EIC3vUfmoZbO/Gn6EKbYAn
- rzz3iU/JWV8DwQ+sZSGu0HmvYMt6t5SmqWQo/hyHtA7uF5Wxtu1lCgolSQw4t49ZuOyOnQi5
- f8R3nE7lpVCSF1TT+h8kMvFPv3VG7KunyjHr3sEptYxQs4VRxqeirSuyBv1TyxT+LdTm6j4a
- mulOWf+YtFRAgIYyyN5YOepDEBv4LUM8Tz98lZiNMlFyRMNrsLV6Pv6SxhrMxbT6TNVS5D+6
- UorTLotDZKp5+M7BTQRUY85qARAAsgMW71BIXRgxjYNCYQ3Xs8k3TfAvQRbHccky50h99TUY
- sqdULbsb3KhmY29raw1bgmyM0a4DGS1YKN7qazCDsdQlxIJp9t2YYdBKXVRzPCCsfWe1dK/q
- 66UVhRPP8EGZ4CmFYuPTxqGY+dGRInxCeap/xzbKdvmPm01Iw3YFjAE4PQ4hTMr/H76KoDbD
- cq62U50oKC83ca/PRRh2QqEqACvIH4BR7jueAZSPEDnzwxvVgzyeuhwqHY05QRK/wsKuhq7s
- UuYtmN92Fasbxbw2tbVLZfoidklikvZAmotg0dwcFTjSRGEg0Gr3p/xBzJWNavFZZ95Rj7Et
- db0lCt0HDSY5q4GMR+SrFbH+jzUY/ZqfGdZCBqo0cdPPp58krVgtIGR+ja2Mkva6ah94/oQN
- lnCOw3udS+Eb/aRcM6detZr7XOngvxsWolBrhwTQFT9D2NH6ryAuvKd6yyAFt3/e7r+HHtkU
- kOy27D7IpjngqP+b4EumELI/NxPgIqT69PQmo9IZaI/oRaKorYnDaZrMXViqDrFdD37XELwQ
- gmLoSm2VfbOYY7fap/AhPOgOYOSqg3/Nxcapv71yoBzRRxOc4FxmZ65mn+q3rEM27yRztBW9
- AnCKIc66T2i92HqXCw6AgoBJRjBkI3QnEkPgohQkZdAb8o9WGVKpfmZKbYBo4pEAEQEAAcLB
- XwQYAQIACQUCVGPOagIbDAAKCRBoNZUwcMmSsJeCEACCh7P/aaOLKWQxcnw47p4phIVR6pVL
- e4IEdR7Jf7ZL00s3vKSNT+nRqdl1ugJx9Ymsp8kXKMk9GSfmZpuMQB9c6io1qZc6nW/3TtvK
- pNGz7KPPtaDzvKA4S5tfrWPnDr7n15AU5vsIZvgMjU42gkbemkjJwP0B1RkifIK60yQqAAlT
- YZ14P0dIPdIPIlfEPiAWcg5BtLQU4Wg3cNQdpWrCJ1E3m/RIlXy/2Y3YOVVohfSy+4kvvYU3
- lXUdPb04UPw4VWwjcVZPg7cgR7Izion61bGHqVqURgSALt2yvHl7cr68NYoFkzbNsGsye9ft
- M9ozM23JSgMkRylPSXTeh5JIK9pz2+etco3AfLCKtaRVysjvpysukmWMTrx8QnI5Nn5MOlJj
- 1Ov4/50JY9pXzgIDVSrgy6LYSMc4vKZ3QfCY7ipLRORyalFDF3j5AGCMRENJjHPD6O7bl3Xo
- 4DzMID+8eucbXxKiNEbs21IqBZbbKdY1GkcEGTE7AnkA3Y6YB7I/j9mQ3hCgm5muJuhM/2Fr
- OPsw5tV/LmQ5GXH0JQ/TZXWygyRFyyI2FqNTx4WHqUn3yFj8rwTAU1tluRUYyeLy0ayUlKBH
- ybj0N71vWO936MqP6haFERzuPAIpxj2ezwu0xb1GjTk4ynna6h5GjnKgdfOWoRtoWndMZxbA
- z5cecg==
-Message-ID: <f52411bc-d18c-895e-a950-c9fa00611399@sr71.net>
-Date:   Fri, 26 Feb 2021 09:09:56 -0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        id S230032AbhBZRpd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 26 Feb 2021 12:45:33 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37074 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229566AbhBZRp3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 26 Feb 2021 12:45:29 -0500
+Received: from mail-pg1-x52a.google.com (mail-pg1-x52a.google.com [IPv6:2607:f8b0:4864:20::52a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 52942C061574
+        for <kvm@vger.kernel.org>; Fri, 26 Feb 2021 09:44:49 -0800 (PST)
+Received: by mail-pg1-x52a.google.com with SMTP id t25so6648092pga.2
+        for <kvm@vger.kernel.org>; Fri, 26 Feb 2021 09:44:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=CoeO2iZ8xxu68vAL8jtiT4/h7hy4METDWBDneXDpQxo=;
+        b=ouVOwFpkPYNO37bwVrVblcq6bdqnNueRnAoPvaIRj9dTVaF2y3M8Go2waK15V1HwD5
+         rfvm5PYKw3zdHnlmTCCgYI1KKjMioBR9fhCV/fdHJHGZS6WHTbEFy9SE1PpSGAQdrMkz
+         1+e15FpWoykh7n9vfrtbUetWHQ5iMElXOe29lKFufFsCTYK2GH+o3YR+loynpTyglkvu
+         2rTGt6LX8RvzGNkbq0+lhfnTAUFZARik9n9xhd3h/409mpd/wAfgWMZbwJ/UJqXcUuMF
+         4CUVQTaRSjAHLHyzPVUy1epDPYvOid6DrzuCXkvIm8iNNAYV0VDB/d/1ZFFap/kla1Hb
+         bcvg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=CoeO2iZ8xxu68vAL8jtiT4/h7hy4METDWBDneXDpQxo=;
+        b=oj555JurAm60S8BE06XN/CBEhell53ouO68GuLtbPaFWHesDJGsvsxJCHou+9aHDaS
+         yB5IQeVz3O8vUNflareFpMSC52pcUSxu8uspdR8wujYzc/KRPEgzRcAJKrj5U0ybnF73
+         WeShrXmq223ipInEdJVKvh0oHVAGix6oktnBZ9hFwlq35WsLLOLW+aljIm3af+Pe+t3V
+         j2ROAgJkG+Ule40Eu1BnxMsl9h/6FsAnqeSdS/Xu0Dp664lhYGeNYJrMPgiP7oBjgV7J
+         iy8CN5IYENNijJyabiQobXY5h2059bdSPdumvBL7zKvleuejQfyrdgw8OFxXKymHfNyH
+         xBsA==
+X-Gm-Message-State: AOAM530yL8oWkBP4/sK506KDmdo3krwG/Wk7NirzsLOGTVCxR7pgLLsw
+        CyKuEpT5iCN/fFDKACWcMvFDFg==
+X-Google-Smtp-Source: ABdhPJwjWOEc7YomYdRhrCUuSr7CR6m145f91kjNCg5blLJKeSXZqiBSwHAQuofeiHLWAwbe6oLYJQ==
+X-Received: by 2002:a63:4753:: with SMTP id w19mr3792496pgk.394.1614361488694;
+        Fri, 26 Feb 2021 09:44:48 -0800 (PST)
+Received: from google.com ([2620:15c:f:10:e190:bf4c:e355:6c55])
+        by smtp.gmail.com with ESMTPSA id p29sm9214572pgm.64.2021.02.26.09.44.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 26 Feb 2021 09:44:48 -0800 (PST)
+Date:   Fri, 26 Feb 2021 09:44:41 -0800
+From:   Sean Christopherson <seanjc@google.com>
+To:     Ashish Kalra <ashish.kalra@amd.com>
+Cc:     Steve Rutherford <srutherford@google.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "venu.busireddy@oracle.com" <venu.busireddy@oracle.com>,
+        "Singh, Brijesh" <brijesh.singh@amd.com>,
+        Will Deacon <will@kernel.org>,
+        Quentin Perret <qperret@google.com>
+Subject: Re: [PATCH v10 10/16] KVM: x86: Introduce KVM_GET_SHARED_PAGES_LIST
+ ioctl
+Message-ID: <YDkzibkC7tAYbfFQ@google.com>
+References: <cover.1612398155.git.ashish.kalra@amd.com>
+ <7266edd714add8ec9d7f63eddfc9bbd4d789c213.1612398155.git.ashish.kalra@amd.com>
+ <YCxrV4u98ZQtInOE@google.com>
+ <SN6PR12MB27672FF8358D122EDD8CC0188E859@SN6PR12MB2767.namprd12.prod.outlook.com>
+ <20210224175122.GA19661@ashkalra_ubuntu_server>
+ <YDaZacLqNQ4nK/Ex@google.com>
+ <20210225202008.GA5208@ashkalra_ubuntu_server>
+ <CABayD+cn5e3PR6NtSWLeM_qxs6hKWtjEx=aeKpy=WC2dzPdRLw@mail.gmail.com>
+ <20210226140432.GB5950@ashkalra_ubuntu_server>
 MIME-Version: 1.0
-In-Reply-To: <caaffe4375099b939dbdb5fa04302dd44c7881e2.1614338774.git.kai.huang@intel.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210226140432.GB5950@ashkalra_ubuntu_server>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2/26/21 4:15 AM, Kai Huang wrote:
-> From: Sean Christopherson <sean.j.christopherson@intel.com>
-> 
-> Expose SGX architectural structures, as KVM will use many of the
-> architectural constants and structs to virtualize SGX.
-> 
-> Name the new header file as asm/sgx.h, rather than asm/sgx_arch.h, to
-> have single header to provide SGX facilities to share with other kernel
-> componments.
-> 
-> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-> Co-developed-by: Kai Huang <kai.huang@intel.com>
-> Signed-off-by: Kai Huang <kai.huang@intel.com>
++Will and Quentin (arm64)
 
-Looks fine:
+Moving the non-KVM x86 folks to bcc, I don't they care about KVM details at this
+point.
 
-Acked-by: Dave Hansen <dave.hansen@intel.com>
+On Fri, Feb 26, 2021, Ashish Kalra wrote:
+> On Thu, Feb 25, 2021 at 02:59:27PM -0800, Steve Rutherford wrote:
+> > On Thu, Feb 25, 2021 at 12:20 PM Ashish Kalra <ashish.kalra@amd.com> wrote:
+> > Thanks for grabbing the data!
+> > 
+> > I am fine with both paths. Sean has stated an explicit desire for
+> > hypercall exiting, so I think that would be the current consensus.
+
+Yep, though it'd be good to get Paolo's input, too.
+
+> > If we want to do hypercall exiting, this should be in a follow-up
+> > series where we implement something more generic, e.g. a hypercall
+> > exiting bitmap or hypercall exit list. If we are taking the hypercall
+> > exit route, we can drop the kvm side of the hypercall.
+
+I don't think this is a good candidate for arbitrary hypercall interception.  Or
+rather, I think hypercall interception should be an orthogonal implementation.
+
+The guest, including guest firmware, needs to be aware that the hypercall is
+supported, and the ABI needs to be well-defined.  Relying on userspace VMMs to
+implement a common ABI is an unnecessary risk.
+
+We could make KVM's default behavior be a nop, i.e. have KVM enforce the ABI but
+require further VMM intervention.  But, I just don't see the point, it would
+save only a few lines of code.  It would also limit what KVM could do in the
+future, e.g. if KVM wanted to do its own bookkeeping _and_ exit to userspace,
+then mandatory interception would essentially make it impossible for KVM to do
+bookkeeping while still honoring the interception request.
+
+However, I do think it would make sense to have the userspace exit be a generic
+exit type.  But hey, we already have the necessary ABI defined for that!  It's
+just not used anywhere.
+
+	/* KVM_EXIT_HYPERCALL */
+	struct {
+		__u64 nr;
+		__u64 args[6];
+		__u64 ret;
+		__u32 longmode;
+		__u32 pad;
+	} hypercall;
+
+
+> > Userspace could also handle the MSR using MSR filters (would need to
+> > confirm that).  Then userspace could also be in control of the cpuid bit.
+
+An MSR is not a great fit; it's x86 specific and limited to 64 bits of data.
+The data limitation could be fudged by shoving data into non-standard GPRs, but
+that will result in truly heinous guest code, and extensibility issues.
+
+The data limitation is a moot point, because the x86-only thing is a deal
+breaker.  arm64's pKVM work has a near-identical use case for a guest to share
+memory with a host.  I can't think of a clever way to avoid having to support
+TDX's and SNP's hypervisor-agnostic variants, but we can at least not have
+multiple KVM variants.
+
+> > Essentially, I think you could drop most of the host kernel work if
+> > there were generic support for hypercall exiting. Then userspace would
+> > be responsible for all of that. Thoughts on this?
+
+> So if i understand it correctly, i will submitting v11 of this patch-set
+> with in-kernel support for page encryption status hypercalls and shared
+> pages list and the userspace control of SEV live migration feature
+> support and fixes for MSR handling.
+
+At this point, I'd say hold off on putting more effort into an implementation
+until we have consensus.
+
+> In subsequent follow-up patches we will add generic support for hypercall 
+> exiting and then drop kvm side of hypercall and also add userspace
+> support for MSR handling.
+> 
+> Thanks,
+> Ashish
