@@ -2,38 +2,38 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8E9CE325B74
-	for <lists+kvm@lfdr.de>; Fri, 26 Feb 2021 03:10:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0A889325B75
+	for <lists+kvm@lfdr.de>; Fri, 26 Feb 2021 03:10:26 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229894AbhBZCKN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 25 Feb 2021 21:10:13 -0500
-Received: from mga03.intel.com ([134.134.136.65]:38821 "EHLO mga03.intel.com"
+        id S230006AbhBZCKY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 25 Feb 2021 21:10:24 -0500
+Received: from mga03.intel.com ([134.134.136.65]:38815 "EHLO mga03.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229492AbhBZCKM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 25 Feb 2021 21:10:12 -0500
-IronPort-SDR: bf+vhVg+nbDxNAEovWhys303dBXpmtxwLIUdLCF4rS4S7Z9nAGPwXwlXIynQphaNi5TEzZ571O
- 6te46mRYWFEA==
-X-IronPort-AV: E=McAfee;i="6000,8403,9906"; a="185801007"
+        id S229508AbhBZCKY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 25 Feb 2021 21:10:24 -0500
+IronPort-SDR: vbXpycg2uKACh+Dsq8tg/vfUDLhd0xHAsY2u/HWjcbGrTNWQ9JGSOKUetKJkFHZX8cgDCY0qoo
+ chIoZ9cD93tw==
+X-IronPort-AV: E=McAfee;i="6000,8403,9906"; a="185801027"
 X-IronPort-AV: E=Sophos;i="5.81,207,1610438400"; 
-   d="scan'208";a="185801007"
+   d="scan'208";a="185801027"
 Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Feb 2021 18:09:30 -0800
-IronPort-SDR: z8elN4nmMyPkRHVMlzUQRR5Wz+T0BW3LoL+nlkrCvb3JTdz0Vdmjx+5+YsKohwU3UZv90mNwhK
- cnfRArgsykTA==
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Feb 2021 18:09:33 -0800
+IronPort-SDR: UeD3u/olY9BJc1HeewxWiOGPguAkQ3LHsi5ShKkODOggqjxM7pppYq9G7ej4IeoZfdTLgNHyM7
+ JC0VJu6A8ugQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.81,207,1610438400"; 
-   d="scan'208";a="404679990"
+   d="scan'208";a="404680036"
 Received: from unknown (HELO local-michael-cet-test.sh.intel.com) ([10.239.159.166])
-  by orsmga008.jf.intel.com with ESMTP; 25 Feb 2021 18:09:28 -0800
+  by orsmga008.jf.intel.com with ESMTP; 25 Feb 2021 18:09:31 -0800
 From:   Yang Weijiang <weijiang.yang@intel.com>
 To:     pbonzini@redhat.com, richard.henderson@linaro.org,
         ehabkost@redhat.com, mtosatti@redhat.com,
         sean.j.christopherson@intel.com, qemu-devel@nongnu.org,
         kvm@vger.kernel.org
 Cc:     Yang Weijiang <weijiang.yang@intel.com>
-Subject: [PATCH v7 2/6] target/i386: Enable XSS feature enumeration for CPUID
-Date:   Fri, 26 Feb 2021 10:20:54 +0800
-Message-Id: <20210226022058.24562-3-weijiang.yang@intel.com>
+Subject: [PATCH v7 3/6] target/i386: Enable CET components support for XSAVES
+Date:   Fri, 26 Feb 2021 10:20:55 +0800
+Message-Id: <20210226022058.24562-4-weijiang.yang@intel.com>
 X-Mailer: git-send-email 2.17.2
 In-Reply-To: <20210226022058.24562-1-weijiang.yang@intel.com>
 References: <20210226022058.24562-1-weijiang.yang@intel.com>
@@ -41,156 +41,146 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Currently, CPUID.(EAX=0DH,ECX=01H) doesn't enumerate features in
-XSS properly, add the support here. XCR0 bits indicate user-mode XSAVE
-components, and XSS bits indicate supervisor-mode XSAVE components.
+CET Shadow Stack(SHSTK) and Indirect Branch Tracking(IBT) are enumerated
+via CPUID.(EAX=07H,ECX=0H):ECX[bit 7] and EDX[bit 20] respectively.
+Two CET bits (bit 11 and 12) are defined in MSR_IA32_XSS for XSAVES.
+They correspond to CET states in user and supervisor mode respectively.
 
 Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
 ---
- target/i386/cpu.c | 48 ++++++++++++++++++++++++++++++++++++++++++-----
- target/i386/cpu.h | 12 ++++++++++++
- 2 files changed, 55 insertions(+), 5 deletions(-)
+ target/i386/cpu.c | 35 +++++++++++++++++++++++++++++++++++
+ target/i386/cpu.h | 23 ++++++++++++++++++++++-
+ 2 files changed, 57 insertions(+), 1 deletion(-)
 
 diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index 89edab4240..f3923988ed 100644
+index f3923988ed..ef786b920e 100644
 --- a/target/i386/cpu.c
 +++ b/target/i386/cpu.c
-@@ -1058,6 +1058,24 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
-         },
-         .tcg_features = TCG_XSAVE_FEATURES,
+@@ -1060,6 +1060,16 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
      },
-+    [FEAT_XSAVE_XSS_LO] = {
-+        .type = CPUID_FEATURE_WORD,
-+        .cpuid = {
-+            .eax = 0xD,
-+            .needs_ecx = true,
-+            .ecx = 1,
-+            .reg = R_ECX,
-+        },
-+    },
-+    [FEAT_XSAVE_XSS_HI] = {
-+        .type = CPUID_FEATURE_WORD,
-+        .cpuid = {
-+            .eax = 0xD,
-+            .needs_ecx = true,
-+            .ecx = 1,
-+            .reg = R_EDX
-+        },
-+    },
-     [FEAT_6_EAX] = {
+     [FEAT_XSAVE_XSS_LO] = {
          .type = CPUID_FEATURE_WORD,
-         .feat_names = {
-@@ -1478,6 +1496,9 @@ static uint32_t xsave_area_size(uint64_t mask)
-     for (i = 0; i < ARRAY_SIZE(x86_ext_save_areas); i++) {
-         const ExtSaveArea *esa = &x86_ext_save_areas[i];
-         if ((mask >> i) & 1) {
-+            if (i >= 2 && !esa->offset) {
-+                continue;
-+            }
-             ret = MAX(ret, esa->offset + esa->size);
-         }
-     }
-@@ -1489,12 +1510,18 @@ static inline bool accel_uses_host_cpuid(void)
-     return kvm_enabled() || hvf_enabled();
- }
++        .feat_names = {
++            NULL, NULL, NULL, NULL,
++            NULL, NULL, NULL, NULL,
++            NULL, NULL, NULL, "cet-u",
++            "cet-s", NULL, NULL, NULL,
++            NULL, NULL, NULL, NULL,
++            NULL, NULL, NULL, NULL,
++            NULL, NULL, NULL, NULL,
++            NULL, NULL, NULL, NULL,
++        },
+         .cpuid = {
+             .eax = 0xD,
+             .needs_ecx = true,
+@@ -1486,6 +1496,14 @@ static const ExtSaveArea x86_ext_save_areas[] = {
+           { .feature = FEAT_7_0_ECX, .bits = CPUID_7_0_ECX_PKU,
+             .offset = offsetof(X86XSaveArea, pkru_state),
+             .size = sizeof(XSavePKRU) },
++    [XSTATE_CET_U_BIT] = {
++            .feature = FEAT_7_0_ECX, .bits = CPUID_7_0_ECX_CET_SHSTK,
++            .offset = 0,
++            .size = sizeof(XSavesCETU) },
++    [XSTATE_CET_S_BIT] = {
++            .feature = FEAT_7_0_ECX, .bits = CPUID_7_0_ECX_CET_SHSTK,
++            .offset = 0,
++            .size = sizeof(XSavesCETS) },
+ };
  
--static inline uint64_t x86_cpu_xsave_components(X86CPU *cpu)
-+static inline uint64_t x86_cpu_xsave_xcr0_components(X86CPU *cpu)
- {
-     return ((uint64_t)cpu->env.features[FEAT_XSAVE_XCR0_HI]) << 32 |
-            cpu->env.features[FEAT_XSAVE_XCR0_LO];
- }
- 
-+static inline uint64_t x86_cpu_xsave_xss_components(X86CPU *cpu)
-+{
-+    return ((uint64_t)cpu->env.features[FEAT_XSAVE_XSS_HI]) << 32 |
-+           cpu->env.features[FEAT_XSAVE_XSS_LO];
-+}
-+
- const char *get_register_name_32(unsigned int reg)
- {
-     if (reg >= CPU_NB_REGS32) {
-@@ -5716,7 +5743,7 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
-         }
- 
-         if (count == 0) {
--            *ecx = xsave_area_size(x86_cpu_xsave_components(cpu));
-+            *ecx = xsave_area_size(x86_cpu_xsave_xcr0_components(cpu));
-             *eax = env->features[FEAT_XSAVE_XCR0_LO];
-             *edx = env->features[FEAT_XSAVE_XCR0_HI];
-             /*
-@@ -5728,11 +5755,17 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
-             *ebx = kvm_enabled() ? *ecx : xsave_area_size(env->xcr0);
-         } else if (count == 1) {
-             *eax = env->features[FEAT_XSAVE];
-+            *ecx = env->features[FEAT_XSAVE_XSS_LO];
-+            *edx = env->features[FEAT_XSAVE_XSS_HI];
-         } else if (count < ARRAY_SIZE(x86_ext_save_areas)) {
--            if ((x86_cpu_xsave_components(cpu) >> count) & 1) {
--                const ExtSaveArea *esa = &x86_ext_save_areas[count];
-+            const ExtSaveArea *esa = &x86_ext_save_areas[count];
-+            if ((x86_cpu_xsave_xcr0_components(cpu) >> count) & 1) {
-                 *eax = esa->size;
-                 *ebx = esa->offset;
-+            } else if ((x86_cpu_xsave_xss_components(cpu) >> count) & 1) {
-+                *eax = esa->size;
-+                *ebx = 0;
-+                *ecx = 1;
-             }
-         }
-         break;
-@@ -6059,6 +6092,9 @@ static void x86_cpu_reset(DeviceState *dev)
-     }
-     for (i = 2; i < ARRAY_SIZE(x86_ext_save_areas); i++) {
-         const ExtSaveArea *esa = &x86_ext_save_areas[i];
-+        if (!esa->offset) {
-+            continue;
-+        }
+ static uint32_t xsave_area_size(uint64_t mask)
+@@ -6329,6 +6347,23 @@ static void x86_cpu_enable_xsave_components(X86CPU *cpu)
          if (env->features[esa->feature] & esa->bits) {
-             xcr0 |= 1ull << i;
+             mask |= (1ULL << i);
          }
-@@ -6295,8 +6331,10 @@ static void x86_cpu_enable_xsave_components(X86CPU *cpu)
-         }
++
++        /*
++         * Both CET SHSTK and IBT feature requires XSAVES support, but two
++         * features can be controlled independently by kernel, and we only
++         * have one correlated bit set in x86_ext_save_areas, so if either
++         * of two features is enabled, we set the XSAVES support bit to make
++         * the enabled feature work.
++         */
++        if (i == XSTATE_CET_U_BIT || i == XSTATE_CET_S_BIT) {
++            uint64_t ecx = env->features[FEAT_7_0_ECX];
++            uint64_t edx = env->features[FEAT_7_0_EDX];
++
++            if ((ecx & CPUID_7_0_ECX_CET_SHSTK) ||
++                (edx & CPUID_7_0_EDX_CET_IBT)) {
++                mask |= (1ULL << i);
++            }
++        }
      }
  
--    env->features[FEAT_XSAVE_XCR0_LO] = mask;
-+    env->features[FEAT_XSAVE_XCR0_LO] = mask & CPUID_XSTATE_XCR0_MASK;
-     env->features[FEAT_XSAVE_XCR0_HI] = mask >> 32;
-+    env->features[FEAT_XSAVE_XSS_LO] = mask & CPUID_XSTATE_XSS_MASK;
-+    env->features[FEAT_XSAVE_XSS_HI] = mask >> 32;
- }
- 
- /***** Steps involved on loading and filtering CPUID data
+     env->features[FEAT_XSAVE_XCR0_LO] = mask & CPUID_XSTATE_XCR0_MASK;
 diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-index 52f31335c4..8aeaa8869a 100644
+index 8aeaa8869a..a43fb6d597 100644
 --- a/target/i386/cpu.h
 +++ b/target/i386/cpu.h
-@@ -504,6 +504,16 @@ typedef enum X86Seg {
+@@ -493,6 +493,8 @@ typedef enum X86Seg {
+ #define XSTATE_ZMM_Hi256_BIT            6
+ #define XSTATE_Hi16_ZMM_BIT             7
+ #define XSTATE_PKRU_BIT                 9
++#define XSTATE_CET_U_BIT                11
++#define XSTATE_CET_S_BIT                12
+ 
+ #define XSTATE_FP_MASK                  (1ULL << XSTATE_FP_BIT)
+ #define XSTATE_SSE_MASK                 (1ULL << XSTATE_SSE_BIT)
+@@ -503,6 +505,8 @@ typedef enum X86Seg {
+ #define XSTATE_ZMM_Hi256_MASK           (1ULL << XSTATE_ZMM_Hi256_BIT)
  #define XSTATE_Hi16_ZMM_MASK            (1ULL << XSTATE_Hi16_ZMM_BIT)
  #define XSTATE_PKRU_MASK                (1ULL << XSTATE_PKRU_BIT)
++#define XSTATE_CET_U_MASK               (1ULL << XSTATE_CET_U_BIT)
++#define XSTATE_CET_S_MASK               (1ULL << XSTATE_CET_S_BIT)
  
-+/* CPUID feature bits available in XCR0 */
-+#define CPUID_XSTATE_XCR0_MASK  (XSTATE_FP_MASK | XSTATE_SSE_MASK | \
-+                                 XSTATE_YMM_MASK | XSTATE_BNDREGS_MASK | \
-+                                 XSTATE_BNDCSR_MASK | XSTATE_OPMASK_MASK | \
-+                                 XSTATE_ZMM_Hi256_MASK | \
-+                                 XSTATE_Hi16_ZMM_MASK | XSTATE_PKRU_MASK)
-+
-+/* CPUID feature bits available in XSS */
-+#define CPUID_XSTATE_XSS_MASK    0
-+
+ /* CPUID feature bits available in XCR0 */
+ #define CPUID_XSTATE_XCR0_MASK  (XSTATE_FP_MASK | XSTATE_SSE_MASK | \
+@@ -512,7 +516,7 @@ typedef enum X86Seg {
+                                  XSTATE_Hi16_ZMM_MASK | XSTATE_PKRU_MASK)
+ 
+ /* CPUID feature bits available in XSS */
+-#define CPUID_XSTATE_XSS_MASK    0
++#define CPUID_XSTATE_XSS_MASK    (XSTATE_CET_U_MASK)
+ 
  /* CPUID feature words */
  typedef enum FeatureWord {
-     FEAT_1_EDX,         /* CPUID[1].EDX */
-@@ -541,6 +551,8 @@ typedef enum FeatureWord {
-     FEAT_VMX_EPT_VPID_CAPS,
-     FEAT_VMX_BASIC,
-     FEAT_VMX_VMFUNC,
-+    FEAT_XSAVE_XSS_LO,     /* CPUID[EAX=0xd,ECX=1].ECX */
-+    FEAT_XSAVE_XSS_HI,     /* CPUID[EAX=0xd,ECX=1].EDX */
-     FEATURE_WORDS,
- } FeatureWord;
+@@ -760,6 +764,8 @@ typedef uint64_t FeatureWordArray[FEATURE_WORDS];
+ #define CPUID_7_0_ECX_WAITPKG           (1U << 5)
+ /* Additional AVX-512 Vector Byte Manipulation Instruction */
+ #define CPUID_7_0_ECX_AVX512_VBMI2      (1U << 6)
++/* CET SHSTK feature */
++#define CPUID_7_0_ECX_CET_SHSTK         (1U << 7)
+ /* Galois Field New Instructions */
+ #define CPUID_7_0_ECX_GFNI              (1U << 8)
+ /* Vector AES Instructions */
+@@ -795,6 +801,8 @@ typedef uint64_t FeatureWordArray[FEATURE_WORDS];
+ #define CPUID_7_0_EDX_SERIALIZE         (1U << 14)
+ /* TSX Suspend Load Address Tracking instruction */
+ #define CPUID_7_0_EDX_TSX_LDTRK         (1U << 16)
++/* CET IBT feature */
++#define CPUID_7_0_EDX_CET_IBT           (1U << 20)
+ /* Speculation Control */
+ #define CPUID_7_0_EDX_SPEC_CTRL         (1U << 26)
+ /* Single Thread Indirect Branch Predictors */
+@@ -1285,6 +1293,19 @@ typedef struct XSavePKRU {
+     uint32_t padding;
+ } XSavePKRU;
  
++/* Ext. save area 11: User mode CET state */
++typedef struct XSavesCETU {
++    uint64_t u_cet;
++    uint64_t user_ssp;
++} XSavesCETU;
++
++/* Ext. save area 12: Supervisor mode CET state */
++typedef struct XSavesCETS {
++    uint64_t kernel_ssp;
++    uint64_t pl1_ssp;
++    uint64_t pl2_ssp;
++} XSavesCETS;
++
+ typedef struct X86XSaveArea {
+     X86LegacyXSaveArea legacy;
+     X86XSaveHeader header;
 -- 
 2.26.2
 
