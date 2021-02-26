@@ -2,109 +2,130 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F2793325E9E
-	for <lists+kvm@lfdr.de>; Fri, 26 Feb 2021 09:09:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7FE68325F95
+	for <lists+kvm@lfdr.de>; Fri, 26 Feb 2021 10:01:44 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230146AbhBZIFS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 26 Feb 2021 03:05:18 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:47126 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230125AbhBZIFI (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 26 Feb 2021 03:05:08 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1614326621;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=HV5MSlda6N597b7xTJHRQ+L2lFOzy5bnowVO9E3RZ1I=;
-        b=Dagp2sIF2GfVCzQ2ZOQbK37DTrdflH2V0/a/j9u30EEyZOcB6v6SurYLFRiWnhuvi/YjrF
-        eN0rQjvA9o4CbMFix5UZbmBo2EWiPGHpJ49uALbcLO7y2l92wzZGgglwRcR8sL+67MeZCN
-        V5db0ed9sm6VhYVjmOsTuvp+/eFJSoM=
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
- [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-139-wZ44h42tN5uSpGZqLyVUJg-1; Fri, 26 Feb 2021 03:03:39 -0500
-X-MC-Unique: wZ44h42tN5uSpGZqLyVUJg-1
-Received: by mail-ed1-f70.google.com with SMTP id p12so4091555edw.9
-        for <kvm@vger.kernel.org>; Fri, 26 Feb 2021 00:03:39 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=HV5MSlda6N597b7xTJHRQ+L2lFOzy5bnowVO9E3RZ1I=;
-        b=qLFbAFUDA5NaSM8d+/dbqptnVWh8rcbOB+ypy2t3zVHpyE+wR1GhVeKa32+IDfAIax
-         ZWWoc1an+uo6WN9AprkIloJkFy7o7WYYm70yi0xoC3bjRPmadwnAO/VvtkYrcOHXyxAE
-         khZa8XkNOZgI6kPVpHS4gWL3Za6LhDD5yXROS4gUNl3Bk911dT8KYko963JK91/0bi/J
-         oQ5HxIPOQKo573yV1u4kZ7mrM7EZIlccR9Qyu8Y6+u+SRYNXH/LsSekhgvjfLYvdQxiQ
-         rnAsqOdmKbhwZxLPmbeVISKs4wyKu2u48wpwFV5A0U2lfXYpNoWGXLTJyPqXk5aCKqr/
-         6/XA==
-X-Gm-Message-State: AOAM533lD0NMgufQLIbn3xu16FmmFfRXyadZMJufJ7XFq4j1z1nXpZ5D
-        K1236n8323QKz0A9rMoy5U+xlychd2OJCznofKRY27mKEsHV0fm4YDDNwT4tncPdAWQK6ZR4rHG
-        zJQXuwfkU63qQ
-X-Received: by 2002:a05:6402:229a:: with SMTP id cw26mr1907104edb.224.1614326618118;
-        Fri, 26 Feb 2021 00:03:38 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJyfJ/56anmdqRgmUDCVI/eXzg0ztaoCYcPKcBOmWVb3dRcYNUvgm0Qxijvi78GBg1a1ORFB1Q==
-X-Received: by 2002:a05:6402:229a:: with SMTP id cw26mr1907083edb.224.1614326617991;
-        Fri, 26 Feb 2021 00:03:37 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id l7sm5058597edv.50.2021.02.26.00.03.36
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 26 Feb 2021 00:03:37 -0800 (PST)
-Subject: Re: [PATCH v2 1/1] KVM: x86: remove misplaced comment on
- active_mmu_pages
-To:     Dongli Zhang <dongli.zhang@oracle.com>, kvm@vger.kernel.org,
-        x86@kernel.org
-Cc:     seanjc@google.com, vkuznets@redhat.com, wanpengli@tencent.com,
-        jmattson@google.com, joro@8bytes.org, tglx@linutronix.de,
-        mingo@redhat.com, bp@alien8.de, hpa@zytor.com,
-        linux-kernel@vger.kernel.org
-References: <20210226061945.1222-1-dongli.zhang@oracle.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <78662af6-be71-4a81-8999-5b7011682728@redhat.com>
-Date:   Fri, 26 Feb 2021 09:03:36 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.7.0
+        id S230001AbhBZI7w (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 26 Feb 2021 03:59:52 -0500
+Received: from szxga06-in.huawei.com ([45.249.212.32]:12953 "EHLO
+        szxga06-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229537AbhBZI7p (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 26 Feb 2021 03:59:45 -0500
+Received: from DGGEMS411-HUB.china.huawei.com (unknown [172.30.72.60])
+        by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4Dn3Sx46yyzjRhZ;
+        Fri, 26 Feb 2021 16:57:37 +0800 (CST)
+Received: from [10.174.184.135] (10.174.184.135) by
+ DGGEMS411-HUB.china.huawei.com (10.3.19.211) with Microsoft SMTP Server id
+ 14.3.498.0; Fri, 26 Feb 2021 16:58:48 +0800
+Subject: Re: [PATCH v3 0/4] KVM: arm64: Add VLPI migration support on GICv4.1
+To:     Marc Zyngier <maz@kernel.org>, Eric Auger <eric.auger@redhat.com>,
+        "Will Deacon" <will@kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>,
+        <kvmarm@lists.cs.columbia.edu>, <kvm@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>
+CC:     Alex Williamson <alex.williamson@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
+        <wanghaibin.wang@huawei.com>, <yuzenghui@huawei.com>
+References: <20210127121337.1092-1-lushenming@huawei.com>
+From:   Shenming Lu <lushenming@huawei.com>
+Message-ID: <4c2fdcc3-4189-6515-3a68-7bdf26e31973@huawei.com>
+Date:   Fri, 26 Feb 2021 16:58:37 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.2.2
 MIME-Version: 1.0
-In-Reply-To: <20210226061945.1222-1-dongli.zhang@oracle.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20210127121337.1092-1-lushenming@huawei.com>
+Content-Type: text/plain; charset="utf-8"
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.174.184.135]
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 26/02/21 07:19, Dongli Zhang wrote:
-> The 'mmu_page_hash' is used as hash table while 'active_mmu_pages' is a
-> list. Remove the misplaced comment as it's mostly stating the obvious
-> anyways.
-> 
-> Signed-off-by: Dongli Zhang <dongli.zhang@oracle.com>
-> Reviewed-by: Sean Christopherson <seanjc@google.com>
-> ---
-> Changed since v1:
->    - change 'incorrect' to 'misplaced'
-> 
->   arch/x86/include/asm/kvm_host.h | 3 ---
->   1 file changed, 3 deletions(-)
-> 
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index 84499aad01a4..318242512407 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -937,9 +937,6 @@ struct kvm_arch {
->   	unsigned int indirect_shadow_pages;
->   	u8 mmu_valid_gen;
->   	struct hlist_head mmu_page_hash[KVM_NUM_MMU_PAGES];
-> -	/*
-> -	 * Hash table of struct kvm_mmu_page.
-> -	 */
->   	struct list_head active_mmu_pages;
->   	struct list_head zapped_obsolete_pages;
->   	struct list_head lpage_disallowed_mmu_pages;
-> 
+Hi Marc,
 
-Queued, thanks.
+Gentle ping. Does this series need any further modification? Wish you can pick it up. :-)
 
-Paolo
+Thanks,
+Shenming
 
+On 2021/1/27 20:13, Shenming Lu wrote:
+> Hi Marc, sorry for the late commit.
+> 
+> In GICv4.1, migration has been supported except for (directly-injected)
+> VLPI. And GICv4.1 Spec explicitly gives a way to get the VLPI's pending
+> state (which was crucially missing in GICv4.0). So we make VLPI migration
+> capable on GICv4.1 in this patch set.
+> 
+> In order to support VLPI migration, we need to save and restore all
+> required configuration information and pending states of VLPIs. But
+> in fact, the configuration information of VLPIs has already been saved
+> (or will be reallocated on the dst host...) in vgic(kvm) migration.
+> So we only have to migrate the pending states of VLPIs specially.
+> 
+> Below is the related workflow in migration.
+> 
+> On the save path:
+> 	In migration completion:
+> 		pause all vCPUs
+> 				|
+> 		call each VM state change handler:
+> 			pause other devices (just keep from sending interrupts, and
+> 			such as VFIO migration protocol has already realized it [1])
+> 					|
+> 			flush ITS tables into guest RAM
+> 					|
+> 			flush RDIST pending tables (also flush VLPI state here)
+> 				|
+> 		...
+> On the resume path:
+> 	load each device's state:
+> 		restore ITS tables (include pending tables) from guest RAM
+> 				|
+> 		for other (PCI) devices (paused), if configured to have VLPIs,
+> 		establish the forwarding paths of their VLPIs (and transfer
+> 		the pending states from kvm's vgic to VPT here)
+> 
+> We have tested this series in VFIO migration, and found some related
+> issues in QEMU [2].
+> 
+> Links:
+> [1] vfio: UAPI for migration interface for device state:
+>     https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=a8a24f3f6e38103b77cf399c38eb54e1219d00d6
+> [2] vfio: Some fixes and optimizations for VFIO migration:
+>     https://patchwork.ozlabs.org/cover/1413263/
+> 
+> History:
+> 
+> v2 -> v3
+>  - Add the vgic initialized check to ensure that the allocation and enabling
+>    of the doorbells have already been done before unmapping the vPEs.
+>  - Check all get_vlpi_state related conditions in save_pending_tables in one place.
+>  - Nit fixes.
+> 
+> v1 -> v2:
+>  - Get the VLPI state from the KVM side.
+>  - Nit fixes.
+> 
+> Thanks,
+> Shenming
+> 
+> 
+> Shenming Lu (3):
+>   KVM: arm64: GICv4.1: Add function to get VLPI state
+>   KVM: arm64: GICv4.1: Try to save hw pending state in
+>     save_pending_tables
+>   KVM: arm64: GICv4.1: Give a chance to save VLPI's pending state
+> 
+> Zenghui Yu (1):
+>   KVM: arm64: GICv4.1: Restore VLPI's pending state to physical side
+> 
+>  .../virt/kvm/devices/arm-vgic-its.rst         |  2 +-
+>  arch/arm64/kvm/vgic/vgic-its.c                |  6 +-
+>  arch/arm64/kvm/vgic/vgic-v3.c                 | 61 +++++++++++++++++--
+>  arch/arm64/kvm/vgic/vgic-v4.c                 | 33 ++++++++++
+>  arch/arm64/kvm/vgic/vgic.h                    |  1 +
+>  5 files changed, 93 insertions(+), 10 deletions(-)
+> 
