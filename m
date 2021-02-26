@@ -2,130 +2,202 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 64DA3326365
-	for <lists+kvm@lfdr.de>; Fri, 26 Feb 2021 14:33:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 09C4732636D
+	for <lists+kvm@lfdr.de>; Fri, 26 Feb 2021 14:36:32 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230184AbhBZNb7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 26 Feb 2021 08:31:59 -0500
-Received: from mail-mw2nam10on2080.outbound.protection.outlook.com ([40.107.94.80]:31981
-        "EHLO NAM10-MW2-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S230106AbhBZNbZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 26 Feb 2021 08:31:25 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=PCRy1TPStn5SO3NeZTj1Alyc33aokyVNoTe/GO9DJLUYK4MEgMR22RiAahwb0/9tPkTKt+Wl6FfuaZcluaZYNwUZJjxKJNpwDDLuVTGFBNsCoCa5BkNurAb1zVP2aFIHLPryGd8yriIfpMDShQDAm7iAMfq7X40jBV+pof/GE6wwUfN/yb4MBU1x4q4vH2xOSwePrn8VEAFXrUVU6mAAQNFDvSoCRAK0LcWmDsQTxqtln4mIoRDuIsdEZyQuAKsAy7BM4QDVLpOsx1Cm/MW2/GS9p+/I6koFk4nhEFUegcheNxvbk92WGIDhtNMH+fJ9zfGZrDpkFNWYiQjJYKPcZw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=QMj97n3NfXHJABM7P0P3/M6LThg+eIecdJdjCXplb28=;
- b=amoCF3nPQuuYttWMjsCUqPTeNCwobRhn2ChonetqV32+b+6zDm0hQ7qtwauucy8sxSgcRbJv99trAAlpvrzNDG31Aq2jMUEcCA+yV3JzFFVCCgIi9OwQ14tnflIc6fumnkdUYZwWefOFmIOodIxOmWUPpiC1Mm1zNHoa38au7p7hOfovHf13xaT5PsjEz6cGZPT0eQj9CFXoI3cICC1h3vm6LnTocv9ltdL7pNL6HAA4lVJGckm0X1CpqJ8MXbER8dm8lQHLFIVNeQW/fzv7MWffkKz6Tc0qZ3+j76gtLgSyXKiMXtuYQFkYoILcL7Fm1L9OQP8Wbs1hYP9MhdDsTA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=QMj97n3NfXHJABM7P0P3/M6LThg+eIecdJdjCXplb28=;
- b=ZcrYTuroA5HoQrtIuSSZKWK5E9a8vBpvjVpVqwqdkuGvybYBZcBpCBfWLkAzsFxTzlv6ebPMkNnNW+ekW0CIRuEEkAbNSm896/Z2jqfQGGBM6pzQp23aR3/uaWzHJN1/SGZTgC5y0j9gF9rOTKm5chHLAFlh3foWmPABMmcIvRg=
-Authentication-Results: redhat.com; dkim=none (message not signed)
- header.d=none;redhat.com; dmarc=none action=none header.from=amd.com;
-Received: from SN6PR12MB2767.namprd12.prod.outlook.com (2603:10b6:805:75::23)
- by SA0PR12MB4575.namprd12.prod.outlook.com (2603:10b6:806:73::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3890.20; Fri, 26 Feb
- 2021 13:30:32 +0000
-Received: from SN6PR12MB2767.namprd12.prod.outlook.com
- ([fe80::24bb:3e53:c95e:cb8e]) by SN6PR12MB2767.namprd12.prod.outlook.com
- ([fe80::24bb:3e53:c95e:cb8e%7]) with mapi id 15.20.3890.020; Fri, 26 Feb 2021
- 13:30:32 +0000
-Date:   Fri, 26 Feb 2021 13:30:23 +0000
-From:   Ashish Kalra <ashish.kalra@amd.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     James Bottomley <James.Bottomley@HansenPartnership.com>,
-        natet@google.com, brijesh.singh@amd.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, rientjes@google.com,
-        seanjc@google.com, srutherford@google.com, thomas.lendacky@amd.com,
-        x86@kernel.org, Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        DOV MURIK <Dov.Murik1@il.ibm.com>
-Subject: Re: [RFC] KVM: x86: Support KVM VMs sharing SEV context
-Message-ID: <20210226133023.GA5950@ashkalra_ubuntu_server>
-References: <20210224085915.28751-1-natet@google.com>
- <7cb132ce522728f7689618832a65e31e37788201.camel@HansenPartnership.com>
- <20210225181812.GA5046@ashkalra_ubuntu_server>
- <b885c283-ceb3-b9bc-516b-c28771652a7c@redhat.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <b885c283-ceb3-b9bc-516b-c28771652a7c@redhat.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-Originating-IP: [165.204.77.1]
-X-ClientProxiedBy: SA9PR13CA0038.namprd13.prod.outlook.com
- (2603:10b6:806:22::13) To SN6PR12MB2767.namprd12.prod.outlook.com
- (2603:10b6:805:75::23)
+        id S229864AbhBZNfO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 26 Feb 2021 08:35:14 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:3894 "EHLO
+        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229554AbhBZNfM (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 26 Feb 2021 08:35:12 -0500
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 11QDYOQv010280
+        for <kvm@vger.kernel.org>; Fri, 26 Feb 2021 08:34:30 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=bJYQ9p9kpDti/puJPsPLZx/hHwTQz9jfxXRxivB1xY0=;
+ b=KA4yNGID2p19q+zCp3ynhawFhKVSqmWugjswqjFOcCtOFRIKVyk0juwAxKkrovRKYqm6
+ Kqw2YRzM9kTlwHzMScrA8gaxndB1odGvdZvwZ1u8eqZroF5cQ/Xo0xM5/m2bdns8Ewhl
+ CIXnREdHzox7G0GJ1V7z1I1BUwrzhYAhfH/7E9BlmFlk0wIR06AWHTnuk7yWPdyFMOVP
+ V6itk9MDxwGij8Aut5pkz9p4ydm4vd9jMsr0beeaObKLCXUgv5Bhchglba5ez5fkvpH6
+ H57rOyYHpDGVANY99xe2jSvY3oWp12jyB1O/hrJnHYTBsVNw2qwSOMVnCO9oL8VJYWhZ 2g== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 36y02suuum-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Fri, 26 Feb 2021 08:34:29 -0500
+Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 11QDYTve010650
+        for <kvm@vger.kernel.org>; Fri, 26 Feb 2021 08:34:29 -0500
+Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 36y02suuty-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 26 Feb 2021 08:34:29 -0500
+Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
+        by ppma02fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 11QDVxgR015192;
+        Fri, 26 Feb 2021 13:34:27 GMT
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
+        by ppma02fra.de.ibm.com with ESMTP id 36tt28atgp-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 26 Feb 2021 13:34:27 +0000
+Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 11QDYO5t42402114
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 26 Feb 2021 13:34:24 GMT
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 8A06711C04A;
+        Fri, 26 Feb 2021 13:34:24 +0000 (GMT)
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 3E21F11C050;
+        Fri, 26 Feb 2021 13:34:24 +0000 (GMT)
+Received: from oc3016276355.ibm.com (unknown [9.145.145.240])
+        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Fri, 26 Feb 2021 13:34:24 +0000 (GMT)
+Subject: Re: [kvm-unit-tests PATCH v3 5/5] s390x: css: testing measurement
+ block format 1
+To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     david@redhat.com, thuth@redhat.com, cohuck@redhat.com,
+        imbrenda@linux.ibm.com
+References: <1613669204-6464-1-git-send-email-pmorel@linux.ibm.com>
+ <1613669204-6464-6-git-send-email-pmorel@linux.ibm.com>
+ <3041cee9-a5b8-1745-5455-f7728ae4d232@linux.ibm.com>
+From:   Pierre Morel <pmorel@linux.ibm.com>
+Message-ID: <47029f68-2bdc-a5ed-f3be-2573b5989899@linux.ibm.com>
+Date:   Fri, 26 Feb 2021 14:34:23 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.7.0
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from ashkalra_ubuntu_server (165.204.77.1) by SA9PR13CA0038.namprd13.prod.outlook.com (2603:10b6:806:22::13) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3912.10 via Frontend Transport; Fri, 26 Feb 2021 13:30:29 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: ed921b6e-ab1f-4f0b-7a44-08d8da5aaf9f
-X-MS-TrafficTypeDiagnostic: SA0PR12MB4575:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <SA0PR12MB45752129EC1B6877856291338E9D9@SA0PR12MB4575.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:8882;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: XZxgOoMr49iOI7zcECP+uauoqA4hOUyn5pbu4byBKjjj7Kc6JyIMm+1hsmP2e65a+T3xrME96CJiHvINFhe5TjKRRV9g8D7EtaXo4vf1q0w5AnBAGel7/sUCIGV58mE8tv6s/IkRrCE7CJnyy9z+9Tf6aXXEVjxiZNIuYTd158/lAf2oZH/dNGuVxf881DCH47pLiaI2ciKVjhNTn5bzOZEaQxlmPvWtJYWSTdiR/o612KGlcyuFit4NeI6ceEwv+yOKbtLw8SdpcgtGphzEMZ/6GpW+1tIRvVO21KsJ7Vjwf7TJTKpj6r+bqzysvjnieDpOOsuQTKBMG04H17xfIaWF4J/9PiR+YzNiVHiSXgEf8tgyUigrhF8rT9csgeX1A2xMrqXjNHL8iirH/EQhc/f7x0ej9uSozww/HFFO57Ej2yZGEIfUUf0Ozp9AAoUZYQCjRRvS5e4JMpmVrIlgxjoADUQa8+SZdPeHKfx/UNH1a1lnzzA9sEiqCl0ExzaZowrk63/m6ZRkco/pjJGQnQ==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2767.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(136003)(39860400002)(396003)(376002)(366004)(346002)(54906003)(16526019)(53546011)(6496006)(8936002)(186003)(9686003)(316002)(44832011)(8676002)(52116002)(956004)(26005)(478600001)(66946007)(66556008)(6916009)(86362001)(66476007)(2906002)(33656002)(4744005)(4326008)(7416002)(33716001)(6666004)(1076003)(55016002)(5660300002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: =?us-ascii?Q?9Ozl5r8ZetPAG+lSKVRV1OXK/aVkQrw0T0ySkpqyK6+0NYOnpWQb5mvy3Yrw?=
- =?us-ascii?Q?dg4DM42wOp4wXGiQwCz7mUTyZOxeuDUJi/eB83pezMqcPMKQwCWay9V80z9E?=
- =?us-ascii?Q?DW54ldC6g6g68GDzoa36WAk+7YgFLgbua0tZrkDKNb1lm53bHVH3Bo/g91Zk?=
- =?us-ascii?Q?bHBN9zWx+tHpAXk2WqoCC1mz9RIAgdPxxrsz/fDBcq1rHN82B8hMdpo3sMjR?=
- =?us-ascii?Q?FZgtAze2lKGXAxd1ZuBvbECogdd723A/3NWmQjiYgm+8Gr9JG7VmfzX7xxV/?=
- =?us-ascii?Q?ycVLNCmAXyVV9bkveTcUJIAYDnI3tUqzAmDKL96b2HBFsEOCGwbZuIg5yirT?=
- =?us-ascii?Q?O/ErmQwu5YklhdztYKFM9dzZMFQv4z3nElnB+TYwRkiI+d0s46RmqBIdoIxl?=
- =?us-ascii?Q?AxZYLhM6Q2R9r3Lt7YoaaR/UVu/QDFk+X1FzkspjscrdlcGjDeibzRliqpQQ?=
- =?us-ascii?Q?AW3mGLE+PfPOFPEwyyAKqwp8i0rswMdPJ8n8SJFlIQcNMmEG3V02TPZX+Q/a?=
- =?us-ascii?Q?X2S/Hs0Idrm0/dfh3NgDt+byR+aA6fre09ql27daU+2QC8iUS5cBzFa3qv0/?=
- =?us-ascii?Q?vmm5zv3qrpMDkmSonvadprLZFZYAaLHJPXUk6x6nZUwaFHGxD5lCv3WY4SYO?=
- =?us-ascii?Q?J+gpXrt43c3molImmekl6xgHIGY5M3XA3fDuyzDTgNjhMsunRPBKi6yOhF5R?=
- =?us-ascii?Q?/7LcS64tCxnvz3WWT6ZT/OYihLNkVZcr+9UmY+yhrGGZbvmEVMTxRSx01v4q?=
- =?us-ascii?Q?W7LV2euw4UklCI/GZZg86TipHDcsI2eh/NeOeXRd/Wu4CSR5ozYCV6YE83hY?=
- =?us-ascii?Q?rNEAE1qFUHD2g4F9TNcB3D188fHBGYByoTCuNceNIdFnze06Kx1Dj8J4PLv3?=
- =?us-ascii?Q?KashvZtcu++DMMy2MGsZq+PKjkPqpCKwXdIk3N+8QAvKnpbnvS42Ei44oIpZ?=
- =?us-ascii?Q?tICCK0NH7/YWM8giKYHKm7fetXfgYaLQJpT0qpd5J8txG6lS4erP5jKz7MUp?=
- =?us-ascii?Q?Jtiht9Gl/nXHmYFntmOVCp05LUPr0Kct6kVe2PheJ/kZAMYAXf9SjPzzHEcZ?=
- =?us-ascii?Q?R5wDtwalx65mDHhoKev5oJ9Hpm0R9vYX6h9C3Bq31VpL1w2uNGjyrW2gjrj3?=
- =?us-ascii?Q?AbyPTL2/LOdn0T4A3NYsPxGGkC8F1gz2RJisj4OZ2fgiPHsdC8cErcWBCsaT?=
- =?us-ascii?Q?1PoMLu0rZADJIS64jPULty2j60Oid7O1/+JOYl6/t6gTvF2crTOCLSCEwiuD?=
- =?us-ascii?Q?XhHueWNJmZIIVBoRO2mALFOg3nEybJlICVbiqp5/e4rKEjrh5YQWKyBpjqci?=
- =?us-ascii?Q?p0Kk5PRZ9gBkg9HOylc6Qk0f?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: ed921b6e-ab1f-4f0b-7a44-08d8da5aaf9f
-X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2767.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Feb 2021 13:30:31.8051
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: jaRIvVIbb/k4kCIhbcijoFMYhd+O6lkPvNtaAYWN3Dw+2wkogjTqW1T8kWqDu0XSEk7Ve6pA8ed1ijyjBPegKA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR12MB4575
+In-Reply-To: <3041cee9-a5b8-1745-5455-f7728ae4d232@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.761
+ definitions=2021-02-26_02:2021-02-24,2021-02-26 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 clxscore=1015
+ mlxscore=0 lowpriorityscore=0 bulkscore=0 spamscore=0 suspectscore=0
+ adultscore=0 mlxlogscore=999 phishscore=0 malwarescore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2102260104
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Feb 25, 2021 at 09:33:09PM +0100, Paolo Bonzini wrote:
-> On 25/02/21 19:18, Ashish Kalra wrote:
-> > I do believe that some of these alternative SEV live migration support
-> > or Migration helper (MH) solutions will still use SEV PSP migration for
-> > migrating the MH itself, therefore the SEV live migration patches
-> > (currently v10 posted upstream) still make sense and will be used.
-> 
-> I think that since the migration helper (at least for SEV, not -ES) is part
-> of the attested firmware, it can be started on the destination before the
-> rest of the VM.
-> 
 
-We may also need to transport VMSA(s) securely using the PSP migration
-support for SEV-ES live migration with MH.
 
-Thanks,
-Ashish
+On 2/26/21 11:02 AM, Janosch Frank wrote:
+> On 2/18/21 6:26 PM, Pierre Morel wrote:
+>> Measurement block format 1 is made available by the extended
+>> measurement block facility and is indicated in the SCHIB by
+>> the bit in the PMCW.
+
+...
+
+>> +void msch_with_wrong_fmt1_mbo(unsigned int schid, uint64_t mb)
+>> +{
+>> +	struct pmcw *pmcw = &schib.pmcw;
+>> +	int cc;
+>> +
+>> +	/* Read the SCHIB for this subchannel */
+>> +	cc = stsch(schid, &schib);
+>> +	if (cc) {> +		report(0, "stsch: sch %08x failed with cc=%d", schid, cc);
+>> +		return;
+>> +	}
+>> +
+>> +	/* Update the SCHIB to enable the measurement block */
+>> +	pmcw->flags |= PMCW_MBUE;
+>> +	pmcw->flags2 |= PMCW_MBF1;
+>> +	schib.mbo = mb;
+>> +
+>> +	/* Tell the CSS we want to modify the subchannel */
+>> +	expect_pgm_int();
+>> +	cc = msch(schid, &schib);
+>> +	check_pgm_int_code(PGM_INT_CODE_OPERAND);
+> 
+> Why would you expect a PGM in a library function are PGMs normal for IO
+> instructions? oO
+> 
+> Is this a test function which should be part of your test file in
+> s390x/*.c or is it part of the IO library which should:
+> 
+>   - Abort if an initialization failed and we can assume that future tests
+> are now useless
+>   - Return an error so the test can report an error
+>   - Return success
+
+
+
+Now it looks clear to me that this test belongs to the tests and not the 
+lib.
+I put it there to avoid exporting the SCHIB, but after all, why not 
+exporting the SCHIB, we may need access to it from other tests again in 
+the future.
+
+
+
+> 
+>> +}
+>> diff --git a/s390x/css.c b/s390x/css.c
+>> index b65aa89..576df48 100644
+>> --- a/s390x/css.c
+>> +++ b/s390x/css.c
+>> @@ -257,6 +257,58 @@ end:
+>>   	report_prefix_pop();
+>>   }
+>>   
+>> +/*
+>> + * test_schm_fmt1:
+>> + * With measurement block format 1 the mesurement block is
+>> + * dedicated to a subchannel.
+>> + */
+>> +static void test_schm_fmt1(void)
+>> +{
+>> +	struct measurement_block_format1 *mb1;
+>> +
+>> +	report_prefix_push("Format 1");
+>> +
+>> +	if (!test_device_sid) {
+>> +		report_skip("No device");
+>> +		goto end;
+>> +	}
+
+...
+
+>> +	report(start_measure((u64)mb1, 0, true) &&
+>> +	       mb1->ssch_rsch_count == SCHM_UPDATE_CNT,
+>> +	       "SSCH measured %d", mb1->ssch_rsch_count);
+>> +	report_prefix_pop();
+>> +
+>> +	schm(NULL, 0); /* Stop the measurement */
+>> +	free_io_mem(mb1, sizeof(struct measurement_block_format1));
+>> +end:
+>> +	report_prefix_pop();
+>> +}
+>> +
+>>   static struct {
+>>   	const char *name;
+>>   	void (*func)(void);
+>> @@ -268,6 +320,7 @@ static struct {
+>>   	{ "sense (ssch/tsch)", test_sense },
+>>   	{ "measurement block (schm)", test_schm },
+>>   	{ "measurement block format0", test_schm_fmt0 },
+>> +	{ "measurement block format1", test_schm_fmt1 },
+> 
+> Output will then be:
+> "measurement block format1: Format 1: Report message"
+> 
+> Wouldn't it make more sense to put the format 0 and 1 tests into
+> test_schm() so we'd have:
+> "measurement block (schm): Format 0: Report message" ?
+
+too much prefix push...
+rationalizing will make the goto disapear...
+
+Thanks for review
+Regards,
+Pierre
+
+-- 
+Pierre Morel
+IBM Lab Boeblingen
