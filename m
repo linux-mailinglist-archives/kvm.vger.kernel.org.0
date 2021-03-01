@@ -2,180 +2,82 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A71E53290D2
-	for <lists+kvm@lfdr.de>; Mon,  1 Mar 2021 21:16:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 67FB132942E
+	for <lists+kvm@lfdr.de>; Mon,  1 Mar 2021 22:51:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239067AbhCAUQF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 1 Mar 2021 15:16:05 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:49949 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S241170AbhCAUKV (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 1 Mar 2021 15:10:21 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1614629329;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=DeZRAZaCcq5fOAnPyHfLItpaonWuUNdGVglPpA6ptmQ=;
-        b=NoDoisBQX8cueJ+5Fl8Y38EmJEAtj1Ylzz+pM0KXsMJLzyLGGk3wHfIzaRUX5QgJ5hgsVX
-        TK1MmktRjxVfUJIa2Sw9dwEo9svK8HHyLNVVNvnQbqZ2oByXG63YqJkN7pU3X2lsl9Il5m
-        C9cczjmCW+irc03PIDRfDkB8JTH3g1Q=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-332-JYFXC9iyNFCbyNZVNyRsNQ-1; Mon, 01 Mar 2021 15:08:46 -0500
-X-MC-Unique: JYFXC9iyNFCbyNZVNyRsNQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C355D801978;
-        Mon,  1 Mar 2021 20:08:45 +0000 (UTC)
-Received: from virtlab710.virt.lab.eng.bos.redhat.com (virtlab710.virt.lab.eng.bos.redhat.com [10.19.152.252])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 45FEF5C1C4;
-        Mon,  1 Mar 2021 20:08:45 +0000 (UTC)
-From:   Cathy Avery <cavery@redhat.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        pbonzini@redhat.com
-Cc:     vkuznets@redhat.com, wei.huang2@amd.com
-Subject: [PATCH] KVM: nSVM: Optimize L12 to L2 vmcb.save copies
-Date:   Mon,  1 Mar 2021 15:08:44 -0500
-Message-Id: <20210301200844.2000-1-cavery@redhat.com>
+        id S241346AbhCAVvh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 1 Mar 2021 16:51:37 -0500
+Received: from mout.gmx.net ([212.227.17.21]:56533 "EHLO mout.gmx.net"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S244758AbhCAVtO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 1 Mar 2021 16:49:14 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.net;
+        s=badeba3b8450; t=1614635257;
+        bh=zVBUFtB0XtjblJmNjnmM9zPfSHxzFzcx47GazfY4lCs=;
+        h=X-UI-Sender-Class:From:To:Cc:Subject:Date;
+        b=K3qP7lBlbIxtPiyoA9XsWkp/BmZ0qYxL9h5wTaFTHFazh1hHJaoBazJwsrwigX42S
+         6H9pcaIUJqLwF+P9V8+HS6dLvbPeHSHRY0hvVLxlhm969EXH+dwf8Sl1JB4gBQcPW3
+         tkc4MKgFxacoSBDzyTzOCL3Z/1fi55A/UmFrkZIM=
+X-UI-Sender-Class: 01bb95c1-4bf8-414a-932a-4f6e2808ef9c
+Received: from longitude ([37.201.215.134]) by mail.gmx.net (mrgmx104
+ [212.227.17.168]) with ESMTPSA (Nemesis) id 1Mq2jC-1ldVwg3Tgg-00n6Zy; Mon, 01
+ Mar 2021 22:47:36 +0100
+From:   =?UTF-8?q?Jonathan=20Neusch=C3=A4fer?= <j.neuschaefer@gmx.net>
+To:     linux-doc@vger.kernel.org
+Cc:     =?UTF-8?q?Jonathan=20Neusch=C3=A4fer?= <j.neuschaefer@gmx.net>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH] docs: kvm: Fix a typo ("althought")
+Date:   Mon,  1 Mar 2021 22:47:21 +0100
+Message-Id: <20210301214722.2310911-1-j.neuschaefer@gmx.net>
+X-Mailer: git-send-email 2.30.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:CTe05Txa0fPqrncPyK6o5poGV4/BtQtlMFSSGCyT/OugiTbOCbh
+ 3NZYAXQHyNJXS55FNFx/wjmhy1mlerNfAyoM0gXWrMpAhWKe7qJsQ8J5Buz+pT8BLcRyvat
+ COANMF/m46XMhZSfasCOq+V+XBUXdc5tm4BaGFwq+84HA75nhH0DZGL0Ws0Vy7f8TMff0yn
+ TB/Aw3Q9Vcjw++OGw4p0w==
+X-Spam-Flag: NO
+X-UI-Out-Filterresults: notjunk:1;V03:K0:gUfQ4K6LBMI=:g+cu8vMnkgzt7iERrau4n5
+ Uzu8J1C5DNojCKpw8gMQ7Ci/ZmiE3ji9FZduOOZmNf6TUpCqVjbqjKMH7z5f3UkA2AZvFM/WM
+ jgzjMpWBVG4pzPuRUgSEB3XU/ourAI5wKFz5udaOFtj3tX4dPayKlIxA1i0LUlI5zaVHLxx+v
+ t3zLIipzs1X6/jjgvdeWEnz9iGSyV+JMdGPWY9/k9lTwHmAfr3Xm02A8NC8Kd5r485UtWbrSd
+ DBKi0cE/HN9549g+v5rZx2kHrLU2XtzxGvvPqSSRSUrTKrFm+tuOUyOpQ5jiAYhHmHZnMZBAS
+ Tyd6+2o651tJEo4ClGo69L2r3KyKMB9ys/Rl9iMTZjbBxvoYsmTE01n9XVCb/45QJCAclKV83
+ B6ygez7ESh0LqZGwS5PWIJ5DN+3+VTXqH8n4GYisJqp6JWj7oIPUNq7T/vyv3SejQbNpGitMP
+ 2LZhP/DAoMc0yxnt5loZsLqAc+Uq5v3PhrpYHqyUKCH3mOv/GLADfavrQyK0bNZElKmkpaKKe
+ GqJRJDywIA5PtKemlAdkDJFA0k70csgNosf/oIy5DumILtYLxyaycmo/T9koQ901RwYdmium/
+ 7numv9IgphhAw5AmseCsH7mZz4S6Ct2NKARvruckcPEnAjgMa5owtpySvE3KqCeGNjC8otxZG
+ FeyPMXeFD98HgSuZxaUKGhmqmq0oX25O0izJBq22eQHmNKzpUEQj523sWtuSZHgHoiacMAVHu
+ k+iwwe8cNuyZhsubYAxQ+ZPNmhiKRSdHyz9XS8Cgi9WA49KFWbHnwrzNARmMvagklzr1GPW+H
+ Deo6mU8TN2oDIVLIvKqxMV2Ke5V+kvk9vYfiZfNi9jYoVKgit1lqV6GNYsQNULOdXVMZKe7lW
+ f/+1Na6efeE5g0d4659A==
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Use the vmcb12 control clean field to determine which vmcb12.save
-registers were marked dirty in order to minimize register copies
-when switching from L1 to L2. Those L12 registers marked as dirty need
-to be copied to L2's vmcb as they will be used to update the vmcb
-state cache for the L2 VMRUN.  In the case where we have a different
-vmcb12 from the last L2 VMRUN all vmcb12.save registers must be
-copied over to L2.save.
+Signed-off-by: Jonathan Neusch=C3=A4fer <j.neuschaefer@gmx.net>
+=2D--
+ Documentation/virt/kvm/api.rst | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Tested:
-kvm-unit-tests
-kvm selftests
-Fedora L1 L2
+diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.r=
+st
+index aed52b0fc16ec..3617a64e81fe2 100644
+=2D-- a/Documentation/virt/kvm/api.rst
++++ b/Documentation/virt/kvm/api.rst
+@@ -55,7 +55,7 @@ not cause harm to the host, their actual behavior is not=
+ guaranteed by
+ the API.  See "General description" for details on the ioctl usage
+ model that is supported by KVM.
 
-Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
-Signed-off-by: Cathy Avery <cavery@redhat.com>
----
- arch/x86/kvm/svm/nested.c | 43 ++++++++++++++++++++++++++-------------
- arch/x86/kvm/svm/svm.c    |  1 +
- arch/x86/kvm/svm/svm.h    |  6 ++++++
- 3 files changed, 36 insertions(+), 14 deletions(-)
-
-diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
-index 90a1704b5752..c1d5944ee473 100644
---- a/arch/x86/kvm/svm/nested.c
-+++ b/arch/x86/kvm/svm/nested.c
-@@ -422,39 +422,54 @@ void nested_vmcb02_compute_g_pat(struct vcpu_svm *svm)
- 
- static void nested_vmcb02_prepare_save(struct vcpu_svm *svm, struct vmcb *vmcb12)
- {
-+	bool new_vmcb12 = false;
-+
- 	nested_vmcb02_compute_g_pat(svm);
- 
- 	/* Load the nested guest state */
--	svm->vmcb->save.es = vmcb12->save.es;
--	svm->vmcb->save.cs = vmcb12->save.cs;
--	svm->vmcb->save.ss = vmcb12->save.ss;
--	svm->vmcb->save.ds = vmcb12->save.ds;
--	svm->vmcb->save.cpl = vmcb12->save.cpl;
--	vmcb_mark_dirty(svm->vmcb, VMCB_SEG);
- 
--	svm->vmcb->save.gdtr = vmcb12->save.gdtr;
--	svm->vmcb->save.idtr = vmcb12->save.idtr;
--	vmcb_mark_dirty(svm->vmcb, VMCB_DT);
-+	if (svm->nested.vmcb12_gpa != svm->nested.last_vmcb12_gpa) {
-+		new_vmcb12 = true;
-+		svm->nested.last_vmcb12_gpa = svm->nested.vmcb12_gpa;
-+	}
-+
-+	if (unlikely(new_vmcb12 || vmcb_is_dirty(vmcb12, VMCB_SEG))) {
-+		svm->vmcb->save.es = vmcb12->save.es;
-+		svm->vmcb->save.cs = vmcb12->save.cs;
-+		svm->vmcb->save.ss = vmcb12->save.ss;
-+		svm->vmcb->save.ds = vmcb12->save.ds;
-+		svm->vmcb->save.cpl = vmcb12->save.cpl;
-+		vmcb_mark_dirty(svm->vmcb, VMCB_SEG);
-+	}
-+
-+	if (unlikely(new_vmcb12 || vmcb_is_dirty(vmcb12, VMCB_DT))) {
-+		svm->vmcb->save.gdtr = vmcb12->save.gdtr;
-+		svm->vmcb->save.idtr = vmcb12->save.idtr;
-+		vmcb_mark_dirty(svm->vmcb, VMCB_DT);
-+	}
- 
- 	kvm_set_rflags(&svm->vcpu, vmcb12->save.rflags | X86_EFLAGS_FIXED);
- 	svm_set_efer(&svm->vcpu, vmcb12->save.efer);
- 	svm_set_cr0(&svm->vcpu, vmcb12->save.cr0);
- 	svm_set_cr4(&svm->vcpu, vmcb12->save.cr4);
- 
--	svm->vcpu.arch.cr2 = vmcb12->save.cr2;
-+	svm->vmcb->save.cr2 = svm->vcpu.arch.cr2 = vmcb12->save.cr2;
-+
- 	kvm_rax_write(&svm->vcpu, vmcb12->save.rax);
- 	kvm_rsp_write(&svm->vcpu, vmcb12->save.rsp);
- 	kvm_rip_write(&svm->vcpu, vmcb12->save.rip);
- 
- 	/* In case we don't even reach vcpu_run, the fields are not updated */
--	svm->vmcb->save.cr2 = svm->vcpu.arch.cr2;
- 	svm->vmcb->save.rax = vmcb12->save.rax;
- 	svm->vmcb->save.rsp = vmcb12->save.rsp;
- 	svm->vmcb->save.rip = vmcb12->save.rip;
- 
--	svm->vmcb->save.dr7 = vmcb12->save.dr7 | DR7_FIXED_1;
--	svm->vcpu.arch.dr6  = vmcb12->save.dr6 | DR6_ACTIVE_LOW;
--	vmcb_mark_dirty(svm->vmcb, VMCB_DR);
-+	/* These bits will be set properly on the first execution when new_vmc12 is true */
-+	if (unlikely(new_vmcb12 || vmcb_is_dirty(vmcb12, VMCB_DR))) {
-+		svm->vmcb->save.dr7 = vmcb12->save.dr7 | DR7_FIXED_1;
-+		svm->vcpu.arch.dr6  = vmcb12->save.dr6 | DR6_ACTIVE_LOW;
-+		vmcb_mark_dirty(svm->vmcb, VMCB_DR);
-+	}
- }
- 
- static void nested_vmcb02_prepare_control(struct vcpu_svm *svm)
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index 54610270f66a..9761a7ca8100 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -1232,6 +1232,7 @@ static void init_vmcb(struct kvm_vcpu *vcpu)
- 	svm->asid = 0;
- 
- 	svm->nested.vmcb12_gpa = 0;
-+	svm->nested.last_vmcb12_gpa = 0;
- 	vcpu->arch.hflags = 0;
- 
- 	if (!kvm_pause_in_guest(vcpu->kvm)) {
-diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-index fbbb26dd0f73..911868d4584c 100644
---- a/arch/x86/kvm/svm/svm.h
-+++ b/arch/x86/kvm/svm/svm.h
-@@ -93,6 +93,7 @@ struct svm_nested_state {
- 	u64 hsave_msr;
- 	u64 vm_cr_msr;
- 	u64 vmcb12_gpa;
-+	u64 last_vmcb12_gpa;
- 
- 	/* These are the merged vectors */
- 	u32 *msrpm;
-@@ -247,6 +248,11 @@ static inline void vmcb_mark_dirty(struct vmcb *vmcb, int bit)
- 	vmcb->control.clean &= ~(1 << bit);
- }
- 
-+static inline bool vmcb_is_dirty(struct vmcb *vmcb, int bit)
-+{
-+        return !test_bit(bit, (unsigned long *)&vmcb->control.clean);
-+}
-+
- static inline struct vcpu_svm *to_svm(struct kvm_vcpu *vcpu)
- {
- 	return container_of(vcpu, struct vcpu_svm, vcpu);
--- 
-2.26.2
+-It is important to note that althought VM ioctls may only be issued from
++It is important to note that although VM ioctls may only be issued from
+ the process that created the VM, a VM's lifecycle is associated with its
+ file descriptor, not its creator (process).  In other words, the VM and
+ its resources, *including the associated address space*, are not freed
+=2D-
+2.30.1
 
