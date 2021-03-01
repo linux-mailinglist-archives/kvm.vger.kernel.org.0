@@ -2,203 +2,102 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 10D5E3282DD
-	for <lists+kvm@lfdr.de>; Mon,  1 Mar 2021 16:55:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7F7C23283C8
+	for <lists+kvm@lfdr.de>; Mon,  1 Mar 2021 17:27:46 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237416AbhCAPzu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 1 Mar 2021 10:55:50 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:26930 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S237417AbhCAPzs (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 1 Mar 2021 10:55:48 -0500
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 121FYdj1122603
-        for <kvm@vger.kernel.org>; Mon, 1 Mar 2021 10:55:03 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=to : cc : references :
- from : subject : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=N8O7C8wy2WaYEBubmBfe+o1tXe7gBRo5K64HV0xEUVs=;
- b=ADgBkNA31LHYGv+hpO567zerRU3D6cGHIYUphCIZmdJLtO59+vgJKBdicFeG8Eivlm0O
- 1F5eJ0ULfGPds09TOHi7drc+bio4d3BqSEejyTRcFlHwc37MK+wHA+xmyA7yzSFEC3EZ
- 5oHhqDMZyltCoUrtXk0g5gOWh8tzNrXzNiLt8FaS6fszJ3wKGgx6YO6s5ELAlpxN3lmS
- siveJgxjM1lJsuaYdS0iorQ1FTFSqomYVnPxFrUkNi9zcblRX4jEBvMjAGVAmSy7mZvr
- x+U/HOut5bI6MLuNa5YLT6zr9NaiemHhtIsrddM7nZW/zyDJHiS3SJfLUNOjxBQMhkhx Sw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 37106d7d4j-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Mon, 01 Mar 2021 10:55:03 -0500
-Received: from m0098394.ppops.net (m0098394.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 121Fa2NH131725
-        for <kvm@vger.kernel.org>; Mon, 1 Mar 2021 10:55:03 -0500
-Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 37106d7d3a-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 01 Mar 2021 10:55:03 -0500
-Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
-        by ppma03fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 121FgKA8032485;
-        Mon, 1 Mar 2021 15:55:00 GMT
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
-        by ppma03fra.de.ibm.com with ESMTP id 36ydq812af-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 01 Mar 2021 15:55:00 +0000
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
-        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 121FsvRq46924190
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 1 Mar 2021 15:54:58 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id CDDDD5204E;
-        Mon,  1 Mar 2021 15:54:57 +0000 (GMT)
-Received: from linux.fritz.box (unknown [9.145.190.79])
-        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 745A852051;
-        Mon,  1 Mar 2021 15:54:57 +0000 (GMT)
-To:     Pierre Morel <pmorel@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     david@redhat.com, thuth@redhat.com, cohuck@redhat.com,
-        imbrenda@linux.ibm.com
-References: <1614599225-17734-1-git-send-email-pmorel@linux.ibm.com>
- <1614599225-17734-6-git-send-email-pmorel@linux.ibm.com>
-From:   Janosch Frank <frankja@linux.ibm.com>
-Subject: Re: [kvm-unit-tests PATCH v4 5/6] s390x: css: testing measurement
- block format 0
-Message-ID: <80e25939-239a-8579-ba48-563ca0b2960f@linux.ibm.com>
-Date:   Mon, 1 Mar 2021 16:54:57 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.7.0
+        id S237811AbhCAQYT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 1 Mar 2021 11:24:19 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35252 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S237438AbhCAQWJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 1 Mar 2021 11:22:09 -0500
+Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A6448C061788
+        for <kvm@vger.kernel.org>; Mon,  1 Mar 2021 08:21:27 -0800 (PST)
+Received: by mail-pj1-x102c.google.com with SMTP id c19so11596464pjq.3
+        for <kvm@vger.kernel.org>; Mon, 01 Mar 2021 08:21:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=jC2WGY5IvJY5a5GaOcvwnDc85miRJPUWJYADM2oq/Vk=;
+        b=RSfR2jcli1GleHaRZ8Ny/9wJRvHkoiPuBTy1nY6AzKOBtnWAcufVR2eThF7uMxrbd4
+         SvCGy1dGOjeYf1HhmCoDZ/EvKnYgXPaJYPk09YdEcK5qALeK9p9zLRJPHI4NGz4qN8ms
+         iIQhskrnUrHIIPW4aFVFr73y6frsAPhkGyu/lEl+uSA7r9o3/c7VpFCC1UT9ZLDhRlmL
+         yz95t6qu75srosy1wuCKPV6h/87XbLBQIYmx3PT02V5jXdJkEhnWYrEAtgDp9gWo2xPv
+         rHE2an4zDaVV6jHhu4JXXCUykswbc7dAHz52xBG5cIT0iIKVoLves2rKVfJ3107CpL7K
+         /ELw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=jC2WGY5IvJY5a5GaOcvwnDc85miRJPUWJYADM2oq/Vk=;
+        b=GaQ8GaqJJ+qWO4khzs3GWw8S9cdhsJR/Pa6AnxOcKdSG327mWyNbGcwY1D4CeNhzY6
+         +DOzGVk9sLG3QqJYBBznFyzpcR0Iv5Kla3rmZF8fVZSX0eeRvy6J7GvWvlXB0xZhMelw
+         F9DtwCpZGb3cYkWndmN68I6clpExXWITkciWaT3LUQQ8OzGiLwfXxu17Mv0IYDB8rRiH
+         AHUBNEbJGqt+LwsM2LqDTKFdBodSEobGXSXLzk9ItmBv/8CtbI7FoG9i562VPzHEGcXB
+         xMxPUg8pq8p34Tcj3rY/mcKSVUIa5x+UOC/ws7A/TxuFix4E4aMUzyN7F7QU1qQwJVGV
+         jnLw==
+X-Gm-Message-State: AOAM533NU3ICWOJPyLBKGgG+UGwGpduiyVNN7NsAnGVnDFJDtVwvHzdP
+        TfAuyA2BkBtfLrX96TGS9r2j1A==
+X-Google-Smtp-Source: ABdhPJzDK3rT//fSp8J4fsSDT5s0A4TeJiUbKdNYMYyEOict+tnCU+C6QCR6dpG7EgSBrxC7OgBIEg==
+X-Received: by 2002:a17:902:c582:b029:e4:c16d:b5eb with SMTP id p2-20020a170902c582b02900e4c16db5ebmr1867568plx.6.1614615686845;
+        Mon, 01 Mar 2021 08:21:26 -0800 (PST)
+Received: from google.com ([2620:15c:f:10:5d06:6d3c:7b9:20c9])
+        by smtp.gmail.com with ESMTPSA id z22sm18134271pfa.41.2021.03.01.08.21.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 01 Mar 2021 08:21:26 -0800 (PST)
+Date:   Mon, 1 Mar 2021 08:21:19 -0800
+From:   Sean Christopherson <seanjc@google.com>
+To:     Kai Huang <kai.huang@intel.com>
+Cc:     kvm@vger.kernel.org, x86@kernel.org, linux-sgx@vger.kernel.org,
+        linux-kernel@vger.kernel.org, jarkko@kernel.org, luto@kernel.org,
+        dave.hansen@intel.com, rick.p.edgecombe@intel.com,
+        haitao.huang@intel.com, pbonzini@redhat.com, bp@alien8.de,
+        tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com
+Subject: Re: [PATCH 05/25] x86/sgx: Introduce virtual EPC for use by KVM
+ guests
+Message-ID: <YD0Uf1LS4jDlXGLo@google.com>
+References: <cover.1614590788.git.kai.huang@intel.com>
+ <aade4006c3474175f97ec149a969eb02f1720a89.1614590788.git.kai.huang@intel.com>
 MIME-Version: 1.0
-In-Reply-To: <1614599225-17734-6-git-send-email-pmorel@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.761
- definitions=2021-03-01_11:2021-03-01,2021-03-01 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 spamscore=0
- suspectscore=0 adultscore=0 mlxlogscore=999 priorityscore=1501
- lowpriorityscore=0 clxscore=1015 bulkscore=0 mlxscore=0 phishscore=0
- impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2103010130
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aade4006c3474175f97ec149a969eb02f1720a89.1614590788.git.kai.huang@intel.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 3/1/21 12:47 PM, Pierre Morel wrote:
-> We test the update of the measurement block format 0, the
-> measurement block origin is calculated from the mbo argument
-> used by the SCHM instruction and the offset calculated using
-> the measurement block index of the SCHIB.
-> 
-> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
-> ---
->  lib/s390x/css.h | 12 +++++++++
->  s390x/css.c     | 66 +++++++++++++++++++++++++++++++++++++++++++++++++
->  2 files changed, 78 insertions(+)
-> 
-> diff --git a/lib/s390x/css.h b/lib/s390x/css.h
-> index b8ac363..40f9efa 100644
-> --- a/lib/s390x/css.h
-> +++ b/lib/s390x/css.h
-> @@ -375,4 +375,16 @@ static inline void schm(void *mbo, unsigned int flags)
->  bool css_enable_mb(int sid, uint64_t mb, uint16_t mbi, uint16_t flg, bool fmt1);
->  bool css_disable_mb(int schid);
->  
-> +struct measurement_block_format0 {
-> +	uint16_t ssch_rsch_count;
-> +	uint16_t sample_count;
-> +	uint32_t device_connect_time;
-> +	uint32_t function_pending_time;
-> +	uint32_t device_disconnect_time;
-> +	uint32_t cu_queuing_time;
-> +	uint32_t device_active_only_time;
-> +	uint32_t device_busy_time;
-> +	uint32_t initial_cmd_resp_time;
-> +};
-> +
->  #endif
-> diff --git a/s390x/css.c b/s390x/css.c
-> index e8f96f3..3915ed3 100644
-> --- a/s390x/css.c
-> +++ b/s390x/css.c
-> @@ -184,6 +184,71 @@ static void test_schm(void)
->  	report_prefix_pop();
->  }
->  
-> +#define SCHM_UPDATE_CNT 10
-> +static bool start_measuring(uint64_t mbo, uint16_t mbi, bool fmt1)
-> +{
-> +	int i;
-> +
-> +	if (!css_enable_mb(test_device_sid, mbo, mbi, PMCW_MBUE, fmt1)) {
-> +		report(0, "Enabling measurement_block_format");
-> +		return false;
-> +	}
-> +
-> +	for (i = 0; i < SCHM_UPDATE_CNT; i++) {
-> +		if (!do_test_sense()) {
-> +			report(0, "Error during sense");
-> +			return false;
-Are these hard fails, i.e. would it make sense to stop testing if this
-or the css_enable_mb() above fails?
+On Mon, Mar 01, 2021, Kai Huang wrote:
+> +	/*
+> +	 * SECS pages are "pinned" by child pages, an unpinned once all
 
-> +		}
-> +	}
-> +
-> +	return true;
-> +}
-> +
-> +/*
-> + * test_schm_fmt0:
-> + * With measurement block format 0 a memory space is shared
-> + * by all subchannels, each subchannel can provide an index
-> + * for the measurement block facility to store the measurements.
-> + */
-> +static void test_schm_fmt0(void)
-> +{
-> +	struct measurement_block_format0 *mb0;
-> +	int shared_mb_size = 2 * sizeof(struct measurement_block_format0);
-> +
-> +	/* Allocate zeroed Measurement block */
-> +	mb0 = alloc_io_mem(shared_mb_size, 0);
-> +	if (!mb0) {
-> +		report_abort("measurement_block_format0 allocation failed");
-> +		return;
-> +	}
-> +
-> +	schm(NULL, 0); /* Stop any previous measurement */
-> +	schm(mb0, SCHM_MBU);
-> +
-> +	/* Expect success */
-> +	report_prefix_push("Valid MB address and index 0");
-> +	report(start_measuring(0, 0, false) &&
-> +	       mb0->ssch_rsch_count == SCHM_UPDATE_CNT,
-> +	       "SSCH measured %d", mb0->ssch_rsch_count);
-> +	report_prefix_pop();
-> +
-> +	/* Clear the measurement block for the next test */
-> +	memset(mb0, 0, shared_mb_size);
-> +
-> +	/* Expect success */
-> +	report_prefix_push("Valid MB address and index 1");
-> +	report(start_measuring(0, 1, false) &&
-> +	       mb0[1].ssch_rsch_count == SCHM_UPDATE_CNT,
-> +	       "SSCH measured %d", mb0[1].ssch_rsch_count);
-> +	report_prefix_pop();
-> +
-> +	/* Stop the measurement */
-> +	css_disable_mb(test_device_sid);
-> +	schm(NULL, 0);
-> +
-> +	free_io_mem(mb0, shared_mb_size);
-> +}
-> +
->  static struct {
->  	const char *name;
->  	void (*func)(void);
-> @@ -194,6 +259,7 @@ static struct {
->  	{ "enable (msch)", test_enable },
->  	{ "sense (ssch/tsch)", test_sense },
->  	{ "measurement block (schm)", test_schm },
-> +	{ "measurement block format0", test_schm_fmt0 },
->  	{ NULL, NULL }
->  };
->  
-> 
+s/an/and
 
+> +	 * children have been EREMOVE'd.  A child page in this instance
+> +	 * may have pinned an SECS page encountered in an earlier release(),
+> +	 * creating a zombie.  Since some children were EREMOVE'd above,
+> +	 * try to EREMOVE all zombies in the hopes that one was unpinned.
+> +	 */
+> +	mutex_lock(&zombie_secs_pages_lock);
+> +	list_for_each_entry_safe(epc_page, tmp, &zombie_secs_pages, list) {
+> +		/*
+> +		 * Speculatively remove the page from the list of zombies,
+> +		 * if the page is successfully EREMOVE it will be added to
+> +		 * the list of free pages.  If EREMOVE fails, throw the page
+> +		 * on the local list, which will be spliced on at the end.
+> +		 */
+> +		list_del(&epc_page->list);
+> +
+> +		if (sgx_vepc_free_page(epc_page))
+> +			list_add_tail(&epc_page->list, &secs_pages);
+> +	}
+> +
+> +	if (!list_empty(&secs_pages))
+> +		list_splice_tail(&secs_pages, &zombie_secs_pages);
+> +	mutex_unlock(&zombie_secs_pages_lock);
+> +
+> +	kfree(vepc);
+> +
+> +	return 0;
+> +}
