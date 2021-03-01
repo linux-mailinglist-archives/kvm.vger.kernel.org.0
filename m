@@ -2,125 +2,319 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 20EF932891B
-	for <lists+kvm@lfdr.de>; Mon,  1 Mar 2021 18:52:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BC44432895E
+	for <lists+kvm@lfdr.de>; Mon,  1 Mar 2021 18:56:35 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239012AbhCARu3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 1 Mar 2021 12:50:29 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53646 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238717AbhCARrh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 1 Mar 2021 12:47:37 -0500
-Received: from mail-pg1-x529.google.com (mail-pg1-x529.google.com [IPv6:2607:f8b0:4864:20::529])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 13C4FC061793
-        for <kvm@vger.kernel.org>; Mon,  1 Mar 2021 09:46:27 -0800 (PST)
-Received: by mail-pg1-x529.google.com with SMTP id a23so2255808pga.8
-        for <kvm@vger.kernel.org>; Mon, 01 Mar 2021 09:46:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=d6E6zqEbjqh+dwazTT0oLku5dnRE/qNGLB3SDKN9dOw=;
-        b=V3umcLnJr+393bucClK75f1l/HHDLkirK5dzlN9sgGKsRZMDmC6Me94xVCuoN4NqNp
-         qcTL3MjWoKS5pDN7p6Efq6YHyYdSOutxT01s6V1iHqoxv3fl3DBPZ1yhDBuXs3TuxpIq
-         x44r9Aw4XSYNCd/1ff8nPZOpl4BSU001+B8uUpS3H9hKKPntWDWv/vQlCMRTQYDxtHqr
-         1Qgx4hpd6s4+llVp9TFvA6VrVfN8/d6BUhmnB1NLcGkvxMKa7r22sonNJUtVo9JNbzeo
-         SMzTkVuFMlExynASWBJI4bPMPzEpV+Lhcx5au3cj1WGYQSO418KYkVnrAwqbmnuURQLo
-         dT7A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=d6E6zqEbjqh+dwazTT0oLku5dnRE/qNGLB3SDKN9dOw=;
-        b=LQNcqXJR0KHATD+l1v1xo9n/iSyC1W3idrXEJ9bSJe9MraTUeoxA677wNd6vB0/bvP
-         ZfGHxYHXzt/W/sColYsbAhxAv8QcR/Gmwebx2eD28EeoRXhk/r+yegmfBT4OLQUwZvDc
-         rYGJgieguz/u/D/B8tasldYN7GhuqEluZh5ScGRmL9dakr9m4KZbCFGGquIe3Bv1Od4n
-         2KWHgyl4FaB9e8qRGf14Dx2UEIbIyjuT9mG5RJKRf0muT3eQv2vwXvtt2z0k8w7QfS9a
-         XQz2LcoLE1Ecand8bLp2gnkgSqqSPQb8CCzmKvO4bzDCFHOCxfQg4lIlFuYQ2wo/zTVU
-         28jw==
-X-Gm-Message-State: AOAM532Yw3RxZu3YNJi0do78om04fcZYvZr6oTgYjuFgLgr2pfhml5IO
-        GXxJt7EfHBpm0mIv5qtSpAMQ6w==
-X-Google-Smtp-Source: ABdhPJxwUl3cOs7feycakrWn32IxbWrdJjJSqGzoDLlyubX5TOmfjlzvs4DgizGVyGqux61oa7xILw==
-X-Received: by 2002:a62:7797:0:b029:1ed:7b10:84c2 with SMTP id s145-20020a6277970000b02901ed7b1084c2mr15949057pfc.47.1614620786279;
-        Mon, 01 Mar 2021 09:46:26 -0800 (PST)
-Received: from google.com ([2620:15c:f:10:5d06:6d3c:7b9:20c9])
-        by smtp.gmail.com with ESMTPSA id b1sm19387523pfp.145.2021.03.01.09.46.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 01 Mar 2021 09:46:25 -0800 (PST)
-Date:   Mon, 1 Mar 2021 09:46:19 -0800
-From:   Sean Christopherson <seanjc@google.com>
-To:     Yang Weijiang <weijiang.yang@intel.com>
-Cc:     pbonzini@redhat.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Vitaly Kuznetsov <vkuznets@redhat.com>
-Subject: Re: [PATCH v2] KVM: nVMX: Sync L2 guest CET states between L1/L2
-Message-ID: <YD0oa99pgXqlS07h@google.com>
-References: <20210225030951.17099-1-weijiang.yang@intel.com>
- <20210225030951.17099-2-weijiang.yang@intel.com>
+        id S232579AbhCARzr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 1 Mar 2021 12:55:47 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:39244 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S237836AbhCARth (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 1 Mar 2021 12:49:37 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1614620876;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=8PS1UBHm7kdpG76VmouLZO2eri439g/lUh+CW0ZVORI=;
+        b=foCmOLTqgZqTsBtrckfCk44AZHvMGGAZ7VCSRjrBzUDYfv0ZFLTY5m+dN8KXsDjZVAk2Wi
+        UyfxAK4emZca0tcPoigydBIXqZ/xDoKpwjMkLh2cCaZ7hs/Lfj6hZtKJC+IBeMmgMAkpSP
+        nqts7WEsZQ8qRNcTSWUGRKJyOmOtgmg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-277-ErL2pmFWNCubwJ7hWFD4WA-1; Mon, 01 Mar 2021 12:47:50 -0500
+X-MC-Unique: ErL2pmFWNCubwJ7hWFD4WA-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7A707186840D;
+        Mon,  1 Mar 2021 17:47:49 +0000 (UTC)
+Received: from localhost (ovpn-115-54.ams2.redhat.com [10.36.115.54])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id E08215D6CF;
+        Mon,  1 Mar 2021 17:47:48 +0000 (UTC)
+Date:   Mon, 1 Mar 2021 17:47:41 +0000
+From:   Stefan Hajnoczi <stefanha@redhat.com>
+To:     Elena Afanasova <eafanasova@gmail.com>
+Cc:     qemu-devel@nongnu.org, kvm@vger.kernel.org, jag.raman@oracle.com,
+        elena.ufimtseva@oracle.com
+Subject: Re: [PATCH RFC] hw/misc/pc-testdev: add support for ioregionfd
+ testing
+Message-ID: <YD0ovavIuThCSS5J@stefanha-x1.localdomain>
+References: <20210301131628.5211-1-eafanasova@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="Zele8yAvao3CFGfa"
 Content-Disposition: inline
-In-Reply-To: <20210225030951.17099-2-weijiang.yang@intel.com>
+In-Reply-To: <20210301131628.5211-1-eafanasova@gmail.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-+Vitaly
 
-On Thu, Feb 25, 2021, Yang Weijiang wrote:
-> These fields are rarely updated by L1 QEMU/KVM, sync them when L1 is trying to
-> read/write them and after they're changed. If CET guest entry-load bit is not
-> set by L1 guest, migrate them to L2 manaully.
-> 
-> Suggested-by: Sean Christopherson <seanjc@google.com>
-> Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
-> 
-> change in v2:
->  - Per Sean's review feedback, change CET guest states as rarely-updated fields.
->    And also migrate L1's CET states to L2 if the entry-load bit is not set.
->  - Opportunistically removed one blank line.
+--Zele8yAvao3CFGfa
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Mon, Mar 01, 2021 at 04:16:28PM +0300, Elena Afanasova wrote:
+
+Thanks for posting this piece of the ioregionfd testing infrastructure!
+
+Please include a commit description even if it's just an RFC patch.
+People on qemu-devel may not be aware of ioregionfd or the purpose of
+this patch.
+
+Something like:
+
+  Add ioregionfd support to pc-testdev for use with kvm-unit-tests that
+  exercise the new KVM ioregionfd API. ioregionfd is a new MMIO/PIO
+  dispatch mechanism for KVM. The kernel patches implementing ioregionfd
+  are available here:
+
+    https://patchwork.kernel.org/project/kvm/list/?series=3D436083
+
+  The kvm-unit-test will create one read FIFO and one write FIFO and
+  then invoke QEMU like this:
+
+    --device pc-testdev,addr=3D0x100000000,size=3D4096,rfifo=3Dpath/to/rfif=
+o,wfifo=3Dpath/to/wfifo
+
+  QEMU does not actually process the read FIFO or write FIFO. It simply
+  registers an ioregionfd with KVM. From then on KVM will communicate
+  directly with the kvm-unit-test via the read FIFO and write FIFO that
+  were provided. This allows test cases to handle MMIO/PIO accesses.
+
+Elena and I discussed the long-term QEMU API for ioregionfd on IRC.
+Eventually this test device could use it instead of directly calling
+kvm_vm_ioctl(). The new QEMU API would be
+memory_region_set_aio_context(AioContext *aio_context).
+
+When ioregionfd is available an ioregion would be registered with KVM
+and AioContext will have a read fd to handle MMIO/PIO accesses for any
+of its ioregions. This way device emulation can run outside the vcpu
+thread.
+
+When ioregionfd is not available QEMU can emulate it by writing a struct
+ioregionfd_cmd to the write fd from the vcpu thread. The relevant
+AioContext will handle the read fd as normal and dispatch the MMIO/PIO
+access to the MemoryRegion.
+
+> Signed-off-by: Elena Afanasova <eafanasova@gmail.com>
 > ---
->  arch/x86/kvm/cpuid.c      |  1 -
->  arch/x86/kvm/vmx/nested.c | 29 +++++++++++++++++++++++++++++
->  arch/x86/kvm/vmx/vmx.h    |  3 +++
->  3 files changed, 32 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-> index 46087bca9418..afc97122c05c 100644
-> --- a/arch/x86/kvm/cpuid.c
-> +++ b/arch/x86/kvm/cpuid.c
-> @@ -143,7 +143,6 @@ void kvm_update_cpuid_runtime(struct kvm_vcpu *vcpu)
->  		}
->  		vcpu->arch.guest_supported_xss =
->  			(((u64)best->edx << 32) | best->ecx) & supported_xss;
-> -
->  	} else {
->  		vcpu->arch.guest_supported_xss = 0;
->  	}
-> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-> index 9728efd529a1..1703b8874fad 100644
-> --- a/arch/x86/kvm/vmx/nested.c
-> +++ b/arch/x86/kvm/vmx/nested.c
-> @@ -2516,6 +2516,12 @@ static void prepare_vmcs02_rare(struct vcpu_vmx *vmx, struct vmcs12 *vmcs12)
->  	vmcs_write32(VM_ENTRY_MSR_LOAD_COUNT, vmx->msr_autoload.guest.nr);
->  
->  	set_cr4_guest_host_mask(vmx);
+>  hw/misc/pc-testdev.c      | 74 +++++++++++++++++++++++++++++++++++++++
+>  include/sysemu/kvm.h      |  4 +--
+>  linux-headers/linux/kvm.h | 24 +++++++++++++
+>  3 files changed, 100 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/hw/misc/pc-testdev.c b/hw/misc/pc-testdev.c
+> index e389651869..38355923ca 100644
+> --- a/hw/misc/pc-testdev.c
+> +++ b/hw/misc/pc-testdev.c
+> @@ -40,6 +40,9 @@
+>  #include "hw/irq.h"
+>  #include "hw/isa/isa.h"
+>  #include "qom/object.h"
+> +#include "sysemu/kvm.h"
+> +#include <linux/kvm.h>
+> +#include "hw/qdev-properties.h"
+> =20
+>  #define IOMEM_LEN    0x10000
+> =20
+> @@ -53,6 +56,15 @@ struct PCTestdev {
+>      MemoryRegion iomem;
+>      uint32_t ioport_data;
+>      char iomem_buf[IOMEM_LEN];
 > +
-> +	if (kvm_cet_supported()) {
+> +    uint64_t guest_paddr;
+> +    uint64_t memory_size;
+> +    char *read_fifo;
+> +    char *write_fifo;
+> +    bool posted_writes;
+> +    bool pio;
+> +    int rfd;
+> +    int wfd;
+>  };
+> =20
+>  #define TYPE_TESTDEV "pc-testdev"
+> @@ -169,6 +181,9 @@ static const MemoryRegionOps test_iomem_ops =3D {
+> =20
+>  static void testdev_realizefn(DeviceState *d, Error **errp)
+>  {
+> +    struct kvm_ioregion ioreg;
 
-This needs to be conditioned on CET coming from vmcs12, it's on the loading of
-host state on VM-Exit that is unconditional (if CET is supported).
+Zero this so that user_data is always 0 instead of undefined data from
+the stack?
 
-	if (kvm_cet_supported() && vmx->nested.nested_run_pending &&
-	    (vmcs12->vm_entry_controls & VM_ENTRY_LOAD_CET_STATE)) {
+> +    int flags =3D 0;
+> +
+>      ISADevice *isa =3D ISA_DEVICE(d);
+>      PCTestdev *dev =3D TESTDEV(d);
+>      MemoryRegion *mem =3D isa_address_space(isa);
+> @@ -191,14 +206,73 @@ static void testdev_realizefn(DeviceState *d, Error=
+ **errp)
+>      memory_region_add_subregion(io,  0xe8,       &dev->ioport_byte);
+>      memory_region_add_subregion(io,  0x2000,     &dev->irq);
+>      memory_region_add_subregion(mem, 0xff000000, &dev->iomem);
+> +
+> +    if (!dev->guest_paddr || !dev->write_fifo) {
+> +        return;
+> +    }
+> +
+> +    dev->wfd =3D open(dev->write_fifo, O_WRONLY);
+> +    if (dev->wfd < 0) {
+> +        error_report("failed to open write fifo %s", dev->write_fifo);
+> +        return;
+> +    }
+> +
+> +    if (dev->read_fifo) {
+> +        dev->rfd =3D open(dev->read_fifo, O_RDONLY);
+> +        if (dev->rfd < 0) {
+> +            error_report("failed to open read fifo %s", dev->read_fifo);
+> +            close(dev->wfd);
+> +            return;
+> +        }
+> +    }
+> +
+> +    flags |=3D dev->pio ? KVM_IOREGION_PIO : 0;
+> +    flags |=3D dev->posted_writes ? KVM_IOREGION_POSTED_WRITES : 0;
+> +    ioreg.guest_paddr =3D dev->guest_paddr;
+> +    ioreg.memory_size =3D dev->memory_size;
+> +    ioreg.write_fd =3D dev->wfd;
+> +    ioreg.read_fd =3D dev->rfd;
+> +    ioreg.flags =3D flags;
+> +    kvm_vm_ioctl(kvm_state, KVM_SET_IOREGION, &ioreg);
 
-I also assume these should be guarded by one of the eVMCS fields, though a quick
-search of the public docs didn't provide a hit on the CET fields.
+Printing an error message would be useful when this fails (e.g. when the
+region overlaps with an existing ioeventfd/ioregionfd).=20
 
-Vitaly, any idea if these will be GUEST_GRP2 or something else?
-
-> +		vmcs_writel(GUEST_SSP, vmcs12->guest_ssp);
-> +		vmcs_writel(GUEST_S_CET, vmcs12->guest_s_cet);
-> +		vmcs_writel(GUEST_INTR_SSP_TABLE, vmcs12->guest_ssp_tbl);
-> +	}
+> +}
+> +
+> +static void testdev_unrealizefn(DeviceState *d)
+> +{
+> +    struct kvm_ioregion ioreg;
+> +    PCTestdev *dev =3D TESTDEV(d);
+> +
+> +    if (!dev->guest_paddr || !dev->write_fifo) {
+> +        return;
+> +    }
+> +
+> +    ioreg.guest_paddr =3D dev->guest_paddr;
+> +    ioreg.memory_size =3D dev->memory_size;
+> +    ioreg.flags =3D KVM_IOREGION_DEASSIGN;
+> +    kvm_vm_ioctl(kvm_state, KVM_SET_IOREGION, &ioreg);
+> +    close(dev->wfd);
+> +    if (dev->rfd > 0) {
+> +        close(dev->rfd);
+> +    }
 >  }
+> =20
+> +static Property ioregionfd_properties[] =3D {
+> +    DEFINE_PROP_UINT64("addr", PCTestdev, guest_paddr, 0),
+> +    DEFINE_PROP_UINT64("size", PCTestdev, memory_size, 0),
+> +    DEFINE_PROP_STRING("rfifo", PCTestdev, read_fifo),
+> +    DEFINE_PROP_STRING("wfifo", PCTestdev, write_fifo),
+> +    DEFINE_PROP_BOOL("pio", PCTestdev, pio, false),
+> +    DEFINE_PROP_BOOL("pw", PCTestdev, posted_writes, false),
+> +    DEFINE_PROP_END_OF_LIST(),
+> +};
+> +
+>  static void testdev_class_init(ObjectClass *klass, void *data)
+>  {
+>      DeviceClass *dc =3D DEVICE_CLASS(klass);
+> =20
+>      set_bit(DEVICE_CATEGORY_MISC, dc->categories);
+>      dc->realize =3D testdev_realizefn;
+> +    dc->unrealize =3D testdev_unrealizefn;
+> +    device_class_set_props(dc, ioregionfd_properties);
+>  }
+> =20
+>  static const TypeInfo testdev_info =3D {
+> diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
+> index 687c598be9..d68728764a 100644
+> --- a/include/sysemu/kvm.h
+> +++ b/include/sysemu/kvm.h
+> @@ -234,6 +234,8 @@ int kvm_has_intx_set_mask(void);
+>  bool kvm_arm_supports_user_irq(void);
+> =20
+> =20
+> +int kvm_vm_ioctl(KVMState *s, int type, ...);
+> +
+>  #ifdef NEED_CPU_H
+>  #include "cpu.h"
+> =20
+> @@ -257,8 +259,6 @@ void phys_mem_set_alloc(void *(*alloc)(size_t, uint64=
+_t *align, bool shared));
+> =20
+>  int kvm_ioctl(KVMState *s, int type, ...);
+> =20
+> -int kvm_vm_ioctl(KVMState *s, int type, ...);
+> -
+>  int kvm_vcpu_ioctl(CPUState *cpu, int type, ...);
+> =20
+>  /**
+> diff --git a/linux-headers/linux/kvm.h b/linux-headers/linux/kvm.h
+> index 020b62a619..c426fa1e56 100644
+> --- a/linux-headers/linux/kvm.h
+> +++ b/linux-headers/linux/kvm.h
+> @@ -733,6 +733,29 @@ struct kvm_ioeventfd {
+>  	__u8  pad[36];
+>  };
+> =20
+> +enum {
+> +	kvm_ioregion_flag_nr_pio,
+> +	kvm_ioregion_flag_nr_posted_writes,
+> +	kvm_ioregion_flag_nr_deassign,
+> +	kvm_ioregion_flag_nr_max,
+> +};
+> +
+> +#define KVM_IOREGION_PIO (1 << kvm_ioregion_flag_nr_pio)
+> +#define KVM_IOREGION_POSTED_WRITES (1 << kvm_ioregion_flag_nr_posted_wri=
+tes)
+> +#define KVM_IOREGION_DEASSIGN (1 << kvm_ioregion_flag_nr_deassign)
+> +
+> +#define KVM_IOREGION_VALID_FLAG_MASK ((1 << kvm_ioregion_flag_nr_max) - =
+1)
+> +
+> +struct kvm_ioregion {
+> +	__u64 guest_paddr; /* guest physical address */
+> +	__u64 memory_size; /* bytes */
+> +	__u64 user_data;
+> +	__s32 read_fd;
+> +	__s32 write_fd;
+> +	__u32 flags;
+> +	__u8  pad[28];
+> +};
+> +
+>  #define KVM_X86_DISABLE_EXITS_MWAIT          (1 << 0)
+>  #define KVM_X86_DISABLE_EXITS_HLT            (1 << 1)
+>  #define KVM_X86_DISABLE_EXITS_PAUSE          (1 << 2)
+> @@ -1311,6 +1334,7 @@ struct kvm_vfio_spapr_tce {
+>  					struct kvm_userspace_memory_region)
+>  #define KVM_SET_TSS_ADDR          _IO(KVMIO,   0x47)
+>  #define KVM_SET_IDENTITY_MAP_ADDR _IOW(KVMIO,  0x48, __u64)
+> +#define KVM_SET_IOREGION          _IOW(KVMIO,  0x49, struct kvm_ioregion)
+> =20
+>  /* enable ucontrol for s390 */
+>  struct kvm_s390_ucas_mapping {
+> --=20
+> 2.25.1
+>=20
+
+--Zele8yAvao3CFGfa
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAmA9KL0ACgkQnKSrs4Gr
+c8i93Af+MWXbS3Km3jjUS7rZtX6TSmAc4cXmI6Ls1rJ2TU3O0FT9PMYi+IeHs1vr
+C/dAUSUppo5j/qHll4YJLSoEFe0CHojT2OUmfZD5AFqXhYQ42VFsPQssB+O0Qiec
+8NbrWPuwwEnf0UfEt7J47+EkbHlL1NOyh4n+hcey0berimExqhEmRCbYxs2sN9Yy
+dEPnKm9wAJWDhTe/Fzce+C9fzkrp28lSa++uMutSSh8cKjlt1du2lAMgGDW35Hdp
+lVC8xByKA/R5e87j+dMWV30XB+QVrBDxxkk7VpYLx9TwaNzO1+t4LG6S231jB/1d
++CmEGHAf2mi3f+FNdPXXYFYoJ7tBJQ==
+=qGgi
+-----END PGP SIGNATURE-----
+
+--Zele8yAvao3CFGfa--
+
