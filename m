@@ -2,156 +2,241 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E07DA327A06
-	for <lists+kvm@lfdr.de>; Mon,  1 Mar 2021 09:54:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 46915327B07
+	for <lists+kvm@lfdr.de>; Mon,  1 Mar 2021 10:45:38 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233589AbhCAIxB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 1 Mar 2021 03:53:01 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50920 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233346AbhCAIuG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 1 Mar 2021 03:50:06 -0500
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 69E18C0617A7;
-        Mon,  1 Mar 2021 00:49:26 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
-        References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
-        Content-Type:Content-ID:Content-Description;
-        bh=xjnrpEXxWqN295Q5FQN/MKyM59zP4it+2k/oCX23gCw=; b=GUTHjhjVLRbJTH2y8N0f5pXfQt
-        BpcjyqebHUSqkrTfxo9sNnMxsXXi553XjQV00V9WvEhU+FZoA+NR+7JFRo7V+AcJrTEM2A0/NWoUY
-        UQcG1jJvPEvJ62t0+skQ3GOQwTgz9bkJrgJ5bnVxZaxWSLvpKWL69ICJDko8VZPR7xnOkfCwL79i7
-        gSKcArm/UWJvBLWZ3LQ2LKR9uhK0zIeUIiMijW/QfWAXEvydnu+GXr4VH9gDQxN7matDN8yNDTwzc
-        mzOmEyht23pCYSJg+mpQkr9XEd1UDX2UeQck2jKCZcJqclZ3cNse2Oooee5h2NDsQSuznxuuEfST1
-        vhs+o1kA==;
-Received: from [2001:4bb8:19b:e4b7:cdf9:733f:4874:8eb4] (helo=localhost)
-        by casper.infradead.org with esmtpsa (Exim 4.94 #2 (Red Hat Linux))
-        id 1lGeES-00FUwW-Vk; Mon, 01 Mar 2021 08:48:50 +0000
-From:   Christoph Hellwig <hch@lst.de>
-To:     Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
-        Li Yang <leoyang.li@nxp.com>
-Cc:     Michael Ellerman <mpe@ellerman.id.au>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Lu Baolu <baolu.lu@linux.intel.com>,
-        linuxppc-dev@lists.ozlabs.org, linux-arm-msm@vger.kernel.org,
-        dri-devel@lists.freedesktop.org, freedreno@lists.freedesktop.org,
-        iommu@lists.linux-foundation.org,
-        linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
-Subject: [PATCH 17/17] iommu: remove iommu_domain_set_attr
-Date:   Mon,  1 Mar 2021 09:42:57 +0100
-Message-Id: <20210301084257.945454-18-hch@lst.de>
+        id S234078AbhCAJpR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 1 Mar 2021 04:45:17 -0500
+Received: from mga18.intel.com ([134.134.136.126]:59762 "EHLO mga18.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S234055AbhCAJpO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 1 Mar 2021 04:45:14 -0500
+IronPort-SDR: cP6QF051E+zHJurv2bT4EeiqfS/Fdja5+Zs9GEwvAIv3o/5AoxDNFuUXXYnMstDWOINOB1ENah
+ BK060BAlv+2A==
+X-IronPort-AV: E=McAfee;i="6000,8403,9909"; a="174046470"
+X-IronPort-AV: E=Sophos;i="5.81,215,1610438400"; 
+   d="scan'208";a="174046470"
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Mar 2021 01:44:32 -0800
+IronPort-SDR: +YgmYuPFNEhKo28m17pGTA+znN2qrayg6lsxhGtmo9GliqKg2kOh52g9KXdkbT4HJuzAIwGWtn
+ hu3EviFiP8sg==
+X-IronPort-AV: E=Sophos;i="5.81,215,1610438400"; 
+   d="scan'208";a="599267263"
+Received: from jscomeax-mobl.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.252.139.76])
+  by fmsmga005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Mar 2021 01:44:22 -0800
+From:   Kai Huang <kai.huang@intel.com>
+To:     kvm@vger.kernel.org, x86@kernel.org, linux-sgx@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org, seanjc@google.com, jarkko@kernel.org,
+        luto@kernel.org, dave.hansen@intel.com, rick.p.edgecombe@intel.com,
+        haitao.huang@intel.com, pbonzini@redhat.com, bp@alien8.de,
+        tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com,
+        jethro@fortanix.com, b.thiel@posteo.de, jmattson@google.com,
+        joro@8bytes.org, vkuznets@redhat.com, wanpengli@tencent.com,
+        corbet@lwn.net
+Subject: [PATCH 00/25] KVM SGX virtualization support
+Date:   Mon,  1 Mar 2021 22:44:08 +1300
+Message-Id: <cover.1614590788.git.kai.huang@intel.com>
 X-Mailer: git-send-email 2.29.2
-In-Reply-To: <20210301084257.945454-1-hch@lst.de>
-References: <20210301084257.945454-1-hch@lst.de>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- drivers/iommu/iommu.c | 17 -----------------
- include/linux/iommu.h | 27 ---------------------------
- 2 files changed, 44 deletions(-)
+This series adds KVM SGX virtualization support. The first 14 patches starting
+with x86/sgx or x86/cpu.. are necessary changes to x86 and SGX core/driver to
+support KVM SGX virtualization, while the rest are patches to KVM subsystem.
 
-diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
-index 8490aefd4b41f8..b04e6cefe8520d 100644
---- a/drivers/iommu/iommu.c
-+++ b/drivers/iommu/iommu.c
-@@ -2668,23 +2668,6 @@ bool iommu_dma_use_flush_queue(struct iommu_domain *domain)
- }
- EXPORT_SYMBOL_GPL(iommu_dma_use_flush_queue);
- 
--int iommu_domain_set_attr(struct iommu_domain *domain,
--			  enum iommu_attr attr, void *data)
--{
--	int ret = 0;
--
--	switch (attr) {
--	default:
--		if (domain->ops->domain_set_attr == NULL)
--			return -EINVAL;
--
--		ret = domain->ops->domain_set_attr(domain, attr, data);
--	}
--
--	return ret;
--}
--EXPORT_SYMBOL_GPL(iommu_domain_set_attr);
--
- int iommu_domain_enable_nesting(struct iommu_domain *domain)
- {
- 	if (!domain->ops->domain_enable_nesting)
-diff --git a/include/linux/iommu.h b/include/linux/iommu.h
-index 39d3ed4d2700ac..62535f563aa491 100644
---- a/include/linux/iommu.h
-+++ b/include/linux/iommu.h
-@@ -97,20 +97,6 @@ enum iommu_cap {
- 	IOMMU_CAP_NOEXEC,		/* IOMMU_NOEXEC flag */
- };
- 
--/*
-- * Following constraints are specifc to FSL_PAMUV1:
-- *  -aperture must be power of 2, and naturally aligned
-- *  -number of windows must be power of 2, and address space size
-- *   of each window is determined by aperture size / # of windows
-- *  -the actual size of the mapped region of a window must be power
-- *   of 2 starting with 4KB and physical address must be naturally
-- *   aligned.
-- */
--
--enum iommu_attr {
--	DOMAIN_ATTR_MAX,
--};
--
- /* These are the possible reserved region types */
- enum iommu_resv_type {
- 	/* Memory regions which must be mapped 1:1 at all times */
-@@ -194,7 +180,6 @@ struct iommu_iotlb_gather {
-  * @device_group: find iommu group for a particular device
-  * @dma_use_flush_queue: Returns %true if a DMA flush queue is used
-  * @dma_enable_flush_queue: Try to enable the DMA flush queue
-- * @domain_set_attr: Change domain attributes
-  * @domain_enable_nesting: Enable nesting
-  * @domain_set_pgtable_attr: Set io page table attributes
-  * @get_resv_regions: Request list of reserved regions for a device
-@@ -247,8 +232,6 @@ struct iommu_ops {
- 	struct iommu_group *(*device_group)(struct device *dev);
- 	bool (*dma_use_flush_queue)(struct iommu_domain *domain);
- 	void (*dma_enable_flush_queue)(struct iommu_domain *domain);
--	int (*domain_set_attr)(struct iommu_domain *domain,
--			       enum iommu_attr attr, void *data);
- 	int (*domain_enable_nesting)(struct iommu_domain *domain);
- 	int (*domain_set_pgtable_attr)(struct iommu_domain *domain,
- 			struct io_pgtable_domain_attr *pgtbl_cfg);
-@@ -498,11 +481,7 @@ extern struct iommu_domain *iommu_group_default_domain(struct iommu_group *);
- bool iommu_dma_use_flush_queue(struct iommu_domain *domain);
- int iommu_domain_set_pgtable_attr(struct iommu_domain *domain,
- 		struct io_pgtable_domain_attr *pgtbl_cfg);
--extern int iommu_domain_set_attr(struct iommu_domain *domain, enum iommu_attr,
--				 void *data);
- int iommu_domain_enable_nesting(struct iommu_domain *domain);
--int iommu_domain_set_pgtable_attr(struct iommu_domain *domain,
--		struct io_pgtable_domain_attr *pgtbl_cfg);
- 
- extern int report_iommu_fault(struct iommu_domain *domain, struct device *dev,
- 			      unsigned long iova, int flags);
-@@ -869,12 +848,6 @@ static inline int iommu_group_id(struct iommu_group *group)
- 	return -ENODEV;
- }
- 
--static inline int iommu_domain_set_attr(struct iommu_domain *domain,
--					enum iommu_attr attr, void *data)
--{
--	return -EINVAL;
--}
--
- static inline int  iommu_device_register(struct iommu_device *iommu)
- {
- 	return -ENODEV;
+This series is based against latest upstream kernel master branch (v5.12-rc1).
+
+You can also get the code from upstream branch of kvm-sgx repo on github:
+
+        https://github.com/intel/kvm-sgx.git upstream
+
+It also requires Qemu changes to create VM with SGX support. You can find Qemu
+repo here:
+
+	https://github.com/intel/qemu-sgx.git upstream
+
+Please refer to README.md of above qemu-sgx repo for detail on how to create
+guest with SGX support. At meantime, for your quick reference you can use below
+command to create SGX guest:
+
+	#qemu-system-x86_64 -smp 4 -m 2G -drive file=<your_vm_image>,if=virtio \
+		-cpu host,+sgx_provisionkey \
+		-sgx-epc id=epc1,memdev=mem1 \
+		-object memory-backend-epc,id=mem1,size=64M,prealloc
+
+Please note that the SGX relevant part is:
+
+		-cpu host,+sgx_provisionkey \
+		-sgx-epc id=epc1,memdev=mem1 \
+		-object memory-backend-epc,id=mem1,size=64M,prealloc
+
+And you can change other parameters of your qemu command based on your needs.
+
+=========
+Changelog:
+
+(Changelog here is for global changes. Please see each patch's changelog for
+ changes made to specific patch.)
+
+RFC->v1:
+
+ - Refined patch (x86/sgx: Wipe out EREMOVE from sgx_free_epc_page()) to print
+   error msg that EPC page is leaked when EREMOVE failed, requested by Dave.
+ - Changelog history of all RFC series is removed in both this cover letter
+   and each individual patch, since majority of x86 part patches already got
+   Acked-by from Dave and Jarkko. And the changelogs are not quite useful from
+   my perspective.
+
+=========
+KVM SGX virtualization Overview
+
+- Virtual EPC
+
+SGX enclave memory is special and is reserved specifically for enclave use.
+In bare-metal SGX enclaves, the kernel allocates enclave pages, copies data
+into the pages with privileged instructions, then allows the enclave to start.
+In this scenario, only initialized pages already assigned to an enclave are
+mapped to userspace.
+
+In virtualized environments, the hypervisor still needs to do the physical
+enclave page allocation.  The guest kernel is responsible for the data copying
+(among other things).  This means that the job of starting an enclave is now
+split between hypervisor and guest.
+
+This series introduces a new misc device: /dev/sgx_vepc.  This device allows
+the host to map *uninitialized* enclave memory into userspace, which can then
+be passed into a guest.
+
+While it might be *possible* to start a host-side enclave with /dev/sgx_enclave
+and pass its memory into a guest, it would be wasteful and convoluted.
+
+Implement the *raw* EPC allocation in the x86 core-SGX subsystem via
+/dev/sgx_vepc rather than in KVM.  Doing so has two major advantages:
+
+  - Does not require changes to KVM's uAPI, e.g. EPC gets handled as
+    just another memory backend for guests.
+
+  - EPC management is wholly contained in the SGX subsystem, e.g. SGX
+    does not have to export any symbols, changes to reclaim flows don't
+    need to be routed through KVM, SGX's dirty laundry doesn't have to
+    get aired out for the world to see, and so on and so forth.
+
+The virtual EPC pages allocated to guests are currently not reclaimable.
+Reclaiming EPC page used by enclave requires a special reclaim mechanism
+separate from normal page reclaim, and that mechanism is not supported
+for virutal EPC pages.  Due to the complications of handling reclaim
+conflicts between guest and host, reclaiming virtual EPC pages is 
+significantly more complex than basic support for SGX virtualization.
+
+- Support SGX virtualization without SGX Flexible Launch Control
+
+SGX hardware supports two "launch control" modes to limit which enclaves can
+run.  In the "locked" mode, the hardware prevents enclaves from running unless
+they are blessed by a third party.  In the unlocked mode, the kernel is in
+full control of which enclaves can run.  The bare-metal SGX code refuses to
+launch enclaves unless it is in the unlocked mode.
+
+This sgx_virt_epc driver does not have such a restriction.  This allows guests
+which are OK with the locked mode to use SGX, even if the host kernel refuses
+to.
+
+- Support exposing SGX2
+
+Due to the same reason above, SGX2 feature detection is added to core SGX code
+to allow KVM to expose SGX2 to guest, even currently SGX driver doesn't support
+SGX2, because SGX2 can work just fine in guest w/o any interaction to host SGX
+driver.
+
+- Restricit SGX guest access to provisioning key
+
+To grant guest being able to fully use SGX, guest needs to be able to access
+provisioning key.  The provisioning key is sensitive, and accessing to it should
+be restricted. In bare-metal driver, allowing enclave to access provisioning key
+is restricted by being able to open /dev/sgx_provision.
+
+Add a new KVM_CAP_SGX_ATTRIBUTE to KVM uAPI to extend above mechanism to KVM
+guests as well.  When userspace hypervisor creates a new VM, the new cap is only
+added to VM when userspace hypervisior is able to open /dev/sgx_provision,
+following the same role as in bare-metal driver.  KVM then traps ECREATE from
+guest, and only allows ECREATE with provisioning key bit to run when guest
+supports KVM_CAP_SGX_ATTRIBUTE.
+
+
+
+Jarkko Sakkinen (1):
+  x86/sgx: Wipe out EREMOVE from sgx_free_epc_page()
+
+Kai Huang (3):
+  x86/cpufeatures: Make SGX_LC feature bit depend on SGX bit
+  x86/sgx: Initialize virtual EPC driver even when SGX driver is
+    disabled
+  x86/sgx: Add helper to update SGX_LEPUBKEYHASHn MSRs
+
+Sean Christopherson (21):
+  x86/cpufeatures: Add SGX1 and SGX2 sub-features
+  x86/sgx: Add SGX_CHILD_PRESENT hardware error code
+  x86/sgx: Introduce virtual EPC for use by KVM guests
+  x86/cpu/intel: Allow SGX virtualization without Launch Control support
+  x86/sgx: Expose SGX architectural definitions to the kernel
+  x86/sgx: Move ENCLS leaf definitions to sgx.h
+  x86/sgx: Add SGX2 ENCLS leaf definitions (EAUG, EMODPR and EMODT)
+  x86/sgx: Add encls_faulted() helper
+  x86/sgx: Add helpers to expose ECREATE and EINIT to KVM
+  x86/sgx: Move provisioning device creation out of SGX driver
+  KVM: x86: Export kvm_mmu_gva_to_gpa_{read,write}() for SGX (VMX)
+  KVM: x86: Define new #PF SGX error code bit
+  KVM: x86: Add support for reverse CPUID lookup of scattered features
+  KVM: x86: Add reverse-CPUID lookup support for scattered SGX features
+  KVM: VMX: Add basic handling of VM-Exit from SGX enclave
+  KVM: VMX: Frame in ENCLS handler for SGX virtualization
+  KVM: VMX: Add SGX ENCLS[ECREATE] handler to enforce CPUID restrictions
+  KVM: VMX: Add emulation of SGX Launch Control LE hash MSRs
+  KVM: VMX: Add ENCLS[EINIT] handler to support SGX Launch Control (LC)
+  KVM: VMX: Enable SGX virtualization for SGX1, SGX2 and LC
+  KVM: x86: Add capability to grant VM access to privileged SGX
+    attribute
+
+ Documentation/virt/kvm/api.rst                |  23 +
+ arch/x86/Kconfig                              |  12 +
+ arch/x86/include/asm/cpufeatures.h            |   2 +
+ arch/x86/include/asm/kvm_host.h               |   5 +
+ .../cpu/sgx/arch.h => include/asm/sgx.h}      |  50 +-
+ arch/x86/include/asm/vmx.h                    |   1 +
+ arch/x86/include/uapi/asm/vmx.h               |   1 +
+ arch/x86/kernel/cpu/cpuid-deps.c              |   3 +
+ arch/x86/kernel/cpu/feat_ctl.c                |  69 ++-
+ arch/x86/kernel/cpu/scattered.c               |   2 +
+ arch/x86/kernel/cpu/sgx/Makefile              |   1 +
+ arch/x86/kernel/cpu/sgx/driver.c              |  17 -
+ arch/x86/kernel/cpu/sgx/encl.c                |  28 +-
+ arch/x86/kernel/cpu/sgx/encls.h               |  30 +-
+ arch/x86/kernel/cpu/sgx/ioctl.c               |  23 +-
+ arch/x86/kernel/cpu/sgx/main.c                |  92 +++-
+ arch/x86/kernel/cpu/sgx/sgx.h                 |  13 +-
+ arch/x86/kernel/cpu/sgx/virt.c                | 355 +++++++++++++
+ arch/x86/kvm/Makefile                         |   2 +
+ arch/x86/kvm/cpuid.c                          |  89 +++-
+ arch/x86/kvm/cpuid.h                          |  50 +-
+ arch/x86/kvm/vmx/nested.c                     |  28 +-
+ arch/x86/kvm/vmx/nested.h                     |   5 +
+ arch/x86/kvm/vmx/sgx.c                        | 465 ++++++++++++++++++
+ arch/x86/kvm/vmx/sgx.h                        |  34 ++
+ arch/x86/kvm/vmx/vmcs12.c                     |   1 +
+ arch/x86/kvm/vmx/vmcs12.h                     |   4 +-
+ arch/x86/kvm/vmx/vmx.c                        | 102 +++-
+ arch/x86/kvm/vmx/vmx.h                        |   2 +
+ arch/x86/kvm/x86.c                            |  23 +
+ include/uapi/linux/kvm.h                      |   1 +
+ tools/testing/selftests/sgx/defines.h         |   2 +-
+ 32 files changed, 1419 insertions(+), 116 deletions(-)
+ rename arch/x86/{kernel/cpu/sgx/arch.h => include/asm/sgx.h} (89%)
+ create mode 100644 arch/x86/kernel/cpu/sgx/virt.c
+ create mode 100644 arch/x86/kvm/vmx/sgx.c
+ create mode 100644 arch/x86/kvm/vmx/sgx.h
+
 -- 
 2.29.2
 
