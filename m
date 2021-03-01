@@ -2,95 +2,146 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7EF5C32776B
-	for <lists+kvm@lfdr.de>; Mon,  1 Mar 2021 07:15:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CCCF43277F4
+	for <lists+kvm@lfdr.de>; Mon,  1 Mar 2021 08:01:42 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231622AbhCAGOP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 1 Mar 2021 01:14:15 -0500
-Received: from mga06.intel.com ([134.134.136.31]:6306 "EHLO mga06.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231247AbhCAGOO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 1 Mar 2021 01:14:14 -0500
-IronPort-SDR: JDxwnz1Wkq3Qp5gKNMYZt630Wgahkjk2vb230xTP+RkVODYgmYZ2maMeT4bS4aoh8Eo3y6ypHI
- fHV6Dg/471UQ==
-X-IronPort-AV: E=McAfee;i="6000,8403,9909"; a="247780721"
-X-IronPort-AV: E=Sophos;i="5.81,214,1610438400"; 
-   d="scan'208";a="247780721"
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Feb 2021 22:13:31 -0800
-IronPort-SDR: gjjuLpoz9CdjFbuuRI3Jf02DDXMPatetPJznPnEPkciJpm5g/1hjgCxG3fbHunpHG807ca7fhF
- z2aztX39tyJw==
-X-IronPort-AV: E=Sophos;i="5.81,214,1610438400"; 
-   d="scan'208";a="517310331"
-Received: from jscomeax-mobl.amr.corp.intel.com ([10.252.139.76])
-  by orsmga004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Feb 2021 22:13:28 -0800
-Message-ID: <c528da37e6ea6172d68270d8bdc1280afc1e98c8.camel@intel.com>
-Subject: Re: [RFC PATCH v6 03/25] x86/sgx: Wipe out EREMOVE from
- sgx_free_epc_page()
-From:   Kai Huang <kai.huang@intel.com>
-To:     Dave Hansen <dave@sr71.net>,
-        Sean Christopherson <seanjc@google.com>
-Cc:     linux-sgx@vger.kernel.org, kvm@vger.kernel.org, x86@kernel.org,
-        jarkko@kernel.org, luto@kernel.org, rick.p.edgecombe@intel.com,
-        haitao.huang@intel.com, pbonzini@redhat.com, bp@alien8.de,
-        tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com
-Date:   Mon, 01 Mar 2021 19:13:25 +1300
-In-Reply-To: <55e0f003-ca2b-24d2-5a23-31a77c5b943d@sr71.net>
-References: <cover.1614338774.git.kai.huang@intel.com>
-         <308bd5a53199d1bf520d488f748e11ce76156a33.1614338774.git.kai.huang@intel.com>
-         <746450bb-917d-ab6c-9a6a-671112cd203e@sr71.net>
-         <YDlRgtnVS4+KkzUW@google.com>
-         <55e0f003-ca2b-24d2-5a23-31a77c5b943d@sr71.net>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.38.4 (3.38.4-1.fc33) 
+        id S232262AbhCAHBc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 1 Mar 2021 02:01:32 -0500
+Received: from szxga06-in.huawei.com ([45.249.212.32]:12958 "EHLO
+        szxga06-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232167AbhCAHBR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 1 Mar 2021 02:01:17 -0500
+Received: from DGGEMS412-HUB.china.huawei.com (unknown [172.30.72.58])
+        by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4Dprgc5BCnzjShq;
+        Mon,  1 Mar 2021 14:58:04 +0800 (CST)
+Received: from DESKTOP-TMVL5KK.china.huawei.com (10.174.187.128) by
+ DGGEMS412-HUB.china.huawei.com (10.3.19.212) with Microsoft SMTP Server id
+ 14.3.498.0; Mon, 1 Mar 2021 14:59:18 +0800
+From:   Yanan Wang <wangyanan55@huawei.com>
+To:     <kvm@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>
+CC:     Paolo Bonzini <pbonzini@redhat.com>,
+        Ben Gardon <bgardon@google.com>,
+        "Sean Christopherson" <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Andrew Jones <drjones@redhat.com>,
+        Peter Xu <peterx@redhat.com>, Marc Zyngier <maz@kernel.org>,
+        Ingo Molnar <mingo@kernel.org>,
+        Adrian Hunter <adrian.hunter@intel.com>,
+        Jiri Olsa <jolsa@redhat.com>,
+        "Arnaldo Carvalho de Melo" <acme@redhat.com>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Michael Kerrisk <mtk.manpages@gmail.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        <wanghaibin.wang@huawei.com>, <yezengruan@huawei.com>,
+        <yuzenghui@huawei.com>, Yanan Wang <wangyanan55@huawei.com>
+Subject: [RFC PATCH v3 0/7] KVM: selftests: some improvement and a new test for kvm page table
+Date:   Mon, 1 Mar 2021 14:59:08 +0800
+Message-ID: <20210301065916.11484-1-wangyanan55@huawei.com>
+X-Mailer: git-send-email 2.8.4.windows.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.174.187.128]
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 2021-02-26 at 12:12 -0800, Dave Hansen wrote:
-> On 2/26/21 11:52 AM, Sean Christopherson wrote:
-> > > We must give a more informative message saying that the page is leaked.
-> > >  Ideally, we'd also make this debuggable by dumping out how many of
-> > > these pages there have been somewhere.  That can wait, though, until we
-> > > have some kind of stats coming out of the code (there's nothing now).  A
-> > > comment to remind us to do this would be nice.
-> > Eh, having debugged these several times, the WARN_ONCE in sgx_reset_epc_page()
-> > is probably sufficient.  IIRC, when I hit this, things were either laughably
-> > broken and every page was failing, or there was another ENCLS failure somewhere
-> > else that provided additional info.  Not saying don't add more debug info,
-> > rather that it's probably not a priority.
-> 
-> Minimally, I just want a warning that says, "Whoops, I leaked a page".
-> Or EREMOVE could even say, "whoops, this *MIGHT* leak a page".
-> 
-> My beef is mostly that "EREMOVE failed" doesn't tell and end user squat
-> about what this means for their system.  At least if we say "leaked",
-> they have some inclination that they've got to reboot to get the page back.
+Hi,
+This v3 series can mainly include two parts.
+Based on kvm queue branch: https://git.kernel.org/pub/scm/virt/kvm/kvm.git/log/?h=queue
+Links of v1: https://lore.kernel.org/lkml/20210208090841.333724-1-wangyanan55@huawei.com/
+Links of v2: https://lore.kernel.org/lkml/20210225055940.18748-1-wangyanan55@huawei.com/
 
-Agreed that a msg to say EPC page is leaked is useful. However I found with current
-sgx_reset_epc_page() I cannot find a suitable place to add:
+In the first part, all the known hugetlb backing src types specified
+with different hugepage sizes are listed, so that we can specify use
+of hugetlb source of the exact granularity that we want, instead of
+the system default ones. And as all the known hugetlb page sizes are
+listed, it's appropriate for all architectures. Besides, a helper that
+can get granularity of different backing src types(anonumous/thp/hugetlb)
+is added, so that we can use the accurate backing src granularity for
+kinds of alignment or guest memory accessing of vcpus.
 
-Theoretically, it's not that right to add "EPC page is leaked", or even *might* (btw,
-I don't think we should use *might* since it is vague), in to sgx_reset_epc_page(),
-since whether leak or not is controlled by whether to call sgx_free_epc_page() upon
-error, which is not in sgx_reset_epc_page(). And
+In the second part, a new test is added:
+This test is added to serve as a performance tester and a bug reproducer
+for kvm page table code (GPA->HPA mappings), it gives guidance for the
+people trying to make some improvement for kvm. And the following explains
+what we can exactly do through this test.
 
-	if (!sgx_reset_epc_page())
-		sgx_free_epc_page();
+The function guest_code() can cover the conditions where a single vcpu or
+multiple vcpus access guest pages within the same memory region, in three
+VM stages(before dirty logging, during dirty logging, after dirty logging).
+Besides, the backing src memory type(ANONYMOUS/THP/HUGETLB) of the tested
+memory region can be specified by users, which means normal page mappings
+or block mappings can be chosen by users to be created in the test.
 
-is called 3 times so I don't want to add a msg for each of them.
+If ANONYMOUS memory is specified, kvm will create normal page mappings
+for the tested memory region before dirty logging, and update attributes
+of the page mappings from RO to RW during dirty logging. If THP/HUGETLB
+memory is specified, kvm will create block mappings for the tested memory
+region before dirty logging, and split the blcok mappings into normal page
+mappings during dirty logging, and coalesce the page mappings back into
+block mappings after dirty logging is stopped.
 
-I ended up with this solution: 
+So in summary, as a performance tester, this test can present the
+performance of kvm creating/updating normal page mappings, or the
+performance of kvm creating/splitting/recovering block mappings,
+through execution time.
 
-1) Rename existing sgx_free_epc_page() to sgx_encl_free_epc_page() to make it more
-specific that it is used to free EPC page that is assigned to an enclave. 2) Wrap
-non-EREMOVE part (putting back to free EPC pool) to sgx_free_epc_page() so it can be
-used by virtual EPC.
+When we need to coalesce the page mappings back to block mappings after
+dirty logging is stopped, we have to firstly invalidate *all* the TLB
+entries for the page mappings right before installation of the block entry,
+because a TLB conflict abort error could occur if we can't invalidate the
+TLB entries fully. We have hit this TLB conflict twice on aarch64 software
+implementation and fixed it. As this test can imulate process from dirty
+logging enabled to dirty logging stopped of a VM with block mappings,
+so it can also reproduce this TLB conflict abort due to inadequate TLB
+invalidation when coalescing tables.
 
-In this way we can just put the error msg in sgx_encl_free_epc_page().
+Links about the TLB conflict abort:
+https://lore.kernel.org/lkml/20201201201034.116760-3-wangyanan55@huawei.com/
 
-And as you said it's time to get RFC tag off, so I'll send out formal patch with
-above solution, but w/o your Acked-by on this particular patch. Thanks :)
+---
+
+Change logs:
+
+v2->v3:
+- Add tags of Suggested-by, Reviewed-by in the patches
+- Add a generic micro to get hugetlb page sizes
+- Some changes for suggestions about v2 series
+
+v1->v2:
+- Add a patch to sync header files
+- Add helpers to get granularity of different backing src types
+- Some changes for suggestions about v1 series
+
+---
+
+Yanan Wang (7):
+  tools headers: sync headers of asm-generic/hugetlb_encode.h
+  tools headers: Add a macro to get HUGETLB page sizes for mmap
+  KVM: selftests: Use flag CLOCK_MONOTONIC_RAW for timing
+  KVM: selftests: Make a generic helper to get vm guest mode strings
+  KVM: selftests: Add a helper to get system configured THP page size
+  KVM: selftests: List all hugetlb src types specified with page sizes
+  KVM: selftests: Adapt vm_userspace_mem_region_add to new helpers
+  KVM: selftests: Add a test for kvm page table code
+
+ include/uapi/linux/mman.h                     |   2 +
+ tools/include/asm-generic/hugetlb_encode.h    |   3 +
+ tools/include/uapi/linux/mman.h               |   2 +
+ tools/testing/selftests/kvm/Makefile          |   3 +
+ .../selftests/kvm/demand_paging_test.c        |   8 +-
+ .../selftests/kvm/dirty_log_perf_test.c       |  14 +-
+ .../testing/selftests/kvm/include/kvm_util.h  |   4 +-
+ .../testing/selftests/kvm/include/test_util.h |  21 +-
+ .../selftests/kvm/kvm_page_table_test.c       | 476 ++++++++++++++++++
+ tools/testing/selftests/kvm/lib/kvm_util.c    |  59 ++-
+ tools/testing/selftests/kvm/lib/test_util.c   |  92 +++-
+ tools/testing/selftests/kvm/steal_time.c      |   4 +-
+ 12 files changed, 628 insertions(+), 60 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/kvm_page_table_test.c 
+
+-- 
+2.19.1
 
