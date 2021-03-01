@@ -2,233 +2,67 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 85A1C327D84
-	for <lists+kvm@lfdr.de>; Mon,  1 Mar 2021 12:48:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 25406327DC0
+	for <lists+kvm@lfdr.de>; Mon,  1 Mar 2021 13:00:04 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232139AbhCALsU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 1 Mar 2021 06:48:20 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:34474 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234211AbhCALr5 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 1 Mar 2021 06:47:57 -0500
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 121BXGjq060575
-        for <kvm@vger.kernel.org>; Mon, 1 Mar 2021 06:47:15 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references; s=pp1;
- bh=7BVcL6nmNb9Ih0bIDSFpJBhc6rY8axTKd7rF67FM6X0=;
- b=iNLvhtdjyKfP14NhDnXq/fPk8eXmwx51M52ln/e7TIje4BkHkTC00xBxRdZt5sY7kEzx
- 1CivO8XDHm/b9XN/S84e2xZ7yYTPBDpmB3MVAMI202JOlYu+N4awMlc5eMbIbQ1f9kv4
- jjJHCFQGAEEnzSSt9mXtORMfeVnNd7CZ8vSp9j8lXA3hDNooI5PKxG8HbExwN6HydURJ
- OJNAEf5kqPhpeyLiDVXoqTbhPMp5nQUZV2uXtmeL15uhFvDFtTPsMkBObytwReFYff/m
- bfOnvBtCBJFuqxSdEB7eIQWeJy4PxBo4BghKqLk2oMMQDkb5XLovVDAKvrYk/C1ZR1qS kg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 370vday0r9-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Mon, 01 Mar 2021 06:47:15 -0500
-Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 121BXTp4061480
-        for <kvm@vger.kernel.org>; Mon, 1 Mar 2021 06:47:14 -0500
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 370vday0qq-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 01 Mar 2021 06:47:14 -0500
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 121Bgq9s014162;
-        Mon, 1 Mar 2021 11:47:12 GMT
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
-        by ppma06ams.nl.ibm.com with ESMTP id 370c59rua7-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 01 Mar 2021 11:47:12 +0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 121Bl9Rj34079092
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 1 Mar 2021 11:47:09 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 78C8AAE055;
-        Mon,  1 Mar 2021 11:47:09 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 20765AE045;
-        Mon,  1 Mar 2021 11:47:09 +0000 (GMT)
-Received: from oc3016276355.ibm.com (unknown [9.145.52.26])
-        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Mon,  1 Mar 2021 11:47:09 +0000 (GMT)
-From:   Pierre Morel <pmorel@linux.ibm.com>
-To:     kvm@vger.kernel.org
-Cc:     frankja@linux.ibm.com, david@redhat.com, thuth@redhat.com,
-        cohuck@redhat.com, imbrenda@linux.ibm.com
-Subject: [kvm-unit-tests PATCH v4 6/6] s390x: css: testing measurement block format 1
-Date:   Mon,  1 Mar 2021 12:47:05 +0100
-Message-Id: <1614599225-17734-7-git-send-email-pmorel@linux.ibm.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1614599225-17734-1-git-send-email-pmorel@linux.ibm.com>
-References: <1614599225-17734-1-git-send-email-pmorel@linux.ibm.com>
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.761
- definitions=2021-03-01_05:2021-02-26,2021-03-01 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 spamscore=0
- mlxscore=0 clxscore=1015 phishscore=0 impostorscore=0 lowpriorityscore=0
- priorityscore=1501 suspectscore=0 bulkscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
- definitions=main-2103010098
+        id S234309AbhCAL7r (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 1 Mar 2021 06:59:47 -0500
+Received: from mail.skyhub.de ([5.9.137.197]:36774 "EHLO mail.skyhub.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S234065AbhCAL7o (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 1 Mar 2021 06:59:44 -0500
+Received: from zn.tnic (p200300ec2f03de007faa2800bd33f191.dip0.t-ipconnect.de [IPv6:2003:ec:2f03:de00:7faa:2800:bd33:f191])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id CA8801EC01E0;
+        Mon,  1 Mar 2021 12:59:02 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1614599942;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=9+LgblyYfLIgXAyx7H8SJ+o5wKr3vfOos7K1dku8iXc=;
+        b=I0xGESE8bQh1HBVM+sjdOk72OIigwaXodn2wqO6ZpWSvBr6RdXwUeJ/IgAllqVSfiI9onS
+        +hZ297OkqJjNqfnE7vvpBBDfn+zyqPqREFdQcD/5zoCdq/LUgjzfiEg2MTV2EgFKdz2OVT
+        tH5C5z9A8+17jIIRPiUyJMWTbbNX0BI=
+Date:   Mon, 1 Mar 2021 12:58:54 +0100
+From:   Borislav Petkov <bp@alien8.de>
+To:     Kai Huang <kai.huang@intel.com>
+Cc:     kvm@vger.kernel.org, x86@kernel.org, linux-sgx@vger.kernel.org,
+        linux-kernel@vger.kernel.org, seanjc@google.com, jarkko@kernel.org,
+        luto@kernel.org, dave.hansen@intel.com, rick.p.edgecombe@intel.com,
+        haitao.huang@intel.com, pbonzini@redhat.com, tglx@linutronix.de,
+        mingo@redhat.com, hpa@zytor.com
+Subject: Re: [PATCH 02/25] x86/cpufeatures: Add SGX1 and SGX2 sub-features
+Message-ID: <20210301115854.GE6699@zn.tnic>
+References: <cover.1614590788.git.kai.huang@intel.com>
+ <bbfc8c833a62e4b55220834320829df1e17aff41.1614590788.git.kai.huang@intel.com>
+ <20210301100037.GA6699@zn.tnic>
+ <3fce1dd2abd42597bde7ae9496bde7b9596b2797.camel@intel.com>
+ <20210301103043.GB6699@zn.tnic>
+ <7603ef673997b6674f785d333a4f263c749d2cf3.camel@intel.com>
+ <20210301105346.GC6699@zn.tnic>
+ <e509c6c1e3644861edafb18e4045b813f9f344b3.camel@intel.com>
+ <20210301113257.GD6699@zn.tnic>
+ <0adc41774945bf9d6e6a72a93b83c80aa8c59544.camel@intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <0adc41774945bf9d6e6a72a93b83c80aa8c59544.camel@intel.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Measurement block format 1 is made available by the extended
-measurement block facility and is indicated in the SCHIB by
-the bit in the PMCW.
+On Tue, Mar 02, 2021 at 12:43:06AM +1300, Kai Huang wrote:
+> To confirm, if we suppress both "sgx1" and "sgx2" in /proc/cpuinfo, we
+> don't need to add "why to suppress" in commit message, right?
 
-The MBO is specified in the SCHIB of each channel and the MBO
-defined by the SCHM instruction is ignored.
+You should always explain in a patch why you're doing the change. So
+that a reviewer knows. And then people in the future can follow why
+you've made that decision. Always.
 
-The test of the MB format 1 is just skipped if the feature is
-not available.
-
-Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
----
- lib/s390x/css.h     | 15 +++++++++
- lib/s390x/css_lib.c |  2 +-
- s390x/css.c         | 75 +++++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 91 insertions(+), 1 deletion(-)
-
-diff --git a/lib/s390x/css.h b/lib/s390x/css.h
-index 40f9efa..c8c8e04 100644
---- a/lib/s390x/css.h
-+++ b/lib/s390x/css.h
-@@ -107,6 +107,7 @@ struct schib {
- 	uint64_t mbo;
- 	uint8_t  md[4];
- } __attribute__ ((aligned(4)));
-+extern struct schib schib;
- 
- struct irb {
- 	struct scsw scsw;
-@@ -387,4 +388,18 @@ struct measurement_block_format0 {
- 	uint32_t initial_cmd_resp_time;
- };
- 
-+struct measurement_block_format1 {
-+	uint32_t ssch_rsch_count;
-+	uint32_t sample_count;
-+	uint32_t device_connect_time;
-+	uint32_t function_pending_time;
-+	uint32_t device_disconnect_time;
-+	uint32_t cu_queuing_time;
-+	uint32_t device_active_only_time;
-+	uint32_t device_busy_time;
-+	uint32_t initial_cmd_resp_time;
-+	uint32_t irq_delay_time;
-+	uint32_t irq_prio_delay_time;
-+};
-+
- #endif
-diff --git a/lib/s390x/css_lib.c b/lib/s390x/css_lib.c
-index 77b39c7..a43da5c 100644
---- a/lib/s390x/css_lib.c
-+++ b/lib/s390x/css_lib.c
-@@ -19,7 +19,7 @@
- #include <malloc_io.h>
- #include <css.h>
- 
--static struct schib schib;
-+struct schib schib;
- struct chsc_scsc *chsc_scsc;
- 
- static const char * const chsc_rsp_description[] = {
-diff --git a/s390x/css.c b/s390x/css.c
-index 3915ed3..5723808 100644
---- a/s390x/css.c
-+++ b/s390x/css.c
-@@ -249,6 +249,80 @@ static void test_schm_fmt0(void)
- 	free_io_mem(mb0, shared_mb_size);
- }
- 
-+static void msch_with_wrong_fmt1_mbo(unsigned int schid, uint64_t mb)
-+{
-+	struct pmcw *pmcw = &schib.pmcw;
-+	int cc;
-+
-+	/* Read the SCHIB for this subchannel */
-+	cc = stsch(schid, &schib);
-+	if (cc) {
-+		report(0, "stsch: sch %08x failed with cc=%d", schid, cc);
-+		return;
-+	}
-+
-+	/* Update the SCHIB to enable the measurement block */
-+	pmcw->flags |= PMCW_MBUE;
-+	pmcw->flags2 |= PMCW_MBF1;
-+	schib.mbo = mb;
-+
-+	/* Tell the CSS we want to modify the subchannel */
-+	expect_pgm_int();
-+	cc = msch(schid, &schib);
-+	check_pgm_int_code(PGM_INT_CODE_OPERAND);
-+}
-+
-+/*
-+ * test_schm_fmt1:
-+ * With measurement block format 1 the measurement block is
-+ * dedicated to a subchannel.
-+ */
-+static void test_schm_fmt1(void)
-+{
-+	struct measurement_block_format1 *mb1;
-+
-+	if (!test_device_sid) {
-+		report_skip("No device");
-+		return;
-+	}
-+
-+	if (!css_general_feature(CSSC_EXTENDED_MEASUREMENT_BLOCK)) {
-+		report_skip("Extended measurement block not available");
-+		return;
-+	}
-+
-+	/* Allocate zeroed Measurement block */
-+	mb1 = alloc_io_mem(sizeof(struct measurement_block_format1), 0);
-+	if (!mb1) {
-+		report_abort("measurement_block_format1 allocation failed");
-+		return;
-+	}
-+
-+	schm(NULL, 0); /* Stop any previous measurement */
-+	schm(0, SCHM_MBU);
-+
-+	/* Expect error for non aligned MB */
-+	report_prefix_push("Unaligned MB origin");
-+	msch_with_wrong_fmt1_mbo(test_device_sid, (uint64_t)mb1 + 1);
-+	report_prefix_pop();
-+
-+	/* Clear the measurement block for the next test */
-+	memset(mb1, 0, sizeof(*mb1));
-+
-+	/* Expect success */
-+	report_prefix_push("Valid MB origin");
-+	report(start_measuring((u64)mb1, 0, true) &&
-+	       mb1->ssch_rsch_count == SCHM_UPDATE_CNT,
-+	       "SSCH measured %d", mb1->ssch_rsch_count);
-+	report_prefix_pop();
-+
-+	/* Stop the measurement */
-+	css_disable_mb(test_device_sid);
-+	schm(NULL, 0);
-+
-+	free_io_mem(mb1, sizeof(struct measurement_block_format1));
-+}
-+
- static struct {
- 	const char *name;
- 	void (*func)(void);
-@@ -260,6 +334,7 @@ static struct {
- 	{ "sense (ssch/tsch)", test_sense },
- 	{ "measurement block (schm)", test_schm },
- 	{ "measurement block format0", test_schm_fmt0 },
-+	{ "measurement block format1", test_schm_fmt1 },
- 	{ NULL, NULL }
- };
- 
 -- 
-2.17.1
+Regards/Gruss,
+    Boris.
 
+https://people.kernel.org/tglx/notes-about-netiquette
