@@ -2,159 +2,115 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0363E32A781
-	for <lists+kvm@lfdr.de>; Tue,  2 Mar 2021 18:14:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 358FA32A782
+	for <lists+kvm@lfdr.de>; Tue,  2 Mar 2021 18:15:13 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1449246AbhCBQQz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 2 Mar 2021 11:16:55 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:27329 "EHLO
+        id S1449256AbhCBQRB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 2 Mar 2021 11:17:01 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:34558 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1573021AbhCBOIb (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 2 Mar 2021 09:08:31 -0500
+        by vger.kernel.org with ESMTP id S1351388AbhCBORX (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 2 Mar 2021 09:17:23 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1614694023;
+        s=mimecast20190719; t=1614694524;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=9ZZPA/RjfCV3cwHtIqxM2nNGL0XO9fFuMgdZl9YFKtA=;
-        b=Wt07/MV6rsiGHfhXKJvCIYzJKfCteUVeqosAbaPUN0e45qVS80gSaLQd/83uNDwP5cuvaS
-        VxcqMShukMa3tonBlxGK6SFe/cAG+Od4TNLWCSFY9DdvQGXcj0nc9n8pcqAGocTkEPZqDE
-        9DVnGPuW0SRDRpEYQwXuGHR6BDwugv4=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-533-70fuzWFGOUmhMo4IWbqhpA-1; Tue, 02 Mar 2021 09:06:59 -0500
-X-MC-Unique: 70fuzWFGOUmhMo4IWbqhpA-1
-Received: by mail-wm1-f72.google.com with SMTP id w10so733798wmk.1
-        for <kvm@vger.kernel.org>; Tue, 02 Mar 2021 06:06:59 -0800 (PST)
+        bh=rjOoUYxeG19DT5eJ2WuZnRhWzkvWoRa4HG3rYru+1nk=;
+        b=VyvCZVLZOgTmE4ZmabP9YB9dS7N0agz0vdeW1Efc8BuFskFpPYHIctNTNrcF4yHm11GRKN
+        aGAsmYsxDjdqGZxqAjCE84KJo1jmeS0tFZveTJBYXyuBxziP+DA86wNm21rOVyHjOIQvSb
+        ioxdGD8TOvng2ivxRYLrhCBUtLh+5Rg=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-429-F56ATpnSO7uS9Pf1TIcS5w-1; Tue, 02 Mar 2021 09:15:21 -0500
+X-MC-Unique: F56ATpnSO7uS9Pf1TIcS5w-1
+Received: by mail-ed1-f71.google.com with SMTP id k8so1980024edn.19
+        for <kvm@vger.kernel.org>; Tue, 02 Mar 2021 06:15:21 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:content-transfer-encoding
          :in-reply-to;
-        bh=9ZZPA/RjfCV3cwHtIqxM2nNGL0XO9fFuMgdZl9YFKtA=;
-        b=a2OWGGPS9p86uSjwwP9bx5658KZQmSkNuRH8SGqWoVV68jxF0gy/IhQ2VpUWwzJZtG
-         y3zXK5X9I5k3riFSB2suKqPs7CZgCueD2a6CLBOBeyaHVxp7QNk+9J0FAAX0Dx4RXsLo
-         mIM7g3gT/CG3pHvhtZQcYobwFB0llyWzhOA2HlPrY0hcWI7vvRsEWnO4tVAF4KmsW0AA
-         M0mqLg7WBbw8N/HB1iiWqdJjowxxWgwCQcIfBMurf7GuOnP/n9kS2VMtkCPuXbYxIss+
-         L8AS7ELnaPqwgmMx1g7IA3AWmKeV4qFe4f/As5Zun0Jox3WaN6+hilxnqubY/70QEyLs
-         1lzw==
-X-Gm-Message-State: AOAM532NtoAeDHOBBD6paFJQrqKf4URWSGWeBl3LEXM6BDAFXZJ8P68q
-        On0AQcvGmBQ+oGjm5wrIiFGZ2PneZvZMusgm3Jbasoj0ycdsaBkpTBC6PKcIvASnnoXDKbXsNtu
-        A5l3WokOJJGdJ
-X-Received: by 2002:adf:e603:: with SMTP id p3mr19332951wrm.360.1614694017990;
-        Tue, 02 Mar 2021 06:06:57 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJxPGvxaY2j2NNhchVLownsWlN5RsZOvtKftuEEVsTkK4Mn+YSpvgBcb/lnrmcwYWFG9dj3inA==
-X-Received: by 2002:adf:e603:: with SMTP id p3mr19332896wrm.360.1614694017534;
-        Tue, 02 Mar 2021 06:06:57 -0800 (PST)
+        bh=rjOoUYxeG19DT5eJ2WuZnRhWzkvWoRa4HG3rYru+1nk=;
+        b=fZktbkVGhmS9oDkjwmLXK3N8/HsEChqcGGTH4lCF4e4xK0/7YS1Npb/oIhlxYEnMKh
+         PQg3YK4X+/lTpIqmj3C4c+ASSQze4I6dDJfuV0rNaxIyG+uumt4jJr1/l2M795BVAcUu
+         twAGQtMPZpUwomSDp/AiGLktbqzSLBhiCwm55uVArfkSHxmSsS13Rebc6UnnNxDywFoa
+         3cpEb9XWWnJaKG7cgp5ZLHjD5xqCCd7RnIvJKxacWbouWxeaB1axAbeIAZyhfax9fC42
+         MPXrTKFWGxhYYCz/Vm67BZzCtWdXvWdgb3TCN4qHqDvWNN6NRMbVZExzLQRdmePaigqQ
+         ++Fw==
+X-Gm-Message-State: AOAM533kytiqwZj988oQBa7vlvBFJh06y5zKOG1o7RM3jkSbsP4/qzUi
+        JrCMUWSfABVlAGKFexEBlt7chqZ/vyXF7nIEUyt4JRISH+13WruYqap8yj5GgaDrLdJB91c50QU
+        FnAJCLTp9b8cI
+X-Received: by 2002:a17:906:f891:: with SMTP id lg17mr21120900ejb.69.1614694520443;
+        Tue, 02 Mar 2021 06:15:20 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJygE29SnX3D3HuuzIHfSkf8dbUaigd8KEMZKU0eY9r+w462+eOcRfQHeat9otGJbyl2OKaNyA==
+X-Received: by 2002:a17:906:f891:: with SMTP id lg17mr21120877ejb.69.1614694520244;
+        Tue, 02 Mar 2021 06:15:20 -0800 (PST)
 Received: from steredhat (host-79-34-249-199.business.telecomitalia.it. [79.34.249.199])
-        by smtp.gmail.com with ESMTPSA id o20sm745021wmq.5.2021.03.02.06.06.56
+        by smtp.gmail.com with ESMTPSA id c17sm18013380edw.32.2021.03.02.06.15.18
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 02 Mar 2021 06:06:57 -0800 (PST)
-Date:   Tue, 2 Mar 2021 15:06:54 +0100
+        Tue, 02 Mar 2021 06:15:19 -0800 (PST)
+Date:   Tue, 2 Mar 2021 15:15:16 +0100
 From:   Stefano Garzarella <sgarzare@redhat.com>
 To:     Jason Wang <jasowang@redhat.com>
 Cc:     virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>
-Subject: Re: [RFC PATCH 10/10] vhost/vdpa: return configuration bytes read
- and written to user space
-Message-ID: <20210302140654.ybmjqui5snp5wxym@steredhat>
+Subject: Re: [RFC PATCH 01/10] vdpa: add get_config_size callback in
+ vdpa_config_ops
+Message-ID: <20210302141516.oxsdb7jogrvu75yc@steredhat>
 References: <20210216094454.82106-1-sgarzare@redhat.com>
- <20210216094454.82106-11-sgarzare@redhat.com>
- <4d682ff2-9663-d6ac-d5bf-616b2bf96e1a@redhat.com>
+ <20210216094454.82106-2-sgarzare@redhat.com>
+ <5de4cd5b-04cb-46ca-1717-075e5e8542fd@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <4d682ff2-9663-d6ac-d5bf-616b2bf96e1a@redhat.com>
+In-Reply-To: <5de4cd5b-04cb-46ca-1717-075e5e8542fd@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Mar 02, 2021 at 12:05:35PM +0800, Jason Wang wrote:
+On Tue, Mar 02, 2021 at 12:14:13PM +0800, Jason Wang wrote:
 >
 >On 2021/2/16 5:44 下午, Stefano Garzarella wrote:
->>vdpa_get_config() and vdpa_set_config() now return the amount
->>of bytes read and written, so let's return them to the user space.
->>
->>We also modify vhost_vdpa_config_validate() to return 0 (bytes read
->>or written) instead of an error, when the buffer length is 0.
+>>This new callback is used to get the size of the configuration space
+>>of vDPA devices.
 >>
 >>Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
 >>---
->>  drivers/vhost/vdpa.c | 26 +++++++++++++++-----------
->>  1 file changed, 15 insertions(+), 11 deletions(-)
+>>  include/linux/vdpa.h              | 4 ++++
+>>  drivers/vdpa/ifcvf/ifcvf_main.c   | 6 ++++++
+>>  drivers/vdpa/mlx5/net/mlx5_vnet.c | 6 ++++++
+>>  drivers/vdpa/vdpa_sim/vdpa_sim.c  | 9 +++++++++
+>>  4 files changed, 25 insertions(+)
 >>
->>diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
->>index 21eea2be5afa..b754c53171a7 100644
->>--- a/drivers/vhost/vdpa.c
->>+++ b/drivers/vhost/vdpa.c
->>@@ -191,9 +191,6 @@ static ssize_t vhost_vdpa_config_validate(struct vhost_vdpa *v,
->>  	struct vdpa_device *vdpa = v->vdpa;
->>  	u32 size = vdpa->config->get_config_size(vdpa);
->>-	if (c->len == 0)
->>-		return -EINVAL;
->>-
->>  	return min(c->len, size);
->>  }
->>@@ -204,6 +201,7 @@ static long vhost_vdpa_get_config(struct vhost_vdpa *v,
->>  	struct vhost_vdpa_config config;
->>  	unsigned long size = offsetof(struct vhost_vdpa_config, buf);
->>  	ssize_t config_size;
->>+	long ret;
->>  	u8 *buf;
->>  	if (copy_from_user(&config, c, size))
->>@@ -217,15 +215,18 @@ static long vhost_vdpa_get_config(struct vhost_vdpa *v,
->>  	if (!buf)
->>  		return -ENOMEM;
->>-	vdpa_get_config(vdpa, config.off, buf, config_size);
->>-
->>-	if (copy_to_user(c->buf, buf, config_size)) {
->>-		kvfree(buf);
->>-		return -EFAULT;
->>+	ret = vdpa_get_config(vdpa, config.off, buf, config_size);
->>+	if (ret < 0) {
->>+		ret = -EFAULT;
->>+		goto out;
->>  	}
->>+	if (copy_to_user(c->buf, buf, config_size))
->>+		ret = -EFAULT;
->>+
->>+out:
->>  	kvfree(buf);
->>-	return 0;
->>+	return ret;
->>  }
->>  static long vhost_vdpa_set_config(struct vhost_vdpa *v,
->>@@ -235,6 +236,7 @@ static long vhost_vdpa_set_config(struct vhost_vdpa *v,
->>  	struct vhost_vdpa_config config;
->>  	unsigned long size = offsetof(struct vhost_vdpa_config, buf);
->>  	ssize_t config_size;
->>+	long ret;
->>  	u8 *buf;
->>  	if (copy_from_user(&config, c, size))
->>@@ -248,10 +250,12 @@ static long vhost_vdpa_set_config(struct vhost_vdpa *v,
->>  	if (IS_ERR(buf))
->>  		return PTR_ERR(buf);
->>-	vdpa_set_config(vdpa, config.off, buf, config_size);
->>+	ret = vdpa_set_config(vdpa, config.off, buf, config_size);
->>+	if (ret < 0)
->>+		ret = -EFAULT;
->>  	kvfree(buf);
->>-	return 0;
->>+	return ret;
->>  }
+>>diff --git a/include/linux/vdpa.h b/include/linux/vdpa.h
+>>index 4ab5494503a8..fddf42b17573 100644
+>>--- a/include/linux/vdpa.h
+>>+++ b/include/linux/vdpa.h
+>>@@ -150,6 +150,9 @@ struct vdpa_iova_range {
+>>   * @set_status:			Set the device status
+>>   *				@vdev: vdpa device
+>>   *				@status: virtio device status
+>>+ * @get_config_size:		Get the size of the configuration space
+>>+ *				@vdev: vdpa device
+>>+ *				Returns size_t: configuration size
 >
 >
->So I wonder whether it's worth to return the number of bytes since we 
->can't propogate the result to driver or driver doesn't care about 
->that.
+>Rethink about this, how much we could gain by introducing a dedicated 
+>ops here? E.g would it be simpler if we simply introduce a 
+>max_config_size to vdpa device?
 
-Okay, but IIUC user space application that issue VHOST_VDPA_GET_CONFIG 
-ioctl can use the return value.
+Mainly because in this way we don't have to add new parameters to the 
+vdpa_alloc_device() function.
 
-Should we change also 'struct virtio_config_ops' to propagate this value 
-also to virtio drivers?
+We do the same for example for 'get_device_id', 'get_vendor_id', 
+'get_vq_num_max'. All of these are usually static, but we have ops.
+I think because it's easier to extend.
+
+I don't know if it's worth adding a new structure for these static 
+values at this point, like 'struct vdpa_config_params'.
 
 Thanks,
 Stefano
