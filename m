@@ -2,131 +2,137 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E924232A6AD
-	for <lists+kvm@lfdr.de>; Tue,  2 Mar 2021 17:49:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 778E332A6C1
+	for <lists+kvm@lfdr.de>; Tue,  2 Mar 2021 17:52:29 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1448729AbhCBPhM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 2 Mar 2021 10:37:12 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49254 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239529AbhCBAAs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 1 Mar 2021 19:00:48 -0500
-Received: from mail-pf1-x430.google.com (mail-pf1-x430.google.com [IPv6:2607:f8b0:4864:20::430])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 913B6C06178B
-        for <kvm@vger.kernel.org>; Mon,  1 Mar 2021 16:00:07 -0800 (PST)
-Received: by mail-pf1-x430.google.com with SMTP id w18so12619786pfu.9
-        for <kvm@vger.kernel.org>; Mon, 01 Mar 2021 16:00:07 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=Yq254SkrVPYkKMx5FhkZ8HM8pUWyZebr3dtEMZbEpmQ=;
-        b=KHn/xhSySXn3fRA4EHKz+k28VC/PZO+vrsZfRduXz5+AjuNRnPtkaqYP7JG8TubLUK
-         hRFt1gGOC2heiXHzduKFVFXs6WiNNWTo9WUk1bbPKS7FearKeUx07v9cM4stWQf1NFwh
-         hjPmarpKBnPizLmty2WBpci0eIh5zGs6G1335QdKOSjmkurTJ4o6lnNh+Dilg86EdyeN
-         BXEgibd52Yf/ZU4p/lZ0BEgAgGpRYq99q9OJht/D6eU8oA3GEthcjtvcUzjLYomAKHPT
-         tKUblaWfzhBWf8x51b0mCNbqKFT/cy2V4vN51eytfvDueZwth5rPGG0/tvcITiISQejx
-         s9kw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=Yq254SkrVPYkKMx5FhkZ8HM8pUWyZebr3dtEMZbEpmQ=;
-        b=V9GHKfbS+AZ5aDCo0B32mTDbkHChng+R/+r9/tuV/GywyoGDc0LlhWRENYbcv0Qbcy
-         FqRAI0AWRroC6Xoc1WTo+l6VPcesPxcJzjJBIVB+Y5lWTZGKeErBEUnhwPqBa+Euhyhv
-         MwQEboGI7Oc0CwGXrdZFBVKeMvw0gHuzu3qhbk/owwEZwFy1rUXi6/Bg3M9AdY6jlCPy
-         G2sHo+LM9PRFJrjYrO6HdhTvCr9VkAVMVW7n7Zay9ipQIuxOcYqi7aAFZ28ihx3KAGX5
-         hDUPsNuN2pbfAH0n7kZGHXoS5Yi6m4Lwx5isBW1VbRx/+JWHVjzTFi7X2oRSUMHMvtJB
-         z+jA==
-X-Gm-Message-State: AOAM533pMCZAIJqlIcoZdFx4djBhmbDfsBB2S2F8piVJJf2onR3MjnnY
-        LtWHh2pY1AIWyvBAts8o0w1lxg==
-X-Google-Smtp-Source: ABdhPJwAT+GcPEZ1FmprKNY55vfpZmbu/uM/M2oFJkKCKneR+u8QUI9ttOwA/hkV3hk1G3YvTkL0eA==
-X-Received: by 2002:a62:16c9:0:b029:1ed:df04:8fcf with SMTP id 192-20020a6216c90000b02901eddf048fcfmr17574872pfw.63.1614643206783;
-        Mon, 01 Mar 2021 16:00:06 -0800 (PST)
-Received: from google.com ([2620:15c:f:10:5d06:6d3c:7b9:20c9])
-        by smtp.gmail.com with ESMTPSA id r16sm18650982pfh.168.2021.03.01.16.00.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 01 Mar 2021 16:00:06 -0800 (PST)
-Date:   Mon, 1 Mar 2021 15:59:59 -0800
-From:   Sean Christopherson <seanjc@google.com>
-To:     Jing Liu <jing2.liu@linux.intel.com>
-Cc:     pbonzini@redhat.com, Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2] KVM: x86: Revise guest_fpu xcomp_bv field
-Message-ID: <YD1//+O57mr2D2Ne@google.com>
-References: <20210225104955.3553-1-jing2.liu@linux.intel.com>
+        id S1348556AbhCBPpr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 2 Mar 2021 10:45:47 -0500
+Received: from mga04.intel.com ([192.55.52.120]:28280 "EHLO mga04.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S238266AbhCBAYp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 1 Mar 2021 19:24:45 -0500
+IronPort-SDR: iN3hYikNJIOSX3u7mrI/drGhaxtKaanPDUGiOIYz0YI24wyzP1XBWtbc8WtAe2B3FHnM+dtz9P
+ NZmXfRqL47mw==
+X-IronPort-AV: E=McAfee;i="6000,8403,9910"; a="184200619"
+X-IronPort-AV: E=Sophos;i="5.81,216,1610438400"; 
+   d="scan'208";a="184200619"
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Mar 2021 16:23:49 -0800
+IronPort-SDR: Om+hs81dnl54ZKsRsn+DsJSHwC6HUChzPGlYt8f2xbAeGL6jI8NFR68jCMYWwF8DSPWIbaV8Nt
+ MgXbA0z6jRaw==
+X-IronPort-AV: E=Sophos;i="5.81,216,1610438400"; 
+   d="scan'208";a="517624851"
+Received: from djiang5-mobl1.amr.corp.intel.com (HELO [10.212.197.33]) ([10.212.197.33])
+  by orsmga004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Mar 2021 16:23:48 -0800
+Subject: Re: [PATCH v5 05/14] vfio/mdev: idxd: add basic mdev registration and
+ helper functions
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     alex.williamson@redhat.com, kwankhede@nvidia.com,
+        tglx@linutronix.de, vkoul@kernel.org, megha.dey@intel.com,
+        jacob.jun.pan@intel.com, ashok.raj@intel.com, yi.l.liu@intel.com,
+        baolu.lu@intel.com, kevin.tian@intel.com, sanjay.k.kumar@intel.com,
+        tony.luck@intel.com, dan.j.williams@intel.com,
+        eric.auger@redhat.com, parav@mellanox.com, netanelg@mellanox.com,
+        shahafs@mellanox.com, pbonzini@redhat.com,
+        dmaengine@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+References: <161255810396.339900.7646244556839438765.stgit@djiang5-desk3.ch.intel.com>
+ <161255840486.339900.5478922203128287192.stgit@djiang5-desk3.ch.intel.com>
+ <20210210235924.GJ4247@nvidia.com>
+From:   Dave Jiang <dave.jiang@intel.com>
+Message-ID: <b41828e1-ab67-856b-f2c0-6215106ba813@intel.com>
+Date:   Mon, 1 Mar 2021 17:23:47 -0700
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.7.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210225104955.3553-1-jing2.liu@linux.intel.com>
+In-Reply-To: <20210210235924.GJ4247@nvidia.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Feb 25, 2021, Jing Liu wrote:
-> XCOMP_BV[63] field indicates that the save area is in the compacted
-> format and XCOMP_BV[62:0] indicates the states that have space allocated
-> in the save area, including both XCR0 and XSS bits enabled by the host
-> kernel. Use xfeatures_mask_all for calculating xcomp_bv and reuse
-> XCOMP_BV_COMPACTED_FORMAT defined by kernel.
-> 
-> Signed-off-by: Jing Liu <jing2.liu@linux.intel.com>
-> ---
->  arch/x86/kvm/x86.c | 8 ++------
->  1 file changed, 2 insertions(+), 6 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 1b404e4d7dd8..f115493f577d 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -4435,8 +4435,6 @@ static int kvm_vcpu_ioctl_x86_set_debugregs(struct kvm_vcpu *vcpu,
->  	return 0;
->  }
->  
-> -#define XSTATE_COMPACTION_ENABLED (1ULL << 63)
-> -
->  static void fill_xsave(u8 *dest, struct kvm_vcpu *vcpu)
->  {
->  	struct xregs_state *xsave = &vcpu->arch.guest_fpu->state.xsave;
-> @@ -4494,7 +4492,8 @@ static void load_xsave(struct kvm_vcpu *vcpu, u8 *src)
->  	/* Set XSTATE_BV and possibly XCOMP_BV.  */
->  	xsave->header.xfeatures = xstate_bv;
->  	if (boot_cpu_has(X86_FEATURE_XSAVES))
-> -		xsave->header.xcomp_bv = host_xcr0 | XSTATE_COMPACTION_ENABLED;
-> +		xsave->header.xcomp_bv = XCOMP_BV_COMPACTED_FORMAT |
-> +					 xfeatures_mask_all;
 
-Doesn't fill_xsave also need to be updated?  Not with xfeatures_mask_all, but
-to account for arch.ia32_xss?  I believe it's a nop with the current code, since
-supported_xss is zero, but it should be fixed, no?
+On 2/10/2021 4:59 PM, Jason Gunthorpe wrote:
+> On Fri, Feb 05, 2021 at 01:53:24PM -0700, Dave Jiang wrote:
 
->  
->  	/*
->  	 * Copy each region from the non-compacted offset to the
-> @@ -9912,9 +9911,6 @@ static void fx_init(struct kvm_vcpu *vcpu)
->  		return;
->  
->  	fpstate_init(&vcpu->arch.guest_fpu->state);
-> -	if (boot_cpu_has(X86_FEATURE_XSAVES))
-> -		vcpu->arch.guest_fpu->state.xsave.header.xcomp_bv =
-> -			host_xcr0 | XSTATE_COMPACTION_ENABLED;
+<-- cut for brevity -->
 
-Ugh, this _really_ needs a comment in the changelog.  It took me a while to
-realize fpstate_init() does exactly what the new fill_xave() is doing.
 
-And isn't the code in load_xsave() redundant and can be removed?  Any code that
-uses get_xsave_addr() would be have a dependency on load_xsave() if it's not
-redundant, and I can't see how that would work.
+> +static int vdcm_idxd_set_msix_trigger(struct vdcm_idxd *vidxd,
+> +				      unsigned int index, unsigned int start,
+> +				      unsigned int count, uint32_t flags,
+> +				      void *data)
+> +{
+> +	int i, rc = 0;
+> +
+> +	if (count > VIDXD_MAX_MSIX_ENTRIES - 1)
+> +		count = VIDXD_MAX_MSIX_ENTRIES - 1;
+> +
+> +	if (count == 0 && (flags & VFIO_IRQ_SET_DATA_NONE)) {
+> +		/* Disable all MSIX entries */
+> +		for (i = 0; i < VIDXD_MAX_MSIX_ENTRIES; i++) {
+> +			rc = msix_trigger_unregister(vidxd, i);
+> +			if (rc < 0)
+> +				return rc;
+> +		}
+> +		return 0;
+> +	}
+> +
+> +	for (i = 0; i < count; i++) {
+> +		if (flags & VFIO_IRQ_SET_DATA_EVENTFD) {
+> +			u32 fd = *(u32 *)(data + i * sizeof(u32));
+> +
+> +			rc = msix_trigger_register(vidxd, fd, i);
+> +			if (rc < 0)
+> +				return rc;
+> +		} else if (flags & VFIO_IRQ_SET_DATA_NONE) {
+> +			rc = msix_trigger_unregister(vidxd, i);
+> +			if (rc < 0)
+> +				return rc;
+> +		}
+> +	}
+> +	return rc;
+> +}
+> +
+> +static int idxd_vdcm_set_irqs(struct vdcm_idxd *vidxd, uint32_t flags,
+> +			      unsigned int index, unsigned int start,
+> +			      unsigned int count, void *data)
+> +{
+> +	int (*func)(struct vdcm_idxd *vidxd, unsigned int index,
+> +		    unsigned int start, unsigned int count, uint32_t flags,
+> +		    void *data) = NULL;
+> +	struct mdev_device *mdev = vidxd->vdev.mdev;
+> +	struct device *dev = mdev_dev(mdev);
+> +
+> +	switch (index) {
+> +	case VFIO_PCI_INTX_IRQ_INDEX:
+> +		dev_warn(dev, "intx interrupts not supported.\n");
+> +		break;
+> +	case VFIO_PCI_MSI_IRQ_INDEX:
+> +		dev_dbg(dev, "msi interrupt.\n");
+> +		switch (flags & VFIO_IRQ_SET_ACTION_TYPE_MASK) {
+> +		case VFIO_IRQ_SET_ACTION_MASK:
+> +		case VFIO_IRQ_SET_ACTION_UNMASK:
+> +			break;
+> +		case VFIO_IRQ_SET_ACTION_TRIGGER:
+> +			func = vdcm_idxd_set_msix_trigger;
+> This would be a good place to insert a common VFIO helper library to
+> take care of the MSI-X emulation for IMS.
 
->  
->  	/*
->  	 * Ensure guest xcr0 is valid for loading
-> -- 
-> 2.18.4
-> 
+Hi Jason,
+
+So after looking at the code in vfio_pci_intrs.c, I agree that the 
+set_irqs code between VFIO_PCI and this driver can be made in common. 
+Given that Alex doesn't want a vfio_pci device embedded in the driver, I 
+think we'll need some sort of generic VFIO device that can be used from 
+the vfio_pci side and vfio_mdev side to pass down in order to have 
+common support library functions. Do you have any thoughts on how to do 
+this cleanly architecturally? Also, with vfio_pci common split [1] still 
+being worked on, do you think we can defer the work on making the 
+interrupt setup code common until the vfio_pci split work settles? Thanks!
+
+[1]: https://lore.kernel.org/kvm/20210201162828.5938-1-mgurtovoy@nvidia.com/
+
+
