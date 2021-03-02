@@ -2,73 +2,95 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A1E9232A6DB
-	for <lists+kvm@lfdr.de>; Tue,  2 Mar 2021 18:03:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 75BB232A6DE
+	for <lists+kvm@lfdr.de>; Tue,  2 Mar 2021 18:04:17 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1577841AbhCBPyD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 2 Mar 2021 10:54:03 -0500
-Received: from mga18.intel.com ([134.134.136.126]:19875 "EHLO mga18.intel.com"
+        id S1578969AbhCBPyH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 2 Mar 2021 10:54:07 -0500
+Received: from mga03.intel.com ([134.134.136.65]:24436 "EHLO mga03.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S237645AbhCBBRZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 1 Mar 2021 20:17:25 -0500
-IronPort-SDR: 71UU4vsaZLPZFjC581KPk6FYuqKLoaIeWqiDz3oduINd7DXzsveChITbD2hzbLcZ3O6DCl3GEG
- z2RNwThxM7vg==
-X-IronPort-AV: E=McAfee;i="6000,8403,9910"; a="174279297"
+        id S1347334AbhCBCym (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 1 Mar 2021 21:54:42 -0500
+IronPort-SDR: MGul3XlqCh8eF0ltbz9vf5HWc0rcYwRQSlqg0RhPdzZnjLEFhB54FW0dpYiAm86IYt/HO5HEld
+ BWoGxOCpPKtg==
+X-IronPort-AV: E=McAfee;i="6000,8403,9910"; a="186721906"
 X-IronPort-AV: E=Sophos;i="5.81,216,1610438400"; 
-   d="scan'208";a="174279297"
+   d="scan'208";a="186721906"
 Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Mar 2021 17:16:26 -0800
-IronPort-SDR: xWLVgGYS1gW6P71aEfavYprovsA8+NABlMKdndDJlKep54DW0uc2FfZjgylXVQcinB2UNVhih9
- u99fkxh3Kx6w==
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Mar 2021 18:52:56 -0800
+IronPort-SDR: 0Y5NNDMqa45GgezOLyZGo9r8aF1T93aO2XijT0PR13FtODXOlI0A+3m/eiyJiE90gfi0q2nXh+
+ VjuEKKEMRVeA==
 X-IronPort-AV: E=Sophos;i="5.81,216,1610438400"; 
-   d="scan'208";a="406481481"
+   d="scan'208";a="406507788"
 Received: from likexu-mobl1.ccr.corp.intel.com (HELO [10.238.4.93]) ([10.238.4.93])
-  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Mar 2021 17:16:25 -0800
-Subject: Re: Processor to run Intel PT in a Guest VM
-To:     Aditya Basu <aditya.basu@psu.edu>
-Cc:     "Jaeger, Trent Ray" <trj1@psu.edu>, kvm <kvm@vger.kernel.org>
-References: <CAPn5F5zvmfpo3tdbfVDYC+rTBmVzQ8aGYG+7FrcbeRsnZKPs-w@mail.gmail.com>
-From:   "Xu, Like" <like.xu@intel.com>
-Message-ID: <0f76acb4-48ee-1e20-f3f1-de4efa276620@intel.com>
-Date:   Tue, 2 Mar 2021 09:16:22 +0800
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Mar 2021 18:52:54 -0800
+Subject: Re: [PATCH v2 1/4] KVM: vmx/pmu: Add MSR_ARCH_LBR_DEPTH emulation for
+ Arch LBR
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20210203135714.318356-1-like.xu@linux.intel.com>
+ <20210203135714.318356-2-like.xu@linux.intel.com>
+ <YD1r2G1UQjVXkUk5@google.com>
+From:   Like Xu <like.xu@linux.intel.com>
+Organization: Intel OTC
+Message-ID: <d194f89a-cd56-6f32-4797-ae11956bf5ba@linux.intel.com>
+Date:   Tue, 2 Mar 2021 10:52:51 +0800
 User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
  Thunderbird/78.8.0
 MIME-Version: 1.0
-In-Reply-To: <CAPn5F5zvmfpo3tdbfVDYC+rTBmVzQ8aGYG+7FrcbeRsnZKPs-w@mail.gmail.com>
+In-Reply-To: <YD1r2G1UQjVXkUk5@google.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
 Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2021/3/2 2:48, Aditya Basu wrote:
-> Hi all,
-> I am a PhD student at the Pennsylvania State University. For my
-> current project, I am trying to run Intel Processor Trace (PT) inside
-> a Guest VM. Specifically, I want to run KVM in the "Host-Guest mode"
-> as stated in the following bug:
-> https://bugzilla.kernel.org/show_bug.cgi?id=201565
->
-> However, I *cannot* find an Intel processor that supports this mode. I
-> have tried using Intel's i7-7700 and i7-9700k processors. Based on my
-> findings, the problem seems to be that bit 24 (PT_USE_GPA) of
-> MSR_IA32_VMX_PROCBASED_CTLS2 (high) is reported as 0 by the processor.
-> Hence, KVM seems to force pt_mode to 0 (or PT_MODE_HOST).
+On 2021/3/2 6:34, Sean Christopherson wrote:
+> On Wed, Feb 03, 2021, Like Xu wrote:
+>> @@ -348,10 +352,26 @@ static bool intel_pmu_handle_lbr_msrs_access(struct kvm_vcpu *vcpu,
+>>   	return true;
+>>   }
+>>   
+>> +/*
+>> + * Check if the requested depth values is supported
+>> + * based on the bits [0:7] of the guest cpuid.1c.eax.
+>> + */
+>> +static bool arch_lbr_depth_is_valid(struct kvm_vcpu *vcpu, u64 depth)
+>> +{
+>> +	struct kvm_cpuid_entry2 *best;
+>> +
+>> +	best = kvm_find_cpuid_entry(vcpu, 0x1c, 0);
+>> +	if (depth && best)
+> 
+>> +		return (best->eax & 0xff) & (1ULL << (depth / 8 - 1));
+> 
+> I believe this will genereate undefined behavior if depth > 64.  Or if depth < 8.
+> And I believe this check also needs to enforce that depth is a multiple of 8.
+> 
+>     For each bit n set in this field, the IA32_LBR_DEPTH.DEPTH value 8*(n+1) is
+>     supported.
+> 
+> Thus it's impossible for 0-7, 9-15, etc... to be legal depths.
 
-You may try the Intel Atom® Processor P* Series.
+Thank you! How about:
 
-https://ark.intel.com/content/www/us/en/ark/products/series/29035/intel-atom-processor.html?wapkw=Atom#@Server
+	best = kvm_find_cpuid_entry(vcpu, 0x1c, 0);
+	if (best && depth && !(depth % 8))
+		return (best->eax & 0xff) & (1ULL << (depth / 8 - 1));
 
->
-> I would appreciate any pointers that someone might have regarding the
-> above. Specifically, I want to find an Intel processor that supports
-> running Intel PT in "Host-Guest mode".
->
-> Regards,
->
-> Aditya Basu
-> PhD Student in CSE
-> Pennsylvania State University
-> https://www.adityabasu.me/
+	return false;
+
+> 
+> 
+>> +
+>> +	return false;
+>> +}
+>> +
+> 
 
