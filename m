@@ -2,58 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E0C1432B580
-	for <lists+kvm@lfdr.de>; Wed,  3 Mar 2021 08:21:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0C85A32B582
+	for <lists+kvm@lfdr.de>; Wed,  3 Mar 2021 08:21:57 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1379923AbhCCHR4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 3 Mar 2021 02:17:56 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39218 "EHLO
+        id S1379939AbhCCHR6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 3 Mar 2021 02:17:58 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39288 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1381093AbhCBS4f (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 2 Mar 2021 13:56:35 -0500
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EC7C1C061226
-        for <kvm@vger.kernel.org>; Tue,  2 Mar 2021 10:46:01 -0800 (PST)
-Received: by mail-yb1-xb4a.google.com with SMTP id v6so23498261ybk.9
-        for <kvm@vger.kernel.org>; Tue, 02 Mar 2021 10:46:01 -0800 (PST)
+        with ESMTP id S1381232AbhCBS4i (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 2 Mar 2021 13:56:38 -0500
+Received: from mail-qk1-x74a.google.com (mail-qk1-x74a.google.com [IPv6:2607:f8b0:4864:20::74a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E8B98C0611BD
+        for <kvm@vger.kernel.org>; Tue,  2 Mar 2021 10:46:06 -0800 (PST)
+Received: by mail-qk1-x74a.google.com with SMTP id h126so17687863qkd.4
+        for <kvm@vger.kernel.org>; Tue, 02 Mar 2021 10:46:06 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=sender:reply-to:date:in-reply-to:message-id:mime-version:references
          :subject:from:to:cc;
-        bh=EnZFLski9RQiJKTWgrYgjdNat8xIrKSM9EmpDdRBoag=;
-        b=scxjXT29yqaE1bBIE5x4Zgc6F4LOv8EyyWUiNAAv+qDm/hGXjM6o9kg5KhmWRVLUFM
-         zhdR8/FEoWylqMQhxxHRXOmgM4H+qgRCyEhB8wDHUUXuiNZCbdlP9I1NtEUqdVkaTeam
-         gugwntXjBdNu0JeTdAQsJcohYbSAh+LKkDEEfxFRTv1e3Ptcv+o+csDw8rXsx+ROPOPq
-         PsNJl9LbRTh46hey3Z5YBQMwM9I1yUcTUhXsGy/vZXyLm/z6foWh2VFoUYuK3nA681DM
-         DTp0zxmhLdpOzkoivjLs9wnh+z7T/CGXbwor9IaPLSpVlgJPeOWYp7nz0Gn2oUSa9Y78
-         3gLQ==
+        bh=pDw5a8xkwlwJrFheedicuJ7ZkUuVv2t+v7LNaWJm4Dw=;
+        b=Ygk5jcCgeatzea90Rb8bzEwERdMBWJFL7meF/8n+9C1z76ccYNoc3o2KHJs49c9YS9
+         +rED1LRhDhhfZQrVJkSnnRdejrl1l/JXRTuDtcFlvwFXdsr6wWnOW/xNRcHG8+WBe4Yb
+         WSUWTNcl7oNaDRe8m2fCdRaYBmA1vX0xKIJA/cCqU1oHZ8fnhVJPmR7yDURMfrk9M0z0
+         bTdi/oemt2W0JE3Qu6l2YHFXzLd5nJ84yxHKqXrQfB/seJYeJ1osrih0tN+q0gmF6i1r
+         1RzQGwI6nk4DVdJ6a1GDGTSLqYs/gkZ2qFom4DxeaJDP3wDuxXgXxo1D0vc0eT6FZ0+L
+         byLw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:sender:reply-to:date:in-reply-to:message-id
          :mime-version:references:subject:from:to:cc;
-        bh=EnZFLski9RQiJKTWgrYgjdNat8xIrKSM9EmpDdRBoag=;
-        b=hjdCuqW8v+uxB5/tqgkrq4urEztRvZfrUb9bPb/dzbDkBBWuDp3J2KaDNz+7UhOTfz
-         JF0YFEbVrucVyR9Q2PNkSVZr8gsetY1rUl+4ji5FkcsuAb1HFvJ5NE371FpFaZHNgLYL
-         a/2PiL5baE5eBu/QT/HQ12+KBBPl0M+lCfiVg3qbaQNqHV3ssaWr9+0M0nNLdevmdD6C
-         yZnnGC5uUwwJvG4BtkX98RilmswUd4rPAlv7q1ckYrdPcp1vCbYgjAfIDMyc2n/tT38o
-         Q32LVUMOs1I8F0BkGKX+fwVKPGFhEBavzXkjXfiS543OjzXFMx0tcai1PD2Wvum15jjC
-         Hjvg==
-X-Gm-Message-State: AOAM530lY0U9hFshYojQwhJwcvYnhdHR8AHLUNMEXSYtFPsPUH8uJdLq
-        yJP1fQ7SVtLtRTJkHXcCOCNsm6fwXi4=
-X-Google-Smtp-Source: ABdhPJwv3m9DetMSaQqbcfD5ZJfQ7ppifSrZOl1LVpPtrJ2Cq+kVO1NCxwUULwBeK8zws6nAxNFtsyNNbBo=
+        bh=pDw5a8xkwlwJrFheedicuJ7ZkUuVv2t+v7LNaWJm4Dw=;
+        b=NRDSSjQ+LzyJ40Wp+yc1N39NVkkn2Od5bN0bdr8kicggPlEmX1zJ9XcOYH0Rhp0Tsi
+         J9F7LfhazsCR3fvCNi/wdJgw4dkb86t/kdm5DssTA03uHUnAjcUOL3zp3Bvam3zdHQE3
+         hFEmfq9XHVqxon4XV6/PtzNmC9guzz6Q8l5qY1Pe/P8gyLMj0nb70K/G1lKcJp/TIflP
+         2m+8t4gGjFJezljBFoHivOZtEvf2+tKxGDKEVWALK7kbexwlR2tSkzMldwUApYlwnu+P
+         /5MrcGA0ueQ1hHxbSc+J9EV9iIb4+Ikrw0SS1ko358BQYU/VjEv+PlB/kNhLY1XuAYHA
+         XF1w==
+X-Gm-Message-State: AOAM533Pc1TJJme9l76q+jCMy3OihiTNOK9kJc9fu7BSDqIlfTWuOBKV
+        id6ur8T8dB7qhYKyoB4fGQxP2W+VNRE=
+X-Google-Smtp-Source: ABdhPJy3aPjJhvDHE+DIXi6sA+MkP5OXW5n7T3/Tf9elJsyZ3fz2ZUT3gXs7k0/Itw25dW+LTYzmWA5qGC4=
 Sender: "seanjc via sendgmr" <seanjc@seanjc798194.pdx.corp.google.com>
 X-Received: from seanjc798194.pdx.corp.google.com ([2620:15c:f:10:805d:6324:3372:6183])
- (user=seanjc job=sendgmr) by 2002:a25:e08b:: with SMTP id x133mr32155992ybg.138.1614710761217;
- Tue, 02 Mar 2021 10:46:01 -0800 (PST)
+ (user=seanjc job=sendgmr) by 2002:a0c:b7a1:: with SMTP id l33mr20824163qve.17.1614710766083;
+ Tue, 02 Mar 2021 10:46:06 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Tue,  2 Mar 2021 10:45:31 -0800
+Date:   Tue,  2 Mar 2021 10:45:33 -0800
 In-Reply-To: <20210302184540.2829328-1-seanjc@google.com>
-Message-Id: <20210302184540.2829328-7-seanjc@google.com>
+Message-Id: <20210302184540.2829328-9-seanjc@google.com>
 Mime-Version: 1.0
 References: <20210302184540.2829328-1-seanjc@google.com>
 X-Mailer: git-send-email 2.30.1.766.gb4fecdf3b7-goog
-Subject: [PATCH 06/15] KVM: x86/mmu: Fix and unconditionally enable WARNs to
- detect PAE leaks
+Subject: [PATCH 08/15] KVM: x86/mmu: Set the C-bit in the PDPTRs and LM pseudo-PDPTRs
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Sean Christopherson <seanjc@google.com>,
@@ -69,54 +68,46 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Exempt NULL PAE roots from the check to detect leaks, since
-kvm_mmu_free_roots() doesn't set them back to INVALID_PAGE.  Stop hiding
-the WARNs to detect PAE root leaks behind MMU_WARN_ON, the hidden WARNs
-obviously didn't do their job given the hilarious number of bugs that
-could lead to PAE roots being leaked, not to mention the above false
-positive.
+Set the C-bit in SPTEs that are set outside of the normal MMU flows,
+specifically the PDPDTRs and the handful of special cased "LM root"
+entries, all of which are shadow paging only.
 
-Opportunistically delete a warning on root_hpa being valid, there's
-nothing special about 4/5-level shadow pages that warrants a WARN.
+Note, the direct-mapped-root PDPTR handling is needed for the scenario
+where paging is disabled in the guest, in which case KVM uses a direct
+mapped MMU even though TDP is disabled.
 
+Fixes: d0ec49d4de90 ("kvm/x86/svm: Support Secure Memory Encryption within KVM")
+Cc: stable@vger.kernel.org
+Cc: Brijesh Singh <brijesh.singh@amd.com>
+Cc: Tom Lendacky <thomas.lendacky@amd.com>
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/mmu/mmu.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ arch/x86/kvm/mmu/mmu.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
 diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index aa20e8d32197..3ef7fb2a9878 100644
+index 59b1709a55b4..ddf1845f072e 100644
 --- a/arch/x86/kvm/mmu/mmu.c
 +++ b/arch/x86/kvm/mmu/mmu.c
-@@ -3244,7 +3244,8 @@ static int mmu_alloc_direct_roots(struct kvm_vcpu *vcpu)
- 		vcpu->arch.mmu->root_hpa = root;
- 	} else if (shadow_root_level == PT32E_ROOT_LEVEL) {
- 		for (i = 0; i < 4; ++i) {
--			MMU_WARN_ON(VALID_PAGE(vcpu->arch.mmu->pae_root[i]));
-+			WARN_ON_ONCE(vcpu->arch.mmu->pae_root[i] &&
-+				     VALID_PAGE(vcpu->arch.mmu->pae_root[i]));
+@@ -3251,7 +3251,8 @@ static int mmu_alloc_direct_roots(struct kvm_vcpu *vcpu)
  
  			root = mmu_alloc_root(vcpu, i << (30 - PAGE_SHIFT),
  					      i << 30, PT32_ROOT_LEVEL, true);
-@@ -3289,8 +3290,6 @@ static int mmu_alloc_shadow_roots(struct kvm_vcpu *vcpu)
- 	 * write-protect the guests page table root.
+-			vcpu->arch.mmu->pae_root[i] = root | PT_PRESENT_MASK;
++			vcpu->arch.mmu->pae_root[i] = root | PT_PRESENT_MASK |
++						      shadow_me_mask;
+ 		}
+ 		vcpu->arch.mmu->root_hpa = __pa(vcpu->arch.mmu->pae_root);
+ 	} else
+@@ -3303,7 +3304,7 @@ static int mmu_alloc_shadow_roots(struct kvm_vcpu *vcpu)
+ 	 * or a PAE 3-level page table. In either case we need to be aware that
+ 	 * the shadow page table may be a PAE or a long mode page table.
  	 */
- 	if (vcpu->arch.mmu->root_level >= PT64_ROOT_4LEVEL) {
--		MMU_WARN_ON(VALID_PAGE(vcpu->arch.mmu->root_hpa));
--
- 		root = mmu_alloc_root(vcpu, root_gfn, 0,
- 				      vcpu->arch.mmu->shadow_root_level, false);
- 		vcpu->arch.mmu->root_hpa = root;
-@@ -3339,7 +3338,8 @@ static int mmu_alloc_shadow_roots(struct kvm_vcpu *vcpu)
- 	}
+-	pm_mask = PT_PRESENT_MASK;
++	pm_mask = PT_PRESENT_MASK | shadow_me_mask;
+ 	if (vcpu->arch.mmu->shadow_root_level == PT64_ROOT_4LEVEL)
+ 		pm_mask |= PT_ACCESSED_MASK | PT_WRITABLE_MASK | PT_USER_MASK;
  
- 	for (i = 0; i < 4; ++i) {
--		MMU_WARN_ON(VALID_PAGE(vcpu->arch.mmu->pae_root[i]));
-+		WARN_ON_ONCE(vcpu->arch.mmu->pae_root[i] &&
-+			     VALID_PAGE(vcpu->arch.mmu->pae_root[i]));
- 
- 		if (vcpu->arch.mmu->root_level == PT32E_ROOT_LEVEL) {
- 			if (!(pdptrs[i] & PT_PRESENT_MASK)) {
 -- 
 2.30.1.766.gb4fecdf3b7-goog
 
