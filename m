@@ -2,92 +2,118 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D222232A6FD
-	for <lists+kvm@lfdr.de>; Tue,  2 Mar 2021 18:05:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 94DC132A700
+	for <lists+kvm@lfdr.de>; Tue,  2 Mar 2021 18:06:14 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1838974AbhCBPzn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 2 Mar 2021 10:55:43 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:56358 "EHLO
+        id S1838985AbhCBPzq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 2 Mar 2021 10:55:46 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:48363 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S238601AbhCBJgU (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 2 Mar 2021 04:36:20 -0500
+        by vger.kernel.org with ESMTP id S1382690AbhCBJmV (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 2 Mar 2021 04:42:21 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1614677646;
+        s=mimecast20190719; t=1614678054;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=UiswwEqWgCcc6JVEOoT/GV1Yehm2pU+siqiY2RK3s7M=;
-        b=SXAZlqo8nD861SAh3zQCa+EtNvd7scSKPuZgkd3V2+ydT1Jhq+x+sOQTsZotknBv0POAdv
-        PMd+wRfRvGLPrtsdXc3xYJy1MbMvGTgRTt37SitmMrJ7t1sNXc3G/VBXx5UpFltIQyOUHf
-        1CfGMa7dwKCe92vqEfbAGfEiZxxjruU=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-39-Y8fwfbKPMzyPahl2vSFHSw-1; Tue, 02 Mar 2021 04:34:01 -0500
-X-MC-Unique: Y8fwfbKPMzyPahl2vSFHSw-1
-Received: by mail-wr1-f69.google.com with SMTP id p18so10811983wrt.5
-        for <kvm@vger.kernel.org>; Tue, 02 Mar 2021 01:34:01 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=UiswwEqWgCcc6JVEOoT/GV1Yehm2pU+siqiY2RK3s7M=;
-        b=aAAr3NSCNGbdG5tBfEIktVhe37L6dmUBY9XZ6XYH5ZyQCiPuq2tvEnFCk48BBw1FBX
-         KelTXQd/S8kKAjVlrdRr0lGd3yEx5ihqkUNnVG5+MqFXrJYqQ/ybccy2yHt0+5PKYrjL
-         2FYbqXphA2SHUZoH3Me8YPqJv50UuzoHuqJsllWlLcFmFuujF3Gz+HR37qbABJmmwf9s
-         kLR1ADUS4TTzhg0+MzfOWF8FxuQnf811jf2vquRAQvoKDGg8vj3gScwNz3FWHlFvPw1r
-         lMHu25zWBJQyXIsTvBB/t8numQu7mTnIat4gkU438egrsBHB2vWq7Eug5rFrV4VUK7cD
-         eFIw==
-X-Gm-Message-State: AOAM533mM4+HXB7Syyoiq+wx0pHeccZCcLkjDQE0fQgCsgymV6IY/deG
-        27fS0NEFwUum6by2q/TLccHx/fW+Eki8qezkIkmtnpjuaGT7YaKrsv8IiBGP4LL7X8aqk3m4/pW
-        uzVfo5CPxtcoO
-X-Received: by 2002:a1c:bac2:: with SMTP id k185mr3137761wmf.148.1614677640851;
-        Tue, 02 Mar 2021 01:34:00 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJyoXcwmapp7HZMXF9WKS7S9md99CuclLhyuqLkFLsTZMmv0tMBvmgShASamrRonSac04nM/rg==
-X-Received: by 2002:a1c:bac2:: with SMTP id k185mr3137742wmf.148.1614677640649;
-        Tue, 02 Mar 2021 01:34:00 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id a131sm1972171wmc.48.2021.03.02.01.33.59
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 02 Mar 2021 01:34:00 -0800 (PST)
-Subject: Re: [PATCH v2] KVM: nVMX: Sync L2 guest CET states between L1/L2
-To:     Yang Weijiang <weijiang.yang@intel.com>,
-        Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Vitaly Kuznetsov <vkuznets@redhat.com>
-References: <20210225030951.17099-1-weijiang.yang@intel.com>
- <20210225030951.17099-2-weijiang.yang@intel.com>
- <YD0oa99pgXqlS07h@google.com> <20210302090532.GA5372@local-michael-cet-test>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <39737fcf-ac15-006e-c21f-39f6caa3b342@redhat.com>
-Date:   Tue, 2 Mar 2021 10:33:59 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.7.0
+        bh=h+mfFjr1hz54KHd0gEhFg6xvfLQMHcjeSW8geqvaMSw=;
+        b=A1vJDgdCFCpc7GtMV0T2GZazz4hfHKAiRc4J1/Avrkk3QS3gcUvGd5K0E0ScegfkPWg/rh
+        9fVE89Ihsw9nuNFqjMDW0yvLQvGn0ABLLjhEf0lQRre+bpQSlEhVO6IbkIMP8gpdepFPKs
+        GnpD0oXrSFmRm1andZsf+xX2NfpGkvA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-135-AgGsTijYOYqsHLhEOSgOKw-1; Tue, 02 Mar 2021 04:40:51 -0500
+X-MC-Unique: AgGsTijYOYqsHLhEOSgOKw-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 18047195D565;
+        Tue,  2 Mar 2021 09:40:50 +0000 (UTC)
+Received: from localhost (ovpn-114-138.ams2.redhat.com [10.36.114.138])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id A027560BFA;
+        Tue,  2 Mar 2021 09:40:49 +0000 (UTC)
+Date:   Tue, 2 Mar 2021 09:40:48 +0000
+From:   Stefan Hajnoczi <stefanha@redhat.com>
+To:     Elena Afanasova <eafanasova@gmail.com>
+Cc:     kvm@vger.kernel.org, jag.raman@oracle.com,
+        elena.ufimtseva@oracle.com
+Subject: Re: [RFC PATCH kvm-unit-tests] x86: add ioregionfd fast PIO test
+Message-ID: <YD4IILn07Aejp6Wc@stefanha-x1.localdomain>
+References: <20210301183319.12370-1-eafanasova@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20210302090532.GA5372@local-michael-cet-test>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="hDkImovCFG9lypPZ"
+Content-Disposition: inline
+In-Reply-To: <20210301183319.12370-1-eafanasova@gmail.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 02/03/21 10:05, Yang Weijiang wrote:
-> I got some description from MSFT as below, do you mean that:
-> 
-> GuestSsp uses clean field GUEST_BASIC (bit 10)
-> GuestSCet/GuestInterruptSspTableAddr uses GUEST_GRP1 (bit 11)
-> HostSCet/HostSsp/HostInterruptSspTableAddr uses HOST_GRP1 (bit 14)
-> 
-> If it is, should these go into separate patch series for Hyper-v nested
-> support? I have some pending patches for the enabling.
 
-Yes, it should be a separate patch.  The main patch however should add 
-the CET fields to EVMCS1_UNSUPPORTED_VMENTRY_CTRL and 
-EVMCS1_UNSUPPORTED_VMEXIT_CTRL.
+--hDkImovCFG9lypPZ
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Thanks,
+On Mon, Mar 01, 2021 at 09:33:19PM +0300, Elena Afanasova wrote:
+> @@ -159,6 +166,8 @@ function run()
+>          print_result "FAIL" $testname "$summary"
+>      fi
+> =20
+> +    [ -n "${fifo}" ] && rm -rf $fifo
 
-Paolo
+Is there a guarantee that $helper_cmd has terminated? If not then it
+would be good to store its pid and invoke kill $helper_cmd_pid here
+(maybe with an error message indicating helper_cmd hung).
+
+> diff --git a/x86/ioregionfd-test.c b/x86/ioregionfd-test.c
+> new file mode 100644
+> index 0000000..5ea5e57
+> --- /dev/null
+> +++ b/x86/ioregionfd-test.c
+> @@ -0,0 +1,84 @@
+
+Please add a comment describing the purpose of this program.
+
+> +	pollfd.fd =3D read_fd;
+> +	pollfd.events =3D POLLIN;
+> +
+> +	for (;;) {
+> +		ret =3D poll(&pollfd, 1, -1);
+> +		if (ret < 0) {
+> +			close(read_fd);
+> +			if (write_fd > 0)
+> +				close(write_fd);
+> +			err_exit("poll\n");
+> +		}
+
+Is poll() necessary? I think a blocking read(read_fd) would have the
+same effect and simplify the code?
+
+> diff --git a/x86/ioregionfd_pio.c b/x86/ioregionfd_pio.c
+> new file mode 100644
+> index 0000000..eaf8aad
+> --- /dev/null
+> +++ b/x86/ioregionfd_pio.c
+> @@ -0,0 +1,24 @@
+
+Please add a comment explaining the purpose of this test.
+
+--hDkImovCFG9lypPZ
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAmA+CCAACgkQnKSrs4Gr
+c8gjmgf/W1ZsuZkTsF49xZkFlY2e4dKs4B6OfPk73Y0La4U1fcLivq7tWnInvUSF
+vUCvn1p+zKiuZhqrixdG9ioNC2/GBvA42UMtDr144KzpUTXteo31OP7WHV//sANE
+dbrxhC6bSnHEjLNPfZBb14m4f4WBueNRVK4sUTG0EuuVYxNOf7LuJmCm+A8YV0l6
+gFt8kIyB9/AoxxDf/4LBHzO0GbKoaN7jS18fvz6lsa9nIdq2QfTGsiZGD+ZpOdPj
+I1XMuwCmAYY2UTzl4Rh+099dWS+eqcCKWXHtWo8a+pOyRQqTS7ncHCHFk6LD37Yg
+zloj2r7VoqBnnyN0GWtYKtyBmwU54g==
+=TjOa
+-----END PGP SIGNATURE-----
+
+--hDkImovCFG9lypPZ--
 
