@@ -2,58 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C2A5732B592
-	for <lists+kvm@lfdr.de>; Wed,  3 Mar 2021 08:40:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D216B32B590
+	for <lists+kvm@lfdr.de>; Wed,  3 Mar 2021 08:40:43 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1380072AbhCCHSU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 3 Mar 2021 02:18:20 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39878 "EHLO
+        id S1379990AbhCCHSN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 3 Mar 2021 02:18:13 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39870 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1581590AbhCBS7P (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S1581586AbhCBS7P (ORCPT <rfc822;kvm@vger.kernel.org>);
         Tue, 2 Mar 2021 13:59:15 -0500
 Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0D575C061A2B
-        for <kvm@vger.kernel.org>; Tue,  2 Mar 2021 10:46:14 -0800 (PST)
-Received: by mail-yb1-xb49.google.com with SMTP id y7so23426705ybh.20
-        for <kvm@vger.kernel.org>; Tue, 02 Mar 2021 10:46:14 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 85DCEC061A2D
+        for <kvm@vger.kernel.org>; Tue,  2 Mar 2021 10:46:16 -0800 (PST)
+Received: by mail-yb1-xb49.google.com with SMTP id o9so23337417yba.18
+        for <kvm@vger.kernel.org>; Tue, 02 Mar 2021 10:46:16 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=sender:reply-to:date:in-reply-to:message-id:mime-version:references
          :subject:from:to:cc;
-        bh=VvZxbsS7usA2XSAkfRC0sbz46vD+BnH1u7vFisa6mO0=;
-        b=V1nMCm/qEh7jjrjHA5O0Kq+9vwKGhxQ0BuRI1m3H0kbtdE/n3BBMW8oK2oQr9bXjDt
-         PlVkbEtvf6X7KthvohEdaYM5+qKB3tfWC2CPgUN7T50xS0/rXXJxB7k4/Gufjj41M4V8
-         35IencokX7qCTSsMr9RRQmdZkFBqdMuM6xkHBfy/Am0ikQDoXz19y01yRfgiyvkX2LwS
-         jR8faVtHCxd1J/ek0BWuTSFEqB/mNoiCjh8ubc1pSXHPqkkU/gIrMevjKjalqfo97ZkQ
-         QFSUYvzLJpV8YpwkK+kdQtAa7LC+ugUgOcaswbEby5TKIM7y31fFovUze0OUkvbQkIE5
-         YB8g==
+        bh=hUIu7sVBeZPHOKAKqkQEBvI6/Cyva1cSCDUAiAjyS7A=;
+        b=U2m54mTmzJt31QJW9BmtK3SiG+FsiHpO3pN2uZt9Mw4OQZ5bvlOnQDJbtecM7GTN30
+         nFGCDx0rmiUX+THo6IaqwBTAr4uIgDycnai7BtIkHIveD7iIhDTxrQQatEK/mnedrwR0
+         C4Cy+o7VeCgOHBuvDGuGyf/1Il9Zq/BsWpIhq3pTzyqCaWUAcq8PRq/79spzOuiuLgNs
+         766OeInO7N3Hv1FTAsGqje1x2GBAuXDbSS4L7AA67n8XoGNTEELiZ6celCpyD26EqiGT
+         WbTrJv+R9ITgernzX5ERoc9HPeuiSfFmo+ErL6IFKY9lQ/FHw0V8Z057E7YrfWL777Wf
+         TbWg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:sender:reply-to:date:in-reply-to:message-id
          :mime-version:references:subject:from:to:cc;
-        bh=VvZxbsS7usA2XSAkfRC0sbz46vD+BnH1u7vFisa6mO0=;
-        b=LfTzaHGLvngVLcfbd3MTOGS2JbuAJxBKcjdMxiy378hH0gQveh+zHJSThCv6fT756n
-         REAApxhx5bqXwu0tKLIzjuPi46VSPF3AI09LIfkk5IVyYwAfGgz5ehwOupau3Ftfum0G
-         2XwKQBAX8RtM19XiHHbJ0lXBerCji1gNwIyw/M6oMCdKxX895XaGhY7K7Mhq8s8yy17s
-         +BtbRi2PlVVisFpCPtxpmV1bi+yTX7PRn7+uUcaYRWxvK2bz9f8Lfl332k0v9Gc4E91U
-         lF8/BZbRvVOnyLiTYbSSyWWNt1oozYADb7eFsj7of2O8J5TypM1IXjEL5vNglXAC45HA
-         +phw==
-X-Gm-Message-State: AOAM530eQaNi+YCpx443FU3L15aDNftjZzYaC6KObR2cExMuOHMVjvf1
-        eEhsFeHX6lCaK3lhB/6tGqd0EKWxxzo=
-X-Google-Smtp-Source: ABdhPJzA/JVavTc1YLp1/c2Tzi52WiK+H305SJZmZc1wRoh9Mn2md0n0TSnsgq5eJ1jz5pb6Ia41rdwDf0E=
+        bh=hUIu7sVBeZPHOKAKqkQEBvI6/Cyva1cSCDUAiAjyS7A=;
+        b=jY4rmj/ShcNJgBw2s1iyBTWcHbClRLJEUI+qWX1aJodeJ5bROuwgN6WYVmBtQpJqZ3
+         g/NVRdzSiSPZikLelrHIGArOIRY8g/KpaaBZwNt4bheB2m08W9R9LhDT9jqSGd3WKdM0
+         TzWDdgEynnBY0jPfYZnv0Er4bvSCCiJrVczD9dFYGCy1u8WIeiYXvwfrqjWFzXnwY/JC
+         C+mlk0NalSjDFDip+F0uOdGiHXqPZnpmAVEuur9dZYDXXdLv4NeEUVZkQLwMwO55REKf
+         ROznn5bhVBu9ZX6e2aiMg/Ch6ih9S3Qpp0B9fvZaH+vL1bPkhWQ3A0SKnE/2m3n6a82+
+         avYw==
+X-Gm-Message-State: AOAM533sFS+68iDvwDOjAGDVI/NAT7NT0baJuKgcvjqbMXaZ8SaEfU9k
+        QWYy+fVJNnpwpNrVyoFWfvZyP2m0JQM=
+X-Google-Smtp-Source: ABdhPJy833CeQjsl9oNWyBsX/oLj6kjISj/tIBT30+qFHWc9PvBK68fihwd+i7l6jp/KwPZoZjK8k+yUeiI=
 Sender: "seanjc via sendgmr" <seanjc@seanjc798194.pdx.corp.google.com>
 X-Received: from seanjc798194.pdx.corp.google.com ([2620:15c:f:10:805d:6324:3372:6183])
- (user=seanjc job=sendgmr) by 2002:a25:d843:: with SMTP id p64mr31348287ybg.339.1614710773295;
- Tue, 02 Mar 2021 10:46:13 -0800 (PST)
+ (user=seanjc job=sendgmr) by 2002:a25:310b:: with SMTP id x11mr8187618ybx.23.1614710775734;
+ Tue, 02 Mar 2021 10:46:15 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Tue,  2 Mar 2021 10:45:36 -0800
+Date:   Tue,  2 Mar 2021 10:45:37 -0800
 In-Reply-To: <20210302184540.2829328-1-seanjc@google.com>
-Message-Id: <20210302184540.2829328-12-seanjc@google.com>
+Message-Id: <20210302184540.2829328-13-seanjc@google.com>
 Mime-Version: 1.0
 References: <20210302184540.2829328-1-seanjc@google.com>
 X-Mailer: git-send-email 2.30.1.766.gb4fecdf3b7-goog
-Subject: [PATCH 11/15] KVM: nVMX: Defer the MMU reload to the normal path on
- an EPTP switch
+Subject: [PATCH 12/15] KVM: x86: Defer the MMU unload to the normal path on an
+ global INVPCID
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Sean Christopherson <seanjc@google.com>,
@@ -69,43 +69,34 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Defer reloading the MMU after a EPTP successful EPTP switch.  The VMFUNC
-instruction itself is executed in the previous EPTP context, any side
-effects, e.g. updating RIP, should occur in the old context.  Practically
-speaking, this bug is benign as VMX doesn't touch the MMU when skipping
-an emulated instruction, nor does queuing a single-step #DB.  No other
-post-switch side effects exist.
+Defer unloading the MMU after a INVPCID until the instruction emulation
+has completed, i.e. until after RIP has been updated.
 
-Fixes: 41ab93727467 ("KVM: nVMX: Emulate EPTP switching for the L1 hypervisor")
+On VMX, this is a benign bug as VMX doesn't touch the MMU when skipping
+an emulated instruction.  However, on SVM, if nrip is disabled, the
+emulator is used to skip an instruction, which would lead to fireworks
+if the emulator were invoked without a valid MMU.
+
+Fixes: eb4b248e152d ("kvm: vmx: Support INVPCID in shadow paging mode")
 Cc: stable@vger.kernel.org
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/vmx/nested.c | 9 ++-------
- 1 file changed, 2 insertions(+), 7 deletions(-)
+ arch/x86/kvm/x86.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index fdd80dd8e781..81f609886c8b 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -5473,16 +5473,11 @@ static int nested_vmx_eptp_switching(struct kvm_vcpu *vcpu,
- 		if (!nested_vmx_check_eptp(vcpu, new_eptp))
- 			return 1;
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 828de7d65074..7b0adebec1ef 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -11531,7 +11531,7 @@ int kvm_handle_invpcid(struct kvm_vcpu *vcpu, unsigned long type, gva_t gva)
  
+ 		fallthrough;
+ 	case INVPCID_TYPE_ALL_INCL_GLOBAL:
 -		kvm_mmu_unload(vcpu);
- 		mmu->ept_ad = accessed_dirty;
- 		mmu->mmu_role.base.ad_disabled = !accessed_dirty;
- 		vmcs12->ept_pointer = new_eptp;
--		/*
--		 * TODO: Check what's the correct approach in case
--		 * mmu reload fails. Currently, we just let the next
--		 * reload potentially fail
--		 */
--		kvm_mmu_reload(vcpu);
-+
 +		kvm_make_request(KVM_REQ_MMU_RELOAD, vcpu);
- 	}
+ 		return kvm_skip_emulated_instruction(vcpu);
  
- 	return 0;
+ 	default:
 -- 
 2.30.1.766.gb4fecdf3b7-goog
 
