@@ -2,115 +2,82 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0CD8D32B5C2
+	by mail.lfdr.de (Postfix) with ESMTP id 7F3FE32B5C3
 	for <lists+kvm@lfdr.de>; Wed,  3 Mar 2021 08:45:03 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1449332AbhCCHTz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 3 Mar 2021 02:19:55 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:52034 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1381773AbhCBVA7 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 2 Mar 2021 16:00:59 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1614718764;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=LFeFwgd416hJgfI8CWTw0qkdzSGitcUKICDrANuntTg=;
-        b=ey1IjgD7oyZ616Yxs0Hb4E85ivxT0ktgRcltFj9EaMPYQyliGVU2ztLetTXslSvLs85DqA
-        Xahz0bXboDeglvup54ANH90aDx49ht08tINYWQGWdJDyUXN/Z4ftVyfkLz5iHQ29vfRUx4
-        106DVleCJ9nZ5nGvMyqKtsYWUiylJ7A=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-287-3qt4LCbVM_iATpODKkWvrA-1; Tue, 02 Mar 2021 15:59:23 -0500
-X-MC-Unique: 3qt4LCbVM_iATpODKkWvrA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        id S1449337AbhCCHT4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 3 Mar 2021 02:19:56 -0500
+Received: from mail.kernel.org ([198.145.29.99]:43272 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2360748AbhCBW00 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 2 Mar 2021 17:26:26 -0500
+Received: from gandalf.local.home (cpe-66-24-58-225.stny.res.rr.com [66.24.58.225])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5014A193578B;
-        Tue,  2 Mar 2021 20:59:21 +0000 (UTC)
-Received: from [10.36.112.56] (ovpn-112-56.ams2.redhat.com [10.36.112.56])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 034C05D9C2;
-        Tue,  2 Mar 2021 20:58:46 +0000 (UTC)
-Subject: Re: [PATCH v1 7/9] memory: introduce RAM_NORESERVE and wire it up in
- qemu_ram_mmap()
-To:     Peter Xu <peterx@redhat.com>
-Cc:     qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>,
-        Eduardo Habkost <ehabkost@redhat.com>,
-        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Igor Mammedov <imammedo@redhat.com>,
-        =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Murilo Opsfelder Araujo <muriloo@linux.ibm.com>,
-        Greg Kurz <groug@kaod.org>,
-        Liam Merwick <liam.merwick@oracle.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Igor Kotrasinski <i.kotrasinsk@partner.samsung.com>,
-        Juan Quintela <quintela@redhat.com>,
-        Stefan Weil <sw@weilnetz.de>, Thomas Huth <thuth@redhat.com>,
-        kvm@vger.kernel.org, qemu-s390x@nongnu.org
-References: <20210209134939.13083-1-david@redhat.com>
- <20210209134939.13083-8-david@redhat.com> <20210302173243.GM397383@xz-x1>
- <91613148-9ade-c192-4b73-0cb5a54ada98@redhat.com>
- <20210302205432.GP397383@xz-x1>
-From:   David Hildenbrand <david@redhat.com>
-Organization: Red Hat GmbH
-Message-ID: <9b7294f9-5269-0429-265d-47cf9c9b33c9@redhat.com>
-Date:   Tue, 2 Mar 2021 21:58:46 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.8.0
+        by mail.kernel.org (Postfix) with ESMTPSA id D234A64F1D;
+        Tue,  2 Mar 2021 22:25:43 +0000 (UTC)
+Date:   Tue, 2 Mar 2021 17:25:42 -0500
+From:   Steven Rostedt <rostedt@goodmis.org>
+To:     Arseny Krasnov <arseny.krasnov@kaspersky.com>
+Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Ingo Molnar <mingo@redhat.com>,
+        Jorgen Hansen <jhansen@vmware.com>,
+        Norbert Slusarek <nslusarek@gmx.net>,
+        Andra Paraschiv <andraprs@amazon.com>,
+        Colin Ian King <colin.king@canonical.com>,
+        <kvm@vger.kernel.org>, <virtualization@lists.linux-foundation.org>,
+        <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <stsp2@yandex.ru>, <oxffffaa@gmail.com>
+Subject: Re: [RFC PATCH v5 19/19] virtio/vsock: update trace event for
+ SEQPACKET
+Message-ID: <20210302172542.605b3795@gandalf.local.home>
+In-Reply-To: <20210218054219.1069224-1-arseny.krasnov@kaspersky.com>
+References: <20210218053347.1066159-1-arseny.krasnov@kaspersky.com>
+        <20210218054219.1069224-1-arseny.krasnov@kaspersky.com>
+X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 MIME-Version: 1.0
-In-Reply-To: <20210302205432.GP397383@xz-x1>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 02.03.21 21:54, Peter Xu wrote:
-> On Tue, Mar 02, 2021 at 08:02:34PM +0100, David Hildenbrand wrote:
->>>> @@ -174,12 +175,18 @@ void *qemu_ram_mmap(int fd,
->>>>                        size_t align,
->>>>                        bool readonly,
->>>>                        bool shared,
->>>> -                    bool is_pmem)
->>>> +                    bool is_pmem,
->>>> +                    bool noreserve)
->>>
->>> Maybe at some point we should use flags too here to cover all bools.
->>>
->>
->> Right. I guess the main point was to not reuse RAM_XXX.
->>
->> Should I introduce RAM_MMAP_XXX ?
-> 
-> Maybe we can directly use MAP_*?  Since I see qemu_ram_mmap() should only exist
+On Thu, 18 Feb 2021 08:42:15 +0300
+Arseny Krasnov <arseny.krasnov@kaspersky.com> wrote:
 
-I think the issue is that there is for example no flag that corresponds 
-to "is_pmem" - and the fallback logic in our mmap code to make "is_pmem" 
-still work is a little bit more involved. In addition, "readonly" 
-translates to PROT_READ ...
+Not sure if this was pulled in yet, but I do have a small issue with this
+patch.
 
-> with CONFIG_POSIX.  However indeed I see no sign to extend more bools in the
-> near future either, so maybe also fine to keep it as is, as 4 bools still looks
-> okay - your call. :)
+> @@ -69,14 +82,19 @@ TRACE_EVENT(virtio_transport_alloc_pkt,
+>  		__entry->type = type;
+>  		__entry->op = op;
+>  		__entry->flags = flags;
+> +		__entry->msg_len = msg_len;
+> +		__entry->msg_cnt = msg_cnt;
+>  	),
+> -	TP_printk("%u:%u -> %u:%u len=%u type=%s op=%s flags=%#x",
+> +	TP_printk("%u:%u -> %u:%u len=%u type=%s op=%s flags=%#x "
+> +		  "msg_len=%u msg_cnt=%u",
 
-Well, I had the same idea when I added yet another bool :) But I guess 
-we won't be adding a lot of additional flags in the near future. 
-(MAP_POPULATE? ;) fortunately we use a different approach to populate 
-memory)
+It's considered poor formatting to split strings like the above. This is
+one of the exceptions for the 80 character limit. Do not break strings just
+to keep it within 80 characters.
 
-I'll think about it, not sure yet if this is worth proper flags. Thanks!
+-- Steve
 
--- 
-Thanks,
 
-David / dhildenb
-
+>  		  __entry->src_cid, __entry->src_port,
+>  		  __entry->dst_cid, __entry->dst_port,
+>  		  __entry->len,
+>  		  show_type(__entry->type),
+>  		  show_op(__entry->op),
+> -		  __entry->flags)
+> +		  __entry->flags,
+> +		  __entry->msg_len,
+> +		  __entry->msg_cnt)
+>  );
