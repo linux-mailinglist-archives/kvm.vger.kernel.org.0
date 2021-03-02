@@ -2,138 +2,136 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BC64932A6F6
-	for <lists+kvm@lfdr.de>; Tue,  2 Mar 2021 18:05:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E1DB232A6FB
+	for <lists+kvm@lfdr.de>; Tue,  2 Mar 2021 18:05:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1838920AbhCBPzU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 2 Mar 2021 10:55:20 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:17628 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S243412AbhCBIYB (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 2 Mar 2021 03:24:01 -0500
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 12283Rbj119801
-        for <kvm@vger.kernel.org>; Tue, 2 Mar 2021 03:22:30 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=to : cc : references :
- from : subject : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=iSsI7EMR5XqwfxXXWxmiI7aXS+At0vvT/UuYpDl2tyA=;
- b=W/3CAZh5CXtdM+F8mSHk4kHr8FobnSmrmqtjX7ZpaCdXUyL95GCo2l4XQnvjWutq3R1k
- 3yDPspq89CphOBrzZoqVaQ7JJ5H8zkIDvTn93pJMLL8fGHHrkJCJFmWnTBNjbL/vXvX8
- ACH/xL2uNNcqblbv6qoAn2S8ncfjxZEfeLdc0o+z+yCUdFIUoOxX4TJj7rCAWu9BF6SE
- pHdE7lFKCyxqViKcwq99uw4gwmxvMozmEjUsMIHF/X1qNSrEymL1999eSHaohO3IKQ03
- DHzl4qv0W1OYUEec7Jv1v6BY9mag+c1RTTOhfvF7cGSbePt5fsjIB7lXlEqzd7bOXa7P 6g== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 371f73mvj4-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Tue, 02 Mar 2021 03:22:30 -0500
-Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 12283j64120806
-        for <kvm@vger.kernel.org>; Tue, 2 Mar 2021 03:22:29 -0500
-Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 371f73mvhg-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 02 Mar 2021 03:22:29 -0500
-Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
-        by ppma02fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 1228DUjE021893;
-        Tue, 2 Mar 2021 08:22:27 GMT
-Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
-        by ppma02fra.de.ibm.com with ESMTP id 36yj5319mw-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 02 Mar 2021 08:22:27 +0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 1228MAU436307386
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 2 Mar 2021 08:22:10 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 7FB0CAE04D;
-        Tue,  2 Mar 2021 08:22:24 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 24E18AE061;
-        Tue,  2 Mar 2021 08:22:24 +0000 (GMT)
-Received: from localhost.localdomain (unknown [9.145.12.104])
-        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue,  2 Mar 2021 08:22:24 +0000 (GMT)
-To:     Thomas Huth <thuth@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     david@redhat.com, cohuck@redhat.com, pmorel@linux.ibm.com,
-        borntraeger@de.ibm.com
-References: <20210301182830.478145-1-imbrenda@linux.ibm.com>
- <20210301182830.478145-4-imbrenda@linux.ibm.com>
- <2104a18d-e68b-cae8-8f9c-3b49bdde3f19@redhat.com>
-From:   Janosch Frank <frankja@linux.ibm.com>
-Subject: Re: [kvm-unit-tests PATCH v3 3/3] s390x: mvpg: skip some tests when
- using TCG
-Message-ID: <3b357040-0ddd-eece-39af-0ca04fdf036b@linux.ibm.com>
-Date:   Tue, 2 Mar 2021 09:22:23 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.8.0
+        id S1838954AbhCBPzf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 2 Mar 2021 10:55:35 -0500
+Received: from szxga04-in.huawei.com ([45.249.212.190]:13107 "EHLO
+        szxga04-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1837868AbhCBI71 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 2 Mar 2021 03:59:27 -0500
+Received: from DGGEMS410-HUB.china.huawei.com (unknown [172.30.72.59])
+        by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4DqVlY4HmHz16Fdw;
+        Tue,  2 Mar 2021 16:33:45 +0800 (CST)
+Received: from [10.174.184.42] (10.174.184.42) by
+ DGGEMS410-HUB.china.huawei.com (10.3.19.210) with Microsoft SMTP Server id
+ 14.3.498.0; Tue, 2 Mar 2021 16:35:16 +0800
+Subject: Re: [PATCH v14 05/13] iommu/smmuv3: Implement
+ attach/detach_pasid_table
+To:     Eric Auger <eric.auger@redhat.com>, <eric.auger.pro@gmail.com>,
+        <iommu@lists.linux-foundation.org>, <linux-kernel@vger.kernel.org>,
+        <kvm@vger.kernel.org>, <kvmarm@lists.cs.columbia.edu>,
+        <will@kernel.org>, <maz@kernel.org>, <robin.murphy@arm.com>,
+        <joro@8bytes.org>, <alex.williamson@redhat.com>, <tn@semihalf.com>
+References: <20210223205634.604221-1-eric.auger@redhat.com>
+ <20210223205634.604221-6-eric.auger@redhat.com>
+CC:     <jacob.jun.pan@linux.intel.com>, <yi.l.liu@intel.com>,
+        <wangxingang5@huawei.com>, <jiangkunkun@huawei.com>,
+        <jean-philippe@linaro.org>, <zhangfei.gao@linaro.org>,
+        <zhangfei.gao@gmail.com>, <vivek.gautam@arm.com>,
+        <shameerali.kolothum.thodi@huawei.com>, <yuzenghui@huawei.com>,
+        <nicoleotsuka@gmail.com>, <lushenming@huawei.com>,
+        <vsethi@nvidia.com>
+From:   Keqian Zhu <zhukeqian1@huawei.com>
+Message-ID: <5a22a597-0fba-edcc-bcf0-50d92346af08@huawei.com>
+Date:   Tue, 2 Mar 2021 16:35:15 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
+ Thunderbird/45.7.1
 MIME-Version: 1.0
-In-Reply-To: <2104a18d-e68b-cae8-8f9c-3b49bdde3f19@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.761
- definitions=2021-03-02_02:2021-03-01,2021-03-02 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0
- lowpriorityscore=0 impostorscore=0 priorityscore=1501 mlxscore=0
- suspectscore=0 clxscore=1015 adultscore=0 mlxlogscore=999 spamscore=0
- phishscore=0 malwarescore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2009150000 definitions=main-2103020066
+In-Reply-To: <20210223205634.604221-6-eric.auger@redhat.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.174.184.42]
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 3/2/21 6:59 AM, Thomas Huth wrote:
-> On 01/03/2021 19.28, Claudio Imbrenda wrote:
->> TCG is known to fail these tests, so add an explicit exception to skip them.
->>
->> Once TCG has been fixed, it will be enough to revert this patch.
->>
->> Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
->> ---
->>   s390x/mvpg.c | 31 +++++++++++++++++++------------
->>   1 file changed, 19 insertions(+), 12 deletions(-)
->>
->> diff --git a/s390x/mvpg.c b/s390x/mvpg.c
->> index 792052ad..148095e0 100644
->> --- a/s390x/mvpg.c
->> +++ b/s390x/mvpg.c
->> @@ -20,6 +20,7 @@
->>   #include <smp.h>
->>   #include <alloc_page.h>
->>   #include <bitops.h>
->> +#include <vm.h>
->>   
->>   /* Used to build the appropriate test values for register 0 */
->>   #define KFC(x) ((x) << 10)
->> @@ -224,20 +225,26 @@ static void test_mmu_prot(void)
->>   	report(clear_pgm_int() == PGM_INT_CODE_PROTECTION, "destination read only");
->>   	fresh += PAGE_SIZE;
->>   
->> -	protect_page(fresh, PAGE_ENTRY_I);
->> -	cc = mvpg(CCO, fresh, source);
->> -	report(cc == 1, "destination invalid");
->> -	fresh += PAGE_SIZE;
->> +	if (vm_is_tcg()) {
->> +		report_skip("destination invalid");
->> +		report_skip("source invalid");
->> +		report_skip("source and destination invalid");
+Hi Eric,
+
+On 2021/2/24 4:56, Eric Auger wrote:
+> On attach_pasid_table() we program STE S1 related info set
+> by the guest into the actual physical STEs. At minimum
+> we need to program the context descriptor GPA and compute
+> whether the stage1 is translated/bypassed or aborted.
 > 
-> You could also use report_xfail(vm_is_tcg(), ...) instead. That shows that 
-> there are still problems without failing CI runs.
-
-If I remember correctly we fail with a PGM so we would also need to add
-a expect_pgm_int() call before each test when running under tcg
-therefore it's not just a 1:1 replacement in this case.
-
-But yes, I'd also like an indication why we're skipping. A comment and a
-TCG prefix for skips should be enough.
-
-
+> On detach, the stage 1 config is unset and the abort flag is
+> unset.
 > 
-> Anyway:
-> Reviewed-by: Thomas Huth <thuth@redhat.com>
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
 > 
+[...]
 
+> +
+> +		/*
+> +		 * we currently support a single CD so s1fmt and s1dss
+> +		 * fields are also ignored
+> +		 */
+> +		if (cfg->pasid_bits)
+> +			goto out;
+> +
+> +		smmu_domain->s1_cfg.cdcfg.cdtab_dma = cfg->base_ptr;
+only the "cdtab_dma" field of "cdcfg" is set, we are not able to locate a specific cd using arm_smmu_get_cd_ptr().
+
+Maybe we'd better use a specialized function to fill other fields of "cdcfg" or add a sanity check in arm_smmu_get_cd_ptr()
+to prevent calling it under nested mode?
+
+As now we just call arm_smmu_get_cd_ptr() during finalise_s1(), no problem found. Just a suggestion ;-)
+
+Thanks,
+Keqian
+
+
+> +		smmu_domain->s1_cfg.set = true;
+> +		smmu_domain->abort = false;
+> +		break;
+> +	default:
+> +		goto out;
+> +	}
+> +	spin_lock_irqsave(&smmu_domain->devices_lock, flags);
+> +	list_for_each_entry(master, &smmu_domain->devices, domain_head)
+> +		arm_smmu_install_ste_for_dev(master);
+> +	spin_unlock_irqrestore(&smmu_domain->devices_lock, flags);
+> +	ret = 0;
+> +out:
+> +	mutex_unlock(&smmu_domain->init_mutex);
+> +	return ret;
+> +}
+> +
+> +static void arm_smmu_detach_pasid_table(struct iommu_domain *domain)
+> +{
+> +	struct arm_smmu_domain *smmu_domain = to_smmu_domain(domain);
+> +	struct arm_smmu_master *master;
+> +	unsigned long flags;
+> +
+> +	mutex_lock(&smmu_domain->init_mutex);
+> +
+> +	if (smmu_domain->stage != ARM_SMMU_DOMAIN_NESTED)
+> +		goto unlock;
+> +
+> +	smmu_domain->s1_cfg.set = false;
+> +	smmu_domain->abort = false;
+> +
+> +	spin_lock_irqsave(&smmu_domain->devices_lock, flags);
+> +	list_for_each_entry(master, &smmu_domain->devices, domain_head)
+> +		arm_smmu_install_ste_for_dev(master);
+> +	spin_unlock_irqrestore(&smmu_domain->devices_lock, flags);
+> +
+> +unlock:
+> +	mutex_unlock(&smmu_domain->init_mutex);
+> +}
+> +
+>  static bool arm_smmu_dev_has_feature(struct device *dev,
+>  				     enum iommu_dev_features feat)
+>  {
+> @@ -2939,6 +3026,8 @@ static struct iommu_ops arm_smmu_ops = {
+>  	.of_xlate		= arm_smmu_of_xlate,
+>  	.get_resv_regions	= arm_smmu_get_resv_regions,
+>  	.put_resv_regions	= generic_iommu_put_resv_regions,
+> +	.attach_pasid_table	= arm_smmu_attach_pasid_table,
+> +	.detach_pasid_table	= arm_smmu_detach_pasid_table,
+>  	.dev_has_feat		= arm_smmu_dev_has_feature,
+>  	.dev_feat_enabled	= arm_smmu_dev_feature_enabled,
+>  	.dev_enable_feat	= arm_smmu_dev_enable_feature,
+> 
