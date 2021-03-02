@@ -2,69 +2,71 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 96E7A32B5B9
-	for <lists+kvm@lfdr.de>; Wed,  3 Mar 2021 08:44:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 152DE32B5BA
+	for <lists+kvm@lfdr.de>; Wed,  3 Mar 2021 08:44:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1446082AbhCCHTf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 3 Mar 2021 02:19:35 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:58282 "EHLO
+        id S1449259AbhCCHTk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 3 Mar 2021 02:19:40 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:33341 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1381222AbhCBTmT (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 2 Mar 2021 14:42:19 -0500
+        by vger.kernel.org with ESMTP id S1839797AbhCBToU (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 2 Mar 2021 14:44:20 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1614713973;
+        s=mimecast20190719; t=1614714166;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=cSnNe9ZPgO5E0WpOmTYQKeyWN6kgimAwSV4Hm5qeUs4=;
-        b=iy1HO4PPXOJ1pGVg1CIRyXxYNkiz6t/rBU2nEZVvyEJo1UYrC35qxvp/Mbm+n/+3M/m4lN
-        DWkC5oTSbi5Peej0oUZt7Eacnx8mBVE9MNnTG2Qp8I5yVG2WLtCI8C+a5p6o4PnngTQQ4Q
-        uGzVp+OE9ms7lM5Jxpga+32Rl9yMKoY=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-214-Wu7dq87aMFeUzUJsIAd2sw-1; Tue, 02 Mar 2021 14:39:32 -0500
-X-MC-Unique: Wu7dq87aMFeUzUJsIAd2sw-1
-Received: by mail-wr1-f71.google.com with SMTP id h30so11622816wrh.10
-        for <kvm@vger.kernel.org>; Tue, 02 Mar 2021 11:39:31 -0800 (PST)
+        bh=HPMC22GbUg3ZONkj89cKsu7qkPMKOaKG8LetMaPE1Yc=;
+        b=ACvzrdbk88LTGKKB6Kjv+5m4Uyj7wjxYvuSgsqOD3WQktdodl+6jNJaq6UMFjY7bEk6Iam
+        KD7+BrsCALrdPrp4WThcJVa1yUJZArzK66oiCyjU3xnzPPJy8nnbTQ1Xxri3DmzLb9s/h/
+        9ARDX3AZnaUJpJZfphtzxp290OEZSuA=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-584-Rd1d6cpZPFCtRPHmaq_g7w-1; Tue, 02 Mar 2021 14:42:45 -0500
+X-MC-Unique: Rd1d6cpZPFCtRPHmaq_g7w-1
+Received: by mail-wm1-f72.google.com with SMTP id v5so1690109wml.9
+        for <kvm@vger.kernel.org>; Tue, 02 Mar 2021 11:42:44 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=cSnNe9ZPgO5E0WpOmTYQKeyWN6kgimAwSV4Hm5qeUs4=;
-        b=WvO/7Pd0KUSYwzPR0OpKAvqGrdLOXkCZLZpLa0SKHraLiLWhQUzX8i59/gE9x8lv/q
-         wx4mJUf8RqDm99xbPe25OIutYEr4xWyKl1++kCys/bd/9fJEkM5WVMnSpcKjjrvBzRue
-         EYDSXY6+0rhUnzSMNe40MpLwytHtjNe9vZzLCf/cvRaF1ccA+8lHerpNmgUsTeY9QyDk
-         5xBhT1PtnYeHUStAbu8Fah13spwhq+DzGilUg25Ufhtg/8sJ/X6D4RCpSIColwbjvKYb
-         jWle4pppqLzHqv/sKbhmGaySBHE8epul+dUtsdrGCsm9PDwxXUfVPS11kYxEVMvRaXp2
-         kVGw==
-X-Gm-Message-State: AOAM530CseVgcRyrL7UIKtbNn8Py18otacw1AhtGxu7CD70JmmB4iaZz
-        yDA+271IUVDYYXFIuC7pUT6p5xTYFJ5jeSFgt3NhuDfGOi0ULrrlXz1+i8+0CyZ/Id35WVZH57Z
-        i6odpe9Mhq3Op
-X-Received: by 2002:adf:b355:: with SMTP id k21mr23901239wrd.156.1614713970667;
-        Tue, 02 Mar 2021 11:39:30 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJwcX+o0N0KVQBN6n2wK/GxJzWg1PiwtIfJxXLOWMn7SvlPUiFri43p4z/7EOeEDrXOMtOkqqg==
-X-Received: by 2002:adf:b355:: with SMTP id k21mr23901212wrd.156.1614713970208;
-        Tue, 02 Mar 2021 11:39:30 -0800 (PST)
+        bh=HPMC22GbUg3ZONkj89cKsu7qkPMKOaKG8LetMaPE1Yc=;
+        b=dAwhMrftScQIkIRByxKaqZIXFOHj9o28Ay12TmsZ7aXFv/NwyQofJ9Tm9Ta2EabwP2
+         s2q+d6zehvRZ0AXAXyvIb5KvFnAsTnNdE4NWnf2k3kb2Wy67ACnPWJrjhdtE0ZG3jiS+
+         Wn/c/LpyEHC41I3hUN6tQjAPHrv15fNBswU03wWIlfUcY9MlBnk4BDQW428HLCAeuTKH
+         o24IDjX6q1u83JHNXAW+kCm4c61LbQCU9naFPDfQgqziZdVwaC15PQl9HlIcigtPwcLa
+         9tS/BAcKabMMVecIBWztrHslAuo7zRzjuFSSrI3XoIzzeMJcvFfHn2GbJc0z1BVyMzDa
+         ycyA==
+X-Gm-Message-State: AOAM5320N0VNp1lUwwoxA16+HUPaP5mvZsXUUmjna6UYyxkkaGmMZRzH
+        lFK8mYF/HfmpJXEqGIibQjHHuuSp63QscaSP4bUzq1NpONBVgAPhfye/QqDb1qTS7mOOtDYhK6Q
+        SpNPHVcLzvHzE
+X-Received: by 2002:a05:600c:358d:: with SMTP id p13mr5669407wmq.152.1614714163569;
+        Tue, 02 Mar 2021 11:42:43 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJxr2O7v4+v2xNtUKu4ghCl09WbXpteX+EqtDzUfD203Js//prK+rD2FyqDL0qAoqSEplVFfwQ==
+X-Received: by 2002:a05:600c:358d:: with SMTP id p13mr5669403wmq.152.1614714163399;
+        Tue, 02 Mar 2021 11:42:43 -0800 (PST)
 Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id a124sm3518464wmh.39.2021.03.02.11.39.28
+        by smtp.gmail.com with ESMTPSA id c9sm3585690wmb.33.2021.03.02.11.42.42
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 02 Mar 2021 11:39:29 -0800 (PST)
-Subject: Re: [PATCH] KVM: SVM: Clear the CR4 register on reset
-To:     Babu Moger <babu.moger@amd.com>
-Cc:     wanpengli@tencent.com, kvm@vger.kernel.org, seanjc@google.com,
-        joro@8bytes.org, x86@kernel.org, linux-kernel@vger.kernel.org,
-        mingo@redhat.com, bp@alien8.de, hpa@zytor.com, vkuznets@redhat.com,
-        tglx@linutronix.de, jmattson@google.com
-References: <161471109108.30811.6392805173629704166.stgit@bmoger-ubuntu>
+        Tue, 02 Mar 2021 11:42:42 -0800 (PST)
+Subject: Re: [PATCH 0/2] KVM: x86: Emulate L2 triple fault without killing L1
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>
+References: <20210302174515.2812275-1-seanjc@google.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <454cb7d4-9f50-42e1-6908-d659491ba140@redhat.com>
-Date:   Tue, 2 Mar 2021 20:39:28 +0100
+Message-ID: <2390f11d-892c-11d3-b71b-3dee531152d9@redhat.com>
+Date:   Tue, 2 Mar 2021 20:42:42 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.7.0
 MIME-Version: 1.0
-In-Reply-To: <161471109108.30811.6392805173629704166.stgit@bmoger-ubuntu>
+In-Reply-To: <20210302174515.2812275-1-seanjc@google.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -72,39 +74,33 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 02/03/21 19:51, Babu Moger wrote:
-> This problem was reported on a SVM guest while executing kexec.
-> Kexec fails to load the new kernel when the PCID feature is enabled.
+On 02/03/21 18:45, Sean Christopherson wrote:
+> If KVM (L0) intercepts #GP, but L1 does not, then L2 can kill L1 by
+> triggering triple fault.  On both VMX and SVM, if the CPU hits a fault
+> while vectoring an injected #DF (or I supposed any #DF), any intercept
+> from the hypervisor takes priority over triple fault.  #PF is unlikely to
+> be intercepted by L0 but not L1.  The bigger problem is #GP, which is
+> intercepted on both VMX and SVM if enable_vmware_backdoor=1, and is also
+> now intercepted for the lovely VMRUN/VMLOAD/VMSAVE errata.
 > 
-> When kexec starts loading the new kernel, it starts the process by
-> resetting the vCPU's and then bringing each vCPU online one by one.
-> The vCPU reset is supposed to reset all the register states before the
-> vCPUs are brought online. However, the CR4 register is not reset during
-> this process. If this register is already setup during the last boot,
-> all the flags can remain intact. The X86_CR4_PCIDE bit can only be
-> enabled in long mode. So, it must be enabled much later in SMP
-> initialization.  Having the X86_CR4_PCIDE bit set during SMP boot can
-> cause a boot failures.
+> Based on kvm/queue, commit fe5f0041c026 ("KVM/SVM: Move vmenter.S exception
+> fixups out of line").  x86.c and svm/nested.c conflict with kvm/master.
+> They are minor and straighforward, but let me know if you want me to post
+> a version based on kvm/master for easier inclusion into 5.12.
 > 
-> Fix the issue by resetting the CR4 register in init_vmcb().
+> Sean Christopherson (2):
+>    KVM: x86: Handle triple fault in L2 without killing L1
+>    KVM: nSVM: Add helper to synthesize nested VM-Exit without collateral
 > 
-> Signed-off-by: Babu Moger <babu.moger@amd.com>
-> ---
->   arch/x86/kvm/svm/svm.c |    1 +
->   1 file changed, 1 insertion(+)
-> 
-> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> index c636021b066b..baee91c1e936 100644
-> --- a/arch/x86/kvm/svm/svm.c
-> +++ b/arch/x86/kvm/svm/svm.c
-> @@ -1200,6 +1200,7 @@ static void init_vmcb(struct vcpu_svm *svm)
->   	init_sys_seg(&save->ldtr, SEG_TYPE_LDT);
->   	init_sys_seg(&save->tr, SEG_TYPE_BUSY_TSS16);
->   
-> +	svm_set_cr4(&svm->vcpu, 0);
->   	svm_set_efer(&svm->vcpu, 0);
->   	save->dr6 = 0xffff0ff0;
->   	kvm_set_rflags(&svm->vcpu, X86_EFLAGS_FIXED);
+>   arch/x86/include/asm/kvm_host.h |  1 +
+>   arch/x86/kvm/lapic.c            |  2 +-
+>   arch/x86/kvm/svm/nested.c       | 57 ++++++++-------------------------
+>   arch/x86/kvm/svm/svm.c          |  6 +---
+>   arch/x86/kvm/svm/svm.h          |  9 ++++++
+>   arch/x86/kvm/vmx/nested.c       |  9 ++++++
+>   arch/x86/kvm/x86.c              | 29 +++++++++++++----
+>   arch/x86/kvm/x86.h              |  2 ++
+>   8 files changed, 60 insertions(+), 55 deletions(-)
 > 
 
 Queued, thanks.
