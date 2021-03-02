@@ -2,149 +2,152 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0F04932A75A
-	for <lists+kvm@lfdr.de>; Tue,  2 Mar 2021 18:08:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6892032A75E
+	for <lists+kvm@lfdr.de>; Tue,  2 Mar 2021 18:09:07 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1384785AbhCBQMU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 2 Mar 2021 11:12:20 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:38122 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1350912AbhCBM7E (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 2 Mar 2021 07:59:04 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1614689795;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=M9fL7n3Tv5twMpsBGgac3V/MmjGJOrbN2fKp4Wp/lhk=;
-        b=R5gAe6uues6+PEcUr3UwZPxiyBWtbbTyHbwIQVhrIejSLcFpnA/YKwvKXV01/7VdVfSz9u
-        +5400peLiY+Pje+RdA4qkO5mkjelEsPlxsTyPX9Q9RllTnoP5FAbA3JfVAl2mwBcpcjVZX
-        i3m4NGWd+6PaRkHHo3rHpu9a20R+dbk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-561-oaeMdRUFPTC5FrLTLYTNBQ-1; Tue, 02 Mar 2021 07:56:33 -0500
-X-MC-Unique: oaeMdRUFPTC5FrLTLYTNBQ-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6DD501E570;
-        Tue,  2 Mar 2021 12:56:32 +0000 (UTC)
-Received: from localhost.localdomain (ovpn-114-4.rdu2.redhat.com [10.10.114.4])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id D3EC060BFA;
-        Tue,  2 Mar 2021 12:56:31 +0000 (UTC)
-Subject: Re: [PATCH] KVM: nSVM: Optimize L12 to L2 vmcb.save copies
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        pbonzini@redhat.com, vkuznets@redhat.com, wei.huang2@amd.com
-References: <20210301200844.2000-1-cavery@redhat.com>
- <YD2N/4sDKS4RJdlR@google.com>
-From:   Cathy Avery <cavery@redhat.com>
-Message-ID: <9c7e4dec-2181-1720-5981-3ae25c5bb0d9@redhat.com>
-Date:   Tue, 2 Mar 2021 07:56:31 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
+        id S1447344AbhCBQO0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 2 Mar 2021 11:14:26 -0500
+Received: from szxga05-in.huawei.com ([45.249.212.191]:13040 "EHLO
+        szxga05-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1350919AbhCBM7L (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 2 Mar 2021 07:59:11 -0500
+Received: from DGGEMS412-HUB.china.huawei.com (unknown [172.30.72.58])
+        by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4DqcZ11GsMzMhCS;
+        Tue,  2 Mar 2021 20:55:53 +0800 (CST)
+Received: from DESKTOP-TMVL5KK.china.huawei.com (10.174.187.128) by
+ DGGEMS412-HUB.china.huawei.com (10.3.19.212) with Microsoft SMTP Server id
+ 14.3.498.0; Tue, 2 Mar 2021 20:57:53 +0800
+From:   Yanan Wang <wangyanan55@huawei.com>
+To:     <kvm@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>
+CC:     Paolo Bonzini <pbonzini@redhat.com>,
+        Ben Gardon <bgardon@google.com>,
+        "Sean Christopherson" <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Andrew Jones <drjones@redhat.com>,
+        Peter Xu <peterx@redhat.com>, Marc Zyngier <maz@kernel.org>,
+        Ingo Molnar <mingo@kernel.org>,
+        Adrian Hunter <adrian.hunter@intel.com>,
+        Jiri Olsa <jolsa@redhat.com>,
+        "Arnaldo Carvalho de Melo" <acme@redhat.com>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Michael Kerrisk <mtk.manpages@gmail.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        <wanghaibin.wang@huawei.com>, <yezengruan@huawei.com>,
+        <yuzenghui@huawei.com>, Yanan Wang <wangyanan55@huawei.com>
+Subject: [RFC PATCH v4 0/9] KVM: selftests: some improvement and a new test for kvm page table
+Date:   Tue, 2 Mar 2021 20:57:42 +0800
+Message-ID: <20210302125751.19080-1-wangyanan55@huawei.com>
+X-Mailer: git-send-email 2.8.4.windows.1
 MIME-Version: 1.0
-In-Reply-To: <YD2N/4sDKS4RJdlR@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Content-Type: text/plain
+X-Originating-IP: [10.174.187.128]
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 3/1/21 7:59 PM, Sean Christopherson wrote:
-> On Mon, Mar 01, 2021, Cathy Avery wrote:
->>   	kvm_set_rflags(&svm->vcpu, vmcb12->save.rflags | X86_EFLAGS_FIXED);
->>   	svm_set_efer(&svm->vcpu, vmcb12->save.efer);
->>   	svm_set_cr0(&svm->vcpu, vmcb12->save.cr0);
->>   	svm_set_cr4(&svm->vcpu, vmcb12->save.cr4);
-> Why not utilize VMCB_CR?
-I was going to tackle CR in a follow up patch. I should have mentioned 
-that but it makes sense to go ahead and do it now.
->
->> -	svm->vcpu.arch.cr2 = vmcb12->save.cr2;
->> +	svm->vmcb->save.cr2 = svm->vcpu.arch.cr2 = vmcb12->save.cr2;
-> Same question for VMCB_CR2.
->
-> Also, isn't writing svm->vmcb->save.cr2 unnecessary since svm_vcpu_run()
-> unconditionally writes it?
->
-> Alternatively, it shouldn't be too much work to add proper dirty tracking for
-> CR2.  VMX has to write the real CR2 every time because there's no VMCS field,
-> but I assume can avoid the write and dirty update on the majority of VMRUNs.
+Hi,
+This v4 series can mainly include two parts.
+Based on kvm queue branch: https://git.kernel.org/pub/scm/virt/kvm/kvm.git/log/?h=queue
+Links of v1: https://lore.kernel.org/lkml/20210208090841.333724-1-wangyanan55@huawei.com/
+Links of v2: https://lore.kernel.org/lkml/20210225055940.18748-1-wangyanan55@huawei.com/
+Links of v3: https://lore.kernel.org/lkml/20210301065916.11484-1-wangyanan55@huawei.com/
 
-I 'll take a look at CR2 as well.
+In the first part, all the known hugetlb backing src types specified
+with different hugepage sizes are listed, so that we can specify use
+of hugetlb source of the exact granularity that we want, instead of
+the system default ones. And as all the known hugetlb page sizes are
+listed, it's appropriate for all architectures. Besides, a helper that
+can get granularity of different backing src types(anonumous/thp/hugetlb)
+is added, so that we can use the accurate backing src granularity for
+kinds of alignment or guest memory accessing of vcpus.
 
-Thanks for the feedback,
+In the second part, a new test is added:
+This test is added to serve as a performance tester and a bug reproducer
+for kvm page table code (GPA->HPA mappings), it gives guidance for the
+people trying to make some improvement for kvm. And the following explains
+what we can exactly do through this test.
 
-Cathy
+The function guest_code() can cover the conditions where a single vcpu or
+multiple vcpus access guest pages within the same memory region, in three
+VM stages(before dirty logging, during dirty logging, after dirty logging).
+Besides, the backing src memory type(ANONYMOUS/THP/HUGETLB) of the tested
+memory region can be specified by users, which means normal page mappings
+or block mappings can be chosen by users to be created in the test.
 
->
->> +
->>   	kvm_rax_write(&svm->vcpu, vmcb12->save.rax);
->>   	kvm_rsp_write(&svm->vcpu, vmcb12->save.rsp);
->>   	kvm_rip_write(&svm->vcpu, vmcb12->save.rip);
->>   
->>   	/* In case we don't even reach vcpu_run, the fields are not updated */
->> -	svm->vmcb->save.cr2 = svm->vcpu.arch.cr2;
->>   	svm->vmcb->save.rax = vmcb12->save.rax;
->>   	svm->vmcb->save.rsp = vmcb12->save.rsp;
->>   	svm->vmcb->save.rip = vmcb12->save.rip;
->>   
->> -	svm->vmcb->save.dr7 = vmcb12->save.dr7 | DR7_FIXED_1;
->> -	svm->vcpu.arch.dr6  = vmcb12->save.dr6 | DR6_ACTIVE_LOW;
->> -	vmcb_mark_dirty(svm->vmcb, VMCB_DR);
->> +	/* These bits will be set properly on the first execution when new_vmc12 is true */
->> +	if (unlikely(new_vmcb12 || vmcb_is_dirty(vmcb12, VMCB_DR))) {
->> +		svm->vmcb->save.dr7 = vmcb12->save.dr7 | DR7_FIXED_1;
->> +		svm->vcpu.arch.dr6  = vmcb12->save.dr6 | DR6_ACTIVE_LOW;
->> +		vmcb_mark_dirty(svm->vmcb, VMCB_DR);
->> +	}
->>   }
->>   
->>   static void nested_vmcb02_prepare_control(struct vcpu_svm *svm)
->> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
->> index 54610270f66a..9761a7ca8100 100644
->> --- a/arch/x86/kvm/svm/svm.c
->> +++ b/arch/x86/kvm/svm/svm.c
->> @@ -1232,6 +1232,7 @@ static void init_vmcb(struct kvm_vcpu *vcpu)
->>   	svm->asid = 0;
->>   
->>   	svm->nested.vmcb12_gpa = 0;
->> +	svm->nested.last_vmcb12_gpa = 0;
-> We should use INVALID_PAGE, '0' is a legal physical address and could
-> theoretically get a false negative on the "new_vmcb12" check.
->
->>   	vcpu->arch.hflags = 0;
->>   
->>   	if (!kvm_pause_in_guest(vcpu->kvm)) {
->> diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
->> index fbbb26dd0f73..911868d4584c 100644
->> --- a/arch/x86/kvm/svm/svm.h
->> +++ b/arch/x86/kvm/svm/svm.h
->> @@ -93,6 +93,7 @@ struct svm_nested_state {
->>   	u64 hsave_msr;
->>   	u64 vm_cr_msr;
->>   	u64 vmcb12_gpa;
->> +	u64 last_vmcb12_gpa;
->>   
->>   	/* These are the merged vectors */
->>   	u32 *msrpm;
->> @@ -247,6 +248,11 @@ static inline void vmcb_mark_dirty(struct vmcb *vmcb, int bit)
->>   	vmcb->control.clean &= ~(1 << bit);
->>   }
->>   
->> +static inline bool vmcb_is_dirty(struct vmcb *vmcb, int bit)
->> +{
->> +        return !test_bit(bit, (unsigned long *)&vmcb->control.clean);
->> +}
->> +
->>   static inline struct vcpu_svm *to_svm(struct kvm_vcpu *vcpu)
->>   {
->>   	return container_of(vcpu, struct vcpu_svm, vcpu);
->> -- 
->> 2.26.2
->>
+If ANONYMOUS memory is specified, kvm will create normal page mappings
+for the tested memory region before dirty logging, and update attributes
+of the page mappings from RO to RW during dirty logging. If THP/HUGETLB
+memory is specified, kvm will create block mappings for the tested memory
+region before dirty logging, and split the blcok mappings into normal page
+mappings during dirty logging, and coalesce the page mappings back into
+block mappings after dirty logging is stopped.
+
+So in summary, as a performance tester, this test can present the
+performance of kvm creating/updating normal page mappings, or the
+performance of kvm creating/splitting/recovering block mappings,
+through execution time.
+
+When we need to coalesce the page mappings back to block mappings after
+dirty logging is stopped, we have to firstly invalidate *all* the TLB
+entries for the page mappings right before installation of the block entry,
+because a TLB conflict abort error could occur if we can't invalidate the
+TLB entries fully. We have hit this TLB conflict twice on aarch64 software
+implementation and fixed it. As this test can imulate process from dirty
+logging enabled to dirty logging stopped of a VM with block mappings,
+so it can also reproduce this TLB conflict abort due to inadequate TLB
+invalidation when coalescing tables.
+
+Links about the TLB conflict abort:
+https://lore.kernel.org/lkml/20201201201034.116760-3-wangyanan55@huawei.com/
+
+---
+
+Change logs:
+
+v3->v4:
+- Add a helper to get system default hugetlb page size
+- Add tags of Reviewed-by of Ben in the patches
+
+v2->v3:
+- Add tags of Suggested-by, Reviewed-by in the patches
+- Add a generic micro to get hugetlb page sizes
+- Some changes for suggestions about v2 series
+
+v1->v2:
+- Add a patch to sync header files
+- Add helpers to get granularity of different backing src types
+- Some changes for suggestions about v1 series
+
+---
+
+Yanan Wang (9):
+  tools headers: sync headers of asm-generic/hugetlb_encode.h
+  tools headers: Add a macro to get HUGETLB page sizes for mmap
+  KVM: selftests: Use flag CLOCK_MONOTONIC_RAW for timing
+  KVM: selftests: Make a generic helper to get vm guest mode strings
+  KVM: selftests: Add a helper to get system configured THP page size
+  KVM: selftests: Add a helper to get system default hugetlb page size
+  KVM: selftests: List all hugetlb src types specified with page sizes
+  KVM: selftests: Adapt vm_userspace_mem_region_add to new helpers
+  KVM: selftests: Add a test for kvm page table code
+
+ include/uapi/linux/mman.h                     |   2 +
+ tools/include/asm-generic/hugetlb_encode.h    |   3 +
+ tools/include/uapi/linux/mman.h               |   2 +
+ tools/testing/selftests/kvm/Makefile          |   3 +
+ .../selftests/kvm/demand_paging_test.c        |   8 +-
+ .../selftests/kvm/dirty_log_perf_test.c       |  14 +-
+ .../testing/selftests/kvm/include/kvm_util.h  |   4 +-
+ .../testing/selftests/kvm/include/test_util.h |  21 +-
+ .../selftests/kvm/kvm_page_table_test.c       | 476 ++++++++++++++++++
+ tools/testing/selftests/kvm/lib/kvm_util.c    |  59 ++-
+ tools/testing/selftests/kvm/lib/test_util.c   | 122 ++++-
+ tools/testing/selftests/kvm/steal_time.c      |   4 +-
+ 12 files changed, 659 insertions(+), 59 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/kvm_page_table_test.c
+
+-- 
+2.19.1
 
