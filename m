@@ -2,107 +2,228 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3C68132A7A5
-	for <lists+kvm@lfdr.de>; Tue,  2 Mar 2021 18:24:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C2F3D32A729
+	for <lists+kvm@lfdr.de>; Tue,  2 Mar 2021 18:07:48 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1449272AbhCBQWC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 2 Mar 2021 11:22:02 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58140 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1449004AbhCBQDc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 2 Mar 2021 11:03:32 -0500
-Received: from mail-pf1-x434.google.com (mail-pf1-x434.google.com [IPv6:2607:f8b0:4864:20::434])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 27320C0617A7
-        for <kvm@vger.kernel.org>; Tue,  2 Mar 2021 08:02:21 -0800 (PST)
-Received: by mail-pf1-x434.google.com with SMTP id t29so14097498pfg.11
-        for <kvm@vger.kernel.org>; Tue, 02 Mar 2021 08:02:21 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to;
-        bh=svOHLaBnqkDfLhE0cZ4LJEE36nGBqyQ9USTfjmqqgrQ=;
-        b=Lt+J5F4Qzn5XcdVTLUz5v5KhazZ3GtoSKi4eCwnhUyfDVP7CjIdTe7wrEupIgJjMIA
-         HlEZVtJ4zbOe7b76HD6dAnG1S4mTkKoSoRXAJchNJGjm5jbrHl2vNE2e9zX2776arIOf
-         UdKsWBRwTk9ywichOZb2Ro3wb2a2Z+VxipxSFch75SK8FHkGV246bAofC+niKQpJXehf
-         72HdOj0vU8M5ay2vJJwK40EHtP0D4bsWr/cHZQsOdFTq+DzNSkk9AJFiElG6TSAEPQtk
-         W/sjo/MiPdD35E2LyD3d1O6fbxO62upDmumlXFe+R2chC97vx6mTl3qzaOix0UNu7QPy
-         uqmA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=svOHLaBnqkDfLhE0cZ4LJEE36nGBqyQ9USTfjmqqgrQ=;
-        b=blV1fUSatm2JhYDT57wzRs6ZIHBNSVyEsXKo+iTENHYI8lGLvM40CwmBY0jIy6Ln9N
-         3RxoZGpNT0lioK/Gj6ioowKzxt+6uX3fQY1AbKfH6SzUEY25Dhjfn6/dmHEfpnkToZtx
-         rmjgcezysEosIl3UdcYgrWfWTbB6yn+C4rrtwjIiMUGCr294PiA1TwA15Nlu3jc5TCP3
-         LWPFxwmc+yfzlWA1RrjAALsN66kZmrB1kQfVwk7RP9cDQQQrZTiCjx/3Jjy8UE72avIk
-         Fu0BFZBzMWfcXAdIHOnuYDhi2/MH6JYMpm7+8xvdGV5CWUPkIeAYB3fKLa5dvLb20Grm
-         Zcpw==
-X-Gm-Message-State: AOAM533QQY7dH5VqP5+2j1VJU/DOylxCMNaery4Lfbw3GEm6lmI3IyUU
-        bni/94gDE9q/qNjpaTaavwy/yg==
-X-Google-Smtp-Source: ABdhPJw8fIoq/1KmCJqNQp/hD/uLuk0oH7QC1JQ5gpW5sqU026irp8qx8M6uJ7zNiZLj0GP87RUJYw==
-X-Received: by 2002:a62:7d17:0:b029:1ee:3bbe:fa5f with SMTP id y23-20020a627d170000b02901ee3bbefa5fmr3727106pfc.67.1614700940422;
-        Tue, 02 Mar 2021 08:02:20 -0800 (PST)
-Received: from google.com ([2620:15c:f:10:805d:6324:3372:6183])
-        by smtp.gmail.com with ESMTPSA id ie12sm3763220pjb.52.2021.03.02.08.02.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 02 Mar 2021 08:02:19 -0800 (PST)
-Date:   Tue, 2 Mar 2021 08:02:13 -0800
-From:   Sean Christopherson <seanjc@google.com>
-To:     Kai Huang <kai.huang@intel.com>
-Cc:     Borislav Petkov <bp@alien8.de>, kvm@vger.kernel.org,
-        x86@kernel.org, linux-sgx@vger.kernel.org,
-        linux-kernel@vger.kernel.org, jarkko@kernel.org, luto@kernel.org,
-        dave.hansen@intel.com, rick.p.edgecombe@intel.com,
-        haitao.huang@intel.com, pbonzini@redhat.com, tglx@linutronix.de,
-        mingo@redhat.com, hpa@zytor.com
-Subject: Re: [PATCH 02/25] x86/cpufeatures: Add SGX1 and SGX2 sub-features
-Message-ID: <YD5hhah9Sgj1YGqw@google.com>
-References: <cover.1614590788.git.kai.huang@intel.com>
- <bbfc8c833a62e4b55220834320829df1e17aff41.1614590788.git.kai.huang@intel.com>
- <20210301100037.GA6699@zn.tnic>
- <3fce1dd2abd42597bde7ae9496bde7b9596b2797.camel@intel.com>
- <20210301103043.GB6699@zn.tnic>
- <7603ef673997b6674f785d333a4f263c749d2cf3.camel@intel.com>
- <20210301105346.GC6699@zn.tnic>
- <e509c6c1e3644861edafb18e4045b813f9f344b3.camel@intel.com>
- <20210301113257.GD6699@zn.tnic>
- <0adc41774945bf9d6e6a72a93b83c80aa8c59544.camel@intel.com>
+        id S1575915AbhCBQEo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 2 Mar 2021 11:04:44 -0500
+Received: from mga06.intel.com ([134.134.136.31]:20180 "EHLO mga06.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1444870AbhCBMlY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 2 Mar 2021 07:41:24 -0500
+IronPort-SDR: OZF29G6vnbznlkSb3whUu3ug+ygNTTMM3k9W0cFp9SwAoAH09b3Z2iPAIWn16z+pkc9/mGHqL7
+ EQirb3VJGhLw==
+X-IronPort-AV: E=McAfee;i="6000,8403,9910"; a="248204697"
+X-IronPort-AV: E=Sophos;i="5.81,216,1610438400"; 
+   d="scan'208";a="248204697"
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Mar 2021 04:36:47 -0800
+IronPort-SDR: /P+Qc/iEKgAQks6WSjR7kEqlqYljDwvgWcGDkQl4X/J8RtV0FH1TNS4nMoqLEy2E0DNSOVfSYm
+ MbkLpwsVgXMg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.81,216,1610438400"; 
+   d="scan'208";a="427471978"
+Received: from yiliu-dev.bj.intel.com (HELO dual-ub.bj.intel.com) ([10.238.156.135])
+  by fmsmga004.fm.intel.com with ESMTP; 02 Mar 2021 04:36:42 -0800
+From:   Liu Yi L <yi.l.liu@intel.com>
+To:     alex.williamson@redhat.com, eric.auger@redhat.com,
+        baolu.lu@linux.intel.com, joro@8bytes.org
+Cc:     kevin.tian@intel.com, jacob.jun.pan@linux.intel.com,
+        ashok.raj@intel.com, yi.l.liu@intel.com, jun.j.tian@intel.com,
+        yi.y.sun@intel.com, jean-philippe@linaro.org, peterx@redhat.com,
+        jasowang@redhat.com, hao.wu@intel.com, stefanha@gmail.com,
+        iommu@lists.linux-foundation.org, kvm@vger.kernel.org,
+        jgg@nvidia.com, Lingshan.Zhu@intel.com, vivek.gautam@arm.com
+Subject: [Patch v8 00/10] vfio: expose virtual Shared Virtual Addressing to VMs
+Date:   Wed,  3 Mar 2021 04:35:35 +0800
+Message-Id: <20210302203545.436623-1-yi.l.liu@intel.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <0adc41774945bf9d6e6a72a93b83c80aa8c59544.camel@intel.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Mar 02, 2021, Kai Huang wrote:
-> On Mon, 2021-03-01 at 12:32 +0100, Borislav Petkov wrote:
-> > On Tue, Mar 02, 2021 at 12:28:27AM +1300, Kai Huang wrote:
-> > > I think some script can utilize /proc/cpuinfo. For instance, admin can have
-> > > automation tool/script to deploy enclave (with sgx2) apps, and that script can check
-> > > whether platform supports sgx2 or not, before it can deploy those enclave apps. Or
-> > > enclave author may just want to check /proc/cpuinfo to know whether the machine can
-> > > be used for testing sgx2 enclave or not.
-> > 
-> > This doesn't sound like a concrete use of this. So you can hide it
-> > initially with "" until you guys have a use case. Exposing it later is
-> > always easy vs exposing it now and then not being able to change it
-> > anymore.
-> > 
-> 
-> Hi Haitao, Jarkko,
-> 
-> Do you have more concrete use case of needing "sgx2" in /proc/cpuinfo?
+Shared Virtual Addressing (SVA), a.k.a, Shared Virtual Memory (SVM) on
+Intel platforms allows address space sharing between device DMA and
+applications. SVA can reduce programming complexity and enhance security.
 
-The KVM use case is to query /proc/cpuinfo to see if sgx2 can be enabled in a
-guest.
+This VFIO series is intended to expose SVA usage to VMs. i.e. Sharing
+guest application address space with passthru devices. This is called
+vSVA in this series. The whole vSVA enabling requires QEMU/VFIO/IOMMU
+changes. For IOMMU and QEMU changes, they are in separate series (listed
+in the "Related series").
 
-The counter-argument to that is we might want sgx2 in /proc/cpuinfo to mean sgx2
-is enabled in hardware _and_ supported by the kernel.  Userspace can grep for
-sgx in /proc/cpuinfo, and use cpuid to discover sgx2, so it's not a blocker.
+The high-level architecture for SVA virtualization is as below, the key
+design of vSVA support is to utilize the dual-stage IOMMU translation (
+also known as IOMMU nesting translation) capability in host IOMMU.
 
-That being said, adding some form of capability/versioning to SGX seems
-inevitable, not sure it's worth witholding sgx2 from /proc/cpuinfo.
+
+    .-------------.  .---------------------------.
+    |   vIOMMU    |  | Guest process CR3, FL only|
+    |             |  '---------------------------'
+    .----------------/
+    | PASID Entry |--- PASID cache flush -
+    '-------------'                       |
+    |             |                       V
+    |             |                CR3 in GPA
+    '-------------'
+Guest
+------| Shadow |--------------------------|--------
+      v        v                          v
+Host
+    .-------------.  .----------------------.
+    |   pIOMMU    |  | Bind FL for GVA-GPA  |
+    |             |  '----------------------'
+    .----------------/  |
+    | PASID Entry |     V (Nested xlate)
+    '----------------\.------------------------------.
+    |             |   |SL for GPA-HPA, default domain|
+    |             |   '------------------------------'
+    '-------------'
+Where:
+ - FL = First level/stage one page tables
+ - SL = Second level/stage two page tables
+
+This patch series has been updated regards to the disscussion around PASID
+allocation in v7 [1]. This series has removed the PASID allocation, and
+adapted to the /dev/ioasid solution [2]. Therefore the patches in this series
+has been re-ordered. And the Patch Overview is as below:
+
+ 1. reports IOMMU nesting info to userspace ( patch 0001, 0002, 0003, 0010)
+ 2. vfio support for binding guest page table to host (patch 0004)
+ 3. vfio support for IOMMU cache invalidation from VMs (patch 0005)
+ 4. vfio support for vSVA usage on IOMMU-backed mdevs (patch 0006, 0007)
+ 5. expose PASID capability to VM (patch 0008)
+ 6. add doc for VFIO dual stage control (patch 0009)
+
+The complete vSVA kernel upstream patches are divided into three phases:
+    1. Common APIs and PCI device direct assignment
+    2. IOMMU-backed Mediated Device assignment
+    3. Page Request Services (PRS) support
+
+This patchset is aiming for the phase 1 and phase 2. And it has dependency on IOASID
+extension from Jacobd Pan [3]. Complete set for current vSVA kernel and QEMU can be
+found in [4] and [5].
+
+[1] https://lore.kernel.org/kvm/DM5PR11MB14351121729909028D6EB365C31D0@DM5PR11MB1435.namprd11.prod.outlook.com/
+[2] https://lore.kernel.org/linux-iommu/1614463286-97618-19-git-send-email-jacob.jun.pan@linux.intel.com/
+[3] https://lore.kernel.org/linux-iommu/1614463286-97618-1-git-send-email-jacob.jun.pan@linux.intel.com/
+[4] https://github.com/jacobpan/linux/tree/vsva-linux-5.12-rc1-v8
+[5] https://github.com/luxis1999/qemu/tree/vsva_5.12_rc1_qemu_rfcv11
+
+Regards,
+Yi Liu
+
+Changelog:
+	- Patch v7 -> Patch v8:
+	  a) removed the PASID allocation out of this series, it is covered by below patch:
+	     https://lore.kernel.org/linux-iommu/1614463286-97618-19-git-send-email-jacob.jun.pan@linux.intel.com/
+	  Patch v7: https://lore.kernel.org/kvm/1599734733-6431-1-git-send-email-yi.l.liu@intel.com/
+
+	- Patch v6 -> Patch v7:
+	  a) drop [PATCH v6 01/15] of v6 as it's merged by Alex.
+	  b) rebase on Jacob's v8 IOMMU uapi enhancement and v2 IOASID extension patchset.
+	  c) Address comments against v6 from Alex and Eric.
+	  Patch v6: https://lore.kernel.org/kvm/1595917664-33276-1-git-send-email-yi.l.liu@intel.com/
+
+	- Patch v5 -> Patch v6:
+	  a) Address comments against v5 from Eric.
+	  b) rebase on Jacob's v6 IOMMU uapi enhancement
+	  Patch v5: https://lore.kernel.org/kvm/1594552870-55687-1-git-send-email-yi.l.liu@intel.com/
+
+	- Patch v4 -> Patch v5:
+	  a) Address comments against v4
+	  Patch v4: https://lore.kernel.org/kvm/1593861989-35920-1-git-send-email-yi.l.liu@intel.com/
+
+	- Patch v3 -> Patch v4:
+	  a) Address comments against v3
+	  b) Add rb from Stefan on patch 14/15
+	  Patch v3: https://lore.kernel.org/kvm/1592988927-48009-1-git-send-email-yi.l.liu@intel.com/
+
+	- Patch v2 -> Patch v3:
+	  a) Rebase on top of Jacob's v3 iommu uapi patchset
+	  b) Address comments from Kevin and Stefan Hajnoczi
+	  c) Reuse DOMAIN_ATTR_NESTING to get iommu nesting info
+	  d) Drop [PATCH v2 07/15] iommu/uapi: Add iommu_gpasid_unbind_data
+	  Patch v2: https://lore.kernel.org/kvm/1591877734-66527-1-git-send-email-yi.l.liu@intel.com/
+
+	- Patch v1 -> Patch v2:
+	  a) Refactor vfio_iommu_type1_ioctl() per suggestion from Christoph
+	     Hellwig.
+	  b) Re-sequence the patch series for better bisect support.
+	  c) Report IOMMU nesting cap info in detail instead of a format in
+	     v1.
+	  d) Enforce one group per nesting type container for vfio iommu type1
+	     driver.
+	  e) Build the vfio_mm related code from vfio.c to be a separate
+	     vfio_pasid.ko.
+	  f) Add PASID ownership check in IOMMU driver.
+	  g) Adopted to latest IOMMU UAPI design. Removed IOMMU UAPI version
+	     check. Added iommu_gpasid_unbind_data for unbind requests from
+	     userspace.
+	  h) Define a single ioctl:VFIO_IOMMU_NESTING_OP for bind/unbind_gtbl
+	     and cahce_invld.
+	  i) Document dual stage control in vfio.rst.
+	  Patch v1: https://lore.kernel.org/kvm/1584880325-10561-1-git-send-email-yi.l.liu@intel.com/
+
+	- RFC v3 -> Patch v1:
+	  a) Address comments to the PASID request(alloc/free) path
+	  b) Report PASID alloc/free availabitiy to user-space
+	  c) Add a vfio_iommu_type1 parameter to support pasid quota tuning
+	  d) Adjusted to latest ioasid code implementation. e.g. remove the
+	     code for tracking the allocated PASIDs as latest ioasid code
+	     will track it, VFIO could use ioasid_free_set() to free all
+	     PASIDs.
+	  RFC v3: https://lore.kernel.org/kvm/1580299912-86084-1-git-send-email-yi.l.liu@intel.com/
+
+	- RFC v2 -> v3:
+	  a) Refine the whole patchset to fit the roughly parts in this series
+	  b) Adds complete vfio PASID management framework. e.g. pasid alloc,
+	  free, reclaim in VM crash/down and per-VM PASID quota to prevent
+	  PASID abuse.
+	  c) Adds IOMMU uAPI version check and page table format check to ensure
+	  version compatibility and hardware compatibility.
+	  d) Adds vSVA vfio support for IOMMU-backed mdevs.
+	  RFC v2: https://lore.kernel.org/kvm/1571919983-3231-1-git-send-email-yi.l.liu@intel.com/
+
+	- RFC v1 -> v2:
+	  Dropped vfio: VFIO_IOMMU_ATTACH/DETACH_PASID_TABLE.
+	  RFC v1: https://lore.kernel.org/kvm/1562324772-3084-1-git-send-email-yi.l.liu@intel.com/
+
+---
+Eric Auger (1):
+  vfio: Document dual stage control
+
+Liu Yi L (8):
+  iommu: Report domain nesting info
+  iommu/smmu: Report empty domain nesting info
+  vfio/type1: Report iommu nesting info to userspace
+  vfio/type1: Support binding guest page tables to PASID
+  vfio/type1: Allow invalidating first-level/stage IOMMU cache
+  vfio/type1: Add vSVA support for IOMMU-backed mdevs
+  vfio/pci: Expose PCIe PASID capability to userspace
+  iommu/vt-d: Support reporting nesting capability info
+
+Yi Sun (1):
+  iommu: Pass domain to sva_unbind_gpasid()
+
+ Documentation/driver-api/vfio.rst           |  77 +++++
+ Documentation/userspace-api/iommu.rst       |   5 +-
+ drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c |  29 +-
+ drivers/iommu/arm/arm-smmu/arm-smmu.c       |  29 +-
+ drivers/iommu/intel/cap_audit.h             |   7 +
+ drivers/iommu/intel/iommu.c                 |  68 ++++-
+ drivers/iommu/intel/svm.c                   |   3 +-
+ drivers/iommu/iommu.c                       |   2 +-
+ drivers/vfio/pci/vfio_pci_config.c          |   2 +-
+ drivers/vfio/vfio_iommu_type1.c             | 321 +++++++++++++++++++-
+ include/linux/intel-iommu.h                 |   3 +-
+ include/linux/iommu.h                       |   3 +-
+ include/uapi/linux/iommu.h                  |  72 +++++
+ include/uapi/linux/vfio.h                   |  57 ++++
+ 14 files changed, 651 insertions(+), 27 deletions(-)
+
+-- 
+2.25.1
+
