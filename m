@@ -2,146 +2,154 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C75C932A718
-	for <lists+kvm@lfdr.de>; Tue,  2 Mar 2021 18:06:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4ED7932A719
+	for <lists+kvm@lfdr.de>; Tue,  2 Mar 2021 18:06:53 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1449053AbhCBQDt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 2 Mar 2021 11:03:49 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:32992 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1443480AbhCBL55 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 2 Mar 2021 06:57:57 -0500
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 122BZCNO139215
-        for <kvm@vger.kernel.org>; Tue, 2 Mar 2021 06:41:15 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=ugfY0Whd30EIeUTNSVFcLdYnAAqB+5AWjdKqivTiCG4=;
- b=D+eGHvbfivG+gU7gi0rAq+hpiPBx281MbIs34AuOQjeelcMZGsxMY7g3/LQpCwCrW4W3
- 3MEA6Kuj09xHRPnT3xxsmOYq3O6kyseyN+txAy9PHh67f0PnRUr+ID9nUHbxlY9AYOIq
- RezENV5Vh7YSK1KwgZ4NCiMshBltyHbif8XubmXVRDPiQ3aEW5Rngg9hGkO5i+pCugZF
- Q14BU5sKC0/KAx7cdWEVWRqit29XchrTONgam+rmePJRZAAtpC5JC8QOIbz1yQpWorIB
- EfJUxrXm/X1GxTeN6mSHjP5RNwej75YVzT8mFeEfz5Y2qKSyDFfoQewjUcsfQBh7GwZO IQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 371gvar9u1-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Tue, 02 Mar 2021 06:41:15 -0500
-Received: from m0098394.ppops.net (m0098394.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 122BZmVW142051
-        for <kvm@vger.kernel.org>; Tue, 2 Mar 2021 06:41:14 -0500
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 371gvar9t4-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 02 Mar 2021 06:41:14 -0500
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 122BbBC2009192;
-        Tue, 2 Mar 2021 11:41:12 GMT
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
-        by ppma04ams.nl.ibm.com with ESMTP id 3712fmgsqw-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 02 Mar 2021 11:41:12 +0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 122Bf9g421823882
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 2 Mar 2021 11:41:09 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 7688BAE045;
-        Tue,  2 Mar 2021 11:41:09 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 1E257AE053;
-        Tue,  2 Mar 2021 11:41:09 +0000 (GMT)
-Received: from ibm-vm.ibmuc.com (unknown [9.145.10.194])
-        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue,  2 Mar 2021 11:41:09 +0000 (GMT)
-From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
-To:     kvm@vger.kernel.org
-Cc:     david@redhat.com, thuth@redhat.com, frankja@linux.ibm.com,
-        cohuck@redhat.com, pmorel@linux.ibm.com, borntraeger@de.ibm.com
-Subject: [kvm-unit-tests PATCH v4 3/3] s390x: mvpg: skip some tests when using TCG
-Date:   Tue,  2 Mar 2021 12:41:07 +0100
-Message-Id: <20210302114107.501837-4-imbrenda@linux.ibm.com>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20210302114107.501837-1-imbrenda@linux.ibm.com>
-References: <20210302114107.501837-1-imbrenda@linux.ibm.com>
+        id S1449062AbhCBQDw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 2 Mar 2021 11:03:52 -0500
+Received: from foss.arm.com ([217.140.110.172]:50316 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1383775AbhCBMHx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 2 Mar 2021 07:07:53 -0500
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9BA7911D4;
+        Tue,  2 Mar 2021 04:04:03 -0800 (PST)
+Received: from ewhatever.cambridge.arm.com (ewhatever.cambridge.arm.com [10.1.197.1])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 12A663F766;
+        Tue,  2 Mar 2021 04:04:01 -0800 (PST)
+From:   Suzuki K Poulose <suzuki.poulose@arm.com>
+To:     maz@kernel.org
+Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, anshuman.khandual@arm.com,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        stable@vger.kernel.org,
+        Christoffer Dall <christoffer.dall@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>
+Subject: [PATCH] kvm: arm64: nvhe: Save the SPE context early
+Date:   Tue,  2 Mar 2021 12:03:45 +0000
+Message-Id: <20210302120345.3102874-1-suzuki.poulose@arm.com>
+X-Mailer: git-send-email 2.24.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.761
- definitions=2021-03-02_03:2021-03-01,2021-03-02 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 mlxscore=0
- lowpriorityscore=0 priorityscore=1501 mlxlogscore=999 adultscore=0
- suspectscore=0 malwarescore=0 phishscore=0 impostorscore=0 clxscore=1015
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2103020098
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-TCG is known to fail these tests, so add an explicit exception to skip them.
+The nVHE KVM hyp drains and disables the SPE buffer, before
+entering the guest, as the EL1&0 translation regime
+is going to be loaded with that of the guest.
 
-Once TCG has been fixed, it will be enough to revert this patch.
+But this operation is performed way too late, because :
+  - The owning translation regime of the SPE buffer
+    is transferred to EL2. (MDCR_EL2_E2PB == 0)
+  - The guest Stage1 is loaded.
 
-Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+Thus the flush could use the host EL1 virtual address,
+but use the EL2 translations instead of host EL1, for writing
+out any cached data.
+
+Fix this by moving the SPE buffer handling early enough.
+The restore path is doing the right thing.
+
+Fixes: 014c4c77aad7 ("KVM: arm64: Improve debug register save/restore flow")
+Cc: stable@vger.kernel.org
+Cc: Christoffer Dall <christoffer.dall@arm.com>
+Cc: Marc Zyngier <maz@kernel.org>
+Cc: Will Deacon <will@kernel.org>
+Cc: Catalin Marinas <catalin.marinas@arm.com>
+Cc: Mark Rutland <mark.rutland@arm.com>
+Cc: Alexandru Elisei <alexandru.elisei@arm.com>
+Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
+Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 ---
- s390x/mvpg.c | 34 ++++++++++++++++++++++------------
- 1 file changed, 22 insertions(+), 12 deletions(-)
+ arch/arm64/include/asm/kvm_hyp.h   |  5 +++++
+ arch/arm64/kvm/hyp/nvhe/debug-sr.c | 12 ++++++++++--
+ arch/arm64/kvm/hyp/nvhe/switch.c   | 11 ++++++++++-
+ 3 files changed, 25 insertions(+), 3 deletions(-)
 
-diff --git a/s390x/mvpg.c b/s390x/mvpg.c
-index 1776ec6e..5743d5b6 100644
---- a/s390x/mvpg.c
-+++ b/s390x/mvpg.c
-@@ -20,6 +20,7 @@
- #include <smp.h>
- #include <alloc_page.h>
- #include <bitops.h>
-+#include <vm.h>
+diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
+index c0450828378b..385bd7dd3d39 100644
+--- a/arch/arm64/include/asm/kvm_hyp.h
++++ b/arch/arm64/include/asm/kvm_hyp.h
+@@ -83,6 +83,11 @@ void sysreg_restore_guest_state_vhe(struct kvm_cpu_context *ctxt);
+ void __debug_switch_to_guest(struct kvm_vcpu *vcpu);
+ void __debug_switch_to_host(struct kvm_vcpu *vcpu);
  
- /* Used to build the appropriate test values for register 0 */
- #define KFC(x) ((x) << 10)
-@@ -225,20 +226,29 @@ static void test_mmu_prot(void)
- 	report(clear_pgm_int() == PGM_INT_CODE_PROTECTION, "destination read only");
- 	fresh += PAGE_SIZE;
++#ifdef __KVM_NVHE_HYPERVISOR__
++void __debug_save_host_buffers_nvhe(struct kvm_vcpu *vcpu);
++void __debug_restore_host_buffers_nvhe(struct kvm_vcpu *vcpu);
++#endif
++
+ void __fpsimd_save_state(struct user_fpsimd_state *fp_regs);
+ void __fpsimd_restore_state(struct user_fpsimd_state *fp_regs);
  
--	protect_page(fresh, PAGE_ENTRY_I);
--	cc = mvpg(CCO, fresh, source);
--	report(cc == 1, "destination invalid");
--	fresh += PAGE_SIZE;
-+	/* Known issue in TCG: CCO flag is not honoured */
-+	if (vm_is_tcg()) {
-+		report_prefix_push("TCG");
-+		report_skip("destination invalid");
-+		report_skip("source invalid");
-+		report_skip("source and destination invalid");
-+		report_prefix_pop();
-+	} else {
-+		protect_page(fresh, PAGE_ENTRY_I);
-+		cc = mvpg(CCO, fresh, source);
-+		report(cc == 1, "destination invalid");
-+		fresh += PAGE_SIZE;
+diff --git a/arch/arm64/kvm/hyp/nvhe/debug-sr.c b/arch/arm64/kvm/hyp/nvhe/debug-sr.c
+index 91a711aa8382..f401724f12ef 100644
+--- a/arch/arm64/kvm/hyp/nvhe/debug-sr.c
++++ b/arch/arm64/kvm/hyp/nvhe/debug-sr.c
+@@ -58,16 +58,24 @@ static void __debug_restore_spe(u64 pmscr_el1)
+ 	write_sysreg_s(pmscr_el1, SYS_PMSCR_EL1);
+ }
  
--	protect_page(source, PAGE_ENTRY_I);
--	cc = mvpg(CCO, fresh, source);
--	report(cc == 2, "source invalid");
--	fresh += PAGE_SIZE;
-+		protect_page(source, PAGE_ENTRY_I);
-+		cc = mvpg(CCO, fresh, source);
-+		report(cc == 2, "source invalid");
-+		fresh += PAGE_SIZE;
+-void __debug_switch_to_guest(struct kvm_vcpu *vcpu)
++void __debug_save_host_buffers_nvhe(struct kvm_vcpu *vcpu)
+ {
+ 	/* Disable and flush SPE data generation */
+ 	__debug_save_spe(&vcpu->arch.host_debug_state.pmscr_el1);
++}
++
++void __debug_switch_to_guest(struct kvm_vcpu *vcpu)
++{
+ 	__debug_switch_to_guest_common(vcpu);
+ }
  
--	protect_page(fresh, PAGE_ENTRY_I);
--	cc = mvpg(CCO, fresh, source);
--	report(cc == 2, "source and destination invalid");
--	fresh += PAGE_SIZE;
-+		protect_page(fresh, PAGE_ENTRY_I);
-+		cc = mvpg(CCO, fresh, source);
-+		report(cc == 2, "source and destination invalid");
-+		fresh += PAGE_SIZE;
-+	}
+-void __debug_switch_to_host(struct kvm_vcpu *vcpu)
++void __debug_restore_host_buffers_nvhe(struct kvm_vcpu *vcpu)
+ {
+ 	__debug_restore_spe(vcpu->arch.host_debug_state.pmscr_el1);
++}
++
++void __debug_switch_to_host(struct kvm_vcpu *vcpu)
++{
+ 	__debug_switch_to_host_common(vcpu);
+ }
  
- 	unprotect_page(source, PAGE_ENTRY_I);
- 	report_prefix_pop();
+diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
+index f3d0e9eca56c..59aa1045fdaf 100644
+--- a/arch/arm64/kvm/hyp/nvhe/switch.c
++++ b/arch/arm64/kvm/hyp/nvhe/switch.c
+@@ -192,6 +192,14 @@ int __kvm_vcpu_run(struct kvm_vcpu *vcpu)
+ 	pmu_switch_needed = __pmu_switch_to_guest(host_ctxt);
+ 
+ 	__sysreg_save_state_nvhe(host_ctxt);
++	/*
++	 * We must flush and disable the SPE buffer for nVHE, as
++	 * the translation regime(EL1&0) is going to be loaded with
++	 * that of the guest. And we must do this before we change the
++	 * translation regime to EL2 (via MDCR_EL2_E2PB == 0) and
++	 * before we load guest Stage1.
++	 */
++	__debug_save_host_buffers_nvhe(vcpu);
+ 
+ 	__adjust_pc(vcpu);
+ 
+@@ -234,11 +242,12 @@ int __kvm_vcpu_run(struct kvm_vcpu *vcpu)
+ 	if (vcpu->arch.flags & KVM_ARM64_FP_ENABLED)
+ 		__fpsimd_save_fpexc32(vcpu);
+ 
++	__debug_switch_to_host(vcpu);
+ 	/*
+ 	 * This must come after restoring the host sysregs, since a non-VHE
+ 	 * system may enable SPE here and make use of the TTBRs.
+ 	 */
+-	__debug_switch_to_host(vcpu);
++	__debug_restore_host_buffers_nvhe(vcpu);
+ 
+ 	if (pmu_switch_needed)
+ 		__pmu_switch_to_host(host_ctxt);
 -- 
-2.26.2
+2.24.1
 
