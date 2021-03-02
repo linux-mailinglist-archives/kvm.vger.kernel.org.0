@@ -2,134 +2,125 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5D36332B56D
+	by mail.lfdr.de (Postfix) with ESMTP id CFB6532B56E
 	for <lists+kvm@lfdr.de>; Wed,  3 Mar 2021 08:21:32 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239364AbhCCHPB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 3 Mar 2021 02:15:01 -0500
-Received: from hqnvemgate26.nvidia.com ([216.228.121.65]:8980 "EHLO
-        hqnvemgate26.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1349743AbhCBRYV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 2 Mar 2021 12:24:21 -0500
-Received: from hqmail.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate26.nvidia.com (using TLS: TLSv1.2, AES256-SHA)
-        id <B603e72d50001>; Tue, 02 Mar 2021 09:16:05 -0800
-Received: from HKMAIL104.nvidia.com (10.18.16.13) by HQMAIL105.nvidia.com
- (172.20.187.12) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Tue, 2 Mar
- 2021 17:16:04 +0000
-Received: from HKMAIL101.nvidia.com (10.18.16.10) by HKMAIL104.nvidia.com
- (10.18.16.13) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Tue, 2 Mar
- 2021 17:15:55 +0000
-Received: from NAM04-MW2-obe.outbound.protection.outlook.com (104.47.73.175)
- by HKMAIL101.nvidia.com (10.18.16.10) with Microsoft SMTP Server (TLS) id
- 15.0.1497.2 via Frontend Transport; Tue, 2 Mar 2021 17:15:55 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=UisxayQgSA4FpKnGtW+fwOD1zHuG9pxno1f8UvK3TayBvQfA/B3qHNSK1k2bGzM+8+WQhfB5Enk/sw70aqR7+UXXqUbrWpkTlTc7C+CXag1ttev4/9kaG9KuxGRkVyWG/tSCrOH7nRuBAsLOHpSw0xad5qSF84BXzV/VQfm/YHRxb3mUVTACPdqxNytTsHpuF9MBeWj8PgMQWOD1K6XwelAvp7Zm0zqw85FVehCcDmdlH9ouInRMtjfX872vL2emqH+0eKf3qVRvT9sWstyQ1hXla2DsbegJlheBuTz5ZN7ppSdlmi9XVkih0ydn+E/zIJNtpufAsq7NM8hUuUnjMQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=3oQlEGY42G/OLU9PJunjf7j8qctAJH22IeNnf2g4K0A=;
- b=H9sehWf05Sf5GZVlBTRSY/Tq7Wyxbj+Lkl92ZvFvPE2rOWtdutBAJvOttbaUaUNcN1rEhJoeLbziwmQC5no6tGf836ZMlln0bX90NaL8mCyPO5h8rKE1q6sZtrwXdb4OhLVZAUkk9gNZMkaxI6igcY/vYtyFMFCvn76Q5ws+vWyx24VkjNvWfnn5sXSlsHHwZhhDaAF4iKSmeVFiQppWZAGoefW5msGACqo+LT3jmsmUQm12kFA21KtGsFeTMkodPGn2noskQcllHb0Ni3o27Dlp7jALLXF3OJUzMfxxqn12PLOwyk90eDLHbpe6tEkN1f5vyqocqDe/G3AjVuoq7A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-Received: from DM6PR12MB3834.namprd12.prod.outlook.com (2603:10b6:5:14a::12)
- by DM5PR12MB1243.namprd12.prod.outlook.com (2603:10b6:3:74::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3890.20; Tue, 2 Mar
- 2021 17:15:52 +0000
-Received: from DM6PR12MB3834.namprd12.prod.outlook.com
- ([fe80::1c62:7fa3:617b:ab87]) by DM6PR12MB3834.namprd12.prod.outlook.com
- ([fe80::1c62:7fa3:617b:ab87%6]) with mapi id 15.20.3912.017; Tue, 2 Mar 2021
- 17:15:52 +0000
-Date:   Tue, 2 Mar 2021 13:15:51 -0400
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Jacob Pan <jacob.jun.pan@linux.intel.com>
-CC:     Liu Yi L <yi.l.liu@intel.com>, <alex.williamson@redhat.com>,
-        <eric.auger@redhat.com>, <baolu.lu@linux.intel.com>,
-        <joro@8bytes.org>, <kevin.tian@intel.com>, <ashok.raj@intel.com>,
-        <jun.j.tian@intel.com>, <yi.y.sun@intel.com>,
-        <jean-philippe@linaro.org>, <peterx@redhat.com>,
-        <jasowang@redhat.com>, <hao.wu@intel.com>, <stefanha@gmail.com>,
-        <iommu@lists.linux-foundation.org>, <kvm@vger.kernel.org>,
-        <Lingshan.Zhu@intel.com>, <vivek.gautam@arm.com>
-Subject: Re: [Patch v8 04/10] vfio/type1: Support binding guest page tables
- to PASID
-Message-ID: <20210302171551.GK4247@nvidia.com>
-References: <20210302203545.436623-1-yi.l.liu@intel.com>
- <20210302203545.436623-5-yi.l.liu@intel.com>
- <20210302125628.GI4247@nvidia.com> <20210302091319.1446a47b@jacob-builder>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20210302091319.1446a47b@jacob-builder>
-X-ClientProxiedBy: MN2PR19CA0021.namprd19.prod.outlook.com
- (2603:10b6:208:178::34) To DM6PR12MB3834.namprd12.prod.outlook.com
- (2603:10b6:5:14a::12)
+        id S240800AbhCCHPs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 3 Mar 2021 02:15:48 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47944 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1446560AbhCBRaF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 2 Mar 2021 12:30:05 -0500
+Received: from mail-pf1-x42c.google.com (mail-pf1-x42c.google.com [IPv6:2607:f8b0:4864:20::42c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D8239C061223
+        for <kvm@vger.kernel.org>; Tue,  2 Mar 2021 09:16:48 -0800 (PST)
+Received: by mail-pf1-x42c.google.com with SMTP id t29so14233415pfg.11
+        for <kvm@vger.kernel.org>; Tue, 02 Mar 2021 09:16:48 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=Ldg8M6N/OFEgwkYYvOKSVPLbYJ0qxhkHRj9/dN3vWoY=;
+        b=fhP2FKczCgCGk0pmQY2wn1hzRdo+XpFeRb+x+FuMga49qBJ8BVrJKmQV2rmTX0C7Js
+         kJy/Zdr97Dq+p7oiCw9HjXdYY3Q+3UYB+fVA/gl6s0PKBnBm1A32JqFDCMILKXRGKrzB
+         B55DIQPf5UGBLEEvoszcN676t8XyXdr2+2gqSerPy1O6z50N/ywiJsYHk+I3CGya8gS7
+         vbIllhWSQ+7/7ttkKC4f2T1KfncL7U/dIyeW9naMCLsrD6/Mdv8vs3Z+GeI3sLfktGz3
+         usfjr/W5oMFt4FAJ4HKsXvkjqa3gR4vI1/mz7oCJsl7rSUp/jkzqrrrvcSANdyNE0Ngf
+         tT4A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=Ldg8M6N/OFEgwkYYvOKSVPLbYJ0qxhkHRj9/dN3vWoY=;
+        b=TSO5gLlU8oQ51vGzI6qAOjC0QGtbFECnZXLAz+HYhNhyMQZBEZdszFZ8Gr33M4TP+x
+         Lnr8ZApmA0xFcGXz0rdGGYLXcOaedvIVjkDBQs3qRr8BOuuTh9f1h0WWXxGGLCIsjhfk
+         U9CLC6QjZsatHId6fRBJ2vU0/aKnhduk/0gOQk3cYYVJpYXlFa5sKg+TVutg2Rc+PH/+
+         vxUHxwTf/bQw01HrdDCG0JD67OkQmGJvmUgAix6F20JMmkCTyvE41B7W+OdUav7u4dJk
+         WZuwezv5P55UnxUtfyXuBOH9zSDTKLDY9X1gcXJZQhpd3zbOt/mAZYbFxZUUQeu9Ry3U
+         U+0A==
+X-Gm-Message-State: AOAM531hwBpOGQIDdn+7g85xERuMk1ze1u5mKpoBRYbwMeRiyr4GlSeP
+        pMZaH3OcmJyF8/5kzyswLbngRw==
+X-Google-Smtp-Source: ABdhPJy/7/d0mTvPy7idBBwJCcpwE/oMOpLanp9ksHSGVxAJw9GO2Jgfl3YwqDJfEj50tctZqFULUw==
+X-Received: by 2002:a62:16c9:0:b029:1ed:df04:8fcf with SMTP id 192-20020a6216c90000b02901eddf048fcfmr20975877pfw.63.1614705408175;
+        Tue, 02 Mar 2021 09:16:48 -0800 (PST)
+Received: from google.com ([2620:15c:f:10:805d:6324:3372:6183])
+        by smtp.gmail.com with ESMTPSA id c29sm20045500pgb.58.2021.03.02.09.16.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 02 Mar 2021 09:16:47 -0800 (PST)
+Date:   Tue, 2 Mar 2021 09:16:41 -0800
+From:   Sean Christopherson <seanjc@google.com>
+To:     Wanpeng Li <kernellwp@gmail.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>
+Subject: Re: [PATCH] KVM: LAPIC: Advancing the timer expiration on guest
+ initiated write
+Message-ID: <YD5y+W2nqnZt5bRZ@google.com>
+References: <1614678202-10808-1-git-send-email-wanpengli@tencent.com>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from mlx.ziepe.ca (142.162.115.133) by MN2PR19CA0021.namprd19.prod.outlook.com (2603:10b6:208:178::34) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3912.17 via Frontend Transport; Tue, 2 Mar 2021 17:15:52 +0000
-Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1lH8ch-004GgH-1X; Tue, 02 Mar 2021 13:15:51 -0400
-X-Header: ProcessedBy-CMR-outbound
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
-        t=1614705365; bh=3oQlEGY42G/OLU9PJunjf7j8qctAJH22IeNnf2g4K0A=;
-        h=ARC-Seal:ARC-Message-Signature:ARC-Authentication-Results:Date:
-         From:To:CC:Subject:Message-ID:References:Content-Type:
-         Content-Disposition:In-Reply-To:X-ClientProxiedBy:MIME-Version:
-         X-MS-Exchange-MessageSentRepresentingType:X-Header;
-        b=fZ3amAQSGUUdVYItRVwWYaLI1JP4P62+SmtzHY5gHB4qez+BySeNe+yYRvYVUge1/
-         7op6B7HL6ypWZsrxjF+juTNXMUfbDRfH25iehP+bf97T4PmsoaJEBIK+Z8j+G94NFu
-         ChMBKeqM3A/I1fI4EQoraiubzH3yHH5mNulT9Kua35O9oXpf5aHLqrErqVwoOECqMR
-         qW+vVaTzxnxawQmZ9I+V0PVFFfXpM/bn+5jGMbH500WaqytBfwF6Nt0XcrR7oBCPj6
-         LW7ZHBmkrdRmVfqbX4uO5vHKF7Sh63iLiZ21kq7fN8B0tVl+K2B/Ynf7T+3VSQzSM4
-         diPkj+o9/5/Jw==
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1614678202-10808-1-git-send-email-wanpengli@tencent.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Mar 02, 2021 at 09:13:19AM -0800, Jacob Pan wrote:
-> Hi Jason,
+On Tue, Mar 02, 2021, Wanpeng Li wrote:
+> From: Wanpeng Li <wanpengli@tencent.com>
 > 
-> On Tue, 2 Mar 2021 08:56:28 -0400, Jason Gunthorpe <jgg@nvidia.com> wrote:
+> Advancing the timer expiration should only be necessary on guest initiated 
+> writes. Now, we cancel the timer, clear .pending and clear expired_tscdeadline 
+> at the same time during state restore.
+
+That last sentence is confusing.  kvm_apic_set_state() already clears .pending,
+by way of __start_apic_timer().  I think what you mean is:
+
+  When we cancel the timer and clear .pending during state restore, clear
+  expired_tscdeadline as well.
+
+With that, 
+
+Reviewed-by: Sean Christopherson <seanjc@google.com> 
+
+
+Side topic, I think there's a theoretical bug where KVM could inject a spurious
+timer interrupt.  If KVM is using hrtimer, the hrtimer expires early due to an
+overzealous timer_advance_ns, and the guest writes MSR_TSCDEADLINE after the
+hrtimer expires but before the vCPU is kicked, then KVM will inject a spurious
+timer IRQ since the premature expiration should have been canceled by the guest's
+WRMSR.
+
+It could also cause KVM to soft hang the guest if the new lapic_timer.tscdeadline
+is written before apic_timer_expired() captures it in expired_tscdeadline.  In
+that case, KVM will wait for the new deadline, which could be far in the future.
+
+
+Side topic #2, I'm pretty sure the direct usage of kvm_wait_lapic_expire() in
+apic_timer_expired() before kvm_apic_inject_pending_timer_irqs() is broken.
+kvm_wait_lapic_expire() requires the interrupt to be pending, but that never
+happens if PI is used, and even if PI "fails", the IRQ isn't injected until the
+next line, kvm_apic_inject_pending_timer_irqs().  I'll send a patch.
+
+> Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
+> ---
+>  arch/x86/kvm/lapic.c | 1 +
+>  1 file changed, 1 insertion(+)
 > 
-> > On Wed, Mar 03, 2021 at 04:35:39AM +0800, Liu Yi L wrote:
-> > >  
-> > > +static int vfio_dev_bind_gpasid_fn(struct device *dev, void *data)
-> > > +{
-> > > +	struct domain_capsule *dc = (struct domain_capsule *)data;
-> > > +	unsigned long arg = *(unsigned long *)dc->data;
-> > > +
-> > > +	return iommu_uapi_sva_bind_gpasid(dc->domain, dev,
-> > > +					  (void __user *)arg);  
-> > 
-> > This arg buisness is really tortured. The type should be set at the
-> > ioctl, not constantly passed down as unsigned long or worse void *.
-> > 
-> > And why is this passing a __user pointer deep into an iommu_* API??
-> > 
-> The idea was that IOMMU UAPI (not API) is independent of VFIO or other user
-> driver frameworks. The design is documented here:
-> Documentation/userspace-api/iommu.rst
-> IOMMU UAPI handles the type and sanitation of user provided data.
-
-Why? If it is uapi it has defined types and those types should be
-completely clear from the C code, not obfuscated.
-
-I haven't looked at the design doc yet, but this is a just a big red
-flag, you shouldn't be tunneling one subsytems uAPI through another
-subsystem.
-
-If you need to hook two subsystems together it should be more
-directly, like VFIO takes in the IOMMU FD and 'registers' itself in
-some way with the IOMMU then you can do the IOMMU actions through the
-IOMMU FD and it can call back to VFIO as needed.
-
-At least in this way we can swap VFIO for other things in the API.
-
-Having every subsystem that wants to implement IOMMU also implement
-tunneled ops seems very backwards.
-
-> Could you be more specific about your concerns?
-
-Avoid using unsigned long, void * and flex arrays to describe
-concretely typed things.
-
-Jason
+> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+> index 45d40bf..f2b6e79 100644
+> --- a/arch/x86/kvm/lapic.c
+> +++ b/arch/x86/kvm/lapic.c
+> @@ -2595,6 +2595,7 @@ int kvm_apic_set_state(struct kvm_vcpu *vcpu, struct kvm_lapic_state *s)
+>  
+>  	apic_update_ppr(apic);
+>  	hrtimer_cancel(&apic->lapic_timer.timer);
+> +	apic->lapic_timer.expired_tscdeadline = 0;
+>  	apic_update_lvtt(apic);
+>  	apic_manage_nmi_watchdog(apic, kvm_lapic_get_reg(apic, APIC_LVT0));
+>  	update_divide_count(apic);
+> -- 
+> 2.7.4
+> 
