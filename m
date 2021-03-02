@@ -2,115 +2,134 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 89B9C32B595
-	for <lists+kvm@lfdr.de>; Wed,  3 Mar 2021 08:41:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BFD3032B59B
+	for <lists+kvm@lfdr.de>; Wed,  3 Mar 2021 08:41:46 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1381078AbhCCHSc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 3 Mar 2021 02:18:32 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39880 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1581631AbhCBTBA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 2 Mar 2021 14:01:00 -0500
-Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 586FCC06178B
-        for <kvm@vger.kernel.org>; Tue,  2 Mar 2021 10:56:26 -0800 (PST)
-Received: by mail-pl1-x631.google.com with SMTP id k22so12560402pll.6
-        for <kvm@vger.kernel.org>; Tue, 02 Mar 2021 10:56:26 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=UakjRFV7I3zgiMcVHz9PtvL5bu+2z3t7UmhBb2UlaRo=;
-        b=KOCX7C/n+Giax9CXgQLNaBQzEb8gAwWJ0mMJs148tKVI2Z1/pG4LQoGmsvTtEBGKvr
-         yDrvvnI9NjgIE2Mv8gfq2rwz5L7zJpMp4LMG7WCMWuDstbzuIxbz/ZqELiyJVHNMF5w3
-         fFTXxk9P6pfeVcjBlbH1WOMAbxAKOAgjnSgPyfyA7qnRRVPShQR46EsMsYM1ORHrSHfB
-         xVuSCmvU5xZr2Y34isIfUWccfDO28BXczsobuwbvJGe6pgjPiTShcveau+lWSklRZ3rt
-         Ef4uVEn7/4yn76fOPbbCsrLsDfFYpL1lNd9thhIq3UKuwfR0/MNk0hE2xP5263Otab7U
-         Mrzw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=UakjRFV7I3zgiMcVHz9PtvL5bu+2z3t7UmhBb2UlaRo=;
-        b=lxcOP+HTG4R2Q2LQ4SBcA37ODbP4cRJ7cchkKO6cQqO2H2jvvjlSNhUpqX41Tv25kw
-         wPvhunFTeOK+1yRfVBI/Y3S+hRn+YzowsTtdDDXR00CB8NPueJGbVQ8S77MIBOaIhtOo
-         FXF1zvga0fjFyQP3txNIiH12CXLdFzkzdM06HV+Fx3ePgiSs5+B3eIfe6tg1TzIK7Ike
-         tqbQ8vtwRiPBqHcIF6+2mwD5+eNTxZeeAPmFZvfi5TWfaYPnVIYqgwSHd0uI2gKwCqHZ
-         iuJbFoY4cAlD9BLzB7qVqGUwdHcS/ccSbF5LdEmoiuF5XPqBInyIn8FAxSMWhagQA6Wb
-         yhlA==
-X-Gm-Message-State: AOAM532H+ry1kuBTRicb4k+QOaWDYvpMTGeppFH+hHX4juQyPG0faQre
-        92vhqBza1NTyfoH3JdZfkDYAyQ==
-X-Google-Smtp-Source: ABdhPJz/3iWxNd/0QEjau5XG3vSh9x0ae3R/TPebaeYLJJ/xMuUMzOpoGvO+Wy+HJKTG0YdOE1v9gw==
-X-Received: by 2002:a17:90a:cd06:: with SMTP id d6mr5755840pju.138.1614711385768;
-        Tue, 02 Mar 2021 10:56:25 -0800 (PST)
-Received: from google.com ([2620:15c:f:10:805d:6324:3372:6183])
-        by smtp.gmail.com with ESMTPSA id z11sm20733810pgc.6.2021.03.02.10.56.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 02 Mar 2021 10:56:25 -0800 (PST)
-Date:   Tue, 2 Mar 2021 10:56:18 -0800
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 00/11] KVM: VMX: Clean up Hyper-V PV TLB flush
-Message-ID: <YD6KUoZGE2UASLa5@google.com>
-References: <20201027212346.23409-1-sean.j.christopherson@intel.com>
- <7ed340f1-f6f7-4682-65be-6bc02f25d612@redhat.com>
+        id S1381489AbhCCHSr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 3 Mar 2021 02:18:47 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:49630 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1835367AbhCBTEQ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 2 Mar 2021 14:04:16 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1614711769;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=pNI+Ky/EAJ5ZEIbf6MYJ2/dtzIOLZZYEqaCFj9rQGv8=;
+        b=EfSyo0vU3h8mMd5QSaqro0qMJ84PLkp5iJlwSJ4rL4Bcpzcd6VL89o2P0yATXgpYdtiow0
+        lGsVquvwP/YYI6NqgEEMhIWEXjUsU1cEG2nLors0KL5WMl2/8SLik7nTPSutxm+PpCBQoP
+        IKDadMnSDfkjwlreCVryioEy0Y0kDVc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-113-O-lWEGKGMTus8FZOmVjsuA-1; Tue, 02 Mar 2021 14:02:48 -0500
+X-MC-Unique: O-lWEGKGMTus8FZOmVjsuA-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 763BC102C851;
+        Tue,  2 Mar 2021 19:02:39 +0000 (UTC)
+Received: from [10.36.114.189] (ovpn-114-189.ams2.redhat.com [10.36.114.189])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 814B16C941;
+        Tue,  2 Mar 2021 19:02:35 +0000 (UTC)
+Subject: Re: [PATCH v1 7/9] memory: introduce RAM_NORESERVE and wire it up in
+ qemu_ram_mmap()
+To:     Peter Xu <peterx@redhat.com>
+Cc:     qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>,
+        Eduardo Habkost <ehabkost@redhat.com>,
+        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Igor Mammedov <imammedo@redhat.com>,
+        =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Murilo Opsfelder Araujo <muriloo@linux.ibm.com>,
+        Greg Kurz <groug@kaod.org>,
+        Liam Merwick <liam.merwick@oracle.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Igor Kotrasinski <i.kotrasinsk@partner.samsung.com>,
+        Juan Quintela <quintela@redhat.com>,
+        Stefan Weil <sw@weilnetz.de>, Thomas Huth <thuth@redhat.com>,
+        kvm@vger.kernel.org, qemu-s390x@nongnu.org
+References: <20210209134939.13083-1-david@redhat.com>
+ <20210209134939.13083-8-david@redhat.com> <20210302173243.GM397383@xz-x1>
+From:   David Hildenbrand <david@redhat.com>
+Organization: Red Hat GmbH
+Message-ID: <91613148-9ade-c192-4b73-0cb5a54ada98@redhat.com>
+Date:   Tue, 2 Mar 2021 20:02:34 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <7ed340f1-f6f7-4682-65be-6bc02f25d612@redhat.com>
+In-Reply-To: <20210302173243.GM397383@xz-x1>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jan 27, 2021, Paolo Bonzini wrote:
-> On 27/10/20 22:23, Sean Christopherson wrote:
-> > Clean up KVM's PV TLB flushing when running with EPT on Hyper-V, i.e. as
-> > a nested VMM.  No real goal in mind other than the sole patch in v1, which
-> > is a minor change to avoid a future mixup when TDX also wants to define
-> > .remote_flush_tlb.  Everything else is opportunistic clean up.
-> > 
-> > Patch 1 legitimately tested on VMX (no SVM), everything else effectively
-> > build tested only.
-> > 
-> > v3:
-> >    - Add a patch to pass the root_hpa instead of pgd to vmx_load_mmu_pgd()
-> >      and retrieve the active PCID only when necessary.  [Vitaly]
-> >    - Selectively collects reviews (skipped a few due to changes). [Vitaly]
-> >    - Explicitly invalidate hv_tlb_eptp instead of leaving it valid when
-> >      the mismatch tracker "knows" it's invalid. [Vitaly]
-> >    - Change the last patch to use "hv_root_ept" instead of "hv_tlb_pgd"
-> >      to better reflect what is actually being tracked.
-> > 
-> > v2: Rewrite everything.
-> > Sean Christopherson (11):
-> >    KVM: x86: Get active PCID only when writing a CR3 value
-> >    KVM: VMX: Track common EPTP for Hyper-V's paravirt TLB flush
-> >    KVM: VMX: Stash kvm_vmx in a local variable for Hyper-V paravirt TLB
-> >      flush
-> >    KVM: VMX: Fold Hyper-V EPTP checking into it's only caller
-> >    KVM: VMX: Do Hyper-V TLB flush iff vCPU's EPTP hasn't been flushed
-> >    KVM: VMX: Invalidate hv_tlb_eptp to denote an EPTP mismatch
-> >    KVM: VMX: Don't invalidate hv_tlb_eptp if the new EPTP matches
-> >    KVM: VMX: Explicitly check for hv_remote_flush_tlb when loading pgd
-> >    KVM: VMX: Define Hyper-V paravirt TLB flush fields iff Hyper-V is
-> >      enabled
-> >    KVM: VMX: Skip additional Hyper-V TLB EPTP flushes if one fails
-> >    KVM: VMX: Track root HPA instead of EPTP for paravirt Hyper-V TLB
-> >      flush
-> > 
-> >   arch/x86/include/asm/kvm_host.h |   4 +-
-> >   arch/x86/kvm/mmu.h              |   2 +-
-> >   arch/x86/kvm/svm/svm.c          |   4 +-
-> >   arch/x86/kvm/vmx/vmx.c          | 134 ++++++++++++++++++--------------
-> >   arch/x86/kvm/vmx/vmx.h          |  19 ++---
-> >   5 files changed, 87 insertions(+), 76 deletions(-)
-> > 
+On 02.03.21 18:32, Peter Xu wrote:
+> On Tue, Feb 09, 2021 at 02:49:37PM +0100, David Hildenbrand wrote:
+>> @@ -899,13 +899,17 @@ int kvm_s390_mem_op_pv(S390CPU *cpu, uint64_t offset, void *hostbuf,
+>>    * to grow. We also have to use MAP parameters that avoid
+>>    * read-only mapping of guest pages.
+>>    */
+>> -static void *legacy_s390_alloc(size_t size, uint64_t *align, bool shared)
+>> +static void *legacy_s390_alloc(size_t size, uint64_t *align, bool shared,
+>> +                               bool noreserve)
+>>   {
+>>       static void *mem;
+>>   
+>>       if (mem) {
+>>           /* we only support one allocation, which is enough for initial ram */
+>>           return NULL;
+>> +    } else if (noreserve) {
+>> +        error_report("Skipping reservation of swap space is not supported.");
+>> +        return NULL
 > 
-> Queued, thanks.
+> Semicolon missing.
 
-Looks like this got shadow-banned, I'll send v4.
+Thanks for catching that!
+
+> 
+>>       }
+>>   
+>>       mem = mmap((void *) 0x800000000ULL, size,
+>> diff --git a/util/mmap-alloc.c b/util/mmap-alloc.c
+>> index b50dc86a3c..bb99843106 100644
+>> --- a/util/mmap-alloc.c
+>> +++ b/util/mmap-alloc.c
+>> @@ -20,6 +20,7 @@
+>>   #include "qemu/osdep.h"
+>>   #include "qemu/mmap-alloc.h"
+>>   #include "qemu/host-utils.h"
+>> +#include "qemu/error-report.h"
+>>   
+>>   #define HUGETLBFS_MAGIC       0x958458f6
+>>   
+>> @@ -174,12 +175,18 @@ void *qemu_ram_mmap(int fd,
+>>                       size_t align,
+>>                       bool readonly,
+>>                       bool shared,
+>> -                    bool is_pmem)
+>> +                    bool is_pmem,
+>> +                    bool noreserve)
+> 
+> Maybe at some point we should use flags too here to cover all bools.
+> 
+
+Right. I guess the main point was to not reuse RAM_XXX.
+
+Should I introduce RAM_MMAP_XXX ?
+
+Thanks!
+
+-- 
+Thanks,
+
+David / dhildenb
+
