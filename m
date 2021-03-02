@@ -2,154 +2,230 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4ED7932A719
-	for <lists+kvm@lfdr.de>; Tue,  2 Mar 2021 18:06:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0913832A77F
+	for <lists+kvm@lfdr.de>; Tue,  2 Mar 2021 18:14:25 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1449062AbhCBQDw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 2 Mar 2021 11:03:52 -0500
-Received: from foss.arm.com ([217.140.110.172]:50316 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1383775AbhCBMHx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 2 Mar 2021 07:07:53 -0500
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9BA7911D4;
-        Tue,  2 Mar 2021 04:04:03 -0800 (PST)
-Received: from ewhatever.cambridge.arm.com (ewhatever.cambridge.arm.com [10.1.197.1])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 12A663F766;
-        Tue,  2 Mar 2021 04:04:01 -0800 (PST)
-From:   Suzuki K Poulose <suzuki.poulose@arm.com>
-To:     maz@kernel.org
-Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, anshuman.khandual@arm.com,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        stable@vger.kernel.org,
-        Christoffer Dall <christoffer.dall@arm.com>,
-        Will Deacon <will@kernel.org>,
+        id S1449236AbhCBQQw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 2 Mar 2021 11:16:52 -0500
+Received: from szxga05-in.huawei.com ([45.249.212.191]:13457 "EHLO
+        szxga05-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1447957AbhCBNyg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 2 Mar 2021 08:54:36 -0500
+Received: from DGGEMS412-HUB.china.huawei.com (unknown [172.30.72.58])
+        by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4Dqbjs4k32zjVL7;
+        Tue,  2 Mar 2021 20:17:37 +0800 (CST)
+Received: from [10.174.184.42] (10.174.184.42) by
+ DGGEMS412-HUB.china.huawei.com (10.3.19.212) with Microsoft SMTP Server id
+ 14.3.498.0; Tue, 2 Mar 2021 20:19:09 +0800
+Subject: Re: [RFC PATCH] kvm: arm64: Try stage2 block mapping for host device
+ MMIO
+To:     Marc Zyngier <maz@kernel.org>
+References: <20210122083650.21812-1-zhukeqian1@huawei.com>
+ <09d89355cdbbd19c456699774a9a980a@kernel.org>
+ <e4836dbc-4f7f-15fe-7b2c-e70bd2909bb7@huawei.com>
+CC:     <linux-kernel@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>, <kvm@vger.kernel.org>,
+        <kvmarm@lists.cs.columbia.edu>, Will Deacon <will@kernel.org>,
         Catalin Marinas <catalin.marinas@arm.com>,
         Mark Rutland <mark.rutland@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>
-Subject: [PATCH] kvm: arm64: nvhe: Save the SPE context early
-Date:   Tue,  2 Mar 2021 12:03:45 +0000
-Message-Id: <20210302120345.3102874-1-suzuki.poulose@arm.com>
-X-Mailer: git-send-email 2.24.1
+        James Morse <james.morse@arm.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Daniel Lezcano <daniel.lezcano@linaro.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        "Suzuki K Poulose" <suzuki.poulose@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Alexios Zavras <alexios.zavras@intel.com>,
+        <wanghaibin.wang@huawei.com>, <jiangkunkun@huawei.com>
+From:   Keqian Zhu <zhukeqian1@huawei.com>
+Message-ID: <8fda1c07-7f6e-065b-c3a1-5f6fa1aeb316@huawei.com>
+Date:   Tue, 2 Mar 2021 20:19:09 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
+ Thunderbird/45.7.1
 MIME-Version: 1.0
+In-Reply-To: <e4836dbc-4f7f-15fe-7b2c-e70bd2909bb7@huawei.com>
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.174.184.42]
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The nVHE KVM hyp drains and disables the SPE buffer, before
-entering the guest, as the EL1&0 translation regime
-is going to be loaded with that of the guest.
+Hi Marc,
 
-But this operation is performed way too late, because :
-  - The owning translation regime of the SPE buffer
-    is transferred to EL2. (MDCR_EL2_E2PB == 0)
-  - The guest Stage1 is loaded.
+Do you have further suggestion on this? Block mapping do bring obvious benefit.
 
-Thus the flush could use the host EL1 virtual address,
-but use the EL2 translations instead of host EL1, for writing
-out any cached data.
+Thanks,
+Keqian
 
-Fix this by moving the SPE buffer handling early enough.
-The restore path is doing the right thing.
-
-Fixes: 014c4c77aad7 ("KVM: arm64: Improve debug register save/restore flow")
-Cc: stable@vger.kernel.org
-Cc: Christoffer Dall <christoffer.dall@arm.com>
-Cc: Marc Zyngier <maz@kernel.org>
-Cc: Will Deacon <will@kernel.org>
-Cc: Catalin Marinas <catalin.marinas@arm.com>
-Cc: Mark Rutland <mark.rutland@arm.com>
-Cc: Alexandru Elisei <alexandru.elisei@arm.com>
-Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
-Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
----
- arch/arm64/include/asm/kvm_hyp.h   |  5 +++++
- arch/arm64/kvm/hyp/nvhe/debug-sr.c | 12 ++++++++++--
- arch/arm64/kvm/hyp/nvhe/switch.c   | 11 ++++++++++-
- 3 files changed, 25 insertions(+), 3 deletions(-)
-
-diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
-index c0450828378b..385bd7dd3d39 100644
---- a/arch/arm64/include/asm/kvm_hyp.h
-+++ b/arch/arm64/include/asm/kvm_hyp.h
-@@ -83,6 +83,11 @@ void sysreg_restore_guest_state_vhe(struct kvm_cpu_context *ctxt);
- void __debug_switch_to_guest(struct kvm_vcpu *vcpu);
- void __debug_switch_to_host(struct kvm_vcpu *vcpu);
- 
-+#ifdef __KVM_NVHE_HYPERVISOR__
-+void __debug_save_host_buffers_nvhe(struct kvm_vcpu *vcpu);
-+void __debug_restore_host_buffers_nvhe(struct kvm_vcpu *vcpu);
-+#endif
-+
- void __fpsimd_save_state(struct user_fpsimd_state *fp_regs);
- void __fpsimd_restore_state(struct user_fpsimd_state *fp_regs);
- 
-diff --git a/arch/arm64/kvm/hyp/nvhe/debug-sr.c b/arch/arm64/kvm/hyp/nvhe/debug-sr.c
-index 91a711aa8382..f401724f12ef 100644
---- a/arch/arm64/kvm/hyp/nvhe/debug-sr.c
-+++ b/arch/arm64/kvm/hyp/nvhe/debug-sr.c
-@@ -58,16 +58,24 @@ static void __debug_restore_spe(u64 pmscr_el1)
- 	write_sysreg_s(pmscr_el1, SYS_PMSCR_EL1);
- }
- 
--void __debug_switch_to_guest(struct kvm_vcpu *vcpu)
-+void __debug_save_host_buffers_nvhe(struct kvm_vcpu *vcpu)
- {
- 	/* Disable and flush SPE data generation */
- 	__debug_save_spe(&vcpu->arch.host_debug_state.pmscr_el1);
-+}
-+
-+void __debug_switch_to_guest(struct kvm_vcpu *vcpu)
-+{
- 	__debug_switch_to_guest_common(vcpu);
- }
- 
--void __debug_switch_to_host(struct kvm_vcpu *vcpu)
-+void __debug_restore_host_buffers_nvhe(struct kvm_vcpu *vcpu)
- {
- 	__debug_restore_spe(vcpu->arch.host_debug_state.pmscr_el1);
-+}
-+
-+void __debug_switch_to_host(struct kvm_vcpu *vcpu)
-+{
- 	__debug_switch_to_host_common(vcpu);
- }
- 
-diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
-index f3d0e9eca56c..59aa1045fdaf 100644
---- a/arch/arm64/kvm/hyp/nvhe/switch.c
-+++ b/arch/arm64/kvm/hyp/nvhe/switch.c
-@@ -192,6 +192,14 @@ int __kvm_vcpu_run(struct kvm_vcpu *vcpu)
- 	pmu_switch_needed = __pmu_switch_to_guest(host_ctxt);
- 
- 	__sysreg_save_state_nvhe(host_ctxt);
-+	/*
-+	 * We must flush and disable the SPE buffer for nVHE, as
-+	 * the translation regime(EL1&0) is going to be loaded with
-+	 * that of the guest. And we must do this before we change the
-+	 * translation regime to EL2 (via MDCR_EL2_E2PB == 0) and
-+	 * before we load guest Stage1.
-+	 */
-+	__debug_save_host_buffers_nvhe(vcpu);
- 
- 	__adjust_pc(vcpu);
- 
-@@ -234,11 +242,12 @@ int __kvm_vcpu_run(struct kvm_vcpu *vcpu)
- 	if (vcpu->arch.flags & KVM_ARM64_FP_ENABLED)
- 		__fpsimd_save_fpexc32(vcpu);
- 
-+	__debug_switch_to_host(vcpu);
- 	/*
- 	 * This must come after restoring the host sysregs, since a non-VHE
- 	 * system may enable SPE here and make use of the TTBRs.
- 	 */
--	__debug_switch_to_host(vcpu);
-+	__debug_restore_host_buffers_nvhe(vcpu);
- 
- 	if (pmu_switch_needed)
- 		__pmu_switch_to_host(host_ctxt);
--- 
-2.24.1
-
+On 2021/1/25 19:25, Keqian Zhu wrote:
+> Hi Marc,
+> 
+> On 2021/1/22 17:45, Marc Zyngier wrote:
+>> On 2021-01-22 08:36, Keqian Zhu wrote:
+>>> The MMIO region of a device maybe huge (GB level), try to use block
+>>> mapping in stage2 to speedup both map and unmap.
+>>>
+>>> Especially for unmap, it performs TLBI right after each invalidation
+>>> of PTE. If all mapping is of PAGE_SIZE, it takes much time to handle
+>>> GB level range.
+>>
+>> This is only on VM teardown, right? Or do you unmap the device more ofet?
+>> Can you please quantify the speedup and the conditions this occurs in?
+> 
+> Yes, and there are some other paths (includes what your patch series handles) will do the unmap action:
+> 
+> 1、guest reboot without S2FWB: stage2_unmap_vm（）which only unmaps guest regular RAM.
+> 2、userspace deletes memslot: kvm_arch_flush_shadow_memslot().
+> 3、rollback of device MMIO mapping: kvm_arch_prepare_memory_region().
+> 4、rollback of dirty log tracking: If we enable hugepage for guest RAM, after dirty log is stopped,
+>                                    the newly created block mappings will unmap all page mappings.
+> 5、mmu notifier: kvm_unmap_hva_range(). AFAICS, we will use this path when VM teardown or guest resets pass-through devices.
+>                                         The bugfix[1] gives the reason for unmapping MMIO region when guest resets pass-through devices.
+> 
+> unmap related to MMIO region, as this patch solves:
+> point 1 is not applied.
+> point 2 occurs when userspace unplug pass-through devices.
+> point 3 can occurs, but rarely.
+> point 4 is not applied.
+> point 5 occurs when VM teardown or guest resets pass-through devices.
+> 
+> And I had a look at your patch series, it can solve:
+> For VM teardown, elide CMO and perform VMALL instead of individually (But current kernel do not go through this path when VM teardown).
+> For rollback of dirty log tracking, elide CMO.
+> For kvm_unmap_hva_range, if event is MMU_NOTIFY_UNMAP. elide CMO.
+> 
+> (But I doubt the CMOs in unmap. As we perform CMOs in user_mem_abort when install new stage2 mapping for VM,
+>  maybe the CMO in unmap is unnecessary under all conditions :-) ?)
+> 
+> So it shows that we are solving different parts of unmap, so they are not conflicting. At least this patch can
+> still speedup map of device MMIO region, and speedup unmap of device MMIO region even if we do not need to perform
+> CMO and TLBI ;-).
+> 
+> speedup: unmap 8GB MMIO on FPGA.
+> 
+>            before            after opt
+> cost    30+ minutes            949ms
+> 
+> Thanks,
+> Keqian
+> 
+>>
+>> I have the feeling that we are just circling around another problem,
+>> which is that we could rely on a VM-wide TLBI when tearing down the
+>> guest. I worked on something like that[1] a long while ago, and parked
+>> it for some reason. Maybe it is worth reviving.
+>>
+>> [1] https://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git/log/?h=kvm-arm64/elide-cmo-tlbi
+>>
+>>>
+>>> Signed-off-by: Keqian Zhu <zhukeqian1@huawei.com>
+>>> ---
+>>>  arch/arm64/include/asm/kvm_pgtable.h | 11 +++++++++++
+>>>  arch/arm64/kvm/hyp/pgtable.c         | 15 +++++++++++++++
+>>>  arch/arm64/kvm/mmu.c                 | 12 ++++++++----
+>>>  3 files changed, 34 insertions(+), 4 deletions(-)
+>>>
+>>> diff --git a/arch/arm64/include/asm/kvm_pgtable.h
+>>> b/arch/arm64/include/asm/kvm_pgtable.h
+>>> index 52ab38db04c7..2266ac45f10c 100644
+>>> --- a/arch/arm64/include/asm/kvm_pgtable.h
+>>> +++ b/arch/arm64/include/asm/kvm_pgtable.h
+>>> @@ -82,6 +82,17 @@ struct kvm_pgtable_walker {
+>>>      const enum kvm_pgtable_walk_flags    flags;
+>>>  };
+>>>
+>>> +/**
+>>> + * kvm_supported_pgsize() - Get the max supported page size of a mapping.
+>>> + * @pgt:    Initialised page-table structure.
+>>> + * @addr:    Virtual address at which to place the mapping.
+>>> + * @end:    End virtual address of the mapping.
+>>> + * @phys:    Physical address of the memory to map.
+>>> + *
+>>> + * The smallest return value is PAGE_SIZE.
+>>> + */
+>>> +u64 kvm_supported_pgsize(struct kvm_pgtable *pgt, u64 addr, u64 end, u64 phys);
+>>> +
+>>>  /**
+>>>   * kvm_pgtable_hyp_init() - Initialise a hypervisor stage-1 page-table.
+>>>   * @pgt:    Uninitialised page-table structure to initialise.
+>>> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+>>> index bdf8e55ed308..ab11609b9b13 100644
+>>> --- a/arch/arm64/kvm/hyp/pgtable.c
+>>> +++ b/arch/arm64/kvm/hyp/pgtable.c
+>>> @@ -81,6 +81,21 @@ static bool kvm_block_mapping_supported(u64 addr,
+>>> u64 end, u64 phys, u32 level)
+>>>      return IS_ALIGNED(addr, granule) && IS_ALIGNED(phys, granule);
+>>>  }
+>>>
+>>> +u64 kvm_supported_pgsize(struct kvm_pgtable *pgt, u64 addr, u64 end, u64 phys)
+>>> +{
+>>> +    u32 lvl;
+>>> +    u64 pgsize = PAGE_SIZE;
+>>> +
+>>> +    for (lvl = pgt->start_level; lvl < KVM_PGTABLE_MAX_LEVELS; lvl++) {
+>>> +        if (kvm_block_mapping_supported(addr, end, phys, lvl)) {
+>>> +            pgsize = kvm_granule_size(lvl);
+>>> +            break;
+>>> +        }
+>>> +    }
+>>> +
+>>> +    return pgsize;
+>>> +}
+>>> +
+>>>  static u32 kvm_pgtable_idx(struct kvm_pgtable_walk_data *data, u32 level)
+>>>  {
+>>>      u64 shift = kvm_granule_shift(level);
+>>> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+>>> index 7d2257cc5438..80b403fc8e64 100644
+>>> --- a/arch/arm64/kvm/mmu.c
+>>> +++ b/arch/arm64/kvm/mmu.c
+>>> @@ -499,7 +499,8 @@ void kvm_free_stage2_pgd(struct kvm_s2_mmu *mmu)
+>>>  int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
+>>>                phys_addr_t pa, unsigned long size, bool writable)
+>>>  {
+>>> -    phys_addr_t addr;
+>>> +    phys_addr_t addr, end;
+>>> +    unsigned long pgsize;
+>>>      int ret = 0;
+>>>      struct kvm_mmu_memory_cache cache = { 0, __GFP_ZERO, NULL, };
+>>>      struct kvm_pgtable *pgt = kvm->arch.mmu.pgt;
+>>> @@ -509,21 +510,24 @@ int kvm_phys_addr_ioremap(struct kvm *kvm,
+>>> phys_addr_t guest_ipa,
+>>>
+>>>      size += offset_in_page(guest_ipa);
+>>>      guest_ipa &= PAGE_MASK;
+>>> +    end = guest_ipa + size;
+>>>
+>>> -    for (addr = guest_ipa; addr < guest_ipa + size; addr += PAGE_SIZE) {
+>>> +    for (addr = guest_ipa; addr < end; addr += pgsize) {
+>>>          ret = kvm_mmu_topup_memory_cache(&cache,
+>>>                           kvm_mmu_cache_min_pages(kvm));
+>>>          if (ret)
+>>>              break;
+>>>
+>>> +        pgsize = kvm_supported_pgsize(pgt, addr, end, pa);
+>>> +
+>>>          spin_lock(&kvm->mmu_lock);
+>>> -        ret = kvm_pgtable_stage2_map(pgt, addr, PAGE_SIZE, pa, prot,
+>>> +        ret = kvm_pgtable_stage2_map(pgt, addr, pgsize, pa, prot,
+>>>                           &cache);
+>>>          spin_unlock(&kvm->mmu_lock);
+>>>          if (ret)
+>>>              break;
+>>>
+>>> -        pa += PAGE_SIZE;
+>>> +        pa += pgsize;
+>>>      }
+>>>
+>>>      kvm_mmu_free_memory_cache(&cache);
+>>
+>> This otherwise looks neat enough.
+>>
+>> Thanks,
+>>
+>>         M.
+> .
+> 
