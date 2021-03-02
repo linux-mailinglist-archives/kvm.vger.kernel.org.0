@@ -2,195 +2,138 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4119432A6F5
+	by mail.lfdr.de (Postfix) with ESMTP id BC64932A6F6
 	for <lists+kvm@lfdr.de>; Tue,  2 Mar 2021 18:05:17 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1838912AbhCBPzP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 2 Mar 2021 10:55:15 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42686 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1377322AbhCBISs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 2 Mar 2021 03:18:48 -0500
-Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A3E2FC061356
-        for <kvm@vger.kernel.org>; Tue,  2 Mar 2021 00:17:18 -0800 (PST)
-Received: by mail-pl1-x649.google.com with SMTP id e12so10812562plh.2
-        for <kvm@vger.kernel.org>; Tue, 02 Mar 2021 00:17:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=sender:date:in-reply-to:message-id:mime-version:references:subject
-         :from:to:cc;
-        bh=9IvSzdbIQqhRyiLJGvOnZfh3hjug63Y1v74jXsaZzZ4=;
-        b=vjq0i7utFQfq/ROgloM8fVCwD3GgQjSjJzxE39PPfoolW/2BTnmUwVxfnbfg/xE8xf
-         nurEyFcMwK9nSlqkfz+TWWrBExl5stjBN3maC6gC31KMD3tBteKgPHUq12s7UUgkwI9M
-         vp0ePmNo9Ra+e+AbeLvDNxW6QBHsadhycldlmZuWH02z7uHsyD1QYqllyYU3eT01p+fk
-         N2vJPKSArl7dvqr7FyBPla3CszX6Ce2ByDzrrm12jXWuSi0kZ2yktEAiVYRWZrBI7lA/
-         KBQ/BHPJUdBBRMuJLk+UJD/X8LruP9bdJ6Fiw9PV3Pmud28l2jlck5kQNw4n2qMFnBC6
-         lbqw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=9IvSzdbIQqhRyiLJGvOnZfh3hjug63Y1v74jXsaZzZ4=;
-        b=EfehRYuQW/4BpfRXuiJfGZia67hiyDrxi3dFkwGBiKeHKu5GxbtyguaOXvcSoxGiYv
-         850/Cul/mp/0gx1LqAO8Rw9QMOYJOSSt3lV6RQS+jRmYQG/pAE2pVuoVd4WUfzzLNEYR
-         XsfjLOA4STyFp7jcyVxB0s5R9Uq4xVSoZWZ8ZgJRAWc9gmzZ57NOflvmmDthh36vkBjV
-         N8uZpt2ytrWkUf3yqAeQIugbrBNro5Grjkr1JnbiRURFAD+DN5fkX2Fr3oRF2zBI9ZhT
-         XLVMw+2dj9gGqN+Z22nBNx5cBJ1eKnWolXNvCVK59XvUQM28RfI3eO/efcDYydhcbbJj
-         mTsA==
-X-Gm-Message-State: AOAM531mxhwOhmg/Pdu6K0fyNiuyKVPgC/E5sc9H9XIxxmBtEqvvDPvO
-        Ypt2OXRHf4qFdIkv48GEdckk7Bczai10
-X-Google-Smtp-Source: ABdhPJyCXCm/dfyyzcTbG52l5hOFatdhe7phOhVOcb2mXZhlI38K9zFUo51+s70nURdhIGdIur5gyGdzY6gm
-Sender: "vipinsh via sendgmr" <vipinsh@vipinsh.kir.corp.google.com>
-X-Received: from vipinsh.kir.corp.google.com ([2620:0:1008:10:e829:dc2a:968a:1370])
- (user=vipinsh job=sendgmr) by 2002:a05:6a00:23c5:b029:1e6:2f2e:a438 with SMTP
- id g5-20020a056a0023c5b02901e62f2ea438mr19154226pfc.75.1614673038114; Tue, 02
- Mar 2021 00:17:18 -0800 (PST)
-Date:   Tue,  2 Mar 2021 00:17:05 -0800
-In-Reply-To: <20210302081705.1990283-1-vipinsh@google.com>
-Message-Id: <20210302081705.1990283-3-vipinsh@google.com>
-Mime-Version: 1.0
-References: <20210302081705.1990283-1-vipinsh@google.com>
-X-Mailer: git-send-email 2.30.1.766.gb4fecdf3b7-goog
-Subject: [RFC v2 2/2] cgroup: sev: Miscellaneous cgroup documentation.
-From:   Vipin Sharma <vipinsh@google.com>
-To:     tj@kernel.org, mkoutny@suse.com, rdunlap@infradead.org,
-        thomas.lendacky@amd.com, brijesh.singh@amd.com, jon.grimm@amd.com,
-        eric.vantassell@amd.com, pbonzini@redhat.com, hannes@cmpxchg.org,
-        frankja@linux.ibm.com, borntraeger@de.ibm.com
-Cc:     corbet@lwn.net, seanjc@google.com, vkuznets@redhat.com,
-        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
-        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, hpa@zytor.com,
-        gingell@google.com, rientjes@google.com, dionnaglaze@google.com,
-        kvm@vger.kernel.org, x86@kernel.org, cgroups@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Vipin Sharma <vipinsh@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        id S1838920AbhCBPzU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 2 Mar 2021 10:55:20 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:17628 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S243412AbhCBIYB (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 2 Mar 2021 03:24:01 -0500
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 12283Rbj119801
+        for <kvm@vger.kernel.org>; Tue, 2 Mar 2021 03:22:30 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=to : cc : references :
+ from : subject : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=iSsI7EMR5XqwfxXXWxmiI7aXS+At0vvT/UuYpDl2tyA=;
+ b=W/3CAZh5CXtdM+F8mSHk4kHr8FobnSmrmqtjX7ZpaCdXUyL95GCo2l4XQnvjWutq3R1k
+ 3yDPspq89CphOBrzZoqVaQ7JJ5H8zkIDvTn93pJMLL8fGHHrkJCJFmWnTBNjbL/vXvX8
+ ACH/xL2uNNcqblbv6qoAn2S8ncfjxZEfeLdc0o+z+yCUdFIUoOxX4TJj7rCAWu9BF6SE
+ pHdE7lFKCyxqViKcwq99uw4gwmxvMozmEjUsMIHF/X1qNSrEymL1999eSHaohO3IKQ03
+ DHzl4qv0W1OYUEec7Jv1v6BY9mag+c1RTTOhfvF7cGSbePt5fsjIB7lXlEqzd7bOXa7P 6g== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 371f73mvj4-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Tue, 02 Mar 2021 03:22:30 -0500
+Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 12283j64120806
+        for <kvm@vger.kernel.org>; Tue, 2 Mar 2021 03:22:29 -0500
+Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 371f73mvhg-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 02 Mar 2021 03:22:29 -0500
+Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
+        by ppma02fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 1228DUjE021893;
+        Tue, 2 Mar 2021 08:22:27 GMT
+Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
+        by ppma02fra.de.ibm.com with ESMTP id 36yj5319mw-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 02 Mar 2021 08:22:27 +0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 1228MAU436307386
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 2 Mar 2021 08:22:10 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 7FB0CAE04D;
+        Tue,  2 Mar 2021 08:22:24 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 24E18AE061;
+        Tue,  2 Mar 2021 08:22:24 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.145.12.104])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Tue,  2 Mar 2021 08:22:24 +0000 (GMT)
+To:     Thomas Huth <thuth@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     david@redhat.com, cohuck@redhat.com, pmorel@linux.ibm.com,
+        borntraeger@de.ibm.com
+References: <20210301182830.478145-1-imbrenda@linux.ibm.com>
+ <20210301182830.478145-4-imbrenda@linux.ibm.com>
+ <2104a18d-e68b-cae8-8f9c-3b49bdde3f19@redhat.com>
+From:   Janosch Frank <frankja@linux.ibm.com>
+Subject: Re: [kvm-unit-tests PATCH v3 3/3] s390x: mvpg: skip some tests when
+ using TCG
+Message-ID: <3b357040-0ddd-eece-39af-0ca04fdf036b@linux.ibm.com>
+Date:   Tue, 2 Mar 2021 09:22:23 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.8.0
+MIME-Version: 1.0
+In-Reply-To: <2104a18d-e68b-cae8-8f9c-3b49bdde3f19@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.761
+ definitions=2021-03-02_02:2021-03-01,2021-03-02 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0
+ lowpriorityscore=0 impostorscore=0 priorityscore=1501 mlxscore=0
+ suspectscore=0 clxscore=1015 adultscore=0 mlxlogscore=999 spamscore=0
+ phishscore=0 malwarescore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2009150000 definitions=main-2103020066
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Documentation of miscellaneous cgroup controller. This new controller is
-used to track and limit the usage of scalar resources.
+On 3/2/21 6:59 AM, Thomas Huth wrote:
+> On 01/03/2021 19.28, Claudio Imbrenda wrote:
+>> TCG is known to fail these tests, so add an explicit exception to skip them.
+>>
+>> Once TCG has been fixed, it will be enough to revert this patch.
+>>
+>> Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+>> ---
+>>   s390x/mvpg.c | 31 +++++++++++++++++++------------
+>>   1 file changed, 19 insertions(+), 12 deletions(-)
+>>
+>> diff --git a/s390x/mvpg.c b/s390x/mvpg.c
+>> index 792052ad..148095e0 100644
+>> --- a/s390x/mvpg.c
+>> +++ b/s390x/mvpg.c
+>> @@ -20,6 +20,7 @@
+>>   #include <smp.h>
+>>   #include <alloc_page.h>
+>>   #include <bitops.h>
+>> +#include <vm.h>
+>>   
+>>   /* Used to build the appropriate test values for register 0 */
+>>   #define KFC(x) ((x) << 10)
+>> @@ -224,20 +225,26 @@ static void test_mmu_prot(void)
+>>   	report(clear_pgm_int() == PGM_INT_CODE_PROTECTION, "destination read only");
+>>   	fresh += PAGE_SIZE;
+>>   
+>> -	protect_page(fresh, PAGE_ENTRY_I);
+>> -	cc = mvpg(CCO, fresh, source);
+>> -	report(cc == 1, "destination invalid");
+>> -	fresh += PAGE_SIZE;
+>> +	if (vm_is_tcg()) {
+>> +		report_skip("destination invalid");
+>> +		report_skip("source invalid");
+>> +		report_skip("source and destination invalid");
+> 
+> You could also use report_xfail(vm_is_tcg(), ...) instead. That shows that 
+> there are still problems without failing CI runs.
 
-Signed-off-by: Vipin Sharma <vipinsh@google.com>
-Reviewed-by: David Rientjes <rientjes@google.com>
----
- Documentation/admin-guide/cgroup-v1/index.rst |  1 +
- Documentation/admin-guide/cgroup-v1/misc.rst  |  4 ++
- Documentation/admin-guide/cgroup-v2.rst       | 69 ++++++++++++++++++-
- 3 files changed, 72 insertions(+), 2 deletions(-)
- create mode 100644 Documentation/admin-guide/cgroup-v1/misc.rst
+If I remember correctly we fail with a PGM so we would also need to add
+a expect_pgm_int() call before each test when running under tcg
+therefore it's not just a 1:1 replacement in this case.
 
-diff --git a/Documentation/admin-guide/cgroup-v1/index.rst b/Documentation/admin-guide/cgroup-v1/index.rst
-index 226f64473e8e..99fbc8a64ba9 100644
---- a/Documentation/admin-guide/cgroup-v1/index.rst
-+++ b/Documentation/admin-guide/cgroup-v1/index.rst
-@@ -17,6 +17,7 @@ Control Groups version 1
-     hugetlb
-     memcg_test
-     memory
-+    misc
-     net_cls
-     net_prio
-     pids
-diff --git a/Documentation/admin-guide/cgroup-v1/misc.rst b/Documentation/admin-guide/cgroup-v1/misc.rst
-new file mode 100644
-index 000000000000..661614c24df3
---- /dev/null
-+++ b/Documentation/admin-guide/cgroup-v1/misc.rst
-@@ -0,0 +1,4 @@
-+===============
-+Misc controller
-+===============
-+Please refer "Misc" documentation in Documentation/admin-guide/cgroup-v2.rst
-diff --git a/Documentation/admin-guide/cgroup-v2.rst b/Documentation/admin-guide/cgroup-v2.rst
-index 1de8695c264b..74777323b7fd 100644
---- a/Documentation/admin-guide/cgroup-v2.rst
-+++ b/Documentation/admin-guide/cgroup-v2.rst
-@@ -63,8 +63,11 @@ v1 is available under :ref:`Documentation/admin-guide/cgroup-v1/index.rst <cgrou
-        5-7-1. RDMA Interface Files
-      5-8. HugeTLB
-        5.8-1. HugeTLB Interface Files
--     5-8. Misc
--       5-8-1. perf_event
-+     5-9. Misc
-+       5.9-1 Miscellaneous cgroup Interface Files
-+       5.9-2 Migration and Ownership
-+     5-10. Others
-+       5-10-1. perf_event
-      5-N. Non-normative information
-        5-N-1. CPU controller root cgroup process behaviour
-        5-N-2. IO controller root cgroup process behaviour
-@@ -2163,6 +2166,68 @@ HugeTLB Interface Files
- Misc
- ----
- 
-+The Miscellaneous cgroup provides the resource limiting and tracking
-+mechanism for the scalar resources which cannot be abstracted like the other
-+cgroup resources. Controller is enabled by the CONFIG_CGROUP_MISC config
-+option.
-+
-+The first two resources added to the miscellaneous controller are Secure
-+Encrypted Virtualization (SEV) ASIDs and SEV - Encrypted State (SEV-ES) ASIDs.
-+These limited ASIDs are used for encrypting virtual machines memory on the AMD
-+platform.
-+
-+Misc Interface Files
-+~~~~~~~~~~~~~~~~~~~~
-+
-+Miscellaneous controller provides 3 interface files:
-+
-+  misc.capacity
-+        A read-only flat-keyed file shown only in the root cgroup.  It shows
-+        miscellaneous scalar resources available on the platform along with
-+        their quantities::
-+
-+	  $ cat misc.capacity
-+	  sev 50
-+	  sev_es 10
-+
-+  misc.current
-+        A read-only flat-keyed file shown in the non-root cgroups.  It shows
-+        the current usage of the resources in the cgroup and its children.::
-+
-+	  $ cat misc.current
-+	  sev 3
-+	  sev_es 0
-+
-+  misc.max
-+        A read-write flat-keyed file shown in the non root cgroups. Allowed
-+        maximum usage of the resources in the cgroup and its children.::
-+
-+	  $ cat misc.max
-+	  sev max
-+	  sev_es 4
-+
-+	Limit can be set by::
-+
-+	  # echo sev 1 > misc.max
-+
-+	Limit can be set to max by::
-+
-+	  # echo sev max > misc.max
-+
-+        Limits can be set higher than the capacity value in the misc.capacity
-+        file.
-+
-+Migration and Ownership
-+~~~~~~~~~~~~~~~~~~~~~~~
-+
-+A miscellaneous scalar resource is charged to the cgroup in which it is used
-+first, and stays charged to that cgroup until that resource is freed. Migrating
-+a process to a different cgroup does not move the charge to the destination
-+cgroup where the process has moved.
-+
-+Others
-+------
-+
- perf_event
- ~~~~~~~~~~
- 
--- 
-2.30.1.766.gb4fecdf3b7-goog
+But yes, I'd also like an indication why we're skipping. A comment and a
+TCG prefix for skips should be enough.
+
+
+> 
+> Anyway:
+> Reviewed-by: Thomas Huth <thuth@redhat.com>
+> 
 
