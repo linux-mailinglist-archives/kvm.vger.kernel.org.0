@@ -2,104 +2,73 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 642EB32A706
+	by mail.lfdr.de (Postfix) with ESMTP id D548F32A707
 	for <lists+kvm@lfdr.de>; Tue,  2 Mar 2021 18:06:17 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1839021AbhCBP4F (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 2 Mar 2021 10:56:05 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40822 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1379952AbhCBKVU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 2 Mar 2021 05:21:20 -0500
-Received: from mail-ej1-x62e.google.com (mail-ej1-x62e.google.com [IPv6:2a00:1450:4864:20::62e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 392B6C06178A
-        for <kvm@vger.kernel.org>; Tue,  2 Mar 2021 02:20:33 -0800 (PST)
-Received: by mail-ej1-x62e.google.com with SMTP id p8so7864340ejb.10
-        for <kvm@vger.kernel.org>; Tue, 02 Mar 2021 02:20:33 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance-com.20150623.gappssmtp.com; s=20150623;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=yi8wECcwdBRjg7+URRAywGRh6tS4eye0VU27h7CmQYU=;
-        b=BV6R8yFKOB05YsyrxRNeCYJYo4Z1LOohGqQ6dB4bVxO9DfKPQiKSIYEpIurIDq4ZC+
-         V4R+0rigcAUXOrWxLGrWHLrU4b48J9GxhVUOt2O/kY82XxtKQX/OfHgcT605GYAjLinc
-         p8JowBmG/U/JhO8dCF3As2f8B8y60LMDVkBV9Ka0tqeUVcFT+T6i59o4uVhgpNoAh8bl
-         s2IVwV4GBuuhzB4354dXUermv/hVxYEDweBUAHicsAtl6oMKBqR0FXwczSlyQEHdIUlr
-         2S28ialJ+lgr/uZ24N2gkdzrasQeFwHoRHC3JNytS8wpxbK93ISyhK+BP74WTqQRnBlw
-         834g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=yi8wECcwdBRjg7+URRAywGRh6tS4eye0VU27h7CmQYU=;
-        b=WN81zfkvUvWquEk8uPfwxe6stgFKQiiYQanj1s6qfozxrv4X7XCBZDuphAkv2nq1rl
-         nqlNqK594CE4gdsfGX/yxugzETJzmTI74PDC6NmtYA4xFjN/4wv3wjBxL4klGZV+Ln++
-         z7mApn1CqMrL5b6ZHh3mcA0THq0riS+6RKEKcN5n8Izh6Nr/I/FpgfrauY7Ef5CcPYTq
-         Rm0LdBpZRyo1HkjlKwsm04CvgXPBWzePL0d5k+7aPjSvcwrfz5kjMk0sPrWiMgiG+ILj
-         fuHVztcWwhEnPqzuu7ZyGOnztcf1piUtwsyJJTqG/TlfeQnE0KFi4tMjAwJ4CFHEifaP
-         E0fg==
-X-Gm-Message-State: AOAM533eVRYwe8oPewG3B4VN4TlVJ//jHdrJGkF9Mbmqi9EFK96LFMCx
-        4pJJkp4ChX2iIVasKxJjJM2MC9luXyz+TmQQ0sBg
-X-Google-Smtp-Source: ABdhPJyBWqFKanD0h+041MluNJeF05cCpfSJ5Sc1CvWrsgH4neTtL6sAPV38+UELsymwPahh831ZljvgeIkDlIg5wcc=
-X-Received: by 2002:a17:907:1629:: with SMTP id hb41mr19229620ejc.197.1614680431831;
- Tue, 02 Mar 2021 02:20:31 -0800 (PST)
+        id S1351191AbhCBP5B (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 2 Mar 2021 10:57:01 -0500
+Received: from foss.arm.com ([217.140.110.172]:48804 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1379932AbhCBK2k (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 2 Mar 2021 05:28:40 -0500
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id BA163ED1;
+        Tue,  2 Mar 2021 02:27:49 -0800 (PST)
+Received: from e121166-lin.cambridge.arm.com (e121166-lin.cambridge.arm.com [10.1.196.255])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 12DD63F73C;
+        Tue,  2 Mar 2021 02:27:48 -0800 (PST)
+From:   Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>
+To:     linux-kernel@vger.kernel.org
+Cc:     Marc Zyngier <maz@kernel.org>,
+        LAKML <linux-arm-kernel@lists.infradead.org>,
+        KVM <kvm@vger.kernel.org>
+Subject: [PATCH v2 0/1] GIC v4.1: Disable VSGI support for GIC CPUIF < v4.1
+Date:   Tue,  2 Mar 2021 10:27:43 +0000
+Message-Id: <20210302102744.12692-1-lorenzo.pieralisi@arm.com>
+X-Mailer: git-send-email 2.29.1
+In-Reply-To: <0201111162841.3151-1-lorenzo.pieralisi@arm.com>
+References: <0201111162841.3151-1-lorenzo.pieralisi@arm.com>
 MIME-Version: 1.0
-References: <20210223115048.435-1-xieyongji@bytedance.com> <20210223115048.435-3-xieyongji@bytedance.com>
- <a170e0ec-f0cf-e23f-0ca7-e8a5bfd1cf31@redhat.com>
-In-Reply-To: <a170e0ec-f0cf-e23f-0ca7-e8a5bfd1cf31@redhat.com>
-From:   Yongji Xie <xieyongji@bytedance.com>
-Date:   Tue, 2 Mar 2021 18:20:21 +0800
-Message-ID: <CACycT3skiem9ZXKCrg4nKcw4jPPCNGwCnRtDUtVhZ7YJJ-se1w@mail.gmail.com>
-Subject: Re: Re: [RFC v4 02/11] vhost-vdpa: protect concurrent access to vhost
- device iotlb
-To:     Jason Wang <jasowang@redhat.com>
-Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        Parav Pandit <parav@nvidia.com>, Bob Liu <bob.liu@oracle.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Matthew Wilcox <willy@infradead.org>, viro@zeniv.linux.org.uk,
-        Jens Axboe <axboe@kernel.dk>, bcrl@kvack.org,
-        Jonathan Corbet <corbet@lwn.net>,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        kvm@vger.kernel.org, linux-aio@kvack.org,
-        linux-fsdevel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Mar 2, 2021 at 2:47 PM Jason Wang <jasowang@redhat.com> wrote:
->
->
-> On 2021/2/23 7:50 =E4=B8=8B=E5=8D=88, Xie Yongji wrote:
-> > Use vhost_dev->mutex to protect vhost device iotlb from
-> > concurrent access.
-> >
-> > Fixes: 4c8cf318("vhost: introduce vDPA-based backend")
-> > Signed-off-by: Xie Yongji <xieyongji@bytedance.com>
-> > ---
-> >   drivers/vhost/vdpa.c | 2 ++
-> >   1 file changed, 2 insertions(+)
-> >
-> > diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
-> > index c50079dfb281..5500e3bf05c1 100644
-> > --- a/drivers/vhost/vdpa.c
-> > +++ b/drivers/vhost/vdpa.c
-> > @@ -723,6 +723,7 @@ static int vhost_vdpa_process_iotlb_msg(struct vhos=
-t_dev *dev,
-> >       if (r)
-> >               return r;
-> >
-> > +     mutex_lock(&dev->mutex);
->
->
-> I think this should be done before the vhost_dev_check_owner() above.
->
+This patchset is v2 of a previous version [1].
 
-Agree. Will do it in v5.
+v1 -> v2:
+	- Fixed vGIC behaviour according to v1 [1] review
+	- Removed capability detection - rely on sanitised reg read
+	- Added vsgi specific flag (for gic and kvm)
 
-Thanks,
-Yongji
+[1] https://lore.kernel.org/linux-arm-kernel/20201111162841.3151-1-lorenzo.pieralisi@arm.com
+
+-- Original cover letter --
+
+GIC v4.1 introduced changes to the GIC CPU interface; systems that
+integrate CPUs that do not support GIC v4.1 features (as reported in the
+ID_AA64PFR0_EL1.GIC bitfield) and a GIC v4.1 controller must disable in
+software virtual SGIs support since the CPUIF and GIC controller version
+mismatch results in CONSTRAINED UNPREDICTABLE behaviour at architectural
+level.
+
+For systems with CPUs reporting ID_AA64PFR0_EL1.GIC == b0001 integrated
+in a system with a GIC v4.1 it _should_ still be safe to enable vLPIs
+(other than vSGI) since the protocol between the GIC redistributor and
+the GIC CPUIF was not changed from GIC v4.0 to GIC v4.1.
+
+Lorenzo Pieralisi (1):
+  irqchip/gic-v4.1: Disable vSGI upon (GIC CPUIF < v4.1) detection
+
+ arch/arm64/kvm/vgic/vgic-mmio-v3.c     |  4 ++--
+ arch/arm64/kvm/vgic/vgic-v3.c          |  3 ++-
+ drivers/irqchip/irq-gic-v3-its.c       |  6 +++++-
+ drivers/irqchip/irq-gic-v3.c           | 22 ++++++++++++++++++++++
+ include/kvm/arm_vgic.h                 |  1 +
+ include/linux/irqchip/arm-gic-common.h |  2 ++
+ include/linux/irqchip/arm-gic-v3.h     |  1 +
+ 7 files changed, 35 insertions(+), 4 deletions(-)
+
+-- 
+2.29.1
+
