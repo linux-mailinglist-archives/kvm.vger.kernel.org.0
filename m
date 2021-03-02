@@ -2,62 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 76F2032A704
-	for <lists+kvm@lfdr.de>; Tue,  2 Mar 2021 18:06:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 642EB32A706
+	for <lists+kvm@lfdr.de>; Tue,  2 Mar 2021 18:06:17 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1839013AbhCBP4D (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 2 Mar 2021 10:56:03 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38894 "EHLO
+        id S1839021AbhCBP4F (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 2 Mar 2021 10:56:05 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40822 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1379926AbhCBKM0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 2 Mar 2021 05:12:26 -0500
-Received: from mail-lj1-x22b.google.com (mail-lj1-x22b.google.com [IPv6:2a00:1450:4864:20::22b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 61FBFC06178A
-        for <kvm@vger.kernel.org>; Tue,  2 Mar 2021 02:11:40 -0800 (PST)
-Received: by mail-lj1-x22b.google.com with SMTP id a17so23218301ljq.2
-        for <kvm@vger.kernel.org>; Tue, 02 Mar 2021 02:11:40 -0800 (PST)
+        with ESMTP id S1379952AbhCBKVU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 2 Mar 2021 05:21:20 -0500
+Received: from mail-ej1-x62e.google.com (mail-ej1-x62e.google.com [IPv6:2a00:1450:4864:20::62e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 392B6C06178A
+        for <kvm@vger.kernel.org>; Tue,  2 Mar 2021 02:20:33 -0800 (PST)
+Received: by mail-ej1-x62e.google.com with SMTP id p8so7864340ejb.10
+        for <kvm@vger.kernel.org>; Tue, 02 Mar 2021 02:20:33 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:reply-to:from:date:message-id:subject:to;
-        bh=H3bGT1ZyGPu3PRQJlJHyQI9TvTjBPuNSyHjFOzNfiP0=;
-        b=XykRLhH1zbBorWcU8S9mefaniLsLsdHy51AradKDzH4XStWlthcxqgwdCQhdr+qlA3
-         BS8ne63n1v1tCvaPAfHJdJWKw2RDOo0GbccDaLKptIIgfWsMI2FwSxmImH6WdscyR1AF
-         kTm9QP6c4BpOgkwk5FAcKC9ETyoHviVaQ2ai2OwKnfdaI5BXhieKBumU92NdmLL5HkcB
-         J7j7joRSehrqkBXIf4WF7OerUtKXDyuu7DSPBDs56+SyGVcP8C6ppO9WEK+LU7fL8m2V
-         6roWNbSV6mRbiyI/YbTOXpOXBXAqhCqMjqqEroTGW4Zj2NZzyrpkEEwIvxr8Bzb7nOVC
-         FvRA==
+        d=bytedance-com.20150623.gappssmtp.com; s=20150623;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=yi8wECcwdBRjg7+URRAywGRh6tS4eye0VU27h7CmQYU=;
+        b=BV6R8yFKOB05YsyrxRNeCYJYo4Z1LOohGqQ6dB4bVxO9DfKPQiKSIYEpIurIDq4ZC+
+         V4R+0rigcAUXOrWxLGrWHLrU4b48J9GxhVUOt2O/kY82XxtKQX/OfHgcT605GYAjLinc
+         p8JowBmG/U/JhO8dCF3As2f8B8y60LMDVkBV9Ka0tqeUVcFT+T6i59o4uVhgpNoAh8bl
+         s2IVwV4GBuuhzB4354dXUermv/hVxYEDweBUAHicsAtl6oMKBqR0FXwczSlyQEHdIUlr
+         2S28ialJ+lgr/uZ24N2gkdzrasQeFwHoRHC3JNytS8wpxbK93ISyhK+BP74WTqQRnBlw
+         834g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:reply-to:from:date:message-id
-         :subject:to;
-        bh=H3bGT1ZyGPu3PRQJlJHyQI9TvTjBPuNSyHjFOzNfiP0=;
-        b=ZE8bxUrDiDcPRFKoXGYiEH/e8+mcXCWzTg0cRjFoaJ7EV12chAlBaXvVYMqnVsXq5I
-         vx1IW1NgmBSXjV55yVWFQ4ECgfrsYNucyt2t2MZEgvVxwkhBOIlljY/0f7TaPK2uW8gQ
-         oD6mp92kIuBURrrLVmMR1Cf2iH6bhfUSfrsrtKYzn3O5/5h1QvUnFVHOdqFHlnMD662A
-         4Hm5dTt6WPl9zUDtjWNET6qO6DI26DSuUMIIwTSfhbHhNFdkSXWTp0tWEkLj5N6oOWnf
-         jiqqziS8YeFKP6Kvs7S4sRVN1i8A1BgdHL0qp0XlHX67KqPBp2i3tOkcKageZNcRQdBs
-         J0PQ==
-X-Gm-Message-State: AOAM532ILqKowm/57ixKRm/KOdCFZrkW7oBt9VJ1bW22ZDEaWlMgC+69
-        8WYEunjpwgUGVJeYbsS516HJFv7lLAATgq86sYU=
-X-Google-Smtp-Source: ABdhPJzJAyBx2IxJdSbKtBUA5DVHDSdDTW49ZZgenP5Cnug3na4A4j8fB20gBT65IupGEdTWr3nTBP4F0ctOHBqbR1s=
-X-Received: by 2002:a2e:3a14:: with SMTP id h20mr11226460lja.168.1614679898111;
- Tue, 02 Mar 2021 02:11:38 -0800 (PST)
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=yi8wECcwdBRjg7+URRAywGRh6tS4eye0VU27h7CmQYU=;
+        b=WN81zfkvUvWquEk8uPfwxe6stgFKQiiYQanj1s6qfozxrv4X7XCBZDuphAkv2nq1rl
+         nqlNqK594CE4gdsfGX/yxugzETJzmTI74PDC6NmtYA4xFjN/4wv3wjBxL4klGZV+Ln++
+         z7mApn1CqMrL5b6ZHh3mcA0THq0riS+6RKEKcN5n8Izh6Nr/I/FpgfrauY7Ef5CcPYTq
+         Rm0LdBpZRyo1HkjlKwsm04CvgXPBWzePL0d5k+7aPjSvcwrfz5kjMk0sPrWiMgiG+ILj
+         fuHVztcWwhEnPqzuu7ZyGOnztcf1piUtwsyJJTqG/TlfeQnE0KFi4tMjAwJ4CFHEifaP
+         E0fg==
+X-Gm-Message-State: AOAM533eVRYwe8oPewG3B4VN4TlVJ//jHdrJGkF9Mbmqi9EFK96LFMCx
+        4pJJkp4ChX2iIVasKxJjJM2MC9luXyz+TmQQ0sBg
+X-Google-Smtp-Source: ABdhPJyBWqFKanD0h+041MluNJeF05cCpfSJ5Sc1CvWrsgH4neTtL6sAPV38+UELsymwPahh831ZljvgeIkDlIg5wcc=
+X-Received: by 2002:a17:907:1629:: with SMTP id hb41mr19229620ejc.197.1614680431831;
+ Tue, 02 Mar 2021 02:20:31 -0800 (PST)
 MIME-Version: 1.0
-Received: by 2002:a2e:b014:0:0:0:0:0 with HTTP; Tue, 2 Mar 2021 02:11:37 -0800 (PST)
-Reply-To: abdwabbomaddahm@gmail.com
-From:   Abdwabbo Maddah <abdwabbomaddah614@gmail.com>
-Date:   Tue, 2 Mar 2021 11:11:37 +0100
-Message-ID: <CAFVKCADJ3qA8DHfT7CBqoNLZRH2FNoRsn7waa4Ph1u6kT_aAVA@mail.gmail.com>
-Subject: DID YOU RECEIVE MY MAIL?
-To:     undisclosed-recipients:;
+References: <20210223115048.435-1-xieyongji@bytedance.com> <20210223115048.435-3-xieyongji@bytedance.com>
+ <a170e0ec-f0cf-e23f-0ca7-e8a5bfd1cf31@redhat.com>
+In-Reply-To: <a170e0ec-f0cf-e23f-0ca7-e8a5bfd1cf31@redhat.com>
+From:   Yongji Xie <xieyongji@bytedance.com>
+Date:   Tue, 2 Mar 2021 18:20:21 +0800
+Message-ID: <CACycT3skiem9ZXKCrg4nKcw4jPPCNGwCnRtDUtVhZ7YJJ-se1w@mail.gmail.com>
+Subject: Re: Re: [RFC v4 02/11] vhost-vdpa: protect concurrent access to vhost
+ device iotlb
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        Parav Pandit <parav@nvidia.com>, Bob Liu <bob.liu@oracle.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Matthew Wilcox <willy@infradead.org>, viro@zeniv.linux.org.uk,
+        Jens Axboe <axboe@kernel.dk>, bcrl@kvack.org,
+        Jonathan Corbet <corbet@lwn.net>,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        kvm@vger.kernel.org, linux-aio@kvack.org,
+        linux-fsdevel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
--- 
-Dear,
-I had sent you a mail but i don't think you received it that's why am
-writing you again.It is important you get back to me as soon as you
-can.
-Abd-Wabbo Maddah
+On Tue, Mar 2, 2021 at 2:47 PM Jason Wang <jasowang@redhat.com> wrote:
+>
+>
+> On 2021/2/23 7:50 =E4=B8=8B=E5=8D=88, Xie Yongji wrote:
+> > Use vhost_dev->mutex to protect vhost device iotlb from
+> > concurrent access.
+> >
+> > Fixes: 4c8cf318("vhost: introduce vDPA-based backend")
+> > Signed-off-by: Xie Yongji <xieyongji@bytedance.com>
+> > ---
+> >   drivers/vhost/vdpa.c | 2 ++
+> >   1 file changed, 2 insertions(+)
+> >
+> > diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
+> > index c50079dfb281..5500e3bf05c1 100644
+> > --- a/drivers/vhost/vdpa.c
+> > +++ b/drivers/vhost/vdpa.c
+> > @@ -723,6 +723,7 @@ static int vhost_vdpa_process_iotlb_msg(struct vhos=
+t_dev *dev,
+> >       if (r)
+> >               return r;
+> >
+> > +     mutex_lock(&dev->mutex);
+>
+>
+> I think this should be done before the vhost_dev_check_owner() above.
+>
+
+Agree. Will do it in v5.
+
+Thanks,
+Yongji
