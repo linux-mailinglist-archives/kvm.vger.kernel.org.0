@@ -2,134 +2,110 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BFF1132B570
-	for <lists+kvm@lfdr.de>; Wed,  3 Mar 2021 08:21:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0735B32B576
+	for <lists+kvm@lfdr.de>; Wed,  3 Mar 2021 08:21:47 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1356129AbhCCHQG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 3 Mar 2021 02:16:06 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:32049 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1351677AbhCBRiR (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 2 Mar 2021 12:38:17 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1614706609;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=jlIWIZYzHD1EhL2tb//404goYHuWYrN3TLsE76K2ILs=;
-        b=X74xOsnTLCto7VVAKE5oIkZaCcJFHxt7akp0/5qrj0nV5cqTGwB2D3tRwZ9Yz1zmgA5L4T
-        RyW1Qu0lbkDCbjdM5HvThAsxZ7MmyYtnGx6p/SmccpyQ5m9OQCUoX52oqUSYc7yfqoJDQ4
-        Lt4KAwH1XZ/3cyG9ovB8xkUDXXdfcAU=
-Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com
- [209.85.160.199]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-379-EqTJIG6bMHyrS8gm0VWlJA-1; Tue, 02 Mar 2021 12:32:48 -0500
-X-MC-Unique: EqTJIG6bMHyrS8gm0VWlJA-1
-Received: by mail-qt1-f199.google.com with SMTP id r1so13708470qtu.9
-        for <kvm@vger.kernel.org>; Tue, 02 Mar 2021 09:32:48 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=jlIWIZYzHD1EhL2tb//404goYHuWYrN3TLsE76K2ILs=;
-        b=OwTpLhIV5GLtGm65fdUBmFKMx/IYIFUogVcsSkdLWL2TqjNaKm3m4C174eyhjekFpD
-         m1yScGiTXCwZbcotga+pSVHoMLWjhfo0nmDhCI+e1Ssr89/JY9dtV6408AJTZSYy5XYL
-         cAsnSMSGOx9uWvsVfHT1acFgIbOQVSfzaPkTNkUmOgFY/iTVHtyXGuMRYlTF0LPNHPeK
-         pHQ/CY16Wxv2bnTba3KgOeH4SZq/VP9ywyyt52CmQWH9X+Op4DPBv/bqD3VeQyPJGn9B
-         rZZgJ7/nMaCEtwZ/bZyE6rMOLvsCCq/sBgn6lEhRfg/jgIrF/hvTLbRS1UFoTgxRhq6V
-         riRg==
-X-Gm-Message-State: AOAM530EWCUh1Ch1u2//ebo2OYbTySMYca8nbQA6T5aDDErWI6BOp7FX
-        lkTfKl03ZPtNk8HxR/j0WBKytBxELi/NBHs143lOLROYFQtT7Ie03A59kLZvKwXL6fXsugCsUjV
-        pBiS+taDy84Ro
-X-Received: by 2002:a05:620a:791:: with SMTP id 17mr2959826qka.170.1614706367958;
-        Tue, 02 Mar 2021 09:32:47 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJzv2aftS50+NpY5Rxj4Em9ob46tG7td8IRzqUVLX4ER2B33/0EUruRU/OkJS/3TfKMcJ1EG3Q==
-X-Received: by 2002:a05:620a:791:: with SMTP id 17mr2959801qka.170.1614706367704;
-        Tue, 02 Mar 2021 09:32:47 -0800 (PST)
-Received: from xz-x1 (bras-vprn-toroon474qw-lp130-25-174-95-95-253.dsl.bell.ca. [174.95.95.253])
-        by smtp.gmail.com with ESMTPSA id o79sm5803300qka.116.2021.03.02.09.32.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 02 Mar 2021 09:32:47 -0800 (PST)
-Date:   Tue, 2 Mar 2021 12:32:43 -0500
-From:   Peter Xu <peterx@redhat.com>
-To:     David Hildenbrand <david@redhat.com>
-Cc:     qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>,
-        Eduardo Habkost <ehabkost@redhat.com>,
-        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Igor Mammedov <imammedo@redhat.com>,
-        Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Murilo Opsfelder Araujo <muriloo@linux.ibm.com>,
-        Greg Kurz <groug@kaod.org>,
-        Liam Merwick <liam.merwick@oracle.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Igor Kotrasinski <i.kotrasinsk@partner.samsung.com>,
-        Juan Quintela <quintela@redhat.com>,
-        Stefan Weil <sw@weilnetz.de>, Thomas Huth <thuth@redhat.com>,
-        kvm@vger.kernel.org, qemu-s390x@nongnu.org
-Subject: Re: [PATCH v1 7/9] memory: introduce RAM_NORESERVE and wire it up in
- qemu_ram_mmap()
-Message-ID: <20210302173243.GM397383@xz-x1>
-References: <20210209134939.13083-1-david@redhat.com>
- <20210209134939.13083-8-david@redhat.com>
+        id S1356206AbhCCHRU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 3 Mar 2021 02:17:20 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:10178 "EHLO
+        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1580770AbhCBSVM (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 2 Mar 2021 13:21:12 -0500
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 122HYaJb059787;
+        Tue, 2 Mar 2021 12:44:49 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=Az/fcfN6DK/osVtNd+1QC/ij+aqzjlyFRETwA+EL+vQ=;
+ b=Z/IDWObxm1imV7V1dNAiNoT9P/7lV6FUatussw1NpTHEwmG3P4uRa5Hx9ubcC1Ar7AEu
+ 5JsSzFsS1XqXK0d5X6WO6xCdQyF27o/C0hZlYU7DoLS/0ycJLyJ0nl1JuuFi/zVtw9lr
+ /obbPhpuqV7OoNestQzN5qJ9PffXwV6hOJ6DjPdvf5VCDefRSkcuYuXFhnnmasO21K4L
+ FzAXTczA4Cj0yWf03q1lhPbnPdGeEpJMY39KJpc5Xb2IA2rBIm8SCQ2+d91pYRgdOkKc
+ HRwfaByguS+sZjYGUGYiZOf5oesUy1FWqRltPPtA6pQfmKdh2sigk8TsSf6e5SD81DPQ Vg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 371qgpwx6d-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 02 Mar 2021 12:44:49 -0500
+Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 122HYotG063795;
+        Tue, 2 Mar 2021 12:44:48 -0500
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 371qgpwx5y-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 02 Mar 2021 12:44:48 -0500
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+        by ppma06ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 122Hh5kE025623;
+        Tue, 2 Mar 2021 17:44:46 GMT
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
+        by ppma06ams.nl.ibm.com with ESMTP id 370c59t464-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 02 Mar 2021 17:44:46 +0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 122Hih4F39191012
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 2 Mar 2021 17:44:43 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id A9DC452052;
+        Tue,  2 Mar 2021 17:44:43 +0000 (GMT)
+Received: from ibm-vm.ibmuc.com (unknown [9.145.10.194])
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 46AC952050;
+        Tue,  2 Mar 2021 17:44:43 +0000 (GMT)
+From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
+To:     linux-kernel@vger.kernel.org
+Cc:     borntraeger@de.ibm.com, frankja@linux.ibm.com, david@redhat.com,
+        cohuck@redhat.com, kvm@vger.kernel.org, linux-s390@vger.kernel.org
+Subject: [PATCH v5 0/3] s390/kvm: fix MVPG when in VSIE
+Date:   Tue,  2 Mar 2021 18:44:40 +0100
+Message-Id: <20210302174443.514363-1-imbrenda@linux.ibm.com>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20210209134939.13083-8-david@redhat.com>
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.761
+ definitions=2021-03-02_08:2021-03-01,2021-03-02 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 spamscore=0
+ priorityscore=1501 clxscore=1015 mlxlogscore=674 bulkscore=0
+ impostorscore=0 lowpriorityscore=0 malwarescore=0 suspectscore=0
+ adultscore=0 mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2103020136
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Feb 09, 2021 at 02:49:37PM +0100, David Hildenbrand wrote:
-> @@ -899,13 +899,17 @@ int kvm_s390_mem_op_pv(S390CPU *cpu, uint64_t offset, void *hostbuf,
->   * to grow. We also have to use MAP parameters that avoid
->   * read-only mapping of guest pages.
->   */
-> -static void *legacy_s390_alloc(size_t size, uint64_t *align, bool shared)
-> +static void *legacy_s390_alloc(size_t size, uint64_t *align, bool shared,
-> +                               bool noreserve)
->  {
->      static void *mem;
->  
->      if (mem) {
->          /* we only support one allocation, which is enough for initial ram */
->          return NULL;
-> +    } else if (noreserve) {
-> +        error_report("Skipping reservation of swap space is not supported.");
-> +        return NULL
+The current handling of the MVPG instruction when executed in a nested
+guest is wrong, and can lead to the nested guest hanging.
 
-Semicolon missing.
+This patchset fixes the behaviour to be more architecturally correct,
+and fixes the hangs observed.
 
->      }
->  
->      mem = mmap((void *) 0x800000000ULL, size,
-> diff --git a/util/mmap-alloc.c b/util/mmap-alloc.c
-> index b50dc86a3c..bb99843106 100644
-> --- a/util/mmap-alloc.c
-> +++ b/util/mmap-alloc.c
-> @@ -20,6 +20,7 @@
->  #include "qemu/osdep.h"
->  #include "qemu/mmap-alloc.h"
->  #include "qemu/host-utils.h"
-> +#include "qemu/error-report.h"
->  
->  #define HUGETLBFS_MAGIC       0x958458f6
->  
-> @@ -174,12 +175,18 @@ void *qemu_ram_mmap(int fd,
->                      size_t align,
->                      bool readonly,
->                      bool shared,
-> -                    bool is_pmem)
-> +                    bool is_pmem,
-> +                    bool noreserve)
+v4->v5
+* split kvm_s390_logical_to_effective so it can be reused for vSIE
+* fix existing comments and add some more comments
+* use the new split _kvm_s390_logical_to_effective in vsie_handle_mvpg
 
-Maybe at some point we should use flags too here to cover all bools.
+v3->v4
+* added PEI_ prefix to DAT_PROT and NOT_PTE macros
+* added small comment to explain what they are about
 
-Thanks,
+v2->v3
+* improved some comments
+* improved some variable and parameter names for increased readability
+* fixed missing handling of page faults in the MVPG handler
+* small readability improvements
+
+v1->v2
+* complete rewrite
+
+Claudio Imbrenda (3):
+  s390/kvm: split kvm_s390_logical_to_effective
+  s390/kvm: extend kvm_s390_shadow_fault to return entry pointer
+  s390/kvm: VSIE: correctly handle MVPG when in VSIE
+
+ arch/s390/kvm/gaccess.c |  30 ++++++++++--
+ arch/s390/kvm/gaccess.h |  35 ++++++++++---
+ arch/s390/kvm/vsie.c    | 106 ++++++++++++++++++++++++++++++++++++----
+ 3 files changed, 151 insertions(+), 20 deletions(-)
 
 -- 
-Peter Xu
+2.26.2
 
