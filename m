@@ -2,166 +2,107 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BF1A432A6F0
-	for <lists+kvm@lfdr.de>; Tue,  2 Mar 2021 18:05:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AE00432A6F2
+	for <lists+kvm@lfdr.de>; Tue,  2 Mar 2021 18:05:15 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1838879AbhCBPzD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 2 Mar 2021 10:55:03 -0500
-Received: from szxga04-in.huawei.com ([45.249.212.190]:13105 "EHLO
-        szxga04-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241317AbhCBHpu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 2 Mar 2021 02:45:50 -0500
-Received: from DGGEMS409-HUB.china.huawei.com (unknown [172.30.72.60])
-        by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4DqTZP1nWGz16FVl;
-        Tue,  2 Mar 2021 15:40:45 +0800 (CST)
-Received: from [10.174.184.42] (10.174.184.42) by
- DGGEMS409-HUB.china.huawei.com (10.3.19.209) with Microsoft SMTP Server id
- 14.3.498.0; Tue, 2 Mar 2021 15:42:18 +0800
-Subject: Re: [RFC PATCH 01/11] iommu/arm-smmu-v3: Add feature detection for
- HTTU
-To:     Robin Murphy <robin.murphy@arm.com>,
-        <linux-kernel@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>, <kvm@vger.kernel.org>,
-        <kvmarm@lists.cs.columbia.edu>, <iommu@lists.linux-foundation.org>,
-        "Will Deacon" <will@kernel.org>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        "Marc Zyngier" <maz@kernel.org>,
-        Catalin Marinas <catalin.marinas@arm.com>
-References: <20210128151742.18840-1-zhukeqian1@huawei.com>
- <20210128151742.18840-2-zhukeqian1@huawei.com>
- <f8be5718-d4d9-0565-eaf0-b5a128897d15@arm.com>
-CC:     Mark Rutland <mark.rutland@arm.com>, <jiangkunkun@huawei.com>,
-        "Suzuki K Poulose" <suzuki.poulose@arm.com>,
-        Cornelia Huck <cohuck@redhat.com>, <lushenming@huawei.com>,
-        Kirti Wankhede <kwankhede@nvidia.com>,
-        James Morse <james.morse@arm.com>, <wanghaibin.wang@huawei.com>
-From:   Keqian Zhu <zhukeqian1@huawei.com>
-Message-ID: <3b347f75-2e53-1f89-a76d-1f328766cf5f@huawei.com>
-Date:   Tue, 2 Mar 2021 15:42:17 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
- Thunderbird/45.7.1
-MIME-Version: 1.0
-In-Reply-To: <f8be5718-d4d9-0565-eaf0-b5a128897d15@arm.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.174.184.42]
-X-CFilter-Loop: Reflected
+        id S1838890AbhCBPzI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 2 Mar 2021 10:55:08 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42470 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1376913AbhCBIRv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 2 Mar 2021 03:17:51 -0500
+Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B80BDC061794
+        for <kvm@vger.kernel.org>; Tue,  2 Mar 2021 00:17:10 -0800 (PST)
+Received: by mail-pl1-x64a.google.com with SMTP id k16so10782883plk.20
+        for <kvm@vger.kernel.org>; Tue, 02 Mar 2021 00:17:10 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=sender:date:message-id:mime-version:subject:from:to:cc;
+        bh=J5nM/aBIL0ud17qxWddLzc4+65+ykqSEziPOIHoR18E=;
+        b=CLaHSQRRQuhzlrNUHt+Ee6dvdh/pvhmKVL23Vm4bjLSGpL9t3yxCRmBAVgHL6lsIyn
+         05iAFmfLfOZZR9GHkYRXKHrHC0SJlD8qUu+AAvO9gfMPcV4vhR646pp/hEvI68QeA2Mb
+         DBYpEVQWeUFHdRFXaub06Vwhv8jjJysBUfgnKx9+1KwWwrDjmMYv+jozyxcKVieG9COH
+         DE7ZHKblBdBpTi6HTjHtr7iiM5+8AIUrueg5HzDkJVCaHvkxaOHcB1vGO3bNgFMavgSK
+         JIqmGJgz7qn0J+SwCsXUdzaYEdBIOPxEJJe80J4+INK+OSDVp9jhM5+vKb5bRxmRrTWt
+         lYag==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:sender:date:message-id:mime-version:subject:from
+         :to:cc;
+        bh=J5nM/aBIL0ud17qxWddLzc4+65+ykqSEziPOIHoR18E=;
+        b=lfg1qDwYmV8AcpDJGqvQlPSTF6Ihz1PCDO6yCLAPr8kZuBAip2indueuV7NaYK8Yj6
+         LjjCW5UIy23NxUpMCte7AwtGBP325Nf3UgIO1Pl+SqobCK3sicfxGEu20pY4wyBdom/h
+         8I7KdlJlvxMzXRJ89D1lqhiUxxjLgn1ocKy60P2AskKpHnZimgELWK29NBBtkHl8oZ9q
+         Wik/bviRn9N89Iywiv/TEztnSCuHG/dZm9xbdcPzzXvxO3nJMkzt/KHpLWzLMw4AWPVI
+         FeCtxMyM3EDDnXLMSM4pPhQxuzEwn3TF9zy8ltFYpDquF0+ikcl9ejMQXYPFQpfJpM9P
+         kf9Q==
+X-Gm-Message-State: AOAM531X6pJVWqBhOqoXAZIVhsFn5dkWPh6T+Fl6ObUOlpfc9M+LzSvJ
+        /aiDqvsnMms0lSw6d/pLXtc86tYZxjDo
+X-Google-Smtp-Source: ABdhPJxpzOEermj6hCTqHdZMYKkcNIjK+rfabJvpEhcLm7hTMoPzPtCdKtmgNr1eNEsnSiBD1DsDg2OTL89T
+Sender: "vipinsh via sendgmr" <vipinsh@vipinsh.kir.corp.google.com>
+X-Received: from vipinsh.kir.corp.google.com ([2620:0:1008:10:e829:dc2a:968a:1370])
+ (user=vipinsh job=sendgmr) by 2002:a62:6585:0:b029:1b9:d8d9:1af2 with SMTP id
+ z127-20020a6265850000b02901b9d8d91af2mr2296150pfb.17.1614673030058; Tue, 02
+ Mar 2021 00:17:10 -0800 (PST)
+Date:   Tue,  2 Mar 2021 00:17:03 -0800
+Message-Id: <20210302081705.1990283-1-vipinsh@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.30.1.766.gb4fecdf3b7-goog
+Subject: [RFC v2 0/2] cgroup: New misc cgroup controller
+From:   Vipin Sharma <vipinsh@google.com>
+To:     tj@kernel.org, mkoutny@suse.com, rdunlap@infradead.org,
+        thomas.lendacky@amd.com, brijesh.singh@amd.com, jon.grimm@amd.com,
+        eric.vantassell@amd.com, pbonzini@redhat.com, hannes@cmpxchg.org,
+        frankja@linux.ibm.com, borntraeger@de.ibm.com
+Cc:     corbet@lwn.net, seanjc@google.com, vkuznets@redhat.com,
+        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
+        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, hpa@zytor.com,
+        gingell@google.com, rientjes@google.com, dionnaglaze@google.com,
+        kvm@vger.kernel.org, x86@kernel.org, cgroups@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Vipin Sharma <vipinsh@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Robin,
+Hello
 
-I am going to send v2 at next week, to addresses these issues reported by you. Many thanks!
-And do you have any further comments on patch #4 #5 and #6?
+This patch series is creating a new misc cgroup controller for limiting
+and tracking of resources which are not abstract like other cgroup
+controllers.
 
-Thanks,
-Keqian
+This controller was initially proposed as encryption_id but after
+the feedbacks, it is now changed to misc cgroup.
+https://lore.kernel.org/lkml/20210108012846.4134815-2-vipinsh@google.com/
 
-On 2021/2/5 3:50, Robin Murphy wrote:
-> On 2021-01-28 15:17, Keqian Zhu wrote:
->> From: jiangkunkun <jiangkunkun@huawei.com>
->>
->> The SMMU which supports HTTU (Hardware Translation Table Update) can
->> update the access flag and the dirty state of TTD by hardware. It is
->> essential to track dirty pages of DMA.
->>
->> This adds feature detection, none functional change.
->>
->> Co-developed-by: Keqian Zhu <zhukeqian1@huawei.com>
->> Signed-off-by: Kunkun Jiang <jiangkunkun@huawei.com>
->> ---
->>   drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c | 16 ++++++++++++++++
->>   drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h |  8 ++++++++
->>   include/linux/io-pgtable.h                  |  1 +
->>   3 files changed, 25 insertions(+)
->>
->> diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
->> index 8ca7415d785d..0f0fe71cc10d 100644
->> --- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
->> +++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
->> @@ -1987,6 +1987,7 @@ static int arm_smmu_domain_finalise(struct iommu_domain *domain,
->>           .pgsize_bitmap    = smmu->pgsize_bitmap,
->>           .ias        = ias,
->>           .oas        = oas,
->> +        .httu_hd    = smmu->features & ARM_SMMU_FEAT_HTTU_HD,
->>           .coherent_walk    = smmu->features & ARM_SMMU_FEAT_COHERENCY,
->>           .tlb        = &arm_smmu_flush_ops,
->>           .iommu_dev    = smmu->dev,
->> @@ -3224,6 +3225,21 @@ static int arm_smmu_device_hw_probe(struct arm_smmu_device *smmu)
->>       if (reg & IDR0_HYP)
->>           smmu->features |= ARM_SMMU_FEAT_HYP;
->>   +    switch (FIELD_GET(IDR0_HTTU, reg)) {
-> 
-> We need to accommodate the firmware override as well if we need this to be meaningful. Jean-Philippe is already carrying a suitable patch in the SVA stack[1].
-> 
->> +    case IDR0_HTTU_NONE:
->> +        break;
->> +    case IDR0_HTTU_HA:
->> +        smmu->features |= ARM_SMMU_FEAT_HTTU_HA;
->> +        break;
->> +    case IDR0_HTTU_HAD:
->> +        smmu->features |= ARM_SMMU_FEAT_HTTU_HA;
->> +        smmu->features |= ARM_SMMU_FEAT_HTTU_HD;
->> +        break;
->> +    default:
->> +        dev_err(smmu->dev, "unknown/unsupported HTTU!\n");
->> +        return -ENXIO;
->> +    }
->> +
->>       /*
->>        * The coherency feature as set by FW is used in preference to the ID
->>        * register, but warn on mismatch.
->> diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h
->> index 96c2e9565e00..e91bea44519e 100644
->> --- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h
->> +++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h
->> @@ -33,6 +33,10 @@
->>   #define IDR0_ASID16            (1 << 12)
->>   #define IDR0_ATS            (1 << 10)
->>   #define IDR0_HYP            (1 << 9)
->> +#define IDR0_HTTU            GENMASK(7, 6)
->> +#define IDR0_HTTU_NONE            0
->> +#define IDR0_HTTU_HA            1
->> +#define IDR0_HTTU_HAD            2
->>   #define IDR0_COHACC            (1 << 4)
->>   #define IDR0_TTF            GENMASK(3, 2)
->>   #define IDR0_TTF_AARCH64        2
->> @@ -286,6 +290,8 @@
->>   #define CTXDESC_CD_0_TCR_TBI0        (1ULL << 38)
->>     #define CTXDESC_CD_0_AA64        (1UL << 41)
->> +#define CTXDESC_CD_0_HD            (1UL << 42)
->> +#define CTXDESC_CD_0_HA            (1UL << 43)
->>   #define CTXDESC_CD_0_S            (1UL << 44)
->>   #define CTXDESC_CD_0_R            (1UL << 45)
->>   #define CTXDESC_CD_0_A            (1UL << 46)
->> @@ -604,6 +610,8 @@ struct arm_smmu_device {
->>   #define ARM_SMMU_FEAT_RANGE_INV        (1 << 15)
->>   #define ARM_SMMU_FEAT_BTM        (1 << 16)
->>   #define ARM_SMMU_FEAT_SVA        (1 << 17)
->> +#define ARM_SMMU_FEAT_HTTU_HA        (1 << 18)
->> +#define ARM_SMMU_FEAT_HTTU_HD        (1 << 19)
->>       u32                features;
->>     #define ARM_SMMU_OPT_SKIP_PREFETCH    (1 << 0)
->> diff --git a/include/linux/io-pgtable.h b/include/linux/io-pgtable.h
->> index ea727eb1a1a9..1a00ea8562c7 100644
->> --- a/include/linux/io-pgtable.h
->> +++ b/include/linux/io-pgtable.h
->> @@ -97,6 +97,7 @@ struct io_pgtable_cfg {
->>       unsigned long            pgsize_bitmap;
->>       unsigned int            ias;
->>       unsigned int            oas;
->> +    bool                httu_hd;
-> 
-> This is very specific to the AArch64 stage 1 format, not a generic capability - I think it should be a quirk flag rather than a common field.
-> 
-> Robin.
-> 
-> [1] https://jpbrucker.net/git/linux/commit/?h=sva/current&id=1ef7d512fb9082450dfe0d22ca4f7e35625a097b
-> 
->>       bool                coherent_walk;
->>       const struct iommu_flush_ops    *tlb;
->>       struct device            *iommu_dev;
->>
-> .
-> 
+Changes in RFC v2:
+1. Documentation fixes.
+2. Added kernel log messages.
+3. Changed charge API to treat misc_cg as input parameter.
+4. Added helper APIs to get and release references on the cgroup.
+
+[1] https://lore.kernel.org/lkml/20210218195549.1696769-1-vipinsh@google.com
+Vipin Sharma (2):
+  cgroup: sev: Add misc cgroup controller
+  cgroup: sev: Miscellaneous cgroup documentation.
+
+ Documentation/admin-guide/cgroup-v1/index.rst |   1 +
+ Documentation/admin-guide/cgroup-v1/misc.rst  |   4 +
+ Documentation/admin-guide/cgroup-v2.rst       |  69 ++-
+ arch/x86/kvm/svm/sev.c                        |  65 ++-
+ arch/x86/kvm/svm/svm.h                        |   1 +
+ include/linux/cgroup_subsys.h                 |   4 +
+ include/linux/misc_cgroup.h                   | 122 +++++
+ init/Kconfig                                  |  14 +
+ kernel/cgroup/Makefile                        |   1 +
+ kernel/cgroup/misc.c                          | 423 ++++++++++++++++++
+ 10 files changed, 692 insertions(+), 12 deletions(-)
+ create mode 100644 Documentation/admin-guide/cgroup-v1/misc.rst
+ create mode 100644 include/linux/misc_cgroup.h
+ create mode 100644 kernel/cgroup/misc.c
+
+-- 
+2.30.1.766.gb4fecdf3b7-goog
+
