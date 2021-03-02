@@ -2,120 +2,149 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id AA51732A792
-	for <lists+kvm@lfdr.de>; Tue,  2 Mar 2021 18:22:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0F04932A75A
+	for <lists+kvm@lfdr.de>; Tue,  2 Mar 2021 18:08:49 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1839336AbhCBQRR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 2 Mar 2021 11:17:17 -0500
-Received: from hqnvemgate24.nvidia.com ([216.228.121.143]:7357 "EHLO
-        hqnvemgate24.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1351433AbhCBOYj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 2 Mar 2021 09:24:39 -0500
-Received: from hqmail.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate24.nvidia.com (using TLS: TLSv1.2, AES256-SHA)
-        id <B603e36090001>; Tue, 02 Mar 2021 04:56:41 -0800
-Received: from HQMAIL101.nvidia.com (172.20.187.10) by HQMAIL107.nvidia.com
- (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Tue, 2 Mar
- 2021 12:56:31 +0000
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (104.47.56.177)
- by HQMAIL101.nvidia.com (172.20.187.10) with Microsoft SMTP Server (TLS) id
- 15.0.1497.2 via Frontend Transport; Tue, 2 Mar 2021 12:56:31 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=JVBGe1a+0bdT+uQl//+se6BS36aERgqzoj4jxC28EhKKHReJTlTKyRExsqQadUp7XG8wrU+n3Jh//qSPYrRDj3ST1fzMvnApxORf39RDQtr6HlGyBLDB5xqkmHLnPiOM6gsqKBy/bbeNbUFjq9EmIJtUtU1T0ftctSIChARx8kPcQpHFDdeCJt6oe1Vmyk0AacKD009cLlurETzq10RLkZA3lPcli8AlYPGw+7mkrlnMMkjv5Eau4uu9hqAj/UbsPPRbiKKQVFFSWSVrsML42aEHNOzjafKOfpQSexzVPVn/C1RemauG9/GKGtX7K1dRqGVGE7bF3iO0Og0dh0lFCQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=9MgLTm4NUOav1OVsggZ0AhuQUe5IdICnRZfme77w4MM=;
- b=LTsTx67l7MykGA/X8wQmm+dxy2pSQCNYpgm8u/irC744IEQPrkoqVscN4y8/SkatF+eatt1ky6i0AWwwabQT+0kRDqC2hmWv/Pim7AQ0M2Ca2MXWaVKUE0I1/3liDrj8QVNgPbP8wGR8x3AJj8N5fiLPN3SutQuIoC6QyDdYH85iOSeBQ+uvc3n1YRIxmiB7ntj8XRcHeif6bzyp+HGWPPECnavSjt3YnC8dCbNKWRaD+RxReqHV8EhcIv5O2J/0/A0HSJ1OOKXPO81l3+nJA9gD1cNk2zSESQ6CdCi9fTUmHK8WtoEo7j3yvr5NWhgLgwvA6lOH0BSuD4JIeJvbjw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-Received: from DM6PR12MB3834.namprd12.prod.outlook.com (2603:10b6:5:14a::12)
- by DM5PR12MB1515.namprd12.prod.outlook.com (2603:10b6:4:6::9) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3890.20; Tue, 2 Mar 2021 12:56:30 +0000
-Received: from DM6PR12MB3834.namprd12.prod.outlook.com
- ([fe80::1c62:7fa3:617b:ab87]) by DM6PR12MB3834.namprd12.prod.outlook.com
- ([fe80::1c62:7fa3:617b:ab87%6]) with mapi id 15.20.3912.017; Tue, 2 Mar 2021
- 12:56:29 +0000
-Date:   Tue, 2 Mar 2021 08:56:28 -0400
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Liu Yi L <yi.l.liu@intel.com>
-CC:     <alex.williamson@redhat.com>, <eric.auger@redhat.com>,
-        <baolu.lu@linux.intel.com>, <joro@8bytes.org>,
-        <kevin.tian@intel.com>, <jacob.jun.pan@linux.intel.com>,
-        <ashok.raj@intel.com>, <jun.j.tian@intel.com>,
-        <yi.y.sun@intel.com>, <jean-philippe@linaro.org>,
-        <peterx@redhat.com>, <jasowang@redhat.com>, <hao.wu@intel.com>,
-        <stefanha@gmail.com>, <iommu@lists.linux-foundation.org>,
-        <kvm@vger.kernel.org>, <Lingshan.Zhu@intel.com>,
-        <vivek.gautam@arm.com>
-Subject: Re: [Patch v8 04/10] vfio/type1: Support binding guest page tables
- to PASID
-Message-ID: <20210302125628.GI4247@nvidia.com>
-References: <20210302203545.436623-1-yi.l.liu@intel.com>
- <20210302203545.436623-5-yi.l.liu@intel.com>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20210302203545.436623-5-yi.l.liu@intel.com>
-X-ClientProxiedBy: MN2PR20CA0049.namprd20.prod.outlook.com
- (2603:10b6:208:235::18) To DM6PR12MB3834.namprd12.prod.outlook.com
- (2603:10b6:5:14a::12)
+        id S1384785AbhCBQMU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 2 Mar 2021 11:12:20 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:38122 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1350912AbhCBM7E (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 2 Mar 2021 07:59:04 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1614689795;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=M9fL7n3Tv5twMpsBGgac3V/MmjGJOrbN2fKp4Wp/lhk=;
+        b=R5gAe6uues6+PEcUr3UwZPxiyBWtbbTyHbwIQVhrIejSLcFpnA/YKwvKXV01/7VdVfSz9u
+        +5400peLiY+Pje+RdA4qkO5mkjelEsPlxsTyPX9Q9RllTnoP5FAbA3JfVAl2mwBcpcjVZX
+        i3m4NGWd+6PaRkHHo3rHpu9a20R+dbk=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-561-oaeMdRUFPTC5FrLTLYTNBQ-1; Tue, 02 Mar 2021 07:56:33 -0500
+X-MC-Unique: oaeMdRUFPTC5FrLTLYTNBQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6DD501E570;
+        Tue,  2 Mar 2021 12:56:32 +0000 (UTC)
+Received: from localhost.localdomain (ovpn-114-4.rdu2.redhat.com [10.10.114.4])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id D3EC060BFA;
+        Tue,  2 Mar 2021 12:56:31 +0000 (UTC)
+Subject: Re: [PATCH] KVM: nSVM: Optimize L12 to L2 vmcb.save copies
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        pbonzini@redhat.com, vkuznets@redhat.com, wei.huang2@amd.com
+References: <20210301200844.2000-1-cavery@redhat.com>
+ <YD2N/4sDKS4RJdlR@google.com>
+From:   Cathy Avery <cavery@redhat.com>
+Message-ID: <9c7e4dec-2181-1720-5981-3ae25c5bb0d9@redhat.com>
+Date:   Tue, 2 Mar 2021 07:56:31 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.4.0
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from mlx.ziepe.ca (142.162.115.133) by MN2PR20CA0049.namprd20.prod.outlook.com (2603:10b6:208:235::18) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3890.19 via Frontend Transport; Tue, 2 Mar 2021 12:56:29 +0000
-Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1lH4Zg-0049l2-AZ; Tue, 02 Mar 2021 08:56:28 -0400
-X-Header: ProcessedBy-CMR-outbound
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
-        t=1614689801; bh=9MgLTm4NUOav1OVsggZ0AhuQUe5IdICnRZfme77w4MM=;
-        h=ARC-Seal:ARC-Message-Signature:ARC-Authentication-Results:Date:
-         From:To:CC:Subject:Message-ID:References:Content-Type:
-         Content-Disposition:In-Reply-To:X-ClientProxiedBy:MIME-Version:
-         X-MS-Exchange-MessageSentRepresentingType:X-Header;
-        b=CvLvudj1bLNW4uS1FHwJ8ieEhafikTtef3ToiDwvY45Dxpv62TIB68vY6GkGegtQ+
-         3RLXwBbC1YwLeEB+xf2UONelKeYY7BBQ8uvv9Grc0jrBbYKnEmUqaRx8pC2y4M7//S
-         2Z+2mCaPtB8Z2HLgw8cgm2sracAAUhEZI5xIMek8vUEhe4DVsr98ll2p8Sxr50Qcc5
-         b6fGCoL7LN69RDQRyAXaX+R/jOL4ApFHVZu9IHHtvFF/msr9/6SXGZXMWO3+dzrn4+
-         MD0BtK/OC55o7vaunlZ/lAibpboie+E1qYsm/Sc8p7QC0chSjGMsreKIFNYX0c+GYJ
-         3R+dg+oGZikEQ==
+In-Reply-To: <YD2N/4sDKS4RJdlR@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Mar 03, 2021 at 04:35:39AM +0800, Liu Yi L wrote:
->  
-> +static int vfio_dev_bind_gpasid_fn(struct device *dev, void *data)
-> +{
-> +	struct domain_capsule *dc = (struct domain_capsule *)data;
-> +	unsigned long arg = *(unsigned long *)dc->data;
-> +
-> +	return iommu_uapi_sva_bind_gpasid(dc->domain, dev,
-> +					  (void __user *)arg);
+On 3/1/21 7:59 PM, Sean Christopherson wrote:
+> On Mon, Mar 01, 2021, Cathy Avery wrote:
+>>   	kvm_set_rflags(&svm->vcpu, vmcb12->save.rflags | X86_EFLAGS_FIXED);
+>>   	svm_set_efer(&svm->vcpu, vmcb12->save.efer);
+>>   	svm_set_cr0(&svm->vcpu, vmcb12->save.cr0);
+>>   	svm_set_cr4(&svm->vcpu, vmcb12->save.cr4);
+> Why not utilize VMCB_CR?
+I was going to tackle CR in a follow up patch. I should have mentioned 
+that but it makes sense to go ahead and do it now.
+>
+>> -	svm->vcpu.arch.cr2 = vmcb12->save.cr2;
+>> +	svm->vmcb->save.cr2 = svm->vcpu.arch.cr2 = vmcb12->save.cr2;
+> Same question for VMCB_CR2.
+>
+> Also, isn't writing svm->vmcb->save.cr2 unnecessary since svm_vcpu_run()
+> unconditionally writes it?
+>
+> Alternatively, it shouldn't be too much work to add proper dirty tracking for
+> CR2.  VMX has to write the real CR2 every time because there's no VMCS field,
+> but I assume can avoid the write and dirty update on the majority of VMRUNs.
 
-This arg buisness is really tortured. The type should be set at the
-ioctl, not constantly passed down as unsigned long or worse void *.
+I 'll take a look at CR2 as well.
 
-And why is this passing a __user pointer deep into an iommu_* API??
+Thanks for the feedback,
 
-> +/**
-> + * VFIO_IOMMU_NESTING_OP - _IOW(VFIO_TYPE, VFIO_BASE + 18,
-> + *				struct vfio_iommu_type1_nesting_op)
-> + *
-> + * This interface allows userspace to utilize the nesting IOMMU
-> + * capabilities as reported in VFIO_IOMMU_TYPE1_INFO_CAP_NESTING
-> + * cap through VFIO_IOMMU_GET_INFO. For platforms which require
-> + * system wide PASID, PASID will be allocated by VFIO_IOMMU_PASID
-> + * _REQUEST.
-> + *
-> + * @data[] types defined for each op:
-> + * +=================+===============================================+
-> + * | NESTING OP      |      @data[]                                  |
-> + * +=================+===============================================+
-> + * | BIND_PGTBL      |      struct iommu_gpasid_bind_data            |
-> + * +-----------------+-----------------------------------------------+
-> + * | UNBIND_PGTBL    |      struct iommu_gpasid_bind_data            |
-> + *
-> +-----------------+-----------------------------------------------+
+Cathy
 
-If the type is known why does the struct have a flex array?
+>
+>> +
+>>   	kvm_rax_write(&svm->vcpu, vmcb12->save.rax);
+>>   	kvm_rsp_write(&svm->vcpu, vmcb12->save.rsp);
+>>   	kvm_rip_write(&svm->vcpu, vmcb12->save.rip);
+>>   
+>>   	/* In case we don't even reach vcpu_run, the fields are not updated */
+>> -	svm->vmcb->save.cr2 = svm->vcpu.arch.cr2;
+>>   	svm->vmcb->save.rax = vmcb12->save.rax;
+>>   	svm->vmcb->save.rsp = vmcb12->save.rsp;
+>>   	svm->vmcb->save.rip = vmcb12->save.rip;
+>>   
+>> -	svm->vmcb->save.dr7 = vmcb12->save.dr7 | DR7_FIXED_1;
+>> -	svm->vcpu.arch.dr6  = vmcb12->save.dr6 | DR6_ACTIVE_LOW;
+>> -	vmcb_mark_dirty(svm->vmcb, VMCB_DR);
+>> +	/* These bits will be set properly on the first execution when new_vmc12 is true */
+>> +	if (unlikely(new_vmcb12 || vmcb_is_dirty(vmcb12, VMCB_DR))) {
+>> +		svm->vmcb->save.dr7 = vmcb12->save.dr7 | DR7_FIXED_1;
+>> +		svm->vcpu.arch.dr6  = vmcb12->save.dr6 | DR6_ACTIVE_LOW;
+>> +		vmcb_mark_dirty(svm->vmcb, VMCB_DR);
+>> +	}
+>>   }
+>>   
+>>   static void nested_vmcb02_prepare_control(struct vcpu_svm *svm)
+>> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+>> index 54610270f66a..9761a7ca8100 100644
+>> --- a/arch/x86/kvm/svm/svm.c
+>> +++ b/arch/x86/kvm/svm/svm.c
+>> @@ -1232,6 +1232,7 @@ static void init_vmcb(struct kvm_vcpu *vcpu)
+>>   	svm->asid = 0;
+>>   
+>>   	svm->nested.vmcb12_gpa = 0;
+>> +	svm->nested.last_vmcb12_gpa = 0;
+> We should use INVALID_PAGE, '0' is a legal physical address and could
+> theoretically get a false negative on the "new_vmcb12" check.
+>
+>>   	vcpu->arch.hflags = 0;
+>>   
+>>   	if (!kvm_pause_in_guest(vcpu->kvm)) {
+>> diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
+>> index fbbb26dd0f73..911868d4584c 100644
+>> --- a/arch/x86/kvm/svm/svm.h
+>> +++ b/arch/x86/kvm/svm/svm.h
+>> @@ -93,6 +93,7 @@ struct svm_nested_state {
+>>   	u64 hsave_msr;
+>>   	u64 vm_cr_msr;
+>>   	u64 vmcb12_gpa;
+>> +	u64 last_vmcb12_gpa;
+>>   
+>>   	/* These are the merged vectors */
+>>   	u32 *msrpm;
+>> @@ -247,6 +248,11 @@ static inline void vmcb_mark_dirty(struct vmcb *vmcb, int bit)
+>>   	vmcb->control.clean &= ~(1 << bit);
+>>   }
+>>   
+>> +static inline bool vmcb_is_dirty(struct vmcb *vmcb, int bit)
+>> +{
+>> +        return !test_bit(bit, (unsigned long *)&vmcb->control.clean);
+>> +}
+>> +
+>>   static inline struct vcpu_svm *to_svm(struct kvm_vcpu *vcpu)
+>>   {
+>>   	return container_of(vcpu, struct vcpu_svm, vcpu);
+>> -- 
+>> 2.26.2
+>>
 
-Jason
