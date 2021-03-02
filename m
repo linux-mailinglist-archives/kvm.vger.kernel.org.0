@@ -2,100 +2,144 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 060AC32B5BC
+	by mail.lfdr.de (Postfix) with ESMTP id EB09F32B5BE
 	for <lists+kvm@lfdr.de>; Wed,  3 Mar 2021 08:44:59 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1449289AbhCCHTo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 3 Mar 2021 02:19:44 -0500
-Received: from tr21g11a.aset.psu.edu ([128.118.146.164]:54176 "EHLO
-        tr21g11a.aset.psu.edu" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1573777AbhCBUAL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 2 Mar 2021 15:00:11 -0500
-Received: from mail-oi1-f179.google.com (mail-oi1-f179.google.com [209.85.167.179])
-        (authenticated bits=0)
-        by tr21g11a.aset.psu.edu (8.15.2/8.15.2) with ESMTPSA id 122JxIUq018989
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Tue, 2 Mar 2021 14:59:19 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=psu.edu;
-        s=authsmtp_2020; t=1614715159;
-        bh=LMmfGmKCfzgLgKGl/Sw65K2lkdEfK5EcXiuTVyy/Joo=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=mV5vixxtzBUJ4q0HFEUlBUdVNceHgW8gtDPxmGPQQ9uV3XJOtcNz3GTlpbIszLVgD
-         OwAPdi9+ekyhJDleMAl5iRXml2wSsjy/c8iFOQsbaFHBFCwBBp/c6LdvltFldzXWpx
-         dwKgK4VmEXRvvYbRWnXwRMbHwKkja/wBzaBfRZLZtgd+u2syw/T/Yk4ueeCGq8pGc+
-         qdLAWZzkppHyCG8LuRYbzVx8/v4hTASswoIOhTuADpC3gtI5ph9q3pzXuuXA1yPqC0
-         H8EYvjn41az97Btj/lITpOFvrK0bhAaShdVvw1kfE29h0Dp5znZfuBsqGvq3GENNVN
-         6jxap7yVkC5Og==
-Received: by mail-oi1-f179.google.com with SMTP id j1so23309268oiw.3
-        for <kvm@vger.kernel.org>; Tue, 02 Mar 2021 11:59:19 -0800 (PST)
-X-Gm-Message-State: AOAM531O3ESbRV3YNkUFQkjkUVzXag/PPImVg5aIYIPEOGstDjc9appL
-        iGwyH0SBmYMD4UfwAEfGvfFlt/S9JxnxdT4MdkRcdA==
-X-Google-Smtp-Source: ABdhPJw3mDRZ/LOBiDEVLcavdoH+tu5sxt//Z5L0JuUnUF/yRf90rakDS/qeqHTWuz8sbCg+D8uNjXMIdTTF7jzVxUQ=
-X-Received: by 2002:aca:b389:: with SMTP id c131mr4563490oif.99.1614715158780;
- Tue, 02 Mar 2021 11:59:18 -0800 (PST)
+        id S1449305AbhCCHTs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 3 Mar 2021 02:19:48 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:30200 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1347714AbhCBUqK (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 2 Mar 2021 15:46:10 -0500
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 122KikOc125081;
+        Tue, 2 Mar 2021 15:45:03 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=i2kvvKV8YkI3FIKc2WLAgthz4xGwzpGL2uBfqaKoBgQ=;
+ b=Q31pWqt/6r8ME6Q2YxafHOQzl2WjvAUBs8jmYh6mFKnhj/Bz0NMiAvR3kaw16UfpgbmW
+ Ul240Ii7O178xskcdpRvefh29GiU6PtVMLvrZv8+dVsWUpOGnh31PNT4iVAArHdQ8V3k
+ E+mKGkfJKgtZ7NQurMCUHuQ/urTO0rEJiJKevCKsQhcCD507K3tyxcPJhDtYy3HSpAbp
+ m05bjn2QSGr4UofYw9//SNB3D7CvAlzVaqYXt4aHcAxtOA2JfAfPiAop/t48dPGfgMei
+ /95nZ7El3rWTjTMTffQvFSR/zDorvsT2k2L9P2Dkpo3P/zMlK4nr0HAHx0e+hEYanUUd ng== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 371vnt00cb-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 02 Mar 2021 15:45:03 -0500
+Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 122Kj2ea127175;
+        Tue, 2 Mar 2021 15:45:02 -0500
+Received: from ppma03dal.us.ibm.com (b.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.11])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 371vnt0043-19
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 02 Mar 2021 15:45:02 -0500
+Received: from pps.filterd (ppma03dal.us.ibm.com [127.0.0.1])
+        by ppma03dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 122KhChr004042;
+        Tue, 2 Mar 2021 20:43:42 GMT
+Received: from b03cxnp08028.gho.boulder.ibm.com (b03cxnp08028.gho.boulder.ibm.com [9.17.130.20])
+        by ppma03dal.us.ibm.com with ESMTP id 37103w5r0q-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 02 Mar 2021 20:43:42 +0000
+Received: from b03ledav004.gho.boulder.ibm.com (b03ledav004.gho.boulder.ibm.com [9.17.130.235])
+        by b03cxnp08028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 122Khe5N38011334
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 2 Mar 2021 20:43:40 GMT
+Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id C0BE278060;
+        Tue,  2 Mar 2021 20:43:40 +0000 (GMT)
+Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id ED9237805C;
+        Tue,  2 Mar 2021 20:43:38 +0000 (GMT)
+Received: from cpe-66-24-58-13.stny.res.rr.com.com (unknown [9.85.150.254])
+        by b03ledav004.gho.boulder.ibm.com (Postfix) with ESMTP;
+        Tue,  2 Mar 2021 20:43:38 +0000 (GMT)
+From:   Tony Krowiak <akrowiak@linux.ibm.com>
+To:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Cc:     stable@vger.kernel.org, borntraeger@de.ibm.com, cohuck@redhat.com,
+        kwankhede@nvidia.com, pbonzini@redhat.com,
+        alex.williamson@redhat.com, pasic@linux.vnet.ibm.com,
+        Tony Krowiak <akrowiak@linux.ibm.com>
+Subject: [PATCH v3 0/1] s390/vfio-ap: fix circular lockdep when starting SE guest
+Date:   Tue,  2 Mar 2021 15:43:21 -0500
+Message-Id: <20210302204322.24441-1-akrowiak@linux.ibm.com>
+X-Mailer: git-send-email 2.21.3
 MIME-Version: 1.0
-References: <CAPn5F5zvmfpo3tdbfVDYC+rTBmVzQ8aGYG+7FrcbeRsnZKPs-w@mail.gmail.com>
- <0f76acb4-48ee-1e20-f3f1-de4efa276620@intel.com>
-In-Reply-To: <0f76acb4-48ee-1e20-f3f1-de4efa276620@intel.com>
-From:   Aditya Basu <aditya.basu@psu.edu>
-Date:   Tue, 2 Mar 2021 14:59:04 -0500
-X-Gmail-Original-Message-ID: <CAPn5F5xms0LnffB78ep-nsHH7LiJYaWv_1c0=Awfz9zcciaogQ@mail.gmail.com>
-Message-ID: <CAPn5F5xms0LnffB78ep-nsHH7LiJYaWv_1c0=Awfz9zcciaogQ@mail.gmail.com>
-Subject: Re: Processor to run Intel PT in a Guest VM
-To:     "Xu, Like" <like.xu@intel.com>
-Cc:     "Jaeger, Trent Ray" <trj1@psu.edu>, kvm <kvm@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Milter: Strip-Plus
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.761
+ definitions=2021-03-02_08:2021-03-01,2021-03-02 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 mlxscore=0
+ suspectscore=0 mlxlogscore=999 priorityscore=1501 lowpriorityscore=0
+ clxscore=1015 adultscore=0 spamscore=0 phishscore=0 impostorscore=0
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2103020156
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Thanks a lot for the information. From what I see, the Atom P series
-are server-grade processors.
+*Commit f21916ec4826 ("s390/vfio-ap: clean up vfio_ap resources when KVM
+pointer invalidated") introduced a change that results in a circular
+lockdep when a Secure Execution guest that is configured with
+crypto devices is started. The problem resulted due to the fact that the
+patch moved the setting of the guest's AP masks within the protection of
+the matrix_dev->lock when the vfio_ap driver is notified that the KVM 
+pointer has been set. Since it is not critical that setting/clearing of
+the guest's AP masks be done under the matrix_dev->lock when the driver is
+notified, the masks will not be updated under the matrix_dev->lock. The
+lock is necessary for the setting/unsetting of the KVM pointer, however,
+so that will remain in place. 
 
-Would you happen to know if any Desktop/Workstation processors (ex.
-10th gen i9) also support this feature?
-Specifically, I'm referring to Comet Lake, here --
+The dependency chain for the circular lockdep resolved by this patch 
+is (in reverse order):
 
-https://ark.intel.com/content/www/us/en/ark/products/codename/90354/comet-l=
-ake.html
+2:	vfio_ap_mdev_group_notifier:	kvm->lock
+					matrix_dev->lock
 
-Aditya
+1:	handle_pqap:			matrix_dev->lock
+	kvm_vcpu_ioctl:			vcpu->mutex
 
+0:	kvm_s390_cpus_to_pv:		vcpu->mutex
+	kvm_vm_ioctl:  			kvm->lock
 
-Aditya
+Please note:
+-----------
+* If checkpatch is run against this patch series, you may
+  get a "WARNING: Unknown commit id 'f21916ec4826', maybe rebased or not 
+  pulled?" message. The commit 'f21916ec4826', however, is definitely
+  in the master branch on top of which this patch series was built, so I'm
+ not sure why this message is being output by checkpatch.
+* All acks granted from previous review of this patch have been removed due
+  to the fact that this patch introduces non-trivial changes (see change
+  log below).
 
-On Mon, Mar 1, 2021 at 8:16 PM Xu, Like <like.xu@intel.com> wrote:
->
-> On 2021/3/2 2:48, Aditya Basu wrote:
-> > Hi all,
-> > I am a PhD student at the Pennsylvania State University. For my
-> > current project, I am trying to run Intel Processor Trace (PT) inside
-> > a Guest VM. Specifically, I want to run KVM in the "Host-Guest mode"
-> > as stated in the following bug:
-> > https://bugzilla.kernel.org/show_bug.cgi?id=3D201565
-> >
-> > However, I *cannot* find an Intel processor that supports this mode. I
-> > have tried using Intel's i7-7700 and i7-9700k processors. Based on my
-> > findings, the problem seems to be that bit 24 (PT_USE_GPA) of
-> > MSR_IA32_VMX_PROCBASED_CTLS2 (high) is reported as 0 by the processor.
-> > Hence, KVM seems to force pt_mode to 0 (or PT_MODE_HOST).
->
-> You may try the Intel Atom=C2=AE Processor P* Series.
->
-> https://ark.intel.com/content/www/us/en/ark/products/series/29035/intel-a=
-tom-processor.html?wapkw=3DAtom#@Server
->
-> >
-> > I would appreciate any pointers that someone might have regarding the
-> > above. Specifically, I want to find an Intel processor that supports
-> > running Intel PT in "Host-Guest mode".
-> >
-> > Regards,
-> >
-> > Aditya Basu
-> > PhD Student in CSE
-> > Pennsylvania State University
-> > https://www.adityabasu.me/
->
+Change log v2=> v3:
+------------------ 
+* Added two fields - 'bool kvm_busy' and 'wait_queue_head_t wait_for_kvm' -
+  fields to struct ap_matrix_mdev. The former indicates that the KVM
+  pointer is in the process of being updated and the second allows a
+  function that needs access to the KVM pointer to wait until it is
+  no longer being updated. Resolves problem of synchronization between
+  the functions that change the KVM pointer value and the functions that
+  required access to it.
+
+Change log v1=> v2:
+------------------
+* No longer holding the matrix_dev->lock prior to setting/clearing the
+  masks supplying the AP configuration to a KVM guest.
+* Make all updates to the data in the matrix mdev that is used to manage
+  AP resources used by the KVM guest in the vfio_ap_mdev_set_kvm() function
+  instead of the group notifier callback.
+* Check for the matrix mdev's KVM pointer in the vfio_ap_mdev_unset_kvm()
+  function instead of the vfio_ap_mdev_release() function.
+
+Tony Krowiak (1):
+  s390/vfio-ap: fix circular lockdep when setting/clearing crypto masks
+
+ drivers/s390/crypto/vfio_ap_ops.c     | 312 ++++++++++++++++++--------
+ drivers/s390/crypto/vfio_ap_private.h |   2 +
+ 2 files changed, 218 insertions(+), 96 deletions(-)
+
+-- 
+2.21.3
+
