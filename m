@@ -2,213 +2,90 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EB14E32A709
-	for <lists+kvm@lfdr.de>; Tue,  2 Mar 2021 18:06:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D85F532A70B
+	for <lists+kvm@lfdr.de>; Tue,  2 Mar 2021 18:06:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1379927AbhCBP63 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 2 Mar 2021 10:58:29 -0500
-Received: from foss.arm.com ([217.140.110.172]:48810 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1380072AbhCBK2p (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 2 Mar 2021 05:28:45 -0500
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9D5931042;
-        Tue,  2 Mar 2021 02:27:50 -0800 (PST)
-Received: from e121166-lin.cambridge.arm.com (e121166-lin.cambridge.arm.com [10.1.196.255])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id ECB993F73C;
-        Tue,  2 Mar 2021 02:27:49 -0800 (PST)
-From:   Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>
-To:     linux-kernel@vger.kernel.org
-Cc:     Marc Zyngier <maz@kernel.org>,
-        LAKML <linux-arm-kernel@lists.infradead.org>,
-        KVM <kvm@vger.kernel.org>
-Subject: [PATCH v2 1/1] irqchip/gic-v4.1: Disable vSGI upon (GIC CPUIF < v4.1) detection
-Date:   Tue,  2 Mar 2021 10:27:44 +0000
-Message-Id: <20210302102744.12692-2-lorenzo.pieralisi@arm.com>
-X-Mailer: git-send-email 2.29.1
-In-Reply-To: <20210302102744.12692-1-lorenzo.pieralisi@arm.com>
-References: <0201111162841.3151-1-lorenzo.pieralisi@arm.com>
- <20210302102744.12692-1-lorenzo.pieralisi@arm.com>
+        id S1445876AbhCBQCM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 2 Mar 2021 11:02:12 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45520 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1349610AbhCBKmy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 2 Mar 2021 05:42:54 -0500
+Received: from mail-ed1-x52f.google.com (mail-ed1-x52f.google.com [IPv6:2a00:1450:4864:20::52f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 45B76C06178C
+        for <kvm@vger.kernel.org>; Tue,  2 Mar 2021 02:32:13 -0800 (PST)
+Received: by mail-ed1-x52f.google.com with SMTP id c6so24562315ede.0
+        for <kvm@vger.kernel.org>; Tue, 02 Mar 2021 02:32:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance-com.20150623.gappssmtp.com; s=20150623;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=aHiivO66cBlvi2omwE76dmO7GHvGNT96Cj5+nu42PGg=;
+        b=I3uOr+q0RQRgiQgCS80GYwUSkTQnW9aaq4gmyDrvqidORji3JQgKK5Gk6gXKJx4JN6
+         Kdw/xd8w7zZL+nnUxuSZdMOnoz9eiyotnG5IKpT+Ud7NlWqTrt6YooiYlRRVi02JJMMr
+         4VYaUBZaNWsU4GxWuGvtyzk3NIV5/ZljDQKPkS7H3te3Wt54mTXFOXDjC2JdrQuaoHhI
+         QtV+wrlNU3ReiikOrRqrSIVv+puzwruHdJKxH4oXnS6xb8gPwknLRq7pC4a/EOpknuQO
+         +skcqqGEbtLCSfYhVvBfpY3tTCreILgdD5pwsxFpWM3+87sOSq+Bypy84M9wCvwAd7bE
+         Twvg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=aHiivO66cBlvi2omwE76dmO7GHvGNT96Cj5+nu42PGg=;
+        b=brEGeM7FcSl0C0MwH48W32rkdz/0g4siOTW/58qZV/oSt62fADxb/bfGrawbssgUSt
+         wv4eHWVK7hHJSsOkRf/oTUTZP+DYrvdfDR33jzr2KfhZ5mbGHVZ/2QCa4zeS9jz4Yfif
+         aJN6tGxlPPHalhwhfWHcsit77Dvvm97jqSQppVJs692xHG/p5U6tsSSw4j5wXed8HTNf
+         o89a64MT5ODJmWWbbHkeXpLv0UcQqSm4yIFcK2muOGqyjDsvCP7adNRxEjR1/XOlSuv7
+         2v+AygnNUBiAo7OrVfLTkCkUs2/fnskv+RCBNsbJv1+TMVKdykdIDu8AMvifckhAR+T7
+         2U4A==
+X-Gm-Message-State: AOAM531mRlf1yUfdw52LGx9rHh/hmZGJZ4ElTs671vMN2WawWK43IWD0
+        8DRVQmvP762ahCbmt/pLYdQgquzxAoU6fyNpWvwF
+X-Google-Smtp-Source: ABdhPJzlkbp8GXrzTY+Abm6IQL/bSnnCkhRKckW2ZUkdVHBw9ERA3un1YwUAbOK+Sq4gG6u3AkoG0LR4jYRsbg5g92Q=
+X-Received: by 2002:a05:6402:180b:: with SMTP id g11mr10194555edy.195.1614681131866;
+ Tue, 02 Mar 2021 02:32:11 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20210223115048.435-1-xieyongji@bytedance.com> <20210223115048.435-2-xieyongji@bytedance.com>
+ <22e96bd6-0113-ef01-376e-0776d7bdbcd8@redhat.com>
+In-Reply-To: <22e96bd6-0113-ef01-376e-0776d7bdbcd8@redhat.com>
+From:   Yongji Xie <xieyongji@bytedance.com>
+Date:   Tue, 2 Mar 2021 18:32:01 +0800
+Message-ID: <CACycT3vYA-2ut31KqzL2osGHDxRB_fTJBGyt4M7FvNkfv7zu7w@mail.gmail.com>
+Subject: Re: Re: [RFC v4 01/11] eventfd: Increase the recursion depth of eventfd_signal()
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        Parav Pandit <parav@nvidia.com>, Bob Liu <bob.liu@oracle.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Matthew Wilcox <willy@infradead.org>, viro@zeniv.linux.org.uk,
+        Jens Axboe <axboe@kernel.dk>, bcrl@kvack.org,
+        Jonathan Corbet <corbet@lwn.net>,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        kvm@vger.kernel.org, linux-aio@kvack.org,
+        linux-fsdevel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-GIC CPU interfaces versions predating GIC v4.1 were not built to
-accommodate vINTID within the vSGI range; as reported in the GIC
-specifications (8.2 "Changes to the CPU interface"), it is
-CONSTRAINED UNPREDICTABLE to deliver a vSGI to a PE with
-ID_AA64PFR0_EL1.GIC < b0011.
+On Tue, Mar 2, 2021 at 2:44 PM Jason Wang <jasowang@redhat.com> wrote:
+>
+>
+> On 2021/2/23 7:50 =E4=B8=8B=E5=8D=88, Xie Yongji wrote:
+> > Increase the recursion depth of eventfd_signal() to 1. This
+> > is the maximum recursion depth we have found so far.
+> >
+> > Signed-off-by: Xie Yongji <xieyongji@bytedance.com>
+>
+>
+> Acked-by: Jason Wang <jasowang@redhat.com>
+>
+> It might be useful to explain how/when we can reach for this condition.
+>
 
-Check the GIC CPUIF version by reading the SYS_ID_AA64_PFR0_EL1.
+Fine.
 
-Disable vSGIs if a CPUIF version < 4.1 is detected to prevent using
-vSGIs on systems where they may misbehave.
-
-Signed-off-by: Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>
-Cc: Marc Zyngier <maz@kernel.org>
----
- arch/arm64/kvm/vgic/vgic-mmio-v3.c     |  4 ++--
- arch/arm64/kvm/vgic/vgic-v3.c          |  3 ++-
- drivers/irqchip/irq-gic-v3-its.c       |  6 +++++-
- drivers/irqchip/irq-gic-v3.c           | 22 ++++++++++++++++++++++
- include/kvm/arm_vgic.h                 |  1 +
- include/linux/irqchip/arm-gic-common.h |  2 ++
- include/linux/irqchip/arm-gic-v3.h     |  1 +
- 7 files changed, 35 insertions(+), 4 deletions(-)
-
-diff --git a/arch/arm64/kvm/vgic/vgic-mmio-v3.c b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
-index 15a6c98ee92f..66548cd2a715 100644
---- a/arch/arm64/kvm/vgic/vgic-mmio-v3.c
-+++ b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
-@@ -86,7 +86,7 @@ static unsigned long vgic_mmio_read_v3_misc(struct kvm_vcpu *vcpu,
- 		}
- 		break;
- 	case GICD_TYPER2:
--		if (kvm_vgic_global_state.has_gicv4_1)
-+		if (kvm_vgic_global_state.has_gicv4_1_vsgi)
- 			value = GICD_TYPER2_nASSGIcap;
- 		break;
- 	case GICD_IIDR:
-@@ -119,7 +119,7 @@ static void vgic_mmio_write_v3_misc(struct kvm_vcpu *vcpu,
- 		dist->enabled = val & GICD_CTLR_ENABLE_SS_G1;
- 
- 		/* Not a GICv4.1? No HW SGIs */
--		if (!kvm_vgic_global_state.has_gicv4_1)
-+		if (!kvm_vgic_global_state.has_gicv4_1_vsgi)
- 			val &= ~GICD_CTLR_nASSGIreq;
- 
- 		/* Dist stays enabled? nASSGIreq is RO */
-diff --git a/arch/arm64/kvm/vgic/vgic-v3.c b/arch/arm64/kvm/vgic/vgic-v3.c
-index 52915b342351..57b73100e8cc 100644
---- a/arch/arm64/kvm/vgic/vgic-v3.c
-+++ b/arch/arm64/kvm/vgic/vgic-v3.c
-@@ -533,7 +533,7 @@ int vgic_v3_map_resources(struct kvm *kvm)
- 		return ret;
- 	}
- 
--	if (kvm_vgic_global_state.has_gicv4_1)
-+	if (kvm_vgic_global_state.has_gicv4_1_vsgi)
- 		vgic_v4_configure_vsgis(kvm);
- 
- 	return 0;
-@@ -589,6 +589,7 @@ int vgic_v3_probe(const struct gic_kvm_info *info)
- 	if (info->has_v4) {
- 		kvm_vgic_global_state.has_gicv4 = gicv4_enable;
- 		kvm_vgic_global_state.has_gicv4_1 = info->has_v4_1 && gicv4_enable;
-+		kvm_vgic_global_state.has_gicv4_1_vsgi = info->has_v4_1_vsgi && gicv4_enable;
- 		kvm_info("GICv4%s support %sabled\n",
- 			 kvm_vgic_global_state.has_gicv4_1 ? ".1" : "",
- 			 gicv4_enable ? "en" : "dis");
-diff --git a/drivers/irqchip/irq-gic-v3-its.c b/drivers/irqchip/irq-gic-v3-its.c
-index ed46e6057e33..ee2a2ca27d5c 100644
---- a/drivers/irqchip/irq-gic-v3-its.c
-+++ b/drivers/irqchip/irq-gic-v3-its.c
-@@ -5412,7 +5412,11 @@ int __init its_init(struct fwnode_handle *handle, struct rdists *rdists,
- 	if (has_v4 & rdists->has_vlpis) {
- 		const struct irq_domain_ops *sgi_ops;
- 
--		if (has_v4_1)
-+		/*
-+		 * Enable vSGIs only if the ITS and the
-+		 * GIC CPUIF support them.
-+		 */
-+		if (has_v4_1 && rdists->has_vsgi_cpuif)
- 			sgi_ops = &its_sgi_domain_ops;
- 		else
- 			sgi_ops = NULL;
-diff --git a/drivers/irqchip/irq-gic-v3.c b/drivers/irqchip/irq-gic-v3.c
-index eb0ee356a629..fd6cd9a5de34 100644
---- a/drivers/irqchip/irq-gic-v3.c
-+++ b/drivers/irqchip/irq-gic-v3.c
-@@ -31,6 +31,21 @@
- 
- #include "irq-gic-common.h"
- 
-+#ifdef CONFIG_ARM64
-+#include <asm/cpufeature.h>
-+
-+static inline bool gic_cpuif_has_vsgi(void)
-+{
-+	unsigned long fld, reg = read_sanitised_ftr_reg(SYS_ID_AA64PFR0_EL1);
-+
-+	fld = cpuid_feature_extract_unsigned_field(reg, ID_AA64PFR0_GIC_SHIFT);
-+
-+	return fld >= 0x3;
-+}
-+#else
-+static inline bool gic_cpuif_has_vsgi(void) { return false; }
-+#endif
-+
- #define GICD_INT_NMI_PRI	(GICD_INT_DEF_PRI & ~0x80)
- 
- #define FLAGS_WORKAROUND_GICR_WAKER_MSM8996	(1ULL << 0)
-@@ -1679,6 +1694,8 @@ static int __init gic_init_bases(void __iomem *dist_base,
- 	gic_data.rdists.has_direct_lpi = true;
- 	gic_data.rdists.has_vpend_valid_dirty = true;
- 
-+	gic_data.rdists.has_vsgi_cpuif = gic_cpuif_has_vsgi();
-+
- 	if (WARN_ON(!gic_data.domain) || WARN_ON(!gic_data.rdists.rdist)) {
- 		err = -ENOMEM;
- 		goto out_free;
-@@ -1852,6 +1869,9 @@ static void __init gic_of_setup_kvm_info(struct device_node *node)
- 
- 	gic_v3_kvm_info.has_v4 = gic_data.rdists.has_vlpis;
- 	gic_v3_kvm_info.has_v4_1 = gic_data.rdists.has_rvpeid;
-+	gic_v3_kvm_info.has_v4_1_vsgi = gic_data.rdists.has_vsgi_cpuif &&
-+					gic_data.rdists.has_rvpeid;
-+
- 	gic_set_kvm_info(&gic_v3_kvm_info);
- }
- 
-@@ -2168,6 +2188,8 @@ static void __init gic_acpi_setup_kvm_info(void)
- 
- 	gic_v3_kvm_info.has_v4 = gic_data.rdists.has_vlpis;
- 	gic_v3_kvm_info.has_v4_1 = gic_data.rdists.has_rvpeid;
-+	gic_v3_kvm_info.has_v4_1_vsgi = gic_data.rdists.has_vsgi_cpuif &&
-+					gic_data.rdists.has_rvpeid;
- 	gic_set_kvm_info(&gic_v3_kvm_info);
- }
- 
-diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-index 3d74f1060bd1..614f11113298 100644
---- a/include/kvm/arm_vgic.h
-+++ b/include/kvm/arm_vgic.h
-@@ -71,6 +71,7 @@ struct vgic_global {
- 	/* Hardware has GICv4? */
- 	bool			has_gicv4;
- 	bool			has_gicv4_1;
-+	bool			has_gicv4_1_vsgi;
- 
- 	/* GIC system register CPU interface */
- 	struct static_key_false gicv3_cpuif;
-diff --git a/include/linux/irqchip/arm-gic-common.h b/include/linux/irqchip/arm-gic-common.h
-index fa8c0455c352..c2efd1dd1790 100644
---- a/include/linux/irqchip/arm-gic-common.h
-+++ b/include/linux/irqchip/arm-gic-common.h
-@@ -34,6 +34,8 @@ struct gic_kvm_info {
- 	bool		has_v4;
- 	/* rvpeid support */
- 	bool		has_v4_1;
-+	/* vsgi support */
-+	bool		has_v4_1_vsgi;
- };
- 
- const struct gic_kvm_info *gic_get_kvm_info(void);
-diff --git a/include/linux/irqchip/arm-gic-v3.h b/include/linux/irqchip/arm-gic-v3.h
-index f6d092fdb93d..5f00ce2535bf 100644
---- a/include/linux/irqchip/arm-gic-v3.h
-+++ b/include/linux/irqchip/arm-gic-v3.h
-@@ -683,6 +683,7 @@ struct rdists {
- 	bool			has_vlpis;
- 	bool			has_rvpeid;
- 	bool			has_direct_lpi;
-+	bool			has_vsgi_cpuif;
- 	bool			has_vpend_valid_dirty;
- };
- 
--- 
-2.29.1
-
+Thanks,
+Yongji
