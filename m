@@ -2,184 +2,322 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9C46B32A6E1
-	for <lists+kvm@lfdr.de>; Tue,  2 Mar 2021 18:04:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4109232A6E5
+	for <lists+kvm@lfdr.de>; Tue,  2 Mar 2021 18:04:59 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1836445AbhCBPyU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 2 Mar 2021 10:54:20 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:21938 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S239542AbhCBEQD (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 1 Mar 2021 23:16:03 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1614658473;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=DTs5bTdT/130awTFS1tu5ijWxNu0Rt9MlaERqm9NUPU=;
-        b=exvsORoxsheubC+CIm1xbrEzodG1sq0d3jV2NACEp1AYvPrWgEcNg7XSqQAVLRR0CHVmwA
-        0PB9E1Ewd7x5NHteq2zq1PkO3HdU1k/h2mvxvn19+/5xuGDlKuWetU1+4vJ9oSKmMFcogJ
-        KOeX00K7WZoJYg4wwOdVErizW4EJ5PU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-30-O1ppRP1lMXWwFuAq_kwXYA-1; Mon, 01 Mar 2021 23:14:32 -0500
-X-MC-Unique: O1ppRP1lMXWwFuAq_kwXYA-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 43D3A1868405;
-        Tue,  2 Mar 2021 04:14:31 +0000 (UTC)
-Received: from wangxiaodeMacBook-Air.local (ovpn-13-215.pek2.redhat.com [10.72.13.215])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id A424D5C730;
-        Tue,  2 Mar 2021 04:14:22 +0000 (UTC)
-Subject: Re: [RFC PATCH 01/10] vdpa: add get_config_size callback in
- vdpa_config_ops
-To:     Stefano Garzarella <sgarzare@redhat.com>,
-        virtualization@lists.linux-foundation.org
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        "Michael S. Tsirkin" <mst@redhat.com>
-References: <20210216094454.82106-1-sgarzare@redhat.com>
- <20210216094454.82106-2-sgarzare@redhat.com>
-From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <5de4cd5b-04cb-46ca-1717-075e5e8542fd@redhat.com>
-Date:   Tue, 2 Mar 2021 12:14:13 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.16; rv:78.0)
- Gecko/20100101 Thunderbird/78.8.0
-MIME-Version: 1.0
-In-Reply-To: <20210216094454.82106-2-sgarzare@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-GB
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+        id S1837189AbhCBPye (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 2 Mar 2021 10:54:34 -0500
+Received: from mga09.intel.com ([134.134.136.24]:47829 "EHLO mga09.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1577006AbhCBFff (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 2 Mar 2021 00:35:35 -0500
+IronPort-SDR: wac7Z8n1fCLv6WvS+dstNoQ/P3dhiR1xCdN5dygJWwruwpPIksm3zFkJu/BAoIag6IrDeMLKeW
+ N0CA6V2cWsVA==
+X-IronPort-AV: E=McAfee;i="6000,8403,9910"; a="186810954"
+X-IronPort-AV: E=Sophos;i="5.81,216,1610438400"; 
+   d="scan'208";a="186810954"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Mar 2021 21:34:52 -0800
+IronPort-SDR: 3DgwjcmrifK0LH1fe4XX0X0VGFqulRodjnNPJY++ShYWegfZ+od/jLcYMEhv/46KKBSD4xutp7
+ JCyiZPdyuJ3Q==
+X-IronPort-AV: E=Sophos;i="5.81,216,1610438400"; 
+   d="scan'208";a="406554558"
+Received: from yueliu2-mobl.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.252.139.111])
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Mar 2021 21:34:48 -0800
+Date:   Tue, 2 Mar 2021 18:34:46 +1300
+From:   Kai Huang <kai.huang@intel.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     kvm@vger.kernel.org, x86@kernel.org, linux-sgx@vger.kernel.org,
+        linux-kernel@vger.kernel.org, jarkko@kernel.org, luto@kernel.org,
+        dave.hansen@intel.com, rick.p.edgecombe@intel.com,
+        haitao.huang@intel.com, pbonzini@redhat.com, bp@alien8.de,
+        tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com,
+        jmattson@google.com, joro@8bytes.org, vkuznets@redhat.com,
+        wanpengli@tencent.com
+Subject: Re: [PATCH 21/25] KVM: VMX: Add SGX ENCLS[ECREATE] handler to
+ enforce CPUID restrictions
+Message-Id: <20210302183446.5f53574be677f5371ed2be14@intel.com>
+In-Reply-To: <YD0iT3c8FMPGUNjo@google.com>
+References: <cover.1614590788.git.kai.huang@intel.com>
+        <58db33aae58582de8f644b686fc99b27f39d4d8f.1614590788.git.kai.huang@intel.com>
+        <YD0iT3c8FMPGUNjo@google.com>
+X-Mailer: Sylpheed 3.7.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-On 2021/2/16 5:44 下午, Stefano Garzarella wrote:
-> This new callback is used to get the size of the configuration space
-> of vDPA devices.
->
-> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+On Mon, 1 Mar 2021 09:20:15 -0800 Sean Christopherson wrote:
+> On Mon, Mar 01, 2021, Kai Huang wrote:
+> > +static int handle_encls_ecreate(struct kvm_vcpu *vcpu)
+> > +{
+> > +	struct kvm_cpuid_entry2 *sgx_12_0, *sgx_12_1;
+> > +	gva_t pageinfo_gva, secs_gva;
+> > +	gva_t metadata_gva, contents_gva;
+> > +	gpa_t metadata_gpa, contents_gpa, secs_gpa;
+> > +	unsigned long metadata_hva, contents_hva, secs_hva;
+> > +	struct sgx_pageinfo pageinfo;
+> > +	struct sgx_secs *contents;
+> > +	u64 attributes, xfrm, size;
+> > +	u32 miscselect;
+> > +	struct x86_exception ex;
+> > +	u8 max_size_log2;
+> > +	int trapnr, r;
+> > +
+> 
+> (see below)
+> 
+> --- cut here --- >8
+> 
+> > +	sgx_12_0 = kvm_find_cpuid_entry(vcpu, 0x12, 0);
+> > +	sgx_12_1 = kvm_find_cpuid_entry(vcpu, 0x12, 1);
+> > +	if (!sgx_12_0 || !sgx_12_1) {
+> > +		kvm_inject_gp(vcpu, 0);
+> 
+> This should probably be an emulation failure.  This code is reached iff SGX1 is
+> enabled in the guest, userspace done messed up if they enabled SGX1 without
+> defining CPUID.0x12.1.  That also makes it more obvious that burying this in a
+> helper after a bunch of other checks isn't wrong, i.e. KVM has already verified
+> that SGX1 is enabled in the guest.
+> 
+> > +		return 1;
+> > +	}
+> 
 > ---
->   include/linux/vdpa.h              | 4 ++++
->   drivers/vdpa/ifcvf/ifcvf_main.c   | 6 ++++++
->   drivers/vdpa/mlx5/net/mlx5_vnet.c | 6 ++++++
->   drivers/vdpa/vdpa_sim/vdpa_sim.c  | 9 +++++++++
->   4 files changed, 25 insertions(+)
->
-> diff --git a/include/linux/vdpa.h b/include/linux/vdpa.h
-> index 4ab5494503a8..fddf42b17573 100644
-> --- a/include/linux/vdpa.h
-> +++ b/include/linux/vdpa.h
-> @@ -150,6 +150,9 @@ struct vdpa_iova_range {
->    * @set_status:			Set the device status
->    *				@vdev: vdpa device
->    *				@status: virtio device status
-> + * @get_config_size:		Get the size of the configuration space
-> + *				@vdev: vdpa device
-> + *				Returns size_t: configuration size
+> 
+> > +
+> > +	if (sgx_get_encls_gva(vcpu, kvm_rbx_read(vcpu), 32, 32, &pageinfo_gva) ||
+> > +	    sgx_get_encls_gva(vcpu, kvm_rcx_read(vcpu), 4096, 4096, &secs_gva))
+> > +		return 1;
+> > +
+> > +	/*
+> > +	 * Copy the PAGEINFO to local memory, its pointers need to be
+> > +	 * translated, i.e. we need to do a deep copy/translate.
+> > +	 */
+> > +	r = kvm_read_guest_virt(vcpu, pageinfo_gva, &pageinfo,
+> > +				sizeof(pageinfo), &ex);
+> > +	if (r == X86EMUL_PROPAGATE_FAULT) {
+> > +		kvm_inject_emulated_page_fault(vcpu, &ex);
+> > +		return 1;
+> > +	} else if (r != X86EMUL_CONTINUE) {
+> > +		sgx_handle_emulation_failure(vcpu, pageinfo_gva, size);
+> > +		return 0;
+> > +	}
+> > +
+> > +	if (sgx_get_encls_gva(vcpu, pageinfo.metadata, 64, 64, &metadata_gva) ||
+> > +	    sgx_get_encls_gva(vcpu, pageinfo.contents, 4096, 4096,
+> > +			      &contents_gva))
+> > +		return 1;
+> > +
+> > +	/*
+> > +	 * Translate the SECINFO, SOURCE and SECS pointers from GVA to GPA.
+> > +	 * Resume the guest on failure to inject a #PF.
+> > +	 */
+> > +	if (sgx_gva_to_gpa(vcpu, metadata_gva, false, &metadata_gpa) ||
+> > +	    sgx_gva_to_gpa(vcpu, contents_gva, false, &contents_gpa) ||
+> > +	    sgx_gva_to_gpa(vcpu, secs_gva, true, &secs_gpa))
+> > +		return 1;
+> > +
+> > +	/*
+> > +	 * ...and then to HVA.  The order of accesses isn't architectural, i.e.
+> > +	 * KVM doesn't have to fully process one address at a time.  Exit to
+> > +	 * userspace if a GPA is invalid.
+> > +	 */
+> > +	if (sgx_gpa_to_hva(vcpu, metadata_gpa, &metadata_hva) ||
+> > +	    sgx_gpa_to_hva(vcpu, contents_gpa, &contents_hva) ||
+> > +	    sgx_gpa_to_hva(vcpu, secs_gpa, &secs_hva))
+> > +		return 0;
+> > +	/*
+> > +	 * Copy contents into kernel memory to prevent TOCTOU attack. E.g. the
+> > +	 * guest could do ECREATE w/ SECS.SGX_ATTR_PROVISIONKEY=0, and
+> > +	 * simultaneously set SGX_ATTR_PROVISIONKEY to bypass the check to
+> > +	 * enforce restriction of access to the PROVISIONKEY.
+> > +	 */
+> > +	contents = (struct sgx_secs *)__get_free_page(GFP_KERNEL);
+> > +	if (!contents)
+> > +		return -ENOMEM;
+> 
+> --- cut here --- >8
+> 
+> > +
+> > +	/* Exit to userspace if copying from a host userspace address fails. */
+> > +	if (sgx_read_hva(vcpu, contents_hva, (void *)contents, PAGE_SIZE))
+> 
+> This, and every failure path below, will leak 'contents'.  The easiest thing is
+> probably to wrap everything in "cut here" in a separate helper.  The CPUID
+> lookups can be , e.g.
+> 
+> 	contents = (struct sgx_secs *)__get_free_page(GFP_KERNEL);
+> 	if (!contents)
+> 		return -ENOMEM;
+> 
+> 	r = __handle_encls_ecreate(vcpu, &pageinfo, secs);
+> 
+> 	free_page((unsigned long)contents);
+> 	return r;
+> 
+> And then the helper can be everything below, plus the CPUID lookup:
+> 
+> 	sgx_12_0 = kvm_find_cpuid_entry(vcpu, 0x12, 0);
+> 	sgx_12_1 = kvm_find_cpuid_entry(vcpu, 0x12, 1);
+> 	if (!sgx_12_0 || !sgx_12_1) {
+> 		vcpu->run->exit_reason = KVM_EXIT_INTERNAL_ERROR;
+> 		vcpu->run->internal.suberror = KVM_INTERNAL_ERROR_EMULATION;
+> 		vcpu->run->internal.ndata = 0;
+> 		return 0;
+> 	}
+> 
+> 
 
+Hi Sean,
 
-Rethink about this, how much we could gain by introducing a dedicated 
-ops here? E.g would it be simpler if we simply introduce a 
-max_config_size to vdpa device?
+I ended up with below:
 
-Thanks
+1) Copy contents is out of __handle_encls_ecreate() since from my perspective
+it is a more reasonable split logically.
+2) In __handle_encls_ecreate(), finding sgx_12_0 and sgx_12_1 is at first since
+provisionkey bit check requires sgx_12_1->eax.
+3) __handle_encls_ecreate() needs secs_gva since sgx_inject_fault() requires it.
 
+Is it OK to you?
 
->    * @get_config:			Read from device specific configuration space
->    *				@vdev: vdpa device
->    *				@offset: offset from the beginning of
-> @@ -231,6 +234,7 @@ struct vdpa_config_ops {
->   	u32 (*get_vendor_id)(struct vdpa_device *vdev);
->   	u8 (*get_status)(struct vdpa_device *vdev);
->   	void (*set_status)(struct vdpa_device *vdev, u8 status);
-> +	size_t (*get_config_size)(struct vdpa_device *vdev);
->   	void (*get_config)(struct vdpa_device *vdev, unsigned int offset,
->   			   void *buf, unsigned int len);
->   	void (*set_config)(struct vdpa_device *vdev, unsigned int offset,
-> diff --git a/drivers/vdpa/ifcvf/ifcvf_main.c b/drivers/vdpa/ifcvf/ifcvf_main.c
-> index 7c8bbfcf6c3e..2443271e17d2 100644
-> --- a/drivers/vdpa/ifcvf/ifcvf_main.c
-> +++ b/drivers/vdpa/ifcvf/ifcvf_main.c
-> @@ -332,6 +332,11 @@ static u32 ifcvf_vdpa_get_vq_align(struct vdpa_device *vdpa_dev)
->   	return IFCVF_QUEUE_ALIGNMENT;
->   }
->   
-> +static size_t ifcvf_vdpa_get_config_size(struct vdpa_device *vdpa_dev)
-> +{
-> +	return sizeof(struct virtio_net_config);
-> +}
-> +
->   static void ifcvf_vdpa_get_config(struct vdpa_device *vdpa_dev,
->   				  unsigned int offset,
->   				  void *buf, unsigned int len)
-> @@ -392,6 +397,7 @@ static const struct vdpa_config_ops ifc_vdpa_ops = {
->   	.get_device_id	= ifcvf_vdpa_get_device_id,
->   	.get_vendor_id	= ifcvf_vdpa_get_vendor_id,
->   	.get_vq_align	= ifcvf_vdpa_get_vq_align,
-> +	.get_config_size	= ifcvf_vdpa_get_config_size,
->   	.get_config	= ifcvf_vdpa_get_config,
->   	.set_config	= ifcvf_vdpa_set_config,
->   	.set_config_cb  = ifcvf_vdpa_set_config_cb,
-> diff --git a/drivers/vdpa/mlx5/net/mlx5_vnet.c b/drivers/vdpa/mlx5/net/mlx5_vnet.c
-> index 10e9b09932eb..78043ee567b6 100644
-> --- a/drivers/vdpa/mlx5/net/mlx5_vnet.c
-> +++ b/drivers/vdpa/mlx5/net/mlx5_vnet.c
-> @@ -1814,6 +1814,11 @@ static void mlx5_vdpa_set_status(struct vdpa_device *vdev, u8 status)
->   	ndev->mvdev.status |= VIRTIO_CONFIG_S_FAILED;
->   }
->   
-> +static size_t mlx5_vdpa_get_config_size(struct vdpa_device *vdev)
-> +{
-> +	return sizeof(struct virtio_net_config);
-> +}
-> +
->   static void mlx5_vdpa_get_config(struct vdpa_device *vdev, unsigned int offset, void *buf,
->   				 unsigned int len)
->   {
-> @@ -1900,6 +1905,7 @@ static const struct vdpa_config_ops mlx5_vdpa_ops = {
->   	.get_vendor_id = mlx5_vdpa_get_vendor_id,
->   	.get_status = mlx5_vdpa_get_status,
->   	.set_status = mlx5_vdpa_set_status,
-> +	.get_config_size = mlx5_vdpa_get_config_size,
->   	.get_config = mlx5_vdpa_get_config,
->   	.set_config = mlx5_vdpa_set_config,
->   	.get_generation = mlx5_vdpa_get_generation,
-> diff --git a/drivers/vdpa/vdpa_sim/vdpa_sim.c b/drivers/vdpa/vdpa_sim/vdpa_sim.c
-> index d5942842432d..779ae6c144d7 100644
-> --- a/drivers/vdpa/vdpa_sim/vdpa_sim.c
-> +++ b/drivers/vdpa/vdpa_sim/vdpa_sim.c
-> @@ -439,6 +439,13 @@ static void vdpasim_set_status(struct vdpa_device *vdpa, u8 status)
->   	spin_unlock(&vdpasim->lock);
->   }
->   
-> +static size_t vdpasim_get_config_size(struct vdpa_device *vdpa)
-> +{
-> +	struct vdpasim *vdpasim = vdpa_to_sim(vdpa);
-> +
-> +	return vdpasim->dev_attr.config_size;
-> +}
-> +
->   static void vdpasim_get_config(struct vdpa_device *vdpa, unsigned int offset,
->   			     void *buf, unsigned int len)
->   {
-> @@ -566,6 +573,7 @@ static const struct vdpa_config_ops vdpasim_config_ops = {
->   	.get_vendor_id          = vdpasim_get_vendor_id,
->   	.get_status             = vdpasim_get_status,
->   	.set_status             = vdpasim_set_status,
-> +	.get_config_size        = vdpasim_get_config_size,
->   	.get_config             = vdpasim_get_config,
->   	.set_config             = vdpasim_set_config,
->   	.get_generation         = vdpasim_get_generation,
-> @@ -593,6 +601,7 @@ static const struct vdpa_config_ops vdpasim_batch_config_ops = {
->   	.get_vendor_id          = vdpasim_get_vendor_id,
->   	.get_status             = vdpasim_get_status,
->   	.set_status             = vdpasim_set_status,
-> +	.get_config_size        = vdpasim_get_config_size,
->   	.get_config             = vdpasim_get_config,
->   	.set_config             = vdpasim_set_config,
->   	.get_generation         = vdpasim_get_generation,
-
++static int __handle_encls_ecreate(struct kvm_vcpu *vcpu,
++                                 struct sgx_pageinfo *pageinfo,
++                                 unsigned long secs_hva,
++                                 gva_t secs_gva)
++{
++       struct sgx_secs *contents = (struct sgx_secs *)pageinfo->contents;
++       struct kvm_cpuid_entry2 *sgx_12_0, *sgx_12_1;
++       u64 attributes, xfrm, size;
++       u32 miscselect;
++       u8 max_size_log2;
++       int trapnr;
++
++       sgx_12_0 = kvm_find_cpuid_entry(vcpu, 0x12, 0);
++       sgx_12_1 = kvm_find_cpuid_entry(vcpu, 0x12, 1);
++       if (!sgx_12_0 || !sgx_12_1) {
++               vcpu->run->exit_reason = KVM_EXIT_INTERNAL_ERROR;
++               vcpu->run->internal.suberror = KVM_INTERNAL_ERROR_EMULATION;
++               vcpu->run->internal.ndata = 0;
++               return 0;
++       }
++
++       miscselect = contents->miscselect;
++       attributes = contents->attributes;
++       xfrm = contents->xfrm;
++       size = contents->size;
++
++       /* Enforce restriction of access to the PROVISIONKEY. */
++       if (!vcpu->kvm->arch.sgx_provisioning_allowed &&
++           (attributes & SGX_ATTR_PROVISIONKEY)) {
++               if (sgx_12_1->eax & SGX_ATTR_PROVISIONKEY)
++                       pr_warn_once("KVM: SGX PROVISIONKEY advertised but not
+allowed\n");
++               kvm_inject_gp(vcpu, 0);
++               return 1;
++       }
++
++       /* Enforce CPUID restrictions on MISCSELECT, ATTRIBUTES and XFRM. */
++       if ((u32)miscselect & ~sgx_12_0->ebx ||
++           (u32)attributes & ~sgx_12_1->eax ||
++           (u32)(attributes >> 32) & ~sgx_12_1->ebx ||
++           (u32)xfrm & ~sgx_12_1->ecx ||
++           (u32)(xfrm >> 32) & ~sgx_12_1->edx) {
++               kvm_inject_gp(vcpu, 0);
++               return 1;
++       }
++
++       /* Enforce CPUID restriction on max enclave size. */
++       max_size_log2 = (attributes & SGX_ATTR_MODE64BIT) ? sgx_12_0->edx >> 8 :
++                                                           sgx_12_0->edx;
++       if (size >= BIT_ULL(max_size_log2))
++               kvm_inject_gp(vcpu, 0);
++
++       if (sgx_virt_ecreate(pageinfo, (void __user *)secs_hva, &trapnr))
++               return sgx_inject_fault(vcpu, secs_gva, trapnr);
++
++       return kvm_skip_emulated_instruction(vcpu);
++}
++
++static int handle_encls_ecreate(struct kvm_vcpu *vcpu)
++{
++       gva_t pageinfo_gva, secs_gva;
++       gva_t metadata_gva, contents_gva;
++       gpa_t metadata_gpa, contents_gpa, secs_gpa;
++       unsigned long metadata_hva, contents_hva, secs_hva;
++       struct sgx_pageinfo pageinfo;
++       struct sgx_secs *contents;
++       struct x86_exception ex;
++       int r;
++
++       if (sgx_get_encls_gva(vcpu, kvm_rbx_read(vcpu), 32, 32, &pageinfo_gva)
+||
++           sgx_get_encls_gva(vcpu, kvm_rcx_read(vcpu), 4096, 4096, &secs_gva))
++               return 1;
++
++       /*
++        * Copy the PAGEINFO to local memory, its pointers need to be
++        * translated, i.e. we need to do a deep copy/translate.
++        */
++       r = kvm_read_guest_virt(vcpu, pageinfo_gva, &pageinfo,
++                               sizeof(pageinfo), &ex);
++       if (r == X86EMUL_PROPAGATE_FAULT) {
++               kvm_inject_emulated_page_fault(vcpu, &ex);
++               return 1;
++       } else if (r != X86EMUL_CONTINUE) {
++               sgx_handle_emulation_failure(vcpu, pageinfo_gva,
++                                            sizeof(pageinfo));
++               return 0;
++       }
++
++       if (sgx_get_encls_gva(vcpu, pageinfo.metadata, 64, 64, &metadata_gva) ||
++           sgx_get_encls_gva(vcpu, pageinfo.contents, 4096, 4096,
++                             &contents_gva))
++               return 1;
++
++       /*
++        * Translate the SECINFO, SOURCE and SECS pointers from GVA to GPA.
++        * Resume the guest on failure to inject a #PF.
++        */
++       if (sgx_gva_to_gpa(vcpu, metadata_gva, false, &metadata_gpa) ||
++           sgx_gva_to_gpa(vcpu, contents_gva, false, &contents_gpa) ||
++           sgx_gva_to_gpa(vcpu, secs_gva, true, &secs_gpa))
++               return 1;
++
++       /*
++        * ...and then to HVA.  The order of accesses isn't architectural, i.e.
++        * KVM doesn't have to fully process one address at a time.  Exit to
++        * userspace if a GPA is invalid.
++        */
++       if (sgx_gpa_to_hva(vcpu, metadata_gpa, &metadata_hva) ||
++           sgx_gpa_to_hva(vcpu, contents_gpa, &contents_hva) ||
++           sgx_gpa_to_hva(vcpu, secs_gpa, &secs_hva))
++               return 0;
++
++       /*
++        * Copy contents into kernel memory to prevent TOCTOU attack. E.g. the
++        * guest could do ECREATE w/ SECS.SGX_ATTR_PROVISIONKEY=0, and
++        * simultaneously set SGX_ATTR_PROVISIONKEY to bypass the check to
++        * enforce restriction of access to the PROVISIONKEY.
++        */
++       contents = (struct sgx_secs *)__get_free_page(GFP_KERNEL);
++       if (!contents)
++               return -ENOMEM;
++
++       /* Exit to userspace if copying from a host userspace address fails. */
++       if (sgx_read_hva(vcpu, contents_hva, (void *)contents, PAGE_SIZE)) {
++               free_page((unsigned long)contents);
++               return 0;
++       }
++
++       pageinfo.metadata = metadata_hva;
++       pageinfo.contents = (u64)contents;
++
++       r = __handle_encls_ecreate(vcpu, &pageinfo, secs_hva, secs_gva);
++
++       free_page((unsigned long)contents);
++
++       return r;
++}
