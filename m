@@ -2,114 +2,182 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3B29632C676
+	by mail.lfdr.de (Postfix) with ESMTP id 8717E32C677
 	for <lists+kvm@lfdr.de>; Thu,  4 Mar 2021 02:02:57 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1355199AbhCDA2y (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        id S1346329AbhCDA2y (ORCPT <rfc822;lists+kvm@lfdr.de>);
         Wed, 3 Mar 2021 19:28:54 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:36849 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S244836AbhCCPL4 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 3 Mar 2021 10:11:56 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1614784221;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=2x8FmaHqNoFWbYN+V4sFpeQTKKF9zJmBr4OukRyZ06M=;
-        b=cvewzn/NN4Lt7XPX+FjKmcox5yO/Kq98j3Qdpw4CRgpjmxPNs0kIx7/7YIb+5Tt6lt5BWr
-        FrbC/HujwNlwatndRJuI4mxDq3V9D58qfFkI5PmoSH+oFz45qExlH1HoeyMxl8gWs1Mi4J
-        7mXFyWDcOAm4Iezz+1hA2z0/3Nlu5MU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-141-54E5Z947OkWGeCxK13k7dw-1; Wed, 03 Mar 2021 10:10:18 -0500
-X-MC-Unique: 54E5Z947OkWGeCxK13k7dw-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0AFAC910160;
-        Wed,  3 Mar 2021 15:10:08 +0000 (UTC)
-Received: from virtlab511.virt.lab.eng.bos.redhat.com (virtlab511.virt.lab.eng.bos.redhat.com [10.19.152.198])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id AA9CD60C13;
-        Wed,  3 Mar 2021 15:10:07 +0000 (UTC)
-From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     torvalds@linux-foundation.org
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: [GIT PULL] KVM changes for 5.12-rc2
-Date:   Wed,  3 Mar 2021 10:10:07 -0500
-Message-Id: <20210303151007.383323-1-pbonzini@redhat.com>
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:64360 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1448192AbhCCPYX (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 3 Mar 2021 10:24:23 -0500
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 123F2QIK144009;
+        Wed, 3 Mar 2021 10:23:41 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=zWAJxsplEzw8/kWSmP04aU3CVx62dYTr+NwGdiCuCrI=;
+ b=Zc3DxdboLUeerw0AZ0Uz1XLhrfV/gWjqgfyBLrzAcGQ5zD3vPo80bHfHgGBDh814+GJ3
+ B8EChSLj7n6UjqCg6ibs2zEiljxjKU9PF1WRUlsui0EB3IHfEPfitK2jv0h12JNu63Gc
+ /7ZWmlmUqYkGhfBz75A1aCpfuBar6ZVLVlCQO32zchoy6Win6o+Yr/XKmhurc8ULoGRy
+ 3r3NaeWpah+ztng7+4VoEJlJludq9+e6xC5M07Eh6fdTjLhfeNaXNUXnmiFPIgRVE/oH
+ ZCibhCVItnnJBpkRl6BN7UnrlUQngkkAerPwNc6ghfMzRCahLDuzByF2mgS6Dc44Bjjx 3w== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 372cp08x70-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 03 Mar 2021 10:23:41 -0500
+Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 123F3PUQ151861;
+        Wed, 3 Mar 2021 10:23:40 -0500
+Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 372cp08x5v-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 03 Mar 2021 10:23:40 -0500
+Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
+        by ppma05fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 123FDjVd031038;
+        Wed, 3 Mar 2021 15:23:38 GMT
+Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
+        by ppma05fra.de.ibm.com with ESMTP id 3712v510tf-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 03 Mar 2021 15:23:38 +0000
+Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 123FNLRq22085970
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 3 Mar 2021 15:23:21 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 2169B4207B;
+        Wed,  3 Mar 2021 15:23:35 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 71C9142061;
+        Wed,  3 Mar 2021 15:23:34 +0000 (GMT)
+Received: from li-e979b1cc-23ba-11b2-a85c-dfd230f6cf82 (unknown [9.171.0.197])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with SMTP;
+        Wed,  3 Mar 2021 15:23:34 +0000 (GMT)
+Date:   Wed, 3 Mar 2021 16:23:32 +0100
+From:   Halil Pasic <pasic@linux.ibm.com>
+To:     Tony Krowiak <akrowiak@linux.ibm.com>
+Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, stable@vger.kernel.org,
+        borntraeger@de.ibm.com, cohuck@redhat.com, kwankhede@nvidia.com,
+        pbonzini@redhat.com, alex.williamson@redhat.com,
+        pasic@linux.vnet.ibm.com
+Subject: Re: [PATCH v3 1/1] s390/vfio-ap: fix circular lockdep when
+ setting/clearing crypto masks
+Message-ID: <20210303162332.4d227dbe.pasic@linux.ibm.com>
+In-Reply-To: <20210302204322.24441-2-akrowiak@linux.ibm.com>
+References: <20210302204322.24441-1-akrowiak@linux.ibm.com>
+        <20210302204322.24441-2-akrowiak@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.761
+ definitions=2021-03-03_04:2021-03-03,2021-03-03 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0
+ mlxlogscore=999 priorityscore=1501 lowpriorityscore=0 spamscore=0
+ adultscore=0 bulkscore=0 clxscore=1011 malwarescore=0 impostorscore=0
+ mlxscore=0 phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2103030116
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Linus,
+On Tue,  2 Mar 2021 15:43:22 -0500
+Tony Krowiak <akrowiak@linux.ibm.com> wrote:
 
-The following changes since commit 2df8d3807ce7f75bb975f1aeae8fc6757527c62d:
+> This patch fixes a lockdep splat introduced by commit f21916ec4826
+> ("s390/vfio-ap: clean up vfio_ap resources when KVM pointer invalidated").
+> The lockdep splat only occurs when starting a Secure Execution guest.
+> Crypto virtualization (vfio_ap) is not yet supported for SE guests;
+> however, in order to avoid this problem when support becomes available,
+> this fix is being provided.
 
-  KVM: SVM: Fix nested VM-Exit on #GP interception handling (2021-02-25 05:13:05 -0500)
+[..]
 
-are available in the Git repository at:
+> @@ -1038,14 +1116,28 @@ static int vfio_ap_mdev_set_kvm(struct ap_matrix_mdev *matrix_mdev,
+>  {
+>  	struct ap_matrix_mdev *m;
+> 
+> -	list_for_each_entry(m, &matrix_dev->mdev_list, node) {
+> -		if ((m != matrix_mdev) && (m->kvm == kvm))
+> -			return -EPERM;
+> -	}
+> +	if (kvm->arch.crypto.crycbd) {
+> +		matrix_mdev->kvm_busy = true;
+> 
+> -	matrix_mdev->kvm = kvm;
+> -	kvm_get_kvm(kvm);
+> -	kvm->arch.crypto.pqap_hook = &matrix_mdev->pqap_hook;
+> +		list_for_each_entry(m, &matrix_dev->mdev_list, node) {
+> +			if ((m != matrix_mdev) && (m->kvm == kvm)) {
+> +				wake_up_all(&matrix_mdev->wait_for_kvm);
 
-  https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
+This ain't no good. kvm_busy will remain true if we take this exit. The
+wake_up_all() is not needed, because we hold the lock, so nobody can
+observe it if we don't forget kvm_busy set.
 
-for you to fetch changes up to 9e46f6c6c959d9bb45445c2e8f04a75324a0dfd0:
+I suggest moving matrix_mdev->kvm_busy = true; after this loop, maybe right
+before the unlock, and removing the wake_up_all().
 
-  KVM: SVM: Clear the CR4 register on reset (2021-03-02 14:39:11 -0500)
+> +				return -EPERM;
+> +			}
+> +		}
+> +
+> +		kvm_get_kvm(kvm);
+> +		mutex_unlock(&matrix_dev->lock);
+> +		kvm_arch_crypto_set_masks(kvm,
+> +					  matrix_mdev->matrix.apm,
+> +					  matrix_mdev->matrix.aqm,
+> +					  matrix_mdev->matrix.adm);
+> +		mutex_lock(&matrix_dev->lock);
+> +		kvm->arch.crypto.pqap_hook = &matrix_mdev->pqap_hook;
+> +		matrix_mdev->kvm = kvm;
+> +		matrix_mdev->kvm_busy = false;
+> +		wake_up_all(&matrix_mdev->wait_for_kvm);
+> +	}
+> 
+>  	return 0;
+>  }
 
-----------------------------------------------------------------
-* Doc fixes
-* selftests fixes
-* Add runstate information to the new Xen support
-* Allow compiling out the Xen interface
-* 32-bit PAE without EPT bugfix
-* NULL pointer dereference bugfix
+[..]
 
-----------------------------------------------------------------
-Aaron Lewis (1):
-      selftests: kvm: Mmap the entire vcpu mmap area
+> @@ -1300,7 +1406,21 @@ static ssize_t vfio_ap_mdev_ioctl(struct mdev_device *mdev,
+>  		ret = vfio_ap_mdev_get_device_info(arg);
+>  		break;
+>  	case VFIO_DEVICE_RESET:
+> -		ret = vfio_ap_mdev_reset_queues(mdev);
+> +		matrix_mdev = mdev_get_drvdata(mdev);
+> +
+> +		/*
+> +		 * If the KVM pointer is in the process of being set, wait until
+> +		 * the process has completed.
+> +		 */
+> +		wait_event_cmd(matrix_mdev->wait_for_kvm,
+> +			       matrix_mdev->kvm_busy == false,
+> +			       mutex_unlock(&matrix_dev->lock),
+> +			       mutex_lock(&matrix_dev->lock));
+> +
+> +		if (matrix_mdev->kvm)
+> +			ret = vfio_ap_mdev_reset_queues(mdev);
+> +		else
+> +			ret = -ENODEV;
 
-Babu Moger (1):
-      KVM: SVM: Clear the CR4 register on reset
+I don't think rejecting the reset is a good idea. I have you a more detailed
+explanation of the list, where we initially discussed this question.
 
-Chenyi Qiang (1):
-      KVM: Documentation: rectify rst markup in kvm_run->flags
+How do you exect userspace to react to this -ENODEV?
 
-David Woodhouse (2):
-      KVM: x86/xen: Fix return code when clearing vcpu_info and vcpu_time_info
-      KVM: x86/xen: Add support for vCPU runstate information
+Otherwise looks good to me!
 
-Dongli Zhang (1):
-      KVM: x86: remove misplaced comment on active_mmu_pages
+I've tested your branch from yesterday (which looks to me like this patch
+without the above check on ->kvm and reset) for the lockdep splat, but I
+didn't do any comprehensive testing -- which would ensure that we didn't
+break something else in the process. With the two issues fixed, and your
+word that the patch was properly tested (except for the lockdep splat
+which I tested myself), I feel comfortable with moving forward with this.
 
-Kai Huang (1):
-      KVM: Documentation: Fix index for KVM_CAP_PPC_DAWR1
-
-Paolo Bonzini (3):
-      Documentation: kvm: fix messy conversion from .txt to .rst
-      KVM: xen: flush deferred static key before checking it
-      KVM: x86: allow compiling out the Xen hypercall interface
-
-Sean Christopherson (1):
-      KVM: x86/mmu: Set SPTE_AD_WRPROT_ONLY_MASK if and only if PML is enabled
-
-Wanpeng Li (1):
-      KVM: x86: hyper-v: Fix Hyper-V context null-ptr-deref
-
- Documentation/virt/kvm/api.rst                     | 115 ++++----
- arch/x86/include/asm/kvm_host.h                    |   9 +-
- arch/x86/kvm/Kconfig                               |   9 +
- arch/x86/kvm/Makefile                              |   3 +-
- arch/x86/kvm/hyperv.c                              |   2 +-
- arch/x86/kvm/mmu/mmu_internal.h                    |  16 +-
- arch/x86/kvm/svm/svm.c                             |   1 +
- arch/x86/kvm/x86.c                                 |  22 +-
- arch/x86/kvm/xen.c                                 | 290 +++++++++++++++++++++
- arch/x86/kvm/xen.h                                 |  64 ++++-
- include/uapi/linux/kvm.h                           |  13 +
- tools/testing/selftests/kvm/lib/kvm_util.c         |   6 +-
- .../testing/selftests/kvm/x86_64/xen_shinfo_test.c | 159 ++++++++++-
- 13 files changed, 633 insertions(+), 76 deletions(-)
+Regards,
 
