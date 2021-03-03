@@ -2,204 +2,198 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BAC6B32C688
-	for <lists+kvm@lfdr.de>; Thu,  4 Mar 2021 02:03:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8986F32C68B
+	for <lists+kvm@lfdr.de>; Thu,  4 Mar 2021 02:03:13 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346243AbhCDA3J (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 3 Mar 2021 19:29:09 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:40716 "EHLO
-        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S235594AbhCCQnv (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 3 Mar 2021 11:43:51 -0500
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 123GX8OL084817;
-        Wed, 3 Mar 2021 11:41:29 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=AtfUp84KbnxJ0IzGbpzeCidHOz/gpE26x//fH8Q6l14=;
- b=D0z/xJTSSW+H0ljoy7V1/WooQlRCZTNpff3tcDq7RWAHK2EUaFLNi8ts5TMX8GYkJ2gw
- 8C9r6/VKXOQMHoyJWDUeetmgV9cY+3i3yOJpBmxFMAa6NpeU3GhZR38QWiCRfWghbIfh
- /0OaCw+Z5hgR0EU7Vq9t1NNfjU9IG+/ZtYDSzrNXa47ZPVIqOkOfGWzMOnAe9y5IODIS
- kheBGiboNzlKr3xgwUrxPix5QThrQImh56tVgrR3cIOLDPckZrrS8dtsjRY0wloF5EeQ
- 0I3gxdfL8KhD70DmzuupUDug4BiIlFRXVBo43xYLH+csQv34WV9SAFtCVwsCKhmelrM+ AA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 372du2gyrw-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 03 Mar 2021 11:41:28 -0500
-Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 123GY4vh096343;
-        Wed, 3 Mar 2021 11:41:28 -0500
-Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com [169.63.214.131])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 372du2gyr9-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 03 Mar 2021 11:41:28 -0500
-Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
-        by ppma01dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 123Gavbq002307;
-        Wed, 3 Mar 2021 16:41:27 GMT
-Received: from b03cxnp07029.gho.boulder.ibm.com (b03cxnp07029.gho.boulder.ibm.com [9.17.130.16])
-        by ppma01dal.us.ibm.com with ESMTP id 371qmujmh3-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 03 Mar 2021 16:41:27 +0000
-Received: from b03ledav002.gho.boulder.ibm.com (b03ledav002.gho.boulder.ibm.com [9.17.130.233])
-        by b03cxnp07029.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 123GfQKd47579454
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 3 Mar 2021 16:41:26 GMT
-Received: from b03ledav002.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 1E2F4136051;
-        Wed,  3 Mar 2021 16:41:26 +0000 (GMT)
-Received: from b03ledav002.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 3DCAB136053;
-        Wed,  3 Mar 2021 16:41:24 +0000 (GMT)
-Received: from cpe-66-24-58-13.stny.res.rr.com (unknown [9.85.150.254])
-        by b03ledav002.gho.boulder.ibm.com (Postfix) with ESMTP;
-        Wed,  3 Mar 2021 16:41:23 +0000 (GMT)
-Subject: Re: [PATCH v3 1/1] s390/vfio-ap: fix circular lockdep when
- setting/clearing crypto masks
-To:     Halil Pasic <pasic@linux.ibm.com>
-Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, stable@vger.kernel.org,
-        borntraeger@de.ibm.com, cohuck@redhat.com, kwankhede@nvidia.com,
-        pbonzini@redhat.com, alex.williamson@redhat.com,
-        pasic@linux.vnet.ibm.com
-References: <20210302204322.24441-1-akrowiak@linux.ibm.com>
- <20210302204322.24441-2-akrowiak@linux.ibm.com>
- <20210303162332.4d227dbe.pasic@linux.ibm.com>
-From:   Tony Krowiak <akrowiak@linux.ibm.com>
-Message-ID: <e5cc2a81-7273-2b3e-0d4c-c6c17502bdae@linux.ibm.com>
-Date:   Wed, 3 Mar 2021 11:41:22 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+        id S1355496AbhCDA3L (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 3 Mar 2021 19:29:11 -0500
+Received: from mail.kernel.org ([198.145.29.99]:41008 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S234325AbhCCQqy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 3 Mar 2021 11:46:54 -0500
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id DD85E64EBB;
+        Wed,  3 Mar 2021 16:45:11 +0000 (UTC)
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=hot-poop.lan)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94)
+        (envelope-from <maz@kernel.org>)
+        id 1lHUcX-00H3NQ-JX; Wed, 03 Mar 2021 16:45:09 +0000
+From:   Marc Zyngier <maz@kernel.org>
+To:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org
+Cc:     kernel-team@android.com, James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>
+Subject: [PATCH] KVM: arm64: Ensure I-cache isolation between vcpus of a same VM
+Date:   Wed,  3 Mar 2021 16:45:05 +0000
+Message-Id: <20210303164505.68492-1-maz@kernel.org>
+X-Mailer: git-send-email 2.30.0
 MIME-Version: 1.0
-In-Reply-To: <20210303162332.4d227dbe.pasic@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.761
- definitions=2021-03-03_05:2021-03-03,2021-03-03 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 malwarescore=0
- phishscore=0 spamscore=0 impostorscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 bulkscore=0 clxscore=1015 lowpriorityscore=0
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2103030121
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, kernel-team@android.com, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, will@kernel.org, mark.rutland@arm.com, catalin.marinas@arm.com, alexandru.elisei@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+It recently became apparent that the ARMv8 architecture has interesting
+rules regarding attributes being used when fetching instructions
+if the MMU is off at Stage-1.
 
+In this situation, the CPU is allowed to fetch from the PoC and
+allocate into the I-cache (unless the memory is mapped with
+the XN attribute at Stage-2).
 
-On 3/3/21 10:23 AM, Halil Pasic wrote:
-> On Tue,  2 Mar 2021 15:43:22 -0500
-> Tony Krowiak <akrowiak@linux.ibm.com> wrote:
->
->> This patch fixes a lockdep splat introduced by commit f21916ec4826
->> ("s390/vfio-ap: clean up vfio_ap resources when KVM pointer invalidated").
->> The lockdep splat only occurs when starting a Secure Execution guest.
->> Crypto virtualization (vfio_ap) is not yet supported for SE guests;
->> however, in order to avoid this problem when support becomes available,
->> this fix is being provided.
-> [..]
->
->> @@ -1038,14 +1116,28 @@ static int vfio_ap_mdev_set_kvm(struct ap_matrix_mdev *matrix_mdev,
->>   {
->>   	struct ap_matrix_mdev *m;
->>
->> -	list_for_each_entry(m, &matrix_dev->mdev_list, node) {
->> -		if ((m != matrix_mdev) && (m->kvm == kvm))
->> -			return -EPERM;
->> -	}
->> +	if (kvm->arch.crypto.crycbd) {
->> +		matrix_mdev->kvm_busy = true;
->>
->> -	matrix_mdev->kvm = kvm;
->> -	kvm_get_kvm(kvm);
->> -	kvm->arch.crypto.pqap_hook = &matrix_mdev->pqap_hook;
->> +		list_for_each_entry(m, &matrix_dev->mdev_list, node) {
->> +			if ((m != matrix_mdev) && (m->kvm == kvm)) {
->> +				wake_up_all(&matrix_mdev->wait_for_kvm);
-> This ain't no good. kvm_busy will remain true if we take this exit. The
-> wake_up_all() is not needed, because we hold the lock, so nobody can
-> observe it if we don't forget kvm_busy set.
->
-> I suggest moving matrix_mdev->kvm_busy = true; after this loop, maybe right
-> before the unlock, and removing the wake_up_all().
+If we transpose this to vcpus sharing a single physical CPU,
+it is possible for a vcpu running with its MMU off to influence
+another vcpu running with its MMU on, as the latter is expected to
+fetch from the PoU (and self-patching code doesn't flush below that
+level).
 
-Okay
+In order to solve this, reuse the vcpu-private TLB invalidation
+code to apply the same policy to the I-cache, nuking it every time
+the vcpu runs on a physical CPU that ran another vcpu of the same
+VM in the past.
 
->
->> +				return -EPERM;
->> +			}
->> +		}
->> +
->> +		kvm_get_kvm(kvm);
->> +		mutex_unlock(&matrix_dev->lock);
->> +		kvm_arch_crypto_set_masks(kvm,
->> +					  matrix_mdev->matrix.apm,
->> +					  matrix_mdev->matrix.aqm,
->> +					  matrix_mdev->matrix.adm);
->> +		mutex_lock(&matrix_dev->lock);
->> +		kvm->arch.crypto.pqap_hook = &matrix_mdev->pqap_hook;
->> +		matrix_mdev->kvm = kvm;
->> +		matrix_mdev->kvm_busy = false;
->> +		wake_up_all(&matrix_mdev->wait_for_kvm);
->> +	}
->>
->>   	return 0;
->>   }
-> [..]
->
->> @@ -1300,7 +1406,21 @@ static ssize_t vfio_ap_mdev_ioctl(struct mdev_device *mdev,
->>   		ret = vfio_ap_mdev_get_device_info(arg);
->>   		break;
->>   	case VFIO_DEVICE_RESET:
->> -		ret = vfio_ap_mdev_reset_queues(mdev);
->> +		matrix_mdev = mdev_get_drvdata(mdev);
->> +
->> +		/*
->> +		 * If the KVM pointer is in the process of being set, wait until
->> +		 * the process has completed.
->> +		 */
->> +		wait_event_cmd(matrix_mdev->wait_for_kvm,
->> +			       matrix_mdev->kvm_busy == false,
->> +			       mutex_unlock(&matrix_dev->lock),
->> +			       mutex_lock(&matrix_dev->lock));
->> +
->> +		if (matrix_mdev->kvm)
->> +			ret = vfio_ap_mdev_reset_queues(mdev);
->> +		else
->> +			ret = -ENODEV;
-> I don't think rejecting the reset is a good idea. I have you a more detailed
-> explanation of the list, where we initially discussed this question.
->
-> How do you exect userspace to react to this -ENODEV?
+This involve renaming __kvm_tlb_flush_local_vmid() to
+__kvm_flush_cpu_context(), and inserting a local i-cache invalidation
+there.
 
-The VFIO_DEVICE_RESET ioctl expects a return code.
-The vfio_ap_mdev_reset_queues() function can return -EIO or
--EBUSY, so I would expect userspace to handle -ENODEV
-similarly to -EIO or any other non-zero return code. I also
-looked at all of the VFIO_DEVICE_RESET calls from QEMU to see
-how the return from the ioctl call is handled:
+Cc: stable@vger.kernel.org
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+---
+ arch/arm64/include/asm/kvm_asm.h   | 4 ++--
+ arch/arm64/kvm/arm.c               | 7 ++++++-
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c | 6 +++---
+ arch/arm64/kvm/hyp/nvhe/tlb.c      | 3 ++-
+ arch/arm64/kvm/hyp/vhe/tlb.c       | 3 ++-
+ 5 files changed, 15 insertions(+), 8 deletions(-)
 
-* ap: reports the reset failed along with the rc
-* ccw: doesn't check the rc
-* pci: kind of hard to follow without digging deep, but definitely
-          handles non-zero rc.
-
-I think the caller should be notified whether the queues were
-successfully reset or not, and why; in this case, the answer is
-there are no devices to reset.
-
->
-> Otherwise looks good to me!
->
-> I've tested your branch from yesterday (which looks to me like this patch
-> without the above check on ->kvm and reset) for the lockdep splat, but I
-> didn't do any comprehensive testing -- which would ensure that we didn't
-> break something else in the process. With the two issues fixed, and your
-> word that the patch was properly tested (except for the lockdep splat
-> which I tested myself), I feel comfortable with moving forward with this.
->
-> Regards,
->
+diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
+index 9c0e396dd03f..a7ab84f781f7 100644
+--- a/arch/arm64/include/asm/kvm_asm.h
++++ b/arch/arm64/include/asm/kvm_asm.h
+@@ -47,7 +47,7 @@
+ #define __KVM_HOST_SMCCC_FUNC___kvm_flush_vm_context		2
+ #define __KVM_HOST_SMCCC_FUNC___kvm_tlb_flush_vmid_ipa		3
+ #define __KVM_HOST_SMCCC_FUNC___kvm_tlb_flush_vmid		4
+-#define __KVM_HOST_SMCCC_FUNC___kvm_tlb_flush_local_vmid	5
++#define __KVM_HOST_SMCCC_FUNC___kvm_flush_cpu_context		5
+ #define __KVM_HOST_SMCCC_FUNC___kvm_timer_set_cntvoff		6
+ #define __KVM_HOST_SMCCC_FUNC___kvm_enable_ssbs			7
+ #define __KVM_HOST_SMCCC_FUNC___vgic_v3_get_gic_config		8
+@@ -183,10 +183,10 @@ DECLARE_KVM_HYP_SYM(__bp_harden_hyp_vecs);
+ #define __bp_harden_hyp_vecs	CHOOSE_HYP_SYM(__bp_harden_hyp_vecs)
+ 
+ extern void __kvm_flush_vm_context(void);
++extern void __kvm_flush_cpu_context(struct kvm_s2_mmu *mmu);
+ extern void __kvm_tlb_flush_vmid_ipa(struct kvm_s2_mmu *mmu, phys_addr_t ipa,
+ 				     int level);
+ extern void __kvm_tlb_flush_vmid(struct kvm_s2_mmu *mmu);
+-extern void __kvm_tlb_flush_local_vmid(struct kvm_s2_mmu *mmu);
+ 
+ extern void __kvm_timer_set_cntvoff(u64 cntvoff);
+ 
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index fc4c95dd2d26..7f06ba76698d 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -385,11 +385,16 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+ 	last_ran = this_cpu_ptr(mmu->last_vcpu_ran);
+ 
+ 	/*
++	 * We guarantee that both TLBs and I-cache are private to each
++	 * vcpu. If detecting that a vcpu from the same VM has
++	 * previously run on the same physical CPU, call into the
++	 * hypervisor code to nuke the relevant contexts.
++	 *
+ 	 * We might get preempted before the vCPU actually runs, but
+ 	 * over-invalidation doesn't affect correctness.
+ 	 */
+ 	if (*last_ran != vcpu->vcpu_id) {
+-		kvm_call_hyp(__kvm_tlb_flush_local_vmid, mmu);
++		kvm_call_hyp(__kvm_flush_cpu_context, mmu);
+ 		*last_ran = vcpu->vcpu_id;
+ 	}
+ 
+diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+index 8f129968204e..936328207bde 100644
+--- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
++++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+@@ -46,11 +46,11 @@ static void handle___kvm_tlb_flush_vmid(struct kvm_cpu_context *host_ctxt)
+ 	__kvm_tlb_flush_vmid(kern_hyp_va(mmu));
+ }
+ 
+-static void handle___kvm_tlb_flush_local_vmid(struct kvm_cpu_context *host_ctxt)
++static void handle___kvm_flush_cpu_context(struct kvm_cpu_context *host_ctxt)
+ {
+ 	DECLARE_REG(struct kvm_s2_mmu *, mmu, host_ctxt, 1);
+ 
+-	__kvm_tlb_flush_local_vmid(kern_hyp_va(mmu));
++	__kvm_flush_cpu_context(kern_hyp_va(mmu));
+ }
+ 
+ static void handle___kvm_timer_set_cntvoff(struct kvm_cpu_context *host_ctxt)
+@@ -115,7 +115,7 @@ static const hcall_t host_hcall[] = {
+ 	HANDLE_FUNC(__kvm_flush_vm_context),
+ 	HANDLE_FUNC(__kvm_tlb_flush_vmid_ipa),
+ 	HANDLE_FUNC(__kvm_tlb_flush_vmid),
+-	HANDLE_FUNC(__kvm_tlb_flush_local_vmid),
++	HANDLE_FUNC(__kvm_flush_cpu_context),
+ 	HANDLE_FUNC(__kvm_timer_set_cntvoff),
+ 	HANDLE_FUNC(__kvm_enable_ssbs),
+ 	HANDLE_FUNC(__vgic_v3_get_gic_config),
+diff --git a/arch/arm64/kvm/hyp/nvhe/tlb.c b/arch/arm64/kvm/hyp/nvhe/tlb.c
+index fbde89a2c6e8..229b06748c20 100644
+--- a/arch/arm64/kvm/hyp/nvhe/tlb.c
++++ b/arch/arm64/kvm/hyp/nvhe/tlb.c
+@@ -123,7 +123,7 @@ void __kvm_tlb_flush_vmid(struct kvm_s2_mmu *mmu)
+ 	__tlb_switch_to_host(&cxt);
+ }
+ 
+-void __kvm_tlb_flush_local_vmid(struct kvm_s2_mmu *mmu)
++void __kvm_flush_cpu_context(struct kvm_s2_mmu *mmu)
+ {
+ 	struct tlb_inv_context cxt;
+ 
+@@ -131,6 +131,7 @@ void __kvm_tlb_flush_local_vmid(struct kvm_s2_mmu *mmu)
+ 	__tlb_switch_to_guest(mmu, &cxt);
+ 
+ 	__tlbi(vmalle1);
++	asm volatile("ic iallu");
+ 	dsb(nsh);
+ 	isb();
+ 
+diff --git a/arch/arm64/kvm/hyp/vhe/tlb.c b/arch/arm64/kvm/hyp/vhe/tlb.c
+index fd7895945bbc..66f17349f0c3 100644
+--- a/arch/arm64/kvm/hyp/vhe/tlb.c
++++ b/arch/arm64/kvm/hyp/vhe/tlb.c
+@@ -127,7 +127,7 @@ void __kvm_tlb_flush_vmid(struct kvm_s2_mmu *mmu)
+ 	__tlb_switch_to_host(&cxt);
+ }
+ 
+-void __kvm_tlb_flush_local_vmid(struct kvm_s2_mmu *mmu)
++void __kvm_flush_cpu_context(struct kvm_s2_mmu *mmu)
+ {
+ 	struct tlb_inv_context cxt;
+ 
+@@ -135,6 +135,7 @@ void __kvm_tlb_flush_local_vmid(struct kvm_s2_mmu *mmu)
+ 	__tlb_switch_to_guest(mmu, &cxt);
+ 
+ 	__tlbi(vmalle1);
++	asm volatile("ic iallu");
+ 	dsb(nsh);
+ 	isb();
+ 
+-- 
+2.30.0
 
