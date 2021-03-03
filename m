@@ -2,88 +2,67 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6A7E132B5C8
+	by mail.lfdr.de (Postfix) with ESMTP id DCBF232B5C9
 	for <lists+kvm@lfdr.de>; Wed,  3 Mar 2021 08:45:05 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1449373AbhCCHUC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 3 Mar 2021 02:20:02 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54120 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234570AbhCCCkZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 2 Mar 2021 21:40:25 -0500
-Received: from mail-pg1-x52c.google.com (mail-pg1-x52c.google.com [IPv6:2607:f8b0:4864:20::52c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2FEE4C061797;
-        Tue,  2 Mar 2021 18:39:41 -0800 (PST)
-Received: by mail-pg1-x52c.google.com with SMTP id h4so15192891pgf.13;
-        Tue, 02 Mar 2021 18:39:41 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=subject:from:to:cc:references:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=EGVG4WkVl5pFpBjbmr9YGkCtEq1i3vWKYOcjQG1R/v0=;
-        b=aS2Uf5dAX41dzyG77xCrLK1TGmya8ecK4+YhOlzcqqsTSkEuXC56qYFBPV0qZ5AokF
-         U1IZ2uNq4U6kIX9oRa42X00OpuSFbq2FjtuDXhprPoLZZer5qI2u1ucLXVEDWEJix57b
-         slwzL4TMyf6hYBH2vyHO6DV7n+1ob4g5K4AnsnHsmcb5Sj58xXxhD/n7+9afq76e5GwW
-         UcTNyVtZ+70xaz+a6rwbuiJExyp3ySWrDbu3ethvOT0WXZdB2VBXYp3ey9sMoIk2TzXT
-         DFw0zMf4+go0l5NdnamfzDJqp1S4hKinnX01Kh3f85oojOfVluEPIwk+jkLAQipNLpmT
-         2XaQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:from:to:cc:references:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=EGVG4WkVl5pFpBjbmr9YGkCtEq1i3vWKYOcjQG1R/v0=;
-        b=cfuXUxenT2e3KCDejA/ZlO7BD3CI17rmGDbHWI3UqKYdDO63hs/rkHs2ngGIeqHrw7
-         kAqxVEbZExlTeeFw7vn2VuELCmoM53HqDxKinMdKxU5j6oVRtipUMGe06f7WQAKXsQ78
-         Doj46jBMRkOn/GIS6AqzLAACzMXl8KqOhVFOUlH31jXBfLyUPt6CwmWxL2Qawi54ebc6
-         nbkDVQXoVHFIaE9FcaTuk2ZmPxP2FGcKzInVTul0ZeWE9e/40PGDwGQWkixr9JOiNsow
-         97Go5K6NurZ2pPXXuN24Ui9rZEJ4wlpACeGjjz4ytS9V2ynziYmiSszMAKSQmyAAfHBj
-         IiOg==
-X-Gm-Message-State: AOAM530VxAFz+fRRLMh8UIQ9/xw2pFuq0wml7cIxH3gWF+5osJnRFROy
-        u6W5fDPzuOuqAjywL8T8og==
-X-Google-Smtp-Source: ABdhPJyks6SodkO5sqbqFQUQZ/9OziaBwHkURJyyyVxkHE4I9p4DH0accCxHjQEUk8hg9uGmf6yrPg==
-X-Received: by 2002:a63:741:: with SMTP id 62mr1302468pgh.70.1614739180726;
-        Tue, 02 Mar 2021 18:39:40 -0800 (PST)
-Received: from [127.0.0.1] ([203.205.141.56])
-        by smtp.gmail.com with ESMTPSA id v1sm9289197pgh.17.2021.03.02.18.39.37
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 02 Mar 2021 18:39:40 -0800 (PST)
-Subject: Re: [PATCH] kvm: lapic: add module parameters for
- LAPIC_TIMER_ADVANCE_ADJUST_MAX/MIN
-From:   Haiwei Li <lihaiwei.kernel@gmail.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     pbonzini@redhat.com, seanjc@google.com, vkuznets@redhat.com,
-        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
-        Haiwei Li <lihaiwei@tencent.com>
-References: <20210303020946.26083-1-lihaiwei.kernel@gmail.com>
-Message-ID: <03239d81-df56-a6c9-c79d-c14d22f62705@gmail.com>
-Date:   Wed, 3 Mar 2021 10:39:29 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.16; rv:78.0)
- Gecko/20100101 Thunderbird/78.8.0
-MIME-Version: 1.0
-In-Reply-To: <20210303020946.26083-1-lihaiwei.kernel@gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+        id S1449385AbhCCHUE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 3 Mar 2021 02:20:04 -0500
+Received: from mga03.intel.com ([134.134.136.65]:64029 "EHLO mga03.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1450806AbhCCFwz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 3 Mar 2021 00:52:55 -0500
+IronPort-SDR: xw+0gtmw6emeXrX5MRE2sCZTw/IrVgH5wSvMEBbeAqdI4dXUF0HhZYYEuMUtlmg759UH+1eQed
+ cygSnMUkQKjQ==
+X-IronPort-AV: E=McAfee;i="6000,8403,9911"; a="187168416"
+X-IronPort-AV: E=Sophos;i="5.81,219,1610438400"; 
+   d="scan'208";a="187168416"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Mar 2021 21:52:13 -0800
+IronPort-SDR: PPCaIJ1yCXU3MQyLWu37t4XQhskMV0FHuE68tL3dJg7WneBmpaJ+EiW2Zcdl0Nbp9Qat9tskR3
+ wTSfznF+aUhA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.81,219,1610438400"; 
+   d="scan'208";a="399515380"
+Received: from local-michael-cet-test.sh.intel.com ([10.239.159.166])
+  by fmsmga008.fm.intel.com with ESMTP; 02 Mar 2021 21:52:11 -0800
+From:   Yang Weijiang <weijiang.yang@intel.com>
+To:     pbonzini@redhat.com, seanjc@google.com, vkuznets@redhat.com,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     Yang Weijiang <weijiang.yang@intel.com>
+Subject: [PATCH] KVM: nVMX: Add CET entry/exit load bits to evmcs unsupported list
+Date:   Wed,  3 Mar 2021 14:04:34 +0800
+Message-Id: <20210303060435.8158-1-weijiang.yang@intel.com>
+X-Mailer: git-send-email 2.17.2
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 21/3/3 10:09, lihaiwei.kernel@gmail.com wrote:
-> From: Haiwei Li <lihaiwei@tencent.com>
-> 
-> In my test environment, advance_expire_delta is frequently greater than
-> the fixed LAPIC_TIMER_ADVANCE_ADJUST_MAX. And this will hinder the
-> adjustment.
+CET in nested guest over Hyper-V is not supported for now. Relevant
+enabling patches will be posted as a separate patch series.
 
-Supplementary details:
+Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
+---
+ arch/x86/kvm/vmx/evmcs.h | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-I have tried to backport timer related features to our production
-kernel.
-
-After completed, i found that advance_expire_delta is frequently greater
-than the fixed value. It's necessary to trun the fixed to dynamically
-values.
-
+diff --git a/arch/x86/kvm/vmx/evmcs.h b/arch/x86/kvm/vmx/evmcs.h
+index bd41d9462355..25588694eb04 100644
+--- a/arch/x86/kvm/vmx/evmcs.h
++++ b/arch/x86/kvm/vmx/evmcs.h
+@@ -59,8 +59,10 @@ DECLARE_STATIC_KEY_FALSE(enable_evmcs);
+ 	 SECONDARY_EXEC_SHADOW_VMCS |					\
+ 	 SECONDARY_EXEC_TSC_SCALING |					\
+ 	 SECONDARY_EXEC_PAUSE_LOOP_EXITING)
+-#define EVMCS1_UNSUPPORTED_VMEXIT_CTRL (VM_EXIT_LOAD_IA32_PERF_GLOBAL_CTRL)
+-#define EVMCS1_UNSUPPORTED_VMENTRY_CTRL (VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL)
++#define EVMCS1_UNSUPPORTED_VMEXIT_CTRL (VM_EXIT_LOAD_IA32_PERF_GLOBAL_CTRL | \
++					VM_EXIT_LOAD_CET_STATE)
++#define EVMCS1_UNSUPPORTED_VMENTRY_CTRL (VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL | \
++					 VM_ENTRY_LOAD_CET_STATE)
+ #define EVMCS1_UNSUPPORTED_VMFUNC (VMX_VMFUNC_EPTP_SWITCHING)
+ 
+ #if IS_ENABLED(CONFIG_HYPERV)
 -- 
-Haiwei Li
+2.26.2
+
