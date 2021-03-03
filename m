@@ -2,187 +2,143 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D49A932C6A4
-	for <lists+kvm@lfdr.de>; Thu,  4 Mar 2021 02:03:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2648232C6A7
+	for <lists+kvm@lfdr.de>; Thu,  4 Mar 2021 02:03:38 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1451050AbhCDA3p (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 3 Mar 2021 19:29:45 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45124 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240166AbhCCR3a (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 3 Mar 2021 12:29:30 -0500
-Received: from mail-io1-xd31.google.com (mail-io1-xd31.google.com [IPv6:2607:f8b0:4864:20::d31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B700DC061760
-        for <kvm@vger.kernel.org>; Wed,  3 Mar 2021 09:28:15 -0800 (PST)
-Received: by mail-io1-xd31.google.com with SMTP id k2so21145410ioh.5
-        for <kvm@vger.kernel.org>; Wed, 03 Mar 2021 09:28:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=ck2w+e5yXkndn1hHoEc40G+HBVTFOBYH8jC+XKOicDs=;
-        b=YSXBefMpnQeJLVXH2u/6vizQTN7Ho5xCOwqne2UzKric8QgKjoWznBVtMcKZnJS/l1
-         CBnEZvshehyDRI6+CSUort61MlyKAsJWSQX4iNx8LTtWnAx0ZooLoqt9xt9hQQJejuSe
-         twEl2M4gyaFVNQ2iP6xie+uaMefYX9aCP80ei1oK/F+tZHUXS5SZ2xli/Rnla2iuH35y
-         HQZkHEa7zBKqwz7GkNafuRf42QHtHxEi6u2lUhgTbjam2v8oO0920jY4bUX1JS5JTMx7
-         4uM7pMSEYFh1V0twXIR172Ux54s64w07d8DapzsMG53O+pBTaow42w+Euq+zmJW+PWbN
-         XOsg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=ck2w+e5yXkndn1hHoEc40G+HBVTFOBYH8jC+XKOicDs=;
-        b=tYYlDNh0OUGCio1G1f5BKODOl8ClUNgx3yzv0QZiKTivcH6ba4u+0ME+N//M9J2k/e
-         q0rpmeaHKQqBKwtRspoYmunejPCRXxP7w8ZUCrHDM2lnv1XsGZOiMA7o2RyiOX1FC49W
-         FS3e93oGKm4KvC/1ZtNQAWV5ijWC0dP3IAw9EItOKtierIjS8gaM31J8okIcbnktFGyS
-         R3KcWtq6XZGMSjAnfrCtWvW5sLbIaYyiuQJADwBqYesLahfrBNWZVlvZ6sZTX0z+is7Q
-         z7wPYT6mLfKd8bSoqcPxcW+vOzz45Dnh585urHF4Ek35sZz6SaoirKOxz3dZgDq8AhVu
-         52eQ==
-X-Gm-Message-State: AOAM533Lof4r18umU9tg7fO5q4KquPndyrs9AnNjLw7t1Q+iTwGWlI7Z
-        AqWHs0Uk/2emNiGSZLqfsk9oKuAxGfNKnQNwm+OMoA==
-X-Google-Smtp-Source: ABdhPJzD8aRdltFXM/NaTn95qOpABgQeAMXTFWz8XzmWvbiOwMUQmg4Z4Z7jc4RFL5cM1+dGliVOWFz6VT9q9Cgnqxg=
-X-Received: by 2002:a05:6638:1648:: with SMTP id a8mr25394286jat.25.1614792494837;
- Wed, 03 Mar 2021 09:28:14 -0800 (PST)
+        id S1451066AbhCDA3r (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 3 Mar 2021 19:29:47 -0500
+Received: from foss.arm.com ([217.140.110.172]:53200 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1386023AbhCCRd1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 3 Mar 2021 12:33:27 -0500
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id AFF7A31B;
+        Wed,  3 Mar 2021 09:32:39 -0800 (PST)
+Received: from slackpad.fritz.box (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D6C2C3F7D7;
+        Wed,  3 Mar 2021 09:32:38 -0800 (PST)
+Date:   Wed, 3 Mar 2021 17:32:34 +0000
+From:   Andre Przywara <andre.przywara@arm.com>
+To:     Alexandru Elisei <alexandru.elisei@arm.com>
+Cc:     drjones@redhat.com, kvm@vger.kernel.org,
+        kvmarm@lists.cs.columbia.edu
+Subject: Re: [kvm-unit-tests PATCH 4/6] lib: arm64: Consolidate register
+ definitions to sysreg.h
+Message-ID: <20210303173234.6d6cec51@slackpad.fritz.box>
+In-Reply-To: <20210227104201.14403-5-alexandru.elisei@arm.com>
+References: <20210227104201.14403-1-alexandru.elisei@arm.com>
+        <20210227104201.14403-5-alexandru.elisei@arm.com>
+Organization: Arm Ltd.
+X-Mailer: Claws Mail 3.17.1 (GTK+ 2.24.31; x86_64-slackware-linux-gnu)
 MIME-Version: 1.0
-References: <20210302184540.2829328-1-seanjc@google.com> <20210302184540.2829328-3-seanjc@google.com>
-In-Reply-To: <20210302184540.2829328-3-seanjc@google.com>
-From:   Ben Gardon <bgardon@google.com>
-Date:   Wed, 3 Mar 2021 09:28:03 -0800
-Message-ID: <CANgfPd9n3HjFOR5230i9_W9-CZjKKQSp+wzDB+Eymqrr3F8xeQ@mail.gmail.com>
-Subject: Re: [PATCH 02/15] KVM: x86/mmu: Alloc page for PDPTEs when shadowing
- 32-bit NPT with 64-bit
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Mar 2, 2021 at 10:45 AM Sean Christopherson <seanjc@google.com> wrote:
->
-> Allocate the so called pae_root page on-demand, along with the lm_root
-> page, when shadowing 32-bit NPT with 64-bit NPT, i.e. when running a
-> 32-bit L1.  KVM currently only allocates the page when NPT is disabled,
-> or when L0 is 32-bit (using PAE paging).
->
-> Note, there is an existing memory leak involving the MMU roots, as KVM
-> fails to free the PAE roots on failure.  This will be addressed in a
-> future commit.
->
-> Fixes: ee6268ba3a68 ("KVM: x86: Skip pae_root shadow allocation if tdp enabled")
-> Fixes: b6b80c78af83 ("KVM: x86/mmu: Allocate PAE root array when using SVM's 32-bit NPT")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
+On Sat, 27 Feb 2021 10:41:59 +0000
+Alexandru Elisei <alexandru.elisei@arm.com> wrote:
 
-Reviewed-by: Ben Gardon <bgardon@google.com>
+> Move system register field definitions to sysreg.h, where the opcodes for
+> system register access are defined, to align ourselves with the Linux
+> kernel. EL2 support, needed for EFI and nested virtualization testing, will
+> require additional register and field definions, and having them in the
+> same place as Linux will make maintenance easier.
+> 
+> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+
+Checked to be just moves, and it compiles, so:
+
+Reviewed-by: Andre Przywara <andre.przywara@arm.com>
+
+Cheers,
+Andre
 
 > ---
->  arch/x86/kvm/mmu/mmu.c | 44 ++++++++++++++++++++++++++++--------------
->  1 file changed, 29 insertions(+), 15 deletions(-)
->
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index 0987cc1d53eb..2ed3fac1244e 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -3187,14 +3187,14 @@ void kvm_mmu_free_roots(struct kvm_vcpu *vcpu, struct kvm_mmu *mmu,
->                 if (mmu->shadow_root_level >= PT64_ROOT_4LEVEL &&
->                     (mmu->root_level >= PT64_ROOT_4LEVEL || mmu->direct_map)) {
->                         mmu_free_root_page(kvm, &mmu->root_hpa, &invalid_list);
-> -               } else {
-> +               } else if (mmu->pae_root) {
->                         for (i = 0; i < 4; ++i)
->                                 if (mmu->pae_root[i] != 0)
-
-I was about to comment on how weird this check is since pae_root can
-also be INVALID_PAGE but that case is handled in mmu_free_root_page...
-but then I realized that you're already addressing that problem in
-patch 7.
-
->                                         mmu_free_root_page(kvm,
->                                                            &mmu->pae_root[i],
->                                                            &invalid_list);
-> -                       mmu->root_hpa = INVALID_PAGE;
->                 }
-> +               mmu->root_hpa = INVALID_PAGE;
->                 mmu->root_pgd = 0;
->         }
->
-> @@ -3306,9 +3306,23 @@ static int mmu_alloc_shadow_roots(struct kvm_vcpu *vcpu)
->          * the shadow page table may be a PAE or a long mode page table.
->          */
->         pm_mask = PT_PRESENT_MASK;
-> -       if (vcpu->arch.mmu->shadow_root_level == PT64_ROOT_4LEVEL)
-> +       if (vcpu->arch.mmu->shadow_root_level == PT64_ROOT_4LEVEL) {
->                 pm_mask |= PT_ACCESSED_MASK | PT_WRITABLE_MASK | PT_USER_MASK;
->
-> +               /*
-> +                * Allocate the page for the PDPTEs when shadowing 32-bit NPT
-> +                * with 64-bit only when needed.  Unlike 32-bit NPT, it doesn't
-> +                * need to be in low mem.  See also lm_root below.
-> +                */
-> +               if (!vcpu->arch.mmu->pae_root) {
-> +                       WARN_ON_ONCE(!tdp_enabled);
-> +
-> +                       vcpu->arch.mmu->pae_root = (void *)get_zeroed_page(GFP_KERNEL_ACCOUNT);
-> +                       if (!vcpu->arch.mmu->pae_root)
-> +                               return -ENOMEM;
-> +               }
-> +       }
-> +
->         for (i = 0; i < 4; ++i) {
->                 MMU_WARN_ON(VALID_PAGE(vcpu->arch.mmu->pae_root[i]));
->                 if (vcpu->arch.mmu->root_level == PT32E_ROOT_LEVEL) {
-> @@ -3331,21 +3345,19 @@ static int mmu_alloc_shadow_roots(struct kvm_vcpu *vcpu)
->         vcpu->arch.mmu->root_hpa = __pa(vcpu->arch.mmu->pae_root);
->
->         /*
-> -        * If we shadow a 32 bit page table with a long mode page
-> -        * table we enter this path.
-> +        * When shadowing 32-bit or PAE NPT with 64-bit NPT, the PML4 and PDP
-> +        * tables are allocated and initialized at MMU creation as there is no
-> +        * equivalent level in the guest's NPT to shadow.  Allocate the tables
-> +        * on demand, as running a 32-bit L1 VMM is very rare.  The PDP is
-> +        * handled above (to share logic with PAE), deal with the PML4 here.
->          */
->         if (vcpu->arch.mmu->shadow_root_level == PT64_ROOT_4LEVEL) {
->                 if (vcpu->arch.mmu->lm_root == NULL) {
-> -                       /*
-> -                        * The additional page necessary for this is only
-> -                        * allocated on demand.
-> -                        */
+>  lib/arm64/asm/arch_gicv3.h |  6 ------
+>  lib/arm64/asm/processor.h  | 10 ----------
+>  lib/arm64/asm/sysreg.h     | 17 +++++++++++++++++
+>  arm/cstart64.S             |  2 +-
+>  4 files changed, 18 insertions(+), 17 deletions(-)
+> 
+> diff --git a/lib/arm64/asm/arch_gicv3.h b/lib/arm64/asm/arch_gicv3.h
+> index a7994ec2fbbe..fdee4de1f1f6 100644
+> --- a/lib/arm64/asm/arch_gicv3.h
+> +++ b/lib/arm64/asm/arch_gicv3.h
+> @@ -10,12 +10,6 @@
+>  
+>  #include <asm/sysreg.h>
+>  
+> -#define ICC_PMR_EL1			sys_reg(3, 0, 4, 6, 0)
+> -#define ICC_SGI1R_EL1			sys_reg(3, 0, 12, 11, 5)
+> -#define ICC_IAR1_EL1			sys_reg(3, 0, 12, 12, 0)
+> -#define ICC_EOIR1_EL1			sys_reg(3, 0, 12, 12, 1)
+> -#define ICC_GRPEN1_EL1			sys_reg(3, 0, 12, 12, 7)
 > -
->                         u64 *lm_root;
->
->                         lm_root = (void*)get_zeroed_page(GFP_KERNEL_ACCOUNT);
-> -                       if (lm_root == NULL)
-> -                               return 1;
-> +                       if (!lm_root)
-> +                               return -ENOMEM;
->
->                         lm_root[0] = __pa(vcpu->arch.mmu->pae_root) | pm_mask;
->
-> @@ -5248,9 +5260,11 @@ static int __kvm_mmu_create(struct kvm_vcpu *vcpu, struct kvm_mmu *mmu)
->          * while the PDP table is a per-vCPU construct that's allocated at MMU
->          * creation.  When emulating 32-bit mode, cr3 is only 32 bits even on
->          * x86_64.  Therefore we need to allocate the PDP table in the first
-> -        * 4GB of memory, which happens to fit the DMA32 zone.  Except for
-> -        * SVM's 32-bit NPT support, TDP paging doesn't use PAE paging and can
-> -        * skip allocating the PDP table.
-> +        * 4GB of memory, which happens to fit the DMA32 zone.  TDP paging
-> +        * generally doesn't use PAE paging and can skip allocating the PDP
-> +        * table.  The main exception, handled here, is SVM's 32-bit NPT.  The
-> +        * other exception is for shadowing L1's 32-bit or PAE NPT on 64-bit
-> +        * KVM; that horror is handled on-demand by mmu_alloc_shadow_roots().
->          */
->         if (tdp_enabled && kvm_mmu_get_tdp_level(vcpu) > PT32E_ROOT_LEVEL)
->                 return 0;
-> --
-> 2.30.1.766.gb4fecdf3b7-goog
->
+>  #ifndef __ASSEMBLY__
+>  
+>  #include <libcflat.h>
+> diff --git a/lib/arm64/asm/processor.h b/lib/arm64/asm/processor.h
+> index cdc2463e1981..4a3d826ab560 100644
+> --- a/lib/arm64/asm/processor.h
+> +++ b/lib/arm64/asm/processor.h
+> @@ -6,16 +6,6 @@
+>   * This work is licensed under the terms of the GNU LGPL, version 2.
+>   */
+>  
+> -/* System Control Register (SCTLR_EL1) bits */
+> -#define SCTLR_EL1_EE	(1 << 25)
+> -#define SCTLR_EL1_WXN	(1 << 19)
+> -#define SCTLR_EL1_I	(1 << 12)
+> -#define SCTLR_EL1_SA0	(1 << 4)
+> -#define SCTLR_EL1_SA	(1 << 3)
+> -#define SCTLR_EL1_C	(1 << 2)
+> -#define SCTLR_EL1_A	(1 << 1)
+> -#define SCTLR_EL1_M	(1 << 0)
+> -
+>  #ifndef __ASSEMBLY__
+>  #include <asm/ptrace.h>
+>  #include <asm/esr.h>
+> diff --git a/lib/arm64/asm/sysreg.h b/lib/arm64/asm/sysreg.h
+> index 378bf7ebb3b5..9d6b4fc66936 100644
+> --- a/lib/arm64/asm/sysreg.h
+> +++ b/lib/arm64/asm/sysreg.h
+> @@ -70,4 +70,21 @@ asm(
+>  "	.endm\n"
+>  );
+>  #endif /* __ASSEMBLY__ */
+> +
+> +#define ICC_PMR_EL1			sys_reg(3, 0, 4, 6, 0)
+> +#define ICC_SGI1R_EL1			sys_reg(3, 0, 12, 11, 5)
+> +#define ICC_IAR1_EL1			sys_reg(3, 0, 12, 12, 0)
+> +#define ICC_EOIR1_EL1			sys_reg(3, 0, 12, 12, 1)
+> +#define ICC_GRPEN1_EL1			sys_reg(3, 0, 12, 12, 7)
+> +
+> +/* System Control Register (SCTLR_EL1) bits */
+> +#define SCTLR_EL1_EE	(1 << 25)
+> +#define SCTLR_EL1_WXN	(1 << 19)
+> +#define SCTLR_EL1_I	(1 << 12)
+> +#define SCTLR_EL1_SA0	(1 << 4)
+> +#define SCTLR_EL1_SA	(1 << 3)
+> +#define SCTLR_EL1_C	(1 << 2)
+> +#define SCTLR_EL1_A	(1 << 1)
+> +#define SCTLR_EL1_M	(1 << 0)
+> +
+>  #endif /* _ASMARM64_SYSREG_H_ */
+> diff --git a/arm/cstart64.S b/arm/cstart64.S
+> index c1deff842f03..f6c5d2ebccf3 100644
+> --- a/arm/cstart64.S
+> +++ b/arm/cstart64.S
+> @@ -10,9 +10,9 @@
+>  #include <asm/asm-offsets.h>
+>  #include <asm/assembler.h>
+>  #include <asm/ptrace.h>
+> -#include <asm/processor.h>
+>  #include <asm/page.h>
+>  #include <asm/pgtable-hwdef.h>
+> +#include <asm/sysreg.h>
+>  
+>  .section .init
+>  
+
