@@ -2,123 +2,126 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CD3D932B5CB
-	for <lists+kvm@lfdr.de>; Wed,  3 Mar 2021 08:45:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E19B432C5F5
+	for <lists+kvm@lfdr.de>; Thu,  4 Mar 2021 02:01:14 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1452182AbhCCHUJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 3 Mar 2021 02:20:09 -0500
-Received: from mga09.intel.com ([134.134.136.24]:46711 "EHLO mga09.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S238280AbhCCF5o (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 3 Mar 2021 00:57:44 -0500
-IronPort-SDR: 4df1HfbWa1TGM3weHNFlY3K3u8vCKkjzmAgydyuyLoahB11GdDRky52wQN7nuORokoOcwPCdOb
- +3A1es2vbJsg==
-X-IronPort-AV: E=McAfee;i="6000,8403,9911"; a="187225218"
-X-IronPort-AV: E=Sophos;i="5.81,219,1610438400"; 
-   d="scan'208";a="187225218"
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Mar 2021 21:56:54 -0800
-IronPort-SDR: PbsOBCdr6YFQPm3VhY1tyo14Q++dIXx3Q8TGVQxLMuzUpfhkLyskwcdSWgz3bwhfjYNyezIG0O
- KcTqKTKkYyYw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.81,219,1610438400"; 
-   d="scan'208";a="399516650"
-Received: from local-michael-cet-test.sh.intel.com (HELO localhost) ([10.239.159.166])
-  by fmsmga008.fm.intel.com with ESMTP; 02 Mar 2021 21:56:52 -0800
-Date:   Wed, 3 Mar 2021 14:09:39 +0800
-From:   Yang Weijiang <weijiang.yang@intel.com>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Yang Weijiang <weijiang.yang@intel.com>, pbonzini@redhat.com,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2] KVM: nVMX: Sync L2 guest CET states between L1/L2
-Message-ID: <20210303060939.GA8243@local-michael-cet-test.sh.intel.com>
-References: <20210225030951.17099-1-weijiang.yang@intel.com>
- <20210225030951.17099-2-weijiang.yang@intel.com>
- <YD0oa99pgXqlS07h@google.com>
- <87y2f5etc2.fsf@vitty.brq.redhat.com>
+        id S1346188AbhCDA1G (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 3 Mar 2021 19:27:06 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:35124 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S234114AbhCCLmu (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 3 Mar 2021 06:42:50 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1614771622;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=r/j20RVofkj/hPK0Wo3xRPO9YBuymSE3SUYDVG+qh8o=;
+        b=LZ7zBmqmD3uCrih3m5/N7teNpl1B0EfKewFFn3Bl7j0BqzG7QzzlN/jqhP8rNe7cqNOcbX
+        7z+x3zBI4xwcWUpUCsBhq6v1PHSZ/VLO9XdoNGe2galTL7vF+3/5Du6PfZ+24D3filCG7c
+        LEpb+lXxMRP3lhIIUAbQLTKdghVdEdk=
+Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
+ [209.85.218.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-349-Y-poX2VJMOGmUo7TFfWoAQ-1; Wed, 03 Mar 2021 04:36:43 -0500
+X-MC-Unique: Y-poX2VJMOGmUo7TFfWoAQ-1
+Received: by mail-ej1-f69.google.com with SMTP id au15so4521321ejc.8
+        for <kvm@vger.kernel.org>; Wed, 03 Mar 2021 01:36:42 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=r/j20RVofkj/hPK0Wo3xRPO9YBuymSE3SUYDVG+qh8o=;
+        b=OZXkH4dZUbySJ5NELXlVLNSQKn3pGYgxZo/hduSyVVA7yKf1t6ka6xrNQDx3uT0UKU
+         fGnfKg2Nis5XDFNrLSp5+m263ul1oml+owNwotuc/1xnYkr1KgziXKyG0FZk47WOpneq
+         GQrfTLcFI8vj4afH23PsQaIwl8OTmYdtgK1Ac8GPslZHNDI3AZMicB/Nt1dvkAGVnC+H
+         MzHusnnWf02x+lKoVBOQsbkFsffRVSvzGZBpyTJ7XTD8CYlk13Ro1rLYM2MOR7QHPUdD
+         zX6lC80WlRbzui2ZGecLJFH8v6CSNOaqY7KlK6fZCOcJrV1+vIrokKCWRQUt/pVDhpDb
+         moyA==
+X-Gm-Message-State: AOAM532lSt+3oDFSUSBeDCAxFz8C0PvIatfCk89gByO4AbYH5BLSeJrd
+        vEyFbHG692cS6aIb6SnVVEwGxIxmXwZEPfxJM1MxrvyIZ18eOQwGXl2wP+07URq9E63R/PiSDTa
+        drnCyynY9okP7
+X-Received: by 2002:a17:906:33d9:: with SMTP id w25mr24858485eja.413.1614764201999;
+        Wed, 03 Mar 2021 01:36:41 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJw9srdPqz0s4q1Xe5kvp25flWERjZA9N812PYdPFVO6+9MmFpJ6/Ozf7O8+uFN1+d2OxMxUQw==
+X-Received: by 2002:a17:906:33d9:: with SMTP id w25mr24858472eja.413.1614764201828;
+        Wed, 03 Mar 2021 01:36:41 -0800 (PST)
+Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id o6sm2602785edw.24.2021.03.03.01.36.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 03 Mar 2021 01:36:41 -0800 (PST)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Yang Weijiang <weijiang.yang@intel.com>
+Cc:     pbonzini@redhat.com, seanjc@google.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] KVM: nVMX: Add CET entry/exit load bits to evmcs
+ unsupported list
+In-Reply-To: <20210303060435.8158-1-weijiang.yang@intel.com>
+References: <20210303060435.8158-1-weijiang.yang@intel.com>
+Date:   Wed, 03 Mar 2021 10:36:40 +0100
+Message-ID: <87h7lsefyv.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87y2f5etc2.fsf@vitty.brq.redhat.com>
-User-Agent: Mutt/1.11.3 (2019-02-01)
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Mar 02, 2021 at 11:35:41AM +0100, Vitaly Kuznetsov wrote:
-> Sean Christopherson <seanjc@google.com> writes:
-> 
-> > +Vitaly
-> >
-> > On Thu, Feb 25, 2021, Yang Weijiang wrote:
-> >> These fields are rarely updated by L1 QEMU/KVM, sync them when L1 is trying to
-> >> read/write them and after they're changed. If CET guest entry-load bit is not
-> >> set by L1 guest, migrate them to L2 manaully.
-> >> 
-> >> Suggested-by: Sean Christopherson <seanjc@google.com>
-> >> Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
-> >> 
-> >> change in v2:
-> >>  - Per Sean's review feedback, change CET guest states as rarely-updated fields.
-> >>    And also migrate L1's CET states to L2 if the entry-load bit is not set.
-> >>  - Opportunistically removed one blank line.
-> >> ---
-> >>  arch/x86/kvm/cpuid.c      |  1 -
-> >>  arch/x86/kvm/vmx/nested.c | 29 +++++++++++++++++++++++++++++
-> >>  arch/x86/kvm/vmx/vmx.h    |  3 +++
-> >>  3 files changed, 32 insertions(+), 1 deletion(-)
-> >> 
-> >> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-> >> index 46087bca9418..afc97122c05c 100644
-> >> --- a/arch/x86/kvm/cpuid.c
-> >> +++ b/arch/x86/kvm/cpuid.c
-> >> @@ -143,7 +143,6 @@ void kvm_update_cpuid_runtime(struct kvm_vcpu *vcpu)
-> >>  		}
-> >>  		vcpu->arch.guest_supported_xss =
-> >>  			(((u64)best->edx << 32) | best->ecx) & supported_xss;
-> >> -
-> >>  	} else {
-> >>  		vcpu->arch.guest_supported_xss = 0;
-> >>  	}
-> >> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-> >> index 9728efd529a1..1703b8874fad 100644
-> >> --- a/arch/x86/kvm/vmx/nested.c
-> >> +++ b/arch/x86/kvm/vmx/nested.c
-> >> @@ -2516,6 +2516,12 @@ static void prepare_vmcs02_rare(struct vcpu_vmx *vmx, struct vmcs12 *vmcs12)
-> >>  	vmcs_write32(VM_ENTRY_MSR_LOAD_COUNT, vmx->msr_autoload.guest.nr);
-> >>  
-> >>  	set_cr4_guest_host_mask(vmx);
-> >> +
-> >> +	if (kvm_cet_supported()) {
-> >
-> > This needs to be conditioned on CET coming from vmcs12, it's on the loading of
-> > host state on VM-Exit that is unconditional (if CET is supported).
-> >
-> > 	if (kvm_cet_supported() && vmx->nested.nested_run_pending &&
-> > 	    (vmcs12->vm_entry_controls & VM_ENTRY_LOAD_CET_STATE)) {
-> >
-> > I also assume these should be guarded by one of the eVMCS fields, though a quick
-> > search of the public docs didn't provide a hit on the CET fields.
-> >
-> > Vitaly, any idea if these will be GUEST_GRP2 or something else?
-> >
-> 
-> The latest published TLFS I see is 6.0b and it doesn't list anything CET
-> related in eVMCS v1.0 :-( So I agree with Paolo: we just need to adjust
-> EVMCS1_UNSUPPORTED_VMENTRY_CTRL/ EVMCS1_UNSUPPORTED_VMEXIT_CTRL for now
-> and enable it separately later.
+Yang Weijiang <weijiang.yang@intel.com> writes:
+
+> CET in nested guest over Hyper-V is not supported for now. Relevant
+> enabling patches will be posted as a separate patch series.
 >
+> Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
+> Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
+> ---
+>  arch/x86/kvm/vmx/evmcs.h | 6 ++++--
+>  1 file changed, 4 insertions(+), 2 deletions(-)
+>
+> diff --git a/arch/x86/kvm/vmx/evmcs.h b/arch/x86/kvm/vmx/evmcs.h
+> index bd41d9462355..25588694eb04 100644
+> --- a/arch/x86/kvm/vmx/evmcs.h
+> +++ b/arch/x86/kvm/vmx/evmcs.h
+> @@ -59,8 +59,10 @@ DECLARE_STATIC_KEY_FALSE(enable_evmcs);
+>  	 SECONDARY_EXEC_SHADOW_VMCS |					\
+>  	 SECONDARY_EXEC_TSC_SCALING |					\
+>  	 SECONDARY_EXEC_PAUSE_LOOP_EXITING)
+> -#define EVMCS1_UNSUPPORTED_VMEXIT_CTRL (VM_EXIT_LOAD_IA32_PERF_GLOBAL_CTRL)
+> -#define EVMCS1_UNSUPPORTED_VMENTRY_CTRL (VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL)
+> +#define EVMCS1_UNSUPPORTED_VMEXIT_CTRL (VM_EXIT_LOAD_IA32_PERF_GLOBAL_CTRL | \
+> +					VM_EXIT_LOAD_CET_STATE)
+> +#define EVMCS1_UNSUPPORTED_VMENTRY_CTRL (VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL | \
+> +					 VM_ENTRY_LOAD_CET_STATE)
+>  #define EVMCS1_UNSUPPORTED_VMFUNC (VMX_VMFUNC_EPTP_SWITCHING)
+>  
+>  #if IS_ENABLED(CONFIG_HYPERV)
 
-Thanks Vitaly and Paolo.
-New patches have been sent to community.
+This should be enough when we run KVM on Hyper-V using eVMCS, however,
+it may not suffice when we run Hyper-V on KVM using eVMCS: there's still
+no corresponding eVMCS fields so CET can't be used. In case Hyper-V is
+smart enough it won't use the feature, however, it was proven to be 'not
+very smart' in the past, see nested_evmcs_filter_control_msr(). I'm
+wondering if we should also do
 
-> >> +		vmcs_writel(GUEST_SSP, vmcs12->guest_ssp);
-> >> +		vmcs_writel(GUEST_S_CET, vmcs12->guest_s_cet);
-> >> +		vmcs_writel(GUEST_INTR_SSP_TABLE, vmcs12->guest_ssp_tbl);
-> >> +	}
-> >>  }
-> >
-> 
-> -- 
-> Vitaly
+diff --git a/arch/x86/kvm/vmx/evmcs.c b/arch/x86/kvm/vmx/evmcs.c
+index 41f24661af04..9f81db51fd8b 100644
+--- a/arch/x86/kvm/vmx/evmcs.c
++++ b/arch/x86/kvm/vmx/evmcs.c
+@@ -351,11 +351,11 @@ void nested_evmcs_filter_control_msr(u32 msr_index, u64 *pdata)
+        switch (msr_index) {
+        case MSR_IA32_VMX_EXIT_CTLS:
+        case MSR_IA32_VMX_TRUE_EXIT_CTLS:
+-               ctl_high &= ~VM_EXIT_LOAD_IA32_PERF_GLOBAL_CTRL;
++               ctl_high &= ~EVMCS1_UNSUPPORTED_VMEXIT_CTRL;
+                break;
+        case MSR_IA32_VMX_ENTRY_CTLS:
+        case MSR_IA32_VMX_TRUE_ENTRY_CTLS:
+-               ctl_high &= ~VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL;
++               ctl_high &= ~EVMCS1_UNSUPPORTED_VMENTRY_CTRL;
+                break;
+        case MSR_IA32_VMX_PROCBASED_CTLS2:
+                ctl_high &= ~SECONDARY_EXEC_VIRTUALIZE_APIC_ACCESSES;
+
+to be on the safe side.
+
+-- 
+Vitaly
+
