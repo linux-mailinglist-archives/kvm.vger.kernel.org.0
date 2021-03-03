@@ -2,132 +2,187 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6123732C762
-	for <lists+kvm@lfdr.de>; Thu,  4 Mar 2021 02:10:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9735A32C768
+	for <lists+kvm@lfdr.de>; Thu,  4 Mar 2021 02:10:52 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1349119AbhCDAbp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 3 Mar 2021 19:31:45 -0500
-Received: from hqnvemgate24.nvidia.com ([216.228.121.143]:13496 "EHLO
-        hqnvemgate24.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1377088AbhCCTqP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 3 Mar 2021 14:46:15 -0500
-Received: from hqmail.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate24.nvidia.com (using TLS: TLSv1.2, AES256-SHA)
-        id <B603fe75d0005>; Wed, 03 Mar 2021 11:45:33 -0800
-Received: from HQMAIL107.nvidia.com (172.20.187.13) by HQMAIL109.nvidia.com
- (172.20.187.15) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Wed, 3 Mar
- 2021 19:45:27 +0000
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (104.47.58.169)
- by HQMAIL107.nvidia.com (172.20.187.13) with Microsoft SMTP Server (TLS) id
- 15.0.1497.2 via Frontend Transport; Wed, 3 Mar 2021 19:45:27 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=IvCSz8nvfc7lCW5PyLxPuLPz5EDB8yav5WbaLvVgBh2aGziTea9RXfYmzLRYZI3Wp3fQvXLVoH8jEFJcbxD1TjbCBMw0VCHAP6B6UQQaPK8AaNjrWGnfFW1KrLGGCSpfLMK2b02ZC5DS3odD8gv7t+V+Hn5WEA/dzgR+Igmt4Y15eLQDXY8zq8LUbPWtJxZr8vBjJGdAp4pGm8wp6+lCZ3pvRwEcwIxL4nI/NpRvfjJgrmS3sTyjMBiOQcC+avZvCSSBg33tyEHQzeLgC/CqJ1IlGEvs+F2DTiun2qR+i8/eXaB+WDmZEaf6h+Nm0oaQ40i1PNO8vm0JwAUUmbcZ0A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ESjraPQ1U+x3dvWd7l3HBKlTBu3ySX2nWO4QM44ApEU=;
- b=jSR3cs3NmxaL0zez1GjX7GjJU1t0Kn0y/Tr8s6tLQnFHKw4jd3ts3ewv/GcPQTnGE3Moz7zRan74v7eu0QnUg2VXW1qugMRHWbxYiCobtPl/MrDWFbd+rCpMwW16xScy5HaZ+sukjw9NtUTJLjD1qG0obCuo5X+yfQwyI5lE931py6MaRFJ5B+QKSq8kYVMWrYK5j+/tKgsqZLWPUAS9twP0I5CH/8KtYxLwZdF00/eQdMXFLZl6oRGSGOTC3a3EGxt90dqBUmiNs0yMm56vNtpfPX2ePGWI/eMnWQB+UNTVSOsSf6TnO0WdchfmiU3Eqc9P1nwcW0jVX0+0yobkqA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-Received: from DM6PR12MB3834.namprd12.prod.outlook.com (2603:10b6:5:14a::12)
- by DM5PR12MB1436.namprd12.prod.outlook.com (2603:10b6:3:78::7) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3890.19; Wed, 3 Mar 2021 19:45:25 +0000
-Received: from DM6PR12MB3834.namprd12.prod.outlook.com
- ([fe80::1c62:7fa3:617b:ab87]) by DM6PR12MB3834.namprd12.prod.outlook.com
- ([fe80::1c62:7fa3:617b:ab87%6]) with mapi id 15.20.3912.017; Wed, 3 Mar 2021
- 19:45:25 +0000
-Date:   Wed, 3 Mar 2021 15:45:23 -0400
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Jacob Pan <jacob.jun.pan@linux.intel.com>
-CC:     Liu Yi L <yi.l.liu@intel.com>, <alex.williamson@redhat.com>,
-        <eric.auger@redhat.com>, <baolu.lu@linux.intel.com>,
-        <joro@8bytes.org>, <kevin.tian@intel.com>, <ashok.raj@intel.com>,
-        <jun.j.tian@intel.com>, <yi.y.sun@intel.com>,
-        <jean-philippe@linaro.org>, <peterx@redhat.com>,
-        <jasowang@redhat.com>, <hao.wu@intel.com>, <stefanha@gmail.com>,
-        <iommu@lists.linux-foundation.org>, <kvm@vger.kernel.org>,
-        <Lingshan.Zhu@intel.com>, <vivek.gautam@arm.com>
-Subject: Re: [Patch v8 04/10] vfio/type1: Support binding guest page tables
- to PASID
-Message-ID: <20210303194523.GX4247@nvidia.com>
-References: <20210302203545.436623-1-yi.l.liu@intel.com>
- <20210302203545.436623-5-yi.l.liu@intel.com>
- <20210302125628.GI4247@nvidia.com> <20210302091319.1446a47b@jacob-builder>
- <20210302171551.GK4247@nvidia.com> <20210303114212.1cd86579@jacob-builder>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20210303114212.1cd86579@jacob-builder>
-X-ClientProxiedBy: BL1PR13CA0005.namprd13.prod.outlook.com
- (2603:10b6:208:256::10) To DM6PR12MB3834.namprd12.prod.outlook.com
- (2603:10b6:5:14a::12)
+        id S1388250AbhCDAb5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 3 Mar 2021 19:31:57 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:25198 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1377144AbhCCTsT (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 3 Mar 2021 14:48:19 -0500
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 123JXXDh053745;
+        Wed, 3 Mar 2021 14:47:37 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=5EPwSfXEH5eZew/H5I7iXDVuIbFZQOElaCxGmhznkNM=;
+ b=l0Xp5yZsXEIwqoUl9uO35kudKhx5hZZlhkfTKK3uvmlxnNpJF0JHuTUMMsk2ZbNwUkdf
+ UhMOTYOgtI0LekzRi3hqLzzIRbj2ylPq0JLZa/NwKHuxN+PNaquPPYY7/W4sdFeXCRWu
+ +eeWF/5yZY9hebE099OwPrLW2JByHk9VztMfxX0CtNnS9IjN5ebzeSDfFGDuf1VnZDSj
+ +nqu1lwpEj06g4/wbhJoL//ue4U7LM4feqjxKpUNj/Z5a7YuOENCur0JEwmyLWWycdGs
+ ZAKy9jSNwuAng2jC+EyBm1bSC899fSiAN2WR6Uw4yVDlq+e6UVptBROfK7mp7daD5Lp1 6w== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 372fyh1s4j-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 03 Mar 2021 14:47:36 -0500
+Received: from m0098414.ppops.net (m0098414.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 123JXUbJ053505;
+        Wed, 3 Mar 2021 14:47:36 -0500
+Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 372fyh1rsm-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 03 Mar 2021 14:47:36 -0500
+Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
+        by ppma05fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 123JdGiU000502;
+        Wed, 3 Mar 2021 19:47:12 GMT
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
+        by ppma05fra.de.ibm.com with ESMTP id 3712v513rd-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 03 Mar 2021 19:47:12 +0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 123Jl9bp7864802
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 3 Mar 2021 19:47:09 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id E18DE5204E;
+        Wed,  3 Mar 2021 19:47:08 +0000 (GMT)
+Received: from li-e979b1cc-23ba-11b2-a85c-dfd230f6cf82 (unknown [9.171.0.197])
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with SMTP id 3464A5204F;
+        Wed,  3 Mar 2021 19:47:08 +0000 (GMT)
+Date:   Wed, 3 Mar 2021 20:47:06 +0100
+From:   Halil Pasic <pasic@linux.ibm.com>
+To:     Tony Krowiak <akrowiak@linux.ibm.com>
+Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, stable@vger.kernel.org,
+        borntraeger@de.ibm.com, cohuck@redhat.com, kwankhede@nvidia.com,
+        pbonzini@redhat.com, alex.williamson@redhat.com,
+        pasic@linux.vnet.ibm.com
+Subject: Re: [PATCH v3 1/1] s390/vfio-ap: fix circular lockdep when
+ setting/clearing crypto masks
+Message-ID: <20210303204706.0538e84f.pasic@linux.ibm.com>
+In-Reply-To: <14665bcf-2224-e313-43ff-357cadd177cf@linux.ibm.com>
+References: <20210302204322.24441-1-akrowiak@linux.ibm.com>
+        <20210302204322.24441-2-akrowiak@linux.ibm.com>
+        <20210303162332.4d227dbe.pasic@linux.ibm.com>
+        <14665bcf-2224-e313-43ff-357cadd177cf@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from mlx.ziepe.ca (142.162.115.133) by BL1PR13CA0005.namprd13.prod.outlook.com (2603:10b6:208:256::10) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3933.13 via Frontend Transport; Wed, 3 Mar 2021 19:45:25 +0000
-Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1lHXQx-006HY0-UI; Wed, 03 Mar 2021 15:45:23 -0400
-X-Header: ProcessedBy-CMR-outbound
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.761
+ definitions=2021-03-03_06:2021-03-03,2021-03-03 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ spamscore=0 clxscore=1015 suspectscore=0 mlxscore=0 malwarescore=0
+ bulkscore=0 lowpriorityscore=0 mlxlogscore=999 adultscore=0
+ impostorscore=0 phishscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2009150000 definitions=main-2103030137
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Mar 03, 2021 at 11:42:12AM -0800, Jacob Pan wrote:
-> Hi Jason,
+On Wed, 3 Mar 2021 12:10:11 -0500
+Tony Krowiak <akrowiak@linux.ibm.com> wrote:
+
+> On 3/3/21 10:23 AM, Halil Pasic wrote:
+> > On Tue,  2 Mar 2021 15:43:22 -0500
+> > Tony Krowiak <akrowiak@linux.ibm.com> wrote:
+> >  
+> >> This patch fixes a lockdep splat introduced by commit f21916ec4826
+> >> ("s390/vfio-ap: clean up vfio_ap resources when KVM pointer invalidated").
+> >> The lockdep splat only occurs when starting a Secure Execution guest.
+> >> Crypto virtualization (vfio_ap) is not yet supported for SE guests;
+> >> however, in order to avoid this problem when support becomes available,
+> >> this fix is being provided.  
+> > [..]
+> >  
+> >> @@ -1038,14 +1116,28 @@ static int vfio_ap_mdev_set_kvm(struct ap_matrix_mdev *matrix_mdev,
+> >>   {
+> >>   	struct ap_matrix_mdev *m;
+> >>
+> >> -	list_for_each_entry(m, &matrix_dev->mdev_list, node) {
+> >> -		if ((m != matrix_mdev) && (m->kvm == kvm))
+> >> -			return -EPERM;
+> >> -	}
+> >> +	if (kvm->arch.crypto.crycbd) {
+> >> +		matrix_mdev->kvm_busy = true;
+> >>
+> >> -	matrix_mdev->kvm = kvm;
+> >> -	kvm_get_kvm(kvm);
+> >> -	kvm->arch.crypto.pqap_hook = &matrix_mdev->pqap_hook;
+> >> +		list_for_each_entry(m, &matrix_dev->mdev_list, node) {
+> >> +			if ((m != matrix_mdev) && (m->kvm == kvm)) {
+> >> +				wake_up_all(&matrix_mdev->wait_for_kvm);  
+> > This ain't no good. kvm_busy will remain true if we take this exit. The
+> > wake_up_all() is not needed, because we hold the lock, so nobody can
+> > observe it if we don't forget kvm_busy set.
+> >
+> > I suggest moving matrix_mdev->kvm_busy = true; after this loop, maybe right
+> > before the unlock, and removing the wake_up_all().
+> >  
+> >> +				return -EPERM;
+> >> +			}
+> >> +		}
+> >> +
+> >> +		kvm_get_kvm(kvm);
+> >> +		mutex_unlock(&matrix_dev->lock);
+> >> +		kvm_arch_crypto_set_masks(kvm,
+> >> +					  matrix_mdev->matrix.apm,
+> >> +					  matrix_mdev->matrix.aqm,
+> >> +					  matrix_mdev->matrix.adm);
+> >> +		mutex_lock(&matrix_dev->lock);
+> >> +		kvm->arch.crypto.pqap_hook = &matrix_mdev->pqap_hook;
+> >> +		matrix_mdev->kvm = kvm;
+> >> +		matrix_mdev->kvm_busy = false;
+> >> +		wake_up_all(&matrix_mdev->wait_for_kvm);
+> >> +	}
+> >>
+> >>   	return 0;
+> >>   }  
+> > [..]
+> >  
+> >> @@ -1300,7 +1406,21 @@ static ssize_t vfio_ap_mdev_ioctl(struct mdev_device *mdev,
+> >>   		ret = vfio_ap_mdev_get_device_info(arg);
+> >>   		break;
+> >>   	case VFIO_DEVICE_RESET:
+> >> -		ret = vfio_ap_mdev_reset_queues(mdev);
+> >> +		matrix_mdev = mdev_get_drvdata(mdev);
+> >> +
+> >> +		/*
+> >> +		 * If the KVM pointer is in the process of being set, wait until
+> >> +		 * the process has completed.
+> >> +		 */
+> >> +		wait_event_cmd(matrix_mdev->wait_for_kvm,
+> >> +			       matrix_mdev->kvm_busy == false,
+> >> +			       mutex_unlock(&matrix_dev->lock),
+> >> +			       mutex_lock(&matrix_dev->lock));
+> >> +
+> >> +		if (matrix_mdev->kvm)
+> >> +			ret = vfio_ap_mdev_reset_queues(mdev);
+> >> +		else
+> >> +			ret = -ENODEV;  
+> > I don't think rejecting the reset is a good idea. I have you a more detailed
+> > explanation of the list, where we initially discussed this question.
+> >
+> > How do you exect userspace to react to this -ENODEV?  
 > 
-> On Tue, 2 Mar 2021 13:15:51 -0400, Jason Gunthorpe <jgg@nvidia.com> wrote:
-> 
-> > On Tue, Mar 02, 2021 at 09:13:19AM -0800, Jacob Pan wrote:
-> > > Hi Jason,
-> > > 
-> > > On Tue, 2 Mar 2021 08:56:28 -0400, Jason Gunthorpe <jgg@nvidia.com>
-> > > wrote: 
-> > > > On Wed, Mar 03, 2021 at 04:35:39AM +0800, Liu Yi L wrote:  
-> > > > >  
-> > > > > +static int vfio_dev_bind_gpasid_fn(struct device *dev, void *data)
-> > > > > +{
-> > > > > +	struct domain_capsule *dc = (struct domain_capsule *)data;
-> > > > > +	unsigned long arg = *(unsigned long *)dc->data;
-> > > > > +
-> > > > > +	return iommu_uapi_sva_bind_gpasid(dc->domain, dev,
-> > > > > +					  (void __user *)arg);    
-> > > > 
-> > > > This arg buisness is really tortured. The type should be set at the
-> > > > ioctl, not constantly passed down as unsigned long or worse void *.
-> > > > 
-> > > > And why is this passing a __user pointer deep into an iommu_* API??
-> > > >   
-> > > The idea was that IOMMU UAPI (not API) is independent of VFIO or other
-> > > user driver frameworks. The design is documented here:
-> > > Documentation/userspace-api/iommu.rst
-> > > IOMMU UAPI handles the type and sanitation of user provided data.  
-> > 
-> > Why? If it is uapi it has defined types and those types should be
-> > completely clear from the C code, not obfuscated.
-> > 
-> From the user's p.o.v., it is plain c code nothing obfuscated. As for
-> kernel handling of the data types, it has to be answered by the bigger
-> question of how we deal with sharing IOMMU among multiple subsystems with
-> UAPIs.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
-	t=1614800733; bh=ESjraPQ1U+x3dvWd7l3HBKlTBu3ySX2nWO4QM44ApEU=;
-	h=ARC-Seal:ARC-Message-Signature:ARC-Authentication-Results:Date:
-	 From:To:CC:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:X-ClientProxiedBy:MIME-Version:
-	 X-MS-Exchange-MessageSentRepresentingType:X-Header;
-	b=Jyxs64SLsrGfmoPaAHc58Bpre6/+/wDGs/dAMDviWTwRc+2Miw0+jOBGQXNLz/lE8
-	 KbS/K02BZmgn/jJwl994Po6nS3kGgTg0of6AFSd2MqtaZPMx+aMJ3prec9hwpHaXmN
-	 SiosC+FviWoFQHmEvWSQoVeEMS093zQ+sjcsymUkMXYHGYQRqebW101Mii6/0hT3iv
-	 Su4YvAyaKmOpWT8sayI4K0ICIhRxWAOT5P78FrXofij9o3X9T9F/9Bo+S5BWSCMzMr
-	 +dM2KsTd4Ecac9hNemigs87T/tiCh50XaZoc8WMRFWGYMpha6KFdCV5wWL0Yzauyt7
-	 H7uCWkmg/QTCw==
+> After reading your more detailed explanation, I have come to the
+> conclusion that the test for matrix_mdev->kvm should not be
+> performed here and the the vfio_ap_mdev_reset_queues() function
+> should be called regardless. Each queue assigned to the mdev
+> that is also bound to the vfio_ap driver will get reset and its
+> IRQ resources cleaned up if they haven't already been and the
+> other required conditions are met (i.e., see 
+> vfio_ap_mdev_free_irq_resources()).
 
-As I said, don't obfuscate types like this in the kernel. It is not
-good style.
+My point is if !->kvm the other required conditions are not met. But
+yes we can go back to unconditional vfio_ap_mdev_reset_queues(mdev),
+and think about the necessity of performing a
+vfio_ap_mdev_reset_queues() if !->kvm later as I proposed in the other
+mail.
 
-> However, IOMMU is a system device which has little value to be exposed to
-> the userspace. Not to mention the device-IOMMU affinity/topology. VFIO
-> nicely abstracts IOMMU from the userspace, why do we want to reverse that?
-
-The other patch was talking about a /dev/ioasid - why can't this stuff
-be run over that?
-
-Jason
+Regards,
+Halil
