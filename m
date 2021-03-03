@@ -2,182 +2,163 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8717E32C677
-	for <lists+kvm@lfdr.de>; Thu,  4 Mar 2021 02:02:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5B1B032C67C
+	for <lists+kvm@lfdr.de>; Thu,  4 Mar 2021 02:02:59 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346329AbhCDA2y (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 3 Mar 2021 19:28:54 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:64360 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1448192AbhCCPYX (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 3 Mar 2021 10:24:23 -0500
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 123F2QIK144009;
-        Wed, 3 Mar 2021 10:23:41 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=zWAJxsplEzw8/kWSmP04aU3CVx62dYTr+NwGdiCuCrI=;
- b=Zc3DxdboLUeerw0AZ0Uz1XLhrfV/gWjqgfyBLrzAcGQ5zD3vPo80bHfHgGBDh814+GJ3
- B8EChSLj7n6UjqCg6ibs2zEiljxjKU9PF1WRUlsui0EB3IHfEPfitK2jv0h12JNu63Gc
- /7ZWmlmUqYkGhfBz75A1aCpfuBar6ZVLVlCQO32zchoy6Win6o+Yr/XKmhurc8ULoGRy
- 3r3NaeWpah+ztng7+4VoEJlJludq9+e6xC5M07Eh6fdTjLhfeNaXNUXnmiFPIgRVE/oH
- ZCibhCVItnnJBpkRl6BN7UnrlUQngkkAerPwNc6ghfMzRCahLDuzByF2mgS6Dc44Bjjx 3w== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 372cp08x70-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 03 Mar 2021 10:23:41 -0500
-Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 123F3PUQ151861;
-        Wed, 3 Mar 2021 10:23:40 -0500
-Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 372cp08x5v-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 03 Mar 2021 10:23:40 -0500
-Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
-        by ppma05fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 123FDjVd031038;
-        Wed, 3 Mar 2021 15:23:38 GMT
-Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
-        by ppma05fra.de.ibm.com with ESMTP id 3712v510tf-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 03 Mar 2021 15:23:38 +0000
-Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 123FNLRq22085970
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 3 Mar 2021 15:23:21 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 2169B4207B;
-        Wed,  3 Mar 2021 15:23:35 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 71C9142061;
-        Wed,  3 Mar 2021 15:23:34 +0000 (GMT)
-Received: from li-e979b1cc-23ba-11b2-a85c-dfd230f6cf82 (unknown [9.171.0.197])
-        by d06av24.portsmouth.uk.ibm.com (Postfix) with SMTP;
-        Wed,  3 Mar 2021 15:23:34 +0000 (GMT)
-Date:   Wed, 3 Mar 2021 16:23:32 +0100
-From:   Halil Pasic <pasic@linux.ibm.com>
-To:     Tony Krowiak <akrowiak@linux.ibm.com>
-Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, stable@vger.kernel.org,
-        borntraeger@de.ibm.com, cohuck@redhat.com, kwankhede@nvidia.com,
-        pbonzini@redhat.com, alex.williamson@redhat.com,
-        pasic@linux.vnet.ibm.com
-Subject: Re: [PATCH v3 1/1] s390/vfio-ap: fix circular lockdep when
- setting/clearing crypto masks
-Message-ID: <20210303162332.4d227dbe.pasic@linux.ibm.com>
-In-Reply-To: <20210302204322.24441-2-akrowiak@linux.ibm.com>
-References: <20210302204322.24441-1-akrowiak@linux.ibm.com>
-        <20210302204322.24441-2-akrowiak@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+        id S1355217AbhCDA3B (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 3 Mar 2021 19:29:01 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50650 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1449031AbhCCPnV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 3 Mar 2021 10:43:21 -0500
+Received: from mail-qt1-x834.google.com (mail-qt1-x834.google.com [IPv6:2607:f8b0:4864:20::834])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 068BFC061756;
+        Wed,  3 Mar 2021 07:42:41 -0800 (PST)
+Received: by mail-qt1-x834.google.com with SMTP id 2so8748800qtw.1;
+        Wed, 03 Mar 2021 07:42:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=sender:date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=474jOip4IgCUoyMxBEribCWEBGxFGSV2OmSthT7tIzw=;
+        b=OUl4a0iSBisVMbYesUskXLxC/LPLDhIN0Z0JGTf84f1GApfyQKw6BzripeCpctzhaH
+         +D7phCtY7W74P4MAMDNeGvYAAtxOcvPJwTwYjkvlPb+txGb+DC6yw9LLjjgmdNwNaBLz
+         T+iX1Z5f0zC8hh/Oq4MPpupIK8Xjsq53GLg0aO8HXh+mEfyHxI0LsJ3V1WVo9UY0nEtk
+         0VvSkiHz7Limw2jEyntvTsr41cqWhO/K1Rrur6QvaBoUNUytNHeQY6W0T9h/gLj3Jcox
+         6FVq2aCkhvKl8XALF/xuQlmwzULpBOvkkCmMpA80t6IHJ0shgNDsfE82JWH6mpsFuv8Q
+         m9hA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+         :references:mime-version:content-disposition:in-reply-to;
+        bh=474jOip4IgCUoyMxBEribCWEBGxFGSV2OmSthT7tIzw=;
+        b=ukwpOc9i0N5mS+7ylyxgpOYfaXxO/rwKJ13Svg6w2NF8Fwt2Vy/xNzzARA1sYnEerT
+         PSJUvsXPvrlYdG/niAhRAwqAuMmIeiC0ebXxTYfioqOmgZF0MhG9WVP1K0Iwt9b0oDH0
+         509IB5yI6fX6lxQWOOiqMb3vQbRSYIJ/XBoQiKdFazpdG4qAikJY78IBeyr84MXSOf/H
+         2CHKirbWMAnFT29ThgvzufvXw/RHQwaAj1scahcmmsL2wBCOKANY0GcA490WWDIwxcOm
+         2kB1Bx3KrFilW+8DaYltbAcjGvCU3JQX0e+qemmxqMMb3TdX/YqdRsaAq/zNsVqfbMcg
+         N+kw==
+X-Gm-Message-State: AOAM533C9ie2rtnSwb80uatIZGVb1dr0qrU+ELhC8VWsX8KSpT5dVIDS
+        ye78jluj6zJpvpxvHFPhWeUARowUhpF9Xg==
+X-Google-Smtp-Source: ABdhPJwLjx1ZIM0IGSCFJl5U/6zxO0tdSMromsGM+JquTtBrWC0ilXZSSOQoOEy0rSaf15B4HSmo9g==
+X-Received: by 2002:ac8:754a:: with SMTP id b10mr23629995qtr.251.1614786160009;
+        Wed, 03 Mar 2021 07:42:40 -0800 (PST)
+Received: from localhost (2603-7000-9602-8233-06d4-c4ff-fe48-9d05.res6.spectrum.com. [2603:7000:9602:8233:6d4:c4ff:fe48:9d05])
+        by smtp.gmail.com with ESMTPSA id j24sm5067992qka.67.2021.03.03.07.42.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 03 Mar 2021 07:42:39 -0800 (PST)
+Sender: Tejun Heo <htejun@gmail.com>
+Date:   Wed, 3 Mar 2021 10:42:37 -0500
+From:   Tejun Heo <tj@kernel.org>
+To:     Vipin Sharma <vipinsh@google.com>
+Cc:     mkoutny@suse.com, rdunlap@infradead.org, thomas.lendacky@amd.com,
+        brijesh.singh@amd.com, jon.grimm@amd.com, eric.vantassell@amd.com,
+        pbonzini@redhat.com, hannes@cmpxchg.org, frankja@linux.ibm.com,
+        borntraeger@de.ibm.com, corbet@lwn.net, seanjc@google.com,
+        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
+        joro@8bytes.org, tglx@linutronix.de, mingo@redhat.com,
+        bp@alien8.de, hpa@zytor.com, gingell@google.com,
+        rientjes@google.com, dionnaglaze@google.com, kvm@vger.kernel.org,
+        x86@kernel.org, cgroups@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [RFC v2 1/2] cgroup: sev: Add misc cgroup controller
+Message-ID: <YD+ubbB4Tz0ZlVvp@slm.duckdns.org>
+References: <20210302081705.1990283-1-vipinsh@google.com>
+ <20210302081705.1990283-2-vipinsh@google.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.761
- definitions=2021-03-03_04:2021-03-03,2021-03-03 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0
- mlxlogscore=999 priorityscore=1501 lowpriorityscore=0 spamscore=0
- adultscore=0 bulkscore=0 clxscore=1011 malwarescore=0 impostorscore=0
- mlxscore=0 phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2103030116
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210302081705.1990283-2-vipinsh@google.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue,  2 Mar 2021 15:43:22 -0500
-Tony Krowiak <akrowiak@linux.ibm.com> wrote:
+Hello,
 
-> This patch fixes a lockdep splat introduced by commit f21916ec4826
-> ("s390/vfio-ap: clean up vfio_ap resources when KVM pointer invalidated").
-> The lockdep splat only occurs when starting a Secure Execution guest.
-> Crypto virtualization (vfio_ap) is not yet supported for SE guests;
-> however, in order to avoid this problem when support becomes available,
-> this fix is being provided.
+On Tue, Mar 02, 2021 at 12:17:04AM -0800, Vipin Sharma wrote:
+> +/**
+> + * struct misc_res: Per cgroup per misc type resource
+> + * @max: Maximum count of the resource.
+> + * @usage: Current usage of the resource.
+> + */
+> +struct misc_res {
+> +	unsigned int max;
+> +	atomic_t usage;
+> +};
 
-[..]
+Can we do 64bits so that something which counts memory can use this too?
 
-> @@ -1038,14 +1116,28 @@ static int vfio_ap_mdev_set_kvm(struct ap_matrix_mdev *matrix_mdev,
->  {
->  	struct ap_matrix_mdev *m;
-> 
-> -	list_for_each_entry(m, &matrix_dev->mdev_list, node) {
-> -		if ((m != matrix_mdev) && (m->kvm == kvm))
-> -			return -EPERM;
-> -	}
-> +	if (kvm->arch.crypto.crycbd) {
-> +		matrix_mdev->kvm_busy = true;
-> 
-> -	matrix_mdev->kvm = kvm;
-> -	kvm_get_kvm(kvm);
-> -	kvm->arch.crypto.pqap_hook = &matrix_mdev->pqap_hook;
-> +		list_for_each_entry(m, &matrix_dev->mdev_list, node) {
-> +			if ((m != matrix_mdev) && (m->kvm == kvm)) {
-> +				wake_up_all(&matrix_mdev->wait_for_kvm);
+> +/*
+> + * Miscellaneous resources capacity for the entire machine. 0 capacity means
+> + * resource is not initialized or not present in the host.
+> + *
+> + * root_cg.max and capacity are independent of each other. root_cg.max can be
+> + * more than the actual capacity. We are using Limits resource distribution
+> + * model of cgroup for miscellaneous controller. However, root_cg.current for a
+> + * resource will never exceeds the resource capacity.
+                                ^
+                                typo
 
-This ain't no good. kvm_busy will remain true if we take this exit. The
-wake_up_all() is not needed, because we hold the lock, so nobody can
-observe it if we don't forget kvm_busy set.
-
-I suggest moving matrix_mdev->kvm_busy = true; after this loop, maybe right
-before the unlock, and removing the wake_up_all().
-
-> +				return -EPERM;
-> +			}
-> +		}
+> +int misc_cg_set_capacity(enum misc_res_type type, unsigned int capacity)
+> +{
+> +	if (!valid_type(type))
+> +		return -EINVAL;
 > +
-> +		kvm_get_kvm(kvm);
-> +		mutex_unlock(&matrix_dev->lock);
-> +		kvm_arch_crypto_set_masks(kvm,
-> +					  matrix_mdev->matrix.apm,
-> +					  matrix_mdev->matrix.aqm,
-> +					  matrix_mdev->matrix.adm);
-> +		mutex_lock(&matrix_dev->lock);
-> +		kvm->arch.crypto.pqap_hook = &matrix_mdev->pqap_hook;
-> +		matrix_mdev->kvm = kvm;
-> +		matrix_mdev->kvm_busy = false;
-> +		wake_up_all(&matrix_mdev->wait_for_kvm);
-> +	}
-> 
->  	return 0;
->  }
-
-[..]
-
-> @@ -1300,7 +1406,21 @@ static ssize_t vfio_ap_mdev_ioctl(struct mdev_device *mdev,
->  		ret = vfio_ap_mdev_get_device_info(arg);
->  		break;
->  	case VFIO_DEVICE_RESET:
-> -		ret = vfio_ap_mdev_reset_queues(mdev);
-> +		matrix_mdev = mdev_get_drvdata(mdev);
+> +	for (;;) {
+> +		int usage;
+> +		unsigned int old;
 > +
 > +		/*
-> +		 * If the KVM pointer is in the process of being set, wait until
-> +		 * the process has completed.
+> +		 * Update the capacity while making sure that it's not below
+> +		 * the concurrently-changing usage value.
+> +		 *
+> +		 * The xchg implies two full memory barriers before and after,
+> +		 * so the read-swap-read is ordered and ensures coherency with
+> +		 * misc_cg_try_charge(): that function modifies the usage
+> +		 * before checking the capacity, so if it sees the old
+> +		 * capacity, we see the modified usage and retry.
 > +		 */
-> +		wait_event_cmd(matrix_mdev->wait_for_kvm,
-> +			       matrix_mdev->kvm_busy == false,
-> +			       mutex_unlock(&matrix_dev->lock),
-> +			       mutex_lock(&matrix_dev->lock));
+> +		usage = atomic_read(&root_cg.res[type].usage);
 > +
-> +		if (matrix_mdev->kvm)
-> +			ret = vfio_ap_mdev_reset_queues(mdev);
-> +		else
-> +			ret = -ENODEV;
+> +		if (usage > capacity)
+> +			return -EBUSY;
 
-I don't think rejecting the reset is a good idea. I have you a more detailed
-explanation of the list, where we initially discussed this question.
+I'd rather go with allowing bringing down capacity below usage so that the
+users can set it to a lower value to drain existing usages while denying new
+ones. It's not like it's difficult to check the current total usage from the
+caller side, so I'm not sure it's very useful to shift the condition check
+here.
 
-How do you exect userspace to react to this -ENODEV?
+> +int misc_cg_try_charge(enum misc_res_type type, struct misc_cg *cg,
+> +		       unsigned int amount)
+> +{
+...
+> +	for (i = cg; i; i = parent_misc(i)) {
+> +		res = &i->res[type];
+> +
+> +		/*
+> +		 * The atomic_long_add_return() implies a full memory barrier
+> +		 * between incrementing the count and reading the capacity.
+> +		 * When racing with misc_cg_set_capacity(), we either see the
+> +		 * new capacity or the setter sees the counter has changed and
+> +		 * retries.
+> +		 */
+> +		new_usage = atomic_add_return(amount, &res->usage);
+> +		if (new_usage > res->max ||
+> +		    new_usage > misc_res_capacity[type]) {
+> +			pr_info("cgroup: charge rejected by misc controller for %s resource in ",
+> +				misc_res_name[type]);
+> +			pr_cont_cgroup_path(i->css.cgroup);
+> +			pr_cont("\n");
 
-Otherwise looks good to me!
+Should have commented on this in the priv thread but don't print something
+on every rejection. This often becomes a nuisance and can make an easy DoS
+vector at worst. If you wanna do it, print it once per cgroup or sth like
+that.
 
-I've tested your branch from yesterday (which looks to me like this patch
-without the above check on ->kvm and reset) for the lockdep splat, but I
-didn't do any comprehensive testing -- which would ensure that we didn't
-break something else in the process. With the two issues fixed, and your
-word that the patch was properly tested (except for the lockdep splat
-which I tested myself), I feel comfortable with moving forward with this.
+Otherwise, looks good to me.
 
-Regards,
+Thanks.
 
+-- 
+tejun
