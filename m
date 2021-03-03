@@ -2,139 +2,118 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 844FD32C605
-	for <lists+kvm@lfdr.de>; Thu,  4 Mar 2021 02:01:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 879C432C60D
+	for <lists+kvm@lfdr.de>; Thu,  4 Mar 2021 02:01:38 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238852AbhCDA1V (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 3 Mar 2021 19:27:21 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:49775 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1378562AbhCCM36 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 3 Mar 2021 07:29:58 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1614774511;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=chYU7WqnLFJ21vl7f9w7xry2Yuqgeij98GlbitlpDNk=;
-        b=dBExbfm3oWGvXP5l2LxNA50PAxOzHMeU4xs0aNQdBA2bhP0x+rHmUNmhOsd7i4d/QE0bXI
-        NLTg3ZmYlAdZhj/OP1uHRK8JbkoZy5pjU8pFKGcuAsurWfTOG5MX4vmhoJvVpEkJgxjKa/
-        ps4lp3v3wke3/P/RV/vsrvhzpATCJgs=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-143-EdxyWr28PqWJADuF6gFd_w-1; Wed, 03 Mar 2021 07:24:28 -0500
-X-MC-Unique: EdxyWr28PqWJADuF6gFd_w-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EFF4C8017FF;
-        Wed,  3 Mar 2021 12:24:25 +0000 (UTC)
-Received: from [10.36.112.28] (ovpn-112-28.ams2.redhat.com [10.36.112.28])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 8FEB06085D;
-        Wed,  3 Mar 2021 12:24:12 +0000 (UTC)
-Subject: Re: [PATCH v1 7/9] memory: introduce RAM_NORESERVE and wire it up in
- qemu_ram_mmap()
-To:     Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>
-Cc:     Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Eduardo Habkost <ehabkost@redhat.com>,
-        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Igor Mammedov <imammedo@redhat.com>,
-        =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Murilo Opsfelder Araujo <muriloo@linux.ibm.com>,
-        Greg Kurz <groug@kaod.org>,
-        Liam Merwick <liam.merwick@oracle.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Igor Kotrasinski <i.kotrasinsk@partner.samsung.com>,
-        Juan Quintela <quintela@redhat.com>,
-        Stefan Weil <sw@weilnetz.de>, kvm@vger.kernel.org,
-        qemu-s390x@nongnu.org
-References: <20210209134939.13083-1-david@redhat.com>
- <20210209134939.13083-8-david@redhat.com> <20210302173243.GM397383@xz-x1>
- <91613148-9ade-c192-4b73-0cb5a54ada98@redhat.com>
- <20210303123517.04729c1e.cohuck@redhat.com>
- <656d4494-ea36-39c2-2d47-bbb044a67f11@redhat.com>
- <104f9788-dee2-29ba-5b53-d358f2252cf8@redhat.com>
-From:   David Hildenbrand <david@redhat.com>
-Organization: Red Hat GmbH
-Message-ID: <72dd331f-2026-6da9-9089-7c4d1c2ffec8@redhat.com>
-Date:   Wed, 3 Mar 2021 13:24:11 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.8.0
+        id S244845AbhCDA1X (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 3 Mar 2021 19:27:23 -0500
+Received: from szxga05-in.huawei.com ([45.249.212.191]:13050 "EHLO
+        szxga05-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234300AbhCCMt5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 3 Mar 2021 07:49:57 -0500
+Received: from DGGEMS410-HUB.china.huawei.com (unknown [172.30.72.58])
+        by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4DrCqw2qlCzMYFX;
+        Wed,  3 Mar 2021 20:25:00 +0800 (CST)
+Received: from localhost (10.174.150.118) by DGGEMS410-HUB.china.huawei.com
+ (10.3.19.210) with Microsoft SMTP Server id 14.3.498.0; Wed, 3 Mar 2021
+ 20:26:59 +0800
+From:   <ann.zhuangyanying@huawei.com>
+To:     <pbonzini@redhat.com>
+CC:     <linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>,
+        <weidong.huang@huawei.com>,
+        Zhuang Yanying <ann.zhuangyanying@huawei.com>
+Subject: [PATCH] KVM: x86: fix cpu hang due to tsc adjustment when kvmclock in use
+Date:   Wed, 3 Mar 2021 20:26:57 +0800
+Message-ID: <20210303122657.23400-1-ann.zhuangyanying@huawei.com>
+X-Mailer: git-send-email 2.21.0.windows.1
 MIME-Version: 1.0
-In-Reply-To: <104f9788-dee2-29ba-5b53-d358f2252cf8@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [10.174.150.118]
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 03.03.21 13:12, Thomas Huth wrote:
-> On 03/03/2021 12.37, David Hildenbrand wrote:
->> On 03.03.21 12:35, Cornelia Huck wrote:
->>> On Tue, 2 Mar 2021 20:02:34 +0100
->>> David Hildenbrand <david@redhat.com> wrote:
->>>
->>>> On 02.03.21 18:32, Peter Xu wrote:
->>>>> On Tue, Feb 09, 2021 at 02:49:37PM +0100, David Hildenbrand wrote:
->>>>>> @@ -899,13 +899,17 @@ int kvm_s390_mem_op_pv(S390CPU *cpu, uint64_t
->>>>>> offset, void *hostbuf,
->>>>>>      * to grow. We also have to use MAP parameters that avoid
->>>>>>      * read-only mapping of guest pages.
->>>>>>      */
->>>>>> -static void *legacy_s390_alloc(size_t size, uint64_t *align, bool shared)
->>>>>> +static void *legacy_s390_alloc(size_t size, uint64_t *align, bool shared,
->>>>>> +                               bool noreserve)
->>>>>>     {
->>>>>>         static void *mem;
->>>>>>         if (mem) {
->>>>>>             /* we only support one allocation, which is enough for
->>>>>> initial ram */
->>>>>>             return NULL;
->>>>>> +    } else if (noreserve) {
->>>>>> +        error_report("Skipping reservation of swap space is not
->>>>>> supported.");
->>>>>> +        return NULL
->>>>>
->>>>> Semicolon missing.
->>>>
->>>> Thanks for catching that!
->>>
->>> Regardless of that (and this patch set), can we finally get rid of
->>> legacy_s390_alloc? We already fence off running with a kernel prior to
->>> 3.15, and KVM_CAP_S390_COW depends on ESOP -- are non-ESOP kvm hosts
->>> still relevant? This seems to be a generation 10 feature; do we
->>> realistically expect anyone running this on e.g. a z/VM host that
->>> doesn't provide ESOP?
->>
->> Good question - last time I asked that question (~2 years ago) I was told
->> that such z/VM environemnts are still relevant.
-> 
-> Now that you've mentioned it ... I've even wrote a blog post about z/VM and
-> ESOP some years ago:
-> 
->   
-> http://people.redhat.com/~thuth/blog/qemu/2017/04/05/s390x-selinux-problem.html
-> 
-> So if I've got that right again, the z/VM ESOP problem only exists on
-> versions older than 6.3. And according to
-> https://www.ibm.com/support/lifecycle/search?q=z%2FVM those old versions are
-> now unsupported since June 2017 ... thus I guess it's valid to assume that
-> nobody is running such an old z/VM version anymore (at least not to use it
-> as an environment to run nested KVM guests).
+From: Zhuang Yanying <ann.zhuangyanying@huawei.com>
 
-Thanks for that info, I'll send a patch proposing to rip it out - that 
-will make things nicer.
+If the TSC frequency of the VM is not equal to the host, hot-plugging vCPU
+will cause the VM to be hang. The time of hang depends on the current TSC
+value of the VM.
 
+System time calculation of kvmclock is based on (tsc_timestamp, system_time),
+and adjusted by delta ( = rdtsc_ordered() - src->tsc_timestamp).The tsc of the
+hotplugged cpu is initialized to 0, which will trigger check_tsc_sync_target()
+to adjust the tsc of the hotplugged cpu according to another online cpu, that
+is, rdtsc_ordered() will change abruptly to a large value. Then system time
+based on kvmclock is modified at the same time.
+
+So after modifying the tsc offset, update vcpu->hv_clock immediately.
+
+Signed-off-by: Zhuang Yanying <ann.zhuangyanying@huawei.com>
+---
+ Host:
+  Intel(R) Xeon(R) Gold 6161 CPU @ 2.20GHz
+  linux-5.11
+  qemu-5.1
+    <cpu mode='host-passthrough' check='none'>
+      <feature policy='require' name='invtsc'/>
+    </cpu>
+    <clock offset='utc'>
+      <timer name='hpet' present='no'/>
+      <timer name='pit' tickpolicy='delay'/>
+      <timer name='tsc' frequency='3000000000'/>
+    </clock>
+ Guest:
+  Centos8.1 (4.18.0-147.el8.x86_64)
+
+ After Hotplug cpu, vm hang for 290s:
+  [  283.224026] CPU3 has been hot-added
+  [  283.226118] smpboot: Booting Node 0 Processor 3 APIC 0x3
+  [  283.226964] kvm-clock: cpu 3, msr 9e5e010c1, secondary cpu clock
+  [  283.247200] TSC ADJUST compensate: CPU3 observed 867529151959 warp. Adjust: 867529151959
+  [  572.445543] KVM setup async PF for cpu 3
+  [  572.446412] kvm-stealtime: cpu 3, msr a16ce5040
+  [  572.448108] Will online and init hotplugged CPU: 3
+  Feb 27 18:47:28 localhost kernel: CPU3 has been hot-added
+  Feb 27 18:47:28 localhost kernel: smpboot: Booting Node 0 Processor 3 APIC 0x3
+  Feb 27 18:47:28 localhost kernel: kvm-clock: cpu 3, msr 9e5e010c1, secondary cpu clock
+  Feb 27 18:47:28 localhost kernel: TSC ADJUST compensate: CPU3 observed 867529151959 warp. Adjust: 867529151959
+  Feb 27 18:47:28 localhost kernel: KVM setup async PF for cpu 3
+  Feb 27 18:47:28 localhost kernel: kvm-stealtime: cpu 3, msr a16ce5040
+  Feb 27 18:47:28 localhost kernel: Will online and init hotplugged CPU: 3
+  Feb 27 18:47:28 localhost systemd[1]: Started /usr/lib/udev/kdump-udev-throttler.
+  [  572.495181] clocksource: timekeeping watchdog on CPU2: Marking clocksource 'tsc' as unstable because the skew is too large:
+  [  572.495181] clocksource:                       'kvm-clock' wd_now: 86ab1286a2 wd_last: 4344b44d09 mask: ffffffffffffffff
+  [  572.495181] clocksource:                       'tsc' cs_now: ca313c563b cs_last: c9d88b54d2 mask: ffffffffffffffff
+  [  572.495181] tsc: Marking TSC unstable due to clocksource watchdog
+  [  572.495181] clocksource: Switched to clocksource kvm-clock
+  Feb 27 18:47:28 localhost kernel: clocksource: timekeeping watchdog on CPU2: Marking clocksource 'tsc' as unstable because the skew 
+  Feb 27 18:47:28 localhost kernel: clocksource:                       'kvm-clock' wd_now: 86ab1286a2 wd_last: 4344b44d09 mask: ffffff
+  Feb 27 18:47:28 localhost kernel: clocksource:                       'tsc' cs_now: ca313c563b cs_last: c9d88b54d2 mask: ffffffffffff
+  Feb 27 18:47:28 localhost kernel: tsc: Marking TSC unstable due to clocksource watchdog
+  Feb 27 18:47:28 localhost kernel: clocksource: Switched to clocksource kvm-clock
+  Feb 27 18:47:28 localhost systemd[1]: Started Getty on tty2.
+  Feb 27 18:47:29 localhost kdump-udev-throttler[3530]: kexec: unloaded kdump kernel
+  Feb 27 18:47:29 localhost kdump-udev-throttler[3530]: Stopping kdump: [OK]
+  Feb 27 18:47:29 localhost kdump-udev-throttler[3530]: kexec: loaded kdump kernel
+  Feb 27 18:47:29 localhost kdump-udev-throttler[3530]: Starting kdump: [OK]
+---
+ arch/x86/kvm/x86.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 3712bb5245eb..429206d65989 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -3078,6 +3078,7 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+ 			if (!msr_info->host_initiated) {
+ 				s64 adj = data - vcpu->arch.ia32_tsc_adjust_msr;
+ 				adjust_tsc_offset_guest(vcpu, adj);
++				kvm_make_request(KVM_REQ_CLOCK_UPDATE, vcpu);
+ 			}
+ 			vcpu->arch.ia32_tsc_adjust_msr = data;
+ 		}
 -- 
-Thanks,
-
-David / dhildenb
+2.23.0
 
