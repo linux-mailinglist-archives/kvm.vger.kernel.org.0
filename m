@@ -2,118 +2,82 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 879C432C60D
-	for <lists+kvm@lfdr.de>; Thu,  4 Mar 2021 02:01:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B1CF032C609
+	for <lists+kvm@lfdr.de>; Thu,  4 Mar 2021 02:01:33 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244845AbhCDA1X (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 3 Mar 2021 19:27:23 -0500
-Received: from szxga05-in.huawei.com ([45.249.212.191]:13050 "EHLO
-        szxga05-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234300AbhCCMt5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 3 Mar 2021 07:49:57 -0500
-Received: from DGGEMS410-HUB.china.huawei.com (unknown [172.30.72.58])
-        by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4DrCqw2qlCzMYFX;
-        Wed,  3 Mar 2021 20:25:00 +0800 (CST)
-Received: from localhost (10.174.150.118) by DGGEMS410-HUB.china.huawei.com
- (10.3.19.210) with Microsoft SMTP Server id 14.3.498.0; Wed, 3 Mar 2021
- 20:26:59 +0800
-From:   <ann.zhuangyanying@huawei.com>
-To:     <pbonzini@redhat.com>
-CC:     <linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>,
-        <weidong.huang@huawei.com>,
-        Zhuang Yanying <ann.zhuangyanying@huawei.com>
-Subject: [PATCH] KVM: x86: fix cpu hang due to tsc adjustment when kvmclock in use
-Date:   Wed, 3 Mar 2021 20:26:57 +0800
-Message-ID: <20210303122657.23400-1-ann.zhuangyanying@huawei.com>
-X-Mailer: git-send-email 2.21.0.windows.1
+        id S239387AbhCDA1W (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 3 Mar 2021 19:27:22 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:54769 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1442243AbhCCMiC (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 3 Mar 2021 07:38:02 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1614774995;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=aZ2uBtAotFD6azGKmTAU2NtFm9E5wKJOahnBefhZJM4=;
+        b=RqrHw3ZU9Em6P89WfnNt7oyAGNTxmDiXrfZJGMl8v1rxa2PDBDya7GUNR6MW0S/oSMKZnd
+        zuBSYBmWSXBsurGryLAm47d2Pg3slT+MY5mLZocM8BHwDbH1ElFc3Lqa8h8/zbaws+eVHu
+        rLMU2u05ltNqW9WeX64J+DaEL+zNdQE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-519-i4lPEMLlOZqz5qskpDuytA-1; Wed, 03 Mar 2021 07:36:33 -0500
+X-MC-Unique: i4lPEMLlOZqz5qskpDuytA-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EC5D1800D55;
+        Wed,  3 Mar 2021 12:36:32 +0000 (UTC)
+Received: from gondolin (ovpn-113-85.ams2.redhat.com [10.36.113.85])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 08E975D730;
+        Wed,  3 Mar 2021 12:36:28 +0000 (UTC)
+Date:   Wed, 3 Mar 2021 13:36:26 +0100
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     <kvm@vger.kernel.org>, Alex Williamson <alex.williamson@redhat.com>
+Subject: Re: [PATCH 1/3] vfio: IOMMU_API should be selected
+Message-ID: <20210303133626.3598b41b.cohuck@redhat.com>
+In-Reply-To: <1-v1-df057e0f92c3+91-vfio_arm_compile_test_jgg@nvidia.com>
+References: <0-v1-df057e0f92c3+91-vfio_arm_compile_test_jgg@nvidia.com>
+        <1-v1-df057e0f92c3+91-vfio_arm_compile_test_jgg@nvidia.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.174.150.118]
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Zhuang Yanying <ann.zhuangyanying@huawei.com>
+On Tue, 23 Feb 2021 15:17:46 -0400
+Jason Gunthorpe <jgg@nvidia.com> wrote:
 
-If the TSC frequency of the VM is not equal to the host, hot-plugging vCPU
-will cause the VM to be hang. The time of hang depends on the current TSC
-value of the VM.
+> As IOMMU_API is a kconfig without a description (eg does not show in the
+> menu) the correct operator is select not 'depends on'. Using 'depends on'
+> for this kind of symbol means VFIO is not selectable unless some other
+> random kconfig has already enabled IOMMU_API for it.
+> 
+> Fixes: cba3345cc494 ("vfio: VFIO core")
+> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
+> ---
+>  drivers/vfio/Kconfig | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/drivers/vfio/Kconfig b/drivers/vfio/Kconfig
+> index 5533df91b257d6..90c0525b1e0cf4 100644
+> --- a/drivers/vfio/Kconfig
+> +++ b/drivers/vfio/Kconfig
+> @@ -21,7 +21,7 @@ config VFIO_VIRQFD
+>  
+>  menuconfig VFIO
+>  	tristate "VFIO Non-Privileged userspace driver framework"
+> -	depends on IOMMU_API
+> +	select IOMMU_API
+>  	select VFIO_IOMMU_TYPE1 if (X86 || S390 || ARM || ARM64)
+>  	help
+>  	  VFIO provides a framework for secure userspace device drivers.
 
-System time calculation of kvmclock is based on (tsc_timestamp, system_time),
-and adjusted by delta ( = rdtsc_ordered() - src->tsc_timestamp).The tsc of the
-hotplugged cpu is initialized to 0, which will trigger check_tsc_sync_target()
-to adjust the tsc of the hotplugged cpu according to another online cpu, that
-is, rdtsc_ordered() will change abruptly to a large value. Then system time
-based on kvmclock is modified at the same time.
-
-So after modifying the tsc offset, update vcpu->hv_clock immediately.
-
-Signed-off-by: Zhuang Yanying <ann.zhuangyanying@huawei.com>
----
- Host:
-  Intel(R) Xeon(R) Gold 6161 CPU @ 2.20GHz
-  linux-5.11
-  qemu-5.1
-    <cpu mode='host-passthrough' check='none'>
-      <feature policy='require' name='invtsc'/>
-    </cpu>
-    <clock offset='utc'>
-      <timer name='hpet' present='no'/>
-      <timer name='pit' tickpolicy='delay'/>
-      <timer name='tsc' frequency='3000000000'/>
-    </clock>
- Guest:
-  Centos8.1 (4.18.0-147.el8.x86_64)
-
- After Hotplug cpu, vm hang for 290s:
-  [  283.224026] CPU3 has been hot-added
-  [  283.226118] smpboot: Booting Node 0 Processor 3 APIC 0x3
-  [  283.226964] kvm-clock: cpu 3, msr 9e5e010c1, secondary cpu clock
-  [  283.247200] TSC ADJUST compensate: CPU3 observed 867529151959 warp. Adjust: 867529151959
-  [  572.445543] KVM setup async PF for cpu 3
-  [  572.446412] kvm-stealtime: cpu 3, msr a16ce5040
-  [  572.448108] Will online and init hotplugged CPU: 3
-  Feb 27 18:47:28 localhost kernel: CPU3 has been hot-added
-  Feb 27 18:47:28 localhost kernel: smpboot: Booting Node 0 Processor 3 APIC 0x3
-  Feb 27 18:47:28 localhost kernel: kvm-clock: cpu 3, msr 9e5e010c1, secondary cpu clock
-  Feb 27 18:47:28 localhost kernel: TSC ADJUST compensate: CPU3 observed 867529151959 warp. Adjust: 867529151959
-  Feb 27 18:47:28 localhost kernel: KVM setup async PF for cpu 3
-  Feb 27 18:47:28 localhost kernel: kvm-stealtime: cpu 3, msr a16ce5040
-  Feb 27 18:47:28 localhost kernel: Will online and init hotplugged CPU: 3
-  Feb 27 18:47:28 localhost systemd[1]: Started /usr/lib/udev/kdump-udev-throttler.
-  [  572.495181] clocksource: timekeeping watchdog on CPU2: Marking clocksource 'tsc' as unstable because the skew is too large:
-  [  572.495181] clocksource:                       'kvm-clock' wd_now: 86ab1286a2 wd_last: 4344b44d09 mask: ffffffffffffffff
-  [  572.495181] clocksource:                       'tsc' cs_now: ca313c563b cs_last: c9d88b54d2 mask: ffffffffffffffff
-  [  572.495181] tsc: Marking TSC unstable due to clocksource watchdog
-  [  572.495181] clocksource: Switched to clocksource kvm-clock
-  Feb 27 18:47:28 localhost kernel: clocksource: timekeeping watchdog on CPU2: Marking clocksource 'tsc' as unstable because the skew 
-  Feb 27 18:47:28 localhost kernel: clocksource:                       'kvm-clock' wd_now: 86ab1286a2 wd_last: 4344b44d09 mask: ffffff
-  Feb 27 18:47:28 localhost kernel: clocksource:                       'tsc' cs_now: ca313c563b cs_last: c9d88b54d2 mask: ffffffffffff
-  Feb 27 18:47:28 localhost kernel: tsc: Marking TSC unstable due to clocksource watchdog
-  Feb 27 18:47:28 localhost kernel: clocksource: Switched to clocksource kvm-clock
-  Feb 27 18:47:28 localhost systemd[1]: Started Getty on tty2.
-  Feb 27 18:47:29 localhost kdump-udev-throttler[3530]: kexec: unloaded kdump kernel
-  Feb 27 18:47:29 localhost kdump-udev-throttler[3530]: Stopping kdump: [OK]
-  Feb 27 18:47:29 localhost kdump-udev-throttler[3530]: kexec: loaded kdump kernel
-  Feb 27 18:47:29 localhost kdump-udev-throttler[3530]: Starting kdump: [OK]
----
- arch/x86/kvm/x86.c | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 3712bb5245eb..429206d65989 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -3078,6 +3078,7 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 			if (!msr_info->host_initiated) {
- 				s64 adj = data - vcpu->arch.ia32_tsc_adjust_msr;
- 				adjust_tsc_offset_guest(vcpu, adj);
-+				kvm_make_request(KVM_REQ_CLOCK_UPDATE, vcpu);
- 			}
- 			vcpu->arch.ia32_tsc_adjust_msr = data;
- 		}
--- 
-2.23.0
+I'm wondering whether this should depend on MMU?
 
