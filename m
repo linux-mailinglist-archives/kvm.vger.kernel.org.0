@@ -2,67 +2,150 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DCBF232B5C9
-	for <lists+kvm@lfdr.de>; Wed,  3 Mar 2021 08:45:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5ADC632B5CA
+	for <lists+kvm@lfdr.de>; Wed,  3 Mar 2021 08:45:06 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1449385AbhCCHUE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 3 Mar 2021 02:20:04 -0500
-Received: from mga03.intel.com ([134.134.136.65]:64029 "EHLO mga03.intel.com"
+        id S1450045AbhCCHUG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 3 Mar 2021 02:20:06 -0500
+Received: from mga17.intel.com ([192.55.52.151]:22187 "EHLO mga17.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1450806AbhCCFwz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 3 Mar 2021 00:52:55 -0500
-IronPort-SDR: xw+0gtmw6emeXrX5MRE2sCZTw/IrVgH5wSvMEBbeAqdI4dXUF0HhZYYEuMUtlmg759UH+1eQed
- cygSnMUkQKjQ==
-X-IronPort-AV: E=McAfee;i="6000,8403,9911"; a="187168416"
+        id S1450819AbhCCFxK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 3 Mar 2021 00:53:10 -0500
+IronPort-SDR: FPG/Zf7UMF84M22E+vI+KzITJi3RNKGMcjCtxzJPnqnseKdbGxhIe+BB2sqPHccghcfQIEs9yM
+ t6rpHhT33TtA==
+X-IronPort-AV: E=McAfee;i="6000,8403,9911"; a="167003758"
 X-IronPort-AV: E=Sophos;i="5.81,219,1610438400"; 
-   d="scan'208";a="187168416"
+   d="scan'208";a="167003758"
 Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Mar 2021 21:52:13 -0800
-IronPort-SDR: PPCaIJ1yCXU3MQyLWu37t4XQhskMV0FHuE68tL3dJg7WneBmpaJ+EiW2Zcdl0Nbp9Qat9tskR3
- wTSfznF+aUhA==
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Mar 2021 21:52:28 -0800
+IronPort-SDR: gsvpMSKUkRqlRBvsAQdTzQ/Lg+yrl/RBCqg7QqHC8MCLh4viy8I0e9aVz2eO9/kzLpvw9mUj8W
+ rXjGqIbCfg8w==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.81,219,1610438400"; 
-   d="scan'208";a="399515380"
+   d="scan'208";a="399515453"
 Received: from local-michael-cet-test.sh.intel.com ([10.239.159.166])
-  by fmsmga008.fm.intel.com with ESMTP; 02 Mar 2021 21:52:11 -0800
+  by fmsmga008.fm.intel.com with ESMTP; 02 Mar 2021 21:52:26 -0800
 From:   Yang Weijiang <weijiang.yang@intel.com>
 To:     pbonzini@redhat.com, seanjc@google.com, vkuznets@redhat.com,
         kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 Cc:     Yang Weijiang <weijiang.yang@intel.com>
-Subject: [PATCH] KVM: nVMX: Add CET entry/exit load bits to evmcs unsupported list
-Date:   Wed,  3 Mar 2021 14:04:34 +0800
-Message-Id: <20210303060435.8158-1-weijiang.yang@intel.com>
+Subject: [PATCH v3] KVM: nVMX: Sync L2 guest CET states between L1/L2
+Date:   Wed,  3 Mar 2021 14:04:35 +0800
+Message-Id: <20210303060435.8158-2-weijiang.yang@intel.com>
 X-Mailer: git-send-email 2.17.2
+In-Reply-To: <20210303060435.8158-1-weijiang.yang@intel.com>
+References: <20210303060435.8158-1-weijiang.yang@intel.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-CET in nested guest over Hyper-V is not supported for now. Relevant
-enabling patches will be posted as a separate patch series.
+These fields are rarely updated by L1 QEMU/KVM, sync them when L1 is trying to
+read/write them and after they're changed. If CET guest entry-load bit is not
+set by L1 guest, migrate them to L2 manaully.
 
-Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
+Suggested-by: Sean Christopherson <seanjc@google.com>
 Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
 ---
- arch/x86/kvm/vmx/evmcs.h | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+ arch/x86/kvm/cpuid.c      |  1 -
+ arch/x86/kvm/vmx/nested.c | 30 ++++++++++++++++++++++++++++++
+ arch/x86/kvm/vmx/vmx.h    |  3 +++
+ 3 files changed, 33 insertions(+), 1 deletion(-)
 
-diff --git a/arch/x86/kvm/vmx/evmcs.h b/arch/x86/kvm/vmx/evmcs.h
-index bd41d9462355..25588694eb04 100644
---- a/arch/x86/kvm/vmx/evmcs.h
-+++ b/arch/x86/kvm/vmx/evmcs.h
-@@ -59,8 +59,10 @@ DECLARE_STATIC_KEY_FALSE(enable_evmcs);
- 	 SECONDARY_EXEC_SHADOW_VMCS |					\
- 	 SECONDARY_EXEC_TSC_SCALING |					\
- 	 SECONDARY_EXEC_PAUSE_LOOP_EXITING)
--#define EVMCS1_UNSUPPORTED_VMEXIT_CTRL (VM_EXIT_LOAD_IA32_PERF_GLOBAL_CTRL)
--#define EVMCS1_UNSUPPORTED_VMENTRY_CTRL (VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL)
-+#define EVMCS1_UNSUPPORTED_VMEXIT_CTRL (VM_EXIT_LOAD_IA32_PERF_GLOBAL_CTRL | \
-+					VM_EXIT_LOAD_CET_STATE)
-+#define EVMCS1_UNSUPPORTED_VMENTRY_CTRL (VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL | \
-+					 VM_ENTRY_LOAD_CET_STATE)
- #define EVMCS1_UNSUPPORTED_VMFUNC (VMX_VMFUNC_EPTP_SWITCHING)
+diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+index d191de769093..8692f53b8cd0 100644
+--- a/arch/x86/kvm/cpuid.c
++++ b/arch/x86/kvm/cpuid.c
+@@ -143,7 +143,6 @@ void kvm_update_cpuid_runtime(struct kvm_vcpu *vcpu)
+ 		}
+ 		vcpu->arch.guest_supported_xss =
+ 			(((u64)best->edx << 32) | best->ecx) & supported_xss;
+-
+ 	} else {
+ 		vcpu->arch.guest_supported_xss = 0;
+ 	}
+diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+index 9728efd529a1..24cace55e1f9 100644
+--- a/arch/x86/kvm/vmx/nested.c
++++ b/arch/x86/kvm/vmx/nested.c
+@@ -2516,6 +2516,13 @@ static void prepare_vmcs02_rare(struct vcpu_vmx *vmx, struct vmcs12 *vmcs12)
+ 	vmcs_write32(VM_ENTRY_MSR_LOAD_COUNT, vmx->msr_autoload.guest.nr);
  
- #if IS_ENABLED(CONFIG_HYPERV)
+ 	set_cr4_guest_host_mask(vmx);
++
++	if (kvm_cet_supported() && vmx->nested.nested_run_pending &&
++	    (vmcs12->vm_entry_controls & VM_ENTRY_LOAD_CET_STATE)) {
++		vmcs_writel(GUEST_SSP, vmcs12->guest_ssp);
++		vmcs_writel(GUEST_S_CET, vmcs12->guest_s_cet);
++		vmcs_writel(GUEST_INTR_SSP_TABLE, vmcs12->guest_ssp_tbl);
++	}
+ }
+ 
+ /*
+@@ -2556,6 +2563,15 @@ static int prepare_vmcs02(struct kvm_vcpu *vcpu, struct vmcs12 *vmcs12,
+ 	if (kvm_mpx_supported() && (!vmx->nested.nested_run_pending ||
+ 	    !(vmcs12->vm_entry_controls & VM_ENTRY_LOAD_BNDCFGS)))
+ 		vmcs_write64(GUEST_BNDCFGS, vmx->nested.vmcs01_guest_bndcfgs);
++
++	if (kvm_cet_supported() && (!vmx->nested.nested_run_pending ||
++	    !(vmcs12->vm_entry_controls & VM_ENTRY_LOAD_CET_STATE))) {
++		vmcs_writel(GUEST_SSP, vmx->nested.vmcs01_guest_ssp);
++		vmcs_writel(GUEST_S_CET, vmx->nested.vmcs01_guest_s_cet);
++		vmcs_writel(GUEST_INTR_SSP_TABLE,
++			    vmx->nested.vmcs01_guest_ssp_tbl);
++	}
++
+ 	vmx_set_rflags(vcpu, vmcs12->guest_rflags);
+ 
+ 	/* EXCEPTION_BITMAP and CR0_GUEST_HOST_MASK should basically be the
+@@ -3375,6 +3391,12 @@ enum nvmx_vmentry_status nested_vmx_enter_non_root_mode(struct kvm_vcpu *vcpu,
+ 	if (kvm_mpx_supported() &&
+ 		!(vmcs12->vm_entry_controls & VM_ENTRY_LOAD_BNDCFGS))
+ 		vmx->nested.vmcs01_guest_bndcfgs = vmcs_read64(GUEST_BNDCFGS);
++	if (kvm_cet_supported() &&
++		!(vmcs12->vm_entry_controls & VM_ENTRY_LOAD_CET_STATE)) {
++		vmx->nested.vmcs01_guest_ssp = vmcs_readl(GUEST_SSP);
++		vmx->nested.vmcs01_guest_s_cet = vmcs_readl(GUEST_S_CET);
++		vmx->nested.vmcs01_guest_ssp_tbl = vmcs_readl(GUEST_INTR_SSP_TABLE);
++	}
+ 
+ 	/*
+ 	 * Overwrite vmcs01.GUEST_CR3 with L1's CR3 if EPT is disabled *and*
+@@ -4001,6 +4023,9 @@ static bool is_vmcs12_ext_field(unsigned long field)
+ 	case GUEST_IDTR_BASE:
+ 	case GUEST_PENDING_DBG_EXCEPTIONS:
+ 	case GUEST_BNDCFGS:
++	case GUEST_SSP:
++	case GUEST_INTR_SSP_TABLE:
++	case GUEST_S_CET:
+ 		return true;
+ 	default:
+ 		break;
+@@ -4052,6 +4077,11 @@ static void sync_vmcs02_to_vmcs12_rare(struct kvm_vcpu *vcpu,
+ 		vmcs_readl(GUEST_PENDING_DBG_EXCEPTIONS);
+ 	if (kvm_mpx_supported())
+ 		vmcs12->guest_bndcfgs = vmcs_read64(GUEST_BNDCFGS);
++	if (kvm_cet_supported()) {
++		vmcs12->guest_ssp = vmcs_readl(GUEST_SSP);
++		vmcs12->guest_s_cet = vmcs_readl(GUEST_S_CET);
++		vmcs12->guest_ssp_tbl = vmcs_readl(GUEST_INTR_SSP_TABLE);
++	}
+ 
+ 	vmx->nested.need_sync_vmcs02_to_vmcs12_rare = false;
+ }
+diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
+index 9d3a557949ac..36dc4fdb0909 100644
+--- a/arch/x86/kvm/vmx/vmx.h
++++ b/arch/x86/kvm/vmx/vmx.h
+@@ -155,6 +155,9 @@ struct nested_vmx {
+ 	/* to migrate it to L2 if VM_ENTRY_LOAD_DEBUG_CONTROLS is off */
+ 	u64 vmcs01_debugctl;
+ 	u64 vmcs01_guest_bndcfgs;
++	u64 vmcs01_guest_ssp;
++	u64 vmcs01_guest_s_cet;
++	u64 vmcs01_guest_ssp_tbl;
+ 
+ 	/* to migrate it to L1 if L2 writes to L1's CR8 directly */
+ 	int l1_tpr_threshold;
 -- 
 2.26.2
 
