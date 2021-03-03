@@ -2,168 +2,124 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0C42132C600
-	for <lists+kvm@lfdr.de>; Thu,  4 Mar 2021 02:01:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7E1D832C5F8
+	for <lists+kvm@lfdr.de>; Thu,  4 Mar 2021 02:01:16 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345927AbhCDA1Q (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 3 Mar 2021 19:27:16 -0500
-Received: from mx13.kaspersky-labs.com ([91.103.66.164]:31931 "EHLO
-        mx13.kaspersky-labs.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1348477AbhCCMFQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 3 Mar 2021 07:05:16 -0500
-Received: from relay13.kaspersky-labs.com (unknown [127.0.0.10])
-        by relay13.kaspersky-labs.com (Postfix) with ESMTP id 50F76521376;
-        Wed,  3 Mar 2021 13:42:28 +0300 (MSK)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kaspersky.com;
-        s=mail202102; t=1614768148;
-        bh=9y/BJdUHyFlRN7zac60l/id5LHRMFKNykaUU53/wMDw=;
-        h=Subject:To:From:Message-ID:Date:MIME-Version:Content-Type;
-        b=RozWfglqTR+416IePLAMDg0840KvM0it659pfzn4DFGiBGQTnA8L3VqYI0Gu8aLj+
-         bmzaja6Sxl1AjUKcBZbSnltzcD1gx8jk57rAthPy7VsUGAV67vUgNsSWbYd0Spi62O
-         EEkF5ohI6l7nTo6bwu6eDV+zZwWypgNNocd+S80I5smXdbf7A24+vt2oZNSiU4Oo3L
-         uqGvwCva1KeDvrCj/HT1bFIj/hCs1413iaPumgf2adJ62Ow0d0b9BDeWcMs9eYdbKK
-         WTiWICKkO9LLisHNbplxvUmH9IvNLeOWGUnKGfYkgLc96WvjHdMKmEz2J4a/VuDdB2
-         Sut6l4LxZVbFw==
-Received: from mail-hq2.kaspersky.com (unknown [91.103.66.206])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
-        (Client CN "mail-hq2.kaspersky.com", Issuer "Kaspersky MailRelays CA G3" (verified OK))
-        by mailhub13.kaspersky-labs.com (Postfix) with ESMTPS id 51BC3521259;
-        Wed,  3 Mar 2021 13:42:27 +0300 (MSK)
-Received: from [10.16.171.77] (10.64.68.128) by hqmailmbx3.avp.ru
- (10.64.67.243) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2044.4; Wed, 3 Mar
- 2021 13:42:26 +0300
-Subject: Re: [RFC PATCH v5 19/19] virtio/vsock: update trace event for
- SEQPACKET
-To:     Steven Rostedt <rostedt@goodmis.org>
-CC:     Stefan Hajnoczi <stefanha@redhat.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
+        id S1345421AbhCDA1I (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 3 Mar 2021 19:27:08 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:26486 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S234644AbhCCLoN (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 3 Mar 2021 06:44:13 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1614771716;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=z+SORn1Xato+SpIYrA4GogV1iNH9wTfftkV/LHdtp3U=;
+        b=MyTLPOhXqcMsl3J/QJEZS/KgC4w91MUE0RbVK5ckC2nyIFk+HGxVoZ+P8/KrzHHXCzk9YJ
+        Vt098WD5Vn26K+Oxdt93oCRaThwVL4YdKbpjmwRDtlu+oxBZnOsgPEJYZr2yjCDfRO6Dge
+        X/WqzsazUmLd3yBh1BRsLiJk5r/xf18=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-348-27eZfgxQMnGe0Gq1FTeSNg-1; Wed, 03 Mar 2021 06:41:54 -0500
+X-MC-Unique: 27eZfgxQMnGe0Gq1FTeSNg-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EDE7384E240;
+        Wed,  3 Mar 2021 11:41:52 +0000 (UTC)
+Received: from [10.36.112.28] (ovpn-112-28.ams2.redhat.com [10.36.112.28])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 24E2E60C05;
+        Wed,  3 Mar 2021 11:41:48 +0000 (UTC)
+Subject: Re: [PATCH v1 7/9] memory: introduce RAM_NORESERVE and wire it up in
+ qemu_ram_mmap()
+To:     Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>
+Cc:     Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org,
         "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Ingo Molnar <mingo@redhat.com>,
-        Jorgen Hansen <jhansen@vmware.com>,
-        Norbert Slusarek <nslusarek@gmx.net>,
-        Andra Paraschiv <andraprs@amazon.com>,
-        Colin Ian King <colin.king@canonical.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "stsp2@yandex.ru" <stsp2@yandex.ru>,
-        "oxffffaa@gmail.com" <oxffffaa@gmail.com>
-References: <20210218053347.1066159-1-arseny.krasnov@kaspersky.com>
- <20210218054219.1069224-1-arseny.krasnov@kaspersky.com>
- <20210302172542.605b3795@gandalf.local.home>
-From:   Arseny Krasnov <arseny.krasnov@kaspersky.com>
-Message-ID: <c80f403d-9fec-dd78-bb91-44c9e0bd74a2@kaspersky.com>
-Date:   Wed, 3 Mar 2021 13:42:20 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        Eduardo Habkost <ehabkost@redhat.com>,
+        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Igor Mammedov <imammedo@redhat.com>,
+        =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Murilo Opsfelder Araujo <muriloo@linux.ibm.com>,
+        Greg Kurz <groug@kaod.org>,
+        Liam Merwick <liam.merwick@oracle.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Igor Kotrasinski <i.kotrasinsk@partner.samsung.com>,
+        Juan Quintela <quintela@redhat.com>,
+        Stefan Weil <sw@weilnetz.de>, kvm@vger.kernel.org,
+        qemu-s390x@nongnu.org
+References: <20210209134939.13083-1-david@redhat.com>
+ <20210209134939.13083-8-david@redhat.com> <20210302173243.GM397383@xz-x1>
+ <91613148-9ade-c192-4b73-0cb5a54ada98@redhat.com>
+ <20210303123517.04729c1e.cohuck@redhat.com>
+ <2c5a8d44-cde7-d9a9-c4c3-4c4af4087db7@redhat.com>
+From:   David Hildenbrand <david@redhat.com>
+Organization: Red Hat GmbH
+Message-ID: <729de5db-4c63-a7a8-eed7-2bb437351165@redhat.com>
+Date:   Wed, 3 Mar 2021 12:41:48 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.8.0
 MIME-Version: 1.0
-In-Reply-To: <20210302172542.605b3795@gandalf.local.home>
-Content-Type: text/plain; charset="windows-1252"
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <2c5a8d44-cde7-d9a9-c4c3-4c4af4087db7@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-X-Originating-IP: [10.64.68.128]
-X-ClientProxiedBy: hqmailmbx1.avp.ru (10.64.67.241) To hqmailmbx3.avp.ru
- (10.64.67.243)
-X-KSE-ServerInfo: hqmailmbx3.avp.ru, 9
-X-KSE-AntiSpam-Interceptor-Info: scan successful
-X-KSE-AntiSpam-Version: 5.9.20, Database issued on: 03/03/2021 10:31:43
-X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
-X-KSE-AntiSpam-Method: none
-X-KSE-AntiSpam-Rate: 0
-X-KSE-AntiSpam-Info: Lua profiles 162194 [Mar 03 2021]
-X-KSE-AntiSpam-Info: LuaCore: 430 430 36bea03808f03ef3db4e56410ed9bb7ad8f7e286
-X-KSE-AntiSpam-Info: Version: 5.9.20.0
-X-KSE-AntiSpam-Info: Envelope from: arseny.krasnov@kaspersky.com
-X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
-X-KSE-AntiSpam-Info: {Macro_CONTENT_PLAIN}
-X-KSE-AntiSpam-Info: {Macro_CONTENT_TEXT_PLAIN_OR_HTML}
-X-KSE-AntiSpam-Info: {Macro_CONTENT_TYPE_8_BIT_WITH_7_BIT_C_TRANSFER_ENCODING}
-X-KSE-AntiSpam-Info: {Macro_CONTENT_TYPE_ENCODING_NOT_JAPANESE}
-X-KSE-AntiSpam-Info: {Macro_CONTENT_TYPE_ENCODING_NOT_RUS}
-X-KSE-AntiSpam-Info: {Macro_CONTENT_TYPE_INCORRECT_BIT_FOR_C_TRANSFER_ENCODING}
-X-KSE-AntiSpam-Info: {Macro_DATE_MOSCOW}
-X-KSE-AntiSpam-Info: {Macro_FROM_DOUBLE_ENG_NAME}
-X-KSE-AntiSpam-Info: {Macro_FROM_LOWCAPS_DOUBLE_ENG_NAME_IN_EMAIL}
-X-KSE-AntiSpam-Info: {Macro_FROM_NOT_RU}
-X-KSE-AntiSpam-Info: {Macro_FROM_NOT_RUS_CHARSET}
-X-KSE-AntiSpam-Info: {Macro_FROM_REAL_NAME_MATCHES_ALL_USERNAME_PROB}
-X-KSE-AntiSpam-Info: {Macro_HEADERS_NOT_LIST}
-X-KSE-AntiSpam-Info: {Macro_MAILER_THUNDERBIRD}
-X-KSE-AntiSpam-Info: {Macro_MISC_X_PRIORITY_MISSED}
-X-KSE-AntiSpam-Info: {Macro_MSGID_LOWHEX_8_4_4_4_12}
-X-KSE-AntiSpam-Info: {Macro_NO_DKIM}
-X-KSE-AntiSpam-Info: {Macro_REPLY_TO_MISSED}
-X-KSE-AntiSpam-Info: {Macro_SUBJECT_AT_LEAST_2_WORDS}
-X-KSE-AntiSpam-Info: {Macro_SUBJECT_ENG_UPPERCASE_BEGINNING}
-X-KSE-AntiSpam-Info: {Macro_SUBJECT_LONG_TEXT}
-X-KSE-AntiSpam-Info: {Macro_SUBJECT_WITH_FWD_OR_RE}
-X-KSE-AntiSpam-Info: kaspersky.com:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2
-X-KSE-AntiSpam-Info: Rate: 0
-X-KSE-AntiSpam-Info: Status: not_detected
-X-KSE-AntiSpam-Info: Method: none
-X-KSE-Antiphishing-Info: Clean
-X-KSE-Antiphishing-ScanningType: Deterministic
-X-KSE-Antiphishing-Method: None
-X-KSE-Antiphishing-Bases: 03/03/2021 10:34:00
-X-KSE-AttachmentFiltering-Interceptor-Info: no applicable attachment filtering
- rules found
-X-KSE-Antivirus-Interceptor-Info: scan successful
-X-KSE-Antivirus-Info: Clean, bases: 03.03.2021 9:17:00
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
-X-KSE-AttachmentFiltering-Interceptor-Info: no applicable attachment filtering
- rules found
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
-X-KLMS-Rule-ID: 52
-X-KLMS-Message-Action: clean
-X-KLMS-AntiSpam-Status: not scanned, disabled by settings
-X-KLMS-AntiSpam-Interceptor-Info: not scanned
-X-KLMS-AntiPhishing: Clean, bases: 2021/03/03 09:54:00
-X-KLMS-AntiVirus: Kaspersky Security for Linux Mail Server, version 8.0.3.30, bases: 2021/03/03 08:59:00 #16322941
-X-KLMS-AntiVirus-Status: Clean, skipped
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On 03.03.21 12:39, Thomas Huth wrote:
+> On 03/03/2021 12.35, Cornelia Huck wrote:
+>> On Tue, 2 Mar 2021 20:02:34 +0100
+>> David Hildenbrand <david@redhat.com> wrote:
+>>
+>>> On 02.03.21 18:32, Peter Xu wrote:
+>>>> On Tue, Feb 09, 2021 at 02:49:37PM +0100, David Hildenbrand wrote:
+>>>>> @@ -899,13 +899,17 @@ int kvm_s390_mem_op_pv(S390CPU *cpu, uint64_t offset, void *hostbuf,
+>>>>>      * to grow. We also have to use MAP parameters that avoid
+>>>>>      * read-only mapping of guest pages.
+>>>>>      */
+>>>>> -static void *legacy_s390_alloc(size_t size, uint64_t *align, bool shared)
+>>>>> +static void *legacy_s390_alloc(size_t size, uint64_t *align, bool shared,
+>>>>> +                               bool noreserve)
+>>>>>     {
+>>>>>         static void *mem;
+>>>>>     
+>>>>>         if (mem) {
+>>>>>             /* we only support one allocation, which is enough for initial ram */
+>>>>>             return NULL;
+>>>>> +    } else if (noreserve) {
+>>>>> +        error_report("Skipping reservation of swap space is not supported.");
+>>>>> +        return NULL
+>>>>
+>>>> Semicolon missing.
+>>>
+>>> Thanks for catching that!
+>>
+>> Regardless of that (and this patch set), can we finally get rid of
+>> legacy_s390_alloc? We already fence off running with a kernel prior to
+>> 3.15, and KVM_CAP_S390_COW depends on ESOP -- are non-ESOP kvm hosts
+>> still relevant? This seems to be a generation 10 feature; do we
+>> realistically expect anyone running this on e.g. a z/VM host that
+>> doesn't provide ESOP?
+> 
+> Looking at the support charts (
+> https://www.ibm.com/support/pages/ibm-mainframe-life-cycle-history ), the
+> z10 is already unsupported. So if all newer mainframes have ESOP, I guess it
+> should be fine to get rid of this code now.
 
-On 03.03.2021 01:25, Steven Rostedt wrote:
-> On Thu, 18 Feb 2021 08:42:15 +0300
-> Arseny Krasnov <arseny.krasnov@kaspersky.com> wrote:
->
-> Not sure if this was pulled in yet, but I do have a small issue with this
-> patch.
-No, it is in RFC state.
->
->> @@ -69,14 +82,19 @@ TRACE_EVENT(virtio_transport_alloc_pkt,
->>  		__entry->type = type;
->>  		__entry->op = op;
->>  		__entry->flags = flags;
->> +		__entry->msg_len = msg_len;
->> +		__entry->msg_cnt = msg_cnt;
->>  	),
->> -	TP_printk("%u:%u -> %u:%u len=%u type=%s op=%s flags=%#x",
->> +	TP_printk("%u:%u -> %u:%u len=%u type=%s op=%s flags=%#x "
->> +		  "msg_len=%u msg_cnt=%u",
-> It's considered poor formatting to split strings like the above. This is
-> one of the exceptions for the 80 character limit. Do not break strings just
-> to keep it within 80 characters.
->
-> -- Steve
-Ok, will fix in next version, Thank You
->
->
->>  		  __entry->src_cid, __entry->src_port,
->>  		  __entry->dst_cid, __entry->dst_port,
->>  		  __entry->len,
->>  		  show_type(__entry->type),
->>  		  show_op(__entry->op),
->> -		  __entry->flags)
->> +		  __entry->flags,
->> +		  __entry->msg_len,
->> +		  __entry->msg_cnt)
->>  );
+I remember this was a z/VM issue, which would not provide this facility 
+to its guests.
+
+-- 
+Thanks,
+
+David / dhildenb
+
