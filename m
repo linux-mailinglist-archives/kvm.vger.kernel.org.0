@@ -2,326 +2,187 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1901332C6BD
-	for <lists+kvm@lfdr.de>; Thu,  4 Mar 2021 02:08:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D49A932C6A4
+	for <lists+kvm@lfdr.de>; Thu,  4 Mar 2021 02:03:35 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1451101AbhCDA34 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 3 Mar 2021 19:29:56 -0500
-Received: from foss.arm.com ([217.140.110.172]:53326 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S236672AbhCCRjp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 3 Mar 2021 12:39:45 -0500
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 061811FB;
-        Wed,  3 Mar 2021 09:26:49 -0800 (PST)
-Received: from [192.168.0.110] (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 3283A3F7D7;
-        Wed,  3 Mar 2021 09:26:47 -0800 (PST)
-Subject: Re: [RFC PATCH 3/4] KVM: arm64: Install the block entry before
- unmapping the page mappings
-To:     "wangyanan (Y)" <wangyanan55@huawei.com>
-Cc:     Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Quentin Perret <qperret@google.com>,
-        Gavin Shan <gshan@redhat.com>, kvmarm@lists.cs.columbia.edu,
-        linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20210208112250.163568-1-wangyanan55@huawei.com>
- <20210208112250.163568-4-wangyanan55@huawei.com>
- <33a9999e-2cc5-52ca-3da8-38f7e7702529@arm.com>
- <93c13a04-6fcc-7544-d6ed-2ebb81d209fe@huawei.com>
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <1b8be8a3-2fb9-be8a-a052-44872355f8cb@arm.com>
-Date:   Wed, 3 Mar 2021 17:27:05 +0000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.8.0
+        id S1451050AbhCDA3p (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 3 Mar 2021 19:29:45 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45124 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S240166AbhCCR3a (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 3 Mar 2021 12:29:30 -0500
+Received: from mail-io1-xd31.google.com (mail-io1-xd31.google.com [IPv6:2607:f8b0:4864:20::d31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B700DC061760
+        for <kvm@vger.kernel.org>; Wed,  3 Mar 2021 09:28:15 -0800 (PST)
+Received: by mail-io1-xd31.google.com with SMTP id k2so21145410ioh.5
+        for <kvm@vger.kernel.org>; Wed, 03 Mar 2021 09:28:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=ck2w+e5yXkndn1hHoEc40G+HBVTFOBYH8jC+XKOicDs=;
+        b=YSXBefMpnQeJLVXH2u/6vizQTN7Ho5xCOwqne2UzKric8QgKjoWznBVtMcKZnJS/l1
+         CBnEZvshehyDRI6+CSUort61MlyKAsJWSQX4iNx8LTtWnAx0ZooLoqt9xt9hQQJejuSe
+         twEl2M4gyaFVNQ2iP6xie+uaMefYX9aCP80ei1oK/F+tZHUXS5SZ2xli/Rnla2iuH35y
+         HQZkHEa7zBKqwz7GkNafuRf42QHtHxEi6u2lUhgTbjam2v8oO0920jY4bUX1JS5JTMx7
+         4uM7pMSEYFh1V0twXIR172Ux54s64w07d8DapzsMG53O+pBTaow42w+Euq+zmJW+PWbN
+         XOsg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=ck2w+e5yXkndn1hHoEc40G+HBVTFOBYH8jC+XKOicDs=;
+        b=tYYlDNh0OUGCio1G1f5BKODOl8ClUNgx3yzv0QZiKTivcH6ba4u+0ME+N//M9J2k/e
+         q0rpmeaHKQqBKwtRspoYmunejPCRXxP7w8ZUCrHDM2lnv1XsGZOiMA7o2RyiOX1FC49W
+         FS3e93oGKm4KvC/1ZtNQAWV5ijWC0dP3IAw9EItOKtierIjS8gaM31J8okIcbnktFGyS
+         R3KcWtq6XZGMSjAnfrCtWvW5sLbIaYyiuQJADwBqYesLahfrBNWZVlvZ6sZTX0z+is7Q
+         z7wPYT6mLfKd8bSoqcPxcW+vOzz45Dnh585urHF4Ek35sZz6SaoirKOxz3dZgDq8AhVu
+         52eQ==
+X-Gm-Message-State: AOAM533Lof4r18umU9tg7fO5q4KquPndyrs9AnNjLw7t1Q+iTwGWlI7Z
+        AqWHs0Uk/2emNiGSZLqfsk9oKuAxGfNKnQNwm+OMoA==
+X-Google-Smtp-Source: ABdhPJzD8aRdltFXM/NaTn95qOpABgQeAMXTFWz8XzmWvbiOwMUQmg4Z4Z7jc4RFL5cM1+dGliVOWFz6VT9q9Cgnqxg=
+X-Received: by 2002:a05:6638:1648:: with SMTP id a8mr25394286jat.25.1614792494837;
+ Wed, 03 Mar 2021 09:28:14 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <93c13a04-6fcc-7544-d6ed-2ebb81d209fe@huawei.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
+References: <20210302184540.2829328-1-seanjc@google.com> <20210302184540.2829328-3-seanjc@google.com>
+In-Reply-To: <20210302184540.2829328-3-seanjc@google.com>
+From:   Ben Gardon <bgardon@google.com>
+Date:   Wed, 3 Mar 2021 09:28:03 -0800
+Message-ID: <CANgfPd9n3HjFOR5230i9_W9-CZjKKQSp+wzDB+Eymqrr3F8xeQ@mail.gmail.com>
+Subject: Re: [PATCH 02/15] KVM: x86/mmu: Alloc page for PDPTEs when shadowing
+ 32-bit NPT with 64-bit
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Yanan,
-
-On 3/3/21 11:04 AM, wangyanan (Y) wrote:
-> Hi Alex,
+On Tue, Mar 2, 2021 at 10:45 AM Sean Christopherson <seanjc@google.com> wrote:
 >
-> On 2021/3/3 1:13, Alexandru Elisei wrote:
->> Hello,
->>
->> On 2/8/21 11:22 AM, Yanan Wang wrote:
->>> When KVM needs to coalesce the normal page mappings into a block mapping,
->>> we currently invalidate the old table entry first followed by invalidation
->>> of TLB, then unmap the page mappings, and install the block entry at last.
->>>
->>> It will cost a long time to unmap the numerous page mappings, which means
->>> there will be a long period when the table entry can be found invalid.
->>> If other vCPUs access any guest page within the block range and find the
->>> table entry invalid, they will all exit from guest with a translation fault
->>> which is not necessary. And KVM will make efforts to handle these faults,
->>> especially when performing CMOs by block range.
->>>
->>> So let's quickly install the block entry at first to ensure uninterrupted
->>> memory access of the other vCPUs, and then unmap the page mappings after
->>> installation. This will reduce most of the time when the table entry is
->>> invalid, and avoid most of the unnecessary translation faults.
->> I'm not convinced I've fully understood what is going on yet, but it seems to me
->> that the idea is sound. Some questions and comments below.
-> What I am trying to do in this patch is to adjust the order of rebuilding block
-> mappings from page mappings.
-> Take the rebuilding of 1G block mappings as an example.
-> Before this patch, the order is like:
-> 1) invalidate the table entry of the 1st level(PUD)
-> 2) flush TLB by VMID
-> 3) unmap the old PMD/PTE tables
-> 4) install the new block entry to the 1st level(PUD)
+> Allocate the so called pae_root page on-demand, along with the lm_root
+> page, when shadowing 32-bit NPT with 64-bit NPT, i.e. when running a
+> 32-bit L1.  KVM currently only allocates the page when NPT is disabled,
+> or when L0 is 32-bit (using PAE paging).
 >
-> So entry in the 1st level can be found invalid by other vcpus in 1), 2), and 3),
-> and it's a long time in 3) to unmap
-> the numerous old PMD/PTE tables, which means the total time of the entry being
-> invalid is long enough to
-> affect the performance.
+> Note, there is an existing memory leak involving the MMU roots, as KVM
+> fails to free the PAE roots on failure.  This will be addressed in a
+> future commit.
 >
-> After this patch, the order is like:
-> 1) invalidate the table ebtry of the 1st level(PUD)
-> 2) flush TLB by VMID
-> 3) install the new block entry to the 1st level(PUD)
-> 4) unmap the old PMD/PTE tables
+> Fixes: ee6268ba3a68 ("KVM: x86: Skip pae_root shadow allocation if tdp enabled")
+> Fixes: b6b80c78af83 ("KVM: x86/mmu: Allocate PAE root array when using SVM's 32-bit NPT")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+
+Reviewed-by: Ben Gardon <bgardon@google.com>
+
+> ---
+>  arch/x86/kvm/mmu/mmu.c | 44 ++++++++++++++++++++++++++++--------------
+>  1 file changed, 29 insertions(+), 15 deletions(-)
 >
-> The change ensures that period of entry in the 1st level(PUD) being invalid is
-> only in 1) and 2),
-> so if other vcpus access memory within 1G, there will be less chance to find the
-> entry invalid
-> and as a result trigger an unnecessary translation fault.
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index 0987cc1d53eb..2ed3fac1244e 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -3187,14 +3187,14 @@ void kvm_mmu_free_roots(struct kvm_vcpu *vcpu, struct kvm_mmu *mmu,
+>                 if (mmu->shadow_root_level >= PT64_ROOT_4LEVEL &&
+>                     (mmu->root_level >= PT64_ROOT_4LEVEL || mmu->direct_map)) {
+>                         mmu_free_root_page(kvm, &mmu->root_hpa, &invalid_list);
+> -               } else {
+> +               } else if (mmu->pae_root) {
+>                         for (i = 0; i < 4; ++i)
+>                                 if (mmu->pae_root[i] != 0)
 
-Thank you for the explanation, that was my understand of it also, and I believe
-your idea is correct. I was more concerned that I got some of the details wrong,
-and you have kindly corrected me below.
+I was about to comment on how weird this check is since pae_root can
+also be INVALID_PAGE but that case is handled in mmu_free_root_page...
+but then I realized that you're already addressing that problem in
+patch 7.
 
->>> Signed-off-by: Yanan Wang <wangyanan55@huawei.com>
->>> ---
->>>   arch/arm64/kvm/hyp/pgtable.c | 26 ++++++++++++--------------
->>>   1 file changed, 12 insertions(+), 14 deletions(-)
->>>
->>> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
->>> index 78a560446f80..308c36b9cd21 100644
->>> --- a/arch/arm64/kvm/hyp/pgtable.c
->>> +++ b/arch/arm64/kvm/hyp/pgtable.c
->>> @@ -434,6 +434,7 @@ struct stage2_map_data {
->>>       kvm_pte_t            attr;
->>>         kvm_pte_t            *anchor;
->>> +    kvm_pte_t            *follow;
->>>         struct kvm_s2_mmu        *mmu;
->>>       struct kvm_mmu_memory_cache    *memcache;
->>> @@ -553,15 +554,14 @@ static int stage2_map_walk_table_pre(u64 addr, u64 end,
->>> u32 level,
->>>       if (!kvm_block_mapping_supported(addr, end, data->phys, level))
->>>           return 0;
->>>   -    kvm_set_invalid_pte(ptep);
->>> -
->>>       /*
->>> -     * Invalidate the whole stage-2, as we may have numerous leaf
->>> -     * entries below us which would otherwise need invalidating
->>> -     * individually.
->>> +     * If we need to coalesce existing table entries into a block here,
->>> +     * then install the block entry first and the sub-level page mappings
->>> +     * will be unmapped later.
->>>        */
->>> -    kvm_call_hyp(__kvm_tlb_flush_vmid, data->mmu);
->>>       data->anchor = ptep;
->>> +    data->follow = kvm_pte_follow(*ptep);
->>> +    stage2_coalesce_tables_into_block(addr, level, ptep, data);
->> Here's how stage2_coalesce_tables_into_block() is implemented from the previous
->> patch (it might be worth merging it with this patch, I found it impossible to
->> judge if the function is correct without seeing how it is used and what is
->> replacing):
-> Ok, will do this if v2 is going to be post.
->> static void stage2_coalesce_tables_into_block(u64 addr, u32 level,
->>                            kvm_pte_t *ptep,
->>                            struct stage2_map_data *data)
->> {
->>      u64 granule = kvm_granule_size(level), phys = data->phys;
->>      kvm_pte_t new = kvm_init_valid_leaf_pte(phys, data->attr, level);
->>
->>      kvm_set_invalid_pte(ptep);
->>
->>      /*
->>       * Invalidate the whole stage-2, as we may have numerous leaf entries
->>       * below us which would otherwise need invalidating individually.
->>       */
->>      kvm_call_hyp(__kvm_tlb_flush_vmid, data->mmu);
->>      smp_store_release(ptep, new);
->>      data->phys += granule;
->> }
->>
->> This works because __kvm_pgtable_visit() saves the *ptep value before calling the
->> pre callback, and it visits the next level table based on the initial pte value,
->> not the new value written by stage2_coalesce_tables_into_block().
-> Right. So before replacing the initial pte value with the new value, we have to use
-> *data->follow = kvm_pte_follow(*ptep)* in stage2_map_walk_table_pre() to save
-> the initial pte value in advance. And data->follow will be used when  we start to
-> unmap the old sub-level tables later.
-
-Right, stage2_map_walk_table_post() will use data->follow to free the table page
-which is no longer needed because we've replaced the entire next level table with
-a block mapping.
-
->>
->> Assuming the first patch in the series is merged ("KVM: arm64: Move the clean of
->> dcache to the map handler"), this function is missing the CMOs from
->> stage2_map_walker_try_leaf().
-> Yes, the CMOs are not performed in stage2_coalesce_tables_into_block() currently,
-> because I thought they were not needed when we rebuild the block mappings from
-> normal page mappings.
-
-This assumes that the *only* situation when we replace a table entry with a block
-mapping is when the next level table (or tables) is *fully* populated. Is there a
-way to prove that this is true? I think it's important to prove it unequivocally,
-because if there's a corner case where this doesn't happen and we remove the
-dcache maintenance, we can end up with hard to reproduce and hard to diagnose
-errors in a guest.
-
+>                                         mmu_free_root_page(kvm,
+>                                                            &mmu->pae_root[i],
+>                                                            &invalid_list);
+> -                       mmu->root_hpa = INVALID_PAGE;
+>                 }
+> +               mmu->root_hpa = INVALID_PAGE;
+>                 mmu->root_pgd = 0;
+>         }
 >
-> At least, they are not needed if we rebuild the block mappings backed by hugetlbfs
-> pages, because we must have built the new block mappings for the first time before
-> and now need to rebuild them after they were split in dirty logging. Can we
-> agree on this?
-> Then let's see the following situation.
->> I can think of the following situation where they
->> are needed:
->>
->> 1. The 2nd level (PMD) table that will be turned into a block is mapped at stage 2
->> because one of the pages in the 3rd level (PTE) table it points to is accessed by
->> the guest.
->>
->> 2. The kernel decides to turn the userspace mapping into a transparent huge page
->> and calls the mmu notifier to remove the mapping from stage 2. The 2nd level table
->> is still valid.
-> I have a question here. Won't the PMD entry been invalidated too in this case?
-> If remove of the stage2 mapping by mmu notifier is an unmap operation of a range,
-> then it's correct and reasonable to both invalidate the PMD entry and free the
-> PTE table.
-> As I know, kvm_pgtable_stage2_unmap() does so when unmapping a range.
+> @@ -3306,9 +3306,23 @@ static int mmu_alloc_shadow_roots(struct kvm_vcpu *vcpu)
+>          * the shadow page table may be a PAE or a long mode page table.
+>          */
+>         pm_mask = PT_PRESENT_MASK;
+> -       if (vcpu->arch.mmu->shadow_root_level == PT64_ROOT_4LEVEL)
+> +       if (vcpu->arch.mmu->shadow_root_level == PT64_ROOT_4LEVEL) {
+>                 pm_mask |= PT_ACCESSED_MASK | PT_WRITABLE_MASK | PT_USER_MASK;
 >
-> And if I was right about this, we will not end up in
-> stage2_coalesce_tables_into_block()
-> like step 3 describes, but in stage2_map_walker_try_leaf() instead. Because the
-> PMD entry
-> is invalid, so KVM will create the new 2M block mapping.
-
-Looking at the code for stage2_unmap_walker(), I believe you are correct. After
-the entire PTE table has been unmapped, the function will mark the PMD entry as
-invalid. In the situation I described, at step 3 we would end up in the leaf
-mapper function because the PMD entry is invalid. My example was wrong.
-
+> +               /*
+> +                * Allocate the page for the PDPTEs when shadowing 32-bit NPT
+> +                * with 64-bit only when needed.  Unlike 32-bit NPT, it doesn't
+> +                * need to be in low mem.  See also lm_root below.
+> +                */
+> +               if (!vcpu->arch.mmu->pae_root) {
+> +                       WARN_ON_ONCE(!tdp_enabled);
+> +
+> +                       vcpu->arch.mmu->pae_root = (void *)get_zeroed_page(GFP_KERNEL_ACCOUNT);
+> +                       if (!vcpu->arch.mmu->pae_root)
+> +                               return -ENOMEM;
+> +               }
+> +       }
+> +
+>         for (i = 0; i < 4; ++i) {
+>                 MMU_WARN_ON(VALID_PAGE(vcpu->arch.mmu->pae_root[i]));
+>                 if (vcpu->arch.mmu->root_level == PT32E_ROOT_LEVEL) {
+> @@ -3331,21 +3345,19 @@ static int mmu_alloc_shadow_roots(struct kvm_vcpu *vcpu)
+>         vcpu->arch.mmu->root_hpa = __pa(vcpu->arch.mmu->pae_root);
 >
-> If I'm wrong about this, then I think this is a valid situation.
->> 3. Guest accesses a page which is not the page it accessed at step 1, which causes
->> a translation fault. KVM decides we can use a PMD block mapping to map the address
->> and we end up in stage2_coalesce_tables_into_block(). We need CMOs in this case
->> because the guest accesses memory it didn't access before.
->>
->> What do you think, is that a valid situation?
->>>       return 0;
->>>   }
->>>   @@ -614,20 +614,18 @@ static int stage2_map_walk_table_post(u64 addr, u64
->>> end, u32 level,
->>>                         kvm_pte_t *ptep,
->>>                         struct stage2_map_data *data)
->>>   {
->>> -    int ret = 0;
->>> -
->>>       if (!data->anchor)
->>>           return 0;
->>>   -    free_page((unsigned long)kvm_pte_follow(*ptep));
->>> -    put_page(virt_to_page(ptep));
->>> -
->>> -    if (data->anchor == ptep) {
->>> +    if (data->anchor != ptep) {
->>> +        free_page((unsigned long)kvm_pte_follow(*ptep));
->>> +        put_page(virt_to_page(ptep));
->>> +    } else {
->>> +        free_page((unsigned long)data->follow);
->>>           data->anchor = NULL;
->>> -        ret = stage2_map_walk_leaf(addr, end, level, ptep, data);
->> stage2_map_walk_leaf() -> stage2_map_walk_table_post calls put_page() and
->> get_page() once in our case (valid old mapping). It looks to me like we're missing
->> a put_page() call when the function is called for the anchor. Have you found the
->> call to be unnecessary?
-> Before this patch:
-> When we find data->anchor == ptep, put_page() has been called once in advance
-> for the anchor
-> in stage2_map_walk_table_post(). Then we call stage2_map_walk_leaf() ->
-> stage2_map_walker_try_leaf()
-> to install the block entry, and only get_page() will be called once in
-> stage2_map_walker_try_leaf().
-> There is a put_page() followed by a get_page() for the anchor, and there will
-> not be a problem about
-> page_counts.
-
-This is how I'm reading the code before your patch:
-
-- stage2_map_walk_table_post() returns early if there is no anchor.
-
-- stage2_map_walk_table_pre() sets the anchor and marks the entry as invalid. The
-entry was a table so the leaf visitor is not called in __kvm_pgtable_visit().
-
-- __kvm_pgtable_visit() visits the next level table.
-
-- stage2_map_walk_table_post() calls put_page(), calls stage2_map_walk_leaf() ->
-stage2_map_walker_try_leaf(). The old entry was invalidated by the pre visitor, so
-it only calls get_page() (and not put_page() + get_page().
-
-I agree with your conclusion, I didn't realize that because the pre visitor marks
-the entry as invalid, stage2_map_walker_try_leaf() will not call put_page().
-
+>         /*
+> -        * If we shadow a 32 bit page table with a long mode page
+> -        * table we enter this path.
+> +        * When shadowing 32-bit or PAE NPT with 64-bit NPT, the PML4 and PDP
+> +        * tables are allocated and initialized at MMU creation as there is no
+> +        * equivalent level in the guest's NPT to shadow.  Allocate the tables
+> +        * on demand, as running a 32-bit L1 VMM is very rare.  The PDP is
+> +        * handled above (to share logic with PAE), deal with the PML4 here.
+>          */
+>         if (vcpu->arch.mmu->shadow_root_level == PT64_ROOT_4LEVEL) {
+>                 if (vcpu->arch.mmu->lm_root == NULL) {
+> -                       /*
+> -                        * The additional page necessary for this is only
+> -                        * allocated on demand.
+> -                        */
+> -
+>                         u64 *lm_root;
 >
-> After this patch:
-> Before we find data->anchor == ptep and after it, there is not a put_page() call
-> for the anchor.
-> This is because that we didn't call get_page() either in
-> stage2_coalesce_tables_into_block() when
-> install the block entry. So I think there will not be a problem too.
-
-I agree, the refcount will be identical.
-
+>                         lm_root = (void*)get_zeroed_page(GFP_KERNEL_ACCOUNT);
+> -                       if (lm_root == NULL)
+> -                               return 1;
+> +                       if (!lm_root)
+> +                               return -ENOMEM;
 >
-> Is above the right answer for your point?
-
-Yes, thank you clearing that up for me.
-
-Thanks,
-
-Alex
-
->>>       }
->>>   -    return ret;
->>> +    return 0;
->> I think it's correct for this function to succeed unconditionally. The error was
->> coming from stage2_map_walk_leaf() -> stage2_map_walker_try_leaf(). The function
->> can return an error code if block mapping is not supported, which we know is
->> supported because we have an anchor, and if only the permissions are different
->> between the old and the new entry, but in our case we've changed both the valid
->> and type bits.
-> Agreed. Besides, we will definitely not end up updating an old valid entry for
-> the anchor
-> in stage2_map_walker_try_leaf(), because *anchor has already been invalidated in
-> stage2_map_walk_table_pre() before set the anchor, so it will look like a build
-> of new mapping.
+>                         lm_root[0] = __pa(vcpu->arch.mmu->pae_root) | pm_mask;
 >
-> Thanks,
+> @@ -5248,9 +5260,11 @@ static int __kvm_mmu_create(struct kvm_vcpu *vcpu, struct kvm_mmu *mmu)
+>          * while the PDP table is a per-vCPU construct that's allocated at MMU
+>          * creation.  When emulating 32-bit mode, cr3 is only 32 bits even on
+>          * x86_64.  Therefore we need to allocate the PDP table in the first
+> -        * 4GB of memory, which happens to fit the DMA32 zone.  Except for
+> -        * SVM's 32-bit NPT support, TDP paging doesn't use PAE paging and can
+> -        * skip allocating the PDP table.
+> +        * 4GB of memory, which happens to fit the DMA32 zone.  TDP paging
+> +        * generally doesn't use PAE paging and can skip allocating the PDP
+> +        * table.  The main exception, handled here, is SVM's 32-bit NPT.  The
+> +        * other exception is for shadowing L1's 32-bit or PAE NPT on 64-bit
+> +        * KVM; that horror is handled on-demand by mmu_alloc_shadow_roots().
+>          */
+>         if (tdp_enabled && kvm_mmu_get_tdp_level(vcpu) > PT32E_ROOT_LEVEL)
+>                 return 0;
+> --
+> 2.30.1.766.gb4fecdf3b7-goog
 >
-> Yanan
->> Thanks,
->>
->> Alex
->>
->>>   }
->>>     /*
->> .
