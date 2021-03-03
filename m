@@ -2,110 +2,326 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1235E32C6A1
-	for <lists+kvm@lfdr.de>; Thu,  4 Mar 2021 02:03:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1901332C6BD
+	for <lists+kvm@lfdr.de>; Thu,  4 Mar 2021 02:08:52 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1449257AbhCDA3l (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 3 Mar 2021 19:29:41 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44686 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236935AbhCCR1W (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 3 Mar 2021 12:27:22 -0500
-Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1DF9EC061762
-        for <kvm@vger.kernel.org>; Wed,  3 Mar 2021 09:26:13 -0800 (PST)
-Received: by mail-pl1-x632.google.com with SMTP id ba1so14428167plb.1
-        for <kvm@vger.kernel.org>; Wed, 03 Mar 2021 09:26:13 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=EK8LKNqmhy5x5LGHLejHKmLyx1MsPWviMZPTqKPSEvc=;
-        b=JAljs/qnOK5jykvYwB6CxVcKXYmcriiOHnXg+2p/0p+pr1G9jTezxPcXNnfUkuF0u6
-         K/gVGL85aHy4UOB9QVbFAJgBq9wGhyEJjMXDjn1Df1LlYWauOVLOuKG6nuERLGdqtrv2
-         2VBT4jEcYz4L1TaZTN0gkWkq9IXNMUX83aTipLspLO2xUxVy6SdyO2uxyzAIpx1W+Gjy
-         hmoD8h3c8uNaGjUMGQPyqOxkravbrA43rCMhX8jabm4CDuqT6Pxa3Y2c9CEAONqGI8fz
-         A0hibh7eoiujKp4rxdjoJ61sXj9OfgRvu0qgsZe2FwMJSkSBDC4DyZAVPen/txEjeohY
-         FE8A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=EK8LKNqmhy5x5LGHLejHKmLyx1MsPWviMZPTqKPSEvc=;
-        b=C5Utlppj+068yTfbHeczxJKJV1JTh3HOCGbNH4OW+GfjH8+C98FXZI7d+zg8VTfS7S
-         zG9GTCYi+yp/cTZ5hn0i+wcO2MigsaiKF9LF58Qipr/k+ptoHqYceBcCJ2HM5mZ10Wqz
-         PJJ/21hr0yTAGjRrS54iXBkuOyrsOAB9UaJYjI/B5VHxm19TSIgNy20fPyDVEbnL9b3X
-         asi/h8FIU6uGVhKAMxzyBJ1fA+UuvpTk7VNXsYkbZLXBFG/pfCkDq5vxGeLBlnmFnS24
-         exc2Oz3AwFcaXn4TcfmiarZXgjixWJ/RxoFhC5u+qQptIedlVvz4LwAkI1pjLbfak3Yk
-         6C8A==
-X-Gm-Message-State: AOAM533o+5A6y/SsG22OYfmWO5TRDVekUeXcnaSd0DjxuMYh+/vRU/Za
-        F5FDA/Cdo2sPJrmR2HfMyWU1JQ==
-X-Google-Smtp-Source: ABdhPJzelju/P4Sadau5toHeUSN3iJ90+g+CrjUu7odQYNHUelH7VSCksC5Fy/t8qpf0EFPUkGkJWg==
-X-Received: by 2002:a17:902:f68c:b029:e5:ca30:8657 with SMTP id l12-20020a170902f68cb02900e5ca308657mr251635plg.78.1614792372514;
-        Wed, 03 Mar 2021 09:26:12 -0800 (PST)
-Received: from google.com ([2620:15c:f:10:805d:6324:3372:6183])
-        by smtp.gmail.com with ESMTPSA id v26sm24500719pff.195.2021.03.03.09.26.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 03 Mar 2021 09:26:11 -0800 (PST)
-Date:   Wed, 3 Mar 2021 09:26:05 -0800
-From:   Sean Christopherson <seanjc@google.com>
-To:     Like Xu <like.xu@linux.intel.com>
-Cc:     Peter Zijlstra <peterz@infradead.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Kan Liang <kan.liang@linux.intel.com>,
-        Dave Hansen <dave.hansen@intel.com>, wei.w.wang@intel.com,
-        Borislav Petkov <bp@alien8.de>, kvm@vger.kernel.org,
-        x86@kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 7/9] KVM: vmx/pmu: Add Arch LBR emulation and its VMCS
- field
-Message-ID: <YD/GrQAl1NMPHXFj@google.com>
-References: <20210303135756.1546253-1-like.xu@linux.intel.com>
- <20210303135756.1546253-8-like.xu@linux.intel.com>
+        id S1451101AbhCDA34 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 3 Mar 2021 19:29:56 -0500
+Received: from foss.arm.com ([217.140.110.172]:53326 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S236672AbhCCRjp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 3 Mar 2021 12:39:45 -0500
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 061811FB;
+        Wed,  3 Mar 2021 09:26:49 -0800 (PST)
+Received: from [192.168.0.110] (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 3283A3F7D7;
+        Wed,  3 Mar 2021 09:26:47 -0800 (PST)
+Subject: Re: [RFC PATCH 3/4] KVM: arm64: Install the block entry before
+ unmapping the page mappings
+To:     "wangyanan (Y)" <wangyanan55@huawei.com>
+Cc:     Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Quentin Perret <qperret@google.com>,
+        Gavin Shan <gshan@redhat.com>, kvmarm@lists.cs.columbia.edu,
+        linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20210208112250.163568-1-wangyanan55@huawei.com>
+ <20210208112250.163568-4-wangyanan55@huawei.com>
+ <33a9999e-2cc5-52ca-3da8-38f7e7702529@arm.com>
+ <93c13a04-6fcc-7544-d6ed-2ebb81d209fe@huawei.com>
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+Message-ID: <1b8be8a3-2fb9-be8a-a052-44872355f8cb@arm.com>
+Date:   Wed, 3 Mar 2021 17:27:05 +0000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210303135756.1546253-8-like.xu@linux.intel.com>
+In-Reply-To: <93c13a04-6fcc-7544-d6ed-2ebb81d209fe@huawei.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Mar 03, 2021, Like Xu wrote:
-> New VMX controls bits for Arch LBR are added. When bit 21 in vmentry_ctrl
-> is set, VM entry will write the value from the "Guest IA32_LBR_CTL" guest
-> state field to IA32_LBR_CTL. When bit 26 in vmexit_ctrl is set, VM exit
-> will clear IA32_LBR_CTL after the value has been saved to the "Guest
-> IA32_LBR_CTL" guest state field.
+Hi Yanan,
 
-...
+On 3/3/21 11:04 AM, wangyanan (Y) wrote:
+> Hi Alex,
+>
+> On 2021/3/3 1:13, Alexandru Elisei wrote:
+>> Hello,
+>>
+>> On 2/8/21 11:22 AM, Yanan Wang wrote:
+>>> When KVM needs to coalesce the normal page mappings into a block mapping,
+>>> we currently invalidate the old table entry first followed by invalidation
+>>> of TLB, then unmap the page mappings, and install the block entry at last.
+>>>
+>>> It will cost a long time to unmap the numerous page mappings, which means
+>>> there will be a long period when the table entry can be found invalid.
+>>> If other vCPUs access any guest page within the block range and find the
+>>> table entry invalid, they will all exit from guest with a translation fault
+>>> which is not necessary. And KVM will make efforts to handle these faults,
+>>> especially when performing CMOs by block range.
+>>>
+>>> So let's quickly install the block entry at first to ensure uninterrupted
+>>> memory access of the other vCPUs, and then unmap the page mappings after
+>>> installation. This will reduce most of the time when the table entry is
+>>> invalid, and avoid most of the unnecessary translation faults.
+>> I'm not convinced I've fully understood what is going on yet, but it seems to me
+>> that the idea is sound. Some questions and comments below.
+> What I am trying to do in this patch is to adjust the order of rebuilding block
+> mappings from page mappings.
+> Take the rebuilding of 1G block mappings as an example.
+> Before this patch, the order is like:
+> 1) invalidate the table entry of the 1st level(PUD)
+> 2) flush TLB by VMID
+> 3) unmap the old PMD/PTE tables
+> 4) install the new block entry to the 1st level(PUD)
+>
+> So entry in the 1st level can be found invalid by other vcpus in 1), 2), and 3),
+> and it's a long time in 3) to unmap
+> the numerous old PMD/PTE tables, which means the total time of the entry being
+> invalid is long enough to
+> affect the performance.
+>
+> After this patch, the order is like:
+> 1) invalidate the table ebtry of the 1st level(PUD)
+> 2) flush TLB by VMID
+> 3) install the new block entry to the 1st level(PUD)
+> 4) unmap the old PMD/PTE tables
+>
+> The change ensures that period of entry in the 1st level(PUD) being invalid is
+> only in 1) and 2),
+> so if other vcpus access memory within 1G, there will be less chance to find the
+> entry invalid
+> and as a result trigger an unnecessary translation fault.
 
-> @@ -2529,7 +2532,8 @@ static __init int setup_vmcs_config(struct vmcs_config *vmcs_conf,
->  	      VM_EXIT_LOAD_IA32_EFER |
->  	      VM_EXIT_CLEAR_BNDCFGS |
->  	      VM_EXIT_PT_CONCEAL_PIP |
-> -	      VM_EXIT_CLEAR_IA32_RTIT_CTL;
-> +	      VM_EXIT_CLEAR_IA32_RTIT_CTL |
-> +	      VM_EXIT_CLEAR_IA32_LBR_CTL;
+Thank you for the explanation, that was my understand of it also, and I believe
+your idea is correct. I was more concerned that I got some of the details wrong,
+and you have kindly corrected me below.
 
-So, how does MSR_ARCH_LBR_CTL get restored on the host?  What if the host wants
-to keep _its_ LBR recording active while the guest is running?
+>>> Signed-off-by: Yanan Wang <wangyanan55@huawei.com>
+>>> ---
+>>>   arch/arm64/kvm/hyp/pgtable.c | 26 ++++++++++++--------------
+>>>   1 file changed, 12 insertions(+), 14 deletions(-)
+>>>
+>>> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+>>> index 78a560446f80..308c36b9cd21 100644
+>>> --- a/arch/arm64/kvm/hyp/pgtable.c
+>>> +++ b/arch/arm64/kvm/hyp/pgtable.c
+>>> @@ -434,6 +434,7 @@ struct stage2_map_data {
+>>>       kvm_pte_t            attr;
+>>>         kvm_pte_t            *anchor;
+>>> +    kvm_pte_t            *follow;
+>>>         struct kvm_s2_mmu        *mmu;
+>>>       struct kvm_mmu_memory_cache    *memcache;
+>>> @@ -553,15 +554,14 @@ static int stage2_map_walk_table_pre(u64 addr, u64 end,
+>>> u32 level,
+>>>       if (!kvm_block_mapping_supported(addr, end, data->phys, level))
+>>>           return 0;
+>>>   -    kvm_set_invalid_pte(ptep);
+>>> -
+>>>       /*
+>>> -     * Invalidate the whole stage-2, as we may have numerous leaf
+>>> -     * entries below us which would otherwise need invalidating
+>>> -     * individually.
+>>> +     * If we need to coalesce existing table entries into a block here,
+>>> +     * then install the block entry first and the sub-level page mappings
+>>> +     * will be unmapped later.
+>>>        */
+>>> -    kvm_call_hyp(__kvm_tlb_flush_vmid, data->mmu);
+>>>       data->anchor = ptep;
+>>> +    data->follow = kvm_pte_follow(*ptep);
+>>> +    stage2_coalesce_tables_into_block(addr, level, ptep, data);
+>> Here's how stage2_coalesce_tables_into_block() is implemented from the previous
+>> patch (it might be worth merging it with this patch, I found it impossible to
+>> judge if the function is correct without seeing how it is used and what is
+>> replacing):
+> Ok, will do this if v2 is going to be post.
+>> static void stage2_coalesce_tables_into_block(u64 addr, u32 level,
+>>                            kvm_pte_t *ptep,
+>>                            struct stage2_map_data *data)
+>> {
+>>      u64 granule = kvm_granule_size(level), phys = data->phys;
+>>      kvm_pte_t new = kvm_init_valid_leaf_pte(phys, data->attr, level);
+>>
+>>      kvm_set_invalid_pte(ptep);
+>>
+>>      /*
+>>       * Invalidate the whole stage-2, as we may have numerous leaf entries
+>>       * below us which would otherwise need invalidating individually.
+>>       */
+>>      kvm_call_hyp(__kvm_tlb_flush_vmid, data->mmu);
+>>      smp_store_release(ptep, new);
+>>      data->phys += granule;
+>> }
+>>
+>> This works because __kvm_pgtable_visit() saves the *ptep value before calling the
+>> pre callback, and it visits the next level table based on the initial pte value,
+>> not the new value written by stage2_coalesce_tables_into_block().
+> Right. So before replacing the initial pte value with the new value, we have to use
+> *data->follow = kvm_pte_follow(*ptep)* in stage2_map_walk_table_pre() to save
+> the initial pte value in advance. And data->follow will be used when  we start to
+> unmap the old sub-level tables later.
 
->  	if (adjust_vmx_controls(min, opt, MSR_IA32_VMX_EXIT_CTLS,
->  				&_vmexit_control) < 0)
->  		return -EIO;
-> @@ -2553,7 +2557,8 @@ static __init int setup_vmcs_config(struct vmcs_config *vmcs_conf,
->  	      VM_ENTRY_LOAD_IA32_EFER |
->  	      VM_ENTRY_LOAD_BNDCFGS |
->  	      VM_ENTRY_PT_CONCEAL_PIP |
-> -	      VM_ENTRY_LOAD_IA32_RTIT_CTL;
-> +	      VM_ENTRY_LOAD_IA32_RTIT_CTL |
-> +	      VM_ENTRY_LOAD_IA32_LBR_CTL;
->  	if (adjust_vmx_controls(min, opt, MSR_IA32_VMX_ENTRY_CTLS,
->  				&_vmentry_control) < 0)
->  		return -EIO;
-> -- 
-> 2.29.2
-> 
+Right, stage2_map_walk_table_post() will use data->follow to free the table page
+which is no longer needed because we've replaced the entire next level table with
+a block mapping.
+
+>>
+>> Assuming the first patch in the series is merged ("KVM: arm64: Move the clean of
+>> dcache to the map handler"), this function is missing the CMOs from
+>> stage2_map_walker_try_leaf().
+> Yes, the CMOs are not performed in stage2_coalesce_tables_into_block() currently,
+> because I thought they were not needed when we rebuild the block mappings from
+> normal page mappings.
+
+This assumes that the *only* situation when we replace a table entry with a block
+mapping is when the next level table (or tables) is *fully* populated. Is there a
+way to prove that this is true? I think it's important to prove it unequivocally,
+because if there's a corner case where this doesn't happen and we remove the
+dcache maintenance, we can end up with hard to reproduce and hard to diagnose
+errors in a guest.
+
+>
+> At least, they are not needed if we rebuild the block mappings backed by hugetlbfs
+> pages, because we must have built the new block mappings for the first time before
+> and now need to rebuild them after they were split in dirty logging. Can we
+> agree on this?
+> Then let's see the following situation.
+>> I can think of the following situation where they
+>> are needed:
+>>
+>> 1. The 2nd level (PMD) table that will be turned into a block is mapped at stage 2
+>> because one of the pages in the 3rd level (PTE) table it points to is accessed by
+>> the guest.
+>>
+>> 2. The kernel decides to turn the userspace mapping into a transparent huge page
+>> and calls the mmu notifier to remove the mapping from stage 2. The 2nd level table
+>> is still valid.
+> I have a question here. Won't the PMD entry been invalidated too in this case?
+> If remove of the stage2 mapping by mmu notifier is an unmap operation of a range,
+> then it's correct and reasonable to both invalidate the PMD entry and free the
+> PTE table.
+> As I know, kvm_pgtable_stage2_unmap() does so when unmapping a range.
+>
+> And if I was right about this, we will not end up in
+> stage2_coalesce_tables_into_block()
+> like step 3 describes, but in stage2_map_walker_try_leaf() instead. Because the
+> PMD entry
+> is invalid, so KVM will create the new 2M block mapping.
+
+Looking at the code for stage2_unmap_walker(), I believe you are correct. After
+the entire PTE table has been unmapped, the function will mark the PMD entry as
+invalid. In the situation I described, at step 3 we would end up in the leaf
+mapper function because the PMD entry is invalid. My example was wrong.
+
+>
+> If I'm wrong about this, then I think this is a valid situation.
+>> 3. Guest accesses a page which is not the page it accessed at step 1, which causes
+>> a translation fault. KVM decides we can use a PMD block mapping to map the address
+>> and we end up in stage2_coalesce_tables_into_block(). We need CMOs in this case
+>> because the guest accesses memory it didn't access before.
+>>
+>> What do you think, is that a valid situation?
+>>>       return 0;
+>>>   }
+>>>   @@ -614,20 +614,18 @@ static int stage2_map_walk_table_post(u64 addr, u64
+>>> end, u32 level,
+>>>                         kvm_pte_t *ptep,
+>>>                         struct stage2_map_data *data)
+>>>   {
+>>> -    int ret = 0;
+>>> -
+>>>       if (!data->anchor)
+>>>           return 0;
+>>>   -    free_page((unsigned long)kvm_pte_follow(*ptep));
+>>> -    put_page(virt_to_page(ptep));
+>>> -
+>>> -    if (data->anchor == ptep) {
+>>> +    if (data->anchor != ptep) {
+>>> +        free_page((unsigned long)kvm_pte_follow(*ptep));
+>>> +        put_page(virt_to_page(ptep));
+>>> +    } else {
+>>> +        free_page((unsigned long)data->follow);
+>>>           data->anchor = NULL;
+>>> -        ret = stage2_map_walk_leaf(addr, end, level, ptep, data);
+>> stage2_map_walk_leaf() -> stage2_map_walk_table_post calls put_page() and
+>> get_page() once in our case (valid old mapping). It looks to me like we're missing
+>> a put_page() call when the function is called for the anchor. Have you found the
+>> call to be unnecessary?
+> Before this patch:
+> When we find data->anchor == ptep, put_page() has been called once in advance
+> for the anchor
+> in stage2_map_walk_table_post(). Then we call stage2_map_walk_leaf() ->
+> stage2_map_walker_try_leaf()
+> to install the block entry, and only get_page() will be called once in
+> stage2_map_walker_try_leaf().
+> There is a put_page() followed by a get_page() for the anchor, and there will
+> not be a problem about
+> page_counts.
+
+This is how I'm reading the code before your patch:
+
+- stage2_map_walk_table_post() returns early if there is no anchor.
+
+- stage2_map_walk_table_pre() sets the anchor and marks the entry as invalid. The
+entry was a table so the leaf visitor is not called in __kvm_pgtable_visit().
+
+- __kvm_pgtable_visit() visits the next level table.
+
+- stage2_map_walk_table_post() calls put_page(), calls stage2_map_walk_leaf() ->
+stage2_map_walker_try_leaf(). The old entry was invalidated by the pre visitor, so
+it only calls get_page() (and not put_page() + get_page().
+
+I agree with your conclusion, I didn't realize that because the pre visitor marks
+the entry as invalid, stage2_map_walker_try_leaf() will not call put_page().
+
+>
+> After this patch:
+> Before we find data->anchor == ptep and after it, there is not a put_page() call
+> for the anchor.
+> This is because that we didn't call get_page() either in
+> stage2_coalesce_tables_into_block() when
+> install the block entry. So I think there will not be a problem too.
+
+I agree, the refcount will be identical.
+
+>
+> Is above the right answer for your point?
+
+Yes, thank you clearing that up for me.
+
+Thanks,
+
+Alex
+
+>>>       }
+>>>   -    return ret;
+>>> +    return 0;
+>> I think it's correct for this function to succeed unconditionally. The error was
+>> coming from stage2_map_walk_leaf() -> stage2_map_walker_try_leaf(). The function
+>> can return an error code if block mapping is not supported, which we know is
+>> supported because we have an anchor, and if only the permissions are different
+>> between the old and the new entry, but in our case we've changed both the valid
+>> and type bits.
+> Agreed. Besides, we will definitely not end up updating an old valid entry for
+> the anchor
+> in stage2_map_walker_try_leaf(), because *anchor has already been invalidated in
+> stage2_map_walk_table_pre() before set the anchor, so it will look like a build
+> of new mapping.
+>
+> Thanks,
+>
+> Yanan
+>> Thanks,
+>>
+>> Alex
+>>
+>>>   }
+>>>     /*
+>> .
