@@ -2,88 +2,170 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 25E5D32C67E
-	for <lists+kvm@lfdr.de>; Thu,  4 Mar 2021 02:03:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 92F1732C682
+	for <lists+kvm@lfdr.de>; Thu,  4 Mar 2021 02:03:04 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346608AbhCDA3C (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 3 Mar 2021 19:29:02 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57080 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235214AbhCCQOO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 3 Mar 2021 11:14:14 -0500
-Received: from mail-pg1-x534.google.com (mail-pg1-x534.google.com [IPv6:2607:f8b0:4864:20::534])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 41EEEC061763
-        for <kvm@vger.kernel.org>; Wed,  3 Mar 2021 08:12:51 -0800 (PST)
-Received: by mail-pg1-x534.google.com with SMTP id a4so16692271pgc.11
-        for <kvm@vger.kernel.org>; Wed, 03 Mar 2021 08:12:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=EisZFm35+8e+0b6JeFIJMc+sANT14O3XGJM3zZNvXm8=;
-        b=jUmj2smBpZsXvifuyxVYJboGtMm1xO2UtgvXTmvnCmSSKvTwo/EKkkHVjYDsSG6ttR
-         NzlRAump7IiQ6FYc1uPeNRURlWsnma/Xg15D0NSgIuDzjHfaqdRcA7ZhMZdnKtCdyvAX
-         QDKQYeAgHNgKaKL1Y4UWKdHMtlROaTD3glYqydOoOGsX3MB7yyK8jXVB4lW5+VrEMFeR
-         D2IvoOIc1oPdV9bj/xnY/9ICgMInrLUdaDk+GhYPVdTkhHDuZ+KsSqSG3eE3mIEhfcu3
-         UxvKXFdc/BYrv1YwUD17vRDrA9km95C8AdHW/TnFaHIAt/FNXIdfHCXPZo1GlHSETye9
-         pA4g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=EisZFm35+8e+0b6JeFIJMc+sANT14O3XGJM3zZNvXm8=;
-        b=tom/69p21hcGwO9U7yhvAR34yLjdkWRsIZu5se2pvtX6GXrs3Ea2oSftqbEqxwNCSz
-         QA8MUizvqBMWRO5BHmfYnjjwmo4YU0Bx2RE/7bPW8r8NIdWm0ebD79L2NgLEO6XnElVe
-         gXVA2xfaYUu47DNslbCF6Q4fsMf6q5W1EyVqJBTb4jvkMZfHD0h7hliTiMnjipfhKE2l
-         u7ufitmDGMXX89qV2Vcu6Sg8I/Izwd0g5Zsf+iQszbIAx4TDSuE2kL/YlrFhAMgwG48z
-         jqYX0TMOiUDpfgh+5FZF6cCqCm2xMD1jCa7KkaovHevDwwT8r7LwSCjf6r+D0vqMuidA
-         i02g==
-X-Gm-Message-State: AOAM533t4Y3WdDo0xjNhf5lf7gG7CuaB4kN2AEB6qOgK6etRjBllF4Pa
-        /l751itAN2GFlckCihvbGMhlAg==
-X-Google-Smtp-Source: ABdhPJz3833pVMK+aWptujeWmaFB/J5T3c+Qp17/0zz4d5NXW9fnQr2lxBo8ueyvHWT7NpjxP0CsHQ==
-X-Received: by 2002:a05:6a00:16cd:b029:1c9:6f5b:3d8c with SMTP id l13-20020a056a0016cdb02901c96f5b3d8cmr8820239pfc.1.1614787970619;
-        Wed, 03 Mar 2021 08:12:50 -0800 (PST)
-Received: from google.com ([2620:15c:f:10:805d:6324:3372:6183])
-        by smtp.gmail.com with ESMTPSA id n184sm15584962pfd.205.2021.03.03.08.12.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 03 Mar 2021 08:12:49 -0800 (PST)
-Date:   Wed, 3 Mar 2021 08:12:43 -0800
-From:   Sean Christopherson <seanjc@google.com>
-To:     Wanpeng Li <kernellwp@gmail.com>
-Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>
-Subject: Re: [PATCH] KVM: LAPIC: Advancing the timer expiration on guest
- initiated write
-Message-ID: <YD+1e1iLyKKWL8FX@google.com>
-References: <1614678202-10808-1-git-send-email-wanpengli@tencent.com>
- <YD5y+W2nqnZt5bRZ@google.com>
- <CANRm+Cy_rNAai+u5pyBXKmQP_Qp=3e_hwi2g9bAFMiocCpru1A@mail.gmail.com>
+        id S1355483AbhCDA3E (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 3 Mar 2021 19:29:04 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:29752 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S236789AbhCCQQH (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 3 Mar 2021 11:16:07 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1614788010;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=mR2GOi2FNIrVfv98gRpeDM1tQAE4p1dBKYW2oWaAOSM=;
+        b=W/Xsex+beKEbEvN4wF0XSD2KbRWHqyhPvLhyXWV5rS0tz9qfjkMBpgBpmcSd61fzK2pPIW
+        IAykMUgleBJdgpd266lSYDtndUWwY015jCWcYEQDsu6bYvXjwIr9rNwqx+9AwDemrKcAwa
+        EOksf+x82NPZujdj5+sPgx/l0QBkwIs=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-465-4L_pqj9jN36uaJbLMPfllg-1; Wed, 03 Mar 2021 11:13:28 -0500
+X-MC-Unique: 4L_pqj9jN36uaJbLMPfllg-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0F70E800D53;
+        Wed,  3 Mar 2021 16:13:27 +0000 (UTC)
+Received: from MiWiFi-RA69-srv (unknown [10.40.208.37])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 0B22C189CE;
+        Wed,  3 Mar 2021 16:13:15 +0000 (UTC)
+Date:   Wed, 3 Mar 2021 17:13:14 +0100
+From:   Igor Mammedov <imammedo@redhat.com>
+To:     David Hildenbrand <david@redhat.com>
+Cc:     qemu-devel@nongnu.org, Thomas Huth <thuth@redhat.com>,
+        kvm@vger.kernel.org, Cornelia Huck <cohuck@redhat.com>,
+        Peter Xu <peterx@redhat.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        qemu-s390x@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Richard Henderson <rth@twiddle.net>
+Subject: Re: [PATCH v1 1/2] s390x/kvm: Get rid of legacy_s390_alloc()
+Message-ID: <20210303171314.7a24b29e@MiWiFi-RA69-srv>
+In-Reply-To: <20210303130916.22553-2-david@redhat.com>
+References: <20210303130916.22553-1-david@redhat.com>
+        <20210303130916.22553-2-david@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CANRm+Cy_rNAai+u5pyBXKmQP_Qp=3e_hwi2g9bAFMiocCpru1A@mail.gmail.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Mar 03, 2021, Wanpeng Li wrote:
-> > Side topic, I think there's a theoretical bug where KVM could inject a spurious
-> > timer interrupt.  If KVM is using hrtimer, the hrtimer expires early due to an
-> > overzealous timer_advance_ns, and the guest writes MSR_TSCDEADLINE after the
-> > hrtimer expires but before the vCPU is kicked, then KVM will inject a spurious
-> > timer IRQ since the premature expiration should have been canceled by the guest's
-> > WRMSR.
-> >
-> > It could also cause KVM to soft hang the guest if the new lapic_timer.tscdeadline
-> > is written before apic_timer_expired() captures it in expired_tscdeadline.  In
-> > that case, KVM will wait for the new deadline, which could be far in the future.
-> 
-> The hrtimer_cancel() before setting new lapic_timer.tscdeadline in
-> kvm_set_lapic_tscdeadline_msr() will wait for the hrtimer callback
-> function to finish. Could it solve this issue?
+On Wed,  3 Mar 2021 14:09:15 +0100
+David Hildenbrand <david@redhat.com> wrote:
 
-Aha!  Yep, that prevents my theoretical bug.  Thanks!
+> legacy_s390_alloc() was required for dealing with the absence of the ESOP
+> feature -- on old HW (< gen 10) and old z/VM versions (< 6.3).
+> 
+> As z/VM v6.2 (and even v6.3) is no longer supported since 2017 [1]
+> and we don't expect to have real users on such old hardware, let's drop
+> legacy_s390_alloc().
+> 
+> Still check+report an error just in case someone still runs on
+> such old z/VM environments, or someone runs under weird nested KVM
+> setups (where we can manually disable ESOP via the CPU model).
+> 
+> No need to check for KVM_CAP_GMAP - that should always be around on
+> kernels that also have KVM_CAP_DEVICE_CTRL (>= v3.15).
+> 
+> [1] https://www.ibm.com/support/lifecycle/search?q=z%2FVM
+> 
+> Suggested-by: Cornelia Huck <cohuck@redhat.com>
+> Suggested-by: Thomas Huth <thuth@redhat.com>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: Richard Henderson <rth@twiddle.net>
+> Cc: Halil Pasic <pasic@linux.ibm.com>
+> Cc: Cornelia Huck <cohuck@redhat.com>
+> Cc: Christian Borntraeger <borntraeger@de.ibm.com>
+> Cc: Thomas Huth <thuth@redhat.com>
+> Cc: Igor Mammedov <imammedo@redhat.com>
+> Cc: Peter Xu <peterx@redhat.com>
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+
+> ---
+>  target/s390x/kvm.c | 43 +++++--------------------------------------
+>  1 file changed, 5 insertions(+), 38 deletions(-)
+> 
+> diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
+> index 7a892d663d..84b40572f2 100644
+> --- a/target/s390x/kvm.c
+> +++ b/target/s390x/kvm.c
+> @@ -161,8 +161,6 @@ static int cap_protected;
+>  
+>  static int active_cmma;
+>  
+> -static void *legacy_s390_alloc(size_t size, uint64_t *align, bool shared);
+> -
+>  static int kvm_s390_query_mem_limit(uint64_t *memory_limit)
+>  {
+>      struct kvm_device_attr attr = {
+> @@ -349,6 +347,11 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
+>                       "please use kernel 3.15 or newer");
+>          return -1;
+>      }
+> +    if (!kvm_check_extension(s, KVM_CAP_S390_COW)) {
+> +        error_report("KVM is missing capability KVM_CAP_S390_COW - "
+> +                     "unsupported environment");
+> +        return -1;
+> +    }
+>  
+>      cap_sync_regs = kvm_check_extension(s, KVM_CAP_SYNC_REGS);
+>      cap_async_pf = kvm_check_extension(s, KVM_CAP_ASYNC_PF);
+> @@ -357,11 +360,6 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
+>      cap_vcpu_resets = kvm_check_extension(s, KVM_CAP_S390_VCPU_RESETS);
+>      cap_protected = kvm_check_extension(s, KVM_CAP_S390_PROTECTED);
+>  
+> -    if (!kvm_check_extension(s, KVM_CAP_S390_GMAP)
+> -        || !kvm_check_extension(s, KVM_CAP_S390_COW)) {
+> -        phys_mem_set_alloc(legacy_s390_alloc);
+> -    }
+> -
+>      kvm_vm_enable_cap(s, KVM_CAP_S390_USER_SIGP, 0);
+>      kvm_vm_enable_cap(s, KVM_CAP_S390_VECTOR_REGISTERS, 0);
+>      kvm_vm_enable_cap(s, KVM_CAP_S390_USER_STSI, 0);
+> @@ -889,37 +887,6 @@ int kvm_s390_mem_op_pv(S390CPU *cpu, uint64_t offset, void *hostbuf,
+>      return ret;
+>  }
+>  
+> -/*
+> - * Legacy layout for s390:
+> - * Older S390 KVM requires the topmost vma of the RAM to be
+> - * smaller than an system defined value, which is at least 256GB.
+> - * Larger systems have larger values. We put the guest between
+> - * the end of data segment (system break) and this value. We
+> - * use 32GB as a base to have enough room for the system break
+> - * to grow. We also have to use MAP parameters that avoid
+> - * read-only mapping of guest pages.
+> - */
+> -static void *legacy_s390_alloc(size_t size, uint64_t *align, bool shared)
+> -{
+> -    static void *mem;
+> -
+> -    if (mem) {
+> -        /* we only support one allocation, which is enough for initial ram */
+> -        return NULL;
+> -    }
+> -
+> -    mem = mmap((void *) 0x800000000ULL, size,
+> -               PROT_EXEC|PROT_READ|PROT_WRITE,
+> -               MAP_SHARED | MAP_ANONYMOUS | MAP_FIXED, -1, 0);
+> -    if (mem == MAP_FAILED) {
+> -        mem = NULL;
+> -    }
+> -    if (mem && align) {
+> -        *align = QEMU_VMALLOC_ALIGN;
+> -    }
+> -    return mem;
+> -}
+> -
+>  static uint8_t const *sw_bp_inst;
+>  static uint8_t sw_bp_ilen;
+>  
+
