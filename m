@@ -2,52 +2,52 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7A3DA32C6C9
-	for <lists+kvm@lfdr.de>; Thu,  4 Mar 2021 02:08:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id ABC9F32C6D2
+	for <lists+kvm@lfdr.de>; Thu,  4 Mar 2021 02:09:01 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1451105AbhCDA37 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 3 Mar 2021 19:29:59 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52342 "EHLO
+        id S231915AbhCDAaH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 3 Mar 2021 19:30:07 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52664 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1835188AbhCCSCd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 3 Mar 2021 13:02:33 -0500
-Received: from mail-pl1-x633.google.com (mail-pl1-x633.google.com [IPv6:2607:f8b0:4864:20::633])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 69A10C061756
-        for <kvm@vger.kernel.org>; Wed,  3 Mar 2021 10:01:51 -0800 (PST)
-Received: by mail-pl1-x633.google.com with SMTP id c16so4998272ply.0
-        for <kvm@vger.kernel.org>; Wed, 03 Mar 2021 10:01:51 -0800 (PST)
+        with ESMTP id S1835542AbhCCSEC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 3 Mar 2021 13:04:02 -0500
+Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A9B90C061756
+        for <kvm@vger.kernel.org>; Wed,  3 Mar 2021 10:03:21 -0800 (PST)
+Received: by mail-pj1-x102d.google.com with SMTP id l18so4833382pji.3
+        for <kvm@vger.kernel.org>; Wed, 03 Mar 2021 10:03:21 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=fN9kN40P4Zb0ukn4Ugrf+KcpYX4t7X0lCi/CEaratbo=;
-        b=HR9HE4CMDqeLv5C4sWclwl7s5hfMoIrfjNf3jN8ZfWfTFiDoND8rTi8dzYei7fRnnG
-         8CEI8u1jdw+BLbKMKrzcydeZ8f3J+72cdzt8W1IMx1C14U5S4QoCBC0kf894CuFZQ/cW
-         e8ajp6S0OR4owY2zjwEKJvEMcq5VIWPKu6lwc3O1ewxsbct508b2NSMNjdofJQfRa/At
-         FignDJwRpKNgc8QOw/06M9O7ZSRUo1ou6O6ktmu4veCYeAgpJxEaKMID+hmPbDst8M32
-         h2iy5nEEA6V/T0ZY+PwDEBsW39qZkrIQwka+beRRpY34dEvprsIPGrg685z+N60f1Q1U
-         tIWg==
+        bh=EZB5FybRq8qQJzZjsg9RL1K43u6gdJrGvoqJbzpIOAc=;
+        b=GANJnuzl+xBpfT33zHPOMsOvR4RJflbUT9Y3LNZuctKjFTjUKxQA6YNZvB4c6Xne5G
+         vkxjkIekkM16DqdyPX/NsuPeYd7KifCT2H+A8XrcrhCFNsqHdknBoF4WZ+WNk4Iu3Xu5
+         bBHePIEy5bQJCY3cJRWdCR/TVHQ2pScActYFZkMeddBokyRgcMrmVt4DCIyWSpil43qd
+         y0q86WeM6INR09Nb9hJZO8a2htWJdfz96mcoMAT7a9zfikwQy3sU3/bxnhqDEifKo2Xk
+         W6VGP9eoc6QaQiD1qVmJzQD5UHb7mnGLuG/4Fr8FEO62N0qZaLK6y7GqpR/gffalUEc/
+         Ql3A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=fN9kN40P4Zb0ukn4Ugrf+KcpYX4t7X0lCi/CEaratbo=;
-        b=OGLIUrUAgcKuvS7al5PRCPAIRgueQTiIjGffnuQhtmj2NQ/SFD4nq+g4M2Ztruf/LP
-         /U9Gqlp1Uc3d1b0+9gupTvBmGOE3L/8IcuSmJmiZNUR7N4FkRO9APV2YfvnxRnqoE+6a
-         RFiRvydBJTUl+02PYiGGzneoCyHg0XVJnQQ1lCWOQ+4Q6HiJXLw0kXLnxifDudidX03v
-         /DNkXTQ/8yZv2a1iyJGxI2FfZXTN5CgOte236sZVE2ptFYEAzalYyvR8UxXx4RU8mSnL
-         jPNmr8ky+m5tz64KE7vBUHjxVnVicF06a97anguwlivBWlsFc+G4Wx8gj1QP1wUs8JkZ
-         qicQ==
-X-Gm-Message-State: AOAM532H9bEnN+14kuSfD/A5FhlO43rSnEi38JkGFbhGyhenaBhuNlXQ
-        ezM3C1of1VFl7ECEMVHBtvPJQw==
-X-Google-Smtp-Source: ABdhPJxNGP2ojm9WBMUOuIrgKMhdSc9v7P8W4g6NZqjn4VtIHtI3ni07XFYu+J2/K28y5xiMoKZ5rw==
-X-Received: by 2002:a17:903:22cb:b029:e5:b8b0:b935 with SMTP id y11-20020a17090322cbb02900e5b8b0b935mr211991plg.66.1614794510591;
-        Wed, 03 Mar 2021 10:01:50 -0800 (PST)
+        bh=EZB5FybRq8qQJzZjsg9RL1K43u6gdJrGvoqJbzpIOAc=;
+        b=eTb7sBwzmx0tqMyJBwgfOwd69PH7ZqKbE3sWBbv+ZV4OLmcGwr7nCEQ1WBLSp2o+9v
+         MEiG/F/QXlxsUypo8Pe01A0mRf/lOxSal3nzxOx0FeYT6v/WyXb1eEiPi7vSyDlZ/tiq
+         E7Jss5ut2LVk52TIn7EJj8BNq6brxP8atv9/w5MZk+CZ0wgFKPoL/q+5iFgmxCIBQ2je
+         tErwUuGWzMvzUQRvMHiPgWrWeoeDRlFphYvV9g40BwYFOMQx6314C4rzk3u6XOgwhvDY
+         aeqjnq5QsMsiYX79HYhPjM0j4xJoTyleszBdpifh4wznpIxIt7E9M5p7PLphgFlsBP1S
+         Y4Lg==
+X-Gm-Message-State: AOAM533xAZQMnmKqJ3zasA0zpm2k3uXwon0SG+Hix4e+kDdclyqWek7D
+        2TDIRlG9QTPH0bVEACqNo9VXjA==
+X-Google-Smtp-Source: ABdhPJxHiz9ohG6+W8dNXmMiMy9EY9e2DVip+EPXLXe1/ag47U0Nhl3U7ARwSbOllz5+QQBx4mIOyw==
+X-Received: by 2002:a17:90b:4b0e:: with SMTP id lx14mr290874pjb.147.1614794601004;
+        Wed, 03 Mar 2021 10:03:21 -0800 (PST)
 Received: from google.com ([2620:15c:f:10:805d:6324:3372:6183])
-        by smtp.gmail.com with ESMTPSA id r15sm25659314pfh.97.2021.03.03.10.01.49
+        by smtp.gmail.com with ESMTPSA id v14sm1438168pju.19.2021.03.03.10.03.19
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 03 Mar 2021 10:01:50 -0800 (PST)
-Date:   Wed, 3 Mar 2021 10:01:43 -0800
+        Wed, 03 Mar 2021 10:03:20 -0800 (PST)
+Date:   Wed, 3 Mar 2021 10:03:14 -0800
 From:   Sean Christopherson <seanjc@google.com>
 To:     Like Xu <like.xu@linux.intel.com>
 Cc:     Peter Zijlstra <peterz@infradead.org>,
@@ -60,78 +60,111 @@ Cc:     Peter Zijlstra <peterz@infradead.org>,
         Dave Hansen <dave.hansen@intel.com>, wei.w.wang@intel.com,
         Borislav Petkov <bp@alien8.de>, kvm@vger.kernel.org,
         x86@kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 8/9] KVM: x86: Expose Architectural LBR CPUID leaf
-Message-ID: <YD/PB18qLqS7noKH@google.com>
+Subject: Re: [PATCH v3 9/9] KVM: x86: Add XSAVE Support for Architectural LBRs
+Message-ID: <YD/PYp0DtZaw2HYh@google.com>
 References: <20210303135756.1546253-1-like.xu@linux.intel.com>
- <20210303135756.1546253-9-like.xu@linux.intel.com>
- <YD/IeTdqbK9kEDNp@google.com>
+ <20210303135756.1546253-10-like.xu@linux.intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <YD/IeTdqbK9kEDNp@google.com>
+In-Reply-To: <20210303135756.1546253-10-like.xu@linux.intel.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Mar 03, 2021, Sean Christopherson wrote:
-> On Wed, Mar 03, 2021, Like Xu wrote:
-> > If CPUID.(EAX=07H, ECX=0):EDX[19] is set to 1, then KVM supports Arch
-> > LBRs and CPUID leaf 01CH indicates details of the Arch LBRs capabilities.
-> > Currently, KVM only supports the current host LBR depth for guests,
-> > which is also the maximum supported depth on the host.
-> > 
-> > Signed-off-by: Like Xu <like.xu@linux.intel.com>
-> > ---
-> >  arch/x86/kvm/cpuid.c   | 25 ++++++++++++++++++++++++-
-> >  arch/x86/kvm/vmx/vmx.c |  2 ++
-> >  2 files changed, 26 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-> > index b4247f821277..4473324fe7be 100644
-> > --- a/arch/x86/kvm/cpuid.c
-> > +++ b/arch/x86/kvm/cpuid.c
-> > @@ -450,7 +450,7 @@ void kvm_set_cpu_caps(void)
-> >  		F(AVX512_4VNNIW) | F(AVX512_4FMAPS) | F(SPEC_CTRL) |
-> >  		F(SPEC_CTRL_SSBD) | F(ARCH_CAPABILITIES) | F(INTEL_STIBP) |
-> >  		F(MD_CLEAR) | F(AVX512_VP2INTERSECT) | F(FSRM) |
-> > -		F(SERIALIZE) | F(TSXLDTRK) | F(AVX512_FP16)
-> > +		F(SERIALIZE) | F(TSXLDTRK) | F(AVX512_FP16) | F(ARCH_LBR)
-> >  	);
-> >  
-> >  	/* TSC_ADJUST and ARCH_CAPABILITIES are emulated in software. */
-> 
-> ...
-> 
-> > diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> > index 2f307689a14b..034708a3df20 100644
-> > --- a/arch/x86/kvm/vmx/vmx.c
-> > +++ b/arch/x86/kvm/vmx/vmx.c
-> > @@ -7258,6 +7258,8 @@ static __init void vmx_set_cpu_caps(void)
-> >  		kvm_cpu_cap_clear(X86_FEATURE_INVPCID);
-> >  	if (vmx_pt_mode_is_host_guest())
-> >  		kvm_cpu_cap_check_and_set(X86_FEATURE_INTEL_PT);
-> > +	if (cpu_has_vmx_arch_lbr())
-> > +		kvm_cpu_cap_check_and_set(X86_FEATURE_ARCH_LBR);
-> 
-> Using kvm_cpu_cap_check_and_set(), which queries boot_cpu_has(), is only
-> necessary if a feature is not exposed by default in kvm_set_cpu_caps().  That's
-> why INTEL_PT uses it.  ARCH_LBR on the other hand is set in the "enable by
-> default" mask.
-> 
-> That being said, it's probably a bad idea to advertise ARCH_LBR by default.  In
-> the unlikely case that AMD adds support for ARCH_LBR, enable-by-default means
-> guest will be able to use ARCH_LBR on old KVMs that presumably would lack support
-> for ARCH_LBR on SVM.
-> 
-> TL;DR: omit F(ARCH_LBR) or replace it with "0 /* ARCH_LBR */".
+On Wed, Mar 03, 2021, Like Xu wrote:
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index 034708a3df20..ec4593e0ee6d 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -7268,6 +7268,8 @@ static __init void vmx_set_cpu_caps(void)
+>  	supported_xss = 0;
+>  	if (!cpu_has_vmx_xsaves())
+>  		kvm_cpu_cap_clear(X86_FEATURE_XSAVES);
+> +	else if (kvm_cpu_cap_has(X86_FEATURE_ARCH_LBR))
+> +		supported_xss |= XFEATURE_MASK_LBR;
+>  
+>  	/* CPUID 0x80000001 */
+>  	if (!cpu_has_vmx_rdtscp())
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index d773836ceb7a..bca2e318ff24 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -10433,6 +10433,8 @@ int kvm_arch_hardware_setup(void *opaque)
+>  
+>  	if (!kvm_cpu_cap_has(X86_FEATURE_XSAVES))
+>  		supported_xss = 0;
+> +	else
+> +		supported_xss &= host_xss;
 
-Actually, I take that back.  It'll require changing SVM, but due to the XSS
-interaction it's probably cleaner to leaf F(ARCH_LBR) as is, and do:
+Not your fault by any means, but I would prefer to have matching logic for XSS
+and XCR0.  The existing clearing of supported_xss here is pointless.  E.g. I'd
+prefer something like the following, though Paolo may have a different opinion.
 
-	if (!cpu_has_vmx_arch_lbr())
-		kvm_cpu_cap_clear(X86_FEATURE_ARCH_LBR);
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 6d7e760fdfa0..c781034463e5 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -7244,12 +7244,15 @@ static __init void vmx_set_cpu_caps(void)
+                kvm_cpu_cap_clear(X86_FEATURE_INVPCID);
+        if (vmx_pt_mode_is_host_guest())
+                kvm_cpu_cap_check_and_set(X86_FEATURE_INTEL_PT);
++       if (!cpu_has_vmx_arch_lbr()) {
++               kvm_cpu_cap_clear(X86_FEATURE_ARCH_LBR);
++               supported_xss &= ~XFEATURE_MASK_LBR;
++       }
 
-and then unconditionally clear the cap for SVM.  In a way, that's arguably
-better documentation as it explicitly shows that SVM lacks supports.
+        if (vmx_umip_emulated())
+                kvm_cpu_cap_set(X86_FEATURE_UMIP);
 
-More thoughts in the next patch...
+        /* CPUID 0xD.1 */
+-       supported_xss = 0;
+        if (!cpu_has_vmx_xsaves())
+                kvm_cpu_cap_clear(X86_FEATURE_XSAVES);
+
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 7b0adebec1ef..5f9eb1f5b840 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -205,6 +205,8 @@ static struct kvm_user_return_msrs __percpu *user_return_msrs;
+                                | XFEATURE_MASK_BNDCSR | XFEATURE_MASK_AVX512 \
+                                | XFEATURE_MASK_PKRU)
+
++#define KVM_SUPPORTED_XSS      XFEATURE_MASK_LBR
++
+ u64 __read_mostly host_efer;
+ EXPORT_SYMBOL_GPL(host_efer);
+
+@@ -8037,6 +8039,11 @@ int kvm_arch_init(void *opaque)
+                supported_xcr0 = host_xcr0 & KVM_SUPPORTED_XCR0;
+        }
+
++       if (boot_cpu_has(X86_FEATURE_XSAVES))
++               rdmsrl(MSR_IA32_XSS, host_xss);
++               supported_xss = host_xss & KVM_SUPPORTED_XSS;
++       }
++
+        if (pi_inject_timer == -1)
+                pi_inject_timer = housekeeping_enabled(HK_FLAG_TIMER);
+ #ifdef CONFIG_X86_64
+@@ -10412,9 +10419,6 @@ int kvm_arch_hardware_setup(void *opaque)
+
+        rdmsrl_safe(MSR_EFER, &host_efer);
+
+-       if (boot_cpu_has(X86_FEATURE_XSAVES))
+-               rdmsrl(MSR_IA32_XSS, host_xss);
+-
+        r = ops->hardware_setup();
+        if (r != 0)
+                return r;
+@@ -10422,9 +10426,6 @@ int kvm_arch_hardware_setup(void *opaque)
+        memcpy(&kvm_x86_ops, ops->runtime_ops, sizeof(kvm_x86_ops));
+        kvm_ops_static_call_update();
+
+-       if (!kvm_cpu_cap_has(X86_FEATURE_XSAVES))
+-               supported_xss = 0;
+-
+ #define __kvm_cpu_cap_has(UNUSED_, f) kvm_cpu_cap_has(f)
+        cr4_reserved_bits = __cr4_reserved_bits(__kvm_cpu_cap_has, UNUSED_);
+ #undef __kvm_cpu_cap_has
+
