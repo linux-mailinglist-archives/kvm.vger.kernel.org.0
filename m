@@ -2,14 +2,14 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C45DE32C6E4
-	for <lists+kvm@lfdr.de>; Thu,  4 Mar 2021 02:09:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6250B32C6EB
+	for <lists+kvm@lfdr.de>; Thu,  4 Mar 2021 02:09:16 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1357340AbhCDAaR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 3 Mar 2021 19:30:17 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:45427 "EHLO
+        id S1451147AbhCDAaZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 3 Mar 2021 19:30:25 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:26265 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1377748AbhCCS2g (ORCPT
+        by vger.kernel.org with ESMTP id S1377403AbhCCS2g (ORCPT
         <rfc822;kvm@vger.kernel.org>); Wed, 3 Mar 2021 13:28:36 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
         s=mimecast20190719; t=1614796023;
@@ -17,39 +17,39 @@ DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=d+d/MBqh7nLsyh5fOlU8/TcU9o+BUbPZsFEks8VNenw=;
-        b=NErkYgPfzczbcuE1y7XjkI87fYTT44juaOZgSKTiXtyNz9diADv5SBliOSVsVvLt3SeDUC
-        VlArwAYxBl8vxOIOsKNVt3+clSBXgp87WNcu+FzLPxIgxDA6wX6LqJqSAvEbn4ewUjeJfR
-        Pp1Qvfo12bwC1kC9yX/1ly5KLtwlpjs=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-437-NqsJ4t1RPk6bqDVuM0RadA-1; Wed, 03 Mar 2021 13:23:08 -0500
-X-MC-Unique: NqsJ4t1RPk6bqDVuM0RadA-1
-Received: by mail-wr1-f69.google.com with SMTP id n17so994080wrq.5
-        for <kvm@vger.kernel.org>; Wed, 03 Mar 2021 10:23:07 -0800 (PST)
+        bh=gcmU4EwKx07Tin9L5OLokG4d2/Qw/rC/JleGsw0pME0=;
+        b=eTXm+p6HyC5IiFjAahH/VNaruOzitGAwz+bOU6Y5ibO8jGXFyacPLJJGx8mYTGhZ1Gndtm
+        G3rNvUd4eyEe39ukU472IFgmI+7kijlnlXm4vlqc8l4X5EHb9WEv1GKstAjHJ5IhA0Kk+O
+        bTnUUH7nw+tRvhqKSvl2XPENlwRLF3s=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-296-TeVkghTIPSeiIOMe4k0tKw-1; Wed, 03 Mar 2021 13:23:13 -0500
+X-MC-Unique: TeVkghTIPSeiIOMe4k0tKw-1
+Received: by mail-wm1-f71.google.com with SMTP id j8so2169374wmq.6
+        for <kvm@vger.kernel.org>; Wed, 03 Mar 2021 10:23:13 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=d+d/MBqh7nLsyh5fOlU8/TcU9o+BUbPZsFEks8VNenw=;
-        b=B1u+n1qoVg1KYj2k0/hHGw8NlI4KVRneQ+JLw7Nv4EccAQDb5L151U6afJ3oi2W7ej
-         J726CTHkHh0I/ELRTLjk0fl7W8LghqrN2wNaq4w5SFb7oCmt6CFU6O8A42acmMnn5Mtj
-         gZpMBdpZmzbjP+0uBkNx1JFiU/DK8M+MBlRFFuyTwrBG2TULdOhLUBmLQuL+sTg9FKrS
-         LKEQ6P0YO0IG1o5ABYJVmMWJGo4zu6d8r4HB9nk9NKfDPunPcce+Z8XfMBgVvJOHnu0a
-         agOorwUS60rqy2kzRWJIt2MRj/Y1n2z4i4mGA+Tw9vORLTjFdoVfIsfRUAMKlg+Y3gFC
-         RXjQ==
-X-Gm-Message-State: AOAM532t96WAuz/29ft8v1kYLVtz5xuA3NGFMIWGh3qeF+t6i5wtOY9h
-        X++/yD3mrKiPXCtBAoGhLA4DfDsUvwuvZpDqPZn2/ZO2ZIuGJOdKn/rpnFxIPMpxong05LviKLa
-        z/OOYC83hjLLB
-X-Received: by 2002:adf:a2cf:: with SMTP id t15mr14834wra.250.1614795786884;
-        Wed, 03 Mar 2021 10:23:06 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJz6ujFjRNPggv7/ipzC5oDJujEI5QYZFdlngvKsuonznRYeYLKD8t2BL7D3qvATAQ4rzlY2SQ==
-X-Received: by 2002:adf:a2cf:: with SMTP id t15mr14791wra.250.1614795786594;
-        Wed, 03 Mar 2021 10:23:06 -0800 (PST)
+        bh=gcmU4EwKx07Tin9L5OLokG4d2/Qw/rC/JleGsw0pME0=;
+        b=LYQwA5Uo02ce3hRYVjxX105V796I0Ub0QEwZiN5XSWRrNb2Z2u2fbU5posO94C8ag6
+         Wrzd5bHDi/kRDUBorC43p62puDjbLoofkc1rXEvyeguD5VCxbaf+XBysmZpdaQyOl4rj
+         w6b56qHgI4lwYJ5ojlvjjc01hqKx6njij5d7cfsGSm69kGvmQu6c2uTT9AmORt9NPTE0
+         WWl31BqtkS1VLFtgULFZbz+7c5zx5oBFVMx5SDHUJAJFgpdCC5Qc6LhuXA8Nuyv5jirt
+         MDO2k6gPzRvLUFJwOFe2+F9V0gj73QSK7PyuEN6RnEE3msLACQWP7MIt91j1z8B0Kk31
+         D7Zw==
+X-Gm-Message-State: AOAM531gFMYJbYNHrIGFUBn7fS4m5oNWAfnOv5KiPxnTjij3BmNydAVF
+        dRd1ei++2IsLRKzFh25IopmHoS90fGN9Mecc5QH0s89/hOrdpL5T+KHcjmqftG7B08mR3o80SH2
+        ZvOQacNTNE8X2
+X-Received: by 2002:adf:f512:: with SMTP id q18mr28690255wro.61.1614795792401;
+        Wed, 03 Mar 2021 10:23:12 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJzsuKFTfGdNl3JrpUfwyW5A/mzww+ew2G6b3+YznKtRBqmyC0QveUl42fP3vSv4XPE27dPvRA==
+X-Received: by 2002:adf:f512:: with SMTP id q18mr28690224wro.61.1614795792253;
+        Wed, 03 Mar 2021 10:23:12 -0800 (PST)
 Received: from x1w.redhat.com (68.red-83-57-175.dynamicip.rima-tde.net. [83.57.175.68])
-        by smtp.gmail.com with ESMTPSA id a3sm33245959wrt.68.2021.03.03.10.23.05
+        by smtp.gmail.com with ESMTPSA id l22sm34033345wrb.4.2021.03.03.10.23.10
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 03 Mar 2021 10:23:06 -0800 (PST)
+        Wed, 03 Mar 2021 10:23:11 -0800 (PST)
 From:   =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To:     qemu-devel@nongnu.org
 Cc:     Eduardo Habkost <ehabkost@redhat.com>,
@@ -73,9 +73,9 @@ Cc:     Eduardo Habkost <ehabkost@redhat.com>,
         Christian Borntraeger <borntraeger@de.ibm.com>,
         qemu-s390x@nongnu.org, haxm-team@intel.com,
         =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Subject: [RFC PATCH 07/19] accel/whpx: Rename struct whpx_vcpu -> AccelvCPUState
-Date:   Wed,  3 Mar 2021 19:22:07 +0100
-Message-Id: <20210303182219.1631042-8-philmd@redhat.com>
+Subject: [RFC PATCH 08/19] accel/whpx: Use 'accel_vcpu' generic pointer
+Date:   Wed,  3 Mar 2021 19:22:08 +0100
+Message-Id: <20210303182219.1631042-9-philmd@redhat.com>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20210303182219.1631042-1-philmd@redhat.com>
 References: <20210303182219.1631042-1-philmd@redhat.com>
@@ -86,32 +86,45 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The current 'struct whpx_vcpu' contains the vCPU fields
-specific to the WHPX accelerator. Rename it as AccelvCPUState.
-We keep the 'whpx_vcpu' typedef to reduce the amount of code
-changed.
+Instead of naming the HAX accelerator in WHPX, use the
+'accel_vcpu' field which is meant for accelerators.
 
 Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 ---
- target/i386/whpx/whpx-all.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ target/i386/whpx/whpx-all.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/target/i386/whpx/whpx-all.c b/target/i386/whpx/whpx-all.c
-index 6469e388b6d..f0b3266114d 100644
+index f0b3266114d..56ec82076cc 100644
 --- a/target/i386/whpx/whpx-all.c
 +++ b/target/i386/whpx/whpx-all.c
-@@ -148,9 +148,9 @@ struct whpx_register_set {
-     WHV_REGISTER_VALUE values[RTL_NUMBER_OF(whpx_register_names)];
- };
+@@ -177,7 +177,7 @@ struct WHPDispatch whp_dispatch;
  
--typedef struct whpx_vcpu whpx_vcpu;
-+typedef struct AccelvCPUState whpx_vcpu;
+ static whpx_vcpu *get_whpx_vcpu(CPUState *cpu)
+ {
+-    return (whpx_vcpu *)cpu->hax_vcpu;
++    return cpu->accel_vcpu;
+ }
  
--struct whpx_vcpu {
-+struct AccelvCPUState {
-     WHV_EMULATOR_HANDLE emulator;
-     bool window_registered;
-     bool interruptable;
+ static WHV_X64_SEGMENT_REGISTER whpx_seg_q2h(const SegmentCache *qs, int v86,
+@@ -1439,7 +1439,7 @@ int whpx_init_vcpu(CPUState *cpu)
+ 
+     vcpu->interruptable = true;
+     cpu->vcpu_dirty = true;
+-    cpu->hax_vcpu = (struct hax_vcpu_state *)vcpu;
++    cpu->accel_vcpu = vcpu;
+     max_vcpu_index = max(max_vcpu_index, cpu->cpu_index);
+     qemu_add_vm_change_state_handler(whpx_cpu_update_state, cpu->env_ptr);
+ 
+@@ -1481,7 +1481,7 @@ void whpx_destroy_vcpu(CPUState *cpu)
+ 
+     whp_dispatch.WHvDeleteVirtualProcessor(whpx->partition, cpu->cpu_index);
+     whp_dispatch.WHvEmulatorDestroyEmulator(vcpu->emulator);
+-    g_free(cpu->hax_vcpu);
++    g_free(cpu->accel_vcpu);
+     return;
+ }
+ 
 -- 
 2.26.2
 
