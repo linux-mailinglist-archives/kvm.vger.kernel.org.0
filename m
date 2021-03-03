@@ -2,163 +2,81 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EB8BC32C66F
-	for <lists+kvm@lfdr.de>; Thu,  4 Mar 2021 02:02:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C38C432C671
+	for <lists+kvm@lfdr.de>; Thu,  4 Mar 2021 02:02:54 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1451030AbhCDA2u (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 3 Mar 2021 19:28:50 -0500
-Received: from foss.arm.com ([217.140.110.172]:48766 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1359458AbhCCOTm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 3 Mar 2021 09:19:42 -0500
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4ABB631B;
-        Wed,  3 Mar 2021 06:18:55 -0800 (PST)
-Received: from slackpad.fritz.box (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 5C4E73F766;
-        Wed,  3 Mar 2021 06:18:54 -0800 (PST)
-Date:   Wed, 3 Mar 2021 14:18:46 +0000
-From:   Andre Przywara <andre.przywara@arm.com>
-To:     Alexandru Elisei <alexandru.elisei@arm.com>
-Cc:     drjones@redhat.com, kvm@vger.kernel.org,
-        kvmarm@lists.cs.columbia.edu, pbonzini@redhat.com
-Subject: Re: [kvm-unit-tests PATCH] configure: arm/arm64: Add --earlycon
- option to set UART type and address
-Message-ID: <20210303141846.0bcc0d2c@slackpad.fritz.box>
-In-Reply-To: <20210219163718.109101-1-alexandru.elisei@arm.com>
-References: <20210219163718.109101-1-alexandru.elisei@arm.com>
-Organization: Arm Ltd.
-X-Mailer: Claws Mail 3.17.1 (GTK+ 2.24.31; x86_64-slackware-linux-gnu)
+        id S1347019AbhCDA2w (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 3 Mar 2021 19:28:52 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:30997 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S240455AbhCCOjr (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 3 Mar 2021 09:39:47 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1614782299;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=aA0ryNvB4RqgkXaIipbDqJ057yJGCC4FNfu7WES52T0=;
+        b=IJav01vY9PosaaSLGiKdf2r+YAkrOUonIxCgMuNbaIvTlA8aQGOaEk1oi5Ze+rVhjnq3MR
+        pvt1YF3Rni1KfiQc9Sd7uFBfT+R1ZYGF6MuPqZXr5uSgVSaOMsThtPuHqR2Z1oQ2Mb0Hfo
+        reJRYAVFitgeRKpKAEsLnw6/Spxls9A=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-204-7Qtqn3AiOJi1lChWk9bqlg-1; Wed, 03 Mar 2021 09:38:15 -0500
+X-MC-Unique: 7Qtqn3AiOJi1lChWk9bqlg-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 33580100A8ED;
+        Wed,  3 Mar 2021 14:38:14 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-115-146.ams2.redhat.com [10.36.115.146])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 201D11E2B4;
+        Wed,  3 Mar 2021 14:38:02 +0000 (UTC)
+Subject: Re: [PATCH v1 2/2] exec: Get rid of phys_mem_set_alloc()
+To:     David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
+Cc:     kvm@vger.kernel.org, qemu-s390x@nongnu.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Richard Henderson <rth@twiddle.net>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Igor Mammedov <imammedo@redhat.com>,
+        Peter Xu <peterx@redhat.com>
+References: <20210303130916.22553-1-david@redhat.com>
+ <20210303130916.22553-3-david@redhat.com>
+From:   Thomas Huth <thuth@redhat.com>
+Message-ID: <dae7136e-964a-2235-8301-4d9487e8ed30@redhat.com>
+Date:   Wed, 3 Mar 2021 15:38:01 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20210303130916.22553-3-david@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 19 Feb 2021 16:37:18 +0000
-Alexandru Elisei <alexandru.elisei@arm.com> wrote:
-
-> Currently, the UART early address is set indirectly with the --vmm option
-> and there are only two possible values: if the VMM is qemu (the default),
-> then the UART address is set to 0x09000000; if the VMM is kvmtool, then the
-> UART address is set to 0x3f8.
+On 03/03/2021 14.09, David Hildenbrand wrote:
+> As the last user is gone, we can get rid of phys_mem_set_alloc() and
+> simplify.
 > 
-> There several efforts under way to change the kvmtool UART address, and
-> kvm-unit-tests so far hasn't had mechanism to let the user set a specific
-> address, which means that the early UART won't be available.
-> 
-> This situation will only become worse as kvm-unit-tests gains support to
-> run as an EFI app, as each platform will have their own UART type and
-> address.
-> 
-> To address both issues, a new configure option is added, --earlycon. The
-> syntax and semantics are identical to the kernel parameter with the same
-> name.
-
-Nice one! I like that reusing of an existing scheme.
-
-> Specifying this option will overwrite the UART address set by --vmm.
-> 
-> At the moment, the UART type and register width parameters are ignored
-> since both qemu's and kvmtool's UART emulation use the same offset for the
-> TX register and no other registers are used by kvm-unit-tests, but the
-> parameters will become relevant once EFI support is added.
-> 
-> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: Richard Henderson <rth@twiddle.net>
+> Cc: Halil Pasic <pasic@linux.ibm.com>
+> Cc: Cornelia Huck <cohuck@redhat.com>
+> Cc: Christian Borntraeger <borntraeger@de.ibm.com>
+> Cc: Thomas Huth <thuth@redhat.com>
+> Cc: Igor Mammedov <imammedo@redhat.com>
+> Cc: Peter Xu <peterx@redhat.com>
+> Signed-off-by: David Hildenbrand <david@redhat.com>
 > ---
-> The kvmtool patches I was referring to are the patches to unify ioport and
-> MMIO emulation [1] and to allow the user to specify a custom memory layout
-> for the VM [2] (these patches are very old, but I plan to revive them after
-> the ioport and MMIO unification series are merged).
-> 
-> [1] https://lore.kernel.org/kvm/20201210142908.169597-1-andre.przywara@arm.com/T/#t
-> [2] https://lore.kernel.org/kvm/1569245722-23375-1-git-send-email-alexandru.elisei@arm.com/
-> 
->  configure | 35 +++++++++++++++++++++++++++++++++++
->  1 file changed, 35 insertions(+)
-> 
-> diff --git a/configure b/configure
-> index cdcd34e94030..d94b92255088 100755
-> --- a/configure
-> +++ b/configure
-> @@ -26,6 +26,7 @@ errata_force=0
->  erratatxt="$srcdir/errata.txt"
->  host_key_document=
->  page_size=
-> +earlycon=
->  
->  usage() {
->      cat <<-EOF
-> @@ -54,6 +55,17 @@ usage() {
->  	    --page-size=PAGE_SIZE
->  	                           Specify the page size (translation granule) (4k, 16k or
->  	                           64k, default is 64k, arm64 only)
-> +	    --earlycon=EARLYCON
-> +	                           Specify the UART name, type and address (optional, arm and
-> +	                           arm64 only). The specified address will overwrite the UART
-> +	                           address set by the --vmm option. EARLYCON can be on of (case
-> +	                           sensitive):
-> +	               uart[8250],mmio,ADDR
-> +	                           Specify an 8250 compatible UART at address ADDR. Supported
-> +	                           register stride is 8 bit only.
-> +	               pl011,mmio,ADDR
-> +	                           Specify a PL011 compatible UART at address ADDR. Supported
-> +	                           register stride is 8 bit only.
+>   include/sysemu/kvm.h |  4 ----
+>   softmmu/physmem.c    | 36 +++---------------------------------
+>   2 files changed, 3 insertions(+), 37 deletions(-)
 
-I think the PL011 only ever specified 32-bit register accesses? I just
-see that we actually do a writeb() for puts, that is not guaranteed to
-work on a hardware PL011, AFAIK. I guess QEMU just doesn't care ...
-Looks like we should fix this, maybe we get mmio32 for uart8250 for
-free, then.
-
-The kernel specifies "pl011,mmio32,ADDR" or "pl011,ADDR", so I think we
-should keep it compatible. "mmio[32]" is pretty much redundant on the
-PL011 (no port I/O), I think it's just for consistency with the 8250.
-Can you tweak the routine below to make this optional, and also accept
-mmio32?
-
-Cheers,
-Andre
-
->  EOF
->      exit 1
->  }
-> @@ -112,6 +124,9 @@ while [[ "$1" = -* ]]; do
->  	--page-size)
->  	    page_size="$arg"
->  	    ;;
-> +	--earlycon)
-> +	    earlycon="$arg"
-> +	    ;;
->  	--help)
->  	    usage
->  	    ;;
-> @@ -170,6 +185,26 @@ elif [ "$arch" = "arm" ] || [ "$arch" = "arm64" ]; then
->          echo '--vmm must be one of "qemu" or "kvmtool"!'
->          usage
->      fi
-> +
-> +    if [ "$earlycon" ]; then
-> +        name=$(echo $earlycon|cut -d',' -f1)
-> +        if [ "$name" != "uart" ] && [ "$name" != "uart8250" ] &&
-> +                [ "$name" != "pl011" ]; then
-> +            echo "unknown earlycon name: $name"
-> +            usage
-> +        fi
-> +        type=$(echo $earlycon|cut -d',' -f2)
-> +        if [ "$type" != "mmio" ]; then
-> +            echo "unknown earlycon type: $type"
-> +            usage
-> +        fi
-> +        addr=$(echo $earlycon|cut -d',' -f3)
-> +        if [ -z "$addr" ]; then
-> +            echo "missing earlycon address"
-> +            usage
-> +        fi
-> +        arm_uart_early_addr=$addr
-> +    fi
->  elif [ "$arch" = "ppc64" ]; then
->      testdir=powerpc
->      firmware="$testdir/boot_rom.bin"
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 
