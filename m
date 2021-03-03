@@ -2,107 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 90E9C32C690
-	for <lists+kvm@lfdr.de>; Thu,  4 Mar 2021 02:03:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B4D2F32C698
+	for <lists+kvm@lfdr.de>; Thu,  4 Mar 2021 02:03:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1355504AbhCDA3O (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 3 Mar 2021 19:29:14 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36258 "EHLO
+        id S1355537AbhCDA3Y (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 3 Mar 2021 19:29:24 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38760 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345098AbhCCQse (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 3 Mar 2021 11:48:34 -0500
-Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 99912C061760
-        for <kvm@vger.kernel.org>; Wed,  3 Mar 2021 08:47:07 -0800 (PST)
-Received: by mail-pj1-x1032.google.com with SMTP id t9so4492740pjl.5
-        for <kvm@vger.kernel.org>; Wed, 03 Mar 2021 08:47:07 -0800 (PST)
+        with ESMTP id S232773AbhCCQ71 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 3 Mar 2021 11:59:27 -0500
+Received: from mail-pf1-x433.google.com (mail-pf1-x433.google.com [IPv6:2607:f8b0:4864:20::433])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 16042C061756
+        for <kvm@vger.kernel.org>; Wed,  3 Mar 2021 08:58:46 -0800 (PST)
+Received: by mail-pf1-x433.google.com with SMTP id o188so10024491pfg.2
+        for <kvm@vger.kernel.org>; Wed, 03 Mar 2021 08:58:46 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=quBPDIsZ4Pg/fHm1dZ2YOsP83yrlR5G0gmwAov0iPyo=;
-        b=nfnyTmPdcBN35cVH4mQoqKGQwKxUIU+7bFPPpRTO/bfdltKL1RD81f4xmocbhz/sHy
-         ukGt1KfjKrIK3SD/vETYWTLmLsFk5wdrsbenp+/QiTwEvJj8dBcXxyaGwsBiSJ+f3Su4
-         CSvnmbzeeCsAedpiEBYNKTTRJH1JIcs6lEoreSCCdmtHKHpUwW84yAf4otQCfxdiwDBk
-         Bg2MiLTEDe+yKxI9r+U+0WJ15+GgklyS8cLL8yv6nDGt4xm6SePOB5U3ePru+ZRSmgU4
-         z6/yT7Da/3gvHycP89VebSJps7CUECkgtkdV6ckfDkpMEs/NYj43P1MxBmYb9MCpWOCB
-         ep3A==
+        bh=nPAwW58BM2Peqy3CsvFvNOceDW2A+CpWJyP28r7fYnw=;
+        b=iWqMtWXZ/Coibv6e5Pne9w95gngr0vKnGRsj0vgqpYNrXUGjw5nIsskbs410PB5w1O
+         0yQrF1ITxJubs9mgois+s1sCDeteC1wkZxjob3ytmoU0G2BQnaKXtxLtVfFWZ9cjDDnC
+         q9sJTrnYhwJu6p1DpZmFCj+twmNrqErIeoq/XfFJN+vRyzamu1aNO0GWpz7mwoGBbQaE
+         k1Ri9AQYHJrOH1VgBIKpoaRFoPEZN9SO2xBuqP0IH5TV2zRU+lk1wGLUJiR7PZjZSvBI
+         ArhNrrBFQp9iA8ITybHeHWxu1eObYGLtz5uVaFmw4nJRSoOBHmFa4hCZLtl81MvtQiXR
+         41ag==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=quBPDIsZ4Pg/fHm1dZ2YOsP83yrlR5G0gmwAov0iPyo=;
-        b=jP3XTe1GVGSurBIKz1+hRMERlNS2ftHfYdqmxaA0Xb1KM2+VNIKGfwcb+aM5w+y+3v
-         4FFkQl6x91+TteJUQ5Sqx0JsnLHzcNyqD5DTuhDZlvu9AgH2AvEZZD8jVdnhXULafRGv
-         6o//WqvFSNhdB9EgYpbmXO8vwfu0HO7OcGZdtanlIJmqCQRXavdv2/THEvyNJPeXavt+
-         D0NmMn03evjpQBYxIxHh4BqvKejuaRBz9D0FJ6E9DoVZTyu7mqcC+r7ERG9AO2orFJfm
-         6WM5FlLgCX8wVluiDYPEq2A4DDG+PGkYw7NKzSL6JWQHKdcdkSog6glMY0CUIdBOQ0gu
-         AbVQ==
-X-Gm-Message-State: AOAM5305n3uEfZ/oXALihyWRvZRgwhItxfMezmq2groqOpWkyxIGuNcx
-        oCd5amLkA3j1sxZ++HiimX60sQ==
-X-Google-Smtp-Source: ABdhPJzfAf5L6Yvs7GUoW/T2RWwJONBtnku3HRK5pysZy15dBYKacthlXUZTDpbKT9JIpvcwi1FyMQ==
-X-Received: by 2002:a17:902:464:b029:e2:ebb4:9251 with SMTP id 91-20020a1709020464b02900e2ebb49251mr3407638ple.29.1614790026969;
-        Wed, 03 Mar 2021 08:47:06 -0800 (PST)
+        bh=nPAwW58BM2Peqy3CsvFvNOceDW2A+CpWJyP28r7fYnw=;
+        b=UYQf2TGfyIs1zIhNo9bFvF646o6aTAoDuXYAEK40nFUS+8CeeH9BZW9bkZ/kIXzNiI
+         DFR3Fquj7yNLk45vmoTSYZYhiICioZmnw0fNjrc4C2UofdBMYhWBOJ0bv4tHwhfOHABS
+         w7gDjW4YOTUmSc4e+XAP9NjV6LOK4il7sqZRHNk6Ti2WaYxdkl8R6QJL2Cda9oA6FnVJ
+         qk9Dgq3yMTl9J3KdIMvLzYYMtJ5Xqs2lkNKexBSWZA+bHSgaZ37NgihywXA5ZJExnjLa
+         KsPMI8tmfd5buUjPt2ds6/tHIaFNB5frG5fGWqiRFI/Cc3V9MFcYR/Q22qUwgeq1vRD9
+         uAXg==
+X-Gm-Message-State: AOAM531DIonKnqZVdPV0u+2IHVaVYonG6E1pVnr97CgOtA35EUj+b7EN
+        kBp+Vg96RIB404yu5JJ/vGTuzw==
+X-Google-Smtp-Source: ABdhPJzLtvZpejYPU1VXFx5zXMGAMaVhEWuOyjZyPI9KLNLaKVCQwsLsaYxA2Glvxdqc737TgzgYcA==
+X-Received: by 2002:a63:e108:: with SMTP id z8mr23579432pgh.363.1614790725369;
+        Wed, 03 Mar 2021 08:58:45 -0800 (PST)
 Received: from google.com ([2620:15c:f:10:805d:6324:3372:6183])
-        by smtp.gmail.com with ESMTPSA id u17sm32036pgl.80.2021.03.03.08.47.05
+        by smtp.gmail.com with ESMTPSA id i20sm3982353pgg.65.2021.03.03.08.58.43
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 03 Mar 2021 08:47:06 -0800 (PST)
-Date:   Wed, 3 Mar 2021 08:46:59 -0800
+        Wed, 03 Mar 2021 08:58:44 -0800 (PST)
+Date:   Wed, 3 Mar 2021 08:58:37 -0800
 From:   Sean Christopherson <seanjc@google.com>
-To:     Ben Gardon <bgardon@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+To:     Like Xu <like.xu@linux.intel.com>
+Cc:     Peter Zijlstra <peterz@infradead.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>
-Subject: Re: [PATCH 03/15] KVM: x86/mmu: Ensure MMU pages are available when
- allocating roots
-Message-ID: <YD+9gwhfFCS7Xghe@google.com>
-References: <20210302184540.2829328-1-seanjc@google.com>
- <20210302184540.2829328-4-seanjc@google.com>
- <CANgfPd95G-01ObzeKeMTUu0yXBJ=0+ZGQwr_5WCNH-NmR03f9w@mail.gmail.com>
+        Joerg Roedel <joro@8bytes.org>,
+        Kan Liang <kan.liang@linux.intel.com>,
+        Dave Hansen <dave.hansen@intel.com>, wei.w.wang@intel.com,
+        Borislav Petkov <bp@alien8.de>, kvm@vger.kernel.org,
+        x86@kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3 5/9] KVM: vmx/pmu: Add MSR_ARCH_LBR_DEPTH emulation
+ for Arch LBR
+Message-ID: <YD/APUcINwvP53VZ@google.com>
+References: <20210303135756.1546253-1-like.xu@linux.intel.com>
+ <20210303135756.1546253-6-like.xu@linux.intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CANgfPd95G-01ObzeKeMTUu0yXBJ=0+ZGQwr_5WCNH-NmR03f9w@mail.gmail.com>
+In-Reply-To: <20210303135756.1546253-6-like.xu@linux.intel.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Mar 02, 2021, Ben Gardon wrote:
-> > @@ -3241,16 +3237,10 @@ static int mmu_alloc_direct_roots(struct kvm_vcpu *vcpu)
-> >
-> >         if (is_tdp_mmu_enabled(vcpu->kvm)) {
-> >                 root = kvm_tdp_mmu_get_vcpu_root_hpa(vcpu);
-> > -
-> > -               if (!VALID_PAGE(root))
-> > -                       return -ENOSPC;
-> >                 vcpu->arch.mmu->root_hpa = root;
-> >         } else if (shadow_root_level >= PT64_ROOT_4LEVEL) {
-> >                 root = mmu_alloc_root(vcpu, 0, 0, shadow_root_level,
-> >                                       true);
-> > -
-> > -               if (!VALID_PAGE(root))
-> > -                       return -ENOSPC;
-> 
-> There's so much going on in mmu_alloc_root that removing this check
-> makes me nervous, but I think it should be safe.
+On Wed, Mar 03, 2021, Like Xu wrote:
+> @@ -348,10 +352,26 @@ static bool intel_pmu_handle_lbr_msrs_access(struct kvm_vcpu *vcpu,
+>  	return true;
+>  }
+>  
+> +/*
+> + * Check if the requested depth values is supported
+> + * based on the bits [0:7] of the guest cpuid.1c.eax.
+> + */
+> +static bool arch_lbr_depth_is_valid(struct kvm_vcpu *vcpu, u64 depth)
+> +{
+> +	struct kvm_cpuid_entry2 *best;
+> +
+> +	best = kvm_find_cpuid_entry(vcpu, 0x1c, 0);
+> +	if (best && depth && !(depth % 8))
 
-Just think of it as a variant of kvm_mmu_get_page(), then all your fears will
-melt away. ;-)
+This is still wrong, it fails to weed out depth > 64.
 
-> I checked though the function because I was worried it might yield
-> somewhere in there, which could result in the page cache being emptied
-> and the allocation failing, but I don't think mmu_alloc_root this
-> function will yield.
+Not that this is a hot path, but it's probably worth double checking that the
+compiler generates simple code for "depth % 8", e.g. it can be "depth & 7)".
 
-Ugh, mmu_alloc_root() won't yield, but get_zeroed_page() used to allocate pae_root
-and lm_root on-demand in mmu_alloc_shadow_roots() will.  The two options are
-(a) allocate the fake roots before taking the lock and (b) allocate them from
-vcpu->arch.mmu_shadow_page_cache.  I probably prefer (a).  (b) will slide
-directly into the existing code, but would require bumping the min number of
-objects for mmu_shadow_page_cache in mmu_topup_memory_caches().  I'd prefer not
-to have yet more code that has to deal with this insanity.
+> +		return (best->eax & 0xff) & (1ULL << (depth / 8 - 1));
+> +
+> +	return false;
+> +}
+> +
