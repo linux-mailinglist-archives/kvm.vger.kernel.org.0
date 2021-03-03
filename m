@@ -2,103 +2,139 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 79C6532B5C5
+	by mail.lfdr.de (Postfix) with ESMTP id EC12F32B5C7
 	for <lists+kvm@lfdr.de>; Wed,  3 Mar 2021 08:45:04 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1449364AbhCCHT7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 3 Mar 2021 02:19:59 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35634 "EHLO
+        id S1449369AbhCCHUB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 3 Mar 2021 02:20:01 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47292 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241892AbhCCBPC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 2 Mar 2021 20:15:02 -0500
-Received: from mail-ot1-x32c.google.com (mail-ot1-x32c.google.com [IPv6:2607:f8b0:4864:20::32c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 14011C06178A;
-        Tue,  2 Mar 2021 17:13:39 -0800 (PST)
-Received: by mail-ot1-x32c.google.com with SMTP id v12so20875367ott.10;
-        Tue, 02 Mar 2021 17:13:39 -0800 (PST)
+        with ESMTP id S238045AbhCCCLA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 2 Mar 2021 21:11:00 -0500
+Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 546B1C061224;
+        Tue,  2 Mar 2021 18:09:58 -0800 (PST)
+Received: by mail-pj1-x1033.google.com with SMTP id e9so3371051pjj.0;
+        Tue, 02 Mar 2021 18:09:58 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=Y54p/dpKPIzMufJOMByqkZMg0hSldch1m8scSHyXvP4=;
-        b=XCqLfckpDOHLSA4PZVWEJdgH6OwCV6Iq1erGKikHDRf4tZtTNEsQuTV2DmwWoSJjnR
-         bqMSuP5CE2icUXTH86yzUfoqSizD26p3iFTtaI/n1TMVwMpyfUxoSvm0kBrdan6+AJvk
-         ao/ucPcOeGdajhLA1Ebl65YLICpxCMrKMN+B5Hvfhqu6p+WmVJ6kfXZICltspjIgHgnB
-         rouPy9W0BfN2+Nmh12n3CasXXRnDsw6s+pmze4RjhEO4xhw1NQccLuDM/C1Pf7kxmQI5
-         BGHOzq6hMXlJ3DZJyfDW+rAQ4ai477KOrnfBCG0fpIPfk4KcNonPAbHbuIOSyzydtemF
-         6pgA==
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=Y4CDZC0XRtdxRyUu6upw3DY8PzyuYgSy6jHykMMCFTY=;
+        b=M+m8+IeTn56qvibEzZaBaLzICwpFnGw1QTeozL3il7ZPPhlofSUc32Pqvf9KvcU4Co
+         1ksSTP9mOLQXpmxuFfe5B09ISx2/2c/OngpINTk7OQwqJa1uM2INoScqO7W+suxk4wUk
+         Dnf3XfWuePpDh1JhqHSdaqT7pvw2FBEc3DgiyoI3eWW0Uwc/qAZw7OeSX8si9cTtjm4H
+         GJXE4NeRLSFyXODVCe1WuRWokDjwtp1eKeEQ8AL5q6hxdP2Rc32Zpns9eWBXIey91Xev
+         A1kRVKb5KOiaCEi8ZmsmmtLmon/o8vAHRBnh3k3E0tVbnI9zTZa8vXSOp15y+PMHolJX
+         FgaQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=Y54p/dpKPIzMufJOMByqkZMg0hSldch1m8scSHyXvP4=;
-        b=fyi8pVzJgcZodp6L4bjTkxdrnQ4LWL20kbHgj+IXFfkxUK2/JssOLfH+i9OtqzMPM2
-         TfwCOJ8MB2eXn5v8dv6PeyfaDi/mRHu7a2wyhS5iLldfkiuGvs5oaauOlZcAO6rF0Gb2
-         t7Bl6qeHPDNQfguvt0U4jPKwJIQNAdZBt22dz44c98O0gkU6CbJOaQjB3VeA89uyLZAh
-         qjiBMR2fYIryjWewMTN8534BfEsBveRdkZMaUSw7EguZVtxiR+e9U5N+Y0zsRa13/7Ur
-         tIhht3JOHzoLO3I6q8SinoQV+lErd527G6GPj+44Q6NbZC3hMvT68zAz8ZPH3HyuqZLp
-         ltaw==
-X-Gm-Message-State: AOAM531ndSww759ByJ72Pl4Y1NelXAwQSFL6JnxOTnY9r+Afdd51f9Mn
-        ssvLb4h6AZwVSpfYaN0iQrAfKV5jPyyJ87W6iWQ=
-X-Google-Smtp-Source: ABdhPJy69FER/IuOKFD5Gvana5EKf4iVtHxc0NZZL4MrZucHLzrHacAF0U+sI/rPLkIlFQgCiStvmz77II6jKOqnZ60=
-X-Received: by 2002:a05:6830:10c1:: with SMTP id z1mr19648521oto.254.1614734018572;
- Tue, 02 Mar 2021 17:13:38 -0800 (PST)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=Y4CDZC0XRtdxRyUu6upw3DY8PzyuYgSy6jHykMMCFTY=;
+        b=a2oiwdicy+VnrOBNxqEg8JyYkKc2h5cjvjff+zPwnzOsO4xCyUoiouzPJux9BbCm4+
+         KFnUeNZvejO2foRCDWqpXKqbbo9lrnkrW6aM7K3zifT8C2tVUwfiQnXJvkmhXKkiulOk
+         bTkrF2YbmXQbplNsjJn8q+xps+zV3qdKDDww6g0TIUZvASyjwlUrSQNWooVuvyUuC1rx
+         tx83zzEdPEtBc95i4bV7zyAqpz/RcGMi7/vOHhjP8zdx9DPQ6YlU0dyqbv0Rcr9iBX32
+         Qn2HlK0gvPLYM0oVjE7AM4bcl+3ujvW991I7IKXBnHsJFHAlYXJKbaa9hQFos7035Af0
+         Ebsw==
+X-Gm-Message-State: AOAM5319bW+TbCC+4h+68G2dRcXPR4mDWeon1T3gB21yFM65DxxRyf8u
+        Bw2TxSXKFcRsHcrNL9ThBQx5n9CyHg==
+X-Google-Smtp-Source: ABdhPJyJ/vLG5EM+mwDq6WrvjKVvipezABEQ4XAsfkBAlmEkSCpxAjE03uaEyDFwX9tlOqQIXfIKjg==
+X-Received: by 2002:a17:90a:7344:: with SMTP id j4mr7575058pjs.216.1614737397602;
+        Tue, 02 Mar 2021 18:09:57 -0800 (PST)
+Received: from localhost.localdomain ([203.205.141.39])
+        by smtp.gmail.com with ESMTPSA id f20sm280415pfa.10.2021.03.02.18.09.55
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 02 Mar 2021 18:09:57 -0800 (PST)
+From:   lihaiwei.kernel@gmail.com
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     pbonzini@redhat.com, seanjc@google.com, vkuznets@redhat.com,
+        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
+        Haiwei Li <lihaiwei@tencent.com>
+Subject: [PATCH] kvm: lapic: add module parameters for LAPIC_TIMER_ADVANCE_ADJUST_MAX/MIN
+Date:   Wed,  3 Mar 2021 10:09:46 +0800
+Message-Id: <20210303020946.26083-1-lihaiwei.kernel@gmail.com>
+X-Mailer: git-send-email 2.28.0
 MIME-Version: 1.0
-References: <1614678202-10808-1-git-send-email-wanpengli@tencent.com> <YD5y+W2nqnZt5bRZ@google.com>
-In-Reply-To: <YD5y+W2nqnZt5bRZ@google.com>
-From:   Wanpeng Li <kernellwp@gmail.com>
-Date:   Wed, 3 Mar 2021 09:13:27 +0800
-Message-ID: <CANRm+Cy_rNAai+u5pyBXKmQP_Qp=3e_hwi2g9bAFMiocCpru1A@mail.gmail.com>
-Subject: Re: [PATCH] KVM: LAPIC: Advancing the timer expiration on guest
- initiated write
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 3 Mar 2021 at 01:16, Sean Christopherson <seanjc@google.com> wrote:
->
-> On Tue, Mar 02, 2021, Wanpeng Li wrote:
-> > From: Wanpeng Li <wanpengli@tencent.com>
-> >
-> > Advancing the timer expiration should only be necessary on guest initiated
-> > writes. Now, we cancel the timer, clear .pending and clear expired_tscdeadline
-> > at the same time during state restore.
->
-> That last sentence is confusing.  kvm_apic_set_state() already clears .pending,
-> by way of __start_apic_timer().  I think what you mean is:
->
->   When we cancel the timer and clear .pending during state restore, clear
->   expired_tscdeadline as well.
+From: Haiwei Li <lihaiwei@tencent.com>
 
-Good statement. :)
+In my test environment, advance_expire_delta is frequently greater than
+the fixed LAPIC_TIMER_ADVANCE_ADJUST_MAX. And this will hinder the
+adjustment.
 
->
-> With that,
->
-> Reviewed-by: Sean Christopherson <seanjc@google.com>
->
->
-> Side topic, I think there's a theoretical bug where KVM could inject a spurious
-> timer interrupt.  If KVM is using hrtimer, the hrtimer expires early due to an
-> overzealous timer_advance_ns, and the guest writes MSR_TSCDEADLINE after the
-> hrtimer expires but before the vCPU is kicked, then KVM will inject a spurious
-> timer IRQ since the premature expiration should have been canceled by the guest's
-> WRMSR.
->
-> It could also cause KVM to soft hang the guest if the new lapic_timer.tscdeadline
-> is written before apic_timer_expired() captures it in expired_tscdeadline.  In
-> that case, KVM will wait for the new deadline, which could be far in the future.
+Adding module parameters for LAPIC_TIMER_ADVANCE_ADJUST_MAX/MIN, so they
+can be dynamically adjusted.
 
-The hrtimer_cancel() before setting new lapic_timer.tscdeadline in
-kvm_set_lapic_tscdeadline_msr() will wait for the hrtimer callback
-function to finish. Could it solve this issue?
+Signed-off-by: Haiwei Li <lihaiwei@tencent.com>
+---
+ arch/x86/kvm/lapic.c | 6 ++----
+ arch/x86/kvm/x86.c   | 8 ++++++++
+ arch/x86/kvm/x86.h   | 3 +++
+ 3 files changed, 13 insertions(+), 4 deletions(-)
 
-    Wanpeng
+diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+index 45d40bf..730c657 100644
+--- a/arch/x86/kvm/lapic.c
++++ b/arch/x86/kvm/lapic.c
+@@ -61,8 +61,6 @@
+ #define APIC_VECTORS_PER_REG		32
+ 
+ static bool lapic_timer_advance_dynamic __read_mostly;
+-#define LAPIC_TIMER_ADVANCE_ADJUST_MIN	100	/* clock cycles */
+-#define LAPIC_TIMER_ADVANCE_ADJUST_MAX	10000	/* clock cycles */
+ #define LAPIC_TIMER_ADVANCE_NS_INIT	1000
+ #define LAPIC_TIMER_ADVANCE_NS_MAX     5000
+ /* step-by-step approximation to mitigate fluctuation */
+@@ -1563,8 +1561,8 @@ static inline void adjust_lapic_timer_advance(struct kvm_vcpu *vcpu,
+ 	u64 ns;
+ 
+ 	/* Do not adjust for tiny fluctuations or large random spikes. */
+-	if (abs(advance_expire_delta) > LAPIC_TIMER_ADVANCE_ADJUST_MAX ||
+-	    abs(advance_expire_delta) < LAPIC_TIMER_ADVANCE_ADJUST_MIN)
++	if (abs(advance_expire_delta) > lapic_timer_advance_adjust_cycles_max ||
++	    abs(advance_expire_delta) < lapic_timer_advance_adjust_cycles_min)
+ 		return;
+ 
+ 	/* too early */
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 828de7d..3bd8d19 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -176,6 +176,14 @@
+ int __read_mostly pi_inject_timer = -1;
+ module_param(pi_inject_timer, bint, S_IRUGO | S_IWUSR);
+ 
++u64 __read_mostly lapic_timer_advance_adjust_cycles_max = 10000;
++module_param(lapic_timer_advance_adjust_cycles_max, ullong, S_IRUGO | S_IWUSR);
++EXPORT_SYMBOL_GPL(lapic_timer_advance_adjust_cycles_max);
++
++u64 __read_mostly lapic_timer_advance_adjust_cycles_min = 100;
++module_param(lapic_timer_advance_adjust_cycles_min, ullong, S_IRUGO | S_IWUSR);
++EXPORT_SYMBOL_GPL(lapic_timer_advance_adjust_cycles_min);
++
+ /*
+  * Restoring the host value for MSRs that are only consumed when running in
+  * usermode, e.g. SYSCALL MSRs and TSC_AUX, can be deferred until the CPU
+diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
+index ee6e010..3f7eca0 100644
+--- a/arch/x86/kvm/x86.h
++++ b/arch/x86/kvm/x86.h
+@@ -305,6 +305,9 @@ static inline bool kvm_mpx_supported(void)
+ 
+ extern int pi_inject_timer;
+ 
++extern u64 lapic_timer_advance_adjust_cycles_max;
++extern u64 lapic_timer_advance_adjust_cycles_min;
++
+ extern struct static_key kvm_no_apic_vcpu;
+ 
+ extern bool report_ignored_msrs;
+-- 
+1.8.3.1
+
