@@ -2,187 +2,163 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C61AD32C661
-	for <lists+kvm@lfdr.de>; Thu,  4 Mar 2021 02:02:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EB8BC32C66F
+	for <lists+kvm@lfdr.de>; Thu,  4 Mar 2021 02:02:51 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1349852AbhCDA2n (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 3 Mar 2021 19:28:43 -0500
-Received: from 8bytes.org ([81.169.241.247]:57472 "EHLO theia.8bytes.org"
+        id S1451030AbhCDA2u (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 3 Mar 2021 19:28:50 -0500
+Received: from foss.arm.com ([217.140.110.172]:48766 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1348829AbhCCOSg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 3 Mar 2021 09:18:36 -0500
-Received: from cap.home.8bytes.org (p549adcf6.dip0.t-ipconnect.de [84.154.220.246])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
-        (No client certificate requested)
-        by theia.8bytes.org (Postfix) with ESMTPSA id 1E31D48E;
-        Wed,  3 Mar 2021 15:17:25 +0100 (CET)
-From:   Joerg Roedel <joro@8bytes.org>
-To:     x86@kernel.org
-Cc:     Joerg Roedel <joro@8bytes.org>, Joerg Roedel <jroedel@suse.de>,
-        stable@vger.kernel.org, hpa@zytor.com,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Jiri Slaby <jslaby@suse.cz>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Juergen Gross <jgross@suse.com>,
-        Kees Cook <keescook@chromium.org>,
-        David Rientjes <rientjes@google.com>,
-        Cfir Cohen <cfir@google.com>,
-        Erdem Aktas <erdemaktas@google.com>,
-        Masami Hiramatsu <mhiramat@kernel.org>,
-        Mike Stunes <mstunes@vmware.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Martin Radev <martin.b.radev@gmail.com>,
-        Arvind Sankar <nivedita@alum.mit.edu>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org
-Subject: [PATCH 5/5] x86/sev-es: Use __copy_from_user_inatomic()
-Date:   Wed,  3 Mar 2021 15:17:16 +0100
-Message-Id: <20210303141716.29223-6-joro@8bytes.org>
-X-Mailer: git-send-email 2.30.1
-In-Reply-To: <20210303141716.29223-1-joro@8bytes.org>
-References: <20210303141716.29223-1-joro@8bytes.org>
+        id S1359458AbhCCOTm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 3 Mar 2021 09:19:42 -0500
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4ABB631B;
+        Wed,  3 Mar 2021 06:18:55 -0800 (PST)
+Received: from slackpad.fritz.box (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 5C4E73F766;
+        Wed,  3 Mar 2021 06:18:54 -0800 (PST)
+Date:   Wed, 3 Mar 2021 14:18:46 +0000
+From:   Andre Przywara <andre.przywara@arm.com>
+To:     Alexandru Elisei <alexandru.elisei@arm.com>
+Cc:     drjones@redhat.com, kvm@vger.kernel.org,
+        kvmarm@lists.cs.columbia.edu, pbonzini@redhat.com
+Subject: Re: [kvm-unit-tests PATCH] configure: arm/arm64: Add --earlycon
+ option to set UART type and address
+Message-ID: <20210303141846.0bcc0d2c@slackpad.fritz.box>
+In-Reply-To: <20210219163718.109101-1-alexandru.elisei@arm.com>
+References: <20210219163718.109101-1-alexandru.elisei@arm.com>
+Organization: Arm Ltd.
+X-Mailer: Claws Mail 3.17.1 (GTK+ 2.24.31; x86_64-slackware-linux-gnu)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Joerg Roedel <jroedel@suse.de>
+On Fri, 19 Feb 2021 16:37:18 +0000
+Alexandru Elisei <alexandru.elisei@arm.com> wrote:
 
-The #VC handler must run atomic and can not be put to sleep. This is a
-problem when it tries to fetch instruction bytes from user-space via
-copy_from_user.
+> Currently, the UART early address is set indirectly with the --vmm option
+> and there are only two possible values: if the VMM is qemu (the default),
+> then the UART address is set to 0x09000000; if the VMM is kvmtool, then the
+> UART address is set to 0x3f8.
+> 
+> There several efforts under way to change the kvmtool UART address, and
+> kvm-unit-tests so far hasn't had mechanism to let the user set a specific
+> address, which means that the early UART won't be available.
+> 
+> This situation will only become worse as kvm-unit-tests gains support to
+> run as an EFI app, as each platform will have their own UART type and
+> address.
+> 
+> To address both issues, a new configure option is added, --earlycon. The
+> syntax and semantics are identical to the kernel parameter with the same
+> name.
 
-Introduce a insn_fetch_from_user_inatomic() helper which uses
-__copy_from_user_inatomic() to safely copy the instruction bytes to
-kernel memory in the #VC handler.
+Nice one! I like that reusing of an existing scheme.
 
-Fixes: 5e3427a7bc432 ("x86/sev-es: Handle instruction fetches from user-space")
-Cc: stable@vger.kernel.org # v5.10+
-Signed-off-by: Joerg Roedel <jroedel@suse.de>
----
- arch/x86/include/asm/insn-eval.h |  2 +
- arch/x86/kernel/sev-es.c         |  2 +-
- arch/x86/lib/insn-eval.c         | 66 +++++++++++++++++++++++++-------
- 3 files changed, 55 insertions(+), 15 deletions(-)
+> Specifying this option will overwrite the UART address set by --vmm.
+> 
+> At the moment, the UART type and register width parameters are ignored
+> since both qemu's and kvmtool's UART emulation use the same offset for the
+> TX register and no other registers are used by kvm-unit-tests, but the
+> parameters will become relevant once EFI support is added.
+> 
+> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> ---
+> The kvmtool patches I was referring to are the patches to unify ioport and
+> MMIO emulation [1] and to allow the user to specify a custom memory layout
+> for the VM [2] (these patches are very old, but I plan to revive them after
+> the ioport and MMIO unification series are merged).
+> 
+> [1] https://lore.kernel.org/kvm/20201210142908.169597-1-andre.przywara@arm.com/T/#t
+> [2] https://lore.kernel.org/kvm/1569245722-23375-1-git-send-email-alexandru.elisei@arm.com/
+> 
+>  configure | 35 +++++++++++++++++++++++++++++++++++
+>  1 file changed, 35 insertions(+)
+> 
+> diff --git a/configure b/configure
+> index cdcd34e94030..d94b92255088 100755
+> --- a/configure
+> +++ b/configure
+> @@ -26,6 +26,7 @@ errata_force=0
+>  erratatxt="$srcdir/errata.txt"
+>  host_key_document=
+>  page_size=
+> +earlycon=
+>  
+>  usage() {
+>      cat <<-EOF
+> @@ -54,6 +55,17 @@ usage() {
+>  	    --page-size=PAGE_SIZE
+>  	                           Specify the page size (translation granule) (4k, 16k or
+>  	                           64k, default is 64k, arm64 only)
+> +	    --earlycon=EARLYCON
+> +	                           Specify the UART name, type and address (optional, arm and
+> +	                           arm64 only). The specified address will overwrite the UART
+> +	                           address set by the --vmm option. EARLYCON can be on of (case
+> +	                           sensitive):
+> +	               uart[8250],mmio,ADDR
+> +	                           Specify an 8250 compatible UART at address ADDR. Supported
+> +	                           register stride is 8 bit only.
+> +	               pl011,mmio,ADDR
+> +	                           Specify a PL011 compatible UART at address ADDR. Supported
+> +	                           register stride is 8 bit only.
 
-diff --git a/arch/x86/include/asm/insn-eval.h b/arch/x86/include/asm/insn-eval.h
-index a0f839aa144d..98b4dae5e8bc 100644
---- a/arch/x86/include/asm/insn-eval.h
-+++ b/arch/x86/include/asm/insn-eval.h
-@@ -23,6 +23,8 @@ unsigned long insn_get_seg_base(struct pt_regs *regs, int seg_reg_idx);
- int insn_get_code_seg_params(struct pt_regs *regs);
- int insn_fetch_from_user(struct pt_regs *regs,
- 			 unsigned char buf[MAX_INSN_SIZE]);
-+int insn_fetch_from_user_inatomic(struct pt_regs *regs,
-+				  unsigned char buf[MAX_INSN_SIZE]);
- bool insn_decode(struct insn *insn, struct pt_regs *regs,
- 		 unsigned char buf[MAX_INSN_SIZE], int buf_size);
- 
-diff --git a/arch/x86/kernel/sev-es.c b/arch/x86/kernel/sev-es.c
-index 3d8ec5bf6f79..26f5479a97a8 100644
---- a/arch/x86/kernel/sev-es.c
-+++ b/arch/x86/kernel/sev-es.c
-@@ -270,7 +270,7 @@ static enum es_result vc_decode_insn(struct es_em_ctxt *ctxt)
- 	int res;
- 
- 	if (user_mode(ctxt->regs)) {
--		res = insn_fetch_from_user(ctxt->regs, buffer);
-+		res = insn_fetch_from_user_inatomic(ctxt->regs, buffer);
- 		if (!res) {
- 			ctxt->fi.vector     = X86_TRAP_PF;
- 			ctxt->fi.error_code = X86_PF_INSTR | X86_PF_USER;
-diff --git a/arch/x86/lib/insn-eval.c b/arch/x86/lib/insn-eval.c
-index 4229950a5d78..bb0b3fe1e0a0 100644
---- a/arch/x86/lib/insn-eval.c
-+++ b/arch/x86/lib/insn-eval.c
-@@ -1415,6 +1415,25 @@ void __user *insn_get_addr_ref(struct insn *insn, struct pt_regs *regs)
- 	}
- }
- 
-+static unsigned long insn_get_effective_ip(struct pt_regs *regs)
-+{
-+	unsigned long seg_base = 0;
-+
-+	/*
-+	 * If not in user-space long mode, a custom code segment could be in
-+	 * use. This is true in protected mode (if the process defined a local
-+	 * descriptor table), or virtual-8086 mode. In most of the cases
-+	 * seg_base will be zero as in USER_CS.
-+	 */
-+	if (!user_64bit_mode(regs)) {
-+		seg_base = insn_get_seg_base(regs, INAT_SEG_REG_CS);
-+		if (seg_base == -1L)
-+			return 0;
-+	}
-+
-+	return seg_base + regs->ip;
-+}
-+
- /**
-  * insn_fetch_from_user() - Copy instruction bytes from user-space memory
-  * @regs:	Structure with register values as seen when entering kernel mode
-@@ -1431,24 +1450,43 @@ void __user *insn_get_addr_ref(struct insn *insn, struct pt_regs *regs)
-  */
- int insn_fetch_from_user(struct pt_regs *regs, unsigned char buf[MAX_INSN_SIZE])
- {
--	unsigned long seg_base = 0;
-+	unsigned long ip;
- 	int not_copied;
- 
--	/*
--	 * If not in user-space long mode, a custom code segment could be in
--	 * use. This is true in protected mode (if the process defined a local
--	 * descriptor table), or virtual-8086 mode. In most of the cases
--	 * seg_base will be zero as in USER_CS.
--	 */
--	if (!user_64bit_mode(regs)) {
--		seg_base = insn_get_seg_base(regs, INAT_SEG_REG_CS);
--		if (seg_base == -1L)
--			return 0;
--	}
-+	ip = insn_get_effective_ip(regs);
-+	if (!ip)
-+		return 0;
-+
-+	not_copied = copy_from_user(buf, (void __user *)ip, MAX_INSN_SIZE);
- 
-+	return MAX_INSN_SIZE - not_copied;
-+}
-+
-+/**
-+ * insn_fetch_from_user_inatomic() - Copy instruction bytes from user-space memory
-+ *                                   while in atomic code
-+ * @regs:	Structure with register values as seen when entering kernel mode
-+ * @buf:	Array to store the fetched instruction
-+ *
-+ * Gets the linear address of the instruction and copies the instruction bytes
-+ * to the buf. This function must be used in atomic context.
-+ *
-+ * Returns:
-+ *
-+ * Number of instruction bytes copied.
-+ *
-+ * 0 if nothing was copied.
-+ */
-+int insn_fetch_from_user_inatomic(struct pt_regs *regs, unsigned char buf[MAX_INSN_SIZE])
-+{
-+	unsigned long ip;
-+	int not_copied;
-+
-+	ip = insn_get_effective_ip(regs);
-+	if (!ip)
-+		return 0;
- 
--	not_copied = copy_from_user(buf, (void __user *)(seg_base + regs->ip),
--				    MAX_INSN_SIZE);
-+	not_copied = __copy_from_user_inatomic(buf, (void __user *)ip, MAX_INSN_SIZE);
- 
- 	return MAX_INSN_SIZE - not_copied;
- }
--- 
-2.30.1
+I think the PL011 only ever specified 32-bit register accesses? I just
+see that we actually do a writeb() for puts, that is not guaranteed to
+work on a hardware PL011, AFAIK. I guess QEMU just doesn't care ...
+Looks like we should fix this, maybe we get mmio32 for uart8250 for
+free, then.
+
+The kernel specifies "pl011,mmio32,ADDR" or "pl011,ADDR", so I think we
+should keep it compatible. "mmio[32]" is pretty much redundant on the
+PL011 (no port I/O), I think it's just for consistency with the 8250.
+Can you tweak the routine below to make this optional, and also accept
+mmio32?
+
+Cheers,
+Andre
+
+>  EOF
+>      exit 1
+>  }
+> @@ -112,6 +124,9 @@ while [[ "$1" = -* ]]; do
+>  	--page-size)
+>  	    page_size="$arg"
+>  	    ;;
+> +	--earlycon)
+> +	    earlycon="$arg"
+> +	    ;;
+>  	--help)
+>  	    usage
+>  	    ;;
+> @@ -170,6 +185,26 @@ elif [ "$arch" = "arm" ] || [ "$arch" = "arm64" ]; then
+>          echo '--vmm must be one of "qemu" or "kvmtool"!'
+>          usage
+>      fi
+> +
+> +    if [ "$earlycon" ]; then
+> +        name=$(echo $earlycon|cut -d',' -f1)
+> +        if [ "$name" != "uart" ] && [ "$name" != "uart8250" ] &&
+> +                [ "$name" != "pl011" ]; then
+> +            echo "unknown earlycon name: $name"
+> +            usage
+> +        fi
+> +        type=$(echo $earlycon|cut -d',' -f2)
+> +        if [ "$type" != "mmio" ]; then
+> +            echo "unknown earlycon type: $type"
+> +            usage
+> +        fi
+> +        addr=$(echo $earlycon|cut -d',' -f3)
+> +        if [ -z "$addr" ]; then
+> +            echo "missing earlycon address"
+> +            usage
+> +        fi
+> +        arm_uart_early_addr=$addr
+> +    fi
+>  elif [ "$arch" = "ppc64" ]; then
+>      testdir=powerpc
+>      firmware="$testdir/boot_rom.bin"
 
