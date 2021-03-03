@@ -2,311 +2,136 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A385132C6C5
-	for <lists+kvm@lfdr.de>; Thu,  4 Mar 2021 02:08:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7A3DA32C6C9
+	for <lists+kvm@lfdr.de>; Thu,  4 Mar 2021 02:08:57 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1451104AbhCDA36 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 3 Mar 2021 19:29:58 -0500
-Received: from foss.arm.com ([217.140.110.172]:53578 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1386220AbhCCR7A (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 3 Mar 2021 12:59:00 -0500
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B2A4F1FB;
-        Wed,  3 Mar 2021 09:58:10 -0800 (PST)
-Received: from [192.168.0.110] (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B07A33F7D7;
-        Wed,  3 Mar 2021 09:58:09 -0800 (PST)
-Subject: Re: [PATCH kvmtool v2 04/22] mmio: Extend handling to include ioport
- emulation
-To:     Andre Przywara <andre.przywara@arm.com>,
-        Will Deacon <will@kernel.org>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>
-Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
-        Marc Zyngier <maz@kernel.org>,
-        Sami Mujawar <sami.mujawar@arm.com>
-References: <20210225005915.26423-1-andre.przywara@arm.com>
- <20210225005915.26423-5-andre.przywara@arm.com>
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <fdbd899f-4800-1157-977a-62e182859e94@arm.com>
-Date:   Wed, 3 Mar 2021 17:58:29 +0000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.8.0
+        id S1451105AbhCDA37 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 3 Mar 2021 19:29:59 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52342 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1835188AbhCCSCd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 3 Mar 2021 13:02:33 -0500
+Received: from mail-pl1-x633.google.com (mail-pl1-x633.google.com [IPv6:2607:f8b0:4864:20::633])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 69A10C061756
+        for <kvm@vger.kernel.org>; Wed,  3 Mar 2021 10:01:51 -0800 (PST)
+Received: by mail-pl1-x633.google.com with SMTP id c16so4998272ply.0
+        for <kvm@vger.kernel.org>; Wed, 03 Mar 2021 10:01:51 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=fN9kN40P4Zb0ukn4Ugrf+KcpYX4t7X0lCi/CEaratbo=;
+        b=HR9HE4CMDqeLv5C4sWclwl7s5hfMoIrfjNf3jN8ZfWfTFiDoND8rTi8dzYei7fRnnG
+         8CEI8u1jdw+BLbKMKrzcydeZ8f3J+72cdzt8W1IMx1C14U5S4QoCBC0kf894CuFZQ/cW
+         e8ajp6S0OR4owY2zjwEKJvEMcq5VIWPKu6lwc3O1ewxsbct508b2NSMNjdofJQfRa/At
+         FignDJwRpKNgc8QOw/06M9O7ZSRUo1ou6O6ktmu4veCYeAgpJxEaKMID+hmPbDst8M32
+         h2iy5nEEA6V/T0ZY+PwDEBsW39qZkrIQwka+beRRpY34dEvprsIPGrg685z+N60f1Q1U
+         tIWg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=fN9kN40P4Zb0ukn4Ugrf+KcpYX4t7X0lCi/CEaratbo=;
+        b=OGLIUrUAgcKuvS7al5PRCPAIRgueQTiIjGffnuQhtmj2NQ/SFD4nq+g4M2Ztruf/LP
+         /U9Gqlp1Uc3d1b0+9gupTvBmGOE3L/8IcuSmJmiZNUR7N4FkRO9APV2YfvnxRnqoE+6a
+         RFiRvydBJTUl+02PYiGGzneoCyHg0XVJnQQ1lCWOQ+4Q6HiJXLw0kXLnxifDudidX03v
+         /DNkXTQ/8yZv2a1iyJGxI2FfZXTN5CgOte236sZVE2ptFYEAzalYyvR8UxXx4RU8mSnL
+         jPNmr8ky+m5tz64KE7vBUHjxVnVicF06a97anguwlivBWlsFc+G4Wx8gj1QP1wUs8JkZ
+         qicQ==
+X-Gm-Message-State: AOAM532H9bEnN+14kuSfD/A5FhlO43rSnEi38JkGFbhGyhenaBhuNlXQ
+        ezM3C1of1VFl7ECEMVHBtvPJQw==
+X-Google-Smtp-Source: ABdhPJxNGP2ojm9WBMUOuIrgKMhdSc9v7P8W4g6NZqjn4VtIHtI3ni07XFYu+J2/K28y5xiMoKZ5rw==
+X-Received: by 2002:a17:903:22cb:b029:e5:b8b0:b935 with SMTP id y11-20020a17090322cbb02900e5b8b0b935mr211991plg.66.1614794510591;
+        Wed, 03 Mar 2021 10:01:50 -0800 (PST)
+Received: from google.com ([2620:15c:f:10:805d:6324:3372:6183])
+        by smtp.gmail.com with ESMTPSA id r15sm25659314pfh.97.2021.03.03.10.01.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 03 Mar 2021 10:01:50 -0800 (PST)
+Date:   Wed, 3 Mar 2021 10:01:43 -0800
+From:   Sean Christopherson <seanjc@google.com>
+To:     Like Xu <like.xu@linux.intel.com>
+Cc:     Peter Zijlstra <peterz@infradead.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Kan Liang <kan.liang@linux.intel.com>,
+        Dave Hansen <dave.hansen@intel.com>, wei.w.wang@intel.com,
+        Borislav Petkov <bp@alien8.de>, kvm@vger.kernel.org,
+        x86@kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3 8/9] KVM: x86: Expose Architectural LBR CPUID leaf
+Message-ID: <YD/PB18qLqS7noKH@google.com>
+References: <20210303135756.1546253-1-like.xu@linux.intel.com>
+ <20210303135756.1546253-9-like.xu@linux.intel.com>
+ <YD/IeTdqbK9kEDNp@google.com>
 MIME-Version: 1.0
-In-Reply-To: <20210225005915.26423-5-andre.przywara@arm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YD/IeTdqbK9kEDNp@google.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Andre,
+On Wed, Mar 03, 2021, Sean Christopherson wrote:
+> On Wed, Mar 03, 2021, Like Xu wrote:
+> > If CPUID.(EAX=07H, ECX=0):EDX[19] is set to 1, then KVM supports Arch
+> > LBRs and CPUID leaf 01CH indicates details of the Arch LBRs capabilities.
+> > Currently, KVM only supports the current host LBR depth for guests,
+> > which is also the maximum supported depth on the host.
+> > 
+> > Signed-off-by: Like Xu <like.xu@linux.intel.com>
+> > ---
+> >  arch/x86/kvm/cpuid.c   | 25 ++++++++++++++++++++++++-
+> >  arch/x86/kvm/vmx/vmx.c |  2 ++
+> >  2 files changed, 26 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+> > index b4247f821277..4473324fe7be 100644
+> > --- a/arch/x86/kvm/cpuid.c
+> > +++ b/arch/x86/kvm/cpuid.c
+> > @@ -450,7 +450,7 @@ void kvm_set_cpu_caps(void)
+> >  		F(AVX512_4VNNIW) | F(AVX512_4FMAPS) | F(SPEC_CTRL) |
+> >  		F(SPEC_CTRL_SSBD) | F(ARCH_CAPABILITIES) | F(INTEL_STIBP) |
+> >  		F(MD_CLEAR) | F(AVX512_VP2INTERSECT) | F(FSRM) |
+> > -		F(SERIALIZE) | F(TSXLDTRK) | F(AVX512_FP16)
+> > +		F(SERIALIZE) | F(TSXLDTRK) | F(AVX512_FP16) | F(ARCH_LBR)
+> >  	);
+> >  
+> >  	/* TSC_ADJUST and ARCH_CAPABILITIES are emulated in software. */
+> 
+> ...
+> 
+> > diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> > index 2f307689a14b..034708a3df20 100644
+> > --- a/arch/x86/kvm/vmx/vmx.c
+> > +++ b/arch/x86/kvm/vmx/vmx.c
+> > @@ -7258,6 +7258,8 @@ static __init void vmx_set_cpu_caps(void)
+> >  		kvm_cpu_cap_clear(X86_FEATURE_INVPCID);
+> >  	if (vmx_pt_mode_is_host_guest())
+> >  		kvm_cpu_cap_check_and_set(X86_FEATURE_INTEL_PT);
+> > +	if (cpu_has_vmx_arch_lbr())
+> > +		kvm_cpu_cap_check_and_set(X86_FEATURE_ARCH_LBR);
+> 
+> Using kvm_cpu_cap_check_and_set(), which queries boot_cpu_has(), is only
+> necessary if a feature is not exposed by default in kvm_set_cpu_caps().  That's
+> why INTEL_PT uses it.  ARCH_LBR on the other hand is set in the "enable by
+> default" mask.
+> 
+> That being said, it's probably a bad idea to advertise ARCH_LBR by default.  In
+> the unlikely case that AMD adds support for ARCH_LBR, enable-by-default means
+> guest will be able to use ARCH_LBR on old KVMs that presumably would lack support
+> for ARCH_LBR on SVM.
+> 
+> TL;DR: omit F(ARCH_LBR) or replace it with "0 /* ARCH_LBR */".
 
-On 2/25/21 12:58 AM, Andre Przywara wrote:
-> In their core functionality MMIO and I/O port traps are not really
-> different, yet we still have two totally separate code paths for
-> handling them. Devices need to decide on one conduit or need to provide
-> different handler functions for each of them.
->
-> Extend the existing MMIO emulation to also cover ioport handlers.
-> This just adds another RB tree root for holding the I/O port handlers,
-> but otherwise uses the same tree population and lookup code.
-> "ioport" or "mmio" just become a flag in the registration function.
-> Provide wrappers to not break existing users, and allow an easy
-> transition for the existing ioport handlers.
->
-> This also means that ioport handlers now can use the same emulation
-> callback prototype as MMIO handlers, which means we have to migrate them
-> over. To allow a smooth transition, we hook up the new I/O emulate
-> function to the end of the existing ioport emulation code.
->
-> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
-> ---
->  include/kvm/kvm.h | 49 ++++++++++++++++++++++++++++++++---
->  ioport.c          |  4 +--
->  mmio.c            | 65 +++++++++++++++++++++++++++++++++++++++--------
->  3 files changed, 102 insertions(+), 16 deletions(-)
->
-> diff --git a/include/kvm/kvm.h b/include/kvm/kvm.h
-> index f1f0afd7..306b258a 100644
-> --- a/include/kvm/kvm.h
-> +++ b/include/kvm/kvm.h
-> @@ -27,10 +27,23 @@
->  #define PAGE_SIZE (sysconf(_SC_PAGE_SIZE))
->  #endif
->  
-> +/*
-> + * We are reusing the existing DEVICE_BUS_MMIO and DEVICE_BUS_IOPORT constants
-> + * from kvm/devices.h to differentiate between registering an I/O port and an
-> + * MMIO region.
-> + * To avoid collisions with future additions of more bus types, we reserve
-> + * a generous 4 bits for the bus mask here.
-> + */
-> +#define IOTRAP_BUS_MASK		0xf
-> +#define IOTRAP_COALESCE		(1U << 4)
-> +
->  #define DEFINE_KVM_EXT(ext)		\
->  	.name = #ext,			\
->  	.code = ext
->  
-> +struct kvm_cpu;
-> +typedef void (*mmio_handler_fn)(struct kvm_cpu *vcpu, u64 addr, u8 *data,
-> +				u32 len, u8 is_write, void *ptr);
->  typedef void (*fdt_irq_fn)(void *fdt, u8 irq, enum irq_type irq_type);
->  
->  enum {
-> @@ -113,6 +126,8 @@ void kvm__irq_line(struct kvm *kvm, int irq, int level);
->  void kvm__irq_trigger(struct kvm *kvm, int irq);
->  bool kvm__emulate_io(struct kvm_cpu *vcpu, u16 port, void *data, int direction, int size, u32 count);
->  bool kvm__emulate_mmio(struct kvm_cpu *vcpu, u64 phys_addr, u8 *data, u32 len, u8 is_write);
-> +bool kvm__emulate_pio(struct kvm_cpu *vcpu, u16 port, void *data,
-> +		      int direction, int size, u32 count);
->  int kvm__destroy_mem(struct kvm *kvm, u64 guest_phys, u64 size, void *userspace_addr);
->  int kvm__register_mem(struct kvm *kvm, u64 guest_phys, u64 size, void *userspace_addr,
->  		      enum kvm_mem_type type);
-> @@ -136,10 +151,36 @@ static inline int kvm__reserve_mem(struct kvm *kvm, u64 guest_phys, u64 size)
->  				 KVM_MEM_TYPE_RESERVED);
->  }
->  
-> -int __must_check kvm__register_mmio(struct kvm *kvm, u64 phys_addr, u64 phys_addr_len, bool coalesce,
-> -				    void (*mmio_fn)(struct kvm_cpu *vcpu, u64 addr, u8 *data, u32 len, u8 is_write, void *ptr),
-> -				    void *ptr);
-> -bool kvm__deregister_mmio(struct kvm *kvm, u64 phys_addr);
-> +int __must_check kvm__register_iotrap(struct kvm *kvm, u64 phys_addr, u64 len,
-> +				      mmio_handler_fn mmio_fn, void *ptr,
-> +				      unsigned int flags);
-> +
-> +static inline
-> +int __must_check kvm__register_mmio(struct kvm *kvm, u64 phys_addr,
-> +				    u64 phys_addr_len, bool coalesce,
-> +				    mmio_handler_fn mmio_fn, void *ptr)
-> +{
-> +	return kvm__register_iotrap(kvm, phys_addr, phys_addr_len, mmio_fn, ptr,
-> +			DEVICE_BUS_MMIO | (coalesce ? IOTRAP_COALESCE : 0));
-> +}
-> +static inline
-> +int __must_check kvm__register_pio(struct kvm *kvm, u16 port, u16 len,
-> +				   mmio_handler_fn mmio_fn, void *ptr)
-> +{
-> +	return kvm__register_iotrap(kvm, port, len, mmio_fn, ptr,
-> +				    DEVICE_BUS_IOPORT);
-> +}
-> +
-> +bool kvm__deregister_iotrap(struct kvm *kvm, u64 phys_addr, unsigned int flags);
-> +static inline bool kvm__deregister_mmio(struct kvm *kvm, u64 phys_addr)
-> +{
-> +	return kvm__deregister_iotrap(kvm, phys_addr, DEVICE_BUS_MMIO);
-> +}
-> +static inline bool kvm__deregister_pio(struct kvm *kvm, u16 port)
-> +{
-> +	return kvm__deregister_iotrap(kvm, port, DEVICE_BUS_IOPORT);
-> +}
-> +
->  void kvm__reboot(struct kvm *kvm);
->  void kvm__pause(struct kvm *kvm);
->  void kvm__continue(struct kvm *kvm);
-> diff --git a/ioport.c b/ioport.c
-> index e0123f27..ce29e7e7 100644
-> --- a/ioport.c
-> +++ b/ioport.c
-> @@ -162,7 +162,8 @@ bool kvm__emulate_io(struct kvm_cpu *vcpu, u16 port, void *data, int direction,
->  
->  	entry = ioport_get(&ioport_tree, port);
->  	if (!entry)
-> -		goto out;
-> +		return kvm__emulate_pio(vcpu, port, data, direction,
-> +					size, count);
->  
->  	ops	= entry->ops;
->  
-> @@ -177,7 +178,6 @@ bool kvm__emulate_io(struct kvm_cpu *vcpu, u16 port, void *data, int direction,
->  
->  	ioport_put(&ioport_tree, entry);
->  
-> -out:
->  	if (ret)
->  		return true;
->  
-> diff --git a/mmio.c b/mmio.c
-> index cd141cd3..75de04ad 100644
-> --- a/mmio.c
-> +++ b/mmio.c
-> @@ -19,13 +19,14 @@ static DEFINE_MUTEX(mmio_lock);
->  
->  struct mmio_mapping {
->  	struct rb_int_node	node;
-> -	void			(*mmio_fn)(struct kvm_cpu *vcpu, u64 addr, u8 *data, u32 len, u8 is_write, void *ptr);
-> +	mmio_handler_fn		mmio_fn;
->  	void			*ptr;
->  	u32			refcount;
->  	bool			remove;
->  };
->  
->  static struct rb_root mmio_tree = RB_ROOT;
-> +static struct rb_root pio_tree = RB_ROOT;
->  
->  static struct mmio_mapping *mmio_search(struct rb_root *root, u64 addr, u64 len)
->  {
-> @@ -103,9 +104,14 @@ static void mmio_put(struct kvm *kvm, struct rb_root *root, struct mmio_mapping
->  	mutex_unlock(&mmio_lock);
->  }
->  
-> -int kvm__register_mmio(struct kvm *kvm, u64 phys_addr, u64 phys_addr_len, bool coalesce,
-> -		       void (*mmio_fn)(struct kvm_cpu *vcpu, u64 addr, u8 *data, u32 len, u8 is_write, void *ptr),
-> -			void *ptr)
-> +static bool trap_is_mmio(unsigned int flags)
-> +{
-> +	return (flags & IOTRAP_BUS_MASK) == DEVICE_BUS_MMIO;
-> +}
-> +
-> +int kvm__register_iotrap(struct kvm *kvm, u64 phys_addr, u64 phys_addr_len,
-> +			 mmio_handler_fn mmio_fn, void *ptr,
-> +			 unsigned int flags)
->  {
->  	struct mmio_mapping *mmio;
->  	struct kvm_coalesced_mmio_zone zone;
-> @@ -127,7 +133,7 @@ int kvm__register_mmio(struct kvm *kvm, u64 phys_addr, u64 phys_addr_len, bool c
->  		.remove		= false,
->  	};
->  
-> -	if (coalesce) {
-> +	if (trap_is_mmio(flags) && (flags & IOTRAP_COALESCE)) {
->  		zone = (struct kvm_coalesced_mmio_zone) {
->  			.addr	= phys_addr,
->  			.size	= phys_addr_len,
-> @@ -138,19 +144,29 @@ int kvm__register_mmio(struct kvm *kvm, u64 phys_addr, u64 phys_addr_len, bool c
->  			return -errno;
->  		}
->  	}
-> +
->  	mutex_lock(&mmio_lock);
-> -	ret = mmio_insert(&mmio_tree, mmio);
-> +	if (trap_is_mmio(flags))
-> +		ret = mmio_insert(&mmio_tree, mmio);
-> +	else
-> +		ret = mmio_insert(&pio_tree, mmio);
->  	mutex_unlock(&mmio_lock);
->  
->  	return ret;
->  }
->  
-> -bool kvm__deregister_mmio(struct kvm *kvm, u64 phys_addr)
-> +bool kvm__deregister_iotrap(struct kvm *kvm, u64 phys_addr, unsigned int flags)
->  {
->  	struct mmio_mapping *mmio;
-> +	struct rb_root *tree;
-> +
-> +	if ((flags & IOTRAP_BUS_MASK) == DEVICE_BUS_IOPORT)
-> +		tree = &pio_tree;
-> +	else
-> +		tree = &mmio_tree;
+Actually, I take that back.  It'll require changing SVM, but due to the XSS
+interaction it's probably cleaner to leaf F(ARCH_LBR) as is, and do:
 
-We could swap the conditional branches and use trap_is_mmio(flags) like we do above.
+	if (!cpu_has_vmx_arch_lbr())
+		kvm_cpu_cap_clear(X86_FEATURE_ARCH_LBR);
 
-Regardless, the patch looks really good:
+and then unconditionally clear the cap for SVM.  In a way, that's arguably
+better documentation as it explicitly shows that SVM lacks supports.
 
-Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
-
-Thanks,
-
-Alex
-
->  
->  	mutex_lock(&mmio_lock);
-> -	mmio = mmio_search_single(&mmio_tree, phys_addr);
-> +	mmio = mmio_search_single(tree, phys_addr);
->  	if (mmio == NULL) {
->  		mutex_unlock(&mmio_lock);
->  		return false;
-> @@ -167,7 +183,7 @@ bool kvm__deregister_mmio(struct kvm *kvm, u64 phys_addr)
->  	 * called mmio_put(). This will trigger use-after-free errors on VCPU0.
->  	 */
->  	if (mmio->refcount == 0)
-> -		mmio_deregister(kvm, &mmio_tree, mmio);
-> +		mmio_deregister(kvm, tree, mmio);
->  	else
->  		mmio->remove = true;
->  	mutex_unlock(&mmio_lock);
-> @@ -175,7 +191,8 @@ bool kvm__deregister_mmio(struct kvm *kvm, u64 phys_addr)
->  	return true;
->  }
->  
-> -bool kvm__emulate_mmio(struct kvm_cpu *vcpu, u64 phys_addr, u8 *data, u32 len, u8 is_write)
-> +bool kvm__emulate_mmio(struct kvm_cpu *vcpu, u64 phys_addr, u8 *data,
-> +		       u32 len, u8 is_write)
->  {
->  	struct mmio_mapping *mmio;
->  
-> @@ -194,3 +211,31 @@ bool kvm__emulate_mmio(struct kvm_cpu *vcpu, u64 phys_addr, u8 *data, u32 len, u
->  out:
->  	return true;
->  }
-> +
-> +bool kvm__emulate_pio(struct kvm_cpu *vcpu, u16 port, void *data,
-> +		     int direction, int size, u32 count)
-> +{
-> +	struct mmio_mapping *mmio;
-> +	bool is_write = direction == KVM_EXIT_IO_OUT;
-> +
-> +	mmio = mmio_get(&pio_tree, port, size);
-> +	if (!mmio) {
-> +		if (vcpu->kvm->cfg.ioport_debug) {
-> +			fprintf(stderr, "IO error: %s port=%x, size=%d, count=%u\n",
-> +				to_direction(direction), port, size, count);
-> +
-> +			return false;
-> +		}
-> +		return true;
-> +	}
-> +
-> +	while (count--) {
-> +		mmio->mmio_fn(vcpu, port, data, size, is_write, mmio->ptr);
-> +
-> +		data += size;
-> +	}
-> +
-> +	mmio_put(vcpu->kvm, &pio_tree, mmio);
-> +
-> +	return true;
-> +}
+More thoughts in the next patch...
