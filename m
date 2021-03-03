@@ -2,54 +2,54 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 877C132C719
-	for <lists+kvm@lfdr.de>; Thu,  4 Mar 2021 02:09:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 10C8E32C716
+	for <lists+kvm@lfdr.de>; Thu,  4 Mar 2021 02:09:46 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240042AbhCDAbC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 3 Mar 2021 19:31:02 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:57376 "EHLO
+        id S234082AbhCDAbB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 3 Mar 2021 19:31:01 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:41018 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1386545AbhCCS3b (ORCPT
+        by vger.kernel.org with ESMTP id S1386550AbhCCS3b (ORCPT
         <rfc822;kvm@vger.kernel.org>); Wed, 3 Mar 2021 13:29:31 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1614796083;
+        s=mimecast20190719; t=1614796084;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=HpZXUiaC2c4IcwOvA2cs846pRcaPAAbCPhPXUPapPlg=;
-        b=GgAWKx0ImKR4xniVn2BWm10eTQL3hxKbcltUCh2N7r8nwLmETI3yCyd/x2dt1R/ek/n1Pe
-        gco+YBNhGkwG+rvYz0GOg0aG417Qje2XN6CBMubriQxlyt5YNOLdaGGWAuKER4UZWsWDC1
-        1X8VkrG5JPDsAyQLODJsZtqkidFfHmw=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-118-z506jDzcM72MrWEVa7dOiQ-1; Wed, 03 Mar 2021 13:23:51 -0500
-X-MC-Unique: z506jDzcM72MrWEVa7dOiQ-1
-Received: by mail-wr1-f69.google.com with SMTP id v13so12196174wrs.21
-        for <kvm@vger.kernel.org>; Wed, 03 Mar 2021 10:23:50 -0800 (PST)
+        bh=jSFJR2T0y61cEAykVjSlmIgXEHeIk/fhpqbk5zPRC7k=;
+        b=TXHM3J5ZTJy+nxwMU7umk3u7uw74HODwcUmf3ckN/QYyN+ICHoGa/K1EAZOOfztrcGi3lw
+        Pn9qAnUhbHNXvJvr1h2U8xDXTxe6AHTY/+P+Uafv8hCvEHlNcAe31Gu/uqNE6REaWPuZFq
+        +TIq41FDdc5r8phpLGEMm3JaOSjVnIg=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-405-VbVCEvlhOiq08SsSoUZiXA-1; Wed, 03 Mar 2021 13:23:56 -0500
+X-MC-Unique: VbVCEvlhOiq08SsSoUZiXA-1
+Received: by mail-wm1-f69.google.com with SMTP id u15so3401915wmj.2
+        for <kvm@vger.kernel.org>; Wed, 03 Mar 2021 10:23:56 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=HpZXUiaC2c4IcwOvA2cs846pRcaPAAbCPhPXUPapPlg=;
-        b=oNEr4oWrAz/A7rxdWfqeSX6wNTl8bsQ+D6tO8nkmO3EO9/Xbg928Yqxm+NMMm9CPX2
-         Q/Q21Y2wJ6zslyboZBeob8WE/H4byAg/vvWhtLpG03YltZVP+k+ICrq4t9JQiQ5PxeSz
-         aRl5+PqxZuLPVCmXMuoAOhVTlN1Z7Wm56snbv7qi7OZbw9rqjkYOV0tf/vkmcxSOXgHk
-         k+jcKHTgKwvEjnT15p7iMEDThmVdT3JgapxvbfiEYJ3rWCj3gsQmJfbVWjDU0tbNJUT0
-         aS9Le0MbJadNH2rLMaURcIXXAmXqHvPhrL/+zh/Q5FTIwRey0bfPxtksna8jPTfEO5EA
-         6boA==
-X-Gm-Message-State: AOAM530ntkm7JfHxh7zbvay4pWgRCJ4XepfBVyDrIanZynnekEXFnjK1
-        9IxJ1uPaWCgI2jyqPe9G67DTxNx89YEVG9EyiBx3RnyC5Lby6UzgQ4PA2aV3VhvI5/6NT5ZsLYX
-        SEkPP/RdULERK
-X-Received: by 2002:adf:9bd7:: with SMTP id e23mr38407wrc.48.1614795829817;
-        Wed, 03 Mar 2021 10:23:49 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJx5Hi2oRgLR+p5+nLOhzpKyBoO9bwdj0rvSDTYuP5mfCGdgF+ImQznX99ey9HDtd42t6mXMIw==
-X-Received: by 2002:adf:9bd7:: with SMTP id e23mr38385wrc.48.1614795829618;
-        Wed, 03 Mar 2021 10:23:49 -0800 (PST)
+        bh=jSFJR2T0y61cEAykVjSlmIgXEHeIk/fhpqbk5zPRC7k=;
+        b=j2+Duw1iE/ufbc/3E8yi2K1aZtt5RBVvQ3JYEdeEj8W4aokml0kyorExpDfNcEYZAt
+         S5VZr8icXjbFhFw98u3qkL6rBwBr/cXdVpFkRPhM0KaeEX2fiarJhNffHULFbzcX9ole
+         I42ku1RDbTTe6jNdNyCO5ohNTCAXggDsNiyYy20IXPdlPvDcWtBvLL0mxDWRSu8NGebA
+         BxyMAT2LXwESrPGqa91wv83v+IGqO6+KW8bMNdOo9JM/lBR/TK0lqd2DiZGg3zNVo38Y
+         TKD8aFZG12m/mYgKveafXXwz9yGdf+/Byci7AQy3vb28gCvycjSBS+ncFTHDxAwG34iD
+         aWLA==
+X-Gm-Message-State: AOAM533GId/WWZAaZeOWP2Ys8+DR6iLNFjM+y3EPWMDy0fTlD2FiFzis
+        pQhPQ4d1GL5XbfqNN0cQNkVWlp2CNA0Rzdb/oYhU8KJfEQMW1A0K6obsSDsCA7Dm1PeOhjMX3Xg
+        HzBHQGIWN7a/u
+X-Received: by 2002:adf:f941:: with SMTP id q1mr29310620wrr.189.1614795835235;
+        Wed, 03 Mar 2021 10:23:55 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJz+U5MnteFFnH0DvjeZoCaADZkKnu3iy+W7Ik0whDtmDP3G8okupBtGMb7OSZvJC7sHUOE4eg==
+X-Received: by 2002:adf:f941:: with SMTP id q1mr29310594wrr.189.1614795835090;
+        Wed, 03 Mar 2021 10:23:55 -0800 (PST)
 Received: from x1w.redhat.com (68.red-83-57-175.dynamicip.rima-tde.net. [83.57.175.68])
-        by smtp.gmail.com with ESMTPSA id p14sm6718722wmc.30.2021.03.03.10.23.48
+        by smtp.gmail.com with ESMTPSA id l15sm6604958wme.43.2021.03.03.10.23.53
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 03 Mar 2021 10:23:49 -0800 (PST)
+        Wed, 03 Mar 2021 10:23:54 -0800 (PST)
 From:   =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To:     qemu-devel@nongnu.org
 Cc:     Eduardo Habkost <ehabkost@redhat.com>,
@@ -73,9 +73,9 @@ Cc:     Eduardo Habkost <ehabkost@redhat.com>,
         Christian Borntraeger <borntraeger@de.ibm.com>,
         qemu-s390x@nongnu.org, haxm-team@intel.com,
         =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Subject: [RFC PATCH 13/19] accel/kvm: Declare and allocate AccelvCPUState struct
-Date:   Wed,  3 Mar 2021 19:22:13 +0100
-Message-Id: <20210303182219.1631042-14-philmd@redhat.com>
+Subject: [RFC PATCH 14/19] accel/kvm: Move the 'kvm_fd' field to AccelvCPUState
+Date:   Wed,  3 Mar 2021 19:22:14 +0100
+Message-Id: <20210303182219.1631042-15-philmd@redhat.com>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20210303182219.1631042-1-philmd@redhat.com>
 References: <20210303182219.1631042-1-philmd@redhat.com>
@@ -86,75 +86,88 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-In preparation of moving KVM-specific fields from CPUState
-to the accelerator-specific AccelvCPUState structure, first
-declare it empty and allocate it. This will make the following
-commits easier to review.
-
 Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 ---
- include/sysemu/kvm_int.h | 3 +++
- accel/kvm/kvm-all.c      | 5 +++++
- target/s390x/kvm.c       | 2 +-
- 3 files changed, 9 insertions(+), 1 deletion(-)
+ include/hw/core/cpu.h    | 2 --
+ include/sysemu/kvm_int.h | 4 ++++
+ accel/kvm/kvm-all.c      | 8 ++++----
+ 3 files changed, 8 insertions(+), 6 deletions(-)
 
+diff --git a/include/hw/core/cpu.h b/include/hw/core/cpu.h
+index 65ff8d86dbc..ca2526e6a23 100644
+--- a/include/hw/core/cpu.h
++++ b/include/hw/core/cpu.h
+@@ -314,7 +314,6 @@ struct AccelvCPUState;
+  * @opaque: User data.
+  * @mem_io_pc: Host Program Counter at which the memory was accessed.
+  * @accel_vcpu: Pointer to accelerator-specific AccelvCPUState field.
+- * @kvm_fd: vCPU file descriptor for KVM.
+  * @work_mutex: Lock to prevent multiple access to @work_list.
+  * @work_list: List of pending asynchronous work.
+  * @trace_dstate_delayed: Delayed changes to trace_dstate (includes all changes
+@@ -416,7 +415,6 @@ struct CPUState {
+ 
+     /* Accelerator-specific fields. */
+     struct AccelvCPUState *accel_vcpu;
+-    int kvm_fd;
+     struct KVMState *kvm_state;
+     struct kvm_run *kvm_run;
+     int hvf_fd;
 diff --git a/include/sysemu/kvm_int.h b/include/sysemu/kvm_int.h
-index ccb8869f01b..f57be10adde 100644
+index f57be10adde..3bf75e62293 100644
 --- a/include/sysemu/kvm_int.h
 +++ b/include/sysemu/kvm_int.h
-@@ -13,6 +13,9 @@
- #include "qemu/accel.h"
+@@ -14,6 +14,10 @@
  #include "sysemu/kvm.h"
  
-+struct AccelvCPUState {
-+};
-+
+ struct AccelvCPUState {
++    /**
++     * @kvm_fd: vCPU file descriptor for KVM
++     */
++    int kvm_fd;
+ };
+ 
  typedef struct KVMSlot
- {
-     hwaddr start_addr;
 diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-index 8259e89bbaf..4ccd12ea56a 100644
+index 4ccd12ea56a..1c08ff3fbe0 100644
 --- a/accel/kvm/kvm-all.c
 +++ b/accel/kvm/kvm-all.c
-@@ -399,6 +399,7 @@ void kvm_destroy_vcpu(CPUState *cpu)
-         error_report("kvm_destroy_vcpu failed");
-         exit(EXIT_FAILURE);
-     }
-+    g_free(cpu->accel_vcpu);
- }
+@@ -387,7 +387,7 @@ static int do_kvm_destroy_vcpu(CPUState *cpu)
  
- static int kvm_get_vcpu(KVMState *s, unsigned long vcpu_id)
-@@ -434,6 +435,7 @@ int kvm_init_vcpu(CPUState *cpu, Error **errp)
-         goto err;
+     vcpu = g_malloc0(sizeof(*vcpu));
+     vcpu->vcpu_id = kvm_arch_vcpu_id(cpu);
+-    vcpu->kvm_fd = cpu->kvm_fd;
++    vcpu->kvm_fd = cpu->accel_vcpu->kvm_fd;
+     QLIST_INSERT_HEAD(&kvm_state->kvm_parked_vcpus, vcpu, node);
+ err:
+     return ret;
+@@ -436,7 +436,7 @@ int kvm_init_vcpu(CPUState *cpu, Error **errp)
      }
  
-+    cpu->accel_vcpu = g_new(struct AccelvCPUState, 1);
-     cpu->kvm_fd = ret;
+     cpu->accel_vcpu = g_new(struct AccelvCPUState, 1);
+-    cpu->kvm_fd = ret;
++    cpu->accel_vcpu->kvm_fd = ret;
      cpu->kvm_state = s;
      cpu->vcpu_dirty = true;
-@@ -468,6 +470,9 @@ int kvm_init_vcpu(CPUState *cpu, Error **errp)
-                          kvm_arch_vcpu_id(cpu));
-     }
- err:
-+    if (ret < 0) {
-+        g_free(cpu->accel_vcpu);
-+    }
-     return ret;
- }
  
-diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
-index d8ac12dfc11..cf6790b2678 100644
---- a/target/s390x/kvm.c
-+++ b/target/s390x/kvm.c
-@@ -2085,7 +2085,7 @@ int kvm_s390_set_cpu_state(S390CPU *cpu, uint8_t cpu_state)
-     int ret;
- 
-     /* the kvm part might not have been initialized yet */
--    if (CPU(cpu)->kvm_state == NULL) {
-+    if (CPU(cpu)->accel_vcpu == NULL) {
-         return 0;
+@@ -449,7 +449,7 @@ int kvm_init_vcpu(CPUState *cpu, Error **errp)
      }
  
+     cpu->kvm_run = mmap(NULL, mmap_size, PROT_READ | PROT_WRITE, MAP_SHARED,
+-                        cpu->kvm_fd, 0);
++                        cpu->accel_vcpu->kvm_fd, 0);
+     if (cpu->kvm_run == MAP_FAILED) {
+         ret = -errno;
+         error_setg_errno(errp, ret,
+@@ -2631,7 +2631,7 @@ int kvm_vcpu_ioctl(CPUState *cpu, int type, ...)
+     va_end(ap);
+ 
+     trace_kvm_vcpu_ioctl(cpu->cpu_index, type, arg);
+-    ret = ioctl(cpu->kvm_fd, type, arg);
++    ret = ioctl(cpu->accel_vcpu->kvm_fd, type, arg);
+     if (ret == -1) {
+         ret = -errno;
+     }
 -- 
 2.26.2
 
