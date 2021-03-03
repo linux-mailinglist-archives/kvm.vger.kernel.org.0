@@ -2,181 +2,202 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C0D7932C651
-	for <lists+kvm@lfdr.de>; Thu,  4 Mar 2021 02:02:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8EE3A32C63C
+	for <lists+kvm@lfdr.de>; Thu,  4 Mar 2021 02:02:14 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1378993AbhCDA22 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 3 Mar 2021 19:28:28 -0500
-Received: from mga11.intel.com ([192.55.52.93]:44167 "EHLO mga11.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S242945AbhCCOSE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 3 Mar 2021 09:18:04 -0500
-IronPort-SDR: skKflAtxweii8+DZcb16U+hqFcOIR/NtUmhzupaQHDYJlAz1ugUZOmG8kweFrBKj75rQX3UTNh
- gcnbpcq3jrMw==
-X-IronPort-AV: E=McAfee;i="6000,8403,9911"; a="183819046"
-X-IronPort-AV: E=Sophos;i="5.81,220,1610438400"; 
-   d="scan'208";a="183819046"
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Mar 2021 06:05:52 -0800
-IronPort-SDR: ZGZV29hhF3391vVbzakTKbsbPpuGvQwk9XF2rJEh4TH6Hi9X/zzV3yovcsRCh7Tns9Cbj2Vi0h
- M9nGT5ZHXmhg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.81,220,1610438400"; 
-   d="scan'208";a="399729508"
-Received: from clx-ap-likexu.sh.intel.com ([10.239.48.108])
-  by fmsmga008.fm.intel.com with ESMTP; 03 Mar 2021 06:05:49 -0800
-From:   Like Xu <like.xu@linux.intel.com>
-To:     Peter Zijlstra <peterz@infradead.org>,
+        id S238080AbhCDA2C (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 3 Mar 2021 19:28:02 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:53080 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S242486AbhCCOI5 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 3 Mar 2021 09:08:57 -0500
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 123E38Jd021322;
+        Wed, 3 Mar 2021 09:07:19 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=b1Eil9MDUxhdYNA6OorS+IFTSjRbNFBSRjLKeiOk0KE=;
+ b=rw5abHo3xhuNsc5IT00HVzzlmjjaR4uoNHmJ/itP40bigjgAgVPNCEedDf6nyCGXh8XD
+ Y1iD+obRUlP0Z3iUKEGgqAel/OsC4J4/cBMBXEEd2JeBLwMMqed+8XwBbUw76EgBEV95
+ mBqhbKw6gpiG0qmnlxXXQQkQiRphfIsqcEF26FBJpMcmMbN7KFZgH2qhtx0OQfj6Uayu
+ M/n1IITerLX01AMSqz9OLXthbZ+MVIPTAPBvMLgOSIxzhgX36HFHrjVydvlAjE/wL9Rb
+ fFE4qrpGrzw+E1l785XvquJBoO6aMT3XciCHNpoymQympwOxsbzXmJbqYd1vOx3pWYG7 KQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 372ap3bda5-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 03 Mar 2021 09:07:18 -0500
+Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 123E3Emb021993;
+        Wed, 3 Mar 2021 09:07:18 -0500
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 372ap3bd4b-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 03 Mar 2021 09:07:18 -0500
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 123E4kIF028060;
+        Wed, 3 Mar 2021 14:07:13 GMT
+Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
+        by ppma03ams.nl.ibm.com with ESMTP id 371162hw15-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 03 Mar 2021 14:07:13 +0000
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
+        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 123E7B9R39649696
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 3 Mar 2021 14:07:11 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 23E254C046;
+        Wed,  3 Mar 2021 14:07:11 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 58BC94C04A;
+        Wed,  3 Mar 2021 14:07:10 +0000 (GMT)
+Received: from oc7455500831.ibm.com (unknown [9.171.85.32])
+        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Wed,  3 Mar 2021 14:07:10 +0000 (GMT)
+Subject: Re: [PATCH v1 1/2] s390x/kvm: Get rid of legacy_s390_alloc()
+To:     David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
+Cc:     kvm@vger.kernel.org, qemu-s390x@nongnu.org,
+        Cornelia Huck <cohuck@redhat.com>,
+        Thomas Huth <thuth@redhat.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Kan Liang <kan.liang@linux.intel.com>,
-        Dave Hansen <dave.hansen@intel.com>, wei.w.wang@intel.com,
-        Borislav Petkov <bp@alien8.de>, kvm@vger.kernel.org,
-        x86@kernel.org, linux-kernel@vger.kernel.org,
-        Like Xu <like.xu@linux.intel.com>
-Subject: [kvm-unit-tests PATCH] x86: Update guest LBR tests for Architectural LBR
-Date:   Wed,  3 Mar 2021 21:57:56 +0800
-Message-Id: <20210303135756.1546253-11-like.xu@linux.intel.com>
-X-Mailer: git-send-email 2.29.2
-In-Reply-To: <20210303135756.1546253-1-like.xu@linux.intel.com>
-References: <20210303135756.1546253-1-like.xu@linux.intel.com>
+        Richard Henderson <rth@twiddle.net>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Igor Mammedov <imammedo@redhat.com>,
+        Peter Xu <peterx@redhat.com>
+References: <20210303130916.22553-1-david@redhat.com>
+ <20210303130916.22553-2-david@redhat.com>
+From:   Christian Borntraeger <borntraeger@de.ibm.com>
+Message-ID: <ffb3c5f5-03bc-c8f8-b414-0556cbdbc101@de.ibm.com>
+Date:   Wed, 3 Mar 2021 15:07:10 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.7.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20210303130916.22553-2-david@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.761
+ definitions=2021-03-03_04:2021-03-03,2021-03-03 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 phishscore=0
+ clxscore=1011 impostorscore=0 mlxlogscore=999 suspectscore=0 mlxscore=0
+ lowpriorityscore=0 spamscore=0 adultscore=0 bulkscore=0 priorityscore=1501
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
+ definitions=main-2103030107
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This unit-test is intended to test the KVM's support for the
-Architectural LBRs which is a Architectural performance monitor
-unit (PMU) feature on Intel processors.
 
-If the LBR bit is set to 1 in the MSR_ARCH_LBR_CTL, the processor
-will record a running trace of the most recent branches guest
-taken in the LBR entries for guest to read.
 
-Signed-off-by: Like Xu <like.xu@linux.intel.com>
----
- x86/pmu_lbr.c | 62 ++++++++++++++++++++++++++++++++++++++++++---------
- 1 file changed, 52 insertions(+), 10 deletions(-)
+On 03.03.21 14:09, David Hildenbrand wrote:
+> legacy_s390_alloc() was required for dealing with the absence of the ESOP
+> feature -- on old HW (< gen 10) and old z/VM versions (< 6.3).
+> 
+> As z/VM v6.2 (and even v6.3) is no longer supported since 2017 [1]
+> and we don't expect to have real users on such old hardware, let's drop
+> legacy_s390_alloc().
+> 
+> Still check+report an error just in case someone still runs on
+> such old z/VM environments, or someone runs under weird nested KVM
+> setups (where we can manually disable ESOP via the CPU model).
+> 
+> No need to check for KVM_CAP_GMAP - that should always be around on
+> kernels that also have KVM_CAP_DEVICE_CTRL (>= v3.15).
+> 
+> [1] https://www.ibm.com/support/lifecycle/search?q=z%2FVM
+> 
+> Suggested-by: Cornelia Huck <cohuck@redhat.com>
+> Suggested-by: Thomas Huth <thuth@redhat.com>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: Richard Henderson <rth@twiddle.net>
+> Cc: Halil Pasic <pasic@linux.ibm.com>
+> Cc: Cornelia Huck <cohuck@redhat.com>
+> Cc: Christian Borntraeger <borntraeger@de.ibm.com>
+> Cc: Thomas Huth <thuth@redhat.com>
+> Cc: Igor Mammedov <imammedo@redhat.com>
+> Cc: Peter Xu <peterx@redhat.com>
+> Signed-off-by: David Hildenbrand <david@redhat.com>
 
-diff --git a/x86/pmu_lbr.c b/x86/pmu_lbr.c
-index 3bd9e9f..588aec8 100644
---- a/x86/pmu_lbr.c
-+++ b/x86/pmu_lbr.c
-@@ -6,6 +6,7 @@
- #define MAX_NUM_LBR_ENTRY	  32
- #define DEBUGCTLMSR_LBR	  (1UL <<  0)
- #define PMU_CAP_LBR_FMT	  0x3f
-+#define KVM_ARCH_LBR_CTL_MASK			0x7f000f
- 
- #define MSR_LBR_NHM_FROM	0x00000680
- #define MSR_LBR_NHM_TO		0x000006c0
-@@ -13,6 +14,10 @@
- #define MSR_LBR_CORE_TO	0x00000060
- #define MSR_LBR_TOS		0x000001c9
- #define MSR_LBR_SELECT		0x000001c8
-+#define MSR_ARCH_LBR_CTL		0x000014ce
-+#define MSR_ARCH_LBR_DEPTH		0x000014cf
-+#define MSR_ARCH_LBR_FROM_0		0x00001500
-+#define MSR_ARCH_LBR_TO_0		0x00001600
- 
- volatile int count;
- 
-@@ -66,6 +71,9 @@ int main(int ac, char **av)
- 	struct cpuid id = cpuid(10);
- 	u64 perf_cap;
- 	int max, i;
-+	bool arch_lbr = false;
-+	u32 ctl_msr = MSR_IA32_DEBUGCTLMSR;
-+	u64 ctl_value = DEBUGCTLMSR_LBR;
- 
- 	setup_vm();
- 	perf_cap = rdmsr(MSR_IA32_PERF_CAPABILITIES);
-@@ -80,8 +88,23 @@ int main(int ac, char **av)
- 		return report_summary();
- 	}
- 
-+	/*
-+	 * On processors that support Architectural LBRs,
-+	 * IA32_PERF_CAPABILITIES.LBR_FMT will have the value 03FH.
-+	 */
-+	if (0x3f == (perf_cap & PMU_CAP_LBR_FMT)) {
-+		arch_lbr = true;
-+		ctl_msr = MSR_ARCH_LBR_CTL;
-+		/* DEPTH defaults to the maximum number of LBRs entries. */
-+		max = rdmsr(MSR_ARCH_LBR_DEPTH) - 1;
-+		ctl_value = KVM_ARCH_LBR_CTL_MASK;
-+	}
-+
- 	printf("PMU version:		 %d\n", eax.split.version_id);
--	printf("LBR version:		 %ld\n", perf_cap & PMU_CAP_LBR_FMT);
-+	if (!arch_lbr)
-+		printf("LBR version:		 %ld\n", perf_cap & PMU_CAP_LBR_FMT);
-+	else
-+		printf("Architectural LBR depth:		 %d\n", max + 1);
- 
- 	/* Look for LBR from and to MSRs */
- 	lbr_from = MSR_LBR_CORE_FROM;
-@@ -90,27 +113,46 @@ int main(int ac, char **av)
- 		lbr_from = MSR_LBR_NHM_FROM;
- 		lbr_to = MSR_LBR_NHM_TO;
- 	}
-+	if (test_init_lbr_from_exception(0)) {
-+		lbr_from = MSR_ARCH_LBR_FROM_0;
-+		lbr_to = MSR_ARCH_LBR_TO_0;
-+	}
- 
- 	if (test_init_lbr_from_exception(0)) {
- 		printf("LBR on this platform is not supported!\n");
- 		return report_summary();
- 	}
- 
--	wrmsr(MSR_LBR_SELECT, 0);
--	wrmsr(MSR_LBR_TOS, 0);
--	for (max = 0; max < MAX_NUM_LBR_ENTRY; max++) {
--		if (test_init_lbr_from_exception(max))
--			break;
-+	/* Reset the guest LBR entries. */
-+	if (arch_lbr) {
-+		/* On a software write to IA32_LBR_DEPTH, all LBR entries are reset to 0.*/
-+		wrmsr(MSR_ARCH_LBR_DEPTH, max + 1);
-+	} else {
-+		wrmsr(MSR_LBR_SELECT, 0);
-+		wrmsr(MSR_LBR_TOS, 0);
-+		for (max = 0; max < MAX_NUM_LBR_ENTRY; max++) {
-+			if (test_init_lbr_from_exception(max))
-+				break;
-+		}
- 	}
--
- 	report(max > 0, "The number of guest LBR entries is good.");
- 
-+	/* Check the guest LBR entries are initialized. */
-+	for (i = 0; i < max; ++i) {
-+		if (rdmsr(lbr_to + i) || rdmsr(lbr_from + i))
-+			break;
-+	}
-+	report(i == max, "The guest LBR initialized FROM_IP/TO_IP values are good.");
-+
- 	/* Do some branch instructions. */
--	wrmsr(MSR_IA32_DEBUGCTLMSR, DEBUGCTLMSR_LBR);
-+	wrmsr(ctl_msr, ctl_value);
- 	lbr_test();
--	wrmsr(MSR_IA32_DEBUGCTLMSR, 0);
-+	wrmsr(ctl_msr, 0);
- 
--	report(rdmsr(MSR_LBR_TOS) != 0, "The guest LBR MSR_LBR_TOS value is good.");
-+	/* Check if the guest LBR has recorded some branches. */
-+	if (!arch_lbr) {
-+		report(rdmsr(MSR_LBR_TOS) != 0, "The guest LBR MSR_LBR_TOS value is good.");
-+	}
- 	for (i = 0; i < max; ++i) {
- 		if (!rdmsr(lbr_to + i) || !rdmsr(lbr_from + i))
- 			break;
--- 
-2.29.2
+I agree, this should now be a corner case that we do not necessarily have to care about.
 
+> ---
+>   target/s390x/kvm.c | 43 +++++--------------------------------------
+>   1 file changed, 5 insertions(+), 38 deletions(-)
+> 
+> diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
+> index 7a892d663d..84b40572f2 100644
+> --- a/target/s390x/kvm.c
+> +++ b/target/s390x/kvm.c
+> @@ -161,8 +161,6 @@ static int cap_protected;
+>   
+>   static int active_cmma;
+>   
+> -static void *legacy_s390_alloc(size_t size, uint64_t *align, bool shared);
+> -
+>   static int kvm_s390_query_mem_limit(uint64_t *memory_limit)
+>   {
+>       struct kvm_device_attr attr = {
+> @@ -349,6 +347,11 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
+>                        "please use kernel 3.15 or newer");
+>           return -1;
+>       }
+> +    if (!kvm_check_extension(s, KVM_CAP_S390_COW)) {
+> +        error_report("KVM is missing capability KVM_CAP_S390_COW - "
+> +                     "unsupported environment");
+> +        return -1;
+> +    }
+>   
+>       cap_sync_regs = kvm_check_extension(s, KVM_CAP_SYNC_REGS);
+>       cap_async_pf = kvm_check_extension(s, KVM_CAP_ASYNC_PF);
+> @@ -357,11 +360,6 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
+>       cap_vcpu_resets = kvm_check_extension(s, KVM_CAP_S390_VCPU_RESETS);
+>       cap_protected = kvm_check_extension(s, KVM_CAP_S390_PROTECTED);
+>   
+> -    if (!kvm_check_extension(s, KVM_CAP_S390_GMAP)
+> -        || !kvm_check_extension(s, KVM_CAP_S390_COW)) {
+> -        phys_mem_set_alloc(legacy_s390_alloc);
+> -    }
+> -
+>       kvm_vm_enable_cap(s, KVM_CAP_S390_USER_SIGP, 0);
+>       kvm_vm_enable_cap(s, KVM_CAP_S390_VECTOR_REGISTERS, 0);
+>       kvm_vm_enable_cap(s, KVM_CAP_S390_USER_STSI, 0);
+> @@ -889,37 +887,6 @@ int kvm_s390_mem_op_pv(S390CPU *cpu, uint64_t offset, void *hostbuf,
+>       return ret;
+>   }
+>   
+> -/*
+> - * Legacy layout for s390:
+> - * Older S390 KVM requires the topmost vma of the RAM to be
+> - * smaller than an system defined value, which is at least 256GB.
+> - * Larger systems have larger values. We put the guest between
+> - * the end of data segment (system break) and this value. We
+> - * use 32GB as a base to have enough room for the system break
+> - * to grow. We also have to use MAP parameters that avoid
+> - * read-only mapping of guest pages.
+> - */
+> -static void *legacy_s390_alloc(size_t size, uint64_t *align, bool shared)
+> -{
+> -    static void *mem;
+> -
+> -    if (mem) {
+> -        /* we only support one allocation, which is enough for initial ram */
+> -        return NULL;
+> -    }
+> -
+> -    mem = mmap((void *) 0x800000000ULL, size,
+> -               PROT_EXEC|PROT_READ|PROT_WRITE,
+> -               MAP_SHARED | MAP_ANONYMOUS | MAP_FIXED, -1, 0);
+> -    if (mem == MAP_FAILED) {
+> -        mem = NULL;
+> -    }
+> -    if (mem && align) {
+> -        *align = QEMU_VMALLOC_ALIGN;
+> -    }
+> -    return mem;
+> -}
+> -
+>   static uint8_t const *sw_bp_inst;
+>   static uint8_t sw_bp_ilen;
+>   
+> 
