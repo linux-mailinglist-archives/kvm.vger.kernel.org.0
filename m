@@ -2,14 +2,14 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5527B32C6F5
-	for <lists+kvm@lfdr.de>; Thu,  4 Mar 2021 02:09:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9853432C6F7
+	for <lists+kvm@lfdr.de>; Thu,  4 Mar 2021 02:09:22 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1451170AbhCDAah (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 3 Mar 2021 19:30:37 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:60256 "EHLO
+        id S1344388AbhCDAal (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 3 Mar 2021 19:30:41 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:56610 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1377705AbhCCS2h (ORCPT
+        by vger.kernel.org with ESMTP id S1377260AbhCCS2h (ORCPT
         <rfc822;kvm@vger.kernel.org>); Wed, 3 Mar 2021 13:28:37 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
         s=mimecast20190719; t=1614796023;
@@ -17,39 +17,39 @@ DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=3WOU0ObUPkLYlvbEIzar57F9vUZTGCF79gCYDqtyU50=;
-        b=FvGOvFJsz/fLD5+RdtJFZDwgcNo9ZKfjAHRgD1lBAEWliVbGu1onYBcX/bjXyj1/qWc9L4
-        ua+s5kv2rwbiTAxcI70emj4CDOMrpu6aYkBX11YA9gg2sILteEf63yDryY8xBXV5gsiTfT
-        0qgpD//WHvPgFp4jvVczNoxgHka98QY=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-210-uK0UFzfeOS2752BtQwqIAw-1; Wed, 03 Mar 2021 13:22:51 -0500
-X-MC-Unique: uK0UFzfeOS2752BtQwqIAw-1
-Received: by mail-wr1-f72.google.com with SMTP id l10so13159846wry.16
-        for <kvm@vger.kernel.org>; Wed, 03 Mar 2021 10:22:51 -0800 (PST)
+        bh=PLSHq+T6Ji51VQxldUQn+fMOB/V6gychel2awYEX8OQ=;
+        b=E7PcqCyYOBd9ukCCdc+/8AHwW8lqYO0WDzFUSUaXumAED/qzPkESh0egDjr0WPky+zpjPt
+        JanLpL/756PmrFe9kQA+l3ZkRfgyMc/r9iwjTAozbukAKCYKBjNITc4cyB7cdzCe8mpWY4
+        M866HmA32LmGXsJSGMwPM0ybWGq+TgA=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-490-2UnEy_V2PYSB1aeq4QHNZw-1; Wed, 03 Mar 2021 13:22:58 -0500
+X-MC-Unique: 2UnEy_V2PYSB1aeq4QHNZw-1
+Received: by mail-wr1-f69.google.com with SMTP id l10so13160032wry.16
+        for <kvm@vger.kernel.org>; Wed, 03 Mar 2021 10:22:58 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=3WOU0ObUPkLYlvbEIzar57F9vUZTGCF79gCYDqtyU50=;
-        b=maZmNwTn+94XQcpz3zyb/xnU1oJIvzlnGirHaGrgZdEejVS0IBMuOYS2KOA3+DcTUV
-         LoZMD8Xn6vZnbpezHZQEheU3FUBnd7NcFpdQYkFm1dfA3gY7Bv5PsPmjFbZYKcT/Za1/
-         AMRLgELY5YfG6sS2TCH3TpntKSVrWHv5JIRBsQEZJns6WxBCFvISJUiBorgx0et2CaaT
-         +ooAHq3BqTWmnwQVjK6IQaBA1ATZO95Kl9PnjXv6l3iLceS47dxDOaz5zPfpu/hTKg07
-         tHUctxzFywppjGpaqMk4X61ZPwV9+AUcn3HXbEfT/wiP4sHec2/838XwlOMrsMEI2qGD
-         UHEQ==
-X-Gm-Message-State: AOAM532VM27CVTbLkrB5yb3eyRu5+m8nYR7AK7pHDhjW3ax3aTGbM10Q
-        UEVZdifMlfP8KpJ4gFV4E07N7K1aBXcDwAs4IoXhvUqq/sPb6iAkWx9WDynebvfcEoMmwvsccNP
-        2xesvOw2ti9p/
-X-Received: by 2002:adf:fe01:: with SMTP id n1mr28570467wrr.341.1614795770195;
-        Wed, 03 Mar 2021 10:22:50 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJzqqykw9kqMqftlN/tD2Ahqv9Vq5lqc3xUzYUUXIkr2YeSmzmNjmOGpzqJYOAdnlKq3vN7dKg==
-X-Received: by 2002:adf:fe01:: with SMTP id n1mr28570454wrr.341.1614795770019;
-        Wed, 03 Mar 2021 10:22:50 -0800 (PST)
+        bh=PLSHq+T6Ji51VQxldUQn+fMOB/V6gychel2awYEX8OQ=;
+        b=hvOdiUmbIflHF2BQzod6K/ISMJJBxntm5PTB75dM0yt3LM3TmKRhapddbtVT7XhmC1
+         IstHyKqroQeYlFn+JambDepA46CDENrXit0aRcgMqwUW8OpYoMqBuR/xU9pp83/K9dxc
+         zFrI+gXDXGofp9F7YuRFznoUe6io+HOMM63DNSefhMC8z3Fo+wtlu4REFrkpIFkREcNa
+         aS6myyBzuV+j5be3rbeg+jyEtk8oT+xO0KqCPz3UhMrI6dStPxhYQZSaS2lc47COioPT
+         QBJOgqQPT/v5O6qyClsmjk+QYCuP9Zz2y4stWliFkkIX07IBERdimtEjA2cemhjl7qVF
+         f1VQ==
+X-Gm-Message-State: AOAM531N10jiraGXog+h6p2ShILZ8GGXDPiS37F8YM922th+80ZvT9+D
+        4CpFzlZwI2aKPdG0a/t0qFZiDz7iMGAGcOd8HQbPLiBI0X/B8GDj57LQfV30rjWc+/7evSOpdxH
+        eeLpP9UFStjpm
+X-Received: by 2002:a5d:4445:: with SMTP id x5mr36864wrr.30.1614795777196;
+        Wed, 03 Mar 2021 10:22:57 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJyL7XqgigoYX+jhMS8HmdFrzDcCNORueIOZ/5Ml4d8Vt2v7I+aoNp8Jrifd3yZk0HsaustCqA==
+X-Received: by 2002:a5d:4445:: with SMTP id x5mr36729wrr.30.1614795775449;
+        Wed, 03 Mar 2021 10:22:55 -0800 (PST)
 Received: from x1w.redhat.com (68.red-83-57-175.dynamicip.rima-tde.net. [83.57.175.68])
-        by smtp.gmail.com with ESMTPSA id a198sm6785613wmd.11.2021.03.03.10.22.48
+        by smtp.gmail.com with ESMTPSA id g9sm34117131wrp.14.2021.03.03.10.22.53
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 03 Mar 2021 10:22:49 -0800 (PST)
+        Wed, 03 Mar 2021 10:22:55 -0800 (PST)
 From:   =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To:     qemu-devel@nongnu.org
 Cc:     Eduardo Habkost <ehabkost@redhat.com>,
@@ -73,9 +73,9 @@ Cc:     Eduardo Habkost <ehabkost@redhat.com>,
         Christian Borntraeger <borntraeger@de.ibm.com>,
         qemu-s390x@nongnu.org, haxm-team@intel.com,
         =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Subject: [PATCH 04/19] cpu: Croup accelerator-specific fields altogether
-Date:   Wed,  3 Mar 2021 19:22:04 +0100
-Message-Id: <20210303182219.1631042-5-philmd@redhat.com>
+Subject: [RFC PATCH 05/19] cpu: Introduce AccelvCPUState opaque structure
+Date:   Wed,  3 Mar 2021 19:22:05 +0100
+Message-Id: <20210303182219.1631042-6-philmd@redhat.com>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20210303182219.1631042-1-philmd@redhat.com>
 References: <20210303182219.1631042-1-philmd@redhat.com>
@@ -86,50 +86,44 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Introduce the opaque 'AccelvCPUState' structure which will
+be declared by each accelerator. Forward-declare it in "cpu.h".
+
 Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 ---
- include/hw/core/cpu.h | 14 ++++++--------
- 1 file changed, 6 insertions(+), 8 deletions(-)
+ include/hw/core/cpu.h | 5 +++++
+ 1 file changed, 5 insertions(+)
 
 diff --git a/include/hw/core/cpu.h b/include/hw/core/cpu.h
-index c005d3dc2d8..074199ce73c 100644
+index 074199ce73c..d807645af2b 100644
 --- a/include/hw/core/cpu.h
 +++ b/include/hw/core/cpu.h
-@@ -393,10 +393,6 @@ struct CPUState {
-      */
-     uintptr_t mem_io_pc;
+@@ -274,6 +274,9 @@ struct qemu_work_item;
+ #define CPU_UNSET_NUMA_NODE_ID -1
+ #define CPU_TRACE_DSTATE_MAX_EVENTS 32
  
--    int kvm_fd;
--    struct KVMState *kvm_state;
--    struct kvm_run *kvm_run;
--
-     /* Used for events with 'vcpu' and *without* the 'disabled' properties */
-     DECLARE_BITMAP(trace_dstate_delayed, CPU_TRACE_DSTATE_MAX_EVENTS);
-     DECLARE_BITMAP(trace_dstate, CPU_TRACE_DSTATE_MAX_EVENTS);
-@@ -416,6 +412,12 @@ struct CPUState {
-     uint32_t can_do_io;
++/* This structure is defined by each accelerator. */
++struct AccelvCPUState;
++
+ /**
+  * CPUState:
+  * @cpu_index: CPU index (informative).
+@@ -312,6 +315,7 @@ struct qemu_work_item;
+  * @next_cpu: Next CPU sharing TB cache.
+  * @opaque: User data.
+  * @mem_io_pc: Host Program Counter at which the memory was accessed.
++ * @accel_vcpu: Pointer to accelerator-specific AccelvCPUState field.
+  * @kvm_fd: vCPU file descriptor for KVM.
+  * @work_mutex: Lock to prevent multiple access to @work_list.
+  * @work_list: List of pending asynchronous work.
+@@ -413,6 +417,7 @@ struct CPUState {
      int32_t exception_index;
  
-+    /* Accelerator-specific fields. */
-+    int kvm_fd;
-+    struct KVMState *kvm_state;
-+    struct kvm_run *kvm_run;
-+    struct hax_vcpu_state *hax_vcpu;
-+    int hvf_fd;
-     /* shared by kvm, hax and hvf */
-     bool vcpu_dirty;
- 
-@@ -426,10 +428,6 @@ struct CPUState {
- 
-     bool ignore_memory_transaction_failures;
- 
--    struct hax_vcpu_state *hax_vcpu;
--
--    int hvf_fd;
--
-     /* track IOMMUs whose translations we've cached in the TCG TLB */
-     GArray *iommu_notifiers;
- };
+     /* Accelerator-specific fields. */
++    struct AccelvCPUState *accel_vcpu;
+     int kvm_fd;
+     struct KVMState *kvm_state;
+     struct kvm_run *kvm_run;
 -- 
 2.26.2
 
