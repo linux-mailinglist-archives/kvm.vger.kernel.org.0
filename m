@@ -2,107 +2,157 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 477F932D858
-	for <lists+kvm@lfdr.de>; Thu,  4 Mar 2021 18:10:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E3C0132D87E
+	for <lists+kvm@lfdr.de>; Thu,  4 Mar 2021 18:19:15 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239025AbhCDRJJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 4 Mar 2021 12:09:09 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:55368 "EHLO
+        id S236197AbhCDRSM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 4 Mar 2021 12:18:12 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:35875 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S239085AbhCDRJD (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 4 Mar 2021 12:09:03 -0500
+        by vger.kernel.org with ESMTP id S231169AbhCDRRn (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 4 Mar 2021 12:17:43 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1614877658;
+        s=mimecast20190719; t=1614878177;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=g78jleyct6Y4h1V/HBlVEU68RhFKMuqYYL2sGBU8pQU=;
-        b=UWPtbN2A+R/wyR/avLHUEKG+BRs9DyzlXhmarqmQIpSgId6EoNUHmcj3kPuUvJr97c97s0
-        sJrAAnCK6L42QYOYYMXfuQ7YiADk9VT3bkIxXpx5OtgrIolPEIXmH0aW7UiOtr4iI9yk/r
-        yf+30yzhtvGcblPVKVNymbJe6xXUfII=
+        bh=SY3y/fjQ9gcJBSAM3ZTh/kWFdCD5EKEzVNMAsrCAGpU=;
+        b=hbl1h6YKessYnMibtP0E4P8FuM0vhtkwCryIuht5jbeBloy2BcfcSwwDtty1PLdVbIEpOh
+        vBMdEhIElONlrnid2D76jWudQn3PDdyDnCNx6H+aYye6hGdUB7S3HAUSbB9wkn1L5sZSZS
+        S437msiAPYwZ1CGUnW2skCZaUjXHPdY=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-510-4onhNTUTO6u9Wlz3Xod8Gg-1; Thu, 04 Mar 2021 12:07:36 -0500
-X-MC-Unique: 4onhNTUTO6u9Wlz3Xod8Gg-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+ us-mta-581-h9RhXSbPOKGq3Iq6rZJaxg-1; Thu, 04 Mar 2021 12:16:13 -0500
+X-MC-Unique: h9RhXSbPOKGq3Iq6rZJaxg-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B127B1346DF;
-        Thu,  4 Mar 2021 17:06:33 +0000 (UTC)
-Received: from gondolin (ovpn-114-163.ams2.redhat.com [10.36.114.163])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 2704160C0F;
-        Thu,  4 Mar 2021 17:06:28 +0000 (UTC)
-Date:   Thu, 4 Mar 2021 18:06:26 +0100
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Pierre Morel <pmorel@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, frankja@linux.ibm.com, david@redhat.com,
-        thuth@redhat.com, imbrenda@linux.ibm.com
-Subject: Re: [kvm-unit-tests PATCH v4 0/6] CSS Mesurement Block
-Message-ID: <20210304180626.18de1a9f.cohuck@redhat.com>
-In-Reply-To: <1614599225-17734-1-git-send-email-pmorel@linux.ibm.com>
-References: <1614599225-17734-1-git-send-email-pmorel@linux.ibm.com>
-Organization: Red Hat GmbH
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 361B592535;
+        Thu,  4 Mar 2021 17:16:09 +0000 (UTC)
+Received: from localhost (ovpn-114-199.ams2.redhat.com [10.36.114.199])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id B78EF19645;
+        Thu,  4 Mar 2021 17:15:55 +0000 (UTC)
+Date:   Thu, 4 Mar 2021 17:15:54 +0000
+From:   Stefan Hajnoczi <stefanha@redhat.com>
+To:     Colin King <colin.king@canonical.com>
+Cc:     "Michael S . Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
+        netdev@vger.kernel.org, kernel-janitors@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] scsi: target: vhost-scsi: remove redundant
+ initialization of variable ret
+Message-ID: <YEEVypxRJloK/CRk@stefanha-x1.localdomain>
+References: <20210303134339.67339-1-colin.king@canonical.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="O/Mw4/hwfMu4pg68"
+Content-Disposition: inline
+In-Reply-To: <20210303134339.67339-1-colin.king@canonical.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon,  1 Mar 2021 12:46:59 +0100
-Pierre Morel <pmorel@linux.ibm.com> wrote:
 
-> We tests the update of the Mesurement Block (MB) format 0
-> and format 1 using a serie of senseid requests.
-> 
-> *Warning*: One of the tests for format-1 will unexpectedly fail for QEMU elf
-> unless the QEMU patch "css: SCHIB measurement block origin must be aligned"
-> is applied.
-> With Protected Virtualization, the PGM is correctly recognized.
-> 
-> The MB format 1 is only provided if the Extended mesurement Block
-> feature is available.
-> 
-> This feature is exposed by the CSS characteristics general features
-> stored by the Store Channel Subsystem Characteristics CHSC command,
-> consequently, we implement the CHSC instruction call and the SCSC CHSC
-> command.
-> 
-> In order to ease the writing of new tests using:
-> - interrupt
-> - enablement of a subchannel
-> - multiple I/O on a subchannel
-> 
-> We do the following simplifications:
-> - we create a CSS initialization routine
-> - we register the I/O interrupt handler on CSS initialization
-> - we do not enable or disable a subchannel in the senseid test,
->   assuming this test is done after the enable test, this allows
->   to create traffic using the SSCH used by senseid.
-> - we add a css_enabled() function to test if a subchannel is enabled.
-> 
-> @Connie, I restructured the patches but I did not modify the
-> functionalities, so I kept your R-B, I hope you are OK with this.
+--O/Mw4/hwfMu4pg68
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Yes, that's fine with me.
+On Wed, Mar 03, 2021 at 01:43:39PM +0000, Colin King wrote:
+> From: Colin Ian King <colin.king@canonical.com>
+>=20
+> The variable ret is being initialized with a value that is never read
+> and it is being updated later with a new value.  The initialization is
+> redundant and can be removed.
+>=20
+> Addresses-Coverity: ("Unused value")
+> Signed-off-by: Colin Ian King <colin.king@canonical.com>
+> ---
+>  drivers/vhost/scsi.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
-> 
-> Regards,
-> Pierre
-> 
-> Pierre Morel (6):
->   s390x: css: Store CSS Characteristics
->   s390x: css: simplifications of the tests
->   s390x: css: extending the subchannel modifying functions
->   s390x: css: implementing Set CHannel Monitor
->   s390x: css: testing measurement block format 0
->   s390x: css: testing measurement block format 1
-> 
->  lib/s390x/css.h     | 116 +++++++++++++++++++++-
->  lib/s390x/css_lib.c | 232 +++++++++++++++++++++++++++++++++++++++++---
->  s390x/css.c         | 228 +++++++++++++++++++++++++++++++++++++++----
->  3 files changed, 542 insertions(+), 34 deletions(-)
-> 
+Which kernel version is this patch based on?
+
+If it's a fix for a patch that hasn't landed yet, please indicate this.
+A "Fixes: ..." tag should be added to this patch as well.
+
+I looked at linux.git/master commit f69d02e37a85645aa90d18cacfff36dba370f79=
+7 and see this:
+
+  static int __init vhost_scsi_init(void)
+  {
+          int ret =3D -ENOMEM;
+
+          pr_debug("TCM_VHOST fabric module %s on %s/%s"
+                  " on "UTS_RELEASE"\n", VHOST_SCSI_VERSION, utsname()->sys=
+name,
+                  utsname()->machine);
+
+          /*
+           * Use our own dedicated workqueue for submitting I/O into
+           * target core to avoid contention within system_wq.
+           */
+          vhost_scsi_workqueue =3D alloc_workqueue("vhost_scsi", 0, 0);
+          if (!vhost_scsi_workqueue)
+                  goto out;
+
+We need ret's initialization value here ^
+
+          ret =3D vhost_scsi_register();
+          if (ret < 0)
+                  goto out_destroy_workqueue;
+
+          ret =3D target_register_template(&vhost_scsi_ops);
+          if (ret < 0)
+                  goto out_vhost_scsi_deregister;
+
+          return 0;
+
+  out_vhost_scsi_deregister:
+          vhost_scsi_deregister();
+  out_destroy_workqueue:
+          destroy_workqueue(vhost_scsi_workqueue);
+  out:
+          return ret;
+  };
+
+
+>=20
+> diff --git a/drivers/vhost/scsi.c b/drivers/vhost/scsi.c
+> index d16c04dcc144..9129ab8187fd 100644
+> --- a/drivers/vhost/scsi.c
+> +++ b/drivers/vhost/scsi.c
+> @@ -2465,7 +2465,7 @@ static const struct target_core_fabric_ops vhost_sc=
+si_ops =3D {
+> =20
+>  static int __init vhost_scsi_init(void)
+>  {
+> -	int ret =3D -ENOMEM;
+> +	int ret;
+> =20
+>  	pr_debug("TCM_VHOST fabric module %s on %s/%s"
+>  		" on "UTS_RELEASE"\n", VHOST_SCSI_VERSION, utsname()->sysname,
+> --=20
+> 2.30.0
+>=20
+
+--O/Mw4/hwfMu4pg68
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAmBBFcoACgkQnKSrs4Gr
+c8gNDQgAxM4D7kpB9RqQmwD/pZXfh57rpPDY0uHmPrBOq7MKsTXUfM1+n3cqcck5
+qp5XiRpnP8mgoJ374YNyayk8ce7uB5z24/A56unCdzgC5cPPPmxvckd7RvG/3aTS
+cKAUbh+I1wNWJCcbzJS/aGI/VOtMRHC3XoWGvXRA8N+FaeCRvyR+I7jyj+iTIeW+
+hZNlQPI5da9WIcsUKyhq3963CdDjCuudTFIQNP8/EhsimQiWgt4DIqc+yJP+H2ny
+Ai1LQxhQskm7QSAnVZz9QhfWdnF5HUK+46Dy0xeO3OzbgeHJBN2y32g1d+5kL1kj
+hL+eyNKX93GZqvoeq8Lh7RVfhQkmFQ==
+=yn4t
+-----END PGP SIGNATURE-----
+
+--O/Mw4/hwfMu4pg68--
 
