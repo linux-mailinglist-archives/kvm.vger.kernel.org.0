@@ -2,133 +2,215 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D6BA832D6E2
-	for <lists+kvm@lfdr.de>; Thu,  4 Mar 2021 16:43:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BD6A532D717
+	for <lists+kvm@lfdr.de>; Thu,  4 Mar 2021 16:51:36 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235259AbhCDPmo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 4 Mar 2021 10:42:44 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:57394 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S235146AbhCDPmQ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 4 Mar 2021 10:42:16 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1614872450;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=oEsOz/8T8z2ylZ4ja7cwKljdny+N8pW5D/wcdQijxOA=;
-        b=c3vh7NvzRuUejUKVeCaLZje7XxQfsXGO9N8xgWfA2/Xj6lxGRDM9hgOwV6WSAZL74NBs8w
-        6zlDW3TCP26VCcx8bh6H2Cj2dvKn9eb8vyIgYSkuVjECqb3dWBH2z0+nXoqGgKQGrnd/99
-        WUT2bq6uZZ1uLslApsqNjJQw0kQ4bRA=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-470-2eGkJGCvNgKvRND_EenlNQ-1; Thu, 04 Mar 2021 10:40:48 -0500
-X-MC-Unique: 2eGkJGCvNgKvRND_EenlNQ-1
-Received: by mail-wr1-f72.google.com with SMTP id m9so8822011wrx.6
-        for <kvm@vger.kernel.org>; Thu, 04 Mar 2021 07:40:48 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:cc:references:from:subject:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=oEsOz/8T8z2ylZ4ja7cwKljdny+N8pW5D/wcdQijxOA=;
-        b=WiXyHE0ELqoxtQUZeEwwM52seAW2N6SuG37E/8iCSjWxj/Eu6X20l4CqXwrAis/rma
-         HIi+/hW/kn3PJh8O76TsRfEc4pWgwTg4WF57MaNdAU/FyAXDp1GGfxyOOEk6qcU9iSu6
-         lNxqauKQ6/geyD1qaKZL4N1G992mJ8KSm6kOcvDCCijdHpKqwQnOCLjS6UM+y66kMe7J
-         HA8lcuASIe4l4MDVOMipcKdv8Goqy4w4OLzEh0fWO9670HqKZheyyyI4TvW+sfxgxRm/
-         wE+olkUYzRbue3uuGY+CBUzsQOvOqZ3huUe2yL0wlqVZHT3IO8U9EqOUsOpPUfpxxdvh
-         zvRg==
-X-Gm-Message-State: AOAM531/42+K/GPfbJKC1d/OvLMH3Z3Nt7YUlqfW8RgF7LORhyJCG+4/
-        K/6O+KeWNy6jy/ZoJNMBJfnT3aSRYMzwV0Ntm/uB1X69lbKJWCR2QB7wJZfvJhh/iWNFXtowpE8
-        42FI6X8WxI5ur
-X-Received: by 2002:a7b:c0c3:: with SMTP id s3mr4475375wmh.11.1614872447598;
-        Thu, 04 Mar 2021 07:40:47 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJwP0EpyGjhDBDf+Mc0MzjfE82cjiMYcXu9FVzWL7+roDia1wTJrSkAJZpvXM7B/U1zggnOmBg==
-X-Received: by 2002:a7b:c0c3:: with SMTP id s3mr4475350wmh.11.1614872447432;
-        Thu, 04 Mar 2021 07:40:47 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id 4sm11076508wma.0.2021.03.04.07.40.45
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 04 Mar 2021 07:40:46 -0800 (PST)
-To:     =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
-        qemu-devel@nongnu.org
-Cc:     Eduardo Habkost <ehabkost@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        Sunil Muthuswamy <sunilmut@microsoft.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        David Gibson <david@gibson.dropbear.id.au>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        kvm@vger.kernel.org, Wenchao Wang <wenchao.wang@intel.com>,
-        Thomas Huth <thuth@redhat.com>,
-        Cameron Esfahani <dirty@apple.com>,
-        David Hildenbrand <david@redhat.com>,
-        Roman Bolshakov <r.bolshakov@yadro.com>,
-        Peter Maydell <peter.maydell@linaro.org>,
-        Greg Kurz <groug@kaod.org>, qemu-arm@nongnu.org,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Colin Xu <colin.xu@intel.com>,
-        Claudio Fontana <cfontana@suse.de>, qemu-ppc@nongnu.org,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        qemu-s390x@nongnu.org, haxm-team@intel.com
-References: <20210303182219.1631042-1-philmd@redhat.com>
- <a84ce2e5-2c4c-9fce-d140-33e4c55c5055@redhat.com>
- <1eda0f3a-1b11-a90e-8502-cf86ef91f77e@redhat.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [RFC PATCH 00/19] accel: Introduce AccelvCPUState opaque
- structure
-Message-ID: <438743f3-6e97-1735-6c11-26d261fa91b4@redhat.com>
-Date:   Thu, 4 Mar 2021 16:40:45 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.7.0
+        id S235726AbhCDPtl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 4 Mar 2021 10:49:41 -0500
+Received: from foss.arm.com ([217.140.110.172]:40288 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S235674AbhCDPtM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 4 Mar 2021 10:49:12 -0500
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 684D61FB;
+        Thu,  4 Mar 2021 07:48:26 -0800 (PST)
+Received: from [10.57.48.219] (unknown [10.57.48.219])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 0AF083F766;
+        Thu,  4 Mar 2021 07:48:23 -0800 (PST)
+Subject: Re: [PATCH 16/17] iommu: remove DOMAIN_ATTR_IO_PGTABLE_CFG
+To:     Christoph Hellwig <hch@lst.de>, Joerg Roedel <joro@8bytes.org>,
+        Will Deacon <will@kernel.org>, Li Yang <leoyang.li@nxp.com>
+Cc:     freedreno@lists.freedesktop.org, kvm@vger.kernel.org,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        linuxppc-dev@lists.ozlabs.org, dri-devel@lists.freedesktop.org,
+        virtualization@lists.linux-foundation.org,
+        iommu@lists.linux-foundation.org, netdev@vger.kernel.org,
+        linux-arm-msm@vger.kernel.org,
+        David Woodhouse <dwmw2@infradead.org>,
+        linux-arm-kernel@lists.infradead.org
+References: <20210301084257.945454-1-hch@lst.de>
+ <20210301084257.945454-17-hch@lst.de>
+From:   Robin Murphy <robin.murphy@arm.com>
+Message-ID: <d567ad5c-5f89-effa-7260-88c6d86b4695@arm.com>
+Date:   Thu, 4 Mar 2021 15:48:23 +0000
+User-Agent: Mozilla/5.0 (Windows NT 10.0; rv:78.0) Gecko/20100101
+ Thunderbird/78.7.1
 MIME-Version: 1.0
-In-Reply-To: <1eda0f3a-1b11-a90e-8502-cf86ef91f77e@redhat.com>
+In-Reply-To: <20210301084257.945454-17-hch@lst.de>
 Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 04/03/21 15:54, Philippe Mathieu-Daudé wrote:
-> On 3/4/21 2:56 PM, Paolo Bonzini wrote:
->> On 03/03/21 19:22, Philippe Mathieu-Daudé wrote:
->>> Series is organized as:
->>> - preliminary trivial cleanups
->>> - introduce AccelvCPUState
->>> - move WHPX fields (build-tested)
->>> - move HAX fields (not tested)
->>> - move KVM fields (build-tested)
->>> - move HVF fields (not tested)
->>
->> This approach prevents adding a TCG state.  Have you thought of using a
->> union instead, or even a void pointer?
-> 
-> Why does it prevent it? We can only have one accelerator per vCPU.
+On 2021-03-01 08:42, Christoph Hellwig wrote:
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
 
-You're right, my misguided assumption was that there can only be one of 
-WHPX/HAX/KVM/HVF.  This is true for WHPX/KVM/HVF but HAX can live with 
-any of the others.
+Moreso than the previous patch, where the feature is at least relatively 
+generic (note that there's a bunch of in-flight development around 
+DOMAIN_ATTR_NESTING), I'm really not convinced that it's beneficial to 
+bloat the generic iommu_ops structure with private driver-specific 
+interfaces. The attribute interface is a great compromise for these 
+kinds of things, and you can easily add type-checked wrappers around it 
+for external callers (maybe even make the actual attributes internal 
+between the IOMMU core and drivers) if that's your concern.
 
-However this means that AccelvCPUState would have multiple definitions. 
-  Did you check that gdb copes well with it?  It's also forbidden by 
-C++[1], so another thing to check would be LTO when using the C++ 
-compiler for linking.
+Robin.
 
-Paolo
-
-[1] https://en.wikipedia.org/wiki/One_Definition_Rule
-
-> TCG state has to be declared as another AccelvCPUState implementation.
+> ---
+>   drivers/gpu/drm/msm/adreno/adreno_gpu.c |  2 +-
+>   drivers/iommu/arm/arm-smmu/arm-smmu.c   | 40 +++++++------------------
+>   drivers/iommu/iommu.c                   |  9 ++++++
+>   include/linux/iommu.h                   |  9 +++++-
+>   4 files changed, 29 insertions(+), 31 deletions(-)
 > 
-> Am I missing something?
+> diff --git a/drivers/gpu/drm/msm/adreno/adreno_gpu.c b/drivers/gpu/drm/msm/adreno/adreno_gpu.c
+> index 0f184c3dd9d9ec..78d98ab2ee3a68 100644
+> --- a/drivers/gpu/drm/msm/adreno/adreno_gpu.c
+> +++ b/drivers/gpu/drm/msm/adreno/adreno_gpu.c
+> @@ -191,7 +191,7 @@ void adreno_set_llc_attributes(struct iommu_domain *iommu)
+>   	struct io_pgtable_domain_attr pgtbl_cfg;
+>   
+>   	pgtbl_cfg.quirks = IO_PGTABLE_QUIRK_ARM_OUTER_WBWA;
+> -	iommu_domain_set_attr(iommu, DOMAIN_ATTR_IO_PGTABLE_CFG, &pgtbl_cfg);
+> +	iommu_domain_set_pgtable_attr(iommu, &pgtbl_cfg);
+>   }
+>   
+>   struct msm_gem_address_space *
+> diff --git a/drivers/iommu/arm/arm-smmu/arm-smmu.c b/drivers/iommu/arm/arm-smmu/arm-smmu.c
+> index 2e17d990d04481..2858999c86dfd1 100644
+> --- a/drivers/iommu/arm/arm-smmu/arm-smmu.c
+> +++ b/drivers/iommu/arm/arm-smmu/arm-smmu.c
+> @@ -1515,40 +1515,22 @@ static int arm_smmu_domain_enable_nesting(struct iommu_domain *domain)
+>   	return ret;
+>   }
+>   
+> -static int arm_smmu_domain_set_attr(struct iommu_domain *domain,
+> -				    enum iommu_attr attr, void *data)
+> +static int arm_smmu_domain_set_pgtable_attr(struct iommu_domain *domain,
+> +		struct io_pgtable_domain_attr *pgtbl_cfg)
+>   {
+> -	int ret = 0;
+>   	struct arm_smmu_domain *smmu_domain = to_smmu_domain(domain);
+> +	int ret = -EPERM;
+>   
+> -	mutex_lock(&smmu_domain->init_mutex);
+> -
+> -	switch(domain->type) {
+> -	case IOMMU_DOMAIN_UNMANAGED:
+> -		switch (attr) {
+> -		case DOMAIN_ATTR_IO_PGTABLE_CFG: {
+> -			struct io_pgtable_domain_attr *pgtbl_cfg = data;
+> -
+> -			if (smmu_domain->smmu) {
+> -				ret = -EPERM;
+> -				goto out_unlock;
+> -			}
+> +	if (domain->type != IOMMU_DOMAIN_UNMANAGED)
+> +		return -EINVAL;
+>   
+> -			smmu_domain->pgtbl_cfg = *pgtbl_cfg;
+> -			break;
+> -		}
+> -		default:
+> -			ret = -ENODEV;
+> -		}
+> -		break;
+> -	case IOMMU_DOMAIN_DMA:
+> -		ret = -ENODEV;
+> -		break;
+> -	default:
+> -		ret = -EINVAL;
+> +	mutex_lock(&smmu_domain->init_mutex);
+> +	if (!smmu_domain->smmu) {
+> +		smmu_domain->pgtbl_cfg = *pgtbl_cfg;
+> +		ret = 0;
+>   	}
+> -out_unlock:
+>   	mutex_unlock(&smmu_domain->init_mutex);
+> +
+>   	return ret;
+>   }
+>   
+> @@ -1609,7 +1591,7 @@ static struct iommu_ops arm_smmu_ops = {
+>   	.device_group		= arm_smmu_device_group,
+>   	.dma_use_flush_queue	= arm_smmu_dma_use_flush_queue,
+>   	.dma_enable_flush_queue	= arm_smmu_dma_enable_flush_queue,
+> -	.domain_set_attr	= arm_smmu_domain_set_attr,
+> +	.domain_set_pgtable_attr = arm_smmu_domain_set_pgtable_attr,
+>   	.domain_enable_nesting	= arm_smmu_domain_enable_nesting,
+>   	.of_xlate		= arm_smmu_of_xlate,
+>   	.get_resv_regions	= arm_smmu_get_resv_regions,
+> diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
+> index 2e9e058501a953..8490aefd4b41f8 100644
+> --- a/drivers/iommu/iommu.c
+> +++ b/drivers/iommu/iommu.c
+> @@ -2693,6 +2693,15 @@ int iommu_domain_enable_nesting(struct iommu_domain *domain)
+>   }
+>   EXPORT_SYMBOL_GPL(iommu_domain_enable_nesting);
+>   
+> +int iommu_domain_set_pgtable_attr(struct iommu_domain *domain,
+> +		struct io_pgtable_domain_attr *pgtbl_cfg)
+> +{
+> +	if (!domain->ops->domain_set_pgtable_attr)
+> +		return -EINVAL;
+> +	return domain->ops->domain_set_pgtable_attr(domain, pgtbl_cfg);
+> +}
+> +EXPORT_SYMBOL_GPL(iommu_domain_set_pgtable_attr);
+> +
+>   void iommu_get_resv_regions(struct device *dev, struct list_head *list)
+>   {
+>   	const struct iommu_ops *ops = dev->bus->iommu_ops;
+> diff --git a/include/linux/iommu.h b/include/linux/iommu.h
+> index aed88aa3bd3edf..39d3ed4d2700ac 100644
+> --- a/include/linux/iommu.h
+> +++ b/include/linux/iommu.h
+> @@ -40,6 +40,7 @@ struct iommu_domain;
+>   struct notifier_block;
+>   struct iommu_sva;
+>   struct iommu_fault_event;
+> +struct io_pgtable_domain_attr;
+>   
+>   /* iommu fault flags */
+>   #define IOMMU_FAULT_READ	0x0
+> @@ -107,7 +108,6 @@ enum iommu_cap {
+>    */
+>   
+>   enum iommu_attr {
+> -	DOMAIN_ATTR_IO_PGTABLE_CFG,
+>   	DOMAIN_ATTR_MAX,
+>   };
+>   
+> @@ -196,6 +196,7 @@ struct iommu_iotlb_gather {
+>    * @dma_enable_flush_queue: Try to enable the DMA flush queue
+>    * @domain_set_attr: Change domain attributes
+>    * @domain_enable_nesting: Enable nesting
+> + * @domain_set_pgtable_attr: Set io page table attributes
+>    * @get_resv_regions: Request list of reserved regions for a device
+>    * @put_resv_regions: Free list of reserved regions for a device
+>    * @apply_resv_region: Temporary helper call-back for iova reserved ranges
+> @@ -249,6 +250,8 @@ struct iommu_ops {
+>   	int (*domain_set_attr)(struct iommu_domain *domain,
+>   			       enum iommu_attr attr, void *data);
+>   	int (*domain_enable_nesting)(struct iommu_domain *domain);
+> +	int (*domain_set_pgtable_attr)(struct iommu_domain *domain,
+> +			struct io_pgtable_domain_attr *pgtbl_cfg);
+>   
+>   	/* Request/Free a list of reserved regions for a device */
+>   	void (*get_resv_regions)(struct device *dev, struct list_head *list);
+> @@ -493,9 +496,13 @@ extern int iommu_group_id(struct iommu_group *group);
+>   extern struct iommu_domain *iommu_group_default_domain(struct iommu_group *);
+>   
+>   bool iommu_dma_use_flush_queue(struct iommu_domain *domain);
+> +int iommu_domain_set_pgtable_attr(struct iommu_domain *domain,
+> +		struct io_pgtable_domain_attr *pgtbl_cfg);
+>   extern int iommu_domain_set_attr(struct iommu_domain *domain, enum iommu_attr,
+>   				 void *data);
+>   int iommu_domain_enable_nesting(struct iommu_domain *domain);
+> +int iommu_domain_set_pgtable_attr(struct iommu_domain *domain,
+> +		struct io_pgtable_domain_attr *pgtbl_cfg);
+>   
+>   extern int report_iommu_fault(struct iommu_domain *domain, struct device *dev,
+>   			      unsigned long iova, int flags);
 > 
-> Preventing building different accelerator-specific code in the same
-> unit file is on purpose.
-> 
-> Regards,
-> 
-> Phil.
-> 
-
