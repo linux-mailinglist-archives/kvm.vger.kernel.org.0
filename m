@@ -2,116 +2,230 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8267A32D5B5
-	for <lists+kvm@lfdr.de>; Thu,  4 Mar 2021 15:57:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DC93E32D5BA
+	for <lists+kvm@lfdr.de>; Thu,  4 Mar 2021 15:59:44 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229730AbhCDO4U (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 4 Mar 2021 09:56:20 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:23974 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229637AbhCDO4F (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 4 Mar 2021 09:56:05 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1614869679;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=xr+0xjbR8wujVaSiREj96vjfeZy56B32moH25XWztBo=;
-        b=XUtReQOez1dg2/qOnmFKNmV7Sn0Mx3dKJ+RD2dj35/e8ujN9UtPkEUjIsI3YgvGIKykTs1
-        stbOjRBU/ch4oxefbz+JYbqahJQZ4fu+zstVB0yPpE5AL62fOrAyjxdEDfmJtNOmCGsNKm
-        e8HbD/lzlcWlNlvpijx1CALOhq/oMm8=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-222-9YsScbcAOKmFQulRblWN1Q-1; Thu, 04 Mar 2021 09:54:38 -0500
-X-MC-Unique: 9YsScbcAOKmFQulRblWN1Q-1
-Received: by mail-wr1-f69.google.com with SMTP id z6so5769653wrh.11
-        for <kvm@vger.kernel.org>; Thu, 04 Mar 2021 06:54:37 -0800 (PST)
+        id S229980AbhCDO54 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 4 Mar 2021 09:57:56 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40420 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229792AbhCDO5e (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 4 Mar 2021 09:57:34 -0500
+Received: from mail-ot1-x333.google.com (mail-ot1-x333.google.com [IPv6:2607:f8b0:4864:20::333])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 17E6FC061574
+        for <kvm@vger.kernel.org>; Thu,  4 Mar 2021 06:56:54 -0800 (PST)
+Received: by mail-ot1-x333.google.com with SMTP id d9so27450840ote.12
+        for <kvm@vger.kernel.org>; Thu, 04 Mar 2021 06:56:54 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=metztli-com.20150623.gappssmtp.com; s=20150623;
+        h=message-id:subject:from:to:cc:date:in-reply-to:references
+         :organization:user-agent:mime-version:content-transfer-encoding;
+        bh=Egt7O0hrtmxmw6ied+hJV1grz0SHUeSD2SQDlj862Pk=;
+        b=fUI/6ZYJMWbUFwjm8jmBfNsfDL4299KeFqYaRVzK5VlqyLXiWQm4/KkiD9Z+Aus4TL
+         0SoZiCvH/Ri7z14bYhnrrgIMuW7Ur1qGeL1MTIBofB8C5SS4PqqPd6vZs8GPNvyI803Y
+         SAsc1nOg4EcGqdnjZ1mWcKrYWvjWjbz0MNuH0rsY3jkH2jQ32elwCupKgkiSKjTnnHuY
+         lCAgnBTLoG/7A07pGFEopN8Bi0hlk1RAyf+7e5rEVh5MwhVNLGs9TfBcGw4fsDuM5LeD
+         o9nCfgnaqlrIy2K/AT2ZicNDCCSh4YB7NRYScdEvRVop5ht+cTAOkkk9Fp87MJI2kvf5
+         BwGQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
+        h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
+         :references:organization:user-agent:mime-version
          :content-transfer-encoding;
-        bh=xr+0xjbR8wujVaSiREj96vjfeZy56B32moH25XWztBo=;
-        b=msfG8niMu3IftSxsplae6xhVp8qYCZN2PaToDEAjhuyHfKkAlz2EQpkexiKAhy5MzF
-         uV9PaXzZTz32RnTXJGaGhgKztNv2TjTyEFbuwLCig+h4uFM74GJGWXrqV29yoIzL/QrO
-         ci45TEdqkgQV+j1/+zQ30dd2W7adrsxc4RyxbpiFEXt6axlQzs595urr2Y5KiyxriJOS
-         M3IoFMaPcU6gTxCwz/k26K1/SIH+nXG0etPDpwP9be/Y2xjAaLduTKLojLWXQhE2x1vz
-         BOYqz8s8mtYfVyPnn+EYsbCqg5m/OU3/OgDBATphmQQMLYeVu3FgZ4PkdhirY3H5Nxef
-         pC5g==
-X-Gm-Message-State: AOAM531i22vU5oqF5m5JN013ZutnQ4PkWn913WszPJ1fOnr9ZQ3bMXAo
-        edW5GmHlHgWJcmJ0vEGVqPsXE4ONraxm6WRHK9EsbF3Gxgglu1A4wy0pXEddZlekPvNOp+w3R8i
-        323MK0/VnxxrT
-X-Received: by 2002:a1c:1f04:: with SMTP id f4mr4480685wmf.12.1614869676913;
-        Thu, 04 Mar 2021 06:54:36 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJwkvaeX62cIP49GRybRrBdkH5Eb5lkzjIfeG7/sCFGKZ5uRMBXqFUsG+t1YjvIFMgWx4AyviA==
-X-Received: by 2002:a1c:1f04:: with SMTP id f4mr4480671wmf.12.1614869676729;
-        Thu, 04 Mar 2021 06:54:36 -0800 (PST)
-Received: from [192.168.1.36] (68.red-83-57-175.dynamicip.rima-tde.net. [83.57.175.68])
-        by smtp.gmail.com with ESMTPSA id w6sm16059433wrl.49.2021.03.04.06.54.34
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 04 Mar 2021 06:54:36 -0800 (PST)
-Subject: Re: [RFC PATCH 00/19] accel: Introduce AccelvCPUState opaque
- structure
-To:     Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-Cc:     Eduardo Habkost <ehabkost@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        Sunil Muthuswamy <sunilmut@microsoft.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        David Gibson <david@gibson.dropbear.id.au>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        kvm@vger.kernel.org, Wenchao Wang <wenchao.wang@intel.com>,
-        Thomas Huth <thuth@redhat.com>,
-        Cameron Esfahani <dirty@apple.com>,
-        David Hildenbrand <david@redhat.com>,
-        Roman Bolshakov <r.bolshakov@yadro.com>,
-        Peter Maydell <peter.maydell@linaro.org>,
-        Greg Kurz <groug@kaod.org>, qemu-arm@nongnu.org,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Colin Xu <colin.xu@intel.com>,
-        Claudio Fontana <cfontana@suse.de>, qemu-ppc@nongnu.org,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        qemu-s390x@nongnu.org, haxm-team@intel.com
-References: <20210303182219.1631042-1-philmd@redhat.com>
- <a84ce2e5-2c4c-9fce-d140-33e4c55c5055@redhat.com>
-From:   =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <1eda0f3a-1b11-a90e-8502-cf86ef91f77e@redhat.com>
-Date:   Thu, 4 Mar 2021 15:54:34 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.7.0
+        bh=Egt7O0hrtmxmw6ied+hJV1grz0SHUeSD2SQDlj862Pk=;
+        b=QG7qBzPEMz7LpTgli+1a3p10R5LykM+om1pEoY4GRPhlQkHoMNCLETFMLqNy/V7/m4
+         7uEyRzex2NW3yXKRIVSJyJgQkOGdb+UCEJNOJSkzvNwXfXFynPx82Y2dSpzKREEQEiVq
+         7x9+sWkChRJY9ZwWT0Such52xDhSLsixoZI4b4zguehPEFQkW4UgRvTj4Zvi7OJHKaDZ
+         2Jav188w2jeoWHdfciKxHOiUk8/EfgKKXsDiQaaXecHkEAv+UOGb9lIVCZXLGZj9eRse
+         fmfIwp5lfPouJNVb2RLTyCZG5J24lMvwu4/jJxb9fbv+TmI5500wBvlgt6QZpoTyskml
+         Kb3A==
+X-Gm-Message-State: AOAM530vPEnXXmLl879pxisVjrjwOEz4Ow9ilyecMiq5x+Hla+3YKpO9
+        hKKVuaGaxDnf0WYeNs0NhmV7pQ==
+X-Google-Smtp-Source: ABdhPJxkNQEB58oZZK3MLqb8eVT35aclKdHIFuP+UL5QdOgSBqHXSzTlszl4v2CAnz/kmCtQxy/h8g==
+X-Received: by 2002:a05:6830:1afc:: with SMTP id c28mr3734282otd.99.1614869813366;
+        Thu, 04 Mar 2021 06:56:53 -0800 (PST)
+Received: from ?IPv6:2600:1700:6470:27a0:682c:9aef:c4a9:8393? ([2600:1700:6470:27a0:682c:9aef:c4a9:8393])
+        by smtp.gmail.com with ESMTPSA id i3sm5834233otk.56.2021.03.04.06.56.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 04 Mar 2021 06:56:52 -0800 (PST)
+Message-ID: <f709dc80a94fa6ee0f34dc785e7f30ba58850122.camel@metztli.com>
+Subject: Re: unexpected kernel reboot (3)
+From:   Jose R Rodriguez <jose.r.r@metztli.com>
+To:     Dmitry Vyukov <dvyukov@google.com>,
+        Andrew Morton <akpm@linux-foundation.org>
+Cc:     syzbot <syzbot+cce9ef2dd25246f815ee@syzkaller.appspotmail.com>,
+        Alexey Dobriyan <adobriyan@gmail.com>,
+        Gargi Sharma <gs051095@gmail.com>, jhugo@codeaurora.org,
+        Josh Poimboeuf <jpoimboe@redhat.com>,
+        Laura Abbott <lauraa@codeaurora.org>,
+        LKML <linux-kernel@vger.kernel.org>, linux@dominikbrodowski.net,
+        Ingo Molnar <mingo@kernel.org>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        syzkaller-bugs <syzkaller-bugs@googlegroups.com>,
+        Thomas Gleixner <tglx@linutronix.de>, thomas.lendacky@amd.com,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Radim =?UTF-8?Q?Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>,
+        KVM list <kvm@vger.kernel.org>,
+        Jim Mattson <jmattson@google.com>,
+        Edward Shishkin <edward.shishkin@gmail.com>
+Date:   Thu, 04 Mar 2021 06:56:50 -0800
+In-Reply-To: <CACT4Y+b1HC5CtFSQJEDBJrP8u1brKxXaFcYKE=g+h3aOW6K3Kg@mail.gmail.com>
+References: <000000000000eb546f0570e84e90@google.com>
+         <20180713145811.683ffd0043cac26a5a5af725@linux-foundation.org>
+         <CACT4Y+b1HC5CtFSQJEDBJrP8u1brKxXaFcYKE=g+h3aOW6K3Kg@mail.gmail.com>
+Organization: Metztli Information Technology
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.38.3-1 
 MIME-Version: 1.0
-In-Reply-To: <a84ce2e5-2c4c-9fce-d140-33e4c55c5055@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 3/4/21 2:56 PM, Paolo Bonzini wrote:
-> On 03/03/21 19:22, Philippe Mathieu-Daudé wrote:
->> Series is organized as:
->> - preliminary trivial cleanups
->> - introduce AccelvCPUState
->> - move WHPX fields (build-tested)
->> - move HAX fields (not tested)
->> - move KVM fields (build-tested)
->> - move HVF fields (not tested)
+On Mon, 2018-07-16 at 12:09 +0200, Dmitry Vyukov wrote:
+> On Fri, Jul 13, 2018 at 11:58 PM, Andrew Morton
+> <akpm@linux-foundation.org> wrote:
+> > On Fri, 13 Jul 2018 14:39:02 -0700 syzbot <
+> > syzbot+cce9ef2dd25246f815ee@syzkaller.appspotmail.com> wrote:
+> > 
+> > > Hello,
+> > > 
+> > > syzbot found the following crash on:
+> > 
+> > hm, I don't think I've seen an "unexpected reboot" report before.
+> > 
+> > Can you expand on specifically what happened here?  Did the machine
+> > simply magically reboot itself?  Or did an external monitor whack it,
+> > or...
 > 
-> This approach prevents adding a TCG state.  Have you thought of using a
-> union instead, or even a void pointer?
+> We put some user-space workload (not involving reboot syscall), and
+> the machine suddenly rebooted. We don't know what triggered the
+> reboot, we only see the consequences. We've seen few such bugs before,
+> e.g.:
+> https://syzkaller.appspot.com/bug?id=4f1db8b5e7dfcca55e20931aec0ee707c5cafc99
+> Usually it involves KVM. Potentially it's a bug in the outer
+> kernel/VMM, it may or may not be present in tip kernel.
 
-Why does it prevent it? We can only have one accelerator per vCPU.
+I have been using GCE with my custom VirtualBox -created reiser4 root fs VMs
+since at least 2018, long term mainly as web servers with LAMP / LEMP --
+including some Ruby apps with Postgresql -- and short term to build our Debian
+Linux kernels. I have not experienced 'suddenly rebooted' scenarios.
 
-TCG state has to be declared as another AccelvCPUState implementation.
+Note that I have been usin Intel CPUs at the Los Angeles zone us-west2-a, as
+well as us-east1-b zone, and AMD Epyc CPUs at us-central1-a zone, without
+abnormalities (other than it's becoming more expensive ;-)
 
-Am I missing something?
+As a matter of fact, I am currently testing a Debian'ized reiser4 (AMD Epyc -
+flavored reizer4 label) -enabled Linux kernel 5.10.15-2 which has logged 17 days
++hours already and sustaining most of the apps already mentioned.
+< https://metztli.it/buster/r4-5.10.15-gce.png >
 
-Preventing building different accelerator-specific code in the same
-unit file is on purpose.
+> 
+> 
+> > Does this test distinguish from a kernel which simply locks up?
+> 
+> Yes. If you look at the log:
+> 
+> https://syzkaller.appspot.com/x/log.txt?x=17c6a6d0400000
+> 
+> We've booted the machine, started running a program, and them boom! it
+> reboots without any other diagnostics. It's not a hang.
+> 
+> 
+> 
+> > > HEAD commit:    1e4b044d2251 Linux 4.18-rc4
+> > > git tree:       upstream
+> > > console output: https://syzkaller.appspot.com/x/log.txt?x=17c6a6d0400000
+> > > kernel config:  https://syzkaller.appspot.com/x/.config?x=25856fac4e580aa7
+> > > dashboard link: 
+> > > https://syzkaller.appspot.com/bug?extid=cce9ef2dd25246f815ee
+> > > compiler:       gcc (GCC) 8.0.1 20180413 (experimental)
+> > > syzkaller repro:https://syzkaller.appspot.com/x/repro.syz?x=165012c2400000
+> > > C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1571462c400000
+> > 
+> > I assume the "C reproducer" is irrelevant here.
+> > 
+> > Is it reproducible?
+> 
+> Yes, it is reproducible and the C reproducer is relevant.
+> If syzbot provides a reproducer, it means that it booted a clean
+> machine, run the provided program (nothing else besides typical init
+> code and ssh/scp invocation) and that's the kernel output it observed
+> running this exact program.
+> However in this case, the exact setup can be relevant. syzbot uses GCE
+> VMs, it may or may not reproduce with other VMMs/physical hardware,
+> sometimes such bugs depend on exact CPU type.
+> 
+> 
+> > > IMPORTANT: if you fix the bug, please add the following tag to the commit:
+> > > Reported-by: syzbot+cce9ef2dd25246f815ee@syzkaller.appspotmail.com
+> > > 
+> > > output_len: 0x00000000092459b0
+> > > kernel_total_size: 0x000000000a505000
+> > > trampoline_32bit: 0x000000000009d000
+> > > 
+> > > Decompressing Linux... Parsing ELF... done.
+> > > Booting the kernel.
+> > > [    0.000000] Linux version 4.18.0-rc4+ (syzkaller@ci) (gcc version 8.0.1
+> > > 20180413 (experimental) (GCC)) #138 SMP Mon Jul 9 10:45:11 UTC 2018
+> > > [    0.000000] Command line: BOOT_IMAGE=/vmlinuz root=/dev/sda1
+> > > console=ttyS0 earlyprintk=serial vsyscall=native rodata=n
+> > > ftrace_dump_on_oops=orig_cpu oops=panic panic_on_warn=1 nmi_watchdog=panic
+> > > panic=86400 workqueue.watchdog_thresh=140 kvm-intel.nested=1
+> > > 
+> > > ...
+> > > 
+> > > regulatory database
+> > > [    4.519364] cfg80211: Loaded X.509 cert 'sforshee: 00b28ddf47aef9cea7'
+> > > [    4.520839] platform regulatory.0: Direct firmware load for
+> > > regulatory.db failed with error -2
+> > > [    4.522155] cfg80211: failed to load regulatory.db
+> > > [    4.522185] ALSA device list:
+> > > [    4.523499]   #0: Dummy 1
+> > > [    4.523951]   #1: Loopback 1
+> > > [    4.524389]   #2: Virtual MIDI Card 1
+> > > [    4.825991] input: ImExPS/2 Generic Explorer Mouse as
+> > > /devices/platform/i8042/serio1/input/input4
+> > > [    4.829533] md: Waiting for all devices to be available before
+> > > autodetect
+> > > [    4.830562] md: If you don't use raid, use raid=noautodetect
+> > > [    4.835237] md: Autodetecting RAID arrays.
+> > > [    4.835882] md: autorun ...
+> > > [    4.836364] md: ... autorun DONE.
+> > 
+> > Can we assume that the failure occurred in or immediately after the MD code,
+> > or might some output have been truncated?
+> > 
+> > It would be useful to know what the kernel was initializing immediately
+> > after MD.  Do you have a kernel log for the same config when the kerenl
+> > didn't fail?  Or maybe enable initcall_debug?
+> > 
+> > --
+> > You received this message because you are subscribed to the Google Groups
+> > "syzkaller-bugs" group.
+> > To unsubscribe from this group and stop receiving emails from it, send an
+> > email to syzkaller-bugs+unsubscribe@googlegroups.com.
+> > To view this discussion on the web visit 
+> > https://groups.google.com/d/msgid/syzkaller-bugs/20180713145811.683ffd0043cac26a5a5af725%40linux-foundation.org
+> > .
+> > For more options, visit https://groups.google.com/d/optout.
 
-Regards,
+(saw your last message of just a couple of hours and...)
 
-Phil.
+Hope provided info helps.
+
+Best Professional Regards.
+
+-- 
+-- 
+Jose R R
+http://metztli.it
+-----------------------------------------------------------------------
+Download Metztli Reiser4: Debian Buster w/ Linux 5.9.16 AMD64
+-----------------------------------------------------------------------
+feats ZSTD compression https://sf.net/projects/metztli-reiser4/
+-----------------------------------------------------------------------
+or SFRN 5.1.3, Metztli Reiser5 https://sf.net/projects/debian-reiser4/
+-----------------------------------------------------------------------
+Official current Reiser4 resources: https://reiser4.wiki.kernel.org/
 
