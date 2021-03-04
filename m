@@ -2,106 +2,97 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1C49532CCC7
-	for <lists+kvm@lfdr.de>; Thu,  4 Mar 2021 07:24:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0F00932CCD3
+	for <lists+kvm@lfdr.de>; Thu,  4 Mar 2021 07:28:30 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234859AbhCDGXW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 4 Mar 2021 01:23:22 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42670 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235073AbhCDGWt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 4 Mar 2021 01:22:49 -0500
-Received: from mail-pf1-x434.google.com (mail-pf1-x434.google.com [IPv6:2607:f8b0:4864:20::434])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D158C061756
-        for <kvm@vger.kernel.org>; Wed,  3 Mar 2021 22:22:09 -0800 (PST)
-Received: by mail-pf1-x434.google.com with SMTP id x24so952083pfn.5
-        for <kvm@vger.kernel.org>; Wed, 03 Mar 2021 22:22:09 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=wa5muaXHut4hfwXTsUBvUfthAuhKwhmv9/hS3aAHRxQ=;
-        b=Ei8dVn1tS3L8d+KCjI+VuCzSj+Cfa7yV0HFL1DM94rBiWSDms9SHkHwivMYn04bjmx
-         OY7XuGQpzmXg0EUzXpFAvpzAbXLTJKYqOnctbovAHMT8rOH5KdM45V87GeUhl5QmBmOf
-         9SsmlkYM/nbtIcpXpwLUik8NdP/SeznAYt/+RCuNSN4C49b2N8+qrYgTtMsFHLPlCq3i
-         oFaz4h5lYyjePLRasP1ShTXGMxKB4OpTzRm53eQV4pK89hTc9zr8XIMmx5W/jGKNj+L3
-         M9VgZ1z/fQqUt6B/WABIinlH+Kr151hgBCYsKRas0sZSUw/S+UXNv+4IxVwtGr+bxBZB
-         7OiA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=wa5muaXHut4hfwXTsUBvUfthAuhKwhmv9/hS3aAHRxQ=;
-        b=K5ygT1UnWhfBhnmAYuVBFZPAXP+yKl6NZ5iGw8ewEAytAe2ljCIpLNXgrTxXjSMWot
-         XziPhwuKyT2/75O+tAG2qq+K5MCijBFPKXFwKRKHBUHN7Z4hAkWY/tynlMEYdGBKDM9K
-         mq0BiksdAG0HGAKGF87BZRxCTf5V6it3DFrRjgAh0BfvK8zV23dvK9R2vJw0y+YhKmbu
-         4lWuyIzivErLq03kwo9Wfug74eeNfaKq5D0jvaMw5yslY4mpoIIE3D1ndJB12QWCgYNV
-         WVAHOd6ZjucU08F7UsafL5QTfEhJKNdyZ4zyG9yq963IyMQ+Yyx+6FSSiPkUiOl+80LW
-         +PTw==
-X-Gm-Message-State: AOAM531in38UipqfLZRnb6weaRPGYk4vEVLR1NdwdCShliy+dVWuBAx0
-        f3QMarC+HpZMedP9g2Zy51p3VQ==
-X-Google-Smtp-Source: ABdhPJxxhHevBDuxsi5CHKFWK0/YIVXgJSyzO2vm7eUTrnkAE2fGT16nVrdFVJcwBDOhVAjGBkGaQg==
-X-Received: by 2002:a63:3e03:: with SMTP id l3mr1928769pga.452.1614838928731;
-        Wed, 03 Mar 2021 22:22:08 -0800 (PST)
-Received: from google.com ([2620:0:1008:10:5ddf:a7e:5239:ef47])
-        by smtp.gmail.com with ESMTPSA id q128sm26609812pfb.51.2021.03.03.22.22.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 03 Mar 2021 22:22:08 -0800 (PST)
-Date:   Wed, 3 Mar 2021 22:22:03 -0800
-From:   Vipin Sharma <vipinsh@google.com>
-To:     Jacob Pan <jacob.jun.pan@intel.com>
-Cc:     tj@kernel.org, mkoutny@suse.com, rdunlap@infradead.org,
-        thomas.lendacky@amd.com, brijesh.singh@amd.com, jon.grimm@amd.com,
-        eric.vantassell@amd.com, pbonzini@redhat.com, hannes@cmpxchg.org,
-        frankja@linux.ibm.com, borntraeger@de.ibm.com, corbet@lwn.net,
-        seanjc@google.com, vkuznets@redhat.com, wanpengli@tencent.com,
-        jmattson@google.com, joro@8bytes.org, tglx@linutronix.de,
-        mingo@redhat.com, bp@alien8.de, hpa@zytor.com, gingell@google.com,
-        rientjes@google.com, dionnaglaze@google.com, kvm@vger.kernel.org,
-        x86@kernel.org, cgroups@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-kernel@vger.kernel.org, "Tian, Kevin" <kevin.tian@intel.com>,
-        "Liu, Yi L" <yi.l.liu@intel.com>,
-        "Raj, Ashok" <ashok.raj@intel.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Jason Gunthorpe <jgg@nvidia.com>
-Subject: Re: [RFC v2 2/2] cgroup: sev: Miscellaneous cgroup documentation.
-Message-ID: <YEB8i6Chq4K/GGF6@google.com>
-References: <20210302081705.1990283-1-vipinsh@google.com>
- <20210302081705.1990283-3-vipinsh@google.com>
- <20210303185513.27e18fce@jacob-builder>
+        id S235187AbhCDG0m (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 4 Mar 2021 01:26:42 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:37402 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S235182AbhCDG03 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 4 Mar 2021 01:26:29 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1614839103;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=YOee7X8Kdaszy+K+bsK5PH8LV+4q28xW28VP0oBbsvI=;
+        b=fhE1saapqup9TnTVbkKXVwJTuXIWaFSTXN63E5J4K82P2N1XCq8u15cmbbkEzf0nJ+yVzV
+        sDSYutzoK4oQvJZLujBNz0zuvTz8Qse6jsBPgar0VdAADvIJ6TZ5pRj/8zmSYekiKAFfrm
+        FYai0NrAELUbluozVETqIiepAUw1ao8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-534-CEFjQCKxMYmCPiVygnz3IA-1; Thu, 04 Mar 2021 01:24:58 -0500
+X-MC-Unique: CEFjQCKxMYmCPiVygnz3IA-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4C8B191270;
+        Thu,  4 Mar 2021 06:24:56 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-112-31.ams2.redhat.com [10.36.112.31])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id D52BC6F447;
+        Thu,  4 Mar 2021 06:24:47 +0000 (UTC)
+Subject: Re: [PATCH 02/19] target/s390x/kvm: Simplify debug code
+To:     =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+        qemu-devel@nongnu.org
+Cc:     Peter Maydell <peter.maydell@linaro.org>,
+        Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org,
+        David Hildenbrand <david@redhat.com>, haxm-team@intel.com,
+        Colin Xu <colin.xu@intel.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Claudio Fontana <cfontana@suse.de>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Eduardo Habkost <ehabkost@redhat.com>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        Greg Kurz <groug@kaod.org>, Cameron Esfahani <dirty@apple.com>,
+        Roman Bolshakov <r.bolshakov@yadro.com>, qemu-arm@nongnu.org,
+        Sunil Muthuswamy <sunilmut@microsoft.com>,
+        David Gibson <david@gibson.dropbear.id.au>,
+        Marcelo Tosatti <mtosatti@redhat.com>, qemu-s390x@nongnu.org,
+        qemu-ppc@nongnu.org, Wenchao Wang <wenchao.wang@intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+References: <20210303182219.1631042-1-philmd@redhat.com>
+ <20210303182219.1631042-3-philmd@redhat.com>
+From:   Thomas Huth <thuth@redhat.com>
+Message-ID: <c77cfa45-9aa1-5b1a-3dd4-861290b11907@redhat.com>
+Date:   Thu, 4 Mar 2021 07:24:46 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210303185513.27e18fce@jacob-builder>
+In-Reply-To: <20210303182219.1631042-3-philmd@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Mar 03, 2021 at 06:55:13PM -0800, Jacob Pan wrote:
-> Hi Vipin,
+On 03/03/2021 19.22, Philippe Mathieu-Daudé wrote:
+> We already have the 'run' variable holding 'cs->kvm_run' value.
 > 
-> On Tue,  2 Mar 2021 00:17:05 -0800, Vipin Sharma <vipinsh@google.com> wrote:
+> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+> ---
+>   target/s390x/kvm.c | 3 +--
+>   1 file changed, 1 insertion(+), 2 deletions(-)
 > 
-> > +Migration and Ownership
-> > +~~~~~~~~~~~~~~~~~~~~~~~
-> > +
-> > +A miscellaneous scalar resource is charged to the cgroup in which it is
-> > used +first, and stays charged to that cgroup until that resource is
-> > freed. Migrating +a process to a different cgroup does not move the
-> > charge to the destination +cgroup where the process has moved.
-> > +
-> I am trying to see if IOASIDs cgroup can also fit in this misc controller
-> as yet another resource type.
-> https://lore.kernel.org/linux-iommu/20210303131726.7a8cb169@jacob-builder/T/#u
-> However, unlike sev IOASIDs need to be migrated if the process is moved to
-> another cgroup. i.e. charge the destination and uncharge the source.
+> diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
+> index 7a892d663df..73f816a7222 100644
+> --- a/target/s390x/kvm.c
+> +++ b/target/s390x/kvm.c
+> @@ -1785,8 +1785,7 @@ static int handle_intercept(S390CPU *cpu)
+>       int icpt_code = run->s390_sieic.icptcode;
+>       int r = 0;
+>   
+> -    DPRINTF("intercept: 0x%x (at 0x%lx)\n", icpt_code,
+> -            (long)cs->kvm_run->psw_addr);
+> +    DPRINTF("intercept: 0x%x (at 0x%lx)\n", icpt_code, (long)run->psw_addr);
+>       switch (icpt_code) {
+>           case ICPT_INSTRUCTION:
+>           case ICPT_PV_INSTR:
 > 
-> Do you think this behavior can be achieved by differentiating resource
-> types? i.e. add attach callbacks for certain types. Having a single misc
-> interface seems cleaner than creating another controller.
 
-I think it makes sense to add support for migration for the resources
-which need it. Resources like SEV, SEV-ES will not participate in
-migration and won't stop can_attach() to succeed, other resources which
-need migration will allow or stop based on their limits and capacity in
-the destination.
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+
