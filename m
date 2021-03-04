@@ -2,212 +2,126 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9FCF032D90C
-	for <lists+kvm@lfdr.de>; Thu,  4 Mar 2021 18:55:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EA80932D925
+	for <lists+kvm@lfdr.de>; Thu,  4 Mar 2021 19:02:03 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229719AbhCDRyw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 4 Mar 2021 12:54:52 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:6624 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S239274AbhCDRpz (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 4 Mar 2021 12:45:55 -0500
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 124HWkJk026321;
-        Thu, 4 Mar 2021 12:43:50 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=O2bpJMovIuAP9ZczXDaRB1F9vrADuLVM4xgG+5AK7CY=;
- b=Zcxc1UYp+R7Iv9MuHrZ/gTrqZliRTRzNJ4Y70G2bO5kEiQaic4UquwJpWwLUKs+dp+LQ
- hImDdWKuMJWgOJY8DC7A6XjkDMU0U2rr/Qw2uoFRkH0jZezJeFtdeTPG32G9D8yKPQCd
- /yxcTfSK3E3z86NFon6j0iJM3tNR9O23KyEryikLn9TBHYzKvLi9KMYh1FJNIylMuYPS
- ZbyshjrofgRmgLADQr12V/ytCe+lTEY3VjH0RNblNzzhQHQO4GEU9NmeBsHi4SQkG70u
- GcIAyZ8h5myZ6yGalussM5mPoL1KwQWdxw5UNG5EIYq6kcZ6IAf3pKJn5B2Wh9RU4EWO vw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3733vn8ux6-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 04 Mar 2021 12:43:50 -0500
-Received: from m0098413.ppops.net (m0098413.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 124HWm7s026717;
-        Thu, 4 Mar 2021 12:43:50 -0500
-Received: from ppma04dal.us.ibm.com (7a.29.35a9.ip4.static.sl-reverse.com [169.53.41.122])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3733vn8uww-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 04 Mar 2021 12:43:50 -0500
-Received: from pps.filterd (ppma04dal.us.ibm.com [127.0.0.1])
-        by ppma04dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 124HclqU001274;
-        Thu, 4 Mar 2021 17:43:49 GMT
-Received: from b03cxnp08026.gho.boulder.ibm.com (b03cxnp08026.gho.boulder.ibm.com [9.17.130.18])
-        by ppma04dal.us.ibm.com with ESMTP id 36ydq9tssu-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 04 Mar 2021 17:43:49 +0000
-Received: from b03ledav001.gho.boulder.ibm.com (b03ledav001.gho.boulder.ibm.com [9.17.130.232])
-        by b03cxnp08026.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 124HhlF523986604
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 4 Mar 2021 17:43:47 GMT
-Received: from b03ledav001.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id DBDE66E062;
-        Thu,  4 Mar 2021 17:43:46 +0000 (GMT)
-Received: from b03ledav001.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 6D6B66E052;
-        Thu,  4 Mar 2021 17:43:45 +0000 (GMT)
-Received: from cpe-66-24-58-13.stny.res.rr.com (unknown [9.85.150.254])
-        by b03ledav001.gho.boulder.ibm.com (Postfix) with ESMTP;
-        Thu,  4 Mar 2021 17:43:45 +0000 (GMT)
-Subject: Re: [PATCH v3 1/1] s390/vfio-ap: fix circular lockdep when
- setting/clearing crypto masks
-To:     Halil Pasic <pasic@linux.ibm.com>
-Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, stable@vger.kernel.org,
-        borntraeger@de.ibm.com, cohuck@redhat.com, kwankhede@nvidia.com,
-        pbonzini@redhat.com, alex.williamson@redhat.com,
-        pasic@linux.vnet.ibm.com
-References: <20210302204322.24441-1-akrowiak@linux.ibm.com>
- <20210302204322.24441-2-akrowiak@linux.ibm.com>
- <20210303162332.4d227dbe.pasic@linux.ibm.com>
- <14665bcf-2224-e313-43ff-357cadd177cf@linux.ibm.com>
- <20210303204706.0538e84f.pasic@linux.ibm.com>
-From:   Tony Krowiak <akrowiak@linux.ibm.com>
-Message-ID: <8f5ab6fa-8fd3-27d8-8561-d03ff457df16@linux.ibm.com>
-Date:   Thu, 4 Mar 2021 12:43:44 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+        id S232695AbhCDSBQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 4 Mar 2021 13:01:16 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:25717 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231789AbhCDSBD (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 4 Mar 2021 13:01:03 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1614880777;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=g3BvVTqRZcHNF2bumxV68Pob+1+419O+zr+luXDJ/Hw=;
+        b=NShRNXGuYnTfZe91xSe/wYUlDxhgvD42ul+RHQ2p0cHEHkL/GW7L9j+OHgjj8zzwrkiEG0
+        zycJUjCJod3Pt7z+LAXNmJQC0V+SYPhOYxSttRJxam2FpuCWVwZ91om38tCqdyn3jbAu+h
+        O9wk82dVqbchKfvQ3GWsdbbkvpKhuDM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-583-wyuwOdCCNg6cKDwheSBRyg-1; Thu, 04 Mar 2021 12:59:35 -0500
+X-MC-Unique: wyuwOdCCNg6cKDwheSBRyg-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B63181054F90
+        for <kvm@vger.kernel.org>; Thu,  4 Mar 2021 17:59:34 +0000 (UTC)
+Received: from virtlab511.virt.lab.eng.bos.redhat.com (virtlab511.virt.lab.eng.bos.redhat.com [10.19.152.198])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 82D2160C0F
+        for <kvm@vger.kernel.org>; Thu,  4 Mar 2021 17:59:34 +0000 (UTC)
+From:   Paolo Bonzini <pbonzini@redhat.com>
+To:     kvm@vger.kernel.org
+Subject: [PATCH kvm-unit-tests] KVM: svm: add a test to observe the gain from clean bits
+Date:   Thu,  4 Mar 2021 12:59:34 -0500
+Message-Id: <20210304175934.402058-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20210303204706.0538e84f.pasic@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.761
- definitions=2021-03-04_05:2021-03-03,2021-03-04 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 priorityscore=1501
- malwarescore=0 clxscore=1015 impostorscore=0 mlxlogscore=999 bulkscore=0
- phishscore=0 adultscore=0 suspectscore=0 lowpriorityscore=0 spamscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
- definitions=main-2103040082
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ x86/svm.h       | 24 +++++++++++++++++++++---
+ x86/svm_tests.c |  9 +++++++++
+ 2 files changed, 30 insertions(+), 3 deletions(-)
 
-
-On 3/3/21 2:47 PM, Halil Pasic wrote:
-> On Wed, 3 Mar 2021 12:10:11 -0500
-> Tony Krowiak <akrowiak@linux.ibm.com> wrote:
->
->> On 3/3/21 10:23 AM, Halil Pasic wrote:
->>> On Tue,  2 Mar 2021 15:43:22 -0500
->>> Tony Krowiak <akrowiak@linux.ibm.com> wrote:
->>>   
->>>> This patch fixes a lockdep splat introduced by commit f21916ec4826
->>>> ("s390/vfio-ap: clean up vfio_ap resources when KVM pointer invalidated").
->>>> The lockdep splat only occurs when starting a Secure Execution guest.
->>>> Crypto virtualization (vfio_ap) is not yet supported for SE guests;
->>>> however, in order to avoid this problem when support becomes available,
->>>> this fix is being provided.
->>> [..]
->>>   
->>>> @@ -1038,14 +1116,28 @@ static int vfio_ap_mdev_set_kvm(struct ap_matrix_mdev *matrix_mdev,
->>>>    {
->>>>    	struct ap_matrix_mdev *m;
->>>>
->>>> -	list_for_each_entry(m, &matrix_dev->mdev_list, node) {
->>>> -		if ((m != matrix_mdev) && (m->kvm == kvm))
->>>> -			return -EPERM;
->>>> -	}
->>>> +	if (kvm->arch.crypto.crycbd) {
->>>> +		matrix_mdev->kvm_busy = true;
->>>>
->>>> -	matrix_mdev->kvm = kvm;
->>>> -	kvm_get_kvm(kvm);
->>>> -	kvm->arch.crypto.pqap_hook = &matrix_mdev->pqap_hook;
->>>> +		list_for_each_entry(m, &matrix_dev->mdev_list, node) {
->>>> +			if ((m != matrix_mdev) && (m->kvm == kvm)) {
->>>> +				wake_up_all(&matrix_mdev->wait_for_kvm);
->>> This ain't no good. kvm_busy will remain true if we take this exit. The
->>> wake_up_all() is not needed, because we hold the lock, so nobody can
->>> observe it if we don't forget kvm_busy set.
->>>
->>> I suggest moving matrix_mdev->kvm_busy = true; after this loop, maybe right
->>> before the unlock, and removing the wake_up_all().
->>>   
->>>> +				return -EPERM;
->>>> +			}
->>>> +		}
->>>> +
->>>> +		kvm_get_kvm(kvm);
->>>> +		mutex_unlock(&matrix_dev->lock);
->>>> +		kvm_arch_crypto_set_masks(kvm,
->>>> +					  matrix_mdev->matrix.apm,
->>>> +					  matrix_mdev->matrix.aqm,
->>>> +					  matrix_mdev->matrix.adm);
->>>> +		mutex_lock(&matrix_dev->lock);
->>>> +		kvm->arch.crypto.pqap_hook = &matrix_mdev->pqap_hook;
->>>> +		matrix_mdev->kvm = kvm;
->>>> +		matrix_mdev->kvm_busy = false;
->>>> +		wake_up_all(&matrix_mdev->wait_for_kvm);
->>>> +	}
->>>>
->>>>    	return 0;
->>>>    }
->>> [..]
->>>   
->>>> @@ -1300,7 +1406,21 @@ static ssize_t vfio_ap_mdev_ioctl(struct mdev_device *mdev,
->>>>    		ret = vfio_ap_mdev_get_device_info(arg);
->>>>    		break;
->>>>    	case VFIO_DEVICE_RESET:
->>>> -		ret = vfio_ap_mdev_reset_queues(mdev);
->>>> +		matrix_mdev = mdev_get_drvdata(mdev);
->>>> +
->>>> +		/*
->>>> +		 * If the KVM pointer is in the process of being set, wait until
->>>> +		 * the process has completed.
->>>> +		 */
->>>> +		wait_event_cmd(matrix_mdev->wait_for_kvm,
->>>> +			       matrix_mdev->kvm_busy == false,
->>>> +			       mutex_unlock(&matrix_dev->lock),
->>>> +			       mutex_lock(&matrix_dev->lock));
->>>> +
->>>> +		if (matrix_mdev->kvm)
->>>> +			ret = vfio_ap_mdev_reset_queues(mdev);
->>>> +		else
->>>> +			ret = -ENODEV;
->>> I don't think rejecting the reset is a good idea. I have you a more detailed
->>> explanation of the list, where we initially discussed this question.
->>>
->>> How do you exect userspace to react to this -ENODEV?
->> After reading your more detailed explanation, I have come to the
->> conclusion that the test for matrix_mdev->kvm should not be
->> performed here and the the vfio_ap_mdev_reset_queues() function
->> should be called regardless. Each queue assigned to the mdev
->> that is also bound to the vfio_ap driver will get reset and its
->> IRQ resources cleaned up if they haven't already been and the
->> other required conditions are met (i.e., see
->> vfio_ap_mdev_free_irq_resources()).
-> My point is if !->kvm the other required conditions are not met. But
-> yes we can go back to unconditional vfio_ap_mdev_reset_queues(mdev),
-> and think about the necessity of performing a
-> vfio_ap_mdev_reset_queues() if !->kvm later as I proposed in the other
-> mail.
-
-The other conditions may or may not have been met depending
-upon whether ->kvm is NULL because the VFIO_DEVICE_RESET
-ioctl was invoked while the matrix_dev->lock was released
-in the vfio_ap_mdev_unset_kvm() function. If that was the case,
-then there is no need to clean up the IRQ resources because it
-will already have been done.
-
-On the other hand, if we don't have ->kvm because something broke,
-then we may be out of luck anyway. There will certainly be no
-way to unregister the GISC; however, it may still be possible
-to unpin the pages if we still have q->saved_pfn.
-
-The point is, if the queue is bound to vfio_ap, it can be reset. If we can't
-clean up the IRQ resources because something is broken, then there
-is nothing we can do about that.
-
-
->
-> Regards,
-> Halil
+diff --git a/x86/svm.h b/x86/svm.h
+index a0863b8..593e3b0 100644
+--- a/x86/svm.h
++++ b/x86/svm.h
+@@ -51,6 +51,22 @@ enum {
+ 	INTERCEPT_MWAIT_COND,
+ };
+ 
++enum {
++        VMCB_CLEAN_INTERCEPTS = 1, /* Intercept vectors, TSC offset, pause filter count */
++        VMCB_CLEAN_PERM_MAP = 2,   /* IOPM Base and MSRPM Base */
++        VMCB_CLEAN_ASID = 4,       /* ASID */
++        VMCB_CLEAN_INTR = 8,       /* int_ctl, int_vector */
++        VMCB_CLEAN_NPT = 16,       /* npt_en, nCR3, gPAT */
++        VMCB_CLEAN_CR = 32,        /* CR0, CR3, CR4, EFER */
++        VMCB_CLEAN_DR = 64,        /* DR6, DR7 */
++        VMCB_CLEAN_DT = 128,       /* GDT, IDT */
++        VMCB_CLEAN_SEG = 256,      /* CS, DS, SS, ES, CPL */
++        VMCB_CLEAN_CR2 = 512,      /* CR2 only */
++        VMCB_CLEAN_LBR = 1024,     /* DBGCTL, BR_FROM, BR_TO, LAST_EX_FROM, LAST_EX_TO */
++        VMCB_CLEAN_AVIC = 2048,    /* APIC_BAR, APIC_BACKING_PAGE,
++				      PHYSICAL_TABLE pointer, LOGICAL_TABLE pointer */
++        VMCB_CLEAN_ALL = 4095,
++};
+ 
+ struct __attribute__ ((__packed__)) vmcb_control_area {
+ 	u16 intercept_cr_read;
+@@ -83,12 +99,14 @@ struct __attribute__ ((__packed__)) vmcb_control_area {
+ 	u32 event_inj_err;
+ 	u64 nested_cr3;
+ 	u64 lbr_ctl;
+-	u64 reserved_5;
++	u32 clean;
++	u32 reserved_5;
+ 	u64 next_rip;
+-	u8 reserved_6[816];
++	u8 insn_len;
++	u8 insn_bytes[15];
++	u8 reserved_6[800];
+ };
+ 
+-
+ #define TLB_CONTROL_DO_NOTHING 0
+ #define TLB_CONTROL_FLUSH_ALL_ASID 1
+ 
+diff --git a/x86/svm_tests.c b/x86/svm_tests.c
+index 29a0b59..8b6fbd5 100644
+--- a/x86/svm_tests.c
++++ b/x86/svm_tests.c
+@@ -1020,6 +1020,12 @@ static bool latency_finished(struct svm_test *test)
+     return runs == 0;
+ }
+ 
++static bool latency_finished_clean(struct svm_test *test)
++{
++    vmcb->control.clean = VMCB_CLEAN_ALL;
++    return latency_finished(test);
++}
++
+ static bool latency_check(struct svm_test *test)
+ {
+     printf("    Latency VMRUN : max: %ld min: %ld avg: %ld\n", latvmrun_max,
+@@ -2458,6 +2464,9 @@ struct svm_test svm_tests[] = {
+     { "latency_run_exit", default_supported, latency_prepare,
+       default_prepare_gif_clear, latency_test,
+       latency_finished, latency_check },
++    { "latency_run_exit_clean", default_supported, latency_prepare,
++      default_prepare_gif_clear, latency_test,
++      latency_finished_clean, latency_check },
+     { "latency_svm_insn", default_supported, lat_svm_insn_prepare,
+       default_prepare_gif_clear, null_test,
+       lat_svm_insn_finished, lat_svm_insn_check },
+-- 
+2.26.2
 
