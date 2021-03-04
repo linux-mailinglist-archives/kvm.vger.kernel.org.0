@@ -2,154 +2,97 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E338032CD9E
-	for <lists+kvm@lfdr.de>; Thu,  4 Mar 2021 08:33:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E167632CDF8
+	for <lists+kvm@lfdr.de>; Thu,  4 Mar 2021 08:57:12 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230440AbhCDHcp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 4 Mar 2021 02:32:45 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:49053 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230439AbhCDHcU (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 4 Mar 2021 02:32:20 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1614843055;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=c7/0tXgFX+Nemc6SQyJg+VG+4lWEi4mRvofkLtSVT7s=;
-        b=XrgyONze8zouAXxl7MAT7UxGk0jaPATjks2ixrG+Er//NxOyY6QC91VdxXlX/mfWf1ckeP
-        w0Muzjg2mOvqPkZRPioGBxf/bb/AQBKOhdyvGsGXMqdZMB0ulc/h/qyazdVzxodyjN8RsH
-        6FYPLzeRHmYfIR9pA/87tPTsnuIuRLU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-224-5Fli40RVOiqTeqVxlv819A-1; Thu, 04 Mar 2021 02:30:51 -0500
-X-MC-Unique: 5Fli40RVOiqTeqVxlv819A-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 15EB7107ACE6;
-        Thu,  4 Mar 2021 07:30:49 +0000 (UTC)
-Received: from wangxiaodeMacBook-Air.local (ovpn-12-64.pek2.redhat.com [10.72.12.64])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id AB85960CCD;
-        Thu,  4 Mar 2021 07:30:35 +0000 (UTC)
-Subject: Re: [RFC v4 11/11] vduse: Support binding irq to the specified cpu
-To:     Xie Yongji <xieyongji@bytedance.com>, mst@redhat.com,
-        stefanha@redhat.com, sgarzare@redhat.com, parav@nvidia.com,
-        bob.liu@oracle.com, hch@infradead.org, rdunlap@infradead.org,
-        willy@infradead.org, viro@zeniv.linux.org.uk, axboe@kernel.dk,
-        bcrl@kvack.org, corbet@lwn.net
-Cc:     virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        kvm@vger.kernel.org, linux-aio@kvack.org,
-        linux-fsdevel@vger.kernel.org
-References: <20210223115048.435-1-xieyongji@bytedance.com>
- <20210223115048.435-12-xieyongji@bytedance.com>
-From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <d104a518-799d-c13f-311c-f7a673f9241b@redhat.com>
-Date:   Thu, 4 Mar 2021 15:30:34 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.16; rv:78.0)
- Gecko/20100101 Thunderbird/78.8.0
+        id S234755AbhCDHzl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 4 Mar 2021 02:55:41 -0500
+Received: from mga07.intel.com ([134.134.136.100]:57527 "EHLO mga07.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S234568AbhCDHzO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 4 Mar 2021 02:55:14 -0500
+IronPort-SDR: tNhDlivBvku/20EVIhzeQ026FImNIhEUqxzUvfWITD80c/MnCeC0877YXnE6hboTOytdyxDWid
+ XQZCrOI4D7FA==
+X-IronPort-AV: E=McAfee;i="6000,8403,9912"; a="251407291"
+X-IronPort-AV: E=Sophos;i="5.81,222,1610438400"; 
+   d="scan'208";a="251407291"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Mar 2021 23:54:33 -0800
+IronPort-SDR: NuJhgYAltXQaRNb65mrv6QqJWpUD9p4tygKJVVwr5bz+sgCpRVQDetQAzXoLSlHElKgbLFqxsd
+ EXP4isHeRzOA==
+X-IronPort-AV: E=Sophos;i="5.81,222,1610438400"; 
+   d="scan'208";a="400475609"
+Received: from likexu-mobl1.ccr.corp.intel.com (HELO [10.238.4.93]) ([10.238.4.93])
+  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Mar 2021 23:54:32 -0800
+Subject: Re: Processor to run Intel PT in a Guest VM
+To:     Aditya Basu <aditya.basu@psu.edu>
+Cc:     "Jaeger, Trent Ray" <trj1@psu.edu>, kvm <kvm@vger.kernel.org>
+References: <CAPn5F5zvmfpo3tdbfVDYC+rTBmVzQ8aGYG+7FrcbeRsnZKPs-w@mail.gmail.com>
+ <0f76acb4-48ee-1e20-f3f1-de4efa276620@intel.com>
+ <CAPn5F5xms0LnffB78ep-nsHH7LiJYaWv_1c0=Awfz9zcciaogQ@mail.gmail.com>
+From:   "Xu, Like" <like.xu@intel.com>
+Message-ID: <762ac97c-5ad9-978e-4962-7d57d9b59581@intel.com>
+Date:   Thu, 4 Mar 2021 15:54:29 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.8.0
 MIME-Version: 1.0
-In-Reply-To: <20210223115048.435-12-xieyongji@bytedance.com>
+In-Reply-To: <CAPn5F5xms0LnffB78ep-nsHH7LiJYaWv_1c0=Awfz9zcciaogQ@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Content-Language: en-GB
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Content-Language: en-US
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Hi Aditya,
 
-On 2021/2/23 7:50 下午, Xie Yongji wrote:
-> Add a parameter for the ioctl VDUSE_INJECT_VQ_IRQ to support
-> injecting virtqueue's interrupt to the specified cpu.
+On "Comet Lake", the answer will also be (unofficially) negative.
+You may preferentially focus on the Small Core (Atom) or Hybrid Processors.
 
+Ref: 
+https://raw.githubusercontent.com/torvalds/linux/master/arch/x86/include/asm/intel-family.h
 
-How userspace know which CPU is this irq for? It looks to me we need to 
-do it at different level.
-
-E.g introduce some API in sys to allow admin to tune for that.
-
-But I think we can do that in antoher patch on top of this series.
-
-Thanks
-
-
+On 2021/3/3 3:59, Aditya Basu wrote:
+> Thanks a lot for the information. From what I see, the Atom P series
+> are server-grade processors.
 >
-> Signed-off-by: Xie Yongji <xieyongji@bytedance.com>
-> ---
->   drivers/vdpa/vdpa_user/vduse_dev.c | 22 +++++++++++++++++-----
->   include/uapi/linux/vduse.h         |  7 ++++++-
->   2 files changed, 23 insertions(+), 6 deletions(-)
+> Would you happen to know if any Desktop/Workstation processors (ex.
+> 10th gen i9) also support this feature?
+> Specifically, I'm referring to Comet Lake, here --
 >
-> diff --git a/drivers/vdpa/vdpa_user/vduse_dev.c b/drivers/vdpa/vdpa_user/vduse_dev.c
-> index f5adeb9ee027..df3d467fff40 100644
-> --- a/drivers/vdpa/vdpa_user/vduse_dev.c
-> +++ b/drivers/vdpa/vdpa_user/vduse_dev.c
-> @@ -923,14 +923,27 @@ static long vduse_dev_ioctl(struct file *file, unsigned int cmd,
->   		break;
->   	}
->   	case VDUSE_INJECT_VQ_IRQ: {
-> +		struct vduse_vq_irq irq;
->   		struct vduse_virtqueue *vq;
->   
-> +		ret = -EFAULT;
-> +		if (copy_from_user(&irq, argp, sizeof(irq)))
-> +			break;
-> +
->   		ret = -EINVAL;
-> -		if (arg >= dev->vq_num)
-> +		if (irq.index >= dev->vq_num)
-> +			break;
-> +
-> +		if (irq.cpu != -1 && (irq.cpu >= nr_cpu_ids ||
-> +		    !cpu_online(irq.cpu)))
->   			break;
->   
-> -		vq = &dev->vqs[arg];
-> -		queue_work(vduse_irq_wq, &vq->inject);
-> +		ret = 0;
-> +		vq = &dev->vqs[irq.index];
-> +		if (irq.cpu == -1)
-> +			queue_work(vduse_irq_wq, &vq->inject);
-> +		else
-> +			queue_work_on(irq.cpu, vduse_irq_wq, &vq->inject);
->   		break;
->   	}
->   	case VDUSE_INJECT_CONFIG_IRQ:
-> @@ -1342,8 +1355,7 @@ static int vduse_init(void)
->   	if (ret)
->   		goto err_chardev;
->   
-> -	vduse_irq_wq = alloc_workqueue("vduse-irq",
-> -				WQ_HIGHPRI | WQ_SYSFS | WQ_UNBOUND, 0);
-> +	vduse_irq_wq = alloc_workqueue("vduse-irq", WQ_HIGHPRI, 0);
->   	if (!vduse_irq_wq)
->   		goto err_wq;
->   
-> diff --git a/include/uapi/linux/vduse.h b/include/uapi/linux/vduse.h
-> index 9070cd512cb4..9c70fd842ce5 100644
-> --- a/include/uapi/linux/vduse.h
-> +++ b/include/uapi/linux/vduse.h
-> @@ -116,6 +116,11 @@ struct vduse_vq_eventfd {
->   	int fd; /* eventfd, -1 means de-assigning the eventfd */
->   };
->   
-> +struct vduse_vq_irq {
-> +	__u32 index; /* virtqueue index */
-> +	int cpu; /* bind irq to the specified cpu, -1 means running on the current cpu */
-> +};
-> +
->   #define VDUSE_BASE	0x81
->   
->   /* Create a vduse device which is represented by a char device (/dev/vduse/<name>) */
-> @@ -131,7 +136,7 @@ struct vduse_vq_eventfd {
->   #define VDUSE_VQ_SETUP_KICKFD	_IOW(VDUSE_BASE, 0x04, struct vduse_vq_eventfd)
->   
->   /* Inject an interrupt for specific virtqueue */
-> -#define VDUSE_INJECT_VQ_IRQ	_IO(VDUSE_BASE, 0x05)
-> +#define VDUSE_INJECT_VQ_IRQ	_IOW(VDUSE_BASE, 0x05, struct vduse_vq_irq)
->   
->   /* Inject a config interrupt */
->   #define VDUSE_INJECT_CONFIG_IRQ	_IO(VDUSE_BASE, 0x06)
+> https://ark.intel.com/content/www/us/en/ark/products/codename/90354/comet-lake.html
+>
+> Aditya
+>
+>
+> Aditya
+>
+> On Mon, Mar 1, 2021 at 8:16 PM Xu, Like <like.xu@intel.com> wrote:
+>> On 2021/3/2 2:48, Aditya Basu wrote:
+>>> Hi all,
+>>> I am a PhD student at the Pennsylvania State University. For my
+>>> current project, I am trying to run Intel Processor Trace (PT) inside
+>>> a Guest VM. Specifically, I want to run KVM in the "Host-Guest mode"
+>>> as stated in the following bug:
+>>> https://bugzilla.kernel.org/show_bug.cgi?id=201565
+>>>
+>>> However, I *cannot* find an Intel processor that supports this mode. I
+>>> have tried using Intel's i7-7700 and i7-9700k processors. Based on my
+>>> findings, the problem seems to be that bit 24 (PT_USE_GPA) of
+>>> MSR_IA32_VMX_PROCBASED_CTLS2 (high) is reported as 0 by the processor.
+>>> Hence, KVM seems to force pt_mode to 0 (or PT_MODE_HOST).
+>> You may try the Intel Atom® Processor P* Series.
+>>
+>> https://ark.intel.com/content/www/us/en/ark/products/series/29035/intel-atom-processor.html?wapkw=Atom#@Server
+>>
+>>> I would appreciate any pointers that someone might have regarding the
+>>> above. Specifically, I want to find an Intel processor that supports
+>>> running Intel PT in "Host-Guest mode".
+>>>
+>>> Regards,
+>>>
+>>> Aditya Basu
+>>> PhD Student in CSE
+>>> Pennsylvania State University
+>>> https://www.adityabasu.me/
 
