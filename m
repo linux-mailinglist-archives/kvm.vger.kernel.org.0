@@ -2,97 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8F3A632DA5A
-	for <lists+kvm@lfdr.de>; Thu,  4 Mar 2021 20:27:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E5B5932DA69
+	for <lists+kvm@lfdr.de>; Thu,  4 Mar 2021 20:32:22 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233750AbhCDT0n (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 4 Mar 2021 14:26:43 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42790 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236098AbhCDT0l (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 4 Mar 2021 14:26:41 -0500
-Received: from mail-wm1-x329.google.com (mail-wm1-x329.google.com [IPv6:2a00:1450:4864:20::329])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2F6E8C061574
-        for <kvm@vger.kernel.org>; Thu,  4 Mar 2021 11:26:01 -0800 (PST)
-Received: by mail-wm1-x329.google.com with SMTP id o7-20020a05600c4fc7b029010a0247d5f0so4996870wmq.1
-        for <kvm@vger.kernel.org>; Thu, 04 Mar 2021 11:26:01 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=K1rMeJSzwzcq98KjXfKjITR3jsmxskM8W7FX7UnUdWM=;
-        b=rs/4W8tPuM/MAzTPkgfenRbbFQ6m5CgD1CMLfCmkzwDx6edd20DBZfdu2FVs+csbW2
-         zaW+sJs14dqT8/OldzMk4ZszUthHC5efW4jrHjLxIDbrbheBa9Zrrnl76WR6O0SWlg2g
-         pnMG33E2WFIW20rwbZ8mYo6lpB8/Ol4fOCtTVL2TdIABnY6bUMeg21x0gmfS+dbBiViJ
-         QFST5anZaibLJrEoTrdat03q2w50wJINbxElELmvcfRR8GtdCntct781h+3GVbUKB5l8
-         co/VHfEmv0d1U6KrS43SFn3gzRcDBeVeu/C7Fd+T5w4FEUj4QMnq3bjcXBhdYQsJ746V
-         M3Cg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
-         :date:user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=K1rMeJSzwzcq98KjXfKjITR3jsmxskM8W7FX7UnUdWM=;
-        b=VfJPBH4E3ygz2h9ka6LehBMhmjRRkowm37fdH2Z4+YWCRCFAokXRdEvm4W0mTH+1Ql
-         NTczFCJSNj6OIr03ZLLhMJSlGk3tLjVZLouLw+b6wU0UITXe8Fh98t8PQcIG3rBxNykt
-         orXnkwuBjVjRgLITqjS9UEVsAPF8pHOEQBCskRf0M/Bn9fZ/LE/sUQy0l9pvLXFt2VcY
-         R5PodOvCDagJg1+hDMPLer+PQKHOs19sIq/woL82Mb62v03wbZY1BPlWco4v0P5ncsZm
-         JZZ4MLBUR1CAS5uQrV7QWDXfxL3WDARlE82fuB8xF/KGXdVmyVn9+erYwGvuRYtrJeUF
-         gR9g==
-X-Gm-Message-State: AOAM531VWx+6Zy+y0D+MrseKR+CQukyNFfm2E4qudNCsSE34ETak9NeM
-        4hpGCeDwVJk1yUzd5y2l+NE=
-X-Google-Smtp-Source: ABdhPJzXyamAlrjSNY+hfTRG5LpIrWByypnuH95AHlow2cjiddxnz8x8p06b5lPMQcGulA1U84Mr4Q==
-X-Received: by 2002:a05:600c:22d9:: with SMTP id 25mr4561826wmg.108.1614885959999;
-        Thu, 04 Mar 2021 11:25:59 -0800 (PST)
-Received: from [192.168.1.36] (68.red-83-57-175.dynamicip.rima-tde.net. [83.57.175.68])
-        by smtp.gmail.com with ESMTPSA id i8sm332582wry.90.2021.03.04.11.25.58
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 04 Mar 2021 11:25:59 -0800 (PST)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= 
-        <philippe.mathieu.daude@gmail.com>
-Subject: Re: [PATCH v6 03/11] target/arm: Restrict ARMv4 cpus to TCG accel
-To:     Claudio Fontana <cfontana@suse.de>, qemu-devel@nongnu.org
-Cc:     Fam Zheng <fam@euphon.net>, Laurent Vivier <lvivier@redhat.com>,
-        Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org,
-        qemu-block@nongnu.org, Peter Maydell <peter.maydell@linaro.org>,
-        =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        John Snow <jsnow@redhat.com>, qemu-arm@nongnu.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
-        Richard Henderson <rth@twiddle.net>
-References: <20210131115022.242570-1-f4bug@amsat.org>
- <20210131115022.242570-4-f4bug@amsat.org>
- <1f571396-c225-0372-12f2-1a366ad181c7@suse.de>
-From:   =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <3c84ad2a-7fb9-241d-c0ba-81ff16269240@amsat.org>
-Date:   Thu, 4 Mar 2021 20:25:57 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.7.0
-MIME-Version: 1.0
-In-Reply-To: <1f571396-c225-0372-12f2-1a366ad181c7@suse.de>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+        id S234552AbhCDTbb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 4 Mar 2021 14:31:31 -0500
+Received: from mail.kernel.org ([198.145.29.99]:44420 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S236098AbhCDTba (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 4 Mar 2021 14:31:30 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPS id 6479964F5F;
+        Thu,  4 Mar 2021 19:30:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1614886249;
+        bh=KM9+FUcEaPklWZy9Z1oXj8NOVoR5Gwh+Tr9RnmZFoBw=;
+        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+        b=O1u2CviFfCz5K954vEVSUa7DsOMb49cAan6vr5AefWgNmJOQ9TCTQVnJSKjguzhr2
+         4O4/hFeltpGZAf3b1zkOFv7IsOjhPZd3sLVY8eFsU8RrWhDlcuH5K75aYH1I5bGENC
+         m+/i4LsOh85uorrkS3KcMyAa7QTq1crhLOvM+dceSsTCW71J+exzvhE79JyHFNVdkI
+         6DLN1cwnj30uBFSILI2XAP32ALUgAqvVpEBaQEn+PtLOYjvXVeRYCDZjZEJjGg5Ebb
+         TXl8gtsMTuG01A+ocAb2k9vxhiNQ26b/F7yrwESuLgE89y301G/BuzmpCKDHiTnnfY
+         RgexsUMV46xPQ==
+Received: from pdx-korg-docbuild-2.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by pdx-korg-docbuild-2.ci.codeaurora.org (Postfix) with ESMTP id 4F569609E7;
+        Thu,  4 Mar 2021 19:30:49 +0000 (UTC)
+Subject: Re: [GIT PULL] KVM changes for 5.12-rc2
+From:   pr-tracker-bot@kernel.org
+In-Reply-To: <20210303151007.383323-1-pbonzini@redhat.com>
+References: <20210303151007.383323-1-pbonzini@redhat.com>
+X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
+X-PR-Tracked-Message-Id: <20210303151007.383323-1-pbonzini@redhat.com>
+X-PR-Tracked-Remote: https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
+X-PR-Tracked-Commit-Id: 9e46f6c6c959d9bb45445c2e8f04a75324a0dfd0
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: cee407c5cc427a7d9b21ee964fbda613e368bdff
+Message-Id: <161488624926.28500.3551606696689046612.pr-tracker-bot@kernel.org>
+Date:   Thu, 04 Mar 2021 19:30:49 +0000
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     torvalds@linux-foundation.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 3/4/21 12:55 PM, Claudio Fontana wrote:
-> Hi,
-> 
-> I am trying to take these patches,
-> in the hope that they help with some of the test issues I am having with the kvm-only build,
-> 
-> but they fail with:
-> 
-> target/arm/Kconfig: does not exist in index
-> 
-> so I guess I need the "target/arm/Kconfig" series right, how can I find that one?
+The pull request you sent on Wed,  3 Mar 2021 10:10:07 -0500:
 
-See the Based-on in the cover ;)
-https://www.mail-archive.com/qemu-block@nongnu.org/msg79924.html
+> https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
 
-Regards,
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/cee407c5cc427a7d9b21ee964fbda613e368bdff
 
-Phil.
+Thank you!
+
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
