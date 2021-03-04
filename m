@@ -2,115 +2,112 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D4EAF32CE95
-	for <lists+kvm@lfdr.de>; Thu,  4 Mar 2021 09:37:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1AA6232CECE
+	for <lists+kvm@lfdr.de>; Thu,  4 Mar 2021 09:53:10 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235903AbhCDIgp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 4 Mar 2021 03:36:45 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:29314 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S235895AbhCDIga (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 4 Mar 2021 03:36:30 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1614846904;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=0bXhR7YJ9IaSyeZ7VfID8y95/AMg+XDUasgSyE009NI=;
-        b=YfP6WUN7ImCBSGznzRgDAe9KpDYmTsmTckBhCMJjOEN/PO4GNE8VtRQeLuG90yY61pWDVi
-        7udEWoHZ0OVKZXs3380pQ3m8/FvQeOPtHA4BimhKHMs7/6KFcCQZOpZLp27clbpj1LC9vX
-        ceBgEr2SBFpmFlCYI5Dxkdjowb4LPSI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-48-TEysT5XLPrWNfNrk6byMxQ-1; Thu, 04 Mar 2021 03:35:03 -0500
-X-MC-Unique: TEysT5XLPrWNfNrk6byMxQ-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E97ED5A090;
-        Thu,  4 Mar 2021 08:35:01 +0000 (UTC)
-Received: from wangxiaodeMacBook-Air.local (ovpn-12-64.pek2.redhat.com [10.72.12.64])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 1580E5FCC8;
-        Thu,  4 Mar 2021 08:34:53 +0000 (UTC)
-Subject: Re: [RFC PATCH 01/10] vdpa: add get_config_size callback in
- vdpa_config_ops
-To:     Stefano Garzarella <sgarzare@redhat.com>
-Cc:     virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>
-References: <20210216094454.82106-1-sgarzare@redhat.com>
- <20210216094454.82106-2-sgarzare@redhat.com>
- <5de4cd5b-04cb-46ca-1717-075e5e8542fd@redhat.com>
- <20210302141516.oxsdb7jogrvu75yc@steredhat>
-From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <8a3f39ab-1cee-d0c3-e4d1-dc3ec492a763@redhat.com>
-Date:   Thu, 4 Mar 2021 16:34:52 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.16; rv:78.0)
- Gecko/20100101 Thunderbird/78.8.0
+        id S236814AbhCDIwO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 4 Mar 2021 03:52:14 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46466 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S236805AbhCDIv7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 4 Mar 2021 03:51:59 -0500
+Received: from mail-qv1-xf2b.google.com (mail-qv1-xf2b.google.com [IPv6:2607:f8b0:4864:20::f2b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C29EAC061756;
+        Thu,  4 Mar 2021 00:51:18 -0800 (PST)
+Received: by mail-qv1-xf2b.google.com with SMTP id h7so6242846qvm.2;
+        Thu, 04 Mar 2021 00:51:18 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=sender:date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=I4gktfqxylGB3DlwpHUJlo46LXTYxo6+TuJCmtDgwqg=;
+        b=WYjdeOOvSLFpvDoGjRRqZlAOwzlmZdzsKW62eY2+C+MatfU5IHlRHugMRRHognkKJa
+         7I/NGS3uGqF63bl8cu+Sd8jPUj2wa8lNZWhg6s7FdnFPLRsxr7AK4HzzeD65KBmPz6wN
+         VQcjeJJbBgX5qiMV1/Cq6/FQCVXVPWIa+tMGhn9gGdfcb2+PL56qDI1QfMLy9cayAD8R
+         QXnYX4JEzS6BN9ANqF2JSjPoHHX1U+rqiF5qO+KIN6ax+4qAeRnkp97wMpAOHuQIRs5o
+         Kj46nYkNjqGS+ndlohRvyB8MUQ4HYU2dQPbGtA8rAwwGGcZ43FjhtD3OMnmovFe3Uaft
+         0aqA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+         :references:mime-version:content-disposition:in-reply-to;
+        bh=I4gktfqxylGB3DlwpHUJlo46LXTYxo6+TuJCmtDgwqg=;
+        b=SCssvo3JnDfv2x8MNnb1/0o+1zLiG2oje8dRx4H1mu3yQalM9G/sMrsYMNayyjE51W
+         sCSb5goftX0iIsrtcfVzhxMcUL7ngF4pW+yzTuM0fwH/mCb1GoG9fcn5O5yIxghzliR0
+         0YezW/4DwQkIjzDV7SUCH0gAvwfkrleLMaEbwynXHPgQHbyo2S+3igidli5SB8zei8yZ
+         whfSFSkj1i8EIiIOlYd+3Iend4J7BapyEn5YMveSeBeihBljxq4uqKPNBQSrP5nTOgOx
+         0R1eP+vMPA+0IWVAAKadCbWMh8Op6LcgJf82lSkL0rLgwsJwXITO1TLJkPt1YKHopkYM
+         f4IA==
+X-Gm-Message-State: AOAM5310QWmMUK2qvXWN5TcTp/zSFJlNBoihJskbq3tpgY0GIh1CBB42
+        3VNl1VlyHSY8VuhWLBkBqyc=
+X-Google-Smtp-Source: ABdhPJzBUoqqJVrNBlQvGGRR49f0+8IuJLMipV5zoSogL0KIUeUBdiMnYRbldFvy1u4CXAnQ7dzQOw==
+X-Received: by 2002:ad4:53ac:: with SMTP id j12mr2877734qvv.3.1614847877771;
+        Thu, 04 Mar 2021 00:51:17 -0800 (PST)
+Received: from localhost (2603-7000-9602-8233-06d4-c4ff-fe48-9d05.res6.spectrum.com. [2603:7000:9602:8233:6d4:c4ff:fe48:9d05])
+        by smtp.gmail.com with ESMTPSA id m16sm1347504qkm.100.2021.03.04.00.51.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 04 Mar 2021 00:51:17 -0800 (PST)
+Sender: Tejun Heo <htejun@gmail.com>
+Date:   Thu, 4 Mar 2021 03:51:16 -0500
+From:   Tejun Heo <tj@kernel.org>
+To:     Vipin Sharma <vipinsh@google.com>
+Cc:     Jacob Pan <jacob.jun.pan@intel.com>, mkoutny@suse.com,
+        rdunlap@infradead.org, thomas.lendacky@amd.com,
+        brijesh.singh@amd.com, jon.grimm@amd.com, eric.vantassell@amd.com,
+        pbonzini@redhat.com, hannes@cmpxchg.org, frankja@linux.ibm.com,
+        borntraeger@de.ibm.com, corbet@lwn.net, seanjc@google.com,
+        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
+        joro@8bytes.org, tglx@linutronix.de, mingo@redhat.com,
+        bp@alien8.de, hpa@zytor.com, gingell@google.com,
+        rientjes@google.com, dionnaglaze@google.com, kvm@vger.kernel.org,
+        x86@kernel.org, cgroups@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-kernel@vger.kernel.org, "Tian, Kevin" <kevin.tian@intel.com>,
+        "Liu, Yi L" <yi.l.liu@intel.com>,
+        "Raj, Ashok" <ashok.raj@intel.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Jason Gunthorpe <jgg@nvidia.com>
+Subject: Re: [RFC v2 2/2] cgroup: sev: Miscellaneous cgroup documentation.
+Message-ID: <YECfhCJtHUL9cB2L@slm.duckdns.org>
+References: <20210302081705.1990283-1-vipinsh@google.com>
+ <20210302081705.1990283-3-vipinsh@google.com>
+ <20210303185513.27e18fce@jacob-builder>
+ <YEB8i6Chq4K/GGF6@google.com>
 MIME-Version: 1.0
-In-Reply-To: <20210302141516.oxsdb7jogrvu75yc@steredhat>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-GB
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YEB8i6Chq4K/GGF6@google.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Hello,
 
-On 2021/3/2 10:15 下午, Stefano Garzarella wrote:
-> On Tue, Mar 02, 2021 at 12:14:13PM +0800, Jason Wang wrote:
->>
->> On 2021/2/16 5:44 下午, Stefano Garzarella wrote:
->>> This new callback is used to get the size of the configuration space
->>> of vDPA devices.
->>>
->>> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
->>> ---
->>>  include/linux/vdpa.h              | 4 ++++
->>>  drivers/vdpa/ifcvf/ifcvf_main.c   | 6 ++++++
->>>  drivers/vdpa/mlx5/net/mlx5_vnet.c | 6 ++++++
->>>  drivers/vdpa/vdpa_sim/vdpa_sim.c  | 9 +++++++++
->>>  4 files changed, 25 insertions(+)
->>>
->>> diff --git a/include/linux/vdpa.h b/include/linux/vdpa.h
->>> index 4ab5494503a8..fddf42b17573 100644
->>> --- a/include/linux/vdpa.h
->>> +++ b/include/linux/vdpa.h
->>> @@ -150,6 +150,9 @@ struct vdpa_iova_range {
->>>   * @set_status:            Set the device status
->>>   *                @vdev: vdpa device
->>>   *                @status: virtio device status
->>> + * @get_config_size:        Get the size of the configuration space
->>> + *                @vdev: vdpa device
->>> + *                Returns size_t: configuration size
->>
->>
->> Rethink about this, how much we could gain by introducing a dedicated 
->> ops here? E.g would it be simpler if we simply introduce a 
->> max_config_size to vdpa device?
->
-> Mainly because in this way we don't have to add new parameters to the 
-> vdpa_alloc_device() function.
->
-> We do the same for example for 'get_device_id', 'get_vendor_id', 
-> 'get_vq_num_max'. All of these are usually static, but we have ops.
-> I think because it's easier to extend.
->
-> I don't know if it's worth adding a new structure for these static 
-> values at this point, like 'struct vdpa_config_params'.
+On Wed, Mar 03, 2021 at 10:22:03PM -0800, Vipin Sharma wrote:
+> > I am trying to see if IOASIDs cgroup can also fit in this misc controller
+> > as yet another resource type.
+> > https://lore.kernel.org/linux-iommu/20210303131726.7a8cb169@jacob-builder/T/#u
+> > However, unlike sev IOASIDs need to be migrated if the process is moved to
+> > another cgroup. i.e. charge the destination and uncharge the source.
+> > 
+> > Do you think this behavior can be achieved by differentiating resource
+> > types? i.e. add attach callbacks for certain types. Having a single misc
+> > interface seems cleaner than creating another controller.
+> 
+> I think it makes sense to add support for migration for the resources
+> which need it. Resources like SEV, SEV-ES will not participate in
+> migration and won't stop can_attach() to succeed, other resources which
+> need migration will allow or stop based on their limits and capacity in
+> the destination.
 
+Please note that cgroup2 by and large don't really like or support charge
+migration or even migrations themselves. We tried that w/ memcg on cgroup1
+and it turned out horrible. The expected usage model as decribed in the doc
+is using migration to seed a cgroup (or even better, use the new clone call
+to start in the target cgroup) and then stay there until exit. All existing
+controllers assume this usage model and I'm likely to nack deviation unless
+there are some super strong justifications.
 
-Yes, that's the point. I think for any static values, it should be set 
-during device allocation.
+Thanks.
 
-I'm fine with both.
-
-Thanks
-
-
->
-> Thanks,
-> Stefano
->
-
+-- 
+tejun
