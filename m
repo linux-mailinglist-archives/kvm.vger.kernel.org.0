@@ -2,93 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5AFA632C9C2
-	for <lists+kvm@lfdr.de>; Thu,  4 Mar 2021 02:20:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3D24D32CA7D
+	for <lists+kvm@lfdr.de>; Thu,  4 Mar 2021 03:32:28 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233473AbhCDBL7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 3 Mar 2021 20:11:59 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52344 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1451777AbhCDAiF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 3 Mar 2021 19:38:05 -0500
-Received: from mail-pf1-x431.google.com (mail-pf1-x431.google.com [IPv6:2607:f8b0:4864:20::431])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B377CC0613E6;
-        Wed,  3 Mar 2021 16:35:32 -0800 (PST)
-Received: by mail-pf1-x431.google.com with SMTP id j12so17525402pfj.12;
-        Wed, 03 Mar 2021 16:35:32 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id;
-        bh=NzpsCCGXP4ItyQsT4XoNqFxXYXsUAk2E6LWEAjyLuuo=;
-        b=tXZgkVEN2lrE004AVMareVAbW5CSpAXGQHu4TYul0hUvEIt3U77pNG1Y3h2bMU2scU
-         dHy75x5mdr30iW5JFblz0qIPTdqqvDYSoakbHvxmQAJbO6sTvwoFuktUGTAyHGqRa9kh
-         ekBnqEWsPRIl+wbQCGa8ssHhpoyr9ryrhCDfMLoMwsRmd17+P+owjb0q5D+YpDf1ZUmF
-         N6Im/b+xicod/UGSxvCoaTOnNsDyJ2A3SA4+hK/LIaZ+2d1+o3aoB2kwURaO0DnXXOum
-         HDQ9LyaxEU3F2PNrs818HgChWT3JjV2mxYpkJ2ZpP6x51CQdOBnLY/bWH+O4j8qxVA2Z
-         g7bg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id;
-        bh=NzpsCCGXP4ItyQsT4XoNqFxXYXsUAk2E6LWEAjyLuuo=;
-        b=a62baNkijeWU/3XywiGQU6l+Jh/tqEtrEmXaWBq9n5NTINMqiXHwN1kK7VLJ3VM7Sm
-         dNGJPLhhfxrDLjpCZ3TzJ/SZkjpUfWeN/tlDMS+BxBVgS1geFl6fVJL0flhncodB9Jpa
-         EpamShn0dAD+25OegysVw6/yDUwpp4HWsbEesFZHVxxJQYwkRgnptK4V05DtkV08TgA/
-         aobe2846CQhCtmdOaqsE3bX+9oPleK3UrCoROyTTpA5567VxIaOpTSO+nX+onO8KBlct
-         Z5mIduClHFI1ek1iqqGfH/V61ENAuiCQ3hkqawQQvXBkknl86d/Q618Fn/H7sYWoHh4P
-         vVBA==
-X-Gm-Message-State: AOAM532KTsWRvdMH1Zgz81t67Aa7mK442fmHg3k4HmVLPaCb3RPQBF4g
-        GJqwGZpO8WazZZRLOAoW5uGgPnKttfk=
-X-Google-Smtp-Source: ABdhPJzrDCJsduLA3BLhJ/QQO6D0co84IVwpPVmwEn29+QHuww5vNQPL75DG4pm1u+B1hQG6ngiLqw==
-X-Received: by 2002:aa7:83cf:0:b029:1ee:f550:7d48 with SMTP id j15-20020aa783cf0000b02901eef5507d48mr1342108pfn.12.1614818132055;
-        Wed, 03 Mar 2021 16:35:32 -0800 (PST)
-Received: from localhost.localdomain ([103.7.29.6])
-        by smtp.googlemail.com with ESMTPSA id e185sm26316479pfe.117.2021.03.03.16.35.29
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 03 Mar 2021 16:35:31 -0800 (PST)
-From:   Wanpeng Li <kernellwp@gmail.com>
-X-Google-Original-From: Wanpeng Li <wanpengli@tencent.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
+        id S231256AbhCDCb4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 3 Mar 2021 21:31:56 -0500
+Received: from mga07.intel.com ([134.134.136.100]:37210 "EHLO mga07.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S231180AbhCDCbY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 3 Mar 2021 21:31:24 -0500
+IronPort-SDR: oF86+uJZZZSkqH3OisORiQXPx0WGdwk903EZuRIJ11dZxF9r3Nsdl/n8TY/SP6NnC87H4QQKiE
+ fApPXlOHv/2g==
+X-IronPort-AV: E=McAfee;i="6000,8403,9912"; a="251371877"
+X-IronPort-AV: E=Sophos;i="5.81,221,1610438400"; 
+   d="scan'208";a="251371877"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Mar 2021 18:30:43 -0800
+IronPort-SDR: XCTwrekLR25oUgm7t70oHJjwYrie2cMryVBSuuk6F0IM31TEET4e9GmZaANhm/dtGQLYb707Hh
+ 0MSP+iEAnDxg==
+X-IronPort-AV: E=Sophos;i="5.81,221,1610438400"; 
+   d="scan'208";a="400276290"
+Received: from likexu-mobl1.ccr.corp.intel.com (HELO [10.238.4.93]) ([10.238.4.93])
+  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Mar 2021 18:30:38 -0800
+Subject: Re: [PATCH v3 5/9] KVM: vmx/pmu: Add MSR_ARCH_LBR_DEPTH emulation for
+ Arch LBR
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Peter Zijlstra <peterz@infradead.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>
-Subject: [PATCH v2] KVM: LAPIC: Advancing the timer expiration on guest initiated write
-Date:   Thu,  4 Mar 2021 08:35:18 +0800
-Message-Id: <1614818118-965-1-git-send-email-wanpengli@tencent.com>
-X-Mailer: git-send-email 2.7.4
+        Joerg Roedel <joro@8bytes.org>,
+        Kan Liang <kan.liang@linux.intel.com>,
+        Dave Hansen <dave.hansen@intel.com>, wei.w.wang@intel.com,
+        Borislav Petkov <bp@alien8.de>, kvm@vger.kernel.org,
+        x86@kernel.org, linux-kernel@vger.kernel.org,
+        Like Xu <like.xu@linux.intel.com>
+References: <20210303135756.1546253-1-like.xu@linux.intel.com>
+ <20210303135756.1546253-6-like.xu@linux.intel.com>
+ <YD/APUcINwvP53VZ@google.com>
+From:   "Xu, Like" <like.xu@intel.com>
+Message-ID: <890a6f34-812a-5937-8761-d448a04f67d7@intel.com>
+Date:   Thu, 4 Mar 2021 10:30:36 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.8.0
+MIME-Version: 1.0
+In-Reply-To: <YD/APUcINwvP53VZ@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Wanpeng Li <wanpengli@tencent.com>
+Hi Sean,
 
-Advancing the timer expiration should only be necessary on guest initiated 
-writes. When we cancel the timer and clear .pending during state restore, 
-clear expired_tscdeadline as well.
+Thanks for your detailed review on the patch set.
 
-Reviewed-by: Sean Christopherson <seanjc@google.com>
-Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
----
-v1 -> v2:
- * update patch description
+On 2021/3/4 0:58, Sean Christopherson wrote:
+> On Wed, Mar 03, 2021, Like Xu wrote:
+>> @@ -348,10 +352,26 @@ static bool intel_pmu_handle_lbr_msrs_access(struct kvm_vcpu *vcpu,
+>>   	return true;
+>>   }
+>>   
+>> +/*
+>> + * Check if the requested depth values is supported
+>> + * based on the bits [0:7] of the guest cpuid.1c.eax.
+>> + */
+>> +static bool arch_lbr_depth_is_valid(struct kvm_vcpu *vcpu, u64 depth)
+>> +{
+>> +	struct kvm_cpuid_entry2 *best;
+>> +
+>> +	best = kvm_find_cpuid_entry(vcpu, 0x1c, 0);
+>> +	if (best && depth && !(depth % 8))
+> This is still wrong, it fails to weed out depth > 64.
 
- arch/x86/kvm/lapic.c | 1 +
- 1 file changed, 1 insertion(+)
+How come ? The testcases depth = {65, 127, 128} get #GP as expected.
 
-diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-index 45d40bf..f2b6e79 100644
---- a/arch/x86/kvm/lapic.c
-+++ b/arch/x86/kvm/lapic.c
-@@ -2595,6 +2595,7 @@ int kvm_apic_set_state(struct kvm_vcpu *vcpu, struct kvm_lapic_state *s)
- 
- 	apic_update_ppr(apic);
- 	hrtimer_cancel(&apic->lapic_timer.timer);
-+	apic->lapic_timer.expired_tscdeadline = 0;
- 	apic_update_lvtt(apic);
- 	apic_manage_nmi_watchdog(apic, kvm_lapic_get_reg(apic, APIC_LVT0));
- 	update_divide_count(apic);
--- 
-2.7.4
+>
+> Not that this is a hot path, but it's probably worth double checking that the
+> compiler generates simple code for "depth % 8", e.g. it can be "depth & 7)".
+
+Emm, the "%" operation is quite normal over kernel code.
+
+if (best && depth && !(depth % 8))
+    10659:       48 85 c0                test   rax,rax
+    1065c:       74 c7                   je     10625 <intel_pmu_set_msr+0x65>
+    1065e:       4d 85 e4                test   r12,r12
+    10661:       74 c2                   je     10625 <intel_pmu_set_msr+0x65>
+    10663:       41 f6 c4 07             test   r12b,0x7
+    10667:       75 bc                   jne    10625 <intel_pmu_set_msr+0x65>
+
+It looks like the compiler does the right thing.
+Do you see the room for optimization ？
+
+>
+>> +		return (best->eax & 0xff) & (1ULL << (depth / 8 - 1));
+>> +
+>> +	return false;
+>> +}
+>> +
 
