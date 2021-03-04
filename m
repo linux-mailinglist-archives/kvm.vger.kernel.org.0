@@ -2,233 +2,449 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5EB2E32CD7D
-	for <lists+kvm@lfdr.de>; Thu,  4 Mar 2021 08:22:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7D25B32CD8C
+	for <lists+kvm@lfdr.de>; Thu,  4 Mar 2021 08:24:55 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236182AbhCDHVf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 4 Mar 2021 02:21:35 -0500
-Received: from mga09.intel.com ([134.134.136.24]:51260 "EHLO mga09.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S236199AbhCDHVH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 4 Mar 2021 02:21:07 -0500
-IronPort-SDR: s7wXX5FycnolHxTxfkW36cGPpPM6LLFpJfoAoZJMoC2wjCwHsqtwkREfoRpEiD86s71XTZBXhW
- a+bIDyoJoHnw==
-X-IronPort-AV: E=McAfee;i="6000,8403,9912"; a="187471623"
-X-IronPort-AV: E=Sophos;i="5.81,222,1610438400"; 
-   d="scan'208";a="187471623"
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Mar 2021 23:20:27 -0800
-IronPort-SDR: oww1WiYP4qwvVkq51tniETF3SCAvC5NfLvnXNISC2HgfhgpSgMGG6IlS8btQi39Sdl+9BKV45D
- wrgvNrcKbU1A==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.81,222,1610438400"; 
-   d="scan'208";a="369654221"
-Received: from orsmsx606.amr.corp.intel.com ([10.22.229.19])
-  by orsmga006.jf.intel.com with ESMTP; 03 Mar 2021 23:20:27 -0800
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX606.amr.corp.intel.com (10.22.229.19) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2106.2; Wed, 3 Mar 2021 23:20:26 -0800
-Received: from orsmsx602.amr.corp.intel.com (10.22.229.15) by
- ORSMSX610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2106.2; Wed, 3 Mar 2021 23:20:26 -0800
-Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
- orsmsx602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2106.2
- via Frontend Transport; Wed, 3 Mar 2021 23:20:26 -0800
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (104.47.55.172)
- by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2106.2; Wed, 3 Mar 2021 23:20:25 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=GdxErzO867sg/GVCPCamURwcmdL/CkTkvVOgd0iwlvCiDpP9QDcuJjO74xE3+XAQ/TH59+O0eeM0kGTaS5fMQ2+o05exGi/wyGnf2KhJJ9921QCH+CMR61mF+f0ln1SnpyD/vwtc9B+g9IpTl+N34D9dcCNOmrp7ZhYUHCsxpzpcrTdDSz0HwHFRP/37nmEOaxme2WGNx/f4Tmbdg2nWDsisgPzXmzMLYH8xU8j6MJ7GwIjgOLMax+REkR9qzrfN6Glpr2WeqwnyjT7Pwi6H0NQ9hlaVeD53bGsad2mYCJhTCkpDNFzyLw0atrTYafHESGWHWGJ4WbHnIZNJMry54w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Ibnv5LHIF3NZNlviCpcvTt5TC1S0fR9q1oZPmP8aICQ=;
- b=SgXdR6aRv3UHAN/6o1rLem6oH2xk049aj66NPJdVbcIaKg+UzwZaxuMDHnrd/LfxDjaG8OY8aACixujgattH6eFpTbUNfnSEIyk31SiaT+szonfLUWv8TS67Xv91mCvxrOPKjoyP43XvTlIQ7DE7FlNg5srYdNkPSOPzMp/khj5N2RXHkK9HiFVnKSZO+lzXlh5vUxgi6gfSkyATaWWw3bpdAx1qm60IGp4gQ9dYehHWGRwm7/Rq/+7hYPUO187Jmyg/QgaIvjJxPWxtnQ8PxKBOE0h9a6Jphz2vu8WWORFZnN95ydXg5FLSfXu+lAYSJ2/Cst4kjQBa1HIypFFuqA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=intel.onmicrosoft.com;
- s=selector2-intel-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Ibnv5LHIF3NZNlviCpcvTt5TC1S0fR9q1oZPmP8aICQ=;
- b=ADj7Kv5cgJYHlRlIkNDB9aaY2zhccV6To/neOB1/PEhWJx5nhNkuK2WeXx9WoSFUCVpAT4NKgisydWyUz3QBEmi+lU4T1qh5Cnor3E5zAGV/Xv+fJg5ikDF94wrxDqEQFatEW8kVq1o4/8q4F0eM5fld41yevCoVIXRS+ZS5kiM=
-Received: from BN6PR11MB4068.namprd11.prod.outlook.com (2603:10b6:405:7c::31)
- by BN6PR11MB1793.namprd11.prod.outlook.com (2603:10b6:404:102::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3912.17; Thu, 4 Mar
- 2021 07:20:24 +0000
-Received: from BN6PR11MB4068.namprd11.prod.outlook.com
- ([fe80::5404:7a7d:4c2a:1c1d]) by BN6PR11MB4068.namprd11.prod.outlook.com
- ([fe80::5404:7a7d:4c2a:1c1d%3]) with mapi id 15.20.3912.021; Thu, 4 Mar 2021
- 07:20:23 +0000
-From:   "Liu, Yi L" <yi.l.liu@intel.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>,
-        Jacob Pan <jacob.jun.pan@linux.intel.com>
-CC:     "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "Raj, Ashok" <ashok.raj@intel.com>,
-        "Tian, Jun J" <jun.j.tian@intel.com>,
-        "Sun, Yi Y" <yi.y.sun@intel.com>,
-        "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
-        "peterx@redhat.com" <peterx@redhat.com>,
-        "jasowang@redhat.com" <jasowang@redhat.com>,
-        "Wu, Hao" <hao.wu@intel.com>,
-        "stefanha@gmail.com" <stefanha@gmail.com>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "Zhu, Lingshan" <lingshan.zhu@intel.com>,
-        "vivek.gautam@arm.com" <vivek.gautam@arm.com>
-Subject: RE: [Patch v8 04/10] vfio/type1: Support binding guest page tables to
- PASID
-Thread-Topic: [Patch v8 04/10] vfio/type1: Support binding guest page tables
- to PASID
-Thread-Index: AQHXD2DTqHwsu8SEs0ulXYEOOzE5O6pwqCkAgABHw4CAAAC2gIABuzgAgAAA5ICAALYpYA==
-Date:   Thu, 4 Mar 2021 07:20:22 +0000
-Message-ID: <BN6PR11MB4068D05B70842124234A7AF4C3979@BN6PR11MB4068.namprd11.prod.outlook.com>
-References: <20210302203545.436623-1-yi.l.liu@intel.com>
- <20210302203545.436623-5-yi.l.liu@intel.com>
- <20210302125628.GI4247@nvidia.com> <20210302091319.1446a47b@jacob-builder>
- <20210302171551.GK4247@nvidia.com> <20210303114212.1cd86579@jacob-builder>
- <20210303194523.GX4247@nvidia.com>
-In-Reply-To: <20210303194523.GX4247@nvidia.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-dlp-reaction: no-action
-dlp-version: 11.5.1.3
-dlp-product: dlpe-windows
-authentication-results: nvidia.com; dkim=none (message not signed)
- header.d=none;nvidia.com; dmarc=none action=none header.from=intel.com;
-x-originating-ip: [192.198.147.221]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 9f1a62ad-089f-464c-1d7e-08d8deddfa07
-x-ms-traffictypediagnostic: BN6PR11MB1793:
-x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <BN6PR11MB17931CF0CAEC836BE1BBA3D8C3979@BN6PR11MB1793.namprd11.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:8882;
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: fVP9S8VszTY+vDthyo+I6/ua5IQvmfaL70Iz/hocMDMGdlqFrgIjxhUH/5Fr4AegMSgV5at8Sz3jVGwuTr1E10LRYqBmuloTJJR+AqgqtlGre5vVjzrbWK0pqFH27ArFrhwZcKV8gOwC4OC/mA7A5ppfV5Q0UkLdQp5WKw4Zl4WQDAi6TqvOnXAUDVFySadOAQrV7Dpi/t9sqSy2nfPmKBjUiVcW0ntNdh9tWILmFsl8Aay2fDo2dwUWEX1wrMiPRNqv4XAMb7J04fU8RzDPPPElmmcSOexU7MfiUDWIzL2Aejr2AE5UfYpPcb6UHS0Stij7ZFZ4AH6ZXf8gzV97T20sCegcf1QBGaboKaVcDfXU3n0yXbUCboTn9ded/021mfMENbGvMMWgzsK9SrfTRIDI2l+CVx0wH8n5CBGuFwwPFGfa7YlIHOhqVliMbcp0WtSvidKT7PYtWiyEWjsm70tNopAEM3h35O1ZpT8bU1sTZELjlLaKgPRpTKIvhPEcvMXJTYBJnzO5yiowAWN4pw==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN6PR11MB4068.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(39860400002)(376002)(366004)(346002)(136003)(396003)(26005)(9686003)(54906003)(33656002)(2906002)(8676002)(316002)(110136005)(478600001)(71200400001)(7416002)(66556008)(76116006)(186003)(64756008)(5660300002)(66946007)(66476007)(7696005)(86362001)(8936002)(55016002)(52536014)(6506007)(66446008)(4326008);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata: =?us-ascii?Q?SVIQvrlk9TNHkrtxCO1XL/kzqGwOq1mt0MqyzrFD0A/JD/fCi+ibrMyhRF6X?=
- =?us-ascii?Q?TKsqZ8qQRl6cMzbQFJdiIW3iBNx9pKC7YDKZjXhMA0BPawn9aTuW0IpIWuBr?=
- =?us-ascii?Q?LhSkHtYMpvCJ4FuwTfQg9UIbeCZcBbCCD1Jnm8LESrju6nB8qKoZITCE4vvX?=
- =?us-ascii?Q?1lXUEbaHf9VBvgbPP0YRmlJpH+VYBIVKFTwHqsOEOmGEK+AxBLjAyRMnJi6C?=
- =?us-ascii?Q?T+JTHbsWOHaiKdTXKuePW9SDEEJVsu7w/h7n06r1W5omLalKRZi+xez4Y4Yp?=
- =?us-ascii?Q?kPqVqkJVzuep22ELFF4L9r9bdf9pRhm4nilp1b+eWX7ww0ZoeyDJG5L4FcTN?=
- =?us-ascii?Q?GPFlEvUzC3J8PSGTI+NzPHvfFLz01dNgeUPtLYXe6wCi9X/Hc1YHHqcvDtSB?=
- =?us-ascii?Q?eb5PeCSyvuMPPo32vRgdzohSQW+06GJMWbAPVlOjC1K8N3C/1IjFPlAJ0iM/?=
- =?us-ascii?Q?g8rEewFtQLtLJwiY9Jy0wM3Y3d652NYGEt1MIntXNQlMku5EwU5F05BH3C5x?=
- =?us-ascii?Q?fS2Wj5BwTdq5Bxr/5p4dL2ezTJSIg+24QiWUXMLrvvwD26sDefaAqqFtQWWR?=
- =?us-ascii?Q?wwEm/hT8TYRV8IYabwLZsdSbCR/2KB2PzeQYGMXRjYMeoU1WD2KieihBtdwz?=
- =?us-ascii?Q?OFS8RJ6SZXG4844/sZXnpBdisirB/cLkI8C89U3XVg7QviwPL0BhmT+jumby?=
- =?us-ascii?Q?25ADjnY44ne3nVrQtUv4RuszmakQoOgyWpGz2d/2MD7cuEOs8hAYdzYuCJL0?=
- =?us-ascii?Q?dm6h9cy56a7S5mN/vsWU2COv4FuYdziExzal4083TrG959HuI+unkLFksCqQ?=
- =?us-ascii?Q?3o2pgQQqGJDJVYSLU4fCqZi7caHbZHSi9ccsqtj+NOhYOHHUtRCKCWYL9DFq?=
- =?us-ascii?Q?td3IEuSj6pDbPQqIoJ7NVObSULLOVcwcsgSrKRlKg2ogWiiNHqFqTE3I+G+O?=
- =?us-ascii?Q?E9akGNhbPwV4VQ+Q9TF7ZZZVr564VozRmmj6kuSCA/hEJxwwV+sZIj4lr0E5?=
- =?us-ascii?Q?USSBiGMyRuPEmd06VX/dev9EnyJUeQsYyx9j702F12kBHAQbANWHw+2ayQbR?=
- =?us-ascii?Q?dxaUgGPivkVEp3/ictVCly0CT/8szGBheEGhgUlClFhZ4l4ekgyrAZI2O2Ik?=
- =?us-ascii?Q?cmA72fbb3nqF8hYDx4mxa4NYIyIGPtyygS8pst2r1YQR8PWsl9/YoZLtzzCr?=
- =?us-ascii?Q?Pff0DK/VEe/2Bi86jJVIEN9e0ssmIuXYNqIhA/sEqpNRNDw6f/Y+OQVLZFOs?=
- =?us-ascii?Q?VlYSGSVI/eSGGtbtrzTs0K9/ot9JloF3s7bBh/4wZ/fG4+Hn8D/9/raGMj3E?=
- =?us-ascii?Q?mDfm1Fv1sBB/i/9xxV3qR64x?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        id S236309AbhCDHXl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 4 Mar 2021 02:23:41 -0500
+Received: from szxga01-in.huawei.com ([45.249.212.187]:4645 "EHLO
+        szxga01-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S236311AbhCDHXg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 4 Mar 2021 02:23:36 -0500
+Received: from DGGEMM401-HUB.china.huawei.com (unknown [172.30.72.55])
+        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4Drj344qf8zYFfP;
+        Thu,  4 Mar 2021 15:21:20 +0800 (CST)
+Received: from dggpemm500023.china.huawei.com (7.185.36.83) by
+ DGGEMM401-HUB.china.huawei.com (10.3.20.209) with Microsoft SMTP Server (TLS)
+ id 14.3.498.0; Thu, 4 Mar 2021 15:22:53 +0800
+Received: from [10.174.187.128] (10.174.187.128) by
+ dggpemm500023.china.huawei.com (7.185.36.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id
+ 15.1.2106.2; Thu, 4 Mar 2021 15:22:52 +0800
+Subject: Re: [RFC PATCH 3/4] KVM: arm64: Install the block entry before
+ unmapping the page mappings
+From:   "wangyanan (Y)" <wangyanan55@huawei.com>
+To:     Marc Zyngier <maz@kernel.org>
+CC:     Alexandru Elisei <alexandru.elisei@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        James Morse <james.morse@arm.com>,
+        "Suzuki K Poulose" <suzuki.poulose@arm.com>,
+        Quentin Perret <qperret@google.com>,
+        "Gavin Shan" <gshan@redhat.com>, <kvmarm@lists.cs.columbia.edu>,
+        <linux-arm-kernel@lists.infradead.org>, <kvm@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>
+References: <20210208112250.163568-1-wangyanan55@huawei.com>
+ <20210208112250.163568-4-wangyanan55@huawei.com>
+ <33a9999e-2cc5-52ca-3da8-38f7e7702529@arm.com>
+ <93c13a04-6fcc-7544-d6ed-2ebb81d209fe@huawei.com>
+ <1b8be8a3-2fb9-be8a-a052-44872355f8cb@arm.com>
+ <b84f41b8-3555-9c8a-126e-34d97643fc95@huawei.com>
+Message-ID: <22f279ce-a655-7f1f-68c8-40bdaaf19102@huawei.com>
+Date:   Thu, 4 Mar 2021 15:22:52 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.4.0
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BN6PR11MB4068.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9f1a62ad-089f-464c-1d7e-08d8deddfa07
-X-MS-Exchange-CrossTenant-originalarrivaltime: 04 Mar 2021 07:20:23.0238
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: H+XbNzZXwETTL0IrELMk/voetBJoTeVo3Y+3ITJmtBK2BtiMr6xw6/EYErTE7qu9nGVp3aeiGSveAQHwKiKN4w==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN6PR11MB1793
-X-OriginatorOrg: intel.com
+In-Reply-To: <b84f41b8-3555-9c8a-126e-34d97643fc95@huawei.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-Originating-IP: [10.174.187.128]
+X-ClientProxiedBy: dggeme716-chm.china.huawei.com (10.1.199.112) To
+ dggpemm500023.china.huawei.com (7.185.36.83)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Jason,
 
-> From: Jason Gunthorpe <jgg@nvidia.com>
-> Sent: Thursday, March 4, 2021 3:45 AM
->=20
-> On Wed, Mar 03, 2021 at 11:42:12AM -0800, Jacob Pan wrote:
-> > Hi Jason,
-> >
-> > On Tue, 2 Mar 2021 13:15:51 -0400, Jason Gunthorpe <jgg@nvidia.com>
-> wrote:
-> >
-> > > On Tue, Mar 02, 2021 at 09:13:19AM -0800, Jacob Pan wrote:
-> > > > Hi Jason,
-> > > >
-> > > > On Tue, 2 Mar 2021 08:56:28 -0400, Jason Gunthorpe <jgg@nvidia.com>
-> > > > wrote:
-> > > > > On Wed, Mar 03, 2021 at 04:35:39AM +0800, Liu Yi L wrote:
-> > > > > >
-> > > > > > +static int vfio_dev_bind_gpasid_fn(struct device *dev, void *d=
-ata)
-> > > > > > +{
-> > > > > > +	struct domain_capsule *dc =3D (struct domain_capsule *)data;
-> > > > > > +	unsigned long arg =3D *(unsigned long *)dc->data;
-> > > > > > +
-> > > > > > +	return iommu_uapi_sva_bind_gpasid(dc->domain, dev,
-> > > > > > +					  (void __user *)arg);
-> > > > >
-> > > > > This arg buisness is really tortured. The type should be set at t=
-he
-> > > > > ioctl, not constantly passed down as unsigned long or worse void =
-*.
-> > > > >
-> > > > > And why is this passing a __user pointer deep into an iommu_* API=
-??
-> > > > >
-> > > > The idea was that IOMMU UAPI (not API) is independent of VFIO or
-> other
-> > > > user driver frameworks. The design is documented here:
-> > > > Documentation/userspace-api/iommu.rst
-> > > > IOMMU UAPI handles the type and sanitation of user provided data.
-> > >
-> > > Why? If it is uapi it has defined types and those types should be
-> > > completely clear from the C code, not obfuscated.
-> > >
-> > From the user's p.o.v., it is plain c code nothing obfuscated. As for
-> > kernel handling of the data types, it has to be answered by the bigger
-> > question of how we deal with sharing IOMMU among multiple
-> subsystems with
-> > UAPIs.
->=20
-> As I said, don't obfuscate types like this in the kernel. It is not
-> good style.
->=20
-> > However, IOMMU is a system device which has little value to be exposed
-> to
-> > the userspace. Not to mention the device-IOMMU affinity/topology. VFIO
-> > nicely abstracts IOMMU from the userspace, why do we want to reverse
-> that?
->=20
-> The other patch was talking about a /dev/ioasid - why can't this stuff
-> be run over that?
-
-The stuff in this patch are actually iommu domain operations, which are
-finally supported by iommu domain ops. While /dev/ioasid in another patch
-is created for IOASID allocation/free to fit the PASID allocation requireme=
-nt
-from both vSVA and vDPA. It has no idea about iommu domain and neither the
-device information. Without such info, /dev/ioasid is unable to run this
-stuff.
+On 2021/3/4 15:07, wangyanan (Y) wrote:
+> Hi Alex,
+>
+> On 2021/3/4 1:27, Alexandru Elisei wrote:
+>> Hi Yanan,
+>>
+>> On 3/3/21 11:04 AM, wangyanan (Y) wrote:
+>>> Hi Alex,
+>>>
+>>> On 2021/3/3 1:13, Alexandru Elisei wrote:
+>>>> Hello,
+>>>>
+>>>> On 2/8/21 11:22 AM, Yanan Wang wrote:
+>>>>> When KVM needs to coalesce the normal page mappings into a block 
+>>>>> mapping,
+>>>>> we currently invalidate the old table entry first followed by 
+>>>>> invalidation
+>>>>> of TLB, then unmap the page mappings, and install the block entry 
+>>>>> at last.
+>>>>>
+>>>>> It will cost a long time to unmap the numerous page mappings, 
+>>>>> which means
+>>>>> there will be a long period when the table entry can be found 
+>>>>> invalid.
+>>>>> If other vCPUs access any guest page within the block range and 
+>>>>> find the
+>>>>> table entry invalid, they will all exit from guest with a 
+>>>>> translation fault
+>>>>> which is not necessary. And KVM will make efforts to handle these 
+>>>>> faults,
+>>>>> especially when performing CMOs by block range.
+>>>>>
+>>>>> So let's quickly install the block entry at first to ensure 
+>>>>> uninterrupted
+>>>>> memory access of the other vCPUs, and then unmap the page mappings 
+>>>>> after
+>>>>> installation. This will reduce most of the time when the table 
+>>>>> entry is
+>>>>> invalid, and avoid most of the unnecessary translation faults.
+>>>> I'm not convinced I've fully understood what is going on yet, but 
+>>>> it seems to me
+>>>> that the idea is sound. Some questions and comments below.
+>>> What I am trying to do in this patch is to adjust the order of 
+>>> rebuilding block
+>>> mappings from page mappings.
+>>> Take the rebuilding of 1G block mappings as an example.
+>>> Before this patch, the order is like:
+>>> 1) invalidate the table entry of the 1st level(PUD)
+>>> 2) flush TLB by VMID
+>>> 3) unmap the old PMD/PTE tables
+>>> 4) install the new block entry to the 1st level(PUD)
+>>>
+>>> So entry in the 1st level can be found invalid by other vcpus in 1), 
+>>> 2), and 3),
+>>> and it's a long time in 3) to unmap
+>>> the numerous old PMD/PTE tables, which means the total time of the 
+>>> entry being
+>>> invalid is long enough to
+>>> affect the performance.
+>>>
+>>> After this patch, the order is like:
+>>> 1) invalidate the table ebtry of the 1st level(PUD)
+>>> 2) flush TLB by VMID
+>>> 3) install the new block entry to the 1st level(PUD)
+>>> 4) unmap the old PMD/PTE tables
+>>>
+>>> The change ensures that period of entry in the 1st level(PUD) being 
+>>> invalid is
+>>> only in 1) and 2),
+>>> so if other vcpus access memory within 1G, there will be less chance 
+>>> to find the
+>>> entry invalid
+>>> and as a result trigger an unnecessary translation fault.
+>> Thank you for the explanation, that was my understand of it also, and 
+>> I believe
+>> your idea is correct. I was more concerned that I got some of the 
+>> details wrong,
+>> and you have kindly corrected me below.
+>>
+>>>>> Signed-off-by: Yanan Wang <wangyanan55@huawei.com>
+>>>>> ---
+>>>>>    arch/arm64/kvm/hyp/pgtable.c | 26 ++++++++++++--------------
+>>>>>    1 file changed, 12 insertions(+), 14 deletions(-)
+>>>>>
+>>>>> diff --git a/arch/arm64/kvm/hyp/pgtable.c 
+>>>>> b/arch/arm64/kvm/hyp/pgtable.c
+>>>>> index 78a560446f80..308c36b9cd21 100644
+>>>>> --- a/arch/arm64/kvm/hyp/pgtable.c
+>>>>> +++ b/arch/arm64/kvm/hyp/pgtable.c
+>>>>> @@ -434,6 +434,7 @@ struct stage2_map_data {
+>>>>>        kvm_pte_t            attr;
+>>>>>          kvm_pte_t            *anchor;
+>>>>> +    kvm_pte_t            *follow;
+>>>>>          struct kvm_s2_mmu        *mmu;
+>>>>>        struct kvm_mmu_memory_cache    *memcache;
+>>>>> @@ -553,15 +554,14 @@ static int stage2_map_walk_table_pre(u64 
+>>>>> addr, u64 end,
+>>>>> u32 level,
+>>>>>        if (!kvm_block_mapping_supported(addr, end, data->phys, 
+>>>>> level))
+>>>>>            return 0;
+>>>>>    -    kvm_set_invalid_pte(ptep);
+>>>>> -
+>>>>>        /*
+>>>>> -     * Invalidate the whole stage-2, as we may have numerous leaf
+>>>>> -     * entries below us which would otherwise need invalidating
+>>>>> -     * individually.
+>>>>> +     * If we need to coalesce existing table entries into a block 
+>>>>> here,
+>>>>> +     * then install the block entry first and the sub-level page 
+>>>>> mappings
+>>>>> +     * will be unmapped later.
+>>>>>         */
+>>>>> -    kvm_call_hyp(__kvm_tlb_flush_vmid, data->mmu);
+>>>>>        data->anchor = ptep;
+>>>>> +    data->follow = kvm_pte_follow(*ptep);
+>>>>> +    stage2_coalesce_tables_into_block(addr, level, ptep, data);
+>>>> Here's how stage2_coalesce_tables_into_block() is implemented from 
+>>>> the previous
+>>>> patch (it might be worth merging it with this patch, I found it 
+>>>> impossible to
+>>>> judge if the function is correct without seeing how it is used and 
+>>>> what is
+>>>> replacing):
+>>> Ok, will do this if v2 is going to be post.
+>>>> static void stage2_coalesce_tables_into_block(u64 addr, u32 level,
+>>>>                             kvm_pte_t *ptep,
+>>>>                             struct stage2_map_data *data)
+>>>> {
+>>>>       u64 granule = kvm_granule_size(level), phys = data->phys;
+>>>>       kvm_pte_t new = kvm_init_valid_leaf_pte(phys, data->attr, 
+>>>> level);
+>>>>
+>>>>       kvm_set_invalid_pte(ptep);
+>>>>
+>>>>       /*
+>>>>        * Invalidate the whole stage-2, as we may have numerous leaf 
+>>>> entries
+>>>>        * below us which would otherwise need invalidating 
+>>>> individually.
+>>>>        */
+>>>>       kvm_call_hyp(__kvm_tlb_flush_vmid, data->mmu);
+>>>>       smp_store_release(ptep, new);
+>>>>       data->phys += granule;
+>>>> }
+>>>>
+>>>> This works because __kvm_pgtable_visit() saves the *ptep value 
+>>>> before calling the
+>>>> pre callback, and it visits the next level table based on the 
+>>>> initial pte value,
+>>>> not the new value written by stage2_coalesce_tables_into_block().
+>>> Right. So before replacing the initial pte value with the new value, 
+>>> we have to use
+>>> *data->follow = kvm_pte_follow(*ptep)* in 
+>>> stage2_map_walk_table_pre() to save
+>>> the initial pte value in advance. And data->follow will be used 
+>>> when  we start to
+>>> unmap the old sub-level tables later.
+>> Right, stage2_map_walk_table_post() will use data->follow to free the 
+>> table page
+>> which is no longer needed because we've replaced the entire next 
+>> level table with
+>> a block mapping.
+>>
+>>>> Assuming the first patch in the series is merged ("KVM: arm64: Move 
+>>>> the clean of
+>>>> dcache to the map handler"), this function is missing the CMOs from
+>>>> stage2_map_walker_try_leaf().
+>>> Yes, the CMOs are not performed in 
+>>> stage2_coalesce_tables_into_block() currently,
+>>> because I thought they were not needed when we rebuild the block 
+>>> mappings from
+>>> normal page mappings.
+>> This assumes that the *only* situation when we replace a table entry 
+>> with a block
+>> mapping is when the next level table (or tables) is *fully* 
+>> populated. Is there a
+>> way to prove that this is true? I think it's important to prove it 
+>> unequivocally,
+>> because if there's a corner case where this doesn't happen and we 
+>> remove the
+>> dcache maintenance, we can end up with hard to reproduce and hard to 
+>> diagnose
+>> errors in a guest.
+> So there is still one thing left about this patch to determine, and 
+> that is whether we can straightly
+> discard CMOs in stage2_coalesce_tables_into_block() or we should 
+> distinguish different situations.
+>
+> Now we know that the situation you have described won't happen, then I 
+> think we will only end up
+> in stage2_coalesce_tables_into_block() in the following situation:
+> 1) KVM create a new block mapping in stage2_map_walker_try_leaf() for 
+> the first time, if guest accesses
+>     memory backed by a THP/HUGETLB huge page. And CMOs will be 
+> performed here.
+> 2) KVM split this block mapping in dirty logging, and build only one 
+> new page mapping.
+> 3) KVM will build other new page mappings in dirty logging lazily, if 
+> guest access any other pages
+>     within the block. *In this stage, pages in this block may be fully 
+> mapped, or may be not.*
+> 4) After dirty logging is disabled, KVM decides to rebuild the block 
+> mapping.
+>
+> Do we still have to perform CMOs when rebuilding the block mapping in 
+> step 4, if pages in the block
+> were not fully mapped in step 3 ? I'm not completely sure about this.
+>
+Hi Marc,
+Could you please have an answer for above confusion :) ?
 
 Thanks,
-Yi Liu
+
+Yanan
+
+
+> Thanks,
+>
+> Yanan
+>>> At least, they are not needed if we rebuild the block mappings 
+>>> backed by hugetlbfs
+>>> pages, because we must have built the new block mappings for the 
+>>> first time before
+>>> and now need to rebuild them after they were split in dirty logging. 
+>>> Can we
+>>> agree on this?
+>>> Then let's see the following situation.
+>>>> I can think of the following situation where they
+>>>> are needed:
+>>>>
+>>>> 1. The 2nd level (PMD) table that will be turned into a block is 
+>>>> mapped at stage 2
+>>>> because one of the pages in the 3rd level (PTE) table it points to 
+>>>> is accessed by
+>>>> the guest.
+>>>>
+>>>> 2. The kernel decides to turn the userspace mapping into a 
+>>>> transparent huge page
+>>>> and calls the mmu notifier to remove the mapping from stage 2. The 
+>>>> 2nd level table
+>>>> is still valid.
+>>> I have a question here. Won't the PMD entry been invalidated too in 
+>>> this case?
+>>> If remove of the stage2 mapping by mmu notifier is an unmap 
+>>> operation of a range,
+>>> then it's correct and reasonable to both invalidate the PMD entry 
+>>> and free the
+>>> PTE table.
+>>> As I know, kvm_pgtable_stage2_unmap() does so when unmapping a range.
+>>>
+>>> And if I was right about this, we will not end up in
+>>> stage2_coalesce_tables_into_block()
+>>> like step 3 describes, but in stage2_map_walker_try_leaf() instead. 
+>>> Because the
+>>> PMD entry
+>>> is invalid, so KVM will create the new 2M block mapping.
+>> Looking at the code for stage2_unmap_walker(), I believe you are 
+>> correct. After
+>> the entire PTE table has been unmapped, the function will mark the 
+>> PMD entry as
+>> invalid. In the situation I described, at step 3 we would end up in 
+>> the leaf
+>> mapper function because the PMD entry is invalid. My example was wrong.
+>>
+>>> If I'm wrong about this, then I think this is a valid situation.
+>>>> 3. Guest accesses a page which is not the page it accessed at step 
+>>>> 1, which causes
+>>>> a translation fault. KVM decides we can use a PMD block mapping to 
+>>>> map the address
+>>>> and we end up in stage2_coalesce_tables_into_block(). We need CMOs 
+>>>> in this case
+>>>> because the guest accesses memory it didn't access before.
+>>>>
+>>>> What do you think, is that a valid situation?
+>>>>>        return 0;
+>>>>>    }
+>>>>>    @@ -614,20 +614,18 @@ static int stage2_map_walk_table_post(u64 
+>>>>> addr, u64
+>>>>> end, u32 level,
+>>>>>                          kvm_pte_t *ptep,
+>>>>>                          struct stage2_map_data *data)
+>>>>>    {
+>>>>> -    int ret = 0;
+>>>>> -
+>>>>>        if (!data->anchor)
+>>>>>            return 0;
+>>>>>    -    free_page((unsigned long)kvm_pte_follow(*ptep));
+>>>>> -    put_page(virt_to_page(ptep));
+>>>>> -
+>>>>> -    if (data->anchor == ptep) {
+>>>>> +    if (data->anchor != ptep) {
+>>>>> +        free_page((unsigned long)kvm_pte_follow(*ptep));
+>>>>> +        put_page(virt_to_page(ptep));
+>>>>> +    } else {
+>>>>> +        free_page((unsigned long)data->follow);
+>>>>>            data->anchor = NULL;
+>>>>> -        ret = stage2_map_walk_leaf(addr, end, level, ptep, data);
+>>>> stage2_map_walk_leaf() -> stage2_map_walk_table_post calls 
+>>>> put_page() and
+>>>> get_page() once in our case (valid old mapping). It looks to me 
+>>>> like we're missing
+>>>> a put_page() call when the function is called for the anchor. Have 
+>>>> you found the
+>>>> call to be unnecessary?
+>>> Before this patch:
+>>> When we find data->anchor == ptep, put_page() has been called once 
+>>> in advance
+>>> for the anchor
+>>> in stage2_map_walk_table_post(). Then we call stage2_map_walk_leaf() ->
+>>> stage2_map_walker_try_leaf()
+>>> to install the block entry, and only get_page() will be called once in
+>>> stage2_map_walker_try_leaf().
+>>> There is a put_page() followed by a get_page() for the anchor, and 
+>>> there will
+>>> not be a problem about
+>>> page_counts.
+>> This is how I'm reading the code before your patch:
+>>
+>> - stage2_map_walk_table_post() returns early if there is no anchor.
+>>
+>> - stage2_map_walk_table_pre() sets the anchor and marks the entry as 
+>> invalid. The
+>> entry was a table so the leaf visitor is not called in 
+>> __kvm_pgtable_visit().
+>>
+>> - __kvm_pgtable_visit() visits the next level table.
+>>
+>> - stage2_map_walk_table_post() calls put_page(), calls 
+>> stage2_map_walk_leaf() ->
+>> stage2_map_walker_try_leaf(). The old entry was invalidated by the 
+>> pre visitor, so
+>> it only calls get_page() (and not put_page() + get_page().
+>>
+>> I agree with your conclusion, I didn't realize that because the pre 
+>> visitor marks
+>> the entry as invalid, stage2_map_walker_try_leaf() will not call 
+>> put_page().
+>>
+>>> After this patch:
+>>> Before we find data->anchor == ptep and after it, there is not a 
+>>> put_page() call
+>>> for the anchor.
+>>> This is because that we didn't call get_page() either in
+>>> stage2_coalesce_tables_into_block() when
+>>> install the block entry. So I think there will not be a problem too.
+>> I agree, the refcount will be identical.
+>>
+>>> Is above the right answer for your point?
+>> Yes, thank you clearing that up for me.
+>>
+>> Thanks,
+>>
+>> Alex
+>>
+>>>>>        }
+>>>>>    -    return ret;
+>>>>> +    return 0;
+>>>> I think it's correct for this function to succeed unconditionally. 
+>>>> The error was
+>>>> coming from stage2_map_walk_leaf() -> stage2_map_walker_try_leaf(). 
+>>>> The function
+>>>> can return an error code if block mapping is not supported, which 
+>>>> we know is
+>>>> supported because we have an anchor, and if only the permissions 
+>>>> are different
+>>>> between the old and the new entry, but in our case we've changed 
+>>>> both the valid
+>>>> and type bits.
+>>> Agreed. Besides, we will definitely not end up updating an old valid 
+>>> entry for
+>>> the anchor
+>>> in stage2_map_walker_try_leaf(), because *anchor has already been 
+>>> invalidated in
+>>> stage2_map_walk_table_pre() before set the anchor, so it will look 
+>>> like a build
+>>> of new mapping.
+>>>
+>>> Thanks,
+>>>
+>>> Yanan
+>>>> Thanks,
+>>>>
+>>>> Alex
+>>>>
+>>>>>    }
+>>>>>      /*
+>>>> .
+>> .
