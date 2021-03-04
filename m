@@ -2,194 +2,153 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D357732DDB8
-	for <lists+kvm@lfdr.de>; Fri,  5 Mar 2021 00:20:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6A0BE32DDFB
+	for <lists+kvm@lfdr.de>; Fri,  5 Mar 2021 00:47:13 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232936AbhCDXUA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 4 Mar 2021 18:20:00 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36878 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232935AbhCDXT6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 4 Mar 2021 18:19:58 -0500
-Received: from mail-qv1-xf4a.google.com (mail-qv1-xf4a.google.com [IPv6:2607:f8b0:4864:20::f4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 45D09C06175F
-        for <kvm@vger.kernel.org>; Thu,  4 Mar 2021 15:19:58 -0800 (PST)
-Received: by mail-qv1-xf4a.google.com with SMTP id h10so21733698qvf.19
-        for <kvm@vger.kernel.org>; Thu, 04 Mar 2021 15:19:58 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=sender:date:in-reply-to:message-id:mime-version:references:subject
-         :from:to:cc;
-        bh=9IvSzdbIQqhRyiLJGvOnZfh3hjug63Y1v74jXsaZzZ4=;
-        b=VUg8JS9esKxgJWQYeNlIzJMv7J5UCwAEn9AMSgO287mOoiWqXjSpqdssGtIduTiM4C
-         2CCOvYag+IijZjoV9/WVXuJF2mWAH15yxfEnXdcauXFD+5BrdwRNxA0YtL7GNYKIRM8O
-         FPrE/nHGdjLL5z2m6gnnfO0uw3uSCDpHBarfDEvXOVa/9Wbddi+9EhLffgVfeOtECb30
-         UhH8JlovXbpoZAwIijoUlGUKuHPTedj6B0bBL6+wgHcgfnoR+2VrjqV/m0MUbjylNJaS
-         Xvr/XyqAMkdEBc/gNRZqG5MUu1icZGhhm1XywvN9o5ymWWCeV8FsjtYCLDumfLnpXN7w
-         I0Hw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=9IvSzdbIQqhRyiLJGvOnZfh3hjug63Y1v74jXsaZzZ4=;
-        b=feLkWtNWlOiHzJMfnmeWFGo9IOXi7+kE3hSnCjogVd/7h+sRzymbWcj05rvlcZqMiN
-         23pOACLPGVTAr5W4Bav4WyM7CGNdGlG3QM3XUGbChBxutFygsEYAj34WuYvAAQHvppwV
-         M5hte4DU2AVbxIIH/+0SZjQI09aToDTHZkASl3KbuhNl3+SCNoFDuLxo9H4l7W5lSpIA
-         7WQDBvfyASH8hKB2SxZK7r2d0/DcK9uIV6hjcOFi9HTcH0bo2Qq/gzBXaIXs2e386vUA
-         sYfcSyenC8ZPOwqUMLyOm6iua+GpIOtrMSXA0FxPz6BOl/WnQ29yUAjQwe7DmmUqw+8j
-         /9og==
-X-Gm-Message-State: AOAM531WjiEUH89k7EyFWYW3EfUWHCL1YzIQX4cXLjT7+mHSEZZ5HbIf
-        E6kuh145s1fL5bt+m9PZy0f29pYtpnXu
-X-Google-Smtp-Source: ABdhPJzQ4UL90vQgpQH42Fu9aOvSGIfVFVvsaXTA5xGaLFstkGCwyeaT6vZtX18j0w5LBvPvs35Oen1A1UJb
-Sender: "vipinsh via sendgmr" <vipinsh@vipinsh.kir.corp.google.com>
-X-Received: from vipinsh.kir.corp.google.com ([2620:0:1008:10:1b1:4021:52a5:84d])
- (user=vipinsh job=sendgmr) by 2002:a05:6214:d4b:: with SMTP id
- 11mr6511589qvr.42.1614899997447; Thu, 04 Mar 2021 15:19:57 -0800 (PST)
-Date:   Thu,  4 Mar 2021 15:19:46 -0800
-In-Reply-To: <20210304231946.2766648-1-vipinsh@google.com>
-Message-Id: <20210304231946.2766648-3-vipinsh@google.com>
-Mime-Version: 1.0
-References: <20210304231946.2766648-1-vipinsh@google.com>
-X-Mailer: git-send-email 2.30.1.766.gb4fecdf3b7-goog
-Subject: [Patch v3 2/2] cgroup: sev: Miscellaneous cgroup documentation.
-From:   Vipin Sharma <vipinsh@google.com>
-To:     tj@kernel.org, mkoutny@suse.com, rdunlap@infradead.org,
-        thomas.lendacky@amd.com, brijesh.singh@amd.com, jon.grimm@amd.com,
-        eric.vantassell@amd.com, pbonzini@redhat.com, hannes@cmpxchg.org,
-        frankja@linux.ibm.com, borntraeger@de.ibm.com
-Cc:     corbet@lwn.net, seanjc@google.com, vkuznets@redhat.com,
-        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
-        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, hpa@zytor.com,
-        gingell@google.com, rientjes@google.com, dionnaglaze@google.com,
-        kvm@vger.kernel.org, x86@kernel.org, cgroups@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Vipin Sharma <vipinsh@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        id S233264AbhCDXrM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 4 Mar 2021 18:47:12 -0500
+Received: from mail110.syd.optusnet.com.au ([211.29.132.97]:45700 "EHLO
+        mail110.syd.optusnet.com.au" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S233262AbhCDXrI (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 4 Mar 2021 18:47:08 -0500
+X-Greylist: delayed 1986 seconds by postgrey-1.27 at vger.kernel.org; Thu, 04 Mar 2021 18:47:08 EST
+Received: from dread.disaster.area (pa49-179-130-210.pa.nsw.optusnet.com.au [49.179.130.210])
+        by mail110.syd.optusnet.com.au (Postfix) with ESMTPS id 3F09F105BD3;
+        Fri,  5 Mar 2021 10:14:00 +1100 (AEDT)
+Received: from dave by dread.disaster.area with local (Exim 4.92.3)
+        (envelope-from <david@fromorbit.com>)
+        id 1lHxAN-00FDz4-8o; Fri, 05 Mar 2021 10:13:59 +1100
+Date:   Fri, 5 Mar 2021 10:13:59 +1100
+From:   Dave Chinner <david@fromorbit.com>
+To:     Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>
+Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-xfs@vger.kernel.org" <linux-xfs@vger.kernel.org>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
+Subject: Re: Problem With XFS + KVM
+Message-ID: <20210304231359.GT4662@dread.disaster.area>
+References: <BYAPR04MB4965AAAB580D73E3B03E7E7886979@BYAPR04MB4965.namprd04.prod.outlook.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <BYAPR04MB4965AAAB580D73E3B03E7E7886979@BYAPR04MB4965.namprd04.prod.outlook.com>
+X-Optus-CM-Score: 0
+X-Optus-CM-Analysis: v=2.3 cv=YKPhNiOx c=1 sm=1 tr=0 cx=a_idp_d
+        a=JD06eNgDs9tuHP7JIKoLzw==:117 a=JD06eNgDs9tuHP7JIKoLzw==:17
+        a=kj9zAlcOel0A:10 a=dESyimp9J3IA:10 a=2J7IuT7wAAAA:8 a=ID6ng7r3AAAA:8
+        a=7-415B0cAAAA:8 a=r7zCAvGXysCvWua5TsEA:9 a=CjuIK1q_8ugA:10
+        a=RtgRkGnnZwJf8nmJIBi8:22 a=AkheI1RvQwOzcTXhi5f4:22
+        a=biEYGPWJfzWAr4FL6Ov7:22
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Documentation of miscellaneous cgroup controller. This new controller is
-used to track and limit the usage of scalar resources.
+On Thu, Mar 04, 2021 at 10:34:29PM +0000, Chaitanya Kulkarni wrote:
+> Hi,
+> 
+> I'm running fio verification job with XFS formatted file system on 5.12-rc1
+> with NVMeOF file backend target inside QEMU test machine.
+> 
+> I'm getting a following message intermittently it is happening since
+> yesterday.
+> This can be easily reproduces with runing block tests nvme/011 :-
+> 
+> nvme/011 (run data verification fio job on NVMeOF file-backed ns) [failed]
+>     runtime  270.553s  ...  268.552s
+>     something found in dmesg:
+>     [  340.781752] run blktests nvme/011 at 2021-03-04 14:22:34
+>     [  340.857161] nvmet: adding nsid 1 to subsystem blktests-subsystem-1
+>     [  340.890225] nvmet: creating controller 1 for subsystem
+> blktests-subsystem-1 for NQN
+> nqn.2014-08.org.nvmexpress:uuid:e4cfc949-8f19-4db2-a232-ab360b79204a.
+>     [  340.892477] nvme nvme0: Please enable CONFIG_NVME_MULTIPATH for
+> full support of multi-port devices.
+>     [  340.892937] nvme nvme0: creating 64 I/O queues.
+>     [  340.913759] nvme nvme0: new ctrl: "blktests-subsystem-1"
+>     [  586.495375] nvme nvme0: Removing ctrl: NQN "blktests-subsystem-1"
+>     [  587.766464] ------------[ cut here ]------------
+>     [  587.766535] raw_local_irq_restore() called with IRQs enabled
+>     [  587.766561] WARNING: CPU: 14 PID: 12543 at
+> kernel/locking/irqflag-debug.c:10 warn_bogus_irq_restore+0x1d/0x20
+>     ...
+>     (See '/root/blktests/results/nodev/nvme/011.dmesg' for the entire
+> message)
+> 
+> Please let me know what kind of more details I can provide to resolve
+> this issue.
+> 
+> Here is the dmesg outout :-
+> 
+>  ------------[ cut here ]------------
+> [  587.766535] raw_local_irq_restore() called with IRQs enabled
+.....
+> [  587.766819] CPU: 14 PID: 12543 Comm: rm Not tainted 5.12.0-rc1nvme+ #165
+> [  587.766823] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996),
+> BIOS rel-1.12.0-59-gc9ba5276e321-prebuilt.qemu.org 04/01/2014
+> [  587.766826] RIP: 0010:warn_bogus_irq_restore+0x1d/0x20
+> [  587.766831] Code: 24 48 c7 c7 e0 f2 0f 82 e8 80 c3 fb ff 80 3d 15 1c
+> 09 01 00 74 01 c3 48 c7 c7 70 6c 10 82 c6 05 04 1c 09 01 01 e8 cc c2 fb
+> ff <0f> 0b c3 55 53 44 8b 05 63 b4 0c 01 65 48 8b 1c 25 40 7e 01 00 45
+> [  587.766835] RSP: 0018:ffffc900086cf990 EFLAGS: 00010286
+> [  587.766840] RAX: 0000000000000000 RBX: 0000000000000003 RCX:
+> 0000000000000027
+> [  587.766843] RDX: 0000000000000000 RSI: ffff8897d37e8a30 RDI:
+> ffff8897d37e8a38
+> [  587.766846] RBP: ffff888138764888 R08: 0000000000000001 R09:
+> 0000000000000001
+> [  587.766848] R10: 000000009f0f619c R11: 00000000b7972d21 R12:
+> 0000000000000200
+> [  587.766851] R13: 0000000000000001 R14: 0000000000000100 R15:
+> 00000000003c0000
+> [  587.766855] FS:  00007f6992aec740(0000) GS:ffff8897d3600000(0000)
+> knlGS:0000000000000000
+> [  587.766858] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> [  587.766860] CR2: 0000000000bcf1c8 CR3: 00000017d29e8000 CR4:
+> 00000000003506e0
+> [  587.766864] Call Trace:
+> [  587.766867]  kvm_wait+0x8c/0x90
+> [  587.766876]  __pv_queued_spin_lock_slowpath+0x265/0x2a0
+> [  587.766893]  do_raw_spin_lock+0xb1/0xc0
+> [  587.766898]  _raw_spin_lock+0x61/0x70
+> [  587.766904]  xfs_extent_busy_trim+0x2f/0x200 [xfs]
 
-Signed-off-by: Vipin Sharma <vipinsh@google.com>
-Reviewed-by: David Rientjes <rientjes@google.com>
----
- Documentation/admin-guide/cgroup-v1/index.rst |  1 +
- Documentation/admin-guide/cgroup-v1/misc.rst  |  4 ++
- Documentation/admin-guide/cgroup-v2.rst       | 69 ++++++++++++++++++-
- 3 files changed, 72 insertions(+), 2 deletions(-)
- create mode 100644 Documentation/admin-guide/cgroup-v1/misc.rst
+That looks like a KVM or local_irq_save()/local_irq_restore problem.
+kvm_wait() does:
 
-diff --git a/Documentation/admin-guide/cgroup-v1/index.rst b/Documentation/admin-guide/cgroup-v1/index.rst
-index 226f64473e8e..99fbc8a64ba9 100644
---- a/Documentation/admin-guide/cgroup-v1/index.rst
-+++ b/Documentation/admin-guide/cgroup-v1/index.rst
-@@ -17,6 +17,7 @@ Control Groups version 1
-     hugetlb
-     memcg_test
-     memory
-+    misc
-     net_cls
-     net_prio
-     pids
-diff --git a/Documentation/admin-guide/cgroup-v1/misc.rst b/Documentation/admin-guide/cgroup-v1/misc.rst
-new file mode 100644
-index 000000000000..661614c24df3
---- /dev/null
-+++ b/Documentation/admin-guide/cgroup-v1/misc.rst
-@@ -0,0 +1,4 @@
-+===============
-+Misc controller
-+===============
-+Please refer "Misc" documentation in Documentation/admin-guide/cgroup-v2.rst
-diff --git a/Documentation/admin-guide/cgroup-v2.rst b/Documentation/admin-guide/cgroup-v2.rst
-index 1de8695c264b..74777323b7fd 100644
---- a/Documentation/admin-guide/cgroup-v2.rst
-+++ b/Documentation/admin-guide/cgroup-v2.rst
-@@ -63,8 +63,11 @@ v1 is available under :ref:`Documentation/admin-guide/cgroup-v1/index.rst <cgrou
-        5-7-1. RDMA Interface Files
-      5-8. HugeTLB
-        5.8-1. HugeTLB Interface Files
--     5-8. Misc
--       5-8-1. perf_event
-+     5-9. Misc
-+       5.9-1 Miscellaneous cgroup Interface Files
-+       5.9-2 Migration and Ownership
-+     5-10. Others
-+       5-10-1. perf_event
-      5-N. Non-normative information
-        5-N-1. CPU controller root cgroup process behaviour
-        5-N-2. IO controller root cgroup process behaviour
-@@ -2163,6 +2166,68 @@ HugeTLB Interface Files
- Misc
- ----
- 
-+The Miscellaneous cgroup provides the resource limiting and tracking
-+mechanism for the scalar resources which cannot be abstracted like the other
-+cgroup resources. Controller is enabled by the CONFIG_CGROUP_MISC config
-+option.
-+
-+The first two resources added to the miscellaneous controller are Secure
-+Encrypted Virtualization (SEV) ASIDs and SEV - Encrypted State (SEV-ES) ASIDs.
-+These limited ASIDs are used for encrypting virtual machines memory on the AMD
-+platform.
-+
-+Misc Interface Files
-+~~~~~~~~~~~~~~~~~~~~
-+
-+Miscellaneous controller provides 3 interface files:
-+
-+  misc.capacity
-+        A read-only flat-keyed file shown only in the root cgroup.  It shows
-+        miscellaneous scalar resources available on the platform along with
-+        their quantities::
-+
-+	  $ cat misc.capacity
-+	  sev 50
-+	  sev_es 10
-+
-+  misc.current
-+        A read-only flat-keyed file shown in the non-root cgroups.  It shows
-+        the current usage of the resources in the cgroup and its children.::
-+
-+	  $ cat misc.current
-+	  sev 3
-+	  sev_es 0
-+
-+  misc.max
-+        A read-write flat-keyed file shown in the non root cgroups. Allowed
-+        maximum usage of the resources in the cgroup and its children.::
-+
-+	  $ cat misc.max
-+	  sev max
-+	  sev_es 4
-+
-+	Limit can be set by::
-+
-+	  # echo sev 1 > misc.max
-+
-+	Limit can be set to max by::
-+
-+	  # echo sev max > misc.max
-+
-+        Limits can be set higher than the capacity value in the misc.capacity
-+        file.
-+
-+Migration and Ownership
-+~~~~~~~~~~~~~~~~~~~~~~~
-+
-+A miscellaneous scalar resource is charged to the cgroup in which it is used
-+first, and stays charged to that cgroup until that resource is freed. Migrating
-+a process to a different cgroup does not move the charge to the destination
-+cgroup where the process has moved.
-+
-+Others
-+------
-+
- perf_event
- ~~~~~~~~~~
- 
+static void kvm_wait(u8 *ptr, u8 val)
+{
+        unsigned long flags;
+
+        if (in_nmi())
+                return;
+
+        local_irq_save(flags);
+
+        if (READ_ONCE(*ptr) != val)
+                goto out;
+
+        /*
+         * halt until it's our turn and kicked. Note that we do safe halt
+         * for irq enabled case to avoid hang when lock info is overwritten
+         * in irq spinlock slowpath and no spurious interrupt occur to save us.
+         */
+        if (arch_irqs_disabled_flags(flags))
+                halt();
+        else
+                safe_halt();
+
+out:
+        local_irq_restore(flags);
+}
+
+And the warning is coming from the local_irq_restore() call
+indicating that interrupts are not disabled when they should be.
+The interrupt state is being modified entirely within the kvm_wait()
+code here, so none of the high level XFS code has any influence on
+behaviour here.
+
+Cheers,
+
+Dave.
 -- 
-2.30.1.766.gb4fecdf3b7-goog
-
+Dave Chinner
+david@fromorbit.com
