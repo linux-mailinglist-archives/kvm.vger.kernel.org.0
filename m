@@ -2,101 +2,122 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3903F32D30A
-	for <lists+kvm@lfdr.de>; Thu,  4 Mar 2021 13:31:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A10BB32D3AB
+	for <lists+kvm@lfdr.de>; Thu,  4 Mar 2021 13:55:07 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240640AbhCDMaK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 4 Mar 2021 07:30:10 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:52811 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S240685AbhCDM3u (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 4 Mar 2021 07:29:50 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1614860904;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=LtAZyTPHai0C5szIeWiO0SDjbjKRItWma6gRleyofco=;
-        b=VhqXOyhAw5V+W1byuBjeBelxjkS35fNvMuUbASRCLt/uevgp0gwhb1AGQGXQljPCv0HEpk
-        GVpAPVaoAvkzaECRtmiyVm70ld+Q6kwxkP98ER9DdcePsn1dubN2X6agcQjloo7Hac6a7a
-        gp7x3e8v41rNSbLrefx9MX6af3w9Sik=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-425-dq38zMl-Nc-4RSXuo2S1rA-1; Thu, 04 Mar 2021 07:28:22 -0500
-X-MC-Unique: dq38zMl-Nc-4RSXuo2S1rA-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 885C1E5768;
-        Thu,  4 Mar 2021 12:28:21 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-112-31.ams2.redhat.com [10.36.112.31])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id D387D18A69;
-        Thu,  4 Mar 2021 12:28:16 +0000 (UTC)
-Subject: Re: [kvm-unit-tests PATCH v3 7/7] s390x: Remove SAVE/RESTORE_STACK
- and lowcore fpc and fprs save areas
-To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, imbrenda@linux.ibm.com,
-        pmorel@linux.ibm.com, david@redhat.com
-References: <20210222085756.14396-1-frankja@linux.ibm.com>
- <20210222085756.14396-8-frankja@linux.ibm.com>
-From:   Thomas Huth <thuth@redhat.com>
-Message-ID: <7154a604-9b00-88f1-7fea-d52aad19edcb@redhat.com>
-Date:   Thu, 4 Mar 2021 13:28:15 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.7.0
+        id S237621AbhCDMxI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 4 Mar 2021 07:53:08 -0500
+Received: from hqnvemgate24.nvidia.com ([216.228.121.143]:12366 "EHLO
+        hqnvemgate24.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S237695AbhCDMw5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 4 Mar 2021 07:52:57 -0500
+Received: from hqmail.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate24.nvidia.com (using TLS: TLSv1.2, AES256-SHA)
+        id <B6040d8010000>; Thu, 04 Mar 2021 04:52:17 -0800
+Received: from HKMAIL104.nvidia.com (10.18.16.13) by HQMAIL101.nvidia.com
+ (172.20.187.10) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Thu, 4 Mar
+ 2021 12:52:16 +0000
+Received: from HKMAIL102.nvidia.com (10.18.16.11) by HKMAIL104.nvidia.com
+ (10.18.16.13) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Thu, 4 Mar
+ 2021 12:52:04 +0000
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (104.47.66.43) by
+ HKMAIL102.nvidia.com (10.18.16.11) with Microsoft SMTP Server (TLS) id
+ 15.0.1497.2 via Frontend Transport; Thu, 4 Mar 2021 12:52:04 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Y3rvkD2htfyw2GGFofzfce8bBOxZUDFm7SU/d/ebOw1uMIvPAOZPsWuIrk4V44iDxyTdRr1iK01CLwCxP8kRC3tgzQo5DXjosN/gVCwU/a026fk8i4oUzB+SQLcVdR1YC1d5KN2ChelqSxfjj5oJ4pzBmeTKaVmYqByD0MXnWEPgk/d9smtF0RDo1P7Ga+ABwyBwJtNeXbcTCD3g24ViQ1eoJkzyqsE8d1cRdeqCUkx1mlY43/wEMP5UTZnmgFe5SNFlm2zq5zeSBbSz+Kvk4rKy9iTMLFQ4JHf4deyrvpBsIxx+n8B+cqPsL40eYfpSeInC1IEryWiSirPuSiowJg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=qxxqEAnlNQ1w50HDAHhTXHasozbopSC2lFlIm5C4DOU=;
+ b=JO4ZOJ2OpZmYmYJorLYvU83AVBAhVNEJ6vMS3tbNuqG13HqtPQQenR1eOjAjnQaGWHgVkTUV8g8uDpev4LzapOCIQ3ekX7KscSbE3WEKa7adL6HjEI3E7qo5YTOP3rDxA7Y/4Q7H7UXgg15UfJd1uAuDy9rqALL69X0KAQmwYyfSAGWc46wFlrfOuLRsLlnj7uug4+9+CWwGEZSTM+ytG3/RfnTxY1+ubvMRtZb8OBoMxECZK4HEu7tWhj8qOWUfbdQDWWd1thI/z2J55GVB+jkRZKtIWidjY/wIKsNRQuBL4jH1H0NcBJ9gkJUEttENXTeE4gEHT+8Osfm8rJ1vfA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+Received: from DM6PR12MB3834.namprd12.prod.outlook.com (2603:10b6:5:14a::12)
+ by DM6PR12MB4546.namprd12.prod.outlook.com (2603:10b6:5:2ae::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3912.17; Thu, 4 Mar
+ 2021 12:52:02 +0000
+Received: from DM6PR12MB3834.namprd12.prod.outlook.com
+ ([fe80::1c62:7fa3:617b:ab87]) by DM6PR12MB3834.namprd12.prod.outlook.com
+ ([fe80::1c62:7fa3:617b:ab87%6]) with mapi id 15.20.3912.017; Thu, 4 Mar 2021
+ 12:52:02 +0000
+Date:   Thu, 4 Mar 2021 08:52:01 -0400
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     "Liu, Yi L" <yi.l.liu@intel.com>
+CC:     Jacob Pan <jacob.jun.pan@linux.intel.com>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "Raj, Ashok" <ashok.raj@intel.com>,
+        "Tian, Jun J" <jun.j.tian@intel.com>,
+        "Sun, Yi Y" <yi.y.sun@intel.com>,
+        "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
+        "peterx@redhat.com" <peterx@redhat.com>,
+        "jasowang@redhat.com" <jasowang@redhat.com>,
+        "Wu, Hao" <hao.wu@intel.com>,
+        "stefanha@gmail.com" <stefanha@gmail.com>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "Zhu, Lingshan" <lingshan.zhu@intel.com>,
+        "vivek.gautam@arm.com" <vivek.gautam@arm.com>
+Subject: Re: [Patch v8 04/10] vfio/type1: Support binding guest page tables
+ to PASID
+Message-ID: <20210304125201.GA4247@nvidia.com>
+References: <20210302203545.436623-1-yi.l.liu@intel.com>
+ <20210302203545.436623-5-yi.l.liu@intel.com>
+ <20210302125628.GI4247@nvidia.com> <20210302091319.1446a47b@jacob-builder>
+ <20210302171551.GK4247@nvidia.com> <20210303114212.1cd86579@jacob-builder>
+ <20210303194523.GX4247@nvidia.com>
+ <BN6PR11MB4068D05B70842124234A7AF4C3979@BN6PR11MB4068.namprd11.prod.outlook.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <BN6PR11MB4068D05B70842124234A7AF4C3979@BN6PR11MB4068.namprd11.prod.outlook.com>
+X-ClientProxiedBy: BL1PR13CA0156.namprd13.prod.outlook.com
+ (2603:10b6:208:2bd::11) To DM6PR12MB3834.namprd12.prod.outlook.com
+ (2603:10b6:5:14a::12)
 MIME-Version: 1.0
-In-Reply-To: <20210222085756.14396-8-frankja@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from mlx.ziepe.ca (142.162.115.133) by BL1PR13CA0156.namprd13.prod.outlook.com (2603:10b6:208:2bd::11) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3912.9 via Frontend Transport; Thu, 4 Mar 2021 12:52:02 +0000
+Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1lHnST-006atm-Fx; Thu, 04 Mar 2021 08:52:01 -0400
+X-Header: ProcessedBy-CMR-outbound
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+        t=1614862337; bh=qxxqEAnlNQ1w50HDAHhTXHasozbopSC2lFlIm5C4DOU=;
+        h=ARC-Seal:ARC-Message-Signature:ARC-Authentication-Results:Date:
+         From:To:CC:Subject:Message-ID:References:Content-Type:
+         Content-Disposition:In-Reply-To:X-ClientProxiedBy:MIME-Version:
+         X-MS-Exchange-MessageSentRepresentingType:X-Header;
+        b=fCwQmhAsaFr4M6reM+Gp+1piwPVPgQBNO5lFK/AiNZDrE9aVJgpvZH+wctUULKkLW
+         eeugqowh6vZ/WxhisMtkTnsz0hccDLDPt/mcKePhNcE2JOzR5QrgEKyE9sUCOtWItM
+         a9I3ufd0dV5icoWKYqu3kdqaYgAjBsKb3aM+4UMlxtH2YFPJTtYp/ybZmcqXqvZhGe
+         sBz4ejzAuCaC726flKN2JVgm844DQXSz9MS5uep8UexaH1fplCN8fQuxcAj+v1fYZW
+         BnMOX5oGviS1/mSv/dmpQh7fHoCBV4nkuUmqeejG7Cvwrze+V4Pc6gWtIbow0+W4fO
+         qfiUMilgHQeKQ==
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 22/02/2021 09.57, Janosch Frank wrote:
-> There are no more users. At the same time remove sw_int_fpc and
-> sw_int_frps plus their asm offsets macros since they are also unused
-> now.
+On Thu, Mar 04, 2021 at 07:20:22AM +0000, Liu, Yi L wrote:
+> > > However, IOMMU is a system device which has little value to be exposed
+> > to
+> > > the userspace. Not to mention the device-IOMMU affinity/topology. VFIO
+> > > nicely abstracts IOMMU from the userspace, why do we want to reverse
+> > that?
+> > 
+> > The other patch was talking about a /dev/ioasid - why can't this stuff
+> > be run over that?
 > 
-> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-> Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-> Reviewed-by: Pierre Morel <pmorel@linux.ibm.com>
-> ---
->   lib/s390x/asm-offsets.c  |  2 --
->   lib/s390x/asm/arch_def.h |  4 +---
->   s390x/macros.S           | 29 -----------------------------
->   3 files changed, 1 insertion(+), 34 deletions(-)
-> 
-> diff --git a/lib/s390x/asm-offsets.c b/lib/s390x/asm-offsets.c
-> index 2658b59a..fbea3278 100644
-> --- a/lib/s390x/asm-offsets.c
-> +++ b/lib/s390x/asm-offsets.c
-> @@ -54,8 +54,6 @@ int main(void)
->   	OFFSET(GEN_LC_MCCK_NEW_PSW, lowcore, mcck_new_psw);
->   	OFFSET(GEN_LC_IO_NEW_PSW, lowcore, io_new_psw);
->   	OFFSET(GEN_LC_SW_INT_GRS, lowcore, sw_int_grs);
-> -	OFFSET(GEN_LC_SW_INT_FPRS, lowcore, sw_int_fprs);
-> -	OFFSET(GEN_LC_SW_INT_FPC, lowcore, sw_int_fpc);
->   	OFFSET(GEN_LC_SW_INT_CRS, lowcore, sw_int_crs);
->   	OFFSET(GEN_LC_SW_INT_PSW, lowcore, sw_int_psw);
->   	OFFSET(GEN_LC_MCCK_EXT_SA_ADDR, lowcore, mcck_ext_sa_addr);
-> diff --git a/lib/s390x/asm/arch_def.h b/lib/s390x/asm/arch_def.h
-> index b8e9fe40..13e19b8a 100644
-> --- a/lib/s390x/asm/arch_def.h
-> +++ b/lib/s390x/asm/arch_def.h
-> @@ -103,9 +103,7 @@ struct lowcore {
->   	struct psw	io_new_psw;			/* 0x01f0 */
->   	/* sw definition: save area for registers in interrupt handlers */
->   	uint64_t	sw_int_grs[16];			/* 0x0200 */
-> -	uint64_t	sw_int_fprs[16];		/* 0x0280 */
-> -	uint32_t	sw_int_fpc;			/* 0x0300 */
-> -	uint8_t		pad_0x0304[0x0308 - 0x0304];	/* 0x0304 */
-> +	uint8_t		pad_0x0304[0x0308 - 0x0280];	/* 0x0280 */
+> The stuff in this patch are actually iommu domain operations, which are
+> finally supported by iommu domain ops. While /dev/ioasid in another patch
+> is created for IOASID allocation/free to fit the PASID allocation requirement
+> from both vSVA and vDPA. It has no idea about iommu domain and neither the
+> device information. Without such info, /dev/ioasid is unable to run this
+> stuff.
 
-Please rename to pad_0x280 now.
+Why can't it know? My point was that VFIO should interact with
+/dev/ioasid to exchange the information both sides need and once
+exchanged the control over IOMMU should be done through /dev/ioasid,
+not inside VFIO.
 
-With that fixed:
-Reviewed-by: Thomas Huth <thuth@redhat.com>
-
+Jason
