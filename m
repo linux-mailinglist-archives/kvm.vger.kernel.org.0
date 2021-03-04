@@ -2,98 +2,141 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EDD7D32D768
-	for <lists+kvm@lfdr.de>; Thu,  4 Mar 2021 17:08:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EAF1832D77B
+	for <lists+kvm@lfdr.de>; Thu,  4 Mar 2021 17:15:05 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236570AbhCDQHQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 4 Mar 2021 11:07:16 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:57932 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S236574AbhCDQHD (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 4 Mar 2021 11:07:03 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1614873938;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=qY1DlRsij3cTrbhkPV5OgPfiBwcs7doGA1y8LRt1/t0=;
-        b=dKy2V+R9kAFBizb9Di6FdXSbEzcsazFozefRcJ/RAYJ0wd959h6N3iTH3GzBMq7m6qlNrk
-        6gNFC3GNP3RNFJSEWnbtD6KpsCgOLmvSFyzbfnO/YwGIXeNnJw4ceuBTIFROYgxoSr6gQn
-        Qp+fY68OOjFEQdIALUMR0WTxQElc50E=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-124-no-0lgYdN2q0sICV6b5Euw-1; Thu, 04 Mar 2021 11:05:36 -0500
-X-MC-Unique: no-0lgYdN2q0sICV6b5Euw-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B14E38030D1;
-        Thu,  4 Mar 2021 16:05:33 +0000 (UTC)
-Received: from gondolin (ovpn-114-163.ams2.redhat.com [10.36.114.163])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 305F6179B3;
-        Thu,  4 Mar 2021 16:05:24 +0000 (UTC)
-Date:   Thu, 4 Mar 2021 17:05:21 +0100
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>
-Cc:     qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        Sunil Muthuswamy <sunilmut@microsoft.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        David Gibson <david@gibson.dropbear.id.au>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        kvm@vger.kernel.org, Wenchao Wang <wenchao.wang@intel.com>,
-        Thomas Huth <thuth@redhat.com>,
-        Cameron Esfahani <dirty@apple.com>,
+        id S236119AbhCDQNk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 4 Mar 2021 11:13:40 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56720 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S236120AbhCDQNI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 4 Mar 2021 11:13:08 -0500
+Received: from mail-pl1-x62a.google.com (mail-pl1-x62a.google.com [IPv6:2607:f8b0:4864:20::62a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C443DC06175F
+        for <kvm@vger.kernel.org>; Thu,  4 Mar 2021 08:12:27 -0800 (PST)
+Received: by mail-pl1-x62a.google.com with SMTP id a24so16379708plm.11
+        for <kvm@vger.kernel.org>; Thu, 04 Mar 2021 08:12:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:content-transfer-encoding:in-reply-to;
+        bh=M0XnnEAqraXAeF4+i+vItLFGXDvAf3tEfz7DahoxJJw=;
+        b=cwCs3pDntYOkJYJ9dj1954BTJbulh/SVFYFy867rYU2YXd3cbO27mWW0JntnQI23Nq
+         YxGLio8waz9UwbuYZfqARkQlev3EDeY7a5Xt6rk3Bb8EXFEMI0vsr6q3ZdM1aHouf5Y5
+         PAAJNi/AZUCMFq0EqWP3LFgS4pxUkkzgic1yK3lRvtFC5bXEUmJmQiyhn/rE5LwrxUm8
+         F2XZEdoREg7bx149EnmQxJuoJJlKwzC5pGLDMFEwHvEj+X+RO2xkat3RK3xjHwFw1j8Z
+         m2cs4uJ4BW9nepnnJB1/6ukkvu4aXNYMCA5aGfFtAnhEBUzlrVAHlygllfp2HhKGDrfT
+         rAnA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=M0XnnEAqraXAeF4+i+vItLFGXDvAf3tEfz7DahoxJJw=;
+        b=MEYYzgteaZJ4Vhx7W9zR/j0fXz4Xt9gd+yxAgvDyNoSfTIWYG5ihvJNYhwKcIiRc2j
+         TlBjsz41KG381lz0bLyTfM1zDLxSrlm2+Y+NV92nrl7kx0oOvwaO9LVZ+be+SdWWyzNP
+         CXg+tEo9vb1YxjbMfwLQA0Iz7H1/BrN/kFscCzKus+3vZgh0x2fE3Rj5s0JZV6hSB+pS
+         3lk5bHEG02+W7KVG05cSWZPKHOClrAyJXzQGZyWkpZUnWb9CQzZ6peSx9yno876rerD6
+         zF0HG3UNjNFJ1VLlxNECCdXIb+rTOYZr7yl0e8Q+gejbNDF+TIOXiLuYTdwLAwmRK6Ry
+         yURA==
+X-Gm-Message-State: AOAM533QO9VIN9hQm5oCnr5AQYwGoF/6hvxbRncFn11AMK/hVWZN5XBb
+        Yz0R5bveUX0DjPhmwuNUFotOBw==
+X-Google-Smtp-Source: ABdhPJypswSWeuvacVV01KINr3t+qwNBGGLALIuoahZrYHJqqwob1SAVeOpezDBWZ9EvmFmAKsHv7w==
+X-Received: by 2002:a17:902:b18c:b029:da:fc41:baf8 with SMTP id s12-20020a170902b18cb02900dafc41baf8mr4653715plr.58.1614874347083;
+        Thu, 04 Mar 2021 08:12:27 -0800 (PST)
+Received: from google.com ([2620:15c:f:10:9857:be95:97a2:e91c])
+        by smtp.gmail.com with ESMTPSA id r15sm28694616pfh.97.2021.03.04.08.12.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 04 Mar 2021 08:12:26 -0800 (PST)
+Date:   Thu, 4 Mar 2021 08:12:19 -0800
+From:   Sean Christopherson <seanjc@google.com>
+To:     "Xu, Like" <like.xu@intel.com>
+Cc:     Peter Zijlstra <peterz@infradead.org>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        David Hildenbrand <david@redhat.com>,
-        Roman Bolshakov <r.bolshakov@yadro.com>,
-        Peter Maydell <peter.maydell@linaro.org>,
-        Greg Kurz <groug@kaod.org>, qemu-arm@nongnu.org,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Colin Xu <colin.xu@intel.com>,
-        Claudio Fontana <cfontana@suse.de>, qemu-ppc@nongnu.org,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        qemu-s390x@nongnu.org, haxm-team@intel.com
-Subject: Re: [PATCH 02/19] target/s390x/kvm: Simplify debug code
-Message-ID: <20210304170521.78c61998.cohuck@redhat.com>
-In-Reply-To: <20210303182219.1631042-3-philmd@redhat.com>
-References: <20210303182219.1631042-1-philmd@redhat.com>
-        <20210303182219.1631042-3-philmd@redhat.com>
-Organization: Red Hat GmbH
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Kan Liang <kan.liang@linux.intel.com>,
+        Dave Hansen <dave.hansen@intel.com>, wei.w.wang@intel.com,
+        Borislav Petkov <bp@alien8.de>, kvm@vger.kernel.org,
+        x86@kernel.org, linux-kernel@vger.kernel.org,
+        Like Xu <like.xu@linux.intel.com>
+Subject: Re: [PATCH v3 5/9] KVM: vmx/pmu: Add MSR_ARCH_LBR_DEPTH emulation
+ for Arch LBR
+Message-ID: <YEEG48erESM0+3CB@google.com>
+References: <20210303135756.1546253-1-like.xu@linux.intel.com>
+ <20210303135756.1546253-6-like.xu@linux.intel.com>
+ <YD/APUcINwvP53VZ@google.com>
+ <890a6f34-812a-5937-8761-d448a04f67d7@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <890a6f34-812a-5937-8761-d448a04f67d7@intel.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed,  3 Mar 2021 19:22:02 +0100
-Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> wrote:
+On Thu, Mar 04, 2021, Xu, Like wrote:
+> Hi Sean,
+> 
+> Thanks for your detailed review on the patch set.
+> 
+> On 2021/3/4 0:58, Sean Christopherson wrote:
+> > On Wed, Mar 03, 2021, Like Xu wrote:
+> > > @@ -348,10 +352,26 @@ static bool intel_pmu_handle_lbr_msrs_access(struct kvm_vcpu *vcpu,
+> > >   	return true;
+> > >   }
+> > > +/*
+> > > + * Check if the requested depth values is supported
+> > > + * based on the bits [0:7] of the guest cpuid.1c.eax.
+> > > + */
+> > > +static bool arch_lbr_depth_is_valid(struct kvm_vcpu *vcpu, u64 depth)
+> > > +{
+> > > +	struct kvm_cpuid_entry2 *best;
+> > > +
+> > > +	best = kvm_find_cpuid_entry(vcpu, 0x1c, 0);
+> > > +	if (best && depth && !(depth % 8))
+> > This is still wrong, it fails to weed out depth > 64.
+> 
+> How come ? The testcases depth = {65, 127, 128} get #GP as expected.
 
-> We already have the 'run' variable holding 'cs->kvm_run' value.
->=20
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> ---
->  target/s390x/kvm.c | 3 +--
->  1 file changed, 1 insertion(+), 2 deletions(-)
->=20
-> diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
-> index 7a892d663df..73f816a7222 100644
-> --- a/target/s390x/kvm.c
-> +++ b/target/s390x/kvm.c
-> @@ -1785,8 +1785,7 @@ static int handle_intercept(S390CPU *cpu)
->      int icpt_code =3D run->s390_sieic.icptcode;
->      int r =3D 0;
-> =20
-> -    DPRINTF("intercept: 0x%x (at 0x%lx)\n", icpt_code,
-> -            (long)cs->kvm_run->psw_addr);
-> +    DPRINTF("intercept: 0x%x (at 0x%lx)\n", icpt_code, (long)run->psw_ad=
-dr);
->      switch (icpt_code) {
->          case ICPT_INSTRUCTION:
->          case ICPT_PV_INSTR:
+@depth is a u64, throw in a number that is a multiple of 8 and >= 520, and the
+"(1ULL << (depth / 8 - 1))" will trigger undefined behavior due to shifting
+beyond the capacity of a ULL / u64.
 
-Thanks, queued this one to s390-next.
+Adding the "< 64" check would also allow dropping the " & 0xff" since the check
+would ensure the shift doesn't go beyond bit 7.  I'm not sure the cleverness is
+worth shaving a cycle, though.
 
+> > Not that this is a hot path, but it's probably worth double checking that the
+> > compiler generates simple code for "depth % 8", e.g. it can be "depth & 7)".
+> 
+> Emm, the "%" operation is quite normal over kernel code.
+
+So is "&" :-)  I was just pointing out that the compiler should optimize this,
+and it did.
+
+> if (best && depth && !(depth % 8))
+>    10659:       48 85 c0                test   rax,rax
+>    1065c:       74 c7                   je     10625 <intel_pmu_set_msr+0x65>
+>    1065e:       4d 85 e4                test   r12,r12
+>    10661:       74 c2                   je     10625 <intel_pmu_set_msr+0x65>
+>    10663:       41 f6 c4 07             test   r12b,0x7
+>    10667:       75 bc                   jne    10625 <intel_pmu_set_msr+0x65>
+> 
+> It looks like the compiler does the right thing.
+> Do you see the room for optimization ？
+> 
+> > 
+> > > +		return (best->eax & 0xff) & (1ULL << (depth / 8 - 1));
+
+Actually, looking at this again, I would explicitly use BIT() instead of 1ULL
+(or BIT_ULL), since the shift must be 7 or less.
+
+> > > +
+> > > +	return false;
+> > > +}
+> > > +
+> 
