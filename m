@@ -2,230 +2,353 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DC93E32D5BA
-	for <lists+kvm@lfdr.de>; Thu,  4 Mar 2021 15:59:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C97D332D5CE
+	for <lists+kvm@lfdr.de>; Thu,  4 Mar 2021 16:02:42 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229980AbhCDO54 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 4 Mar 2021 09:57:56 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40420 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229792AbhCDO5e (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 4 Mar 2021 09:57:34 -0500
-Received: from mail-ot1-x333.google.com (mail-ot1-x333.google.com [IPv6:2607:f8b0:4864:20::333])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 17E6FC061574
-        for <kvm@vger.kernel.org>; Thu,  4 Mar 2021 06:56:54 -0800 (PST)
-Received: by mail-ot1-x333.google.com with SMTP id d9so27450840ote.12
-        for <kvm@vger.kernel.org>; Thu, 04 Mar 2021 06:56:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=metztli-com.20150623.gappssmtp.com; s=20150623;
-        h=message-id:subject:from:to:cc:date:in-reply-to:references
-         :organization:user-agent:mime-version:content-transfer-encoding;
-        bh=Egt7O0hrtmxmw6ied+hJV1grz0SHUeSD2SQDlj862Pk=;
-        b=fUI/6ZYJMWbUFwjm8jmBfNsfDL4299KeFqYaRVzK5VlqyLXiWQm4/KkiD9Z+Aus4TL
-         0SoZiCvH/Ri7z14bYhnrrgIMuW7Ur1qGeL1MTIBofB8C5SS4PqqPd6vZs8GPNvyI803Y
-         SAsc1nOg4EcGqdnjZ1mWcKrYWvjWjbz0MNuH0rsY3jkH2jQ32elwCupKgkiSKjTnnHuY
-         lCAgnBTLoG/7A07pGFEopN8Bi0hlk1RAyf+7e5rEVh5MwhVNLGs9TfBcGw4fsDuM5LeD
-         o9nCfgnaqlrIy2K/AT2ZicNDCCSh4YB7NRYScdEvRVop5ht+cTAOkkk9Fp87MJI2kvf5
-         BwGQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
-         :references:organization:user-agent:mime-version
-         :content-transfer-encoding;
-        bh=Egt7O0hrtmxmw6ied+hJV1grz0SHUeSD2SQDlj862Pk=;
-        b=QG7qBzPEMz7LpTgli+1a3p10R5LykM+om1pEoY4GRPhlQkHoMNCLETFMLqNy/V7/m4
-         7uEyRzex2NW3yXKRIVSJyJgQkOGdb+UCEJNOJSkzvNwXfXFynPx82Y2dSpzKREEQEiVq
-         7x9+sWkChRJY9ZwWT0Such52xDhSLsixoZI4b4zguehPEFQkW4UgRvTj4Zvi7OJHKaDZ
-         2Jav188w2jeoWHdfciKxHOiUk8/EfgKKXsDiQaaXecHkEAv+UOGb9lIVCZXLGZj9eRse
-         fmfIwp5lfPouJNVb2RLTyCZG5J24lMvwu4/jJxb9fbv+TmI5500wBvlgt6QZpoTyskml
-         Kb3A==
-X-Gm-Message-State: AOAM530vPEnXXmLl879pxisVjrjwOEz4Ow9ilyecMiq5x+Hla+3YKpO9
-        hKKVuaGaxDnf0WYeNs0NhmV7pQ==
-X-Google-Smtp-Source: ABdhPJxkNQEB58oZZK3MLqb8eVT35aclKdHIFuP+UL5QdOgSBqHXSzTlszl4v2CAnz/kmCtQxy/h8g==
-X-Received: by 2002:a05:6830:1afc:: with SMTP id c28mr3734282otd.99.1614869813366;
-        Thu, 04 Mar 2021 06:56:53 -0800 (PST)
-Received: from ?IPv6:2600:1700:6470:27a0:682c:9aef:c4a9:8393? ([2600:1700:6470:27a0:682c:9aef:c4a9:8393])
-        by smtp.gmail.com with ESMTPSA id i3sm5834233otk.56.2021.03.04.06.56.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 04 Mar 2021 06:56:52 -0800 (PST)
-Message-ID: <f709dc80a94fa6ee0f34dc785e7f30ba58850122.camel@metztli.com>
-Subject: Re: unexpected kernel reboot (3)
-From:   Jose R Rodriguez <jose.r.r@metztli.com>
-To:     Dmitry Vyukov <dvyukov@google.com>,
-        Andrew Morton <akpm@linux-foundation.org>
-Cc:     syzbot <syzbot+cce9ef2dd25246f815ee@syzkaller.appspotmail.com>,
-        Alexey Dobriyan <adobriyan@gmail.com>,
-        Gargi Sharma <gs051095@gmail.com>, jhugo@codeaurora.org,
-        Josh Poimboeuf <jpoimboe@redhat.com>,
-        Laura Abbott <lauraa@codeaurora.org>,
-        LKML <linux-kernel@vger.kernel.org>, linux@dominikbrodowski.net,
-        Ingo Molnar <mingo@kernel.org>,
-        Steven Rostedt <rostedt@goodmis.org>,
-        syzkaller-bugs <syzkaller-bugs@googlegroups.com>,
-        Thomas Gleixner <tglx@linutronix.de>, thomas.lendacky@amd.com,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Radim =?UTF-8?Q?Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>,
-        KVM list <kvm@vger.kernel.org>,
-        Jim Mattson <jmattson@google.com>,
-        Edward Shishkin <edward.shishkin@gmail.com>
-Date:   Thu, 04 Mar 2021 06:56:50 -0800
-In-Reply-To: <CACT4Y+b1HC5CtFSQJEDBJrP8u1brKxXaFcYKE=g+h3aOW6K3Kg@mail.gmail.com>
-References: <000000000000eb546f0570e84e90@google.com>
-         <20180713145811.683ffd0043cac26a5a5af725@linux-foundation.org>
-         <CACT4Y+b1HC5CtFSQJEDBJrP8u1brKxXaFcYKE=g+h3aOW6K3Kg@mail.gmail.com>
-Organization: Metztli Information Technology
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.38.3-1 
+        id S232918AbhCDPBk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 4 Mar 2021 10:01:40 -0500
+Received: from foss.arm.com ([217.140.110.172]:39516 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S232924AbhCDPB1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 4 Mar 2021 10:01:27 -0500
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D29ABD6E;
+        Thu,  4 Mar 2021 07:00:41 -0800 (PST)
+Received: from slackpad.fritz.box (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 0F2EB3F766;
+        Thu,  4 Mar 2021 07:00:40 -0800 (PST)
+Date:   Thu, 4 Mar 2021 15:00:31 +0000
+From:   Andre Przywara <andre.przywara@arm.com>
+To:     Alexandru Elisei <alexandru.elisei@arm.com>
+Cc:     drjones@redhat.com, kvm@vger.kernel.org,
+        kvmarm@lists.cs.columbia.edu
+Subject: Re: [kvm-unit-tests PATCH 2/6] arm/arm64: Remove dcache_line_size
+ global variable
+Message-ID: <20210304150031.7805c75e@slackpad.fritz.box>
+In-Reply-To: <20210227104201.14403-3-alexandru.elisei@arm.com>
+References: <20210227104201.14403-1-alexandru.elisei@arm.com>
+        <20210227104201.14403-3-alexandru.elisei@arm.com>
+Organization: Arm Ltd.
+X-Mailer: Claws Mail 3.17.1 (GTK+ 2.24.31; x86_64-slackware-linux-gnu)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 2018-07-16 at 12:09 +0200, Dmitry Vyukov wrote:
-> On Fri, Jul 13, 2018 at 11:58 PM, Andrew Morton
-> <akpm@linux-foundation.org> wrote:
-> > On Fri, 13 Jul 2018 14:39:02 -0700 syzbot <
-> > syzbot+cce9ef2dd25246f815ee@syzkaller.appspotmail.com> wrote:
-> > 
-> > > Hello,
-> > > 
-> > > syzbot found the following crash on:
-> > 
-> > hm, I don't think I've seen an "unexpected reboot" report before.
-> > 
-> > Can you expand on specifically what happened here?  Did the machine
-> > simply magically reboot itself?  Or did an external monitor whack it,
-> > or...
-> 
-> We put some user-space workload (not involving reboot syscall), and
-> the machine suddenly rebooted. We don't know what triggered the
-> reboot, we only see the consequences. We've seen few such bugs before,
-> e.g.:
-> https://syzkaller.appspot.com/bug?id=4f1db8b5e7dfcca55e20931aec0ee707c5cafc99
-> Usually it involves KVM. Potentially it's a bug in the outer
-> kernel/VMM, it may or may not be present in tip kernel.
+On Sat, 27 Feb 2021 10:41:57 +0000
+Alexandru Elisei <alexandru.elisei@arm.com> wrote:
 
-I have been using GCE with my custom VirtualBox -created reiser4 root fs VMs
-since at least 2018, long term mainly as web servers with LAMP / LEMP --
-including some Ruby apps with Postgresql -- and short term to build our Debian
-Linux kernels. I have not experienced 'suddenly rebooted' scenarios.
+> Compute the dcache line size when doing dcache maintenance instead of using
+> a global variable computed in setup(), which allows us to do dcache
+> maintenance at any point in the boot process. This will be useful for
+> running as an EFI app and it also aligns our implementation to that of the
+> Linux kernel.
 
-Note that I have been usin Intel CPUs at the Los Angeles zone us-west2-a, as
-well as us-east1-b zone, and AMD Epyc CPUs at us-central1-a zone, without
-abnormalities (other than it's becoming more expensive ;-)
-
-As a matter of fact, I am currently testing a Debian'ized reiser4 (AMD Epyc -
-flavored reizer4 label) -enabled Linux kernel 5.10.15-2 which has logged 17 days
-+hours already and sustaining most of the apps already mentioned.
-< https://metztli.it/buster/r4-5.10.15-gce.png >
+Can you add that this changes the semantic of dcache_by_line_op to use
+the size instead of the end address?
 
 > 
+> For consistency, the arm code has been similary modified.
 > 
-> > Does this test distinguish from a kernel which simply locks up?
+> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> ---
+>  lib/arm/asm/assembler.h   | 44 ++++++++++++++++++++++++++++++++
+>  lib/arm/asm/processor.h   |  7 ------
+>  lib/arm64/asm/assembler.h | 53 +++++++++++++++++++++++++++++++++++++++
+>  lib/arm64/asm/processor.h |  7 ------
+>  lib/arm/setup.c           |  7 ------
+>  arm/cstart.S              | 18 +++----------
+>  arm/cstart64.S            | 16 ++----------
+>  7 files changed, 102 insertions(+), 50 deletions(-)
+>  create mode 100644 lib/arm/asm/assembler.h
+>  create mode 100644 lib/arm64/asm/assembler.h
 > 
-> Yes. If you look at the log:
-> 
-> https://syzkaller.appspot.com/x/log.txt?x=17c6a6d0400000
-> 
-> We've booted the machine, started running a program, and them boom! it
-> reboots without any other diagnostics. It's not a hang.
-> 
-> 
-> 
-> > > HEAD commit:    1e4b044d2251 Linux 4.18-rc4
-> > > git tree:       upstream
-> > > console output: https://syzkaller.appspot.com/x/log.txt?x=17c6a6d0400000
-> > > kernel config:  https://syzkaller.appspot.com/x/.config?x=25856fac4e580aa7
-> > > dashboard link: 
-> > > https://syzkaller.appspot.com/bug?extid=cce9ef2dd25246f815ee
-> > > compiler:       gcc (GCC) 8.0.1 20180413 (experimental)
-> > > syzkaller repro:https://syzkaller.appspot.com/x/repro.syz?x=165012c2400000
-> > > C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1571462c400000
-> > 
-> > I assume the "C reproducer" is irrelevant here.
-> > 
-> > Is it reproducible?
-> 
-> Yes, it is reproducible and the C reproducer is relevant.
-> If syzbot provides a reproducer, it means that it booted a clean
-> machine, run the provided program (nothing else besides typical init
-> code and ssh/scp invocation) and that's the kernel output it observed
-> running this exact program.
-> However in this case, the exact setup can be relevant. syzbot uses GCE
-> VMs, it may or may not reproduce with other VMMs/physical hardware,
-> sometimes such bugs depend on exact CPU type.
-> 
-> 
-> > > IMPORTANT: if you fix the bug, please add the following tag to the commit:
-> > > Reported-by: syzbot+cce9ef2dd25246f815ee@syzkaller.appspotmail.com
-> > > 
-> > > output_len: 0x00000000092459b0
-> > > kernel_total_size: 0x000000000a505000
-> > > trampoline_32bit: 0x000000000009d000
-> > > 
-> > > Decompressing Linux... Parsing ELF... done.
-> > > Booting the kernel.
-> > > [    0.000000] Linux version 4.18.0-rc4+ (syzkaller@ci) (gcc version 8.0.1
-> > > 20180413 (experimental) (GCC)) #138 SMP Mon Jul 9 10:45:11 UTC 2018
-> > > [    0.000000] Command line: BOOT_IMAGE=/vmlinuz root=/dev/sda1
-> > > console=ttyS0 earlyprintk=serial vsyscall=native rodata=n
-> > > ftrace_dump_on_oops=orig_cpu oops=panic panic_on_warn=1 nmi_watchdog=panic
-> > > panic=86400 workqueue.watchdog_thresh=140 kvm-intel.nested=1
-> > > 
-> > > ...
-> > > 
-> > > regulatory database
-> > > [    4.519364] cfg80211: Loaded X.509 cert 'sforshee: 00b28ddf47aef9cea7'
-> > > [    4.520839] platform regulatory.0: Direct firmware load for
-> > > regulatory.db failed with error -2
-> > > [    4.522155] cfg80211: failed to load regulatory.db
-> > > [    4.522185] ALSA device list:
-> > > [    4.523499]   #0: Dummy 1
-> > > [    4.523951]   #1: Loopback 1
-> > > [    4.524389]   #2: Virtual MIDI Card 1
-> > > [    4.825991] input: ImExPS/2 Generic Explorer Mouse as
-> > > /devices/platform/i8042/serio1/input/input4
-> > > [    4.829533] md: Waiting for all devices to be available before
-> > > autodetect
-> > > [    4.830562] md: If you don't use raid, use raid=noautodetect
-> > > [    4.835237] md: Autodetecting RAID arrays.
-> > > [    4.835882] md: autorun ...
-> > > [    4.836364] md: ... autorun DONE.
-> > 
-> > Can we assume that the failure occurred in or immediately after the MD code,
-> > or might some output have been truncated?
-> > 
-> > It would be useful to know what the kernel was initializing immediately
-> > after MD.  Do you have a kernel log for the same config when the kerenl
-> > didn't fail?  Or maybe enable initcall_debug?
-> > 
-> > --
-> > You received this message because you are subscribed to the Google Groups
-> > "syzkaller-bugs" group.
-> > To unsubscribe from this group and stop receiving emails from it, send an
-> > email to syzkaller-bugs+unsubscribe@googlegroups.com.
-> > To view this discussion on the web visit 
-> > https://groups.google.com/d/msgid/syzkaller-bugs/20180713145811.683ffd0043cac26a5a5af725%40linux-foundation.org
-> > .
-> > For more options, visit https://groups.google.com/d/optout.
+> diff --git a/lib/arm/asm/assembler.h b/lib/arm/asm/assembler.h
+> new file mode 100644
+> index 000000000000..6b932df86204
+> --- /dev/null
+> +++ b/lib/arm/asm/assembler.h
+> @@ -0,0 +1,44 @@
+> +/* SPDX-License-Identifier: GPL-2.0 */
+> +/*
+> + * Based on several files from Linux version v5.10: arch/arm/mm/proc-macros.S,
+> + * arch/arm/mm/proc-v7.S.
+> + */
+> +
+> +/*
+> + * dcache_line_size - get the minimum D-cache line size from the CTR register
+`> + * on ARMv7.
+> + */
+> +	.macro	dcache_line_size, reg, tmp
+> +	mrc	p15, 0, \tmp, c0, c0, 1		// read ctr
+> +	lsr	\tmp, \tmp, #16
+> +	and	\tmp, \tmp, #0xf		// cache line size encoding
+> +	mov	\reg, #4			// bytes per word
+> +	mov	\reg, \reg, lsl \tmp		// actual cache line size
+> +	.endm
+> +
+> +/*
+> + * Macro to perform a data cache maintenance for the interval
+> + * [addr, addr + size).
+> + *
+> + * 	op:		operation to execute
+> + * 	domain		domain used in the dsb instruction
+> + * 	addr:		starting virtual address of the region
+> + * 	size:		size of the region
+> + * 	Corrupts:	addr, size, tmp1, tmp2
+> + */
+> +	.macro dcache_by_line_op op, domain, addr, size, tmp1, tmp2
+> +	dcache_line_size \tmp1, \tmp2
+> +	add	\size, \addr, \size
+> +	sub	\tmp2, \tmp1, #1
+> +	bic	\addr, \addr, \tmp2
 
-(saw your last message of just a couple of hours and...)
+Just a nit, but since my brain was in assembly land: We could skip tmp2,
+by adding back #1 to tmp1 after the bic.
+Same for the arm64 code.
 
-Hope provided info helps.
+> +9998:
+> +	.ifc	\op, dccimvac
+> +	mcr	p15, 0, \addr, c7, c14, 1
+> +	.else
+> +	.err
+> +	.endif
+> +	add	\addr, \addr, \tmp1
+> +	cmp	\addr, \size
+> +	blo	9998b
+> +	dsb	\domain
+> +	.endm
+> diff --git a/lib/arm/asm/processor.h b/lib/arm/asm/processor.h
+> index 273366d1fe1c..3c36eac903f0 100644
+> --- a/lib/arm/asm/processor.h
+> +++ b/lib/arm/asm/processor.h
+> @@ -9,11 +9,6 @@
+>  #include <asm/sysreg.h>
+>  #include <asm/barrier.h>
 
-Best Professional Regards.
+Do we want the same protection against inclusion from C here as in the
+arm64 version?
 
--- 
--- 
-Jose R R
-http://metztli.it
------------------------------------------------------------------------
-Download Metztli Reiser4: Debian Buster w/ Linux 5.9.16 AMD64
------------------------------------------------------------------------
-feats ZSTD compression https://sf.net/projects/metztli-reiser4/
------------------------------------------------------------------------
-or SFRN 5.1.3, Metztli Reiser5 https://sf.net/projects/debian-reiser4/
------------------------------------------------------------------------
-Official current Reiser4 resources: https://reiser4.wiki.kernel.org/
+> -#define CTR_DMINLINE_SHIFT	16
+> -#define CTR_DMINLINE_MASK	(0xf << 16)
+> -#define CTR_DMINLINE(x)	\
+> -	(((x) & CTR_DMINLINE_MASK) >> CTR_DMINLINE_SHIFT)
+> -
+>  enum vector {
+>  	EXCPTN_RST,
+>  	EXCPTN_UND,
+> @@ -89,6 +84,4 @@ static inline u32 get_ctr(void)
+>  	return read_sysreg(CTR);
+>  }
+>  
+> -extern unsigned long dcache_line_size;
+> -
+>  #endif /* _ASMARM_PROCESSOR_H_ */
+> diff --git a/lib/arm64/asm/assembler.h b/lib/arm64/asm/assembler.h
+> new file mode 100644
+> index 000000000000..f801c0c43d02
+> --- /dev/null
+> +++ b/lib/arm64/asm/assembler.h
+> @@ -0,0 +1,53 @@
+> +/* SPDX-License-Identifier: GPL-2.0-only */
+> +/*
+> + * Based on the file arch/arm64/include/asm/assembled.h from Linux v5.10, which
+> + * in turn is based on arch/arm/include/asm/assembler.h and
+> + * arch/arm/mm/proc-macros.S
+> + *
+> + * Copyright (C) 1996-2000 Russell King
+> + * Copyright (C) 2012 ARM Ltd.
+> + */
+> +#ifndef __ASSEMBLY__
+> +#error "Only include this from assembly code"
+> +#endif
+> +
+> +#ifndef __ASM_ASSEMBLER_H
+> +#define __ASM_ASSEMBLER_H
+> +
+> +/*
+> + * raw_dcache_line_size - get the minimum D-cache line size on this CPU
+> + * from the CTR register.
+> + */
+> +	.macro	raw_dcache_line_size, reg, tmp
+> +	mrs	\tmp, ctr_el0			// read CTR
+> +	ubfm	\tmp, \tmp, #16, #19		// cache line size encoding
+
+this encoding of ubfm is supposed to be written as:
+	ubfx \tmp, \tmp, #16, #4
+This is also what objdump makes of the above.
+
+The rest looks good, I convinced myself that the assembly algorithms are
+correct.
+
+Cheers,
+Andre
+
+
+> +	mov	\reg, #4			// bytes per word
+> +	lsl	\reg, \reg, \tmp		// actual cache line size
+> +	.endm
+> +
+> +/*
+> + * Macro to perform a data cache maintenance for the interval
+> + * [addr, addr + size). Use the raw value for the dcache line size because
+> + * kvm-unit-tests has no concept of scheduling.
+> + *
+> + * 	op:		operation passed to dc instruction
+> + * 	domain:		domain used in dsb instruciton
+> + * 	addr:		starting virtual address of the region
+> + * 	size:		size of the region
+> + * 	Corrupts:	addr, size, tmp1, tmp2
+> + */
+> +
+> +	.macro dcache_by_line_op op, domain, addr, size, tmp1, tmp2
+> +	raw_dcache_line_size \tmp1, \tmp2
+> +	add	\size, \addr, \size
+> +	sub	\tmp2, \tmp1, #1
+> +	bic	\addr, \addr, \tmp2
+> +9998:
+> +	dc	\op, \addr
+> +	add	\addr, \addr, \tmp1
+> +	cmp	\addr, \size
+> +	b.lo	9998b
+> +	dsb	\domain
+> +	.endm
+> +
+> +#endif	/* __ASM_ASSEMBLER_H */
+> diff --git a/lib/arm64/asm/processor.h b/lib/arm64/asm/processor.h
+> index 771b2d1e0c94..cdc2463e1981 100644
+> --- a/lib/arm64/asm/processor.h
+> +++ b/lib/arm64/asm/processor.h
+> @@ -16,11 +16,6 @@
+>  #define SCTLR_EL1_A	(1 << 1)
+>  #define SCTLR_EL1_M	(1 << 0)
+>  
+> -#define CTR_DMINLINE_SHIFT	16
+> -#define CTR_DMINLINE_MASK	(0xf << 16)
+> -#define CTR_DMINLINE(x)	\
+> -	(((x) & CTR_DMINLINE_MASK) >> CTR_DMINLINE_SHIFT)
+> -
+>  #ifndef __ASSEMBLY__
+>  #include <asm/ptrace.h>
+>  #include <asm/esr.h>
+> @@ -115,8 +110,6 @@ static inline u64 get_ctr(void)
+>  	return read_sysreg(ctr_el0);
+>  }
+>  
+> -extern unsigned long dcache_line_size;
+> -
+>  static inline unsigned long get_id_aa64mmfr0_el1(void)
+>  {
+>  	return read_sysreg(id_aa64mmfr0_el1);
+> diff --git a/lib/arm/setup.c b/lib/arm/setup.c
+> index 066524f8bf61..751ba980000a 100644
+> --- a/lib/arm/setup.c
+> +++ b/lib/arm/setup.c
+> @@ -42,8 +42,6 @@ static struct mem_region __initial_mem_regions[NR_INITIAL_MEM_REGIONS + 1];
+>  struct mem_region *mem_regions = __initial_mem_regions;
+>  phys_addr_t __phys_offset, __phys_end;
+>  
+> -unsigned long dcache_line_size;
+> -
+>  int mpidr_to_cpu(uint64_t mpidr)
+>  {
+>  	int i;
+> @@ -72,11 +70,6 @@ static void cpu_init(void)
+>  	ret = dt_for_each_cpu_node(cpu_set, NULL);
+>  	assert(ret == 0);
+>  	set_cpu_online(0, true);
+> -	/*
+> -	 * DminLine is log2 of the number of words in the smallest cache line; a
+> -	 * word is 4 bytes.
+> -	 */
+> -	dcache_line_size = 1 << (CTR_DMINLINE(get_ctr()) + 2);
+>  }
+>  
+>  unsigned int mem_region_get_flags(phys_addr_t paddr)
+> diff --git a/arm/cstart.S b/arm/cstart.S
+> index ef936ae2f874..954748b00f64 100644
+> --- a/arm/cstart.S
+> +++ b/arm/cstart.S
+> @@ -7,6 +7,7 @@
+>   */
+>  #define __ASSEMBLY__
+>  #include <auxinfo.h>
+> +#include <asm/assembler.h>
+>  #include <asm/thread_info.h>
+>  #include <asm/asm-offsets.h>
+>  #include <asm/pgtable-hwdef.h>
+> @@ -197,20 +198,6 @@ asm_mmu_enable:
+>  
+>  	mov     pc, lr
+>  
+> -.macro dcache_clean_inval domain, start, end, tmp1, tmp2
+> -	ldr	\tmp1, =dcache_line_size
+> -	ldr	\tmp1, [\tmp1]
+> -	sub	\tmp2, \tmp1, #1
+> -	bic	\start, \start, \tmp2
+> -9998:
+> -	/* DCCIMVAC */
+> -	mcr	p15, 0, \start, c7, c14, 1
+> -	add	\start, \start, \tmp1
+> -	cmp	\start, \end
+> -	blo	9998b
+> -	dsb	\domain
+> -.endm
+> -
+>  .globl asm_mmu_disable
+>  asm_mmu_disable:
+>  	/* SCTLR */
+> @@ -223,7 +210,8 @@ asm_mmu_disable:
+>  	ldr	r0, [r0]
+>  	ldr	r1, =__phys_end
+>  	ldr	r1, [r1]
+> -	dcache_clean_inval sy, r0, r1, r2, r3
+> +	sub	r1, r1, r0
+> +	dcache_by_line_op dccimvac, sy, r0, r1, r2, r3
+>  	isb
+>  
+>  	mov     pc, lr
+> diff --git a/arm/cstart64.S b/arm/cstart64.S
+> index fc1930bcdb53..046bd3914098 100644
+> --- a/arm/cstart64.S
+> +++ b/arm/cstart64.S
+> @@ -8,6 +8,7 @@
+>  #define __ASSEMBLY__
+>  #include <auxinfo.h>
+>  #include <asm/asm-offsets.h>
+> +#include <asm/assembler.h>
+>  #include <asm/ptrace.h>
+>  #include <asm/processor.h>
+>  #include <asm/page.h>
+> @@ -204,20 +205,6 @@ asm_mmu_enable:
+>  
+>  	ret
+>  
+> -/* Taken with small changes from arch/arm64/incluse/asm/assembler.h */
+> -.macro dcache_by_line_op op, domain, start, end, tmp1, tmp2
+> -	adrp	\tmp1, dcache_line_size
+> -	ldr	\tmp1, [\tmp1, :lo12:dcache_line_size]
+> -	sub	\tmp2, \tmp1, #1
+> -	bic	\start, \start, \tmp2
+> -9998:
+> -	dc	\op , \start
+> -	add	\start, \start, \tmp1
+> -	cmp	\start, \end
+> -	b.lo	9998b
+> -	dsb	\domain
+> -.endm
+> -
+>  .globl asm_mmu_disable
+>  asm_mmu_disable:
+>  	mrs	x0, sctlr_el1
+> @@ -230,6 +217,7 @@ asm_mmu_disable:
+>  	ldr	x0, [x0, :lo12:__phys_offset]
+>  	adrp	x1, __phys_end
+>  	ldr	x1, [x1, :lo12:__phys_end]
+> +	sub	x1, x1, x0
+>  	dcache_by_line_op civac, sy, x0, x1, x2, x3
+>  	isb
+>  
 
