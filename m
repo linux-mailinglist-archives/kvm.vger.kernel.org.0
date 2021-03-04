@@ -2,157 +2,131 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E3C0132D87E
-	for <lists+kvm@lfdr.de>; Thu,  4 Mar 2021 18:19:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 215A632D88E
+	for <lists+kvm@lfdr.de>; Thu,  4 Mar 2021 18:26:12 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236197AbhCDRSM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 4 Mar 2021 12:18:12 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:35875 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231169AbhCDRRn (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 4 Mar 2021 12:17:43 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1614878177;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=SY3y/fjQ9gcJBSAM3ZTh/kWFdCD5EKEzVNMAsrCAGpU=;
-        b=hbl1h6YKessYnMibtP0E4P8FuM0vhtkwCryIuht5jbeBloy2BcfcSwwDtty1PLdVbIEpOh
-        vBMdEhIElONlrnid2D76jWudQn3PDdyDnCNx6H+aYye6hGdUB7S3HAUSbB9wkn1L5sZSZS
-        S437msiAPYwZ1CGUnW2skCZaUjXHPdY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-581-h9RhXSbPOKGq3Iq6rZJaxg-1; Thu, 04 Mar 2021 12:16:13 -0500
-X-MC-Unique: h9RhXSbPOKGq3Iq6rZJaxg-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 361B592535;
-        Thu,  4 Mar 2021 17:16:09 +0000 (UTC)
-Received: from localhost (ovpn-114-199.ams2.redhat.com [10.36.114.199])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id B78EF19645;
-        Thu,  4 Mar 2021 17:15:55 +0000 (UTC)
-Date:   Thu, 4 Mar 2021 17:15:54 +0000
-From:   Stefan Hajnoczi <stefanha@redhat.com>
-To:     Colin King <colin.king@canonical.com>
-Cc:     "Michael S . Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
+        id S237058AbhCDRZI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 4 Mar 2021 12:25:08 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43918 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233695AbhCDRYm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 4 Mar 2021 12:24:42 -0500
+Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 620BCC061756
+        for <kvm@vger.kernel.org>; Thu,  4 Mar 2021 09:24:02 -0800 (PST)
+Received: by mail-pl1-x62d.google.com with SMTP id u18so10333630plc.12
+        for <kvm@vger.kernel.org>; Thu, 04 Mar 2021 09:24:02 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=yEg9qQ9+Lh0kR3V9SEuUm28SfP2oct9m6aZdQ9sZc1A=;
+        b=THVuTBpyCwu9YWCG7jYg5nbREA0QwBvrWEpolfxArJG8WKP/h0Fip0usH3PXPRiD0o
+         urV33e+liUCmzCtbRedmIoP4mHUsv/urfbj9pv7aLfnJFzS5t3e9fRoLO7c2KWbaMaPg
+         bvWLThStTEpHZccm+y8InV7sBBxcYcCm26SOfjw4q7CWouHaDSYBkqbB/hDLPkgjRIsI
+         LyZdzYfQnOKwwD+EVHmwKi5kgqOOyrhpHqXLfb1X5wUwxCCafswD92lHLng71bJj77Bl
+         15yn8iykRH4rieDrN2+99t/fQPU7rY9rC3P6xr6zdZiEWWpKesq7VTDP/yUraV3Hxoeq
+         +0JA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=yEg9qQ9+Lh0kR3V9SEuUm28SfP2oct9m6aZdQ9sZc1A=;
+        b=K3XPkBjZJCvMktwgLdX/ijZgLla77NQ6lMF4gqq4/JEVzLVQt0Oo6gfrhy6uKujLCu
+         wZS9d4Dl5xkiPfqrs5UN27y0lf+S+Z7xw9e2ulOr5uVlKRevzeEv3SLTMmvdhD/CYWmF
+         0rvt+gdD9c4Ov1+MAH46GLaO3NA8ZAxw675HAz9mzR9EVYFjfic0u/0Jzirc77Ab/68l
+         Rpvacl2ljdCQl1RigVtpi7CrK66Pp4xoUg5qNzQTRvd85RYH9tFjmOb+lRpb3e6B+Qiw
+         LMgUQMZIl9k7WCaW67EXbdrhLYIOQjs1p69LgYVHqgE1UAlSb4416SbWlmakfXmRYC5Q
+         xE7g==
+X-Gm-Message-State: AOAM5334D6lBJzYwo5xpsNDZ2mZ8yoNadGPrOzlnS2BgllU0hPgPEjho
+        sip54SZLMiTTB9MjJzFTrpuqMg==
+X-Google-Smtp-Source: ABdhPJwfPFA7trtIGjUv1OTpERHQQL1X64kdEtO6Bt2U6eyu5H/RMinMlpabgpREF29EKOOiK9ukIQ==
+X-Received: by 2002:a17:90a:ff15:: with SMTP id ce21mr5631029pjb.172.1614878641748;
+        Thu, 04 Mar 2021 09:24:01 -0800 (PST)
+Received: from google.com ([2620:15c:f:10:9857:be95:97a2:e91c])
+        by smtp.gmail.com with ESMTPSA id q4sm19465pfq.103.2021.03.04.09.23.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 04 Mar 2021 09:24:01 -0800 (PST)
+Date:   Thu, 4 Mar 2021 09:23:53 -0800
+From:   Sean Christopherson <seanjc@google.com>
+To:     "Xu, Like" <like.xu@intel.com>
+Cc:     Peter Zijlstra <peterz@infradead.org>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
-        netdev@vger.kernel.org, kernel-janitors@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] scsi: target: vhost-scsi: remove redundant
- initialization of variable ret
-Message-ID: <YEEVypxRJloK/CRk@stefanha-x1.localdomain>
-References: <20210303134339.67339-1-colin.king@canonical.com>
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Kan Liang <kan.liang@linux.intel.com>,
+        Dave Hansen <dave.hansen@intel.com>, wei.w.wang@intel.com,
+        Borislav Petkov <bp@alien8.de>, kvm@vger.kernel.org,
+        x86@kernel.org, linux-kernel@vger.kernel.org,
+        Like Xu <like.xu@linux.intel.com>
+Subject: Re: [PATCH v3 7/9] KVM: vmx/pmu: Add Arch LBR emulation and its VMCS
+ field
+Message-ID: <YEEXqf3b4uaSdNKv@google.com>
+References: <20210303135756.1546253-1-like.xu@linux.intel.com>
+ <20210303135756.1546253-8-like.xu@linux.intel.com>
+ <YD/GrQAl1NMPHXFj@google.com>
+ <267c408c-6999-649b-d733-8d64f9cf0594@intel.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="O/Mw4/hwfMu4pg68"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210303134339.67339-1-colin.king@canonical.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+In-Reply-To: <267c408c-6999-649b-d733-8d64f9cf0594@intel.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Thu, Mar 04, 2021, Xu, Like wrote:
+> On 2021/3/4 1:26, Sean Christopherson wrote:
+> > On Wed, Mar 03, 2021, Like Xu wrote:
+> > > New VMX controls bits for Arch LBR are added. When bit 21 in vmentry_ctrl
+> > > is set, VM entry will write the value from the "Guest IA32_LBR_CTL" guest
+> > > state field to IA32_LBR_CTL. When bit 26 in vmexit_ctrl is set, VM exit
+> > > will clear IA32_LBR_CTL after the value has been saved to the "Guest
+> > > IA32_LBR_CTL" guest state field.
+> > ...
+> > 
+> > > @@ -2529,7 +2532,8 @@ static __init int setup_vmcs_config(struct vmcs_config *vmcs_conf,
+> > >   	      VM_EXIT_LOAD_IA32_EFER |
+> > >   	      VM_EXIT_CLEAR_BNDCFGS |
+> > >   	      VM_EXIT_PT_CONCEAL_PIP |
+> > > -	      VM_EXIT_CLEAR_IA32_RTIT_CTL;
+> > > +	      VM_EXIT_CLEAR_IA32_RTIT_CTL |
+> > > +	      VM_EXIT_CLEAR_IA32_LBR_CTL;
+> > So, how does MSR_ARCH_LBR_CTL get restored on the host?  What if the host wants
+> > to keep _its_ LBR recording active while the guest is running?
+> 
+> Thank you!
+> 
+> I will add "host_lbrctlmsr" field to "struct vcpu_vmx" and
+> repeat the update/get_debugctlmsr() stuff.
 
---O/Mw4/hwfMu4pg68
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+I am not remotely confident that tracking LBRCTL via vcpu_vmx is correct, and
+I'm far less confident that the existing DEBUGCTL logic is correct.  As Jim
+pointed out[*], intel_pmu_handle_irq() can run at any time, and it's not at all
+clear to me that the DEBUGCTL coming out of the NMI handler is guaranteed to be
+the same value going in.  Ditto for LBRCTL.
 
-On Wed, Mar 03, 2021 at 01:43:39PM +0000, Colin King wrote:
-> From: Colin Ian King <colin.king@canonical.com>
->=20
-> The variable ret is being initialized with a value that is never read
-> and it is being updated later with a new value.  The initialization is
-> redundant and can be removed.
->=20
-> Addresses-Coverity: ("Unused value")
-> Signed-off-by: Colin Ian King <colin.king@canonical.com>
-> ---
->  drivers/vhost/scsi.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+Actually, NMIs aside, KVM's DEBUGCTL handling is provably broken since writing
+/sys/devices/cpu/freeze_on_smi is propagated to other CPUs via IRQ, and KVM
+snapshots DEBUCTL on vCPU load, i.e. runs with IRQs enabled long after grabbing
+the value.
 
-Which kernel version is this patch based on?
-
-If it's a fix for a patch that hasn't landed yet, please indicate this.
-A "Fixes: ..." tag should be added to this patch as well.
-
-I looked at linux.git/master commit f69d02e37a85645aa90d18cacfff36dba370f79=
-7 and see this:
-
-  static int __init vhost_scsi_init(void)
-  {
-          int ret =3D -ENOMEM;
-
-          pr_debug("TCM_VHOST fabric module %s on %s/%s"
-                  " on "UTS_RELEASE"\n", VHOST_SCSI_VERSION, utsname()->sys=
-name,
-                  utsname()->machine);
-
-          /*
-           * Use our own dedicated workqueue for submitting I/O into
-           * target core to avoid contention within system_wq.
-           */
-          vhost_scsi_workqueue =3D alloc_workqueue("vhost_scsi", 0, 0);
-          if (!vhost_scsi_workqueue)
-                  goto out;
-
-We need ret's initialization value here ^
-
-          ret =3D vhost_scsi_register();
-          if (ret < 0)
-                  goto out_destroy_workqueue;
-
-          ret =3D target_register_template(&vhost_scsi_ops);
-          if (ret < 0)
-                  goto out_vhost_scsi_deregister;
-
-          return 0;
-
-  out_vhost_scsi_deregister:
-          vhost_scsi_deregister();
-  out_destroy_workqueue:
-          destroy_workqueue(vhost_scsi_workqueue);
-  out:
-          return ret;
-  };
+  WARNING: CPU: 5 PID: 0 at arch/x86/events/intel/core.c:4066 flip_smm_bit+0xb/0x30
+  RIP: 0010:flip_smm_bit+0xb/0x30
+  Call Trace:
+   <IRQ>
+   flush_smp_call_function_queue+0x118/0x1a0
+   __sysvec_call_function+0x2c/0x90
+   asm_call_irq_on_stack+0x12/0x20
+   </IRQ>
 
 
->=20
-> diff --git a/drivers/vhost/scsi.c b/drivers/vhost/scsi.c
-> index d16c04dcc144..9129ab8187fd 100644
-> --- a/drivers/vhost/scsi.c
-> +++ b/drivers/vhost/scsi.c
-> @@ -2465,7 +2465,7 @@ static const struct target_core_fabric_ops vhost_sc=
-si_ops =3D {
-> =20
->  static int __init vhost_scsi_init(void)
->  {
-> -	int ret =3D -ENOMEM;
-> +	int ret;
-> =20
->  	pr_debug("TCM_VHOST fabric module %s on %s/%s"
->  		" on "UTS_RELEASE"\n", VHOST_SCSI_VERSION, utsname()->sysname,
-> --=20
-> 2.30.0
->=20
+So, rather than pile on more MSR handling that is at best dubious, and at worst
+broken, I would like to see KVM properly integrate with perf to ensure KVM
+restores the correct, fresh values of all MSRs that are owned by perf.  Or at
+least add something that guarantees that intel_pmu_handle_irq() preserves the
+MSRs.  As is, it's impossible to review these KVM changes without deep, deep
+knowledge of what perf is doing.
 
---O/Mw4/hwfMu4pg68
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAmBBFcoACgkQnKSrs4Gr
-c8gNDQgAxM4D7kpB9RqQmwD/pZXfh57rpPDY0uHmPrBOq7MKsTXUfM1+n3cqcck5
-qp5XiRpnP8mgoJ374YNyayk8ce7uB5z24/A56unCdzgC5cPPPmxvckd7RvG/3aTS
-cKAUbh+I1wNWJCcbzJS/aGI/VOtMRHC3XoWGvXRA8N+FaeCRvyR+I7jyj+iTIeW+
-hZNlQPI5da9WIcsUKyhq3963CdDjCuudTFIQNP8/EhsimQiWgt4DIqc+yJP+H2ny
-Ai1LQxhQskm7QSAnVZz9QhfWdnF5HUK+46Dy0xeO3OzbgeHJBN2y32g1d+5kL1kj
-hL+eyNKX93GZqvoeq8Lh7RVfhQkmFQ==
-=yn4t
------END PGP SIGNATURE-----
-
---O/Mw4/hwfMu4pg68--
-
+https://lkml.kernel.org/r/20210209225653.1393771-1-jmattson@google.com
