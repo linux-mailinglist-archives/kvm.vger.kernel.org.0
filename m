@@ -2,141 +2,153 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EAF1832D77B
-	for <lists+kvm@lfdr.de>; Thu,  4 Mar 2021 17:15:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7646832D7BE
+	for <lists+kvm@lfdr.de>; Thu,  4 Mar 2021 17:27:17 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236119AbhCDQNk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 4 Mar 2021 11:13:40 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56720 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236120AbhCDQNI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 4 Mar 2021 11:13:08 -0500
-Received: from mail-pl1-x62a.google.com (mail-pl1-x62a.google.com [IPv6:2607:f8b0:4864:20::62a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C443DC06175F
-        for <kvm@vger.kernel.org>; Thu,  4 Mar 2021 08:12:27 -0800 (PST)
-Received: by mail-pl1-x62a.google.com with SMTP id a24so16379708plm.11
-        for <kvm@vger.kernel.org>; Thu, 04 Mar 2021 08:12:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to;
-        bh=M0XnnEAqraXAeF4+i+vItLFGXDvAf3tEfz7DahoxJJw=;
-        b=cwCs3pDntYOkJYJ9dj1954BTJbulh/SVFYFy867rYU2YXd3cbO27mWW0JntnQI23Nq
-         YxGLio8waz9UwbuYZfqARkQlev3EDeY7a5Xt6rk3Bb8EXFEMI0vsr6q3ZdM1aHouf5Y5
-         PAAJNi/AZUCMFq0EqWP3LFgS4pxUkkzgic1yK3lRvtFC5bXEUmJmQiyhn/rE5LwrxUm8
-         F2XZEdoREg7bx149EnmQxJuoJJlKwzC5pGLDMFEwHvEj+X+RO2xkat3RK3xjHwFw1j8Z
-         m2cs4uJ4BW9nepnnJB1/6ukkvu4aXNYMCA5aGfFtAnhEBUzlrVAHlygllfp2HhKGDrfT
-         rAnA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=M0XnnEAqraXAeF4+i+vItLFGXDvAf3tEfz7DahoxJJw=;
-        b=MEYYzgteaZJ4Vhx7W9zR/j0fXz4Xt9gd+yxAgvDyNoSfTIWYG5ihvJNYhwKcIiRc2j
-         TlBjsz41KG381lz0bLyTfM1zDLxSrlm2+Y+NV92nrl7kx0oOvwaO9LVZ+be+SdWWyzNP
-         CXg+tEo9vb1YxjbMfwLQA0Iz7H1/BrN/kFscCzKus+3vZgh0x2fE3Rj5s0JZV6hSB+pS
-         3lk5bHEG02+W7KVG05cSWZPKHOClrAyJXzQGZyWkpZUnWb9CQzZ6peSx9yno876rerD6
-         zF0HG3UNjNFJ1VLlxNECCdXIb+rTOYZr7yl0e8Q+gejbNDF+TIOXiLuYTdwLAwmRK6Ry
-         yURA==
-X-Gm-Message-State: AOAM533QO9VIN9hQm5oCnr5AQYwGoF/6hvxbRncFn11AMK/hVWZN5XBb
-        Yz0R5bveUX0DjPhmwuNUFotOBw==
-X-Google-Smtp-Source: ABdhPJypswSWeuvacVV01KINr3t+qwNBGGLALIuoahZrYHJqqwob1SAVeOpezDBWZ9EvmFmAKsHv7w==
-X-Received: by 2002:a17:902:b18c:b029:da:fc41:baf8 with SMTP id s12-20020a170902b18cb02900dafc41baf8mr4653715plr.58.1614874347083;
-        Thu, 04 Mar 2021 08:12:27 -0800 (PST)
-Received: from google.com ([2620:15c:f:10:9857:be95:97a2:e91c])
-        by smtp.gmail.com with ESMTPSA id r15sm28694616pfh.97.2021.03.04.08.12.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 04 Mar 2021 08:12:26 -0800 (PST)
-Date:   Thu, 4 Mar 2021 08:12:19 -0800
-From:   Sean Christopherson <seanjc@google.com>
-To:     "Xu, Like" <like.xu@intel.com>
-Cc:     Peter Zijlstra <peterz@infradead.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Kan Liang <kan.liang@linux.intel.com>,
-        Dave Hansen <dave.hansen@intel.com>, wei.w.wang@intel.com,
-        Borislav Petkov <bp@alien8.de>, kvm@vger.kernel.org,
-        x86@kernel.org, linux-kernel@vger.kernel.org,
-        Like Xu <like.xu@linux.intel.com>
-Subject: Re: [PATCH v3 5/9] KVM: vmx/pmu: Add MSR_ARCH_LBR_DEPTH emulation
- for Arch LBR
-Message-ID: <YEEG48erESM0+3CB@google.com>
-References: <20210303135756.1546253-1-like.xu@linux.intel.com>
- <20210303135756.1546253-6-like.xu@linux.intel.com>
- <YD/APUcINwvP53VZ@google.com>
- <890a6f34-812a-5937-8761-d448a04f67d7@intel.com>
+        id S237515AbhCDQZ4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 4 Mar 2021 11:25:56 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:24438 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S236822AbhCDQZu (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 4 Mar 2021 11:25:50 -0500
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 124GDuCT067189;
+        Thu, 4 Mar 2021 11:25:08 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=zocqs67l/MZY4ZkwtXWxHu4Wqu0Qn3ypuSqnvVRrCtQ=;
+ b=ZiM0NvUXeL3/GTKLGhhXJaacdHt2gUBBFLahcQwDQqrs3pUWO7EvcrnrbYO6haPEGMn8
+ F85DbgDWXxASWYrXIaDBaNuztkkUDcb++noj3PYZaX4p6D9crKxjWFFAfnPYbkEC7ZOk
+ CnOzLG8EBSOUiy6BeZoNuiZGRcR2dpvkBQLjn2pIMv8+eCaF6RlrdD7naQQ6m5dbeHRC
+ 11qbSGU0WfeGp3KNqiPnYqVe6yESMLjxE5heUSOkgZMR+G42aAh/z7qU7ftKLMTzUp6P
+ 4mdKkImWskBM9Na/zPltZGqTBef+mig/1fVoMoMS6id7z0lZrxiTHk1xap8VgX4THw42 1A== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3732vs0qb0-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 04 Mar 2021 11:25:05 -0500
+Received: from m0098413.ppops.net (m0098413.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 124GDw4T067469;
+        Thu, 4 Mar 2021 11:23:17 -0500
+Received: from ppma01wdc.us.ibm.com (fd.55.37a9.ip4.static.sl-reverse.com [169.55.85.253])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3732vs0pfc-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 04 Mar 2021 11:23:17 -0500
+Received: from pps.filterd (ppma01wdc.us.ibm.com [127.0.0.1])
+        by ppma01wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 124GI2RK018473;
+        Thu, 4 Mar 2021 16:22:31 GMT
+Received: from b03cxnp07028.gho.boulder.ibm.com (b03cxnp07028.gho.boulder.ibm.com [9.17.130.15])
+        by ppma01wdc.us.ibm.com with ESMTP id 36ydq9g0fb-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 04 Mar 2021 16:22:31 +0000
+Received: from b03ledav001.gho.boulder.ibm.com (b03ledav001.gho.boulder.ibm.com [9.17.130.232])
+        by b03cxnp07028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 124GMUZP18219434
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 4 Mar 2021 16:22:30 GMT
+Received: from b03ledav001.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id ADE8F6E053;
+        Thu,  4 Mar 2021 16:22:30 +0000 (GMT)
+Received: from b03ledav001.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 1AB4B6E052;
+        Thu,  4 Mar 2021 16:22:29 +0000 (GMT)
+Received: from cpe-66-24-58-13.stny.res.rr.com (unknown [9.85.150.254])
+        by b03ledav001.gho.boulder.ibm.com (Postfix) with ESMTP;
+        Thu,  4 Mar 2021 16:22:28 +0000 (GMT)
+Subject: Re: [PATCH v3 1/1] s390/vfio-ap: fix circular lockdep when
+ setting/clearing crypto masks
+To:     Halil Pasic <pasic@linux.ibm.com>
+Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, stable@vger.kernel.org,
+        borntraeger@de.ibm.com, cohuck@redhat.com, kwankhede@nvidia.com,
+        pbonzini@redhat.com, alex.williamson@redhat.com,
+        pasic@linux.vnet.ibm.com
+References: <20210302204322.24441-1-akrowiak@linux.ibm.com>
+ <20210302204322.24441-2-akrowiak@linux.ibm.com>
+ <20210303162332.4d227dbe.pasic@linux.ibm.com>
+ <e5cc2a81-7273-2b3e-0d4c-c6c17502bdae@linux.ibm.com>
+ <20210303204211.4c021c25.pasic@linux.ibm.com>
+From:   Tony Krowiak <akrowiak@linux.ibm.com>
+Message-ID: <c623c4d6-4cda-9521-ec5e-e4d6fd978a90@linux.ibm.com>
+Date:   Thu, 4 Mar 2021 11:22:28 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+In-Reply-To: <20210303204211.4c021c25.pasic@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <890a6f34-812a-5937-8761-d448a04f67d7@intel.com>
+Content-Language: en-US
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.761
+ definitions=2021-03-04_05:2021-03-03,2021-03-04 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ bulkscore=0 mlxlogscore=999 clxscore=1015 spamscore=0 adultscore=0
+ mlxscore=0 phishscore=0 malwarescore=0 impostorscore=0 suspectscore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2103040076
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Mar 04, 2021, Xu, Like wrote:
-> Hi Sean,
-> 
-> Thanks for your detailed review on the patch set.
-> 
-> On 2021/3/4 0:58, Sean Christopherson wrote:
-> > On Wed, Mar 03, 2021, Like Xu wrote:
-> > > @@ -348,10 +352,26 @@ static bool intel_pmu_handle_lbr_msrs_access(struct kvm_vcpu *vcpu,
-> > >   	return true;
-> > >   }
-> > > +/*
-> > > + * Check if the requested depth values is supported
-> > > + * based on the bits [0:7] of the guest cpuid.1c.eax.
-> > > + */
-> > > +static bool arch_lbr_depth_is_valid(struct kvm_vcpu *vcpu, u64 depth)
-> > > +{
-> > > +	struct kvm_cpuid_entry2 *best;
-> > > +
-> > > +	best = kvm_find_cpuid_entry(vcpu, 0x1c, 0);
-> > > +	if (best && depth && !(depth % 8))
-> > This is still wrong, it fails to weed out depth > 64.
-> 
-> How come ? The testcases depth = {65, 127, 128} get #GP as expected.
 
-@depth is a u64, throw in a number that is a multiple of 8 and >= 520, and the
-"(1ULL << (depth / 8 - 1))" will trigger undefined behavior due to shifting
-beyond the capacity of a ULL / u64.
 
-Adding the "< 64" check would also allow dropping the " & 0xff" since the check
-would ensure the shift doesn't go beyond bit 7.  I'm not sure the cleverness is
-worth shaving a cycle, though.
+On 3/3/21 2:42 PM, Halil Pasic wrote:
+> On Wed, 3 Mar 2021 11:41:22 -0500
+> Tony Krowiak <akrowiak@linux.ibm.com> wrote:
+>
+>>> How do you exect userspace to react to this -ENODEV?
+>> The VFIO_DEVICE_RESET ioctl expects a return code.
+>> The vfio_ap_mdev_reset_queues() function can return -EIO or
+>> -EBUSY, so I would expect userspace to handle -ENODEV
+>> similarly to -EIO or any other non-zero return code. I also
+>> looked at all of the VFIO_DEVICE_RESET calls from QEMU to see
+>> how the return from the ioctl call is handled:
+>>
+>> * ap: reports the reset failed along with the rc
+> And carries on as if nothing happened. There is not much smart
+> userspace can do in such a situation. Therefore the reset really
+> should not fail.
 
-> > Not that this is a hot path, but it's probably worth double checking that the
-> > compiler generates simple code for "depth % 8", e.g. it can be "depth & 7)".
-> 
-> Emm, the "%" operation is quite normal over kernel code.
+Regardless of what we decide to do here, there is the
+possibility that the vfio_ap_mdev_reset_queues()
+function will return an error, so your point is moot
+and maybe should be brought up as a QEMU
+implementation issue. I don't think it is encumbent
+upon the KVM code to anticipate how userspace
+will respond to a non-zero return code. I think the
+pertinent question is what return code makes sense.
+Having said that, I have other concerns which I
+discussed below.
 
-So is "&" :-)  I was just pointing out that the compiler should optimize this,
-and it did.
+>
+> Please note that in this particular case, if the userspace would
+> opt for a retry, we would most likely end up in a retry loop.
+>
+>> * ccw: doesn't check the rc
+>> * pci: kind of hard to follow without digging deep, but definitely
+>>            handles non-zero rc.
+>>
+>> I think the caller should be notified whether the queues were
+>> successfully reset or not, and why; in this case, the answer is
+>> there are no devices to reset.
+> That is the wrong answer. The ioctl is supposed to reset the
+> ap_matrix_mdev device. The ap_matrix_mdev device still exists. Thus
+> returning -ENODEV is bugous.
 
-> if (best && depth && !(depth % 8))
->    10659:       48 85 c0                test   rax,rax
->    1065c:       74 c7                   je     10625 <intel_pmu_set_msr+0x65>
->    1065e:       4d 85 e4                test   r12,r12
->    10661:       74 c2                   je     10625 <intel_pmu_set_msr+0x65>
->    10663:       41 f6 c4 07             test   r12b,0x7
->    10667:       75 bc                   jne    10625 <intel_pmu_set_msr+0x65>
-> 
-> It looks like the compiler does the right thing.
-> Do you see the room for optimization ？
-> 
-> > 
-> > > +		return (best->eax & 0xff) & (1ULL << (depth / 8 - 1));
+That makes sense and it begs the question, what does it mean to
+reset the mdev? Is resetting the queues an appropriate response
+to the VFIO_DEVICE_RESET ioctl call?
 
-Actually, looking at this again, I would explicitly use BIT() instead of 1ULL
-(or BIT_ULL), since the shift must be 7 or less.
+The purpose of the mdev is to supply the AP configuration to a KVM
+guest. The queues themselves belong to the guest. If the guest enables
+interrupts for a queue and vfio_ap does a reset in response to the ioctl
+call, then the guest will be sitting there waiting for interrupts which
+have been disabled by the reset. It seems that as long as a guest is
+using the mdev, then management of its queues (i.e., reset) should be
+left to the guest. Unless there is something to reset as far as the
+mdev is concerned, maybe the response to the VFIO_RESET_DEVICE
+ioctl ought to be a NOP regardless of the value of ->kvm.
 
-> > > +
-> > > +	return false;
-> > > +}
-> > > +
-> 
+>
+> Regards,
+> Halil
+
