@@ -2,93 +2,101 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BBB0732CEE8
-	for <lists+kvm@lfdr.de>; Thu,  4 Mar 2021 09:56:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 76A8B32CF22
+	for <lists+kvm@lfdr.de>; Thu,  4 Mar 2021 10:01:00 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236937AbhCDIyY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 4 Mar 2021 03:54:24 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46888 "EHLO
+        id S237187AbhCDI7O (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 4 Mar 2021 03:59:14 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47932 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236904AbhCDIxy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 4 Mar 2021 03:53:54 -0500
-Received: from mail-qk1-x735.google.com (mail-qk1-x735.google.com [IPv6:2607:f8b0:4864:20::735])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B6657C061574;
-        Thu,  4 Mar 2021 00:53:13 -0800 (PST)
-Received: by mail-qk1-x735.google.com with SMTP id l132so25784951qke.7;
-        Thu, 04 Mar 2021 00:53:13 -0800 (PST)
+        with ESMTP id S237143AbhCDI6y (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 4 Mar 2021 03:58:54 -0500
+Received: from mail-ed1-x52a.google.com (mail-ed1-x52a.google.com [IPv6:2a00:1450:4864:20::52a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8ED4FC06175F
+        for <kvm@vger.kernel.org>; Thu,  4 Mar 2021 00:58:39 -0800 (PST)
+Received: by mail-ed1-x52a.google.com with SMTP id t1so3761153eds.7
+        for <kvm@vger.kernel.org>; Thu, 04 Mar 2021 00:58:39 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=7yRX9wnbaqglQOqo35jp40oCDrn05rlNxnwnL03DlpE=;
-        b=KZp4VpCLyjq4r7v+f3wf3DEJwmNX69ZdxRoq/N35GcQfqmjHiarec+NRj7KIldoeDn
-         pZbEMbqOFxiQNvPhJdL/up4J+DHXdVPtN8l6ev1aGrjKVWrHdVUiyQ3Ne3+oN+ssrls6
-         LxnEGJ3S+kkZGcOyVXuepIbNqb1RPDtwc1GiQwhln41uDV1zNmeLCoGVCz1Zou/rv8Km
-         3zoPGw9sfJxB/GP+6HeJLHc7ZL8k/473wsXPli2Df4HTj+afRv1U+MNTSquDZmTG4vZZ
-         1GO0fzGBFPwvgzS1jPRN+1sMTk1UKbe7A2bA5z1ZcNiHFJUYu/I4XRGD4g+xai+Z2UfJ
-         P1BA==
+        d=bytedance-com.20150623.gappssmtp.com; s=20150623;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=WcsXXXbrDSVn9JnL1kI4tSiyWOxm9D+WqcuRuZ8ZPPY=;
+        b=SgIJQX+v/dAp6zKtCoUdKvxd747j/oIsOOlWt3BXoINpvb8gM2GUvlCR5DCRqwiLzx
+         qanElF3lR5Fr1/bcxvlAMjAdzVuPop19Ck5lylT/XrIhZ3r2rle5OmJX8PxYEU9XKxuu
+         Iw6L1WE502mtn0lYP9httAirkVvwVutnvdqLR0+0sBBVZsjZd2vA/zVcYpTZI5p/MXAR
+         +tsVCNpQxU53RtJ4KyP79ztx2eVInM9T5VemFzBVpaRDtn5ogkX3Y6iMsEL6on25AwGM
+         QzTayVrZ5DCL6nhyaK0As2yq9bQ2XY7aGG4uM3iZbe2E67jW4p4yj4D7UlTLfDhQXcNl
+         Au8A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
-         :references:mime-version:content-disposition:in-reply-to;
-        bh=7yRX9wnbaqglQOqo35jp40oCDrn05rlNxnwnL03DlpE=;
-        b=BrsrX6sXJT4Igv+0Dy4ru0hFWHRrHKS8s1CqYahfpFjv50gCTHtU17o+rIa93aOkKx
-         apfyuIMozmBdxcHZbCuU68GxH19Ns2AT31X2qK371pUoNR9V3wA7I7d4echRLgVVhqI1
-         TD8vctw2hQSAd6qcgU46GV4l4AZ08M/H86Dvi6FJQcfsF45PJYWkT1f8dDk+W5obDj8R
-         V0cs3B9puM29cVdw3MXMzuSoxX/wdLRwMF/NLA/imzA0v2vkStX/SDnOIcMAAR0VuRbA
-         gldMY/GE59QROPINJ/dV5d6DJSmFw0qfjVIltjjDaf5MHM+eDgTO3DG/Ps/GD7h8m37i
-         PYcA==
-X-Gm-Message-State: AOAM530UPQMHNuz4/4GaSR/srqejclm9+kxQnQTIOLlQEjWRd40f5e67
-        Le6felvS1iyGBxjTUCtXlAs=
-X-Google-Smtp-Source: ABdhPJxjxqpmSS1hWEgEm4NSaHKWX/oNGl1qgvhGmr20OkNkRZoYpCeiWyVlFdEF31Z6wDbKA53ELg==
-X-Received: by 2002:ae9:eb8a:: with SMTP id b132mr2828097qkg.296.1614847992933;
-        Thu, 04 Mar 2021 00:53:12 -0800 (PST)
-Received: from localhost (2603-7000-9602-8233-06d4-c4ff-fe48-9d05.res6.spectrum.com. [2603:7000:9602:8233:6d4:c4ff:fe48:9d05])
-        by smtp.gmail.com with ESMTPSA id v145sm19926066qka.27.2021.03.04.00.53.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 04 Mar 2021 00:53:12 -0800 (PST)
-Sender: Tejun Heo <htejun@gmail.com>
-Date:   Thu, 4 Mar 2021 03:53:11 -0500
-From:   Tejun Heo <tj@kernel.org>
-To:     Vipin Sharma <vipinsh@google.com>
-Cc:     mkoutny@suse.com, rdunlap@infradead.org, thomas.lendacky@amd.com,
-        brijesh.singh@amd.com, jon.grimm@amd.com, eric.vantassell@amd.com,
-        pbonzini@redhat.com, hannes@cmpxchg.org, frankja@linux.ibm.com,
-        borntraeger@de.ibm.com, corbet@lwn.net, seanjc@google.com,
-        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
-        joro@8bytes.org, tglx@linutronix.de, mingo@redhat.com,
-        bp@alien8.de, hpa@zytor.com, gingell@google.com,
-        rientjes@google.com, dionnaglaze@google.com, kvm@vger.kernel.org,
-        x86@kernel.org, cgroups@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [RFC v2 1/2] cgroup: sev: Add misc cgroup controller
-Message-ID: <YECf9yxMMAztYEH4@slm.duckdns.org>
-References: <20210302081705.1990283-1-vipinsh@google.com>
- <20210302081705.1990283-2-vipinsh@google.com>
- <YD+ubbB4Tz0ZlVvp@slm.duckdns.org>
- <YEB6ULUgbf+s8ydd@google.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=WcsXXXbrDSVn9JnL1kI4tSiyWOxm9D+WqcuRuZ8ZPPY=;
+        b=sJ3rIdN5lGlw1+J0HSLZeiBd/oXTUUrg7qyRgIf6aosZO1Bt/Fv8lLiJTqsvqjqklx
+         IK3H3FXoVldhexU3BVq74qmdcMktlw7ZZ6014ecVof3p3beF6LEH7xv/LCJzhWH31pH+
+         rrIFZd/SxCtVdToK3lZPSwiVNqYEubZKE+y/LeoUz8xmRMgC4tlKEs9zeCOu1NR+Tolq
+         4gYUBfTEe539lIYoFqUNSc5wvKu40bgZoZ8s50cPvMQM3i2VNvOVMdIE6ATlH8M97gwS
+         Z3bIP2Lc87SpkWlntp7YUFXdhalPJu7UprAbCC+7u4f+IBEvMh5jj1O8Zq6gzWZ7CtpQ
+         mKpA==
+X-Gm-Message-State: AOAM532g4iZA1v0ms7tKc2CSbbu6jIAIPzJgn3UspLifu+LFQZravL51
+        2eEj1Ymu2znM7uw8ZKRrDUwjco55q7+iso4uRmHW
+X-Google-Smtp-Source: ABdhPJz1yhS4bpogbrj7802vVThEsweuzWygoO16SS4Sm5PZ+sHcuk5hH2T4ZXUpPr/tI/5DOjViugXNCjqXBngk2S0=
+X-Received: by 2002:a05:6402:6ca:: with SMTP id n10mr3201074edy.312.1614848318350;
+ Thu, 04 Mar 2021 00:58:38 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YEB6ULUgbf+s8ydd@google.com>
+References: <20210223115048.435-1-xieyongji@bytedance.com> <20210223115048.435-11-xieyongji@bytedance.com>
+ <d63e4cfd-4992-8493-32b0-18e0478f6e1a@redhat.com>
+In-Reply-To: <d63e4cfd-4992-8493-32b0-18e0478f6e1a@redhat.com>
+From:   Yongji Xie <xieyongji@bytedance.com>
+Date:   Thu, 4 Mar 2021 16:58:27 +0800
+Message-ID: <CACycT3tqM=ALOG1r0Ve6UTGmwJ7Wg7fQpLZypjZsJF1mJ+adMA@mail.gmail.com>
+Subject: Re: Re: [RFC v4 10/11] vduse: Introduce a workqueue for irq injection
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        Parav Pandit <parav@nvidia.com>, Bob Liu <bob.liu@oracle.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Matthew Wilcox <willy@infradead.org>, viro@zeniv.linux.org.uk,
+        Jens Axboe <axboe@kernel.dk>, bcrl@kvack.org,
+        Jonathan Corbet <corbet@lwn.net>,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        kvm@vger.kernel.org, linux-aio@kvack.org,
+        linux-fsdevel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hello,
+On Thu, Mar 4, 2021 at 2:59 PM Jason Wang <jasowang@redhat.com> wrote:
+>
+>
+> On 2021/2/23 7:50 =E4=B8=8B=E5=8D=88, Xie Yongji wrote:
+> > This patch introduces a workqueue to support injecting
+> > virtqueue's interrupt asynchronously. This is mainly
+> > for performance considerations which makes sure the push()
+> > and pop() for used vring can be asynchronous.
+>
+>
+> Do you have pref numbers for this patch?
+>
 
-On Wed, Mar 03, 2021 at 10:12:32PM -0800, Vipin Sharma wrote:
-> Right now there is no API for the caller to know total usage, unless they
-> keep their own tally, I was thinking it will be useful to add one more API
-> 
-> unsigned long misc_cg_res_total_usage(enum misc_res_type type)
-> 
-> It will return root_cg usage for "type" resource.
-> Will it be fine?
+No, I can do some tests for it if needed.
 
-Yeah, that sounds fine.
+Another problem is the VIRTIO_RING_F_EVENT_IDX feature will be useless
+if we call irq callback in ioctl context. Something like:
 
-Thanks.
+virtqueue_push();
+virtio_notify();
+    ioctl()
+-------------------------------------------------
+        irq_cb()
+            virtqueue_get_buf()
 
--- 
-tejun
+The used vring is always empty each time we call virtqueue_push() in
+userspace. Not sure if it is what we expected.
+
+Thanks,
+Yongji
