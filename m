@@ -2,117 +2,158 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 815F232CC7D
-	for <lists+kvm@lfdr.de>; Thu,  4 Mar 2021 07:16:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 871B432CC49
+	for <lists+kvm@lfdr.de>; Thu,  4 Mar 2021 07:02:03 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234527AbhCDGNp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 4 Mar 2021 01:13:45 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40594 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234525AbhCDGNT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 4 Mar 2021 01:13:19 -0500
-Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E21BAC06175F
-        for <kvm@vger.kernel.org>; Wed,  3 Mar 2021 22:12:38 -0800 (PST)
-Received: by mail-pj1-x1032.google.com with SMTP id u12so6131776pjr.2
-        for <kvm@vger.kernel.org>; Wed, 03 Mar 2021 22:12:38 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=wrRdPDPB3VCRpfnlU4rkj1XLWJk4+xODxpIbuwpHG+Y=;
-        b=Mym+BpeRKl4ppls7nPY+P84Wq2Ud/GZk6tA0DczxIwInISgM7CE1f2mF7YJfODiqK4
-         XH3AcCKqc8EP1qDxSnxZfc3OaZgrLZjYhMxoQGdzAX9eRqIwn5TrLUe3aVvj1+95nlc4
-         t+mWhOGTQervTzGSIfWDK0WpFFPiX1V/GhAgaMZQciXUpe3mRBZ2L2WcSt9gj0fbV+Nn
-         ADWTRRnbMc4R+ee4X2l6udt04Tmxxf/PoypVtrzbHnC99T6/ZF3jFsQeGHxoRLFcd6su
-         kjOdjT8wTHO84LDxBLDEo2trTu7feZ3mQESF3hDu+dWyyHlkU3nAlu8jZB26xsWoMJwP
-         Iv9w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=wrRdPDPB3VCRpfnlU4rkj1XLWJk4+xODxpIbuwpHG+Y=;
-        b=pukbbS5+iAskI30vJav1zlPmkNGn9yA5zPV1MGd3qOO5EXGLjXPevwmt8/WwhcZcdU
-         E/n46F7kJOcQrhBkHB9i5PT6A0ByvCPfQc+8NZLtD8XWSt+DdwgpQ2/EJSYfONOiIV6n
-         yHr4ZcZ5mnEXPiOSC1hrBpEaX/IWx53GKpyrLLVhjDDBQRis5tNfptkuMV6zJ+/tUZOp
-         emRAlexkddtt1Zqac+OSUX0WVEQgF2qisJkyGZuwqtmUiYFe6Xxcq2Y9jtIk4MJglYn7
-         KuzMKYkcrkaifUwEUKtpWxUc1zklcCrG97V+hkg8WVlBg8TOQ5BfSwKZVa36xxqWTwFH
-         lECw==
-X-Gm-Message-State: AOAM5301SksBG5ymNfThyhpx2sg1olyuPh4f9ac8DA3Hwnzj3FYRKyVZ
-        CRnqfx/t8qimZzrZ0+atLFALWw==
-X-Google-Smtp-Source: ABdhPJxoQ4XeAYEroSjRKIe3ajdC9MLdtC450rboK3p9g++hxKRkIyYCXNH35Jr8sb3SlgtDgBGI+w==
-X-Received: by 2002:a17:90a:31cf:: with SMTP id j15mr2749433pjf.41.1614838358171;
-        Wed, 03 Mar 2021 22:12:38 -0800 (PST)
-Received: from google.com ([2620:0:1008:10:5ddf:a7e:5239:ef47])
-        by smtp.gmail.com with ESMTPSA id e1sm8477557pjt.10.2021.03.03.22.12.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 03 Mar 2021 22:12:37 -0800 (PST)
-Date:   Wed, 3 Mar 2021 22:12:32 -0800
-From:   Vipin Sharma <vipinsh@google.com>
-To:     Tejun Heo <tj@kernel.org>
-Cc:     mkoutny@suse.com, rdunlap@infradead.org, thomas.lendacky@amd.com,
-        brijesh.singh@amd.com, jon.grimm@amd.com, eric.vantassell@amd.com,
-        pbonzini@redhat.com, hannes@cmpxchg.org, frankja@linux.ibm.com,
-        borntraeger@de.ibm.com, corbet@lwn.net, seanjc@google.com,
-        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
-        joro@8bytes.org, tglx@linutronix.de, mingo@redhat.com,
-        bp@alien8.de, hpa@zytor.com, gingell@google.com,
-        rientjes@google.com, dionnaglaze@google.com, kvm@vger.kernel.org,
-        x86@kernel.org, cgroups@vger.kernel.org, linux-doc@vger.kernel.org,
+        id S233892AbhCDGB3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 4 Mar 2021 01:01:29 -0500
+Received: from mga11.intel.com ([192.55.52.93]:11330 "EHLO mga11.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S233606AbhCDGBF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 4 Mar 2021 01:01:05 -0500
+IronPort-SDR: kYnNXkR/YbRNwepgmwRVMvR95FPdmoaH90bs5i3KsGXF/DCjli98gr6SuOW1igAqLTXcnqZNBq
+ hV3Efg036Nzw==
+X-IronPort-AV: E=McAfee;i="6000,8403,9912"; a="183971516"
+X-IronPort-AV: E=Sophos;i="5.81,222,1610438400"; 
+   d="scan'208";a="183971516"
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Mar 2021 22:00:25 -0800
+IronPort-SDR: uVzITc5gF9aR0GdLU4nZWB257d8WTncstF3Ig+P8Va4fgOc2zUi/bZa59cNpxYifGn77db6CB5
+ zxZ9M93OvP2Q==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.81,221,1610438400"; 
+   d="scan'208";a="367876364"
+Received: from local-michael-cet-test.sh.intel.com (HELO localhost) ([10.239.159.166])
+  by orsmga003.jf.intel.com with ESMTP; 03 Mar 2021 22:00:23 -0800
+Date:   Thu, 4 Mar 2021 14:13:08 +0800
+From:   Yang Weijiang <weijiang.yang@intel.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Yang Weijiang <weijiang.yang@intel.com>, seanjc@google.com,
+        vkuznets@redhat.com, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: Re: [RFC v2 1/2] cgroup: sev: Add misc cgroup controller
-Message-ID: <YEB6ULUgbf+s8ydd@google.com>
-References: <20210302081705.1990283-1-vipinsh@google.com>
- <20210302081705.1990283-2-vipinsh@google.com>
- <YD+ubbB4Tz0ZlVvp@slm.duckdns.org>
+Subject: Re: [PATCH v3] KVM: nVMX: Sync L2 guest CET states between L1/L2
+Message-ID: <20210304061308.GB11421@local-michael-cet-test.sh.intel.com>
+References: <20210303060435.8158-1-weijiang.yang@intel.com>
+ <20210303060435.8158-2-weijiang.yang@intel.com>
+ <073a7e70-33a0-4ce4-9e15-77c4e13e2af3@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <YD+ubbB4Tz0ZlVvp@slm.duckdns.org>
+In-Reply-To: <073a7e70-33a0-4ce4-9e15-77c4e13e2af3@redhat.com>
+User-Agent: Mutt/1.11.3 (2019-02-01)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Mar 03, 2021 at 10:42:37AM -0500, Tejun Heo wrote:
-> > +	atomic_t usage;
-> > +};
+On Wed, Mar 03, 2021 at 01:24:07PM +0100, Paolo Bonzini wrote:
+> On 03/03/21 07:04, Yang Weijiang wrote:
+> > These fields are rarely updated by L1 QEMU/KVM, sync them when L1 is trying to
+> > read/write them and after they're changed. If CET guest entry-load bit is not
+> > set by L1 guest, migrate them to L2 manaully.
+> > 
+> > Suggested-by: Sean Christopherson <seanjc@google.com>
+> > Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
 > 
-> Can we do 64bits so that something which counts memory can use this too?
-> 
-Sure.
+> Hi Weijiang, can you post the complete series again?  Thanks!
 
+Sure, sent v3 version to include all the patches. Thanks!
+
+> 
+> Paolo
+> 
+> > ---
+> >   arch/x86/kvm/cpuid.c      |  1 -
+> >   arch/x86/kvm/vmx/nested.c | 30 ++++++++++++++++++++++++++++++
+> >   arch/x86/kvm/vmx/vmx.h    |  3 +++
+> >   3 files changed, 33 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+> > index d191de769093..8692f53b8cd0 100644
+> > --- a/arch/x86/kvm/cpuid.c
+> > +++ b/arch/x86/kvm/cpuid.c
+> > @@ -143,7 +143,6 @@ void kvm_update_cpuid_runtime(struct kvm_vcpu *vcpu)
+> >   		}
+> >   		vcpu->arch.guest_supported_xss =
+> >   			(((u64)best->edx << 32) | best->ecx) & supported_xss;
+> > -
+> >   	} else {
+> >   		vcpu->arch.guest_supported_xss = 0;
+> >   	}
+> > diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+> > index 9728efd529a1..24cace55e1f9 100644
+> > --- a/arch/x86/kvm/vmx/nested.c
+> > +++ b/arch/x86/kvm/vmx/nested.c
+> > @@ -2516,6 +2516,13 @@ static void prepare_vmcs02_rare(struct vcpu_vmx *vmx, struct vmcs12 *vmcs12)
+> >   	vmcs_write32(VM_ENTRY_MSR_LOAD_COUNT, vmx->msr_autoload.guest.nr);
+> >   	set_cr4_guest_host_mask(vmx);
 > > +
-> > +		if (usage > capacity)
-> > +			return -EBUSY;
-> 
-> I'd rather go with allowing bringing down capacity below usage so that the
-> users can set it to a lower value to drain existing usages while denying new
-> ones. It's not like it's difficult to check the current total usage from the
-> caller side, so I'm not sure it's very useful to shift the condition check
-> here.
-> 
-
-Okay, I will change the code to set new capacity unconditionally.
-
-Right now there is no API for the caller to know total usage, unless they
-keep their own tally, I was thinking it will be useful to add one more API
-
-unsigned long misc_cg_res_total_usage(enum misc_res_type type)
-
-It will return root_cg usage for "type" resource.
-Will it be fine?
-
-> > +			pr_info("cgroup: charge rejected by misc controller for %s resource in ",
-> > +				misc_res_name[type]);
-> > +			pr_cont_cgroup_path(i->css.cgroup);
-> > +			pr_cont("\n");
-> 
-> Should have commented on this in the priv thread but don't print something
-> on every rejection. This often becomes a nuisance and can make an easy DoS
-> vector at worst. If you wanna do it, print it once per cgroup or sth like
-> that.
-
-I didn't think in that way. Thanks, I will print it once per cgroup.
-
-Thanks
-Vipin
+> > +	if (kvm_cet_supported() && vmx->nested.nested_run_pending &&
+> > +	    (vmcs12->vm_entry_controls & VM_ENTRY_LOAD_CET_STATE)) {
+> > +		vmcs_writel(GUEST_SSP, vmcs12->guest_ssp);
+> > +		vmcs_writel(GUEST_S_CET, vmcs12->guest_s_cet);
+> > +		vmcs_writel(GUEST_INTR_SSP_TABLE, vmcs12->guest_ssp_tbl);
+> > +	}
+> >   }
+> >   /*
+> > @@ -2556,6 +2563,15 @@ static int prepare_vmcs02(struct kvm_vcpu *vcpu, struct vmcs12 *vmcs12,
+> >   	if (kvm_mpx_supported() && (!vmx->nested.nested_run_pending ||
+> >   	    !(vmcs12->vm_entry_controls & VM_ENTRY_LOAD_BNDCFGS)))
+> >   		vmcs_write64(GUEST_BNDCFGS, vmx->nested.vmcs01_guest_bndcfgs);
+> > +
+> > +	if (kvm_cet_supported() && (!vmx->nested.nested_run_pending ||
+> > +	    !(vmcs12->vm_entry_controls & VM_ENTRY_LOAD_CET_STATE))) {
+> > +		vmcs_writel(GUEST_SSP, vmx->nested.vmcs01_guest_ssp);
+> > +		vmcs_writel(GUEST_S_CET, vmx->nested.vmcs01_guest_s_cet);
+> > +		vmcs_writel(GUEST_INTR_SSP_TABLE,
+> > +			    vmx->nested.vmcs01_guest_ssp_tbl);
+> > +	}
+> > +
+> >   	vmx_set_rflags(vcpu, vmcs12->guest_rflags);
+> >   	/* EXCEPTION_BITMAP and CR0_GUEST_HOST_MASK should basically be the
+> > @@ -3375,6 +3391,12 @@ enum nvmx_vmentry_status nested_vmx_enter_non_root_mode(struct kvm_vcpu *vcpu,
+> >   	if (kvm_mpx_supported() &&
+> >   		!(vmcs12->vm_entry_controls & VM_ENTRY_LOAD_BNDCFGS))
+> >   		vmx->nested.vmcs01_guest_bndcfgs = vmcs_read64(GUEST_BNDCFGS);
+> > +	if (kvm_cet_supported() &&
+> > +		!(vmcs12->vm_entry_controls & VM_ENTRY_LOAD_CET_STATE)) {
+> > +		vmx->nested.vmcs01_guest_ssp = vmcs_readl(GUEST_SSP);
+> > +		vmx->nested.vmcs01_guest_s_cet = vmcs_readl(GUEST_S_CET);
+> > +		vmx->nested.vmcs01_guest_ssp_tbl = vmcs_readl(GUEST_INTR_SSP_TABLE);
+> > +	}
+> >   	/*
+> >   	 * Overwrite vmcs01.GUEST_CR3 with L1's CR3 if EPT is disabled *and*
+> > @@ -4001,6 +4023,9 @@ static bool is_vmcs12_ext_field(unsigned long field)
+> >   	case GUEST_IDTR_BASE:
+> >   	case GUEST_PENDING_DBG_EXCEPTIONS:
+> >   	case GUEST_BNDCFGS:
+> > +	case GUEST_SSP:
+> > +	case GUEST_INTR_SSP_TABLE:
+> > +	case GUEST_S_CET:
+> >   		return true;
+> >   	default:
+> >   		break;
+> > @@ -4052,6 +4077,11 @@ static void sync_vmcs02_to_vmcs12_rare(struct kvm_vcpu *vcpu,
+> >   		vmcs_readl(GUEST_PENDING_DBG_EXCEPTIONS);
+> >   	if (kvm_mpx_supported())
+> >   		vmcs12->guest_bndcfgs = vmcs_read64(GUEST_BNDCFGS);
+> > +	if (kvm_cet_supported()) {
+> > +		vmcs12->guest_ssp = vmcs_readl(GUEST_SSP);
+> > +		vmcs12->guest_s_cet = vmcs_readl(GUEST_S_CET);
+> > +		vmcs12->guest_ssp_tbl = vmcs_readl(GUEST_INTR_SSP_TABLE);
+> > +	}
+> >   	vmx->nested.need_sync_vmcs02_to_vmcs12_rare = false;
+> >   }
+> > diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
+> > index 9d3a557949ac..36dc4fdb0909 100644
+> > --- a/arch/x86/kvm/vmx/vmx.h
+> > +++ b/arch/x86/kvm/vmx/vmx.h
+> > @@ -155,6 +155,9 @@ struct nested_vmx {
+> >   	/* to migrate it to L2 if VM_ENTRY_LOAD_DEBUG_CONTROLS is off */
+> >   	u64 vmcs01_debugctl;
+> >   	u64 vmcs01_guest_bndcfgs;
+> > +	u64 vmcs01_guest_ssp;
+> > +	u64 vmcs01_guest_s_cet;
+> > +	u64 vmcs01_guest_ssp_tbl;
+> >   	/* to migrate it to L1 if L2 writes to L1's CR8 directly */
+> >   	int l1_tpr_threshold;
+> > 
