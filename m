@@ -2,109 +2,117 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0591F32CC44
-	for <lists+kvm@lfdr.de>; Thu,  4 Mar 2021 07:00:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 815F232CC7D
+	for <lists+kvm@lfdr.de>; Thu,  4 Mar 2021 07:16:22 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234449AbhCDF7W (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 4 Mar 2021 00:59:22 -0500
-Received: from mga17.intel.com ([192.55.52.151]:21297 "EHLO mga17.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S234473AbhCDF64 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 4 Mar 2021 00:58:56 -0500
-IronPort-SDR: Z1p5Tn5nraeebuC75Eb9NDZmY6fsoLIEY6ZBgEVN8iZOjL0EmrnWRswv+m6zZPWBkb+sAVDdT2
- XcGbxNH7WY2g==
-X-IronPort-AV: E=McAfee;i="6000,8403,9912"; a="167246444"
-X-IronPort-AV: E=Sophos;i="5.81,222,1610438400"; 
-   d="scan'208";a="167246444"
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Mar 2021 21:58:12 -0800
-IronPort-SDR: Nwe/rRRaOBisODDOsXPKZlisjpbHoEK99+qpPu6jkfqQ7F8SCn8eEIlorjhPBz1Bv3x832B8RE
- J67n0ZdmJOAg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.81,221,1610438400"; 
-   d="scan'208";a="400431233"
-Received: from local-michael-cet-test.sh.intel.com (HELO localhost) ([10.239.159.166])
-  by fmsmga008.fm.intel.com with ESMTP; 03 Mar 2021 21:58:10 -0800
-Date:   Thu, 4 Mar 2021 14:10:55 +0800
-From:   Yang Weijiang <weijiang.yang@intel.com>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     Yang Weijiang <weijiang.yang@intel.com>, pbonzini@redhat.com,
-        seanjc@google.com, kvm@vger.kernel.org,
+        id S234527AbhCDGNp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 4 Mar 2021 01:13:45 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40594 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234525AbhCDGNT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 4 Mar 2021 01:13:19 -0500
+Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E21BAC06175F
+        for <kvm@vger.kernel.org>; Wed,  3 Mar 2021 22:12:38 -0800 (PST)
+Received: by mail-pj1-x1032.google.com with SMTP id u12so6131776pjr.2
+        for <kvm@vger.kernel.org>; Wed, 03 Mar 2021 22:12:38 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=wrRdPDPB3VCRpfnlU4rkj1XLWJk4+xODxpIbuwpHG+Y=;
+        b=Mym+BpeRKl4ppls7nPY+P84Wq2Ud/GZk6tA0DczxIwInISgM7CE1f2mF7YJfODiqK4
+         XH3AcCKqc8EP1qDxSnxZfc3OaZgrLZjYhMxoQGdzAX9eRqIwn5TrLUe3aVvj1+95nlc4
+         t+mWhOGTQervTzGSIfWDK0WpFFPiX1V/GhAgaMZQciXUpe3mRBZ2L2WcSt9gj0fbV+Nn
+         ADWTRRnbMc4R+ee4X2l6udt04Tmxxf/PoypVtrzbHnC99T6/ZF3jFsQeGHxoRLFcd6su
+         kjOdjT8wTHO84LDxBLDEo2trTu7feZ3mQESF3hDu+dWyyHlkU3nAlu8jZB26xsWoMJwP
+         Iv9w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=wrRdPDPB3VCRpfnlU4rkj1XLWJk4+xODxpIbuwpHG+Y=;
+        b=pukbbS5+iAskI30vJav1zlPmkNGn9yA5zPV1MGd3qOO5EXGLjXPevwmt8/WwhcZcdU
+         E/n46F7kJOcQrhBkHB9i5PT6A0ByvCPfQc+8NZLtD8XWSt+DdwgpQ2/EJSYfONOiIV6n
+         yHr4ZcZ5mnEXPiOSC1hrBpEaX/IWx53GKpyrLLVhjDDBQRis5tNfptkuMV6zJ+/tUZOp
+         emRAlexkddtt1Zqac+OSUX0WVEQgF2qisJkyGZuwqtmUiYFe6Xxcq2Y9jtIk4MJglYn7
+         KuzMKYkcrkaifUwEUKtpWxUc1zklcCrG97V+hkg8WVlBg8TOQ5BfSwKZVa36xxqWTwFH
+         lECw==
+X-Gm-Message-State: AOAM5301SksBG5ymNfThyhpx2sg1olyuPh4f9ac8DA3Hwnzj3FYRKyVZ
+        CRnqfx/t8qimZzrZ0+atLFALWw==
+X-Google-Smtp-Source: ABdhPJxoQ4XeAYEroSjRKIe3ajdC9MLdtC450rboK3p9g++hxKRkIyYCXNH35Jr8sb3SlgtDgBGI+w==
+X-Received: by 2002:a17:90a:31cf:: with SMTP id j15mr2749433pjf.41.1614838358171;
+        Wed, 03 Mar 2021 22:12:38 -0800 (PST)
+Received: from google.com ([2620:0:1008:10:5ddf:a7e:5239:ef47])
+        by smtp.gmail.com with ESMTPSA id e1sm8477557pjt.10.2021.03.03.22.12.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 03 Mar 2021 22:12:37 -0800 (PST)
+Date:   Wed, 3 Mar 2021 22:12:32 -0800
+From:   Vipin Sharma <vipinsh@google.com>
+To:     Tejun Heo <tj@kernel.org>
+Cc:     mkoutny@suse.com, rdunlap@infradead.org, thomas.lendacky@amd.com,
+        brijesh.singh@amd.com, jon.grimm@amd.com, eric.vantassell@amd.com,
+        pbonzini@redhat.com, hannes@cmpxchg.org, frankja@linux.ibm.com,
+        borntraeger@de.ibm.com, corbet@lwn.net, seanjc@google.com,
+        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
+        joro@8bytes.org, tglx@linutronix.de, mingo@redhat.com,
+        bp@alien8.de, hpa@zytor.com, gingell@google.com,
+        rientjes@google.com, dionnaglaze@google.com, kvm@vger.kernel.org,
+        x86@kernel.org, cgroups@vger.kernel.org, linux-doc@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] KVM: nVMX: Add CET entry/exit load bits to evmcs
- unsupported list
-Message-ID: <20210304061055.GA11421@local-michael-cet-test.sh.intel.com>
-References: <20210303060435.8158-1-weijiang.yang@intel.com>
- <87h7lsefyv.fsf@vitty.brq.redhat.com>
+Subject: Re: [RFC v2 1/2] cgroup: sev: Add misc cgroup controller
+Message-ID: <YEB6ULUgbf+s8ydd@google.com>
+References: <20210302081705.1990283-1-vipinsh@google.com>
+ <20210302081705.1990283-2-vipinsh@google.com>
+ <YD+ubbB4Tz0ZlVvp@slm.duckdns.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <87h7lsefyv.fsf@vitty.brq.redhat.com>
-User-Agent: Mutt/1.11.3 (2019-02-01)
+In-Reply-To: <YD+ubbB4Tz0ZlVvp@slm.duckdns.org>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Mar 03, 2021 at 10:36:40AM +0100, Vitaly Kuznetsov wrote:
-> Yang Weijiang <weijiang.yang@intel.com> writes:
+On Wed, Mar 03, 2021 at 10:42:37AM -0500, Tejun Heo wrote:
+> > +	atomic_t usage;
+> > +};
 > 
-> > CET in nested guest over Hyper-V is not supported for now. Relevant
-> > enabling patches will be posted as a separate patch series.
-> >
-> > Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
-> > Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
-> > ---
-> >  arch/x86/kvm/vmx/evmcs.h | 6 ++++--
-> >  1 file changed, 4 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/arch/x86/kvm/vmx/evmcs.h b/arch/x86/kvm/vmx/evmcs.h
-> > index bd41d9462355..25588694eb04 100644
-> > --- a/arch/x86/kvm/vmx/evmcs.h
-> > +++ b/arch/x86/kvm/vmx/evmcs.h
-> > @@ -59,8 +59,10 @@ DECLARE_STATIC_KEY_FALSE(enable_evmcs);
-> >  	 SECONDARY_EXEC_SHADOW_VMCS |					\
-> >  	 SECONDARY_EXEC_TSC_SCALING |					\
-> >  	 SECONDARY_EXEC_PAUSE_LOOP_EXITING)
-> > -#define EVMCS1_UNSUPPORTED_VMEXIT_CTRL (VM_EXIT_LOAD_IA32_PERF_GLOBAL_CTRL)
-> > -#define EVMCS1_UNSUPPORTED_VMENTRY_CTRL (VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL)
-> > +#define EVMCS1_UNSUPPORTED_VMEXIT_CTRL (VM_EXIT_LOAD_IA32_PERF_GLOBAL_CTRL | \
-> > +					VM_EXIT_LOAD_CET_STATE)
-> > +#define EVMCS1_UNSUPPORTED_VMENTRY_CTRL (VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL | \
-> > +					 VM_ENTRY_LOAD_CET_STATE)
-> >  #define EVMCS1_UNSUPPORTED_VMFUNC (VMX_VMFUNC_EPTP_SWITCHING)
-> >  
-> >  #if IS_ENABLED(CONFIG_HYPERV)
+> Can we do 64bits so that something which counts memory can use this too?
 > 
-> This should be enough when we run KVM on Hyper-V using eVMCS, however,
-> it may not suffice when we run Hyper-V on KVM using eVMCS: there's still
-> no corresponding eVMCS fields so CET can't be used. In case Hyper-V is
-> smart enough it won't use the feature, however, it was proven to be 'not
-> very smart' in the past, see nested_evmcs_filter_control_msr(). I'm
-> wondering if we should also do
-> 
-> diff --git a/arch/x86/kvm/vmx/evmcs.c b/arch/x86/kvm/vmx/evmcs.c
-> index 41f24661af04..9f81db51fd8b 100644
-> --- a/arch/x86/kvm/vmx/evmcs.c
-> +++ b/arch/x86/kvm/vmx/evmcs.c
-> @@ -351,11 +351,11 @@ void nested_evmcs_filter_control_msr(u32 msr_index, u64 *pdata)
->         switch (msr_index) {
->         case MSR_IA32_VMX_EXIT_CTLS:
->         case MSR_IA32_VMX_TRUE_EXIT_CTLS:
-> -               ctl_high &= ~VM_EXIT_LOAD_IA32_PERF_GLOBAL_CTRL;
-> +               ctl_high &= ~EVMCS1_UNSUPPORTED_VMEXIT_CTRL;
->                 break;
->         case MSR_IA32_VMX_ENTRY_CTLS:
->         case MSR_IA32_VMX_TRUE_ENTRY_CTLS:
-> -               ctl_high &= ~VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL;
-> +               ctl_high &= ~EVMCS1_UNSUPPORTED_VMENTRY_CTRL;
->                 break;
->         case MSR_IA32_VMX_PROCBASED_CTLS2:
->                 ctl_high &= ~SECONDARY_EXEC_VIRTUALIZE_APIC_ACCESSES;
-> 
-> to be on the safe side.
+Sure.
 
-Yes, it looks good to me, will add it to new patch, thanks!
-
+> > +
+> > +		if (usage > capacity)
+> > +			return -EBUSY;
 > 
-> -- 
-> Vitaly
+> I'd rather go with allowing bringing down capacity below usage so that the
+> users can set it to a lower value to drain existing usages while denying new
+> ones. It's not like it's difficult to check the current total usage from the
+> caller side, so I'm not sure it's very useful to shift the condition check
+> here.
+> 
+
+Okay, I will change the code to set new capacity unconditionally.
+
+Right now there is no API for the caller to know total usage, unless they
+keep their own tally, I was thinking it will be useful to add one more API
+
+unsigned long misc_cg_res_total_usage(enum misc_res_type type)
+
+It will return root_cg usage for "type" resource.
+Will it be fine?
+
+> > +			pr_info("cgroup: charge rejected by misc controller for %s resource in ",
+> > +				misc_res_name[type]);
+> > +			pr_cont_cgroup_path(i->css.cgroup);
+> > +			pr_cont("\n");
+> 
+> Should have commented on this in the priv thread but don't print something
+> on every rejection. This often becomes a nuisance and can make an easy DoS
+> vector at worst. If you wanna do it, print it once per cgroup or sth like
+> that.
+
+I didn't think in that way. Thanks, I will print it once per cgroup.
+
+Thanks
+Vipin
