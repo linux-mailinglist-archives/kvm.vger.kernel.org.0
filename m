@@ -2,173 +2,140 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BF41332D3D2
-	for <lists+kvm@lfdr.de>; Thu,  4 Mar 2021 14:04:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 246BA32D422
+	for <lists+kvm@lfdr.de>; Thu,  4 Mar 2021 14:28:51 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241069AbhCDNDr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 4 Mar 2021 08:03:47 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:11158 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S241029AbhCDND3 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 4 Mar 2021 08:03:29 -0500
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 124CiBGF089450;
-        Thu, 4 Mar 2021 08:02:49 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=X7G/uG3aEbl9jHXVzs22+ZQ+OPpxQ3A3sFa+wT1hZtQ=;
- b=QMn+X7NoJnEbf/QmJVe4gUdecrsAAJ+fYzXgQT0wsfj2id2gpo3hVCkdTqN89Q/S+yIL
- umExCxdR1/p9Kgr2DpY+TYVi33L9ba1x8WqktAg3i+2WDXTF5L3otwU1WuuzZp5otqda
- Nq96+NYicNi476KNeBXgnCC2y0r6zwyvppNmn7qabQqbf6iwNHm3nzFK3HE2Kqn8hFV9
- kcbeoaKj00idIRJyhn0JQia+NXeLehAy+nvUG7NMkzbfxEDsXWC3jMj7fpbxmW1hYCWo
- +hK4qiuBJUrAHGkePTSy4fdlB/fP7ZrKOhv2CBFya+YvnZZBk1SGjQfqqs90UfMH0bNV 9Q== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 372wmrc18m-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 04 Mar 2021 08:02:49 -0500
-Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 124CkbDH098912;
-        Thu, 4 Mar 2021 08:02:48 -0500
-Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 372wmrc16w-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 04 Mar 2021 08:02:48 -0500
-Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
-        by ppma02fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 124ClkAP013654;
-        Thu, 4 Mar 2021 13:02:45 GMT
-Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
-        by ppma02fra.de.ibm.com with ESMTP id 36yj532e91-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 04 Mar 2021 13:02:45 +0000
-Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 124D2SaP38076898
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 4 Mar 2021 13:02:28 GMT
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 1D40C11C04A;
-        Thu,  4 Mar 2021 13:02:43 +0000 (GMT)
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id B755911C058;
-        Thu,  4 Mar 2021 13:02:42 +0000 (GMT)
-Received: from ibm-vm (unknown [9.145.10.194])
-        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu,  4 Mar 2021 13:02:42 +0000 (GMT)
-Date:   Thu, 4 Mar 2021 14:02:14 +0100
-From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
-To:     Janosch Frank <frankja@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        pmorel@linux.ibm.com, david@redhat.com, thuth@redhat.com
-Subject: Re: [kvm-unit-tests PATCH v3 4/7] s390x: Provide preliminary
- backtrace support
-Message-ID: <20210304140214.7ff5eae3@ibm-vm>
-In-Reply-To: <20210222085756.14396-5-frankja@linux.ibm.com>
-References: <20210222085756.14396-1-frankja@linux.ibm.com>
-        <20210222085756.14396-5-frankja@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+        id S241041AbhCDN1r (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 4 Mar 2021 08:27:47 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:43674 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S238063AbhCDN1e (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 4 Mar 2021 08:27:34 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1614864369;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=epVabmFghWRYjAezRywLsA7F665VoAppwPqPKAd51DQ=;
+        b=JPoyeanjHqcVvRt2/EWloUuhJBXTmfQ+b9q02rV2osAmwf0qc6JG8K2lfkC1MByVjYx4/d
+        nkDD4y1XDhL5KbyWWUupWBW3JI7EibDliKwNwnzN1jeh46st64n8jrj/7R+iR671Kh/Ler
+        EWIaEFr2tblpGywZV7q7yVltk0/7d20=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-94-DxVe1JwfOWaj7ph7S9Osew-1; Thu, 04 Mar 2021 08:26:07 -0500
+X-MC-Unique: DxVe1JwfOWaj7ph7S9Osew-1
+Received: by mail-wr1-f70.google.com with SMTP id l10so14402291wry.16
+        for <kvm@vger.kernel.org>; Thu, 04 Mar 2021 05:26:07 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=epVabmFghWRYjAezRywLsA7F665VoAppwPqPKAd51DQ=;
+        b=A4FwsIXoV9n7hv6lrCuayLivFZbR6J4HjZlJTEhI/2HYXxEpltAG+mJ5lMZp+jjro2
+         wRMkwY8X0SbbWROw54PYB5guuhXJ38bzVb1RI9dD7dWxM7ORXvdnxp0RhBuriCAE7QvE
+         RCZveVZ8nJfu/0zxPy0Bb1HJxJShMTbtAtdy7dzUAe2eXq+BXHf3k35W0U9gfv3dM+VX
+         3h0mto5azs7kxbSWmxlgU9Po8uq8Wlca8kJ87ygYomiA1nQODniEoghR934jbugFtUzN
+         X6s8taKLAWRbJHbkU+BRgAVO35oR9rVC8Z5MQKUAMoSKQZXkxbuer0FGWKWssHON3kA+
+         8xWg==
+X-Gm-Message-State: AOAM5316bDsa2eaPismHewq689eZY6FfOvw3lkQGaHwsFsjAHM2R7s5s
+        UuE+v/iWtfbwcKuJwzMyIA38ib8KizhbdB1sGOX/o/ApusW3sn5gM3zQbCme2CKtu+0h6YRDJWl
+        /mLF2hK1LThGq
+X-Received: by 2002:adf:9148:: with SMTP id j66mr4187970wrj.124.1614864366652;
+        Thu, 04 Mar 2021 05:26:06 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJy6E/KhoVFWABDvp7oRh4xY4g/xgOk4pjLukA9kWhjiqDC3l2ucy7xQysr1rX+UMEREr0a4CA==
+X-Received: by 2002:adf:9148:: with SMTP id j66mr4187941wrj.124.1614864366510;
+        Thu, 04 Mar 2021 05:26:06 -0800 (PST)
+Received: from [192.168.1.36] (68.red-83-57-175.dynamicip.rima-tde.net. [83.57.175.68])
+        by smtp.gmail.com with ESMTPSA id g11sm24741248wrw.89.2021.03.04.05.26.04
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 04 Mar 2021 05:26:06 -0800 (PST)
+Subject: Re: [PATCH 04/19] cpu: Croup accelerator-specific fields altogether
+To:     qemu-devel@nongnu.org
+Cc:     Eduardo Habkost <ehabkost@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        Sunil Muthuswamy <sunilmut@microsoft.com>,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        David Gibson <david@gibson.dropbear.id.au>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        kvm@vger.kernel.org, Wenchao Wang <wenchao.wang@intel.com>,
+        Thomas Huth <thuth@redhat.com>,
+        Cameron Esfahani <dirty@apple.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        David Hildenbrand <david@redhat.com>,
+        Roman Bolshakov <r.bolshakov@yadro.com>,
+        Peter Maydell <peter.maydell@linaro.org>,
+        Greg Kurz <groug@kaod.org>, qemu-arm@nongnu.org,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Colin Xu <colin.xu@intel.com>,
+        Claudio Fontana <cfontana@suse.de>, qemu-ppc@nongnu.org,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        qemu-s390x@nongnu.org, haxm-team@intel.com
+References: <20210303182219.1631042-1-philmd@redhat.com>
+ <20210303182219.1631042-5-philmd@redhat.com>
+From:   =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <be8823b0-3d58-e7d1-d2a9-447d78bdb50e@redhat.com>
+Date:   Thu, 4 Mar 2021 14:26:04 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.761
- definitions=2021-03-04_03:2021-03-03,2021-03-04 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
- priorityscore=1501 impostorscore=0 lowpriorityscore=0 suspectscore=0
- mlxlogscore=999 phishscore=0 clxscore=1015 spamscore=0 bulkscore=0
- mlxscore=0 adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2103040059
+In-Reply-To: <20210303182219.1631042-5-philmd@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 22 Feb 2021 03:57:53 -0500
-Janosch Frank <frankja@linux.ibm.com> wrote:
-
-> After the stack changes we can finally use -mbackchain and have a
-> working backtrace.
-> 
-> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-
-Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-
+On 3/3/21 7:22 PM, Philippe Mathieu-Daudé wrote:
+> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 > ---
->  lib/s390x/stack.c | 20 ++++++++++++++------
->  s390x/Makefile    |  1 +
->  s390x/macros.S    |  5 +++++
->  3 files changed, 20 insertions(+), 6 deletions(-)
+>  include/hw/core/cpu.h | 14 ++++++--------
+>  1 file changed, 6 insertions(+), 8 deletions(-)
+
+Typo in patch subject "Group" ;)
+
 > 
-> diff --git a/lib/s390x/stack.c b/lib/s390x/stack.c
-> index 0fcd1afb..4cf80dae 100644
-> --- a/lib/s390x/stack.c
-> +++ b/lib/s390x/stack.c
-> @@ -3,24 +3,32 @@
->   * s390x stack implementation
->   *
->   * Copyright (c) 2017 Red Hat Inc
-> + * Copyright 2021 IBM Corp
->   *
->   * Authors:
->   *  Thomas Huth <thuth@redhat.com>
->   *  David Hildenbrand <david@redhat.com>
-> + *  Janosch Frank <frankja@de.ibm.com>
->   */
->  #include <libcflat.h>
->  #include <stack.h>
-> +#include <asm/arch_def.h>
+> diff --git a/include/hw/core/cpu.h b/include/hw/core/cpu.h
+> index c005d3dc2d8..074199ce73c 100644
+> --- a/include/hw/core/cpu.h
+> +++ b/include/hw/core/cpu.h
+> @@ -393,10 +393,6 @@ struct CPUState {
+>       */
+>      uintptr_t mem_io_pc;
 >  
->  int backtrace_frame(const void *frame, const void **return_addrs,
-> int max_depth) {
-> -	printf("TODO: Implement backtrace_frame(%p, %p, %d)
-> function!\n",
-> -	       frame, return_addrs, max_depth);
-> -	return 0;
-> +	int depth = 0;
-> +	struct stack_frame *stack = (struct stack_frame *)frame;
-> +
-> +	for (depth = 0; stack && depth < max_depth; depth++) {
-> +		return_addrs[depth] = (void *)stack->grs[8];
-> +		stack = stack->back_chain;
-> +	}
-> +
-> +	return depth;
->  }
+> -    int kvm_fd;
+> -    struct KVMState *kvm_state;
+> -    struct kvm_run *kvm_run;
+> -
+>      /* Used for events with 'vcpu' and *without* the 'disabled' properties */
+>      DECLARE_BITMAP(trace_dstate_delayed, CPU_TRACE_DSTATE_MAX_EVENTS);
+>      DECLARE_BITMAP(trace_dstate, CPU_TRACE_DSTATE_MAX_EVENTS);
+> @@ -416,6 +412,12 @@ struct CPUState {
+>      uint32_t can_do_io;
+>      int32_t exception_index;
 >  
->  int backtrace(const void **return_addrs, int max_depth)
->  {
-> -	printf("TODO: Implement backtrace(%p, %d) function!\n",
-> -	       return_addrs, max_depth);
-> -	return 0;
-> +	return backtrace_frame(__builtin_frame_address(0),
-> +			       return_addrs, max_depth);
->  }
-> diff --git a/s390x/Makefile b/s390x/Makefile
-> index f3b0fccf..20bb5683 100644
-> --- a/s390x/Makefile
-> +++ b/s390x/Makefile
-> @@ -39,6 +39,7 @@ CFLAGS += -ffreestanding
->  CFLAGS += -I $(SRCDIR)/lib -I $(SRCDIR)/lib/s390x -I lib
->  CFLAGS += -O2
->  CFLAGS += -march=zEC12
-> +CFLAGS += -mbackchain
->  CFLAGS += -fno-delete-null-pointer-checks
->  LDFLAGS += -nostdlib -Wl,--build-id=none
+> +    /* Accelerator-specific fields. */
+> +    int kvm_fd;
+> +    struct KVMState *kvm_state;
+> +    struct kvm_run *kvm_run;
+> +    struct hax_vcpu_state *hax_vcpu;
+> +    int hvf_fd;
+>      /* shared by kvm, hax and hvf */
+>      bool vcpu_dirty;
 >  
-> diff --git a/s390x/macros.S b/s390x/macros.S
-> index 11f4397a..d4f41ec4 100644
-> --- a/s390x/macros.S
-> +++ b/s390x/macros.S
-> @@ -22,6 +22,11 @@
->  	lgr     %r2, %r15
->  	/* Allocate stack space for called C function, as specified
-> in s390 ELF ABI */ slgfi   %r15, 160
-> +	/*
-> +	 * Save the address of the interrupt stack into the back
-> chain
-> +	 * of the called function.
-> +	 */
-> +	stg     %r2, STACK_FRAME_INT_BACKCHAIN(%r15)
->  	brasl	%r14, \c_func
->  	algfi   %r15, 160
->  	RESTORE_REGS_STACK
+> @@ -426,10 +428,6 @@ struct CPUState {
+>  
+>      bool ignore_memory_transaction_failures;
+>  
+> -    struct hax_vcpu_state *hax_vcpu;
+> -
+> -    int hvf_fd;
+> -
+>      /* track IOMMUs whose translations we've cached in the TCG TLB */
+>      GArray *iommu_notifiers;
+>  };
+> 
 
