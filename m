@@ -2,102 +2,135 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5451A32DF15
-	for <lists+kvm@lfdr.de>; Fri,  5 Mar 2021 02:30:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CD9BA32DF89
+	for <lists+kvm@lfdr.de>; Fri,  5 Mar 2021 03:16:45 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229485AbhCEBaH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 4 Mar 2021 20:30:07 -0500
-Received: from hqnvemgate24.nvidia.com ([216.228.121.143]:18112 "EHLO
-        hqnvemgate24.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229436AbhCEBaH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 4 Mar 2021 20:30:07 -0500
-Received: from hqmail.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate24.nvidia.com (using TLS: TLSv1.2, AES256-SHA)
-        id <B6041899f0000>; Thu, 04 Mar 2021 17:30:07 -0800
-Received: from HQMAIL101.nvidia.com (172.20.187.10) by HQMAIL105.nvidia.com
- (172.20.187.12) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Fri, 5 Mar
- 2021 01:30:06 +0000
-Received: from NAM02-SN1-obe.outbound.protection.outlook.com (104.47.36.52) by
- HQMAIL101.nvidia.com (172.20.187.10) with Microsoft SMTP Server (TLS) id
- 15.0.1497.2 via Frontend Transport; Fri, 5 Mar 2021 01:30:06 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Ac6ihfUy/biuNfmwDjXSVfCvM+Fe8JeYfDTnCl0MZDXL7k8N/WRclG3ImNFBnPJQHMn9ls/r1wn9z8duARBs3KpzA5sSh7v2WLatLQaCw2j3t71z0deeZh4zWRwbSrUh4jiKVfi5lVfKpS4FtpiJoxAU3yM2rmaNwh95d+Yzh8w78+Xjss+wbwvCKfok/IZ3tejJOPl/3wmj0fLGhrI7o1yCxzl4bCt94WmLriiZehE7TQc2BKVJMd5aSeGysk8JB/+4ywoAHso6HMAJeTSJilZ6v48fTIC3ufODN+G10g7EpAUhAlqvX0AWcAtPrUduPnvZ4J3+SSdRRl/Pda2ozw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=R0HnrV8BhKqIOPMc7De7KpT+ejGhNiggopqlkuBAI10=;
- b=KoVBgGRIgD2I5uWLfeXdmP223dKwG/g2f5rhTkXZFmEKP9VP4BfZohXik4wWQ1fN+yGguDJaBJ8oYf4+rGXEeSybNlEyNzr1Uo5XfADvyqednBq91hGfbN15/lcjpheyRnBSFkDU0wJU4oHRVjwhU6VnIhFNLXaLjtm02Q6AtWapnmh7i8Ak1+4SExGPGCOWWng2mBOYfDOqRLcAxrd7WMNW9uj5MftSTH8mVT+5S5xECUQHaf4rWSkwAgJcm4Wfhk5QEq0k+Qi/jPL6knpjhgioDKEXfADYXVtDJncEYPs9TLzicd1XsqjnGR2cIqRj9q3fSsaKj6l/TZxMyIt6Dg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-Received: from DM6PR12MB3834.namprd12.prod.outlook.com (2603:10b6:5:14a::12)
- by DM5PR12MB1244.namprd12.prod.outlook.com (2603:10b6:3:73::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3890.19; Fri, 5 Mar
- 2021 01:30:04 +0000
-Received: from DM6PR12MB3834.namprd12.prod.outlook.com
- ([fe80::1c62:7fa3:617b:ab87]) by DM6PR12MB3834.namprd12.prod.outlook.com
- ([fe80::1c62:7fa3:617b:ab87%6]) with mapi id 15.20.3912.017; Fri, 5 Mar 2021
- 01:30:04 +0000
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Alex Williamson <alex.williamson@redhat.com>, <kvm@vger.kernel.org>
-CC:     Cornelia Huck <cohuck@redhat.com>
-Subject: [PATCH] vfio: Depend on MMU
-Date:   Thu, 4 Mar 2021 21:30:03 -0400
-Message-ID: <0-v1-02cb5500df6e+78-vfio_no_mmu_jgg@nvidia.com>
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain
-X-ClientProxiedBy: BL1PR13CA0117.namprd13.prod.outlook.com
- (2603:10b6:208:2b9::32) To DM6PR12MB3834.namprd12.prod.outlook.com
- (2603:10b6:5:14a::12)
-MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from mlx.ziepe.ca (142.162.115.133) by BL1PR13CA0117.namprd13.prod.outlook.com (2603:10b6:208:2b9::32) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3912.9 via Frontend Transport; Fri, 5 Mar 2021 01:30:04 +0000
-Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1lHzI3-007fZC-7x; Thu, 04 Mar 2021 21:30:03 -0400
-X-Header: ProcessedBy-CMR-outbound
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
-        t=1614907807; bh=94v8CiAQgCxpNFeI1+EuH7XU8W3yryiC8Ef1AwGRROo=;
-        h=ARC-Seal:ARC-Message-Signature:ARC-Authentication-Results:From:To:
-         CC:Subject:Date:Message-ID:Content-Transfer-Encoding:Content-Type:
-         X-ClientProxiedBy:MIME-Version:
-         X-MS-Exchange-MessageSentRepresentingType:X-Header;
-        b=Zn8QLekN6zaKagG1OEf8dAhrc9RkxuyYCuzGE3rmCsaYyGXJXFflymqRb0F6vJ4uD
-         iW4h+QfIJkLm6UNv6qhTZ7zFMHWk3DBcJvTaRLvIMrkeK/1UOjak2Y+L1dB7ijw3y7
-         edNockL5AUvug+rfiMRmLI66XKCqpkrj9C6cSK9wPdlg1aioSADG3s1LdM9E0mAa+z
-         03TgSiAA3+40Z27xfzopFCSN14HyBGIHQBlN8G72WjXSxKPvKeUvJ7MJmhBVgiJNo+
-         L8EgdP8tostP+8q66Z2/0aexKJDlZPQJTHlZMtm0QHvWq11erlrZir10bfMIQd1H/u
-         gE3FMESIJS6Qw==
+        id S229818AbhCECQl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 4 Mar 2021 21:16:41 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46756 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229503AbhCECQl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 4 Mar 2021 21:16:41 -0500
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E1161C061756
+        for <kvm@vger.kernel.org>; Thu,  4 Mar 2021 18:16:40 -0800 (PST)
+Received: by mail-yb1-xb4a.google.com with SMTP id a186so898306ybg.1
+        for <kvm@vger.kernel.org>; Thu, 04 Mar 2021 18:16:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=sender:reply-to:date:message-id:mime-version:subject:from:to:cc;
+        bh=XCuZlcex++tlORTWddHh341Mae7tA0syCjmGbmGPn9g=;
+        b=qWBQmAwlMgMgF4FtEbl6VOjLqoWiCkJFNktt9fpqeco2hKyqjvgv9fgentVlBECwVy
+         qwATzdmr4c7yY4EhBm4HboriqczFqV4Il+hRoYSxJn0FmVuvZUAn8RO/oJCAVx7/MuMs
+         T5bvw+xjZnjoAKG0HwtUzo84urtfEO1d0PNPSqfyenZWbXhLayyU9y9dJ2hhdnTMBKSa
+         BC69jOdx39bVmd4E3TVQodre8QBR0cutRcrNfzOZdZhAfGbyjOMlqBTS8xlj4ZvUyXDB
+         H4hCm/0aM/uWQUlRd9Q3x/qM68r5m5dhxjxPyJXC4UZiGdXF4U7iGeWAAmzbMyCnxyJ8
+         X+Pw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:sender:reply-to:date:message-id:mime-version
+         :subject:from:to:cc;
+        bh=XCuZlcex++tlORTWddHh341Mae7tA0syCjmGbmGPn9g=;
+        b=NvOk2plssF3Ew6lEysYGtpqCOYQrc61YVUyplUmdjgESgIvE3/TCnjnotzw9wL573p
+         BFniQNmTiYY2Ow2kscjJCqcrT5L5Df7dnkFxSVA/vHA4c9s3B6VB9nPVWn3V3NCIGyop
+         fhdtHblzzW4gLcJioIIIBplLbWA6VLUyuPUlavO6Xkv3DAwCuDXi3Z98fO9ey5WdfAKz
+         uOdtzEQnkWU9md+vGoW4QE5u7XaLe0FYWvuk+BAyYojg9+dl69b3Yo6pY1ziA5nwyQJ1
+         YVPUSRdCcKqpxPdS/NlgK/W1ZXAkx58BCzZhIWU5vdfv9AU8a0eHscoen395Mhb47lT+
+         p13w==
+X-Gm-Message-State: AOAM533lBEdx6RJrqyvmys+PSoi4rxXdFut6i69/M8gL5cEJcEIaXTcM
+        FdzHQd/sUOd7NCPr2N3+KvVcsXl+b+A=
+X-Google-Smtp-Source: ABdhPJw6kqqgn6lrO6/hWAaUSPFDGUSNlB+6yvYlFi8u2jKAW9fWp2mYtsqAFS5R4iAcL7UPxV2InPNUHg8=
+Sender: "seanjc via sendgmr" <seanjc@seanjc798194.pdx.corp.google.com>
+X-Received: from seanjc798194.pdx.corp.google.com ([2620:15c:f:10:9857:be95:97a2:e91c])
+ (user=seanjc job=sendgmr) by 2002:a25:9c02:: with SMTP id c2mr9890875ybo.402.1614910600122;
+ Thu, 04 Mar 2021 18:16:40 -0800 (PST)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date:   Thu,  4 Mar 2021 18:16:37 -0800
+Message-Id: <20210305021637.3768573-1-seanjc@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.30.1.766.gb4fecdf3b7-goog
+Subject: [PATCH] KVM: SVM: Connect 'npt' module param to KVM's internal 'npt_enabled'
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-VFIO_IOMMU_TYPE1 does not compile with !MMU:
+Directly connect the 'npt' param to the 'npt_enabled' variable so that
+runtime adjustments to npt_enabled are reflected in sysfs.  Move the
+!PAE restriction to a runtime check to ensure NPT is forced off if the
+host is using 2-level paging, and add a comment explicitly stating why
+NPT requires a 64-bit kernel or a kernel with PAE enabled.
 
-../drivers/vfio/vfio_iommu_type1.c: In function 'follow_fault_pfn':
-../drivers/vfio/vfio_iommu_type1.c:536:22: error: implicit declaration of f=
-unction 'pte_write'; did you mean 'vfs_write'? [-Werror=3Dimplicit-function=
--declaration]
+Opportunistically switch the param to octal permissions.
 
-So require it.
-
-Suggested-by: Cornelia Huck <cohuck@redhat.com>
-Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
+Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- drivers/vfio/Kconfig | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ arch/x86/kvm/svm/svm.c | 27 ++++++++++++++-------------
+ 1 file changed, 14 insertions(+), 13 deletions(-)
 
-diff --git a/drivers/vfio/Kconfig b/drivers/vfio/Kconfig
-index 90c0525b1e0cf4..67d0bf4efa1606 100644
---- a/drivers/vfio/Kconfig
-+++ b/drivers/vfio/Kconfig
-@@ -22,7 +22,7 @@ config VFIO_VIRQFD
- menuconfig VFIO
- 	tristate "VFIO Non-Privileged userspace driver framework"
- 	select IOMMU_API
--	select VFIO_IOMMU_TYPE1 if (X86 || S390 || ARM || ARM64)
-+	select VFIO_IOMMU_TYPE1 if MMU && (X86 || S390 || ARM || ARM64)
- 	help
- 	  VFIO provides a framework for secure userspace device drivers.
- 	  See Documentation/driver-api/vfio.rst for more details.
---=20
-2.30.1
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index 54610270f66a..0ee74321461e 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -115,13 +115,6 @@ static const struct svm_direct_access_msrs {
+ 	{ .index = MSR_INVALID,				.always = false },
+ };
+ 
+-/* enable NPT for AMD64 and X86 with PAE */
+-#if defined(CONFIG_X86_64) || defined(CONFIG_X86_PAE)
+-bool npt_enabled = true;
+-#else
+-bool npt_enabled;
+-#endif
+-
+ /*
+  * These 2 parameters are used to config the controls for Pause-Loop Exiting:
+  * pause_filter_count: On processors that support Pause filtering(indicated
+@@ -170,9 +163,12 @@ module_param(pause_filter_count_shrink, ushort, 0444);
+ static unsigned short pause_filter_count_max = KVM_SVM_DEFAULT_PLE_WINDOW_MAX;
+ module_param(pause_filter_count_max, ushort, 0444);
+ 
+-/* allow nested paging (virtualized MMU) for all guests */
+-static int npt = true;
+-module_param(npt, int, S_IRUGO);
++/*
++ * Use nested page tables by default.  Note, NPT may get forced off by
++ * svm_hardware_setup() if it's unsupported by hardware or the host kernel.
++ */
++bool npt_enabled = true;
++module_param_named(npt, npt_enabled, bool, 0444);
+ 
+ /* allow nested virtualization in KVM/SVM */
+ static int nested = true;
+@@ -988,12 +984,17 @@ static __init int svm_hardware_setup(void)
+ 			goto err;
+ 	}
+ 
++	/*
++	 * KVM's MMU doesn't support using 2-level paging for itself, and thus
++	 * NPT isn't supported if the host is using 2-level paging since host
++	 * CR4 is unchanged on VMRUN.
++	 */
++	if (!IS_ENABLED(CONFIG_X86_64) && !IS_ENABLED(CONFIG_X86_PAE))
++		npt_enabled = false;
++
+ 	if (!boot_cpu_has(X86_FEATURE_NPT))
+ 		npt_enabled = false;
+ 
+-	if (npt_enabled && !npt)
+-		npt_enabled = false;
+-
+ 	kvm_configure_mmu(npt_enabled, get_max_npt_level(), PG_LEVEL_1G);
+ 	pr_info("kvm: Nested Paging %sabled\n", npt_enabled ? "en" : "dis");
+ 
+-- 
+2.30.1.766.gb4fecdf3b7-goog
 
