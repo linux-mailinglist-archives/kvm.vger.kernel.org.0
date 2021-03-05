@@ -2,164 +2,146 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4D87E32DE5D
-	for <lists+kvm@lfdr.de>; Fri,  5 Mar 2021 01:36:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4FD8C32DECF
+	for <lists+kvm@lfdr.de>; Fri,  5 Mar 2021 02:11:07 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231325AbhCEAgq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 4 Mar 2021 19:36:46 -0500
-Received: from hqnvemgate26.nvidia.com ([216.228.121.65]:15873 "EHLO
-        hqnvemgate26.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229465AbhCEAgq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 4 Mar 2021 19:36:46 -0500
-Received: from hqmail.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate26.nvidia.com (using TLS: TLSv1.2, AES256-SHA)
-        id <B60417d1d0003>; Thu, 04 Mar 2021 16:36:45 -0800
-Received: from HQMAIL109.nvidia.com (172.20.187.15) by HQMAIL109.nvidia.com
- (172.20.187.15) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Fri, 5 Mar
- 2021 00:36:45 +0000
-Received: from NAM02-BL2-obe.outbound.protection.outlook.com (104.47.38.58) by
- HQMAIL109.nvidia.com (172.20.187.15) with Microsoft SMTP Server (TLS) id
- 15.0.1497.2 via Frontend Transport; Fri, 5 Mar 2021 00:36:45 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=RGmyDLMTCmyLM7RnVutLJizWiA3Qz6McpKN+g9Ja1FPiUSK5fTKTTvFcVeB57oMUes7fJIFT6wtCbrJLViYnQG9mCDTc7gdvOwPZGNZOk91L3JsCprwYLrRDGx7Y+MU47VhvO4KWYtWXGNkctikVY1HmDmNCZaCX5/PkCKbAjtOFIj+DP2JxMq/t+YQYXIxAcS6ASjKH83jMDcPPNzgfoLqJqIJwRT1GPaVh+p+QwS5PRPL2MfkynupB2KHZVSNybL/Abxs0OzleDm8sqlQQ9XIYGTW7UsIpOSuGQcXVCfWZe9wgbJ96IvzJL44PUzJvHoXnUZNPxKG2XOOfkqvp2A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Vyh9LWTDJIo2GFCbfvqALL248gDhDJRdUGVTiIZxeHw=;
- b=BevzVPaA1KMthBvjGmlDGePxkTObzvsiFBlV89xd2lmmy71luOJaIGRB5VX3vVD8RBRnENGuYM7EcqzWGN/ypqAmV3fkXhvUM7XxFkTjg8PU0jGWf6SrCaWnvHTG85hE8WIuvmgdbmRC9t0YMad7Ziyh4ezKfgId0MxlFhZ8xk8AceKay0I/q+st9GKsLg+QwRmeMR1oE9ronk5t3lmhwEXWevoddfH6WmaitOSYG+zmpMfIWYAs1DYadFvylXj20EvcAqbwExaVQF/ED8yrHy9yBN9p+Zzho3vqvA1Qop71UZFSLLTleHDIiePqxLUZrvUiKkulEyH6ahjXiReCNA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-Received: from DM6PR12MB3834.namprd12.prod.outlook.com (2603:10b6:5:14a::12)
- by DM6PR12MB4266.namprd12.prod.outlook.com (2603:10b6:5:21a::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3890.19; Fri, 5 Mar
- 2021 00:36:43 +0000
-Received: from DM6PR12MB3834.namprd12.prod.outlook.com
- ([fe80::1c62:7fa3:617b:ab87]) by DM6PR12MB3834.namprd12.prod.outlook.com
- ([fe80::1c62:7fa3:617b:ab87%6]) with mapi id 15.20.3912.017; Fri, 5 Mar 2021
- 00:36:43 +0000
-Date:   Thu, 4 Mar 2021 20:36:42 -0400
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Alex Williamson <alex.williamson@redhat.com>
-CC:     <cohuck@redhat.com>, <kvm@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <peterx@redhat.com>
-Subject: Re: [RFC PATCH 05/10] vfio: Create a vfio_device from vma lookup
-Message-ID: <20210305003642.GR4247@nvidia.com>
-References: <161401167013.16443.8389863523766611711.stgit@gimli.home>
- <161401268537.16443.2329805617992345365.stgit@gimli.home>
- <20210222172913.GP4247@nvidia.com>
- <20210224145506.48f6e0b4@omen.home.shazbot.org>
- <20210225000610.GP4247@nvidia.com>
- <20210225152113.3e083b4a@omen.home.shazbot.org>
- <20210225234949.GV4247@nvidia.com>
- <20210304143757.1ca42cfc@omen.home.shazbot.org>
- <20210304231633.GP4247@nvidia.com>
- <20210304170731.72039a23@omen.home.shazbot.org>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20210304170731.72039a23@omen.home.shazbot.org>
-X-ClientProxiedBy: MN2PR16CA0021.namprd16.prod.outlook.com
- (2603:10b6:208:134::34) To DM6PR12MB3834.namprd12.prod.outlook.com
- (2603:10b6:5:14a::12)
-MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from mlx.ziepe.ca (142.162.115.133) by MN2PR16CA0021.namprd16.prod.outlook.com (2603:10b6:208:134::34) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3912.17 via Frontend Transport; Fri, 5 Mar 2021 00:36:43 +0000
-Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1lHySQ-007ZPP-A2; Thu, 04 Mar 2021 20:36:42 -0400
-X-Header: ProcessedBy-CMR-outbound
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
-        t=1614904605; bh=Vyh9LWTDJIo2GFCbfvqALL248gDhDJRdUGVTiIZxeHw=;
-        h=ARC-Seal:ARC-Message-Signature:ARC-Authentication-Results:Date:
-         From:To:CC:Subject:Message-ID:References:Content-Type:
-         Content-Disposition:In-Reply-To:X-ClientProxiedBy:MIME-Version:
-         X-MS-Exchange-MessageSentRepresentingType:X-Header;
-        b=CiJ64o7VuJgoYZdSz1m4Z3eSG1tDZrlhFP2vzTg8mvYGzyoqbEwk6HjS2AwuXsa+l
-         FLHnxAs3vlzW76edJX/P8HByyDr5bUmmxbyw6Ws0uuvy1qTBDzWz8vKrMunCIMPRQr
-         TdcXDYwJ3ZUrNJz0BB7YzqdRt39Pmnh6tpWKbaDepTkC5/wtJYsi3dc/6j3ELvKOkW
-         6pNk6trSgbgVdJoV7pFRQlawfQUYuTf9MW50M0cwIzzeA38+NQFbEElxKEmTAYz7/f
-         nK37j86aWjHO97XxzAqe4Jl7FrDvyQGSathpvkk7PrfnRPynTiKrW2ebINWaGUzFpg
-         d9e64b6JTdzlQ==
+        id S229521AbhCEBLG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 4 Mar 2021 20:11:06 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60816 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229436AbhCEBLF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 4 Mar 2021 20:11:05 -0500
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 91CEAC061574
+        for <kvm@vger.kernel.org>; Thu,  4 Mar 2021 17:11:05 -0800 (PST)
+Received: by mail-yb1-xb4a.google.com with SMTP id a186so712053ybg.1
+        for <kvm@vger.kernel.org>; Thu, 04 Mar 2021 17:11:05 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=sender:reply-to:date:message-id:mime-version:subject:from:to:cc;
+        bh=JQj32MjsoOkFQgAa4dRvlgfsPVUAE2bdIFl0c0to9LI=;
+        b=Ipbo52HC6kb61zCq1TqaOzcodnmP4A3+oLF5d4EY7YdMqapY7cDqY1zMePWCnXEyiK
+         R1+6lFVHDwDin+Y7is5gabYeALsOH8nyaI978z430vam5oafunfX9xUBJK/I0BY0Ml8H
+         aGubULvlQP/z3esxtjOv7LtOBkgXOeZ/abgYi3zTng0Ab+ch+nqauKOXWwWr0dpaDt2T
+         VQPNcL/WK45ZFrIu0uDIgc2zU+bFQtMv+CMTf6kwNbJD4VdM+pjmi0wpn0buHKZL+RDE
+         +76LU02R8rhjccX2ZfbPlIpTselpu5rT4hb3esySS2i8FcwSSFdPPqzmK/CkzmHw/vZy
+         ItiQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:sender:reply-to:date:message-id:mime-version
+         :subject:from:to:cc;
+        bh=JQj32MjsoOkFQgAa4dRvlgfsPVUAE2bdIFl0c0to9LI=;
+        b=OORLiSxM1j6Bxap7QkR+/vQiWRmcDL9yrGiKUlKp/wAbjlbworRL66R+x1BcaORjPq
+         aKi3MnLSof394tnZ7ApzVrInwLWFhkIil5o0kIXYN9vljA7kAIax1ZCxkh+/OX1BJaRz
+         XxSyli/4Cg903I41csKAYi+nM5+qOtQIa2sWoXESEYk72NDq3HmeKnEUuQZ4TguphkEv
+         KIxwEo0tkCASGfF3cgmllK2rqpoEqg0EiKzgH5hjfeSneCI8Om8jcds0yJ8bFbNrqjTa
+         9WFjkFZBfxq1C+TxP0wzQ6O3ULLRbhalnsCA1Pg1ZKkwD8fILNoLsNmhZEsHa7mJzymo
+         U//Q==
+X-Gm-Message-State: AOAM531rGa6GWs9MKei2IeGnkfiub0FjBVn9Q1ARmPfG3ywSrmzM1rZc
+        mNdp7XWrxFf3NGNTxVL9146EsH29SP8=
+X-Google-Smtp-Source: ABdhPJyJ+Bog5SRGTPV/+GyISdqN2oduHDRYE/B34rx/eftGyz66dYWdH1dFwn0T+iZKZykB5xNkjJxYkus=
+Sender: "seanjc via sendgmr" <seanjc@seanjc798194.pdx.corp.google.com>
+X-Received: from seanjc798194.pdx.corp.google.com ([2620:15c:f:10:9857:be95:97a2:e91c])
+ (user=seanjc job=sendgmr) by 2002:a25:40d8:: with SMTP id n207mr10059603yba.3.1614906664878;
+ Thu, 04 Mar 2021 17:11:04 -0800 (PST)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date:   Thu,  4 Mar 2021 17:10:44 -0800
+Message-Id: <20210305011101.3597423-1-seanjc@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.30.1.766.gb4fecdf3b7-goog
+Subject: [PATCH v2 00/17] KVM: x86/mmu: Lots of bug fixes
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Ben Gardon <bgardon@google.com>,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Mar 04, 2021 at 05:07:31PM -0700, Alex Williamson wrote:
-> On Thu, 4 Mar 2021 19:16:33 -0400
-> Jason Gunthorpe <jgg@nvidia.com> wrote:
-> 
-> > On Thu, Mar 04, 2021 at 02:37:57PM -0700, Alex Williamson wrote:
-> > 
-> > > Therefore unless a bus driver opts-out by replacing vm_private_data, we
-> > > can identify participating vmas by the vm_ops and have flags indicating
-> > > if the vma maps device memory such that vfio_get_device_from_vma()
-> > > should produce a device reference.  The vfio IOMMU backends would also
-> > > consume this, ie. if they get a valid vfio_device from the vma, use the
-> > > pfn_base field directly.  vfio_vm_ops would wrap the bus driver
-> > > callbacks and provide reference counting on open/close to release this
-> > > object.  
-> > 
-> > > I'm not thrilled with a vfio_device_ops callback plumbed through
-> > > vfio-core to do vma-to-pfn translation, so I thought this might be a
-> > > better alternative.  Thanks,  
-> > 
-> > Maybe you could explain why, because I'm looking at this idea and
-> > thinking it looks very complicated compared to a simple driver op
-> > callback?
-> 
-> vfio-core needs to export a vfio_vma_to_pfn() which I think assumes the
-> caller has already used vfio_device_get_from_vma(), but should still
-> validate the vma is one from a vfio device before calling this new
-> vfio_device_ops callback.
+Fix nested NPT (nSVM) with 32-bit L1 and SME with shadow paging, which
+are completely broken.  Opportunistically fix theoretical bugs related to
+prematurely reloading/unloading the MMU.
 
-Huh? Validate? Why?
+If nNPT is enabled, L1 can crash the host simply by using 32-bit NPT to
+trigger a null pointer dereference on pae_root.
 
-Something like this in the IOMMU stuff:
+SME with shadow paging (including nNPT) fails to set the C-bit in the
+shadow pages that don't go through standard MMU flows (PDPTPRs and the
+PML4 used by nNPT to shadow legacy NPT).  It also failes to account for
+CR3[63:32], and thus the C-bit, being ignored outside of 64-bit mode.
 
-   struct vfio_device *vfio = vfio_device_get_from_vma(vma)
+Patches 01 and 02 fix the null pointer bugs.
 
-   if (!vfio->vma_to_pfn)
-        return -EINVAL;
-   vfio->ops->vma_to_pfn(vfio, vma, offset_from_vma_start)
+Patches 03-09 fix mostly-benign related memory leaks.
 
-Is fine, why do we need to over complicate?
+Patches 10-12 fix the SME shadow paging bugs, which are also what led me to
+the nNPT null pointer bugs.
 
-I don't need to check that the vma belongs to the vfio because it is
-the API contract that the caller will guarantee that.
+Patches 13 and 14 fix theoretical bugs with PTP_SWITCH and INVPCID that
+I found when auditing flows that touch the MMU context.
 
-This is the kernel, I can (and do!) check these sorts of things by
-code inspection when working on stuff - I can look at every
-implementation and every call site to prove these things.
+Patches 14-17 do additional clean up to hopefully make it harder to
+introduce bugs in the future.
 
-IMHO doing an expensive check like that is a style of defensive
-programming the kernel community frowns upon.
+On the plus side, I finally understand why KVM supports shadowing 2-level
+page tables with 4-level page tables...
 
-> vfio-pci needs to validate the vm_pgoff value falls within a BAR
-> region, mask off the index and get the pci_resource_start() for the
-> BAR index.
+Based on kvm/queue, commit fe5f0041c026 ("KVM/SVM: Move vmenter.S exception
+fixups out of line").  The null pointer fixes cherry-pick cleanly onto
+kvm/master, haven't tried the other bug fixes (I doubt they're worth
+backporting even though I tagged 'em with stable).
 
-It needs to do the same thing fault() already does, which is currently
-one line..
+v2:
+  - Collect a review from Ben (did not include his review of patch 03
+    since the patch and its direct dependencies were changed).
+  - Move pae_root and lm_root allocation to a separate helper to avoid
+    sleeping via get_zeroed_page() while holding mmu_lock.
+  - Add a patch to grab 'mmu' in a local variable.
+  - Remove the BUILD_BUG_ON() in make_mmu_pages_available() since the
+    final check wouldn't actually guarnatee 4 pages were "available".
+    Instead, add a comment about the limit being soft.
 
-> Then we need a solution for how vfio_device_get_from_vma() determines
-> whether to grant a device reference for a given vma, where that vma may
-> map something other than device memory. Are you imagining that we hand
-> out device references independently and vfio_vma_to_pfn() would return
-> an errno for vm_pgoff values that don't map device memory and the IOMMU
-> driver would release the reference?
+v1:
+  - https://lkml.kernel.org/r/20210302184540.2829328-1-seanjc@google.com
+ 
+Sean Christopherson (17):
+  KVM: nSVM: Set the shadow root level to the TDP level for nested NPT
+  KVM: x86/mmu: Alloc page for PDPTEs when shadowing 32-bit NPT with
+    64-bit
+  KVM: x86/mmu: Capture 'mmu' in a local variable when allocating roots
+  KVM: x86/mmu: Allocate the lm_root before allocating PAE roots
+  KVM: x86/mmu: Allocate pae_root and lm_root pages in dedicated helper
+  KVM: x86/mmu: Ensure MMU pages are available when allocating roots
+  KVM: x86/mmu: Check PDPTRs before allocating PAE roots
+  KVM: x86/mmu: Fix and unconditionally enable WARNs to detect PAE leaks
+  KVM: x86/mmu: Use '0' as the one and only value for an invalid PAE
+    root
+  KVM: x86/mmu: Set the C-bit in the PDPTRs and LM pseudo-PDPTRs
+  KVM: x86/mmu: Mark the PAE roots as decrypted for shadow paging
+  KVM: SVM: Don't strip the C-bit from CR2 on #PF interception
+  KVM: nVMX: Defer the MMU reload to the normal path on an EPTP switch
+  KVM: x86: Defer the MMU unload to the normal path on an global INVPCID
+  KVM: x86/mmu: Unexport MMU load/unload functions
+  KVM: x86/mmu: Sync roots after MMU load iff load as successful
+  KVM: x86/mmu: WARN on NULL pae_root or lm_root, or bad shadow root
+    level
 
-That seems a reasonable place to start
+ arch/x86/include/asm/kvm_host.h |   3 -
+ arch/x86/kvm/mmu.h              |   4 +
+ arch/x86/kvm/mmu/mmu.c          | 273 ++++++++++++++++++++------------
+ arch/x86/kvm/mmu/tdp_mmu.c      |  23 +--
+ arch/x86/kvm/svm/svm.c          |   9 +-
+ arch/x86/kvm/vmx/nested.c       |   9 +-
+ arch/x86/kvm/x86.c              |   2 +-
+ 7 files changed, 192 insertions(+), 131 deletions(-)
 
-> prevent using unmmap_mapping_range().  The IOMMU backend, once it has a
-> vfio_device via vfio_device_get_from_vma() can know the format of
-> vm_private_data, cast it as a vfio_vma_private_data and directly use
-> base_pfn, accomplishing the big point.  They're all operating in the
-> agreed upon vm_private_data format.  Thanks,
+-- 
+2.30.1.766.gb4fecdf3b7-goog
 
-If we force all drivers into a mandatory (!) vm_private_data format
-then every driver has to be audited and updated before the new pfn
-code can be done. If any driver in the future makes a mistake here
-(and omitting the unique vm_private_data magics is a very easy mistake
-to make) then it will cause a kernel crash in an obscure scenario.
-
-It is the "design the API to be hard to use wrong" philosophy.
-
-Jason
