@@ -2,176 +2,139 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D6BC832F12A
-	for <lists+kvm@lfdr.de>; Fri,  5 Mar 2021 18:28:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E575232F132
+	for <lists+kvm@lfdr.de>; Fri,  5 Mar 2021 18:30:57 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229576AbhCER1n (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 5 Mar 2021 12:27:43 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:28851 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229493AbhCER1m (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 5 Mar 2021 12:27:42 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1614965261;
+        id S229650AbhCERaZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 5 Mar 2021 12:30:25 -0500
+Received: from mail.skyhub.de ([5.9.137.197]:50164 "EHLO mail.skyhub.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229465AbhCERaG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 5 Mar 2021 12:30:06 -0500
+Received: from zn.tnic (p200300ec2f0b95001b26a1a345abd660.dip0.t-ipconnect.de [IPv6:2003:ec:2f0b:9500:1b26:a1a3:45ab:d660])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 46BFC1EC0528;
+        Fri,  5 Mar 2021 18:30:04 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1614965404;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=bLxB2l1qRKkq52ZoCU3NDR4MPkAT8Rs45+g/2VRl+rw=;
-        b=W469EHssZmQPFCfW6EfFs0RBBauroJrZMY5p9uHnu8RXlTEpLudPXCuH0PwfyDpHek55Zj
-        bt6hp416szEnBfXNbMSNN0L6Uzvy6eHaMMmwZXg7L8RfbnQYltRK6WefdsUjqzA6tgXG2E
-        8EjrtWUQZJZYYGvI8mEg30InqX8cBbg=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-5-bg0x38exN5yjV2zd4Mk8ww-1; Fri, 05 Mar 2021 12:27:40 -0500
-X-MC-Unique: bg0x38exN5yjV2zd4Mk8ww-1
-Received: by mail-wr1-f72.google.com with SMTP id m9so1346765wrx.6
-        for <kvm@vger.kernel.org>; Fri, 05 Mar 2021 09:27:40 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=bLxB2l1qRKkq52ZoCU3NDR4MPkAT8Rs45+g/2VRl+rw=;
-        b=m6pGzefX8xmthVO2hOoxR5bQ6x0y7qmIOElbFw3a3HwseV6tijwK2pL4es4Ugm6EbR
-         wKt9xpMvoiDzp28wCPtnlqf9H0/TqFL3TeZwFOIxMtRFmQJ+XwMFJspzoLFB5fKKolIU
-         Fud76amrFiEvRfS03Vw8yi9f50zrgxuOR79bZWpNCwdHiL48VU7yEWAqoUKVJ+bL0uw4
-         mx0IlmCi4jJQkeRnCdFm2ve9mV6nj+42+nSpROlYktjTBQXOHZB1K2DciKSwljbFC63Y
-         tO3Z90kM59h/jUv3yQ/ptXQOFT7kSsWqDO62hsJRTBcqCMKrO9jVJAEYfPkkJE5XkrSS
-         2HWA==
-X-Gm-Message-State: AOAM533gzxiJujsicbME4L5F6azLO8QM0e5Dis5wdYTlOwC8Q7HFEO1V
-        ZkwDTwklYingm2y3pH1R3i1dFNojnuw9WMbbAEZDnkQmyUX/cvtFUkU5TLziYtkennXkhrLmZND
-        Wan1TPidCUeg1Rg7MRtaAR8OtOPml6hlS6aVulka0qAf/2xBbtJLIff+cEwOgzFog
-X-Received: by 2002:a5d:63d2:: with SMTP id c18mr10413768wrw.277.1614965258880;
-        Fri, 05 Mar 2021 09:27:38 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJxkbOTMiAdDixzDlmyw0o+BrvOtsI4Mh4wmSTXrH0tuUAuSZrSvkdc9LdEhdcKIKd6WWY0CAA==
-X-Received: by 2002:a5d:63d2:: with SMTP id c18mr10413736wrw.277.1614965258679;
-        Fri, 05 Mar 2021 09:27:38 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id n5sm5001272wmq.7.2021.03.05.09.27.37
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 05 Mar 2021 09:27:37 -0800 (PST)
-Subject: Re: [GIT PULL] KVM/arm64 fixes for 5.12, take #1
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     Alexandru Elisei <alexandru.elisei@arm.com>,
-        Andre Przywara <andre.przywara@arm.com>,
-        Andrew Scull <ascull@google.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Christoffer Dall <christoffer.dall@arm.com>,
-        Howard Zhang <Howard.Zhang@arm.com>,
-        Jia He <justin.he@arm.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Quentin Perret <qperret@google.com>,
-        Shameerali Kolothum Thodi 
-        <shameerali.kolothum.thodi@huawei.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Will Deacon <will@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        kernel-team@android.com, linux-arm-kernel@lists.infradead.org,
-        kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
-References: <20210305164944.3729910-1-maz@kernel.org>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <847417af-fdab-9ca1-3edc-39f1d77cb6cb@redhat.com>
-Date:   Fri, 5 Mar 2021 18:27:36 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.7.0
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=L2DznrHs2974hAtcbJbvPMJYMDAjtrQkOfNloB/J18Q=;
+        b=OwVefF93ifvJ8TJ6cAegoM4gB4nOErwB5WceW+2rX+dAgQUQoafLsfVikx7oeag4PwkqXE
+        7CNJI1j8b+qoF9/J4BaQmbdwUNvIL75wE6lfpJWn8rHt0Q8BTH7cY2Ib+FEybueqyX+poB
+        1X3SmYcjaOUtSK150JIasD4Fm+VA5YE=
+Date:   Fri, 5 Mar 2021 18:29:57 +0100
+From:   Borislav Petkov <bp@alien8.de>
+To:     Kai Huang <kai.huang@intel.com>
+Cc:     kvm@vger.kernel.org, x86@kernel.org, linux-sgx@vger.kernel.org,
+        linux-kernel@vger.kernel.org, seanjc@google.com, jarkko@kernel.org,
+        luto@kernel.org, dave.hansen@intel.com, rick.p.edgecombe@intel.com,
+        haitao.huang@intel.com, pbonzini@redhat.com, tglx@linutronix.de,
+        mingo@redhat.com, hpa@zytor.com, jethro@fortanix.com,
+        b.thiel@posteo.de
+Subject: Re: [PATCH 06/25] x86/cpu/intel: Allow SGX virtualization without
+ Launch Control support
+Message-ID: <20210305172957.GE2685@zn.tnic>
+References: <cover.1614590788.git.kai.huang@intel.com>
+ <12541888ae9ac7f517582aa64d9153feede7aed4.1614590788.git.kai.huang@intel.com>
 MIME-Version: 1.0
-In-Reply-To: <20210305164944.3729910-1-maz@kernel.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <12541888ae9ac7f517582aa64d9153feede7aed4.1614590788.git.kai.huang@intel.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 05/03/21 17:49, Marc Zyngier wrote:
-> Hi Paolo,
+On Mon, Mar 01, 2021 at 10:45:02PM +1300, Kai Huang wrote:
+> From: Sean Christopherson <sean.j.christopherson@intel.com>
 > 
-> Here's the first batch of fixes for 5.12. We have a handful of low
-> level world-switch regressions, a page table walker fix, more PMU
-> tidying up, and a workaround for systems with creative firmware.
+> The kernel will currently disable all SGX support if the hardware does
+> not support launch control.  Make it more permissive to allow SGX
+> virtualization on systems without Launch Control support.  This will
+> allow KVM to expose SGX to guests that have less-strict requirements on
+> the availability of flexible launch control.
 > 
-> Note that this is based on -rc1 despite the breakage, as I didn't feel
-> like holding these patches until -rc2.
+> Improve error message to distinguish between three cases.  There are two
+> cases where SGX support is completely disabled:
+> 1) SGX has been disabled completely by the BIOS
+> 2) SGX LC is locked by the BIOS.  Bare-metal support is disabled because
+>    of LC unavailability.  SGX virtualization is unavailable (because of
+>    Kconfig).
+> One where it is partially available:
+> 3) SGX LC is locked by the BIOS.  Bare-metal support is disabled because
+>    of LC unavailability.  SGX virtualization is supported.
 > 
-> Please pull,
+> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> Co-developed-by: Kai Huang <kai.huang@intel.com>
+> Acked-by: Dave Hansen <dave.hansen@intel.com>
+> Signed-off-by: Kai Huang <kai.huang@intel.com>
+> ---
+>  arch/x86/kernel/cpu/feat_ctl.c | 57 ++++++++++++++++++++++++++--------
+>  1 file changed, 44 insertions(+), 13 deletions(-)
 > 
-> 	M.
-> 
-> The following changes since commit fe07bfda2fb9cdef8a4d4008a409bb02f35f1bd8:
-> 
->    Linux 5.12-rc1 (2021-02-28 16:05:19 -0800)
-> 
-> are available in the Git repository at:
-> 
->    git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-fixes-5.12-1
-> 
-> for you to fetch changes up to e85583b3f1fe62c9b371a3100c1c91af94005ca9:
-> 
->    KVM: arm64: Fix range alignment when walking page tables (2021-03-04 09:54:12 +0000)
+> diff --git a/arch/x86/kernel/cpu/feat_ctl.c b/arch/x86/kernel/cpu/feat_ctl.c
+> index 27533a6e04fa..96c370284913 100644
+> --- a/arch/x86/kernel/cpu/feat_ctl.c
+> +++ b/arch/x86/kernel/cpu/feat_ctl.c
+> @@ -105,7 +105,8 @@ early_param("nosgx", nosgx);
+>  void init_ia32_feat_ctl(struct cpuinfo_x86 *c)
+>  {
+>  	bool tboot = tboot_enabled();
+> -	bool enable_sgx;
+> +	bool enable_sgx_any, enable_sgx_kvm, enable_sgx_driver;
+> +	bool enable_vmx;
+>  	u64 msr;
 
-Hi Marc,
+The preferred ordering of variable declarations at the beginning of a
+function is reverse fir tree order::
 
-due to a severe data corruption bug in 5.12-rc1, Linus suggested not 
-including 5.12-rc1 in trees to avoid it eating our filesystems 
-unwittingly during future bisections.
+	struct long_struct_name *descriptive_name;
+	unsigned long foo, bar;
+	unsigned int tmp;
+	int ret;
 
-Would it be a problem for you to rebase on top of your merge window pull 
-request?  If there are conflicts, another possibility is for you to just 
-send me the patch series.  I will handle all the topic branch juggling.
 
-This will mean rewriting kvmarm.git's history, but it does seem to be 
-the lesser (or the most future-proof) evil.
+>  	if (rdmsrl_safe(MSR_IA32_FEAT_CTL, &msr)) {
+> @@ -114,13 +115,21 @@ void init_ia32_feat_ctl(struct cpuinfo_x86 *c)
+>  		return;
+>  	}
+>  
+> +	enable_vmx = cpu_has(c, X86_FEATURE_VMX) &&
+> +		     IS_ENABLED(CONFIG_KVM_INTEL);
+> +
+>  	/*
+> -	 * Enable SGX if and only if the kernel supports SGX and Launch Control
+> -	 * is supported, i.e. disable SGX if the LE hash MSRs can't be written.
+> +	 * Separate out SGX driver enabling from KVM.  This allows KVM
+> +	 * guests to use SGX even if the kernel SGX driver refuses to
+> +	 * use it.  This happens if flexible Faunch Control is not
+> +	 * available.
+>  	 */
+> -	enable_sgx = cpu_has(c, X86_FEATURE_SGX) &&
+> -		     cpu_has(c, X86_FEATURE_SGX_LC) &&
+> -		     IS_ENABLED(CONFIG_X86_SGX);
+> +	enable_sgx_any = cpu_has(c, X86_FEATURE_SGX) &&
+> +			 IS_ENABLED(CONFIG_X86_SGX);
+> +	enable_sgx_driver = enable_sgx_any &&
+> +			    cpu_has(c, X86_FEATURE_SGX_LC);
+> +	enable_sgx_kvm = enable_sgx_any && enable_vmx &&
+> +			  IS_ENABLED(CONFIG_X86_SGX_KVM);
 
-Thanks,
+That enable_sgx_any use looks weird. You can get rid of it:
 
-Paolo
+	if (cpu_has(c, X86_FEATURE_SGX) && IS_ENABLED(CONFIG_X86_SGX)) {
+		enable_sgx_driver = cpu_has(c, X86_FEATURE_SGX_LC);
+		enable_sgx_kvm    = enable_vmx && IS_ENABLED(CONFIG_X86_SGX_KVM);
+	}
 
-> ----------------------------------------------------------------
-> KVM/arm64 fixes for 5.12, take #1
-> 
-> - Fix SPE context save/restore on nVHE
-> - Fix some subtle host context corruption on vcpu exit
-> - Fix panic handling on nVHE
-> - Prevent the hypervisor from accessing PMU registers when there is none
-> - Workaround broken firmwares advertising bogus GICv2 compatibility
-> - Fix Stage-2 unaligned range unmapping
-> 
-> ----------------------------------------------------------------
-> Andrew Scull (1):
->        KVM: arm64: Fix nVHE hyp panic host context restore
-> 
-> Jia He (1):
->        KVM: arm64: Fix range alignment when walking page tables
-> 
-> Marc Zyngier (4):
->        KVM: arm64: Turn kvm_arm_support_pmu_v3() into a static key
->        KVM: arm64: Don't access PMSELR_EL0/PMUSERENR_EL0 when no PMU is available
->        KVM: arm64: Rename __vgic_v3_get_ich_vtr_el2() to __vgic_v3_get_gic_config()
->        KVM: arm64: Workaround firmware wrongly advertising GICv2-on-v3 compatibility
-> 
-> Suzuki K Poulose (1):
->        KVM: arm64: nvhe: Save the SPE context early
-> 
-> Will Deacon (1):
->        KVM: arm64: Avoid corrupting vCPU context register in guest exit
-> 
->   arch/arm64/include/asm/kvm_asm.h        |  4 ++--
->   arch/arm64/include/asm/kvm_hyp.h        |  8 ++++++-
->   arch/arm64/kernel/image-vars.h          |  3 +++
->   arch/arm64/kvm/hyp/entry.S              |  2 +-
->   arch/arm64/kvm/hyp/include/hyp/switch.h |  9 +++++---
->   arch/arm64/kvm/hyp/nvhe/debug-sr.c      | 12 ++++++++--
->   arch/arm64/kvm/hyp/nvhe/host.S          | 15 +++++++------
->   arch/arm64/kvm/hyp/nvhe/hyp-main.c      |  6 ++---
->   arch/arm64/kvm/hyp/nvhe/switch.c        | 14 +++++++++---
->   arch/arm64/kvm/hyp/pgtable.c            |  1 +
->   arch/arm64/kvm/hyp/vgic-v3-sr.c         | 40 +++++++++++++++++++++++++++++++--
->   arch/arm64/kvm/perf.c                   | 10 +++++++++
->   arch/arm64/kvm/pmu-emul.c               | 10 ---------
->   arch/arm64/kvm/vgic/vgic-v3.c           | 12 +++++++---
->   include/kvm/arm_pmu.h                   |  9 ++++++--
->   15 files changed, 116 insertions(+), 39 deletions(-)
-> 
+and yap, let longer lines stick out.
 
+Thx.
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
