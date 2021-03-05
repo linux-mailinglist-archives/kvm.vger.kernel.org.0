@@ -2,121 +2,125 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 19B5132EF0A
-	for <lists+kvm@lfdr.de>; Fri,  5 Mar 2021 16:38:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 026C732F05F
+	for <lists+kvm@lfdr.de>; Fri,  5 Mar 2021 17:50:30 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230286AbhCEPhv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 5 Mar 2021 10:37:51 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:36288 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229446AbhCEPhS (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 5 Mar 2021 10:37:18 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1614958638;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=VM5usnxbwbdMQmAkNqSEXWFDqDsME8ZUFNJtssClblc=;
-        b=a6zRAOpRwek2kvaw/RhLdBze0Wgz99WNFvSkKWAh237SPoMWepqrLMFOqho+pe+dtZrIV+
-        EzhYCA0xo1h315kT4AOOrhBmof1MSfasBoW1K8LdRgDCEPPng+DWweTqIGz/Mw0mB/CkUY
-        zB/b1cdpQ3dIYQ7Sv4UtzIVAKyFdFjc=
-Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com
- [209.85.160.199]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-495-k-6sOvr5PXWdXILqxO3e4A-1; Fri, 05 Mar 2021 10:37:16 -0500
-X-MC-Unique: k-6sOvr5PXWdXILqxO3e4A-1
-Received: by mail-qt1-f199.google.com with SMTP id h13so1872220qti.21
-        for <kvm@vger.kernel.org>; Fri, 05 Mar 2021 07:37:16 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=VM5usnxbwbdMQmAkNqSEXWFDqDsME8ZUFNJtssClblc=;
-        b=a+iO80eHKbPQ0RssALbBACxK1ZhBu9fYi00NMzp5SdTpj/0yHwYAWcavZuDADind8E
-         gI+w0lr+GgajfhDs2VVkiEHZnt6gcdS1mqWv+QUOb8IsNpFDkw79xeF+8apUzC5KjgBd
-         6/BGeWluLCdPN4/f/58luDsu1wuH1kQt2ahlAVtGIkbrczBGfb2bZrMKg8wTMGZjAcQK
-         v6QHwX/21sEJpVut9nZ2OJGQrZP+4ZY3hjXx/WEhVUP0sRLQiGOz7XCs7DsDwfIwr2hd
-         iTkDCiu1hh8cAgJOPtc7VysksOhhjzJynvoSVydaH2qPsr1kbDzUCVbtn4l0aP6AVMTm
-         pz/A==
-X-Gm-Message-State: AOAM532esUUJ+l5ecwjRSA7mLqL7mr3Ue/amrJmpLzKb2qcYyGx5VrVu
-        LgXHmxmc/jUxZjTPcR1AAneS2fKnSqKi9iXLbgUnYHYdM9wnVuevKf14Z0y3f10nXPG2oe/5CWg
-        XXJBiYNHcGO+B
-X-Received: by 2002:a05:6214:aae:: with SMTP id ew14mr9540457qvb.24.1614958636122;
-        Fri, 05 Mar 2021 07:37:16 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJyB4JZtMASx0k65cuavabY0PrSoysqOM6feB49hI/cytiY6dkQjJwkq5kXlzFeukx6oQdfC4A==
-X-Received: by 2002:a05:6214:aae:: with SMTP id ew14mr9540423qvb.24.1614958635882;
-        Fri, 05 Mar 2021 07:37:15 -0800 (PST)
-Received: from xz-x1 (bras-vprn-toroon474qw-lp130-25-174-95-95-253.dsl.bell.ca. [174.95.95.253])
-        by smtp.gmail.com with ESMTPSA id a9sm1995727qtx.96.2021.03.05.07.37.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 05 Mar 2021 07:37:15 -0800 (PST)
-Date:   Fri, 5 Mar 2021 10:37:13 -0500
-From:   Peter Xu <peterx@redhat.com>
-To:     David Hildenbrand <david@redhat.com>
-Cc:     qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>,
-        Eduardo Habkost <ehabkost@redhat.com>,
-        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Igor Mammedov <imammedo@redhat.com>,
-        Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Murilo Opsfelder Araujo <muriloo@linux.ibm.com>,
-        Greg Kurz <groug@kaod.org>,
-        Liam Merwick <liam.merwick@oracle.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Igor Kotrasinski <i.kotrasinsk@partner.samsung.com>,
-        Juan Quintela <quintela@redhat.com>,
-        Stefan Weil <sw@weilnetz.de>, Thomas Huth <thuth@redhat.com>,
-        kvm@vger.kernel.org, qemu-s390x@nongnu.org
-Subject: Re: [PATCH v2 7/9] memory: introduce RAM_NORESERVE and wire it up in
- qemu_ram_mmap()
-Message-ID: <20210305153713.GG397383@xz-x1>
-References: <20210305101634.10745-1-david@redhat.com>
- <20210305101634.10745-8-david@redhat.com>
+        id S230130AbhCEQt5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 5 Mar 2021 11:49:57 -0500
+Received: from mail.kernel.org ([198.145.29.99]:41998 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229882AbhCEQt4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 5 Mar 2021 11:49:56 -0500
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id A88946508B;
+        Fri,  5 Mar 2021 16:49:55 +0000 (UTC)
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.lan)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94)
+        (envelope-from <maz@kernel.org>)
+        id 1lIDeD-00HWzC-DC; Fri, 05 Mar 2021 16:49:53 +0000
+From:   Marc Zyngier <maz@kernel.org>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Alexandru Elisei <alexandru.elisei@arm.com>,
+        Andre Przywara <andre.przywara@arm.com>,
+        Andrew Scull <ascull@google.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Christoffer Dall <christoffer.dall@arm.com>,
+        Howard Zhang <Howard.Zhang@arm.com>,
+        Jia He <justin.he@arm.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Quentin Perret <qperret@google.com>,
+        Shameerali Kolothum Thodi 
+        <shameerali.kolothum.thodi@huawei.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Will Deacon <will@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        kernel-team@android.com, linux-arm-kernel@lists.infradead.org,
+        kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+Subject: [GIT PULL] KVM/arm64 fixes for 5.12, take #1
+Date:   Fri,  5 Mar 2021 16:49:43 +0000
+Message-Id: <20210305164944.3729910-1-maz@kernel.org>
+X-Mailer: git-send-email 2.29.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20210305101634.10745-8-david@redhat.com>
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: pbonzini@redhat.com, alexandru.elisei@arm.com, andre.przywara@arm.com, ascull@google.com, catalin.marinas@arm.com, christoffer.dall@arm.com, Howard.Zhang@arm.com, justin.he@arm.com, mark.rutland@arm.com, qperret@google.com, shameerali.kolothum.thodi@huawei.com, suzuki.poulose@arm.com, will@kernel.org, james.morse@arm.com, julien.thierry.kdev@gmail.com, kernel-team@android.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Mar 05, 2021 at 11:16:32AM +0100, David Hildenbrand wrote:
-> Let's introduce RAM_NORESERVE, allowing mmap'ing with MAP_NORESERVE. The
-> new flag has the following semantics:
-> 
->   RAM is mmap-ed with MAP_NORESERVE. When set, reserving swap space (or
->   huge pages on Linux) is skipped: will bail out if not supported. When not
->   set, the OS might reserve swap space (or huge pages on Linux), depending
->   on OS support.
-> 
-> Allow passing it into:
-> - memory_region_init_ram_nomigrate()
-> - memory_region_init_resizeable_ram()
-> - memory_region_init_ram_from_file()
-> 
-> ... and teach qemu_ram_mmap() and qemu_anon_ram_alloc() about the flag.
-> Bail out if the flag is not supported, which is the case right now for
-> both, POSIX and win32. We will add the POSIX mmap implementation next and
-> allow specifying RAM_NORESERVE via memory backends.
-> 
-> The target use case is virtio-mem, which dynamically exposes memory
-> inside a large, sparse memory area to the VM.
-> 
-> Cc: Juan Quintela <quintela@redhat.com>
-> Cc: Halil Pasic <pasic@linux.ibm.com>
-> Cc: Cornelia Huck <cohuck@redhat.com>
-> Cc: Christian Borntraeger <borntraeger@de.ibm.com>
-> Cc: Thomas Huth <thuth@redhat.com>
-> Cc: Stefan Weil <sw@weilnetz.de>
-> Cc: kvm@vger.kernel.org
-> Cc: qemu-s390x@nongnu.org
-> Signed-off-by: David Hildenbrand <david@redhat.com>
+Hi Paolo,
 
-Reviewed-by: Peter Xu <peterx@redhat.com>
+Here's the first batch of fixes for 5.12. We have a handful of low
+level world-switch regressions, a page table walker fix, more PMU
+tidying up, and a workaround for systems with creative firmware.
 
--- 
-Peter Xu
+Note that this is based on -rc1 despite the breakage, as I didn't feel
+like holding these patches until -rc2.
 
+Please pull,
+
+	M.
+
+The following changes since commit fe07bfda2fb9cdef8a4d4008a409bb02f35f1bd8:
+
+  Linux 5.12-rc1 (2021-02-28 16:05:19 -0800)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-fixes-5.12-1
+
+for you to fetch changes up to e85583b3f1fe62c9b371a3100c1c91af94005ca9:
+
+  KVM: arm64: Fix range alignment when walking page tables (2021-03-04 09:54:12 +0000)
+
+----------------------------------------------------------------
+KVM/arm64 fixes for 5.12, take #1
+
+- Fix SPE context save/restore on nVHE
+- Fix some subtle host context corruption on vcpu exit
+- Fix panic handling on nVHE
+- Prevent the hypervisor from accessing PMU registers when there is none
+- Workaround broken firmwares advertising bogus GICv2 compatibility
+- Fix Stage-2 unaligned range unmapping
+
+----------------------------------------------------------------
+Andrew Scull (1):
+      KVM: arm64: Fix nVHE hyp panic host context restore
+
+Jia He (1):
+      KVM: arm64: Fix range alignment when walking page tables
+
+Marc Zyngier (4):
+      KVM: arm64: Turn kvm_arm_support_pmu_v3() into a static key
+      KVM: arm64: Don't access PMSELR_EL0/PMUSERENR_EL0 when no PMU is available
+      KVM: arm64: Rename __vgic_v3_get_ich_vtr_el2() to __vgic_v3_get_gic_config()
+      KVM: arm64: Workaround firmware wrongly advertising GICv2-on-v3 compatibility
+
+Suzuki K Poulose (1):
+      KVM: arm64: nvhe: Save the SPE context early
+
+Will Deacon (1):
+      KVM: arm64: Avoid corrupting vCPU context register in guest exit
+
+ arch/arm64/include/asm/kvm_asm.h        |  4 ++--
+ arch/arm64/include/asm/kvm_hyp.h        |  8 ++++++-
+ arch/arm64/kernel/image-vars.h          |  3 +++
+ arch/arm64/kvm/hyp/entry.S              |  2 +-
+ arch/arm64/kvm/hyp/include/hyp/switch.h |  9 +++++---
+ arch/arm64/kvm/hyp/nvhe/debug-sr.c      | 12 ++++++++--
+ arch/arm64/kvm/hyp/nvhe/host.S          | 15 +++++++------
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c      |  6 ++---
+ arch/arm64/kvm/hyp/nvhe/switch.c        | 14 +++++++++---
+ arch/arm64/kvm/hyp/pgtable.c            |  1 +
+ arch/arm64/kvm/hyp/vgic-v3-sr.c         | 40 +++++++++++++++++++++++++++++++--
+ arch/arm64/kvm/perf.c                   | 10 +++++++++
+ arch/arm64/kvm/pmu-emul.c               | 10 ---------
+ arch/arm64/kvm/vgic/vgic-v3.c           | 12 +++++++---
+ include/kvm/arm_pmu.h                   |  9 ++++++--
+ 15 files changed, 116 insertions(+), 39 deletions(-)
