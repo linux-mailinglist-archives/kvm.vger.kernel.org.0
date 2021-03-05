@@ -2,166 +2,189 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B1D5D32E373
-	for <lists+kvm@lfdr.de>; Fri,  5 Mar 2021 09:13:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6867B32E3CD
+	for <lists+kvm@lfdr.de>; Fri,  5 Mar 2021 09:38:12 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229559AbhCEINE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 5 Mar 2021 03:13:04 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38222 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229469AbhCEIMt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 5 Mar 2021 03:12:49 -0500
-Received: from mail-ej1-x62a.google.com (mail-ej1-x62a.google.com [IPv6:2a00:1450:4864:20::62a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D4B56C061756
-        for <kvm@vger.kernel.org>; Fri,  5 Mar 2021 00:12:48 -0800 (PST)
-Received: by mail-ej1-x62a.google.com with SMTP id w17so1719480ejc.6
-        for <kvm@vger.kernel.org>; Fri, 05 Mar 2021 00:12:48 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance-com.20150623.gappssmtp.com; s=20150623;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=MBq2dGqsKbpMQki8GbETIioPY9a6dWwdNAOqi//tVmc=;
-        b=porWskft+5t/TBuUshloZFxNjeupZlZ23+ErLyvvzGuXRkkEYh0vvQbJbucntZdqAg
-         0ES+45LLefK3HEONaNlvegQ1vO5iTeel907vOXTK3EePZ8izS8gwXWV5fyWAY4GWOZ0Z
-         5tk/5HS7ka14qwrbaJgTdKn790HLoPQHjao2dSkPjEvBMV4vj5LRycnQyCZoxw043iYM
-         jX88gNjUJRTSNabDKBY1BHfqKcuzf8tJL18lOYbJUWwBIb2czXRDBoUeZKrlNpqB+vo4
-         EedABKKbBL3IqVnaB4xIsYUGuZbmMZwsEbqSBko3xGQ6k4GCN0iLRX/ROIY/R//Lo0Zc
-         MnaA==
+        id S229601AbhCEIhk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 5 Mar 2021 03:37:40 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:20564 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229592AbhCEIhT (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 5 Mar 2021 03:37:19 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1614933439;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=5IxD+zRq/yhrLjAjbqOqe9sITek/cTcDBZYIQhAd6Ic=;
+        b=E2qDu376iIH0DMKpz9DxCB2PXjd5T9f/snqSBqHXhFtIFibUAUBnlULS3dlqOIomiMC+Vc
+        FMxrBQLVU1PumBdRr/V6LOyZvv5CKENWjbNNn1vsjs/i80o9mFHzVHmgd8I1p96YTF/6sH
+        yyIZJCfEeOCkTuP70hjApWm2NaEk4dk=
+Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
+ [209.85.218.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-27-EZc_keigOpGbr4_RBH4cfg-1; Fri, 05 Mar 2021 03:37:16 -0500
+X-MC-Unique: EZc_keigOpGbr4_RBH4cfg-1
+Received: by mail-ej1-f69.google.com with SMTP id rl7so536524ejb.16
+        for <kvm@vger.kernel.org>; Fri, 05 Mar 2021 00:37:16 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=MBq2dGqsKbpMQki8GbETIioPY9a6dWwdNAOqi//tVmc=;
-        b=QjZ03Zjl8p5uh3XHZEkK+5mYzXwS+Ky1gwLKBW0TxPw+K63h7Zge/yY18AaSLK7/xw
-         pScXVnO4bUPocZGsjUl2lA9fxmfXcT3h339At3+DLg7fihfH8RorCLf3tLaR6BOXMWJP
-         RQ68CsrlqU3NAud4yVXYYN9w1uuFygEO0/gCuf1Xfxl9B86okWTPkbAkNcY9CdRnnWbH
-         +ez5DvC8iNVW0Ra+JYwsJT3spM8vb7K1ZZljsWmZHUDYPZjSywngBn99wqw/eEjefpk1
-         jf5+MtukFNquTrrAqtI9pkmWMxAbRsNpdfwfmG2ZJ+rZYWRW4UK/9CD+CC4ol3Z+N9pB
-         wS5Q==
-X-Gm-Message-State: AOAM531cTcbCLF2YCh6AkCU3bFR69Nk2lPwPBJvwamShAY9dT0D93ta8
-        P/wiM9PmZGAIGcTzF+VyJlZaOGJB1Y+oBpKTqgsg
-X-Google-Smtp-Source: ABdhPJwBVpzIGvikUm/YZyRyq/dpIgXIV3a8HsfaiFFYOPN+MrInYoK8nhTRYFkzCPSxGa96na2IDVTi9Bc9HIxIN8s=
-X-Received: by 2002:a17:906:7b8d:: with SMTP id s13mr1273371ejo.247.1614931967461;
- Fri, 05 Mar 2021 00:12:47 -0800 (PST)
-MIME-Version: 1.0
-References: <20210223115048.435-1-xieyongji@bytedance.com> <20210223115048.435-11-xieyongji@bytedance.com>
- <d63e4cfd-4992-8493-32b0-18e0478f6e1a@redhat.com> <CACycT3tqM=ALOG1r0Ve6UTGmwJ7Wg7fQpLZypjZsJF1mJ+adMA@mail.gmail.com>
- <2d3418d9-856c-37ee-7614-af5b721becd7@redhat.com> <CACycT3u0+LTbtFMS75grKGZ2mnXzHnKug+HGWbf+nqVybqwkZQ@mail.gmail.com>
- <b3faa4a6-a65b-faf7-985a-b2771533c8bb@redhat.com> <CACycT3uZ2ZPjUwVZqzQPZ4ke=VrHCkfNvYagA-oxggPUEUi0Vg@mail.gmail.com>
- <e933ec33-9d47-0ef5-9152-25cedd330ce2@redhat.com> <CACycT3ug30sQptdoSP8XzRJVN7Yb2DPLBtfG-RNbus3BOhdONA@mail.gmail.com>
- <b01d9ee7-b038-cef2-8996-cd6401003267@redhat.com>
-In-Reply-To: <b01d9ee7-b038-cef2-8996-cd6401003267@redhat.com>
-From:   Yongji Xie <xieyongji@bytedance.com>
-Date:   Fri, 5 Mar 2021 16:12:36 +0800
-Message-ID: <CACycT3vSRvRUbqbPNjAPQ-TeXnbqtrQO+gD1M0qDRRqX1zovVA@mail.gmail.com>
-Subject: Re: Re: [RFC v4 10/11] vduse: Introduce a workqueue for irq injection
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=5IxD+zRq/yhrLjAjbqOqe9sITek/cTcDBZYIQhAd6Ic=;
+        b=eyi65ri4pSRAEUY49Rq0+gLLmrb81z9XKXXaWPP6WwxL8pqNq5Pk7EhB+1bgzqtYcf
+         OdtHpTNBzF45zoan8EL54ds9HOE8asW7zR+npCrOivfXkpFiN1wITNsC9VE3nZD0ldws
+         9K+OMrvhW19LmWekW/4JiJtjp4yAr0Ith3tPbOyxRNiVaFZqHFEqV4hRefsGdY8vu5iP
+         ReasRNvHGs7Pby4qGtJ28tMd7eV2LMGfCCe1nDJ58K7Qku4ZX4Cn4UiFHpf+gAElwaaH
+         HIpFrCNksBC2PrKxZBrWU28uyypRqKmGp/8A8MY0CmAwPquvwxPlFt9HGGBs0WL0pkg1
+         xyfQ==
+X-Gm-Message-State: AOAM531NcqcgK8uVLUVHOWZ62vu6IJhKojjuzDS5mGvcWRNvrI84Eprx
+        ZZlO5Q+No6fMFuj+cEED1ab7imO6nEf2aWghlT3cZg66020exqb6fJ2deQ6YFjvqsV7rfVaGzUs
+        vwCKJYwO9E9Jl
+X-Received: by 2002:aa7:d316:: with SMTP id p22mr7803924edq.107.1614933435326;
+        Fri, 05 Mar 2021 00:37:15 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJyjOmXvN8EMZ0rcYtj7qz24OPE/oP+k8nHqB8bmBISFKPKisJaNW2VnaxRq7If6mLdWgTCHeg==
+X-Received: by 2002:aa7:d316:: with SMTP id p22mr7803915edq.107.1614933435181;
+        Fri, 05 Mar 2021 00:37:15 -0800 (PST)
+Received: from steredhat (host-79-34-249-199.business.telecomitalia.it. [79.34.249.199])
+        by smtp.gmail.com with ESMTPSA id si7sm1078074ejb.84.2021.03.05.00.37.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 05 Mar 2021 00:37:14 -0800 (PST)
+Date:   Fri, 5 Mar 2021 09:37:12 +0100
+From:   Stefano Garzarella <sgarzare@redhat.com>
 To:     Jason Wang <jasowang@redhat.com>
-Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        Parav Pandit <parav@nvidia.com>, Bob Liu <bob.liu@oracle.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Matthew Wilcox <willy@infradead.org>, viro@zeniv.linux.org.uk,
-        Jens Axboe <axboe@kernel.dk>, bcrl@kvack.org,
-        Jonathan Corbet <corbet@lwn.net>,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        kvm@vger.kernel.org, linux-aio@kvack.org,
-        linux-fsdevel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Cc:     virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>
+Subject: Re: [RFC PATCH 10/10] vhost/vdpa: return configuration bytes read
+ and written to user space
+Message-ID: <20210305083712.atfrlpq6bkjrf6pd@steredhat>
+References: <20210216094454.82106-1-sgarzare@redhat.com>
+ <20210216094454.82106-11-sgarzare@redhat.com>
+ <4d682ff2-9663-d6ac-d5bf-616b2bf96e1a@redhat.com>
+ <20210302140654.ybmjqui5snp5wxym@steredhat>
+ <5cf852b1-1279-20e9-516d-30f876e0162d@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <5cf852b1-1279-20e9-516d-30f876e0162d@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Mar 5, 2021 at 3:37 PM Jason Wang <jasowang@redhat.com> wrote:
+On Thu, Mar 04, 2021 at 04:31:22PM +0800, Jason Wang wrote:
+>
+>On 2021/3/2 10:06 下午, Stefano Garzarella wrote:
+>>On Tue, Mar 02, 2021 at 12:05:35PM +0800, Jason Wang wrote:
+>>>
+>>>On 2021/2/16 5:44 下午, Stefano Garzarella wrote:
+>>>>vdpa_get_config() and vdpa_set_config() now return the amount
+>>>>of bytes read and written, so let's return them to the user space.
+>>>>
+>>>>We also modify vhost_vdpa_config_validate() to return 0 (bytes read
+>>>>or written) instead of an error, when the buffer length is 0.
+>>>>
+>>>>Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+>>>>---
+>>>> drivers/vhost/vdpa.c | 26 +++++++++++++++-----------
+>>>> 1 file changed, 15 insertions(+), 11 deletions(-)
+>>>>
+>>>>diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
+>>>>index 21eea2be5afa..b754c53171a7 100644
+>>>>--- a/drivers/vhost/vdpa.c
+>>>>+++ b/drivers/vhost/vdpa.c
+>>>>@@ -191,9 +191,6 @@ static ssize_t 
+>>>>vhost_vdpa_config_validate(struct vhost_vdpa *v,
+>>>>     struct vdpa_device *vdpa = v->vdpa;
+>>>>     u32 size = vdpa->config->get_config_size(vdpa);
+>>>>-    if (c->len == 0)
+>>>>-        return -EINVAL;
+>>>>-
+>>>>     return min(c->len, size);
+>>>> }
+>>>>@@ -204,6 +201,7 @@ static long vhost_vdpa_get_config(struct 
+>>>>vhost_vdpa *v,
+>>>>     struct vhost_vdpa_config config;
+>>>>     unsigned long size = offsetof(struct vhost_vdpa_config, buf);
+>>>>     ssize_t config_size;
+>>>>+    long ret;
+>>>>     u8 *buf;
+>>>>     if (copy_from_user(&config, c, size))
+>>>>@@ -217,15 +215,18 @@ static long vhost_vdpa_get_config(struct 
+>>>>vhost_vdpa *v,
+>>>>     if (!buf)
+>>>>         return -ENOMEM;
+>>>>-    vdpa_get_config(vdpa, config.off, buf, config_size);
+>>>>-
+>>>>-    if (copy_to_user(c->buf, buf, config_size)) {
+>>>>-        kvfree(buf);
+>>>>-        return -EFAULT;
+>>>>+    ret = vdpa_get_config(vdpa, config.off, buf, config_size);
+>>>>+    if (ret < 0) {
+>>>>+        ret = -EFAULT;
+>>>>+        goto out;
+>>>>     }
+>>>>+    if (copy_to_user(c->buf, buf, config_size))
+>>>>+        ret = -EFAULT;
+>>>>+
+>>>>+out:
+>>>>     kvfree(buf);
+>>>>-    return 0;
+>>>>+    return ret;
+>>>> }
+>>>> static long vhost_vdpa_set_config(struct vhost_vdpa *v,
+>>>>@@ -235,6 +236,7 @@ static long vhost_vdpa_set_config(struct 
+>>>>vhost_vdpa *v,
+>>>>     struct vhost_vdpa_config config;
+>>>>     unsigned long size = offsetof(struct vhost_vdpa_config, buf);
+>>>>     ssize_t config_size;
+>>>>+    long ret;
+>>>>     u8 *buf;
+>>>>     if (copy_from_user(&config, c, size))
+>>>>@@ -248,10 +250,12 @@ static long vhost_vdpa_set_config(struct 
+>>>>vhost_vdpa *v,
+>>>>     if (IS_ERR(buf))
+>>>>         return PTR_ERR(buf);
+>>>>-    vdpa_set_config(vdpa, config.off, buf, config_size);
+>>>>+    ret = vdpa_set_config(vdpa, config.off, buf, config_size);
+>>>>+    if (ret < 0)
+>>>>+        ret = -EFAULT;
+>>>>     kvfree(buf);
+>>>>-    return 0;
+>>>>+    return ret;
+>>>> }
+>>>
+>>>
+>>>So I wonder whether it's worth to return the number of bytes since 
+>>>we can't propogate the result to driver or driver doesn't care 
+>>>about that.
+>>
+>>Okay, but IIUC user space application that issue 
+>>VHOST_VDPA_GET_CONFIG ioctl can use the return value.
 >
 >
-> On 2021/3/5 3:27 =E4=B8=8B=E5=8D=88, Yongji Xie wrote:
-> > On Fri, Mar 5, 2021 at 3:01 PM Jason Wang <jasowang@redhat.com> wrote:
-> >>
-> >> On 2021/3/5 2:36 =E4=B8=8B=E5=8D=88, Yongji Xie wrote:
-> >>> On Fri, Mar 5, 2021 at 11:42 AM Jason Wang <jasowang@redhat.com> wrot=
-e:
-> >>>> On 2021/3/5 11:30 =E4=B8=8A=E5=8D=88, Yongji Xie wrote:
-> >>>>> On Fri, Mar 5, 2021 at 11:05 AM Jason Wang <jasowang@redhat.com> wr=
-ote:
-> >>>>>> On 2021/3/4 4:58 =E4=B8=8B=E5=8D=88, Yongji Xie wrote:
-> >>>>>>> On Thu, Mar 4, 2021 at 2:59 PM Jason Wang <jasowang@redhat.com> w=
-rote:
-> >>>>>>>> On 2021/2/23 7:50 =E4=B8=8B=E5=8D=88, Xie Yongji wrote:
-> >>>>>>>>> This patch introduces a workqueue to support injecting
-> >>>>>>>>> virtqueue's interrupt asynchronously. This is mainly
-> >>>>>>>>> for performance considerations which makes sure the push()
-> >>>>>>>>> and pop() for used vring can be asynchronous.
-> >>>>>>>> Do you have pref numbers for this patch?
-> >>>>>>>>
-> >>>>>>> No, I can do some tests for it if needed.
-> >>>>>>>
-> >>>>>>> Another problem is the VIRTIO_RING_F_EVENT_IDX feature will be us=
-eless
-> >>>>>>> if we call irq callback in ioctl context. Something like:
-> >>>>>>>
-> >>>>>>> virtqueue_push();
-> >>>>>>> virtio_notify();
-> >>>>>>>         ioctl()
-> >>>>>>> -------------------------------------------------
-> >>>>>>>             irq_cb()
-> >>>>>>>                 virtqueue_get_buf()
-> >>>>>>>
-> >>>>>>> The used vring is always empty each time we call virtqueue_push()=
- in
-> >>>>>>> userspace. Not sure if it is what we expected.
-> >>>>>> I'm not sure I get the issue.
-> >>>>>>
-> >>>>>> THe used ring should be filled by virtqueue_push() which is done b=
-y
-> >>>>>> userspace before?
-> >>>>>>
-> >>>>> After userspace call virtqueue_push(), it always call virtio_notify=
-()
-> >>>>> immediately. In traditional VM (vhost-vdpa) cases, virtio_notify()
-> >>>>> will inject an irq to VM and return, then vcpu thread will call
-> >>>>> interrupt handler. But in container (virtio-vdpa) cases,
-> >>>>> virtio_notify() will call interrupt handler directly. So it looks l=
-ike
-> >>>>> we have to optimize the virtio-vdpa cases. But one problem is we do=
-n't
-> >>>>> know whether we are in the VM user case or container user case.
-> >>>> Yes, but I still don't get why used ring is empty after the ioctl()?
-> >>>> Used ring does not use bounce page so it should be visible to the ke=
-rnel
-> >>>> driver. What did I miss :) ?
-> >>>>
-> >>> Sorry, I'm not saying the kernel can't see the correct used vring. I
-> >>> mean the kernel will consume the used vring in the ioctl context
-> >>> directly in the virtio-vdpa case. In userspace's view, that means
-> >>> virtqueue_push() is used vring's producer and virtio_notify() is used
-> >>> vring's consumer. They will be called one by one in one thread rather
-> >>> than different threads, which looks odd and has a bad effect on
-> >>> performance.
-> >>
-> >> Yes, that's why we need a workqueue (WQ_UNBOUND you used). Or do you
-> >> want to squash this patch into patch 8?
-> >>
-> >> So I think we can see obvious difference when virtio-vdpa is used.
-> >>
-> > But it looks like we don't need this workqueue in vhost-vdpa cases.
-> > Any suggestions?
->
->
-> I haven't had a deep thought. But I feel we can solve this by using the
-> irq bypass manager (or something similar). Then we don't need it to be
-> relayed via workqueue and vdpa. But I'm not sure how hard it will be.
->
+>Yes, but it looks to it's too late to change since it's a userspace 
+>noticble behaviour.
 
- Or let vdpa bus drivers give us some information?
+Yeah, this is a good point.
+I looked at QEMU and we only check if the value is not negative, so it 
+should work, but for other applications it could be a real change.
 
-> Do you see any obvious performance regression by using the workqueue? Or
-> we can optimize it in the future.
+Do we leave it as is?
+
 >
+>
+>>
+>>Should we change also 'struct virtio_config_ops' to propagate this 
+>>value also to virtio drivers?
+>
+>
+>I think not, the reason is the driver doesn't expect the get()/set() 
+>can fail...
 
-Agree.
+Got it.
 
 Thanks,
-Yongji
+Stefano
+
