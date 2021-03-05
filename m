@@ -2,116 +2,157 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E7D6A32F26D
-	for <lists+kvm@lfdr.de>; Fri,  5 Mar 2021 19:24:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id F3B0432F292
+	for <lists+kvm@lfdr.de>; Fri,  5 Mar 2021 19:32:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229929AbhCESXn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 5 Mar 2021 13:23:43 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:46982 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229951AbhCESXZ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 5 Mar 2021 13:23:25 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1614968604;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Cif4JRqiNpGdkfMRSZ/fYAiktCyfQJU6RgpMU5eJol0=;
-        b=VevMURydhdwlNELK/4jBcDI+HBU9/abKWBjL+M9vf5IGENaOiei8F594TgN0InOJwaVJlH
-        wNyoe8RXwlMiZSnrh16QlY5N+VHU47QKo2BJ3ZXNi+7iLGdNs2ZdH5oE539tadv8WvczHf
-        5XCoeqvxMlecSKl+94MqbPEKSmNGCjI=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-546-i69ApeolNmWXK-bKQ7qusg-1; Fri, 05 Mar 2021 13:23:21 -0500
-X-MC-Unique: i69ApeolNmWXK-bKQ7qusg-1
-Received: by mail-wr1-f69.google.com with SMTP id e13so1402119wrg.4
-        for <kvm@vger.kernel.org>; Fri, 05 Mar 2021 10:23:21 -0800 (PST)
+        id S229976AbhCESbn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 5 Mar 2021 13:31:43 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58260 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229781AbhCESb3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 5 Mar 2021 13:31:29 -0500
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 63355C061574
+        for <kvm@vger.kernel.org>; Fri,  5 Mar 2021 10:31:29 -0800 (PST)
+Received: by mail-yb1-xb49.google.com with SMTP id 131so3365700ybp.16
+        for <kvm@vger.kernel.org>; Fri, 05 Mar 2021 10:31:29 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=sender:reply-to:date:message-id:mime-version:subject:from:to:cc;
+        bh=ImkS2ZR1p3G/2SDQfJ8HrKEAKHalQx7zguwSD6QHvf4=;
+        b=YL0vcJHfRYSHkVgKACDQ3L9PjVHPp6sLUYoXm52dI16ZcNixwN16BIaqK2VTUebMrx
+         k9Ub3Qcdxi7iiVh09Oa/NA9pmYhmxbXDaAj9mILJLnRY9Bg3qsqb4QD/VvunbMITPzpK
+         RCOWh+TJ6fCcI0HSV2J9RmapDBoIV8L1E/29CyG9lBO73bw+/swuwfsTJCJgna0dbiCF
+         DDCbM8w0lxUuqT16PE5ypiiEn1nssV6QwBoZUmJhsxXsLAM8LPWsRJVt49Ki6TxkRo4N
+         NjlrP2GpOEkmp4ACxKyG26+Ycr3jci/eL3ROrETC6KesZLiu3CkZetIqGZCRTSKSG6BP
+         BAww==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=Cif4JRqiNpGdkfMRSZ/fYAiktCyfQJU6RgpMU5eJol0=;
-        b=bjMSCWyy+AXk7MgJrsfCgv4vG01hiwO4J6cuyLc7SQuE1MFZqp64aJQ2pPEDbkXy4M
-         O5cfhtSGwyiZdZhx8PH+K7NyxqSufWDHmfWGi+YH2x4d7Cb9/sWi6jLF4NpTpNU0Pte1
-         REJZLDQ4W/m/wn09Ag1KJKnu0YW7Ut5lZxPybc4xBG9GMgkp0Jz5ly87roBsZPb274TP
-         tcozTWzf/8khHe5mN7YzbqBx1D2bQlM/g2WpMFfS3WIXqLFO1yYPvOldkmhyf9cSXZ13
-         erTM7K3xAyQKcPGej2Zt6jOM5mqwIjes/eIq5BlYx3ir/alFJ3B1jbFuElxBRvh1Hk89
-         1XAg==
-X-Gm-Message-State: AOAM530IadHS1Y2x9sG2JpxeX/lQrNEdiCtRPECurB53LLrPMV2lg0+A
-        F+hRl6ybUsP7UZbJrUoIdwSsLmVUGyen6Xb5dIDEj7K/y+CzQhYGv9pDCTskuQTaIuU8lsAVPGt
-        00zgOI+FKPa1N
-X-Received: by 2002:adf:f851:: with SMTP id d17mr10572410wrq.267.1614968600001;
-        Fri, 05 Mar 2021 10:23:20 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJx3epZPNLDLCGcU127fgtBb9iUrOAdZs2EfY770AltyxOXwJ9t8wyFIk7LamLdgEUUg+Ku2aA==
-X-Received: by 2002:adf:f851:: with SMTP id d17mr10572398wrq.267.1614968599844;
-        Fri, 05 Mar 2021 10:23:19 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id x8sm5343865wru.46.2021.03.05.10.23.18
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 05 Mar 2021 10:23:19 -0800 (PST)
-Subject: Re: [PATCH v2 09/17] KVM: x86/mmu: Use '0' as the one and only value
- for an invalid PAE root
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        h=x-gm-message-state:sender:reply-to:date:message-id:mime-version
+         :subject:from:to:cc;
+        bh=ImkS2ZR1p3G/2SDQfJ8HrKEAKHalQx7zguwSD6QHvf4=;
+        b=EFO2xlGcTL6ic5FSc5UsFTKcbqbmqBvimyG+vQJtE5q03kWmXWUm+VICBL8NsNdSef
+         uANhOKlwh7FWssuiH92qX/PjdTQhqd42RvxoxY5+HRick6s/mmElnHX5CwZPd3mPzDnH
+         AygoDwSsS8ka9b51H1352G26Cnjy+ZlLP61k5S+PaNKnT3E8KRQ8w1CrcDnwwd5BesU8
+         h2qtDauU0ELV7YDHnA8gqqi2ak+NTaXxai98/nmvDFxrFs+KxqlcYAl5gtSRTsrUeL4L
+         49+cfhbx2py4+096n5h/zm2Jn1tBam8jILkOnCB5XZYdn/lbZM5AB6kQX8cIuLCuBziQ
+         Tohw==
+X-Gm-Message-State: AOAM53200/zGBI+p4fm404LtpCSOfbSiazmKkR+XgwyAA6sN6ar5hGoI
+        VIwqkVLYDl2TtJIWhDeIvQtJk8MiRGY=
+X-Google-Smtp-Source: ABdhPJxkD12a1/MPoA7dPeZYo+wpri52SSaJlYIfFndPtwRa14t6bLCHd6V0p0YQqDRr1xe1rARfTwTbHf4=
+Sender: "seanjc via sendgmr" <seanjc@seanjc798194.pdx.corp.google.com>
+X-Received: from seanjc798194.pdx.corp.google.com ([2620:15c:f:10:9857:be95:97a2:e91c])
+ (user=seanjc job=sendgmr) by 2002:a25:aae2:: with SMTP id t89mr16583064ybi.63.1614969088683;
+ Fri, 05 Mar 2021 10:31:28 -0800 (PST)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date:   Fri,  5 Mar 2021 10:31:12 -0800
+Message-Id: <20210305183123.3978098-1-seanjc@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.30.1.766.gb4fecdf3b7-goog
+Subject: [PATCH v4 00/11] KVM: VMX: Clean up Hyper-V PV TLB flush
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Ben Gardon <bgardon@google.com>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>
-References: <20210305011101.3597423-1-seanjc@google.com>
- <20210305011101.3597423-10-seanjc@google.com>
- <63d2a610-f897-805c-23a7-488a65485f36@redhat.com>
- <YEJ21vvQfBXnvlP8@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <c4e386f6-35f5-fdd7-10c9-c690615f1a47@redhat.com>
-Date:   Fri, 5 Mar 2021 19:23:18 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.7.0
-MIME-Version: 1.0
-In-Reply-To: <YEJ21vvQfBXnvlP8@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+        linux-kernel@vger.kernel.org,
+        Sean Christopherson <sean.j.christopherson@intel.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 05/03/21 19:22, Sean Christopherson wrote:
-> On Fri, Mar 05, 2021, Paolo Bonzini wrote:
->> On 05/03/21 02:10, Sean Christopherson wrote:
->>> Use '0' to denote an invalid pae_root instead of '0' or INVALID_PAGE.
->>> Unlike root_hpa, the pae_roots hold permission bits and thus are
->>> guaranteed to be non-zero.  Having to deal with both values leads to
->>> bugs, e.g. failing to set back to INVALID_PAGE, warning on the wrong
->>> value, etc...
->>
->> I don't dispute this is a good idea, but it deserves one or more comments.
-> 
-> Agreed.   What about adding macros?
-> 
-> /* Comment goes here. */
-> #define INVALID_PAE_ROOT	0
-> #define IS_VALID_PAE_ROOT(x)	(!!(x))
+Clean up KVM's PV TLB flushing when running with EPT on Hyper-V, i.e. as
+a nested VMM.  No real goal in mind other than the sole patch in v1, which
+is a minor change to avoid a future mixup when TDX also wants to define
+.remote_flush_tlb.  Everything else is opportunistic clean up.
 
-Yep, that's a nice solution.
+NOTE: Based on my NPT+SME bug fix series[*] due to multiple conflicts with
+      non-trivial resolutions.
 
-Paolo
+[*] https://lkml.kernel.org/r/20210305011101.3597423-1-seanjc@google.com
 
-> 
-> 
-> Also, I missed this pattern in mmu_audit.c's mmu_spte_walk():
-> 
-> 	for (i = 0; i < 4; ++i) {
-> 		hpa_t root = vcpu->arch.mmu->pae_root[i];
-> 
-> 		if (root && VALID_PAGE(root)) {
-> 			root &= PT64_BASE_ADDR_MASK;
-> 			sp = to_shadow_page(root);
-> 			__mmu_spte_walk(vcpu, sp, fn, 2);
-> 		}
-> 	}
-> 
+
+Patch 1 legitimately tested on VMX and SVM (including i386).  Patches 2+
+smoke tested by hacking usage of the relevant flows without actually
+routing to the Hyper-V hypercalls (partial hack-a-patch below).
+
+-static inline int hv_remote_flush_root_ept(hpa_t root_ept,
++static inline int hv_remote_flush_root_ept(struct kvm *kvm, hpa_t root_ept,
+                                           struct kvm_tlb_range *range)
+ {
+-       if (range)
+-               return hyperv_flush_guest_mapping_range(root_ept,
+-                               kvm_fill_hv_flush_list_func, (void *)range);
+-       else
+-               return hyperv_flush_guest_mapping(root_ept);
++       if (range) {
++               kvm_make_all_cpus_request(kvm, KVM_REQ_TLB_FLUSH);
++               return 0;
++       }
++
++       return -ENOMEM;
+ }
+ 
+ static int hv_remote_flush_tlb_with_range(struct kvm *kvm,
+@@ -7753,8 +7754,7 @@ static __init int hardware_setup(void)
+                vmx_x86_ops.update_cr8_intercept = NULL;
+ 
+ #if IS_ENABLED(CONFIG_HYPERV)
+-       if (ms_hyperv.nested_features & HV_X64_NESTED_GUEST_MAPPING_FLUSH
+-           && enable_ept) {
++       if (enable_ept) {
+                vmx_x86_ops.tlb_remote_flush = hv_remote_flush_tlb;
+                vmx_x86_ops.tlb_remote_flush_with_range =
+                                hv_remote_flush_tlb_with_range;
+
+v4: 
+  - Rebased to kvm/queue, commit fe5f0041c026 ("KVM/SVM: Move vmenter.S
+    exception fixups out of line"), plus the aforementioned series.
+  - Don't grab PCID for nested_cr3 (NPT). [Paolo]
+  - Collect reviews. [Vitaly]
+
+v3:
+  - https://lkml.kernel.org/r/20201027212346.23409-1-sean.j.christopherson@intel.com
+  - Add a patch to pass the root_hpa instead of pgd to vmx_load_mmu_pgd()
+    and retrieve the active PCID only when necessary.  [Vitaly]
+  - Selectively collects reviews (skipped a few due to changes). [Vitaly]
+  - Explicitly invalidate hv_tlb_eptp instead of leaving it valid when
+    the mismatch tracker "knows" it's invalid. [Vitaly]
+  - Change the last patch to use "hv_root_ept" instead of "hv_tlb_pgd"
+    to better reflect what is actually being tracked.
+
+v2:
+  - Rewrite everything.
+  - https://lkml.kernel.org/r/20201020215613.8972-1-sean.j.christopherson@intel.com
+
+v1: ???
+
+Sean Christopherson (11):
+  KVM: x86: Get active PCID only when writing a CR3 value
+  KVM: VMX: Track common EPTP for Hyper-V's paravirt TLB flush
+  KVM: VMX: Stash kvm_vmx in a local variable for Hyper-V paravirt TLB
+    flush
+  KVM: VMX: Fold Hyper-V EPTP checking into it's only caller
+  KVM: VMX: Do Hyper-V TLB flush iff vCPU's EPTP hasn't been flushed
+  KVM: VMX: Invalidate hv_tlb_eptp to denote an EPTP mismatch
+  KVM: VMX: Don't invalidate hv_tlb_eptp if the new EPTP matches
+  KVM: VMX: Explicitly check for hv_remote_flush_tlb when loading pgd
+  KVM: VMX: Define Hyper-V paravirt TLB flush fields iff Hyper-V is
+    enabled
+  KVM: VMX: Skip additional Hyper-V TLB EPTP flushes if one fails
+  KVM: VMX: Track root HPA instead of EPTP for paravirt Hyper-V TLB
+    flush
+
+ arch/x86/include/asm/kvm_host.h |   4 +-
+ arch/x86/kvm/mmu.h              |   4 +-
+ arch/x86/kvm/svm/svm.c          |  10 ++-
+ arch/x86/kvm/vmx/vmx.c          | 134 ++++++++++++++++++--------------
+ arch/x86/kvm/vmx/vmx.h          |  19 ++---
+ 5 files changed, 92 insertions(+), 79 deletions(-)
+
+-- 
+2.30.1.766.gb4fecdf3b7-goog
 
