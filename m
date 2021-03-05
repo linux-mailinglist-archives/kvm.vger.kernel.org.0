@@ -2,104 +2,132 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BBCF332DF8F
-	for <lists+kvm@lfdr.de>; Fri,  5 Mar 2021 03:18:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C992F32DFB0
+	for <lists+kvm@lfdr.de>; Fri,  5 Mar 2021 03:33:32 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229576AbhCECSP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 4 Mar 2021 21:18:15 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47094 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229463AbhCECSP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 4 Mar 2021 21:18:15 -0500
-Received: from mail-qt1-x849.google.com (mail-qt1-x849.google.com [IPv6:2607:f8b0:4864:20::849])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B4ABC061574
-        for <kvm@vger.kernel.org>; Thu,  4 Mar 2021 18:18:15 -0800 (PST)
-Received: by mail-qt1-x849.google.com with SMTP id p32so380251qtd.14
-        for <kvm@vger.kernel.org>; Thu, 04 Mar 2021 18:18:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=sender:reply-to:date:message-id:mime-version:subject:from:to:cc;
-        bh=iFsu/EdgzPCi1WqYdYUBcFgRLZpgieXshXK9nnq/e2Q=;
-        b=Dm7EqRrQGHwk4GNJMLxWsQTTtpmjMKr5XzzRltH4yF4XLUzdFFiyvsjnp1NTrFqAWD
-         CjfRG3hCuW1YFGc6A9Y05LccX7aY94QO+wvrTna8ER7QCPvAqc9cTr+SDbDE7Ldpjw3t
-         rgtktSM2aFRd0K33Dqco70ItekgC6OfWuwo0KQ+vkE9LIdkGuecrItyAYNY5IrqvtPnf
-         IM5vybBlZZIJb6OQHKcf0RcSJiUJryCWGAhm5Qi0FNJWVncKswsoai/pll1Euh2JIGiA
-         gbO6fIcNJdAVjAQtSPfOZWTgAaL5JAINvcWY30PuSr1We+YkowOrraGVXDfiXT9XhhEG
-         nq9A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:reply-to:date:message-id:mime-version
-         :subject:from:to:cc;
-        bh=iFsu/EdgzPCi1WqYdYUBcFgRLZpgieXshXK9nnq/e2Q=;
-        b=XZcRynh44y5qxDNyZXBkBUUa4mi/LzN0Na4dFgFBQfyFqKWQz7CM8CttjNOVikudqF
-         JFef39+HDscx/NFx5uqcLq2q9zRlMTmQYABAJeNXBNC91mH2CDPuKZOX/yrQolIMrnNg
-         uQ2sIE3r8Psjjxuvnz5dQLfeB2IMMDbeXeD4e+irZBPPWZdZbyKyAS94mrxTL+qudsMu
-         Xspydyju9i/jT4t0nl/qZfzPHgK1BYE/lQ3a/h+YPlVjMEtetPctrsC7R9/Hrs2BRJaB
-         1tPMl/mg6518VW/nWLau4BMJVhPN/fH1WUpHmhux022zU2e7SCj/WVFEaLDTNYS60Aye
-         wKww==
-X-Gm-Message-State: AOAM531xUqpeFiFWo07go7MPkuEKjOrt+Gvxypa4lkUqmMK2VtPEPh8P
-        KyBHdx7b0lLIxdxebUc+A2bqTB7AEag=
-X-Google-Smtp-Source: ABdhPJyfHd60C/yt6/C0Ijkwk9RyVf8bjnYna4ppLSBzVsVQ7VGppNses7R6R1uiC2x3LrH3g3AER8JsCOo=
-Sender: "seanjc via sendgmr" <seanjc@seanjc798194.pdx.corp.google.com>
-X-Received: from seanjc798194.pdx.corp.google.com ([2620:15c:f:10:9857:be95:97a2:e91c])
- (user=seanjc job=sendgmr) by 2002:a0c:fec8:: with SMTP id z8mr7027044qvs.59.1614910691867;
- Thu, 04 Mar 2021 18:18:11 -0800 (PST)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Thu,  4 Mar 2021 18:18:08 -0800
-Message-Id: <20210305021808.3769732-1-seanjc@google.com>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.30.1.766.gb4fecdf3b7-goog
-Subject: [PATCH] KVM: x86: Ensure deadline timer has truly expired before
- posting its IRQ
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
+        id S229503AbhCECdb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 4 Mar 2021 21:33:31 -0500
+Received: from mga06.intel.com ([134.134.136.31]:38809 "EHLO mga06.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229436AbhCECdb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 4 Mar 2021 21:33:31 -0500
+IronPort-SDR: J5ZrL8MbjQAIS+PNlNF2fc4GMVOYa64tAfkOP2STYc+/W8rU7pxgFw1q3+f4bXYPhrRxxGpyLZ
+ 7PDr+hT1em+A==
+X-IronPort-AV: E=McAfee;i="6000,8403,9913"; a="248941328"
+X-IronPort-AV: E=Sophos;i="5.81,224,1610438400"; 
+   d="scan'208";a="248941328"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Mar 2021 18:33:30 -0800
+IronPort-SDR: ZBEGOxWl1Occbip9Q3/yVi4Hx23VPJWDUFNza22g7byXr/dQhCIv+jUgZ6NB6D1WIeO0qGXVVC
+ vjEQtDRhraiA==
+X-IronPort-AV: E=Sophos;i="5.81,224,1610438400"; 
+   d="scan'208";a="401093201"
+Received: from likexu-mobl1.ccr.corp.intel.com (HELO [10.238.4.93]) ([10.238.4.93])
+  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Mar 2021 18:33:26 -0800
+Subject: Re: [PATCH v3 5/9] KVM: vmx/pmu: Add MSR_ARCH_LBR_DEPTH emulation for
+ Arch LBR
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Peter Zijlstra <peterz@infradead.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+        Joerg Roedel <joro@8bytes.org>,
+        Kan Liang <kan.liang@linux.intel.com>,
+        Dave Hansen <dave.hansen@intel.com>, wei.w.wang@intel.com,
+        Borislav Petkov <bp@alien8.de>, kvm@vger.kernel.org,
+        x86@kernel.org, linux-kernel@vger.kernel.org,
+        Like Xu <like.xu@linux.intel.com>
+References: <20210303135756.1546253-1-like.xu@linux.intel.com>
+ <20210303135756.1546253-6-like.xu@linux.intel.com>
+ <YD/APUcINwvP53VZ@google.com>
+ <890a6f34-812a-5937-8761-d448a04f67d7@intel.com>
+ <YEEG48erESM0+3CB@google.com>
+From:   "Xu, Like" <like.xu@intel.com>
+Message-ID: <5be999eb-64d7-de0e-254b-82711acc5e24@intel.com>
+Date:   Fri, 5 Mar 2021 10:33:24 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.8.0
+MIME-Version: 1.0
+In-Reply-To: <YEEG48erESM0+3CB@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When posting a deadline timer interrupt, open code the checks guarding
-__kvm_wait_lapic_expire() in order to skip the lapic_timer_int_injected()
-check in kvm_wait_lapic_expire().  The injection check will always fail
-since the interrupt has not yet be injected.  Moving the call after
-injection would also be wrong as that wouldn't actually delay delivery
-of the IRQ if it is indeed sent via posted interrupt.
+On 2021/3/5 0:12, Sean Christopherson wrote:
+> On Thu, Mar 04, 2021, Xu, Like wrote:
+>> Hi Sean,
+>>
+>> Thanks for your detailed review on the patch set.
+>>
+>> On 2021/3/4 0:58, Sean Christopherson wrote:
+>>> On Wed, Mar 03, 2021, Like Xu wrote:
+>>>> @@ -348,10 +352,26 @@ static bool intel_pmu_handle_lbr_msrs_access(struct kvm_vcpu *vcpu,
+>>>>    	return true;
+>>>>    }
+>>>> +/*
+>>>> + * Check if the requested depth values is supported
+>>>> + * based on the bits [0:7] of the guest cpuid.1c.eax.
+>>>> + */
+>>>> +static bool arch_lbr_depth_is_valid(struct kvm_vcpu *vcpu, u64 depth)
+>>>> +{
+>>>> +	struct kvm_cpuid_entry2 *best;
+>>>> +
+>>>> +	best = kvm_find_cpuid_entry(vcpu, 0x1c, 0);
+>>>> +	if (best && depth && !(depth % 8))
+>>> This is still wrong, it fails to weed out depth > 64.
+>> How come ? The testcases depth = {65, 127, 128} get #GP as expected.
+> @depth is a u64, throw in a number that is a multiple of 8 and >= 520, and the
+> "(1ULL << (depth / 8 - 1))" will trigger undefined behavior due to shifting
+> beyond the capacity of a ULL / u64.
 
-Fixes: 010fd37fddf6 ("KVM: LAPIC: Reduce world switch latency caused by timer_advance_ns")
-Cc: stable@vger.kernel.org
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- arch/x86/kvm/lapic.c | 11 ++++++++++-
- 1 file changed, 10 insertions(+), 1 deletion(-)
+Extra:
 
-diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-index 45d40bfacb7c..cb8ebfaccfb6 100644
---- a/arch/x86/kvm/lapic.c
-+++ b/arch/x86/kvm/lapic.c
-@@ -1642,7 +1642,16 @@ static void apic_timer_expired(struct kvm_lapic *apic, bool from_timer_fn)
- 	}
- 
- 	if (kvm_use_posted_timer_interrupt(apic->vcpu)) {
--		kvm_wait_lapic_expire(vcpu);
-+		/*
-+		 * Ensure the guest's timer has truly expired before posting an
-+		 * interrupt.  Open code the relevant checks to avoid querying
-+		 * lapic_timer_int_injected(), which will be false since the
-+		 * interrupt isn't yet injected.  Waiting until after injecting
-+		 * is not an option since that won't help a posted interrupt.
-+		 */
-+		if (vcpu->arch.apic->lapic_timer.expired_tscdeadline &&
-+		    vcpu->arch.apic->lapic_timer.timer_advance_ns)
-+			__kvm_wait_lapic_expire(vcpu);
- 		kvm_apic_inject_pending_timer_irqs(apic);
- 		return;
- 	}
--- 
-2.30.1.766.gb4fecdf3b7-goog
+when we say "undefined behavior" if shifting beyond the capacity of a ULL,
+do you mean that the actual behavior depends on the machine, architecture 
+or compiler?
+
+>
+> Adding the "< 64" check would also allow dropping the " & 0xff" since the check
+> would ensure the shift doesn't go beyond bit 7.  I'm not sure the cleverness is
+> worth shaving a cycle, though.
+
+Finally how about:
+
+     if (best && depth && (depth < 65) && !(depth & 7))
+         return best->eax & BIT_ULL(depth / 8 - 1);
+
+     return false;
+
+Do you see the room for optimization ？
+
+>
+>>> Not that this is a hot path, but it's probably worth double checking that the
+>>> compiler generates simple code for "depth % 8", e.g. it can be "depth & 7)".
+>> Emm, the "%" operation is quite normal over kernel code.
+> So is "&" :-)  I was just pointing out that the compiler should optimize this,
+> and it did.
+>
+>> if (best && depth && !(depth % 8))
+>>     10659:       48 85 c0                test   rax,rax
+>>     1065c:       74 c7                   je     10625 <intel_pmu_set_msr+0x65>
+>>     1065e:       4d 85 e4                test   r12,r12
+>>     10661:       74 c2                   je     10625 <intel_pmu_set_msr+0x65>
+>>     10663:       41 f6 c4 07             test   r12b,0x7
+>>     10667:       75 bc                   jne    10625 <intel_pmu_set_msr+0x65>
+>>
+>> It looks like the compiler does the right thing.
+>> Do you see the room for optimization ？
+>>
+>>>> +		return (best->eax & 0xff) & (1ULL << (depth / 8 - 1));
+> Actually, looking at this again, I would explicitly use BIT() instead of 1ULL
+> (or BIT_ULL), since the shift must be 7 or less.
+>
+>>>> +
+>>>> +	return false;
+>>>> +}
+>>>> +
 
