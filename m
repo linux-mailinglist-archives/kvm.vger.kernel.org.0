@@ -2,123 +2,122 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 35B8332DE0A
-	for <lists+kvm@lfdr.de>; Fri,  5 Mar 2021 00:51:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8799832DE3C
+	for <lists+kvm@lfdr.de>; Fri,  5 Mar 2021 01:07:41 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233362AbhCDXvu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 4 Mar 2021 18:51:50 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43816 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232543AbhCDXvu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 4 Mar 2021 18:51:50 -0500
-Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E4637C061574
-        for <kvm@vger.kernel.org>; Thu,  4 Mar 2021 15:51:49 -0800 (PST)
-Received: by mail-pl1-x631.google.com with SMTP id ba1so366691plb.1
-        for <kvm@vger.kernel.org>; Thu, 04 Mar 2021 15:51:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=OXSfr2dabCSvdFRUAzNzC8wQejac0UjQtMYaN+FXYKk=;
-        b=stE3m++/iGDyiGc9o3fu84MVOWZUsRRvCJGX4SHMhA0uTiAYXG2r+2IjLFpDbM7Ic5
-         wdSB54z0J+GYobdHMBWLaiF83w9GCZKcRVAFJogRlq0Lkd5WbV1Ps1GSCuWZKWhYIH/b
-         HGD9Itn8q7SciMCBbnfm6HQ4zzFq7lDY4tsF1gNaSmEHaxrVMp3kU9PYVMtzlg8tg4gn
-         WzZbNOCe/4RpmkVLfQkCT6wdya/ca+XMiZrYoEmL6omTyg1nZ3sDxpjwnie/YeBuqt4V
-         p0GktkGr+Mm4hR0FpiK8ctZsDqO5pstn2Cooo15/nJCBKQqogdCm1N7rB83MdaLpbrVn
-         nKnw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=OXSfr2dabCSvdFRUAzNzC8wQejac0UjQtMYaN+FXYKk=;
-        b=FAKtCHgAOrvwG5EwmpIuQeZHlKDWAz5yyDa5HgkC62sXQ7qsf4duxz346BSUAObtR5
-         4qVds+iGb0jgIMvuzhLzK4y45MuzFq3Na94ILGLoXSz8rga4+Gl/4nlmjGsMcJfAY429
-         XkEf2ghtpX4qOWgxExmJKy6WRSRPnJmFLypXOnAkAwvMFAJu6N7tAxalRZdt+HZJdxB6
-         RiZz9HaOaO7ApE7+bYNQhT8sY0VfL2uAXuCfN49DLReDTBxfJO9PPYSLnpLfjyRpyWUB
-         JEUO4JqXmcQeXe+khf3Qo3tp/hfVQdM51OERsWPQi4ltcIBjTpfCM73K30e09Z8BdHkv
-         ftxw==
-X-Gm-Message-State: AOAM530tenGKQjtJWBaYpUuo5e0atwmVfUKNUkcC87xXEtjTjJ145Y6E
-        lUF0GTsj4/RpRIVrIcu7thtjJtrQowoPXg==
-X-Google-Smtp-Source: ABdhPJztBXto5m76DGiuLZ+N4lYSCUxyX25pHdM3nm5pZ4z/p6uNUFKDRA822D5mSyPjIqaXGmEXag==
-X-Received: by 2002:a17:90a:b63:: with SMTP id 90mr7194261pjq.124.1614901909348;
-        Thu, 04 Mar 2021 15:51:49 -0800 (PST)
-Received: from google.com ([2620:15c:f:10:9857:be95:97a2:e91c])
-        by smtp.gmail.com with ESMTPSA id y202sm424952pfb.153.2021.03.04.15.51.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 04 Mar 2021 15:51:48 -0800 (PST)
-Date:   Thu, 4 Mar 2021 15:51:42 -0800
-From:   Sean Christopherson <seanjc@google.com>
-To:     Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>
-Cc:     Dave Chinner <david@fromorbit.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-xfs@vger.kernel.org" <linux-xfs@vger.kernel.org>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
-Subject: Re: Problem With XFS + KVM
-Message-ID: <YEFyjtsftfU2WRPg@google.com>
-References: <BYAPR04MB4965AAAB580D73E3B03E7E7886979@BYAPR04MB4965.namprd04.prod.outlook.com>
- <20210304231359.GT4662@dread.disaster.area>
- <BYAPR04MB49657CB2E5F0C2F2FC4F24E686979@BYAPR04MB4965.namprd04.prod.outlook.com>
+        id S231136AbhCEAHj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 4 Mar 2021 19:07:39 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:34772 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229582AbhCEAHj (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 4 Mar 2021 19:07:39 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1614902858;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=h6l5+K0Gr4gH4UEeNthFmTFNjx300eie785UyYH0gW4=;
+        b=XTxY973kssu0YY4kStjdY4KtcYHVyOKsZhPtVzKC4ltNpPj7vLwScnV+kg7Pt0TZoF8T8F
+        8+E3SmgmSq4SYjldYv82ioA9mISkhd836v0bH8CVmAIQ275YiclQPZnoMcegXITOZN7iIj
+        wlAWlUl2YF8E3jWRrlgA83TgCWL3utg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-593-ZDW2kIJPMneREUkzWYmAcg-1; Thu, 04 Mar 2021 19:07:37 -0500
+X-MC-Unique: ZDW2kIJPMneREUkzWYmAcg-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CF5F9101F7A5;
+        Fri,  5 Mar 2021 00:07:35 +0000 (UTC)
+Received: from omen.home.shazbot.org (ovpn-112-255.phx2.redhat.com [10.3.112.255])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id A790D5C1A1;
+        Fri,  5 Mar 2021 00:07:31 +0000 (UTC)
+Date:   Thu, 4 Mar 2021 17:07:31 -0700
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     <cohuck@redhat.com>, <kvm@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <peterx@redhat.com>
+Subject: Re: [RFC PATCH 05/10] vfio: Create a vfio_device from vma lookup
+Message-ID: <20210304170731.72039a23@omen.home.shazbot.org>
+In-Reply-To: <20210304231633.GP4247@nvidia.com>
+References: <161401167013.16443.8389863523766611711.stgit@gimli.home>
+        <161401268537.16443.2329805617992345365.stgit@gimli.home>
+        <20210222172913.GP4247@nvidia.com>
+        <20210224145506.48f6e0b4@omen.home.shazbot.org>
+        <20210225000610.GP4247@nvidia.com>
+        <20210225152113.3e083b4a@omen.home.shazbot.org>
+        <20210225234949.GV4247@nvidia.com>
+        <20210304143757.1ca42cfc@omen.home.shazbot.org>
+        <20210304231633.GP4247@nvidia.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <BYAPR04MB49657CB2E5F0C2F2FC4F24E686979@BYAPR04MB4965.namprd04.prod.outlook.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Mar 04, 2021, Chaitanya Kulkarni wrote:
-> On 3/4/21 15:14, Dave Chinner wrote:
-> >> 00000000003506e0
-> >> [  587.766864] Call Trace:
-> >> [  587.766867]  kvm_wait+0x8c/0x90
-> >> [  587.766876]  __pv_queued_spin_lock_slowpath+0x265/0x2a0
-> >> [  587.766893]  do_raw_spin_lock+0xb1/0xc0
-> >> [  587.766898]  _raw_spin_lock+0x61/0x70
-> >> [  587.766904]  xfs_extent_busy_trim+0x2f/0x200 [xfs]
-> > That looks like a KVM or local_irq_save()/local_irq_restore problem.
-> > kvm_wait() does:
-> >
-> > static void kvm_wait(u8 *ptr, u8 val)
-> > {
-> >         unsigned long flags;
-> >
-> >         if (in_nmi())
-> >                 return;
-> >
-> >         local_irq_save(flags);
-> >
-> >         if (READ_ONCE(*ptr) != val)
-> >                 goto out;
-> >
-> >         /*
-> >          * halt until it's our turn and kicked. Note that we do safe halt
-> >          * for irq enabled case to avoid hang when lock info is overwritten
-> >          * in irq spinlock slowpath and no spurious interrupt occur to save us.
-> >          */
-> >         if (arch_irqs_disabled_flags(flags))
-> >                 halt();
-> >         else
-> >                 safe_halt();
-> >
-> > out:
-> >         local_irq_restore(flags);
-> > }
-> >
-> > And the warning is coming from the local_irq_restore() call
-> > indicating that interrupts are not disabled when they should be.
-> > The interrupt state is being modified entirely within the kvm_wait()
-> > code here, so none of the high level XFS code has any influence on
-> > behaviour here.
-> >
-> > Cheers,
-> >
-> > Dave.
-> > -- Dave Chinner david@fromorbit.com
+On Thu, 4 Mar 2021 19:16:33 -0400
+Jason Gunthorpe <jgg@nvidia.com> wrote:
+
+> On Thu, Mar 04, 2021 at 02:37:57PM -0700, Alex Williamson wrote:
 > 
-> Thanks a lot for the response Dave, that is what I thought, just wasn't
-> sure.
+> > Therefore unless a bus driver opts-out by replacing vm_private_data, we
+> > can identify participating vmas by the vm_ops and have flags indicating
+> > if the vma maps device memory such that vfio_get_device_from_vma()
+> > should produce a device reference.  The vfio IOMMU backends would also
+> > consume this, ie. if they get a valid vfio_device from the vma, use the
+> > pfn_base field directly.  vfio_vm_ops would wrap the bus driver
+> > callbacks and provide reference counting on open/close to release this
+> > object.  
+> 
+> > I'm not thrilled with a vfio_device_ops callback plumbed through
+> > vfio-core to do vma-to-pfn translation, so I thought this might be a
+> > better alternative.  Thanks,  
+> 
+> Maybe you could explain why, because I'm looking at this idea and
+> thinking it looks very complicated compared to a simple driver op
+> callback?
 
-Yep, Wanpeng posted a patch for this.
+vfio-core needs to export a vfio_vma_to_pfn() which I think assumes the
+caller has already used vfio_device_get_from_vma(), but should still
+validate the vma is one from a vfio device before calling this new
+vfio_device_ops callback.  vfio-pci needs to validate the vm_pgoff
+value falls within a BAR region, mask off the index and get the
+pci_resource_start() for the BAR index.
 
-https://lkml.kernel.org/r/1614057902-23774-1-git-send-email-wanpengli@tencent.com
+Then we need a solution for how vfio_device_get_from_vma() determines
+whether to grant a device reference for a given vma, where that vma may
+map something other than device memory.  Are you imagining that we hand
+out device references independently and vfio_vma_to_pfn() would return
+an errno for vm_pgoff values that don't map device memory and the IOMMU
+driver would release the reference?
+
+It all seems rather ad-hoc.
+ 
+> The implementation of such an op for vfio_pci is one line trivial, why
+> do we need allocated memory and a entire shim layer instead? 
+> 
+> Shim layers are bad.
+
+The only thing here I'd consider a shim layer is overriding vm_ops,
+which just seemed like a cleaner and simpler solution than exporting
+open/close functions and validating the bus driver installs them, and
+the error path should they not.
+
+> We still need a driver op of some kind because only the driver can
+> convert a pg_off into a PFN. Remember the big point here is to remove
+> the sketchy follow_pte()...
+
+The bus driver simply writes the base_pfn value in the example
+structure I outlined in its .mmap callback.  I'm just looking for an
+alternative place to store our former vm_pgoff in a way that doesn't
+prevent using unmmap_mapping_range().  The IOMMU backend, once it has a
+vfio_device via vfio_device_get_from_vma() can know the format of
+vm_private_data, cast it as a vfio_vma_private_data and directly use
+base_pfn, accomplishing the big point.  They're all operating in the
+agreed upon vm_private_data format.  Thanks,
+
+Alex
+
