@@ -2,98 +2,52 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3688832F346
-	for <lists+kvm@lfdr.de>; Fri,  5 Mar 2021 19:54:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 19A6E32F379
+	for <lists+kvm@lfdr.de>; Fri,  5 Mar 2021 20:08:04 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229976AbhCESx3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 5 Mar 2021 13:53:29 -0500
-Received: from mail.kernel.org ([198.145.29.99]:58412 "EHLO mail.kernel.org"
+        id S229899AbhCETHb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 5 Mar 2021 14:07:31 -0500
+Received: from mail.kernel.org ([198.145.29.99]:33434 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229794AbhCESxG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 5 Mar 2021 13:53:06 -0500
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 92BB6650AC;
-        Fri,  5 Mar 2021 18:53:06 +0000 (UTC)
-Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.lan)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.94)
-        (envelope-from <maz@kernel.org>)
-        id 1lIFZQ-00HYFA-Qa; Fri, 05 Mar 2021 18:53:04 +0000
-From:   Marc Zyngier <maz@kernel.org>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Alexandru Elisei <alexandru.elisei@arm.com>,
-        Andre Przywara <andre.przywara@arm.com>,
-        Andrew Scull <ascull@google.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Christoffer Dall <christoffer.dall@arm.com>,
-        Howard Zhang <Howard.Zhang@arm.com>,
-        Jia He <justin.he@arm.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Quentin Perret <qperret@google.com>,
-        Shameerali Kolothum Thodi 
-        <shameerali.kolothum.thodi@huawei.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Will Deacon <will@kernel.org>,
+        id S229758AbhCETHN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 5 Mar 2021 14:07:13 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 7DC1A6509E;
+        Fri,  5 Mar 2021 19:07:11 +0000 (UTC)
+Date:   Fri, 5 Mar 2021 19:07:09 +0000
+From:   Catalin Marinas <catalin.marinas@arm.com>
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, kernel-team@android.com,
         James Morse <james.morse@arm.com>,
         Julien Thierry <julien.thierry.kdev@gmail.com>,
-        kernel-team@android.com, linux-arm-kernel@lists.infradead.org,
-        kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
-        stable@vger.kernel.org
-Subject: [PATCH 8/8] KVM: arm64: Fix range alignment when walking page tables
-Date:   Fri,  5 Mar 2021 18:52:54 +0000
-Message-Id: <20210305185254.3730990-9-maz@kernel.org>
-X-Mailer: git-send-email 2.29.2
-In-Reply-To: <20210305185254.3730990-1-maz@kernel.org>
-References: <87eegtzbch.wl-maz@kernel.org>
- <20210305185254.3730990-1-maz@kernel.org>
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>
+Subject: Re: [PATCH] KVM: arm64: Ensure I-cache isolation between vcpus of a
+ same VM
+Message-ID: <20210305190708.GL23855@arm.com>
+References: <20210303164505.68492-1-maz@kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: pbonzini@redhat.com, alexandru.elisei@arm.com, andre.przywara@arm.com, ascull@google.com, catalin.marinas@arm.com, christoffer.dall@arm.com, Howard.Zhang@arm.com, justin.he@arm.com, mark.rutland@arm.com, qperret@google.com, shameerali.kolothum.thodi@huawei.com, suzuki.poulose@arm.com, will@kernel.org, james.morse@arm.com, julien.thierry.kdev@gmail.com, kernel-team@android.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, stable@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210303164505.68492-1-maz@kernel.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Jia He <justin.he@arm.com>
+On Wed, Mar 03, 2021 at 04:45:05PM +0000, Marc Zyngier wrote:
+> It recently became apparent that the ARMv8 architecture has interesting
+> rules regarding attributes being used when fetching instructions
+> if the MMU is off at Stage-1.
+> 
+> In this situation, the CPU is allowed to fetch from the PoC and
+> allocate into the I-cache (unless the memory is mapped with
+> the XN attribute at Stage-2).
 
-When walking the page tables at a given level, and if the start
-address for the range isn't aligned for that level, we propagate
-the misalignment on each iteration at that level.
+Digging through the ARM ARM is hard. Do we have this behaviour with FWB
+as well?
 
-This results in the walker ignoring a number of entries (depending
-on the original misalignment) on each subsequent iteration.
-
-Properly aligning the address before the next iteration addresses
-this issue.
-
-Cc: stable@vger.kernel.org
-Reported-by: Howard Zhang <Howard.Zhang@arm.com>
-Acked-by: Will Deacon <will@kernel.org>
-Signed-off-by: Jia He <justin.he@arm.com>
-Fixes: b1e57de62cfb ("KVM: arm64: Add stand-alone page-table walker infrastructure")
-[maz: rewrite commit message]
-Signed-off-by: Marc Zyngier <maz@kernel.org>
-Link: https://lore.kernel.org/r/20210303024225.2591-1-justin.he@arm.com
----
- arch/arm64/kvm/hyp/pgtable.c | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-index 4d177ce1d536..926fc07074f5 100644
---- a/arch/arm64/kvm/hyp/pgtable.c
-+++ b/arch/arm64/kvm/hyp/pgtable.c
-@@ -223,6 +223,7 @@ static inline int __kvm_pgtable_visit(struct kvm_pgtable_walk_data *data,
- 		goto out;
- 
- 	if (!table) {
-+		data->addr = ALIGN_DOWN(data->addr, kvm_granule_size(level));
- 		data->addr += kvm_granule_size(level);
- 		goto out;
- 	}
 -- 
-2.29.2
-
+Catalin
