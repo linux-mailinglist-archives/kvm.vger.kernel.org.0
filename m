@@ -2,95 +2,380 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0A15332E6A1
-	for <lists+kvm@lfdr.de>; Fri,  5 Mar 2021 11:47:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 73B0432E6FE
+	for <lists+kvm@lfdr.de>; Fri,  5 Mar 2021 12:04:59 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229604AbhCEKq3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 5 Mar 2021 05:46:29 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43026 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229528AbhCEKqO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 5 Mar 2021 05:46:14 -0500
-Received: from mail-wm1-x334.google.com (mail-wm1-x334.google.com [IPv6:2a00:1450:4864:20::334])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D2A27C061756
-        for <kvm@vger.kernel.org>; Fri,  5 Mar 2021 02:46:13 -0800 (PST)
-Received: by mail-wm1-x334.google.com with SMTP id m1so1035985wml.2
-        for <kvm@vger.kernel.org>; Fri, 05 Mar 2021 02:46:13 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=QYcloRQYqoQYeneB9TUL5LWRoYdegubdAgTSoIagbwI=;
-        b=l1f+UOwIgVlt828ar7VR0vnkFXh4cRc5C417MtipeTaqlFL9hi+QxQf/kRpJECja4M
-         b1VgvXtLOV2KpkBB58JtxLb1r7x39cua/HRZI9XXxtgnnfrWNKNfRFRTEas45fO773zY
-         7mJT+4G1Sc+QLV2KsJ35V7xN27sbUzT0B7bZHtGhOQSugEZHgtKaZ8IjZJJY8KECnj/e
-         NDxYvkkIxMp0CEG5YQG2rPAaxqFREGuonfLmWbqP9a2as8Ty/JDljoFuQmk5w49uAPkM
-         S2mRfInX6LS/JeefCGRhe0mbClkNBjicwLmnvj5wLTXA7t3Uwhc3PfpgO3P27y1rnfyj
-         Tanw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=QYcloRQYqoQYeneB9TUL5LWRoYdegubdAgTSoIagbwI=;
-        b=cbQWv/OpW3gw763+oAIQCRPa+PAR4ZnjmOar18ASVLPBjgjYhqm2T9HqjxsHZsIQot
-         /DQpuBlOquFEqMTtwCVVnz/NgyA8fmCDIIVC7TY7VIhf0qoYpXTwJI8KHIbR+v9HUy34
-         Y2gpioKIKMUt5H+4P1WE/JWgmQoObDEKpJIWpi7V2jIm9RcOL0Kolnbui1q772gwIkoL
-         Ce1iCEw6T+4RYQRj2/1KpacRwMfAgLyb/RdyLK5FXDZvNUEy5Gd202N+9Pn73N6gd1sx
-         xC70qxCYK0hymOAEdk0KM27yiYhRBe0TCGubbQceKjPOFXpAIlFKQUNic2nrJWVls2GM
-         +CRg==
-X-Gm-Message-State: AOAM533eprRT3kFd6uPhvkbKj7zywxoRWrkQT+PA3O/cOnioXWwfJoTg
-        6DExlwPyod613YgNE15lAHaPew==
-X-Google-Smtp-Source: ABdhPJyPsHNdCZQ/LIRLnpXLb4jgGrGPiuq6+S8OtX5p5lHKSRBR7HyNChZTX5gDnxX/xPZN/4jXLA==
-X-Received: by 2002:a1c:2049:: with SMTP id g70mr8213376wmg.7.1614941172536;
-        Fri, 05 Mar 2021 02:46:12 -0800 (PST)
-Received: from myrica ([2001:1715:4e26:a7e0:116c:c27a:3e7f:5eaf])
-        by smtp.gmail.com with ESMTPSA id o11sm4083278wrq.74.2021.03.05.02.46.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 05 Mar 2021 02:46:12 -0800 (PST)
-Date:   Fri, 5 Mar 2021 11:45:50 +0100
-From:   Jean-Philippe Brucker <jean-philippe@linaro.org>
-To:     Eric Auger <eric.auger@redhat.com>
-Cc:     eric.auger.pro@gmail.com, iommu@lists.linux-foundation.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        kvmarm@lists.cs.columbia.edu, will@kernel.org, maz@kernel.org,
-        robin.murphy@arm.com, joro@8bytes.org, alex.williamson@redhat.com,
-        tn@semihalf.com, zhukeqian1@huawei.com,
-        jacob.jun.pan@linux.intel.com, yi.l.liu@intel.com,
-        wangxingang5@huawei.com, jiangkunkun@huawei.com,
-        zhangfei.gao@linaro.org, zhangfei.gao@gmail.com,
-        vivek.gautam@arm.com, shameerali.kolothum.thodi@huawei.com,
-        yuzenghui@huawei.com, nicoleotsuka@gmail.com,
-        lushenming@huawei.com, vsethi@nvidia.com
-Subject: Re: [PATCH v12 03/13] vfio: VFIO_IOMMU_SET_MSI_BINDING
-Message-ID: <YEIL3qmcRfhUoRGt@myrica>
-References: <20210223210625.604517-1-eric.auger@redhat.com>
- <20210223210625.604517-4-eric.auger@redhat.com>
+        id S229690AbhCELE0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 5 Mar 2021 06:04:26 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:37468 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230070AbhCELEQ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 5 Mar 2021 06:04:16 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1614942255;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=CTI54gtG4KxErsuBXhuStCvzIrM6C0NuDNU00PmVl9I=;
+        b=ZP92E2rz6PL8fTB1+G40ENUkmI9v/wCj3UTGeOdPi/gQrpEt0DQqOLV8ce16fYpqmyI7Ve
+        uYoRPY12lK3u95GkNUrXQyGlvuELDkUIF7fgNEjiYcVGdf1qXjyHKCHun8feNsDNRCE4I5
+        fLRLgrLUVIktK5co5PCD1ULONnvYlms=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-578-Slgb5qvZOAq5A__U3712-g-1; Fri, 05 Mar 2021 06:04:09 -0500
+X-MC-Unique: Slgb5qvZOAq5A__U3712-g-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AF0FCA40C1;
+        Fri,  5 Mar 2021 11:04:08 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.40.193.9])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id A34FC614EF;
+        Fri,  5 Mar 2021 11:04:06 +0000 (UTC)
+Date:   Fri, 5 Mar 2021 12:04:03 +0100
+From:   Andrew Jones <drjones@redhat.com>
+To:     Elena Afanasova <eafanasova@gmail.com>
+Cc:     kvm@vger.kernel.org, stefanha@redhat.com, jag.raman@oracle.com,
+        elena.ufimtseva@oracle.com
+Subject: Re: [RFC PATCH kvm-unit-tests] x86: add ioregionfd fast PIO test
+Message-ID: <20210305110403.piqta7jn3bpgfkxs@kamzik.brq.redhat.com>
+References: <20210301183319.12370-1-eafanasova@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210223210625.604517-4-eric.auger@redhat.com>
+In-Reply-To: <20210301183319.12370-1-eafanasova@gmail.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi,
+Hi Elena,
 
-On Tue, Feb 23, 2021 at 10:06:15PM +0100, Eric Auger wrote:
-> This patch adds the VFIO_IOMMU_SET_MSI_BINDING ioctl which aim
-> to (un)register the guest MSI binding to the host. This latter
-> then can use those stage 1 bindings to build a nested stage
-> binding targeting the physical MSIs.
+I think KVM selftests[1] is perhaps a better test framework for this
+type of test, but I'm not opposed to teaching kvm-unit-tests how to
+do this too. I have some ideas as to how to do it more generally
+though. Please see comments below.
 
-Now that RMR is in the IORT spec, could it be used for the nested MSI
-problem?  For virtio-iommu tables I was planning to do it like this:
+(If you are interested in trying to do the testing with KVM selftests,
+ and would like some suggestions as to how to get started, then feel
+ free to mail me.)
 
-MSI is mapped at stage-2 with an arbitrary IPA->doorbell PA. We report
-this IPA to userspace through iommu_groups/X/reserved_regions. No change
-there. Then to the guest we report a reserved identity mapping at IPA
-(using RMR, an equivalent DT binding, or probed RESV_MEM for
-virtio-iommu). The guest creates that mapping at stage-1, and that's it.
-Unless I overlooked something we'd only reuse existing infrastructure and
-avoid the SET_MSI_BINDING interface.
+[1] Linux src: tools/testing/selftests/kvm
+
+
+On Mon, Mar 01, 2021 at 09:33:19PM +0300, Elena Afanasova wrote:
+> Signed-off-by: Elena Afanasova <eafanasova@gmail.com>
+> ---
+>  scripts/common.bash   | 12 +++++--
+>  scripts/runtime.bash  |  9 +++++
+>  x86/Makefile.common   |  5 ++-
+>  x86/Makefile.x86_64   |  2 ++
+>  x86/ioregionfd-test.c | 84 +++++++++++++++++++++++++++++++++++++++++++
+>  x86/ioregionfd_pio.c  | 24 +++++++++++++
+>  x86/unittests.cfg     |  7 ++++
+>  7 files changed, 140 insertions(+), 3 deletions(-)
+>  create mode 100644 x86/ioregionfd-test.c
+>  create mode 100644 x86/ioregionfd_pio.c
+> 
+> diff --git a/scripts/common.bash b/scripts/common.bash
+> index 7b983f7..d9f8556 100644
+> --- a/scripts/common.bash
+> +++ b/scripts/common.bash
+> @@ -14,6 +14,8 @@ function for_each_unittest()
+>  	local accel
+>  	local timeout
+>  	local rematch
+> +	local helper_cmd
+> +	local fifo
+
+I'd prefer not to add 'fifo' to the unittests.cfg parameter list, as
+that's specific to this particular "helper_cmd". Also, while in this
+case the helper runs along side the test, a generic helper may need
+to do pre-test and post-test work. So, I think we should follow the
+migration test model and pass the QEMU command line (minus the new
+-device pc-testdev part) to the helper program where it then does
+pre-test stuff (in this case mkfifo), possibly augments the test's
+QEMU command line (in this case with the -device pc-testdev part),
+and runs the test (in parallel with ioregionfd-helper in this case),
+and then does any post-test work (remove the fifos).
+
+You can write a Bash script that does most of that and which also
+launches ioregionfd-helper (notice, I'm suggesting we rename that
+from iorergionfd-test, as it's not a test, it's a test helper).
+
+>  
+>  	exec {fd}<"$unittests"
+>  
+> @@ -21,7 +23,7 @@ function for_each_unittest()
+>  		if [[ "$line" =~ ^\[(.*)\]$ ]]; then
+>  			rematch=${BASH_REMATCH[1]}
+>  			if [ -n "${testname}" ]; then
+> -				$(arch_cmd) "$cmd" "$testname" "$groups" "$smp" "$kernel" "$opts" "$arch" "$check" "$accel" "$timeout"
+> +				$(arch_cmd) "$cmd" "$testname" "$groups" "$smp" "$kernel" "$opts" "$arch" "$check" "$accel" "$timeout" "$helper_cmd" "$fifo"
+>  			fi
+>  			testname=$rematch
+>  			smp=1
+> @@ -32,6 +34,8 @@ function for_each_unittest()
+>  			check=""
+>  			accel=""
+>  			timeout=""
+> +			helper_cmd=""
+> +			fifo=""
+>  		elif [[ $line =~ ^file\ *=\ *(.*)$ ]]; then
+>  			kernel=$TEST_DIR/${BASH_REMATCH[1]}
+>  		elif [[ $line =~ ^smp\ *=\ *(.*)$ ]]; then
+> @@ -48,10 +52,14 @@ function for_each_unittest()
+>  			accel=${BASH_REMATCH[1]}
+>  		elif [[ $line =~ ^timeout\ *=\ *(.*)$ ]]; then
+>  			timeout=${BASH_REMATCH[1]}
+> +		elif [[ $line =~ ^helper_cmd\ *=\ *(.*)$ ]]; then
+> +			helper_cmd=$TEST_DIR/${BASH_REMATCH[1]}
+> +		elif [[ $line =~ ^fifo\ *=\ *(.*)$ ]]; then
+> +			fifo=${BASH_REMATCH[1]}
+>  		fi
+>  	done
+>  	if [ -n "${testname}" ]; then
+> -		$(arch_cmd) "$cmd" "$testname" "$groups" "$smp" "$kernel" "$opts" "$arch" "$check" "$accel" "$timeout"
+> +		$(arch_cmd) "$cmd" "$testname" "$groups" "$smp" "$kernel" "$opts" "$arch" "$check" "$accel" "$timeout" "$helper_cmd" "$fifo"
+>  	fi
+>  	exec {fd}<&-
+>  }
+> diff --git a/scripts/runtime.bash b/scripts/runtime.bash
+> index 132389c..ba94ee5 100644
+> --- a/scripts/runtime.bash
+> +++ b/scripts/runtime.bash
+> @@ -81,6 +81,8 @@ function run()
+>      local check="${CHECK:-$7}"
+>      local accel="$8"
+>      local timeout="${9:-$TIMEOUT}" # unittests.cfg overrides the default
+> +    local helper_cmd="${10}"
+> +    local fifo="${11}"
+>  
+>      if [ -z "$testname" ]; then
+>          return
+> @@ -139,6 +141,11 @@ function run()
+>          echo $cmdline
+>      fi
+>  
+> +    if [ -n "${helper_cmd}" ] && [ -n "${fifo}" ]; then
+> +        mkfifo $fifo
+> +        $helper_cmd $fifo &
+> +    fi
+> +
+>      # extra_params in the config file may contain backticks that need to be
+>      # expanded, so use eval to start qemu.  Use "> >(foo)" instead of a pipe to
+>      # preserve the exit status.
+> @@ -159,6 +166,8 @@ function run()
+>          print_result "FAIL" $testname "$summary"
+>      fi
+>  
+> +    [ -n "${fifo}" ] && rm -rf $fifo
+> +
+>      return $ret
+>  }
+
+With the suggestion I'm making I think all the changes above in runtime.bash
+can go away, as we can simply do the following instead
+
+diff --git a/x86/run b/x86/run
+index 8b2425f45640..fdd6121e37ad 100755
+--- a/x86/run
++++ b/x86/run
+@@ -39,6 +39,6 @@ fi
+ 
+ command="${qemu} --no-reboot -nodefaults $pc_testdev -vnc none -serial stdio $pci_testdev"
+ command+=" -machine accel=$ACCEL -kernel"
+-command="$(timeout_cmd) $command"
++command="$(timeout_cmd) $(helper_cmd) $command"
+ 
+ run_qemu ${command} "$@"
+
+
+Assuming we have helper_cmd defined in x86/run some how.
+
+>  
+> diff --git a/x86/Makefile.common b/x86/Makefile.common
+> index 55f7f28..a5cd1d2 100644
+> --- a/x86/Makefile.common
+> +++ b/x86/Makefile.common
+> @@ -82,6 +82,9 @@ $(TEST_DIR)/hyperv_stimer.elf: $(TEST_DIR)/hyperv.o
+>  
+>  $(TEST_DIR)/hyperv_connections.elf: $(TEST_DIR)/hyperv.o
+>  
+> +$(TEST_DIR)/ioregionfd-test:
+> +	$(CC) -o $@ $(TEST_DIR)/ioregionfd-test.c
+> +
+>  arch_clean:
+> -	$(RM) $(TEST_DIR)/*.o $(TEST_DIR)/*.flat $(TEST_DIR)/*.elf \
+> +	$(RM) $(TEST_DIR)/*.o $(TEST_DIR)/*.flat $(TEST_DIR)/*.elf $(TEST_DIR)/ioregionfd-test \
+>  	$(TEST_DIR)/.*.d lib/x86/.*.d \
+> diff --git a/x86/Makefile.x86_64 b/x86/Makefile.x86_64
+> index 8134952..1a7a6b1 100644
+> --- a/x86/Makefile.x86_64
+> +++ b/x86/Makefile.x86_64
+> @@ -24,6 +24,8 @@ tests += $(TEST_DIR)/vmware_backdoors.flat
+>  tests += $(TEST_DIR)/rdpru.flat
+>  tests += $(TEST_DIR)/pks.flat
+>  tests += $(TEST_DIR)/pmu_lbr.flat
+> +tests += $(TEST_DIR)/ioregionfd_pio.flat
+> +tests += $(TEST_DIR)/ioregionfd-test
+
+Please write as
+
+ tests += $(TEST_DIR)/ioregionfd_pio.flat $(TEST_DIR)/ioregionfd-test
+
+>  
+>  ifneq ($(fcf_protection_full),)
+>  tests += $(TEST_DIR)/cet.flat
+> diff --git a/x86/ioregionfd-test.c b/x86/ioregionfd-test.c
+> new file mode 100644
+> index 0000000..5ea5e57
+> --- /dev/null
+> +++ b/x86/ioregionfd-test.c
+> @@ -0,0 +1,84 @@
+> +#include <linux/ioregion.h>
+> +#include <string.h>
+> +#include <poll.h>
+> +#include <stdarg.h>
+> +#include <stdio.h>
+> +#include <stdlib.h>
+> +#include <unistd.h>
+> +#include <fcntl.h>
+> +
+> +void err_exit(const char *fmt, ...)
+> +{
+> +	va_list args;
+> +
+> +	va_start(args, fmt);
+> +	vfprintf(stderr, fmt, args);
+> +	va_end(args);
+> +	exit(EXIT_FAILURE);
+> +}
+> +
+> +int main(int argc, char *argv[])
+> +{
+> +	struct ioregionfd_cmd cmd;
+> +	struct ioregionfd_resp resp;
+> +	struct pollfd pollfd;
+> +	int read_fd, write_fd = -1;
+> +	unsigned long cdata = 0;
+> +	int ret;
+> +
+> +	if (argc < 2)
+> +		err_exit("Usage: %s <read_fifo> <write_fifo>\n", argv[0]);
+> +
+> +	read_fd = open(argv[1], O_RDONLY);
+> +	if (read_fd < 0)
+> +		err_exit("failed to open read fifo %s\n", argv[1]);
+> +
+> +	if (argc == 3) {
+> +		write_fd = open(argv[2], O_WRONLY);
+> +		if (write_fd < 0) {
+> +			close(read_fd);
+> +			err_exit("failed to open write fifo %s\n", argv[2]);
+> +		}
+> +	}
+> +
+> +	pollfd.fd = read_fd;
+> +	pollfd.events = POLLIN;
+> +
+> +	for (;;) {
+> +		ret = poll(&pollfd, 1, -1);
+> +		if (ret < 0) {
+> +			close(read_fd);
+> +			if (write_fd > 0)
+> +				close(write_fd);
+> +			err_exit("poll\n");
+> +		}
+> +
+> +		if (pollfd.revents & POLLIN) {
+> +			ret = read(read_fd, &cmd, sizeof(cmd));
+> +
+> +			switch (cmd.cmd) {
+> +			case IOREGIONFD_CMD_READ:
+> +				memset(&resp, 0, sizeof(resp));
+> +				memcpy(&resp.data, &cdata, 1 << cmd.size_exponent);
+> +				ret = write(write_fd, &resp, sizeof(resp));
+> +				break;
+> +			case IOREGIONFD_CMD_WRITE:
+> +				memcpy(&cdata, &cmd.data, 1 << cmd.size_exponent);
+> +				if (cmd.resp) {
+> +					memset(&resp, 0, sizeof(resp));
+> +					ret = write(write_fd, &resp, sizeof(resp));
+> +				}
+> +				break;
+> +			default:
+> +				break;
+> +			}
+> +		} else
+> +			break;
+> +	}
+> +
+> +	close(read_fd);
+> +	if (write_fd > 0)
+> +		close(write_fd);
+> +
+> +	return 0;
+> +}
+> diff --git a/x86/ioregionfd_pio.c b/x86/ioregionfd_pio.c
+> new file mode 100644
+> index 0000000..eaf8aad
+> --- /dev/null
+> +++ b/x86/ioregionfd_pio.c
+> @@ -0,0 +1,24 @@
+> +#include "x86/vm.h"
+> +
+> +int main(int ac, char **av)
+> +{
+> +	u32 expected = 0x11223344;
+> +	u32 val = 0;
+> +	u32 write_addr = 0x1234;
+
+Getting this address from the command line would allow us to only
+hard code it in one place, unittests.cfg.
+
+> +	u32 read_addr = 0x1238;
+> +
+> +	outb(expected, write_addr);
+> +	val = inb(read_addr);
+> +	report(val == (u8)expected, "%x\n", val);
+> +
+> +	outw(expected, write_addr);
+> +	val = inw(read_addr);
+> +	report(val == (u16)expected, "%x\n", val);
+> +
+> +	outl(expected, write_addr);
+> +	val = inl(read_addr);
+> +	report(val == expected, "%x\n", val);
+> +
+> +	return report_summary();
+> +}
+> +
+> diff --git a/x86/unittests.cfg b/x86/unittests.cfg
+> index 0698d15..8001808 100644
+> --- a/x86/unittests.cfg
+> +++ b/x86/unittests.cfg
+> @@ -389,3 +389,10 @@ file = cet.flat
+>  arch = x86_64
+>  smp = 2
+>  extra_params = -enable-kvm -m 2048 -cpu host
+> +
+> +[ioregion-pio]
+> +file = ioregionfd_pio.flat
+> +helper_cmd = ioregionfd-test
+> +fifo = /tmp/test1 /tmp/test2
+> +extra_params = -device pc-testdev,addr=0x1234,size=8,rfifo=/tmp/test2,wfifo=/tmp/test1,pio=true
+
+If we wrap the QEMU invocation in the helper_cmd, then we can use mktemp to
+create our fifo node names. We also can put the address into a variable
+that we both pass to the QEMU command line augmentation and to the unit
+test through the unit test's command line.
 
 Thanks,
-Jean
+drew
+
+> +arch = x86_64
+> -- 
+> 2.25.1
+> 
+
