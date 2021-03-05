@@ -2,125 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 026C732F05F
-	for <lists+kvm@lfdr.de>; Fri,  5 Mar 2021 17:50:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C2CCC32F082
+	for <lists+kvm@lfdr.de>; Fri,  5 Mar 2021 18:01:57 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230130AbhCEQt5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 5 Mar 2021 11:49:57 -0500
-Received: from mail.kernel.org ([198.145.29.99]:41998 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229882AbhCEQt4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 5 Mar 2021 11:49:56 -0500
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id A88946508B;
-        Fri,  5 Mar 2021 16:49:55 +0000 (UTC)
-Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.lan)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.94)
-        (envelope-from <maz@kernel.org>)
-        id 1lIDeD-00HWzC-DC; Fri, 05 Mar 2021 16:49:53 +0000
-From:   Marc Zyngier <maz@kernel.org>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Alexandru Elisei <alexandru.elisei@arm.com>,
-        Andre Przywara <andre.przywara@arm.com>,
-        Andrew Scull <ascull@google.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Christoffer Dall <christoffer.dall@arm.com>,
-        Howard Zhang <Howard.Zhang@arm.com>,
-        Jia He <justin.he@arm.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Quentin Perret <qperret@google.com>,
-        Shameerali Kolothum Thodi 
-        <shameerali.kolothum.thodi@huawei.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Will Deacon <will@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        kernel-team@android.com, linux-arm-kernel@lists.infradead.org,
-        kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
-Subject: [GIT PULL] KVM/arm64 fixes for 5.12, take #1
-Date:   Fri,  5 Mar 2021 16:49:43 +0000
-Message-Id: <20210305164944.3729910-1-maz@kernel.org>
-X-Mailer: git-send-email 2.29.2
+        id S229964AbhCERBY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 5 Mar 2021 12:01:24 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:51016 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S229573AbhCERBL (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 5 Mar 2021 12:01:11 -0500
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 125GX0MG005830;
+        Fri, 5 Mar 2021 12:01:08 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=Ja40FQIv5e2vkmFlsLDSDU8/jkakWKsrFjjZV7N+kjA=;
+ b=revsDj5pHP6wnUfOYmesxOYEfzb3sxeomnhM8WrK9WEzfwb5Gtr9zkrttWkKZOEFIKJL
+ plM7ZPdQbUT/8RgYtAVznPN1c/nSE+E0ZRxrzOyDL7unqME8EubpNjnT8YmjsqB3nyEN
+ IaviXuHngccXQ3kHJOXH9jlUkBLlXXOoTFW6gFVE+/BkSTXA+w2EwygwaZEOPOQf165/
+ RTJyTTyyEX3sshfjVgForItKYBbNxSq04kSzaGiRL3KlXAMI4hcFJUMNJAaChiVvhAPe
+ +ktRHDE5yy1psqlxu5MjjOR98WM0AGPqgYci8LDujRHqGqghI4POuwUTw8P8jYzGjNuT JQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 373r17h7pq-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 05 Mar 2021 12:01:08 -0500
+Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 125GXEJh008148;
+        Fri, 5 Mar 2021 12:01:08 -0500
+Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 373r17h7ns-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 05 Mar 2021 12:01:08 -0500
+Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
+        by ppma04fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 125GxHmf004479;
+        Fri, 5 Mar 2021 17:01:06 GMT
+Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
+        by ppma04fra.de.ibm.com with ESMTP id 37150ct06g-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 05 Mar 2021 17:01:06 +0000
+Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 125H0nAh30212486
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 5 Mar 2021 17:00:49 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 880DE42045;
+        Fri,  5 Mar 2021 17:01:03 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 166074204C;
+        Fri,  5 Mar 2021 17:01:03 +0000 (GMT)
+Received: from oc7455500831.ibm.com (unknown [9.171.57.80])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Fri,  5 Mar 2021 17:01:03 +0000 (GMT)
+Subject: Re: [PATCH v5 2/3] s390/kvm: extend kvm_s390_shadow_fault to return
+ entry pointer
+To:     Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        linux-kernel@vger.kernel.org
+Cc:     frankja@linux.ibm.com, david@redhat.com, cohuck@redhat.com,
+        kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        stable@vger.kernel.org, Janosch Frank <frankja@de.ibm.com>
+References: <20210302174443.514363-1-imbrenda@linux.ibm.com>
+ <20210302174443.514363-3-imbrenda@linux.ibm.com>
+From:   Christian Borntraeger <borntraeger@de.ibm.com>
+Message-ID: <5b3af39c-d141-c51d-156a-a2ed0f9396ee@de.ibm.com>
+Date:   Fri, 5 Mar 2021 18:01:02 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.7.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: pbonzini@redhat.com, alexandru.elisei@arm.com, andre.przywara@arm.com, ascull@google.com, catalin.marinas@arm.com, christoffer.dall@arm.com, Howard.Zhang@arm.com, justin.he@arm.com, mark.rutland@arm.com, qperret@google.com, shameerali.kolothum.thodi@huawei.com, suzuki.poulose@arm.com, will@kernel.org, james.morse@arm.com, julien.thierry.kdev@gmail.com, kernel-team@android.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+In-Reply-To: <20210302174443.514363-3-imbrenda@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.761
+ definitions=2021-03-05_10:2021-03-03,2021-03-05 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0
+ priorityscore=1501 mlxscore=0 phishscore=0 impostorscore=0 bulkscore=0
+ clxscore=1015 adultscore=0 malwarescore=0 mlxlogscore=999
+ lowpriorityscore=0 spamscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2009150000 definitions=main-2103050083
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Paolo,
 
-Here's the first batch of fixes for 5.12. We have a handful of low
-level world-switch regressions, a page table walker fix, more PMU
-tidying up, and a workaround for systems with creative firmware.
 
-Note that this is based on -rc1 despite the breakage, as I didn't feel
-like holding these patches until -rc2.
+On 02.03.21 18:44, Claudio Imbrenda wrote:
+> Extend kvm_s390_shadow_fault to return the pointer to the valid leaf
+> DAT table entry, or to the invalid entry.
+> 
+> Also return some flags in the lower bits of the address:
+> PEI_DAT_PROT: indicates that DAT protection applies because of the
+>                protection bit in the segment (or, if EDAT, region) tables.
+> PEI_NOT_PTE: indicates that the address of the DAT table entry returned
+>               does not refer to a PTE, but to a segment or region table.
+> 
+> Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+> Cc: stable@vger.kernel.org
+> Reviewed-by: Janosch Frank <frankja@de.ibm.com>
+> Reviewed-by: David Hildenbrand <david@redhat.com>
 
-Please pull,
-
-	M.
-
-The following changes since commit fe07bfda2fb9cdef8a4d4008a409bb02f35f1bd8:
-
-  Linux 5.12-rc1 (2021-02-28 16:05:19 -0800)
-
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-fixes-5.12-1
-
-for you to fetch changes up to e85583b3f1fe62c9b371a3100c1c91af94005ca9:
-
-  KVM: arm64: Fix range alignment when walking page tables (2021-03-04 09:54:12 +0000)
-
-----------------------------------------------------------------
-KVM/arm64 fixes for 5.12, take #1
-
-- Fix SPE context save/restore on nVHE
-- Fix some subtle host context corruption on vcpu exit
-- Fix panic handling on nVHE
-- Prevent the hypervisor from accessing PMU registers when there is none
-- Workaround broken firmwares advertising bogus GICv2 compatibility
-- Fix Stage-2 unaligned range unmapping
-
-----------------------------------------------------------------
-Andrew Scull (1):
-      KVM: arm64: Fix nVHE hyp panic host context restore
-
-Jia He (1):
-      KVM: arm64: Fix range alignment when walking page tables
-
-Marc Zyngier (4):
-      KVM: arm64: Turn kvm_arm_support_pmu_v3() into a static key
-      KVM: arm64: Don't access PMSELR_EL0/PMUSERENR_EL0 when no PMU is available
-      KVM: arm64: Rename __vgic_v3_get_ich_vtr_el2() to __vgic_v3_get_gic_config()
-      KVM: arm64: Workaround firmware wrongly advertising GICv2-on-v3 compatibility
-
-Suzuki K Poulose (1):
-      KVM: arm64: nvhe: Save the SPE context early
-
-Will Deacon (1):
-      KVM: arm64: Avoid corrupting vCPU context register in guest exit
-
- arch/arm64/include/asm/kvm_asm.h        |  4 ++--
- arch/arm64/include/asm/kvm_hyp.h        |  8 ++++++-
- arch/arm64/kernel/image-vars.h          |  3 +++
- arch/arm64/kvm/hyp/entry.S              |  2 +-
- arch/arm64/kvm/hyp/include/hyp/switch.h |  9 +++++---
- arch/arm64/kvm/hyp/nvhe/debug-sr.c      | 12 ++++++++--
- arch/arm64/kvm/hyp/nvhe/host.S          | 15 +++++++------
- arch/arm64/kvm/hyp/nvhe/hyp-main.c      |  6 ++---
- arch/arm64/kvm/hyp/nvhe/switch.c        | 14 +++++++++---
- arch/arm64/kvm/hyp/pgtable.c            |  1 +
- arch/arm64/kvm/hyp/vgic-v3-sr.c         | 40 +++++++++++++++++++++++++++++++--
- arch/arm64/kvm/perf.c                   | 10 +++++++++
- arch/arm64/kvm/pmu-emul.c               | 10 ---------
- arch/arm64/kvm/vgic/vgic-v3.c           | 12 +++++++---
- include/kvm/arm_pmu.h                   |  9 ++++++--
- 15 files changed, 116 insertions(+), 39 deletions(-)
+Reviewed-by: Christian Borntraeger <borntraeger@de.ibm.com>
