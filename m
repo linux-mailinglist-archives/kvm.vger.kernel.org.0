@@ -2,148 +2,151 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 62D7232F9D4
-	for <lists+kvm@lfdr.de>; Sat,  6 Mar 2021 12:38:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7B69A32FAF5
+	for <lists+kvm@lfdr.de>; Sat,  6 Mar 2021 14:57:01 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230427AbhCFLiM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 6 Mar 2021 06:38:12 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51640 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230322AbhCFLht (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 6 Mar 2021 06:37:49 -0500
-Received: from mail-qt1-x82e.google.com (mail-qt1-x82e.google.com [IPv6:2607:f8b0:4864:20::82e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 76AA9C061760
-        for <kvm@vger.kernel.org>; Sat,  6 Mar 2021 03:37:49 -0800 (PST)
-Received: by mail-qt1-x82e.google.com with SMTP id t13so2544304qta.11
-        for <kvm@vger.kernel.org>; Sat, 06 Mar 2021 03:37:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=rLZcEItVMaZT77m15hh5Bj+DXsjyuX1Wi7CvUEsHYU8=;
-        b=kGkkyvuxM16s5Dd/vu0fIqgpFdef4nuJUXBQc/3cH7o636pQYm2QfEwuYjcFnIUF3+
-         VSLfZe+X9py2TuwhVEGO7Wf09FSALWAnIh/2LhtXSfAQKItNguvyi0RSwbXNP0ZQWXO9
-         jEVCZpjPOrEfQYGntZ2JF76WJVmOqgAiW+TxUgCRl4kTS3903KwV6HFF5kaVELDC/x4r
-         nAeugQb4NgG3jKdAMnRH0rQSy8r0Z6OsGvx0bOeplv6oUxRsTk4cF/3prlFisjwNIHwN
-         h/vQLNBSQFJKOd/XGkCmmdEFhMs/MmOML01q88UMCAsObuvHMOLCCBB6aqzf8+aGuu3/
-         1DpQ==
+        id S230455AbhCFN42 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 6 Mar 2021 08:56:28 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:34701 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230425AbhCFN4T (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Sat, 6 Mar 2021 08:56:19 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1615038978;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=FeqUTRA8uP0WljeVKQJ0UhmWA2YO3SuLjYpwE2Mi2Yo=;
+        b=bsv9VWb39Z8umXij17mEs9hgSJhT5Ti4NU2ci7HCR3N4I/HzEksa4HPMI0DcxJbCuYWK1E
+        mgWDLb6MCu7R5AvSrjNYazd7jVnkiGfZy9S/5TaKPI3h9lHySK6fv1VQRLw37eEOHbCcDu
+        qwtRYZzHEZyGccvt1W+JdhfCw60p0Fg=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-42-bQ-W06KEPQy6bt2kTonV9w-1; Sat, 06 Mar 2021 08:56:16 -0500
+X-MC-Unique: bQ-W06KEPQy6bt2kTonV9w-1
+Received: by mail-wr1-f71.google.com with SMTP id r12so2536491wro.15
+        for <kvm@vger.kernel.org>; Sat, 06 Mar 2021 05:56:16 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=rLZcEItVMaZT77m15hh5Bj+DXsjyuX1Wi7CvUEsHYU8=;
-        b=XwMfyunkDVSNaAhZMVEpMkxbbet1DMa0hg2AsyYFnVz+tionXHpwKshZ1FZa5qu5ZO
-         xJ/rEdlKrk9fitgRpLjOVReiwxDznCdLXqXwsJeOWxEQVse8jiqqfJZDQGzmkumE+HtM
-         rKadQ04HwJIAW3M06wpqlq8tF8kJHEX5dFriEyW6XNOiG5TO3On60hAB36nBbRXqhBvo
-         g+I2Bp+NsZiuey1S1d16pZOL528TNVvPFWl+H64+uyC0jRnlGWyNJ1DZ2MfJVj5b21oH
-         0Y37pBj12mcvmtbPUDKEHAa4iefP0IhC/qSCfIgVnkyS9BjRddrZwkyEwQ5/uN5Vkula
-         boJw==
-X-Gm-Message-State: AOAM531tDZhj2xzlZwzXpDCk0nCmInG8e0tl+EgxCvJUf3qfYgdFDfWX
-        +vA/SZ1ljtPb6nFntGyINbLjRgOKxyVXMxXOGsL5Bg==
-X-Google-Smtp-Source: ABdhPJxYA9ku6N1PDdsktCXehDnti2bdz0hJtZV0CfBHamUTyev7iN1pLvaay9z4cLB807kE3n8lo8+uorUNVhpJwZ0=
-X-Received: by 2002:ac8:6f3b:: with SMTP id i27mr12856662qtv.67.1615030668299;
- Sat, 06 Mar 2021 03:37:48 -0800 (PST)
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=FeqUTRA8uP0WljeVKQJ0UhmWA2YO3SuLjYpwE2Mi2Yo=;
+        b=RlgZsWdktV6GyYZmteeTmvdiMrbPq+SU7XmFTynKXtxWfSXgRc8v8c/A3OS/BdsQaK
+         hvgnZ27qeYiOqUFj1FwsYSrRfy6QX8zZb+DpanFGpo/+v1CFD2eI4u6CwPjlfdDWlPzD
+         gvqksun3oh/oa16wtfMGKiYGpHx0z/+CAnvmkI97fe1qHV9qaTJkuwy8Mh/5O+VxbGWJ
+         HnhDwqZO/PwipEaMM8XBYhoDYk9S5rYUwOUNPsvd6W73m8f750ZOaq8PcLnHx8QFeikM
+         3BuY/GfcHF0HAe6f3jlE+1CqgdQ1TJ8001uSyklcKOtV6SYqDcMTKWFB4Zv5Yb8J4Is/
+         O13g==
+X-Gm-Message-State: AOAM5305dc0L/O646Kaq6Mec1pNzwRJUJYr8RDIIfKHivn2xeOTsrHFC
+        M1EJsze+hU4czVJaOkmLc8SO5Nj4gNmavpo0DdJZA1Xwh+o3kG9OyTCA8DG5TTsQ0RoSITUQVAy
+        6Qk561chFRDGI
+X-Received: by 2002:adf:8b0d:: with SMTP id n13mr14482380wra.94.1615038973891;
+        Sat, 06 Mar 2021 05:56:13 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJx0gXaw4vyThiyxnIVYScgpR0Sj+FLwy7oYfzFJuKCwugx3XAqCs2vWgS8/jgzo0gmGY4nw6Q==
+X-Received: by 2002:adf:8b0d:: with SMTP id n13mr14482362wra.94.1615038973700;
+        Sat, 06 Mar 2021 05:56:13 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e? ([2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e])
+        by smtp.gmail.com with ESMTPSA id g202sm8781763wme.20.2021.03.06.05.56.08
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 06 Mar 2021 05:56:13 -0800 (PST)
+Subject: Re: [PATCH 1/1] KVM: x86: to track if L1 is running L2 VM
+To:     Dongli Zhang <dongli.zhang@oracle.com>, x86@kernel.org,
+        kvm@vger.kernel.org
+Cc:     seanjc@google.com, vkuznets@redhat.com, wanpengli@tencent.com,
+        jmattson@google.com, joro@8bytes.org, tglx@linutronix.de,
+        mingo@redhat.com, bp@alien8.de, hpa@zytor.com,
+        linux-kernel@vger.kernel.org, joe.jin@oracle.com
+References: <20210305225747.7682-1-dongli.zhang@oracle.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <cebd5f51-12e8-44e5-7568-8890343ca36e@redhat.com>
+Date:   Sat, 6 Mar 2021 14:56:07 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.7.0
 MIME-Version: 1.0
-References: <000000000000ccbedd05bcd0504e@google.com>
-In-Reply-To: <000000000000ccbedd05bcd0504e@google.com>
-From:   Dmitry Vyukov <dvyukov@google.com>
-Date:   Sat, 6 Mar 2021 12:37:37 +0100
-Message-ID: <CACT4Y+a54q=WzJU9UgzW1P6-xvJqrTJ9doXcqCgyu+MPBFFL=w@mail.gmail.com>
-Subject: Re: [syzbot] upstream boot error: WARNING in kvm_wait
-To:     syzbot <syzbot+a4c8bc1d1dc7b620630d@syzkaller.appspotmail.com>
-Cc:     Borislav Petkov <bp@alien8.de>, "H. Peter Anvin" <hpa@zytor.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, KVM list <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Ingo Molnar <mingo@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        syzkaller-bugs <syzkaller-bugs@googlegroups.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>, wanpengli@tencent.com,
-        "the arch/x86 maintainers" <x86@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20210305225747.7682-1-dongli.zhang@oracle.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Mar 5, 2021 at 9:56 PM syzbot
-<syzbot+a4c8bc1d1dc7b620630d@syzkaller.appspotmail.com> wrote:
->
-> Hello,
->
-> syzbot found the following issue on:
->
-> HEAD commit:    280d542f Merge tag 'drm-fixes-2021-03-05' of git://anongit..
-> git tree:       upstream
-> console output: https://syzkaller.appspot.com/x/log.txt?x=138c7a92d00000
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=dc4003509ab3fc78
-> dashboard link: https://syzkaller.appspot.com/bug?extid=a4c8bc1d1dc7b620630d
->
-> IMPORTANT: if you fix the issue, please add the following tag to the commit:
-> Reported-by: syzbot+a4c8bc1d1dc7b620630d@syzkaller.appspotmail.com
-
-+Mark, I've enabled CONFIG_DEBUG_IRQFLAGS on syzbot and it led to this breakage.
-Is it a bug in kvm_wait or in the debugging code itself? If it's a
-real bug, I would assume it's pretty bad as it happens all the time.
-
-
-> ------------[ cut here ]------------
-> raw_local_irq_restore() called with IRQs enabled
-> WARNING: CPU: 2 PID: 213 at kernel/locking/irqflag-debug.c:10 warn_bogus_irq_restore+0x1d/0x20 kernel/locking/irqflag-debug.c:10
-> Modules linked in:
-> CPU: 2 PID: 213 Comm: kworker/u17:4 Not tainted 5.12.0-rc1-syzkaller #0
-> Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.14.0-2 04/01/2014
-> Workqueue: events_unbound call_usermodehelper_exec_work
->
-> RIP: 0010:warn_bogus_irq_restore+0x1d/0x20 kernel/locking/irqflag-debug.c:10
-> Code: be ff cc cc cc cc cc cc cc cc cc cc cc 80 3d e4 38 af 04 00 74 01 c3 48 c7 c7 a0 8f 6b 89 c6 05 d3 38 af 04 01 e8 e7 b9 be ff <0f> 0b c3 48 39 77 10 0f 84 97 00 00 00 66 f7 47 22 f0 ff 74 4b 48
-> RSP: 0000:ffffc90000fe7770 EFLAGS: 00010286
->
-> RAX: 0000000000000000 RBX: ffffffff8c0e9c68 RCX: 0000000000000000
-> RDX: ffff8880116bc3c0 RSI: ffffffff815c0cf5 RDI: fffff520001fcee0
-> RBP: 0000000000000200 R08: 0000000000000000 R09: 0000000000000001
-> R10: ffffffff815b9a5e R11: 0000000000000000 R12: 0000000000000003
-> R13: fffffbfff181d38d R14: 0000000000000001 R15: ffff88802cc36000
-> FS:  0000000000000000(0000) GS:ffff88802cc00000(0000) knlGS:0000000000000000
-> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> CR2: 0000000000000000 CR3: 000000000bc8e000 CR4: 0000000000150ee0
-> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-> Call Trace:
->  kvm_wait arch/x86/kernel/kvm.c:860 [inline]
->  kvm_wait+0xc9/0xe0 arch/x86/kernel/kvm.c:837
->  pv_wait arch/x86/include/asm/paravirt.h:564 [inline]
->  pv_wait_head_or_lock kernel/locking/qspinlock_paravirt.h:470 [inline]
->  __pv_queued_spin_lock_slowpath+0x8b8/0xb40 kernel/locking/qspinlock.c:508
->  pv_queued_spin_lock_slowpath arch/x86/include/asm/paravirt.h:554 [inline]
->  queued_spin_lock_slowpath arch/x86/include/asm/qspinlock.h:51 [inline]
->  queued_spin_lock include/asm-generic/qspinlock.h:85 [inline]
->  do_raw_spin_lock+0x200/0x2b0 kernel/locking/spinlock_debug.c:113
->  spin_lock include/linux/spinlock.h:354 [inline]
->  copy_fs_struct+0x1c8/0x340 fs/fs_struct.c:123
->  copy_fs kernel/fork.c:1443 [inline]
->  copy_process+0x4dc2/0x6fd0 kernel/fork.c:2088
->  kernel_clone+0xe7/0xab0 kernel/fork.c:2462
->  kernel_thread+0xb5/0xf0 kernel/fork.c:2514
->  call_usermodehelper_exec_work kernel/umh.c:172 [inline]
->  call_usermodehelper_exec_work+0xcc/0x180 kernel/umh.c:158
->  process_one_work+0x98d/0x1600 kernel/workqueue.c:2275
->  worker_thread+0x64c/0x1120 kernel/workqueue.c:2421
->  kthread+0x3b1/0x4a0 kernel/kthread.c:292
->  ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:294
->
->
+On 05/03/21 23:57, Dongli Zhang wrote:
+> The new per-cpu stat 'nested_run' is introduced in order to track if L1 VM
+> is running or used to run L2 VM.
+> 
+> An example of the usage of 'nested_run' is to help the host administrator
+> to easily track if any L1 VM is used to run L2 VM. Suppose there is issue
+> that may happen with nested virtualization, the administrator will be able
+> to easily narrow down and confirm if the issue is due to nested
+> virtualization via 'nested_run'. For example, whether the fix like
+> commit 88dddc11a8d6 ("KVM: nVMX: do not use dangling shadow VMCS after
+> guest reset") is required.
+> 
+> Cc: Joe Jin <joe.jin@oracle.com>
+> Signed-off-by: Dongli Zhang <dongli.zhang@oracle.com>
 > ---
-> This report is generated by a bot. It may contain errors.
-> See https://goo.gl/tpsmEJ for more information about syzbot.
-> syzbot engineers can be reached at syzkaller@googlegroups.com.
->
-> syzbot will keep track of this issue. See:
-> https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
->
-> --
-> You received this message because you are subscribed to the Google Groups "syzkaller-bugs" group.
-> To unsubscribe from this group and stop receiving emails from it, send an email to syzkaller-bugs+unsubscribe@googlegroups.com.
-> To view this discussion on the web visit https://groups.google.com/d/msgid/syzkaller-bugs/000000000000ccbedd05bcd0504e%40google.com.
+>   arch/x86/include/asm/kvm_host.h | 1 +
+>   arch/x86/kvm/svm/nested.c       | 2 ++
+>   arch/x86/kvm/vmx/nested.c       | 2 ++
+>   arch/x86/kvm/x86.c              | 1 +
+>   4 files changed, 6 insertions(+)
+> 
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index 877a4025d8da..7669215426ac 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -1125,6 +1125,7 @@ struct kvm_vcpu_stat {
+>   	u64 req_event;
+>   	u64 halt_poll_success_ns;
+>   	u64 halt_poll_fail_ns;
+> +	u64 nested_run;
+>   };
+>   
+>   struct x86_instruction_info;
+> diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
+> index 35891d9a1099..18c02e958a09 100644
+> --- a/arch/x86/kvm/svm/nested.c
+> +++ b/arch/x86/kvm/svm/nested.c
+> @@ -494,6 +494,8 @@ int nested_svm_vmrun(struct vcpu_svm *svm)
+>   	struct kvm_host_map map;
+>   	u64 vmcb12_gpa;
+>   
+> +	++svm->vcpu.stat.nested_run;
+> +
+>   	if (is_smm(&svm->vcpu)) {
+>   		kvm_queue_exception(&svm->vcpu, UD_VECTOR);
+>   		return 1;
+> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+> index bcca0b80e0d0..bd1343a0896e 100644
+> --- a/arch/x86/kvm/vmx/nested.c
+> +++ b/arch/x86/kvm/vmx/nested.c
+> @@ -3453,6 +3453,8 @@ static int nested_vmx_run(struct kvm_vcpu *vcpu, bool launch)
+>   	u32 interrupt_shadow = vmx_get_interrupt_shadow(vcpu);
+>   	enum nested_evmptrld_status evmptrld_status;
+>   
+> +	++vcpu->stat.nested_run;
+> +
+>   	if (!nested_vmx_check_permission(vcpu))
+>   		return 1;
+>   
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 2a20ce60152e..f296febb0485 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -245,6 +245,7 @@ struct kvm_stats_debugfs_item debugfs_entries[] = {
+>   	VCPU_STAT("l1d_flush", l1d_flush),
+>   	VCPU_STAT("halt_poll_success_ns", halt_poll_success_ns),
+>   	VCPU_STAT("halt_poll_fail_ns", halt_poll_fail_ns),
+> +	VCPU_STAT("nested_run", nested_run),
+>   	VM_STAT("mmu_shadow_zapped", mmu_shadow_zapped),
+>   	VM_STAT("mmu_pte_write", mmu_pte_write),
+>   	VM_STAT("mmu_pde_zapped", mmu_pde_zapped),
+> 
+
+Queued, thanks.
+
+Paolo
+
