@@ -2,137 +2,98 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A510232F7B8
-	for <lists+kvm@lfdr.de>; Sat,  6 Mar 2021 03:02:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 48CB032F923
+	for <lists+kvm@lfdr.de>; Sat,  6 Mar 2021 10:28:01 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230329AbhCFCAa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 5 Mar 2021 21:00:30 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41418 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230222AbhCFB7v (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 5 Mar 2021 20:59:51 -0500
-Received: from mail-qv1-xf4a.google.com (mail-qv1-xf4a.google.com [IPv6:2607:f8b0:4864:20::f4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 29314C061760
-        for <kvm@vger.kernel.org>; Fri,  5 Mar 2021 17:59:51 -0800 (PST)
-Received: by mail-qv1-xf4a.google.com with SMTP id e9so2908546qvf.21
-        for <kvm@vger.kernel.org>; Fri, 05 Mar 2021 17:59:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=sender:reply-to:date:in-reply-to:message-id:mime-version:references
-         :subject:from:to:cc;
-        bh=RGBGjRYcLpzZKmmikFQwZLPbNnCzmLhMB1ZnNSdMI9Q=;
-        b=B2slHV0TDG3kCxdpO6MqS6MEA29EPE00hM4j4eEMMirvy2nvf7tYOlXFK4t7AKTH61
-         nMDnUJOW7I1l8Vktzb0QZJu3TyjCcXTPS5+FI/IciWJiQKIUtzK6jYZvQUL1DmegzDqp
-         +vhGN2JmcZQhDvROioiZ/J4XABwioYcsMJdMNXC3/0kGW0EQWkY7se41i+AYVxOGfpvY
-         dYa/j2sfIWGAm4yaAIOXGN+DOtXzBMbi1QmKGymC5+IdFHQtq99lMKP+GfKE53N1Gnp2
-         RSDvByxJoeXjiLlLKqv4CUQS6shOb5RyQsnCZPgsgqwdgSLgy2KL5veo0QwI2SMUitD4
-         cGlw==
+        id S229815AbhCFJ1M (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 6 Mar 2021 04:27:12 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:54830 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229701AbhCFJ1D (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Sat, 6 Mar 2021 04:27:03 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1615022821;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=e5O/LpcxMMdquDVNYjg2lF3OYstWuYNsRwulGsHakfc=;
+        b=blbWV8cU3prZoc4ZWouEcs9cXArZ+MHCuP/f7ygGNUs7gR4wPjxq6LGluQaxsr6zqttR9k
+        Z4d3umG2MkTAZFEtpBGO6FnQz3my3ee33zMY1nG5Rs+9hpYRXYH+9EUsTk2em58wGJlwbk
+        iraBKs4ayU8TddT1ynP8QoSC07EIWYI=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-274-FH9W9zl-PSKWMH9tX-Zmog-1; Sat, 06 Mar 2021 04:26:59 -0500
+X-MC-Unique: FH9W9zl-PSKWMH9tX-Zmog-1
+Received: by mail-wr1-f72.google.com with SMTP id r12so2268194wro.15
+        for <kvm@vger.kernel.org>; Sat, 06 Mar 2021 01:26:58 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:reply-to:date:in-reply-to:message-id
-         :mime-version:references:subject:from:to:cc;
-        bh=RGBGjRYcLpzZKmmikFQwZLPbNnCzmLhMB1ZnNSdMI9Q=;
-        b=IuWrq+jbSSQLPs+Po05Zk7ryOcKPXNo8OHR3iP5kkPyHP7hb0tt/dILjZniVWNQV+0
-         Nr52eycuPaWYDDjPCEhUvT8FneytcI6+rD2c1gxkBQGr61z+RvsSS/wbiHC9qI4xv2Ap
-         1SCYub6/HNcOOqJS3YBqesDNRNPevmHXCGX2IW/goODEUsdG02C1MmgOYSeZyXT+8n7b
-         z1pB1QmVb0xjHvcv6s5sM5h6OnNjr0WA3H89HMuJFNFS0QbXEj/v+aPtKL5V0+iLp1Yf
-         NippSRD2j0V8rqTD0kszB0jPMhKc4k+M8z0mU5b7sBDWrLvmV2d+TkVOd/pRjCx3Kwjq
-         Clkg==
-X-Gm-Message-State: AOAM533aC5wABMMIPCXV/qU85Rh0tElxbYlrOE4sgDw630dxwxr32UG2
-        SpB7aLsgXAB213nwRQaK62sgSPOAlUI=
-X-Google-Smtp-Source: ABdhPJwSoKByoD4fhMYtVv7nTAckUzrERAauGnDMgwYEfWPsbSLGyNIuvE+yfkt8C2ng8lyhOS/O+n+WuEA=
-Sender: "seanjc via sendgmr" <seanjc@seanjc798194.pdx.corp.google.com>
-X-Received: from seanjc798194.pdx.corp.google.com ([2620:15c:f:10:fc04:f9df:1efb:bf0c])
- (user=seanjc job=sendgmr) by 2002:a05:6214:1085:: with SMTP id
- o5mr11740761qvr.5.1614995990308; Fri, 05 Mar 2021 17:59:50 -0800 (PST)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Fri,  5 Mar 2021 17:59:05 -0800
-In-Reply-To: <20210306015905.186698-1-seanjc@google.com>
-Message-Id: <20210306015905.186698-15-seanjc@google.com>
-Mime-Version: 1.0
-References: <20210306015905.186698-1-seanjc@google.com>
-X-Mailer: git-send-email 2.30.1.766.gb4fecdf3b7-goog
-Subject: [PATCH v4 14/14] KVM: SVM: Skip SEV cache flush if no ASIDs have been used
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Borislav Petkov <bp@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Brijesh Singh <brijesh.singh@amd.com>
-Content-Type: text/plain; charset="UTF-8"
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=e5O/LpcxMMdquDVNYjg2lF3OYstWuYNsRwulGsHakfc=;
+        b=fOzb72KGtQ85yGsIK/qfpGoa0i/eAWEFP2N0qcx5ZzHDp6GGMyoB9ObDjE1T7Qrv4v
+         NP70NbtzcyuKtyhoabyziIH4T09kRyd9WMA2dwDDmDFeSFTsrTpTkgGtthjhjgZsSSu3
+         Jf36Z4LvsmbIQ/WtRL8L9BdpQmqFBsKUuOPddAWZhjTTNTaqnrrJ/BYcE5vAV9CmZpSl
+         ycM4zLUzxa9n2nIk+Acc4ODiaXrVa2yGsYBuQgh6pKKQbG2EgBmOHy+IoTdLbivaoARQ
+         slxQLD+cXIKuXx2nZyTAQANxeNJvkKlhAvifJY3ERymjtKThJmvQZp3zNtHvDZXBRqWj
+         7NCA==
+X-Gm-Message-State: AOAM532tcczjRXkJKiUJWgVQ3Gp9e41/f0TKTTnB+U1lKEuk1XVodsuh
+        jTpZc119y+xCRvbmXQi0kDWxKg+nw68rV/ZtwzhXVruj3+wAJQvIh2tmIROa1/rdqYb+pKKGNcj
+        l7conuu7SlG1v
+X-Received: by 2002:a5d:4002:: with SMTP id n2mr3398524wrp.148.1615022818013;
+        Sat, 06 Mar 2021 01:26:58 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJw9/q/9S+4sLU2rGSr6w+yDYGAFfQ+D9c80lfJ+5k/SiOHKsOSUvmPuATMc8lsg7cJLJrdpgA==
+X-Received: by 2002:a5d:4002:: with SMTP id n2mr3398516wrp.148.1615022817864;
+        Sat, 06 Mar 2021 01:26:57 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e? ([2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e])
+        by smtp.gmail.com with ESMTPSA id o14sm7710140wri.48.2021.03.06.01.26.56
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 06 Mar 2021 01:26:57 -0800 (PST)
+Subject: Re: [PATCH 03/28] KVM: nSVM: inject exceptions via
+ svm_check_nested_events
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        vkuznets@redhat.com, mlevitsk@redhat.com,
+        Jim Mattson <jmattson@google.com>
+References: <YELdblXaKBTQ4LGf@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <fc2b0085-eb0f-dbab-28c2-a244916c655f@redhat.com>
+Date:   Sat, 6 Mar 2021 10:26:56 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.7.0
+MIME-Version: 1.0
+In-Reply-To: <YELdblXaKBTQ4LGf@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Skip SEV's expensive WBINVD and DF_FLUSH if there are no SEV ASIDs
-waiting to be reclaimed, e.g. if SEV was never used.  This "fixes" an
-issue where the DF_FLUSH fails during hardware teardown if the original
-SEV_INIT failed.  Ideally, SEV wouldn't be marked as enabled in KVM if
-SEV_INIT fails, but that's a problem for another day.
+On 06/03/21 02:39, Sean Christopherson wrote:
+> Unless KVM (L0) knowingly wants to override L1, e.g. KVM_GUESTDBG_* cases, KVM
+> shouldn't do a damn thing except forward the exception to L1 if L1 wants the
+> exception.
+> 
+> ud_interception() and gp_interception() do quite a bit before forwarding the
+> exception, and in the case of #UD, it's entirely possible the #UD will never get
+> forwarded to L1.  #GP is even more problematic because it's a contributory
+> exception, and kvm_multiple_exception() is not equipped to check and handle
+> nested intercepts before vectoring the exception, which means KVM will
+> incorrectly escalate a #GP->#DF and #GP->#DF->Triple Fault instead of exiting
+> to L1.  That's a wee bit problematic since KVM also has a soon-to-be-fixed bug
+> where it kills L1 on a Triple Fault in L2...
 
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- arch/x86/kvm/svm/sev.c | 23 +++++++++++------------
- 1 file changed, 11 insertions(+), 12 deletions(-)
+I agree with the #GP problem, but this is on purpose.  For example, if 
+L1 CPUID has MOVBE and it is being emulated via #UD, L1 would be right 
+to set MOVBE in L2's CPUID and expect it not to cause a #UD.  The same 
+is true for the VMware #GP interception case.
 
-diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index 3bf04a697723..f8ebda7c365a 100644
---- a/arch/x86/kvm/svm/sev.c
-+++ b/arch/x86/kvm/svm/sev.c
-@@ -57,9 +57,14 @@ struct enc_region {
- 	unsigned long size;
- };
- 
--static int sev_flush_asids(void)
-+static int sev_flush_asids(int min_asid, int max_asid)
- {
--	int ret, error = 0;
-+	int ret, pos, error = 0;
-+
-+	/* Check if there are any ASIDs to reclaim before performing a flush */
-+	pos = find_next_bit(sev_reclaim_asid_bitmap, max_sev_asid, min_asid);
-+	if (pos >= max_asid)
-+		return -EBUSY;
- 
- 	/*
- 	 * DEACTIVATE will clear the WBINVD indicator causing DF_FLUSH to fail,
-@@ -81,14 +86,7 @@ static int sev_flush_asids(void)
- /* Must be called with the sev_bitmap_lock held */
- static bool __sev_recycle_asids(int min_asid, int max_asid)
- {
--	int pos;
--
--	/* Check if there are any ASIDs to reclaim before performing a flush */
--	pos = find_next_bit(sev_reclaim_asid_bitmap, max_sev_asid, min_asid);
--	if (pos >= max_asid)
--		return false;
--
--	if (sev_flush_asids())
-+	if (sev_flush_asids(min_asid, max_asid))
- 		return false;
- 
- 	/* The flush process will flush all reclaimable SEV and SEV-ES ASIDs */
-@@ -1399,10 +1397,11 @@ void sev_hardware_teardown(void)
- 	if (!sev_enabled)
- 		return;
- 
-+	/* No need to take sev_bitmap_lock, all VMs have been destroyed. */
-+	sev_flush_asids(0, max_sev_asid);
-+
- 	bitmap_free(sev_asid_bitmap);
- 	bitmap_free(sev_reclaim_asid_bitmap);
--
--	sev_flush_asids();
- }
- 
- int sev_cpu_init(struct svm_cpu_data *sd)
--- 
-2.30.1.766.gb4fecdf3b7-goog
+Maxim is also working on this, the root cause is that 
+kvm_multiple_exception()'s escalation of contributory exceptions to #DF 
+and triple fault is incorrect in the case of nested virtualization.
+
+Paolo
 
