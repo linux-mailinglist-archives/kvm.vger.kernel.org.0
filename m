@@ -2,69 +2,83 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 48CB032F923
-	for <lists+kvm@lfdr.de>; Sat,  6 Mar 2021 10:28:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A4B0632F92C
+	for <lists+kvm@lfdr.de>; Sat,  6 Mar 2021 10:52:00 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229815AbhCFJ1M (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 6 Mar 2021 04:27:12 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:54830 "EHLO
+        id S229972AbhCFJuX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 6 Mar 2021 04:50:23 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:29272 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229701AbhCFJ1D (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Sat, 6 Mar 2021 04:27:03 -0500
+        by vger.kernel.org with ESMTP id S229662AbhCFJuJ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Sat, 6 Mar 2021 04:50:09 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1615022821;
+        s=mimecast20190719; t=1615024208;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=e5O/LpcxMMdquDVNYjg2lF3OYstWuYNsRwulGsHakfc=;
-        b=blbWV8cU3prZoc4ZWouEcs9cXArZ+MHCuP/f7ygGNUs7gR4wPjxq6LGluQaxsr6zqttR9k
-        Z4d3umG2MkTAZFEtpBGO6FnQz3my3ee33zMY1nG5Rs+9hpYRXYH+9EUsTk2em58wGJlwbk
-        iraBKs4ayU8TddT1ynP8QoSC07EIWYI=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-274-FH9W9zl-PSKWMH9tX-Zmog-1; Sat, 06 Mar 2021 04:26:59 -0500
-X-MC-Unique: FH9W9zl-PSKWMH9tX-Zmog-1
-Received: by mail-wr1-f72.google.com with SMTP id r12so2268194wro.15
-        for <kvm@vger.kernel.org>; Sat, 06 Mar 2021 01:26:58 -0800 (PST)
+        bh=wtTBL6IGeyh8BSRigo0CKkYcexJFfp/4IWRWxSSwnCI=;
+        b=b9MaAX0rVm388DL/Vm0qC9YOo6vurAI/31Rm9xRKN97RMV6RxCtbMWOxYxI9wl8fry8G3T
+        uUMYCIVKkX39AQw+suyJrxcAcwWuyj5ohXJ4fjGdtfK7f0nWmYqitOPMpYvoQz5qoYSRie
+        4iQARwXtdkgyO+txqXNMohIDS8s8tqg=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-439-bBjo3HXfOiukrJTH3pW2rg-1; Sat, 06 Mar 2021 04:50:07 -0500
+X-MC-Unique: bBjo3HXfOiukrJTH3pW2rg-1
+Received: by mail-wr1-f69.google.com with SMTP id n16so1209501wro.1
+        for <kvm@vger.kernel.org>; Sat, 06 Mar 2021 01:50:06 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=e5O/LpcxMMdquDVNYjg2lF3OYstWuYNsRwulGsHakfc=;
-        b=fOzb72KGtQ85yGsIK/qfpGoa0i/eAWEFP2N0qcx5ZzHDp6GGMyoB9ObDjE1T7Qrv4v
-         NP70NbtzcyuKtyhoabyziIH4T09kRyd9WMA2dwDDmDFeSFTsrTpTkgGtthjhjgZsSSu3
-         Jf36Z4LvsmbIQ/WtRL8L9BdpQmqFBsKUuOPddAWZhjTTNTaqnrrJ/BYcE5vAV9CmZpSl
-         ycM4zLUzxa9n2nIk+Acc4ODiaXrVa2yGsYBuQgh6pKKQbG2EgBmOHy+IoTdLbivaoARQ
-         slxQLD+cXIKuXx2nZyTAQANxeNJvkKlhAvifJY3ERymjtKThJmvQZp3zNtHvDZXBRqWj
-         7NCA==
-X-Gm-Message-State: AOAM532tcczjRXkJKiUJWgVQ3Gp9e41/f0TKTTnB+U1lKEuk1XVodsuh
-        jTpZc119y+xCRvbmXQi0kDWxKg+nw68rV/ZtwzhXVruj3+wAJQvIh2tmIROa1/rdqYb+pKKGNcj
-        l7conuu7SlG1v
-X-Received: by 2002:a5d:4002:: with SMTP id n2mr3398524wrp.148.1615022818013;
-        Sat, 06 Mar 2021 01:26:58 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJw9/q/9S+4sLU2rGSr6w+yDYGAFfQ+D9c80lfJ+5k/SiOHKsOSUvmPuATMc8lsg7cJLJrdpgA==
-X-Received: by 2002:a5d:4002:: with SMTP id n2mr3398516wrp.148.1615022817864;
-        Sat, 06 Mar 2021 01:26:57 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e? ([2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e])
-        by smtp.gmail.com with ESMTPSA id o14sm7710140wri.48.2021.03.06.01.26.56
+        bh=wtTBL6IGeyh8BSRigo0CKkYcexJFfp/4IWRWxSSwnCI=;
+        b=liZhfIb7bFU3iu0hmGKX/JQClYgmdVIhrTCMvrp7bS4dL+J86vj9tt2PVxv5rWcdT2
+         pJ2o2zT6QnjbwFD44n+RSTKLU5wVi2KH1//Qq+QU7LrYWaaYPtcWVof5Unl5U/98n5SZ
+         U07A9XK4sL9IaPzdWUTngoAHokcr0LiUVg3CsviworXFEjQ2hjrK32b6uwdc6iNTTcVd
+         a+VVVkIIlY/qtOR+1VwLs90xe1O9haKqjG7jEmN+lJs3XxWoRjynexZ7k7XajS+V/ckJ
+         SK+29JDFydnMp7j6A9qnRShSxRLsshaHZbg6kKk7YKkTE8kTbu/Yeoom7q13w550WRa2
+         5fHg==
+X-Gm-Message-State: AOAM532ulcAQ9R4rlPuKaZktMcq0d+Xk5v0MDGSJEyyfWVFxmmYuFiru
+        uNo9VvAxlYgUNAinMV058a3vxInSkpdjqCH0RCnhLS4AO0cvlFpc3xjcTkjxxxXChbirWhnaiNY
+        Uu9LqM5pVdzBdAOtEH3s5B4MMS3Z+baUzAbECoAa3iYLQVJuBSzyFZRf8P9rH4M3A
+X-Received: by 2002:a05:600c:2312:: with SMTP id 18mr12896202wmo.8.1615024205667;
+        Sat, 06 Mar 2021 01:50:05 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJz8afe+cwtYmFye2D6e0melYZ9I5pdVrhkTg5wC3o1VvGnf0tHz47eDy06nGS/FpuI4hTDltw==
+X-Received: by 2002:a05:600c:2312:: with SMTP id 18mr12896177wmo.8.1615024205516;
+        Sat, 06 Mar 2021 01:50:05 -0800 (PST)
+Received: from [192.168.10.118] ([93.56.170.5])
+        by smtp.gmail.com with ESMTPSA id m132sm9079567wmf.45.2021.03.06.01.50.03
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 06 Mar 2021 01:26:57 -0800 (PST)
-Subject: Re: [PATCH 03/28] KVM: nSVM: inject exceptions via
- svm_check_nested_events
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        vkuznets@redhat.com, mlevitsk@redhat.com,
-        Jim Mattson <jmattson@google.com>
-References: <YELdblXaKBTQ4LGf@google.com>
+        Sat, 06 Mar 2021 01:50:04 -0800 (PST)
+Subject: Re: [PATCH 0/8] KVM/arm64 fixes for 5.12, take #1
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     Alexandru Elisei <alexandru.elisei@arm.com>,
+        Andre Przywara <andre.przywara@arm.com>,
+        Andrew Scull <ascull@google.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Christoffer Dall <christoffer.dall@arm.com>,
+        Howard Zhang <Howard.Zhang@arm.com>,
+        Jia He <justin.he@arm.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Quentin Perret <qperret@google.com>,
+        Shameerali Kolothum Thodi 
+        <shameerali.kolothum.thodi@huawei.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Will Deacon <will@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        kernel-team@android.com, linux-arm-kernel@lists.infradead.org,
+        kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+References: <87eegtzbch.wl-maz@kernel.org>
+ <20210305185254.3730990-1-maz@kernel.org>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <fc2b0085-eb0f-dbab-28c2-a244916c655f@redhat.com>
-Date:   Sat, 6 Mar 2021 10:26:56 +0100
+Message-ID: <7a42527e-df78-35ea-4b93-8587effb46cd@redhat.com>
+Date:   Sat, 6 Mar 2021 10:50:02 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.7.0
 MIME-Version: 1.0
-In-Reply-To: <YELdblXaKBTQ4LGf@google.com>
+In-Reply-To: <20210305185254.3730990-1-maz@kernel.org>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -72,28 +86,57 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 06/03/21 02:39, Sean Christopherson wrote:
-> Unless KVM (L0) knowingly wants to override L1, e.g. KVM_GUESTDBG_* cases, KVM
-> shouldn't do a damn thing except forward the exception to L1 if L1 wants the
-> exception.
+On 05/03/21 19:52, Marc Zyngier wrote:
+> Hi Paolo,
 > 
-> ud_interception() and gp_interception() do quite a bit before forwarding the
-> exception, and in the case of #UD, it's entirely possible the #UD will never get
-> forwarded to L1.  #GP is even more problematic because it's a contributory
-> exception, and kvm_multiple_exception() is not equipped to check and handle
-> nested intercepts before vectoring the exception, which means KVM will
-> incorrectly escalate a #GP->#DF and #GP->#DF->Triple Fault instead of exiting
-> to L1.  That's a wee bit problematic since KVM also has a soon-to-be-fixed bug
-> where it kills L1 on a Triple Fault in L2...
+> Here's the first batch of fixes for 5.12. We have a handful of low
+> level world-switch regressions, a page table walker fix, more PMU
+> tidying up, and a workaround for systems with creative firmware.
+> 
+> This will need to go on top of the current state of mainline.
 
-I agree with the #GP problem, but this is on purpose.  For example, if 
-L1 CPUID has MOVBE and it is being emulated via #UD, L1 would be right 
-to set MOVBE in L2's CPUID and expect it not to cause a #UD.  The same 
-is true for the VMware #GP interception case.
-
-Maxim is also working on this, the root cause is that 
-kvm_multiple_exception()'s escalation of contributory exceptions to #DF 
-and triple fault is incorrect in the case of nested virtualization.
+Applied to kvm/next (because kvm/master is also on the problematic 
+5.12-rc1 tags), thanks.
 
 Paolo
+
+> Please apply,
+> 
+> 	M.
+> 
+> Andrew Scull (1):
+>        KVM: arm64: Fix nVHE hyp panic host context restore
+> 
+> Jia He (1):
+>        KVM: arm64: Fix range alignment when walking page tables
+> 
+> Marc Zyngier (4):
+>        KVM: arm64: Turn kvm_arm_support_pmu_v3() into a static key
+>        KVM: arm64: Don't access PMSELR_EL0/PMUSERENR_EL0 when no PMU is available
+>        KVM: arm64: Rename __vgic_v3_get_ich_vtr_el2() to __vgic_v3_get_gic_config()
+>        KVM: arm64: Workaround firmware wrongly advertising GICv2-on-v3 compatibility
+> 
+> Suzuki K Poulose (1):
+>        KVM: arm64: nvhe: Save the SPE context early
+> 
+> Will Deacon (1):
+>        KVM: arm64: Avoid corrupting vCPU context register in guest exit
+> 
+>   arch/arm64/include/asm/kvm_asm.h        |  4 ++--
+>   arch/arm64/include/asm/kvm_hyp.h        |  8 ++++++-
+>   arch/arm64/kernel/image-vars.h          |  3 +++
+>   arch/arm64/kvm/hyp/entry.S              |  2 +-
+>   arch/arm64/kvm/hyp/include/hyp/switch.h |  9 +++++---
+>   arch/arm64/kvm/hyp/nvhe/debug-sr.c      | 12 ++++++++--
+>   arch/arm64/kvm/hyp/nvhe/host.S          | 15 +++++++------
+>   arch/arm64/kvm/hyp/nvhe/hyp-main.c      |  6 ++---
+>   arch/arm64/kvm/hyp/nvhe/switch.c        | 14 +++++++++---
+>   arch/arm64/kvm/hyp/pgtable.c            |  1 +
+>   arch/arm64/kvm/hyp/vgic-v3-sr.c         | 40 +++++++++++++++++++++++++++++++--
+>   arch/arm64/kvm/perf.c                   | 10 +++++++++
+>   arch/arm64/kvm/pmu-emul.c               | 10 ---------
+>   arch/arm64/kvm/vgic/vgic-v3.c           | 12 +++++++---
+>   include/kvm/arm_pmu.h                   |  9 ++++++--
+>   15 files changed, 116 insertions(+), 39 deletions(-)
+> 
 
