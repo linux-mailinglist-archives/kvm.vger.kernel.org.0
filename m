@@ -2,91 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 34014330108
-	for <lists+kvm@lfdr.de>; Sun,  7 Mar 2021 13:49:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B14FB3301A3
+	for <lists+kvm@lfdr.de>; Sun,  7 Mar 2021 14:58:59 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230458AbhCGMtO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 7 Mar 2021 07:49:14 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37172 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230399AbhCGMsp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 7 Mar 2021 07:48:45 -0500
-Received: from mail-qk1-x731.google.com (mail-qk1-x731.google.com [IPv6:2607:f8b0:4864:20::731])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 68BB6C06174A;
-        Sun,  7 Mar 2021 04:48:42 -0800 (PST)
-Received: by mail-qk1-x731.google.com with SMTP id n79so6717425qke.3;
-        Sun, 07 Mar 2021 04:48:42 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=Sh8Gq3xXPV8r6pCBgU3qRZ/zv3llBCo/ukoG7YI1B6o=;
-        b=W1llN+mC69wsu46WFlBMoFXcOnmVr7w0NFEv8x9AJaKgTSImmeCGxTwulSESANzMZb
-         5QrRLyXhWRLdMn3gd1w7hSGEjUbXmxrPBJhCpf4ux983dCPe45FS6mktIWQisPQhK9Tq
-         NLveo8d3ow+mrKYvQ3/lYmyhm6XFWaI62Se/mDoLeEQxG1pEq/xvPZroRcaQI8iRPw45
-         OCAfkJvZelYLqfG/lrbAps9A4zLtFQBb/iUebqGE129kI3dXK+o6bcV2UoCZUlLFIYDP
-         xGMCNUzTC2uJraLOZlHmOfbCc+uflS6Vi+SrfcoEJHdcKiM3w5V7v/WrAO1Rw+XJL31t
-         P8yw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
-         :references:mime-version:content-disposition:in-reply-to;
-        bh=Sh8Gq3xXPV8r6pCBgU3qRZ/zv3llBCo/ukoG7YI1B6o=;
-        b=SMtzRnbgjnY96v5iXLG1jKJ3QgaaU21ndupZPGJqGqtmoO9r80ydxuchTUiNNk9gn5
-         SZzhG5ZWLSoAvlwKvwjuSc3+O2nAUIiHXUFtuqM+BxHmc6vU/dscrB54i7Ndw7Z3APrD
-         DtFpA9JPn4Bunwu4h1ox0rHNWKl6Dq0iumRQV1+g+IVtyZCBIABg7o7/2RbpJzWUoIEG
-         QbJKwI7+27/w0iI2Mh4qfFcqxL2ePrajXu1fK6BQ3nLRC7MrBmi54VLe2L9VQOjIEnfL
-         jknMbUniOzwLJY6VHOb0RVzk98ktZRftT0c0MiiUeyr7s9bn549e27zOksJiJ0+2KkKw
-         pTTA==
-X-Gm-Message-State: AOAM530yG88O+/m0hHILgfn/2rhVqR8WL9Pj4V2zvCFjwIhsgzeIu1sK
-        5LeNyFkSbk4vs6yBIheB1xU=
-X-Google-Smtp-Source: ABdhPJx3c7mILG8MIBfrQS6fPbhTs6qFOLaaIS6D52odgn+G5oEd+ci+KjN5R16r7BoJb1S4sbz+hw==
-X-Received: by 2002:a37:a282:: with SMTP id l124mr16162623qke.37.1615121321567;
-        Sun, 07 Mar 2021 04:48:41 -0800 (PST)
-Received: from localhost (2603-7000-9602-8233-06d4-c4ff-fe48-9d05.res6.spectrum.com. [2603:7000:9602:8233:6d4:c4ff:fe48:9d05])
-        by smtp.gmail.com with ESMTPSA id e190sm5640131qkd.122.2021.03.07.04.48.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 07 Mar 2021 04:48:41 -0800 (PST)
-Sender: Tejun Heo <htejun@gmail.com>
-Date:   Sun, 7 Mar 2021 07:48:40 -0500
-From:   Tejun Heo <tj@kernel.org>
-To:     Vipin Sharma <vipinsh@google.com>
-Cc:     mkoutny@suse.com, rdunlap@infradead.org, thomas.lendacky@amd.com,
-        brijesh.singh@amd.com, jon.grimm@amd.com, eric.vantassell@amd.com,
-        pbonzini@redhat.com, hannes@cmpxchg.org, frankja@linux.ibm.com,
-        borntraeger@de.ibm.com, corbet@lwn.net, seanjc@google.com,
-        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
-        joro@8bytes.org, tglx@linutronix.de, mingo@redhat.com,
-        bp@alien8.de, hpa@zytor.com, gingell@google.com,
-        rientjes@google.com, dionnaglaze@google.com, kvm@vger.kernel.org,
-        x86@kernel.org, cgroups@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [Patch v3 0/2] cgroup: New misc cgroup controller
-Message-ID: <YETLqGIw1GekWdYK@slm.duckdns.org>
-References: <20210304231946.2766648-1-vipinsh@google.com>
+        id S231574AbhCGN6O (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 7 Mar 2021 08:58:14 -0500
+Received: from mail.kernel.org ([198.145.29.99]:43548 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S231512AbhCGN5w (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 7 Mar 2021 08:57:52 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 2191565105;
+        Sun,  7 Mar 2021 13:57:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1615125471;
+        bh=9TCSJgcR6u2SdCY9KvCmvnAp+LuBrYghyXysTkfVj8k=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=i7AlBR0p8RgmZ4JO2SVfz03PcpLyfJroey8nLtjVLDyd14gT31l1kct0P3f3Nq5D4
+         nlOZtg/LiqZNkPTVY3hr9lflRo4Wb38+13eFLkokuhXd/uto8HlGoselHGgki0mGDY
+         ERWphI1bop7qeP6qstLet0MyrENoOO1gf1rpOUUSRIEW1hr8HdISf4WswooGsBsS3G
+         Bak65PdApIHbu5Z1uwrVY1WkYYXm5BwKqXwbaztTBQhJ/1g81qHCCGr+3hsvrjwvLm
+         vpC+9xTgVvImcPEVBtJsqfN9vnOO3RAGUnm7Qns0qohPEyuMn8Xj+c9BJFRuqDGki5
+         2GVAWkKHZjJyQ==
+From:   Sasha Levin <sashal@kernel.org>
+To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc:     Aaron Lewis <aaronlewis@google.com>,
+        Andrew Jones <drjones@redhat.com>,
+        Steve Rutherford <srutherford@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sasha Levin <sashal@kernel.org>, kvm@vger.kernel.org,
+        linux-kselftest@vger.kernel.org
+Subject: [PATCH AUTOSEL 5.11 04/12] selftests: kvm: Mmap the entire vcpu mmap area
+Date:   Sun,  7 Mar 2021 08:57:38 -0500
+Message-Id: <20210307135746.967418-4-sashal@kernel.org>
+X-Mailer: git-send-email 2.30.1
+In-Reply-To: <20210307135746.967418-1-sashal@kernel.org>
+References: <20210307135746.967418-1-sashal@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210304231946.2766648-1-vipinsh@google.com>
+X-stable: review
+X-Patchwork-Hint: Ignore
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hello,
+From: Aaron Lewis <aaronlewis@google.com>
 
-On Thu, Mar 04, 2021 at 03:19:44PM -0800, Vipin Sharma wrote:
-> This patch series is creating a new misc cgroup controller for limiting
-> and tracking of resources which are not abstract like other cgroup
-> controllers.
-> 
-> This controller was initially proposed as encryption_id but after
-> the feedbacks, it is now changed to misc cgroup.
-> https://lore.kernel.org/lkml/20210108012846.4134815-2-vipinsh@google.com/
+[ Upstream commit 6528fc0a11de3d16339cf17639e2f69a68fcaf4d ]
 
-Vipin, thank you very much for your persistence and patience. The patchset
-looks good to me. Michal, as you've been reviewing the series, can you
-please take another look and ack them if you don't find anything
-objectionable?
+The vcpu mmap area may consist of more than just the kvm_run struct.
+Allocate enough space for the entire vcpu mmap area. Without this, on
+x86, the PIO page, for example, will be missing.  This is problematic
+when dealing with an unhandled exception from the guest as the exception
+vector will be incorrectly reported as 0x0.
 
+Message-Id: <20210210165035.3712489-1-aaronlewis@google.com>
+Reviewed-by: Andrew Jones <drjones@redhat.com>
+Co-developed-by: Steve Rutherford <srutherford@google.com>
+Signed-off-by: Aaron Lewis <aaronlewis@google.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ tools/testing/selftests/kvm/lib/kvm_util.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
+index fa5a90e6c6f0..859a0b57c683 100644
+--- a/tools/testing/selftests/kvm/lib/kvm_util.c
++++ b/tools/testing/selftests/kvm/lib/kvm_util.c
+@@ -21,6 +21,8 @@
+ #define KVM_UTIL_PGS_PER_HUGEPG 512
+ #define KVM_UTIL_MIN_PFN	2
+ 
++static int vcpu_mmap_sz(void);
++
+ /* Aligns x up to the next multiple of size. Size must be a power of 2. */
+ static void *align(void *x, size_t size)
+ {
+@@ -509,7 +511,7 @@ static void vm_vcpu_rm(struct kvm_vm *vm, struct vcpu *vcpu)
+ 		vcpu->dirty_gfns = NULL;
+ 	}
+ 
+-	ret = munmap(vcpu->state, sizeof(*vcpu->state));
++	ret = munmap(vcpu->state, vcpu_mmap_sz());
+ 	TEST_ASSERT(ret == 0, "munmap of VCPU fd failed, rc: %i "
+ 		"errno: %i", ret, errno);
+ 	close(vcpu->fd);
+@@ -978,7 +980,7 @@ void vm_vcpu_add(struct kvm_vm *vm, uint32_t vcpuid)
+ 	TEST_ASSERT(vcpu_mmap_sz() >= sizeof(*vcpu->state), "vcpu mmap size "
+ 		"smaller than expected, vcpu_mmap_sz: %i expected_min: %zi",
+ 		vcpu_mmap_sz(), sizeof(*vcpu->state));
+-	vcpu->state = (struct kvm_run *) mmap(NULL, sizeof(*vcpu->state),
++	vcpu->state = (struct kvm_run *) mmap(NULL, vcpu_mmap_sz(),
+ 		PROT_READ | PROT_WRITE, MAP_SHARED, vcpu->fd, 0);
+ 	TEST_ASSERT(vcpu->state != MAP_FAILED, "mmap vcpu_state failed, "
+ 		"vcpu id: %u errno: %i", vcpuid, errno);
 -- 
-tejun
+2.30.1
+
