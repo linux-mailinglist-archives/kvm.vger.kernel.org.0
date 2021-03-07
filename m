@@ -2,349 +2,70 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B1AF23303C8
-	for <lists+kvm@lfdr.de>; Sun,  7 Mar 2021 19:06:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CE3FA330512
+	for <lists+kvm@lfdr.de>; Sun,  7 Mar 2021 23:53:27 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230323AbhCGSGD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 7 Mar 2021 13:06:03 -0500
-Received: from mx12.kaspersky-labs.com ([91.103.66.155]:58780 "EHLO
-        mx12.kaspersky-labs.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230411AbhCGSFh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 7 Mar 2021 13:05:37 -0500
-Received: from relay12.kaspersky-labs.com (unknown [127.0.0.10])
-        by relay12.kaspersky-labs.com (Postfix) with ESMTP id 02DFB77896;
-        Sun,  7 Mar 2021 21:05:31 +0300 (MSK)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kaspersky.com;
-        s=mail202102; t=1615140331;
-        bh=b4/Mz4bK9iRD5x1sJZmQtDFpczFGv7X+FyFIE54b9xI=;
-        h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type;
-        b=WLhMETtUA0NnIqAjbuPNfLc/lA2zx5KZAhEPOGqdJUovDI7RFEeFL84jsZWyAIAIY
-         lxQYJ+LZVXxMmIYDQ27zBEsdZO+5CBodxl/CEx2v/1pT26jWehEmZKmhdi8nZKxmYE
-         wHDXeJgT8c8V+3dbZpah2oAClXtBLPFlyMhB1AfndR988yuCCpwoEIA2KdqR71oUBp
-         txkd1DrxnqHP6NA/DpDZ1GS5wy5FaLdsFzvsmDaBAXhEZH/eVHdj2khL6iKqv5hfaL
-         sNh7pg3TsZAb+j4PM4a8PkfIg732wRA+aQJKtDUb+KUjQyIguoUTuyjzLMCxZoxeBx
-         Uu4cK8odArzhA==
-Received: from mail-hq2.kaspersky.com (unknown [91.103.66.206])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
-        (Client CN "mail-hq2.kaspersky.com", Issuer "Kaspersky MailRelays CA G3" (verified OK))
-        by mailhub12.kaspersky-labs.com (Postfix) with ESMTPS id 612E4778A1;
-        Sun,  7 Mar 2021 21:05:30 +0300 (MSK)
-Received: from arseniy-pc.avp.ru (10.64.64.121) by hqmailmbx3.avp.ru
- (10.64.67.243) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2176.2; Sun, 7 Mar
- 2021 21:05:29 +0300
-From:   Arseny Krasnov <arseny.krasnov@kaspersky.com>
-To:     Stefan Hajnoczi <stefanha@redhat.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Steven Rostedt <rostedt@goodmis.org>,
-        Ingo Molnar <mingo@redhat.com>,
-        Arseny Krasnov <arseny.krasnov@kaspersky.com>,
-        Jorgen Hansen <jhansen@vmware.com>,
-        Norbert Slusarek <nslusarek@gmx.net>,
-        Andra Paraschiv <andraprs@amazon.com>,
-        Colin Ian King <colin.king@canonical.com>
-CC:     <kvm@vger.kernel.org>, <virtualization@lists.linux-foundation.org>,
-        <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <stsp2@yandex.ru>, <oxffffaa@gmail.com>
-Subject: [RFC PATCH v6 22/22] virtio/vsock: update trace event for SEQPACKET
-Date:   Sun, 7 Mar 2021 21:05:21 +0300
-Message-ID: <20210307180525.3467195-1-arseny.krasnov@kaspersky.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20210307175722.3464068-1-arseny.krasnov@kaspersky.com>
-References: <20210307175722.3464068-1-arseny.krasnov@kaspersky.com>
+        id S232266AbhCGWuQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 7 Mar 2021 17:50:16 -0500
+Received: from mga07.intel.com ([134.134.136.100]:48931 "EHLO mga07.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S230341AbhCGWuD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 7 Mar 2021 17:50:03 -0500
+IronPort-SDR: idmNM8PHrrPE7S0CUQs1imn2m9Hef9vWn2GxtGdIKUwckAK6Hw8Uk5DSG4dDucVBUpCm4g2QJf
+ ZH5maHoxJ98Q==
+X-IronPort-AV: E=McAfee;i="6000,8403,9916"; a="251963195"
+X-IronPort-AV: E=Sophos;i="5.81,231,1610438400"; 
+   d="scan'208";a="251963195"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Mar 2021 14:50:02 -0800
+IronPort-SDR: t2TgmVgIRzyCY1eaGBDsNyFb86KvKjYMEPvb4sXTI7WgGA6ou91hu1D/wvrfFWXhRpmexM3YlI
+ LUMqFt4tCZ3Q==
+X-IronPort-AV: E=Sophos;i="5.81,231,1610438400"; 
+   d="scan'208";a="402595373"
+Received: from ggkanher-mobl4.amr.corp.intel.com ([10.252.142.177])
+  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Mar 2021 14:49:58 -0800
+Message-ID: <df1986285d014837dce015003e3c2d5675c891bd.camel@intel.com>
+Subject: Re: [PATCH 02/25] x86/cpufeatures: Add SGX1 and SGX2 sub-features
+From:   Kai Huang <kai.huang@intel.com>
+To:     Dave Hansen <dave.hansen@intel.com>,
+        Haitao Huang <haitao.huang@linux.intel.com>,
+        Borislav Petkov <bp@alien8.de>
+Cc:     kvm@vger.kernel.org, x86@kernel.org, linux-sgx@vger.kernel.org,
+        linux-kernel@vger.kernel.org, seanjc@google.com, jarkko@kernel.org,
+        luto@kernel.org, rick.p.edgecombe@intel.com,
+        haitao.huang@intel.com, pbonzini@redhat.com, tglx@linutronix.de,
+        mingo@redhat.com, hpa@zytor.com
+Date:   Mon, 08 Mar 2021 11:49:43 +1300
+In-Reply-To: <22f8a4be-b0ec-dfc5-cf05-a2586ce7557c@intel.com>
+References: <cover.1614590788.git.kai.huang@intel.com>
+         <bbfc8c833a62e4b55220834320829df1e17aff41.1614590788.git.kai.huang@intel.com>
+         <20210301100037.GA6699@zn.tnic>
+         <3fce1dd2abd42597bde7ae9496bde7b9596b2797.camel@intel.com>
+         <20210301103043.GB6699@zn.tnic>
+         <7603ef673997b6674f785d333a4f263c749d2cf3.camel@intel.com>
+         <20210301105346.GC6699@zn.tnic>
+         <e509c6c1e3644861edafb18e4045b813f9f344b3.camel@intel.com>
+         <20210301113257.GD6699@zn.tnic>
+         <0adc41774945bf9d6e6a72a93b83c80aa8c59544.camel@intel.com>
+         <op.0zmwm1ogwjvjmi@arkane-mobl1.gar.corp.intel.com>
+         <22f8a4be-b0ec-dfc5-cf05-a2586ce7557c@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.38.4 (3.38.4-1.fc33) 
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.64.64.121]
-X-ClientProxiedBy: hqmailmbx3.avp.ru (10.64.67.243) To hqmailmbx3.avp.ru
- (10.64.67.243)
-X-KSE-ServerInfo: hqmailmbx3.avp.ru, 9
-X-KSE-AntiSpam-Interceptor-Info: scan successful
-X-KSE-AntiSpam-Version: 5.9.20, Database issued on: 03/07/2021 17:55:05
-X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
-X-KSE-AntiSpam-Method: none
-X-KSE-AntiSpam-Rate: 10
-X-KSE-AntiSpam-Info: Lua profiles 162254 [Mar 07 2021]
-X-KSE-AntiSpam-Info: LuaCore: 431 431 6af1f0c9661e70e28927a654c0fea10ff13ade05
-X-KSE-AntiSpam-Info: Version: 5.9.20.0
-X-KSE-AntiSpam-Info: Envelope from: arseny.krasnov@kaspersky.com
-X-KSE-AntiSpam-Info: {Prob_from_in_msgid}
-X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
-X-KSE-AntiSpam-Info: {Macro_CONTENT_TYPE_ENCODING_NOT_JAPANESE}
-X-KSE-AntiSpam-Info: {Macro_CONTENT_TYPE_ENCODING_NOT_RUS}
-X-KSE-AntiSpam-Info: {Macro_CONTENT_TYPE_MISSED}
-X-KSE-AntiSpam-Info: {Macro_DATE_DOUBLE_SPACE}
-X-KSE-AntiSpam-Info: {Macro_DATE_MOSCOW}
-X-KSE-AntiSpam-Info: {Macro_FROM_DOUBLE_ENG_NAME}
-X-KSE-AntiSpam-Info: {Macro_FROM_LOWCAPS_DOUBLE_ENG_NAME_IN_EMAIL}
-X-KSE-AntiSpam-Info: {Macro_FROM_NOT_RU}
-X-KSE-AntiSpam-Info: {Macro_FROM_NOT_RUS_CHARSET}
-X-KSE-AntiSpam-Info: {Macro_FROM_REAL_NAME_MATCHES_ALL_USERNAME_PROB}
-X-KSE-AntiSpam-Info: {Macro_HEADERS_NOT_LIST}
-X-KSE-AntiSpam-Info: {Macro_MAILER_OTHER}
-X-KSE-AntiSpam-Info: {Macro_MISC_X_PRIORITY_MISSED}
-X-KSE-AntiSpam-Info: {Macro_NO_DKIM}
-X-KSE-AntiSpam-Info: {Macro_REPLY_TO_MISSED}
-X-KSE-AntiSpam-Info: {Macro_SUBJECT_AT_LEAST_2_WORDS}
-X-KSE-AntiSpam-Info: {Macro_SUBJECT_LONG_TEXT}
-X-KSE-AntiSpam-Info: {Macro_TO_CONTAINS_5_EMAILS}
-X-KSE-AntiSpam-Info: {Macro_TO_CONTAINS_SEVERAL_EMAILS}
-X-KSE-AntiSpam-Info: d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2;kaspersky.com:7.1.1;arseniy-pc.avp.ru:7.1.1
-X-KSE-AntiSpam-Info: Rate: 10
-X-KSE-AntiSpam-Info: Status: not_detected
-X-KSE-AntiSpam-Info: Method: none
-X-KSE-Antiphishing-Info: Clean
-X-KSE-Antiphishing-ScanningType: Deterministic
-X-KSE-Antiphishing-Method: None
-X-KSE-Antiphishing-Bases: 03/07/2021 17:57:00
-X-KSE-AttachmentFiltering-Interceptor-Info: no applicable attachment filtering
- rules found
-X-KSE-Antivirus-Interceptor-Info: scan successful
-X-KSE-Antivirus-Info: Clean, bases: 07.03.2021 15:50:00
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
-X-KSE-AttachmentFiltering-Interceptor-Info: no applicable attachment filtering
- rules found
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
-X-KLMS-Rule-ID: 52
-X-KLMS-Message-Action: clean
-X-KLMS-AntiSpam-Status: not scanned, disabled by settings
-X-KLMS-AntiSpam-Interceptor-Info: not scanned
-X-KLMS-AntiPhishing: Clean, bases: 2021/03/07 17:11:00
-X-KLMS-AntiVirus: Kaspersky Security for Linux Mail Server, version 8.0.3.30, bases: 2021/03/07 15:50:00 #16360637
-X-KLMS-AntiVirus-Status: Clean, skipped
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This updates current implementation for trace event of virtio vsock:
-SEQPACKET socket's type, SEQPACKET specific ops and SEQPACKET 'msg_len'
-and 'msg_id' fields are added.
+On Tue, 2021-03-02 at 07:58 -0800, Dave Hansen wrote:
+> On 3/2/21 7:48 AM, Haitao Huang wrote:
+> > 
+> > Hi Haitao, Jarkko,
+> > 
+> > Do you have more concrete use case of needing "sgx2" in /proc/cpuinfo?
+> 
+> Kai, please remove it from your series.  I'm not hearing any arguments
+> remotely close enough to what Boris would require in order to keep it.
 
-Signed-off-by: Arseny Krasnov <arseny.krasnov@kaspersky.com>
----
- .../events/vsock_virtio_transport_common.h    | 48 ++++++++++++++-----
- net/vmw_vsock/virtio_transport_common.c       | 25 +++++++++-
- 2 files changed, 60 insertions(+), 13 deletions(-)
-
-diff --git a/include/trace/events/vsock_virtio_transport_common.h b/include/trace/events/vsock_virtio_transport_common.h
-index 6782213778be..3254607eac04 100644
---- a/include/trace/events/vsock_virtio_transport_common.h
-+++ b/include/trace/events/vsock_virtio_transport_common.h
-@@ -9,9 +9,12 @@
- #include <linux/tracepoint.h>
- 
- TRACE_DEFINE_ENUM(VIRTIO_VSOCK_TYPE_STREAM);
-+TRACE_DEFINE_ENUM(VIRTIO_VSOCK_TYPE_SEQPACKET);
- 
- #define show_type(val) \
--	__print_symbolic(val, { VIRTIO_VSOCK_TYPE_STREAM, "STREAM" })
-+	__print_symbolic(val, \
-+				{ VIRTIO_VSOCK_TYPE_STREAM, "STREAM" }, \
-+				{ VIRTIO_VSOCK_TYPE_SEQPACKET, "SEQPACKET" })
- 
- TRACE_DEFINE_ENUM(VIRTIO_VSOCK_OP_INVALID);
- TRACE_DEFINE_ENUM(VIRTIO_VSOCK_OP_REQUEST);
-@@ -21,6 +24,8 @@ TRACE_DEFINE_ENUM(VIRTIO_VSOCK_OP_SHUTDOWN);
- TRACE_DEFINE_ENUM(VIRTIO_VSOCK_OP_RW);
- TRACE_DEFINE_ENUM(VIRTIO_VSOCK_OP_CREDIT_UPDATE);
- TRACE_DEFINE_ENUM(VIRTIO_VSOCK_OP_CREDIT_REQUEST);
-+TRACE_DEFINE_ENUM(VIRTIO_VSOCK_OP_SEQ_BEGIN);
-+TRACE_DEFINE_ENUM(VIRTIO_VSOCK_OP_SEQ_END);
- 
- #define show_op(val) \
- 	__print_symbolic(val, \
-@@ -31,7 +36,9 @@ TRACE_DEFINE_ENUM(VIRTIO_VSOCK_OP_CREDIT_REQUEST);
- 			 { VIRTIO_VSOCK_OP_SHUTDOWN, "SHUTDOWN" }, \
- 			 { VIRTIO_VSOCK_OP_RW, "RW" }, \
- 			 { VIRTIO_VSOCK_OP_CREDIT_UPDATE, "CREDIT_UPDATE" }, \
--			 { VIRTIO_VSOCK_OP_CREDIT_REQUEST, "CREDIT_REQUEST" })
-+			 { VIRTIO_VSOCK_OP_CREDIT_REQUEST, "CREDIT_REQUEST" }, \
-+			 { VIRTIO_VSOCK_OP_SEQ_BEGIN, "SEQ_BEGIN" }, \
-+			 { VIRTIO_VSOCK_OP_SEQ_END, "SEQ_END" })
- 
- TRACE_EVENT(virtio_transport_alloc_pkt,
- 	TP_PROTO(
-@@ -40,7 +47,9 @@ TRACE_EVENT(virtio_transport_alloc_pkt,
- 		 __u32 len,
- 		 __u16 type,
- 		 __u16 op,
--		 __u32 flags
-+		 __u32 flags,
-+		 __u32 msg_len,
-+		 __u32 msg_id
- 	),
- 	TP_ARGS(
- 		src_cid, src_port,
-@@ -48,7 +57,9 @@ TRACE_EVENT(virtio_transport_alloc_pkt,
- 		len,
- 		type,
- 		op,
--		flags
-+		flags,
-+		msg_len,
-+		msg_id
- 	),
- 	TP_STRUCT__entry(
- 		__field(__u32, src_cid)
-@@ -59,6 +70,8 @@ TRACE_EVENT(virtio_transport_alloc_pkt,
- 		__field(__u16, type)
- 		__field(__u16, op)
- 		__field(__u32, flags)
-+		__field(__u32, msg_len)
-+		__field(__u32, msg_id)
- 	),
- 	TP_fast_assign(
- 		__entry->src_cid = src_cid;
-@@ -69,14 +82,18 @@ TRACE_EVENT(virtio_transport_alloc_pkt,
- 		__entry->type = type;
- 		__entry->op = op;
- 		__entry->flags = flags;
-+		__entry->msg_len = msg_len;
-+		__entry->msg_id = msg_id;
- 	),
--	TP_printk("%u:%u -> %u:%u len=%u type=%s op=%s flags=%#x",
-+	TP_printk("%u:%u -> %u:%u len=%u type=%s op=%s flags=%#x msg_len=%u msg_id=%u",
- 		  __entry->src_cid, __entry->src_port,
- 		  __entry->dst_cid, __entry->dst_port,
- 		  __entry->len,
- 		  show_type(__entry->type),
- 		  show_op(__entry->op),
--		  __entry->flags)
-+		  __entry->flags,
-+		  __entry->msg_len,
-+		  __entry->msg_id)
- );
- 
- TRACE_EVENT(virtio_transport_recv_pkt,
-@@ -88,7 +105,9 @@ TRACE_EVENT(virtio_transport_recv_pkt,
- 		 __u16 op,
- 		 __u32 flags,
- 		 __u32 buf_alloc,
--		 __u32 fwd_cnt
-+		 __u32 fwd_cnt,
-+		 __u32 msg_len,
-+		 __u32 msg_id
- 	),
- 	TP_ARGS(
- 		src_cid, src_port,
-@@ -98,7 +117,9 @@ TRACE_EVENT(virtio_transport_recv_pkt,
- 		op,
- 		flags,
- 		buf_alloc,
--		fwd_cnt
-+		fwd_cnt,
-+		msg_len,
-+		msg_id
- 	),
- 	TP_STRUCT__entry(
- 		__field(__u32, src_cid)
-@@ -111,6 +132,8 @@ TRACE_EVENT(virtio_transport_recv_pkt,
- 		__field(__u32, flags)
- 		__field(__u32, buf_alloc)
- 		__field(__u32, fwd_cnt)
-+		__field(__u32, msg_len)
-+		__field(__u32, msg_id)
- 	),
- 	TP_fast_assign(
- 		__entry->src_cid = src_cid;
-@@ -123,9 +146,10 @@ TRACE_EVENT(virtio_transport_recv_pkt,
- 		__entry->flags = flags;
- 		__entry->buf_alloc = buf_alloc;
- 		__entry->fwd_cnt = fwd_cnt;
-+		__entry->msg_len = msg_len;
-+		__entry->msg_id = msg_id;
- 	),
--	TP_printk("%u:%u -> %u:%u len=%u type=%s op=%s flags=%#x "
--		  "buf_alloc=%u fwd_cnt=%u",
-+	TP_printk("%u:%u -> %u:%u len=%u type=%s op=%s flags=%#x buf_alloc=%u fwd_cnt=%u msg_len=%u msg_id=%u",
- 		  __entry->src_cid, __entry->src_port,
- 		  __entry->dst_cid, __entry->dst_port,
- 		  __entry->len,
-@@ -133,7 +157,9 @@ TRACE_EVENT(virtio_transport_recv_pkt,
- 		  show_op(__entry->op),
- 		  __entry->flags,
- 		  __entry->buf_alloc,
--		  __entry->fwd_cnt)
-+		  __entry->fwd_cnt,
-+		  __entry->msg_len,
-+		  __entry->msg_id)
- );
- 
- #endif /* _TRACE_VSOCK_VIRTIO_TRANSPORT_COMMON_H */
-diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
-index 8e9fdd8aba5d..2323c0a5bf0a 100644
---- a/net/vmw_vsock/virtio_transport_common.c
-+++ b/net/vmw_vsock/virtio_transport_common.c
-@@ -47,6 +47,8 @@ virtio_transport_alloc_pkt(struct virtio_vsock_pkt_info *info,
- {
- 	struct virtio_vsock_pkt *pkt;
- 	int err;
-+	u32 msg_len = 0;
-+	u32 msg_id = 0;
- 
- 	pkt = kzalloc(sizeof(*pkt), GFP_KERNEL);
- 	if (!pkt)
-@@ -74,6 +76,14 @@ virtio_transport_alloc_pkt(struct virtio_vsock_pkt_info *info,
- 		err = memcpy_from_msg(pkt->buf, info->msg, len);
- 		if (err)
- 			goto out;
-+
-+		if (info->op == VIRTIO_VSOCK_OP_SEQ_BEGIN ||
-+		    info->op == VIRTIO_VSOCK_OP_SEQ_END) {
-+			struct virtio_vsock_seq_hdr *seq_hdr = pkt->buf;
-+
-+			msg_len = le32_to_cpu(seq_hdr->msg_len);
-+			msg_id = le32_to_cpu(seq_hdr->msg_id);
-+		}
- 	}
- 
- 	trace_virtio_transport_alloc_pkt(src_cid, src_port,
-@@ -81,7 +91,7 @@ virtio_transport_alloc_pkt(struct virtio_vsock_pkt_info *info,
- 					 len,
- 					 info->type,
- 					 info->op,
--					 info->flags);
-+					 info->flags, msg_len, msg_id);
- 
- 	return pkt;
- 
-@@ -1358,12 +1368,22 @@ void virtio_transport_recv_pkt(struct virtio_transport *t,
- 	struct vsock_sock *vsk;
- 	struct sock *sk;
- 	bool space_available;
-+	u32 msg_len = 0;
-+	u32 msg_id = 0;
- 
- 	vsock_addr_init(&src, le64_to_cpu(pkt->hdr.src_cid),
- 			le32_to_cpu(pkt->hdr.src_port));
- 	vsock_addr_init(&dst, le64_to_cpu(pkt->hdr.dst_cid),
- 			le32_to_cpu(pkt->hdr.dst_port));
- 
-+	if (le16_to_cpu(pkt->hdr.op) == VIRTIO_VSOCK_OP_SEQ_BEGIN ||
-+	    le16_to_cpu(pkt->hdr.op) == VIRTIO_VSOCK_OP_SEQ_END) {
-+		struct virtio_vsock_seq_hdr *seq_hdr = pkt->buf;
-+
-+		msg_len = le32_to_cpu(seq_hdr->msg_len);
-+		msg_id = le32_to_cpu(seq_hdr->msg_id);
-+	}
-+
- 	trace_virtio_transport_recv_pkt(src.svm_cid, src.svm_port,
- 					dst.svm_cid, dst.svm_port,
- 					le32_to_cpu(pkt->hdr.len),
-@@ -1371,7 +1391,8 @@ void virtio_transport_recv_pkt(struct virtio_transport *t,
- 					le16_to_cpu(pkt->hdr.op),
- 					le32_to_cpu(pkt->hdr.flags),
- 					le32_to_cpu(pkt->hdr.buf_alloc),
--					le32_to_cpu(pkt->hdr.fwd_cnt));
-+					le32_to_cpu(pkt->hdr.fwd_cnt),
-+					msg_len, msg_id);
- 
- 	if (!virtio_transport_valid_type(le16_to_cpu(pkt->hdr.type))) {
- 		(void)virtio_transport_reset_no_sock(t, pkt);
--- 
-2.25.1
+Yes I will do. Thanks.
 
