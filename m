@@ -2,181 +2,119 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6C54733185A
-	for <lists+kvm@lfdr.de>; Mon,  8 Mar 2021 21:22:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 650413318C3
+	for <lists+kvm@lfdr.de>; Mon,  8 Mar 2021 21:41:50 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230070AbhCHUVx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 8 Mar 2021 15:21:53 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:23441 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229650AbhCHUVS (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 8 Mar 2021 15:21:18 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1615234878;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=CnOdrg+zuN9I7icqeoUJJHRaYHJ2yvJy7iK4d/+2Nsg=;
-        b=VMsoveOAFkfB/19wC0YkAW8GSXVz7za8xWLoYJyakopVt/IZEcbM5RxNUUiW1d4G8g0vkA
-        sbogRJQizh6R1PlR9uhmeN2ZqYCyUi2lKjPhfdHS7ezIsC2D0d617dA8n7y4nQe2O5/4mM
-        dq7vO0S/tWRPY+MstYjmL+8UBZFtc6o=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-600-vZ1m_1qkM9Gr4lbC7TDRGA-1; Mon, 08 Mar 2021 15:21:14 -0500
-X-MC-Unique: vZ1m_1qkM9Gr4lbC7TDRGA-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 68B4180432E;
-        Mon,  8 Mar 2021 20:21:12 +0000 (UTC)
-Received: from omen.home.shazbot.org (ovpn-112-255.phx2.redhat.com [10.3.112.255])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 9E00860855;
-        Mon,  8 Mar 2021 20:21:07 +0000 (UTC)
-Date:   Mon, 8 Mar 2021 13:21:06 -0700
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Zeng Tao <prime.zeng@hisilicon.com>
-Cc:     <linuxarm@huawei.com>, Cornelia Huck <cohuck@redhat.com>,
-        Kevin Tian <kevin.tian@intel.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Peter Xu <peterx@redhat.com>,
-        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-        Michel Lespinasse <walken@google.com>,
-        "Jann Horn" <jannh@google.com>,
-        Max Gurtovoy <mgurtovoy@nvidia.com>, <kvm@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, Jason Gunthorpe <jgg@nvidia.com>
-Subject: Re: [PATCH] vfio/pci: make the vfio_pci_mmap_fault reentrant
-Message-ID: <20210308132106.49da42e2@omen.home.shazbot.org>
-In-Reply-To: <1615201890-887-1-git-send-email-prime.zeng@hisilicon.com>
-References: <1615201890-887-1-git-send-email-prime.zeng@hisilicon.com>
+        id S230404AbhCHUlR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 8 Mar 2021 15:41:17 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53508 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229446AbhCHUkx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 8 Mar 2021 15:40:53 -0500
+Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D1DD4C06174A
+        for <kvm@vger.kernel.org>; Mon,  8 Mar 2021 12:40:52 -0800 (PST)
+Received: by mail-pj1-x102f.google.com with SMTP id q6-20020a17090a4306b02900c42a012202so3844684pjg.5
+        for <kvm@vger.kernel.org>; Mon, 08 Mar 2021 12:40:52 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=YieL4r+TN+gn7WlBHT97uAGWLZ5+RH9FuBAcVj4s06U=;
+        b=ZFGEV3DPNQZz37SL1BXfQkCq19S9we9dg+Cy44D92qHZPJ9reMhamBLz2Pam8qT77S
+         SGT9QYiesdFSexslHwU9naxYNHyljqxxbRs5YFvPAGNOETxfFZ21N0oCU8a03261XyVz
+         IiOGbfRSo3FMXbevkMgJTXUZC6pUm1rUBrbb2BMH0HaL9tSnHKjGw+e87pqOIxL9bUsQ
+         /cZRNaK1CiVXM/h/X0XpBYN6a6iw6uDG+TZ0k8ryt3VhHyMFIxLFaXNpquZ1JGdOQYkn
+         z8YTagHXadjU9hp4ThfgAqAIsOiTcAmAGM1V5y3xjAnvFvAkuF2+EBzrt7GXArFYBhfy
+         /R5Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=YieL4r+TN+gn7WlBHT97uAGWLZ5+RH9FuBAcVj4s06U=;
+        b=AxqKZEZx3QbOrAcCU7/74X19C9xCXJIMHvaSI3NQ9yp0gpPhBkYh2rx0zhu1U8/ebk
+         ra+vqhgMOnzfoM4bGuxms2A/eimIyl1rmRvSB80YkewwJU6I/NUqPjrCgVabw+Z5RRzM
+         isLF8vHjVcSB/eh/q2oGJSl5jeFXEaD4jo1acUJ/GiXA4pauBS+q3ID5PijAAicJX5p0
+         Ky8NKeiZEODmFUOWD32axl6ZeiQWFxuWm0+JJ9qB4PVi+r3U8ojLE1JqqSj9rlUe+xFY
+         I0Cn0yvN7IfOn4Tc1CTwtFQw40MK2Xussq4iak7x7vGc2rWtmWD3896Setgm/zu/fAZV
+         tCyA==
+X-Gm-Message-State: AOAM530FMxX1ff4Ahp7aG3c/Ydvly9He2pjT6KCFupZQk8HFbn8HP99q
+        b/f3CNT0S7jDvNARzfvv34xhfA==
+X-Google-Smtp-Source: ABdhPJzcDQa65JtsCO7brDxr9Rg9TeLDEn0f6G2jrZtRXgde7MiweWhKYfiIc1B5lQfqL6h5LdfVaw==
+X-Received: by 2002:a17:902:7287:b029:e5:bd05:4a97 with SMTP id d7-20020a1709027287b02900e5bd054a97mr22397043pll.27.1615236052207;
+        Mon, 08 Mar 2021 12:40:52 -0800 (PST)
+Received: from google.com ([2620:15c:f:10:8:847a:d8b5:e2cc])
+        by smtp.gmail.com with ESMTPSA id gw20sm230132pjb.3.2021.03.08.12.40.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 08 Mar 2021 12:40:51 -0800 (PST)
+Date:   Mon, 8 Mar 2021 12:40:44 -0800
+From:   Sean Christopherson <seanjc@google.com>
+To:     Peter Zijlstra <peterz@infradead.org>
+Cc:     "Xu, Like" <like.xu@intel.com>, Dmitry Vyukov <dvyukov@google.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Jiri Olsa <jolsa@redhat.com>,
+        Namhyung Kim <namhyung@kernel.org>,
+        "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org,
+        Like Xu <like.xu@linux.intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jim Mattson <jmattson@google.com>, kvm@vger.kernel.org,
+        "Thomas Gleixner
+        (x86/pti/timer/core/smp/irq/perf/efi/locking/ras/objtool)
+        (x86@kernel.org)" <tglx@linutronix.de>,
+        Borislav Petkov <bp@alien8.de>,
+        Arnaldo Carvalho de Melo <acme@kernel.org>,
+        Ingo Molnar <mingo@redhat.com>
+Subject: Re: [PATCH] x86/perf: Fix guest_get_msrs static call if there is no
+ PMU
+Message-ID: <YEaLzKWd0wAmdqvs@google.com>
+References: <20210305223331.4173565-1-seanjc@google.com>
+ <053d0a22-394d-90d0-8d3b-3cd37ca3f378@intel.com>
+ <YEXmILSHDNDuMk/N@hirez.programming.kicks-ass.net>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YEXmILSHDNDuMk/N@hirez.programming.kicks-ass.net>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 8 Mar 2021 19:11:26 +0800
-Zeng Tao <prime.zeng@hisilicon.com> wrote:
-
-> We have met the following error when test with DPDK testpmd:
-> [ 1591.733256] kernel BUG at mm/memory.c:2177!
-> [ 1591.739515] Internal error: Oops - BUG: 0 [#1] PREEMPT SMP
-> [ 1591.747381] Modules linked in: vfio_iommu_type1 vfio_pci vfio_virqfd vfio pv680_mii(O)
-> [ 1591.760536] CPU: 2 PID: 227 Comm: lcore-worker-2 Tainted: G O 5.11.0-rc3+ #1
-> [ 1591.770735] Hardware name:  , BIOS HixxxxFPGA 1P B600 V121-1
-> [ 1591.778872] pstate: 40400009 (nZcv daif +PAN -UAO -TCO BTYPE=--)
-> [ 1591.786134] pc : remap_pfn_range+0x214/0x340
-> [ 1591.793564] lr : remap_pfn_range+0x1b8/0x340
-> [ 1591.799117] sp : ffff80001068bbd0
-> [ 1591.803476] x29: ffff80001068bbd0 x28: 0000042eff6f0000
-> [ 1591.810404] x27: 0000001100910000 x26: 0000001300910000
-> [ 1591.817457] x25: 0068000000000fd3 x24: ffffa92f1338e358
-> [ 1591.825144] x23: 0000001140000000 x22: 0000000000000041
-> [ 1591.832506] x21: 0000001300910000 x20: ffffa92f141a4000
-> [ 1591.839520] x19: 0000001100a00000 x18: 0000000000000000
-> [ 1591.846108] x17: 0000000000000000 x16: ffffa92f11844540
-> [ 1591.853570] x15: 0000000000000000 x14: 0000000000000000
-> [ 1591.860768] x13: fffffc0000000000 x12: 0000000000000880
-> [ 1591.868053] x11: ffff0821bf3d01d0 x10: ffff5ef2abd89000
-> [ 1591.875932] x9 : ffffa92f12ab0064 x8 : ffffa92f136471c0
-> [ 1591.883208] x7 : 0000001140910000 x6 : 0000000200000000
-> [ 1591.890177] x5 : 0000000000000001 x4 : 0000000000000001
-> [ 1591.896656] x3 : 0000000000000000 x2 : 0168044000000fd3
-> [ 1591.903215] x1 : ffff082126261880 x0 : fffffc2084989868
-> [ 1591.910234] Call trace:
-> [ 1591.914837]  remap_pfn_range+0x214/0x340
-> [ 1591.921765]  vfio_pci_mmap_fault+0xac/0x130 [vfio_pci]
-> [ 1591.931200]  __do_fault+0x44/0x12c
-> [ 1591.937031]  handle_mm_fault+0xcc8/0x1230
-> [ 1591.942475]  do_page_fault+0x16c/0x484
-> [ 1591.948635]  do_translation_fault+0xbc/0xd8
-> [ 1591.954171]  do_mem_abort+0x4c/0xc0
-> [ 1591.960316]  el0_da+0x40/0x80
-> [ 1591.965585]  el0_sync_handler+0x168/0x1b0
-> [ 1591.971608]  el0_sync+0x174/0x180
-> [ 1591.978312] Code: eb1b027f 540000c0 f9400022 b4fffe02 (d4210000)
+On Mon, Mar 08, 2021, Peter Zijlstra wrote:
+> On Mon, Mar 08, 2021 at 10:25:59AM +0800, Xu, Like wrote:
+> > On 2021/3/6 6:33, Sean Christopherson wrote:
+> > > Handle a NULL x86_pmu.guest_get_msrs at invocation instead of patching
+> > > in perf_guest_get_msrs_nop() during setup.  If there is no PMU, setup
+> > 
+> > "If there is no PMU" ...
 > 
-> The cause is that the vfio_pci_mmap_fault function is not reentrant, if
-> multiple threads access the same address which will lead to a page fault
-> at the same time, we will have the above error.
+> Then you shouldn't be calling this either ofcourse :-)
+
+This effectively is KVM's check to find out there is no PMU.  I certainly don't
+want to replicate the switch statement in init_hw_perf_events(), plus whatever
+is buried in check_hw_exists().  The alternative would be to add X86_FEATURE_PMU
+so that KVM can easily check for PMU existence.  I don't really see the point
+though, as bare metal KVM, where we really care about performance, is likely to
+have a functional PMU, and if it doesn't then I doubt whoever is running KVM
+cares much about performance.
+
+> > > @@ -671,7 +671,11 @@ void x86_pmu_disable_all(void)
+> > >   struct perf_guest_switch_msr *perf_guest_get_msrs(int *nr)
+> > >   {
+> > > -	return static_call(x86_pmu_guest_get_msrs)(nr);
+> > > +	if (x86_pmu.guest_get_msrs)
+> > > +		return static_call(x86_pmu_guest_get_msrs)(nr);
+> > 
+> > How about using "static_call_cond" per commit "452cddbff7" ?
 > 
-> Fix the issue by making the vfio_pci_mmap_fault reentrant, and there is
-> another issue that when the io_remap_pfn_range fails, we need to undo
-> the __vfio_pci_add_vma, fix it by moving the __vfio_pci_add_vma down
-> after the io_remap_pfn_range.
-> 
-> Fixes: 11c4cd07ba11 ("vfio-pci: Fault mmaps to enable vma tracking")
-> Signed-off-by: Zeng Tao <prime.zeng@hisilicon.com>
-> ---
->  drivers/vfio/pci/vfio_pci.c | 14 ++++++++++----
->  1 file changed, 10 insertions(+), 4 deletions(-)
-> 
-> diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
-> index 65e7e6b..6928c37 100644
-> --- a/drivers/vfio/pci/vfio_pci.c
-> +++ b/drivers/vfio/pci/vfio_pci.c
-> @@ -1613,6 +1613,7 @@ static vm_fault_t vfio_pci_mmap_fault(struct vm_fault *vmf)
->  	struct vm_area_struct *vma = vmf->vma;
->  	struct vfio_pci_device *vdev = vma->vm_private_data;
->  	vm_fault_t ret = VM_FAULT_NOPAGE;
-> +	unsigned long pfn;
->  
->  	mutex_lock(&vdev->vma_lock);
->  	down_read(&vdev->memory_lock);
-> @@ -1623,18 +1624,23 @@ static vm_fault_t vfio_pci_mmap_fault(struct vm_fault *vmf)
->  		goto up_out;
->  	}
->  
-> -	if (__vfio_pci_add_vma(vdev, vma)) {
-> -		ret = VM_FAULT_OOM;
-> +	if (!follow_pfn(vma, vma->vm_start, &pfn)) {
->  		mutex_unlock(&vdev->vma_lock);
->  		goto up_out;
->  	}
->  
-> -	mutex_unlock(&vdev->vma_lock);
+> Given the one user in atomic_switch_perf_msrs() that should work because
+> it doesn't seem to care about nr_msrs when !msrs.
 
+Uh, that commit quite cleary says:
 
-If I understand correctly, I think you're using (perhaps slightly
-abusing) the vma_lock to extend the serialization of the vma_list
-manipulation to include io_remap_pfn_range() such that you can test
-whether the pte has already been populated using follow_pfn().  In that
-case we return VM_FAULT_NOPAGE without trying to repopulate the page
-and therefore avoid the BUG_ON in remap_pte_range() triggered by trying
-to overwrite an existing pte, and less importantly, a duplicate vma in
-our list.  I wonder if use of follow_pfn() is still strongly
-discouraged for this use case.
+   NOTE: this is 'obviously' limited to functions with a 'void' return type.
 
-I'm surprised that it's left to the fault handler to provide this
-serialization, is this because we're filling the entire vma rather than
-only the faulting page?
+Even if we somehow bypass the (void) cast, IIUC it will compile to a single
+'ret',  and return whatever happens to be in RAX, not NULL as is needed.
 
-As we move to unmap_mapping_range()[1] we remove all of the complexity
-of managing a list of vmas to zap based on whether device memory is
-enabled, including the vma_lock.  Are we going to need to replace that
-with another lock here, or is there a better approach to handling
-concurrency of this fault handler?  Jason/Peter?  Thanks,
-
-Alex
-
-[1]https://lore.kernel.org/kvm/161401267316.16443.11184767955094847849.stgit@gimli.home/
-
->  
->  	if (io_remap_pfn_range(vma, vma->vm_start, vma->vm_pgoff,
-> -			       vma->vm_end - vma->vm_start, vma->vm_page_prot))
-> +			       vma->vm_end - vma->vm_start, vma->vm_page_prot)) {
->  		ret = VM_FAULT_SIGBUS;
-> +		mutex_unlock(&vdev->vma_lock);
-> +		goto up_out;
-> +	}
-> +
-> +	if (__vfio_pci_add_vma(vdev, vma))
-> +		ret = VM_FAULT_OOM;
->  
-> +	mutex_unlock(&vdev->vma_lock);
->  up_out:
->  	up_read(&vdev->memory_lock);
->  	return ret;
-
+> Still, it calling atomic_switch_perf_msrs() and
+> intel_pmu_lbr_is_enabled() when there isn't a PMU at all is of course, a
