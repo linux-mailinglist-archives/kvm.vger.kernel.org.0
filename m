@@ -2,91 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 278BC3309C6
-	for <lists+kvm@lfdr.de>; Mon,  8 Mar 2021 09:55:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E0611330A4F
+	for <lists+kvm@lfdr.de>; Mon,  8 Mar 2021 10:31:11 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229650AbhCHIzC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 8 Mar 2021 03:55:02 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40696 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229468AbhCHIyk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 8 Mar 2021 03:54:40 -0500
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0C27CC06174A;
-        Mon,  8 Mar 2021 00:54:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=ANaVFRfhdnFocYbReHLCZECtJVt3gnfyZgmlG+L6e9g=; b=BO4fm6t9c/hak3Yul5LcR2NTEW
-        SbcjBht12dJpLW3Oavg3bAT/cmkoRHgVvhm72MkA0k/mV0eDg8JWoKP8q3xJKGh4JYYXh6M9hzFwS
-        /Z8sYXGIJcln9AEXXr7uRnMyv2i5h1j7HvF4Ua3tEE//wY8SK5vl/+NtjlgZwUrp5lizKaWF3KL8c
-        LqjRxJXAfd4Kv7NGlg3iUBGmMngwiMBNLI1eI91c46QKbvIT16uPWv/k0oeSe2r23yyV4zcxMo0pt
-        G8QwATc7mf3uC9zFkF1M8Vy8on3ZTioa/w0DrySGlCvCqjx9yTOZd0qaPbtsKoNlVJJi+dw8ThSF6
-        zQCU/lVw==;
-Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
-        by casper.infradead.org with esmtpsa (Exim 4.94 #2 (Red Hat Linux))
-        id 1lJBeF-00FFUW-98; Mon, 08 Mar 2021 08:54:00 +0000
-Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (Client did not present a certificate)
-        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id DB32F300238;
-        Mon,  8 Mar 2021 09:53:52 +0100 (CET)
-Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
-        id BD7FB2BB25DDF; Mon,  8 Mar 2021 09:53:52 +0100 (CET)
-Date:   Mon, 8 Mar 2021 09:53:52 +0100
-From:   Peter Zijlstra <peterz@infradead.org>
-To:     "Xu, Like" <like.xu@intel.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Dmitry Vyukov <dvyukov@google.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-        Jiri Olsa <jolsa@redhat.com>,
-        Namhyung Kim <namhyung@kernel.org>,
-        "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org,
-        Like Xu <like.xu@linux.intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jim Mattson <jmattson@google.com>, kvm@vger.kernel.org,
-        "Thomas Gleixner
-        (x86/pti/timer/core/smp/irq/perf/efi/locking/ras/objtool)
-        (x86@kernel.org)" <tglx@linutronix.de>,
-        Borislav Petkov <bp@alien8.de>,
-        Arnaldo Carvalho de Melo <acme@kernel.org>,
-        Ingo Molnar <mingo@redhat.com>
-Subject: Re: [PATCH] x86/perf: Fix guest_get_msrs static call if there is no
- PMU
-Message-ID: <YEXmILSHDNDuMk/N@hirez.programming.kicks-ass.net>
-References: <20210305223331.4173565-1-seanjc@google.com>
- <053d0a22-394d-90d0-8d3b-3cd37ca3f378@intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <053d0a22-394d-90d0-8d3b-3cd37ca3f378@intel.com>
+        id S229928AbhCHJag (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 8 Mar 2021 04:30:36 -0500
+Received: from mga05.intel.com ([192.55.52.43]:4791 "EHLO mga05.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229671AbhCHJaQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 8 Mar 2021 04:30:16 -0500
+IronPort-SDR: xcu7sOWR1fLJJJ6A5YCgKmTJYrmnJQrAG4gpht/uR2v6HLfQxU3XczRYpRMBVxn/1T3g7jp7kK
+ yWij/Oi+HDKQ==
+X-IronPort-AV: E=McAfee;i="6000,8403,9916"; a="273022005"
+X-IronPort-AV: E=Sophos;i="5.81,232,1610438400"; 
+   d="scan'208";a="273022005"
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Mar 2021 01:30:12 -0800
+IronPort-SDR: diR/365hAgy68dFnjcy7Th7jZpHdZg1MAB0kVgUqPyV0CEA4aodHtYvTj3uQv6TJFd4hlRGmhh
+ 7ul4jOAyM+1A==
+X-IronPort-AV: E=Sophos;i="5.81,232,1610438400"; 
+   d="scan'208";a="437333253"
+Received: from ggkanher-mobl4.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.252.142.177])
+  by fmsmga002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Mar 2021 01:30:08 -0800
+Date:   Mon, 8 Mar 2021 22:30:06 +1300
+From:   Kai Huang <kai.huang@intel.com>
+To:     Dave Hansen <dave.hansen@intel.com>
+Cc:     <linux-sgx@vger.kernel.org>, <kvm@vger.kernel.org>,
+        <x86@kernel.org>, <seanjc@google.com>, <jarkko@kernel.org>,
+        <luto@kernel.org>, <rick.p.edgecombe@intel.com>,
+        <haitao.huang@intel.com>, <pbonzini@redhat.com>, <bp@alien8.de>,
+        <tglx@linutronix.de>, <mingo@redhat.com>, <hpa@zytor.com>
+Subject: Re: [RFC PATCH v6 13/25] x86/sgx: Add helpers to expose ECREATE and
+ EINIT to KVM
+Message-Id: <20210308223006.5610bc084eb17844f43c0b27@intel.com>
+In-Reply-To: <64a2d65f-ddf9-b42b-5b51-76bb3b79a30e@intel.com>
+References: <cover.1614338774.git.kai.huang@intel.com>
+        <14908104a7ff5724b6fb4e4c7df6e675adafe5a7.1614338774.git.kai.huang@intel.com>
+        <64a2d65f-ddf9-b42b-5b51-76bb3b79a30e@intel.com>
+X-Mailer: Sylpheed 3.7.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Mar 08, 2021 at 10:25:59AM +0800, Xu, Like wrote:
-> On 2021/3/6 6:33, Sean Christopherson wrote:
-> > Handle a NULL x86_pmu.guest_get_msrs at invocation instead of patching
-> > in perf_guest_get_msrs_nop() during setup.  If there is no PMU, setup
+On Fri, 5 Mar 2021 09:51:56 -0800 Dave Hansen wrote:
+> On 2/26/21 4:15 AM, Kai Huang wrote:
+> > +int sgx_virt_ecreate(struct sgx_pageinfo *pageinfo, void __user *secs,
+> > +		     int *trapnr)
+> > +{
+> > +	int ret;
+> > +
+> > +	/*
+> > +	 * @secs is userspace address, and it's not guaranteed @secs points at
+> > +	 * an actual EPC page. 
 > 
-> "If there is no PMU" ...
-
-Then you shouldn't be calling this either ofcourse :-)
-
-> > @@ -671,7 +671,11 @@ void x86_pmu_disable_all(void)
-> >   struct perf_guest_switch_msr *perf_guest_get_msrs(int *nr)
-> >   {
-> > -	return static_call(x86_pmu_guest_get_msrs)(nr);
-> > +	if (x86_pmu.guest_get_msrs)
-> > +		return static_call(x86_pmu_guest_get_msrs)(nr);
+> There are four cases that I can think of:
+> 1. @secs points to an EPC page.  Good, return 0 and go on with life.
+> 2. @secs points to a non-EPC page.  It will fault and permanently error
+>    out
+> 3. @secs points to a Present=0 PTE.  It will fault, but we need to call
+>    the fault handler to get a page in here.
+> 4. @secs points to a kernel address
 > 
-> How about using "static_call_cond" per commit "452cddbff7" ?
+> #1 and #2 are handled and described.
+> 
+> #4 is probably impossible because the address comes out of some
+> gpa_to_hva() KVM code.  But, it still _looks_ wonky here.  I wouldn't
+> hate an access_ok() check on it.
+> 
+> 	/*
+> 	 * @secs is an untrusted, userspace-provided address.  It comes
+>          * from KVM and is assumed to point somewhere in userspace.
+>  	 * This can fault and call SGX or other fault handlers.
+> 	 */
+> 
+> You can also spend a moment to describe the kinds of faults that are
+> handled and what is fatal.
 
-Given the one user in atomic_switch_perf_msrs() that should work because
-it doesn't seem to care about nr_msrs when !msrs.
+Thanks Dave for the comments. I'll refine accordingly.
 
-Still, it calling atomic_switch_perf_msrs() and
-intel_pmu_lbr_is_enabled() when there isn't a PMU at all is of course, a
-complete waste of cycles.
+> 
+> 
+> > +	 * to physical EPC page by resolving PFN but using __uaccess_xx() is
+> > +	 * simpler.
+> > +	 */
+> 
+> I'd leave the justification for the changelog.
+
+Will do.
+
+> 
+> > +	__uaccess_begin();
+> > +	ret = __ecreate(pageinfo, (void *)secs);
+> > +	__uaccess_end();
+> > +
+> > +	if (encls_faulted(ret)) {
+> > +		*trapnr = ENCLS_TRAPNR(ret);
+> > +		return -EFAULT;
+> > +	}
+> 
