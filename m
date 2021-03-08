@@ -2,159 +2,72 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id ABE5933199A
-	for <lists+kvm@lfdr.de>; Mon,  8 Mar 2021 22:49:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5C85433199D
+	for <lists+kvm@lfdr.de>; Mon,  8 Mar 2021 22:49:53 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231852AbhCHVsu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 8 Mar 2021 16:48:50 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:30797 "EHLO
+        id S231760AbhCHVtU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 8 Mar 2021 16:49:20 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:55792 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230457AbhCHVsk (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 8 Mar 2021 16:48:40 -0500
+        by vger.kernel.org with ESMTP id S231907AbhCHVsw (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 8 Mar 2021 16:48:52 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1615240120;
+        s=mimecast20190719; t=1615240132;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=ZiCtnKe49mXJKCHvRCDyFEhrqKhPGm+jd0mcGZGsRFA=;
-        b=QEi4sL8c3SRWRWQJN2ORma9apsboYEW3tXT+BcO5n0XpXraUh/MORsm3yjd9oE7C/NAfMc
-        yy5apTWWV8zd2l3Yg74yUXRYs1Cl2AyE+2yV/s7D15KTs0TLG/UnJMT625tnPy5AdUtUrw
-        ZyK13fqWfPSGKUa4pNY1X3vit5rBJYE=
+        bh=RiD+X3RrWWZTnpp+Wb9slelJucGP/OyLw2+qHNm3UaM=;
+        b=ErSWn7wxFJxhPC6ZHOjdTol915tRV5n2CIoYHnaM8JqAk5jvqI/YksGyLca0y1ZigiTm8X
+        RXtxKEAG5cJtM1+hN6idSKNtAUVT9XiskVOHgiPhIQQ1MgYoGGNUhVZV1XizzGSXuzgAlx
+        bcrr3XkRua372ZB78dJPAQgaNVVpba8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-203-zxMQ6AjANZq_2nxcTOj-fQ-1; Mon, 08 Mar 2021 16:48:38 -0500
-X-MC-Unique: zxMQ6AjANZq_2nxcTOj-fQ-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+ us-mta-518-UH31uqmPPWerh-gcH3_cYQ-1; Mon, 08 Mar 2021 16:48:49 -0500
+X-MC-Unique: UH31uqmPPWerh-gcH3_cYQ-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F34391005D45;
-        Mon,  8 Mar 2021 21:48:36 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DDEE58018B3;
+        Mon,  8 Mar 2021 21:48:48 +0000 (UTC)
 Received: from gimli.home (ovpn-112-255.phx2.redhat.com [10.3.112.255])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 5ADD71A878;
-        Mon,  8 Mar 2021 21:48:30 +0000 (UTC)
-Subject: [PATCH v1 07/14] vfio: Add a device notifier interface
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 69D9B5C27C;
+        Mon,  8 Mar 2021 21:48:42 +0000 (UTC)
+Subject: [PATCH v1 08/14] vfio/pci: Notify on device release
 From:   Alex Williamson <alex.williamson@redhat.com>
 To:     alex.williamson@redhat.com
 Cc:     cohuck@redhat.com, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org, jgg@nvidia.com, peterx@redhat.com
-Date:   Mon, 08 Mar 2021 14:48:30 -0700
-Message-ID: <161524010999.3480.14282676267275402685.stgit@gimli.home>
+Date:   Mon, 08 Mar 2021 14:48:42 -0700
+Message-ID: <161524012206.3480.6390372271074364981.stgit@gimli.home>
 In-Reply-To: <161523878883.3480.12103845207889888280.stgit@gimli.home>
 References: <161523878883.3480.12103845207889888280.stgit@gimli.home>
 User-Agent: StGit/0.21-2-g8ef5
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Using a vfio device, a notifier block can be registered to receive
-select device events.  Notifiers can only be registered for contained
-devices, ie. they are available through a user context.  Registration
-of a notifier increments the reference to that container context
-therefore notifiers must minimally respond to the release event by
-asynchronously removing notifiers.
+Trigger a release notifier call when open reference count is zero.
 
 Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
 ---
- drivers/vfio/Kconfig |    1 +
- drivers/vfio/vfio.c  |   35 +++++++++++++++++++++++++++++++++++
- include/linux/vfio.h |    9 +++++++++
- 3 files changed, 45 insertions(+)
+ drivers/vfio/pci/vfio_pci.c |    1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/drivers/vfio/Kconfig b/drivers/vfio/Kconfig
-index 90c0525b1e0c..9a67675c9b6c 100644
---- a/drivers/vfio/Kconfig
-+++ b/drivers/vfio/Kconfig
-@@ -23,6 +23,7 @@ menuconfig VFIO
- 	tristate "VFIO Non-Privileged userspace driver framework"
- 	select IOMMU_API
- 	select VFIO_IOMMU_TYPE1 if (X86 || S390 || ARM || ARM64)
-+	select SRCU
- 	help
- 	  VFIO provides a framework for secure userspace device drivers.
- 	  See Documentation/driver-api/vfio.rst for more details.
-diff --git a/drivers/vfio/vfio.c b/drivers/vfio/vfio.c
-index c47895539a1a..7f6d00e54e83 100644
---- a/drivers/vfio/vfio.c
-+++ b/drivers/vfio/vfio.c
-@@ -105,6 +105,7 @@ struct vfio_device {
- 	struct list_head		group_next;
- 	void				*device_data;
- 	struct inode			*inode;
-+	struct srcu_notifier_head	notifier;
- };
+diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
+index 585895970e9c..bee9318b46ed 100644
+--- a/drivers/vfio/pci/vfio_pci.c
++++ b/drivers/vfio/pci/vfio_pci.c
+@@ -560,6 +560,7 @@ static void vfio_pci_release(void *device_data)
+ 	mutex_lock(&vdev->reflck->lock);
  
- #ifdef CONFIG_VFIO_NOIOMMU
-@@ -601,6 +602,7 @@ struct vfio_device *vfio_group_create_device(struct vfio_group *group,
- 	device->ops = ops;
- 	device->device_data = device_data;
- 	dev_set_drvdata(dev, device);
-+	srcu_init_notifier_head(&device->notifier);
- 
- 	/* No need to get group_lock, caller has group reference */
- 	vfio_group_get(group);
-@@ -1785,6 +1787,39 @@ static const struct file_operations vfio_device_fops = {
- 	.mmap		= vfio_device_fops_mmap,
- };
- 
-+int vfio_device_register_notifier(struct vfio_device *device,
-+				  struct notifier_block *nb)
-+{
-+	int ret;
-+
-+	/* Container ref persists until unregister on success */
-+	ret =  vfio_group_add_container_user(device->group);
-+	if (ret)
-+		return ret;
-+
-+	ret = srcu_notifier_chain_register(&device->notifier, nb);
-+	if (ret)
-+		vfio_group_try_dissolve_container(device->group);
-+
-+	return ret;
-+}
-+EXPORT_SYMBOL_GPL(vfio_device_register_notifier);
-+
-+void vfio_device_unregister_notifier(struct vfio_device *device,
-+				    struct notifier_block *nb)
-+{
-+	if (!srcu_notifier_chain_unregister(&device->notifier, nb))
-+		vfio_group_try_dissolve_container(device->group);
-+}
-+EXPORT_SYMBOL_GPL(vfio_device_unregister_notifier);
-+
-+int vfio_device_notifier_call(struct vfio_device *device,
-+			      enum vfio_device_notify_type event)
-+{
-+	return srcu_notifier_call_chain(&device->notifier, event, NULL);
-+}
-+EXPORT_SYMBOL_GPL(vfio_device_notifier_call);
-+
- /**
-  * External user API, exported by symbols to be linked dynamically.
-  *
-diff --git a/include/linux/vfio.h b/include/linux/vfio.h
-index dbd90d0ba713..c3ff36a7fa6f 100644
---- a/include/linux/vfio.h
-+++ b/include/linux/vfio.h
-@@ -62,6 +62,15 @@ extern void vfio_device_unmap_mapping_range(struct vfio_device *device,
- 					    loff_t start, loff_t len);
- extern struct vfio_device *vfio_device_get_from_vma(struct vm_area_struct *vma);
- extern int vfio_vma_to_pfn(struct vm_area_struct *vma, unsigned long *pfn);
-+extern int vfio_device_register_notifier(struct vfio_device *device,
-+					 struct notifier_block *nb);
-+extern void vfio_device_unregister_notifier(struct vfio_device *device,
-+					    struct notifier_block *nb);
-+enum vfio_device_notify_type {
-+	VFIO_DEVICE_RELEASE = 0,
-+};
-+int vfio_device_notifier_call(struct vfio_device *device,
-+			      enum vfio_device_notify_type event);
- 
- /* events for the backend driver notify callback */
- enum vfio_iommu_notify_type {
+ 	if (!(--vdev->refcnt)) {
++		vfio_device_notifier_call(vdev->device, VFIO_DEVICE_RELEASE);
+ 		vfio_pci_vf_token_user_add(vdev, -1);
+ 		vfio_spapr_pci_eeh_release(vdev->pdev);
+ 		vfio_pci_disable(vdev);
 
