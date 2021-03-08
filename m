@@ -2,126 +2,130 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BF8B7331493
-	for <lists+kvm@lfdr.de>; Mon,  8 Mar 2021 18:22:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5E72B3314BC
+	for <lists+kvm@lfdr.de>; Mon,  8 Mar 2021 18:25:34 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230212AbhCHRVp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 8 Mar 2021 12:21:45 -0500
-Received: from foss.arm.com ([217.140.110.172]:41162 "EHLO foss.arm.com"
+        id S231219AbhCHRZB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 8 Mar 2021 12:25:01 -0500
+Received: from mail.kernel.org ([198.145.29.99]:35710 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230143AbhCHRVm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 8 Mar 2021 12:21:42 -0500
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 82B21D6E;
-        Mon,  8 Mar 2021 09:21:42 -0800 (PST)
-Received: from [192.168.0.110] (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 886EA3F71B;
-        Mon,  8 Mar 2021 09:21:41 -0800 (PST)
-Subject: Re: [PATCH kvmtool v2 07/22] hw/i8042: Switch to new trap handlers
-To:     Andre Przywara <andre.przywara@arm.com>,
-        Will Deacon <will@kernel.org>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>
-Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
-        Marc Zyngier <maz@kernel.org>,
-        Sami Mujawar <sami.mujawar@arm.com>
-References: <20210225005915.26423-1-andre.przywara@arm.com>
- <20210225005915.26423-8-andre.przywara@arm.com>
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <3a77522e-c3f7-7250-5a9a-0533400ce9bd@arm.com>
-Date:   Mon, 8 Mar 2021 17:22:06 +0000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.8.0
+        id S231208AbhCHRYr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 8 Mar 2021 12:24:47 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPSA id A52356520F;
+        Mon,  8 Mar 2021 17:24:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+        s=korg; t=1615224287;
+        bh=mM7ct2vgRlQeJ6mmmYx4ShAL1KKFFLg9U+ZCmnf0rDA=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=ox8FtV0m2DJVYbt3iY5k+JsCuBCZYeAax/5KG5HDdHKEeeI8sCl3nSGWG3yxIemTQ
+         zo57Q6vcHbPtuQ3m++iZxB3o17ukYqBu+NyjDs2esBwc2yzujLL0srdvXbrkEFBJBk
+         TuOz/byGz6rgCi4wOlsohTDSEYC+AgfW5dtmIhnk=
+Date:   Mon, 8 Mar 2021 18:24:44 +0100
+From:   Greg KH <gregkh@linuxfoundation.org>
+To:     Alexander Graf <graf@amazon.com>
+Cc:     Adrian Catangiu <acatan@amazon.com>, linux-doc@vger.kernel.org,
+        linux-kernel@vger.kernel.org, qemu-devel@nongnu.org,
+        kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        rdunlap@infradead.org, arnd@arndb.de, ebiederm@xmission.com,
+        rppt@kernel.org, 0x7f454c46@gmail.com, borntraeger@de.ibm.com,
+        Jason@zx2c4.com, jannh@google.com, w@1wt.eu, colmmacc@amazon.com,
+        luto@kernel.org, tytso@mit.edu, ebiggers@kernel.org,
+        dwmw@amazon.co.uk, bonzini@gnu.org, sblbir@amazon.com,
+        raduweis@amazon.com, corbet@lwn.net, mst@redhat.com,
+        mhocko@kernel.org, rafael@kernel.org, pavel@ucw.cz,
+        mpe@ellerman.id.au, areber@redhat.com, ovzxemul@gmail.com,
+        avagin@gmail.com, ptikhomirov@virtuozzo.com, gil@azul.com,
+        asmehra@redhat.com, dgunigun@redhat.com, vijaysun@ca.ibm.com,
+        oridgar@gmail.com, ghammer@redhat.com
+Subject: Re: [PATCH v8] drivers/misc: sysgenid: add system generation id
+ driver
+Message-ID: <YEZd3It1llq9ctPN@kroah.com>
+References: <1615213083-29869-1-git-send-email-acatan@amazon.com>
+ <YEY2b1QU5RxozL0r@kroah.com>
+ <a61c976f-b362-bb60-50a5-04073360e702@amazon.com>
 MIME-Version: 1.0
-In-Reply-To: <20210225005915.26423-8-andre.przywara@arm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <a61c976f-b362-bb60-50a5-04073360e702@amazon.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Andre,
+On Mon, Mar 08, 2021 at 05:03:58PM +0100, Alexander Graf wrote:
+> 
+> 
+> On 08.03.21 15:36, Greg KH wrote:
+> > 
+> > On Mon, Mar 08, 2021 at 04:18:03PM +0200, Adrian Catangiu wrote:
+> > > +static struct miscdevice sysgenid_misc = {
+> > > +     .minor = MISC_DYNAMIC_MINOR,
+> > > +     .name = "sysgenid",
+> > > +     .fops = &fops,
+> > > +};
+> > 
+> > Much cleaner, but:
+> > 
+> > > +static int __init sysgenid_init(void)
+> > > +{
+> > > +     int ret;
+> > > +
+> > > +     sysgenid_data.map_buf = get_zeroed_page(GFP_KERNEL);
+> > > +     if (!sysgenid_data.map_buf)
+> > > +             return -ENOMEM;
+> > > +
+> > > +     atomic_set(&sysgenid_data.generation_counter, 0);
+> > > +     atomic_set(&sysgenid_data.outdated_watchers, 0);
+> > > +     init_waitqueue_head(&sysgenid_data.read_waitq);
+> > > +     init_waitqueue_head(&sysgenid_data.outdated_waitq);
+> > > +     spin_lock_init(&sysgenid_data.lock);
+> > > +
+> > > +     ret = misc_register(&sysgenid_misc);
+> > > +     if (ret < 0) {
+> > > +             pr_err("misc_register() failed for sysgenid\n");
+> > > +             goto err;
+> > > +     }
+> > > +
+> > > +     return 0;
+> > > +
+> > > +err:
+> > > +     free_pages(sysgenid_data.map_buf, 0);
+> > > +     sysgenid_data.map_buf = 0;
+> > > +
+> > > +     return ret;
+> > > +}
+> > > +
+> > > +static void __exit sysgenid_exit(void)
+> > > +{
+> > > +     misc_deregister(&sysgenid_misc);
+> > > +     free_pages(sysgenid_data.map_buf, 0);
+> > > +     sysgenid_data.map_buf = 0;
+> > > +}
+> > > +
+> > > +module_init(sysgenid_init);
+> > > +module_exit(sysgenid_exit);
+> > 
+> > So you do this for any bit of hardware that happens to be out there?
+> > Will that really work?  You do not have any hwid to trigger off of to
+> > know that this is a valid device you can handle?
+> 
+> The interface is already useful in a pure container context where the
+> generation change request is triggered by software.
+> 
+> And yes, there are hardware triggers, but Michael was quite unhappy about
+> potential races between VMGenID change and SysGenID change and thus wanted
+> to ideally separate the interfaces. So we went ahead and isolated the
+> SysGenID one, as it's already useful as is.
+> 
+> Hardware drivers to inject change events into SysGenID can then follow
+> later, for all different hardware platforms. But SysGenID as in this patch
+> is a completely hardware agnostic concept.
 
-On 2/25/21 12:59 AM, Andre Przywara wrote:
-> Now that the PC keyboard has a trap handler adhering to the MMIO fault
-> handler prototype, let's switch over to the joint registration routine.
->
-> This allows us to get rid of the ioport shim routines.
->
-> Make the kbd_init() function static on the way.
->
-> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
-> ---
->  hw/i8042.c          | 30 ++++--------------------------
->  include/kvm/i8042.h |  1 -
->  2 files changed, 4 insertions(+), 27 deletions(-)
->
-> diff --git a/hw/i8042.c b/hw/i8042.c
-> index ab866662..20be36c4 100644
-> --- a/hw/i8042.c
-> +++ b/hw/i8042.c
-> @@ -325,40 +325,18 @@ static void kbd_io(struct kvm_cpu *vcpu, u64 addr, u8 *data, u32 len,
->  		ioport__write8(data, value);
->  }
->  
-> -/*
-> - * Called when the OS has written to one of the keyboard's ports (0x60 or 0x64)
-> - */
-> -static bool kbd_in(struct ioport *ioport, struct kvm_cpu *vcpu, u16 port, void *data, int size)
-> -{
-> -	kbd_io(vcpu, port, data, size, false, NULL);
-> -
-> -	return true;
-> -}
-> -
-> -static bool kbd_out(struct ioport *ioport, struct kvm_cpu *vcpu, u16 port, void *data, int size)
-> -{
-> -	kbd_io(vcpu, port, data, size, true, NULL);
-> -
-> -	return true;
-> -}
-> -
-> -static struct ioport_operations kbd_ops = {
-> -	.io_in		= kbd_in,
-> -	.io_out		= kbd_out,
-> -};
-> -
-> -int kbd__init(struct kvm *kvm)
-> +static int kbd__init(struct kvm *kvm)
->  {
->  	int r;
->  
->  	kbd_reset();
->  	state.kvm = kvm;
-> -	r = ioport__register(kvm, I8042_DATA_REG, &kbd_ops, 2, NULL);
-> +	r = kvm__register_pio(kvm, I8042_DATA_REG, 2, kbd_io, NULL);
->  	if (r < 0)
->  		return r;
-> -	r = ioport__register(kvm, I8042_COMMAND_REG, &kbd_ops, 2, NULL);
-> +	r = kvm__register_pio(kvm, I8042_COMMAND_REG, 2, kbd_io, NULL);
->  	if (r < 0) {
-> -		ioport__unregister(kvm, I8042_DATA_REG);
-> +		kvm__deregister_pio(kvm, I8042_DATA_REG);
->  		return r;
->  	}
->  
-> diff --git a/include/kvm/i8042.h b/include/kvm/i8042.h
-> index 3b4ab688..cd4ae6bb 100644
-> --- a/include/kvm/i8042.h
-> +++ b/include/kvm/i8042.h
-> @@ -7,6 +7,5 @@ struct kvm;
->  
->  void mouse_queue(u8 c);
->  void kbd_queue(u8 c);
-> -int kbd__init(struct kvm *kvm);
->  
->  #endif
+Ok, so what is going to cause this driver to be automatically loaded?
+How will userspace "know" they want this and know to load it?
 
-Looks good, I also compile tested the code:
+This really is just a shared memory "driver", it's gotten so small now,
+so why can't this just be a userspace program/server now?  :)
 
-Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
+thanks,
 
-Thanks,
-
-Alex
-
+greg k-h
