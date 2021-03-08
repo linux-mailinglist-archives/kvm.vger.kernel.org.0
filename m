@@ -2,28 +2,28 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A6D12331382
-	for <lists+kvm@lfdr.de>; Mon,  8 Mar 2021 17:36:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 006AA331384
+	for <lists+kvm@lfdr.de>; Mon,  8 Mar 2021 17:36:03 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229955AbhCHQf2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 8 Mar 2021 11:35:28 -0500
-Received: from mail.kernel.org ([198.145.29.99]:48532 "EHLO mail.kernel.org"
+        id S230286AbhCHQf3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 8 Mar 2021 11:35:29 -0500
+Received: from mail.kernel.org ([198.145.29.99]:48588 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229893AbhCHQfA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 8 Mar 2021 11:35:00 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 4C22365227;
-        Mon,  8 Mar 2021 16:34:58 +0000 (UTC)
+        id S229971AbhCHQfV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 8 Mar 2021 11:35:21 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPSA id E834965227;
+        Mon,  8 Mar 2021 16:35:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1615221300;
-        bh=/a8q5f9+mgUFjkaLUOWpenLQISW7GAOWifO2INunHhc=;
+        s=k20201202; t=1615221320;
+        bh=aB3ELpHAsNqPMSU1NTeVXZu4tkER3Fw968tuBoPwCbA=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=t5mel8PvzyIhShxoDA+EYt9ooh6ur1wDK1mo2e24m54Zx3cROiOtV0NEhX4/3rRSl
-         /TlHqZIXfRKvEQOHpJErHsLES1zBkjwEoExPy6eht2zFRgBtMpqY5ls2zXbjfMo3Pn
-         C1J3+tV/nHLvKuNv/hMb/40sr4OIwG0Fg7LZfzb5tYfh6bpBtEUMzd9M/XftoY2IeF
-         We5ZbQAUx2VgWHkI4eEwybZK2xxJT+l5Sx7kWe/31C2e2rnE/pjyq0ED4mWGN4oG9d
-         bfqXkhSEHSlb5p42qw8nyzwEf1xamImHeIz7i9CtXfsH5iv6hd5MXuAR14aqd1Wx3E
-         E8wW/7oQAOKsg==
-Date:   Mon, 8 Mar 2021 16:34:55 +0000
+        b=UWctiQnaYW8/k1Yb9drt1Gx33SIx53VEr9QUvBFtO++cSktio2IJ0zfV/ewCRZarp
+         336YuKkMtHXRSuYBavY39s4mbcMYiHtBWr+sRvWGZ5lHGSrbfP2i3cT6bD3IXB5dK9
+         XG0wo0LtPIgiU1G/ZSF3cH7a/ODuX4Kng0qGTuOltSSMi8YqXBiBF/+fT0PUpovADG
+         83SbF/T2HmBE5FmqBDw1IlC7Fjl6d5Uw9lO45d1PRrtuH7UwKIwqi7eTN8EMhz3x95
+         Z7z0loOP+g5/iO2/WDVCxGD5NF44agOCV8FrKagw7dGRiIx0vYS9+tRbTqTzhu1BTI
+         sZ5LT0LmUIgug==
+Date:   Mon, 8 Mar 2021 16:35:16 +0000
 From:   Will Deacon <will@kernel.org>
 To:     Yanan Wang <wangyanan55@huawei.com>
 Cc:     Marc Zyngier <maz@kernel.org>,
@@ -34,72 +34,78 @@ Cc:     Marc Zyngier <maz@kernel.org>,
         kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
         kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
         wanghaibin.wang@huawei.com, yuzenghui@huawei.com
-Subject: Re: [PATCH 2/2] KVM: arm64: Skip the cache flush when coalescing
- tables into a block
-Message-ID: <20210308163454.GA26561@willie-the-truck>
+Subject: Re: [PATCH 1/2] KVM: arm64: Distinguish cases of allocating memcache
+ more precisely
+Message-ID: <20210308163515.GB26561@willie-the-truck>
 References: <20210125141044.380156-1-wangyanan55@huawei.com>
- <20210125141044.380156-3-wangyanan55@huawei.com>
+ <20210125141044.380156-2-wangyanan55@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210125141044.380156-3-wangyanan55@huawei.com>
+In-Reply-To: <20210125141044.380156-2-wangyanan55@huawei.com>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jan 25, 2021 at 10:10:44PM +0800, Yanan Wang wrote:
-> After dirty-logging is stopped for a VM configured with huge mappings,
-> KVM will recover the table mappings back to block mappings. As we only
-> replace the existing page tables with a block entry and the cacheability
-> has not been changed, the cache maintenance opreations can be skipped.
+On Mon, Jan 25, 2021 at 10:10:43PM +0800, Yanan Wang wrote:
+> With a guest translation fault, we don't really need the memcache pages
+> when only installing a new entry to the existing page table or replacing
+> the table entry with a block entry. And with a guest permission fault,
+> we also don't need the memcache pages for a write_fault in dirty-logging
+> time if VMs are not configured with huge mappings.
+> 
+> The cases where allocations from memcache are required can be much more
+> precisely distinguished by comparing fault_granule and vma_pagesize.
 > 
 > Signed-off-by: Yanan Wang <wangyanan55@huawei.com>
 > ---
->  arch/arm64/kvm/mmu.c | 12 +++++++++---
->  1 file changed, 9 insertions(+), 3 deletions(-)
+>  arch/arm64/kvm/mmu.c | 25 ++++++++++++-------------
+>  1 file changed, 12 insertions(+), 13 deletions(-)
 > 
 > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index 8e8549ea1d70..37b427dcbc4f 100644
+> index 7d2257cc5438..8e8549ea1d70 100644
 > --- a/arch/arm64/kvm/mmu.c
 > +++ b/arch/arm64/kvm/mmu.c
-> @@ -744,7 +744,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->  {
->  	int ret = 0;
->  	bool write_fault, writable, force_pte = false;
-> -	bool exec_fault;
-> +	bool exec_fault, adjust_hugepage;
->  	bool device = false;
->  	unsigned long mmu_seq;
->  	struct kvm *kvm = vcpu->kvm;
-> @@ -872,12 +872,18 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->  		mark_page_dirty(kvm, gfn);
->  	}
+> @@ -820,19 +820,6 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>  	gfn = fault_ipa >> PAGE_SHIFT;
+>  	mmap_read_unlock(current->mm);
 >  
-> -	if (fault_status != FSC_PERM && !device)
+> -	/*
+> -	 * Permission faults just need to update the existing leaf entry,
+> -	 * and so normally don't require allocations from the memcache. The
+> -	 * only exception to this is when dirty logging is enabled at runtime
+> -	 * and a write fault needs to collapse a block entry into a table.
+> -	 */
+> -	if (fault_status != FSC_PERM || (logging_active && write_fault)) {
+> -		ret = kvm_mmu_topup_memory_cache(memcache,
+> -						 kvm_mmu_cache_min_pages(kvm));
+> -		if (ret)
+> -			return ret;
+> -	}
+> -
+>  	mmu_seq = vcpu->kvm->mmu_notifier_seq;
+>  	/*
+>  	 * Ensure the read of mmu_notifier_seq happens before we call
+> @@ -898,6 +885,18 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>  	else if (cpus_have_const_cap(ARM64_HAS_CACHE_DIC))
+>  		prot |= KVM_PGTABLE_PROT_X;
+>  
 > +	/*
-> +	 * There is no necessity to perform cache maintenance operations if we
-> +	 * will only replace the existing table mappings with a block mapping.
+> +	 * Allocations from the memcache are required only when granule of the
+> +	 * lookup level where a guest fault happened exceeds the vma_pagesize,
+> +	 * which means new page tables will be created in the fault handlers.
 > +	 */
-> +	adjust_hugepage = fault_granule < vma_pagesize ? true : false;
+> +	if (fault_granule > vma_pagesize) {
+> +		ret = kvm_mmu_topup_memory_cache(memcache,
+> +						 kvm_mmu_cache_min_pages(kvm));
+> +		if (ret)
+> +			return ret;
+> +	}
 
-nit: you don't need the '? true : false' part
-
-That said, your previous patch checks for 'fault_granule > vma_pagesize',
-so I'm not sure the local variable helps all that much here because it
-obscures the size checks in my opinion. It would be more straight-forward
-if we could structure the logic as:
-
-
-	if (fault_granule < vma_pagesize) {
-
-	} else if (fault_granule > vma_page_size) {
-
-	} else {
-
-	}
-
-With some comments describing what we can infer about the memcache and cache
-maintenance requirements for each case.
+This feels like it could bite us in future as the code evolves but people
+forget to reconsider this check. Maybe it would be better to extend this
+patch so that we handle getting -ENOMEM back and try a second time after
+topping up the memcache?
 
 Will
