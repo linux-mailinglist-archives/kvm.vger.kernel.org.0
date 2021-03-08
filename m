@@ -2,138 +2,126 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B0E24330C14
-	for <lists+kvm@lfdr.de>; Mon,  8 Mar 2021 12:17:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id F08E1330C11
+	for <lists+kvm@lfdr.de>; Mon,  8 Mar 2021 12:15:08 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231657AbhCHLRZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 8 Mar 2021 06:17:25 -0500
-Received: from szxga05-in.huawei.com ([45.249.212.191]:13071 "EHLO
-        szxga05-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231633AbhCHLRT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 8 Mar 2021 06:17:19 -0500
-Received: from DGGEMS406-HUB.china.huawei.com (unknown [172.30.72.58])
-        by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4DvG2t2cX8zMkKk;
-        Mon,  8 Mar 2021 19:15:02 +0800 (CST)
-Received: from localhost.localdomain (10.67.165.24) by
- DGGEMS406-HUB.china.huawei.com (10.3.19.206) with Microsoft SMTP Server id
- 14.3.498.0; Mon, 8 Mar 2021 19:17:10 +0800
-From:   Zeng Tao <prime.zeng@hisilicon.com>
-To:     <alex.williamson@redhat.com>
-CC:     <linuxarm@huawei.com>, Zeng Tao <prime.zeng@hisilicon.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Kevin Tian <kevin.tian@intel.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Peter Xu <peterx@redhat.com>,
-        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-        Michel Lespinasse <walken@google.com>,
-        "Jann Horn" <jannh@google.com>,
-        Max Gurtovoy <mgurtovoy@nvidia.com>, <kvm@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>
-Subject: [PATCH] vfio/pci: make the vfio_pci_mmap_fault reentrant
-Date:   Mon, 8 Mar 2021 19:11:26 +0800
-Message-ID: <1615201890-887-1-git-send-email-prime.zeng@hisilicon.com>
-X-Mailer: git-send-email 2.8.1
+        id S229821AbhCHLOf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 8 Mar 2021 06:14:35 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:6572 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S231601AbhCHLOa (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 8 Mar 2021 06:14:30 -0500
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 128B457Z032164
+        for <kvm@vger.kernel.org>; Mon, 8 Mar 2021 06:14:29 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=JQQ+pfsxADTED4XQUetVnNfFyi4Q6iQqLcfIBeZHV+o=;
+ b=TLnd1lfYmNeHIooXnS75+9rnm7obAg0+DZpMS0iwBBpwRzvESoa5fTTj7y3hylyIP5sH
+ oEL4qGYzY76ISQ6QmHI15MTUfeBB6bBum60XVzoAM+r81V1ljltU//ILHhOCCABZ2AqP
+ AJt77L4FZPiNA9Zep8UJl3n0u9scjLoO7VEZJXZyi0wW+x380BxnsoE+0o9ffzsFXvHk
+ vGKvfsvfcVeaAmLDXFmBTNN8PZY+Ct1D/avM+cx0tTpG/oFbxS3xvUjVRXjqOuue6+bm
+ /E+a/e+6xzE5hMZEC4gNPzF4njF/o4qkd/oHOsD35bNW/EY7HE/p0Ap2nIBTmjWhs05v 6Q== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 375j1hsdnm-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Mon, 08 Mar 2021 06:14:29 -0500
+Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 128B4aZH037331
+        for <kvm@vger.kernel.org>; Mon, 8 Mar 2021 06:14:29 -0500
+Received: from ppma06fra.de.ibm.com (48.49.7a9f.ip4.static.sl-reverse.com [159.122.73.72])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 375j1hsdn5-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 08 Mar 2021 06:14:28 -0500
+Received: from pps.filterd (ppma06fra.de.ibm.com [127.0.0.1])
+        by ppma06fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 128B7wsW022491;
+        Mon, 8 Mar 2021 11:14:27 GMT
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
+        by ppma06fra.de.ibm.com with ESMTP id 37410h8wsb-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 08 Mar 2021 11:14:27 +0000
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 128BEOqC61735374
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 8 Mar 2021 11:14:24 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 11E754C044;
+        Mon,  8 Mar 2021 11:14:24 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id AC15D4C046;
+        Mon,  8 Mar 2021 11:14:23 +0000 (GMT)
+Received: from [9.145.7.187] (unknown [9.145.7.187])
+        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Mon,  8 Mar 2021 11:14:23 +0000 (GMT)
+Subject: Re: [kvm-unit-tests PATCH v4 0/3] s390x: mvpg test
+To:     Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     david@redhat.com, thuth@redhat.com, cohuck@redhat.com,
+        pmorel@linux.ibm.com, borntraeger@de.ibm.com
+References: <20210302114107.501837-1-imbrenda@linux.ibm.com>
+From:   Janosch Frank <frankja@linux.ibm.com>
+Message-ID: <19312596-d09a-41a1-95e9-992b6a307bfa@linux.ibm.com>
+Date:   Mon, 8 Mar 2021 12:14:23 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.8.0
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.67.165.24]
-X-CFilter-Loop: Reflected
+In-Reply-To: <20210302114107.501837-1-imbrenda@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.761
+ definitions=2021-03-08_04:2021-03-08,2021-03-08 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ phishscore=0 mlxlogscore=999 mlxscore=0 clxscore=1015 bulkscore=0
+ suspectscore=0 malwarescore=0 spamscore=0 lowpriorityscore=0
+ impostorscore=0 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2009150000 definitions=main-2103080059
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-We have met the following error when test with DPDK testpmd:
-[ 1591.733256] kernel BUG at mm/memory.c:2177!
-[ 1591.739515] Internal error: Oops - BUG: 0 [#1] PREEMPT SMP
-[ 1591.747381] Modules linked in: vfio_iommu_type1 vfio_pci vfio_virqfd vfio pv680_mii(O)
-[ 1591.760536] CPU: 2 PID: 227 Comm: lcore-worker-2 Tainted: G O 5.11.0-rc3+ #1
-[ 1591.770735] Hardware name:  , BIOS HixxxxFPGA 1P B600 V121-1
-[ 1591.778872] pstate: 40400009 (nZcv daif +PAN -UAO -TCO BTYPE=--)
-[ 1591.786134] pc : remap_pfn_range+0x214/0x340
-[ 1591.793564] lr : remap_pfn_range+0x1b8/0x340
-[ 1591.799117] sp : ffff80001068bbd0
-[ 1591.803476] x29: ffff80001068bbd0 x28: 0000042eff6f0000
-[ 1591.810404] x27: 0000001100910000 x26: 0000001300910000
-[ 1591.817457] x25: 0068000000000fd3 x24: ffffa92f1338e358
-[ 1591.825144] x23: 0000001140000000 x22: 0000000000000041
-[ 1591.832506] x21: 0000001300910000 x20: ffffa92f141a4000
-[ 1591.839520] x19: 0000001100a00000 x18: 0000000000000000
-[ 1591.846108] x17: 0000000000000000 x16: ffffa92f11844540
-[ 1591.853570] x15: 0000000000000000 x14: 0000000000000000
-[ 1591.860768] x13: fffffc0000000000 x12: 0000000000000880
-[ 1591.868053] x11: ffff0821bf3d01d0 x10: ffff5ef2abd89000
-[ 1591.875932] x9 : ffffa92f12ab0064 x8 : ffffa92f136471c0
-[ 1591.883208] x7 : 0000001140910000 x6 : 0000000200000000
-[ 1591.890177] x5 : 0000000000000001 x4 : 0000000000000001
-[ 1591.896656] x3 : 0000000000000000 x2 : 0168044000000fd3
-[ 1591.903215] x1 : ffff082126261880 x0 : fffffc2084989868
-[ 1591.910234] Call trace:
-[ 1591.914837]  remap_pfn_range+0x214/0x340
-[ 1591.921765]  vfio_pci_mmap_fault+0xac/0x130 [vfio_pci]
-[ 1591.931200]  __do_fault+0x44/0x12c
-[ 1591.937031]  handle_mm_fault+0xcc8/0x1230
-[ 1591.942475]  do_page_fault+0x16c/0x484
-[ 1591.948635]  do_translation_fault+0xbc/0xd8
-[ 1591.954171]  do_mem_abort+0x4c/0xc0
-[ 1591.960316]  el0_da+0x40/0x80
-[ 1591.965585]  el0_sync_handler+0x168/0x1b0
-[ 1591.971608]  el0_sync+0x174/0x180
-[ 1591.978312] Code: eb1b027f 540000c0 f9400022 b4fffe02 (d4210000)
+On 3/2/21 12:41 PM, Claudio Imbrenda wrote:
+> A simple unit test for the MVPG instruction.
+> 
+> The timeout is set to 10 seconds because the test should complete in a
+> fraction of a second even on busy machines. If the test is run in VSIE
+> and the host of the host is not handling MVPG properly, the test will
+> probably hang.
+> 
+> Testing MVPG behaviour in VSIE is the main motivation for this test.
+> 
+> Anything related to storage keys is not tested.
 
-The cause is that the vfio_pci_mmap_fault function is not reentrant, if
-multiple threads access the same address which will lead to a page fault
-at the same time, we will have the above error.
+Thanks, picked.
 
-Fix the issue by making the vfio_pci_mmap_fault reentrant, and there is
-another issue that when the io_remap_pfn_range fails, we need to undo
-the __vfio_pci_add_vma, fix it by moving the __vfio_pci_add_vma down
-after the io_remap_pfn_range.
-
-Fixes: 11c4cd07ba11 ("vfio-pci: Fault mmaps to enable vma tracking")
-Signed-off-by: Zeng Tao <prime.zeng@hisilicon.com>
----
- drivers/vfio/pci/vfio_pci.c | 14 ++++++++++----
- 1 file changed, 10 insertions(+), 4 deletions(-)
-
-diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
-index 65e7e6b..6928c37 100644
---- a/drivers/vfio/pci/vfio_pci.c
-+++ b/drivers/vfio/pci/vfio_pci.c
-@@ -1613,6 +1613,7 @@ static vm_fault_t vfio_pci_mmap_fault(struct vm_fault *vmf)
- 	struct vm_area_struct *vma = vmf->vma;
- 	struct vfio_pci_device *vdev = vma->vm_private_data;
- 	vm_fault_t ret = VM_FAULT_NOPAGE;
-+	unsigned long pfn;
- 
- 	mutex_lock(&vdev->vma_lock);
- 	down_read(&vdev->memory_lock);
-@@ -1623,18 +1624,23 @@ static vm_fault_t vfio_pci_mmap_fault(struct vm_fault *vmf)
- 		goto up_out;
- 	}
- 
--	if (__vfio_pci_add_vma(vdev, vma)) {
--		ret = VM_FAULT_OOM;
-+	if (!follow_pfn(vma, vma->vm_start, &pfn)) {
- 		mutex_unlock(&vdev->vma_lock);
- 		goto up_out;
- 	}
- 
--	mutex_unlock(&vdev->vma_lock);
- 
- 	if (io_remap_pfn_range(vma, vma->vm_start, vma->vm_pgoff,
--			       vma->vm_end - vma->vm_start, vma->vm_page_prot))
-+			       vma->vm_end - vma->vm_start, vma->vm_page_prot)) {
- 		ret = VM_FAULT_SIGBUS;
-+		mutex_unlock(&vdev->vma_lock);
-+		goto up_out;
-+	}
-+
-+	if (__vfio_pci_add_vma(vdev, vma))
-+		ret = VM_FAULT_OOM;
- 
-+	mutex_unlock(&vdev->vma_lock);
- up_out:
- 	up_read(&vdev->memory_lock);
- 	return ret;
--- 
-2.8.1
+> 
+> v3->v4
+> * add memset after the first successful mvpg to make sure memory is really
+>   copied successfully
+> * add a comment and an additional prefix to the tests skipped when running
+>   in TCG
+> 
+> v2->v3
+> * fix copyright (2020 is over!)
+> * add the third patch to skip some known issues when running in TCG
+> 
+> v1->v2
+> * droppped patch 2 which introduced is_pgm();
+> * patch 1: replace a hardcoded value with the new macro SVC_LEAVE_PSTATE
+> * patch 2: clear_pgm_int() returns the old value, use that instad of is_pgm()
+> 
+> Claudio Imbrenda (3):
+>   s390x: introduce leave_pstate to leave userspace
+>   s390x: mvpg: simple test
+>   s390x: mvpg: skip some tests when using TCG
+> 
+>  s390x/Makefile           |   1 +
+>  lib/s390x/asm/arch_def.h |   7 +
+>  lib/s390x/interrupt.c    |  12 +-
+>  s390x/mvpg.c             | 277 +++++++++++++++++++++++++++++++++++++++
+>  s390x/unittests.cfg      |   4 +
+>  5 files changed, 299 insertions(+), 2 deletions(-)
+>  create mode 100644 s390x/mvpg.c
+> 
 
