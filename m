@@ -2,113 +2,307 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1E08B331918
-	for <lists+kvm@lfdr.de>; Mon,  8 Mar 2021 22:11:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E9D6433191D
+	for <lists+kvm@lfdr.de>; Mon,  8 Mar 2021 22:12:47 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231151AbhCHVLG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 8 Mar 2021 16:11:06 -0500
-Received: from mail-il1-f197.google.com ([209.85.166.197]:51986 "EHLO
-        mail-il1-f197.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229938AbhCHVKc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 8 Mar 2021 16:10:32 -0500
-Received: by mail-il1-f197.google.com with SMTP id y11so8555547ilc.18
-        for <kvm@vger.kernel.org>; Mon, 08 Mar 2021 13:10:32 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
-        bh=MlrwDWSqQ3VwrUBIGlkHQVvbOROSKag3Yj/DlloiHp8=;
-        b=B6IZdR4PsBK8oGqWzXSxVQAwcXx5swdopcdqe+z9BpVBeDPDMqhUqBU3izyThyO6S6
-         KreQG2tO4JXXItwstfi5X2GCfSIt3PDNKqoIRx6HjahEk7txkDE7hSEwRbc1wvg4D1au
-         xHoKzOJbChz3ax+eIhCkHlXKbWKeDJdkoAKLBYaFfUxkcM2jvDefftGvo3GtPncWgOrz
-         9H0NVl8N1EJrlvU3QoFmhavUoMOEDbLIykmCFpjEUwIro05sJAKPqlaXp5mecg1Od/8P
-         cJjybG4OHr5N1p9QphUrmUe/JqW9VxkBikKoIShLvOizpF48UKsZBR/19oJNsIXfDjg/
-         C1Iw==
-X-Gm-Message-State: AOAM532fWtq/4/gi3apnseWXiCV30M+yJrCUcimCGxpIJSAKYQCCeUif
-        MjMbdB23NU5zkfxRz0/LhIZOhWdU0If22iYe3jbUFHYo9Kj8
-X-Google-Smtp-Source: ABdhPJz9NWIxK779w1caAr5X0rqBsPkfMcXCRwYE4vhhhC94DD97C/JqGZXPqOwGVsWy62RvY9inLUIzwDetwD2yw5w3gWyTBIOR
+        id S231300AbhCHVMN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 8 Mar 2021 16:12:13 -0500
+Received: from mail-dm6nam12on2041.outbound.protection.outlook.com ([40.107.243.41]:63941
+        "EHLO NAM12-DM6-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S231335AbhCHVLp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 8 Mar 2021 16:11:45 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=c2LNIclTS64VRHArqGl/hTYWddorFJPAf65CYcLRPsqaaSYJ+TTXlwU2UBODG4WCPbzczw2xjbrZEgMVL790PGkqDIudlkXxArToMW6Z8CYZo/ww7qZSZCmv1qyLYEEFU8JzcUoapuXrpvWhdDcQRXRKfk6YWU8EH2fEMY3nJzh0yZ8qBa1q3yC5ZhQl7oXEry12TPwxhJvIISS7NsG6ro6p9lk98G+0YiDS0YHyIKkxFbD8LX4f8BNwt5ijcoI444bAB94uAuKEhysc7Excwe2LtXpClV1Ydh1+BwTdZrxBa5UTks/XJGt9g0n2vvytjSvBU4c04xFX7CtlDSs/yg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=j8TQnz52Pmavx40BoPE2qmRh8rlZTt8kkwvMcq7HF5I=;
+ b=ZjweuPnM/h6FbJ/ZqGq8y4So/MkOcxq7DPXRtbdCabrE2X3hplGYwE40ycTjcKl8IscwCvanVI63w5vwBSIwIgzQ2SoDeaisJqUJLPWlIR3PyC9V790T/pCQNiJEdqJg816JpYGf/8EnkaDjV7kOMlh2qb8D1if3RPqM33qtYMAcQ0qJ6DnB9tPAmmsuDtLJ6diXWO4ouGPC+kh7pOuOnx3imsjPaHWJPdrP9KDGT6S50rrbitpvFeLfZ7f8Vp9h3xEPjn0M3mxGYzn/JCbXO206xUAsLm9jUtC1LdPjulBvC26oen92Aw77DkdGfLtfppiTnCiPiWLF8WjmAeXM1A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=j8TQnz52Pmavx40BoPE2qmRh8rlZTt8kkwvMcq7HF5I=;
+ b=0iMN1falNlY1/rfuXiHUtDtaD4neL4xTaSc/nMLeWJYEqVjGaFHxzlXuZGwfs6s9jSfx5VYNeWdCh9MoEMymR8D/Wnm21XbHL27mfm2jftwUsZWSE45hcx8yKORoQ0f9prxHsjv2IDytULmIpNbnIEsPr/Q8YVcJOxx8AeHAKvU=
+Authentication-Results: google.com; dkim=none (message not signed)
+ header.d=none;google.com; dmarc=none action=none header.from=amd.com;
+Received: from SN6PR12MB2718.namprd12.prod.outlook.com (2603:10b6:805:6f::22)
+ by SA0PR12MB4559.namprd12.prod.outlook.com (2603:10b6:806:9e::23) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3890.19; Mon, 8 Mar
+ 2021 21:11:44 +0000
+Received: from SN6PR12MB2718.namprd12.prod.outlook.com
+ ([fe80::30fb:2d6c:a0bf:2f1d]) by SN6PR12MB2718.namprd12.prod.outlook.com
+ ([fe80::30fb:2d6c:a0bf:2f1d%3]) with mapi id 15.20.3890.038; Mon, 8 Mar 2021
+ 21:11:43 +0000
+Cc:     brijesh.singh@amd.com, Steve Rutherford <srutherford@google.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "venu.busireddy@oracle.com" <venu.busireddy@oracle.com>,
+        Will Deacon <will@kernel.org>,
+        Quentin Perret <qperret@google.com>
+Subject: Re: [PATCH v10 10/16] KVM: x86: Introduce KVM_GET_SHARED_PAGES_LIST
+ ioctl
+To:     Sean Christopherson <seanjc@google.com>,
+        Ashish Kalra <ashish.kalra@amd.com>
+References: <7266edd714add8ec9d7f63eddfc9bbd4d789c213.1612398155.git.ashish.kalra@amd.com>
+ <YCxrV4u98ZQtInOE@google.com>
+ <SN6PR12MB27672FF8358D122EDD8CC0188E859@SN6PR12MB2767.namprd12.prod.outlook.com>
+ <20210224175122.GA19661@ashkalra_ubuntu_server> <YDaZacLqNQ4nK/Ex@google.com>
+ <20210225202008.GA5208@ashkalra_ubuntu_server>
+ <CABayD+cn5e3PR6NtSWLeM_qxs6hKWtjEx=aeKpy=WC2dzPdRLw@mail.gmail.com>
+ <20210226140432.GB5950@ashkalra_ubuntu_server> <YDkzibkC7tAYbfFQ@google.com>
+ <20210308104014.GA5333@ashkalra_ubuntu_server> <YEaAXXGZH0uSMA3v@google.com>
+From:   Brijesh Singh <brijesh.singh@amd.com>
+Message-ID: <bdf0767f-c2c4-5863-fd0d-352a3f68f7f9@amd.com>
+Date:   Mon, 8 Mar 2021 15:11:41 -0600
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
+ Gecko/20100101 Thunderbird/78.7.1
+In-Reply-To: <YEaAXXGZH0uSMA3v@google.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-Originating-IP: [70.112.153.56]
+X-ClientProxiedBy: SN6PR04CA0080.namprd04.prod.outlook.com
+ (2603:10b6:805:f2::21) To SN6PR12MB2718.namprd12.prod.outlook.com
+ (2603:10b6:805:6f::22)
 MIME-Version: 1.0
-X-Received: by 2002:a5d:9c50:: with SMTP id 16mr20624458iof.66.1615237832313;
- Mon, 08 Mar 2021 13:10:32 -0800 (PST)
-Date:   Mon, 08 Mar 2021 13:10:32 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000003912cf05bd0cdd75@google.com>
-Subject: [syzbot] WARNING in kvm_wait
-From:   syzbot <syzbot+3c2bc6358072ede0f11b@syzkaller.appspotmail.com>
-To:     bp@alien8.de, hpa@zytor.com, jmattson@google.com, joro@8bytes.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        mingo@redhat.com, pbonzini@redhat.com, seanjc@google.com,
-        syzkaller-bugs@googlegroups.com, tglx@linutronix.de,
-        vkuznets@redhat.com, wanpengli@tencent.com, x86@kernel.org
-Content-Type: text/plain; charset="UTF-8"
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from Brijeshs-MacBook-Pro.local (70.112.153.56) by SN6PR04CA0080.namprd04.prod.outlook.com (2603:10b6:805:f2::21) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3912.17 via Frontend Transport; Mon, 8 Mar 2021 21:11:43 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-HT: Tenant
+X-MS-Office365-Filtering-Correlation-Id: 4f0f5654-daaa-4c6c-dd1c-08d8e276c678
+X-MS-TrafficTypeDiagnostic: SA0PR12MB4559:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <SA0PR12MB45590D78A4B550A2AFBA5311E5939@SA0PR12MB4559.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:8882;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: iKaYh7aJ7wqj2eA4VcF6sZwWYd+lfNjbn5yK8uAgvFhp4UZlCxRBBKOS4DagY40f8TfFoI4a7IKY15yVKCk4wsLcYKcOQL7Sp5LunAf3e5lYgC0veZMLjBTS/JST9XlKrhRayS4rTgmT9PCv7xazG7PQ6sFS7kGLlFIpO3lqYdBCcjpwVXkn3sAMehQkC7HOMiufNLV3B2nX3H0AZsewdc2KT22LcLmAA5aaoEzLmZxHOG9FymiZIfN09Um6ZuSHfhnCLXxXx3wS7yoIdtuT4NeIwEo7rE4VExCx0JYlxCwS4PNF/dUlkb4etMjtqyxpGgCPIRYl1Ukx1kbkwBeBTVWFANDycGbc6C8NQX0n/UsGceISpleP8OINrAoiSJ13e/SitV+irQb7SBNbVg6MFgG1IlYLq9ievOA4PGIdwJVi5ULNfJrhyK4wefO/hpUM5vB0PZXyhSbJ4Fm3X9i9sMV7k4Fp8MC9UYXDrT86SGIBQqd71KgeAgJJneSn3xcI5/OQAmufUjdh5/BOp6mwIY4oudreNG6Bxw3maWKvbjtxNM2MZkr6vYEFlIFQbWtL/fQhEWQY5vOKQ351nbZeKP0hPNORs4TXGI24y0YHujo=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2718.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(39860400002)(376002)(136003)(396003)(346002)(366004)(6506007)(53546011)(83380400001)(31686004)(44832011)(2906002)(54906003)(956004)(2616005)(110136005)(31696002)(86362001)(6636002)(6512007)(5660300002)(316002)(36756003)(6486002)(4326008)(8936002)(66946007)(66476007)(66556008)(478600001)(8676002)(186003)(26005)(52116002)(16526019)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData: =?utf-8?B?THJDMDcvSGdSMzVyZUJuUGNmck9JQXN6WkpQYzZNVTJWK0ZlOTFvSERaSldU?=
+ =?utf-8?B?NkZYb2NhQ0cxNzBRUUJaVE9Pei9NcDFBUFd5Wm00WndGR1NlRXFPNHZWVThi?=
+ =?utf-8?B?cE9rV3JneXBDSXNEbkI1OGF5TldYNERLQ1RGQUo5Nm1NejNjTG5JSmp3ZzhI?=
+ =?utf-8?B?cVVLaExjeENxaGNiYldxYVR6clFWVGxGQ1h1OWY1Z05leVRYYWhYNTBFaWhD?=
+ =?utf-8?B?amxsSjJGYm5BQnk3YlpnajlWclVYcXdmUTh5SWpncUZuSGFGZzJvb291SE9h?=
+ =?utf-8?B?cENHZjkvamc4ZXRmVG14WVNKWEZ5Tlp3RkdaTmFtRE9sTS9UZFJmTHJiTmRJ?=
+ =?utf-8?B?VnRtT0NacHFlMVZYaEVXdGRNb1gyUWx1enFlN3FUZlE0SHcvdTI2MUlpZkhm?=
+ =?utf-8?B?d2VDeHNNV2dMZUhYQkJzcEx1SVRSOGZITkJOQ1J0QkhTbnZqckI3TUVoOFBx?=
+ =?utf-8?B?WnBISXdFZXVNSHJ5V3Rac054SWs5bkZqT2dzU1hqNXlHOVRmZEZyeVQ5OTRD?=
+ =?utf-8?B?RUFJTC9SMHB5V1lJTGd1ZGRibUtjdDIvMGZGUmplUENHWDZnQVdtVTE4MDhw?=
+ =?utf-8?B?bGpCL2ZJakkxK1RGUzZzZHlMVmxxT2J3cG5sUi9wME1KVUVYVjJkbGRaSW9l?=
+ =?utf-8?B?dmlFZkpUczI0cnJIbWdjZFJnTDBtSXM2bkp1K1l5M0tDODhlNXYzb2N6NU13?=
+ =?utf-8?B?QUdFMmlvampoN2NvR2NNaTRYNnBteUptc3V6c2JMYld4czliTVBEcjFUMUd2?=
+ =?utf-8?B?SEk0Q2JJdWlXcXp2dUlGaW9zUHNKMGl1M28zdTc4ZWc4WmRvL0FSMEUxRXV3?=
+ =?utf-8?B?aENIWHl0Tnk4enpvbVNST0NHRzM0SFoxYUlQT3AzMHA3c0RZZWVTeVcybU8v?=
+ =?utf-8?B?UmtSK1o0Ym1OWVNlN0FXS29id2ZsOC8ydzdHd3pxQjBYajdmT1Q1UE9ib0Ry?=
+ =?utf-8?B?UTU5WU5qamVRQUtGaEdhbkkxQnJYaUZEbFNWcy9pOFhtbXRGdUswSU5LNVlI?=
+ =?utf-8?B?aWtKK2s5QnBSRlJTbDk2NVdDZC8waHdCODZKcTVMZWhsWXNwUmRqQVBTRktM?=
+ =?utf-8?B?Q0htdjZMMFhVWVRvQTh6Yko0SXJXNnRJeFBwYm1QTWdXbXMwS3g1ZmZEb01M?=
+ =?utf-8?B?ckZGeVJGMWt3ZlM1SHJFK0FON0FiSHlmTjR1TkUyRlFMd2lsNEhRLzg5TWc4?=
+ =?utf-8?B?RkN2TEQxRGVNazIxN21iMUdDQXZUMTB5OEJOakZBRytoTzA3bXRqYXE4SDNk?=
+ =?utf-8?B?TDVCTkVtaDRraDZxWW1VSEJmVDRYM2pnRWZyZTlFVStsTjhMVHRXbkk3VW9h?=
+ =?utf-8?B?Rkc1N3FBYXFBQlJiN1JMKzBLY25FbFNwQzg5Z3IrMVhiWXpoSzlnYnlHSkhL?=
+ =?utf-8?B?V1NMcFlHNTFIL2R6Vk1OdXNNWlpTcGZmQlRFelNicGpJbVo3U1VrTk1JZWpL?=
+ =?utf-8?B?R29oYmVXeU5SelZNaTlCdGo2bXNxTFdTRWJ5UHdvRHdWbzdjcEZ4bGF2UmR6?=
+ =?utf-8?B?dDN4TUxUeE9sS1EvS3EvUDNvVlN6N3cvTVlsSC83TmczWnViNnk3cy9wOWNJ?=
+ =?utf-8?B?VHNuVW9iSTFORk1tSzI0YkdjSVh0d0QrVHdPMDdUSFlzaWNDVDRKL0NxbEpW?=
+ =?utf-8?B?djI1SDcxcU4vR0czZjVpV3B6b29Ub3F0VTNkckg1YndYY0FsWmVQUXBBdnBM?=
+ =?utf-8?B?b2pkSHg0YXBzeXJQRkdodmduemRETUVydllYdGcyaEp4aDJaSFNlK0Q5S2xV?=
+ =?utf-8?Q?l4Z5rlCBjRSYpHszDS4uGGOQaHAaOa96SEvMKrE?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4f0f5654-daaa-4c6c-dd1c-08d8e276c678
+X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2718.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Mar 2021 21:11:43.8824
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: gf3KQl8OFiLiba8QJCgTMWM8IPXIma4neHNbP2P2rgLzyJqMs/7i4VPnptKx0BYi8o/ojdksqy5+chq78Cwmsw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR12MB4559
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hello,
 
-syzbot found the following issue on:
+On 3/8/21 1:51 PM, Sean Christopherson wrote:
+> On Mon, Mar 08, 2021, Ashish Kalra wrote:
+>> On Fri, Feb 26, 2021 at 09:44:41AM -0800, Sean Christopherson wrote:
+>>> +Will and Quentin (arm64)
+>>>
+>>> Moving the non-KVM x86 folks to bcc, I don't they care about KVM details at this
+>>> point.
+>>>
+>>> On Fri, Feb 26, 2021, Ashish Kalra wrote:
+>>>> On Thu, Feb 25, 2021 at 02:59:27PM -0800, Steve Rutherford wrote:
+>>>>> On Thu, Feb 25, 2021 at 12:20 PM Ashish Kalra <ashish.kalra@amd.com> wrote:
+>>>>> Thanks for grabbing the data!
+>>>>>
+>>>>> I am fine with both paths. Sean has stated an explicit desire for
+>>>>> hypercall exiting, so I think that would be the current consensus.
+>>> Yep, though it'd be good to get Paolo's input, too.
+>>>
+>>>>> If we want to do hypercall exiting, this should be in a follow-up
+>>>>> series where we implement something more generic, e.g. a hypercall
+>>>>> exiting bitmap or hypercall exit list. If we are taking the hypercall
+>>>>> exit route, we can drop the kvm side of the hypercall.
+>>> I don't think this is a good candidate for arbitrary hypercall interception.  Or
+>>> rather, I think hypercall interception should be an orthogonal implementation.
+>>>
+>>> The guest, including guest firmware, needs to be aware that the hypercall is
+>>> supported, and the ABI needs to be well-defined.  Relying on userspace VMMs to
+>>> implement a common ABI is an unnecessary risk.
+>>>
+>>> We could make KVM's default behavior be a nop, i.e. have KVM enforce the ABI but
+>>> require further VMM intervention.  But, I just don't see the point, it would
+>>> save only a few lines of code.  It would also limit what KVM could do in the
+>>> future, e.g. if KVM wanted to do its own bookkeeping _and_ exit to userspace,
+>>> then mandatory interception would essentially make it impossible for KVM to do
+>>> bookkeeping while still honoring the interception request.
+>>>
+>>> However, I do think it would make sense to have the userspace exit be a generic
+>>> exit type.  But hey, we already have the necessary ABI defined for that!  It's
+>>> just not used anywhere.
+>>>
+>>> 	/* KVM_EXIT_HYPERCALL */
+>>> 	struct {
+>>> 		__u64 nr;
+>>> 		__u64 args[6];
+>>> 		__u64 ret;
+>>> 		__u32 longmode;
+>>> 		__u32 pad;
+>>> 	} hypercall;
+>>>
+>>>
+>>>>> Userspace could also handle the MSR using MSR filters (would need to
+>>>>> confirm that).  Then userspace could also be in control of the cpuid bit.
+>>> An MSR is not a great fit; it's x86 specific and limited to 64 bits of data.
+>>> The data limitation could be fudged by shoving data into non-standard GPRs, but
+>>> that will result in truly heinous guest code, and extensibility issues.
+>>>
+>>> The data limitation is a moot point, because the x86-only thing is a deal
+>>> breaker.  arm64's pKVM work has a near-identical use case for a guest to share
+>>> memory with a host.  I can't think of a clever way to avoid having to support
+>>> TDX's and SNP's hypervisor-agnostic variants, but we can at least not have
+>>> multiple KVM variants.
+>>>
+>> Potentially, there is another reason for in-kernel hypercall handling
+>> considering SEV-SNP. In case of SEV-SNP the RMP table tracks the state
+>> of each guest page, for instance pages in hypervisor state, i.e., pages
+>> with C=0 and pages in guest valid state with C=1.
+>>
+>> Now, there shouldn't be a need for page encryption status hypercalls on 
+>> SEV-SNP as KVM can track & reference guest page status directly using 
+>> the RMP table.
+> Relying on the RMP table itself would require locking the RMP table for an
+> extended duration, and walking the entire RMP to find shared pages would be
+> very inefficient.
+>
+>> As KVM maintains the RMP table, therefore we will need SET/GET type of
+>> interfaces to provide the guest page encryption status to userspace.
+> Hrm, somehow I temporarily forgot about SNP and TDX adding their own hypercalls
+> for converting between shared and private.  And in the case of TDX, the hypercall
+> can't be trusted, i.e. is just a hint, otherwise the guest could induce a #MC in
+> the host.
+>
+> But, the different guest behavior doesn't require KVM to maintain a list/tree,
+> e.g. adding a dedicated KVM_EXIT_* for notifying userspace of page encryption
+> status changes would also suffice.  
+>
+> Actually, that made me think of another argument against maintaining a list in
+> KVM: there's no way to notify userspace that a page's status has changed.
+> Userspace would need to query KVM to do GET_LIST after every GET_DIRTY.
+> Obviously not a huge issue, but it does make migration slightly less efficient.
+>
+> On a related topic, there are fatal race conditions that will require careful
+> coordination between guest and host, and will effectively be wired into the ABI.
+> SNP and TDX don't suffer these issues because host awareness of status is atomic
+> with respect to the guest actually writing the page with the new encryption
+> status.
+>
+> For SEV live migration...
+>
+> If the guest does the hypercall after writing the page, then the guest is hosed
+> if it gets migrated while writing the page (scenario #1):
+>
+>   vCPU                 Userspace
+>   zero_bytes[0:N]
+>                        <transfers written bytes as private instead of shared>
+> 		       <migrates vCPU>
+>   zero_bytes[N+1:4095]
+>   set_shared (dest)
+>   kaboom!
 
-HEAD commit:    a38fd874 Linux 5.12-rc2
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=14158fdad00000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=db9c6adb4986f2f2
-dashboard link: https://syzkaller.appspot.com/bug?extid=3c2bc6358072ede0f11b
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1096d35cd00000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=16bf1e52d00000
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+3c2bc6358072ede0f11b@syzkaller.appspotmail.com
-
-------------[ cut here ]------------
-raw_local_irq_restore() called with IRQs enabled
-WARNING: CPU: 0 PID: 14236 at kernel/locking/irqflag-debug.c:10 warn_bogus_irq_restore+0x1d/0x20 kernel/locking/irqflag-debug.c:10
-Modules linked in:
-CPU: 0 PID: 14236 Comm: syz-executor143 Not tainted 5.12.0-rc2-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
-RIP: 0010:warn_bogus_irq_restore+0x1d/0x20 kernel/locking/irqflag-debug.c:10
-Code: be ff cc cc cc cc cc cc cc cc cc cc cc 80 3d ac 2b b0 04 00 74 01 c3 48 c7 c7 a0 8f 6b 89 c6 05 9b 2b b0 04 01 e8 f7 cb be ff <0f> 0b c3 48 39 77 10 0f 84 97 00 00 00 66 f7 47 22 f0 ff 74 4b 48
-RSP: 0018:ffffc9000c29f9c0 EFLAGS: 00010286
-RAX: 0000000000000000 RBX: ffffc90000e1b688 RCX: 0000000000000000
-RDX: ffff88801e689bc0 RSI: ffffffff815c0eb5 RDI: fffff52001853f2a
-RBP: 0000000000000200 R08: 0000000000000000 R09: 0000000000000000
-R10: ffffffff815b9c4e R11: 0000000000000000 R12: 0000000000000003
-R13: fffff520001c36d1 R14: 0000000000000001 R15: ffff8880b9c35f40
-FS:  00000000018ce300(0000) GS:ffff8880b9c00000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007ffd79af41d8 CR3: 000000001c373000 CR4: 0000000000350ef0
-Call Trace:
- kvm_wait arch/x86/kernel/kvm.c:860 [inline]
- kvm_wait+0xc9/0xe0 arch/x86/kernel/kvm.c:837
- pv_wait arch/x86/include/asm/paravirt.h:564 [inline]
- pv_wait_head_or_lock kernel/locking/qspinlock_paravirt.h:470 [inline]
- __pv_queued_spin_lock_slowpath+0x8b8/0xb40 kernel/locking/qspinlock.c:508
- pv_queued_spin_lock_slowpath arch/x86/include/asm/paravirt.h:554 [inline]
- queued_spin_lock_slowpath arch/x86/include/asm/qspinlock.h:51 [inline]
- queued_spin_lock include/asm-generic/qspinlock.h:85 [inline]
- do_raw_spin_lock+0x200/0x2b0 kernel/locking/spinlock_debug.c:113
- spin_lock include/linux/spinlock.h:354 [inline]
- futex_wake+0x1b5/0x490 kernel/futex.c:1610
- do_futex+0x326/0x1710 kernel/futex.c:3740
- __do_sys_futex+0x2a2/0x470 kernel/futex.c:3798
- do_syscall_64+0x2d/0x70 arch/x86/entry/common.c:46
- entry_SYSCALL_64_after_hwframe+0x44/0xae
-RIP: 0033:0x4459c9
-Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 11 15 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007ffd79af41f8 EFLAGS: 00000246 ORIG_RAX: 00000000000000ca
-RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00000000004459c9
-RDX: 00000000000f4240 RSI: 0000000000000081 RDI: 00000000004ca408
-RBP: 00000000004ca400 R08: 0000000000000000 R09: 0000000000000000
-R10: 00007ffd79bec090 R11: 0000000000000246 R12: 00007ffd79af4230
-R13: 00000000004ca40c R14: 0000000000000001 R15: 00000000004023b0
+Maybe I am missing something, this is not any different from a normal
+operation inside a guest. Making a page shared/private in the page table
+does not update the content of the page itself. In your above case, I
+assume zero_bytes[N+1:4095] are written by the destination VM. The
+memory region was private in the source VM page table, so, those writes
+will be performed encrypted. The destination VM later changed the memory
+to shared, but nobody wrote to the memory after it has been transitioned
+to the  shared, so a reader of the memory should get ciphertext and
+unless there was a write after the set_shared (dest).
 
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+> If userspace does GET_DIRTY after GET_LIST, then the host would transfer bad
+> data by consuming a stale list (scenario #2):
+>
+>   vCPU               Userspace
+>                      get_list (from KVM or internally)
+>   set_shared (src)
+>   zero_page (src)
+>                      get_dirty
+>                      <transfers private data instead of shared>
+>                      <migrates vCPU>
+>   kaboom!
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-syzbot can test patches for this issue, for details see:
-https://goo.gl/tpsmEJ#testing-patches
+
+I don't remember how things are done in recent Ashish Qemu/KVM patches
+but in previous series, the get_dirty() happens before the querying the
+encrypted state. There was some logic in VMM to resync the encrypted
+bitmap during the final migration stage and perform any additional data
+transfer since last sync.
+
+
+> If both guest and host order things to avoid #1 and #2, the host can still
+> migrate the wrong data (scenario #3):
+>
+>   vCPU               Userspace
+>   set_private
+>   zero_bytes[0:4096]
+>                      get_dirty
+>   set_shared (src)
+>                      get_list
+>                      <transfers as shared instead of private>
+> 		     <migrates vCPU>
+>   set_private (dest)
+>   kaboom!
+
+
+Since there was no write to the memory after the set_shared (src), so
+the content of the page should not have changed. After the set_private
+(dest), the caller should be seeing the same content written by the
+zero_bytes[0:4096]
+
+
+> Scenario #3 is unlikely, but plausible, e.g. if the guest bails from its
+> conversion flow for whatever reason, after making the initial hypercall.  Maybe
+> it goes without saying, but to address #3, the guest must consider existing data
+> as lost the instant it tells the host the page has been converted to a different
+> type.
+>
+>> For the above reason if we do in-kernel hypercall handling for page
+>> encryption status (which we probably won't require for SEV-SNP &
+>> correspondingly there will be no hypercall exiting),
+> As above, that doesn't preclude KVM from exiting to userspace on conversion.
+>
+>> then we can implement a standard GET/SET ioctl interface to get/set the guest
+>> page encryption status for userspace, which will work across SEV, SEV-ES and
+>> SEV-SNP.
