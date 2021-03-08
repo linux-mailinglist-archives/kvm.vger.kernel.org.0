@@ -2,101 +2,143 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 46D0E3314D7
-	for <lists+kvm@lfdr.de>; Mon,  8 Mar 2021 18:29:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DD260331524
+	for <lists+kvm@lfdr.de>; Mon,  8 Mar 2021 18:47:42 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230341AbhCHR2p (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 8 Mar 2021 12:28:45 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:55223 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230480AbhCHR23 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 8 Mar 2021 12:28:29 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1615224508;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=68Q1xwUkanNcV5e2B7tNzGwWeOXg0fkQwRdlSBUoc5s=;
-        b=U9gWc4gdxQcs+MJ/mo9lI0Bznf4Hom+rru504lpyQanR6OF1L6QULBulrQUVffWlpnURtp
-        zyXPDOkEwGHDkeSQyjD3EeUmEDNjd86wnlO1JLFkc1Cxc4Eb3Dqe00iOqVKKxnU1xrwa35
-        Hm/hO6NSmGUNkAxoYkZCvH2z84bfkhs=
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
- [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-230-zzM6bs1sMDO_9HfKdig8uA-1; Mon, 08 Mar 2021 12:28:27 -0500
-X-MC-Unique: zzM6bs1sMDO_9HfKdig8uA-1
-Received: by mail-ed1-f70.google.com with SMTP id t27so5362972edi.2
-        for <kvm@vger.kernel.org>; Mon, 08 Mar 2021 09:28:26 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:cc:references:from:subject:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=68Q1xwUkanNcV5e2B7tNzGwWeOXg0fkQwRdlSBUoc5s=;
-        b=SbGOxX5mEiurhIZvPtuGbvs3w+tEHVgFV32h0Qw1HKW1c/v7UDVIbWC3lr5MlS+CR5
-         IhJ4eOG+XAeF2t6tUtYuhLXhKPvuVMuOAzRCUKph0bS1adoT3ZBulSFeMPRdCOZnA7xV
-         fJn8cAJNGWlimWBIi7ahUJRtbbEUvBQpt4BMurxCReTEZlZtKWNTBr3hREYA2puVGo/H
-         tOy0j/kyQVg0X8dDJ+VG3F5aofN9whnClDJNGlKka7PL6Y5TT8/29SIRY6vc7AYK3xAq
-         tvTTNaZru/7erzPfXhYuuHZWkGKJSpQnQBYQHVQe7rlrdXK2hlvY3/h1Pl/6VbINIqo2
-         nTLQ==
-X-Gm-Message-State: AOAM532VHaKYl/qDHKyS5ByZr+krI9DlqKk3bbP4gJH8ztGV4rtxeuiu
-        4k6sg3b/VJXLLRIHbIOcT4wE+oY1DZYr6aK+FP004Z0kSODv48jubRx2QUHLY9PHvyyWZnv0XX1
-        iAYmKPDNtNHmB
-X-Received: by 2002:a50:fd15:: with SMTP id i21mr21495789eds.384.1615224505894;
-        Mon, 08 Mar 2021 09:28:25 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJy0Zyu+67mVRR61VYO+4Xe2/P4FYPxhpFhPj3T0/5mSt00vh1v0MKUMP1YkBf0lkUxJl9kuAQ==
-X-Received: by 2002:a50:fd15:: with SMTP id i21mr21495773eds.384.1615224505712;
-        Mon, 08 Mar 2021 09:28:25 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id j14sm7353450eds.78.2021.03.08.09.28.24
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 08 Mar 2021 09:28:25 -0800 (PST)
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        vkuznets@redhat.com, mlevitsk@redhat.com,
-        Jim Mattson <jmattson@google.com>
-References: <YELdblXaKBTQ4LGf@google.com>
- <fc2b0085-eb0f-dbab-28c2-a244916c655f@redhat.com>
- <YEZUhbBtNjWh0Zka@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH 03/28] KVM: nSVM: inject exceptions via
- svm_check_nested_events
-Message-ID: <006be822-697e-56d5-84a7-fa51f5087a34@redhat.com>
-Date:   Mon, 8 Mar 2021 18:28:24 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.7.0
+        id S230116AbhCHRrJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 8 Mar 2021 12:47:09 -0500
+Received: from mail.kernel.org ([198.145.29.99]:44548 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S230184AbhCHRq4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 8 Mar 2021 12:46:56 -0500
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 2450165296;
+        Mon,  8 Mar 2021 17:46:52 +0000 (UTC)
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=hot-poop.lan)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94)
+        (envelope-from <maz@kernel.org>)
+        id 1lJJxy-000OD8-8a; Mon, 08 Mar 2021 17:46:50 +0000
+From:   Marc Zyngier <maz@kernel.org>
+To:     kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
+        kvm@vger.kernel.org
+Cc:     James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        kernel-team@android.com
+Subject: [PATCH] KVM: arm64: Cap default IPA size to the host's own size
+Date:   Mon,  8 Mar 2021 17:46:43 +0000
+Message-Id: <20210308174643.761100-1-maz@kernel.org>
+X-Mailer: git-send-email 2.30.0
 MIME-Version: 1.0
-In-Reply-To: <YEZUhbBtNjWh0Zka@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
 Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com, kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 08/03/21 17:44, Sean Christopherson wrote:
-> VMCALL is also probably ok
-> in most scenarios, but patching L2's code from L0 KVM is sketchy.
+KVM/arm64 has forever used a 40bit default IPA space, partially
+due to its 32bit heritage (where the only choice is 40bit).
 
-I agree that patching is sketchy and I'll send a patch.  However...
+However, there are implementations in the wild that have a *cough*
+much smaller *cough* IPA space, which leads to a misprogramming of
+VTCR_EL2, and a guest that is stuck on its first memory access
+if userspace dares to ask for the default IPA setting (which most
+VMMs do).
 
->> The same is true for the VMware #GP interception case.
->
-> I highly doubt that will ever work out as intended for the modified IO #GP
-> behavior.  The only way emulating #GP in L2 is correct if L1 wants to pass
-> through the capabilities to L2, i.e. the I/O access isn't intercepted by L1.
-> That seems unlikely.
+Instead, cap the default IPA size to what the host can actually
+do, and spit out a one-off message on the console. The boot warning
+is turned into a more meaningfull message, and the new behaviour
+is also documented.
 
-... not all hypervisors trap everything.  In particular in this case the 
-VMCS12 I/O permission bitmap should be consulted (which we do in 
-vmx_check_intercept_io), but if the I/O is not trapped by L1 it should 
-bypass the IOPL and TSS-bitmap checks in my opinion.
+Although this is a userspace ABI change, it doesn't really change
+much for userspace:
 
-Paolo
+- the guest couldn't run before this change, while it now has
+  a chance to if the memory range fits the reduced IPA space
 
-> If the I/O is is intercepted by L1, bypassing the IOPL and
-> TSS-bitmap checks is wrong and will cause L1 to emulate I/O for L2 userspace
-> that should never be allowed.  Odds are there isn't a corresponding emulated
-> port in L1, i.e. there's no major security flaw, but it's far from good
-> behavior.
+- a memory slot that was accepted because it did fit the default
+  IPA space but didn't fit the HW constraints is now properly
+  rejected
+
+The other thing that's left doing is to convince userspace to
+actually use the IPA space setting instead of relying on the
+antiquated default.
+
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+---
+ Documentation/virt/kvm/api.rst | 13 +++++++------
+ arch/arm64/kvm/reset.c         | 12 ++++++++----
+ 2 files changed, 15 insertions(+), 10 deletions(-)
+
+diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+index aed52b0fc16e..80c710035f31 100644
+--- a/Documentation/virt/kvm/api.rst
++++ b/Documentation/virt/kvm/api.rst
+@@ -158,12 +158,13 @@ flag KVM_VM_MIPS_VZ.
+ 
+ 
+ On arm64, the physical address size for a VM (IPA Size limit) is limited
+-to 40bits by default. The limit can be configured if the host supports the
+-extension KVM_CAP_ARM_VM_IPA_SIZE. When supported, use
++to 40bits by default, though capped to the host's limit. The VM's own
++limit can be configured if the host supports the extension
++KVM_CAP_ARM_VM_IPA_SIZE. When supported, use
+ KVM_VM_TYPE_ARM_IPA_SIZE(IPA_Bits) to set the size in the machine type
+-identifier, where IPA_Bits is the maximum width of any physical
+-address used by the VM. The IPA_Bits is encoded in bits[7-0] of the
+-machine type identifier.
++identifier, where IPA_Bits is the maximum width of any physical address
++used by the VM. The IPA_Bits is encoded in bits[7-0] of the machine type
++identifier.
+ 
+ e.g, to configure a guest to use 48bit physical address size::
+ 
+@@ -172,7 +173,7 @@ e.g, to configure a guest to use 48bit physical address size::
+ The requested size (IPA_Bits) must be:
+ 
+  ==   =========================================================
+-  0   Implies default size, 40bits (for backward compatibility)
++  0   Implies default size, 40bits or less (for backward compatibility)
+   N   Implies N bits, where N is a positive integer such that,
+       32 <= N <= Host_IPA_Limit
+  ==   =========================================================
+diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
+index 47f3f035f3ea..1f22b36a0eff 100644
+--- a/arch/arm64/kvm/reset.c
++++ b/arch/arm64/kvm/reset.c
+@@ -324,10 +324,9 @@ int kvm_set_ipa_limit(void)
+ 	}
+ 
+ 	kvm_ipa_limit = id_aa64mmfr0_parange_to_phys_shift(parange);
+-	WARN(kvm_ipa_limit < KVM_PHYS_SHIFT,
+-	     "KVM IPA Size Limit (%d bits) is smaller than default size\n",
+-	     kvm_ipa_limit);
+-	kvm_info("IPA Size Limit: %d bits\n", kvm_ipa_limit);
++	kvm_info("IPA Size Limit: %d bits%s\n", kvm_ipa_limit,
++		 ((kvm_ipa_limit < KVM_PHYS_SHIFT) ?
++		  " (Reduced IPA size, limited VM compatibility)" : ""));
+ 
+ 	return 0;
+ }
+@@ -356,6 +355,11 @@ int kvm_arm_setup_stage2(struct kvm *kvm, unsigned long type)
+ 			return -EINVAL;
+ 	} else {
+ 		phys_shift = KVM_PHYS_SHIFT;
++		if (phys_shift > kvm_ipa_limit) {
++			pr_warn_once("Userspace using unsupported default IPA limit, capping to %d bits\n",
++				     kvm_ipa_limit);
++			phys_shift = kvm_ipa_limit;
++		}
+ 	}
+ 
+ 	mmfr0 = read_sanitised_ftr_reg(SYS_ID_AA64MMFR0_EL1);
+-- 
+2.30.0
 
