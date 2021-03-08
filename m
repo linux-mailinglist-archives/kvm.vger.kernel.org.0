@@ -2,108 +2,111 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F313B33159D
-	for <lists+kvm@lfdr.de>; Mon,  8 Mar 2021 19:13:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 213D43315AA
+	for <lists+kvm@lfdr.de>; Mon,  8 Mar 2021 19:16:01 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230455AbhCHSNS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 8 Mar 2021 13:13:18 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:50555 "EHLO
+        id S230510AbhCHSP2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 8 Mar 2021 13:15:28 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:56727 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230173AbhCHSMp (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 8 Mar 2021 13:12:45 -0500
+        by vger.kernel.org with ESMTP id S230475AbhCHSPJ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 8 Mar 2021 13:15:09 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1615227164;
+        s=mimecast20190719; t=1615227309;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=g3PfKhdiqdgUwSWYSwDNbfusFaETS5oAF78BcOmOgew=;
-        b=KojPM+aCjtw7dZvKWAuFFjs6OQ+SE59GTh2hxHMYuVClQNO6oqblWOga7PCeU6LdlMWpM7
-        uBvzMxmmW0h4lUGVhr/DNChmtpgw9fxjy5Ui19gZkatH2nr1e2HqimRq+43k1O/jlDWMpm
-        meieghCrrWB4REOn6/z9Yh6qNYhzNEY=
+        bh=FhXr3Aup+JoRONDG/Ll127NVHPyRKYn2FZ70r6w3RZI=;
+        b=cU6xLBdU0mHGoLE5Nnv/N201fIMXk/Zag/loWjaxDBDxcDMymFY0GPcM/zq7JqxDRIGl/x
+        LGOrWKda75LAmueeovjxq5OakMBUzfelFFNoclq5izVS9CS/pwG1q8hPbUUkKQERcwVfv3
+        3+LRX8lAwjuwyL/zmeB6ulsfltd1M6s=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-509-LHQEfOXhMzaPdazJnqfR1g-1; Mon, 08 Mar 2021 13:12:40 -0500
-X-MC-Unique: LHQEfOXhMzaPdazJnqfR1g-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+ us-mta-149-h7mfrAGcMTKte-RfZHIdOg-1; Mon, 08 Mar 2021 13:15:06 -0500
+X-MC-Unique: h7mfrAGcMTKte-RfZHIdOg-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E1E3980432E;
-        Mon,  8 Mar 2021 18:12:35 +0000 (UTC)
-Received: from [10.36.112.254] (ovpn-112-254.ams2.redhat.com [10.36.112.254])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 29A7D5D756;
-        Mon,  8 Mar 2021 18:12:22 +0000 (UTC)
-Subject: Re: [PATCH v12 03/13] vfio: VFIO_IOMMU_SET_MSI_BINDING
-To:     Jean-Philippe Brucker <jean-philippe@linaro.org>
-Cc:     eric.auger.pro@gmail.com, iommu@lists.linux-foundation.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        kvmarm@lists.cs.columbia.edu, will@kernel.org, maz@kernel.org,
-        robin.murphy@arm.com, joro@8bytes.org, alex.williamson@redhat.com,
-        tn@semihalf.com, zhukeqian1@huawei.com,
-        jacob.jun.pan@linux.intel.com, yi.l.liu@intel.com,
-        wangxingang5@huawei.com, jiangkunkun@huawei.com,
-        zhangfei.gao@linaro.org, zhangfei.gao@gmail.com,
-        vivek.gautam@arm.com, shameerali.kolothum.thodi@huawei.com,
-        yuzenghui@huawei.com, nicoleotsuka@gmail.com,
-        lushenming@huawei.com, vsethi@nvidia.com
-References: <20210223210625.604517-1-eric.auger@redhat.com>
- <20210223210625.604517-4-eric.auger@redhat.com> <YEIL3qmcRfhUoRGt@myrica>
-From:   Auger Eric <eric.auger@redhat.com>
-Message-ID: <0e23edb9-9923-edb9-ac3d-8fb52d2fe8c6@redhat.com>
-Date:   Mon, 8 Mar 2021 19:12:21 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.7.0
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 30DF58030D1;
+        Mon,  8 Mar 2021 18:14:28 +0000 (UTC)
+Received: from gondolin (ovpn-112-94.ams2.redhat.com [10.36.112.94])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id DB52F5D9CD;
+        Mon,  8 Mar 2021 18:14:23 +0000 (UTC)
+Date:   Mon, 8 Mar 2021 19:14:21 +0100
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     Alex Williamson <alex.williamson@redhat.com>, <kvm@vger.kernel.org>
+Subject: Re: [PATCH] vfio: Depend on MMU
+Message-ID: <20210308191421.7f823b28.cohuck@redhat.com>
+In-Reply-To: <20210305231141.GS4247@nvidia.com>
+References: <0-v1-02cb5500df6e+78-vfio_no_mmu_jgg@nvidia.com>
+        <20210305094649.25991311.cohuck@redhat.com>
+        <20210305231141.GS4247@nvidia.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-In-Reply-To: <YEIL3qmcRfhUoRGt@myrica>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Jean,
+On Fri, 5 Mar 2021 19:11:41 -0400
+Jason Gunthorpe <jgg@nvidia.com> wrote:
 
-On 3/5/21 11:45 AM, Jean-Philippe Brucker wrote:
-> Hi,
+> On Fri, Mar 05, 2021 at 09:46:49AM +0100, Cornelia Huck wrote:
+> > On Thu, 4 Mar 2021 21:30:03 -0400
+> > Jason Gunthorpe <jgg@nvidia.com> wrote:
+> >   
+> > > VFIO_IOMMU_TYPE1 does not compile with !MMU:
+> > > 
+> > > ../drivers/vfio/vfio_iommu_type1.c: In function 'follow_fault_pfn':
+> > > ../drivers/vfio/vfio_iommu_type1.c:536:22: error: implicit declaration of function 'pte_write'; did you mean 'vfs_write'? [-Werror=implicit-function-declaration]
+> > > 
+> > > So require it.
+> > > 
+> > > Suggested-by: Cornelia Huck <cohuck@redhat.com>
+> > > Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
+> > >  drivers/vfio/Kconfig | 2 +-
+> > >  1 file changed, 1 insertion(+), 1 deletion(-)
+> > > 
+> > > diff --git a/drivers/vfio/Kconfig b/drivers/vfio/Kconfig
+> > > index 90c0525b1e0cf4..67d0bf4efa1606 100644
+> > > +++ b/drivers/vfio/Kconfig
+> > > @@ -22,7 +22,7 @@ config VFIO_VIRQFD
+> > >  menuconfig VFIO
+> > >  	tristate "VFIO Non-Privileged userspace driver framework"
+> > >  	select IOMMU_API
+> > > -	select VFIO_IOMMU_TYPE1 if (X86 || S390 || ARM || ARM64)
+> > > +	select VFIO_IOMMU_TYPE1 if MMU && (X86 || S390 || ARM || ARM64)
+> > >  	help
+> > >  	  VFIO provides a framework for secure userspace device drivers.
+> > >  	  See Documentation/driver-api/vfio.rst for more details.  
+> > 
+> > Actually, I'm wondering how much sense vfio makes on !MMU at all? (And
+> > maybe just merge this with your patch that switches IOMMU_API from a
+> > depend to a select, because that is the change that makes the MMU
+> > dependency required?)  
 > 
-> On Tue, Feb 23, 2021 at 10:06:15PM +0100, Eric Auger wrote:
->> This patch adds the VFIO_IOMMU_SET_MSI_BINDING ioctl which aim
->> to (un)register the guest MSI binding to the host. This latter
->> then can use those stage 1 bindings to build a nested stage
->> binding targeting the physical MSIs.
+> Why does changing depend to select affect MMU vs !MMU? Am I missing
+> something?
 > 
-> Now that RMR is in the IORT spec, could it be used for the nested MSI
-> problem?  For virtio-iommu tables I was planning to do it like this:
+> It looks like IOMMU_API can be turned with ARM !MMU here, for
+> instance:
 > 
-> MSI is mapped at stage-2 with an arbitrary IPA->doorbell PA. We report
-> this IPA to userspace through iommu_groups/X/reserved_regions. No change
-> there. Then to the guest we report a reserved identity mapping at IPA
-> (using RMR, an equivalent DT binding, or probed RESV_MEM for
-> virtio-iommu).
+> config MSM_IOMMU
+>         bool "MSM IOMMU Support"
+>         depends on ARM
+>         depends on ARCH_MSM8X60 || ARCH_MSM8960 || COMPILE_TEST
+>         select IOMMU_API
 
-Is there any DT binding equivalent?
+But that one is sitting under a menu depending on MMU, isn't it?
 
- The guest creates that mapping at stage-1, and that's it.
-> Unless I overlooked something we'd only reuse existing infrastructure and
-> avoid the SET_MSI_BINDING interface.
-
-Yes at first glance I think this should work. The guest SMMU driver will
-continue allocating IOVA for MSIs but I think that's not an issue as
-they won't be used.
-
-For the SMMU case this makes the guest behavior different from the
-baremetal one though. Typically you will never get any S1 fault. Also
-the S1 mapping is static and direct.
-
-I will prototype this too.
-
-Thanks
-
-Eric
 > 
-> Thanks,
-> Jean
+> Generally with !MMU I try to ignore it as much as possible unless
+> things don't compile, as I have no idea what people use it for :)
+> 
+> Jason
 > 
 
