@@ -2,138 +2,181 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E044A331839
-	for <lists+kvm@lfdr.de>; Mon,  8 Mar 2021 21:12:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6C54733185A
+	for <lists+kvm@lfdr.de>; Mon,  8 Mar 2021 21:22:25 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231646AbhCHUMH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 8 Mar 2021 15:12:07 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47030 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231584AbhCHULl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 8 Mar 2021 15:11:41 -0500
-Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E6F45C06174A
-        for <kvm@vger.kernel.org>; Mon,  8 Mar 2021 12:11:39 -0800 (PST)
-Received: by mail-pj1-x102b.google.com with SMTP id nh23-20020a17090b3657b02900c0d5e235a8so3801743pjb.0
-        for <kvm@vger.kernel.org>; Mon, 08 Mar 2021 12:11:39 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=inJpvYK1YMJnyEUoM1LxpFGBkfU9djOOCnPiOu1eiZI=;
-        b=UrnslPo3nSqw83+2HmcT3KLPcfVkAD/fOuRoClq0tEi5b1nPZQ+3UWQJGh+TTYMkO3
-         1l//NE/z+ViHMOe4opx92Z1rX8R737mfuIDKis8alBfBv8zr1usyEImqY+xU7IOCup/u
-         P1tZDd37vCs9jl4a55n7VKMRlZN8yOfzVjK1IERWlHRUNQ3+Ny29I/bP33c9hGlUQsOp
-         iClpBzZlj4n5j9WpJ79lAnfKfrdgxMz2J3xraiUpKpMe0ZRtioTXX714pOaahczmh14E
-         drfFdQomsrNSV4bHDNdakjbYE4MV32lUf9XWALzfc2103pgqESyDBF1UITmhobXop/CY
-         2BVQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=inJpvYK1YMJnyEUoM1LxpFGBkfU9djOOCnPiOu1eiZI=;
-        b=c4VSJKYeBC7jkhSykD7yrmNel16T6I9CzeBiYpBuQCza0VlynmIeBlzyjxB4TV+9A0
-         YXup/P4uKuITv8pZdb6Fhko7i6Lv8MFPqPmw9Fkk5aIDzpLie2SMIO3airyVWF9uv5mk
-         NyQB2zZardmfgBW7IAWYEx4UQ4h41bBezSC2i1l6TNRw1lBSppAFJESzbkFazmJ7Nywb
-         7hMGNYWvnd9miPtpswHg1mWUgdfdou47TL1SducLmyyLJmc500UbLun4BqB9fZPH6uoD
-         FSH7NCGI+cs/eax/jiETyuJy3RV3xtQNkqHVdq5S/rmyLaFXhuHd2XOBimynhuSUdlvo
-         K4CQ==
-X-Gm-Message-State: AOAM5303WYJITAlYZfCmZ8TZbQnt5dqJTDFCD1oykWjA+plqSalsQ0z4
-        pgTynfUn0us4aVC+KxZU/18AXA==
-X-Google-Smtp-Source: ABdhPJy85xPIDDDXOyiIL5nJi99l75uOA7O+Owc3vNcVsIW4vP5vCrIbUh9jUooS/eFV8AukhWK40A==
-X-Received: by 2002:a17:903:102:b029:e5:fc29:de83 with SMTP id y2-20020a1709030102b02900e5fc29de83mr15275757plc.31.1615234299359;
-        Mon, 08 Mar 2021 12:11:39 -0800 (PST)
-Received: from google.com ([2620:15c:f:10:8:847a:d8b5:e2cc])
-        by smtp.gmail.com with ESMTPSA id n5sm11072730pfq.44.2021.03.08.12.11.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 08 Mar 2021 12:11:38 -0800 (PST)
-Date:   Mon, 8 Mar 2021 12:11:32 -0800
-From:   Sean Christopherson <seanjc@google.com>
-To:     Tom Lendacky <thomas.lendacky@amd.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Ben Gardon <bgardon@google.com>
-Subject: Re: [PATCH 20/24] KVM: x86/mmu: Use a dedicated bit to track
- shadow/MMU-present SPTEs
-Message-ID: <YEaE9K/dAjImXv0f@google.com>
-References: <20210225204749.1512652-1-seanjc@google.com>
- <20210225204749.1512652-21-seanjc@google.com>
- <42917119-b43a-062b-6c09-13b988f7194b@amd.com>
+        id S230070AbhCHUVx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 8 Mar 2021 15:21:53 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:23441 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229650AbhCHUVS (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 8 Mar 2021 15:21:18 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1615234878;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=CnOdrg+zuN9I7icqeoUJJHRaYHJ2yvJy7iK4d/+2Nsg=;
+        b=VMsoveOAFkfB/19wC0YkAW8GSXVz7za8xWLoYJyakopVt/IZEcbM5RxNUUiW1d4G8g0vkA
+        sbogRJQizh6R1PlR9uhmeN2ZqYCyUi2lKjPhfdHS7ezIsC2D0d617dA8n7y4nQe2O5/4mM
+        dq7vO0S/tWRPY+MstYjmL+8UBZFtc6o=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-600-vZ1m_1qkM9Gr4lbC7TDRGA-1; Mon, 08 Mar 2021 15:21:14 -0500
+X-MC-Unique: vZ1m_1qkM9Gr4lbC7TDRGA-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 68B4180432E;
+        Mon,  8 Mar 2021 20:21:12 +0000 (UTC)
+Received: from omen.home.shazbot.org (ovpn-112-255.phx2.redhat.com [10.3.112.255])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 9E00860855;
+        Mon,  8 Mar 2021 20:21:07 +0000 (UTC)
+Date:   Mon, 8 Mar 2021 13:21:06 -0700
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Zeng Tao <prime.zeng@hisilicon.com>
+Cc:     <linuxarm@huawei.com>, Cornelia Huck <cohuck@redhat.com>,
+        Kevin Tian <kevin.tian@intel.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Peter Xu <peterx@redhat.com>,
+        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+        Michel Lespinasse <walken@google.com>,
+        "Jann Horn" <jannh@google.com>,
+        Max Gurtovoy <mgurtovoy@nvidia.com>, <kvm@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, Jason Gunthorpe <jgg@nvidia.com>
+Subject: Re: [PATCH] vfio/pci: make the vfio_pci_mmap_fault reentrant
+Message-ID: <20210308132106.49da42e2@omen.home.shazbot.org>
+In-Reply-To: <1615201890-887-1-git-send-email-prime.zeng@hisilicon.com>
+References: <1615201890-887-1-git-send-email-prime.zeng@hisilicon.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <42917119-b43a-062b-6c09-13b988f7194b@amd.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Mar 08, 2021, Tom Lendacky wrote:
-> On 2/25/21 2:47 PM, Sean Christopherson wrote:
-> > Introduce MMU_PRESENT to explicitly track which SPTEs are "present" from
-> > the MMU's perspective.  Checking for shadow-present SPTEs is a very
-> > common operation for the MMU, particularly in hot paths such as page
-> > faults.  With the addition of "removed" SPTEs for the TDP MMU,
-> > identifying shadow-present SPTEs is quite costly especially since it
-> > requires checking multiple 64-bit values.
-> > 
-> > On 64-bit KVM, this reduces the footprint of kvm.ko's .text by ~2k bytes.
-> > On 32-bit KVM, this increases the footprint by ~200 bytes, but only
-> > because gcc now inlines several more MMU helpers, e.g. drop_parent_pte().
-> > 
-> > Signed-off-by: Sean Christopherson <seanjc@google.com>
-> > ---
-> >   arch/x86/kvm/mmu/spte.c |  8 ++++----
-> >   arch/x86/kvm/mmu/spte.h | 11 ++++++++++-
-> >   2 files changed, 14 insertions(+), 5 deletions(-)
-> 
-> I'm trying to run a guest on my Rome system using the queue branch, but
-> I'm encountering an error that I bisected to this commit. In the guest
-> (during OVMF boot) I see:
-> 
-> error: kvm run failed Invalid argument
-> RAX=0000000000000000 RBX=00000000ffc12792 RCX=000000007f58401a RDX=000000007faaf808
-> RSI=0000000000000010 RDI=00000000ffc12792 RBP=00000000ffc12792 RSP=000000007faaf740
-> R8 =0000000000000792 R9 =000000007faaf808 R10=00000000ffc12793 R11=00000000000003f8
-> R12=0000000000000010 R13=0000000000000000 R14=000000007faaf808 R15=0000000000000012
-> RIP=000000007f6e9a90 RFL=00000246 [---Z-P-] CPL=0 II=0 A20=1 SMM=0 HLT=0
-> ES =0030 0000000000000000 ffffffff 00c09300 DPL=0 DS   [-WA]
-> CS =0038 0000000000000000 ffffffff 00a09b00 DPL=0 CS64 [-RA]
-> SS =0030 0000000000000000 ffffffff 00c09300 DPL=0 DS   [-WA]
-> DS =0030 0000000000000000 ffffffff 00c09300 DPL=0 DS   [-WA]
-> FS =0030 0000000000000000 ffffffff 00c09300 DPL=0 DS   [-WA]
-> GS =0030 0000000000000000 ffffffff 00c09300 DPL=0 DS   [-WA]
-> LDT=0000 0000000000000000 0000ffff 00008200 DPL=0 LDT
-> TR =0000 0000000000000000 0000ffff 00008b00 DPL=0 TSS64-busy
-> GDT=     000000007f5ee698 00000047
-> IDT=     000000007f186018 00000fff
-> CR0=80010033 CR2=0000000000000000 CR3=000000007f801000 CR4=00000668
-> DR0=0000000000000000 DR1=0000000000000000 DR2=0000000000000000 DR3=0000000000000000 
-> DR6=00000000ffff0ff0 DR7=0000000000000400
-> EFER=0000000000000d00
-> Code=22 00 00 e8 c0 e6 ff ff 48 83 c4 20 45 84 ed 74 07 fb eb 04 <44> 88 65 00 58 5b 5d 41 5c 41 5d c3 55 48 0f af 3d 1b 37 00 00 be 20 00 00 00 48 03 3d 17
-> 
-> On the hypervisor, I see the following:
-> 
-> [   55.886136] get_mmio_spte: detect reserved bits on spte, addr 0xffc12792, dump hierarchy:
-> [   55.895284] ------ spte 0x1344a0827 level 4.
-> [   55.900059] ------ spte 0x134499827 level 3.
-> [   55.904877] ------ spte 0x165bf0827 level 2.
-> [   55.909651] ------ spte 0xff800ffc12817 level 1.
+On Mon, 8 Mar 2021 19:11:26 +0800
+Zeng Tao <prime.zeng@hisilicon.com> wrote:
 
-Ah fudge.  I know what's wrong.  The MMIO generation uses bit 11, which means
-is_shadow_present_pte() can get a false positive on high MMIO generations.  This
-particular error can be squashed by explicitly checking for MMIO sptes in
-get_mmio_spte(), but I'm guessing there are other flows where a false positive
-is fatal (probably the __pte_list_remove bug below...).  The safe thing to do is
-to steal bit 11 from MMIO SPTEs so that shadow present PTEs are the only thing
-that sets that bit.
-
-I'll reproduce by stuffing the MMIO generation and get a patch posted.  Sorry :-/
-
-> When I kill the guest, I get a kernel panic:
+> We have met the following error when test with DPDK testpmd:
+> [ 1591.733256] kernel BUG at mm/memory.c:2177!
+> [ 1591.739515] Internal error: Oops - BUG: 0 [#1] PREEMPT SMP
+> [ 1591.747381] Modules linked in: vfio_iommu_type1 vfio_pci vfio_virqfd vfio pv680_mii(O)
+> [ 1591.760536] CPU: 2 PID: 227 Comm: lcore-worker-2 Tainted: G O 5.11.0-rc3+ #1
+> [ 1591.770735] Hardware name:  , BIOS HixxxxFPGA 1P B600 V121-1
+> [ 1591.778872] pstate: 40400009 (nZcv daif +PAN -UAO -TCO BTYPE=--)
+> [ 1591.786134] pc : remap_pfn_range+0x214/0x340
+> [ 1591.793564] lr : remap_pfn_range+0x1b8/0x340
+> [ 1591.799117] sp : ffff80001068bbd0
+> [ 1591.803476] x29: ffff80001068bbd0 x28: 0000042eff6f0000
+> [ 1591.810404] x27: 0000001100910000 x26: 0000001300910000
+> [ 1591.817457] x25: 0068000000000fd3 x24: ffffa92f1338e358
+> [ 1591.825144] x23: 0000001140000000 x22: 0000000000000041
+> [ 1591.832506] x21: 0000001300910000 x20: ffffa92f141a4000
+> [ 1591.839520] x19: 0000001100a00000 x18: 0000000000000000
+> [ 1591.846108] x17: 0000000000000000 x16: ffffa92f11844540
+> [ 1591.853570] x15: 0000000000000000 x14: 0000000000000000
+> [ 1591.860768] x13: fffffc0000000000 x12: 0000000000000880
+> [ 1591.868053] x11: ffff0821bf3d01d0 x10: ffff5ef2abd89000
+> [ 1591.875932] x9 : ffffa92f12ab0064 x8 : ffffa92f136471c0
+> [ 1591.883208] x7 : 0000001140910000 x6 : 0000000200000000
+> [ 1591.890177] x5 : 0000000000000001 x4 : 0000000000000001
+> [ 1591.896656] x3 : 0000000000000000 x2 : 0168044000000fd3
+> [ 1591.903215] x1 : ffff082126261880 x0 : fffffc2084989868
+> [ 1591.910234] Call trace:
+> [ 1591.914837]  remap_pfn_range+0x214/0x340
+> [ 1591.921765]  vfio_pci_mmap_fault+0xac/0x130 [vfio_pci]
+> [ 1591.931200]  __do_fault+0x44/0x12c
+> [ 1591.937031]  handle_mm_fault+0xcc8/0x1230
+> [ 1591.942475]  do_page_fault+0x16c/0x484
+> [ 1591.948635]  do_translation_fault+0xbc/0xd8
+> [ 1591.954171]  do_mem_abort+0x4c/0xc0
+> [ 1591.960316]  el0_da+0x40/0x80
+> [ 1591.965585]  el0_sync_handler+0x168/0x1b0
+> [ 1591.971608]  el0_sync+0x174/0x180
+> [ 1591.978312] Code: eb1b027f 540000c0 f9400022 b4fffe02 (d4210000)
 > 
-> [   95.539683] __pte_list_remove: 0000000040567a6a 0->BUG
-> [   95.545481] kernel BUG at arch/x86/kvm/mmu/mmu.c:896!
+> The cause is that the vfio_pci_mmap_fault function is not reentrant, if
+> multiple threads access the same address which will lead to a page fault
+> at the same time, we will have the above error.
+> 
+> Fix the issue by making the vfio_pci_mmap_fault reentrant, and there is
+> another issue that when the io_remap_pfn_range fails, we need to undo
+> the __vfio_pci_add_vma, fix it by moving the __vfio_pci_add_vma down
+> after the io_remap_pfn_range.
+> 
+> Fixes: 11c4cd07ba11 ("vfio-pci: Fault mmaps to enable vma tracking")
+> Signed-off-by: Zeng Tao <prime.zeng@hisilicon.com>
+> ---
+>  drivers/vfio/pci/vfio_pci.c | 14 ++++++++++----
+>  1 file changed, 10 insertions(+), 4 deletions(-)
+> 
+> diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
+> index 65e7e6b..6928c37 100644
+> --- a/drivers/vfio/pci/vfio_pci.c
+> +++ b/drivers/vfio/pci/vfio_pci.c
+> @@ -1613,6 +1613,7 @@ static vm_fault_t vfio_pci_mmap_fault(struct vm_fault *vmf)
+>  	struct vm_area_struct *vma = vmf->vma;
+>  	struct vfio_pci_device *vdev = vma->vm_private_data;
+>  	vm_fault_t ret = VM_FAULT_NOPAGE;
+> +	unsigned long pfn;
+>  
+>  	mutex_lock(&vdev->vma_lock);
+>  	down_read(&vdev->memory_lock);
+> @@ -1623,18 +1624,23 @@ static vm_fault_t vfio_pci_mmap_fault(struct vm_fault *vmf)
+>  		goto up_out;
+>  	}
+>  
+> -	if (__vfio_pci_add_vma(vdev, vma)) {
+> -		ret = VM_FAULT_OOM;
+> +	if (!follow_pfn(vma, vma->vm_start, &pfn)) {
+>  		mutex_unlock(&vdev->vma_lock);
+>  		goto up_out;
+>  	}
+>  
+> -	mutex_unlock(&vdev->vma_lock);
+
+
+If I understand correctly, I think you're using (perhaps slightly
+abusing) the vma_lock to extend the serialization of the vma_list
+manipulation to include io_remap_pfn_range() such that you can test
+whether the pte has already been populated using follow_pfn().  In that
+case we return VM_FAULT_NOPAGE without trying to repopulate the page
+and therefore avoid the BUG_ON in remap_pte_range() triggered by trying
+to overwrite an existing pte, and less importantly, a duplicate vma in
+our list.  I wonder if use of follow_pfn() is still strongly
+discouraged for this use case.
+
+I'm surprised that it's left to the fault handler to provide this
+serialization, is this because we're filling the entire vma rather than
+only the faulting page?
+
+As we move to unmap_mapping_range()[1] we remove all of the complexity
+of managing a list of vmas to zap based on whether device memory is
+enabled, including the vma_lock.  Are we going to need to replace that
+with another lock here, or is there a better approach to handling
+concurrency of this fault handler?  Jason/Peter?  Thanks,
+
+Alex
+
+[1]https://lore.kernel.org/kvm/161401267316.16443.11184767955094847849.stgit@gimli.home/
+
+>  
+>  	if (io_remap_pfn_range(vma, vma->vm_start, vma->vm_pgoff,
+> -			       vma->vm_end - vma->vm_start, vma->vm_page_prot))
+> +			       vma->vm_end - vma->vm_start, vma->vm_page_prot)) {
+>  		ret = VM_FAULT_SIGBUS;
+> +		mutex_unlock(&vdev->vma_lock);
+> +		goto up_out;
+> +	}
+> +
+> +	if (__vfio_pci_add_vma(vdev, vma))
+> +		ret = VM_FAULT_OOM;
+>  
+> +	mutex_unlock(&vdev->vma_lock);
+>  up_out:
+>  	up_read(&vdev->memory_lock);
+>  	return ret;
+
