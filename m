@@ -2,72 +2,68 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EC67B332DB9
-	for <lists+kvm@lfdr.de>; Tue,  9 Mar 2021 19:01:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 85DD9332DDB
+	for <lists+kvm@lfdr.de>; Tue,  9 Mar 2021 19:09:30 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231687AbhCISBY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 9 Mar 2021 13:01:24 -0500
-Received: from mail.kernel.org ([198.145.29.99]:52898 "EHLO mail.kernel.org"
+        id S231639AbhCISI6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 9 Mar 2021 13:08:58 -0500
+Received: from mga09.intel.com ([134.134.136.24]:32469 "EHLO mga09.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230457AbhCISBX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 9 Mar 2021 13:01:23 -0500
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 12BBB65228;
-        Tue,  9 Mar 2021 18:01:23 +0000 (UTC)
-Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.lan)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.94)
-        (envelope-from <maz@kernel.org>)
-        id 1lJgfY-000blB-TY; Tue, 09 Mar 2021 18:01:21 +0000
-From:   Marc Zyngier <maz@kernel.org>
-To:     kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        kvmarm@lists.cs.columbia.edu, Marc Zyngier <maz@kernel.org>
-Cc:     kernel-team@android.com, Catalin Marinas <catalin.marinas@arm.com>,
-        James Morse <james.morse@arm.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Will Deacon <will@kernel.org>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>
-Subject: Re: [PATCH] KVM: arm64: Ensure I-cache isolation between vcpus of a same VM
-Date:   Tue,  9 Mar 2021 18:01:05 +0000
-Message-Id: <161531284779.3772144.1323992258111335863.b4-ty@kernel.org>
-X-Mailer: git-send-email 2.29.2
-In-Reply-To: <20210303164505.68492-1-maz@kernel.org>
-References: <20210303164505.68492-1-maz@kernel.org>
+        id S229691AbhCISI0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 9 Mar 2021 13:08:26 -0500
+IronPort-SDR: EQA/y7d2+ZGXty8uRwddQ0hbMn+FrW3NXZKRU3Q/I/qm1P+7bX3ltCUJbxP22Ky2E7XkK8BpPv
+ IFG7Jk0vVc7A==
+X-IronPort-AV: E=McAfee;i="6000,8403,9917"; a="188395941"
+X-IronPort-AV: E=Sophos;i="5.81,236,1610438400"; 
+   d="scan'208";a="188395941"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Mar 2021 10:08:22 -0800
+IronPort-SDR: 20GELUBpTBCAyjRitRaEEf2u0/w3WWcCgFpSSYmo4fiujBJPTDDu3iMMDGXjXUTkadkkRrv6p/
+ MG2fAgxxQC4w==
+X-IronPort-AV: E=Sophos;i="5.81,236,1610438400"; 
+   d="scan'208";a="403326250"
+Received: from kvolpe-mobl1.amr.corp.intel.com ([10.251.3.165])
+  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Mar 2021 10:08:16 -0800
+Message-ID: <b6b93b11e9b5383c613d402806678fa77b7df7e8.camel@intel.com>
+Subject: Re: [PATCH v2 00/25] KVM SGX virtualization support
+From:   Kai Huang <kai.huang@intel.com>
+To:     Borislav Petkov <bp@alien8.de>
+Cc:     kvm@vger.kernel.org, x86@kernel.org, linux-sgx@vger.kernel.org,
+        linux-kernel@vger.kernel.org, seanjc@google.com, jarkko@kernel.org,
+        luto@kernel.org, dave.hansen@intel.com, rick.p.edgecombe@intel.com,
+        haitao.huang@intel.com, pbonzini@redhat.com, tglx@linutronix.de,
+        mingo@redhat.com, hpa@zytor.com, jethro@fortanix.com,
+        b.thiel@posteo.de, jmattson@google.com, joro@8bytes.org,
+        vkuznets@redhat.com, wanpengli@tencent.com, corbet@lwn.net
+Date:   Wed, 10 Mar 2021 07:08:14 +1300
+In-Reply-To: <20210309093037.GA699@zn.tnic>
+References: <cover.1615250634.git.kai.huang@intel.com>
+         <20210309093037.GA699@zn.tnic>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.38.4 (3.38.4-1.fc33) 
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, maz@kernel.org, kernel-team@android.com, catalin.marinas@arm.com, james.morse@arm.com, mark.rutland@arm.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com, will@kernel.org, julien.thierry.kdev@gmail.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 3 Mar 2021 16:45:05 +0000, Marc Zyngier wrote:
-> It recently became apparent that the ARMv8 architecture has interesting
-> rules regarding attributes being used when fetching instructions
-> if the MMU is off at Stage-1.
+On Tue, 2021-03-09 at 10:30 +0100, Borislav Petkov wrote:
+> On Tue, Mar 09, 2021 at 02:38:49PM +1300, Kai Huang wrote:
+> > This series adds KVM SGX virtualization support. The first 14 patches starting
+> > with x86/sgx or x86/cpu.. are necessary changes to x86 and SGX core/driver to
+> > support KVM SGX virtualization, while the rest are patches to KVM subsystem.
 > 
-> In this situation, the CPU is allowed to fetch from the PoC and
-> allocate into the I-cache (unless the memory is mapped with
-> the XN attribute at Stage-2).
+> Ok, I guess I'll queue 1-14 once Sean doesn't find anything
+> objectionable then give Paolo an immutable commit to base the KVM stuff
+> ontop.
 > 
-> [...]
+> Unless folks have better suggestions, ofc.
+> 
+> Thx.
+> 
+Thanks Boris!
 
-Applied to fixes, thanks!
+Hi Sean, Paolo,
 
-[1/1] KVM: arm64: Ensure I-cache isolation between vcpus of a same VM
-      commit: 01dc9262ff5797b675c32c0c6bc682777d23de05
-
-Cheers,
-
-	M.
--- 
-Without deviation from the norm, progress is not possible.
-
+Could you take a look? Thanks.
 
