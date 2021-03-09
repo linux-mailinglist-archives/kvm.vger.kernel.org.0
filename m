@@ -2,87 +2,138 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E38763320D7
-	for <lists+kvm@lfdr.de>; Tue,  9 Mar 2021 09:37:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 70F173320EF
+	for <lists+kvm@lfdr.de>; Tue,  9 Mar 2021 09:44:31 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229878AbhCIIg5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 9 Mar 2021 03:36:57 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38576 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229948AbhCIIgv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 9 Mar 2021 03:36:51 -0500
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1CA8DC06174A;
-        Tue,  9 Mar 2021 00:36:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=1nJO4XTKt7zFVdztSkFpRJqlqh8a16sejG+dCghcYvg=; b=k0+T7doXzkMCgq8tMaaEpGRr87
-        QzqYywz/YSEgroYM7hAoH60RO0jwfZFoa1odGMIfreObTgvGg6Na9qjKuvDfQ7utlHfZVLtGpLqsn
-        zRGjb+4Ciqgp36oxAf9UrKLtdvTDGE6TZucWq4aa+klHVq+Jbn6k/zhIRh5nNsOU0F2QnSQYI/glr
-        OZAV8vjXI2/dOy15IqLocAjwsW1BWKzrIFSpqpq6LVC77ZxtQ660ROt0zVjkNL59SmPxXnp0PtaUu
-        73TzL1CpIDhWnhZkmLILd6EI4WApkaN4TuwzVEFFQdtvUsQ34JNEMxLRNJPNBGOiKzpmo77CW2GOZ
-        pLbt+ETQ==;
-Received: from hch by casper.infradead.org with local (Exim 4.94 #2 (Red Hat Linux))
-        id 1lJXr7-000FPy-IN; Tue, 09 Mar 2021 08:36:43 +0000
-Date:   Tue, 9 Mar 2021 08:36:41 +0000
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     cohuck@redhat.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, jgg@nvidia.com, peterx@redhat.com,
-        viro@zeniv.linux.org.uk
-Subject: Re: [PATCH v1 01/14] vfio: Create vfio_fs_type with inode per device
-Message-ID: <20210309083641.GB55734@infradead.org>
-References: <161523878883.3480.12103845207889888280.stgit@gimli.home>
- <161524004828.3480.1817334832614722574.stgit@gimli.home>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <161524004828.3480.1817334832614722574.stgit@gimli.home>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+        id S229875AbhCIIoA convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Tue, 9 Mar 2021 03:44:00 -0500
+Received: from mail.kernel.org ([198.145.29.99]:41830 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229515AbhCIIn4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 9 Mar 2021 03:43:56 -0500
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id DB0FA6525D;
+        Tue,  9 Mar 2021 08:43:55 +0000 (UTC)
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94)
+        (envelope-from <maz@kernel.org>)
+        id 1lJXy5-000UxK-Rc; Tue, 09 Mar 2021 08:43:53 +0000
+Date:   Tue, 09 Mar 2021 08:43:52 +0000
+Message-ID: <87y2ewyawn.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     "wangyanan (Y)" <wangyanan55@huawei.com>
+Cc:     Will Deacon <will@kernel.org>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        <kvmarm@lists.cs.columbia.edu>,
+        <linux-arm-kernel@lists.infradead.org>, <kvm@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <wanghaibin.wang@huawei.com>,
+        <yuzenghui@huawei.com>
+Subject: Re: [PATCH 2/2] KVM: arm64: Skip the cache flush when coalescing tables into a block
+In-Reply-To: <8a947c73-16e9-7ca7-c185-d4c951938505@huawei.com>
+References: <20210125141044.380156-1-wangyanan55@huawei.com>
+        <20210125141044.380156-3-wangyanan55@huawei.com>
+        <20210308163454.GA26561@willie-the-truck>
+        <8a947c73-16e9-7ca7-c185-d4c951938505@huawei.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8BIT
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: wangyanan55@huawei.com, will@kernel.org, catalin.marinas@arm.com, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, wanghaibin.wang@huawei.com, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Mar 08, 2021 at 02:47:28PM -0700, Alex Williamson wrote:
-> By linking all the device fds we provide to userspace to an
-> address space through a new pseudo fs, we can use tools like
-> unmap_mapping_range() to zap all vmas associated with a device.
+On Tue, 09 Mar 2021 08:34:43 +0000,
+"wangyanan (Y)" <wangyanan55@huawei.com> wrote:
 > 
-> Suggested-by: Jason Gunthorpe <jgg@nvidia.com>
-> Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
+> 
+> On 2021/3/9 0:34, Will Deacon wrote:
+> > On Mon, Jan 25, 2021 at 10:10:44PM +0800, Yanan Wang wrote:
+> >> After dirty-logging is stopped for a VM configured with huge mappings,
+> >> KVM will recover the table mappings back to block mappings. As we only
+> >> replace the existing page tables with a block entry and the cacheability
+> >> has not been changed, the cache maintenance opreations can be skipped.
+> >> 
+> >> Signed-off-by: Yanan Wang <wangyanan55@huawei.com>
+> >> ---
+> >>   arch/arm64/kvm/mmu.c | 12 +++++++++---
+> >>   1 file changed, 9 insertions(+), 3 deletions(-)
+> >> 
+> >> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> >> index 8e8549ea1d70..37b427dcbc4f 100644
+> >> --- a/arch/arm64/kvm/mmu.c
+> >> +++ b/arch/arm64/kvm/mmu.c
+> >> @@ -744,7 +744,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+> >>   {
+> >>   	int ret = 0;
+> >>   	bool write_fault, writable, force_pte = false;
+> >> -	bool exec_fault;
+> >> +	bool exec_fault, adjust_hugepage;
+> >>   	bool device = false;
+> >>   	unsigned long mmu_seq;
+> >>   	struct kvm *kvm = vcpu->kvm;
+> >> @@ -872,12 +872,18 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+> >>   		mark_page_dirty(kvm, gfn);
+> >>   	}
+> >>   -	if (fault_status != FSC_PERM && !device)
+> >> +	/*
+> >> +	 * There is no necessity to perform cache maintenance operations if we
+> >> +	 * will only replace the existing table mappings with a block mapping.
+> >> +	 */
+> >> +	adjust_hugepage = fault_granule < vma_pagesize ? true : false;
+> > nit: you don't need the '? true : false' part
+> > 
+> > That said, your previous patch checks for 'fault_granule > vma_pagesize',
+> > so I'm not sure the local variable helps all that much here because it
+> > obscures the size checks in my opinion. It would be more straight-forward
+> > if we could structure the logic as:
+> > 
+> > 
+> > 	if (fault_granule < vma_pagesize) {
+> > 
+> > 	} else if (fault_granule > vma_page_size) {
+> > 
+> > 	} else {
+> > 
+> > 	}
+> > 
+> > With some comments describing what we can infer about the memcache and cache
+> > maintenance requirements for each case.
+> Thanks for your suggestion here, Will.
+> But I have resent another newer series [1] (KVM: arm64: Improve
+> efficiency of stage2 page table)
+> recently, which has the same theme but different solutions that I
+> think are better.
+> [1]
+> https://lore.kernel.org/lkml/20210208112250.163568-1-wangyanan55@huawei.com/
+> 
+> Could you please comment on that series ?  I think it can be found in
+> your inbox :).
 
-I'd much prefer to just piggy back on the anon_inode fs rather than
-duplicating this logic all over.  Something like the trivial patch below
-should be all that is needed:
+There were already a bunch of comments on that series, and I stopped
+at the point where the cache maintenance was broken. Please respin
+that series if you want further feedback on it.
 
-diff --git a/fs/anon_inodes.c b/fs/anon_inodes.c
-index a280156138ed89..6fe404aab0f0dd 100644
---- a/fs/anon_inodes.c
-+++ b/fs/anon_inodes.c
-@@ -225,6 +225,12 @@ int anon_inode_getfd_secure(const char *name, const struct file_operations *fops
- }
- EXPORT_SYMBOL_GPL(anon_inode_getfd_secure);
- 
-+struct inode *alloc_anon_inode_simple(void)
-+{
-+	return alloc_anon_inode(anon_inode_mnt->mnt_sb);
-+}
-+EXPORT_SYMBOL_GPL(alloc_anon_inode_simple);
-+
- static int __init anon_inode_init(void)
- {
- 	anon_inode_mnt = kern_mount(&anon_inode_fs_type);
-diff --git a/include/linux/anon_inodes.h b/include/linux/anon_inodes.h
-index 71881a2b6f7860..6b2fb7d0abc57a 100644
---- a/include/linux/anon_inodes.h
-+++ b/include/linux/anon_inodes.h
-@@ -21,6 +21,7 @@ int anon_inode_getfd_secure(const char *name,
- 			    const struct file_operations *fops,
- 			    void *priv, int flags,
- 			    const struct inode *context_inode);
-+struct inode *alloc_anon_inode_simple(void);
- 
- #endif /* _LINUX_ANON_INODES_H */
- 
+In the future, if you deprecate a series (which is completely
+understandable), please leave a note on the list with a pointer to the
+new series so that people don't waste time reviewing an obsolete
+series. Or post the new series with a new version number so that it is
+obvious that the original series has been superseded.
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
