@@ -2,57 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 830B13331A6
+	by mail.lfdr.de (Postfix) with ESMTP id D02573331A7
 	for <lists+kvm@lfdr.de>; Tue,  9 Mar 2021 23:43:02 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232095AbhCIWmd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        id S232138AbhCIWmd (ORCPT <rfc822;lists+kvm@lfdr.de>);
         Tue, 9 Mar 2021 17:42:33 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52896 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52908 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232101AbhCIWmT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 9 Mar 2021 17:42:19 -0500
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3ACA1C06174A
-        for <kvm@vger.kernel.org>; Tue,  9 Mar 2021 14:42:19 -0800 (PST)
-Received: by mail-yb1-xb4a.google.com with SMTP id q77so19080661ybq.0
-        for <kvm@vger.kernel.org>; Tue, 09 Mar 2021 14:42:19 -0800 (PST)
+        with ESMTP id S232107AbhCIWmV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 9 Mar 2021 17:42:21 -0500
+Received: from mail-qk1-x74a.google.com (mail-qk1-x74a.google.com [IPv6:2607:f8b0:4864:20::74a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ACC04C06174A
+        for <kvm@vger.kernel.org>; Tue,  9 Mar 2021 14:42:21 -0800 (PST)
+Received: by mail-qk1-x74a.google.com with SMTP id h126so11301096qkd.4
+        for <kvm@vger.kernel.org>; Tue, 09 Mar 2021 14:42:21 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=reply-to:date:in-reply-to:message-id:mime-version:references
          :subject:from:to:cc;
-        bh=lsTrBguBJ33tlWNbEPVySyXiNpj8s/BCHc56IoJDIiw=;
-        b=qF8XJ66q2Y/it4EK9taRHSOkIeXPutLgTrwsvj79SpSXAD5hNpqW/Ry+yVn/KzVOWx
-         qkUbmv+U7rgXGiq6Q4QNl2PCf+Q/jVe65w9Lum0TAGh2cwn31Sy5waZXlp9FJ1ZjVOBP
-         7HaH4dTObwlqU2IXjPJSOUpe0n0wavCM0BYo0riidZD+zB2bJ+CtzJIZ5P0Mk6cEtFrO
-         LaeyRgH4zjWE63BB5U4HtkAdEJ2SLbo3Pk3fCDSOpUD8SjKQq0ndiJ5PfXq+87lKmN6p
-         tQODzEuQXfEbWVgq54MLUrEKMjOwxg0uVQsulD91krEwVb6/B9qzLD5yp5Cs9WSmvnb0
-         /0xw==
+        bh=3FDwgTSdlybb0+QpsP8TGr882VxHot0P+ICZIwf0/7Y=;
+        b=oW2lr/XjXHg3Nm0VgnuAiEKlaz9HAuC1KRfqgW2Mej9IR1fv7tZd29Q0rJNk8kbwyy
+         SQDLQCLoY2lc72OxFhtWMYZoPJHKBy8vxit8uE1so0nAPVLgsuk3eZdprPjmvKUHOWm3
+         2mEQViqJRN8DaZk1CqdIsy6b9aHers+u7wJkATiOQshwgQ1RBOnKH2sSWPk0SpXzuGjA
+         YYnHrERktO5leQqBWNZg/BmvAaC5g+Nwa6zwwiuzA5i3Z5Wd2GXV7QvUzei/cdpLU7Qj
+         h6GDPr7CqLoqv8pL/Fb698SVhxdivZgCisyogbkB9qTTS/uvjO2Uo1RsDZXj7RnkzVOy
+         bAjA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:reply-to:date:in-reply-to:message-id
          :mime-version:references:subject:from:to:cc;
-        bh=lsTrBguBJ33tlWNbEPVySyXiNpj8s/BCHc56IoJDIiw=;
-        b=UxxiphINO9luDAzDTyS+tQ6Ose0SkrKcozk2VHc24SpFtVBgjolMvs1ctu9WgIUya/
-         oKCTDr0i4xt8wiWVStiw3/MEtmtNwpr1m+2sRb0poE0GwQ2OHuATiAFT4WSCzxW0Zyvf
-         AAox31KV8AV/x9P0N2ZaqpBJo2okwCsq0SLBVSOHd2WUZA1zTJvImVaW98jpOIerjsQD
-         kZmlqGSThB0CSPt1bFo6aw1YHACvi9kLs9ptyBhbA61lSc9dhVE1WPMsECYkDrHjF3Cg
-         hR1Q/OoX9m5qxQCsexMnZRCQ7HmJ44T8rNBW5r7Sgre3+C7m7Ls5M4ciB5W4OjuqIxnl
-         eEgA==
-X-Gm-Message-State: AOAM533vUCz3VB8Saj7f8YUUBP5fSPHB5o16IQNhSR5z5H904a617tqt
-        dswmPbfJ8fzfAP1MhFBKE2rjcsmE3PY=
-X-Google-Smtp-Source: ABdhPJx6AEOtkTqNg9rttQTRVJPCrBwoWb02SpJI50TEvPxJjU+v0/F+/WuOOuqc8q8wRrtJdPR9bOM8dF0=
+        bh=3FDwgTSdlybb0+QpsP8TGr882VxHot0P+ICZIwf0/7Y=;
+        b=f8lEFREniuiNzQJUpefmCdvXfdCF3H28RU2sWUCHAifWiEWbc8XdfuCgL0A6rhGyCT
+         NkCknsoUUFFd7tcaufBn2X3OfrHeBBgz8PqJl/WEjgRW8Xp0ksFE5JNHe1o/cqrx/6gO
+         KU9w4zZc/ttVz1eOt0rUsvwHjeSuRerI1FtAHr8HQKV8Szg+WAiM6JShHYLojMWhuASg
+         0Eql7YRrAx2v41O3b0wdrK0Kl4omtYzEgOR4u95/4GkcjzZ/yXNGhAe87b7Va3nZ6six
+         EYu8Hn8vhCNLiVDAmr8NZ+4j3AR9juY0rBiBlPusejkeflZn1wYb5PR8HuvYuoGR2DH9
+         uqjA==
+X-Gm-Message-State: AOAM533u9QOAogWd7AqVgYZFCtNrButpH/Wy4P9JERVMPrXA47sMIzf4
+        n9AROoAZqNXM4H7jiKEPY3VPzgYrJc8=
+X-Google-Smtp-Source: ABdhPJw5U0P6iQMF5biraJ2CMhXIV52ZCiW4aOwwilimTx8W3XMvVhsYpE+xa+8pbuPNKS0hkuqZ2hOdbxU=
 X-Received: from seanjc798194.pdx.corp.google.com ([2620:15c:f:10:e4dd:6c31:9463:f8da])
- (user=seanjc job=sendgmr) by 2002:a25:8b0d:: with SMTP id i13mr32562ybl.521.1615329738523;
- Tue, 09 Mar 2021 14:42:18 -0800 (PST)
+ (user=seanjc job=sendgmr) by 2002:a0c:b9a5:: with SMTP id v37mr172321qvf.46.1615329740864;
+ Tue, 09 Mar 2021 14:42:20 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Tue,  9 Mar 2021 14:42:05 -0800
+Date:   Tue,  9 Mar 2021 14:42:06 -0800
 In-Reply-To: <20210309224207.1218275-1-seanjc@google.com>
-Message-Id: <20210309224207.1218275-3-seanjc@google.com>
+Message-Id: <20210309224207.1218275-4-seanjc@google.com>
 Mime-Version: 1.0
 References: <20210309224207.1218275-1-seanjc@google.com>
 X-Mailer: git-send-email 2.30.1.766.gb4fecdf3b7-goog
-Subject: [PATCH v2 2/4] KVM: x86/mmu: Exclude the MMU_PRESENT bit from MMIO
- SPTE's generation
+Subject: [PATCH v2 3/4] KVM: x86/mmu: Use '0' as the one and only value for an
+ invalid PAE root
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Sean Christopherson <seanjc@google.com>,
@@ -69,66 +69,119 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Drop bit 11, used for the MMU_PRESENT flag, from the set of bits used to
-store the generation number in MMIO SPTEs.  MMIO SPTEs with bit 11 set,
-which occurs when userspace creates 128+ memslots in an address space,
-get false positives for is_shadow_present_spte(), which lead to a variety
-of fireworks, crashes KVM, and likely hangs the host kernel.
+Use '0' to denote an invalid pae_root instead of '0' or INVALID_PAGE.
+Unlike root_hpa, the pae_roots hold permission bits and thus are
+guaranteed to be non-zero.  Having to deal with both values leads to
+bugs, e.g. failing to set back to INVALID_PAGE, warning on the wrong
+value, etc...
 
-Fixes: b14e28f37e9b ("KVM: x86/mmu: Use a dedicated bit to track shadow/MMU-present SPTEs")
-Reported-by: Tom Lendacky <thomas.lendacky@amd.com>
-Reported-by: Paolo Bonzini <pbonzini@redhat.com>
-Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
-Tested-by: Tom Lendacky <thomas.lendacky@amd.com>
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/mmu/spte.h | 12 +++++++-----
- 1 file changed, 7 insertions(+), 5 deletions(-)
+ arch/x86/kvm/mmu/mmu.c          | 24 +++++++++++++-----------
+ arch/x86/kvm/mmu/mmu_audit.c    |  2 +-
+ arch/x86/kvm/mmu/mmu_internal.h | 10 ++++++++++
+ 3 files changed, 24 insertions(+), 12 deletions(-)
 
-diff --git a/arch/x86/kvm/mmu/spte.h b/arch/x86/kvm/mmu/spte.h
-index b53036d9ddf3..bca0ba11cccf 100644
---- a/arch/x86/kvm/mmu/spte.h
-+++ b/arch/x86/kvm/mmu/spte.h
-@@ -101,11 +101,11 @@ static_assert(!(EPT_SPTE_MMU_WRITABLE & SHADOW_ACC_TRACK_SAVED_MASK));
- #undef SHADOW_ACC_TRACK_SAVED_MASK
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index febe71935bb5..6b0576ff2846 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -3197,11 +3197,14 @@ void kvm_mmu_free_roots(struct kvm_vcpu *vcpu, struct kvm_mmu *mmu,
+ 		    (mmu->root_level >= PT64_ROOT_4LEVEL || mmu->direct_map)) {
+ 			mmu_free_root_page(kvm, &mmu->root_hpa, &invalid_list);
+ 		} else if (mmu->pae_root) {
+-			for (i = 0; i < 4; ++i)
+-				if (mmu->pae_root[i] != 0)
+-					mmu_free_root_page(kvm,
+-							   &mmu->pae_root[i],
+-							   &invalid_list);
++			for (i = 0; i < 4; ++i) {
++				if (!IS_VALID_PAE_ROOT(mmu->pae_root[i]))
++					continue;
++
++				mmu_free_root_page(kvm, &mmu->pae_root[i],
++						   &invalid_list);
++				mmu->pae_root[i] = INVALID_PAE_ROOT;
++			}
+ 		}
+ 		mmu->root_hpa = INVALID_PAGE;
+ 		mmu->root_pgd = 0;
+@@ -3253,8 +3256,7 @@ static int mmu_alloc_direct_roots(struct kvm_vcpu *vcpu)
+ 			return -EIO;
  
- /*
-- * Due to limited space in PTEs, the MMIO generation is a 20 bit subset of
-+ * Due to limited space in PTEs, the MMIO generation is a 19 bit subset of
-  * the memslots generation and is derived as follows:
-  *
-- * Bits 0-8 of the MMIO generation are propagated to spte bits 3-11
-- * Bits 9-19 of the MMIO generation are propagated to spte bits 52-62
-+ * Bits 0-7 of the MMIO generation are propagated to spte bits 3-10
-+ * Bits 8-18 of the MMIO generation are propagated to spte bits 52-62
-  *
-  * The KVM_MEMSLOT_GEN_UPDATE_IN_PROGRESS flag is intentionally not included in
-  * the MMIO generation number, as doing so would require stealing a bit from
-@@ -116,7 +116,7 @@ static_assert(!(EPT_SPTE_MMU_WRITABLE & SHADOW_ACC_TRACK_SAVED_MASK));
-  */
+ 		for (i = 0; i < 4; ++i) {
+-			WARN_ON_ONCE(mmu->pae_root[i] &&
+-				     VALID_PAGE(mmu->pae_root[i]));
++			WARN_ON_ONCE(IS_VALID_PAE_ROOT(mmu->pae_root[i]));
  
- #define MMIO_SPTE_GEN_LOW_START		3
--#define MMIO_SPTE_GEN_LOW_END		11
-+#define MMIO_SPTE_GEN_LOW_END		10
+ 			root = mmu_alloc_root(vcpu, i << (30 - PAGE_SHIFT),
+ 					      i << 30, PT32_ROOT_LEVEL, true);
+@@ -3328,11 +3330,11 @@ static int mmu_alloc_shadow_roots(struct kvm_vcpu *vcpu)
+ 	}
  
- #define MMIO_SPTE_GEN_HIGH_START	52
- #define MMIO_SPTE_GEN_HIGH_END		62
-@@ -125,12 +125,14 @@ static_assert(!(EPT_SPTE_MMU_WRITABLE & SHADOW_ACC_TRACK_SAVED_MASK));
- 						    MMIO_SPTE_GEN_LOW_START)
- #define MMIO_SPTE_GEN_HIGH_MASK		GENMASK_ULL(MMIO_SPTE_GEN_HIGH_END, \
- 						    MMIO_SPTE_GEN_HIGH_START)
-+static_assert(!(SPTE_MMU_PRESENT_MASK &
-+		(MMIO_SPTE_GEN_LOW_MASK | MMIO_SPTE_GEN_HIGH_MASK)));
+ 	for (i = 0; i < 4; ++i) {
+-		WARN_ON_ONCE(mmu->pae_root[i] && VALID_PAGE(mmu->pae_root[i]));
++		WARN_ON_ONCE(IS_VALID_PAE_ROOT(mmu->pae_root[i]));
  
- #define MMIO_SPTE_GEN_LOW_BITS		(MMIO_SPTE_GEN_LOW_END - MMIO_SPTE_GEN_LOW_START + 1)
- #define MMIO_SPTE_GEN_HIGH_BITS		(MMIO_SPTE_GEN_HIGH_END - MMIO_SPTE_GEN_HIGH_START + 1)
+ 		if (mmu->root_level == PT32E_ROOT_LEVEL) {
+ 			if (!(pdptrs[i] & PT_PRESENT_MASK)) {
+-				mmu->pae_root[i] = 0;
++				mmu->pae_root[i] = INVALID_PAE_ROOT;
+ 				continue;
+ 			}
+ 			root_gfn = pdptrs[i] >> PAGE_SHIFT;
+@@ -3450,7 +3452,7 @@ void kvm_mmu_sync_roots(struct kvm_vcpu *vcpu)
+ 	for (i = 0; i < 4; ++i) {
+ 		hpa_t root = vcpu->arch.mmu->pae_root[i];
  
- /* remember to adjust the comment above as well if you change these */
--static_assert(MMIO_SPTE_GEN_LOW_BITS == 9 && MMIO_SPTE_GEN_HIGH_BITS == 11);
-+static_assert(MMIO_SPTE_GEN_LOW_BITS == 8 && MMIO_SPTE_GEN_HIGH_BITS == 11);
+-		if (root && VALID_PAGE(root)) {
++		if (IS_VALID_PAE_ROOT(root)) {
+ 			root &= PT64_BASE_ADDR_MASK;
+ 			sp = to_shadow_page(root);
+ 			mmu_sync_children(vcpu, sp);
+@@ -5307,7 +5309,7 @@ static int __kvm_mmu_create(struct kvm_vcpu *vcpu, struct kvm_mmu *mmu)
  
- #define MMIO_SPTE_GEN_LOW_SHIFT		(MMIO_SPTE_GEN_LOW_START - 0)
- #define MMIO_SPTE_GEN_HIGH_SHIFT	(MMIO_SPTE_GEN_HIGH_START - MMIO_SPTE_GEN_LOW_BITS)
+ 	mmu->pae_root = page_address(page);
+ 	for (i = 0; i < 4; ++i)
+-		mmu->pae_root[i] = INVALID_PAGE;
++		mmu->pae_root[i] = INVALID_PAE_ROOT;
+ 
+ 	return 0;
+ }
+diff --git a/arch/x86/kvm/mmu/mmu_audit.c b/arch/x86/kvm/mmu/mmu_audit.c
+index ced15fd58fde..cedc17b2f60e 100644
+--- a/arch/x86/kvm/mmu/mmu_audit.c
++++ b/arch/x86/kvm/mmu/mmu_audit.c
+@@ -70,7 +70,7 @@ static void mmu_spte_walk(struct kvm_vcpu *vcpu, inspect_spte_fn fn)
+ 	for (i = 0; i < 4; ++i) {
+ 		hpa_t root = vcpu->arch.mmu->pae_root[i];
+ 
+-		if (root && VALID_PAGE(root)) {
++		if (IS_VALID_PAE_ROOT(root)) {
+ 			root &= PT64_BASE_ADDR_MASK;
+ 			sp = to_shadow_page(root);
+ 			__mmu_spte_walk(vcpu, sp, fn, 2);
+diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_internal.h
+index ec4fc28b325a..5fe9123fc932 100644
+--- a/arch/x86/kvm/mmu/mmu_internal.h
++++ b/arch/x86/kvm/mmu/mmu_internal.h
+@@ -20,6 +20,16 @@ extern bool dbg;
+ #define MMU_WARN_ON(x) do { } while (0)
+ #endif
+ 
++/*
++ * Unlike regular MMU roots, PAE "roots", a.k.a. PDPTEs/PDPTRs, have a PRESENT
++ * bit, and thus are guaranteed to be non-zero when valid.  And, when a guest
++ * PDPTR is !PRESENT, its corresponding PAE root cannot be set to INVALID_PAGE,
++ * as the CPU would treat that as PRESENT PDPTR with reserved bits set.  Use
++ * '0' instead of INVALID_PAGE to indicate an invalid PAE root.
++ */
++#define INVALID_PAE_ROOT	0
++#define IS_VALID_PAE_ROOT(x)	(!!(x))
++
+ struct kvm_mmu_page {
+ 	struct list_head link;
+ 	struct hlist_node hash_link;
 -- 
 2.30.1.766.gb4fecdf3b7-goog
 
