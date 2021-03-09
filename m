@@ -2,93 +2,146 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D86B433243E
-	for <lists+kvm@lfdr.de>; Tue,  9 Mar 2021 12:41:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D906D332464
+	for <lists+kvm@lfdr.de>; Tue,  9 Mar 2021 12:50:03 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229691AbhCILkq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 9 Mar 2021 06:40:46 -0500
-Received: from mail.kernel.org ([198.145.29.99]:52408 "EHLO mail.kernel.org"
+        id S230047AbhCILtb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 9 Mar 2021 06:49:31 -0500
+Received: from foss.arm.com ([217.140.110.172]:51944 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229553AbhCILkh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 9 Mar 2021 06:40:37 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 9ED6365256;
-        Tue,  9 Mar 2021 11:40:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1615290037;
-        bh=Nzz2M6AplgH6sqJ1uLdq6POaRuNHG79f8esG/LsBO9g=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=hwbDJ2WeE/PHt7yIerwSzElvCp50W3J8vS2zCZtNk15TNQvVP0ZDtJJnJ5oWXWhW2
-         JtGfriFDyGa/xtB62mO3JJzb4xYt11oifKHWKIuDqKwhR5WQoIJJnjvi/P945aFGR6
-         etxXfxuHYUMRiua/Uuo9n5C2fg1zrQXqGrirgx8us8DI6cPmWBOwsWTHFCaSssNyYK
-         7DuRwnIOgLOgAfJ0JOJUhdK5/oJwpU2LuKC4mBNzrSlYDfpQEAR7tbLVWndIdFalol
-         TtpVZPiSeF3YlgOD4TkAplAup7ifA/q/3VueGfo6vfBwawW9lXxSDlmFPTwh96QmGb
-         1VTVO67ksG89g==
-Date:   Tue, 9 Mar 2021 11:40:32 +0000
-From:   Will Deacon <will@kernel.org>
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
-        kvm@vger.kernel.org, James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        kernel-team@android.com
-Subject: Re: [PATCH] KVM: arm64: Cap default IPA size to the host's own size
-Message-ID: <20210309114031.GA28091@willie-the-truck>
-References: <20210308174643.761100-1-maz@kernel.org>
- <20210309112658.GA28025@willie-the-truck>
- <87o8fsy2xx.wl-maz@kernel.org>
+        id S229599AbhCILt1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 9 Mar 2021 06:49:27 -0500
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4B2711042;
+        Tue,  9 Mar 2021 03:49:27 -0800 (PST)
+Received: from [192.168.0.110] (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 4DAD73F70D;
+        Tue,  9 Mar 2021 03:49:26 -0800 (PST)
+Subject: Re: [PATCH kvmtool v2 08/22] x86/ioport: Refactor trap handlers
+To:     Andre Przywara <andre.przywara@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>
+Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+        Marc Zyngier <maz@kernel.org>,
+        Sami Mujawar <sami.mujawar@arm.com>
+References: <20210225005915.26423-1-andre.przywara@arm.com>
+ <20210225005915.26423-9-andre.przywara@arm.com>
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+Message-ID: <f25a7313-99ab-957b-afc6-066e2dfff32b@arm.com>
+Date:   Tue, 9 Mar 2021 11:49:47 +0000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87o8fsy2xx.wl-maz@kernel.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <20210225005915.26423-9-andre.przywara@arm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Mar 09, 2021 at 11:35:54AM +0000, Marc Zyngier wrote:
-> On Tue, 09 Mar 2021 11:26:59 +0000,
-> Will Deacon <will@kernel.org> wrote:
-> > 
-> > On Mon, Mar 08, 2021 at 05:46:43PM +0000, Marc Zyngier wrote:
-> > > KVM/arm64 has forever used a 40bit default IPA space, partially
-> > > due to its 32bit heritage (where the only choice is 40bit).
-> > > 
-> > > However, there are implementations in the wild that have a *cough*
-> > > much smaller *cough* IPA space, which leads to a misprogramming of
-> > > VTCR_EL2, and a guest that is stuck on its first memory access
-> > > if userspace dares to ask for the default IPA setting (which most
-> > > VMMs do).
-> > > 
-> > > Instead, cap the default IPA size to what the host can actually
-> > > do, and spit out a one-off message on the console. The boot warning
-> > > is turned into a more meaningfull message, and the new behaviour
-> > > is also documented.
-> > > 
-> > > Although this is a userspace ABI change, it doesn't really change
-> > > much for userspace:
-> > > 
-> > > - the guest couldn't run before this change, while it now has
-> > >   a chance to if the memory range fits the reduced IPA space
-> > > 
-> > > - a memory slot that was accepted because it did fit the default
-> > >   IPA space but didn't fit the HW constraints is now properly
-> > >   rejected
-> > > 
-> > > The other thing that's left doing is to convince userspace to
-> > > actually use the IPA space setting instead of relying on the
-> > > antiquated default.
-> > 
-> > Is there a way for userspace to discover the default IPA size, or does
-> > it have to try setting values until it finds one that sticks?
-> 
-> Yes, since 233a7cb23531 ("kvm: arm64: Allow tuning the physical
-> address size for VM").
-> 
-> The VMM can issue a KVM_CAP_ARM_VM_IPA_SIZE ioctl(), and get in return
-> the maximum IPA size (I have a patch for kvmtool that does this).
+Hi Andre,
 
-Great, thanks -- that's exactly what I was thinking about when I asked the
-question!
+Regarding the naming of the functions, these are real ioport emulation functions,
+which are executed because a KVM_EXIT_IO exit reason from KVM_RUN. Wouldn't naming
+the functions something like *_pio or *_io be more appropriate?
 
-Will
+Thanks,
+
+Alex
+
+On 2/25/21 12:59 AM, Andre Przywara wrote:
+> With the planned retirement of the special ioport emulation code, we
+> need to provide emulation functions compatible with the MMIO
+> prototype.
+>
+> Adjust the trap handlers to use that new function, and provide shims to
+> implement the old ioport interface, for now.
+>
+> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+> Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> ---
+>  x86/ioport.c | 30 ++++++++++++++++++++++++++----
+>  1 file changed, 26 insertions(+), 4 deletions(-)
+>
+> diff --git a/x86/ioport.c b/x86/ioport.c
+> index a8d2bb1a..78f9a863 100644
+> --- a/x86/ioport.c
+> +++ b/x86/ioport.c
+> @@ -3,8 +3,14 @@
+>  #include <stdlib.h>
+>  #include <stdio.h>
+>  
+> +static void dummy_mmio(struct kvm_cpu *vcpu, u64 addr, u8 *data, u32 len,
+> +		       u8 is_write, void *ptr)
+> +{
+> +}
+> +
+>  static bool debug_io_out(struct ioport *ioport, struct kvm_cpu *vcpu, u16 port, void *data, int size)
+>  {
+> +	dummy_mmio(vcpu, port, data, size, true, NULL);
+>  	return 0;
+>  }
+>  
+> @@ -12,15 +18,23 @@ static struct ioport_operations debug_ops = {
+>  	.io_out		= debug_io_out,
+>  };
+>  
+> -static bool seabios_debug_io_out(struct ioport *ioport, struct kvm_cpu *vcpu, u16 port, void *data, int size)
+> +static void seabios_debug_mmio(struct kvm_cpu *vcpu, u64 addr, u8 *data,
+> +			       u32 len, u8 is_write, void *ptr)
+>  {
+>  	char ch;
+>  
+> +	if (!is_write)
+> +		return;
+> +
+>  	ch = ioport__read8(data);
+>  
+>  	putchar(ch);
+> +}
+>  
+> -	return true;
+> +static bool seabios_debug_io_out(struct ioport *ioport, struct kvm_cpu *vcpu, u16 port, void *data, int size)
+> +{
+> +	seabios_debug_mmio(vcpu, port, data, size, true, NULL);
+> +	return 0;
+>  }
+>  
+>  static struct ioport_operations seabios_debug_ops = {
+> @@ -29,11 +43,13 @@ static struct ioport_operations seabios_debug_ops = {
+>  
+>  static bool dummy_io_in(struct ioport *ioport, struct kvm_cpu *vcpu, u16 port, void *data, int size)
+>  {
+> +	dummy_mmio(vcpu, port, data, size, false, NULL);
+>  	return true;
+>  }
+>  
+>  static bool dummy_io_out(struct ioport *ioport, struct kvm_cpu *vcpu, u16 port, void *data, int size)
+>  {
+> +	dummy_mmio(vcpu, port, data, size, true, NULL);
+>  	return true;
+>  }
+>  
+> @@ -50,13 +66,19 @@ static struct ioport_operations dummy_write_only_ioport_ops = {
+>   * The "fast A20 gate"
+>   */
+>  
+> -static bool ps2_control_a_io_in(struct ioport *ioport, struct kvm_cpu *vcpu, u16 port, void *data, int size)
+> +static void ps2_control_mmio(struct kvm_cpu *vcpu, u64 addr, u8 *data, u32 len,
+> +			     u8 is_write, void *ptr)
+>  {
+>  	/*
+>  	 * A20 is always enabled.
+>  	 */
+> -	ioport__write8(data, 0x02);
+> +	if (!is_write)
+> +		ioport__write8(data, 0x02);
+> +}
+>  
+> +static bool ps2_control_a_io_in(struct ioport *ioport, struct kvm_cpu *vcpu, u16 port, void *data, int size)
+> +{
+> +	ps2_control_mmio(vcpu, port, data, size, false, NULL);
+>  	return true;
+>  }
+>  
