@@ -2,139 +2,101 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2984D332CAE
-	for <lists+kvm@lfdr.de>; Tue,  9 Mar 2021 17:57:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 116EE332CCA
+	for <lists+kvm@lfdr.de>; Tue,  9 Mar 2021 18:06:04 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230492AbhCIQ5O (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 9 Mar 2021 11:57:14 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:50628 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230173AbhCIQ4z (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 9 Mar 2021 11:56:55 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1615309015;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=q1egl+L1rZWa8ln2yZ0cI9KtimfXRm5vTfuSpGiRUEg=;
-        b=VDCtNT5N1WsOymVPEKwNmTzEzXgtNEtibiR76cpixyyUzM3Z9Sf1w9VY7jTRA10Y+ivTTu
-        ncdUspgqRntS69r/pFltYbTU61C09RoQTr+imk720lvC2D6ZAmYszzEHQBwvQtAEvvD373
-        l+4jZDfscBrjBsqVw7D/Fq05wPFX8eU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-436-7cBjGNihM9CVZ_Z8JErhaw-1; Tue, 09 Mar 2021 11:56:52 -0500
-X-MC-Unique: 7cBjGNihM9CVZ_Z8JErhaw-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 199EE1019630;
-        Tue,  9 Mar 2021 16:56:51 +0000 (UTC)
-Received: from gondolin (ovpn-113-144.ams2.redhat.com [10.36.113.144])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 834E51001B2C;
-        Tue,  9 Mar 2021 16:56:46 +0000 (UTC)
-Date:   Tue, 9 Mar 2021 17:56:44 +0100
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Pierre Morel <pmorel@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, frankja@linux.ibm.com, david@redhat.com,
-        thuth@redhat.com, imbrenda@linux.ibm.com
-Subject: Re: [kvm-unit-tests PATCH v5 4/6] s390x: css: implementing Set
- CHannel Monitor
-Message-ID: <20210309175644.2cf7d11d.cohuck@redhat.com>
-In-Reply-To: <1615294277-7332-5-git-send-email-pmorel@linux.ibm.com>
-References: <1615294277-7332-1-git-send-email-pmorel@linux.ibm.com>
-        <1615294277-7332-5-git-send-email-pmorel@linux.ibm.com>
-Organization: Red Hat GmbH
+        id S230231AbhCIRFc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 9 Mar 2021 12:05:32 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36084 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230359AbhCIRFI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 9 Mar 2021 12:05:08 -0500
+Received: from mail-pl1-x633.google.com (mail-pl1-x633.google.com [IPv6:2607:f8b0:4864:20::633])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A2654C06174A
+        for <kvm@vger.kernel.org>; Tue,  9 Mar 2021 09:05:08 -0800 (PST)
+Received: by mail-pl1-x633.google.com with SMTP id n17so3342410plc.7
+        for <kvm@vger.kernel.org>; Tue, 09 Mar 2021 09:05:08 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=tQCrZGAl0b60/4Ggr0xLToEhk1KYEANewuulT6STebg=;
+        b=B8PvmorMpqrWVpxlNrzzWceE/e3T4Q2YCqZ8sVuCFzH46o80eZ81cDA5moe5lAaNzp
+         P918sQFhr+LkMw3+2ZHLxO5f084u1jcdJUg3VTMSsWxcn//w8zMEvR/7AIZoGA62exnO
+         hvcJ3ahs5+mNk+p2SAUSMgcloq84rVlaGSQRNJF52IkKc+0hfiLSV/Yv/qHM2/URlV3C
+         pJutN/rEKfAjfNFxZcgtFTvJ3YJ+vos6W1OGWu8tbRyj7Wgi4Zuvu91Sv4g2lLs3i0it
+         LGFuvqx+uINrsfGh6egqCmVeoI+UQEzxgbxwA5IhYqENUko/OT0fMcGQBHAA4AemfDDY
+         OycQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=tQCrZGAl0b60/4Ggr0xLToEhk1KYEANewuulT6STebg=;
+        b=puUfICeUbWaJ9BvuQCHfm8TQZ4gd+sikGUigQan7nlmiJu9ZedoFytK6uIL9MerpG8
+         WJJJ9YjJOGSGKdT1G092UBRqgFnv1w1tTrXDGZlwywebwco2HB4T8z1LDk9NNnBy/G3N
+         O5jy6gyFiqLFVQkLdUdziy92o3WYFn+IApebktgvt4bUZNtls3Yg6yMTlNuVESB4zTGB
+         epKy9wpVOAocQj5hYrICLGvIdV11GMlPNk0+vc5L1p36BPNPMv9RfOj+xVmmRBHXg4sf
+         +RrSJqlpieRRHnTgHR4a94l3dkae3xRpCOGBUYm3KztGXN1vVQAHErX1JtyBnuYaoyvD
+         fSYg==
+X-Gm-Message-State: AOAM533kawbfIUfqTgpHswsjo63ccz/sWI+YtDpyaHR1+bfLxuyFnbcd
+        xl0+/+wugA1Z3tfXxBB4C7H8pQ==
+X-Google-Smtp-Source: ABdhPJwW0J3xWZ6EcBpG5tri8DTiYIZJan3TWKiHbWHKoPqfXeewUF1+YEDKwm9IrNm/jBQ7uQYpmA==
+X-Received: by 2002:a17:90a:f190:: with SMTP id bv16mr5526843pjb.187.1615309507956;
+        Tue, 09 Mar 2021 09:05:07 -0800 (PST)
+Received: from google.com ([2620:15c:f:10:8:847a:d8b5:e2cc])
+        by smtp.gmail.com with ESMTPSA id v16sm13253080pfu.76.2021.03.09.09.05.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 09 Mar 2021 09:05:06 -0800 (PST)
+Date:   Tue, 9 Mar 2021 09:05:00 -0800
+From:   Sean Christopherson <seanjc@google.com>
+To:     Peter Zijlstra <peterz@infradead.org>
+Cc:     "Xu, Like" <like.xu@intel.com>, Dmitry Vyukov <dvyukov@google.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Jiri Olsa <jolsa@redhat.com>,
+        Namhyung Kim <namhyung@kernel.org>,
+        "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org,
+        Like Xu <like.xu@linux.intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jim Mattson <jmattson@google.com>, kvm@vger.kernel.org,
+        "Thomas Gleixner
+        (x86/pti/timer/core/smp/irq/perf/efi/locking/ras/objtool)
+        (x86@kernel.org)" <tglx@linutronix.de>,
+        Borislav Petkov <bp@alien8.de>,
+        Arnaldo Carvalho de Melo <acme@kernel.org>,
+        Ingo Molnar <mingo@redhat.com>
+Subject: Re: [PATCH] x86/perf: Fix guest_get_msrs static call if there is no
+ PMU
+Message-ID: <YEeqvC4QmJcj+pkC@google.com>
+References: <20210305223331.4173565-1-seanjc@google.com>
+ <053d0a22-394d-90d0-8d3b-3cd37ca3f378@intel.com>
+ <YEXmILSHDNDuMk/N@hirez.programming.kicks-ass.net>
+ <YEaLzKWd0wAmdqvs@google.com>
+ <YEcn6bGYxdgrp0Ik@hirez.programming.kicks-ass.net>
+ <YEc1mFkaILfF37At@hirez.programming.kicks-ass.net>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YEc1mFkaILfF37At@hirez.programming.kicks-ass.net>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue,  9 Mar 2021 13:51:15 +0100
-Pierre Morel <pmorel@linux.ibm.com> wrote:
-
-> We implement the call of the Set CHannel Monitor instruction,
-> starting the monitoring of the all Channel Sub System, and
-> initializing channel subsystem monitoring.
+On Tue, Mar 09, 2021, Peter Zijlstra wrote:
+> On Tue, Mar 09, 2021 at 08:46:49AM +0100, Peter Zijlstra wrote:
+> > On Mon, Mar 08, 2021 at 12:40:44PM -0800, Sean Christopherson wrote:
+> > > On Mon, Mar 08, 2021, Peter Zijlstra wrote:
+> > 
+> > > > Given the one user in atomic_switch_perf_msrs() that should work because
+> > > > it doesn't seem to care about nr_msrs when !msrs.
+> > > 
+> > > Uh, that commit quite cleary says:
+> > 
+> > D0h! I got static_call_cond() and __static_call_return0 mixed up.
+> > Anyway, let me see if I can make something work here.
 > 
-> Initial tests report the presence of the extended measurement block
-> feature, and verify the error reporting of the hypervisor for SCHM.
-> 
-> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
-> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
-> Acked-by: Janosch Frank <frankja@linux.ibm.com>
-> ---
->  lib/s390x/css.h     | 16 ++++++++++++++--
->  lib/s390x/css_lib.c |  4 ++--
->  s390x/css.c         | 35 +++++++++++++++++++++++++++++++++++
->  3 files changed, 51 insertions(+), 4 deletions(-)
-> 
-> diff --git a/lib/s390x/css.h b/lib/s390x/css.h
-> index 3c50fa8..7158423 100644
-> --- a/lib/s390x/css.h
-> +++ b/lib/s390x/css.h
-> @@ -309,6 +309,7 @@ struct chsc_scsc {
->  	uint8_t reserved[9];
->  	struct chsc_header res;
->  	uint32_t res_fmt;
-> +#define CSSC_EXTENDED_MEASUREMENT_BLOCK 48
->  	uint64_t general_char[255];
->  	uint64_t chsc_char[254];
->  };
-> @@ -356,8 +357,19 @@ static inline int _chsc(void *p)
->  bool chsc(void *p, uint16_t code, uint16_t len);
->  
->  #include <bitops.h>
-> -#define css_general_feature(bit) test_bit_inv(bit, chsc_scsc->general_char)
-> -#define css_chsc_feature(bit) test_bit_inv(bit, chsc_scsc->chsc_char)
-> +#define css_test_general_feature(bit) test_bit_inv(bit, chsc_scsc->general_char)
-> +#define css_test_chsc_feature(bit) test_bit_inv(bit, chsc_scsc->chsc_char)
+> Does this work? I can never seem to start a VM, and if I do accidentally
+> manage, then it never contains the things I need :/
 
-I think the renaming belongs in patch 1?
-
-> +
-> +#define SCHM_DCTM	1 /* activate Device Connection TiMe */
-> +#define SCHM_MBU	2 /* activate Measurement Block Update */
-> +
-> +static inline void schm(void *mbo, unsigned int flags)
-> +{
-> +	register void *__gpr2 asm("2") = mbo;
-> +	register long __gpr1 asm("1") = flags;
-> +
-> +	asm("schm" : : "d" (__gpr2), "d" (__gpr1));
-> +}
->  
->  bool css_enable_mb(int sid, uint64_t mb, uint16_t mbi, uint16_t flg, bool fmt1);
->  bool css_disable_mb(int schid);
-> diff --git a/lib/s390x/css_lib.c b/lib/s390x/css_lib.c
-> index 77b39c7..95d9a78 100644
-> --- a/lib/s390x/css_lib.c
-> +++ b/lib/s390x/css_lib.c
-> @@ -94,7 +94,7 @@ bool get_chsc_scsc(void)
->  		return false;
->  
->  	for (i = 0, p = buffer; i < CSS_GENERAL_FEAT_BITLEN; i++) {
-> -		if (css_general_feature(i)) {
-> +		if (css_test_general_feature(i)) {
-
-and here...
-
->  			n = snprintf(p, sizeof(buffer), "%d,", i);
->  			p += n;
->  		}
-> @@ -102,7 +102,7 @@ bool get_chsc_scsc(void)
->  	report_info("General features: %s", buffer);
->  
->  	for (i = 0, p = buffer; i < CSS_CHSC_FEAT_BITLEN; i++) {
-> -		if (css_chsc_feature(i)) {
-> +		if (css_test_chsc_feature(i)) {
-
-...and here.
-
->  			n = snprintf(p, sizeof(buffer), "%d,", i);
->  			p += n;
->  		}
-
+Yep, once I found the dependencies in tip/sched/core (thank tip-bot!).  I'll
+send v2 your way.
