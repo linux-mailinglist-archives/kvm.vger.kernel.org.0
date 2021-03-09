@@ -2,49 +2,47 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 67E2F331EAC
-	for <lists+kvm@lfdr.de>; Tue,  9 Mar 2021 06:32:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 76845331EC4
+	for <lists+kvm@lfdr.de>; Tue,  9 Mar 2021 06:52:08 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229475AbhCIFcS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 9 Mar 2021 00:32:18 -0500
-Received: from mga07.intel.com ([134.134.136.100]:19796 "EHLO mga07.intel.com"
+        id S229623AbhCIFvE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 9 Mar 2021 00:51:04 -0500
+Received: from mga03.intel.com ([134.134.136.65]:26342 "EHLO mga03.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229577AbhCIFb7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 9 Mar 2021 00:31:59 -0500
-IronPort-SDR: 7pZJoSZ1F7aVM1opUOgR0xP4cRYS0OCfT5keBAlKx+JkJ4XA49FsCAh7kgfSWrpXWrnWa77PXq
- RLGACKbbauzQ==
-X-IronPort-AV: E=McAfee;i="6000,8403,9917"; a="252188877"
+        id S229481AbhCIFup (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 9 Mar 2021 00:50:45 -0500
+IronPort-SDR: zTsIF8QdPj/DEcmjbc4Grobmt5IhBDiQ2eMDYURy43MZ48yW6Ha2K1qu4/bvozjGyUGa8c/oQz
+ 8EJxKuRjQuQg==
+X-IronPort-AV: E=McAfee;i="6000,8403,9917"; a="188211755"
 X-IronPort-AV: E=Sophos;i="5.81,234,1610438400"; 
-   d="scan'208";a="252188877"
+   d="scan'208";a="188211755"
 Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Mar 2021 21:31:58 -0800
-IronPort-SDR: uf4phKz1TYjzv4cjOC+7I5P++yGKncold3EPtLN7RuVyTA48MxO9FBa0NGlxr5VFuH0/Vp1ZRE
- INovo7saS2qQ==
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Mar 2021 21:50:44 -0800
+IronPort-SDR: eBfZNne6GFYr0HVLC5ATPoAVGAgEzKJ8YYJ4noZ2rarbc2fN4gbwEvvNKaVjtkHN9azhPg4kKw
+ 0rxeOXHMlf0A==
 X-IronPort-AV: E=Sophos;i="5.81,234,1610438400"; 
-   d="scan'208";a="447377192"
-Received: from unknown (HELO [10.238.130.230]) ([10.238.130.230])
-  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Mar 2021 21:31:54 -0800
-Subject: Re: [PATCH v2] KVM: x86: Revise guest_fpu xcomp_bv field
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     pbonzini@redhat.com, Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
+   d="scan'208";a="447383043"
+Received: from lingshan-mobl5.ccr.corp.intel.com (HELO [10.255.31.165]) ([10.255.31.165])
+  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Mar 2021 21:50:42 -0800
+Subject: Re: [PATCH V2 2/4] vDPA/ifcvf: enable Intel C5000X-PL virtio-net for
+ vDPA
+To:     Jason Wang <jasowang@redhat.com>, mst@redhat.com, lulu@redhat.com
+Cc:     virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
         kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20210225104955.3553-1-jing2.liu@linux.intel.com>
- <YD1//+O57mr2D2Ne@google.com>
-From:   "Liu, Jing2" <jing2.liu@linux.intel.com>
-Message-ID: <ffb71039-c77d-93d0-1e41-9f29d87d4532@linux.intel.com>
-Date:   Tue, 9 Mar 2021 13:31:52 +0800
+References: <20210308083525.382514-1-lingshan.zhu@intel.com>
+ <20210308083525.382514-3-lingshan.zhu@intel.com>
+ <d37ea3f4-1c18-087b-a444-0d4e1ebbe417@redhat.com>
+ <93aabf0c-3ea0-72d7-e7d7-1d503fe6cc75@intel.com>
+ <91c08fdd-0a36-ddca-5b8c-ef2eef7cddc2@redhat.com>
+From:   "Zhu, Lingshan" <lingshan.zhu@intel.com>
+Message-ID: <0e72009d-60af-980d-a43e-495733f6f6f7@intel.com>
+Date:   Tue, 9 Mar 2021 13:50:39 +0800
 User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.0
+ Thunderbird/78.7.1
 MIME-Version: 1.0
-In-Reply-To: <YD1//+O57mr2D2Ne@google.com>
+In-Reply-To: <91c08fdd-0a36-ddca-5b8c-ef2eef7cddc2@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Content-Language: en-US
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
@@ -52,86 +50,121 @@ X-Mailing-List: kvm@vger.kernel.org
 
 
 
-On 3/2/2021 7:59 AM, Sean Christopherson wrote:
-> On Thu, Feb 25, 2021, Jing Liu wrote:
->> XCOMP_BV[63] field indicates that the save area is in the compacted
->> format and XCOMP_BV[62:0] indicates the states that have space allocated
->> in the save area, including both XCR0 and XSS bits enabled by the host
->> kernel. Use xfeatures_mask_all for calculating xcomp_bv and reuse
->> XCOMP_BV_COMPACTED_FORMAT defined by kernel.
->>
->> Signed-off-by: Jing Liu <jing2.liu@linux.intel.com>
->> ---
->>   arch/x86/kvm/x86.c | 8 ++------
->>   1 file changed, 2 insertions(+), 6 deletions(-)
->>
->> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
->> index 1b404e4d7dd8..f115493f577d 100644
->> --- a/arch/x86/kvm/x86.c
->> +++ b/arch/x86/kvm/x86.c
->> @@ -4435,8 +4435,6 @@ static int kvm_vcpu_ioctl_x86_set_debugregs(struct kvm_vcpu *vcpu,
->>   	return 0;
->>   }
->>   
->> -#define XSTATE_COMPACTION_ENABLED (1ULL << 63)
->> -
->>   static void fill_xsave(u8 *dest, struct kvm_vcpu *vcpu)
->>   {
->>   	struct xregs_state *xsave = &vcpu->arch.guest_fpu->state.xsave;
->> @@ -4494,7 +4492,8 @@ static void load_xsave(struct kvm_vcpu *vcpu, u8 *src)
->>   	/* Set XSTATE_BV and possibly XCOMP_BV.  */
->>   	xsave->header.xfeatures = xstate_bv;
->>   	if (boot_cpu_has(X86_FEATURE_XSAVES))
->> -		xsave->header.xcomp_bv = host_xcr0 | XSTATE_COMPACTION_ENABLED;
->> +		xsave->header.xcomp_bv = XCOMP_BV_COMPACTED_FORMAT |
->> +					 xfeatures_mask_all;
-> Doesn't fill_xsave also need to be updated?  Not with xfeatures_mask_all, but
-> to account for arch.ia32_xss?  I believe it's a nop with the current code, since
-> supported_xss is zero, but it should be fixed, no?
-Yes. For the arch.ia32_xss, I noticed CET 
-(https://lkml.org/lkml/2020/7/15/1412)
-has posted related change so I didn't touch xstate_bv for fill_xsave for 
-now.
-Finally, fill_xsave() need e.g. arch.guest_supported_xss for xstate_bv,
-for xcomp_bv, xfeatures_mask_all is ok.
+On 3/9/2021 10:42 AM, Jason Wang wrote:
 >
->>   
->>   	/*
->>   	 * Copy each region from the non-compacted offset to the
->> @@ -9912,9 +9911,6 @@ static void fx_init(struct kvm_vcpu *vcpu)
->>   		return;
->>   
->>   	fpstate_init(&vcpu->arch.guest_fpu->state);
->> -	if (boot_cpu_has(X86_FEATURE_XSAVES))
->> -		vcpu->arch.guest_fpu->state.xsave.header.xcomp_bv =
->> -			host_xcr0 | XSTATE_COMPACTION_ENABLED;
-> Ugh, this _really_ needs a comment in the changelog.  It took me a while to
-> realize fpstate_init() does exactly what the new fill_xave() is doing.
-How about introducing that "fx_init()->fpstate_init() initializes xcomp_bv
-of guest_fpu so no need to set again in later fill_xsave() and 
-load_xsave()"
-in commit message?
+> On 2021/3/9 10:28 上午, Zhu, Lingshan wrote:
+>>
+>>
+>> On 3/9/2021 10:23 AM, Jason Wang wrote:
+>>>
+>>> On 2021/3/8 4:35 下午, Zhu Lingshan wrote:
+>>>> This commit enabled Intel FPGA SmartNIC C5000X-PL virtio-net
+>>>> for vDPA
+>>>>
+>>>> Signed-off-by: Zhu Lingshan <lingshan.zhu@intel.com>
+>>>> ---
+>>>>   drivers/vdpa/ifcvf/ifcvf_base.h | 5 +++++
+>>>>   drivers/vdpa/ifcvf/ifcvf_main.c | 5 +++++
+>>>>   2 files changed, 10 insertions(+)
+>>>>
+>>>> diff --git a/drivers/vdpa/ifcvf/ifcvf_base.h 
+>>>> b/drivers/vdpa/ifcvf/ifcvf_base.h
+>>>> index 64696d63fe07..75d9a8052039 100644
+>>>> --- a/drivers/vdpa/ifcvf/ifcvf_base.h
+>>>> +++ b/drivers/vdpa/ifcvf/ifcvf_base.h
+>>>> @@ -23,6 +23,11 @@
+>>>>   #define IFCVF_SUBSYS_VENDOR_ID    0x8086
+>>>>   #define IFCVF_SUBSYS_DEVICE_ID    0x001A
+>>>>   +#define C5000X_PL_VENDOR_ID        0x1AF4
+>>>> +#define C5000X_PL_DEVICE_ID        0x1000
+>>>> +#define C5000X_PL_SUBSYS_VENDOR_ID    0x8086
+>>>> +#define C5000X_PL_SUBSYS_DEVICE_ID    0x0001
+>>>
+>>>
+>>> I just notice that the device is a transtitional one. Any reason for 
+>>> doing this?
+>>>
+>>> Note that IFCVF is a moden device anyhow (0x1041). Supporting legacy 
+>>> drive may bring many issues (e.g the definition is non-nomartive). 
+>>> One example is the support of VIRTIO_F_IOMMU_PLATFORM, legacy driver 
+>>> may assume the device can bypass IOMMU.
+>>>
+>>> Thanks
+>> Hi Jason,
+>>
+>> This device will support virtio1.0 by default, so has 
+>> VIRTIO_F_IOMMU_PLATFORM by default.
 >
-> And isn't the code in load_xsave() redundant and can be removed?
-Oh, yes. Keep fx_init() initializing xcomp_bv for guest_fpu is enough.
-Let me remove it in load_xsave later.
-And for fill_xsave(), I think no need to set xcomp_bv there.
+>
+> If you device want to force VIRTIO_F_IOMMU_PLATFORM you probably need 
+> to do what has been done by mlx5 (verify_min_features).
+>
+> According to the spec, if VIRTIO_F_IOMMU_PLATFORM is not mandatory, 
+> when it's not negotiated, device needs to disable or bypass IOMMU:
+>
+>
+> "
+>
+> If this feature bit is set to 0, then the device has same access to 
+> memory addresses supplied to it as the driver has. In particular, the 
+> device will always use physical addresses matching addresses used by 
+> the driver (typically meaning physical addresses used by the CPU) and 
+> not translated further, and can access any address supplied to it by 
+> the driver.
+>
+> "
+sure, I can implement code to check the feature bits.
+>
+>
+>> Transitional device gives the software a chance to fall back to 
+>> virtio 0.95.
+>
+>
+> This only applies if you want to passthrough the card to guest 
+> directly without the help of vDPA.
+>
+> If we go with vDPA, it doesn't hlep. For virtio-vdpa, we know it will 
+> negotiated IOMMU_PLATFORM. For vhost-vdpa, Qemu can provide a legacy 
+> or transitional device on top of a modern vDPA device.
+>
+> Thanks
+For some cases, users may run quite out of date OS does not have vDPA 
+nor virtio 1.0 support, transitional characters give them a chance to 
+use the devices.
 
-> Any code that
-> uses get_xsave_addr() would be have a dependency on load_xsave() if it's not
-> redundant, and I can't see how that would work.
-Sorry I didn't quite understand why get_xsave_addr() has dependency on
-load_xsave(), do you mean the xstate_bv instead of xcomp_bv, that 
-load_xsave()
-uses it to get the addr?
-
-Thanks,
-Jing
+Thanks
+Zhu Lingshan
 >
->>   
->>   	/*
->>   	 * Ensure guest xcr0 is valid for loading
->> -- 
->> 2.18.4
+>
+>> ifcvf drives this device in virtio 1.0 mode, set features 
+>> VIRTIO_F_IOMMU_PLATFORM successfully.
 >>
+>> Thanks,
+>> Zhu Lingshan
+>>>
+>>>
+>>>> +
+>>>>   #define IFCVF_SUPPORTED_FEATURES \
+>>>>           ((1ULL << VIRTIO_NET_F_MAC)            | \
+>>>>            (1ULL << VIRTIO_F_ANY_LAYOUT) | \
+>>>> diff --git a/drivers/vdpa/ifcvf/ifcvf_main.c 
+>>>> b/drivers/vdpa/ifcvf/ifcvf_main.c
+>>>> index e501ee07de17..26a2dab7ca66 100644
+>>>> --- a/drivers/vdpa/ifcvf/ifcvf_main.c
+>>>> +++ b/drivers/vdpa/ifcvf/ifcvf_main.c
+>>>> @@ -484,6 +484,11 @@ static struct pci_device_id ifcvf_pci_ids[] = {
+>>>>           IFCVF_DEVICE_ID,
+>>>>           IFCVF_SUBSYS_VENDOR_ID,
+>>>>           IFCVF_SUBSYS_DEVICE_ID) },
+>>>> +    { PCI_DEVICE_SUB(C5000X_PL_VENDOR_ID,
+>>>> +             C5000X_PL_DEVICE_ID,
+>>>> +             C5000X_PL_SUBSYS_VENDOR_ID,
+>>>> +             C5000X_PL_SUBSYS_DEVICE_ID) },
+>>>> +
+>>>>       { 0 },
+>>>>   };
+>>>>   MODULE_DEVICE_TABLE(pci, ifcvf_pci_ids);
+>>>
+>>
+>
 
