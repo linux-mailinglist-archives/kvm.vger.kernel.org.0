@@ -2,126 +2,143 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 315BB332120
-	for <lists+kvm@lfdr.de>; Tue,  9 Mar 2021 09:46:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2A3C2332183
+	for <lists+kvm@lfdr.de>; Tue,  9 Mar 2021 10:03:33 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231327AbhCIIqT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 9 Mar 2021 03:46:19 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40584 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229652AbhCIIp5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 9 Mar 2021 03:45:57 -0500
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 35059C06174A;
-        Tue,  9 Mar 2021 00:45:57 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=G2k3R4Tdi/Hx20QLdrIl7Gd0ODGJ454XbaXMZQmyqdc=; b=BfNvIj93IMzsXqG7n+fpKKD5HB
-        7SyO6rt2YhcfAVUh1zG7n5g49xapE5f/5xmQofHqlr0e0OE+Hc5FDLiopskI1Q7uORjt53Y44TxVf
-        tgJOEC4YBmW1sUP9+N1HIdM3Dr0F/DcHKxaqaCfdSS7G7GpVGjPYbiNVlcXNkPCG1tVo2Qm52sUjY
-        gd2gK0bjnap+drG4izl2l2BTF1lSpOY9iVnNFbeMs+jWxD66jaX4IsW8O1sk2L0j81n1pSS8eXJLF
-        JMmKnUb1XlFWgKkvyLVlb+5paovs1AWUbMaOmAbKvbwaR89l5BlE5Epd+QHPUSm/g2v1C3tbyWEti
-        zcFfqNrw==;
-Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
-        by casper.infradead.org with esmtpsa (Exim 4.94 #2 (Red Hat Linux))
-        id 1lJXzN-000Fqx-W3; Tue, 09 Mar 2021 08:45:17 +0000
-Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (Client did not present a certificate)
-        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 5B4B5301A32;
-        Tue,  9 Mar 2021 09:45:12 +0100 (CET)
-Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
-        id 45CCA2351CF0D; Tue,  9 Mar 2021 09:45:12 +0100 (CET)
-Date:   Tue, 9 Mar 2021 09:45:12 +0100
-From:   Peter Zijlstra <peterz@infradead.org>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     "Xu, Like" <like.xu@intel.com>, Dmitry Vyukov <dvyukov@google.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-        Jiri Olsa <jolsa@redhat.com>,
-        Namhyung Kim <namhyung@kernel.org>,
-        "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org,
-        Like Xu <like.xu@linux.intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jim Mattson <jmattson@google.com>, kvm@vger.kernel.org,
-        "Thomas Gleixner
-        (x86/pti/timer/core/smp/irq/perf/efi/locking/ras/objtool)
-        (x86@kernel.org)" <tglx@linutronix.de>,
-        Borislav Petkov <bp@alien8.de>,
-        Arnaldo Carvalho de Melo <acme@kernel.org>,
-        Ingo Molnar <mingo@redhat.com>
-Subject: Re: [PATCH] x86/perf: Fix guest_get_msrs static call if there is no
- PMU
-Message-ID: <YEc1mFkaILfF37At@hirez.programming.kicks-ass.net>
-References: <20210305223331.4173565-1-seanjc@google.com>
- <053d0a22-394d-90d0-8d3b-3cd37ca3f378@intel.com>
- <YEXmILSHDNDuMk/N@hirez.programming.kicks-ass.net>
- <YEaLzKWd0wAmdqvs@google.com>
- <YEcn6bGYxdgrp0Ik@hirez.programming.kicks-ass.net>
+        id S229901AbhCIJDB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 9 Mar 2021 04:03:01 -0500
+Received: from szxga08-in.huawei.com ([45.249.212.255]:3297 "EHLO
+        szxga08-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229730AbhCIJCi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 9 Mar 2021 04:02:38 -0500
+Received: from DGGEMM402-HUB.china.huawei.com (unknown [172.30.72.55])
+        by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4Dvq0C3dsFz143DX;
+        Tue,  9 Mar 2021 16:59:39 +0800 (CST)
+Received: from dggpemm500023.china.huawei.com (7.185.36.83) by
+ DGGEMM402-HUB.china.huawei.com (10.3.20.210) with Microsoft SMTP Server (TLS)
+ id 14.3.498.0; Tue, 9 Mar 2021 17:02:30 +0800
+Received: from [10.174.187.128] (10.174.187.128) by
+ dggpemm500023.china.huawei.com (7.185.36.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id
+ 15.1.2106.2; Tue, 9 Mar 2021 17:02:30 +0800
+Subject: Re: [PATCH 2/2] KVM: arm64: Skip the cache flush when coalescing
+ tables into a block
+To:     Marc Zyngier <maz@kernel.org>
+CC:     Will Deacon <will@kernel.org>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        <kvmarm@lists.cs.columbia.edu>,
+        <linux-arm-kernel@lists.infradead.org>, <kvm@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <wanghaibin.wang@huawei.com>,
+        <yuzenghui@huawei.com>
+References: <20210125141044.380156-1-wangyanan55@huawei.com>
+ <20210125141044.380156-3-wangyanan55@huawei.com>
+ <20210308163454.GA26561@willie-the-truck>
+ <8a947c73-16e9-7ca7-c185-d4c951938505@huawei.com>
+ <87y2ewyawn.wl-maz@kernel.org>
+From:   "wangyanan (Y)" <wangyanan55@huawei.com>
+Message-ID: <fbdd19aa-fae6-0613-d5ec-dd062c66514a@huawei.com>
+Date:   Tue, 9 Mar 2021 17:02:29 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.4.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YEcn6bGYxdgrp0Ik@hirez.programming.kicks-ass.net>
+In-Reply-To: <87y2ewyawn.wl-maz@kernel.org>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-Originating-IP: [10.174.187.128]
+X-ClientProxiedBy: dggeme712-chm.china.huawei.com (10.1.199.108) To
+ dggpemm500023.china.huawei.com (7.185.36.83)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Mar 09, 2021 at 08:46:49AM +0100, Peter Zijlstra wrote:
-> On Mon, Mar 08, 2021 at 12:40:44PM -0800, Sean Christopherson wrote:
-> > On Mon, Mar 08, 2021, Peter Zijlstra wrote:
-> 
-> > > Given the one user in atomic_switch_perf_msrs() that should work because
-> > > it doesn't seem to care about nr_msrs when !msrs.
-> > 
-> > Uh, that commit quite cleary says:
-> 
-> D0h! I got static_call_cond() and __static_call_return0 mixed up.
-> Anyway, let me see if I can make something work here.
 
-Does this work? I can never seem to start a VM, and if I do accidentally
-manage, then it never contains the things I need :/
+On 2021/3/9 16:43, Marc Zyngier wrote:
+> On Tue, 09 Mar 2021 08:34:43 +0000,
+> "wangyanan (Y)" <wangyanan55@huawei.com> wrote:
+>>
+>> On 2021/3/9 0:34, Will Deacon wrote:
+>>> On Mon, Jan 25, 2021 at 10:10:44PM +0800, Yanan Wang wrote:
+>>>> After dirty-logging is stopped for a VM configured with huge mappings,
+>>>> KVM will recover the table mappings back to block mappings. As we only
+>>>> replace the existing page tables with a block entry and the cacheability
+>>>> has not been changed, the cache maintenance opreations can be skipped.
+>>>>
+>>>> Signed-off-by: Yanan Wang <wangyanan55@huawei.com>
+>>>> ---
+>>>>    arch/arm64/kvm/mmu.c | 12 +++++++++---
+>>>>    1 file changed, 9 insertions(+), 3 deletions(-)
+>>>>
+>>>> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+>>>> index 8e8549ea1d70..37b427dcbc4f 100644
+>>>> --- a/arch/arm64/kvm/mmu.c
+>>>> +++ b/arch/arm64/kvm/mmu.c
+>>>> @@ -744,7 +744,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>>>>    {
+>>>>    	int ret = 0;
+>>>>    	bool write_fault, writable, force_pte = false;
+>>>> -	bool exec_fault;
+>>>> +	bool exec_fault, adjust_hugepage;
+>>>>    	bool device = false;
+>>>>    	unsigned long mmu_seq;
+>>>>    	struct kvm *kvm = vcpu->kvm;
+>>>> @@ -872,12 +872,18 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>>>>    		mark_page_dirty(kvm, gfn);
+>>>>    	}
+>>>>    -	if (fault_status != FSC_PERM && !device)
+>>>> +	/*
+>>>> +	 * There is no necessity to perform cache maintenance operations if we
+>>>> +	 * will only replace the existing table mappings with a block mapping.
+>>>> +	 */
+>>>> +	adjust_hugepage = fault_granule < vma_pagesize ? true : false;
+>>> nit: you don't need the '? true : false' part
+>>>
+>>> That said, your previous patch checks for 'fault_granule > vma_pagesize',
+>>> so I'm not sure the local variable helps all that much here because it
+>>> obscures the size checks in my opinion. It would be more straight-forward
+>>> if we could structure the logic as:
+>>>
+>>>
+>>> 	if (fault_granule < vma_pagesize) {
+>>>
+>>> 	} else if (fault_granule > vma_page_size) {
+>>>
+>>> 	} else {
+>>>
+>>> 	}
+>>>
+>>> With some comments describing what we can infer about the memcache and cache
+>>> maintenance requirements for each case.
+>> Thanks for your suggestion here, Will.
+>> But I have resent another newer series [1] (KVM: arm64: Improve
+>> efficiency of stage2 page table)
+>> recently, which has the same theme but different solutions that I
+>> think are better.
+>> [1]
+>> https://lore.kernel.org/lkml/20210208112250.163568-1-wangyanan55@huawei.com/
+>>
+>> Could you please comment on that series ?  I think it can be found in
+>> your inbox :).
+> There were already a bunch of comments on that series, and I stopped
+> at the point where the cache maintenance was broken. Please respin
+> that series if you want further feedback on it.
+Ok, I will send a new version later.
+>
+> In the future, if you deprecate a series (which is completely
+> understandable), please leave a note on the list with a pointer to the
+> new series so that people don't waste time reviewing an obsolete
+> series. Or post the new series with a new version number so that it is
+> obvious that the original series has been superseded.
+I apologize for this, I will be more careful in the future.
 
----
-diff --git a/arch/x86/events/core.c b/arch/x86/events/core.c
-index 6ddeed3cd2ac..fadcecd73e1a 100644
---- a/arch/x86/events/core.c
-+++ b/arch/x86/events/core.c
-@@ -81,7 +81,11 @@ DEFINE_STATIC_CALL_NULL(x86_pmu_swap_task_ctx, *x86_pmu.swap_task_ctx);
- DEFINE_STATIC_CALL_NULL(x86_pmu_drain_pebs,   *x86_pmu.drain_pebs);
- DEFINE_STATIC_CALL_NULL(x86_pmu_pebs_aliases, *x86_pmu.pebs_aliases);
- 
--DEFINE_STATIC_CALL_NULL(x86_pmu_guest_get_msrs,  *x86_pmu.guest_get_msrs);
-+/*
-+ * This one is magic, it will get called even when PMU init fails (because
-+ * there is no PMU), in which case it should simply return NULL.
-+ */
-+__DEFINE_STATIC_CALL(x86_pmu_guest_get_msrs, *x86_pmu.guest_get_msrs, __static_call_return0);
- 
- u64 __read_mostly hw_cache_event_ids
- 				[PERF_COUNT_HW_CACHE_MAX]
-@@ -1944,13 +1948,6 @@ static void _x86_pmu_read(struct perf_event *event)
- 	x86_perf_event_update(event);
- }
- 
--static inline struct perf_guest_switch_msr *
--perf_guest_get_msrs_nop(int *nr)
--{
--	*nr = 0;
--	return NULL;
--}
--
- static int __init init_hw_perf_events(void)
- {
- 	struct x86_pmu_quirk *quirk;
-@@ -2024,9 +2021,6 @@ static int __init init_hw_perf_events(void)
- 	if (!x86_pmu.read)
- 		x86_pmu.read = _x86_pmu_read;
- 
--	if (!x86_pmu.guest_get_msrs)
--		x86_pmu.guest_get_msrs = perf_guest_get_msrs_nop;
--
- 	x86_pmu_static_call_update();
- 
- 	/*
+Thanks,
+
+Yanan
+> Thanks,
+>
+> 	M.
+>
