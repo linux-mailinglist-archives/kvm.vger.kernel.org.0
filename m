@@ -2,46 +2,48 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F0196332CA3
-	for <lists+kvm@lfdr.de>; Tue,  9 Mar 2021 17:55:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2984D332CAE
+	for <lists+kvm@lfdr.de>; Tue,  9 Mar 2021 17:57:50 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229799AbhCIQyf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 9 Mar 2021 11:54:35 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:31888 "EHLO
+        id S230492AbhCIQ5O (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 9 Mar 2021 11:57:14 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:50628 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230150AbhCIQyQ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 9 Mar 2021 11:54:16 -0500
+        by vger.kernel.org with ESMTP id S230173AbhCIQ4z (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 9 Mar 2021 11:56:55 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1615308855;
+        s=mimecast20190719; t=1615309015;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=CTgUbg/6dIfJ8+vRrUqQadtIO/EgwtNQwHY7b9X2uxM=;
-        b=CztM7cWsmaukxyqU+0VTqQGHdsT+JHMIZlDhMtyqyzsyTKVO62Y3o6eAvt7RUFLxkJpqvJ
-        sgBz0M/E2jqaI+8CsPHWJ8f8DH2CxTJ5V7IgIyUtRzxj0eob8Iae57SjuLeZinzn09Prak
-        u9KoWpxQ0LgGVmP9vU3fPrX9EKmIWq8=
+        bh=q1egl+L1rZWa8ln2yZ0cI9KtimfXRm5vTfuSpGiRUEg=;
+        b=VDCtNT5N1WsOymVPEKwNmTzEzXgtNEtibiR76cpixyyUzM3Z9Sf1w9VY7jTRA10Y+ivTTu
+        ncdUspgqRntS69r/pFltYbTU61C09RoQTr+imk720lvC2D6ZAmYszzEHQBwvQtAEvvD373
+        l+4jZDfscBrjBsqVw7D/Fq05wPFX8eU=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-168-n3SpqBgbPYCDxRRBaeDR4A-1; Tue, 09 Mar 2021 11:54:10 -0500
-X-MC-Unique: n3SpqBgbPYCDxRRBaeDR4A-1
+ us-mta-436-7cBjGNihM9CVZ_Z8JErhaw-1; Tue, 09 Mar 2021 11:56:52 -0500
+X-MC-Unique: 7cBjGNihM9CVZ_Z8JErhaw-1
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EA71E800D62;
-        Tue,  9 Mar 2021 16:54:08 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 199EE1019630;
+        Tue,  9 Mar 2021 16:56:51 +0000 (UTC)
 Received: from gondolin (ovpn-113-144.ams2.redhat.com [10.36.113.144])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 4FD6310013C1;
-        Tue,  9 Mar 2021 16:54:04 +0000 (UTC)
-Date:   Tue, 9 Mar 2021 17:54:01 +0100
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 834E51001B2C;
+        Tue,  9 Mar 2021 16:56:46 +0000 (UTC)
+Date:   Tue, 9 Mar 2021 17:56:44 +0100
 From:   Cornelia Huck <cohuck@redhat.com>
 To:     Pierre Morel <pmorel@linux.ibm.com>
 Cc:     kvm@vger.kernel.org, frankja@linux.ibm.com, david@redhat.com,
         thuth@redhat.com, imbrenda@linux.ibm.com
-Subject: Re: [kvm-unit-tests PATCH v5 0/6] CSS Mesurement Block
-Message-ID: <20210309175401.6302833e.cohuck@redhat.com>
-In-Reply-To: <1615294277-7332-1-git-send-email-pmorel@linux.ibm.com>
+Subject: Re: [kvm-unit-tests PATCH v5 4/6] s390x: css: implementing Set
+ CHannel Monitor
+Message-ID: <20210309175644.2cf7d11d.cohuck@redhat.com>
+In-Reply-To: <1615294277-7332-5-git-send-email-pmorel@linux.ibm.com>
 References: <1615294277-7332-1-git-send-email-pmorel@linux.ibm.com>
+        <1615294277-7332-5-git-send-email-pmorel@linux.ibm.com>
 Organization: Red Hat GmbH
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
@@ -51,69 +53,88 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue,  9 Mar 2021 13:51:11 +0100
+On Tue,  9 Mar 2021 13:51:15 +0100
 Pierre Morel <pmorel@linux.ibm.com> wrote:
 
-> We tests the update of the Mesurement Block (MB) format 0
-> and format 1 using a serie of senseid requests.
+> We implement the call of the Set CHannel Monitor instruction,
+> starting the monitoring of the all Channel Sub System, and
+> initializing channel subsystem monitoring.
 > 
-> *Warning*: One of the tests for format-1 will unexpectedly fail for QEMU elf
-> unless the QEMU patch "css: SCHIB measurement block origin must be aligned"
-> is applied.
+> Initial tests report the presence of the extended measurement block
+> feature, and verify the error reporting of the hypervisor for SCHM.
+> 
+> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+> Acked-by: Janosch Frank <frankja@linux.ibm.com>
+> ---
+>  lib/s390x/css.h     | 16 ++++++++++++++--
+>  lib/s390x/css_lib.c |  4 ++--
+>  s390x/css.c         | 35 +++++++++++++++++++++++++++++++++++
+>  3 files changed, 51 insertions(+), 4 deletions(-)
+> 
+> diff --git a/lib/s390x/css.h b/lib/s390x/css.h
+> index 3c50fa8..7158423 100644
+> --- a/lib/s390x/css.h
+> +++ b/lib/s390x/css.h
+> @@ -309,6 +309,7 @@ struct chsc_scsc {
+>  	uint8_t reserved[9];
+>  	struct chsc_header res;
+>  	uint32_t res_fmt;
+> +#define CSSC_EXTENDED_MEASUREMENT_BLOCK 48
+>  	uint64_t general_char[255];
+>  	uint64_t chsc_char[254];
+>  };
+> @@ -356,8 +357,19 @@ static inline int _chsc(void *p)
+>  bool chsc(void *p, uint16_t code, uint16_t len);
+>  
+>  #include <bitops.h>
+> -#define css_general_feature(bit) test_bit_inv(bit, chsc_scsc->general_char)
+> -#define css_chsc_feature(bit) test_bit_inv(bit, chsc_scsc->chsc_char)
+> +#define css_test_general_feature(bit) test_bit_inv(bit, chsc_scsc->general_char)
+> +#define css_test_chsc_feature(bit) test_bit_inv(bit, chsc_scsc->chsc_char)
 
-That one has hit QEMU master by now.
+I think the renaming belongs in patch 1?
 
-> With Protected Virtualization, the PGM is correctly recognized.
-> 
-> The MB format 1 is only provided if the Extended mesurement Block
-> feature is available.
-> 
-> This feature is exposed by the CSS characteristics general features
-> stored by the Store Channel Subsystem Characteristics CHSC command,
-> consequently, we implement the CHSC instruction call and the SCSC CHSC
-> command.
-> 
-> In order to ease the writing of new tests using:
-> - interrupt
-> - enablement of a subchannel
-> - multiple I/O on a subchannel
-> 
-> We do the following simplifications:
-> - we create a CSS initialization routine
-> - we register the I/O interrupt handler on CSS initialization
-> - we do not enable or disable a subchannel in the senseid test,
->   assuming this test is done after the enable test, this allows
->   to create traffic using the SSCH used by senseid.
-> - failures not part of the feature under test will stop the tests.
-> - we add a css_enabled() function to test if a subchannel is enabled.
-> 
-> *note*:
->     I rearranged the use of the senseid for the tests, by not modifying
->     the existing test and having a dedicated senseid() function for
->     the purpose of the tests.
->     I think that it is in the rigght way so I kept the RB and ACK on
->     the simplification, there are less changes, if it is wrong from me
->     I suppose I will see this in the comments.
->     Since the changed are moved inside the fmt0 test which is not approved
->     for now I hope it is OK.
+> +
+> +#define SCHM_DCTM	1 /* activate Device Connection TiMe */
+> +#define SCHM_MBU	2 /* activate Measurement Block Update */
+> +
+> +static inline void schm(void *mbo, unsigned int flags)
+> +{
+> +	register void *__gpr2 asm("2") = mbo;
+> +	register long __gpr1 asm("1") = flags;
+> +
+> +	asm("schm" : : "d" (__gpr2), "d" (__gpr1));
+> +}
+>  
+>  bool css_enable_mb(int sid, uint64_t mb, uint16_t mbi, uint16_t flg, bool fmt1);
+>  bool css_disable_mb(int schid);
+> diff --git a/lib/s390x/css_lib.c b/lib/s390x/css_lib.c
+> index 77b39c7..95d9a78 100644
+> --- a/lib/s390x/css_lib.c
+> +++ b/lib/s390x/css_lib.c
+> @@ -94,7 +94,7 @@ bool get_chsc_scsc(void)
+>  		return false;
+>  
+>  	for (i = 0, p = buffer; i < CSS_GENERAL_FEAT_BITLEN; i++) {
+> -		if (css_general_feature(i)) {
+> +		if (css_test_general_feature(i)) {
 
-I'll double-check, but I think it should be ok.
+and here...
 
-> 
-> Regards,
-> Pierre
-> 
-> Pierre Morel (6):
->   s390x: css: Store CSS Characteristics
->   s390x: css: simplifications of the tests
->   s390x: css: extending the subchannel modifying functions
->   s390x: css: implementing Set CHannel Monitor
->   s390x: css: testing measurement block format 0
->   s390x: css: testing measurement block format 1
-> 
->  lib/s390x/css.h     | 115 ++++++++++++++++++++-
->  lib/s390x/css_lib.c | 236 ++++++++++++++++++++++++++++++++++++++++----
->  s390x/css.c         | 216 ++++++++++++++++++++++++++++++++++++++--
->  3 files changed, 540 insertions(+), 27 deletions(-)
-> 
+>  			n = snprintf(p, sizeof(buffer), "%d,", i);
+>  			p += n;
+>  		}
+> @@ -102,7 +102,7 @@ bool get_chsc_scsc(void)
+>  	report_info("General features: %s", buffer);
+>  
+>  	for (i = 0, p = buffer; i < CSS_CHSC_FEAT_BITLEN; i++) {
+> -		if (css_chsc_feature(i)) {
+> +		if (css_test_chsc_feature(i)) {
+
+...and here.
+
+>  			n = snprintf(p, sizeof(buffer), "%d,", i);
+>  			p += n;
+>  		}
 
