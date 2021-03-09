@@ -2,21 +2,21 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 35A09331F2C
+	by mail.lfdr.de (Postfix) with ESMTP id A6FAE331F2D
 	for <lists+kvm@lfdr.de>; Tue,  9 Mar 2021 07:23:32 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230046AbhCIGW7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        id S229980AbhCIGW7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
         Tue, 9 Mar 2021 01:22:59 -0500
-Received: from szxga04-in.huawei.com ([45.249.212.190]:13584 "EHLO
+Received: from szxga04-in.huawei.com ([45.249.212.190]:13582 "EHLO
         szxga04-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229911AbhCIGWa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S229904AbhCIGWa (ORCPT <rfc822;kvm@vger.kernel.org>);
         Tue, 9 Mar 2021 01:22:30 -0500
 Received: from DGGEMS414-HUB.china.huawei.com (unknown [172.30.72.59])
-        by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4DvlSp0bKmz17Hgx;
-        Tue,  9 Mar 2021 14:20:42 +0800 (CST)
+        by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4DvlSn6hNnz17Hqm;
+        Tue,  9 Mar 2021 14:20:41 +0800 (CST)
 Received: from DESKTOP-7FEPK9S.china.huawei.com (10.174.184.135) by
  DGGEMS414-HUB.china.huawei.com (10.3.19.214) with Microsoft SMTP Server id
- 14.3.498.0; Tue, 9 Mar 2021 14:22:19 +0800
+ 14.3.498.0; Tue, 9 Mar 2021 14:22:21 +0800
 From:   Shenming Lu <lushenming@huawei.com>
 To:     Alex Williamson <alex.williamson@redhat.com>,
         Cornelia Huck <cohuck@redhat.com>,
@@ -35,9 +35,9 @@ CC:     Kevin Tian <kevin.tian@intel.com>, <yi.l.liu@intel.com>,
         Barry Song <song.bao.hua@hisilicon.com>,
         <wanghaibin.wang@huawei.com>, <yuzenghui@huawei.com>,
         <zhukeqian1@huawei.com>, <lushenming@huawei.com>
-Subject: [RFC PATCH v2 3/6] vfio: Add a page fault handler
-Date:   Tue, 9 Mar 2021 14:22:04 +0800
-Message-ID: <20210309062207.505-4-lushenming@huawei.com>
+Subject: [RFC PATCH v2 4/6] vfio: VFIO_IOMMU_ENABLE_IOPF
+Date:   Tue, 9 Mar 2021 14:22:05 +0800
+Message-ID: <20210309062207.505-5-lushenming@huawei.com>
 X-Mailer: git-send-email 2.27.0.windows.1
 In-Reply-To: <20210309062207.505-1-lushenming@huawei.com>
 References: <20210309062207.505-1-lushenming@huawei.com>
@@ -50,273 +50,256 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-VFIO manages the DMA mapping itself. To support IOPF for VFIO
-devices, we add a VFIO page fault handler to serve the reported
-page faults from the IOMMU driver. Besides, we can pre-map more
-pages than requested at once to optimize for fewer page fault
-handlings.
+Since enabling IOPF for devices may lead to a slow ramp up of
+performance, we add an VFIO_IOMMU_ENABLE_IOPF ioctl to make it
+configurable. And the IOPF enabling of a VFIO device includes
+setting IOMMU_DEV_FEAT_IOPF and registering the VFIO page fault
+handler. Note that VFIO_IOMMU_DISABLE_IOPF is not supported
+since there may be inflight page faults when disabling.
 
 Signed-off-by: Shenming Lu <lushenming@huawei.com>
 ---
- drivers/vfio/vfio.c             |  35 +++++++
- drivers/vfio/vfio_iommu_type1.c | 167 ++++++++++++++++++++++++++++++++
- include/linux/vfio.h            |   5 +
- 3 files changed, 207 insertions(+)
+ drivers/vfio/vfio_iommu_type1.c | 139 +++++++++++++++++++++++++++++++-
+ include/uapi/linux/vfio.h       |   6 ++
+ 2 files changed, 142 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/vfio/vfio.c b/drivers/vfio/vfio.c
-index 38779e6fd80c..77b29bbd3027 100644
---- a/drivers/vfio/vfio.c
-+++ b/drivers/vfio/vfio.c
-@@ -2354,6 +2354,41 @@ struct iommu_domain *vfio_group_iommu_domain(struct vfio_group *group)
- }
- EXPORT_SYMBOL_GPL(vfio_group_iommu_domain);
- 
-+int vfio_iommu_dev_fault_handler(struct iommu_fault *fault, void *data)
-+{
-+	struct device *dev = (struct device *)data;
-+	struct vfio_container *container;
-+	struct vfio_group *group;
-+	struct vfio_iommu_driver *driver;
-+	int ret;
-+
-+	if (!dev)
-+		return -EINVAL;
-+
-+	group = vfio_group_get_from_dev(dev);
-+	if (!group)
-+		return -ENODEV;
-+
-+	ret = vfio_group_add_container_user(group);
-+	if (ret)
-+		goto out;
-+
-+	container = group->container;
-+	driver = container->iommu_driver;
-+	if (likely(driver && driver->ops->dma_map_iopf))
-+		ret = driver->ops->dma_map_iopf(container->iommu_data,
-+						fault, dev);
-+	else
-+		ret = -ENOTTY;
-+
-+	vfio_group_try_dissolve_container(group);
-+
-+out:
-+	vfio_group_put(group);
-+	return ret;
-+}
-+EXPORT_SYMBOL_GPL(vfio_iommu_dev_fault_handler);
-+
- /**
-  * Module/class support
-  */
 diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-index 03ccc11057af..167d52c1468b 100644
+index 167d52c1468b..3997473be4a7 100644
 --- a/drivers/vfio/vfio_iommu_type1.c
 +++ b/drivers/vfio/vfio_iommu_type1.c
-@@ -3330,6 +3330,172 @@ static void vfio_iommu_type1_notify(void *iommu_data,
- 	wake_up_all(&iommu->vaddr_wait);
+@@ -71,6 +71,7 @@ struct vfio_iommu {
+ 	struct rb_root		dma_list;
+ 	struct blocking_notifier_head notifier;
+ 	struct mmu_notifier	mn;
++	struct mm_struct	*mm;
+ 	unsigned int		dma_avail;
+ 	unsigned int		vaddr_invalid_count;
+ 	uint64_t		pgsize_bitmap;
+@@ -81,6 +82,7 @@ struct vfio_iommu {
+ 	bool			dirty_page_tracking;
+ 	bool			pinned_page_dirty_scope;
+ 	bool			container_open;
++	bool			iopf_enabled;
+ };
+ 
+ struct vfio_domain {
+@@ -2278,6 +2280,62 @@ static void vfio_iommu_iova_insert_copy(struct vfio_iommu *iommu,
+ 	list_splice_tail(iova_copy, iova);
  }
  
-+/*
-+ * To optimize for fewer page fault handlings, try to
-+ * pre-map more pages than requested.
-+ */
-+#define IOPF_PREMAP_LEN		512
-+
-+static void unpin_pages_iopf(struct vfio_dma *dma,
-+			     unsigned long pfn, unsigned long npages)
++static int dev_disable_iopf(struct device *dev, void *data)
 +{
-+	while (npages--)
-+		put_pfn(pfn++, dma->prot);
-+}
++	int *enabled_dev_cnt = data;
 +
-+/*
-+ * Return 0 on success or a negative error code, the
-+ * number of pages contiguously pinned is in @*pinned.
-+ */
-+static int pin_pages_iopf(struct vfio_dma *dma, unsigned long vaddr,
-+			  unsigned long npages, unsigned long *pfn_base,
-+			  unsigned long *pinned, struct vfio_batch *batch)
-+{
-+	struct mm_struct *mm;
-+	unsigned long pfn;
-+	int ret = 0;
-+	*pinned = 0;
++	if (enabled_dev_cnt && *enabled_dev_cnt <= 0)
++		return -1;
 +
-+	mm = get_task_mm(dma->task);
-+	if (!mm)
-+		return -ENODEV;
++	iommu_unregister_device_fault_handler(dev);
++	iommu_dev_disable_feature(dev, IOMMU_DEV_FEAT_IOPF);
 +
-+	if (batch->size) {
-+		*pfn_base = page_to_pfn(batch->pages[batch->offset]);
-+		pfn = *pfn_base;
-+	} else
-+		*pfn_base = 0;
++	if (enabled_dev_cnt)
++		(*enabled_dev_cnt)--;
 +
-+	while (npages) {
-+		if (!batch->size) {
-+			unsigned long req_pages = min_t(unsigned long, npages,
-+							batch->capacity);
-+
-+			ret = vaddr_get_pfns(mm, vaddr, req_pages, dma->prot,
-+					     &pfn, batch->pages);
-+			if (ret < 0)
-+				goto out;
-+
-+			batch->size = ret;
-+			batch->offset = 0;
-+			ret = 0;
-+
-+			if (!*pfn_base)
-+				*pfn_base = pfn;
-+		}
-+
-+		while (true) {
-+			if (pfn != *pfn_base + *pinned)
-+				goto out;
-+
-+			(*pinned)++;
-+			npages--;
-+			vaddr += PAGE_SIZE;
-+			batch->offset++;
-+			batch->size--;
-+
-+			if (!batch->size)
-+				break;
-+
-+			pfn = page_to_pfn(batch->pages[batch->offset]);
-+		}
-+
-+		if (unlikely(disable_hugepages))
-+			break;
-+	}
-+
-+out:
-+	mmput(mm);
-+	return ret;
-+}
-+
-+static int vfio_iommu_type1_dma_map_iopf(void *iommu_data,
-+					 struct iommu_fault *fault,
-+					 struct device *dev)
-+{
-+	struct vfio_iommu *iommu = iommu_data;
-+	dma_addr_t iova = ALIGN_DOWN(fault->prm.addr, PAGE_SIZE);
-+	struct vfio_dma *dma;
-+	int access_flags = 0;
-+	size_t premap_len, map_len, mapped_len = 0;
-+	unsigned long bit_offset, npages, i, vaddr, pfn;
-+	struct vfio_batch batch;
-+	enum iommu_page_response_code status = IOMMU_PAGE_RESP_INVALID;
-+	struct iommu_page_response resp = {0};
-+
-+	mutex_lock(&iommu->lock);
-+
-+	dma = vfio_find_dma(iommu, iova, PAGE_SIZE);
-+	if (!dma)
-+		goto out_invalid;
-+
-+	if (fault->prm.perm & IOMMU_FAULT_PERM_READ)
-+		access_flags |= IOMMU_READ;
-+	if (fault->prm.perm & IOMMU_FAULT_PERM_WRITE)
-+		access_flags |= IOMMU_WRITE;
-+	if ((dma->prot & access_flags) != access_flags)
-+		goto out_invalid;
-+
-+	bit_offset = (iova - dma->iova) >> PAGE_SHIFT;
-+	if (IOPF_MAPPED_BITMAP_GET(dma, bit_offset))
-+		goto out_success;
-+
-+	premap_len = IOPF_PREMAP_LEN << PAGE_SHIFT;
-+	npages = dma->size >> PAGE_SHIFT;
-+	map_len = PAGE_SIZE;
-+	for (i = bit_offset + 1; i < npages; i++) {
-+		if (map_len >= premap_len || IOPF_MAPPED_BITMAP_GET(dma, i))
-+			break;
-+		map_len += PAGE_SIZE;
-+	}
-+	vaddr = iova - dma->iova + dma->vaddr;
-+	vfio_batch_init(&batch);
-+
-+	while (map_len) {
-+		int ret;
-+
-+		ret = pin_pages_iopf(dma, vaddr + mapped_len,
-+				     map_len >> PAGE_SHIFT, &pfn,
-+				     &npages, &batch);
-+		if (!npages)
-+			break;
-+
-+		if (vfio_iommu_map(iommu, iova + mapped_len, pfn,
-+				   npages, dma->prot)) {
-+			unpin_pages_iopf(dma, pfn, npages);
-+			vfio_batch_unpin(&batch, dma);
-+			break;
-+		}
-+
-+		bitmap_set(dma->iopf_mapped_bitmap,
-+			   bit_offset + (mapped_len >> PAGE_SHIFT), npages);
-+
-+		unpin_pages_iopf(dma, pfn, npages);
-+
-+		map_len -= npages << PAGE_SHIFT;
-+		mapped_len += npages << PAGE_SHIFT;
-+
-+		if (ret)
-+			break;
-+	}
-+
-+	vfio_batch_fini(&batch);
-+
-+	if (!mapped_len)
-+		goto out_invalid;
-+
-+out_success:
-+	status = IOMMU_PAGE_RESP_SUCCESS;
-+
-+out_invalid:
-+	mutex_unlock(&iommu->lock);
-+	resp.version		= IOMMU_PAGE_RESP_VERSION_1;
-+	resp.grpid		= fault->prm.grpid;
-+	resp.code		= status;
-+	iommu_page_response(dev, &resp);
 +	return 0;
 +}
 +
- static const struct vfio_iommu_driver_ops vfio_iommu_driver_ops_type1 = {
- 	.name			= "vfio-iommu-type1",
- 	.owner			= THIS_MODULE,
-@@ -3345,6 +3511,7 @@ static const struct vfio_iommu_driver_ops vfio_iommu_driver_ops_type1 = {
- 	.dma_rw			= vfio_iommu_type1_dma_rw,
- 	.group_iommu_domain	= vfio_iommu_type1_group_iommu_domain,
- 	.notify			= vfio_iommu_type1_notify,
-+	.dma_map_iopf		= vfio_iommu_type1_dma_map_iopf,
- };
- 
- static int __init vfio_iommu_type1_init(void)
-diff --git a/include/linux/vfio.h b/include/linux/vfio.h
-index b7e18bde5aa8..73af317a4343 100644
---- a/include/linux/vfio.h
-+++ b/include/linux/vfio.h
-@@ -99,6 +99,9 @@ struct vfio_iommu_driver_ops {
- 						   struct iommu_group *group);
- 	void		(*notify)(void *iommu_data,
- 				  enum vfio_iommu_notify_type event);
-+	int		(*dma_map_iopf)(void *iommu_data,
-+					struct iommu_fault *fault,
-+					struct device *dev);
- };
- 
- extern int vfio_register_iommu_driver(const struct vfio_iommu_driver_ops *ops);
-@@ -160,6 +163,8 @@ extern int vfio_unregister_notifier(struct device *dev,
- struct kvm;
- extern void vfio_group_set_kvm(struct vfio_group *group, struct kvm *kvm);
- 
-+extern int vfio_iommu_dev_fault_handler(struct iommu_fault *fault, void *data);
++static int dev_enable_iopf(struct device *dev, void *data)
++{
++	int *enabled_dev_cnt = data;
++	struct iommu_domain *domain;
++	int nested;
++	u32 flags;
++	int ret;
 +
++	ret = iommu_dev_enable_feature(dev, IOMMU_DEV_FEAT_IOPF);
++	if (ret)
++		return ret;
++
++	domain = iommu_get_domain_for_dev(dev);
++	if (!domain) {
++		ret = -ENODEV;
++		goto out_disable;
++	}
++
++	ret = iommu_domain_get_attr(domain, DOMAIN_ATTR_NESTING, &nested);
++	if (ret)
++		goto out_disable;
++
++	if (nested)
++		flags = IOPF_REPORT_NESTED | IOPF_REPORT_NESTED_L2_CONCERNED;
++	else
++		flags = IOPF_REPORT_FLAT;
++
++	ret = iommu_register_device_fault_handler(dev,
++				vfio_iommu_dev_fault_handler, flags, dev);
++	if (ret)
++		goto out_disable;
++
++	(*enabled_dev_cnt)++;
++	return 0;
++
++out_disable:
++	iommu_dev_disable_feature(dev, IOMMU_DEV_FEAT_IOPF);
++	return ret;
++}
++
+ static int vfio_iommu_type1_attach_group(void *iommu_data,
+ 					 struct iommu_group *iommu_group)
+ {
+@@ -2291,6 +2349,7 @@ static int vfio_iommu_type1_attach_group(void *iommu_data,
+ 	struct iommu_domain_geometry geo;
+ 	LIST_HEAD(iova_copy);
+ 	LIST_HEAD(group_resv_regions);
++	int iopf_enabled_dev_cnt = 0;
+ 
+ 	mutex_lock(&iommu->lock);
+ 
+@@ -2368,6 +2427,13 @@ static int vfio_iommu_type1_attach_group(void *iommu_data,
+ 	if (ret)
+ 		goto out_domain;
+ 
++	if (iommu->iopf_enabled) {
++		ret = iommu_group_for_each_dev(iommu_group, &iopf_enabled_dev_cnt,
++					       dev_enable_iopf);
++		if (ret)
++			goto out_detach;
++	}
++
+ 	/* Get aperture info */
+ 	iommu_domain_get_attr(domain->domain, DOMAIN_ATTR_GEOMETRY, &geo);
+ 
+@@ -2449,9 +2515,11 @@ static int vfio_iommu_type1_attach_group(void *iommu_data,
+ 	vfio_test_domain_fgsp(domain);
+ 
+ 	/* replay mappings on new domains */
+-	ret = vfio_iommu_replay(iommu, domain);
+-	if (ret)
+-		goto out_detach;
++	if (!iommu->iopf_enabled) {
++		ret = vfio_iommu_replay(iommu, domain);
++		if (ret)
++			goto out_detach;
++	}
+ 
+ 	if (resv_msi) {
+ 		ret = iommu_get_msi_cookie(domain->domain, resv_msi_base);
+@@ -2482,6 +2550,8 @@ static int vfio_iommu_type1_attach_group(void *iommu_data,
+ 	iommu_domain_free(domain->domain);
+ 	vfio_iommu_iova_free(&iova_copy);
+ 	vfio_iommu_resv_free(&group_resv_regions);
++	iommu_group_for_each_dev(iommu_group, &iopf_enabled_dev_cnt,
++				 dev_disable_iopf);
+ out_free:
+ 	kfree(domain);
+ 	kfree(group);
+@@ -2643,6 +2713,10 @@ static void vfio_iommu_type1_detach_group(void *iommu_data,
+ 		if (!group)
+ 			continue;
+ 
++		if (iommu->iopf_enabled)
++			iommu_group_for_each_dev(iommu_group, NULL,
++						 dev_disable_iopf);
++
+ 		vfio_iommu_detach_group(domain, group);
+ 		update_dirty_scope = !group->pinned_page_dirty_scope;
+ 		list_del(&group->next);
+@@ -2761,6 +2835,11 @@ static void vfio_iommu_type1_release(void *iommu_data)
+ 
+ 	vfio_iommu_iova_free(&iommu->iova_list);
+ 
++	if (iommu->iopf_enabled) {
++		mmu_notifier_unregister(&iommu->mn, iommu->mm);
++		mmdrop(iommu->mm);
++	}
++
+ 	kfree(iommu);
+ }
+ 
+@@ -3164,6 +3243,58 @@ static const struct mmu_notifier_ops vfio_iommu_type1_mn_ops = {
+ 	.invalidate_range	= mn_invalidate_range,
+ };
+ 
++static int vfio_iommu_type1_enable_iopf(struct vfio_iommu *iommu)
++{
++	struct vfio_domain *d;
++	struct vfio_group *g;
++	int enabled_dev_cnt = 0;
++	int ret;
++
++	if (!current->mm)
++		return -ENODEV;
++
++	mutex_lock(&iommu->lock);
++
++	mmgrab(current->mm);
++	iommu->mm = current->mm;
++	iommu->mn.ops = &vfio_iommu_type1_mn_ops;
++	ret = mmu_notifier_register(&iommu->mn, current->mm);
++	if (ret)
++		goto out_drop;
++
++	list_for_each_entry(d, &iommu->domain_list, next) {
++		list_for_each_entry(g, &d->group_list, next) {
++			ret = iommu_group_for_each_dev(g->iommu_group,
++					&enabled_dev_cnt, dev_enable_iopf);
++			if (ret)
++				goto out_unwind;
++		}
++	}
++
++	iommu->iopf_enabled = true;
++	goto out_unlock;
++
++out_unwind:
++	list_for_each_entry(d, &iommu->domain_list, next) {
++		list_for_each_entry(g, &d->group_list, next) {
++			if (iommu_group_for_each_dev(g->iommu_group,
++					&enabled_dev_cnt, dev_disable_iopf))
++				goto out_unregister;
++		}
++	}
++
++out_unregister:
++	mmu_notifier_unregister(&iommu->mn, current->mm);
++
++out_drop:
++	iommu->mm = NULL;
++	mmdrop(current->mm);
++
++out_unlock:
++	mutex_unlock(&iommu->lock);
++	return ret;
++}
++
+ static long vfio_iommu_type1_ioctl(void *iommu_data,
+ 				   unsigned int cmd, unsigned long arg)
+ {
+@@ -3180,6 +3311,8 @@ static long vfio_iommu_type1_ioctl(void *iommu_data,
+ 		return vfio_iommu_type1_unmap_dma(iommu, arg);
+ 	case VFIO_IOMMU_DIRTY_PAGES:
+ 		return vfio_iommu_type1_dirty_pages(iommu, arg);
++	case VFIO_IOMMU_ENABLE_IOPF:
++		return vfio_iommu_type1_enable_iopf(iommu);
+ 	default:
+ 		return -ENOTTY;
+ 	}
+diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
+index 8ce36c1d53ca..5497036bebdc 100644
+--- a/include/uapi/linux/vfio.h
++++ b/include/uapi/linux/vfio.h
+@@ -1208,6 +1208,12 @@ struct vfio_iommu_type1_dirty_bitmap_get {
+ 
+ #define VFIO_IOMMU_DIRTY_PAGES             _IO(VFIO_TYPE, VFIO_BASE + 17)
+ 
++/*
++ * IOCTL to enable IOPF for the container.
++ * Called right after VFIO_SET_IOMMU.
++ */
++#define VFIO_IOMMU_ENABLE_IOPF             _IO(VFIO_TYPE, VFIO_BASE + 18)
++
+ /* -------- Additional API for SPAPR TCE (Server POWERPC) IOMMU -------- */
+ 
  /*
-  * Sub-module helpers
-  */
 -- 
 2.19.1
 
