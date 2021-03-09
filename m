@@ -2,90 +2,88 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1F106331CDC
-	for <lists+kvm@lfdr.de>; Tue,  9 Mar 2021 03:19:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3CB79331CE1
+	for <lists+kvm@lfdr.de>; Tue,  9 Mar 2021 03:20:18 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230526AbhCICSl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 8 Mar 2021 21:18:41 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:36317 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230214AbhCICSZ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 8 Mar 2021 21:18:25 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1615256305;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=rcShwLoJWnpEZpwYw3XT7sfmNyFh50D0tcu/Ys15ACw=;
-        b=Xl/nDcYcvmw2geBsxOImbRY8FeHfBxdFEF4vjSRXKAiZqOlhwSBj7JizoXZ8MsYk8WUdFE
-        CCCuXCBNrMeXEF5yfG2IsrS6VqKxJnxytKtCotXn/PgoJaJwYPWa9ljm45dTleCkJOZ0JN
-        vo60GOQzzunNTSzW8ffuBRpkjxABVbs=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-417-Yjo8hpWsNR6Gv8zljaCtoQ-1; Mon, 08 Mar 2021 21:18:20 -0500
-X-MC-Unique: Yjo8hpWsNR6Gv8zljaCtoQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B0E2C80432D;
-        Tue,  9 Mar 2021 02:18:18 +0000 (UTC)
-Received: from wangxiaodeMacBook-Air.local (ovpn-13-202.pek2.redhat.com [10.72.13.202])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 61C0D5C27C;
-        Tue,  9 Mar 2021 02:18:12 +0000 (UTC)
-Subject: Re: [PATCH V2 1/4] vDPA/ifcvf: get_vendor_id returns a device
- specific vendor id
-To:     Zhu Lingshan <lingshan.zhu@intel.com>, mst@redhat.com,
-        lulu@redhat.com
-Cc:     virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20210308083525.382514-1-lingshan.zhu@intel.com>
- <20210308083525.382514-2-lingshan.zhu@intel.com>
-From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <2a7b9cba-620f-a447-7de6-0b9dc74817ba@redhat.com>
-Date:   Tue, 9 Mar 2021 10:18:11 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.16; rv:78.0)
- Gecko/20100101 Thunderbird/78.8.0
-MIME-Version: 1.0
-In-Reply-To: <20210308083525.382514-2-lingshan.zhu@intel.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-GB
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+        id S230397AbhCICTr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 8 Mar 2021 21:19:47 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41948 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230512AbhCICTW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 8 Mar 2021 21:19:22 -0500
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E2101C06174A
+        for <kvm@vger.kernel.org>; Mon,  8 Mar 2021 18:19:21 -0800 (PST)
+Received: by mail-yb1-xb4a.google.com with SMTP id 194so15239276ybl.5
+        for <kvm@vger.kernel.org>; Mon, 08 Mar 2021 18:19:21 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=sender:reply-to:date:message-id:mime-version:subject:from:to:cc;
+        bh=LHP3MFoVQ43/Gdu+SGGU2Is+rQZvEboJW+kRfZtIQZg=;
+        b=v7urjtWEjHOqyhANz7nFw0kaPm9raBppEFnZDYvx7qFQqJzsK8pdL4gt4ZnZw/bHT9
+         Cp9xkaguoC80WQZYY9gWD0/uB8xuBN8vwlY60QiSyE8LI20slrRP/qbxo3PuwcVWciAY
+         ng31rfT81AbR94iBpRSLzXwObL/sfr6cIMDSLrlukpe+3PG7Oko6cb3o5+OgccuAdctd
+         Fm0iWBv2F/fAsngBn+anutmUzokyADBbBbo2vU9nYH6MpnMOPRnx1QNJy4VUVmWwHmHe
+         q8qsUi1C5D/6pAqx+yZIa1pNcyo4oHyqbNeySKRCDdab+bM8r+ZLhAsTrOPmH6DBSM3B
+         hx1g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:sender:reply-to:date:message-id:mime-version
+         :subject:from:to:cc;
+        bh=LHP3MFoVQ43/Gdu+SGGU2Is+rQZvEboJW+kRfZtIQZg=;
+        b=DUBk1eKD/pPNneVqRab7WuerE2F6Tpnb2XJsTeddQfKyLLI3xi/zyAEPJ5OmIkL/Uz
+         lEzWUHcoJoYdJgQdeT79/C5e8iZ20/oqVovjo1hO1/NieBaZHBN51r6dA6wJim1OaWHj
+         6fJisopJeAj30r655s25a/p1t4zc31CRcLv1PCTwGqHWiLC94tDGI1FYn6/Rs8mOnu9r
+         kUSgBnVQkOL8SZZ1R7Fk+7KF92MjKxCAXF79yrftOiZoNMJUDLL0TgPMKrK0iLMeP9dy
+         DUEMs6qPnEcQimfWgGtxNCT9JN+R/9lJSsq6x94No0xAQ+AV9ZSksomr2ltY0SOO74d+
+         tI8Q==
+X-Gm-Message-State: AOAM532aQ0vDpNW2rYfItdnhcqPt+EJVKaiD9Ud2Qr27BRGHEZna7sCY
+        1MCkzJiW8INDGyzhkMqeFd/JzUZOTlk=
+X-Google-Smtp-Source: ABdhPJyq27oip7hDkYlMjMkztlsUexbcEDv3n7XSxHWiJPIx5Qg3sDA6iE+hYLdwyQZ/M+0JF+uyBqQmSSY=
+Sender: "seanjc via sendgmr" <seanjc@seanjc798194.pdx.corp.google.com>
+X-Received: from seanjc798194.pdx.corp.google.com ([2620:15c:f:10:8:847a:d8b5:e2cc])
+ (user=seanjc job=sendgmr) by 2002:a25:3bc6:: with SMTP id i189mr19775166yba.31.1615256361119;
+ Mon, 08 Mar 2021 18:19:21 -0800 (PST)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date:   Mon,  8 Mar 2021 18:18:58 -0800
+Message-Id: <20210309021900.1001843-1-seanjc@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.30.1.766.gb4fecdf3b7-goog
+Subject: [PATCH 0/2] Fixups to hide our goofs
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Tom Lendacky <thomas.lendacky@amd.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Please squash away our mistakes and hide them from the world. :-)
 
-On 2021/3/8 4:35 下午, Zhu Lingshan wrote:
-> In this commit, ifcvf_get_vendor_id() will return
-> a device specific vendor id of the probed pci device
-> than a hard code.
->
-> Signed-off-by: Zhu Lingshan <lingshan.zhu@intel.com>
+Stuffed the MMIO generation to start at 0x3ffffffffffffff0 (bits 61:4 set)
+and role over into bit 62.  Bit 63 is used for the "update in-progress" so
+I'm fairly confident there are no more collisions with other SPTE bits.
 
+For the PCID thing, note that there are two patches with the same changelog.
+Not sure what's intended there...
 
-Acked-by: Jason Wang <jasowang@redhat.com>
+Also, I forgot about adding the PAE root helpers until I tried testing and
+PAE didn't work with SME.  I'll get those to you tomorrow.
 
+Sean Christopherson (2):
+  KVM: x86: Fixup "Get active PCID only when writing a CR3 value"
+  KVM: x86/mmu: Exclude the MMU_PRESENT bit from MMIO SPTE's generation
 
-> ---
->   drivers/vdpa/ifcvf/ifcvf_main.c | 5 ++++-
->   1 file changed, 4 insertions(+), 1 deletion(-)
->
-> diff --git a/drivers/vdpa/ifcvf/ifcvf_main.c b/drivers/vdpa/ifcvf/ifcvf_main.c
-> index fa1af301cf55..e501ee07de17 100644
-> --- a/drivers/vdpa/ifcvf/ifcvf_main.c
-> +++ b/drivers/vdpa/ifcvf/ifcvf_main.c
-> @@ -324,7 +324,10 @@ static u32 ifcvf_vdpa_get_device_id(struct vdpa_device *vdpa_dev)
->   
->   static u32 ifcvf_vdpa_get_vendor_id(struct vdpa_device *vdpa_dev)
->   {
-> -	return IFCVF_SUBSYS_VENDOR_ID;
-> +	struct ifcvf_adapter *adapter = vdpa_to_adapter(vdpa_dev);
-> +	struct pci_dev *pdev = adapter->pdev;
-> +
-> +	return pdev->subsystem_vendor;
->   }
->   
->   static u32 ifcvf_vdpa_get_vq_align(struct vdpa_device *vdpa_dev)
+ arch/x86/kvm/mmu/spte.h | 12 +++++++-----
+ arch/x86/kvm/svm/svm.c  |  9 +++++++--
+ 2 files changed, 14 insertions(+), 7 deletions(-)
+
+-- 
+2.30.1.766.gb4fecdf3b7-goog
 
