@@ -2,100 +2,160 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0CD20332CD6
-	for <lists+kvm@lfdr.de>; Tue,  9 Mar 2021 18:08:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B5C09332CD4
+	for <lists+kvm@lfdr.de>; Tue,  9 Mar 2021 18:07:39 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231397AbhCIRHj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 9 Mar 2021 12:07:39 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36618 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231491AbhCIRH0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 9 Mar 2021 12:07:26 -0500
-Received: from mail-qt1-x82b.google.com (mail-qt1-x82b.google.com [IPv6:2607:f8b0:4864:20::82b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 98499C06175F
-        for <kvm@vger.kernel.org>; Tue,  9 Mar 2021 09:07:26 -0800 (PST)
-Received: by mail-qt1-x82b.google.com with SMTP id h26so6402218qtm.5
-        for <kvm@vger.kernel.org>; Tue, 09 Mar 2021 09:07:26 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=56FbvxYSyCO6wMKJdNcCg3DsZ58M3AgopzwpcrCwJ8M=;
-        b=p9MFtEixfJK+C3OPIvyxsnbCCdPeJyP3yuIayQyx4bcy51/7AwiQHD3E2kH2inD3Sl
-         dZDcwuFfelPyoPNTWto0FOXnVbZ4TquFs/P+y92UFfHoOXPVcFZcZFjDIoe77pTJT4OO
-         SEt6H9KErkFAg7BGl7kYWMyC63q1CeR4dWZ4lyGhmbyb5fbOWiS5m5BxZb2huYOL+KuE
-         FQjbUmGWAT1ypB8dukJilItUFmrV6gSu1Ryzz0clWm1Dpcqud3jCYwx0KM7HOpP9Ps3L
-         a/I7xOsBGQqH8E/TXf1gdaLWPw2obeK/IAEpRUYkcrokwD4iBCSC6A3jvQ2t83xq8EGD
-         MqMA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=56FbvxYSyCO6wMKJdNcCg3DsZ58M3AgopzwpcrCwJ8M=;
-        b=aeoY/wnBgavdbX/4mBni+bCI3717aUPHsFKQlwhG5VBgPCd9h6Et0MwD3GwuhYIk24
-         6TF4B7Cw7bn/3t3kRyw6kXoGK25b0BcANWmxe6p6rlXCEducT8QAjsyguZNr8rT7ZY86
-         JdnrQb5AuGaHRUc7B8pcPXEF6XFM+K9FKrPAlXZ+bzpG441FdkfqtkkEN2qrNsL2+56Y
-         bGNtplvL5CGakW3APnM17XTcjOnbLjxuF9naP1Pi1QW3MjhpCGmscq/3So9yL9y/im3x
-         UPlTk2fJ0BlI2ES4wSM3Eq6DbcR8a48uzURHvfGquFWgjA5UPoMvL5Zv+1i+h2O6j1oz
-         fXhQ==
-X-Gm-Message-State: AOAM532DEyn1XrmCaebyj85f6CV2iJhECtQ0R4imlzj7a01Qxrj+aoId
-        Z24tgxTJ4aRgixSVfhzYkk1hIWy+3KpByp5oDp78ig==
-X-Google-Smtp-Source: ABdhPJxZX3UdvVqs1e2abPQvsIZT5YVWWWzFsq8aDd2lDWVh0cD2NXhUm8HucMz85rZmRKEA3T7/bWLQMWcO6Xm0t7Q=
-X-Received: by 2002:ac8:7318:: with SMTP id x24mr7500268qto.67.1615309645573;
- Tue, 09 Mar 2021 09:07:25 -0800 (PST)
+        id S231256AbhCIRHI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 9 Mar 2021 12:07:08 -0500
+Received: from foss.arm.com ([217.140.110.172]:56700 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S231308AbhCIRHE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 9 Mar 2021 12:07:04 -0500
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 386E41FB;
+        Tue,  9 Mar 2021 09:07:04 -0800 (PST)
+Received: from [192.168.0.110] (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B3A0C3F73C;
+        Tue,  9 Mar 2021 09:07:02 -0800 (PST)
+Subject: Re: [PATCH] KVM: arm64: Ensure I-cache isolation between vcpus of a
+ same VM
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     Catalin Marinas <catalin.marinas@arm.com>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, kernel-team@android.com,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>
+References: <20210303164505.68492-1-maz@kernel.org>
+ <20210305190708.GL23855@arm.com> <877dmksgaw.wl-maz@kernel.org>
+ <20210306141546.GB2932@arm.com>
+ <db428d01-594c-edc3-8d4f-75061d22c3ef@arm.com> <8735x5s99g.wl-maz@kernel.org>
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+Message-ID: <609c2574-a130-c0db-d9ed-bfd1a2f5689f@arm.com>
+Date:   Tue, 9 Mar 2021 17:07:18 +0000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.8.0
 MIME-Version: 1.0
-References: <20210305223331.4173565-1-seanjc@google.com> <053d0a22-394d-90d0-8d3b-3cd37ca3f378@intel.com>
- <YEXmILSHDNDuMk/N@hirez.programming.kicks-ass.net> <YEaLzKWd0wAmdqvs@google.com>
- <YEcn6bGYxdgrp0Ik@hirez.programming.kicks-ass.net> <YEc1mFkaILfF37At@hirez.programming.kicks-ass.net>
- <YEeqvC4QmJcj+pkC@google.com>
-In-Reply-To: <YEeqvC4QmJcj+pkC@google.com>
-From:   Dmitry Vyukov <dvyukov@google.com>
-Date:   Tue, 9 Mar 2021 18:07:14 +0100
-Message-ID: <CACT4Y+b6rDO0PiHrhYHMynXmW+f_s5AaJLDo39rGJX69ZWSaMQ@mail.gmail.com>
-Subject: Re: [PATCH] x86/perf: Fix guest_get_msrs static call if there is no PMU
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Peter Zijlstra <peterz@infradead.org>,
-        "Xu, Like" <like.xu@intel.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-        Jiri Olsa <jolsa@redhat.com>,
-        Namhyung Kim <namhyung@kernel.org>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Like Xu <like.xu@linux.intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        KVM list <kvm@vger.kernel.org>,
-        "Thomas Gleixner
-        (x86/pti/timer/core/smp/irq/perf/efi/locking/ras/objtool)
-        (x86@kernel.org)" <tglx@linutronix.de>,
-        Borislav Petkov <bp@alien8.de>,
-        Arnaldo Carvalho de Melo <acme@kernel.org>,
-        Ingo Molnar <mingo@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <8735x5s99g.wl-maz@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Mar 9, 2021 at 6:05 PM Sean Christopherson <seanjc@google.com> wrote:
->
-> On Tue, Mar 09, 2021, Peter Zijlstra wrote:
-> > On Tue, Mar 09, 2021 at 08:46:49AM +0100, Peter Zijlstra wrote:
-> > > On Mon, Mar 08, 2021 at 12:40:44PM -0800, Sean Christopherson wrote:
-> > > > On Mon, Mar 08, 2021, Peter Zijlstra wrote:
-> > >
-> > > > > Given the one user in atomic_switch_perf_msrs() that should work because
-> > > > > it doesn't seem to care about nr_msrs when !msrs.
-> > > >
-> > > > Uh, that commit quite cleary says:
-> > >
-> > > D0h! I got static_call_cond() and __static_call_return0 mixed up.
-> > > Anyway, let me see if I can make something work here.
-> >
-> > Does this work? I can never seem to start a VM, and if I do accidentally
-> > manage, then it never contains the things I need :/
->
-> Yep, once I found the dependencies in tip/sched/core (thank tip-bot!).  I'll
-> send v2 your way.
+Hi Marc,
 
-If you are resending, please also add the syzbot Reported-by tag. Thanks.
+On 3/8/21 8:03 PM, Marc Zyngier wrote:
+> Hi Alex,
+>
+> On Mon, 08 Mar 2021 16:53:09 +0000,
+> Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+>> Hello,
+>>
+>> It's not clear to me why this patch is needed. If one VCPU in the VM is generating
+>> code, is it not the software running in the VM responsible for keeping track of
+>> the MMU state of the other VCPUs and making sure the new code is executed
+>> correctly? Why should KVM get involved?
+>>
+>> I don't see how this is different than running on bare metal (no
+>> hypervisor), and one CPU with the MMU on generates code that another
+>> CPU with the MMU off must execute.
+> The difference is that so far, we have always considered i-caches to
+> be private to each CPU. With a hypervisor that allows migration of
+> vcpus from one physical CPU to another, the i-cache isn't private
+> anymore from the perspective of the vcpus.
+
+I think I understand what the problem is. VCPU X running on CPU A with MMU off
+fetches instructions from PoC and allocates them into the icache. VCPU Y running
+on CPU B generates code and does dcache clean to PoU + icache invalidate, gets
+scheduled on CPU A and executes the stale instructions fetched by VCPU X from PoC.
+
+>
+>> Some comments below.
+>>
+>> On 3/6/21 2:15 PM, Catalin Marinas wrote:
+>>> On Sat, Mar 06, 2021 at 10:54:47AM +0000, Marc Zyngier wrote:
+>>>> On Fri, 05 Mar 2021 19:07:09 +0000,
+>>>> Catalin Marinas <catalin.marinas@arm.com> wrote:
+>>>>> On Wed, Mar 03, 2021 at 04:45:05PM +0000, Marc Zyngier wrote:
+>>>>>> It recently became apparent that the ARMv8 architecture has interesting
+>>>>>> rules regarding attributes being used when fetching instructions
+>>>>>> if the MMU is off at Stage-1.
+>>>>>>
+>>>>>> In this situation, the CPU is allowed to fetch from the PoC and
+>>>>>> allocate into the I-cache (unless the memory is mapped with
+>>>>>> the XN attribute at Stage-2).
+>>>>> Digging through the ARM ARM is hard. Do we have this behaviour with FWB
+>>>>> as well?
+>>>> The ARM ARM doesn't seem to mention FWB at all when it comes to
+>>>> instruction fetch, which is sort of expected as it only covers the
+>>>> D-side. I *think* we could sidestep this when CTR_EL0.DIC is set
+>>>> though, as the I-side would then snoop the D-side.
+>>> Not sure this helps. CTR_EL0.DIC refers to the need for maintenance to
+>>> PoU while the SCTLR_EL1.M == 0 causes the I-cache to fetch from PoC. I
+>>> don't think I-cache snooping the D-cache would happen to the PoU when
+>>> the S1 MMU is off.
+>> FEAT_FWB requires that CLIDR_EL1.{LoUIS, LoUU} = {0, 0} which means
+>> that no dcache clean is required for instruction to data coherence
+>> (page D13-3086). I interpret that as saying that with FEAT_FWB,
+>> CTR_EL0.IDC is effectively 1, which means that dcache clean is not
+>> required for instruction generation, and icache invalidation is
+>> required only if CTR_EL0.DIC = 0 (according to B2-158).
+>>
+>>> My reading of D4.4.4 is that when SCTLR_EL1.M == 0 both I and D accesses
+>>> are Normal Non-cacheable with a note in D4.4.6 that Non-cacheable
+>>> accesses may be held in the I-cache.
+>> Nitpicking, but SCTLR_EL1.M == 0 and SCTLR_EL1.I == 1 means that
+>> instruction fetches are to Normal Cacheable, Inner and Outer
+>> Read-Allocate memory (ARM DDI 0487G.a, pages D5-2709 and indirectly
+>> at D13-3586).
+> I think that's the allocation in unified caches, and not necessarily
+> the i-cache, given that it also mention things such as "Inner
+> Write-Through", which makes no sense for the i-cache.
+>> Like you've pointed out, as mentioned in D4.4.6, it is always
+>> possible that instruction fetches are held in the instruction cache,
+>> regardless of the state of the SCTLR_EL1.M bit.
+> Exactly, and that's what breaks things.
+>
+>>> The FWB rules on combining S1 and S2 says that Normal Non-cacheable at
+>>> S1 is "upgraded" to cacheable. This should happen irrespective of
+>>> whether the S1 MMU is on or off and should apply to both I and D
+>>> accesses (since it does not explicitly says). So I think we could skip
+>>> this IC IALLU when FWB is present.
+>>>
+>>> The same logic should apply when the VMM copies the VM text. With FWB,
+>>> we probably only need D-cache maintenance to PoU and only if
+>>> CTR_EL0.IDC==0. I haven't checked what the code currently does.
+>> When FEAT_FWB, CTR_EL0.IDC is effectively 1 (see above), so we don't
+>> need a dcache clean in this case.
+> But that isn't what concerns me. FWB is exclusively documented in
+> terms of d-cache, and doesn't describe how that affects the
+> instruction fetch (which is why I'm reluctant to attribute any effect
+> to it).
+
+I tend to agree with this. FEAT_S2FWB is described in terms of resultant memory
+type, cacheability attribute and cacheability hints, which in the architecture
+don't affect the need to do instruction cache invalidation or data cache clean
+when generating instructions.
+
+There's also this part which is specifically targeted at instruction generation
+(page D5-2761):
+
+"When FEAT_S2FWB is implemented, the architecture requires that CLIDR_EL1.{LOUU,
+LOIUS} are zero so that no levels of data cache need to be cleaned in order to
+manage coherency with instruction fetches."
+
+There's no mention of not needing to do instruction invalidation. I think the
+invalidation is still necessary with FWB when CTR_EL0.DIC == 0b0.
+
+Thanks,
+
+Alex
+
+> Thanks,
+>
+> 	M.
+>
