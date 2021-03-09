@@ -2,136 +2,226 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 544273325AD
-	for <lists+kvm@lfdr.de>; Tue,  9 Mar 2021 13:47:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 39A023325CC
+	for <lists+kvm@lfdr.de>; Tue,  9 Mar 2021 13:52:10 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230394AbhCIMqo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 9 Mar 2021 07:46:44 -0500
-Received: from mail-eopbgr770041.outbound.protection.outlook.com ([40.107.77.41]:3390
-        "EHLO NAM02-SN1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S229544AbhCIMqP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 9 Mar 2021 07:46:15 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=nzZ0PMx1lIXmNUkiKYymnyJoL8c48YAK0akPFHJQQdqROeK3bGQHtgyZpP3TVKjDzsZfoh5Eo2bRkmMKRkKkRotshDUpSdN+cVbrRoMoYTYGCafZ2vdOfwqal2GRjcxg/kDEDM/NhqWgKYDoQNPGEoZvqqcSt8tzCs6OmwalXf/KdHJ/+V84/SpA9V44LQsrdZqWzGSK3qtbGzvNgtu0UrNgkXqgPN1+yiwHUYUziGA7T7pNQhTIOIId06CcpZoiw0jKRUOovmioTQlvmRDjqsmSzXc53kDktgQBMPrsB0zoLUfxQq6dsLlvYChECfsfGeIiHFwC2MhqXkIsqraUTw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=sYpH1ne6ihC0NC7OJaGf1xZoRSJWxUnMgQ/tMmuIMks=;
- b=l8GDG2ybPy6uHYJ/UHxo+URfGfH65zEFUOj58LdgFUh3wYyphR5ez6Lx1UiONJ8lGtvRAauzBVl8FAoW4upU//UpwKD90MU9EdhRW4om9NzHJKqb/PYSgbnKfdTEaAmw2IEwqqgPLnkEmVVL2C9Jgfr0Jsfq/WHtgZ12aSmOTtzeip3HJ6QAofTd16uQyUTCjKjpvw/TAwov+A71ZGaS+mlkPDvhjSg5TXRPsx8c7kL3GKCGGH0s+MgAUS/0FN1xs884pcxoubB0cfLAc9RC6J8QwT2hEjkc6NFNLZuZdKWNrl1wbmcdEP6aCqPWBBnTEuHnX++D7z4BRBaAhfauxg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=sYpH1ne6ihC0NC7OJaGf1xZoRSJWxUnMgQ/tMmuIMks=;
- b=jxhMwG1GucZ6QY8vwkr5mndEqZVxBeElTUbsj1zgtrc4gZM9q1kUiUdonXuMhByWd2jgyym017uihM1osx42KjAPTONqW831xfdvrnhywsbv9GoQTuJVMX1DJjQSqH5lrXdbfQPwLtrMGx19FZGw+WO3OR5kRVlc6wCqGWrUNP42iknBGfZjdEjnw5FMhL4mGFFtREAgYkZBx9w8YaC9qO461ZXMJ/RqhGU9RAEbm3T/P0Xmp1zvrwAxzczFRj897bwh5kVyH2+havU0mDVKgKA/n1o0N82M0q/hHrOpMOUqEEUmfQmF0cprO+xUxal9ATZ73nFCyln1zveHu0baBg==
-Authentication-Results: hisilicon.com; dkim=none (message not signed)
- header.d=none;hisilicon.com; dmarc=none action=none header.from=nvidia.com;
-Received: from DM6PR12MB3834.namprd12.prod.outlook.com (2603:10b6:5:14a::12)
- by DM6PR12MB4012.namprd12.prod.outlook.com (2603:10b6:5:1cc::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3890.28; Tue, 9 Mar
- 2021 12:46:11 +0000
-Received: from DM6PR12MB3834.namprd12.prod.outlook.com
- ([fe80::1c62:7fa3:617b:ab87]) by DM6PR12MB3834.namprd12.prod.outlook.com
- ([fe80::1c62:7fa3:617b:ab87%6]) with mapi id 15.20.3912.027; Tue, 9 Mar 2021
- 12:46:11 +0000
-Date:   Tue, 9 Mar 2021 08:46:09 -0400
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     "Zengtao (B)" <prime.zeng@hisilicon.com>
-Cc:     Peter Xu <peterx@redhat.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Kevin Tian <kevin.tian@intel.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-        Michel Lespinasse <walken@google.com>,
-        Jann Horn <jannh@google.com>,
-        Max Gurtovoy <mgurtovoy@nvidia.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Linuxarm <linuxarm@huawei.com>
-Subject: Re: =?utf-8?B?562U5aSN?= =?utf-8?Q?=3A?= [PATCH] vfio/pci: make the
- vfio_pci_mmap_fault reentrant
-Message-ID: <20210309124609.GG2356281@nvidia.com>
-References: <1615201890-887-1-git-send-email-prime.zeng@hisilicon.com>
- <20210308132106.49da42e2@omen.home.shazbot.org>
- <20210308225626.GN397383@xz-x1>
- <6b98461600f74f2385b9096203fa3611@hisilicon.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <6b98461600f74f2385b9096203fa3611@hisilicon.com>
-X-Originating-IP: [142.162.115.133]
-X-ClientProxiedBy: BL1PR13CA0234.namprd13.prod.outlook.com
- (2603:10b6:208:2bf::29) To DM6PR12MB3834.namprd12.prod.outlook.com
- (2603:10b6:5:14a::12)
-MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from mlx.ziepe.ca (142.162.115.133) by BL1PR13CA0234.namprd13.prod.outlook.com (2603:10b6:208:2bf::29) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3933.23 via Frontend Transport; Tue, 9 Mar 2021 12:46:11 +0000
-Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1lJbkX-00A439-8V; Tue, 09 Mar 2021 08:46:09 -0400
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: ff539f98-eefb-4a30-7474-08d8e2f9515d
-X-MS-TrafficTypeDiagnostic: DM6PR12MB4012:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <DM6PR12MB4012913D4752E987F82F8C44C2929@DM6PR12MB4012.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:3826;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: QkrlaYEtEUR0dNVgdu3IjTv9IM40FrKrOX0HTYoLDUv1WqQ+T/XqUmMFql6eoJI+WEKegFGEnLB+CStg28JS/lBQrnI4oWMcBFEAeq4v8CSEwkA6I/JC4TDm/QrKZnyINlbsPiUibMNTWW7CEXs/n/npRNks+pqNZOrokYLYffyxsWA/NjQkr3YDO+VFktCPwbZy/JuiQ41aig7ezyvJ99kMzO56oX7aiKCJX7kDgUMNZvR+I82r76tD421Vrc6txky7y0Bbjx9YLD0qlidzMM3YO9o912PSqYkkKf54RrwWEIl9l9fEXT2axjIGQFvKYHOiPMPnbSRtEe+FOkEDimp9yRwj3mkuiETgGMSWw5965QMXUm/1ZAqsXIqYjcZnVIBUAqwTeUn5icrgjGK2dq//4J01L6eawMpzTuxXPkdlEekRqaANHO1+mNkQJ9nrffNZhnkzJk0clTnPi02WzL8NEIIUgnG+8a2MYnSPOH84ifYmtfBKpZhG5m6FMCOLyL1mUceik+T6MIsdv+47sQ==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB3834.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(346002)(136003)(39860400002)(376002)(396003)(8936002)(26005)(5660300002)(2616005)(66476007)(66556008)(33656002)(426003)(316002)(4326008)(478600001)(66946007)(7416002)(2906002)(224303003)(9746002)(1076003)(54906003)(186003)(86362001)(4744005)(36756003)(83380400001)(6916009)(9786002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: =?us-ascii?Q?sQnm/gIvDX/jykutQCwQlUSx0cFQEbov1erPh1QqBqY9MMVYBpl0XXxJs/tR?=
- =?us-ascii?Q?nJkDLAG9uYckSqNEQpmRO4yOsWN+lKRDAwL60GtTrE1wuByYVFQo1n4lroBz?=
- =?us-ascii?Q?9xzIoXfEEekm1EKEjILm/c8e/4KtOt+Ry6Bml8uxcxr1BN2I8fu83JPB8gPf?=
- =?us-ascii?Q?LWefPtGdpClIZSUxkpv+9y9rlezWqDUPf0AWNdwrbzazwV+Iw7NyMpgDTRMZ?=
- =?us-ascii?Q?AFi2bcWw4KbSyYL4SWVvU1JDaZK2PvI7syrVnyVVmmBfIjbmVAVj++6LDQ4W?=
- =?us-ascii?Q?oWUuN9WEqmlDv0R9VRxM9oj+UhDFjgn6pf00Mlfk7KlYZi2E2Ny1Hwvv94Qd?=
- =?us-ascii?Q?4x+XUA4d/jslyQm++AcS5/VSSaDpLV+zsD0sIx3WzmKztRddmEiQT0bU3nov?=
- =?us-ascii?Q?U2bl7wh43U9dNq2WJcyUgOB2ZxZSKsjcMLY7f3AjbYphSbpoMCy0gDmPYCJF?=
- =?us-ascii?Q?JVbRuc583xwe10XgYjVyTsz1sEwbpTMQjbDHOg+/T7I4ikgFcD/Aol6WvToX?=
- =?us-ascii?Q?wXe+t1/7FceHzA/KoHZG3HfW/169pmMBCH35NZg0HfUhrP1EB7kB6Yw6oQXF?=
- =?us-ascii?Q?GVfPL97yy3RC1VUXjTRQNnUrUCC5Nz+PgzpNlp95IoRjpRgBhAfNGPMgdsCd?=
- =?us-ascii?Q?1im0EKxyK80ZiWBqeMCh4PqmtSzVdI3YEDny3gEXFJeCrx5gBPwkdCx3Jvqh?=
- =?us-ascii?Q?RFLEpimm2YnC/YuSzlxsmK3sxHhPqNhpTwUsR0H0kYc7pLfSS0d4XA0lOgHm?=
- =?us-ascii?Q?/V7lGOcXSM0reGsp8W+s0t/9aTd0TDMyyuZVFFyOsSdR2w9IFeXBVc2Eprmy?=
- =?us-ascii?Q?tlxZ0OCZ36eBdfbI99ZMHgje16ke5H3BtaYedTp52MWsambHi/bzeZJbUNPU?=
- =?us-ascii?Q?JCALMwDWaLhp6gp32yJQ9yjnKx2x1BMCKwEwMHFw3T17qGZipjrDUZK6f2Jw?=
- =?us-ascii?Q?fntPTT4fr4yuPbrEbPW1fNPu0mqqr4BQb+BDoIzf1ixIMSSyoj/y7dtJ+PNR?=
- =?us-ascii?Q?DtSyMmMnOI9rHk4+FEHXdKN+5ybXRYVhSAcWP4UROxZwN5Et5YcJ8fxbnJ4s?=
- =?us-ascii?Q?eTsp6YJm5+SvUvZJPx5X7c8zGfh9zaiaD6fw9CM6BAW5CtCumqWNFlvStoEz?=
- =?us-ascii?Q?rd2uLQaFwgZCpwO9wIWoL6g7Kg8zfQNbl4EXx+m1JIppCtRTtU5UnX8RwJC+?=
- =?us-ascii?Q?ISl+Xz42k3lKtsOCy7UOfFvvMahpqnhVOGBcgXJ3eTnjLxblMraIoVEvKr+Y?=
- =?us-ascii?Q?5SKmEKRPNgZ6GuxsUjS14JzxF/FqfE6HwLn0qusYWtq/LVamlpGvy0RIMgy6?=
- =?us-ascii?Q?BNFhI0fLDDH8UknDltoWzUIX?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: ff539f98-eefb-4a30-7474-08d8e2f9515d
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB3834.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Mar 2021 12:46:11.5866
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: uofv1Ow3A7wx093EWS/nJWnzTguLqDnj6SiS3DFd8wxUwXIDhcmOitBBvrFtyUMf
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4012
+        id S231180AbhCIMvj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 9 Mar 2021 07:51:39 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:2674 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S231264AbhCIMvY (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 9 Mar 2021 07:51:24 -0500
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 129CXcBV031526
+        for <kvm@vger.kernel.org>; Tue, 9 Mar 2021 07:51:24 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id; s=pp1;
+ bh=hWzhu368mYkRmLRSSxtlvSUwq74LObVkUqkHJlmUkFg=;
+ b=RBiMeUpDPgkt1coEx7uGJ4+dwdna2YlO9A/uLDbNX8wpwLovmXLw2LYJSrmCoMFr85j8
+ FXiYkmxLxWCe692Ex9iwirsU06IML2iEuy/P2uWAi1xVAMExsuqpyts5ATGRzqjwrnDj
+ DKkJIGUa0+f4KWNbhnJqO/wEsTsdLWgjmkOIo73MfoHYSK/kV8qANzp7+Aa8ro+NzIE0
+ 2G+s4jW88aaRMMVJvnKminLNTZ9SrkC41HkX2r+zNGOxwXVm9v9ehqr1ADLdLG17sgHG
+ fFzH1asR2JQi59wMB5CalNndJi/dTB0+yJ1+V0h5CmFtS+rmsP6PmDjR9C3Pc8S8z22o PA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 375whhgsw7-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Tue, 09 Mar 2021 07:51:24 -0500
+Received: from m0098413.ppops.net (m0098413.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 129CYNRP034449
+        for <kvm@vger.kernel.org>; Tue, 9 Mar 2021 07:51:23 -0500
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 375whhgsun-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 09 Mar 2021 07:51:23 -0500
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+        by ppma06ams.nl.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 129CTZAI008604;
+        Tue, 9 Mar 2021 12:51:21 GMT
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
+        by ppma06ams.nl.ibm.com with ESMTP id 3768urr0ya-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 09 Mar 2021 12:51:21 +0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 129CpIpE42926346
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 9 Mar 2021 12:51:19 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id D25EE52050;
+        Tue,  9 Mar 2021 12:51:18 +0000 (GMT)
+Received: from oc3016276355.ibm.com (unknown [9.145.156.215])
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 8DABE52054;
+        Tue,  9 Mar 2021 12:51:18 +0000 (GMT)
+From:   Pierre Morel <pmorel@linux.ibm.com>
+To:     kvm@vger.kernel.org
+Cc:     frankja@linux.ibm.com, david@redhat.com, thuth@redhat.com,
+        cohuck@redhat.com, imbrenda@linux.ibm.com
+Subject: [kvm-unit-tests PATCH v5 0/6] CSS Mesurement Block
+Date:   Tue,  9 Mar 2021 13:51:11 +0100
+Message-Id: <1615294277-7332-1-git-send-email-pmorel@linux.ibm.com>
+X-Mailer: git-send-email 1.8.3.1
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.761
+ definitions=2021-03-09_11:2021-03-08,2021-03-09 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 bulkscore=0
+ phishscore=0 mlxlogscore=999 spamscore=0 lowpriorityscore=0 adultscore=0
+ clxscore=1015 priorityscore=1501 impostorscore=0 mlxscore=0 malwarescore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
+ definitions=main-2103090062
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Mar 09, 2021 at 03:49:09AM +0000, Zengtao (B) wrote:
-> Hi guys:
-> 
-> Thanks for the helpful comments, after rethinking the issue, I have proposed
->  the following change: 
-> 1. follow_pte instead of follow_pfn.
+We tests the update of the Mesurement Block (MB) format 0
+and format 1 using a serie of senseid requests.
 
-Still no on follow_pfn, you don't need it once you use vmf_insert_pfn
+*Warning*: One of the tests for format-1 will unexpectedly fail for QEMU elf
+unless the QEMU patch "css: SCHIB measurement block origin must be aligned"
+is applied.
+With Protected Virtualization, the PGM is correctly recognized.
 
-> 2. vmf_insert_pfn loops instead of io_remap_pfn_range
-> 3. proper undos when some call fails.
-> 4. keep the bigger lock range to avoid unessary pte install. 
+The MB format 1 is only provided if the Extended mesurement Block
+feature is available.
 
-Why do we need locks at all here?
+This feature is exposed by the CSS characteristics general features
+stored by the Store Channel Subsystem Characteristics CHSC command,
+consequently, we implement the CHSC instruction call and the SCSC CHSC
+command.
 
-Jason
+In order to ease the writing of new tests using:
+- interrupt
+- enablement of a subchannel
+- multiple I/O on a subchannel
+
+We do the following simplifications:
+- we create a CSS initialization routine
+- we register the I/O interrupt handler on CSS initialization
+- we do not enable or disable a subchannel in the senseid test,
+  assuming this test is done after the enable test, this allows
+  to create traffic using the SSCH used by senseid.
+- failures not part of the feature under test will stop the tests.
+- we add a css_enabled() function to test if a subchannel is enabled.
+
+*note*:
+    I rearranged the use of the senseid for the tests, by not modifying
+    the existing test and having a dedicated senseid() function for
+    the purpose of the tests.
+    I think that it is in the rigght way so I kept the RB and ACK on
+    the simplification, there are less changes, if it is wrong from me
+    I suppose I will see this in the comments.
+    Since the changed are moved inside the fmt0 test which is not approved
+    for now I hope it is OK.
+
+Regards,
+Pierre
+
+Pierre Morel (6):
+  s390x: css: Store CSS Characteristics
+  s390x: css: simplifications of the tests
+  s390x: css: extending the subchannel modifying functions
+  s390x: css: implementing Set CHannel Monitor
+  s390x: css: testing measurement block format 0
+  s390x: css: testing measurement block format 1
+
+ lib/s390x/css.h     | 115 ++++++++++++++++++++-
+ lib/s390x/css_lib.c | 236 ++++++++++++++++++++++++++++++++++++++++----
+ s390x/css.c         | 216 ++++++++++++++++++++++++++++++++++++++--
+ 3 files changed, 540 insertions(+), 27 deletions(-)
+
+-- 
+2.17.1
+
+changelog:
+
+from v4:
+
+- no modification of test_senseid() in the simplification patch,
+  replaced by a new function in the fmt0 patch
+  (Pierre)
+
+- suppress report_info() in the interrupt routine.
+  (Pierre)
+
+- in chsc_scsc, rationalise the reserved area name.
+  (Janosch)
+
+- use assert for errors that should never happen
+  like register_io_int_func()
+  (Janosch)
+
+- Changed css_general_feature to css_test_general_feature
+  same for css_test_chsc_feature
+  (Janosch)
+
+- use report_abort() for hard failures in tests
+  (Janosch, Connie)
+
+
+from v3:
+
+- stay coherent and use uintX_t types in css.h
+  (Janosch)
+
+- reworking test versus library to leave the reports
+  mostly inside the tests
+  (Janosh)
+
+- Restructured some tests to use booleans instead of int
+  this simplifies testing.
+  (inspired by comments from Janosch)
+
+- rewordings and orthograph (Measurement !!!)
+  (Connie)
+
+- stop measurement at the channel too before freeing the
+  MB memory.
+  (Connie)
+
+- split out the subchannel-modifying functions into a
+  separate patch
+  (Connie)
+
+- move msch_with_wrong_fmt1_mbo() from the library
+  into the tests
+  (Janosch)
+
+- Suppress redundancy in the prefixes of format0/1 tests
+  (Janosch)
+
+from v2:
+
+- stop measurement before freeing memory
+  (Connie)
+
+- added a css_disable_mb()
+  (Connie)
+
+- several rewriting of comments and commits
+  (Connie)
+
+- modified eroneous test for MB index for fmt0
+  (Pierre)
+
+- modified eroneous test for unaligned MBO for fmt1
+  (Pierre)
+
+- several small coding style issues corrected
+  (Pierre)
+
+from v1:
+
+- check the return code of CHSC
+  (Connie)
+
+- reporting in css_init
+  (Connie)
+
+- added braces when a loop contains several statement
+  (Thomas)
+
+- changed retval to success in boolean function
+  (Thomas)
+
+- suppress goto retries
+  (thomas)
+
+- rewording and use correct return types in css_enabled
+  (Janosch)
