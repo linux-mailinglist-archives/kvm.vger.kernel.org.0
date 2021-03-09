@@ -2,127 +2,166 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D0FB9332CDE
-	for <lists+kvm@lfdr.de>; Tue,  9 Mar 2021 18:09:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C0057332CEB
+	for <lists+kvm@lfdr.de>; Tue,  9 Mar 2021 18:11:24 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231248AbhCIRJP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 9 Mar 2021 12:09:15 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:54435 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231245AbhCIRIp (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 9 Mar 2021 12:08:45 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1615309725;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=z81F3ToxTtoB+hBfmKgavO5HYdYeG5l9hwtNkEnMkNo=;
-        b=LwnktTT8h/2b9wakGTIwiGslIKkmjzyRlsva8jY+htZ/lQEPeQvDZBAZ4OG3JcE9PT2XgA
-        ZBslVxCEfr4ueHcPAGwGVqYMlxMdmqFWMJqNIrf7+7quPszNJgzseyHTj0NtU9agrAB0wJ
-        9QeoSzoAPwyFJ+AOT5bOgzphlTlO1hQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-215-5tL9JaBvPjaHmg9tGOTwUg-1; Tue, 09 Mar 2021 12:08:43 -0500
-X-MC-Unique: 5tL9JaBvPjaHmg9tGOTwUg-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C135364AD2;
-        Tue,  9 Mar 2021 17:08:41 +0000 (UTC)
-Received: from gondolin (ovpn-113-144.ams2.redhat.com [10.36.113.144])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 0BECC5C261;
-        Tue,  9 Mar 2021 17:08:36 +0000 (UTC)
-Date:   Tue, 9 Mar 2021 18:08:34 +0100
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Pierre Morel <pmorel@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, frankja@linux.ibm.com, david@redhat.com,
-        thuth@redhat.com, imbrenda@linux.ibm.com
-Subject: Re: [kvm-unit-tests PATCH v5 0/6] CSS Mesurement Block
-Message-ID: <20210309180834.14945da1.cohuck@redhat.com>
-In-Reply-To: <20210309175401.6302833e.cohuck@redhat.com>
-References: <1615294277-7332-1-git-send-email-pmorel@linux.ibm.com>
-        <20210309175401.6302833e.cohuck@redhat.com>
-Organization: Red Hat GmbH
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+        id S231161AbhCIRKw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 9 Mar 2021 12:10:52 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37372 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231273AbhCIRK1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 9 Mar 2021 12:10:27 -0500
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 382B8C06175F
+        for <kvm@vger.kernel.org>; Tue,  9 Mar 2021 09:10:27 -0800 (PST)
+Received: by mail-yb1-xb4a.google.com with SMTP id p136so17960498ybc.21
+        for <kvm@vger.kernel.org>; Tue, 09 Mar 2021 09:10:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=sender:reply-to:date:message-id:mime-version:subject:from:to:cc;
+        bh=DoRgiyLjNklM6rtntPUZIImM3ULIR10XzAP+GnWM3ms=;
+        b=jFhPiOfq/F44oTP4XYhhXZGvFEC5azXnCZH7dJWpHw1NutprxD5MKr8aXhx4dZgsfp
+         N8aNwN1P6Hh2br5dchmerKJXmsuj3c1YFzX7ftRqXdUngf1SrqNsYwTxKAYyFKtyz9Zb
+         lHTE3jdBXC6amjPxtjswpxEpXAjvcdT8Ly3tpMhLMhBfS5q+GuPjkOjf+99KuN2HKi0q
+         3FyQs0KHmAWGrj6BSngs6oc3g2AAlXJC7dS+uROeBAcRxrrg4epyk5nNsAnRtUaEk8AP
+         FurA1Lbd1Yi5LjuwFE5i+465qyid0YtqpWB4FGswR9T69qa1Sjid82hs7vKawfOUOlS3
+         Iaqg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:sender:reply-to:date:message-id:mime-version
+         :subject:from:to:cc;
+        bh=DoRgiyLjNklM6rtntPUZIImM3ULIR10XzAP+GnWM3ms=;
+        b=XhWrgybiH7U6NejOfzLM2kPLBwQaW0crsMQFdgZuOUCpyVOdr6NBJ+EbNyITrlJVdO
+         2fZ6ZipsFqG3iPgQGN3O9zutQDMkE3O/GEoTYlE8ylseH4uetY0WQdntgbE8AnpHI32z
+         l3/ObhWW8uWUw3LOP/XnWQLDby7Flp4Q0qTXSphCCugk+EKWGXBxJGgUb6Vxpl2185g6
+         nCBdhBdTlEAdmb2sC//PmgvkT7exfWU24EpeaUWHESyCHCEtAG1M0G0aYro7zGz5Xaip
+         pQ4ujGKS7u2g5EFx7+w9I8+7qGBx+T/VfttnPh1Ed3/3hj1TEh5oS3Uj3ncEUDgtq6Su
+         Fdcw==
+X-Gm-Message-State: AOAM532aEJ9Rki5fKnnJQyxFJd53FMQA2OdOk57eMwNrH1y84KlDJ1k1
+        TN/J6B3xvQa46NfWzWCCNyXVZmM2RG0=
+X-Google-Smtp-Source: ABdhPJyDJdVqKyWdxn0RWpoIwEArWFLUrCd9SVeGL7GSkVtsoUdPxf3VAk2FbtSI6aq3FCMSiY26zWBtKhU=
+Sender: "seanjc via sendgmr" <seanjc@seanjc798194.pdx.corp.google.com>
+X-Received: from seanjc798194.pdx.corp.google.com ([2620:15c:f:10:8:847a:d8b5:e2cc])
+ (user=seanjc job=sendgmr) by 2002:a25:bfc1:: with SMTP id q1mr39194688ybm.89.1615309826442;
+ Tue, 09 Mar 2021 09:10:26 -0800 (PST)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date:   Tue,  9 Mar 2021 09:10:19 -0800
+Message-Id: <20210309171019.1125243-1-seanjc@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.30.1.766.gb4fecdf3b7-goog
+Subject: [PATCH v2] x86/perf: Use RET0 as default for guest_get_msrs to handle
+ "no PMU" case
+From:   Sean Christopherson <seanjc@google.com>
+To:     Peter Zijlstra <peterz@infradead.org>,
+        Ingo Molnar <mingo@redhat.com>,
+        Arnaldo Carvalho de Melo <acme@kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Borislav Petkov <bp@alien8.de>, x86@kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Mark Rutland <mark.rutland@arm.com>,
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Jiri Olsa <jolsa@redhat.com>,
+        Namhyung Kim <namhyung@kernel.org>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, Like Xu <like.xu@linux.intel.com>,
+        Dmitry Vyukov <dvyukov@google.com>,
+        syzbot+cce9ef2dd25246f815ee@syzkaller.appspotmail.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 9 Mar 2021 17:54:01 +0100
-Cornelia Huck <cohuck@redhat.com> wrote:
+Initialize x86_pmu.guest_get_msrs to return 0/NULL to handle the "nop"
+case.  Patching in perf_guest_get_msrs_nop() during setup does not work
+if there is no PMU, as setup bails before updating the static calls,
+leaving x86_pmu.guest_get_msrs NULL and thus a complete nop.  Ultimately,
+this causes VMX abort on VM-Exit due to KVM putting random garbage from
+the stack into the MSR load list.
 
-> On Tue,  9 Mar 2021 13:51:11 +0100
-> Pierre Morel <pmorel@linux.ibm.com> wrote:
-> 
-> > We tests the update of the Mesurement Block (MB) format 0
-> > and format 1 using a serie of senseid requests.
-> > 
-> > *Warning*: One of the tests for format-1 will unexpectedly fail for QEMU elf
-> > unless the QEMU patch "css: SCHIB measurement block origin must be aligned"
-> > is applied.  
-> 
-> That one has hit QEMU master by now.
-> 
-> > With Protected Virtualization, the PGM is correctly recognized.
-> > 
-> > The MB format 1 is only provided if the Extended mesurement Block
-> > feature is available.
-> > 
-> > This feature is exposed by the CSS characteristics general features
-> > stored by the Store Channel Subsystem Characteristics CHSC command,
-> > consequently, we implement the CHSC instruction call and the SCSC CHSC
-> > command.
-> > 
-> > In order to ease the writing of new tests using:
-> > - interrupt
-> > - enablement of a subchannel
-> > - multiple I/O on a subchannel
-> > 
-> > We do the following simplifications:
-> > - we create a CSS initialization routine
-> > - we register the I/O interrupt handler on CSS initialization
-> > - we do not enable or disable a subchannel in the senseid test,
-> >   assuming this test is done after the enable test, this allows
-> >   to create traffic using the SSCH used by senseid.
-> > - failures not part of the feature under test will stop the tests.
-> > - we add a css_enabled() function to test if a subchannel is enabled.
-> > 
-> > *note*:
-> >     I rearranged the use of the senseid for the tests, by not modifying
-> >     the existing test and having a dedicated senseid() function for
-> >     the purpose of the tests.
-> >     I think that it is in the rigght way so I kept the RB and ACK on
-> >     the simplification, there are less changes, if it is wrong from me
-> >     I suppose I will see this in the comments.
-> >     Since the changed are moved inside the fmt0 test which is not approved
-> >     for now I hope it is OK.  
-> 
-> I'll double-check, but I think it should be ok.
+Add a comment in KVM to note that nr_msrs is valid if and only if the
+return value is non-NULL.
 
-...that said, I found some reordering issues, but nothing major;
-generally, it looks good to me.
+Fixes: abd562df94d1 ("x86/perf: Use static_call for x86_pmu.guest_get_msrs")
+Cc: Like Xu <like.xu@linux.intel.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Jim Mattson <jmattson@google.com>
+Reported-by: Dmitry Vyukov <dvyukov@google.com>
+Reported-by: syzbot+cce9ef2dd25246f815ee@syzkaller.appspotmail.com
+Suggested-by: Peter Zijlstra <peterz@infradead.org>
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
 
-> 
-> > 
-> > Regards,
-> > Pierre
-> > 
-> > Pierre Morel (6):
-> >   s390x: css: Store CSS Characteristics
-> >   s390x: css: simplifications of the tests
-> >   s390x: css: extending the subchannel modifying functions
-> >   s390x: css: implementing Set CHannel Monitor
-> >   s390x: css: testing measurement block format 0
-> >   s390x: css: testing measurement block format 1
-> > 
-> >  lib/s390x/css.h     | 115 ++++++++++++++++++++-
-> >  lib/s390x/css_lib.c | 236 ++++++++++++++++++++++++++++++++++++++++----
-> >  s390x/css.c         | 216 ++++++++++++++++++++++++++++++++++++++--
-> >  3 files changed, 540 insertions(+), 27 deletions(-)
-> >   
-> 
+v2:
+ - Use __static_call_return0 to return NULL instead of manually checking
+   the hook at invocation.  [Peter]
+ - Rebase to tip/sched/core, commit 4117cebf1a9f ("psi: Optimize task
+   switch inside shared cgroups").
+
+
+ arch/x86/events/core.c | 16 +++++-----------
+ arch/x86/kvm/vmx/vmx.c |  2 +-
+ 2 files changed, 6 insertions(+), 12 deletions(-)
+
+diff --git a/arch/x86/events/core.c b/arch/x86/events/core.c
+index 6ddeed3cd2ac..7bb056151ecc 100644
+--- a/arch/x86/events/core.c
++++ b/arch/x86/events/core.c
+@@ -81,7 +81,11 @@ DEFINE_STATIC_CALL_NULL(x86_pmu_swap_task_ctx, *x86_pmu.swap_task_ctx);
+ DEFINE_STATIC_CALL_NULL(x86_pmu_drain_pebs,   *x86_pmu.drain_pebs);
+ DEFINE_STATIC_CALL_NULL(x86_pmu_pebs_aliases, *x86_pmu.pebs_aliases);
+ 
+-DEFINE_STATIC_CALL_NULL(x86_pmu_guest_get_msrs,  *x86_pmu.guest_get_msrs);
++/*
++ * This one is magic, it will get called even when PMU init fails (because
++ * there is no PMU), in which case it should simply return NULL.
++ */
++DEFINE_STATIC_CALL_RET0(x86_pmu_guest_get_msrs, *x86_pmu.guest_get_msrs);
+ 
+ u64 __read_mostly hw_cache_event_ids
+ 				[PERF_COUNT_HW_CACHE_MAX]
+@@ -1944,13 +1948,6 @@ static void _x86_pmu_read(struct perf_event *event)
+ 	x86_perf_event_update(event);
+ }
+ 
+-static inline struct perf_guest_switch_msr *
+-perf_guest_get_msrs_nop(int *nr)
+-{
+-	*nr = 0;
+-	return NULL;
+-}
+-
+ static int __init init_hw_perf_events(void)
+ {
+ 	struct x86_pmu_quirk *quirk;
+@@ -2024,9 +2021,6 @@ static int __init init_hw_perf_events(void)
+ 	if (!x86_pmu.read)
+ 		x86_pmu.read = _x86_pmu_read;
+ 
+-	if (!x86_pmu.guest_get_msrs)
+-		x86_pmu.guest_get_msrs = perf_guest_get_msrs_nop;
+-
+ 	x86_pmu_static_call_update();
+ 
+ 	/*
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 50810d471462..32cf8287d4a7 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -6580,8 +6580,8 @@ static void atomic_switch_perf_msrs(struct vcpu_vmx *vmx)
+ 	int i, nr_msrs;
+ 	struct perf_guest_switch_msr *msrs;
+ 
++	/* Note, nr_msrs may be garbage if perf_guest_get_msrs() returns NULL. */
+ 	msrs = perf_guest_get_msrs(&nr_msrs);
+-
+ 	if (!msrs)
+ 		return;
+ 
+-- 
+2.30.1.766.gb4fecdf3b7-goog
 
