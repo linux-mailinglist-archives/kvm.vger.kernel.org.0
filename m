@@ -2,21 +2,21 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EB003331F29
-	for <lists+kvm@lfdr.de>; Tue,  9 Mar 2021 07:23:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id F0234331F37
+	for <lists+kvm@lfdr.de>; Tue,  9 Mar 2021 07:23:35 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229872AbhCIGW6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 9 Mar 2021 01:22:58 -0500
-Received: from szxga05-in.huawei.com ([45.249.212.191]:13075 "EHLO
-        szxga05-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229530AbhCIGW0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        id S229873AbhCIGW5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 9 Mar 2021 01:22:57 -0500
+Received: from szxga06-in.huawei.com ([45.249.212.32]:13455 "EHLO
+        szxga06-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229544AbhCIGW0 (ORCPT <rfc822;kvm@vger.kernel.org>);
         Tue, 9 Mar 2021 01:22:26 -0500
 Received: from DGGEMS414-HUB.china.huawei.com (unknown [172.30.72.59])
-        by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4DvlS86Y4MzMkgq;
-        Tue,  9 Mar 2021 14:20:08 +0800 (CST)
+        by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4DvlT45JTXzkWc1;
+        Tue,  9 Mar 2021 14:20:56 +0800 (CST)
 Received: from DESKTOP-7FEPK9S.china.huawei.com (10.174.184.135) by
  DGGEMS414-HUB.china.huawei.com (10.3.19.214) with Microsoft SMTP Server id
- 14.3.498.0; Tue, 9 Mar 2021 14:22:15 +0800
+ 14.3.498.0; Tue, 9 Mar 2021 14:22:17 +0800
 From:   Shenming Lu <lushenming@huawei.com>
 To:     Alex Williamson <alex.williamson@redhat.com>,
         Cornelia Huck <cohuck@redhat.com>,
@@ -35,9 +35,9 @@ CC:     Kevin Tian <kevin.tian@intel.com>, <yi.l.liu@intel.com>,
         Barry Song <song.bao.hua@hisilicon.com>,
         <wanghaibin.wang@huawei.com>, <yuzenghui@huawei.com>,
         <zhukeqian1@huawei.com>, <lushenming@huawei.com>
-Subject: [RFC PATCH v2 1/6] iommu: Evolve to support more scenarios of using IOPF
-Date:   Tue, 9 Mar 2021 14:22:02 +0800
-Message-ID: <20210309062207.505-2-lushenming@huawei.com>
+Subject: [RFC PATCH v2 2/6] vfio: Add an MMU notifier to avoid pinning
+Date:   Tue, 9 Mar 2021 14:22:03 +0800
+Message-ID: <20210309062207.505-3-lushenming@huawei.com>
 X-Mailer: git-send-email 2.27.0.windows.1
 In-Reply-To: <20210309062207.505-1-lushenming@huawei.com>
 References: <20210309062207.505-1-lushenming@huawei.com>
@@ -50,264 +50,129 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This patch follows the discussion here:
-
-https://lore.kernel.org/linux-acpi/YAaxjmJW+ZMvrhac@myrica/
-
-In order to support more scenarios of using IOPF (mainly consider
-the nested extension), besides keeping IOMMU_DEV_FEAT_IOPF as a
-general capability for whether delivering faults through the IOMMU,
-we extend iommu_register_fault_handler() with flags and introduce
-IOPF_REPORT_FLAT and IOPF_REPORT_NESTED to describe the page fault
-reporting capability under a specific configuration.
-IOPF_REPORT_NESTED needs additional info to indicate which level/stage
-is concerned since the fault client may be interested in only one
-level.
+To avoid pinning pages when they are mapped in IOMMU page tables,
+we add an MMU notifier to tell the addresses which are no longer
+valid and try to unmap them.
 
 Signed-off-by: Shenming Lu <lushenming@huawei.com>
 ---
- .../iommu/arm/arm-smmu-v3/arm-smmu-v3-sva.c   |  3 +-
- drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c   | 11 ++--
- drivers/iommu/io-pgfault.c                    |  4 --
- drivers/iommu/iommu.c                         | 56 ++++++++++++++++++-
- include/linux/iommu.h                         | 21 ++++++-
- include/uapi/linux/iommu.h                    |  3 +
- 6 files changed, 85 insertions(+), 13 deletions(-)
+ drivers/vfio/vfio_iommu_type1.c | 68 +++++++++++++++++++++++++++++++++
+ 1 file changed, 68 insertions(+)
 
-diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3-sva.c b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3-sva.c
-index ee66d1f4cb81..5de9432349d4 100644
---- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3-sva.c
-+++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3-sva.c
-@@ -482,7 +482,8 @@ static int arm_smmu_master_sva_enable_iopf(struct arm_smmu_master *master)
- 	if (ret)
- 		return ret;
+diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+index 4bb162c1d649..03ccc11057af 100644
+--- a/drivers/vfio/vfio_iommu_type1.c
++++ b/drivers/vfio/vfio_iommu_type1.c
+@@ -40,6 +40,7 @@
+ #include <linux/notifier.h>
+ #include <linux/dma-iommu.h>
+ #include <linux/irqdomain.h>
++#include <linux/mmu_notifier.h>
  
--	ret = iommu_register_device_fault_handler(dev, iommu_queue_iopf, dev);
-+	ret = iommu_register_device_fault_handler(dev, iommu_queue_iopf,
-+						  IOPF_REPORT_FLAT, dev);
- 	if (ret) {
- 		iopf_queue_remove_device(master->smmu->evtq.iopf, dev);
- 		return ret;
-diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
-index 363744df8d51..f40529d0075d 100644
---- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
-+++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
-@@ -1447,10 +1447,6 @@ static int arm_smmu_handle_evt(struct arm_smmu_device *smmu, u64 *evt)
- 		return -EOPNOTSUPP;
- 	}
+ #define DRIVER_VERSION  "0.2"
+ #define DRIVER_AUTHOR   "Alex Williamson <alex.williamson@redhat.com>"
+@@ -69,6 +70,7 @@ struct vfio_iommu {
+ 	struct mutex		lock;
+ 	struct rb_root		dma_list;
+ 	struct blocking_notifier_head notifier;
++	struct mmu_notifier	mn;
+ 	unsigned int		dma_avail;
+ 	unsigned int		vaddr_invalid_count;
+ 	uint64_t		pgsize_bitmap;
+@@ -101,6 +103,7 @@ struct vfio_dma {
+ 	struct task_struct	*task;
+ 	struct rb_root		pfn_list;	/* Ex-user pinned pfn list */
+ 	unsigned long		*bitmap;
++	unsigned long		*iopf_mapped_bitmap;
+ };
  
--	/* Stage-2 is always pinned at the moment */
--	if (evt[1] & EVTQ_1_S2)
--		return -EFAULT;
--
- 	if (evt[1] & EVTQ_1_RnW)
- 		perm |= IOMMU_FAULT_PERM_READ;
- 	else
-@@ -1468,13 +1464,18 @@ static int arm_smmu_handle_evt(struct arm_smmu_device *smmu, u64 *evt)
- 			.flags = IOMMU_FAULT_PAGE_REQUEST_LAST_PAGE,
- 			.grpid = FIELD_GET(EVTQ_1_STAG, evt[1]),
- 			.perm = perm,
--			.addr = FIELD_GET(EVTQ_2_ADDR, evt[2]),
- 		};
+ struct vfio_batch {
+@@ -157,6 +160,10 @@ struct vfio_regions {
+ #define DIRTY_BITMAP_PAGES_MAX	 ((u64)INT_MAX)
+ #define DIRTY_BITMAP_SIZE_MAX	 DIRTY_BITMAP_BYTES(DIRTY_BITMAP_PAGES_MAX)
  
- 		if (ssid_valid) {
- 			flt->prm.flags |= IOMMU_FAULT_PAGE_REQUEST_PASID_VALID;
- 			flt->prm.pasid = FIELD_GET(EVTQ_0_SSID, evt[0]);
- 		}
++#define IOPF_MAPPED_BITMAP_GET(dma, i)	\
++			      ((dma->iopf_mapped_bitmap[(i) / BITS_PER_LONG]	\
++			       >> ((i) % BITS_PER_LONG)) & 0x1)
 +
-+		if (evt[1] & EVTQ_1_S2) {
-+			flt->prm.flags |= IOMMU_FAULT_PAGE_REQUEST_L2;
-+			flt->prm.addr = FIELD_GET(EVTQ_3_IPA, evt[3]);
-+		} else
-+			flt->prm.addr = FIELD_GET(EVTQ_2_ADDR, evt[2]);
- 	} else {
- 		flt->type = IOMMU_FAULT_DMA_UNRECOV;
- 		flt->event = (struct iommu_fault_unrecoverable) {
-diff --git a/drivers/iommu/io-pgfault.c b/drivers/iommu/io-pgfault.c
-index 1df8c1dcae77..abf16e06bcf5 100644
---- a/drivers/iommu/io-pgfault.c
-+++ b/drivers/iommu/io-pgfault.c
-@@ -195,10 +195,6 @@ int iommu_queue_iopf(struct iommu_fault *fault, void *cookie)
+ #define WAITED 1
  
- 	lockdep_assert_held(&param->lock);
- 
--	if (fault->type != IOMMU_FAULT_PAGE_REQ)
--		/* Not a recoverable page fault */
--		return -EOPNOTSUPP;
--
- 	/*
- 	 * As long as we're holding param->lock, the queue can't be unlinked
- 	 * from the device and therefore cannot disappear.
-diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
-index d0b0a15dba84..cb1d93b00f7d 100644
---- a/drivers/iommu/iommu.c
-+++ b/drivers/iommu/iommu.c
-@@ -1056,6 +1056,40 @@ int iommu_group_unregister_notifier(struct iommu_group *group,
- }
- EXPORT_SYMBOL_GPL(iommu_group_unregister_notifier);
- 
-+/*
-+ * iommu_update_device_fault_handler - Update the device fault handler via flags
-+ * @dev: the device
-+ * @mask: bits(not set) to clear
-+ * @set: bits to set
-+ *
-+ * Update the device fault handler installed by
-+ * iommu_register_device_fault_handler().
-+ *
-+ * Return 0 on success, or an error.
-+ */
-+int iommu_update_device_fault_handler(struct device *dev, u32 mask, u32 set)
-+{
-+	struct dev_iommu *param = dev->iommu;
-+	int ret = 0;
-+
-+	if (!param)
-+		return -EINVAL;
-+
-+	mutex_lock(&param->lock);
-+
-+	if (param->fault_param) {
-+		ret = -EINVAL;
-+		goto out_unlock;
-+	}
-+
-+	param->fault_param->flags = (param->fault_param->flags & mask) | set;
-+
-+out_unlock:
-+	mutex_unlock(&param->lock);
-+	return ret;
-+}
-+EXPORT_SYMBOL_GPL(iommu_update_device_fault_handler);
-+
- /**
-  * iommu_register_device_fault_handler() - Register a device fault handler
-  * @dev: the device
-@@ -1076,11 +1110,14 @@ EXPORT_SYMBOL_GPL(iommu_group_unregister_notifier);
-  */
- int iommu_register_device_fault_handler(struct device *dev,
- 					iommu_dev_fault_handler_t handler,
--					void *data)
-+					u32 flags, void *data)
- {
- 	struct dev_iommu *param = dev->iommu;
- 	int ret = 0;
- 
-+	if (flags & IOPF_REPORT_FLAT && flags & IOPF_REPORT_NESTED)
-+		return -EINVAL;
-+
- 	if (!param)
- 		return -EINVAL;
- 
-@@ -1099,6 +1136,7 @@ int iommu_register_device_fault_handler(struct device *dev,
- 		goto done_unlock;
- 	}
- 	param->fault_param->handler = handler;
-+	param->fault_param->flags = flags;
- 	param->fault_param->data = data;
- 	mutex_init(&param->fault_param->lock);
- 	INIT_LIST_HEAD(&param->fault_param->faults);
-@@ -1177,6 +1215,22 @@ int iommu_report_device_fault(struct device *dev, struct iommu_fault_event *evt)
- 		goto done_unlock;
- 	}
- 
-+	/* The unrecoverable fault reporting is not supported at the moment. */
-+	if (evt->fault.type != IOMMU_FAULT_PAGE_REQ)
-+		return -EOPNOTSUPP;
-+
-+	if (evt->fault.type == IOMMU_FAULT_PAGE_REQ) {
-+		if (fparam->flags & IOPF_REPORT_NESTED) {
-+			if (evt->fault.prm.flags & IOMMU_FAULT_PAGE_REQUEST_L2 &&
-+			    !(fparam->flags & IOPF_REPORT_NESTED_L2_CONCERNED))
-+				return -EOPNOTSUPP;
-+			if (!(evt->fault.prm.flags & IOMMU_FAULT_PAGE_REQUEST_L2) &&
-+			    !(fparam->flags & IOPF_REPORT_NESTED_L1_CONCERNED))
-+				return -EOPNOTSUPP;
-+		} else if (!(fparam->flags & IOPF_REPORT_FLAT))
-+			return -EOPNOTSUPP;
-+	}
-+
- 	if (evt->fault.type == IOMMU_FAULT_PAGE_REQ &&
- 	    (evt->fault.prm.flags & IOMMU_FAULT_PAGE_REQUEST_LAST_PAGE)) {
- 		evt_pending = kmemdup(evt, sizeof(struct iommu_fault_event),
-diff --git a/include/linux/iommu.h b/include/linux/iommu.h
-index 86d688c4418f..f03d761e8310 100644
---- a/include/linux/iommu.h
-+++ b/include/linux/iommu.h
-@@ -352,12 +352,21 @@ struct iommu_fault_event {
- /**
-  * struct iommu_fault_param - per-device IOMMU fault data
-  * @handler: Callback function to handle IOMMU faults at device level
-+ * @flags: Indicates whether the fault reporting is available under a
-+ *	   specific configuration (1st/2nd-level-only(FLAT), or nested).
-+ *	   IOPF_REPORT_NESTED needs to additionally know which level/stage
-+ *	   is concerned.
-  * @data: handler private data
-  * @faults: holds the pending faults which needs response
-  * @lock: protect pending faults list
-  */
- struct iommu_fault_param {
- 	iommu_dev_fault_handler_t handler;
-+#define IOPF_REPORT_FLAT			(1 << 0)
-+#define IOPF_REPORT_NESTED			(1 << 1)
-+#define IOPF_REPORT_NESTED_L1_CONCERNED		(1 << 2)
-+#define IOPF_REPORT_NESTED_L2_CONCERNED		(1 << 3)
-+	u32 flags;
- 	void *data;
- 	struct list_head faults;
- 	struct mutex lock;
-@@ -509,9 +518,11 @@ extern int iommu_group_register_notifier(struct iommu_group *group,
- 					 struct notifier_block *nb);
- extern int iommu_group_unregister_notifier(struct iommu_group *group,
- 					   struct notifier_block *nb);
-+extern int iommu_update_device_fault_handler(struct device *dev,
-+					     u32 mask, u32 set);
- extern int iommu_register_device_fault_handler(struct device *dev,
- 					iommu_dev_fault_handler_t handler,
--					void *data);
-+					u32 flags, void *data);
- 
- extern int iommu_unregister_device_fault_handler(struct device *dev);
- 
-@@ -873,10 +884,16 @@ static inline int iommu_group_unregister_notifier(struct iommu_group *group,
- 	return 0;
+ static int put_pfn(unsigned long pfn, int prot);
+@@ -1149,6 +1156,35 @@ static long vfio_unmap_unpin(struct vfio_iommu *iommu, struct vfio_dma *dma,
+ 	return unlocked;
  }
  
-+static inline int iommu_update_device_fault_handler(struct device *dev,
-+						    u32 mask, u32 set)
++static void vfio_unmap_partial_iopf(struct vfio_iommu *iommu,
++				    struct vfio_dma *dma,
++				    dma_addr_t start, dma_addr_t end)
 +{
-+	return -ENODEV;
++	unsigned long bit_offset;
++	size_t len;
++	struct vfio_domain *d;
++
++	while (start < end) {
++		bit_offset = (start - dma->iova) >> PAGE_SHIFT;
++
++		for (len = 0; start + len < end; len += PAGE_SIZE) {
++			if (!IOPF_MAPPED_BITMAP_GET(dma,
++					bit_offset + (len >> PAGE_SHIFT)))
++				break;
++		}
++
++		if (len) {
++			list_for_each_entry(d, &iommu->domain_list, next)
++				iommu_unmap(d->domain, start, len);
++
++			bitmap_clear(dma->iopf_mapped_bitmap,
++				     bit_offset, len >> PAGE_SHIFT);
++		}
++
++		start += (len + PAGE_SIZE);
++	}
 +}
 +
- static inline
- int iommu_register_device_fault_handler(struct device *dev,
- 					iommu_dev_fault_handler_t handler,
--					void *data)
-+					u32 flags, void *data)
+ static void vfio_remove_dma(struct vfio_iommu *iommu, struct vfio_dma *dma)
  {
- 	return -ENODEV;
+ 	WARN_ON(!RB_EMPTY_ROOT(&dma->pfn_list));
+@@ -3096,6 +3132,38 @@ static int vfio_iommu_type1_dirty_pages(struct vfio_iommu *iommu,
+ 	return -EINVAL;
  }
-diff --git a/include/uapi/linux/iommu.h b/include/uapi/linux/iommu.h
-index e1d9e75f2c94..0ce0dfb7713e 100644
---- a/include/uapi/linux/iommu.h
-+++ b/include/uapi/linux/iommu.h
-@@ -85,6 +85,8 @@ struct iommu_fault_unrecoverable {
-  *         When IOMMU_FAULT_PAGE_RESPONSE_NEEDS_PASID is set, the page response
-  *         must have the same PASID value as the page request. When it is clear,
-  *         the page response should not have a PASID.
-+ *         If IOMMU_FAULT_PAGE_REQUEST_L2 is set, the fault occurred at the
-+ *         second level/stage, otherwise, occurred at the first level.
-  * @pasid: Process Address Space ID
-  * @grpid: Page Request Group Index
-  * @perm: requested page permissions (IOMMU_FAULT_PERM_* values)
-@@ -96,6 +98,7 @@ struct iommu_fault_page_request {
- #define IOMMU_FAULT_PAGE_REQUEST_LAST_PAGE	(1 << 1)
- #define IOMMU_FAULT_PAGE_REQUEST_PRIV_DATA	(1 << 2)
- #define IOMMU_FAULT_PAGE_RESPONSE_NEEDS_PASID	(1 << 3)
-+#define IOMMU_FAULT_PAGE_REQUEST_L2		(1 << 4)
- 	__u32	flags;
- 	__u32	pasid;
- 	__u32	grpid;
+ 
++static void mn_invalidate_range(struct mmu_notifier *mn, struct mm_struct *mm,
++				unsigned long start, unsigned long end)
++{
++	struct vfio_iommu *iommu = container_of(mn, struct vfio_iommu, mn);
++	struct rb_node *n;
++
++	mutex_lock(&iommu->lock);
++
++	for (n = rb_first(&iommu->dma_list); n; n = rb_next(n)) {
++		struct vfio_dma *dma = rb_entry(n, struct vfio_dma, node);
++		unsigned long start_n, end_n;
++
++		if (end <= dma->vaddr || start >= dma->vaddr + dma->size)
++			continue;
++
++		start_n = ALIGN_DOWN(max_t(unsigned long, start, dma->vaddr),
++				     PAGE_SIZE);
++		end_n = ALIGN(min_t(unsigned long, end, dma->vaddr + dma->size),
++			      PAGE_SIZE);
++
++		vfio_unmap_partial_iopf(iommu, dma,
++					start_n - dma->vaddr + dma->iova,
++					end_n - dma->vaddr + dma->iova);
++	}
++
++	mutex_unlock(&iommu->lock);
++}
++
++static const struct mmu_notifier_ops vfio_iommu_type1_mn_ops = {
++	.invalidate_range	= mn_invalidate_range,
++};
++
+ static long vfio_iommu_type1_ioctl(void *iommu_data,
+ 				   unsigned int cmd, unsigned long arg)
+ {
 -- 
 2.19.1
 
