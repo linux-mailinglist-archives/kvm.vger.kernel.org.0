@@ -2,97 +2,110 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C1F0B33272E
-	for <lists+kvm@lfdr.de>; Tue,  9 Mar 2021 14:32:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7A3FE33276E
+	for <lists+kvm@lfdr.de>; Tue,  9 Mar 2021 14:44:34 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230116AbhCINbi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 9 Mar 2021 08:31:38 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:21742 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229851AbhCINb2 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 9 Mar 2021 08:31:28 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1615296688;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=EpvaiT9lNridqnyvnBIVcNFfk1XSrEn77fD74rsW3bg=;
-        b=GqhJTLtR7XC7p4NWBwZqyqK5m8nFQyrAcFujvruDJ2Zu9x40hCopqogVJSLPO/cDOVuXWo
-        1yyqbJBPnW/+J2rkEPfNclyQbVpMFAckeqluHJ1rws7m1P0JjJhMrZdVrAhgh9bj2fSbdn
-        BckPDEmpXZF2n9t0ZWR6tyLrJawy4/M=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-76-yuDpp31vNJ2ZcgeLvMHd8A-1; Tue, 09 Mar 2021 08:31:26 -0500
-X-MC-Unique: yuDpp31vNJ2ZcgeLvMHd8A-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        id S231234AbhCINoB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 9 Mar 2021 08:44:01 -0500
+Received: from mail.kernel.org ([198.145.29.99]:53188 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S231137AbhCINnn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 9 Mar 2021 08:43:43 -0500
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 218F71005D4A;
-        Tue,  9 Mar 2021 13:31:25 +0000 (UTC)
-Received: from starship (unknown [10.35.206.156])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 7600319D7C;
-        Tue,  9 Mar 2021 13:31:22 +0000 (UTC)
-Message-ID: <b0e0aaac1b1aae31a12a416a6df2c7f2ef768734.camel@redhat.com>
-Subject: Re: [PATCH 2/2] KVM: x86/mmu: Exclude the MMU_PRESENT bit from MMIO
- SPTE's generation
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Tom Lendacky <thomas.lendacky@amd.com>
-Date:   Tue, 09 Mar 2021 15:31:21 +0200
-In-Reply-To: <d72993d9-c11c-a5f4-0452-b2bed730938c@redhat.com>
-References: <20210309021900.1001843-1-seanjc@google.com>
-         <20210309021900.1001843-3-seanjc@google.com>
-         <785c17c307e66b9d7b422cc577499d284cfb6e7b.camel@redhat.com>
-         <d72993d9-c11c-a5f4-0452-b2bed730938c@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+        by mail.kernel.org (Postfix) with ESMTPSA id 0BEDF64F51;
+        Tue,  9 Mar 2021 13:43:43 +0000 (UTC)
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94)
+        (envelope-from <maz@kernel.org>)
+        id 1lJceC-000YiA-T1; Tue, 09 Mar 2021 13:43:41 +0000
+Date:   Tue, 09 Mar 2021 13:43:40 +0000
+Message-ID: <87mtvcxx0z.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Andrew Jones <drjones@redhat.com>
+Cc:     kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
+        kvm@vger.kernel.org, James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        kernel-team@android.com
+Subject: Re: [PATCH] KVM: arm64: Cap default IPA size to the host's own size
+In-Reply-To: <20210309132021.7vuuf73joybhlhg3@kamzik.brq.redhat.com>
+References: <20210308174643.761100-1-maz@kernel.org>
+        <20210309132021.7vuuf73joybhlhg3@kamzik.brq.redhat.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: drjones@redhat.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com, kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 2021-03-09 at 14:12 +0100, Paolo Bonzini wrote:
-> On 09/03/21 11:09, Maxim Levitsky wrote:
-> > What happens if mmio generation overflows (e.g if userspace keeps on updating the memslots)?
-> > In theory if we have a SPTE with a stale generation, it can became valid, no?
+Hi Andrew,
+
+On Tue, 09 Mar 2021 13:20:21 +0000,
+Andrew Jones <drjones@redhat.com> wrote:
+> 
+> Hi Marc,
+> 
+> On Mon, Mar 08, 2021 at 05:46:43PM +0000, Marc Zyngier wrote:
+> > KVM/arm64 has forever used a 40bit default IPA space, partially
+> > due to its 32bit heritage (where the only choice is 40bit).
 > > 
-> > I think that we should in the case of the overflow zap all mmio sptes.
-> > What do you think?
+> > However, there are implementations in the wild that have a *cough*
+> > much smaller *cough* IPA space, which leads to a misprogramming of
+> > VTCR_EL2, and a guest that is stuck on its first memory access
+> > if userspace dares to ask for the default IPA setting (which most
+> > VMMs do).
+> > 
+> > Instead, cap the default IPA size to what the host can actually
+> > do, and spit out a one-off message on the console. The boot warning
+> > is turned into a more meaningfull message, and the new behaviour
+> > is also documented.
+> > 
+> > Although this is a userspace ABI change, it doesn't really change
+> > much for userspace:
+> > 
+> > - the guest couldn't run before this change, while it now has
+> >   a chance to if the memory range fits the reduced IPA space
+> > 
+> > - a memory slot that was accepted because it did fit the default
+> >   IPA space but didn't fit the HW constraints is now properly
+> >   rejected
 > 
-> Zapping all MMIO SPTEs is done by updating the generation count.  When 
-> it overflows, all SPs are zapped:
+> I'm not sure deferring the misconfiguration error until memslot
+> request time is better than just failing to create a VM. If
+> userspace doesn't use KVM_CAP_ARM_VM_IPA_SIZE to determine the
+> limit (which it hasn't been obliged to do) and it is able to
+> successfully create a VM, then it will assume up to 40-bit IPAs
+> are supported. Later, when it tries to add memslots and fails
+> it may be confused, especially if that later is much, much later
+> with memory hotplug.
+
+That's a fair point. However, no existing userspace will work on these
+systems. Is that what we want to do? I don't care much, but having
+non-usable defaults feel a bit... odd. I do spit out a warning, but I
+agree this isn't great either.
+
+> > The other thing that's left doing is to convince userspace to
+> > actually use the IPA space setting instead of relying on the
+> > antiquated default.
 > 
->          /*
->           * The very rare case: if the MMIO generation number has wrapped,
->           * zap all shadow pages.
->           */
->          if (unlikely(gen == 0)) {
->                  kvm_debug_ratelimited("kvm: zapping shadow pages for 
-> mmio generation wraparound\n");
->                  kvm_mmu_zap_all_fast(kvm);
->          }
-> 
-> So giving it more bits make this more rare, at the same time having to 
-> remove one or two bits is not the end of the world.
+> Failing to create any VM which hasn't selected a valid IPA limit
+> should be pretty convincing :-)
 
-This is exactly what I expected to happen, I just didn't find that code.
-Thanks for explanation, and it shows that I didn't study the mmio spte
-code much.
+I'll make sure to redirect the reports your way! :D
 
-Best regards,
-	Maxim Levitsky
+Thanks,
 
-> 
-> Paolo
-> 
+	M.
 
-
+-- 
+Without deviation from the norm, progress is not possible.
