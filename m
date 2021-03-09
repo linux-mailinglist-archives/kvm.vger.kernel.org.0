@@ -2,57 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7F2083320CC
+	by mail.lfdr.de (Postfix) with ESMTP id CB6863320CD
 	for <lists+kvm@lfdr.de>; Tue,  9 Mar 2021 09:36:37 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230434AbhCIIfY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 9 Mar 2021 03:35:24 -0500
-Received: from mail-dm6nam10on2069.outbound.protection.outlook.com ([40.107.93.69]:33792
-        "EHLO NAM10-DM6-obe.outbound.protection.outlook.com"
+        id S230503AbhCIIf1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 9 Mar 2021 03:35:27 -0500
+Received: from mail-bn8nam12on2057.outbound.protection.outlook.com ([40.107.237.57]:50147
+        "EHLO NAM12-BN8-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S230483AbhCIIe7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 9 Mar 2021 03:34:59 -0500
+        id S230526AbhCIIfC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 9 Mar 2021 03:35:02 -0500
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=cfHNzXjIjrG3npM+hT7NRhgoICDsnQyhuJb5pEjwNy24MPvQ9sraDtGjcB0MHvDlpS0/+k5IMFql4O45Khio2XuOOT36ZaoIFtm58H9gQgYRVC6xSthyUVT7WtbTz6AfKR48s4JE1rkSQVATNOaeafyaJBMbMFnGD+oKw4FZqxspKWMGFoB0JYeprd5mipMoty6WGYsrsu7azBp/ZnPcDWajyt3cmhboXIJtvgoL6QavzUiRGphcvsxQRbncWGxcvTp2az/UCawuIx6xhn4PLAqp2/RlbjTUTUBMboMgRf3DbWPzUndzV2iFD0OdOQOCOvEgMlhuGhwYZI8OKxq7DA==
+ b=kQ9u2fZMXQJhnkkPpgtfoDaWbT52KEeLWiFuKAqliLkTQJe35z5t6FftTQTjW8/wi3SNgJfYKZK2JHR0tW0rAbCVr9t05qdyCSXdtprILSOSZvsx8eAwHyC6zwO/zE1dDC7kw41osNd1QH6ofGSXvHu2wxdp5A2KLl2EdOJqeA8lMx66nMcbNfsbD2yRmxltudXoV9PL8OmUQjc1zBVv8PWi4p/o67dScrtNmRRJfY2qNZjz8YhRIbHp86mAeujZLBUJX2V/tCzim97tiKKZKEQ4VlX6Ko989P2l8yQyd3bTQrjRVrsBEMDQ3vd3REwclrsN5DYxtqsceAoEFu5skw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=p4daIEL87NOMVMmKAMKowc3K3gr9XlepFv1BIZAn01Y=;
- b=BQot8k3km+hc7P5iSmHWBrcosbchsAid6+VdekVQ074cEb67n/Nt7Z01/x73hPzjQwqb52QALQaYsojA0wjiSMQVr3UWYgB1/B+LUDwhurbkiTBZVGJeTEdN6MsFEaDLBWIZ3MG51fTpeskWL6V4VIVHFIKPm//RqaT+pgAOG0jgT/fbCnGxFbH8vXYA8ByxqtXS/aoCGgwhVi50tiwvzSVtyS7+3Ht2AKjOx/BACLuChbh0eglOxPZksHke4E/Zm6gdTRe4ApVWzqZnea0WlmqqcVwiZZa/yXkqa2hx7L+z4oopv7g7H1rwSaxJmTxnvskD4mfy99ZYyvFBQClbZA==
+ bh=Yh7Sv51obkkSmM/XL2iq8xuUwpYOztQTlt6iapqpfBU=;
+ b=N2s6OxM+JzXZPzOrZ24F5E1M5DLNwGQilb/F6tWvXLLMmCvWGTcDjayDaW02m1axehscJz2HrpCc+RvyAV8dhgM2RWcqT2m4bqazoaoz7P6SqWI7gTdE422IF8ZeDdqEVCwAtxr4Qx9Nuvopq3Kpe7GnF1iLRXSCviKqQp501tFpQLeHgUqgMRWOJUfQhdF1ohGNnE+SFlXGFIVkHaxffL6Bc93+wOpq++SlB+qLCUgAG+zYG6vmiNwJ20Ucf0lUks/bcj9V59UZlEdc/B9hnpJeHi6+tMLdBpxmknnxBxceoxU3TObVe1wzAe0aER/hSyXrq2kVThcGYnvUnBWKIw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.112.34) smtp.rcpttodomain=linux.ibm.com smtp.mailfrom=nvidia.com;
+ 216.228.112.35) smtp.rcpttodomain=linux.ibm.com smtp.mailfrom=nvidia.com;
  dmarc=pass (p=none sp=none pct=100) action=none header.from=nvidia.com;
  dkim=none (message not signed); arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=p4daIEL87NOMVMmKAMKowc3K3gr9XlepFv1BIZAn01Y=;
- b=cCnKC9EiGWlpLzCvCcP/RFh0RjTitCaYYK8sYSdh/J7CsI1VDKQY8eLRnKDTB9ZLhDQW1RVGD5ptpcXWwa2eIwNcg8Ak4fT1W7u269hAnfqqaPyTehRGmZRdYE2JtpAnm6SEDD1y0UrfzuWl/r6HHG+NAi0wMVR23J1M3vb5v+13EO1EQT8FtarH7DkQma1cRS0V+1XRgXT21vsVgJR3WZl+r58O47XusOgPD2uL+DO/V6gjnN1qwweQquGnDrZ1016bcUYL6d+jwpi5PdjfCFdK3KdbkbtlCsIYTtE7fPWpXXRl/1FBhFJ8Lch0EJBGpp4iAf9wQ/q6imQ0cCiSNA==
-Received: from DM5PR18CA0092.namprd18.prod.outlook.com (2603:10b6:3:3::30) by
- MW3PR12MB4412.namprd12.prod.outlook.com (2603:10b6:303:58::10) with Microsoft
+ bh=Yh7Sv51obkkSmM/XL2iq8xuUwpYOztQTlt6iapqpfBU=;
+ b=a6tx8UjZpSWkGXNYJvfwzZWLAAVljygILvotg0oZpFx2InCIEyPml+5PmZP5MJ7hXCKhfoiRN04CKsFDdm9JqCfoj0D6v9Y748ewbSweIUKjSDnCYeALh/R1gtzR78D1NYtdb7hmwbRvd4B6HGUWIt+PGwbYzAJUfDXRGY/Wj5NG3i9OA/Wea5puxIF5o/uWjkJLt/f1mzVBGl2rTmdqxeLqiRQ8ItqTtyk1PVofdKtEeJZUkAu9J1Wpl/0wCnd88SXs223qnjjdYvVggCOjITt5mXxA07V+Fvzy860ILK305niyZsJKFiRNsQRMRLw3+eArdlEmBZfm97/pEom1Jg==
+Received: from DM6PR13CA0025.namprd13.prod.outlook.com (2603:10b6:5:bc::38) by
+ BN6PR12MB1202.namprd12.prod.outlook.com (2603:10b6:404:1c::12) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3890.23; Tue, 9 Mar 2021 08:34:52 +0000
-Received: from DM6NAM11FT024.eop-nam11.prod.protection.outlook.com
- (2603:10b6:3:3:cafe::8c) by DM5PR18CA0092.outlook.office365.com
- (2603:10b6:3:3::30) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3912.17 via Frontend
- Transport; Tue, 9 Mar 2021 08:34:52 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.112.34)
+ 15.20.3912.19; Tue, 9 Mar 2021 08:34:58 +0000
+Received: from DM6NAM11FT037.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:5:bc:cafe::b7) by DM6PR13CA0025.outlook.office365.com
+ (2603:10b6:5:bc::38) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3933.22 via Frontend
+ Transport; Tue, 9 Mar 2021 08:34:58 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.112.35)
  smtp.mailfrom=nvidia.com; linux.ibm.com; dkim=none (message not signed)
  header.d=none;linux.ibm.com; dmarc=pass action=none header.from=nvidia.com;
 Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.112.34 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.112.34; helo=mail.nvidia.com;
-Received: from mail.nvidia.com (216.228.112.34) by
- DM6NAM11FT024.mail.protection.outlook.com (10.13.172.159) with Microsoft SMTP
+ 216.228.112.35 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.112.35; helo=mail.nvidia.com;
+Received: from mail.nvidia.com (216.228.112.35) by
+ DM6NAM11FT037.mail.protection.outlook.com (10.13.172.122) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- 15.20.3912.17 via Frontend Transport; Tue, 9 Mar 2021 08:34:51 +0000
-Received: from HQMAIL111.nvidia.com (172.20.187.18) by HQMAIL107.nvidia.com
- (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Tue, 9 Mar
- 2021 08:34:50 +0000
+ 15.20.3912.17 via Frontend Transport; Tue, 9 Mar 2021 08:34:57 +0000
+Received: from HQMAIL111.nvidia.com (172.20.187.18) by HQMAIL111.nvidia.com
+ (172.20.187.18) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Tue, 9 Mar
+ 2021 08:34:56 +0000
 Received: from r-nvmx02.mtr.labs.mlnx (172.20.145.6) by mail.nvidia.com
  (172.20.187.18) with Microsoft SMTP Server id 15.0.1497.2 via Frontend
- Transport; Tue, 9 Mar 2021 08:34:45 +0000
+ Transport; Tue, 9 Mar 2021 08:34:51 +0000
 From:   Max Gurtovoy <mgurtovoy@nvidia.com>
 To:     <jgg@nvidia.com>, <alex.williamson@redhat.com>,
         <cohuck@redhat.com>, <kvm@vger.kernel.org>,
@@ -63,9 +63,9 @@ CC:     <liranl@nvidia.com>, <oren@nvidia.com>, <tzahio@nvidia.com>,
         <ACurrid@nvidia.com>, <cjia@nvidia.com>, <yishaih@nvidia.com>,
         <mjrosato@linux.ibm.com>, <aik@ozlabs.ru>, <hch@lst.de>,
         Max Gurtovoy <mgurtovoy@nvidia.com>
-Subject: [PATCH 8/9] vfio/pci: export nvlink2 support into vendor vfio_pci drivers
-Date:   Tue, 9 Mar 2021 08:33:56 +0000
-Message-ID: <20210309083357.65467-9-mgurtovoy@nvidia.com>
+Subject: [PATCH 9/9] vfio/pci: export igd support into vendor vfio_pci driver
+Date:   Tue, 9 Mar 2021 08:33:57 +0000
+Message-ID: <20210309083357.65467-10-mgurtovoy@nvidia.com>
 X-Mailer: git-send-email 2.25.4
 In-Reply-To: <20210309083357.65467-1-mgurtovoy@nvidia.com>
 References: <20210309083357.65467-1-mgurtovoy@nvidia.com>
@@ -74,124 +74,100 @@ Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 12b3926e-4db4-4850-e361-08d8e2d63561
-X-MS-TrafficTypeDiagnostic: MW3PR12MB4412:
-X-Microsoft-Antispam-PRVS: <MW3PR12MB4412F7BBF02D981272C31DD1DE929@MW3PR12MB4412.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:7691;
+X-MS-Office365-Filtering-Correlation-Id: 7c9a7aaf-db9d-4dfa-f2c9-08d8e2d638f1
+X-MS-TrafficTypeDiagnostic: BN6PR12MB1202:
+X-Microsoft-Antispam-PRVS: <BN6PR12MB12029B11644F7532115C5703DE929@BN6PR12MB1202.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:268;
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 3ytcKo31YI6UjoWPp4ZpDL4wXbP3ks/w4rYMIAH2E9wmRUxWOuKylMVhXu32mo1cOn6fdPKZN65qD/sF136TweL1MMvgGwf5t4kdkYf2mMsmIl2v0jr5ItIpLkFO8ypOXTzr9ptUov3uO0IihT9SyLGVKribIMXAL1UIERHefNqQUMfTowChgqjRLmWorZQ9m5lTkwN34tpRVYQpIFXqu+3FAm6ano/VQXSFi/RxrV9L5D5nMLVPTJSrYBdKK7pER8v1Q5P0nnqgC69tH3BaFivtz61mSK9yDnf1mdEsxnk4zmaBWkcDdJSqHe++PAgx/bNSePpuTysRHgzgawk0hfMtzcoNYKY8A5l7Pc0pu4hqRgdpScD1T76x2tarm1ysTpnYw3tNNmE3s+xDWkVwPrIooC/ztnXXVcTIFC4wkwNKwSlctwBZrQ+BuJCNdhqv61w34DGTxDEsNgJu6KTWRxX3YD/T4TIsFSLTZG2Cf69e+qZhpjZqACd5zKGRC57CtNjzmff4vk6yum6pL+KZhPQu3wBu+JnYToJtsXC1Pqls3L5Y9YhTwsaGtyU/cSxlBSV21vVmiv/GDTb7izzv2zyedE3/1Ku5PIvMJR74pbsGcWmdu4i/ayXMz3fF7KZSWY6jTBl2YS4Xtk33FMS9+RdnWpwnL7CG1FzZ/UgQoIdOf66640+vmk4iOgKPe0wg
-X-Forefront-Antispam-Report: CIP:216.228.112.34;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:schybrid03.nvidia.com;CAT:NONE;SFS:(4636009)(396003)(346002)(376002)(136003)(39860400002)(36840700001)(46966006)(26005)(2616005)(86362001)(186003)(70586007)(1076003)(34020700004)(30864003)(5660300002)(70206006)(2906002)(54906003)(316002)(356005)(36860700001)(110136005)(83380400001)(8936002)(7636003)(8676002)(36756003)(47076005)(4326008)(6666004)(107886003)(478600001)(336012)(82310400003)(426003)(82740400003);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: zZp4SJecrXzWxkAwqtDtaGMKNxPYbimvSnS5V/tomYaNp4DB67nVFuiL0emcTdXym+4BlRHwAtQdfv4+Ksm7i8NRYOzivU7USoNr/u7wH348nXK4B/gmmTMzoFaWR07+YI5QIsuFAoGDn7SEOZARcvsbVwiDAlkFAl2+OzErgQDDSUB2GkHVCUaaCrBXgjYaWx03MQpjoPxNvrP7oIOR+D0/647N4U2NOAGcaox3Gxwmzg3KEGb9SahPMzZaZBUWwCvRWSuU1qTyDwsQ84ppj8OpnvvIuE9wpFT8lktWGKMOYwGW10wFrYbkWKtMR90lEewze1ay4YDKHFwJKmCYz1HP/impMpNT4p8uyX9rbSVXrOsgj/0Ka7FUtqIyEk1SZMEKF/WW1NrDhGgR8BPO7pWtBoQYSskmSD+ybbAPWduFEjDfa4XmpxvvUuwzfx9XSjCLRdM91B+Q5LOt0zZfYtQzez2CKRpqe9er9Md7rQ4KDtuxzsvYYPBSa22CJGlhPnciDOAUvz7LUoszbIk3943EF4GaOMfOYbkLU1HpFJUMvfNQ1bTmskUgDA8V8WTdv/pm2InZw7zTPm8NPfBHIKeTVoQiEfmEeaT7vdgKZg+4BC4K0L1f2c9ZojmcbkZCy2ilhr1x6Qvl5JVQ9U03g2E+FwpzbzeYPIuMzlTD9JjIkIuUWLlZZbXslDZWsDIZ
+X-Forefront-Antispam-Report: CIP:216.228.112.35;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:schybrid04.nvidia.com;CAT:NONE;SFS:(4636009)(39860400002)(376002)(346002)(396003)(136003)(36840700001)(46966006)(426003)(36860700001)(70586007)(83380400001)(36756003)(107886003)(82740400003)(2906002)(70206006)(34020700004)(478600001)(82310400003)(186003)(336012)(8676002)(26005)(8936002)(356005)(2616005)(5660300002)(110136005)(86362001)(4326008)(54906003)(1076003)(7636003)(47076005)(316002);DIR:OUT;SFP:1101;
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Mar 2021 08:34:51.7782
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Mar 2021 08:34:57.7575
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 12b3926e-4db4-4850-e361-08d8e2d63561
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7c9a7aaf-db9d-4dfa-f2c9-08d8e2d638f1
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.112.34];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT024.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.112.35];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT037.eop-nam11.prod.protection.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW3PR12MB4412
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN6PR12MB1202
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The new drivers introduced are nvlink2gpu_vfio_pci.ko and
-npu2_vfio_pci.ko.
-The first will be responsible for providing special extensions for
-NVIDIA GPUs with NVLINK2 support for P9 platform (and others in the
-future). The last will be responsible for POWER9 NPU2 unit (NVLink2 host
-bus adapter).
+Create a new driver igd_vfio_pci.ko that will be responsible for
+providing special extensions for INTEL Graphics card (GVT-d).
 
-Also, preserve backward compatibility for users that were binding
-NVLINK2 devices to vfio_pci.ko. Hopefully this compatibility layer will
-be dropped in the future
+Also preserve backward compatibility with vfio_pci.ko vendor specific
+extensions.
 
 Signed-off-by: Max Gurtovoy <mgurtovoy@nvidia.com>
 ---
- drivers/vfio/pci/Kconfig                      |  28 +++-
- drivers/vfio/pci/Makefile                     |   7 +-
- .../pci/{vfio_pci_npu2.c => npu2_vfio_pci.c}  | 144 ++++++++++++++++-
- drivers/vfio/pci/npu2_vfio_pci.h              |  24 +++
- ...pci_nvlink2gpu.c => nvlink2gpu_vfio_pci.c} | 149 +++++++++++++++++-
- drivers/vfio/pci/nvlink2gpu_vfio_pci.h        |  24 +++
- drivers/vfio/pci/vfio_pci.c                   |  61 ++++++-
- drivers/vfio/pci/vfio_pci_core.c              |  18 ---
- drivers/vfio/pci/vfio_pci_core.h              |  14 --
- 9 files changed, 422 insertions(+), 47 deletions(-)
- rename drivers/vfio/pci/{vfio_pci_npu2.c => npu2_vfio_pci.c} (64%)
- create mode 100644 drivers/vfio/pci/npu2_vfio_pci.h
- rename drivers/vfio/pci/{vfio_pci_nvlink2gpu.c => nvlink2gpu_vfio_pci.c} (67%)
- create mode 100644 drivers/vfio/pci/nvlink2gpu_vfio_pci.h
+ drivers/vfio/pci/Kconfig                      |   5 +-
+ drivers/vfio/pci/Makefile                     |   4 +-
+ .../pci/{vfio_pci_igd.c => igd_vfio_pci.c}    | 147 +++++++++++++++++-
+ drivers/vfio/pci/igd_vfio_pci.h               |  24 +++
+ drivers/vfio/pci/vfio_pci.c                   |   4 +
+ drivers/vfio/pci/vfio_pci_core.c              |  15 --
+ drivers/vfio/pci/vfio_pci_core.h              |   9 --
+ 7 files changed, 176 insertions(+), 32 deletions(-)
+ rename drivers/vfio/pci/{vfio_pci_igd.c => igd_vfio_pci.c} (62%)
+ create mode 100644 drivers/vfio/pci/igd_vfio_pci.h
 
 diff --git a/drivers/vfio/pci/Kconfig b/drivers/vfio/pci/Kconfig
-index 829e90a2e5a3..88c89863a205 100644
+index 88c89863a205..09d85ba3e5b2 100644
 --- a/drivers/vfio/pci/Kconfig
 +++ b/drivers/vfio/pci/Kconfig
-@@ -48,8 +48,30 @@ config VFIO_PCI_IGD
+@@ -37,17 +37,14 @@ config VFIO_PCI_INTX
+ 	def_bool y if !S390
  
- 	  To enable Intel IGD assignment through vfio-pci, say Y.
- 
--config VFIO_PCI_NVLINK2
--	def_bool y
-+config VFIO_PCI_NVLINK2GPU
-+	tristate "VFIO support for NVIDIA NVLINK2 GPUs"
- 	depends on VFIO_PCI_CORE && PPC_POWERNV
+ config VFIO_PCI_IGD
+-	bool "VFIO PCI extensions for Intel graphics (GVT-d)"
++	tristate "VFIO PCI extensions for Intel graphics (GVT-d)"
+ 	depends on VFIO_PCI_CORE && X86
+-	default y
  	help
--	  VFIO PCI support for P9 Witherspoon machine with NVIDIA V100 GPUs
-+	  VFIO PCI driver for NVIDIA NVLINK2 GPUs with specific extensions
-+	  for P9 Witherspoon machine.
-+
-+config VFIO_PCI_NPU2
-+	tristate "VFIO support for IBM NPU host bus adapter on P9"
-+	depends on VFIO_PCI_NVLINK2GPU && PPC_POWERNV
-+	help
-+	  VFIO PCI specific extensions for IBM NVLink2 host bus adapter on P9
-+	  Witherspoon machine.
-+
-+config VFIO_PCI_DRIVER_COMPAT
-+	bool "VFIO PCI backward compatibility for vendor specific extensions"
-+	default y
-+	depends on VFIO_PCI
-+	help
-+	  Say Y here if you want to preserve VFIO PCI backward
-+	  compatibility. vfio_pci.ko will continue to automatically use
-+	  the NVLINK2, NPU2 and IGD VFIO drivers when it is attached to
-+	  a compatible device.
-+
-+	  When N is selected the user must bind explicity to the module
-+	  they want to handle the device and vfio_pci.ko will have no
-+	  device specific special behaviors.
+ 	  Support for Intel IGD specific extensions to enable direct
+ 	  assignment to virtual machines.  This includes exposing an IGD
+ 	  specific firmware table and read-only copies of the host bridge
+ 	  and LPC bridge config space.
+ 
+-	  To enable Intel IGD assignment through vfio-pci, say Y.
+-
+ config VFIO_PCI_NVLINK2GPU
+ 	tristate "VFIO support for NVIDIA NVLINK2 GPUs"
+ 	depends on VFIO_PCI_CORE && PPC_POWERNV
 diff --git a/drivers/vfio/pci/Makefile b/drivers/vfio/pci/Makefile
-index f539f32c9296..86fb62e271fc 100644
+index 86fb62e271fc..298b2fb3f075 100644
 --- a/drivers/vfio/pci/Makefile
 +++ b/drivers/vfio/pci/Makefile
-@@ -2,10 +2,15 @@
- 
- obj-$(CONFIG_VFIO_PCI_CORE) += vfio-pci-core.o
+@@ -4,9 +4,9 @@ obj-$(CONFIG_VFIO_PCI_CORE) += vfio-pci-core.o
  obj-$(CONFIG_VFIO_PCI) += vfio-pci.o
-+obj-$(CONFIG_VFIO_PCI_NPU2) += npu2-vfio-pci.o
-+obj-$(CONFIG_VFIO_PCI_NVLINK2GPU) += nvlink2gpu-vfio-pci.o
+ obj-$(CONFIG_VFIO_PCI_NPU2) += npu2-vfio-pci.o
+ obj-$(CONFIG_VFIO_PCI_NVLINK2GPU) += nvlink2gpu-vfio-pci.o
++obj-$(CONFIG_VFIO_PCI_IGD) += igd-vfio-pci.o
  
  vfio-pci-core-y := vfio_pci_core.o vfio_pci_intrs.o vfio_pci_rdwr.o vfio_pci_config.o
- vfio-pci-core-$(CONFIG_VFIO_PCI_IGD) += vfio_pci_igd.o
--vfio-pci-core-$(CONFIG_VFIO_PCI_NVLINK2) += vfio_pci_nvlink2gpu.o vfio_pci_npu2.o
+-vfio-pci-core-$(CONFIG_VFIO_PCI_IGD) += vfio_pci_igd.o
  vfio-pci-core-$(CONFIG_S390) += vfio_pci_zdev.o
  
  vfio-pci-y := vfio_pci.o
+@@ -14,3 +14,5 @@ vfio-pci-y := vfio_pci.o
+ npu2-vfio-pci-y := npu2_vfio_pci.o
+ 
+ nvlink2gpu-vfio-pci-y := nvlink2gpu_vfio_pci.o
 +
-+npu2-vfio-pci-y := npu2_vfio_pci.o
-+
-+nvlink2gpu-vfio-pci-y := nvlink2gpu_vfio_pci.o
-diff --git a/drivers/vfio/pci/vfio_pci_npu2.c b/drivers/vfio/pci/npu2_vfio_pci.c
-similarity index 64%
-rename from drivers/vfio/pci/vfio_pci_npu2.c
-rename to drivers/vfio/pci/npu2_vfio_pci.c
-index 717745256ab3..7071bda0f2b6 100644
---- a/drivers/vfio/pci/vfio_pci_npu2.c
-+++ b/drivers/vfio/pci/npu2_vfio_pci.c
-@@ -14,19 +14,28 @@
-  *	Author: Alex Williamson <alex.williamson@redhat.com>
++igd-vfio-pci-y := igd_vfio_pci.o
+diff --git a/drivers/vfio/pci/vfio_pci_igd.c b/drivers/vfio/pci/igd_vfio_pci.c
+similarity index 62%
+rename from drivers/vfio/pci/vfio_pci_igd.c
+rename to drivers/vfio/pci/igd_vfio_pci.c
+index 2388c9722ed8..bbbc432bca82 100644
+--- a/drivers/vfio/pci/vfio_pci_igd.c
++++ b/drivers/vfio/pci/igd_vfio_pci.c
+@@ -10,19 +10,32 @@
+  * address is also virtualized to prevent user modification.
   */
  
 +#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
@@ -199,52 +175,47 @@ index 717745256ab3..7071bda0f2b6 100644
 +#include <linux/module.h>
  #include <linux/io.h>
  #include <linux/pci.h>
++#include <linux/list.h>
  #include <linux/uaccess.h>
  #include <linux/vfio.h>
-+#include <linux/list.h>
- #include <linux/sched/mm.h>
- #include <linux/mmu_context.h>
- #include <asm/kvm_ppc.h>
  
  #include "vfio_pci_core.h"
-+#include "npu2_vfio_pci.h"
++#include "igd_vfio_pci.h"
  
- #define CREATE_TRACE_POINTS
- #include "npu2_trace.h"
+ #define OPREGION_SIGNATURE	"IntelGraphicsMem"
+ #define OPREGION_SIZE		(8 * 1024)
+ #define OPREGION_PCI_ADDR	0xfc
  
+-static size_t vfio_pci_igd_rw(struct vfio_pci_core_device *vdev, char __user *buf,
+-			      size_t count, loff_t *ppos, bool iswrite)
 +#define DRIVER_VERSION  "0.1"
-+#define DRIVER_AUTHOR   "Alexey Kardashevskiy <aik@ozlabs.ru>"
-+#define DRIVER_DESC     "NPU2 VFIO PCI - User Level meta-driver for POWER9 NPU NVLink2 HBA"
++#define DRIVER_AUTHOR   "Alex Williamson <alex.williamson@redhat.com>"
++#define DRIVER_DESC     "IGD VFIO PCI - User Level meta-driver for Intel Graphics Processing Unit"
 +
- EXPORT_TRACEPOINT_SYMBOL_GPL(vfio_pci_npu2_mmap);
- 
- struct vfio_pci_npu2_data {
-@@ -36,6 +45,10 @@ struct vfio_pci_npu2_data {
- 	unsigned int link_speed; /* The link speed from DT's ibm,nvlink-speed */
- };
- 
-+struct npu2_vfio_pci_device {
++struct igd_vfio_pci_device {
 +	struct vfio_pci_core_device	vdev;
 +};
 +
- static size_t vfio_pci_npu2_rw(struct vfio_pci_core_device *vdev,
- 		char __user *buf, size_t count, loff_t *ppos, bool iswrite)
++static size_t vfio_pci_igd_rw(struct vfio_pci_core_device *vdev,
++		char __user *buf, size_t count, loff_t *ppos, bool iswrite)
  {
-@@ -120,7 +133,7 @@ static const struct vfio_pci_regops vfio_pci_npu2_regops = {
- 	.add_capability = vfio_pci_npu2_add_capability,
- };
+ 	unsigned int i = VFIO_PCI_OFFSET_TO_INDEX(*ppos) - VFIO_PCI_NUM_REGIONS;
+ 	void *base = vdev->region[i].data;
+@@ -261,7 +274,7 @@ static int vfio_pci_igd_cfg_init(struct vfio_pci_core_device *vdev)
+ 	return 0;
+ }
  
--int vfio_pci_ibm_npu2_init(struct vfio_pci_core_device *vdev)
-+static int vfio_pci_ibm_npu2_init(struct vfio_pci_core_device *vdev)
+-int vfio_pci_igd_init(struct vfio_pci_core_device *vdev)
++static int vfio_pci_igd_init(struct vfio_pci_core_device *vdev)
  {
  	int ret;
- 	struct vfio_pci_npu2_data *data;
-@@ -220,3 +233,132 @@ int vfio_pci_ibm_npu2_init(struct vfio_pci_core_device *vdev)
  
- 	return ret;
+@@ -275,3 +288,131 @@ int vfio_pci_igd_init(struct vfio_pci_core_device *vdev)
+ 
+ 	return 0;
  }
 +
-+static void npu2_vfio_pci_release(void *device_data)
++static void igd_vfio_pci_release(void *device_data)
 +{
 +	struct vfio_pci_core_device *vdev = device_data;
 +
@@ -259,7 +230,7 @@ index 717745256ab3..7071bda0f2b6 100644
 +	module_put(THIS_MODULE);
 +}
 +
-+static int npu2_vfio_pci_open(void *device_data)
++static int igd_vfio_pci_open(void *device_data)
 +{
 +	struct vfio_pci_core_device *vdev = device_data;
 +	int ret = 0;
@@ -274,10 +245,9 @@ index 717745256ab3..7071bda0f2b6 100644
 +		if (ret)
 +			goto error;
 +
-+		ret = vfio_pci_ibm_npu2_init(vdev);
++		ret = vfio_pci_igd_init(vdev);
 +		if (ret && ret != -ENODEV) {
-+			pci_warn(vdev->pdev,
-+				 "Failed to setup NVIDIA NV2 ATSD region\n");
++			pci_warn(vdev->pdev, "Failed to setup Intel IGD regions\n");
 +			vfio_pci_core_disable(vdev);
 +			goto error;
 +		}
@@ -294,10 +264,10 @@ index 717745256ab3..7071bda0f2b6 100644
 +	return ret;
 +}
 +
-+static const struct vfio_device_ops npu2_vfio_pci_ops = {
-+	.name		= "npu2-vfio-pci",
-+	.open		= npu2_vfio_pci_open,
-+	.release	= npu2_vfio_pci_release,
++static const struct vfio_device_ops igd_vfio_pci_ops = {
++	.name		= "igd-vfio-pci",
++	.open		= igd_vfio_pci_open,
++	.release	= igd_vfio_pci_release,
 +	.ioctl		= vfio_pci_core_ioctl,
 +	.read		= vfio_pci_core_read,
 +	.write		= vfio_pci_core_write,
@@ -306,50 +276,50 @@ index 717745256ab3..7071bda0f2b6 100644
 +	.match		= vfio_pci_core_match,
 +};
 +
-+static int npu2_vfio_pci_probe(struct pci_dev *pdev,
++static int igd_vfio_pci_probe(struct pci_dev *pdev,
 +		const struct pci_device_id *id)
 +{
-+	struct npu2_vfio_pci_device *npvdev;
++	struct igd_vfio_pci_device *igvdev;
 +	int ret;
 +
-+	npvdev = kzalloc(sizeof(*npvdev), GFP_KERNEL);
-+	if (!npvdev)
++	igvdev = kzalloc(sizeof(*igvdev), GFP_KERNEL);
++	if (!igvdev)
 +		return -ENOMEM;
 +
-+	ret = vfio_pci_core_register_device(&npvdev->vdev, pdev,
-+			&npu2_vfio_pci_ops);
++	ret = vfio_pci_core_register_device(&igvdev->vdev, pdev,
++			&igd_vfio_pci_ops);
 +	if (ret)
 +		goto out_free;
 +
 +	return 0;
 +
 +out_free:
-+	kfree(npvdev);
++	kfree(igvdev);
 +	return ret;
 +}
 +
-+static void npu2_vfio_pci_remove(struct pci_dev *pdev)
++static void igd_vfio_pci_remove(struct pci_dev *pdev)
 +{
 +	struct vfio_device *vdev = dev_get_drvdata(&pdev->dev);
 +	struct vfio_pci_core_device *core_vpdev = vfio_device_data(vdev);
-+	struct npu2_vfio_pci_device *npvdev;
++	struct igd_vfio_pci_device *igvdev;
 +
-+	npvdev = container_of(core_vpdev, struct npu2_vfio_pci_device, vdev);
++	igvdev = container_of(core_vpdev, struct igd_vfio_pci_device, vdev);
 +
 +	vfio_pci_core_unregister_device(core_vpdev);
-+	kfree(npvdev);
++	kfree(igvdev);
 +}
 +
-+static const struct pci_device_id npu2_vfio_pci_table[] = {
-+	{ PCI_VDEVICE(IBM, 0x04ea) },
++static const struct pci_device_id igd_vfio_pci_table[] = {
++	{ PCI_VENDOR_ID_INTEL, PCI_ANY_ID, PCI_ANY_ID, PCI_ANY_ID, PCI_CLASS_DISPLAY_VGA << 8, 0xff0000, 0 },
 +	{ 0, }
 +};
 +
-+static struct pci_driver npu2_vfio_pci_driver = {
-+	.name			= "npu2-vfio-pci",
-+	.id_table		= npu2_vfio_pci_table,
-+	.probe			= npu2_vfio_pci_probe,
-+	.remove			= npu2_vfio_pci_remove,
++static struct pci_driver igd_vfio_pci_driver = {
++	.name			= "igd-vfio-pci",
++	.id_table		= igd_vfio_pci_table,
++	.probe			= igd_vfio_pci_probe,
++	.remove			= igd_vfio_pci_remove,
 +#ifdef CONFIG_PCI_IOV
 +	.sriov_configure	= vfio_pci_core_sriov_configure,
 +#endif
@@ -357,26 +327,26 @@ index 717745256ab3..7071bda0f2b6 100644
 +};
 +
 +#ifdef CONFIG_VFIO_PCI_DRIVER_COMPAT
-+struct pci_driver *get_npu2_vfio_pci_driver(struct pci_dev *pdev)
++struct pci_driver *get_igd_vfio_pci_driver(struct pci_dev *pdev)
 +{
-+	if (pci_match_id(npu2_vfio_pci_driver.id_table, pdev))
-+		return &npu2_vfio_pci_driver;
++	if (pci_match_id(igd_vfio_pci_driver.id_table, pdev))
++		return &igd_vfio_pci_driver;
 +	return NULL;
 +}
-+EXPORT_SYMBOL_GPL(get_npu2_vfio_pci_driver);
++EXPORT_SYMBOL_GPL(get_igd_vfio_pci_driver);
 +#endif
 +
-+module_pci_driver(npu2_vfio_pci_driver);
++module_pci_driver(igd_vfio_pci_driver);
 +
 +MODULE_VERSION(DRIVER_VERSION);
 +MODULE_LICENSE("GPL v2");
 +MODULE_AUTHOR(DRIVER_AUTHOR);
 +MODULE_DESCRIPTION(DRIVER_DESC);
-diff --git a/drivers/vfio/pci/npu2_vfio_pci.h b/drivers/vfio/pci/npu2_vfio_pci.h
+diff --git a/drivers/vfio/pci/igd_vfio_pci.h b/drivers/vfio/pci/igd_vfio_pci.h
 new file mode 100644
-index 000000000000..92010d340346
+index 000000000000..859aeca354cb
 --- /dev/null
-+++ b/drivers/vfio/pci/npu2_vfio_pci.h
++++ b/drivers/vfio/pci/igd_vfio_pci.h
 @@ -0,0 +1,24 @@
 +/* SPDX-License-Identifier: GPL-2.0 */
 +/*
@@ -384,400 +354,93 @@ index 000000000000..92010d340346
 + *     Author: Max Gurtovoy <mgurtovoy@nvidia.com>
 + */
 +
-+#ifndef NPU2_VFIO_PCI_H
-+#define NPU2_VFIO_PCI_H
++#ifndef IGD_VFIO_PCI_H
++#define IGD_VFIO_PCI_H
 +
 +#include <linux/pci.h>
 +#include <linux/module.h>
 +
 +#ifdef CONFIG_VFIO_PCI_DRIVER_COMPAT
-+#if defined(CONFIG_VFIO_PCI_NPU2) || defined(CONFIG_VFIO_PCI_NPU2_MODULE)
-+struct pci_driver *get_npu2_vfio_pci_driver(struct pci_dev *pdev);
++#if defined(CONFIG_VFIO_PCI_IGD) || defined(CONFIG_VFIO_PCI_IGD_MODULE)
++struct pci_driver *get_igd_vfio_pci_driver(struct pci_dev *pdev);
 +#else
-+struct pci_driver *get_npu2_vfio_pci_driver(struct pci_dev *pdev)
++struct pci_driver *get_igd_vfio_pci_driver(struct pci_dev *pdev)
 +{
 +	return NULL;
 +}
 +#endif
 +#endif
 +
-+#endif /* NPU2_VFIO_PCI_H */
-diff --git a/drivers/vfio/pci/vfio_pci_nvlink2gpu.c b/drivers/vfio/pci/nvlink2gpu_vfio_pci.c
-similarity index 67%
-rename from drivers/vfio/pci/vfio_pci_nvlink2gpu.c
-rename to drivers/vfio/pci/nvlink2gpu_vfio_pci.c
-index 6dce1e78ee82..84a5ac1ce8ac 100644
---- a/drivers/vfio/pci/vfio_pci_nvlink2gpu.c
-+++ b/drivers/vfio/pci/nvlink2gpu_vfio_pci.c
-@@ -1,6 +1,6 @@
- // SPDX-License-Identifier: GPL-2.0-only
- /*
-- * VFIO PCI NVIDIA Whitherspoon GPU support a.k.a. NVLink2.
-+ * VFIO PCI NVIDIA NVLink2 GPUs support.
-  *
-  * Copyright (C) 2018 IBM Corp.  All rights reserved.
-  *     Author: Alexey Kardashevskiy <aik@ozlabs.ru>
-@@ -12,6 +12,9 @@
-  *	Author: Alex Williamson <alex.williamson@redhat.com>
-  */
- 
-+#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
-+
-+#include <linux/module.h>
- #include <linux/io.h>
- #include <linux/pci.h>
- #include <linux/uaccess.h>
-@@ -21,10 +24,15 @@
- #include <asm/kvm_ppc.h>
- 
- #include "vfio_pci_core.h"
-+#include "nvlink2gpu_vfio_pci.h"
- 
- #define CREATE_TRACE_POINTS
- #include "nvlink2gpu_trace.h"
- 
-+#define DRIVER_VERSION  "0.1"
-+#define DRIVER_AUTHOR   "Alexey Kardashevskiy <aik@ozlabs.ru>"
-+#define DRIVER_DESC     "NVLINK2GPU VFIO PCI - User Level meta-driver for NVIDIA NVLink2 GPUs"
-+
- EXPORT_TRACEPOINT_SYMBOL_GPL(vfio_pci_nvgpu_mmap_fault);
- EXPORT_TRACEPOINT_SYMBOL_GPL(vfio_pci_nvgpu_mmap);
- 
-@@ -39,6 +47,10 @@ struct vfio_pci_nvgpu_data {
- 	struct notifier_block group_notifier;
- };
- 
-+struct nv_vfio_pci_device {
-+	struct vfio_pci_core_device	vdev;
-+};
-+
- static size_t vfio_pci_nvgpu_rw(struct vfio_pci_core_device *vdev,
- 		char __user *buf, size_t count, loff_t *ppos, bool iswrite)
- {
-@@ -207,7 +219,8 @@ static int vfio_pci_nvgpu_group_notifier(struct notifier_block *nb,
- 	return NOTIFY_OK;
- }
- 
--int vfio_pci_nvidia_v100_nvlink2_init(struct vfio_pci_core_device *vdev)
-+static int
-+vfio_pci_nvidia_v100_nvlink2_init(struct vfio_pci_core_device *vdev)
- {
- 	int ret;
- 	u64 reg[2];
-@@ -293,3 +306,135 @@ int vfio_pci_nvidia_v100_nvlink2_init(struct vfio_pci_core_device *vdev)
- 
- 	return ret;
- }
-+
-+static void nvlink2gpu_vfio_pci_release(void *device_data)
-+{
-+	struct vfio_pci_core_device *vdev = device_data;
-+
-+	mutex_lock(&vdev->reflck->lock);
-+	if (!(--vdev->refcnt)) {
-+		vfio_pci_vf_token_user_add(vdev, -1);
-+		vfio_pci_core_spapr_eeh_release(vdev);
-+		vfio_pci_core_disable(vdev);
-+	}
-+	mutex_unlock(&vdev->reflck->lock);
-+
-+	module_put(THIS_MODULE);
-+}
-+
-+static int nvlink2gpu_vfio_pci_open(void *device_data)
-+{
-+	struct vfio_pci_core_device *vdev = device_data;
-+	int ret = 0;
-+
-+	if (!try_module_get(THIS_MODULE))
-+		return -ENODEV;
-+
-+	mutex_lock(&vdev->reflck->lock);
-+
-+	if (!vdev->refcnt) {
-+		ret = vfio_pci_core_enable(vdev);
-+		if (ret)
-+			goto error;
-+
-+		ret = vfio_pci_nvidia_v100_nvlink2_init(vdev);
-+		if (ret && ret != -ENODEV) {
-+			pci_warn(vdev->pdev,
-+				 "Failed to setup NVIDIA NV2 RAM region\n");
-+			vfio_pci_core_disable(vdev);
-+			goto error;
-+		}
-+		ret = 0;
-+		vfio_pci_probe_mmaps(vdev);
-+		vfio_pci_core_spapr_eeh_open(vdev);
-+		vfio_pci_vf_token_user_add(vdev, 1);
-+	}
-+	vdev->refcnt++;
-+error:
-+	mutex_unlock(&vdev->reflck->lock);
-+	if (ret)
-+		module_put(THIS_MODULE);
-+	return ret;
-+}
-+
-+static const struct vfio_device_ops nvlink2gpu_vfio_pci_ops = {
-+	.name		= "nvlink2gpu-vfio-pci",
-+	.open		= nvlink2gpu_vfio_pci_open,
-+	.release	= nvlink2gpu_vfio_pci_release,
-+	.ioctl		= vfio_pci_core_ioctl,
-+	.read		= vfio_pci_core_read,
-+	.write		= vfio_pci_core_write,
-+	.mmap		= vfio_pci_core_mmap,
-+	.request	= vfio_pci_core_request,
-+	.match		= vfio_pci_core_match,
-+};
-+
-+static int nvlink2gpu_vfio_pci_probe(struct pci_dev *pdev,
-+		const struct pci_device_id *id)
-+{
-+	struct nv_vfio_pci_device *nvdev;
-+	int ret;
-+
-+	nvdev = kzalloc(sizeof(*nvdev), GFP_KERNEL);
-+	if (!nvdev)
-+		return -ENOMEM;
-+
-+	ret = vfio_pci_core_register_device(&nvdev->vdev, pdev,
-+			&nvlink2gpu_vfio_pci_ops);
-+	if (ret)
-+		goto out_free;
-+
-+	return 0;
-+
-+out_free:
-+	kfree(nvdev);
-+	return ret;
-+}
-+
-+static void nvlink2gpu_vfio_pci_remove(struct pci_dev *pdev)
-+{
-+	struct vfio_device *vdev = dev_get_drvdata(&pdev->dev);
-+	struct vfio_pci_core_device *core_vpdev = vfio_device_data(vdev);
-+	struct nv_vfio_pci_device *nvdev;
-+
-+	nvdev = container_of(core_vpdev, struct nv_vfio_pci_device, vdev);
-+
-+	vfio_pci_core_unregister_device(core_vpdev);
-+	kfree(nvdev);
-+}
-+
-+static const struct pci_device_id nvlink2gpu_vfio_pci_table[] = {
-+	{ PCI_VDEVICE(NVIDIA, 0x1DB1) }, /* GV100GL-A NVIDIA Tesla V100-SXM2-16GB */
-+	{ PCI_VDEVICE(NVIDIA, 0x1DB5) }, /* GV100GL-A NVIDIA Tesla V100-SXM2-32GB */
-+	{ PCI_VDEVICE(NVIDIA, 0x1DB8) }, /* GV100GL-A NVIDIA Tesla V100-SXM3-32GB */
-+	{ PCI_VDEVICE(NVIDIA, 0x1DF5) }, /* GV100GL-B NVIDIA Tesla V100-SXM2-16GB */
-+	{ 0, }
-+};
-+
-+static struct pci_driver nvlink2gpu_vfio_pci_driver = {
-+	.name			= "nvlink2gpu-vfio-pci",
-+	.id_table		= nvlink2gpu_vfio_pci_table,
-+	.probe			= nvlink2gpu_vfio_pci_probe,
-+	.remove			= nvlink2gpu_vfio_pci_remove,
-+#ifdef CONFIG_PCI_IOV
-+	.sriov_configure	= vfio_pci_core_sriov_configure,
-+#endif
-+	.err_handler		= &vfio_pci_core_err_handlers,
-+};
-+
-+#ifdef CONFIG_VFIO_PCI_DRIVER_COMPAT
-+struct pci_driver *get_nvlink2gpu_vfio_pci_driver(struct pci_dev *pdev)
-+{
-+	if (pci_match_id(nvlink2gpu_vfio_pci_driver.id_table, pdev))
-+		return &nvlink2gpu_vfio_pci_driver;
-+	return NULL;
-+}
-+EXPORT_SYMBOL_GPL(get_nvlink2gpu_vfio_pci_driver);
-+#endif
-+
-+module_pci_driver(nvlink2gpu_vfio_pci_driver);
-+
-+MODULE_VERSION(DRIVER_VERSION);
-+MODULE_LICENSE("GPL v2");
-+MODULE_AUTHOR(DRIVER_AUTHOR);
-+MODULE_DESCRIPTION(DRIVER_DESC);
-diff --git a/drivers/vfio/pci/nvlink2gpu_vfio_pci.h b/drivers/vfio/pci/nvlink2gpu_vfio_pci.h
-new file mode 100644
-index 000000000000..ebd5b600b190
---- /dev/null
-+++ b/drivers/vfio/pci/nvlink2gpu_vfio_pci.h
-@@ -0,0 +1,24 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+/*
-+ * Copyright (c) 2020, Mellanox Technologies, Ltd.  All rights reserved.
-+ *     Author: Max Gurtovoy <mgurtovoy@nvidia.com>
-+ */
-+
-+#ifndef NVLINK2GPU_VFIO_PCI_H
-+#define NVLINK2GPU_VFIO_PCI_H
-+
-+#include <linux/pci.h>
-+#include <linux/module.h>
-+
-+#ifdef CONFIG_VFIO_PCI_DRIVER_COMPAT
-+#if defined(CONFIG_VFIO_PCI_NVLINK2GPU) || defined(CONFIG_VFIO_PCI_NVLINK2GPU_MODULE)
-+struct pci_driver *get_nvlink2gpu_vfio_pci_driver(struct pci_dev *pdev);
-+#else
-+struct pci_driver *get_nvlink2gpu_vfio_pci_driver(struct pci_dev *pdev)
-+{
-+	return NULL;
-+}
-+#endif
-+#endif
-+
-+#endif /* NVLINK2GPU_VFIO_PCI_H */
++#endif /* IGD_VFIO_PCI_H */
 diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
-index dbc0a6559914..8e81ea039f31 100644
+index 8e81ea039f31..1c2f6d55a243 100644
 --- a/drivers/vfio/pci/vfio_pci.c
 +++ b/drivers/vfio/pci/vfio_pci.c
-@@ -27,6 +27,10 @@
- #include <linux/uaccess.h>
- 
- #include "vfio_pci_core.h"
-+#ifdef CONFIG_VFIO_PCI_DRIVER_COMPAT
-+#include "npu2_vfio_pci.h"
-+#include "nvlink2gpu_vfio_pci.h"
-+#endif
+@@ -30,6 +30,7 @@
+ #ifdef CONFIG_VFIO_PCI_DRIVER_COMPAT
+ #include "npu2_vfio_pci.h"
+ #include "nvlink2gpu_vfio_pci.h"
++#include "igd_vfio_pci.h"
+ #endif
  
  #define DRIVER_VERSION  "0.2"
- #define DRIVER_AUTHOR   "Alex Williamson <alex.williamson@redhat.com>"
-@@ -142,14 +146,48 @@ static const struct vfio_device_ops vfio_pci_ops = {
- 	.match		= vfio_pci_core_match,
- };
- 
-+/*
-+ * This layer is used for backward compatibility. Hopefully it will be
-+ * removed in the future.
-+ */
-+static struct pci_driver *vfio_pci_get_compat_driver(struct pci_dev *pdev)
-+{
-+	switch (pdev->vendor) {
-+	case PCI_VENDOR_ID_NVIDIA:
-+		switch (pdev->device) {
-+		case 0x1db1:
-+		case 0x1db5:
-+		case 0x1db8:
-+		case 0x1df5:
-+			return get_nvlink2gpu_vfio_pci_driver(pdev);
-+		default:
-+			return NULL;
-+		}
-+	case PCI_VENDOR_ID_IBM:
-+		switch (pdev->device) {
-+		case 0x04ea:
-+			return get_npu2_vfio_pci_driver(pdev);
-+		default:
-+			return NULL;
-+		}
-+	}
-+
-+	return NULL;
-+}
-+
- static int vfio_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
- {
- 	struct vfio_pci_device *vpdev;
-+	struct pci_driver *driver;
- 	int ret;
- 
- 	if (vfio_pci_is_denylisted(pdev))
- 		return -EINVAL;
- 
-+	driver = vfio_pci_get_compat_driver(pdev);
-+	if (driver)
-+		return driver->probe(pdev, id);
-+
- 	vpdev = kzalloc(sizeof(*vpdev), GFP_KERNEL);
- 	if (!vpdev)
- 		return -ENOMEM;
-@@ -167,14 +205,21 @@ static int vfio_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
- 
- static void vfio_pci_remove(struct pci_dev *pdev)
- {
--	struct vfio_device *vdev = dev_get_drvdata(&pdev->dev);
--	struct vfio_pci_core_device *core_vpdev = vfio_device_data(vdev);
--	struct vfio_pci_device *vpdev;
--
--	vpdev = container_of(core_vpdev, struct vfio_pci_device, vdev);
--
--	vfio_pci_core_unregister_device(core_vpdev);
--	kfree(vpdev);
-+	struct pci_driver *driver;
-+
-+	driver = vfio_pci_get_compat_driver(pdev);
-+	if (driver) {
-+		driver->remove(pdev);
-+	} else {
-+		struct vfio_device *vdev = dev_get_drvdata(&pdev->dev);
-+		struct vfio_pci_core_device *core_vpdev;
-+		struct vfio_pci_device *vpdev;
-+
-+		core_vpdev = vfio_device_data(vdev);
-+		vpdev = container_of(core_vpdev, struct vfio_pci_device, vdev);
-+		vfio_pci_core_unregister_device(core_vpdev);
-+		kfree(vpdev);
-+	}
- }
- 
- static int vfio_pci_sriov_configure(struct pci_dev *pdev, int nr_virtfn)
-diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
-index 4de8e352df9c..f9b39abe54cb 100644
---- a/drivers/vfio/pci/vfio_pci_core.c
-+++ b/drivers/vfio/pci/vfio_pci_core.c
-@@ -354,24 +354,6 @@ int vfio_pci_core_enable(struct vfio_pci_core_device *vdev)
+@@ -170,6 +171,9 @@ static struct pci_driver *vfio_pci_get_compat_driver(struct pci_dev *pdev)
+ 		default:
+ 			return NULL;
  		}
++	case PCI_VENDOR_ID_INTEL:
++		if (pdev->class == PCI_CLASS_DISPLAY_VGA << 8)
++			return get_igd_vfio_pci_driver(pdev);
  	}
  
--	if (pdev->vendor == PCI_VENDOR_ID_NVIDIA &&
--	    IS_ENABLED(CONFIG_VFIO_PCI_NVLINK2)) {
--		ret = vfio_pci_nvidia_v100_nvlink2_init(vdev);
--		if (ret && ret != -ENODEV) {
--			pci_warn(pdev, "Failed to setup NVIDIA NV2 RAM region\n");
--			goto disable_exit;
--		}
--	}
+ 	return NULL;
+diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
+index f9b39abe54cb..59c9d0d56a0b 100644
+--- a/drivers/vfio/pci/vfio_pci_core.c
++++ b/drivers/vfio/pci/vfio_pci_core.c
+@@ -343,22 +343,7 @@ int vfio_pci_core_enable(struct vfio_pci_core_device *vdev)
+ 	if (!vfio_vga_disabled() && vfio_pci_is_vga(pdev))
+ 		vdev->has_vga = true;
+ 
 -
--	if (pdev->vendor == PCI_VENDOR_ID_IBM &&
--	    IS_ENABLED(CONFIG_VFIO_PCI_NVLINK2)) {
--		ret = vfio_pci_ibm_npu2_init(vdev);
+-	if (vfio_pci_is_vga(pdev) &&
+-	    pdev->vendor == PCI_VENDOR_ID_INTEL &&
+-	    IS_ENABLED(CONFIG_VFIO_PCI_IGD)) {
+-		ret = vfio_pci_igd_init(vdev);
 -		if (ret && ret != -ENODEV) {
--			pci_warn(pdev, "Failed to setup NVIDIA NV2 ATSD region\n");
+-			pci_warn(pdev, "Failed to setup Intel IGD regions\n");
 -			goto disable_exit;
 -		}
 -	}
 -
  	return 0;
+-
+-disable_exit:
+-	vfio_pci_disable(vdev);
+-	return ret;
+ }
+ EXPORT_SYMBOL_GPL(vfio_pci_core_enable);
  
- disable_exit:
 diff --git a/drivers/vfio/pci/vfio_pci_core.h b/drivers/vfio/pci/vfio_pci_core.h
-index 8989443c3086..31f3836e606e 100644
+index 31f3836e606e..2b5ea0db9284 100644
 --- a/drivers/vfio/pci/vfio_pci_core.h
 +++ b/drivers/vfio/pci/vfio_pci_core.h
-@@ -204,20 +204,6 @@ static inline int vfio_pci_igd_init(struct vfio_pci_core_device *vdev)
- 	return -ENODEV;
- }
- #endif
--#ifdef CONFIG_VFIO_PCI_NVLINK2
--extern int vfio_pci_nvidia_v100_nvlink2_init(struct vfio_pci_core_device *vdev);
--extern int vfio_pci_ibm_npu2_init(struct vfio_pci_core_device *vdev);
+@@ -196,15 +196,6 @@ extern u16 vfio_pci_memory_lock_and_enable(struct vfio_pci_core_device *vdev);
+ extern void vfio_pci_memory_unlock_and_restore(struct vfio_pci_core_device *vdev,
+ 					       u16 cmd);
+ 
+-#ifdef CONFIG_VFIO_PCI_IGD
+-extern int vfio_pci_igd_init(struct vfio_pci_core_device *vdev);
 -#else
--static inline int vfio_pci_nvidia_v100_nvlink2_init(struct vfio_pci_core_device *vdev)
--{
--	return -ENODEV;
--}
--
--static inline int vfio_pci_ibm_npu2_init(struct vfio_pci_core_device *vdev)
+-static inline int vfio_pci_igd_init(struct vfio_pci_core_device *vdev)
 -{
 -	return -ENODEV;
 -}
 -#endif
- 
+-
  #ifdef CONFIG_S390
  extern int vfio_pci_info_zdev_add_caps(struct vfio_pci_core_device *vdev,
+ 				       struct vfio_info_cap *caps);
 -- 
 2.25.4
 
