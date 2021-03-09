@@ -2,133 +2,111 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F07E03322A1
-	for <lists+kvm@lfdr.de>; Tue,  9 Mar 2021 11:10:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 664673322EA
+	for <lists+kvm@lfdr.de>; Tue,  9 Mar 2021 11:24:15 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230224AbhCIKKF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 9 Mar 2021 05:10:05 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:39016 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230149AbhCIKJv (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 9 Mar 2021 05:09:51 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1615284591;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=E7+PqvKTFHdaKCmM0AiAKUNzRu+ZOxj1wno09Cr/Az0=;
-        b=Gfjn7pEB3NvEmzpoN1dxvWcXIlXUuKqiAB/ozMa9mzwxe0cRyLDInLbm/TJZDgl4+D/Qp8
-        +m+hhwHY4budqdUfpKORDqz51bbrg06QvOfSvsgDqaxBlbiwFAepDoSW6Kj1+dbm53VCAg
-        fdqrrqg5CoImzEQ+c1bQeBtoUn51/eY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-544-BGkCS5InMzyjBBKcXi9jAA-1; Tue, 09 Mar 2021 05:09:47 -0500
-X-MC-Unique: BGkCS5InMzyjBBKcXi9jAA-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 59DB11005D45;
-        Tue,  9 Mar 2021 10:09:46 +0000 (UTC)
-Received: from starship (unknown [10.35.206.156])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id DB0935D6D7;
-        Tue,  9 Mar 2021 10:09:43 +0000 (UTC)
-Message-ID: <785c17c307e66b9d7b422cc577499d284cfb6e7b.camel@redhat.com>
-Subject: Re: [PATCH 2/2] KVM: x86/mmu: Exclude the MMU_PRESENT bit from MMIO
- SPTE's generation
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Tom Lendacky <thomas.lendacky@amd.com>
-Date:   Tue, 09 Mar 2021 12:09:41 +0200
-In-Reply-To: <20210309021900.1001843-3-seanjc@google.com>
-References: <20210309021900.1001843-1-seanjc@google.com>
-         <20210309021900.1001843-3-seanjc@google.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+        id S229980AbhCIKXk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 9 Mar 2021 05:23:40 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:16242 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S229691AbhCIKX0 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 9 Mar 2021 05:23:26 -0500
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 129A2Zd7030158;
+        Tue, 9 Mar 2021 05:23:21 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=Y2WYqbW5vkjG0KSIX+1BH32UqUNLKp0S+GdGNFjfW1A=;
+ b=XYrn2b4dcNORFoL99o+Qbz1b3dq78V3Ao9bB+BdXZQFlU8G/s+IYLNTca9UR/n97dDzN
+ UVhhIYw7wdeV3R61Rk8acVlmgj2IRaljbiY8AGPcTpiEF9iNvEni4IHUasmWDEER5Cyc
+ 5uXqP7PAKH0pUM8VYdMAZvcTwjIlp8s3C6pNlZ7OHi1uobcAESqSHoXkyEBaN0UDzykI
+ QgTLQlO0BXQPQboZNX2OEJWaDQOR0t31CWwmrF/IpGTsZvjm5Rv4Gq/wqOrw58CyiR4r
+ q2aWs0c4H37Q07ocllO1T6rF96viRmeEOux1e+Eqe4k9Og4QNISmkhr+lXw9NqpH5aPr tw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 375wdd61up-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 09 Mar 2021 05:23:21 -0500
+Received: from m0098416.ppops.net (m0098416.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 129A4qBj038770;
+        Tue, 9 Mar 2021 05:23:20 -0500
+Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 375wdd61tu-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 09 Mar 2021 05:23:20 -0500
+Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
+        by ppma04fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 1299rm5V009628;
+        Tue, 9 Mar 2021 10:23:19 GMT
+Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
+        by ppma04fra.de.ibm.com with ESMTP id 3741c89chq-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 09 Mar 2021 10:23:18 +0000
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
+        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 129AN0N030867852
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 9 Mar 2021 10:23:00 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id CE8B9A4051;
+        Tue,  9 Mar 2021 10:23:15 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 19FE4A404D;
+        Tue,  9 Mar 2021 10:23:15 +0000 (GMT)
+Received: from li-e979b1cc-23ba-11b2-a85c-dfd230f6cf82 (unknown [9.171.42.128])
+        by d06av23.portsmouth.uk.ibm.com (Postfix) with SMTP;
+        Tue,  9 Mar 2021 10:23:15 +0000 (GMT)
+Date:   Tue, 9 Mar 2021 11:23:13 +0100
+From:   Halil Pasic <pasic@linux.ibm.com>
+To:     Tony Krowiak <akrowiak@linux.ibm.com>
+Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, stable@vger.kernel.org,
+        borntraeger@de.ibm.com, cohuck@redhat.com, kwankhede@nvidia.com,
+        pbonzini@redhat.com, alex.williamson@redhat.com,
+        pasic@linux.vnet.ibm.com
+Subject: Re: [PATCH v3 1/1] s390/vfio-ap: fix circular lockdep when
+ setting/clearing crypto masks
+Message-ID: <20210309112313.4c6e3347.pasic@linux.ibm.com>
+In-Reply-To: <8f5ab6fa-8fd3-27d8-8561-d03ff457df16@linux.ibm.com>
+References: <20210302204322.24441-1-akrowiak@linux.ibm.com>
+        <20210302204322.24441-2-akrowiak@linux.ibm.com>
+        <20210303162332.4d227dbe.pasic@linux.ibm.com>
+        <14665bcf-2224-e313-43ff-357cadd177cf@linux.ibm.com>
+        <20210303204706.0538e84f.pasic@linux.ibm.com>
+        <8f5ab6fa-8fd3-27d8-8561-d03ff457df16@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.761
+ definitions=2021-03-09_09:2021-03-08,2021-03-09 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 bulkscore=0
+ malwarescore=0 clxscore=1015 phishscore=0 spamscore=0 lowpriorityscore=0
+ priorityscore=1501 mlxscore=0 impostorscore=0 suspectscore=0
+ mlxlogscore=861 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2103090048
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 2021-03-08 at 18:19 -0800, Sean Christopherson wrote:
-> Drop bit 11, used for the MMU_PRESENT flag, from the set of bits used to
-> store the generation number in MMIO SPTEs.  MMIO SPTEs with bit 11 set,
-> which occurs when userspace creates 128+ memslots in an address space,
-> get false positives for is_shadow_present_spte(), which lead to a variety
-> of fireworks, crashes KVM, and likely hangs the host kernel.
+On Thu, 4 Mar 2021 12:43:44 -0500
+Tony Krowiak <akrowiak@linux.ibm.com> wrote:
+
+> On the other hand, if we don't have ->kvm because something broke,
+> then we may be out of luck anyway. There will certainly be no
+> way to unregister the GISC; however, it may still be possible
+> to unpin the pages if we still have q->saved_pfn.
 > 
-> Fixes: b14e28f37e9b ("KVM: x86/mmu: Use a dedicated bit to track shadow/MMU-present SPTEs")
-> Reported-by: Tom Lendacky <thomas.lendacky@amd.com>
-> Reported-by: Paolo Bonzini <pbonzini@redhat.com>
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->  arch/x86/kvm/mmu/spte.h | 12 +++++++-----
->  1 file changed, 7 insertions(+), 5 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/mmu/spte.h b/arch/x86/kvm/mmu/spte.h
-> index b53036d9ddf3..bca0ba11cccf 100644
-> --- a/arch/x86/kvm/mmu/spte.h
-> +++ b/arch/x86/kvm/mmu/spte.h
-> @@ -101,11 +101,11 @@ static_assert(!(EPT_SPTE_MMU_WRITABLE & SHADOW_ACC_TRACK_SAVED_MASK));
->  #undef SHADOW_ACC_TRACK_SAVED_MASK
->  
->  /*
-> - * Due to limited space in PTEs, the MMIO generation is a 20 bit subset of
-> + * Due to limited space in PTEs, the MMIO generation is a 19 bit subset of
->   * the memslots generation and is derived as follows:
->   *
-> - * Bits 0-8 of the MMIO generation are propagated to spte bits 3-11
-> - * Bits 9-19 of the MMIO generation are propagated to spte bits 52-62
-> + * Bits 0-7 of the MMIO generation are propagated to spte bits 3-10
-> + * Bits 8-18 of the MMIO generation are propagated to spte bits 52-62
->   *
->   * The KVM_MEMSLOT_GEN_UPDATE_IN_PROGRESS flag is intentionally not included in
->   * the MMIO generation number, as doing so would require stealing a bit from
-> @@ -116,7 +116,7 @@ static_assert(!(EPT_SPTE_MMU_WRITABLE & SHADOW_ACC_TRACK_SAVED_MASK));
->   */
->  
->  #define MMIO_SPTE_GEN_LOW_START		3
-> -#define MMIO_SPTE_GEN_LOW_END		11
-> +#define MMIO_SPTE_GEN_LOW_END		10
->  
->  #define MMIO_SPTE_GEN_HIGH_START	52
->  #define MMIO_SPTE_GEN_HIGH_END		62
-> @@ -125,12 +125,14 @@ static_assert(!(EPT_SPTE_MMU_WRITABLE & SHADOW_ACC_TRACK_SAVED_MASK));
->  						    MMIO_SPTE_GEN_LOW_START)
->  #define MMIO_SPTE_GEN_HIGH_MASK		GENMASK_ULL(MMIO_SPTE_GEN_HIGH_END, \
->  						    MMIO_SPTE_GEN_HIGH_START)
-> +static_assert(!(SPTE_MMU_PRESENT_MASK &
-> +		(MMIO_SPTE_GEN_LOW_MASK | MMIO_SPTE_GEN_HIGH_MASK)));
->  
->  #define MMIO_SPTE_GEN_LOW_BITS		(MMIO_SPTE_GEN_LOW_END - MMIO_SPTE_GEN_LOW_START + 1)
->  #define MMIO_SPTE_GEN_HIGH_BITS		(MMIO_SPTE_GEN_HIGH_END - MMIO_SPTE_GEN_HIGH_START + 1)
->  
->  /* remember to adjust the comment above as well if you change these */
-> -static_assert(MMIO_SPTE_GEN_LOW_BITS == 9 && MMIO_SPTE_GEN_HIGH_BITS == 11);
-> +static_assert(MMIO_SPTE_GEN_LOW_BITS == 8 && MMIO_SPTE_GEN_HIGH_BITS == 11);
->  
->  #define MMIO_SPTE_GEN_LOW_SHIFT		(MMIO_SPTE_GEN_LOW_START - 0)
->  #define MMIO_SPTE_GEN_HIGH_SHIFT	(MMIO_SPTE_GEN_HIGH_START - MMIO_SPTE_GEN_LOW_BITS)
-I bisected this and I reached the same conclusion that bit 11 has to be removed from mmio generation mask.
+> The point is, if the queue is bound to vfio_ap, it can be reset. If we can't
+> clean up the IRQ resources because something is broken, then there
+> is nothing we can do about that.
 
-Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
- 
-I do wonder, why do we need 19 (and now 18 bits) for the mmio generation:
+Especially since the recently added WARN_ONCE macros calling reset_queues
+unconditionally ain't that bad: we would at least see if there is a
+problem with cleaning up the IRQ resources.
 
-What happens if mmio generation overflows (e.g if userspace keeps on updating the memslots)? 
-In theory if we have a SPTE with a stale generation, it can became valid, no?
+Let's make it unconditional again and observe. Can you send out a v4 with
+this and the other issue fixed. 
 
-I think that we should in the case of the overflow zap all mmio sptes.
-What do you think?
-
-Best regards,
-	Maxim Levitsky
-
+Regards,
+Halil
