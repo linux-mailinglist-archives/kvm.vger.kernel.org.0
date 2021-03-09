@@ -2,73 +2,91 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F2F19331B8B
-	for <lists+kvm@lfdr.de>; Tue,  9 Mar 2021 01:19:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D9D0F331B9A
+	for <lists+kvm@lfdr.de>; Tue,  9 Mar 2021 01:22:21 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231941AbhCIASe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 8 Mar 2021 19:18:34 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43704 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231339AbhCIASA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 8 Mar 2021 19:18:00 -0500
-Received: from ms.lwn.net (ms.lwn.net [IPv6:2600:3c01:e000:3a1::42])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CB65DC06174A
-        for <kvm@vger.kernel.org>; Mon,  8 Mar 2021 16:18:00 -0800 (PST)
-Received: from localhost (unknown [IPv6:2601:281:8300:104d::5f6])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ms.lwn.net (Postfix) with ESMTPSA id 4A7922B0;
-        Tue,  9 Mar 2021 00:18:00 +0000 (UTC)
-DKIM-Filter: OpenDKIM Filter v2.11.0 ms.lwn.net 4A7922B0
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=lwn.net; s=20201203;
-        t=1615249080; bh=n7wlyMaMbYzb1UQpQtoONC+OZVt9gNvZ4n6Erv9av6k=;
-        h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-        b=lEAXGVTGmst4CmEzR2HYBn7sJEMq6Yun6ou/ZKpGVeQ0lRvOfvrx21LyOa80/iZRd
-         /LeZ2WkQ1+OzV1QcLsmyHxysukOpeaIKgO9pkv/Di3rwI9+HbzjKTgf0OUhogpIO4i
-         p4Ado++Xs41vhUhtcTAVKqcF9AFLInOfD0dKlnqcqbdeKv8KsCgi2aMlgMMADm1M6O
-         tPUpsryHB+LZ68qfJuelPxPWy1NbXIqb/KikrALMqWHcnzHtl7ghVH1HI262lhWCCi
-         f156P3KGCfbnmOr0vhNf3alqGomh94adT3OYG1tTJICliOCL3GfWRALoZdl+Jby8XG
-         MUOw97zXbQpEA==
-From:   Jonathan Corbet <corbet@lwn.net>
-To:     Jonathan =?utf-8?Q?Neusch=C3=A4fer?= <j.neuschaefer@gmx.net>,
-        linux-doc@vger.kernel.org
-Cc:     Jonathan =?utf-8?Q?Neusch=C3=A4fer?= <j.neuschaefer@gmx.net>,
-        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] docs: kvm: Fix a typo ("althought")
-In-Reply-To: <20210301214722.2310911-1-j.neuschaefer@gmx.net>
-References: <20210301214722.2310911-1-j.neuschaefer@gmx.net>
-Date:   Mon, 08 Mar 2021 17:17:59 -0700
-Message-ID: <87zgzd41u0.fsf@meer.lwn.net>
+        id S231911AbhCIAVs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 8 Mar 2021 19:21:48 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:1416 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231928AbhCIAVO (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 8 Mar 2021 19:21:14 -0500
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 12902YG0158925;
+        Mon, 8 Mar 2021 19:21:13 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=bYkZf8inncM42ojubFY1EA73hItazVPFDfrnTI1cWuM=;
+ b=jD9h6mxV1E2r3Br8iggZx8RJqeFrAs2Ymy2G7zwLp69gF4s7h8xYDzaKDH9HIdmQzTA4
+ qCl4Dq98SauytRLoKT2q6w2oYFlB6sAN5ZIwm9kWDW4TRwIpw1/39KFS/v6k8NKdaQ7h
+ 8tkiUrlBVLjoQdV+syrzAmP1Qzo+CxPrjGK29ppxaIuRLK1n+GDiB5zPeCsK1J+rieve
+ m0A6X1bJ/FjFnCw4Zv8EmwwGACOm6XyUDwDb1gnSo6/aUVFotpuY8GzW6rZIJMReTa5g
+ LXRzNbnYbGl1ShESWnukbREMNZzvF9pF8an1Qs5rZ/XSn6grJ7KyBpzoLxW1n9jkV/uw Fw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 375wdth9u9-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 08 Mar 2021 19:21:13 -0500
+Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 12902pHQ159823;
+        Mon, 8 Mar 2021 19:21:13 -0500
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 375wdth9tr-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 08 Mar 2021 19:21:13 -0500
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 12908HeW003282;
+        Tue, 9 Mar 2021 00:21:11 GMT
+Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
+        by ppma03ams.nl.ibm.com with ESMTP id 3741c8a8pa-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 09 Mar 2021 00:21:10 +0000
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
+        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 1290KrsB13173210
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 9 Mar 2021 00:20:53 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id A04B64C044;
+        Tue,  9 Mar 2021 00:21:08 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 278134C040;
+        Tue,  9 Mar 2021 00:21:08 +0000 (GMT)
+Received: from li-e979b1cc-23ba-11b2-a85c-dfd230f6cf82 (unknown [9.171.56.228])
+        by d06av22.portsmouth.uk.ibm.com (Postfix) with SMTP;
+        Tue,  9 Mar 2021 00:21:08 +0000 (GMT)
+Date:   Tue, 9 Mar 2021 01:21:05 +0100
+From:   Halil Pasic <pasic@linux.ibm.com>
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     cohuck@redhat.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, jgg@nvidia.com, peterx@redhat.com
+Subject: Re: [PATCH v1 13/14] vfio: Remove extern from declarations across
+ vfio
+Message-ID: <20210309012105.6a0d6fb6.pasic@linux.ibm.com>
+In-Reply-To: <161524018283.3480.13909145183028051928.stgit@gimli.home>
+References: <161523878883.3480.12103845207889888280.stgit@gimli.home>
+        <161524018283.3480.13909145183028051928.stgit@gimli.home>
+Organization: IBM
+X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.761
+ definitions=2021-03-08_22:2021-03-08,2021-03-08 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0
+ impostorscore=0 mlxlogscore=999 malwarescore=0 lowpriorityscore=0
+ adultscore=0 clxscore=1011 mlxscore=0 priorityscore=1501 phishscore=0
+ spamscore=0 bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2103080126
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Jonathan Neusch=C3=A4fer <j.neuschaefer@gmx.net> writes:
+On Mon, 08 Mar 2021 14:49:42 -0700
+Alex Williamson <alex.williamson@redhat.com> wrote:
 
-> Signed-off-by: Jonathan Neusch=C3=A4fer <j.neuschaefer@gmx.net>
-> ---
->  Documentation/virt/kvm/api.rst | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.=
-rst
-> index aed52b0fc16ec..3617a64e81fe2 100644
-> --- a/Documentation/virt/kvm/api.rst
-> +++ b/Documentation/virt/kvm/api.rst
-> @@ -55,7 +55,7 @@ not cause harm to the host, their actual behavior is no=
-t guaranteed by
->  the API.  See "General description" for details on the ioctl usage
->  model that is supported by KVM.
->
-> -It is important to note that althought VM ioctls may only be issued from
-> +It is important to note that although VM ioctls may only be issued from
->  the process that created the VM, a VM's lifecycle is associated with its
->  file descriptor, not its creator (process).  In other words, the VM and
+> Cleanup disrecommended usage and docs.
+> 
+> Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
 
-Applied, thanks.
-
-jon
+Acked-by: Halil Pasic <pasic@linux.ibm.com>
