@@ -2,65 +2,74 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 91C843338B0
-	for <lists+kvm@lfdr.de>; Wed, 10 Mar 2021 10:26:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EE58E3338B5
+	for <lists+kvm@lfdr.de>; Wed, 10 Mar 2021 10:28:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232537AbhCJJ0K (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 10 Mar 2021 04:26:10 -0500
-Received: from verein.lst.de ([213.95.11.211]:35412 "EHLO verein.lst.de"
+        id S232318AbhCJJ1r (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 10 Mar 2021 04:27:47 -0500
+Received: from mga01.intel.com ([192.55.52.88]:5514 "EHLO mga01.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230397AbhCJJZk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 10 Mar 2021 04:25:40 -0500
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id 2657568B05; Wed, 10 Mar 2021 10:25:34 +0100 (CET)
-Date:   Wed, 10 Mar 2021 10:25:33 +0100
-From:   Christoph Hellwig <hch@lst.de>
-To:     Robin Murphy <robin.murphy@arm.com>
-Cc:     Christoph Hellwig <hch@lst.de>, Joerg Roedel <joro@8bytes.org>,
-        Will Deacon <will@kernel.org>, Li Yang <leoyang.li@nxp.com>,
-        freedreno@lists.freedesktop.org, kvm@vger.kernel.org,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        linuxppc-dev@lists.ozlabs.org, dri-devel@lists.freedesktop.org,
-        virtualization@lists.linux-foundation.org,
-        iommu@lists.linux-foundation.org, netdev@vger.kernel.org,
-        linux-arm-msm@vger.kernel.org,
-        David Woodhouse <dwmw2@infradead.org>,
-        linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH 14/17] iommu: remove DOMAIN_ATTR_DMA_USE_FLUSH_QUEUE
-Message-ID: <20210310092533.GA6819@lst.de>
-References: <20210301084257.945454-1-hch@lst.de> <20210301084257.945454-15-hch@lst.de> <1658805c-ed28-b650-7385-a56fab3383e3@arm.com> <20210310091501.GC5928@lst.de>
+        id S231650AbhCJJ1R (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 10 Mar 2021 04:27:17 -0500
+IronPort-SDR: v0dXUVXvIRQvGhyfs+H15jwOoxyHCTe0TiIQ/gXN4aS85ktGqbZuqjz2LD7NyhW3+NrgfHYJog
+ OgrCxkJxNgJw==
+X-IronPort-AV: E=McAfee;i="6000,8403,9917"; a="208226165"
+X-IronPort-AV: E=Sophos;i="5.81,237,1610438400"; 
+   d="scan'208";a="208226165"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Mar 2021 01:27:14 -0800
+IronPort-SDR: ysRAFg8NY0/1jEIhIleol71g4qBZpKD7537pWIT8VULSCRdP286zcesNTls46sZ+//6f44BDcs
+ LdtiwhriQeAQ==
+X-IronPort-AV: E=Sophos;i="5.81,237,1610438400"; 
+   d="scan'208";a="410117039"
+Received: from arashid-mobl.amr.corp.intel.com ([10.255.230.40])
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Mar 2021 01:27:08 -0800
+Message-ID: <76cb4216a7a689883c78b4622c86bd9c3faaa465.camel@intel.com>
+Subject: Re: [PATCH v2 00/25] KVM SGX virtualization support
+From:   Kai Huang <kai.huang@intel.com>
+To:     Borislav Petkov <bp@alien8.de>
+Cc:     kvm@vger.kernel.org, x86@kernel.org, linux-sgx@vger.kernel.org,
+        linux-kernel@vger.kernel.org, seanjc@google.com, jarkko@kernel.org,
+        luto@kernel.org, dave.hansen@intel.com, rick.p.edgecombe@intel.com,
+        haitao.huang@intel.com, pbonzini@redhat.com, tglx@linutronix.de,
+        mingo@redhat.com, hpa@zytor.com, jethro@fortanix.com,
+        b.thiel@posteo.de, jmattson@google.com, joro@8bytes.org,
+        vkuznets@redhat.com, wanpengli@tencent.com, corbet@lwn.net
+Date:   Wed, 10 Mar 2021 22:27:05 +1300
+In-Reply-To: <20210309093037.GA699@zn.tnic>
+References: <cover.1615250634.git.kai.huang@intel.com>
+         <20210309093037.GA699@zn.tnic>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.38.4 (3.38.4-1.fc33) 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210310091501.GC5928@lst.de>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Mar 10, 2021 at 10:15:01AM +0100, Christoph Hellwig wrote:
-> On Thu, Mar 04, 2021 at 03:25:27PM +0000, Robin Murphy wrote:
-> > On 2021-03-01 08:42, Christoph Hellwig wrote:
-> >> Use explicit methods for setting and querying the information instead.
-> >
-> > Now that everyone's using iommu-dma, is there any point in bouncing this 
-> > through the drivers at all? Seems like it would make more sense for the x86 
-> > drivers to reflect their private options back to iommu_dma_strict (and 
-> > allow Intel's caching mode to override it as well), then have 
-> > iommu_dma_init_domain just test !iommu_dma_strict && 
-> > domain->ops->flush_iotlb_all.
+On Tue, 2021-03-09 at 10:30 +0100, Borislav Petkov wrote:
+> On Tue, Mar 09, 2021 at 02:38:49PM +1300, Kai Huang wrote:
+> > This series adds KVM SGX virtualization support. The first 14 patches starting
+> > with x86/sgx or x86/cpu.. are necessary changes to x86 and SGX core/driver to
+> > support KVM SGX virtualization, while the rest are patches to KVM subsystem.
 > 
-> Hmm.  I looked at this, and kill off ->dma_enable_flush_queue for
-> the ARM drivers and just looking at iommu_dma_strict seems like a
-> very clear win.
+> Ok, I guess I'll queue 1-14 once Sean doesn't find anything
+> objectionable then give Paolo an immutable commit to base the KVM stuff
+> ontop.
 > 
-> OTOH x86 is a little more complicated.  AMD and intel defaul to lazy
-> mode, so we'd have to change the global iommu_dma_strict if they are
-> initialized.  Also Intel has not only a "static" option to disable
-> lazy mode, but also a "dynamic" one where it iterates structure.  So
-> I think on the get side we're stuck with the method, but it still
-> simplifies the whole thing.
+> Unless folks have better suggestions, ofc.
+> 
+> Thx.
+> 
 
-Actually... Just mirroring the iommu_dma_strict value into
-struct iommu_domain should solve all of that with very little
-boilerplate code. 
+Hi Boris,
+
+Sorry that we found a bug in below patch in series:
+
+[PATCH v2 03/25] x86/sgx: Wipe out EREMOVE from sgx_free_epc_page()
+
+that I made a mistake when copying & pasting, which results in SECS page and va_page
+not being freed correctly in sgx_encl_release().
+
+Sorry for the mistake. I will send out another version with that fixed.
+
