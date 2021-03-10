@@ -2,60 +2,114 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BBDE1333878
-	for <lists+kvm@lfdr.de>; Wed, 10 Mar 2021 10:15:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CCB4533387D
+	for <lists+kvm@lfdr.de>; Wed, 10 Mar 2021 10:16:16 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231582AbhCJJPN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 10 Mar 2021 04:15:13 -0500
-Received: from verein.lst.de ([213.95.11.211]:35351 "EHLO verein.lst.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229544AbhCJJPJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 10 Mar 2021 04:15:09 -0500
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id 4E49D68B05; Wed, 10 Mar 2021 10:15:02 +0100 (CET)
-Date:   Wed, 10 Mar 2021 10:15:01 +0100
-From:   Christoph Hellwig <hch@lst.de>
-To:     Robin Murphy <robin.murphy@arm.com>
-Cc:     Christoph Hellwig <hch@lst.de>, Joerg Roedel <joro@8bytes.org>,
-        Will Deacon <will@kernel.org>, Li Yang <leoyang.li@nxp.com>,
-        freedreno@lists.freedesktop.org, kvm@vger.kernel.org,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        linuxppc-dev@lists.ozlabs.org, dri-devel@lists.freedesktop.org,
-        virtualization@lists.linux-foundation.org,
-        iommu@lists.linux-foundation.org, netdev@vger.kernel.org,
-        linux-arm-msm@vger.kernel.org,
-        David Woodhouse <dwmw2@infradead.org>,
-        linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH 14/17] iommu: remove DOMAIN_ATTR_DMA_USE_FLUSH_QUEUE
-Message-ID: <20210310091501.GC5928@lst.de>
-References: <20210301084257.945454-1-hch@lst.de> <20210301084257.945454-15-hch@lst.de> <1658805c-ed28-b650-7385-a56fab3383e3@arm.com>
+        id S232543AbhCJJPo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 10 Mar 2021 04:15:44 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47964 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232471AbhCJJPc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 10 Mar 2021 04:15:32 -0500
+Received: from mail-ej1-x635.google.com (mail-ej1-x635.google.com [IPv6:2a00:1450:4864:20::635])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2232DC06174A;
+        Wed, 10 Mar 2021 01:15:32 -0800 (PST)
+Received: by mail-ej1-x635.google.com with SMTP id bm21so37182209ejb.4;
+        Wed, 10 Mar 2021 01:15:32 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=h4zBemXq8V6/AVM5Gm1CAbSuTQBM3iIefLQNaul1B2Q=;
+        b=Jqz4gUnE05MsaD3zwKJpbufnV9qNjkW/U/dRxpVxrhFa6eelmaI30jwCwbKr5qafuQ
+         u2OAtAObw1pqroeIfi+00Km0u6t4zHML4FTTWWBLtEQ/e2+EsF6aYeFMNeEX1Wgsf/+s
+         PXxa4bEBkGtz//chJ1fwm0rck5YXviTjVFKn8fOs5GCSagWdACDXGl0nKb+1upPlUTRX
+         n4eMtlW/th63PeMaiW93sNBTKeXuEet+45siKUQoYl7FSAhRET/NYmThrEUJtahhfYxR
+         I7lXEd8dUPgyW2PyIOQnBARYnjZUMBxCkQE+fwM/gvsc6/exatjkgP+TwE7H8GStV8hd
+         A+QQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=h4zBemXq8V6/AVM5Gm1CAbSuTQBM3iIefLQNaul1B2Q=;
+        b=flLTBKUhPphTxfDmrm4o8mxJ7MzsdWRq54JcN1ixYlOb3G2AAFNl876aTXNFBTdFmL
+         nvS4OEFQg7BUPSvMLYm9c07VBcSiHqYzj+/1RSpO33MkQs63x257s8sI/XBOcFm56oey
+         a0DUJZd7P/OsAulHd7l4TF4mD4n0fqsDf4C1KSNARWCxjMt+cPZZgNpArV37FVecjEun
+         /Xl41xhVZrd+Z/toyobFxeyGLdX+VnskYAtAR6/uNvuDX1lrjBktz0v9QtF3bRu/JIS2
+         uDSjAHEae6VMmOh0eEehTsnUw7k+4tkD/KnJbVu6IYwQTi1Se0RlG2uBfg9uAbwTHI3E
+         duEg==
+X-Gm-Message-State: AOAM533Bipp4xq/CmW0Xnikpyx2mwNdpmtBrMIWfPZiaoCBKai8tBFaE
+        XnGRixzXoxv8Lb+07cmbQ3aBv0/B97jpbQdqNQ==
+X-Google-Smtp-Source: ABdhPJyvyL496vu1nUaY2xMu+CkLv+zpNH1ISwEGWCABWap9ED/IB6hi7BEpdXBTEQcHDGWff4LSZYvjJT1u+ngJmxQ=
+X-Received: by 2002:a17:906:f210:: with SMTP id gt16mr2576308ejb.206.1615367730887;
+ Wed, 10 Mar 2021 01:15:30 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1658805c-ed28-b650-7385-a56fab3383e3@arm.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+References: <20210303020946.26083-1-lihaiwei.kernel@gmail.com>
+ <03239d81-df56-a6c9-c79d-c14d22f62705@gmail.com> <YEgH11nNwdCkF5kT@google.com>
+In-Reply-To: <YEgH11nNwdCkF5kT@google.com>
+From:   Haiwei Li <lihaiwei.kernel@gmail.com>
+Date:   Wed, 10 Mar 2021 17:15:08 +0800
+Message-ID: <CAB5KdOZkdXsLup+58On=LZ6eG4jYdcaK2NCt9U0Q-qy_6dQrfw@mail.gmail.com>
+Subject: Re: [PATCH] kvm: lapic: add module parameters for LAPIC_TIMER_ADVANCE_ADJUST_MAX/MIN
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Haiwei Li <lihaiwei@tencent.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Mar 04, 2021 at 03:25:27PM +0000, Robin Murphy wrote:
-> On 2021-03-01 08:42, Christoph Hellwig wrote:
->> Use explicit methods for setting and querying the information instead.
+On Wed, Mar 10, 2021 at 7:42 AM Sean Christopherson <seanjc@google.com> wrote:
 >
-> Now that everyone's using iommu-dma, is there any point in bouncing this 
-> through the drivers at all? Seems like it would make more sense for the x86 
-> drivers to reflect their private options back to iommu_dma_strict (and 
-> allow Intel's caching mode to override it as well), then have 
-> iommu_dma_init_domain just test !iommu_dma_strict && 
-> domain->ops->flush_iotlb_all.
+> On Wed, Mar 03, 2021, Haiwei Li wrote:
+> > On 21/3/3 10:09, lihaiwei.kernel@gmail.com wrote:
+> > > From: Haiwei Li <lihaiwei@tencent.com>
+> > >
+> > > In my test environment, advance_expire_delta is frequently greater than
+> > > the fixed LAPIC_TIMER_ADVANCE_ADJUST_MAX. And this will hinder the
+> > > adjustment.
+> >
+> > Supplementary details:
+> >
+> > I have tried to backport timer related features to our production
+> > kernel.
+> >
+> > After completed, i found that advance_expire_delta is frequently greater
+> > than the fixed value. It's necessary to trun the fixed to dynamically
+> > values.
+>
+> Does this reproduce on an upstream kernel?  If so...
+>
+>   1. How much over the 10k cycle limit is the delta?
+>   2. Any idea what causes the large delta?  E.g. is there something that can
+>      and/or should be fixed elsewhere?
+>   3. Is it platform/CPU specific?
 
-Hmm.  I looked at this, and kill off ->dma_enable_flush_queue for
-the ARM drivers and just looking at iommu_dma_strict seems like a
-very clear win.
+Hi, Sean
 
-OTOH x86 is a little more complicated.  AMD and intel defaul to lazy
-mode, so we'd have to change the global iommu_dma_strict if they are
-initialized.  Also Intel has not only a "static" option to disable
-lazy mode, but also a "dynamic" one where it iterates structure.  So
-I think on the get side we're stuck with the method, but it still
-simplifies the whole thing.
+I have traced the flow on our production kernel and it frequently consumes more
+than 10K cycles from sched_out to sched_in.
+So two scenarios tested on Cascade lake Server(96 pcpu), v5.11 kernel.
+
+1. only cyclictest in guest(88 vcpu and bound with isolated pcpus, w/o mwait
+exposed, adaptive advance lapic timer is default -1). The ratio of occurrences:
+
+greater_than_10k/total: 29/2060, 1.41%
+
+2. cyclictest in guest(88 vcpu and not bound, w/o mwait exposed, adaptive
+advance lapic timer is default -1) and stress in host(no isolate). The ratio of
+occurrences:
+
+greater_than_10k/total: 122381/1017363, 12.03%
+
+-- 
+Haiwei Li
+
+>
+> Ideally, KVM would play nice with "all" environments by default without forcing
+> the admin to hand-tune things.
