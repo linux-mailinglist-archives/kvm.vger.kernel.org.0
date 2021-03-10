@@ -2,132 +2,184 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B50443344DB
-	for <lists+kvm@lfdr.de>; Wed, 10 Mar 2021 18:12:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4C3C2334517
+	for <lists+kvm@lfdr.de>; Wed, 10 Mar 2021 18:27:41 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229950AbhCJRL7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 10 Mar 2021 12:11:59 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:58766 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230525AbhCJRLx (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 10 Mar 2021 12:11:53 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1615396312;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=npEmB1G2ved3m8cb8eHAFpucuy0wI7cKFS8zXAK0eEM=;
-        b=C3tRehejEk96+Ki1J0YV3P+ePtwGqFKxmQ6VcVu/zsk8LcjM4hOuAMLaEuEpeXq5eWiK2k
-        Or39ixz13L6ByiBVp66RfGWczh9xJ5yfLAVcRJr5aRDFH+gC/kzzZd+UolZzUvkkqAiFsP
-        8DxelnbqkftoPDqa+Wj1rTiPkysSdRg=
-Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
- [209.85.218.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-242-ht7bTqeJNbWXSq_762zIyg-1; Wed, 10 Mar 2021 12:11:51 -0500
-X-MC-Unique: ht7bTqeJNbWXSq_762zIyg-1
-Received: by mail-ej1-f71.google.com with SMTP id bg7so1473155ejb.12
-        for <kvm@vger.kernel.org>; Wed, 10 Mar 2021 09:11:51 -0800 (PST)
+        id S232387AbhCJR1H (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 10 Mar 2021 12:27:07 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41958 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232670AbhCJR0s (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 10 Mar 2021 12:26:48 -0500
+Received: from mail-lf1-x12b.google.com (mail-lf1-x12b.google.com [IPv6:2a00:1450:4864:20::12b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD238C061760;
+        Wed, 10 Mar 2021 09:26:47 -0800 (PST)
+Received: by mail-lf1-x12b.google.com with SMTP id k9so34802350lfo.12;
+        Wed, 10 Mar 2021 09:26:47 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=1LykyLduLhTeLGxvql/hvJyXPaRgNTwi4bgV8vO/5g4=;
+        b=YQe5YX1lcwCRNB/R7ZSGLb8mFGu5AKEVnXHd/CLXHTxXrUVr0vrSYA2R2EbC1dubfE
+         2HgXNCh8nrtz8pmwE3rDUrMbGV6U5Jbo2Q/2ujw9pDacr1J7iIWG4Ngt3JTUoMrPIiuD
+         FDgE3/dkIYQe2L6r7e4r4Xb0oywHboVttJ53TB7Zi4L8STNcH99hdfv83Qemb03Oirug
+         EyKi0Fx7sHCTNm/9VPp9XMAPRB7jaJ3qngVxeR/4o+Ny3z/2YMAQ2knp6ugT6u33VTey
+         UjJnaTG9Hq55RaPEpZADXy+3Sr4Y4zuNP+VEDdKnguhTdt3ATUS2kUCyY/oWpyhp6j18
+         g8Iw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=npEmB1G2ved3m8cb8eHAFpucuy0wI7cKFS8zXAK0eEM=;
-        b=QZCIdfMpt+rTTXnofDjlcnWZEiimCPemn+eNOfx/qww8woawdbNk/VlkEDSVmygVLu
-         2x+KRaVzKTncNQ6rkmWn8gQqGZpH+JpoTBFVbipw4cypjSvC33uLkm+igjIaxn2kQR4D
-         22mxXqRvkPLGUDMHykLNHWRGMPifrSzJrvzL9v7nOgEKax/DsDZyabAp96UtNOr8IJEc
-         RxzpXjl49L+krqf3RonP8i2HvTZ6/WOcWlowfBMkA+rhG9TaezuCPOBiA4qegrXH9BG/
-         GjDsa5RFyaN3CZHUZFfRC44zRRJoT+ibXpMcqO5JJ+B472fIzhRORI0lAh/vJDIASmpJ
-         BStA==
-X-Gm-Message-State: AOAM530D2gAL2FeLW2beJI7b9xNF9CtFiTbAYktAPcJNKxj/Mn83ubpd
-        VouM5MaOO88NjUcUhePtPvkfqCvJ987qimoKBfykCLGSSAbGU0ne7AM4jEzdCwz5kgVelkoxtBO
-        pZnNWILG4WvNh
-X-Received: by 2002:a17:906:29c3:: with SMTP id y3mr4574767eje.430.1615396310181;
-        Wed, 10 Mar 2021 09:11:50 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJwPss/0WtwYTPFF2AWpi4QdCF2rQJI8+OlQAs4Ax1N/oVR6iCHbCOYshTcU9dU+pTRgby2Rsw==
-X-Received: by 2002:a17:906:29c3:: with SMTP id y3mr4574734eje.430.1615396309942;
-        Wed, 10 Mar 2021 09:11:49 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id n25sm11384840edq.55.2021.03.10.09.11.48
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 10 Mar 2021 09:11:49 -0800 (PST)
-Subject: Re: [RFC PATCH 3/4] KVM: stats: Add ioctl commands to pull statistics
- in binary format
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     Jing Zhang <jingzhangos@google.com>, KVM <kvm@vger.kernel.org>,
-        KVM ARM <kvmarm@lists.cs.columbia.edu>,
-        Linux MIPS <linux-mips@vger.kernel.org>,
-        KVM PPC <kvm-ppc@vger.kernel.org>,
-        Linux S390 <linux-s390@vger.kernel.org>,
-        Linux kselftest <linux-kselftest@vger.kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Will Deacon <will@kernel.org>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-        Paul Mackerras <paulus@ozlabs.org>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Peter Shier <pshier@google.com>,
-        Oliver Upton <oupton@google.com>,
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=1LykyLduLhTeLGxvql/hvJyXPaRgNTwi4bgV8vO/5g4=;
+        b=plPRcS9cw2uE5KQclb+JMtyzCf1GhJTgrfxTFt0NgPmMfBmtJ8c94bV+C+LBg2P9sj
+         dCdPTiG3yrRgT5QKCOFtcKmU9uWUcZBqAf8tuhbZdFnd/t5tRXK/EkuZ7zXfjuCgzWcb
+         L0inFmdcxf49NXKdYpwVrvRKWUyIvcqUIAowp/ba6s3/hfn0AVRzBKxIrq4hXDfWSU21
+         NogGIcwCkF5bM2o6Tn16LQFEKF5P0QU9OC4OjWKMr06+3baAWgLbeDE1nRY0q5AWXxXS
+         Byo92E4Bo/hvgf3x4Pbplpzy4BgK9w77eoL9IF13i/edKY25JMlEYWe0JrxbGM58wa26
+         pQ9w==
+X-Gm-Message-State: AOAM5333Eu3uO0tjGzxByJMfs5NBVhzTpP9TdqOPoAX2tpAVdaWLTIu/
+        W9uo4hnO1cHKq9mY58DHshs=
+X-Google-Smtp-Source: ABdhPJyiY5ZC4EfGObNl/uExMhFGrkhuDez57YxDH+cuVMI8cP63mfrS1PoAceVVTWUpLxkn7PvLBw==
+X-Received: by 2002:a05:6512:1192:: with SMTP id g18mr2712428lfr.102.1615397206276;
+        Wed, 10 Mar 2021 09:26:46 -0800 (PST)
+Received: from martin-ThinkPad-T440p (88-115-234-24.elisa-laajakaista.fi. [88.115.234.24])
+        by smtp.gmail.com with ESMTPSA id l5sm3055049lfc.137.2021.03.10.09.26.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 10 Mar 2021 09:26:46 -0800 (PST)
+Date:   Wed, 10 Mar 2021 18:26:43 +0100
+From:   Martin Radev <martin.b.radev@gmail.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Joerg Roedel <joro@8bytes.org>, x86@kernel.org,
+        Joerg Roedel <jroedel@suse.de>, hpa@zytor.com,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Jiri Slaby <jslaby@suse.cz>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Juergen Gross <jgross@suse.com>,
+        Kees Cook <keescook@chromium.org>,
         David Rientjes <rientjes@google.com>,
-        Emanuele Giuseppe Esposito <eesposit@redhat.com>
-References: <20210310003024.2026253-1-jingzhangos@google.com>
- <20210310003024.2026253-4-jingzhangos@google.com>
- <875z1zxb11.wl-maz@kernel.org>
- <a475d935-e404-93dd-4c6d-a5f8038d8f4d@redhat.com>
- <8735x3x7lu.wl-maz@kernel.org>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <2749fe68-acbb-8f4d-dc76-4cb23edb9b35@redhat.com>
-Date:   Wed, 10 Mar 2021 18:11:47 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.7.0
+        Cfir Cohen <cfir@google.com>,
+        Erdem Aktas <erdemaktas@google.com>,
+        Masami Hiramatsu <mhiramat@kernel.org>,
+        Mike Stunes <mstunes@vmware.com>,
+        Arvind Sankar <nivedita@alum.mit.edu>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org
+Subject: Re: [PATCH v2 5/7] x86/boot/compressed/64: Add CPUID sanity check to
+ 32-bit boot-path
+Message-ID: <YEkBU9em9SQZ25vA@martin-ThinkPad-T440p>
+References: <20210310084325.12966-1-joro@8bytes.org>
+ <20210310084325.12966-6-joro@8bytes.org>
+ <YEjvBfJg8P1SQt98@google.com>
 MIME-Version: 1.0
-In-Reply-To: <8735x3x7lu.wl-maz@kernel.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YEjvBfJg8P1SQt98@google.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10/03/21 18:05, Marc Zyngier wrote:
-> On Wed, 10 Mar 2021 16:03:42 +0000,
-> Paolo Bonzini <pbonzini@redhat.com> wrote:
->>
->> On 10/03/21 16:51, Marc Zyngier wrote:
->>>> +	kvm_for_each_vcpu(j, vcpu, kvm) {
->>>> +		pdata = data + VM_STAT_COUNT;
->>>> +		for (i = 0; i < VCPU_STAT_COUNT; i++, pdata++)
->>>> +			*pdata += *((u64 *)&vcpu->stat + i);
->>> Do you really need the in-kernel copy? Why not directly organise the
->>> data structures in a way that would allow a bulk copy using
->>> copy_to_user()?
->>
->> The result is built by summing per-vCPU counters, so that the counter
->> updates are fast and do not require a lock.  So consistency basically
->> cannot be guaranteed.
+On Wed, Mar 10, 2021 at 08:08:37AM -0800, Sean Christopherson wrote:
+> On Wed, Mar 10, 2021, Joerg Roedel wrote:
+> > From: Joerg Roedel <jroedel@suse.de>
+> > 
+> > The 32-bit #VC handler has no GHCB and can only handle CPUID exit codes.
+> > It is needed by the early boot code to handle #VC exceptions raised in
+> > verify_cpu() and to get the position of the C bit.
+> > 
+> > But the CPUID information comes from the hypervisor, which is untrusted
+> > and might return results which trick the guest into the no-SEV boot path
+> > with no C bit set in the page-tables. All data written to memory would
+> > then be unencrypted and could leak sensitive data to the hypervisor.
+> > 
+> > Add sanity checks to the 32-bit boot #VC handler to make sure the
+> > hypervisor does not pretend that SEV is not enabled.
+> > 
+> > Signed-off-by: Joerg Roedel <jroedel@suse.de>
+> > ---
+> >  arch/x86/boot/compressed/mem_encrypt.S | 36 ++++++++++++++++++++++++++
+> >  1 file changed, 36 insertions(+)
+> > 
+> > diff --git a/arch/x86/boot/compressed/mem_encrypt.S b/arch/x86/boot/compressed/mem_encrypt.S
+> > index 2ca056a3707c..8941c3a8ff8a 100644
+> > --- a/arch/x86/boot/compressed/mem_encrypt.S
+> > +++ b/arch/x86/boot/compressed/mem_encrypt.S
+> > @@ -145,6 +145,34 @@ SYM_CODE_START(startup32_vc_handler)
+> >  	jnz	.Lfail
+> >  	movl	%edx, 0(%esp)		# Store result
+> >  
+> > +	/*
+> > +	 * Sanity check CPUID results from the Hypervisor. See comment in
+> > +	 * do_vc_no_ghcb() for more details on why this is necessary.
+> > +	 */
+> > +
+> > +	/* Fail if Hypervisor bit not set in CPUID[1].ECX[31] */
 > 
-> Sure, but I wonder whether there is scope for VM-global counters to be
-> maintained in parallel with per-vCPU counters if speed/efficiency is
-> of the essence (and this seems to be how it is sold in the cover
-> letter).
+> This check is flawed, as is the existing check in 64-bit boot.  Or I guess more
+> accurately, the check in get_sev_encryption_bit() is flawed.  AIUI, SEV-ES
+> doesn't require the hypervisor to intercept CPUID.  A malicious hypervisor can
+> temporarily pass-through CPUID to bypass the CPUID[1].ECX[31] check.
 
-Maintaining VM-global counters would require an atomic instruction and 
-would suffer lots of cacheline bouncing even on architectures that have 
-relaxed atomic memory operations.
+If erroneous information is provided, either through interception or without, there's
+this check which is performed every time a new page table is set in the early linux stages:
+https://elixir.bootlin.com/linux/v5.12-rc2/source/arch/x86/kernel/sev_verify_cbit.S#L22
 
-Speed/efficiency of retrieving statistics is important, but let's keep 
-in mind that the baseline for comparison is hundreds of syscalls and 
-filesystem lookups.
+This should lead to a halt if corruption is detected, unless I'm overlooking something.
+Please share more info.
 
-Paolo
 
+> The
+> hypervisor likely has access to the guest firmware source, so it wouldn't be
+> difficult for the hypervisor to disable CPUID interception once it detects that
+> firmware is handing over control to the kernel.
+> 
+
+You probably don't even need to know the firmware for that. There the option to set CR* changes to cause
+#AE which probably gives away enough information.
+
+> > +	cmpl    $1, %ebx
+> > +	jne     .Lcheck_leaf
+> > +	btl     $31, 4(%esp)
+> > +	jnc     .Lfail
+> > +	jmp     .Ldone
+> > +
+> > +.Lcheck_leaf:
+> > +	/* Fail if SEV leaf not available in CPUID[0x80000000].EAX */
+> > +	cmpl    $0x80000000, %ebx
+> > +	jne     .Lcheck_sev
+> > +	cmpl    $0x8000001f, 12(%esp)
+> > +	jb      .Lfail
+> > +	jmp     .Ldone
+> > +
+> > +.Lcheck_sev:
+> > +	/* Fail if SEV bit not set in CPUID[0x8000001f].EAX[1] */
+> > +	cmpl    $0x8000001f, %ebx
+> > +	jne     .Ldone
+> > +	btl     $1, 12(%esp)
+> > +	jnc     .Lfail
+> > +
+> > +.Ldone:
+> >  	popl	%edx
+> >  	popl	%ecx
+> >  	popl	%ebx
+> > @@ -158,6 +186,14 @@ SYM_CODE_START(startup32_vc_handler)
+> >  
+> >  	iret
+> >  .Lfail:
+> > +	/* Send terminate request to Hypervisor */
+> > +	movl    $0x100, %eax
+> > +	xorl    %edx, %edx
+> > +	movl    $MSR_AMD64_SEV_ES_GHCB, %ecx
+> > +	wrmsr
+> > +	rep; vmmcall
+> > +
+> > +	/* If request fails, go to hlt loop */
+> >  	hlt
+> >  	jmp .Lfail
+> >  SYM_CODE_END(startup32_vc_handler)
+> > -- 
+> > 2.30.1
+> > 
