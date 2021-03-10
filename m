@@ -2,681 +2,350 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B520E3335CE
-	for <lists+kvm@lfdr.de>; Wed, 10 Mar 2021 07:25:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6A04D3335DB
+	for <lists+kvm@lfdr.de>; Wed, 10 Mar 2021 07:35:39 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232249AbhCJGYr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 10 Mar 2021 01:24:47 -0500
-Received: from mail.kernel.org ([198.145.29.99]:36786 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232299AbhCJGYk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 10 Mar 2021 01:24:40 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPSA id C46AF64FE8;
-        Wed, 10 Mar 2021 06:24:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1615357479;
-        bh=gN/UyopJfYDI1ugvGUMSUdpLzW66JmC3JP8K+pDV8cw=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=Uzi7Qu5+1v6QHqTL0bKnHGoY/QnozE0d4Hdgb1QN6xo/qx7ewdvtgnc8LX61dvAHc
-         c/NMDQ11KBYEJhRaDOV3OhbSrZXpeO4u/rGeeeaocBqyAbv8ceRRKrFGpU7HWPPdGj
-         iR8QoRWBvlFIgM9csRaukJ1PNR80hnKLhsnns6XIZN92i6bZSMihW8+Eaukm4za+6B
-         6xLSHHx95R7lDscN6TQNJBGanCTom6LWxhcsPaz4EOKjnfLAyhebJaea5MJL+rn1ip
-         agAF1iTCuGYsHOtKc9ITo3tPT6uzqL5UAqJHyDk75AKu0yKEETM9njkWE3Ar5ZZnvY
-         iHipYy1iP9JuQ==
-Date:   Wed, 10 Mar 2021 08:24:35 +0200
-From:   Leon Romanovsky <leon@kernel.org>
-To:     Dan Williams <dan.j.williams@intel.com>
-Cc:     Jason Gunthorpe <jgg@nvidia.com>,
+        id S230468AbhCJGfG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 10 Mar 2021 01:35:06 -0500
+Received: from szxga06-in.huawei.com ([45.249.212.32]:13900 "EHLO
+        szxga06-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229803AbhCJGeq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 10 Mar 2021 01:34:46 -0500
+Received: from DGGEMS413-HUB.china.huawei.com (unknown [172.30.72.58])
+        by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4DwMhb3RfczjWpQ;
+        Wed, 10 Mar 2021 14:33:03 +0800 (CST)
+Received: from [10.174.184.135] (10.174.184.135) by
+ DGGEMS413-HUB.china.huawei.com (10.3.19.213) with Microsoft SMTP Server id
+ 14.3.498.0; Wed, 10 Mar 2021 14:34:20 +0800
+Subject: Re: [RFC PATCH v2 1/6] iommu: Evolve to support more scenarios of
+ using IOPF
+To:     Lu Baolu <baolu.lu@linux.intel.com>,
         Alex Williamson <alex.williamson@redhat.com>,
         Cornelia Huck <cohuck@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Diana Craciun <diana.craciun@oss.nxp.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        KVM list <kvm@vger.kernel.org>,
-        Kirti Wankhede <kwankhede@nvidia.com>,
-        Linux Doc Mailing List <linux-doc@vger.kernel.org>,
-        "Raj, Ashok" <ashok.raj@intel.com>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Christoph Hellwig <hch@lst.de>,
-        Max Gurtovoy <mgurtovoy@nvidia.com>,
-        Tarun Gupta <targupta@nvidia.com>
-Subject: Re: [PATCH 08/10] vfio: Make vfio_device_ops pass a 'struct
- vfio_device *' instead of 'void *'
-Message-ID: <YEhmI27kqo9CxcnZ@unreal>
-References: <0-v1-7355d38b9344+17481-vfio1_jgg@nvidia.com>
- <8-v1-7355d38b9344+17481-vfio1_jgg@nvidia.com>
- <CAPcyv4hqALoBpH-yir4WNPj4+z1n-zj4o_6bfOMBRmd5sOCMNw@mail.gmail.com>
+        Will Deacon <will@kernel.org>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        "Eric Auger" <eric.auger@redhat.com>, <kvm@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>,
+        <iommu@lists.linux-foundation.org>, <linux-api@vger.kernel.org>
+CC:     Kevin Tian <kevin.tian@intel.com>, <yi.l.liu@intel.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+        "Barry Song" <song.bao.hua@hisilicon.com>,
+        <wanghaibin.wang@huawei.com>, <yuzenghui@huawei.com>,
+        <zhukeqian1@huawei.com>
+References: <20210309062207.505-1-lushenming@huawei.com>
+ <20210309062207.505-2-lushenming@huawei.com>
+ <7f8daef9-36db-f67c-a3e2-b96b5fa70291@linux.intel.com>
+From:   Shenming Lu <lushenming@huawei.com>
+Message-ID: <7479e543-1598-459d-4838-50a6f1c3770b@huawei.com>
+Date:   Wed, 10 Mar 2021 14:34:19 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.2.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAPcyv4hqALoBpH-yir4WNPj4+z1n-zj4o_6bfOMBRmd5sOCMNw@mail.gmail.com>
+In-Reply-To: <7f8daef9-36db-f67c-a3e2-b96b5fa70291@linux.intel.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.174.184.135]
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Mar 09, 2021 at 09:52:30PM -0800, Dan Williams wrote:
-> On Tue, Mar 9, 2021 at 1:39 PM Jason Gunthorpe <jgg@nvidia.com> wrote:
-> >
-> > This is the standard kernel pattern, the ops associated with a struct get
-> > the struct pointer in for typesafety. The expected design is to use
-> > container_of to cleanly go from the subsystem level type to the driver
-> > level type without having any type erasure in a void *.
->
-> This patch alone is worth the price of admission.
->
-> Seems like it would be worth adding
-> to_vfio_{pci,platform,fsl_mc}_device() helpers in this patch as well.
->
-> I've sometimes added runtime type safety to to_* helpers for early
-> warning of mistakes that happen when refactoring...
->
-> static inline struct vfio_pci_device *
-> to_vfio_pci_device(struct vfio_device *core_dev)
-> {
->         if (dev_WARN_ONCE(core_dev->dev, core_dev->ops != &vfio_pci_ops,
->                           "not a vfio_pci_device!\n"))
->                 return NULL;
+Hi Baolu,
 
-I personally didn't see any bug related to the problem presented by you.
-For this discussion let's assume that the extra check can be sometimes useful,
-however the "return NULL" construction is extremely harmful. This requires callers
-to check if it is not NULL, which is wrong for container_of(..) callers. Such checks
-are sort of wrong assumptions later.
+On 2021/3/10 10:09, Lu Baolu wrote:
+> Hi Shenming,
+> 
+> On 3/9/21 2:22 PM, Shenming Lu wrote:
+>> This patch follows the discussion here:
+>>
+>> https://lore.kernel.org/linux-acpi/YAaxjmJW+ZMvrhac@myrica/
+>>
+>> In order to support more scenarios of using IOPF (mainly consider
+>> the nested extension), besides keeping IOMMU_DEV_FEAT_IOPF as a
+>> general capability for whether delivering faults through the IOMMU,
+>> we extend iommu_register_fault_handler() with flags and introduce
+>> IOPF_REPORT_FLAT and IOPF_REPORT_NESTED to describe the page fault
+>> reporting capability under a specific configuration.
+>> IOPF_REPORT_NESTED needs additional info to indicate which level/stage
+>> is concerned since the fault client may be interested in only one
+>> level.
+>>
+>> Signed-off-by: Shenming Lu <lushenming@huawei.com>
+>> ---
+>>   .../iommu/arm/arm-smmu-v3/arm-smmu-v3-sva.c   |  3 +-
+>>   drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c   | 11 ++--
+>>   drivers/iommu/io-pgfault.c                    |  4 --
+>>   drivers/iommu/iommu.c                         | 56 ++++++++++++++++++-
+>>   include/linux/iommu.h                         | 21 ++++++-
+>>   include/uapi/linux/iommu.h                    |  3 +
+>>   6 files changed, 85 insertions(+), 13 deletions(-)
+>>
+>> diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3-sva.c b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3-sva.c
+>> index ee66d1f4cb81..5de9432349d4 100644
+>> --- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3-sva.c
+>> +++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3-sva.c
+>> @@ -482,7 +482,8 @@ static int arm_smmu_master_sva_enable_iopf(struct arm_smmu_master *master)
+>>       if (ret)
+>>           return ret;
+>>   -    ret = iommu_register_device_fault_handler(dev, iommu_queue_iopf, dev);
+>> +    ret = iommu_register_device_fault_handler(dev, iommu_queue_iopf,
+>> +                          IOPF_REPORT_FLAT, dev);
+>>       if (ret) {
+>>           iopf_queue_remove_device(master->smmu->evtq.iopf, dev);
+>>           return ret;
+>> diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
+>> index 363744df8d51..f40529d0075d 100644
+>> --- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
+>> +++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
+>> @@ -1447,10 +1447,6 @@ static int arm_smmu_handle_evt(struct arm_smmu_device *smmu, u64 *evt)
+>>           return -EOPNOTSUPP;
+>>       }
+>>   -    /* Stage-2 is always pinned at the moment */
+>> -    if (evt[1] & EVTQ_1_S2)
+>> -        return -EFAULT;
+>> -
+>>       if (evt[1] & EVTQ_1_RnW)
+>>           perm |= IOMMU_FAULT_PERM_READ;
+>>       else
+>> @@ -1468,13 +1464,18 @@ static int arm_smmu_handle_evt(struct arm_smmu_device *smmu, u64 *evt)
+>>               .flags = IOMMU_FAULT_PAGE_REQUEST_LAST_PAGE,
+>>               .grpid = FIELD_GET(EVTQ_1_STAG, evt[1]),
+>>               .perm = perm,
+>> -            .addr = FIELD_GET(EVTQ_2_ADDR, evt[2]),
+>>           };
+>>             if (ssid_valid) {
+>>               flt->prm.flags |= IOMMU_FAULT_PAGE_REQUEST_PASID_VALID;
+>>               flt->prm.pasid = FIELD_GET(EVTQ_0_SSID, evt[0]);
+>>           }
+>> +
+>> +        if (evt[1] & EVTQ_1_S2) {
+>> +            flt->prm.flags |= IOMMU_FAULT_PAGE_REQUEST_L2;
+>> +            flt->prm.addr = FIELD_GET(EVTQ_3_IPA, evt[3]);
+>> +        } else
+>> +            flt->prm.addr = FIELD_GET(EVTQ_2_ADDR, evt[2]);
+>>       } else {
+>>           flt->type = IOMMU_FAULT_DMA_UNRECOV;
+>>           flt->event = (struct iommu_fault_unrecoverable) {
+>> diff --git a/drivers/iommu/io-pgfault.c b/drivers/iommu/io-pgfault.c
+>> index 1df8c1dcae77..abf16e06bcf5 100644
+>> --- a/drivers/iommu/io-pgfault.c
+>> +++ b/drivers/iommu/io-pgfault.c
+>> @@ -195,10 +195,6 @@ int iommu_queue_iopf(struct iommu_fault *fault, void *cookie)
+>>         lockdep_assert_held(&param->lock);
+>>   -    if (fault->type != IOMMU_FAULT_PAGE_REQ)
+>> -        /* Not a recoverable page fault */
+>> -        return -EOPNOTSUPP;
+>> -
+> 
+> Any reasons why do you want to remove this check?
 
-Just as an example of this bad behaviour, I have series in progress that fixes it:
-https://elixir.bootlin.com/linux/v5.12-rc2/source/drivers/infiniband/hw/bnxt_re/ib_verbs.c#L1100
-	srq = container_of(init_attr->srq, struct bnxt_re_srq, ib_srq);
-	if (!srq) {
-		ibdev_err(&rdev->ibdev, "SRQ not found");
-		return -EINVAL;
-	}
+My thought was to make the reporting cap more detailed: IOPF_REPORT_ is only for recoverable
+page faults (IOMMU_FAULT_PAGE_REQ), and we may add UNRECOV_FAULT_REPORT_ later for unrecoverable
+faults (IOMMU_FAULT_DMA_UNRECOV)...
 
->         return container_of(core_vdev, struct vfio_pci_device, vdev);
-> }
->
-> ...but typed ops is already a significant idiomatic improvement.
+> 
+>>       /*
+>>        * As long as we're holding param->lock, the queue can't be unlinked
+>>        * from the device and therefore cannot disappear.
+>> diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
+>> index d0b0a15dba84..cb1d93b00f7d 100644
+>> --- a/drivers/iommu/iommu.c
+>> +++ b/drivers/iommu/iommu.c
+>> @@ -1056,6 +1056,40 @@ int iommu_group_unregister_notifier(struct iommu_group *group,
+>>   }
+>>   EXPORT_SYMBOL_GPL(iommu_group_unregister_notifier);
+>>   +/*
+>> + * iommu_update_device_fault_handler - Update the device fault handler via flags
+>> + * @dev: the device
+>> + * @mask: bits(not set) to clear
+>> + * @set: bits to set
+>> + *
+>> + * Update the device fault handler installed by
+>> + * iommu_register_device_fault_handler().
+>> + *
+>> + * Return 0 on success, or an error.
+>> + */
+>> +int iommu_update_device_fault_handler(struct device *dev, u32 mask, u32 set)
+>> +{
+>> +    struct dev_iommu *param = dev->iommu;
+>> +    int ret = 0;
+>> +
+>> +    if (!param)
+>> +        return -EINVAL;
+>> +
+>> +    mutex_lock(&param->lock);
+>> +
+>> +    if (param->fault_param) {
+>> +        ret = -EINVAL;
+>> +        goto out_unlock;
+>> +    }
+>> +
+>> +    param->fault_param->flags = (param->fault_param->flags & mask) | set;
+>> +
+>> +out_unlock:
+>> +    mutex_unlock(&param->lock);
+>> +    return ret;
+>> +}
+>> +EXPORT_SYMBOL_GPL(iommu_update_device_fault_handler);
+> 
+> When and why will this API be used? Why not registering the fault
+> handling capabilities of a device driver only once during probe()?
 
-Everything here is an improvement, in-kernel vfio implementation is too far
-from canonical kernel code and I'm glad that Jason proposes way to improve
-this situation.
+In VFIO, stage 2 IOPF might be enabled via an ioctl from the userspace (in this series),
+while stage 1 IOPF is enabled from vfio_pci_enable() [1] for nested mode, they are
+configured separately, and currently each device can only have one iommu dev fault
+handler. So I choose to add a update interface for the second one.
 
-Thanks
+[1] https://patchwork.kernel.org/project/kvm/patch/20210223210625.604517-6-eric.auger@redhat.com/
 
->
->
-> >
-> > Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
-> > ---
-> >  Documentation/driver-api/vfio.rst            | 18 ++++----
-> >  drivers/vfio/fsl-mc/vfio_fsl_mc.c            | 36 +++++++++------
-> >  drivers/vfio/mdev/vfio_mdev.c                | 33 +++++++-------
-> >  drivers/vfio/pci/vfio_pci.c                  | 47 ++++++++++++--------
-> >  drivers/vfio/platform/vfio_platform_common.c | 33 ++++++++------
-> >  drivers/vfio/vfio.c                          | 20 ++++-----
-> >  include/linux/vfio.h                         | 16 +++----
-> >  7 files changed, 117 insertions(+), 86 deletions(-)
-> >
-> > diff --git a/Documentation/driver-api/vfio.rst b/Documentation/driver-api/vfio.rst
-> > index d3a02300913a7f..3337f337293a32 100644
-> > --- a/Documentation/driver-api/vfio.rst
-> > +++ b/Documentation/driver-api/vfio.rst
-> > @@ -269,20 +269,22 @@ ready before calling it. The driver provides an ops structure for callbacks
-> >  similar to a file operations structure::
-> >
-> >         struct vfio_device_ops {
-> > -               int     (*open)(void *device_data);
-> > -               void    (*release)(void *device_data);
-> > -               ssize_t (*read)(void *device_data, char __user *buf,
-> > +               int     (*open)(struct vfio_device *vdev);
-> > +               void    (*release)(struct vfio_device *vdev);
-> > +               ssize_t (*read)(struct vfio_device *vdev, char __user *buf,
-> >                                 size_t count, loff_t *ppos);
-> > -               ssize_t (*write)(void *device_data, const char __user *buf,
-> > +               ssize_t (*write)(struct vfio_device *vdev,
-> > +                                const char __user *buf,
-> >                                  size_t size, loff_t *ppos);
-> > -               long    (*ioctl)(void *device_data, unsigned int cmd,
-> > +               long    (*ioctl)(struct vfio_device *vdev, unsigned int cmd,
-> >                                  unsigned long arg);
-> > -               int     (*mmap)(void *device_data, struct vm_area_struct *vma);
-> > +               int     (*mmap)(struct vfio_device *vdev,
-> > +                               struct vm_area_struct *vma);
-> >         };
-> >
-> > -Each function is passed the device_data that was originally registered
-> > +Each function is passed the vdev that was originally registered
-> >  in the vfio_register_group_dev() call above.  This allows the bus driver
-> > -an easy place to store its opaque, private data.  The open/release
-> > +to obtain its private data using container_of().  The open/release
-> >  callbacks are issued when a new file descriptor is created for a
-> >  device (via VFIO_GROUP_GET_DEVICE_FD).  The ioctl interface provides
-> >  a direct pass through for VFIO_DEVICE_* ioctls.  The read/write/mmap
-> > diff --git a/drivers/vfio/fsl-mc/vfio_fsl_mc.c b/drivers/vfio/fsl-mc/vfio_fsl_mc.c
-> > index ddee6ed20c4523..74a5de1b791934 100644
-> > --- a/drivers/vfio/fsl-mc/vfio_fsl_mc.c
-> > +++ b/drivers/vfio/fsl-mc/vfio_fsl_mc.c
-> > @@ -135,9 +135,10 @@ static void vfio_fsl_mc_regions_cleanup(struct vfio_fsl_mc_device *vdev)
-> >         kfree(vdev->regions);
-> >  }
-> >
-> > -static int vfio_fsl_mc_open(void *device_data)
-> > +static int vfio_fsl_mc_open(struct vfio_device *core_vdev)
-> >  {
-> > -       struct vfio_fsl_mc_device *vdev = device_data;
-> > +       struct vfio_fsl_mc_device *vdev =
-> > +               container_of(core_vdev, struct vfio_fsl_mc_device, vdev);
-> >         int ret;
-> >
-> >         if (!try_module_get(THIS_MODULE))
-> > @@ -161,9 +162,10 @@ static int vfio_fsl_mc_open(void *device_data)
-> >         return ret;
-> >  }
-> >
-> > -static void vfio_fsl_mc_release(void *device_data)
-> > +static void vfio_fsl_mc_release(struct vfio_device *core_vdev)
-> >  {
-> > -       struct vfio_fsl_mc_device *vdev = device_data;
-> > +       struct vfio_fsl_mc_device *vdev =
-> > +               container_of(core_vdev, struct vfio_fsl_mc_device, vdev);
-> >         int ret;
-> >
-> >         mutex_lock(&vdev->reflck->lock);
-> > @@ -197,11 +199,12 @@ static void vfio_fsl_mc_release(void *device_data)
-> >         module_put(THIS_MODULE);
-> >  }
-> >
-> > -static long vfio_fsl_mc_ioctl(void *device_data, unsigned int cmd,
-> > -                             unsigned long arg)
-> > +static long vfio_fsl_mc_ioctl(struct vfio_device *core_vdev,
-> > +                             unsigned int cmd, unsigned long arg)
-> >  {
-> >         unsigned long minsz;
-> > -       struct vfio_fsl_mc_device *vdev = device_data;
-> > +       struct vfio_fsl_mc_device *vdev =
-> > +               container_of(core_vdev, struct vfio_fsl_mc_device, vdev);
-> >         struct fsl_mc_device *mc_dev = vdev->mc_dev;
-> >
-> >         switch (cmd) {
-> > @@ -327,10 +330,11 @@ static long vfio_fsl_mc_ioctl(void *device_data, unsigned int cmd,
-> >         }
-> >  }
-> >
-> > -static ssize_t vfio_fsl_mc_read(void *device_data, char __user *buf,
-> > +static ssize_t vfio_fsl_mc_read(struct vfio_device *core_vdev, char __user *buf,
-> >                                 size_t count, loff_t *ppos)
-> >  {
-> > -       struct vfio_fsl_mc_device *vdev = device_data;
-> > +       struct vfio_fsl_mc_device *vdev =
-> > +               container_of(core_vdev, struct vfio_fsl_mc_device, vdev);
-> >         unsigned int index = VFIO_FSL_MC_OFFSET_TO_INDEX(*ppos);
-> >         loff_t off = *ppos & VFIO_FSL_MC_OFFSET_MASK;
-> >         struct fsl_mc_device *mc_dev = vdev->mc_dev;
-> > @@ -404,10 +408,12 @@ static int vfio_fsl_mc_send_command(void __iomem *ioaddr, uint64_t *cmd_data)
-> >         return 0;
-> >  }
-> >
-> > -static ssize_t vfio_fsl_mc_write(void *device_data, const char __user *buf,
-> > -                                size_t count, loff_t *ppos)
-> > +static ssize_t vfio_fsl_mc_write(struct vfio_device *core_vdev,
-> > +                                const char __user *buf, size_t count,
-> > +                                loff_t *ppos)
-> >  {
-> > -       struct vfio_fsl_mc_device *vdev = device_data;
-> > +       struct vfio_fsl_mc_device *vdev =
-> > +               container_of(core_vdev, struct vfio_fsl_mc_device, vdev);
-> >         unsigned int index = VFIO_FSL_MC_OFFSET_TO_INDEX(*ppos);
-> >         loff_t off = *ppos & VFIO_FSL_MC_OFFSET_MASK;
-> >         struct fsl_mc_device *mc_dev = vdev->mc_dev;
-> > @@ -468,9 +474,11 @@ static int vfio_fsl_mc_mmap_mmio(struct vfio_fsl_mc_region region,
-> >                                size, vma->vm_page_prot);
-> >  }
-> >
-> > -static int vfio_fsl_mc_mmap(void *device_data, struct vm_area_struct *vma)
-> > +static int vfio_fsl_mc_mmap(struct vfio_device *core_vdev,
-> > +                           struct vm_area_struct *vma)
-> >  {
-> > -       struct vfio_fsl_mc_device *vdev = device_data;
-> > +       struct vfio_fsl_mc_device *vdev =
-> > +               container_of(core_vdev, struct vfio_fsl_mc_device, vdev);
-> >         struct fsl_mc_device *mc_dev = vdev->mc_dev;
-> >         unsigned int index;
-> >
-> > diff --git a/drivers/vfio/mdev/vfio_mdev.c b/drivers/vfio/mdev/vfio_mdev.c
-> > index 4469aaf31b56cb..e7309caa99c71b 100644
-> > --- a/drivers/vfio/mdev/vfio_mdev.c
-> > +++ b/drivers/vfio/mdev/vfio_mdev.c
-> > @@ -25,10 +25,11 @@ struct mdev_vfio_device {
-> >         struct vfio_device vdev;
-> >  };
-> >
-> > -static int vfio_mdev_open(void *device_data)
-> > +static int vfio_mdev_open(struct vfio_device *core_vdev)
-> >  {
-> > -       struct mdev_device *mdev = device_data;
-> > +       struct mdev_device *mdev = to_mdev_device(core_vdev->dev);
-> >         struct mdev_parent *parent = mdev->parent;
-> > +
-> >         int ret;
-> >
-> >         if (unlikely(!parent->ops->open))
-> > @@ -44,9 +45,9 @@ static int vfio_mdev_open(void *device_data)
-> >         return ret;
-> >  }
-> >
-> > -static void vfio_mdev_release(void *device_data)
-> > +static void vfio_mdev_release(struct vfio_device *core_vdev)
-> >  {
-> > -       struct mdev_device *mdev = device_data;
-> > +       struct mdev_device *mdev = to_mdev_device(core_vdev->dev);
-> >         struct mdev_parent *parent = mdev->parent;
-> >
-> >         if (likely(parent->ops->release))
-> > @@ -55,10 +56,10 @@ static void vfio_mdev_release(void *device_data)
-> >         module_put(THIS_MODULE);
-> >  }
-> >
-> > -static long vfio_mdev_unlocked_ioctl(void *device_data,
-> > +static long vfio_mdev_unlocked_ioctl(struct vfio_device *core_vdev,
-> >                                      unsigned int cmd, unsigned long arg)
-> >  {
-> > -       struct mdev_device *mdev = device_data;
-> > +       struct mdev_device *mdev = to_mdev_device(core_vdev->dev);
-> >         struct mdev_parent *parent = mdev->parent;
-> >
-> >         if (unlikely(!parent->ops->ioctl))
-> > @@ -67,10 +68,10 @@ static long vfio_mdev_unlocked_ioctl(void *device_data,
-> >         return parent->ops->ioctl(mdev, cmd, arg);
-> >  }
-> >
-> > -static ssize_t vfio_mdev_read(void *device_data, char __user *buf,
-> > +static ssize_t vfio_mdev_read(struct vfio_device *core_vdev, char __user *buf,
-> >                               size_t count, loff_t *ppos)
-> >  {
-> > -       struct mdev_device *mdev = device_data;
-> > +       struct mdev_device *mdev = to_mdev_device(core_vdev->dev);
-> >         struct mdev_parent *parent = mdev->parent;
-> >
-> >         if (unlikely(!parent->ops->read))
-> > @@ -79,10 +80,11 @@ static ssize_t vfio_mdev_read(void *device_data, char __user *buf,
-> >         return parent->ops->read(mdev, buf, count, ppos);
-> >  }
-> >
-> > -static ssize_t vfio_mdev_write(void *device_data, const char __user *buf,
-> > -                              size_t count, loff_t *ppos)
-> > +static ssize_t vfio_mdev_write(struct vfio_device *core_vdev,
-> > +                              const char __user *buf, size_t count,
-> > +                              loff_t *ppos)
-> >  {
-> > -       struct mdev_device *mdev = device_data;
-> > +       struct mdev_device *mdev = to_mdev_device(core_vdev->dev);
-> >         struct mdev_parent *parent = mdev->parent;
-> >
-> >         if (unlikely(!parent->ops->write))
-> > @@ -91,9 +93,10 @@ static ssize_t vfio_mdev_write(void *device_data, const char __user *buf,
-> >         return parent->ops->write(mdev, buf, count, ppos);
-> >  }
-> >
-> > -static int vfio_mdev_mmap(void *device_data, struct vm_area_struct *vma)
-> > +static int vfio_mdev_mmap(struct vfio_device *core_vdev,
-> > +                         struct vm_area_struct *vma)
-> >  {
-> > -       struct mdev_device *mdev = device_data;
-> > +       struct mdev_device *mdev = to_mdev_device(core_vdev->dev);
-> >         struct mdev_parent *parent = mdev->parent;
-> >
-> >         if (unlikely(!parent->ops->mmap))
-> > @@ -102,9 +105,9 @@ static int vfio_mdev_mmap(void *device_data, struct vm_area_struct *vma)
-> >         return parent->ops->mmap(mdev, vma);
-> >  }
-> >
-> > -static void vfio_mdev_request(void *device_data, unsigned int count)
-> > +static void vfio_mdev_request(struct vfio_device *core_vdev, unsigned int count)
-> >  {
-> > -       struct mdev_device *mdev = device_data;
-> > +       struct mdev_device *mdev = to_mdev_device(core_vdev->dev);
-> >         struct mdev_parent *parent = mdev->parent;
-> >
-> >         if (parent->ops->request)
-> > diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
-> > index fae573c6f86bdf..af5696a96a76e0 100644
-> > --- a/drivers/vfio/pci/vfio_pci.c
-> > +++ b/drivers/vfio/pci/vfio_pci.c
-> > @@ -553,9 +553,10 @@ static void vfio_pci_vf_token_user_add(struct vfio_pci_device *vdev, int val)
-> >         vfio_device_put(pf_dev);
-> >  }
-> >
-> > -static void vfio_pci_release(void *device_data)
-> > +static void vfio_pci_release(struct vfio_device *core_vdev)
-> >  {
-> > -       struct vfio_pci_device *vdev = device_data;
-> > +       struct vfio_pci_device *vdev =
-> > +               container_of(core_vdev, struct vfio_pci_device, vdev);
-> >
-> >         mutex_lock(&vdev->reflck->lock);
-> >
-> > @@ -581,9 +582,10 @@ static void vfio_pci_release(void *device_data)
-> >         module_put(THIS_MODULE);
-> >  }
-> >
-> > -static int vfio_pci_open(void *device_data)
-> > +static int vfio_pci_open(struct vfio_device *core_vdev)
-> >  {
-> > -       struct vfio_pci_device *vdev = device_data;
-> > +       struct vfio_pci_device *vdev =
-> > +               container_of(core_vdev, struct vfio_pci_device, vdev);
-> >         int ret = 0;
-> >
-> >         if (!try_module_get(THIS_MODULE))
-> > @@ -797,10 +799,11 @@ struct vfio_devices {
-> >         int max_index;
-> >  };
-> >
-> > -static long vfio_pci_ioctl(void *device_data,
-> > +static long vfio_pci_ioctl(struct vfio_device *core_vdev,
-> >                            unsigned int cmd, unsigned long arg)
-> >  {
-> > -       struct vfio_pci_device *vdev = device_data;
-> > +       struct vfio_pci_device *vdev =
-> > +               container_of(core_vdev, struct vfio_pci_device, vdev);
-> >         unsigned long minsz;
-> >
-> >         if (cmd == VFIO_DEVICE_GET_INFO) {
-> > @@ -1402,11 +1405,10 @@ static long vfio_pci_ioctl(void *device_data,
-> >         return -ENOTTY;
-> >  }
-> >
-> > -static ssize_t vfio_pci_rw(void *device_data, char __user *buf,
-> > +static ssize_t vfio_pci_rw(struct vfio_pci_device *vdev, char __user *buf,
-> >                            size_t count, loff_t *ppos, bool iswrite)
-> >  {
-> >         unsigned int index = VFIO_PCI_OFFSET_TO_INDEX(*ppos);
-> > -       struct vfio_pci_device *vdev = device_data;
-> >
-> >         if (index >= VFIO_PCI_NUM_REGIONS + vdev->num_regions)
-> >                 return -EINVAL;
-> > @@ -1434,22 +1436,28 @@ static ssize_t vfio_pci_rw(void *device_data, char __user *buf,
-> >         return -EINVAL;
-> >  }
-> >
-> > -static ssize_t vfio_pci_read(void *device_data, char __user *buf,
-> > +static ssize_t vfio_pci_read(struct vfio_device *core_vdev, char __user *buf,
-> >                              size_t count, loff_t *ppos)
-> >  {
-> > +       struct vfio_pci_device *vdev =
-> > +               container_of(core_vdev, struct vfio_pci_device, vdev);
-> > +
-> >         if (!count)
-> >                 return 0;
-> >
-> > -       return vfio_pci_rw(device_data, buf, count, ppos, false);
-> > +       return vfio_pci_rw(vdev, buf, count, ppos, false);
-> >  }
-> >
-> > -static ssize_t vfio_pci_write(void *device_data, const char __user *buf,
-> > +static ssize_t vfio_pci_write(struct vfio_device *core_vdev, const char __user *buf,
-> >                               size_t count, loff_t *ppos)
-> >  {
-> > +       struct vfio_pci_device *vdev =
-> > +               container_of(core_vdev, struct vfio_pci_device, vdev);
-> > +
-> >         if (!count)
-> >                 return 0;
-> >
-> > -       return vfio_pci_rw(device_data, (char __user *)buf, count, ppos, true);
-> > +       return vfio_pci_rw(vdev, (char __user *)buf, count, ppos, true);
-> >  }
-> >
-> >  /* Return 1 on zap and vma_lock acquired, 0 on contention (only with @try) */
-> > @@ -1646,9 +1654,10 @@ static const struct vm_operations_struct vfio_pci_mmap_ops = {
-> >         .fault = vfio_pci_mmap_fault,
-> >  };
-> >
-> > -static int vfio_pci_mmap(void *device_data, struct vm_area_struct *vma)
-> > +static int vfio_pci_mmap(struct vfio_device *core_vdev, struct vm_area_struct *vma)
-> >  {
-> > -       struct vfio_pci_device *vdev = device_data;
-> > +       struct vfio_pci_device *vdev =
-> > +               container_of(core_vdev, struct vfio_pci_device, vdev);
-> >         struct pci_dev *pdev = vdev->pdev;
-> >         unsigned int index;
-> >         u64 phys_len, req_len, pgoff, req_start;
-> > @@ -1714,9 +1723,10 @@ static int vfio_pci_mmap(void *device_data, struct vm_area_struct *vma)
-> >         return 0;
-> >  }
-> >
-> > -static void vfio_pci_request(void *device_data, unsigned int count)
-> > +static void vfio_pci_request(struct vfio_device *core_vdev, unsigned int count)
-> >  {
-> > -       struct vfio_pci_device *vdev = device_data;
-> > +       struct vfio_pci_device *vdev =
-> > +               container_of(core_vdev, struct vfio_pci_device, vdev);
-> >         struct pci_dev *pdev = vdev->pdev;
-> >
-> >         mutex_lock(&vdev->igate);
-> > @@ -1830,9 +1840,10 @@ static int vfio_pci_validate_vf_token(struct vfio_pci_device *vdev,
-> >
-> >  #define VF_TOKEN_ARG "vf_token="
-> >
-> > -static int vfio_pci_match(void *device_data, char *buf)
-> > +static int vfio_pci_match(struct vfio_device *core_vdev, char *buf)
-> >  {
-> > -       struct vfio_pci_device *vdev = device_data;
-> > +       struct vfio_pci_device *vdev =
-> > +               container_of(core_vdev, struct vfio_pci_device, vdev);
-> >         bool vf_token = false;
-> >         uuid_t uuid;
-> >         int ret;
-> > diff --git a/drivers/vfio/platform/vfio_platform_common.c b/drivers/vfio/platform/vfio_platform_common.c
-> > index 6eb749250ee41c..f5f6b537084a67 100644
-> > --- a/drivers/vfio/platform/vfio_platform_common.c
-> > +++ b/drivers/vfio/platform/vfio_platform_common.c
-> > @@ -218,9 +218,10 @@ static int vfio_platform_call_reset(struct vfio_platform_device *vdev,
-> >         return -EINVAL;
-> >  }
-> >
-> > -static void vfio_platform_release(void *device_data)
-> > +static void vfio_platform_release(struct vfio_device *core_vdev)
-> >  {
-> > -       struct vfio_platform_device *vdev = device_data;
-> > +       struct vfio_platform_device *vdev =
-> > +               container_of(core_vdev, struct vfio_platform_device, vdev);
-> >
-> >         mutex_lock(&driver_lock);
-> >
-> > @@ -244,9 +245,10 @@ static void vfio_platform_release(void *device_data)
-> >         module_put(vdev->parent_module);
-> >  }
-> >
-> > -static int vfio_platform_open(void *device_data)
-> > +static int vfio_platform_open(struct vfio_device *core_vdev)
-> >  {
-> > -       struct vfio_platform_device *vdev = device_data;
-> > +       struct vfio_platform_device *vdev =
-> > +               container_of(core_vdev, struct vfio_platform_device, vdev);
-> >         int ret;
-> >
-> >         if (!try_module_get(vdev->parent_module))
-> > @@ -293,10 +295,12 @@ static int vfio_platform_open(void *device_data)
-> >         return ret;
-> >  }
-> >
-> > -static long vfio_platform_ioctl(void *device_data,
-> > +static long vfio_platform_ioctl(struct vfio_device *core_vdev,
-> >                                 unsigned int cmd, unsigned long arg)
-> >  {
-> > -       struct vfio_platform_device *vdev = device_data;
-> > +       struct vfio_platform_device *vdev =
-> > +               container_of(core_vdev, struct vfio_platform_device, vdev);
-> > +
-> >         unsigned long minsz;
-> >
-> >         if (cmd == VFIO_DEVICE_GET_INFO) {
-> > @@ -455,10 +459,11 @@ static ssize_t vfio_platform_read_mmio(struct vfio_platform_region *reg,
-> >         return -EFAULT;
-> >  }
-> >
-> > -static ssize_t vfio_platform_read(void *device_data, char __user *buf,
-> > -                                 size_t count, loff_t *ppos)
-> > +static ssize_t vfio_platform_read(struct vfio_device *core_vdev,
-> > +                                 char __user *buf, size_t count, loff_t *ppos)
-> >  {
-> > -       struct vfio_platform_device *vdev = device_data;
-> > +       struct vfio_platform_device *vdev =
-> > +               container_of(core_vdev, struct vfio_platform_device, vdev);
-> >         unsigned int index = VFIO_PLATFORM_OFFSET_TO_INDEX(*ppos);
-> >         loff_t off = *ppos & VFIO_PLATFORM_OFFSET_MASK;
-> >
-> > @@ -531,10 +536,11 @@ static ssize_t vfio_platform_write_mmio(struct vfio_platform_region *reg,
-> >         return -EFAULT;
-> >  }
-> >
-> > -static ssize_t vfio_platform_write(void *device_data, const char __user *buf,
-> > +static ssize_t vfio_platform_write(struct vfio_device *core_vdev, const char __user *buf,
-> >                                    size_t count, loff_t *ppos)
-> >  {
-> > -       struct vfio_platform_device *vdev = device_data;
-> > +       struct vfio_platform_device *vdev =
-> > +               container_of(core_vdev, struct vfio_platform_device, vdev);
-> >         unsigned int index = VFIO_PLATFORM_OFFSET_TO_INDEX(*ppos);
-> >         loff_t off = *ppos & VFIO_PLATFORM_OFFSET_MASK;
-> >
-> > @@ -573,9 +579,10 @@ static int vfio_platform_mmap_mmio(struct vfio_platform_region region,
-> >                                req_len, vma->vm_page_prot);
-> >  }
-> >
-> > -static int vfio_platform_mmap(void *device_data, struct vm_area_struct *vma)
-> > +static int vfio_platform_mmap(struct vfio_device *core_vdev, struct vm_area_struct *vma)
-> >  {
-> > -       struct vfio_platform_device *vdev = device_data;
-> > +       struct vfio_platform_device *vdev =
-> > +               container_of(core_vdev, struct vfio_platform_device, vdev);
-> >         unsigned int index;
-> >
-> >         index = vma->vm_pgoff >> (VFIO_PLATFORM_OFFSET_SHIFT - PAGE_SHIFT);
-> > diff --git a/drivers/vfio/vfio.c b/drivers/vfio/vfio.c
-> > index 2d6d7cc1d1ebf9..01de47d1810b6b 100644
-> > --- a/drivers/vfio/vfio.c
-> > +++ b/drivers/vfio/vfio.c
-> > @@ -832,7 +832,7 @@ static struct vfio_device *vfio_device_get_from_name(struct vfio_group *group,
-> >                 int ret;
-> >
-> >                 if (it->ops->match) {
-> > -                       ret = it->ops->match(it->device_data, buf);
-> > +                       ret = it->ops->match(it, buf);
-> >                         if (ret < 0) {
-> >                                 device = ERR_PTR(ret);
-> >                                 break;
-> > @@ -893,7 +893,7 @@ void vfio_unregister_group_dev(struct vfio_device *device)
-> >         rc = try_wait_for_completion(&device->comp);
-> >         while (rc <= 0) {
-> >                 if (device->ops->request)
-> > -                       device->ops->request(device->device_data, i++);
-> > +                       device->ops->request(device, i++);
-> >
-> >                 if (interrupted) {
-> >                         rc = wait_for_completion_timeout(&device->comp,
-> > @@ -1379,7 +1379,7 @@ static int vfio_group_get_device_fd(struct vfio_group *group, char *buf)
-> >         if (IS_ERR(device))
-> >                 return PTR_ERR(device);
-> >
-> > -       ret = device->ops->open(device->device_data);
-> > +       ret = device->ops->open(device);
-> >         if (ret) {
-> >                 vfio_device_put(device);
-> >                 return ret;
-> > @@ -1391,7 +1391,7 @@ static int vfio_group_get_device_fd(struct vfio_group *group, char *buf)
-> >          */
-> >         ret = get_unused_fd_flags(O_CLOEXEC);
-> >         if (ret < 0) {
-> > -               device->ops->release(device->device_data);
-> > +               device->ops->release(device);
-> >                 vfio_device_put(device);
-> >                 return ret;
-> >         }
-> > @@ -1401,7 +1401,7 @@ static int vfio_group_get_device_fd(struct vfio_group *group, char *buf)
-> >         if (IS_ERR(filep)) {
-> >                 put_unused_fd(ret);
-> >                 ret = PTR_ERR(filep);
-> > -               device->ops->release(device->device_data);
-> > +               device->ops->release(device);
-> >                 vfio_device_put(device);
-> >                 return ret;
-> >         }
-> > @@ -1558,7 +1558,7 @@ static int vfio_device_fops_release(struct inode *inode, struct file *filep)
-> >  {
-> >         struct vfio_device *device = filep->private_data;
-> >
-> > -       device->ops->release(device->device_data);
-> > +       device->ops->release(device);
-> >
-> >         vfio_group_try_dissolve_container(device->group);
-> >
-> > @@ -1575,7 +1575,7 @@ static long vfio_device_fops_unl_ioctl(struct file *filep,
-> >         if (unlikely(!device->ops->ioctl))
-> >                 return -EINVAL;
-> >
-> > -       return device->ops->ioctl(device->device_data, cmd, arg);
-> > +       return device->ops->ioctl(device, cmd, arg);
-> >  }
-> >
-> >  static ssize_t vfio_device_fops_read(struct file *filep, char __user *buf,
-> > @@ -1586,7 +1586,7 @@ static ssize_t vfio_device_fops_read(struct file *filep, char __user *buf,
-> >         if (unlikely(!device->ops->read))
-> >                 return -EINVAL;
-> >
-> > -       return device->ops->read(device->device_data, buf, count, ppos);
-> > +       return device->ops->read(device, buf, count, ppos);
-> >  }
-> >
-> >  static ssize_t vfio_device_fops_write(struct file *filep,
-> > @@ -1598,7 +1598,7 @@ static ssize_t vfio_device_fops_write(struct file *filep,
-> >         if (unlikely(!device->ops->write))
-> >                 return -EINVAL;
-> >
-> > -       return device->ops->write(device->device_data, buf, count, ppos);
-> > +       return device->ops->write(device, buf, count, ppos);
-> >  }
-> >
-> >  static int vfio_device_fops_mmap(struct file *filep, struct vm_area_struct *vma)
-> > @@ -1608,7 +1608,7 @@ static int vfio_device_fops_mmap(struct file *filep, struct vm_area_struct *vma)
-> >         if (unlikely(!device->ops->mmap))
-> >                 return -EINVAL;
-> >
-> > -       return device->ops->mmap(device->device_data, vma);
-> > +       return device->ops->mmap(device, vma);
-> >  }
-> >
-> >  static const struct file_operations vfio_device_fops = {
-> > diff --git a/include/linux/vfio.h b/include/linux/vfio.h
-> > index 4995faf51efeae..784c34c0a28763 100644
-> > --- a/include/linux/vfio.h
-> > +++ b/include/linux/vfio.h
-> > @@ -44,17 +44,17 @@ struct vfio_device {
-> >   */
-> >  struct vfio_device_ops {
-> >         char    *name;
-> > -       int     (*open)(void *device_data);
-> > -       void    (*release)(void *device_data);
-> > -       ssize_t (*read)(void *device_data, char __user *buf,
-> > +       int     (*open)(struct vfio_device *vdev);
-> > +       void    (*release)(struct vfio_device *vdev);
-> > +       ssize_t (*read)(struct vfio_device *vdev, char __user *buf,
-> >                         size_t count, loff_t *ppos);
-> > -       ssize_t (*write)(void *device_data, const char __user *buf,
-> > +       ssize_t (*write)(struct vfio_device *vdev, const char __user *buf,
-> >                          size_t count, loff_t *size);
-> > -       long    (*ioctl)(void *device_data, unsigned int cmd,
-> > +       long    (*ioctl)(struct vfio_device *vdev, unsigned int cmd,
-> >                          unsigned long arg);
-> > -       int     (*mmap)(void *device_data, struct vm_area_struct *vma);
-> > -       void    (*request)(void *device_data, unsigned int count);
-> > -       int     (*match)(void *device_data, char *buf);
-> > +       int     (*mmap)(struct vfio_device *vdev, struct vm_area_struct *vma);
-> > +       void    (*request)(struct vfio_device *vdev, unsigned int count);
-> > +       int     (*match)(struct vfio_device *vdev, char *buf);
-> >  };
-> >
-> >  extern struct iommu_group *vfio_iommu_group_get(struct device *dev);
-> > --
-> > 2.30.1
-> >
+> 
+>> +
+>>   /**
+>>    * iommu_register_device_fault_handler() - Register a device fault handler
+>>    * @dev: the device
+>> @@ -1076,11 +1110,14 @@ EXPORT_SYMBOL_GPL(iommu_group_unregister_notifier);
+>>    */
+>>   int iommu_register_device_fault_handler(struct device *dev,
+>>                       iommu_dev_fault_handler_t handler,
+>> -                    void *data)
+>> +                    u32 flags, void *data)
+>>   {
+>>       struct dev_iommu *param = dev->iommu;
+>>       int ret = 0;
+>>   +    if (flags & IOPF_REPORT_FLAT && flags & IOPF_REPORT_NESTED)
+>> +        return -EINVAL;
+>> +
+>>       if (!param)
+>>           return -EINVAL;
+>>   @@ -1099,6 +1136,7 @@ int iommu_register_device_fault_handler(struct device *dev,
+>>           goto done_unlock;
+>>       }
+>>       param->fault_param->handler = handler;
+>> +    param->fault_param->flags = flags;
+>>       param->fault_param->data = data;
+>>       mutex_init(&param->fault_param->lock);
+>>       INIT_LIST_HEAD(&param->fault_param->faults);
+>> @@ -1177,6 +1215,22 @@ int iommu_report_device_fault(struct device *dev, struct iommu_fault_event *evt)
+>>           goto done_unlock;
+>>       }
+>>   +    /* The unrecoverable fault reporting is not supported at the moment. */
+>> +    if (evt->fault.type != IOMMU_FAULT_PAGE_REQ)
+>> +        return -EOPNOTSUPP;
+> 
+> Any reasons why do you want to disable reporting an unrecoverable fault?
+
+When I add UNRECOV_FAULT_REPORT_ (mentioned above), I will enable the unrecoverable fault
+reporting if the fault client concerns it. Sorry for this. :-)
+
+> 
+>> +
+>> +    if (evt->fault.type == IOMMU_FAULT_PAGE_REQ) {
+>> +        if (fparam->flags & IOPF_REPORT_NESTED) {
+>> +            if (evt->fault.prm.flags & IOMMU_FAULT_PAGE_REQUEST_L2 &&
+>> +                !(fparam->flags & IOPF_REPORT_NESTED_L2_CONCERNED))
+>> +                return -EOPNOTSUPP;
+>> +            if (!(evt->fault.prm.flags & IOMMU_FAULT_PAGE_REQUEST_L2) &&
+>> +                !(fparam->flags & IOPF_REPORT_NESTED_L1_CONCERNED))
+>> +                return -EOPNOTSUPP;
+>> +        } else if (!(fparam->flags & IOPF_REPORT_FLAT))
+>> +            return -EOPNOTSUPP;
+>> +    }
+>> +
+>>       if (evt->fault.type == IOMMU_FAULT_PAGE_REQ &&
+>>           (evt->fault.prm.flags & IOMMU_FAULT_PAGE_REQUEST_LAST_PAGE)) {
+>>           evt_pending = kmemdup(evt, sizeof(struct iommu_fault_event),
+>> diff --git a/include/linux/iommu.h b/include/linux/iommu.h
+>> index 86d688c4418f..f03d761e8310 100644
+>> --- a/include/linux/iommu.h
+>> +++ b/include/linux/iommu.h
+>> @@ -352,12 +352,21 @@ struct iommu_fault_event {
+>>   /**
+>>    * struct iommu_fault_param - per-device IOMMU fault data
+>>    * @handler: Callback function to handle IOMMU faults at device level
+>> + * @flags: Indicates whether the fault reporting is available under a
+>> + *       specific configuration (1st/2nd-level-only(FLAT), or nested).
+>> + *       IOPF_REPORT_NESTED needs to additionally know which level/stage
+>> + *       is concerned.
+> 
+> If IOPF_REPORT_NESTED only is not valid why do you want to define it?
+
+Yeah, it seems that IOPF_REPORT_NESTED is unnecessary, IOPF_REPORT_NESTED_L1 + IOPF_REPORT_NESTED_L2
+is enough...
+
+Thanks for your comments!
+Shenming
+
+> 
+>>    * @data: handler private data
+>>    * @faults: holds the pending faults which needs response
+>>    * @lock: protect pending faults list
+>>    */
+>>   struct iommu_fault_param {
+>>       iommu_dev_fault_handler_t handler;
+>> +#define IOPF_REPORT_FLAT            (1 << 0)
+>> +#define IOPF_REPORT_NESTED            (1 << 1)
+>> +#define IOPF_REPORT_NESTED_L1_CONCERNED        (1 << 2)
+>> +#define IOPF_REPORT_NESTED_L2_CONCERNED        (1 << 3)
+>> +    u32 flags;
+>>       void *data;
+>>       struct list_head faults;
+>>       struct mutex lock;
+>> @@ -509,9 +518,11 @@ extern int iommu_group_register_notifier(struct iommu_group *group,
+>>                        struct notifier_block *nb);
+>>   extern int iommu_group_unregister_notifier(struct iommu_group *group,
+>>                          struct notifier_block *nb);
+>> +extern int iommu_update_device_fault_handler(struct device *dev,
+>> +                         u32 mask, u32 set);
+>>   extern int iommu_register_device_fault_handler(struct device *dev,
+>>                       iommu_dev_fault_handler_t handler,
+>> -                    void *data);
+>> +                    u32 flags, void *data);
+>>     extern int iommu_unregister_device_fault_handler(struct device *dev);
+>>   @@ -873,10 +884,16 @@ static inline int iommu_group_unregister_notifier(struct iommu_group *group,
+>>       return 0;
+>>   }
+>>   +static inline int iommu_update_device_fault_handler(struct device *dev,
+>> +                            u32 mask, u32 set)
+>> +{
+>> +    return -ENODEV;
+>> +}
+>> +
+>>   static inline
+>>   int iommu_register_device_fault_handler(struct device *dev,
+>>                       iommu_dev_fault_handler_t handler,
+>> -                    void *data)
+>> +                    u32 flags, void *data)
+>>   {
+>>       return -ENODEV;
+>>   }
+>> diff --git a/include/uapi/linux/iommu.h b/include/uapi/linux/iommu.h
+>> index e1d9e75f2c94..0ce0dfb7713e 100644
+>> --- a/include/uapi/linux/iommu.h
+>> +++ b/include/uapi/linux/iommu.h
+>> @@ -85,6 +85,8 @@ struct iommu_fault_unrecoverable {
+>>    *         When IOMMU_FAULT_PAGE_RESPONSE_NEEDS_PASID is set, the page response
+>>    *         must have the same PASID value as the page request. When it is clear,
+>>    *         the page response should not have a PASID.
+>> + *         If IOMMU_FAULT_PAGE_REQUEST_L2 is set, the fault occurred at the
+>> + *         second level/stage, otherwise, occurred at the first level.
+>>    * @pasid: Process Address Space ID
+>>    * @grpid: Page Request Group Index
+>>    * @perm: requested page permissions (IOMMU_FAULT_PERM_* values)
+>> @@ -96,6 +98,7 @@ struct iommu_fault_page_request {
+>>   #define IOMMU_FAULT_PAGE_REQUEST_LAST_PAGE    (1 << 1)
+>>   #define IOMMU_FAULT_PAGE_REQUEST_PRIV_DATA    (1 << 2)
+>>   #define IOMMU_FAULT_PAGE_RESPONSE_NEEDS_PASID    (1 << 3)
+>> +#define IOMMU_FAULT_PAGE_REQUEST_L2        (1 << 4)
+>>       __u32    flags;
+>>       __u32    pasid;
+>>       __u32    grpid;
+>>
+> 
+> Best regards,
+> baolu
+> .
