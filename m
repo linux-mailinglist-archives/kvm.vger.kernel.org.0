@@ -2,95 +2,109 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E19513348A2
-	for <lists+kvm@lfdr.de>; Wed, 10 Mar 2021 21:07:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 97DD9334913
+	for <lists+kvm@lfdr.de>; Wed, 10 Mar 2021 21:45:06 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231231AbhCJUGj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 10 Mar 2021 15:06:39 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:33635 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232064AbhCJUGM (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 10 Mar 2021 15:06:12 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1615406771;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=MZqOerku4ka3IhMUBjG/XTRlN6lYxBxQ2MLf7EPvQE8=;
-        b=cj3XsgcqkOVGyDxGmuHB7+iklIAOzSwBwQi4S3VkUSFPKZq59Z//PL8YH78rfXmf2Tz+mV
-        6usKUJZR0udPViiXoZtsg0ySfnYr2OlGyReQQKmY72QwODBH5pKAu5HZQrZHh+x0J1XJZl
-        51zpTsVxG7N7jM+QQ+z6QMyx2sNcSR0=
-Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
- [209.85.219.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-569-PU1mr1JGP7a_GU5__lAA3w-1; Wed, 10 Mar 2021 15:06:09 -0500
-X-MC-Unique: PU1mr1JGP7a_GU5__lAA3w-1
-Received: by mail-qv1-f70.google.com with SMTP id x20so4438046qvd.21
-        for <kvm@vger.kernel.org>; Wed, 10 Mar 2021 12:06:09 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=MZqOerku4ka3IhMUBjG/XTRlN6lYxBxQ2MLf7EPvQE8=;
-        b=Vd+cEV6y2LMkgokpRvnvI2B6kTjyFEitMlB7Wi7hB4Fd4NvN/E/1gIhwgUwtSCXvU/
-         b5tElRyR+aQfbyxocfLXnfGeE+TsZuZjTPseZGlR3dgcQ9lmIZnn4R2pK03XCsLNUbXc
-         wObPwmb8ULiQhTD1N1fU3OCj0JclClencw0RXNh0+knh9PuHRFq4/qHROam4zhgHXbYL
-         IEnCESIt9figdiL8BteUb/O4eKDdRT0uhkXT0aiUN52prGEPDiy+Pl4DCiQoHJENcXHy
-         sqkmWOW0LqfKQV+M1FYfMR4dXO+dtquMlO8tqdmlWoIFK47dhfVL6Otncnb7ZlcYJh4U
-         Q2CQ==
-X-Gm-Message-State: AOAM531aWZwWMqyNCvHmOD4KPcyiW2VpT4p049pf/rQxblQjC3y1EYeq
-        e5jbcWQRQ2l+m9mrxe60aV2fFcoT2DDcdVrousSK58n9MVtEUHnjzgduE14F53nil/TmhiC2wcV
-        f34lCiDYFgWS5
-X-Received: by 2002:aed:3741:: with SMTP id i59mr2410754qtb.303.1615406769019;
-        Wed, 10 Mar 2021 12:06:09 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJzT3IYnqEF4ggAfCl202qrDbK8JrUuXkacUIxpIN6UHTxsbOnQgsrU2TqIx7iJ6zbkiigwpgA==
-X-Received: by 2002:aed:3741:: with SMTP id i59mr2410742qtb.303.1615406768814;
-        Wed, 10 Mar 2021 12:06:08 -0800 (PST)
-Received: from xz-x1 ([142.126.89.138])
-        by smtp.gmail.com with ESMTPSA id 131sm284373qkl.74.2021.03.10.12.06.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 10 Mar 2021 12:06:08 -0800 (PST)
-Date:   Wed, 10 Mar 2021 15:06:07 -0500
-From:   Peter Xu <peterx@redhat.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     Alex Williamson <alex.williamson@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, prime.zeng@hisilicon.com,
-        cohuck@redhat.com
-Subject: Re: [PATCH] vfio/pci: Handle concurrent vma faults
-Message-ID: <20210310200607.GG6530@xz-x1>
-References: <161539852724.8302.17137130175894127401.stgit@gimli.home>
- <20210310181446.GZ2356281@nvidia.com>
- <20210310113406.6f029fcf@omen.home.shazbot.org>
- <20210310184011.GA2356281@nvidia.com>
+        id S231394AbhCJUoa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 10 Mar 2021 15:44:30 -0500
+Received: from mga12.intel.com ([192.55.52.136]:58443 "EHLO mga12.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S230491AbhCJUoP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 10 Mar 2021 15:44:15 -0500
+IronPort-SDR: ziWv5KNtIST7z6I1+g9nvbU4w+qgqVyljisoYyRL5Tuj5dug9CxNoKmiWl7hwVGP2MDVZtibjB
+ v5hercud+LoQ==
+X-IronPort-AV: E=McAfee;i="6000,8403,9919"; a="167835676"
+X-IronPort-AV: E=Sophos;i="5.81,238,1610438400"; 
+   d="scan'208";a="167835676"
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Mar 2021 12:44:15 -0800
+IronPort-SDR: j71S+seXjSD2UZQz7i5nkTRxqrVG0IghE+KqmMko2hAAUd91sa+u9WXuqyx8cG45Iwth9SGz1l
+ bMP616clnbTw==
+X-IronPort-AV: E=Sophos;i="5.81,238,1610438400"; 
+   d="scan'208";a="438040003"
+Received: from xuhuiliu-mobl1.amr.corp.intel.com ([10.251.31.67])
+  by fmsmga002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Mar 2021 12:44:09 -0800
+Message-ID: <519e3851e2857f653af29d64a79044cff233401b.camel@intel.com>
+Subject: Re: [PATCH v2 00/25] KVM SGX virtualization support
+From:   Kai Huang <kai.huang@intel.com>
+To:     Jarkko Sakkinen <jarkko@kernel.org>, Borislav Petkov <bp@alien8.de>
+Cc:     kvm@vger.kernel.org, x86@kernel.org, linux-sgx@vger.kernel.org,
+        linux-kernel@vger.kernel.org, seanjc@google.com, luto@kernel.org,
+        dave.hansen@intel.com, rick.p.edgecombe@intel.com,
+        haitao.huang@intel.com, pbonzini@redhat.com, tglx@linutronix.de,
+        mingo@redhat.com, hpa@zytor.com, jethro@fortanix.com,
+        b.thiel@posteo.de, jmattson@google.com, joro@8bytes.org,
+        vkuznets@redhat.com, wanpengli@tencent.com, corbet@lwn.net
+Date:   Thu, 11 Mar 2021 09:44:07 +1300
+In-Reply-To: <YEkJXu262YDa8ZaK@kernel.org>
+References: <cover.1615250634.git.kai.huang@intel.com>
+         <20210309093037.GA699@zn.tnic> <YEkJXu262YDa8ZaK@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.38.4 (3.38.4-1.fc33) 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20210310184011.GA2356281@nvidia.com>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Mar 10, 2021 at 02:40:11PM -0400, Jason Gunthorpe wrote:
-> On Wed, Mar 10, 2021 at 11:34:06AM -0700, Alex Williamson wrote:
-> 
-> > > I think after the address_space changes this should try to stick with
-> > > a normal io_rmap_pfn_range() done outside the fault handler.
+On Wed, 2021-03-10 at 20:01 +0200, Jarkko Sakkinen wrote:
+> On Tue, Mar 09, 2021 at 10:30:37AM +0100, Borislav Petkov wrote:
+> > On Tue, Mar 09, 2021 at 02:38:49PM +1300, Kai Huang wrote:
+> > > This series adds KVM SGX virtualization support. The first 14 patches starting
+> > > with x86/sgx or x86/cpu.. are necessary changes to x86 and SGX core/driver to
+> > > support KVM SGX virtualization, while the rest are patches to KVM subsystem.
 > > 
-> > I assume you're suggesting calling io_remap_pfn_range() when device
-> > memory is enabled,
+> > Ok, I guess I'll queue 1-14 once Sean doesn't find anything
+> > objectionable then give Paolo an immutable commit to base the KVM stuff
+> > ontop.
+> > 
+> > Unless folks have better suggestions, ofc.
 > 
-> Yes, I think I saw Peter thinking along these lines too
+> I'm otherwise cool with that, except patch #2.
 > 
-> Then fault just always causes SIGBUS if it gets called
+> It's based on this series:
+> 
+> https://lore.kernel.org/linux-sgx/20210113233541.17669-1-jarkko@kernel.org/
+> 
+> It's not reasonable to create driver specific wrapper for
+> sgx_free_epc_page() because there is exactly *2* call sites of the function
+> in the driver.  The driver contains 10 call sites (11 after my NUMA patches
+> have been applied) of sgx_free_epc_page() in total.
+> 
+> Instead, it is better to add explicit EREMOVE to those call sites.
+> 
+> The wrapper only trashes the codebase. I'm not happy with it, given all the
+> trouble to make it clean and sound.
 
-Indeed that looks better than looping in the fault().
+However, your change has side effort: it always put page back into free pool, even
+EREMOVE fails. To make your change w/o having any functional change, it has to be:
 
-But I don't know whether it'll be easy to move io_remap_pfn_range() to device
-memory enablement.  If it's a two-step thing, we can fix the BUG_ON and vma
-duplication issue first, then the full rework can be done in the bigger series
-as what be chosen as the last approach.
+	if(!sgx_reset_epc_page())
+		sgx_free_epc_page();
 
-Thanks,
+And for this, Dave raised one concern we should add a WARN() to let user know EPC
+page is leaked, and reboot is requied to get them back.
 
--- 
-Peter Xu
+However with sgx_reset_epc_page(), there's no place to add such WARN(), and
+implementing original sgx_free_epc_page() as sgx_encl_free_epc_page() looks very
+reasonable to me:
+
+https://www.spinics.net/lists/linux-sgx/msg04631.html
+
+Hi Dave,
+
+What is your comment here?
+
+> 
+> > Thx.
+> > 
+> > -- 
+> > Regards/Gruss,
+> >     Boris.
+> > 
+> > https://people.kernel.org/tglx/notes-about-netiquette
+> 
+> 
+> /Jarkko
+
 
