@@ -2,130 +2,264 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B56DB3346E3
-	for <lists+kvm@lfdr.de>; Wed, 10 Mar 2021 19:35:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 10C353346FD
+	for <lists+kvm@lfdr.de>; Wed, 10 Mar 2021 19:41:14 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233425AbhCJSen (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 10 Mar 2021 13:34:43 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:58839 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232387AbhCJSeS (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 10 Mar 2021 13:34:18 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1615401255;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=2zg5A9GRmmUbhQTpSccn6Zg6U2kdiSb2CT/WezBnaxU=;
-        b=cQEjw2bPS9KrMOT9vaRF9ISfTGonCMXMlbF8GfPIkheuPhIw0L71kdwD7SQucHZX0mvbML
-        IPG959ado/SVgHEhKfmtZvwTB8as830TaB6Zxu5j3pPq8ZnVvC+qOMq1Vvs/iVGADI1KZR
-        NPT/hR1ugd9exykRq97mRWifoc3UNWo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-142-9tpFA-piNeewkWb8-_F1Gg-1; Wed, 10 Mar 2021 13:34:14 -0500
-X-MC-Unique: 9tpFA-piNeewkWb8-_F1Gg-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5DFEA69738;
-        Wed, 10 Mar 2021 18:34:12 +0000 (UTC)
-Received: from omen.home.shazbot.org (ovpn-112-255.phx2.redhat.com [10.3.112.255])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 2C59D62461;
-        Wed, 10 Mar 2021 18:34:07 +0000 (UTC)
-Date:   Wed, 10 Mar 2021 11:34:06 -0700
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        peterx@redhat.com, prime.zeng@hisilicon.com, cohuck@redhat.com
-Subject: Re: [PATCH] vfio/pci: Handle concurrent vma faults
-Message-ID: <20210310113406.6f029fcf@omen.home.shazbot.org>
-In-Reply-To: <20210310181446.GZ2356281@nvidia.com>
-References: <161539852724.8302.17137130175894127401.stgit@gimli.home>
-        <20210310181446.GZ2356281@nvidia.com>
+        id S233135AbhCJSkk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 10 Mar 2021 13:40:40 -0500
+Received: from foss.arm.com ([217.140.110.172]:51764 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S233424AbhCJSkH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 10 Mar 2021 13:40:07 -0500
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 837CE1FB;
+        Wed, 10 Mar 2021 10:40:06 -0800 (PST)
+Received: from [10.57.52.136] (unknown [10.57.52.136])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 0A6053F800;
+        Wed, 10 Mar 2021 10:40:03 -0800 (PST)
+Subject: Re: [PATCH 14/17] iommu: remove DOMAIN_ATTR_DMA_USE_FLUSH_QUEUE
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
+        Li Yang <leoyang.li@nxp.com>, freedreno@lists.freedesktop.org,
+        kvm@vger.kernel.org, Michael Ellerman <mpe@ellerman.id.au>,
+        linuxppc-dev@lists.ozlabs.org, dri-devel@lists.freedesktop.org,
+        virtualization@lists.linux-foundation.org,
+        iommu@lists.linux-foundation.org, netdev@vger.kernel.org,
+        linux-arm-msm@vger.kernel.org,
+        David Woodhouse <dwmw2@infradead.org>,
+        linux-arm-kernel@lists.infradead.org
+References: <20210301084257.945454-1-hch@lst.de>
+ <20210301084257.945454-15-hch@lst.de>
+ <1658805c-ed28-b650-7385-a56fab3383e3@arm.com> <20210310091501.GC5928@lst.de>
+ <20210310092533.GA6819@lst.de>
+From:   Robin Murphy <robin.murphy@arm.com>
+Message-ID: <fdacf87a-be14-c92c-4084-1d1dd4fc7766@arm.com>
+Date:   Wed, 10 Mar 2021 18:39:57 +0000
+User-Agent: Mozilla/5.0 (Windows NT 10.0; rv:78.0) Gecko/20100101
+ Thunderbird/78.7.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20210310092533.GA6819@lst.de>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-GB
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 10 Mar 2021 14:14:46 -0400
-Jason Gunthorpe <jgg@nvidia.com> wrote:
+On 2021-03-10 09:25, Christoph Hellwig wrote:
+> On Wed, Mar 10, 2021 at 10:15:01AM +0100, Christoph Hellwig wrote:
+>> On Thu, Mar 04, 2021 at 03:25:27PM +0000, Robin Murphy wrote:
+>>> On 2021-03-01 08:42, Christoph Hellwig wrote:
+>>>> Use explicit methods for setting and querying the information instead.
+>>>
+>>> Now that everyone's using iommu-dma, is there any point in bouncing this
+>>> through the drivers at all? Seems like it would make more sense for the x86
+>>> drivers to reflect their private options back to iommu_dma_strict (and
+>>> allow Intel's caching mode to override it as well), then have
+>>> iommu_dma_init_domain just test !iommu_dma_strict &&
+>>> domain->ops->flush_iotlb_all.
+>>
+>> Hmm.  I looked at this, and kill off ->dma_enable_flush_queue for
+>> the ARM drivers and just looking at iommu_dma_strict seems like a
+>> very clear win.
+>>
+>> OTOH x86 is a little more complicated.  AMD and intel defaul to lazy
+>> mode, so we'd have to change the global iommu_dma_strict if they are
+>> initialized.  Also Intel has not only a "static" option to disable
+>> lazy mode, but also a "dynamic" one where it iterates structure.  So
+>> I think on the get side we're stuck with the method, but it still
+>> simplifies the whole thing.
+> 
+> Actually... Just mirroring the iommu_dma_strict value into
+> struct iommu_domain should solve all of that with very little
+> boilerplate code.
 
-> On Wed, Mar 10, 2021 at 10:53:29AM -0700, Alex Williamson wrote:
-> 
-> > diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
-> > index 65e7e6b44578..ae723808e08b 100644
-> > +++ b/drivers/vfio/pci/vfio_pci.c
-> > @@ -1573,6 +1573,11 @@ static int __vfio_pci_add_vma(struct vfio_pci_device *vdev,
-> >  {
-> >  	struct vfio_pci_mmap_vma *mmap_vma;
-> >  
-> > +	list_for_each_entry(mmap_vma, &vdev->vma_list, vma_next) {
-> > +		if (mmap_vma->vma == vma)
-> > +			return 0; /* Swallow the error, the vma is tracked */
-> > +	}
-> > +
-> >  	mmap_vma = kmalloc(sizeof(*mmap_vma), GFP_KERNEL);
-> >  	if (!mmap_vma)
-> >  		return -ENOMEM;
-> > @@ -1612,31 +1617,32 @@ static vm_fault_t vfio_pci_mmap_fault(struct vm_fault *vmf)
-> >  {
-> >  	struct vm_area_struct *vma = vmf->vma;
-> >  	struct vfio_pci_device *vdev = vma->vm_private_data;
-> > -	vm_fault_t ret = VM_FAULT_NOPAGE;
-> > +	unsigned long vaddr = vma->vm_start, pfn = vma->vm_pgoff;
-> > +	vm_fault_t ret = VM_FAULT_SIGBUS;
-> >  
-> >  	mutex_lock(&vdev->vma_lock);
-> >  	down_read(&vdev->memory_lock);
-> >  
-> > -	if (!__vfio_pci_memory_enabled(vdev)) {
-> > -		ret = VM_FAULT_SIGBUS;
-> > -		mutex_unlock(&vdev->vma_lock);
-> > +	if (!__vfio_pci_memory_enabled(vdev))
-> >  		goto up_out;
-> > +
-> > +	for (; vaddr < vma->vm_end; vaddr += PAGE_SIZE, pfn++) {
-> > +		ret = vmf_insert_pfn_prot(vma, vaddr, pfn,
-> > +					  pgprot_decrypted(vma->vm_page_prot));  
-> 
-> I investigated this, I think the above pgprot_decrypted() should be
-> moved here:
-> 
-> static int vfio_pci_mmap(void *device_data, struct vm_area_struct *vma)
-> {
->         vma->vm_page_prot = pgprot_noncached(vma->vm_page_prot);
-> +       vma->vm_page_prot = pgprot_decrypted(vma->vm_page_prot);
-> 
-> 
-> And since:
-> 
-> vm_fault_t vmf_insert_pfn(struct vm_area_struct *vma, unsigned long addr,
-> 			unsigned long pfn)
-> {
-> 	return vmf_insert_pfn_prot(vma, addr, pfn, vma->vm_page_prot);
-> 
-> The above can just use vfm_insert_pfn()
+Yes, my initial thought was to directly replace the attribute with a
+common flag at iommu_domain level, but since in all cases the behaviour
+is effectively global rather than actually per-domain, it seemed
+reasonable to take it a step further. This passes compile-testing for
+arm64 and x86, what do you think?
 
-Cool, easy enough.  Thanks for looking.
- 
-> The only thing that makes me nervous about this arrangment is loosing
-> the track_pfn_remap() which was in remap_pfn_range() - I think it
-> means we miss out on certain PAT manipulations.. I *suspect* this is
-> not a problem for VFIO because it will rely on the MTRRs generally on
-> x86 - but I also don't know this mechanim too well.
+Robin.
 
-Yeah, for VM use cases the MTRRs generally override.
+----->8-----
+Subject: [PATCH] iommu: Consolidate strict invalidation handling
 
-> I think after the address_space changes this should try to stick with
-> a normal io_rmap_pfn_range() done outside the fault handler.
+Now that everyone is using iommu-dma, the global invalidation policy
+really doesn't need to be woven through several parts of the core API
+and individual drivers, we can just look it up directly at the one point
+that we now make the flush queue decision. If the x86 drivers reflect
+their internal options and overrides back to iommu_dma_strict, that can
+become the canonical source.
 
-I assume you're suggesting calling io_remap_pfn_range() when device
-memory is enabled, do you mean using vma_interval_tree_foreach() like
-unmap_mapping_range() does to avoid re-adding a vma list?  Thanks,
+Signed-off-by: Robin Murphy <robin.murphy@arm.com>
+---
+  drivers/iommu/amd/iommu.c   |  2 ++
+  drivers/iommu/dma-iommu.c   |  8 +-------
+  drivers/iommu/intel/iommu.c | 12 ++++++++++++
+  drivers/iommu/iommu.c       | 35 +++++++++++++++++++++++++++--------
+  include/linux/iommu.h       |  2 ++
+  5 files changed, 44 insertions(+), 15 deletions(-)
 
-Alex
+diff --git a/drivers/iommu/amd/iommu.c b/drivers/iommu/amd/iommu.c
+index a69a8b573e40..1db29e59d468 100644
+--- a/drivers/iommu/amd/iommu.c
++++ b/drivers/iommu/amd/iommu.c
+@@ -1856,6 +1856,8 @@ int __init amd_iommu_init_dma_ops(void)
+  	else
+  		pr_info("Lazy IO/TLB flushing enabled\n");
+  
++	iommu_set_dma_strict(amd_iommu_unmap_flush);
++
+  	return 0;
+  
+  }
+diff --git a/drivers/iommu/dma-iommu.c b/drivers/iommu/dma-iommu.c
+index af765c813cc8..789a950cc125 100644
+--- a/drivers/iommu/dma-iommu.c
++++ b/drivers/iommu/dma-iommu.c
+@@ -304,10 +304,6 @@ static void iommu_dma_flush_iotlb_all(struct iova_domain *iovad)
+  
+  	cookie = container_of(iovad, struct iommu_dma_cookie, iovad);
+  	domain = cookie->fq_domain;
+-	/*
+-	 * The IOMMU driver supporting DOMAIN_ATTR_DMA_USE_FLUSH_QUEUE
+-	 * implies that ops->flush_iotlb_all must be non-NULL.
+-	 */
+  	domain->ops->flush_iotlb_all(domain);
+  }
+  
+@@ -334,7 +330,6 @@ static int iommu_dma_init_domain(struct iommu_domain *domain, dma_addr_t base,
+  	struct iommu_dma_cookie *cookie = domain->iova_cookie;
+  	unsigned long order, base_pfn;
+  	struct iova_domain *iovad;
+-	int attr;
+  
+  	if (!cookie || cookie->type != IOMMU_DMA_IOVA_COOKIE)
+  		return -EINVAL;
+@@ -371,8 +366,7 @@ static int iommu_dma_init_domain(struct iommu_domain *domain, dma_addr_t base,
+  	init_iova_domain(iovad, 1UL << order, base_pfn);
+  
+  	if (!cookie->fq_domain && (!dev || !dev_is_untrusted(dev)) &&
+-	    !iommu_domain_get_attr(domain, DOMAIN_ATTR_DMA_USE_FLUSH_QUEUE, &attr) &&
+-	    attr) {
++	    domain->ops->flush_iotlb_all && !iommu_get_dma_strict()) {
+  		if (init_iova_flush_queue(iovad, iommu_dma_flush_iotlb_all,
+  					  iommu_dma_entry_dtor))
+  			pr_warn("iova flush queue initialization failed\n");
+diff --git a/drivers/iommu/intel/iommu.c b/drivers/iommu/intel/iommu.c
+index b5c746f0f63b..f5b452cd1266 100644
+--- a/drivers/iommu/intel/iommu.c
++++ b/drivers/iommu/intel/iommu.c
+@@ -4377,6 +4377,17 @@ int __init intel_iommu_init(void)
+  
+  	down_read(&dmar_global_lock);
+  	for_each_active_iommu(iommu, drhd) {
++		if (!intel_iommu_strict && cap_caching_mode(iommu->cap)) {
++			/*
++			 * The flush queue implementation does not perform page-selective
++			 * invalidations that are required for efficient TLB flushes in
++			 * virtual environments. The benefit of batching is likely to be
++			 * much lower than the overhead of synchronizing the virtual and
++			 * physical IOMMU page-tables.
++			 */
++			pr_warn("IOMMU batching is disabled due to virtualization");
++			intel_iommu_strict = 1;
++		}
+  		iommu_device_sysfs_add(&iommu->iommu, NULL,
+  				       intel_iommu_groups,
+  				       "%s", iommu->name);
+@@ -4384,6 +4395,7 @@ int __init intel_iommu_init(void)
+  	}
+  	up_read(&dmar_global_lock);
+  
++	iommu_set_dma_strict(intel_iommu_strict);
+  	bus_set_iommu(&pci_bus_type, &intel_iommu_ops);
+  	if (si_domain && !hw_pass_through)
+  		register_memory_notifier(&intel_iommu_memory_nb);
+diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
+index 2f3399203813..80afcf50cd3c 100644
+--- a/drivers/iommu/iommu.c
++++ b/drivers/iommu/iommu.c
+@@ -69,6 +69,7 @@ static const char * const iommu_group_resv_type_string[] = {
+  };
+  
+  #define IOMMU_CMD_LINE_DMA_API		BIT(0)
++#define IOMMU_CMD_LINE_STRICT		BIT(1)
+  
+  static void iommu_set_cmd_line_dma_api(void)
+  {
+@@ -80,6 +81,16 @@ static bool iommu_cmd_line_dma_api(void)
+  	return !!(iommu_cmd_line & IOMMU_CMD_LINE_DMA_API);
+  }
+  
++static void iommu_set_cmd_line_strict(void)
++{
++	iommu_cmd_line |= IOMMU_CMD_LINE_STRICT;
++}
++
++static bool iommu_cmd_line_strict(void)
++{
++	return !!(iommu_cmd_line & IOMMU_CMD_LINE_STRICT);
++}
++
+  static int iommu_alloc_default_domain(struct iommu_group *group,
+  				      struct device *dev);
+  static struct iommu_domain *__iommu_domain_alloc(struct bus_type *bus,
+@@ -337,10 +348,25 @@ early_param("iommu.passthrough", iommu_set_def_domain_type);
+  
+  static int __init iommu_dma_setup(char *str)
+  {
+-	return kstrtobool(str, &iommu_dma_strict);
++	int ret = kstrtobool(str, &iommu_dma_strict);
++
++	if (!ret)
++		iommu_set_cmd_line_strict();
++	return ret;
+  }
+  early_param("iommu.strict", iommu_dma_setup);
+  
++void iommu_set_dma_strict(bool val)
++{
++	if (val || !iommu_cmd_line_strict())
++		iommu_dma_strict = val;
++}
++
++bool iommu_get_dma_strict(void)
++{
++	return iommu_dma_strict;
++}
++
+  static ssize_t iommu_group_attr_show(struct kobject *kobj,
+  				     struct attribute *__attr, char *buf)
+  {
+@@ -1520,13 +1546,6 @@ static int iommu_group_alloc_default_domain(struct bus_type *bus,
+  	if (!group->domain)
+  		group->domain = dom;
+  
+-	if (!iommu_dma_strict) {
+-		int attr = 1;
+-		iommu_domain_set_attr(dom,
+-				      DOMAIN_ATTR_DMA_USE_FLUSH_QUEUE,
+-				      &attr);
+-	}
+-
+  	return 0;
+  }
+  
+diff --git a/include/linux/iommu.h b/include/linux/iommu.h
+index eb5e3f14c5ad..11bbfa273d98 100644
+--- a/include/linux/iommu.h
++++ b/include/linux/iommu.h
+@@ -495,6 +495,8 @@ extern int iommu_domain_get_attr(struct iommu_domain *domain, enum iommu_attr,
+  				 void *data);
+  extern int iommu_domain_set_attr(struct iommu_domain *domain, enum iommu_attr,
+  				 void *data);
++extern void iommu_set_dma_strict(bool val);
++extern bool iommu_get_dma_strict(void);
+  
+  /* Window handling function prototypes */
+  extern int iommu_domain_window_enable(struct iommu_domain *domain, u32 wnd_nr,
+-- 
+2.21.0.dirty
 
