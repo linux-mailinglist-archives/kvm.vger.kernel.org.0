@@ -2,85 +2,192 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 58AD43341EC
-	for <lists+kvm@lfdr.de>; Wed, 10 Mar 2021 16:47:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E134D33421A
+	for <lists+kvm@lfdr.de>; Wed, 10 Mar 2021 16:52:06 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231519AbhCJPql (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 10 Mar 2021 10:46:41 -0500
-Received: from mail.kernel.org ([198.145.29.99]:53118 "EHLO mail.kernel.org"
+        id S232931AbhCJPva (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 10 Mar 2021 10:51:30 -0500
+Received: from mail.kernel.org ([198.145.29.99]:54620 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S233186AbhCJPqb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 10 Mar 2021 10:46:31 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 6A17C64F9B;
-        Wed, 10 Mar 2021 15:46:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1615391191;
-        bh=8vc+t9597Gj+0rwLWp8DvyB0wv6J+I8bsOUKobbB8m0=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=Fe7vgIGRTKIo0wCFNOTGlUdE0URCo/cefTHyf+UByBTUerKvcPL66vWDOFqSrEBFs
-         B6rF6h+yif7c1epUqr0ASg2bn8rlwiRkG4EK1xJ1DGKzlrAGH1U16ALssFLf0AZF+U
-         HL0QqepNP9ivPjAG7kqjL0lZTR72cybWEgO7yhfM6MdcK04TfXbNULOdPEaib5Suk/
-         3XqUx4WNeIEjW9PDo4prB7PyUVK2W7xJ5OXhNKbI0ZBbIxbFo7rbmhp0lKmOni/xMY
-         Ml7gmR6FD/wWK6B1tNXN1mWT08GE97Udmf1HM6H4srA/r1U3K5Fd7QHLSawQodst4p
-         Q9TGH5JjnCotQ==
-Date:   Wed, 10 Mar 2021 15:46:26 +0000
-From:   Will Deacon <will@kernel.org>
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
-        linux-arm-kernel@lists.infradead.org,
+        id S233096AbhCJPvK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 10 Mar 2021 10:51:10 -0500
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id CE1D864FB9;
+        Wed, 10 Mar 2021 15:51:09 +0000 (UTC)
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94)
+        (envelope-from <maz@kernel.org>)
+        id 1lK175-000nQG-Kj; Wed, 10 Mar 2021 15:51:07 +0000
+Date:   Wed, 10 Mar 2021 15:51:06 +0000
+Message-ID: <875z1zxb11.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Jing Zhang <jingzhangos@google.com>
+Cc:     KVM <kvm@vger.kernel.org>, KVM ARM <kvmarm@lists.cs.columbia.edu>,
+        Linux MIPS <linux-mips@vger.kernel.org>,
+        KVM PPC <kvm-ppc@vger.kernel.org>,
+        Linux S390 <linux-s390@vger.kernel.org>,
+        Linux kselftest <linux-kselftest@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
         James Morse <james.morse@arm.com>,
         Julien Thierry <julien.thierry.kdev@gmail.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Mark Rutland <mark.rutland@arm.com>, qperret@google.com,
-        kernel-team@android.com
-Subject: Re: [PATCH 3/4] KVM: arm64: Rename SCTLR_ELx_FLAGS to SCTLR_EL2_FLAGS
-Message-ID: <20210310154625.GA29738@willie-the-truck>
-References: <20210310152656.3821253-1-maz@kernel.org>
- <20210310152656.3821253-4-maz@kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210310152656.3821253-4-maz@kernel.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+        Will Deacon <will@kernel.org>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Peter Shier <pshier@google.com>,
+        Oliver Upton <oupton@google.com>,
+        David Rientjes <rientjes@google.com>,
+        Emanuele Giuseppe Esposito <eesposit@redhat.com>
+Subject: Re: [RFC PATCH 3/4] KVM: stats: Add ioctl commands to pull statistics in binary format
+In-Reply-To: <20210310003024.2026253-4-jingzhangos@google.com>
+References: <20210310003024.2026253-1-jingzhangos@google.com>
+        <20210310003024.2026253-4-jingzhangos@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: jingzhangos@google.com, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-mips@vger.kernel.org, kvm-ppc@vger.kernel.org, linux-s390@vger.kernel.org, linux-kselftest@vger.kernel.org, pbonzini@redhat.com, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, will@kernel.org, chenhuacai@kernel.org, aleksandar.qemu.devel@gmail.com, tsbogend@alpha.franken.de, paulus@ozlabs.org, borntraeger@de.ibm.com, frankja@linux.ibm.com, david@redhat.com, cohuck@redhat.com, imbrenda@linux.ibm.com, seanjc@google.com, vkuznets@redhat.com, jmattson@google.com, pshier@google.com, oupton@google.com, rientjes@google.com, eesposit@redhat.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Mar 10, 2021 at 03:26:55PM +0000, Marc Zyngier wrote:
-> Only the nVHE EL2 code is using this define, so let's make it
-> plain that it is EL2 only.
+On Wed, 10 Mar 2021 00:30:23 +0000,
+Jing Zhang <jingzhangos@google.com> wrote:
 > 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> Three ioctl commands are added to support binary form statistics data
+> retrieval. KVM_STATS_GET_INFO, KVM_STATS_GET_NAMES, KVM_STATS_GET_DATA.
+> KVM_CAP_STATS_BINARY_FORM indicates the capability.
+> 
+> Signed-off-by: Jing Zhang <jingzhangos@google.com>
 > ---
->  arch/arm64/include/asm/sysreg.h    | 2 +-
->  arch/arm64/kvm/hyp/nvhe/hyp-init.S | 2 +-
->  2 files changed, 2 insertions(+), 2 deletions(-)
+>  virt/kvm/kvm_main.c | 115 ++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 115 insertions(+)
 > 
-> diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-> index dfd4edbfe360..9d1aef631646 100644
-> --- a/arch/arm64/include/asm/sysreg.h
-> +++ b/arch/arm64/include/asm/sysreg.h
-> @@ -579,7 +579,7 @@
->  #define SCTLR_ELx_A	(BIT(1))
->  #define SCTLR_ELx_M	(BIT(0))
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index 383df23514b9..87dd62516c8b 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -3464,6 +3464,51 @@ static long kvm_vcpu_ioctl(struct file *filp,
+>  		r = kvm_arch_vcpu_ioctl_set_fpu(vcpu, fpu);
+>  		break;
+>  	}
+> +	case KVM_STATS_GET_INFO: {
+> +		struct kvm_stats_info stats_info;
+> +
+> +		r = -EFAULT;
+> +		stats_info.num_stats = VCPU_STAT_COUNT;
+> +		if (copy_to_user(argp, &stats_info, sizeof(stats_info)))
+> +			goto out;
+> +		r = 0;
+> +		break;
+> +	}
+> +	case KVM_STATS_GET_NAMES: {
+> +		struct kvm_stats_names stats_names;
+> +
+> +		r = -EFAULT;
+> +		if (copy_from_user(&stats_names, argp, sizeof(stats_names)))
+> +			goto out;
+> +		r = -EINVAL;
+> +		if (stats_names.size < VCPU_STAT_COUNT * KVM_STATS_NAME_LEN)
+> +			goto out;
+> +
+> +		r = -EFAULT;
+> +		if (copy_to_user(argp + sizeof(stats_names),
+> +				kvm_vcpu_stat_strings,
+> +				VCPU_STAT_COUNT * KVM_STATS_NAME_LEN))
+> +			goto out;
+> +		r = 0;
+> +		break;
+> +	}
+> +	case KVM_STATS_GET_DATA: {
+> +		struct kvm_stats_data stats_data;
+> +
+> +		r = -EFAULT;
+> +		if (copy_from_user(&stats_data, argp, sizeof(stats_data)))
+> +			goto out;
+> +		r = -EINVAL;
+> +		if (stats_data.size < sizeof(vcpu->stat))
+> +			goto out;
+> +
+> +		r = -EFAULT;
+> +		argp += sizeof(stats_data);
+> +		if (copy_to_user(argp, &vcpu->stat, sizeof(vcpu->stat)))
+> +			goto out;
+> +		r = 0;
+> +		break;
+> +	}
+>  	default:
+>  		r = kvm_arch_vcpu_ioctl(filp, ioctl, arg);
+>  	}
+> @@ -3695,6 +3740,7 @@ static long kvm_vm_ioctl_check_extension_generic(struct kvm *kvm, long arg)
+>  	case KVM_CAP_CHECK_EXTENSION_VM:
+>  	case KVM_CAP_ENABLE_CAP_VM:
+>  	case KVM_CAP_HALT_POLL:
+> +	case KVM_CAP_STATS_BINARY_FORM:
+>  		return 1;
+>  #ifdef CONFIG_KVM_MMIO
+>  	case KVM_CAP_COALESCED_MMIO:
+> @@ -3825,6 +3871,40 @@ static int kvm_vm_ioctl_enable_cap_generic(struct kvm *kvm,
+>  	}
+>  }
 >  
-> -#define SCTLR_ELx_FLAGS	(SCTLR_ELx_M  | SCTLR_ELx_A | SCTLR_ELx_C | \
-> +#define SCTLR_EL2_FLAGS	(SCTLR_ELx_M  | SCTLR_ELx_A | SCTLR_ELx_C | \
->  			 SCTLR_ELx_SA | SCTLR_ELx_I | SCTLR_ELx_IESB)
->  
->  /* SCTLR_EL2 specific flags. */
-> diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-init.S b/arch/arm64/kvm/hyp/nvhe/hyp-init.S
-> index 4eb584ae13d9..7423f4d961a4 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/hyp-init.S
-> +++ b/arch/arm64/kvm/hyp/nvhe/hyp-init.S
-> @@ -122,7 +122,7 @@ alternative_else_nop_endif
->  	 * as well as the EE bit on BE. Drop the A flag since the compiler
->  	 * is allowed to generate unaligned accesses.
->  	 */
-> -	mov_q	x0, (SCTLR_EL2_RES1 | (SCTLR_ELx_FLAGS & ~SCTLR_ELx_A))
-> +	mov_q	x0, (SCTLR_EL2_RES1 | (SCTLR_EL2_FLAGS & ~SCTLR_ELx_A))
+> +static long kvm_vm_ioctl_stats_get_data(struct kvm *kvm, unsigned long arg)
+> +{
+> +	void __user *argp = (void __user *)arg;
+> +	struct kvm_vcpu *vcpu;
+> +	struct kvm_stats_data stats_data;
+> +	u64 *data = NULL, *pdata;
+> +	int i, j, ret = 0;
+> +	size_t dsize = (VM_STAT_COUNT + VCPU_STAT_COUNT) * sizeof(*data);
+> +
+> +
+> +	if (copy_from_user(&stats_data, argp, sizeof(stats_data)))
+> +		return -EFAULT;
+> +	if (stats_data.size < dsize)
+> +		return -EINVAL;
+> +	data = kzalloc(dsize, GFP_KERNEL_ACCOUNT);
+> +	if (!data)
+> +		return -ENOMEM;
+> +
+> +	for (i = 0; i < VM_STAT_COUNT; i++)
+> +		*(data + i) = *((ulong *)&kvm->stat + i);
 
-Can we just drop SCTLR_ELx_A from SCTLR_EL2_FLAGS instead of clearing it
-here?
+This kind of dance could be avoided if your stats were just an array,
+or a union of the current data structure and an array.
 
-Will
+> +
+> +	kvm_for_each_vcpu(j, vcpu, kvm) {
+> +		pdata = data + VM_STAT_COUNT;
+> +		for (i = 0; i < VCPU_STAT_COUNT; i++, pdata++)
+> +			*pdata += *((u64 *)&vcpu->stat + i);
+
+Do you really need the in-kernel copy? Why not directly organise the
+data structures in a way that would allow a bulk copy using
+copy_to_user()?
+
+Another thing is the atomicity of what you are reporting. Don't you
+care about the consistency of the counters?
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
