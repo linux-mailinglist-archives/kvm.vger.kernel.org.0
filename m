@@ -2,115 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D3A783337AC
-	for <lists+kvm@lfdr.de>; Wed, 10 Mar 2021 09:45:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 837C03337E7
+	for <lists+kvm@lfdr.de>; Wed, 10 Mar 2021 09:55:18 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232432AbhCJIo3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 10 Mar 2021 03:44:29 -0500
-Received: from 8bytes.org ([81.169.241.247]:58444 "EHLO theia.8bytes.org"
+        id S231283AbhCJIyl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 10 Mar 2021 03:54:41 -0500
+Received: from verein.lst.de ([213.95.11.211]:35224 "EHLO verein.lst.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231207AbhCJIn6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 10 Mar 2021 03:43:58 -0500
-Received: from cap.home.8bytes.org (p549adcf6.dip0.t-ipconnect.de [84.154.220.246])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
-        (No client certificate requested)
-        by theia.8bytes.org (Postfix) with ESMTPSA id ACB6D638;
-        Wed, 10 Mar 2021 09:43:55 +0100 (CET)
-From:   Joerg Roedel <joro@8bytes.org>
-To:     x86@kernel.org
-Cc:     Joerg Roedel <joro@8bytes.org>, Joerg Roedel <jroedel@suse.de>,
-        hpa@zytor.com, Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Jiri Slaby <jslaby@suse.cz>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Juergen Gross <jgross@suse.com>,
-        Kees Cook <keescook@chromium.org>,
-        David Rientjes <rientjes@google.com>,
-        Cfir Cohen <cfir@google.com>,
-        Erdem Aktas <erdemaktas@google.com>,
-        Masami Hiramatsu <mhiramat@kernel.org>,
-        Mike Stunes <mstunes@vmware.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Martin Radev <martin.b.radev@gmail.com>,
-        Arvind Sankar <nivedita@alum.mit.edu>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org
-Subject: [PATCH v2 7/7] x86/sev-es: Replace open-coded hlt-loops with sev_es_terminate()
-Date:   Wed, 10 Mar 2021 09:43:25 +0100
-Message-Id: <20210310084325.12966-8-joro@8bytes.org>
-X-Mailer: git-send-email 2.30.1
-In-Reply-To: <20210310084325.12966-1-joro@8bytes.org>
-References: <20210310084325.12966-1-joro@8bytes.org>
+        id S232495AbhCJIy1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 10 Mar 2021 03:54:27 -0500
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id 9DE7968B05; Wed, 10 Mar 2021 09:54:23 +0100 (CET)
+Date:   Wed, 10 Mar 2021 09:54:23 +0100
+From:   Christoph Hellwig <hch@lst.de>
+To:     Robin Murphy <robin.murphy@arm.com>
+Cc:     Christoph Hellwig <hch@lst.de>, Joerg Roedel <joro@8bytes.org>,
+        Will Deacon <will@kernel.org>, Li Yang <leoyang.li@nxp.com>,
+        freedreno@lists.freedesktop.org, kvm@vger.kernel.org,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        linuxppc-dev@lists.ozlabs.org, dri-devel@lists.freedesktop.org,
+        virtualization@lists.linux-foundation.org,
+        iommu@lists.linux-foundation.org, netdev@vger.kernel.org,
+        linux-arm-msm@vger.kernel.org,
+        David Woodhouse <dwmw2@infradead.org>,
+        linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH 14/17] iommu: remove DOMAIN_ATTR_DMA_USE_FLUSH_QUEUE
+Message-ID: <20210310085423.GA5928@lst.de>
+References: <20210301084257.945454-1-hch@lst.de> <20210301084257.945454-15-hch@lst.de> <1658805c-ed28-b650-7385-a56fab3383e3@arm.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1658805c-ed28-b650-7385-a56fab3383e3@arm.com>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Joerg Roedel <jroedel@suse.de>
+On Thu, Mar 04, 2021 at 03:25:27PM +0000, Robin Murphy wrote:
+> On 2021-03-01 08:42, Christoph Hellwig wrote:
+>> Use explicit methods for setting and querying the information instead.
+>
+> Now that everyone's using iommu-dma, is there any point in bouncing this 
+> through the drivers at all? Seems like it would make more sense for the x86 
+> drivers to reflect their private options back to iommu_dma_strict (and 
+> allow Intel's caching mode to override it as well), then have 
+> iommu_dma_init_domain just test !iommu_dma_strict && 
+> domain->ops->flush_iotlb_all.
 
-There are a few places left in the SEV-ES C code where hlt loops and/or
-terminate requests are implemented. Replace them all with calls to
-sev_es_terminate().
-
-Signed-off-by: Joerg Roedel <jroedel@suse.de>
----
- arch/x86/boot/compressed/sev-es.c | 12 +++---------
- arch/x86/kernel/sev-es-shared.c   | 10 +++-------
- 2 files changed, 6 insertions(+), 16 deletions(-)
-
-diff --git a/arch/x86/boot/compressed/sev-es.c b/arch/x86/boot/compressed/sev-es.c
-index 27826c265aab..d904bd56b3e3 100644
---- a/arch/x86/boot/compressed/sev-es.c
-+++ b/arch/x86/boot/compressed/sev-es.c
-@@ -200,14 +200,8 @@ void do_boot_stage2_vc(struct pt_regs *regs, unsigned long exit_code)
- 	}
- 
- finish:
--	if (result == ES_OK) {
-+	if (result == ES_OK)
- 		vc_finish_insn(&ctxt);
--	} else if (result != ES_RETRY) {
--		/*
--		 * For now, just halt the machine. That makes debugging easier,
--		 * later we just call sev_es_terminate() here.
--		 */
--		while (true)
--			asm volatile("hlt\n");
--	}
-+	else if (result != ES_RETRY)
-+		sev_es_terminate(GHCB_SEV_ES_REASON_GENERAL_REQUEST);
- }
-diff --git a/arch/x86/kernel/sev-es-shared.c b/arch/x86/kernel/sev-es-shared.c
-index cdc04d091242..7c34be61258e 100644
---- a/arch/x86/kernel/sev-es-shared.c
-+++ b/arch/x86/kernel/sev-es-shared.c
-@@ -24,7 +24,7 @@ static bool __init sev_es_check_cpu_features(void)
- 	return true;
- }
- 
--static void sev_es_terminate(unsigned int reason)
-+static void __noreturn sev_es_terminate(unsigned int reason)
- {
- 	u64 val = GHCB_SEV_TERMINATE;
- 
-@@ -210,12 +210,8 @@ void __init do_vc_no_ghcb(struct pt_regs *regs, unsigned long exit_code)
- 	return;
- 
- fail:
--	sev_es_wr_ghcb_msr(GHCB_SEV_TERMINATE);
--	VMGEXIT();
--
--	/* Shouldn't get here - if we do halt the machine */
--	while (true)
--		asm volatile("hlt\n");
-+	/* Terminate the guest */
-+	sev_es_terminate(GHCB_SEV_ES_REASON_GENERAL_REQUEST);
- }
- 
- static enum es_result vc_insn_string_read(struct es_em_ctxt *ctxt,
--- 
-2.30.1
-
+Indeed.  I switch to that.
