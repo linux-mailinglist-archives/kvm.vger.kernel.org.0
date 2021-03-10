@@ -2,338 +2,295 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8442833330A
-	for <lists+kvm@lfdr.de>; Wed, 10 Mar 2021 03:19:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B93183333EA
+	for <lists+kvm@lfdr.de>; Wed, 10 Mar 2021 04:43:07 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231877AbhCJCSi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 9 Mar 2021 21:18:38 -0500
-Received: from mga07.intel.com ([134.134.136.100]:40888 "EHLO mga07.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231235AbhCJCSO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 9 Mar 2021 21:18:14 -0500
-IronPort-SDR: 9uv+l8/zA4Hk8lVV5cQHlbc1fkbe4zpeOlry9gaiTYJMnTAlpV0maoPpzkDvwN8cdhPYbUfSA6
- ELY3jZz6vHMg==
-X-IronPort-AV: E=McAfee;i="6000,8403,9917"; a="252385792"
-X-IronPort-AV: E=Sophos;i="5.81,236,1610438400"; 
-   d="scan'208";a="252385792"
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Mar 2021 18:18:12 -0800
-IronPort-SDR: f2H1dAHId6ZzjekGB9nU3EQDwn7my+pMOHWESAMYYD6+bRRj5APTIRjezBQukEPYv6FH7+6L+d
- b2suply+bSpw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.81,236,1610438400"; 
-   d="scan'208";a="431008885"
-Received: from allen-box.sh.intel.com (HELO [10.239.159.128]) ([10.239.159.128])
-  by fmsmga004.fm.intel.com with ESMTP; 09 Mar 2021 18:18:07 -0800
-Cc:     baolu.lu@linux.intel.com, Kevin Tian <kevin.tian@intel.com>,
-        yi.l.liu@intel.com, Christoph Hellwig <hch@infradead.org>,
-        Jonathan Cameron <Jonathan.Cameron@huawei.com>,
-        Barry Song <song.bao.hua@hisilicon.com>,
-        wanghaibin.wang@huawei.com, yuzenghui@huawei.com,
-        zhukeqian1@huawei.com
-Subject: Re: [RFC PATCH v2 1/6] iommu: Evolve to support more scenarios of
- using IOPF
-To:     Shenming Lu <lushenming@huawei.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
+        id S232154AbhCJDmf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 9 Mar 2021 22:42:35 -0500
+Received: from mail-dm6nam11on2045.outbound.protection.outlook.com ([40.107.223.45]:25953
+        "EHLO NAM11-DM6-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S230094AbhCJDmH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 9 Mar 2021 22:42:07 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=oYutKcVwypCwrzuvjRIfmLZcvxfBVzeqjVTCDtr2V3+fje9FKYbmSXAlHsrKvZt/mWc/rYIPh1VNs1QHOP7fHEDkH3ipQa7QlnE3OZ9Mppu9wMBu6QcDyPu8DXSeRzD69thsgbIKBQTQCV75qw8TsU+k+jdVqAcck62wPp6pr8jz9seLCCuw/U/sZ9wmMCra4f+X4QYcHPqjK+IbzHvAooAzD8y4fDgf3vpEhjQPZa4ZeKngOWQIPSdDZK0Z+I+npq4lHOaR8OjwViePOLzwwIfQD8X3x9hNgcjFl6RE3RNFswGMozUu05knFu+SUaKOp05yFvim4Zzxz8e6KyXvfA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=q+wKOKAUFszGF5bHJrtbKVSy6ajjuLn+ewYRAjLePJU=;
+ b=YXoE7SzGjI8s8htb3NvIJBPpHMo/I40TIdJkusEa+Ji6mHcSxEyBOREiVGFK+iZeNx2nHS5t1r+nnZ/DVPALL2HcR6PKpnZucE/ycHpQ1O90mcUy6lB5SbgIdVXOwfOzGxI5zoN6ho3zuwPdnP4shhCKRLWTEkMwRDcrj4Sb1UZUYHaoQL1HPQ5E9xBgflKYGxAKG/P7ihTW65+ZdO7VIcum1DDAwzlM0TFVbqKy6v3DS5PFNc+B4Hi2e0nFN5rQ/T3IfpKnofCgLYk30NyPAOW/tZXtAlyaSTiy92QI6oAiPp1sSxxvsLMJTTGbyDziQ9PtYsChGBHjNhDLYjJOUA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=q+wKOKAUFszGF5bHJrtbKVSy6ajjuLn+ewYRAjLePJU=;
+ b=yr690BYqoDUp1VG8HhBX7SfMtTKkDODLfU9r54a2tDo3NskBikghAjyRh73ruzGX/6GaR336Fbyjg5y/CrKsSRo/VLz6XgLPr0eiTmwtuHtrwixQbFYGtoRsyyfFjIw1K1EMxRNnLCDA4aOh31oEZvrelJVi3wqH8UQt/xHGE1g=
+Received: from SN6PR12MB2767.namprd12.prod.outlook.com (2603:10b6:805:75::23)
+ by SA0PR12MB4590.namprd12.prod.outlook.com (2603:10b6:806:93::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3912.29; Wed, 10 Mar
+ 2021 03:42:05 +0000
+Received: from SN6PR12MB2767.namprd12.prod.outlook.com
+ ([fe80::24bb:3e53:c95e:cb8e]) by SN6PR12MB2767.namprd12.prod.outlook.com
+ ([fe80::24bb:3e53:c95e:cb8e%7]) with mapi id 15.20.3912.027; Wed, 10 Mar 2021
+ 03:42:04 +0000
+From:   "Kalra, Ashish" <Ashish.Kalra@amd.com>
+To:     Steve Rutherford <srutherford@google.com>
+CC:     "Singh, Brijesh" <brijesh.singh@amd.com>,
+        Sean Christopherson <seanjc@google.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "venu.busireddy@oracle.com" <venu.busireddy@oracle.com>,
         Will Deacon <will@kernel.org>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Jean-Philippe Brucker <jean-philippe@linaro.org>,
-        Eric Auger <eric.auger@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        iommu@lists.linux-foundation.org, linux-api@vger.kernel.org
-References: <20210309062207.505-1-lushenming@huawei.com>
- <20210309062207.505-2-lushenming@huawei.com>
-From:   Lu Baolu <baolu.lu@linux.intel.com>
-Message-ID: <7f8daef9-36db-f67c-a3e2-b96b5fa70291@linux.intel.com>
-Date:   Wed, 10 Mar 2021 10:09:04 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
-MIME-Version: 1.0
-In-Reply-To: <20210309062207.505-2-lushenming@huawei.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+        Quentin Perret <qperret@google.com>
+Subject: Re: [PATCH v10 10/16] KVM: x86: Introduce KVM_GET_SHARED_PAGES_LIST
+ ioctl
+Thread-Topic: [PATCH v10 10/16] KVM: x86: Introduce KVM_GET_SHARED_PAGES_LIST
+ ioctl
+Thread-Index: AQHW+o4w4C5VGgubRkqZlElkExidF6pbnD+AgAK18QCACWQGAIAACLeAgAGzLwCAACyDgIAA/OEAgAA9goCAD0C5AIAAmiaAgAAWR4CAAAspAIAB9D60
+Date:   Wed, 10 Mar 2021 03:42:04 +0000
+Message-ID: <F3B77ECE-8C70-47AA-98F8-0C032CB5F568@amd.com>
+References: <7266edd714add8ec9d7f63eddfc9bbd4d789c213.1612398155.git.ashish.kalra@amd.com>
+ <YCxrV4u98ZQtInOE@google.com>
+ <SN6PR12MB27672FF8358D122EDD8CC0188E859@SN6PR12MB2767.namprd12.prod.outlook.com>
+ <20210224175122.GA19661@ashkalra_ubuntu_server> <YDaZacLqNQ4nK/Ex@google.com>
+ <20210225202008.GA5208@ashkalra_ubuntu_server>
+ <CABayD+cn5e3PR6NtSWLeM_qxs6hKWtjEx=aeKpy=WC2dzPdRLw@mail.gmail.com>
+ <20210226140432.GB5950@ashkalra_ubuntu_server> <YDkzibkC7tAYbfFQ@google.com>
+ <20210308104014.GA5333@ashkalra_ubuntu_server> <YEaAXXGZH0uSMA3v@google.com>
+ <bdf0767f-c2c4-5863-fd0d-352a3f68f7f9@amd.com>,<CABayD+ftv5DNdXj-Bs8MXGeFNKx7-aTt99fPuD2R6w1mJ2u8TQ@mail.gmail.com>
+In-Reply-To: <CABayD+ftv5DNdXj-Bs8MXGeFNKx7-aTt99fPuD2R6w1mJ2u8TQ@mail.gmail.com>
+Accept-Language: en-US
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: amd.com; dkim=none (message not signed)
+ header.d=none;amd.com; dmarc=none action=none header.from=amd.com;
+x-originating-ip: [183.83.214.227]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-ht: Tenant
+x-ms-office365-filtering-correlation-id: 890239fd-c100-4af2-9af6-08d8e37678ee
+x-ms-traffictypediagnostic: SA0PR12MB4590:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <SA0PR12MB4590EC78F815AB1B873818348E919@SA0PR12MB4590.namprd12.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:8882;
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: 2lbieinh+8XrhpRVDDMEX6Di/WgIdrKvC81JyvG75ZAWvNg9i4M7VPSpDvyFWbr2DAAHVkgVFlj7pw+78/MZgtaczO6H5gAvaUQP1YVWWNG5cvftgGHMcXJbsP+sQNm7TPvQoIVR/BwbkGQfcTdUjfOidKFwSaN7FhxCNhUhD+Lz7/oUiud5MWvKQtKaHzx6RZ2TD6iBXOb8N1ue/NsVUvu8keWWL2kYZcqufgPtzW9BzpAIMoj8dPTreUN+XNDog0htsh01ITa8jp0FHibW6URIyarV/pGbxOmiLJQblV7AZNzj2OsgyJnfxgL6f91GPxMizml+SipyYRk80CBaL6K4LouCsj+JgRJOmmOzrfdKPLFnyPP4b8G/bJtEn8Dl/fq1Tb8A+dahhsCFi4CT/FUM0nQbjT/0yB3WhZL4Yp8Vq6DIXrc3Ry3DkRlFRc0OlwRewnE3GSZyrjKWnTxiNnhKQcfKFA6wrHhOHi8/FSR05RB0MIDrDvt4GCmxAitLfFg1Ujq8ti146n+V2oWqDqZtK40qFKLa1i3+JDKhGI5FYY8YCI3vgjZoDOOAJATgzUkJVZD2wgQF5P+c/iL8iA==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2767.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(136003)(376002)(346002)(396003)(39860400002)(366004)(86362001)(316002)(33656002)(54906003)(6512007)(4326008)(2906002)(71200400001)(36756003)(2616005)(5660300002)(26005)(478600001)(76116006)(6506007)(53546011)(6486002)(91956017)(66476007)(6916009)(66946007)(66556008)(8936002)(64756008)(66446008)(83380400001)(8676002)(186003)(45980500001);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata: =?utf-8?B?aUdiVk1FWlhYVENzL2VNRnRKdFhLSVhKaWgxT3kvKzZTUHVZZ3VHWVJqQ3NF?=
+ =?utf-8?B?OXVkQWtZSW1PdmdIWG1xakJQazlQSyt0Z3ErRzJDY1BSald1Nnc5ckF0Vjgw?=
+ =?utf-8?B?bW9CeFA2b09TaVpOZTg0SU1VMXNsRkVuaGNsdldDMUhzUHp0M25MTk93cUEv?=
+ =?utf-8?B?b1N0bzRUMDZkUzhDSUhZa2lDRDFXK1FrRyt6dnAvOHc1L29maVB6c0M2SG0r?=
+ =?utf-8?B?aFc1cWpISnpYejRXZFQrVVNYMDU0VlQ2UWJwNkNxWXM1K2ZjVjJYRUQ0OW5v?=
+ =?utf-8?B?VEZTYWYvbEoxMFVrZ3d5V2ZDa1ZOZmtYNDJya0R5ZnlVZkNBbE1jUTBkdGR6?=
+ =?utf-8?B?OGdBWmJSTDNaR1pUQXBpRmRxWkZIK1c0Rnc3MHF2VUFJQmIwbXJFZjJTNjc2?=
+ =?utf-8?B?Yk1Eb3F0U0IveUtRVUdVK1pkYVcwU25adS9ia0NVRUVqbnFXa0VHNWEyQU95?=
+ =?utf-8?B?TlFzbXlMaTBWWWFsaVBCd28vbkhyMlgyVUJ0WVhrUGQzL0ZybU9wa3hvSmUz?=
+ =?utf-8?B?TG5IQ0NRV1NpRi9LaFhwU2dtNGcvcGtGby81WVpmZUdORHhxcHZyaVkyNnNx?=
+ =?utf-8?B?dXVVd0hrSmVpMytBSlRRVytUUi8wV25IZks1WGlqQVEvMk1DMUoxa0M3NjI2?=
+ =?utf-8?B?UlF1L3pFNHltNXpCOTBFdm85NzhtcXByV2lRekptOEkxVkd1Y0tFZDN0QlZa?=
+ =?utf-8?B?c0ZVNFpEbUl5cmhtYTUvZlVuQlhRZjVPYU5VVWZzMEFUYnhLeVZOd0tUSWdo?=
+ =?utf-8?B?RG9CNDhlanBKWU5LQnd0UGM2UFRnT2lOcjl3Q3NISDRuWHVCbUxDaUxlT1ZM?=
+ =?utf-8?B?ZWlrODhISmVaWG10SlJJTHl4MjM3c2lZUDk1M0pZaGlLSUdSSmVjSit2aFVh?=
+ =?utf-8?B?b1NSU1VOVjBxN2s5NS9IOHYvbmJBNHNsbENwMGUwYVR3dmxISktpQndrY0Fo?=
+ =?utf-8?B?UU1CZnRlaERkSk9kdHhXTmNBUTcvQ3JVRGRNM0R4Z1IrK2JnVCs4QmZBY3VB?=
+ =?utf-8?B?M1NOQXhycUJRUm9Qell4Uk9ZeEkyUmt4NllPVlBaVTZjQmp3amdXYWpoMzQ1?=
+ =?utf-8?B?S3RlQUo0bTF4ckRMQllwQ0wxQnJVcTJSeXhOZGg2alNoY2p2NmxaOGkzc2Rv?=
+ =?utf-8?B?TmtYYmlKM1E3N1Y5QXhpQnJYcW9EMmFPN2t2ZUZPNTk1bTRSMmVVUlYrTFA0?=
+ =?utf-8?B?bTg2U3ZQVVlTSVhuYnhWdCs1czk4YkNCTVdJU2FQSFpkVWNDbUJmZWkxRGI1?=
+ =?utf-8?B?dzA2MTJ6Q1hGRGhSMmt5NUh4K1ZsYVhwWjZEei9MREhxOTZwWmE3endpLy9h?=
+ =?utf-8?B?bUZGd2VueWllcW95SjJwZ2poemlLRFpxajBHdDJXWWF3dmVWUHFLbzRPNW56?=
+ =?utf-8?B?MTdRLzRqR2NFYUxKV1pxZ3hpZzB5c2JYa1Y0aDhnTWtDZ2VXWEMrblRjUmFz?=
+ =?utf-8?B?aUVCczFhRWJtTUlib09kR1YraHA2OGRNVmxRWW1WS2ZLdFlSdWs4Ukw3NThn?=
+ =?utf-8?B?c1ZmMDJCQkRoaUVQL0IyUnoyM1YzSTNTUEFoa3htWXowUUFqbzA4M3hhRjFi?=
+ =?utf-8?B?c0R2VEsyWkNHWUVUZWM0UklTWDU3TDdqNzNNbVMyaHhSdVQ0Z2N2R3Y5YVMx?=
+ =?utf-8?B?clJtcHRLVTIvTEphUzhHY1BSQXZjdjNoVnhiaDM4SHpvK04zV3FYTzdBZjhI?=
+ =?utf-8?B?KzFaQTUyeGRnTzh4aHFGUUhQWUlsWU5ZbVc2WWZCRWRocGs3bVNiWE80WFlG?=
+ =?utf-8?Q?qr4Yg6Wfwe3z5UGhaZcGQBMRzHu4asTBG5OySyw?=
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2767.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 890239fd-c100-4af2-9af6-08d8e37678ee
+X-MS-Exchange-CrossTenant-originalarrivaltime: 10 Mar 2021 03:42:04.6674
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: u+wWh4JmwKndAmPgTKZkIoe7pp8eyxf5uOBh2JCO9Q3OKhUQfhWCG0VyGfyaXqKLmOpnNUSIhp30EvlDe7CwxQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR12MB4590
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Shenming,
-
-On 3/9/21 2:22 PM, Shenming Lu wrote:
-> This patch follows the discussion here:
-> 
-> https://lore.kernel.org/linux-acpi/YAaxjmJW+ZMvrhac@myrica/
-> 
-> In order to support more scenarios of using IOPF (mainly consider
-> the nested extension), besides keeping IOMMU_DEV_FEAT_IOPF as a
-> general capability for whether delivering faults through the IOMMU,
-> we extend iommu_register_fault_handler() with flags and introduce
-> IOPF_REPORT_FLAT and IOPF_REPORT_NESTED to describe the page fault
-> reporting capability under a specific configuration.
-> IOPF_REPORT_NESTED needs additional info to indicate which level/stage
-> is concerned since the fault client may be interested in only one
-> level.
-> 
-> Signed-off-by: Shenming Lu <lushenming@huawei.com>
-> ---
->   .../iommu/arm/arm-smmu-v3/arm-smmu-v3-sva.c   |  3 +-
->   drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c   | 11 ++--
->   drivers/iommu/io-pgfault.c                    |  4 --
->   drivers/iommu/iommu.c                         | 56 ++++++++++++++++++-
->   include/linux/iommu.h                         | 21 ++++++-
->   include/uapi/linux/iommu.h                    |  3 +
->   6 files changed, 85 insertions(+), 13 deletions(-)
-> 
-> diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3-sva.c b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3-sva.c
-> index ee66d1f4cb81..5de9432349d4 100644
-> --- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3-sva.c
-> +++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3-sva.c
-> @@ -482,7 +482,8 @@ static int arm_smmu_master_sva_enable_iopf(struct arm_smmu_master *master)
->   	if (ret)
->   		return ret;
->   
-> -	ret = iommu_register_device_fault_handler(dev, iommu_queue_iopf, dev);
-> +	ret = iommu_register_device_fault_handler(dev, iommu_queue_iopf,
-> +						  IOPF_REPORT_FLAT, dev);
->   	if (ret) {
->   		iopf_queue_remove_device(master->smmu->evtq.iopf, dev);
->   		return ret;
-> diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
-> index 363744df8d51..f40529d0075d 100644
-> --- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
-> +++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
-> @@ -1447,10 +1447,6 @@ static int arm_smmu_handle_evt(struct arm_smmu_device *smmu, u64 *evt)
->   		return -EOPNOTSUPP;
->   	}
->   
-> -	/* Stage-2 is always pinned at the moment */
-> -	if (evt[1] & EVTQ_1_S2)
-> -		return -EFAULT;
-> -
->   	if (evt[1] & EVTQ_1_RnW)
->   		perm |= IOMMU_FAULT_PERM_READ;
->   	else
-> @@ -1468,13 +1464,18 @@ static int arm_smmu_handle_evt(struct arm_smmu_device *smmu, u64 *evt)
->   			.flags = IOMMU_FAULT_PAGE_REQUEST_LAST_PAGE,
->   			.grpid = FIELD_GET(EVTQ_1_STAG, evt[1]),
->   			.perm = perm,
-> -			.addr = FIELD_GET(EVTQ_2_ADDR, evt[2]),
->   		};
->   
->   		if (ssid_valid) {
->   			flt->prm.flags |= IOMMU_FAULT_PAGE_REQUEST_PASID_VALID;
->   			flt->prm.pasid = FIELD_GET(EVTQ_0_SSID, evt[0]);
->   		}
-> +
-> +		if (evt[1] & EVTQ_1_S2) {
-> +			flt->prm.flags |= IOMMU_FAULT_PAGE_REQUEST_L2;
-> +			flt->prm.addr = FIELD_GET(EVTQ_3_IPA, evt[3]);
-> +		} else
-> +			flt->prm.addr = FIELD_GET(EVTQ_2_ADDR, evt[2]);
->   	} else {
->   		flt->type = IOMMU_FAULT_DMA_UNRECOV;
->   		flt->event = (struct iommu_fault_unrecoverable) {
-> diff --git a/drivers/iommu/io-pgfault.c b/drivers/iommu/io-pgfault.c
-> index 1df8c1dcae77..abf16e06bcf5 100644
-> --- a/drivers/iommu/io-pgfault.c
-> +++ b/drivers/iommu/io-pgfault.c
-> @@ -195,10 +195,6 @@ int iommu_queue_iopf(struct iommu_fault *fault, void *cookie)
->   
->   	lockdep_assert_held(&param->lock);
->   
-> -	if (fault->type != IOMMU_FAULT_PAGE_REQ)
-> -		/* Not a recoverable page fault */
-> -		return -EOPNOTSUPP;
-> -
-
-Any reasons why do you want to remove this check?
-
->   	/*
->   	 * As long as we're holding param->lock, the queue can't be unlinked
->   	 * from the device and therefore cannot disappear.
-> diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
-> index d0b0a15dba84..cb1d93b00f7d 100644
-> --- a/drivers/iommu/iommu.c
-> +++ b/drivers/iommu/iommu.c
-> @@ -1056,6 +1056,40 @@ int iommu_group_unregister_notifier(struct iommu_group *group,
->   }
->   EXPORT_SYMBOL_GPL(iommu_group_unregister_notifier);
->   
-> +/*
-> + * iommu_update_device_fault_handler - Update the device fault handler via flags
-> + * @dev: the device
-> + * @mask: bits(not set) to clear
-> + * @set: bits to set
-> + *
-> + * Update the device fault handler installed by
-> + * iommu_register_device_fault_handler().
-> + *
-> + * Return 0 on success, or an error.
-> + */
-> +int iommu_update_device_fault_handler(struct device *dev, u32 mask, u32 set)
-> +{
-> +	struct dev_iommu *param = dev->iommu;
-> +	int ret = 0;
-> +
-> +	if (!param)
-> +		return -EINVAL;
-> +
-> +	mutex_lock(&param->lock);
-> +
-> +	if (param->fault_param) {
-> +		ret = -EINVAL;
-> +		goto out_unlock;
-> +	}
-> +
-> +	param->fault_param->flags = (param->fault_param->flags & mask) | set;
-> +
-> +out_unlock:
-> +	mutex_unlock(&param->lock);
-> +	return ret;
-> +}
-> +EXPORT_SYMBOL_GPL(iommu_update_device_fault_handler);
-
-When and why will this API be used? Why not registering the fault
-handling capabilities of a device driver only once during probe()?
-
-> +
->   /**
->    * iommu_register_device_fault_handler() - Register a device fault handler
->    * @dev: the device
-> @@ -1076,11 +1110,14 @@ EXPORT_SYMBOL_GPL(iommu_group_unregister_notifier);
->    */
->   int iommu_register_device_fault_handler(struct device *dev,
->   					iommu_dev_fault_handler_t handler,
-> -					void *data)
-> +					u32 flags, void *data)
->   {
->   	struct dev_iommu *param = dev->iommu;
->   	int ret = 0;
->   
-> +	if (flags & IOPF_REPORT_FLAT && flags & IOPF_REPORT_NESTED)
-> +		return -EINVAL;
-> +
->   	if (!param)
->   		return -EINVAL;
->   
-> @@ -1099,6 +1136,7 @@ int iommu_register_device_fault_handler(struct device *dev,
->   		goto done_unlock;
->   	}
->   	param->fault_param->handler = handler;
-> +	param->fault_param->flags = flags;
->   	param->fault_param->data = data;
->   	mutex_init(&param->fault_param->lock);
->   	INIT_LIST_HEAD(&param->fault_param->faults);
-> @@ -1177,6 +1215,22 @@ int iommu_report_device_fault(struct device *dev, struct iommu_fault_event *evt)
->   		goto done_unlock;
->   	}
->   
-> +	/* The unrecoverable fault reporting is not supported at the moment. */
-> +	if (evt->fault.type != IOMMU_FAULT_PAGE_REQ)
-> +		return -EOPNOTSUPP;
-
-Any reasons why do you want to disable reporting an unrecoverable fault?
-
-> +
-> +	if (evt->fault.type == IOMMU_FAULT_PAGE_REQ) {
-> +		if (fparam->flags & IOPF_REPORT_NESTED) {
-> +			if (evt->fault.prm.flags & IOMMU_FAULT_PAGE_REQUEST_L2 &&
-> +			    !(fparam->flags & IOPF_REPORT_NESTED_L2_CONCERNED))
-> +				return -EOPNOTSUPP;
-> +			if (!(evt->fault.prm.flags & IOMMU_FAULT_PAGE_REQUEST_L2) &&
-> +			    !(fparam->flags & IOPF_REPORT_NESTED_L1_CONCERNED))
-> +				return -EOPNOTSUPP;
-> +		} else if (!(fparam->flags & IOPF_REPORT_FLAT))
-> +			return -EOPNOTSUPP;
-> +	}
-> +
->   	if (evt->fault.type == IOMMU_FAULT_PAGE_REQ &&
->   	    (evt->fault.prm.flags & IOMMU_FAULT_PAGE_REQUEST_LAST_PAGE)) {
->   		evt_pending = kmemdup(evt, sizeof(struct iommu_fault_event),
-> diff --git a/include/linux/iommu.h b/include/linux/iommu.h
-> index 86d688c4418f..f03d761e8310 100644
-> --- a/include/linux/iommu.h
-> +++ b/include/linux/iommu.h
-> @@ -352,12 +352,21 @@ struct iommu_fault_event {
->   /**
->    * struct iommu_fault_param - per-device IOMMU fault data
->    * @handler: Callback function to handle IOMMU faults at device level
-> + * @flags: Indicates whether the fault reporting is available under a
-> + *	   specific configuration (1st/2nd-level-only(FLAT), or nested).
-> + *	   IOPF_REPORT_NESTED needs to additionally know which level/stage
-> + *	   is concerned.
-
-If IOPF_REPORT_NESTED only is not valid why do you want to define it?
-
->    * @data: handler private data
->    * @faults: holds the pending faults which needs response
->    * @lock: protect pending faults list
->    */
->   struct iommu_fault_param {
->   	iommu_dev_fault_handler_t handler;
-> +#define IOPF_REPORT_FLAT			(1 << 0)
-> +#define IOPF_REPORT_NESTED			(1 << 1)
-> +#define IOPF_REPORT_NESTED_L1_CONCERNED		(1 << 2)
-> +#define IOPF_REPORT_NESTED_L2_CONCERNED		(1 << 3)
-> +	u32 flags;
->   	void *data;
->   	struct list_head faults;
->   	struct mutex lock;
-> @@ -509,9 +518,11 @@ extern int iommu_group_register_notifier(struct iommu_group *group,
->   					 struct notifier_block *nb);
->   extern int iommu_group_unregister_notifier(struct iommu_group *group,
->   					   struct notifier_block *nb);
-> +extern int iommu_update_device_fault_handler(struct device *dev,
-> +					     u32 mask, u32 set);
->   extern int iommu_register_device_fault_handler(struct device *dev,
->   					iommu_dev_fault_handler_t handler,
-> -					void *data);
-> +					u32 flags, void *data);
->   
->   extern int iommu_unregister_device_fault_handler(struct device *dev);
->   
-> @@ -873,10 +884,16 @@ static inline int iommu_group_unregister_notifier(struct iommu_group *group,
->   	return 0;
->   }
->   
-> +static inline int iommu_update_device_fault_handler(struct device *dev,
-> +						    u32 mask, u32 set)
-> +{
-> +	return -ENODEV;
-> +}
-> +
->   static inline
->   int iommu_register_device_fault_handler(struct device *dev,
->   					iommu_dev_fault_handler_t handler,
-> -					void *data)
-> +					u32 flags, void *data)
->   {
->   	return -ENODEV;
->   }
-> diff --git a/include/uapi/linux/iommu.h b/include/uapi/linux/iommu.h
-> index e1d9e75f2c94..0ce0dfb7713e 100644
-> --- a/include/uapi/linux/iommu.h
-> +++ b/include/uapi/linux/iommu.h
-> @@ -85,6 +85,8 @@ struct iommu_fault_unrecoverable {
->    *         When IOMMU_FAULT_PAGE_RESPONSE_NEEDS_PASID is set, the page response
->    *         must have the same PASID value as the page request. When it is clear,
->    *         the page response should not have a PASID.
-> + *         If IOMMU_FAULT_PAGE_REQUEST_L2 is set, the fault occurred at the
-> + *         second level/stage, otherwise, occurred at the first level.
->    * @pasid: Process Address Space ID
->    * @grpid: Page Request Group Index
->    * @perm: requested page permissions (IOMMU_FAULT_PERM_* values)
-> @@ -96,6 +98,7 @@ struct iommu_fault_page_request {
->   #define IOMMU_FAULT_PAGE_REQUEST_LAST_PAGE	(1 << 1)
->   #define IOMMU_FAULT_PAGE_REQUEST_PRIV_DATA	(1 << 2)
->   #define IOMMU_FAULT_PAGE_RESPONSE_NEEDS_PASID	(1 << 3)
-> +#define IOMMU_FAULT_PAGE_REQUEST_L2		(1 << 4)
->   	__u32	flags;
->   	__u32	pasid;
->   	__u32	grpid;
-> 
-
-Best regards,
-baolu
+DQoNCj4gT24gTWFyIDksIDIwMjEsIGF0IDM6MjIgQU0sIFN0ZXZlIFJ1dGhlcmZvcmQgPHNydXRo
+ZXJmb3JkQGdvb2dsZS5jb20+IHdyb3RlOg0KPiANCj4g77u/T24gTW9uLCBNYXIgOCwgMjAyMSBh
+dCAxOjExIFBNIEJyaWplc2ggU2luZ2ggPGJyaWplc2guc2luZ2hAYW1kLmNvbT4gd3JvdGU6DQo+
+PiANCj4+IA0KPj4+IE9uIDMvOC8yMSAxOjUxIFBNLCBTZWFuIENocmlzdG9waGVyc29uIHdyb3Rl
+Og0KPj4+IE9uIE1vbiwgTWFyIDA4LCAyMDIxLCBBc2hpc2ggS2FscmEgd3JvdGU6DQo+Pj4+IE9u
+IEZyaSwgRmViIDI2LCAyMDIxIGF0IDA5OjQ0OjQxQU0gLTA4MDAsIFNlYW4gQ2hyaXN0b3BoZXJz
+b24gd3JvdGU6DQo+Pj4+PiArV2lsbCBhbmQgUXVlbnRpbiAoYXJtNjQpDQo+Pj4+PiANCj4+Pj4+
+IE1vdmluZyB0aGUgbm9uLUtWTSB4ODYgZm9sa3MgdG8gYmNjLCBJIGRvbid0IHRoZXkgY2FyZSBh
+Ym91dCBLVk0gZGV0YWlscyBhdCB0aGlzDQo+Pj4+PiBwb2ludC4NCj4+Pj4+IA0KPj4+Pj4gT24g
+RnJpLCBGZWIgMjYsIDIwMjEsIEFzaGlzaCBLYWxyYSB3cm90ZToNCj4+Pj4+PiBPbiBUaHUsIEZl
+YiAyNSwgMjAyMSBhdCAwMjo1OToyN1BNIC0wODAwLCBTdGV2ZSBSdXRoZXJmb3JkIHdyb3RlOg0K
+Pj4+Pj4+PiBPbiBUaHUsIEZlYiAyNSwgMjAyMSBhdCAxMjoyMCBQTSBBc2hpc2ggS2FscmEgPGFz
+aGlzaC5rYWxyYUBhbWQuY29tPiB3cm90ZToNCj4+Pj4+Pj4gVGhhbmtzIGZvciBncmFiYmluZyB0
+aGUgZGF0YSENCj4+Pj4+Pj4gDQo+Pj4+Pj4+IEkgYW0gZmluZSB3aXRoIGJvdGggcGF0aHMuIFNl
+YW4gaGFzIHN0YXRlZCBhbiBleHBsaWNpdCBkZXNpcmUgZm9yDQo+Pj4+Pj4+IGh5cGVyY2FsbCBl
+eGl0aW5nLCBzbyBJIHRoaW5rIHRoYXQgd291bGQgYmUgdGhlIGN1cnJlbnQgY29uc2Vuc3VzLg0K
+Pj4+Pj4gWWVwLCB0aG91Z2ggaXQnZCBiZSBnb29kIHRvIGdldCBQYW9sbydzIGlucHV0LCB0b28u
+DQo+Pj4+PiANCj4+Pj4+Pj4gSWYgd2Ugd2FudCB0byBkbyBoeXBlcmNhbGwgZXhpdGluZywgdGhp
+cyBzaG91bGQgYmUgaW4gYSBmb2xsb3ctdXANCj4+Pj4+Pj4gc2VyaWVzIHdoZXJlIHdlIGltcGxl
+bWVudCBzb21ldGhpbmcgbW9yZSBnZW5lcmljLCBlLmcuIGEgaHlwZXJjYWxsDQo+Pj4+Pj4+IGV4
+aXRpbmcgYml0bWFwIG9yIGh5cGVyY2FsbCBleGl0IGxpc3QuIElmIHdlIGFyZSB0YWtpbmcgdGhl
+IGh5cGVyY2FsbA0KPj4+Pj4+PiBleGl0IHJvdXRlLCB3ZSBjYW4gZHJvcCB0aGUga3ZtIHNpZGUg
+b2YgdGhlIGh5cGVyY2FsbC4NCj4+Pj4+IEkgZG9uJ3QgdGhpbmsgdGhpcyBpcyBhIGdvb2QgY2Fu
+ZGlkYXRlIGZvciBhcmJpdHJhcnkgaHlwZXJjYWxsIGludGVyY2VwdGlvbi4gIE9yDQo+Pj4+PiBy
+YXRoZXIsIEkgdGhpbmsgaHlwZXJjYWxsIGludGVyY2VwdGlvbiBzaG91bGQgYmUgYW4gb3J0aG9n
+b25hbCBpbXBsZW1lbnRhdGlvbi4NCj4+Pj4+IA0KPj4+Pj4gVGhlIGd1ZXN0LCBpbmNsdWRpbmcg
+Z3Vlc3QgZmlybXdhcmUsIG5lZWRzIHRvIGJlIGF3YXJlIHRoYXQgdGhlIGh5cGVyY2FsbCBpcw0K
+Pj4+Pj4gc3VwcG9ydGVkLCBhbmQgdGhlIEFCSSBuZWVkcyB0byBiZSB3ZWxsLWRlZmluZWQuICBS
+ZWx5aW5nIG9uIHVzZXJzcGFjZSBWTU1zIHRvDQo+Pj4+PiBpbXBsZW1lbnQgYSBjb21tb24gQUJJ
+IGlzIGFuIHVubmVjZXNzYXJ5IHJpc2suDQo+Pj4+PiANCj4+Pj4+IFdlIGNvdWxkIG1ha2UgS1ZN
+J3MgZGVmYXVsdCBiZWhhdmlvciBiZSBhIG5vcCwgaS5lLiBoYXZlIEtWTSBlbmZvcmNlIHRoZSBB
+QkkgYnV0DQo+Pj4+PiByZXF1aXJlIGZ1cnRoZXIgVk1NIGludGVydmVudGlvbi4gIEJ1dCwgSSBq
+dXN0IGRvbid0IHNlZSB0aGUgcG9pbnQsIGl0IHdvdWxkDQo+Pj4+PiBzYXZlIG9ubHkgYSBmZXcg
+bGluZXMgb2YgY29kZS4gIEl0IHdvdWxkIGFsc28gbGltaXQgd2hhdCBLVk0gY291bGQgZG8gaW4g
+dGhlDQo+Pj4+PiBmdXR1cmUsIGUuZy4gaWYgS1ZNIHdhbnRlZCB0byBkbyBpdHMgb3duIGJvb2tr
+ZWVwaW5nIF9hbmRfIGV4aXQgdG8gdXNlcnNwYWNlLA0KPj4+Pj4gdGhlbiBtYW5kYXRvcnkgaW50
+ZXJjZXB0aW9uIHdvdWxkIGVzc2VudGlhbGx5IG1ha2UgaXQgaW1wb3NzaWJsZSBmb3IgS1ZNIHRv
+IGRvDQo+Pj4+PiBib29ra2VlcGluZyB3aGlsZSBzdGlsbCBob25vcmluZyB0aGUgaW50ZXJjZXB0
+aW9uIHJlcXVlc3QuDQo+Pj4+PiANCj4+Pj4+IEhvd2V2ZXIsIEkgZG8gdGhpbmsgaXQgd291bGQg
+bWFrZSBzZW5zZSB0byBoYXZlIHRoZSB1c2Vyc3BhY2UgZXhpdCBiZSBhIGdlbmVyaWMNCj4+Pj4+
+IGV4aXQgdHlwZS4gIEJ1dCBoZXksIHdlIGFscmVhZHkgaGF2ZSB0aGUgbmVjZXNzYXJ5IEFCSSBk
+ZWZpbmVkIGZvciB0aGF0ISAgSXQncw0KPj4+Pj4ganVzdCBub3QgdXNlZCBhbnl3aGVyZS4NCj4+
+Pj4+IA0KPj4+Pj4gICAgLyogS1ZNX0VYSVRfSFlQRVJDQUxMICovDQo+Pj4+PiAgICBzdHJ1Y3Qg
+ew0KPj4+Pj4gICAgICAgICAgICBfX3U2NCBucjsNCj4+Pj4+ICAgICAgICAgICAgX191NjQgYXJn
+c1s2XTsNCj4+Pj4+ICAgICAgICAgICAgX191NjQgcmV0Ow0KPj4+Pj4gICAgICAgICAgICBfX3Uz
+MiBsb25nbW9kZTsNCj4+Pj4+ICAgICAgICAgICAgX191MzIgcGFkOw0KPj4+Pj4gICAgfSBoeXBl
+cmNhbGw7DQo+Pj4+PiANCj4+Pj4+IA0KPj4+Pj4+PiBVc2Vyc3BhY2UgY291bGQgYWxzbyBoYW5k
+bGUgdGhlIE1TUiB1c2luZyBNU1IgZmlsdGVycyAod291bGQgbmVlZCB0bw0KPj4+Pj4+PiBjb25m
+aXJtIHRoYXQpLiAgVGhlbiB1c2Vyc3BhY2UgY291bGQgYWxzbyBiZSBpbiBjb250cm9sIG9mIHRo
+ZSBjcHVpZCBiaXQuDQo+Pj4+PiBBbiBNU1IgaXMgbm90IGEgZ3JlYXQgZml0OyBpdCdzIHg4NiBz
+cGVjaWZpYyBhbmQgbGltaXRlZCB0byA2NCBiaXRzIG9mIGRhdGEuDQo+Pj4+PiBUaGUgZGF0YSBs
+aW1pdGF0aW9uIGNvdWxkIGJlIGZ1ZGdlZCBieSBzaG92aW5nIGRhdGEgaW50byBub24tc3RhbmRh
+cmQgR1BScywgYnV0DQo+Pj4+PiB0aGF0IHdpbGwgcmVzdWx0IGluIHRydWx5IGhlaW5vdXMgZ3Vl
+c3QgY29kZSwgYW5kIGV4dGVuc2liaWxpdHkgaXNzdWVzLg0KPj4+Pj4gDQo+Pj4+PiBUaGUgZGF0
+YSBsaW1pdGF0aW9uIGlzIGEgbW9vdCBwb2ludCwgYmVjYXVzZSB0aGUgeDg2LW9ubHkgdGhpbmcg
+aXMgYSBkZWFsDQo+Pj4+PiBicmVha2VyLiAgYXJtNjQncyBwS1ZNIHdvcmsgaGFzIGEgbmVhci1p
+ZGVudGljYWwgdXNlIGNhc2UgZm9yIGEgZ3Vlc3QgdG8gc2hhcmUNCj4+Pj4+IG1lbW9yeSB3aXRo
+IGEgaG9zdC4gIEkgY2FuJ3QgdGhpbmsgb2YgYSBjbGV2ZXIgd2F5IHRvIGF2b2lkIGhhdmluZyB0
+byBzdXBwb3J0DQo+Pj4+PiBURFgncyBhbmQgU05QJ3MgaHlwZXJ2aXNvci1hZ25vc3RpYyB2YXJp
+YW50cywgYnV0IHdlIGNhbiBhdCBsZWFzdCBub3QgaGF2ZQ0KPj4+Pj4gbXVsdGlwbGUgS1ZNIHZh
+cmlhbnRzLg0KPj4+Pj4gDQo+Pj4+IFBvdGVudGlhbGx5LCB0aGVyZSBpcyBhbm90aGVyIHJlYXNv
+biBmb3IgaW4ta2VybmVsIGh5cGVyY2FsbCBoYW5kbGluZw0KPj4+PiBjb25zaWRlcmluZyBTRVYt
+U05QLiBJbiBjYXNlIG9mIFNFVi1TTlAgdGhlIFJNUCB0YWJsZSB0cmFja3MgdGhlIHN0YXRlDQo+
+Pj4+IG9mIGVhY2ggZ3Vlc3QgcGFnZSwgZm9yIGluc3RhbmNlIHBhZ2VzIGluIGh5cGVydmlzb3Ig
+c3RhdGUsIGkuZS4sIHBhZ2VzDQo+Pj4+IHdpdGggQz0wIGFuZCBwYWdlcyBpbiBndWVzdCB2YWxp
+ZCBzdGF0ZSB3aXRoIEM9MS4NCj4+Pj4gDQo+Pj4+IE5vdywgdGhlcmUgc2hvdWxkbid0IGJlIGEg
+bmVlZCBmb3IgcGFnZSBlbmNyeXB0aW9uIHN0YXR1cyBoeXBlcmNhbGxzIG9uDQo+Pj4+IFNFVi1T
+TlAgYXMgS1ZNIGNhbiB0cmFjayAmIHJlZmVyZW5jZSBndWVzdCBwYWdlIHN0YXR1cyBkaXJlY3Rs
+eSB1c2luZw0KPj4+PiB0aGUgUk1QIHRhYmxlLg0KPj4+IFJlbHlpbmcgb24gdGhlIFJNUCB0YWJs
+ZSBpdHNlbGYgd291bGQgcmVxdWlyZSBsb2NraW5nIHRoZSBSTVAgdGFibGUgZm9yIGFuDQo+Pj4g
+ZXh0ZW5kZWQgZHVyYXRpb24sIGFuZCB3YWxraW5nIHRoZSBlbnRpcmUgUk1QIHRvIGZpbmQgc2hh
+cmVkIHBhZ2VzIHdvdWxkIGJlDQo+Pj4gdmVyeSBpbmVmZmljaWVudC4NCj4+PiANCj4+Pj4gQXMg
+S1ZNIG1haW50YWlucyB0aGUgUk1QIHRhYmxlLCB0aGVyZWZvcmUgd2Ugd2lsbCBuZWVkIFNFVC9H
+RVQgdHlwZSBvZg0KPj4+PiBpbnRlcmZhY2VzIHRvIHByb3ZpZGUgdGhlIGd1ZXN0IHBhZ2UgZW5j
+cnlwdGlvbiBzdGF0dXMgdG8gdXNlcnNwYWNlLg0KPj4+IEhybSwgc29tZWhvdyBJIHRlbXBvcmFy
+aWx5IGZvcmdvdCBhYm91dCBTTlAgYW5kIFREWCBhZGRpbmcgdGhlaXIgb3duIGh5cGVyY2FsbHMN
+Cj4+PiBmb3IgY29udmVydGluZyBiZXR3ZWVuIHNoYXJlZCBhbmQgcHJpdmF0ZS4gIEFuZCBpbiB0
+aGUgY2FzZSBvZiBURFgsIHRoZSBoeXBlcmNhbGwNCj4+PiBjYW4ndCBiZSB0cnVzdGVkLCBpLmUu
+IGlzIGp1c3QgYSBoaW50LCBvdGhlcndpc2UgdGhlIGd1ZXN0IGNvdWxkIGluZHVjZSBhICNNQyBp
+bg0KPj4+IHRoZSBob3N0Lg0KPj4+IA0KPj4+IEJ1dCwgdGhlIGRpZmZlcmVudCBndWVzdCBiZWhh
+dmlvciBkb2Vzbid0IHJlcXVpcmUgS1ZNIHRvIG1haW50YWluIGEgbGlzdC90cmVlLA0KPj4+IGUu
+Zy4gYWRkaW5nIGEgZGVkaWNhdGVkIEtWTV9FWElUXyogZm9yIG5vdGlmeWluZyB1c2Vyc3BhY2Ug
+b2YgcGFnZSBlbmNyeXB0aW9uDQo+Pj4gc3RhdHVzIGNoYW5nZXMgd291bGQgYWxzbyBzdWZmaWNl
+Lg0KPj4+IA0KPj4+IEFjdHVhbGx5LCB0aGF0IG1hZGUgbWUgdGhpbmsgb2YgYW5vdGhlciBhcmd1
+bWVudCBhZ2FpbnN0IG1haW50YWluaW5nIGEgbGlzdCBpbg0KPj4+IEtWTTogdGhlcmUncyBubyB3
+YXkgdG8gbm90aWZ5IHVzZXJzcGFjZSB0aGF0IGEgcGFnZSdzIHN0YXR1cyBoYXMgY2hhbmdlZC4N
+Cj4+PiBVc2Vyc3BhY2Ugd291bGQgbmVlZCB0byBxdWVyeSBLVk0gdG8gZG8gR0VUX0xJU1QgYWZ0
+ZXIgZXZlcnkgR0VUX0RJUlRZLg0KPj4+IE9idmlvdXNseSBub3QgYSBodWdlIGlzc3VlLCBidXQg
+aXQgZG9lcyBtYWtlIG1pZ3JhdGlvbiBzbGlnaHRseSBsZXNzIGVmZmljaWVudC4NCj4+PiANCj4+
+PiBPbiBhIHJlbGF0ZWQgdG9waWMsIHRoZXJlIGFyZSBmYXRhbCByYWNlIGNvbmRpdGlvbnMgdGhh
+dCB3aWxsIHJlcXVpcmUgY2FyZWZ1bA0KPj4+IGNvb3JkaW5hdGlvbiBiZXR3ZWVuIGd1ZXN0IGFu
+ZCBob3N0LCBhbmQgd2lsbCBlZmZlY3RpdmVseSBiZSB3aXJlZCBpbnRvIHRoZSBBQkkuDQo+Pj4g
+U05QIGFuZCBURFggZG9uJ3Qgc3VmZmVyIHRoZXNlIGlzc3VlcyBiZWNhdXNlIGhvc3QgYXdhcmVu
+ZXNzIG9mIHN0YXR1cyBpcyBhdG9taWMNCj4+PiB3aXRoIHJlc3BlY3QgdG8gdGhlIGd1ZXN0IGFj
+dHVhbGx5IHdyaXRpbmcgdGhlIHBhZ2Ugd2l0aCB0aGUgbmV3IGVuY3J5cHRpb24NCj4+PiBzdGF0
+dXMuDQo+Pj4gDQo+Pj4gRm9yIFNFViBsaXZlIG1pZ3JhdGlvbi4uLg0KPj4+IA0KPj4+IElmIHRo
+ZSBndWVzdCBkb2VzIHRoZSBoeXBlcmNhbGwgYWZ0ZXIgd3JpdGluZyB0aGUgcGFnZSwgdGhlbiB0
+aGUgZ3Vlc3QgaXMgaG9zZWQNCj4+PiBpZiBpdCBnZXRzIG1pZ3JhdGVkIHdoaWxlIHdyaXRpbmcg
+dGhlIHBhZ2UgKHNjZW5hcmlvICMxKToNCj4+PiANCj4+PiAgdkNQVSAgICAgICAgICAgICAgICAg
+VXNlcnNwYWNlDQo+Pj4gIHplcm9fYnl0ZXNbMDpOXQ0KPj4+ICAgICAgICAgICAgICAgICAgICAg
+ICA8dHJhbnNmZXJzIHdyaXR0ZW4gYnl0ZXMgYXMgcHJpdmF0ZSBpbnN0ZWFkIG9mIHNoYXJlZD4N
+Cj4+PiAgICAgICAgICAgICAgICAgICAgIDxtaWdyYXRlcyB2Q1BVPg0KPj4+ICB6ZXJvX2J5dGVz
+W04rMTo0MDk1XQ0KPj4+ICBzZXRfc2hhcmVkIChkZXN0KQ0KPj4+ICBrYWJvb20hDQo+PiANCj4+
+IA0KPj4gTWF5YmUgSSBhbSBtaXNzaW5nIHNvbWV0aGluZywgdGhpcyBpcyBub3QgYW55IGRpZmZl
+cmVudCBmcm9tIGEgbm9ybWFsDQo+PiBvcGVyYXRpb24gaW5zaWRlIGEgZ3Vlc3QuIE1ha2luZyBh
+IHBhZ2Ugc2hhcmVkL3ByaXZhdGUgaW4gdGhlIHBhZ2UgdGFibGUNCj4+IGRvZXMgbm90IHVwZGF0
+ZSB0aGUgY29udGVudCBvZiB0aGUgcGFnZSBpdHNlbGYuIEluIHlvdXIgYWJvdmUgY2FzZSwgSQ0K
+Pj4gYXNzdW1lIHplcm9fYnl0ZXNbTisxOjQwOTVdIGFyZSB3cml0dGVuIGJ5IHRoZSBkZXN0aW5h
+dGlvbiBWTS4gVGhlDQo+PiBtZW1vcnkgcmVnaW9uIHdhcyBwcml2YXRlIGluIHRoZSBzb3VyY2Ug
+Vk0gcGFnZSB0YWJsZSwgc28sIHRob3NlIHdyaXRlcw0KPj4gd2lsbCBiZSBwZXJmb3JtZWQgZW5j
+cnlwdGVkLiBUaGUgZGVzdGluYXRpb24gVk0gbGF0ZXIgY2hhbmdlZCB0aGUgbWVtb3J5DQo+PiB0
+byBzaGFyZWQsIGJ1dCBub2JvZHkgd3JvdGUgdG8gdGhlIG1lbW9yeSBhZnRlciBpdCBoYXMgYmVl
+biB0cmFuc2l0aW9uZWQNCj4+IHRvIHRoZSAgc2hhcmVkLCBzbyBhIHJlYWRlciBvZiB0aGUgbWVt
+b3J5IHNob3VsZCBnZXQgY2lwaGVydGV4dCBhbmQNCj4+IHVubGVzcyB0aGVyZSB3YXMgYSB3cml0
+ZSBhZnRlciB0aGUgc2V0X3NoYXJlZCAoZGVzdCkuDQo+PiANCj4+IA0KPj4+IElmIHVzZXJzcGFj
+ZSBkb2VzIEdFVF9ESVJUWSBhZnRlciBHRVRfTElTVCwgdGhlbiB0aGUgaG9zdCB3b3VsZCB0cmFu
+c2ZlciBiYWQNCj4+PiBkYXRhIGJ5IGNvbnN1bWluZyBhIHN0YWxlIGxpc3QgKHNjZW5hcmlvICMy
+KToNCj4+PiANCj4+PiAgdkNQVSAgICAgICAgICAgICAgIFVzZXJzcGFjZQ0KPj4+ICAgICAgICAg
+ICAgICAgICAgICAgZ2V0X2xpc3QgKGZyb20gS1ZNIG9yIGludGVybmFsbHkpDQo+Pj4gIHNldF9z
+aGFyZWQgKHNyYykNCj4+PiAgemVyb19wYWdlIChzcmMpDQo+Pj4gICAgICAgICAgICAgICAgICAg
+ICBnZXRfZGlydHkNCj4+PiAgICAgICAgICAgICAgICAgICAgIDx0cmFuc2ZlcnMgcHJpdmF0ZSBk
+YXRhIGluc3RlYWQgb2Ygc2hhcmVkPg0KPj4+ICAgICAgICAgICAgICAgICAgICAgPG1pZ3JhdGVz
+IHZDUFU+DQo+Pj4gIGthYm9vbSENCj4+IA0KPj4gDQo+PiBJIGRvbid0IHJlbWVtYmVyIGhvdyB0
+aGluZ3MgYXJlIGRvbmUgaW4gcmVjZW50IEFzaGlzaCBRZW11L0tWTSBwYXRjaGVzDQo+PiBidXQg
+aW4gcHJldmlvdXMgc2VyaWVzLCB0aGUgZ2V0X2RpcnR5KCkgaGFwcGVucyBiZWZvcmUgdGhlIHF1
+ZXJ5aW5nIHRoZQ0KPj4gZW5jcnlwdGVkIHN0YXRlLiBUaGVyZSB3YXMgc29tZSBsb2dpYyBpbiBW
+TU0gdG8gcmVzeW5jIHRoZSBlbmNyeXB0ZWQNCj4+IGJpdG1hcCBkdXJpbmcgdGhlIGZpbmFsIG1p
+Z3JhdGlvbiBzdGFnZSBhbmQgcGVyZm9ybSBhbnkgYWRkaXRpb25hbCBkYXRhDQo+PiB0cmFuc2Zl
+ciBzaW5jZSBsYXN0IHN5bmMuDQo+PiANCj4+IA0KPj4+IElmIGJvdGggZ3Vlc3QgYW5kIGhvc3Qg
+b3JkZXIgdGhpbmdzIHRvIGF2b2lkICMxIGFuZCAjMiwgdGhlIGhvc3QgY2FuIHN0aWxsDQo+Pj4g
+bWlncmF0ZSB0aGUgd3JvbmcgZGF0YSAoc2NlbmFyaW8gIzMpOg0KPj4+IA0KPj4+ICB2Q1BVICAg
+ICAgICAgICAgICAgVXNlcnNwYWNlDQo+Pj4gIHNldF9wcml2YXRlDQo+Pj4gIHplcm9fYnl0ZXNb
+MDo0MDk2XQ0KPj4+ICAgICAgICAgICAgICAgICAgICAgZ2V0X2RpcnR5DQo+Pj4gIHNldF9zaGFy
+ZWQgKHNyYykNCj4+PiAgICAgICAgICAgICAgICAgICAgIGdldF9saXN0DQo+Pj4gICAgICAgICAg
+ICAgICAgICAgICA8dHJhbnNmZXJzIGFzIHNoYXJlZCBpbnN0ZWFkIG9mIHByaXZhdGU+DQo+Pj4g
+ICAgICAgICAgICAgICAgICAgPG1pZ3JhdGVzIHZDUFU+DQo+Pj4gIHNldF9wcml2YXRlIChkZXN0
+KQ0KPj4+ICBrYWJvb20hDQo+PiANCj4+IA0KPj4gU2luY2UgdGhlcmUgd2FzIG5vIHdyaXRlIHRv
+IHRoZSBtZW1vcnkgYWZ0ZXIgdGhlIHNldF9zaGFyZWQgKHNyYyksIHNvDQo+PiB0aGUgY29udGVu
+dCBvZiB0aGUgcGFnZSBzaG91bGQgbm90IGhhdmUgY2hhbmdlZC4gQWZ0ZXIgdGhlIHNldF9wcml2
+YXRlDQo+PiAoZGVzdCksIHRoZSBjYWxsZXIgc2hvdWxkIGJlIHNlZWluZyB0aGUgc2FtZSBjb250
+ZW50IHdyaXR0ZW4gYnkgdGhlDQo+PiB6ZXJvX2J5dGVzWzA6NDA5Nl0NCj4gSSB0aGluayBTZWFu
+IHdhcyBnb2luZyBmb3IgdGhlIHNpdHVhdGlvbiB3aGVyZSB0aGUgVk0gaGFzIG1vdmVkIHRvIHRo
+ZQ0KPiBkZXN0aW5hdGlvbiwgd2hpY2ggd291bGQgaGF2ZSBjaGFuZ2VkIHRoZSBWRUsuIFRoYXQg
+d2F5IHRoZSBndWVzdA0KPiB3b3VsZCBiZSBkZWNyeXB0aW5nIHRoZSBvbGQgY2lwaGVydGV4dCB3
+aXRoIHRoZSBuZXcgKHdyb25nKSBrZXkuDQo+PiANCg0KQnV0IGhvdyBjYW4gdGhpcyBoYXBwZW4s
+IGlmIGEgcGFnZSBpcyBtaWdyYXRlZCBhcyBwcml2YXRlICwgd2hlbiBpdCBpcyByZWNlaXZlZCBp
+dCB3aWxsIGJlIGRlY3J5cHRlZCB1c2luZyB0aGUgdHJhbnNwb3J0IGtleSBURUsgYW5kIHRoZW4g
+cmUtZW5jcnlwdGVkIHVzaW5nIHRoZSBkZXN0aW5hdGlvbiBWTeKAmXMgVkVLIG9uIHRoZSBkZXN0
+aW5hdGlvbiBWTS4NCg0KVGhhbmtzLA0KQXNoaXNoDQoNCj4+IA0KPj4+IFNjZW5hcmlvICMzIGlz
+IHVubGlrZWx5LCBidXQgcGxhdXNpYmxlLCBlLmcuIGlmIHRoZSBndWVzdCBiYWlscyBmcm9tIGl0
+cw0KPj4+IGNvbnZlcnNpb24gZmxvdyBmb3Igd2hhdGV2ZXIgcmVhc29uLCBhZnRlciBtYWtpbmcg
+dGhlIGluaXRpYWwgaHlwZXJjYWxsLiAgTWF5YmUNCj4+PiBpdCBnb2VzIHdpdGhvdXQgc2F5aW5n
+LCBidXQgdG8gYWRkcmVzcyAjMywgdGhlIGd1ZXN0IG11c3QgY29uc2lkZXIgZXhpc3RpbmcgZGF0
+YQ0KPj4+IGFzIGxvc3QgdGhlIGluc3RhbnQgaXQgdGVsbHMgdGhlIGhvc3QgdGhlIHBhZ2UgaGFz
+IGJlZW4gY29udmVydGVkIHRvIGEgZGlmZmVyZW50DQo+Pj4gdHlwZS4NCj4+PiANCj4+Pj4gRm9y
+IHRoZSBhYm92ZSByZWFzb24gaWYgd2UgZG8gaW4ta2VybmVsIGh5cGVyY2FsbCBoYW5kbGluZyBm
+b3IgcGFnZQ0KPj4+PiBlbmNyeXB0aW9uIHN0YXR1cyAod2hpY2ggd2UgcHJvYmFibHkgd29uJ3Qg
+cmVxdWlyZSBmb3IgU0VWLVNOUCAmDQo+Pj4+IGNvcnJlc3BvbmRpbmdseSB0aGVyZSB3aWxsIGJl
+IG5vIGh5cGVyY2FsbCBleGl0aW5nKSwNCj4+PiBBcyBhYm92ZSwgdGhhdCBkb2Vzbid0IHByZWNs
+dWRlIEtWTSBmcm9tIGV4aXRpbmcgdG8gdXNlcnNwYWNlIG9uIGNvbnZlcnNpb24uDQo+Pj4gDQo+
+Pj4+IHRoZW4gd2UgY2FuIGltcGxlbWVudCBhIHN0YW5kYXJkIEdFVC9TRVQgaW9jdGwgaW50ZXJm
+YWNlIHRvIGdldC9zZXQgdGhlIGd1ZXN0DQo+Pj4+IHBhZ2UgZW5jcnlwdGlvbiBzdGF0dXMgZm9y
+IHVzZXJzcGFjZSwgd2hpY2ggd2lsbCB3b3JrIGFjcm9zcyBTRVYsIFNFVi1FUyBhbmQNCj4+Pj4g
+U0VWLVNOUC4NCg==
