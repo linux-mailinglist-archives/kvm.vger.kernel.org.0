@@ -2,115 +2,170 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3905E334047
-	for <lists+kvm@lfdr.de>; Wed, 10 Mar 2021 15:25:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EF6CB3340D9
+	for <lists+kvm@lfdr.de>; Wed, 10 Mar 2021 15:55:57 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232952AbhCJOZM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 10 Mar 2021 09:25:12 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59144 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232659AbhCJOY4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 10 Mar 2021 09:24:56 -0500
-Received: from mail-pg1-x52d.google.com (mail-pg1-x52d.google.com [IPv6:2607:f8b0:4864:20::52d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A960C061761
-        for <kvm@vger.kernel.org>; Wed, 10 Mar 2021 06:24:56 -0800 (PST)
-Received: by mail-pg1-x52d.google.com with SMTP id t26so11505665pgv.3
-        for <kvm@vger.kernel.org>; Wed, 10 Mar 2021 06:24:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ozlabs-ru.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=ia4RFpicq2fRuAPgXhAozb2Coa1dHuagLeIfRQj8pNQ=;
-        b=MVAAnh5akGxaYjBBsx/wd8dd5mvwQkezHzzvAcU0d3DczYATYUbjWj9CxafssTwVdh
-         REID571/jUKlKRb3gGXQIlmV97PHAQyskUXSEstmL5xmEQibOXsFipYb2XnIpvfU/T9o
-         tw83tRACD2PPz3STkY9W0iyfEEMWvShwcUJhhroXzZPJa4iu4/uuJGifbuCZ1GdvUO/3
-         qAEqnVpVVKcnT+Jgqa6JsFXIGmQzsk3jlQZSKNaw+CgA2tdZkeXuIGPyeTntOeYHuNQN
-         5u99ovhof1usctC3jN4IBI++x0C5EDQWVXrvs09hQp3zP9acru0Y93MNL+ipZ8lBvpmm
-         NiLw==
+        id S230341AbhCJOz1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 10 Mar 2021 09:55:27 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:57040 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232696AbhCJOzG (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 10 Mar 2021 09:55:06 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1615388106;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=LPQFDLvKrDj5V75j3OST6UCIU/ZY4HfSALPlvqp1Wfg=;
+        b=UrMC50TDYFGQfhhPO62CuifVKV2BbyDMUZlOI0L/a8/axkhPrAPEWkhL7u9CL6q6Xuy87P
+        LAQXcy+bQTxt7Ex6BwgCMOIPdm31Sb5PEBZEwAN8iptCt7EWCMIxWkkfMc7J39Zs9Z1oxg
+        az7faHsRBIu2DsBPWYrQbsdeSrk30hc=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-211-SZyHpnPdMvOb4MokT6EMpg-1; Wed, 10 Mar 2021 09:55:04 -0500
+X-MC-Unique: SZyHpnPdMvOb4MokT6EMpg-1
+Received: by mail-wm1-f72.google.com with SMTP id f9so2774523wml.0
+        for <kvm@vger.kernel.org>; Wed, 10 Mar 2021 06:55:04 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+        h=x-gm-message-state:subject:to:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=ia4RFpicq2fRuAPgXhAozb2Coa1dHuagLeIfRQj8pNQ=;
-        b=TvLWDShbfSD1xi4e2MNkjEG1aTkhpNIFbGRRYIe2P0Rwr3bPAyoLt8u4L+xMeSAWCJ
-         JlX+Fb93wAgYEajUw/YE93d5gIQj28lq0+lB47w3LsHLad7CokdmhWzsejQ0W12C2nd3
-         KGwLejsC0EQ2D+MkhW2ZNHab58mKtmTERFoROuIkNoOIPmYIsbPeaDNHqyHn01ldyrTh
-         M1qa2bZNJf8URVED7MbbrQZ9hdWn5vKQvIvE/XTz1kzzeaA6Kfo4eN+ZAEruRWk1GWIx
-         rP7FxssoIvgDUWFYJfXLs3OPRKQkepZUwp9R17WWxUsXPpvS1du8Wfi5lOGt0jUxWIkK
-         IXvw==
-X-Gm-Message-State: AOAM5314G6XoZbvQut9yRO8dZweT4FOqV3DbP9OtaZUa1V6c+SUIIsTM
-        8ZhzbHM1TbZUpbxTXQlWbOm+5g==
-X-Google-Smtp-Source: ABdhPJx/UEee10lhYSYD3qYfveLX/q/dS1C6S7LjHVDoMUNs4sdEMcr8xQaGtWjRqety3E84OglSew==
-X-Received: by 2002:a63:5b5d:: with SMTP id l29mr2978518pgm.272.1615386295912;
-        Wed, 10 Mar 2021 06:24:55 -0800 (PST)
-Received: from [192.168.10.23] (124-171-107-241.dyn.iinet.net.au. [124.171.107.241])
-        by smtp.gmail.com with UTF8SMTPSA id j3sm3099058pjf.36.2021.03.10.06.24.49
+        bh=LPQFDLvKrDj5V75j3OST6UCIU/ZY4HfSALPlvqp1Wfg=;
+        b=ruhn/0RZZrJnITs5NVWNDoNbdISu0KblbKqKaA5nrKXLF5UTpp936WIHE9Qoh6TLPy
+         33047nHQNjmayxm9sh8q2X7TIW+7awsX4VvHoe0UJe+CVhmfae6GbmB/Jgrg7CrV2uJI
+         volo9OquT/iU/2SJLxCnAC6mQ4raATOk8rRS2k7VhCLNa4tNmDrMSJ4S6ac+tYih49pc
+         PG8/Ga7KBWiTv61d80H6PfYb9buQGghSl/thN5g9AA/fpGkan2TvR5yxER6w6s/dmzTc
+         dYOYKiMjrBi2YztXrezvP4jZyWpPCOWKBvUJEsNHhqTPq/cMOfyfhaWi41P77Cvjp8UC
+         jg+g==
+X-Gm-Message-State: AOAM533MOofkjri45X3m/hOuaaDuX5Q/u0e7Ya+TSk+HhMGB3RurNzAH
+        OspPISq9zzV45GnPUG1VOkJB1OzNkFHbrj8oHMHCKNkbKq4Fr0Epo1FQ0AuGOm8XR55wGbOI4cI
+        ckql/Kq8HGWsg
+X-Received: by 2002:adf:b642:: with SMTP id i2mr3865640wre.8.1615388103108;
+        Wed, 10 Mar 2021 06:55:03 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJwp8IPvog+z5u0xHa71sLbhjUTN4LuYnyJQMDL+lgzE2lfZRrpnQ7PMYA0UId6FUANQ1ovE/g==
+X-Received: by 2002:adf:b642:: with SMTP id i2mr3865612wre.8.1615388102915;
+        Wed, 10 Mar 2021 06:55:02 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id s8sm30974435wrn.97.2021.03.10.06.55.01
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 10 Mar 2021 06:24:55 -0800 (PST)
-Subject: Re: [PATCH 8/9] vfio/pci: export nvlink2 support into vendor vfio_pci
- drivers
-To:     Jason Gunthorpe <jgg@nvidia.com>,
-        Max Gurtovoy <mgurtovoy@nvidia.com>
-Cc:     alex.williamson@redhat.com, cohuck@redhat.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, liranl@nvidia.com, oren@nvidia.com,
-        tzahio@nvidia.com, leonro@nvidia.com, yarong@nvidia.com,
-        aviadye@nvidia.com, shahafs@nvidia.com, artemp@nvidia.com,
-        kwankhede@nvidia.com, ACurrid@nvidia.com, cjia@nvidia.com,
-        yishaih@nvidia.com, mjrosato@linux.ibm.com, hch@lst.de
-References: <20210309083357.65467-1-mgurtovoy@nvidia.com>
- <20210309083357.65467-9-mgurtovoy@nvidia.com>
- <19e73e58-c7a9-03ce-65a7-50f37d52ca15@ozlabs.ru>
- <8941cf42-0c40-776e-6c02-9227146d3d66@nvidia.com>
- <20210310130246.GW2356281@nvidia.com>
-From:   Alexey Kardashevskiy <aik@ozlabs.ru>
-Message-ID: <3b772357-7448-5fa7-9ecc-c13c08df95c3@ozlabs.ru>
-Date:   Thu, 11 Mar 2021 01:24:47 +1100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:85.0) Gecko/20100101
- Thunderbird/85.0
+        Wed, 10 Mar 2021 06:55:02 -0800 (PST)
+Subject: Re: [RFC PATCH 3/4] KVM: stats: Add ioctl commands to pull statistics
+ in binary format
+To:     Jing Zhang <jingzhangos@google.com>, KVM <kvm@vger.kernel.org>,
+        KVM ARM <kvmarm@lists.cs.columbia.edu>,
+        Linux MIPS <linux-mips@vger.kernel.org>,
+        KVM PPC <kvm-ppc@vger.kernel.org>,
+        Linux S390 <linux-s390@vger.kernel.org>,
+        Linux kselftest <linux-kselftest@vger.kernel.org>,
+        Marc Zyngier <maz@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Peter Shier <pshier@google.com>,
+        Oliver Upton <oupton@google.com>,
+        David Rientjes <rientjes@google.com>,
+        Emanuele Giuseppe Esposito <eesposit@redhat.com>
+References: <20210310003024.2026253-1-jingzhangos@google.com>
+ <20210310003024.2026253-4-jingzhangos@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <bb03107c-a413-50da-e228-d338dd471fb3@redhat.com>
+Date:   Wed, 10 Mar 2021 15:55:00 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.7.0
 MIME-Version: 1.0
-In-Reply-To: <20210310130246.GW2356281@nvidia.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+In-Reply-To: <20210310003024.2026253-4-jingzhangos@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On 10/03/21 01:30, Jing Zhang wrote:
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index 383df23514b9..87dd62516c8b 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -3464,6 +3464,51 @@ static long kvm_vcpu_ioctl(struct file *filp,
+>   		r = kvm_arch_vcpu_ioctl_set_fpu(vcpu, fpu);
+>   		break;
+>   	}
+> +	case KVM_STATS_GET_INFO: {
+> +		struct kvm_stats_info stats_info;
+> +
+> +		r = -EFAULT;
+> +		stats_info.num_stats = VCPU_STAT_COUNT;
+> +		if (copy_to_user(argp, &stats_info, sizeof(stats_info)))
+> +			goto out;
+> +		r = 0;
+> +		break;
+> +	}
+> +	case KVM_STATS_GET_NAMES: {
+> +		struct kvm_stats_names stats_names;
+> +
+> +		r = -EFAULT;
+> +		if (copy_from_user(&stats_names, argp, sizeof(stats_names)))
+> +			goto out;
+> +		r = -EINVAL;
+> +		if (stats_names.size < VCPU_STAT_COUNT * KVM_STATS_NAME_LEN)
+> +			goto out;
+> +
+> +		r = -EFAULT;
+> +		if (copy_to_user(argp + sizeof(stats_names),
+> +				kvm_vcpu_stat_strings,
+> +				VCPU_STAT_COUNT * KVM_STATS_NAME_LEN))
 
+The only reason to separate the strings in patch 1 is to pass them here. 
+  But this is a poor API because it imposes a limit on the length of the 
+statistics, and makes that length part of the binary interface.
 
-On 11/03/2021 00:02, Jason Gunthorpe wrote:
-> On Wed, Mar 10, 2021 at 02:57:57PM +0200, Max Gurtovoy wrote:
-> 
->>>> +    .err_handler        = &vfio_pci_core_err_handlers,
->>>> +};
->>>> +
->>>> +#ifdef CONFIG_VFIO_PCI_DRIVER_COMPAT
->>>> +struct pci_driver *get_nvlink2gpu_vfio_pci_driver(struct pci_dev *pdev)
->>>> +{
->>>> +    if (pci_match_id(nvlink2gpu_vfio_pci_driver.id_table, pdev))
->>>> +        return &nvlink2gpu_vfio_pci_driver;
->>>
->>>
->>> Why do we need matching PCI ids here instead of looking at the FDT which
->>> will work better?
->>
->> what is FDT ? any is it better to use it instead of match_id ?
-> 
-> This is emulating the device_driver match for the pci_driver.
+I would prefer a completely different interface, where you have a file 
+descriptor that can be created and associated to a vCPU or VM (or even 
+to /dev/kvm).  Having a file descriptor is important because the fd can 
+be passed to a less-privileged process that takes care of gathering the 
+metrics
 
+The result of reading the file descriptor could be either ASCII or 
+binary.  IMO the real cost lies in opening and reading a multitude of 
+files rather than in the ASCII<->binary conversion.
 
-No it is not, it is a device tree info which lets to skip the linux PCI 
-discovery part (the firmware does it anyway) but it tells nothing about 
-which drivers to bind.
+The format could be one of the following:
 
+* binary:
 
-> I don't think we can combine FDT matching with pci_driver, can we?
+4 bytes flags (always zero)
+4 bytes number of statistics
+4 bytes offset of the first stat description
+4 bytes offset of the first stat value
+stat descriptions:
+   - 4 bytes for the type (for now always zero: uint64_t)
+   - 4 bytes for the flags (for now always zero)
+   - length of name
+   - name
+statistics in 64-bit format
 
-It is a c function calling another c function, all within vfio-pci, this 
-is not called by the generic pci code.
+* text:
 
+stat1_name uint64 123
+stat2_name uint64 456
+...
 
+What do you think?
 
--- 
-Alexey
+Paolo
+
