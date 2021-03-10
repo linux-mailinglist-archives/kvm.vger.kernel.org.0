@@ -2,25 +2,25 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DF169333A76
-	for <lists+kvm@lfdr.de>; Wed, 10 Mar 2021 11:44:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 37005333A77
+	for <lists+kvm@lfdr.de>; Wed, 10 Mar 2021 11:44:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232633AbhCJKm4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 10 Mar 2021 05:42:56 -0500
-Received: from mail.kernel.org ([198.145.29.99]:42862 "EHLO mail.kernel.org"
+        id S232729AbhCJKm5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 10 Mar 2021 05:42:57 -0500
+Received: from mail.kernel.org ([198.145.29.99]:42876 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232566AbhCJKmY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 10 Mar 2021 05:42:24 -0500
+        id S232563AbhCJKmZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 10 Mar 2021 05:42:25 -0500
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 3B73564F51;
+        by mail.kernel.org (Postfix) with ESMTPSA id 64F4664FE1;
         Wed, 10 Mar 2021 10:42:24 +0000 (UTC)
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.lan)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.94)
         (envelope-from <maz@kernel.org>)
-        id 1lJwII-000jdD-1H; Wed, 10 Mar 2021 10:42:22 +0000
+        id 1lJwII-000jdD-Jy; Wed, 10 Mar 2021 10:42:22 +0000
 From:   Marc Zyngier <maz@kernel.org>
 To:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
         kvm@vger.kernel.org
@@ -32,10 +32,12 @@ Cc:     James Morse <james.morse@arm.com>,
         Eric Auger <eric.auger@redhat.com>,
         Alexandru Elisei <alexandru.elisei@arm.com>,
         kernel-team@android.com
-Subject: [PATCH v2 0/2] KVM: arm64: Assorted IPA size fixes
-Date:   Wed, 10 Mar 2021 10:42:06 +0000
-Message-Id: <20210310104208.3819061-1-maz@kernel.org>
+Subject: [PATCH v2 1/2] KVM: arm64: Reject VM creation when the default IPA size is unsupported
+Date:   Wed, 10 Mar 2021 10:42:07 +0000
+Message-Id: <20210310104208.3819061-2-maz@kernel.org>
 X-Mailer: git-send-email 2.29.2
+In-Reply-To: <20210310104208.3819061-1-maz@kernel.org>
+References: <20210310104208.3819061-1-maz@kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 62.31.163.78
@@ -46,42 +48,83 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This is a rework of an initial patch posted a couple of days back[1]
+KVM/arm64 has forever used a 40bit default IPA space, partially
+due to its 32bit heritage (where the only choice is 40bit).
 
-While working on enabling KVM on "reduced IPA size" systems, I realise
-we have a couple of issues, some of while do impact userspace.
+However, there are implementations in the wild that have a *cough*
+much smaller *cough* IPA space, which leads to a misprogramming of
+VTCR_EL2, and a guest that is stuck on its first memory access
+if userspace dares to ask for the default IPA setting (which most
+VMMs do).
 
-The first issue is that we accept the creation of a "default IPA size"
-VM (40 bits) even when the HW doesn't support it. Not good.
+Instead, blundly reject the creation of such VM, as we can't
+satisfy the requirements from userspace (with a one-off warning).
+Also clarify the boot warning, and document that the VM creation
+will fail when an unsupported IPA size is probided.
 
-The second one is that we disallow a memslot to end right where the
-IPA limit is. One page less and you're good, but that's not quite what
-it should be.
+Although this is an ABI change, it doesn't really change much
+for userspace:
 
-I intend for both patches to be backported to -stable.
+- the guest couldn't run before this change, but no error was
+  returned. At least userspace knows what is happening.
 
-Thanks,
+- a memory slot that was accepted because it did fit the default
+  IPA space now doesn't even get a chance to be registered.
 
-	M.
+The other thing that is left doing is to convince userspace to
+actually use the IPA space setting instead of relying on the
+antiquated default.
 
-* From v1:
-  - Don't try to cap the default IPA size. If userspace uses 0 with an
-    expectation that it will get 40bits, we should abide by it and
-    return an error immediately (noticed by Andrew)
-  - Added a new patch to fix the exclusive nature of the IPA limit
-  
-[1] https://lore.kernel.org/r/20210308174643.761100-1-maz@kernel.org
-
-Marc Zyngier (2):
-  KVM: arm64: Reject VM creation when the default IPA size is
-    unsupported
-  KVM: arm64: Fix exclusive limit for IPA size
-
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+---
  Documentation/virt/kvm/api.rst |  3 +++
- arch/arm64/kvm/mmu.c           |  3 +--
  arch/arm64/kvm/reset.c         | 12 ++++++++----
- 3 files changed, 12 insertions(+), 6 deletions(-)
+ 2 files changed, 11 insertions(+), 4 deletions(-)
 
+diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+index 1a2b5210cdbf..38e327d4b479 100644
+--- a/Documentation/virt/kvm/api.rst
++++ b/Documentation/virt/kvm/api.rst
+@@ -182,6 +182,9 @@ is dependent on the CPU capability and the kernel configuration. The limit can
+ be retrieved using KVM_CAP_ARM_VM_IPA_SIZE of the KVM_CHECK_EXTENSION
+ ioctl() at run-time.
+ 
++Creation of the VM will fail if the requested IPA size (whether it is
++implicit or explicit) is unsupported on the host.
++
+ Please note that configuring the IPA size does not affect the capability
+ exposed by the guest CPUs in ID_AA64MMFR0_EL1[PARange]. It only affects
+ size of the address translated by the stage2 level (guest physical to
+diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
+index 47f3f035f3ea..f1a38405934e 100644
+--- a/arch/arm64/kvm/reset.c
++++ b/arch/arm64/kvm/reset.c
+@@ -324,10 +324,9 @@ int kvm_set_ipa_limit(void)
+ 	}
+ 
+ 	kvm_ipa_limit = id_aa64mmfr0_parange_to_phys_shift(parange);
+-	WARN(kvm_ipa_limit < KVM_PHYS_SHIFT,
+-	     "KVM IPA Size Limit (%d bits) is smaller than default size\n",
+-	     kvm_ipa_limit);
+-	kvm_info("IPA Size Limit: %d bits\n", kvm_ipa_limit);
++	kvm_info("IPA Size Limit: %d bits%s\n", kvm_ipa_limit,
++		 ((kvm_ipa_limit < KVM_PHYS_SHIFT) ?
++		  " (Reduced IPA size, limited VM/VMM compatibility)" : ""));
+ 
+ 	return 0;
+ }
+@@ -356,6 +355,11 @@ int kvm_arm_setup_stage2(struct kvm *kvm, unsigned long type)
+ 			return -EINVAL;
+ 	} else {
+ 		phys_shift = KVM_PHYS_SHIFT;
++		if (phys_shift > kvm_ipa_limit) {
++			pr_warn_once("%s using unsupported default IPA limit, upgrade your VMM\n",
++				     current->comm, kvm_ipa_limit);
++			return -EINVAL;
++		}
+ 	}
+ 
+ 	mmfr0 = read_sanitised_ftr_reg(SYS_ID_AA64MMFR0_EL1);
 -- 
 2.29.2
 
