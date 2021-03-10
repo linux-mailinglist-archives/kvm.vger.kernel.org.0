@@ -2,102 +2,183 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5C8D53349B0
-	for <lists+kvm@lfdr.de>; Wed, 10 Mar 2021 22:14:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5A0C33349F4
+	for <lists+kvm@lfdr.de>; Wed, 10 Mar 2021 22:42:50 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232064AbhCJVOI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 10 Mar 2021 16:14:08 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34692 "EHLO
+        id S232087AbhCJVmR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 10 Mar 2021 16:42:17 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40668 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232032AbhCJVN7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 10 Mar 2021 16:13:59 -0500
-Received: from mail-pl1-x62f.google.com (mail-pl1-x62f.google.com [IPv6:2607:f8b0:4864:20::62f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CF5E0C061574
-        for <kvm@vger.kernel.org>; Wed, 10 Mar 2021 13:13:59 -0800 (PST)
-Received: by mail-pl1-x62f.google.com with SMTP id d8so9109151plg.10
-        for <kvm@vger.kernel.org>; Wed, 10 Mar 2021 13:13:59 -0800 (PST)
+        with ESMTP id S232056AbhCJVmA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 10 Mar 2021 16:42:00 -0500
+Received: from mail-lf1-x135.google.com (mail-lf1-x135.google.com [IPv6:2a00:1450:4864:20::135])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AD66DC061762
+        for <kvm@vger.kernel.org>; Wed, 10 Mar 2021 13:41:59 -0800 (PST)
+Received: by mail-lf1-x135.google.com with SMTP id x4so29391449lfu.7
+        for <kvm@vger.kernel.org>; Wed, 10 Mar 2021 13:41:59 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=kAXMqxdxdneWktNp5H67SJO5q7mXClNQldO77UatuMM=;
-        b=JMi1ZJRd3xHeYXZB52qu1XGvcIRoIVcM96RSTrU4DQg+c3jwejgLhkpKQWBOIWwujC
-         1Zk1YhNZFbY6/ft8doAGhhJ2kJyr+mB5NQiiIKaoMUhF0xKKATP6rgwDmXwZtvYZdiRZ
-         /D1UDNW+VdFUqyEFyaTj2F2oSKF5jFIesVrtCJeKtz9UQ+Ig4xQJV4MSofP8DNR9qQKQ
-         I2cfYqjgWnzvrafQ8wTjC2KKqC4oZCy7C3ZuCLhZsitQ2C5Rg0K3KUhPpEDbWp/kghQh
-         XizeeaISFSU8hzCWqJZZ5EOx2tlkX6Ib+EctWag9rgzC+dKzL38yGJdhtcT7SdHhOB65
-         NdgA==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=1aCWly0eHYOBMX2QbB2MVQEtisRq+kLH3ylpaLZI0cc=;
+        b=BwXgkRlIC4KTvskQmfIRT1UpL8FUSVcbmMR/10Xjal9SvwnJMSNCtMz4ebGfjZEpwl
+         HCKgLGqmaBchqQkax5bvx+rjJAcaO8g0WZ2ZWmXxQ4vS1uLC6HEi952fLlwgPn3Wd4/q
+         vqoybvVvV+lDlyFafHyb1AQmj59H1UWu6vilft7PMlZn1CkgPU9esxjzW1aIIW+ywWBj
+         Udj5I9gR1kMtWjutL1NRbhChAuUHbUnPbNGqzqbYkjkbI7sy94gi6OuNkgkvUFI0515F
+         8abSIYRh9W1om06VP1Y1rY1/9BRsh8VfgJuLmZ+BZIgJ3nbpC1hAYP0ed0rHqB2zazZ5
+         +JZw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=kAXMqxdxdneWktNp5H67SJO5q7mXClNQldO77UatuMM=;
-        b=QBMXLjNvWS3aVrNKmyeUEjWAXfbyEZX6uAt3Yh9IWdAD7Oe1XhEiS4O9NaAK1q6dR/
-         BM+mjf+knCFROQBtfR8Be35KEbbQo+CpG2MenDz6kYi23aqoJYVDaOHl+Jhng7EKmr/F
-         HCVZK9OO04uCasek1+RsiF3uNdUVX8KeBCvDBawbEiZR6Z4t6jvUm6ZvDljGCSDRk7LV
-         IuH6E4/yy2TTv49FrTlwVIo3E8h1e7tjXZ0tsM91ZLF1vATEFx8L928glLR5q7S23jgw
-         KOuueTj56gy846/MFINnwLWd/mGL1swL7kRO0o8u5LIQalLLe3nqw6VATamImGzrykVj
-         oudA==
-X-Gm-Message-State: AOAM533hlx3j0a5LZNfI6erM589l7pFcmc5af3v9qlwCNf9VEMnkiZks
-        hoxZBRXnp3VaqzweBdrsZIUdmw==
-X-Google-Smtp-Source: ABdhPJyH62glBEwklUAhJ9Knc5yX1P0ERojERB5UvOQmfV5bJhw/HVriZa6AQuZHQ9BY6xyA099ahw==
-X-Received: by 2002:a17:902:e906:b029:e5:c6d2:7dd0 with SMTP id k6-20020a170902e906b02900e5c6d27dd0mr4759310pld.12.1615410838821;
-        Wed, 10 Mar 2021 13:13:58 -0800 (PST)
-Received: from google.com ([2620:15c:f:10:e4dd:6c31:9463:f8da])
-        by smtp.gmail.com with ESMTPSA id u17sm364023pgl.80.2021.03.10.13.13.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 10 Mar 2021 13:13:58 -0800 (PST)
-Date:   Wed, 10 Mar 2021 13:13:52 -0800
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Ben Gardon <bgardon@google.com>
-Subject: Re: [PATCH] KVM: x86/mmu: Skip !MMU-present SPTEs when removing SP
- in exclusive mode
-Message-ID: <YEk2kBRUriFlCM62@google.com>
-References: <20210310003029.1250571-1-seanjc@google.com>
- <07cf7833-c74a-9ae0-6895-d74708b97f68@redhat.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=1aCWly0eHYOBMX2QbB2MVQEtisRq+kLH3ylpaLZI0cc=;
+        b=WLwoIYW7nCeQRg1RgT6bXIZ9zx22btqCTHBGCwy6GvyGmV8zbBxDV7sUHEUhvtMocg
+         RJo8+xUDsRJAYdTjmOCt8KTOZ+ie9KoApvuszUV09OxaLH4a/dro9vZQz4itP+ZnCOcf
+         Q9Aw15Dt0cHNP4E/mojgkjIiJXSToBWI7Qig9OJhHepUp8AIeHqxYUjCCJLQEpcUkcrp
+         qX4+RybR/xG1iIcH1LU/qXA4spgt51wBrc9awP1H1FyWWpe54oR8LlZ78sLnEdr4HJha
+         D07Yjeo+7B9xqTR47wAsv8ynPpx23YgYpDpOpsRwc4n+CWTu+JvGkVpYgn2eDfStb4Kp
+         xspg==
+X-Gm-Message-State: AOAM531WFzOHVyfYhBZBSvJM9sVOmDjnyKrn+28OfxGR4G4BkWA2uy2a
+        HoDR7TFJN2QxzleBaWB6wk6XgeY8nJEA1HLXgAromX6VvVUx7g==
+X-Google-Smtp-Source: ABdhPJzddr7Z3ChXsEeTaXJHTGvoL/NEnML3O1DtWcsC2600kv1w2ebi95vsyLg0smm0e43j3ORQP/5lcH5lDtVqU9E=
+X-Received: by 2002:a05:6512:32ab:: with SMTP id q11mr306450lfe.106.1615412517738;
+ Wed, 10 Mar 2021 13:41:57 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <07cf7833-c74a-9ae0-6895-d74708b97f68@redhat.com>
+References: <20210310003024.2026253-1-jingzhangos@google.com>
+ <20210310003024.2026253-4-jingzhangos@google.com> <bb03107c-a413-50da-e228-d338dd471fb3@redhat.com>
+In-Reply-To: <bb03107c-a413-50da-e228-d338dd471fb3@redhat.com>
+From:   Jing Zhang <jingzhangos@google.com>
+Date:   Wed, 10 Mar 2021 15:41:46 -0600
+Message-ID: <CAAdAUtjj52+cAhD4KUzAaqrMSJXHD0g=ecQNG-a92Mqn3BCxiQ@mail.gmail.com>
+Subject: Re: [RFC PATCH 3/4] KVM: stats: Add ioctl commands to pull statistics
+ in binary format
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     KVM <kvm@vger.kernel.org>, KVM ARM <kvmarm@lists.cs.columbia.edu>,
+        Linux MIPS <linux-mips@vger.kernel.org>,
+        KVM PPC <kvm-ppc@vger.kernel.org>,
+        Linux S390 <linux-s390@vger.kernel.org>,
+        Linux kselftest <linux-kselftest@vger.kernel.org>,
+        Marc Zyngier <maz@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Peter Shier <pshier@google.com>,
+        Oliver Upton <oupton@google.com>,
+        David Rientjes <rientjes@google.com>,
+        Emanuele Giuseppe Esposito <eesposit@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Mar 10, 2021, Paolo Bonzini wrote:
-> On 10/03/21 01:30, Sean Christopherson wrote:
-> > diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-> > index 50ef757c5586..f0c99fa04ef2 100644
-> > --- a/arch/x86/kvm/mmu/tdp_mmu.c
-> > +++ b/arch/x86/kvm/mmu/tdp_mmu.c
-> > @@ -323,7 +323,18 @@ static void handle_removed_tdp_mmu_page(struct kvm *kvm, u64 *pt,
-> >   				cpu_relax();
-> >   			}
-> >   		} else {
-> > +			/*
-> > +			 * If the SPTE is not MMU-present, there is no backing
-> > +			 * page associated with the SPTE and so no side effects
-> > +			 * that need to be recorded, and exclusive ownership of
-> > +			 * mmu_lock ensures the SPTE can't be made present.
-> > +			 * Note, zapping MMIO SPTEs is also unnecessary as they
-> > +			 * are guarded by the memslots generation, not by being
-> > +			 * unreachable.
-> > +			 */
-> >   			old_child_spte = READ_ONCE(*sptep);
-> > +			if (!is_shadow_present_pte(old_child_spte))
-> > +				continue;
-> >   			/*
-> >   			 * Marking the SPTE as a removed SPTE is not
-> 
-> Ben, do you plan to make this path take mmu_lock for read?  If so, this
-> wouldn't be too useful IIUC.
+Hi Paolo,
 
-I can see kvm_mmu_zap_all_fast()->kvm_tdp_mmu_zap_all() moving to a shared-mode
-flow, but I don't think we'll ever want to move away from exclusive-mode zapping
-for kvm_arch_flush_shadow_all()->kvm_mmu_zap_all()->kvm_tdp_mmu_zap_all().  In
-that case, the VM is dead or dying; freeing memory should be done as quickly as
-possible.
+On Wed, Mar 10, 2021 at 8:55 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+> On 10/03/21 01:30, Jing Zhang wrote:
+> > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> > index 383df23514b9..87dd62516c8b 100644
+> > --- a/virt/kvm/kvm_main.c
+> > +++ b/virt/kvm/kvm_main.c
+> > @@ -3464,6 +3464,51 @@ static long kvm_vcpu_ioctl(struct file *filp,
+> >               r = kvm_arch_vcpu_ioctl_set_fpu(vcpu, fpu);
+> >               break;
+> >       }
+> > +     case KVM_STATS_GET_INFO: {
+> > +             struct kvm_stats_info stats_info;
+> > +
+> > +             r = -EFAULT;
+> > +             stats_info.num_stats = VCPU_STAT_COUNT;
+> > +             if (copy_to_user(argp, &stats_info, sizeof(stats_info)))
+> > +                     goto out;
+> > +             r = 0;
+> > +             break;
+> > +     }
+> > +     case KVM_STATS_GET_NAMES: {
+> > +             struct kvm_stats_names stats_names;
+> > +
+> > +             r = -EFAULT;
+> > +             if (copy_from_user(&stats_names, argp, sizeof(stats_names)))
+> > +                     goto out;
+> > +             r = -EINVAL;
+> > +             if (stats_names.size < VCPU_STAT_COUNT * KVM_STATS_NAME_LEN)
+> > +                     goto out;
+> > +
+> > +             r = -EFAULT;
+> > +             if (copy_to_user(argp + sizeof(stats_names),
+> > +                             kvm_vcpu_stat_strings,
+> > +                             VCPU_STAT_COUNT * KVM_STATS_NAME_LEN))
+>
+> The only reason to separate the strings in patch 1 is to pass them here.
+>   But this is a poor API because it imposes a limit on the length of the
+> statistics, and makes that length part of the binary interface.
+Agreed. I am considering returning the length of stats name strings in
+the kvm_stats_info structure instead of exporting it as a constant in uapi,
+which would put no limit on the length of the stats name strings.
+>
+> I would prefer a completely different interface, where you have a file
+> descriptor that can be created and associated to a vCPU or VM (or even
+> to /dev/kvm).  Having a file descriptor is important because the fd can
+> be passed to a less-privileged process that takes care of gathering the
+> metrics
+Separate file descriptor solution is very tempting. We are still considering it
+seriously. Our biggest concern is that the metrics gathering/handling process
+is not necessary running on the same node as the one file descriptor belongs to.
+It scales better to pass metrics data directly than to pass file descriptors.
+>
+> The result of reading the file descriptor could be either ASCII or
+> binary.  IMO the real cost lies in opening and reading a multitude of
+> files rather than in the ASCII<->binary conversion.
+Agreed.
+>
+> The format could be one of the following:
+>
+> * binary:
+>
+> 4 bytes flags (always zero)
+> 4 bytes number of statistics
+> 4 bytes offset of the first stat description
+> 4 bytes offset of the first stat value
+> stat descriptions:
+>    - 4 bytes for the type (for now always zero: uint64_t)
+>    - 4 bytes for the flags (for now always zero)
+>    - length of name
+>    - name
+> statistics in 64-bit format
+>
+> * text:
+>
+> stat1_name uint64 123
+> stat2_name uint64 456
+> ...
+>
+> What do you think?
+The binary format presented above is very flexible. I understand why it is
+organized this way.
+In our situation, the metrics data could be pulled periodically as short as
+half second. They are used by different kinds of monitors/triggers/alerts.
+To enhance efficiency and reduce traffic caused by metrics passing, we
+treat all metrics info/data as two kinds. One is immutable information,
+which doesn't change in a given system boot. The other is mutable
+data (statistics data), which is pulled/transferred periodically at a high
+frequency.
+
+>
+> Paolo
+>
+
+Thanks,
+Jing
