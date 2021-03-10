@@ -2,350 +2,795 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6A04D3335DB
-	for <lists+kvm@lfdr.de>; Wed, 10 Mar 2021 07:35:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4AA4A3335F4
+	for <lists+kvm@lfdr.de>; Wed, 10 Mar 2021 07:40:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230468AbhCJGfG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 10 Mar 2021 01:35:06 -0500
-Received: from szxga06-in.huawei.com ([45.249.212.32]:13900 "EHLO
-        szxga06-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229803AbhCJGeq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 10 Mar 2021 01:34:46 -0500
-Received: from DGGEMS413-HUB.china.huawei.com (unknown [172.30.72.58])
-        by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4DwMhb3RfczjWpQ;
-        Wed, 10 Mar 2021 14:33:03 +0800 (CST)
-Received: from [10.174.184.135] (10.174.184.135) by
- DGGEMS413-HUB.china.huawei.com (10.3.19.213) with Microsoft SMTP Server id
- 14.3.498.0; Wed, 10 Mar 2021 14:34:20 +0800
-Subject: Re: [RFC PATCH v2 1/6] iommu: Evolve to support more scenarios of
- using IOPF
-To:     Lu Baolu <baolu.lu@linux.intel.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Will Deacon <will@kernel.org>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Jean-Philippe Brucker <jean-philippe@linaro.org>,
-        "Eric Auger" <eric.auger@redhat.com>, <kvm@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>,
-        <iommu@lists.linux-foundation.org>, <linux-api@vger.kernel.org>
-CC:     Kevin Tian <kevin.tian@intel.com>, <yi.l.liu@intel.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Jonathan Cameron <Jonathan.Cameron@huawei.com>,
-        "Barry Song" <song.bao.hua@hisilicon.com>,
-        <wanghaibin.wang@huawei.com>, <yuzenghui@huawei.com>,
-        <zhukeqian1@huawei.com>
-References: <20210309062207.505-1-lushenming@huawei.com>
- <20210309062207.505-2-lushenming@huawei.com>
- <7f8daef9-36db-f67c-a3e2-b96b5fa70291@linux.intel.com>
-From:   Shenming Lu <lushenming@huawei.com>
-Message-ID: <7479e543-1598-459d-4838-50a6f1c3770b@huawei.com>
-Date:   Wed, 10 Mar 2021 14:34:19 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.2.2
+        id S229543AbhCJGk0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 10 Mar 2021 01:40:26 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42510 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229763AbhCJGjz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 10 Mar 2021 01:39:55 -0500
+Received: from mail-pf1-x42f.google.com (mail-pf1-x42f.google.com [IPv6:2607:f8b0:4864:20::42f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 96254C06174A
+        for <kvm@vger.kernel.org>; Tue,  9 Mar 2021 22:39:55 -0800 (PST)
+Received: by mail-pf1-x42f.google.com with SMTP id x7so7936380pfi.7
+        for <kvm@vger.kernel.org>; Tue, 09 Mar 2021 22:39:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ozlabs-ru.20150623.gappssmtp.com; s=20150623;
+        h=message-id:date:mime-version:user-agent:subject:content-language:to
+         :cc:references:from:in-reply-to:content-transfer-encoding;
+        bh=pJIeycRyBl82zbIOkGj5+nVx2KP+L5NlE3vNx7mXURE=;
+        b=zdL5sglidjUtdRdTs8aGMnK/66nxn6CvMkbKwSW/KbNv2Se1/qr+M5e1JFQ/HBoQAC
+         dpRkSEFeDzbJ6ibaWMai/XgCaHSp6ev2Yv6D6YzLBh6lkgREhHXDOmUfUs4lwCyU8LcC
+         TuEbJG1PMREZTZ+kUgn7G1XcC50In6yziJlgO76Ns+CDvgRHN63SP9Mac3Re+/KTQ6Q3
+         JK1Fu/1KQTolsGPeHtcntJgFZr93GvzNPc+sCiTwTveFTy+VrUwvUDs1MSVxv3Jw8AgK
+         5pIDoA+BI1u8m2XdZppJEmqAdYI/U13xyVm1sThvYomcHJGgV6pjN0yt+/XdprH3L4gL
+         jxgQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=pJIeycRyBl82zbIOkGj5+nVx2KP+L5NlE3vNx7mXURE=;
+        b=mkqXyvHJx7lQRX3gwEXzLyM4rvajwzBTC1vRwyQP7at+e7bnwy6rUSBVsUgHi8r2wB
+         E/KICZyksWQQLog/vrwcJgecQRlQAm1hd1XXVMY+RcPjocl8XUs0tj+/SU3XDoFs9zLn
+         rZMl9RBJQJ71n3umCQw4fO7vpqk3IusXdiD7Ok0oHb6LSQhGXLbMFXWmBIbXHlLpYljT
+         H+XsGW193PBBKEpxo+yYTmbGtT71FyI6FJSYPhpEesByGyy49v6TUe/9njc3fMIEcVGc
+         EBCwGo7K5ctaYWjaBLYE8auV7bkKw+1GD9Mo9kTS7AKEQv+wxHyg9EuH/wfBmEXTig/L
+         jBkg==
+X-Gm-Message-State: AOAM531b9nZ11RcfhUPwrd3rNtRfIkLgjDtK3wimeURvHZlL//eLeTO0
+        C+VK8T8u+PqRHcXjvXzh2KjTZw==
+X-Google-Smtp-Source: ABdhPJzLW/XuN4VRIXFwLDljUjmg+QpTLcEUxj0ImuwYBqep6/x6QK0dsd7DnrFmcq3SWS+gQQchRg==
+X-Received: by 2002:a63:1b01:: with SMTP id b1mr1516007pgb.330.1615358394952;
+        Tue, 09 Mar 2021 22:39:54 -0800 (PST)
+Received: from [192.168.10.153] (124-171-107-241.dyn.iinet.net.au. [124.171.107.241])
+        by smtp.gmail.com with UTF8SMTPSA id t16sm14048749pfc.204.2021.03.09.22.39.47
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 09 Mar 2021 22:39:54 -0800 (PST)
+Message-ID: <19e73e58-c7a9-03ce-65a7-50f37d52ca15@ozlabs.ru>
+Date:   Wed, 10 Mar 2021 17:39:45 +1100
 MIME-Version: 1.0
-In-Reply-To: <7f8daef9-36db-f67c-a3e2-b96b5fa70291@linux.intel.com>
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:85.0) Gecko/20100101
+ Thunderbird/85.0
+Subject: Re: [PATCH 8/9] vfio/pci: export nvlink2 support into vendor vfio_pci
+ drivers
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.174.184.135]
-X-CFilter-Loop: Reflected
+To:     Max Gurtovoy <mgurtovoy@nvidia.com>, jgg@nvidia.com,
+        alex.williamson@redhat.com, cohuck@redhat.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Cc:     liranl@nvidia.com, oren@nvidia.com, tzahio@nvidia.com,
+        leonro@nvidia.com, yarong@nvidia.com, aviadye@nvidia.com,
+        shahafs@nvidia.com, artemp@nvidia.com, kwankhede@nvidia.com,
+        ACurrid@nvidia.com, cjia@nvidia.com, yishaih@nvidia.com,
+        mjrosato@linux.ibm.com, hch@lst.de
+References: <20210309083357.65467-1-mgurtovoy@nvidia.com>
+ <20210309083357.65467-9-mgurtovoy@nvidia.com>
+From:   Alexey Kardashevskiy <aik@ozlabs.ru>
+In-Reply-To: <20210309083357.65467-9-mgurtovoy@nvidia.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Baolu,
 
-On 2021/3/10 10:09, Lu Baolu wrote:
-> Hi Shenming,
+
+On 09/03/2021 19:33, Max Gurtovoy wrote:
+> The new drivers introduced are nvlink2gpu_vfio_pci.ko and
+> npu2_vfio_pci.ko.
+> The first will be responsible for providing special extensions for
+> NVIDIA GPUs with NVLINK2 support for P9 platform (and others in the
+> future). The last will be responsible for POWER9 NPU2 unit (NVLink2 host
+> bus adapter).
 > 
-> On 3/9/21 2:22 PM, Shenming Lu wrote:
->> This patch follows the discussion here:
->>
->> https://lore.kernel.org/linux-acpi/YAaxjmJW+ZMvrhac@myrica/
->>
->> In order to support more scenarios of using IOPF (mainly consider
->> the nested extension), besides keeping IOMMU_DEV_FEAT_IOPF as a
->> general capability for whether delivering faults through the IOMMU,
->> we extend iommu_register_fault_handler() with flags and introduce
->> IOPF_REPORT_FLAT and IOPF_REPORT_NESTED to describe the page fault
->> reporting capability under a specific configuration.
->> IOPF_REPORT_NESTED needs additional info to indicate which level/stage
->> is concerned since the fault client may be interested in only one
->> level.
->>
->> Signed-off-by: Shenming Lu <lushenming@huawei.com>
->> ---
->>   .../iommu/arm/arm-smmu-v3/arm-smmu-v3-sva.c   |  3 +-
->>   drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c   | 11 ++--
->>   drivers/iommu/io-pgfault.c                    |  4 --
->>   drivers/iommu/iommu.c                         | 56 ++++++++++++++++++-
->>   include/linux/iommu.h                         | 21 ++++++-
->>   include/uapi/linux/iommu.h                    |  3 +
->>   6 files changed, 85 insertions(+), 13 deletions(-)
->>
->> diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3-sva.c b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3-sva.c
->> index ee66d1f4cb81..5de9432349d4 100644
->> --- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3-sva.c
->> +++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3-sva.c
->> @@ -482,7 +482,8 @@ static int arm_smmu_master_sva_enable_iopf(struct arm_smmu_master *master)
->>       if (ret)
->>           return ret;
->>   -    ret = iommu_register_device_fault_handler(dev, iommu_queue_iopf, dev);
->> +    ret = iommu_register_device_fault_handler(dev, iommu_queue_iopf,
->> +                          IOPF_REPORT_FLAT, dev);
->>       if (ret) {
->>           iopf_queue_remove_device(master->smmu->evtq.iopf, dev);
->>           return ret;
->> diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
->> index 363744df8d51..f40529d0075d 100644
->> --- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
->> +++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
->> @@ -1447,10 +1447,6 @@ static int arm_smmu_handle_evt(struct arm_smmu_device *smmu, u64 *evt)
->>           return -EOPNOTSUPP;
->>       }
->>   -    /* Stage-2 is always pinned at the moment */
->> -    if (evt[1] & EVTQ_1_S2)
->> -        return -EFAULT;
->> -
->>       if (evt[1] & EVTQ_1_RnW)
->>           perm |= IOMMU_FAULT_PERM_READ;
->>       else
->> @@ -1468,13 +1464,18 @@ static int arm_smmu_handle_evt(struct arm_smmu_device *smmu, u64 *evt)
->>               .flags = IOMMU_FAULT_PAGE_REQUEST_LAST_PAGE,
->>               .grpid = FIELD_GET(EVTQ_1_STAG, evt[1]),
->>               .perm = perm,
->> -            .addr = FIELD_GET(EVTQ_2_ADDR, evt[2]),
->>           };
->>             if (ssid_valid) {
->>               flt->prm.flags |= IOMMU_FAULT_PAGE_REQUEST_PASID_VALID;
->>               flt->prm.pasid = FIELD_GET(EVTQ_0_SSID, evt[0]);
->>           }
->> +
->> +        if (evt[1] & EVTQ_1_S2) {
->> +            flt->prm.flags |= IOMMU_FAULT_PAGE_REQUEST_L2;
->> +            flt->prm.addr = FIELD_GET(EVTQ_3_IPA, evt[3]);
->> +        } else
->> +            flt->prm.addr = FIELD_GET(EVTQ_2_ADDR, evt[2]);
->>       } else {
->>           flt->type = IOMMU_FAULT_DMA_UNRECOV;
->>           flt->event = (struct iommu_fault_unrecoverable) {
->> diff --git a/drivers/iommu/io-pgfault.c b/drivers/iommu/io-pgfault.c
->> index 1df8c1dcae77..abf16e06bcf5 100644
->> --- a/drivers/iommu/io-pgfault.c
->> +++ b/drivers/iommu/io-pgfault.c
->> @@ -195,10 +195,6 @@ int iommu_queue_iopf(struct iommu_fault *fault, void *cookie)
->>         lockdep_assert_held(&param->lock);
->>   -    if (fault->type != IOMMU_FAULT_PAGE_REQ)
->> -        /* Not a recoverable page fault */
->> -        return -EOPNOTSUPP;
->> -
+> Also, preserve backward compatibility for users that were binding
+> NVLINK2 devices to vfio_pci.ko. Hopefully this compatibility layer will
+> be dropped in the future
 > 
-> Any reasons why do you want to remove this check?
-
-My thought was to make the reporting cap more detailed: IOPF_REPORT_ is only for recoverable
-page faults (IOMMU_FAULT_PAGE_REQ), and we may add UNRECOV_FAULT_REPORT_ later for unrecoverable
-faults (IOMMU_FAULT_DMA_UNRECOV)...
-
+> Signed-off-by: Max Gurtovoy <mgurtovoy@nvidia.com>
+> ---
+>   drivers/vfio/pci/Kconfig                      |  28 +++-
+>   drivers/vfio/pci/Makefile                     |   7 +-
+>   .../pci/{vfio_pci_npu2.c => npu2_vfio_pci.c}  | 144 ++++++++++++++++-
+>   drivers/vfio/pci/npu2_vfio_pci.h              |  24 +++
+>   ...pci_nvlink2gpu.c => nvlink2gpu_vfio_pci.c} | 149 +++++++++++++++++-
+>   drivers/vfio/pci/nvlink2gpu_vfio_pci.h        |  24 +++
+>   drivers/vfio/pci/vfio_pci.c                   |  61 ++++++-
+>   drivers/vfio/pci/vfio_pci_core.c              |  18 ---
+>   drivers/vfio/pci/vfio_pci_core.h              |  14 --
+>   9 files changed, 422 insertions(+), 47 deletions(-)
+>   rename drivers/vfio/pci/{vfio_pci_npu2.c => npu2_vfio_pci.c} (64%)
+>   create mode 100644 drivers/vfio/pci/npu2_vfio_pci.h
+>   rename drivers/vfio/pci/{vfio_pci_nvlink2gpu.c => nvlink2gpu_vfio_pci.c} (67%)
+>   create mode 100644 drivers/vfio/pci/nvlink2gpu_vfio_pci.h
 > 
->>       /*
->>        * As long as we're holding param->lock, the queue can't be unlinked
->>        * from the device and therefore cannot disappear.
->> diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
->> index d0b0a15dba84..cb1d93b00f7d 100644
->> --- a/drivers/iommu/iommu.c
->> +++ b/drivers/iommu/iommu.c
->> @@ -1056,6 +1056,40 @@ int iommu_group_unregister_notifier(struct iommu_group *group,
->>   }
->>   EXPORT_SYMBOL_GPL(iommu_group_unregister_notifier);
->>   +/*
->> + * iommu_update_device_fault_handler - Update the device fault handler via flags
->> + * @dev: the device
->> + * @mask: bits(not set) to clear
->> + * @set: bits to set
->> + *
->> + * Update the device fault handler installed by
->> + * iommu_register_device_fault_handler().
->> + *
->> + * Return 0 on success, or an error.
->> + */
->> +int iommu_update_device_fault_handler(struct device *dev, u32 mask, u32 set)
->> +{
->> +    struct dev_iommu *param = dev->iommu;
->> +    int ret = 0;
->> +
->> +    if (!param)
->> +        return -EINVAL;
->> +
->> +    mutex_lock(&param->lock);
->> +
->> +    if (param->fault_param) {
->> +        ret = -EINVAL;
->> +        goto out_unlock;
->> +    }
->> +
->> +    param->fault_param->flags = (param->fault_param->flags & mask) | set;
->> +
->> +out_unlock:
->> +    mutex_unlock(&param->lock);
->> +    return ret;
->> +}
->> +EXPORT_SYMBOL_GPL(iommu_update_device_fault_handler);
+> diff --git a/drivers/vfio/pci/Kconfig b/drivers/vfio/pci/Kconfig
+> index 829e90a2e5a3..88c89863a205 100644
+> --- a/drivers/vfio/pci/Kconfig
+> +++ b/drivers/vfio/pci/Kconfig
+> @@ -48,8 +48,30 @@ config VFIO_PCI_IGD
+>   
+>   	  To enable Intel IGD assignment through vfio-pci, say Y.
+>   
+> -config VFIO_PCI_NVLINK2
+> -	def_bool y
+> +config VFIO_PCI_NVLINK2GPU
+> +	tristate "VFIO support for NVIDIA NVLINK2 GPUs"
+>   	depends on VFIO_PCI_CORE && PPC_POWERNV
+>   	help
+> -	  VFIO PCI support for P9 Witherspoon machine with NVIDIA V100 GPUs
+> +	  VFIO PCI driver for NVIDIA NVLINK2 GPUs with specific extensions
+> +	  for P9 Witherspoon machine.
+> +
+> +config VFIO_PCI_NPU2
+> +	tristate "VFIO support for IBM NPU host bus adapter on P9"
+> +	depends on VFIO_PCI_NVLINK2GPU && PPC_POWERNV
+> +	help
+> +	  VFIO PCI specific extensions for IBM NVLink2 host bus adapter on P9
+> +	  Witherspoon machine.
+> +
+> +config VFIO_PCI_DRIVER_COMPAT
+> +	bool "VFIO PCI backward compatibility for vendor specific extensions"
+> +	default y
+> +	depends on VFIO_PCI
+> +	help
+> +	  Say Y here if you want to preserve VFIO PCI backward
+> +	  compatibility. vfio_pci.ko will continue to automatically use
+> +	  the NVLINK2, NPU2 and IGD VFIO drivers when it is attached to
+> +	  a compatible device.
+> +
+> +	  When N is selected the user must bind explicity to the module
+> +	  they want to handle the device and vfio_pci.ko will have no
+> +	  device specific special behaviors.
+> diff --git a/drivers/vfio/pci/Makefile b/drivers/vfio/pci/Makefile
+> index f539f32c9296..86fb62e271fc 100644
+> --- a/drivers/vfio/pci/Makefile
+> +++ b/drivers/vfio/pci/Makefile
+> @@ -2,10 +2,15 @@
+>   
+>   obj-$(CONFIG_VFIO_PCI_CORE) += vfio-pci-core.o
+>   obj-$(CONFIG_VFIO_PCI) += vfio-pci.o
+> +obj-$(CONFIG_VFIO_PCI_NPU2) += npu2-vfio-pci.o
+> +obj-$(CONFIG_VFIO_PCI_NVLINK2GPU) += nvlink2gpu-vfio-pci.o
+>   
+>   vfio-pci-core-y := vfio_pci_core.o vfio_pci_intrs.o vfio_pci_rdwr.o vfio_pci_config.o
+>   vfio-pci-core-$(CONFIG_VFIO_PCI_IGD) += vfio_pci_igd.o
+> -vfio-pci-core-$(CONFIG_VFIO_PCI_NVLINK2) += vfio_pci_nvlink2gpu.o vfio_pci_npu2.o
+>   vfio-pci-core-$(CONFIG_S390) += vfio_pci_zdev.o
+>   
+>   vfio-pci-y := vfio_pci.o
+> +
+> +npu2-vfio-pci-y := npu2_vfio_pci.o
+> +
+> +nvlink2gpu-vfio-pci-y := nvlink2gpu_vfio_pci.o
+> diff --git a/drivers/vfio/pci/vfio_pci_npu2.c b/drivers/vfio/pci/npu2_vfio_pci.c
+> similarity index 64%
+> rename from drivers/vfio/pci/vfio_pci_npu2.c
+> rename to drivers/vfio/pci/npu2_vfio_pci.c
+> index 717745256ab3..7071bda0f2b6 100644
+> --- a/drivers/vfio/pci/vfio_pci_npu2.c
+> +++ b/drivers/vfio/pci/npu2_vfio_pci.c
+> @@ -14,19 +14,28 @@
+>    *	Author: Alex Williamson <alex.williamson@redhat.com>
+>    */
+>   
+> +#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
+> +
+> +#include <linux/module.h>
+>   #include <linux/io.h>
+>   #include <linux/pci.h>
+>   #include <linux/uaccess.h>
+>   #include <linux/vfio.h>
+> +#include <linux/list.h>
+>   #include <linux/sched/mm.h>
+>   #include <linux/mmu_context.h>
+>   #include <asm/kvm_ppc.h>
+>   
+>   #include "vfio_pci_core.h"
+> +#include "npu2_vfio_pci.h"
+>   
+>   #define CREATE_TRACE_POINTS
+>   #include "npu2_trace.h"
+>   
+> +#define DRIVER_VERSION  "0.1"
+> +#define DRIVER_AUTHOR   "Alexey Kardashevskiy <aik@ozlabs.ru>"
+> +#define DRIVER_DESC     "NPU2 VFIO PCI - User Level meta-driver for POWER9 NPU NVLink2 HBA"
+> +
+>   EXPORT_TRACEPOINT_SYMBOL_GPL(vfio_pci_npu2_mmap);
+>   
+>   struct vfio_pci_npu2_data {
+> @@ -36,6 +45,10 @@ struct vfio_pci_npu2_data {
+>   	unsigned int link_speed; /* The link speed from DT's ibm,nvlink-speed */
+>   };
+>   
+> +struct npu2_vfio_pci_device {
+> +	struct vfio_pci_core_device	vdev;
+> +};
+> +
+>   static size_t vfio_pci_npu2_rw(struct vfio_pci_core_device *vdev,
+>   		char __user *buf, size_t count, loff_t *ppos, bool iswrite)
+>   {
+> @@ -120,7 +133,7 @@ static const struct vfio_pci_regops vfio_pci_npu2_regops = {
+>   	.add_capability = vfio_pci_npu2_add_capability,
+>   };
+>   
+> -int vfio_pci_ibm_npu2_init(struct vfio_pci_core_device *vdev)
+> +static int vfio_pci_ibm_npu2_init(struct vfio_pci_core_device *vdev)
+>   {
+>   	int ret;
+>   	struct vfio_pci_npu2_data *data;
+> @@ -220,3 +233,132 @@ int vfio_pci_ibm_npu2_init(struct vfio_pci_core_device *vdev)
+>   
+>   	return ret;
+>   }
+> +
+> +static void npu2_vfio_pci_release(void *device_data)
+> +{
+> +	struct vfio_pci_core_device *vdev = device_data;
+> +
+> +	mutex_lock(&vdev->reflck->lock);
+> +	if (!(--vdev->refcnt)) {
+> +		vfio_pci_vf_token_user_add(vdev, -1);
+> +		vfio_pci_core_spapr_eeh_release(vdev);
+> +		vfio_pci_core_disable(vdev);
+> +	}
+> +	mutex_unlock(&vdev->reflck->lock);
+> +
+> +	module_put(THIS_MODULE);
+> +}
+> +
+> +static int npu2_vfio_pci_open(void *device_data)
+> +{
+> +	struct vfio_pci_core_device *vdev = device_data;
+> +	int ret = 0;
+> +
+> +	if (!try_module_get(THIS_MODULE))
+> +		return -ENODEV;
+> +
+> +	mutex_lock(&vdev->reflck->lock);
+> +
+> +	if (!vdev->refcnt) {
+> +		ret = vfio_pci_core_enable(vdev);
+> +		if (ret)
+> +			goto error;
+> +
+> +		ret = vfio_pci_ibm_npu2_init(vdev);
+> +		if (ret && ret != -ENODEV) {
+> +			pci_warn(vdev->pdev,
+> +				 "Failed to setup NVIDIA NV2 ATSD region\n");
+> +			vfio_pci_core_disable(vdev);
+> +			goto error;
+> +		}
+> +		ret = 0;
+> +		vfio_pci_probe_mmaps(vdev);
+> +		vfio_pci_core_spapr_eeh_open(vdev);
+> +		vfio_pci_vf_token_user_add(vdev, 1);
+> +	}
+> +	vdev->refcnt++;
+> +error:
+> +	mutex_unlock(&vdev->reflck->lock);
+> +	if (ret)
+> +		module_put(THIS_MODULE);
+> +	return ret;
+> +}
+> +
+> +static const struct vfio_device_ops npu2_vfio_pci_ops = {
+> +	.name		= "npu2-vfio-pci",
+> +	.open		= npu2_vfio_pci_open,
+> +	.release	= npu2_vfio_pci_release,
+> +	.ioctl		= vfio_pci_core_ioctl,
+> +	.read		= vfio_pci_core_read,
+> +	.write		= vfio_pci_core_write,
+> +	.mmap		= vfio_pci_core_mmap,
+> +	.request	= vfio_pci_core_request,
+> +	.match		= vfio_pci_core_match,
+> +};
+> +
+> +static int npu2_vfio_pci_probe(struct pci_dev *pdev,
+> +		const struct pci_device_id *id)
+> +{
+> +	struct npu2_vfio_pci_device *npvdev;
+> +	int ret;
+> +
+> +	npvdev = kzalloc(sizeof(*npvdev), GFP_KERNEL);
+> +	if (!npvdev)
+> +		return -ENOMEM;
+> +
+> +	ret = vfio_pci_core_register_device(&npvdev->vdev, pdev,
+> +			&npu2_vfio_pci_ops);
+> +	if (ret)
+> +		goto out_free;
+> +
+> +	return 0;
+> +
+> +out_free:
+> +	kfree(npvdev);
+> +	return ret;
+> +}
+> +
+> +static void npu2_vfio_pci_remove(struct pci_dev *pdev)
+> +{
+> +	struct vfio_device *vdev = dev_get_drvdata(&pdev->dev);
+> +	struct vfio_pci_core_device *core_vpdev = vfio_device_data(vdev);
+> +	struct npu2_vfio_pci_device *npvdev;
+> +
+> +	npvdev = container_of(core_vpdev, struct npu2_vfio_pci_device, vdev);
+> +
+> +	vfio_pci_core_unregister_device(core_vpdev);
+> +	kfree(npvdev);
+> +}
+> +
+> +static const struct pci_device_id npu2_vfio_pci_table[] = {
+> +	{ PCI_VDEVICE(IBM, 0x04ea) },
+> +	{ 0, }
+> +};
+> +
+> +static struct pci_driver npu2_vfio_pci_driver = {
+> +	.name			= "npu2-vfio-pci",
+> +	.id_table		= npu2_vfio_pci_table,
+> +	.probe			= npu2_vfio_pci_probe,
+> +	.remove			= npu2_vfio_pci_remove,
+> +#ifdef CONFIG_PCI_IOV
+> +	.sriov_configure	= vfio_pci_core_sriov_configure,
+> +#endif
+> +	.err_handler		= &vfio_pci_core_err_handlers,
+> +};
+> +
+> +#ifdef CONFIG_VFIO_PCI_DRIVER_COMPAT
+> +struct pci_driver *get_npu2_vfio_pci_driver(struct pci_dev *pdev)
+> +{
+> +	if (pci_match_id(npu2_vfio_pci_driver.id_table, pdev))
+> +		return &npu2_vfio_pci_driver;
+> +	return NULL;
+> +}
+> +EXPORT_SYMBOL_GPL(get_npu2_vfio_pci_driver);
+> +#endif
+> +
+> +module_pci_driver(npu2_vfio_pci_driver);
+> +
+> +MODULE_VERSION(DRIVER_VERSION);
+> +MODULE_LICENSE("GPL v2");
+> +MODULE_AUTHOR(DRIVER_AUTHOR);
+> +MODULE_DESCRIPTION(DRIVER_DESC);
+> diff --git a/drivers/vfio/pci/npu2_vfio_pci.h b/drivers/vfio/pci/npu2_vfio_pci.h
+> new file mode 100644
+> index 000000000000..92010d340346
+> --- /dev/null
+> +++ b/drivers/vfio/pci/npu2_vfio_pci.h
+> @@ -0,0 +1,24 @@
+> +/* SPDX-License-Identifier: GPL-2.0 */
+> +/*
+> + * Copyright (c) 2020, Mellanox Technologies, Ltd.  All rights reserved.
+> + *     Author: Max Gurtovoy <mgurtovoy@nvidia.com>
+> + */
+> +
+> +#ifndef NPU2_VFIO_PCI_H
+> +#define NPU2_VFIO_PCI_H
+> +
+> +#include <linux/pci.h>
+> +#include <linux/module.h>
+> +
+> +#ifdef CONFIG_VFIO_PCI_DRIVER_COMPAT
+> +#if defined(CONFIG_VFIO_PCI_NPU2) || defined(CONFIG_VFIO_PCI_NPU2_MODULE)
+> +struct pci_driver *get_npu2_vfio_pci_driver(struct pci_dev *pdev);
+> +#else
+> +struct pci_driver *get_npu2_vfio_pci_driver(struct pci_dev *pdev)
+> +{
+> +	return NULL;
+> +}
+> +#endif
+> +#endif
+> +
+> +#endif /* NPU2_VFIO_PCI_H */
+> diff --git a/drivers/vfio/pci/vfio_pci_nvlink2gpu.c b/drivers/vfio/pci/nvlink2gpu_vfio_pci.c
+> similarity index 67%
+> rename from drivers/vfio/pci/vfio_pci_nvlink2gpu.c
+> rename to drivers/vfio/pci/nvlink2gpu_vfio_pci.c
+> index 6dce1e78ee82..84a5ac1ce8ac 100644
+> --- a/drivers/vfio/pci/vfio_pci_nvlink2gpu.c
+> +++ b/drivers/vfio/pci/nvlink2gpu_vfio_pci.c
+> @@ -1,6 +1,6 @@
+>   // SPDX-License-Identifier: GPL-2.0-only
+>   /*
+> - * VFIO PCI NVIDIA Whitherspoon GPU support a.k.a. NVLink2.
+> + * VFIO PCI NVIDIA NVLink2 GPUs support.
+>    *
+>    * Copyright (C) 2018 IBM Corp.  All rights reserved.
+>    *     Author: Alexey Kardashevskiy <aik@ozlabs.ru>
+> @@ -12,6 +12,9 @@
+>    *	Author: Alex Williamson <alex.williamson@redhat.com>
+>    */
+>   
+> +#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
+> +
+> +#include <linux/module.h>
+>   #include <linux/io.h>
+>   #include <linux/pci.h>
+>   #include <linux/uaccess.h>
+> @@ -21,10 +24,15 @@
+>   #include <asm/kvm_ppc.h>
+>   
+>   #include "vfio_pci_core.h"
+> +#include "nvlink2gpu_vfio_pci.h"
+>   
+>   #define CREATE_TRACE_POINTS
+>   #include "nvlink2gpu_trace.h"
+>   
+> +#define DRIVER_VERSION  "0.1"
+> +#define DRIVER_AUTHOR   "Alexey Kardashevskiy <aik@ozlabs.ru>"
+> +#define DRIVER_DESC     "NVLINK2GPU VFIO PCI - User Level meta-driver for NVIDIA NVLink2 GPUs"
+> +
+>   EXPORT_TRACEPOINT_SYMBOL_GPL(vfio_pci_nvgpu_mmap_fault);
+>   EXPORT_TRACEPOINT_SYMBOL_GPL(vfio_pci_nvgpu_mmap);
+>   
+> @@ -39,6 +47,10 @@ struct vfio_pci_nvgpu_data {
+>   	struct notifier_block group_notifier;
+>   };
+>   
+> +struct nv_vfio_pci_device {
+> +	struct vfio_pci_core_device	vdev;
+> +};
+> +
+>   static size_t vfio_pci_nvgpu_rw(struct vfio_pci_core_device *vdev,
+>   		char __user *buf, size_t count, loff_t *ppos, bool iswrite)
+>   {
+> @@ -207,7 +219,8 @@ static int vfio_pci_nvgpu_group_notifier(struct notifier_block *nb,
+>   	return NOTIFY_OK;
+>   }
+>   
+> -int vfio_pci_nvidia_v100_nvlink2_init(struct vfio_pci_core_device *vdev)
+> +static int
+> +vfio_pci_nvidia_v100_nvlink2_init(struct vfio_pci_core_device *vdev)
+>   {
+>   	int ret;
+>   	u64 reg[2];
+> @@ -293,3 +306,135 @@ int vfio_pci_nvidia_v100_nvlink2_init(struct vfio_pci_core_device *vdev)
+>   
+>   	return ret;
+>   }
+> +
+> +static void nvlink2gpu_vfio_pci_release(void *device_data)
+> +{
+> +	struct vfio_pci_core_device *vdev = device_data;
+> +
+> +	mutex_lock(&vdev->reflck->lock);
+> +	if (!(--vdev->refcnt)) {
+> +		vfio_pci_vf_token_user_add(vdev, -1);
+> +		vfio_pci_core_spapr_eeh_release(vdev);
+> +		vfio_pci_core_disable(vdev);
+> +	}
+> +	mutex_unlock(&vdev->reflck->lock);
+> +
+> +	module_put(THIS_MODULE);
+> +}
+> +
+> +static int nvlink2gpu_vfio_pci_open(void *device_data)
+> +{
+> +	struct vfio_pci_core_device *vdev = device_data;
+> +	int ret = 0;
+> +
+> +	if (!try_module_get(THIS_MODULE))
+> +		return -ENODEV;
+> +
+> +	mutex_lock(&vdev->reflck->lock);
+> +
+> +	if (!vdev->refcnt) {
+> +		ret = vfio_pci_core_enable(vdev);
+> +		if (ret)
+> +			goto error;
+> +
+> +		ret = vfio_pci_nvidia_v100_nvlink2_init(vdev);
+> +		if (ret && ret != -ENODEV) {
+> +			pci_warn(vdev->pdev,
+> +				 "Failed to setup NVIDIA NV2 RAM region\n");
+> +			vfio_pci_core_disable(vdev);
+> +			goto error;
+> +		}
+> +		ret = 0;
+> +		vfio_pci_probe_mmaps(vdev);
+> +		vfio_pci_core_spapr_eeh_open(vdev);
+> +		vfio_pci_vf_token_user_add(vdev, 1);
+> +	}
+> +	vdev->refcnt++;
+> +error:
+> +	mutex_unlock(&vdev->reflck->lock);
+> +	if (ret)
+> +		module_put(THIS_MODULE);
+> +	return ret;
+> +}
+> +
+> +static const struct vfio_device_ops nvlink2gpu_vfio_pci_ops = {
+> +	.name		= "nvlink2gpu-vfio-pci",
+> +	.open		= nvlink2gpu_vfio_pci_open,
+> +	.release	= nvlink2gpu_vfio_pci_release,
+> +	.ioctl		= vfio_pci_core_ioctl,
+> +	.read		= vfio_pci_core_read,
+> +	.write		= vfio_pci_core_write,
+> +	.mmap		= vfio_pci_core_mmap,
+> +	.request	= vfio_pci_core_request,
+> +	.match		= vfio_pci_core_match,
+> +};
+> +
+> +static int nvlink2gpu_vfio_pci_probe(struct pci_dev *pdev,
+> +		const struct pci_device_id *id)
+> +{
+> +	struct nv_vfio_pci_device *nvdev;
+> +	int ret;
+> +
+> +	nvdev = kzalloc(sizeof(*nvdev), GFP_KERNEL);
+> +	if (!nvdev)
+> +		return -ENOMEM;
+> +
+> +	ret = vfio_pci_core_register_device(&nvdev->vdev, pdev,
+> +			&nvlink2gpu_vfio_pci_ops);
+> +	if (ret)
+> +		goto out_free;
+> +
+> +	return 0;
+> +
+> +out_free:
+> +	kfree(nvdev);
+> +	return ret;
+> +}
+> +
+> +static void nvlink2gpu_vfio_pci_remove(struct pci_dev *pdev)
+> +{
+> +	struct vfio_device *vdev = dev_get_drvdata(&pdev->dev);
+> +	struct vfio_pci_core_device *core_vpdev = vfio_device_data(vdev);
+> +	struct nv_vfio_pci_device *nvdev;
+> +
+> +	nvdev = container_of(core_vpdev, struct nv_vfio_pci_device, vdev);
+> +
+> +	vfio_pci_core_unregister_device(core_vpdev);
+> +	kfree(nvdev);
+> +}
+> +
+> +static const struct pci_device_id nvlink2gpu_vfio_pci_table[] = {
+> +	{ PCI_VDEVICE(NVIDIA, 0x1DB1) }, /* GV100GL-A NVIDIA Tesla V100-SXM2-16GB */
+> +	{ PCI_VDEVICE(NVIDIA, 0x1DB5) }, /* GV100GL-A NVIDIA Tesla V100-SXM2-32GB */
+> +	{ PCI_VDEVICE(NVIDIA, 0x1DB8) }, /* GV100GL-A NVIDIA Tesla V100-SXM3-32GB */
+> +	{ PCI_VDEVICE(NVIDIA, 0x1DF5) }, /* GV100GL-B NVIDIA Tesla V100-SXM2-16GB */
+
+
+Where is this list from?
+
+Also, how is this supposed to work at the boot time? Will the kernel try 
+binding let's say this one and nouveau? Which one is going to win?
+
+
+> +	{ 0, }
+
+
+Why a comma?
+
+> +};
+
+
+
+> +
+> +static struct pci_driver nvlink2gpu_vfio_pci_driver = {
+> +	.name			= "nvlink2gpu-vfio-pci",
+> +	.id_table		= nvlink2gpu_vfio_pci_table,
+> +	.probe			= nvlink2gpu_vfio_pci_probe,
+> +	.remove			= nvlink2gpu_vfio_pci_remove,
+> +#ifdef CONFIG_PCI_IOV
+> +	.sriov_configure	= vfio_pci_core_sriov_configure,
+> +#endif
+
+
+What is this IOV business about?
+
+
+> +	.err_handler		= &vfio_pci_core_err_handlers,
+> +};
+> +
+> +#ifdef CONFIG_VFIO_PCI_DRIVER_COMPAT
+> +struct pci_driver *get_nvlink2gpu_vfio_pci_driver(struct pci_dev *pdev)
+> +{
+> +	if (pci_match_id(nvlink2gpu_vfio_pci_driver.id_table, pdev))
+> +		return &nvlink2gpu_vfio_pci_driver;
+
+
+Why do we need matching PCI ids here instead of looking at the FDT which 
+will work better?
+
+
+> +	return NULL;
+> +}
+> +EXPORT_SYMBOL_GPL(get_nvlink2gpu_vfio_pci_driver);
+> +#endif
+> +
+> +module_pci_driver(nvlink2gpu_vfio_pci_driver);
+> +
+> +MODULE_VERSION(DRIVER_VERSION);
+> +MODULE_LICENSE("GPL v2");
+> +MODULE_AUTHOR(DRIVER_AUTHOR);
+> +MODULE_DESCRIPTION(DRIVER_DESC);
+> diff --git a/drivers/vfio/pci/nvlink2gpu_vfio_pci.h b/drivers/vfio/pci/nvlink2gpu_vfio_pci.h
+> new file mode 100644
+> index 000000000000..ebd5b600b190
+> --- /dev/null
+> +++ b/drivers/vfio/pci/nvlink2gpu_vfio_pci.h
+> @@ -0,0 +1,24 @@
+> +/* SPDX-License-Identifier: GPL-2.0 */
+> +/*
+> + * Copyright (c) 2020, Mellanox Technologies, Ltd.  All rights reserved.
+> + *     Author: Max Gurtovoy <mgurtovoy@nvidia.com>
+> + */
+> +
+> +#ifndef NVLINK2GPU_VFIO_PCI_H
+> +#define NVLINK2GPU_VFIO_PCI_H
+> +
+> +#include <linux/pci.h>
+> +#include <linux/module.h>
+> +
+> +#ifdef CONFIG_VFIO_PCI_DRIVER_COMPAT
+> +#if defined(CONFIG_VFIO_PCI_NVLINK2GPU) || defined(CONFIG_VFIO_PCI_NVLINK2GPU_MODULE)
+> +struct pci_driver *get_nvlink2gpu_vfio_pci_driver(struct pci_dev *pdev);
+> +#else
+> +struct pci_driver *get_nvlink2gpu_vfio_pci_driver(struct pci_dev *pdev)
+> +{
+> +	return NULL;
+> +}
+> +#endif
+> +#endif
+> +
+> +#endif /* NVLINK2GPU_VFIO_PCI_H */
+> diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
+> index dbc0a6559914..8e81ea039f31 100644
+> --- a/drivers/vfio/pci/vfio_pci.c
+> +++ b/drivers/vfio/pci/vfio_pci.c
+> @@ -27,6 +27,10 @@
+>   #include <linux/uaccess.h>
+>   
+>   #include "vfio_pci_core.h"
+> +#ifdef CONFIG_VFIO_PCI_DRIVER_COMPAT
+> +#include "npu2_vfio_pci.h"
+> +#include "nvlink2gpu_vfio_pci.h"
+> +#endif
+>   
+>   #define DRIVER_VERSION  "0.2"
+>   #define DRIVER_AUTHOR   "Alex Williamson <alex.williamson@redhat.com>"
+> @@ -142,14 +146,48 @@ static const struct vfio_device_ops vfio_pci_ops = {
+>   	.match		= vfio_pci_core_match,
+>   };
+>   
+> +/*
+> + * This layer is used for backward compatibility. Hopefully it will be
+> + * removed in the future.
+> + */
+> +static struct pci_driver *vfio_pci_get_compat_driver(struct pci_dev *pdev)
+> +{
+> +	switch (pdev->vendor) {
+> +	case PCI_VENDOR_ID_NVIDIA:
+> +		switch (pdev->device) {
+> +		case 0x1db1:
+> +		case 0x1db5:
+> +		case 0x1db8:
+> +		case 0x1df5:
+> +			return get_nvlink2gpu_vfio_pci_driver(pdev);
+
+This does not really need a switch, could simply call these 
+get_xxxx_vfio_pci_driver. Thanks,
+
+
+> +		default:
+> +			return NULL;
+> +		}
+> +	case PCI_VENDOR_ID_IBM:
+> +		switch (pdev->device) {
+> +		case 0x04ea:
+> +			return get_npu2_vfio_pci_driver(pdev);
+> +		default:
+> +			return NULL;
+> +		}
+> +	}
+> +
+> +	return NULL;
+> +}
+> +
+>   static int vfio_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+>   {
+>   	struct vfio_pci_device *vpdev;
+> +	struct pci_driver *driver;
+>   	int ret;
+>   
+>   	if (vfio_pci_is_denylisted(pdev))
+>   		return -EINVAL;
+>   
+> +	driver = vfio_pci_get_compat_driver(pdev);
+> +	if (driver)
+> +		return driver->probe(pdev, id);
+> +
+>   	vpdev = kzalloc(sizeof(*vpdev), GFP_KERNEL);
+>   	if (!vpdev)
+>   		return -ENOMEM;
+> @@ -167,14 +205,21 @@ static int vfio_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+>   
+>   static void vfio_pci_remove(struct pci_dev *pdev)
+>   {
+> -	struct vfio_device *vdev = dev_get_drvdata(&pdev->dev);
+> -	struct vfio_pci_core_device *core_vpdev = vfio_device_data(vdev);
+> -	struct vfio_pci_device *vpdev;
+> -
+> -	vpdev = container_of(core_vpdev, struct vfio_pci_device, vdev);
+> -
+> -	vfio_pci_core_unregister_device(core_vpdev);
+> -	kfree(vpdev);
+> +	struct pci_driver *driver;
+> +
+> +	driver = vfio_pci_get_compat_driver(pdev);
+> +	if (driver) {
+> +		driver->remove(pdev);
+> +	} else {
+> +		struct vfio_device *vdev = dev_get_drvdata(&pdev->dev);
+> +		struct vfio_pci_core_device *core_vpdev;
+> +		struct vfio_pci_device *vpdev;
+> +
+> +		core_vpdev = vfio_device_data(vdev);
+> +		vpdev = container_of(core_vpdev, struct vfio_pci_device, vdev);
+> +		vfio_pci_core_unregister_device(core_vpdev);
+> +		kfree(vpdev);
+> +	}
+>   }
+>   
+>   static int vfio_pci_sriov_configure(struct pci_dev *pdev, int nr_virtfn)
+> diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
+> index 4de8e352df9c..f9b39abe54cb 100644
+> --- a/drivers/vfio/pci/vfio_pci_core.c
+> +++ b/drivers/vfio/pci/vfio_pci_core.c
+> @@ -354,24 +354,6 @@ int vfio_pci_core_enable(struct vfio_pci_core_device *vdev)
+>   		}
+>   	}
+>   
+> -	if (pdev->vendor == PCI_VENDOR_ID_NVIDIA &&
+> -	    IS_ENABLED(CONFIG_VFIO_PCI_NVLINK2)) {
+> -		ret = vfio_pci_nvidia_v100_nvlink2_init(vdev);
+> -		if (ret && ret != -ENODEV) {
+> -			pci_warn(pdev, "Failed to setup NVIDIA NV2 RAM region\n");
+> -			goto disable_exit;
+> -		}
+> -	}
+> -
+> -	if (pdev->vendor == PCI_VENDOR_ID_IBM &&
+> -	    IS_ENABLED(CONFIG_VFIO_PCI_NVLINK2)) {
+> -		ret = vfio_pci_ibm_npu2_init(vdev);
+> -		if (ret && ret != -ENODEV) {
+> -			pci_warn(pdev, "Failed to setup NVIDIA NV2 ATSD region\n");
+> -			goto disable_exit;
+> -		}
+> -	}
+> -
+>   	return 0;
+>   
+>   disable_exit:
+> diff --git a/drivers/vfio/pci/vfio_pci_core.h b/drivers/vfio/pci/vfio_pci_core.h
+> index 8989443c3086..31f3836e606e 100644
+> --- a/drivers/vfio/pci/vfio_pci_core.h
+> +++ b/drivers/vfio/pci/vfio_pci_core.h
+> @@ -204,20 +204,6 @@ static inline int vfio_pci_igd_init(struct vfio_pci_core_device *vdev)
+>   	return -ENODEV;
+>   }
+>   #endif
+> -#ifdef CONFIG_VFIO_PCI_NVLINK2
+> -extern int vfio_pci_nvidia_v100_nvlink2_init(struct vfio_pci_core_device *vdev);
+> -extern int vfio_pci_ibm_npu2_init(struct vfio_pci_core_device *vdev);
+> -#else
+> -static inline int vfio_pci_nvidia_v100_nvlink2_init(struct vfio_pci_core_device *vdev)
+> -{
+> -	return -ENODEV;
+> -}
+> -
+> -static inline int vfio_pci_ibm_npu2_init(struct vfio_pci_core_device *vdev)
+> -{
+> -	return -ENODEV;
+> -}
+> -#endif
+>   
+>   #ifdef CONFIG_S390
+>   extern int vfio_pci_info_zdev_add_caps(struct vfio_pci_core_device *vdev,
 > 
-> When and why will this API be used? Why not registering the fault
-> handling capabilities of a device driver only once during probe()?
 
-In VFIO, stage 2 IOPF might be enabled via an ioctl from the userspace (in this series),
-while stage 1 IOPF is enabled from vfio_pci_enable() [1] for nested mode, they are
-configured separately, and currently each device can only have one iommu dev fault
-handler. So I choose to add a update interface for the second one.
-
-[1] https://patchwork.kernel.org/project/kvm/patch/20210223210625.604517-6-eric.auger@redhat.com/
-
-> 
->> +
->>   /**
->>    * iommu_register_device_fault_handler() - Register a device fault handler
->>    * @dev: the device
->> @@ -1076,11 +1110,14 @@ EXPORT_SYMBOL_GPL(iommu_group_unregister_notifier);
->>    */
->>   int iommu_register_device_fault_handler(struct device *dev,
->>                       iommu_dev_fault_handler_t handler,
->> -                    void *data)
->> +                    u32 flags, void *data)
->>   {
->>       struct dev_iommu *param = dev->iommu;
->>       int ret = 0;
->>   +    if (flags & IOPF_REPORT_FLAT && flags & IOPF_REPORT_NESTED)
->> +        return -EINVAL;
->> +
->>       if (!param)
->>           return -EINVAL;
->>   @@ -1099,6 +1136,7 @@ int iommu_register_device_fault_handler(struct device *dev,
->>           goto done_unlock;
->>       }
->>       param->fault_param->handler = handler;
->> +    param->fault_param->flags = flags;
->>       param->fault_param->data = data;
->>       mutex_init(&param->fault_param->lock);
->>       INIT_LIST_HEAD(&param->fault_param->faults);
->> @@ -1177,6 +1215,22 @@ int iommu_report_device_fault(struct device *dev, struct iommu_fault_event *evt)
->>           goto done_unlock;
->>       }
->>   +    /* The unrecoverable fault reporting is not supported at the moment. */
->> +    if (evt->fault.type != IOMMU_FAULT_PAGE_REQ)
->> +        return -EOPNOTSUPP;
-> 
-> Any reasons why do you want to disable reporting an unrecoverable fault?
-
-When I add UNRECOV_FAULT_REPORT_ (mentioned above), I will enable the unrecoverable fault
-reporting if the fault client concerns it. Sorry for this. :-)
-
-> 
->> +
->> +    if (evt->fault.type == IOMMU_FAULT_PAGE_REQ) {
->> +        if (fparam->flags & IOPF_REPORT_NESTED) {
->> +            if (evt->fault.prm.flags & IOMMU_FAULT_PAGE_REQUEST_L2 &&
->> +                !(fparam->flags & IOPF_REPORT_NESTED_L2_CONCERNED))
->> +                return -EOPNOTSUPP;
->> +            if (!(evt->fault.prm.flags & IOMMU_FAULT_PAGE_REQUEST_L2) &&
->> +                !(fparam->flags & IOPF_REPORT_NESTED_L1_CONCERNED))
->> +                return -EOPNOTSUPP;
->> +        } else if (!(fparam->flags & IOPF_REPORT_FLAT))
->> +            return -EOPNOTSUPP;
->> +    }
->> +
->>       if (evt->fault.type == IOMMU_FAULT_PAGE_REQ &&
->>           (evt->fault.prm.flags & IOMMU_FAULT_PAGE_REQUEST_LAST_PAGE)) {
->>           evt_pending = kmemdup(evt, sizeof(struct iommu_fault_event),
->> diff --git a/include/linux/iommu.h b/include/linux/iommu.h
->> index 86d688c4418f..f03d761e8310 100644
->> --- a/include/linux/iommu.h
->> +++ b/include/linux/iommu.h
->> @@ -352,12 +352,21 @@ struct iommu_fault_event {
->>   /**
->>    * struct iommu_fault_param - per-device IOMMU fault data
->>    * @handler: Callback function to handle IOMMU faults at device level
->> + * @flags: Indicates whether the fault reporting is available under a
->> + *       specific configuration (1st/2nd-level-only(FLAT), or nested).
->> + *       IOPF_REPORT_NESTED needs to additionally know which level/stage
->> + *       is concerned.
-> 
-> If IOPF_REPORT_NESTED only is not valid why do you want to define it?
-
-Yeah, it seems that IOPF_REPORT_NESTED is unnecessary, IOPF_REPORT_NESTED_L1 + IOPF_REPORT_NESTED_L2
-is enough...
-
-Thanks for your comments!
-Shenming
-
-> 
->>    * @data: handler private data
->>    * @faults: holds the pending faults which needs response
->>    * @lock: protect pending faults list
->>    */
->>   struct iommu_fault_param {
->>       iommu_dev_fault_handler_t handler;
->> +#define IOPF_REPORT_FLAT            (1 << 0)
->> +#define IOPF_REPORT_NESTED            (1 << 1)
->> +#define IOPF_REPORT_NESTED_L1_CONCERNED        (1 << 2)
->> +#define IOPF_REPORT_NESTED_L2_CONCERNED        (1 << 3)
->> +    u32 flags;
->>       void *data;
->>       struct list_head faults;
->>       struct mutex lock;
->> @@ -509,9 +518,11 @@ extern int iommu_group_register_notifier(struct iommu_group *group,
->>                        struct notifier_block *nb);
->>   extern int iommu_group_unregister_notifier(struct iommu_group *group,
->>                          struct notifier_block *nb);
->> +extern int iommu_update_device_fault_handler(struct device *dev,
->> +                         u32 mask, u32 set);
->>   extern int iommu_register_device_fault_handler(struct device *dev,
->>                       iommu_dev_fault_handler_t handler,
->> -                    void *data);
->> +                    u32 flags, void *data);
->>     extern int iommu_unregister_device_fault_handler(struct device *dev);
->>   @@ -873,10 +884,16 @@ static inline int iommu_group_unregister_notifier(struct iommu_group *group,
->>       return 0;
->>   }
->>   +static inline int iommu_update_device_fault_handler(struct device *dev,
->> +                            u32 mask, u32 set)
->> +{
->> +    return -ENODEV;
->> +}
->> +
->>   static inline
->>   int iommu_register_device_fault_handler(struct device *dev,
->>                       iommu_dev_fault_handler_t handler,
->> -                    void *data)
->> +                    u32 flags, void *data)
->>   {
->>       return -ENODEV;
->>   }
->> diff --git a/include/uapi/linux/iommu.h b/include/uapi/linux/iommu.h
->> index e1d9e75f2c94..0ce0dfb7713e 100644
->> --- a/include/uapi/linux/iommu.h
->> +++ b/include/uapi/linux/iommu.h
->> @@ -85,6 +85,8 @@ struct iommu_fault_unrecoverable {
->>    *         When IOMMU_FAULT_PAGE_RESPONSE_NEEDS_PASID is set, the page response
->>    *         must have the same PASID value as the page request. When it is clear,
->>    *         the page response should not have a PASID.
->> + *         If IOMMU_FAULT_PAGE_REQUEST_L2 is set, the fault occurred at the
->> + *         second level/stage, otherwise, occurred at the first level.
->>    * @pasid: Process Address Space ID
->>    * @grpid: Page Request Group Index
->>    * @perm: requested page permissions (IOMMU_FAULT_PERM_* values)
->> @@ -96,6 +98,7 @@ struct iommu_fault_page_request {
->>   #define IOMMU_FAULT_PAGE_REQUEST_LAST_PAGE    (1 << 1)
->>   #define IOMMU_FAULT_PAGE_REQUEST_PRIV_DATA    (1 << 2)
->>   #define IOMMU_FAULT_PAGE_RESPONSE_NEEDS_PASID    (1 << 3)
->> +#define IOMMU_FAULT_PAGE_REQUEST_L2        (1 << 4)
->>       __u32    flags;
->>       __u32    pasid;
->>       __u32    grpid;
->>
-> 
-> Best regards,
-> baolu
-> .
+-- 
+Alexey
