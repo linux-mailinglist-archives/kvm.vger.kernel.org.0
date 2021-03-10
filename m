@@ -2,56 +2,65 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C5F18333880
-	for <lists+kvm@lfdr.de>; Wed, 10 Mar 2021 10:16:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 91C843338B0
+	for <lists+kvm@lfdr.de>; Wed, 10 Mar 2021 10:26:45 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232557AbhCJJQT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 10 Mar 2021 04:16:19 -0500
-Received: from mail.kernel.org ([198.145.29.99]:34042 "EHLO mail.kernel.org"
+        id S232537AbhCJJ0K (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 10 Mar 2021 04:26:10 -0500
+Received: from verein.lst.de ([213.95.11.211]:35412 "EHLO verein.lst.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232176AbhCJJQO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 10 Mar 2021 04:16:14 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 247FD64F67;
-        Wed, 10 Mar 2021 09:16:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1615367773;
-        bh=4F4UviQ0MAwWWHGmRaFTU410NI5y3UWsDtvwcmlSP2U=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=rPmwTLlrtWTu2qQuhPhBH52pvWiMC67U6RLHUy5jFd6s5KV5WISTGY82LshD7IroU
-         P3CGm/60n76YpIAvfRAj4De7EnEiyj45rrhpMhyVwoo3FJVJYIiuVve5WeXS6PfN+v
-         vucVqHnGJ36woeUDu2CljqJKgqdNTCYVcKmF5pVjbUaTtoStsfD9iRndJSbcJP46/D
-         ykkfDHqnuDiZfFKDOPT+KNVS3zkiddTsGadEMt7Haio1eSHWVhlykg5DHC3BD2sOqy
-         GW784CMMmtKIZFv5qqzkMPK4LkB6lCMisjNCFnXNx9r4WNbzrtfvVZ02ExxIC/5RC/
-         sWzWsne7OPVqg==
-Date:   Wed, 10 Mar 2021 11:16:09 +0200
-From:   Leon Romanovsky <leon@kernel.org>
-To:     Zhu Lingshan <lingshan.zhu@intel.com>
-Cc:     jasowang@redhat.com, mst@redhat.com, lulu@redhat.com,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH V3 4/6] vDPA/ifcvf: remove the version number string
-Message-ID: <YEiOWd9jXHnw4b11@unreal>
-References: <20210310090052.4762-1-lingshan.zhu@intel.com>
- <20210310090052.4762-5-lingshan.zhu@intel.com>
+        id S230397AbhCJJZk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 10 Mar 2021 04:25:40 -0500
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id 2657568B05; Wed, 10 Mar 2021 10:25:34 +0100 (CET)
+Date:   Wed, 10 Mar 2021 10:25:33 +0100
+From:   Christoph Hellwig <hch@lst.de>
+To:     Robin Murphy <robin.murphy@arm.com>
+Cc:     Christoph Hellwig <hch@lst.de>, Joerg Roedel <joro@8bytes.org>,
+        Will Deacon <will@kernel.org>, Li Yang <leoyang.li@nxp.com>,
+        freedreno@lists.freedesktop.org, kvm@vger.kernel.org,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        linuxppc-dev@lists.ozlabs.org, dri-devel@lists.freedesktop.org,
+        virtualization@lists.linux-foundation.org,
+        iommu@lists.linux-foundation.org, netdev@vger.kernel.org,
+        linux-arm-msm@vger.kernel.org,
+        David Woodhouse <dwmw2@infradead.org>,
+        linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH 14/17] iommu: remove DOMAIN_ATTR_DMA_USE_FLUSH_QUEUE
+Message-ID: <20210310092533.GA6819@lst.de>
+References: <20210301084257.945454-1-hch@lst.de> <20210301084257.945454-15-hch@lst.de> <1658805c-ed28-b650-7385-a56fab3383e3@arm.com> <20210310091501.GC5928@lst.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210310090052.4762-5-lingshan.zhu@intel.com>
+In-Reply-To: <20210310091501.GC5928@lst.de>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Mar 10, 2021 at 05:00:50PM +0800, Zhu Lingshan wrote:
-> This commit removes the version number string, using kernel
-> version is enough.
->
-> Signed-off-by: Zhu Lingshan <lingshan.zhu@intel.com>
-> ---
->  drivers/vdpa/ifcvf/ifcvf_main.c | 2 --
->  1 file changed, 2 deletions(-)
->
+On Wed, Mar 10, 2021 at 10:15:01AM +0100, Christoph Hellwig wrote:
+> On Thu, Mar 04, 2021 at 03:25:27PM +0000, Robin Murphy wrote:
+> > On 2021-03-01 08:42, Christoph Hellwig wrote:
+> >> Use explicit methods for setting and querying the information instead.
+> >
+> > Now that everyone's using iommu-dma, is there any point in bouncing this 
+> > through the drivers at all? Seems like it would make more sense for the x86 
+> > drivers to reflect their private options back to iommu_dma_strict (and 
+> > allow Intel's caching mode to override it as well), then have 
+> > iommu_dma_init_domain just test !iommu_dma_strict && 
+> > domain->ops->flush_iotlb_all.
+> 
+> Hmm.  I looked at this, and kill off ->dma_enable_flush_queue for
+> the ARM drivers and just looking at iommu_dma_strict seems like a
+> very clear win.
+> 
+> OTOH x86 is a little more complicated.  AMD and intel defaul to lazy
+> mode, so we'd have to change the global iommu_dma_strict if they are
+> initialized.  Also Intel has not only a "static" option to disable
+> lazy mode, but also a "dynamic" one where it iterates structure.  So
+> I think on the get side we're stuck with the method, but it still
+> simplifies the whole thing.
 
-I already added my ROB, but will add again.
-
-Thanks,
-Reviewed-by: Leon Romanovsky <leonro@nvidia.com>
+Actually... Just mirroring the iommu_dma_strict value into
+struct iommu_domain should solve all of that with very little
+boilerplate code. 
