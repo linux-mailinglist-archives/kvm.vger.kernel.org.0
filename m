@@ -2,22 +2,19 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9AAC73337B5
-	for <lists+kvm@lfdr.de>; Wed, 10 Mar 2021 09:45:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D3A783337AC
+	for <lists+kvm@lfdr.de>; Wed, 10 Mar 2021 09:45:03 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232476AbhCJIog (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 10 Mar 2021 03:44:36 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40966 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232323AbhCJIn6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        id S232432AbhCJIo3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 10 Mar 2021 03:44:29 -0500
+Received: from 8bytes.org ([81.169.241.247]:58444 "EHLO theia.8bytes.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S231207AbhCJIn6 (ORCPT <rfc822;kvm@vger.kernel.org>);
         Wed, 10 Mar 2021 03:43:58 -0500
-Received: from theia.8bytes.org (8bytes.org [IPv6:2a01:238:4383:600:38bc:a715:4b6d:a889])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 02C06C061764;
-        Wed, 10 Mar 2021 00:43:58 -0800 (PST)
 Received: from cap.home.8bytes.org (p549adcf6.dip0.t-ipconnect.de [84.154.220.246])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
         (No client certificate requested)
-        by theia.8bytes.org (Postfix) with ESMTPSA id 09B8B5F0;
+        by theia.8bytes.org (Postfix) with ESMTPSA id ACB6D638;
         Wed, 10 Mar 2021 09:43:55 +0100 (CET)
 From:   Joerg Roedel <joro@8bytes.org>
 To:     x86@kernel.org
@@ -40,9 +37,9 @@ Cc:     Joerg Roedel <joro@8bytes.org>, Joerg Roedel <jroedel@suse.de>,
         Arvind Sankar <nivedita@alum.mit.edu>,
         linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         virtualization@lists.linux-foundation.org
-Subject: [PATCH v2 6/7] x86/boot/compressed/64: Check SEV encryption in 32-bit boot-path
-Date:   Wed, 10 Mar 2021 09:43:24 +0100
-Message-Id: <20210310084325.12966-7-joro@8bytes.org>
+Subject: [PATCH v2 7/7] x86/sev-es: Replace open-coded hlt-loops with sev_es_terminate()
+Date:   Wed, 10 Mar 2021 09:43:25 +0100
+Message-Id: <20210310084325.12966-8-joro@8bytes.org>
 X-Mailer: git-send-email 2.30.1
 In-Reply-To: <20210310084325.12966-1-joro@8bytes.org>
 References: <20210310084325.12966-1-joro@8bytes.org>
@@ -54,128 +51,66 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Joerg Roedel <jroedel@suse.de>
 
-Check whether the hypervisor reported the correct C-bit when running as
-an SEV guest. Using a wrong C-bit position could be used to leak
-sensitive data from the guest to the hypervisor.
+There are a few places left in the SEV-ES C code where hlt loops and/or
+terminate requests are implemented. Replace them all with calls to
+sev_es_terminate().
 
 Signed-off-by: Joerg Roedel <jroedel@suse.de>
 ---
- arch/x86/boot/compressed/head_64.S | 83 ++++++++++++++++++++++++++++++
- 1 file changed, 83 insertions(+)
+ arch/x86/boot/compressed/sev-es.c | 12 +++---------
+ arch/x86/kernel/sev-es-shared.c   | 10 +++-------
+ 2 files changed, 6 insertions(+), 16 deletions(-)
 
-diff --git a/arch/x86/boot/compressed/head_64.S b/arch/x86/boot/compressed/head_64.S
-index ee448aedb8b0..7c5c2698a96e 100644
---- a/arch/x86/boot/compressed/head_64.S
-+++ b/arch/x86/boot/compressed/head_64.S
-@@ -183,11 +183,21 @@ SYM_FUNC_START(startup_32)
- 	 */
- 	call	get_sev_encryption_bit
- 	xorl	%edx, %edx
-+#ifdef	CONFIG_AMD_MEM_ENCRYPT
- 	testl	%eax, %eax
- 	jz	1f
- 	subl	$32, %eax	/* Encryption bit is always above bit 31 */
- 	bts	%eax, %edx	/* Set encryption mask for page tables */
-+	/*
-+	 * Mark SEV as active in sev_status so that startup32_check_sev_cbit()
-+	 * will do a check. The sev_status memory will be fully initialized
-+	 * with the contents of MSR_AMD_SEV_STATUS later in
-+	 * set_sev_encryption_mask(). For now it is sufficient to know that SEV
-+	 * is active.
-+	 */
-+	movl	$1, rva(sev_status)(%ebp)
- 1:
-+#endif
+diff --git a/arch/x86/boot/compressed/sev-es.c b/arch/x86/boot/compressed/sev-es.c
+index 27826c265aab..d904bd56b3e3 100644
+--- a/arch/x86/boot/compressed/sev-es.c
++++ b/arch/x86/boot/compressed/sev-es.c
+@@ -200,14 +200,8 @@ void do_boot_stage2_vc(struct pt_regs *regs, unsigned long exit_code)
+ 	}
  
- 	/* Initialize Page tables to 0 */
- 	leal	rva(pgtable)(%ebx), %edi
-@@ -272,6 +282,9 @@ SYM_FUNC_START(startup_32)
- 	movl	%esi, %edx
- 1:
- #endif
-+	/* Check if the C-bit position is correct when SEV is active */
-+	call	startup32_check_sev_cbit
-+
- 	pushl	$__KERNEL_CS
- 	pushl	%eax
+ finish:
+-	if (result == ES_OK) {
++	if (result == ES_OK)
+ 		vc_finish_insn(&ctxt);
+-	} else if (result != ES_RETRY) {
+-		/*
+-		 * For now, just halt the machine. That makes debugging easier,
+-		 * later we just call sev_es_terminate() here.
+-		 */
+-		while (true)
+-			asm volatile("hlt\n");
+-	}
++	else if (result != ES_RETRY)
++		sev_es_terminate(GHCB_SEV_ES_REASON_GENERAL_REQUEST);
+ }
+diff --git a/arch/x86/kernel/sev-es-shared.c b/arch/x86/kernel/sev-es-shared.c
+index cdc04d091242..7c34be61258e 100644
+--- a/arch/x86/kernel/sev-es-shared.c
++++ b/arch/x86/kernel/sev-es-shared.c
+@@ -24,7 +24,7 @@ static bool __init sev_es_check_cpu_features(void)
+ 	return true;
+ }
  
-@@ -871,6 +884,76 @@ SYM_FUNC_START(startup32_load_idt)
- 	ret
- SYM_FUNC_END(startup32_load_idt)
+-static void sev_es_terminate(unsigned int reason)
++static void __noreturn sev_es_terminate(unsigned int reason)
+ {
+ 	u64 val = GHCB_SEV_TERMINATE;
  
-+/*
-+ * Check for the correct C-bit position when the startup_32 boot-path is used.
-+ *
-+ * The check makes use of the fact that all memory is encrypted when paging is
-+ * disabled. The function creates 64 bits of random data using the RDRAND
-+ * instruction. RDRAND is mandatory for SEV guests, so always available. If the
-+ * hypervisor violates that the kernel will crash right here.
-+ *
-+ * The 64 bits of random data are stored to a memory location and at the same
-+ * time kept in the %eax and %ebx registers. Since encryption is always active
-+ * when paging is off the random data will be stored encrypted in main memory.
-+ *
-+ * Then paging is enabled. When the C-bit position is correct all memory is
-+ * still mapped encrypted and comparing the register values with memory will
-+ * succeed. An incorrect C-bit position will map all memory unencrypted, so that
-+ * the compare will use the encrypted random data and fail.
-+ */
-+SYM_FUNC_START(startup32_check_sev_cbit)
-+#ifdef CONFIG_AMD_MEM_ENCRYPT
-+	pushl	%eax
-+	pushl	%ebx
-+	pushl	%ecx
-+	pushl	%edx
-+
-+	/* Check for non-zero sev_status */
-+	movl	rva(sev_status)(%ebp), %eax
-+	testl	%eax, %eax
-+	jz	4f
-+
-+	/*
-+	 * Get two 32-bit random values - Don't bail out if RDRAND fails
-+	 * because it is better to prevent forward progress if no random value
-+	 * can be gathered.
-+	 */
-+1:	rdrand	%eax
-+	jnc	1b
-+2:	rdrand	%ebx
-+	jnc	2b
-+
-+	/* Store to memory and keep it in the registers */
-+	movl	%eax, rva(sev_check_data)(%ebp)
-+	movl	%ebx, rva(sev_check_data+4)(%ebp)
-+
-+	/* Enable paging to see if encryption is active */
-+	movl	%cr0, %edx	/* Backup %cr0 in %edx */
-+	movl	$(X86_CR0_PG | X86_CR0_PE), %ecx /* Enable Paging and Protected mode */
-+	movl	%ecx, %cr0
-+
-+	cmpl	%eax, rva(sev_check_data)(%ebp)
-+	jne	3f
-+	cmpl	%ebx, rva(sev_check_data+4)(%ebp)
-+	jne	3f
-+
-+	movl	%edx, %cr0	/* Restore previous %cr0 */
-+
-+	jmp	4f
-+
-+3:	/* Check failed - hlt the machine */
-+	hlt
-+	jmp	3b
-+
-+4:
-+	popl	%edx
-+	popl	%ecx
-+	popl	%ebx
-+	popl	%eax
-+#endif
-+	ret
-+SYM_FUNC_END(startup32_check_sev_cbit)
-+
- /*
-  * Stack and heap for uncompression
-  */
+@@ -210,12 +210,8 @@ void __init do_vc_no_ghcb(struct pt_regs *regs, unsigned long exit_code)
+ 	return;
+ 
+ fail:
+-	sev_es_wr_ghcb_msr(GHCB_SEV_TERMINATE);
+-	VMGEXIT();
+-
+-	/* Shouldn't get here - if we do halt the machine */
+-	while (true)
+-		asm volatile("hlt\n");
++	/* Terminate the guest */
++	sev_es_terminate(GHCB_SEV_ES_REASON_GENERAL_REQUEST);
+ }
+ 
+ static enum es_result vc_insn_string_read(struct es_em_ctxt *ctxt,
 -- 
 2.30.1
 
