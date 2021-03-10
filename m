@@ -2,101 +2,85 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 42359334192
-	for <lists+kvm@lfdr.de>; Wed, 10 Mar 2021 16:33:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 58AD43341EC
+	for <lists+kvm@lfdr.de>; Wed, 10 Mar 2021 16:47:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231359AbhCJPdS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 10 Mar 2021 10:33:18 -0500
-Received: from mail.kernel.org ([198.145.29.99]:50414 "EHLO mail.kernel.org"
+        id S231519AbhCJPql (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 10 Mar 2021 10:46:41 -0500
+Received: from mail.kernel.org ([198.145.29.99]:53118 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S233093AbhCJPc6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 10 Mar 2021 10:32:58 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 1517464F98;
-        Wed, 10 Mar 2021 15:32:56 +0000 (UTC)
+        id S233186AbhCJPqb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 10 Mar 2021 10:46:31 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 6A17C64F9B;
+        Wed, 10 Mar 2021 15:46:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1615390377;
-        bh=mVVLhBBsU5qZlMYB4KOflh2qpOSUHlTOvz5Dlwno1ug=;
+        s=k20201202; t=1615391191;
+        bh=8vc+t9597Gj+0rwLWp8DvyB0wv6J+I8bsOUKobbB8m0=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=jZkzMnhpI+2gyubsbPr2NOX9QtAZXPK9kgOuMlbNt86zORB4LL6vMzPMQQLvSOh0t
-         xPcv3bUWT+fRdcpuL4PRH3cL2CnoEnrUA7OCDI5v/atsX/tzR8TLsw4x3oEUBD6UNc
-         /Lj7COY/OJoglSC4NVqtSPt75dHj9TFYwrTsXmXNhe9R8favdVqDbgv2p+pey8v+50
-         DzryozBL+VuzUPHYesPMVmiDpv8Dpkn6J9d4XXXbl9MsGiIyPThMvmQ4OQDBv8IuIL
-         /4C2LhXVjqXTCH4fA4VoNi1supv4muL1FtVwKiXwDyGTFNjM73c5IpehWAATm6D181
-         OSH4jMcmUS9RQ==
-Date:   Wed, 10 Mar 2021 17:32:33 +0200
-From:   Jarkko Sakkinen <jarkko@kernel.org>
-To:     Borislav Petkov <bp@alien8.de>
-Cc:     Kai Huang <kai.huang@intel.com>, kvm@vger.kernel.org,
-        x86@kernel.org, linux-sgx@vger.kernel.org,
-        linux-kernel@vger.kernel.org, seanjc@google.com, luto@kernel.org,
-        dave.hansen@intel.com, rick.p.edgecombe@intel.com,
-        haitao.huang@intel.com, pbonzini@redhat.com, tglx@linutronix.de,
-        mingo@redhat.com, hpa@zytor.com, jethro@fortanix.com,
-        b.thiel@posteo.de
-Subject: Re: [PATCH 06/25] x86/cpu/intel: Allow SGX virtualization without
- Launch Control support
-Message-ID: <YEjmkadk7azp53f4@kernel.org>
-References: <cover.1614590788.git.kai.huang@intel.com>
- <12541888ae9ac7f517582aa64d9153feede7aed4.1614590788.git.kai.huang@intel.com>
- <20210305172957.GE2685@zn.tnic>
+        b=Fe7vgIGRTKIo0wCFNOTGlUdE0URCo/cefTHyf+UByBTUerKvcPL66vWDOFqSrEBFs
+         B6rF6h+yif7c1epUqr0ASg2bn8rlwiRkG4EK1xJ1DGKzlrAGH1U16ALssFLf0AZF+U
+         HL0QqepNP9ivPjAG7kqjL0lZTR72cybWEgO7yhfM6MdcK04TfXbNULOdPEaib5Suk/
+         3XqUx4WNeIEjW9PDo4prB7PyUVK2W7xJ5OXhNKbI0ZBbIxbFo7rbmhp0lKmOni/xMY
+         Ml7gmR6FD/wWK6B1tNXN1mWT08GE97Udmf1HM6H4srA/r1U3K5Fd7QHLSawQodst4p
+         Q9TGH5JjnCotQ==
+Date:   Wed, 10 Mar 2021 15:46:26 +0000
+From:   Will Deacon <will@kernel.org>
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+        linux-arm-kernel@lists.infradead.org,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Mark Rutland <mark.rutland@arm.com>, qperret@google.com,
+        kernel-team@android.com
+Subject: Re: [PATCH 3/4] KVM: arm64: Rename SCTLR_ELx_FLAGS to SCTLR_EL2_FLAGS
+Message-ID: <20210310154625.GA29738@willie-the-truck>
+References: <20210310152656.3821253-1-maz@kernel.org>
+ <20210310152656.3821253-4-maz@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210305172957.GE2685@zn.tnic>
+In-Reply-To: <20210310152656.3821253-4-maz@kernel.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Mar 05, 2021 at 06:29:57PM +0100, Borislav Petkov wrote:
-> On Mon, Mar 01, 2021 at 10:45:02PM +1300, Kai Huang wrote:
-> > From: Sean Christopherson <sean.j.christopherson@intel.com>
-> > 
-> > The kernel will currently disable all SGX support if the hardware does
-> > not support launch control.  Make it more permissive to allow SGX
-> > virtualization on systems without Launch Control support.  This will
-> > allow KVM to expose SGX to guests that have less-strict requirements on
-> > the availability of flexible launch control.
-> > 
-> > Improve error message to distinguish between three cases.  There are two
-> > cases where SGX support is completely disabled:
-> > 1) SGX has been disabled completely by the BIOS
-> > 2) SGX LC is locked by the BIOS.  Bare-metal support is disabled because
-> >    of LC unavailability.  SGX virtualization is unavailable (because of
-> >    Kconfig).
-> > One where it is partially available:
-> > 3) SGX LC is locked by the BIOS.  Bare-metal support is disabled because
-> >    of LC unavailability.  SGX virtualization is supported.
-> > 
-> > Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-> > Co-developed-by: Kai Huang <kai.huang@intel.com>
-> > Acked-by: Dave Hansen <dave.hansen@intel.com>
-> > Signed-off-by: Kai Huang <kai.huang@intel.com>
-> > ---
-> >  arch/x86/kernel/cpu/feat_ctl.c | 57 ++++++++++++++++++++++++++--------
-> >  1 file changed, 44 insertions(+), 13 deletions(-)
-> > 
-> > diff --git a/arch/x86/kernel/cpu/feat_ctl.c b/arch/x86/kernel/cpu/feat_ctl.c
-> > index 27533a6e04fa..96c370284913 100644
-> > --- a/arch/x86/kernel/cpu/feat_ctl.c
-> > +++ b/arch/x86/kernel/cpu/feat_ctl.c
-> > @@ -105,7 +105,8 @@ early_param("nosgx", nosgx);
-> >  void init_ia32_feat_ctl(struct cpuinfo_x86 *c)
-> >  {
-> >  	bool tboot = tboot_enabled();
-> > -	bool enable_sgx;
-> > +	bool enable_sgx_any, enable_sgx_kvm, enable_sgx_driver;
-> > +	bool enable_vmx;
-> >  	u64 msr;
+On Wed, Mar 10, 2021 at 03:26:55PM +0000, Marc Zyngier wrote:
+> Only the nVHE EL2 code is using this define, so let's make it
+> plain that it is EL2 only.
 > 
-> The preferred ordering of variable declarations at the beginning of a
-> function is reverse fir tree order::
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/include/asm/sysreg.h    | 2 +-
+>  arch/arm64/kvm/hyp/nvhe/hyp-init.S | 2 +-
+>  2 files changed, 2 insertions(+), 2 deletions(-)
 > 
-> 	struct long_struct_name *descriptive_name;
-> 	unsigned long foo, bar;
-> 	unsigned int tmp;
-> 	int ret;
+> diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+> index dfd4edbfe360..9d1aef631646 100644
+> --- a/arch/arm64/include/asm/sysreg.h
+> +++ b/arch/arm64/include/asm/sysreg.h
+> @@ -579,7 +579,7 @@
+>  #define SCTLR_ELx_A	(BIT(1))
+>  #define SCTLR_ELx_M	(BIT(0))
+>  
+> -#define SCTLR_ELx_FLAGS	(SCTLR_ELx_M  | SCTLR_ELx_A | SCTLR_ELx_C | \
+> +#define SCTLR_EL2_FLAGS	(SCTLR_ELx_M  | SCTLR_ELx_A | SCTLR_ELx_C | \
+>  			 SCTLR_ELx_SA | SCTLR_ELx_I | SCTLR_ELx_IESB)
+>  
+>  /* SCTLR_EL2 specific flags. */
+> diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-init.S b/arch/arm64/kvm/hyp/nvhe/hyp-init.S
+> index 4eb584ae13d9..7423f4d961a4 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/hyp-init.S
+> +++ b/arch/arm64/kvm/hyp/nvhe/hyp-init.S
+> @@ -122,7 +122,7 @@ alternative_else_nop_endif
+>  	 * as well as the EE bit on BE. Drop the A flag since the compiler
+>  	 * is allowed to generate unaligned accesses.
+>  	 */
+> -	mov_q	x0, (SCTLR_EL2_RES1 | (SCTLR_ELx_FLAGS & ~SCTLR_ELx_A))
+> +	mov_q	x0, (SCTLR_EL2_RES1 | (SCTLR_EL2_FLAGS & ~SCTLR_ELx_A))
 
-IMHO here declaring separate lines would make also sense, given
-how long the local variable names are.
+Can we just drop SCTLR_ELx_A from SCTLR_EL2_FLAGS instead of clearing it
+here?
 
- /Jarkko
+Will
