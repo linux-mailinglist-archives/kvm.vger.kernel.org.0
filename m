@@ -2,125 +2,153 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3524933455A
-	for <lists+kvm@lfdr.de>; Wed, 10 Mar 2021 18:45:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C877D3345A7
+	for <lists+kvm@lfdr.de>; Wed, 10 Mar 2021 18:50:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233188AbhCJRox (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 10 Mar 2021 12:44:53 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:39980 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233145AbhCJRof (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 10 Mar 2021 12:44:35 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1615398273;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=hU8ekKHxTbztMp+pHZxvBx516z1N7ENAuWaGaufXY5Q=;
-        b=NCR2xmSG9Y4ys0xBlASbFmJjQSkPdCCDRj5nzRe8NPDPlu30WRgpTV9zZ5/i9ecOVgYOZc
-        PmGifb7MNb7tjdCAU7vSCE6YT1KptANyJMiK4BisSxmqTQ8ohcy7GorSKkAE55FVn5T/9d
-        V40fiTbBvLSwouBk82fJS4/mLVLKdk0=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-502-VQn2i_wRPWWLdsGQh1kyug-1; Wed, 10 Mar 2021 12:44:31 -0500
-X-MC-Unique: VQn2i_wRPWWLdsGQh1kyug-1
-Received: by mail-ej1-f69.google.com with SMTP id e13so7528959ejd.21
-        for <kvm@vger.kernel.org>; Wed, 10 Mar 2021 09:44:31 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=hU8ekKHxTbztMp+pHZxvBx516z1N7ENAuWaGaufXY5Q=;
-        b=hHQXFuUBeRHOSmyTsLfAAmeNhR7PzlwOQb7gktr12vtggLOnrSuyv/WABNecQQZ/G0
-         z24pJCp875h+m1jkft33hJhk8kC8YfKABqoAX9W32qBIHsikGqv/t95KCltZhuMekd7p
-         lE/rQicV+YE/rW7ysuuHiYfQmE8VHkBrqgf9k+XAKAmDLEYwED4UtsxWqSSOl4I6Ae7k
-         gmktycHfDN4y5EAo42VLSBBOkC4Y+70IjR1qvIKWU+V2Bn6n97CC5fj8NoRwtc/maCYq
-         1Ky295IXB7CyPpQeIWE0NQz8ukaEWd7pS0ywEfCaXMZ0UuYX6VDuFnwKe2cLfOPD3pl8
-         LBDA==
-X-Gm-Message-State: AOAM531PfCnmY14hadBVx15dLhTlrQe14Wa8LHgtiPWQoD1Ku9zkck/T
-        k/CECaRdrxOAV6OBf3+mW1gB4uYO1ibph6LDskQ8qjYv7DzFn9WZmAi2DnU/oczwjSj6rZsBqA6
-        szZ0czL3OLP+i
-X-Received: by 2002:aa7:ca02:: with SMTP id y2mr4748932eds.53.1615398270277;
-        Wed, 10 Mar 2021 09:44:30 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJxG/7Jpsz0wHHG4vrGLPJ/mZ70rGmjD1p1cn8m5yCq4LyuA7dJeziZrVH9s6TVL8ShkHCSIiQ==
-X-Received: by 2002:aa7:ca02:: with SMTP id y2mr4748899eds.53.1615398270150;
-        Wed, 10 Mar 2021 09:44:30 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id 90sm11387479edr.69.2021.03.10.09.44.28
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 10 Mar 2021 09:44:29 -0800 (PST)
-Subject: Re: [RFC PATCH 3/4] KVM: stats: Add ioctl commands to pull statistics
- in binary format
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     Jing Zhang <jingzhangos@google.com>, KVM <kvm@vger.kernel.org>,
-        KVM ARM <kvmarm@lists.cs.columbia.edu>,
-        Linux MIPS <linux-mips@vger.kernel.org>,
-        KVM PPC <kvm-ppc@vger.kernel.org>,
-        Linux S390 <linux-s390@vger.kernel.org>,
-        Linux kselftest <linux-kselftest@vger.kernel.org>,
+        id S233141AbhCJRtl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 10 Mar 2021 12:49:41 -0500
+Received: from mail.kernel.org ([198.145.29.99]:53404 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S232734AbhCJRtU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 10 Mar 2021 12:49:20 -0500
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 4877164F7F;
+        Wed, 10 Mar 2021 17:49:20 +0000 (UTC)
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94)
+        (envelope-from <maz@kernel.org>)
+        id 1lK2xS-000ote-0L; Wed, 10 Mar 2021 17:49:18 +0000
+Date:   Wed, 10 Mar 2021 17:49:17 +0000
+Message-ID: <87zgzagaqq.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Will Deacon <will@kernel.org>
+Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+        linux-arm-kernel@lists.infradead.org,
         James Morse <james.morse@arm.com>,
         Julien Thierry <julien.thierry.kdev@gmail.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Will Deacon <will@kernel.org>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-        Paul Mackerras <paulus@ozlabs.org>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Peter Shier <pshier@google.com>,
-        Oliver Upton <oupton@google.com>,
-        David Rientjes <rientjes@google.com>,
-        Emanuele Giuseppe Esposito <eesposit@redhat.com>
-References: <20210310003024.2026253-1-jingzhangos@google.com>
- <20210310003024.2026253-4-jingzhangos@google.com>
- <875z1zxb11.wl-maz@kernel.org>
- <a475d935-e404-93dd-4c6d-a5f8038d8f4d@redhat.com>
- <8735x3x7lu.wl-maz@kernel.org>
- <2749fe68-acbb-8f4d-dc76-4cb23edb9b35@redhat.com>
- <871rcmhq43.wl-maz@kernel.org>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <fd37d21f-f3ae-d370-f8e1-cf552be3b2ee@redhat.com>
-Date:   Wed, 10 Mar 2021 18:44:27 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.7.0
-MIME-Version: 1.0
-In-Reply-To: <871rcmhq43.wl-maz@kernel.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+        Mark Rutland <mark.rutland@arm.com>, qperret@google.com,
+        kernel-team@android.com
+Subject: Re: [PATCH 3/4] KVM: arm64: Rename SCTLR_ELx_FLAGS to SCTLR_EL2_FLAGS
+In-Reply-To: <20210310161546.GC29834@willie-the-truck>
+References: <20210310152656.3821253-1-maz@kernel.org>
+        <20210310152656.3821253-4-maz@kernel.org>
+        <20210310154625.GA29738@willie-the-truck>
+        <874khjxade.wl-maz@kernel.org>
+        <20210310161546.GC29834@willie-the-truck>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: will@kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, mark.rutland@arm.com, qperret@google.com, kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10/03/21 18:31, Marc Zyngier wrote:
->> Maintaining VM-global counters would require an atomic instruction and
->> would suffer lots of cacheline bouncing even on architectures that
->> have relaxed atomic memory operations.
-> Which is why we have per-cpu counters already. Making use of them
-> doesn't seem that outlandish.
+On Wed, 10 Mar 2021 16:15:47 +0000,
+Will Deacon <will@kernel.org> wrote:
+> 
+> On Wed, Mar 10, 2021 at 04:05:17PM +0000, Marc Zyngier wrote:
+> > On Wed, 10 Mar 2021 15:46:26 +0000,
+> > Will Deacon <will@kernel.org> wrote:
+> > > 
+> > > On Wed, Mar 10, 2021 at 03:26:55PM +0000, Marc Zyngier wrote:
+> > > > Only the nVHE EL2 code is using this define, so let's make it
+> > > > plain that it is EL2 only.
+> > > > 
+> > > > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > > > ---
+> > > >  arch/arm64/include/asm/sysreg.h    | 2 +-
+> > > >  arch/arm64/kvm/hyp/nvhe/hyp-init.S | 2 +-
+> > > >  2 files changed, 2 insertions(+), 2 deletions(-)
+> > > > 
+> > > > diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+> > > > index dfd4edbfe360..9d1aef631646 100644
+> > > > --- a/arch/arm64/include/asm/sysreg.h
+> > > > +++ b/arch/arm64/include/asm/sysreg.h
+> > > > @@ -579,7 +579,7 @@
+> > > >  #define SCTLR_ELx_A	(BIT(1))
+> > > >  #define SCTLR_ELx_M	(BIT(0))
+> > > >  
+> > > > -#define SCTLR_ELx_FLAGS	(SCTLR_ELx_M  | SCTLR_ELx_A | SCTLR_ELx_C | \
+> > > > +#define SCTLR_EL2_FLAGS	(SCTLR_ELx_M  | SCTLR_ELx_A | SCTLR_ELx_C | \
+> > > >  			 SCTLR_ELx_SA | SCTLR_ELx_I | SCTLR_ELx_IESB)
+> > > >  
+> > > >  /* SCTLR_EL2 specific flags. */
+> > > > diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-init.S b/arch/arm64/kvm/hyp/nvhe/hyp-init.S
+> > > > index 4eb584ae13d9..7423f4d961a4 100644
+> > > > --- a/arch/arm64/kvm/hyp/nvhe/hyp-init.S
+> > > > +++ b/arch/arm64/kvm/hyp/nvhe/hyp-init.S
+> > > > @@ -122,7 +122,7 @@ alternative_else_nop_endif
+> > > >  	 * as well as the EE bit on BE. Drop the A flag since the compiler
+> > > >  	 * is allowed to generate unaligned accesses.
+> > > >  	 */
+> > > > -	mov_q	x0, (SCTLR_EL2_RES1 | (SCTLR_ELx_FLAGS & ~SCTLR_ELx_A))
+> > > > +	mov_q	x0, (SCTLR_EL2_RES1 | (SCTLR_EL2_FLAGS & ~SCTLR_ELx_A))
+> > > 
+> > > Can we just drop SCTLR_ELx_A from SCTLR_EL2_FLAGS instead of clearing it
+> > > here?
+> > 
+> > Absolutely. That'd actually be an improvement.
+> 
+> In fact, maybe just define INIT_SCTLR_EL2_MMU_ON to mirror what we do for
+> EL1 (i.e. including the RES1 bits) and then use that here?
 
-But you wouldn't be able to guarantee consistency anyway, would you? 
-You *could* copy N*M counters to userspace, but there's no guarantee 
-that they are consistent, neither within a single vCPU nor within a 
-single counter.
+Like this?
 
->> Speed/efficiency of retrieving statistics is important, but let's keep
->> in mind that the baseline for comparison is hundreds of syscalls and
->> filesystem lookups.
->
-> Having that baseline in the cover letter would be a good start, as
-> well as an indication of the frequency this is used at.
+diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+index dfd4edbfe360..593b9bf91bbd 100644
+--- a/arch/arm64/include/asm/sysreg.h
++++ b/arch/arm64/include/asm/sysreg.h
+@@ -579,9 +579,6 @@
+ #define SCTLR_ELx_A	(BIT(1))
+ #define SCTLR_ELx_M	(BIT(0))
+ 
+-#define SCTLR_ELx_FLAGS	(SCTLR_ELx_M  | SCTLR_ELx_A | SCTLR_ELx_C | \
+-			 SCTLR_ELx_SA | SCTLR_ELx_I | SCTLR_ELx_IESB)
+-
+ /* SCTLR_EL2 specific flags. */
+ #define SCTLR_EL2_RES1	((BIT(4))  | (BIT(5))  | (BIT(11)) | (BIT(16)) | \
+ 			 (BIT(18)) | (BIT(22)) | (BIT(23)) | (BIT(28)) | \
+@@ -593,6 +590,10 @@
+ #define ENDIAN_SET_EL2		0
+ #endif
+ 
++#define INIT_SCTLR_EL2_MMU_ON						\
++	(SCTLR_ELx_M  | SCTLR_ELx_C | SCTLR_ELx_SA | SCTLR_ELx_I |	\
++	 SCTLR_ELx_IESB | ENDIAN_SET_EL2 | SCTLR_EL2_RES1)
++
+ #define INIT_SCTLR_EL2_MMU_OFF \
+ 	(SCTLR_EL2_RES1 | ENDIAN_SET_EL2)
+ 
+diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-init.S b/arch/arm64/kvm/hyp/nvhe/hyp-init.S
+index 4eb584ae13d9..2e16b2098bbd 100644
+--- a/arch/arm64/kvm/hyp/nvhe/hyp-init.S
++++ b/arch/arm64/kvm/hyp/nvhe/hyp-init.S
+@@ -117,13 +117,7 @@ alternative_else_nop_endif
+ 	tlbi	alle2
+ 	dsb	sy
+ 
+-	/*
+-	 * Preserve all the RES1 bits while setting the default flags,
+-	 * as well as the EE bit on BE. Drop the A flag since the compiler
+-	 * is allowed to generate unaligned accesses.
+-	 */
+-	mov_q	x0, (SCTLR_EL2_RES1 | (SCTLR_ELx_FLAGS & ~SCTLR_ELx_A))
+-CPU_BE(	orr	x0, x0, #SCTLR_ELx_EE)
++	mov_q	x0, INIT_SCTLR_EL2_MMU_ON
+ alternative_if ARM64_HAS_ADDRESS_AUTH
+ 	mov_q	x1, (SCTLR_ELx_ENIA | SCTLR_ELx_ENIB | \
+ 		     SCTLR_ELx_ENDA | SCTLR_ELx_ENDB)
 
-Can't disagree, especially on the latter which I have no idea about.
+	M.
 
-Paolo
-
+-- 
+Without deviation from the norm, progress is not possible.
