@@ -2,128 +2,172 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9C3723345BA
-	for <lists+kvm@lfdr.de>; Wed, 10 Mar 2021 18:53:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3A14C3345C0
+	for <lists+kvm@lfdr.de>; Wed, 10 Mar 2021 18:54:37 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233480AbhCJRwW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 10 Mar 2021 12:52:22 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47366 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233257AbhCJRv5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 10 Mar 2021 12:51:57 -0500
-Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 97D9AC061761
-        for <kvm@vger.kernel.org>; Wed, 10 Mar 2021 09:51:57 -0800 (PST)
-Received: by mail-pj1-x1030.google.com with SMTP id mz6-20020a17090b3786b02900c16cb41d63so7914329pjb.2
-        for <kvm@vger.kernel.org>; Wed, 10 Mar 2021 09:51:57 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=YAIZBUejgsuRm3I/i8T3yjE4IQIAIxaYEAKBNsGudB8=;
-        b=n7lAY9Mh6yDTmTTIv7zZyu41T9/hF6k4r9wQkCHFWNi0aKhriqdg3RwoAnkmp+lgwk
-         Oy/bbQXbJgFLBo6GR1J30O/H2pM+3SOBLTotrHTTK0VLehStaNQLiDWXyxAJE2mjc1dC
-         ntlQpJkvDo7H5ChokF7zw02U6yB/4+aEXUwD/2Pv32YC3hrMeWgJsBKnkja+L5kqQPis
-         M5sJUpsQ6+Lckj2ERtiVM0F9lRmy8+qRydOp6ns1Gh33ktnXoaNPdndAPw7s0nZF9HER
-         /8iZil8ckUoUwH6HzX7JXqVCfmQc1AkEcafLpOg1TaxViD/cyNak0teaHOHK2/PnZ8Dm
-         ngVg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=YAIZBUejgsuRm3I/i8T3yjE4IQIAIxaYEAKBNsGudB8=;
-        b=N70BhsWdJDvWhhFBE69l2S95xO8wVkhLCYxw/pujW4Pl4tLsg/5RldPnnbTP70CS2r
-         lNmwQ8LZ7E0CAXaA8Nk8O/4M5KMXhAGLZduYSpTW/RP767eMXNWFBx71s6pS9T0MLgG/
-         GNi8e1/1SjiUPJoZJYw1Ga6hkLPJLq3xa6cAxWbkt1EmYsxijS/SoOrC0U0awKh2E88Z
-         ybG2K59IRYF37tlmuTI2KnxSnE4La5wZ5bPuqpPxYOuuPcpeRfIYDlDbX/ZnQ60uoef2
-         iArWgHx3rcmrtjkeQwpCtZijxj6o5XhkVjTiBON51lP/GIVy47dEx9qFMyM50Vwv3sBE
-         PxDg==
-X-Gm-Message-State: AOAM532BQiD9DSqU0Sp4dxwzf3Qtclk0c0VdEzLTenLwOqfNuiBb3doK
-        j+nAOgkqWcJqeINWiUs3slQoFw==
-X-Google-Smtp-Source: ABdhPJx2/KjxJOlLrywlrZyCi4etdMjlYm9VOhRGmyxW79l/RXMdX6XsloC3NohTmM/VTndD9sLVmA==
-X-Received: by 2002:a17:902:b610:b029:e3:2b1e:34ff with SMTP id b16-20020a170902b610b02900e32b1e34ffmr4041572pls.69.1615398716928;
-        Wed, 10 Mar 2021 09:51:56 -0800 (PST)
-Received: from google.com ([2620:15c:f:10:e4dd:6c31:9463:f8da])
-        by smtp.gmail.com with ESMTPSA id f3sm164471pfe.25.2021.03.10.09.51.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 10 Mar 2021 09:51:56 -0800 (PST)
-Date:   Wed, 10 Mar 2021 09:51:48 -0800
-From:   Sean Christopherson <seanjc@google.com>
-To:     Martin Radev <martin.b.radev@gmail.com>
-Cc:     Joerg Roedel <joro@8bytes.org>, x86@kernel.org,
-        Joerg Roedel <jroedel@suse.de>, hpa@zytor.com,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Jiri Slaby <jslaby@suse.cz>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Juergen Gross <jgross@suse.com>,
-        Kees Cook <keescook@chromium.org>,
-        David Rientjes <rientjes@google.com>,
-        Cfir Cohen <cfir@google.com>,
-        Erdem Aktas <erdemaktas@google.com>,
-        Masami Hiramatsu <mhiramat@kernel.org>,
-        Mike Stunes <mstunes@vmware.com>,
-        Arvind Sankar <nivedita@alum.mit.edu>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org
-Subject: Re: [PATCH v2 5/7] x86/boot/compressed/64: Add CPUID sanity check to
- 32-bit boot-path
-Message-ID: <YEkHNDgmybNI+Ptt@google.com>
-References: <20210310084325.12966-1-joro@8bytes.org>
- <20210310084325.12966-6-joro@8bytes.org>
- <YEjvBfJg8P1SQt98@google.com>
- <YEkBU9em9SQZ25vA@martin-ThinkPad-T440p>
+        id S233418AbhCJRx5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 10 Mar 2021 12:53:57 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:40508 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S233141AbhCJRxm (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 10 Mar 2021 12:53:42 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1615398822;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=PuJS7Uwxjf6BC5NU8Y7Fju1Ajk5eXmk9D7KP7XIVI9E=;
+        b=PYdhZt9RcIJVy+lJMjN72MeEqZcQgoUQn9jWNIvI141Nm81AUCG8INl3j0JE7Y54TIJKqO
+        z427OpoiUEonIEQIgnlVntNvupvp1jah9YNRMv70gf61psm3S1thBtWuHUncTCIfBYW/HC
+        jye2QlYMv9qV1bKbWbTibvYtPl4RBZw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-62-a6dvy-ReNKWEL7uMIW-mrg-1; Wed, 10 Mar 2021 12:53:38 -0500
+X-MC-Unique: a6dvy-ReNKWEL7uMIW-mrg-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 23ECE808259;
+        Wed, 10 Mar 2021 17:53:37 +0000 (UTC)
+Received: from gimli.home (ovpn-112-255.phx2.redhat.com [10.3.112.255])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 04846E15C;
+        Wed, 10 Mar 2021 17:53:29 +0000 (UTC)
+Subject: [PATCH] vfio/pci: Handle concurrent vma faults
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     alex.williamson@redhat.com
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org, jgg@nvidia.com,
+        peterx@redhat.com, prime.zeng@hisilicon.com, cohuck@redhat.com
+Date:   Wed, 10 Mar 2021 10:53:29 -0700
+Message-ID: <161539852724.8302.17137130175894127401.stgit@gimli.home>
+User-Agent: StGit/0.21-2-g8ef5
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YEkBU9em9SQZ25vA@martin-ThinkPad-T440p>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Mar 10, 2021, Martin Radev wrote:
-> On Wed, Mar 10, 2021 at 08:08:37AM -0800, Sean Christopherson wrote:
-> > On Wed, Mar 10, 2021, Joerg Roedel wrote:
-> > > +	/*
-> > > +	 * Sanity check CPUID results from the Hypervisor. See comment in
-> > > +	 * do_vc_no_ghcb() for more details on why this is necessary.
-> > > +	 */
-> > > +
-> > > +	/* Fail if Hypervisor bit not set in CPUID[1].ECX[31] */
-> > 
-> > This check is flawed, as is the existing check in 64-bit boot.  Or I guess more
-> > accurately, the check in get_sev_encryption_bit() is flawed.  AIUI, SEV-ES
-> > doesn't require the hypervisor to intercept CPUID.  A malicious hypervisor can
-> > temporarily pass-through CPUID to bypass the CPUID[1].ECX[31] check.
-> 
-> If erroneous information is provided, either through interception or without, there's
-> this check which is performed every time a new page table is set in the early linux stages:
-> https://elixir.bootlin.com/linux/v5.12-rc2/source/arch/x86/kernel/sev_verify_cbit.S#L22
-> 
-> This should lead to a halt if corruption is detected, unless I'm overlooking something.
-> Please share more info.
+vfio_pci_mmap_fault() incorrectly makes use of io_remap_pfn_range()
+from within a vm_ops fault handler.  This function will trigger a
+BUG_ON if it encounters a populated pte within the remapped range,
+where any fault is meant to populate the entire vma.  Concurrent
+inflight faults to the same vma will therefore hit this issue,
+triggering traces such as:
 
-That check is predicated on sme_me_mask != 0, sme_me_mask is set based on the
-result of get_sev_encryption_bit(), and that returns '0' if CPUID[1].ECX[31] is
-'0'.
+[ 1591.733256] kernel BUG at mm/memory.c:2177!
+[ 1591.739515] Internal error: Oops - BUG: 0 [#1] PREEMPT SMP
+[ 1591.747381] Modules linked in: vfio_iommu_type1 vfio_pci vfio_virqfd vfio pv680_mii(O)
+[ 1591.760536] CPU: 2 PID: 227 Comm: lcore-worker-2 Tainted: G O 5.11.0-rc3+ #1
+[ 1591.770735] Hardware name:  , BIOS HixxxxFPGA 1P B600 V121-1
+[ 1591.778872] pstate: 40400009 (nZcv daif +PAN -UAO -TCO BTYPE=--)
+[ 1591.786134] pc : remap_pfn_range+0x214/0x340
+[ 1591.793564] lr : remap_pfn_range+0x1b8/0x340
+[ 1591.799117] sp : ffff80001068bbd0
+[ 1591.803476] x29: ffff80001068bbd0 x28: 0000042eff6f0000
+[ 1591.810404] x27: 0000001100910000 x26: 0000001300910000
+[ 1591.817457] x25: 0068000000000fd3 x24: ffffa92f1338e358
+[ 1591.825144] x23: 0000001140000000 x22: 0000000000000041
+[ 1591.832506] x21: 0000001300910000 x20: ffffa92f141a4000
+[ 1591.839520] x19: 0000001100a00000 x18: 0000000000000000
+[ 1591.846108] x17: 0000000000000000 x16: ffffa92f11844540
+[ 1591.853570] x15: 0000000000000000 x14: 0000000000000000
+[ 1591.860768] x13: fffffc0000000000 x12: 0000000000000880
+[ 1591.868053] x11: ffff0821bf3d01d0 x10: ffff5ef2abd89000
+[ 1591.875932] x9 : ffffa92f12ab0064 x8 : ffffa92f136471c0
+[ 1591.883208] x7 : 0000001140910000 x6 : 0000000200000000
+[ 1591.890177] x5 : 0000000000000001 x4 : 0000000000000001
+[ 1591.896656] x3 : 0000000000000000 x2 : 0168044000000fd3
+[ 1591.903215] x1 : ffff082126261880 x0 : fffffc2084989868
+[ 1591.910234] Call trace:
+[ 1591.914837]  remap_pfn_range+0x214/0x340
+[ 1591.921765]  vfio_pci_mmap_fault+0xac/0x130 [vfio_pci]
+[ 1591.931200]  __do_fault+0x44/0x12c
+[ 1591.937031]  handle_mm_fault+0xcc8/0x1230
+[ 1591.942475]  do_page_fault+0x16c/0x484
+[ 1591.948635]  do_translation_fault+0xbc/0xd8
+[ 1591.954171]  do_mem_abort+0x4c/0xc0
+[ 1591.960316]  el0_da+0x40/0x80
+[ 1591.965585]  el0_sync_handler+0x168/0x1b0
+[ 1591.971608]  el0_sync+0x174/0x180
+[ 1591.978312] Code: eb1b027f 540000c0 f9400022 b4fffe02 (d4210000)
 
-sme_enable() also appears to have the same issue, as CPUID[1].ECX[31]=0 would
-cause it to check for SME instead of SEV, and the hypervisor can simply return
-0 for a VMGEXIT to get MSR_K8_SYSCFG.
+Switch to using vmf_insert_pfn_prot() so that we can retain the
+decrypted memory protection from io_remap_pfn_range(), but allow
+concurrent page table updates.  Tracking of vmas is also updated to
+prevent duplicate entries.
 
-I've no idea if the guest would actually survive with a bogus sme_me_mask, but
-relying on CPUID[1] to #VC is flawed.
+Fixes: 11c4cd07ba11 ("vfio-pci: Fault mmaps to enable vma tracking")
+Reported-by: Zeng Tao <prime.zeng@hisilicon.com>
+Suggested-by: Zeng Tao <prime.zeng@hisilicon.com>
+Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
+---
 
-Since MSR_AMD64_SEV is non-interceptable, that seems like it should be the
-canonical way to detect SEV/SEV-ES.  The only complication seems to be handling
-#GP faults on the RDMSR in early boot.
+Zeng Tao, I hope you don't mind me sending a new version to keep
+this moving.  Testing and review appreciated, thanks!
 
-> > The hypervisor likely has access to the guest firmware source, so it
-> > wouldn't be difficult for the hypervisor to disable CPUID interception once
-> > it detects that firmware is handing over control to the kernel.
-> > 
-> 
-> You probably don't even need to know the firmware for that. There the option
-> to set CR* changes to cause #AE which probably gives away enough information.
+ drivers/vfio/pci/vfio_pci.c |   30 ++++++++++++++++++------------
+ 1 file changed, 18 insertions(+), 12 deletions(-)
+
+diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
+index 65e7e6b44578..ae723808e08b 100644
+--- a/drivers/vfio/pci/vfio_pci.c
++++ b/drivers/vfio/pci/vfio_pci.c
+@@ -1573,6 +1573,11 @@ static int __vfio_pci_add_vma(struct vfio_pci_device *vdev,
+ {
+ 	struct vfio_pci_mmap_vma *mmap_vma;
+ 
++	list_for_each_entry(mmap_vma, &vdev->vma_list, vma_next) {
++		if (mmap_vma->vma == vma)
++			return 0; /* Swallow the error, the vma is tracked */
++	}
++
+ 	mmap_vma = kmalloc(sizeof(*mmap_vma), GFP_KERNEL);
+ 	if (!mmap_vma)
+ 		return -ENOMEM;
+@@ -1612,31 +1617,32 @@ static vm_fault_t vfio_pci_mmap_fault(struct vm_fault *vmf)
+ {
+ 	struct vm_area_struct *vma = vmf->vma;
+ 	struct vfio_pci_device *vdev = vma->vm_private_data;
+-	vm_fault_t ret = VM_FAULT_NOPAGE;
++	unsigned long vaddr = vma->vm_start, pfn = vma->vm_pgoff;
++	vm_fault_t ret = VM_FAULT_SIGBUS;
+ 
+ 	mutex_lock(&vdev->vma_lock);
+ 	down_read(&vdev->memory_lock);
+ 
+-	if (!__vfio_pci_memory_enabled(vdev)) {
+-		ret = VM_FAULT_SIGBUS;
+-		mutex_unlock(&vdev->vma_lock);
++	if (!__vfio_pci_memory_enabled(vdev))
+ 		goto up_out;
++
++	for (; vaddr < vma->vm_end; vaddr += PAGE_SIZE, pfn++) {
++		ret = vmf_insert_pfn_prot(vma, vaddr, pfn,
++					  pgprot_decrypted(vma->vm_page_prot));
++		if (ret != VM_FAULT_NOPAGE) {
++			zap_vma_ptes(vma, vma->vm_start, vaddr - vma->vm_start);
++			goto up_out;
++		}
+ 	}
+ 
+ 	if (__vfio_pci_add_vma(vdev, vma)) {
+ 		ret = VM_FAULT_OOM;
+-		mutex_unlock(&vdev->vma_lock);
+-		goto up_out;
++		zap_vma_ptes(vma, vma->vm_start, vma->vm_end - vma->vm_start);
+ 	}
+ 
+-	mutex_unlock(&vdev->vma_lock);
+-
+-	if (io_remap_pfn_range(vma, vma->vm_start, vma->vm_pgoff,
+-			       vma->vm_end - vma->vm_start, vma->vm_page_prot))
+-		ret = VM_FAULT_SIGBUS;
+-
+ up_out:
+ 	up_read(&vdev->memory_lock);
++	mutex_unlock(&vdev->vma_lock);
+ 	return ret;
+ }
+ 
+
