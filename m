@@ -2,264 +2,120 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 10C353346FD
-	for <lists+kvm@lfdr.de>; Wed, 10 Mar 2021 19:41:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1EC913346FA
+	for <lists+kvm@lfdr.de>; Wed, 10 Mar 2021 19:41:13 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233135AbhCJSkk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 10 Mar 2021 13:40:40 -0500
-Received: from foss.arm.com ([217.140.110.172]:51764 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S233424AbhCJSkH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 10 Mar 2021 13:40:07 -0500
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 837CE1FB;
-        Wed, 10 Mar 2021 10:40:06 -0800 (PST)
-Received: from [10.57.52.136] (unknown [10.57.52.136])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 0A6053F800;
-        Wed, 10 Mar 2021 10:40:03 -0800 (PST)
-Subject: Re: [PATCH 14/17] iommu: remove DOMAIN_ATTR_DMA_USE_FLUSH_QUEUE
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
-        Li Yang <leoyang.li@nxp.com>, freedreno@lists.freedesktop.org,
-        kvm@vger.kernel.org, Michael Ellerman <mpe@ellerman.id.au>,
-        linuxppc-dev@lists.ozlabs.org, dri-devel@lists.freedesktop.org,
-        virtualization@lists.linux-foundation.org,
-        iommu@lists.linux-foundation.org, netdev@vger.kernel.org,
-        linux-arm-msm@vger.kernel.org,
-        David Woodhouse <dwmw2@infradead.org>,
-        linux-arm-kernel@lists.infradead.org
-References: <20210301084257.945454-1-hch@lst.de>
- <20210301084257.945454-15-hch@lst.de>
- <1658805c-ed28-b650-7385-a56fab3383e3@arm.com> <20210310091501.GC5928@lst.de>
- <20210310092533.GA6819@lst.de>
-From:   Robin Murphy <robin.murphy@arm.com>
-Message-ID: <fdacf87a-be14-c92c-4084-1d1dd4fc7766@arm.com>
-Date:   Wed, 10 Mar 2021 18:39:57 +0000
-User-Agent: Mozilla/5.0 (Windows NT 10.0; rv:78.0) Gecko/20100101
- Thunderbird/78.7.1
+        id S233424AbhCJSkl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 10 Mar 2021 13:40:41 -0500
+Received: from mail-mw2nam08on2051.outbound.protection.outlook.com ([40.107.101.51]:45440
+        "EHLO NAM04-MW2-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S233250AbhCJSkP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 10 Mar 2021 13:40:15 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=ExEBygMgQaY8vs0q9Xbq+tzXjTt0nUJq/hLu0KB1XN3g1NpttjYdXqiiTm3Z87Ngm+ktTQxJiKP0C2EsF30c556V5U3H0yZibxilwJO9OGM3svqy01om4Scot1HJEitYKzAxXCXzP7aaAll8MLBTdyF2Cqdq8X+LQuWwrMLzZq2afn+tGI8CC8Gfzq6BJw3YSbBrwHilVW7/2QMSdiEmCU2zb+NxnwB3Kkor37KIX3IhHztFJt6YhN7PX1HkTZtNaMC2M5ekau4XzUlDQ0WgIK0fa/WeEm7PjocbpJ7zxamxchz/E4ywVujF+Gse9yNnJgjzU9C2xhS9lpAjhzNiEQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=7C7w+XxO2DopMgquN2wSLs1qQ2d24B8PrXfyqjJ+7Bk=;
+ b=FepGCX9bm6SYUUAH2s3l9TQ7P00IaUgkOd82BfqEmtnpf5iPrU/1Tp2tia4H1zOaHu4Mee6afRCgkO4jz/srUIXGrM3SZQkYxlc0q+ok9qI25MkXV+oe+pB0gVD9arh2EsXlQJYk2+8Wx0GuaHSNbwFJHS/a4XgNpMApDc7X95pnASELcBK+nBsV0gOWppgvVrEEb+jdes7ddLY2hcA9YtbBiVykYaPIgm0Ss/HsoaAUndjx7SyfXOEp1J/6pzJoYIa5+XDUlmU2hkGPdaAoFSw/ZNA0QFmryht89R4XtSZzFar+MmvQmYk8HD6UduLaJrvzNjKikn2vu+R+K7PeEg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=7C7w+XxO2DopMgquN2wSLs1qQ2d24B8PrXfyqjJ+7Bk=;
+ b=FkAe8lnbOtA0ua9WYRtNtTzuv4pcq9hKP9EDhn4c6/uSd4O5AH3AAfrhuL4yZnv8hJFhXVUV49ati8LgbrQuRVHiaDtX2qOKyzm1cV0a50EovCg297MMPKoSAmhyOv7J6/UE75qDqHoQjhSL7Q2DS/msZPOczOrnQLC5LoD8N84O+Lf7x8pcRQT5SXSDes03yKsSl7KU4KcecwU/0qytikCNbYh0pEY9PDea0hN3eWsomgE+IzA3oVTZiqgabrGxdq03dlzYnhQSZZHOKB6NUYeQKC2Y7ym3eE7+smgIIOOl2a1VbLr+g7l936jNvbVdS59D2SfNoSfsk66WNoeeBA==
+Authentication-Results: redhat.com; dkim=none (message not signed)
+ header.d=none;redhat.com; dmarc=none action=none header.from=nvidia.com;
+Received: from DM6PR12MB3834.namprd12.prod.outlook.com (2603:10b6:5:14a::12)
+ by DM5PR12MB1659.namprd12.prod.outlook.com (2603:10b6:4:11::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3912.17; Wed, 10 Mar
+ 2021 18:40:14 +0000
+Received: from DM6PR12MB3834.namprd12.prod.outlook.com
+ ([fe80::1c62:7fa3:617b:ab87]) by DM6PR12MB3834.namprd12.prod.outlook.com
+ ([fe80::1c62:7fa3:617b:ab87%6]) with mapi id 15.20.3912.027; Wed, 10 Mar 2021
+ 18:40:14 +0000
+Date:   Wed, 10 Mar 2021 14:40:11 -0400
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        peterx@redhat.com, prime.zeng@hisilicon.com, cohuck@redhat.com
+Subject: Re: [PATCH] vfio/pci: Handle concurrent vma faults
+Message-ID: <20210310184011.GA2356281@nvidia.com>
+References: <161539852724.8302.17137130175894127401.stgit@gimli.home>
+ <20210310181446.GZ2356281@nvidia.com>
+ <20210310113406.6f029fcf@omen.home.shazbot.org>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210310113406.6f029fcf@omen.home.shazbot.org>
+X-Originating-IP: [142.162.115.133]
+X-ClientProxiedBy: BL1PR13CA0104.namprd13.prod.outlook.com
+ (2603:10b6:208:2b9::19) To DM6PR12MB3834.namprd12.prod.outlook.com
+ (2603:10b6:5:14a::12)
 MIME-Version: 1.0
-In-Reply-To: <20210310092533.GA6819@lst.de>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-GB
-Content-Transfer-Encoding: 7bit
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from mlx.ziepe.ca (142.162.115.133) by BL1PR13CA0104.namprd13.prod.outlook.com (2603:10b6:208:2b9::19) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3933.23 via Frontend Transport; Wed, 10 Mar 2021 18:40:13 +0000
+Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1lK3kh-00AqVr-Mg; Wed, 10 Mar 2021 14:40:11 -0400
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 1cc0c7f0-e389-4396-c400-08d8e3f3f0e6
+X-MS-TrafficTypeDiagnostic: DM5PR12MB1659:
+X-Microsoft-Antispam-PRVS: <DM5PR12MB16597BCC813E6F68D2587895C2919@DM5PR12MB1659.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:2733;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: VkPMPLg8VJwIOUTw/SMGjkV/E7AHugPPzwlFNfuTYO0WMhiqzzQ8GCAexnWw6yd947fEMdCHqqT+c0qLLD4Z7fF9paqxP5AVVHCVvB/PP6+OByp/DDJqTwOJcKF8TzVg+VknzCSLhKZujwqkHODI4nd3fcrknsMriwAcD77eAq1gCdTAU7fQBCRrPz1WfTFq2yoC1UnKfz7GkaqCfRqtuLrDpwztQnU+t5CakxKqK4w/O8VGTTWdczEvcizWtwm7CdexxLFOtTs7fYpM2/Yojr4uXaM+PAAvnfwpCl0m2laSUsPKFEzXbBgVa6BT2fXOFlTUTw90ex2ktWONQyR1NVXP0BZhhy28N01rDtfhnEa3KDpaOqwz5BAXDkVysW5CcXKqD909elUaVrgCNi6hU50Bk5VZYXDhtPi/JL6kcNtihTytKv++GDL2QDxSh7CBJf3bvdUgxWQwt+o7o64+7Yj/KTqc09+lM8oOs0WXn0J3vEXm8TfhCyRaCWO6Ltj9B5bEF5kmqAHqDzaPQadQZg==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB3834.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(136003)(39860400002)(346002)(396003)(376002)(478600001)(4326008)(86362001)(5660300002)(1076003)(4744005)(33656002)(6916009)(8676002)(426003)(2906002)(8936002)(316002)(26005)(2616005)(186003)(36756003)(9746002)(9786002)(66946007)(66476007)(66556008);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData: =?us-ascii?Q?306x1TcXVIRkvEBurhN/uf7VsyhmiKyab9RpXbUQc3zwl6Tk2JO+yWVAc+V7?=
+ =?us-ascii?Q?KE6E4CQlyVB1vj3d34pBOAwzbHCqCPZej+ubE6zwNBOVCt6PAaJtVo7LI2Za?=
+ =?us-ascii?Q?7Zz/sD1eFyXMGDpeQ11/fOZ9CQCrEbZ7W1Lf/yLiZ/4/ElKfiv6kAcZXSNyJ?=
+ =?us-ascii?Q?bLi9hul9NucHGoiU2YEZG3zenG8zyuROPsiHFc4VQwgjWYMDkf/qsJNO7Df2?=
+ =?us-ascii?Q?HMGEougbqZ4YDOAH5qqPUtpk8ZQbBzwZ6UVZnLsMICoqEVWVDeR/63njpVaP?=
+ =?us-ascii?Q?XXCJlNjPbEDqJPqAB02izi29bbLet+asAEkjE8P5rpu6sfQMnyRFNbY2wagC?=
+ =?us-ascii?Q?44CrdabMCAokI52iWqtJ1Ce68N0ki9ZKpEhpe8WhF1gtAPT82HYLn8WiX2tH?=
+ =?us-ascii?Q?WqY0lHcZUTJ7ikRdpZceRARFNc5HRGqGCgE1q3SO52kmB/6NbX1EL1BcDXfu?=
+ =?us-ascii?Q?Ge8Ac8O0dUXm1VHKJk2t63YV8iF4yNBPN3agbPXBwP6IzARzyRZwrMNEP3wb?=
+ =?us-ascii?Q?v9N+MUi4ONUSK3se8MWowOmmMG6OYE5qJkQSEe9j0YVJIKXhqJ/PI/dIMFFm?=
+ =?us-ascii?Q?ozSbZPBbhbxbz0rq1asN/d5yU5G4Tp2sJ7gs9Xc+bNHH5OwUNjhctfuP/4o5?=
+ =?us-ascii?Q?48Vie85qRobX2kj1Pp2jA+8qmFU/uU1GHNrBNMgt1T16oCvdHiWI0jGRnUPc?=
+ =?us-ascii?Q?2Kcl0BAHS/kr3wwEBn0F8UbZOYyUjS6pL8kOUEjnV1foRrKZQphz8oirC77e?=
+ =?us-ascii?Q?ntB57Hw0hmMloPmUsp7Xkc6WPnqO+lvVt7Q7rseEbd5ejLuh/Zs6oDLLUPQL?=
+ =?us-ascii?Q?J6IqQ1DMuVUVZeCBi6hT8SBeo/2a0iOH+1TbXdnjW0XgzV9HWsj6YWRh/6qz?=
+ =?us-ascii?Q?uhgyR/0N/HTSN+6puK5GzI8v4RvH9hJyLyqtYjoHXvF7pcUkgHIxZgas/7Sy?=
+ =?us-ascii?Q?+9EQGLP49+E5R8CWAm5k5MEMQO9S9ENArJjv3YHEaXbZbL1p3TxW4o8T17o8?=
+ =?us-ascii?Q?ly15SXsJgXmW7wOK1R1m0uixectSHGGTtvsZwRU94T/WYB+eBbx0hQf1L5SW?=
+ =?us-ascii?Q?LJSBnHnqXl7y0oxWs3EuC03hNdBA9KET72wzDeMRGAnAYZMpz3YbserXd/cy?=
+ =?us-ascii?Q?CkHK4BTvznHIYYl+gGDtgURj/Enfz6oPAE1kZ7P5g4FMVyyMTv2k9yCct6mU?=
+ =?us-ascii?Q?odej3U4IpD56ZE/wINu1n+i2efahnOIjl6U9WBCi5vQ+V0aPRMgotoRQLmwO?=
+ =?us-ascii?Q?wumgSiaih+27fW614+Nns+2vihlhaac+JLlal9YcaR3MmP+FUAZtj910JylH?=
+ =?us-ascii?Q?zx1RIXueBPlU7HzBzNw7kESkPUeFZdY1RibwcQb9NJpcFg=3D=3D?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1cc0c7f0-e389-4396-c400-08d8e3f3f0e6
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB3834.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Mar 2021 18:40:13.9074
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 8MUTXaFqCvtXqLvxWb3sp0ApvmXFTRX4C+EisDCgYXYSo5Vu2vt7aMgEw8yx+wxj
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR12MB1659
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2021-03-10 09:25, Christoph Hellwig wrote:
-> On Wed, Mar 10, 2021 at 10:15:01AM +0100, Christoph Hellwig wrote:
->> On Thu, Mar 04, 2021 at 03:25:27PM +0000, Robin Murphy wrote:
->>> On 2021-03-01 08:42, Christoph Hellwig wrote:
->>>> Use explicit methods for setting and querying the information instead.
->>>
->>> Now that everyone's using iommu-dma, is there any point in bouncing this
->>> through the drivers at all? Seems like it would make more sense for the x86
->>> drivers to reflect their private options back to iommu_dma_strict (and
->>> allow Intel's caching mode to override it as well), then have
->>> iommu_dma_init_domain just test !iommu_dma_strict &&
->>> domain->ops->flush_iotlb_all.
->>
->> Hmm.  I looked at this, and kill off ->dma_enable_flush_queue for
->> the ARM drivers and just looking at iommu_dma_strict seems like a
->> very clear win.
->>
->> OTOH x86 is a little more complicated.  AMD and intel defaul to lazy
->> mode, so we'd have to change the global iommu_dma_strict if they are
->> initialized.  Also Intel has not only a "static" option to disable
->> lazy mode, but also a "dynamic" one where it iterates structure.  So
->> I think on the get side we're stuck with the method, but it still
->> simplifies the whole thing.
+On Wed, Mar 10, 2021 at 11:34:06AM -0700, Alex Williamson wrote:
+
+> > I think after the address_space changes this should try to stick with
+> > a normal io_rmap_pfn_range() done outside the fault handler.
 > 
-> Actually... Just mirroring the iommu_dma_strict value into
-> struct iommu_domain should solve all of that with very little
-> boilerplate code.
+> I assume you're suggesting calling io_remap_pfn_range() when device
+> memory is enabled,
 
-Yes, my initial thought was to directly replace the attribute with a
-common flag at iommu_domain level, but since in all cases the behaviour
-is effectively global rather than actually per-domain, it seemed
-reasonable to take it a step further. This passes compile-testing for
-arm64 and x86, what do you think?
+Yes, I think I saw Peter thinking along these lines too
 
-Robin.
+Then fault just always causes SIGBUS if it gets called
 
------>8-----
-Subject: [PATCH] iommu: Consolidate strict invalidation handling
-
-Now that everyone is using iommu-dma, the global invalidation policy
-really doesn't need to be woven through several parts of the core API
-and individual drivers, we can just look it up directly at the one point
-that we now make the flush queue decision. If the x86 drivers reflect
-their internal options and overrides back to iommu_dma_strict, that can
-become the canonical source.
-
-Signed-off-by: Robin Murphy <robin.murphy@arm.com>
----
-  drivers/iommu/amd/iommu.c   |  2 ++
-  drivers/iommu/dma-iommu.c   |  8 +-------
-  drivers/iommu/intel/iommu.c | 12 ++++++++++++
-  drivers/iommu/iommu.c       | 35 +++++++++++++++++++++++++++--------
-  include/linux/iommu.h       |  2 ++
-  5 files changed, 44 insertions(+), 15 deletions(-)
-
-diff --git a/drivers/iommu/amd/iommu.c b/drivers/iommu/amd/iommu.c
-index a69a8b573e40..1db29e59d468 100644
---- a/drivers/iommu/amd/iommu.c
-+++ b/drivers/iommu/amd/iommu.c
-@@ -1856,6 +1856,8 @@ int __init amd_iommu_init_dma_ops(void)
-  	else
-  		pr_info("Lazy IO/TLB flushing enabled\n");
-  
-+	iommu_set_dma_strict(amd_iommu_unmap_flush);
-+
-  	return 0;
-  
-  }
-diff --git a/drivers/iommu/dma-iommu.c b/drivers/iommu/dma-iommu.c
-index af765c813cc8..789a950cc125 100644
---- a/drivers/iommu/dma-iommu.c
-+++ b/drivers/iommu/dma-iommu.c
-@@ -304,10 +304,6 @@ static void iommu_dma_flush_iotlb_all(struct iova_domain *iovad)
-  
-  	cookie = container_of(iovad, struct iommu_dma_cookie, iovad);
-  	domain = cookie->fq_domain;
--	/*
--	 * The IOMMU driver supporting DOMAIN_ATTR_DMA_USE_FLUSH_QUEUE
--	 * implies that ops->flush_iotlb_all must be non-NULL.
--	 */
-  	domain->ops->flush_iotlb_all(domain);
-  }
-  
-@@ -334,7 +330,6 @@ static int iommu_dma_init_domain(struct iommu_domain *domain, dma_addr_t base,
-  	struct iommu_dma_cookie *cookie = domain->iova_cookie;
-  	unsigned long order, base_pfn;
-  	struct iova_domain *iovad;
--	int attr;
-  
-  	if (!cookie || cookie->type != IOMMU_DMA_IOVA_COOKIE)
-  		return -EINVAL;
-@@ -371,8 +366,7 @@ static int iommu_dma_init_domain(struct iommu_domain *domain, dma_addr_t base,
-  	init_iova_domain(iovad, 1UL << order, base_pfn);
-  
-  	if (!cookie->fq_domain && (!dev || !dev_is_untrusted(dev)) &&
--	    !iommu_domain_get_attr(domain, DOMAIN_ATTR_DMA_USE_FLUSH_QUEUE, &attr) &&
--	    attr) {
-+	    domain->ops->flush_iotlb_all && !iommu_get_dma_strict()) {
-  		if (init_iova_flush_queue(iovad, iommu_dma_flush_iotlb_all,
-  					  iommu_dma_entry_dtor))
-  			pr_warn("iova flush queue initialization failed\n");
-diff --git a/drivers/iommu/intel/iommu.c b/drivers/iommu/intel/iommu.c
-index b5c746f0f63b..f5b452cd1266 100644
---- a/drivers/iommu/intel/iommu.c
-+++ b/drivers/iommu/intel/iommu.c
-@@ -4377,6 +4377,17 @@ int __init intel_iommu_init(void)
-  
-  	down_read(&dmar_global_lock);
-  	for_each_active_iommu(iommu, drhd) {
-+		if (!intel_iommu_strict && cap_caching_mode(iommu->cap)) {
-+			/*
-+			 * The flush queue implementation does not perform page-selective
-+			 * invalidations that are required for efficient TLB flushes in
-+			 * virtual environments. The benefit of batching is likely to be
-+			 * much lower than the overhead of synchronizing the virtual and
-+			 * physical IOMMU page-tables.
-+			 */
-+			pr_warn("IOMMU batching is disabled due to virtualization");
-+			intel_iommu_strict = 1;
-+		}
-  		iommu_device_sysfs_add(&iommu->iommu, NULL,
-  				       intel_iommu_groups,
-  				       "%s", iommu->name);
-@@ -4384,6 +4395,7 @@ int __init intel_iommu_init(void)
-  	}
-  	up_read(&dmar_global_lock);
-  
-+	iommu_set_dma_strict(intel_iommu_strict);
-  	bus_set_iommu(&pci_bus_type, &intel_iommu_ops);
-  	if (si_domain && !hw_pass_through)
-  		register_memory_notifier(&intel_iommu_memory_nb);
-diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
-index 2f3399203813..80afcf50cd3c 100644
---- a/drivers/iommu/iommu.c
-+++ b/drivers/iommu/iommu.c
-@@ -69,6 +69,7 @@ static const char * const iommu_group_resv_type_string[] = {
-  };
-  
-  #define IOMMU_CMD_LINE_DMA_API		BIT(0)
-+#define IOMMU_CMD_LINE_STRICT		BIT(1)
-  
-  static void iommu_set_cmd_line_dma_api(void)
-  {
-@@ -80,6 +81,16 @@ static bool iommu_cmd_line_dma_api(void)
-  	return !!(iommu_cmd_line & IOMMU_CMD_LINE_DMA_API);
-  }
-  
-+static void iommu_set_cmd_line_strict(void)
-+{
-+	iommu_cmd_line |= IOMMU_CMD_LINE_STRICT;
-+}
-+
-+static bool iommu_cmd_line_strict(void)
-+{
-+	return !!(iommu_cmd_line & IOMMU_CMD_LINE_STRICT);
-+}
-+
-  static int iommu_alloc_default_domain(struct iommu_group *group,
-  				      struct device *dev);
-  static struct iommu_domain *__iommu_domain_alloc(struct bus_type *bus,
-@@ -337,10 +348,25 @@ early_param("iommu.passthrough", iommu_set_def_domain_type);
-  
-  static int __init iommu_dma_setup(char *str)
-  {
--	return kstrtobool(str, &iommu_dma_strict);
-+	int ret = kstrtobool(str, &iommu_dma_strict);
-+
-+	if (!ret)
-+		iommu_set_cmd_line_strict();
-+	return ret;
-  }
-  early_param("iommu.strict", iommu_dma_setup);
-  
-+void iommu_set_dma_strict(bool val)
-+{
-+	if (val || !iommu_cmd_line_strict())
-+		iommu_dma_strict = val;
-+}
-+
-+bool iommu_get_dma_strict(void)
-+{
-+	return iommu_dma_strict;
-+}
-+
-  static ssize_t iommu_group_attr_show(struct kobject *kobj,
-  				     struct attribute *__attr, char *buf)
-  {
-@@ -1520,13 +1546,6 @@ static int iommu_group_alloc_default_domain(struct bus_type *bus,
-  	if (!group->domain)
-  		group->domain = dom;
-  
--	if (!iommu_dma_strict) {
--		int attr = 1;
--		iommu_domain_set_attr(dom,
--				      DOMAIN_ATTR_DMA_USE_FLUSH_QUEUE,
--				      &attr);
--	}
--
-  	return 0;
-  }
-  
-diff --git a/include/linux/iommu.h b/include/linux/iommu.h
-index eb5e3f14c5ad..11bbfa273d98 100644
---- a/include/linux/iommu.h
-+++ b/include/linux/iommu.h
-@@ -495,6 +495,8 @@ extern int iommu_domain_get_attr(struct iommu_domain *domain, enum iommu_attr,
-  				 void *data);
-  extern int iommu_domain_set_attr(struct iommu_domain *domain, enum iommu_attr,
-  				 void *data);
-+extern void iommu_set_dma_strict(bool val);
-+extern bool iommu_get_dma_strict(void);
-  
-  /* Window handling function prototypes */
-  extern int iommu_domain_window_enable(struct iommu_domain *domain, u32 wnd_nr,
--- 
-2.21.0.dirty
-
+Jason
