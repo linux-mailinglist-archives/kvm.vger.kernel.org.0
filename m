@@ -2,235 +2,114 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4C536333278
-	for <lists+kvm@lfdr.de>; Wed, 10 Mar 2021 01:31:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9545433325C
+	for <lists+kvm@lfdr.de>; Wed, 10 Mar 2021 01:31:14 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231607AbhCJAbS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 9 Mar 2021 19:31:18 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48042 "EHLO
+        id S231295AbhCJAai (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 9 Mar 2021 19:30:38 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47944 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231464AbhCJAar (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 9 Mar 2021 19:30:47 -0500
-Received: from mail-qv1-xf49.google.com (mail-qv1-xf49.google.com [IPv6:2607:f8b0:4864:20::f49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4B42AC061762
-        for <kvm@vger.kernel.org>; Tue,  9 Mar 2021 16:30:47 -0800 (PST)
-Received: by mail-qv1-xf49.google.com with SMTP id bt20so2584347qvb.0
-        for <kvm@vger.kernel.org>; Tue, 09 Mar 2021 16:30:47 -0800 (PST)
+        with ESMTP id S231332AbhCJAad (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 9 Mar 2021 19:30:33 -0500
+Received: from mail-qv1-xf4a.google.com (mail-qv1-xf4a.google.com [IPv6:2607:f8b0:4864:20::f4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5645BC06174A
+        for <kvm@vger.kernel.org>; Tue,  9 Mar 2021 16:30:33 -0800 (PST)
+Received: by mail-qv1-xf4a.google.com with SMTP id e10so11453315qvr.17
+        for <kvm@vger.kernel.org>; Tue, 09 Mar 2021 16:30:33 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
-         :cc;
-        bh=DHxB02lHBuSNm1Tq7ppWLhclQ6LGjD2vwbT8+0hyBYQ=;
-        b=i9nnGI1yJf5zkDtvuzAcFHkNKf3iYy4fMgWPsn0CUr62qyKKEML7n/XqRiL4DuhrVD
-         lOYIjYImLQHRMCLtPvlKUFDxo1P7/lsLESUmJw0tVdAgsA54KJz5QlWXoqESVY0fXkYS
-         KJ+M9fOfot6eeFDCrwoGSqeBqbJGQEoxwG3zMnPXqpV5ZMbroRPNsnIYd1I9SoaLcNfV
-         2Ehb5DHXA9zswPk9gJK87g+ScrbL46n7nqhZIrrsCH9ySbP5XLo+k2xO9bYMaYPpHUpH
-         b8ohv5kWZiy5uVMb+jik0GkoEQUvObXLnigZ2hmjx/h3f8OYWB2BIEzR/TH2cjB1N4wS
-         TlfA==
+        h=reply-to:date:message-id:mime-version:subject:from:to:cc;
+        bh=ZbG3xZb8PBQgiaDoQSCf4y5RYRarcXuHOWtQzEo4Lp4=;
+        b=us2FvwuKuUsnKtfzXb/jE9ZyNfz3iRwsk6KoFEfxEIznNEhIADvJky2H+nPDcHEZR/
+         vll9/s0EeGTtsOotd350+EnFp+LlDw9a7VzG7Yzup0s7mN88cuVzSHHDWewX+PXJC3U0
+         +WhZREu1Dw2O+ti0oRCiF+/PyGn5LBENAwy9wXS7g2VW4IVqT7PkYnyNeJ9A4YmGpCAC
+         Ritx82nsW4Kpi/W6N1Sv557L3+x2JRRz6SkRU2WNSl6xG87d717YIRdK0HDQZlmj2MqU
+         Hgs1pijsHPN8P3gS1o5ylJOoC4vYeIW/w+qjmVjrPzce/+GcqTGt3dqS0Qlao7bGwccb
+         S2lQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=DHxB02lHBuSNm1Tq7ppWLhclQ6LGjD2vwbT8+0hyBYQ=;
-        b=AaCcBvTy6b5RMSvzwvnn6K5r9hySjbkjFl8rC1gei+YTN0y5STR8R71Ai7Alt7v/ju
-         Lnj0rXplLXv9gT9xJO/Z/IUO/svF41HK2LUaaE4wyJGlFXD002wQOcKf7zOvorPLeuVw
-         G11Sr/7zrG4WUAbwMfZf515bXeMCahSQqrUjkIztn0u9uBx//ffyBuWu4mCLfPnQuzTV
-         HHh4G3VX58sOkujxGjsGsJaHtn2eExn+wANmr2s9PfkfjM6dDj4TNGNpsiU8+G/e+TgS
-         inz2UbitDpRBCJ7afMD4KUhuObi0gbF3/3GRAv15tS+qe4tf8EDIpgs80WLpjN1LgSNP
-         7XKg==
-X-Gm-Message-State: AOAM532BkG4fYrdEQyxtHpp+cFjiaoElXFZCuWl0W4n99tc40cSzlxG3
-        hlaop/RhP/48GCpJp0rjT5slW6Gdw8S0NoIwZH026RPVBzu8/EV+7AV9DwH+Kej82BQbnxNgkzS
-        GlnLHZuqvSsIxi2zEqC8lsicxN8UHcR/Xnix8cQhH0kJ0AooKsxI/JQuC9WyKQ5tIboMTwjc=
-X-Google-Smtp-Source: ABdhPJyUNUM/sAdenGIGgvVPCloQCo5gPdn0LHQMLGSw3kNLQg8mscQ8MFWXB1+jfVgEjigVvGqt7memgn4xEsF28w==
-X-Received: from jingzhangos.c.googlers.com ([fda3:e722:ac3:10:2b:ff92:c0a8:513])
- (user=jingzhangos job=sendgmr) by 2002:a0c:9e15:: with SMTP id
- p21mr678608qve.53.1615336246323; Tue, 09 Mar 2021 16:30:46 -0800 (PST)
-Date:   Wed, 10 Mar 2021 00:30:24 +0000
-In-Reply-To: <20210310003024.2026253-1-jingzhangos@google.com>
-Message-Id: <20210310003024.2026253-5-jingzhangos@google.com>
+        h=x-gm-message-state:reply-to:date:message-id:mime-version:subject
+         :from:to:cc;
+        bh=ZbG3xZb8PBQgiaDoQSCf4y5RYRarcXuHOWtQzEo4Lp4=;
+        b=judCnNUA5jrEPUvnnPsathWTiPtgn83W+aO0rXozTEK8QuramftkBQ295rrRnLiUNu
+         wkxWsJI9M5XMzbzXL2wkmsYV/Tj3d5V4qBhZP1buR64PCk+t3HhvVElcV1OO9jSoxV2n
+         r4d95sT0eoKGoUFQN/nvuR6FDBBMs9LgWJi+Zn/dyca2GcekYIwM01myzQIvxRBoKb/M
+         H6638L73dvOWdPPQF5QkhcSe/uQ9ie+Zskts5BuspKliSYGSWE+s2kY/1u1Cra74D7id
+         P/BOV7bt4soM+HI+vYf/Idj/mvLDKO+e/YInD+raSY/pP/FaAIDNeePNRVTG0SMgYS26
+         T4rQ==
+X-Gm-Message-State: AOAM533lYxazTmL7Nu+FN3b6WcOyv/5u2+Y2766RW/NqK2+L2OCIY/7T
+        KXEJr22y6b4JK/PS/fVU/gzWKdHfRWU=
+X-Google-Smtp-Source: ABdhPJz8JBsJ6DNuTmV245LAf4RiHcBxMThlSVNRRXuyrUb6m0zifQoo7EXUCGWd67jnrZzuYtZf609dG5c=
+X-Received: from seanjc798194.pdx.corp.google.com ([2620:15c:f:10:e4dd:6c31:9463:f8da])
+ (user=seanjc job=sendgmr) by 2002:a0c:b71a:: with SMTP id t26mr558668qvd.38.1615336232507;
+ Tue, 09 Mar 2021 16:30:32 -0800 (PST)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date:   Tue,  9 Mar 2021 16:30:29 -0800
+Message-Id: <20210310003029.1250571-1-seanjc@google.com>
 Mime-Version: 1.0
-References: <20210310003024.2026253-1-jingzhangos@google.com>
 X-Mailer: git-send-email 2.30.1.766.gb4fecdf3b7-goog
-Subject: [RFC PATCH 4/4] KVM: selftests: Add selftest for KVM binary form
- statistics interface
-From:   Jing Zhang <jingzhangos@google.com>
-To:     KVM <kvm@vger.kernel.org>, KVM ARM <kvmarm@lists.cs.columbia.edu>,
-        Linux MIPS <linux-mips@vger.kernel.org>,
-        KVM PPC <kvm-ppc@vger.kernel.org>,
-        Linux S390 <linux-s390@vger.kernel.org>,
-        Linux kselftest <linux-kselftest@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Marc Zyngier <maz@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Will Deacon <will@kernel.org>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-        Paul Mackerras <paulus@ozlabs.org>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Sean Christopherson <seanjc@google.com>,
+Subject: [PATCH] KVM: x86/mmu: Skip !MMU-present SPTEs when removing SP in
+ exclusive mode
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Peter Shier <pshier@google.com>,
-        Oliver Upton <oupton@google.com>,
-        David Rientjes <rientjes@google.com>,
-        Emanuele Giuseppe Esposito <eesposit@redhat.com>
-Cc:     Jing Zhang <jingzhangos@google.com>
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Ben Gardon <bgardon@google.com>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Check if the KVM binary form statistics works correctly and whether the
-statistics name strings are synced correctly with KVM internal stats
-data.
+If mmu_lock is held for write, don't bother setting !PRESENT SPTEs to
+REMOVED_SPTE when recursively zapping SPTEs as part of shadow page
+removal.  The concurrent write protections provided by REMOVED_SPTE are
+not needed, there are no backing page side effects to record, and MMIO
+SPTEs can be left as is since they are protected by the memslot
+generation, not by ensuring that the MMIO SPTE is unreachable (which
+is racy with respect to lockless walks regardless of zapping behavior).
 
-Signed-off-by: Jing Zhang <jingzhangos@google.com>
+Skipping !PRESENT drastically reduces the number of updates needed to
+tear down sparsely populated MMUs, e.g. when tearing down a 6gb VM that
+didn't touch much memory, 6929/7168 (~96.6%) of SPTEs were '0' and could
+be skipped.
+
+Avoiding the write itself is likely close to a wash, but avoiding
+__handle_changed_spte() is a clear-cut win as that involves saving and
+restoring all non-volatile GPRs (it's a subtly big function), as well as
+several conditional branches before bailing out.
+
+Cc: Ben Gardon <bgardon@google.com>
+Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- tools/testing/selftests/kvm/.gitignore        |  1 +
- tools/testing/selftests/kvm/Makefile          |  3 +
- .../selftests/kvm/kvm_bin_form_stats.c        | 89 +++++++++++++++++++
- 3 files changed, 93 insertions(+)
- create mode 100644 tools/testing/selftests/kvm/kvm_bin_form_stats.c
+ arch/x86/kvm/mmu/tdp_mmu.c | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
-diff --git a/tools/testing/selftests/kvm/.gitignore b/tools/testing/selftests/kvm/.gitignore
-index 32b87cc77c8e..0c8241bd9a17 100644
---- a/tools/testing/selftests/kvm/.gitignore
-+++ b/tools/testing/selftests/kvm/.gitignore
-@@ -38,3 +38,4 @@
- /memslot_modification_stress_test
- /set_memory_region_test
- /steal_time
-+/kvm_bin_form_stats
-diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-index a6d61f451f88..5cdd52ccedf2 100644
---- a/tools/testing/selftests/kvm/Makefile
-+++ b/tools/testing/selftests/kvm/Makefile
-@@ -72,6 +72,7 @@ TEST_GEN_PROGS_x86_64 += kvm_create_max_vcpus
- TEST_GEN_PROGS_x86_64 += memslot_modification_stress_test
- TEST_GEN_PROGS_x86_64 += set_memory_region_test
- TEST_GEN_PROGS_x86_64 += steal_time
-+TEST_GEN_PROGS_x86_64 += kvm_bin_form_stats
+diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+index 50ef757c5586..f0c99fa04ef2 100644
+--- a/arch/x86/kvm/mmu/tdp_mmu.c
++++ b/arch/x86/kvm/mmu/tdp_mmu.c
+@@ -323,7 +323,18 @@ static void handle_removed_tdp_mmu_page(struct kvm *kvm, u64 *pt,
+ 				cpu_relax();
+ 			}
+ 		} else {
++			/*
++			 * If the SPTE is not MMU-present, there is no backing
++			 * page associated with the SPTE and so no side effects
++			 * that need to be recorded, and exclusive ownership of
++			 * mmu_lock ensures the SPTE can't be made present.
++			 * Note, zapping MMIO SPTEs is also unnecessary as they
++			 * are guarded by the memslots generation, not by being
++			 * unreachable.
++			 */
+ 			old_child_spte = READ_ONCE(*sptep);
++			if (!is_shadow_present_pte(old_child_spte))
++				continue;
  
- TEST_GEN_PROGS_aarch64 += aarch64/get-reg-list
- TEST_GEN_PROGS_aarch64 += aarch64/get-reg-list-sve
-@@ -81,6 +82,7 @@ TEST_GEN_PROGS_aarch64 += dirty_log_perf_test
- TEST_GEN_PROGS_aarch64 += kvm_create_max_vcpus
- TEST_GEN_PROGS_aarch64 += set_memory_region_test
- TEST_GEN_PROGS_aarch64 += steal_time
-+TEST_GEN_PROGS_aarch64 += kvm_bin_form_stats
- 
- TEST_GEN_PROGS_s390x = s390x/memop
- TEST_GEN_PROGS_s390x += s390x/resets
-@@ -89,6 +91,7 @@ TEST_GEN_PROGS_s390x += demand_paging_test
- TEST_GEN_PROGS_s390x += dirty_log_test
- TEST_GEN_PROGS_s390x += kvm_create_max_vcpus
- TEST_GEN_PROGS_s390x += set_memory_region_test
-+TEST_GEN_PROGS_s390x += kvm_bin_form_stats
- 
- TEST_GEN_PROGS += $(TEST_GEN_PROGS_$(UNAME_M))
- LIBKVM += $(LIBKVM_$(UNAME_M))
-diff --git a/tools/testing/selftests/kvm/kvm_bin_form_stats.c b/tools/testing/selftests/kvm/kvm_bin_form_stats.c
-new file mode 100644
-index 000000000000..36cf206470b1
---- /dev/null
-+++ b/tools/testing/selftests/kvm/kvm_bin_form_stats.c
-@@ -0,0 +1,89 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * kvm_bin_form_stats
-+ *
-+ * Copyright (C) 2021, Google LLC.
-+ *
-+ * Test for fd-based IOCTL commands for retrieving KVM statistics data in
-+ * binary form. KVM_CAP_STATS_BINARY_FORM, KVM_STATS_GET_INFO,
-+ * KVM_STATS_GET_NAMES and KVM_STATS_GET_DATA are checked.
-+ */
-+
-+#define _GNU_SOURCE /* for program_invocation_short_name */
-+#include <fcntl.h>
-+#include <stdio.h>
-+#include <stdlib.h>
-+#include <string.h>
-+
-+#include "test_util.h"
-+
-+#include "kvm_util.h"
-+#include "asm/kvm.h"
-+#include "linux/kvm.h"
-+
-+int main(int argc, char *argv[])
-+{
-+	struct kvm_stats_info stats_info = {0};
-+	struct kvm_stats_names *stats_names;
-+	struct kvm_stats_data *stats_data;
-+	struct kvm_vm *kvm;
-+	int i, ret;
-+
-+	kvm = vm_create(VM_MODE_DEFAULT, DEFAULT_GUEST_PHY_PAGES, O_RDWR);
-+
-+	ret = kvm_check_cap(KVM_CAP_STATS_BINARY_FORM);
-+	if (ret < 0) {
-+		pr_info("Binary form statistics interface is not supported!\n");
-+		goto out_free_kvm;
-+	}
-+
-+	ret = -1;
-+	vm_ioctl(kvm, KVM_STATS_GET_INFO, &stats_info);
-+	if (stats_info.num_stats == 0) {
-+		pr_info("KVM_STATS_GET_INFO failed!\n");
-+		pr_info("Or the number of stistics data is zero.\n");
-+		goto out_free_kvm;
-+	}
-+
-+	/* Allocate memory for stats name strings and value */
-+	stats_names = malloc(sizeof(*stats_names) +
-+			stats_info.num_stats * KVM_STATS_NAME_LEN);
-+	if (!stats_names) {
-+		pr_info("Memory allocation failed!\n");
-+		goto out_free_kvm;
-+	}
-+
-+	stats_data = malloc(sizeof(*stats_data) +
-+				stats_info.num_stats * sizeof(__u64));
-+	if (!stats_data) {
-+		pr_info("Memory allocation failed!\n");
-+		goto out_free_names;
-+	}
-+
-+	/* Retrieve the name strings and data */
-+	stats_names->size = stats_info.num_stats * KVM_STATS_NAME_LEN;
-+	vm_ioctl(kvm, KVM_STATS_GET_NAMES, stats_names);
-+
-+	stats_data->size = stats_info.num_stats * sizeof(__u64);
-+	vm_ioctl(kvm, KVM_STATS_GET_DATA, stats_data);
-+
-+	/* Display supported statistics names */
-+	for (i = 0; i < (int)stats_info.num_stats; i++) {
-+		char *name = (char *)stats_names->names + i * KVM_STATS_NAME_LEN;
-+
-+		if (strnlen(name, KVM_STATS_NAME_LEN) == 0) {
-+			pr_info("Empty stats name at offset %d!\n", i);
-+			goto out_free_data;
-+		}
-+		pr_info("%s\n", name);
-+	}
-+
-+	ret = 0;
-+out_free_data:
-+	free(stats_data);
-+out_free_names:
-+	free(stats_names);
-+out_free_kvm:
-+	kvm_vm_free(kvm);
-+	return ret;
-+}
+ 			/*
+ 			 * Marking the SPTE as a removed SPTE is not
 -- 
 2.30.1.766.gb4fecdf3b7-goog
 
