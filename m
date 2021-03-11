@@ -2,115 +2,135 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0C184336D2A
-	for <lists+kvm@lfdr.de>; Thu, 11 Mar 2021 08:35:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A0778336D59
+	for <lists+kvm@lfdr.de>; Thu, 11 Mar 2021 08:55:18 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231826AbhCKHfW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 11 Mar 2021 02:35:22 -0500
-Received: from mga05.intel.com ([192.55.52.43]:29828 "EHLO mga05.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231805AbhCKHem (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 11 Mar 2021 02:34:42 -0500
-IronPort-SDR: CAEDVrC4pyi8RRkqz7JmnAxtcvPczXDXHRQx71oJBe97+wK3vHI9lcBS6F/xwj4lJT0FPL5Y+c
- FzDK/pbMvJ2g==
-X-IronPort-AV: E=McAfee;i="6000,8403,9919"; a="273666471"
-X-IronPort-AV: E=Sophos;i="5.81,239,1610438400"; 
-   d="scan'208";a="273666471"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Mar 2021 23:34:39 -0800
-IronPort-SDR: NuRQBgchhrV+Vt6dNKgNTu/EnK2Uk6O5ySowyrfz123EJac6kux1f+hM1li+qNGkFydBecweTA
- XiJ26AKXSH9g==
-X-IronPort-AV: E=Sophos;i="5.81,239,1610438400"; 
-   d="scan'208";a="410515964"
-Received: from lingshan-mobl5.ccr.corp.intel.com (HELO [10.249.170.224]) ([10.249.170.224])
-  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Mar 2021 23:34:36 -0800
-Subject: Re: [PATCH V3 1/6] vDPA/ifcvf: get_vendor_id returns a device
- specific vendor id
-To:     Jason Wang <jasowang@redhat.com>,
-        Zhu Lingshan <lingshan.zhu@linux.intel.com>, mst@redhat.com,
-        lulu@redhat.com, leonro@nvidia.com
-Cc:     virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20210310090052.4762-1-lingshan.zhu@intel.com>
- <20210310090052.4762-2-lingshan.zhu@intel.com>
- <ff5fc8f9-f886-bd2a-60cc-771c628c6c4b@redhat.com>
- <5f2d915f-e1b0-c9eb-9fc8-4b64f5d8cd0f@linux.intel.com>
- <05e3fbc9-be49-a208-19a4-85f891323312@redhat.com>
-From:   "Zhu, Lingshan" <lingshan.zhu@intel.com>
-Message-ID: <a5b0c4e1-dbca-22d2-cce5-19451388ae86@intel.com>
-Date:   Thu, 11 Mar 2021 15:34:34 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.7.1
+        id S229829AbhCKHyn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 11 Mar 2021 02:54:43 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59222 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230145AbhCKHyT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 11 Mar 2021 02:54:19 -0500
+Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 07C5CC061574
+        for <kvm@vger.kernel.org>; Wed, 10 Mar 2021 23:54:18 -0800 (PST)
+Received: by mail-pj1-x102b.google.com with SMTP id s21so3046457pjq.1
+        for <kvm@vger.kernel.org>; Wed, 10 Mar 2021 23:54:18 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ozlabs-ru.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=PnvVPbZcFGFyCEhF0G1+tIMw3x2kNLtmvdQVPet9ctE=;
+        b=foKJExde6LDu1eEM7/Y6kM+pdVI2bNGljjgWTDiR87NXjEjikBHX78pCPLfU/9DMbv
+         lrhNo04TBbVwoGfl3VfROa7zhsSdwkhzSuFSdPwoNU5HQWl+AZSCfH/mXJ2Wtus7qQ8l
+         41LLgcGtd+HsEzKAhQRtt5hPhcPcNSsuTuUkTk5XSCn0LslBCWTR2s8tV+/ZF3ooOdrF
+         oIJ+3XZsYOIYYu2cMWU9TxISwIn4D8Wafz6CvfYIh38zq08nO5HeO8ptkXIMnO/7aFV5
+         os5On43XZK5fr6IBfTl8o242rSZq2BruSotbTHS3RfiudzCutrI3l/MBRZMHLyrxl5QU
+         Vxew==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=PnvVPbZcFGFyCEhF0G1+tIMw3x2kNLtmvdQVPet9ctE=;
+        b=kIaqHiTSeBJGW5acI9GCv0Oy971+6qqJSGC9WsyQREfanEJm9b4fFtITZoAS1/nwIm
+         z3UmHXQ0E0bNDueDRBdcUBz/2uicmM/irD/r90KcJMQdIT5bncVihctTe99uugADYoLo
+         ZksxZoXuQfApv55mbReERwdV/3P/rBsnoT28N4A0DvAk7zdDTqvXzejricMI8KsLqTtE
+         48hJNllOM717wdyffK6pAN03qBKz4yAf1rUw4CIW28QprZKuexmSrkRYS4erNCZBFuKC
+         3+KogJK45aPOYt3PC4+3VBzx6QvO6WYq69iy3qXRsfJcohQioMBulRs/0pmpmP7tXV0X
+         wfaQ==
+X-Gm-Message-State: AOAM5306Otu+CdJbAsOYhGz74tSTx/tntM9Li9ScRKkOay/XNbzzaj65
+        6fPD+PpyOaHZhzla4ZyD5Ij1+Q==
+X-Google-Smtp-Source: ABdhPJwwOJ1rUKugJGDVCTBqPbPUgmENy5fzFWhD2yjASVj0K9sJiXMXKRKSixzRLX109AGDLPgCSg==
+X-Received: by 2002:a17:902:d4cc:b029:e4:9cd9:f189 with SMTP id o12-20020a170902d4ccb02900e49cd9f189mr6979567plg.53.1615449258508;
+        Wed, 10 Mar 2021 23:54:18 -0800 (PST)
+Received: from [192.168.10.23] (124-171-107-241.dyn.iinet.net.au. [124.171.107.241])
+        by smtp.gmail.com with UTF8SMTPSA id e83sm1607300pfh.80.2021.03.10.23.54.11
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 10 Mar 2021 23:54:18 -0800 (PST)
+Subject: Re: [PATCH 8/9] vfio/pci: export nvlink2 support into vendor vfio_pci
+ drivers
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     Max Gurtovoy <mgurtovoy@nvidia.com>, alex.williamson@redhat.com,
+        cohuck@redhat.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, liranl@nvidia.com, oren@nvidia.com,
+        tzahio@nvidia.com, leonro@nvidia.com, yarong@nvidia.com,
+        aviadye@nvidia.com, shahafs@nvidia.com, artemp@nvidia.com,
+        kwankhede@nvidia.com, ACurrid@nvidia.com, cjia@nvidia.com,
+        yishaih@nvidia.com, mjrosato@linux.ibm.com, hch@lst.de
+References: <20210309083357.65467-1-mgurtovoy@nvidia.com>
+ <20210309083357.65467-9-mgurtovoy@nvidia.com>
+ <19e73e58-c7a9-03ce-65a7-50f37d52ca15@ozlabs.ru>
+ <8941cf42-0c40-776e-6c02-9227146d3d66@nvidia.com>
+ <20210310130246.GW2356281@nvidia.com>
+ <3b772357-7448-5fa7-9ecc-c13c08df95c3@ozlabs.ru>
+ <20210310194002.GD2356281@nvidia.com>
+ <7f0310db-a8e3-4045-c83a-11111767a22f@ozlabs.ru>
+ <20210311013443.GH2356281@nvidia.com>
+ <d862adf9-6fe7-a99e-6c14-8413aae70cd4@ozlabs.ru>
+ <20210311020056.GI2356281@nvidia.com>
+From:   Alexey Kardashevskiy <aik@ozlabs.ru>
+Message-ID: <73c99da0-6624-7aa2-2857-ef68092c0d07@ozlabs.ru>
+Date:   Thu, 11 Mar 2021 18:54:09 +1100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:85.0) Gecko/20100101
+ Thunderbird/85.0
 MIME-Version: 1.0
-In-Reply-To: <05e3fbc9-be49-a208-19a4-85f891323312@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20210311020056.GI2356281@nvidia.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
 
-On 3/11/2021 2:13 PM, Jason Wang wrote:
->
-> On 2021/3/11 12:21 下午, Zhu Lingshan wrote:
->>
->>
->> On 3/11/2021 11:23 AM, Jason Wang wrote:
+On 11/03/2021 13:00, Jason Gunthorpe wrote:
+> On Thu, Mar 11, 2021 at 12:42:56PM +1100, Alexey Kardashevskiy wrote:
+>>>> btw can the id list have only vendor ids and not have device ids?
 >>>
->>> On 2021/3/10 5:00 下午, Zhu Lingshan wrote:
->>>> In this commit, ifcvf_get_vendor_id() will return
->>>> a device specific vendor id of the probed pci device
->>>> than a hard code.
->>>>
->>>> Signed-off-by: Zhu Lingshan <lingshan.zhu@intel.com>
->>>> ---
->>>>   drivers/vdpa/ifcvf/ifcvf_main.c | 5 ++++-
->>>>   1 file changed, 4 insertions(+), 1 deletion(-)
->>>>
->>>> diff --git a/drivers/vdpa/ifcvf/ifcvf_main.c 
->>>> b/drivers/vdpa/ifcvf/ifcvf_main.c
->>>> index fa1af301cf55..e501ee07de17 100644
->>>> --- a/drivers/vdpa/ifcvf/ifcvf_main.c
->>>> +++ b/drivers/vdpa/ifcvf/ifcvf_main.c
->>>> @@ -324,7 +324,10 @@ static u32 ifcvf_vdpa_get_device_id(struct 
->>>> vdpa_device *vdpa_dev)
->>>>     static u32 ifcvf_vdpa_get_vendor_id(struct vdpa_device *vdpa_dev)
->>>>   {
->>>> -    return IFCVF_SUBSYS_VENDOR_ID;
->>>> +    struct ifcvf_adapter *adapter = vdpa_to_adapter(vdpa_dev);
->>>> +    struct pci_dev *pdev = adapter->pdev;
->>>> +
->>>> +    return pdev->subsystem_vendor;
->>>>   }
->>>
->>>
->>> While at this, I wonder if we can do something similar in 
->>> get_device_id() if it could be simple deduced from some simple math 
->>> from the pci device id?
->>>
->>> Thanks
->> Hi Jason,
->>
->> IMHO, this implementation is just some memory read ops, I think other 
->> implementations may not save many cpu cycles, an if cost at least 
->> three cpu cycles.
->>
->> Thanks!
->
->
-> Well, I meant whehter you can deduce virtio device id from 
-> pdev->subsystem_device.
->
-> Thanks
-Oh, sure, I get you
->
->
->>>
->>>
->>>>     static u32 ifcvf_vdpa_get_vq_align(struct vdpa_device *vdpa_dev)
->>>
->>
->
+>>> The PCI matcher is quite flexable, see the other patch from Max for
+>>> the igd
+>>   
+>> ah cool, do this for NVIDIA GPUs then please, I just discovered another P9
+>> system sold with NVIDIA T4s which is not in your list.
+> 
+> I think it will make things easier down the road if you maintain an
+> exact list <shrug>
 
+
+Then why do not you do the exact list for Intel IGD? The commit log does 
+not explain this detail.
+
+
+>>> But best practice is to be as narrow as possible as I hope this will
+>>> eventually impact module autoloading and other details.
+>>
+>> The amount of device specific knowledge is too little to tie it up to device
+>> ids, it is a generic PCI driver with quirks. We do not have a separate
+>> drivers for the hardware which requires quirks.
+> 
+> It provides its own capability structure exposed to userspace, that is
+> absolutely not a "quirk"
+> 
+>> And how do you hope this should impact autoloading?
+> 
+> I would like to autoload the most specific vfio driver for the target
+> hardware.
+
+
+Is there an idea how it is going to work? For example, the Intel IGD 
+driver and vfio-pci-igd - how should the system pick one? If there is no 
+MODULE_DEVICE_TABLE in vfio-pci-xxx, is the user supposed to try binding 
+all vfio-pci-xxx drivers until some binds?
+
+
+> If you someday need to support new GPU HW that needs a different VFIO
+> driver then you are really stuck because things become indeterminate
+> if there are two devices claiming the ID. We don't have the concept of
+> "best match", driver core works on exact match.
+
+
+
+-- 
+Alexey
