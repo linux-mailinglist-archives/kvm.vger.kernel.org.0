@@ -2,45 +2,55 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5D6EA3369B3
-	for <lists+kvm@lfdr.de>; Thu, 11 Mar 2021 02:35:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7F0AA3369DB
+	for <lists+kvm@lfdr.de>; Thu, 11 Mar 2021 02:44:17 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229593AbhCKBfG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 10 Mar 2021 20:35:06 -0500
-Received: from mail-eopbgr690069.outbound.protection.outlook.com ([40.107.69.69]:10430
-        "EHLO NAM04-CO1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S229608AbhCKBeq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 10 Mar 2021 20:34:46 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Z47ZRhb1mjx6S4XIQrgNHVYF6HZ3OzK1hYCzsxzhKgwF0IWZgL71A2IyUDGlwVuzExoNcKiMf2hcs4c/AUAWt8eimbAPUSqmoOw56wyEP4+qZ8hASzuz3r80tG92cBmN49x3H8AJScN8rMw0ewMtFDCsZawtFwPYoJwe9I3SaoeJX6ENSpz7hrxNlruzqHImIYKbEo1qYV78fdquA59N+MlYD7tb6kgccFQvQV2BLnRfE1COheYJ2znNVFMshn90z6hlISZGKdBPZ36Vq40TY6+1ASMymDBgmdtfe2eNiYDpySLQ2oCASer/PBIaTzOPlzWtDx2X9Npjkmw3w0m8vQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=0Tso6aIVKsaKDczeP0/TpUkt5xqzq/yW00tdPe/hrKw=;
- b=mBNEDFhmVRfq2MYT++a4F9anCEOnbItMEHqyGaWiaWwLUHdY1oGfmCYEF9t3jyhNUSW3JfKpoiAS2zb8xhD0j+vkKpsH8sodaSkImzjMV9AgKNqrnaiJo1RsANVrf/KPWSgsqukYhSuvF35hxla0k4cni7+1x0WWqe0oBiUODTgpaGTqI4PgRsP0ee5t0QyhpenxohcqZJiUseRk/K2JTvnIgdfa8sb7uOs9e/vCvKDlEkFL+SKJcCBY2zslMhLZAEse818oNWEvuOxHk833juRUBtH3n8VFJRALGc2bXpu4tpRaRQx8ftl0+vXqBzIFfyN4LRh4qxkbH01ZXT8V6w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=0Tso6aIVKsaKDczeP0/TpUkt5xqzq/yW00tdPe/hrKw=;
- b=os3lVumeg+6pj+hn6NGnd+l+uLGlGR7jW7Ce34N65do9GA0BFlnHCeALb6qPUFs/h9+oP2G12aUrM6BVR6x46e9b8nqsxE33/aqBbIUWAMCDRGHUa66SFJHXbN++91ZHHRH7LOveQEqe2jXpTSiZP4Efe4X1nwwqjE2a0Vzzb/INh5ezPoCFiEM7jhfq3DJP/vbr/s+QLIfhihyDXmHFyNWN/1WwwBXzDSKReaol/Vyq2dPSwN0wFnFXKymPHKFVrAVB8gVOXTC//vyg8hmpp/SWYoyHDWZfri6twFLggFyIjIBdOENYkPG1YTCkyAGrTij5NaWN6cLHX6Pu1V7zBw==
-Authentication-Results: ozlabs.ru; dkim=none (message not signed)
- header.d=none;ozlabs.ru; dmarc=none action=none header.from=nvidia.com;
-Received: from DM6PR12MB3834.namprd12.prod.outlook.com (2603:10b6:5:14a::12)
- by DM6PR12MB4578.namprd12.prod.outlook.com (2603:10b6:5:2a9::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3912.17; Thu, 11 Mar
- 2021 01:34:44 +0000
-Received: from DM6PR12MB3834.namprd12.prod.outlook.com
- ([fe80::1c62:7fa3:617b:ab87]) by DM6PR12MB3834.namprd12.prod.outlook.com
- ([fe80::1c62:7fa3:617b:ab87%6]) with mapi id 15.20.3912.031; Thu, 11 Mar 2021
- 01:34:44 +0000
-Date:   Wed, 10 Mar 2021 21:34:43 -0400
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Alexey Kardashevskiy <aik@ozlabs.ru>
+        id S229569AbhCKBnn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 10 Mar 2021 20:43:43 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36216 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229441AbhCKBnM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 10 Mar 2021 20:43:12 -0500
+Received: from mail-pg1-x529.google.com (mail-pg1-x529.google.com [IPv6:2607:f8b0:4864:20::529])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0A2EDC061574
+        for <kvm@vger.kernel.org>; Wed, 10 Mar 2021 17:43:12 -0800 (PST)
+Received: by mail-pg1-x529.google.com with SMTP id t26so12620425pgv.3
+        for <kvm@vger.kernel.org>; Wed, 10 Mar 2021 17:43:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ozlabs-ru.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=MWojlJbUjd8zeoqWw9mfU3jMWrIYqMEd6vbJ5jtrUws=;
+        b=Sa9/Vp7ANEMp+nq3kdNHz5hLIhyAAfUqRrv1U71IBC4MZ/QwYxf7GA9TfF/vIleoGD
+         LG8ZdcTnkWi2Ka8G05Q7H2ZoN5R/0JvxjDcdf0DAXG6U4b0v0u1RzaFZhTvGjvNIjfM3
+         qtcB1HniugfDx0NsU9tGro1jViIiR8g0aBIjQlQng4CtvI2uwqfqlTCwryXZZqhW/cPE
+         Dm5HnCFbg2UjhbaxBUvhOp+d+SjnHLvSno2XKApGMKeJ/JXyU6i4hieRNdF+PvxwZYLn
+         /uziyQZs2tSbiWGTLsonMt00StcmiDExuqM1O7g5RN75xk8KPmpS1CBXJJlWEvkOPkGN
+         gFnw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=MWojlJbUjd8zeoqWw9mfU3jMWrIYqMEd6vbJ5jtrUws=;
+        b=uVBsa12gX13RHrGW/keM4pI8N+4HjLd/DDN8TPfFj4pG8Ee/RXCLs7Axxrsw8bt/gx
+         m/CWmBKPXTzWNRpvWX0Z8Nmw62glF7ElBjkPlTYVgczqDPxnca0NcrWGHvrimuvTuIz1
+         gqKMiUIRlusMHrww/ZDa84LULEjSLkwO+di/RLRYoU0Vh5EbDrIvoWEfYRQ4niMam8nt
+         cV1qCJFveMHAVYvazhygDAeq3NRT4Br0EVOnT1EyP2uZUH01/qwh/0zJhOucVOIkgJtw
+         0jRSyUtevRJbzGSYRjzGxKr7RUzLBOZOkV19roTuqXNchT+3htWuoxTBNI6eOJV89qYE
+         qJfg==
+X-Gm-Message-State: AOAM531/Xm2aoQbj+VRKRUtMH2BrWBgtBjiJO1wiVdQuC4hcvpGuqtUb
+        VGbC/tTLjmKyUcLNoYDBpA4x8Q==
+X-Google-Smtp-Source: ABdhPJzCjrEDF22HR8BBzOTqHG5psBpFNzWPU//hpBEJ39p1CwsucIYBG8PUZdW8cdI4LaaOtKux6g==
+X-Received: by 2002:a63:689:: with SMTP id 131mr5200828pgg.416.1615426991602;
+        Wed, 10 Mar 2021 17:43:11 -0800 (PST)
+Received: from [192.168.10.23] (124-171-107-241.dyn.iinet.net.au. [124.171.107.241])
+        by smtp.gmail.com with UTF8SMTPSA id s11sm641511pfu.69.2021.03.10.17.42.58
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 10 Mar 2021 17:43:11 -0800 (PST)
+Subject: Re: [PATCH 8/9] vfio/pci: export nvlink2 support into vendor vfio_pci
+ drivers
+To:     Jason Gunthorpe <jgg@nvidia.com>
 Cc:     Max Gurtovoy <mgurtovoy@nvidia.com>, alex.williamson@redhat.com,
         cohuck@redhat.com, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org, liranl@nvidia.com, oren@nvidia.com,
@@ -48,9 +58,6 @@ Cc:     Max Gurtovoy <mgurtovoy@nvidia.com>, alex.williamson@redhat.com,
         aviadye@nvidia.com, shahafs@nvidia.com, artemp@nvidia.com,
         kwankhede@nvidia.com, ACurrid@nvidia.com, cjia@nvidia.com,
         yishaih@nvidia.com, mjrosato@linux.ibm.com, hch@lst.de
-Subject: Re: [PATCH 8/9] vfio/pci: export nvlink2 support into vendor
- vfio_pci drivers
-Message-ID: <20210311013443.GH2356281@nvidia.com>
 References: <20210309083357.65467-1-mgurtovoy@nvidia.com>
  <20210309083357.65467-9-mgurtovoy@nvidia.com>
  <19e73e58-c7a9-03ce-65a7-50f37d52ca15@ozlabs.ru>
@@ -59,93 +66,70 @@ References: <20210309083357.65467-1-mgurtovoy@nvidia.com>
  <3b772357-7448-5fa7-9ecc-c13c08df95c3@ozlabs.ru>
  <20210310194002.GD2356281@nvidia.com>
  <7f0310db-a8e3-4045-c83a-11111767a22f@ozlabs.ru>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <7f0310db-a8e3-4045-c83a-11111767a22f@ozlabs.ru>
-X-Originating-IP: [142.162.115.133]
-X-ClientProxiedBy: BL0PR02CA0015.namprd02.prod.outlook.com
- (2603:10b6:207:3c::28) To DM6PR12MB3834.namprd12.prod.outlook.com
- (2603:10b6:5:14a::12)
+ <20210311013443.GH2356281@nvidia.com>
+From:   Alexey Kardashevskiy <aik@ozlabs.ru>
+Message-ID: <d862adf9-6fe7-a99e-6c14-8413aae70cd4@ozlabs.ru>
+Date:   Thu, 11 Mar 2021 12:42:56 +1100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:85.0) Gecko/20100101
+ Thunderbird/85.0
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from mlx.ziepe.ca (142.162.115.133) by BL0PR02CA0015.namprd02.prod.outlook.com (2603:10b6:207:3c::28) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3912.17 via Frontend Transport; Thu, 11 Mar 2021 01:34:44 +0000
-Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1lKADr-00B00A-1h; Wed, 10 Mar 2021 21:34:43 -0400
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 91209ed4-ac2e-49d8-b85d-08d8e42dd95e
-X-MS-TrafficTypeDiagnostic: DM6PR12MB4578:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <DM6PR12MB4578AD523CDB733E550B0B9DC2909@DM6PR12MB4578.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: cpDBXZ+rz5/xmzPerYm4rceRIsjZx3br0Xf/TrCE50FRCb4XeNXR3hfba8zjhL+X59HROsYPN7pgIbysNVUSxrPp/jfzVrLb3AfqpR4rXY9bdDgGPEMK4URm8wv6EyP8Y6QUc+kFytdN811jeTOD1NT7tEzanfdqdTa7lPly4t2ltDX5huboALsOC/uiRQ1a/EIOKPqOGWDVKq1uSRqp9XVv8qfiUTZ8PjK9BWgaWhuF9+dhkHcuTwi4ILdhExJ07oehiu/yHNwCqWtOxNVeipz2Zyhz8GD6VZPOka+lt322nO+/FWSZsDbDdE4lq7VyvnM4AJIysi8gQxkok2RlgYemnQMZ/UcEo08i6FiKZGuFg94K2N3l4t+SpTw4859ZwljDOphR1SXV3a4oxoYNWqZDFq7hzGTz/b7RgKEacEvB+YqIqyR9E+ybfaEJ8flU69ba1f8B2TPKqLu4D3ZxzJvARLEwj2C6mZ3p2i4dHwvtWNe6YBtig7lS20rgdqzH0Op6OGg+n/j+xOqgEAywbg==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB3834.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(136003)(39860400002)(396003)(346002)(366004)(376002)(4326008)(478600001)(86362001)(5660300002)(66476007)(316002)(66556008)(6916009)(66946007)(36756003)(2906002)(83380400001)(2616005)(8936002)(426003)(8676002)(33656002)(9786002)(1076003)(9746002)(186003)(26005);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: =?us-ascii?Q?ONhJxytIL7rdrBFLJ6ZsewIDMbG1fysfJeUBkSUm8C2XpuARb/UAI/OdZRUE?=
- =?us-ascii?Q?wSUw+/O7cW5W7MbuklJrHwEO1LOKDm9Zoby24ZrcbFqaZPHK4tkO23sxtOwh?=
- =?us-ascii?Q?s3eCM3bZlzXe5I8AQtpWpFJ7IWv4oPwLeSmL/MJUfOjaf27nFim0pWjje6Dq?=
- =?us-ascii?Q?VGKRBdv04dBpTNpjrVByXDfNJV5t5z6n0OrEad4ahvbGiINN0d2yrx7ebRpN?=
- =?us-ascii?Q?V8EwbARK5+aEZrUziAuetn/eub5w4+9Qj3fY2yFDtbJSbyiuXtWYLdstE1/D?=
- =?us-ascii?Q?YukwH3msps3MIeu8eLdyMOn3Q5mu1QbW4Lf07dS7xrYvUIF7d/Ika7wYmGXO?=
- =?us-ascii?Q?C/nJ7eTy0t85X2cX8/zUy1fzKHhzZMAxjitj7qJHQ4mS1l6C/+phhtmyoAE0?=
- =?us-ascii?Q?DB6E5e7nz8A4NusGM4cTSA0xfnR2sNGdB6//BkYo4FeKM7LWxQ/Sv1gjuqHu?=
- =?us-ascii?Q?0poEHeRSX09qURYuMUbICQvPE8mO9UZwgr+52dGYWh0fG4RFDtPk89aYlRjt?=
- =?us-ascii?Q?RCCQrxXrvdnTPmuuV4sFFPchkH7Np0q4ySx/YPoSRSSKj0Q8xgHWBJ/WtccO?=
- =?us-ascii?Q?Rm83WaZ+9lgdb8dyCnLUcKpPGzWdB25noScsrqYiB+D4h7Ztb7hnx5XcLJGt?=
- =?us-ascii?Q?AM16m6L3W+CXDtL4Sig7q7fWlM4eYFDQQjNcaZ8X3naYYocew8Y4cMG8fCzT?=
- =?us-ascii?Q?Fitt9ApxCngPzMY/O1BI5tnpzIuDrBa8pCIIVw+ySUKrWM3fjVS1UQ1JWHdF?=
- =?us-ascii?Q?U0KaHRzIIc8I+V3nAzJc3Wk+SreQV3/f4FzcEaLEU2gp+R/38Sg3rxweesIU?=
- =?us-ascii?Q?de+wThMr6QFCPlR3FGkoFMasJ6QQoCKjO7H0zYkZ9VrAx27l6BKM2hu5K6u+?=
- =?us-ascii?Q?2fl0JGiTPSlUbUHvu4LnRoJlvTZnFBVd3hQpV4z6FAd19dvLrBQEtB3zbwn2?=
- =?us-ascii?Q?Ecc0PUzat0PYbQv/wRcjim+ep5EfF69Hn7dHJvDiKU3/zO4Rn8+go62Xvu6Q?=
- =?us-ascii?Q?jBQ4u1isHWr9lJUKt3a5gwEJ7+P1AfzpiUPn1HDPVIhU2eZ1ZVCMCrOYoIG7?=
- =?us-ascii?Q?gRrwd/epLV1XXX+WyeM9i2HLpHRoyl7RlePCxpN05fAO8CigyMuWQpckJMW2?=
- =?us-ascii?Q?j4ozKZ9jsfdkv2DSCG70qzG7s1adHY18YSRprhI1a8Ny/A5uTRA8+7i73oYy?=
- =?us-ascii?Q?82rU3ODK/ciCa7NheYMQ3jvMmnksvaC1bU3VxhBdrd9PkoW4XmGXPReM8dOH?=
- =?us-ascii?Q?nq0vY7afvux7vCJbqWkdkdtTVMMkpjwV4Nx5A8fLLKhqZaWnS4lV51xdjNuj?=
- =?us-ascii?Q?zeRB73e6RuOTOQ6dO3HljEDYwAjDz8N/H81VnMwkjJX3WQ=3D=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 91209ed4-ac2e-49d8-b85d-08d8e42dd95e
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB3834.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Mar 2021 01:34:44.7008
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 4hhsftH/KjNuspO9iehjYkpMMFk9cjONizOiyFJUFZu2E7G6bznGePSPIHZmRcC5
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4578
+In-Reply-To: <20210311013443.GH2356281@nvidia.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Mar 11, 2021 at 12:20:33PM +1100, Alexey Kardashevskiy wrote:
 
-> > It is supposed to match exactly the same match table as the pci_driver
-> > above. We *don't* want different behavior from what the standrd PCI
-> > driver matcher will do.
+
+On 11/03/2021 12:34, Jason Gunthorpe wrote:
+> On Thu, Mar 11, 2021 at 12:20:33PM +1100, Alexey Kardashevskiy wrote:
 > 
-> This is not a standard PCI driver though 
+>>> It is supposed to match exactly the same match table as the pci_driver
+>>> above. We *don't* want different behavior from what the standrd PCI
+>>> driver matcher will do.
+>>
+>> This is not a standard PCI driver though
+> 
+> It is now, that is what this patch makes it into. This is why it now
+> has a struct pci_driver.
+> 
+>> and the main vfio-pci won't have a
+>> list to match ever.
+> 
+> ?? vfio-pci uses driver_override or new_id to manage its match list
 
-It is now, that is what this patch makes it into. This is why it now
-has a struct pci_driver.
 
-> and the main vfio-pci won't have a
-> list to match ever.
+Exactly, no list to update.
 
-?? vfio-pci uses driver_override or new_id to manage its match list
 
-> IBM NPU PCI id is unlikely to change ever but NVIDIA keeps making
-> new devices which work in those P9 boxes, are you going to keep
-> adding those ids to nvlink2gpu_vfio_pci_table?
+>> IBM NPU PCI id is unlikely to change ever but NVIDIA keeps making
+>> new devices which work in those P9 boxes, are you going to keep
+>> adding those ids to nvlink2gpu_vfio_pci_table?
+> 
+> Certainly, as needed. PCI list updates is normal for the kernel.
+> 
+>> btw can the id list have only vendor ids and not have device ids?
+> 
+> The PCI matcher is quite flexable, see the other patch from Max for
+> the igd
 
-Certainly, as needed. PCI list updates is normal for the kernel.
 
-> btw can the id list have only vendor ids and not have device ids?
+ah cool, do this for NVIDIA GPUs then please, I just discovered another 
+P9 system sold with NVIDIA T4s which is not in your list.
 
-The PCI matcher is quite flexable, see the other patch from Max for
-the igd
 
-But best practice is to be as narrow as possible as I hope this will
-eventually impact module autoloading and other details.
+> But best practice is to be as narrow as possible as I hope this will
+> eventually impact module autoloading and other details.
 
-Jason
+The amount of device specific knowledge is too little to tie it up to 
+device ids, it is a generic PCI driver with quirks. We do not have a 
+separate drivers for the hardware which requires quirks.
+
+And how do you hope this should impact autoloading?
+
+
+
+-- 
+Alexey
