@@ -2,71 +2,125 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C0088336A03
-	for <lists+kvm@lfdr.de>; Thu, 11 Mar 2021 03:06:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8B039336A23
+	for <lists+kvm@lfdr.de>; Thu, 11 Mar 2021 03:29:54 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229633AbhCKCGK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 10 Mar 2021 21:06:10 -0500
-Received: from mga09.intel.com ([134.134.136.24]:11748 "EHLO mga09.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229483AbhCKCFj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 10 Mar 2021 21:05:39 -0500
-IronPort-SDR: PQzxYWTbtAXBscr0rfysBe4uRsrZfzcsHs4Uk6UH3YJHuj4RQEka0EGaeliwCl3tJSn14vhrTt
- VRormKLFx2zg==
-X-IronPort-AV: E=McAfee;i="6000,8403,9919"; a="188697240"
-X-IronPort-AV: E=Sophos;i="5.81,238,1610438400"; 
-   d="scan'208";a="188697240"
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Mar 2021 18:05:37 -0800
-IronPort-SDR: q48dR3kVgGtxcmi9QBxCY9R6f15dk8DY6svngvGn3PyQQE/VcdF1dMSRab+qtGj8dgDMcx1Nv9
- LPn2ICiqJqKw==
-X-IronPort-AV: E=Sophos;i="5.81,238,1610438400"; 
-   d="scan'208";a="603342257"
-Received: from xuhuiliu-mobl1.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.251.31.67])
-  by fmsmga005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Mar 2021 18:05:32 -0800
-Date:   Thu, 11 Mar 2021 15:05:29 +1300
-From:   Kai Huang <kai.huang@intel.com>
-To:     Borislav Petkov <bp@alien8.de>
-Cc:     kvm@vger.kernel.org, x86@kernel.org, linux-sgx@vger.kernel.org,
-        linux-kernel@vger.kernel.org, seanjc@google.com, jarkko@kernel.org,
-        luto@kernel.org, dave.hansen@intel.com, rick.p.edgecombe@intel.com,
-        haitao.huang@intel.com, pbonzini@redhat.com, tglx@linutronix.de,
-        mingo@redhat.com, hpa@zytor.com, jethro@fortanix.com,
-        b.thiel@posteo.de, jmattson@google.com, joro@8bytes.org,
-        vkuznets@redhat.com, wanpengli@tencent.com, corbet@lwn.net
-Subject: Re: [PATCH v2 00/25] KVM SGX virtualization support
-Message-Id: <20210311150529.4bf07611d074b654297cfd92@intel.com>
-In-Reply-To: <20210310132948.GE23521@zn.tnic>
-References: <cover.1615250634.git.kai.huang@intel.com>
-        <20210309093037.GA699@zn.tnic>
-        <76cb4216a7a689883c78b4622c86bd9c3faaa465.camel@intel.com>
-        <20210310132948.GE23521@zn.tnic>
-X-Mailer: Sylpheed 3.7.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+        id S229673AbhCKC3J (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 10 Mar 2021 21:29:09 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46104 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229593AbhCKC3J (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 10 Mar 2021 21:29:09 -0500
+Received: from mail-ej1-x630.google.com (mail-ej1-x630.google.com [IPv6:2a00:1450:4864:20::630])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 60C20C061761
+        for <kvm@vger.kernel.org>; Wed, 10 Mar 2021 18:28:57 -0800 (PST)
+Received: by mail-ej1-x630.google.com with SMTP id dx17so43078861ejb.2
+        for <kvm@vger.kernel.org>; Wed, 10 Mar 2021 18:28:57 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance-com.20150623.gappssmtp.com; s=20150623;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=nGcG4vIt8aK8XQYHFfVsg5ZilyuH9KX5JCZmjoZKMsA=;
+        b=bJFaB7w2p1VmRWq7tx9CxGxY3HG7DINc80iCJrafg+N0T0fIpXcxAoRLUhZsrZnkHt
+         Li+G0KV/JQX5TdIQxf37qh2Yh8LnfZPN/iDVu1Wl6OQR9hFnk23cnOM0oiD2tEnQ89T9
+         XM0l6SErGC3jeogkdBxN1tzHYTiSG+OKvV36N+3Lc6TJL8YSDu8TguWfBvbVQGHctCtt
+         pvZgbIR96nCZ85xunUrkBEdeR8PN4Wpg7gQgxEIYuMa45vei3621A6dP4TDWpGvUIMs0
+         bMz74FHMW5d9Q5QDgyt+facrntknlie1x4j9Cc6p3TXqkvVu44bycD9Yd4KnJXHRbxSA
+         yH9w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=nGcG4vIt8aK8XQYHFfVsg5ZilyuH9KX5JCZmjoZKMsA=;
+        b=K2tFAX0Z3HfDE5m6KmMqDjplpJdvl5CqBXMrkJL0EcPJoAG6vZl1gesbHtg0NZN9EA
+         RJwBe+jdxgyOB515pxrpCYjRyb+zLVjFdEjPop3UggTN0CbglDYMmtPAlVU4bxDDXqfc
+         97UjtBq5vJzPwLiBy01jDklgxBw1+B40mjQwR3JgSz2jfhLaZVbqB5vG+C3FD8g2ukuD
+         tMusjVh5uKnmaLtUemRBx9FeR2rbu3pBsA/XGRRqZ1/jBepKI6Zi8cnqZod71jq82RRf
+         /xsWzDr50Lgo8QsK1/mTYBzViLllbU4zUH0+p6Lvzehjfbb1PRwGY9RaMrd8CR5LH+wg
+         Gz6A==
+X-Gm-Message-State: AOAM532+p3VY1g6VAfgvEEVH35CW43N+zfMOw21Dng0kLhjKwqCJntFT
+        W2U/SgnnqjQvvbGV/9Xk9Ye273b1men+fxvtnxrc
+X-Google-Smtp-Source: ABdhPJwETmRnZq0PVHiftngf3TWvad/EGIWbau++w4aXQxStI2INxttwkESh3Zs0S3paI2zoVX/YMR2WB71SMvc7KXM=
+X-Received: by 2002:a17:906:18f1:: with SMTP id e17mr825050ejf.372.1615429736001;
+ Wed, 10 Mar 2021 18:28:56 -0800 (PST)
+MIME-Version: 1.0
+References: <20210223115048.435-1-xieyongji@bytedance.com> <20210223115048.435-8-xieyongji@bytedance.com>
+ <2c7446dd-38f8-a06a-e423-6744c6a7207f@redhat.com>
+In-Reply-To: <2c7446dd-38f8-a06a-e423-6744c6a7207f@redhat.com>
+From:   Yongji Xie <xieyongji@bytedance.com>
+Date:   Thu, 11 Mar 2021 10:28:45 +0800
+Message-ID: <CACycT3vYPHNrgVTrtMegQu6VdbaOGvCcxP+w8oUK5kPt6XLPUw@mail.gmail.com>
+Subject: Re: Re: [RFC v4 07/11] vduse: Introduce VDUSE - vDPA Device in Userspace
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        Parav Pandit <parav@nvidia.com>, Bob Liu <bob.liu@oracle.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Matthew Wilcox <willy@infradead.org>, viro@zeniv.linux.org.uk,
+        Jens Axboe <axboe@kernel.dk>, bcrl@kvack.org,
+        Jonathan Corbet <corbet@lwn.net>,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        kvm@vger.kernel.org, linux-aio@kvack.org,
+        linux-fsdevel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 10 Mar 2021 14:29:48 +0100 Borislav Petkov wrote:
-> On Wed, Mar 10, 2021 at 10:27:05PM +1300, Kai Huang wrote:
-> > Sorry for the mistake. I will send out another version with that fixed.
-> 
-> If patch 3 is the only one which needs to change, you can send only that
-> one as a reply to the original patch 3 message...
-> 
-> Thx.
+On Wed, Mar 10, 2021 at 8:58 PM Jason Wang <jasowang@redhat.com> wrote:
+>
+>
+> On 2021/2/23 7:50 =E4=B8=8B=E5=8D=88, Xie Yongji wrote:
+> > +
+> > +     switch (cmd) {
+> > +     case VDUSE_IOTLB_GET_FD: {
+> > +             struct vduse_iotlb_entry entry;
+> > +             struct vhost_iotlb_map *map;
+> > +             struct vdpa_map_file *map_file;
+> > +             struct file *f =3D NULL;
+> > +
+> > +             ret =3D -EFAULT;
+> > +             if (copy_from_user(&entry, argp, sizeof(entry)))
+> > +                     break;
+> > +
+> > +             spin_lock(&dev->iommu_lock);
+> > +             map =3D vhost_iotlb_itree_first(dev->iommu, entry.start,
+> > +                                           entry.last);
+> > +             if (map) {
+> > +                     map_file =3D (struct vdpa_map_file *)map->opaque;
+> > +                     f =3D get_file(map_file->file);
+> > +                     entry.offset =3D map_file->offset;
+> > +                     entry.start =3D map->start;
+> > +                     entry.last =3D map->last;
+> > +                     entry.perm =3D map->perm;
+> > +             }
+> > +             spin_unlock(&dev->iommu_lock);
+> > +             if (!f) {
+> > +                     ret =3D -EINVAL;
+> > +                     break;
+> > +             }
+> > +             if (copy_to_user(argp, &entry, sizeof(entry))) {
+> > +                     fput(f);
+> > +                     ret =3D -EFAULT;
+> > +                     break;
+> > +             }
+> > +             ret =3D get_unused_fd_flags(perm_to_file_flags(entry.perm=
+));
+> > +             if (ret < 0) {
+> > +                     fput(f);
+> > +                     break;
+> > +             }
+> > +             fd_install(ret, f);
+>
+>
+> So at least we need to use receice_fd_user() here to give a chance to be
+> hooked into security module.
+>
 
-Hi Boris,
+Good point. Will do it in v5.
 
-Yes it is the only patch needs change. I have send out updated v3 patch 3.
-
-I provided some changelog history to explain and also added Jarkko's Acked-by in
-the new patch. Sorry for the trouble.
-
-Hi Sean,
-
-If you see this, could you take another check on whether this series is OK?
-
-Thanks in advance.
+Thanks,
+Yongji
