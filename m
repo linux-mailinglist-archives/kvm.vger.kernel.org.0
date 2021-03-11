@@ -2,132 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1FF15337178
-	for <lists+kvm@lfdr.de>; Thu, 11 Mar 2021 12:36:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CAB0233717F
+	for <lists+kvm@lfdr.de>; Thu, 11 Mar 2021 12:38:15 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232632AbhCKLgE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 11 Mar 2021 06:36:04 -0500
-Received: from foss.arm.com ([217.140.110.172]:33456 "EHLO foss.arm.com"
+        id S232759AbhCKLhj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 11 Mar 2021 06:37:39 -0500
+Received: from verein.lst.de ([213.95.11.211]:40565 "EHLO verein.lst.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232644AbhCKLff (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 11 Mar 2021 06:35:35 -0500
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 32AC431B;
-        Thu, 11 Mar 2021 03:35:35 -0800 (PST)
-Received: from C02TD0UTHF1T.local (unknown [10.57.54.221])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B82053F793;
-        Thu, 11 Mar 2021 03:35:32 -0800 (PST)
-Date:   Thu, 11 Mar 2021 11:35:29 +0000
-From:   Mark Rutland <mark.rutland@arm.com>
-To:     Will Deacon <will@kernel.org>
-Cc:     Marc Zyngier <maz@kernel.org>, kvm@vger.kernel.org,
-        kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        qperret@google.com, kernel-team@android.com
-Subject: Re: [PATCH 3/4] KVM: arm64: Rename SCTLR_ELx_FLAGS to SCTLR_EL2_FLAGS
-Message-ID: <20210311113529.GD37303@C02TD0UTHF1T.local>
-References: <20210310152656.3821253-1-maz@kernel.org>
- <20210310152656.3821253-4-maz@kernel.org>
- <20210310154625.GA29738@willie-the-truck>
- <874khjxade.wl-maz@kernel.org>
- <20210310161546.GC29834@willie-the-truck>
- <87zgzagaqq.wl-maz@kernel.org>
- <20210310182022.GA29969@willie-the-truck>
+        id S232679AbhCKLhJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 11 Mar 2021 06:37:09 -0500
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id 0C4B268B05; Thu, 11 Mar 2021 12:37:07 +0100 (CET)
+Date:   Thu, 11 Mar 2021 12:37:06 +0100
+From:   Christoph Hellwig <hch@lst.de>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     Christoph Hellwig <hch@lst.de>,
+        Max Gurtovoy <mgurtovoy@nvidia.com>,
+        alex.williamson@redhat.com, cohuck@redhat.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, liranl@nvidia.com, oren@nvidia.com,
+        tzahio@nvidia.com, leonro@nvidia.com, yarong@nvidia.com,
+        aviadye@nvidia.com, shahafs@nvidia.com, artemp@nvidia.com,
+        kwankhede@nvidia.com, ACurrid@nvidia.com, cjia@nvidia.com,
+        yishaih@nvidia.com, mjrosato@linux.ibm.com, aik@ozlabs.ru
+Subject: Re: [PATCH 9/9] vfio/pci: export igd support into vendor vfio_pci
+ driver
+Message-ID: <20210311113706.GC17183@lst.de>
+References: <20210309083357.65467-1-mgurtovoy@nvidia.com> <20210309083357.65467-10-mgurtovoy@nvidia.com> <20210310081508.GB4364@lst.de> <20210310123127.GT2356281@nvidia.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210310182022.GA29969@willie-the-truck>
+In-Reply-To: <20210310123127.GT2356281@nvidia.com>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Mar 10, 2021 at 06:20:22PM +0000, Will Deacon wrote:
-> On Wed, Mar 10, 2021 at 05:49:17PM +0000, Marc Zyngier wrote:
-> > On Wed, 10 Mar 2021 16:15:47 +0000,
-> > Will Deacon <will@kernel.org> wrote:
-> > > On Wed, Mar 10, 2021 at 04:05:17PM +0000, Marc Zyngier wrote:
-> > > > On Wed, 10 Mar 2021 15:46:26 +0000,
-> > > > Will Deacon <will@kernel.org> wrote:
-> > > > > On Wed, Mar 10, 2021 at 03:26:55PM +0000, Marc Zyngier wrote:
-> > > > > > diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-init.S b/arch/arm64/kvm/hyp/nvhe/hyp-init.S
-> > > > > > index 4eb584ae13d9..7423f4d961a4 100644
-> > > > > > --- a/arch/arm64/kvm/hyp/nvhe/hyp-init.S
-> > > > > > +++ b/arch/arm64/kvm/hyp/nvhe/hyp-init.S
-> > > > > > @@ -122,7 +122,7 @@ alternative_else_nop_endif
-> > > > > >  	 * as well as the EE bit on BE. Drop the A flag since the compiler
-> > > > > >  	 * is allowed to generate unaligned accesses.
-> > > > > >  	 */
-> > > > > > -	mov_q	x0, (SCTLR_EL2_RES1 | (SCTLR_ELx_FLAGS & ~SCTLR_ELx_A))
-> > > > > > +	mov_q	x0, (SCTLR_EL2_RES1 | (SCTLR_EL2_FLAGS & ~SCTLR_ELx_A))
-> > > > > 
-> > > > > Can we just drop SCTLR_ELx_A from SCTLR_EL2_FLAGS instead of clearing it
-> > > > > here?
-> > > > 
-> > > > Absolutely. That'd actually be an improvement.
-> > > 
-> > > In fact, maybe just define INIT_SCTLR_EL2_MMU_ON to mirror what we do for
-> > > EL1 (i.e. including the RES1 bits) and then use that here?
-> > 
-> > Like this?
-> > 
-> > diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-> > index dfd4edbfe360..593b9bf91bbd 100644
-> > --- a/arch/arm64/include/asm/sysreg.h
-> > +++ b/arch/arm64/include/asm/sysreg.h
-> > @@ -579,9 +579,6 @@
-> >  #define SCTLR_ELx_A	(BIT(1))
-> >  #define SCTLR_ELx_M	(BIT(0))
-> >  
-> > -#define SCTLR_ELx_FLAGS	(SCTLR_ELx_M  | SCTLR_ELx_A | SCTLR_ELx_C | \
-> > -			 SCTLR_ELx_SA | SCTLR_ELx_I | SCTLR_ELx_IESB)
-> > -
-> >  /* SCTLR_EL2 specific flags. */
-> >  #define SCTLR_EL2_RES1	((BIT(4))  | (BIT(5))  | (BIT(11)) | (BIT(16)) | \
-> >  			 (BIT(18)) | (BIT(22)) | (BIT(23)) | (BIT(28)) | \
-> > @@ -593,6 +590,10 @@
-> >  #define ENDIAN_SET_EL2		0
-> >  #endif
-> >  
-> > +#define INIT_SCTLR_EL2_MMU_ON						\
-> > +	(SCTLR_ELx_M  | SCTLR_ELx_C | SCTLR_ELx_SA | SCTLR_ELx_I |	\
-> > +	 SCTLR_ELx_IESB | ENDIAN_SET_EL2 | SCTLR_EL2_RES1)
-> > +
-> >  #define INIT_SCTLR_EL2_MMU_OFF \
-> >  	(SCTLR_EL2_RES1 | ENDIAN_SET_EL2)
-> >  
-> > diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-init.S b/arch/arm64/kvm/hyp/nvhe/hyp-init.S
-> > index 4eb584ae13d9..2e16b2098bbd 100644
-> > --- a/arch/arm64/kvm/hyp/nvhe/hyp-init.S
-> > +++ b/arch/arm64/kvm/hyp/nvhe/hyp-init.S
-> > @@ -117,13 +117,7 @@ alternative_else_nop_endif
-> >  	tlbi	alle2
-> >  	dsb	sy
-> >  
-> > -	/*
-> > -	 * Preserve all the RES1 bits while setting the default flags,
-> > -	 * as well as the EE bit on BE. Drop the A flag since the compiler
-> > -	 * is allowed to generate unaligned accesses.
-> > -	 */
-> > -	mov_q	x0, (SCTLR_EL2_RES1 | (SCTLR_ELx_FLAGS & ~SCTLR_ELx_A))
-> > -CPU_BE(	orr	x0, x0, #SCTLR_ELx_EE)
-> > +	mov_q	x0, INIT_SCTLR_EL2_MMU_ON
-> >  alternative_if ARM64_HAS_ADDRESS_AUTH
-> >  	mov_q	x1, (SCTLR_ELx_ENIA | SCTLR_ELx_ENIB | \
-> >  		     SCTLR_ELx_ENDA | SCTLR_ELx_ENDB)
+On Wed, Mar 10, 2021 at 08:31:27AM -0400, Jason Gunthorpe wrote:
+> Yes, that needs more refactoring. I'm viewing this series as a
+> "statement of intent" and once we commit to doing this we can go
+> through the bigger effort to split up vfio_pci_core and tidy its API.
 > 
-> Beautiful!
-> 
-> With that, you can have my ack on the whole series:
-> 
-> Acked-by: Will Deacon <will@kernel.org>
+> Obviously this is a big project, given the past comments I don't want
+> to send more effort here until we see a community consensus emerge
+> that this is what we want to do. If we build a sub-driver instead the
+> work is all in the trash bin.
 
-FWIW, likewise:
-
-Acked-by: Mark Rutland <nark.rutland@arm.com>
-
-This is really nice!
-
-Thanks,
-Mark.
+So my viewpoint here is that this work doesn't seem very useful for
+the existing subdrivers given how much compat pain there is.  It
+defintively is the right way to go for a new driver.
