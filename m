@@ -2,97 +2,147 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D8E57336A6B
-	for <lists+kvm@lfdr.de>; Thu, 11 Mar 2021 04:09:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3453C336A6C
+	for <lists+kvm@lfdr.de>; Thu, 11 Mar 2021 04:09:49 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230214AbhCKDJQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 10 Mar 2021 22:09:16 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54600 "EHLO
+        id S230250AbhCKDJR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 10 Mar 2021 22:09:17 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54658 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229851AbhCKDIt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 10 Mar 2021 22:08:49 -0500
-Received: from mail-ot1-x32c.google.com (mail-ot1-x32c.google.com [IPv6:2607:f8b0:4864:20::32c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF27EC061574;
-        Wed, 10 Mar 2021 19:08:49 -0800 (PST)
-Received: by mail-ot1-x32c.google.com with SMTP id j8so185052otc.0;
-        Wed, 10 Mar 2021 19:08:49 -0800 (PST)
+        with ESMTP id S229920AbhCKDJE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 10 Mar 2021 22:09:04 -0500
+Received: from mail-oi1-x230.google.com (mail-oi1-x230.google.com [IPv6:2607:f8b0:4864:20::230])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 99ACDC061574;
+        Wed, 10 Mar 2021 19:09:04 -0800 (PST)
+Received: by mail-oi1-x230.google.com with SMTP id v192so14041540oia.5;
+        Wed, 10 Mar 2021 19:09:04 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=DpjsV6DgfrzVz3csQVFdnTPnpXnXN7Ul8q7EgQp2fS8=;
-        b=lkpaktUOCZV9Z1Wq1EhtbYH/keQdx3AoWUQCdEl0daqO+5M4kGCzk6R03k38tjA3oD
-         iyfiNcIgrG/pcLs3NiRmUsNzz0wB7UX9OD3G+oQyT5R2a/NVf1irkN8R0qVvMA6SwgGr
-         7QTXTX7nGXK4IUgTexfb8t1HoXLZfvmkuSpGUJ5RyCbe0vVgsoS0GFtcwA/C7gxl+epc
-         7P05pR6Jgrg1B1mQGKuCZcHgkldQOV3oK4iRiLHqopMmJaG8aOuH0JhRSh7+q98PQ0Xv
-         +29nxXk17TErHKroJvBf3jLsMdKVhp4lOCOQ43Jpg2JE+bh/qMkGJuPiXEynU1196X6Z
-         Wb/Q==
+        bh=CpYr2shWjkG+N+QLxthfTv5bG8FNrC8Nvj/Q2Hx+eMM=;
+        b=dDjxs9wbKFOJyi78KHhb2oeVtgz0s9r1NkojdbvqhCyt50j2A78iFYw/+s+yOqy+zB
+         Kik7iOaeNMCMAYIveTgNYFp52A6zJ4doRTXIj+lgi80hb84fmBnhPTlwxhNL0d2NhWeG
+         nR7OqVufvZ2UbGl6+D0fGfgFmvwmrqEq6t8i90/WegEAQoyhBTLhaA6VRpFdFrQAfSFg
+         e1H20V/3cLQPkgLDkUXgWBHyUA9tv3MUhBn2Cc8OJ/nZTx+FR+ypWOJD63aVcHbmnC4s
+         8R8dC3pp7E+uu2tlOsh6Fv5aSv6GBl4MM01VPrpbxC05eJqfVt5HKBHXXGZfQhW0j5Ew
+         Zesg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=DpjsV6DgfrzVz3csQVFdnTPnpXnXN7Ul8q7EgQp2fS8=;
-        b=n/1C30dJ+l5Las1BOBQ0KFD/u6QFapQLxWjpQt9Zkq0xYVrY2jArKRVBrZfmBwp9H0
-         BKjcscOqeV6dU+oyTrOuDWkIHTcwLLycTzQXi2dzip2H1ejo2Pz8lLOCO5HEOgVRcS7M
-         SonYcYvRqY5fGjgs+eWla32dBWWhXaZhSAakPg+MYeubVlTf+phnwo+/j/6PUHSZRKdG
-         kV9z7oCoaWgi8GD1r9G9+hxWNlb8civnkwWDO+cRkyfO3pbXILRS7wxgDdIsr1BS4Om4
-         HXCIAOxXliPaNMU9Okfk2tZtfn/gSYYdUr7O+9UZHD+B26S8X9D2Kh8g68vrr50MzPbt
-         38gQ==
-X-Gm-Message-State: AOAM531eCw28H6Ubt8d2jQWVfkUNXDT+rgPR+0fPA7IvRE55rVhlR/J3
-        3IMeBUr14ESJ/R3m72gkbEIWvZSgLUPlvXfl73KegTa7
-X-Google-Smtp-Source: ABdhPJzKnF5hpUhqwvtyTKCnkFS8JsrmF93ONq/zj/6d+uU5N2d2YuV3+j3jQKCgy3foXVhZ7/BmxqI60nFE56bkoeY=
-X-Received: by 2002:a05:6830:1304:: with SMTP id p4mr5225706otq.185.1615432128924;
- Wed, 10 Mar 2021 19:08:48 -0800 (PST)
+        bh=CpYr2shWjkG+N+QLxthfTv5bG8FNrC8Nvj/Q2Hx+eMM=;
+        b=FmZtJqy4BzzmIyv1bNX+UXtutFslm9vrAFeo2X5txfWJJyWgs377qbzgZGPiLwYUFF
+         S/g0ymqvL2/VZucLfltkTI/7JS+ul2pLWrxJ2ZMOjTePCVnzMpEZ1rXj3rYGs7/vU59H
+         s8T87EBr+PKFRH/G5xTALijpTK6423Kz13xRxQheOOw/YcfYbAgNCN4soHPbG9IiC7Np
+         XWVsDTX6/HQt1TMgeJ5gMYmZk77WXVwGKR/expBEqH3WzxGnX6pZVFUatbJZUOg00Kun
+         /Zw526tmZLXTq93eHSYBjrvA/hzg3GHyl5I22+ZAdlzRS9HmzkbCg6P6X+AcnfNgZJDy
+         /F0Q==
+X-Gm-Message-State: AOAM533s3DKdOwxp4SHa6b/3d4O+yvuzst9VR4ILvzHFMbD1zwYePGNs
+        nRjv72tqx2jHXuWTvadYiSBjUjPsv6FP5W/iXVbr+wnd
+X-Google-Smtp-Source: ABdhPJx0GTwhLGYhOlbN3VZXfZS4v+ACCXf9GxRQ5GcUH8VIJj9GWv6pUY7EAR+eCtgG+yaiuJ4enwhfQkS4d8EjMa4=
+X-Received: by 2002:a54:408a:: with SMTP id i10mr4875452oii.141.1615432143818;
+ Wed, 10 Mar 2021 19:09:03 -0800 (PST)
 MIME-Version: 1.0
-References: <1614818118-965-1-git-send-email-wanpengli@tencent.com>
-In-Reply-To: <1614818118-965-1-git-send-email-wanpengli@tencent.com>
+References: <1614130683-24137-1-git-send-email-wanpengli@tencent.com>
+In-Reply-To: <1614130683-24137-1-git-send-email-wanpengli@tencent.com>
 From:   Wanpeng Li <kernellwp@gmail.com>
-Date:   Thu, 11 Mar 2021 11:08:37 +0800
-Message-ID: <CANRm+CyxVC6gbdakvtqN+NFtDBvrSTShqF9HdB4fanomykd=ww@mail.gmail.com>
-Subject: Re: [PATCH v2] KVM: LAPIC: Advancing the timer expiration on guest
- initiated write
+Date:   Thu, 11 Mar 2021 11:08:53 +0800
+Message-ID: <CANRm+CwLmHVuG36MCwU2kMQHfGODNismJEy2QDwH_AbN1OMPRQ@mail.gmail.com>
+Subject: Re: [PATCH v4] KVM: kvmclock: Fix vCPUs > 64 can't be online/hotpluged
 To:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <seanjc@google.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>
+        Joerg Roedel <joro@8bytes.org>,
+        Brijesh Singh <brijesh.singh@amd.com>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 ping, :)
-On Thu, 4 Mar 2021 at 08:35, Wanpeng Li <kernellwp@gmail.com> wrote:
+On Wed, 24 Feb 2021 at 09:38, Wanpeng Li <kernellwp@gmail.com> wrote:
 >
 > From: Wanpeng Li <wanpengli@tencent.com>
 >
-> Advancing the timer expiration should only be necessary on guest initiated
-> writes. When we cancel the timer and clear .pending during state restore,
-> clear expired_tscdeadline as well.
+> # lscpu
+> Architecture:          x86_64
+> CPU op-mode(s):        32-bit, 64-bit
+> Byte Order:            Little Endian
+> CPU(s):                88
+> On-line CPU(s) list:   0-63
+> Off-line CPU(s) list:  64-87
 >
-> Reviewed-by: Sean Christopherson <seanjc@google.com>
+> # cat /proc/cmdline
+> BOOT_IMAGE=/vmlinuz-5.10.0-rc3-tlinux2-0050+ root=/dev/mapper/cl-root ro
+> rd.lvm.lv=cl/root rhgb quiet console=ttyS0 LANG=en_US .UTF-8 no-kvmclock-vsyscall
+>
+> # echo 1 > /sys/devices/system/cpu/cpu76/online
+> -bash: echo: write error: Cannot allocate memory
+>
+> The per-cpu vsyscall pvclock data pointer assigns either an element of the
+> static array hv_clock_boot (#vCPU <= 64) or dynamically allocated memory
+> hvclock_mem (vCPU > 64), the dynamically memory will not be allocated if
+> kvmclock vsyscall is disabled, this can result in cpu hotpluged fails in
+> kvmclock_setup_percpu() which returns -ENOMEM. It's broken for no-vsyscall
+> and sometimes you end up with vsyscall disabled if the host does something
+> strange. This patch fixes it by allocating this dynamically memory
+> unconditionally even if vsyscall is disabled.
+>
+> Fixes: 6a1cac56f4 ("x86/kvm: Use __bss_decrypted attribute in shared variables")
+> Reported-by: Zelin Deng <zelin.deng@linux.alibaba.com>
+> Cc: Brijesh Singh <brijesh.singh@amd.com>
+> Cc: stable@vger.kernel.org#v4.19-rc5+
 > Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
 > ---
+> v3 -> v4:
+>  * fix kernel test robot report WARNING
+> v2 -> v3:
+>  * allocate dynamically memory unconditionally
 > v1 -> v2:
->  * update patch description
+>  * add code comments
 >
->  arch/x86/kvm/lapic.c | 1 +
->  1 file changed, 1 insertion(+)
+>  arch/x86/kernel/kvmclock.c | 19 +++++++++----------
+>  1 file changed, 9 insertions(+), 10 deletions(-)
 >
-> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-> index 45d40bf..f2b6e79 100644
-> --- a/arch/x86/kvm/lapic.c
-> +++ b/arch/x86/kvm/lapic.c
-> @@ -2595,6 +2595,7 @@ int kvm_apic_set_state(struct kvm_vcpu *vcpu, struct kvm_lapic_state *s)
+> diff --git a/arch/x86/kernel/kvmclock.c b/arch/x86/kernel/kvmclock.c
+> index aa59374..1fc0962 100644
+> --- a/arch/x86/kernel/kvmclock.c
+> +++ b/arch/x86/kernel/kvmclock.c
+> @@ -268,21 +268,20 @@ static void __init kvmclock_init_mem(void)
 >
->         apic_update_ppr(apic);
->         hrtimer_cancel(&apic->lapic_timer.timer);
-> +       apic->lapic_timer.expired_tscdeadline = 0;
->         apic_update_lvtt(apic);
->         apic_manage_nmi_watchdog(apic, kvm_lapic_get_reg(apic, APIC_LVT0));
->         update_divide_count(apic);
+>  static int __init kvm_setup_vsyscall_timeinfo(void)
+>  {
+> -#ifdef CONFIG_X86_64
+> -       u8 flags;
+> +       kvmclock_init_mem();
+>
+> -       if (!per_cpu(hv_clock_per_cpu, 0) || !kvmclock_vsyscall)
+> -               return 0;
+> +#ifdef CONFIG_X86_64
+> +       if (per_cpu(hv_clock_per_cpu, 0) && kvmclock_vsyscall) {
+> +               u8 flags;
+>
+> -       flags = pvclock_read_flags(&hv_clock_boot[0].pvti);
+> -       if (!(flags & PVCLOCK_TSC_STABLE_BIT))
+> -               return 0;
+> +               flags = pvclock_read_flags(&hv_clock_boot[0].pvti);
+> +               if (!(flags & PVCLOCK_TSC_STABLE_BIT))
+> +                       return 0;
+>
+> -       kvm_clock.vdso_clock_mode = VDSO_CLOCKMODE_PVCLOCK;
+> +               kvm_clock.vdso_clock_mode = VDSO_CLOCKMODE_PVCLOCK;
+> +       }
+>  #endif
+>
+> -       kvmclock_init_mem();
+> -
+>         return 0;
+>  }
+>  early_initcall(kvm_setup_vsyscall_timeinfo);
 > --
 > 2.7.4
 >
