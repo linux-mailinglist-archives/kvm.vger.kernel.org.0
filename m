@@ -2,76 +2,132 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B913A33717A
+	by mail.lfdr.de (Postfix) with ESMTP id 1FF15337178
 	for <lists+kvm@lfdr.de>; Thu, 11 Mar 2021 12:36:36 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232716AbhCKLgF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 11 Mar 2021 06:36:05 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50198 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232681AbhCKLfg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 11 Mar 2021 06:35:36 -0500
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D5793C061574;
+        id S232632AbhCKLgE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 11 Mar 2021 06:36:04 -0500
+Received: from foss.arm.com ([217.140.110.172]:33456 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S232644AbhCKLff (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 11 Mar 2021 06:35:35 -0500
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 32AC431B;
         Thu, 11 Mar 2021 03:35:35 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=j0CoZewAw1TWkgGt0IV+Hpz2wChVlsz2EUkJ3HV24OE=; b=hI6WA+ji+j9Im7phV8IwxUv4uJ
-        xoyAiuk/0KuLxS6r/F4vwgWpEybLL0xxQvzL1oDYT1Jidi79KwKr21DlDgIhS602scoN+6/VNeE5E
-        NmoVlh6HYL3o8sC1y2H5W95izTjPYitLXctZG42VkTLvTsnpFz0LaCKa61a1LVwE+ZEOi8+qzI7/6
-        r3+BpqOzxtBWBgx9e+Tva6Ip/dO5tTNHrkmVtL6r2nCfVt0IQgeo8UOP1cZM2zlSDOSkG9fVh2gZv
-        4aXp6vtQNnvR3r4/1XEquXCbE5XPTuGrXUrbe3Jjs7G0aoheBS0uaS7apAChXiPKg3e1KUt8LfK4C
-        FTS/2Y7g==;
-Received: from hch by casper.infradead.org with local (Exim 4.94 #2 (Red Hat Linux))
-        id 1lKJbA-007Fqd-27; Thu, 11 Mar 2021 11:35:24 +0000
-Date:   Thu, 11 Mar 2021 11:35:24 +0000
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Peter Xu <peterx@redhat.com>
-Cc:     Jason Gunthorpe <jgg@nvidia.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        prime.zeng@hisilicon.com, cohuck@redhat.com
-Subject: Re: [PATCH] vfio/pci: Handle concurrent vma faults
-Message-ID: <20210311113524.GA1726872@infradead.org>
-References: <161539852724.8302.17137130175894127401.stgit@gimli.home>
- <20210310181446.GZ2356281@nvidia.com>
- <20210310113406.6f029fcf@omen.home.shazbot.org>
- <20210310184011.GA2356281@nvidia.com>
- <20210310200607.GG6530@xz-x1>
+Received: from C02TD0UTHF1T.local (unknown [10.57.54.221])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B82053F793;
+        Thu, 11 Mar 2021 03:35:32 -0800 (PST)
+Date:   Thu, 11 Mar 2021 11:35:29 +0000
+From:   Mark Rutland <mark.rutland@arm.com>
+To:     Will Deacon <will@kernel.org>
+Cc:     Marc Zyngier <maz@kernel.org>, kvm@vger.kernel.org,
+        kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        qperret@google.com, kernel-team@android.com
+Subject: Re: [PATCH 3/4] KVM: arm64: Rename SCTLR_ELx_FLAGS to SCTLR_EL2_FLAGS
+Message-ID: <20210311113529.GD37303@C02TD0UTHF1T.local>
+References: <20210310152656.3821253-1-maz@kernel.org>
+ <20210310152656.3821253-4-maz@kernel.org>
+ <20210310154625.GA29738@willie-the-truck>
+ <874khjxade.wl-maz@kernel.org>
+ <20210310161546.GC29834@willie-the-truck>
+ <87zgzagaqq.wl-maz@kernel.org>
+ <20210310182022.GA29969@willie-the-truck>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210310200607.GG6530@xz-x1>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <20210310182022.GA29969@willie-the-truck>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Mar 10, 2021 at 03:06:07PM -0500, Peter Xu wrote:
-> On Wed, Mar 10, 2021 at 02:40:11PM -0400, Jason Gunthorpe wrote:
-> > On Wed, Mar 10, 2021 at 11:34:06AM -0700, Alex Williamson wrote:
-> > 
-> > > > I think after the address_space changes this should try to stick with
-> > > > a normal io_rmap_pfn_range() done outside the fault handler.
+On Wed, Mar 10, 2021 at 06:20:22PM +0000, Will Deacon wrote:
+> On Wed, Mar 10, 2021 at 05:49:17PM +0000, Marc Zyngier wrote:
+> > On Wed, 10 Mar 2021 16:15:47 +0000,
+> > Will Deacon <will@kernel.org> wrote:
+> > > On Wed, Mar 10, 2021 at 04:05:17PM +0000, Marc Zyngier wrote:
+> > > > On Wed, 10 Mar 2021 15:46:26 +0000,
+> > > > Will Deacon <will@kernel.org> wrote:
+> > > > > On Wed, Mar 10, 2021 at 03:26:55PM +0000, Marc Zyngier wrote:
+> > > > > > diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-init.S b/arch/arm64/kvm/hyp/nvhe/hyp-init.S
+> > > > > > index 4eb584ae13d9..7423f4d961a4 100644
+> > > > > > --- a/arch/arm64/kvm/hyp/nvhe/hyp-init.S
+> > > > > > +++ b/arch/arm64/kvm/hyp/nvhe/hyp-init.S
+> > > > > > @@ -122,7 +122,7 @@ alternative_else_nop_endif
+> > > > > >  	 * as well as the EE bit on BE. Drop the A flag since the compiler
+> > > > > >  	 * is allowed to generate unaligned accesses.
+> > > > > >  	 */
+> > > > > > -	mov_q	x0, (SCTLR_EL2_RES1 | (SCTLR_ELx_FLAGS & ~SCTLR_ELx_A))
+> > > > > > +	mov_q	x0, (SCTLR_EL2_RES1 | (SCTLR_EL2_FLAGS & ~SCTLR_ELx_A))
+> > > > > 
+> > > > > Can we just drop SCTLR_ELx_A from SCTLR_EL2_FLAGS instead of clearing it
+> > > > > here?
+> > > > 
+> > > > Absolutely. That'd actually be an improvement.
 > > > 
-> > > I assume you're suggesting calling io_remap_pfn_range() when device
-> > > memory is enabled,
+> > > In fact, maybe just define INIT_SCTLR_EL2_MMU_ON to mirror what we do for
+> > > EL1 (i.e. including the RES1 bits) and then use that here?
 > > 
-> > Yes, I think I saw Peter thinking along these lines too
+> > Like this?
 > > 
-> > Then fault just always causes SIGBUS if it gets called
-
-I feel much more comfortable having the io_remap_pfn_range in place.
-
+> > diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+> > index dfd4edbfe360..593b9bf91bbd 100644
+> > --- a/arch/arm64/include/asm/sysreg.h
+> > +++ b/arch/arm64/include/asm/sysreg.h
+> > @@ -579,9 +579,6 @@
+> >  #define SCTLR_ELx_A	(BIT(1))
+> >  #define SCTLR_ELx_M	(BIT(0))
+> >  
+> > -#define SCTLR_ELx_FLAGS	(SCTLR_ELx_M  | SCTLR_ELx_A | SCTLR_ELx_C | \
+> > -			 SCTLR_ELx_SA | SCTLR_ELx_I | SCTLR_ELx_IESB)
+> > -
+> >  /* SCTLR_EL2 specific flags. */
+> >  #define SCTLR_EL2_RES1	((BIT(4))  | (BIT(5))  | (BIT(11)) | (BIT(16)) | \
+> >  			 (BIT(18)) | (BIT(22)) | (BIT(23)) | (BIT(28)) | \
+> > @@ -593,6 +590,10 @@
+> >  #define ENDIAN_SET_EL2		0
+> >  #endif
+> >  
+> > +#define INIT_SCTLR_EL2_MMU_ON						\
+> > +	(SCTLR_ELx_M  | SCTLR_ELx_C | SCTLR_ELx_SA | SCTLR_ELx_I |	\
+> > +	 SCTLR_ELx_IESB | ENDIAN_SET_EL2 | SCTLR_EL2_RES1)
+> > +
+> >  #define INIT_SCTLR_EL2_MMU_OFF \
+> >  	(SCTLR_EL2_RES1 | ENDIAN_SET_EL2)
+> >  
+> > diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-init.S b/arch/arm64/kvm/hyp/nvhe/hyp-init.S
+> > index 4eb584ae13d9..2e16b2098bbd 100644
+> > --- a/arch/arm64/kvm/hyp/nvhe/hyp-init.S
+> > +++ b/arch/arm64/kvm/hyp/nvhe/hyp-init.S
+> > @@ -117,13 +117,7 @@ alternative_else_nop_endif
+> >  	tlbi	alle2
+> >  	dsb	sy
+> >  
+> > -	/*
+> > -	 * Preserve all the RES1 bits while setting the default flags,
+> > -	 * as well as the EE bit on BE. Drop the A flag since the compiler
+> > -	 * is allowed to generate unaligned accesses.
+> > -	 */
+> > -	mov_q	x0, (SCTLR_EL2_RES1 | (SCTLR_ELx_FLAGS & ~SCTLR_ELx_A))
+> > -CPU_BE(	orr	x0, x0, #SCTLR_ELx_EE)
+> > +	mov_q	x0, INIT_SCTLR_EL2_MMU_ON
+> >  alternative_if ARM64_HAS_ADDRESS_AUTH
+> >  	mov_q	x1, (SCTLR_ELx_ENIA | SCTLR_ELx_ENIB | \
+> >  		     SCTLR_ELx_ENDA | SCTLR_ELx_ENDB)
 > 
-> Indeed that looks better than looping in the fault().
+> Beautiful!
 > 
-> But I don't know whether it'll be easy to move io_remap_pfn_range() to device
-> memory enablement.  If it's a two-step thing, we can fix the BUG_ON and vma
-> duplication issue first, then the full rework can be done in the bigger series
-> as what be chosen as the last approach.
+> With that, you can have my ack on the whole series:
+> 
+> Acked-by: Will Deacon <will@kernel.org>
 
-What kind of problems do you envision?  It seems pretty simple to do,
-at least when combined with the unmap_mapping_range patch.
+FWIW, likewise:
+
+Acked-by: Mark Rutland <nark.rutland@arm.com>
+
+This is really nice!
+
+Thanks,
+Mark.
