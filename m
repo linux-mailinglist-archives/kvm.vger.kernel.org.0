@@ -2,152 +2,176 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id ACE8E33750A
-	for <lists+kvm@lfdr.de>; Thu, 11 Mar 2021 15:06:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 092A7337581
+	for <lists+kvm@lfdr.de>; Thu, 11 Mar 2021 15:24:27 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233730AbhCKOFn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 11 Mar 2021 09:05:43 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:24615 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233891AbhCKOFU (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 11 Mar 2021 09:05:20 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1615471519;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=90Q2n6m6EwL+XSKkC/k2rK0sBsGWuNAH+8zbCxifFnw=;
-        b=GwMNmUshxtzVS6p9up5uV1v8pHFR6mw3G6w5Oq1G8ryYaCh0U4ew1VRyYvQEYlJWkf6/5e
-        R12xUzl3bPxpvNUk74TTwg08YJ6CUpWdUswKyjmrd9zbnHE1xzq/gb2oODD9+qe+tWhtxn
-        P7M+xKE7rhzSBMhjwFI/UXYq1C/tDhQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-245-wnMcU4zAPBad_tREVJY_tA-1; Thu, 11 Mar 2021 09:05:16 -0500
-X-MC-Unique: wnMcU4zAPBad_tREVJY_tA-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 16DA0800D55;
-        Thu, 11 Mar 2021 14:05:14 +0000 (UTC)
-Received: from [10.36.112.254] (ovpn-112-254.ams2.redhat.com [10.36.112.254])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 3B3B12C15A;
-        Thu, 11 Mar 2021 14:05:11 +0000 (UTC)
-Subject: Re: [PATCH v3 1/2] KVM: arm64: Reject VM creation when the default
- IPA size is unsupported
-To:     Marc Zyngier <maz@kernel.org>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org
-Cc:     James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        id S233822AbhCKOXz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 11 Mar 2021 09:23:55 -0500
+Received: from mx2.suse.de ([195.135.220.15]:47540 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S233511AbhCKOXZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 11 Mar 2021 09:23:25 -0500
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+        t=1615472603; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+        bh=po4QZsHAN+vzX5uvzJmshXlPCac7n69c5r9Fdn0dvCo=;
+        b=sjqqOUQpbELgunG51bLYnaAneLdLoAHn6rXcSwK/DsFchfLZJWPal7opKb2RUZtxFSKIEo
+        JbtKBiDJ2iWmLlE8dN17PcQJiP6NCqXX2GAZhWcMmbQgbNa+4/4kethaBp09UxMuCAjwFQ
+        d8u620eAOSyPtbAZDTHxKFPkybBM2LQ=
+Received: from relay2.suse.de (unknown [195.135.221.27])
+        by mx2.suse.de (Postfix) with ESMTP id DB47BAC23;
+        Thu, 11 Mar 2021 14:23:22 +0000 (UTC)
+From:   Juergen Gross <jgross@suse.com>
+To:     xen-devel@lists.xenproject.org, x86@kernel.org,
+        linux-kernel@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        linux-arm-kernel@lists.infradead.org, linux-hyperv@vger.kernel.org,
+        kvm@vger.kernel.org, clang-built-linux@googlegroups.com
+Cc:     Juergen Gross <jgross@suse.com>, Andy Lutomirski <luto@kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Josh Poimboeuf <jpoimboe@redhat.com>,
+        Jason Baron <jbaron@akamai.com>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Ard Biesheuvel <ardb@kernel.org>, Deep Shah <sdeep@vmware.com>,
+        "VMware, Inc." <pv-drivers@vmware.com>,
+        Russell King <linux@armlinux.org.uk>,
+        Catalin Marinas <catalin.marinas@arm.com>,
         Will Deacon <will@kernel.org>,
-        Andrew Jones <drjones@redhat.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        kernel-team@android.com, stable@vger.kernel.org
-References: <20210311100016.3830038-1-maz@kernel.org>
- <20210311100016.3830038-2-maz@kernel.org>
-From:   Auger Eric <eric.auger@redhat.com>
-Message-ID: <fab68a4a-f96e-9eee-9066-b3f95ff26c35@redhat.com>
-Date:   Thu, 11 Mar 2021 15:05:08 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.7.0
+        "K. Y. Srinivasan" <kys@microsoft.com>,
+        Haiyang Zhang <haiyangz@microsoft.com>,
+        Stephen Hemminger <sthemmin@microsoft.com>,
+        Wei Liu <wei.liu@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        Stefano Stabellini <sstabellini@kernel.org>,
+        Nathan Chancellor <nathan@kernel.org>,
+        Nick Desaulniers <ndesaulniers@google.com>
+Subject: [PATCH v7 00/14] x86: major paravirt cleanup
+Date:   Thu, 11 Mar 2021 15:23:05 +0100
+Message-Id: <20210311142319.4723-1-jgross@suse.com>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-In-Reply-To: <20210311100016.3830038-2-maz@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Marc,
+This is a major cleanup of the paravirt infrastructure aiming at
+eliminating all custom code patching via paravirt patching.
 
-On 3/11/21 11:00 AM, Marc Zyngier wrote:
-> KVM/arm64 has forever used a 40bit default IPA space, partially
-> due to its 32bit heritage (where the only choice is 40bit).
-> 
-> However, there are implementations in the wild that have a *cough*
-> much smaller *cough* IPA space, which leads to a misprogramming of
-> VTCR_EL2, and a guest that is stuck on its first memory access
-> if userspace dares to ask for the default IPA setting (which most
-> VMMs do).
-> 
-> Instead, blundly reject the creation of such VM, as we can't
-> satisfy the requirements from userspace (with a one-off warning).
-> Also clarify the boot warning, and document that the VM creation
-> will fail when an unsupported IPA size is probided.
-> 
-> Although this is an ABI change, it doesn't really change much
-> for userspace:
-> 
-> - the guest couldn't run before this change, but no error was
->   returned. At least userspace knows what is happening.
-> 
-> - a memory slot that was accepted because it did fit the default
->   IPA space now doesn't even get a chance to be registered.
-> 
-> The other thing that is left doing is to convince userspace to
-> actually use the IPA space setting instead of relying on the
-> antiquated default.
-> 
-> Fixes: 233a7cb23531 ("kvm: arm64: Allow tuning the physical address size for VM")
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> Cc: stable@vger.kernel.org
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
+This is achieved by using ALTERNATIVE instead, leading to the ability
+to give objtool access to the patched in instructions.
 
-Thanks
+In order to remove most of the 32-bit special handling from pvops the
+time related operations are switched to use static_call() instead.
 
-Eric
-> ---
->  Documentation/virt/kvm/api.rst |  3 +++
->  arch/arm64/kvm/reset.c         | 12 ++++++++----
->  2 files changed, 11 insertions(+), 4 deletions(-)
-> 
-> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-> index 1a2b5210cdbf..38e327d4b479 100644
-> --- a/Documentation/virt/kvm/api.rst
-> +++ b/Documentation/virt/kvm/api.rst
-> @@ -182,6 +182,9 @@ is dependent on the CPU capability and the kernel configuration. The limit can
->  be retrieved using KVM_CAP_ARM_VM_IPA_SIZE of the KVM_CHECK_EXTENSION
->  ioctl() at run-time.
->  
-> +Creation of the VM will fail if the requested IPA size (whether it is
-> +implicit or explicit) is unsupported on the host.
-> +
->  Please note that configuring the IPA size does not affect the capability
->  exposed by the guest CPUs in ID_AA64MMFR0_EL1[PARange]. It only affects
->  size of the address translated by the stage2 level (guest physical to
-> diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
-> index 47f3f035f3ea..9d3d09a89894 100644
-> --- a/arch/arm64/kvm/reset.c
-> +++ b/arch/arm64/kvm/reset.c
-> @@ -324,10 +324,9 @@ int kvm_set_ipa_limit(void)
->  	}
->  
->  	kvm_ipa_limit = id_aa64mmfr0_parange_to_phys_shift(parange);
-> -	WARN(kvm_ipa_limit < KVM_PHYS_SHIFT,
-> -	     "KVM IPA Size Limit (%d bits) is smaller than default size\n",
-> -	     kvm_ipa_limit);
-> -	kvm_info("IPA Size Limit: %d bits\n", kvm_ipa_limit);
-> +	kvm_info("IPA Size Limit: %d bits%s\n", kvm_ipa_limit,
-> +		 ((kvm_ipa_limit < KVM_PHYS_SHIFT) ?
-> +		  " (Reduced IPA size, limited VM/VMM compatibility)" : ""));
->  
->  	return 0;
->  }
-> @@ -356,6 +355,11 @@ int kvm_arm_setup_stage2(struct kvm *kvm, unsigned long type)
->  			return -EINVAL;
->  	} else {
->  		phys_shift = KVM_PHYS_SHIFT;
-> +		if (phys_shift > kvm_ipa_limit) {
-> +			pr_warn_once("%s using unsupported default IPA limit, upgrade your VMM\n",
-> +				     current->comm);
-> +			return -EINVAL;
-> +		}
->  	}
->  
->  	mmfr0 = read_sanitised_ftr_reg(SYS_ID_AA64MMFR0_EL1);
-> 
+At the end of this series all paravirt patching has to do is to
+replace indirect calls with direct ones. In a further step this could
+be switched to static_call(), too.
+
+Changes in V7:
+- dropped patch 3, as already applied on tip tree
+- new patch 3 (patches 1 and 7 have been added to V6 late)
+- addressed comments by Boris
+
+Changes in V6:
+- switched back to "not" bit in feature value for "not feature"
+- other minor comments addressed
+
+Changes in V5:
+- patches 1-5 of V4 dropped, as already applied
+- new patches 1+3
+- fixed patch 2
+- split V4 patch 8 into patches 4+5
+- use flag byte instead of negative feature bit for "not feature"
+
+Changes in V4:
+- fixed several build failures
+- removed objtool patch, as objtool patches are in tip now
+- added patch 1 for making usage of static_call easier
+- even more cleanup
+
+Changes in V3:
+- added patches 7 and 12
+- addressed all comments
+
+Changes in V2:
+- added patches 5-12
+
+Juergen Gross (14):
+  x86/alternative: merge include files
+  static_call: move struct static_call_key definition to
+    static_call_types.h
+  static_call: add function to query current function
+  x86/paravirt: switch time pvops functions to use static_call()
+  x86/alternative: support not-feature
+  x86/alternative: support ALTERNATIVE_TERNARY
+  x86/alternative: don't open code ALTERNATIVE_TERNARY() in
+    _static_cpu_has()
+  x86: add new features for paravirt patching
+  x86/paravirt: remove no longer needed 32-bit pvops cruft
+  x86/paravirt: simplify paravirt macros
+  x86/paravirt: switch iret pvops to ALTERNATIVE
+  x86/paravirt: add new macros PVOP_ALT* supporting pvops in
+    ALTERNATIVEs
+  x86/paravirt: switch functions with custom code to ALTERNATIVE
+  x86/paravirt: have only one paravirt patch function
+
+ arch/arm/include/asm/paravirt.h          |  14 +-
+ arch/arm/kernel/paravirt.c               |   9 +-
+ arch/arm64/include/asm/paravirt.h        |  14 +-
+ arch/arm64/kernel/paravirt.c             |  13 +-
+ arch/x86/Kconfig                         |   1 +
+ arch/x86/entry/entry_32.S                |   6 +-
+ arch/x86/entry/entry_64.S                |   2 +-
+ arch/x86/entry/vdso/vdso32/system_call.S |   2 +-
+ arch/x86/include/asm/alternative-asm.h   | 114 ------------
+ arch/x86/include/asm/alternative.h       | 126 +++++++++++++-
+ arch/x86/include/asm/cpufeature.h        |  41 +----
+ arch/x86/include/asm/cpufeatures.h       |   2 +
+ arch/x86/include/asm/irqflags.h          |   7 +-
+ arch/x86/include/asm/mshyperv.h          |   2 +-
+ arch/x86/include/asm/nospec-branch.h     |   1 -
+ arch/x86/include/asm/paravirt.h          | 167 ++++++++----------
+ arch/x86/include/asm/paravirt_types.h    | 210 +++++++++--------------
+ arch/x86/include/asm/smap.h              |   5 +-
+ arch/x86/kernel/Makefile                 |   3 +-
+ arch/x86/kernel/alternative.c            |  52 +++++-
+ arch/x86/kernel/asm-offsets.c            |   7 -
+ arch/x86/kernel/cpu/vmware.c             |   5 +-
+ arch/x86/kernel/kvm.c                    |   2 +-
+ arch/x86/kernel/kvmclock.c               |   2 +-
+ arch/x86/kernel/paravirt-spinlocks.c     |   9 +
+ arch/x86/kernel/paravirt.c               |  75 ++------
+ arch/x86/kernel/paravirt_patch.c         |  99 -----------
+ arch/x86/kernel/tsc.c                    |   3 +-
+ arch/x86/lib/atomic64_386_32.S           |   2 +-
+ arch/x86/lib/atomic64_cx8_32.S           |   2 +-
+ arch/x86/lib/copy_page_64.S              |   2 +-
+ arch/x86/lib/copy_user_64.S              |   2 +-
+ arch/x86/lib/memcpy_64.S                 |   2 +-
+ arch/x86/lib/memmove_64.S                |   2 +-
+ arch/x86/lib/memset_64.S                 |   2 +-
+ arch/x86/lib/retpoline.S                 |   2 +-
+ arch/x86/xen/enlighten_pv.c              |   4 +-
+ arch/x86/xen/time.c                      |  26 +--
+ drivers/xen/time.c                       |   3 +-
+ include/linux/static_call.h              |  26 +--
+ include/linux/static_call_types.h        |  18 ++
+ tools/include/linux/static_call_types.h  |  18 ++
+ 42 files changed, 473 insertions(+), 631 deletions(-)
+ delete mode 100644 arch/x86/include/asm/alternative-asm.h
+ delete mode 100644 arch/x86/kernel/paravirt_patch.c
+
+-- 
+2.26.2
 
