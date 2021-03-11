@@ -2,139 +2,179 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 62CB1336CAF
-	for <lists+kvm@lfdr.de>; Thu, 11 Mar 2021 08:04:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5F6F7336CFB
+	for <lists+kvm@lfdr.de>; Thu, 11 Mar 2021 08:20:08 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231533AbhCKHEG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 11 Mar 2021 02:04:06 -0500
-Received: from szxga04-in.huawei.com ([45.249.212.190]:12710 "EHLO
-        szxga04-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231531AbhCKHDr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 11 Mar 2021 02:03:47 -0500
-Received: from DGGEMS410-HUB.china.huawei.com (unknown [172.30.72.58])
-        by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4Dx0Gt3QxszmVqH;
-        Thu, 11 Mar 2021 15:01:26 +0800 (CST)
-Received: from [10.174.184.135] (10.174.184.135) by
- DGGEMS410-HUB.china.huawei.com (10.3.19.210) with Microsoft SMTP Server id
- 14.3.498.0; Thu, 11 Mar 2021 15:03:32 +0800
-Subject: Re: [PATCH v3 0/4] KVM: arm64: Add VLPI migration support on GICv4.1
-From:   Shenming Lu <lushenming@huawei.com>
-To:     Marc Zyngier <maz@kernel.org>, Eric Auger <eric.auger@redhat.com>,
-        "Will Deacon" <will@kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>,
-        <kvmarm@lists.cs.columbia.edu>, <kvm@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>
-CC:     Alex Williamson <alex.williamson@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
-        <wanghaibin.wang@huawei.com>, <yuzenghui@huawei.com>
-References: <20210127121337.1092-1-lushenming@huawei.com>
- <4c2fdcc3-4189-6515-3a68-7bdf26e31973@huawei.com>
-Message-ID: <ba9511e7-a23f-f644-e310-f0bf1bce835a@huawei.com>
-Date:   Thu, 11 Mar 2021 15:03:21 +0800
+        id S231639AbhCKHTd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 11 Mar 2021 02:19:33 -0500
+Received: from mga03.intel.com ([134.134.136.65]:37751 "EHLO mga03.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S231264AbhCKHTU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 11 Mar 2021 02:19:20 -0500
+IronPort-SDR: 7WGrixQLnFE0tni0eEuZLdK9c0YEbeYg9/5b2nXn6iyXEx5DUfQN/vwRINptMgUYc7TEuqv1UN
+ hp131siNC1tQ==
+X-IronPort-AV: E=McAfee;i="6000,8403,9919"; a="188664309"
+X-IronPort-AV: E=Sophos;i="5.81,239,1610438400"; 
+   d="scan'208";a="188664309"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Mar 2021 23:19:20 -0800
+IronPort-SDR: ESO2S2GY8gGwqPZ/QQ6VfKe9g4j9lje94zcbUsD3B35zRfsxWDU3ddayxA2+1SIHbRVMIGR36n
+ dHZ4/h1bFj3w==
+X-IronPort-AV: E=Sophos;i="5.81,239,1610438400"; 
+   d="scan'208";a="410511997"
+Received: from lingshan-mobl5.ccr.corp.intel.com (HELO [10.249.170.224]) ([10.249.170.224])
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Mar 2021 23:19:17 -0800
+Subject: Re: [PATCH V3 6/6] vDPA/ifcvf: verify mandatory feature bits for vDPA
+To:     Jason Wang <jasowang@redhat.com>,
+        Zhu Lingshan <lingshan.zhu@linux.intel.com>, mst@redhat.com,
+        lulu@redhat.com, leonro@nvidia.com
+Cc:     netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org
+References: <20210310090052.4762-1-lingshan.zhu@intel.com>
+ <20210310090052.4762-7-lingshan.zhu@intel.com>
+ <3e53a5c9-c531-48ee-c9a7-907dfdacc9d1@redhat.com>
+ <9c2fb3d0-2d69-20b9-589d-cc5ffc830f38@linux.intel.com>
+ <4f3ef2bb-d823-d53d-3bb0-0152a3f6c9f1@redhat.com>
+From:   "Zhu, Lingshan" <lingshan.zhu@intel.com>
+Message-ID: <a1f346cc-c9fd-6d16-39d7-b59965a18b0a@intel.com>
+Date:   Thu, 11 Mar 2021 15:19:14 +0800
 User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.2.2
+ Thunderbird/78.7.1
 MIME-Version: 1.0
-In-Reply-To: <4c2fdcc3-4189-6515-3a68-7bdf26e31973@huawei.com>
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <4f3ef2bb-d823-d53d-3bb0-0152a3f6c9f1@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.174.184.135]
-X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi,
 
-Sorry to bother again, I am really hoping a response for this series. :-)
 
-Thanks,
-Shenming
+On 3/11/2021 2:20 PM, Jason Wang wrote:
+>
+> On 2021/3/11 12:16 下午, Zhu Lingshan wrote:
+>>
+>>
+>> On 3/11/2021 11:20 AM, Jason Wang wrote:
+>>>
+>>> On 2021/3/10 5:00 下午, Zhu Lingshan wrote:
+>>>> vDPA requres VIRTIO_F_ACCESS_PLATFORM as a must, this commit
+>>>> examines this when set features.
+>>>>
+>>>> Signed-off-by: Zhu Lingshan <lingshan.zhu@intel.com>
+>>>> ---
+>>>>   drivers/vdpa/ifcvf/ifcvf_base.c | 8 ++++++++
+>>>>   drivers/vdpa/ifcvf/ifcvf_base.h | 1 +
+>>>>   drivers/vdpa/ifcvf/ifcvf_main.c | 5 +++++
+>>>>   3 files changed, 14 insertions(+)
+>>>>
+>>>> diff --git a/drivers/vdpa/ifcvf/ifcvf_base.c 
+>>>> b/drivers/vdpa/ifcvf/ifcvf_base.c
+>>>> index ea6a78791c9b..58f47fdce385 100644
+>>>> --- a/drivers/vdpa/ifcvf/ifcvf_base.c
+>>>> +++ b/drivers/vdpa/ifcvf/ifcvf_base.c
+>>>> @@ -224,6 +224,14 @@ u64 ifcvf_get_features(struct ifcvf_hw *hw)
+>>>>       return hw->hw_features;
+>>>>   }
+>>>>   +int ifcvf_verify_min_features(struct ifcvf_hw *hw)
+>>>> +{
+>>>> +    if (!(hw->hw_features & BIT_ULL(VIRTIO_F_ACCESS_PLATFORM)))
+>>>> +        return -EINVAL;
+>>>> +
+>>>> +    return 0;
+>>>> +}
+>>>> +
+>>>>   void ifcvf_read_net_config(struct ifcvf_hw *hw, u64 offset,
+>>>>                  void *dst, int length)
+>>>>   {
+>>>> diff --git a/drivers/vdpa/ifcvf/ifcvf_base.h 
+>>>> b/drivers/vdpa/ifcvf/ifcvf_base.h
+>>>> index dbb8c10aa3b1..91c5735d4dc9 100644
+>>>> --- a/drivers/vdpa/ifcvf/ifcvf_base.h
+>>>> +++ b/drivers/vdpa/ifcvf/ifcvf_base.h
+>>>> @@ -123,6 +123,7 @@ void io_write64_twopart(u64 val, u32 *lo, u32 
+>>>> *hi);
+>>>>   void ifcvf_reset(struct ifcvf_hw *hw);
+>>>>   u64 ifcvf_get_features(struct ifcvf_hw *hw);
+>>>>   u64 ifcvf_get_hw_features(struct ifcvf_hw *hw);
+>>>> +int ifcvf_verify_min_features(struct ifcvf_hw *hw);
+>>>>   u16 ifcvf_get_vq_state(struct ifcvf_hw *hw, u16 qid);
+>>>>   int ifcvf_set_vq_state(struct ifcvf_hw *hw, u16 qid, u16 num);
+>>>>   struct ifcvf_adapter *vf_to_adapter(struct ifcvf_hw *hw);
+>>>> diff --git a/drivers/vdpa/ifcvf/ifcvf_main.c 
+>>>> b/drivers/vdpa/ifcvf/ifcvf_main.c
+>>>> index 25fb9dfe23f0..f624f202447d 100644
+>>>> --- a/drivers/vdpa/ifcvf/ifcvf_main.c
+>>>> +++ b/drivers/vdpa/ifcvf/ifcvf_main.c
+>>>> @@ -179,6 +179,11 @@ static u64 ifcvf_vdpa_get_features(struct 
+>>>> vdpa_device *vdpa_dev)
+>>>>   static int ifcvf_vdpa_set_features(struct vdpa_device *vdpa_dev, 
+>>>> u64 features)
+>>>>   {
+>>>>       struct ifcvf_hw *vf = vdpa_to_vf(vdpa_dev);
+>>>> +    int ret;
+>>>> +
+>>>> +    ret = ifcvf_verify_min_features(vf);
+>>>
+>>>
+>>> So this validate device features instead of driver which is the one 
+>>> we really want to check?
+>>>
+>>> Thanks
+>>
+>> Hi Jason,
+>>
+>> Here we check device feature bits to make sure the device support 
+>> ACCESS_PLATFORM. 
+>
+>
+> If you want to check device features, you need to do that during 
+> probe() and fail the probing if without the feature. But I think you 
+> won't ship cards without ACCESS_PLATFORM.
+Yes, there are no reasons ship a card without ACCESS_PLATFORM
+>
+>
+>> In get_features(),
+>> it will return a intersection of device features bit and driver 
+>> supported features bits(which includes ACCESS_PLATFORM).
+>> Other components like QEMU should not set features bits more than 
+>> this intersection of bits. so we can make sure if this
+>> ifcvf_verify_min_features() passed, both device and driver support 
+>> ACCESS_PLATFORM.
+>>
+>> Are you suggesting check driver feature bits in 
+>> ifcvf_verify_min_features() in the meantime as well?
+>
+>
+> So it really depends on your hardware. If you hardware can always 
+> offer ACCESS_PLATFORM, you just need to check driver features. This is 
+> how vdpa_sim and mlx5_vdpa work.
+Yes, we always support ACCESS_PLATFORM, so it is hard coded in the macro 
+IFCVF_SUPPORTED_FEATURES.
+Now we check whether device support this feature bit as a double 
+conformation, are you suggesting we should check whether ACCESS_PLATFORM 
+& IFCVF_SUPPORTED_FEATURES
+in set_features() as well? I prefer check both device and 
+IFCVF_SUPPORTED_FEATURES both, more reliable.
 
-On 2021/2/26 16:58, Shenming Lu wrote:
-> Hi Marc,
-> 
-> Gentle ping. Does this series need any further modification? Wish you can pick it up. :-)
-> 
-> Thanks,
-> Shenming
-> 
-> On 2021/1/27 20:13, Shenming Lu wrote:
->> Hi Marc, sorry for the late commit.
+Thanks!
+>
+> Thanks
+>
+>
 >>
->> In GICv4.1, migration has been supported except for (directly-injected)
->> VLPI. And GICv4.1 Spec explicitly gives a way to get the VLPI's pending
->> state (which was crucially missing in GICv4.0). So we make VLPI migration
->> capable on GICv4.1 in this patch set.
+>> Thanks！
+>>>
+>>>
+>>>> +    if (ret)
+>>>> +        return ret;
+>>>>         vf->req_features = features;
+>>>
+>>> _______________________________________________
+>>> Virtualization mailing list
+>>> Virtualization@lists.linux-foundation.org
+>>> https://lists.linuxfoundation.org/mailman/listinfo/virtualization
 >>
->> In order to support VLPI migration, we need to save and restore all
->> required configuration information and pending states of VLPIs. But
->> in fact, the configuration information of VLPIs has already been saved
->> (or will be reallocated on the dst host...) in vgic(kvm) migration.
->> So we only have to migrate the pending states of VLPIs specially.
->>
->> Below is the related workflow in migration.
->>
->> On the save path:
->> 	In migration completion:
->> 		pause all vCPUs
->> 				|
->> 		call each VM state change handler:
->> 			pause other devices (just keep from sending interrupts, and
->> 			such as VFIO migration protocol has already realized it [1])
->> 					|
->> 			flush ITS tables into guest RAM
->> 					|
->> 			flush RDIST pending tables (also flush VLPI state here)
->> 				|
->> 		...
->> On the resume path:
->> 	load each device's state:
->> 		restore ITS tables (include pending tables) from guest RAM
->> 				|
->> 		for other (PCI) devices (paused), if configured to have VLPIs,
->> 		establish the forwarding paths of their VLPIs (and transfer
->> 		the pending states from kvm's vgic to VPT here)
->>
->> We have tested this series in VFIO migration, and found some related
->> issues in QEMU [2].
->>
->> Links:
->> [1] vfio: UAPI for migration interface for device state:
->>     https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=a8a24f3f6e38103b77cf399c38eb54e1219d00d6
->> [2] vfio: Some fixes and optimizations for VFIO migration:
->>     https://patchwork.ozlabs.org/cover/1413263/
->>
->> History:
->>
->> v2 -> v3
->>  - Add the vgic initialized check to ensure that the allocation and enabling
->>    of the doorbells have already been done before unmapping the vPEs.
->>  - Check all get_vlpi_state related conditions in save_pending_tables in one place.
->>  - Nit fixes.
->>
->> v1 -> v2:
->>  - Get the VLPI state from the KVM side.
->>  - Nit fixes.
->>
->> Thanks,
->> Shenming
->>
->>
->> Shenming Lu (3):
->>   KVM: arm64: GICv4.1: Add function to get VLPI state
->>   KVM: arm64: GICv4.1: Try to save hw pending state in
->>     save_pending_tables
->>   KVM: arm64: GICv4.1: Give a chance to save VLPI's pending state
->>
->> Zenghui Yu (1):
->>   KVM: arm64: GICv4.1: Restore VLPI's pending state to physical side
->>
->>  .../virt/kvm/devices/arm-vgic-its.rst         |  2 +-
->>  arch/arm64/kvm/vgic/vgic-its.c                |  6 +-
->>  arch/arm64/kvm/vgic/vgic-v3.c                 | 61 +++++++++++++++++--
->>  arch/arm64/kvm/vgic/vgic-v4.c                 | 33 ++++++++++
->>  arch/arm64/kvm/vgic/vgic.h                    |  1 +
->>  5 files changed, 93 insertions(+), 10 deletions(-)
->>
+>
+
