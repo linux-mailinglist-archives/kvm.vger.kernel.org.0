@@ -2,55 +2,54 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2B42B336BEC
-	for <lists+kvm@lfdr.de>; Thu, 11 Mar 2021 07:15:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 88863336C02
+	for <lists+kvm@lfdr.de>; Thu, 11 Mar 2021 07:21:35 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230011AbhCKGPI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 11 Mar 2021 01:15:08 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:55728 "EHLO
+        id S230131AbhCKGVB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 11 Mar 2021 01:21:01 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:52612 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230074AbhCKGPB (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 11 Mar 2021 01:15:01 -0500
+        by vger.kernel.org with ESMTP id S230104AbhCKGU6 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 11 Mar 2021 01:20:58 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1615443300;
+        s=mimecast20190719; t=1615443658;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=EGHGtDY6oYOq4ktx0P7B3AMQkeS8BtbFf081LchZP84=;
-        b=hJjBOCMbgpUHuvCMgpF4fnR5dixgEaMkU8ToYOsM4slI6RG9NrrhVs+P0I8YM+iJ8bA07p
-        HVHuWr0wqmAtcPdmoumIychGgGmXsseZVgZsneVFAIi6P46WeIQN1N+KmvkiO2Ih67dcgV
-        NwujuFsPxmywH02GVHR3RK2lSeeR3RU=
+        bh=pjTxE9BR2uNybLgUHvNoBdUWBPK4sh7rwx5cjZJ/jb8=;
+        b=Kq36lmcCh3JEHZbPIMdx7TtV27FIpjUFBybOdPDI7MKA3gUE97vX8s3BbL0vH5PHeWffsV
+        Ei+72RtDWzPkORUz1DNWTvvQRoJYAnwcDpnr9TIVA8IGDwcaQx0ZGl21DCfNIXNEd4NdSh
+        ucKnUvkL/HttwUqnUYdJuaPtVZC7Lmo=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-205-F6FLOejKPrGzpWAcUACzDg-1; Thu, 11 Mar 2021 01:14:58 -0500
-X-MC-Unique: F6FLOejKPrGzpWAcUACzDg-1
+ us-mta-106-ul4rT5NMNz6JRQwGn0PCcw-1; Thu, 11 Mar 2021 01:20:55 -0500
+X-MC-Unique: ul4rT5NMNz6JRQwGn0PCcw-1
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1F68A1858F2B;
-        Thu, 11 Mar 2021 06:14:57 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C011A1005D45;
+        Thu, 11 Mar 2021 06:20:53 +0000 (UTC)
 Received: from wangxiaodeMacBook-Air.local (ovpn-13-9.pek2.redhat.com [10.72.13.9])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id D8CE062463;
-        Thu, 11 Mar 2021 06:14:48 +0000 (UTC)
-Subject: Re: [PATCH V3 3/6] vDPA/ifcvf: rename original IFCVF dev ids to N3000
- ids
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 9A94B5D746;
+        Thu, 11 Mar 2021 06:20:47 +0000 (UTC)
+Subject: Re: [PATCH V3 6/6] vDPA/ifcvf: verify mandatory feature bits for vDPA
 To:     Zhu Lingshan <lingshan.zhu@linux.intel.com>,
         Zhu Lingshan <lingshan.zhu@intel.com>, mst@redhat.com,
         lulu@redhat.com, leonro@nvidia.com
-Cc:     virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org
 References: <20210310090052.4762-1-lingshan.zhu@intel.com>
- <20210310090052.4762-4-lingshan.zhu@intel.com>
- <5e2b22cc-7faa-2987-a30a-ce32f10099b6@redhat.com>
- <4472d8f3-ef44-37a0-8ee1-82caa4a0a843@linux.intel.com>
+ <20210310090052.4762-7-lingshan.zhu@intel.com>
+ <3e53a5c9-c531-48ee-c9a7-907dfdacc9d1@redhat.com>
+ <9c2fb3d0-2d69-20b9-589d-cc5ffc830f38@linux.intel.com>
 From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <a14608bb-bd32-00fe-94bf-1d87361c89df@redhat.com>
-Date:   Thu, 11 Mar 2021 14:14:47 +0800
+Message-ID: <4f3ef2bb-d823-d53d-3bb0-0152a3f6c9f1@redhat.com>
+Date:   Thu, 11 Mar 2021 14:20:46 +0800
 User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.16; rv:78.0)
  Gecko/20100101 Thunderbird/78.8.0
 MIME-Version: 1.0
-In-Reply-To: <4472d8f3-ef44-37a0-8ee1-82caa4a0a843@linux.intel.com>
+In-Reply-To: <9c2fb3d0-2d69-20b9-589d-cc5ffc830f38@linux.intel.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
 Content-Language: en-GB
@@ -60,81 +59,116 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
-On 2021/3/11 12:23 下午, Zhu Lingshan wrote:
+On 2021/3/11 12:16 下午, Zhu Lingshan wrote:
 >
 >
-> On 3/11/2021 11:25 AM, Jason Wang wrote:
+> On 3/11/2021 11:20 AM, Jason Wang wrote:
 >>
 >> On 2021/3/10 5:00 下午, Zhu Lingshan wrote:
->>> IFCVF driver probes multiple types of devices now,
->>> to distinguish the original device driven by IFCVF
->>> from others, it is renamed as "N3000".
+>>> vDPA requres VIRTIO_F_ACCESS_PLATFORM as a must, this commit
+>>> examines this when set features.
 >>>
 >>> Signed-off-by: Zhu Lingshan <lingshan.zhu@intel.com>
 >>> ---
->>>   drivers/vdpa/ifcvf/ifcvf_base.h | 8 ++++----
->>>   drivers/vdpa/ifcvf/ifcvf_main.c | 8 ++++----
->>>   2 files changed, 8 insertions(+), 8 deletions(-)
+>>>   drivers/vdpa/ifcvf/ifcvf_base.c | 8 ++++++++
+>>>   drivers/vdpa/ifcvf/ifcvf_base.h | 1 +
+>>>   drivers/vdpa/ifcvf/ifcvf_main.c | 5 +++++
+>>>   3 files changed, 14 insertions(+)
 >>>
+>>> diff --git a/drivers/vdpa/ifcvf/ifcvf_base.c 
+>>> b/drivers/vdpa/ifcvf/ifcvf_base.c
+>>> index ea6a78791c9b..58f47fdce385 100644
+>>> --- a/drivers/vdpa/ifcvf/ifcvf_base.c
+>>> +++ b/drivers/vdpa/ifcvf/ifcvf_base.c
+>>> @@ -224,6 +224,14 @@ u64 ifcvf_get_features(struct ifcvf_hw *hw)
+>>>       return hw->hw_features;
+>>>   }
+>>>   +int ifcvf_verify_min_features(struct ifcvf_hw *hw)
+>>> +{
+>>> +    if (!(hw->hw_features & BIT_ULL(VIRTIO_F_ACCESS_PLATFORM)))
+>>> +        return -EINVAL;
+>>> +
+>>> +    return 0;
+>>> +}
+>>> +
+>>>   void ifcvf_read_net_config(struct ifcvf_hw *hw, u64 offset,
+>>>                  void *dst, int length)
+>>>   {
 >>> diff --git a/drivers/vdpa/ifcvf/ifcvf_base.h 
 >>> b/drivers/vdpa/ifcvf/ifcvf_base.h
->>> index 75d9a8052039..794d1505d857 100644
+>>> index dbb8c10aa3b1..91c5735d4dc9 100644
 >>> --- a/drivers/vdpa/ifcvf/ifcvf_base.h
 >>> +++ b/drivers/vdpa/ifcvf/ifcvf_base.h
->>> @@ -18,10 +18,10 @@
->>>   #include <uapi/linux/virtio_config.h>
->>>   #include <uapi/linux/virtio_pci.h>
->>>   -#define IFCVF_VENDOR_ID        0x1AF4
->>> -#define IFCVF_DEVICE_ID        0x1041
->>> -#define IFCVF_SUBSYS_VENDOR_ID    0x8086
->>> -#define IFCVF_SUBSYS_DEVICE_ID    0x001A
->>> +#define N3000_VENDOR_ID        0x1AF4
->>> +#define N3000_DEVICE_ID        0x1041
->>> +#define N3000_SUBSYS_VENDOR_ID    0x8086
->>> +#define N3000_SUBSYS_DEVICE_ID    0x001A
->>>     #define C5000X_PL_VENDOR_ID        0x1AF4
->>>   #define C5000X_PL_DEVICE_ID        0x1000
+>>> @@ -123,6 +123,7 @@ void io_write64_twopart(u64 val, u32 *lo, u32 *hi);
+>>>   void ifcvf_reset(struct ifcvf_hw *hw);
+>>>   u64 ifcvf_get_features(struct ifcvf_hw *hw);
+>>>   u64 ifcvf_get_hw_features(struct ifcvf_hw *hw);
+>>> +int ifcvf_verify_min_features(struct ifcvf_hw *hw);
+>>>   u16 ifcvf_get_vq_state(struct ifcvf_hw *hw, u16 qid);
+>>>   int ifcvf_set_vq_state(struct ifcvf_hw *hw, u16 qid, u16 num);
+>>>   struct ifcvf_adapter *vf_to_adapter(struct ifcvf_hw *hw);
 >>> diff --git a/drivers/vdpa/ifcvf/ifcvf_main.c 
 >>> b/drivers/vdpa/ifcvf/ifcvf_main.c
->>> index 26a2dab7ca66..fd5befc5cbcc 100644
+>>> index 25fb9dfe23f0..f624f202447d 100644
 >>> --- a/drivers/vdpa/ifcvf/ifcvf_main.c
 >>> +++ b/drivers/vdpa/ifcvf/ifcvf_main.c
->>> @@ -480,10 +480,10 @@ static void ifcvf_remove(struct pci_dev *pdev)
->>>   }
->>>     static struct pci_device_id ifcvf_pci_ids[] = {
->>> -    { PCI_DEVICE_SUB(IFCVF_VENDOR_ID,
->>> -        IFCVF_DEVICE_ID,
->>> -        IFCVF_SUBSYS_VENDOR_ID,
->>> -        IFCVF_SUBSYS_DEVICE_ID) },
->>> +    { PCI_DEVICE_SUB(N3000_VENDOR_ID,
->>> +             N3000_DEVICE_ID,
+>>> @@ -179,6 +179,11 @@ static u64 ifcvf_vdpa_get_features(struct 
+>>> vdpa_device *vdpa_dev)
+>>>   static int ifcvf_vdpa_set_features(struct vdpa_device *vdpa_dev, 
+>>> u64 features)
+>>>   {
+>>>       struct ifcvf_hw *vf = vdpa_to_vf(vdpa_dev);
+>>> +    int ret;
+>>> +
+>>> +    ret = ifcvf_verify_min_features(vf);
 >>
 >>
->> I am not sure the plan for Intel but I wonder if we can simply use 
->> PCI_ANY_ID for device id here. Otherewise you need to maintain a very 
->> long list of ids here.
+>> So this validate device features instead of driver which is the one 
+>> we really want to check?
 >>
 >> Thanks
+>
 > Hi Jason,
 >
-> Thanks! but maybe if we present a very simple and clear list like what 
-> e1000 does can help the users understand what we support easily.
+> Here we check device feature bits to make sure the device support 
+> ACCESS_PLATFORM. 
+
+
+If you want to check device features, you need to do that during probe() 
+and fail the probing if without the feature. But I think you won't ship 
+cards without ACCESS_PLATFORM.
+
+
+> In get_features(),
+> it will return a intersection of device features bit and driver 
+> supported features bits(which includes ACCESS_PLATFORM).
+> Other components like QEMU should not set features bits more than this 
+> intersection of bits. so we can make sure if this
+> ifcvf_verify_min_features() passed, both device and driver support 
+> ACCESS_PLATFORM.
 >
-> Thanks!
+> Are you suggesting check driver feature bits in 
+> ifcvf_verify_min_features() in the meantime as well?
 
 
-That's fine.
+So it really depends on your hardware. If you hardware can always offer 
+ACCESS_PLATFORM, you just need to check driver features. This is how 
+vdpa_sim and mlx5_vdpa work.
 
 Thanks
 
 
+>
+> Thanks！
 >>
 >>
->>> + N3000_SUBSYS_VENDOR_ID,
->>> +             N3000_SUBSYS_DEVICE_ID) },
->>>       { PCI_DEVICE_SUB(C5000X_PL_VENDOR_ID,
->>>                C5000X_PL_DEVICE_ID,
->>>                C5000X_PL_SUBSYS_VENDOR_ID,
+>>> +    if (ret)
+>>> +        return ret;
+>>>         vf->req_features = features;
 >>
+>> _______________________________________________
+>> Virtualization mailing list
+>> Virtualization@lists.linux-foundation.org
+>> https://lists.linuxfoundation.org/mailman/listinfo/virtualization
 >
 
