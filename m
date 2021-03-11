@@ -2,174 +2,71 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id ACAF33369FF
-	for <lists+kvm@lfdr.de>; Thu, 11 Mar 2021 03:02:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C0088336A03
+	for <lists+kvm@lfdr.de>; Thu, 11 Mar 2021 03:06:43 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229712AbhCKCC0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 10 Mar 2021 21:02:26 -0500
-Received: from mga03.intel.com ([134.134.136.65]:17593 "EHLO mga03.intel.com"
+        id S229633AbhCKCGK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 10 Mar 2021 21:06:10 -0500
+Received: from mga09.intel.com ([134.134.136.24]:11748 "EHLO mga09.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229732AbhCKCCA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 10 Mar 2021 21:02:00 -0500
-IronPort-SDR: Xd8thHuJZXPsFEv51ow/4pyOzC0ymbh88NrYUQ2GijjtlUR8WAJrUPb4UIjrRIKnebgw7vE/Aa
- sJVuzCnOtbng==
-X-IronPort-AV: E=McAfee;i="6000,8403,9919"; a="188637167"
+        id S229483AbhCKCFj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 10 Mar 2021 21:05:39 -0500
+IronPort-SDR: PQzxYWTbtAXBscr0rfysBe4uRsrZfzcsHs4Uk6UH3YJHuj4RQEka0EGaeliwCl3tJSn14vhrTt
+ VRormKLFx2zg==
+X-IronPort-AV: E=McAfee;i="6000,8403,9919"; a="188697240"
 X-IronPort-AV: E=Sophos;i="5.81,238,1610438400"; 
-   d="scan'208";a="188637167"
+   d="scan'208";a="188697240"
 Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Mar 2021 18:01:59 -0800
-IronPort-SDR: rC1XXEczXjVfHmcxzcFBWufL7rmCqZTEUB9lcvcJI/1dtIGjxfQrCEntZpPlWl3bskp1kH+Uh9
- BSQ5IwFmFOfQ==
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Mar 2021 18:05:37 -0800
+IronPort-SDR: q48dR3kVgGtxcmi9QBxCY9R6f15dk8DY6svngvGn3PyQQE/VcdF1dMSRab+qtGj8dgDMcx1Nv9
+ LPn2ICiqJqKw==
 X-IronPort-AV: E=Sophos;i="5.81,238,1610438400"; 
-   d="scan'208";a="603341119"
+   d="scan'208";a="603342257"
 Received: from xuhuiliu-mobl1.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.251.31.67])
-  by fmsmga005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Mar 2021 18:01:54 -0800
+  by fmsmga005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Mar 2021 18:05:32 -0800
+Date:   Thu, 11 Mar 2021 15:05:29 +1300
 From:   Kai Huang <kai.huang@intel.com>
-To:     kvm@vger.kernel.org, x86@kernel.org, linux-sgx@vger.kernel.org
-Cc:     linux-kernel@vger.kernel.org, seanjc@google.com, jarkko@kernel.org,
+To:     Borislav Petkov <bp@alien8.de>
+Cc:     kvm@vger.kernel.org, x86@kernel.org, linux-sgx@vger.kernel.org,
+        linux-kernel@vger.kernel.org, seanjc@google.com, jarkko@kernel.org,
         luto@kernel.org, dave.hansen@intel.com, rick.p.edgecombe@intel.com,
-        haitao.huang@intel.com, pbonzini@redhat.com, bp@alien8.de,
-        tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com,
-        Kai Huang <kai.huang@intel.com>
-Subject: [PATCH v3 03/25] x86/sgx: Wipe out EREMOVE from sgx_free_epc_page()
-Date:   Thu, 11 Mar 2021 15:01:42 +1300
-Message-Id: <20210311020142.125722-1-kai.huang@intel.com>
-X-Mailer: git-send-email 2.29.2
-In-Reply-To: <e1ca4131bc9f98cf50a1200efcf46080d6512fe7.1615250634.git.kai.huang@intel.com>
-References: <e1ca4131bc9f98cf50a1200efcf46080d6512fe7.1615250634.git.kai.huang@intel.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+        haitao.huang@intel.com, pbonzini@redhat.com, tglx@linutronix.de,
+        mingo@redhat.com, hpa@zytor.com, jethro@fortanix.com,
+        b.thiel@posteo.de, jmattson@google.com, joro@8bytes.org,
+        vkuznets@redhat.com, wanpengli@tencent.com, corbet@lwn.net
+Subject: Re: [PATCH v2 00/25] KVM SGX virtualization support
+Message-Id: <20210311150529.4bf07611d074b654297cfd92@intel.com>
+In-Reply-To: <20210310132948.GE23521@zn.tnic>
+References: <cover.1615250634.git.kai.huang@intel.com>
+        <20210309093037.GA699@zn.tnic>
+        <76cb4216a7a689883c78b4622c86bd9c3faaa465.camel@intel.com>
+        <20210310132948.GE23521@zn.tnic>
+X-Mailer: Sylpheed 3.7.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Jarkko Sakkinen <jarkko@kernel.org>
+On Wed, 10 Mar 2021 14:29:48 +0100 Borislav Petkov wrote:
+> On Wed, Mar 10, 2021 at 10:27:05PM +1300, Kai Huang wrote:
+> > Sorry for the mistake. I will send out another version with that fixed.
+> 
+> If patch 3 is the only one which needs to change, you can send only that
+> one as a reply to the original patch 3 message...
+> 
+> Thx.
 
-EREMOVE takes a page and removes any association between that page and
-an enclave.  It must be run on a page before it can be added into
-another enclave.  Currently, EREMOVE is run as part of pages being freed
-into the SGX page allocator.  It is not expected to fail.
+Hi Boris,
 
-KVM does not track how guest pages are used, which means that SGX
-virtualization use of EREMOVE might fail.
+Yes it is the only patch needs change. I have send out updated v3 patch 3.
 
-Break out the EREMOVE call from the SGX page allocator.  This will allow
-the SGX virtualization code to use the allocator directly.  (SGX/KVM
-will also introduce a more permissive EREMOVE helper).
+I provided some changelog history to explain and also added Jarkko's Acked-by in
+the new patch. Sorry for the trouble.
 
-Implement original sgx_free_epc_page() as sgx_encl_free_epc_page() to be
-more specific that it is used to free EPC page assigned to one enclave.
-Print an error message when EREMOVE fails to explicitly call out EPC
-page is leaked, and requires machine reboot to get leaked pages back.
+Hi Sean,
 
-Signed-off-by: Jarkko Sakkinen <jarkko@kernel.org>
-Co-developed-by: Kai Huang <kai.huang@intel.com>
-Acked-by: Jarkko Sakkinen <jarkko@kernel.org>
-Signed-off-by: Kai Huang <kai.huang@intel.com>
----
-v2->v3:
+If you see this, could you take another check on whether this series is OK?
 
- - Fixed bug during copy/paste which results in SECS page and va pages are not
-   correctly freed in sgx_encl_release() (sorry for the mistake).
- - Added Jarkko's Acked-by.
-
-v1->v2:
-
- - Changed to hide both SGX1 and SGX2 from /proc/cpuinfo, since no concrete
-   use case, per Boris.
- - Refined commit msg to explain why to hide SGX1 and SGX2 in /proc/cpuinfo.
-
----
- arch/x86/kernel/cpu/sgx/encl.c | 27 ++++++++++++++++++++++++---
- arch/x86/kernel/cpu/sgx/main.c | 12 ++++--------
- 2 files changed, 28 insertions(+), 11 deletions(-)
-
-diff --git a/arch/x86/kernel/cpu/sgx/encl.c b/arch/x86/kernel/cpu/sgx/encl.c
-index 7449ef33f081..c0b80c0853d8 100644
---- a/arch/x86/kernel/cpu/sgx/encl.c
-+++ b/arch/x86/kernel/cpu/sgx/encl.c
-@@ -381,6 +381,27 @@ const struct vm_operations_struct sgx_vm_ops = {
- 	.access = sgx_vma_access,
- };
- 
-+static void sgx_encl_free_epc_page(struct sgx_epc_page *epc_page)
-+{
-+	int ret;
-+
-+	WARN_ON_ONCE(epc_page->flags & SGX_EPC_PAGE_RECLAIMER_TRACKED);
-+
-+	/*
-+	 * Give a message to remind EPC page is leaked when EREMOVE fails,
-+	 * and requires machine reboot to get leaked pages back. This can
-+	 * be improved in future by adding stats of leaked pages, etc.
-+	 */
-+#define EREMOVE_ERROR_MESSAGE \
-+	"EREMOVE returned %d (0x%x).  EPC page leaked.  Reboot required to retrieve leaked pages."
-+	ret = __eremove(sgx_get_epc_virt_addr(epc_page));
-+	if (WARN_ONCE(ret, EREMOVE_ERROR_MESSAGE, ret, ret))
-+		return;
-+#undef EREMOVE_ERROR_MESSAGE
-+
-+	sgx_free_epc_page(epc_page);
-+}
-+
- /**
-  * sgx_encl_release - Destroy an enclave instance
-  * @kref:	address of a kref inside &sgx_encl
-@@ -404,7 +425,7 @@ void sgx_encl_release(struct kref *ref)
- 			if (sgx_unmark_page_reclaimable(entry->epc_page))
- 				continue;
- 
--			sgx_free_epc_page(entry->epc_page);
-+			sgx_encl_free_epc_page(entry->epc_page);
- 			encl->secs_child_cnt--;
- 			entry->epc_page = NULL;
- 		}
-@@ -415,7 +436,7 @@ void sgx_encl_release(struct kref *ref)
- 	xa_destroy(&encl->page_array);
- 
- 	if (!encl->secs_child_cnt && encl->secs.epc_page) {
--		sgx_free_epc_page(encl->secs.epc_page);
-+		sgx_encl_free_epc_page(encl->secs.epc_page);
- 		encl->secs.epc_page = NULL;
- 	}
- 
-@@ -423,7 +444,7 @@ void sgx_encl_release(struct kref *ref)
- 		va_page = list_first_entry(&encl->va_pages, struct sgx_va_page,
- 					   list);
- 		list_del(&va_page->list);
--		sgx_free_epc_page(va_page->epc_page);
-+		sgx_encl_free_epc_page(va_page->epc_page);
- 		kfree(va_page);
- 	}
- 
-diff --git a/arch/x86/kernel/cpu/sgx/main.c b/arch/x86/kernel/cpu/sgx/main.c
-index 8df81a3ed945..44fe91a5bfb3 100644
---- a/arch/x86/kernel/cpu/sgx/main.c
-+++ b/arch/x86/kernel/cpu/sgx/main.c
-@@ -598,18 +598,14 @@ struct sgx_epc_page *sgx_alloc_epc_page(void *owner, bool reclaim)
-  * sgx_free_epc_page() - Free an EPC page
-  * @page:	an EPC page
-  *
-- * Call EREMOVE for an EPC page and insert it back to the list of free pages.
-+ * Put the EPC page back to the list of free pages. It's the caller's
-+ * responsibility to make sure that the page is in uninitialized state. In other
-+ * words, do EREMOVE, EWB or whatever operation is necessary before calling
-+ * this function.
-  */
- void sgx_free_epc_page(struct sgx_epc_page *page)
- {
- 	struct sgx_epc_section *section = &sgx_epc_sections[page->section];
--	int ret;
--
--	WARN_ON_ONCE(page->flags & SGX_EPC_PAGE_RECLAIMER_TRACKED);
--
--	ret = __eremove(sgx_get_epc_virt_addr(page));
--	if (WARN_ONCE(ret, "EREMOVE returned %d (0x%x)", ret, ret))
--		return;
- 
- 	spin_lock(&section->lock);
- 	list_add_tail(&page->list, &section->page_list);
--- 
-2.29.2
-
+Thanks in advance.
