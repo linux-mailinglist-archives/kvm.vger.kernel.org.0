@@ -2,117 +2,153 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3B4AE336FFB
-	for <lists+kvm@lfdr.de>; Thu, 11 Mar 2021 11:27:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id F40AB3370DB
+	for <lists+kvm@lfdr.de>; Thu, 11 Mar 2021 12:08:52 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232388AbhCKK1M (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 11 Mar 2021 05:27:12 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:22946 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S232254AbhCKK0p (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 11 Mar 2021 05:26:45 -0500
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 12BA57Kn158053
-        for <kvm@vger.kernel.org>; Thu, 11 Mar 2021 05:26:44 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=vJt86cW6sNaCtfgAaQ8N5FGliw1/2LAVGdGGzX+Oahk=;
- b=LtcML58gqJn/HxRo9PMoK2rlagyI8uuqemoGehxMPqPA2apLfmDkpxScNvdtG/PcEWng
- u7J5deCVLd03dK26adeDMonZSpgm8GExfJsTuJzkM3pSoWI3XYfYzNiR0td3R3oJFO0x
- mxLnO6aHhSBUOzRfJoRnqjPnT0M3njTutqE0IddI1fNZL4TW8S6bsfP94+Ea2JBIZvnZ
- ubqXOz7rY6pzDx4MPo6dJctzCetTn5WH25xHtXd4cXn3MpMBRq+FL6KGmHMCgrBVNNLO
- Gt9HVCC1xgOTsYnzCTLLvogLvu6I5V34/J0jfxrUo8v/Hm6Cx73WnJmleo+75vNGxKLZ KA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3774m8tqxq-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Thu, 11 Mar 2021 05:26:44 -0500
-Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 12BA55Mg157930
-        for <kvm@vger.kernel.org>; Thu, 11 Mar 2021 05:26:44 -0500
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3774m8tqxa-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 11 Mar 2021 05:26:44 -0500
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 12BAMJVt006623;
-        Thu, 11 Mar 2021 10:26:42 GMT
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
-        by ppma04ams.nl.ibm.com with ESMTP id 376mb0s94h-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 11 Mar 2021 10:26:42 +0000
-Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
-        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 12BAQd8P45154712
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 11 Mar 2021 10:26:39 GMT
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id A4C0E11C052;
-        Thu, 11 Mar 2021 10:26:39 +0000 (GMT)
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 6642E11C04C;
-        Thu, 11 Mar 2021 10:26:39 +0000 (GMT)
-Received: from oc3016276355.ibm.com (unknown [9.145.87.106])
-        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu, 11 Mar 2021 10:26:39 +0000 (GMT)
-Subject: Re: [kvm-unit-tests PATCH v5 6/6] s390x: css: testing measurement
- block format 1
-To:     Cornelia Huck <cohuck@redhat.com>
-Cc:     kvm@vger.kernel.org, frankja@linux.ibm.com, david@redhat.com,
-        thuth@redhat.com, imbrenda@linux.ibm.com
-References: <1615294277-7332-1-git-send-email-pmorel@linux.ibm.com>
- <1615294277-7332-7-git-send-email-pmorel@linux.ibm.com>
- <20210309180726.29e4784e.cohuck@redhat.com>
-From:   Pierre Morel <pmorel@linux.ibm.com>
-Message-ID: <079ba886-c32a-bc3f-fdb0-b15fca940fb5@linux.ibm.com>
-Date:   Thu, 11 Mar 2021 11:26:39 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.8.0
+        id S232582AbhCKLIT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 11 Mar 2021 06:08:19 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:51149 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232538AbhCKLIR (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 11 Mar 2021 06:08:17 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1615460896;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=DwM1zrj6y+SPq/Wn5uH5zHFoKtylvkdUobCwon2GWsw=;
+        b=NfoXz1EkRD6j3ZAHEOkePDqs3pX3bjhAqyM8X1X6C70QjgnKsCPqj1kaeqbsXEpfnkY0D4
+        spesZ5gheGhUw/r6MwqKij7GQZewrTVv3KqyBT0x4QBa8sSkMfQRXdxl5Y/rtjP6UKr3ss
+        c+N7c0dJJgXHO8ih3I6JUoWbTSxlMlQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-561-PwlpRNx-MOeUMqH7hXhblg-1; Thu, 11 Mar 2021 06:08:12 -0500
+X-MC-Unique: PwlpRNx-MOeUMqH7hXhblg-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B4DE318460E0;
+        Thu, 11 Mar 2021 11:08:10 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.40.193.217])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 1413F60BF3;
+        Thu, 11 Mar 2021 11:08:03 +0000 (UTC)
+Date:   Thu, 11 Mar 2021 12:08:01 +0100
+From:   Andrew Jones <drjones@redhat.com>
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Eric Auger <eric.auger@redhat.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        kernel-team@android.com, stable@vger.kernel.org
+Subject: Re: [PATCH v3 1/2] KVM: arm64: Reject VM creation when the default
+ IPA size is unsupported
+Message-ID: <20210311110801.mcjhenee3e3dizoo@kamzik.brq.redhat.com>
+References: <20210311100016.3830038-1-maz@kernel.org>
+ <20210311100016.3830038-2-maz@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20210309180726.29e4784e.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.761
- definitions=2021-03-11_04:2021-03-10,2021-03-11 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 malwarescore=0
- mlxlogscore=999 suspectscore=0 priorityscore=1501 impostorscore=0
- spamscore=0 adultscore=0 lowpriorityscore=0 phishscore=0 bulkscore=0
- clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2103110053
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210311100016.3830038-2-maz@kernel.org>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Thu, Mar 11, 2021 at 10:00:15AM +0000, Marc Zyngier wrote:
+> KVM/arm64 has forever used a 40bit default IPA space, partially
+> due to its 32bit heritage (where the only choice is 40bit).
+> 
+> However, there are implementations in the wild that have a *cough*
+> much smaller *cough* IPA space, which leads to a misprogramming of
+> VTCR_EL2, and a guest that is stuck on its first memory access
+> if userspace dares to ask for the default IPA setting (which most
+> VMMs do).
+> 
+> Instead, blundly reject the creation of such VM, as we can't
+> satisfy the requirements from userspace (with a one-off warning).
+> Also clarify the boot warning, and document that the VM creation
+> will fail when an unsupported IPA size is probided.
 
+provided
 
-On 3/9/21 6:07 PM, Cornelia Huck wrote:
-> On Tue,  9 Mar 2021 13:51:17 +0100
-> Pierre Morel <pmorel@linux.ibm.com> wrote:
 > 
->> Measurement block format 1 is made available by the extended
->> measurement block facility and is indicated in the SCHIB by
->> the bit in the PMCW.
->>
->> The MBO is specified in the SCHIB of each channel and the MBO
->> defined by the SCHM instruction is ignored.
->>
->> The test of the MB format 1 is just skipped if the feature is
->> not available.
->>
->> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
->> ---
->>   lib/s390x/css.h     | 15 +++++++++
->>   lib/s390x/css_lib.c |  2 +-
->>   s390x/css.c         | 75 +++++++++++++++++++++++++++++++++++++++++++++
->>   3 files changed, 91 insertions(+), 1 deletion(-)
+> Although this is an ABI change, it doesn't really change much
+> for userspace:
 > 
-> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+> - the guest couldn't run before this change, but no error was
+>   returned. At least userspace knows what is happening.
 > 
+> - a memory slot that was accepted because it did fit the default
+>   IPA space now doesn't even get a chance to be registered.
+> 
+> The other thing that is left doing is to convince userspace to
+> actually use the IPA space setting instead of relying on the
+> antiquated default.
+> 
+> Fixes: 233a7cb23531 ("kvm: arm64: Allow tuning the physical address size for VM")
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> Cc: stable@vger.kernel.org
+> ---
+>  Documentation/virt/kvm/api.rst |  3 +++
+>  arch/arm64/kvm/reset.c         | 12 ++++++++----
+>  2 files changed, 11 insertions(+), 4 deletions(-)
+> 
+> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> index 1a2b5210cdbf..38e327d4b479 100644
+> --- a/Documentation/virt/kvm/api.rst
+> +++ b/Documentation/virt/kvm/api.rst
+> @@ -182,6 +182,9 @@ is dependent on the CPU capability and the kernel configuration. The limit can
+>  be retrieved using KVM_CAP_ARM_VM_IPA_SIZE of the KVM_CHECK_EXTENSION
+>  ioctl() at run-time.
+>  
+> +Creation of the VM will fail if the requested IPA size (whether it is
+> +implicit or explicit) is unsupported on the host.
+> +
+>  Please note that configuring the IPA size does not affect the capability
+>  exposed by the guest CPUs in ID_AA64MMFR0_EL1[PARange]. It only affects
+>  size of the address translated by the stage2 level (guest physical to
+> diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
+> index 47f3f035f3ea..9d3d09a89894 100644
+> --- a/arch/arm64/kvm/reset.c
+> +++ b/arch/arm64/kvm/reset.c
+> @@ -324,10 +324,9 @@ int kvm_set_ipa_limit(void)
+>  	}
+>  
+>  	kvm_ipa_limit = id_aa64mmfr0_parange_to_phys_shift(parange);
+> -	WARN(kvm_ipa_limit < KVM_PHYS_SHIFT,
+> -	     "KVM IPA Size Limit (%d bits) is smaller than default size\n",
+> -	     kvm_ipa_limit);
+> -	kvm_info("IPA Size Limit: %d bits\n", kvm_ipa_limit);
+> +	kvm_info("IPA Size Limit: %d bits%s\n", kvm_ipa_limit,
+> +		 ((kvm_ipa_limit < KVM_PHYS_SHIFT) ?
+> +		  " (Reduced IPA size, limited VM/VMM compatibility)" : ""));
+
+nit: there's a couple pair of unnecessary ()
+
+>  
+>  	return 0;
+>  }
+> @@ -356,6 +355,11 @@ int kvm_arm_setup_stage2(struct kvm *kvm, unsigned long type)
+>  			return -EINVAL;
+>  	} else {
+>  		phys_shift = KVM_PHYS_SHIFT;
+> +		if (phys_shift > kvm_ipa_limit) {
+> +			pr_warn_once("%s using unsupported default IPA limit, upgrade your VMM\n",
+> +				     current->comm);
+> +			return -EINVAL;
+> +		}
+>  	}
+>  
+>  	mmfr0 = read_sanitised_ftr_reg(SYS_ID_AA64MMFR0_EL1);
+> -- 
+> 2.29.2
+> 
+
+Reviewed-by: Andrew Jones <drjones@redhat.com>
 
 Thanks,
-Pierre
+drew
 
--- 
-Pierre Morel
-IBM Lab Boeblingen
