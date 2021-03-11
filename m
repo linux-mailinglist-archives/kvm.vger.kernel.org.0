@@ -2,125 +2,97 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8B039336A23
-	for <lists+kvm@lfdr.de>; Thu, 11 Mar 2021 03:29:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D8E57336A6B
+	for <lists+kvm@lfdr.de>; Thu, 11 Mar 2021 04:09:48 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229673AbhCKC3J (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 10 Mar 2021 21:29:09 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46104 "EHLO
+        id S230214AbhCKDJQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 10 Mar 2021 22:09:16 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54600 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229593AbhCKC3J (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 10 Mar 2021 21:29:09 -0500
-Received: from mail-ej1-x630.google.com (mail-ej1-x630.google.com [IPv6:2a00:1450:4864:20::630])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 60C20C061761
-        for <kvm@vger.kernel.org>; Wed, 10 Mar 2021 18:28:57 -0800 (PST)
-Received: by mail-ej1-x630.google.com with SMTP id dx17so43078861ejb.2
-        for <kvm@vger.kernel.org>; Wed, 10 Mar 2021 18:28:57 -0800 (PST)
+        with ESMTP id S229851AbhCKDIt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 10 Mar 2021 22:08:49 -0500
+Received: from mail-ot1-x32c.google.com (mail-ot1-x32c.google.com [IPv6:2607:f8b0:4864:20::32c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF27EC061574;
+        Wed, 10 Mar 2021 19:08:49 -0800 (PST)
+Received: by mail-ot1-x32c.google.com with SMTP id j8so185052otc.0;
+        Wed, 10 Mar 2021 19:08:49 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance-com.20150623.gappssmtp.com; s=20150623;
+        d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=nGcG4vIt8aK8XQYHFfVsg5ZilyuH9KX5JCZmjoZKMsA=;
-        b=bJFaB7w2p1VmRWq7tx9CxGxY3HG7DINc80iCJrafg+N0T0fIpXcxAoRLUhZsrZnkHt
-         Li+G0KV/JQX5TdIQxf37qh2Yh8LnfZPN/iDVu1Wl6OQR9hFnk23cnOM0oiD2tEnQ89T9
-         XM0l6SErGC3jeogkdBxN1tzHYTiSG+OKvV36N+3Lc6TJL8YSDu8TguWfBvbVQGHctCtt
-         pvZgbIR96nCZ85xunUrkBEdeR8PN4Wpg7gQgxEIYuMa45vei3621A6dP4TDWpGvUIMs0
-         bMz74FHMW5d9Q5QDgyt+facrntknlie1x4j9Cc6p3TXqkvVu44bycD9Yd4KnJXHRbxSA
-         yH9w==
+         :cc;
+        bh=DpjsV6DgfrzVz3csQVFdnTPnpXnXN7Ul8q7EgQp2fS8=;
+        b=lkpaktUOCZV9Z1Wq1EhtbYH/keQdx3AoWUQCdEl0daqO+5M4kGCzk6R03k38tjA3oD
+         iyfiNcIgrG/pcLs3NiRmUsNzz0wB7UX9OD3G+oQyT5R2a/NVf1irkN8R0qVvMA6SwgGr
+         7QTXTX7nGXK4IUgTexfb8t1HoXLZfvmkuSpGUJ5RyCbe0vVgsoS0GFtcwA/C7gxl+epc
+         7P05pR6Jgrg1B1mQGKuCZcHgkldQOV3oK4iRiLHqopMmJaG8aOuH0JhRSh7+q98PQ0Xv
+         +29nxXk17TErHKroJvBf3jLsMdKVhp4lOCOQ43Jpg2JE+bh/qMkGJuPiXEynU1196X6Z
+         Wb/Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=nGcG4vIt8aK8XQYHFfVsg5ZilyuH9KX5JCZmjoZKMsA=;
-        b=K2tFAX0Z3HfDE5m6KmMqDjplpJdvl5CqBXMrkJL0EcPJoAG6vZl1gesbHtg0NZN9EA
-         RJwBe+jdxgyOB515pxrpCYjRyb+zLVjFdEjPop3UggTN0CbglDYMmtPAlVU4bxDDXqfc
-         97UjtBq5vJzPwLiBy01jDklgxBw1+B40mjQwR3JgSz2jfhLaZVbqB5vG+C3FD8g2ukuD
-         tMusjVh5uKnmaLtUemRBx9FeR2rbu3pBsA/XGRRqZ1/jBepKI6Zi8cnqZod71jq82RRf
-         /xsWzDr50Lgo8QsK1/mTYBzViLllbU4zUH0+p6Lvzehjfbb1PRwGY9RaMrd8CR5LH+wg
-         Gz6A==
-X-Gm-Message-State: AOAM532+p3VY1g6VAfgvEEVH35CW43N+zfMOw21Dng0kLhjKwqCJntFT
-        W2U/SgnnqjQvvbGV/9Xk9Ye273b1men+fxvtnxrc
-X-Google-Smtp-Source: ABdhPJwETmRnZq0PVHiftngf3TWvad/EGIWbau++w4aXQxStI2INxttwkESh3Zs0S3paI2zoVX/YMR2WB71SMvc7KXM=
-X-Received: by 2002:a17:906:18f1:: with SMTP id e17mr825050ejf.372.1615429736001;
- Wed, 10 Mar 2021 18:28:56 -0800 (PST)
+         :message-id:subject:to:cc;
+        bh=DpjsV6DgfrzVz3csQVFdnTPnpXnXN7Ul8q7EgQp2fS8=;
+        b=n/1C30dJ+l5Las1BOBQ0KFD/u6QFapQLxWjpQt9Zkq0xYVrY2jArKRVBrZfmBwp9H0
+         BKjcscOqeV6dU+oyTrOuDWkIHTcwLLycTzQXi2dzip2H1ejo2Pz8lLOCO5HEOgVRcS7M
+         SonYcYvRqY5fGjgs+eWla32dBWWhXaZhSAakPg+MYeubVlTf+phnwo+/j/6PUHSZRKdG
+         kV9z7oCoaWgi8GD1r9G9+hxWNlb8civnkwWDO+cRkyfO3pbXILRS7wxgDdIsr1BS4Om4
+         HXCIAOxXliPaNMU9Okfk2tZtfn/gSYYdUr7O+9UZHD+B26S8X9D2Kh8g68vrr50MzPbt
+         38gQ==
+X-Gm-Message-State: AOAM531eCw28H6Ubt8d2jQWVfkUNXDT+rgPR+0fPA7IvRE55rVhlR/J3
+        3IMeBUr14ESJ/R3m72gkbEIWvZSgLUPlvXfl73KegTa7
+X-Google-Smtp-Source: ABdhPJzKnF5hpUhqwvtyTKCnkFS8JsrmF93ONq/zj/6d+uU5N2d2YuV3+j3jQKCgy3foXVhZ7/BmxqI60nFE56bkoeY=
+X-Received: by 2002:a05:6830:1304:: with SMTP id p4mr5225706otq.185.1615432128924;
+ Wed, 10 Mar 2021 19:08:48 -0800 (PST)
 MIME-Version: 1.0
-References: <20210223115048.435-1-xieyongji@bytedance.com> <20210223115048.435-8-xieyongji@bytedance.com>
- <2c7446dd-38f8-a06a-e423-6744c6a7207f@redhat.com>
-In-Reply-To: <2c7446dd-38f8-a06a-e423-6744c6a7207f@redhat.com>
-From:   Yongji Xie <xieyongji@bytedance.com>
-Date:   Thu, 11 Mar 2021 10:28:45 +0800
-Message-ID: <CACycT3vYPHNrgVTrtMegQu6VdbaOGvCcxP+w8oUK5kPt6XLPUw@mail.gmail.com>
-Subject: Re: Re: [RFC v4 07/11] vduse: Introduce VDUSE - vDPA Device in Userspace
-To:     Jason Wang <jasowang@redhat.com>
-Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        Parav Pandit <parav@nvidia.com>, Bob Liu <bob.liu@oracle.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Matthew Wilcox <willy@infradead.org>, viro@zeniv.linux.org.uk,
-        Jens Axboe <axboe@kernel.dk>, bcrl@kvack.org,
-        Jonathan Corbet <corbet@lwn.net>,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        kvm@vger.kernel.org, linux-aio@kvack.org,
-        linux-fsdevel@vger.kernel.org
+References: <1614818118-965-1-git-send-email-wanpengli@tencent.com>
+In-Reply-To: <1614818118-965-1-git-send-email-wanpengli@tencent.com>
+From:   Wanpeng Li <kernellwp@gmail.com>
+Date:   Thu, 11 Mar 2021 11:08:37 +0800
+Message-ID: <CANRm+CyxVC6gbdakvtqN+NFtDBvrSTShqF9HdB4fanomykd=ww@mail.gmail.com>
+Subject: Re: [PATCH v2] KVM: LAPIC: Advancing the timer expiration on guest
+ initiated write
+To:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Mar 10, 2021 at 8:58 PM Jason Wang <jasowang@redhat.com> wrote:
+ping, :)
+On Thu, 4 Mar 2021 at 08:35, Wanpeng Li <kernellwp@gmail.com> wrote:
 >
+> From: Wanpeng Li <wanpengli@tencent.com>
 >
-> On 2021/2/23 7:50 =E4=B8=8B=E5=8D=88, Xie Yongji wrote:
-> > +
-> > +     switch (cmd) {
-> > +     case VDUSE_IOTLB_GET_FD: {
-> > +             struct vduse_iotlb_entry entry;
-> > +             struct vhost_iotlb_map *map;
-> > +             struct vdpa_map_file *map_file;
-> > +             struct file *f =3D NULL;
-> > +
-> > +             ret =3D -EFAULT;
-> > +             if (copy_from_user(&entry, argp, sizeof(entry)))
-> > +                     break;
-> > +
-> > +             spin_lock(&dev->iommu_lock);
-> > +             map =3D vhost_iotlb_itree_first(dev->iommu, entry.start,
-> > +                                           entry.last);
-> > +             if (map) {
-> > +                     map_file =3D (struct vdpa_map_file *)map->opaque;
-> > +                     f =3D get_file(map_file->file);
-> > +                     entry.offset =3D map_file->offset;
-> > +                     entry.start =3D map->start;
-> > +                     entry.last =3D map->last;
-> > +                     entry.perm =3D map->perm;
-> > +             }
-> > +             spin_unlock(&dev->iommu_lock);
-> > +             if (!f) {
-> > +                     ret =3D -EINVAL;
-> > +                     break;
-> > +             }
-> > +             if (copy_to_user(argp, &entry, sizeof(entry))) {
-> > +                     fput(f);
-> > +                     ret =3D -EFAULT;
-> > +                     break;
-> > +             }
-> > +             ret =3D get_unused_fd_flags(perm_to_file_flags(entry.perm=
-));
-> > +             if (ret < 0) {
-> > +                     fput(f);
-> > +                     break;
-> > +             }
-> > +             fd_install(ret, f);
+> Advancing the timer expiration should only be necessary on guest initiated
+> writes. When we cancel the timer and clear .pending during state restore,
+> clear expired_tscdeadline as well.
 >
+> Reviewed-by: Sean Christopherson <seanjc@google.com>
+> Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
+> ---
+> v1 -> v2:
+>  * update patch description
 >
-> So at least we need to use receice_fd_user() here to give a chance to be
-> hooked into security module.
+>  arch/x86/kvm/lapic.c | 1 +
+>  1 file changed, 1 insertion(+)
 >
-
-Good point. Will do it in v5.
-
-Thanks,
-Yongji
+> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+> index 45d40bf..f2b6e79 100644
+> --- a/arch/x86/kvm/lapic.c
+> +++ b/arch/x86/kvm/lapic.c
+> @@ -2595,6 +2595,7 @@ int kvm_apic_set_state(struct kvm_vcpu *vcpu, struct kvm_lapic_state *s)
+>
+>         apic_update_ppr(apic);
+>         hrtimer_cancel(&apic->lapic_timer.timer);
+> +       apic->lapic_timer.expired_tscdeadline = 0;
+>         apic_update_lvtt(apic);
+>         apic_manage_nmi_watchdog(apic, kvm_lapic_get_reg(apic, APIC_LVT0));
+>         update_divide_count(apic);
+> --
+> 2.7.4
+>
