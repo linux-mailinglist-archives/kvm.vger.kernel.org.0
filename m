@@ -2,136 +2,124 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E9C6E336A6E
-	for <lists+kvm@lfdr.de>; Thu, 11 Mar 2021 04:10:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D5B56336A93
+	for <lists+kvm@lfdr.de>; Thu, 11 Mar 2021 04:21:06 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230346AbhCKDJs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 10 Mar 2021 22:09:48 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54716 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229920AbhCKDJc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 10 Mar 2021 22:09:32 -0500
-Received: from mail-oo1-xc31.google.com (mail-oo1-xc31.google.com [IPv6:2607:f8b0:4864:20::c31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 07E96C061574;
-        Wed, 10 Mar 2021 19:09:22 -0800 (PST)
-Received: by mail-oo1-xc31.google.com with SMTP id z47-20020a4a98720000b02901b5f20aed58so337728ooi.0;
-        Wed, 10 Mar 2021 19:09:22 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=f8s2BYFkRAlrcL5fH4h6mp5Vr1uQC0s8KYZq39wp270=;
-        b=aQU8tLc0883Itw1FbO1/2m9S7YUANZmRBo/KdnN5kaNalSBwBmh7U2O4KfBLT99aZ+
-         ay2K7+dGAdS6nCSUGhGtZVfRjuW5fcLpOTgfShjrfFhmgbOebgDo760+jHuwUk2uWC7w
-         Uyc+BfQiOUkDZ57OLFX7tjzNizxszN8IZtpC8lb0yeS+tvsbQ53Mnj+AtAA9mfmLdZ9e
-         jVRyFxtmmUVrSrHui18zmjEPxDmA9Xq3um4poHqVaKjPREWrCfamQxGXGSwKkyyl4pSg
-         y+uqu6kk+N4c+9PtQPB5wFEmaLuXIEyvDcdTmpZVPBwEL2PgNQpBZetxdUHnnjU3zLwU
-         uvGA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=f8s2BYFkRAlrcL5fH4h6mp5Vr1uQC0s8KYZq39wp270=;
-        b=X0wCo5PfGZmpxVsb5YcfDaq+8TNk2/h8cTu4Pl8o6ErjkTgpjOvXMIvCjN5pQM9iEK
-         BltFC+FbWpsFlZMQ5S9YP9idxW+y02uzsEobQVJk6My0FlpdSaMH8gI5EP8/CriJsY1C
-         1OEYAZUNEtkzOVZvRIrtvHmJaTU60/8FLS6vfOHf6l8QCsG+TeIoLm2rbDv4vAVEisbU
-         JYrx6hVBwmmWmM2447r3OXXeJMTw3NxLuCtapPNsHw7kLHtDMwTJLkY908kewBtPhxvf
-         AYT0GbVpzhlMpZmD6XptTHdCbEa+ZTZBLgNt0Ir0oqiUtiUq4xfCIiPxRtMC8MdlrAgn
-         EvTA==
-X-Gm-Message-State: AOAM533JRTEZifDmADVRDaXkPmatD8UR5eA/j9eHPoySGX8H9s4S+Te7
-        JKDt5hs9N2n8e8IyyJhDk4pQexP4SGLeMaEg40K6womf
-X-Google-Smtp-Source: ABdhPJzuRfyNSDS/ECwr6eYkC+3MLV78crdkV4sjdfCvG9ZtfIUTxJE9knMhMkVFLV1NoJhpuYWci4ebpKPdQMt7pGU=
-X-Received: by 2002:a4a:a223:: with SMTP id m35mr4927781ool.39.1615432160511;
- Wed, 10 Mar 2021 19:09:20 -0800 (PST)
+        id S230506AbhCKDUe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 10 Mar 2021 22:20:34 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:37646 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231156AbhCKDUa (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 10 Mar 2021 22:20:30 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1615432829;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=P09mB4c+K2vA0WOzF718rEjH0GsJKBr1s72NBk2MRHg=;
+        b=Ala55X0RKH+Tl3ClxuP5uFgevBN3+EsFZoxl0iZ2aiiDffmKunY4lTuQZI8glcYM37Wt1u
+        0RzWY8p38pvpMyBar0SRb5CIy00eqwPek9k+xGTXI0l8B78wrl1lYiTG8Eyvw0JVirW2KJ
+        NpuhGGCif/ubF7ZxZ1NVa/7gLGkuYQE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-191-VPLtTuS8NzqooVXMHlP4zw-1; Wed, 10 Mar 2021 22:20:27 -0500
+X-MC-Unique: VPLtTuS8NzqooVXMHlP4zw-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 097C619200C1;
+        Thu, 11 Mar 2021 03:20:26 +0000 (UTC)
+Received: from wangxiaodeMacBook-Air.local (ovpn-13-9.pek2.redhat.com [10.72.13.9])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 490795D746;
+        Thu, 11 Mar 2021 03:20:20 +0000 (UTC)
+Subject: Re: [PATCH V3 6/6] vDPA/ifcvf: verify mandatory feature bits for vDPA
+To:     Zhu Lingshan <lingshan.zhu@intel.com>, mst@redhat.com,
+        lulu@redhat.com, leonro@nvidia.com
+Cc:     virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20210310090052.4762-1-lingshan.zhu@intel.com>
+ <20210310090052.4762-7-lingshan.zhu@intel.com>
+From:   Jason Wang <jasowang@redhat.com>
+Message-ID: <3e53a5c9-c531-48ee-c9a7-907dfdacc9d1@redhat.com>
+Date:   Thu, 11 Mar 2021 11:20:18 +0800
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.16; rv:78.0)
+ Gecko/20100101 Thunderbird/78.8.0
 MIME-Version: 1.0
-References: <1614057902-23774-1-git-send-email-wanpengli@tencent.com>
-In-Reply-To: <1614057902-23774-1-git-send-email-wanpengli@tencent.com>
-From:   Wanpeng Li <kernellwp@gmail.com>
-Date:   Thu, 11 Mar 2021 11:09:09 +0800
-Message-ID: <CANRm+CyDPTio2DArTn0tiNs5kCRvKeT7YHUySvUnqkdQLC1+6Q@mail.gmail.com>
-Subject: Re: [PATCH] x86/kvm: Fix broken irq restoration in kvm_wait
-To:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Thomas Gleixner <tglx@linutronix.de>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20210310090052.4762-7-lingshan.zhu@intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-GB
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-ping,
-On Tue, 23 Feb 2021 at 13:25, Wanpeng Li <kernellwp@gmail.com> wrote:
+
+On 2021/3/10 5:00 下午, Zhu Lingshan wrote:
+> vDPA requres VIRTIO_F_ACCESS_PLATFORM as a must, this commit
+> examines this when set features.
 >
-> From: Wanpeng Li <wanpengli@tencent.com>
->
-> After commit 997acaf6b4b59c (lockdep: report broken irq restoration), the guest
-> splatting below during boot:
->
->  raw_local_irq_restore() called with IRQs enabled
->  WARNING: CPU: 1 PID: 169 at kernel/locking/irqflag-debug.c:10 warn_bogus_irq_restore+0x26/0x30
->  Modules linked in: hid_generic usbhid hid
->  CPU: 1 PID: 169 Comm: systemd-udevd Not tainted 5.11.0+ #25
->  RIP: 0010:warn_bogus_irq_restore+0x26/0x30
->  Call Trace:
->   kvm_wait+0x76/0x90
->   __pv_queued_spin_lock_slowpath+0x285/0x2e0
->   do_raw_spin_lock+0xc9/0xd0
->   _raw_spin_lock+0x59/0x70
->   lockref_get_not_dead+0xf/0x50
->   __legitimize_path+0x31/0x60
->   legitimize_root+0x37/0x50
->   try_to_unlazy_next+0x7f/0x1d0
->   lookup_fast+0xb0/0x170
->   path_openat+0x165/0x9b0
->   do_filp_open+0x99/0x110
->   do_sys_openat2+0x1f1/0x2e0
->   do_sys_open+0x5c/0x80
->   __x64_sys_open+0x21/0x30
->   do_syscall_64+0x32/0x50
->   entry_SYSCALL_64_after_hwframe+0x44/0xae
->
-> The irqflags handling in kvm_wait() which ends up doing:
->
->         local_irq_save(flags);
->         safe_halt();
->         local_irq_restore(flags);
->
-> which triggered a new consistency checking, we generally expect
-> local_irq_save() and local_irq_restore() to be pared and sanely
-> nested, and so local_irq_restore() expects to be called with
-> irqs disabled.
->
-> This patch fixes it by adding a local_irq_disable() after safe_halt()
-> to avoid this warning.
->
-> Cc: Mark Rutland <mark.rutland@arm.com>
-> Cc: Thomas Gleixner <tglx@linutronix.de>
-> Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
+> Signed-off-by: Zhu Lingshan <lingshan.zhu@intel.com>
 > ---
->  arch/x86/kernel/kvm.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
+>   drivers/vdpa/ifcvf/ifcvf_base.c | 8 ++++++++
+>   drivers/vdpa/ifcvf/ifcvf_base.h | 1 +
+>   drivers/vdpa/ifcvf/ifcvf_main.c | 5 +++++
+>   3 files changed, 14 insertions(+)
 >
-> diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
-> index 5e78e01..688c84a 100644
-> --- a/arch/x86/kernel/kvm.c
-> +++ b/arch/x86/kernel/kvm.c
-> @@ -853,8 +853,10 @@ static void kvm_wait(u8 *ptr, u8 val)
->          */
->         if (arch_irqs_disabled_flags(flags))
->                 halt();
-> -       else
-> +       else {
->                 safe_halt();
-> +               local_irq_disable();
-> +       }
->
->  out:
->         local_irq_restore(flags);
-> --
-> 2.7.4
->
+> diff --git a/drivers/vdpa/ifcvf/ifcvf_base.c b/drivers/vdpa/ifcvf/ifcvf_base.c
+> index ea6a78791c9b..58f47fdce385 100644
+> --- a/drivers/vdpa/ifcvf/ifcvf_base.c
+> +++ b/drivers/vdpa/ifcvf/ifcvf_base.c
+> @@ -224,6 +224,14 @@ u64 ifcvf_get_features(struct ifcvf_hw *hw)
+>   	return hw->hw_features;
+>   }
+>   
+> +int ifcvf_verify_min_features(struct ifcvf_hw *hw)
+> +{
+> +	if (!(hw->hw_features & BIT_ULL(VIRTIO_F_ACCESS_PLATFORM)))
+> +		return -EINVAL;
+> +
+> +	return 0;
+> +}
+> +
+>   void ifcvf_read_net_config(struct ifcvf_hw *hw, u64 offset,
+>   			   void *dst, int length)
+>   {
+> diff --git a/drivers/vdpa/ifcvf/ifcvf_base.h b/drivers/vdpa/ifcvf/ifcvf_base.h
+> index dbb8c10aa3b1..91c5735d4dc9 100644
+> --- a/drivers/vdpa/ifcvf/ifcvf_base.h
+> +++ b/drivers/vdpa/ifcvf/ifcvf_base.h
+> @@ -123,6 +123,7 @@ void io_write64_twopart(u64 val, u32 *lo, u32 *hi);
+>   void ifcvf_reset(struct ifcvf_hw *hw);
+>   u64 ifcvf_get_features(struct ifcvf_hw *hw);
+>   u64 ifcvf_get_hw_features(struct ifcvf_hw *hw);
+> +int ifcvf_verify_min_features(struct ifcvf_hw *hw);
+>   u16 ifcvf_get_vq_state(struct ifcvf_hw *hw, u16 qid);
+>   int ifcvf_set_vq_state(struct ifcvf_hw *hw, u16 qid, u16 num);
+>   struct ifcvf_adapter *vf_to_adapter(struct ifcvf_hw *hw);
+> diff --git a/drivers/vdpa/ifcvf/ifcvf_main.c b/drivers/vdpa/ifcvf/ifcvf_main.c
+> index 25fb9dfe23f0..f624f202447d 100644
+> --- a/drivers/vdpa/ifcvf/ifcvf_main.c
+> +++ b/drivers/vdpa/ifcvf/ifcvf_main.c
+> @@ -179,6 +179,11 @@ static u64 ifcvf_vdpa_get_features(struct vdpa_device *vdpa_dev)
+>   static int ifcvf_vdpa_set_features(struct vdpa_device *vdpa_dev, u64 features)
+>   {
+>   	struct ifcvf_hw *vf = vdpa_to_vf(vdpa_dev);
+> +	int ret;
+> +
+> +	ret = ifcvf_verify_min_features(vf);
+
+
+So this validate device features instead of driver which is the one we 
+really want to check?
+
+Thanks
+
+
+> +	if (ret)
+> +		return ret;
+>   
+>   	vf->req_features = features;
+>   
+
