@@ -2,23 +2,23 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 776A833728B
-	for <lists+kvm@lfdr.de>; Thu, 11 Mar 2021 13:27:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C56A53372A7
+	for <lists+kvm@lfdr.de>; Thu, 11 Mar 2021 13:32:42 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233105AbhCKM1W (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 11 Mar 2021 07:27:22 -0500
-Received: from szxga04-in.huawei.com ([45.249.212.190]:13593 "EHLO
-        szxga04-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232846AbhCKM0y (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 11 Mar 2021 07:26:54 -0500
-Received: from DGGEMS409-HUB.china.huawei.com (unknown [172.30.72.58])
-        by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4Dx7SB0fTgz17Jh9;
-        Thu, 11 Mar 2021 20:24:58 +0800 (CST)
+        id S233208AbhCKMcL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 11 Mar 2021 07:32:11 -0500
+Received: from szxga07-in.huawei.com ([45.249.212.35]:13879 "EHLO
+        szxga07-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233216AbhCKMcD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 11 Mar 2021 07:32:03 -0500
+Received: from DGGEMS403-HUB.china.huawei.com (unknown [172.30.72.58])
+        by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4Dx7Z970zlz7p3Q;
+        Thu, 11 Mar 2021 20:30:09 +0800 (CST)
 Received: from [10.174.184.135] (10.174.184.135) by
- DGGEMS409-HUB.china.huawei.com (10.3.19.209) with Microsoft SMTP Server id
- 14.3.498.0; Thu, 11 Mar 2021 20:26:38 +0800
-Subject: Re: [PATCH v3 1/4] KVM: arm64: GICv4.1: Add function to get VLPI
- state
+ DGGEMS403-HUB.china.huawei.com (10.3.19.203) with Microsoft SMTP Server id
+ 14.3.498.0; Thu, 11 Mar 2021 20:31:49 +0800
+Subject: Re: [PATCH v3 2/4] KVM: arm64: GICv4.1: Try to save hw pending state
+ in save_pending_tables
 To:     Marc Zyngier <maz@kernel.org>
 CC:     Eric Auger <eric.auger@redhat.com>, Will Deacon <will@kernel.org>,
         <linux-arm-kernel@lists.infradead.org>,
@@ -29,90 +29,182 @@ CC:     Eric Auger <eric.auger@redhat.com>, Will Deacon <will@kernel.org>,
         "Lorenzo Pieralisi" <lorenzo.pieralisi@arm.com>,
         <wanghaibin.wang@huawei.com>, <yuzenghui@huawei.com>
 References: <20210127121337.1092-1-lushenming@huawei.com>
- <20210127121337.1092-2-lushenming@huawei.com> <87wnuef4oj.wl-maz@kernel.org>
+ <20210127121337.1092-3-lushenming@huawei.com> <87v99yf450.wl-maz@kernel.org>
 From:   Shenming Lu <lushenming@huawei.com>
-Message-ID: <fc7dc4ec-e223-91ae-536f-1aa52c8a5739@huawei.com>
-Date:   Thu, 11 Mar 2021 20:26:38 +0800
+Message-ID: <3b47598f-0795-a165-1a64-abe02258b306@huawei.com>
+Date:   Thu, 11 Mar 2021 20:31:48 +0800
 User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
  Thunderbird/78.2.2
 MIME-Version: 1.0
-In-Reply-To: <87wnuef4oj.wl-maz@kernel.org>
+In-Reply-To: <87v99yf450.wl-maz@kernel.org>
 Content-Type: text/plain; charset="utf-8"
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 X-Originating-IP: [10.174.184.135]
 X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2021/3/11 16:57, Marc Zyngier wrote:
-> On Wed, 27 Jan 2021 12:13:34 +0000,
+On 2021/3/11 17:09, Marc Zyngier wrote:
+> On Wed, 27 Jan 2021 12:13:35 +0000,
 > Shenming Lu <lushenming@huawei.com> wrote:
 >>
->> With GICv4.1 and the vPE unmapped, which indicates the invalidation
->> of any VPT caches associated with the vPE, we can get the VLPI state
->> by peeking at the VPT. So we add a function for this.
+>> After pausing all vCPUs and devices capable of interrupting, in order
+>> to save the information of all interrupts, besides flushing the pending
+>> states in kvm’s vgic, we also try to flush the states of VLPIs in the
+>> virtual pending tables into guest RAM, but we need to have GICv4.1 and
+>> safely unmap the vPEs first.
+>>
+>> As for the saving of VSGIs, which needs the vPEs to be mapped and might
+>> conflict with the saving of VLPIs, but since we will map the vPEs back
+>> at the end of save_pending_tables and both savings require the kvm->lock
+>> to be held (only happen serially), it will work fine.
 >>
 >> Signed-off-by: Shenming Lu <lushenming@huawei.com>
 >> ---
->>  arch/arm64/kvm/vgic/vgic-v4.c | 19 +++++++++++++++++++
->>  arch/arm64/kvm/vgic/vgic.h    |  1 +
->>  2 files changed, 20 insertions(+)
+>>  arch/arm64/kvm/vgic/vgic-v3.c | 61 +++++++++++++++++++++++++++++++----
+>>  1 file changed, 55 insertions(+), 6 deletions(-)
 >>
->> diff --git a/arch/arm64/kvm/vgic/vgic-v4.c b/arch/arm64/kvm/vgic/vgic-v4.c
->> index 66508b03094f..ac029ba3d337 100644
->> --- a/arch/arm64/kvm/vgic/vgic-v4.c
->> +++ b/arch/arm64/kvm/vgic/vgic-v4.c
->> @@ -203,6 +203,25 @@ void vgic_v4_configure_vsgis(struct kvm *kvm)
->>  	kvm_arm_resume_guest(kvm);
+>> diff --git a/arch/arm64/kvm/vgic/vgic-v3.c b/arch/arm64/kvm/vgic/vgic-v3.c
+>> index 52915b342351..06b1162b7a0a 100644
+>> --- a/arch/arm64/kvm/vgic/vgic-v3.c
+>> +++ b/arch/arm64/kvm/vgic/vgic-v3.c
+>> @@ -1,6 +1,8 @@
+>>  // SPDX-License-Identifier: GPL-2.0-only
+>>  
+>>  #include <linux/irqchip/arm-gic-v3.h>
+>> +#include <linux/irq.h>
+>> +#include <linux/irqdomain.h>
+>>  #include <linux/kvm.h>
+>>  #include <linux/kvm_host.h>
+>>  #include <kvm/arm_vgic.h>
+>> @@ -356,6 +358,32 @@ int vgic_v3_lpi_sync_pending_status(struct kvm *kvm, struct vgic_irq *irq)
+>>  	return 0;
 >>  }
 >>  
 >> +/*
->> + * Must be called with GICv4.1 and the vPE unmapped, which
->> + * indicates the invalidation of any VPT caches associated
->> + * with the vPE, thus we can get the VLPI state by peeking
->> + * at the VPT.
+>> + * The deactivation of the doorbell interrupt will trigger the
+>> + * unmapping of the associated vPE.
 >> + */
->> +void vgic_v4_get_vlpi_state(struct vgic_irq *irq, bool *val)
+>> +static void unmap_all_vpes(struct vgic_dist *dist)
 >> +{
->> +	struct its_vpe *vpe = &irq->target_vcpu->arch.vgic_cpu.vgic_v3.its_vpe;
->> +	int mask = BIT(irq->intid % BITS_PER_BYTE);
->> +	void *va;
->> +	u8 *ptr;
+>> +	struct irq_desc *desc;
+>> +	int i;
 >> +
->> +	va = page_address(vpe->vpt_page);
->> +	ptr = va + irq->intid / BITS_PER_BYTE;
+>> +	for (i = 0; i < dist->its_vm.nr_vpes; i++) {
+>> +		desc = irq_to_desc(dist->its_vm.vpes[i]->irq);
+>> +		irq_domain_deactivate_irq(irq_desc_get_irq_data(desc));
+>> +	}
+>> +}
 >> +
->> +	*val = !!(*ptr & mask);
+>> +static void map_all_vpes(struct vgic_dist *dist)
+>> +{
+>> +	struct irq_desc *desc;
+>> +	int i;
+>> +
+>> +	for (i = 0; i < dist->its_vm.nr_vpes; i++) {
+>> +		desc = irq_to_desc(dist->its_vm.vpes[i]->irq);
+>> +		irq_domain_activate_irq(irq_desc_get_irq_data(desc), false);
+>> +	}
+>> +}
+>> +
+>>  /**
+>>   * vgic_v3_save_pending_tables - Save the pending tables into guest RAM
+>>   * kvm lock and all vcpu lock must be held
+>> @@ -365,14 +393,26 @@ int vgic_v3_save_pending_tables(struct kvm *kvm)
+>>  	struct vgic_dist *dist = &kvm->arch.vgic;
+>>  	struct vgic_irq *irq;
+>>  	gpa_t last_ptr = ~(gpa_t)0;
+>> -	int ret;
+>> +	bool vlpi_avail = false;
+>> +	int ret = 0;
+>>  	u8 val;
+>>  
+>> +	/*
+>> +	 * As a preparation for getting any VLPI states.
+>> +	 * The vgic initialized check ensures that the allocation and
+>> +	 * enabling of the doorbells have already been done.
+>> +	 */
+>> +	if (kvm_vgic_global_state.has_gicv4_1 && !WARN_ON(!vgic_initialized(kvm))) {
 > 
-> What guarantees that you can actually read anything valid? Yes, the
-> VPT caches are clean. But that doesn't make them coherent with CPU
-> caches.
+> Should we bail out if we ever spot !vgic_initialized()? In general, I
+> find the double negation horrible to read).
+
+Ok, I will change it.
+
 > 
-> You need some level of cache maintenance here.
+>> +		unmap_all_vpes(dist);
+>> +		vlpi_avail = true;
+>> +	}
+>> +
+>>  	list_for_each_entry(irq, &dist->lpi_list_head, lpi_list) {
+>>  		int byte_offset, bit_nr;
+>>  		struct kvm_vcpu *vcpu;
+>>  		gpa_t pendbase, ptr;
+>>  		bool stored;
+>> +		bool is_pending = irq->pending_latch;
+>>  
+>>  		vcpu = irq->target_vcpu;
+>>  		if (!vcpu)
+>> @@ -387,24 +427,33 @@ int vgic_v3_save_pending_tables(struct kvm *kvm)
+>>  		if (ptr != last_ptr) {
+>>  			ret = kvm_read_guest_lock(kvm, ptr, &val, 1);
+>>  			if (ret)
+>> -				return ret;
+>> +				goto out;
+>>  			last_ptr = ptr;
+>>  		}
+>>  
+>>  		stored = val & (1U << bit_nr);
+>> -		if (stored == irq->pending_latch)
+>> +
+>> +		if (irq->hw && vlpi_avail)
+>> +			vgic_v4_get_vlpi_state(irq, &is_pending);
+> 
+> Keep the 'is_pending = irq->pending_latch;' statement close to the VPT
+> read, since they represent the same state.
 
-Yeah, and you have come up with some codes for this in v2:
+Ok, make sense.
 
-diff --git a/drivers/irqchip/irq-gic-v3-its.c
-b/drivers/irqchip/irq-gic-v3-its.c
-index 7db602434ac5..2dbef127ca15 100644
---- a/drivers/irqchip/irq-gic-v3-its.c
-+++ b/drivers/irqchip/irq-gic-v3-its.c
-@@ -4552,6 +4552,10 @@ static void its_vpe_irq_domain_deactivate(struct
-irq_domain *domain,
+> 
+>> +
+>> +		if (stored == is_pending)
+>>  			continue;
+>>  
+>> -		if (irq->pending_latch)
+>> +		if (is_pending)
+>>  			val |= 1 << bit_nr;
+>>  		else
+>>  			val &= ~(1 << bit_nr);
+>>  
+>>  		ret = kvm_write_guest_lock(kvm, ptr, &val, 1);
+>>  		if (ret)
+>> -			return ret;
+>> +			goto out;
+>>  	}
+>> -	return 0;
+>> +
+>> +out:
+>> +	if (vlpi_avail)
+>> +		map_all_vpes(dist);
+> 
+> I have asked that question in the past: is it actually safe to remap
+> the vPEs and expect them to be runnable
 
-  		its_send_vmapp(its, vpe, false);
-  	}
-+
-+	if (find_4_1_its() && !atomic_read(vpe->vmapp_count))
-+		gic_flush_dcache_to_poc(page_address(vpe->vpt_page),
-+					LPI_PENDBASE_SZ);
-  }
+In my opinion, logically it can work, but there might be problems like the
+one below that I didn't notice...
 
-  static const struct irq_domain_ops its_vpe_domain_ops = {
+> 
+> Also, the current code assumes that VMAPP.PTZ can be advertised if a
+> VPT is mapped for the first time. Clearly, it is unlikely that the VPT
+> will be only populated with 0s, so you'll end up with state corruption
+> on the first remap.
 
-Could I add it to this series? :-)
+Oh, thanks for pointing it out.
+And if we always signal PTZ when alloc = 1, does it mean that we can't remap the
+vPE when the VPT is not empty, thus there is no chance to get the VLPI state?
+Could we just assume that the VPT is not empty when first mapping the vPE?
 
 Thanks,
 Shenming
