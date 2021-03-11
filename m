@@ -2,51 +2,52 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CAB0233717F
-	for <lists+kvm@lfdr.de>; Thu, 11 Mar 2021 12:38:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2C0003371EA
+	for <lists+kvm@lfdr.de>; Thu, 11 Mar 2021 13:01:45 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232759AbhCKLhj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 11 Mar 2021 06:37:39 -0500
-Received: from verein.lst.de ([213.95.11.211]:40565 "EHLO verein.lst.de"
+        id S232678AbhCKMBM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 11 Mar 2021 07:01:12 -0500
+Received: from foss.arm.com ([217.140.110.172]:33920 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232679AbhCKLhJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 11 Mar 2021 06:37:09 -0500
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id 0C4B268B05; Thu, 11 Mar 2021 12:37:07 +0100 (CET)
-Date:   Thu, 11 Mar 2021 12:37:06 +0100
-From:   Christoph Hellwig <hch@lst.de>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     Christoph Hellwig <hch@lst.de>,
-        Max Gurtovoy <mgurtovoy@nvidia.com>,
-        alex.williamson@redhat.com, cohuck@redhat.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, liranl@nvidia.com, oren@nvidia.com,
-        tzahio@nvidia.com, leonro@nvidia.com, yarong@nvidia.com,
-        aviadye@nvidia.com, shahafs@nvidia.com, artemp@nvidia.com,
-        kwankhede@nvidia.com, ACurrid@nvidia.com, cjia@nvidia.com,
-        yishaih@nvidia.com, mjrosato@linux.ibm.com, aik@ozlabs.ru
-Subject: Re: [PATCH 9/9] vfio/pci: export igd support into vendor vfio_pci
- driver
-Message-ID: <20210311113706.GC17183@lst.de>
-References: <20210309083357.65467-1-mgurtovoy@nvidia.com> <20210309083357.65467-10-mgurtovoy@nvidia.com> <20210310081508.GB4364@lst.de> <20210310123127.GT2356281@nvidia.com>
+        id S232579AbhCKMAr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 11 Mar 2021 07:00:47 -0500
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5931031B;
+        Thu, 11 Mar 2021 04:00:47 -0800 (PST)
+Received: from C02TD0UTHF1T.local (unknown [10.57.54.221])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 245CE3F793;
+        Thu, 11 Mar 2021 04:00:45 -0800 (PST)
+Date:   Thu, 11 Mar 2021 12:00:43 +0000
+From:   Mark Rutland <mark.rutland@arm.com>
+To:     Will Deacon <will@kernel.org>
+Cc:     kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
+        kernel-team@android.com, kvmarm@lists.cs.columbia.edu,
+        linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH 3/4] KVM: arm64: Rename SCTLR_ELx_FLAGS to SCTLR_EL2_FLAGS
+Message-ID: <20210311120043.GE37303@C02TD0UTHF1T.local>
+References: <20210310152656.3821253-1-maz@kernel.org>
+ <20210310152656.3821253-4-maz@kernel.org>
+ <20210310154625.GA29738@willie-the-truck>
+ <874khjxade.wl-maz@kernel.org>
+ <20210310161546.GC29834@willie-the-truck>
+ <87zgzagaqq.wl-maz@kernel.org>
+ <20210310182022.GA29969@willie-the-truck>
+ <20210311113529.GD37303@C02TD0UTHF1T.local>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210310123127.GT2356281@nvidia.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <20210311113529.GD37303@C02TD0UTHF1T.local>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Mar 10, 2021 at 08:31:27AM -0400, Jason Gunthorpe wrote:
-> Yes, that needs more refactoring. I'm viewing this series as a
-> "statement of intent" and once we commit to doing this we can go
-> through the bigger effort to split up vfio_pci_core and tidy its API.
-> 
-> Obviously this is a big project, given the past comments I don't want
-> to send more effort here until we see a community consensus emerge
-> that this is what we want to do. If we build a sub-driver instead the
-> work is all in the trash bin.
+On Thu, Mar 11, 2021 at 11:35:29AM +0000, Mark Rutland wrote:
+> Acked-by: Mark Rutland <nark.rutland@arm.com>
 
-So my viewpoint here is that this work doesn't seem very useful for
-the existing subdrivers given how much compat pain there is.  It
-defintively is the right way to go for a new driver.
+Upon reflection, maybe I should spell my own name correctly:
+
+Acked-by: Mark Rutland <mark.rutland@arm.com>
+
+... lest you decide to add a Mocked-by tag instead ;)
+
+Mark.
