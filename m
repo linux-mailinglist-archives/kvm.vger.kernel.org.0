@@ -2,53 +2,53 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E7D86338A6F
+	by mail.lfdr.de (Postfix) with ESMTP id 9B522338A6D
 	for <lists+kvm@lfdr.de>; Fri, 12 Mar 2021 11:42:52 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233468AbhCLKmU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 12 Mar 2021 05:42:20 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:20224 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233497AbhCLKmE (ORCPT
+        id S233475AbhCLKmV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 12 Mar 2021 05:42:21 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:6966 "EHLO
+        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S233493AbhCLKmE (ORCPT
         <rfc822;kvm@vger.kernel.org>); Fri, 12 Mar 2021 05:42:04 -0500
-Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 12CAXwN8161289
-        for <kvm@vger.kernel.org>; Fri, 12 Mar 2021 05:42:04 -0500
+Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 12CAXiMi119868
+        for <kvm@vger.kernel.org>; Fri, 12 Mar 2021 05:42:03 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
  : date : message-id : in-reply-to : references; s=pp1;
- bh=P50ZHWrN4azW1++K3SjCB1h07TxgYC6u/usi7dsMzlE=;
- b=o5CH6b7I2Pg8PPMJ6RgJUR5XOaOAhCOonfQEwwAhZl+kf8KlyY5MZ4wOx+HhrKVoNQm/
- bZq3cWc7sJ1tHLTjp6yQFng/bR2hMR2KDD4RW6GabNJ9jPXeHywC2d41lAfxFaM8Gswz
- vLVPXuwcgq/gIIcAtQ0QPfOBHn62eF0Hy62B5SLclWUsvUx4CR89o4ssAtmAdldlJNlp
- vMCvdRw8PFkxki+QPnxMqJyY+b9XW6e+DUK6i92upVu66a1I5n/cVPFj13YNtZJ1uSmH
- NhcjMsVT25AifAjixN1rhahhBen8RPROh0V+zu7HENQtxnoTRcvja4Zf0NAhrwRXuyKK Zg== 
+ bh=DishcRxBAFwRuNThKfh9pH9U39zaiJMec1GDct8bPYE=;
+ b=GqEU8Ds6Qa7NLw42YewinH/q/w6QmxNexseDOq59qe7TRYxEv3uivnUjcFFdEJkeLVf8
+ n7l3sxzOo3NDODJtDaLKfB0cIv5FJruVpGc704hhcicUTkE14DsmeomhX2EiNizCP3Ib
+ Li8rJY/LfEqKKHNt103NX88KRGmztlUiWxOwUI7uW01gEhq305Qn5kUtMRFkiUU+HFBu
+ cY6aJiiCgpKX/CNpZfZUt7QyFqx8ht55LhL9ZifsGr3wRrKpXGxPX95soExXtzqKTFEK
+ +gD8wyTTHUUVCTQpgGRyaDF7YQtIfD7hNrRZG3wFHQzq1TI3cjSBev9ADfN7NUvysSPl XQ== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3774kyjf77-1
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3774m8t1tt-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Fri, 12 Mar 2021 05:42:04 -0500
-Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 12CAY7b9161691
         for <kvm@vger.kernel.org>; Fri, 12 Mar 2021 05:42:03 -0500
-Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3774kyjf5r-1
+Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 12CAXqPn120262
+        for <kvm@vger.kernel.org>; Fri, 12 Mar 2021 05:42:02 -0500
+Received: from ppma06fra.de.ibm.com (48.49.7a9f.ip4.static.sl-reverse.com [159.122.73.72])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3774m8t1t8-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 12 Mar 2021 05:42:03 -0500
-Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
-        by ppma01fra.de.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 12CAfp6a010330;
-        Fri, 12 Mar 2021 10:42:00 GMT
-Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
-        by ppma01fra.de.ibm.com with ESMTP id 376agr1dvt-1
+        Fri, 12 Mar 2021 05:42:02 -0500
+Received: from pps.filterd (ppma06fra.de.ibm.com [127.0.0.1])
+        by ppma06fra.de.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 12CAdFlZ027958;
+        Fri, 12 Mar 2021 10:42:01 GMT
+Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
+        by ppma06fra.de.ibm.com with ESMTP id 3768n61fp0-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 12 Mar 2021 10:42:00 +0000
+        Fri, 12 Mar 2021 10:42:01 +0000
 Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 12CAfgfj37028230
+        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 12CAfgOo24642002
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
         Fri, 12 Mar 2021 10:41:42 GMT
 Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id B9BB0AE051;
-        Fri, 12 Mar 2021 10:41:57 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 2A473AE053;
+        Fri, 12 Mar 2021 10:41:58 +0000 (GMT)
 Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 670FAAE04D;
+        by IMSVA (Postfix) with ESMTP id CB54EAE04D;
         Fri, 12 Mar 2021 10:41:57 +0000 (GMT)
 Received: from oc3016276355.ibm.com (unknown [9.145.32.251])
         by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
@@ -57,46 +57,61 @@ From:   Pierre Morel <pmorel@linux.ibm.com>
 To:     kvm@vger.kernel.org
 Cc:     frankja@linux.ibm.com, david@redhat.com, thuth@redhat.com,
         cohuck@redhat.com, imbrenda@linux.ibm.com
-Subject: [kvm-unit-tests PATCH v6 5/6] s390x: css: testing measurement block format 0
-Date:   Fri, 12 Mar 2021 11:41:53 +0100
-Message-Id: <1615545714-13747-6-git-send-email-pmorel@linux.ibm.com>
+Subject: [kvm-unit-tests PATCH v6 6/6] s390x: css: testing measurement block format 1
+Date:   Fri, 12 Mar 2021 11:41:54 +0100
+Message-Id: <1615545714-13747-7-git-send-email-pmorel@linux.ibm.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1615545714-13747-1-git-send-email-pmorel@linux.ibm.com>
 References: <1615545714-13747-1-git-send-email-pmorel@linux.ibm.com>
 X-TM-AS-GCONF: 00
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.761
  definitions=2021-03-12_03:2021-03-10,2021-03-12 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 mlxlogscore=999
- clxscore=1015 impostorscore=0 priorityscore=1501 bulkscore=0 mlxscore=0
- spamscore=0 adultscore=0 malwarescore=0 suspectscore=0 lowpriorityscore=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 lowpriorityscore=0
+ mlxlogscore=999 bulkscore=0 clxscore=1015 malwarescore=0 suspectscore=0
+ adultscore=0 phishscore=0 impostorscore=0 priorityscore=1501 spamscore=0
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
  definitions=main-2103120072
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-We test the update of the measurement block format 0, the
-measurement block origin is calculated from the mbo argument
-used by the SCHM instruction and the offset calculated using
-the measurement block index of the SCHIB.
+Measurement block format 1 is made available by the extended
+measurement block facility and is indicated in the SCHIB by
+the bit in the PMCW.
+
+The MBO is specified in the SCHIB of each channel and the MBO
+defined by the SCHM instruction is ignored.
+
+The test of the MB format 1 is just skipped if the feature is
+not available.
 
 Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
 ---
- lib/s390x/css.h | 12 +++++++
- s390x/css.c     | 83 +++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 95 insertions(+)
+ lib/s390x/css.h     | 15 +++++++++
+ lib/s390x/css_lib.c |  2 +-
+ s390x/css.c         | 75 +++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 91 insertions(+), 1 deletion(-)
 
 diff --git a/lib/s390x/css.h b/lib/s390x/css.h
-index 7158423..335bc70 100644
+index 335bc70..7e3d261 100644
 --- a/lib/s390x/css.h
 +++ b/lib/s390x/css.h
-@@ -374,4 +374,16 @@ static inline void schm(void *mbo, unsigned int flags)
- bool css_enable_mb(int sid, uint64_t mb, uint16_t mbi, uint16_t flg, bool fmt1);
- bool css_disable_mb(int schid);
+@@ -107,6 +107,7 @@ struct schib {
+ 	uint64_t mbo;
+ 	uint8_t  md[4];
+ } __attribute__ ((aligned(4)));
++extern struct schib schib;
  
-+struct measurement_block_format0 {
-+	uint16_t ssch_rsch_count;
-+	uint16_t sample_count;
+ struct irb {
+ 	struct scsw scsw;
+@@ -386,4 +387,18 @@ struct measurement_block_format0 {
+ 	uint32_t initial_cmd_resp_time;
+ };
+ 
++struct measurement_block_format1 {
++	uint32_t ssch_rsch_count;
++	uint32_t sample_count;
 +	uint32_t device_connect_time;
 +	uint32_t function_pending_time;
 +	uint32_t device_disconnect_time;
@@ -104,114 +119,114 @@ index 7158423..335bc70 100644
 +	uint32_t device_active_only_time;
 +	uint32_t device_busy_time;
 +	uint32_t initial_cmd_resp_time;
++	uint32_t irq_delay_time;
++	uint32_t irq_prio_delay_time;
 +};
 +
  #endif
+diff --git a/lib/s390x/css_lib.c b/lib/s390x/css_lib.c
+index 8f09383..efc7057 100644
+--- a/lib/s390x/css_lib.c
++++ b/lib/s390x/css_lib.c
+@@ -19,7 +19,7 @@
+ #include <malloc_io.h>
+ #include <css.h>
+ 
+-static struct schib schib;
++struct schib schib;
+ struct chsc_scsc *chsc_scsc;
+ 
+ static const char * const chsc_rsp_description[] = {
 diff --git a/s390x/css.c b/s390x/css.c
-index af68266..658c5f8 100644
+index 658c5f8..c340c53 100644
 --- a/s390x/css.c
 +++ b/s390x/css.c
-@@ -133,6 +133,13 @@ error_ccw:
- 	free_io_mem(senseid, sizeof(*senseid));
+@@ -257,6 +257,80 @@ static void test_schm_fmt0(void)
+ 	free_io_mem(mb0, shared_mb_size);
  }
  
-+static void sense_id(void)
++static void msch_with_wrong_fmt1_mbo(unsigned int schid, uint64_t mb)
 +{
-+	assert(!start_ccw1_chain(test_device_sid, ccw));
++	struct pmcw *pmcw = &schib.pmcw;
++	int cc;
 +
-+	assert(wait_and_check_io_completion(test_device_sid) >= 0);
-+}
-+
- static void css_init(void)
- {
- 	assert(register_io_int_func(css_irq_io) == 0);
-@@ -175,6 +182,81 @@ static void test_schm(void)
- 	report_prefix_pop();
- }
- 
-+#define SCHM_UPDATE_CNT 10
-+static bool start_measuring(uint64_t mbo, uint16_t mbi, bool fmt1)
-+{
-+	int i;
-+
-+	senseid = alloc_io_mem(sizeof(*senseid), 0);
-+	assert(senseid);
-+
-+	ccw = ccw_alloc(CCW_CMD_SENSE_ID, senseid, sizeof(*senseid), CCW_F_SLI);
-+	assert(ccw);
-+
-+	if (!css_enable_mb(test_device_sid, mbo, mbi, PMCW_MBUE, fmt1)) {
-+		report_abort("Enabling measurement block failed");
-+		return false;
++	/* Read the SCHIB for this subchannel */
++	cc = stsch(schid, &schib);
++	if (cc) {
++		report(0, "stsch: sch %08x failed with cc=%d", schid, cc);
++		return;
 +	}
 +
-+	for (i = 0; i < SCHM_UPDATE_CNT; i++)
-+		sense_id();
++	/* Update the SCHIB to enable the measurement block */
++	pmcw->flags |= PMCW_MBUE;
++	pmcw->flags2 |= PMCW_MBF1;
++	schib.mbo = mb;
 +
-+	free_io_mem(ccw, sizeof(*ccw));
-+	free_io_mem(senseid, sizeof(*senseid));
-+
-+	return true;
++	/* Tell the CSS we want to modify the subchannel */
++	expect_pgm_int();
++	cc = msch(schid, &schib);
++	check_pgm_int_code(PGM_INT_CODE_OPERAND);
 +}
 +
 +/*
-+ * test_schm_fmt0:
-+ * With measurement block format 0 a memory space is shared
-+ * by all subchannels, each subchannel can provide an index
-+ * for the measurement block facility to store the measurements.
++ * test_schm_fmt1:
++ * With measurement block format 1 the measurement block is
++ * dedicated to a subchannel.
 + */
-+static void test_schm_fmt0(void)
++static void test_schm_fmt1(void)
 +{
-+	struct measurement_block_format0 *mb0;
-+	int shared_mb_size = 2 * sizeof(struct measurement_block_format0);
++	struct measurement_block_format1 *mb1;
 +
 +	if (!test_device_sid) {
 +		report_skip("No device");
 +		return;
 +	}
 +
++	if (!css_test_general_feature(CSSC_EXTENDED_MEASUREMENT_BLOCK)) {
++		report_skip("Extended measurement block not available");
++		return;
++	}
++
 +	/* Allocate zeroed Measurement block */
-+	mb0 = alloc_io_mem(shared_mb_size, 0);
-+	if (!mb0) {
-+		report_abort("measurement_block_format0 allocation failed");
++	mb1 = alloc_io_mem(sizeof(struct measurement_block_format1), 0);
++	if (!mb1) {
++		report_abort("measurement_block_format1 allocation failed");
 +		return;
 +	}
 +
 +	schm(NULL, 0); /* Stop any previous measurement */
-+	schm(mb0, SCHM_MBU);
++	schm(0, SCHM_MBU);
 +
-+	/* Expect success */
-+	report_prefix_push("Valid MB address and index 0");
-+	report(start_measuring(0, 0, false) &&
-+	       mb0->ssch_rsch_count == SCHM_UPDATE_CNT,
-+	       "SSCH measured %d", mb0->ssch_rsch_count);
++	/* Expect error for non aligned MB */
++	report_prefix_push("Unaligned MB origin");
++	msch_with_wrong_fmt1_mbo(test_device_sid, (uint64_t)mb1 + 1);
 +	report_prefix_pop();
 +
 +	/* Clear the measurement block for the next test */
-+	memset(mb0, 0, shared_mb_size);
++	memset(mb1, 0, sizeof(*mb1));
 +
 +	/* Expect success */
-+	report_prefix_push("Valid MB address and index 1");
-+	if (start_measuring(0, 1, false))
-+		report(mb0[1].ssch_rsch_count == SCHM_UPDATE_CNT,
-+		       "SSCH measured %d", mb0[1].ssch_rsch_count);
++	report_prefix_push("Valid MB origin");
++	if (start_measuring((u64)mb1, 0, true))
++		report(mb1->ssch_rsch_count == SCHM_UPDATE_CNT,
++		       "SSCH measured %d", mb1->ssch_rsch_count);
 +	report_prefix_pop();
 +
 +	/* Stop the measurement */
 +	css_disable_mb(test_device_sid);
 +	schm(NULL, 0);
 +
-+	free_io_mem(mb0, shared_mb_size);
++	free_io_mem(mb1, sizeof(struct measurement_block_format1));
 +}
 +
  static struct {
  	const char *name;
  	void (*func)(void);
-@@ -185,6 +267,7 @@ static struct {
- 	{ "enable (msch)", test_enable },
+@@ -268,6 +342,7 @@ static struct {
  	{ "sense (ssch/tsch)", test_sense },
  	{ "measurement block (schm)", test_schm },
-+	{ "measurement block format0", test_schm_fmt0 },
+ 	{ "measurement block format0", test_schm_fmt0 },
++	{ "measurement block format1", test_schm_fmt1 },
  	{ NULL, NULL }
  };
  
