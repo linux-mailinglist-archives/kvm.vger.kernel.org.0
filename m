@@ -2,115 +2,81 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B5C903398C5
-	for <lists+kvm@lfdr.de>; Fri, 12 Mar 2021 21:59:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 38BBA3398D6
+	for <lists+kvm@lfdr.de>; Fri, 12 Mar 2021 22:07:45 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235114AbhCLU7J (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 12 Mar 2021 15:59:09 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:50946 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S235079AbhCLU6z (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 12 Mar 2021 15:58:55 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1615582734;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=tqrwGSWs78kmFc+bZgFNWuIXo+lT3T9Q8DDXoclb0G4=;
-        b=jBZSQEZ2l3aVpNqcDfR6cXl6+vOPcrraFOzJHNZMMByYd0UoF6uFFF4BETKVfi3z8eDrVq
-        RuDvOIOGY76gRlSktoCCviP3OCJK0XxnoThyxlAxFkfZG1eebWx0YxK2HZs+PTI5yjMbtb
-        bwDkJP31QjYnj9DXXLIQQZhWA4zdJ9E=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-553-nJHOhb7fOK239aU1O3cm5A-1; Fri, 12 Mar 2021 15:58:51 -0500
-X-MC-Unique: nJHOhb7fOK239aU1O3cm5A-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 763838189C7;
-        Fri, 12 Mar 2021 20:58:49 +0000 (UTC)
-Received: from omen.home.shazbot.org (ovpn-112-255.phx2.redhat.com [10.3.112.255])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id E57FF5D9CC;
-        Fri, 12 Mar 2021 20:58:44 +0000 (UTC)
-Date:   Fri, 12 Mar 2021 13:58:44 -0700
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        peterx@redhat.com, prime.zeng@hisilicon.com, cohuck@redhat.com
-Subject: Re: [PATCH] vfio/pci: Handle concurrent vma faults
-Message-ID: <20210312135844.5e97aac7@omen.home.shazbot.org>
-In-Reply-To: <20210312130938.1e535e50@omen.home.shazbot.org>
-References: <161539852724.8302.17137130175894127401.stgit@gimli.home>
-        <20210310181446.GZ2356281@nvidia.com>
-        <20210310113406.6f029fcf@omen.home.shazbot.org>
-        <20210310184011.GA2356281@nvidia.com>
-        <20210312121611.07a313e3@omen.home.shazbot.org>
-        <20210312194147.GH2356281@nvidia.com>
-        <20210312130938.1e535e50@omen.home.shazbot.org>
+        id S234962AbhCLVFd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 12 Mar 2021 16:05:33 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60220 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234961AbhCLVFO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 12 Mar 2021 16:05:14 -0500
+Received: from mail-pg1-x536.google.com (mail-pg1-x536.google.com [IPv6:2607:f8b0:4864:20::536])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1EFBDC061761
+        for <kvm@vger.kernel.org>; Fri, 12 Mar 2021 13:05:14 -0800 (PST)
+Received: by mail-pg1-x536.google.com with SMTP id w34so15583895pga.8
+        for <kvm@vger.kernel.org>; Fri, 12 Mar 2021 13:05:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=6Dit5vwBS0Tl56hF0sV6VbghcZIe1S41EYMzdih+yBg=;
+        b=nEeSswegnhhkAibhJ1uTCz7k5obZ5nRpCoOdtmVAkMw2qaaCjJhhVDtmoL4tNpnCDw
+         Y5LFSWSrhdqOAuH/HVKJ4dk5mN5Mx6FvXYQxPN2A7CDRD9SK5Oc4qZ5qKjf/y10yIm+U
+         OSKK9/uMf/AV42XbKI7nsC/a4baXpBGqGB8GsManeYAWIrs59hulg3oAnNh9jUEjTB66
+         vNO8UAvI9plmjN4fIXrVe6H2bUJUzRmL67aCRXe27F25eXLrkmwsdExayHAA4a9qeQo8
+         Vtf8UudYTpY17b50gdeUC06E0XHFn37p5YCbAkpbpoA8ra/9ybWm42/JtkMCKoUrew5E
+         yXcw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=6Dit5vwBS0Tl56hF0sV6VbghcZIe1S41EYMzdih+yBg=;
+        b=k62ONNRz4fDG1yJcmIz/uVxyc7/n99RMmWwx2/2Gw6f2YqO18gYuBpeTV0MCkP4v08
+         jSiUZPGikMarOlkxn1PdOAR1KjCp+DWHLRtwn+AE07sH2uFaH+RY7YDxusGK39M21yBH
+         QV8CQK71ZPxZj314WAoKB54bXNyM9DJenTrAV/OCIYyST3Z9SY9GJ+hR8pb9gp/ynOLE
+         tw1VAHQQzZJlBIUJbH6k8Oce/JMY8pwq2qre3vrq+9GMiHBEm8wjaRoX8YSR2B9549mM
+         tP6678KXkXrUFg8psNo1CXLewNns9fIhRjy/GCpQNWG/HsdMU9hPpgUr13MbHDKp0o2c
+         Nw9A==
+X-Gm-Message-State: AOAM532BVhbX+OXKA+WLnDrE2sCDhlp6zaugmdWtgKBNMMIfZsFxQOib
+        eEQfAdYyOygnV9q45n3LqKuc3g==
+X-Google-Smtp-Source: ABdhPJzmemUX7SbHrAbNu7g0mrdTwUprvem2ml8WOxUCNjRg9YPyfEYgNbttg2HkiAkobkQsrqU4rQ==
+X-Received: by 2002:a63:f14e:: with SMTP id o14mr14118322pgk.260.1615583113422;
+        Fri, 12 Mar 2021 13:05:13 -0800 (PST)
+Received: from google.com ([2620:15c:f:10:e1a6:2eeb:4e45:756])
+        by smtp.gmail.com with ESMTPSA id v18sm6632395pfn.117.2021.03.12.13.05.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 12 Mar 2021 13:05:12 -0800 (PST)
+Date:   Fri, 12 Mar 2021 13:05:06 -0800
+From:   Sean Christopherson <seanjc@google.com>
+To:     Kai Huang <kai.huang@intel.com>
+Cc:     kvm@vger.kernel.org, x86@kernel.org, linux-sgx@vger.kernel.org,
+        linux-kernel@vger.kernel.org, jarkko@kernel.org, luto@kernel.org,
+        dave.hansen@intel.com, rick.p.edgecombe@intel.com,
+        haitao.huang@intel.com, pbonzini@redhat.com, bp@alien8.de,
+        tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com
+Subject: Re: [PATCH v2 01/25] x86/cpufeatures: Make SGX_LC feature bit depend
+ on SGX bit
+Message-ID: <YEvXgpqvwH2O/5pE@google.com>
+References: <cover.1615250634.git.kai.huang@intel.com>
+ <eaf02a594f0fb27ab3f358a0effef5519f4824e8.1615250634.git.kai.huang@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <eaf02a594f0fb27ab3f358a0effef5519f4824e8.1615250634.git.kai.huang@intel.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 12 Mar 2021 13:09:38 -0700
-Alex Williamson <alex.williamson@redhat.com> wrote:
+On Tue, Mar 09, 2021, Kai Huang wrote:
+> Move SGX_LC feature bit to CPUID dependency table to make clearing all
+> SGX feature bits easier. Also remove clear_sgx_caps() since it is just
+> a wrapper of setup_clear_cpu_cap(X86_FEATURE_SGX) now.
+> 
+> Suggested-by: Sean Christopherson <seanjc@google.com>
+> Acked-by: Dave Hansen <dave.hansen@intel.com>
+> Acked-by: Jarkko Sakkinen <jarkko@kernel.org>
+> Signed-off-by: Kai Huang <kai.huang@intel.com>
+> ---
 
-> On Fri, 12 Mar 2021 15:41:47 -0400
-> Jason Gunthorpe <jgg@nvidia.com> wrote:
-> 
-> 
-> ======================================================
-> WARNING: possible circular locking dependency detected
-> 5.12.0-rc1+ #18 Not tainted
-> ------------------------------------------------------
-> CPU 0/KVM/1406 is trying to acquire lock:
-> ffffffffa5a58d60 (fs_reclaim){+.+.}-{0:0}, at: fs_reclaim_acquire+0x83/0xd0
-> 
-> but task is already holding lock:
-> ffff94c0f3e8fb08 (&mapping->i_mmap_rwsem){++++}-{3:3}, at: vfio_device_io_remap_mapping_range+0x31/0x120 [vfio]
-> 
-> which lock already depends on the new lock.
-> 
-> 
-> the existing dependency chain (in reverse order) is:
-> 
-> -> #1 (&mapping->i_mmap_rwsem){++++}-{3:3}:  
->        down_write+0x3d/0x70
->        dma_resv_lockdep+0x1b0/0x298
->        do_one_initcall+0x5b/0x2d0
->        kernel_init_freeable+0x251/0x298
->        kernel_init+0xa/0x111
->        ret_from_fork+0x22/0x30
-> 
-> -> #0 (fs_reclaim){+.+.}-{0:0}:  
->        __lock_acquire+0x111f/0x1e10
->        lock_acquire+0xb5/0x380
->        fs_reclaim_acquire+0xa3/0xd0
->        kmem_cache_alloc_trace+0x30/0x2c0
->        memtype_reserve+0xc3/0x280
->        reserve_pfn_range+0x86/0x160
->        track_pfn_remap+0xa6/0xe0
->        remap_pfn_range+0xa8/0x610
->        vfio_device_io_remap_mapping_range+0x93/0x120 [vfio]
->        vfio_pci_test_and_up_write_memory_lock+0x34/0x40 [vfio_pci]
->        vfio_basic_config_write+0x12d/0x230 [vfio_pci]
->        vfio_pci_config_rw+0x1b7/0x3a0 [vfio_pci]
->        vfs_write+0xea/0x390
->        __x64_sys_pwrite64+0x72/0xb0
->        do_syscall_64+0x33/0x40
->        entry_SYSCALL_64_after_hwframe+0x44/0xae
-> 
-..
-> > Does current_gfp_context()/memalloc_nofs_save()/etc solve it?  
-
-Yeah, we can indeed use memalloc_nofs_save/restore().  It seems we're
-trying to allocate something for pfnmap tracking and that enables lots
-of lockdep specific tests.  Is it valid to wrap io_remap_pfn_range()
-around clearing this flag or am I just masking a bug?  Thanks,
-
-Alex
-
+Reviewed-by: Sean Christopherson <seanjc@google.com>
