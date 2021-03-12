@@ -2,155 +2,141 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 39E40338769
-	for <lists+kvm@lfdr.de>; Fri, 12 Mar 2021 09:32:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D2BE83388B1
+	for <lists+kvm@lfdr.de>; Fri, 12 Mar 2021 10:30:47 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232274AbhCLIcC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 12 Mar 2021 03:32:02 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38122 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231764AbhCLIcC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 12 Mar 2021 03:32:02 -0500
-Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D9250C061574
-        for <kvm@vger.kernel.org>; Fri, 12 Mar 2021 00:32:01 -0800 (PST)
-Received: by mail-pj1-x1031.google.com with SMTP id mz6-20020a17090b3786b02900c16cb41d63so10730362pjb.2
-        for <kvm@vger.kernel.org>; Fri, 12 Mar 2021 00:32:01 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=CXpW0jwlizj8GYTWHzwU8bAHHZKAdwaecc1NswSz/OE=;
-        b=Ccj25YDTPKU/57oEL/GyBbzdoG3Cad1MC5quVjSh1ZoLeLYp/oRlBjJJWGKN2QAFlP
-         8299qZp3bQJMvvbvg1UTV+zydy/b2Hzgexu50JBiylyqKEq46bc3pxUCPDFH3O36/LFX
-         kJ+br9H0Eb+q7AWaSuzrLYEOlgZTmA5nHPPYPoRt2LjDcOCsvEhsiwDSpQOONFpBj6Go
-         lJyzEU4SzgXRLk2vkkV6B0KiscdvSAgwj+n3cN2FQBeBE4YQHa/XEJpZ1m7pXyy5owU2
-         fc+DgjWfaINp1NjLkCk0FcGg5htcxCPhikvIYN9Plw+biynveEp+496yv3vFkoYHUetv
-         h+kA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=CXpW0jwlizj8GYTWHzwU8bAHHZKAdwaecc1NswSz/OE=;
-        b=nQQMPoO+mKl8QDA2Rp+sTebfGaDdU/aUsZ2n7IqL6PYITbDRlaff+fNwiROoZ9wJYs
-         Njza0wHrzo39bIZ0VV4eNKc5dbQf6NZkZ34xH45+JSBhRIoEC3KNpOvbg/aLQshBRx5m
-         24jp6zyMgjQd1kaiQSKll4wRl5Ef5aXFqWcR+GF/G7QocgKNrNHS0q+nXeDd6Gk257Qd
-         eQ6rQHq1FKzc41G+D0D5mhcC3e4pDi3yJ9QNQGn0QBeAluUSRPYpUmRKhTUwA0442PQV
-         jd2ISV5gBHzs6eNGt28MHPY15iF41l5dsskgNkyFhRtuv7W7PtRfGt/lHkfiClFpZ/W+
-         Txdg==
-X-Gm-Message-State: AOAM531mTeWJpx3S7ciDe3xPEKbWrVwvpLK/YFTOzbyTXIzRi5q0/iMZ
-        PpE5opFOSSLekm75biyMxuI=
-X-Google-Smtp-Source: ABdhPJwP36IB34Owww3eDhkOSn0CtURJiGKPlguqyhIT5PdyQT3VFZJB4jFJR0/0jvVLyHI542wg2A==
-X-Received: by 2002:a17:90a:c389:: with SMTP id h9mr13158014pjt.226.1615537921339;
-        Fri, 12 Mar 2021 00:32:01 -0800 (PST)
-Received: from localhost (176.222.229.35.bc.googleusercontent.com. [35.229.222.176])
-        by smtp.gmail.com with ESMTPSA id c25sm4340198pfo.101.2021.03.12.00.31.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 12 Mar 2021 00:32:00 -0800 (PST)
-From:   Yuan Yao <yaoyuan0329os@gmail.com>
-To:     pbonzini@redhat.com, kvm@vger.kernel.org
-Cc:     Yuan Yao <yaoyuan0329os@gmail.com>
-Subject: [PATCH 1/1] Fix potential bitmap corruption in ksm_msr_allowed()
-Date:   Fri, 12 Mar 2021 16:31:57 +0800
-Message-Id: <20210312083157.25403-1-yaoyuan0329os@gmail.com>
-X-Mailer: git-send-email 2.30.1
+        id S232850AbhCLJaI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 12 Mar 2021 04:30:08 -0500
+Received: from szxga07-in.huawei.com ([45.249.212.35]:13883 "EHLO
+        szxga07-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232860AbhCLJ3r (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 12 Mar 2021 04:29:47 -0500
+Received: from DGGEMS407-HUB.china.huawei.com (unknown [172.30.72.58])
+        by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4DxgTR1Pjnz8x4g;
+        Fri, 12 Mar 2021 17:27:55 +0800 (CST)
+Received: from [10.174.184.42] (10.174.184.42) by
+ DGGEMS407-HUB.china.huawei.com (10.3.19.207) with Microsoft SMTP Server id
+ 14.3.498.0; Fri, 12 Mar 2021 17:29:35 +0800
+Subject: Re: [RFC PATCH] kvm: arm64: Try stage2 block mapping for host device
+ MMIO
+To:     Marc Zyngier <maz@kernel.org>
+References: <20210122083650.21812-1-zhukeqian1@huawei.com>
+ <87y2euf5d2.wl-maz@kernel.org>
+ <e2a36913-2ded-71ff-d3ed-f7f8d831447c@huawei.com>
+ <87o8fog3et.wl-maz@kernel.org>
+CC:     <linux-kernel@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>, <kvm@vger.kernel.org>,
+        <kvmarm@lists.cs.columbia.edu>, Will Deacon <will@kernel.org>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        James Morse <james.morse@arm.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Daniel Lezcano <daniel.lezcano@linaro.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        "Suzuki K Poulose" <suzuki.poulose@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Alexios Zavras <alexios.zavras@intel.com>,
+        <wanghaibin.wang@huawei.com>, <jiangkunkun@huawei.com>
+From:   Keqian Zhu <zhukeqian1@huawei.com>
+Message-ID: <e0859e30-a4ca-7456-385e-c9efd914e1e4@huawei.com>
+Date:   Fri, 12 Mar 2021 17:29:34 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
+ Thunderbird/45.7.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <87o8fog3et.wl-maz@kernel.org>
+Content-Type: text/plain; charset="windows-1252"
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.174.184.42]
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-In ksm_msr_allowed() we read "count" out of the SRCU read section,
-this may cause access to corrupted bitmap in ksm_msr_allowed()
-due to kfree() by kvm_clear_msr_filter() in very small ratio.
+Hi Marc,
 
-We can fix this by reading "count" value in the SRCU read
-section. The big comment block below shows detail of this
-issue:
+On 2021/3/12 16:52, Marc Zyngier wrote:
+> On Thu, 11 Mar 2021 14:28:17 +0000,
+> Keqian Zhu <zhukeqian1@huawei.com> wrote:
+>>
+>> Hi Marc,
+>>
+>> On 2021/3/11 16:43, Marc Zyngier wrote:
+>>> Digging this patch back from my Inbox...
+>> Yeah, thanks ;-)
+>>
+>>>
+>>> On Fri, 22 Jan 2021 08:36:50 +0000,
+>>> Keqian Zhu <zhukeqian1@huawei.com> wrote:
+>>>>
+>>>> The MMIO region of a device maybe huge (GB level), try to use block
+>>>> mapping in stage2 to speedup both map and unmap.
+[...]
 
-===== Details =====
-bool kvm_msr_allowed(struct kvm_vcpu *vcpu, u32 index, u32 type)
-{
-	struct kvm *kvm = vcpu->kvm;
-	struct msr_bitmap_range *ranges = kvm->arch.msr_filter.ranges;
-	u32 count = kvm->arch.msr_filter.count;
+>>>>  			break;
+>>>>  
+>>>> -		pa += PAGE_SIZE;
+>>>> +		pa += pgsize;
+>>>>  	}
+>>>>  
+>>>>  	kvm_mmu_free_memory_cache(&cache);
+>>>
+>>> There is one issue with this patch, which is that it only does half
+>>> the job. A VM_PFNMAP VMA can definitely be faulted in dynamically, and
+>>> in that case we force this to be a page mapping. This conflicts with
+>>> what you are doing here.
+>> Oh yes, these two paths should keep a same mapping logic.
+>>
+>> I try to search the "force_pte" and find out some discussion [1]
+>> between you and Christoffer.  And I failed to get a reason about
+>> forcing pte mapping for device MMIO region (expect that we want to
+>> keep a same logic with the eager mapping path). So if you don't
+>> object to it, I will try to implement block mapping for device MMIO
+>> in user_mem_abort().
+>>
+>>>
+>>> There is also the fact that if we can map things on demand, why are we
+>>> still mapping these MMIO regions ahead of time?
+>>
+>> Indeed. Though this provides good *startup* performance for guest
+>> accessing MMIO, it's hard to keep the two paths in sync. We can keep
+>> this minor optimization or delete it to avoid hard maintenance,
+>> which one do you prefer?
+> 
+> I think we should be able to get rid of the startup path. If we can do
+> it for memory, I see no reason not to do it for MMIO.
+OK, I will do.
 
-    /*
-       Schedule out happenes at this point, but before the
-       kvm_clear_msr_filter() run "kvm->arch.msr_filter.count = 0;"
-       on another CPU, so we get the "old" count value which should
-       be > 0 if QEMU already set the MSR filter before.
-    */
+> 
+>> BTW, could you please have a look at my another patch series[2]
+>> about HW/SW combined dirty log? ;)
+> 
+> I will eventually, but while I really appreciate your contributions in
+> terms of features and bug fixes, I would really *love* it if you were
+> a bit more active on the list when it comes to reviewing other
+> people's code.
+> 
+> There is no shortage of patches that really need reviewing, and just
+> pointing me in the direction of your favourite series doesn't really
+> help. I have something like 200+ patches that need careful reviewing
+> in my inbox, and they all deserve the same level of attention.
+> 
+> To make it short, help me to help you!
+My apologies, and I can't agree more.
 
-	u32 i;
-	bool r = kvm->arch.msr_filter.default_allow;
-	int idx;
+I have noticed this, and have reviewed several patches of IOMMU community.
+For that some patches are with much background knowledge, so it's hard to
+review. I will dig into them in the future.
 
-	/* MSR filtering not set up or x2APIC enabled, allow everything */
-	if (!count || (index >= 0x800 && index <= 0x8ff))
-		return true;
+Thanks for your valuable advice. :)
 
-    /*
-       Schedule in at this point later, now it has very small
-       ratio that the kvm_clear_msr_filter() run on another CPU is
-       doing "kfree(ranges[i].bitmap)" due to no exist srcu read
-       sections of kvm->srcu, then the below code will access
-       to a currupted(kfreed) bitmap, we already got count > 0
-       before.
-    */
+Thanks,
+Keqian
 
-	/* Prevent collision with set_msr_filter */
-	idx = srcu_read_lock(&kvm->srcu);
 
-	for (i = 0; i < count; i++) {
-		u32 start = ranges[i].base;
-		u32 end = start + ranges[i].nmsrs;
-		u32 flags = ranges[i].flags;
-		unsigned long *bitmap = ranges[i].bitmap;
-
-		if ((index >= start) && (index < end) && (flags & type)) {
-			r = !!test_bit(index - start, bitmap);
-			break;
-		}
-	}
-
-	srcu_read_unlock(&kvm->srcu, idx);
-
-	return r;
-}
----
- arch/x86/kvm/x86.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
-
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 46b0e52671bb..d6bc1b858167 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -1528,18 +1528,22 @@ bool kvm_msr_allowed(struct kvm_vcpu *vcpu, u32 index, u32 type)
- {
- 	struct kvm *kvm = vcpu->kvm;
- 	struct msr_bitmap_range *ranges = kvm->arch.msr_filter.ranges;
--	u32 count = kvm->arch.msr_filter.count;
-+	u32 count;
- 	u32 i;
- 	bool r = kvm->arch.msr_filter.default_allow;
- 	int idx;
- 
- 	/* MSR filtering not set up or x2APIC enabled, allow everything */
--	if (!count || (index >= 0x800 && index <= 0x8ff))
-+	if (index >= 0x800 && index <= 0x8ff)
- 		return true;
- 
- 	/* Prevent collision with set_msr_filter */
- 	idx = srcu_read_lock(&kvm->srcu);
- 
-+	count = kvm->arch.msr_filter.count;
-+	if (!count)
-+		r = true;
-+
- 	for (i = 0; i < count; i++) {
- 		u32 start = ranges[i].base;
- 		u32 end = start + ranges[i].nmsrs;
--- 
-2.30.1
-
+> 
+> Thanks,
+> 
+> 	M.
+> 
