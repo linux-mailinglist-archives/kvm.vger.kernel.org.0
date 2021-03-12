@@ -2,116 +2,122 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A10B7338A8E
-	for <lists+kvm@lfdr.de>; Fri, 12 Mar 2021 11:50:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E88A1338B53
+	for <lists+kvm@lfdr.de>; Fri, 12 Mar 2021 12:16:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233437AbhCLKt5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 12 Mar 2021 05:49:57 -0500
-Received: from szxga04-in.huawei.com ([45.249.212.190]:13156 "EHLO
-        szxga04-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233633AbhCLKt1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 12 Mar 2021 05:49:27 -0500
-Received: from DGGEMS404-HUB.china.huawei.com (unknown [172.30.72.60])
-        by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4DxjCv5Q4pzmWPx;
-        Fri, 12 Mar 2021 18:46:19 +0800 (CST)
-Received: from [10.174.184.135] (10.174.184.135) by
- DGGEMS404-HUB.china.huawei.com (10.3.19.204) with Microsoft SMTP Server id
- 14.3.498.0; Fri, 12 Mar 2021 18:48:29 +0800
-Subject: Re: [PATCH v3 3/4] KVM: arm64: GICv4.1: Restore VLPI's pending state
- to physical side
-To:     Marc Zyngier <maz@kernel.org>
-CC:     Eric Auger <eric.auger@redhat.com>, Will Deacon <will@kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>,
-        <kvmarm@lists.cs.columbia.edu>, <kvm@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        "Lorenzo Pieralisi" <lorenzo.pieralisi@arm.com>,
-        <wanghaibin.wang@huawei.com>, <yuzenghui@huawei.com>
-References: <20210127121337.1092-1-lushenming@huawei.com>
- <20210127121337.1092-4-lushenming@huawei.com> <87tupif3x3.wl-maz@kernel.org>
- <0820f429-4c29-acd6-d9e0-af9f6deb68e4@huawei.com>
- <87k0qcg2s6.wl-maz@kernel.org>
-From:   Shenming Lu <lushenming@huawei.com>
-Message-ID: <aecfbf72-c653-e967-b539-89f629b52cde@huawei.com>
-Date:   Fri, 12 Mar 2021 18:48:29 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.2.2
+        id S233332AbhCLLPq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 12 Mar 2021 06:15:46 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:28075 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S233639AbhCLLPf (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 12 Mar 2021 06:15:35 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1615547734;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=hXSshFQeFLOgp+frZhl0j2pqci63p2uc+L6BvWuJgGc=;
+        b=EjGbAqUT+7yqt/nCQDCIPnn+Uc1miZfOf/PcoEQqseLVgLLEbxYGfmBXycrCFJIbPQiIhx
+        BZhnIVfkQK+wYlWMcKsZX27GRZSe2r2ebRjET5uzIVtudDOPj0aYwkwXbrBKukug90oFeS
+        ZdraPcWllzNyHgP9GqFnm3LUV6Dk6q8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-207-QvrsFBn2OPm5U9RfuB7OUg-1; Fri, 12 Mar 2021 06:15:30 -0500
+X-MC-Unique: QvrsFBn2OPm5U9RfuB7OUg-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 27152100C691;
+        Fri, 12 Mar 2021 11:15:28 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.40.192.104])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 991C17A8CA;
+        Fri, 12 Mar 2021 11:14:59 +0000 (UTC)
+Date:   Fri, 12 Mar 2021 12:14:56 +0100
+From:   Andrew Jones <drjones@redhat.com>
+To:     Yanan Wang <wangyanan55@huawei.com>
+Cc:     kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Ben Gardon <bgardon@google.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Peter Xu <peterx@redhat.com>, Marc Zyngier <maz@kernel.org>,
+        Ingo Molnar <mingo@kernel.org>,
+        Adrian Hunter <adrian.hunter@intel.com>,
+        Jiri Olsa <jolsa@redhat.com>,
+        Arnaldo Carvalho de Melo <acme@redhat.com>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Michael Kerrisk <mtk.manpages@gmail.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        wanghaibin.wang@huawei.com, yezengruan@huawei.com,
+        yuzenghui@huawei.com
+Subject: Re: [RFC PATCH v4 2/9] tools headers: Add a macro to get HUGETLB
+ page sizes for mmap
+Message-ID: <20210312111456.ukxss6uxu3frqmiu@kamzik.brq.redhat.com>
+References: <20210302125751.19080-1-wangyanan55@huawei.com>
+ <20210302125751.19080-3-wangyanan55@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <87k0qcg2s6.wl-maz@kernel.org>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.174.184.135]
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210302125751.19080-3-wangyanan55@huawei.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2021/3/12 17:05, Marc Zyngier wrote:
-> On Thu, 11 Mar 2021 12:32:07 +0000,
-> Shenming Lu <lushenming@huawei.com> wrote:
->>
->> On 2021/3/11 17:14, Marc Zyngier wrote:
->>> On Wed, 27 Jan 2021 12:13:36 +0000,
->>> Shenming Lu <lushenming@huawei.com> wrote:
->>>>
->>>> From: Zenghui Yu <yuzenghui@huawei.com>
->>>>
->>>> When setting the forwarding path of a VLPI (switch to the HW mode),
->>>> we could also transfer the pending state from irq->pending_latch to
->>>> VPT (especially in migration, the pending states of VLPIs are restored
->>>> into kvm’s vgic first). And we currently send "INT+VSYNC" to trigger
->>>> a VLPI to pending.
->>>>
->>>> Signed-off-by: Zenghui Yu <yuzenghui@huawei.com>
->>>> Signed-off-by: Shenming Lu <lushenming@huawei.com>
->>>> ---
->>>>  arch/arm64/kvm/vgic/vgic-v4.c | 14 ++++++++++++++
->>>>  1 file changed, 14 insertions(+)
->>>>
->>>> diff --git a/arch/arm64/kvm/vgic/vgic-v4.c b/arch/arm64/kvm/vgic/vgic-v4.c
->>>> index ac029ba3d337..a3542af6f04a 100644
->>>> --- a/arch/arm64/kvm/vgic/vgic-v4.c
->>>> +++ b/arch/arm64/kvm/vgic/vgic-v4.c
->>>> @@ -449,6 +449,20 @@ int kvm_vgic_v4_set_forwarding(struct kvm *kvm, int virq,
->>>>  	irq->host_irq	= virq;
->>>>  	atomic_inc(&map.vpe->vlpi_count);
->>>>  
->>>> +	/* Transfer pending state */
->>>> +	if (irq->pending_latch) {
->>>> +		ret = irq_set_irqchip_state(irq->host_irq,
->>>> +					    IRQCHIP_STATE_PENDING,
->>>> +					    irq->pending_latch);
->>>> +		WARN_RATELIMIT(ret, "IRQ %d", irq->host_irq);
->>>> +
->>>> +		/*
->>>> +		 * Let it be pruned from ap_list later and don't bother
->>>> +		 * the List Register.
->>>> +		 */
->>>> +		irq->pending_latch = false;
->>>
->>> NAK. If the interrupt is on the AP list, it must be pruned from it
->>> *immediately*. The only case where it can be !pending and still on the
->>> AP list is in interval between sync and prune. If we start messing
->>> with this, we can't reason about the state of this list anymore.
->>>
->>> Consider calling vgic_queue_irq_unlock() here.
->>
->> Thanks for giving a hint, but it seems that vgic_queue_irq_unlock() only
->> queues an IRQ after checking, did you mean vgic_prune_ap_list() instead?
+On Tue, Mar 02, 2021 at 08:57:44PM +0800, Yanan Wang wrote:
+> We know that if a system supports multiple hugetlb page sizes,
+> the desired hugetlb page size can be specified in bits [26:31]
+> of the flag arguments. The value in these 6 bits will be the
+> shift of each hugetlb page size.
 > 
-> No, I really mean vgic_queue_irq_unlock(). It can be used to remove
-> the pending state from an interrupt, and drop it from the AP
-> list. This is exactly what happens when clearing the pending state of
-> a level interrupt, for example.
-
-Hi, I have gone through vgic_queue_irq_unlock more than once, but still can't
-find the place in it to drop an IRQ from the AP list... Did I miss something ?...
-Or could you help to point it out? Thanks very much for this!
-
-Shenming
-
+> So add a macro to get the page size shift and then calculate the
+> corresponding hugetlb page size, using flag x.
 > 
-> 	M.
+> Cc: Ben Gardon <bgardon@google.com>
+> Cc: Ingo Molnar <mingo@kernel.org>
+> Cc: Adrian Hunter <adrian.hunter@intel.com>
+> Cc: Jiri Olsa <jolsa@redhat.com>
+> Cc: Arnaldo Carvalho de Melo <acme@redhat.com>
+> Cc: Arnd Bergmann <arnd@arndb.de>
+> Cc: Michael Kerrisk <mtk.manpages@gmail.com>
+> Cc: Thomas Gleixner <tglx@linutronix.de>
+> Suggested-by: Ben Gardon <bgardon@google.com>
+> Signed-off-by: Yanan Wang <wangyanan55@huawei.com>
+> Reviewed-by: Ben Gardon <bgardon@google.com>
+> ---
+>  include/uapi/linux/mman.h       | 2 ++
+>  tools/include/uapi/linux/mman.h | 2 ++
+>  2 files changed, 4 insertions(+)
 > 
+> diff --git a/include/uapi/linux/mman.h b/include/uapi/linux/mman.h
+> index f55bc680b5b0..8bd41128a0ee 100644
+> --- a/include/uapi/linux/mman.h
+> +++ b/include/uapi/linux/mman.h
+> @@ -41,4 +41,6 @@
+>  #define MAP_HUGE_2GB	HUGETLB_FLAG_ENCODE_2GB
+>  #define MAP_HUGE_16GB	HUGETLB_FLAG_ENCODE_16GB
+>  
+> +#define MAP_HUGE_PAGE_SIZE(x) (1 << ((x >> MAP_HUGE_SHIFT) & MAP_HUGE_MASK))
+
+Needs to be '1ULL' to avoid shift overflow when given MAP_HUGE_16GB.
+
+Thanks,
+drew
+
+> +
+>  #endif /* _UAPI_LINUX_MMAN_H */
+> diff --git a/tools/include/uapi/linux/mman.h b/tools/include/uapi/linux/mman.h
+> index f55bc680b5b0..8bd41128a0ee 100644
+> --- a/tools/include/uapi/linux/mman.h
+> +++ b/tools/include/uapi/linux/mman.h
+> @@ -41,4 +41,6 @@
+>  #define MAP_HUGE_2GB	HUGETLB_FLAG_ENCODE_2GB
+>  #define MAP_HUGE_16GB	HUGETLB_FLAG_ENCODE_16GB
+>  
+> +#define MAP_HUGE_PAGE_SIZE(x) (1 << ((x >> MAP_HUGE_SHIFT) & MAP_HUGE_MASK))
+> +
+>  #endif /* _UAPI_LINUX_MMAN_H */
+> -- 
+> 2.23.0
+> 
+
