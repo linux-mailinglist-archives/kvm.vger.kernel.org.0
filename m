@@ -2,80 +2,65 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0FADB339209
-	for <lists+kvm@lfdr.de>; Fri, 12 Mar 2021 16:45:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3831F339286
+	for <lists+kvm@lfdr.de>; Fri, 12 Mar 2021 16:57:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232389AbhCLPpK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 12 Mar 2021 10:45:10 -0500
-Received: from mail.kernel.org ([198.145.29.99]:59146 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232665AbhCLPol (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 12 Mar 2021 10:44:41 -0500
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        id S231745AbhCLP4v (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 12 Mar 2021 10:56:51 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:44224 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232217AbhCLP4m (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 12 Mar 2021 10:56:42 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1615564601;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=iNRqHcH9ezVvoDkXmsp5dMKADlIQxuqTBWArK12WKOY=;
+        b=dvi8OgSsFGWvc22jn02QxNWA1GYMAmfptHQLAG0W5eq77XY3KhojhTXocdBgPSfCzQRrah
+        YbIo9hEFzF/X/llVYEn9yaNylcB6UzJXQsM4Y9Ea1BwtkO5UbBc4KXzk9gOVE2L5qbKIJW
+        KD/gLdHqwqiK+gbXIb2UODWmORb+Ios=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-533-AmwVcowHNL29SXiSWjhFBw-1; Fri, 12 Mar 2021 10:56:39 -0500
+X-MC-Unique: AmwVcowHNL29SXiSWjhFBw-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id BF86864FDC;
-        Fri, 12 Mar 2021 15:44:40 +0000 (UTC)
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-        (Exim 4.94)
-        (envelope-from <maz@kernel.org>)
-        id 1lKjxu-001Fuj-NY; Fri, 12 Mar 2021 15:44:38 +0000
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9ECD81015C84;
+        Fri, 12 Mar 2021 15:56:38 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-112-83.ams2.redhat.com [10.36.112.83])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id A47445C1D1;
+        Fri, 12 Mar 2021 15:56:32 +0000 (UTC)
+Subject: Re: [kvm-unit-tests PATCH v1 1/1] s390x: mvpg: add checks for
+ op_acc_id
+To:     Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     david@redhat.com, frankja@linux.ibm.com, cohuck@redhat.com,
+        pmorel@linux.ibm.com
+References: <20210312124700.142269-1-imbrenda@linux.ibm.com>
+From:   Thomas Huth <thuth@redhat.com>
+Message-ID: <4dff44ab-f668-c405-cdaf-0ff01b33d23f@redhat.com>
+Date:   Fri, 12 Mar 2021 16:56:31 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
+In-Reply-To: <20210312124700.142269-1-imbrenda@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Date:   Fri, 12 Mar 2021 15:44:38 +0000
-From:   Marc Zyngier <maz@kernel.org>
-To:     Andrew Jones <drjones@redhat.com>
-Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Will Deacon <will@kernel.org>,
-        Eric Auger <eric.auger@redhat.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        kernel-team@android.com, stable@vger.kernel.org
-Subject: Re: [PATCH v3 2/2] KVM: arm64: Fix exclusive limit for IPA size
-In-Reply-To: <20210311111500.uqy4lolxtp7t4xd4@kamzik.brq.redhat.com>
-References: <20210311100016.3830038-1-maz@kernel.org>
- <20210311100016.3830038-3-maz@kernel.org>
- <20210311111500.uqy4lolxtp7t4xd4@kamzik.brq.redhat.com>
-User-Agent: Roundcube Webmail/1.4.11
-Message-ID: <7ce8f57d2bcc19a77993fc01845ac6cb@kernel.org>
-X-Sender: maz@kernel.org
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: drjones@redhat.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, will@kernel.org, eric.auger@redhat.com, alexandru.elisei@arm.com, kernel-team@android.com, stable@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2021-03-11 11:15, Andrew Jones wrote:
-> On Thu, Mar 11, 2021 at 10:00:16AM +0000, Marc Zyngier wrote:
->> When registering a memslot, we check the size and location of that
->> memslot against the IPA size to ensure that we can provide guest
->> access to the whole of the memory.
->> 
->> Unfortunately, this check rejects memslot that end-up at the exact
->> limit of the addressing capability for a given IPA size. For example,
->> it refuses the creation of a 2GB memslot at 0x8000000 with a 32bit
->> IPA space.
->> 
->> Fix it by relaxing the check to accept a memslot reaching the
->> limit of the IPA space.
->> 
->> Fixes: e55cac5bf2a9 ("kvm: arm/arm64: Prepare for VM specific stage2 
->> translations")
+On 12/03/2021 13.47, Claudio Imbrenda wrote:
+> Check the operand access identification when MVPG causes a page fault.
 > 
-> Isn't this actually fixing commit c3058d5da222 ("arm/arm64: KVM: Ensure
-> memslots are within KVM_PHYS_SIZE") ?
+> Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+> ---
+>   s390x/mvpg.c | 28 ++++++++++++++++++++++++++--
+>   1 file changed, 26 insertions(+), 2 deletions(-)
 
-Ah, yes, that's indeed better (more backport work... ;-)
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 
-Thanks,
-
-         M.
--- 
-Jazz is not dead. It just smells funny...
