@@ -2,23 +2,23 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id ADCAA338A85
-	for <lists+kvm@lfdr.de>; Fri, 12 Mar 2021 11:48:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A10B7338A8E
+	for <lists+kvm@lfdr.de>; Fri, 12 Mar 2021 11:50:30 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233594AbhCLKrr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 12 Mar 2021 05:47:47 -0500
-Received: from szxga07-in.huawei.com ([45.249.212.35]:13886 "EHLO
-        szxga07-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233497AbhCLKrP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 12 Mar 2021 05:47:15 -0500
-Received: from DGGEMS403-HUB.china.huawei.com (unknown [172.30.72.59])
-        by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4DxjBr137Kz8x4p;
-        Fri, 12 Mar 2021 18:45:24 +0800 (CST)
+        id S233437AbhCLKt5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 12 Mar 2021 05:49:57 -0500
+Received: from szxga04-in.huawei.com ([45.249.212.190]:13156 "EHLO
+        szxga04-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233633AbhCLKt1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 12 Mar 2021 05:49:27 -0500
+Received: from DGGEMS404-HUB.china.huawei.com (unknown [172.30.72.60])
+        by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4DxjCv5Q4pzmWPx;
+        Fri, 12 Mar 2021 18:46:19 +0800 (CST)
 Received: from [10.174.184.135] (10.174.184.135) by
- DGGEMS403-HUB.china.huawei.com (10.3.19.203) with Microsoft SMTP Server id
- 14.3.498.0; Fri, 12 Mar 2021 18:47:04 +0800
-Subject: Re: [PATCH v3 2/4] KVM: arm64: GICv4.1: Try to save hw pending state
- in save_pending_tables
+ DGGEMS404-HUB.china.huawei.com (10.3.19.204) with Microsoft SMTP Server id
+ 14.3.498.0; Fri, 12 Mar 2021 18:48:29 +0800
+Subject: Re: [PATCH v3 3/4] KVM: arm64: GICv4.1: Restore VLPI's pending state
+ to physical side
 To:     Marc Zyngier <maz@kernel.org>
 CC:     Eric Auger <eric.auger@redhat.com>, Will Deacon <will@kernel.org>,
         <linux-arm-kernel@lists.infradead.org>,
@@ -29,69 +29,89 @@ CC:     Eric Auger <eric.auger@redhat.com>, Will Deacon <will@kernel.org>,
         "Lorenzo Pieralisi" <lorenzo.pieralisi@arm.com>,
         <wanghaibin.wang@huawei.com>, <yuzenghui@huawei.com>
 References: <20210127121337.1092-1-lushenming@huawei.com>
- <20210127121337.1092-3-lushenming@huawei.com> <87v99yf450.wl-maz@kernel.org>
- <3b47598f-0795-a165-1a64-abe02258b306@huawei.com>
- <87lfasg2wt.wl-maz@kernel.org>
+ <20210127121337.1092-4-lushenming@huawei.com> <87tupif3x3.wl-maz@kernel.org>
+ <0820f429-4c29-acd6-d9e0-af9f6deb68e4@huawei.com>
+ <87k0qcg2s6.wl-maz@kernel.org>
 From:   Shenming Lu <lushenming@huawei.com>
-Message-ID: <f43021d8-81f5-81ee-4561-7cfa52ae8023@huawei.com>
-Date:   Fri, 12 Mar 2021 18:47:04 +0800
+Message-ID: <aecfbf72-c653-e967-b539-89f629b52cde@huawei.com>
+Date:   Fri, 12 Mar 2021 18:48:29 +0800
 User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
  Thunderbird/78.2.2
 MIME-Version: 1.0
-In-Reply-To: <87lfasg2wt.wl-maz@kernel.org>
+In-Reply-To: <87k0qcg2s6.wl-maz@kernel.org>
 Content-Type: text/plain; charset="utf-8"
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 X-Originating-IP: [10.174.184.135]
 X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2021/3/12 17:02, Marc Zyngier wrote:
-> On Thu, 11 Mar 2021 12:31:48 +0000,
+On 2021/3/12 17:05, Marc Zyngier wrote:
+> On Thu, 11 Mar 2021 12:32:07 +0000,
 > Shenming Lu <lushenming@huawei.com> wrote:
 >>
->> On 2021/3/11 17:09, Marc Zyngier wrote:
-> 
->>> I have asked that question in the past: is it actually safe to remap
->>> the vPEs and expect them to be runnable
->>
->> In my opinion, logically it can work, but there might be problems like the
->> one below that I didn't notice...
-> 
-> One thing is that you will have lost interrupts in the meantime
-> (assuming your devices are still alive). How will you make up for
-> that?
-
-I think that devices should be paused for (not only) saving interrupt states,
-and in fact, that's exactly what such as VFIO devices do...
-
-> 
->>
+>> On 2021/3/11 17:14, Marc Zyngier wrote:
+>>> On Wed, 27 Jan 2021 12:13:36 +0000,
+>>> Shenming Lu <lushenming@huawei.com> wrote:
+>>>>
+>>>> From: Zenghui Yu <yuzenghui@huawei.com>
+>>>>
+>>>> When setting the forwarding path of a VLPI (switch to the HW mode),
+>>>> we could also transfer the pending state from irq->pending_latch to
+>>>> VPT (especially in migration, the pending states of VLPIs are restored
+>>>> into kvm’s vgic first). And we currently send "INT+VSYNC" to trigger
+>>>> a VLPI to pending.
+>>>>
+>>>> Signed-off-by: Zenghui Yu <yuzenghui@huawei.com>
+>>>> Signed-off-by: Shenming Lu <lushenming@huawei.com>
+>>>> ---
+>>>>  arch/arm64/kvm/vgic/vgic-v4.c | 14 ++++++++++++++
+>>>>  1 file changed, 14 insertions(+)
+>>>>
+>>>> diff --git a/arch/arm64/kvm/vgic/vgic-v4.c b/arch/arm64/kvm/vgic/vgic-v4.c
+>>>> index ac029ba3d337..a3542af6f04a 100644
+>>>> --- a/arch/arm64/kvm/vgic/vgic-v4.c
+>>>> +++ b/arch/arm64/kvm/vgic/vgic-v4.c
+>>>> @@ -449,6 +449,20 @@ int kvm_vgic_v4_set_forwarding(struct kvm *kvm, int virq,
+>>>>  	irq->host_irq	= virq;
+>>>>  	atomic_inc(&map.vpe->vlpi_count);
+>>>>  
+>>>> +	/* Transfer pending state */
+>>>> +	if (irq->pending_latch) {
+>>>> +		ret = irq_set_irqchip_state(irq->host_irq,
+>>>> +					    IRQCHIP_STATE_PENDING,
+>>>> +					    irq->pending_latch);
+>>>> +		WARN_RATELIMIT(ret, "IRQ %d", irq->host_irq);
+>>>> +
+>>>> +		/*
+>>>> +		 * Let it be pruned from ap_list later and don't bother
+>>>> +		 * the List Register.
+>>>> +		 */
+>>>> +		irq->pending_latch = false;
 >>>
->>> Also, the current code assumes that VMAPP.PTZ can be advertised if a
->>> VPT is mapped for the first time. Clearly, it is unlikely that the VPT
->>> will be only populated with 0s, so you'll end up with state corruption
->>> on the first remap.
+>>> NAK. If the interrupt is on the AP list, it must be pruned from it
+>>> *immediately*. The only case where it can be !pending and still on the
+>>> AP list is in interval between sync and prune. If we start messing
+>>> with this, we can't reason about the state of this list anymore.
+>>>
+>>> Consider calling vgic_queue_irq_unlock() here.
 >>
->> Oh, thanks for pointing it out.
->> And if we always signal PTZ when alloc = 1, does it mean that we
->> can't remap the vPE when the VPT is not empty, thus there is no
->> chance to get the VLPI state?  Could we just assume that the VPT is
->> not empty when first mapping the vPE?
+>> Thanks for giving a hint, but it seems that vgic_queue_irq_unlock() only
+>> queues an IRQ after checking, did you mean vgic_prune_ap_list() instead?
 > 
-> I think we should drop the setting of PTZ altogether. It is a silly
-> micro-optimisation, and if the HW can't parse the VPT efficiently when
-> it is empty, then the HW is pretty bad, PTZ or not.
+> No, I really mean vgic_queue_irq_unlock(). It can be used to remove
+> the pending state from an interrupt, and drop it from the AP
+> list. This is exactly what happens when clearing the pending state of
+> a level interrupt, for example.
 
-agree :-)
+Hi, I have gone through vgic_queue_irq_unlock more than once, but still can't
+find the place in it to drop an IRQ from the AP list... Did I miss something ?...
+Or could you help to point it out? Thanks very much for this!
 
-Thanks,
 Shenming
 
-> 
-> Thanks,
 > 
 > 	M.
 > 
