@@ -2,118 +2,79 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 280EF339722
-	for <lists+kvm@lfdr.de>; Fri, 12 Mar 2021 20:08:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DC7A6339744
+	for <lists+kvm@lfdr.de>; Fri, 12 Mar 2021 20:17:12 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234176AbhCLTHh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 12 Mar 2021 14:07:37 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34756 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234168AbhCLTHW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 12 Mar 2021 14:07:22 -0500
-Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3C92CC061763
-        for <kvm@vger.kernel.org>; Fri, 12 Mar 2021 11:07:22 -0800 (PST)
-Received: by mail-pj1-x102c.google.com with SMTP id j6-20020a17090adc86b02900cbfe6f2c96so11526215pjv.1
-        for <kvm@vger.kernel.org>; Fri, 12 Mar 2021 11:07:22 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to;
-        bh=tJjzSwOgveQ7vdx3Cu3uc6PULmHuHzmVLjdTR0gLlhA=;
-        b=ntQoBbcWXqtifUBev/B0KOJ7BdEhMcK4Vt5DvxlbjWTaLmYcIzto4hVOQ019Ktjclt
-         IzpMHUC/yiAR42nNISAaWyzIojLrbFqvLiuqfCJeg4pkWHKlQIuqvE/fB5ka2n9/pkxv
-         YKc+kNafGRjUbzhy/8GpyCOkWZhLaF7gTkkwxvjBQ05Zb4MpXjI1NEx/9kHWr5VG/hr9
-         fyFTu4Dx4sGcxcI4/77RGpWwmxVRidKc9jp2iRX8mPbvdvav/UYKiLxb3Kwnjf/GxyYm
-         jnVuPX8KHdjB2ohJT5DD6zNXt2j3Go/jUeaKAltxlVB+ClDE9O+cvF1HmjxqqD3oE3ec
-         Q9sA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=tJjzSwOgveQ7vdx3Cu3uc6PULmHuHzmVLjdTR0gLlhA=;
-        b=IHJnykfJNMJgj/7eXaXTknmrWQuCe1zKLO5/cRc3+HQLFzpfx+CgR6f4HLvjlB/ZMw
-         DSFxZaL53RzUtYBh9yZ2iEZNLISB/Ci9yNyanLpwdtPPeC9WSWw9fpOW4c8CYk2FJkwr
-         cSAHCYPnKRbBe/sFCEn2rKqcUF1FIDkSA9k9ucsmh2XAMZWiNlJa2CeJIYnbN9bB2TyP
-         9VmCqOxVSo6IZ/hDIfX4+OUlHQqRi/ULonXkZDGir+C/gJI14B6yy3ZgdLkyK7ViwJjL
-         FwCZZqa5V9C2vspfVBBJKGhiy+jl/tnRxte6qOdiQ2B+NhgJLlp86U+kc7xZ+q14Fn0i
-         MPbQ==
-X-Gm-Message-State: AOAM531TCoAffOqexvWTI+Tip/cTC6HfRFaRjiNc3YANlZVFMRV/Id2w
-        lNIRGVY/hRbcmRxR8PW2+pP2HA==
-X-Google-Smtp-Source: ABdhPJyGnJc8lVpyplLP6vlQnQwwdL2pHC8tPobUN/3QxEpjMo2qw2d2f4Wb0MPIAgUMFkwynpk4RA==
-X-Received: by 2002:a17:902:ba0a:b029:e6:5c5c:d3b8 with SMTP id j10-20020a170902ba0ab02900e65c5cd3b8mr466876pls.79.1615576041235;
-        Fri, 12 Mar 2021 11:07:21 -0800 (PST)
-Received: from google.com ([2620:0:1008:10:18a1:1d64:e35b:961e])
-        by smtp.gmail.com with ESMTPSA id b3sm2917024pjg.41.2021.03.12.11.07.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 12 Mar 2021 11:07:20 -0800 (PST)
-Date:   Fri, 12 Mar 2021 11:07:14 -0800
-From:   Vipin Sharma <vipinsh@google.com>
-To:     Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>
-Cc:     tj@kernel.org, rdunlap@infradead.org, thomas.lendacky@amd.com,
-        brijesh.singh@amd.com, jon.grimm@amd.com, eric.vantassell@amd.com,
-        pbonzini@redhat.com, hannes@cmpxchg.org, frankja@linux.ibm.com,
-        borntraeger@de.ibm.com, corbet@lwn.net, seanjc@google.com,
-        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
-        joro@8bytes.org, tglx@linutronix.de, mingo@redhat.com,
-        bp@alien8.de, hpa@zytor.com, gingell@google.com,
-        rientjes@google.com, dionnaglaze@google.com, kvm@vger.kernel.org,
-        x86@kernel.org, cgroups@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [Patch v3 1/2] cgroup: sev: Add misc cgroup controller
-Message-ID: <YEu74hkEPEyvxC85@google.com>
-References: <20210304231946.2766648-1-vipinsh@google.com>
- <20210304231946.2766648-2-vipinsh@google.com>
- <YEpod5X29YqMhW/g@blackbook>
+        id S234264AbhCLTQl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 12 Mar 2021 14:16:41 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:20191 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S234107AbhCLTQT (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 12 Mar 2021 14:16:19 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1615576579;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=eVjqGVZoICZZjA+qkatGRQYeCm6jx7YodrGSvV5+S90=;
+        b=Au1EWyutCzHzi+eISnEoBTD1rNGCXcLDkwEtukVw3jWuQGombLxYOMasRY7I6mRBKBMKE6
+        c5rZfUoXYPyZG5NV5JJC2B2i7WmGB82Vmt1iU3ZNHnqcG3oKpYBJsT8JfVARln4h/pWYFK
+        PMhmP9xkrZd7P//T1f51YDzed5OaEh0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-545-uj7z9W6YNL-MpJWmBlCUfA-1; Fri, 12 Mar 2021 14:16:17 -0500
+X-MC-Unique: uj7z9W6YNL-MpJWmBlCUfA-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 07141800D55;
+        Fri, 12 Mar 2021 19:16:16 +0000 (UTC)
+Received: from omen.home.shazbot.org (ovpn-112-255.phx2.redhat.com [10.3.112.255])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 3F13B60CD1;
+        Fri, 12 Mar 2021 19:16:12 +0000 (UTC)
+Date:   Fri, 12 Mar 2021 12:16:11 -0700
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        peterx@redhat.com, prime.zeng@hisilicon.com, cohuck@redhat.com
+Subject: Re: [PATCH] vfio/pci: Handle concurrent vma faults
+Message-ID: <20210312121611.07a313e3@omen.home.shazbot.org>
+In-Reply-To: <20210310184011.GA2356281@nvidia.com>
+References: <161539852724.8302.17137130175894127401.stgit@gimli.home>
+        <20210310181446.GZ2356281@nvidia.com>
+        <20210310113406.6f029fcf@omen.home.shazbot.org>
+        <20210310184011.GA2356281@nvidia.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <YEpod5X29YqMhW/g@blackbook>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Mar 11, 2021 at 07:59:03PM +0100, Michal Koutný wrote:
-> Given different two-fold nature (SEV caller vs misc controller) of some
-> remarks below, I think it makes sense to split this into two patches:
-> a) generic controller implementation,
-> b) hooking the controller into SEV ASIDs management.
+On Wed, 10 Mar 2021 14:40:11 -0400
+Jason Gunthorpe <jgg@nvidia.com> wrote:
 
-Sounds good. I will split it.
+> On Wed, Mar 10, 2021 at 11:34:06AM -0700, Alex Williamson wrote:
+> 
+> > > I think after the address_space changes this should try to stick with
+> > > a normal io_rmap_pfn_range() done outside the fault handler.  
+> > 
+> > I assume you're suggesting calling io_remap_pfn_range() when device
+> > memory is enabled,  
+> 
+> Yes, I think I saw Peter thinking along these lines too
+> 
+> Then fault just always causes SIGBUS if it gets called
 
-> > +	if (misc_res_capacity[type])
-> > +		cg->res[type].max = max;
-> In theory, parallel writers can clash here, so having the limit atomic
-> type to prevent this would resolve it. See also commit a713af394cf3
-> ("cgroup: pids: use atomic64_t for pids->limit").
+Trying to use the address_space approach because otherwise we'd just be
+adding back vma list tracking, it looks like we can't call
+io_remap_pfn_range() while holding the address_space i_mmap_rwsem via
+i_mmap_lock_write(), like done in unmap_mapping_range().  lockdep
+identifies a circular lock order issue against fs_reclaim.  Minimally we
+also need vma_interval_tree_iter_{first,next} exported in order to use
+vma_interval_tree_foreach().  Suggestions?  Thanks,
 
-We should be fine without atomic64_t because we are using unsigned
-long and not 64 bit explicitly. This will work on both 32 and 64 bit
-machines.
+Alex
 
-But I will add READ_ONCE and WRITE_ONCE because of potential chances of
-load tearing and store tearing.
-
-Do you agree?
-
-> > +static int misc_cg_capacity_show(struct seq_file *sf, void *v)
-> > +{
-> > +	int i;
-> > +	unsigned long cap;
-> > +
-> > +	for (i = 0; i < MISC_CG_RES_TYPES; i++) {
-> > +		cap = READ_ONCE(misc_res_capacity[i]);
-> Why is READ_ONCE only here and not in other places that (actually) check
-> against the set capacity value? Also, there should be a paired
-> WRITE_ONCCE in misc_cg_set_capacity().
-
-This was only here to avoid multiple reads of capacity and making sure
-if condition and seq_print will see the same value. Also, I was not
-aware of load and store tearing of properly aligned and machine word
-size variables. I will add READ_ONCE and WRITE_ONCE at
-other places.
-
-Thanks
-Vipin
