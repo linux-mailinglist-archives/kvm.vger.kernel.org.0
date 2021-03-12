@@ -2,124 +2,97 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D1194339091
-	for <lists+kvm@lfdr.de>; Fri, 12 Mar 2021 16:01:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D287A339099
+	for <lists+kvm@lfdr.de>; Fri, 12 Mar 2021 16:02:25 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231865AbhCLPAP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 12 Mar 2021 10:00:15 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:45766 "EHLO
+        id S231960AbhCLPBw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 12 Mar 2021 10:01:52 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:30224 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231601AbhCLO76 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 12 Mar 2021 09:59:58 -0500
+        by vger.kernel.org with ESMTP id S231786AbhCLPBW (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 12 Mar 2021 10:01:22 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1615561197;
+        s=mimecast20190719; t=1615561281;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=rjGcZs7Vy2maRevaHJ9Zv8LK1uzd9Lhozx0sgGCsnz8=;
-        b=jHZ36SaI91dtcgPQFFvJN/jO7yknZ7sKqUvkUiaLFxwHP8OrTGpORi6bQbchQHcrEe9EXS
-        84Vii5si1T5FK2fRrpqRw+YFt2QFXoAlNCmlu907WAE/mcw7XjYukUQW63SrqN0JlHzGpY
-        jhC7JKh5s3Hji1jDGM4k6n78OvZEYow=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-178-JB7uhuwoOqSXK344pdd6bg-1; Fri, 12 Mar 2021 09:59:56 -0500
-X-MC-Unique: JB7uhuwoOqSXK344pdd6bg-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C37FA81746C;
-        Fri, 12 Mar 2021 14:59:54 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.40.192.104])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id C4A255D6D7;
-        Fri, 12 Mar 2021 14:59:53 +0000 (UTC)
-Date:   Fri, 12 Mar 2021 15:59:50 +0100
-From:   Andrew Jones <drjones@redhat.com>
-To:     Alexandru Elisei <alexandru.elisei@arm.com>
-Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
-Subject: Re: [kvm-unit-tests PATCH 3/6] arm/arm64: Remove unnecessary ISB
- when doing dcache maintenance
-Message-ID: <20210312145950.whq7ofrhbklwhprx@kamzik.brq.redhat.com>
-References: <20210227104201.14403-1-alexandru.elisei@arm.com>
- <20210227104201.14403-4-alexandru.elisei@arm.com>
+        bh=dY5uAwZg117bNtRKEEBL+2LzAlswxrz2wq+X03tujc0=;
+        b=DLjOU81I080QFBOxfI9lPAiTVOdKjLn8goYgM96HIIJTCn8n0QiaJDIbquFwtc6pU6kM9E
+        e5aJSccq15MD9+fWd0n2RmIpRvKwGba+1I0m/myfDC/IkbfPDfrqnYKM89h84uMoIxoppN
+        IUW4eaxqCGHhr4D7b30e4KgOX2073g4=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-102-zDpNjDwmMR-FyaYPOcZcfw-1; Fri, 12 Mar 2021 10:01:20 -0500
+X-MC-Unique: zDpNjDwmMR-FyaYPOcZcfw-1
+Received: by mail-wm1-f72.google.com with SMTP id m17so2140735wml.3
+        for <kvm@vger.kernel.org>; Fri, 12 Mar 2021 07:01:20 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=dY5uAwZg117bNtRKEEBL+2LzAlswxrz2wq+X03tujc0=;
+        b=szqQzSAQaQqgueMP2AIm1nCGTN47+y/lmqytAwvHmh7UCPOirfTZk3CX8rrQ/jlUJN
+         0y4vIltE3Yg/d3RqzSjfqwaG6uy1l7u4tRSviQsP//DdeB5Umnjfe79n4J49T5sxQWJC
+         GvJxrHdwIkZwJ7spuz1aP5hyb6tMBG2Z9WOz2oHoVSotCX3Q8ZnwwrL4FIB7SY2tB80J
+         Nz2wQeYoBLc40aFJBEW1dIH9kenrPiGUuyfocgti0yaGXeGWkGIvGxWK1pm732rjiAWu
+         dUqGq1kqFoQSQFqbBS80qM8S5fQkUQ4uSmAymdUppa0ttvAD74RLzRQJaVhpTO+rPHs9
+         wdcA==
+X-Gm-Message-State: AOAM533gK/BCb9JqGFrxIby/dIzeICagPQjE3KqoT8GGdFsPchM3HYfg
+        NOh07DYNWjPJsgO71z7CH1Z5QMRHE2e0n5EjzYmy/ByVNhRBPemq8UkFOqF2GBepxY+4YtTlASU
+        b/Fmop02OUdwf
+X-Received: by 2002:a1c:195:: with SMTP id 143mr13139788wmb.81.1615561274643;
+        Fri, 12 Mar 2021 07:01:14 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJwU/+j7YIHGGD7r2/oDTZXMPTuZH3Lx7EWKi5joHVZyKzFAUrs1mT0L3T9QcEyLqXmzz7K7Aw==
+X-Received: by 2002:a1c:195:: with SMTP id 143mr13139730wmb.81.1615561274237;
+        Fri, 12 Mar 2021 07:01:14 -0800 (PST)
+Received: from steredhat (host-79-34-249-199.business.telecomitalia.it. [79.34.249.199])
+        by smtp.gmail.com with ESMTPSA id c8sm691886wmb.34.2021.03.12.07.01.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 12 Mar 2021 07:01:13 -0800 (PST)
+Date:   Fri, 12 Mar 2021 16:01:10 +0100
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     Arseny Krasnov <arseny.krasnov@kaspersky.com>
+Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Jorgen Hansen <jhansen@vmware.com>,
+        Colin Ian King <colin.king@canonical.com>,
+        Norbert Slusarek <nslusarek@gmx.net>,
+        Andra Paraschiv <andraprs@amazon.com>, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, stsp2@yandex.ru, oxffffaa@gmail.com
+Subject: Re: [RFC PATCH v6 04/22] af_vsock: implement SEQPACKET receive loop
+Message-ID: <20210312150110.344tr3wgz5cwruzz@steredhat>
+References: <20210307175722.3464068-1-arseny.krasnov@kaspersky.com>
+ <20210307175948.3464885-1-arseny.krasnov@kaspersky.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Content-Disposition: inline
-In-Reply-To: <20210227104201.14403-4-alexandru.elisei@arm.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+In-Reply-To: <20210307175948.3464885-1-arseny.krasnov@kaspersky.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, Feb 27, 2021 at 10:41:58AM +0000, Alexandru Elisei wrote:
-> The dcache_by_line_op macro executes a DSB to complete the cache
-> maintenance operations. According to ARM DDI 0487G.a, page B2-150:
-> 
-> "In addition, no instruction that appears in program order after the DSB
-> instruction can alter any state of the system or perform any part of its
-> functionality until the DSB completes other than:
-> 
-> - Being fetched from memory and decoded.
-> - Reading the general-purpose, SIMD and floating-point, Special-purpose, or
->   System registers that are directly or indirectly read without causing
->   side-effects."
-> 
-> Similar definition for ARM in ARM DDI 0406C.d, page A3-150:
-> 
-> "In addition, no instruction that appears in program order after the DSB
-> instruction can execute until the DSB completes."
-> 
-> This means that we don't need the ISB to prevent reordering of the cache
-> maintenance instructions.
-> 
-> We are also not doing icache maintenance, where an ISB would be required
-> for the PE to discard instructions speculated before the invalidation.
-> 
-> In conclusion, the ISB is unnecessary, so remove it.
+On Sun, Mar 07, 2021 at 08:59:45PM +0300, Arseny Krasnov wrote:
+>This adds receive loop for SEQPACKET. It looks like receive loop for
+>STREAM, but there is a little bit difference:
+>1) It doesn't call notify callbacks.
+>2) It doesn't care about 'SO_SNDLOWAT' and 'SO_RCVLOWAT' values, because
+>   there is no sense for these values in SEQPACKET case.
+>3) It waits until whole record is received or error is found during
+>   receiving.
+>4) It processes and sets 'MSG_TRUNC' flag.
+>
+>So to avoid extra conditions for two types of socket inside one loop, two
+>independent functions were created.
+>
+>Signed-off-by: Arseny Krasnov <arseny.krasnov@kaspersky.com>
+>---
+> include/net/af_vsock.h   |  5 +++
+> net/vmw_vsock/af_vsock.c | 95 +++++++++++++++++++++++++++++++++++++++-
+> 2 files changed, 99 insertions(+), 1 deletion(-)
 
-Hi Alexandru,
-
-We can go ahead and take this patch, since you've written quite a
-convincing commit message, but in general I'd prefer we be overly cautious
-in our common code. We'd like to ensure we don't introduce difficult to
-debug issues there, and we don't care about optimizations, let alone
-micro-optimizations. Testing barrier needs to the letter of the spec is a
-good idea, but it's probably better to do that in the test cases.
-
-Thanks,
-drew
-
-> 
-> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
-> ---
->  arm/cstart.S   | 1 -
->  arm/cstart64.S | 1 -
->  2 files changed, 2 deletions(-)
-> 
-> diff --git a/arm/cstart.S b/arm/cstart.S
-> index 954748b00f64..2d62c1e6d40d 100644
-> --- a/arm/cstart.S
-> +++ b/arm/cstart.S
-> @@ -212,7 +212,6 @@ asm_mmu_disable:
->  	ldr	r1, [r1]
->  	sub	r1, r1, r0
->  	dcache_by_line_op dccimvac, sy, r0, r1, r2, r3
-> -	isb
->  
->  	mov     pc, lr
->  
-> diff --git a/arm/cstart64.S b/arm/cstart64.S
-> index 046bd3914098..c1deff842f03 100644
-> --- a/arm/cstart64.S
-> +++ b/arm/cstart64.S
-> @@ -219,7 +219,6 @@ asm_mmu_disable:
->  	ldr	x1, [x1, :lo12:__phys_end]
->  	sub	x1, x1, x0
->  	dcache_by_line_op civac, sy, x0, x1, x2, x3
-> -	isb
->  
->  	ret
->  
-> -- 
-> 2.30.1
-> 
+Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
 
