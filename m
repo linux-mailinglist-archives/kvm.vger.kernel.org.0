@@ -2,150 +2,111 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EFB1F338D23
-	for <lists+kvm@lfdr.de>; Fri, 12 Mar 2021 13:33:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BE0FB338D3B
+	for <lists+kvm@lfdr.de>; Fri, 12 Mar 2021 13:39:59 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229799AbhCLMcm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 12 Mar 2021 07:32:42 -0500
-Received: from szxga05-in.huawei.com ([45.249.212.191]:13504 "EHLO
-        szxga05-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231349AbhCLMcJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 12 Mar 2021 07:32:09 -0500
-Received: from DGGEMS403-HUB.china.huawei.com (unknown [172.30.72.59])
-        by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4DxlWs2tZfzrTqr;
-        Fri, 12 Mar 2021 20:30:17 +0800 (CST)
-Received: from [10.174.184.135] (10.174.184.135) by
- DGGEMS403-HUB.china.huawei.com (10.3.19.203) with Microsoft SMTP Server id
- 14.3.498.0; Fri, 12 Mar 2021 20:31:56 +0800
-Subject: Re: [PATCH v3 3/4] KVM: arm64: GICv4.1: Restore VLPI's pending state
- to physical side
-To:     Marc Zyngier <maz@kernel.org>
-CC:     Eric Auger <eric.auger@redhat.com>, Will Deacon <will@kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>,
-        <kvmarm@lists.cs.columbia.edu>, <kvm@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        "Lorenzo Pieralisi" <lorenzo.pieralisi@arm.com>,
-        <wanghaibin.wang@huawei.com>, <yuzenghui@huawei.com>
-References: <20210127121337.1092-1-lushenming@huawei.com>
- <20210127121337.1092-4-lushenming@huawei.com> <87tupif3x3.wl-maz@kernel.org>
- <0820f429-4c29-acd6-d9e0-af9f6deb68e4@huawei.com>
- <87k0qcg2s6.wl-maz@kernel.org>
- <aecfbf72-c653-e967-b539-89f629b52cde@huawei.com>
- <87h7lgfwzu.wl-maz@kernel.org>
- <df4b939d-27c1-be84-ea7e-327251958cde@huawei.com>
- <87ft10fulr.wl-maz@kernel.org>
-From:   Shenming Lu <lushenming@huawei.com>
-Message-ID: <40f40432-63b4-cceb-a9bd-09c6ef91f34d@huawei.com>
-Date:   Fri, 12 Mar 2021 20:31:45 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.2.2
+        id S229907AbhCLMi4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 12 Mar 2021 07:38:56 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35110 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229913AbhCLMie (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 12 Mar 2021 07:38:34 -0500
+Received: from theia.8bytes.org (8bytes.org [IPv6:2a01:238:4383:600:38bc:a715:4b6d:a889])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 545BEC061574;
+        Fri, 12 Mar 2021 04:38:34 -0800 (PST)
+Received: from cap.home.8bytes.org (p549adcf6.dip0.t-ipconnect.de [84.154.220.246])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
+        (No client certificate requested)
+        by theia.8bytes.org (Postfix) with ESMTPSA id 724822A6;
+        Fri, 12 Mar 2021 13:38:30 +0100 (CET)
+From:   Joerg Roedel <joro@8bytes.org>
+To:     x86@kernel.org
+Cc:     Joerg Roedel <joro@8bytes.org>, Joerg Roedel <jroedel@suse.de>,
+        hpa@zytor.com, Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Jiri Slaby <jslaby@suse.cz>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Juergen Gross <jgross@suse.com>,
+        Kees Cook <keescook@chromium.org>,
+        David Rientjes <rientjes@google.com>,
+        Cfir Cohen <cfir@google.com>,
+        Erdem Aktas <erdemaktas@google.com>,
+        Masami Hiramatsu <mhiramat@kernel.org>,
+        Mike Stunes <mstunes@vmware.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Martin Radev <martin.b.radev@gmail.com>,
+        Arvind Sankar <nivedita@alum.mit.edu>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org
+Subject: [PATCH v3 0/8] x86/seves: Support 32-bit boot path and other updates
+Date:   Fri, 12 Mar 2021 13:38:16 +0100
+Message-Id: <20210312123824.306-1-joro@8bytes.org>
+X-Mailer: git-send-email 2.30.1
 MIME-Version: 1.0
-In-Reply-To: <87ft10fulr.wl-maz@kernel.org>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.174.184.135]
-X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2021/3/12 20:02, Marc Zyngier wrote:
-> On Fri, 12 Mar 2021 11:34:07 +0000,
-> Shenming Lu <lushenming@huawei.com> wrote:
->>
->> On 2021/3/12 19:10, Marc Zyngier wrote:
->>> On Fri, 12 Mar 2021 10:48:29 +0000,
->>> Shenming Lu <lushenming@huawei.com> wrote:
->>>>
->>>> On 2021/3/12 17:05, Marc Zyngier wrote:
->>>>> On Thu, 11 Mar 2021 12:32:07 +0000,
->>>>> Shenming Lu <lushenming@huawei.com> wrote:
->>>>>>
->>>>>> On 2021/3/11 17:14, Marc Zyngier wrote:
->>>>>>> On Wed, 27 Jan 2021 12:13:36 +0000,
->>>>>>> Shenming Lu <lushenming@huawei.com> wrote:
->>>>>>>>
->>>>>>>> From: Zenghui Yu <yuzenghui@huawei.com>
->>>>>>>>
->>>>>>>> When setting the forwarding path of a VLPI (switch to the HW mode),
->>>>>>>> we could also transfer the pending state from irq->pending_latch to
->>>>>>>> VPT (especially in migration, the pending states of VLPIs are restored
->>>>>>>> into kvm’s vgic first). And we currently send "INT+VSYNC" to trigger
->>>>>>>> a VLPI to pending.
->>>>>>>>
->>>>>>>> Signed-off-by: Zenghui Yu <yuzenghui@huawei.com>
->>>>>>>> Signed-off-by: Shenming Lu <lushenming@huawei.com>
->>>>>>>> ---
->>>>>>>>  arch/arm64/kvm/vgic/vgic-v4.c | 14 ++++++++++++++
->>>>>>>>  1 file changed, 14 insertions(+)
->>>>>>>>
->>>>>>>> diff --git a/arch/arm64/kvm/vgic/vgic-v4.c b/arch/arm64/kvm/vgic/vgic-v4.c
->>>>>>>> index ac029ba3d337..a3542af6f04a 100644
->>>>>>>> --- a/arch/arm64/kvm/vgic/vgic-v4.c
->>>>>>>> +++ b/arch/arm64/kvm/vgic/vgic-v4.c
->>>>>>>> @@ -449,6 +449,20 @@ int kvm_vgic_v4_set_forwarding(struct kvm *kvm, int virq,
->>>>>>>>  	irq->host_irq	= virq;
->>>>>>>>  	atomic_inc(&map.vpe->vlpi_count);
->>>>>>>>  
->>>>>>>> +	/* Transfer pending state */
->>>>>>>> +	if (irq->pending_latch) {
->>>>>>>> +		ret = irq_set_irqchip_state(irq->host_irq,
->>>>>>>> +					    IRQCHIP_STATE_PENDING,
->>>>>>>> +					    irq->pending_latch);
->>>>>>>> +		WARN_RATELIMIT(ret, "IRQ %d", irq->host_irq);
->>>>>>>> +
->>>>>>>> +		/*
->>>>>>>> +		 * Let it be pruned from ap_list later and don't bother
->>>>>>>> +		 * the List Register.
->>>>>>>> +		 */
->>>>>>>> +		irq->pending_latch = false;
->>>>>>>
->>>>>>> NAK. If the interrupt is on the AP list, it must be pruned from it
->>>>>>> *immediately*. The only case where it can be !pending and still on the
->>>>>>> AP list is in interval between sync and prune. If we start messing
->>>>>>> with this, we can't reason about the state of this list anymore.
->>>>>>>
->>>>>>> Consider calling vgic_queue_irq_unlock() here.
->>>>>>
->>>>>> Thanks for giving a hint, but it seems that vgic_queue_irq_unlock() only
->>>>>> queues an IRQ after checking, did you mean vgic_prune_ap_list() instead?
->>>>>
->>>>> No, I really mean vgic_queue_irq_unlock(). It can be used to remove
->>>>> the pending state from an interrupt, and drop it from the AP
->>>>> list. This is exactly what happens when clearing the pending state of
->>>>> a level interrupt, for example.
->>>>
->>>> Hi, I have gone through vgic_queue_irq_unlock more than once, but
->>>> still can't find the place in it to drop an IRQ from the AP
->>>> list... Did I miss something ?...  Or could you help to point it
->>>> out? Thanks very much for this!
->>>
->>> NO, you are right. I think this is a missing optimisation. Please call
->>> the function anyway, as that's what is required to communicate a
->>> change of state in general.>
->>> I'll have a think about it.
->>
->> Maybe we could call vgic_prune_ap_list() if (irq->vcpu &&
->> !vgic_target_oracle(irq)) in vgic_queue_irq_unlock()...
-> 
-> The locking is pretty ugly in this case, and I don't want to reparse
-> the whole AP list. It is basically doing the same work as the
-> insertion, but with a list_del() instead of a list_add()...
+From: Joerg Roedel <jroedel@suse.de>
 
-make sense..
+Hi,
+
+these patches add support for the 32-bit boot in the decompressor
+code. This is needed to boot an SEV-ES guest on some firmware and grub
+versions. The patches also add the necessary CPUID sanity checks and a
+32-bit version of the C-bit check.
+
+Other updates included here:
+
+        1. Add code to shut down exception handling in the
+           decompressor code before jumping to the real kernel.
+           Once in the real kernel it is not safe anymore to jump
+           back to the decompressor code via exceptions.
+
+        2. Replace open-coded hlt loops with proper calls to
+           sev_es_terminate().
+
+Please review.
 
 Thanks,
-Shenming
 
-> 
-> We can live without it for now.
-> 
->> OK, I will retest this series and send a v4 soon. :-)
-> 
-> Thanks,
-> 
-> 	M.
-> 
+	Joerg
+
+Changes v2->v3:
+
+	- Added a patch to remove the check for the Hypervisor CPUID
+	  bit for detecting SEV
+
+Changes v1->v2:
+
+	- Addressed Boris' review comments.
+	- Fixed a bug which caused the cbit-check to never be
+	  executed even in an SEV guest.
+
+Joerg Roedel (8):
+  x86/boot/compressed/64: Cleanup exception handling before booting
+    kernel
+  x86/sev: Do not require Hypervisor CPUID bit for SEV guests
+  x86/boot/compressed/64: Reload CS in startup_32
+  x86/boot/compressed/64: Setup IDT in startup_32 boot path
+  x86/boot/compressed/64: Add 32-bit boot #VC handler
+  x86/boot/compressed/64: Add CPUID sanity check to 32-bit boot-path
+  x86/boot/compressed/64: Check SEV encryption in 32-bit boot-path
+  x86/sev-es: Replace open-coded hlt-loops with sev_es_terminate()
+
+ arch/x86/boot/compressed/head_64.S     | 170 ++++++++++++++++++++++++-
+ arch/x86/boot/compressed/idt_64.c      |  14 ++
+ arch/x86/boot/compressed/mem_encrypt.S | 130 ++++++++++++++++++-
+ arch/x86/boot/compressed/misc.c        |   7 +-
+ arch/x86/boot/compressed/misc.h        |   6 +
+ arch/x86/boot/compressed/sev-es.c      |  12 +-
+ arch/x86/kernel/sev-es-shared.c        |  16 +--
+ arch/x86/mm/mem_encrypt_identity.c     |  35 ++---
+ 8 files changed, 340 insertions(+), 50 deletions(-)
+
+-- 
+2.30.1
+
