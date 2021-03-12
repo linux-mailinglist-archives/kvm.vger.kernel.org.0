@@ -2,169 +2,221 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7F24C338603
-	for <lists+kvm@lfdr.de>; Fri, 12 Mar 2021 07:37:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EAC5933860F
+	for <lists+kvm@lfdr.de>; Fri, 12 Mar 2021 07:41:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230443AbhCLGhB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 12 Mar 2021 01:37:01 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41688 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229866AbhCLGgk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 12 Mar 2021 01:36:40 -0500
-Received: from mail-qt1-x82d.google.com (mail-qt1-x82d.google.com [IPv6:2607:f8b0:4864:20::82d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 23A38C061761
-        for <kvm@vger.kernel.org>; Thu, 11 Mar 2021 22:36:40 -0800 (PST)
-Received: by mail-qt1-x82d.google.com with SMTP id r14so3047650qtt.7
-        for <kvm@vger.kernel.org>; Thu, 11 Mar 2021 22:36:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=YuBBCqZr1Px85yleK39mC93HGbGySY0fITwLtMOGyoA=;
-        b=KQ5KAEoYHEZNwOyAP4oRAj1vPu7WsdZfiztwVv3Np1+bED+C6berPMOj/WyPeJuhFy
-         Ie0a8uDfQ3YcG8JWKKC2Ba1drHTJknlDYvZ5P8CoXO1P7TYfKkllYmscByxE/oERYrnA
-         7PiySIzZI2iM0ERBVwx7RTOQsDs7vAHb33gfVS5t33u5njOKc6gcZfQ0peaDnLIAXuY0
-         9LtuE8K7Nw1HcWWycfaDVK0/+iUjIzJwZJoMRy9is20IVj7n5LQv8C+W4e1G+trMEEGF
-         Yz+5ENl7bnDDhbRb2bcf/ExBQL5T0y/o1gvqXTaatPxiXhBzopJYka8bfTgfzMcuGXBX
-         XSNw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=YuBBCqZr1Px85yleK39mC93HGbGySY0fITwLtMOGyoA=;
-        b=AdCIj67FxJ9d5sTfv0qVpqNLkZ48RMTog4V7TD++kuPk+tpNiYg2L21rvkwESkQ2KV
-         j7avUtE2wzWy30Hrsi98B7ouj2UfnyD+KSiGAhTpTkLqfAgDNYCOM1KD6fbxooybrY/u
-         0FzqxMT2OghiqufFQ03jiPRzG2pfmohxRFGaJ1h/LeVMFEEMizv8OAi8LQ9jahl4iIsQ
-         FsyXcvykzK3A1neeylJFQaNVZflGRhWfDwoGMs6bLTGe9/6yEecw1Ugt92fscLSafhAI
-         ZoKqSjU7Q/nTFR1KVf+sEqSsKon0tW20N8OY22qEx2cm8xRX69QlZCO0aiH/bPeC9sM/
-         dnLg==
-X-Gm-Message-State: AOAM531eC+pA/w9U71Y0vk/8ChuFj9Rd7JWIjlWn96ViogWULVLtm2Hr
-        zMRU2GyWgGC8S7EizAqGPWLQB9b5a6nu+S4y8u1FCw==
-X-Google-Smtp-Source: ABdhPJyzKKrKccsmKmzC3iwT0eYiBXMeRUluIecoA3zBNiSG0mj0+LWF4mjLJf4qxlReCTafyqheCU6DgzE8PIlIDfk=
-X-Received: by 2002:ac8:5212:: with SMTP id r18mr10402768qtn.290.1615530999035;
- Thu, 11 Mar 2021 22:36:39 -0800 (PST)
+        id S231466AbhCLGkt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 12 Mar 2021 01:40:49 -0500
+Received: from mga04.intel.com ([192.55.52.120]:1795 "EHLO mga04.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S230175AbhCLGkh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 12 Mar 2021 01:40:37 -0500
+IronPort-SDR: WpSkSycepxtyrJacb5u8TFUU4Wd7Jg3rfPfr2AovdFpNpfUNaZNyCwsC4K8RiwvGMhjFCzk3tj
+ 16edUv7Pe+xg==
+X-IronPort-AV: E=McAfee;i="6000,8403,9920"; a="186416776"
+X-IronPort-AV: E=Sophos;i="5.81,242,1610438400"; 
+   d="scan'208";a="186416776"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Mar 2021 22:40:36 -0800
+IronPort-SDR: T6+IIT5dUJgvUP2o5e2S60+UU2tbglvfwcnw/zvytnFpNdDjZhOgeCvMaop0Q4TNhHm0iQCpkg
+ RecChuH4nEUA==
+X-IronPort-AV: E=Sophos;i="5.81,242,1610438400"; 
+   d="scan'208";a="410909635"
+Received: from lingshan-mobl5.ccr.corp.intel.com (HELO [10.254.214.210]) ([10.254.214.210])
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Mar 2021 22:40:33 -0800
+Subject: Re: [PATCH V3 6/6] vDPA/ifcvf: verify mandatory feature bits for vDPA
+To:     Jason Wang <jasowang@redhat.com>,
+        Zhu Lingshan <lingshan.zhu@linux.intel.com>, mst@redhat.com,
+        lulu@redhat.com, leonro@nvidia.com
+Cc:     netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org
+References: <20210310090052.4762-1-lingshan.zhu@intel.com>
+ <20210310090052.4762-7-lingshan.zhu@intel.com>
+ <3e53a5c9-c531-48ee-c9a7-907dfdacc9d1@redhat.com>
+ <9c2fb3d0-2d69-20b9-589d-cc5ffc830f38@linux.intel.com>
+ <4f3ef2bb-d823-d53d-3bb0-0152a3f6c9f1@redhat.com>
+ <a1f346cc-c9fd-6d16-39d7-b59965a18b0a@intel.com>
+ <67be60b6-bf30-de85-ed42-d9fad974f42b@redhat.com>
+From:   "Zhu, Lingshan" <lingshan.zhu@intel.com>
+Message-ID: <2a6e31d3-ea31-9b64-0749-1f149b656623@intel.com>
+Date:   Fri, 12 Mar 2021 14:40:30 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.7.1
 MIME-Version: 1.0
-References: <000000000000d356ca05bd4c1974@google.com> <CALCETrXUJOHj8PynvZVWgG7jBe6ZtqKpvjhbUM8perbbydRw5Q@mail.gmail.com>
-In-Reply-To: <CALCETrXUJOHj8PynvZVWgG7jBe6ZtqKpvjhbUM8perbbydRw5Q@mail.gmail.com>
-From:   Dmitry Vyukov <dvyukov@google.com>
-Date:   Fri, 12 Mar 2021 07:36:27 +0100
-Message-ID: <CACT4Y+ZimBeG_g1842OqYpsjmm3x=tN-GYsTU-5yxnDd7gLTPw@mail.gmail.com>
-Subject: Re: [syzbot] WARNING in handle_mm_fault
-To:     Andy Lutomirski <luto@kernel.org>
-Cc:     syzbot <syzbot+7d7013084f0a806f3786@syzkaller.appspotmail.com>,
-        Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm list <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Ingo Molnar <mingo@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        syzkaller-bugs <syzkaller-bugs@googlegroups.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>, X86 ML <x86@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <67be60b6-bf30-de85-ed42-d9fad974f42b@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Mar 12, 2021 at 3:30 AM Andy Lutomirski <luto@kernel.org> wrote:
->
-> Your warning is odd, but I see the bug.  It's in KVM.
-
-Hi Andy,
-
-By "your" you mean "kernel", right? ;)
 
 
-> On Thu, Mar 11, 2021 at 4:37 PM syzbot
-> <syzbot+7d7013084f0a806f3786@syzkaller.appspotmail.com> wrote:
-> >
-> > Hello,
-> >
-> > syzbot found the following issue on:
-> >
-> > HEAD commit:    05a59d79 Merge git://git.kernel.org:/pub/scm/linux/kernel/..
-> > git tree:       upstream
-> > console output: https://syzkaller.appspot.com/x/log.txt?x=16f493ead00000
-> > kernel config:  https://syzkaller.appspot.com/x/.config?x=750735fdbc630971
-> > dashboard link: https://syzkaller.appspot.com/bug?extid=7d7013084f0a806f3786
-> >
-> > Unfortunately, I don't have any reproducer for this issue yet.
-> >
-> > IMPORTANT: if you fix the issue, please add the following tag to the commit:
-> > Reported-by: syzbot+7d7013084f0a806f3786@syzkaller.appspotmail.com
-> >
-> > ------------[ cut here ]------------
-> > raw_local_irq_restore() called with IRQs enabled
-> > WARNING: CPU: 0 PID: 8412 at kernel/locking/irqflag-debug.c:10 warn_bogus_irq_restore+0x1d/0x20 kernel/locking/irqflag-debug.c:10
-> > Modules linked in:
-> > CPU: 0 PID: 8412 Comm: syz-fuzzer Not tainted 5.12.0-rc2-syzkaller #0
-> > Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
-> > RIP: 0010:warn_bogus_irq_restore+0x1d/0x20 kernel/locking/irqflag-debug.c:10
+On 3/12/2021 1:52 PM, Jason Wang wrote:
 >
-> The above makes sense, but WTH is the below:
+> On 2021/3/11 3:19 下午, Zhu, Lingshan wrote:
+>>
+>>
+>> On 3/11/2021 2:20 PM, Jason Wang wrote:
+>>>
+>>> On 2021/3/11 12:16 下午, Zhu Lingshan wrote:
+>>>>
+>>>>
+>>>> On 3/11/2021 11:20 AM, Jason Wang wrote:
+>>>>>
+>>>>> On 2021/3/10 5:00 下午, Zhu Lingshan wrote:
+>>>>>> vDPA requres VIRTIO_F_ACCESS_PLATFORM as a must, this commit
+>>>>>> examines this when set features.
+>>>>>>
+>>>>>> Signed-off-by: Zhu Lingshan <lingshan.zhu@intel.com>
+>>>>>> ---
+>>>>>>   drivers/vdpa/ifcvf/ifcvf_base.c | 8 ++++++++
+>>>>>>   drivers/vdpa/ifcvf/ifcvf_base.h | 1 +
+>>>>>>   drivers/vdpa/ifcvf/ifcvf_main.c | 5 +++++
+>>>>>>   3 files changed, 14 insertions(+)
+>>>>>>
+>>>>>> diff --git a/drivers/vdpa/ifcvf/ifcvf_base.c 
+>>>>>> b/drivers/vdpa/ifcvf/ifcvf_base.c
+>>>>>> index ea6a78791c9b..58f47fdce385 100644
+>>>>>> --- a/drivers/vdpa/ifcvf/ifcvf_base.c
+>>>>>> +++ b/drivers/vdpa/ifcvf/ifcvf_base.c
+>>>>>> @@ -224,6 +224,14 @@ u64 ifcvf_get_features(struct ifcvf_hw *hw)
+>>>>>>       return hw->hw_features;
+>>>>>>   }
+>>>>>>   +int ifcvf_verify_min_features(struct ifcvf_hw *hw)
+>>>>>> +{
+>>>>>> +    if (!(hw->hw_features & BIT_ULL(VIRTIO_F_ACCESS_PLATFORM)))
+>>>>>> +        return -EINVAL;
+>>>>>> +
+>>>>>> +    return 0;
+>>>>>> +}
+>>>>>> +
+>>>>>>   void ifcvf_read_net_config(struct ifcvf_hw *hw, u64 offset,
+>>>>>>                  void *dst, int length)
+>>>>>>   {
+>>>>>> diff --git a/drivers/vdpa/ifcvf/ifcvf_base.h 
+>>>>>> b/drivers/vdpa/ifcvf/ifcvf_base.h
+>>>>>> index dbb8c10aa3b1..91c5735d4dc9 100644
+>>>>>> --- a/drivers/vdpa/ifcvf/ifcvf_base.h
+>>>>>> +++ b/drivers/vdpa/ifcvf/ifcvf_base.h
+>>>>>> @@ -123,6 +123,7 @@ void io_write64_twopart(u64 val, u32 *lo, u32 
+>>>>>> *hi);
+>>>>>>   void ifcvf_reset(struct ifcvf_hw *hw);
+>>>>>>   u64 ifcvf_get_features(struct ifcvf_hw *hw);
+>>>>>>   u64 ifcvf_get_hw_features(struct ifcvf_hw *hw);
+>>>>>> +int ifcvf_verify_min_features(struct ifcvf_hw *hw);
+>>>>>>   u16 ifcvf_get_vq_state(struct ifcvf_hw *hw, u16 qid);
+>>>>>>   int ifcvf_set_vq_state(struct ifcvf_hw *hw, u16 qid, u16 num);
+>>>>>>   struct ifcvf_adapter *vf_to_adapter(struct ifcvf_hw *hw);
+>>>>>> diff --git a/drivers/vdpa/ifcvf/ifcvf_main.c 
+>>>>>> b/drivers/vdpa/ifcvf/ifcvf_main.c
+>>>>>> index 25fb9dfe23f0..f624f202447d 100644
+>>>>>> --- a/drivers/vdpa/ifcvf/ifcvf_main.c
+>>>>>> +++ b/drivers/vdpa/ifcvf/ifcvf_main.c
+>>>>>> @@ -179,6 +179,11 @@ static u64 ifcvf_vdpa_get_features(struct 
+>>>>>> vdpa_device *vdpa_dev)
+>>>>>>   static int ifcvf_vdpa_set_features(struct vdpa_device 
+>>>>>> *vdpa_dev, u64 features)
+>>>>>>   {
+>>>>>>       struct ifcvf_hw *vf = vdpa_to_vf(vdpa_dev);
+>>>>>> +    int ret;
+>>>>>> +
+>>>>>> +    ret = ifcvf_verify_min_features(vf);
+>>>>>
+>>>>>
+>>>>> So this validate device features instead of driver which is the 
+>>>>> one we really want to check?
+>>>>>
+>>>>> Thanks
+>>>>
+>>>> Hi Jason,
+>>>>
+>>>> Here we check device feature bits to make sure the device support 
+>>>> ACCESS_PLATFORM. 
+>>>
+>>>
+>>> If you want to check device features, you need to do that during 
+>>> probe() and fail the probing if without the feature. But I think you 
+>>> won't ship cards without ACCESS_PLATFORM.
+>> Yes, there are no reasons ship a card without ACCESS_PLATFORM
+>>>
+>>>
+>>>> In get_features(),
+>>>> it will return a intersection of device features bit and driver 
+>>>> supported features bits(which includes ACCESS_PLATFORM).
+>>>> Other components like QEMU should not set features bits more than 
+>>>> this intersection of bits. so we can make sure if this
+>>>> ifcvf_verify_min_features() passed, both device and driver support 
+>>>> ACCESS_PLATFORM.
+>>>>
+>>>> Are you suggesting check driver feature bits in 
+>>>> ifcvf_verify_min_features() in the meantime as well?
+>>>
+>>>
+>>> So it really depends on your hardware. If you hardware can always 
+>>> offer ACCESS_PLATFORM, you just need to check driver features. This 
+>>> is how vdpa_sim and mlx5_vdpa work.
+>> Yes, we always support ACCESS_PLATFORM, so it is hard coded in the 
+>> macro IFCVF_SUPPORTED_FEATURES.
 >
-> > Code: be ff cc cc cc cc cc cc cc cc cc cc cc 80 3d 11 d1 ad 04 00 74 01 c3 48 c7 c7 20 79 6b 89 c6 05 00 d1 ad 04 01 e8 75 5b be ff <0f> 0b c3 48 39 77 10 0f 84 97 00 00 00 66 f7 47 22 f0 ff 74 4b 48
-> > RSP: 0000:ffffc9000185fac8 EFLAGS: 00010282
-> > RAX: 0000000000000000 RBX: ffff8880194268a0 RCX: 0000000000000000
-> > RBP: 0000000000000200 R08: 0000000000000000 R09: 0000000000000000
-> > R13: ffffed1003284d14 R14: 0000000000000001 R15: ffff8880b9c36000
-> > FS:  000000c00002ec90(0000) GS:ffff8880b9c00000(0000) knlGS:0000000000000000
-> > Call Trace:
-> >  handle_mm_fault+0x1bc/0x7e0 mm/memory.c:4549
-> > Code: 48 8d 05 97 25 3e 00 48 89 44 24 08 e8 6d 54 ea ff 90 e8 07 a1 ed ff eb a5 cc cc cc cc cc 8b 44 24 10 48 8b 4c 24 08 89 41 24 <c3> cc cc cc cc cc cc cc cc cc cc cc cc cc cc cc cc cc cc cc 48 8b
-> > RAX: 00000000000047f6 RBX: 00000000000047f6 RCX: 0000000000d60000
-> > RDX: 0000000000004c00 RSI: 0000000000d60000 RDI: 000000000181cad0
-> > RBP: 000000c000301890 R08: 00000000000047f5 R09: 000000000059c5a0
-> > R10: 000000c0004e2000 R11: 0000000000000020 R12: 00000000000000fa
-> > R13: 00aaaaaaaaaaaaaa R14: 000000000093f064 R15: 0000000000000038
-> > Kernel panic - not syncing: panic_on_warn set ...
-> > CPU: 0 PID: 8412 Comm: syz-fuzzer Not tainted 5.12.0-rc2-syzkaller #0
-> > Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
-> > Call Trace:
 >
-> Now we start reading here:
+> That's not what I read from the code:
 >
-> >  __dump_stack lib/dump_stack.c:79 [inline]
-> >  dump_stack+0x141/0x1d7 lib/dump_stack.c:120
-> >  panic+0x306/0x73d kernel/panic.c:231
-> >  __warn.cold+0x35/0x44 kernel/panic.c:605
-> >  report_bug+0x1bd/0x210 lib/bug.c:195
-> >  handle_bug+0x3c/0x60 arch/x86/kernel/traps.c:239
-> >  exc_invalid_op+0x14/0x40 arch/x86/kernel/traps.c:259
-> >  asm_exc_invalid_op+0x12/0x20 arch/x86/include/asm/idtentry.h:575
-> > RIP: 0010:warn_bogus_irq_restore+0x1d/0x20 kernel/locking/irqflag-debug.c:10
-> > Code: be ff cc cc cc cc cc cc cc cc cc cc cc 80 3d 11 d1 ad 04 00 74 01 c3 48 c7 c7 20 79 6b 89 c6 05 00 d1 ad 04 01 e8 75 5b be ff <0f> 0b c3 48 39 77 10 0f 84 97 00 00 00 66 f7 47 22 f0 ff 74 4b 48
-> > RSP: 0000:ffffc9000185fac8 EFLAGS: 00010282
-> > RAX: 0000000000000000 RBX: ffff8880194268a0 RCX: 0000000000000000
-> > RDX: ffff88802f7b2400 RSI: ffffffff815b4435 RDI: fffff5200030bf4b
-> > RBP: 0000000000000200 R08: 0000000000000000 R09: 0000000000000000
-> > R10: ffffffff815ad19e R11: 0000000000000000 R12: 0000000000000003
-> > R13: ffffed1003284d14 R14: 0000000000000001 R15: ffff8880b9c36000
-> >  kvm_wait arch/x86/kernel/kvm.c:860 [inline]
+>         features = ifcvf_get_features(vf) & IFCVF_SUPPORTED_FEATURES;
+ifcvf_get_features() reads device feature bits(which should always has 
+ACCSSS_PLATFORM) and IFCVF_SUPPORTED_FEATURES is the driver supported 
+feature bits which hard coded ACCESS_PLATFORM, so the intersection 
+should include ACCESS_PLATFORM.
+the intersection "features" is returned in get_features(), qemu should 
+set features according to it.
 >
-> and there's the bug:
 >
->         /*
->          * halt until it's our turn and kicked. Note that we do safe halt
->          * for irq enabled case to avoid hang when lock info is overwritten
->          * in irq spinlock slowpath and no spurious interrupt occur to save us.
->          */
->         if (arch_irqs_disabled_flags(flags))
->                 halt();
->         else
->                 safe_halt();
+>> Now we check whether device support this feature bit as a double 
+>> conformation, are you suggesting we should check whether 
+>> ACCESS_PLATFORM & IFCVF_SUPPORTED_FEATURES
+>> in set_features() as well?
 >
-> out:
->         local_irq_restore(flags);
-> }
 >
-> The safe_halt path is bogus.  It should just return instead of
-> restoring the IRQ flags.
+> If we know device will always offer ACCESS_PLATFORM, there's no need 
+> to check it again. What we should check if whether driver set that, 
+> and if it doesn't we need to fail set_features(). I think there's 
+> little chance that IFCVF can work when IOMMU_PLATFORM is not negotiated.
+Agree, will check the features bit to set instead of device feature 
+bits. Thanks!
+>
+>
+>
+>> I prefer check both device and IFCVF_SUPPORTED_FEATURES both, more 
+>> reliable.
+>
+>
+> So again, if you want to check device features, set_features() is not 
+> the proper place. We need to fail the probe in this case.
+>
+> Thanks
+>
+>
+>>
+>> Thanks!
+>>>
+>>> Thanks
+>>>
+>>>
+>>>>
+>>>> Thanks！
+>>>>>
+>>>>>
+>>>>>> +    if (ret)
+>>>>>> +        return ret;
+>>>>>>         vf->req_features = features;
+>>>>>
+>>>>> _______________________________________________
+>>>>> Virtualization mailing list
+>>>>> Virtualization@lists.linux-foundation.org
+>>>>> https://lists.linuxfoundation.org/mailman/listinfo/virtualization
+>>>>
+>>>
+>>
+>
 
-I think this should be fixed already by:
-https://patchwork.kernel.org/project/kvm/patch/1614057902-23774-1-git-send-email-wanpengli@tencent.com/
-
-#syz fix: x86/kvm: Fix broken irq restoration in kvm_wait
