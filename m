@@ -2,115 +2,287 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3D875338B5E
-	for <lists+kvm@lfdr.de>; Fri, 12 Mar 2021 12:19:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A20F1338B7D
+	for <lists+kvm@lfdr.de>; Fri, 12 Mar 2021 12:30:24 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233863AbhCLLSa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 12 Mar 2021 06:18:30 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:21348 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233295AbhCLLSQ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 12 Mar 2021 06:18:16 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1615547895;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Z0M9faSL2lzWVH3vB0ZfkjedWFZeXCcWirgJwQpnSxA=;
-        b=bR+yGp37LT/RmFFNpSFw06J7awyZOkakIC3949SJKLHwajieLXilys1bqhra8k/S8MsZAo
-        6gmq0gO0bV2aJUmqWcfBZaSrtvLwurX8ioSiAUxNCi7rNh5zgHHn3MhbUTmFups9bTIw60
-        1iMl1g+52oj4p0RWX2DGd4LoitOjWVU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-159-TmvtNFi-NEuKYUj-gxuXNA-1; Fri, 12 Mar 2021 06:18:13 -0500
-X-MC-Unique: TmvtNFi-NEuKYUj-gxuXNA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 385FE107ACCA;
-        Fri, 12 Mar 2021 11:18:12 +0000 (UTC)
-Received: from gondolin (ovpn-113-3.ams2.redhat.com [10.36.113.3])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id DFE2D5DAA5;
-        Fri, 12 Mar 2021 11:18:07 +0000 (UTC)
-Date:   Fri, 12 Mar 2021 12:18:05 +0100
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Pierre Morel <pmorel@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, frankja@linux.ibm.com, david@redhat.com,
-        thuth@redhat.com, imbrenda@linux.ibm.com
-Subject: Re: [kvm-unit-tests PATCH v6 0/6] CSS Mesurement Block
-Message-ID: <20210312121805.4fab030c.cohuck@redhat.com>
-In-Reply-To: <1615545714-13747-1-git-send-email-pmorel@linux.ibm.com>
-References: <1615545714-13747-1-git-send-email-pmorel@linux.ibm.com>
-Organization: Red Hat GmbH
+        id S231730AbhCLL3v (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 12 Mar 2021 06:29:51 -0500
+Received: from foss.arm.com ([217.140.110.172]:52260 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S231749AbhCLL3V (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 12 Mar 2021 06:29:21 -0500
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4FF7EED1;
+        Fri, 12 Mar 2021 03:29:21 -0800 (PST)
+Received: from [192.168.0.110] (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 544BC3F793;
+        Fri, 12 Mar 2021 03:29:20 -0800 (PST)
+Subject: Re: [PATCH kvmtool v2 13/22] hw/serial: Refactor trap handler
+To:     Andre Przywara <andre.przywara@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>
+Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+        Marc Zyngier <maz@kernel.org>,
+        Sami Mujawar <sami.mujawar@arm.com>
+References: <20210225005915.26423-1-andre.przywara@arm.com>
+ <20210225005915.26423-14-andre.przywara@arm.com>
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+Message-ID: <07b64ff1-a9d7-0393-36f4-8df4f87937f6@arm.com>
+Date:   Fri, 12 Mar 2021 11:29:43 +0000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.8.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20210225005915.26423-14-andre.przywara@arm.com>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Content-Language: en-US
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 12 Mar 2021 11:41:48 +0100
-Pierre Morel <pmorel@linux.ibm.com> wrote:
+Hi Andre,
 
-> We tests the update of the Mesurement Block (MB) format 0
-> and format 1 using a serie of senseid requests.
-> 
-> *Warning*: One of the tests for format-1 will unexpectedly fail for QEMU elf
-> unless the QEMU patch "css: SCHIB measurement block origin must be aligned"
-> is applied.
-> This patch has recently hit QEMU master ...
-> With Protected Virtualization, the PGM is correctly recognized.
-> 
-> The MB format 1 is only provided if the Extended mesurement Block
-> feature is available.
-> 
-> This feature is exposed by the CSS characteristics general features
-> stored by the Store Channel Subsystem Characteristics CHSC command,
-> consequently, we implement the CHSC instruction call and the SCSC CHSC
-> command.
-> 
-> In order to ease the writing of new tests using:
-> - interrupt
-> - enablement of a subchannel
-> - multiple I/O on a subchannel
-> 
-> We do the following simplifications:
-> - we create a CSS initialization routine
-> - we register the I/O interrupt handler on CSS initialization
-> - we do not enable or disable a subchannel in the senseid test,
->   assuming this test is done after the enable test, this allows
->   to create traffic using the SSCH used by senseid.
-> - failures not part of the feature under test will stop the tests.
-> - we add a css_enabled() function to test if a subchannel is enabled.
-> 
-> *note*:
->     I rearranged the use of the senseid for the tests, by not modifying
->     the existing test and having a dedicated senseid() function for
->     the purpose of the tests.
->     I think that it is in the rigght way so I kept the RB and ACK on
->     the simplification, there are less changes, if it is wrong from me
->     I suppose I will see this in the comments.
->     Since the changed are moved inside the fmt0 test which is not approved
->     for now I hope it is OK.
-> 
-> Regards,
-> Pierre
-> 
-> Pierre Morel (6):
->   s390x: css: Store CSS Characteristics
->   s390x: css: simplifications of the tests
->   s390x: css: extending the subchannel modifying functions
->   s390x: css: implementing Set CHannel Monitor
->   s390x: css: testing measurement block format 0
->   s390x: css: testing measurement block format 1
-> 
->  lib/s390x/css.h     | 115 ++++++++++++++++++++-
->  lib/s390x/css_lib.c | 236 ++++++++++++++++++++++++++++++++++++++++----
->  s390x/css.c         | 216 ++++++++++++++++++++++++++++++++++++++--
->  3 files changed, 539 insertions(+), 28 deletions(-)
-> 
+On 2/25/21 12:59 AM, Andre Przywara wrote:
+> With the planned retirement of the special ioport emulation code, we
+> need to provide an emulation function compatible with the MMIO prototype.
+>
+> Adjust the trap handler to use that new function, and provide shims to
+> implement the old ioport interface, for now.
+>
+> We drop the usage of ioport__read8/write8 entirely, as this would only
+> be applicable for I/O port accesses, and does nothing for 8-bit wide
+> accesses anyway.
+>
+> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+> ---
+>  hw/serial.c | 93 +++++++++++++++++++++++++++++++++--------------------
+>  1 file changed, 58 insertions(+), 35 deletions(-)
+>
+> diff --git a/hw/serial.c b/hw/serial.c
+> index b0465d99..c495eac1 100644
+> --- a/hw/serial.c
+> +++ b/hw/serial.c
+> @@ -242,36 +242,31 @@ void serial8250__inject_sysrq(struct kvm *kvm, char sysrq)
+>  	sysrq_pending = sysrq;
+>  }
+>  
+> -static bool serial8250_out(struct ioport *ioport, struct kvm_cpu *vcpu, u16 port,
+> -			   void *data, int size)
+> +static bool serial8250_out(struct serial8250_device *dev, struct kvm_cpu *vcpu,
+> +			   u16 offset, u8 data)
+>  {
+> -	struct serial8250_device *dev = ioport->priv;
+> -	u16 offset;
+>  	bool ret = true;
+> -	char *addr = data;
+>  
+>  	mutex_lock(&dev->mutex);
+>  
+> -	offset = port - dev->iobase;
+> -
+>  	switch (offset) {
+>  	case UART_TX:
+>  		if (dev->lcr & UART_LCR_DLAB) {
+> -			dev->dll = ioport__read8(data);
+> +			dev->dll = data;
+>  			break;
+>  		}
+>  
+>  		/* Loopback mode */
+>  		if (dev->mcr & UART_MCR_LOOP) {
+>  			if (dev->rxcnt < FIFO_LEN) {
+> -				dev->rxbuf[dev->rxcnt++] = *addr;
+> +				dev->rxbuf[dev->rxcnt++] = data;
+>  				dev->lsr |= UART_LSR_DR;
+>  			}
+>  			break;
+>  		}
+>  
+>  		if (dev->txcnt < FIFO_LEN) {
+> -			dev->txbuf[dev->txcnt++] = *addr;
+> +			dev->txbuf[dev->txcnt++] = data;
+>  			dev->lsr &= ~UART_LSR_TEMT;
+>  			if (dev->txcnt == FIFO_LEN / 2)
+>  				dev->lsr &= ~UART_LSR_THRE;
+> @@ -283,18 +278,18 @@ static bool serial8250_out(struct ioport *ioport, struct kvm_cpu *vcpu, u16 port
+>  		break;
+>  	case UART_IER:
+>  		if (!(dev->lcr & UART_LCR_DLAB))
+> -			dev->ier = ioport__read8(data) & 0x0f;
+> +			dev->ier = data & 0x0f;
+>  		else
+> -			dev->dlm = ioport__read8(data);
+> +			dev->dlm = data;
+>  		break;
+>  	case UART_FCR:
+> -		dev->fcr = ioport__read8(data);
+> +		dev->fcr = data;
+>  		break;
+>  	case UART_LCR:
+> -		dev->lcr = ioport__read8(data);
+> +		dev->lcr = data;
+>  		break;
+>  	case UART_MCR:
+> -		dev->mcr = ioport__read8(data);
+> +		dev->mcr = data;
+>  		break;
+>  	case UART_LSR:
+>  		/* Factory test */
+> @@ -303,7 +298,7 @@ static bool serial8250_out(struct ioport *ioport, struct kvm_cpu *vcpu, u16 port
+>  		/* Not used */
+>  		break;
+>  	case UART_SCR:
+> -		dev->scr = ioport__read8(data);
+> +		dev->scr = data;
+>  		break;
+>  	default:
+>  		ret = false;
+> @@ -317,7 +312,7 @@ static bool serial8250_out(struct ioport *ioport, struct kvm_cpu *vcpu, u16 port
+>  	return ret;
+>  }
+>  
+> -static void serial8250_rx(struct serial8250_device *dev, void *data)
+> +static void serial8250_rx(struct serial8250_device *dev, u8 *data)
+>  {
+>  	if (dev->rxdone == dev->rxcnt)
+>  		return;
+> @@ -325,57 +320,54 @@ static void serial8250_rx(struct serial8250_device *dev, void *data)
+>  	/* Break issued ? */
+>  	if (dev->lsr & UART_LSR_BI) {
+>  		dev->lsr &= ~UART_LSR_BI;
+> -		ioport__write8(data, 0);
+> +		*data = 0;
+>  		return;
+>  	}
+>  
+> -	ioport__write8(data, dev->rxbuf[dev->rxdone++]);
+> +	*data = dev->rxbuf[dev->rxdone++];
+>  	if (dev->rxcnt == dev->rxdone) {
+>  		dev->lsr &= ~UART_LSR_DR;
+>  		dev->rxcnt = dev->rxdone = 0;
+>  	}
+>  }
+>  
+> -static bool serial8250_in(struct ioport *ioport, struct kvm_cpu *vcpu, u16 port, void *data, int size)
+> +static bool serial8250_in(struct serial8250_device *dev, struct kvm_cpu *vcpu,
+> +			  u16 offset, u8 *data)
+>  {
+> -	struct serial8250_device *dev = ioport->priv;
+> -	u16 offset;
+>  	bool ret = true;
+>  
+>  	mutex_lock(&dev->mutex);
+>  
+> -	offset = port - dev->iobase;
+> -
+>  	switch (offset) {
+>  	case UART_RX:
+>  		if (dev->lcr & UART_LCR_DLAB)
+> -			ioport__write8(data, dev->dll);
+> +			*data = dev->dll;
+>  		else
+>  			serial8250_rx(dev, data);
+>  		break;
+>  	case UART_IER:
+>  		if (dev->lcr & UART_LCR_DLAB)
+> -			ioport__write8(data, dev->dlm);
+> +			*data = dev->dlm;
+>  		else
+> -			ioport__write8(data, dev->ier);
+> +			*data = dev->ier;
+>  		break;
+>  	case UART_IIR:
+> -		ioport__write8(data, dev->iir | UART_IIR_TYPE_BITS);
+> +		*data = dev->iir | UART_IIR_TYPE_BITS;
+>  		break;
+>  	case UART_LCR:
+> -		ioport__write8(data, dev->lcr);
+> +		*data = dev->lcr;
+>  		break;
+>  	case UART_MCR:
+> -		ioport__write8(data, dev->mcr);
+> +		*data = dev->mcr;
+>  		break;
+>  	case UART_LSR:
+> -		ioport__write8(data, dev->lsr);
+> +		*data = dev->lsr;
+>  		break;
+>  	case UART_MSR:
+> -		ioport__write8(data, dev->msr);
+> +		*data = dev->msr;
+>  		break;
+>  	case UART_SCR:
+> -		ioport__write8(data, dev->scr);
+> +		*data = dev->scr;
+>  		break;
+>  	default:
+>  		ret = false;
+> @@ -389,6 +381,37 @@ static bool serial8250_in(struct ioport *ioport, struct kvm_cpu *vcpu, u16 port,
+>  	return ret;
+>  }
 
-Series looks good to me.
+I'm not sure about replacing ioport_{read,write}8 with pointer dereferencing. They
+are functionally equivalent because big-endian and little-endian are about the
+order of bytes in memory, not the order of bits, but I don't think the change
+makes much sense because:
 
+1. All the other emulated devices use the ioport accessors, even in the case of 8
+bit accesses. For example, the RTC device uses ioport accessors and it too is
+converted in the end to a MMIO device, just like serial.
+
+2. The patch is about refactoring the emulation callbacks, other (non-trivial)
+changes should be a separate patch.
+
+Please let me know if it's something that I'm missing. Other than this change, the
+patch looks good.
+
+Thanks,
+
+Alex
+
+>  
+> +static void serial8250_mmio(struct kvm_cpu *vcpu, u64 addr, u8 *data, u32 len,
+> +			    u8 is_write, void *ptr)
+> +{
+> +	struct serial8250_device *dev = ptr;
+> +
+> +	if (is_write)
+> +		serial8250_out(dev, vcpu, addr - dev->iobase, *data);
+> +	else
+> +		serial8250_in(dev, vcpu, addr - dev->iobase, data);
+> +}
+> +
+> +static bool serial8250_ioport_out(struct ioport *ioport, struct kvm_cpu *vcpu,
+> +				  u16 port, void *data, int size)
+> +{
+> +	struct serial8250_device *dev = ioport->priv;
+> +
+> +	serial8250_mmio(vcpu, port, data, 1, true, dev);
+> +
+> +	return true;
+> +}
+> +
+> +static bool serial8250_ioport_in(struct ioport *ioport, struct kvm_cpu *vcpu,
+> +				 u16 port, void *data, int size)
+> +{
+> +	struct serial8250_device *dev = ioport->priv;
+> +
+> +	serial8250_mmio(vcpu, port, data, 1, false, dev);
+> +
+> +	return true;
+> +}
+> +
+>  #ifdef CONFIG_HAS_LIBFDT
+>  
+>  char *fdt_stdout_path = NULL;
+> @@ -427,8 +450,8 @@ void serial8250_generate_fdt_node(void *fdt, struct device_header *dev_hdr,
+>  #endif
+>  
+>  static struct ioport_operations serial8250_ops = {
+> -	.io_in			= serial8250_in,
+> -	.io_out			= serial8250_out,
+> +	.io_in			= serial8250_ioport_in,
+> +	.io_out			= serial8250_ioport_out,
+>  };
+>  
+>  static int serial8250__device_init(struct kvm *kvm,
