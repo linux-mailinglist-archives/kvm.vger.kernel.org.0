@@ -2,204 +2,97 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F177B339805
-	for <lists+kvm@lfdr.de>; Fri, 12 Mar 2021 21:10:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 352583398AF
+	for <lists+kvm@lfdr.de>; Fri, 12 Mar 2021 21:52:14 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234642AbhCLUKE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 12 Mar 2021 15:10:04 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:20822 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234653AbhCLUJt (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 12 Mar 2021 15:09:49 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1615579788;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Jyz52keAoIKnP4MO3/5Lr7keCuYbmY1/k6xZpVT/8EI=;
-        b=clj84phO4ijnJ/uGKeAklKA2NuPecoRl+dZpF0wOOZaQuchFUwRJ39r9yTtYtU+mup/VM/
-        Ctl8E9Y39AD92u+lqLoyc69QC6l+233UHcaxOBAdataT2d1f02ixktcVVjhikOsicOss54
-        /mpgK29bNDCNLgximE8imS+PEdOXwSU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-364-OSk_6vnuNbKzkCrXTnd6Sg-1; Fri, 12 Mar 2021 15:09:45 -0500
-X-MC-Unique: OSk_6vnuNbKzkCrXTnd6Sg-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E644984B9A1;
-        Fri, 12 Mar 2021 20:09:43 +0000 (UTC)
-Received: from omen.home.shazbot.org (ovpn-112-255.phx2.redhat.com [10.3.112.255])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 716FE6087C;
-        Fri, 12 Mar 2021 20:09:39 +0000 (UTC)
-Date:   Fri, 12 Mar 2021 13:09:38 -0700
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        peterx@redhat.com, prime.zeng@hisilicon.com, cohuck@redhat.com
-Subject: Re: [PATCH] vfio/pci: Handle concurrent vma faults
-Message-ID: <20210312130938.1e535e50@omen.home.shazbot.org>
-In-Reply-To: <20210312194147.GH2356281@nvidia.com>
-References: <161539852724.8302.17137130175894127401.stgit@gimli.home>
-        <20210310181446.GZ2356281@nvidia.com>
-        <20210310113406.6f029fcf@omen.home.shazbot.org>
-        <20210310184011.GA2356281@nvidia.com>
-        <20210312121611.07a313e3@omen.home.shazbot.org>
-        <20210312194147.GH2356281@nvidia.com>
+        id S235028AbhCLUvl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 12 Mar 2021 15:51:41 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57284 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235009AbhCLUvd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 12 Mar 2021 15:51:33 -0500
+Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6DBE9C061574
+        for <kvm@vger.kernel.org>; Fri, 12 Mar 2021 12:51:33 -0800 (PST)
+Received: by mail-pj1-x1033.google.com with SMTP id ha17so4972698pjb.2
+        for <kvm@vger.kernel.org>; Fri, 12 Mar 2021 12:51:33 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:content-transfer-encoding:in-reply-to;
+        bh=vDrjln050ZWSD2n57JKYsjj24mDG3Mu6cQfXoag8kqA=;
+        b=o1+mWphvFvKetD8P/Z44PWPcjEPdOlxMP5SOQC16Tskp42s9q00lujmGOIFQWhhEaV
+         1ink7OOHVOKxPCCC+xqBCilm4hYNtfYqXA93rZbxOrH+fXw4mCuIhAwvWzxV35JiV+lI
+         F1bLUj/xMyG+8vXBR7aexe3fAaM4Tn1okrASG7GtrXc5qspcBWXZQM7rDaB+VFV0N60v
+         kqKR+njm735YkwAXVBzJHHZZE38U649WTUg1VLZeSW1oWofsuolBzXu7AdqcTUoHQVzv
+         iadBzD/YkaVT31MESOfV0PH2BVjAOVGU26qG6tzmz3UOVKovVIWHocspnwgnzALbc0so
+         pMqQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=vDrjln050ZWSD2n57JKYsjj24mDG3Mu6cQfXoag8kqA=;
+        b=OVPR6i8Rv56SjB/zuVmJ3TA7zFLQ3afkkSVcGrk/+X1AmIzwiDDAUHlB3CXVxMyfJW
+         309qHmLQ8vNi+SuOPtnz7+mRJ6NNye0Xoz0XDjrSvWU0eQ2m4bOm/ymutahKmb8WRPZ+
+         I+DSaonnoe1OT8W8VSu1CBKV/5UPDBUOBQJ5DHgyW9cMyCl04Hoc3r9GWRma4KHy/Sf5
+         ceU/RslcwXFhpI428FiBXLZpfxvKRG4OTgjfPMnMyAt0p2jivtOOtPuXM+b1msut98ub
+         yQmd2R+P9hhqjqoDexVPr8n0CaGaq9BFGEJQKnbr3wCG6akVvGHYWYSgV84/ibA43kGk
+         IzZw==
+X-Gm-Message-State: AOAM532mU78QRvb4HBKMX8Cgab21YIPgjk12c8d7XCwjZgxknzAkzrBV
+        aRsDE3zL09/2HOPxAGO/v1hFKQ==
+X-Google-Smtp-Source: ABdhPJyOxdn4Hc2Qvr6pK+LxEXDtcg+Su4dKCMB6KabV21efjdTrwWXlyMlnQo+c+UfqNxWghTBHkQ==
+X-Received: by 2002:a17:90a:a414:: with SMTP id y20mr122695pjp.77.1615582292700;
+        Fri, 12 Mar 2021 12:51:32 -0800 (PST)
+Received: from google.com ([2620:15c:f:10:e1a6:2eeb:4e45:756])
+        by smtp.gmail.com with ESMTPSA id a144sm6710227pfd.200.2021.03.12.12.51.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 12 Mar 2021 12:51:32 -0800 (PST)
+Date:   Fri, 12 Mar 2021 12:51:25 -0800
+From:   Sean Christopherson <seanjc@google.com>
+To:     Vipin Sharma <vipinsh@google.com>
+Cc:     Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>,
+        thomas.lendacky@amd.com, brijesh.singh@amd.com, tj@kernel.org,
+        rdunlap@infradead.org, jon.grimm@amd.com, eric.vantassell@amd.com,
+        pbonzini@redhat.com, hannes@cmpxchg.org, frankja@linux.ibm.com,
+        borntraeger@de.ibm.com, corbet@lwn.net, vkuznets@redhat.com,
+        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
+        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, hpa@zytor.com,
+        gingell@google.com, rientjes@google.com, dionnaglaze@google.com,
+        kvm@vger.kernel.org, x86@kernel.org, cgroups@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [Patch v3 1/2] cgroup: sev: Add misc cgroup controller
+Message-ID: <YEvUTatAjIoP7dPD@google.com>
+References: <20210304231946.2766648-1-vipinsh@google.com>
+ <20210304231946.2766648-2-vipinsh@google.com>
+ <YEpod5X29YqMhW/g@blackbook>
+ <YEvFldKZ8YQM+t2q@google.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <YEvFldKZ8YQM+t2q@google.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 12 Mar 2021 15:41:47 -0400
-Jason Gunthorpe <jgg@nvidia.com> wrote:
-
-> On Fri, Mar 12, 2021 at 12:16:11PM -0700, Alex Williamson wrote:
-> > On Wed, 10 Mar 2021 14:40:11 -0400
-> > Jason Gunthorpe <jgg@nvidia.com> wrote:
-> >   
-> > > On Wed, Mar 10, 2021 at 11:34:06AM -0700, Alex Williamson wrote:
-> > >   
-> > > > > I think after the address_space changes this should try to stick with
-> > > > > a normal io_rmap_pfn_range() done outside the fault handler.    
-> > > > 
-> > > > I assume you're suggesting calling io_remap_pfn_range() when device
-> > > > memory is enabled,    
-> > > 
-> > > Yes, I think I saw Peter thinking along these lines too
-> > > 
-> > > Then fault just always causes SIGBUS if it gets called  
-> > 
-> > Trying to use the address_space approach because otherwise we'd just be
-> > adding back vma list tracking, it looks like we can't call
-> > io_remap_pfn_range() while holding the address_space i_mmap_rwsem via
-> > i_mmap_lock_write(), like done in unmap_mapping_range().  lockdep
-> > identifies a circular lock order issue against fs_reclaim.  Minimally we
-> > also need vma_interval_tree_iter_{first,next} exported in order to use
-> > vma_interval_tree_foreach().  Suggestions?  Thanks,  
+On Fri, Mar 12, 2021, Vipin Sharma wrote:
+> On Thu, Mar 11, 2021 at 07:59:03PM +0100, Michal Koutný wrote:
+> > > +#ifndef CONFIG_KVM_AMD_SEV
+> > > +/*
+> > > + * When this config is not defined, SEV feature is not supported and APIs in
+> > > + * this file are not used but this file still gets compiled into the KVM AMD
+> > > + * module.
+> > > + *
+> > > + * We will not have MISC_CG_RES_SEV and MISC_CG_RES_SEV_ES entries in the enum
+> > > + * misc_res_type {} defined in linux/misc_cgroup.h.
+> > BTW, was there any progress on conditioning sev.c build on
+> > CONFIG_KVM_AMD_SEV? (So that the defines workaround isn't needeed.)
 > 
-> You are asking how to put the BAR back into every VMA when it is
-> enabled again after it has been zap'd?
+> Tom, Brijesh,
+> Is this something you guys thought about or have some plans to do in the
+> future? Basically to not include sev.c in compilation if
+> CONFIG_KVM_AMD_SEV is disabled.
 
-Exactly.
- 
-> What did the lockdep splat look like? Is it a memory allocation?
-
-
-======================================================
-WARNING: possible circular locking dependency detected
-5.12.0-rc1+ #18 Not tainted
-------------------------------------------------------
-CPU 0/KVM/1406 is trying to acquire lock:
-ffffffffa5a58d60 (fs_reclaim){+.+.}-{0:0}, at: fs_reclaim_acquire+0x83/0xd0
-
-but task is already holding lock:
-ffff94c0f3e8fb08 (&mapping->i_mmap_rwsem){++++}-{3:3}, at: vfio_device_io_remap_mapping_range+0x31/0x120 [vfio]
-
-which lock already depends on the new lock.
-
-
-the existing dependency chain (in reverse order) is:
-
--> #1 (&mapping->i_mmap_rwsem){++++}-{3:3}:
-       down_write+0x3d/0x70
-       dma_resv_lockdep+0x1b0/0x298
-       do_one_initcall+0x5b/0x2d0
-       kernel_init_freeable+0x251/0x298
-       kernel_init+0xa/0x111
-       ret_from_fork+0x22/0x30
-
--> #0 (fs_reclaim){+.+.}-{0:0}:
-       __lock_acquire+0x111f/0x1e10
-       lock_acquire+0xb5/0x380
-       fs_reclaim_acquire+0xa3/0xd0
-       kmem_cache_alloc_trace+0x30/0x2c0
-       memtype_reserve+0xc3/0x280
-       reserve_pfn_range+0x86/0x160
-       track_pfn_remap+0xa6/0xe0
-       remap_pfn_range+0xa8/0x610
-       vfio_device_io_remap_mapping_range+0x93/0x120 [vfio]
-       vfio_pci_test_and_up_write_memory_lock+0x34/0x40 [vfio_pci]
-       vfio_basic_config_write+0x12d/0x230 [vfio_pci]
-       vfio_pci_config_rw+0x1b7/0x3a0 [vfio_pci]
-       vfs_write+0xea/0x390
-       __x64_sys_pwrite64+0x72/0xb0
-       do_syscall_64+0x33/0x40
-       entry_SYSCALL_64_after_hwframe+0x44/0xae
-
-other info that might help us debug this:
-
- Possible unsafe locking scenario:
-
-       CPU0                    CPU1
-       ----                    ----
-  lock(&mapping->i_mmap_rwsem);
-                               lock(fs_reclaim);
-                               lock(&mapping->i_mmap_rwsem);
-  lock(fs_reclaim);
-
- *** DEADLOCK ***
-
-2 locks held by CPU 0/KVM/1406:
- #0: ffff94c0f9c71ef0 (&vdev->memory_lock){++++}-{3:3}, at: vfio_basic_config_write+0x19a/0x230 [vfio_pci]
- #1: ffff94c0f3e8fb08 (&mapping->i_mmap_rwsem){++++}-{3:3}, at: vfio_device_io_remap_mapping_range+0x31/0x120 [vfio]
-
-stack backtrace:
-CPU: 3 PID: 1406 Comm: CPU 0/KVM Not tainted 5.12.0-rc1+ #18
-Hardware name: System manufacturer System Product Name/P8H67-M PRO, BIOS 3904 04/27/2013
-Call Trace:
- dump_stack+0x7f/0xa1
- check_noncircular+0xcf/0xf0
- __lock_acquire+0x111f/0x1e10
- lock_acquire+0xb5/0x380
- ? fs_reclaim_acquire+0x83/0xd0
- ? pat_enabled+0x10/0x10
- ? memtype_reserve+0xc3/0x280
- fs_reclaim_acquire+0xa3/0xd0
- ? fs_reclaim_acquire+0x83/0xd0
- kmem_cache_alloc_trace+0x30/0x2c0
- memtype_reserve+0xc3/0x280
- reserve_pfn_range+0x86/0x160
- track_pfn_remap+0xa6/0xe0
- remap_pfn_range+0xa8/0x610
- ? lock_acquire+0xb5/0x380
- ? vfio_device_io_remap_mapping_range+0x31/0x120 [vfio]
- ? lock_is_held_type+0xa5/0x120
- vfio_device_io_remap_mapping_range+0x93/0x120 [vfio]
- vfio_pci_test_and_up_write_memory_lock+0x34/0x40 [vfio_pci]
- vfio_basic_config_write+0x12d/0x230 [vfio_pci]
- vfio_pci_config_rw+0x1b7/0x3a0 [vfio_pci]
- vfs_write+0xea/0x390
- __x64_sys_pwrite64+0x72/0xb0
- do_syscall_64+0x33/0x40
- entry_SYSCALL_64_after_hwframe+0x44/0xae
-RIP: 0033:0x7f80176152ff
-Code: 08 89 3c 24 48 89 4c 24 18 e8 3d f3 ff ff 4c 8b 54 24 18 48 8b 54 24 10 41 89 c0 48 8b 74 24 08 8b 3c 24 b8 12 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 31 44 89 c7 48 89 04 24 e8 6d f3 ff ff 48 8b
-RSP: 002b:00007f7efa5f72f0 EFLAGS: 00000293 ORIG_RAX: 0000000000000012
-RAX: ffffffffffffffda RBX: 0000000000000004 RCX: 00007f80176152ff
-RDX: 0000000000000002 RSI: 00007f7efa5f736c RDI: 000000000000002d
-RBP: 000055b66913d530 R08: 0000000000000000 R09: 000000000000ffff
-R10: 0000070000000004 R11: 0000000000000293 R12: 0000000000000004
-R13: 0000000000000102 R14: 0000000000000002 R15: 000055b66913d530
-
-> Does current_gfp_context()/memalloc_nofs_save()/etc solve it?
-
-Will investigate...
- 
-> The easiest answer is to continue to use fault and the
-> vmf_insert_page()..
-> 
-> But it feels like it wouuld be OK to export enough i_mmap machinery to
-> enable this. Cleaner than building your own tracking, which would
-> still have the same ugly mmap_sem inversion issue which was preventing
-> this last time.
-
-Yup, I'd rather fault than add that back, but I'm not sure we have a
-mapping function compatible with this framework.  Thanks,
-
-Alex
-
+It's crossed my mind, but the number of stubs needed made me back off.  I'm
+certainly not opposed to the idea, it's just not a trivial change.
