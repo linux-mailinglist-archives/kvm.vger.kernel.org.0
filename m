@@ -2,135 +2,143 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C1D94338B90
-	for <lists+kvm@lfdr.de>; Fri, 12 Mar 2021 12:35:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3F579338BB5
+	for <lists+kvm@lfdr.de>; Fri, 12 Mar 2021 12:42:32 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232178AbhCLLex (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 12 Mar 2021 06:34:53 -0500
-Received: from szxga05-in.huawei.com ([45.249.212.191]:13525 "EHLO
-        szxga05-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230062AbhCLLe2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 12 Mar 2021 06:34:28 -0500
-Received: from DGGEMS409-HUB.china.huawei.com (unknown [172.30.72.59])
-        by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4DxkDk5yxmzNlm9;
-        Fri, 12 Mar 2021 19:32:06 +0800 (CST)
-Received: from [10.174.184.135] (10.174.184.135) by
- DGGEMS409-HUB.china.huawei.com (10.3.19.209) with Microsoft SMTP Server id
- 14.3.498.0; Fri, 12 Mar 2021 19:34:18 +0800
-Subject: Re: [PATCH v3 3/4] KVM: arm64: GICv4.1: Restore VLPI's pending state
- to physical side
-To:     Marc Zyngier <maz@kernel.org>
-CC:     Eric Auger <eric.auger@redhat.com>, Will Deacon <will@kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>,
-        <kvmarm@lists.cs.columbia.edu>, <kvm@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        "Lorenzo Pieralisi" <lorenzo.pieralisi@arm.com>,
-        <wanghaibin.wang@huawei.com>, <yuzenghui@huawei.com>
-References: <20210127121337.1092-1-lushenming@huawei.com>
- <20210127121337.1092-4-lushenming@huawei.com> <87tupif3x3.wl-maz@kernel.org>
- <0820f429-4c29-acd6-d9e0-af9f6deb68e4@huawei.com>
- <87k0qcg2s6.wl-maz@kernel.org>
- <aecfbf72-c653-e967-b539-89f629b52cde@huawei.com>
- <87h7lgfwzu.wl-maz@kernel.org>
-From:   Shenming Lu <lushenming@huawei.com>
-Message-ID: <df4b939d-27c1-be84-ea7e-327251958cde@huawei.com>
-Date:   Fri, 12 Mar 2021 19:34:07 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.2.2
+        id S230245AbhCLLl7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 12 Mar 2021 06:41:59 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:22462 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231500AbhCLLla (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 12 Mar 2021 06:41:30 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1615549288;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=8jHxvC75w9X24DxN9G8Wywf246TTfX1Ko6CkI1Ni8H8=;
+        b=cTJmSu3MtIU87iKwFXmw5rCBx16lhu5g4YAQlvdEyw5M5eq8dOGjJlHnTy5kn30DqJsMnu
+        BDUisbaFAq7XMr5HHnEgtIStroZ8FKrNs6AsTfYnqxKAL7qjIC2J7kQV9GmPNgr7GTfY/m
+        0SLCp3rQqddRT2IPVBXGH2pf+NWhTIs=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-16-93NYT4tYNUKlYYYmJOtiQA-1; Fri, 12 Mar 2021 06:41:26 -0500
+X-MC-Unique: 93NYT4tYNUKlYYYmJOtiQA-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C74C48AA1F6;
+        Fri, 12 Mar 2021 11:41:12 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.40.192.104])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id B2D766F80B;
+        Fri, 12 Mar 2021 11:40:32 +0000 (UTC)
+Date:   Fri, 12 Mar 2021 12:40:29 +0100
+From:   Andrew Jones <drjones@redhat.com>
+To:     Yanan Wang <wangyanan55@huawei.com>
+Cc:     kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Ben Gardon <bgardon@google.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Peter Xu <peterx@redhat.com>, Marc Zyngier <maz@kernel.org>,
+        Ingo Molnar <mingo@kernel.org>,
+        Adrian Hunter <adrian.hunter@intel.com>,
+        Jiri Olsa <jolsa@redhat.com>,
+        Arnaldo Carvalho de Melo <acme@redhat.com>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Michael Kerrisk <mtk.manpages@gmail.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        wanghaibin.wang@huawei.com, yezengruan@huawei.com,
+        yuzenghui@huawei.com
+Subject: Re: [RFC PATCH v4 6/9] KVM: selftests: Add a helper to get system
+ default hugetlb page size
+Message-ID: <20210312114029.ju66lm5rrqdakgar@kamzik.brq.redhat.com>
+References: <20210302125751.19080-1-wangyanan55@huawei.com>
+ <20210302125751.19080-7-wangyanan55@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <87h7lgfwzu.wl-maz@kernel.org>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.174.184.135]
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210302125751.19080-7-wangyanan55@huawei.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2021/3/12 19:10, Marc Zyngier wrote:
-> On Fri, 12 Mar 2021 10:48:29 +0000,
-> Shenming Lu <lushenming@huawei.com> wrote:
->>
->> On 2021/3/12 17:05, Marc Zyngier wrote:
->>> On Thu, 11 Mar 2021 12:32:07 +0000,
->>> Shenming Lu <lushenming@huawei.com> wrote:
->>>>
->>>> On 2021/3/11 17:14, Marc Zyngier wrote:
->>>>> On Wed, 27 Jan 2021 12:13:36 +0000,
->>>>> Shenming Lu <lushenming@huawei.com> wrote:
->>>>>>
->>>>>> From: Zenghui Yu <yuzenghui@huawei.com>
->>>>>>
->>>>>> When setting the forwarding path of a VLPI (switch to the HW mode),
->>>>>> we could also transfer the pending state from irq->pending_latch to
->>>>>> VPT (especially in migration, the pending states of VLPIs are restored
->>>>>> into kvm’s vgic first). And we currently send "INT+VSYNC" to trigger
->>>>>> a VLPI to pending.
->>>>>>
->>>>>> Signed-off-by: Zenghui Yu <yuzenghui@huawei.com>
->>>>>> Signed-off-by: Shenming Lu <lushenming@huawei.com>
->>>>>> ---
->>>>>>  arch/arm64/kvm/vgic/vgic-v4.c | 14 ++++++++++++++
->>>>>>  1 file changed, 14 insertions(+)
->>>>>>
->>>>>> diff --git a/arch/arm64/kvm/vgic/vgic-v4.c b/arch/arm64/kvm/vgic/vgic-v4.c
->>>>>> index ac029ba3d337..a3542af6f04a 100644
->>>>>> --- a/arch/arm64/kvm/vgic/vgic-v4.c
->>>>>> +++ b/arch/arm64/kvm/vgic/vgic-v4.c
->>>>>> @@ -449,6 +449,20 @@ int kvm_vgic_v4_set_forwarding(struct kvm *kvm, int virq,
->>>>>>  	irq->host_irq	= virq;
->>>>>>  	atomic_inc(&map.vpe->vlpi_count);
->>>>>>  
->>>>>> +	/* Transfer pending state */
->>>>>> +	if (irq->pending_latch) {
->>>>>> +		ret = irq_set_irqchip_state(irq->host_irq,
->>>>>> +					    IRQCHIP_STATE_PENDING,
->>>>>> +					    irq->pending_latch);
->>>>>> +		WARN_RATELIMIT(ret, "IRQ %d", irq->host_irq);
->>>>>> +
->>>>>> +		/*
->>>>>> +		 * Let it be pruned from ap_list later and don't bother
->>>>>> +		 * the List Register.
->>>>>> +		 */
->>>>>> +		irq->pending_latch = false;
->>>>>
->>>>> NAK. If the interrupt is on the AP list, it must be pruned from it
->>>>> *immediately*. The only case where it can be !pending and still on the
->>>>> AP list is in interval between sync and prune. If we start messing
->>>>> with this, we can't reason about the state of this list anymore.
->>>>>
->>>>> Consider calling vgic_queue_irq_unlock() here.
->>>>
->>>> Thanks for giving a hint, but it seems that vgic_queue_irq_unlock() only
->>>> queues an IRQ after checking, did you mean vgic_prune_ap_list() instead?
->>>
->>> No, I really mean vgic_queue_irq_unlock(). It can be used to remove
->>> the pending state from an interrupt, and drop it from the AP
->>> list. This is exactly what happens when clearing the pending state of
->>> a level interrupt, for example.
->>
->> Hi, I have gone through vgic_queue_irq_unlock more than once, but
->> still can't find the place in it to drop an IRQ from the AP
->> list... Did I miss something ?...  Or could you help to point it
->> out? Thanks very much for this!
+On Tue, Mar 02, 2021 at 08:57:48PM +0800, Yanan Wang wrote:
+> If HUGETLB is configured in the host kernel, then we can know the system
+> default hugetlb page size through *cat /proc/meminfo*. Otherwise, we will
+> not see the information of hugetlb pages in file /proc/meminfo if it's not
+> configured. So add a helper to determine whether HUGETLB is configured and
+> then get the default page size by reading /proc/meminfo.
 > 
-> NO, you are right. I think this is a missing optimisation. Please call
-> the function anyway, as that's what is required to communicate a
-> change of state in general.>
-> I'll have a think about it.
-
-Maybe we could call vgic_prune_ap_list() if (irq->vcpu && !vgic_target_oracle(irq)) in vgic_queue_irq_unlock()...
-
-OK, I will retest this series and send a v4 soon. :-)
-
-Thanks,
-Shenming
-
+> This helper can be useful when a program wants to use the default hugetlb
+> pages of the system and doesn't know the default page size.
 > 
-> Thanks,
+> Signed-off-by: Yanan Wang <wangyanan55@huawei.com>
+> ---
+>  .../testing/selftests/kvm/include/test_util.h |  1 +
+>  tools/testing/selftests/kvm/lib/test_util.c   | 27 +++++++++++++++++++
+>  2 files changed, 28 insertions(+)
 > 
-> 	M.
-> 
+> diff --git a/tools/testing/selftests/kvm/include/test_util.h b/tools/testing/selftests/kvm/include/test_util.h
+> index ef24c76ba89a..e087174eefe5 100644
+> --- a/tools/testing/selftests/kvm/include/test_util.h
+> +++ b/tools/testing/selftests/kvm/include/test_util.h
+> @@ -80,6 +80,7 @@ struct vm_mem_backing_src_alias {
+>  
+>  bool thp_configured(void);
+>  size_t get_trans_hugepagesz(void);
+> +size_t get_def_hugetlb_pagesz(void);
+>  void backing_src_help(void);
+>  enum vm_mem_backing_src_type parse_backing_src_type(const char *type_name);
+>  
+> diff --git a/tools/testing/selftests/kvm/lib/test_util.c b/tools/testing/selftests/kvm/lib/test_util.c
+> index f2d133f76c67..80d68dbd72d2 100644
+> --- a/tools/testing/selftests/kvm/lib/test_util.c
+> +++ b/tools/testing/selftests/kvm/lib/test_util.c
+> @@ -153,6 +153,33 @@ size_t get_trans_hugepagesz(void)
+>  	return size;
+>  }
+>  
+> +size_t get_def_hugetlb_pagesz(void)
+> +{
+> +	char buf[64];
+> +	const char *tag = "Hugepagesize:";
+> +	FILE *f;
+> +
+> +	f = fopen("/proc/meminfo", "r");
+> +	TEST_ASSERT(f != NULL, "Error in opening /proc/meminfo: %d", errno);
+> +
+> +	while (fgets(buf, sizeof(buf), f) != NULL) {
+> +		if (strstr(buf, tag) == buf) {
+> +			fclose(f);
+> +			return strtoull(buf + strlen(tag), NULL, 10) << 10;
+> +		}
+> +	}
+> +
+> +	if (feof(f)) {
+> +		fclose(f);
+> +		TEST_FAIL("HUGETLB is not configured in host kernel");
+> +	} else {
+> +		fclose(f);
+> +		TEST_FAIL("Error in reading /proc/meminfo: %d", errno);
+> +	}
+
+fclose() can be factored out.
+
+> +
+> +	return 0;
+> +}
+> +
+>  void backing_src_help(void)
+>  {
+>  	int i;
+> -- 
+> 2.23.0
+>
+
+Besides the fclose comment and the same errno comment as the previous
+patch
+
+Reviewed-by: Andrew Jones <drjones@redhat.com>
+
