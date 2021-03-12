@@ -2,108 +2,115 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CB1403398BB
-	for <lists+kvm@lfdr.de>; Fri, 12 Mar 2021 21:57:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B5C903398C5
+	for <lists+kvm@lfdr.de>; Fri, 12 Mar 2021 21:59:44 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235091AbhCLU4d (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 12 Mar 2021 15:56:33 -0500
-Received: from mga17.intel.com ([192.55.52.151]:49632 "EHLO mga17.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S235011AbhCLU4Z (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 12 Mar 2021 15:56:25 -0500
-IronPort-SDR: GZt40eTfKr0URQLU/Tc+BtdeyHeiOGDa29QSlS0yaqhhfkZjQelBAtgLDp4ucYl09L2EAWt93p
- oExztKn7WgQg==
-X-IronPort-AV: E=McAfee;i="6000,8403,9921"; a="168804613"
-X-IronPort-AV: E=Sophos;i="5.81,244,1610438400"; 
-   d="scan'208";a="168804613"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Mar 2021 12:56:02 -0800
-IronPort-SDR: +yAZQZlRFxNXGrsWBVBqLoh/L0S7tpb3FBFzxMaALzYg4kQ7i99mlKqSU50VYpRr6f29lPQa1b
- oHgYgPF50/xw==
-X-IronPort-AV: E=Sophos;i="5.81,244,1610438400"; 
-   d="scan'208";a="409967645"
-Received: from jacob-builder.jf.intel.com (HELO jacob-builder) ([10.7.199.155])
-  by orsmga007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Mar 2021 12:56:02 -0800
-Date:   Fri, 12 Mar 2021 12:58:21 -0800
-From:   Jacob Pan <jacob.jun.pan@intel.com>
-To:     Tejun Heo <tj@kernel.org>
-Cc:     Vipin Sharma <vipinsh@google.com>, mkoutny@suse.com,
-        rdunlap@infradead.org, thomas.lendacky@amd.com,
-        brijesh.singh@amd.com, jon.grimm@amd.com, eric.vantassell@amd.com,
-        pbonzini@redhat.com, hannes@cmpxchg.org, frankja@linux.ibm.com,
-        borntraeger@de.ibm.com, corbet@lwn.net, seanjc@google.com,
-        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
-        joro@8bytes.org, tglx@linutronix.de, mingo@redhat.com,
-        bp@alien8.de, hpa@zytor.com, gingell@google.com,
-        rientjes@google.com, dionnaglaze@google.com, kvm@vger.kernel.org,
-        x86@kernel.org, cgroups@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-kernel@vger.kernel.org, "Tian, Kevin" <kevin.tian@intel.com>,
-        "Liu, Yi L" <yi.l.liu@intel.com>,
-        "Raj, Ashok" <ashok.raj@intel.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Jason Gunthorpe <jgg@nvidia.com>, jacob.jun.pan@intel.com,
-        Jacob Pan <jacob.jun.pan@linux.intel.com>
-Subject: Re: [RFC v2 2/2] cgroup: sev: Miscellaneous cgroup documentation.
-Message-ID: <20210312125821.22d9bfca@jacob-builder>
-In-Reply-To: <YECfhCJtHUL9cB2L@slm.duckdns.org>
-References: <20210302081705.1990283-1-vipinsh@google.com>
-        <20210302081705.1990283-3-vipinsh@google.com>
-        <20210303185513.27e18fce@jacob-builder>
-        <YEB8i6Chq4K/GGF6@google.com>
-        <YECfhCJtHUL9cB2L@slm.duckdns.org>
-Organization: OTC
-X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
+        id S235114AbhCLU7J (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 12 Mar 2021 15:59:09 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:50946 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S235079AbhCLU6z (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 12 Mar 2021 15:58:55 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1615582734;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=tqrwGSWs78kmFc+bZgFNWuIXo+lT3T9Q8DDXoclb0G4=;
+        b=jBZSQEZ2l3aVpNqcDfR6cXl6+vOPcrraFOzJHNZMMByYd0UoF6uFFF4BETKVfi3z8eDrVq
+        RuDvOIOGY76gRlSktoCCviP3OCJK0XxnoThyxlAxFkfZG1eebWx0YxK2HZs+PTI5yjMbtb
+        bwDkJP31QjYnj9DXXLIQQZhWA4zdJ9E=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-553-nJHOhb7fOK239aU1O3cm5A-1; Fri, 12 Mar 2021 15:58:51 -0500
+X-MC-Unique: nJHOhb7fOK239aU1O3cm5A-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 763838189C7;
+        Fri, 12 Mar 2021 20:58:49 +0000 (UTC)
+Received: from omen.home.shazbot.org (ovpn-112-255.phx2.redhat.com [10.3.112.255])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id E57FF5D9CC;
+        Fri, 12 Mar 2021 20:58:44 +0000 (UTC)
+Date:   Fri, 12 Mar 2021 13:58:44 -0700
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        peterx@redhat.com, prime.zeng@hisilicon.com, cohuck@redhat.com
+Subject: Re: [PATCH] vfio/pci: Handle concurrent vma faults
+Message-ID: <20210312135844.5e97aac7@omen.home.shazbot.org>
+In-Reply-To: <20210312130938.1e535e50@omen.home.shazbot.org>
+References: <161539852724.8302.17137130175894127401.stgit@gimli.home>
+        <20210310181446.GZ2356281@nvidia.com>
+        <20210310113406.6f029fcf@omen.home.shazbot.org>
+        <20210310184011.GA2356281@nvidia.com>
+        <20210312121611.07a313e3@omen.home.shazbot.org>
+        <20210312194147.GH2356281@nvidia.com>
+        <20210312130938.1e535e50@omen.home.shazbot.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Vipin & Tejun,
+On Fri, 12 Mar 2021 13:09:38 -0700
+Alex Williamson <alex.williamson@redhat.com> wrote:
 
-Sorry for the late reply, I sent from a different email address than I
-intended. Please see my comments inline.
-
-
-On Thu, 4 Mar 2021 03:51:16 -0500, Tejun Heo <tj@kernel.org> wrote:
-
-> Hello,
+> On Fri, 12 Mar 2021 15:41:47 -0400
+> Jason Gunthorpe <jgg@nvidia.com> wrote:
 > 
-> On Wed, Mar 03, 2021 at 10:22:03PM -0800, Vipin Sharma wrote:
-> > > I am trying to see if IOASIDs cgroup can also fit in this misc
-> > > controller as yet another resource type.
-> > > https://lore.kernel.org/linux-iommu/20210303131726.7a8cb169@jacob-builder/T/#u
-> > > However, unlike sev IOASIDs need to be migrated if the process is
-> > > moved to another cgroup. i.e. charge the destination and uncharge the
-> > > source.
-> > > 
-> > > Do you think this behavior can be achieved by differentiating resource
-> > > types? i.e. add attach callbacks for certain types. Having a single
-> > > misc interface seems cleaner than creating another controller.  
-> > 
-> > I think it makes sense to add support for migration for the resources
-> > which need it. Resources like SEV, SEV-ES will not participate in
-> > migration and won't stop can_attach() to succeed, other resources which
-> > need migration will allow or stop based on their limits and capacity in
-> > the destination.  
 > 
-Sounds good. Perhaps some capability/feature flags for each resource such
-that different behavior can be accommodated?
-Could you please include me in your future posting? I will rebase on yours.
-
-> Please note that cgroup2 by and large don't really like or support charge
-> migration or even migrations themselves. We tried that w/ memcg on cgroup1
-> and it turned out horrible. The expected usage model as decribed in the
-> doc is using migration to seed a cgroup (or even better, use the new
-> clone call to start in the target cgroup) and then stay there until exit.
-> All existing controllers assume this usage model and I'm likely to nack
-> deviation unless there are some super strong justifications.
+> ======================================================
+> WARNING: possible circular locking dependency detected
+> 5.12.0-rc1+ #18 Not tainted
+> ------------------------------------------------------
+> CPU 0/KVM/1406 is trying to acquire lock:
+> ffffffffa5a58d60 (fs_reclaim){+.+.}-{0:0}, at: fs_reclaim_acquire+0x83/0xd0
 > 
-Thank you so much for the pointers. Just to be clear, you meant
-1. Use clone3 CLONE_INTO_CGROUP to put the child into a different cgroup.
-2. Do not support migration of the parent (existing proc)
+> but task is already holding lock:
+> ffff94c0f3e8fb08 (&mapping->i_mmap_rwsem){++++}-{3:3}, at: vfio_device_io_remap_mapping_range+0x31/0x120 [vfio]
+> 
+> which lock already depends on the new lock.
+> 
+> 
+> the existing dependency chain (in reverse order) is:
+> 
+> -> #1 (&mapping->i_mmap_rwsem){++++}-{3:3}:  
+>        down_write+0x3d/0x70
+>        dma_resv_lockdep+0x1b0/0x298
+>        do_one_initcall+0x5b/0x2d0
+>        kernel_init_freeable+0x251/0x298
+>        kernel_init+0xa/0x111
+>        ret_from_fork+0x22/0x30
+> 
+> -> #0 (fs_reclaim){+.+.}-{0:0}:  
+>        __lock_acquire+0x111f/0x1e10
+>        lock_acquire+0xb5/0x380
+>        fs_reclaim_acquire+0xa3/0xd0
+>        kmem_cache_alloc_trace+0x30/0x2c0
+>        memtype_reserve+0xc3/0x280
+>        reserve_pfn_range+0x86/0x160
+>        track_pfn_remap+0xa6/0xe0
+>        remap_pfn_range+0xa8/0x610
+>        vfio_device_io_remap_mapping_range+0x93/0x120 [vfio]
+>        vfio_pci_test_and_up_write_memory_lock+0x34/0x40 [vfio_pci]
+>        vfio_basic_config_write+0x12d/0x230 [vfio_pci]
+>        vfio_pci_config_rw+0x1b7/0x3a0 [vfio_pci]
+>        vfs_write+0xea/0x390
+>        __x64_sys_pwrite64+0x72/0xb0
+>        do_syscall_64+0x33/0x40
+>        entry_SYSCALL_64_after_hwframe+0x44/0xae
+> 
+..
+> > Does current_gfp_context()/memalloc_nofs_save()/etc solve it?  
 
-Thanks,
+Yeah, we can indeed use memalloc_nofs_save/restore().  It seems we're
+trying to allocate something for pfnmap tracking and that enables lots
+of lockdep specific tests.  Is it valid to wrap io_remap_pfn_range()
+around clearing this flag or am I just masking a bug?  Thanks,
 
-Jacob
+Alex
+
