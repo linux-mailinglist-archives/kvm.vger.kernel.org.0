@@ -2,88 +2,124 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C92EE33902F
-	for <lists+kvm@lfdr.de>; Fri, 12 Mar 2021 15:41:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D1194339091
+	for <lists+kvm@lfdr.de>; Fri, 12 Mar 2021 16:01:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230136AbhCLOlL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 12 Mar 2021 09:41:11 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:41658 "EHLO
+        id S231865AbhCLPAP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 12 Mar 2021 10:00:15 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:45766 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230072AbhCLOky (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 12 Mar 2021 09:40:54 -0500
+        by vger.kernel.org with ESMTP id S231601AbhCLO76 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 12 Mar 2021 09:59:58 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1615560053;
+        s=mimecast20190719; t=1615561197;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=UHFz+ZfMKEJbP5t9K2bCk5hCYslzNNC+cpLu7ln61Mg=;
-        b=Q0A/s5Osax2RIMU3L94kc6QYqDq1qn8DDBFo0xDyElDn8FmB7jFg14+igb5IOoSMQPMu+s
-        IjRsoyF/aNpRVylbMwoWxoMvWjnG4bxgJhIp/yzk4KhjTuKx29kbTSEsY+S/lJAzda8wXg
-        9/TiGMmYlujIg2ZquVgyIPd0uss71oM=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-217--jbfGZkSOmWiNbYUX4bpog-1; Fri, 12 Mar 2021 09:40:50 -0500
-X-MC-Unique: -jbfGZkSOmWiNbYUX4bpog-1
-Received: by mail-wr1-f71.google.com with SMTP id e13so11237405wrg.4
-        for <kvm@vger.kernel.org>; Fri, 12 Mar 2021 06:40:50 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=UHFz+ZfMKEJbP5t9K2bCk5hCYslzNNC+cpLu7ln61Mg=;
-        b=cUpuocGJZuFy63rkHuNg1h0+J/JB0j6bl7Rcw9GGpEMcvsjWf3NiSHp0c+gE2EzYT7
-         /5x/5DLdCuJMpcSxoqfOp7edMOgOqCMapCYr5kke4FKsenbjmGB72qZAqU2SpfHUa+Qw
-         A6gKlABPY8bNTXTTwVjH6LBQn4MTOYD2dQrIPYW0tu9Tv6qy0mGca4rOGxV8yheB81ZF
-         UsdlLwks+bnQjne9AgB5I2zb3BoTztGvgcTdec54MdqbTqsUmFQSKxcke+VmrhCw6Q4Z
-         yEPMwh5FwhZM4kecAa1gcmtLMf2eSRe4Vbie6Rl9w9es60eN5eChki/DNT0IO1neLgOy
-         YJKA==
-X-Gm-Message-State: AOAM530JOL5s7jU+EOCvDUkXM1uvdXR3QAbEfKGBUtvCCvl8vg/piuTp
-        q5Pr0DnYwhtEPoE/OpYJvBS+wn4em2v/tX+ueEbLNWjzB2f4M0vrscu82BR0H6TeyVJCQjHwSht
-        o4D3rTUFo4GJ8
-X-Received: by 2002:adf:f841:: with SMTP id d1mr14157283wrq.36.1615560049592;
-        Fri, 12 Mar 2021 06:40:49 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJzgzENVDWH77SrdxqPP5xavvsUwfa0+M+2ZdEnSJauzOQ012YEkvpkDBfuH0dxQ2NcCuQ1oKw==
-X-Received: by 2002:adf:f841:: with SMTP id d1mr14157254wrq.36.1615560049394;
-        Fri, 12 Mar 2021 06:40:49 -0800 (PST)
-Received: from steredhat (host-79-34-249-199.business.telecomitalia.it. [79.34.249.199])
-        by smtp.gmail.com with ESMTPSA id q17sm3268632wrv.25.2021.03.12.06.40.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 12 Mar 2021 06:40:49 -0800 (PST)
-Date:   Fri, 12 Mar 2021 15:40:46 +0100
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     Arseny Krasnov <arseny.krasnov@kaspersky.com>
-Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Jorgen Hansen <jhansen@vmware.com>,
-        Andra Paraschiv <andraprs@amazon.com>,
-        Colin Ian King <colin.king@canonical.com>,
-        Norbert Slusarek <nslusarek@gmx.net>, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, stsp2@yandex.ru, oxffffaa@gmail.com
-Subject: Re: [RFC PATCH v6 02/22] af_vsock: separate wait data loop
-Message-ID: <20210312144046.dnthewowhmkvfotd@steredhat>
-References: <20210307175722.3464068-1-arseny.krasnov@kaspersky.com>
- <20210307175905.3464610-1-arseny.krasnov@kaspersky.com>
+        bh=rjGcZs7Vy2maRevaHJ9Zv8LK1uzd9Lhozx0sgGCsnz8=;
+        b=jHZ36SaI91dtcgPQFFvJN/jO7yknZ7sKqUvkUiaLFxwHP8OrTGpORi6bQbchQHcrEe9EXS
+        84Vii5si1T5FK2fRrpqRw+YFt2QFXoAlNCmlu907WAE/mcw7XjYukUQW63SrqN0JlHzGpY
+        jhC7JKh5s3Hji1jDGM4k6n78OvZEYow=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-178-JB7uhuwoOqSXK344pdd6bg-1; Fri, 12 Mar 2021 09:59:56 -0500
+X-MC-Unique: JB7uhuwoOqSXK344pdd6bg-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C37FA81746C;
+        Fri, 12 Mar 2021 14:59:54 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.40.192.104])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id C4A255D6D7;
+        Fri, 12 Mar 2021 14:59:53 +0000 (UTC)
+Date:   Fri, 12 Mar 2021 15:59:50 +0100
+From:   Andrew Jones <drjones@redhat.com>
+To:     Alexandru Elisei <alexandru.elisei@arm.com>
+Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+Subject: Re: [kvm-unit-tests PATCH 3/6] arm/arm64: Remove unnecessary ISB
+ when doing dcache maintenance
+Message-ID: <20210312145950.whq7ofrhbklwhprx@kamzik.brq.redhat.com>
+References: <20210227104201.14403-1-alexandru.elisei@arm.com>
+ <20210227104201.14403-4-alexandru.elisei@arm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210307175905.3464610-1-arseny.krasnov@kaspersky.com>
+In-Reply-To: <20210227104201.14403-4-alexandru.elisei@arm.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, Mar 07, 2021 at 08:59:01PM +0300, Arseny Krasnov wrote:
->This moves wait loop for data to dedicated function, because later it
->will be used by SEQPACKET data receive loop. While moving the code
->around, let's update an old comment.
->
->Signed-off-by: Arseny Krasnov <arseny.krasnov@kaspersky.com>
->---
-> net/vmw_vsock/af_vsock.c | 156 +++++++++++++++++++++------------------
-> 1 file changed, 84 insertions(+), 72 deletions(-)
+On Sat, Feb 27, 2021 at 10:41:58AM +0000, Alexandru Elisei wrote:
+> The dcache_by_line_op macro executes a DSB to complete the cache
+> maintenance operations. According to ARM DDI 0487G.a, page B2-150:
+> 
+> "In addition, no instruction that appears in program order after the DSB
+> instruction can alter any state of the system or perform any part of its
+> functionality until the DSB completes other than:
+> 
+> - Being fetched from memory and decoded.
+> - Reading the general-purpose, SIMD and floating-point, Special-purpose, or
+>   System registers that are directly or indirectly read without causing
+>   side-effects."
+> 
+> Similar definition for ARM in ARM DDI 0406C.d, page A3-150:
+> 
+> "In addition, no instruction that appears in program order after the DSB
+> instruction can execute until the DSB completes."
+> 
+> This means that we don't need the ISB to prevent reordering of the cache
+> maintenance instructions.
+> 
+> We are also not doing icache maintenance, where an ISB would be required
+> for the PE to discard instructions speculated before the invalidation.
+> 
+> In conclusion, the ISB is unnecessary, so remove it.
 
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+Hi Alexandru,
+
+We can go ahead and take this patch, since you've written quite a
+convincing commit message, but in general I'd prefer we be overly cautious
+in our common code. We'd like to ensure we don't introduce difficult to
+debug issues there, and we don't care about optimizations, let alone
+micro-optimizations. Testing barrier needs to the letter of the spec is a
+good idea, but it's probably better to do that in the test cases.
+
+Thanks,
+drew
+
+> 
+> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> ---
+>  arm/cstart.S   | 1 -
+>  arm/cstart64.S | 1 -
+>  2 files changed, 2 deletions(-)
+> 
+> diff --git a/arm/cstart.S b/arm/cstart.S
+> index 954748b00f64..2d62c1e6d40d 100644
+> --- a/arm/cstart.S
+> +++ b/arm/cstart.S
+> @@ -212,7 +212,6 @@ asm_mmu_disable:
+>  	ldr	r1, [r1]
+>  	sub	r1, r1, r0
+>  	dcache_by_line_op dccimvac, sy, r0, r1, r2, r3
+> -	isb
+>  
+>  	mov     pc, lr
+>  
+> diff --git a/arm/cstart64.S b/arm/cstart64.S
+> index 046bd3914098..c1deff842f03 100644
+> --- a/arm/cstart64.S
+> +++ b/arm/cstart64.S
+> @@ -219,7 +219,6 @@ asm_mmu_disable:
+>  	ldr	x1, [x1, :lo12:__phys_end]
+>  	sub	x1, x1, x0
+>  	dcache_by_line_op civac, sy, x0, x1, x2, x3
+> -	isb
+>  
+>  	ret
+>  
+> -- 
+> 2.30.1
+> 
 
