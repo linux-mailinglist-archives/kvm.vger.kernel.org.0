@@ -2,173 +2,217 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BC2503384CF
-	for <lists+kvm@lfdr.de>; Fri, 12 Mar 2021 06:04:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4F397338590
+	for <lists+kvm@lfdr.de>; Fri, 12 Mar 2021 06:53:38 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229913AbhCLFDp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 12 Mar 2021 00:03:45 -0500
-Received: from szxga03-in.huawei.com ([45.249.212.189]:3360 "EHLO
-        szxga03-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229891AbhCLFDe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 12 Mar 2021 00:03:34 -0500
-Received: from DGGEMM406-HUB.china.huawei.com (unknown [172.30.72.55])
-        by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4DxYYY6x8gz5T4V;
-        Fri, 12 Mar 2021 13:01:05 +0800 (CST)
-Received: from dggpemm500023.china.huawei.com (7.185.36.83) by
- DGGEMM406-HUB.china.huawei.com (10.3.20.214) with Microsoft SMTP Server (TLS)
- id 14.3.498.0; Fri, 12 Mar 2021 13:03:23 +0800
-Received: from [10.174.187.128] (10.174.187.128) by
- dggpemm500023.china.huawei.com (7.185.36.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id
- 15.1.2106.2; Fri, 12 Mar 2021 13:03:22 +0800
-Subject: Re: [RFC PATCH v4 0/9] KVM: selftests: some improvement and a new
- test for kvm page table
-To:     Paolo Bonzini <pbonzini@redhat.com>, kvm <kvm@vger.kernel.org>,
-        <linux-kselftest@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC:     Ben Gardon <bgardon@google.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Andrew Jones <drjones@redhat.com>,
-        Peter Xu <peterx@redhat.com>,
-        Arnaldo Carvalho de Melo <acme@redhat.com>,
-        Ingo Molnar <mingo@kernel.org>,
-        Adrian Hunter <adrian.hunter@intel.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        <wanghaibin.wang@huawei.com>, <yezengruan@huawei.com>,
-        <yuzenghui@huawei.com>
-References: <20210302125751.19080-1-wangyanan55@huawei.com>
-From:   "wangyanan (Y)" <wangyanan55@huawei.com>
-Message-ID: <086dfadc-70c5-1a90-e7ff-e1f1095733bb@huawei.com>
-Date:   Fri, 12 Mar 2021 13:03:21 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.4.0
+        id S231166AbhCLFxD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 12 Mar 2021 00:53:03 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:31082 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230475AbhCLFxA (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 12 Mar 2021 00:53:00 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1615528379;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=IIo64LdJLthFkJBxGpFePO70WMUQBBdNsmfbPvgk47s=;
+        b=NGFswg7ip3oHWSlKO+ap/wifxoAannD5DJy9RWKM8iwPNhvIuv8VlC2k7uNZp9Y0GLV++p
+        tP5LetvWQbIuOXqt9FgmpzsZ+48Fsb5av3AFHiNNrxXqm5H+InLfEelmrVVeUW9WsvWGyA
+        ucgvY6qUV2ZGl7LDiBR7zbco/5oecLg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-207-7-3Ode_4Npydt4MxE7d6AA-1; Fri, 12 Mar 2021 00:52:56 -0500
+X-MC-Unique: 7-3Ode_4Npydt4MxE7d6AA-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CE9B419253FD;
+        Fri, 12 Mar 2021 05:52:38 +0000 (UTC)
+Received: from wangxiaodeMacBook-Air.local (ovpn-13-33.pek2.redhat.com [10.72.13.33])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id AFB235947E;
+        Fri, 12 Mar 2021 05:52:35 +0000 (UTC)
+Subject: Re: [PATCH V3 6/6] vDPA/ifcvf: verify mandatory feature bits for vDPA
+To:     "Zhu, Lingshan" <lingshan.zhu@intel.com>,
+        Zhu Lingshan <lingshan.zhu@linux.intel.com>, mst@redhat.com,
+        lulu@redhat.com, leonro@nvidia.com
+Cc:     netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org
+References: <20210310090052.4762-1-lingshan.zhu@intel.com>
+ <20210310090052.4762-7-lingshan.zhu@intel.com>
+ <3e53a5c9-c531-48ee-c9a7-907dfdacc9d1@redhat.com>
+ <9c2fb3d0-2d69-20b9-589d-cc5ffc830f38@linux.intel.com>
+ <4f3ef2bb-d823-d53d-3bb0-0152a3f6c9f1@redhat.com>
+ <a1f346cc-c9fd-6d16-39d7-b59965a18b0a@intel.com>
+From:   Jason Wang <jasowang@redhat.com>
+Message-ID: <67be60b6-bf30-de85-ed42-d9fad974f42b@redhat.com>
+Date:   Fri, 12 Mar 2021 13:52:34 +0800
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.16; rv:78.0)
+ Gecko/20100101 Thunderbird/78.8.1
 MIME-Version: 1.0
-In-Reply-To: <20210302125751.19080-1-wangyanan55@huawei.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-Originating-IP: [10.174.187.128]
-X-ClientProxiedBy: dggeme714-chm.china.huawei.com (10.1.199.110) To
- dggpemm500023.china.huawei.com (7.185.36.83)
-X-CFilter-Loop: Reflected
+In-Reply-To: <a1f346cc-c9fd-6d16-39d7-b59965a18b0a@intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-GB
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi all,
 
-Kindly ping :)!
+On 2021/3/11 3:19 下午, Zhu, Lingshan wrote:
+>
+>
+> On 3/11/2021 2:20 PM, Jason Wang wrote:
+>>
+>> On 2021/3/11 12:16 下午, Zhu Lingshan wrote:
+>>>
+>>>
+>>> On 3/11/2021 11:20 AM, Jason Wang wrote:
+>>>>
+>>>> On 2021/3/10 5:00 下午, Zhu Lingshan wrote:
+>>>>> vDPA requres VIRTIO_F_ACCESS_PLATFORM as a must, this commit
+>>>>> examines this when set features.
+>>>>>
+>>>>> Signed-off-by: Zhu Lingshan <lingshan.zhu@intel.com>
+>>>>> ---
+>>>>>   drivers/vdpa/ifcvf/ifcvf_base.c | 8 ++++++++
+>>>>>   drivers/vdpa/ifcvf/ifcvf_base.h | 1 +
+>>>>>   drivers/vdpa/ifcvf/ifcvf_main.c | 5 +++++
+>>>>>   3 files changed, 14 insertions(+)
+>>>>>
+>>>>> diff --git a/drivers/vdpa/ifcvf/ifcvf_base.c 
+>>>>> b/drivers/vdpa/ifcvf/ifcvf_base.c
+>>>>> index ea6a78791c9b..58f47fdce385 100644
+>>>>> --- a/drivers/vdpa/ifcvf/ifcvf_base.c
+>>>>> +++ b/drivers/vdpa/ifcvf/ifcvf_base.c
+>>>>> @@ -224,6 +224,14 @@ u64 ifcvf_get_features(struct ifcvf_hw *hw)
+>>>>>       return hw->hw_features;
+>>>>>   }
+>>>>>   +int ifcvf_verify_min_features(struct ifcvf_hw *hw)
+>>>>> +{
+>>>>> +    if (!(hw->hw_features & BIT_ULL(VIRTIO_F_ACCESS_PLATFORM)))
+>>>>> +        return -EINVAL;
+>>>>> +
+>>>>> +    return 0;
+>>>>> +}
+>>>>> +
+>>>>>   void ifcvf_read_net_config(struct ifcvf_hw *hw, u64 offset,
+>>>>>                  void *dst, int length)
+>>>>>   {
+>>>>> diff --git a/drivers/vdpa/ifcvf/ifcvf_base.h 
+>>>>> b/drivers/vdpa/ifcvf/ifcvf_base.h
+>>>>> index dbb8c10aa3b1..91c5735d4dc9 100644
+>>>>> --- a/drivers/vdpa/ifcvf/ifcvf_base.h
+>>>>> +++ b/drivers/vdpa/ifcvf/ifcvf_base.h
+>>>>> @@ -123,6 +123,7 @@ void io_write64_twopart(u64 val, u32 *lo, u32 
+>>>>> *hi);
+>>>>>   void ifcvf_reset(struct ifcvf_hw *hw);
+>>>>>   u64 ifcvf_get_features(struct ifcvf_hw *hw);
+>>>>>   u64 ifcvf_get_hw_features(struct ifcvf_hw *hw);
+>>>>> +int ifcvf_verify_min_features(struct ifcvf_hw *hw);
+>>>>>   u16 ifcvf_get_vq_state(struct ifcvf_hw *hw, u16 qid);
+>>>>>   int ifcvf_set_vq_state(struct ifcvf_hw *hw, u16 qid, u16 num);
+>>>>>   struct ifcvf_adapter *vf_to_adapter(struct ifcvf_hw *hw);
+>>>>> diff --git a/drivers/vdpa/ifcvf/ifcvf_main.c 
+>>>>> b/drivers/vdpa/ifcvf/ifcvf_main.c
+>>>>> index 25fb9dfe23f0..f624f202447d 100644
+>>>>> --- a/drivers/vdpa/ifcvf/ifcvf_main.c
+>>>>> +++ b/drivers/vdpa/ifcvf/ifcvf_main.c
+>>>>> @@ -179,6 +179,11 @@ static u64 ifcvf_vdpa_get_features(struct 
+>>>>> vdpa_device *vdpa_dev)
+>>>>>   static int ifcvf_vdpa_set_features(struct vdpa_device *vdpa_dev, 
+>>>>> u64 features)
+>>>>>   {
+>>>>>       struct ifcvf_hw *vf = vdpa_to_vf(vdpa_dev);
+>>>>> +    int ret;
+>>>>> +
+>>>>> +    ret = ifcvf_verify_min_features(vf);
+>>>>
+>>>>
+>>>> So this validate device features instead of driver which is the one 
+>>>> we really want to check?
+>>>>
+>>>> Thanks
+>>>
+>>> Hi Jason,
+>>>
+>>> Here we check device feature bits to make sure the device support 
+>>> ACCESS_PLATFORM. 
+>>
+>>
+>> If you want to check device features, you need to do that during 
+>> probe() and fail the probing if without the feature. But I think you 
+>> won't ship cards without ACCESS_PLATFORM.
+> Yes, there are no reasons ship a card without ACCESS_PLATFORM
+>>
+>>
+>>> In get_features(),
+>>> it will return a intersection of device features bit and driver 
+>>> supported features bits(which includes ACCESS_PLATFORM).
+>>> Other components like QEMU should not set features bits more than 
+>>> this intersection of bits. so we can make sure if this
+>>> ifcvf_verify_min_features() passed, both device and driver support 
+>>> ACCESS_PLATFORM.
+>>>
+>>> Are you suggesting check driver feature bits in 
+>>> ifcvf_verify_min_features() in the meantime as well?
+>>
+>>
+>> So it really depends on your hardware. If you hardware can always 
+>> offer ACCESS_PLATFORM, you just need to check driver features. This 
+>> is how vdpa_sim and mlx5_vdpa work.
+> Yes, we always support ACCESS_PLATFORM, so it is hard coded in the 
+> macro IFCVF_SUPPORTED_FEATURES.
 
-Are there any further comments for this v4 series? Please let me know if 
-there
-is still something that needs fixing.
 
-Or is this v4 series fine enough to be queued? Most of the patches have been
-added with Reviewed-by. If there are merge conflicts with the newest branch,
-please also let me know and I will send a new version fixed.
+That's not what I read from the code:
 
-Regards,
-Yanan
+         features = ifcvf_get_features(vf) & IFCVF_SUPPORTED_FEATURES;
 
-On 2021/3/2 20:57, Yanan Wang wrote:
-> Hi,
-> This v4 series can mainly include two parts.
-> Based on kvm queue branch: https://git.kernel.org/pub/scm/virt/kvm/kvm.git/log/?h=queue
-> Links of v1: https://lore.kernel.org/lkml/20210208090841.333724-1-wangyanan55@huawei.com/
-> Links of v2: https://lore.kernel.org/lkml/20210225055940.18748-1-wangyanan55@huawei.com/
-> Links of v3: https://lore.kernel.org/lkml/20210301065916.11484-1-wangyanan55@huawei.com/
+
+> Now we check whether device support this feature bit as a double 
+> conformation, are you suggesting we should check whether 
+> ACCESS_PLATFORM & IFCVF_SUPPORTED_FEATURES
+> in set_features() as well?
+
+
+If we know device will always offer ACCESS_PLATFORM, there's no need to 
+check it again. What we should check if whether driver set that, and if 
+it doesn't we need to fail set_features(). I think there's little chance 
+that IFCVF can work when IOMMU_PLATFORM is not negotiated.
+
+
+> I prefer check both device and IFCVF_SUPPORTED_FEATURES both, more 
+> reliable.
+
+
+So again, if you want to check device features, set_features() is not 
+the proper place. We need to fail the probe in this case.
+
+Thanks
+
+
 >
-> In the first part, all the known hugetlb backing src types specified
-> with different hugepage sizes are listed, so that we can specify use
-> of hugetlb source of the exact granularity that we want, instead of
-> the system default ones. And as all the known hugetlb page sizes are
-> listed, it's appropriate for all architectures. Besides, a helper that
-> can get granularity of different backing src types(anonumous/thp/hugetlb)
-> is added, so that we can use the accurate backing src granularity for
-> kinds of alignment or guest memory accessing of vcpus.
+> Thanks!
+>>
+>> Thanks
+>>
+>>
+>>>
+>>> Thanks！
+>>>>
+>>>>
+>>>>> +    if (ret)
+>>>>> +        return ret;
+>>>>>         vf->req_features = features;
+>>>>
+>>>> _______________________________________________
+>>>> Virtualization mailing list
+>>>> Virtualization@lists.linux-foundation.org
+>>>> https://lists.linuxfoundation.org/mailman/listinfo/virtualization
+>>>
+>>
 >
-> In the second part, a new test is added:
-> This test is added to serve as a performance tester and a bug reproducer
-> for kvm page table code (GPA->HPA mappings), it gives guidance for the
-> people trying to make some improvement for kvm. And the following explains
-> what we can exactly do through this test.
->
-> The function guest_code() can cover the conditions where a single vcpu or
-> multiple vcpus access guest pages within the same memory region, in three
-> VM stages(before dirty logging, during dirty logging, after dirty logging).
-> Besides, the backing src memory type(ANONYMOUS/THP/HUGETLB) of the tested
-> memory region can be specified by users, which means normal page mappings
-> or block mappings can be chosen by users to be created in the test.
->
-> If ANONYMOUS memory is specified, kvm will create normal page mappings
-> for the tested memory region before dirty logging, and update attributes
-> of the page mappings from RO to RW during dirty logging. If THP/HUGETLB
-> memory is specified, kvm will create block mappings for the tested memory
-> region before dirty logging, and split the blcok mappings into normal page
-> mappings during dirty logging, and coalesce the page mappings back into
-> block mappings after dirty logging is stopped.
->
-> So in summary, as a performance tester, this test can present the
-> performance of kvm creating/updating normal page mappings, or the
-> performance of kvm creating/splitting/recovering block mappings,
-> through execution time.
->
-> When we need to coalesce the page mappings back to block mappings after
-> dirty logging is stopped, we have to firstly invalidate *all* the TLB
-> entries for the page mappings right before installation of the block entry,
-> because a TLB conflict abort error could occur if we can't invalidate the
-> TLB entries fully. We have hit this TLB conflict twice on aarch64 software
-> implementation and fixed it. As this test can imulate process from dirty
-> logging enabled to dirty logging stopped of a VM with block mappings,
-> so it can also reproduce this TLB conflict abort due to inadequate TLB
-> invalidation when coalescing tables.
->
-> Links about the TLB conflict abort:
-> https://lore.kernel.org/lkml/20201201201034.116760-3-wangyanan55@huawei.com/
->
-> ---
->
-> Change logs:
->
-> v3->v4:
-> - Add a helper to get system default hugetlb page size
-> - Add tags of Reviewed-by of Ben in the patches
->
-> v2->v3:
-> - Add tags of Suggested-by, Reviewed-by in the patches
-> - Add a generic micro to get hugetlb page sizes
-> - Some changes for suggestions about v2 series
->
-> v1->v2:
-> - Add a patch to sync header files
-> - Add helpers to get granularity of different backing src types
-> - Some changes for suggestions about v1 series
->
-> ---
->
-> Yanan Wang (9):
->    tools headers: sync headers of asm-generic/hugetlb_encode.h
->    tools headers: Add a macro to get HUGETLB page sizes for mmap
->    KVM: selftests: Use flag CLOCK_MONOTONIC_RAW for timing
->    KVM: selftests: Make a generic helper to get vm guest mode strings
->    KVM: selftests: Add a helper to get system configured THP page size
->    KVM: selftests: Add a helper to get system default hugetlb page size
->    KVM: selftests: List all hugetlb src types specified with page sizes
->    KVM: selftests: Adapt vm_userspace_mem_region_add to new helpers
->    KVM: selftests: Add a test for kvm page table code
->
->   include/uapi/linux/mman.h                     |   2 +
->   tools/include/asm-generic/hugetlb_encode.h    |   3 +
->   tools/include/uapi/linux/mman.h               |   2 +
->   tools/testing/selftests/kvm/Makefile          |   3 +
->   .../selftests/kvm/demand_paging_test.c        |   8 +-
->   .../selftests/kvm/dirty_log_perf_test.c       |  14 +-
->   .../testing/selftests/kvm/include/kvm_util.h  |   4 +-
->   .../testing/selftests/kvm/include/test_util.h |  21 +-
->   .../selftests/kvm/kvm_page_table_test.c       | 476 ++++++++++++++++++
->   tools/testing/selftests/kvm/lib/kvm_util.c    |  59 ++-
->   tools/testing/selftests/kvm/lib/test_util.c   | 122 ++++-
->   tools/testing/selftests/kvm/steal_time.c      |   4 +-
->   12 files changed, 659 insertions(+), 59 deletions(-)
->   create mode 100644 tools/testing/selftests/kvm/kvm_page_table_test.c
->
+
