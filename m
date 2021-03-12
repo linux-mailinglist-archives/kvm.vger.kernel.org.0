@@ -2,242 +2,150 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A2A9F338C4D
-	for <lists+kvm@lfdr.de>; Fri, 12 Mar 2021 13:03:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EFB1F338D23
+	for <lists+kvm@lfdr.de>; Fri, 12 Mar 2021 13:33:15 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230341AbhCLMCy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 12 Mar 2021 07:02:54 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:29409 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231774AbhCLMCh (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 12 Mar 2021 07:02:37 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1615550556;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=qrEHj5I0bZYnneD3PLLPPSpfhRiDox4bq62WY+1YUCQ=;
-        b=FpEcBJSXz94fi+p/3/f9SH/hV/U86pbI4xKAChu2t1jhQPpV22d4F3t8WnPC+z5uhE8IyV
-        4BVTnMjjdx0ZMMMdlmMLmH9tSOX+nhDfFb/nCwTK80hgR2UY99Ol2VlZbkfGw1iD1+FR4e
-        jBHYgvzEE2AWnIJoRhP6QfqigMtXvZs=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-498-FBr7Ld_VMlW_trAbhxSQfg-1; Fri, 12 Mar 2021 07:02:34 -0500
-X-MC-Unique: FBr7Ld_VMlW_trAbhxSQfg-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6C5EC1940920;
-        Fri, 12 Mar 2021 12:02:32 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.40.192.104])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 89A6C60636;
-        Fri, 12 Mar 2021 12:02:24 +0000 (UTC)
-Date:   Fri, 12 Mar 2021 13:02:21 +0100
-From:   Andrew Jones <drjones@redhat.com>
-To:     Yanan Wang <wangyanan55@huawei.com>
-Cc:     kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Ben Gardon <bgardon@google.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Peter Xu <peterx@redhat.com>, Marc Zyngier <maz@kernel.org>,
-        Ingo Molnar <mingo@kernel.org>,
-        Adrian Hunter <adrian.hunter@intel.com>,
-        Jiri Olsa <jolsa@redhat.com>,
-        Arnaldo Carvalho de Melo <acme@redhat.com>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Michael Kerrisk <mtk.manpages@gmail.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        wanghaibin.wang@huawei.com, yezengruan@huawei.com,
-        yuzenghui@huawei.com
-Subject: Re: [RFC PATCH v4 7/9] KVM: selftests: List all hugetlb src types
- specified with page sizes
-Message-ID: <20210312120221.urbbfl7o3vocblk7@kamzik.brq.redhat.com>
-References: <20210302125751.19080-1-wangyanan55@huawei.com>
- <20210302125751.19080-8-wangyanan55@huawei.com>
+        id S229799AbhCLMcm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 12 Mar 2021 07:32:42 -0500
+Received: from szxga05-in.huawei.com ([45.249.212.191]:13504 "EHLO
+        szxga05-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231349AbhCLMcJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 12 Mar 2021 07:32:09 -0500
+Received: from DGGEMS403-HUB.china.huawei.com (unknown [172.30.72.59])
+        by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4DxlWs2tZfzrTqr;
+        Fri, 12 Mar 2021 20:30:17 +0800 (CST)
+Received: from [10.174.184.135] (10.174.184.135) by
+ DGGEMS403-HUB.china.huawei.com (10.3.19.203) with Microsoft SMTP Server id
+ 14.3.498.0; Fri, 12 Mar 2021 20:31:56 +0800
+Subject: Re: [PATCH v3 3/4] KVM: arm64: GICv4.1: Restore VLPI's pending state
+ to physical side
+To:     Marc Zyngier <maz@kernel.org>
+CC:     Eric Auger <eric.auger@redhat.com>, Will Deacon <will@kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>,
+        <kvmarm@lists.cs.columbia.edu>, <kvm@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        "Lorenzo Pieralisi" <lorenzo.pieralisi@arm.com>,
+        <wanghaibin.wang@huawei.com>, <yuzenghui@huawei.com>
+References: <20210127121337.1092-1-lushenming@huawei.com>
+ <20210127121337.1092-4-lushenming@huawei.com> <87tupif3x3.wl-maz@kernel.org>
+ <0820f429-4c29-acd6-d9e0-af9f6deb68e4@huawei.com>
+ <87k0qcg2s6.wl-maz@kernel.org>
+ <aecfbf72-c653-e967-b539-89f629b52cde@huawei.com>
+ <87h7lgfwzu.wl-maz@kernel.org>
+ <df4b939d-27c1-be84-ea7e-327251958cde@huawei.com>
+ <87ft10fulr.wl-maz@kernel.org>
+From:   Shenming Lu <lushenming@huawei.com>
+Message-ID: <40f40432-63b4-cceb-a9bd-09c6ef91f34d@huawei.com>
+Date:   Fri, 12 Mar 2021 20:31:45 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.2.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210302125751.19080-8-wangyanan55@huawei.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+In-Reply-To: <87ft10fulr.wl-maz@kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.174.184.135]
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Mar 02, 2021 at 08:57:49PM +0800, Yanan Wang wrote:
-> With VM_MEM_SRC_ANONYMOUS_HUGETLB, we currently can only use system
-> default hugetlb pages to back the testing guest memory. In order to
-> add flexibility, now list all the known hugetlb backing src types with
-> different page sizes, so that we can specify use of hugetlb pages of the
-> exact granularity that we want. And as all the known hugetlb page sizes
-> are listed, it's appropriate for all architectures.
+On 2021/3/12 20:02, Marc Zyngier wrote:
+> On Fri, 12 Mar 2021 11:34:07 +0000,
+> Shenming Lu <lushenming@huawei.com> wrote:
+>>
+>> On 2021/3/12 19:10, Marc Zyngier wrote:
+>>> On Fri, 12 Mar 2021 10:48:29 +0000,
+>>> Shenming Lu <lushenming@huawei.com> wrote:
+>>>>
+>>>> On 2021/3/12 17:05, Marc Zyngier wrote:
+>>>>> On Thu, 11 Mar 2021 12:32:07 +0000,
+>>>>> Shenming Lu <lushenming@huawei.com> wrote:
+>>>>>>
+>>>>>> On 2021/3/11 17:14, Marc Zyngier wrote:
+>>>>>>> On Wed, 27 Jan 2021 12:13:36 +0000,
+>>>>>>> Shenming Lu <lushenming@huawei.com> wrote:
+>>>>>>>>
+>>>>>>>> From: Zenghui Yu <yuzenghui@huawei.com>
+>>>>>>>>
+>>>>>>>> When setting the forwarding path of a VLPI (switch to the HW mode),
+>>>>>>>> we could also transfer the pending state from irq->pending_latch to
+>>>>>>>> VPT (especially in migration, the pending states of VLPIs are restored
+>>>>>>>> into kvm’s vgic first). And we currently send "INT+VSYNC" to trigger
+>>>>>>>> a VLPI to pending.
+>>>>>>>>
+>>>>>>>> Signed-off-by: Zenghui Yu <yuzenghui@huawei.com>
+>>>>>>>> Signed-off-by: Shenming Lu <lushenming@huawei.com>
+>>>>>>>> ---
+>>>>>>>>  arch/arm64/kvm/vgic/vgic-v4.c | 14 ++++++++++++++
+>>>>>>>>  1 file changed, 14 insertions(+)
+>>>>>>>>
+>>>>>>>> diff --git a/arch/arm64/kvm/vgic/vgic-v4.c b/arch/arm64/kvm/vgic/vgic-v4.c
+>>>>>>>> index ac029ba3d337..a3542af6f04a 100644
+>>>>>>>> --- a/arch/arm64/kvm/vgic/vgic-v4.c
+>>>>>>>> +++ b/arch/arm64/kvm/vgic/vgic-v4.c
+>>>>>>>> @@ -449,6 +449,20 @@ int kvm_vgic_v4_set_forwarding(struct kvm *kvm, int virq,
+>>>>>>>>  	irq->host_irq	= virq;
+>>>>>>>>  	atomic_inc(&map.vpe->vlpi_count);
+>>>>>>>>  
+>>>>>>>> +	/* Transfer pending state */
+>>>>>>>> +	if (irq->pending_latch) {
+>>>>>>>> +		ret = irq_set_irqchip_state(irq->host_irq,
+>>>>>>>> +					    IRQCHIP_STATE_PENDING,
+>>>>>>>> +					    irq->pending_latch);
+>>>>>>>> +		WARN_RATELIMIT(ret, "IRQ %d", irq->host_irq);
+>>>>>>>> +
+>>>>>>>> +		/*
+>>>>>>>> +		 * Let it be pruned from ap_list later and don't bother
+>>>>>>>> +		 * the List Register.
+>>>>>>>> +		 */
+>>>>>>>> +		irq->pending_latch = false;
+>>>>>>>
+>>>>>>> NAK. If the interrupt is on the AP list, it must be pruned from it
+>>>>>>> *immediately*. The only case where it can be !pending and still on the
+>>>>>>> AP list is in interval between sync and prune. If we start messing
+>>>>>>> with this, we can't reason about the state of this list anymore.
+>>>>>>>
+>>>>>>> Consider calling vgic_queue_irq_unlock() here.
+>>>>>>
+>>>>>> Thanks for giving a hint, but it seems that vgic_queue_irq_unlock() only
+>>>>>> queues an IRQ after checking, did you mean vgic_prune_ap_list() instead?
+>>>>>
+>>>>> No, I really mean vgic_queue_irq_unlock(). It can be used to remove
+>>>>> the pending state from an interrupt, and drop it from the AP
+>>>>> list. This is exactly what happens when clearing the pending state of
+>>>>> a level interrupt, for example.
+>>>>
+>>>> Hi, I have gone through vgic_queue_irq_unlock more than once, but
+>>>> still can't find the place in it to drop an IRQ from the AP
+>>>> list... Did I miss something ?...  Or could you help to point it
+>>>> out? Thanks very much for this!
+>>>
+>>> NO, you are right. I think this is a missing optimisation. Please call
+>>> the function anyway, as that's what is required to communicate a
+>>> change of state in general.>
+>>> I'll have a think about it.
+>>
+>> Maybe we could call vgic_prune_ap_list() if (irq->vcpu &&
+>> !vgic_target_oracle(irq)) in vgic_queue_irq_unlock()...
 > 
-> Besides, the helper get_backing_src_pagesz() is added to get the
-> granularity of different backing src types(anonumous, thp, hugetlb).
-> 
-> Suggested-by: Ben Gardon <bgardon@google.com>
-> Signed-off-by: Yanan Wang <wangyanan55@huawei.com>
-> ---
->  .../testing/selftests/kvm/include/test_util.h | 18 +++++-
->  tools/testing/selftests/kvm/lib/kvm_util.c    |  2 +-
->  tools/testing/selftests/kvm/lib/test_util.c   | 59 +++++++++++++++----
->  3 files changed, 66 insertions(+), 13 deletions(-)
-> 
-> diff --git a/tools/testing/selftests/kvm/include/test_util.h b/tools/testing/selftests/kvm/include/test_util.h
-> index e087174eefe5..fade3130eb01 100644
-> --- a/tools/testing/selftests/kvm/include/test_util.h
-> +++ b/tools/testing/selftests/kvm/include/test_util.h
-> @@ -71,16 +71,32 @@ enum vm_mem_backing_src_type {
->  	VM_MEM_SRC_ANONYMOUS,
->  	VM_MEM_SRC_ANONYMOUS_THP,
->  	VM_MEM_SRC_ANONYMOUS_HUGETLB,
-> +	VM_MEM_SRC_ANONYMOUS_HUGETLB_16KB,
-> +	VM_MEM_SRC_ANONYMOUS_HUGETLB_64KB,
-> +	VM_MEM_SRC_ANONYMOUS_HUGETLB_512KB,
-> +	VM_MEM_SRC_ANONYMOUS_HUGETLB_1MB,
-> +	VM_MEM_SRC_ANONYMOUS_HUGETLB_2MB,
-> +	VM_MEM_SRC_ANONYMOUS_HUGETLB_8MB,
-> +	VM_MEM_SRC_ANONYMOUS_HUGETLB_16MB,
-> +	VM_MEM_SRC_ANONYMOUS_HUGETLB_32MB,
-> +	VM_MEM_SRC_ANONYMOUS_HUGETLB_256MB,
-> +	VM_MEM_SRC_ANONYMOUS_HUGETLB_512MB,
-> +	VM_MEM_SRC_ANONYMOUS_HUGETLB_1GB,
-> +	VM_MEM_SRC_ANONYMOUS_HUGETLB_2GB,
-> +	VM_MEM_SRC_ANONYMOUS_HUGETLB_16GB,
-> +	NUM_SRC_TYPES,
->  };
->  
->  struct vm_mem_backing_src_alias {
->  	const char *name;
-> -	enum vm_mem_backing_src_type type;
-> +	uint32_t flag;
->  };
->  
->  bool thp_configured(void);
->  size_t get_trans_hugepagesz(void);
->  size_t get_def_hugetlb_pagesz(void);
-> +const struct vm_mem_backing_src_alias *vm_mem_backing_src_alias(uint32_t i);
-> +size_t get_backing_src_pagesz(uint32_t i);
->  void backing_src_help(void);
->  enum vm_mem_backing_src_type parse_backing_src_type(const char *type_name);
->  
-> diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-> index cc22c4ab7d67..b91c8e3a7ee1 100644
-> --- a/tools/testing/selftests/kvm/lib/kvm_util.c
-> +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-> @@ -757,7 +757,7 @@ void vm_userspace_mem_region_add(struct kvm_vm *vm,
->  	region->mmap_start = mmap(NULL, region->mmap_size,
->  				  PROT_READ | PROT_WRITE,
->  				  MAP_PRIVATE | MAP_ANONYMOUS
-> -				  | (src_type == VM_MEM_SRC_ANONYMOUS_HUGETLB ? MAP_HUGETLB : 0),
-> +				  | vm_mem_backing_src_alias(src_type)->flag,
->  				  -1, 0);
->  	TEST_ASSERT(region->mmap_start != MAP_FAILED,
->  		    "test_malloc failed, mmap_start: %p errno: %i",
-> diff --git a/tools/testing/selftests/kvm/lib/test_util.c b/tools/testing/selftests/kvm/lib/test_util.c
-> index 80d68dbd72d2..df8a42eff1f8 100644
-> --- a/tools/testing/selftests/kvm/lib/test_util.c
-> +++ b/tools/testing/selftests/kvm/lib/test_util.c
-> @@ -11,6 +11,7 @@
->  #include <stdlib.h>
->  #include <time.h>
->  #include <sys/stat.h>
-> +#include <linux/mman.h>
->  #include "linux/kernel.h"
->  
->  #include "test_util.h"
-> @@ -112,12 +113,6 @@ void print_skip(const char *fmt, ...)
->  	puts(", skipping test");
->  }
->  
-> -const struct vm_mem_backing_src_alias backing_src_aliases[] = {
-> -	{"anonymous", VM_MEM_SRC_ANONYMOUS,},
-> -	{"anonymous_thp", VM_MEM_SRC_ANONYMOUS_THP,},
-> -	{"anonymous_hugetlb", VM_MEM_SRC_ANONYMOUS_HUGETLB,},
-> -};
-> -
->  bool thp_configured(void)
->  {
->  	int ret;
-> @@ -180,22 +175,64 @@ size_t get_def_hugetlb_pagesz(void)
->  	return 0;
->  }
->  
-> +const struct vm_mem_backing_src_alias *vm_mem_backing_src_alias(uint32_t i)
-> +{
-> +	static const struct vm_mem_backing_src_alias aliases[] = {
-> +		{ "anonymous",               0                            },
-> +		{ "anonymous_thp",           0                            },
-> +		{ "anonymous_hugetlb",       MAP_HUGETLB                  },
-> +		{ "anonymous_hugetlb_16kb",  MAP_HUGETLB | MAP_HUGE_16KB  },
-> +		{ "anonymous_hugetlb_64kb",  MAP_HUGETLB | MAP_HUGE_64KB  },
-> +		{ "anonymous_hugetlb_512kb", MAP_HUGETLB | MAP_HUGE_512KB },
-> +		{ "anonymous_hugetlb_1mb",   MAP_HUGETLB | MAP_HUGE_1MB   },
-> +		{ "anonymous_hugetlb_2mb",   MAP_HUGETLB | MAP_HUGE_2MB   },
-> +		{ "anonymous_hugetlb_8mb",   MAP_HUGETLB | MAP_HUGE_8MB   },
-> +		{ "anonymous_hugetlb_16mb",  MAP_HUGETLB | MAP_HUGE_16MB  },
-> +		{ "anonymous_hugetlb_32mb",  MAP_HUGETLB | MAP_HUGE_32MB  },
-> +		{ "anonymous_hugetlb_256mb", MAP_HUGETLB | MAP_HUGE_256MB },
-> +		{ "anonymous_hugetlb_512mb", MAP_HUGETLB | MAP_HUGE_512MB },
-> +		{ "anonymous_hugetlb_1gb",   MAP_HUGETLB | MAP_HUGE_1GB   },
-> +		{ "anonymous_hugetlb_2gb",   MAP_HUGETLB | MAP_HUGE_2GB   },
-> +		{ "anonymous_hugetlb_16gb",  MAP_HUGETLB | MAP_HUGE_16GB  },
-> +	};
-> +	_Static_assert(ARRAY_SIZE(aliases) == NUM_SRC_TYPES,
-> +		       "Missing new backing src types?");
-> +
-> +	TEST_ASSERT(i < NUM_SRC_TYPES, "Backing src type ID %d too big", i);
-> +
-> +	return &aliases[i];
-> +}
-> +
-> +size_t get_backing_src_pagesz(uint32_t i)
-> +{
-> +	uint32_t flag = vm_mem_backing_src_alias(i)->flag;
-> +
-> +	if (i == VM_MEM_SRC_ANONYMOUS)
-> +		return getpagesize();
-> +	if (i == VM_MEM_SRC_ANONYMOUS_THP)
-> +		return get_trans_hugepagesz();
-> +	if (i == VM_MEM_SRC_ANONYMOUS_HUGETLB)
-> +		return get_def_hugetlb_pagesz();
-> +
-> +	return MAP_HUGE_PAGE_SIZE(flag);
-> +}
-> +
->  void backing_src_help(void)
->  {
->  	int i;
->  
->  	printf("Available backing src types:\n");
-> -	for (i = 0; i < ARRAY_SIZE(backing_src_aliases); i++)
-> -		printf("\t%s\n", backing_src_aliases[i].name);
-> +		for (i = 0; i < NUM_SRC_TYPES; i++)
-> +			printf("\t%s\n", vm_mem_backing_src_alias(i)->name);
->  }
->  
->  enum vm_mem_backing_src_type parse_backing_src_type(const char *type_name)
->  {
->  	int i;
->  
-> -	for (i = 0; i < ARRAY_SIZE(backing_src_aliases); i++)
-> -		if (!strcmp(type_name, backing_src_aliases[i].name))
-> -			return backing_src_aliases[i].type;
-> +	for (i = 0; i < NUM_SRC_TYPES; i++)
-> +		if (!strcmp(type_name, vm_mem_backing_src_alias(i)->name))
-> +			return i;
+> The locking is pretty ugly in this case, and I don't want to reparse
+> the whole AP list. It is basically doing the same work as the
+> insertion, but with a list_del() instead of a list_add()...
 
-This requires vm_mem_backing_src_alias.aliases[] to be in the same order
-as vm_mem_backing_src_type, so we should do the designated array
-initialization like in vm_guest_mode_string().
+make sense..
 
 Thanks,
-drew
+Shenming
 
->  
->  	backing_src_help();
->  	TEST_FAIL("Unknown backing src type: %s", type_name);
-> -- 
-> 2.23.0
 > 
-
+> We can live without it for now.
+> 
+>> OK, I will retest this series and send a v4 soon. :-)
+> 
+> Thanks,
+> 
+> 	M.
+> 
