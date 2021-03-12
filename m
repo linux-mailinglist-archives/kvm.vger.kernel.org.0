@@ -2,153 +2,165 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 355303390DB
-	for <lists+kvm@lfdr.de>; Fri, 12 Mar 2021 16:11:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2C33E3390F8
+	for <lists+kvm@lfdr.de>; Fri, 12 Mar 2021 16:16:56 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230256AbhCLPLB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 12 Mar 2021 10:11:01 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:42243 "EHLO
+        id S231337AbhCLPQV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 12 Mar 2021 10:16:21 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:36751 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231843AbhCLPKf (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 12 Mar 2021 10:10:35 -0500
+        by vger.kernel.org with ESMTP id S231861AbhCLPQR (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 12 Mar 2021 10:16:17 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1615561834;
+        s=mimecast20190719; t=1615562176;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=At+gLYpOVuwtYiPKDJPSOAsFyXGyFQ/Ei1/8xDCko3E=;
-        b=UsoiAJB0qzl2h+jsYu2T2ijyIwcIsvJS0urhcpOHjkrgZhogAwAM6zCv+pfXXQCCoN+IYm
-        V5kPJ1mk4WOq1vHPb+fnIopVXW3adG4xPJUvbCNrnlmENwRyjD5LiQFUcVZKEuVKksWdCb
-        hVdHtHy4zOePN54w4BXJZ2Yecyj2HXg=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-206-Tx-Cg1UmPx-iIzwaJNrAJg-1; Fri, 12 Mar 2021 10:10:33 -0500
-X-MC-Unique: Tx-Cg1UmPx-iIzwaJNrAJg-1
-Received: by mail-wr1-f69.google.com with SMTP id 75so11199161wrl.3
-        for <kvm@vger.kernel.org>; Fri, 12 Mar 2021 07:10:33 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=At+gLYpOVuwtYiPKDJPSOAsFyXGyFQ/Ei1/8xDCko3E=;
-        b=L1JVMfMH/kNQ/gUmxRFhNHySjIMd5E+QUSovjpArnuDUlPptIhgRU7FBoSJP3ELnm+
-         ODuwev0ZVTQXnyHOQhGG+t32b7y8yDc1mw8Ko8JtSjxF0qWPDRWF4IyFss9Br+qZZn/M
-         PaJfEyEA34vGXqrMe+LwWassh61Zo0+dXDD2kbGKEHbDQkevlMdmlaemsX9TWfjq/QdI
-         yE/Dl4TVZ8cwiDrR9+4Bx/mNVj9ndYbSXh2jKRqresSe/wb7By/3hyRcPvxEFsKop4zi
-         TlofPUywNO8HMasrlBB+8RPqu03+urH2JU82+5xfNAX5ZGdcu7/yRqUo4en5OuJfgN2E
-         2d5Q==
-X-Gm-Message-State: AOAM530BxKbyXcV/0MwLn96t4Jy+wK0p2qNSywuecHhtvIeQKKVfMB9Q
-        u3GKPqmNVYfERZmfwICn66b5kODNFBJv2rwM+aRXuwpyhj+mnrCRKXAfARoZRAjdWgUB8rugutN
-        A+UzYKeW7Wb53
-X-Received: by 2002:adf:90c2:: with SMTP id i60mr14448538wri.75.1615561832250;
-        Fri, 12 Mar 2021 07:10:32 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJwBUQ6H37FhlxEuc6bIG9e30/3DvMV1YlOPohF80Djr/3IK1mCCHCFlpAvMtmDgq0mHUGX6jQ==
-X-Received: by 2002:adf:90c2:: with SMTP id i60mr14448382wri.75.1615561830569;
-        Fri, 12 Mar 2021 07:10:30 -0800 (PST)
-Received: from steredhat (host-79-34-249-199.business.telecomitalia.it. [79.34.249.199])
-        by smtp.gmail.com with ESMTPSA id t8sm8072008wrr.10.2021.03.12.07.10.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 12 Mar 2021 07:10:30 -0800 (PST)
-Date:   Fri, 12 Mar 2021 16:10:27 +0100
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     Arseny Krasnov <arseny.krasnov@kaspersky.com>
-Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Jorgen Hansen <jhansen@vmware.com>,
-        Andra Paraschiv <andraprs@amazon.com>,
-        Colin Ian King <colin.king@canonical.com>,
-        Norbert Slusarek <nslusarek@gmx.net>, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, stsp2@yandex.ru, oxffffaa@gmail.com
-Subject: Re: [RFC PATCH v6 06/22] af_vsock: implement send logic for SEQPACKET
-Message-ID: <20210312151027.kamodty37ftspkmc@steredhat>
-References: <20210307175722.3464068-1-arseny.krasnov@kaspersky.com>
- <20210307180030.3465161-1-arseny.krasnov@kaspersky.com>
+        bh=A5J2rJulblbgqoqRb92cPCJCQqD7ZFSeC+TL1fUNNCA=;
+        b=S5VojyAwcrKyEhWt53gobzRfN+ndiwcEc+q2MnCz2wUjusXp2RlU/RvJxCXNe4gt+VReqD
+        knOHQQ5wmOSN81VNH38EgUZIhp70Pu2S2WsD7YLfVkSC9GDDJ3aNjvc8b60Q0tgqcKeZ6U
+        YmUh1WrixPLNTIyGWFmtdOXuAtQrURk=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-22-9H0tOIyEP7qpkoGZnRSVqg-1; Fri, 12 Mar 2021 10:16:12 -0500
+X-MC-Unique: 9H0tOIyEP7qpkoGZnRSVqg-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2078A107ACCD;
+        Fri, 12 Mar 2021 15:16:11 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.40.192.104])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 8589619704;
+        Fri, 12 Mar 2021 15:16:09 +0000 (UTC)
+Date:   Fri, 12 Mar 2021 16:16:06 +0100
+From:   Andrew Jones <drjones@redhat.com>
+To:     Alexandru Elisei <alexandru.elisei@arm.com>
+Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+        pbonzini@redhat.com
+Subject: Re: [kvm-unit-tests PATCH] configure: arm/arm64: Add --earlycon
+ option to set UART type and address
+Message-ID: <20210312151606.qkfp7evsrpbw2wtq@kamzik.brq.redhat.com>
+References: <20210219163718.109101-1-alexandru.elisei@arm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210307180030.3465161-1-arseny.krasnov@kaspersky.com>
+In-Reply-To: <20210219163718.109101-1-alexandru.elisei@arm.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, Mar 07, 2021 at 09:00:26PM +0300, Arseny Krasnov wrote:
->This adds some logic to current stream enqueue function for SEQPACKET
->support:
->1) Use transport's seqpacket enqueue callback.
->2) Return value from enqueue function is whole record length or error
->   for SOCK_SEQPACKET.
->
->Signed-off-by: Arseny Krasnov <arseny.krasnov@kaspersky.com>
->---
-> include/net/af_vsock.h   |  2 ++
-> net/vmw_vsock/af_vsock.c | 22 ++++++++++++++++------
-> 2 files changed, 18 insertions(+), 6 deletions(-)
->
->diff --git a/include/net/af_vsock.h b/include/net/af_vsock.h
->index a8c4039e40cf..aed306292ab3 100644
->--- a/include/net/af_vsock.h
->+++ b/include/net/af_vsock.h
->@@ -139,6 +139,8 @@ struct vsock_transport {
-> 	size_t (*seqpacket_seq_get_len)(struct vsock_sock *vsk);
-> 	int (*seqpacket_dequeue)(struct vsock_sock *vsk, struct msghdr *msg,
-> 				 int flags, bool *msg_ready);
->+	int (*seqpacket_enqueue)(struct vsock_sock *vsk, struct msghdr *msg,
->+				 int flags, size_t len);
->
-> 	/* Notification. */
-> 	int (*notify_poll_in)(struct vsock_sock *, size_t, bool *);
->diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
->index 5bf64a3e678a..a031f165494d 100644
->--- a/net/vmw_vsock/af_vsock.c
->+++ b/net/vmw_vsock/af_vsock.c
->@@ -1830,9 +1830,14 @@ static int vsock_connectible_sendmsg(struct socket *sock, struct msghdr *msg,
-> 		 * responsibility to check how many bytes we were able to send.
-> 		 */
->
->-		written = transport->stream_enqueue(
->-				vsk, msg,
->-				len - total_written);
->+		if (sk->sk_type == SOCK_SEQPACKET) {
->+			written = transport->seqpacket_enqueue(vsk,
->+						msg, msg->msg_flags,
+On Fri, Feb 19, 2021 at 04:37:18PM +0000, Alexandru Elisei wrote:
+> Currently, the UART early address is set indirectly with the --vmm option
+> and there are only two possible values: if the VMM is qemu (the default),
+> then the UART address is set to 0x09000000; if the VMM is kvmtool, then the
+> UART address is set to 0x3f8.
+> 
+> There several efforts under way to change the kvmtool UART address, and
+> kvm-unit-tests so far hasn't had mechanism to let the user set a specific
+> address, which means that the early UART won't be available.
+> 
+> This situation will only become worse as kvm-unit-tests gains support to
+> run as an EFI app, as each platform will have their own UART type and
+> address.
+> 
+> To address both issues, a new configure option is added, --earlycon. The
+> syntax and semantics are identical to the kernel parameter with the same
+> name. Specifying this option will overwrite the UART address set by --vmm.
+> 
+> At the moment, the UART type and register width parameters are ignored
+> since both qemu's and kvmtool's UART emulation use the same offset for the
+> TX register and no other registers are used by kvm-unit-tests, but the
+> parameters will become relevant once EFI support is added.
+> 
+> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> ---
+> The kvmtool patches I was referring to are the patches to unify ioport and
+> MMIO emulation [1] and to allow the user to specify a custom memory layout
+> for the VM [2] (these patches are very old, but I plan to revive them after
+> the ioport and MMIO unification series are merged).
+> 
+> [1] https://lore.kernel.org/kvm/20201210142908.169597-1-andre.przywara@arm.com/T/#t
+> [2] https://lore.kernel.org/kvm/1569245722-23375-1-git-send-email-alexandru.elisei@arm.com/
+> 
+>  configure | 35 +++++++++++++++++++++++++++++++++++
+>  1 file changed, 35 insertions(+)
+> 
+> diff --git a/configure b/configure
+> index cdcd34e94030..d94b92255088 100755
+> --- a/configure
+> +++ b/configure
+> @@ -26,6 +26,7 @@ errata_force=0
+>  erratatxt="$srcdir/errata.txt"
+>  host_key_document=
+>  page_size=
+> +earlycon=
+>  
+>  usage() {
+>      cat <<-EOF
+> @@ -54,6 +55,17 @@ usage() {
+>  	    --page-size=PAGE_SIZE
+>  	                           Specify the page size (translation granule) (4k, 16k or
+>  	                           64k, default is 64k, arm64 only)
+> +	    --earlycon=EARLYCON
+> +	                           Specify the UART name, type and address (optional, arm and
+> +	                           arm64 only). The specified address will overwrite the UART
+> +	                           address set by the --vmm option. EARLYCON can be on of (case
 
-I think we can avoid to pass 'msg->msg_flags', since the transport can 
-access it through the 'msg' pointer, right?
+s/be on of/be one of/
 
->+						len - total_written);
->+		} else {
->+			written = transport->stream_enqueue(vsk,
->+					msg, len - total_written);
->+		}
-> 		if (written < 0) {
-> 			err = -ENOMEM;
-> 			goto out_err;
->@@ -1844,12 +1849,17 @@ static int vsock_connectible_sendmsg(struct socket *sock, struct msghdr *msg,
-> 				vsk, written, &send_data);
-> 		if (err < 0)
-> 			goto out_err;
->-
-> 	}
+> +	                           sensitive):
+> +	               uart[8250],mmio,ADDR
+> +	                           Specify an 8250 compatible UART at address ADDR. Supported
+> +	                           register stride is 8 bit only.
+> +	               pl011,mmio,ADDR
+> +	                           Specify a PL011 compatible UART at address ADDR. Supported
+> +	                           register stride is 8 bit only.
+>  EOF
+>      exit 1
+>  }
+> @@ -112,6 +124,9 @@ while [[ "$1" = -* ]]; do
+>  	--page-size)
+>  	    page_size="$arg"
+>  	    ;;
+> +	--earlycon)
+> +	    earlycon="$arg"
+> +	    ;;
+>  	--help)
+>  	    usage
+>  	    ;;
+> @@ -170,6 +185,26 @@ elif [ "$arch" = "arm" ] || [ "$arch" = "arm64" ]; then
+>          echo '--vmm must be one of "qemu" or "kvmtool"!'
+>          usage
+>      fi
+> +
+> +    if [ "$earlycon" ]; then
+> +        name=$(echo $earlycon|cut -d',' -f1)
+> +        if [ "$name" != "uart" ] && [ "$name" != "uart8250" ] &&
+> +                [ "$name" != "pl011" ]; then
+> +            echo "unknown earlycon name: $name"
+> +            usage
+> +        fi
+> +        type=$(echo $earlycon|cut -d',' -f2)
+> +        if [ "$type" != "mmio" ]; then
+> +            echo "unknown earlycon type: $type"
+> +            usage
+> +        fi
+> +        addr=$(echo $earlycon|cut -d',' -f3)
+> +        if [ -z "$addr" ]; then
+> +            echo "missing earlycon address"
+> +            usage
+> +        fi
+> +        arm_uart_early_addr=$addr
+> +    fi
+>  elif [ "$arch" = "ppc64" ]; then
+>      testdir=powerpc
+>      firmware="$testdir/boot_rom.bin"
+> -- 
+> 2.30.1
 >
-> out_err:
->-	if (total_written > 0)
->-		err = total_written;
->+	if (total_written > 0) {
->+		/* Return number of written bytes only if:
->+		 * 1) SOCK_STREAM socket.
->+		 * 2) SOCK_SEQPACKET socket when whole buffer is sent.
->+		 */
->+		if (sk->sk_type == SOCK_STREAM || total_written == len)
->+			err = total_written;
->+	}
-> out:
-> 	release_sock(sk);
-> 	return err;
->-- 
->2.25.1
->
+
+Otherwise,
+ 
+Reviewed-by: Andrew Jones <drjones@redhat.com>
 
