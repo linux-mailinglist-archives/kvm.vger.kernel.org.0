@@ -2,144 +2,116 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 073763395E9
-	for <lists+kvm@lfdr.de>; Fri, 12 Mar 2021 19:11:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EEA6A3395EF
+	for <lists+kvm@lfdr.de>; Fri, 12 Mar 2021 19:13:01 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231789AbhCLSLY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 12 Mar 2021 13:11:24 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:53189 "EHLO
+        id S232554AbhCLSMa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 12 Mar 2021 13:12:30 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:45123 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231907AbhCLSLR (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 12 Mar 2021 13:11:17 -0500
+        by vger.kernel.org with ESMTP id S232686AbhCLSMT (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 12 Mar 2021 13:12:19 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1615572677;
+        s=mimecast20190719; t=1615572739;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=SQXRSD89A8xhrCuxpBydg6Y3MyKh1PtNusEjHfIcj18=;
-        b=bX2tgC6SGJS1FhnxL+ShdpbV0pLyAO9+FUIdqKoG98EqAFtJNab07mbizgtZniFZMTxfVe
-        yB3hiKnqXlPvJlqxRaWDIrxbtUgP3uC1ngCJHX7eueW1w6Vhr9+MV7xoZFQ+2Ix0NctftV
-        Et2RnuCBjO75v8YPGSuTU4nb8KEoCF0=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-10-yW6F0dvMPs23nrzPZOTzJQ-1; Fri, 12 Mar 2021 13:11:15 -0500
-X-MC-Unique: yW6F0dvMPs23nrzPZOTzJQ-1
-Received: by mail-wr1-f69.google.com with SMTP id m9so11529127wrx.6
-        for <kvm@vger.kernel.org>; Fri, 12 Mar 2021 10:11:14 -0800 (PST)
+        bh=FEwm7dbFA9YEtIy6iLHK/1/1xLzzzQXYHGmPoA51kGY=;
+        b=Z6xWg19dCUVYQWfzWDdNkaNCXeOG2uvNmCX3I9TE3x1c/plBsnqiG3ZkRpfFurUhfVoUUW
+        zGI2vG1CR57vIaus8tfmVuSrtPTozbS0S1wn8MQ7cx9N6cdxPwhTG0opz0iYVNd2sh5KqE
+        JLesZW+lpDg8VFSpNvbrUtZaS78FVUE=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-577-3ImRkeclMmKkgplX4k4p6w-1; Fri, 12 Mar 2021 13:12:17 -0500
+X-MC-Unique: 3ImRkeclMmKkgplX4k4p6w-1
+Received: by mail-wm1-f72.google.com with SMTP id n17so2247965wmi.2
+        for <kvm@vger.kernel.org>; Fri, 12 Mar 2021 10:12:17 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:cc:references:from:subject:message-id:date
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=SQXRSD89A8xhrCuxpBydg6Y3MyKh1PtNusEjHfIcj18=;
-        b=G2ofYAJIqEucTmsTFaIOXP+2/9hTcVt08wSs9TaEIooSj07ICcAiqqw1d80JGcg5hN
-         dOYudxCLoTf4llD0KMDiam+QWgUxX3kbji4kzdlldSI6FQbdy04bMFkBM2tJaI74G8WD
-         6rGHe/t2U4s5XOE3qpcz3nKcPCm1YHzPght+VSmxGZTVZjZWQqeSyMqA/lz8v4LH+E87
-         DwMCWLpoOESHhZwGPIEikeImUQU0mIFc47jDw9vzOPt9E+y05H7WIeyu2BVwKKDU52rF
-         TdIvOUpkeNLd2YzbJCO/Og2brW6bedmlOfEK3QdGnYbhS5bLitc2pOSeX6I6oBdjrv5G
-         Oq3w==
-X-Gm-Message-State: AOAM5311BvG/wUvJRqRzzT6QNNrZDRzSi8iCBIC5ICrCnMsXq802Hes1
-        oWgqzC53fjy5RuOmM6KYqJgmpNZ66/qTbQcnpoW7diSyDr8YFLfrqo3QKM012nvYe6J0dQYNx81
-        vJlEys4S1fN4T
-X-Received: by 2002:a1c:498b:: with SMTP id w133mr14755141wma.134.1615572673386;
-        Fri, 12 Mar 2021 10:11:13 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJx2aInA1bidlltyWIjYrqBjK+SGizjJOOZcscWT2RiFNd2X/0uEYFLiJqfA7xaEL8hELymOZw==
-X-Received: by 2002:a1c:498b:: with SMTP id w133mr14755105wma.134.1615572673180;
-        Fri, 12 Mar 2021 10:11:13 -0800 (PST)
+        bh=FEwm7dbFA9YEtIy6iLHK/1/1xLzzzQXYHGmPoA51kGY=;
+        b=ereL8UnjPl4j3bWr5mzBz+4kS8YaPBImUg5OlMhOI6qdlcvi6GVx2QIWKokDbsiQyJ
+         yylu5ckcZWXBESYIiWznTfATxleZIRULdCaoA27dEgXMNVJlEsDls6AobPeYhb36HSpo
+         w+m84al0aaSl3wmFldZus0w13WJoCsuQBcslNiVl8tDQ6ccEpzS6ELVMf3uVHJNdOUTG
+         iq7SZoQyAEldIgZ1KFqSSkrBeqH6eUQxfCtwNIFLhhgw39pDf9DSX9k+wwapeP1efXeK
+         6gXWFEQvZ8JAOsY0tv+iesHFXg3QcODkb6r32oD1V2kIYspznhkEkhy0Th6TZHbIFQtS
+         ORmg==
+X-Gm-Message-State: AOAM530jozSVskG8dyP2G0bSEFuWPHNIDIdnjIRaiQZUuWE/EqRE6KcK
+        HDxT8dYfHGVmeI1ed1CBqF3kTH5LIkx/Nz67+kLSnoA1efsPYncb3dygSYkwW9s6H21fnqcxB8C
+        gtt4MIVdb2F0l
+X-Received: by 2002:a7b:cc84:: with SMTP id p4mr14411435wma.10.1615572736320;
+        Fri, 12 Mar 2021 10:12:16 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJztaR9pls6kz3Lfs5bJVbE2dnEL9uu98jcGBYdpHNScOrUa5G4QFWGNdLiPxHzLFm5fa/OULw==
+X-Received: by 2002:a7b:cc84:: with SMTP id p4mr14411425wma.10.1615572736164;
+        Fri, 12 Mar 2021 10:12:16 -0800 (PST)
 Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id y8sm2934326wmi.46.2021.03.12.10.11.11
+        by smtp.gmail.com with ESMTPSA id q4sm3154713wma.20.2021.03.12.10.12.15
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 12 Mar 2021 10:11:12 -0800 (PST)
-To:     Jing Zhang <jingzhangos@google.com>
-Cc:     KVM <kvm@vger.kernel.org>, KVM ARM <kvmarm@lists.cs.columbia.edu>,
-        Linux MIPS <linux-mips@vger.kernel.org>,
-        KVM PPC <kvm-ppc@vger.kernel.org>,
-        Linux S390 <linux-s390@vger.kernel.org>,
-        Linux kselftest <linux-kselftest@vger.kernel.org>,
-        Marc Zyngier <maz@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Will Deacon <will@kernel.org>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-        Paul Mackerras <paulus@ozlabs.org>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Fri, 12 Mar 2021 10:12:15 -0800 (PST)
+Subject: Re: [PATCH] KVM: x86/mmu: Skip !MMU-present SPTEs when removing SP in
+ exclusive mode
+To:     Ben Gardon <bgardon@google.com>,
+        Sean Christopherson <seanjc@google.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Peter Shier <pshier@google.com>,
-        Oliver Upton <oupton@google.com>,
-        David Rientjes <rientjes@google.com>,
-        Emanuele Giuseppe Esposito <eesposit@redhat.com>
-References: <20210310003024.2026253-1-jingzhangos@google.com>
- <20210310003024.2026253-4-jingzhangos@google.com>
- <bb03107c-a413-50da-e228-d338dd471fb3@redhat.com>
- <CAAdAUtjj52+cAhD4KUzAaqrMSJXHD0g=ecQNG-a92Mqn3BCxiQ@mail.gmail.com>
+        Joerg Roedel <joro@8bytes.org>, kvm <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>
+References: <20210310003029.1250571-1-seanjc@google.com>
+ <07cf7833-c74a-9ae0-6895-d74708b97f68@redhat.com>
+ <YEk2kBRUriFlCM62@google.com>
+ <CANgfPd9WS+ntjdh87Gk97MQq6FYNUk8KVE3jQYfmgr2mFb3Stw@mail.gmail.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [RFC PATCH 3/4] KVM: stats: Add ioctl commands to pull statistics
- in binary format
-Message-ID: <ac7462de-1531-5428-5dca-4e3dfb897000@redhat.com>
-Date:   Fri, 12 Mar 2021 19:11:10 +0100
+Message-ID: <c62c7635-48a8-dbc8-748e-188d402fd241@redhat.com>
+Date:   Fri, 12 Mar 2021 19:12:14 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.7.0
 MIME-Version: 1.0
-In-Reply-To: <CAAdAUtjj52+cAhD4KUzAaqrMSJXHD0g=ecQNG-a92Mqn3BCxiQ@mail.gmail.com>
+In-Reply-To: <CANgfPd9WS+ntjdh87Gk97MQq6FYNUk8KVE3jQYfmgr2mFb3Stw@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10/03/21 22:41, Jing Zhang wrote:
->> I would prefer a completely different interface, where you have a file
->> descriptor that can be created and associated to a vCPU or VM (or even
->> to /dev/kvm).  Having a file descriptor is important because the fd can
->> be passed to a less-privileged process that takes care of gathering the
->> metrics
-> Separate file descriptor solution is very tempting. We are still considering it
-> seriously. Our biggest concern is that the metrics gathering/handling process
-> is not necessary running on the same node as the one file descriptor belongs to.
-> It scales better to pass metrics data directly than to pass file descriptors.
-
-If you want to pass metrics data directly, you can just read the file 
-descriptor from your VMM, just like you're using the ioctls now. 
-However the file descriptor also allows a privilege-separated same-host 
-interface.
-
->> 4 bytes flags (always zero)
->> 4 bytes number of statistics
->> 4 bytes offset of the first stat description
->> 4 bytes offset of the first stat value
->> stat descriptions:
->>    - 4 bytes for the type (for now always zero: uint64_t)
->>    - 4 bytes for the flags (for now always zero)
->>    - length of name
->>    - name
->> statistics in 64-bit format
+On 10/03/21 23:24, Ben Gardon wrote:
+> On Wed, Mar 10, 2021 at 1:14 PM Sean Christopherson <seanjc@google.com> wrote:
+>>
+>> On Wed, Mar 10, 2021, Paolo Bonzini wrote:
+>>> On 10/03/21 01:30, Sean Christopherson wrote:
+>>>> diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+>>>> index 50ef757c5586..f0c99fa04ef2 100644
+>>>> --- a/arch/x86/kvm/mmu/tdp_mmu.c
+>>>> +++ b/arch/x86/kvm/mmu/tdp_mmu.c
+>>>> @@ -323,7 +323,18 @@ static void handle_removed_tdp_mmu_page(struct kvm *kvm, u64 *pt,
+>>>>                              cpu_relax();
+>>>>                      }
+>>>>              } else {
+>>>> +                   /*
+>>>> +                    * If the SPTE is not MMU-present, there is no backing
+>>>> +                    * page associated with the SPTE and so no side effects
+>>>> +                    * that need to be recorded, and exclusive ownership of
+>>>> +                    * mmu_lock ensures the SPTE can't be made present.
+>>>> +                    * Note, zapping MMIO SPTEs is also unnecessary as they
+>>>> +                    * are guarded by the memslots generation, not by being
+>>>> +                    * unreachable.
+>>>> +                    */
+>>>>                      old_child_spte = READ_ONCE(*sptep);
+>>>> +                   if (!is_shadow_present_pte(old_child_spte))
+>>>> +                           continue;
+>>>>                      /*
+>>>>                       * Marking the SPTE as a removed SPTE is not
 > 
-> The binary format presented above is very flexible. I understand why it is
-> organized this way.
-> In our situation, the metrics data could be pulled periodically as short as
-> half second. They are used by different kinds of monitors/triggers/alerts.
-> To enhance efficiency and reduce traffic caused by metrics passing, we
-> treat all metrics info/data as two kinds. One is immutable information,
-> which doesn't change in a given system boot. The other is mutable
-> data (statistics data), which is pulled/transferred periodically at a high
-> frequency.
-
-The format allows to place the values before the descriptions.  So you 
-could use pread to only read the first part of the file descriptor, and 
-the file_operations implementation would then skip the work of building 
-the immutable data.  It doesn't have to be implemented from the
-beginning like that, but the above format supports it.
+> This optimization also makes me think we could also skip the
+> __handle_changed_spte call in the read mode case if the SPTE change
+> was !PRESENT -> REMOVED.
+> 
+Yes, I think so.  It should be a separate patch anyway, so I've queued 
+this one.
 
 Paolo
 
