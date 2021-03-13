@@ -2,100 +2,87 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8D1FE339D89
-	for <lists+kvm@lfdr.de>; Sat, 13 Mar 2021 11:25:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 60C91339DA9
+	for <lists+kvm@lfdr.de>; Sat, 13 Mar 2021 11:47:12 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233248AbhCMKV7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 13 Mar 2021 05:21:59 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33148 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230349AbhCMKVo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 13 Mar 2021 05:21:44 -0500
-Received: from mail-qk1-x730.google.com (mail-qk1-x730.google.com [IPv6:2607:f8b0:4864:20::730])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1C84BC061574;
-        Sat, 13 Mar 2021 02:21:44 -0800 (PST)
-Received: by mail-qk1-x730.google.com with SMTP id b130so26989772qkc.10;
-        Sat, 13 Mar 2021 02:21:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=UpX1Lg+mq54WtiAhrwBDWXYDPmqQUSFtcUwtNY+v8RQ=;
-        b=FS0YqOTWPrsR8T8rB+TOtNMqfIpKjZbMujx1QpqRgZjz+StMzp0ESXTxK/LGZVIOsP
-         9J/ID9iq3J8fZXg6Zvd+AZeFr0D4YkkTPs8aOslYrPBSny6+99XB8x6oEohV8QVCe77t
-         cUb0BW4BeNSoNY+qqwndaQGB63Hxq/SUFNI/zOzGmYw9u8iUbebYf6K0V012N05CS6MU
-         HkIJs4hs3gGUSxMlZ1Fh6L2Gc3+begGLpY1xDxOeF1bLTazwfYrTo9ed3PR2AFrzSZHL
-         aUwrIpg9owREHwMHERhVCTJp9HrkZ26YA1xMQIDqfyU3uRlaMJYeB8puRxRmsdcEjhCI
-         OInA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
-         :references:mime-version:content-disposition:in-reply-to;
-        bh=UpX1Lg+mq54WtiAhrwBDWXYDPmqQUSFtcUwtNY+v8RQ=;
-        b=TOs1rCxAk0veONv7kDC8O8wkAHQ/H7ZrnYpgYkq3nH+sYywMkdUlAd6Duw3fGFDmPh
-         /GNOtRjj+IktzIIg2G6TLl5rNbIHDYtAfpMukwKNzhNtwor6P6pntTZBZolsV2A6XVaN
-         UrEwsVInrEDCsmSo6G3PwW2+o5FYeIojQ48qwsQPfLt0obeMIlAG0/XBezMiClCPeHdC
-         uRxnZuhoqdYvAcwPH/apZNO3AsBtjqdVuKaYsYaDY41GNUCswBbKR7Dy03mQgqGwfLzt
-         jsJ5jRMaTDZRpZmeckDxhVII8/VDBoSasGZKRSGCIN66vv2a8+67ncUK+Febt56qMY+5
-         QFPw==
-X-Gm-Message-State: AOAM533A001jVMpWQPPx+pyTE7DGUcWHm+p3TPj28SyPvFeRWRvnZkCT
-        ohW7Ciug+1D3w+KfkbYfXTE=
-X-Google-Smtp-Source: ABdhPJzvrDsFGZRbsgl4wu3pGJt4hqTE0dedEbZoaS2lE81Ko30AmIDxkFn/Hgy8XduDR4fInx5ipQ==
-X-Received: by 2002:a37:6348:: with SMTP id x69mr16074698qkb.154.1615630903056;
-        Sat, 13 Mar 2021 02:21:43 -0800 (PST)
-Received: from localhost ([2620:10d:c091:480::1:26b6])
-        by smtp.gmail.com with ESMTPSA id r125sm6279413qkf.132.2021.03.13.02.21.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 13 Mar 2021 02:21:42 -0800 (PST)
-Sender: Tejun Heo <htejun@gmail.com>
-Date:   Sat, 13 Mar 2021 05:20:39 -0500
-From:   Tejun Heo <tj@kernel.org>
-To:     Jacob Pan <jacob.jun.pan@intel.com>
-Cc:     Vipin Sharma <vipinsh@google.com>, mkoutny@suse.com,
-        rdunlap@infradead.org, thomas.lendacky@amd.com,
-        brijesh.singh@amd.com, jon.grimm@amd.com, eric.vantassell@amd.com,
-        pbonzini@redhat.com, hannes@cmpxchg.org, frankja@linux.ibm.com,
-        borntraeger@de.ibm.com, corbet@lwn.net, seanjc@google.com,
-        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
-        joro@8bytes.org, tglx@linutronix.de, mingo@redhat.com,
-        bp@alien8.de, hpa@zytor.com, gingell@google.com,
-        rientjes@google.com, dionnaglaze@google.com, kvm@vger.kernel.org,
-        x86@kernel.org, cgroups@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-kernel@vger.kernel.org, "Tian, Kevin" <kevin.tian@intel.com>,
-        "Liu, Yi L" <yi.l.liu@intel.com>,
-        "Raj, Ashok" <ashok.raj@intel.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        Jacob Pan <jacob.jun.pan@linux.intel.com>,
-        "jean-philippe@linaro.org" <jean-philippe@linaro.org>
-Subject: Re: [RFC v2 2/2] cgroup: sev: Miscellaneous cgroup documentation.
-Message-ID: <YEyR9181Qgzt+Ps9@mtj.duckdns.org>
-References: <20210302081705.1990283-1-vipinsh@google.com>
- <20210302081705.1990283-3-vipinsh@google.com>
- <20210303185513.27e18fce@jacob-builder>
- <YEB8i6Chq4K/GGF6@google.com>
- <YECfhCJtHUL9cB2L@slm.duckdns.org>
- <20210312125821.22d9bfca@jacob-builder>
- <YEvZ4muXqiSScQ8i@google.com>
- <20210312145904.4071a9d6@jacob-builder>
+        id S233760AbhCMKqb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 13 Mar 2021 05:46:31 -0500
+Received: from mail.kernel.org ([198.145.29.99]:42030 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S233761AbhCMKqT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 13 Mar 2021 05:46:19 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 88D6464F1C;
+        Sat, 13 Mar 2021 10:46:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1615632379;
+        bh=qAaJYRNOuNIk1PDV0g7I91KX2FFogaJhE/pcVuFhjKk=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=FOean60Xw4PRLx+aSGJgUzFjL/7NZKisHmr5TiQ7H07Y3VmAINhrFg9yWpEkaMkwD
+         ymCqO1ZtITZqtjKrtB4Ro/EoeVf3Mw5g6UGKncF5FKI3Nw/vQYQPKutm/0H7EMFMs2
+         Ul6ncBkdQ57FuFmkVfpXs7FmRR7nJO2w4kmWBuz1SNMNt3HMvzzNjeAH95ayD5BPLA
+         wNQFCGJ653edFu7YYKnVZtpp4SxlT2liIx14kTNUgohQSkWgflPpaqyMdBZm0wXg8o
+         92OR9b/J2kUaKEmGGAxQ67dsxuVGbVSMwEU5zFyH045EV9pQaLFTq/KQgB6PkjIjZ0
+         qM8ucwdbXCsQA==
+Date:   Sat, 13 Mar 2021 12:45:53 +0200
+From:   Jarkko Sakkinen <jarkko@kernel.org>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Kai Huang <kai.huang@intel.com>, kvm@vger.kernel.org,
+        x86@kernel.org, linux-sgx@vger.kernel.org,
+        linux-kernel@vger.kernel.org, luto@kernel.org,
+        dave.hansen@intel.com, rick.p.edgecombe@intel.com,
+        haitao.huang@intel.com, pbonzini@redhat.com, bp@alien8.de,
+        tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com
+Subject: Re: [PATCH v3 03/25] x86/sgx: Wipe out EREMOVE from
+ sgx_free_epc_page()
+Message-ID: <YEyX4V7BcS3MZNzp@kernel.org>
+References: <e1ca4131bc9f98cf50a1200efcf46080d6512fe7.1615250634.git.kai.huang@intel.com>
+ <20210311020142.125722-1-kai.huang@intel.com>
+ <YEvbcrTZyiUAxZAu@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210312145904.4071a9d6@jacob-builder>
+In-Reply-To: <YEvbcrTZyiUAxZAu@google.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Mar 12, 2021 at 02:59:04PM -0800, Jacob Pan wrote:
-> Our primary goal is to limit the amount of IOASIDs that VMs can allocate.
-> If a VM is migrated to a different cgroup, I think we need to
-> charge/uncharge the destination/source cgroup in order enforce the limit. I
-> am not an expert here, any feedback would be appreciated.
+On Fri, Mar 12, 2021 at 01:21:54PM -0800, Sean Christopherson wrote:
+> On Thu, Mar 11, 2021, Kai Huang wrote:
+> > From: Jarkko Sakkinen <jarkko@kernel.org>
+> > 
+> > EREMOVE takes a page and removes any association between that page and
+> > an enclave.  It must be run on a page before it can be added into
+> > another enclave.  Currently, EREMOVE is run as part of pages being freed
+> > into the SGX page allocator.  It is not expected to fail.
+> > 
+> > KVM does not track how guest pages are used, which means that SGX
+> > virtualization use of EREMOVE might fail.
+> > 
+> > Break out the EREMOVE call from the SGX page allocator.  This will allow
+> > the SGX virtualization code to use the allocator directly.  (SGX/KVM
+> > will also introduce a more permissive EREMOVE helper).
+> > 
+> > Implement original sgx_free_epc_page() as sgx_encl_free_epc_page() to be
+> > more specific that it is used to free EPC page assigned to one enclave.
+> > Print an error message when EREMOVE fails to explicitly call out EPC
+> > page is leaked, and requires machine reboot to get leaked pages back.
+> > 
+> > Signed-off-by: Jarkko Sakkinen <jarkko@kernel.org>
+> > Co-developed-by: Kai Huang <kai.huang@intel.com>
+> > Acked-by: Jarkko Sakkinen <jarkko@kernel.org>
+> > Signed-off-by: Kai Huang <kai.huang@intel.com>
+> > ---
+> > v2->v3:
+> > 
+> >  - Fixed bug during copy/paste which results in SECS page and va pages are not
+> >    correctly freed in sgx_encl_release() (sorry for the mistake).
+> >  - Added Jarkko's Acked-by.
+> 
+> That Acked-by should either be dropped or moved above Co-developed-by to make
+> checkpatch happy.
+> 
+> Reviewed-by: Sean Christopherson <seanjc@google.com>
 
-That simply isn't a supported usage model. None of other resources will get
-tracked if you do that.
+Oops, my bad. Yup, ack should be removed.
 
-Thanks.
-
--- 
-tejun
+/Jarkko
