@@ -2,74 +2,117 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 769E5339BB6
-	for <lists+kvm@lfdr.de>; Sat, 13 Mar 2021 05:40:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9FAE0339BF3
+	for <lists+kvm@lfdr.de>; Sat, 13 Mar 2021 06:11:31 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232904AbhCMEah (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 12 Mar 2021 23:30:37 -0500
-Received: from mga03.intel.com ([134.134.136.65]:38799 "EHLO mga03.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231597AbhCMEa2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 12 Mar 2021 23:30:28 -0500
-IronPort-SDR: AJFAvR7GP5rM82kqJxFtfZ6niSIRVmsLL4sd91pXRb/bVXg69/eDM5IMBo/9w5dtM2pl6t1jh7
- U5sG4sRMaT9g==
-X-IronPort-AV: E=McAfee;i="6000,8403,9921"; a="188962572"
-X-IronPort-AV: E=Sophos;i="5.81,245,1610438400"; 
-   d="scan'208";a="188962572"
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Mar 2021 20:30:27 -0800
-IronPort-SDR: w1dgyukI4YaleZ7Xy+Fft36hB6Wetu4Mkj54VtLghA+tAD+Bv7g9pJVaEjJaQvzw7Qf+uaptwV
- qDt2tbtcPAmA==
-X-IronPort-AV: E=Sophos;i="5.81,245,1610438400"; 
-   d="scan'208";a="387549457"
-Received: from standon-mobl1.amr.corp.intel.com ([10.255.230.31])
-  by orsmga002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Mar 2021 20:30:22 -0800
-Message-ID: <6eec5091aeac32ebd5e95ca7f4696c9775857bc7.camel@intel.com>
-Subject: Re: [PATCH v2 00/25] KVM SGX virtualization support
-From:   Kai Huang <kai.huang@intel.com>
-To:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Borislav Petkov <bp@alien8.de>, kvm@vger.kernel.org,
-        x86@kernel.org, linux-sgx@vger.kernel.org,
-        linux-kernel@vger.kernel.org, jarkko@kernel.org, luto@kernel.org,
-        dave.hansen@intel.com, rick.p.edgecombe@intel.com,
-        haitao.huang@intel.com, tglx@linutronix.de, mingo@redhat.com,
-        hpa@zytor.com, jethro@fortanix.com, b.thiel@posteo.de,
-        jmattson@google.com, joro@8bytes.org, vkuznets@redhat.com,
-        wanpengli@tencent.com, corbet@lwn.net
-Date:   Sat, 13 Mar 2021 17:30:19 +1300
-In-Reply-To: <YEvlUIOWGstrgh7H@google.com>
-References: <cover.1615250634.git.kai.huang@intel.com>
-         <20210309093037.GA699@zn.tnic>
-         <51ebf191-e83a-657a-1030-4ccdc32f0f33@redhat.com>
-         <YEvlUIOWGstrgh7H@google.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.38.4 (3.38.4-1.fc33) 
+        id S231280AbhCMFKz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 13 Mar 2021 00:10:55 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51108 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229852AbhCMFKs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 13 Mar 2021 00:10:48 -0500
+Received: from mail-pf1-x430.google.com (mail-pf1-x430.google.com [IPv6:2607:f8b0:4864:20::430])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 63A99C061574;
+        Fri, 12 Mar 2021 21:10:48 -0800 (PST)
+Received: by mail-pf1-x430.google.com with SMTP id x21so1939158pfa.3;
+        Fri, 12 Mar 2021 21:10:48 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=rZiHATcqAxSVuhRyTi2E5mTS4Xv1o3Mg3eeyKP3UZ5g=;
+        b=V0LnVckIlEb6217KBYOSW05AESkEojvfEcUII/Z6pX0szMiyJ14AWYcYTWmqKRNgyW
+         3+QuyBv4rbEV/DgVbMST/DLbSBUCRI46Ohluk+jzDpZlNywrZ7ZvSXOYVJT8CU0phqJa
+         DvzcHXNMFzNm+cUPBU7yvwci1Ran08HuWWvyVYqiyeo7OMmeWNvC76TcqLYyWV/kNRSI
+         iTRwlOnFjLKcDXa9EbqQV0KyILtNabSO6ppH71SEMBRM7rQ84xTanzotSexSaU9cVGrN
+         kjWeJosqxiluyOdp2OmhG1jt1bF+ai7QsI7n85E2tR5cgFqQwNGYOqDWHMxLfH3RVOax
+         sxmQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=rZiHATcqAxSVuhRyTi2E5mTS4Xv1o3Mg3eeyKP3UZ5g=;
+        b=gITQAuBGsjgZeqzMxaEHPoneuznKKuZyAqDSdV3YaD+uPX3ztnvs2HN6rIAgcwYVlw
+         PeFVmTZDlOVEspxGW4em/XUwstVas9mtKSZsi/7xTxAzjF0o9BOA+nYAGhkFfG41GpGG
+         AVLJ2aqtcKCbvlmjGTxUHtQ6ZFvGhc5HT+qsXeOZfEZfbFUabTkpaLtENIK8TgVoHZY2
+         GdCzPcNev7hCw6MDx+OMIUuqIPMgtuTnSF4kinxBt5oTTb7D1AVT4na/oyTGSz6tfn8E
+         /E8nnBvXJodsi1yGlfRzepimmtww+alOUQvaYPZSWMMnChzSsRxvtudC/ma9N+zqbyBR
+         Y/Lw==
+X-Gm-Message-State: AOAM530bUeiLrOEv2zhEEzB7IlW+hbFYtSxI9gncLZMWyqyIPCdS23RH
+        nHIFZmJEtI3MXx7KET+zWHX+ZoVXWQ==
+X-Google-Smtp-Source: ABdhPJwwEf94/agw3SzyxHDnvwR/nCGIQ2OtwLhM46quNqQcjW29ycjh2H/lL7kY+uf03ZjkO0Dd4g==
+X-Received: by 2002:aa7:9ecf:0:b029:1f4:f737:12d6 with SMTP id r15-20020aa79ecf0000b02901f4f73712d6mr1562865pfq.8.1615612247490;
+        Fri, 12 Mar 2021 21:10:47 -0800 (PST)
+Received: from localhost.localdomain ([203.205.141.39])
+        by smtp.gmail.com with ESMTPSA id q95sm3541430pjq.20.2021.03.12.21.10.44
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 12 Mar 2021 21:10:47 -0800 (PST)
+From:   lihaiwei.kernel@gmail.com
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     pbonzini@redhat.com, seanjc@google.com, vkuznets@redhat.com,
+        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
+        Haiwei Li <lihaiwei@tencent.com>
+Subject: [PATCH] KVM: clean up the unused argument
+Date:   Sat, 13 Mar 2021 13:10:32 +0800
+Message-Id: <20210313051032.4171-1-lihaiwei.kernel@gmail.com>
+X-Mailer: git-send-email 2.28.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 2021-03-12 at 14:04 -0800, Sean Christopherson wrote:
-> On Tue, Mar 09, 2021, Paolo Bonzini wrote:
-> > On 09/03/21 10:30, Borislav Petkov wrote:
-> > > On Tue, Mar 09, 2021 at 02:38:49PM +1300, Kai Huang wrote:
-> > > > This series adds KVM SGX virtualization support. The first 14 patches starting
-> > > > with x86/sgx or x86/cpu.. are necessary changes to x86 and SGX core/driver to
-> > > > support KVM SGX virtualization, while the rest are patches to KVM subsystem.
-> > > 
-> > > Ok, I guess I'll queue 1-14 once Sean doesn't find anything
-> > > objectionable then give Paolo an immutable commit to base the KVM stuff
-> > > ontop.
-> > 
-> > Sounds great.
-> 
-> Patches 1-14 look good, just a few minor nits, nothing functional.  I'll look at
-> the KVM patches next week.
-> 
-> Thanks for picking this up Kai!
+From: Haiwei Li <lihaiwei@tencent.com>
 
-Thank you Sean! I'll address your comments in next version.
+kvm_msr_ignored_check function never uses vcpu argument. Clean up the
+function and invokers.
 
+Signed-off-by: Haiwei Li <lihaiwei@tencent.com>
+---
+ arch/x86/kvm/x86.c | 9 ++++-----
+ 1 file changed, 4 insertions(+), 5 deletions(-)
+
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 012d5df..27e9ee8 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -271,8 +271,7 @@ struct kvm_stats_debugfs_item debugfs_entries[] = {
+  * When called, it means the previous get/set msr reached an invalid msr.
+  * Return true if we want to ignore/silent this failed msr access.
+  */
+-static bool kvm_msr_ignored_check(struct kvm_vcpu *vcpu, u32 msr,
+-				  u64 data, bool write)
++static bool kvm_msr_ignored_check(u32 msr, u64 data, bool write)
+ {
+ 	const char *op = write ? "wrmsr" : "rdmsr";
+ 
+@@ -1447,7 +1446,7 @@ static int do_get_msr_feature(struct kvm_vcpu *vcpu, unsigned index, u64 *data)
+ 	if (r == KVM_MSR_RET_INVALID) {
+ 		/* Unconditionally clear the output for simplicity */
+ 		*data = 0;
+-		if (kvm_msr_ignored_check(vcpu, index, 0, false))
++		if (kvm_msr_ignored_check(index, 0, false))
+ 			r = 0;
+ 	}
+ 
+@@ -1613,7 +1612,7 @@ static int kvm_set_msr_ignored_check(struct kvm_vcpu *vcpu,
+ 	int ret = __kvm_set_msr(vcpu, index, data, host_initiated);
+ 
+ 	if (ret == KVM_MSR_RET_INVALID)
+-		if (kvm_msr_ignored_check(vcpu, index, data, true))
++		if (kvm_msr_ignored_check(index, data, true))
+ 			ret = 0;
+ 
+ 	return ret;
+@@ -1651,7 +1650,7 @@ static int kvm_get_msr_ignored_check(struct kvm_vcpu *vcpu,
+ 	if (ret == KVM_MSR_RET_INVALID) {
+ 		/* Unconditionally clear *data for simplicity */
+ 		*data = 0;
+-		if (kvm_msr_ignored_check(vcpu, index, 0, false))
++		if (kvm_msr_ignored_check(index, 0, false))
+ 			ret = 0;
+ 	}
+ 
+-- 
+1.8.3.1
 
