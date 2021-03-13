@@ -2,111 +2,91 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A12E5339FD0
-	for <lists+kvm@lfdr.de>; Sat, 13 Mar 2021 19:24:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DF9CC33A02B
+	for <lists+kvm@lfdr.de>; Sat, 13 Mar 2021 20:06:43 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234104AbhCMSXr convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Sat, 13 Mar 2021 13:23:47 -0500
-Received: from smtp.econet.co.zw ([77.246.51.158]:16989 "EHLO
-        ironportDMZ.econet.co.zw" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S233635AbhCMSXe (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Sat, 13 Mar 2021 13:23:34 -0500
-X-Greylist: delayed 428 seconds by postgrey-1.27 at vger.kernel.org; Sat, 13 Mar 2021 13:23:33 EST
-IronPort-SDR: pfOqp8Ie6beoFPh3hAy8jlb49H4aQmKvANrzgr2PQDNB7J5B1aLlq3yOqmDFqLryCX1MOrR16V
- nkIhmDXMprgdTco2vXdxhteHkCTTp8ObWecNAiqpHTXFgm8BVkQvNcyUTqO+WxlFinGomQWjzc
- LnN2/w+aUa4fTY2NUzgeHp5iqn3Y9qkmPyXw6fIjq6+K3xDUpLeWlmJwDD/MAzR0e+aBMNWD/f
- xVwC26DhgwYX1GMM3H0nP6xbrYmw7w1zhpuuLgrf4sDXUK9HQ8r6MTUIUfU043dPMzUUalgutk
- mCE=
-IronPort-HdrOrdr: A9a23:vt17Oaj0to+CAM/iqAjBbQGeenBQXnQji2hD6mlwRA09T+Wzkc
- eykPMHkSLugDEKV3063fyGMq+MQXTTnKQFgrU5F7GkQQXgpS+UPJhvhLGD/xTMEzDzn9Qy6Y
- 5OaK57YeedMXFfreLXpDa1CMwhxt7vysGVrMPT1W1kQw0vS4wI1XYeNi+hHkd7RBZLCPMCff
- L2jPZvnDa4fGRSU8LTPBQ4dtPOusHRk9beaQMGbiRXkDWmty+i67LxDnGjsSs2bjUn+8ZazU
- H11yjCwq2itrWD0R/bzG/P//1t6b7c4+oGIMSNj8QPQw+c7jqAVcBEW7mPmhUYydvfj2oCoZ
- 30uBcnJMRv+xrqDwOInSc=
-X-IronPort-AV: E=Sophos;i="5.81,245,1610402400"; 
-   d="scan'208";a="3438382"
-Received: from unknown (HELO wvale-mb-svr-06.econetzw.local) ([192.168.101.174])
-  by ironportLAN.econet.co.zw with ESMTP; 13 Mar 2021 20:16:23 +0200
-Received: from WVALE-CAS-SVR-9.econetzw.local (192.168.101.184) by
- wvale-mb-svr-06.econetzw.local (192.168.101.174) with Microsoft SMTP Server
- (TLS) id 15.0.1473.3; Sat, 13 Mar 2021 20:12:26 +0200
-Received: from User (165.231.148.189) by WVALE-CAS-SVR-9.econetzw.local
- (10.10.11.230) with Microsoft SMTP Server id 15.0.1473.3 via Frontend
- Transport; Sat, 13 Mar 2021 20:16:33 +0200
-Reply-To: <r19772744@daum.net>
-From:   "Reem E. A" <chawora@econet.co.zw>
-Subject: Re:
-Date:   Sat, 13 Mar 2021 18:16:19 -0800
+        id S234297AbhCMTGA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 13 Mar 2021 14:06:00 -0500
+Received: from mail.kernel.org ([198.145.29.99]:41604 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S234124AbhCMTF6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 13 Mar 2021 14:05:58 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 658CA64EC6;
+        Sat, 13 Mar 2021 19:05:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1615662357;
+        bh=4web00tJEwqiwwmbuK8tkU4dxrLVDLg96w+/MeovCrg=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=EdD+gOR5wB+/fVaPM0+2NZGy89/U2dLTDAO9mQfO6zb8M7FQxSetCpyOl7Qxnolnu
+         983Jt9q78eaGQSxz87V8c4jqSITGSeJvll6sGX8s5iRc9ufp2V/3vInArcmK2M6HJQ
+         n6IRveTj8MttfvY2Ch+xcW6lO1w+gzFsOHw5n+J+McUSeZF260lxxVE+H3BGFMVlfn
+         gmc+1kPInQLMjzjqqzlbKmmdKMzAQ6/6zCaTge3G28kDmhrdjTOvxel81ZitranRZe
+         aXt0Wp7nJnZ0t9mJQ6w2LrF8OgVRDUHZX5MwqISgVbzfiSDRi5h8nzGjiriZAzZzzj
+         DpDs6QakdPiRw==
+Date:   Sat, 13 Mar 2021 21:05:33 +0200
+From:   Jarkko Sakkinen <jarkko@kernel.org>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Kai Huang <kai.huang@intel.com>, kvm@vger.kernel.org,
+        linux-sgx@vger.kernel.org, x86@kernel.org,
+        linux-kernel@vger.kernel.org, luto@kernel.org,
+        dave.hansen@intel.com, rick.p.edgecombe@intel.com,
+        haitao.huang@intel.com, pbonzini@redhat.com, bp@alien8.de,
+        tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com
+Subject: Re: [PATCH v2 07/25] x86/sgx: Initialize virtual EPC driver even
+ when SGX driver is disabled
+Message-ID: <YE0M/VoETPw7YZIy@kernel.org>
+References: <cover.1615250634.git.kai.huang@intel.com>
+ <d2ebcffeb9193d26a1305e08fe1aa1347feb1c62.1615250634.git.kai.huang@intel.com>
+ <YEvg2vNfiDYoc9u3@google.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="Windows-1251"
-Content-Transfer-Encoding: 8BIT
-X-Priority: 3
-X-MSMail-Priority: Normal
-X-Mailer: Microsoft Outlook Express 6.00.2600.0000
-X-MimeOLE: Produced By Microsoft MimeOLE V6.00.2600.0000
-Message-ID: <57a853dee13a4d75bd2edd55cf5b8d7b@WVALE-CAS-SVR-9.econetzw.local>
-To:     Undisclosed recipients:;
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YEvg2vNfiDYoc9u3@google.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hello,
+On Fri, Mar 12, 2021 at 01:44:58PM -0800, Sean Christopherson wrote:
+> On Tue, Mar 09, 2021, Kai Huang wrote:
+> > Modify sgx_init() to always try to initialize the virtual EPC driver,
+> > even if the SGX driver is disabled.  The SGX driver might be disabled
+> > if SGX Launch Control is in locked mode, or not supported in the
+> > hardware at all.  This allows (non-Linux) guests that support non-LC
+> > configurations to use SGX.
+> > 
+> > Acked-by: Dave Hansen <dave.hansen@intel.com>
+> > Signed-off-by: Kai Huang <kai.huang@intel.com>
+> > ---
+> >  arch/x86/kernel/cpu/sgx/main.c | 10 +++++++++-
+> >  1 file changed, 9 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/arch/x86/kernel/cpu/sgx/main.c b/arch/x86/kernel/cpu/sgx/main.c
+> > index 44fe91a5bfb3..8c922e68274d 100644
+> > --- a/arch/x86/kernel/cpu/sgx/main.c
+> > +++ b/arch/x86/kernel/cpu/sgx/main.c
+> > @@ -712,7 +712,15 @@ static int __init sgx_init(void)
+> >  		goto err_page_cache;
+> >  	}
+> >  
+> > -	ret = sgx_drv_init();
+> > +	/*
+> > +	 * Always try to initialize the native *and* KVM drivers.
+> > +	 * The KVM driver is less picky than the native one and
+> > +	 * can function if the native one is not supported on the
+> > +	 * current system or fails to initialize.
+> > +	 *
+> > +	 * Error out only if both fail to initialize.
+> > +	 */
+> > +	ret = !!sgx_drv_init() & !!sgx_vepc_init();
+> 
+> I love this code.
+> 
+> Reviewed-by: Sean Christopherson <seanjc@google.com>
 
-My name is Ms. Reem Ebrahim Al-Hashimi, I am the "Minister of state
-and Petroleum" also "Minister of State for International Cooperation"
-in UAE. I write to you on behalf of my other "three (2) colleagues"
-who has approved me to solicit for your "partnership in claiming of
-{us$47=Million}" from a Financial Home on their behalf and
-for our "Mutual Benefits".
+I'm still wondering why this code let's go through when sgx_drv_init()
+succeeds and sgx_vepc_init() fails.
 
-The Fund {us$47=Million} is our share from the (over-invoiced) Oil/Gas
-deal with Turkish Government within 2013/2014, however, we
-don't want our government to know about the fund. If this proposal
-interests you, let me know, by sending me an email and I will send to
-you detailed information on how this business would be successfully
-transacted. Be informed that nobody knows about the secret of this
-fund except us, and we know how to carry out the entire transaction.
-So I am compelled to ask, that you will stand on our behalf and
-receive this fund into any account that is solely controlled by you.
+The inline comment explains only the mirrored case (which does make
+sense).
 
-We will compensate you with 15% of the total amount involved as
-gratification for being our partner in this transaction. Reply to:
-reem.alhashimi@yandex.com
-
-Regards,
-Ms. Reem.
-This mail was sent through Econet Wireless, a Global telecoms leader.
-
-DISCLAIMER
-
-The information in this message is confidential and is legally privileged. It is intended solely for the addressee. Access to this message by anyone else is unauthorized. If received in error please accept our apologies and notify the sender immediately. You must also delete the original message from your machine. If you are not the intended recipient, any use, disclosure, copying, distribution or action taken in reliance of it, is prohibited and may be unlawful. The information, attachments, opinions or advice contained in this email are not the views or opinions of Econet Wireless, its subsidiaries or affiliates. Econet Wireless therefore accepts no liability for claims, losses, or damages arising from the inaccuracy, incorrectness, or lack of integrity of such information.
-[https://mail.econet.co.zw/OWA/auth/current/themes/resources/Agile/AgileBanner.png]
-WORK ISN'T A PLACE
-IT'S WHAT WE DO
-________________________________
-
-
-
-
-
-[https://mail.econet.co.zw/OWA/auth/current/themes/resources/Agile/telephone.png]
-
-
-
-
-[https://mail.econet.co.zw/OWA/auth/current/themes/resources/Agile/email.png]
-
-<mailto:>
-
-
-[https://mail.econet.co.zw/OWA/auth/current/themes/resources/Agile/location.png]
-
-
-
-
-[https://mail.econet.co.zw/OWA/auth/current/themes/resources/Agile/website.png]
-
-www.econet.co.zw<https://www.econet.co.zw>
-
-
-[https://mail.econet.co.zw/OWA/auth/current/themes/resources/Agile/inspired.jpg]
+/Jarkko
