@@ -2,271 +2,229 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 320E0339A99
-	for <lists+kvm@lfdr.de>; Sat, 13 Mar 2021 01:57:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2785B339AA1
+	for <lists+kvm@lfdr.de>; Sat, 13 Mar 2021 01:58:06 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232943AbhCMA4e (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 12 Mar 2021 19:56:34 -0500
-Received: from mail-dm6nam12on2065.outbound.protection.outlook.com ([40.107.243.65]:30549
-        "EHLO NAM12-DM6-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S232223AbhCMA4O (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 12 Mar 2021 19:56:14 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ZXgFH2NvCRlxGbKIt6HWs8ZcUpd0SRz7cxNOHvSvarCjM9+XwHINgGXViFnxnae65ptJ9wspwz77IwTIV/+eB6qvrRKO0kNLc1NGEELndNrKgAWV+XTisFFy8YN20a9XPktUOMD27ZL8MrvtnkOrO39u70FYmEF9V1fgyOhbgRyneV4EkFWLKerI6FNSBlB7ppxBOHmnDMB480fWL1Iz/hbH6r9yWedZsHp5EM1uiouwNXSq+CV2KvVP40HR6Z+gT/3KK2XwCIWw3gjvUwTzOqZoV46RwIEoFbpD21/gFmmy+saCyUieCjyMvThILvZzUDjYTnuCyvpmM15nqmOYIQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=NMA5eI6+0w3JuPIdmz4FGsnE5kNex/3uiNtHiAJ+31Q=;
- b=Mw6wh8A7XV0Gd5KhOEU+I5jkHFguVP0nTqnp/xQ2yBSlblbyarBifi0vrxsXeUso/7zdJRZC+glwsmXXSOtXd0e5iAC2sdptk/p/nq122UnTfdmFgioIpeIvqT8ZljIikk6zqw0Q8nszE+46pIb642hPnUy1prcZasqcCk3Qmgf+HMDKxY6RkP/Fr/3vPHuPtqChSX22YC0KujWoPPaRiR0aP/iHuPRdBbXI+B+1S85JICnPo/6CSz/87/I05dCP3A83q6R8bqzRHZxeLe6zgF1ehUArzMiBZ1ZCTEPEf1CfQxSHJBG+W4JyoR0IYFxcjY0GBD5WcSxlfb+qzS5j0w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=NMA5eI6+0w3JuPIdmz4FGsnE5kNex/3uiNtHiAJ+31Q=;
- b=dH7QBAtQSbmBhUoJxtHCiUOMZiLMDXMPmJkpVuu1pOJxw8bzrpA/xCrkXilPc2MrHwNYOrutnbXu1xqjuMfS7JN7qMpEFFn/PwWIqI2viVWIbPWCcDiAq4aXVcf+iSk4S0l82rmTq2zN4CL5VJQDdGq2I1lTMQiXxsH7CJf4DH1wQfj/BbfPyZvtA+SIroKMmX5OPJGukBGvS7MGTOk1XtoMOj94IqRH3A+0ta09DhTHSbe6e7DNWUcuUVRQBQyMVdZgt1a5zI6RNq2pJT4H1h7m3MnuPTkVHGpcWfvoiTsWRFlcoSy1eR0IQa7terIuOAvloaYo+TT09gtyMuKxrQ==
-Authentication-Results: redhat.com; dkim=none (message not signed)
- header.d=none;redhat.com; dmarc=none action=none header.from=nvidia.com;
-Received: from DM6PR12MB3834.namprd12.prod.outlook.com (2603:10b6:5:14a::12)
- by DM6PR12MB2940.namprd12.prod.outlook.com (2603:10b6:5:15f::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3933.31; Sat, 13 Mar
- 2021 00:56:13 +0000
-Received: from DM6PR12MB3834.namprd12.prod.outlook.com
- ([fe80::1c62:7fa3:617b:ab87]) by DM6PR12MB3834.namprd12.prod.outlook.com
- ([fe80::1c62:7fa3:617b:ab87%6]) with mapi id 15.20.3933.032; Sat, 13 Mar 2021
- 00:56:13 +0000
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Alex Williamson <alex.williamson@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Diana Craciun <diana.craciun@oss.nxp.com>,
-        Eric Auger <eric.auger@redhat.com>, kvm@vger.kernel.org,
-        Kirti Wankhede <kwankhede@nvidia.com>,
-        linux-doc@vger.kernel.org
-Cc:     "Raj, Ashok" <ashok.raj@intel.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Christoph Hellwig <hch@lst.de>,
-        Leon Romanovsky <leonro@nvidia.com>,
-        Max Gurtovoy <mgurtovoy@nvidia.com>,
-        Tarun Gupta <targupta@nvidia.com>
-Subject: [PATCH v2 14/14] vfio: Remove device_data from the vfio bus driver API
-Date:   Fri, 12 Mar 2021 20:56:06 -0400
-Message-Id: <14-v2-20d933792272+4ff-vfio1_jgg@nvidia.com>
-In-Reply-To: <0-v2-20d933792272+4ff-vfio1_jgg@nvidia.com>
-References: 
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [142.162.115.133]
-X-ClientProxiedBy: MN2PR22CA0027.namprd22.prod.outlook.com
- (2603:10b6:208:238::32) To DM6PR12MB3834.namprd12.prod.outlook.com
- (2603:10b6:5:14a::12)
+        id S232554AbhCMA5c (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 12 Mar 2021 19:57:32 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53574 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232559AbhCMA5Z (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 12 Mar 2021 19:57:25 -0500
+Received: from mail-oi1-x229.google.com (mail-oi1-x229.google.com [IPv6:2607:f8b0:4864:20::229])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B1D63C061574;
+        Fri, 12 Mar 2021 16:57:25 -0800 (PST)
+Received: by mail-oi1-x229.google.com with SMTP id x135so24202513oia.9;
+        Fri, 12 Mar 2021 16:57:25 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=xznO7qF0Fh32t6GWFRHABRU6yKc7RKkv+nykz4qj2eg=;
+        b=SiObuZz7aXD2AihzXolqZpQvM7XzSoCfJ7gyUUOK1LcBC06Uw+KxadFLo3FayZaNPG
+         gKTeByT/mdU/3GxrGnYSrKyz/oVZMTqqbXBWLMMfsUIiDGeO2v73a7kZNtb+jqbRZzxu
+         HtsTSBO/4ufBlA8ZddvSLTwT+vFGB+Ynm+/q/WJcBIqFaTgBThltwq2/+qrqW3943AbE
+         bDZmhnaHiWqM0XRcrKnCA6b8UmMY4XfiP7/JDRaEVb8+sgACIaWkqUAV7N5CtjmV1KDr
+         wxaHKczsYq3WsRb2kscyEmYAxpsr2OUx+x2Dvxs2a5xcTM/NOC0xndElW1A4KR5Gzs2E
+         AGLA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=xznO7qF0Fh32t6GWFRHABRU6yKc7RKkv+nykz4qj2eg=;
+        b=SWjHW1fwkZzreFYb8wZ7NKd3h/r1NaGTQavJafw399I0GiYDZjP0YG7sD5GftBfV23
+         yRXY/s30jvrvUbPJourobFX8W2d71OmILG0JFT5NwfPNskCpcqjVNzLv5MUzARuOBuKy
+         YmrRmJ7vN/svgSYqEFzmTGqW142Ynu33qQCeOUgj4lTS8JJ359AoQbinNGFUDzDrjisB
+         /jAUuVHOb3oM6su19ymd0wRNAKNgphbGAxNT+wD/tRx4L892MEm/1Xa4F3aOZrkVwB0+
+         wfU6tYdFLu8vQ0zBvsWT0eGO6pkuLsV2agE7mFLXc1Puud1YaFFp3ltMQafhisn1C9JF
+         BdzA==
+X-Gm-Message-State: AOAM533Kcw9k4SDSrpS5bFoF3z2bx/zTFcm1CfBKznXBxTGaVDe6MIr6
+        ArGqQ9gcxa1tLT4CGSet83uL/mXlJ9FZw3M5L5M=
+X-Google-Smtp-Source: ABdhPJwr8iopn1z4CW9JBsvYgaer28n+yQtdO+sR7f1x8Uvjykfv9wldQXHyadYfSzGBYhpxIfYLphngh1Sh6DdxfYM=
+X-Received: by 2002:aca:fccb:: with SMTP id a194mr11177348oii.5.1615597045131;
+ Fri, 12 Mar 2021 16:57:25 -0800 (PST)
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from mlx.ziepe.ca (142.162.115.133) by MN2PR22CA0027.namprd22.prod.outlook.com (2603:10b6:208:238::32) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3912.17 via Frontend Transport; Sat, 13 Mar 2021 00:56:10 +0000
-Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1lKsZb-00EMBc-A7; Fri, 12 Mar 2021 20:56:07 -0400
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 6b1a769c-facd-4db5-d9e3-08d8e5bacb44
-X-MS-TrafficTypeDiagnostic: DM6PR12MB2940:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <DM6PR12MB294090CC4B9FDFBD69810DFCC26E9@DM6PR12MB2940.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:4125;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: V+I2DlF+pMSG1oZC/zDHCTLpH9NN6jNZk/WRs7ogZcTZjPh8dx8mNRKKu6I02scy/YQM+2NMzqfE3+nvnc1XoSUvl/XlnB1Sw8wajwbfzZt2hx+G/x8KG3pEazmpOUz2hiWca3MxqTrzlhwhK8tWcbF/oH1zbA/ncI+zEEMTxecSVnY492nIATzrCWuZw3Rp7qWXYSGpR3WtcblKYXFrvftSrgp3t+PDsH6vFVrxGFiBd/Yzy0D+80JwstVm+0bMjTSGFKc9PxqhYkvIwg3nBO8K/fQbF3Hq4TsI+9z7PNgCQ0mOKYPHfwxQjEr534AGD1N94lUaXZgPk61U3aJq9AbMsvGsjKvJQaW38JKzgI0Uz1tpoKM163q1I3mb5bTzvl67P3sIShnQcFrrBtQSlvsMYAaNe3gB5Xk6S76CuAf7D8g6l8rBZtcqt/V2PHApuAL5vYPv6abf+Xuj5QEESvW8JQ+TpElEuRu2elr2qPlq8+wfoSvIxgpVo0Fq0Dgn5K8+QJiBF67ExsFjai4jNgDdGlYuQYiBRUxhRtit27K19rPJx6J+VgG/AH6ncvbF
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB3834.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(39860400002)(376002)(396003)(136003)(366004)(346002)(9746002)(9786002)(8676002)(4326008)(107886003)(54906003)(8936002)(5660300002)(36756003)(316002)(110136005)(83380400001)(66946007)(66556008)(186003)(26005)(66476007)(478600001)(2906002)(426003)(86362001)(7416002)(2616005);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: =?us-ascii?Q?cCdPaAs2X3qcV3kFttmwpI4a6ixvGoQpOdTtyzXx7DQBkuP9LzGNZleWd0br?=
- =?us-ascii?Q?sfKbvkA5/+2flK05aDYEB1E+cfwUEObNel6T6C3HjZYUjZoZ+jQE/8kDFiKE?=
- =?us-ascii?Q?BmJ6FqQYLefi2CwnrvTgiQQMPYXGHkHLr2rTSRK6kxWkSSJm1Lk+yqMjHVxV?=
- =?us-ascii?Q?E9QpRSMA3H3fynrIzIX4/khuQmhXP8dRURT+w7F1b+wlq8VcGSUxcLxEx6Ih?=
- =?us-ascii?Q?ulC3pKgmdMypaEJuOFvJqZhqKWbXLt+HOeFsTXTjgDN3xWmTatbye7nAsAeZ?=
- =?us-ascii?Q?k2jiu5cAAKV0CVEL4vPQytwwfzmK2MnaWRBTvAuchEDxa/epcVUMe04+btdU?=
- =?us-ascii?Q?6BrVUvpXJt7BNnfTk8guoH8yzaXy1CGRwIF9UuuvZxsMhjaBzgT+dwU9Xtnj?=
- =?us-ascii?Q?27+bCEcR7fQJSltlXHPVinkWWNN0nhtAD9/ufj55xf5vIV73wG+agceIbAU6?=
- =?us-ascii?Q?HLBV+VTb4M0uB1zz9dSs4bkrmX0SU74z/rzVdGxlSJ38G8P1dpQAnuRWPQeP?=
- =?us-ascii?Q?1U7gqhLikYt3q97EzkW82eobqYKQS7IQrdxUfb/w1gjleypZSH1ty5Dd8UlJ?=
- =?us-ascii?Q?avE2evcwnUUCXujtqcPaB3TNI6ieW2bM7g9+PxpgZ/H37tj73qoTsNIo7tAc?=
- =?us-ascii?Q?wP4mzOWAVVAnMU8pvbsOounwYqqt+tYjuLGk/sy4Ir/nSwzesr3fYyL4N1/v?=
- =?us-ascii?Q?rrNkMIY24vXfeiECHnqg0wDfSoJf0s3b1GMAp1lzYUehLFdKqHKD6+P1eMt/?=
- =?us-ascii?Q?wjqPGw/TnDgwBp+L/icwC8bkf1SOgCcNtcNNWWsNKbL3z35MVheDn+3Ou/5L?=
- =?us-ascii?Q?kyJAOuXddMMhoNPp9ce9CdJLVy2HZGgYnkH7xX6Ve8yKOy41lV/9RCbpmeec?=
- =?us-ascii?Q?yp8c4gDTNsPuA2tkInQukEX9G+qCKOkOl83l13/3xcV0yUJd9qbIMH9gg/4Y?=
- =?us-ascii?Q?0+TPYpMcJmYpbupt2foBKHqrS+c0ts8RpzLjer2JTfmu3u3uio+dCXGkweVi?=
- =?us-ascii?Q?CALaiLz1LJo5OGhoVd8nKZz9KREKspVeSaNb9L733kJONPeCEH+sm8NnFnUc?=
- =?us-ascii?Q?vmfmnYMfXTThtjJRCkbrLVcM4jm54XBOA0/AXXjx4PG4bmK3vwLcRbxC7Eak?=
- =?us-ascii?Q?itwRlpD+t2j/pgtn/+Ci61xuIDFTHo6j8xagYPDwaJk4Qp9QYIKLELPrUGcX?=
- =?us-ascii?Q?+LDiyHmPk2Rp1aki7TqpmoBQn3fjxcV0mE5qAaO2e80lEHFdNr2FyjttaYao?=
- =?us-ascii?Q?PqEEhmO89n6fOa5L9ltgymqhMmVYMlspqVrdFsRO36AyBOPaZjuJb9pGKwfd?=
- =?us-ascii?Q?wlQWjCTECHVWSg26BrmI4FVu5oZ8oAD4DWJozKg2EwqfIQ=3D=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6b1a769c-facd-4db5-d9e3-08d8e5bacb44
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB3834.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Mar 2021 00:56:11.2888
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: wWowNwzXCYWvfQ9oWFZoSbysFkl/oSwLWa0/MZ2r32LZq7CURXlK93JO/cjL7rck
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB2940
+References: <1614057902-23774-1-git-send-email-wanpengli@tencent.com>
+ <CANRm+CwX189YE_oi5x-b6Xx4=hpcGCqzLaHjmW6bz_=Fj2N7Mw@mail.gmail.com> <YEo9GsUTKQRbd3HF@google.com>
+In-Reply-To: <YEo9GsUTKQRbd3HF@google.com>
+From:   Wanpeng Li <kernellwp@gmail.com>
+Date:   Sat, 13 Mar 2021 08:57:13 +0800
+Message-ID: <CANRm+Cy42tM1M2vkuZk3y_-_wD-re9QxvoxWPGmyew+k1j_67w@mail.gmail.com>
+Subject: Re: [PATCH] x86/kvm: Fix broken irq restoration in kvm_wait
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Thomas Gleixner <tglx@linutronix.de>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-There are no longer any users, so it can go away. Everything is using
-container_of now.
+On Thu, 11 Mar 2021 at 23:54, Sean Christopherson <seanjc@google.com> wrote:
+>
+> On Tue, Feb 23, 2021, Wanpeng Li wrote:
+> > On Tue, 23 Feb 2021 at 13:25, Wanpeng Li <kernellwp@gmail.com> wrote:
+> > >
+> > > From: Wanpeng Li <wanpengli@tencent.com>
+> > >
+> > > After commit 997acaf6b4b59c (lockdep: report broken irq restoration), the guest
+> > > splatting below during boot:
+> > >
+> > >  raw_local_irq_restore() called with IRQs enabled
+> > >  WARNING: CPU: 1 PID: 169 at kernel/locking/irqflag-debug.c:10 warn_bogus_irq_restore+0x26/0x30
+> > >  Modules linked in: hid_generic usbhid hid
+> > >  CPU: 1 PID: 169 Comm: systemd-udevd Not tainted 5.11.0+ #25
+> > >  RIP: 0010:warn_bogus_irq_restore+0x26/0x30
+> > >  Call Trace:
+> > >   kvm_wait+0x76/0x90
+> > >   __pv_queued_spin_lock_slowpath+0x285/0x2e0
+> > >   do_raw_spin_lock+0xc9/0xd0
+> > >   _raw_spin_lock+0x59/0x70
+> > >   lockref_get_not_dead+0xf/0x50
+> > >   __legitimize_path+0x31/0x60
+> > >   legitimize_root+0x37/0x50
+> > >   try_to_unlazy_next+0x7f/0x1d0
+> > >   lookup_fast+0xb0/0x170
+> > >   path_openat+0x165/0x9b0
+> > >   do_filp_open+0x99/0x110
+> > >   do_sys_openat2+0x1f1/0x2e0
+> > >   do_sys_open+0x5c/0x80
+> > >   __x64_sys_open+0x21/0x30
+> > >   do_syscall_64+0x32/0x50
+> > >   entry_SYSCALL_64_after_hwframe+0x44/0xae
+> > >
+> > > The irqflags handling in kvm_wait() which ends up doing:
+> > >
+> > >         local_irq_save(flags);
+> > >         safe_halt();
+> > >         local_irq_restore(flags);
+> > >
+> > > which triggered a new consistency checking, we generally expect
+> > > local_irq_save() and local_irq_restore() to be pared and sanely
+> > > nested, and so local_irq_restore() expects to be called with
+> > > irqs disabled.
+> > >
+> > > This patch fixes it by adding a local_irq_disable() after safe_halt()
+> > > to avoid this warning.
+> > >
+> > > Cc: Mark Rutland <mark.rutland@arm.com>
+> > > Cc: Thomas Gleixner <tglx@linutronix.de>
+> > > Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
+> > > ---
+> > >  arch/x86/kernel/kvm.c | 4 +++-
+> > >  1 file changed, 3 insertions(+), 1 deletion(-)
+> > >
+> > > diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
+> > > index 5e78e01..688c84a 100644
+> > > --- a/arch/x86/kernel/kvm.c
+> > > +++ b/arch/x86/kernel/kvm.c
+> > > @@ -853,8 +853,10 @@ static void kvm_wait(u8 *ptr, u8 val)
+> > >          */
+> > >         if (arch_irqs_disabled_flags(flags))
+> > >                 halt();
+> > > -       else
+> > > +       else {
+> > >                 safe_halt();
+> > > +               local_irq_disable();
+> > > +       }
+> >
+> > An alternative fix:
+> >
+> > diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
+> > index 5e78e01..7127aef 100644
+> > --- a/arch/x86/kernel/kvm.c
+> > +++ b/arch/x86/kernel/kvm.c
+> > @@ -836,12 +836,13 @@ static void kvm_kick_cpu(int cpu)
+> >
+> >  static void kvm_wait(u8 *ptr, u8 val)
+> >  {
+> > -    unsigned long flags;
+> > +    bool disabled = irqs_disabled();
+> >
+> >      if (in_nmi())
+> >          return;
+> >
+> > -    local_irq_save(flags);
+> > +    if (!disabled)
+> > +        local_irq_disable();
+> >
+> >      if (READ_ONCE(*ptr) != val)
+> >          goto out;
+> > @@ -851,13 +852,14 @@ static void kvm_wait(u8 *ptr, u8 val)
+> >       * for irq enabled case to avoid hang when lock info is overwritten
+> >       * in irq spinlock slowpath and no spurious interrupt occur to save us.
+> >       */
+> > -    if (arch_irqs_disabled_flags(flags))
+> > +    if (disabled)
+> >          halt();
+> >      else
+> >          safe_halt();
+> >
+> >  out:
+> > -    local_irq_restore(flags);
+> > +    if (!disabled)
+> > +        local_irq_enable();
+> >  }
+> >
+> >  #ifdef CONFIG_X86_32
+>
+> A third option would be to split the paths.  In the end, it's only the ptr/val
+> line that's shared.
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
----
- Documentation/driver-api/vfio.rst            |  3 +--
- drivers/vfio/fsl-mc/vfio_fsl_mc.c            |  5 +++--
- drivers/vfio/mdev/vfio_mdev.c                |  2 +-
- drivers/vfio/pci/vfio_pci.c                  |  2 +-
- drivers/vfio/platform/vfio_platform_common.c |  2 +-
- drivers/vfio/vfio.c                          | 12 +-----------
- include/linux/vfio.h                         |  4 +---
- 7 files changed, 9 insertions(+), 21 deletions(-)
+I just sent out a formal patch for my alternative fix, I think the
+whole logic in kvm_wait is more clear w/ my version.
 
-diff --git a/Documentation/driver-api/vfio.rst b/Documentation/driver-api/vfio.rst
-index 3337f337293a32..decc68cb8114ac 100644
---- a/Documentation/driver-api/vfio.rst
-+++ b/Documentation/driver-api/vfio.rst
-@@ -254,8 +254,7 @@ vfio_unregister_group_dev() respectively::
- 
- 	void vfio_init_group_dev(struct vfio_device *device,
- 				struct device *dev,
--				const struct vfio_device_ops *ops,
--				void *device_data);
-+				const struct vfio_device_ops *ops);
- 	int vfio_register_group_dev(struct vfio_device *device);
- 	void vfio_unregister_group_dev(struct vfio_device *device);
- 
-diff --git a/drivers/vfio/fsl-mc/vfio_fsl_mc.c b/drivers/vfio/fsl-mc/vfio_fsl_mc.c
-index 023b2222806424..3af3ca59478f94 100644
---- a/drivers/vfio/fsl-mc/vfio_fsl_mc.c
-+++ b/drivers/vfio/fsl-mc/vfio_fsl_mc.c
-@@ -75,7 +75,8 @@ static int vfio_fsl_mc_reflck_attach(struct vfio_fsl_mc_device *vdev)
- 			goto unlock;
- 		}
- 
--		cont_vdev = vfio_device_data(device);
-+		cont_vdev =
-+			container_of(device, struct vfio_fsl_mc_device, vdev);
- 		if (!cont_vdev || !cont_vdev->reflck) {
- 			vfio_device_put(device);
- 			ret = -ENODEV;
-@@ -624,7 +625,7 @@ static int vfio_fsl_mc_probe(struct fsl_mc_device *mc_dev)
- 		goto out_group_put;
- 	}
- 
--	vfio_init_group_dev(&vdev->vdev, dev, &vfio_fsl_mc_ops, vdev);
-+	vfio_init_group_dev(&vdev->vdev, dev, &vfio_fsl_mc_ops);
- 	vdev->mc_dev = mc_dev;
- 	mutex_init(&vdev->igate);
- 
-diff --git a/drivers/vfio/mdev/vfio_mdev.c b/drivers/vfio/mdev/vfio_mdev.c
-index e7309caa99c71b..71bd28f976e5af 100644
---- a/drivers/vfio/mdev/vfio_mdev.c
-+++ b/drivers/vfio/mdev/vfio_mdev.c
-@@ -138,7 +138,7 @@ static int vfio_mdev_probe(struct device *dev)
- 	if (!mvdev)
- 		return -ENOMEM;
- 
--	vfio_init_group_dev(&mvdev->vdev, &mdev->dev, &vfio_mdev_dev_ops, mdev);
-+	vfio_init_group_dev(&mvdev->vdev, &mdev->dev, &vfio_mdev_dev_ops);
- 	ret = vfio_register_group_dev(&mvdev->vdev);
- 	if (ret) {
- 		kfree(mvdev);
-diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
-index 1f70387c8afe37..55ef27a15d4d3f 100644
---- a/drivers/vfio/pci/vfio_pci.c
-+++ b/drivers/vfio/pci/vfio_pci.c
-@@ -2022,7 +2022,7 @@ static int vfio_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
- 		goto out_group_put;
- 	}
- 
--	vfio_init_group_dev(&vdev->vdev, &pdev->dev, &vfio_pci_ops, vdev);
-+	vfio_init_group_dev(&vdev->vdev, &pdev->dev, &vfio_pci_ops);
- 	vdev->pdev = pdev;
- 	vdev->irq_type = VFIO_PCI_NUM_IRQS;
- 	mutex_init(&vdev->igate);
-diff --git a/drivers/vfio/platform/vfio_platform_common.c b/drivers/vfio/platform/vfio_platform_common.c
-index f5f6b537084a67..361e5b57e36932 100644
---- a/drivers/vfio/platform/vfio_platform_common.c
-+++ b/drivers/vfio/platform/vfio_platform_common.c
-@@ -666,7 +666,7 @@ int vfio_platform_probe_common(struct vfio_platform_device *vdev,
- 	struct iommu_group *group;
- 	int ret;
- 
--	vfio_init_group_dev(&vdev->vdev, dev, &vfio_platform_ops, vdev);
-+	vfio_init_group_dev(&vdev->vdev, dev, &vfio_platform_ops);
- 
- 	ret = vfio_platform_acpi_probe(vdev, dev);
- 	if (ret)
-diff --git a/drivers/vfio/vfio.c b/drivers/vfio/vfio.c
-index 01de47d1810b6b..39ea77557ba0c4 100644
---- a/drivers/vfio/vfio.c
-+++ b/drivers/vfio/vfio.c
-@@ -741,12 +741,11 @@ static int vfio_iommu_group_notifier(struct notifier_block *nb,
-  * VFIO driver API
-  */
- void vfio_init_group_dev(struct vfio_device *device, struct device *dev,
--			 const struct vfio_device_ops *ops, void *device_data)
-+			 const struct vfio_device_ops *ops)
- {
- 	init_completion(&device->comp);
- 	device->dev = dev;
- 	device->ops = ops;
--	device->device_data = device_data;
- }
- EXPORT_SYMBOL_GPL(vfio_init_group_dev);
- 
-@@ -851,15 +850,6 @@ static struct vfio_device *vfio_device_get_from_name(struct vfio_group *group,
- 	return device;
- }
- 
--/*
-- * Caller must hold a reference to the vfio_device
-- */
--void *vfio_device_data(struct vfio_device *device)
--{
--	return device->device_data;
--}
--EXPORT_SYMBOL_GPL(vfio_device_data);
--
- /*
-  * Decrement the device reference count and wait for the device to be
-  * removed.  Open file descriptors for the device... */
-diff --git a/include/linux/vfio.h b/include/linux/vfio.h
-index 784c34c0a28763..a2c5b30e1763ba 100644
---- a/include/linux/vfio.h
-+++ b/include/linux/vfio.h
-@@ -24,7 +24,6 @@ struct vfio_device {
- 	refcount_t refcount;
- 	struct completion comp;
- 	struct list_head group_next;
--	void *device_data;
- };
- 
- /**
-@@ -61,12 +60,11 @@ extern struct iommu_group *vfio_iommu_group_get(struct device *dev);
- extern void vfio_iommu_group_put(struct iommu_group *group, struct device *dev);
- 
- void vfio_init_group_dev(struct vfio_device *device, struct device *dev,
--			 const struct vfio_device_ops *ops, void *device_data);
-+			 const struct vfio_device_ops *ops);
- int vfio_register_group_dev(struct vfio_device *device);
- void vfio_unregister_group_dev(struct vfio_device *device);
- extern struct vfio_device *vfio_device_get_from_dev(struct device *dev);
- extern void vfio_device_put(struct vfio_device *device);
--extern void *vfio_device_data(struct vfio_device *device);
- 
- /* events for the backend driver notify callback */
- enum vfio_iommu_notify_type {
--- 
-2.30.2
-
+>
+> ---
+>  arch/x86/kernel/kvm.c | 23 ++++++++++-------------
+>  1 file changed, 10 insertions(+), 13 deletions(-)
+>
+> diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
+> index 5e78e01ca3b4..78bb0fae3982 100644
+> --- a/arch/x86/kernel/kvm.c
+> +++ b/arch/x86/kernel/kvm.c
+> @@ -836,28 +836,25 @@ static void kvm_kick_cpu(int cpu)
+>
+>  static void kvm_wait(u8 *ptr, u8 val)
+>  {
+> -       unsigned long flags;
+> -
+>         if (in_nmi())
+>                 return;
+>
+> -       local_irq_save(flags);
+> -
+> -       if (READ_ONCE(*ptr) != val)
+> -               goto out;
+> -
+>         /*
+>          * halt until it's our turn and kicked. Note that we do safe halt
+>          * for irq enabled case to avoid hang when lock info is overwritten
+>          * in irq spinlock slowpath and no spurious interrupt occur to save us.
+>          */
+> -       if (arch_irqs_disabled_flags(flags))
+> -               halt();
+> -       else
+> -               safe_halt();
+> +       if (irqs_disabled()) {
+> +               if (READ_ONCE(*ptr) == val)
+> +                       halt();
+> +       } else {
+> +               local_irq_disable();
+>
+> -out:
+> -       local_irq_restore(flags);
+> +               if (READ_ONCE(*ptr) == val)
+> +                       safe_halt();
+> +
+> +               local_irq_enable();
+> +       }
+>  }
+>
+>  #ifdef CONFIG_X86_32
+> --
