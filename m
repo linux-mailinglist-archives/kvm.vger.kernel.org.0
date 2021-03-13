@@ -2,117 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9FAE0339BF3
-	for <lists+kvm@lfdr.de>; Sat, 13 Mar 2021 06:11:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 116E0339C97
+	for <lists+kvm@lfdr.de>; Sat, 13 Mar 2021 08:36:01 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231280AbhCMFKz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 13 Mar 2021 00:10:55 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51108 "EHLO
+        id S232431AbhCMHfY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 13 Mar 2021 02:35:24 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53968 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229852AbhCMFKs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 13 Mar 2021 00:10:48 -0500
-Received: from mail-pf1-x430.google.com (mail-pf1-x430.google.com [IPv6:2607:f8b0:4864:20::430])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 63A99C061574;
-        Fri, 12 Mar 2021 21:10:48 -0800 (PST)
-Received: by mail-pf1-x430.google.com with SMTP id x21so1939158pfa.3;
-        Fri, 12 Mar 2021 21:10:48 -0800 (PST)
+        with ESMTP id S231392AbhCMHe5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 13 Mar 2021 02:34:57 -0500
+Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 95A6AC061574
+        for <kvm@vger.kernel.org>; Fri, 12 Mar 2021 23:34:57 -0800 (PST)
+Received: by mail-pj1-x1032.google.com with SMTP id x7-20020a17090a2b07b02900c0ea793940so11830082pjc.2
+        for <kvm@vger.kernel.org>; Fri, 12 Mar 2021 23:34:57 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=rZiHATcqAxSVuhRyTi2E5mTS4Xv1o3Mg3eeyKP3UZ5g=;
-        b=V0LnVckIlEb6217KBYOSW05AESkEojvfEcUII/Z6pX0szMiyJ14AWYcYTWmqKRNgyW
-         3+QuyBv4rbEV/DgVbMST/DLbSBUCRI46Ohluk+jzDpZlNywrZ7ZvSXOYVJT8CU0phqJa
-         DvzcHXNMFzNm+cUPBU7yvwci1Ran08HuWWvyVYqiyeo7OMmeWNvC76TcqLYyWV/kNRSI
-         iTRwlOnFjLKcDXa9EbqQV0KyILtNabSO6ppH71SEMBRM7rQ84xTanzotSexSaU9cVGrN
-         kjWeJosqxiluyOdp2OmhG1jt1bF+ai7QsI7n85E2tR5cgFqQwNGYOqDWHMxLfH3RVOax
-         sxmQ==
+        bh=3HgyLA1cm8PON8AANlntpjJCCSAi8+m9Kx2hbGBjvCk=;
+        b=pmNjIHpVg1CP7Ub8WCe50fGc8P5D0xxNpFS0Pgu1fk2mVrcZROoiFLXPL5/omhH9W6
+         TfQANfFtb4aX1gsU72ENTYTD/9ldMxioSQQY1Fm/KWQU6c2eRePf8LbLARwF9GNOkaiH
+         PO9q0oCBr0fiqJXtLHMAP3fr+4EVjz21O2yRB6ZtbD7u4Zbo9IqLAUddCPLDTcCY8ijI
+         M6UgTCsPaft8CyDfYPB5pCGYPSUa+KklCLzJPs49FzXHBoovzEbip9tx9feBR1+YJRKv
+         fLB2+mCJcj0W4N3vthW/egQY9IoadwgrQOE5oRojgX8y+xWieRzWdWxaehQz7k4U9ZM7
+         KD+A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=rZiHATcqAxSVuhRyTi2E5mTS4Xv1o3Mg3eeyKP3UZ5g=;
-        b=gITQAuBGsjgZeqzMxaEHPoneuznKKuZyAqDSdV3YaD+uPX3ztnvs2HN6rIAgcwYVlw
-         PeFVmTZDlOVEspxGW4em/XUwstVas9mtKSZsi/7xTxAzjF0o9BOA+nYAGhkFfG41GpGG
-         AVLJ2aqtcKCbvlmjGTxUHtQ6ZFvGhc5HT+qsXeOZfEZfbFUabTkpaLtENIK8TgVoHZY2
-         GdCzPcNev7hCw6MDx+OMIUuqIPMgtuTnSF4kinxBt5oTTb7D1AVT4na/oyTGSz6tfn8E
-         /E8nnBvXJodsi1yGlfRzepimmtww+alOUQvaYPZSWMMnChzSsRxvtudC/ma9N+zqbyBR
-         Y/Lw==
-X-Gm-Message-State: AOAM530bUeiLrOEv2zhEEzB7IlW+hbFYtSxI9gncLZMWyqyIPCdS23RH
-        nHIFZmJEtI3MXx7KET+zWHX+ZoVXWQ==
-X-Google-Smtp-Source: ABdhPJwwEf94/agw3SzyxHDnvwR/nCGIQ2OtwLhM46quNqQcjW29ycjh2H/lL7kY+uf03ZjkO0Dd4g==
-X-Received: by 2002:aa7:9ecf:0:b029:1f4:f737:12d6 with SMTP id r15-20020aa79ecf0000b02901f4f73712d6mr1562865pfq.8.1615612247490;
-        Fri, 12 Mar 2021 21:10:47 -0800 (PST)
-Received: from localhost.localdomain ([203.205.141.39])
-        by smtp.gmail.com with ESMTPSA id q95sm3541430pjq.20.2021.03.12.21.10.44
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 12 Mar 2021 21:10:47 -0800 (PST)
-From:   lihaiwei.kernel@gmail.com
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     pbonzini@redhat.com, seanjc@google.com, vkuznets@redhat.com,
-        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
-        Haiwei Li <lihaiwei@tencent.com>
-Subject: [PATCH] KVM: clean up the unused argument
-Date:   Sat, 13 Mar 2021 13:10:32 +0800
-Message-Id: <20210313051032.4171-1-lihaiwei.kernel@gmail.com>
-X-Mailer: git-send-email 2.28.0
+        bh=3HgyLA1cm8PON8AANlntpjJCCSAi8+m9Kx2hbGBjvCk=;
+        b=pAY7PQEh8Pvt3/OmFHxuYPbqFdCPwAv/aDbn5TDciwp1XHFzqRhtnpJLTM+vCm7KDP
+         dmMsNVgTpP3a88cMwxjhYqLOt73JPncJ1WXn7XYhS3IWQyU93PUtQYjm5xbXjjsnf21l
+         KFxrwX/FtAg9A1/SfyA83p9Sqcf6oHN43qd3vHz5Q+8V/rFrUm4NfUiT1Y3wyrVUMMJA
+         r58c+qCo808+kj7rFaY5SPx/JHSVuz85FK6EBMsfBzSK+YNNPUrSnJLV4RhE989eTkrn
+         9eN9qyvfbBsZA74NrCyFsE77uZfWfTGmnp7EKodB3jk10GGKVq488Ld3f7x8OzKDABRT
+         htAg==
+X-Gm-Message-State: AOAM530BHo6WFSMgEIJzXenCrJfXFCe6OwAfxG1zEHXiO9s0OttYVDOE
+        UXJIeXOUJXbOb8QC736RSJ0=
+X-Google-Smtp-Source: ABdhPJyZNv3HNA4qQy7WRYpHqA58GMlu5y3aXj43gY7aLTm87XBj1UVxYxlJFPc6FAlTRacebq9ZqQ==
+X-Received: by 2002:a17:90b:228e:: with SMTP id kx14mr2386569pjb.71.1615620896804;
+        Fri, 12 Mar 2021 23:34:56 -0800 (PST)
+Received: from sc2-haas01-esx0118.eng.vmware.com ([66.170.99.1])
+        by smtp.gmail.com with ESMTPSA id gw20sm4097462pjb.3.2021.03.12.23.34.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 12 Mar 2021 23:34:56 -0800 (PST)
+From:   Nadav Amit <nadav.amit@gmail.com>
+X-Google-Original-From: Nadav Amit
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org, Nadav Amit <namit@vmware.com>
+Subject: [kvm-unit-tests PATCH] x86: on 32-bit do not initialize memory above 2GB
+Date:   Fri, 12 Mar 2021 23:30:20 -0800
+Message-Id: <20210313073020.36984-1-namit@vmware.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Haiwei Li <lihaiwei@tencent.com>
+From: Nadav Amit <namit@vmware.com>
 
-kvm_msr_ignored_check function never uses vcpu argument. Clean up the
-function and invokers.
+taskswitch2 test fails on certain configurations with more than 2GB of
+memory.
 
-Signed-off-by: Haiwei Li <lihaiwei@tencent.com>
+The reason is that on i386, setup_mmu() creates a hole above 2GB and
+does not map that area.
+
+Do not initialize the memory above 2GB on i386.
+
+Signed-off-by: Nadav Amit <namit@vmware.com>
 ---
- arch/x86/kvm/x86.c | 9 ++++-----
- 1 file changed, 4 insertions(+), 5 deletions(-)
+ lib/x86/setup.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 012d5df..27e9ee8 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -271,8 +271,7 @@ struct kvm_stats_debugfs_item debugfs_entries[] = {
-  * When called, it means the previous get/set msr reached an invalid msr.
-  * Return true if we want to ignore/silent this failed msr access.
-  */
--static bool kvm_msr_ignored_check(struct kvm_vcpu *vcpu, u32 msr,
--				  u64 data, bool write)
-+static bool kvm_msr_ignored_check(u32 msr, u64 data, bool write)
- {
- 	const char *op = write ? "wrmsr" : "rdmsr";
+diff --git a/lib/x86/setup.c b/lib/x86/setup.c
+index 7befe09..001853c 100644
+--- a/lib/x86/setup.c
++++ b/lib/x86/setup.c
+@@ -107,6 +107,15 @@ void setup_multiboot(struct mbi_bootinfo *bi)
  
-@@ -1447,7 +1446,7 @@ static int do_get_msr_feature(struct kvm_vcpu *vcpu, unsigned index, u64 *data)
- 	if (r == KVM_MSR_RET_INVALID) {
- 		/* Unconditionally clear the output for simplicity */
- 		*data = 0;
--		if (kvm_msr_ignored_check(vcpu, index, 0, false))
-+		if (kvm_msr_ignored_check(index, 0, false))
- 			r = 0;
- 	}
+ 	u64 best_start = (uintptr_t) &edata;
+ 	u64 best_end = bootinfo->mem_upper * 1024ull;
++
++#ifndef __x86_64__
++	/*
++	 * On i386, setup_mmu() creates a hole above 2GB, so do not initialize
++	 * the memory above 2GB.
++	 */
++	if (best_end > 2ul << 30)
++		best_end = 2ul << 30;
++#endif
+ 	phys_alloc_init(best_start, best_end - best_start);
  
-@@ -1613,7 +1612,7 @@ static int kvm_set_msr_ignored_check(struct kvm_vcpu *vcpu,
- 	int ret = __kvm_set_msr(vcpu, index, data, host_initiated);
- 
- 	if (ret == KVM_MSR_RET_INVALID)
--		if (kvm_msr_ignored_check(vcpu, index, data, true))
-+		if (kvm_msr_ignored_check(index, data, true))
- 			ret = 0;
- 
- 	return ret;
-@@ -1651,7 +1650,7 @@ static int kvm_get_msr_ignored_check(struct kvm_vcpu *vcpu,
- 	if (ret == KVM_MSR_RET_INVALID) {
- 		/* Unconditionally clear *data for simplicity */
- 		*data = 0;
--		if (kvm_msr_ignored_check(vcpu, index, 0, false))
-+		if (kvm_msr_ignored_check(index, 0, false))
- 			ret = 0;
- 	}
- 
+ 	if (bootinfo->mods_count != 1)
 -- 
-1.8.3.1
+2.25.1
 
