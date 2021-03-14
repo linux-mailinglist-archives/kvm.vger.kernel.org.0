@@ -2,29 +2,29 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id AFECF33A5F1
-	for <lists+kvm@lfdr.de>; Sun, 14 Mar 2021 17:01:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2F8A533A5F2
+	for <lists+kvm@lfdr.de>; Sun, 14 Mar 2021 17:01:50 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234595AbhCNQBb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 14 Mar 2021 12:01:31 -0400
+        id S234610AbhCNQBe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 14 Mar 2021 12:01:34 -0400
 Received: from mga14.intel.com ([192.55.52.115]:7174 "EHLO mga14.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S234015AbhCNQA4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 14 Mar 2021 12:00:56 -0400
-IronPort-SDR: XJgfbQfToSSTzcUc7hdItZzb5+M/YTy+8AN3XlUQZ+3HhFI7cDIlHQ19S/aUygCZleEatN8l6b
- 3mxSzGob0z2w==
-X-IronPort-AV: E=McAfee;i="6000,8403,9923"; a="188360764"
+        id S234204AbhCNQA7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 14 Mar 2021 12:00:59 -0400
+IronPort-SDR: 9tOJP9ZjFj851vNfqCLTlKRQQbKySFl5/ZZoF4xS5KrDayVdZG5izXHpURYf9pqGKajSXlzFh6
+ at/f76iHmg6w==
+X-IronPort-AV: E=McAfee;i="6000,8403,9923"; a="188360768"
 X-IronPort-AV: E=Sophos;i="5.81,248,1610438400"; 
-   d="scan'208";a="188360764"
+   d="scan'208";a="188360768"
 Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Mar 2021 09:00:56 -0700
-IronPort-SDR: lc+ow3R5Kk4ix3YIjqkit245+MKgI0kYw6w9k1FMsmcM+Y9qwnxXYpp7rpBtv4fpEmGm3Pjw2v
- KG+/EZBkfOng==
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Mar 2021 09:00:59 -0700
+IronPort-SDR: FNMvPAvA+DKd0ZQmS4Cd+TtQTo84gtyvQf+j2PfXugx6KgwKs+fI8J2kpf8eWToFruM+FnzpZw
+ YvGHTwjTfF4g==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.81,248,1610438400"; 
-   d="scan'208";a="439530741"
+   d="scan'208";a="439530752"
 Received: from clx-ap-likexu.sh.intel.com ([10.239.48.108])
-  by FMSMGA003.fm.intel.com with ESMTP; 14 Mar 2021 09:00:54 -0700
+  by FMSMGA003.fm.intel.com with ESMTP; 14 Mar 2021 09:00:56 -0700
 From:   Like Xu <like.xu@linux.intel.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <seanjc@google.com>
@@ -34,9 +34,9 @@ Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
         Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
         x86@kernel.org, wei.w.wang@intel.com, linux-kernel@vger.kernel.org,
         Like Xu <like.xu@linux.intel.com>
-Subject: [PATCH v4 11/11] KVM: x86: Add XSAVE Support for Architectural LBRs
-Date:   Sun, 14 Mar 2021 23:52:24 +0800
-Message-Id: <20210314155225.206661-12-like.xu@linux.intel.com>
+Subject: [PATCH v2] x86: Update guest LBR tests for Architectural LBR
+Date:   Sun, 14 Mar 2021 23:52:25 +0800
+Message-Id: <20210314155225.206661-13-like.xu@linux.intel.com>
 X-Mailer: git-send-email 2.29.2
 In-Reply-To: <20210314155225.206661-1-like.xu@linux.intel.com>
 References: <20210314155225.206661-1-like.xu@linux.intel.com>
@@ -46,68 +46,171 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On processors whose XSAVE feature set supports XSAVES and XRSTORS,
-the availability of support for Architectural LBR configuration state save
-and restore can be determined from CPUID.(EAX=0DH, ECX=1):EDX:ECX[bit 15].
-The detailed leaf for Arch LBRs is enumerated in CPUID.(EAX=0DH, ECX=0FH).
+This unit-test is intended to test the basic KVM's support for
+Architectural LBRs which is a Architectural performance monitor
+unit (PMU) feature on Intel processors including negative testing
+on the MSR LBR_DEPTH values.
 
-XSAVES provides a faster means than RDMSR for guest to read all LBRs.
-When guest IA32_XSS[bit 15] is set, the Arch LBRs state can be saved using
-XSAVES and restored by XRSTORS with the appropriate RFBM.
-
-If the KVM fails to pass-through the LBR msrs to the guest, the LBR msrs
-will be reset to prevent the leakage of host records via XSAVES. In this
-case, the guest results may be inaccurate as the legacy LBR.
+If the LBR bit is set to 1 in the MSR_ARCH_LBR_CTL, the processor
+will record a running trace of the most recent branches guest
+taken in the LBR entries for guest to read.
 
 Signed-off-by: Like Xu <like.xu@linux.intel.com>
 ---
- arch/x86/kvm/vmx/pmu_intel.c | 2 ++
- arch/x86/kvm/vmx/vmx.c       | 4 +++-
- arch/x86/kvm/x86.c           | 2 +-
- 3 files changed, 6 insertions(+), 2 deletions(-)
+ x86/pmu_lbr.c | 88 +++++++++++++++++++++++++++++++++++++++++++++------
+ 1 file changed, 79 insertions(+), 9 deletions(-)
 
-diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
-index 9199d3974d57..7666292094ec 100644
---- a/arch/x86/kvm/vmx/pmu_intel.c
-+++ b/arch/x86/kvm/vmx/pmu_intel.c
-@@ -772,6 +772,8 @@ void vmx_passthrough_lbr_msrs(struct kvm_vcpu *vcpu)
- 	return;
+diff --git a/x86/pmu_lbr.c b/x86/pmu_lbr.c
+index 3bd9e9f..8cde208 100644
+--- a/x86/pmu_lbr.c
++++ b/x86/pmu_lbr.c
+@@ -6,6 +6,7 @@
+ #define MAX_NUM_LBR_ENTRY	  32
+ #define DEBUGCTLMSR_LBR	  (1UL <<  0)
+ #define PMU_CAP_LBR_FMT	  0x3f
++#define KVM_ARCH_LBR_CTL_MASK	  0x7f000f
  
- warn:
-+	if (kvm_cpu_cap_has(X86_FEATURE_ARCH_LBR))
-+		wrmsrl(MSR_ARCH_LBR_DEPTH, lbr_desc->records.nr);
- 	pr_warn_ratelimited("kvm: vcpu-%d: fail to passthrough LBR.\n",
- 		vcpu->vcpu_id);
+ #define MSR_LBR_NHM_FROM	0x00000680
+ #define MSR_LBR_NHM_TO		0x000006c0
+@@ -13,6 +14,10 @@
+ #define MSR_LBR_CORE_TO	0x00000060
+ #define MSR_LBR_TOS		0x000001c9
+ #define MSR_LBR_SELECT		0x000001c8
++#define MSR_ARCH_LBR_CTL	0x000014ce
++#define MSR_ARCH_LBR_DEPTH	0x000014cf
++#define MSR_ARCH_LBR_FROM_0	0x00001500
++#define MSR_ARCH_LBR_TO_0	0x00001600
+ 
+ volatile int count;
+ 
+@@ -61,11 +66,26 @@ static bool test_init_lbr_from_exception(u64 index)
+ 	return test_for_exception(GP_VECTOR, init_lbr, &index);
  }
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 14ed3251376f..659be0d708ac 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -7295,8 +7295,10 @@ static __init void vmx_set_cpu_caps(void)
- 		kvm_cpu_cap_clear(X86_FEATURE_INVPCID);
- 	if (vmx_pt_mode_is_host_guest())
- 		kvm_cpu_cap_check_and_set(X86_FEATURE_INTEL_PT);
--	if (!cpu_has_vmx_arch_lbr())
-+	if (!cpu_has_vmx_arch_lbr()) {
- 		kvm_cpu_cap_clear(X86_FEATURE_ARCH_LBR);
-+		supported_xss &= ~XFEATURE_MASK_LBR;
+ 
++static void change_archlbr_depth(void *depth)
++{
++	wrmsr(MSR_ARCH_LBR_DEPTH, *(u64 *)depth);
++}
++
++static bool test_change_archlbr_depth_from_exception(u64 depth)
++{
++	return test_for_exception(GP_VECTOR, change_archlbr_depth, &depth);
++}
++
+ int main(int ac, char **av)
+ {
+ 	struct cpuid id = cpuid(10);
++	struct cpuid id_7 = cpuid(7);
++	struct cpuid id_1c;
+ 	u64 perf_cap;
+ 	int max, i;
++	bool arch_lbr = false;
++	u32 ctl_msr = MSR_IA32_DEBUGCTLMSR;
++	u64 ctl_value = DEBUGCTLMSR_LBR;
+ 
+ 	setup_vm();
+ 	perf_cap = rdmsr(MSR_IA32_PERF_CAPABILITIES);
+@@ -80,8 +100,19 @@ int main(int ac, char **av)
+ 		return report_summary();
+ 	}
+ 
++	if (id_7.d & (1UL << 19)) {
++		arch_lbr = true;
++		ctl_msr = MSR_ARCH_LBR_CTL;
++		/* DEPTH defaults to the maximum number of LBRs entries. */
++		max = rdmsr(MSR_ARCH_LBR_DEPTH) - 1;
++		ctl_value = KVM_ARCH_LBR_CTL_MASK;
++	}
++
+ 	printf("PMU version:		 %d\n", eax.split.version_id);
+-	printf("LBR version:		 %ld\n", perf_cap & PMU_CAP_LBR_FMT);
++	if (!arch_lbr)
++		printf("LBR version:		 %ld\n", perf_cap & PMU_CAP_LBR_FMT);
++	else
++		printf("Architectural LBR depth:		 %d\n", max + 1);
+ 
+ 	/* Look for LBR from and to MSRs */
+ 	lbr_from = MSR_LBR_CORE_FROM;
+@@ -90,32 +121,71 @@ int main(int ac, char **av)
+ 		lbr_from = MSR_LBR_NHM_FROM;
+ 		lbr_to = MSR_LBR_NHM_TO;
+ 	}
++	if (test_init_lbr_from_exception(0)) {
++		lbr_from = MSR_ARCH_LBR_FROM_0;
++		lbr_to = MSR_ARCH_LBR_TO_0;
 +	}
  
- 	if (vmx_umip_emulated())
- 		kvm_cpu_cap_set(X86_FEATURE_UMIP);
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 171605dcbd65..2e0935795502 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -205,7 +205,7 @@ static struct kvm_user_return_msrs __percpu *user_return_msrs;
- 				| XFEATURE_MASK_BNDCSR | XFEATURE_MASK_AVX512 \
- 				| XFEATURE_MASK_PKRU)
+ 	if (test_init_lbr_from_exception(0)) {
+ 		printf("LBR on this platform is not supported!\n");
+ 		return report_summary();
+ 	}
  
--#define KVM_SUPPORTED_XSS     0
-+#define KVM_SUPPORTED_XSS     XFEATURE_MASK_LBR
+-	wrmsr(MSR_LBR_SELECT, 0);
+-	wrmsr(MSR_LBR_TOS, 0);
+-	for (max = 0; max < MAX_NUM_LBR_ENTRY; max++) {
+-		if (test_init_lbr_from_exception(max))
+-			break;
++	if (arch_lbr) {
++		/*
++		 * On processors that support Architectural LBRs,
++		 * IA32_PERF_CAPABILITIES.LBR_FMT will have the value 03FH.
++		 */
++		report(0x3f == (perf_cap & PMU_CAP_LBR_FMT), "The guest LBR_FMT value is good.");
+ 	}
  
- u64 __read_mostly host_efer;
- EXPORT_SYMBOL_GPL(host_efer);
++	/* Reset the guest LBR entries. */
++	if (arch_lbr) {
++		/* On a software write to IA32_LBR_DEPTH, all LBR entries are reset to 0.*/
++		wrmsr(MSR_ARCH_LBR_DEPTH, max + 1);
++	} else {
++		wrmsr(MSR_LBR_SELECT, 0);
++		wrmsr(MSR_LBR_TOS, 0);
++		for (max = 0; max < MAX_NUM_LBR_ENTRY; max++) {
++			if (test_init_lbr_from_exception(max))
++				break;
++		}
++	}
+ 	report(max > 0, "The number of guest LBR entries is good.");
+ 
++	/* Check the guest LBR entries are initialized. */
++	for (i = 0; i < max; ++i) {
++		if (rdmsr(lbr_to + i) || rdmsr(lbr_from + i))
++			break;
++	}
++	report(i == max, "The guest LBR initialized FROM_IP/TO_IP values are good.");
++
+ 	/* Do some branch instructions. */
+-	wrmsr(MSR_IA32_DEBUGCTLMSR, DEBUGCTLMSR_LBR);
++	wrmsr(ctl_msr, ctl_value);
+ 	lbr_test();
+-	wrmsr(MSR_IA32_DEBUGCTLMSR, 0);
++	wrmsr(ctl_msr, 0);
+ 
+-	report(rdmsr(MSR_LBR_TOS) != 0, "The guest LBR MSR_LBR_TOS value is good.");
++	/* Check if the guest LBR has recorded some branches. */
++	if (!arch_lbr) {
++		report(rdmsr(MSR_LBR_TOS) != 0, "The guest LBR MSR_LBR_TOS value is good.");
++	}
+ 	for (i = 0; i < max; ++i) {
+ 		if (!rdmsr(lbr_to + i) || !rdmsr(lbr_from + i))
+ 			break;
+ 	}
+ 	report(i == max, "The guest LBR FROM_IP/TO_IP values are good.");
+ 
++	if (!arch_lbr)
++		return report_summary();
++
++	/* Negative testing on the LBR_DEPTH MSR values */
++	id_1c = cpuid(0x1c);
++	for (i = 0; i < 8; i++) {
++		if (id_1c.a & (1UL << i))
++			continue;
++		report(test_change_archlbr_depth_from_exception(8*(i+1)) == 1,
++			"Negative test: guest LBR depth %d is unsupported.", 8*(i+1));
++	}
++
+ 	return report_summary();
+ }
 -- 
 2.29.2
 
