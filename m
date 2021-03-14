@@ -2,336 +2,117 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 203D033A43D
-	for <lists+kvm@lfdr.de>; Sun, 14 Mar 2021 11:45:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0817233A532
+	for <lists+kvm@lfdr.de>; Sun, 14 Mar 2021 15:36:43 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235160AbhCNKpW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 14 Mar 2021 06:45:22 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:53059 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S235108AbhCNKpI (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Sun, 14 Mar 2021 06:45:08 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1615718706;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=eHpIhrioLYh4eORQxM4GKdpIFT9gzCBjG8gZQYhgxOo=;
-        b=aNugvw1uOuzc5SzreT9Z3HbOMkQ5w/7vHBG3DHC2FgZkI6COOR/jcLA4uZGwqJ9tTcnfmx
-        4dHcdsKkuxgb15ylQmDFCUNvAFxYxjVmNeyf9KIYKbdKZMwVJ+6ShiXHEH3nGeThWPMMe+
-        QkvGTqtmyG/n1MR/0kIbBFz2KbKKbeY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-503-E9yVcn_5PrqLH04e4dxJbg-1; Sun, 14 Mar 2021 06:45:02 -0400
-X-MC-Unique: E9yVcn_5PrqLH04e4dxJbg-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 82E7E800C78;
-        Sun, 14 Mar 2021 10:44:59 +0000 (UTC)
-Received: from [10.36.112.254] (ovpn-112-254.ams2.redhat.com [10.36.112.254])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id ED7A9620DE;
-        Sun, 14 Mar 2021 10:44:54 +0000 (UTC)
-Subject: Re: [PATCH 15/17] iommu: remove DOMAIN_ATTR_NESTING
-To:     Christoph Hellwig <hch@lst.de>, Joerg Roedel <joro@8bytes.org>,
-        Will Deacon <will@kernel.org>, Li Yang <leoyang.li@nxp.com>
-Cc:     freedreno@lists.freedesktop.org, kvm@vger.kernel.org,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        linuxppc-dev@lists.ozlabs.org, dri-devel@lists.freedesktop.org,
-        virtualization@lists.linux-foundation.org,
-        iommu@lists.linux-foundation.org, netdev@vger.kernel.org,
-        linux-arm-msm@vger.kernel.org,
-        David Woodhouse <dwmw2@infradead.org>,
-        linux-arm-kernel@lists.infradead.org
-References: <20210301084257.945454-1-hch@lst.de>
- <20210301084257.945454-16-hch@lst.de>
-From:   Auger Eric <eric.auger@redhat.com>
-Message-ID: <3e8f1078-9222-0017-3fa8-4d884dbc848e@redhat.com>
-Date:   Sun, 14 Mar 2021 11:44:52 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.7.0
+        id S233305AbhCNOgE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 14 Mar 2021 10:36:04 -0400
+Received: from mail.kernel.org ([198.145.29.99]:55784 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S233259AbhCNOfo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 14 Mar 2021 10:35:44 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPS id 12DB564EE5
+        for <kvm@vger.kernel.org>; Sun, 14 Mar 2021 14:35:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1615732543;
+        bh=mU+pTwrnvwLuUXAHAOyo29EaSN/DCx4dMGVYq2R9pVM=;
+        h=From:To:Subject:Date:From;
+        b=JgryjocrEpFKbW3BMdF+wizMk9N3dfqSN00hvcBHW9TfVdmIzXWMt9QSCWMO8giy0
+         Zv4EMZ1Uc6E3Ha9qBQwJKtJ/OuQMO60SRChBt8f/PoxQe7pjMlLXnL0hOfEJ1gQFGZ
+         dX33sFPdp5+q418IecM37z3b5lOPSnRDM72xf+GEr3857bakP2VEP1RtCsk+U2xjId
+         B3bY+tO7l9FuTrPYqRq8sUNUtNmKZrymFNUynWIs+0lhaF1A6htDqGBidWGFGmbjSH
+         5SoFU/nmHX/QB9TwaaFUEBdhWnqKMhu91fkjzxSt1DgRwsPw2HlCyod8KrpWTZ+ByE
+         JfB0h53VKEEdg==
+Received: by pdx-korg-bugzilla-2.web.codeaurora.org (Postfix, from userid 48)
+        id 054A5652FD; Sun, 14 Mar 2021 14:35:43 +0000 (UTC)
+From:   bugzilla-daemon@bugzilla.kernel.org
+To:     kvm@vger.kernel.org
+Subject: [Bug 212273] New: unchecked MSR access error
+Date:   Sun, 14 Mar 2021 14:35:42 +0000
+X-Bugzilla-Reason: None
+X-Bugzilla-Type: new
+X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Product: Virtualization
+X-Bugzilla-Component: kvm
+X-Bugzilla-Version: unspecified
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: ionut_n2001@yahoo.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: bug_id short_desc product version
+ cf_kernel_version rep_platform op_sys cf_tree bug_status bug_severity
+ priority component assigned_to reporter cf_regression
+Message-ID: <bug-212273-28872@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 MIME-Version: 1.0
-In-Reply-To: <20210301084257.945454-16-hch@lst.de>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Christoph,
+https://bugzilla.kernel.org/show_bug.cgi?id=3D212273
 
-On 3/1/21 9:42 AM, Christoph Hellwig wrote:
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> ---
->  drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c | 40 ++++++---------------
->  drivers/iommu/arm/arm-smmu/arm-smmu.c       | 30 ++++++++++------
->  drivers/iommu/intel/iommu.c                 | 28 +++++----------
->  drivers/iommu/iommu.c                       |  8 +++++
->  drivers/vfio/vfio_iommu_type1.c             |  5 +--
->  include/linux/iommu.h                       |  4 ++-
->  6 files changed, 50 insertions(+), 65 deletions(-)
+            Bug ID: 212273
+           Summary: unchecked MSR access error
+           Product: Virtualization
+           Version: unspecified
+    Kernel Version: 5.12.0-rc2
+          Hardware: x86-64
+                OS: Linux
+              Tree: Mainline
+            Status: NEW
+          Severity: normal
+          Priority: P1
+         Component: kvm
+          Assignee: virtualization_kvm@kernel-bugs.osdl.org
+          Reporter: ionut_n2001@yahoo.com
+        Regression: No
 
-As mentionned by Robin, there are series planning to use
-DOMAIN_ATTR_NESTING to get info about the nested caps of the iommu (ARM
-and Intel):
+[    8.581625] calling  intel_uncore_init+0x0/0x10c @ 1
+[    8.582371] unchecked MSR access error: RDMSR from 0x620 at rIP:
+0xffffffff8d7abe2b (__rdmsr_on_cpu+0x2b/0x60)
+[    8.584572] Call Trace:
+[    8.584572]  generic_exec_single+0x4b/0x80
+[    8.584572]  smp_call_function_single+0xc4/0x100
+[    8.584572]  ? wrmsr_safe_regs_on_cpu+0x40/0x40
+[    8.584572]  rdmsrl_on_cpu+0x43/0x60
+[    8.584572]  ? rdmsrl_on_cpu+0x43/0x60
+[    8.584572]  uncore_read_ratio.isra.6+0x23/0x60
+[    8.584572]  uncore_add_die_entry+0xe2/0x140
+[    8.584572]  uncore_event_cpu_online+0x43/0x50
+[    8.584572]  ? show_min_freq_khz+0x60/0x60
+[    8.584572]  cpuhp_invoke_callback+0x80/0x410
+[    8.584572]  ? __schedule+0x2b0/0x900
+[    8.584572]  ? sort_range+0x20/0x20
+[    8.584572]  cpuhp_thread_fun+0xa7/0x110
+[    8.584572]  smpboot_thread_fn+0xf7/0x170
+[    8.584572]  kthread+0x121/0x140
+[    8.584572]  ? kthread_park+0x90/0x90
+[    8.584572]  ret_from_fork+0x22/0x30
+[    8.603792] initcall intel_uncore_init+0x0/0x10c returned 0 after 20960
+usecs
 
-[Patch v8 00/10] vfio: expose virtual Shared Virtual Addressing to VMs
-patches 1, 2, 3
+qemu-system-x86_64 -kernel arch/x86_64/boot/bzImage -initrd initrd -nograph=
+ic
+-append "console=3DttyS0 acpi_rev_override=3D1 acpi_osi=3D! acpi_osi=3D'Win=
+dows 2017'
+loglevel=3D7 root=3D/dev/ram initcall_debug tsc=3Dreliable no_timer_check
+noreplace-smp kvm-intel.nested=3D1 intel_iommu=3Digfx_off cryptomgr.notests
+rcupdate.rcu_expedited=3D1 rcu_nocbs=3D0-64 rw nomodeset i915.modeset=3D0 d=
+ebug
+ignore_loglevel log_buf_len=3D16M no_console_suspend systemd.log_target=3Dn=
+ull
+systemd.unit=3Drescue.target" -no-reboot -m 3100 -enable-kvm -cpu host -smp
+cores=3D2,sockets=3D2
 
-Is the plan to introduce a new domain_get_nesting_info ops then?
+--=20
+You may reply to this email to add a comment.
 
-Thanks
-
-Eric	
-
-
-> 
-> diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
-> index bf96172e8c1f71..8e6fee3ea454d3 100644
-> --- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
-> +++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
-> @@ -2466,41 +2466,21 @@ static void arm_smmu_dma_enable_flush_queue(struct iommu_domain *domain)
->  	to_smmu_domain(domain)->non_strict = true;
->  }
->  
-> -static int arm_smmu_domain_set_attr(struct iommu_domain *domain,
-> -				    enum iommu_attr attr, void *data)
-> +static int arm_smmu_domain_enable_nesting(struct iommu_domain *domain)
->  {
-> -	int ret = 0;
->  	struct arm_smmu_domain *smmu_domain = to_smmu_domain(domain);
-> +	int ret = -EPERM;
->  
-> -	mutex_lock(&smmu_domain->init_mutex);
-> +	if (domain->type != IOMMU_DOMAIN_UNMANAGED)
-> +		return -EINVAL;
->  
-> -	switch (domain->type) {
-> -	case IOMMU_DOMAIN_UNMANAGED:
-> -		switch (attr) {
-> -		case DOMAIN_ATTR_NESTING:
-> -			if (smmu_domain->smmu) {
-> -				ret = -EPERM;
-> -				goto out_unlock;
-> -			}
-> -
-> -			if (*(int *)data)
-> -				smmu_domain->stage = ARM_SMMU_DOMAIN_NESTED;
-> -			else
-> -				smmu_domain->stage = ARM_SMMU_DOMAIN_S1;
-> -			break;
-> -		default:
-> -			ret = -ENODEV;
-> -		}
-> -		break;
-> -	case IOMMU_DOMAIN_DMA:
-> -		ret = -ENODEV;
-> -		break;
-> -	default:
-> -		ret = -EINVAL;
-> +	mutex_lock(&smmu_domain->init_mutex);
-> +	if (!smmu_domain->smmu) {
-> +		smmu_domain->stage = ARM_SMMU_DOMAIN_NESTED;
-> +		ret = 0;
->  	}
-> -
-> -out_unlock:
->  	mutex_unlock(&smmu_domain->init_mutex);
-> +
->  	return ret;
->  }
->  
-> @@ -2603,7 +2583,7 @@ static struct iommu_ops arm_smmu_ops = {
->  	.device_group		= arm_smmu_device_group,
->  	.dma_use_flush_queue	= arm_smmu_dma_use_flush_queue,
->  	.dma_enable_flush_queue	= arm_smmu_dma_enable_flush_queue,
-> -	.domain_set_attr	= arm_smmu_domain_set_attr,
-> +	.domain_enable_nesting	= arm_smmu_domain_enable_nesting,
->  	.of_xlate		= arm_smmu_of_xlate,
->  	.get_resv_regions	= arm_smmu_get_resv_regions,
->  	.put_resv_regions	= generic_iommu_put_resv_regions,
-> diff --git a/drivers/iommu/arm/arm-smmu/arm-smmu.c b/drivers/iommu/arm/arm-smmu/arm-smmu.c
-> index e7893e96f5177a..2e17d990d04481 100644
-> --- a/drivers/iommu/arm/arm-smmu/arm-smmu.c
-> +++ b/drivers/iommu/arm/arm-smmu/arm-smmu.c
-> @@ -1497,6 +1497,24 @@ static void arm_smmu_dma_enable_flush_queue(struct iommu_domain *domain)
->  	to_smmu_domain(domain)->pgtbl_cfg.quirks |= IO_PGTABLE_QUIRK_NON_STRICT;
->  }
->  
-> +static int arm_smmu_domain_enable_nesting(struct iommu_domain *domain)
-> +{
-> +	struct arm_smmu_domain *smmu_domain = to_smmu_domain(domain);
-> +	int ret = -EPERM;
-> +	
-> +	if (domain->type != IOMMU_DOMAIN_UNMANAGED)
-> +		return -EINVAL;
-> +
-> +	mutex_lock(&smmu_domain->init_mutex);
-> +	if (!smmu_domain->smmu) {
-> +		smmu_domain->stage = ARM_SMMU_DOMAIN_NESTED;
-> +		ret = 0;
-> +	}
-> +	mutex_unlock(&smmu_domain->init_mutex);
-> +
-> +	return ret;
-> +}
-> +
->  static int arm_smmu_domain_set_attr(struct iommu_domain *domain,
->  				    enum iommu_attr attr, void *data)
->  {
-> @@ -1508,17 +1526,6 @@ static int arm_smmu_domain_set_attr(struct iommu_domain *domain,
->  	switch(domain->type) {
->  	case IOMMU_DOMAIN_UNMANAGED:
->  		switch (attr) {
-> -		case DOMAIN_ATTR_NESTING:
-> -			if (smmu_domain->smmu) {
-> -				ret = -EPERM;
-> -				goto out_unlock;
-> -			}
-> -
-> -			if (*(int *)data)
-> -				smmu_domain->stage = ARM_SMMU_DOMAIN_NESTED;
-> -			else
-> -				smmu_domain->stage = ARM_SMMU_DOMAIN_S1;
-> -			break;
->  		case DOMAIN_ATTR_IO_PGTABLE_CFG: {
->  			struct io_pgtable_domain_attr *pgtbl_cfg = data;
->  
-> @@ -1603,6 +1610,7 @@ static struct iommu_ops arm_smmu_ops = {
->  	.dma_use_flush_queue	= arm_smmu_dma_use_flush_queue,
->  	.dma_enable_flush_queue	= arm_smmu_dma_enable_flush_queue,
->  	.domain_set_attr	= arm_smmu_domain_set_attr,
-> +	.domain_enable_nesting	= arm_smmu_domain_enable_nesting,
->  	.of_xlate		= arm_smmu_of_xlate,
->  	.get_resv_regions	= arm_smmu_get_resv_regions,
->  	.put_resv_regions	= generic_iommu_put_resv_regions,
-> diff --git a/drivers/iommu/intel/iommu.c b/drivers/iommu/intel/iommu.c
-> index eaa80c33f4bc91..0f1374d6612a60 100644
-> --- a/drivers/iommu/intel/iommu.c
-> +++ b/drivers/iommu/intel/iommu.c
-> @@ -5423,32 +5423,22 @@ static bool intel_iommu_is_attach_deferred(struct iommu_domain *domain,
->  }
->  
->  static int
-> -intel_iommu_domain_set_attr(struct iommu_domain *domain,
-> -			    enum iommu_attr attr, void *data)
-> +intel_iommu_domain_enable_nesting(struct iommu_domain *domain)
->  {
->  	struct dmar_domain *dmar_domain = to_dmar_domain(domain);
->  	unsigned long flags;
-> -	int ret = 0;
-> +	int ret = -ENODEV;
->  
->  	if (domain->type != IOMMU_DOMAIN_UNMANAGED)
->  		return -EINVAL;
->  
-> -	switch (attr) {
-> -	case DOMAIN_ATTR_NESTING:
-> -		spin_lock_irqsave(&device_domain_lock, flags);
-> -		if (nested_mode_support() &&
-> -		    list_empty(&dmar_domain->devices)) {
-> -			dmar_domain->flags |= DOMAIN_FLAG_NESTING_MODE;
-> -			dmar_domain->flags &= ~DOMAIN_FLAG_USE_FIRST_LEVEL;
-> -		} else {
-> -			ret = -ENODEV;
-> -		}
-> -		spin_unlock_irqrestore(&device_domain_lock, flags);
-> -		break;
-> -	default:
-> -		ret = -EINVAL;
-> -		break;
-> +	spin_lock_irqsave(&device_domain_lock, flags);
-> +	if (nested_mode_support() && list_empty(&dmar_domain->devices)) {
-> +		dmar_domain->flags |= DOMAIN_FLAG_NESTING_MODE;
-> +		dmar_domain->flags &= ~DOMAIN_FLAG_USE_FIRST_LEVEL;
-> +		ret = 0;
->  	}
-> +	spin_unlock_irqrestore(&device_domain_lock, flags);
->  
->  	return ret;
->  }
-> @@ -5556,7 +5546,7 @@ const struct iommu_ops intel_iommu_ops = {
->  	.domain_alloc		= intel_iommu_domain_alloc,
->  	.domain_free		= intel_iommu_domain_free,
->  	.dma_use_flush_queue	= intel_iommu_dma_use_flush_queue,
-> -	.domain_set_attr	= intel_iommu_domain_set_attr,
-> +	.domain_enable_nesting	= intel_iommu_domain_enable_nesting,
->  	.attach_dev		= intel_iommu_attach_device,
->  	.detach_dev		= intel_iommu_detach_device,
->  	.aux_attach_dev		= intel_iommu_aux_attach_device,
-> diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
-> index 0f12c4d58cdc42..2e9e058501a953 100644
-> --- a/drivers/iommu/iommu.c
-> +++ b/drivers/iommu/iommu.c
-> @@ -2685,6 +2685,14 @@ int iommu_domain_set_attr(struct iommu_domain *domain,
->  }
->  EXPORT_SYMBOL_GPL(iommu_domain_set_attr);
->  
-> +int iommu_domain_enable_nesting(struct iommu_domain *domain)
-> +{
-> +	if (!domain->ops->domain_enable_nesting)
-> +		return -EINVAL;
-> +	return domain->ops->domain_enable_nesting(domain);
-> +}
-> +EXPORT_SYMBOL_GPL(iommu_domain_enable_nesting);
-> +
->  void iommu_get_resv_regions(struct device *dev, struct list_head *list)
->  {
->  	const struct iommu_ops *ops = dev->bus->iommu_ops;
-> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-> index c8e57f22f421c5..9cea4d80dd66ed 100644
-> --- a/drivers/vfio/vfio_iommu_type1.c
-> +++ b/drivers/vfio/vfio_iommu_type1.c
-> @@ -2320,10 +2320,7 @@ static int vfio_iommu_type1_attach_group(void *iommu_data,
->  	}
->  
->  	if (iommu->nesting) {
-> -		int attr = 1;
-> -
-> -		ret = iommu_domain_set_attr(domain->domain, DOMAIN_ATTR_NESTING,
-> -					    &attr);
-> +		ret = iommu_domain_enable_nesting(domain->domain);
->  		if (ret)
->  			goto out_domain;
->  	}
-> diff --git a/include/linux/iommu.h b/include/linux/iommu.h
-> index f30de33c6ff56e..aed88aa3bd3edf 100644
-> --- a/include/linux/iommu.h
-> +++ b/include/linux/iommu.h
-> @@ -107,7 +107,6 @@ enum iommu_cap {
->   */
->  
->  enum iommu_attr {
-> -	DOMAIN_ATTR_NESTING,	/* two stages of translation */
->  	DOMAIN_ATTR_IO_PGTABLE_CFG,
->  	DOMAIN_ATTR_MAX,
->  };
-> @@ -196,6 +195,7 @@ struct iommu_iotlb_gather {
->   * @dma_use_flush_queue: Returns %true if a DMA flush queue is used
->   * @dma_enable_flush_queue: Try to enable the DMA flush queue
->   * @domain_set_attr: Change domain attributes
-> + * @domain_enable_nesting: Enable nesting
->   * @get_resv_regions: Request list of reserved regions for a device
->   * @put_resv_regions: Free list of reserved regions for a device
->   * @apply_resv_region: Temporary helper call-back for iova reserved ranges
-> @@ -248,6 +248,7 @@ struct iommu_ops {
->  	void (*dma_enable_flush_queue)(struct iommu_domain *domain);
->  	int (*domain_set_attr)(struct iommu_domain *domain,
->  			       enum iommu_attr attr, void *data);
-> +	int (*domain_enable_nesting)(struct iommu_domain *domain);
->  
->  	/* Request/Free a list of reserved regions for a device */
->  	void (*get_resv_regions)(struct device *dev, struct list_head *list);
-> @@ -494,6 +495,7 @@ extern struct iommu_domain *iommu_group_default_domain(struct iommu_group *);
->  bool iommu_dma_use_flush_queue(struct iommu_domain *domain);
->  extern int iommu_domain_set_attr(struct iommu_domain *domain, enum iommu_attr,
->  				 void *data);
-> +int iommu_domain_enable_nesting(struct iommu_domain *domain);
->  
->  extern int report_iommu_fault(struct iommu_domain *domain, struct device *dev,
->  			      unsigned long iova, int flags);
-> 
-
+You are receiving this mail because:
+You are watching the assignee of the bug.=
