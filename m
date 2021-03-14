@@ -2,124 +2,111 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B39F6339FC0
-	for <lists+kvm@lfdr.de>; Sat, 13 Mar 2021 19:07:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A12E5339FD0
+	for <lists+kvm@lfdr.de>; Sat, 13 Mar 2021 19:24:22 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234321AbhCMSHO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 13 Mar 2021 13:07:14 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47496 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233635AbhCMSGp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 13 Mar 2021 13:06:45 -0500
-Received: from mail-qt1-x82c.google.com (mail-qt1-x82c.google.com [IPv6:2607:f8b0:4864:20::82c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 14A31C061574;
-        Sat, 13 Mar 2021 10:06:45 -0800 (PST)
-Received: by mail-qt1-x82c.google.com with SMTP id l13so6393122qtu.9;
-        Sat, 13 Mar 2021 10:06:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=qmztczQ8nwlB2ZsLfNT+eUr55Vm8FQvEeckkwobT4Fo=;
-        b=J7BNxH+9zAJSpZT49oEVvoljADKL0mcaBvvxC0C2vlCBSuitKhdzpCMx3KI7BfdLdR
-         /OVlpcir79WWkWYHgudf7wc9wI4ikkGV/oj89W25FwqepTpfgBDOv3TxCNN1z0uOgJoF
-         SY+FzlHUH+gZypRWujGQZPCo07NOekPMlT6BO8sJqBPNB+gWKZZKCGZuL/ixT0afD7hq
-         OlHTJCfLA8dLtgYqCXf/rFP71y5lTue4Qkq7ePDIAbamQLwhl562yOeZmScANXRCkB69
-         aY1f6sROr7S36dtchcv8kUNsxshmcp7+lC20LpV2jCcBoL7a980V+Pouv5fVkFtI4Qzb
-         bDKQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
-         :references:mime-version:content-disposition:in-reply-to;
-        bh=qmztczQ8nwlB2ZsLfNT+eUr55Vm8FQvEeckkwobT4Fo=;
-        b=j2xSpHUseQZns+GrsvZe0cZ1wXLmFVJJij0sMkONS0QzpFzZiYtOqMtoZFMQyG/N0+
-         iyeHsxdhwBpm1yn44Lvdmc6yzoLZyUvTbC9B21nay6DUcmetErQNwhe2ZwSfK9s/N6AA
-         Q0+gxa4Ask3XXdpPgESa1l1vYhxz5sYKPbYsVZ5/60Q9cSmz5jKxjXffIHmav6HlRUZw
-         iJvD8tn22wyUVjCa+4g0vziee72EQXqxuo2Q9ctbiTHcSM7kYQegoT+pJjuGnV3l/erh
-         TNiV5TW/O3PriavS0jfZvkHPhfRIhEUlzZl4r/bkjQ12nTrp46i8R2C6itlo+Lo/HbOS
-         ohJQ==
-X-Gm-Message-State: AOAM531n1pSpQ+MwwtfqHwaweY1o137huGAWIvHZtNA71ZLbw6h0OvjL
-        KBOSJqseyC5HtZ89UKdn+GI=
-X-Google-Smtp-Source: ABdhPJx3TZWYKiCGPWxCw/QJBwue9nIX+6EKNJ5BoCzcywtVpMNr5EN/6N8MBRGBMGQWeo413t9GRQ==
-X-Received: by 2002:ac8:4543:: with SMTP id z3mr17030003qtn.286.1615658803977;
-        Sat, 13 Mar 2021 10:06:43 -0800 (PST)
-Received: from localhost ([2620:10d:c091:480::1:fde1])
-        by smtp.gmail.com with ESMTPSA id k138sm7201936qke.60.2021.03.13.10.06.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 13 Mar 2021 10:06:43 -0800 (PST)
-Sender: Tejun Heo <htejun@gmail.com>
-Date:   Sat, 13 Mar 2021 13:05:36 -0500
-From:   Tejun Heo <tj@kernel.org>
-To:     Jacob Pan <jacob.jun.pan@intel.com>
-Cc:     Vipin Sharma <vipinsh@google.com>, mkoutny@suse.com,
-        rdunlap@infradead.org, thomas.lendacky@amd.com,
-        brijesh.singh@amd.com, jon.grimm@amd.com, eric.vantassell@amd.com,
-        pbonzini@redhat.com, hannes@cmpxchg.org, frankja@linux.ibm.com,
-        borntraeger@de.ibm.com, corbet@lwn.net, seanjc@google.com,
-        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
-        joro@8bytes.org, tglx@linutronix.de, mingo@redhat.com,
-        bp@alien8.de, hpa@zytor.com, gingell@google.com,
-        rientjes@google.com, dionnaglaze@google.com, kvm@vger.kernel.org,
-        x86@kernel.org, cgroups@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-kernel@vger.kernel.org, "Tian, Kevin" <kevin.tian@intel.com>,
-        "Liu, Yi L" <yi.l.liu@intel.com>,
-        "Raj, Ashok" <ashok.raj@intel.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        Jacob Pan <jacob.jun.pan@linux.intel.com>,
-        "jean-philippe@linaro.org" <jean-philippe@linaro.org>
-Subject: Re: [RFC v2 2/2] cgroup: sev: Miscellaneous cgroup documentation.
-Message-ID: <YEz+8HbfkbGgG5Tm@mtj.duckdns.org>
-References: <20210302081705.1990283-1-vipinsh@google.com>
- <20210302081705.1990283-3-vipinsh@google.com>
- <20210303185513.27e18fce@jacob-builder>
- <YEB8i6Chq4K/GGF6@google.com>
- <YECfhCJtHUL9cB2L@slm.duckdns.org>
- <20210312125821.22d9bfca@jacob-builder>
- <YEvZ4muXqiSScQ8i@google.com>
- <20210312145904.4071a9d6@jacob-builder>
- <YEyR9181Qgzt+Ps9@mtj.duckdns.org>
- <20210313085701.1fd16a39@jacob-builder>
+        id S234104AbhCMSXr convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Sat, 13 Mar 2021 13:23:47 -0500
+Received: from smtp.econet.co.zw ([77.246.51.158]:16989 "EHLO
+        ironportDMZ.econet.co.zw" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S233635AbhCMSXe (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Sat, 13 Mar 2021 13:23:34 -0500
+X-Greylist: delayed 428 seconds by postgrey-1.27 at vger.kernel.org; Sat, 13 Mar 2021 13:23:33 EST
+IronPort-SDR: pfOqp8Ie6beoFPh3hAy8jlb49H4aQmKvANrzgr2PQDNB7J5B1aLlq3yOqmDFqLryCX1MOrR16V
+ nkIhmDXMprgdTco2vXdxhteHkCTTp8ObWecNAiqpHTXFgm8BVkQvNcyUTqO+WxlFinGomQWjzc
+ LnN2/w+aUa4fTY2NUzgeHp5iqn3Y9qkmPyXw6fIjq6+K3xDUpLeWlmJwDD/MAzR0e+aBMNWD/f
+ xVwC26DhgwYX1GMM3H0nP6xbrYmw7w1zhpuuLgrf4sDXUK9HQ8r6MTUIUfU043dPMzUUalgutk
+ mCE=
+IronPort-HdrOrdr: A9a23:vt17Oaj0to+CAM/iqAjBbQGeenBQXnQji2hD6mlwRA09T+Wzkc
+ eykPMHkSLugDEKV3063fyGMq+MQXTTnKQFgrU5F7GkQQXgpS+UPJhvhLGD/xTMEzDzn9Qy6Y
+ 5OaK57YeedMXFfreLXpDa1CMwhxt7vysGVrMPT1W1kQw0vS4wI1XYeNi+hHkd7RBZLCPMCff
+ L2jPZvnDa4fGRSU8LTPBQ4dtPOusHRk9beaQMGbiRXkDWmty+i67LxDnGjsSs2bjUn+8ZazU
+ H11yjCwq2itrWD0R/bzG/P//1t6b7c4+oGIMSNj8QPQw+c7jqAVcBEW7mPmhUYydvfj2oCoZ
+ 30uBcnJMRv+xrqDwOInSc=
+X-IronPort-AV: E=Sophos;i="5.81,245,1610402400"; 
+   d="scan'208";a="3438382"
+Received: from unknown (HELO wvale-mb-svr-06.econetzw.local) ([192.168.101.174])
+  by ironportLAN.econet.co.zw with ESMTP; 13 Mar 2021 20:16:23 +0200
+Received: from WVALE-CAS-SVR-9.econetzw.local (192.168.101.184) by
+ wvale-mb-svr-06.econetzw.local (192.168.101.174) with Microsoft SMTP Server
+ (TLS) id 15.0.1473.3; Sat, 13 Mar 2021 20:12:26 +0200
+Received: from User (165.231.148.189) by WVALE-CAS-SVR-9.econetzw.local
+ (10.10.11.230) with Microsoft SMTP Server id 15.0.1473.3 via Frontend
+ Transport; Sat, 13 Mar 2021 20:16:33 +0200
+Reply-To: <r19772744@daum.net>
+From:   "Reem E. A" <chawora@econet.co.zw>
+Subject: Re:
+Date:   Sat, 13 Mar 2021 18:16:19 -0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210313085701.1fd16a39@jacob-builder>
+Content-Type: text/plain; charset="Windows-1251"
+Content-Transfer-Encoding: 8BIT
+X-Priority: 3
+X-MSMail-Priority: Normal
+X-Mailer: Microsoft Outlook Express 6.00.2600.0000
+X-MimeOLE: Produced By Microsoft MimeOLE V6.00.2600.0000
+Message-ID: <57a853dee13a4d75bd2edd55cf5b8d7b@WVALE-CAS-SVR-9.econetzw.local>
+To:     Undisclosed recipients:;
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 Hello,
 
-On Sat, Mar 13, 2021 at 08:57:01AM -0800, Jacob Pan wrote:
-> Isn't PIDs controller doing the charge/uncharge? I was under the impression
-> that each resource can be independently charged/uncharged, why it affects
-> other resources? Sorry for the basic question.
+My name is Ms. Reem Ebrahim Al-Hashimi, I am the "Minister of state
+and Petroleum" also "Minister of State for International Cooperation"
+in UAE. I write to you on behalf of my other "three (2) colleagues"
+who has approved me to solicit for your "partnership in claiming of
+{us$47=Million}" from a Financial Home on their behalf and
+for our "Mutual Benefits".
 
-Yeah, PID is an exception as we needed the initial migration to seed new
-cgroups and it gets really confusing with other ways to observe the
-processes - e.g. if you follow the original way of creating a cgroup,
-forking and then moving the seed process into the target cgroup, if we don't
-migrate the pid charge together, the numbers wouldn't agree and the seeder
-cgroup may end up running out of pids if there are any restrictions.
+The Fund {us$47=Million} is our share from the (over-invoiced) Oil/Gas
+deal with Turkish Government within 2013/2014, however, we
+don't want our government to know about the fund. If this proposal
+interests you, let me know, by sending me an email and I will send to
+you detailed information on how this business would be successfully
+transacted. Be informed that nobody knows about the secret of this
+fund except us, and we know how to carry out the entire transaction.
+So I am compelled to ask, that you will stand on our behalf and
+receive this fund into any account that is solely controlled by you.
 
-> I also didn't quite get the limitation on cgroup v2 migration, this is much
-> simpler than memcg. Could you give me some pointers?
+We will compensate you with 15% of the total amount involved as
+gratification for being our partner in this transaction. Reply to:
+reem.alhashimi@yandex.com
 
-Migration itself doesn't have restrictions but all resources are distributed
-on the same hierarchy, so the controllers are supposed to follow the same
-conventions that can be implemented by all controllers.
+Regards,
+Ms. Reem.
+This mail was sent through Econet Wireless, a Global telecoms leader.
 
-> BTW, since the IOASIDs are used to tag DMA and bound with guest process(mm)
-> for shared virtual addressing. fork() cannot be supported, so I guess clone
-> is not a solution here.
+DISCLAIMER
 
-Can you please elaborate what wouldn't work? The new spawning into a new
-cgroup w/ clone doesn't really change the usage model. It's just a neater
-way to seed a new cgroup. If you're saying that the overall usage model
-doesn't fit the needs of IOASIDs, it likely shouldn't be a cgroup
-controller.
+The information in this message is confidential and is legally privileged. It is intended solely for the addressee. Access to this message by anyone else is unauthorized. If received in error please accept our apologies and notify the sender immediately. You must also delete the original message from your machine. If you are not the intended recipient, any use, disclosure, copying, distribution or action taken in reliance of it, is prohibited and may be unlawful. The information, attachments, opinions or advice contained in this email are not the views or opinions of Econet Wireless, its subsidiaries or affiliates. Econet Wireless therefore accepts no liability for claims, losses, or damages arising from the inaccuracy, incorrectness, or lack of integrity of such information.
+[https://mail.econet.co.zw/OWA/auth/current/themes/resources/Agile/AgileBanner.png]
+WORK ISN'T A PLACE
+IT'S WHAT WE DO
+________________________________
 
-Thanks.
 
--- 
-tejun
+
+
+
+[https://mail.econet.co.zw/OWA/auth/current/themes/resources/Agile/telephone.png]
+
+
+
+
+[https://mail.econet.co.zw/OWA/auth/current/themes/resources/Agile/email.png]
+
+<mailto:>
+
+
+[https://mail.econet.co.zw/OWA/auth/current/themes/resources/Agile/location.png]
+
+
+
+
+[https://mail.econet.co.zw/OWA/auth/current/themes/resources/Agile/website.png]
+
+www.econet.co.zw<https://www.econet.co.zw>
+
+
+[https://mail.econet.co.zw/OWA/auth/current/themes/resources/Agile/inspired.jpg]
