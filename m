@@ -2,52 +2,50 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E340C33CA28
-	for <lists+kvm@lfdr.de>; Tue, 16 Mar 2021 00:50:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 46F5733CA2B
+	for <lists+kvm@lfdr.de>; Tue, 16 Mar 2021 00:51:35 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231794AbhCOXt6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 15 Mar 2021 19:49:58 -0400
-Received: from mga11.intel.com ([192.55.52.93]:20962 "EHLO mga11.intel.com"
+        id S232334AbhCOXvD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 15 Mar 2021 19:51:03 -0400
+Received: from mga03.intel.com ([134.134.136.65]:26954 "EHLO mga03.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231441AbhCOXtj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 15 Mar 2021 19:49:39 -0400
-IronPort-SDR: +skRiTTidTowaKW3Tq6ndHMPTqDxUMwP7pZArbZ+0RJYbKwZOMIzMjiaIzqGHr90E/pz3Q2bH6
- BP6CZRlUkjow==
-X-IronPort-AV: E=McAfee;i="6000,8403,9924"; a="185810421"
+        id S232736AbhCOXu5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 15 Mar 2021 19:50:57 -0400
+IronPort-SDR: 4tPvZS4Q5TNvfwKSxjhe48dA1ItNaTTVfZU8JviLb31OrBIkpJmU2+YzJ7h2z+dOaQbQwmNgfv
+ LT167SKOXb3g==
+X-IronPort-AV: E=McAfee;i="6000,8403,9924"; a="189219898"
 X-IronPort-AV: E=Sophos;i="5.81,251,1610438400"; 
-   d="scan'208";a="185810421"
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Mar 2021 16:49:39 -0700
-IronPort-SDR: G3Kfxx1H3lWkaaJTQcSPdWIJ5LT62bC8jUkQ7S5lM8sjBW5swY9z2e5Q4uKCdOQeNy23jRFqy8
- yyAcGqWRQSvA==
+   d="scan'208";a="189219898"
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Mar 2021 16:50:56 -0700
+IronPort-SDR: Sqx2u262IOgq7KaHUZLwlqUcainSDUrfcwqLW9+CFXQOhCeyhicI5AHfU3b/QNDmLtoMxWQxBV
+ TuvOTGVPqVeQ==
 X-IronPort-AV: E=Sophos;i="5.81,251,1610438400"; 
-   d="scan'208";a="371796194"
+   d="scan'208";a="439019930"
 Received: from vamcfadd-mobl1.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.252.129.148])
-  by orsmga003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Mar 2021 16:49:35 -0700
-Date:   Tue, 16 Mar 2021 12:49:33 +1300
+  by fmsmga002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Mar 2021 16:50:52 -0700
+Date:   Tue, 16 Mar 2021 12:50:50 +1300
 From:   Kai Huang <kai.huang@intel.com>
 To:     Jarkko Sakkinen <jarkko@kernel.org>
 Cc:     Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org,
-        linux-sgx@vger.kernel.org, x86@kernel.org,
+        x86@kernel.org, linux-sgx@vger.kernel.org,
         linux-kernel@vger.kernel.org, luto@kernel.org,
         dave.hansen@intel.com, rick.p.edgecombe@intel.com,
         haitao.huang@intel.com, pbonzini@redhat.com, bp@alien8.de,
         tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com
-Subject: Re: [PATCH v2 07/25] x86/sgx: Initialize virtual EPC driver even
- when SGX driver is disabled
-Message-Id: <20210316124933.3921b390ae153af598b145df@intel.com>
-In-Reply-To: <YE/o/IGBAB8N+fnt@kernel.org>
-References: <YEvg2vNfiDYoc9u3@google.com>
-        <YE0M/VoETPw7YZIy@kernel.org>
-        <YE0NeChRjBlldQ8H@kernel.org>
-        <YE4M8JGGl9Xyx51/@kernel.org>
-        <YE4rVnfQ9y7CnVvr@kernel.org>
-        <20210315161317.9c72479dfcde4e22078abcd2@intel.com>
-        <YE9beKYDaG1sMWq+@kernel.org>
-        <YE9mVUF0KOPNSfA9@kernel.org>
-        <20210316094859.7b5947b743a81dff7434615c@intel.com>
-        <YE/oHt92suFDHJ7Z@kernel.org>
-        <YE/o/IGBAB8N+fnt@kernel.org>
+Subject: Re: [PATCH v3 03/25] x86/sgx: Wipe out EREMOVE from
+ sgx_free_epc_page()
+Message-Id: <20210316125050.9205f9be79501e4ee52369fc@intel.com>
+In-Reply-To: <YE/m06LWFTDKfUCc@kernel.org>
+References: <e1ca4131bc9f98cf50a1200efcf46080d6512fe7.1615250634.git.kai.huang@intel.com>
+        <20210311020142.125722-1-kai.huang@intel.com>
+        <YEvbcrTZyiUAxZAu@google.com>
+        <YEyX4V7BcS3MZNzp@kernel.org>
+        <20210315201236.de3cd9389f853a418ec53e86@intel.com>
+        <YE9elQfTZHo/9TJI@kernel.org>
+        <YE9e5JAP3agUByXr@kernel.org>
+        <20210316092934.d4dd7f2e65f507c3856341bc@intel.com>
+        <YE/m06LWFTDKfUCc@kernel.org>
 X-Mailer: Sylpheed 3.7.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
 Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
@@ -56,208 +54,130 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 16 Mar 2021 01:08:44 +0200 Jarkko Sakkinen wrote:
-> On Tue, Mar 16, 2021 at 01:05:05AM +0200, Jarkko Sakkinen wrote:
-> > On Tue, Mar 16, 2021 at 09:48:59AM +1300, Kai Huang wrote:
-> > > On Mon, 15 Mar 2021 15:51:17 +0200 Jarkko Sakkinen wrote:
-> > > > On Mon, Mar 15, 2021 at 03:04:59PM +0200, Jarkko Sakkinen wrote:
-> > > > > On Mon, Mar 15, 2021 at 04:13:17PM +1300, Kai Huang wrote:
-> > > > > > On Sun, 14 Mar 2021 17:27:18 +0200 Jarkko Sakkinen wrote:
-> > > > > > > On Sun, Mar 14, 2021 at 05:25:26PM +0200, Jarkko Sakkinen wrote:
-> > > > > > > > On Sat, Mar 13, 2021 at 09:07:36PM +0200, Jarkko Sakkinen wrote:
-> > > > > > > > > On Sat, Mar 13, 2021 at 09:05:36PM +0200, Jarkko Sakkinen wrote:
-> > > > > > > > > > On Fri, Mar 12, 2021 at 01:44:58PM -0800, Sean Christopherson wrote:
-> > > > > > > > > > > On Tue, Mar 09, 2021, Kai Huang wrote:
-> > > > > > > > > > > > Modify sgx_init() to always try to initialize the virtual EPC driver,
-> > > > > > > > > > > > even if the SGX driver is disabled.  The SGX driver might be disabled
-> > > > > > > > > > > > if SGX Launch Control is in locked mode, or not supported in the
-> > > > > > > > > > > > hardware at all.  This allows (non-Linux) guests that support non-LC
-> > > > > > > > > > > > configurations to use SGX.
-> > > > > > > > > > > > 
-> > > > > > > > > > > > Acked-by: Dave Hansen <dave.hansen@intel.com>
-> > > > > > > > > > > > Signed-off-by: Kai Huang <kai.huang@intel.com>
-> > > > > > > > > > > > ---
-> > > > > > > > > > > >  arch/x86/kernel/cpu/sgx/main.c | 10 +++++++++-
-> > > > > > > > > > > >  1 file changed, 9 insertions(+), 1 deletion(-)
-> > > > > > > > > > > > 
-> > > > > > > > > > > > diff --git a/arch/x86/kernel/cpu/sgx/main.c b/arch/x86/kernel/cpu/sgx/main.c
-> > > > > > > > > > > > index 44fe91a5bfb3..8c922e68274d 100644
-> > > > > > > > > > > > --- a/arch/x86/kernel/cpu/sgx/main.c
-> > > > > > > > > > > > +++ b/arch/x86/kernel/cpu/sgx/main.c
-> > > > > > > > > > > > @@ -712,7 +712,15 @@ static int __init sgx_init(void)
-> > > > > > > > > > > >  		goto err_page_cache;
-> > > > > > > > > > > >  	}
-> > > > > > > > > > > >  
-> > > > > > > > > > > > -	ret = sgx_drv_init();
-> > > > > > > > > > > > +	/*
-> > > > > > > > > > > > +	 * Always try to initialize the native *and* KVM drivers.
-> > > > > > > > > > > > +	 * The KVM driver is less picky than the native one and
-> > > > > > > > > > > > +	 * can function if the native one is not supported on the
-> > > > > > > > > > > > +	 * current system or fails to initialize.
-> > > > > > > > > > > > +	 *
-> > > > > > > > > > > > +	 * Error out only if both fail to initialize.
-> > > > > > > > > > > > +	 */
-> > > > > > > > > > > > +	ret = !!sgx_drv_init() & !!sgx_vepc_init();
-> > > > > > > > > > > 
-> > > > > > > > > > > I love this code.
-> > > > > > > > > > > 
-> > > > > > > > > > > Reviewed-by: Sean Christopherson <seanjc@google.com>
-> > > > > > > > > > 
-> > > > > > > > > > I'm still wondering why this code let's go through when sgx_drv_init()
-> > > > > > > > > > succeeds and sgx_vepc_init() fails.
-> > > > > > > > > > 
-> > > > > > > > > > The inline comment explains only the mirrored case (which does make
-> > > > > > > > > > sense).
-> > > > > > > > > 
-> > > > > > > > > I.e. if sgx_drv_init() succeeds, I'd expect that sgx_vepc_init() must
-> > > > > > > > > succeed. Why expect legitly anything else?
-> > > > > > > >  
-> > > > > > > > Apologies coming with these ideas at this point, but here is what this
-> > > > > > > > led me.
+On Tue, 16 Mar 2021 00:59:31 +0200 Jarkko Sakkinen wrote:
+> On Tue, Mar 16, 2021 at 09:29:34AM +1300, Kai Huang wrote:
+> > On Mon, 15 Mar 2021 15:19:32 +0200 Jarkko Sakkinen wrote:
+> > > On Mon, Mar 15, 2021 at 03:18:16PM +0200, Jarkko Sakkinen wrote:
+> > > > On Mon, Mar 15, 2021 at 08:12:36PM +1300, Kai Huang wrote:
+> > > > > On Sat, 13 Mar 2021 12:45:53 +0200 Jarkko Sakkinen wrote:
+> > > > > > On Fri, Mar 12, 2021 at 01:21:54PM -0800, Sean Christopherson wrote:
+> > > > > > > On Thu, Mar 11, 2021, Kai Huang wrote:
+> > > > > > > > From: Jarkko Sakkinen <jarkko@kernel.org>
 > > > > > > > > 
-> > > > > > > > I think that the all this complexity comes from a bad code structure.
+> > > > > > > > EREMOVE takes a page and removes any association between that page and
+> > > > > > > > an enclave.  It must be run on a page before it can be added into
+> > > > > > > > another enclave.  Currently, EREMOVE is run as part of pages being freed
+> > > > > > > > into the SGX page allocator.  It is not expected to fail.
 > > > > > > > > 
-> > > > > > > > So, what is essentially happening here:
+> > > > > > > > KVM does not track how guest pages are used, which means that SGX
+> > > > > > > > virtualization use of EREMOVE might fail.
 > > > > > > > > 
-> > > > > > > > - We essentially want to make EPC always work.
-> > > > > > > > - Driver optionally.
+> > > > > > > > Break out the EREMOVE call from the SGX page allocator.  This will allow
+> > > > > > > > the SGX virtualization code to use the allocator directly.  (SGX/KVM
+> > > > > > > > will also introduce a more permissive EREMOVE helper).
 > > > > > > > > 
-> > > > > > > > So what this sums to is something like:
+> > > > > > > > Implement original sgx_free_epc_page() as sgx_encl_free_epc_page() to be
+> > > > > > > > more specific that it is used to free EPC page assigned to one enclave.
+> > > > > > > > Print an error message when EREMOVE fails to explicitly call out EPC
+> > > > > > > > page is leaked, and requires machine reboot to get leaked pages back.
 > > > > > > > > 
-> > > > > > > >         ret = sgx_epc_init();
-> > > > > > > >         if (ret) {
-> > > > > > > >                 pr_err("EPC initialization failed.\n");
-> > > > > > > >                 return ret;
-> > > > > > > >         }
+> > > > > > > > Signed-off-by: Jarkko Sakkinen <jarkko@kernel.org>
+> > > > > > > > Co-developed-by: Kai Huang <kai.huang@intel.com>
+> > > > > > > > Acked-by: Jarkko Sakkinen <jarkko@kernel.org>
+> > > > > > > > Signed-off-by: Kai Huang <kai.huang@intel.com>
+> > > > > > > > ---
+> > > > > > > > v2->v3:
 > > > > > > > > 
-> > > > > > > >         ret = sgx_drv_init();
-> > > > > > > >         if (ret)
-> > > > > > > >                 pr_info("Driver could not be initialized.\n");
-> > > > > > > > 
-> > > > > > > >         /* continue */
-> > > > > > > > 
-> > > > > > > > I.e. I think there should be a single EPC init, which does both EPC
-> > > > > > > > bootstrapping and vepc, and driver initialization comes after that.
+> > > > > > > >  - Fixed bug during copy/paste which results in SECS page and va pages are not
+> > > > > > > >    correctly freed in sgx_encl_release() (sorry for the mistake).
+> > > > > > > >  - Added Jarkko's Acked-by.
 > > > > > > > 
-> > > > > > > In other words, from SGX point of view, the thing that KVM needs is
-> > > > > > > to cut out EPC and driver part into different islands. How this is now
-> > > > > > > implemented in the current patch set is half-way there but not yet what
-> > > > > > > it should be.
+> > > > > > > That Acked-by should either be dropped or moved above Co-developed-by to make
+> > > > > > > checkpatch happy.
+> > > > > > > 
+> > > > > > > Reviewed-by: Sean Christopherson <seanjc@google.com>
 > > > > > > 
-> > > > > > Well conceptually, SGX virtualization and SGX driver are two independently
-> > > > > > functionalities can be enabled separately, although they both requires some
-> > > > > > come functionalities, such as /dev/sgx_provision, which we have moved to
-> > > > > > sgx/main.c exactly for this purpose. THerefore, conceptually, it is bad to make
-> > > > > > assumption that, if SGX virtualization initialization succeeded, SGX driver
-> > > > > > must succeed -- we can potentially add more staff in SGX virtualization in the
-> > > > > > future..
+> > > > > > Oops, my bad. Yup, ack should be removed.
 > > > > > > 
-> > > > > > If the name sgx_vepc_init() confuses you, I can rename it to sgx_virt_init().
+> > > > > > /Jarkko
 > > > > > 
-> > > > > I don't understand what would be the bad thing here. Can you open that
-> > > > > up please? I'm neither capable of predicting the future...
-> > > 
-> > > Conceptually they are two different functionalities, and doesn't depend on each
-> > > other. Why calling SGX driver initialization only when SGX virtualization
-> > > succeeded?
-> > > 
-> > > We might want to add reclaiming EPC page (VMM EPC oversubscription) from KVM
-> > > guest in the future, which may bring more initialization staff sgx_vepc_init(),
-> > > and those new staff should not impact SGX driver.
-> > > 
-> > > I don't see your approach is any better, both from concept and flexibility.
-> > > 
-> > > Like I said, we can rename to sgx_virt_init() to be more generic, but I
-> > > strongly disagree your approach.
-> > > 
+> > > > > Hi Jarkko,
+> > > > > 
+> > > > > Your reply of your concern of this patch to the cover-letter
+> > > > > 
+> > > > > https://lore.kernel.org/lkml/YEkJXu262YDa8ZaK@kernel.org/
+> > > > > 
+> > > > > reminds me to do more sanity check of whether removing EREMOVE in
+> > > > > sgx_free_epc_page() will impact other code path or not, and I think
+> > > > > sgx_encl_release() is not the only place should be changed:
+> > > > > 
+> > > > > - sgx_encl_shrink() needs to call sgx_encl_free_epc_page(), since when this is
+> > > > > called, the VA page can be already valid -- there are other failures can
+> > > > > trigger sgx_encl_shrink().
 > > > > 
-> > > > Right, so since vepc_init() does only just device file initialization the
-> > > > current function structure is fine. I totally forgot that sgx_drv_init()
-> > > > does not call EPC initialization when I wrote the above :-) We refactored
-> > > > during the inital cycle the driver so many times that I sometimes fix up
-> > > > thing, sorry about.
+> > > > You right about this, good catch.
 > > > > 
-> > > > To meld this into code:
+> > > > Shrink needs to always do EREMOVE as grow has done EPA, which changes
+> > > > EPC page state.
 > > > > 
-> > > >         ret = sgx_vepc_init();
-> > > >         if (ret != -ENODEV) {
-> > > >                 pr_err("vEPC initialization failed with %d.\n", ret);
-> > > >                 return ret;
-> > > >         }
+> > > > > - sgx_encl_add_page() should call sgx_encl_free_epc_page() in "err_out_free:"
+> > > > > label, since the EPC page can be already valid when error happened, i.e. when
+> > > > > EEXTEND fails.
 > > > > 
-> > > >         ret = sgx_drv_init();
-> > > >         if (ret != ENODEV)
-> > > >                 pr_info("Driver initialization failed %d.\n", ret);
+> > > > Yes, correct, good work!
+> > > > 
+> > > > > Other places should be OK per my check, but I'd prefer to just replacing all
+> > > > > sgx_free_epc_page() call sites in driver with sgx_encl_free_epc_page(), with
+> > > > > one exception: sgx_alloc_va_page(), which calls sgx_free_epc_page() when EPA
+> > > > > fails, in which case EREMOVE is not required for sure.
+> > > > 
+> > > > I would not unless they require it.
+> > > > 
+> > > > > Your idea, please?
+> > > > > 
+> > > > > Btw, introducing a driver wrapper of sgx_free_epc_page() does make sense to me,
+> > > > > because virtualization has a counterpart in sgx/virt.c too.
+> > > > 
+> > > > It does make sense to use sgx_free_epc_page() everywhere where it's
+> > > > the right thing to call and here's why.
+> > > > 
+> > > > If there is some unrelated regression that causes EPC page not get
+> > > > uninitialized when it actually should, doing extra EREMOVE could mask
+> > > > those bugs. I.e. it can postpone a failure, which can make a bug harder
+> > > > to backtrace.
+> > > > 
 > > > 
-> > > Hmm.. Let's say an extreme case: misc_register() failed in sgx_vepc_init(), due
-> > > to -ENOMEM. Then OOM kill gets involved, and kills bunch of apps. And then In
-> > > this case, theoretically, misc_register() in sgx_drv_init() doesn't need to
-> > > fail.
-> > > 
-> > > The point is really SGX driver and SGX virt are two independent
-> > > functionalities, so don't make dependency on them, manually. Plus I don't see
-> > > any benefit of your approach, but only cons.
+> > > I.e. even though it is true that for correctly working code extra EREMOVE
+> > > is nil functionality, it could change semantics for buggy code.
 > > 
-> > The way I've understood it is that given that KVM can support SGX
-> > without FLC, vEPC should be available even if driver cannot be
-> > enabled.
+> > Thanks for feedback. Sorry I am not sure if I understand you. So if we don't
+> > want to bring functionality change, we need to replace sgx_free_epc_page() in
+> > all call sites with sgx_encl_free_epc_page(). To me for this patch only, it's
+> > better not to bring any functional change, so I intend to replace all (I now
+> > consider even leaving sgx_alloc_va_page() out is not good idea in *this*
+> > patch). 
 > > 
-> > This is also exactly what the short summary states.
+> > Or do you just want to replace sgx_free_epc_page() with
+> > sgx_encl_free_epc_page() in sgx_encl_shrink() and sgx_encl_add_page(), as I
+> > pointed above? In this way there will be functional change in this patch, and
+> > we need to explicitly explain  why leaving others out is OK in commit message.
 > > 
-> > "Initialize virtual EPC driver even when SGX driver is disabled"
-> > 
-> > It *does not* state:
-> > 
-> > "Initialize SGX driver even when vEPC driver is disabled"
-
-OK. The patch title can be improved. How about:
-
-"Initialize SGX driver and virtual EPC driver independently"
-
-?
-
-> > 
-> > Also, this is how I interpret the inline comment.
-> > 
-> > All this considered, the other direction is undocumented functionality.
-
-OK. How about below?
-
-/*
- * Always try to initialize the native *and* KVM drivers. They are independent
- * functionalities and one can be initialized even when the other is not
- * supported or fails to initialize.
- */
-
-The explicit saying of "not supported or fails to initialize" was requested by
-you -- you wanted to distinguish -ENODEV with other error codes.
-
+> > To me I prefer the former.
 > 
-> Also:
+> The original purpose of this patch was exactly to remove EREMOVE
+> sgx_free_epc_page() and call it explicitly where it is required. That's
+> why I introduced sgx_reset_epc_page(). So the latter was actually the goal
+> of this patch at least when I did it. Now this is something completely
+> different.
 > 
-> 1. There is *zero* good practical reasons to support the "2nd direction".
->    For KVM getting init'd with SGX, on the other hand, we have good
->    practical reasons.
-
-Why there's *zero* good practical reasons? With initializing them
-independently, people don't need to worry about *internal* of
-sgx_vepc_init() and sgx_drv_init(), but just need pay attention of the logic
-that they are two independent functionalities. Being able to initialize them
-independently is much more clear and easier to understand. And like I said, in
-this way it is more flexible to extend -- for instance, we may add more staff
-to support VMM EPC oversubscription. So why there is *zero* good practical
-reasons?
-
-Btw, there are customers that want to just use KVM SGX, but not SGX driver in
-host, for which people may want to add separate CONFIG option, say,
-CONFIG_X86_SGX_DRIVER, to be able to disable/enable SGX driver code, just like
-CONFIG_X86_SGX_KVM. Make them independent logically  just make things more
-clear.
-
-> 2. We can get something practically useful with simpler and more verbose
->    code, i.e. better logging.
-
-I can add error msg in sgx_vepc_init() upon misc_register() if you want.
-
+> So, I don't consider myself author of this patch in any possible way,
+> because this is not what I intended.
 > 
-> /Jarkko
+> To move forward, for the next patch set version, you should change the
+> author field as yourself, and remove all my tags, and I will review it.
+> So you can work out this with former approach if you wish.
+> 
+> I.e. my ack/nak/etc. apply to this patch because it's not my code.
+
+OK. Thanks.
+
