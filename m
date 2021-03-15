@@ -2,87 +2,88 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B5F3E33AF36
-	for <lists+kvm@lfdr.de>; Mon, 15 Mar 2021 10:47:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5C9E433AFD9
+	for <lists+kvm@lfdr.de>; Mon, 15 Mar 2021 11:18:55 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229913AbhCOJrF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 15 Mar 2021 05:47:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46584 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229601AbhCOJq4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 15 Mar 2021 05:46:56 -0400
-Received: from mail-ej1-x62c.google.com (mail-ej1-x62c.google.com [IPv6:2a00:1450:4864:20::62c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B4AD8C061574
-        for <kvm@vger.kernel.org>; Mon, 15 Mar 2021 02:46:55 -0700 (PDT)
-Received: by mail-ej1-x62c.google.com with SMTP id si25so9322975ejb.1
-        for <kvm@vger.kernel.org>; Mon, 15 Mar 2021 02:46:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance-com.20150623.gappssmtp.com; s=20150623;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=QCH3VsMvUSEqRY0D77ObQA6OJaIvmvlJ89ZGUx/CcXM=;
-        b=KBdJN57ZQ8VQz1uCDRBPHQrOXwItBmwEOFNPq9ozYMbd8bVSP9hZj0v9/leZLxc2v+
-         bnEIog66c/xVxrJaQAQDSfaN+5ON+6/yYsZ8IdtMtK+aTlx4uX2mxihZsNBRUez/do4+
-         1KvtRI7pNUOjnhjQuA0DVTja0OSZL+D2vVMQuDfYKe+dQbply48UC3cv2rlAidtOomQs
-         k1BP33T2HNlfsNTa9+WA72vbFKmtOzfthLV8yRt2Y3aDsU1xaHrDx2k0biUGtA/628u1
-         XwtKg+gHWjT467qCsHWkew3z6+raHVfH7JAGoUlxnPeVEVkdXSpctfKubCK/DjB1C3Uf
-         K5Sw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=QCH3VsMvUSEqRY0D77ObQA6OJaIvmvlJ89ZGUx/CcXM=;
-        b=lQLTJHFT/6YTvlA9KBx7tvTx7tRjTnpLUZ7pBRroHrZYYkwD7sNmAZbprCYulmGCiC
-         ArGqUn9fdaBXA5RNLbyoPkYWpg8YMn4XLy8hn/XJSc9UPR8WWTFcfWw+jES33N0pY6aU
-         tCvhc1pXm4GFe4xC8Vt/q7QeLtZU0d0phDUvsAvHcR2Ce8nQw7FdToQvyfww10zEoZxB
-         fSzZhuN9ofQsvserEikTfRoiFb3RRvQOFHYJziyNRbMppFkwmsxWyTj3XXea2/sVuT4k
-         IWTiTyzI/ZZKVVtr/7IIAvQgjB+ZaWv/vpAMsRcGnGOQBMdI+2BV+UCHHfns0aaUvv6+
-         F4Lw==
-X-Gm-Message-State: AOAM530rk6UXtQPpEa+0H4E1/Nq1/hj7UxjG+k4niD2VTdmA29g1zDug
-        EI2GBf/qYJHhT3JLqBBznRZpVzYEMLK20DDXdozN
-X-Google-Smtp-Source: ABdhPJwfPpbGsW1NwziEvCm+pu9W0AYA2Ip5t3r5CSavHkGCI1g9/KIycGHrq/KBYUgnQfbZQ1cImKEpNMiBrV1NXz0=
-X-Received: by 2002:a17:906:311a:: with SMTP id 26mr22439640ejx.395.1615801614537;
- Mon, 15 Mar 2021 02:46:54 -0700 (PDT)
+        id S230028AbhCOKSW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 15 Mar 2021 06:18:22 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:12192 "EHLO
+        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230021AbhCOKSR (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 15 Mar 2021 06:18:17 -0400
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 12FA4VQX030588
+        for <kvm@vger.kernel.org>; Mon, 15 Mar 2021 06:18:17 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=Z/Kb7g3WBoZpHwVf0hsdUU64/e0tOzoxg2AFuVaqHU4=;
+ b=nXMoP+7C6Xc0nuSso8HLR94GobeAVoSOSsh6W4nSW079nN4I15nSg6yL0xXumMgOwzpH
+ jyD0s4eCXnxb55SOY96aQ80M9Dgdtm1EUiI3JrtAOrv/k/Hs46FHoRBcPrH78TVKR6vr
+ iOecRyqbNWIICo/IgfkU7MRSNT8UMEGJ+imXAqKiIiCFoJpWUSNhcR70/50tzxD3ZOw9
+ e/nRJLrAOXrCCstl5srOMZVuxh3HXLDrI2/gyr1fMVWl0QQwW7vurRMIXEn6JL0zMNxn
+ IuSQWI7q+0EWtnDWLIXuFTFlJqm0iOxdY390yHulGC2tdu3EAXfgtZ3Y81x5DAS9DILl Sg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 379yhv15aq-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Mon, 15 Mar 2021 06:18:16 -0400
+Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 12FA4btK031370
+        for <kvm@vger.kernel.org>; Mon, 15 Mar 2021 06:18:15 -0400
+Received: from ppma06fra.de.ibm.com (48.49.7a9f.ip4.static.sl-reverse.com [159.122.73.72])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 379yhv1597-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 15 Mar 2021 06:18:15 -0400
+Received: from pps.filterd (ppma06fra.de.ibm.com [127.0.0.1])
+        by ppma06fra.de.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 12FA99S7016801;
+        Mon, 15 Mar 2021 10:18:12 GMT
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
+        by ppma06fra.de.ibm.com with ESMTP id 378mnh8w9s-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 15 Mar 2021 10:18:12 +0000
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 12FAI9rN34144684
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 15 Mar 2021 10:18:09 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 63585A4065;
+        Mon, 15 Mar 2021 10:18:09 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 037C4A4051;
+        Mon, 15 Mar 2021 10:18:09 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.145.14.133])
+        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Mon, 15 Mar 2021 10:18:08 +0000 (GMT)
+Subject: Re: [kvm-unit-tests PATCH v1 1/1] s390x: mvpg: add checks for
+ op_acc_id
+To:     Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     david@redhat.com, thuth@redhat.com, cohuck@redhat.com,
+        pmorel@linux.ibm.com
+References: <20210312124700.142269-1-imbrenda@linux.ibm.com>
+From:   Janosch Frank <frankja@linux.ibm.com>
+Message-ID: <6e9022f6-de6f-d3c5-b30f-5935fb6e4ca4@linux.ibm.com>
+Date:   Mon, 15 Mar 2021 11:18:08 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.8.0
 MIME-Version: 1.0
-References: <20210315053721.189-1-xieyongji@bytedance.com> <20210315053721.189-2-xieyongji@bytedance.com>
- <20210315090822.GA4166677@infradead.org>
-In-Reply-To: <20210315090822.GA4166677@infradead.org>
-From:   Yongji Xie <xieyongji@bytedance.com>
-Date:   Mon, 15 Mar 2021 17:46:43 +0800
-Message-ID: <CACycT3vrHOExXj6v8ULvUzdLcRkdzS5=TNK6=g4+RWEdN-nOJw@mail.gmail.com>
-Subject: Re: Re: [PATCH v5 01/11] file: Export __receive_fd() to modules
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        Parav Pandit <parav@nvidia.com>, Bob Liu <bob.liu@oracle.com>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Matthew Wilcox <willy@infradead.org>, viro@zeniv.linux.org.uk,
-        Jens Axboe <axboe@kernel.dk>, bcrl@kvack.org,
-        Jonathan Corbet <corbet@lwn.net>,
-        =?UTF-8?Q?Mika_Penttil=C3=A4?= <mika.penttila@nextfour.com>,
-        Dan Carpenter <dan.carpenter@oracle.com>,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        kvm@vger.kernel.org, linux-fsdevel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20210312124700.142269-1-imbrenda@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.761
+ definitions=2021-03-15_03:2021-03-15,2021-03-15 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999
+ malwarescore=0 bulkscore=0 adultscore=0 spamscore=0 lowpriorityscore=0
+ impostorscore=0 priorityscore=1501 clxscore=1015 mlxscore=0 phishscore=0
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2103150067
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Mar 15, 2021 at 5:08 PM Christoph Hellwig <hch@infradead.org> wrote:
->
-> On Mon, Mar 15, 2021 at 01:37:11PM +0800, Xie Yongji wrote:
-> > Export __receive_fd() so that some modules can use
-> > it to pass file descriptor between processes.
->
-> I really don't think any non-core code should do that, especilly not
-> modular mere driver code.
+On 3/12/21 1:47 PM, Claudio Imbrenda wrote:
+> + * Check that the Operand Access Identification matches with the values of
 
-Do you see any issue? Now I think we're able to do that with the help
-of get_unused_fd_flags() and fd_install() in modules. But we may miss
-some security stuff in this way. So I try to export __receive_fd() and
-use it instead.
-
-Thanks,
-Yongji
+Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
+Thanks, picked!
