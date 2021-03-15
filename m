@@ -2,77 +2,169 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C9EC933C959
-	for <lists+kvm@lfdr.de>; Mon, 15 Mar 2021 23:27:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9000C33C968
+	for <lists+kvm@lfdr.de>; Mon, 15 Mar 2021 23:32:05 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232392AbhCOW0m (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 15 Mar 2021 18:26:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41930 "EHLO
+        id S232940AbhCOWba (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 15 Mar 2021 18:31:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43066 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232898AbhCOW0P (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 15 Mar 2021 18:26:15 -0400
-Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F3EECC061762
-        for <kvm@vger.kernel.org>; Mon, 15 Mar 2021 15:26:13 -0700 (PDT)
-Received: by mail-pj1-x102e.google.com with SMTP id s21so9573011pjq.1
-        for <kvm@vger.kernel.org>; Mon, 15 Mar 2021 15:26:13 -0700 (PDT)
+        with ESMTP id S232957AbhCOWb3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 15 Mar 2021 18:31:29 -0400
+Received: from mail-lj1-x233.google.com (mail-lj1-x233.google.com [IPv6:2a00:1450:4864:20::233])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E870C061763
+        for <kvm@vger.kernel.org>; Mon, 15 Mar 2021 15:31:29 -0700 (PDT)
+Received: by mail-lj1-x233.google.com with SMTP id 15so18177863ljj.0
+        for <kvm@vger.kernel.org>; Mon, 15 Mar 2021 15:31:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=SXXfUbxitLxem4y5IOmlGNcXjSvMqPDKJf33Q5FpRTM=;
-        b=udaXDZY+TsOUgxc0zzqYXJLMT2zq5mhWq00mizdMMzE6C8T29RJnXAekUi0TO0leGc
-         dNavq6Cts3q4Y8NJ0SqSgh4oSvYYxApdJYk4nvT/eeSZYx4uBPadoNfTwfUsH1DAuTQD
-         kqGwC6g7+7Mxw8SaR3TXca5fIpGCSCdVuSEy+T7BELjBM+zFKVa+pKgU2C0Wy0wxzDtI
-         g2NHLGceeMUk7DW06dUEFrjYcA21JCFXBqRQTGaM/0ap7F6VOw6CHBdFnAPO35kfk118
-         YndXAbahqkgoPlGsd57fl4sn964/VS7GWsm+tl4q+v3r08mF51IMIsSB/HJcNSwUdGyA
-         TbEA==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=t48JfE/I+ydsOOfkocl4ExwOYD4Cwrny9/Xf4iuVVeE=;
+        b=YzOHwW9gU+2CCoT9hKyxcZQ9g6o779atEw1QSJLPBRAVTj7Gc0vDffISoB/Cd9mLvk
+         keJsigpwHmgy2X42PpmONt7PB65J85QkeCx9fHcaIGkNovhredA86swM4cAXZwH+PSi8
+         lRrPBaNDuKAYAs9HX13mcFnjNF4HVRXNtJQ97EfCuIjTjC3+fdoJesfZFgSy75Qsy3h5
+         3KMoc/MoTsK7c1+mpTCTSVgVngYK9wFNZHp/tgw8qVex1AQ+P9QYvrUzbu9XpmNTz0v7
+         2GyGh2j9ZBeGQ8E+jCJEwyRovr3E+WurRkyCDBICw0iCS9XJ4oKdl+9A7ZLiVshUP9R/
+         VTaw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=SXXfUbxitLxem4y5IOmlGNcXjSvMqPDKJf33Q5FpRTM=;
-        b=CPyiMTxtGjN6QVy+yLgrcK9fu0j/L9s6RN3E5a+cEbRi3fKyX5Eq7hE/f998+9m5ku
-         vykdqwasb1HrHbY0v0yYoE0sEeFmAA/62DV6bd7iy/gv/Z+UmCXGfIV8d14GT0evv+tM
-         dc6fG7MBaeaA+ktYe6PO8h+R9a7EYNQaBJZU3Y+MzTgzk2uZobbnJ8eE7AhVT07Pv0Dt
-         dGD6SbzD91oNgIjit8rSoTzsMeVR8+zUZII/T48C6FP8tFSzGA+jNyyvsn34Qrx/zSa9
-         2knEKrWFpYcWiXEJzrASeOkA9+/L1fmHr4RTc9XRjGMNft8uaBg7TXY9IGazwF5yUrjk
-         ECsw==
-X-Gm-Message-State: AOAM532167eXu6xPejsX+1NdW/UO2Sulnvchxl83gjKH6OdikDked+4k
-        6oZyc/MYgsOoOhsCCAu6sqUyXQ==
-X-Google-Smtp-Source: ABdhPJzbRrLp4UqUBBV/1iVunsJ7Ia5up2kgNLKYTf6vRlt9VH19h4d1D6DqoUUSnWjHiOffkRH5Tw==
-X-Received: by 2002:a17:90b:1950:: with SMTP id nk16mr1333994pjb.140.1615847173500;
-        Mon, 15 Mar 2021 15:26:13 -0700 (PDT)
-Received: from google.com ([2620:15c:f:10:3d60:4c70:d756:da57])
-        by smtp.gmail.com with ESMTPSA id 23sm16026771pge.0.2021.03.15.15.26.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 15 Mar 2021 15:26:12 -0700 (PDT)
-Date:   Mon, 15 Mar 2021 15:26:06 -0700
-From:   Sean Christopherson <seanjc@google.com>
-To:     Ben Gardon <bgardon@google.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Peter Shier <pshier@google.com>,
-        Jim Mattson <jmattson@google.com>,
-        kernel test robot <lkp@intel.com>
-Subject: Re: [PATCH v2 2/4] KVM: x86/mmu: Fix RCU usage when atomically
- zapping SPTEs
-Message-ID: <YE/e/sE6FQtuuRLG@google.com>
-References: <20210315182643.2437374-1-bgardon@google.com>
- <20210315182643.2437374-3-bgardon@google.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=t48JfE/I+ydsOOfkocl4ExwOYD4Cwrny9/Xf4iuVVeE=;
+        b=RfaHq3Ihl/fajHGhrFLzGsZXi6EP0BFjFJ483o0M/JEXeWsSZTcGnMmymcYD/EUhrB
+         RtDqVT4rox+RnCsRI3y6YBW0MzoEubIqGZGFnu7pFuevgi9uRH4wH0LkIgNw7GzPvBTU
+         vtiUMFNNldt+qTsdAGm0D65X9LwHvmmTZ5HP7scM8TtJPVN0gZm5uizTL8qXQ8KJriEd
+         U0zAj89d0vjR7eLI1Dle3/83dn1+7+4FOxT6JTtHG3dfdMGyX7nu4O9sFLrOv9MbEkf3
+         UEHJ7KXqufgdiIElC8KawRCliIA0C0zV+DM7RPlVoW+TJA2pijn983QyK910ES1mPKgr
+         E6VA==
+X-Gm-Message-State: AOAM531/lKlNdK1Bvh3nhhMd4GLV+Zcmx5Ps96PktNS3hdUCjcF47Ku0
+        GtoRqrUkUwf9S0zON56rMlRcy3Csw9BpWdlhtcFXdQ==
+X-Google-Smtp-Source: ABdhPJxjr/et45iqQeRMTErI0LQhEQm42DqVbpHRSpcjhEUlWFO96pLBoZaf9saYhs4q/r0gUqfHvBityBsZA51vteE=
+X-Received: by 2002:a2e:988f:: with SMTP id b15mr751964ljj.394.1615847486669;
+ Mon, 15 Mar 2021 15:31:26 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210315182643.2437374-3-bgardon@google.com>
+References: <20210310003024.2026253-1-jingzhangos@google.com>
+ <20210310003024.2026253-4-jingzhangos@google.com> <bb03107c-a413-50da-e228-d338dd471fb3@redhat.com>
+In-Reply-To: <bb03107c-a413-50da-e228-d338dd471fb3@redhat.com>
+From:   Jing Zhang <jingzhangos@google.com>
+Date:   Mon, 15 Mar 2021 17:31:15 -0500
+Message-ID: <CAAdAUth0J6z7fFpOkkmzKc83Bj+MST-jhsZ0uU0iYdRcE_-gMA@mail.gmail.com>
+Subject: Re: [RFC PATCH 3/4] KVM: stats: Add ioctl commands to pull statistics
+ in binary format
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     KVM <kvm@vger.kernel.org>, KVM ARM <kvmarm@lists.cs.columbia.edu>,
+        Linux MIPS <linux-mips@vger.kernel.org>,
+        KVM PPC <kvm-ppc@vger.kernel.org>,
+        Linux S390 <linux-s390@vger.kernel.org>,
+        Linux kselftest <linux-kselftest@vger.kernel.org>,
+        Marc Zyngier <maz@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Peter Shier <pshier@google.com>,
+        Oliver Upton <oupton@google.com>,
+        David Rientjes <rientjes@google.com>,
+        Emanuele Giuseppe Esposito <eesposit@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Mar 15, 2021, Ben Gardon wrote:
-> Fix a missing rcu_dereference in tdp_mmu_zap_spte_atomic.
-> 
-> Reported-by: kernel test robot <lkp@intel.com>
-> Signed-off-by: Ben Gardon <bgardon@google.com>
-> ---
+Hi Paolo,
 
-Reviewed-by: Sean Christopherson <seanjc@google.com>
+On Wed, Mar 10, 2021 at 8:55 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+> On 10/03/21 01:30, Jing Zhang wrote:
+> > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> > index 383df23514b9..87dd62516c8b 100644
+> > --- a/virt/kvm/kvm_main.c
+> > +++ b/virt/kvm/kvm_main.c
+> > @@ -3464,6 +3464,51 @@ static long kvm_vcpu_ioctl(struct file *filp,
+> >               r = kvm_arch_vcpu_ioctl_set_fpu(vcpu, fpu);
+> >               break;
+> >       }
+> > +     case KVM_STATS_GET_INFO: {
+> > +             struct kvm_stats_info stats_info;
+> > +
+> > +             r = -EFAULT;
+> > +             stats_info.num_stats = VCPU_STAT_COUNT;
+> > +             if (copy_to_user(argp, &stats_info, sizeof(stats_info)))
+> > +                     goto out;
+> > +             r = 0;
+> > +             break;
+> > +     }
+> > +     case KVM_STATS_GET_NAMES: {
+> > +             struct kvm_stats_names stats_names;
+> > +
+> > +             r = -EFAULT;
+> > +             if (copy_from_user(&stats_names, argp, sizeof(stats_names)))
+> > +                     goto out;
+> > +             r = -EINVAL;
+> > +             if (stats_names.size < VCPU_STAT_COUNT * KVM_STATS_NAME_LEN)
+> > +                     goto out;
+> > +
+> > +             r = -EFAULT;
+> > +             if (copy_to_user(argp + sizeof(stats_names),
+> > +                             kvm_vcpu_stat_strings,
+> > +                             VCPU_STAT_COUNT * KVM_STATS_NAME_LEN))
+>
+> The only reason to separate the strings in patch 1 is to pass them here.
+>   But this is a poor API because it imposes a limit on the length of the
+> statistics, and makes that length part of the binary interface.
+>
+> I would prefer a completely different interface, where you have a file
+> descriptor that can be created and associated to a vCPU or VM (or even
+> to /dev/kvm).  Having a file descriptor is important because the fd can
+We are considering about how to create the file descriptor. It might be risky
+to create an extra fd for every vCPU. It will easily hit the fd limit for the
+process or the system for machines running a ton of small VMs.
+Looks like creating an extra file descriptor for every VM is a better option.
+And then we can check per vCPU stats through Ioctl of this VM fd by
+passing the vCPU index.
+What do you think?
+> be passed to a less-privileged process that takes care of gathering the
+> metrics
+>
+> The result of reading the file descriptor could be either ASCII or
+> binary.  IMO the real cost lies in opening and reading a multitude of
+> files rather than in the ASCII<->binary conversion.
+>
+> The format could be one of the following:
+>
+> * binary:
+>
+> 4 bytes flags (always zero)
+> 4 bytes number of statistics
+> 4 bytes offset of the first stat description
+> 4 bytes offset of the first stat value
+> stat descriptions:
+>    - 4 bytes for the type (for now always zero: uint64_t)
+>    - 4 bytes for the flags (for now always zero)
+>    - length of name
+>    - name
+> statistics in 64-bit format
+>
+> * text:
+>
+> stat1_name uint64 123
+> stat2_name uint64 456
+> ...
+>
+> What do you think?
+>
+> Paolo
+>
