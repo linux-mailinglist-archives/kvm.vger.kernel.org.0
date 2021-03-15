@@ -2,96 +2,131 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0534933C1A0
-	for <lists+kvm@lfdr.de>; Mon, 15 Mar 2021 17:24:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B95DA33C20F
+	for <lists+kvm@lfdr.de>; Mon, 15 Mar 2021 17:35:50 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232465AbhCOQYD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 15 Mar 2021 12:24:03 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:53544 "EHLO
+        id S232254AbhCOQfO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 15 Mar 2021 12:35:14 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:48261 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232445AbhCOQXo (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 15 Mar 2021 12:23:44 -0400
+        by vger.kernel.org with ESMTP id S232273AbhCOQfE (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 15 Mar 2021 12:35:04 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1615825424;
+        s=mimecast20190719; t=1615826104;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=3wdZ2o2UMvoAMlrjWoFf17ZzvfbNLm3Hw3Ulncm86lM=;
-        b=heE/TPvyDvuRjmUu1q8P5l2hLARjFkXSMtq5VzX+fmOnXStXygb8PnsbwP1Hg7bgNXsLw5
-        a4BP8coNQrd71GTHY9kCJAye3Lze1GgMky3FJKQAD99S1v6ZHbE5CBHkKLswfr5wbfwmCo
-        x1jyM8C/9NJ9YCcZxI8D3uRARb15OBc=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-273-BPA3bdVYNFOvdqzVgFWEKg-1; Mon, 15 Mar 2021 12:23:42 -0400
-X-MC-Unique: BPA3bdVYNFOvdqzVgFWEKg-1
-Received: by mail-wm1-f70.google.com with SMTP id y9so3013305wma.4
-        for <kvm@vger.kernel.org>; Mon, 15 Mar 2021 09:23:42 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=3wdZ2o2UMvoAMlrjWoFf17ZzvfbNLm3Hw3Ulncm86lM=;
-        b=dXQcQJkpv9E//ZQ+2jftY+tE9CungrCqyWQ2h3KwbbenejnMwT/diyNcFf29Y1bITH
-         m8TAgyTgPeiC5v4XqriMoQStSKsxuk0eew1Ql0dwXEUT8Op88CPk8OkCE3Wy2cDjh1eq
-         LQ9yNsf7XwS525zGYojCT/YHJRPeTdSo2ioGhl8T4Pa29IVHvAABgBY2FPhEXWeHEo1G
-         Q89tJmrHfp1IjlAsr48pKBsLygZ9EPianxu9hCHhLNYcSByGo/WrMJanJGGu77BsTcmV
-         pfoaYvyZcg0ZrO2o0EmaR2gDQEH/df3Yw2FpS4pZuCeiw7F/v+d3Cq3dNn6yzWo4bsEi
-         LvaQ==
-X-Gm-Message-State: AOAM532G0B9iypoMZlMh9oouIXiVrGVPpUj+gH/tjt0vlEDmQHQfdo6g
-        BF0aHFCftDvFt3CVy4RLL2CcHZsTYcjCS67DooiZoFr08tTPY89sSd6KR6LdsY2PJ1xyj46mAK1
-        duEAjGVHx28gy
-X-Received: by 2002:a7b:c38d:: with SMTP id s13mr499085wmj.44.1615825420886;
-        Mon, 15 Mar 2021 09:23:40 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJx48wpeFGkULhUPziop+7I6XIylLHEf7uh9fFC7HbtW8j8rz7mfnHbK8sHo+NqkbmpdQHaE9Q==
-X-Received: by 2002:a7b:c38d:: with SMTP id s13mr499067wmj.44.1615825420735;
-        Mon, 15 Mar 2021 09:23:40 -0700 (PDT)
-Received: from ?IPv6:2001:b07:add:ec09:c399:bc87:7b6c:fb2a? ([2001:b07:add:ec09:c399:bc87:7b6c:fb2a])
-        by smtp.gmail.com with ESMTPSA id v13sm22098238wrt.45.2021.03.15.09.23.39
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 15 Mar 2021 09:23:40 -0700 (PDT)
-Subject: Re: [PATCH 2/4] KVM: x86: hyper-v: Prevent using not-yet-updated TSC
- page by secondary CPUs
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>
-References: <20210315143706.859293-1-vkuznets@redhat.com>
- <20210315143706.859293-3-vkuznets@redhat.com>
- <6b392d7e-8135-53a9-9040-f6f5e316c6cb@redhat.com>
- <87im5s8l9g.fsf@vitty.brq.redhat.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <92bccdca-b6bb-5c09-c5a1-5c75e5a3887d@redhat.com>
-Date:   Mon, 15 Mar 2021 17:23:39 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.7.0
+         content-transfer-encoding:content-transfer-encoding;
+        bh=8E7bQAO4mPMCMNy7czH8SXiPxDN2NhK2/K7/V4lwNsU=;
+        b=bK+mEQQOxA7/pIHyPC8GJ/Omz888Jt3qCh6TKZTK9ZOOlwwlXBhg8jW7SPhGsDWTDToVVh
+        /DBAD6wify8rAh4Kc2WWMHc9QrxD2EGwwHuqWgSZkZm1JkhBU0boGUoUweqMkia+KFHT9j
+        SeA0gy4Eg0N5sPQ+MQN8Tk3TDHpI77g=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-219-3bB14KOROdS3_D81865z-Q-1; Mon, 15 Mar 2021 12:35:01 -0400
+X-MC-Unique: 3bB14KOROdS3_D81865z-Q-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E03A6100C663;
+        Mon, 15 Mar 2021 16:34:59 +0000 (UTC)
+Received: from steredhat.redhat.com (ovpn-114-1.ams2.redhat.com [10.36.114.1])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 47AD319D7C;
+        Mon, 15 Mar 2021 16:34:51 +0000 (UTC)
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     virtualization@lists.linux-foundation.org
+Cc:     netdev@vger.kernel.org, Xie Yongji <xieyongji@bytedance.com>,
+        Laurent Vivier <lvivier@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        linux-kernel@vger.kernel.org, Max Gurtovoy <mgurtovoy@nvidia.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Parav Pandit <parav@nvidia.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>, kvm@vger.kernel.org
+Subject: [PATCH v4 00/14] vdpa: add vdpa simulator for block device
+Date:   Mon, 15 Mar 2021 17:34:36 +0100
+Message-Id: <20210315163450.254396-1-sgarzare@redhat.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-In-Reply-To: <87im5s8l9g.fsf@vitty.brq.redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 15/03/21 16:55, Vitaly Kuznetsov wrote:
->> I think we should instead write 0 to the page in kvm_gen_update_masterclock.
->
-> We can do that but we will also need to invalidate
-> hv->tsc_ref.tsc_sequence to prevent MSR based clocksource
-> (HV_X64_MSR_TIME_REF_COUNT -> get_time_ref_counter()) from using stale
-> hv->tsc_ref.tsc_scale/tsc_offset values (in case we had them
-> calculated).
+v4:
+- added support for iproute2 vdpa management tool in vdpa_sim_blk
+- removed get/set_config patches
+  - 'vdpa: add return value to get_config/set_config callbacks'
+  - 'vhost/vdpa: remove vhost_vdpa_config_validate()'
+- added get_config_size() patches
+  - 'vdpa: add get_config_size callback in vdpa_config_ops'
+  - 'vhost/vdpa: use get_config_size callback in vhost_vdpa_config_validate()'
 
-Yes, we're talking about the same thing (invalidating tsc_sequence is 
-done by writing 0 to it).
+v3: https://lore.kernel.org/lkml/20210204172230.85853-1-sgarzare@redhat.com/
+v2: https://lore.kernel.org/lkml/20210128144127.113245-1-sgarzare@redhat.com/
+v1: https://lore.kernel.org/lkml/93f207c0-61e6-3696-f218-e7d7ea9a7c93@redhat.com/
 
-Paolo
+This series is the second part of the v1 linked above. The first part with
+refactoring of vdpa_sim has already been merged.
 
-> Also, we can't really disable TSC page for nested scenario when guest
-> opted for reenlightenment (PATCH4) but we're not going to update the
-> page anyway so there's not much different.
-> 
+The patches are based on Max Gurtovoy's work and extend the block simulator to
+have a ramdisk behaviour.
+
+As mentioned in the v1 there was 2 issues and I fixed them in this series:
+1. The identical mapping in the IOMMU used until now in vdpa_sim created issues
+   when mapping different virtual pages with the same physical address.
+   Fixed by patch "vdpa_sim: use iova module to allocate IOVA addresses"
+
+2. There was a race accessing the IOMMU between the vdpasim_blk_work() and the
+   device driver that map/unmap DMA regions. Fixed by patch "vringh: add
+   'iotlb_lock' to synchronize iotlb accesses"
+
+I used the Xie's patch coming from VDUSE series to allow vhost-vdpa to use
+block devices, and I added get_config_size() callback to allow any device
+in vhost-vdpa.
+
+The series also includes small fixes for vringh, vdpa, and vdpa_sim that I
+discovered while implementing and testing the block simulator.
+
+Thanks for your feedback,
+Stefano
+
+Max Gurtovoy (1):
+  vdpa: add vdpa simulator for block device
+
+Stefano Garzarella (12):
+  vdpa_sim: use iova module to allocate IOVA addresses
+  vringh: add 'iotlb_lock' to synchronize iotlb accesses
+  vringh: reset kiov 'consumed' field in __vringh_iov()
+  vringh: explain more about cleaning riov and wiov
+  vringh: implement vringh_kiov_advance()
+  vringh: add vringh_kiov_length() helper
+  vdpa_sim: cleanup kiovs in vdpasim_free()
+  vdpa: add get_config_size callback in vdpa_config_ops
+  vhost/vdpa: use get_config_size callback in
+    vhost_vdpa_config_validate()
+  vdpa_sim_blk: implement ramdisk behaviour
+  vdpa_sim_blk: handle VIRTIO_BLK_T_GET_ID
+  vdpa_sim_blk: add support for vdpa management tool
+
+Xie Yongji (1):
+  vhost/vdpa: Remove the restriction that only supports virtio-net
+    devices
+
+ drivers/vdpa/vdpa_sim/vdpa_sim.h     |   2 +
+ include/linux/vdpa.h                 |   4 +
+ include/linux/vringh.h               |  19 +-
+ drivers/vdpa/ifcvf/ifcvf_main.c      |   6 +
+ drivers/vdpa/mlx5/net/mlx5_vnet.c    |   6 +
+ drivers/vdpa/vdpa_sim/vdpa_sim.c     | 127 ++++++----
+ drivers/vdpa/vdpa_sim/vdpa_sim_blk.c | 338 +++++++++++++++++++++++++++
+ drivers/vdpa/virtio_pci/vp_vdpa.c    |   8 +
+ drivers/vhost/vdpa.c                 |  15 +-
+ drivers/vhost/vringh.c               |  69 ++++--
+ drivers/vdpa/Kconfig                 |   8 +
+ drivers/vdpa/vdpa_sim/Makefile       |   1 +
+ 12 files changed, 529 insertions(+), 74 deletions(-)
+ create mode 100644 drivers/vdpa/vdpa_sim/vdpa_sim_blk.c
+
+-- 
+2.30.2
 
