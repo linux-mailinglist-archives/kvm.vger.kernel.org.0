@@ -2,230 +2,125 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B6F5E33B06A
-	for <lists+kvm@lfdr.de>; Mon, 15 Mar 2021 11:54:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1D2FE33B093
+	for <lists+kvm@lfdr.de>; Mon, 15 Mar 2021 12:03:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229789AbhCOKyG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 15 Mar 2021 06:54:06 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:52218 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S229524AbhCOKxz (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 15 Mar 2021 06:53:55 -0400
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 12FAXr6u104876
-        for <kvm@vger.kernel.org>; Mon, 15 Mar 2021 06:53:54 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=zbzNTnIJ7ZLwkgLLD5QMMGmY8nDaxKn1dFBIB60bw7w=;
- b=dqMtC4kpBAQEtrPLvzPtu51daTXOuMq7+ky0y0ipUOWrJbUelAehpFIvjxUHbgJdS/nu
- rkJzR3Z6//zlggLPiCYV4N0ilQhRxpTGdT1q1o5ef3OSgkwj7JmzgvWwjRCv3WqhjHaL
- 2LiC1X2UWTRar+DVwG9WvgkiBw3dzJeWKgigu9aQpMxYwjXqCcHm25Jy8YjO5FGUJufE
- 1Uq1zxlRjdc8E+ldF4/Auwedgel9/s5f8m12ufa+tijSmpvA9Y+/nMIqlq4ugwJ7sINW
- TXUtZz6mQkZ1cdYyZmiu925cVj4nItTnmVaW3/Huhrgi3gHGOzB0XJLr/8E3W7psNNjD EA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 379yj1t1bn-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Mon, 15 Mar 2021 06:53:54 -0400
-Received: from m0098416.ppops.net (m0098416.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 12FAYMoq106190
-        for <kvm@vger.kernel.org>; Mon, 15 Mar 2021 06:53:54 -0400
-Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 379yj1t1bc-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 15 Mar 2021 06:53:54 -0400
-Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
-        by ppma05fra.de.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 12FAm2Mn006901;
-        Mon, 15 Mar 2021 10:53:52 GMT
-Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
-        by ppma05fra.de.ibm.com with ESMTP id 378n188wwj-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 15 Mar 2021 10:53:52 +0000
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
-        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 12FArXrL34865440
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 15 Mar 2021 10:53:33 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 55FD5A4051;
-        Mon, 15 Mar 2021 10:53:49 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id EB307A404D;
-        Mon, 15 Mar 2021 10:53:48 +0000 (GMT)
-Received: from localhost.localdomain (unknown [9.145.14.133])
-        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Mon, 15 Mar 2021 10:53:48 +0000 (GMT)
-Subject: Re: [kvm-unit-tests PATCH v6 5/6] s390x: css: testing measurement
- block format 0
-To:     Pierre Morel <pmorel@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     david@redhat.com, thuth@redhat.com, cohuck@redhat.com,
-        imbrenda@linux.ibm.com
-References: <1615545714-13747-1-git-send-email-pmorel@linux.ibm.com>
- <1615545714-13747-6-git-send-email-pmorel@linux.ibm.com>
-From:   Janosch Frank <frankja@linux.ibm.com>
-Message-ID: <0b2ebdfd-c6f9-bca2-b2d7-5187bdfab4a2@linux.ibm.com>
-Date:   Mon, 15 Mar 2021 11:53:48 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.8.0
+        id S229812AbhCOLCp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 15 Mar 2021 07:02:45 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:40044 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229771AbhCOLCQ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 15 Mar 2021 07:02:16 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1615806135;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=S/oWGawpXGhyQCD9KmbcPNHKcWmsnOSDhuC/sNGQZGI=;
+        b=CrnWFDtveGdiLUbmvbydLmBN6TLTE7QMgQOJ12yZT8Vt6lkPCeWQZKw9Uo56yX3EiQOJaM
+        6seAr11sAfbiAXgrs4UluURXSFstinoxjQjqDztwldNQ4DI0kNUMSahBp27aoaIfYqCiqs
+        s8GYxEosPmumVk9z97/dJLNzjBiXlHg=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-135-gnzoAHczNzOtolvNhNHEnA-1; Mon, 15 Mar 2021 07:02:14 -0400
+X-MC-Unique: gnzoAHczNzOtolvNhNHEnA-1
+Received: by mail-wm1-f69.google.com with SMTP id c7so8027396wml.8
+        for <kvm@vger.kernel.org>; Mon, 15 Mar 2021 04:02:13 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=S/oWGawpXGhyQCD9KmbcPNHKcWmsnOSDhuC/sNGQZGI=;
+        b=WnOBmEXiv5oekRivB0FQ8qmpPaIeaqVs9tjYnyjRvQW2cqBwCv745SvmsNL0HwpWN+
+         wfh2e5kCFN27lfI+iaU87LGXmvaJgnvVS+nRM0+4yUaLb5nzkPc2f0Kf8/zt2hgfwp5q
+         0yLZ2K+V3Ywc8PK5xpH07BjAiBNQ6Ep30Fa5q2YNq/8c2A7zeN6gMm/ydiiU9Z4lxpLp
+         7jXnea5SwzsHRibXfrNrHTIcLK1b3Dc7tvcUdjK7/fuMsBc2VJe7DgXBWkiBTXt5vS/I
+         evW6aUB37zymAfkbcP3/Z9AEHOPDfOYYiP2KMBOKzGgWBslTULMvk9PzcC13IWj9pGWi
+         +9kw==
+X-Gm-Message-State: AOAM530jLD0kg90hoAmFHYaSJ9ZzvFlYPGzHxRsHrhKflwHacpM9O6MZ
+        L711xMIJobSE7j5Y++iEM1K4frvLdOGsgraSiYCdkUhmvEdt9EUs6zyggr5ND66h5oIgN9WavKo
+        j/6r/vMRogyvj
+X-Received: by 2002:a05:6000:24b:: with SMTP id m11mr26777707wrz.393.1615806132639;
+        Mon, 15 Mar 2021 04:02:12 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzxngqoRvyImvtrS1gTlOBvENXh/6EdwVXEpl38+sSZZ8VElzUNwwM/9wN8W829CrCnbUyofg==
+X-Received: by 2002:a05:6000:24b:: with SMTP id m11mr26777627wrz.393.1615806132028;
+        Mon, 15 Mar 2021 04:02:12 -0700 (PDT)
+Received: from steredhat (host-79-34-249-199.business.telecomitalia.it. [79.34.249.199])
+        by smtp.gmail.com with ESMTPSA id a13sm16170382wrp.31.2021.03.15.04.02.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 15 Mar 2021 04:02:11 -0700 (PDT)
+Date:   Mon, 15 Mar 2021 12:02:09 +0100
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     Arseny Krasnov <arseny.krasnov@kaspersky.com>
+Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Jorgen Hansen <jhansen@vmware.com>,
+        Colin Ian King <colin.king@canonical.com>,
+        Norbert Slusarek <nslusarek@gmx.net>,
+        Andra Paraschiv <andraprs@amazon.com>, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, stsp2@yandex.ru, oxffffaa@gmail.com
+Subject: Re: [RFC PATCH v6 11/22] virtio/vsock: dequeue callback for
+ SOCK_SEQPACKET
+Message-ID: <20210315110209.xuaq5q3a2zp4u3g5@steredhat>
+References: <20210307175722.3464068-1-arseny.krasnov@kaspersky.com>
+ <20210307180204.3465806-1-arseny.krasnov@kaspersky.com>
 MIME-Version: 1.0
-In-Reply-To: <1615545714-13747-6-git-send-email-pmorel@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.761
- definitions=2021-03-15_03:2021-03-15,2021-03-15 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 mlxscore=0
- lowpriorityscore=0 priorityscore=1501 clxscore=1015 spamscore=0
- adultscore=0 malwarescore=0 suspectscore=0 mlxlogscore=999 phishscore=0
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2103150072
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20210307180204.3465806-1-arseny.krasnov@kaspersky.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 3/12/21 11:41 AM, Pierre Morel wrote:
-> We test the update of the measurement block format 0, the
-> measurement block origin is calculated from the mbo argument
-> used by the SCHM instruction and the offset calculated using
-> the measurement block index of the SCHIB.
-> 
-> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+On Sun, Mar 07, 2021 at 09:02:01PM +0300, Arseny Krasnov wrote:
+>This adds transport callback and it's logic for SEQPACKET dequeue.
+>Callback fetches RW packets from rx queue of socket until whole record
+>is copied(if user's buffer is full, user is not woken up). This is done
+>to not stall sender, because if we wake up user and it leaves syscall,
+>nobody will send credit update for rest of record, and sender will wait
+>for next enter of read syscall at receiver's side. So if user buffer is
+>full, we just send credit update and drop data. If during copy SEQ_BEGIN
+>was found(and not all data was copied), copying is restarted by reset
+>user's iov iterator(previous unfinished data is dropped).
+>
+>Signed-off-by: Arseny Krasnov <arseny.krasnov@kaspersky.com>
+>---
+> include/linux/virtio_vsock.h            |  13 +++
+> include/uapi/linux/virtio_vsock.h       |  16 ++++
+> net/vmw_vsock/virtio_transport_common.c | 116 ++++++++++++++++++++++++
+> 3 files changed, 145 insertions(+)
+>
+>diff --git a/include/linux/virtio_vsock.h b/include/linux/virtio_vsock.h
+>index dc636b727179..466a5832d2f5 100644
+>--- a/include/linux/virtio_vsock.h
+>+++ b/include/linux/virtio_vsock.h
+>@@ -18,6 +18,12 @@ enum {
+> 	VSOCK_VQ_MAX    = 3,
+> };
+>
+>+struct virtio_vsock_seqpack_state {
+>+	u32 user_read_seq_len;
+>+	u32 user_read_copied;
+>+	u32 curr_rx_msg_id;
+>+};
+>+
+> /* Per-socket state (accessed via vsk->trans) */
+> struct virtio_vsock_sock {
+> 	struct vsock_sock *vsk;
+>@@ -36,6 +42,8 @@ struct virtio_vsock_sock {
+> 	u32 rx_bytes;
+> 	u32 buf_alloc;
+> 	struct list_head rx_queue;
+>+
+>+	struct virtio_vsock_seqpack_state seqpacket_state;
 
-Acked-by: Janosch Frank <frankja@linux.ibm.com>
+Following 'virtio_vsock_seq_hdr', maybe we can shorten in:
 
-> ---
->  lib/s390x/css.h | 12 +++++++
->  s390x/css.c     | 83 +++++++++++++++++++++++++++++++++++++++++++++++++
->  2 files changed, 95 insertions(+)
-> 
-> diff --git a/lib/s390x/css.h b/lib/s390x/css.h
-> index 7158423..335bc70 100644
-> --- a/lib/s390x/css.h
-> +++ b/lib/s390x/css.h
-> @@ -374,4 +374,16 @@ static inline void schm(void *mbo, unsigned int flags)
->  bool css_enable_mb(int sid, uint64_t mb, uint16_t mbi, uint16_t flg, bool fmt1);
->  bool css_disable_mb(int schid);
->  
-> +struct measurement_block_format0 {
-> +	uint16_t ssch_rsch_count;
-> +	uint16_t sample_count;
-> +	uint32_t device_connect_time;
-> +	uint32_t function_pending_time;
-> +	uint32_t device_disconnect_time;
-> +	uint32_t cu_queuing_time;
-> +	uint32_t device_active_only_time;
-> +	uint32_t device_busy_time;
-> +	uint32_t initial_cmd_resp_time;
-> +};
-> +
->  #endif
-> diff --git a/s390x/css.c b/s390x/css.c
-> index af68266..658c5f8 100644
-> --- a/s390x/css.c
-> +++ b/s390x/css.c
-> @@ -133,6 +133,13 @@ error_ccw:
->  	free_io_mem(senseid, sizeof(*senseid));
->  }
->  
-> +static void sense_id(void)
-> +{
-> +	assert(!start_ccw1_chain(test_device_sid, ccw));
-> +
-> +	assert(wait_and_check_io_completion(test_device_sid) >= 0);
-> +}
-> +
->  static void css_init(void)
->  {
->  	assert(register_io_int_func(css_irq_io) == 0);
-> @@ -175,6 +182,81 @@ static void test_schm(void)
->  	report_prefix_pop();
->  }
->  
-> +#define SCHM_UPDATE_CNT 10
-> +static bool start_measuring(uint64_t mbo, uint16_t mbi, bool fmt1)
-> +{
-> +	int i;
-> +
-> +	senseid = alloc_io_mem(sizeof(*senseid), 0);
-> +	assert(senseid);
-> +
-> +	ccw = ccw_alloc(CCW_CMD_SENSE_ID, senseid, sizeof(*senseid), CCW_F_SLI);
-> +	assert(ccw);
-> +
-> +	if (!css_enable_mb(test_device_sid, mbo, mbi, PMCW_MBUE, fmt1)) {
-> +		report_abort("Enabling measurement block failed");
-> +		return false;
-> +	}
-> +
-> +	for (i = 0; i < SCHM_UPDATE_CNT; i++)
-> +		sense_id();
-> +
-> +	free_io_mem(ccw, sizeof(*ccw));
-> +	free_io_mem(senseid, sizeof(*senseid));
-> +
-> +	return true;
-> +}
-> +
-> +/*
-> + * test_schm_fmt0:
-> + * With measurement block format 0 a memory space is shared
-> + * by all subchannels, each subchannel can provide an index
-> + * for the measurement block facility to store the measurements.
-> + */
-> +static void test_schm_fmt0(void)
-> +{
-> +	struct measurement_block_format0 *mb0;
-> +	int shared_mb_size = 2 * sizeof(struct measurement_block_format0);
-> +
-> +	if (!test_device_sid) {
-> +		report_skip("No device");
-> +		return;
-> +	}
-> +
-> +	/* Allocate zeroed Measurement block */
-> +	mb0 = alloc_io_mem(shared_mb_size, 0);
-> +	if (!mb0) {
-> +		report_abort("measurement_block_format0 allocation failed");
-> +		return;
-> +	}
-> +
-> +	schm(NULL, 0); /* Stop any previous measurement */
-> +	schm(mb0, SCHM_MBU);
-> +
-> +	/* Expect success */
-> +	report_prefix_push("Valid MB address and index 0");
-> +	report(start_measuring(0, 0, false) &&
-> +	       mb0->ssch_rsch_count == SCHM_UPDATE_CNT,
-> +	       "SSCH measured %d", mb0->ssch_rsch_count);
-> +	report_prefix_pop();
-> +
-> +	/* Clear the measurement block for the next test */
-> +	memset(mb0, 0, shared_mb_size);
-> +
-> +	/* Expect success */
-> +	report_prefix_push("Valid MB address and index 1");
-> +	if (start_measuring(0, 1, false))
-> +		report(mb0[1].ssch_rsch_count == SCHM_UPDATE_CNT,
-> +		       "SSCH measured %d", mb0[1].ssch_rsch_count);
-> +	report_prefix_pop();
-> +
-> +	/* Stop the measurement */
-> +	css_disable_mb(test_device_sid);
-> +	schm(NULL, 0);
-> +
-> +	free_io_mem(mb0, shared_mb_size);
-> +}
-> +
->  static struct {
->  	const char *name;
->  	void (*func)(void);
-> @@ -185,6 +267,7 @@ static struct {
->  	{ "enable (msch)", test_enable },
->  	{ "sense (ssch/tsch)", test_sense },
->  	{ "measurement block (schm)", test_schm },
-> +	{ "measurement block format0", test_schm_fmt0 },
->  	{ NULL, NULL }
->  };
->  
-> 
+         struct virtio_vsock_seq_state seq_state;
+
+The rest LGTM.
 
