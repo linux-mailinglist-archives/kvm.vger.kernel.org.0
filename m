@@ -2,37 +2,37 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9AE9B33C920
-	for <lists+kvm@lfdr.de>; Mon, 15 Mar 2021 23:11:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CD11D33C923
+	for <lists+kvm@lfdr.de>; Mon, 15 Mar 2021 23:11:45 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232445AbhCOWKm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 15 Mar 2021 18:10:42 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:38779 "EHLO
+        id S231613AbhCOWLP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 15 Mar 2021 18:11:15 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:40076 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232626AbhCOWKg (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 15 Mar 2021 18:10:36 -0400
+        by vger.kernel.org with ESMTP id S232466AbhCOWKn (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 15 Mar 2021 18:10:43 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1615846235;
+        s=mimecast20190719; t=1615846242;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=xs80L4S7if4oQ7sYgkwvzm47LtF8hDXaNV9qxN93CWM=;
-        b=b8mnflWXZcOn24vmjjM1zqqmAo1SEIpzz3IZPaVVUVsPqOmtAUjek0vRCR28aCpETAvShM
-        HhAkyg5B7t3zCTqz/AsNFFzp0g9vrLc8OP8qZ3h08fTS7KlUDuHSmYtQl4LGmzqzrWzSDC
-        6ylkUZbL+IcVAawzCudbYZHHl46Sbn8=
+        bh=G9NrupMURdEuUMDF610xSyzzhCAN0PBHUS0Y8SXmWZA=;
+        b=SHKc/CrwAI3h/davTaO5K+vC5hS4x5PZubSQljVtizTQdLNeXF6QRwcyn8ZSZQNCR1rqdF
+        1UH4KMezvC6ac1rirmAziVjn5eL6Y2w3BJZ00H8TrLvG/mvGuiU1GNkthz6CgPxXxJwaqy
+        PxxnJSZ7fxVajYkGmZ1LHL82Qef5CjY=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-474-3JeqLqiZM1GMdXfm4fr1Wg-1; Mon, 15 Mar 2021 18:10:33 -0400
-X-MC-Unique: 3JeqLqiZM1GMdXfm4fr1Wg-1
+ us-mta-311-3Oks0f7rMSyKvgBBSD5aJg-1; Mon, 15 Mar 2021 18:10:40 -0400
+X-MC-Unique: 3Oks0f7rMSyKvgBBSD5aJg-1
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 997BC87A826;
-        Mon, 15 Mar 2021 22:10:31 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3AB18100C619;
+        Mon, 15 Mar 2021 22:10:38 +0000 (UTC)
 Received: from localhost.localdomain (unknown [10.35.207.30])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 416DA5E1A4;
-        Mon, 15 Mar 2021 22:10:27 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 0264A5F706;
+        Mon, 15 Mar 2021 22:10:31 +0000 (UTC)
 From:   Maxim Levitsky <mlevitsk@redhat.com>
 To:     kvm@vger.kernel.org
 Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
@@ -52,9 +52,9 @@ Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
         "H. Peter Anvin" <hpa@zytor.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
         Ingo Molnar <mingo@redhat.com>
-Subject: [PATCH 1/3] scripts/gdb: rework lx-symbols gdb script
-Date:   Tue, 16 Mar 2021 00:10:18 +0200
-Message-Id: <20210315221020.661693-2-mlevitsk@redhat.com>
+Subject: [PATCH 2/3] KVM: x86: guest debug: don't inject interrupts while single stepping
+Date:   Tue, 16 Mar 2021 00:10:19 +0200
+Message-Id: <20210315221020.661693-3-mlevitsk@redhat.com>
 In-Reply-To: <20210315221020.661693-1-mlevitsk@redhat.com>
 References: <20210315221020.661693-1-mlevitsk@redhat.com>
 MIME-Version: 1.0
@@ -64,231 +64,57 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Fix several issues that are present in lx-symbols script:
+This change greatly helps with two issues:
 
-* Track module unloads by placing another software breakpoint at 'free_module'
-  (force uninline this symbol just in case), and use remove-symbol-file
-  gdb command to unload the symobls of the module that is unloading.
+* Resuming from a breakpoint is much more reliable.
 
-  That gives the gdb a chance to mark all software breakpoints from
-  this module as pending again.
-  Also remove the module from the 'known' module list once it is unloaded.
+  When resuming execution from a breakpoint, with interrupts enabled, more often
+  than not, KVM would inject an interrupt and make the CPU jump immediately to
+  the interrupt handler and eventually return to the breakpoint, to trigger it
+  again.
 
-* Since we now track module unload, we don't need to reload all
-  symbols anymore when 'known' module loaded again (that can't happen anymore).
-  This allows reloading a module in the debugged kernel to finish much faster,
-  while lx-symbols tracks module loads and unloads.
+  From the user point of view it looks like the CPU never executed a
+  single instruction and in some cases that can even prevent forward progress,
+  for example, when the breakpoint is placed by an automated script
+  (e.g lx-symbols), which does something in response to the breakpoint and then
+  continues the guest automatically.
+  If the script execution takes enough time for another interrupt to arrive,
+  the guest will be stuck on the same breakpoint RIP forever.
 
-* Disable/enable all gdb breakpoints on both module load and unload breakpoint
-  hits, and not only in 'load_all_symbols' as was done before.
-  (load_all_symbols is no longer called on breakpoint hit)
-  That allows gdb to avoid getting confused about the state of the (now two)
-  internal breakpoints we place.
+* Normal single stepping is much more predictable, since it won't land the
+  debugger into an interrupt handler, so it is much more usable.
 
-  Otherwise it will leave them in the kernel code segment, when continuing
-  which triggers a guest kernel panic as soon as it skips over the 'int3'
-  instruction and executes the garbage tail of the optcode on which
-  the breakpoint was placed.
+  (If entry to an interrupt handler is desired, the user can still place a
+  breakpoint at it and resume the guest, which won't activate this workaround
+  and let the gdb still stop at the interrupt handler)
+
+Since this change is only active when guest is debugged, it won't affect
+KVM running normal 'production' VMs.
+
 
 Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+Tested-by: Stefano Garzarella <sgarzare@redhat.com>
 ---
- kernel/module.c              |   8 ++-
- scripts/gdb/linux/symbols.py | 106 +++++++++++++++++++++++++----------
- 2 files changed, 83 insertions(+), 31 deletions(-)
+ arch/x86/kvm/x86.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-diff --git a/kernel/module.c b/kernel/module.c
-index 30479355ab850..ea81fc06ea1f5 100644
---- a/kernel/module.c
-+++ b/kernel/module.c
-@@ -901,8 +901,12 @@ int module_refcount(struct module *mod)
- }
- EXPORT_SYMBOL(module_refcount);
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index a9d95f90a0487..b75d990fcf12b 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -8458,6 +8458,12 @@ static void inject_pending_event(struct kvm_vcpu *vcpu, bool *req_immediate_exit
+ 		can_inject = false;
+ 	}
  
--/* This exists whether we can unload or not */
--static void free_module(struct module *mod);
-+/* This exists whether we can unload or not
-+ * Keep it uninlined to provide a reliable breakpoint target,
-+ * e.g. for the gdb helper command 'lx-symbols'.
-+ */
++	/*
++	 * Don't inject interrupts while single stepping to make guest debug easier
++	 */
++	if (vcpu->guest_debug & KVM_GUESTDBG_SINGLESTEP)
++		return;
 +
-+static noinline void free_module(struct module *mod);
- 
- SYSCALL_DEFINE2(delete_module, const char __user *, name_user,
- 		unsigned int, flags)
-diff --git a/scripts/gdb/linux/symbols.py b/scripts/gdb/linux/symbols.py
-index 1be9763cf8bb2..4ce879548a1ae 100644
---- a/scripts/gdb/linux/symbols.py
-+++ b/scripts/gdb/linux/symbols.py
-@@ -17,6 +17,24 @@ import re
- 
- from linux import modules, utils
- 
-+def save_state():
-+        breakpoints = []
-+        if hasattr(gdb, 'breakpoints') and not gdb.breakpoints() is None:
-+            for bp in gdb.breakpoints():
-+                breakpoints.append({'breakpoint': bp, 'enabled': bp.enabled})
-+                bp.enabled = False
-+
-+        show_pagination = gdb.execute("show pagination", to_string=True)
-+        pagination = show_pagination.endswith("on.\n")
-+        gdb.execute("set pagination off")
-+
-+        return {"breakpoints":breakpoints, "show_pagination": show_pagination}
-+
-+def load_state(state):
-+    for breakpoint in state["breakpoints"]:
-+        breakpoint['breakpoint'].enabled = breakpoint['enabled']
-+    gdb.execute("set pagination %s" % ("on" if state["show_pagination"] else "off"))
-+
- 
- if hasattr(gdb, 'Breakpoint'):
-     class LoadModuleBreakpoint(gdb.Breakpoint):
-@@ -30,26 +48,38 @@ if hasattr(gdb, 'Breakpoint'):
-             module_name = module['name'].string()
-             cmd = self.gdb_command
- 
-+            # module already loaded, false alarm
-+            if module_name in cmd.loaded_modules:
-+                return False
-+
-             # enforce update if object file is not found
-             cmd.module_files_updated = False
- 
-             # Disable pagination while reporting symbol (re-)loading.
-             # The console input is blocked in this context so that we would
-             # get stuck waiting for the user to acknowledge paged output.
--            show_pagination = gdb.execute("show pagination", to_string=True)
--            pagination = show_pagination.endswith("on.\n")
--            gdb.execute("set pagination off")
-+            state = save_state()
-+            cmd.load_module_symbols(module)
-+            load_state(state)
-+            return False
- 
--            if module_name in cmd.loaded_modules:
--                gdb.write("refreshing all symbols to reload module "
--                          "'{0}'\n".format(module_name))
--                cmd.load_all_symbols()
--            else:
--                cmd.load_module_symbols(module)
-+    class UnLoadModuleBreakpoint(gdb.Breakpoint):
-+        def __init__(self, spec, gdb_command):
-+            super(UnLoadModuleBreakpoint, self).__init__(spec, internal=True)
-+            self.silent = True
-+            self.gdb_command = gdb_command
-+
-+        def stop(self):
-+            module = gdb.parse_and_eval("mod")
-+            module_name = module['name'].string()
-+            cmd = self.gdb_command
- 
--            # restore pagination state
--            gdb.execute("set pagination %s" % ("on" if pagination else "off"))
-+            if not module_name in cmd.loaded_modules:
-+                return False
- 
-+            state = save_state()
-+            cmd.unload_module_symbols(module)
-+            load_state(state)
-             return False
- 
- 
-@@ -64,8 +94,9 @@ lx-symbols command."""
-     module_paths = []
-     module_files = []
-     module_files_updated = False
--    loaded_modules = []
--    breakpoint = None
-+    loaded_modules = {}
-+    module_load_breakpoint = None
-+    module_unload_breakpoint = None
- 
-     def __init__(self):
-         super(LxSymbols, self).__init__("lx-symbols", gdb.COMMAND_FILES,
-@@ -129,21 +160,32 @@ lx-symbols command."""
-                 filename=module_file,
-                 addr=module_addr,
-                 sections=self._section_arguments(module))
-+
-             gdb.execute(cmdline, to_string=True)
--            if module_name not in self.loaded_modules:
--                self.loaded_modules.append(module_name)
-+            self.loaded_modules[module_name] = {"module_file": module_file,
-+                                                "module_addr": module_addr}
-         else:
-             gdb.write("no module object found for '{0}'\n".format(module_name))
- 
-+    def unload_module_symbols(self, module):
-+        module_name = module['name'].string()
-+
-+        module_file = self.loaded_modules[module_name]["module_file"]
-+        module_addr = self.loaded_modules[module_name]["module_addr"]
-+
-+        gdb.write("unloading @{addr}: {filename}\n".format(
-+            addr=module_addr, filename=module_file))
-+        cmdline = "remove-symbol-file {filename}".format(
-+            filename=module_file)
-+
-+        gdb.execute(cmdline, to_string=True)
-+        del self.loaded_modules[module_name]
-+
-+
-     def load_all_symbols(self):
-         gdb.write("loading vmlinux\n")
- 
--        # Dropping symbols will disable all breakpoints. So save their states
--        # and restore them afterward.
--        saved_states = []
--        if hasattr(gdb, 'breakpoints') and not gdb.breakpoints() is None:
--            for bp in gdb.breakpoints():
--                saved_states.append({'breakpoint': bp, 'enabled': bp.enabled})
-+        state = save_state()
- 
-         # drop all current symbols and reload vmlinux
-         orig_vmlinux = 'vmlinux'
-@@ -153,15 +195,14 @@ lx-symbols command."""
-         gdb.execute("symbol-file", to_string=True)
-         gdb.execute("symbol-file {0}".format(orig_vmlinux))
- 
--        self.loaded_modules = []
-+        self.loaded_modules = {}
-         module_list = modules.module_list()
-         if not module_list:
-             gdb.write("no modules found\n")
-         else:
-             [self.load_module_symbols(module) for module in module_list]
- 
--        for saved_state in saved_states:
--            saved_state['breakpoint'].enabled = saved_state['enabled']
-+        load_state(state)
- 
-     def invoke(self, arg, from_tty):
-         self.module_paths = [os.path.expanduser(p) for p in arg.split()]
-@@ -174,11 +215,18 @@ lx-symbols command."""
-         self.load_all_symbols()
- 
-         if hasattr(gdb, 'Breakpoint'):
--            if self.breakpoint is not None:
--                self.breakpoint.delete()
--                self.breakpoint = None
--            self.breakpoint = LoadModuleBreakpoint(
--                "kernel/module.c:do_init_module", self)
-+            if self.module_load_breakpoint is not None:
-+                self.module_load_breakpoint.delete()
-+                self.module_load_breakpoint = None
-+            self.module_load_breakpoint = \
-+                LoadModuleBreakpoint("kernel/module.c:do_init_module", self)
-+
-+            if self.module_unload_breakpoint is not None:
-+                self.module_unload_breakpoint.delete()
-+                self.module_unload_breakpoint = None
-+            self.module_unload_breakpoint = \
-+                UnLoadModuleBreakpoint("kernel/module.c:free_module", self)
-+
-         else:
-             gdb.write("Note: symbol update on module loading not supported "
-                       "with this gdb version\n")
+ 	/*
+ 	 * Finally, inject interrupt events.  If an event cannot be injected
+ 	 * due to architectural conditions (e.g. IF=0) a window-open exit
 -- 
 2.26.2
 
