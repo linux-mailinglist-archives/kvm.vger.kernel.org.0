@@ -2,122 +2,99 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6EB1E33C357
-	for <lists+kvm@lfdr.de>; Mon, 15 Mar 2021 18:07:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DBD5533C38F
+	for <lists+kvm@lfdr.de>; Mon, 15 Mar 2021 18:09:54 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234781AbhCORGt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 15 Mar 2021 13:06:49 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:37764 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234621AbhCORGN (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 15 Mar 2021 13:06:13 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1615827972;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=J/vGkdsnQYAk+OhLsLeLAuUC9tdXLy1WCBIdxzujSVI=;
-        b=X+GpsOWsgmKVOoIpjJfKLLpA5ZjVfuwrHDnqjrWQsQ/4QLkP3hFJrya8dDJ8ivvVxq6SxW
-        mLDYQhiPFAsNCw6M91WfRzZtlLvsnDaaLYqk36HsR+hilvtIMnfDWov/DlI80cmUrfrxiM
-        BN85rxxL/pkqwSqjbWBzoCCdRblB2HM=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-601-ltupJhzgMg-LyfQOOHLbqg-1; Mon, 15 Mar 2021 13:06:11 -0400
-X-MC-Unique: ltupJhzgMg-LyfQOOHLbqg-1
-Received: by mail-wr1-f71.google.com with SMTP id i5so15365894wrp.8
-        for <kvm@vger.kernel.org>; Mon, 15 Mar 2021 10:06:10 -0700 (PDT)
+        id S235193AbhCORJ1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 15 Mar 2021 13:09:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58046 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234621AbhCORJM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 15 Mar 2021 13:09:12 -0400
+Received: from mail-io1-xd29.google.com (mail-io1-xd29.google.com [IPv6:2607:f8b0:4864:20::d29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A8F22C06175F
+        for <kvm@vger.kernel.org>; Mon, 15 Mar 2021 10:09:10 -0700 (PDT)
+Received: by mail-io1-xd29.google.com with SMTP id 81so34147174iou.11
+        for <kvm@vger.kernel.org>; Mon, 15 Mar 2021 10:09:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=PM0AOv7hR2q7y6qMzYZR/71bbo2GAhaoJjNSG+Jn9vI=;
+        b=XPVddlj/y9FfagcJIbWAAqZ3K8DsC1HETVSpnea00/4CXVu4LWPuBklrfJjIaw5r2g
+         PoVpawn/vSW5ZDVCgGFCI3w6ubw86AtUhIBdr1DoOrF/ZVwV3/ImN9I3kTp6RjGPR7cT
+         Clyo/B4oGI8gyDMlwW31NFSz5gFoQOtG+yN+L8SN8fzkDRWJkxRN8FH/DX7QRCTCxM/A
+         oNkMos357ahqhb7wgx7eqQnBAupzYwqY9NgJn49bt73nQdn5FvAI8RBsygXvvtCOAEz3
+         XBJY1JQf58qtNMP6fCZKOHfyWXh7Fi2CKpYzg60DlMt9MFRLA7AlxjgDy/vD3j3ytDF+
+         Ex6w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=J/vGkdsnQYAk+OhLsLeLAuUC9tdXLy1WCBIdxzujSVI=;
-        b=CPO0Wut0Cb7U6AYrpjG1hmZCuXNBGoR/pB9Oj/ImKf624awzWX0aYJuCI/F13pkNKz
-         H5qv0qmhnT0l/VMlNkDY5mMd1Wz7h5yLKYcgKmq0FIgA7STqM8+5oSi58zw53FdDnkop
-         qpkjeMBIilNN2GXqRX8QUtlsC1U/W3xmDk3IW+5hqPbSOsdPWxVFwTlhoCIH64k8oG4a
-         WGoARJlhTSyejfTkqy/c+3q8mhaTMM7TPhwAR7aKcketlH524HAwrz2YfkJ7x0rVyoT1
-         ihz2J+SWwso8DcKzJrp5+2FIz9M22iqqAgJA/FGyI3TJL6RgWqNau8WI/bVtcRsIcpHB
-         OxzQ==
-X-Gm-Message-State: AOAM530k9E6J/YU/miqvjKkcDFo9w7qfxe+2Rcyu6kwcL3f4K9ZbYfq7
-        CCoJffM9g35b8p2D9QDxstwCXQeWLi6tnWEn5DDPUoP4lz2MqNnqdjSMQdYoE+QEXc8upc3d94/
-        NE3SQ+Q/KB78+
-X-Received: by 2002:adf:fb05:: with SMTP id c5mr661763wrr.302.1615827970006;
-        Mon, 15 Mar 2021 10:06:10 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzB2RlJqBtvYUnzW0bm+UEON3/wM1HGbq8FitDx5F3L0+jguIDUzug5Ca5xtj3gBuGabiQNOw==
-X-Received: by 2002:adf:fb05:: with SMTP id c5mr661748wrr.302.1615827969836;
-        Mon, 15 Mar 2021 10:06:09 -0700 (PDT)
-Received: from steredhat (host-79-34-249-199.business.telecomitalia.it. [79.34.249.199])
-        by smtp.gmail.com with ESMTPSA id l22sm19448508wrb.4.2021.03.15.10.06.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 15 Mar 2021 10:06:09 -0700 (PDT)
-Date:   Mon, 15 Mar 2021 18:06:07 +0100
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     Laurent Vivier <lvivier@redhat.com>
-Cc:     virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        Xie Yongji <xieyongji@bytedance.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        linux-kernel@vger.kernel.org, Max Gurtovoy <mgurtovoy@nvidia.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Parav Pandit <parav@nvidia.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>, kvm@vger.kernel.org
-Subject: Re: [PATCH v4 06/14] vringh: add vringh_kiov_length() helper
-Message-ID: <20210315170607.3lajkedzkxa4elmr@steredhat>
-References: <20210315163450.254396-1-sgarzare@redhat.com>
- <20210315163450.254396-7-sgarzare@redhat.com>
- <b06eb44c-d4e5-e47c-fbf5-26be469aae9e@redhat.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=PM0AOv7hR2q7y6qMzYZR/71bbo2GAhaoJjNSG+Jn9vI=;
+        b=skQkrCy/W7/aOCjFk4kuyMxrysqb9pUyI2YAy1rBONOSGGe6StObulPHLGzoAau5In
+         6jkZ1Egi9UH/0oi5+MtO3gEtqwIS3Oz4OVHhIJAuY6zeKKUZiJhzA+g2VBi9nQZ4l1OA
+         xTAuEkY3XLLzvYnKCESB13ljG8ISQ9jwmAjHh0PtkXEod+B4a5nQUcBWUfAK/GEv+/TK
+         paFhKc2eeptKk34PRlmlRDVvnALTeWEgUeeCi50ia8IHX6/Rd1pzron8Klui0/x35OxG
+         zO3m50UrKGAoD1KjtDUDz1Zb/+j9gCq1J83w7e0mErYbA2eVeH7GdpzunJGBomB3En8W
+         uSVw==
+X-Gm-Message-State: AOAM532luospTyLrrDq0fj9OEn/t5sxXq2zxjENRc6i5jqGrHD1RlK+I
+        bdPKfNyEPWEnX21RpqN7Dmv2uO565/E1SvLU0g+USpg4dGI=
+X-Google-Smtp-Source: ABdhPJwo0RLf07s4jCWFCOBKdsbS3gt1d6KD2G+UGPHhDUd6hNzjV9TWdeVk+RyqVLPTMceCsBlrLVTGl4DHnqIUjVc=
+X-Received: by 2002:a6b:7f4d:: with SMTP id m13mr426365ioq.134.1615828149903;
+ Mon, 15 Mar 2021 10:09:09 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <b06eb44c-d4e5-e47c-fbf5-26be469aae9e@redhat.com>
+References: <20210311231658.1243953-1-bgardon@google.com> <20210311231658.1243953-2-bgardon@google.com>
+ <YEuKx6ZveaT5RgAs@google.com> <cc472f99-f9f0-8a63-c38b-31a650b4a39c@redhat.com>
+In-Reply-To: <cc472f99-f9f0-8a63-c38b-31a650b4a39c@redhat.com>
+From:   Ben Gardon <bgardon@google.com>
+Date:   Mon, 15 Mar 2021 10:08:59 -0700
+Message-ID: <CANgfPd9SeD4Vt3MW5HsipvrZmYsO8XyP4bU=ni7u8Ws84rXKzA@mail.gmail.com>
+Subject: Re: [PATCH 1/4] KVM: x86/mmu: Fix RCU usage in handle_removed_tdp_mmu_page
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
+        Peter Shier <pshier@google.com>,
+        Jim Mattson <jmattson@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Mar 15, 2021 at 05:51:30PM +0100, Laurent Vivier wrote:
->On 15/03/2021 17:34, Stefano Garzarella wrote:
->> This new helper returns the total number of bytes covered by
->> a vringh_kiov.
->>
->> Suggested-by: Jason Wang <jasowang@redhat.com>
->> Acked-by: Jason Wang <jasowang@redhat.com>
->> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
->> ---
->>  include/linux/vringh.h | 11 +++++++++++
->>  1 file changed, 11 insertions(+)
->>
->> diff --git a/include/linux/vringh.h b/include/linux/vringh.h
->> index 755211ebd195..84db7b8f912f 100644
->> --- a/include/linux/vringh.h
->> +++ b/include/linux/vringh.h
->> @@ -199,6 +199,17 @@ static inline void vringh_kiov_cleanup(struct vringh_kiov *kiov)
->>  	kiov->iov = NULL;
->>  }
->>
->> +static inline size_t vringh_kiov_length(struct vringh_kiov *kiov)
->> +{
->> +	size_t len = 0;
->> +	int i;
->> +
->> +	for (i = kiov->i; i < kiov->used; i++)
->> +		len += kiov->iov[i].iov_len;
->> +
->> +	return len;
->> +}
+On Fri, Mar 12, 2021 at 7:43 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
 >
->Do we really need an helper?
+> On 12/03/21 16:37, Sean Christopherson wrote:
+> > On Thu, Mar 11, 2021, Ben Gardon wrote:
+> >> The pt passed into handle_removed_tdp_mmu_page does not need RCU
+> >> protection, as it is not at any risk of being freed by another thread at
+> >> that point. However, the implicit cast from tdp_sptep_t to u64 * dropped
+> >> the __rcu annotation without a proper rcu_derefrence. Fix this by
+> >> passing the pt as a tdp_ptep_t and then rcu_dereferencing it in
+> >> the function.
+> >>
+> >> Suggested-by: Sean Christopherson <seanjc@google.com>
+> >> Reported-by: kernel test robot <lkp@xxxxxxxxx>
+> >
+> > Should be <lkp@intel.com>.  Looks like you've been taking pointers from Paolo :-)
+
+I'll update that in v2. I was a little confused because I was looking
+at the report archived on Spinics, where all the domains are xxxxxxxx.
+Didn't notice that all the emails had been redacted like that.
+
+
 >
->For instance, we can use:
+> The day someone starts confusing employers in CCs you should tell them
+> "I see you have constructed a new email sending alias.  Your skills are
+> now complete".
 >
->len = iov_length((struct iovec *)kiov->iov, kiov->used);
+> Paolo
 >
->Or do we want to avoid the cast?
-
-Yes, that should be fine. If we want, I can remove the helper and use 
-iov_length() directly. I thought vringh wanted to hide iovec from users 
-though.
-
-Anyway talking to Jason, as a long term solution we should reconsider 
-vringh and support iov_iter.
-
-Thanks,
-Stefano
-
+> > https://lkml.org/lkml/2019/6/17/1210
+> >
+> > Other than that,
+> >
+> > Reviewed-by: Sean Christopherson <seanjc@google.com>
+> >
+> >> Signed-off-by: Ben Gardon <bgardon@google.com>
+> >
+>
