@@ -2,88 +2,107 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8E0B233ACCA
-	for <lists+kvm@lfdr.de>; Mon, 15 Mar 2021 08:53:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E15EE33AD79
+	for <lists+kvm@lfdr.de>; Mon, 15 Mar 2021 09:32:01 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230205AbhCOHwn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 15 Mar 2021 03:52:43 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:39052 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230227AbhCOHwi (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 15 Mar 2021 03:52:38 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1615794758;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=M3VcyCK15wuo7OnaOdUlq2bza4tGVkBBmoXXTmML6Bg=;
-        b=hnaksWImQGfRmAj4ejiiuviZ9A/5QcjPsO/kdgDZ/JbnnIAxlxLNVUB4BarHUPrrBoLO4X
-        qmvo5k37X6G9xiK6CzmIPBvCEwzYaehXskskF6r8Bz4XNGH/3y7wFuXUTcwX1LsFuibuNl
-        x36PH6X9UPTWRPy34dMpwAjdRd8T/eQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-425-QbWxkMulMV6r7TYiz1r-2A-1; Mon, 15 Mar 2021 03:52:35 -0400
-X-MC-Unique: QbWxkMulMV6r7TYiz1r-2A-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        id S229536AbhCOIb2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 15 Mar 2021 04:31:28 -0400
+Received: from mail.kernel.org ([198.145.29.99]:57022 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229494AbhCOIaz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 15 Mar 2021 04:30:55 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 57C5983DD26;
-        Mon, 15 Mar 2021 07:52:33 +0000 (UTC)
-Received: from [10.36.112.254] (ovpn-112-254.ams2.redhat.com [10.36.112.254])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id B094410023BE;
-        Mon, 15 Mar 2021 07:52:29 +0000 (UTC)
-Subject: Re: [PATCH 15/17] iommu: remove DOMAIN_ATTR_NESTING
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
-        Li Yang <leoyang.li@nxp.com>, freedreno@lists.freedesktop.org,
-        kvm@vger.kernel.org, Michael Ellerman <mpe@ellerman.id.au>,
-        linuxppc-dev@lists.ozlabs.org, dri-devel@lists.freedesktop.org,
-        virtualization@lists.linux-foundation.org,
-        iommu@lists.linux-foundation.org, netdev@vger.kernel.org,
-        linux-arm-msm@vger.kernel.org,
-        David Woodhouse <dwmw2@infradead.org>,
-        linux-arm-kernel@lists.infradead.org
-References: <20210301084257.945454-1-hch@lst.de>
- <20210301084257.945454-16-hch@lst.de>
- <3e8f1078-9222-0017-3fa8-4d884dbc848e@redhat.com>
- <20210314155813.GA788@lst.de>
-From:   Auger Eric <eric.auger@redhat.com>
-Message-ID: <3a1194de-a053-84dd-3d6a-bff8e01ebcd3@redhat.com>
-Date:   Mon, 15 Mar 2021 08:52:28 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.7.0
+        by mail.kernel.org (Postfix) with ESMTPSA id 2795A64E89;
+        Mon, 15 Mar 2021 08:30:55 +0000 (UTC)
+Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+        (Exim 4.94)
+        (envelope-from <maz@kernel.org>)
+        id 1lLicn-001bcl-2Z; Mon, 15 Mar 2021 08:30:53 +0000
 MIME-Version: 1.0
-In-Reply-To: <20210314155813.GA788@lst.de>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Content-Type: text/plain; charset=UTF-8;
+ format=flowed
+Content-Transfer-Encoding: 8bit
+Date:   Mon, 15 Mar 2021 08:30:52 +0000
+From:   Marc Zyngier <maz@kernel.org>
+To:     Shenming Lu <lushenming@huawei.com>
+Cc:     Eric Auger <eric.auger@redhat.com>, Will Deacon <will@kernel.org>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
+        wanghaibin.wang@huawei.com, yuzenghui@huawei.com
+Subject: Re: [PATCH v4 5/6] KVM: arm64: GICv4.1: Restore VLPI pending state to
+ physical side
+In-Reply-To: <20210313083900.234-6-lushenming@huawei.com>
+References: <20210313083900.234-1-lushenming@huawei.com>
+ <20210313083900.234-6-lushenming@huawei.com>
+User-Agent: Roundcube Webmail/1.4.11
+Message-ID: <d9047922808df340feca2f257cfb8a3d@kernel.org>
+X-Sender: maz@kernel.org
+X-SA-Exim-Connect-IP: 51.254.78.96
+X-SA-Exim-Rcpt-To: lushenming@huawei.com, eric.auger@redhat.com, will@kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, alex.williamson@redhat.com, cohuck@redhat.com, lorenzo.pieralisi@arm.com, wanghaibin.wang@huawei.com, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Christoph,
-
-On 3/14/21 4:58 PM, Christoph Hellwig wrote:
-> On Sun, Mar 14, 2021 at 11:44:52AM +0100, Auger Eric wrote:
->> As mentionned by Robin, there are series planning to use
->> DOMAIN_ATTR_NESTING to get info about the nested caps of the iommu (ARM
->> and Intel):
->>
->> [Patch v8 00/10] vfio: expose virtual Shared Virtual Addressing to VMs
->> patches 1, 2, 3
->>
->> Is the plan to introduce a new domain_get_nesting_info ops then?
+On 2021-03-13 08:38, Shenming Lu wrote:
+> From: Zenghui Yu <yuzenghui@huawei.com>
 > 
-> The plan as usual would be to add it the series adding that support.
-> Not sure what the merge plans are - if the series is ready to be
-> merged I could rebase on top of it, otherwise that series will need
-> to add the method.
-OK I think your series may be upstreamed first.
-
-Thanks
-
-Eric
+> When setting the forwarding path of a VLPI (switch to the HW mode),
+> we can also transfer the pending state from irq->pending_latch to
+> VPT (especially in migration, the pending states of VLPIs are restored
+> into kvm’s vgic first). And we currently send "INT+VSYNC" to trigger
+> a VLPI to pending.
 > 
+> Signed-off-by: Zenghui Yu <yuzenghui@huawei.com>
+> Signed-off-by: Shenming Lu <lushenming@huawei.com>
+> ---
+>  arch/arm64/kvm/vgic/vgic-v4.c | 18 ++++++++++++++++++
+>  1 file changed, 18 insertions(+)
+> 
+> diff --git a/arch/arm64/kvm/vgic/vgic-v4.c 
+> b/arch/arm64/kvm/vgic/vgic-v4.c
+> index ac029ba3d337..3b82ab80c2f3 100644
+> --- a/arch/arm64/kvm/vgic/vgic-v4.c
+> +++ b/arch/arm64/kvm/vgic/vgic-v4.c
+> @@ -449,6 +449,24 @@ int kvm_vgic_v4_set_forwarding(struct kvm *kvm, 
+> int virq,
+>  	irq->host_irq	= virq;
+>  	atomic_inc(&map.vpe->vlpi_count);
+> 
+> +	/* Transfer pending state */
+> +	if (irq->pending_latch) {
+> +		unsigned long flags;
+> +
+> +		ret = irq_set_irqchip_state(irq->host_irq,
+> +					    IRQCHIP_STATE_PENDING,
+> +					    irq->pending_latch);
+> +		WARN_RATELIMIT(ret, "IRQ %d", irq->host_irq);
+> +
+> +		/*
+> +		 * Clear pending_latch and communicate this state
+> +		 * change via vgic_queue_irq_unlock.
+> +		 */
+> +		raw_spin_lock_irqsave(&irq->irq_lock, flags);
+> +		irq->pending_latch = false;
+> +		vgic_queue_irq_unlock(kvm, irq, flags);
+> +	}
+> +
+>  out:
+>  	mutex_unlock(&its->its_lock);
+>  	return ret;
 
+The read side of the pending state isn't locked, but the write side is.
+I'd rather you lock the whole sequence for peace of mind.
+
+Thanks,
+
+         M.
+-- 
+Jazz is not dead. It just smells funny...
