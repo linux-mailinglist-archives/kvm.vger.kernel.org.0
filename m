@@ -2,108 +2,132 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D2A1F33BE4D
-	for <lists+kvm@lfdr.de>; Mon, 15 Mar 2021 15:51:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 31CF533BF8F
+	for <lists+kvm@lfdr.de>; Mon, 15 Mar 2021 16:16:36 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238206AbhCOOpD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 15 Mar 2021 10:45:03 -0400
-Received: from youngberry.canonical.com ([91.189.89.112]:37478 "EHLO
-        youngberry.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238681AbhCOOou (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 15 Mar 2021 10:44:50 -0400
-Received: from mail-ed1-f71.google.com ([209.85.208.71])
-        by youngberry.canonical.com with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        (Exim 4.86_2)
-        (envelope-from <christian.brauner@canonical.com>)
-        id 1lLoSe-00061a-Bi
-        for kvm@vger.kernel.org; Mon, 15 Mar 2021 14:44:48 +0000
-Received: by mail-ed1-f71.google.com with SMTP id i6so16158956edq.12
-        for <kvm@vger.kernel.org>; Mon, 15 Mar 2021 07:44:48 -0700 (PDT)
+        id S231452AbhCOPQD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 15 Mar 2021 11:16:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60974 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231604AbhCOPPc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 15 Mar 2021 11:15:32 -0400
+Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 84A46C06174A
+        for <kvm@vger.kernel.org>; Mon, 15 Mar 2021 08:15:32 -0700 (PDT)
+Received: by mail-pj1-x102e.google.com with SMTP id lr1-20020a17090b4b81b02900ea0a3f38c1so2105480pjb.0
+        for <kvm@vger.kernel.org>; Mon, 15 Mar 2021 08:15:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=29tlbpBidLiX7cZGeLgeOwEsi9aLcqGPG2CxmfByAsQ=;
+        b=G70Yi+HZ7xQs8CVYSesF7lAmPjStzjs1y2vz86ytp/moWZPMOjyu5kDS2vRMASm7TC
+         eYkptyylr9YmpYCXc541zduhUa5bjGaDikfNvXgW25K/aivRZmB3DxnwTgEyEM5+SNcG
+         4y2RYGB60pM6GWjqf8yyr1JodFbkJZBROVT+PNIPtRN1iFin52czM+TWVuKISmfa5KZU
+         kN4FWw3MA1dFnVAdFpXnaPaA0gYhmSnhQqoec3l38kyI7WxlVJq6gKB4YstXw20q9npo
+         og7Soan1r30+kXGpZXXShyJOdwelsknDbjsfxtnd/1GokjN46GBlgD5/2c5Q1r7cOz4n
+         XjIA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=/rOw6JMsy5TmcuNfXsdMbz1wU7+IrDSNfY1nK4kmqAI=;
-        b=qa1gQrh3GYOUqP/Q2MQ7eblUVsyTVTZ/VyXHpJiZSmtwVEDPb3n821gBBgcePn2GzA
-         BowzN43cR8mr59hvrH4VrUAwccIaZ4GQJXxXUlf1X6RvmbgPLK4GFOkN2ZJ2vTDELHFN
-         +B0Qmmw9LnGtXkwQZE/97r+O361Z7Rzpw77xClqPTDOPnGw56/E8p4JF7p1rjp1IUp21
-         cOgSUVLO0TdcIZNoufNvUZK2WMZ5/Rez94ijyVtDC2e6PnOQPHkL01nuY0nTjwViunFf
-         iLxgK6Ceh1iMTuDCdCKomb1EYZAWeaIDp672WQsibtc3SJs8+k+ZQCP+ZdJRXEDVwwFj
-         6oVQ==
-X-Gm-Message-State: AOAM53229LOIh7rxcFpTrEatjyMtHp2YYtPClRvfhJarhOFdMWzbGC01
-        sHg9o73FdW1Ay8fCVpDYidXGPm0u4S6woTOjKHQen6pZ8z8TS23pt97GwHEGQfmJSbjsKucCvEn
-        3qDhRsjIq5+czedeGWu+9j4aFzlc0Qg==
-X-Received: by 2002:a17:906:e16:: with SMTP id l22mr23860026eji.173.1615819487933;
-        Mon, 15 Mar 2021 07:44:47 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyX850jlad2N9FOS0qZRXIsOYQvuD87/PkQkWtiWY3kY5mGjEJZj64Syjg1iARAIS5QEMLnoA==
-X-Received: by 2002:a17:906:e16:: with SMTP id l22mr23860009eji.173.1615819487785;
-        Mon, 15 Mar 2021 07:44:47 -0700 (PDT)
-Received: from gmail.com (ip5f5af0a0.dynamic.kabel-deutschland.de. [95.90.240.160])
-        by smtp.gmail.com with ESMTPSA id e4sm7443229ejz.4.2021.03.15.07.44.45
+        bh=29tlbpBidLiX7cZGeLgeOwEsi9aLcqGPG2CxmfByAsQ=;
+        b=JJ5aQS9M6eUTX1HGOJn3o5i3k9+ms2689rGtEMOWURFmczPNEggXfbwSAJ3jJUXhw2
+         oM0qduhvHWxd7b7fCttGJZlqIT+IzGF34qXZbw4TEQAjjVwDcnoW+Eb3kz9wNgRzX8TT
+         9mGB3cOCOG0R/OhdW2yr3a4ZLWMVz8nFUSSl8yICNg7U3jldojVSOyHznDuKRTCuUxjb
+         DCqNb7fXLpZGI+SBbS3cfdYI4dreE4ykGb96FP3fD8+aQvV6qB1p2dH25QsW+D0+/ouO
+         ZLUUdkQChvPLxIlSSycwBWc9hEVxAghBBQc41z2ychrIMswh6UnyyEAz4YWUCs/8wRuO
+         supA==
+X-Gm-Message-State: AOAM533LiYZr4o6G9/z3p9/pmJJZ3MQONuoF0WW7GDJUZmroTIsgyVtg
+        zqFAWsE6T98QWr5DqpzZvLBJSQ==
+X-Google-Smtp-Source: ABdhPJw0Wp2wjRR9CitnPrjcB1f6eX+nzwALcNAzjhks9pfylM6xEeSY/z9JaS56JUgekOlamOBRbA==
+X-Received: by 2002:a17:902:c154:b029:e5:e7cf:9627 with SMTP id 20-20020a170902c154b02900e5e7cf9627mr11785530plj.68.1615821331929;
+        Mon, 15 Mar 2021 08:15:31 -0700 (PDT)
+Received: from google.com ([2620:15c:f:10:3d60:4c70:d756:da57])
+        by smtp.gmail.com with ESMTPSA id h14sm11725077pjc.37.2021.03.15.08.15.30
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 15 Mar 2021 07:44:47 -0700 (PDT)
-Date:   Mon, 15 Mar 2021 15:44:44 +0100
-From:   Christian Brauner <christian.brauner@canonical.com>
-To:     Yongji Xie <xieyongji@bytedance.com>
-Cc:     Christoph Hellwig <hch@infradead.org>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        Parav Pandit <parav@nvidia.com>, Bob Liu <bob.liu@oracle.com>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Matthew Wilcox <willy@infradead.org>, viro@zeniv.linux.org.uk,
-        Jens Axboe <axboe@kernel.dk>, bcrl@kvack.org,
-        Jonathan Corbet <corbet@lwn.net>,
-        Mika =?utf-8?B?UGVudHRpbMOk?= <mika.penttila@nextfour.com>,
-        Dan Carpenter <dan.carpenter@oracle.com>,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        kvm@vger.kernel.org, linux-fsdevel@vger.kernel.org
-Subject: Re: [PATCH v5 01/11] file: Export __receive_fd() to modules
-Message-ID: <20210315144444.bgtllddee7s55lfx@gmail.com>
-References: <20210315053721.189-1-xieyongji@bytedance.com>
- <20210315053721.189-2-xieyongji@bytedance.com>
- <20210315090822.GA4166677@infradead.org>
- <CACycT3vrHOExXj6v8ULvUzdLcRkdzS5=TNK6=g4+RWEdN-nOJw@mail.gmail.com>
+        Mon, 15 Mar 2021 08:15:31 -0700 (PDT)
+Date:   Mon, 15 Mar 2021 08:15:24 -0700
+From:   Sean Christopherson <seanjc@google.com>
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Marcelo Tosatti <mtosatti@redhat.com>
+Subject: Re: [PATCH 3/4] KVM: x86: hyper-v: Track Hyper-V TSC page status
+Message-ID: <YE96DDyEZ3zVgb8p@google.com>
+References: <20210315143706.859293-1-vkuznets@redhat.com>
+ <20210315143706.859293-4-vkuznets@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CACycT3vrHOExXj6v8ULvUzdLcRkdzS5=TNK6=g4+RWEdN-nOJw@mail.gmail.com>
+In-Reply-To: <20210315143706.859293-4-vkuznets@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Mar 15, 2021 at 05:46:43PM +0800, Yongji Xie wrote:
-> On Mon, Mar 15, 2021 at 5:08 PM Christoph Hellwig <hch@infradead.org> wrote:
-> >
-> > On Mon, Mar 15, 2021 at 01:37:11PM +0800, Xie Yongji wrote:
-> > > Export __receive_fd() so that some modules can use
-> > > it to pass file descriptor between processes.
-> >
-> > I really don't think any non-core code should do that, especilly not
-> > modular mere driver code.
+On Mon, Mar 15, 2021, Vitaly Kuznetsov wrote:
+> Create an infrastructure for tracking Hyper-V TSC page status, i.e. if it
+> was updated from guest/host side or if we've failed to set it up (because
+> e.g. guest wrote some garbage to HV_X64_MSR_REFERENCE_TSC) and there's no
+> need to retry.
 > 
-> Do you see any issue? Now I think we're able to do that with the help
-> of get_unused_fd_flags() and fd_install() in modules. But we may miss
-> some security stuff in this way. So I try to export __receive_fd() and
-> use it instead.
+> Also, in a hypothetical situation when we are in 'always catchup' mode for
+> TSC we can now avoid contending 'hv->hv_lock' on every guest enter by
+> setting the state to HV_TSC_PAGE_BROKEN after compute_tsc_page_parameters()
+> returns false.
+> 
+> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+> ---
+> diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
+> index eefb85b86fe8..2a8d078b16cb 100644
+> --- a/arch/x86/kvm/hyperv.c
+> +++ b/arch/x86/kvm/hyperv.c
+> @@ -1087,7 +1087,7 @@ void kvm_hv_setup_tsc_page(struct kvm *kvm,
+>  	BUILD_BUG_ON(sizeof(tsc_seq) != sizeof(hv->tsc_ref.tsc_sequence));
+>  	BUILD_BUG_ON(offsetof(struct ms_hyperv_tsc_page, tsc_sequence) != 0);
+>  
+> -	if (!(hv->hv_tsc_page & HV_X64_MSR_TSC_REFERENCE_ENABLE))
+> +	if (hv->hv_tsc_page_status == HV_TSC_PAGE_BROKEN)
+>  		return;
+>  
+>  	mutex_lock(&hv->hv_lock);
 
-The __receive_fd() helper was added for core-kernel code only and we
-mainly did it for the seccomp notifier (and scm rights). The "__" prefix
-was intended to convey that message.
-And I agree with Christoph that we should probably keep it that way
-since __receive_fd() allows a few operations that no driver should
-probably do.
-I can see it being kinda ok to export a variant that really only
-receives and installs an fd, i.e. if we were to export what's currently
-available as an inline helper:
+...
 
-static inline int receive_fd(struct file *file, unsigned int o_flags)
+> @@ -1133,6 +1133,12 @@ void kvm_hv_setup_tsc_page(struct kvm *kvm,
+>  	hv->tsc_ref.tsc_sequence = tsc_seq;
+>  	kvm_write_guest(kvm, gfn_to_gpa(gfn),
+>  			&hv->tsc_ref, sizeof(hv->tsc_ref.tsc_sequence));
+> +
+> +	hv->hv_tsc_page_status = HV_TSC_PAGE_SET;
+> +	goto out_unlock;
+> +
+> +out_err:
+> +	hv->hv_tsc_page_status = HV_TSC_PAGE_BROKEN;
+>  out_unlock:
+>  	mutex_unlock(&hv->hv_lock);
+>  }
+> @@ -1193,8 +1199,13 @@ static int kvm_hv_set_msr_pw(struct kvm_vcpu *vcpu, u32 msr, u64 data,
+>  	}
+>  	case HV_X64_MSR_REFERENCE_TSC:
+>  		hv->hv_tsc_page = data;
+> -		if (hv->hv_tsc_page & HV_X64_MSR_TSC_REFERENCE_ENABLE)
+> +		if (hv->hv_tsc_page & HV_X64_MSR_TSC_REFERENCE_ENABLE) {
+> +			if (!host)
+> +				hv->hv_tsc_page_status = HV_TSC_PAGE_GUEST_CHANGED;
+> +			else
+> +				hv->hv_tsc_page_status = HV_TSC_PAGE_HOST_CHANGED;
 
-but definitely none of the fd replacement stuff; that shold be
-off-limits. The seccomp notifier is the only codepath that should even
-think about fd replacement since it's about managing the syscalls of
-another task. Drivers swapping out fds doesn't sound like a good idea to
-me.
+Writing the status without taking hv->hv_lock could cause the update to be lost,
+e.g. if a different vCPU fails kvm_hv_setup_tsc_page() at the same time, its
+write to set status to HV_TSC_PAGE_BROKEN would race with this write.
 
-Christian
+>  			kvm_make_request(KVM_REQ_MASTERCLOCK_UPDATE, vcpu);
+> +		}
+>  		break;
+>  	case HV_X64_MSR_CRASH_P0 ... HV_X64_MSR_CRASH_P4:
+>  		return kvm_hv_msr_set_crash_data(kvm,
+> -- 
+> 2.30.2
+> 
