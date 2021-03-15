@@ -2,172 +2,115 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B7D9833B4F1
-	for <lists+kvm@lfdr.de>; Mon, 15 Mar 2021 14:52:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 10D8733BD87
+	for <lists+kvm@lfdr.de>; Mon, 15 Mar 2021 15:38:38 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229688AbhCONv6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 15 Mar 2021 09:51:58 -0400
-Received: from mail.kernel.org ([198.145.29.99]:54874 "EHLO mail.kernel.org"
+        id S237288AbhCOOg4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 15 Mar 2021 10:36:56 -0400
+Received: from mail.kernel.org ([198.145.29.99]:32822 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229524AbhCONvn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 15 Mar 2021 09:51:43 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id D8A0964D9E;
-        Mon, 15 Mar 2021 13:51:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1615816303;
-        bh=+BIlPAZ2Vr8nw75QH4LHz5LqpPdXI0+6isk0ygUkL3U=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=qseNXZnkK9rROY8OB4iQubMB9JDLhkaaxooFBeEKM3coajSvaULa/u/T2t/OU94t0
-         oMUqB5PGbYDCDI8WAgJjDKaL3aDDs5M/d4s5FL5NTSrOIBkjSMeuqPv2p44doO+nDQ
-         RDTxKT0dZSxzrC1CFS8CVDY9zj1BpSedcWtY7EvZIOKOwQxkG/jqDM8PYQIZh2V9bR
-         QYwdkupTIRNmpqVhuTcOtcb2Kse1+BObzwSJxRtBqvQ5i080CHfN7gulShypikw5dG
-         gNHh8Me63fkQSJfj/uQ+f47fRRLW0HJhWukjym3ERxXOG/gEzrbBYhsFk4bm5UHC2n
-         wchXdu6VelJUg==
-Date:   Mon, 15 Mar 2021 15:51:17 +0200
-From:   Jarkko Sakkinen <jarkko@kernel.org>
-To:     Kai Huang <kai.huang@intel.com>
-Cc:     Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org,
-        linux-sgx@vger.kernel.org, x86@kernel.org,
-        linux-kernel@vger.kernel.org, luto@kernel.org,
-        dave.hansen@intel.com, rick.p.edgecombe@intel.com,
-        haitao.huang@intel.com, pbonzini@redhat.com, bp@alien8.de,
-        tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com
-Subject: Re: [PATCH v2 07/25] x86/sgx: Initialize virtual EPC driver even
- when SGX driver is disabled
-Message-ID: <YE9mVUF0KOPNSfA9@kernel.org>
-References: <cover.1615250634.git.kai.huang@intel.com>
- <d2ebcffeb9193d26a1305e08fe1aa1347feb1c62.1615250634.git.kai.huang@intel.com>
- <YEvg2vNfiDYoc9u3@google.com>
- <YE0M/VoETPw7YZIy@kernel.org>
- <YE0NeChRjBlldQ8H@kernel.org>
- <YE4M8JGGl9Xyx51/@kernel.org>
- <YE4rVnfQ9y7CnVvr@kernel.org>
- <20210315161317.9c72479dfcde4e22078abcd2@intel.com>
- <YE9beKYDaG1sMWq+@kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YE9beKYDaG1sMWq+@kernel.org>
+        id S236423AbhCOOgk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 15 Mar 2021 10:36:40 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 3788465012;
+        Mon, 15 Mar 2021 14:36:39 +0000 (UTC)
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94)
+        (envelope-from <maz@kernel.org>)
+        id 1lLoKg-001hZH-Dt; Mon, 15 Mar 2021 14:36:36 +0000
+Date:   Mon, 15 Mar 2021 14:36:33 +0000
+Message-ID: <87czw0fpqm.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Andre Przywara <andre.przywara@arm.com>,
+        Andrew Scull <ascull@google.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Christoffer Dall <christoffer.dall@arm.com>,
+        Howard Zhang <Howard.Zhang@arm.com>,
+        Jia He <justin.he@arm.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Quentin Perret <qperret@google.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Will Deacon <will@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        "kernel-team@android.com" <kernel-team@android.com>,
+        "linux-arm-kernel@lists.infradead.org" 
+        <linux-arm-kernel@lists.infradead.org>,
+        "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Subject: Re: [PATCH 7/8] KVM: arm64: Workaround firmware wrongly advertising GICv2-on-v3 compatibility
+In-Reply-To: <d38d4dc684f94221bdf5ca35b8f66cfc@huawei.com>
+References: <87eegtzbch.wl-maz@kernel.org>
+        <20210305185254.3730990-1-maz@kernel.org>
+        <20210305185254.3730990-8-maz@kernel.org>
+        <d38d4dc684f94221bdf5ca35b8f66cfc@huawei.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: shameerali.kolothum.thodi@huawei.com, pbonzini@redhat.com, alexandru.elisei@arm.com, andre.przywara@arm.com, ascull@google.com, catalin.marinas@arm.com, christoffer.dall@arm.com, Howard.Zhang@arm.com, justin.he@arm.com, mark.rutland@arm.com, qperret@google.com, suzuki.poulose@arm.com, will@kernel.org, james.morse@arm.com, julien.thierry.kdev@gmail.com, kernel-team@android.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Mar 15, 2021 at 03:04:59PM +0200, Jarkko Sakkinen wrote:
-> On Mon, Mar 15, 2021 at 04:13:17PM +1300, Kai Huang wrote:
-> > On Sun, 14 Mar 2021 17:27:18 +0200 Jarkko Sakkinen wrote:
-> > > On Sun, Mar 14, 2021 at 05:25:26PM +0200, Jarkko Sakkinen wrote:
-> > > > On Sat, Mar 13, 2021 at 09:07:36PM +0200, Jarkko Sakkinen wrote:
-> > > > > On Sat, Mar 13, 2021 at 09:05:36PM +0200, Jarkko Sakkinen wrote:
-> > > > > > On Fri, Mar 12, 2021 at 01:44:58PM -0800, Sean Christopherson wrote:
-> > > > > > > On Tue, Mar 09, 2021, Kai Huang wrote:
-> > > > > > > > Modify sgx_init() to always try to initialize the virtual EPC driver,
-> > > > > > > > even if the SGX driver is disabled.  The SGX driver might be disabled
-> > > > > > > > if SGX Launch Control is in locked mode, or not supported in the
-> > > > > > > > hardware at all.  This allows (non-Linux) guests that support non-LC
-> > > > > > > > configurations to use SGX.
-> > > > > > > > 
-> > > > > > > > Acked-by: Dave Hansen <dave.hansen@intel.com>
-> > > > > > > > Signed-off-by: Kai Huang <kai.huang@intel.com>
-> > > > > > > > ---
-> > > > > > > >  arch/x86/kernel/cpu/sgx/main.c | 10 +++++++++-
-> > > > > > > >  1 file changed, 9 insertions(+), 1 deletion(-)
-> > > > > > > > 
-> > > > > > > > diff --git a/arch/x86/kernel/cpu/sgx/main.c b/arch/x86/kernel/cpu/sgx/main.c
-> > > > > > > > index 44fe91a5bfb3..8c922e68274d 100644
-> > > > > > > > --- a/arch/x86/kernel/cpu/sgx/main.c
-> > > > > > > > +++ b/arch/x86/kernel/cpu/sgx/main.c
-> > > > > > > > @@ -712,7 +712,15 @@ static int __init sgx_init(void)
-> > > > > > > >  		goto err_page_cache;
-> > > > > > > >  	}
-> > > > > > > >  
-> > > > > > > > -	ret = sgx_drv_init();
-> > > > > > > > +	/*
-> > > > > > > > +	 * Always try to initialize the native *and* KVM drivers.
-> > > > > > > > +	 * The KVM driver is less picky than the native one and
-> > > > > > > > +	 * can function if the native one is not supported on the
-> > > > > > > > +	 * current system or fails to initialize.
-> > > > > > > > +	 *
-> > > > > > > > +	 * Error out only if both fail to initialize.
-> > > > > > > > +	 */
-> > > > > > > > +	ret = !!sgx_drv_init() & !!sgx_vepc_init();
-> > > > > > > 
-> > > > > > > I love this code.
-> > > > > > > 
-> > > > > > > Reviewed-by: Sean Christopherson <seanjc@google.com>
-> > > > > > 
-> > > > > > I'm still wondering why this code let's go through when sgx_drv_init()
-> > > > > > succeeds and sgx_vepc_init() fails.
-> > > > > > 
-> > > > > > The inline comment explains only the mirrored case (which does make
-> > > > > > sense).
-> > > > > 
-> > > > > I.e. if sgx_drv_init() succeeds, I'd expect that sgx_vepc_init() must
-> > > > > succeed. Why expect legitly anything else?
-> > > >  
-> > > > Apologies coming with these ideas at this point, but here is what this
-> > > > led me.
-> > > > 
-> > > > I think that the all this complexity comes from a bad code structure.
-> > > > 
-> > > > So, what is essentially happening here:
-> > > > 
-> > > > - We essentially want to make EPC always work.
-> > > > - Driver optionally.
-> > > > 
-> > > > So what this sums to is something like:
-> > > > 
-> > > >         ret = sgx_epc_init();
-> > > >         if (ret) {
-> > > >                 pr_err("EPC initialization failed.\n");
-> > > >                 return ret;
-> > > >         }
-> > > > 
-> > > >         ret = sgx_drv_init();
-> > > >         if (ret)
-> > > >                 pr_info("Driver could not be initialized.\n");
-> > > > 
-> > > >         /* continue */
-> > > > 
-> > > > I.e. I think there should be a single EPC init, which does both EPC
-> > > > bootstrapping and vepc, and driver initialization comes after that.
-> > > 
-> > > In other words, from SGX point of view, the thing that KVM needs is
-> > > to cut out EPC and driver part into different islands. How this is now
-> > > implemented in the current patch set is half-way there but not yet what
-> > > it should be.
-> > 
-> > Well conceptually, SGX virtualization and SGX driver are two independently
-> > functionalities can be enabled separately, although they both requires some
-> > come functionalities, such as /dev/sgx_provision, which we have moved to
-> > sgx/main.c exactly for this purpose. THerefore, conceptually, it is bad to make
-> > assumption that, if SGX virtualization initialization succeeded, SGX driver
-> > must succeed -- we can potentially add more staff in SGX virtualization in the
-> > future..
-> > 
-> > If the name sgx_vepc_init() confuses you, I can rename it to sgx_virt_init().
+On Mon, 15 Mar 2021 12:55:42 +0000,
+Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com> wrote:
 > 
-> I don't understand what would be the bad thing here. Can you open that
-> up please? I'm neither capable of predicting the future...
+> 
+> 
+> > -----Original Message-----
+> > From: Marc Zyngier [mailto:maz@kernel.org]
+> > Sent: 05 March 2021 18:53
+> > To: Paolo Bonzini <pbonzini@redhat.com>
+> > Cc: Alexandru Elisei <alexandru.elisei@arm.com>; Andre Przywara
+> > <andre.przywara@arm.com>; Andrew Scull <ascull@google.com>; Catalin
+> > Marinas <catalin.marinas@arm.com>; Christoffer Dall
+> > <christoffer.dall@arm.com>; Howard Zhang <Howard.Zhang@arm.com>; Jia
+> > He <justin.he@arm.com>; Mark Rutland <mark.rutland@arm.com>; Quentin
+> > Perret <qperret@google.com>; Shameerali Kolothum Thodi
+> > <shameerali.kolothum.thodi@huawei.com>; Suzuki K Poulose
+> > <suzuki.poulose@arm.com>; Will Deacon <will@kernel.org>; James Morse
+> > <james.morse@arm.com>; Julien Thierry <julien.thierry.kdev@gmail.com>;
+> > kernel-team@android.com; linux-arm-kernel@lists.infradead.org;
+> > kvmarm@lists.cs.columbia.edu; kvm@vger.kernel.org
+> > Subject: [PATCH 7/8] KVM: arm64: Workaround firmware wrongly advertising
+> > GICv2-on-v3 compatibility
+> > 
+> > It looks like we have broken firmware out there that wrongly advertises
+> > a GICv2 compatibility interface, despite the CPUs not being able to deal
+> > with it.
+> > 
+> > To work around this, check that the CPU initialising KVM is actually able
+> > to switch to MMIO instead of system registers, and use that as a
+> > precondition to enable GICv2 compatibility in KVM.
+> > 
+> > Note that the detection happens on a single CPU. If the firmware is
+> > lying *and* that the CPUs are asymetric, all hope is lost anyway.
+> > 
+> > Reported-by: Shameerali Kolothum Thodi
+> > <shameerali.kolothum.thodi@huawei.com>
+> > Tested-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> 
+> Is it possible to add stable tag for this? Looks like we do have
+> systems out there and reports issues.
 
-Right, so since vepc_init() does only just device file initialization the
-current function structure is fine. I totally forgot that sgx_drv_init()
-does not call EPC initialization when I wrote the above :-) We refactored
-during the inital cycle the driver so many times that I sometimes fix up
-thing, sorry about.
+It is already merged. Which kernel versions do you need that for? In
+any case, please submit the backports, and I'll review them.
 
-To meld this into code:
+Thanks,
 
-        ret = sgx_vepc_init();
-        if (ret != -ENODEV) {
-                pr_err("vEPC initialization failed with %d.\n", ret);
-                return ret;
-        }
+	M.
 
-        ret = sgx_drv_init();
-        if (ret != ENODEV)
-                pr_info("Driver initialization failed %d.\n", ret);
-
-This would also give more accurate information how far the initialization
-went.
-
-/Jarkko
+-- 
+Without deviation from the norm, progress is not possible.
