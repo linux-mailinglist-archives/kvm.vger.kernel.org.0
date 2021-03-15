@@ -2,235 +2,204 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DD2FC33B2BB
-	for <lists+kvm@lfdr.de>; Mon, 15 Mar 2021 13:28:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5298B33B31A
+	for <lists+kvm@lfdr.de>; Mon, 15 Mar 2021 13:56:55 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229518AbhCOM16 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 15 Mar 2021 08:27:58 -0400
-Received: from foss.arm.com ([217.140.110.172]:37236 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229878AbhCOM1t (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 15 Mar 2021 08:27:49 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id F2B84D6E;
-        Mon, 15 Mar 2021 05:27:48 -0700 (PDT)
-Received: from slackpad.fritz.box (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C727F3F792;
-        Mon, 15 Mar 2021 05:27:47 -0700 (PDT)
-Date:   Mon, 15 Mar 2021 12:27:34 +0000
-From:   Andre Przywara <andre.przywara@arm.com>
-To:     Alexandru Elisei <alexandru.elisei@arm.com>
-Cc:     Will Deacon <will@kernel.org>,
+        id S229588AbhCOM4X convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Mon, 15 Mar 2021 08:56:23 -0400
+Received: from frasgout.his.huawei.com ([185.176.79.56]:2698 "EHLO
+        frasgout.his.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229614AbhCOMzw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 15 Mar 2021 08:55:52 -0400
+Received: from fraeml744-chm.china.huawei.com (unknown [172.18.147.207])
+        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4Dzbpk4qbmz67yxm;
+        Mon, 15 Mar 2021 20:49:34 +0800 (CST)
+Received: from lhreml721-chm.china.huawei.com (10.201.108.72) by
+ fraeml744-chm.china.huawei.com (10.206.15.225) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2106.2; Mon, 15 Mar 2021 13:55:43 +0100
+Received: from lhreml710-chm.china.huawei.com (10.201.108.61) by
+ lhreml721-chm.china.huawei.com (10.201.108.72) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2106.2; Mon, 15 Mar 2021 12:55:43 +0000
+Received: from lhreml710-chm.china.huawei.com ([169.254.81.184]) by
+ lhreml710-chm.china.huawei.com ([169.254.81.184]) with mapi id
+ 15.01.2106.013; Mon, 15 Mar 2021 12:55:43 +0000
+From:   Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+To:     Marc Zyngier <maz@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>
+CC:     Alexandru Elisei <alexandru.elisei@arm.com>,
+        Andre Przywara <andre.przywara@arm.com>,
+        Andrew Scull <ascull@google.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Christoffer Dall <christoffer.dall@arm.com>,
+        Howard Zhang <Howard.Zhang@arm.com>,
+        Jia He <justin.he@arm.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Quentin Perret <qperret@google.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Will Deacon <will@kernel.org>,
+        James Morse <james.morse@arm.com>,
         Julien Thierry <julien.thierry.kdev@gmail.com>,
-        kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
-        Marc Zyngier <maz@kernel.org>,
-        Sami Mujawar <sami.mujawar@arm.com>
-Subject: Re: [PATCH kvmtool v2 21/22] hw/serial: ARM/arm64: Use MMIO at
- higher addresses
-Message-ID: <20210315122734.6ae4063b@slackpad.fritz.box>
-In-Reply-To: <cac73e1d-7240-695e-5769-78f191429621@arm.com>
-References: <20210225005915.26423-1-andre.przywara@arm.com>
-        <20210225005915.26423-22-andre.przywara@arm.com>
-        <cac73e1d-7240-695e-5769-78f191429621@arm.com>
-Organization: Arm Ltd.
-X-Mailer: Claws Mail 3.17.1 (GTK+ 2.24.31; x86_64-slackware-linux-gnu)
+        "kernel-team@android.com" <kernel-team@android.com>,
+        "linux-arm-kernel@lists.infradead.org" 
+        <linux-arm-kernel@lists.infradead.org>,
+        "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Subject: RE: [PATCH 7/8] KVM: arm64: Workaround firmware wrongly advertising
+ GICv2-on-v3 compatibility
+Thread-Topic: [PATCH 7/8] KVM: arm64: Workaround firmware wrongly advertising
+ GICv2-on-v3 compatibility
+Thread-Index: AQHXEfDNrYnyjo3A40aH4g7YcYymu6qFD7Yw
+Date:   Mon, 15 Mar 2021 12:55:42 +0000
+Message-ID: <d38d4dc684f94221bdf5ca35b8f66cfc@huawei.com>
+References: <87eegtzbch.wl-maz@kernel.org>
+ <20210305185254.3730990-1-maz@kernel.org>
+ <20210305185254.3730990-8-maz@kernel.org>
+In-Reply-To: <20210305185254.3730990-8-maz@kernel.org>
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.47.84.80]
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 9 Mar 2021 16:02:20 +0000
-Alexandru Elisei <alexandru.elisei@arm.com> wrote:
 
-> Hi Andre,
+
+> -----Original Message-----
+> From: Marc Zyngier [mailto:maz@kernel.org]
+> Sent: 05 March 2021 18:53
+> To: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: Alexandru Elisei <alexandru.elisei@arm.com>; Andre Przywara
+> <andre.przywara@arm.com>; Andrew Scull <ascull@google.com>; Catalin
+> Marinas <catalin.marinas@arm.com>; Christoffer Dall
+> <christoffer.dall@arm.com>; Howard Zhang <Howard.Zhang@arm.com>; Jia
+> He <justin.he@arm.com>; Mark Rutland <mark.rutland@arm.com>; Quentin
+> Perret <qperret@google.com>; Shameerali Kolothum Thodi
+> <shameerali.kolothum.thodi@huawei.com>; Suzuki K Poulose
+> <suzuki.poulose@arm.com>; Will Deacon <will@kernel.org>; James Morse
+> <james.morse@arm.com>; Julien Thierry <julien.thierry.kdev@gmail.com>;
+> kernel-team@android.com; linux-arm-kernel@lists.infradead.org;
+> kvmarm@lists.cs.columbia.edu; kvm@vger.kernel.org
+> Subject: [PATCH 7/8] KVM: arm64: Workaround firmware wrongly advertising
+> GICv2-on-v3 compatibility
 > 
-> I think you forgot to change the way the address is generated in
-> serial8250_generate_fdt_node, it's still KVM_IOPORT_AREA + dev->iobase. It's
-> technically correct, as KVM_IOPORT_AREA == ARM_IOPORT_AREA == 0x0, but very
-> confusing (and prone to breakage is something changes in the memory layout).
-
-So I moved the addition of KVM_IOPORT_AREA into the definition of
-serial_iobase() (at the beginning of the file). This means I can remove
-it below, and just use dev->iobase as is.
-
-> One more comment below.
+> It looks like we have broken firmware out there that wrongly advertises
+> a GICv2 compatibility interface, despite the CPUs not being able to deal
+> with it.
 > 
-> On 2/25/21 12:59 AM, Andre Przywara wrote:
-> > Using the UART devices at their legacy I/O addresses as set by IBM in
-> > 1981 was a kludge we used for simplicity on ARM platforms as well.
-> > However this imposes problems due to their missing alignment and overlap
-> > with the PCI I/O address space.
-> >
-> > Now that we can switch a device easily between using ioports and MMIO,
-> > let's move the UARTs out of the first 4K of memory on ARM platforms.
-> >
-> > That should be transparent for well behaved guests, since the change is
-> > naturally reflected in the device tree. Even "earlycon" keeps working,
-> > as the stdout-path property is adjusted automatically.
-> >
-> > People providing direct earlycon parameters via the command line need to
-> > adjust it to: "earlycon=uart,mmio,0x1000000".
-> >
-> > Signed-off-by: Andre Przywara <andre.przywara@arm.com>
-> > ---
-> >  arm/include/arm-common/kvm-arch.h |  3 +++
-> >  hw/serial.c                       | 45 ++++++++++++++++++++-----------
-> >  2 files changed, 32 insertions(+), 16 deletions(-)
-> >
-> > diff --git a/arm/include/arm-common/kvm-arch.h b/arm/include/arm-common/kvm-arch.h
-> > index b12255b0..633ea8fa 100644
-> > --- a/arm/include/arm-common/kvm-arch.h
-> > +++ b/arm/include/arm-common/kvm-arch.h
-> > @@ -28,6 +28,9 @@
-> >  #define ARM_IOPORT_SIZE		(1U << 16)
-> >  
-> >  
-> > +#define ARM_UART_MMIO_BASE	ARM_MMIO_AREA
-> > +#define ARM_UART_MMIO_SIZE	0x10000
-> > +
-> >  #define KVM_FLASH_MMIO_BASE	(ARM_MMIO_AREA + 0x1000000)
-> >  #define KVM_FLASH_MAX_SIZE	0x1000000
-> >  
-> > diff --git a/hw/serial.c b/hw/serial.c
-> > index 4be188a1..1854add2 100644
-> > --- a/hw/serial.c
-> > +++ b/hw/serial.c
-> > @@ -13,6 +13,17 @@
-> >  
-> >  #include <pthread.h>
-> >  
-> > +#if defined(CONFIG_ARM) || defined(CONFIG_ARM64)
-> > +#define serial_iobase(nr)	(ARM_UART_MMIO_BASE + (nr) * 0x1000)
-> > +#define serial_irq(nr)		(32 + (nr))
-> > +#define SERIAL8250_BUS_TYPE	DEVICE_BUS_MMIO
-> > +#else
-> > +#define serial_iobase(nr)	((((nr) & 1) ? 0x200 : 0x300) +	\
-> > +				 ((nr) >= 2 ? 0xe8 : 0xf8))
-> > +#define serial_irq(nr)		(((nr) & 1) ? 3 : 4)  
+> To work around this, check that the CPU initialising KVM is actually able
+> to switch to MMIO instead of system registers, and use that as a
+> precondition to enable GICv2 compatibility in KVM.
 > 
-> Those two defines are hard to read, is there a reason for changing them from v1?
-> They looked a lot more readable in v1.
-
-Oh, good catch, must have been a rebase artefact, from the very first
-draft version I had. Fixed that.
-
-Cheers,
-Andre
-
+> Note that the detection happens on a single CPU. If the firmware is
+> lying *and* that the CPUs are asymetric, all hope is lost anyway.
 > 
-> > +#define SERIAL8250_BUS_TYPE	DEVICE_BUS_IOPORT
-> > +#endif
-> > +
-> >  /*
-> >   * This fakes a U6_16550A. The fifo len needs to be 64 as the kernel
-> >   * expects that for autodetection.
-> > @@ -27,7 +38,7 @@ struct serial8250_device {
-> >  	struct mutex		mutex;
-> >  	u8			id;
-> >  
-> > -	u16			iobase;
-> > +	u32			iobase;
-> >  	u8			irq;
-> >  	u8			irq_state;
-> >  	int			txcnt;
-> > @@ -65,56 +76,56 @@ static struct serial8250_device devices[] = {
-> >  	/* ttyS0 */
-> >  	[0]	= {
-> >  		.dev_hdr = {
-> > -			.bus_type	= DEVICE_BUS_IOPORT,
-> > +			.bus_type	= SERIAL8250_BUS_TYPE,
-> >  			.data		= serial8250_generate_fdt_node,
-> >  		},
-> >  		.mutex			= MUTEX_INITIALIZER,
-> >  
-> >  		.id			= 0,
-> > -		.iobase			= 0x3f8,
-> > -		.irq			= 4,
-> > +		.iobase			= serial_iobase(0),
-> > +		.irq			= serial_irq(0),
-> >  
-> >  		SERIAL_REGS_SETTING
-> >  	},
-> >  	/* ttyS1 */
-> >  	[1]	= {
-> >  		.dev_hdr = {
-> > -			.bus_type	= DEVICE_BUS_IOPORT,
-> > +			.bus_type	= SERIAL8250_BUS_TYPE,
-> >  			.data		= serial8250_generate_fdt_node,
-> >  		},
-> >  		.mutex			= MUTEX_INITIALIZER,
-> >  
-> >  		.id			= 1,
-> > -		.iobase			= 0x2f8,
-> > -		.irq			= 3,
-> > +		.iobase			= serial_iobase(1),
-> > +		.irq			= serial_irq(1),
-> >  
-> >  		SERIAL_REGS_SETTING
-> >  	},
-> >  	/* ttyS2 */
-> >  	[2]	= {
-> >  		.dev_hdr = {
-> > -			.bus_type	= DEVICE_BUS_IOPORT,
-> > +			.bus_type	= SERIAL8250_BUS_TYPE,
-> >  			.data		= serial8250_generate_fdt_node,
-> >  		},
-> >  		.mutex			= MUTEX_INITIALIZER,
-> >  
-> >  		.id			= 2,
-> > -		.iobase			= 0x3e8,
-> > -		.irq			= 4,
-> > +		.iobase			= serial_iobase(2),
-> > +		.irq			= serial_irq(2),
-> >  
-> >  		SERIAL_REGS_SETTING
-> >  	},
-> >  	/* ttyS3 */
-> >  	[3]	= {
-> >  		.dev_hdr = {
-> > -			.bus_type	= DEVICE_BUS_IOPORT,
-> > +			.bus_type	= SERIAL8250_BUS_TYPE,
-> >  			.data		= serial8250_generate_fdt_node,
-> >  		},
-> >  		.mutex			= MUTEX_INITIALIZER,
-> >  
-> >  		.id			= 3,
-> > -		.iobase			= 0x2e8,
-> > -		.irq			= 3,
-> > +		.iobase			= serial_iobase(3),
-> > +		.irq			= serial_irq(3),
-> >  
-> >  		SERIAL_REGS_SETTING
-> >  	},
-> > @@ -439,7 +450,8 @@ static int serial8250__device_init(struct kvm *kvm,
-> >  		return r;
-> >  
-> >  	ioport__map_irq(&dev->irq);
-> > -	r = kvm__register_pio(kvm, dev->iobase, 8, serial8250_mmio, dev);
-> > +	r = kvm__register_iotrap(kvm, dev->iobase, 8, serial8250_mmio, dev,
-> > +				 SERIAL8250_BUS_TYPE);
-> >  
-> >  	return r;
-> >  }
-> > @@ -462,7 +474,7 @@ cleanup:
-> >  	for (j = 0; j <= i; j++) {
-> >  		struct serial8250_device *dev = &devices[j];
-> >  
-> > -		kvm__deregister_pio(kvm, dev->iobase);
-> > +		kvm__deregister_iotrap(kvm, dev->iobase, SERIAL8250_BUS_TYPE);
-> >  		device__unregister(&dev->dev_hdr);
-> >  	}
-> >  
-> > @@ -478,7 +490,8 @@ int serial8250__exit(struct kvm *kvm)
-> >  	for (i = 0; i < ARRAY_SIZE(devices); i++) {
-> >  		struct serial8250_device *dev = &devices[i];
-> >  
-> > -		r = kvm__deregister_pio(kvm, dev->iobase);
-> > +		r = kvm__deregister_iotrap(kvm, dev->iobase,
-> > +					   SERIAL8250_BUS_TYPE);
-> >  		if (r < 0)
-> >  			return r;
-> >  		device__unregister(&dev->dev_hdr);  
+> Reported-by: Shameerali Kolothum Thodi
+> <shameerali.kolothum.thodi@huawei.com>
+> Tested-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+
+Is it possible to add stable tag for this? Looks like we do have systems out there
+and reports issues.
+
+Thanks,
+Shameer
+
+> ---
+>  arch/arm64/kvm/hyp/vgic-v3-sr.c | 35 +++++++++++++++++++++++++++++++--
+>  arch/arm64/kvm/vgic/vgic-v3.c   |  8 ++++++--
+>  2 files changed, 39 insertions(+), 4 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/hyp/vgic-v3-sr.c
+> b/arch/arm64/kvm/hyp/vgic-v3-sr.c
+> index 005daa0c9dd7..ee3682b9873c 100644
+> --- a/arch/arm64/kvm/hyp/vgic-v3-sr.c
+> +++ b/arch/arm64/kvm/hyp/vgic-v3-sr.c
+> @@ -408,11 +408,42 @@ void __vgic_v3_init_lrs(void)
+>  /*
+>   * Return the GIC CPU configuration:
+>   * - [31:0]  ICH_VTR_EL2
+> - * - [63:32] RES0
+> + * - [62:32] RES0
+> + * - [63]    MMIO (GICv2) capable
+>   */
+>  u64 __vgic_v3_get_gic_config(void)
+>  {
+> -	return read_gicreg(ICH_VTR_EL2);
+> +	u64 val, sre = read_gicreg(ICC_SRE_EL1);
+> +	unsigned long flags = 0;
+> +
+> +	/*
+> +	 * To check whether we have a MMIO-based (GICv2 compatible)
+> +	 * CPU interface, we need to disable the system register
+> +	 * view. To do that safely, we have to prevent any interrupt
+> +	 * from firing (which would be deadly).
+> +	 *
+> +	 * Note that this only makes sense on VHE, as interrupts are
+> +	 * already masked for nVHE as part of the exception entry to
+> +	 * EL2.
+> +	 */
+> +	if (has_vhe())
+> +		flags = local_daif_save();
+> +
+> +	write_gicreg(0, ICC_SRE_EL1);
+> +	isb();
+> +
+> +	val = read_gicreg(ICC_SRE_EL1);
+> +
+> +	write_gicreg(sre, ICC_SRE_EL1);
+> +	isb();
+> +
+> +	if (has_vhe())
+> +		local_daif_restore(flags);
+> +
+> +	val  = (val & ICC_SRE_EL1_SRE) ? 0 : (1ULL << 63);
+> +	val |= read_gicreg(ICH_VTR_EL2);
+> +
+> +	return val;
+>  }
+> 
+>  u64 __vgic_v3_read_vmcr(void)
+> diff --git a/arch/arm64/kvm/vgic/vgic-v3.c b/arch/arm64/kvm/vgic/vgic-v3.c
+> index c3e6c3fd333b..6f530925a231 100644
+> --- a/arch/arm64/kvm/vgic/vgic-v3.c
+> +++ b/arch/arm64/kvm/vgic/vgic-v3.c
+> @@ -575,8 +575,10 @@ early_param("kvm-arm.vgic_v4_enable",
+> early_gicv4_enable);
+>  int vgic_v3_probe(const struct gic_kvm_info *info)
+>  {
+>  	u64 ich_vtr_el2 = kvm_call_hyp_ret(__vgic_v3_get_gic_config);
+> +	bool has_v2;
+>  	int ret;
+> 
+> +	has_v2 = ich_vtr_el2 >> 63;
+>  	ich_vtr_el2 = (u32)ich_vtr_el2;
+> 
+>  	/*
+> @@ -596,13 +598,15 @@ int vgic_v3_probe(const struct gic_kvm_info *info)
+>  			 gicv4_enable ? "en" : "dis");
+>  	}
+> 
+> +	kvm_vgic_global_state.vcpu_base = 0;
+> +
+>  	if (!info->vcpu.start) {
+>  		kvm_info("GICv3: no GICV resource entry\n");
+> -		kvm_vgic_global_state.vcpu_base = 0;
+> +	} else if (!has_v2) {
+> +		pr_warn(FW_BUG "CPU interface incapable of MMIO access\n");
+>  	} else if (!PAGE_ALIGNED(info->vcpu.start)) {
+>  		pr_warn("GICV physical address 0x%llx not page aligned\n",
+>  			(unsigned long long)info->vcpu.start);
+> -		kvm_vgic_global_state.vcpu_base = 0;
+>  	} else {
+>  		kvm_vgic_global_state.vcpu_base = info->vcpu.start;
+>  		kvm_vgic_global_state.can_emulate_gicv2 = true;
+> --
+> 2.29.2
 
