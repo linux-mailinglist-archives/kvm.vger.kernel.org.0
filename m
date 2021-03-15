@@ -2,209 +2,143 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7D6BB33CA08
-	for <lists+kvm@lfdr.de>; Tue, 16 Mar 2021 00:39:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7B3B733C9FE
+	for <lists+kvm@lfdr.de>; Tue, 16 Mar 2021 00:38:47 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233920AbhCOXiw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 15 Mar 2021 19:38:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57352 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233855AbhCOXiU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 15 Mar 2021 19:38:20 -0400
-Received: from mail-qt1-x849.google.com (mail-qt1-x849.google.com [IPv6:2607:f8b0:4864:20::849])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 45D9AC06174A
-        for <kvm@vger.kernel.org>; Mon, 15 Mar 2021 16:38:20 -0700 (PDT)
-Received: by mail-qt1-x849.google.com with SMTP id 11so2989479qtz.7
-        for <kvm@vger.kernel.org>; Mon, 15 Mar 2021 16:38:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
-         :cc;
-        bh=11SZDQJBmy0VS8yPygn+u5hc7CNk6/hYLjvA/ixucu0=;
-        b=rG5lIPXY7sBIpKzUZGcMtods8SGuaPQAv9qvd8H7hYAxrkmOsOLmd4VaYkgNjkhEN0
-         LUA08tC9LMR37CN5uIpOuYnPPwgzmmVgLFCQ+pOj2z3nrjfC4Z84JGq/JkUjcY3qdZBh
-         R9//mCSHxgPvw65JHXhgmrDL0/Uc9Z8mtr4zxCwWyZGEI45mOTzgYfc9jVQJxBxwIme7
-         T+sZB4XvgUMkqA6tNRl+4nxFvS9zPNjvX0/DfFxhfg7oMFfYY0RUGX28wrYgjJQNPg5s
-         TLYZOq3OkVz3VkWvc9+cMd8/Sr5Tz7jpu5gqijxX02ZbuW6PiSX85hnzREsgCKniBEvP
-         ckYg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=11SZDQJBmy0VS8yPygn+u5hc7CNk6/hYLjvA/ixucu0=;
-        b=aSZutstH5mibykTaKwCUls5FQzZ2AOkYWM0xxPqNDBz03GQx8GSN8hnC/pftMeuMjG
-         icFg+UwbU4/mmeA2rUNE/pR75MxTRScW3E3fB+ns617gPs7Dx9dDlyakJGDVnOlCecyp
-         KI6PprWXhJ+DeYeKqFzdf69KnksTDA3lJJvot+CeiVDU6h9Iubi5cfxdy7esdtxrTt9d
-         ko616FIj/QAXw4c/LtB2pO7Yi0JsxMvF4SydYrUzEZMiPuy+HS+gi573XjraQJLjl8n6
-         3lm2N4qs8SGy0thkDCTzbbh4ka74VSF5a/QLmCRTsybnQlYytZmnKXoi6qUmvRqReqHx
-         iCSg==
-X-Gm-Message-State: AOAM533U9ZnA2qnZHMjUrvn5ZYMpx+tHSymH0CviqO9UZZhYDZKT9uCy
-        WH3fW/9qZ3Wued4TEOMTYKvyigluPysz
-X-Google-Smtp-Source: ABdhPJwSenFacKz5nyVO1O2ghvdeWvx9MxHuAR2+UOa2ywCLFSI5UQu66PkXts972obleZLVwlB3KacIxA9l
-X-Received: from bgardon.sea.corp.google.com ([2620:15c:100:202:888a:4e22:67:844a])
- (user=bgardon job=sendgmr) by 2002:ad4:4d92:: with SMTP id
- cv18mr13122936qvb.5.1615851499416; Mon, 15 Mar 2021 16:38:19 -0700 (PDT)
-Date:   Mon, 15 Mar 2021 16:38:03 -0700
-In-Reply-To: <20210315233803.2706477-1-bgardon@google.com>
-Message-Id: <20210315233803.2706477-5-bgardon@google.com>
-Mime-Version: 1.0
-References: <20210315233803.2706477-1-bgardon@google.com>
-X-Mailer: git-send-email 2.31.0.rc2.261.g7f71774620-goog
-Subject: [PATCH v3 4/4] KVM: x86/mmu: Store the address space ID in the TDP iterator
-From:   Ben Gardon <bgardon@google.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Peter Shier <pshier@google.com>,
-        Jim Mattson <jmattson@google.com>,
-        kernel test robot <lkp@intel.com>,
-        Ben Gardon <bgardon@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        id S232677AbhCOXiP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 15 Mar 2021 19:38:15 -0400
+Received: from mga06.intel.com ([134.134.136.31]:47444 "EHLO mga06.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S233779AbhCOXhv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 15 Mar 2021 19:37:51 -0400
+IronPort-SDR: xC46zmYawu1Ti+Z7aGKkw/MlCzzWoVdaA2whKmWXYvwtAbCBHBkAF03p8BAxyVxF/wOVsHCNfM
+ nlRkqnXA2bFA==
+X-IronPort-AV: E=McAfee;i="6000,8403,9924"; a="250534644"
+X-IronPort-AV: E=Sophos;i="5.81,251,1610438400"; 
+   d="scan'208";a="250534644"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Mar 2021 16:37:51 -0700
+IronPort-SDR: Arp01YLngEKK/mATz7xeSEqowA0Khd72bSSt/H+r5puobLJP6QT2p1qIcoV2q13QyL/MIlM9d6
+ 1Agfyzc8fi9w==
+X-IronPort-AV: E=Sophos;i="5.81,251,1610438400"; 
+   d="scan'208";a="412010634"
+Received: from jacob-builder.jf.intel.com (HELO jacob-builder) ([10.7.199.155])
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Mar 2021 16:37:51 -0700
+Date:   Mon, 15 Mar 2021 16:40:12 -0700
+From:   Jacob Pan <jacob.jun.pan@intel.com>
+To:     Tejun Heo <tj@kernel.org>
+Cc:     Vipin Sharma <vipinsh@google.com>, mkoutny@suse.com,
+        rdunlap@infradead.org, thomas.lendacky@amd.com,
+        brijesh.singh@amd.com, jon.grimm@amd.com, eric.vantassell@amd.com,
+        pbonzini@redhat.com, hannes@cmpxchg.org, frankja@linux.ibm.com,
+        borntraeger@de.ibm.com, corbet@lwn.net, seanjc@google.com,
+        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
+        joro@8bytes.org, tglx@linutronix.de, mingo@redhat.com,
+        bp@alien8.de, hpa@zytor.com, gingell@google.com,
+        rientjes@google.com, dionnaglaze@google.com, kvm@vger.kernel.org,
+        x86@kernel.org, cgroups@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-kernel@vger.kernel.org, "Tian, Kevin" <kevin.tian@intel.com>,
+        "Liu, Yi L" <yi.l.liu@intel.com>,
+        "Raj, Ashok" <ashok.raj@intel.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Jason Gunthorpe <jgg@nvidia.com>,
+        Jacob Pan <jacob.jun.pan@linux.intel.com>,
+        "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
+        jacob.jun.pan@intel.com
+Subject: Re: [RFC v2 2/2] cgroup: sev: Miscellaneous cgroup documentation.
+Message-ID: <20210315164012.4adeabe8@jacob-builder>
+In-Reply-To: <YE/ddx5+ToNsgUF0@slm.duckdns.org>
+References: <20210303185513.27e18fce@jacob-builder>
+        <YEB8i6Chq4K/GGF6@google.com>
+        <YECfhCJtHUL9cB2L@slm.duckdns.org>
+        <20210312125821.22d9bfca@jacob-builder>
+        <YEvZ4muXqiSScQ8i@google.com>
+        <20210312145904.4071a9d6@jacob-builder>
+        <YEyR9181Qgzt+Ps9@mtj.duckdns.org>
+        <20210313085701.1fd16a39@jacob-builder>
+        <YEz+8HbfkbGgG5Tm@mtj.duckdns.org>
+        <20210315151155.383a7e6e@jacob-builder>
+        <YE/ddx5+ToNsgUF0@slm.duckdns.org>
+Organization: OTC
+X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Sean Christopherson <seanjc@google.com>
+Hi Tejun,
 
-Store the address space ID in the TDP iterator so that it can be
-retrieved without having to bounce through the root shadow page.  This
-streamlines the code and fixes a Sparse warning about not properly using
-rcu_dereference() when grabbing the ID from the root on the fly.
+On Mon, 15 Mar 2021 18:19:35 -0400, Tejun Heo <tj@kernel.org> wrote:
 
-Reported-by: kernel test robot <lkp@intel.com>
-Signed-off-by: Sean Christopherson <seanjc@google.com>
-Signed-off-by: Ben Gardon <bgardon@google.com>
----
- arch/x86/kvm/mmu/mmu_internal.h |  5 +++++
- arch/x86/kvm/mmu/tdp_iter.c     |  6 +-----
- arch/x86/kvm/mmu/tdp_iter.h     |  3 ++-
- arch/x86/kvm/mmu/tdp_mmu.c      | 23 +++++------------------
- 4 files changed, 13 insertions(+), 24 deletions(-)
+> Hello,
+> 
+> On Mon, Mar 15, 2021 at 03:11:55PM -0700, Jacob Pan wrote:
+> > > Migration itself doesn't have restrictions but all resources are
+> > > distributed on the same hierarchy, so the controllers are supposed to
+> > > follow the same conventions that can be implemented by all
+> > > controllers. 
+> > Got it, I guess that is the behavior required by the unified hierarchy.
+> > Cgroup v1 would be ok? But I am guessing we are not extending on v1?  
+> 
+> A new cgroup1 only controller is unlikely to be accpeted.
+> 
+> > The IOASIDs are programmed into devices to generate DMA requests tagged
+> > with them. The IOMMU has a per device IOASID table with each entry has
+> > two pointers:
+> >  - the PGD of the guest process.
+> >  - the PGD of the host process
+> > 
+> > The result of this 2 stage/nested translation is that we can share
+> > virtual address (SVA) between guest process and DMA. The host process
+> > needs to allocate multiple IOASIDs since one IOASID is needed for each
+> > guest process who wants SVA.
+> > 
+> > The DMA binding among device-IOMMU-process is setup via a series of user
+> > APIs (e.g. via VFIO).
+> > 
+> > If a process calls fork(), the children does not inherit the IOASIDs and
+> > their bindings. Children who wish to use SVA has to call those APIs to
+> > establish the binding for themselves.
+> > 
+> > Therefore, if a host process allocates 10 IOASIDs then does a
+> > fork()/clone(), it cannot charge 10 IOASIDs in the new cgroup. i.e. the
+> > 10 IOASIDs stays with the process wherever it goes.
+> > 
+> > I feel this fit in the domain model, true?  
+> 
+> I still don't get where migration is coming into the picture. Who's
+> migrating where?
+> 
+Sorry, perhaps I can explain by an example.
 
-diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_internal.h
-index ec4fc28b325a..1f6f98c76bdf 100644
---- a/arch/x86/kvm/mmu/mmu_internal.h
-+++ b/arch/x86/kvm/mmu/mmu_internal.h
-@@ -78,6 +78,11 @@ static inline struct kvm_mmu_page *sptep_to_sp(u64 *sptep)
- 	return to_shadow_page(__pa(sptep));
- }
- 
-+static inline int kvm_mmu_page_as_id(struct kvm_mmu_page *sp)
-+{
-+	return sp->role.smm ? 1 : 0;
-+}
-+
- static inline bool kvm_vcpu_ad_need_write_protect(struct kvm_vcpu *vcpu)
- {
- 	/*
-diff --git a/arch/x86/kvm/mmu/tdp_iter.c b/arch/x86/kvm/mmu/tdp_iter.c
-index f7f94ea65243..b3ed302c1a35 100644
---- a/arch/x86/kvm/mmu/tdp_iter.c
-+++ b/arch/x86/kvm/mmu/tdp_iter.c
-@@ -49,6 +49,7 @@ void tdp_iter_start(struct tdp_iter *iter, u64 *root_pt, int root_level,
- 	iter->root_level = root_level;
- 	iter->min_level = min_level;
- 	iter->pt_path[iter->root_level - 1] = (tdp_ptep_t)root_pt;
-+	iter->as_id = kvm_mmu_page_as_id(sptep_to_sp(root_pt));
- 
- 	tdp_iter_restart(iter);
- }
-@@ -169,8 +170,3 @@ void tdp_iter_next(struct tdp_iter *iter)
- 	iter->valid = false;
- }
- 
--tdp_ptep_t tdp_iter_root_pt(struct tdp_iter *iter)
--{
--	return iter->pt_path[iter->root_level - 1];
--}
--
-diff --git a/arch/x86/kvm/mmu/tdp_iter.h b/arch/x86/kvm/mmu/tdp_iter.h
-index 8eb424d17c91..b1748b988d3a 100644
---- a/arch/x86/kvm/mmu/tdp_iter.h
-+++ b/arch/x86/kvm/mmu/tdp_iter.h
-@@ -36,6 +36,8 @@ struct tdp_iter {
- 	int min_level;
- 	/* The iterator's current level within the paging structure */
- 	int level;
-+	/* The address space ID, i.e. SMM vs. regular. */
-+	int as_id;
- 	/* A snapshot of the value at sptep */
- 	u64 old_spte;
- 	/*
-@@ -62,7 +64,6 @@ tdp_ptep_t spte_to_child_pt(u64 pte, int level);
- void tdp_iter_start(struct tdp_iter *iter, u64 *root_pt, int root_level,
- 		    int min_level, gfn_t next_last_level_gfn);
- void tdp_iter_next(struct tdp_iter *iter);
--tdp_ptep_t tdp_iter_root_pt(struct tdp_iter *iter);
- void tdp_iter_restart(struct tdp_iter *iter);
- 
- #endif /* __KVM_X86_MMU_TDP_ITER_H */
-diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-index 38b6b6936171..462b1f71c77f 100644
---- a/arch/x86/kvm/mmu/tdp_mmu.c
-+++ b/arch/x86/kvm/mmu/tdp_mmu.c
-@@ -203,11 +203,6 @@ static void handle_changed_spte(struct kvm *kvm, int as_id, gfn_t gfn,
- 				u64 old_spte, u64 new_spte, int level,
- 				bool shared);
- 
--static int kvm_mmu_page_as_id(struct kvm_mmu_page *sp)
--{
--	return sp->role.smm ? 1 : 0;
--}
--
- static void handle_changed_spte_acc_track(u64 old_spte, u64 new_spte, int level)
- {
- 	bool pfn_changed = spte_to_pfn(old_spte) != spte_to_pfn(new_spte);
-@@ -497,10 +492,6 @@ static inline bool tdp_mmu_set_spte_atomic(struct kvm *kvm,
- 					   struct tdp_iter *iter,
- 					   u64 new_spte)
- {
--	u64 *root_pt = tdp_iter_root_pt(iter);
--	struct kvm_mmu_page *root = sptep_to_sp(root_pt);
--	int as_id = kvm_mmu_page_as_id(root);
--
- 	lockdep_assert_held_read(&kvm->mmu_lock);
- 
- 	/*
-@@ -514,8 +505,8 @@ static inline bool tdp_mmu_set_spte_atomic(struct kvm *kvm,
- 		      new_spte) != iter->old_spte)
- 		return false;
- 
--	handle_changed_spte(kvm, as_id, iter->gfn, iter->old_spte, new_spte,
--			    iter->level, true);
-+	handle_changed_spte(kvm, iter->as_id, iter->gfn, iter->old_spte,
-+			    new_spte, iter->level, true);
- 
- 	return true;
- }
-@@ -569,10 +560,6 @@ static inline void __tdp_mmu_set_spte(struct kvm *kvm, struct tdp_iter *iter,
- 				      u64 new_spte, bool record_acc_track,
- 				      bool record_dirty_log)
- {
--	tdp_ptep_t root_pt = tdp_iter_root_pt(iter);
--	struct kvm_mmu_page *root = sptep_to_sp(root_pt);
--	int as_id = kvm_mmu_page_as_id(root);
--
- 	lockdep_assert_held_write(&kvm->mmu_lock);
- 
- 	/*
-@@ -586,13 +573,13 @@ static inline void __tdp_mmu_set_spte(struct kvm *kvm, struct tdp_iter *iter,
- 
- 	WRITE_ONCE(*rcu_dereference(iter->sptep), new_spte);
- 
--	__handle_changed_spte(kvm, as_id, iter->gfn, iter->old_spte, new_spte,
--			      iter->level, false);
-+	__handle_changed_spte(kvm, iter->as_id, iter->gfn, iter->old_spte,
-+			      new_spte, iter->level, false);
- 	if (record_acc_track)
- 		handle_changed_spte_acc_track(iter->old_spte, new_spte,
- 					      iter->level);
- 	if (record_dirty_log)
--		handle_changed_spte_dirty_log(kvm, as_id, iter->gfn,
-+		handle_changed_spte_dirty_log(kvm, iter->as_id, iter->gfn,
- 					      iter->old_spte, new_spte,
- 					      iter->level);
- }
--- 
-2.31.0.rc2.261.g7f71774620-goog
+There are two cgroups: cg_A and cg_B with limit set to 20 for both. Process1
+is in cg_A. The initial state is:
+cg_A/ioasid.current=0, cg_A/ioasid.max=20
+cg_B/ioasid.current=0, cg_B/ioasid.max=20
 
+Now, consider the following steps:
+
+1. Process1 allocated 10 IOASIDs,
+cg_A/ioasid.current=10,
+cg_B/ioasid.current=0
+
+2. then we want to move/migrate Process1 to cg_B. so we need uncharge 10 of
+cg_A, charge 10 of cg_B
+
+3. After the migration, I expect
+cg_A/ioasid.current=0,
+cg_B/ioasid.current=10
+
+We don't enforce the limit during this organizational change since we can't
+force free IOASIDs. But any new allocations will be subject to the limit
+set in ioasid.max.
+
+> Thanks.
+> 
+
+
+Thanks,
+
+Jacob
