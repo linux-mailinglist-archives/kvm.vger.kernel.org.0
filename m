@@ -2,207 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4282033C598
-	for <lists+kvm@lfdr.de>; Mon, 15 Mar 2021 19:28:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A5DC733C5C3
+	for <lists+kvm@lfdr.de>; Mon, 15 Mar 2021 19:35:06 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232319AbhCOS1k (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 15 Mar 2021 14:27:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46838 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231377AbhCOS1O (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 15 Mar 2021 14:27:14 -0400
-Received: from mail-qv1-xf49.google.com (mail-qv1-xf49.google.com [IPv6:2607:f8b0:4864:20::f49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF9E3C06174A
-        for <kvm@vger.kernel.org>; Mon, 15 Mar 2021 11:27:13 -0700 (PDT)
-Received: by mail-qv1-xf49.google.com with SMTP id i1so23707951qvu.12
-        for <kvm@vger.kernel.org>; Mon, 15 Mar 2021 11:27:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
-         :cc;
-        bh=YJ4LYikLJ6LnYtflKHwYLFORojLmasAvwJZ1SOdvg4k=;
-        b=R4U454aE0SCZ0ShHHqVFDB7cWipimWRK+MqPBvlPKTI+UubfEhsJ9LeScntpFJUV9D
-         G0dPrTC6J2LQiXlDhpjXkuLLXoC+VQb37WFsMpn/rtQA8SdEvBd7QuUfyLR0ojoYTfq2
-         mU0ln5HmEE546LUukBzF8jH+yHNDveMOs315Ksl0K5Tts2L733Y6L2obPOrNpAEyJ9Hl
-         ycmnxWP3kFJlmSPNDj97YvC5zxTdCo5jxpvDztsTslptRRoxm3hTuko9N2cGYpyrkKBl
-         MDgpOPi6Bp5YeWZtLFKQm89ebCxaeR6/PRTUn7Gd6p39r1zuXhJxeOE6vdUC9lIaVbVL
-         n/kA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=YJ4LYikLJ6LnYtflKHwYLFORojLmasAvwJZ1SOdvg4k=;
-        b=VNNpdseYyGcVh8JXSJy8iJ3afLA0bVvOhcvdvYHv+qSVCTpGCYYypj+Q3r65jvCajH
-         rxm5eKqah2xnKY1cC7oF6NvILhi3WaCDYh9/bqjbViUj5sb4HDREbdBnDljTCVf/Y42r
-         /TXwaLndYNhxLVOfNpZ3inMKQ8mulvA3lw7lBm0a/1xTGrFA3FBH8bP5/QiOWPBSeJ7G
-         edhdpQj58vxvZEPrm2d9EwID31kw1sC7sWff6kSRmab4xZLZ8DQuEdfsY8MSmwOBbwjm
-         SgiN86ydHElbCJdhrXu0ZRHUV3FczY5ZkEqqa/YsnvuQ6kGatcczt3wMr/GTZKwcAVCK
-         UYyg==
-X-Gm-Message-State: AOAM530NYuniGMh4bQBpo2pmIjItdyYtYRIZyXvtHGqpcaQluF94tTku
-        +kJPSk555rwOa2X4zYWM0uHB+vjK0EdN
-X-Google-Smtp-Source: ABdhPJwbVQiLfVe2Db5rkIEg6KzSZtaX141pcPBDUyBP93Xmq6wAChQpbIRa1w7i0Lz1G5vf2ZWzAU3ZLQ+8
-X-Received: from bgardon.sea.corp.google.com ([2620:15c:100:202:888a:4e22:67:844a])
- (user=bgardon job=sendgmr) by 2002:a0c:b89a:: with SMTP id
- y26mr12061368qvf.49.1615832833135; Mon, 15 Mar 2021 11:27:13 -0700 (PDT)
-Date:   Mon, 15 Mar 2021 11:26:43 -0700
-In-Reply-To: <20210315182643.2437374-1-bgardon@google.com>
-Message-Id: <20210315182643.2437374-5-bgardon@google.com>
-Mime-Version: 1.0
-References: <20210315182643.2437374-1-bgardon@google.com>
-X-Mailer: git-send-email 2.31.0.rc2.261.g7f71774620-goog
-Subject: [PATCH v2 4/4] KVM: x86/mmu: Store the address space ID in the TDP iterator
-From:   Ben Gardon <bgardon@google.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Peter Shier <pshier@google.com>,
-        Jim Mattson <jmattson@google.com>,
-        Ben Gardon <bgardon@google.com>,
-        kernel test robot <lkp@intel.com>
-Content-Type: text/plain; charset="UTF-8"
+        id S230371AbhCOSed (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 15 Mar 2021 14:34:33 -0400
+Received: from mx2.suse.de ([195.135.220.15]:38734 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S232041AbhCOSeT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 15 Mar 2021 14:34:19 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+        t=1615833258; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=H+y7FsHAfr9H0V0nZlpCJwqn4arhOTDKupfGhSsi4L0=;
+        b=KjlbibSfXB7NG662v+nqeUvX9bQmFZ6Tn4FZ8LSyV2Dy1wShX6HyGPkQ/3oP/oi8ltOa82
+        p4LArpJEH3uiUS4qK5AotGb4JiNd6JM5FPMBGV9OllfNYp2H0+Bq9mcfUIPNFQ81bOWovM
+        7fmYs578Xsmg19z3fl9mWp/3G2HomOI=
+Received: from relay2.suse.de (unknown [195.135.221.27])
+        by mx2.suse.de (Postfix) with ESMTP id 2014DAE8F;
+        Mon, 15 Mar 2021 18:34:18 +0000 (UTC)
+Date:   Mon, 15 Mar 2021 19:34:15 +0100
+From:   Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>
+To:     Vipin Sharma <vipinsh@google.com>
+Cc:     tj@kernel.org, rdunlap@infradead.org, thomas.lendacky@amd.com,
+        brijesh.singh@amd.com, jon.grimm@amd.com, eric.vantassell@amd.com,
+        pbonzini@redhat.com, hannes@cmpxchg.org, frankja@linux.ibm.com,
+        borntraeger@de.ibm.com, corbet@lwn.net, seanjc@google.com,
+        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
+        joro@8bytes.org, tglx@linutronix.de, mingo@redhat.com,
+        bp@alien8.de, hpa@zytor.com, gingell@google.com,
+        rientjes@google.com, dionnaglaze@google.com, kvm@vger.kernel.org,
+        x86@kernel.org, cgroups@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [Patch v3 1/2] cgroup: sev: Add misc cgroup controller
+Message-ID: <YE+op0MZKG41EALi@blackbook>
+References: <20210304231946.2766648-1-vipinsh@google.com>
+ <20210304231946.2766648-2-vipinsh@google.com>
+ <YEpod5X29YqMhW/g@blackbook>
+ <YEu74hkEPEyvxC85@google.com>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="s/zzXfvrLmfa0Un9"
+Content-Disposition: inline
+In-Reply-To: <YEu74hkEPEyvxC85@google.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Store the address space ID in the TDP iterator so that it can be
-retrieved without having to bounce through the root shadow page.  This
-streamlines the code and fixes a Sparse warning about not properly using
-rcu_dereference() when grabbing the ID from the root on the fly.
 
-Reported-by: kernel test robot <lkp@intel.com>
-Signed-off-by: Sean Christopherson <seanjc@google.com>
-Signed-off-by: Ben Gardon <bgardon@google.com>
----
- arch/x86/kvm/mmu/mmu_internal.h |  5 +++++
- arch/x86/kvm/mmu/tdp_iter.c     |  6 +-----
- arch/x86/kvm/mmu/tdp_iter.h     |  3 ++-
- arch/x86/kvm/mmu/tdp_mmu.c      | 23 +++++------------------
- 4 files changed, 13 insertions(+), 24 deletions(-)
+--s/zzXfvrLmfa0Un9
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_internal.h
-index ec4fc28b325a..1f6f98c76bdf 100644
---- a/arch/x86/kvm/mmu/mmu_internal.h
-+++ b/arch/x86/kvm/mmu/mmu_internal.h
-@@ -78,6 +78,11 @@ static inline struct kvm_mmu_page *sptep_to_sp(u64 *sptep)
- 	return to_shadow_page(__pa(sptep));
- }
- 
-+static inline int kvm_mmu_page_as_id(struct kvm_mmu_page *sp)
-+{
-+	return sp->role.smm ? 1 : 0;
-+}
-+
- static inline bool kvm_vcpu_ad_need_write_protect(struct kvm_vcpu *vcpu)
- {
- 	/*
-diff --git a/arch/x86/kvm/mmu/tdp_iter.c b/arch/x86/kvm/mmu/tdp_iter.c
-index f7f94ea65243..b3ed302c1a35 100644
---- a/arch/x86/kvm/mmu/tdp_iter.c
-+++ b/arch/x86/kvm/mmu/tdp_iter.c
-@@ -49,6 +49,7 @@ void tdp_iter_start(struct tdp_iter *iter, u64 *root_pt, int root_level,
- 	iter->root_level = root_level;
- 	iter->min_level = min_level;
- 	iter->pt_path[iter->root_level - 1] = (tdp_ptep_t)root_pt;
-+	iter->as_id = kvm_mmu_page_as_id(sptep_to_sp(root_pt));
- 
- 	tdp_iter_restart(iter);
- }
-@@ -169,8 +170,3 @@ void tdp_iter_next(struct tdp_iter *iter)
- 	iter->valid = false;
- }
- 
--tdp_ptep_t tdp_iter_root_pt(struct tdp_iter *iter)
--{
--	return iter->pt_path[iter->root_level - 1];
--}
--
-diff --git a/arch/x86/kvm/mmu/tdp_iter.h b/arch/x86/kvm/mmu/tdp_iter.h
-index 8eb424d17c91..b1748b988d3a 100644
---- a/arch/x86/kvm/mmu/tdp_iter.h
-+++ b/arch/x86/kvm/mmu/tdp_iter.h
-@@ -36,6 +36,8 @@ struct tdp_iter {
- 	int min_level;
- 	/* The iterator's current level within the paging structure */
- 	int level;
-+	/* The address space ID, i.e. SMM vs. regular. */
-+	int as_id;
- 	/* A snapshot of the value at sptep */
- 	u64 old_spte;
- 	/*
-@@ -62,7 +64,6 @@ tdp_ptep_t spte_to_child_pt(u64 pte, int level);
- void tdp_iter_start(struct tdp_iter *iter, u64 *root_pt, int root_level,
- 		    int min_level, gfn_t next_last_level_gfn);
- void tdp_iter_next(struct tdp_iter *iter);
--tdp_ptep_t tdp_iter_root_pt(struct tdp_iter *iter);
- void tdp_iter_restart(struct tdp_iter *iter);
- 
- #endif /* __KVM_X86_MMU_TDP_ITER_H */
-diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-index 38b6b6936171..462b1f71c77f 100644
---- a/arch/x86/kvm/mmu/tdp_mmu.c
-+++ b/arch/x86/kvm/mmu/tdp_mmu.c
-@@ -203,11 +203,6 @@ static void handle_changed_spte(struct kvm *kvm, int as_id, gfn_t gfn,
- 				u64 old_spte, u64 new_spte, int level,
- 				bool shared);
- 
--static int kvm_mmu_page_as_id(struct kvm_mmu_page *sp)
--{
--	return sp->role.smm ? 1 : 0;
--}
--
- static void handle_changed_spte_acc_track(u64 old_spte, u64 new_spte, int level)
- {
- 	bool pfn_changed = spte_to_pfn(old_spte) != spte_to_pfn(new_spte);
-@@ -497,10 +492,6 @@ static inline bool tdp_mmu_set_spte_atomic(struct kvm *kvm,
- 					   struct tdp_iter *iter,
- 					   u64 new_spte)
- {
--	u64 *root_pt = tdp_iter_root_pt(iter);
--	struct kvm_mmu_page *root = sptep_to_sp(root_pt);
--	int as_id = kvm_mmu_page_as_id(root);
--
- 	lockdep_assert_held_read(&kvm->mmu_lock);
- 
- 	/*
-@@ -514,8 +505,8 @@ static inline bool tdp_mmu_set_spte_atomic(struct kvm *kvm,
- 		      new_spte) != iter->old_spte)
- 		return false;
- 
--	handle_changed_spte(kvm, as_id, iter->gfn, iter->old_spte, new_spte,
--			    iter->level, true);
-+	handle_changed_spte(kvm, iter->as_id, iter->gfn, iter->old_spte,
-+			    new_spte, iter->level, true);
- 
- 	return true;
- }
-@@ -569,10 +560,6 @@ static inline void __tdp_mmu_set_spte(struct kvm *kvm, struct tdp_iter *iter,
- 				      u64 new_spte, bool record_acc_track,
- 				      bool record_dirty_log)
- {
--	tdp_ptep_t root_pt = tdp_iter_root_pt(iter);
--	struct kvm_mmu_page *root = sptep_to_sp(root_pt);
--	int as_id = kvm_mmu_page_as_id(root);
--
- 	lockdep_assert_held_write(&kvm->mmu_lock);
- 
- 	/*
-@@ -586,13 +573,13 @@ static inline void __tdp_mmu_set_spte(struct kvm *kvm, struct tdp_iter *iter,
- 
- 	WRITE_ONCE(*rcu_dereference(iter->sptep), new_spte);
- 
--	__handle_changed_spte(kvm, as_id, iter->gfn, iter->old_spte, new_spte,
--			      iter->level, false);
-+	__handle_changed_spte(kvm, iter->as_id, iter->gfn, iter->old_spte,
-+			      new_spte, iter->level, false);
- 	if (record_acc_track)
- 		handle_changed_spte_acc_track(iter->old_spte, new_spte,
- 					      iter->level);
- 	if (record_dirty_log)
--		handle_changed_spte_dirty_log(kvm, as_id, iter->gfn,
-+		handle_changed_spte_dirty_log(kvm, iter->as_id, iter->gfn,
- 					      iter->old_spte, new_spte,
- 					      iter->level);
- }
--- 
-2.31.0.rc2.261.g7f71774620-goog
+On Fri, Mar 12, 2021 at 11:07:14AM -0800, Vipin Sharma <vipinsh@google.com>=
+ wrote:
+> We should be fine without atomic64_t because we are using unsigned
+> long and not 64 bit explicitly. This will work on both 32 and 64 bit
+> machines.
+I see.
 
+> But I will add READ_ONCE and WRITE_ONCE because of potential chances of
+> load tearing and store tearing.
+>=20
+> Do you agree?
+Yes.
+
+> This was only here to avoid multiple reads of capacity and making sure
+> if condition and seq_print will see the same value.
+Aha.
+
+> Also, I was not aware of load and store tearing of properly aligned
+> and machine word size variables. I will add READ_ONCE and WRITE_ONCE
+> at other places.
+Yeah, although it's theoretical, I think it also serves well to annotate
+such unsychronized accesses.
+
+Thanks,
+Michal
+
+--s/zzXfvrLmfa0Un9
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: Digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEEoQaUCWq8F2Id1tNia1+riC5qSgFAmBPqKEACgkQia1+riC5
+qSihOg//SpH6gNPHIcbQ+iF47BrOX3zJwft1PTn3D8d3byIaot3/Sym+j12ttkQU
+xstX/U3Mvimyouy50DFaYLiQ+EWMOPm8dzEw2nPOQFrL0bT6cjRdFnAzH7Y2m87c
+GufRjzeGwn8H2dRTPHiUjc+ETQhdjIRUOL5yUgoJkDGmV1m63j4rQUS5JXoHuW/i
+WH8ePRhc4SlGS/Ifgu3/+g0a3z+K46umCrHA9//BHI5gPyuvobyCdwIjrFekSDAq
+5vWwp6YGavoX5ZoZALUpokgcZR/iVRhTpt5m6psuYFhb+i+sWi/jYVgAeGSzZgCU
+G9uvFogZrPASTAHTss+MwdXoKUWWckG33D5MA8RtTXobewWrO7GcpTCFb79Mm0pF
+JzdVgBuMMuphLjkXHgQnSX8wHQQ7R545TuaSLXZBM9AqDPFjScEwdi68qRKPqopt
+wqqL64XiFnoICLnZjFpp11cL1gccY4cHYo71eNrVA1bdscO1iiO/c5xPbh9JD6cX
+I/cwAksf9R+bW+XUWrgsDvx9VuCiWfhEtiT/obqgDyHEQfE7JtgVX2IDN1o1pLcM
++aGLPoyU/4Nc6aK898xqpJdzY/kCNB73YUuhdgH8lf1tY1P0myDTTivn7+XqZXd3
+hfMM6u+AdaUZhqymfylaEnTpQpBH4VfRAsBS0SnFuUnT93GnkqU=
+=+zv/
+-----END PGP SIGNATURE-----
+
+--s/zzXfvrLmfa0Un9--
