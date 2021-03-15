@@ -2,265 +2,142 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7290633C925
-	for <lists+kvm@lfdr.de>; Mon, 15 Mar 2021 23:11:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1F69233C916
+	for <lists+kvm@lfdr.de>; Mon, 15 Mar 2021 23:10:10 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232691AbhCOWLQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 15 Mar 2021 18:11:16 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:47047 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232605AbhCOWKz (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 15 Mar 2021 18:10:55 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1615846255;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=AoArXX9WPpL4SnAa/Ge0fyAJqtNqRN2jjUvZKB7Oaa0=;
-        b=XFz/zrA2py5zpBvuH8+EO6Ww9km+/fuwui0p7eLeLG7E6ZNRL9G4Wr8WvJN3aAq3kK59eS
-        OIXC3VJQbdczxAnZ/TpvK6OOvJaPv/Fv7I+Jh2O4nh/l8BVWTRcalYtEB9dfQpkqI+Nr/l
-        vnFdBFNPO4z29/QXT4uhRbxb2Zmdf54=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-539-o7X9-GtpMoyv7NehMQKMfQ-1; Mon, 15 Mar 2021 18:10:53 -0400
-X-MC-Unique: o7X9-GtpMoyv7NehMQKMfQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EB8DA107ACCA;
-        Mon, 15 Mar 2021 22:10:50 +0000 (UTC)
-Received: from localhost.localdomain (unknown [10.35.207.30])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 960D45C261;
-        Mon, 15 Mar 2021 22:10:38 +0000 (UTC)
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     kvm@vger.kernel.org
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        linux-kernel@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Kieran Bingham <kbingham@kernel.org>,
-        Jessica Yu <jeyu@kernel.org>,
-        Jan Kiszka <jan.kiszka@siemens.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        x86@kernel.org (maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)),
-        Joerg Roedel <joro@8bytes.org>,
-        Sean Christopherson <seanjc@google.com>,
-        Jim Mattson <jmattson@google.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@suse.de>
-Subject: [PATCH 3/3] KVM: SVM: allow to intercept all exceptions for debug
-Date:   Tue, 16 Mar 2021 00:10:20 +0200
-Message-Id: <20210315221020.661693-4-mlevitsk@redhat.com>
-In-Reply-To: <20210315221020.661693-1-mlevitsk@redhat.com>
-References: <20210315221020.661693-1-mlevitsk@redhat.com>
+        id S232043AbhCOWJh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 15 Mar 2021 18:09:37 -0400
+Received: from mga09.intel.com ([134.134.136.24]:24979 "EHLO mga09.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S231400AbhCOWJg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 15 Mar 2021 18:09:36 -0400
+IronPort-SDR: 92spJeBzHVX1Wqwx0W/3ytlPnt6+cBuFFYzv/tjVsTNJGUirjzRzyW800UHKZQdWCTwpRTgEjE
+ ZYjbRX5ZATmA==
+X-IronPort-AV: E=McAfee;i="6000,8403,9924"; a="189252800"
+X-IronPort-AV: E=Sophos;i="5.81,251,1610438400"; 
+   d="scan'208";a="189252800"
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Mar 2021 15:09:34 -0700
+IronPort-SDR: h8R33qztUP4g3UWFP1eMSDTvke59umLwYr2NaDzDujI4j9ez+ZOoIOyvqjxkBlv7P+E+GuGOUu
+ g5ZI9i5IL7Kw==
+X-IronPort-AV: E=Sophos;i="5.81,251,1610438400"; 
+   d="scan'208";a="522298432"
+Received: from jacob-builder.jf.intel.com (HELO jacob-builder) ([10.7.199.155])
+  by orsmga004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Mar 2021 15:09:34 -0700
+Date:   Mon, 15 Mar 2021 15:11:55 -0700
+From:   Jacob Pan <jacob.jun.pan@intel.com>
+To:     Tejun Heo <tj@kernel.org>
+Cc:     Vipin Sharma <vipinsh@google.com>, mkoutny@suse.com,
+        rdunlap@infradead.org, thomas.lendacky@amd.com,
+        brijesh.singh@amd.com, jon.grimm@amd.com, eric.vantassell@amd.com,
+        pbonzini@redhat.com, hannes@cmpxchg.org, frankja@linux.ibm.com,
+        borntraeger@de.ibm.com, corbet@lwn.net, seanjc@google.com,
+        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
+        joro@8bytes.org, tglx@linutronix.de, mingo@redhat.com,
+        bp@alien8.de, hpa@zytor.com, gingell@google.com,
+        rientjes@google.com, dionnaglaze@google.com, kvm@vger.kernel.org,
+        x86@kernel.org, cgroups@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-kernel@vger.kernel.org, "Tian, Kevin" <kevin.tian@intel.com>,
+        "Liu, Yi L" <yi.l.liu@intel.com>,
+        "Raj, Ashok" <ashok.raj@intel.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Jason Gunthorpe <jgg@nvidia.com>,
+        Jacob Pan <jacob.jun.pan@linux.intel.com>,
+        "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
+        jacob.jun.pan@intel.com
+Subject: Re: [RFC v2 2/2] cgroup: sev: Miscellaneous cgroup documentation.
+Message-ID: <20210315151155.383a7e6e@jacob-builder>
+In-Reply-To: <YEz+8HbfkbGgG5Tm@mtj.duckdns.org>
+References: <20210302081705.1990283-1-vipinsh@google.com>
+        <20210302081705.1990283-3-vipinsh@google.com>
+        <20210303185513.27e18fce@jacob-builder>
+        <YEB8i6Chq4K/GGF6@google.com>
+        <YECfhCJtHUL9cB2L@slm.duckdns.org>
+        <20210312125821.22d9bfca@jacob-builder>
+        <YEvZ4muXqiSScQ8i@google.com>
+        <20210312145904.4071a9d6@jacob-builder>
+        <YEyR9181Qgzt+Ps9@mtj.duckdns.org>
+        <20210313085701.1fd16a39@jacob-builder>
+        <YEz+8HbfkbGgG5Tm@mtj.duckdns.org>
+Organization: OTC
+X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add a new debug module param 'debug_intercept_exceptions' which will allow the
-KVM to intercept any guest exception, and forward it to the guest.
+Hi Tejun,
 
-This can be very useful for guest debugging and/or KVM debugging with kvm trace.
-This is not intended to be used on production systems.
+On Sat, 13 Mar 2021 13:05:36 -0500, Tejun Heo <tj@kernel.org> wrote:
 
-This is based on an idea first shown here:
-https://patchwork.kernel.org/project/kvm/patch/20160301192822.GD22677@pd.tnic/
+> Hello,
+> 
+> On Sat, Mar 13, 2021 at 08:57:01AM -0800, Jacob Pan wrote:
+> > Isn't PIDs controller doing the charge/uncharge? I was under the
+> > impression that each resource can be independently charged/uncharged,
+> > why it affects other resources? Sorry for the basic question.  
+> 
+> Yeah, PID is an exception as we needed the initial migration to seed new
+> cgroups and it gets really confusing with other ways to observe the
+> processes - e.g. if you follow the original way of creating a cgroup,
+> forking and then moving the seed process into the target cgroup, if we
+> don't migrate the pid charge together, the numbers wouldn't agree and the
+> seeder cgroup may end up running out of pids if there are any
+> restrictions.
+> 
+Thanks for explaining. Unfortunately, it seems IOASIDs has a similar needs
+in terms of migrating the charge.
 
-CC: Borislav Petkov <bp@suse.de>
-Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
----
- arch/x86/include/asm/kvm_host.h |  2 +
- arch/x86/kvm/svm/svm.c          | 77 ++++++++++++++++++++++++++++++++-
- arch/x86/kvm/svm/svm.h          |  5 ++-
- arch/x86/kvm/x86.c              |  5 ++-
- 4 files changed, 85 insertions(+), 4 deletions(-)
+> > I also didn't quite get the limitation on cgroup v2 migration, this is
+> > much simpler than memcg. Could you give me some pointers?  
+> 
+> Migration itself doesn't have restrictions but all resources are
+> distributed on the same hierarchy, so the controllers are supposed to
+> follow the same conventions that can be implemented by all controllers.
+> 
+Got it, I guess that is the behavior required by the unified hierarchy.
+Cgroup v1 would be ok? But I am guessing we are not extending on v1?
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index a52f973bdff6d..c8f44a88b3153 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -1564,6 +1564,8 @@ int kvm_emulate_rdpmc(struct kvm_vcpu *vcpu);
- void kvm_queue_exception(struct kvm_vcpu *vcpu, unsigned nr);
- void kvm_queue_exception_e(struct kvm_vcpu *vcpu, unsigned nr, u32 error_code);
- void kvm_queue_exception_p(struct kvm_vcpu *vcpu, unsigned nr, unsigned long payload);
-+void kvm_queue_exception_e_p(struct kvm_vcpu *vcpu, unsigned nr,
-+			     u32 error_code, unsigned long payload);
- void kvm_requeue_exception(struct kvm_vcpu *vcpu, unsigned nr);
- void kvm_requeue_exception_e(struct kvm_vcpu *vcpu, unsigned nr, u32 error_code);
- void kvm_inject_page_fault(struct kvm_vcpu *vcpu, struct x86_exception *fault);
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index 271196400495f..94156a367a663 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -197,6 +197,9 @@ module_param(sev_es, int, 0444);
- bool __read_mostly dump_invalid_vmcb;
- module_param(dump_invalid_vmcb, bool, 0644);
- 
-+uint debug_intercept_exceptions;
-+module_param(debug_intercept_exceptions, uint, 0444);
-+
- static bool svm_gp_erratum_intercept = true;
- 
- static u8 rsm_ins_bytes[] = "\x0f\xaa";
-@@ -220,6 +223,8 @@ static const u32 msrpm_ranges[] = {0, 0xc0000000, 0xc0010000};
- #define MSRS_RANGE_SIZE 2048
- #define MSRS_IN_RANGE (MSRS_RANGE_SIZE * 8 / 2)
- 
-+static void init_debug_exceptions_intercept(struct vcpu_svm *svm);
-+
- u32 svm_msrpm_offset(u32 msr)
- {
- 	u32 offset;
-@@ -1137,6 +1142,8 @@ static void init_vmcb(struct kvm_vcpu *vcpu)
- 	set_exception_intercept(svm, MC_VECTOR);
- 	set_exception_intercept(svm, AC_VECTOR);
- 	set_exception_intercept(svm, DB_VECTOR);
-+
-+	init_debug_exceptions_intercept(svm);
- 	/*
- 	 * Guest access to VMware backdoor ports could legitimately
- 	 * trigger #GP because of TSS I/O permission bitmap.
-@@ -1913,6 +1920,17 @@ static int pf_interception(struct kvm_vcpu *vcpu)
- 	u64 fault_address = svm->vmcb->control.exit_info_2;
- 	u64 error_code = svm->vmcb->control.exit_info_1;
- 
-+	if ((debug_intercept_exceptions & (1 << PF_VECTOR)))
-+		if (npt_enabled && !vcpu->arch.apf.host_apf_flags) {
-+			/* If #PF was only intercepted for debug, inject
-+			 * it directly to the guest, since the mmu code
-+			 * is not ready to deal with such page faults
-+			 */
-+			kvm_queue_exception_e_p(vcpu, PF_VECTOR,
-+						error_code, fault_address);
-+			return 1;
-+		}
-+
- 	return kvm_handle_page_fault(vcpu, error_code, fault_address,
- 			static_cpu_has(X86_FEATURE_DECODEASSISTS) ?
- 			svm->vmcb->control.insn_bytes : NULL,
-@@ -3025,7 +3043,7 @@ static int invpcid_interception(struct kvm_vcpu *vcpu)
- 	return kvm_handle_invpcid(vcpu, type, gva);
- }
- 
--static int (*const svm_exit_handlers[])(struct kvm_vcpu *vcpu) = {
-+static int (*svm_exit_handlers[])(struct kvm_vcpu *vcpu) = {
- 	[SVM_EXIT_READ_CR0]			= cr_interception,
- 	[SVM_EXIT_READ_CR3]			= cr_interception,
- 	[SVM_EXIT_READ_CR4]			= cr_interception,
-@@ -3099,6 +3117,63 @@ static int (*const svm_exit_handlers[])(struct kvm_vcpu *vcpu) = {
- 	[SVM_EXIT_VMGEXIT]			= sev_handle_vmgexit,
- };
- 
-+static int generic_exception_interception(struct kvm_vcpu *vcpu)
-+{
-+	/*
-+	 * Generic exception handler which forwards a guest exception
-+	 * as-is to the guest.
-+	 * For exceptions that don't have a special intercept handler.
-+	 *
-+	 * Used for 'debug_intercept_exceptions' KVM debug feature only.
-+	 */
-+	struct vcpu_svm *svm = to_svm(vcpu);
-+	int exc = svm->vmcb->control.exit_code - SVM_EXIT_EXCP_BASE;
-+
-+	WARN_ON(exc < 0 || exc > 31);
-+
-+	if (exc == TS_VECTOR) {
-+		/*
-+		 * SVM doesn't provide us with an error code to be able to
-+		 * re-inject the #TS exception, so just disable its
-+		 * interception, and let the guest re-execute the instruction.
-+		 */
-+		vmcb_clr_intercept(&svm->vmcb01.ptr->control,
-+				   INTERCEPT_EXCEPTION_OFFSET + TS_VECTOR);
-+		recalc_intercepts(svm);
-+		return 1;
-+	} else if (exc == DF_VECTOR) {
-+		/* SVM doesn't provide us with an error code for the #DF */
-+		kvm_queue_exception_e(vcpu, exc, 0);
-+		return 1;
-+	}
-+
-+	if (x86_exception_has_error_code(exc))
-+		kvm_queue_exception_e(vcpu, exc, svm->vmcb->control.exit_info_1);
-+	else
-+		kvm_queue_exception(vcpu, exc);
-+	return 1;
-+}
-+
-+static void init_debug_exceptions_intercept(struct vcpu_svm *svm)
-+{
-+	int exc;
-+
-+	for (exc = 0 ; exc < 32 ; exc++) {
-+		if (!(debug_intercept_exceptions & (1 << exc)))
-+			continue;
-+
-+		/* Those are defined to have undefined behavior in the SVM spec */
-+		if (exc == 2 || exc == 9)
-+			continue;
-+
-+		set_exception_intercept(svm, exc);
-+
-+		if (!svm_exit_handlers[SVM_EXIT_EXCP_BASE + exc])
-+			svm_exit_handlers[SVM_EXIT_EXCP_BASE + exc] =
-+					generic_exception_interception;
-+	}
-+}
-+
- static void dump_vmcb(struct kvm_vcpu *vcpu)
- {
- 	struct vcpu_svm *svm = to_svm(vcpu);
-diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-index 8e276c4fb33df..e0ff9ca996df8 100644
---- a/arch/x86/kvm/svm/svm.h
-+++ b/arch/x86/kvm/svm/svm.h
-@@ -32,6 +32,7 @@ static const u32 host_save_user_msrs[] = {
- #define MSRPM_OFFSETS	16
- extern u32 msrpm_offsets[MSRPM_OFFSETS] __read_mostly;
- extern bool npt_enabled;
-+extern uint debug_intercept_exceptions;
- 
- enum {
- 	VMCB_INTERCEPTS, /* Intercept vectors, TSC offset,
-@@ -333,7 +334,9 @@ static inline void clr_exception_intercept(struct vcpu_svm *svm, u32 bit)
- 	struct vmcb *vmcb = svm->vmcb01.ptr;
- 
- 	WARN_ON_ONCE(bit >= 32);
--	vmcb_clr_intercept(&vmcb->control, INTERCEPT_EXCEPTION_OFFSET + bit);
-+
-+	if (!((1 << bit) & debug_intercept_exceptions))
-+		vmcb_clr_intercept(&vmcb->control, INTERCEPT_EXCEPTION_OFFSET + bit);
- 
- 	recalc_intercepts(svm);
- }
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index b75d990fcf12b..be509944622bd 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -627,12 +627,13 @@ void kvm_queue_exception_p(struct kvm_vcpu *vcpu, unsigned nr,
- }
- EXPORT_SYMBOL_GPL(kvm_queue_exception_p);
- 
--static void kvm_queue_exception_e_p(struct kvm_vcpu *vcpu, unsigned nr,
--				    u32 error_code, unsigned long payload)
-+void kvm_queue_exception_e_p(struct kvm_vcpu *vcpu, unsigned nr,
-+			     u32 error_code, unsigned long payload)
- {
- 	kvm_multiple_exception(vcpu, nr, true, error_code,
- 			       true, payload, false);
- }
-+EXPORT_SYMBOL_GPL(kvm_queue_exception_e_p);
- 
- int kvm_complete_insn_gp(struct kvm_vcpu *vcpu, int err)
- {
--- 
-2.26.2
+> > BTW, since the IOASIDs are used to tag DMA and bound with guest
+> > process(mm) for shared virtual addressing. fork() cannot be supported,
+> > so I guess clone is not a solution here.  
+> 
+> Can you please elaborate what wouldn't work? The new spawning into a new
+> cgroup w/ clone doesn't really change the usage model. It's just a neater
+> way to seed a new cgroup. If you're saying that the overall usage model
+> doesn't fit the needs of IOASIDs, it likely shouldn't be a cgroup
+> controller.
+> 
+The IOASIDs are programmed into devices to generate DMA requests tagged
+with them. The IOMMU has a per device IOASID table with each entry has two
+pointers:
+ - the PGD of the guest process.
+ - the PGD of the host process
 
+The result of this 2 stage/nested translation is that we can share virtual
+address (SVA) between guest process and DMA. The host process needs to
+allocate multiple IOASIDs since one IOASID is needed for each guest process
+who wants SVA.
+
+The DMA binding among device-IOMMU-process is setup via a series of user
+APIs (e.g. via VFIO).
+
+If a process calls fork(), the children does not inherit the IOASIDs and
+their bindings. Children who wish to use SVA has to call those APIs to
+establish the binding for themselves.
+
+Therefore, if a host process allocates 10 IOASIDs then does a
+fork()/clone(), it cannot charge 10 IOASIDs in the new cgroup. i.e. the 10
+IOASIDs stays with the process wherever it goes.
+
+I feel this fit in the domain model, true?
+
+> Thanks.
+> 
+
+
+Thanks,
+
+Jacob
