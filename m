@@ -2,310 +2,136 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DCE4433AB28
-	for <lists+kvm@lfdr.de>; Mon, 15 Mar 2021 06:39:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6F83533AB83
+	for <lists+kvm@lfdr.de>; Mon, 15 Mar 2021 07:15:09 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230285AbhCOFiu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 15 Mar 2021 01:38:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49600 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230187AbhCOFib (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 15 Mar 2021 01:38:31 -0400
-Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E878FC061762
-        for <kvm@vger.kernel.org>; Sun, 14 Mar 2021 22:38:30 -0700 (PDT)
-Received: by mail-pj1-x102a.google.com with SMTP id gb6so8165797pjb.0
-        for <kvm@vger.kernel.org>; Sun, 14 Mar 2021 22:38:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance-com.20150623.gappssmtp.com; s=20150623;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=lVG7vtvMbRMpvTShU3eF9/pmfbsuVpTNULn/mM9+dMw=;
-        b=X4Katv61hXzWe/h3bbDQWPAQO+MiETrtLH9iH2sLpZRpl7F2JHyimf/FUJ29UjQADI
-         /LZaO1zGI/9WVRVY+cmFhFmjEnvs2n8N+kRGoWjxIKubAFLqDfndDyq0otr0/G6wkgqO
-         MUEqC3mUUFl1/WGlZfZZjPcsYBQWaGRaKdrB9GtVT6JwDT/7dvtAdM80/OnJza+1X3R+
-         a5KWUW95sUdB0zU9dOEwluTrVZeA+j13WV62gcbi7yM/Jf5+nma5ZcpAyc/Ig9G8FCwP
-         dIfE/ozUv8SlBm35FchW29E/rQbzfLZPqejj8CooWPgaMzNe4h2es5r4z1Yx+O/nFhXq
-         J9nQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=lVG7vtvMbRMpvTShU3eF9/pmfbsuVpTNULn/mM9+dMw=;
-        b=mJ/lAAW88sQsI+cDBng+2Bu+MNLYktKqVmGbgtMAn0ngKsOCkCIa9QYW2TuCrw8+d9
-         mlFod+e7/du6Zz3ftOXkXxjo+QDFpPqrk+w59xH1doGPVlFu/TBleU6yaD7IuVA0A+S8
-         XC1sFkd/I9PPBzO6E4Qugil60NncU3SVP9UBbh4CJYEA/GmaXCCWHPMYdAjYGlAgFBPX
-         KVgGhDIHyOTKFYzCJ5Ob3Y8DiSqulTulDBDxHrifJoRSGWM/RxcU1BBlABHZxgPWDpMx
-         /0Zim/5N+iO6nu+hXQD8xG/El9Rm4DSEQPM/rT/FPgIBBujXTyUAo814arDY6pSMmmgj
-         LWTQ==
-X-Gm-Message-State: AOAM532LxYN6LDTM4l8dxRECk57EDmwsLDtd2xRizgu1xp3H5kWp9v2G
-        1C25GR0NiHwGZqIB63Eb0ufl
-X-Google-Smtp-Source: ABdhPJy0ZNV143F4ylJty11vzLVRq3Al/lgreCs5sIT9ATazkmI77l1xyiIl9kk/TpuIoUh/8F9Sjg==
-X-Received: by 2002:a17:902:6bca:b029:e2:c5d6:973e with SMTP id m10-20020a1709026bcab02900e2c5d6973emr9918682plt.40.1615786710484;
-        Sun, 14 Mar 2021 22:38:30 -0700 (PDT)
-Received: from localhost ([139.177.225.227])
-        by smtp.gmail.com with ESMTPSA id o18sm8538438pji.10.2021.03.14.22.38.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 14 Mar 2021 22:38:30 -0700 (PDT)
-From:   Xie Yongji <xieyongji@bytedance.com>
-To:     mst@redhat.com, jasowang@redhat.com, stefanha@redhat.com,
-        sgarzare@redhat.com, parav@nvidia.com, bob.liu@oracle.com,
-        hch@infradead.org, rdunlap@infradead.org, willy@infradead.org,
-        viro@zeniv.linux.org.uk, axboe@kernel.dk, bcrl@kvack.org,
-        corbet@lwn.net, mika.penttila@nextfour.com,
-        dan.carpenter@oracle.com
-Cc:     virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        kvm@vger.kernel.org, linux-fsdevel@vger.kernel.org
-Subject: [PATCH v5 11/11] Documentation: Add documentation for VDUSE
-Date:   Mon, 15 Mar 2021 13:37:21 +0800
-Message-Id: <20210315053721.189-12-xieyongji@bytedance.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20210315053721.189-1-xieyongji@bytedance.com>
-References: <20210315053721.189-1-xieyongji@bytedance.com>
+        id S229905AbhCOGOh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 15 Mar 2021 02:14:37 -0400
+Received: from mga01.intel.com ([192.55.52.88]:62126 "EHLO mga01.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229948AbhCOGOf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 15 Mar 2021 02:14:35 -0400
+IronPort-SDR: ciO835APx1i3nfQ7Y5pbUrAPC0NfIuIZj7ABVh46pC7IWfOMQicn6NL9zTp0FTbr5tFXmBDgut
+ +XOFXlKvUF+Q==
+X-IronPort-AV: E=McAfee;i="6000,8403,9923"; a="208938057"
+X-IronPort-AV: E=Sophos;i="5.81,249,1610438400"; 
+   d="scan'208";a="208938057"
+Received: from fmsmga007.fm.intel.com ([10.253.24.52])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Mar 2021 23:14:34 -0700
+IronPort-SDR: 2IsMkTcOw1sn9UK3hGIzTm40Q1utLFn5qQzeYsBi9PtOgBIDbS7NcfeURG+P6fbvkGGVzCYcBV
+ rS0vME5SKzeQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.81,249,1610438400"; 
+   d="scan'208";a="378401328"
+Received: from local-michael-cet-test.sh.intel.com (HELO localhost) ([10.239.159.166])
+  by fmsmga007.fm.intel.com with ESMTP; 14 Mar 2021 23:14:32 -0700
+Date:   Mon, 15 Mar 2021 14:26:57 +0800
+From:   Yang Weijiang <weijiang.yang@intel.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Yang Weijiang <weijiang.yang@intel.com>, pbonzini@redhat.com,
+        vkuznets@redhat.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3 1/3] KVM: nVMX: Sync L2 guest CET states between L1/L2
+Message-ID: <20210315062656.GA6688@local-michael-cet-test.sh.intel.com>
+References: <20210304060740.11339-1-weijiang.yang@intel.com>
+ <20210304060740.11339-2-weijiang.yang@intel.com>
+ <YEEO9bcLnc0gyLyP@google.com>
+ <20210308080108.GA1160@local-michael-cet-test.sh.intel.com>
+ <YEv5IFrh/HBUsMR/@google.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YEv5IFrh/HBUsMR/@google.com>
+User-Agent: Mutt/1.11.3 (2019-02-01)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-VDUSE (vDPA Device in Userspace) is a framework to support
-implementing software-emulated vDPA devices in userspace. This
-document is intended to clarify the VDUSE design and usage.
+On Fri, Mar 12, 2021 at 03:28:32PM -0800, Sean Christopherson wrote:
+> On Mon, Mar 08, 2021, Yang Weijiang wrote:
+> > On Thu, Mar 04, 2021 at 08:46:45AM -0800, Sean Christopherson wrote:
+> > > On Thu, Mar 04, 2021, Yang Weijiang wrote:
+> > > > @@ -3375,6 +3391,12 @@ enum nvmx_vmentry_status nested_vmx_enter_non_root_mode(struct kvm_vcpu *vcpu,
+> > > >  	if (kvm_mpx_supported() &&
+> > > >  		!(vmcs12->vm_entry_controls & VM_ENTRY_LOAD_BNDCFGS))
+> > > >  		vmx->nested.vmcs01_guest_bndcfgs = vmcs_read64(GUEST_BNDCFGS);
+> > > > +	if (kvm_cet_supported() &&
+> > > > +		!(vmcs12->vm_entry_controls & VM_ENTRY_LOAD_CET_STATE)) {
+> > > 
+> > > Alignment.
+> > > 
+> > > > +		vmx->nested.vmcs01_guest_ssp = vmcs_readl(GUEST_SSP);
+> > > > +		vmx->nested.vmcs01_guest_s_cet = vmcs_readl(GUEST_S_CET);
+> > > > +		vmx->nested.vmcs01_guest_ssp_tbl = vmcs_readl(GUEST_INTR_SSP_TABLE);
+> > > > +	}
+> > > >  
+> > > >  	/*
+> > > >  	 * Overwrite vmcs01.GUEST_CR3 with L1's CR3 if EPT is disabled *and*
+> > > > @@ -4001,6 +4023,9 @@ static bool is_vmcs12_ext_field(unsigned long field)
+> > > >  	case GUEST_IDTR_BASE:
+> > > >  	case GUEST_PENDING_DBG_EXCEPTIONS:
+> > > >  	case GUEST_BNDCFGS:
+> > > > +	case GUEST_SSP:
+> > > > +	case GUEST_INTR_SSP_TABLE:
+> > > > +	case GUEST_S_CET:
+> > > >  		return true;
+> > > >  	default:
+> > > >  		break;
+> > > > @@ -4052,6 +4077,11 @@ static void sync_vmcs02_to_vmcs12_rare(struct kvm_vcpu *vcpu,
+> > > >  		vmcs_readl(GUEST_PENDING_DBG_EXCEPTIONS);
+> > > >  	if (kvm_mpx_supported())
+> > > >  		vmcs12->guest_bndcfgs = vmcs_read64(GUEST_BNDCFGS);
+> > > > +	if (kvm_cet_supported()) {
+> > > 
+> > > Isn't the existing kvm_mpx_supported() check wrong in the sense that KVM only
+> > > needs to sync to vmcs12 if KVM and the guest both support MPX?  
+> > 
+> > For MPX, if guest_cpuid_has() is not efficent, can it be checked by BNDCFGS EN bit?
+> > E.g.:
+> > 
+> > if (kvm_mpx_supported() && (vmcs12->guest_bndcfgs & 1))
+> > 
+> > > Same would apply to CET. Not sure it'd be a net positive in terms of performance since
+> > > guest_cpuid_has() can be quite slow, but overwriting vmcs12 fields that technically don't exist
+> > > feels wrong.
+> > 
+> > For CET, can we get equivalent effect by checking vmcs12->guest_cr4.CET?
+> > E.g.:
+> > if (kvm_cet_supported() && (vmcs12->guest_cr4 & X86_CR4_CET))
+> 
+> No, because the existence of the fields does not depend on them being enabled.
+> E.g. things will go sideways if the values change while L2 is running, L2
+> disables CET, and then an exit occurs.
+> 
+> This is already a slow path, maybe the guest_cpuid_has() checks are a non-issue.
 
-Signed-off-by: Xie Yongji <xieyongji@bytedance.com>
----
- Documentation/userspace-api/index.rst |   1 +
- Documentation/userspace-api/vduse.rst | 209 ++++++++++++++++++++++++++++++++++
- 2 files changed, 210 insertions(+)
- create mode 100644 Documentation/userspace-api/vduse.rst
+Agree, then will add the check to both MPX and CET. Thanks!
 
-diff --git a/Documentation/userspace-api/index.rst b/Documentation/userspace-api/index.rst
-index acd2cc2a538d..f63119130898 100644
---- a/Documentation/userspace-api/index.rst
-+++ b/Documentation/userspace-api/index.rst
-@@ -24,6 +24,7 @@ place where this information is gathered.
-    ioctl/index
-    iommu
-    media/index
-+   vduse
- 
- .. only::  subproject and html
- 
-diff --git a/Documentation/userspace-api/vduse.rst b/Documentation/userspace-api/vduse.rst
-new file mode 100644
-index 000000000000..744a9d3452c1
---- /dev/null
-+++ b/Documentation/userspace-api/vduse.rst
-@@ -0,0 +1,209 @@
-+==================================
-+VDUSE - "vDPA Device in Userspace"
-+==================================
-+
-+vDPA (virtio data path acceleration) device is a device that uses a
-+datapath which complies with the virtio specifications with vendor
-+specific control path. vDPA devices can be both physically located on
-+the hardware or emulated by software. VDUSE is a framework that makes it
-+possible to implement software-emulated vDPA devices in userspace.
-+
-+How VDUSE works
-+------------
-+Each userspace vDPA device is created by the VDUSE_CREATE_DEV ioctl on
-+the character device (/dev/vduse/control). Then a device file with the
-+specified name (/dev/vduse/$NAME) will appear, which can be used to
-+implement the userspace vDPA device's control path and data path.
-+
-+To implement control path, a message-based communication protocol and some
-+types of control messages are introduced in the VDUSE framework:
-+
-+- VDUSE_SET_VQ_ADDR: Set the vring address of virtqueue.
-+
-+- VDUSE_SET_VQ_NUM: Set the size of virtqueue
-+
-+- VDUSE_SET_VQ_READY: Set ready status of virtqueue
-+
-+- VDUSE_GET_VQ_READY: Get ready status of virtqueue
-+
-+- VDUSE_SET_VQ_STATE: Set the state for virtqueue
-+
-+- VDUSE_GET_VQ_STATE: Get the state for virtqueue
-+
-+- VDUSE_SET_FEATURES: Set virtio features supported by the driver
-+
-+- VDUSE_GET_FEATURES: Get virtio features supported by the device
-+
-+- VDUSE_SET_STATUS: Set the device status
-+
-+- VDUSE_GET_STATUS: Get the device status
-+
-+- VDUSE_SET_CONFIG: Write to device specific configuration space
-+
-+- VDUSE_GET_CONFIG: Read from device specific configuration space
-+
-+- VDUSE_UPDATE_IOTLB: Notify userspace to update the memory mapping in device IOTLB
-+
-+Those control messages are mostly based on the vdpa_config_ops in
-+include/linux/vdpa.h which defines a unified interface to control
-+different types of vdpa device. Userspace needs to read()/write()
-+on the VDUSE device file to receive/reply those control messages
-+from/to VDUSE kernel module as follows:
-+
-+.. code-block:: c
-+
-+	static int vduse_message_handler(int dev_fd)
-+	{
-+		int len;
-+		struct vduse_dev_request req;
-+		struct vduse_dev_response resp;
-+
-+		len = read(dev_fd, &req, sizeof(req));
-+		if (len != sizeof(req))
-+			return -1;
-+
-+		resp.request_id = req.request_id;
-+
-+		switch (req.type) {
-+
-+		/* handle different types of message */
-+
-+		}
-+
-+		len = write(dev_fd, &resp, sizeof(resp));
-+		if (len != sizeof(resp))
-+			return -1;
-+
-+		return 0;
-+	}
-+
-+In the data path, vDPA device's iova regions will be mapped into userspace
-+with the help of VDUSE_IOTLB_GET_ENTRY ioctl on the VDUSE device file:
-+
-+- VDUSE_IOTLB_GET_ENTRY: get a mmap'able iova region containing the specified iova.
-+  Userspace can access this iova region by passing corresponding size, offset, perm
-+  and fd to mmap(). For example:
-+
-+.. code-block:: c
-+
-+	static int perm_to_prot(uint8_t perm)
-+	{
-+		int prot = 0;
-+
-+		switch (perm) {
-+		case VDUSE_ACCESS_WO:
-+			prot |= PROT_WRITE;
-+			break;
-+		case VDUSE_ACCESS_RO:
-+			prot |= PROT_READ;
-+			break;
-+		case VDUSE_ACCESS_RW:
-+			prot |= PROT_READ | PROT_WRITE;
-+			break;
-+		}
-+
-+		return prot;
-+	}
-+
-+	static void *iova_to_va(int dev_fd, uint64_t iova, uint64_t *len)
-+	{
-+		void *addr;
-+		size_t size;
-+		struct vduse_iotlb_entry entry;
-+
-+		entry.start = iova;
-+		if (ioctl(dev_fd, VDUSE_IOTLB_GET_ENTRY, &entry))
-+			return NULL;
-+
-+		size = entry.last - entry.start + 1;
-+		*len = entry.last - iova + 1;
-+		addr = mmap(0, size, perm_to_prot(entry.perm), MAP_SHARED,
-+			    entry.fd, entry.offset);
-+
-+		if (addr == MAP_FAILED)
-+			return NULL;
-+
-+		/* do something to cache this iova region */
-+
-+		return addr + iova - entry.start;
-+	}
-+
-+Besides, the following ioctls on the VDUSE device file are provided to support
-+interrupt injection and setting up eventfd for virtqueue kicks:
-+
-+- VDUSE_VQ_SETUP_KICKFD: set the kickfd for virtqueue, this eventfd is used
-+  by VDUSE kernel module to notify userspace to consume the vring.
-+
-+- VDUSE_INJECT_VQ_IRQ: inject an interrupt for specific virtqueue
-+
-+- VDUSE_INJECT_CONFIG_IRQ: inject a config interrupt
-+
-+Register VDUSE device on vDPA bus
-+---------------------------------
-+In order to make the VDUSE device work, administrator needs to use the management
-+API (netlink) to register it on vDPA bus. Some sample codes are show below:
-+
-+.. code-block:: c
-+
-+	static int netlink_add_vduse(const char *name, int device_id)
-+	{
-+		struct nl_sock *nlsock;
-+		struct nl_msg *msg;
-+		int famid;
-+
-+		nlsock = nl_socket_alloc();
-+		if (!nlsock)
-+			return -ENOMEM;
-+
-+		if (genl_connect(nlsock))
-+			goto free_sock;
-+
-+		famid = genl_ctrl_resolve(nlsock, VDPA_GENL_NAME);
-+		if (famid < 0)
-+			goto close_sock;
-+
-+		msg = nlmsg_alloc();
-+		if (!msg)
-+			goto close_sock;
-+
-+		if (!genlmsg_put(msg, NL_AUTO_PORT, NL_AUTO_SEQ, famid, 0, 0,
-+		    VDPA_CMD_DEV_NEW, 0))
-+			goto nla_put_failure;
-+
-+		NLA_PUT_STRING(msg, VDPA_ATTR_DEV_NAME, name);
-+		NLA_PUT_STRING(msg, VDPA_ATTR_MGMTDEV_DEV_NAME, "vduse");
-+		NLA_PUT_U32(msg, VDPA_ATTR_DEV_ID, device_id);
-+
-+		if (nl_send_sync(nlsock, msg))
-+			goto close_sock;
-+
-+		nl_close(nlsock);
-+		nl_socket_free(nlsock);
-+
-+		return 0;
-+	nla_put_failure:
-+		nlmsg_free(msg);
-+	close_sock:
-+		nl_close(nlsock);
-+	free_sock:
-+		nl_socket_free(nlsock);
-+		return -1;
-+	}
-+
-+MMU-based IOMMU Driver
-+----------------------
-+VDUSE framework implements an MMU-based on-chip IOMMU driver to support
-+mapping the kernel DMA buffer into the userspace iova region dynamically.
-+This is mainly designed for virtio-vdpa case (kernel virtio drivers).
-+
-+The basic idea behind this driver is treating MMU (VA->PA) as IOMMU (IOVA->PA).
-+The driver will set up MMU mapping instead of IOMMU mapping for the DMA transfer
-+so that the userspace process is able to use its virtual address to access
-+the DMA buffer in kernel.
-+
-+And to avoid security issue, a bounce-buffering mechanism is introduced to
-+prevent userspace accessing the original buffer directly which may contain other
-+kernel data. During the mapping, unmapping, the driver will copy the data from
-+the original buffer to the bounce buffer and back, depending on the direction of
-+the transfer. And the bounce-buffer addresses will be mapped into the user address
-+space instead of the original one.
--- 
-2.11.0
-
+>
+> 
+> > 
+> > > 
+> > > > +		vmcs12->guest_ssp = vmcs_readl(GUEST_SSP);
+> > > > +		vmcs12->guest_s_cet = vmcs_readl(GUEST_S_CET);
+> > > > +		vmcs12->guest_ssp_tbl = vmcs_readl(GUEST_INTR_SSP_TABLE);
+> > > > +	}
+> > > >  
+> > > >  	vmx->nested.need_sync_vmcs02_to_vmcs12_rare = false;
+> > > >  }
+> > > > diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
+> > > > index 9d3a557949ac..36dc4fdb0909 100644
+> > > > --- a/arch/x86/kvm/vmx/vmx.h
+> > > > +++ b/arch/x86/kvm/vmx/vmx.h
+> > > > @@ -155,6 +155,9 @@ struct nested_vmx {
+> > > >  	/* to migrate it to L2 if VM_ENTRY_LOAD_DEBUG_CONTROLS is off */
+> > > >  	u64 vmcs01_debugctl;
+> > > >  	u64 vmcs01_guest_bndcfgs;
+> > > > +	u64 vmcs01_guest_ssp;
+> > > > +	u64 vmcs01_guest_s_cet;
+> > > > +	u64 vmcs01_guest_ssp_tbl;
+> > > >  
+> > > >  	/* to migrate it to L1 if L2 writes to L1's CR8 directly */
+> > > >  	int l1_tpr_threshold;
+> > > > -- 
+> > > > 2.26.2
+> > > > 
