@@ -2,106 +2,109 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A5DC733C5C3
-	for <lists+kvm@lfdr.de>; Mon, 15 Mar 2021 19:35:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4C24D33C68C
+	for <lists+kvm@lfdr.de>; Mon, 15 Mar 2021 20:10:51 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230371AbhCOSed (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 15 Mar 2021 14:34:33 -0400
-Received: from mx2.suse.de ([195.135.220.15]:38734 "EHLO mx2.suse.de"
+        id S231437AbhCOTKU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 15 Mar 2021 15:10:20 -0400
+Received: from mx2.suse.de ([195.135.220.15]:58734 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232041AbhCOSeT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 15 Mar 2021 14:34:19 -0400
+        id S230243AbhCOTKN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 15 Mar 2021 15:10:13 -0400
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-        t=1615833258; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+        t=1615835412; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=H+y7FsHAfr9H0V0nZlpCJwqn4arhOTDKupfGhSsi4L0=;
-        b=KjlbibSfXB7NG662v+nqeUvX9bQmFZ6Tn4FZ8LSyV2Dy1wShX6HyGPkQ/3oP/oi8ltOa82
-        p4LArpJEH3uiUS4qK5AotGb4JiNd6JM5FPMBGV9OllfNYp2H0+Bq9mcfUIPNFQ81bOWovM
-        7fmYs578Xsmg19z3fl9mWp/3G2HomOI=
+        bh=gBh9rZ1pe0Dw23aY7I0BceM5dAfPMfFrVDEvEe02JBQ=;
+        b=LtTDSfiEFPCuY2dr1iPNxVN3WP7R4nJ6QBfYlBO9dIEx3AZD7DORPVEpyqSZwxaNBD67ho
+        thqQwRLsCImAVaMVNPEnBPxDviIafWx0by0BLCZeyNCaYS1XjGqT0/nwMs8kOH0kUWCam7
+        aDMSyE7WKRGcejD1r5ZNrf11mumaWEc=
 Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id 2014DAE8F;
-        Mon, 15 Mar 2021 18:34:18 +0000 (UTC)
-Date:   Mon, 15 Mar 2021 19:34:15 +0100
+        by mx2.suse.de (Postfix) with ESMTP id 126BDAE8F;
+        Mon, 15 Mar 2021 19:10:12 +0000 (UTC)
+Date:   Mon, 15 Mar 2021 20:10:09 +0100
 From:   Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>
 To:     Vipin Sharma <vipinsh@google.com>
-Cc:     tj@kernel.org, rdunlap@infradead.org, thomas.lendacky@amd.com,
-        brijesh.singh@amd.com, jon.grimm@amd.com, eric.vantassell@amd.com,
-        pbonzini@redhat.com, hannes@cmpxchg.org, frankja@linux.ibm.com,
-        borntraeger@de.ibm.com, corbet@lwn.net, seanjc@google.com,
-        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
-        joro@8bytes.org, tglx@linutronix.de, mingo@redhat.com,
-        bp@alien8.de, hpa@zytor.com, gingell@google.com,
+Cc:     Tejun Heo <tj@kernel.org>, rdunlap@infradead.org,
+        thomas.lendacky@amd.com, brijesh.singh@amd.com, jon.grimm@amd.com,
+        eric.vantassell@amd.com, pbonzini@redhat.com, hannes@cmpxchg.org,
+        frankja@linux.ibm.com, borntraeger@de.ibm.com, corbet@lwn.net,
+        seanjc@google.com, vkuznets@redhat.com, wanpengli@tencent.com,
+        jmattson@google.com, joro@8bytes.org, tglx@linutronix.de,
+        mingo@redhat.com, bp@alien8.de, hpa@zytor.com, gingell@google.com,
         rientjes@google.com, dionnaglaze@google.com, kvm@vger.kernel.org,
         x86@kernel.org, cgroups@vger.kernel.org, linux-doc@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: Re: [Patch v3 1/2] cgroup: sev: Add misc cgroup controller
-Message-ID: <YE+op0MZKG41EALi@blackbook>
+Subject: Re: [Patch v3 0/2] cgroup: New misc cgroup controller
+Message-ID: <YE+xEbwUoRj+snTY@blackbook>
 References: <20210304231946.2766648-1-vipinsh@google.com>
- <20210304231946.2766648-2-vipinsh@google.com>
- <YEpod5X29YqMhW/g@blackbook>
- <YEu74hkEPEyvxC85@google.com>
+ <YETLqGIw1GekWdYK@slm.duckdns.org>
+ <YEpoS90X19Z2QOro@blackbook>
+ <YEupplaAWU1i0G6B@google.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="s/zzXfvrLmfa0Un9"
+        protocol="application/pgp-signature"; boundary="WauBitk+7AKZVUrp"
 Content-Disposition: inline
-In-Reply-To: <YEu74hkEPEyvxC85@google.com>
+In-Reply-To: <YEupplaAWU1i0G6B@google.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
---s/zzXfvrLmfa0Un9
+--WauBitk+7AKZVUrp
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-On Fri, Mar 12, 2021 at 11:07:14AM -0800, Vipin Sharma <vipinsh@google.com>=
- wrote:
-> We should be fine without atomic64_t because we are using unsigned
-> long and not 64 bit explicitly. This will work on both 32 and 64 bit
-> machines.
-I see.
+On Fri, Mar 12, 2021 at 09:49:26AM -0800, Vipin Sharma <vipinsh@google.com> wrote:
+> I will add some more information in the cover letter of the next version.
+Thanks.
 
-> But I will add READ_ONCE and WRITE_ONCE because of potential chances of
-> load tearing and store tearing.
->=20
-> Do you agree?
-Yes.
+> Each one coming up with their own interaction is a duplicate effort
+> when they all need similar thing.
+Could this be expressed as a new BPF hook (when allocating/freeing such
+a resource unit)?
 
-> This was only here to avoid multiple reads of capacity and making sure
-> if condition and seq_print will see the same value.
-Aha.
+The decision could be made based on the configured limit or even some
+other predicate.
 
-> Also, I was not aware of load and store tearing of properly aligned
-> and machine word size variables. I will add READ_ONCE and WRITE_ONCE
-> at other places.
-Yeah, although it's theoretical, I think it also serves well to annotate
-such unsychronized accesses.
+(I saw this proposed already but I haven't seen some more reasoning
+whether it's worse/better. IMO, BPF hooks are "cheaper" than full-blown
+controllers, though it's still new user API.)
 
-Thanks,
+
+> As per my understanding this is the only for way for loadable modules
+> (kvm-amd in this case) to access Kernel APIs. Let me know if there is a
+> better way to do it.
+I understood the symbols are exported for such modularized builds.
+However, making them non-GPL exposes them to any out-of-tree modules,
+although, the resource types are supposed to stay hardcoded in the misc
+controller. So my point was to make them EXPORT_SYMBOL_GPL to mark
+they're just a means of implementing the modularized builds and not an
+API. (But they'd remain API for out-of-tree GPL modules anyway, so take
+this reasoning of mine with a grain of salt.)
+
 Michal
 
---s/zzXfvrLmfa0Un9
+--WauBitk+7AKZVUrp
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: Digital signature
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEEoQaUCWq8F2Id1tNia1+riC5qSgFAmBPqKEACgkQia1+riC5
-qSihOg//SpH6gNPHIcbQ+iF47BrOX3zJwft1PTn3D8d3byIaot3/Sym+j12ttkQU
-xstX/U3Mvimyouy50DFaYLiQ+EWMOPm8dzEw2nPOQFrL0bT6cjRdFnAzH7Y2m87c
-GufRjzeGwn8H2dRTPHiUjc+ETQhdjIRUOL5yUgoJkDGmV1m63j4rQUS5JXoHuW/i
-WH8ePRhc4SlGS/Ifgu3/+g0a3z+K46umCrHA9//BHI5gPyuvobyCdwIjrFekSDAq
-5vWwp6YGavoX5ZoZALUpokgcZR/iVRhTpt5m6psuYFhb+i+sWi/jYVgAeGSzZgCU
-G9uvFogZrPASTAHTss+MwdXoKUWWckG33D5MA8RtTXobewWrO7GcpTCFb79Mm0pF
-JzdVgBuMMuphLjkXHgQnSX8wHQQ7R545TuaSLXZBM9AqDPFjScEwdi68qRKPqopt
-wqqL64XiFnoICLnZjFpp11cL1gccY4cHYo71eNrVA1bdscO1iiO/c5xPbh9JD6cX
-I/cwAksf9R+bW+XUWrgsDvx9VuCiWfhEtiT/obqgDyHEQfE7JtgVX2IDN1o1pLcM
-+aGLPoyU/4Nc6aK898xqpJdzY/kCNB73YUuhdgH8lf1tY1P0myDTTivn7+XqZXd3
-hfMM6u+AdaUZhqymfylaEnTpQpBH4VfRAsBS0SnFuUnT93GnkqU=
-=+zv/
+iQIzBAEBCAAdFiEEEoQaUCWq8F2Id1tNia1+riC5qSgFAmBPsQ0ACgkQia1+riC5
+qSh1cQ/9GddlgkcRcRP9oxFJbsVUxhnntwF8wqSof5oSUCBDSWP5Hz7M3P05aFrI
+5VTcopKswg9sI+xO2rMiZb2guzOsy4soqTHRj6emRwbs09Pmtb9uEPrg3nbTZsAR
+jUHnNRkhPB7LVMhyVRH4wmZRcD1mq0HiJLkzQNaPVG8D3XG0ge6xVr6+doCc2Ev6
+UTrbbtcdBXmZX8hnLutMYu+QWNWQJyWJjii1nJKwby1v6heb10/fN40Ai1DQiOrR
+l21qKqxrzUjzpJUOv7Rek/FHvKf1u6HcIEI8H1wx/tMdbptH7IMH6fAtRSDpzbnl
+rPzovNq6h6r49VwFPKAaY0kx8u0Yv+IUME2GrjpmuxO+O3dvDJiaQeltisxlfWLn
+/Cn236Hzs3aGAHHqqLDJXoxarCmdbFbLL5KjLfK8onoUuNkKf9jmZ2puG04Lgin6
+iuvW2VEwUeKDXGxly0+JmzbRatQlvjfltDf7QlHx5zZxbGXYXVDFaz0AKx2hS6h+
+XeoV5ko/poc6htsxJWdygD+DXl8y0c9JJlQsLHhBr5JPszYaw3BegCedwvZdF4ph
+5QczC/tm0JiKqlb9tNIJ/kv2qIC97DbLt0Q0wv3idoAAZ9iTCwOSwRIdA79txnm4
+brb1x019FyJQXQbSL9pP2saG0dbJ7PYgNHp//N/zFMahETXHkq4=
+=lJqH
 -----END PGP SIGNATURE-----
 
---s/zzXfvrLmfa0Un9--
+--WauBitk+7AKZVUrp--
