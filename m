@@ -2,22 +2,22 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2BAA033B2BA
-	for <lists+kvm@lfdr.de>; Mon, 15 Mar 2021 13:27:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 34F4333B2BC
+	for <lists+kvm@lfdr.de>; Mon, 15 Mar 2021 13:28:30 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229585AbhCOM10 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 15 Mar 2021 08:27:26 -0400
-Received: from foss.arm.com ([217.140.110.172]:37166 "EHLO foss.arm.com"
+        id S229660AbhCOM15 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 15 Mar 2021 08:27:57 -0400
+Received: from foss.arm.com ([217.140.110.172]:37192 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229602AbhCOM1D (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 15 Mar 2021 08:27:03 -0400
+        id S229505AbhCOM1Z (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 15 Mar 2021 08:27:25 -0400
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5D5EBD6E;
-        Mon, 15 Mar 2021 05:27:03 -0700 (PDT)
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D3897D6E;
+        Mon, 15 Mar 2021 05:27:24 -0700 (PDT)
 Received: from slackpad.fritz.box (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 31DA33F792;
-        Mon, 15 Mar 2021 05:27:02 -0700 (PDT)
-Date:   Mon, 15 Mar 2021 12:26:48 +0000
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A81343F792;
+        Mon, 15 Mar 2021 05:27:23 -0700 (PDT)
+Date:   Mon, 15 Mar 2021 12:27:02 +0000
 From:   Andre Przywara <andre.przywara@arm.com>
 To:     Alexandru Elisei <alexandru.elisei@arm.com>
 Cc:     Will Deacon <will@kernel.org>,
@@ -25,12 +25,13 @@ Cc:     Will Deacon <will@kernel.org>,
         kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
         Marc Zyngier <maz@kernel.org>,
         Sami Mujawar <sami.mujawar@arm.com>
-Subject: Re: [PATCH kvmtool v2 13/22] hw/serial: Refactor trap handler
-Message-ID: <20210315122648.59e3dc85@slackpad.fritz.box>
-In-Reply-To: <07b64ff1-a9d7-0393-36f4-8df4f87937f6@arm.com>
+Subject: Re: [PATCH kvmtool v2 20/22] arm: Reorganise and document memory
+ map
+Message-ID: <20210315122702.5f5c629f@slackpad.fritz.box>
+In-Reply-To: <deb3e029-e634-c28c-2a9a-e461041bb249@arm.com>
 References: <20210225005915.26423-1-andre.przywara@arm.com>
-        <20210225005915.26423-14-andre.przywara@arm.com>
-        <07b64ff1-a9d7-0393-36f4-8df4f87937f6@arm.com>
+        <20210225005915.26423-21-andre.przywara@arm.com>
+        <deb3e029-e634-c28c-2a9a-e461041bb249@arm.com>
 Organization: Arm Ltd.
 X-Mailer: Claws Mail 3.17.1 (GTK+ 2.24.31; x86_64-slackware-linux-gnu)
 MIME-Version: 1.0
@@ -40,262 +41,143 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 12 Mar 2021 11:29:43 +0000
+On Tue, 9 Mar 2021 15:46:29 +0000
 Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+
+Hi,
 
 > Hi Andre,
 > 
+> This is a really good idea, thank you for implementing it!
+> 
+> Some comments below.
+> 
 > On 2/25/21 12:59 AM, Andre Przywara wrote:
-> > With the planned retirement of the special ioport emulation code, we
-> > need to provide an emulation function compatible with the MMIO prototype.
+> > The hardcoded memory map we expose to a guest is currently described
+> > using a series of partially interconnected preprocessor constants,
+> > which is hard to read and follow.
 > >
-> > Adjust the trap handler to use that new function, and provide shims to
-> > implement the old ioport interface, for now.
+> > In preparation for moving the UART and RTC to some different MMIO
+> > region, document the current map with some ASCII art, and clean up the
+> > definition of the sections.
 > >
-> > We drop the usage of ioport__read8/write8 entirely, as this would only
-> > be applicable for I/O port accesses, and does nothing for 8-bit wide
-> > accesses anyway.
+> > No functional change.
 > >
 > > Signed-off-by: Andre Przywara <andre.przywara@arm.com>
 > > ---
-> >  hw/serial.c | 93 +++++++++++++++++++++++++++++++++--------------------
-> >  1 file changed, 58 insertions(+), 35 deletions(-)
+> >  arm/include/arm-common/kvm-arch.h | 41 ++++++++++++++++++++++---------
+> >  1 file changed, 29 insertions(+), 12 deletions(-)
 > >
-> > diff --git a/hw/serial.c b/hw/serial.c
-> > index b0465d99..c495eac1 100644
-> > --- a/hw/serial.c
-> > +++ b/hw/serial.c
-> > @@ -242,36 +242,31 @@ void serial8250__inject_sysrq(struct kvm *kvm, char sysrq)
-> >  	sysrq_pending = sysrq;
-> >  }
+> > diff --git a/arm/include/arm-common/kvm-arch.h b/arm/include/arm-common/kvm-arch.h
+> > index d84e50cd..b12255b0 100644
+> > --- a/arm/include/arm-common/kvm-arch.h
+> > +++ b/arm/include/arm-common/kvm-arch.h
+> > @@ -7,14 +7,33 @@
 > >  
-> > -static bool serial8250_out(struct ioport *ioport, struct kvm_cpu *vcpu, u16 port,
-> > -			   void *data, int size)
-> > +static bool serial8250_out(struct serial8250_device *dev, struct kvm_cpu *vcpu,
-> > +			   u16 offset, u8 data)
-> >  {
-> > -	struct serial8250_device *dev = ioport->priv;
-> > -	u16 offset;
-> >  	bool ret = true;
-> > -	char *addr = data;
+> >  #include "arm-common/gic.h"
 > >  
-> >  	mutex_lock(&dev->mutex);
-> >  
-> > -	offset = port - dev->iobase;
-> > -
-> >  	switch (offset) {
-> >  	case UART_TX:
-> >  		if (dev->lcr & UART_LCR_DLAB) {
-> > -			dev->dll = ioport__read8(data);
-> > +			dev->dll = data;
-> >  			break;
-> >  		}
-> >  
-> >  		/* Loopback mode */
-> >  		if (dev->mcr & UART_MCR_LOOP) {
-> >  			if (dev->rxcnt < FIFO_LEN) {
-> > -				dev->rxbuf[dev->rxcnt++] = *addr;
-> > +				dev->rxbuf[dev->rxcnt++] = data;
-> >  				dev->lsr |= UART_LSR_DR;
-> >  			}
-> >  			break;
-> >  		}
-> >  
-> >  		if (dev->txcnt < FIFO_LEN) {
-> > -			dev->txbuf[dev->txcnt++] = *addr;
-> > +			dev->txbuf[dev->txcnt++] = data;
-> >  			dev->lsr &= ~UART_LSR_TEMT;
-> >  			if (dev->txcnt == FIFO_LEN / 2)
-> >  				dev->lsr &= ~UART_LSR_THRE;
-> > @@ -283,18 +278,18 @@ static bool serial8250_out(struct ioport *ioport, struct kvm_cpu *vcpu, u16 port
-> >  		break;
-> >  	case UART_IER:
-> >  		if (!(dev->lcr & UART_LCR_DLAB))
-> > -			dev->ier = ioport__read8(data) & 0x0f;
-> > +			dev->ier = data & 0x0f;
-> >  		else
-> > -			dev->dlm = ioport__read8(data);
-> > +			dev->dlm = data;
-> >  		break;
-> >  	case UART_FCR:
-> > -		dev->fcr = ioport__read8(data);
-> > +		dev->fcr = data;
-> >  		break;
-> >  	case UART_LCR:
-> > -		dev->lcr = ioport__read8(data);
-> > +		dev->lcr = data;
-> >  		break;
-> >  	case UART_MCR:
-> > -		dev->mcr = ioport__read8(data);
-> > +		dev->mcr = data;
-> >  		break;
-> >  	case UART_LSR:
-> >  		/* Factory test */
-> > @@ -303,7 +298,7 @@ static bool serial8250_out(struct ioport *ioport, struct kvm_cpu *vcpu, u16 port
-> >  		/* Not used */
-> >  		break;
-> >  	case UART_SCR:
-> > -		dev->scr = ioport__read8(data);
-> > +		dev->scr = data;
-> >  		break;
-> >  	default:
-> >  		ret = false;
-> > @@ -317,7 +312,7 @@ static bool serial8250_out(struct ioport *ioport, struct kvm_cpu *vcpu, u16 port
-> >  	return ret;
-> >  }
-> >  
-> > -static void serial8250_rx(struct serial8250_device *dev, void *data)
-> > +static void serial8250_rx(struct serial8250_device *dev, u8 *data)
-> >  {
-> >  	if (dev->rxdone == dev->rxcnt)
-> >  		return;
-> > @@ -325,57 +320,54 @@ static void serial8250_rx(struct serial8250_device *dev, void *data)
-> >  	/* Break issued ? */
-> >  	if (dev->lsr & UART_LSR_BI) {
-> >  		dev->lsr &= ~UART_LSR_BI;
-> > -		ioport__write8(data, 0);
-> > +		*data = 0;
-> >  		return;
-> >  	}
-> >  
-> > -	ioport__write8(data, dev->rxbuf[dev->rxdone++]);
-> > +	*data = dev->rxbuf[dev->rxdone++];
-> >  	if (dev->rxcnt == dev->rxdone) {
-> >  		dev->lsr &= ~UART_LSR_DR;
-> >  		dev->rxcnt = dev->rxdone = 0;
-> >  	}
-> >  }
-> >  
-> > -static bool serial8250_in(struct ioport *ioport, struct kvm_cpu *vcpu, u16 port, void *data, int size)
-> > +static bool serial8250_in(struct serial8250_device *dev, struct kvm_cpu *vcpu,
-> > +			  u16 offset, u8 *data)
-> >  {
-> > -	struct serial8250_device *dev = ioport->priv;
-> > -	u16 offset;
-> >  	bool ret = true;
-> >  
-> >  	mutex_lock(&dev->mutex);
-> >  
-> > -	offset = port - dev->iobase;
-> > -
-> >  	switch (offset) {
-> >  	case UART_RX:
-> >  		if (dev->lcr & UART_LCR_DLAB)
-> > -			ioport__write8(data, dev->dll);
-> > +			*data = dev->dll;
-> >  		else
-> >  			serial8250_rx(dev, data);
-> >  		break;
-> >  	case UART_IER:
-> >  		if (dev->lcr & UART_LCR_DLAB)
-> > -			ioport__write8(data, dev->dlm);
-> > +			*data = dev->dlm;
-> >  		else
-> > -			ioport__write8(data, dev->ier);
-> > +			*data = dev->ier;
-> >  		break;
-> >  	case UART_IIR:
-> > -		ioport__write8(data, dev->iir | UART_IIR_TYPE_BITS);
-> > +		*data = dev->iir | UART_IIR_TYPE_BITS;
-> >  		break;
-> >  	case UART_LCR:
-> > -		ioport__write8(data, dev->lcr);
-> > +		*data = dev->lcr;
-> >  		break;
-> >  	case UART_MCR:
-> > -		ioport__write8(data, dev->mcr);
-> > +		*data = dev->mcr;
-> >  		break;
-> >  	case UART_LSR:
-> > -		ioport__write8(data, dev->lsr);
-> > +		*data = dev->lsr;
-> >  		break;
-> >  	case UART_MSR:
-> > -		ioport__write8(data, dev->msr);
-> > +		*data = dev->msr;
-> >  		break;
-> >  	case UART_SCR:
-> > -		ioport__write8(data, dev->scr);
-> > +		*data = dev->scr;
-> >  		break;
-> >  	default:
-> >  		ret = false;
-> > @@ -389,6 +381,37 @@ static bool serial8250_in(struct ioport *ioport, struct kvm_cpu *vcpu, u16 port,
-> >  	return ret;
-> >  }  
+> > +/*
+> > + * The memory map used for ARM guests (not to scale):
+> > + *
+> > + * 0      64K  16M     32M     48M            1GB       2GB
+> > + * +-------+-..-+-------+-------+--....--+-----+--.....--+---......
+> > + * | (PCI) |////| int.  |       |        |     |         |
+> > + * |  I/O  |////| MMIO: | Flash | virtio | GIC |   PCI   |  DRAM
+> > + * | ports |////| UART, |       |  MMIO  |     |  (AXI)  |
+> > + * |       |////| RTC   |       |        |     |         |
+> > + * +-------+-..-+-------+-------+--....--+-----+--.....--+---......
+> > + */  
 > 
-> I'm not sure about replacing ioport_{read,write}8 with pointer dereferencing. They
-> are functionally equivalent because big-endian and little-endian are about the
-> order of bytes in memory, not the order of bits, but I don't think the change
-> makes much sense because:
-> 
-> 1. All the other emulated devices use the ioport accessors, even in the case of 8
-> bit accesses. For example, the RTC device uses ioport accessors and it too is
-> converted in the end to a MMIO device, just like serial.
-> 
-> 2. The patch is about refactoring the emulation callbacks, other (non-trivial)
-> changes should be a separate patch.
-> 
-> Please let me know if it's something that I'm missing. Other than this change, the
-> patch looks good.
+> Nitpick: I searched the PCI Local Bus Specification revision 3.0 (which kvmtool
+> currently implements) for the term I/O ports, and found one mention in a schematic
+> for an add-in card. The I/O region is called in the spec I/O Space.
 
-Well, I can see merits in both approaches: keeping the wrappers and
-ditching them. Don't really have a strong opinion, but I think
-eventually we should have the endian conversion in one central place
-(in kvm__emulate_io()), where we can easily differentiate between port
-I/O, MMIO and PCI accesses. Then all devices just need to dereference
-pointers.
-But this is indeed something for another time, and having wrappers
-should not hurt either way, so I will keep them. Makes the patch smaller
-anyway.
+Right, will change that.
+ 
+> I don't know what "int." means in the region for the UART and RTC.
+
+It was meant to mean "internal", but this is really nonsensical, so I
+will replace it with "plat MMIO".
+ 
+> The comment says that the art is not to scale, so I don't think there's any need
+> for the "..." between the corners of the regions. To my eyes, it makes the ASCII
+> art look crooked.
+
+fixed.
+ 
+> The next patches add the UART and RTC outside the first 64K, I think the region
+> should be documented in the patches where the changes are made, not here. Another
+> alternative would be to move this patch to the end of the series instead of
+> incrementally changing the memory ASCII art (which I imagine is time consuming).
+
+You passed the scrutiny test ;-)
+I noticed this last minute, but didn't feel like changing it then.
+Have done it now.
+
+> 
+> Otherwise, the numbers look OK.
+> 
+> > +
+> >  #define ARM_IOPORT_AREA		_AC(0x0000000000000000, UL)
+> > -#define ARM_FLASH_AREA		_AC(0x0000000002000000, UL)
+> > -#define ARM_MMIO_AREA		_AC(0x0000000003000000, UL)
+> > +#define ARM_MMIO_AREA		_AC(0x0000000001000000, UL)  
+> 
+> The patch says it is *documenting* the memory layout, but here it is *changing*
+> the layout. Other than that, I like the shuffling of definitions so the kvmtool
+> global defines are closer to the arch values.
+
+I amended the commit message to mention that I change the value of
+ARM_MMIO_AREA, but that stays internal to that file and doesn't affect
+the other definitions.
+In fact I imported this header into a C file and printed all
+externally used names, before and after: it didn't show any changes.
 
 Cheers,
 Andre
 
+> >  #define ARM_AXI_AREA		_AC(0x0000000040000000, UL)
+> >  #define ARM_MEMORY_AREA		_AC(0x0000000080000000, UL)
 > >  
-> > +static void serial8250_mmio(struct kvm_cpu *vcpu, u64 addr, u8 *data, u32 len,
-> > +			    u8 is_write, void *ptr)
-> > +{
-> > +	struct serial8250_device *dev = ptr;
+> > -#define ARM_LOMAP_MAX_MEMORY	((1ULL << 32) - ARM_MEMORY_AREA)
+> > -#define ARM_HIMAP_MAX_MEMORY	((1ULL << 40) - ARM_MEMORY_AREA)
+> > +#define KVM_IOPORT_AREA		ARM_IOPORT_AREA
+> > +#define ARM_IOPORT_SIZE		(1U << 16)
 > > +
-> > +	if (is_write)
-> > +		serial8250_out(dev, vcpu, addr - dev->iobase, *data);
-> > +	else
-> > +		serial8250_in(dev, vcpu, addr - dev->iobase, data);
-> > +}
 > > +
-> > +static bool serial8250_ioport_out(struct ioport *ioport, struct kvm_cpu *vcpu,
-> > +				  u16 port, void *data, int size)
-> > +{
-> > +	struct serial8250_device *dev = ioport->priv;
+> > +#define KVM_FLASH_MMIO_BASE	(ARM_MMIO_AREA + 0x1000000)
+> > +#define KVM_FLASH_MAX_SIZE	0x1000000
 > > +
-> > +	serial8250_mmio(vcpu, port, data, 1, true, dev);
-> > +
-> > +	return true;
-> > +}
-> > +
-> > +static bool serial8250_ioport_in(struct ioport *ioport, struct kvm_cpu *vcpu,
-> > +				 u16 port, void *data, int size)
-> > +{
-> > +	struct serial8250_device *dev = ioport->priv;
-> > +
-> > +	serial8250_mmio(vcpu, port, data, 1, false, dev);
-> > +
-> > +	return true;
-> > +}
-> > +
-> >  #ifdef CONFIG_HAS_LIBFDT
+> > +#define KVM_VIRTIO_MMIO_AREA	(KVM_FLASH_MMIO_BASE + KVM_FLASH_MAX_SIZE)
+> > +#define ARM_VIRTIO_MMIO_SIZE	(ARM_AXI_AREA - \
+> > +				(KVM_VIRTIO_MMIO_AREA + ARM_GIC_SIZE))
 > >  
-> >  char *fdt_stdout_path = NULL;
-> > @@ -427,8 +450,8 @@ void serial8250_generate_fdt_node(void *fdt, struct device_header *dev_hdr,
-> >  #endif
+> >  #define ARM_GIC_DIST_BASE	(ARM_AXI_AREA - ARM_GIC_DIST_SIZE)
+> >  #define ARM_GIC_CPUI_BASE	(ARM_GIC_DIST_BASE - ARM_GIC_CPUI_SIZE)
+> > @@ -22,19 +41,17 @@
+> >  #define ARM_GIC_DIST_SIZE	0x10000
+> >  #define ARM_GIC_CPUI_SIZE	0x20000
 > >  
-> >  static struct ioport_operations serial8250_ops = {
-> > -	.io_in			= serial8250_in,
-> > -	.io_out			= serial8250_out,
-> > +	.io_in			= serial8250_ioport_in,
-> > +	.io_out			= serial8250_ioport_out,
-> >  };
+> > -#define KVM_FLASH_MMIO_BASE	ARM_FLASH_AREA
+> > -#define KVM_FLASH_MAX_SIZE	(ARM_MMIO_AREA - ARM_FLASH_AREA)
 > >  
-> >  static int serial8250__device_init(struct kvm *kvm,  
+> > -#define ARM_IOPORT_SIZE		(1U << 16)
+> > -#define ARM_VIRTIO_MMIO_SIZE	(ARM_AXI_AREA - (ARM_MMIO_AREA + ARM_GIC_SIZE))
+> > +#define KVM_PCI_CFG_AREA	ARM_AXI_AREA
+> >  #define ARM_PCI_CFG_SIZE	(1ULL << 24)
+> > +#define KVM_PCI_MMIO_AREA	(KVM_PCI_CFG_AREA + ARM_PCI_CFG_SIZE)
+> >  #define ARM_PCI_MMIO_SIZE	(ARM_MEMORY_AREA - \
+> >  				(ARM_AXI_AREA + ARM_PCI_CFG_SIZE))
+> >  
+> > -#define KVM_IOPORT_AREA		ARM_IOPORT_AREA
+> > -#define KVM_PCI_CFG_AREA	ARM_AXI_AREA
+> > -#define KVM_PCI_MMIO_AREA	(KVM_PCI_CFG_AREA + ARM_PCI_CFG_SIZE)
+> > -#define KVM_VIRTIO_MMIO_AREA	ARM_MMIO_AREA
+> > +
+> > +#define ARM_LOMAP_MAX_MEMORY	((1ULL << 32) - ARM_MEMORY_AREA)
+> > +#define ARM_HIMAP_MAX_MEMORY	((1ULL << 40) - ARM_MEMORY_AREA)
+> > +
+> >  
+> >  #define KVM_IOEVENTFD_HAS_PIO	0
+> >    
 
