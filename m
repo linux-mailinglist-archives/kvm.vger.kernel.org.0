@@ -2,132 +2,84 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CE54633C93C
-	for <lists+kvm@lfdr.de>; Mon, 15 Mar 2021 23:20:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6ABB733C94D
+	for <lists+kvm@lfdr.de>; Mon, 15 Mar 2021 23:24:34 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229605AbhCOWTp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 15 Mar 2021 18:19:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40478 "EHLO
+        id S232263AbhCOWYB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 15 Mar 2021 18:24:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41330 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229948AbhCOWTh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 15 Mar 2021 18:19:37 -0400
-Received: from mail-qt1-x830.google.com (mail-qt1-x830.google.com [IPv6:2607:f8b0:4864:20::830])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3DEA6C06175F;
-        Mon, 15 Mar 2021 15:19:37 -0700 (PDT)
-Received: by mail-qt1-x830.google.com with SMTP id x9so10339619qto.8;
-        Mon, 15 Mar 2021 15:19:37 -0700 (PDT)
+        with ESMTP id S232290AbhCOWXa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 15 Mar 2021 18:23:30 -0400
+Received: from mail-pf1-x431.google.com (mail-pf1-x431.google.com [IPv6:2607:f8b0:4864:20::431])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B3DBFC061764
+        for <kvm@vger.kernel.org>; Mon, 15 Mar 2021 15:23:30 -0700 (PDT)
+Received: by mail-pf1-x431.google.com with SMTP id o3so2827734pfh.11
+        for <kvm@vger.kernel.org>; Mon, 15 Mar 2021 15:23:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:date:from:to:cc:subject:message-id:references:mime-version
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=3mc7yshphWRfddErbP6ANAyJjIp9vav1KVv/MqnV+08=;
-        b=k4pm+oGHyW/0Hrhbuc7q0+8SgSfdHGYYhPiguGQUh3briuu3jw/5TCyzMGYg8w060V
-         MryXnAFafYTZSEg8Y+OqxpfH8TPufBlnRmse3CpAcUakPqZ4TqGz08U1Dp6IHGvZo6dO
-         XzvFYARQvIi9vwCArHIBTKB7h0shngcktmS2v27/iOr9YVJOqXHOVsRyLEZeZV/XAEBz
-         wTWFgYDv6KA49YfmbS8Kz1BvuHErK/RNw44PjG4hs4LhLyftup1EIv+0wxbGVYDzlIxn
-         sKPxsUOx+ytNRtofdhTLCw/ZiSovafjqT75OP8vBE51uc2DsudjKzAuXR9mAJe0PxXw2
-         7Y0g==
+        bh=76pLO4ynd5ZWyHNZ5ZDnbUyusicrWJvIzQ5SsEfOQDk=;
+        b=airqsXzB/pgup9ugIMokOYOuKc7ZnQPtpIwDXFzpRbFsDaCkP1G8y4Exe06QF6l+hd
+         k7GGyjxmpCS+N8LxgaxVkErbGTuglwMmT442b3UL14DvdSXAE0DQQG4bEJzaEUWyEqMU
+         /48gWqX0Y9tvWyQ7fMkNcuOwMqwk7aDAy/wCP2Wp0lhKACYfP+dNRuwzwc9pVCXlIG3L
+         Pcwi0I8n/Br+aUTJP3BM1796/zCy2pUhwBtFQffBrFz0k8LVLxC/FmQk4nDbrGL4SzZH
+         W5tsoTvgZRxpSeqxRDY2m6gXmjcrNVishHe56MgyoPTWALrd1ClF+ylfl0Oo5XCaaVZo
+         t74g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
-         :references:mime-version:content-disposition:in-reply-to;
-        bh=3mc7yshphWRfddErbP6ANAyJjIp9vav1KVv/MqnV+08=;
-        b=fhDP/AO+qKTx3lp1qLorflGV5wFmAvIcpV4H5Pwdls3FlQTL4oTzcBQsG+zCJZ7Qz6
-         T+E7x/sIr3Qn8vK478HrOBdUv6vhqbGS2Dy9cRXMa/XZSHZo+M9SDl8WPkH0ysZfGoOp
-         jbDv65stZjKDXCGJGUhDLsjsc6+FyY+H7r0MBtnzpfIhVbQXagtxnOEPQfQfx1aAQZnR
-         /bHvn+tezX8aUESBs/Pjj10L88/27d5L6AcXrU+lyk2KVAJ11ziXLhZwUVUDACGNHPo3
-         8ZuKrwPW4R/4iWmNOKB4hQuOhV1ux02RpzphdGBmlN32E1e4UhwE6Bb5AT2K6Ly0JblJ
-         B45A==
-X-Gm-Message-State: AOAM530NhVJUjbvXGHahEf7MXYUuSJrP+w4bNXvxGDcfVaYkchSA3A/P
-        o1fIVL+fVRO7zWl66e5pN+U=
-X-Google-Smtp-Source: ABdhPJzvXqprKoAutME/Zx0t4IAmyvOYWNNLf7LhOP5C6LVfWPeE7qFKtLKEj9qf8W3FiHj+NYGgGw==
-X-Received: by 2002:ac8:7a95:: with SMTP id x21mr6759670qtr.209.1615846776285;
-        Mon, 15 Mar 2021 15:19:36 -0700 (PDT)
-Received: from localhost (2603-7000-9602-8233-06d4-c4ff-fe48-9d05.res6.spectrum.com. [2603:7000:9602:8233:6d4:c4ff:fe48:9d05])
-        by smtp.gmail.com with ESMTPSA id 6sm12369287qth.82.2021.03.15.15.19.35
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=76pLO4ynd5ZWyHNZ5ZDnbUyusicrWJvIzQ5SsEfOQDk=;
+        b=abU+oeDjptyNyZHmLHiUSksffQKml+D1gvfamMjWeKpjjLeXE4qjB5AJyhyyGqhxbx
+         GgsfK3SAdD7fUA0gn89kMoU7L0gLoq34ITu0PHaxtmbaabQWhRGDaArIpLLlNmmQ73LK
+         1U2oUE3IoeeAWsm9VRvzK+pGl3Qd9u/pgRnFKtpJmJ0jYpv+polw8mF5IET19/LIdH1S
+         gXZ4JEXi46fstp1dW4p5Xbvqfhk+cklh/BWLuEut/W611eJgqn9UpJF+H03pUx8mBUuW
+         YgXQU/UjNsXYDcJG6Q7MsP+o/8L9UG8ObhmnsSYz6JzxFmpcHYsz5T/j6LjzNng7Tlnz
+         tlOg==
+X-Gm-Message-State: AOAM530nMqIi+xmFh7/dQXtOlmVMZCW2NC5S1YuH1pQxl49sVemezSLW
+        uysRg3TPH7edgeHp2b0WW8Yqyw==
+X-Google-Smtp-Source: ABdhPJzErUir6olHz3A1ngb1qVLxTGkxO4C5zuXPoJPawtyx7X02V/kHW2KtzInAJJ84hCgOH6wwSw==
+X-Received: by 2002:a62:37c6:0:b029:1f0:abe0:8d1c with SMTP id e189-20020a6237c60000b02901f0abe08d1cmr12130769pfa.23.1615847010099;
+        Mon, 15 Mar 2021 15:23:30 -0700 (PDT)
+Received: from google.com ([2620:15c:f:10:3d60:4c70:d756:da57])
+        by smtp.gmail.com with ESMTPSA id s76sm14738422pfc.110.2021.03.15.15.23.28
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 15 Mar 2021 15:19:35 -0700 (PDT)
-Sender: Tejun Heo <htejun@gmail.com>
-Date:   Mon, 15 Mar 2021 18:19:35 -0400
-From:   Tejun Heo <tj@kernel.org>
-To:     Jacob Pan <jacob.jun.pan@intel.com>
-Cc:     Vipin Sharma <vipinsh@google.com>, mkoutny@suse.com,
-        rdunlap@infradead.org, thomas.lendacky@amd.com,
-        brijesh.singh@amd.com, jon.grimm@amd.com, eric.vantassell@amd.com,
-        pbonzini@redhat.com, hannes@cmpxchg.org, frankja@linux.ibm.com,
-        borntraeger@de.ibm.com, corbet@lwn.net, seanjc@google.com,
-        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
-        joro@8bytes.org, tglx@linutronix.de, mingo@redhat.com,
-        bp@alien8.de, hpa@zytor.com, gingell@google.com,
-        rientjes@google.com, dionnaglaze@google.com, kvm@vger.kernel.org,
-        x86@kernel.org, cgroups@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-kernel@vger.kernel.org, "Tian, Kevin" <kevin.tian@intel.com>,
-        "Liu, Yi L" <yi.l.liu@intel.com>,
-        "Raj, Ashok" <ashok.raj@intel.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        Jacob Pan <jacob.jun.pan@linux.intel.com>,
-        "jean-philippe@linaro.org" <jean-philippe@linaro.org>
-Subject: Re: [RFC v2 2/2] cgroup: sev: Miscellaneous cgroup documentation.
-Message-ID: <YE/ddx5+ToNsgUF0@slm.duckdns.org>
-References: <20210303185513.27e18fce@jacob-builder>
- <YEB8i6Chq4K/GGF6@google.com>
- <YECfhCJtHUL9cB2L@slm.duckdns.org>
- <20210312125821.22d9bfca@jacob-builder>
- <YEvZ4muXqiSScQ8i@google.com>
- <20210312145904.4071a9d6@jacob-builder>
- <YEyR9181Qgzt+Ps9@mtj.duckdns.org>
- <20210313085701.1fd16a39@jacob-builder>
- <YEz+8HbfkbGgG5Tm@mtj.duckdns.org>
- <20210315151155.383a7e6e@jacob-builder>
+        Mon, 15 Mar 2021 15:23:29 -0700 (PDT)
+Date:   Mon, 15 Mar 2021 15:23:24 -0700
+From:   Sean Christopherson <seanjc@google.com>
+To:     Ben Gardon <bgardon@google.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Peter Shier <pshier@google.com>,
+        Jim Mattson <jmattson@google.com>,
+        kernel test robot <lkp@intel.com>
+Subject: Re: [PATCH v2 4/4] KVM: x86/mmu: Store the address space ID in the
+ TDP iterator
+Message-ID: <YE/eXP60IVki7csd@google.com>
+References: <20210315182643.2437374-1-bgardon@google.com>
+ <20210315182643.2437374-5-bgardon@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210315151155.383a7e6e@jacob-builder>
+In-Reply-To: <20210315182643.2437374-5-bgardon@google.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hello,
+On Mon, Mar 15, 2021, Ben Gardon wrote:
 
-On Mon, Mar 15, 2021 at 03:11:55PM -0700, Jacob Pan wrote:
-> > Migration itself doesn't have restrictions but all resources are
-> > distributed on the same hierarchy, so the controllers are supposed to
-> > follow the same conventions that can be implemented by all controllers.
-> > 
-> Got it, I guess that is the behavior required by the unified hierarchy.
-> Cgroup v1 would be ok? But I am guessing we are not extending on v1?
+Missing "From: Sean Christopherson <seanjc@google.com>", i.e. the commit in your
+local tree needs "git commit --amend --author="Sean Christopherson <seanjc@google.com>".
+Alternatively, you could just erase my SOB ;-)
 
-A new cgroup1 only controller is unlikely to be accpeted.
-
-> The IOASIDs are programmed into devices to generate DMA requests tagged
-> with them. The IOMMU has a per device IOASID table with each entry has two
-> pointers:
->  - the PGD of the guest process.
->  - the PGD of the host process
+> Store the address space ID in the TDP iterator so that it can be
+> retrieved without having to bounce through the root shadow page.  This
+> streamlines the code and fixes a Sparse warning about not properly using
+> rcu_dereference() when grabbing the ID from the root on the fly.
 > 
-> The result of this 2 stage/nested translation is that we can share virtual
-> address (SVA) between guest process and DMA. The host process needs to
-> allocate multiple IOASIDs since one IOASID is needed for each guest process
-> who wants SVA.
-> 
-> The DMA binding among device-IOMMU-process is setup via a series of user
-> APIs (e.g. via VFIO).
-> 
-> If a process calls fork(), the children does not inherit the IOASIDs and
-> their bindings. Children who wish to use SVA has to call those APIs to
-> establish the binding for themselves.
-> 
-> Therefore, if a host process allocates 10 IOASIDs then does a
-> fork()/clone(), it cannot charge 10 IOASIDs in the new cgroup. i.e. the 10
-> IOASIDs stays with the process wherever it goes.
-> 
-> I feel this fit in the domain model, true?
-
-I still don't get where migration is coming into the picture. Who's
-migrating where?
-
-Thanks.
-
--- 
-tejun
+> Reported-by: kernel test robot <lkp@intel.com>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> Signed-off-by: Ben Gardon <bgardon@google.com>
+> ---
