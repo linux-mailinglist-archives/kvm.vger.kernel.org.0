@@ -2,46 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B48A433AE1E
-	for <lists+kvm@lfdr.de>; Mon, 15 Mar 2021 09:59:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0850C33AE37
+	for <lists+kvm@lfdr.de>; Mon, 15 Mar 2021 10:10:40 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229643AbhCOI6n (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 15 Mar 2021 04:58:43 -0400
-Received: from verein.lst.de ([213.95.11.211]:52958 "EHLO verein.lst.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229608AbhCOI6e (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 15 Mar 2021 04:58:34 -0400
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id A56C668C4E; Mon, 15 Mar 2021 09:58:31 +0100 (CET)
-Date:   Mon, 15 Mar 2021 09:58:31 +0100
-From:   Christoph Hellwig <hch@lst.de>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     Alex Williamson <alex.williamson@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Diana Craciun <diana.craciun@oss.nxp.com>,
-        Eric Auger <eric.auger@redhat.com>, kvm@vger.kernel.org,
-        Kirti Wankhede <kwankhede@nvidia.com>,
-        linux-doc@vger.kernel.org, "Raj, Ashok" <ashok.raj@intel.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Christoph Hellwig <hch@lst.de>,
-        Leon Romanovsky <leonro@nvidia.com>,
-        Max Gurtovoy <mgurtovoy@nvidia.com>,
-        Tarun Gupta <targupta@nvidia.com>
-Subject: Re: [PATCH v2 12/14] vfio: Make vfio_device_ops pass a 'struct
- vfio_device *' instead of 'void *'
-Message-ID: <20210315085831.GE29269@lst.de>
-References: <0-v2-20d933792272+4ff-vfio1_jgg@nvidia.com> <12-v2-20d933792272+4ff-vfio1_jgg@nvidia.com>
+        id S229549AbhCOJKG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 15 Mar 2021 05:10:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38554 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229490AbhCOJJu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 15 Mar 2021 05:09:50 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7701CC061574;
+        Mon, 15 Mar 2021 02:09:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=a9gg6oJQhPPM7u3VKZMtdQzIuN1q3Wx++payqsoQUyo=; b=mFecxq7ONcsePC6b0VSW3y9V6t
+        PVSk5CTm0jpk4ChPtmaYl9/Pwho3AkaNrtLDTUjN8pJaDVS0q9LjQy4FQ4/zNolRtK5KmIkXpYmZG
+        glLOI7o2kH5qU0A57FX81pbhx18d8uALXHe1TvXBG00Lj9H/jGkO1ZDUBGseO/2ihCMcY8EYKtHqO
+        P5CumkZonUW2+fOXpswXn98pf42x2mXffxiIcICa7g5hKQ6XkWKFWHErwDk51QE7+JF705Wg1geCp
+        4miqNpwdhMR1s4jjQJryKg/Br36ZPhbSFwCrN168mt6j75oZ1y22dtOwx4g7e0wW+SADD8jx2I3yn
+        kI8DmPiw==;
+Received: from hch by casper.infradead.org with local (Exim 4.94 #2 (Red Hat Linux))
+        id 1lLjD4-00HUP1-8A; Mon, 15 Mar 2021 09:08:25 +0000
+Date:   Mon, 15 Mar 2021 09:08:22 +0000
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Xie Yongji <xieyongji@bytedance.com>
+Cc:     mst@redhat.com, jasowang@redhat.com, stefanha@redhat.com,
+        sgarzare@redhat.com, parav@nvidia.com, bob.liu@oracle.com,
+        hch@infradead.org, rdunlap@infradead.org, willy@infradead.org,
+        viro@zeniv.linux.org.uk, axboe@kernel.dk, bcrl@kvack.org,
+        corbet@lwn.net, mika.penttila@nextfour.com,
+        dan.carpenter@oracle.com,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        kvm@vger.kernel.org, linux-fsdevel@vger.kernel.org
+Subject: Re: [PATCH v5 01/11] file: Export __receive_fd() to modules
+Message-ID: <20210315090822.GA4166677@infradead.org>
+References: <20210315053721.189-1-xieyongji@bytedance.com>
+ <20210315053721.189-2-xieyongji@bytedance.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <12-v2-20d933792272+4ff-vfio1_jgg@nvidia.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <20210315053721.189-2-xieyongji@bytedance.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Looks good,
+On Mon, Mar 15, 2021 at 01:37:11PM +0800, Xie Yongji wrote:
+> Export __receive_fd() so that some modules can use
+> it to pass file descriptor between processes.
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+I really don't think any non-core code should do that, especilly not
+modular mere driver code.
