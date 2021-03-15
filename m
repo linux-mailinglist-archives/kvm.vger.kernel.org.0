@@ -2,72 +2,72 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0EEDC33B05C
-	for <lists+kvm@lfdr.de>; Mon, 15 Mar 2021 11:50:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B6F5E33B06A
+	for <lists+kvm@lfdr.de>; Mon, 15 Mar 2021 11:54:38 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230031AbhCOKuW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 15 Mar 2021 06:50:22 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:48120 "EHLO
+        id S229789AbhCOKyG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 15 Mar 2021 06:54:06 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:52218 "EHLO
         mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S230039AbhCOKuM (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 15 Mar 2021 06:50:12 -0400
+        by vger.kernel.org with ESMTP id S229524AbhCOKxz (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 15 Mar 2021 06:53:55 -0400
 Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 12FAXqAY104764
-        for <kvm@vger.kernel.org>; Mon, 15 Mar 2021 06:50:11 -0400
+        by mx0b-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 12FAXr6u104876
+        for <kvm@vger.kernel.org>; Mon, 15 Mar 2021 06:53:54 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
  references : from : message-id : date : mime-version : in-reply-to :
  content-type : content-transfer-encoding; s=pp1;
- bh=G507uCpQp+UPzbJqt6sM/j6kSeYNZ9KuW3PExZT+3do=;
- b=N5t3kjLZUVEf6koiPqW4xlZwqAL7BcAa/7IP1TaL4poaOox8oQ7yjNwBm2/cgSdlsyjp
- 2+jXI2MyZLHvDVrfh/n5bBfWKcY0QdafM60I/5SVOXu2X1zTNUPZAm4Oq2Zjc27gy+nG
- bujUOtV6GZQXEO1TbwPxaoYb2XXtDN7EPO14OksUVmuyn2dfr3QbjBsMbOazHtfAARpN
- ppQ7sc8+jWK6xFluvx8b1PnYbmzf8w1Dx6f9+iY73XKBOl7e5CeWMOgjU2pn1CzpNqU6
- ICegSqILaC4+ZObShx8Yi5HVMyb98s498YOVYsnxcAosMBtpMb5dUpRsbjThgh7RMVl4 ZA== 
+ bh=zbzNTnIJ7ZLwkgLLD5QMMGmY8nDaxKn1dFBIB60bw7w=;
+ b=dqMtC4kpBAQEtrPLvzPtu51daTXOuMq7+ky0y0ipUOWrJbUelAehpFIvjxUHbgJdS/nu
+ rkJzR3Z6//zlggLPiCYV4N0ilQhRxpTGdT1q1o5ef3OSgkwj7JmzgvWwjRCv3WqhjHaL
+ 2LiC1X2UWTRar+DVwG9WvgkiBw3dzJeWKgigu9aQpMxYwjXqCcHm25Jy8YjO5FGUJufE
+ 1Uq1zxlRjdc8E+ldF4/Auwedgel9/s5f8m12ufa+tijSmpvA9Y+/nMIqlq4ugwJ7sINW
+ TXUtZz6mQkZ1cdYyZmiu925cVj4nItTnmVaW3/Huhrgi3gHGOzB0XJLr/8E3W7psNNjD EA== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 379yj1sx90-1
+        by mx0b-001b2d01.pphosted.com with ESMTP id 379yj1t1bn-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Mon, 15 Mar 2021 06:50:11 -0400
+        for <kvm@vger.kernel.org>; Mon, 15 Mar 2021 06:53:54 -0400
 Received: from m0098416.ppops.net (m0098416.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 12FAbdjD118436
-        for <kvm@vger.kernel.org>; Mon, 15 Mar 2021 06:50:11 -0400
-Received: from ppma06fra.de.ibm.com (48.49.7a9f.ip4.static.sl-reverse.com [159.122.73.72])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 379yj1sx7y-1
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 12FAYMoq106190
+        for <kvm@vger.kernel.org>; Mon, 15 Mar 2021 06:53:54 -0400
+Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 379yj1t1bc-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 15 Mar 2021 06:50:10 -0400
-Received: from pps.filterd (ppma06fra.de.ibm.com [127.0.0.1])
-        by ppma06fra.de.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 12FAmgqR017137;
-        Mon, 15 Mar 2021 10:50:09 GMT
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
-        by ppma06fra.de.ibm.com with ESMTP id 378mnh8wt0-1
+        Mon, 15 Mar 2021 06:53:54 -0400
+Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
+        by ppma05fra.de.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 12FAm2Mn006901;
+        Mon, 15 Mar 2021 10:53:52 GMT
+Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
+        by ppma05fra.de.ibm.com with ESMTP id 378n188wwj-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 15 Mar 2021 10:50:09 +0000
+        Mon, 15 Mar 2021 10:53:52 +0000
 Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 12FAo6JR38076812
+        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 12FArXrL34865440
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 15 Mar 2021 10:50:06 GMT
+        Mon, 15 Mar 2021 10:53:33 GMT
 Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 3ED67A405E;
-        Mon, 15 Mar 2021 10:50:06 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 55FD5A4051;
+        Mon, 15 Mar 2021 10:53:49 +0000 (GMT)
 Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id E3984A4051;
-        Mon, 15 Mar 2021 10:50:05 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id EB307A404D;
+        Mon, 15 Mar 2021 10:53:48 +0000 (GMT)
 Received: from localhost.localdomain (unknown [9.145.14.133])
         by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Mon, 15 Mar 2021 10:50:05 +0000 (GMT)
-Subject: Re: [kvm-unit-tests PATCH v6 3/6] s390x: css: extending the
- subchannel modifying functions
+        Mon, 15 Mar 2021 10:53:48 +0000 (GMT)
+Subject: Re: [kvm-unit-tests PATCH v6 5/6] s390x: css: testing measurement
+ block format 0
 To:     Pierre Morel <pmorel@linux.ibm.com>, kvm@vger.kernel.org
 Cc:     david@redhat.com, thuth@redhat.com, cohuck@redhat.com,
         imbrenda@linux.ibm.com
 References: <1615545714-13747-1-git-send-email-pmorel@linux.ibm.com>
- <1615545714-13747-4-git-send-email-pmorel@linux.ibm.com>
+ <1615545714-13747-6-git-send-email-pmorel@linux.ibm.com>
 From:   Janosch Frank <frankja@linux.ibm.com>
-Message-ID: <e24ced70-5008-e432-95f5-c5862beb9741@linux.ibm.com>
-Date:   Mon, 15 Mar 2021 11:50:05 +0100
+Message-ID: <0b2ebdfd-c6f9-bca2-b2d7-5187bdfab4a2@linux.ibm.com>
+Date:   Mon, 15 Mar 2021 11:53:48 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.8.0
 MIME-Version: 1.0
-In-Reply-To: <1615545714-13747-4-git-send-email-pmorel@linux.ibm.com>
+In-Reply-To: <1615545714-13747-6-git-send-email-pmorel@linux.ibm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -84,168 +84,148 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On 3/12/21 11:41 AM, Pierre Morel wrote:
-> To enable or disable measurement we will need specific
-> modifications on the subchannel.
+> We test the update of the measurement block format 0, the
+> measurement block origin is calculated from the mbo argument
+> used by the SCHM instruction and the offset calculated using
+> the measurement block index of the SCHIB.
 > 
 > Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
-> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
 
 Acked-by: Janosch Frank <frankja@linux.ibm.com>
 
 > ---
->  lib/s390x/css.h     |   9 +++-
->  lib/s390x/css_lib.c | 100 ++++++++++++++++++++++++++++++++++++++++++++
->  2 files changed, 108 insertions(+), 1 deletion(-)
+>  lib/s390x/css.h | 12 +++++++
+>  s390x/css.c     | 83 +++++++++++++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 95 insertions(+)
 > 
 > diff --git a/lib/s390x/css.h b/lib/s390x/css.h
-> index b9e4c08..7dddb42 100644
+> index 7158423..335bc70 100644
 > --- a/lib/s390x/css.h
 > +++ b/lib/s390x/css.h
-> @@ -82,6 +82,8 @@ struct pmcw {
->  	uint32_t intparm;
->  #define PMCW_DNV	0x0001
->  #define PMCW_ENABLE	0x0080
-> +#define PMCW_MBUE	0x0010
-> +#define PMCW_DCTME	0x0008
->  #define PMCW_ISC_MASK	0x3800
->  #define PMCW_ISC_SHIFT	11
->  	uint16_t flags;
-> @@ -94,6 +96,7 @@ struct pmcw {
->  	uint8_t  pom;
->  	uint8_t  pam;
->  	uint8_t  chpid[8];
-> +#define PMCW_MBF1	0x0004
->  	uint32_t flags2;
->  };
->  #define PMCW_CHANNEL_TYPE(pmcw) (pmcw->flags2 >> 21)
-> @@ -101,7 +104,8 @@ struct pmcw {
->  struct schib {
->  	struct pmcw pmcw;
->  	struct scsw scsw;
-> -	uint8_t  md[12];
-> +	uint64_t mbo;
-> +	uint8_t  md[4];
->  } __attribute__ ((aligned(4)));
+> @@ -374,4 +374,16 @@ static inline void schm(void *mbo, unsigned int flags)
+>  bool css_enable_mb(int sid, uint64_t mb, uint16_t mbi, uint16_t flg, bool fmt1);
+>  bool css_disable_mb(int schid);
 >  
->  struct irb {
-> @@ -355,4 +359,7 @@ bool chsc(void *p, uint16_t code, uint16_t len);
->  #define css_test_general_feature(bit) test_bit_inv(bit, chsc_scsc->general_char)
->  #define css_test_chsc_feature(bit) test_bit_inv(bit, chsc_scsc->chsc_char)
->  
-> +bool css_enable_mb(int sid, uint64_t mb, uint16_t mbi, uint16_t flg, bool fmt1);
-> +bool css_disable_mb(int schid);
+> +struct measurement_block_format0 {
+> +	uint16_t ssch_rsch_count;
+> +	uint16_t sample_count;
+> +	uint32_t device_connect_time;
+> +	uint32_t function_pending_time;
+> +	uint32_t device_disconnect_time;
+> +	uint32_t cu_queuing_time;
+> +	uint32_t device_active_only_time;
+> +	uint32_t device_busy_time;
+> +	uint32_t initial_cmd_resp_time;
+> +};
 > +
 >  #endif
-> diff --git a/lib/s390x/css_lib.c b/lib/s390x/css_lib.c
-> index a97d61e..8f09383 100644
-> --- a/lib/s390x/css_lib.c
-> +++ b/lib/s390x/css_lib.c
-> @@ -248,6 +248,106 @@ retry:
->  	return -1;
+> diff --git a/s390x/css.c b/s390x/css.c
+> index af68266..658c5f8 100644
+> --- a/s390x/css.c
+> +++ b/s390x/css.c
+> @@ -133,6 +133,13 @@ error_ccw:
+>  	free_io_mem(senseid, sizeof(*senseid));
 >  }
 >  
-> +/*
-> + * schib_update_mb: update the subchannel Measurement Block
-> + * @schid: Subchannel Identifier
-> + * @mb   : 64bit address of the measurement block
-> + * @mbi : the measurement block offset
-> + * @flags : PMCW_MBUE to enable measurement block update
-> + *	    PMCW_DCTME to enable device connect time
-> + *	    0 to disable measurement
-> + * @format1: set if format 1 is to be used
-> + */
-> +static bool schib_update_mb(int schid, uint64_t mb, uint16_t mbi,
-> +			    uint16_t flags, bool format1)
+> +static void sense_id(void)
 > +{
-> +	struct pmcw *pmcw = &schib.pmcw;
-> +	int cc;
+> +	assert(!start_ccw1_chain(test_device_sid, ccw));
 > +
-> +	/* Read the SCHIB for this subchannel */
-> +	cc = stsch(schid, &schib);
-> +	if (cc) {
-> +		report_info("stsch: sch %08x failed with cc=%d", schid, cc);
+> +	assert(wait_and_check_io_completion(test_device_sid) >= 0);
+> +}
+> +
+>  static void css_init(void)
+>  {
+>  	assert(register_io_int_func(css_irq_io) == 0);
+> @@ -175,6 +182,81 @@ static void test_schm(void)
+>  	report_prefix_pop();
+>  }
+>  
+> +#define SCHM_UPDATE_CNT 10
+> +static bool start_measuring(uint64_t mbo, uint16_t mbi, bool fmt1)
+> +{
+> +	int i;
+> +
+> +	senseid = alloc_io_mem(sizeof(*senseid), 0);
+> +	assert(senseid);
+> +
+> +	ccw = ccw_alloc(CCW_CMD_SENSE_ID, senseid, sizeof(*senseid), CCW_F_SLI);
+> +	assert(ccw);
+> +
+> +	if (!css_enable_mb(test_device_sid, mbo, mbi, PMCW_MBUE, fmt1)) {
+> +		report_abort("Enabling measurement block failed");
 > +		return false;
 > +	}
 > +
-> +	/* Update the SCHIB to enable the measurement block */
-> +	if (flags) {
-> +		pmcw->flags |= flags;
+> +	for (i = 0; i < SCHM_UPDATE_CNT; i++)
+> +		sense_id();
 > +
-> +		if (format1)
-> +			pmcw->flags2 |= PMCW_MBF1;
-> +		else
-> +			pmcw->flags2 &= ~PMCW_MBF1;
-> +
-> +		pmcw->mbi = mbi;
-> +		schib.mbo = mb & ~0x3f;
-> +	} else {
-> +		pmcw->flags &= ~(PMCW_MBUE | PMCW_DCTME);
-> +	}
-> +
-> +	/* Tell the CSS we want to modify the subchannel */
-> +	cc = msch(schid, &schib);
-> +	if (cc) {
-> +		/*
-> +		 * If the subchannel is status pending or
-> +		 * if a function is in progress,
-> +		 * we consider both cases as errors.
-> +		 */
-> +		report_info("msch: sch %08x failed with cc=%d", schid, cc);
-> +		return false;
-> +	}
-> +
-> +	/*
-> +	 * Read the SCHIB again
-> +	 */
-> +	cc = stsch(schid, &schib);
-> +	if (cc) {
-> +		report_info("stsch: updating sch %08x failed with cc=%d",
-> +			    schid, cc);
-> +		return false;
-> +	}
+> +	free_io_mem(ccw, sizeof(*ccw));
+> +	free_io_mem(senseid, sizeof(*senseid));
 > +
 > +	return true;
 > +}
 > +
 > +/*
-> + * css_enable_mb: enable the subchannel Measurement Block
-> + * @schid: Subchannel Identifier
-> + * @mb   : 64bit address of the measurement block
-> + * @format1: set if format 1 is to be used
-> + * @mbi : the measurement block offset
-> + * @flags : PMCW_MBUE to enable measurement block update
-> + *	    PMCW_DCTME to enable device connect time
+> + * test_schm_fmt0:
+> + * With measurement block format 0 a memory space is shared
+> + * by all subchannels, each subchannel can provide an index
+> + * for the measurement block facility to store the measurements.
 > + */
-> +bool css_enable_mb(int schid, uint64_t mb, uint16_t mbi, uint16_t flags,
-> +		   bool format1)
+> +static void test_schm_fmt0(void)
 > +{
-> +	int retry_count = MAX_ENABLE_RETRIES;
-> +	struct pmcw *pmcw = &schib.pmcw;
+> +	struct measurement_block_format0 *mb0;
+> +	int shared_mb_size = 2 * sizeof(struct measurement_block_format0);
 > +
-> +	while (retry_count-- &&
-> +	       !schib_update_mb(schid, mb, mbi, flags, format1))
-> +		mdelay(10); /* the hardware was not ready, give it some time */
+> +	if (!test_device_sid) {
+> +		report_skip("No device");
+> +		return;
+> +	}
 > +
-> +	return schib.mbo == mb && pmcw->mbi == mbi;
+> +	/* Allocate zeroed Measurement block */
+> +	mb0 = alloc_io_mem(shared_mb_size, 0);
+> +	if (!mb0) {
+> +		report_abort("measurement_block_format0 allocation failed");
+> +		return;
+> +	}
+> +
+> +	schm(NULL, 0); /* Stop any previous measurement */
+> +	schm(mb0, SCHM_MBU);
+> +
+> +	/* Expect success */
+> +	report_prefix_push("Valid MB address and index 0");
+> +	report(start_measuring(0, 0, false) &&
+> +	       mb0->ssch_rsch_count == SCHM_UPDATE_CNT,
+> +	       "SSCH measured %d", mb0->ssch_rsch_count);
+> +	report_prefix_pop();
+> +
+> +	/* Clear the measurement block for the next test */
+> +	memset(mb0, 0, shared_mb_size);
+> +
+> +	/* Expect success */
+> +	report_prefix_push("Valid MB address and index 1");
+> +	if (start_measuring(0, 1, false))
+> +		report(mb0[1].ssch_rsch_count == SCHM_UPDATE_CNT,
+> +		       "SSCH measured %d", mb0[1].ssch_rsch_count);
+> +	report_prefix_pop();
+> +
+> +	/* Stop the measurement */
+> +	css_disable_mb(test_device_sid);
+> +	schm(NULL, 0);
+> +
+> +	free_io_mem(mb0, shared_mb_size);
 > +}
 > +
-> +/*
-> + * css_disable_mb: disable the subchannel Measurement Block
-> + * @schid: Subchannel Identifier
-> + */
-> +bool css_disable_mb(int schid)
-> +{
-> +	int retry_count = MAX_ENABLE_RETRIES;
-> +
-> +	while (retry_count-- &&
-> +	       !schib_update_mb(schid, 0, 0, 0, 0))
-> +		mdelay(10); /* the hardware was not ready, give it some time */
-> +
-> +	return retry_count > 0;
-> +}
-> +
->  static struct irb irb;
+>  static struct {
+>  	const char *name;
+>  	void (*func)(void);
+> @@ -185,6 +267,7 @@ static struct {
+>  	{ "enable (msch)", test_enable },
+>  	{ "sense (ssch/tsch)", test_sense },
+>  	{ "measurement block (schm)", test_schm },
+> +	{ "measurement block format0", test_schm_fmt0 },
+>  	{ NULL, NULL }
+>  };
 >  
->  void css_irq_io(void)
 > 
 
