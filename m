@@ -2,133 +2,87 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BCB7333AED8
-	for <lists+kvm@lfdr.de>; Mon, 15 Mar 2021 10:31:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B5F3E33AF36
+	for <lists+kvm@lfdr.de>; Mon, 15 Mar 2021 10:47:37 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229664AbhCOJan (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 15 Mar 2021 05:30:43 -0400
-Received: from mail.kernel.org ([198.145.29.99]:53698 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229490AbhCOJaM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 15 Mar 2021 05:30:12 -0400
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 98C0D64E74;
-        Mon, 15 Mar 2021 09:30:08 +0000 (UTC)
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-        (Exim 4.94)
-        (envelope-from <maz@kernel.org>)
-        id 1lLjY6-001cQC-Iq; Mon, 15 Mar 2021 09:30:06 +0000
+        id S229913AbhCOJrF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 15 Mar 2021 05:47:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46584 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229601AbhCOJq4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 15 Mar 2021 05:46:56 -0400
+Received: from mail-ej1-x62c.google.com (mail-ej1-x62c.google.com [IPv6:2a00:1450:4864:20::62c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B4AD8C061574
+        for <kvm@vger.kernel.org>; Mon, 15 Mar 2021 02:46:55 -0700 (PDT)
+Received: by mail-ej1-x62c.google.com with SMTP id si25so9322975ejb.1
+        for <kvm@vger.kernel.org>; Mon, 15 Mar 2021 02:46:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance-com.20150623.gappssmtp.com; s=20150623;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=QCH3VsMvUSEqRY0D77ObQA6OJaIvmvlJ89ZGUx/CcXM=;
+        b=KBdJN57ZQ8VQz1uCDRBPHQrOXwItBmwEOFNPq9ozYMbd8bVSP9hZj0v9/leZLxc2v+
+         bnEIog66c/xVxrJaQAQDSfaN+5ON+6/yYsZ8IdtMtK+aTlx4uX2mxihZsNBRUez/do4+
+         1KvtRI7pNUOjnhjQuA0DVTja0OSZL+D2vVMQuDfYKe+dQbply48UC3cv2rlAidtOomQs
+         k1BP33T2HNlfsNTa9+WA72vbFKmtOzfthLV8yRt2Y3aDsU1xaHrDx2k0biUGtA/628u1
+         XwtKg+gHWjT467qCsHWkew3z6+raHVfH7JAGoUlxnPeVEVkdXSpctfKubCK/DjB1C3Uf
+         K5Sw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=QCH3VsMvUSEqRY0D77ObQA6OJaIvmvlJ89ZGUx/CcXM=;
+        b=lQLTJHFT/6YTvlA9KBx7tvTx7tRjTnpLUZ7pBRroHrZYYkwD7sNmAZbprCYulmGCiC
+         ArGqUn9fdaBXA5RNLbyoPkYWpg8YMn4XLy8hn/XJSc9UPR8WWTFcfWw+jES33N0pY6aU
+         tCvhc1pXm4GFe4xC8Vt/q7QeLtZU0d0phDUvsAvHcR2Ce8nQw7FdToQvyfww10zEoZxB
+         fSzZhuN9ofQsvserEikTfRoiFb3RRvQOFHYJziyNRbMppFkwmsxWyTj3XXea2/sVuT4k
+         IWTiTyzI/ZZKVVtr/7IIAvQgjB+ZaWv/vpAMsRcGnGOQBMdI+2BV+UCHHfns0aaUvv6+
+         F4Lw==
+X-Gm-Message-State: AOAM530rk6UXtQPpEa+0H4E1/Nq1/hj7UxjG+k4niD2VTdmA29g1zDug
+        EI2GBf/qYJHhT3JLqBBznRZpVzYEMLK20DDXdozN
+X-Google-Smtp-Source: ABdhPJwfPpbGsW1NwziEvCm+pu9W0AYA2Ip5t3r5CSavHkGCI1g9/KIycGHrq/KBYUgnQfbZQ1cImKEpNMiBrV1NXz0=
+X-Received: by 2002:a17:906:311a:: with SMTP id 26mr22439640ejx.395.1615801614537;
+ Mon, 15 Mar 2021 02:46:54 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8;
- format=flowed
-Content-Transfer-Encoding: 8bit
-Date:   Mon, 15 Mar 2021 09:30:06 +0000
-From:   Marc Zyngier <maz@kernel.org>
-To:     Shenming Lu <lushenming@huawei.com>
-Cc:     Eric Auger <eric.auger@redhat.com>, Will Deacon <will@kernel.org>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
-        wanghaibin.wang@huawei.com, yuzenghui@huawei.com
-Subject: Re: [PATCH v4 5/6] KVM: arm64: GICv4.1: Restore VLPI pending state to
- physical side
-In-Reply-To: <cd821431-52a7-d9a6-1468-8ce0c9446d85@huawei.com>
-References: <20210313083900.234-1-lushenming@huawei.com>
- <20210313083900.234-6-lushenming@huawei.com>
- <d9047922808df340feca2f257cfb8a3d@kernel.org>
- <81fbadda-0489-ffc3-cb38-08e89871ec95@huawei.com>
- <b03ec1e5447024f9f990377e2c28e84f@kernel.org>
- <cd821431-52a7-d9a6-1468-8ce0c9446d85@huawei.com>
-User-Agent: Roundcube Webmail/1.4.11
-Message-ID: <4f37549dcc5d3dd59a92bc94f2f0b59b@kernel.org>
-X-Sender: maz@kernel.org
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: lushenming@huawei.com, eric.auger@redhat.com, will@kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, alex.williamson@redhat.com, cohuck@redhat.com, lorenzo.pieralisi@arm.com, wanghaibin.wang@huawei.com, yuzenghui@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+References: <20210315053721.189-1-xieyongji@bytedance.com> <20210315053721.189-2-xieyongji@bytedance.com>
+ <20210315090822.GA4166677@infradead.org>
+In-Reply-To: <20210315090822.GA4166677@infradead.org>
+From:   Yongji Xie <xieyongji@bytedance.com>
+Date:   Mon, 15 Mar 2021 17:46:43 +0800
+Message-ID: <CACycT3vrHOExXj6v8ULvUzdLcRkdzS5=TNK6=g4+RWEdN-nOJw@mail.gmail.com>
+Subject: Re: Re: [PATCH v5 01/11] file: Export __receive_fd() to modules
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        Parav Pandit <parav@nvidia.com>, Bob Liu <bob.liu@oracle.com>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Matthew Wilcox <willy@infradead.org>, viro@zeniv.linux.org.uk,
+        Jens Axboe <axboe@kernel.dk>, bcrl@kvack.org,
+        Jonathan Corbet <corbet@lwn.net>,
+        =?UTF-8?Q?Mika_Penttil=C3=A4?= <mika.penttila@nextfour.com>,
+        Dan Carpenter <dan.carpenter@oracle.com>,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        kvm@vger.kernel.org, linux-fsdevel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2021-03-15 09:25, Shenming Lu wrote:
-> On 2021/3/15 17:20, Marc Zyngier wrote:
->> On 2021-03-15 09:11, Shenming Lu wrote:
->>> On 2021/3/15 16:30, Marc Zyngier wrote:
->>>> On 2021-03-13 08:38, Shenming Lu wrote:
->>>>> From: Zenghui Yu <yuzenghui@huawei.com>
->>>>> 
->>>>> When setting the forwarding path of a VLPI (switch to the HW mode),
->>>>> we can also transfer the pending state from irq->pending_latch to
->>>>> VPT (especially in migration, the pending states of VLPIs are 
->>>>> restored
->>>>> into kvm’s vgic first). And we currently send "INT+VSYNC" to 
->>>>> trigger
->>>>> a VLPI to pending.
->>>>> 
->>>>> Signed-off-by: Zenghui Yu <yuzenghui@huawei.com>
->>>>> Signed-off-by: Shenming Lu <lushenming@huawei.com>
->>>>> ---
->>>>>  arch/arm64/kvm/vgic/vgic-v4.c | 18 ++++++++++++++++++
->>>>>  1 file changed, 18 insertions(+)
->>>>> 
->>>>> diff --git a/arch/arm64/kvm/vgic/vgic-v4.c 
->>>>> b/arch/arm64/kvm/vgic/vgic-v4.c
->>>>> index ac029ba3d337..3b82ab80c2f3 100644
->>>>> --- a/arch/arm64/kvm/vgic/vgic-v4.c
->>>>> +++ b/arch/arm64/kvm/vgic/vgic-v4.c
->>>>> @@ -449,6 +449,24 @@ int kvm_vgic_v4_set_forwarding(struct kvm 
->>>>> *kvm, int virq,
->>>>>      irq->host_irq    = virq;
->>>>>      atomic_inc(&map.vpe->vlpi_count);
->>>>> 
->>>>> +    /* Transfer pending state */
->>>>> +    if (irq->pending_latch) {
->>>>> +        unsigned long flags;
->>>>> +
->>>>> +        ret = irq_set_irqchip_state(irq->host_irq,
->>>>> +                        IRQCHIP_STATE_PENDING,
->>>>> +                        irq->pending_latch);
->>>>> +        WARN_RATELIMIT(ret, "IRQ %d", irq->host_irq);
->>>>> +
->>>>> +        /*
->>>>> +         * Clear pending_latch and communicate this state
->>>>> +         * change via vgic_queue_irq_unlock.
->>>>> +         */
->>>>> +        raw_spin_lock_irqsave(&irq->irq_lock, flags);
->>>>> +        irq->pending_latch = false;
->>>>> +        vgic_queue_irq_unlock(kvm, irq, flags);
->>>>> +    }
->>>>> +
->>>>>  out:
->>>>>      mutex_unlock(&its->its_lock);
->>>>>      return ret;
->>>> 
->>>> The read side of the pending state isn't locked, but the write side 
->>>> is.
->>>> I'd rather you lock the whole sequence for peace of mind.
->>> 
->>> Did you mean to lock before emitting the mapping request, Or just 
->>> before reading
->>> the pending state?
->> 
->> Just before reading the pending state, so that we can't get a 
->> concurrent
->> modification of that state while we make the interrupt pending in the 
->> VPT
->> and clearing it in the emulation.
-> 
-> Get it. I will correct it right now.
+On Mon, Mar 15, 2021 at 5:08 PM Christoph Hellwig <hch@infradead.org> wrote:
+>
+> On Mon, Mar 15, 2021 at 01:37:11PM +0800, Xie Yongji wrote:
+> > Export __receive_fd() so that some modules can use
+> > it to pass file descriptor between processes.
+>
+> I really don't think any non-core code should do that, especilly not
+> modular mere driver code.
 
-Please hold off sending a new version for a few days. My inbox is 
-exploding...
+Do you see any issue? Now I think we're able to do that with the help
+of get_unused_fd_flags() and fd_install() in modules. But we may miss
+some security stuff in this way. So I try to export __receive_fd() and
+use it instead.
 
 Thanks,
-
-         M.
--- 
-Jazz is not dead. It just smells funny...
+Yongji
