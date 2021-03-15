@@ -2,125 +2,272 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1D2FE33B093
-	for <lists+kvm@lfdr.de>; Mon, 15 Mar 2021 12:03:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1895F33B090
+	for <lists+kvm@lfdr.de>; Mon, 15 Mar 2021 12:03:18 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229812AbhCOLCp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 15 Mar 2021 07:02:45 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:40044 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229771AbhCOLCQ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 15 Mar 2021 07:02:16 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1615806135;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=S/oWGawpXGhyQCD9KmbcPNHKcWmsnOSDhuC/sNGQZGI=;
-        b=CrnWFDtveGdiLUbmvbydLmBN6TLTE7QMgQOJ12yZT8Vt6lkPCeWQZKw9Uo56yX3EiQOJaM
-        6seAr11sAfbiAXgrs4UluURXSFstinoxjQjqDztwldNQ4DI0kNUMSahBp27aoaIfYqCiqs
-        s8GYxEosPmumVk9z97/dJLNzjBiXlHg=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-135-gnzoAHczNzOtolvNhNHEnA-1; Mon, 15 Mar 2021 07:02:14 -0400
-X-MC-Unique: gnzoAHczNzOtolvNhNHEnA-1
-Received: by mail-wm1-f69.google.com with SMTP id c7so8027396wml.8
-        for <kvm@vger.kernel.org>; Mon, 15 Mar 2021 04:02:13 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=S/oWGawpXGhyQCD9KmbcPNHKcWmsnOSDhuC/sNGQZGI=;
-        b=WnOBmEXiv5oekRivB0FQ8qmpPaIeaqVs9tjYnyjRvQW2cqBwCv745SvmsNL0HwpWN+
-         wfh2e5kCFN27lfI+iaU87LGXmvaJgnvVS+nRM0+4yUaLb5nzkPc2f0Kf8/zt2hgfwp5q
-         0yLZ2K+V3Ywc8PK5xpH07BjAiBNQ6Ep30Fa5q2YNq/8c2A7zeN6gMm/ydiiU9Z4lxpLp
-         7jXnea5SwzsHRibXfrNrHTIcLK1b3Dc7tvcUdjK7/fuMsBc2VJe7DgXBWkiBTXt5vS/I
-         evW6aUB37zymAfkbcP3/Z9AEHOPDfOYYiP2KMBOKzGgWBslTULMvk9PzcC13IWj9pGWi
-         +9kw==
-X-Gm-Message-State: AOAM530jLD0kg90hoAmFHYaSJ9ZzvFlYPGzHxRsHrhKflwHacpM9O6MZ
-        L711xMIJobSE7j5Y++iEM1K4frvLdOGsgraSiYCdkUhmvEdt9EUs6zyggr5ND66h5oIgN9WavKo
-        j/6r/vMRogyvj
-X-Received: by 2002:a05:6000:24b:: with SMTP id m11mr26777707wrz.393.1615806132639;
-        Mon, 15 Mar 2021 04:02:12 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzxngqoRvyImvtrS1gTlOBvENXh/6EdwVXEpl38+sSZZ8VElzUNwwM/9wN8W829CrCnbUyofg==
-X-Received: by 2002:a05:6000:24b:: with SMTP id m11mr26777627wrz.393.1615806132028;
-        Mon, 15 Mar 2021 04:02:12 -0700 (PDT)
-Received: from steredhat (host-79-34-249-199.business.telecomitalia.it. [79.34.249.199])
-        by smtp.gmail.com with ESMTPSA id a13sm16170382wrp.31.2021.03.15.04.02.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 15 Mar 2021 04:02:11 -0700 (PDT)
-Date:   Mon, 15 Mar 2021 12:02:09 +0100
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     Arseny Krasnov <arseny.krasnov@kaspersky.com>
-Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Jorgen Hansen <jhansen@vmware.com>,
-        Colin Ian King <colin.king@canonical.com>,
-        Norbert Slusarek <nslusarek@gmx.net>,
-        Andra Paraschiv <andraprs@amazon.com>, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, stsp2@yandex.ru, oxffffaa@gmail.com
-Subject: Re: [RFC PATCH v6 11/22] virtio/vsock: dequeue callback for
- SOCK_SEQPACKET
-Message-ID: <20210315110209.xuaq5q3a2zp4u3g5@steredhat>
-References: <20210307175722.3464068-1-arseny.krasnov@kaspersky.com>
- <20210307180204.3465806-1-arseny.krasnov@kaspersky.com>
+        id S229875AbhCOLCr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 15 Mar 2021 07:02:47 -0400
+Received: from foss.arm.com ([217.140.110.172]:60478 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229519AbhCOLC1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 15 Mar 2021 07:02:27 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 956C6D6E;
+        Mon, 15 Mar 2021 04:02:26 -0700 (PDT)
+Received: from e121166-lin.cambridge.arm.com (e121166-lin.cambridge.arm.com [10.1.196.255])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E3B953F70D;
+        Mon, 15 Mar 2021 04:02:25 -0700 (PDT)
+Date:   Mon, 15 Mar 2021 11:02:20 +0000
+From:   Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     linux-kernel@vger.kernel.org,
+        LAKML <linux-arm-kernel@lists.infradead.org>,
+        KVM <kvm@vger.kernel.org>
+Subject: Re: [PATCH v2 1/1] irqchip/gic-v4.1: Disable vSGI upon (GIC CPUIF <
+ v4.1) detection
+Message-ID: <20210315110220.GA18335@e121166-lin.cambridge.arm.com>
+References: <0201111162841.3151-1-lorenzo.pieralisi@arm.com>
+ <20210302102744.12692-1-lorenzo.pieralisi@arm.com>
+ <20210302102744.12692-2-lorenzo.pieralisi@arm.com>
+ <87zgzdxxf2.wl-maz@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210307180204.3465806-1-arseny.krasnov@kaspersky.com>
+In-Reply-To: <87zgzdxxf2.wl-maz@kernel.org>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, Mar 07, 2021 at 09:02:01PM +0300, Arseny Krasnov wrote:
->This adds transport callback and it's logic for SEQPACKET dequeue.
->Callback fetches RW packets from rx queue of socket until whole record
->is copied(if user's buffer is full, user is not woken up). This is done
->to not stall sender, because if we wake up user and it leaves syscall,
->nobody will send credit update for rest of record, and sender will wait
->for next enter of read syscall at receiver's side. So if user buffer is
->full, we just send credit update and drop data. If during copy SEQ_BEGIN
->was found(and not all data was copied), copying is restarted by reset
->user's iov iterator(previous unfinished data is dropped).
->
->Signed-off-by: Arseny Krasnov <arseny.krasnov@kaspersky.com>
->---
-> include/linux/virtio_vsock.h            |  13 +++
-> include/uapi/linux/virtio_vsock.h       |  16 ++++
-> net/vmw_vsock/virtio_transport_common.c | 116 ++++++++++++++++++++++++
-> 3 files changed, 145 insertions(+)
->
->diff --git a/include/linux/virtio_vsock.h b/include/linux/virtio_vsock.h
->index dc636b727179..466a5832d2f5 100644
->--- a/include/linux/virtio_vsock.h
->+++ b/include/linux/virtio_vsock.h
->@@ -18,6 +18,12 @@ enum {
-> 	VSOCK_VQ_MAX    = 3,
-> };
->
->+struct virtio_vsock_seqpack_state {
->+	u32 user_read_seq_len;
->+	u32 user_read_copied;
->+	u32 curr_rx_msg_id;
->+};
->+
-> /* Per-socket state (accessed via vsk->trans) */
-> struct virtio_vsock_sock {
-> 	struct vsock_sock *vsk;
->@@ -36,6 +42,8 @@ struct virtio_vsock_sock {
-> 	u32 rx_bytes;
-> 	u32 buf_alloc;
-> 	struct list_head rx_queue;
->+
->+	struct virtio_vsock_seqpack_state seqpacket_state;
+On Mon, Mar 08, 2021 at 07:22:57PM +0000, Marc Zyngier wrote:
+> Hi Lorenzo,
+> 
+> On Tue, 02 Mar 2021 10:27:44 +0000,
+> Lorenzo Pieralisi <lorenzo.pieralisi@arm.com> wrote:
+> > 
+> > GIC CPU interfaces versions predating GIC v4.1 were not built to
+> > accommodate vINTID within the vSGI range; as reported in the GIC
+> > specifications (8.2 "Changes to the CPU interface"), it is
+> > CONSTRAINED UNPREDICTABLE to deliver a vSGI to a PE with
+> > ID_AA64PFR0_EL1.GIC < b0011.
+> > 
+> > Check the GIC CPUIF version by reading the SYS_ID_AA64_PFR0_EL1.
+> > 
+> > Disable vSGIs if a CPUIF version < 4.1 is detected to prevent using
+> > vSGIs on systems where they may misbehave.
+> > 
+> > Signed-off-by: Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>
+> > Cc: Marc Zyngier <maz@kernel.org>
+> > ---
+> >  arch/arm64/kvm/vgic/vgic-mmio-v3.c     |  4 ++--
+> >  arch/arm64/kvm/vgic/vgic-v3.c          |  3 ++-
+> >  drivers/irqchip/irq-gic-v3-its.c       |  6 +++++-
+> >  drivers/irqchip/irq-gic-v3.c           | 22 ++++++++++++++++++++++
+> >  include/kvm/arm_vgic.h                 |  1 +
+> >  include/linux/irqchip/arm-gic-common.h |  2 ++
+> >  include/linux/irqchip/arm-gic-v3.h     |  1 +
+> >  7 files changed, 35 insertions(+), 4 deletions(-)
+> > 
+> > diff --git a/arch/arm64/kvm/vgic/vgic-mmio-v3.c b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
+> > index 15a6c98ee92f..66548cd2a715 100644
+> > --- a/arch/arm64/kvm/vgic/vgic-mmio-v3.c
+> > +++ b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
+> > @@ -86,7 +86,7 @@ static unsigned long vgic_mmio_read_v3_misc(struct kvm_vcpu *vcpu,
+> >  		}
+> >  		break;
+> >  	case GICD_TYPER2:
+> > -		if (kvm_vgic_global_state.has_gicv4_1)
+> > +		if (kvm_vgic_global_state.has_gicv4_1_vsgi)
+> >  			value = GICD_TYPER2_nASSGIcap;
+> >  		break;
+> >  	case GICD_IIDR:
+> > @@ -119,7 +119,7 @@ static void vgic_mmio_write_v3_misc(struct kvm_vcpu *vcpu,
+> >  		dist->enabled = val & GICD_CTLR_ENABLE_SS_G1;
+> >  
+> >  		/* Not a GICv4.1? No HW SGIs */
+> > -		if (!kvm_vgic_global_state.has_gicv4_1)
+> > +		if (!kvm_vgic_global_state.has_gicv4_1_vsgi)
+> >  			val &= ~GICD_CTLR_nASSGIreq;
+> >  
+> >  		/* Dist stays enabled? nASSGIreq is RO */
+> > diff --git a/arch/arm64/kvm/vgic/vgic-v3.c b/arch/arm64/kvm/vgic/vgic-v3.c
+> > index 52915b342351..57b73100e8cc 100644
+> > --- a/arch/arm64/kvm/vgic/vgic-v3.c
+> > +++ b/arch/arm64/kvm/vgic/vgic-v3.c
+> > @@ -533,7 +533,7 @@ int vgic_v3_map_resources(struct kvm *kvm)
+> >  		return ret;
+> >  	}
+> >  
+> > -	if (kvm_vgic_global_state.has_gicv4_1)
+> > +	if (kvm_vgic_global_state.has_gicv4_1_vsgi)
+> >  		vgic_v4_configure_vsgis(kvm);
+> >  
+> >  	return 0;
+> > @@ -589,6 +589,7 @@ int vgic_v3_probe(const struct gic_kvm_info *info)
+> >  	if (info->has_v4) {
+> >  		kvm_vgic_global_state.has_gicv4 = gicv4_enable;
+> >  		kvm_vgic_global_state.has_gicv4_1 = info->has_v4_1 && gicv4_enable;
+> > +		kvm_vgic_global_state.has_gicv4_1_vsgi = info->has_v4_1_vsgi && gicv4_enable;
+> >  		kvm_info("GICv4%s support %sabled\n",
+> >  			 kvm_vgic_global_state.has_gicv4_1 ? ".1" : "",
+> >  			 gicv4_enable ? "en" : "dis");
+> > diff --git a/drivers/irqchip/irq-gic-v3-its.c b/drivers/irqchip/irq-gic-v3-its.c
+> > index ed46e6057e33..ee2a2ca27d5c 100644
+> > --- a/drivers/irqchip/irq-gic-v3-its.c
+> > +++ b/drivers/irqchip/irq-gic-v3-its.c
+> > @@ -5412,7 +5412,11 @@ int __init its_init(struct fwnode_handle *handle, struct rdists *rdists,
+> >  	if (has_v4 & rdists->has_vlpis) {
+> >  		const struct irq_domain_ops *sgi_ops;
+> >  
+> > -		if (has_v4_1)
+> > +		/*
+> > +		 * Enable vSGIs only if the ITS and the
+> > +		 * GIC CPUIF support them.
+> > +		 */
+> > +		if (has_v4_1 && rdists->has_vsgi_cpuif)
+> >  			sgi_ops = &its_sgi_domain_ops;
+> >  		else
+> >  			sgi_ops = NULL;
+> 
+> This doesn't seem right. If you pass NULL for the SGI ops, you also
+> lose the per-VPE doorbells and stick to the terrible GICv4.0 behaviour
+> (see the use of has_v4_1() in irq-gic-v4.c). I don't think that is
+> what you really want.
 
-Following 'virtio_vsock_seq_hdr', maybe we can shorten in:
+Yes, I was caught out again - we use the sgi_ops to detect v4.1 behaviour,
+I will remove this hunk.
 
-         struct virtio_vsock_seq_state seq_state;
+> > diff --git a/drivers/irqchip/irq-gic-v3.c b/drivers/irqchip/irq-gic-v3.c
+> > index eb0ee356a629..fd6cd9a5de34 100644
+> > --- a/drivers/irqchip/irq-gic-v3.c
+> > +++ b/drivers/irqchip/irq-gic-v3.c
+> > @@ -31,6 +31,21 @@
+> >  
+> >  #include "irq-gic-common.h"
+> >  
+> > +#ifdef CONFIG_ARM64
+> > +#include <asm/cpufeature.h>
+> > +
+> > +static inline bool gic_cpuif_has_vsgi(void)
+> > +{
+> > +	unsigned long fld, reg = read_sanitised_ftr_reg(SYS_ID_AA64PFR0_EL1);
+> > +
+> > +	fld = cpuid_feature_extract_unsigned_field(reg, ID_AA64PFR0_GIC_SHIFT);
+> > +
+> > +	return fld >= 0x3;
+> > +}
+> > +#else
+> > +static inline bool gic_cpuif_has_vsgi(void) { return false; }
+> > +#endif
+> 
+> Why do we need to expose this in the GICv3 driver instead of the GICv4
+> code? At the moment, you track this state:
+> 
+> - in gic_data.rdists.has_vsgi_cpuif
+> - indirectly in gic_v3_kvm_info.has_v4_1_vsgi
+> - indirectly in kvm_vgic_global_state.has_gicv4_1_vsgi
+> 
+> Can't we simplify the logic and track it *once*? Or even better, just
+> evaluate it when required? I hacked the following stuff based on your
+> patch (untested). What do you think?
 
-The rest LGTM.
+Thanks for that I will give it a shot - it makes sense. I will have
+a look to see if we can consolidate these v4.0 vs v4.1 checks somehow
+before reposting.
 
+Thanks a lot for the review.
+
+Lorenzo
+
+> Thanks,
+> 
+> 	M.
+> 
+> diff --git a/arch/arm64/kvm/vgic/vgic-mmio-v3.c b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
+> index 15a6c98ee92f..2f1b156021a6 100644
+> --- a/arch/arm64/kvm/vgic/vgic-mmio-v3.c
+> +++ b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
+> @@ -86,7 +86,7 @@ static unsigned long vgic_mmio_read_v3_misc(struct kvm_vcpu *vcpu,
+>  		}
+>  		break;
+>  	case GICD_TYPER2:
+> -		if (kvm_vgic_global_state.has_gicv4_1)
+> +		if (kvm_vgic_global_state.has_gicv4_1 && gic_cpuif_has_vsgi())
+>  			value = GICD_TYPER2_nASSGIcap;
+>  		break;
+>  	case GICD_IIDR:
+> @@ -119,7 +119,7 @@ static void vgic_mmio_write_v3_misc(struct kvm_vcpu *vcpu,
+>  		dist->enabled = val & GICD_CTLR_ENABLE_SS_G1;
+>  
+>  		/* Not a GICv4.1? No HW SGIs */
+> -		if (!kvm_vgic_global_state.has_gicv4_1)
+> +		if (!kvm_vgic_global_state.has_gicv4_1 || !gic_cpuif_has_vsgi())
+>  			val &= ~GICD_CTLR_nASSGIreq;
+>  
+>  		/* Dist stays enabled? nASSGIreq is RO */
+> diff --git a/drivers/irqchip/irq-gic-v4.c b/drivers/irqchip/irq-gic-v4.c
+> index 5d1dc9915272..864fa9bbda4c 100644
+> --- a/drivers/irqchip/irq-gic-v4.c
+> +++ b/drivers/irqchip/irq-gic-v4.c
+> @@ -87,17 +87,37 @@ static struct irq_domain *gic_domain;
+>  static const struct irq_domain_ops *vpe_domain_ops;
+>  static const struct irq_domain_ops *sgi_domain_ops;
+>  
+> +#ifdef CONFIG_ARM64
+> +#include <asm/cpufeature.h>
+> +
+> +bool gic_cpuif_has_vsgi(void)
+> +{
+> +	unsigned long fld, reg = read_sanitised_ftr_reg(SYS_ID_AA64PFR0_EL1);
+> +
+> +	fld = cpuid_feature_extract_unsigned_field(reg, ID_AA64PFR0_GIC_SHIFT);
+> +
+> +	return fld >= 0x3;
+> +}
+> +#else
+> +bool gic_cpuif_has_vsgi(void) { }
+> +#endif
+> +
+>  static bool has_v4_1(void)
+>  {
+>  	return !!sgi_domain_ops;
+>  }
+>  
+> +static bool has_v4_1_sgi(void)
+> +{
+> +	return has_v4_1() && gic_cpuif_has_vsgi();
+> +}
+> +
+>  static int its_alloc_vcpu_sgis(struct its_vpe *vpe, int idx)
+>  {
+>  	char *name;
+>  	int sgi_base;
+>  
+> -	if (!has_v4_1())
+> +	if (!has_v4_1_sgi())
+>  		return 0;
+>  
+>  	name = kasprintf(GFP_KERNEL, "GICv4-sgi-%d", task_pid_nr(current));
+> @@ -182,7 +202,7 @@ static void its_free_sgi_irqs(struct its_vm *vm)
+>  {
+>  	int i;
+>  
+> -	if (!has_v4_1())
+> +	if (!has_v4_1_sgi())
+>  		return;
+>  
+>  	for (i = 0; i < vm->nr_vpes; i++) {
+> diff --git a/include/linux/irqchip/arm-gic-v4.h b/include/linux/irqchip/arm-gic-v4.h
+> index 943c3411ca10..2c63375bbd43 100644
+> --- a/include/linux/irqchip/arm-gic-v4.h
+> +++ b/include/linux/irqchip/arm-gic-v4.h
+> @@ -145,4 +145,6 @@ int its_init_v4(struct irq_domain *domain,
+>  		const struct irq_domain_ops *vpe_ops,
+>  		const struct irq_domain_ops *sgi_ops);
+>  
+> +bool gic_cpuif_has_vsgi(void);
+> +
+>  #endif
+> 
+> -- 
+> Without deviation from the norm, progress is not possible.
