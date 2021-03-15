@@ -2,91 +2,102 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 96F4533C8F4
-	for <lists+kvm@lfdr.de>; Mon, 15 Mar 2021 23:01:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4EAEC33C91F
+	for <lists+kvm@lfdr.de>; Mon, 15 Mar 2021 23:11:14 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231790AbhCOWAh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 15 Mar 2021 18:00:37 -0400
-Received: from mail.kernel.org ([198.145.29.99]:33482 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231371AbhCOWAR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 15 Mar 2021 18:00:17 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPS id D25F364F60
-        for <kvm@vger.kernel.org>; Mon, 15 Mar 2021 22:00:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1615845616;
-        bh=J7PLDfv7b19BDojN3LSd/g5IVJLtfBzxOxUtpNbGlF8=;
-        h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=X7bVaf9kP3rzxTEarpqjKNxqvo5FUPbxPUa2skSl8398qtPqflovPHWlCzQZOzhdg
-         TQ8oy/u+XJMtIu578lQcyEs/sHgRYvin00bpTMjsLoNrHvNw0QFy9h1TrRjPg4OW4X
-         REkeXMRgv9itd5DwRTxl6K8paYc1pQYm8r7cE8HM5pH8062rIO312vdxnzBP2zFmkE
-         1o76p4UxRmkrBof4ksRO80ppCDqchqliYp6ff8Mp3Rk8QYVDH/hNZqShCLn/9CB6Qk
-         e2GPN0o+PvvyW5CTa9y0DVSR+lVc57BuP/IceMYwamaWXQ8NQxvEsWe2/mlGocInwb
-         f3FLgIAWyt+eg==
-Received: by pdx-korg-bugzilla-2.web.codeaurora.org (Postfix, from userid 48)
-        id CFCE76533C; Mon, 15 Mar 2021 22:00:16 +0000 (UTC)
-From:   bugzilla-daemon@bugzilla.kernel.org
+        id S232169AbhCOWKl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 15 Mar 2021 18:10:41 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:39314 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232605AbhCOWKb (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 15 Mar 2021 18:10:31 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1615846230;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=GO4Svw6p1VObWYcp8yWMtHx+jBqxgLew+cAErGqrrHw=;
+        b=ZXzROqVC+NIBFFOHqbfv4OmaH/FZ9mto+xfqza7ja/Qic/Ra3jRFJF90VENUycRhWj5Y/f
+        fhNRL5Z68QNx0Y+hYPLQ8MuHwg/l+8mWsbee5w8mXzUFwgWNpgzdNTp9scovdJJEmGvJty
+        mtvU96nhdmNPQDckbi3xXyNmTmOB+vU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-205-dg5EnmfcNuaKPeeqVJjVGw-1; Mon, 15 Mar 2021 18:10:29 -0400
+X-MC-Unique: dg5EnmfcNuaKPeeqVJjVGw-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D693C801817;
+        Mon, 15 Mar 2021 22:10:26 +0000 (UTC)
+Received: from localhost.localdomain (unknown [10.35.207.30])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id EAD6C5C261;
+        Mon, 15 Mar 2021 22:10:21 +0000 (UTC)
+From:   Maxim Levitsky <mlevitsk@redhat.com>
 To:     kvm@vger.kernel.org
-Subject: [Bug 201753] AMD-Vi: Unable to write to IOMMU perf counter
-Date:   Mon, 15 Mar 2021 22:00:16 +0000
-X-Bugzilla-Reason: None
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Product: Virtualization
-X-Bugzilla-Component: kvm
-X-Bugzilla-Version: unspecified
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: bubuxp@gmail.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: cc
-Message-ID: <bug-201753-28872-ZFclF5BdZT@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-201753-28872@https.bugzilla.kernel.org/>
-References: <bug-201753-28872@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        linux-kernel@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Kieran Bingham <kbingham@kernel.org>,
+        Jessica Yu <jeyu@kernel.org>,
+        Jan Kiszka <jan.kiszka@siemens.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        x86@kernel.org (maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)),
+        Joerg Roedel <joro@8bytes.org>,
+        Sean Christopherson <seanjc@google.com>,
+        Jim Mattson <jmattson@google.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Ingo Molnar <mingo@redhat.com>
+Subject: [PATCH 0/3] KVM: my debug patch queue
+Date:   Tue, 16 Mar 2021 00:10:17 +0200
+Message-Id: <20210315221020.661693-1-mlevitsk@redhat.com>
 MIME-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D201753
+Hi!=0D
+=0D
+I would like to publish two debug features which were needed for other stuf=
+f=0D
+I work on.=0D
+=0D
+One is the reworked lx-symbols script which now actually works on at least=
+=0D
+gdb 9.1 (gdb 9.2 was reported to fail to load the debug symbols from the ke=
+rnel=0D
+for some reason, not related to this patch) and upstream qemu.=0D
+=0D
+The other feature is the ability to trap all guest exceptions (on SVM for n=
+ow)=0D
+and see them in kvmtrace prior to potential merge to double/triple fault.=0D
+=0D
+This can be very useful and I already had to manually patch KVM a few=0D
+times for this.=0D
+I will, once time permits, implement this feature on Intel as well.=0D
+=0D
+Best regards,=0D
+        Maxim Levitsky=0D
+=0D
+Maxim Levitsky (3):=0D
+  scripts/gdb: rework lx-symbols gdb script=0D
+  KVM: x86: guest debug: don't inject interrupts while single stepping=0D
+  KVM: SVM: allow to intercept all exceptions for debug=0D
+=0D
+ arch/x86/include/asm/kvm_host.h |   2 +=0D
+ arch/x86/kvm/svm/svm.c          |  77 ++++++++++++++++++++++-=0D
+ arch/x86/kvm/svm/svm.h          |   5 +-=0D
+ arch/x86/kvm/x86.c              |  11 +++-=0D
+ kernel/module.c                 |   8 ++-=0D
+ scripts/gdb/linux/symbols.py    | 106 +++++++++++++++++++++++---------=0D
+ 6 files changed, 174 insertions(+), 35 deletions(-)=0D
+=0D
+-- =0D
+2.26.2=0D
+=0D
 
-BubuXP (bubuxp@gmail.com) changed:
-
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-                 CC|                            |bubuxp@gmail.com
-
---- Comment #22 from BubuXP (bubuxp@gmail.com) ---
-Just a note, maybe useless.
-I own a Huawei laptop, model KPL-W00D with Ryzen 2500U and it suffer this s=
-ame
-bug.
-
-I cannot compile a kernel so, after installing Devuan testing, I installed =
-also
-the generic kernel located here:
-https://kernel.ubuntu.com/~kernel-ppa/mainline/daily/2021-03-15/amd64/
-that is a 5.12.0 RC3 and it includes the upstream patch for this bug.
-
-The patch works but only on cold boots, after a simple reboot the bug turns
-back again.
-
-Maybe it's only a hardware problem, maybe a distro fault or misconfiguratio=
-n, I
-don't know, but I felt compelled to report this.
-
-If needed I can give more detailed informations.
-
---=20
-You may reply to this email to add a comment.
-
-You are receiving this mail because:
-You are watching the assignee of the bug.=
