@@ -2,182 +2,103 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 46F5733CA2B
-	for <lists+kvm@lfdr.de>; Tue, 16 Mar 2021 00:51:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 09B7133CA30
+	for <lists+kvm@lfdr.de>; Tue, 16 Mar 2021 00:55:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232334AbhCOXvD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 15 Mar 2021 19:51:03 -0400
-Received: from mga03.intel.com ([134.134.136.65]:26954 "EHLO mga03.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232736AbhCOXu5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 15 Mar 2021 19:50:57 -0400
-IronPort-SDR: 4tPvZS4Q5TNvfwKSxjhe48dA1ItNaTTVfZU8JviLb31OrBIkpJmU2+YzJ7h2z+dOaQbQwmNgfv
- LT167SKOXb3g==
-X-IronPort-AV: E=McAfee;i="6000,8403,9924"; a="189219898"
-X-IronPort-AV: E=Sophos;i="5.81,251,1610438400"; 
-   d="scan'208";a="189219898"
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Mar 2021 16:50:56 -0700
-IronPort-SDR: Sqx2u262IOgq7KaHUZLwlqUcainSDUrfcwqLW9+CFXQOhCeyhicI5AHfU3b/QNDmLtoMxWQxBV
- TuvOTGVPqVeQ==
-X-IronPort-AV: E=Sophos;i="5.81,251,1610438400"; 
-   d="scan'208";a="439019930"
-Received: from vamcfadd-mobl1.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.252.129.148])
-  by fmsmga002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Mar 2021 16:50:52 -0700
-Date:   Tue, 16 Mar 2021 12:50:50 +1300
-From:   Kai Huang <kai.huang@intel.com>
-To:     Jarkko Sakkinen <jarkko@kernel.org>
-Cc:     Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org,
-        x86@kernel.org, linux-sgx@vger.kernel.org,
-        linux-kernel@vger.kernel.org, luto@kernel.org,
-        dave.hansen@intel.com, rick.p.edgecombe@intel.com,
-        haitao.huang@intel.com, pbonzini@redhat.com, bp@alien8.de,
-        tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com
-Subject: Re: [PATCH v3 03/25] x86/sgx: Wipe out EREMOVE from
- sgx_free_epc_page()
-Message-Id: <20210316125050.9205f9be79501e4ee52369fc@intel.com>
-In-Reply-To: <YE/m06LWFTDKfUCc@kernel.org>
-References: <e1ca4131bc9f98cf50a1200efcf46080d6512fe7.1615250634.git.kai.huang@intel.com>
-        <20210311020142.125722-1-kai.huang@intel.com>
-        <YEvbcrTZyiUAxZAu@google.com>
-        <YEyX4V7BcS3MZNzp@kernel.org>
-        <20210315201236.de3cd9389f853a418ec53e86@intel.com>
-        <YE9elQfTZHo/9TJI@kernel.org>
-        <YE9e5JAP3agUByXr@kernel.org>
-        <20210316092934.d4dd7f2e65f507c3856341bc@intel.com>
-        <YE/m06LWFTDKfUCc@kernel.org>
-X-Mailer: Sylpheed 3.7.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+        id S233830AbhCOXyq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 15 Mar 2021 19:54:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60922 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232736AbhCOXyj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 15 Mar 2021 19:54:39 -0400
+Received: from mail-qk1-x733.google.com (mail-qk1-x733.google.com [IPv6:2607:f8b0:4864:20::733])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E526C06174A;
+        Mon, 15 Mar 2021 16:54:39 -0700 (PDT)
+Received: by mail-qk1-x733.google.com with SMTP id l4so33579197qkl.0;
+        Mon, 15 Mar 2021 16:54:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=sender:date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=US0hVPQ8vE/ff4q4EMV/WahbUbFBxAIlNGyDC8TZKKo=;
+        b=anlpAKgv1icjbUA4PcLTmi9IUjIbI/zzazbcKLMIKSnLma+f+zvtMa/z+TNJ1Fb4/U
+         w4LKNq8Sxa+Jd4ADL3B6JaCsM2rY4qXj3HeZD4506hVAgMner9pcoO2Vd9OZCjXqeQ2Q
+         C/KJ3q0LAJ2t2P4R0lPsrUK1AC8Cgrxvl02ibVFSP88VrAhtb7nDKS5uiJI/tNu+Uv/M
+         HvEa87XZIybFq27EArSte01J4H7GrL53gn48U5jGfSOP/O0z/vgpwwPp2ftthhXWAsVY
+         //QJ71p/BWJs/LrqaW7yb0VkIlGKZxprXpB0uMM1gym5oJ/Pjk4XP/jxxyLzDqwn2AFp
+         k4vg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+         :references:mime-version:content-disposition:in-reply-to;
+        bh=US0hVPQ8vE/ff4q4EMV/WahbUbFBxAIlNGyDC8TZKKo=;
+        b=KEGWOT8MVzbPBjCMDkpk8xVkk+J5TARSWq11CGzFI1rA5KWn13A/ZNNKke1pCLGutH
+         bKD1UoKogYl3cA4WbBiooJQ5MntH74omUIhKKJgIxvrEGFoNmLoJ6tprs9s4egS1Y6XV
+         7kqTJCTL4b3CJZb9Aq/BXbfYUWaB138R9CrVhVYX+7XGgh0gmfhYy2viTffPuaSjRo6a
+         s2gCy7sYUo7W0m+zayo6ipxwH8j40yQ9i4EKX9aQc8l6M7QyUMRjK7qvUS3ygXVTDaYM
+         Z9fumSBBnH4X58ek0b1ezXg69/CdoNgx5NDWybWF0R8EhFD9ZZoLOrEdFORPaeESq+bC
+         IKpw==
+X-Gm-Message-State: AOAM530U6jQg+tIETAhYN2/IuUmqty0q9sCXmJWICpIhHsCveo6u2+yw
+        dyXICQSwH8jsZqva9QyHlDk=
+X-Google-Smtp-Source: ABdhPJwa2U9JAW0IdxHOI/3q/+uL14oiW0exgSHcfpOxWOPVytqe+AmVKLw8B8hEQOQOpxUo2j2moA==
+X-Received: by 2002:a37:9b82:: with SMTP id d124mr27326575qke.489.1615852478161;
+        Mon, 15 Mar 2021 16:54:38 -0700 (PDT)
+Received: from localhost (2603-7000-9602-8233-06d4-c4ff-fe48-9d05.res6.spectrum.com. [2603:7000:9602:8233:6d4:c4ff:fe48:9d05])
+        by smtp.gmail.com with ESMTPSA id g186sm14138805qke.0.2021.03.15.16.54.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 15 Mar 2021 16:54:37 -0700 (PDT)
+Sender: Tejun Heo <htejun@gmail.com>
+Date:   Mon, 15 Mar 2021 19:54:36 -0400
+From:   Tejun Heo <tj@kernel.org>
+To:     Jacob Pan <jacob.jun.pan@intel.com>
+Cc:     Vipin Sharma <vipinsh@google.com>, mkoutny@suse.com,
+        rdunlap@infradead.org, thomas.lendacky@amd.com,
+        brijesh.singh@amd.com, jon.grimm@amd.com, eric.vantassell@amd.com,
+        pbonzini@redhat.com, hannes@cmpxchg.org, frankja@linux.ibm.com,
+        borntraeger@de.ibm.com, corbet@lwn.net, seanjc@google.com,
+        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
+        joro@8bytes.org, tglx@linutronix.de, mingo@redhat.com,
+        bp@alien8.de, hpa@zytor.com, gingell@google.com,
+        rientjes@google.com, dionnaglaze@google.com, kvm@vger.kernel.org,
+        x86@kernel.org, cgroups@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-kernel@vger.kernel.org, "Tian, Kevin" <kevin.tian@intel.com>,
+        "Liu, Yi L" <yi.l.liu@intel.com>,
+        "Raj, Ashok" <ashok.raj@intel.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Jason Gunthorpe <jgg@nvidia.com>,
+        Jacob Pan <jacob.jun.pan@linux.intel.com>,
+        "jean-philippe@linaro.org" <jean-philippe@linaro.org>
+Subject: Re: [RFC v2 2/2] cgroup: sev: Miscellaneous cgroup documentation.
+Message-ID: <YE/zvLkL1vM8/Cdm@slm.duckdns.org>
+References: <YECfhCJtHUL9cB2L@slm.duckdns.org>
+ <20210312125821.22d9bfca@jacob-builder>
+ <YEvZ4muXqiSScQ8i@google.com>
+ <20210312145904.4071a9d6@jacob-builder>
+ <YEyR9181Qgzt+Ps9@mtj.duckdns.org>
+ <20210313085701.1fd16a39@jacob-builder>
+ <YEz+8HbfkbGgG5Tm@mtj.duckdns.org>
+ <20210315151155.383a7e6e@jacob-builder>
+ <YE/ddx5+ToNsgUF0@slm.duckdns.org>
+ <20210315164012.4adeabe8@jacob-builder>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210315164012.4adeabe8@jacob-builder>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 16 Mar 2021 00:59:31 +0200 Jarkko Sakkinen wrote:
-> On Tue, Mar 16, 2021 at 09:29:34AM +1300, Kai Huang wrote:
-> > On Mon, 15 Mar 2021 15:19:32 +0200 Jarkko Sakkinen wrote:
-> > > On Mon, Mar 15, 2021 at 03:18:16PM +0200, Jarkko Sakkinen wrote:
-> > > > On Mon, Mar 15, 2021 at 08:12:36PM +1300, Kai Huang wrote:
-> > > > > On Sat, 13 Mar 2021 12:45:53 +0200 Jarkko Sakkinen wrote:
-> > > > > > On Fri, Mar 12, 2021 at 01:21:54PM -0800, Sean Christopherson wrote:
-> > > > > > > On Thu, Mar 11, 2021, Kai Huang wrote:
-> > > > > > > > From: Jarkko Sakkinen <jarkko@kernel.org>
-> > > > > > > > 
-> > > > > > > > EREMOVE takes a page and removes any association between that page and
-> > > > > > > > an enclave.  It must be run on a page before it can be added into
-> > > > > > > > another enclave.  Currently, EREMOVE is run as part of pages being freed
-> > > > > > > > into the SGX page allocator.  It is not expected to fail.
-> > > > > > > > 
-> > > > > > > > KVM does not track how guest pages are used, which means that SGX
-> > > > > > > > virtualization use of EREMOVE might fail.
-> > > > > > > > 
-> > > > > > > > Break out the EREMOVE call from the SGX page allocator.  This will allow
-> > > > > > > > the SGX virtualization code to use the allocator directly.  (SGX/KVM
-> > > > > > > > will also introduce a more permissive EREMOVE helper).
-> > > > > > > > 
-> > > > > > > > Implement original sgx_free_epc_page() as sgx_encl_free_epc_page() to be
-> > > > > > > > more specific that it is used to free EPC page assigned to one enclave.
-> > > > > > > > Print an error message when EREMOVE fails to explicitly call out EPC
-> > > > > > > > page is leaked, and requires machine reboot to get leaked pages back.
-> > > > > > > > 
-> > > > > > > > Signed-off-by: Jarkko Sakkinen <jarkko@kernel.org>
-> > > > > > > > Co-developed-by: Kai Huang <kai.huang@intel.com>
-> > > > > > > > Acked-by: Jarkko Sakkinen <jarkko@kernel.org>
-> > > > > > > > Signed-off-by: Kai Huang <kai.huang@intel.com>
-> > > > > > > > ---
-> > > > > > > > v2->v3:
-> > > > > > > > 
-> > > > > > > >  - Fixed bug during copy/paste which results in SECS page and va pages are not
-> > > > > > > >    correctly freed in sgx_encl_release() (sorry for the mistake).
-> > > > > > > >  - Added Jarkko's Acked-by.
-> > > > > > > 
-> > > > > > > That Acked-by should either be dropped or moved above Co-developed-by to make
-> > > > > > > checkpatch happy.
-> > > > > > > 
-> > > > > > > Reviewed-by: Sean Christopherson <seanjc@google.com>
-> > > > > > 
-> > > > > > Oops, my bad. Yup, ack should be removed.
-> > > > > > 
-> > > > > > /Jarkko
-> > > > > 
-> > > > > Hi Jarkko,
-> > > > > 
-> > > > > Your reply of your concern of this patch to the cover-letter
-> > > > > 
-> > > > > https://lore.kernel.org/lkml/YEkJXu262YDa8ZaK@kernel.org/
-> > > > > 
-> > > > > reminds me to do more sanity check of whether removing EREMOVE in
-> > > > > sgx_free_epc_page() will impact other code path or not, and I think
-> > > > > sgx_encl_release() is not the only place should be changed:
-> > > > > 
-> > > > > - sgx_encl_shrink() needs to call sgx_encl_free_epc_page(), since when this is
-> > > > > called, the VA page can be already valid -- there are other failures can
-> > > > > trigger sgx_encl_shrink().
-> > > > 
-> > > > You right about this, good catch.
-> > > > 
-> > > > Shrink needs to always do EREMOVE as grow has done EPA, which changes
-> > > > EPC page state.
-> > > > 
-> > > > > - sgx_encl_add_page() should call sgx_encl_free_epc_page() in "err_out_free:"
-> > > > > label, since the EPC page can be already valid when error happened, i.e. when
-> > > > > EEXTEND fails.
-> > > > 
-> > > > Yes, correct, good work!
-> > > > 
-> > > > > Other places should be OK per my check, but I'd prefer to just replacing all
-> > > > > sgx_free_epc_page() call sites in driver with sgx_encl_free_epc_page(), with
-> > > > > one exception: sgx_alloc_va_page(), which calls sgx_free_epc_page() when EPA
-> > > > > fails, in which case EREMOVE is not required for sure.
-> > > > 
-> > > > I would not unless they require it.
-> > > > 
-> > > > > Your idea, please?
-> > > > > 
-> > > > > Btw, introducing a driver wrapper of sgx_free_epc_page() does make sense to me,
-> > > > > because virtualization has a counterpart in sgx/virt.c too.
-> > > > 
-> > > > It does make sense to use sgx_free_epc_page() everywhere where it's
-> > > > the right thing to call and here's why.
-> > > > 
-> > > > If there is some unrelated regression that causes EPC page not get
-> > > > uninitialized when it actually should, doing extra EREMOVE could mask
-> > > > those bugs. I.e. it can postpone a failure, which can make a bug harder
-> > > > to backtrace.
-> > > > 
-> > > 
-> > > I.e. even though it is true that for correctly working code extra EREMOVE
-> > > is nil functionality, it could change semantics for buggy code.
-> > 
-> > Thanks for feedback. Sorry I am not sure if I understand you. So if we don't
-> > want to bring functionality change, we need to replace sgx_free_epc_page() in
-> > all call sites with sgx_encl_free_epc_page(). To me for this patch only, it's
-> > better not to bring any functional change, so I intend to replace all (I now
-> > consider even leaving sgx_alloc_va_page() out is not good idea in *this*
-> > patch). 
-> > 
-> > Or do you just want to replace sgx_free_epc_page() with
-> > sgx_encl_free_epc_page() in sgx_encl_shrink() and sgx_encl_add_page(), as I
-> > pointed above? In this way there will be functional change in this patch, and
-> > we need to explicitly explain  why leaving others out is OK in commit message.
-> > 
-> > To me I prefer the former.
-> 
-> The original purpose of this patch was exactly to remove EREMOVE
-> sgx_free_epc_page() and call it explicitly where it is required. That's
-> why I introduced sgx_reset_epc_page(). So the latter was actually the goal
-> of this patch at least when I did it. Now this is something completely
-> different.
-> 
-> So, I don't consider myself author of this patch in any possible way,
-> because this is not what I intended.
-> 
-> To move forward, for the next patch set version, you should change the
-> author field as yourself, and remove all my tags, and I will review it.
-> So you can work out this with former approach if you wish.
-> 
-> I.e. my ack/nak/etc. apply to this patch because it's not my code.
+Hello,
 
-OK. Thanks.
+On Mon, Mar 15, 2021 at 04:40:12PM -0700, Jacob Pan wrote:
+> 2. then we want to move/migrate Process1 to cg_B. so we need uncharge 10 of
+> cg_A, charge 10 of cg_B
 
+So, what I don't get is why this migration is necessary. This isn't
+supported as a usage pattern and no one, at least in terms of wide-spread
+usage, does this. Why is this a requirement for your use case?
+
+Thanks.
+
+-- 
+tejun
