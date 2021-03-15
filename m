@@ -2,126 +2,122 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BF3E933C09B
-	for <lists+kvm@lfdr.de>; Mon, 15 Mar 2021 16:55:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D849333C193
+	for <lists+kvm@lfdr.de>; Mon, 15 Mar 2021 17:23:31 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229787AbhCOPzP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 15 Mar 2021 11:55:15 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:33571 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229505AbhCOPzM (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 15 Mar 2021 11:55:12 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1615823711;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=2RtrMeo7+6C33syP/ppW8DPH4IpAYTqGXSBD94o2bnM=;
-        b=b+3UI9ad5/Fe7wiWOzOYthnzuuctZfjlXXXFRZFt+r7EU8ISchFG1vkKFeyMHZW6nSVx61
-        rkJMeb5Um9A4HDDANB5FQEg4qpJNhEXMJeJjpGnWsWfdlxzvOsSwGVLqYumGbprrL0UghW
-        UruhbCVuE8xDwI42rozUB3QfOixoLZo=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-315-rJMheXL_Oh235P8r2DIqPw-1; Mon, 15 Mar 2021 11:55:09 -0400
-X-MC-Unique: rJMheXL_Oh235P8r2DIqPw-1
-Received: by mail-wr1-f71.google.com with SMTP id e13so15258699wrg.4
-        for <kvm@vger.kernel.org>; Mon, 15 Mar 2021 08:55:09 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=2RtrMeo7+6C33syP/ppW8DPH4IpAYTqGXSBD94o2bnM=;
-        b=szJrjTLY1UKE2VIYz8h6rgv116T4a3+1dMqLtUJjunEToJyq4n/TBfhvnkpqORFHTZ
-         njQrAQUSCMdUoXgvWJWLeHUFLRmtSNN89vlG6AQqmDNhjc4qesNIuGrWCg5vZasg6F9M
-         RbSyn1aOXg8mnVaEN1/zOSwjeLc2PVhYhLF1M/VgQXHjhCf2J6GmHgK6d3DCQYR/U0cM
-         tXBPxWqCtaK39f+HeITeiYfCQWZ2RkB9LBxvaj2wjIsa6gVXg4fPc/cqw1iCcyk6Xak8
-         /mBaZ4ODUgzer6IHvHWK5bSfHXB1vnxjYxdLcyprkWsMeSCaOIQCp/dtjS2FAmPMZgoI
-         dnDg==
-X-Gm-Message-State: AOAM532vPJ3dkJkL9i0H0RBzOMk6W1EuHxjXyr+ofLd0yOVrqIAwv/LI
-        Chl1Pp2sN7iDivV3KUL4yuMwk2Nzs0c+egIP4py3tChBY7rta0PfeAeo3ATSpvGgR6uCI60T3pM
-        WztwB13XxqWDK
-X-Received: by 2002:a7b:c357:: with SMTP id l23mr353365wmj.152.1615823708621;
-        Mon, 15 Mar 2021 08:55:08 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzJx3VlQMxD8rYju3Oz2hSAowohPcCGOlnoGzzv6kx4rhbdXE1UOxszvKj4SO0QA0jYMNH2+w==
-X-Received: by 2002:a7b:c357:: with SMTP id l23mr353355wmj.152.1615823708481;
-        Mon, 15 Mar 2021 08:55:08 -0700 (PDT)
-Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id i10sm18066324wrs.11.2021.03.15.08.55.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 15 Mar 2021 08:55:08 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>
-Subject: Re: [PATCH 2/4] KVM: x86: hyper-v: Prevent using not-yet-updated
- TSC page by secondary CPUs
-In-Reply-To: <6b392d7e-8135-53a9-9040-f6f5e316c6cb@redhat.com>
-References: <20210315143706.859293-1-vkuznets@redhat.com>
- <20210315143706.859293-3-vkuznets@redhat.com>
- <6b392d7e-8135-53a9-9040-f6f5e316c6cb@redhat.com>
-Date:   Mon, 15 Mar 2021 16:55:07 +0100
-Message-ID: <87im5s8l9g.fsf@vitty.brq.redhat.com>
+        id S232068AbhCOQW6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 15 Mar 2021 12:22:58 -0400
+Received: from foss.arm.com ([217.140.110.172]:53522 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S232328AbhCOQW0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 15 Mar 2021 12:22:26 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9DBCD1FB;
+        Mon, 15 Mar 2021 09:22:25 -0700 (PDT)
+Received: from [192.168.0.110] (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 235C43F718;
+        Mon, 15 Mar 2021 09:22:25 -0700 (PDT)
+Subject: Re: [kvm-unit-tests PATCH 3/6] arm/arm64: Remove unnecessary ISB when
+ doing dcache maintenance
+To:     Andrew Jones <drjones@redhat.com>
+Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+References: <20210227104201.14403-1-alexandru.elisei@arm.com>
+ <20210227104201.14403-4-alexandru.elisei@arm.com>
+ <20210312145950.whq7ofrhbklwhprx@kamzik.brq.redhat.com>
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+Message-ID: <2b6cd31a-ae8d-0fd6-dc82-583d73f79a9b@arm.com>
+Date:   Mon, 15 Mar 2021 16:22:21 +0000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.8.1
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <20210312145950.whq7ofrhbklwhprx@kamzik.brq.redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Paolo Bonzini <pbonzini@redhat.com> writes:
+Hi Drew,
 
-> On 15/03/21 15:37, Vitaly Kuznetsov wrote:
->> When KVM_REQ_MASTERCLOCK_UPDATE request is issued (e.g. after migration)
->> we need to make sure no vCPU sees stale values in PV clock structures and
->> thus all vCPUs are kicked with KVM_REQ_CLOCK_UPDATE. Hyper-V TSC page
->> clocksource is global and kvm_guest_time_update() only updates in on vCPU0
->> but this is not entirely correct: nothing blocks some other vCPU from
->> entering the guest before we finish the update on CPU0 and it can read
->> stale values from the page.
->> 
->> Call kvm_hv_setup_tsc_page() on all vCPUs. Normally, KVM_REQ_CLOCK_UPDATE
->> should be very rare so we may not care much about being wasteful.
+On 3/12/21 2:59 PM, Andrew Jones wrote:
+> On Sat, Feb 27, 2021 at 10:41:58AM +0000, Alexandru Elisei wrote:
+>> The dcache_by_line_op macro executes a DSB to complete the cache
+>> maintenance operations. According to ARM DDI 0487G.a, page B2-150:
+>>
+>> "In addition, no instruction that appears in program order after the DSB
+>> instruction can alter any state of the system or perform any part of its
+>> functionality until the DSB completes other than:
+>>
+>> - Being fetched from memory and decoded.
+>> - Reading the general-purpose, SIMD and floating-point, Special-purpose, or
+>>   System registers that are directly or indirectly read without causing
+>>   side-effects."
+>>
+>> Similar definition for ARM in ARM DDI 0406C.d, page A3-150:
+>>
+>> "In addition, no instruction that appears in program order after the DSB
+>> instruction can execute until the DSB completes."
+>>
+>> This means that we don't need the ISB to prevent reordering of the cache
+>> maintenance instructions.
+>>
+>> We are also not doing icache maintenance, where an ISB would be required
+>> for the PE to discard instructions speculated before the invalidation.
+>>
+>> In conclusion, the ISB is unnecessary, so remove it.
+> Hi Alexandru,
 >
-> I think we should instead write 0 to the page in kvm_gen_update_masterclock.
+> We can go ahead and take this patch, since you've written quite a
+> convincing commit message, but in general I'd prefer we be overly cautious
+> in our common code. We'd like to ensure we don't introduce difficult to
+> debug issues there, and we don't care about optimizations, let alone
+> micro-optimizations. Testing barrier needs to the letter of the spec is a
+> good idea, but it's probably better to do that in the test cases.
+
+You are correct, the intention of this patch was to do the minimum necessary to
+ensure correctness.
+
+Thank you for the explanation, I will keep this in mind for future patches.
+
+Thanks,
+
+Alex
+
 >
-
-We can do that but we will also need to invalidate
-hv->tsc_ref.tsc_sequence to prevent MSR based clocksource
-(HV_X64_MSR_TIME_REF_COUNT -> get_time_ref_counter()) from using stale
-hv->tsc_ref.tsc_scale/tsc_offset values (in case we had them
-calculated).
-
-Also, we can't really disable TSC page for nested scenario when guest
-opted for reenlightenment (PATCH4) but we're not going to update the
-page anyway so there's not much different.
-
-> Paolo
+> Thanks,
+> drew
 >
->> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+>> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
 >> ---
->>   arch/x86/kvm/x86.c | 5 +++--
->>   1 file changed, 3 insertions(+), 2 deletions(-)
->> 
->> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
->> index 47e021bdcc94..882c509bfc86 100644
->> --- a/arch/x86/kvm/x86.c
->> +++ b/arch/x86/kvm/x86.c
->> @@ -2748,8 +2748,9 @@ static int kvm_guest_time_update(struct kvm_vcpu *v)
->>   				       offsetof(struct compat_vcpu_info, time));
->>   	if (vcpu->xen.vcpu_time_info_set)
->>   		kvm_setup_pvclock_page(v, &vcpu->xen.vcpu_time_info_cache, 0);
->> -	if (v == kvm_get_vcpu(v->kvm, 0))
->> -		kvm_hv_setup_tsc_page(v->kvm, &vcpu->hv_clock);
->> +
->> +	kvm_hv_setup_tsc_page(v->kvm, &vcpu->hv_clock);
->> +
->>   	return 0;
->>   }
->>   
->> 
->
-
--- 
-Vitaly
-
+>>  arm/cstart.S   | 1 -
+>>  arm/cstart64.S | 1 -
+>>  2 files changed, 2 deletions(-)
+>>
+>> diff --git a/arm/cstart.S b/arm/cstart.S
+>> index 954748b00f64..2d62c1e6d40d 100644
+>> --- a/arm/cstart.S
+>> +++ b/arm/cstart.S
+>> @@ -212,7 +212,6 @@ asm_mmu_disable:
+>>  	ldr	r1, [r1]
+>>  	sub	r1, r1, r0
+>>  	dcache_by_line_op dccimvac, sy, r0, r1, r2, r3
+>> -	isb
+>>  
+>>  	mov     pc, lr
+>>  
+>> diff --git a/arm/cstart64.S b/arm/cstart64.S
+>> index 046bd3914098..c1deff842f03 100644
+>> --- a/arm/cstart64.S
+>> +++ b/arm/cstart64.S
+>> @@ -219,7 +219,6 @@ asm_mmu_disable:
+>>  	ldr	x1, [x1, :lo12:__phys_end]
+>>  	sub	x1, x1, x0
+>>  	dcache_by_line_op civac, sy, x0, x1, x2, x3
+>> -	isb
+>>  
+>>  	ret
+>>  
+>> -- 
+>> 2.30.1
+>>
