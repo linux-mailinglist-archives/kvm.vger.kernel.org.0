@@ -2,169 +2,177 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9000C33C968
-	for <lists+kvm@lfdr.de>; Mon, 15 Mar 2021 23:32:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2E79133C990
+	for <lists+kvm@lfdr.de>; Tue, 16 Mar 2021 00:00:51 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232940AbhCOWba (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 15 Mar 2021 18:31:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43066 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232957AbhCOWb3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 15 Mar 2021 18:31:29 -0400
-Received: from mail-lj1-x233.google.com (mail-lj1-x233.google.com [IPv6:2a00:1450:4864:20::233])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E870C061763
-        for <kvm@vger.kernel.org>; Mon, 15 Mar 2021 15:31:29 -0700 (PDT)
-Received: by mail-lj1-x233.google.com with SMTP id 15so18177863ljj.0
-        for <kvm@vger.kernel.org>; Mon, 15 Mar 2021 15:31:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=t48JfE/I+ydsOOfkocl4ExwOYD4Cwrny9/Xf4iuVVeE=;
-        b=YzOHwW9gU+2CCoT9hKyxcZQ9g6o779atEw1QSJLPBRAVTj7Gc0vDffISoB/Cd9mLvk
-         keJsigpwHmgy2X42PpmONt7PB65J85QkeCx9fHcaIGkNovhredA86swM4cAXZwH+PSi8
-         lRrPBaNDuKAYAs9HX13mcFnjNF4HVRXNtJQ97EfCuIjTjC3+fdoJesfZFgSy75Qsy3h5
-         3KMoc/MoTsK7c1+mpTCTSVgVngYK9wFNZHp/tgw8qVex1AQ+P9QYvrUzbu9XpmNTz0v7
-         2GyGh2j9ZBeGQ8E+jCJEwyRovr3E+WurRkyCDBICw0iCS9XJ4oKdl+9A7ZLiVshUP9R/
-         VTaw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=t48JfE/I+ydsOOfkocl4ExwOYD4Cwrny9/Xf4iuVVeE=;
-        b=RfaHq3Ihl/fajHGhrFLzGsZXi6EP0BFjFJ483o0M/JEXeWsSZTcGnMmymcYD/EUhrB
-         RtDqVT4rox+RnCsRI3y6YBW0MzoEubIqGZGFnu7pFuevgi9uRH4wH0LkIgNw7GzPvBTU
-         vtiUMFNNldt+qTsdAGm0D65X9LwHvmmTZ5HP7scM8TtJPVN0gZm5uizTL8qXQ8KJriEd
-         U0zAj89d0vjR7eLI1Dle3/83dn1+7+4FOxT6JTtHG3dfdMGyX7nu4O9sFLrOv9MbEkf3
-         UEHJ7KXqufgdiIElC8KawRCliIA0C0zV+DM7RPlVoW+TJA2pijn983QyK910ES1mPKgr
-         E6VA==
-X-Gm-Message-State: AOAM531/lKlNdK1Bvh3nhhMd4GLV+Zcmx5Ps96PktNS3hdUCjcF47Ku0
-        GtoRqrUkUwf9S0zON56rMlRcy3Csw9BpWdlhtcFXdQ==
-X-Google-Smtp-Source: ABdhPJxjr/et45iqQeRMTErI0LQhEQm42DqVbpHRSpcjhEUlWFO96pLBoZaf9saYhs4q/r0gUqfHvBityBsZA51vteE=
-X-Received: by 2002:a2e:988f:: with SMTP id b15mr751964ljj.394.1615847486669;
- Mon, 15 Mar 2021 15:31:26 -0700 (PDT)
+        id S232125AbhCOXAT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 15 Mar 2021 19:00:19 -0400
+Received: from mail.kernel.org ([198.145.29.99]:46100 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229756AbhCOW75 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 15 Mar 2021 18:59:57 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id EF28564E07;
+        Mon, 15 Mar 2021 22:59:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1615849197;
+        bh=UliWFZarDt8A7KzjhpgdUls6aoWSbbaoBwK3mUzw6WM=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=RPLA7BJNkVJafijEsrvEsQm8v8trO/DKoAVqHLic/5MGDyCa/pEGlmtPoaff4UC2E
+         VChVXusPyBEWjbV/kUhnqmwtUKGBNgE8dM3L2M5j58PWl02gFbncHmENkoY35/aUOO
+         CwgBV3LTZI56LI/K2mHRQ4ah/QgL75iBUoPs3kTL1RUYs5FqPE1kRAGnvetl37JkV8
+         JmQ/PFMHjj0nTSL68XzfRU9yHlpZPDNSiBuzgeszVmjyXu25Q28+ZJW3PWyPSvTEYO
+         hKemF9ApwWsWQdenHdxblFpdr73L3v3vLyoj7QYSSmT/V9btMLhTxK9tKEFSPJNico
+         lcnPuxgjFp8bQ==
+Date:   Tue, 16 Mar 2021 00:59:31 +0200
+From:   Jarkko Sakkinen <jarkko@kernel.org>
+To:     Kai Huang <kai.huang@intel.com>
+Cc:     Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org,
+        x86@kernel.org, linux-sgx@vger.kernel.org,
+        linux-kernel@vger.kernel.org, luto@kernel.org,
+        dave.hansen@intel.com, rick.p.edgecombe@intel.com,
+        haitao.huang@intel.com, pbonzini@redhat.com, bp@alien8.de,
+        tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com
+Subject: Re: [PATCH v3 03/25] x86/sgx: Wipe out EREMOVE from
+ sgx_free_epc_page()
+Message-ID: <YE/m06LWFTDKfUCc@kernel.org>
+References: <e1ca4131bc9f98cf50a1200efcf46080d6512fe7.1615250634.git.kai.huang@intel.com>
+ <20210311020142.125722-1-kai.huang@intel.com>
+ <YEvbcrTZyiUAxZAu@google.com>
+ <YEyX4V7BcS3MZNzp@kernel.org>
+ <20210315201236.de3cd9389f853a418ec53e86@intel.com>
+ <YE9elQfTZHo/9TJI@kernel.org>
+ <YE9e5JAP3agUByXr@kernel.org>
+ <20210316092934.d4dd7f2e65f507c3856341bc@intel.com>
 MIME-Version: 1.0
-References: <20210310003024.2026253-1-jingzhangos@google.com>
- <20210310003024.2026253-4-jingzhangos@google.com> <bb03107c-a413-50da-e228-d338dd471fb3@redhat.com>
-In-Reply-To: <bb03107c-a413-50da-e228-d338dd471fb3@redhat.com>
-From:   Jing Zhang <jingzhangos@google.com>
-Date:   Mon, 15 Mar 2021 17:31:15 -0500
-Message-ID: <CAAdAUth0J6z7fFpOkkmzKc83Bj+MST-jhsZ0uU0iYdRcE_-gMA@mail.gmail.com>
-Subject: Re: [RFC PATCH 3/4] KVM: stats: Add ioctl commands to pull statistics
- in binary format
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     KVM <kvm@vger.kernel.org>, KVM ARM <kvmarm@lists.cs.columbia.edu>,
-        Linux MIPS <linux-mips@vger.kernel.org>,
-        KVM PPC <kvm-ppc@vger.kernel.org>,
-        Linux S390 <linux-s390@vger.kernel.org>,
-        Linux kselftest <linux-kselftest@vger.kernel.org>,
-        Marc Zyngier <maz@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Will Deacon <will@kernel.org>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-        Paul Mackerras <paulus@ozlabs.org>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Peter Shier <pshier@google.com>,
-        Oliver Upton <oupton@google.com>,
-        David Rientjes <rientjes@google.com>,
-        Emanuele Giuseppe Esposito <eesposit@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210316092934.d4dd7f2e65f507c3856341bc@intel.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Paolo,
+On Tue, Mar 16, 2021 at 09:29:34AM +1300, Kai Huang wrote:
+> On Mon, 15 Mar 2021 15:19:32 +0200 Jarkko Sakkinen wrote:
+> > On Mon, Mar 15, 2021 at 03:18:16PM +0200, Jarkko Sakkinen wrote:
+> > > On Mon, Mar 15, 2021 at 08:12:36PM +1300, Kai Huang wrote:
+> > > > On Sat, 13 Mar 2021 12:45:53 +0200 Jarkko Sakkinen wrote:
+> > > > > On Fri, Mar 12, 2021 at 01:21:54PM -0800, Sean Christopherson wrote:
+> > > > > > On Thu, Mar 11, 2021, Kai Huang wrote:
+> > > > > > > From: Jarkko Sakkinen <jarkko@kernel.org>
+> > > > > > > 
+> > > > > > > EREMOVE takes a page and removes any association between that page and
+> > > > > > > an enclave.  It must be run on a page before it can be added into
+> > > > > > > another enclave.  Currently, EREMOVE is run as part of pages being freed
+> > > > > > > into the SGX page allocator.  It is not expected to fail.
+> > > > > > > 
+> > > > > > > KVM does not track how guest pages are used, which means that SGX
+> > > > > > > virtualization use of EREMOVE might fail.
+> > > > > > > 
+> > > > > > > Break out the EREMOVE call from the SGX page allocator.  This will allow
+> > > > > > > the SGX virtualization code to use the allocator directly.  (SGX/KVM
+> > > > > > > will also introduce a more permissive EREMOVE helper).
+> > > > > > > 
+> > > > > > > Implement original sgx_free_epc_page() as sgx_encl_free_epc_page() to be
+> > > > > > > more specific that it is used to free EPC page assigned to one enclave.
+> > > > > > > Print an error message when EREMOVE fails to explicitly call out EPC
+> > > > > > > page is leaked, and requires machine reboot to get leaked pages back.
+> > > > > > > 
+> > > > > > > Signed-off-by: Jarkko Sakkinen <jarkko@kernel.org>
+> > > > > > > Co-developed-by: Kai Huang <kai.huang@intel.com>
+> > > > > > > Acked-by: Jarkko Sakkinen <jarkko@kernel.org>
+> > > > > > > Signed-off-by: Kai Huang <kai.huang@intel.com>
+> > > > > > > ---
+> > > > > > > v2->v3:
+> > > > > > > 
+> > > > > > >  - Fixed bug during copy/paste which results in SECS page and va pages are not
+> > > > > > >    correctly freed in sgx_encl_release() (sorry for the mistake).
+> > > > > > >  - Added Jarkko's Acked-by.
+> > > > > > 
+> > > > > > That Acked-by should either be dropped or moved above Co-developed-by to make
+> > > > > > checkpatch happy.
+> > > > > > 
+> > > > > > Reviewed-by: Sean Christopherson <seanjc@google.com>
+> > > > > 
+> > > > > Oops, my bad. Yup, ack should be removed.
+> > > > > 
+> > > > > /Jarkko
+> > > > 
+> > > > Hi Jarkko,
+> > > > 
+> > > > Your reply of your concern of this patch to the cover-letter
+> > > > 
+> > > > https://lore.kernel.org/lkml/YEkJXu262YDa8ZaK@kernel.org/
+> > > > 
+> > > > reminds me to do more sanity check of whether removing EREMOVE in
+> > > > sgx_free_epc_page() will impact other code path or not, and I think
+> > > > sgx_encl_release() is not the only place should be changed:
+> > > > 
+> > > > - sgx_encl_shrink() needs to call sgx_encl_free_epc_page(), since when this is
+> > > > called, the VA page can be already valid -- there are other failures can
+> > > > trigger sgx_encl_shrink().
+> > > 
+> > > You right about this, good catch.
+> > > 
+> > > Shrink needs to always do EREMOVE as grow has done EPA, which changes
+> > > EPC page state.
+> > > 
+> > > > - sgx_encl_add_page() should call sgx_encl_free_epc_page() in "err_out_free:"
+> > > > label, since the EPC page can be already valid when error happened, i.e. when
+> > > > EEXTEND fails.
+> > > 
+> > > Yes, correct, good work!
+> > > 
+> > > > Other places should be OK per my check, but I'd prefer to just replacing all
+> > > > sgx_free_epc_page() call sites in driver with sgx_encl_free_epc_page(), with
+> > > > one exception: sgx_alloc_va_page(), which calls sgx_free_epc_page() when EPA
+> > > > fails, in which case EREMOVE is not required for sure.
+> > > 
+> > > I would not unless they require it.
+> > > 
+> > > > Your idea, please?
+> > > > 
+> > > > Btw, introducing a driver wrapper of sgx_free_epc_page() does make sense to me,
+> > > > because virtualization has a counterpart in sgx/virt.c too.
+> > > 
+> > > It does make sense to use sgx_free_epc_page() everywhere where it's
+> > > the right thing to call and here's why.
+> > > 
+> > > If there is some unrelated regression that causes EPC page not get
+> > > uninitialized when it actually should, doing extra EREMOVE could mask
+> > > those bugs. I.e. it can postpone a failure, which can make a bug harder
+> > > to backtrace.
+> > > 
+> > 
+> > I.e. even though it is true that for correctly working code extra EREMOVE
+> > is nil functionality, it could change semantics for buggy code.
+> 
+> Thanks for feedback. Sorry I am not sure if I understand you. So if we don't
+> want to bring functionality change, we need to replace sgx_free_epc_page() in
+> all call sites with sgx_encl_free_epc_page(). To me for this patch only, it's
+> better not to bring any functional change, so I intend to replace all (I now
+> consider even leaving sgx_alloc_va_page() out is not good idea in *this*
+> patch). 
+> 
+> Or do you just want to replace sgx_free_epc_page() with
+> sgx_encl_free_epc_page() in sgx_encl_shrink() and sgx_encl_add_page(), as I
+> pointed above? In this way there will be functional change in this patch, and
+> we need to explicitly explain  why leaving others out is OK in commit message.
+> 
+> To me I prefer the former.
 
-On Wed, Mar 10, 2021 at 8:55 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> On 10/03/21 01:30, Jing Zhang wrote:
-> > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> > index 383df23514b9..87dd62516c8b 100644
-> > --- a/virt/kvm/kvm_main.c
-> > +++ b/virt/kvm/kvm_main.c
-> > @@ -3464,6 +3464,51 @@ static long kvm_vcpu_ioctl(struct file *filp,
-> >               r = kvm_arch_vcpu_ioctl_set_fpu(vcpu, fpu);
-> >               break;
-> >       }
-> > +     case KVM_STATS_GET_INFO: {
-> > +             struct kvm_stats_info stats_info;
-> > +
-> > +             r = -EFAULT;
-> > +             stats_info.num_stats = VCPU_STAT_COUNT;
-> > +             if (copy_to_user(argp, &stats_info, sizeof(stats_info)))
-> > +                     goto out;
-> > +             r = 0;
-> > +             break;
-> > +     }
-> > +     case KVM_STATS_GET_NAMES: {
-> > +             struct kvm_stats_names stats_names;
-> > +
-> > +             r = -EFAULT;
-> > +             if (copy_from_user(&stats_names, argp, sizeof(stats_names)))
-> > +                     goto out;
-> > +             r = -EINVAL;
-> > +             if (stats_names.size < VCPU_STAT_COUNT * KVM_STATS_NAME_LEN)
-> > +                     goto out;
-> > +
-> > +             r = -EFAULT;
-> > +             if (copy_to_user(argp + sizeof(stats_names),
-> > +                             kvm_vcpu_stat_strings,
-> > +                             VCPU_STAT_COUNT * KVM_STATS_NAME_LEN))
->
-> The only reason to separate the strings in patch 1 is to pass them here.
->   But this is a poor API because it imposes a limit on the length of the
-> statistics, and makes that length part of the binary interface.
->
-> I would prefer a completely different interface, where you have a file
-> descriptor that can be created and associated to a vCPU or VM (or even
-> to /dev/kvm).  Having a file descriptor is important because the fd can
-We are considering about how to create the file descriptor. It might be risky
-to create an extra fd for every vCPU. It will easily hit the fd limit for the
-process or the system for machines running a ton of small VMs.
-Looks like creating an extra file descriptor for every VM is a better option.
-And then we can check per vCPU stats through Ioctl of this VM fd by
-passing the vCPU index.
-What do you think?
-> be passed to a less-privileged process that takes care of gathering the
-> metrics
->
-> The result of reading the file descriptor could be either ASCII or
-> binary.  IMO the real cost lies in opening and reading a multitude of
-> files rather than in the ASCII<->binary conversion.
->
-> The format could be one of the following:
->
-> * binary:
->
-> 4 bytes flags (always zero)
-> 4 bytes number of statistics
-> 4 bytes offset of the first stat description
-> 4 bytes offset of the first stat value
-> stat descriptions:
->    - 4 bytes for the type (for now always zero: uint64_t)
->    - 4 bytes for the flags (for now always zero)
->    - length of name
->    - name
-> statistics in 64-bit format
->
-> * text:
->
-> stat1_name uint64 123
-> stat2_name uint64 456
-> ...
->
-> What do you think?
->
-> Paolo
->
+The original purpose of this patch was exactly to remove EREMOVE
+sgx_free_epc_page() and call it explicitly where it is required. That's
+why I introduced sgx_reset_epc_page(). So the latter was actually the goal
+of this patch at least when I did it. Now this is something completely
+different.
+
+So, I don't consider myself author of this patch in any possible way,
+because this is not what I intended.
+
+To move forward, for the next patch set version, you should change the
+author field as yourself, and remove all my tags, and I will review it.
+So you can work out this with former approach if you wish.
+
+I.e. my ack/nak/etc. apply to this patch because it's not my code.
+
+/Jarkko
