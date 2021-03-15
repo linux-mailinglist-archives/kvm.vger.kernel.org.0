@@ -2,219 +2,316 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9EB4533B147
-	for <lists+kvm@lfdr.de>; Mon, 15 Mar 2021 12:41:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3BCD233B294
+	for <lists+kvm@lfdr.de>; Mon, 15 Mar 2021 13:25:50 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229985AbhCOLkj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 15 Mar 2021 07:40:39 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:38015 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229775AbhCOLkd (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 15 Mar 2021 07:40:33 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1615808433;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=PxSaxzcxzfAbRfARa8s8vrxSF0Vnz+8utthTPaHAa5g=;
-        b=ImIWsnjf4pUI5VRiOndXDP2SK4+FteVLhLWLLKi/SGTvLAd6ee+EXmW3mlX8AjA+0Naoif
-        9UEaIODsD/YuTr2inLMA55G+wCtC4PWEPFKpcNGYRSHs2tYPfQylHePgrcraZ3L0OlxUkj
-        SL1iPDelY9Xu10p6jouzXh2L+J739Tk=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-576-sBtFwcgmOj613faYuH7-8A-1; Mon, 15 Mar 2021 07:40:31 -0400
-X-MC-Unique: sBtFwcgmOj613faYuH7-8A-1
-Received: by mail-wr1-f71.google.com with SMTP id z6so14939463wrh.11
-        for <kvm@vger.kernel.org>; Mon, 15 Mar 2021 04:40:31 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=PxSaxzcxzfAbRfARa8s8vrxSF0Vnz+8utthTPaHAa5g=;
-        b=WuSprbxXS1qJY/uzKAEMILOSyRZzs3yZEepNoHtOBThER+Ok/ZIKZVS67iyi2xRgQs
-         5JRusoNG+QxTBfDj5elSEIyL8Tc2O6MnbcWdS6X293HJQyBOPeFzNBrZv0jbYo138s+d
-         6NyBf/0ftXnBwHF/5gXskBmu8sxHqlSy0BAneGySoSqSpCVMKCi7H55AMNUN7DvOlrmC
-         hS0831CYzH6kr69cu/d89zR28DBac10x9Ix6Ao/cmn9++ft54Re3JfuVs+KlrfomBwOV
-         P8rcmJpVdbowjPqeP3Cc7xPo8FImKc8r9WIU9smTF7nul0kKm2c28CHS/Ra2znk5S/8L
-         6tng==
-X-Gm-Message-State: AOAM532iIXvPTbn7rKJRiwlQaIIB0HlZFjWCS22f1erwfGxlIQ6gsjWC
-        LRLg1lxlEqPMPoIO1Qxe3/Cp3PaBNg9lVGtpTsx7dyqLrC6KeXN3R2jIRFYU0EeXjgmNzxYnWMx
-        V1OSh6CXVSUBx
-X-Received: by 2002:a05:600c:35c1:: with SMTP id r1mr25432448wmq.60.1615808430351;
-        Mon, 15 Mar 2021 04:40:30 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxe9wDe+7swqQKqvY5kx7A6XwNsh8/JyRypHkYEToXuJ1PEbwx4O2LUUxUlVxnA1rSmVHkGtQ==
-X-Received: by 2002:a05:600c:35c1:: with SMTP id r1mr25432432wmq.60.1615808430099;
-        Mon, 15 Mar 2021 04:40:30 -0700 (PDT)
-Received: from steredhat (host-79-34-249-199.business.telecomitalia.it. [79.34.249.199])
-        by smtp.gmail.com with ESMTPSA id l4sm17987614wrt.60.2021.03.15.04.40.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 15 Mar 2021 04:40:29 -0700 (PDT)
-Date:   Mon, 15 Mar 2021 12:40:27 +0100
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     Arseny Krasnov <arseny.krasnov@kaspersky.com>
-Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Jorgen Hansen <jhansen@vmware.com>,
-        Norbert Slusarek <nslusarek@gmx.net>,
-        Andra Paraschiv <andraprs@amazon.com>,
-        Colin Ian King <colin.king@canonical.com>,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        stsp2@yandex.ru, oxffffaa@gmail.com
-Subject: Re: [RFC PATCH v6 00/22] virtio/vsock: introduce SOCK_SEQPACKET
- support
-Message-ID: <20210315114027.neacovpmw3nzz77z@steredhat>
-References: <20210307175722.3464068-1-arseny.krasnov@kaspersky.com>
+        id S229732AbhCOMZU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 15 Mar 2021 08:25:20 -0400
+Received: from foss.arm.com ([217.140.110.172]:37012 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229523AbhCOMZL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 15 Mar 2021 08:25:11 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 971A9D6E;
+        Mon, 15 Mar 2021 05:25:10 -0700 (PDT)
+Received: from slackpad.fritz.box (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6A08C3F792;
+        Mon, 15 Mar 2021 05:25:09 -0700 (PDT)
+Date:   Mon, 15 Mar 2021 12:24:21 +0000
+From:   Andre Przywara <andre.przywara@arm.com>
+To:     Alexandru Elisei <alexandru.elisei@arm.com>
+Cc:     Will Deacon <will@kernel.org>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+        Marc Zyngier <maz@kernel.org>,
+        Sami Mujawar <sami.mujawar@arm.com>
+Subject: Re: [PATCH kvmtool v2 04/22] mmio: Extend handling to include
+ ioport emulation
+Message-ID: <20210315122421.7f547308@slackpad.fritz.box>
+In-Reply-To: <fdbd899f-4800-1157-977a-62e182859e94@arm.com>
+References: <20210225005915.26423-1-andre.przywara@arm.com>
+        <20210225005915.26423-5-andre.przywara@arm.com>
+        <fdbd899f-4800-1157-977a-62e182859e94@arm.com>
+Organization: Arm Ltd.
+X-Mailer: Claws Mail 3.17.1 (GTK+ 2.24.31; x86_64-slackware-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20210307175722.3464068-1-arseny.krasnov@kaspersky.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Arseny,
+On Wed, 3 Mar 2021 17:58:29 +0000
+Alexandru Elisei <alexandru.elisei@arm.com> wrote:
 
-On Sun, Mar 07, 2021 at 08:57:19PM +0300, Arseny Krasnov wrote:
->	This patchset implements support of SOCK_SEQPACKET for virtio
->transport.
->	As SOCK_SEQPACKET guarantees to save record boundaries, so to
->do it, two new packet operations were added: first for start of record
-> and second to mark end of record(SEQ_BEGIN and SEQ_END later). Also,
->both operations carries metadata - to maintain boundaries and payload
->integrity. Metadata is introduced by adding special header with two
->fields - message id and message length:
->
->	struct virtio_vsock_seq_hdr {
->		__le32  msg_id;
->		__le32  msg_len;
->	} __attribute__((packed));
->
->	This header is transmitted as payload of SEQ_BEGIN and SEQ_END
->packets(buffer of second virtio descriptor in chain) in the same way as
->data transmitted in RW packets. Payload was chosen as buffer for this
->header to avoid touching first virtio buffer which carries header of
->packet, because someone could check that size of this buffer is equal
->to size of packet header. To send record, packet with start marker is
->sent first(it's header carries length of record and id),then all data
->is sent as usual 'RW' packets and finally SEQ_END is sent(it carries
->id of message, which is equal to id of SEQ_BEGIN), also after sending
->SEQ_END id is incremented. On receiver's side,size of record is known
->from packet with start record marker. To check that no packets were
->dropped by transport, 'msg_id's of two sequential SEQ_BEGIN and SEQ_END
->are checked to be equal and length of data between two markers is
->compared to then length in SEQ_BEGIN header.
->	Now as  packets of one socket are not reordered neither on
->vsock nor on vhost transport layers, such markers allows to restore
->original record on receiver's side. If user's buffer is smaller that
->record length, when all out of size data is dropped.
->	Maximum length of datagram is not limited as in stream socket,
->because same credit logic is used. Difference with stream socket is
->that user is not woken up until whole record is received or error
->occurred. Implementation also supports 'MSG_EOR' and 'MSG_TRUNC' flags.
->	Tests also implemented.
->
->	Thanks to stsp2@yandex.ru for encouragements and initial design
->recommendations.
->
-> Arseny Krasnov (22):
->  af_vsock: update functions for connectible socket
->  af_vsock: separate wait data loop
->  af_vsock: separate receive data loop
->  af_vsock: implement SEQPACKET receive loop
->  af_vsock: separate wait space loop
->  af_vsock: implement send logic for SEQPACKET
->  af_vsock: rest of SEQPACKET support
->  af_vsock: update comments for stream sockets
->  virtio/vsock: set packet's type in virtio_transport_send_pkt_info()
->  virtio/vsock: simplify credit update function API
->  virtio/vsock: dequeue callback for SOCK_SEQPACKET
->  virtio/vsock: fetch length for SEQPACKET record
->  virtio/vsock: add SEQPACKET receive logic
->  virtio/vsock: rest of SOCK_SEQPACKET support
->  virtio/vsock: SEQPACKET feature bit
->  vhost/vsock: SEQPACKET feature bit support
->  virtio/vsock: SEQPACKET feature bit support
->  virtio/vsock: setup SEQPACKET ops for transport
->  vhost/vsock: setup SEQPACKET ops for transport
->  vsock/loopback: setup SEQPACKET ops for transport
->  vsock_test: add SOCK_SEQPACKET tests
->  virtio/vsock: update trace event for SEQPACKET
->
-> drivers/vhost/vsock.c                        |  22 +-
-> include/linux/virtio_vsock.h                 |  22 +
-> include/net/af_vsock.h                       |  10 +
-> .../events/vsock_virtio_transport_common.h   |  48 +-
-> include/uapi/linux/virtio_vsock.h            |  19 +
-> net/vmw_vsock/af_vsock.c                     | 589 +++++++++++------
-> net/vmw_vsock/virtio_transport.c             |  18 +
-> net/vmw_vsock/virtio_transport_common.c      | 364 ++++++++--
-> net/vmw_vsock/vsock_loopback.c               |  13 +
-> tools/testing/vsock/util.c                   |  32 +-
-> tools/testing/vsock/util.h                   |   3 +
-> tools/testing/vsock/vsock_test.c             | 126 ++++
-> 12 files changed, 1013 insertions(+), 253 deletions(-)
->
-> v5 -> v6:
-> General changelog:
-> - virtio transport specific callbacks which send SEQ_BEGIN or
->   SEQ_END now hidden inside virtio transport. Only enqueue,
->   dequeue and record length callbacks are provided by transport.
->
-> - virtio feature bit for SEQPACKET socket support introduced:
->   VIRTIO_VSOCK_F_SEQPACKET.
->
-> - 'msg_cnt' field in 'struct virtio_vsock_seq_hdr' renamed to
->   'msg_id' and used as id.
->
-> Per patch changelog:
-> - 'af_vsock: separate wait data loop':
->    1) Commit message updated.
->    2) 'prepare_to_wait()' moved inside while loop(thanks to
->      Jorgen Hansen).
->    Marked 'Reviewed-by' with 1), but as 2) I removed R-b.
->
-> - 'af_vsock: separate receive data loop': commit message
->    updated.
->    Marked 'Reviewed-by' with that fix.
->
-> - 'af_vsock: implement SEQPACKET receive loop': style fixes.
->
-> - 'af_vsock: rest of SEQPACKET support':
->    1) 'module_put()' added when transport callback check failed.
->    2) Now only 'seqpacket_allow()' callback called to check
->       support of SEQPACKET by transport.
->
-> - 'af_vsock: update comments for stream sockets': commit message
->    updated.
->    Marked 'Reviewed-by' with that fix.
->
-> - 'virtio/vsock: set packet's type in send':
->    1) Commit message updated.
->    2) Parameter 'type' from 'virtio_transport_send_credit_update()'
->       also removed in this patch instead of in next.
->
-> - 'virtio/vsock: dequeue callback for SOCK_SEQPACKET': SEQPACKET
->    related state wrapped to special struct.
->
-> - 'virtio/vsock: update trace event for SEQPACKET': format strings
->    now not broken by new lines.
+Hi Alex,
 
-I left a bunch of comments in the patches, I hope they are easy to fix 
-:-)
+> On 2/25/21 12:58 AM, Andre Przywara wrote:
+> > In their core functionality MMIO and I/O port traps are not really
+> > different, yet we still have two totally separate code paths for
+> > handling them. Devices need to decide on one conduit or need to provide
+> > different handler functions for each of them.
+> >
+> > Extend the existing MMIO emulation to also cover ioport handlers.
+> > This just adds another RB tree root for holding the I/O port handlers,
+> > but otherwise uses the same tree population and lookup code.
+> > "ioport" or "mmio" just become a flag in the registration function.
+> > Provide wrappers to not break existing users, and allow an easy
+> > transition for the existing ioport handlers.
+> >
+> > This also means that ioport handlers now can use the same emulation
+> > callback prototype as MMIO handlers, which means we have to migrate them
+> > over. To allow a smooth transition, we hook up the new I/O emulate
+> > function to the end of the existing ioport emulation code.
+> >
+> > Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+> > ---
+> >  include/kvm/kvm.h | 49 ++++++++++++++++++++++++++++++++---
+> >  ioport.c          |  4 +--
+> >  mmio.c            | 65 +++++++++++++++++++++++++++++++++++++++--------
+> >  3 files changed, 102 insertions(+), 16 deletions(-)
+> >
+> > diff --git a/include/kvm/kvm.h b/include/kvm/kvm.h
+> > index f1f0afd7..306b258a 100644
+> > --- a/include/kvm/kvm.h
+> > +++ b/include/kvm/kvm.h
+> > @@ -27,10 +27,23 @@
+> >  #define PAGE_SIZE (sysconf(_SC_PAGE_SIZE))
+> >  #endif
+> >  
+> > +/*
+> > + * We are reusing the existing DEVICE_BUS_MMIO and DEVICE_BUS_IOPORT constants
+> > + * from kvm/devices.h to differentiate between registering an I/O port and an
+> > + * MMIO region.
+> > + * To avoid collisions with future additions of more bus types, we reserve
+> > + * a generous 4 bits for the bus mask here.
+> > + */
+> > +#define IOTRAP_BUS_MASK		0xf
+> > +#define IOTRAP_COALESCE		(1U << 4)
+> > +
+> >  #define DEFINE_KVM_EXT(ext)		\
+> >  	.name = #ext,			\
+> >  	.code = ext
+> >  
+> > +struct kvm_cpu;
+> > +typedef void (*mmio_handler_fn)(struct kvm_cpu *vcpu, u64 addr, u8 *data,
+> > +				u32 len, u8 is_write, void *ptr);
+> >  typedef void (*fdt_irq_fn)(void *fdt, u8 irq, enum irq_type irq_type);
+> >  
+> >  enum {
+> > @@ -113,6 +126,8 @@ void kvm__irq_line(struct kvm *kvm, int irq, int level);
+> >  void kvm__irq_trigger(struct kvm *kvm, int irq);
+> >  bool kvm__emulate_io(struct kvm_cpu *vcpu, u16 port, void *data, int direction, int size, u32 count);
+> >  bool kvm__emulate_mmio(struct kvm_cpu *vcpu, u64 phys_addr, u8 *data, u32 len, u8 is_write);
+> > +bool kvm__emulate_pio(struct kvm_cpu *vcpu, u16 port, void *data,
+> > +		      int direction, int size, u32 count);
+> >  int kvm__destroy_mem(struct kvm *kvm, u64 guest_phys, u64 size, void *userspace_addr);
+> >  int kvm__register_mem(struct kvm *kvm, u64 guest_phys, u64 size, void *userspace_addr,
+> >  		      enum kvm_mem_type type);
+> > @@ -136,10 +151,36 @@ static inline int kvm__reserve_mem(struct kvm *kvm, u64 guest_phys, u64 size)
+> >  				 KVM_MEM_TYPE_RESERVED);
+> >  }
+> >  
+> > -int __must_check kvm__register_mmio(struct kvm *kvm, u64 phys_addr, u64 phys_addr_len, bool coalesce,
+> > -				    void (*mmio_fn)(struct kvm_cpu *vcpu, u64 addr, u8 *data, u32 len, u8 is_write, void *ptr),
+> > -				    void *ptr);
+> > -bool kvm__deregister_mmio(struct kvm *kvm, u64 phys_addr);
+> > +int __must_check kvm__register_iotrap(struct kvm *kvm, u64 phys_addr, u64 len,
+> > +				      mmio_handler_fn mmio_fn, void *ptr,
+> > +				      unsigned int flags);
+> > +
+> > +static inline
+> > +int __must_check kvm__register_mmio(struct kvm *kvm, u64 phys_addr,
+> > +				    u64 phys_addr_len, bool coalesce,
+> > +				    mmio_handler_fn mmio_fn, void *ptr)
+> > +{
+> > +	return kvm__register_iotrap(kvm, phys_addr, phys_addr_len, mmio_fn, ptr,
+> > +			DEVICE_BUS_MMIO | (coalesce ? IOTRAP_COALESCE : 0));
+> > +}
+> > +static inline
+> > +int __must_check kvm__register_pio(struct kvm *kvm, u16 port, u16 len,
+> > +				   mmio_handler_fn mmio_fn, void *ptr)
+> > +{
+> > +	return kvm__register_iotrap(kvm, port, len, mmio_fn, ptr,
+> > +				    DEVICE_BUS_IOPORT);
+> > +}
+> > +
+> > +bool kvm__deregister_iotrap(struct kvm *kvm, u64 phys_addr, unsigned int flags);
+> > +static inline bool kvm__deregister_mmio(struct kvm *kvm, u64 phys_addr)
+> > +{
+> > +	return kvm__deregister_iotrap(kvm, phys_addr, DEVICE_BUS_MMIO);
+> > +}
+> > +static inline bool kvm__deregister_pio(struct kvm *kvm, u16 port)
+> > +{
+> > +	return kvm__deregister_iotrap(kvm, port, DEVICE_BUS_IOPORT);
+> > +}
+> > +
+> >  void kvm__reboot(struct kvm *kvm);
+> >  void kvm__pause(struct kvm *kvm);
+> >  void kvm__continue(struct kvm *kvm);
+> > diff --git a/ioport.c b/ioport.c
+> > index e0123f27..ce29e7e7 100644
+> > --- a/ioport.c
+> > +++ b/ioport.c
+> > @@ -162,7 +162,8 @@ bool kvm__emulate_io(struct kvm_cpu *vcpu, u16 port, void *data, int direction,
+> >  
+> >  	entry = ioport_get(&ioport_tree, port);
+> >  	if (!entry)
+> > -		goto out;
+> > +		return kvm__emulate_pio(vcpu, port, data, direction,
+> > +					size, count);
+> >  
+> >  	ops	= entry->ops;
+> >  
+> > @@ -177,7 +178,6 @@ bool kvm__emulate_io(struct kvm_cpu *vcpu, u16 port, void *data, int direction,
+> >  
+> >  	ioport_put(&ioport_tree, entry);
+> >  
+> > -out:
+> >  	if (ret)
+> >  		return true;
+> >  
+> > diff --git a/mmio.c b/mmio.c
+> > index cd141cd3..75de04ad 100644
+> > --- a/mmio.c
+> > +++ b/mmio.c
+> > @@ -19,13 +19,14 @@ static DEFINE_MUTEX(mmio_lock);
+> >  
+> >  struct mmio_mapping {
+> >  	struct rb_int_node	node;
+> > -	void			(*mmio_fn)(struct kvm_cpu *vcpu, u64 addr, u8 *data, u32 len, u8 is_write, void *ptr);
+> > +	mmio_handler_fn		mmio_fn;
+> >  	void			*ptr;
+> >  	u32			refcount;
+> >  	bool			remove;
+> >  };
+> >  
+> >  static struct rb_root mmio_tree = RB_ROOT;
+> > +static struct rb_root pio_tree = RB_ROOT;
+> >  
+> >  static struct mmio_mapping *mmio_search(struct rb_root *root, u64 addr, u64 len)
+> >  {
+> > @@ -103,9 +104,14 @@ static void mmio_put(struct kvm *kvm, struct rb_root *root, struct mmio_mapping
+> >  	mutex_unlock(&mmio_lock);
+> >  }
+> >  
+> > -int kvm__register_mmio(struct kvm *kvm, u64 phys_addr, u64 phys_addr_len, bool coalesce,
+> > -		       void (*mmio_fn)(struct kvm_cpu *vcpu, u64 addr, u8 *data, u32 len, u8 is_write, void *ptr),
+> > -			void *ptr)
+> > +static bool trap_is_mmio(unsigned int flags)
+> > +{
+> > +	return (flags & IOTRAP_BUS_MASK) == DEVICE_BUS_MMIO;
+> > +}
+> > +
+> > +int kvm__register_iotrap(struct kvm *kvm, u64 phys_addr, u64 phys_addr_len,
+> > +			 mmio_handler_fn mmio_fn, void *ptr,
+> > +			 unsigned int flags)
+> >  {
+> >  	struct mmio_mapping *mmio;
+> >  	struct kvm_coalesced_mmio_zone zone;
+> > @@ -127,7 +133,7 @@ int kvm__register_mmio(struct kvm *kvm, u64 phys_addr, u64 phys_addr_len, bool c
+> >  		.remove		= false,
+> >  	};
+> >  
+> > -	if (coalesce) {
+> > +	if (trap_is_mmio(flags) && (flags & IOTRAP_COALESCE)) {
+> >  		zone = (struct kvm_coalesced_mmio_zone) {
+> >  			.addr	= phys_addr,
+> >  			.size	= phys_addr_len,
+> > @@ -138,19 +144,29 @@ int kvm__register_mmio(struct kvm *kvm, u64 phys_addr, u64 phys_addr_len, bool c
+> >  			return -errno;
+> >  		}
+> >  	}
+> > +
+> >  	mutex_lock(&mmio_lock);
+> > -	ret = mmio_insert(&mmio_tree, mmio);
+> > +	if (trap_is_mmio(flags))
+> > +		ret = mmio_insert(&mmio_tree, mmio);
+> > +	else
+> > +		ret = mmio_insert(&pio_tree, mmio);
+> >  	mutex_unlock(&mmio_lock);
+> >  
+> >  	return ret;
+> >  }
+> >  
+> > -bool kvm__deregister_mmio(struct kvm *kvm, u64 phys_addr)
+> > +bool kvm__deregister_iotrap(struct kvm *kvm, u64 phys_addr, unsigned int flags)
+> >  {
+> >  	struct mmio_mapping *mmio;
+> > +	struct rb_root *tree;
+> > +
+> > +	if ((flags & IOTRAP_BUS_MASK) == DEVICE_BUS_IOPORT)
+> > +		tree = &pio_tree;
+> > +	else
+> > +		tree = &mmio_tree;  
+> 
+> We could swap the conditional branches and use trap_is_mmio(flags) like we do above.
 
-Thanks for the changelogs. About 'per patch changelog', it is very 
-useful!
-Just a suggestion, I think is better to include them in each patch after 
-the '---' to simplify the review.
+Of course! Fixed that.
 
-You can use git-notes(1) or you can simply edit the format-patch and add 
-the changelog after the 3 dashes, so that they are ignored when the 
-patch is applied.
+> Regardless, the patch looks really good:
+> 
+> Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
 
-Thanks,
-Stefano
+Thanks!
+Andre
+
+> >  
+> >  	mutex_lock(&mmio_lock);
+> > -	mmio = mmio_search_single(&mmio_tree, phys_addr);
+> > +	mmio = mmio_search_single(tree, phys_addr);
+> >  	if (mmio == NULL) {
+> >  		mutex_unlock(&mmio_lock);
+> >  		return false;
+> > @@ -167,7 +183,7 @@ bool kvm__deregister_mmio(struct kvm *kvm, u64 phys_addr)
+> >  	 * called mmio_put(). This will trigger use-after-free errors on VCPU0.
+> >  	 */
+> >  	if (mmio->refcount == 0)
+> > -		mmio_deregister(kvm, &mmio_tree, mmio);
+> > +		mmio_deregister(kvm, tree, mmio);
+> >  	else
+> >  		mmio->remove = true;
+> >  	mutex_unlock(&mmio_lock);
+> > @@ -175,7 +191,8 @@ bool kvm__deregister_mmio(struct kvm *kvm, u64 phys_addr)
+> >  	return true;
+> >  }
+> >  
+> > -bool kvm__emulate_mmio(struct kvm_cpu *vcpu, u64 phys_addr, u8 *data, u32 len, u8 is_write)
+> > +bool kvm__emulate_mmio(struct kvm_cpu *vcpu, u64 phys_addr, u8 *data,
+> > +		       u32 len, u8 is_write)
+> >  {
+> >  	struct mmio_mapping *mmio;
+> >  
+> > @@ -194,3 +211,31 @@ bool kvm__emulate_mmio(struct kvm_cpu *vcpu, u64 phys_addr, u8 *data, u32 len, u
+> >  out:
+> >  	return true;
+> >  }
+> > +
+> > +bool kvm__emulate_pio(struct kvm_cpu *vcpu, u16 port, void *data,
+> > +		     int direction, int size, u32 count)
+> > +{
+> > +	struct mmio_mapping *mmio;
+> > +	bool is_write = direction == KVM_EXIT_IO_OUT;
+> > +
+> > +	mmio = mmio_get(&pio_tree, port, size);
+> > +	if (!mmio) {
+> > +		if (vcpu->kvm->cfg.ioport_debug) {
+> > +			fprintf(stderr, "IO error: %s port=%x, size=%d, count=%u\n",
+> > +				to_direction(direction), port, size, count);
+> > +
+> > +			return false;
+> > +		}
+> > +		return true;
+> > +	}
+> > +
+> > +	while (count--) {
+> > +		mmio->mmio_fn(vcpu, port, data, size, is_write, mmio->ptr);
+> > +
+> > +		data += size;
+> > +	}
+> > +
+> > +	mmio_put(vcpu->kvm, &pio_tree, mmio);
+> > +
+> > +	return true;
+> > +}  
 
