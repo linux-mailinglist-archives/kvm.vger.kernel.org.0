@@ -2,30 +2,30 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 990D933BFEA
-	for <lists+kvm@lfdr.de>; Mon, 15 Mar 2021 16:35:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C702333BFE8
+	for <lists+kvm@lfdr.de>; Mon, 15 Mar 2021 16:34:59 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231883AbhCOPe1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 15 Mar 2021 11:34:27 -0400
-Received: from foss.arm.com ([217.140.110.172]:50664 "EHLO foss.arm.com"
+        id S231982AbhCOPe2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 15 Mar 2021 11:34:28 -0400
+Received: from foss.arm.com ([217.140.110.172]:50678 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229900AbhCOPeT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 15 Mar 2021 11:34:19 -0400
+        id S230490AbhCOPeU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 15 Mar 2021 11:34:20 -0400
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 018BA1FB;
-        Mon, 15 Mar 2021 08:34:19 -0700 (PDT)
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 86626D6E;
+        Mon, 15 Mar 2021 08:34:20 -0700 (PDT)
 Received: from localhost.localdomain (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A8E3D3F792;
-        Mon, 15 Mar 2021 08:34:17 -0700 (PDT)
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 3BF6D3F792;
+        Mon, 15 Mar 2021 08:34:19 -0700 (PDT)
 From:   Andre Przywara <andre.przywara@arm.com>
 To:     Will Deacon <will@kernel.org>,
         Julien Thierry <julien.thierry.kdev@gmail.com>
 Cc:     Alexandru Elisei <alexandru.elisei@arm.com>, kvm@vger.kernel.org,
         kvmarm@lists.cs.columbia.edu, Marc Zyngier <maz@kernel.org>,
         Sami Mujawar <sami.mujawar@arm.com>
-Subject: [PATCH kvmtool v3 05/22] hw/i8042: Clean up data types
-Date:   Mon, 15 Mar 2021 15:33:33 +0000
-Message-Id: <20210315153350.19988-6-andre.przywara@arm.com>
+Subject: [PATCH kvmtool v3 06/22] hw/i8042: Refactor trap handler
+Date:   Mon, 15 Mar 2021 15:33:34 +0000
+Message-Id: <20210315153350.19988-7-andre.przywara@arm.com>
 X-Mailer: git-send-email 2.14.1
 In-Reply-To: <20210315153350.19988-1-andre.przywara@arm.com>
 References: <20210315153350.19988-1-andre.przywara@arm.com>
@@ -33,107 +33,110 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The i8042 is clearly an 8-bit era device, so there is little room for
-32-bit registers.
-Clean up the data types used.
+With the planned retirement of the special ioport emulation code, we
+need to provide an emulation function compatible with the MMIO
+prototype.
+
+Adjust the trap handler to use that new function, and provide shims to
+implement the old ioport interface, for now.
 
 Signed-off-by: Andre Przywara <andre.przywara@arm.com>
 Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
 ---
- hw/i8042.c | 26 +++++++++++++-------------
- 1 file changed, 13 insertions(+), 13 deletions(-)
+ hw/i8042.c | 68 +++++++++++++++++++++++++++---------------------------
+ 1 file changed, 34 insertions(+), 34 deletions(-)
 
 diff --git a/hw/i8042.c b/hw/i8042.c
-index 37a99a2d..7d1f9772 100644
+index 7d1f9772..ab866662 100644
 --- a/hw/i8042.c
 +++ b/hw/i8042.c
-@@ -64,11 +64,11 @@
- struct kbd_state {
- 	struct kvm		*kvm;
- 
--	char			kq[QUEUE_SIZE];	/* Keyboard queue */
-+	u8			kq[QUEUE_SIZE];	/* Keyboard queue */
- 	int			kread, kwrite;	/* Indexes into the queue */
- 	int			kcount;		/* number of elements in queue */
- 
--	char			mq[QUEUE_SIZE];
-+	u8			mq[QUEUE_SIZE];
- 	int			mread, mwrite;
- 	int			mcount;
- 
-@@ -82,7 +82,7 @@ struct kbd_state {
- 	 * Some commands (on port 0x64) have arguments;
- 	 * we store the command here while we wait for the argument
- 	 */
--	u32			write_cmd;
-+	u8			write_cmd;
- };
- 
- static struct kbd_state		state;
-@@ -173,9 +173,9 @@ static void kbd_write_command(struct kvm *kvm, u8 val)
- /*
-  * Called when the OS reads from port 0x60 (PS/2 data)
-  */
--static u32 kbd_read_data(void)
-+static u8 kbd_read_data(void)
- {
--	u32 ret;
-+	u8 ret;
- 	int i;
- 
- 	if (state.kcount != 0) {
-@@ -202,9 +202,9 @@ static u32 kbd_read_data(void)
- /*
-  * Called when the OS read from port 0x64, the command port
-  */
--static u32 kbd_read_status(void)
-+static u8 kbd_read_status(void)
- {
--	return (u32)state.status;
-+	return state.status;
+@@ -292,52 +292,52 @@ static void kbd_reset(void)
+ 	};
  }
  
- /*
-@@ -212,7 +212,7 @@ static u32 kbd_read_status(void)
-  * Things written here are generally arguments to commands previously
-  * written to port 0x64 and stored in state.write_cmd
-  */
--static void kbd_write_data(u32 val)
-+static void kbd_write_data(u8 val)
+-/*
+- * Called when the OS has written to one of the keyboard's ports (0x60 or 0x64)
+- */
+-static bool kbd_in(struct ioport *ioport, struct kvm_cpu *vcpu, u16 port, void *data, int size)
++static void kbd_io(struct kvm_cpu *vcpu, u64 addr, u8 *data, u32 len,
++		   u8 is_write, void *ptr)
  {
- 	switch (state.write_cmd) {
- 	case I8042_CMD_CTL_WCTR:
-@@ -266,8 +266,8 @@ static void kbd_write_data(u32 val)
- 			break;
- 		default:
- 			break;
+-	switch (port) {
+-	case I8042_COMMAND_REG: {
+-		u8 value = kbd_read_status();
+-		ioport__write8(data, value);
++	u8 value;
++
++	if (is_write)
++		value = ioport__read8(data);
++
++	switch (addr) {
++	case I8042_COMMAND_REG:
++		if (is_write)
++			kbd_write_command(vcpu->kvm, value);
++		else
++			value = kbd_read_status();
+ 		break;
 -	}
--	break;
-+		}
-+		break;
- 	case 0:
- 		/* Just send the ID */
- 		kbd_queue(RESPONSE_ACK);
-@@ -304,8 +304,8 @@ static bool kbd_in(struct ioport *ioport, struct kvm_cpu *vcpu, u16 port, void *
+-	case I8042_DATA_REG: {
+-		u8 value = kbd_read_data();
+-		ioport__write8(data, value);
++	case I8042_DATA_REG:
++		if (is_write)
++			kbd_write_data(value);
++		else
++			value = kbd_read_data();
  		break;
+-	}
+-	case I8042_PORT_B_REG: {
+-		ioport__write8(data, 0x20);
++	case I8042_PORT_B_REG:
++		if (!is_write)
++			value = 0x20;
+ 		break;
+-	}
+ 	default:
+-		return false;
++		return;
  	}
- 	case I8042_DATA_REG: {
--		u32 value = kbd_read_data();
--		ioport__write32(data, value);
-+		u8 value = kbd_read_data();
+ 
++	if (!is_write)
 +		ioport__write8(data, value);
- 		break;
- 	}
- 	case I8042_PORT_B_REG: {
-@@ -328,7 +328,7 @@ static bool kbd_out(struct ioport *ioport, struct kvm_cpu *vcpu, u16 port, void
- 		break;
- 	}
- 	case I8042_DATA_REG: {
--		u32 value = ioport__read32(data);
-+		u8 value = ioport__read8(data);
- 		kbd_write_data(value);
- 		break;
- 	}
++}
++
++/*
++ * Called when the OS has written to one of the keyboard's ports (0x60 or 0x64)
++ */
++static bool kbd_in(struct ioport *ioport, struct kvm_cpu *vcpu, u16 port, void *data, int size)
++{
++	kbd_io(vcpu, port, data, size, false, NULL);
++
+ 	return true;
+ }
+ 
+ static bool kbd_out(struct ioport *ioport, struct kvm_cpu *vcpu, u16 port, void *data, int size)
+ {
+-	switch (port) {
+-	case I8042_COMMAND_REG: {
+-		u8 value = ioport__read8(data);
+-		kbd_write_command(vcpu->kvm, value);
+-		break;
+-	}
+-	case I8042_DATA_REG: {
+-		u8 value = ioport__read8(data);
+-		kbd_write_data(value);
+-		break;
+-	}
+-	case I8042_PORT_B_REG: {
+-		break;
+-	}
+-	default:
+-		return false;
+-	}
++	kbd_io(vcpu, port, data, size, true, NULL);
+ 
+ 	return true;
+ }
 -- 
 2.17.5
 
