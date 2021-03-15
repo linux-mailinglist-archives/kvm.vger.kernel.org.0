@@ -2,157 +2,144 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 95FEF33C001
-	for <lists+kvm@lfdr.de>; Mon, 15 Mar 2021 16:35:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BDD4133BFFA
+	for <lists+kvm@lfdr.de>; Mon, 15 Mar 2021 16:35:34 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233202AbhCOPfN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 15 Mar 2021 11:35:13 -0400
-Received: from foss.arm.com ([217.140.110.172]:50870 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231591AbhCOPep (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 15 Mar 2021 11:34:45 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4ECDA1FB;
-        Mon, 15 Mar 2021 08:34:45 -0700 (PDT)
-Received: from localhost.localdomain (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 034CA3F792;
-        Mon, 15 Mar 2021 08:34:43 -0700 (PDT)
-From:   Andre Przywara <andre.przywara@arm.com>
-To:     Will Deacon <will@kernel.org>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>
-Cc:     Alexandru Elisei <alexandru.elisei@arm.com>, kvm@vger.kernel.org,
-        kvmarm@lists.cs.columbia.edu, Marc Zyngier <maz@kernel.org>,
-        Sami Mujawar <sami.mujawar@arm.com>
-Subject: [PATCH kvmtool v3 22/22] hw/rtc: ARM/arm64: Use MMIO at higher addresses
-Date:   Mon, 15 Mar 2021 15:33:50 +0000
-Message-Id: <20210315153350.19988-23-andre.przywara@arm.com>
-X-Mailer: git-send-email 2.14.1
-In-Reply-To: <20210315153350.19988-1-andre.przywara@arm.com>
-References: <20210315153350.19988-1-andre.przywara@arm.com>
+        id S232948AbhCOPfG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 15 Mar 2021 11:35:06 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:24014 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232183AbhCOPeg (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 15 Mar 2021 11:34:36 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1615822476;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=QAY8RWv6lusUZHQmEpQMI0BV4LG43ZJCZoyFS8d8UBw=;
+        b=TR3pWRCt17Ts/TB7kV5i4Ks3Rgeg25tgwYVOZjFYJr0TMyWgiKNy7RaNQHs8BX/aj2iCO/
+        cW2iJte00UgWgrpHVh6keH+Z3KlC1qZmDTuSaoXO+LNcE6QHLwl88MayCxCJBnKeb4N/bP
+        eynyiK5Oiw3L1zgKDE90wlXw7VwICHM=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-383-LbImmedkMgyJH88F4xROdg-1; Mon, 15 Mar 2021 11:34:34 -0400
+X-MC-Unique: LbImmedkMgyJH88F4xROdg-1
+Received: by mail-wr1-f70.google.com with SMTP id e13so15236125wrg.4
+        for <kvm@vger.kernel.org>; Mon, 15 Mar 2021 08:34:34 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=QAY8RWv6lusUZHQmEpQMI0BV4LG43ZJCZoyFS8d8UBw=;
+        b=F0INemaagQdzueNB6pSCZJN/5xMdbisLkeNTOyApOpwF0ljDkwerk23Yjv0aUDgz34
+         jxr/8f+Sxo0JRfe6Psk9DRq2OkQJz9drbQuE5z+09oFraOfnlWY+sV8316KGXBAORQc+
+         9lD8THEmE6F4B5oylEElxsZ/BEfvSa3gkvxyO3u0LsJdSBlWODq+0Ui2ncbdQPOUFCnB
+         EwucDSXXvxsJ9QzAWpI5wYpJqG6AZkw8Tz7vUqvnLWr+wpZiyMCCmxJWWaPYu4RE8+NT
+         lK92ZpPdKfZVsLz7UQ1hpzbeZkp5QUWNBMjD/B2qxnap6LNDm0AepqVM5ezrMeYvgJPi
+         SQzQ==
+X-Gm-Message-State: AOAM531PIrJ8KCE/YF2IN5NB0BWpPlYZ4EMMHn2LDIisXAUl2iQUoiyc
+        dm7P/4qaIL8QKwt3DmcZmnv/jKtliuH0+iWMJS+lF7Ic9cVdYKL3lm83j186S/80p9NJcCJJffG
+        g1rzgRkgSPnan
+X-Received: by 2002:adf:e412:: with SMTP id g18mr240969wrm.159.1615822473064;
+        Mon, 15 Mar 2021 08:34:33 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwEI2gEAVCRe6lkMzzHRC/qUpPSO+TnXKE+CHTyPDh0ctgY6INUvGtk2xc8+jY4I1Uy5zWzyQ==
+X-Received: by 2002:adf:e412:: with SMTP id g18mr240953wrm.159.1615822472775;
+        Mon, 15 Mar 2021 08:34:32 -0700 (PDT)
+Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id v6sm18855386wrx.32.2021.03.15.08.34.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 15 Mar 2021 08:34:32 -0700 (PDT)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Marcelo Tosatti <mtosatti@redhat.com>
+Subject: Re: [PATCH 3/4] KVM: x86: hyper-v: Track Hyper-V TSC page status
+In-Reply-To: <YE96DDyEZ3zVgb8p@google.com>
+References: <20210315143706.859293-1-vkuznets@redhat.com>
+ <20210315143706.859293-4-vkuznets@redhat.com>
+ <YE96DDyEZ3zVgb8p@google.com>
+Date:   Mon, 15 Mar 2021 16:34:31 +0100
+Message-ID: <87lfao8m7s.fsf@vitty.brq.redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Using the RTC device at its legacy I/O address as set by IBM in 1981
-was a kludge we used for simplicity on ARM platforms as well.
-However this imposes problems due to their missing alignment and overlap
-with the PCI I/O address space.
+Sean Christopherson <seanjc@google.com> writes:
 
-Now that we can switch a device easily between using ioports and
-MMIO, let's move the RTC out of the first 4K of memory on ARM platforms.
+> On Mon, Mar 15, 2021, Vitaly Kuznetsov wrote:
+>> Create an infrastructure for tracking Hyper-V TSC page status, i.e. if it
+>> was updated from guest/host side or if we've failed to set it up (because
+>> e.g. guest wrote some garbage to HV_X64_MSR_REFERENCE_TSC) and there's no
+>> need to retry.
+>> 
+>> Also, in a hypothetical situation when we are in 'always catchup' mode for
+>> TSC we can now avoid contending 'hv->hv_lock' on every guest enter by
+>> setting the state to HV_TSC_PAGE_BROKEN after compute_tsc_page_parameters()
+>> returns false.
+>> 
+>> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+>> ---
+>> diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
+>> index eefb85b86fe8..2a8d078b16cb 100644
+>> --- a/arch/x86/kvm/hyperv.c
+>> +++ b/arch/x86/kvm/hyperv.c
+>> @@ -1087,7 +1087,7 @@ void kvm_hv_setup_tsc_page(struct kvm *kvm,
+>>  	BUILD_BUG_ON(sizeof(tsc_seq) != sizeof(hv->tsc_ref.tsc_sequence));
+>>  	BUILD_BUG_ON(offsetof(struct ms_hyperv_tsc_page, tsc_sequence) != 0);
+>>  
+>> -	if (!(hv->hv_tsc_page & HV_X64_MSR_TSC_REFERENCE_ENABLE))
+>> +	if (hv->hv_tsc_page_status == HV_TSC_PAGE_BROKEN)
+>>  		return;
+>>  
+>>  	mutex_lock(&hv->hv_lock);
+>
+> ...
+>
+>> @@ -1133,6 +1133,12 @@ void kvm_hv_setup_tsc_page(struct kvm *kvm,
+>>  	hv->tsc_ref.tsc_sequence = tsc_seq;
+>>  	kvm_write_guest(kvm, gfn_to_gpa(gfn),
+>>  			&hv->tsc_ref, sizeof(hv->tsc_ref.tsc_sequence));
+>> +
+>> +	hv->hv_tsc_page_status = HV_TSC_PAGE_SET;
+>> +	goto out_unlock;
+>> +
+>> +out_err:
+>> +	hv->hv_tsc_page_status = HV_TSC_PAGE_BROKEN;
+>>  out_unlock:
+>>  	mutex_unlock(&hv->hv_lock);
+>>  }
+>> @@ -1193,8 +1199,13 @@ static int kvm_hv_set_msr_pw(struct kvm_vcpu *vcpu, u32 msr, u64 data,
+>>  	}
+>>  	case HV_X64_MSR_REFERENCE_TSC:
+>>  		hv->hv_tsc_page = data;
+>> -		if (hv->hv_tsc_page & HV_X64_MSR_TSC_REFERENCE_ENABLE)
+>> +		if (hv->hv_tsc_page & HV_X64_MSR_TSC_REFERENCE_ENABLE) {
+>> +			if (!host)
+>> +				hv->hv_tsc_page_status = HV_TSC_PAGE_GUEST_CHANGED;
+>> +			else
+>> +				hv->hv_tsc_page_status = HV_TSC_PAGE_HOST_CHANGED;
+>
+> Writing the status without taking hv->hv_lock could cause the update to be lost,
+> e.g. if a different vCPU fails kvm_hv_setup_tsc_page() at the same time, its
+> write to set status to HV_TSC_PAGE_BROKEN would race with this write.
+>
 
-That should be transparent for well behaved guests, since the change is
-naturally reflected in the device tree.
+Oh, right you are, the lock was somewhere in my brain :-) Will do in v2.
 
-Signed-off-by: Andre Przywara <andre.przywara@arm.com>
-Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
----
- arm/include/arm-common/kvm-arch.h |  7 +++++--
- hw/rtc.c                          | 24 ++++++++++++++++--------
- 2 files changed, 21 insertions(+), 10 deletions(-)
+>>  			kvm_make_request(KVM_REQ_MASTERCLOCK_UPDATE, vcpu);
+>> +		}
+>>  		break;
+>>  	case HV_X64_MSR_CRASH_P0 ... HV_X64_MSR_CRASH_P4:
+>>  		return kvm_hv_msr_set_crash_data(kvm,
+>> -- 
+>> 2.30.2
+>> 
+>
 
-diff --git a/arm/include/arm-common/kvm-arch.h b/arm/include/arm-common/kvm-arch.h
-index bf34d742..436b67b8 100644
---- a/arm/include/arm-common/kvm-arch.h
-+++ b/arm/include/arm-common/kvm-arch.h
-@@ -14,8 +14,8 @@
-  * +-------+----+-------+-------+--------+-----+---------+---......
-  * |  PCI  |////| plat  |       |        |     |         |
-  * |  I/O  |////| MMIO: | Flash | virtio | GIC |   PCI   |  DRAM
-- * | space |////| UART  |       |  MMIO  |     |  (AXI)  |
-- * |       |////|       |       |        |     |         |
-+ * | space |////| UART, |       |  MMIO  |     |  (AXI)  |
-+ * |       |////| RTC   |       |        |     |         |
-  * +-------+----+-------+-------+--------+-----+---------+---......
-  */
- 
-@@ -31,6 +31,9 @@
- #define ARM_UART_MMIO_BASE	ARM_MMIO_AREA
- #define ARM_UART_MMIO_SIZE	0x10000
- 
-+#define ARM_RTC_MMIO_BASE	(ARM_UART_MMIO_BASE + ARM_UART_MMIO_SIZE)
-+#define ARM_RTC_MMIO_SIZE	0x10000
-+
- #define KVM_FLASH_MMIO_BASE	(ARM_MMIO_AREA + 0x1000000)
- #define KVM_FLASH_MAX_SIZE	0x1000000
- 
-diff --git a/hw/rtc.c b/hw/rtc.c
-index ee4c9102..aec31c52 100644
---- a/hw/rtc.c
-+++ b/hw/rtc.c
-@@ -5,6 +5,15 @@
- 
- #include <time.h>
- 
-+#if defined(CONFIG_ARM) || defined(CONFIG_ARM64)
-+#define RTC_BUS_TYPE		DEVICE_BUS_MMIO
-+#define RTC_BASE_ADDRESS	ARM_RTC_MMIO_BASE
-+#else
-+/* PORT 0070-007F - CMOS RAM/RTC (REAL TIME CLOCK) */
-+#define RTC_BUS_TYPE		DEVICE_BUS_IOPORT
-+#define RTC_BASE_ADDRESS	0x70
-+#endif
-+
- /*
-  * MC146818 RTC registers
-  */
-@@ -49,7 +58,7 @@ static void cmos_ram_io(struct kvm_cpu *vcpu, u64 addr, u8 *data,
- 	time_t ti;
- 
- 	if (is_write) {
--		if (addr == 0x70) {	/* index register */
-+		if (addr == RTC_BASE_ADDRESS) {	/* index register */
- 			u8 value = ioport__read8(data);
- 
- 			vcpu->kvm->nmi_disabled	= value & (1UL << 7);
-@@ -70,7 +79,7 @@ static void cmos_ram_io(struct kvm_cpu *vcpu, u64 addr, u8 *data,
- 		return;
- 	}
- 
--	if (addr == 0x70)
-+	if (addr == RTC_BASE_ADDRESS)	/* index register is write-only */
- 		return;
- 
- 	time(&ti);
-@@ -127,7 +136,7 @@ static void generate_rtc_fdt_node(void *fdt,
- 							    u8 irq,
- 							    enum irq_type))
- {
--	u64 reg_prop[2] = { cpu_to_fdt64(0x70), cpu_to_fdt64(2) };
-+	u64 reg_prop[2] = { cpu_to_fdt64(RTC_BASE_ADDRESS), cpu_to_fdt64(2) };
- 
- 	_FDT(fdt_begin_node(fdt, "rtc"));
- 	_FDT(fdt_property_string(fdt, "compatible", "motorola,mc146818"));
-@@ -139,7 +148,7 @@ static void generate_rtc_fdt_node(void *fdt,
- #endif
- 
- struct device_header rtc_dev_hdr = {
--	.bus_type = DEVICE_BUS_IOPORT,
-+	.bus_type = RTC_BUS_TYPE,
- 	.data = generate_rtc_fdt_node,
- };
- 
-@@ -151,8 +160,8 @@ int rtc__init(struct kvm *kvm)
- 	if (r < 0)
- 		return r;
- 
--	/* PORT 0070-007F - CMOS RAM/RTC (REAL TIME CLOCK) */
--	r = kvm__register_pio(kvm, 0x0070, 2, cmos_ram_io, NULL);
-+	r = kvm__register_iotrap(kvm, RTC_BASE_ADDRESS, 2, cmos_ram_io, NULL,
-+				 RTC_BUS_TYPE);
- 	if (r < 0)
- 		goto out_device;
- 
-@@ -170,8 +179,7 @@ dev_init(rtc__init);
- 
- int rtc__exit(struct kvm *kvm)
- {
--	/* PORT 0070-007F - CMOS RAM/RTC (REAL TIME CLOCK) */
--	kvm__deregister_pio(kvm, 0x0070);
-+	kvm__deregister_iotrap(kvm, RTC_BASE_ADDRESS, RTC_BUS_TYPE);
- 
- 	return 0;
- }
 -- 
-2.17.5
+Vitaly
 
