@@ -2,118 +2,108 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C5FC633BDC9
-	for <lists+kvm@lfdr.de>; Mon, 15 Mar 2021 15:39:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D2A1F33BE4D
+	for <lists+kvm@lfdr.de>; Mon, 15 Mar 2021 15:51:45 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233506AbhCOOik (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 15 Mar 2021 10:38:40 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:27708 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S240219AbhCOOhX (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 15 Mar 2021 10:37:23 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1615819042;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=yF/DRECI57j8pYNPafUBHiPKLqMI/OZXnNRjB907b1Q=;
-        b=cbhfZf4VJiBP6xqGaE2RQj6Fyg9g73ik4lR/nxJMOqHg2he8KVQEJ9MGmv8/gDzjviSwIm
-        hkP6XazuiUn4/RL+l1MCIwFiwju/r81YzIbyM7woCsW8fxqLeaF7EjLSPuuAR9XrfQy8Ae
-        iePVLih0NurRShBgChkg5gxiOQ05Cp4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-157-m1gV5_plM6-b04MT6-c8vg-1; Mon, 15 Mar 2021 10:37:20 -0400
-X-MC-Unique: m1gV5_plM6-b04MT6-c8vg-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 48551107ACCD;
-        Mon, 15 Mar 2021 14:37:19 +0000 (UTC)
-Received: from vitty.brq.redhat.com (unknown [10.40.195.229])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 4FFFB5C8B3;
-        Mon, 15 Mar 2021 14:37:17 +0000 (UTC)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>
-Subject: [PATCH 4/4] KVM: x86: hyper-v: Don't touch TSC page values when guest opted for re-enlightenment
-Date:   Mon, 15 Mar 2021 15:37:06 +0100
-Message-Id: <20210315143706.859293-5-vkuznets@redhat.com>
-In-Reply-To: <20210315143706.859293-1-vkuznets@redhat.com>
-References: <20210315143706.859293-1-vkuznets@redhat.com>
+        id S238206AbhCOOpD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 15 Mar 2021 10:45:03 -0400
+Received: from youngberry.canonical.com ([91.189.89.112]:37478 "EHLO
+        youngberry.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S238681AbhCOOou (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 15 Mar 2021 10:44:50 -0400
+Received: from mail-ed1-f71.google.com ([209.85.208.71])
+        by youngberry.canonical.com with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+        (Exim 4.86_2)
+        (envelope-from <christian.brauner@canonical.com>)
+        id 1lLoSe-00061a-Bi
+        for kvm@vger.kernel.org; Mon, 15 Mar 2021 14:44:48 +0000
+Received: by mail-ed1-f71.google.com with SMTP id i6so16158956edq.12
+        for <kvm@vger.kernel.org>; Mon, 15 Mar 2021 07:44:48 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=/rOw6JMsy5TmcuNfXsdMbz1wU7+IrDSNfY1nK4kmqAI=;
+        b=qa1gQrh3GYOUqP/Q2MQ7eblUVsyTVTZ/VyXHpJiZSmtwVEDPb3n821gBBgcePn2GzA
+         BowzN43cR8mr59hvrH4VrUAwccIaZ4GQJXxXUlf1X6RvmbgPLK4GFOkN2ZJ2vTDELHFN
+         +B0Qmmw9LnGtXkwQZE/97r+O361Z7Rzpw77xClqPTDOPnGw56/E8p4JF7p1rjp1IUp21
+         cOgSUVLO0TdcIZNoufNvUZK2WMZ5/Rez94ijyVtDC2e6PnOQPHkL01nuY0nTjwViunFf
+         iLxgK6Ceh1iMTuDCdCKomb1EYZAWeaIDp672WQsibtc3SJs8+k+ZQCP+ZdJRXEDVwwFj
+         6oVQ==
+X-Gm-Message-State: AOAM53229LOIh7rxcFpTrEatjyMtHp2YYtPClRvfhJarhOFdMWzbGC01
+        sHg9o73FdW1Ay8fCVpDYidXGPm0u4S6woTOjKHQen6pZ8z8TS23pt97GwHEGQfmJSbjsKucCvEn
+        3qDhRsjIq5+czedeGWu+9j4aFzlc0Qg==
+X-Received: by 2002:a17:906:e16:: with SMTP id l22mr23860026eji.173.1615819487933;
+        Mon, 15 Mar 2021 07:44:47 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyX850jlad2N9FOS0qZRXIsOYQvuD87/PkQkWtiWY3kY5mGjEJZj64Syjg1iARAIS5QEMLnoA==
+X-Received: by 2002:a17:906:e16:: with SMTP id l22mr23860009eji.173.1615819487785;
+        Mon, 15 Mar 2021 07:44:47 -0700 (PDT)
+Received: from gmail.com (ip5f5af0a0.dynamic.kabel-deutschland.de. [95.90.240.160])
+        by smtp.gmail.com with ESMTPSA id e4sm7443229ejz.4.2021.03.15.07.44.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 15 Mar 2021 07:44:47 -0700 (PDT)
+Date:   Mon, 15 Mar 2021 15:44:44 +0100
+From:   Christian Brauner <christian.brauner@canonical.com>
+To:     Yongji Xie <xieyongji@bytedance.com>
+Cc:     Christoph Hellwig <hch@infradead.org>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        Parav Pandit <parav@nvidia.com>, Bob Liu <bob.liu@oracle.com>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Matthew Wilcox <willy@infradead.org>, viro@zeniv.linux.org.uk,
+        Jens Axboe <axboe@kernel.dk>, bcrl@kvack.org,
+        Jonathan Corbet <corbet@lwn.net>,
+        Mika =?utf-8?B?UGVudHRpbMOk?= <mika.penttila@nextfour.com>,
+        Dan Carpenter <dan.carpenter@oracle.com>,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        kvm@vger.kernel.org, linux-fsdevel@vger.kernel.org
+Subject: Re: [PATCH v5 01/11] file: Export __receive_fd() to modules
+Message-ID: <20210315144444.bgtllddee7s55lfx@gmail.com>
+References: <20210315053721.189-1-xieyongji@bytedance.com>
+ <20210315053721.189-2-xieyongji@bytedance.com>
+ <20210315090822.GA4166677@infradead.org>
+ <CACycT3vrHOExXj6v8ULvUzdLcRkdzS5=TNK6=g4+RWEdN-nOJw@mail.gmail.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <CACycT3vrHOExXj6v8ULvUzdLcRkdzS5=TNK6=g4+RWEdN-nOJw@mail.gmail.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When guest opts for re-enlightenment notifications upon migration, it is
-in its right to assume that TSC page values never change (as they're only
-supposed to change upon migration and the host has to keep things as they
-are before it receives confirmation from the guest). This is mostly true
-until the guest is migrated somewhere. KVM userspace (e.g. QEMU) will
-trigger masterclock update by writing to HV_X64_MSR_REFERENCE_TSC, by
-calling KVM_SET_CLOCK,... and as TSC value and kvmclock reading drift
-apart (even slightly), the update causes TSC page values to change.
+On Mon, Mar 15, 2021 at 05:46:43PM +0800, Yongji Xie wrote:
+> On Mon, Mar 15, 2021 at 5:08 PM Christoph Hellwig <hch@infradead.org> wrote:
+> >
+> > On Mon, Mar 15, 2021 at 01:37:11PM +0800, Xie Yongji wrote:
+> > > Export __receive_fd() so that some modules can use
+> > > it to pass file descriptor between processes.
+> >
+> > I really don't think any non-core code should do that, especilly not
+> > modular mere driver code.
+> 
+> Do you see any issue? Now I think we're able to do that with the help
+> of get_unused_fd_flags() and fd_install() in modules. But we may miss
+> some security stuff in this way. So I try to export __receive_fd() and
+> use it instead.
 
-The issue at hand is that when Hyper-V is migrated, it uses stale (cached)
-TSC page values to compute the difference between its own clocksource
-(provided by KVM) and its guests' TSC pages to program synthetic timers
-and in some cases, when TSC page is updated, this puts all stimer
-expirations in the past. This, in its turn, causes an interrupt storm
-and L2 guests not making much forward progress.
+The __receive_fd() helper was added for core-kernel code only and we
+mainly did it for the seccomp notifier (and scm rights). The "__" prefix
+was intended to convey that message.
+And I agree with Christoph that we should probably keep it that way
+since __receive_fd() allows a few operations that no driver should
+probably do.
+I can see it being kinda ok to export a variant that really only
+receives and installs an fd, i.e. if we were to export what's currently
+available as an inline helper:
 
-Note, KVM doesn't fully implement re-enlightenment notification. Basically,
-the support for reenlightenment MSRs is just a stub and userspace is only
-expected to expose the feature when TSC scaling on the expected destination
-hosts is available. With TSC scaling, no real re-enlightenment is needed
-as TSC frequency doesn't change. With TSC scaling becoming ubiquitous, it
-likely makes little sense to fully implement re-enlightenment in KVM.
+static inline int receive_fd(struct file *file, unsigned int o_flags)
 
-Prevent TSC page from being updated after migration. In case it's not the
-guest who's initiating the change and when TSC page is already enabled,
-just keep it as it is: TSC value is supposed to be preserved across
-migration and TSC frequency can't change with re-enlightenment enabled.
-The guest is doomed anyway if any of this is not true.
+but definitely none of the fd replacement stuff; that shold be
+off-limits. The seccomp notifier is the only codepath that should even
+think about fd replacement since it's about managing the syscalls of
+another task. Drivers swapping out fds doesn't sound like a good idea to
+me.
 
-Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
----
- arch/x86/kvm/hyperv.c | 18 ++++++++++++++++++
- 1 file changed, 18 insertions(+)
-
-diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
-index 2a8d078b16cb..5889de580e37 100644
---- a/arch/x86/kvm/hyperv.c
-+++ b/arch/x86/kvm/hyperv.c
-@@ -1103,6 +1103,24 @@ void kvm_hv_setup_tsc_page(struct kvm *kvm,
- 				    &tsc_seq, sizeof(tsc_seq))))
- 		goto out_err;
- 
-+	/*
-+	 * Don't touch TSC page values if the guest has opted for TSC emulation
-+	 * after migration. KVM doesn't fully support reenlightenment
-+	 * notifications and TSC access emulation and Hyper-V is known to expect
-+	 * the values in TSC page to stay constant before TSC access emulation
-+	 * is disabled from guest side (HV_X64_MSR_TSC_EMULATION_STATUS).
-+	 * Userspace is expected to preserve TSC frequency and guest visible TSC
-+	 * value across migration (and prevent it when TSC scaling is
-+	 * unsupported).
-+	 */
-+	if ((hv->hv_tsc_page_status != HV_TSC_PAGE_GUEST_CHANGED) &&
-+	    hv->hv_tsc_emulation_control && tsc_seq) {
-+		if (kvm_read_guest(kvm, gfn_to_gpa(gfn), &hv->tsc_ref, sizeof(hv->tsc_ref)))
-+			goto out_err;
-+
-+		goto out_unlock;
-+	}
-+
- 	/*
- 	 * While we're computing and writing the parameters, force the
- 	 * guest to use the time reference count MSR.
--- 
-2.30.2
-
+Christian
