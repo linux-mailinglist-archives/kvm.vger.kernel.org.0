@@ -2,88 +2,89 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 62E0333CCAD
-	for <lists+kvm@lfdr.de>; Tue, 16 Mar 2021 05:45:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A873033CDC5
+	for <lists+kvm@lfdr.de>; Tue, 16 Mar 2021 07:10:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234097AbhCPEpL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 16 Mar 2021 00:45:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38506 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229962AbhCPEot (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 16 Mar 2021 00:44:49 -0400
-Received: from mail-qt1-x832.google.com (mail-qt1-x832.google.com [IPv6:2607:f8b0:4864:20::832])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3C571C06174A;
-        Mon, 15 Mar 2021 21:44:49 -0700 (PDT)
-Received: by mail-qt1-x832.google.com with SMTP id h7so4027120qtx.3;
-        Mon, 15 Mar 2021 21:44:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=Ln6IROcL0oqmiyWgZVylBCyeTAvDQnVtqaLoFG3jsSA=;
-        b=Lkh6Qx6Q7o3RBAorjTjSkvKFkltnLwjRXu/3fiMeGJEQEMoLLu59QV6qN7aDvOo/21
-         JnVdfWhhzEjz9Ytx66L0CDdqcIHYlV/H5cITChcr+ZvL/TtNtc3W79q807BHlHZNnB3A
-         a1H+tR//ncYKigcDknno3igITuo7a55hTEivqGv77MnSjrx+3oOCng49rOD5UTt52NpY
-         J4nVZjCyz5m+xCvT1cKOlffLFgHjUNPSpbOpOXY0bD+eBA+OxthhUL5jo+pTrpqEOEy7
-         oXMKOVEiRdUfXS+GJHjbyIivWCQPgpTXXIuYLx+eyBsqxl3fACNx3MXb776Tm/7XB7xS
-         LPvg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=Ln6IROcL0oqmiyWgZVylBCyeTAvDQnVtqaLoFG3jsSA=;
-        b=h4nXQipthQ5VHsq9RetQ0CY+R0JS346n1d5KIA6a1D18Eqh+GHyrfCbT26O0qds/if
-         ZVgxCiijjVdu3bQZW+2GVnx9G0hDdyN36emS/ya3Lhe1mRe8XB73lFQSbxCIaXt85Fhw
-         OkEl9I0ol5IV7aPYEijjmFRmj2pywzJHd9VMWL/n9dFLIbqMjWnaell29hUa0J1VlrBU
-         n3SSSzUS959wDyfHnNl8e8VfZ5Z6LVdF5PPJR0O1IOk1iFylAXBzcfLb2GGFKqtTYLv3
-         U7RougDanxLXyMCZuUGYRiF4Z6YbKOD+EqZmXqXxzyZvbrwCNaWyJZzARu9rpRKzC11A
-         Z33w==
-X-Gm-Message-State: AOAM532PDROGGMuqLgfZ2zhcFephPn5nmAJlCd3aLRGUSZa0Wm1zI/9r
-        wxKakbdmLhJMTzAeYV2Koyw=
-X-Google-Smtp-Source: ABdhPJxRoDEvfZK3pGTpLK8ocuHyLorhAGB8PQ4JCJWBaKlabF+nz/DW1jipdHChWgkcJtt8glqz5Q==
-X-Received: by 2002:ac8:6b8a:: with SMTP id z10mr6231616qts.243.1615869888471;
-        Mon, 15 Mar 2021 21:44:48 -0700 (PDT)
-Received: from localhost.localdomain ([156.146.58.45])
-        by smtp.gmail.com with ESMTPSA id g14sm14306322qkm.98.2021.03.15.21.44.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 15 Mar 2021 21:44:47 -0700 (PDT)
-From:   Bhaskar Chowdhury <unixbhaskar@gmail.com>
-To:     pbonzini@redhat.com, corbet@lwn.net, kvm@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     rdunlap@infradead.org, Bhaskar Chowdhury <unixbhaskar@gmail.com>
-Subject: [PATCH] docs: virt: kvm: Trivial typo fix in the file timekeeping.rst
-Date:   Tue, 16 Mar 2021 10:14:24 +0530
-Message-Id: <20210316044424.3068802-1-unixbhaskar@gmail.com>
-X-Mailer: git-send-email 2.30.2
+        id S235628AbhCPGJo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 16 Mar 2021 02:09:44 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:50892 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S233097AbhCPGJN (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 16 Mar 2021 02:09:13 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1615874953;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=2BW1sBItML7wtTpQapaMP53TtXuZoCkLLYqm0wfSE7A=;
+        b=RuyscgyHdMHcycD99zzeonkfWcrwDd+mHPbkNiRQBMUA2eylv819As6MV3fZi8I9Nsxfu+
+        wToNZjSEcy7awkMrx1PxZ6Uswt98+nrvBPtoTUtc9fqcmAKbs9k5qUXdBQkEEl0RXsXTUz
+        YCxAUeiOZSrVggUXygDxIDUf1a2ufvU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-153-VChqBI0RMoW8WQp27xjQ-g-1; Tue, 16 Mar 2021 02:09:09 -0400
+X-MC-Unique: VChqBI0RMoW8WQp27xjQ-g-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 94237801817;
+        Tue, 16 Mar 2021 06:09:07 +0000 (UTC)
+Received: from wangxiaodeMacBook-Air.local (ovpn-12-216.pek2.redhat.com [10.72.12.216])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 746CF60C0F;
+        Tue, 16 Mar 2021 06:09:01 +0000 (UTC)
+Subject: Re: [PATCH V4 1/7] vDPA/ifcvf: get_vendor_id returns a device
+ specific vendor id
+To:     Zhu Lingshan <lingshan.zhu@intel.com>, mst@redhat.com,
+        lulu@redhat.com, leonro@nvidia.com
+Cc:     virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20210315074501.15868-1-lingshan.zhu@intel.com>
+ <20210315074501.15868-2-lingshan.zhu@intel.com>
+From:   Jason Wang <jasowang@redhat.com>
+Message-ID: <7ad48606-1ed1-0b96-a236-ecdb0b01e560@redhat.com>
+Date:   Tue, 16 Mar 2021 14:09:00 +0800
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.16; rv:78.0)
+ Gecko/20100101 Thunderbird/78.8.1
 MIME-Version: 1.0
+In-Reply-To: <20210315074501.15868-2-lingshan.zhu@intel.com>
+Content-Type: text/plain; charset=gbk; format=flowed
 Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
-s/extremal/external/
+ÔÚ 2021/3/15 ÏÂÎç3:44, Zhu Lingshan Ð´µÀ:
+> In this commit, ifcvf_get_vendor_id() will return
+> a device specific vendor id of the probed pci device
+> than a hard code.
+>
+> Signed-off-by: Zhu Lingshan <lingshan.zhu@intel.com>
 
-Signed-off-by: Bhaskar Chowdhury <unixbhaskar@gmail.com>
----
- But...Paolo,is it also "extreme"? I am in a catch-22?
 
- Documentation/virt/kvm/timekeeping.rst | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Acked-by: Jason Wang <jasowang@redhat.com>
 
-diff --git a/Documentation/virt/kvm/timekeeping.rst b/Documentation/virt/kvm/timekeeping.rst
-index 21ae7efa29ba..932d7f7d1ece 100644
---- a/Documentation/virt/kvm/timekeeping.rst
-+++ b/Documentation/virt/kvm/timekeeping.rst
-@@ -299,7 +299,7 @@ device.
 
- The HPET spec is rather loose and vague, requiring at least 3 hardware timers,
- but allowing implementation freedom to support many more.  It also imposes no
--fixed rate on the timer frequency, but does impose some extremal values on
-+fixed rate on the timer frequency, but does impose some external values on
- frequency, error and slew.
-
- In general, the HPET is recommended as a high precision (compared to PIT /RTC)
---
-2.30.2
+> ---
+>   drivers/vdpa/ifcvf/ifcvf_main.c | 5 ++++-
+>   1 file changed, 4 insertions(+), 1 deletion(-)
+>
+> diff --git a/drivers/vdpa/ifcvf/ifcvf_main.c b/drivers/vdpa/ifcvf/ifcvf_main.c
+> index fa1af301cf55..e501ee07de17 100644
+> --- a/drivers/vdpa/ifcvf/ifcvf_main.c
+> +++ b/drivers/vdpa/ifcvf/ifcvf_main.c
+> @@ -324,7 +324,10 @@ static u32 ifcvf_vdpa_get_device_id(struct vdpa_device *vdpa_dev)
+>   
+>   static u32 ifcvf_vdpa_get_vendor_id(struct vdpa_device *vdpa_dev)
+>   {
+> -	return IFCVF_SUBSYS_VENDOR_ID;
+> +	struct ifcvf_adapter *adapter = vdpa_to_adapter(vdpa_dev);
+> +	struct pci_dev *pdev = adapter->pdev;
+> +
+> +	return pdev->subsystem_vendor;
+>   }
+>   
+>   static u32 ifcvf_vdpa_get_vq_align(struct vdpa_device *vdpa_dev)
 
