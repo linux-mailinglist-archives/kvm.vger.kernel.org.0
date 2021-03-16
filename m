@@ -2,117 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7A61033D38E
-	for <lists+kvm@lfdr.de>; Tue, 16 Mar 2021 13:11:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 74CEB33D3AA
+	for <lists+kvm@lfdr.de>; Tue, 16 Mar 2021 13:19:08 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229886AbhCPMKu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 16 Mar 2021 08:10:50 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:35852 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229813AbhCPMKa (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 16 Mar 2021 08:10:30 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1615896629;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=wL0kA5V4awrAMkhBt9rGxF6XAuTQ/W9ItmjpvY+pCfI=;
-        b=D6kry9he5w+2LXD12LP/qceWyZ5V7+MCcJDnhSFMxGhomL8Pbgp5psroLhn+UbZqJjKY+B
-        hFwp3Ge7EMn1lEhfEn79w21n3ZFe0MQFxOwyLYcWMFnzxa5pkcT3X5oHsRJLt9MtZJgDhx
-        QRgfYjpmg2xp8kGrHBGwcRuNREXtUu0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-46-O-I9bnU0PWquNb1OQwMXUA-1; Tue, 16 Mar 2021 08:10:27 -0400
-X-MC-Unique: O-I9bnU0PWquNb1OQwMXUA-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        id S229972AbhCPMRr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 16 Mar 2021 08:17:47 -0400
+Received: from mail.kernel.org ([198.145.29.99]:36380 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229995AbhCPMRM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 16 Mar 2021 08:17:12 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7FAA7101F001;
-        Tue, 16 Mar 2021 12:10:25 +0000 (UTC)
-Received: from gondolin (ovpn-113-185.ams2.redhat.com [10.36.113.185])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 967295D6B1;
-        Tue, 16 Mar 2021 12:10:19 +0000 (UTC)
-Date:   Tue, 16 Mar 2021 13:10:17 +0100
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     "Tian, Kevin" <kevin.tian@intel.com>
-Cc:     Jason Gunthorpe <jgg@nvidia.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "Raj, Ashok" <ashok.raj@intel.com>,
-        "Williams, Dan J" <dan.j.williams@intel.com>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        "Christoph Hellwig" <hch@lst.de>,
-        Leon Romanovsky <leonro@nvidia.com>,
-        Max Gurtovoy <mgurtovoy@nvidia.com>,
-        Tarun Gupta <targupta@nvidia.com>
-Subject: Re: [PATCH v2 02/14] vfio: Simplify the lifetime logic for
- vfio_device
-Message-ID: <20210316131017.63b7ff22.cohuck@redhat.com>
-In-Reply-To: <MWHPR11MB18865B08DE53D9E9EE04DA5B8C6B9@MWHPR11MB1886.namprd11.prod.outlook.com>
-References: <0-v2-20d933792272+4ff-vfio1_jgg@nvidia.com>
-        <2-v2-20d933792272+4ff-vfio1_jgg@nvidia.com>
-        <MWHPR11MB18865B08DE53D9E9EE04DA5B8C6B9@MWHPR11MB1886.namprd11.prod.outlook.com>
-Organization: Red Hat GmbH
-MIME-Version: 1.0
+        by mail.kernel.org (Postfix) with ESMTPSA id 60FD064FE0;
+        Tue, 16 Mar 2021 12:17:11 +0000 (UTC)
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94)
+        (envelope-from <maz@kernel.org>)
+        id 1lM8dJ-001xW3-7h; Tue, 16 Mar 2021 12:17:09 +0000
+Date:   Tue, 16 Mar 2021 12:17:08 +0000
+Message-ID: <87blbjfg3f.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Quentin Perret <qperret@google.com>
+Cc:     kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
+        kvm@vger.kernel.org, dave.martin@arm.com, daniel.kiss@arm.com,
+        Will Deacon <will@kernel.org>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        broonie@kernel.org, kernel-team@android.com
+Subject: Re: [PATCH 01/10] KVM: arm64: Provide KVM's own save/restore SVE primitives
+In-Reply-To: <YFCJEgjUZ5cnq0AK@google.com>
+References: <20210316101312.102925-1-maz@kernel.org>
+        <20210316101312.102925-2-maz@kernel.org>
+        <YFCJEgjUZ5cnq0AK@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: qperret@google.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, dave.martin@arm.com, daniel.kiss@arm.com, will@kernel.org, catalin.marinas@arm.com, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, broonie@kernel.org, kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 16 Mar 2021 07:38:09 +0000
-"Tian, Kevin" <kevin.tian@intel.com> wrote:
-
-> > From: Jason Gunthorpe <jgg@nvidia.com>
-> > Sent: Saturday, March 13, 2021 8:56 AM
-> > 
-> > The vfio_device is using a 'sleep until all refs go to zero' pattern for
-> > its lifetime, but it is indirectly coded by repeatedly scanning the group
-> > list waiting for the device to be removed on its own.
-> > 
-> > Switch this around to be a direct representation, use a refcount to count
-> > the number of places that are blocking destruction and sleep directly on a
-> > completion until that counter goes to zero. kfree the device after other
-> > accesses have been excluded in vfio_del_group_dev(). This is a fairly
-> > common Linux idiom.
-> > 
-> > Due to this we can now remove kref_put_mutex(), which is very rarely used
-> > in the kernel. Here it is being used to prevent a zero ref device from
-> > being seen in the group list. Instead allow the zero ref device to
-> > continue to exist in the device_list and use refcount_inc_not_zero() to
-> > exclude it once refs go to zero.
-> > 
-> > This patch is organized so the next patch will be able to alter the API to
-> > allow drivers to provide the kfree.
-> > 
-> > Reviewed-by: Christoph Hellwig <hch@lst.de>
-> > Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
-> > ---
-> >  drivers/vfio/vfio.c | 79 ++++++++++++++-------------------------------
-> >  1 file changed, 25 insertions(+), 54 deletions(-)
-
-> > @@ -935,32 +916,18 @@ void *vfio_del_group_dev(struct device *dev)
-> >  	WARN_ON(!unbound);
-> > 
-> >  	vfio_device_put(device);
-> > -
-> > -	/*
-> > -	 * If the device is still present in the group after the above
-> > -	 * 'put', then it is in use and we need to request it from the
-> > -	 * bus driver.  The driver may in turn need to request the
-> > -	 * device from the user.  We send the request on an arbitrary
-> > -	 * interval with counter to allow the driver to take escalating
-> > -	 * measures to release the device if it has the ability to do so.
-> > -	 */  
+On Tue, 16 Mar 2021 10:31:46 +0000,
+Quentin Perret <qperret@google.com> wrote:
 > 
-> Above comment still makes sense even with this patch. What about
-> keeping it? otherwise:
+> On Tuesday 16 Mar 2021 at 10:13:03 (+0000), Marc Zyngier wrote:
+> > diff --git a/arch/arm64/kvm/hyp/fpsimd.S b/arch/arm64/kvm/hyp/fpsimd.S
+> > index 01f114aa47b0..e4010d1acb79 100644
+> > --- a/arch/arm64/kvm/hyp/fpsimd.S
+> > +++ b/arch/arm64/kvm/hyp/fpsimd.S
+> > @@ -19,3 +19,13 @@ SYM_FUNC_START(__fpsimd_restore_state)
+> >  	fpsimd_restore	x0, 1
+> >  	ret
+> >  SYM_FUNC_END(__fpsimd_restore_state)
+> > +
+> > +SYM_FUNC_START(__sve_restore_state)
+> > +	sve_load 0, x1, x2, 3, x4
+> > +	ret
+> > +SYM_FUNC_END(__sve_restore_state)
 > 
-> Reviewed-by: Kevin Tian <kevin.tian@intel.com>
+> Nit: maybe this could be named __sve_load_state() for consistency with
+> the EL1 version?
 
-I agree, this still looks useful.
+Well, we already have the discrepancy for fpsimd in the same file, so
+I opted for another kind of consistency...
 
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+> 
+> > +SYM_FUNC_START(__sve_save_state)
+> > +	sve_save 0, x1, 2
+> > +	ret
+> > +SYM_FUNC_END(__sve_restore_state)
+> 
+> SYM_FUNC_END(__sve_save_state) here?
 
+Yup, good catch.
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
