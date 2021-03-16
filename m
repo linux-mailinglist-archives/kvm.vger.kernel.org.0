@@ -2,205 +2,86 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5017633D7A2
-	for <lists+kvm@lfdr.de>; Tue, 16 Mar 2021 16:34:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 855F533D817
+	for <lists+kvm@lfdr.de>; Tue, 16 Mar 2021 16:49:36 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237133AbhCPPdy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 16 Mar 2021 11:33:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36892 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238110AbhCPPdR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 16 Mar 2021 11:33:17 -0400
-Received: from mail-wr1-x436.google.com (mail-wr1-x436.google.com [IPv6:2a00:1450:4864:20::436])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D2AF5C061764
-        for <kvm@vger.kernel.org>; Tue, 16 Mar 2021 08:33:16 -0700 (PDT)
-Received: by mail-wr1-x436.google.com with SMTP id a18so10675247wrc.13
-        for <kvm@vger.kernel.org>; Tue, 16 Mar 2021 08:33:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ffwll.ch; s=google;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=zwe0ekXmy9t5eNr3sFs9jCzA/xhMldV8JLAydoSdCfc=;
-        b=GzG+edIxhOWO3e0C//e9ZTvwmWIMqXUh3qVGupEH1XpIfgojiM9nr7zfSbfVnLpEX1
-         TppZD/lYq2BFxWK6uExvqhTf4cGvOaXXXtjYXrDDvq/txY4i5BzARGuD/BQ+Nc/vZ9CP
-         U43D7zJSOobDqMzHTu1jMNW+6MtVYMmXPpabc=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=zwe0ekXmy9t5eNr3sFs9jCzA/xhMldV8JLAydoSdCfc=;
-        b=dpX4WcR2ijzZ88eOudwgATu6Z3HMNoC1/MP5LBlhdMOLuk1v3y5APqC/K35Qw96O4s
-         TIfzWigp5qJdm/sa3Kp6Ohl9eqRznBUAyZ0dsK/69yfEdTyS+bDwgUGyPsT4nrlkKv7i
-         o7uA37uPv8WzkbopsMe5uQP6FvzmPLBum8keqXolJzI8GRXR2UFdSNp6ck3GtHx8W2ox
-         NuXZepFhSB+OwCmzL6X7CAGtbV1DvsxLBpfnwmywHMj3ps8dQcTAUam4nqhQJtbLUUzy
-         iyHQriX2usLydgNDfp0CUj80FZsbeNJ3ILO/BL8DiJdzXzDJDdgi9iqbjJv4jSakVOEa
-         U/4w==
-X-Gm-Message-State: AOAM531blbTBtDqtZK042Zb2II1vV+RxEPLVdg6q8/EPPJ3SnrkTxBax
-        RVevyOqbj+jqeZWn2CzXkHyzaw==
-X-Google-Smtp-Source: ABdhPJxsQT1ztD0lh1/0ccaL0ZTcHbZx32nTGgPOptwOia/Vap2jPDUXToCOLm5fL6HRJJsLfse8jA==
-X-Received: by 2002:adf:ec0b:: with SMTP id x11mr5396504wrn.175.1615908795642;
-        Tue, 16 Mar 2021 08:33:15 -0700 (PDT)
-Received: from phenom.ffwll.local ([2a02:168:57f4:0:efd0:b9e5:5ae6:c2fa])
-        by smtp.gmail.com with ESMTPSA id h22sm3985078wmb.36.2021.03.16.08.33.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 16 Mar 2021 08:33:15 -0700 (PDT)
-From:   Daniel Vetter <daniel.vetter@ffwll.ch>
-To:     DRI Development <dri-devel@lists.freedesktop.org>,
-        LKML <linux-kernel@vger.kernel.org>
-Cc:     kvm@vger.kernel.org, linux-mm@kvack.org,
-        linux-arm-kernel@lists.infradead.org,
-        linux-samsung-soc@vger.kernel.org, linux-media@vger.kernel.org,
-        Daniel Vetter <daniel.vetter@ffwll.ch>, 3pvd@google.com,
-        Jann Horn <jannh@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Peter Xu <peterx@redhat.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Daniel Vetter <daniel.vetter@intel.com>
-Subject: [PATCH 3/3] mm: unexport follow_pfn
-Date:   Tue, 16 Mar 2021 16:33:03 +0100
-Message-Id: <20210316153303.3216674-4-daniel.vetter@ffwll.ch>
-X-Mailer: git-send-email 2.30.0
-In-Reply-To: <20210316153303.3216674-1-daniel.vetter@ffwll.ch>
-References: <20210316153303.3216674-1-daniel.vetter@ffwll.ch>
+        id S237405AbhCPPtD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 16 Mar 2021 11:49:03 -0400
+Received: from casper.infradead.org ([90.155.50.34]:39140 "EHLO
+        casper.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S237322AbhCPPs3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 16 Mar 2021 11:48:29 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
+        Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
+        Content-Description:In-Reply-To:References;
+        bh=12rvd64Ndi7MRA+1SoMh242ee4C3L3o7Pby48IMpla4=; b=pRv8Va/4qX1pEYYBqJk0vnbVPp
+        MsAX+LIZx3fF9lJjdvUR8D1kDe/YT373EXtrV3AMJAYizNDEVxeHr3hZ7hQFevrbxp8sM59nDOhfP
+        Ty2fFGJQYXKG1ej2zqJiT/QB3zmW5XHL6ZmSs+dxyOfXVlpFuHZ1zS8KYdPV/U6YjZxgWAo5o10fz
+        Ka4FRHzAWihGD2X1aXfgx4tM+HiwWRXYYf0U4WwwpKx8Qp+1Z8cn76b+vNFwSVA+I5saBYkVNz6qK
+        iVj/pNy9rreGA1YKwDQQbKt9W6af59N8PZT3z1dUYxMtlbbl09W1zFhtykyE0u2ku+Su0+0+LQo/o
+        9tCx0xYg==;
+Received: from [89.144.199.244] (helo=localhost)
+        by casper.infradead.org with esmtpsa (Exim 4.94 #2 (Red Hat Linux))
+        id 1lMBoC-000FeZ-UZ; Tue, 16 Mar 2021 15:40:40 +0000
+From:   Christoph Hellwig <hch@lst.de>
+To:     Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
+        Li Yang <leoyang.li@nxp.com>
+Cc:     Michael Ellerman <mpe@ellerman.id.au>,
+        David Woodhouse <dwmw2@infradead.org>,
+        Lu Baolu <baolu.lu@linux.intel.com>,
+        linuxppc-dev@lists.ozlabs.org, linux-arm-msm@vger.kernel.org,
+        dri-devel@lists.freedesktop.org, freedreno@lists.freedesktop.org,
+        iommu@lists.linux-foundation.org,
+        linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
+Subject: cleanup unused or almost unused IOMMU APIs and the FSL PAMU driver v2
+Date:   Tue, 16 Mar 2021 16:38:06 +0100
+Message-Id: <20210316153825.135976-1-hch@lst.de>
+X-Mailer: git-send-email 2.30.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Both kvm (in bd2fae8da794 ("KVM: do not assume PTE is writable after
-follow_pfn")) and vfio (in 07956b6269d3 ("vfio/type1: Use
-follow_pte()")) have lost their callsites of follow_pfn(). All the
-other ones have been switched over to unsafe_follow_pfn because they
-cannot be fixed without breaking userspace api.
+Hi all,
 
-Argueably the vfio code is still racy, but that's kinda a bigger
-picture. But since it does leak the pte beyond where it drops the pt
-lock, without anything else like an mmu notifier guaranteeing
-coherence, the problem is at least clearly visible in the vfio code.
-So good enough with me.
+there are a bunch of IOMMU APIs that are entirely unused, or only used as
+a private communication channel between the FSL PAMU driver and it's only
+consumer, the qbman portal driver.
 
-I've decided to keep the explanation that after dropping the pt lock
-you must have an mmu notifier if you keep using the pte somehow by
-adjusting it and moving it into the kerneldoc for the new follow_pte()
-function.
+So this series drops a huge chunk of entirely unused FSL PAMU
+functionality, then drops all kinds of unused IOMMU APIs, and then
+replaces what is left of the iommu_attrs with properly typed, smaller
+and easier to use specific APIs.
 
-Cc: 3pvd@google.com
-Cc: Jann Horn <jannh@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Jason Gunthorpe <jgg@nvidia.com>
-Cc: Cornelia Huck <cohuck@redhat.com>
-Cc: Peter Xu <peterx@redhat.com>
-Cc: Alex Williamson <alex.williamson@redhat.com>
-Cc: linux-mm@kvack.org
-Cc: linux-arm-kernel@lists.infradead.org
-Cc: linux-samsung-soc@vger.kernel.org
-Cc: linux-media@vger.kernel.org
-Cc: kvm@vger.kernel.org
-Signed-off-by: Daniel Vetter <daniel.vetter@intel.com>
----
- include/linux/mm.h |  2 --
- mm/memory.c        | 26 +++++---------------------
- mm/nommu.c         | 13 +------------
- 3 files changed, 6 insertions(+), 35 deletions(-)
+Changes since v1:
+ - use a different way to control strict flushing behavior (from Robin)
+ - remove the iommu_cmd_line wrappers
+ - simplify the pagetbl quirks a little more
+ - slightly improved patch ordering
+ - better changelogs
 
-diff --git a/include/linux/mm.h b/include/linux/mm.h
-index caec8b25d66f..304588e2f829 100644
---- a/include/linux/mm.h
-+++ b/include/linux/mm.h
-@@ -1693,8 +1693,6 @@ int follow_invalidate_pte(struct mm_struct *mm, unsigned long address,
- 			  pmd_t **pmdpp, spinlock_t **ptlp);
- int follow_pte(struct mm_struct *mm, unsigned long address,
- 	       pte_t **ptepp, spinlock_t **ptlp);
--int follow_pfn(struct vm_area_struct *vma, unsigned long address,
--	unsigned long *pfn);
- int unsafe_follow_pfn(struct vm_area_struct *vma, unsigned long address,
- 		      unsigned long *pfn);
- int follow_phys(struct vm_area_struct *vma, unsigned long address,
-diff --git a/mm/memory.c b/mm/memory.c
-index e8a145505b69..317e653c8aeb 100644
---- a/mm/memory.c
-+++ b/mm/memory.c
-@@ -4724,7 +4724,10 @@ int follow_invalidate_pte(struct mm_struct *mm, unsigned long address,
-  * should be taken for read.
-  *
-  * KVM uses this function.  While it is arguably less bad than ``follow_pfn``,
-- * it is not a good general-purpose API.
-+ * it is not a good general-purpose API: If callers use the pte after they've
-+ * unlocked @ptlp they must ensure coherency with pte updates by using a
-+ * &mmu_notifier to follow updates. Any caller not following these requirements
-+ * must use unsafe_follow_pfn() instead.
-  *
-  * Return: zero on success, -ve otherwise.
-  */
-@@ -4735,25 +4738,7 @@ int follow_pte(struct mm_struct *mm, unsigned long address,
- }
- EXPORT_SYMBOL_GPL(follow_pte);
- 
--/**
-- * follow_pfn - look up PFN at a user virtual address
-- * @vma: memory mapping
-- * @address: user virtual address
-- * @pfn: location to store found PFN
-- *
-- * Only IO mappings and raw PFN mappings are allowed. Note that callers must
-- * ensure coherency with pte updates by using a &mmu_notifier to follow updates.
-- * If this is not feasible, or the access to the @pfn is only very short term,
-- * use follow_pte_pmd() instead and hold the pagetable lock for the duration of
-- * the access instead. Any caller not following these requirements must use
-- * unsafe_follow_pfn() instead.
-- *
-- * This function does not allow the caller to read the permissions
-- * of the PTE.  Do not use it.
-- *
-- * Return: zero and the pfn at @pfn on success, -ve otherwise.
-- */
--int follow_pfn(struct vm_area_struct *vma, unsigned long address,
-+static int follow_pfn(struct vm_area_struct *vma, unsigned long address,
- 	unsigned long *pfn)
- {
- 	int ret = -EINVAL;
-@@ -4770,7 +4755,6 @@ int follow_pfn(struct vm_area_struct *vma, unsigned long address,
- 	pte_unmap_unlock(ptep, ptl);
- 	return 0;
- }
--EXPORT_SYMBOL_GPL(follow_pfn);
- 
- /**
-  * unsafe_follow_pfn - look up PFN at a user virtual address
-diff --git a/mm/nommu.c b/mm/nommu.c
-index 1dc983f50e2c..cee29d0791b3 100644
---- a/mm/nommu.c
-+++ b/mm/nommu.c
-@@ -111,17 +111,7 @@ unsigned int kobjsize(const void *objp)
- 	return page_size(page);
- }
- 
--/**
-- * follow_pfn - look up PFN at a user virtual address
-- * @vma: memory mapping
-- * @address: user virtual address
-- * @pfn: location to store found PFN
-- *
-- * Only IO mappings and raw PFN mappings are allowed.
-- *
-- * Returns zero and the pfn at @pfn on success, -ve otherwise.
-- */
--int follow_pfn(struct vm_area_struct *vma, unsigned long address,
-+static int follow_pfn(struct vm_area_struct *vma, unsigned long address,
- 	unsigned long *pfn)
- {
- 	if (!(vma->vm_flags & (VM_IO | VM_PFNMAP)))
-@@ -130,7 +120,6 @@ int follow_pfn(struct vm_area_struct *vma, unsigned long address,
- 	*pfn = address >> PAGE_SHIFT;
- 	return 0;
- }
--EXPORT_SYMBOL_GPL(follow_pfn);
- 
- /**
-  * unsafe_follow_pfn - look up PFN at a user virtual address
--- 
-2.30.0
-
+Diffstat:
+ arch/powerpc/include/asm/fsl_pamu_stash.h   |   12 
+ drivers/gpu/drm/msm/adreno/adreno_gpu.c     |    5 
+ drivers/iommu/amd/iommu.c                   |   23 
+ drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c |   75 ---
+ drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h |    1 
+ drivers/iommu/arm/arm-smmu/arm-smmu.c       |  111 +---
+ drivers/iommu/arm/arm-smmu/arm-smmu.h       |    2 
+ drivers/iommu/dma-iommu.c                   |    9 
+ drivers/iommu/fsl_pamu.c                    |  264 ----------
+ drivers/iommu/fsl_pamu.h                    |   10 
+ drivers/iommu/fsl_pamu_domain.c             |  694 ++--------------------------
+ drivers/iommu/fsl_pamu_domain.h             |   46 -
+ drivers/iommu/intel/iommu.c                 |   95 ---
+ drivers/iommu/iommu.c                       |  115 +---
+ drivers/soc/fsl/qbman/qman_portal.c         |   55 --
+ drivers/vfio/vfio_iommu_type1.c             |   31 -
+ drivers/vhost/vdpa.c                        |   10 
+ include/linux/io-pgtable.h                  |    4 
+ include/linux/iommu.h                       |   76 ---
+ 19 files changed, 203 insertions(+), 1435 deletions(-)
