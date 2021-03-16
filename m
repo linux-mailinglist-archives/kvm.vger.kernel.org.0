@@ -2,106 +2,109 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5B66033D0F3
-	for <lists+kvm@lfdr.de>; Tue, 16 Mar 2021 10:40:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1409633D18C
+	for <lists+kvm@lfdr.de>; Tue, 16 Mar 2021 11:14:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234156AbhCPJkD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 16 Mar 2021 05:40:03 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:60662 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231278AbhCPJjh (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 16 Mar 2021 05:39:37 -0400
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 12G9YDHk014438
-        for <kvm@vger.kernel.org>; Tue, 16 Mar 2021 05:39:36 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=CHYZu2cbs6yMgtJjrJG0aFbvgAoj/Ty9uQ6jvhuotnY=;
- b=UbhFwqnSzs75ovftYoMJRBzW7KVzA+VJ6b4sAUhHOyt249QlJnjPH3k6NNLC2GvS4Od2
- r+gkLkTSWdunPK+5R/ZK88dz4cb3t13ZkNw0TPpH8UwBOkehC+U20EAVwD3UiuEw411E
- 8T9gWDc3jbdt6GdDS3U65m3ia6wCpvt4V2C2Mn85xTD5mlfhP1oi1es/YHxWg0v8tDNG
- vPdsgyiktFreSDjCpZbHfpd7Sg14m5tYJQBLhgK+xoi7xpTeGX+6u59xhw+mQF8Ce+j6
- 9qoF4kx1c2/UhI3CcNQBNOguK0BtCHdwmVOruSIbaAzcvmo+LJNizE13RZhqfLjdLk4o ug== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 37abcxp6a6-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Tue, 16 Mar 2021 05:39:36 -0400
-Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 12G9akQH024870
-        for <kvm@vger.kernel.org>; Tue, 16 Mar 2021 05:39:36 -0400
-Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 37abcxp69f-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 16 Mar 2021 05:39:36 -0400
-Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
-        by ppma04fra.de.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 12G9T60T002983;
-        Tue, 16 Mar 2021 09:39:34 GMT
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
-        by ppma04fra.de.ibm.com with ESMTP id 378n189dgx-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 16 Mar 2021 09:39:34 +0000
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 12G9dVis36438294
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 16 Mar 2021 09:39:31 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 08EB95204E;
-        Tue, 16 Mar 2021 09:39:31 +0000 (GMT)
-Received: from oc3016276355.ibm.com (unknown [9.145.149.250])
-        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id BA97C52054;
-        Tue, 16 Mar 2021 09:39:30 +0000 (GMT)
-Subject: Re: [kvm-unit-tests PATCH v6 0/6] CSS Mesurement Block
-To:     Janosch Frank <frankja@linux.ibm.com>,
-        Cornelia Huck <cohuck@redhat.com>
-Cc:     kvm@vger.kernel.org, david@redhat.com, thuth@redhat.com,
-        imbrenda@linux.ibm.com
-References: <1615545714-13747-1-git-send-email-pmorel@linux.ibm.com>
- <20210312121805.4fab030c.cohuck@redhat.com>
- <3e422288-77d5-3869-ba21-64b4fe2f2551@linux.ibm.com>
-From:   Pierre Morel <pmorel@linux.ibm.com>
-Message-ID: <e60a8abd-48cb-29fe-ea3f-7b750939f1b0@linux.ibm.com>
-Date:   Tue, 16 Mar 2021 10:39:30 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.8.0
+        id S236560AbhCPKNu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 16 Mar 2021 06:13:50 -0400
+Received: from mail.kernel.org ([198.145.29.99]:56456 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S236564AbhCPKNc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 16 Mar 2021 06:13:32 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id C740D64F91;
+        Tue, 16 Mar 2021 10:13:31 +0000 (UTC)
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.lan)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94)
+        (envelope-from <maz@kernel.org>)
+        id 1lM6hd-001uep-Iw; Tue, 16 Mar 2021 10:13:29 +0000
+From:   Marc Zyngier <maz@kernel.org>
+To:     kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
+        kvm@vger.kernel.org
+Cc:     dave.martin@arm.com, daniel.kiss@arm.com,
+        Will Deacon <will@kernel.org>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        broonie@kernel.org, kernel-team@android.com
+Subject: [PATCH 00/10] KVM: arm64: Enable SVE support on nVHE systems
+Date:   Tue, 16 Mar 2021 10:13:02 +0000
+Message-Id: <20210316101312.102925-1-maz@kernel.org>
+X-Mailer: git-send-email 2.29.2
 MIME-Version: 1.0
-In-Reply-To: <3e422288-77d5-3869-ba21-64b4fe2f2551@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.761
- definitions=2021-03-16_03:2021-03-15,2021-03-16 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 phishscore=0
- mlxlogscore=998 spamscore=0 impostorscore=0 malwarescore=0 adultscore=0
- mlxscore=0 priorityscore=1501 bulkscore=0 lowpriorityscore=0 clxscore=1015
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
- definitions=main-2103160065
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, dave.martin@arm.com, daniel.kiss@arm.com, will@kernel.org, catalin.marinas@arm.com, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, broonie@kernel.org, kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+This series enables SVE support for KVM on nVHE hardware (or more
+likely, software models), and is an alternative to Daniel's patch[1]
+which has gone through 3 versions, but still has a number of issues.
 
+Instead of waiting for things to happen, I decided to try and see what
+I could come up with.
 
-On 3/12/21 3:17 PM, Janosch Frank wrote:
-> On 3/12/21 12:18 PM, Cornelia Huck wrote:
->> On Fri, 12 Mar 2021 11:41:48 +0100
->> Pierre Morel <pmorel@linux.ibm.com> wrote:
+The SVE save/restore is modelled after the SVE VHE flow, itself
+closely following the FPSIMD flow:
 
-...
+- the guest traps to EL2 on first SVE access, and will not trap
+  anymore until vcpu_put()
 
->> Series looks good to me.
->>
-> 
-> @Pierre: Could you please push to devel?
-> 
-> Let's give it a whirl on the CI over the weekend and I'll have another
-> look at the patches at Monday before picking.
-> 
+- ZCR_EL2 stays constant as long as the guest has SVE enabled
 
-  pushed this morning, sorry, had vacancies the last 2 days :)
+- on vcpu_put(), ZCR_EL2 is restored to the default value
 
+Most of this series only repaints things so that VHE and nVHE look as
+similar as possible, the ZCR_EL2 management being the most visible
+exception. This results in a bunch of preparatory patches that aim at
+making the code slightly more readable.
+
+This has been tested on a FVP model with both VHE.nVHE configurations
+using the string tests included with the "optimized-routines"
+library[2].
+
+Patches against 5.12-rc2.
+
+[1] https://lore.kernel.org/r/20210302164850.3553701-1-daniel.kiss@arm.com
+[2] https://github.com/ARM-software/optimized-routines
+
+Daniel Kiss (1):
+  KVM: arm64: Enable SVE support for nVHE
+
+Marc Zyngier (9):
+  KVM: arm64: Provide KVM's own save/restore SVE primitives
+  KVM: arm64: Use {read,write}_sysreg_el1 to access ZCR_EL1
+  KVM: arm64: Let vcpu_sve_pffr() handle HYP VAs
+  KVM: arm64: Introduce vcpu_sve_vq() helper
+  KVM: arm64: Rework SVE host-save/guest-restore
+  KVM: arm64: Map SVE context at EL2 when available
+  KVM: arm64: Save guest's ZCR_EL1 before saving the FPSIMD state
+  KVM: arm64: Add a nVHE-specific SVE VQ reset hypercall
+  KVM: arm64: Save/restore SVE state for nVHE
+
+ arch/arm64/Kconfig                      |  7 ---
+ arch/arm64/include/asm/fpsimdmacros.h   | 10 +++-
+ arch/arm64/include/asm/kvm_asm.h        |  1 +
+ arch/arm64/include/asm/kvm_host.h       | 25 +++-----
+ arch/arm64/include/asm/kvm_hyp.h        |  2 +
+ arch/arm64/kvm/arm.c                    |  5 --
+ arch/arm64/kvm/fpsimd.c                 | 31 ++++++++--
+ arch/arm64/kvm/guest.c                  |  6 +-
+ arch/arm64/kvm/hyp/fpsimd.S             | 10 ++++
+ arch/arm64/kvm/hyp/include/hyp/switch.h | 78 ++++++++++++-------------
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c      |  8 +++
+ arch/arm64/kvm/hyp/nvhe/switch.c        |  4 +-
+ arch/arm64/kvm/reset.c                  |  4 --
+ 13 files changed, 107 insertions(+), 84 deletions(-)
 
 -- 
-Pierre Morel
-IBM Lab Boeblingen
+2.29.2
+
