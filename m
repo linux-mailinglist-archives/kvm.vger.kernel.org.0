@@ -2,99 +2,129 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CDE6633D1D6
-	for <lists+kvm@lfdr.de>; Tue, 16 Mar 2021 11:32:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1C0D333D1E9
+	for <lists+kvm@lfdr.de>; Tue, 16 Mar 2021 11:40:42 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236686AbhCPKcP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 16 Mar 2021 06:32:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56752 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236697AbhCPKbv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 16 Mar 2021 06:31:51 -0400
-Received: from mail-wr1-x42f.google.com (mail-wr1-x42f.google.com [IPv6:2a00:1450:4864:20::42f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 64736C06174A
-        for <kvm@vger.kernel.org>; Tue, 16 Mar 2021 03:31:50 -0700 (PDT)
-Received: by mail-wr1-x42f.google.com with SMTP id v4so7147169wrp.13
-        for <kvm@vger.kernel.org>; Tue, 16 Mar 2021 03:31:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=nidvh/89tn+Y/HVhz7QTE7lN1pMSoiQsRzITbdZvVck=;
-        b=W1RROg28NSJY+h0JNcBa2OvIgqaoB2tDMiJU6Yuc1AWATHeOV/W7nAGnC706xuhnRg
-         Y92LTO9v79rp5ZibisFG/OJXd1QSQsDUqLPYsba8dZx5W1og0IRzlUqMVm/Z7Ld7O8Pu
-         ueWROCrphU1orMKIERU6TjPyZLuRJdEPKmsUKTyjpTkrJk/QiHEcaEBsASeatZkRJwI4
-         zSqUBkLUmYjBtJv9M2MLl6MXRgwC5JHcFxprBmGIF5U6uDou5yifMF8RfGwWXEHog6i5
-         Mzyl0VryqajrdJXkE/dw5iNFe47bk2QbScCn5nbuIWb0nSSurj/ZuiWicIY7YZe/kAmD
-         vExw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=nidvh/89tn+Y/HVhz7QTE7lN1pMSoiQsRzITbdZvVck=;
-        b=epmR3ljULFBlMMp2BFETu9AKYEFaK2AzHOTRUCBJ3nv9hf2xwLa/yvCq1+Ah5HswdX
-         z4aBAmChITaeMatXeDIbr2i72a6FnjfSADTRDOr8O0bAKU3qM5PXHiNgTLnCegW2SDBx
-         4JP4ro4i9X8P7i/jFqZ+6HbTvFOvnr5x5DWtJmIzjia1+joNzaZ/8B6fRi6+i9qAKU+P
-         tDEGar5PUyCbW4l9v/5tuOmro5Po0rwSSF2glxAHBlUSc3NqaPCL5QCM/cclS516r8P/
-         BPF9h7YFSBuetydCMBu1HLC+cs5hkA0oJOR2fvdxWwklBiVy/8nFyyK9ga3ZHRsEaIRp
-         CASQ==
-X-Gm-Message-State: AOAM532zMKkwtOq3/kXt5U7pbtD4Vc0W2LgpT09aEznimKB/1xYpzS16
-        PVygoWKYtPGCv4WXnWVfwVin0g==
-X-Google-Smtp-Source: ABdhPJz9EQO1Z6JuVEny9FQp/kgBd99pD2l8NgikvLXqL/mEIHDS8WGg/zebhRv8UldsnFywXQplgg==
-X-Received: by 2002:a5d:400f:: with SMTP id n15mr4028400wrp.89.1615890709026;
-        Tue, 16 Mar 2021 03:31:49 -0700 (PDT)
-Received: from google.com (230.69.233.35.bc.googleusercontent.com. [35.233.69.230])
-        by smtp.gmail.com with ESMTPSA id s18sm24967422wrr.27.2021.03.16.03.31.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 16 Mar 2021 03:31:48 -0700 (PDT)
-Date:   Tue, 16 Mar 2021 10:31:46 +0000
-From:   Quentin Perret <qperret@google.com>
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
-        kvm@vger.kernel.org, dave.martin@arm.com, daniel.kiss@arm.com,
-        Will Deacon <will@kernel.org>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        broonie@kernel.org, kernel-team@android.com
-Subject: Re: [PATCH 01/10] KVM: arm64: Provide KVM's own save/restore SVE
- primitives
-Message-ID: <YFCJEgjUZ5cnq0AK@google.com>
-References: <20210316101312.102925-1-maz@kernel.org>
- <20210316101312.102925-2-maz@kernel.org>
+        id S236739AbhCPKkE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 16 Mar 2021 06:40:04 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:23470 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231383AbhCPKjo (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 16 Mar 2021 06:39:44 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1615891184;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=8dU9IneHGaHNFOjov7DnhzTntJcnj94OUhCbXAz8zI4=;
+        b=C2yzw8mJywQy0mJ2ycnRKWRri4v7sXRv/QB7qcL3/Y/DTEXv7Jb+gQ1mGUJMiaPWxevPos
+        CQ5xzUctHYEc8pFM7u+6bExxs0BdYpGFG1tjtqSoABkJ60sae8s9e9g/4XVJjXNSxXQ6Zt
+        uIZDuKk7iVfLLIvfGPwRDsHzBl+NCDw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-520-vXftc9TbM5CF3E0ZmL606w-1; Tue, 16 Mar 2021 06:39:39 -0400
+X-MC-Unique: vXftc9TbM5CF3E0ZmL606w-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B49E310866A4;
+        Tue, 16 Mar 2021 10:39:37 +0000 (UTC)
+Received: from starship (unknown [10.35.207.30])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id E64661001281;
+        Tue, 16 Mar 2021 10:39:31 +0000 (UTC)
+Message-ID: <33a306b07a102ae8ad61efb18118a475ff89eba2.camel@redhat.com>
+Subject: Re: [PATCH 2/2] KVM: nSVM: improve SYSENTER emulation on AMD
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
+Cc:     "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        "open list:X86 ARCHITECTURE (32-BIT AND 64-BIT)" 
+        <linux-kernel@vger.kernel.org>, Wanpeng Li <wanpengli@tencent.com>,
+        Borislav Petkov <bp@alien8.de>
+Date:   Tue, 16 Mar 2021 12:39:30 +0200
+In-Reply-To: <f1ee6230-760e-b614-5290-663b44fe1436@redhat.com>
+References: <20210315174316.477511-1-mlevitsk@redhat.com>
+         <20210315174316.477511-3-mlevitsk@redhat.com>
+         <0dbcff57-8197-8fbb-809d-b47a4f5e9e77@redhat.com>
+         <1a4f35e356c50e38916acef6c86175b24efca0a3.camel@redhat.com>
+         <f1ee6230-760e-b614-5290-663b44fe1436@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210316101312.102925-2-maz@kernel.org>
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tuesday 16 Mar 2021 at 10:13:03 (+0000), Marc Zyngier wrote:
-> diff --git a/arch/arm64/kvm/hyp/fpsimd.S b/arch/arm64/kvm/hyp/fpsimd.S
-> index 01f114aa47b0..e4010d1acb79 100644
-> --- a/arch/arm64/kvm/hyp/fpsimd.S
-> +++ b/arch/arm64/kvm/hyp/fpsimd.S
-> @@ -19,3 +19,13 @@ SYM_FUNC_START(__fpsimd_restore_state)
->  	fpsimd_restore	x0, 1
->  	ret
->  SYM_FUNC_END(__fpsimd_restore_state)
-> +
-> +SYM_FUNC_START(__sve_restore_state)
-> +	sve_load 0, x1, x2, 3, x4
-> +	ret
-> +SYM_FUNC_END(__sve_restore_state)
+On Tue, 2021-03-16 at 09:16 +0100, Paolo Bonzini wrote:
+> On 15/03/21 19:19, Maxim Levitsky wrote:
+> > On Mon, 2021-03-15 at 18:56 +0100, Paolo Bonzini wrote:
+> > > On 15/03/21 18:43, Maxim Levitsky wrote:
+> > > > +	if (!guest_cpuid_is_intel(vcpu)) {
+> > > > +		/*
+> > > > +		 * If hardware supports Virtual VMLOAD VMSAVE then enable it
+> > > > +		 * in VMCB and clear intercepts to avoid #VMEXIT.
+> > > > +		 */
+> > > > +		if (vls) {
+> > > > +			svm_clr_intercept(svm, INTERCEPT_VMLOAD);
+> > > > +			svm_clr_intercept(svm, INTERCEPT_VMSAVE);
+> > > > +			svm->vmcb->control.virt_ext |= VIRTUAL_VMLOAD_VMSAVE_ENABLE_MASK;
+> > > > +		}
+> > > > +		/* No need to intercept these msrs either */
+> > > > +		set_msr_interception(vcpu, svm->msrpm, MSR_IA32_SYSENTER_EIP, 1, 1);
+> > > > +		set_msr_interception(vcpu, svm->msrpm, MSR_IA32_SYSENTER_ESP, 1, 1);
+> > > > +	}
+> > > 
+> > > An "else" is needed here to do the opposite setup (removing the "if
+> > > (vls)" from init_vmcb).
+> > 
+> > init_vmcb currently set the INTERCEPT_VMLOAD and INTERCEPT_VMSAVE and it doesn't enable vls
+> 
+> There's also this towards the end of the function:
+> 
+>          /*
+>           * If hardware supports Virtual VMLOAD VMSAVE then enable it
+>           * in VMCB and clear intercepts to avoid #VMEXIT.
+>           */
+>          if (vls) {
+>                  svm_clr_intercept(svm, INTERCEPT_VMLOAD);
+>                  svm_clr_intercept(svm, INTERCEPT_VMSAVE);
+>                  svm->vmcb->control.virt_ext |= 
+> VIRTUAL_VMLOAD_VMSAVE_ENABLE_MASK;
+>          }
+> 
+> > thus there is nothing to do if I don't want to enable vls.
+> > It seems reasonable to me.
+> > 
+> > Both msrs I marked as '.always = false' in the
+> > 'direct_access_msrs', which makes them be intercepted by the default.
+> > If I were to use '.always = true' it would feel a bit wrong as the intercept is not always
+> > enabled.
+> 
+> I agree that .always = false is correct.
+> 
+> > What do you think?
+> 
+> You can set the CPUID multiple times, so you could go from AMD to Intel 
+> and back.
 
-Nit: maybe this could be named __sve_load_state() for consistency with
-the EL1 version?
+I understand now, I will send V2 with that. Thanks for the review!
 
-> +SYM_FUNC_START(__sve_save_state)
-> +	sve_save 0, x1, 2
-> +	ret
-> +SYM_FUNC_END(__sve_restore_state)
+Best regards,
+	Maxim Levitsky
 
-SYM_FUNC_END(__sve_save_state) here?
+> 
+> Thanks,
+> 
+> Paolo
+> 
 
-Thanks,
-Quentin
+
