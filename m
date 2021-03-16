@@ -2,25 +2,25 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F263233DB58
-	for <lists+kvm@lfdr.de>; Tue, 16 Mar 2021 18:47:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9824833DB85
+	for <lists+kvm@lfdr.de>; Tue, 16 Mar 2021 18:54:50 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239340AbhCPRrT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 16 Mar 2021 13:47:19 -0400
-Received: from mail.kernel.org ([198.145.29.99]:40160 "EHLO mail.kernel.org"
+        id S239362AbhCPRyT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 16 Mar 2021 13:54:19 -0400
+Received: from mail.kernel.org ([198.145.29.99]:43558 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S239239AbhCPRqp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 16 Mar 2021 13:46:45 -0400
+        id S239369AbhCPRxi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 16 Mar 2021 13:53:38 -0400
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 707D665120;
-        Tue, 16 Mar 2021 17:46:45 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 7E0CD65104;
+        Tue, 16 Mar 2021 17:53:38 +0000 (UTC)
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.lan)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.94)
         (envelope-from <maz@kernel.org>)
-        id 1lMDmF-0021ao-Nw; Tue, 16 Mar 2021 17:46:43 +0000
+        id 1lMDmG-0021ao-9X; Tue, 16 Mar 2021 17:46:44 +0000
 From:   Marc Zyngier <maz@kernel.org>
 To:     linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
         kvmarm@lists.cs.columbia.edu
@@ -31,9 +31,9 @@ Cc:     James Morse <james.morse@arm.com>,
         Eric Auger <eric.auger@redhat.com>,
         Hector Martin <marcan@marcan.st>,
         Mark Rutland <mark.rutland@arm.com>, kernel-team@android.com
-Subject: [PATCH 09/11] irqchip/apple-aic: Fix [un]masking of guest timers
-Date:   Tue, 16 Mar 2021 17:46:14 +0000
-Message-Id: <20210316174617.173033-10-maz@kernel.org>
+Subject: [PATCH 10/11] irqchip/apple-aic: Initialise SYS_APL_VM_TMR_FIQ_ENA_EL1 at boot time
+Date:   Tue, 16 Mar 2021 17:46:15 +0000
+Message-Id: <20210316174617.173033-11-maz@kernel.org>
 X-Mailer: git-send-email 2.29.2
 In-Reply-To: <20210316174617.173033-1-maz@kernel.org>
 References: <20210316174617.173033-1-maz@kernel.org>
@@ -47,43 +47,43 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-As the enabling of the guest timer interrupts is done by
-accessing a system register, make sure the access is correctly
-synchronised.
+Instead of masking the guest timer at the source, take advantage of
+the SYS_APL_VM_TMR_FIQ_ENA_EL1 register and properly mask the
+timers at init time.
+
+For a good measure, add the missing ISB that synchronises all
+the previous sysreg accesses.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- drivers/irqchip/irq-apple-aic.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ drivers/irqchip/irq-apple-aic.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/irqchip/irq-apple-aic.c b/drivers/irqchip/irq-apple-aic.c
-index ddc0856f36a5..447c9e87f13a 100644
+index 447c9e87f13a..26ee149dbae3 100644
 --- a/drivers/irqchip/irq-apple-aic.c
 +++ b/drivers/irqchip/irq-apple-aic.c
-@@ -242,9 +242,11 @@ static void aic_fiq_mask(struct irq_data *d)
- 	switch (d->hwirq) {
- 	case AIC_TMR_GUEST_PHYS:
- 		sysreg_clear_set_s(SYS_APL_VM_TMR_FIQ_ENA_EL1, VM_TMR_FIQ_ENABLE_P, 0);
-+		isb();
- 		break;
- 	case AIC_TMR_GUEST_VIRT:
- 		sysreg_clear_set_s(SYS_APL_VM_TMR_FIQ_ENA_EL1, VM_TMR_FIQ_ENABLE_V, 0);
-+		isb();
- 		break;
- 	}
- }
-@@ -254,9 +256,11 @@ static void aic_fiq_unmask(struct irq_data *d)
- 	switch (d->hwirq) {
- 	case AIC_TMR_GUEST_PHYS:
- 		sysreg_clear_set_s(SYS_APL_VM_TMR_FIQ_ENA_EL1, 0, VM_TMR_FIQ_ENABLE_P);
-+		isb();
- 		break;
- 	case AIC_TMR_GUEST_VIRT:
- 		sysreg_clear_set_s(SYS_APL_VM_TMR_FIQ_ENA_EL1, 0, VM_TMR_FIQ_ENABLE_V);
-+		isb();
- 		break;
- 	}
- }
+@@ -622,8 +622,8 @@ static int aic_init_cpu(unsigned int cpu)
+ 	/* Timer FIQs */
+ 	sysreg_clear_set(cntp_ctl_el0, 0, ARCH_TIMER_CTRL_IT_MASK);
+ 	sysreg_clear_set(cntv_ctl_el0, 0, ARCH_TIMER_CTRL_IT_MASK);
+-	sysreg_clear_set_s(SYS_CNTP_CTL_EL02, 0, ARCH_TIMER_CTRL_IT_MASK);
+-	sysreg_clear_set_s(SYS_CNTV_CTL_EL02, 0, ARCH_TIMER_CTRL_IT_MASK);
++	sysreg_clear_set_s(SYS_APL_VM_TMR_FIQ_ENA_EL1,
++			   VM_TMR_FIQ_ENABLE_V | VM_TMR_FIQ_ENABLE_P, 0);
+ 
+ 	/* PMC FIQ */
+ 	sysreg_clear_set_s(SYS_APL_PMCR0_EL1, PMCR0_IMODE | PMCR0_IACT,
+@@ -633,6 +633,9 @@ static int aic_init_cpu(unsigned int cpu)
+ 	sysreg_clear_set_s(SYS_APL_UPMCR0_EL1, UPMCR0_IMODE,
+ 			   FIELD_PREP(UPMCR0_IMODE, UPMCR0_IMODE_OFF));
+ 
++	/* Commit all of the above */
++	isb();
++
+ 	/*
+ 	 * Make sure the kernel's idea of logical CPU order is the same as AIC's
+ 	 * If we ever end up with a mismatch here, we will have to introduce
 -- 
 2.29.2
 
