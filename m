@@ -2,108 +2,174 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D927033D849
-	for <lists+kvm@lfdr.de>; Tue, 16 Mar 2021 16:54:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D3EB933D882
+	for <lists+kvm@lfdr.de>; Tue, 16 Mar 2021 17:03:00 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237592AbhCPPxX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 16 Mar 2021 11:53:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41266 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237591AbhCPPw5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 16 Mar 2021 11:52:57 -0400
-Received: from mail-oi1-x232.google.com (mail-oi1-x232.google.com [IPv6:2607:f8b0:4864:20::232])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6FCFFC061763
-        for <kvm@vger.kernel.org>; Tue, 16 Mar 2021 08:52:56 -0700 (PDT)
-Received: by mail-oi1-x232.google.com with SMTP id x135so34079413oia.9
-        for <kvm@vger.kernel.org>; Tue, 16 Mar 2021 08:52:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ffwll.ch; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=H9qbH69IBoptMfn8E8EI/JvkYdGz2fb3BHGazwe2dlM=;
-        b=N9EuUopTyLYmp/30v4PlCksqyqVrtHnmIWXaZ4XcHcyJlh/IKbvvrNQY1qfiH3e5Ee
-         lelk1b8VUwFdD+q76VSpMaPnzL/lvIFOuKBCKDjInKV/GcppAeygsSyrgDsECt+95gH8
-         4Hrr19JKU7qUT90Jqgp59LH0ykjG0DfXZI4HE=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=H9qbH69IBoptMfn8E8EI/JvkYdGz2fb3BHGazwe2dlM=;
-        b=rGtxLvY1L6BXeLJWE9RQwsOQVnKnBCpeicNISA3mJh6GvALwlkg1HGTzb1zyyIZAeX
-         UAnvv+3zShPtR/Zp3LrLH+9QyUoqvCuNWnF2xaSqUCk9dblWOLNSCNWG9P3+VUHzlkBC
-         kEYCPZKwttwjglB66HjDCAF26OLPLaUGV78euQQUUjgnVL6Tpm7pdVk+gXUgEuJlg9RM
-         FXKvYP2+RXxBaQlE9f0RyR4GTIVTb1DR+VZ+VT13O77JuYYr0ty7HfjcUzWN9xyOkgx1
-         ResKJ7Wwg3+8jIq5Qxrv7VQqGO0mOUepi1oAk05Dwioux++ovFBiraLP0ttyeQgIIvc3
-         OG+Q==
-X-Gm-Message-State: AOAM530sPjvpzqa7+gXVRiyrh0UpZR/FeHYpxpaECosA84ii2Mjcop4c
-        os381jqlA9qJovtoTOV9fyMgf+/35vwztsuRnKhCeA==
-X-Google-Smtp-Source: ABdhPJznz2I6yaUfu5sapSxfaawTvDWTc4egwzJFTFOwI97d2Oq+qgjhGAyeojv1m2fr5BiGgMr/zgmA3/HTfQyhJ8k=
-X-Received: by 2002:aca:4188:: with SMTP id o130mr152546oia.101.1615909975767;
- Tue, 16 Mar 2021 08:52:55 -0700 (PDT)
+        id S234223AbhCPQC3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 16 Mar 2021 12:02:29 -0400
+Received: from casper.infradead.org ([90.155.50.34]:40304 "EHLO
+        casper.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S238406AbhCPQA0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 16 Mar 2021 12:00:26 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
+        References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
+        Content-Type:Content-ID:Content-Description;
+        bh=uAkAL9bKpEi2EHehW2pGjvC7Z2PgJIxUdOpjcgZC0vk=; b=Qt22ze7Ge8lRN1C/kGC82F1d6H
+        MJExup8bOyJQbhJDnVi2n/POMgBEQJBqGxeQUfNS7uZY0W0qw8WeFwUmbF5QwFTot1AgE9JTwPHOJ
+        cBdq0yVzkPLNFL+kM6co7kJ70DIwfkL6snqTVa5+A1B79uxD9b26FLheYDcM03iOsXg1UmQoIRr++
+        0+WdeMQw5SMM1Oinu7tKy4rKkKdpW7l/RtTpD3LQkXe6YqbQe2pibrMwmCdhGFFrFCzNIO/j1gn11
+        2mg0fIH7YfDY19y+biZHqZgbHl+uLPnbrNnqgU5kYwS63iJ93vPMjJ8Pl3e9/IcuoBdMfnRTCcWEA
+        tMnVcidQ==;
+Received: from 089144199244.atnat0008.highway.a1.net ([89.144.199.244] helo=localhost)
+        by casper.infradead.org with esmtpsa (Exim 4.94 #2 (Red Hat Linux))
+        id 1lMC6q-000Gy8-1D; Tue, 16 Mar 2021 15:59:54 +0000
+From:   Christoph Hellwig <hch@lst.de>
+To:     Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
+        Li Yang <leoyang.li@nxp.com>
+Cc:     Michael Ellerman <mpe@ellerman.id.au>,
+        David Woodhouse <dwmw2@infradead.org>,
+        Lu Baolu <baolu.lu@linux.intel.com>,
+        linuxppc-dev@lists.ozlabs.org, linux-arm-msm@vger.kernel.org,
+        dri-devel@lists.freedesktop.org, freedreno@lists.freedesktop.org,
+        iommu@lists.linux-foundation.org,
+        linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
+Subject: [PATCH 08/18] iommu/fsl_pamu: merge pamu_set_liodn and map_liodn
+Date:   Tue, 16 Mar 2021 16:38:14 +0100
+Message-Id: <20210316153825.135976-9-hch@lst.de>
+X-Mailer: git-send-email 2.30.1
+In-Reply-To: <20210316153825.135976-1-hch@lst.de>
+References: <20210316153825.135976-1-hch@lst.de>
 MIME-Version: 1.0
-References: <20210316153303.3216674-1-daniel.vetter@ffwll.ch>
- <20210316153303.3216674-3-daniel.vetter@ffwll.ch> <20210316154549.GA60450@infradead.org>
-In-Reply-To: <20210316154549.GA60450@infradead.org>
-From:   Daniel Vetter <daniel.vetter@ffwll.ch>
-Date:   Tue, 16 Mar 2021 16:52:44 +0100
-Message-ID: <CAKMK7uF8Lv0P4TuoctjUiVHtRzAnXf9a50JaYgm0rV+v+7=LFw@mail.gmail.com>
-Subject: Re: [PATCH 2/3] media/videobuf1|2: Mark follow_pfn usage as unsafe
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     DRI Development <dri-devel@lists.freedesktop.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        KVM list <kvm@vger.kernel.org>, Linux MM <linux-mm@kvack.org>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        linux-samsung-soc <linux-samsung-soc@vger.kernel.org>,
-        "open list:DMA BUFFER SHARING FRAMEWORK" 
-        <linux-media@vger.kernel.org>, Tomasz Figa <tfiga@chromium.org>,
-        Hans Verkuil <hverkuil-cisco@xs4all.nl>,
-        Daniel Vetter <daniel.vetter@intel.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        Kees Cook <keescook@chromium.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        John Hubbard <jhubbard@nvidia.com>,
-        "J??r??me Glisse" <jglisse@redhat.com>, Jan Kara <jack@suse.cz>,
-        Pawel Osciak <pawel@osciak.com>,
-        Marek Szyprowski <m.szyprowski@samsung.com>,
-        Kyungmin Park <kyungmin.park@samsung.com>,
-        Laurent Dufour <ldufour@linux.ibm.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Daniel Jordan <daniel.m.jordan@oracle.com>,
-        Michel Lespinasse <walken@google.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Mar 16, 2021 at 4:46 PM Christoph Hellwig <hch@infradead.org> wrote:
->
-> On Tue, Mar 16, 2021 at 04:33:02PM +0100, Daniel Vetter wrote:
-> > The media model assumes that buffers are all preallocated, so that
-> > when a media pipeline is running we never miss a deadline because the
-> > buffers aren't allocated or available.
-> >
-> > This means we cannot fix the v4l follow_pfn usage through
-> > mmu_notifier, without breaking how this all works. The only real fix
-> > is to deprecate userptr support for VM_IO | VM_PFNMAP mappings and
-> > tell everyone to cut over to dma-buf memory sharing for zerocopy.
-> >
-> > userptr for normal memory will keep working as-is, this only affects
-> > the zerocopy userptr usage enabled in 50ac952d2263 ("[media]
-> > videobuf2-dma-sg: Support io userptr operations on io memory").
->
-> Maybe I'm missing something, but wasn't the conclusion last time that
-> this hackish early device to device copy support can just go away?
+Merge the two fuctions that configure the ppaace into a single coherent
+function.  I somehow doubt we need the two pamu_config_ppaace calls,
+but keep the existing behavior just to be on the safe side.
 
-My understanding is mostly, but with some objections. And I kinda
-don't want to let this die in a bikeshed and then not getting rid of
-follow_pfn as a result. There's enough people who acked this, and the
-full removal got some nack from Mauro iirc.
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+Acked-by: Li Yang <leoyang.li@nxp.com>
+---
+ drivers/iommu/fsl_pamu_domain.c | 65 +++++++++------------------------
+ 1 file changed, 17 insertions(+), 48 deletions(-)
 
-Maybe if no bug report ever shows up for 1-2 years we can sunset it
-for real&completely.
--Daniel
+diff --git a/drivers/iommu/fsl_pamu_domain.c b/drivers/iommu/fsl_pamu_domain.c
+index 40eff4b7bc5d42..4a4944332674f7 100644
+--- a/drivers/iommu/fsl_pamu_domain.c
++++ b/drivers/iommu/fsl_pamu_domain.c
+@@ -54,25 +54,6 @@ static int __init iommu_init_mempool(void)
+ 	return 0;
+ }
+ 
+-/* Map the DMA window corresponding to the LIODN */
+-static int map_liodn(int liodn, struct fsl_dma_domain *dma_domain)
+-{
+-	int ret;
+-	struct iommu_domain_geometry *geom = &dma_domain->iommu_domain.geometry;
+-	unsigned long flags;
+-
+-	spin_lock_irqsave(&iommu_lock, flags);
+-	ret = pamu_config_ppaace(liodn, geom->aperture_start,
+-				 geom->aperture_end - 1, ~(u32)0,
+-				 0, dma_domain->snoop_id, dma_domain->stash_id,
+-				 PAACE_AP_PERMS_QUERY | PAACE_AP_PERMS_UPDATE);
+-	spin_unlock_irqrestore(&iommu_lock, flags);
+-	if (ret)
+-		pr_debug("PAACE configuration failed for liodn %d\n", liodn);
+-
+-	return ret;
+-}
+-
+ static int update_liodn_stash(int liodn, struct fsl_dma_domain *dma_domain,
+ 			      u32 val)
+ {
+@@ -94,11 +75,11 @@ static int update_liodn_stash(int liodn, struct fsl_dma_domain *dma_domain,
+ }
+ 
+ /* Set the geometry parameters for a LIODN */
+-static int pamu_set_liodn(int liodn, struct device *dev,
+-			  struct fsl_dma_domain *dma_domain,
+-			  struct iommu_domain_geometry *geom_attr)
++static int pamu_set_liodn(struct fsl_dma_domain *dma_domain, struct device *dev,
++			  int liodn)
+ {
+-	phys_addr_t window_addr, window_size;
++	struct iommu_domain *domain = &dma_domain->iommu_domain;
++	struct iommu_domain_geometry *geom = &domain->geometry;
+ 	u32 omi_index = ~(u32)0;
+ 	unsigned long flags;
+ 	int ret;
+@@ -110,22 +91,25 @@ static int pamu_set_liodn(int liodn, struct device *dev,
+ 	 */
+ 	get_ome_index(&omi_index, dev);
+ 
+-	window_addr = geom_attr->aperture_start;
+-	window_size = geom_attr->aperture_end + 1;
+-
+ 	spin_lock_irqsave(&iommu_lock, flags);
+ 	ret = pamu_disable_liodn(liodn);
+-	if (!ret)
+-		ret = pamu_config_ppaace(liodn, window_addr, window_size, omi_index,
+-					 0, dma_domain->snoop_id,
+-					 dma_domain->stash_id, 0);
++	if (ret)
++		goto out_unlock;
++	ret = pamu_config_ppaace(liodn, geom->aperture_start,
++				 geom->aperture_end - 1, omi_index, 0,
++				 dma_domain->snoop_id, dma_domain->stash_id, 0);
++	if (ret)
++		goto out_unlock;
++	ret = pamu_config_ppaace(liodn, geom->aperture_start,
++				 geom->aperture_end - 1, ~(u32)0,
++				 0, dma_domain->snoop_id, dma_domain->stash_id,
++				 PAACE_AP_PERMS_QUERY | PAACE_AP_PERMS_UPDATE);
++out_unlock:
+ 	spin_unlock_irqrestore(&iommu_lock, flags);
+ 	if (ret) {
+ 		pr_debug("PAACE configuration failed for liodn %d\n",
+ 			 liodn);
+-		return ret;
+ 	}
+-
+ 	return ret;
+ }
+ 
+@@ -265,7 +249,6 @@ static int handle_attach_device(struct fsl_dma_domain *dma_domain,
+ 				int num)
+ {
+ 	unsigned long flags;
+-	struct iommu_domain *domain = &dma_domain->iommu_domain;
+ 	int ret = 0;
+ 	int i;
+ 
+@@ -280,21 +263,7 @@ static int handle_attach_device(struct fsl_dma_domain *dma_domain,
+ 		}
+ 
+ 		attach_device(dma_domain, liodn[i], dev);
+-		/*
+-		 * Check if geometry has already been configured
+-		 * for the domain. If yes, set the geometry for
+-		 * the LIODN.
+-		 */
+-		ret = pamu_set_liodn(liodn[i], dev, dma_domain,
+-				     &domain->geometry);
+-		if (ret)
+-			break;
+-
+-		/*
+-		 * Create window/subwindow mapping for
+-		 * the LIODN.
+-		 */
+-		ret = map_liodn(liodn[i], dma_domain);
++		ret = pamu_set_liodn(dma_domain, dev, liodn[i]);
+ 		if (ret)
+ 			break;
+ 	}
 -- 
-Daniel Vetter
-Software Engineer, Intel Corporation
-http://blog.ffwll.ch
+2.30.1
+
