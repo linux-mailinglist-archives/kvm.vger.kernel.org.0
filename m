@@ -2,47 +2,121 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 36C1C33CDF0
-	for <lists+kvm@lfdr.de>; Tue, 16 Mar 2021 07:28:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 192F033CEB2
+	for <lists+kvm@lfdr.de>; Tue, 16 Mar 2021 08:34:40 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231394AbhCPG1x (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 16 Mar 2021 02:27:53 -0400
-Received: from verein.lst.de ([213.95.11.211]:58538 "EHLO verein.lst.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229775AbhCPG1X (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 16 Mar 2021 02:27:23 -0400
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id 5C35268C4E; Tue, 16 Mar 2021 07:27:20 +0100 (CET)
-Date:   Tue, 16 Mar 2021 07:27:20 +0100
-From:   Christoph Hellwig <hch@lst.de>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     Christoph Hellwig <hch@lst.de>, Cornelia Huck <cohuck@redhat.com>,
-        kvm@vger.kernel.org, Alex Williamson <alex.williamson@redhat.com>,
-        "Raj, Ashok" <ashok.raj@intel.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Leon Romanovsky <leonro@nvidia.com>,
-        Max Gurtovoy <mgurtovoy@nvidia.com>,
-        Tarun Gupta <targupta@nvidia.com>
-Subject: Re: [PATCH v2 07/14] vfio/pci: Move VGA and VF initialization to
- functions
-Message-ID: <20210316062720.GA13303@lst.de>
-References: <0-v2-20d933792272+4ff-vfio1_jgg@nvidia.com> <7-v2-20d933792272+4ff-vfio1_jgg@nvidia.com> <20210315084534.GC29269@lst.de> <20210315230746.GJ2356281@nvidia.com>
+        id S231476AbhCPHeB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 16 Mar 2021 03:34:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46492 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232549AbhCPHdo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 16 Mar 2021 03:33:44 -0400
+Received: from mail-pl1-x643.google.com (mail-pl1-x643.google.com [IPv6:2607:f8b0:4864:20::643])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D0740C06174A;
+        Tue, 16 Mar 2021 00:33:43 -0700 (PDT)
+Received: by mail-pl1-x643.google.com with SMTP id n17so12976750plc.7;
+        Tue, 16 Mar 2021 00:33:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=4uwGLw4oyBg2siguHNzqzxEJ2zioYts2IjBxF9nVxAg=;
+        b=SdXcCZp5eAj0eG7le1UodFJ9kJpKFCcQXFQp8y9qS8SdgjuQUyQtykgdEoNmnyyzKW
+         IQ1GtYSUBCwWSC3WBh0bAoZ1T7a7sfvhhxTRkgQjODrJjpZBbfucYpPO1DICYL7y46U5
+         kVnaM9dnC+obTvaD/Pyd4n4TjkZkW4PzW+0l8hSS3H3HbX+yTGRz1cuTTefF98kwU7/9
+         9jyskWUQbxOckPjq60RBOooNAgPyiBqm2eqoD6AYFhZoYW7UqkZI+ejXh2XmO80BklJ8
+         C/uD2l2ry6DUrtnjfwjnWoB4JMxx2v6vYiNyXeiSwuyG9FbMSR2nPHCgnDmBRLpNRsXe
+         6uew==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=4uwGLw4oyBg2siguHNzqzxEJ2zioYts2IjBxF9nVxAg=;
+        b=X6gA/qSlTVxWah5/YczMbVHaD+iWPPIiRXzdbkxD5Gu9kaQQFsvZaEgS9MSNZ7uxzH
+         BNTchcTxviMiR6aK0J0+mXuTn5K1LZCJywkMOjioWZOElD36RCPyFJ7FA9z7dxif5YVo
+         3Y4W0Whe2Ro5eZsp6Ctd6OHXXZVYwWNY2Tx9AK8yuq5gDzdE0A3n6beZNaUuk97W1ZPW
+         GlCBxlZRGMPn32PdHemiIPDdAlmb3niM6QPFTsg2mt2ZON1ss7Z2kGMsnceyWFGuMmY5
+         J7OXugJEa2tGAuftgREuT2jxbzlpX7u2U9J1melE+kL0//MhRpPXPo4R2nCcVtou0nmt
+         lw+Q==
+X-Gm-Message-State: AOAM533g7q/ACucvqH1YuZvvrvgLSFhoC8pEYwyaakutxCcDQVTl7OG4
+        /YkGiGfuuNTVDUbsZ8WeTXk=
+X-Google-Smtp-Source: ABdhPJz2vO1LkuhskFr46Ba09gSjtiCwL5zhzdrTzGXkiqsvd3q1KCoj2T2CQeDKwYaintJT/FE2Ew==
+X-Received: by 2002:a17:90a:cb12:: with SMTP id z18mr3298352pjt.132.1615880023387;
+        Tue, 16 Mar 2021 00:33:43 -0700 (PDT)
+Received: from localhost.localdomain ([178.236.46.205])
+        by smtp.gmail.com with ESMTPSA id d20sm1850131pjv.47.2021.03.16.00.33.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 16 Mar 2021 00:33:42 -0700 (PDT)
+From:   menglong8.dong@gmail.com
+X-Google-Original-From: zhang.yunkai@zte.com.cn
+To:     pbonzini@redhat.com
+Cc:     shuah@kernel.org, mpe@ellerman.id.au, benh@kernel.crashing.org,
+        paulus@samba.org, zhang.yunkai@zte.com.cn,
+        akpm@linux-foundation.org, ricardo.canuelo@collabora.com,
+        kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
+Subject: [PATCH] selftests: remove duplicate include
+Date:   Tue, 16 Mar 2021 00:33:36 -0700
+Message-Id: <20210316073336.426255-1-zhang.yunkai@zte.com.cn>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210315230746.GJ2356281@nvidia.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Mar 15, 2021 at 08:07:46PM -0300, Jason Gunthorpe wrote:
-> So the goto unwind looks quite odd when this is open coded. At least
-> with the helpers you can read the init then uninit and go 'yah, OK,
-> this makes sense'
+From: Zhang Yunkai <zhang.yunkai@zte.com.cn>
 
-Still looks odd to me.  But this is your series and overall a major
-improvements, so:
+'assert.h' included in 'sparsebit.c' is duplicated.
+It is also included in the 161th line.
+'string.h' included in 'mincore_selftest.c' is duplicated.
+It is also included in the 15th line.
+'sched.h' included in 'tlbie_test.c' is duplicated.
+It is also included in the 33th line.
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Zhang Yunkai <zhang.yunkai@zte.com.cn>
+---
+ tools/testing/selftests/kvm/lib/sparsebit.c        | 1 -
+ tools/testing/selftests/mincore/mincore_selftest.c | 1 -
+ tools/testing/selftests/powerpc/mm/tlbie_test.c    | 1 -
+ 3 files changed, 3 deletions(-)
+
+diff --git a/tools/testing/selftests/kvm/lib/sparsebit.c b/tools/testing/selftests/kvm/lib/sparsebit.c
+index 031ba3c932ed..a0d0c83d83de 100644
+--- a/tools/testing/selftests/kvm/lib/sparsebit.c
++++ b/tools/testing/selftests/kvm/lib/sparsebit.c
+@@ -1890,7 +1890,6 @@ void sparsebit_validate_internal(struct sparsebit *s)
+  */
+ 
+ #include <stdlib.h>
+-#include <assert.h>
+ 
+ struct range {
+ 	sparsebit_idx_t first, last;
+diff --git a/tools/testing/selftests/mincore/mincore_selftest.c b/tools/testing/selftests/mincore/mincore_selftest.c
+index 5a1e85ff5d32..e54106643337 100644
+--- a/tools/testing/selftests/mincore/mincore_selftest.c
++++ b/tools/testing/selftests/mincore/mincore_selftest.c
+@@ -14,7 +14,6 @@
+ #include <sys/mman.h>
+ #include <string.h>
+ #include <fcntl.h>
+-#include <string.h>
+ 
+ #include "../kselftest.h"
+ #include "../kselftest_harness.h"
+diff --git a/tools/testing/selftests/powerpc/mm/tlbie_test.c b/tools/testing/selftests/powerpc/mm/tlbie_test.c
+index f85a0938ab25..48344a74b212 100644
+--- a/tools/testing/selftests/powerpc/mm/tlbie_test.c
++++ b/tools/testing/selftests/powerpc/mm/tlbie_test.c
+@@ -33,7 +33,6 @@
+ #include <sched.h>
+ #include <time.h>
+ #include <stdarg.h>
+-#include <sched.h>
+ #include <pthread.h>
+ #include <signal.h>
+ #include <sys/prctl.h>
+-- 
+2.25.1
+
