@@ -2,87 +2,88 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E9BC133CF40
-	for <lists+kvm@lfdr.de>; Tue, 16 Mar 2021 09:06:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 41F7D33CF43
+	for <lists+kvm@lfdr.de>; Tue, 16 Mar 2021 09:07:11 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232412AbhCPIFd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 16 Mar 2021 04:05:33 -0400
-Received: from mga17.intel.com ([192.55.52.151]:57420 "EHLO mga17.intel.com"
+        id S230175AbhCPIGi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 16 Mar 2021 04:06:38 -0400
+Received: from mga17.intel.com ([192.55.52.151]:57558 "EHLO mga17.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230435AbhCPIFA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 16 Mar 2021 04:05:00 -0400
-IronPort-SDR: KiTcuw0ZjkRdMcUZtUPcM3rUcCmqB7cVa7B44aYxtQkWHk0jIFTNpWMdKk9d8aUh1yyoONscJk
- aAfKBNq2ZmOg==
-X-IronPort-AV: E=McAfee;i="6000,8403,9924"; a="169135866"
+        id S233792AbhCPIG2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 16 Mar 2021 04:06:28 -0400
+IronPort-SDR: q9Y6uiEr3ir6WcPg405amuh9aZKH7Lr4oYFbb54/z2QpG0O50nG7MDmu/NmmvcYl6AMM5TCv0u
+ z+kgvq1GGjZQ==
+X-IronPort-AV: E=McAfee;i="6000,8403,9924"; a="169136067"
 X-IronPort-AV: E=Sophos;i="5.81,251,1610438400"; 
-   d="scan'208";a="169135866"
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Mar 2021 01:04:59 -0700
-IronPort-SDR: 1iLdc7IarRWxQJguj/yHAOrF7M9einclgBSjXKKpvuBSBiu1YMKmmivVAvefRSbDLwYnV/EJfW
- vnmtYIzse1JA==
+   d="scan'208";a="169136067"
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Mar 2021 01:06:28 -0700
+IronPort-SDR: 6vPYIGygoITxj4h4+3XCKCMqhWaNyXCgjnX8ToS7oXzHjcVFQbWGizIGWrSq1B1n+tB1SJ8Il1
+ yIGnRUgQpaOA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.81,251,1610438400"; 
-   d="scan'208";a="371901277"
-Received: from fmsmsx605.amr.corp.intel.com ([10.18.126.85])
-  by orsmga003.jf.intel.com with ESMTP; 16 Mar 2021 01:04:58 -0700
-Received: from fmsmsx609.amr.corp.intel.com (10.18.126.89) by
- fmsmsx605.amr.corp.intel.com (10.18.126.85) with Microsoft SMTP Server
+   d="scan'208";a="440014034"
+Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
+  by FMSMGA003.fm.intel.com with ESMTP; 16 Mar 2021 01:06:28 -0700
+Received: from fmsmsx612.amr.corp.intel.com (10.18.126.92) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2106.2; Tue, 16 Mar 2021 01:04:58 -0700
+ 15.1.2106.2; Tue, 16 Mar 2021 01:06:27 -0700
 Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
- fmsmsx609.amr.corp.intel.com (10.18.126.89) with Microsoft SMTP Server
+ fmsmsx612.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2106.2
- via Frontend Transport; Tue, 16 Mar 2021 01:04:58 -0700
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.176)
+ via Frontend Transport; Tue, 16 Mar 2021 01:06:27 -0700
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (104.47.56.171)
  by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2106.2; Tue, 16 Mar 2021 01:04:58 -0700
+ 15.1.2106.2; Tue, 16 Mar 2021 01:06:27 -0700
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ZgiLrR6vWKk9920G/PyjJfnx3PPDoX1nYlHZqq1QKDIOHmRjOecwDzlWi3BXos8aVdu3QE7nYqQ0XN4MEs3eH9Y8zCj1WaroHCMPyag7lsS6s50HiRRXqCtqiwzlIdFkws73scv/KH4Lq5UEUhsEusR23cA4YSWuJdp3iiepixtmpiYcKenjqO9Ld2W8fuH9oEK5ustWugXbY7ILZI9Wr8TFEf2kBUGvYwd3PTi2AVTB2zn7IcdlqgIhVfB/ECgzEtzEN6inrg2YxNABkzmVvuj8eqCDPvMbbRqbsIdQ+WunE+ah0yTyuPkPwwRjkqG5mTvTV6Tc+Ngfahm1Z7LIeA==
+ b=nM6Re+c2myaiaanR3i1bZ3AMrQloE+Ewo1BSH0RupowSSY+vuDLSky3xOumAsi0UrnafVrzpzIhogxF1dyNY/llAPbTC5zBY5Syc3q8xB2dVnQBJbeYWKN8B2rwaFGPoSyGMuDVIEM09nkq1b2T35joML82MVAUfKtqfKOxRwwnUSiVowklLz05kgpodA+uW2Du7g6LfuDgeoc9hHKm+y3XIrXdYWC04hnXERQSZKUtL4bpnDeyP7z3uSzVdAeHKHVBtoNH9s+gbY8Sy6OD9CNdgsr3v4T17NlcF9Dyc6NaVEU8UCS4g6PsKhKC+N8h9cMvM4un1a8YkQAvXegXtfA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=3iYTds+9TxRmZkscAFT+xyO6ZhlFRDQdhjWTlbWz7gY=;
- b=DuqxbY21VA5fWTzmvC/BpLb6GNEm8KjHCJLIhjhEsO2QbCkYHpIvZha5Qd2l000PRU3V3bHM/AyM8lC0T7xl7l5f+fxcQ9ZYoZo08iYvjQNX5uNW9gXdSkiRjlBXXgU6TOmknvaKWhRy+PXPOnb+o0y8piPllMXg2jdEUFQO6ex7N9LQwF2W9R0thBmmHKCbBKUo6cLa5zted7K4lGJ4etUvFyW4eOdmGQgdLIBy0sPQlc8HeW3TKJPwL8nROQ74gjRknESDyniltceKdnua4Jm4B+0ZbrSd71pqMmjiwc0xBhMKDu5xX8YD8J/afJQuOeGXG3VG2kfRZVZtCZHopA==
+ bh=lMpzxwtGnDjECuATUdz68twSo7SXs/HP4h1XaMgXBRw=;
+ b=NZiNIumlr29rNFTM4VogesGzZ28urYeh2jPMet2PVZ4ZlRHboxXObFNJpeF9/oGpcjLhizwsVOXoZHYuz/VkoTT3ZwlcMHQ5pO1euABz/dAnle+au+473RsJmGcpthijOqAhjqcRPkNT3DAZMFGYBi7oHzXkqiuX8BhTr1NyMSJSZmytsVkGDxmFF9tNsX/3FkqEFsy4P9GLAutGzTqJ5kqSpsXsAdsr4v/esci8DmtbEzLvDKcK14x9HkfN73DjJ1BkUOpSgSNivRJCTsB3YsEC5z5cl9DP1j7GSu54d1lyCBKGSJmil/yaNWkhRgSvXr432aeaR1LEHn98dQoMhw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
  dkim=pass header.d=intel.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=intel.onmicrosoft.com;
  s=selector2-intel-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=3iYTds+9TxRmZkscAFT+xyO6ZhlFRDQdhjWTlbWz7gY=;
- b=TNjjx65Lm48v5OBsafP3LULcGsPsmYguvT80qOTeqTqpCH5tiNj1DPztY/3T1yAiLRRtem2s0TB1pqcTWhw8cpNN4MTYdaJ3GfEhpSksHfA1+3CTax84HCVxAFg2GGtbB0fhLYI0OMfi0sUjSz0UJ1HWHzjTSdYXiIboPglw5fA=
+ bh=lMpzxwtGnDjECuATUdz68twSo7SXs/HP4h1XaMgXBRw=;
+ b=xCs3M8PaZDoTh6vADB/X6XeOJT8FqQpg+aXn0iSJ34AehcmnNL2jp//R+hVIW9f3J2ZYD96ucltr8yYKueQtvx0IeiR5OzLat3IgXrTsd4C+7GgVrs451nAaOGueUcOERpphnbc3lFqqHJp6xqcr/nVcjdzGv4eGJxHS45ECOIY=
 Received: from MWHPR11MB1886.namprd11.prod.outlook.com (2603:10b6:300:110::9)
  by MWHPR11MB1664.namprd11.prod.outlook.com (2603:10b6:301:c::13) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3933.32; Tue, 16 Mar
- 2021 08:04:55 +0000
+ 2021 08:06:26 +0000
 Received: from MWHPR11MB1886.namprd11.prod.outlook.com
  ([fe80::75b0:a8e9:60cb:7a29]) by MWHPR11MB1886.namprd11.prod.outlook.com
  ([fe80::75b0:a8e9:60cb:7a29%9]) with mapi id 15.20.3933.032; Tue, 16 Mar 2021
- 08:04:55 +0000
+ 08:06:26 +0000
 From:   "Tian, Kevin" <kevin.tian@intel.com>
 To:     Jason Gunthorpe <jgg@nvidia.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-CC:     Alex Williamson <alex.williamson@redhat.com>,
-        "Raj, Ashok" <ashok.raj@intel.com>,
-        Christian Ehrhardt <christian.ehrhardt@canonical.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
         Cornelia Huck <cohuck@redhat.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+CC:     "Raj, Ashok" <ashok.raj@intel.com>,
         "Williams, Dan J" <dan.j.williams@intel.com>,
         Daniel Vetter <daniel@ffwll.ch>,
-        Eric Auger <eric.auger@redhat.com>,
-        Christoph Hellwig <hch@lst.de>,
+        "Christoph Hellwig" <hch@lst.de>,
         Leon Romanovsky <leonro@nvidia.com>,
         Max Gurtovoy <mgurtovoy@nvidia.com>,
-        Tarun Gupta <targupta@nvidia.com>
-Subject: RE: [PATCH v2 08/14] vfio/pci: Re-order vfio_pci_probe()
-Thread-Topic: [PATCH v2 08/14] vfio/pci: Re-order vfio_pci_probe()
-Thread-Index: AQHXF6OyKRGb0hKB6UOc45JJMJQlBKqGRKjQ
-Date:   Tue, 16 Mar 2021 08:04:55 +0000
-Message-ID: <MWHPR11MB1886D4C304FD9C599FD7A8848C6B9@MWHPR11MB1886.namprd11.prod.outlook.com>
+        Tarun Gupta <targupta@nvidia.com>,
+        "Liu, Yi L" <yi.l.liu@intel.com>
+Subject: RE: [PATCH v2 09/14] vfio/pci: Use
+ vfio_init/register/unregister_group_dev
+Thread-Topic: [PATCH v2 09/14] vfio/pci: Use
+ vfio_init/register/unregister_group_dev
+Thread-Index: AQHXF6PvzoRkRRB6gEOfXKJ8WqPBx6qGRtkQ
+Date:   Tue, 16 Mar 2021 08:06:25 +0000
+Message-ID: <MWHPR11MB1886BA597E1F305C7FBA08208C6B9@MWHPR11MB1886.namprd11.prod.outlook.com>
 References: <0-v2-20d933792272+4ff-vfio1_jgg@nvidia.com>
- <8-v2-20d933792272+4ff-vfio1_jgg@nvidia.com>
-In-Reply-To: <8-v2-20d933792272+4ff-vfio1_jgg@nvidia.com>
+ <9-v2-20d933792272+4ff-vfio1_jgg@nvidia.com>
+In-Reply-To: <9-v2-20d933792272+4ff-vfio1_jgg@nvidia.com>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach: 
@@ -94,51 +95,51 @@ authentication-results: nvidia.com; dkim=none (message not signed)
  header.d=none;nvidia.com; dmarc=none action=none header.from=intel.com;
 x-originating-ip: [192.198.147.218]
 x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 6b737baf-b24c-4a0b-0478-08d8e8522fc6
+x-ms-office365-filtering-correlation-id: 265008db-ef68-479e-54d6-08d8e8526587
 x-ms-traffictypediagnostic: MWHPR11MB1664:
 x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr,ExtFwd
 x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <MWHPR11MB1664F274A5E464278A71FB838C6B9@MWHPR11MB1664.namprd11.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:4941;
+x-microsoft-antispam-prvs: <MWHPR11MB16640EB49B52FE53F4E79A9C8C6B9@MWHPR11MB1664.namprd11.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:2150;
 x-ms-exchange-senderadcheck: 1
 x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: XefqeX+L5iEJ484xD8rvDbIo+MHQ62yaA6opNyRAuAbwh71BejUI2/LxXDni76dawsFQRwyb4gXc+ec+zPUjIbEY8FeJFQtozgQxedE3cVFVEkk3RNBgZty1+cxslsXpD/EEhBJRj/r4EDWG/z00sUbJURL8WyPoJUtik6gKQqWSaaizjbR50o72UDQ/1Wbx5hSuoQJdSsOqwvJEMeFhdiEH67WfhiWdj7zxGIuevZIhH9RXR41rW64cw/bny2YvYEosq/SN6IczV9xgMemUtkh0jN0gDoDtd1V5BZW7+Qty00HOtSfqxLyvw9uBOUc07SJ5RURKxRp4moN3SkjrSqbph6raHsX02keKTGCOC0IItGIkAoff1aE90GvTmepT+VLMsJzl9/vXxrhMISM2XzSwpGpgDUh/Bw165/md9mtQEIg7IF4io7bXAlv2AM0gOwOa7XPLv1zWG0arbXQw+DCd4pwMpexzpbZaFq09qfc1nNfBkloEQQnv86+TFvt2x8PVH7NHyqTdxdgpqtEA9NG5YxYaWUXe/IUyLMJBar/R9KFZcWHrCdrGVu+58ncEdEwhCELUQz/3F+n3r6vYO2kLoxHsRmnseH2ne9QYw653Z5tPjb4DZbBKwBhCSGOo
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MWHPR11MB1886.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(136003)(366004)(39860400002)(346002)(396003)(376002)(66556008)(110136005)(7416002)(478600001)(2906002)(66476007)(71200400001)(54906003)(8676002)(316002)(76116006)(186003)(64756008)(86362001)(6506007)(66946007)(5660300002)(52536014)(83380400001)(4326008)(55016002)(26005)(33656002)(7696005)(9686003)(8936002)(66446008)(169823001);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata: =?us-ascii?Q?DnCV96YYKG9XtON+UFJswVP7slycH8qksPYg1Dbjub61VyIEJuq/7+KaBJD0?=
- =?us-ascii?Q?bIKYt+ggx9YbCtA1MPLqZN9r0ZVf7u1x4ICS4FekMUdtaOjBvvXh0RUwHAJx?=
- =?us-ascii?Q?ec7RUfhxKfNYxzwE5ToIFdfbh5z2mxzZgB9FlEsDrIxrT5JrWPDCY3/znVCl?=
- =?us-ascii?Q?FR0XaLJwEh+nGO+76NvzObZzjAo20sC7SAYEyKrLEGwQhaXDoK2lXWA8tfwu?=
- =?us-ascii?Q?r1W+CiNAQL4p/MEueFuNlzYmEk15+QS4AlXQJWfGTFdBRnyLmRyUqhQm1EUZ?=
- =?us-ascii?Q?YtyyADcBq3cehsHPxydEM0ayWJHFWbQiwYj90U9zRqXn2oPMf+Cd17DTnbfO?=
- =?us-ascii?Q?6or6xIe0xGQ+ydpcDbpFbH/EX+N/7EH6UQ9YjU6yYlXepjdELV7aLBATTKUK?=
- =?us-ascii?Q?P5xBqdA5gUwxiOekbqXBoK1cH9CqskMwV0+60Mfjvorr9QfAa3L8z2h6pWsl?=
- =?us-ascii?Q?lZt5HkPLo+87DU12VAxEuRbmY0D9069ywCVEYhEr2JVHvWpK9CX8aMXhphja?=
- =?us-ascii?Q?l88WvYNTTph2ALsbYrXYErrWI+F4nCGPPs2/3bbWYtI8EVMqAyuj9Edg2CYQ?=
- =?us-ascii?Q?D4lBbsHvxjKTJzVn+mwVBbYCWkAdBs8r0GPM6Cvt4zMk7m8Phvl8iSVhUikY?=
- =?us-ascii?Q?iB2U4mqT3f4A/RJzgmnOsXR6pmdo7TDPYqCAObFK61HU5IdWQf75i5HwwTAJ?=
- =?us-ascii?Q?htNvvBe7S1gqzDnaqZjcsxY7yP3B6VEXNP004tdWf85BBsxbMSAWuqGHOlhW?=
- =?us-ascii?Q?c1xcEN5tBJ1GwXwbsRQZ+eNkcHPlzgZjsCaCZO/ZG95wAvvcQYprS0f9NLN1?=
- =?us-ascii?Q?z8IviSar9PjvOwjf+NklOqiKh8r8YYkgWCodorbG1RIeTqbbjpRdOK1kUSU6?=
- =?us-ascii?Q?4sZ+NrAwQkaC5yE8c6Shj6IJYnmTrblhSGf2Ga+KwWw86Kiw3DVD56pZ1Egw?=
- =?us-ascii?Q?gu68lJKjCV/wJHNVOvsqwdGjSQD3z4A1m1YgjOiKUryEwsMEsBUGseZ4QeY9?=
- =?us-ascii?Q?CHjGElES0PGfJAI9H6S38p0uydrfb/apWNT+7yENqBJ9O/DLbVEuKL0TMBbM?=
- =?us-ascii?Q?El0MiquWhaEIV8zNM90MTEZkwMFr63OF8fXNO+J36SKKoveXJWbrUxGgc+E1?=
- =?us-ascii?Q?GNQN5X4KK8oTHyUPbcV92Z5n5t7f+EI6G/KiHOJQ9R+M/OxbJ6PVcH2moof/?=
- =?us-ascii?Q?P8qGSUYJI1JuccSaG+z6RlBvz+5rHErm+CppWm12do0tC9MYttoZUUfgrn6M?=
- =?us-ascii?Q?6kKk2doNYciFJd3HrnuJlv0GsJ/yVq+4C0IZDapxgVb/LIUbmjDr5qI26XU9?=
- =?us-ascii?Q?EBN8RaMQf7Z1mRIafcB/5rN4?=
+x-microsoft-antispam-message-info: VeX93Xl5b1eY5hRqcbgbxG9biu/8/dnW+mCw2t7azZteNXkzy+drjudkXF+Lf/gAXlpJHNhhYO3X4IiYqv0JyV+AnLVNcUSv+611nNPkYt8YMBu+Ym5INNB4JmEkC0Z+Na+GE3JBvtq3MJLZ3o9eAYZ77wvqIWTPEV0pRswORf16Xo7IgF2dzzhXwdtArFhkhAMzC2vBEDzy3oTP1ZV09j9wrZcDcUGrINqA9IQ3/iGhB/pyaV8jn0MCxsVCGiLLve+V4uuPxR58rUtSSW4wfV8kF7OXxRL+XAMV7SXjKwqPRCjyYfFuZ+kbppj1+m29cF7C9PlSyQHq2l+i2z0JLJ34wg6tqXKRRQcCVnj348IZXh+ryLZLqjpppV70J38ec577VrsUlAxXyS6HbNItOajyVN9H6TnEkOWi/Z9xU46r/seigzj3Gr6saiHWuHk0dZw26vVHqvRnGLyi4+woW7sqqwDPxQHv7Zdx7wWp0ezLgFXGnselyJpSnVzxyOogVT38dEdN5lHuou+YEvbqyyYbamIh1FMI6HDH+28jm9wdlc7quCY9TWsh+BW2m8Mw
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MWHPR11MB1886.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(136003)(366004)(39860400002)(346002)(396003)(376002)(66556008)(110136005)(7416002)(478600001)(2906002)(66476007)(71200400001)(54906003)(8676002)(316002)(76116006)(186003)(64756008)(86362001)(6506007)(66946007)(5660300002)(52536014)(83380400001)(4326008)(55016002)(26005)(33656002)(7696005)(9686003)(8936002)(66446008);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata: =?us-ascii?Q?z9p3SA6ht8qip4XuSyjlE2p5I2WRAqy7l5NMOzBniwW+vHe8MgjKRwuax/c4?=
+ =?us-ascii?Q?/3Jcr5SADQPqhl6ohGw2a/Eq1nWZtRTZFyEDsZ/O3pw8XRGDSExgRwzuz5vQ?=
+ =?us-ascii?Q?xHEf2nH3QderNRseutHA5DTUbcS0WGRv4nk7LB+Y+fRCe3SXOnGqSPxb+Es/?=
+ =?us-ascii?Q?Yao5GnMSlU3UmJmdlgBjpJcCooFqYspszNLeysEcJq2VTKsdh1zzEE1EZj1q?=
+ =?us-ascii?Q?nEcMRHWw0lKPBbPtKK7ML8eDklet6LpHUoTvQp9KzPPrj58PVTG0kcsAgKO1?=
+ =?us-ascii?Q?ShyYCaPHTBEbn19tCzE28o3JQyVAd04IWVoxnkr/aEIe566Db1qHzS0YzTgi?=
+ =?us-ascii?Q?1f/EJ5A8Se5WptI79bWAnflRJ6YCSAJy1WqiTw7TglO2jTKThebUR4oTyb7o?=
+ =?us-ascii?Q?TZffySvtkCdIZ4OUaWRtZvnU1/rb4oeFhAFWt+f30590+2f2XMV7QGwj7uOU?=
+ =?us-ascii?Q?SdUUhjgY6wAAZGK97BNwhs46i8my4uVa7/LQaLFMon5drA4rs2pt73sxR6Pq?=
+ =?us-ascii?Q?dlejQ338hnbTj7AX2zR5eawLPHzgzGA1jXBRkGvgHyYmYQEor2rzvw1IsbE4?=
+ =?us-ascii?Q?Gb9RZ+WWa+tkdiuiJdlojJbicA6ujoNbLUvMdv23nNIa5GrUT2Dsc70WYCsN?=
+ =?us-ascii?Q?HUhLWgGB5TWqBDAr5SlhnBNhuuAhW+/LYxU1l2V5ZzAUUizlY1woixRN8De9?=
+ =?us-ascii?Q?Rr5YPmO0SSNQxFOM68IUOI4wCdNvIo8dcPtnuOnZNmxUMOo+TKu9U8/WVcHl?=
+ =?us-ascii?Q?+H/OOo+2df6PYen8bvA0z8kqqK+AzkPl1lfPqYoaemOaIUQso/NVzPk2SKoT?=
+ =?us-ascii?Q?lwBZ6jTVbp2OJRlEH0getFRan82SE0vVnhzneUnmVtPsstiBdCBfFs2BruC1?=
+ =?us-ascii?Q?t09nRKz8qNIWqgCA5p73U+6pkDvRa876i0dYkknz7UY0ByNubm4g28Le9KMn?=
+ =?us-ascii?Q?j6TuBztG5coerOaXDw4HxfLZ6ugOIWcLyOX4HKNdUvep/rBWl0nZWhqXr1wp?=
+ =?us-ascii?Q?qmSpBTkY2gYHcQfhv+eFGn+bDWaAea/dum1g82f3YHMW9SwgSmM0tQ3Yypfb?=
+ =?us-ascii?Q?gp0qTz78tz99Yp/7ZotFe62QMCR6jaKEVuKVchSlS2S6exXbt+mkeDH4KWHq?=
+ =?us-ascii?Q?wu1cQzn/tVfPFBLtelCh8DkJrsf41jVtEvqv3lnfJwl+GH8E0Ou7HUTrWYvf?=
+ =?us-ascii?Q?j96OH/xYByvV1yTpYNA56YUpIBr8WN60b74l/PqaSl/GOPJNZfPgfKMUT0X8?=
+ =?us-ascii?Q?dCPS9QnNmtI6FlJwkYdKnr1wAe8sKmq9ehuG+go8axRrWqkrnt3d8IgU/kC3?=
+ =?us-ascii?Q?neXKjjZKGn5qU6UDDgzXwQzN?=
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
 X-MS-Exchange-CrossTenant-AuthAs: Internal
 X-MS-Exchange-CrossTenant-AuthSource: MWHPR11MB1886.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6b737baf-b24c-4a0b-0478-08d8e8522fc6
-X-MS-Exchange-CrossTenant-originalarrivaltime: 16 Mar 2021 08:04:55.8194
+X-MS-Exchange-CrossTenant-Network-Message-Id: 265008db-ef68-479e-54d6-08d8e8526587
+X-MS-Exchange-CrossTenant-originalarrivaltime: 16 Mar 2021 08:06:25.9905
  (UTC)
 X-MS-Exchange-CrossTenant-fromentityheader: Hosted
 X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
 X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: tJlxNNw7RkRgW8aAMm2uMsu680tU8mSrGdTsJG93YkcQoBHX4B6/Or7z21KDHNmCs9/r/1jtVbFgn+kHUKv4dA==
+X-MS-Exchange-CrossTenant-userprincipalname: 4JVmDoTjel7fntcGXPzPqF3yieqI4mXdfUnI3mBA4UX51A/s1RIxFEvCvfAanPcI7M3LuyhT4Zdqa+rrONmJxQ==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: MWHPR11MB1664
 X-OriginatorOrg: intel.com
 Precedence: bulk
@@ -148,75 +149,77 @@ X-Mailing-List: kvm@vger.kernel.org
 > From: Jason Gunthorpe <jgg@nvidia.com>
 > Sent: Saturday, March 13, 2021 8:56 AM
 >=20
-> vfio_add_group_dev() must be called only after all of the private data in
-> vdev is fully setup and ready, otherwise there could be races with user
-> space instantiating a device file descriptor and starting to call ops.
+> pci already allocates a struct vfio_pci_device with exactly the same
+> lifetime as vfio_device, switch to the new API and embed vfio_device in
+> vfio_pci_device.
 >=20
-> For instance vfio_pci_reflck_attach() sets vdev->reflck and
-> vfio_pci_open(), called by fops open, unconditionally derefs it, which
-> will crash if things get out of order.
->=20
-> Fixes: cc20d7999000 ("vfio/pci: Introduce VF token")
-> Fixes: e309df5b0c9e ("vfio/pci: Parallelize device open and release")
-> Fixes: 6eb7018705de ("vfio-pci: Move idle devices to D3hot power state")
-> Fixes: ecaa1f6a0154 ("vfio-pci: Add VGA arbiter client")
+> Reviewed-by: Christoph Hellwig <hch@lst.de>
+> Reviewed-by: Liu Yi L <yi.l.liu@intel.com>
 > Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
+
+Reviewed-by: Kevin Tian <kevin.tian@intel.com>
+
 > ---
->  drivers/vfio/pci/vfio_pci.c | 17 +++++++++--------
->  1 file changed, 9 insertions(+), 8 deletions(-)
+>  drivers/vfio/pci/vfio_pci.c         | 10 +++++-----
+>  drivers/vfio/pci/vfio_pci_private.h |  1 +
+>  2 files changed, 6 insertions(+), 5 deletions(-)
 >=20
 > diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
-> index f95b58376156a0..0e7682e7a0b478 100644
+> index 0e7682e7a0b478..a0ac20a499cf6c 100644
 > --- a/drivers/vfio/pci/vfio_pci.c
 > +++ b/drivers/vfio/pci/vfio_pci.c
-> @@ -2030,13 +2030,9 @@ static int vfio_pci_probe(struct pci_dev *pdev,
+> @@ -2019,6 +2019,7 @@ static int vfio_pci_probe(struct pci_dev *pdev,
 > const struct pci_device_id *id)
->  	INIT_LIST_HEAD(&vdev->vma_list);
->  	init_rwsem(&vdev->memory_lock);
+>  		goto out_group_put;
+>  	}
 >=20
-> -	ret =3D vfio_add_group_dev(&pdev->dev, &vfio_pci_ops, vdev);
-> -	if (ret)
-> -		goto out_free;
-> -
->  	ret =3D vfio_pci_reflck_attach(vdev);
->  	if (ret)
-> -		goto out_del_group_dev;
-> +		goto out_free;
->  	ret =3D vfio_pci_vf_init(vdev);
->  	if (ret)
->  		goto out_reflck;
-> @@ -2060,15 +2056,20 @@ static int vfio_pci_probe(struct pci_dev *pdev,
+> +	vfio_init_group_dev(&vdev->vdev, &pdev->dev, &vfio_pci_ops, vdev);
+>  	vdev->pdev =3D pdev;
+>  	vdev->irq_type =3D VFIO_PCI_NUM_IRQS;
+>  	mutex_init(&vdev->igate);
+> @@ -2056,9 +2057,10 @@ static int vfio_pci_probe(struct pci_dev *pdev,
 > const struct pci_device_id *id)
 >  		vfio_pci_set_power_state(vdev, PCI_D3hot);
 >  	}
 >=20
-> -	return ret;
-> +	ret =3D vfio_add_group_dev(&pdev->dev, &vfio_pci_ops, vdev);
-> +	if (ret)
-> +		goto out_power;
-> +	return 0;
+> -	ret =3D vfio_add_group_dev(&pdev->dev, &vfio_pci_ops, vdev);
+> +	ret =3D vfio_register_group_dev(&vdev->vdev);
+>  	if (ret)
+>  		goto out_power;
+> +	dev_set_drvdata(&pdev->dev, vdev);
+>  	return 0;
 >=20
-> +out_power:
-> +	if (!disable_idle_d3)
-> +		vfio_pci_set_power_state(vdev, PCI_D0);
-
-Just curious whether the power state must be recovered upon failure here.
-From the comment several lines above, the power state is set to an unknown
-state before doing D3 transaction. From this point it looks fine if leaving=
- the
-device in D3 since there is no expected state to be recovered?
-
->  out_vf:
+>  out_power:
+> @@ -2078,13 +2080,11 @@ static int vfio_pci_probe(struct pci_dev *pdev,
+> const struct pci_device_id *id)
+>=20
+>  static void vfio_pci_remove(struct pci_dev *pdev)
+>  {
+> -	struct vfio_pci_device *vdev;
+> +	struct vfio_pci_device *vdev =3D dev_get_drvdata(&pdev->dev);
+>=20
+>  	pci_disable_sriov(pdev);
+>=20
+> -	vdev =3D vfio_del_group_dev(&pdev->dev);
+> -	if (!vdev)
+> -		return;
+> +	vfio_unregister_group_dev(&vdev->vdev);
+>=20
 >  	vfio_pci_vf_uninit(vdev);
->  out_reflck:
 >  	vfio_pci_reflck_put(vdev->reflck);
-> -out_del_group_dev:
-> -	vfio_del_group_dev(&pdev->dev);
->  out_free:
-> +	kfree(vdev->pm_save);
->  	kfree(vdev);
->  out_group_put:
->  	vfio_iommu_group_put(group, &pdev->dev);
+> diff --git a/drivers/vfio/pci/vfio_pci_private.h
+> b/drivers/vfio/pci/vfio_pci_private.h
+> index 9cd1882a05af69..8755a0febd054a 100644
+> --- a/drivers/vfio/pci/vfio_pci_private.h
+> +++ b/drivers/vfio/pci/vfio_pci_private.h
+> @@ -100,6 +100,7 @@ struct vfio_pci_mmap_vma {
+>  };
+>=20
+>  struct vfio_pci_device {
+> +	struct vfio_device	vdev;
+>  	struct pci_dev		*pdev;
+>  	void __iomem		*barmap[PCI_STD_NUM_BARS];
+>  	bool			bar_mmap_supported[PCI_STD_NUM_BARS];
 > --
 > 2.30.2
 
