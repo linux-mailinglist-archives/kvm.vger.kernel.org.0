@@ -2,27 +2,27 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 74CEB33D3AA
-	for <lists+kvm@lfdr.de>; Tue, 16 Mar 2021 13:19:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 11F6E33D3AD
+	for <lists+kvm@lfdr.de>; Tue, 16 Mar 2021 13:19:22 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229972AbhCPMRr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 16 Mar 2021 08:17:47 -0400
-Received: from mail.kernel.org ([198.145.29.99]:36380 "EHLO mail.kernel.org"
+        id S230124AbhCPMSu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 16 Mar 2021 08:18:50 -0400
+Received: from mail.kernel.org ([198.145.29.99]:36878 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229995AbhCPMRM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 16 Mar 2021 08:17:12 -0400
+        id S229814AbhCPMSS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 16 Mar 2021 08:18:18 -0400
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 60FD064FE0;
-        Tue, 16 Mar 2021 12:17:11 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 8E6E464FE0;
+        Tue, 16 Mar 2021 12:18:18 +0000 (UTC)
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.misterjones.org)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.94)
         (envelope-from <maz@kernel.org>)
-        id 1lM8dJ-001xW3-7h; Tue, 16 Mar 2021 12:17:09 +0000
-Date:   Tue, 16 Mar 2021 12:17:08 +0000
-Message-ID: <87blbjfg3f.wl-maz@kernel.org>
+        id 1lM8eO-001xWm-HL; Tue, 16 Mar 2021 12:18:16 +0000
+Date:   Tue, 16 Mar 2021 12:18:15 +0000
+Message-ID: <87a6r3fg1k.wl-maz@kernel.org>
 From:   Marc Zyngier <maz@kernel.org>
 To:     Quentin Perret <qperret@google.com>
 Cc:     kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
@@ -33,11 +33,11 @@ Cc:     kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
         Julien Thierry <julien.thierry.kdev@gmail.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
         broonie@kernel.org, kernel-team@android.com
-Subject: Re: [PATCH 01/10] KVM: arm64: Provide KVM's own save/restore SVE primitives
-In-Reply-To: <YFCJEgjUZ5cnq0AK@google.com>
+Subject: Re: [PATCH 08/10] KVM: arm64: Add a nVHE-specific SVE VQ reset hypercall
+In-Reply-To: <YFCMY2TDl4/6++PJ@google.com>
 References: <20210316101312.102925-1-maz@kernel.org>
-        <20210316101312.102925-2-maz@kernel.org>
-        <YFCJEgjUZ5cnq0AK@google.com>
+        <20210316101312.102925-9-maz@kernel.org>
+        <YFCMY2TDl4/6++PJ@google.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -51,39 +51,27 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 16 Mar 2021 10:31:46 +0000,
+On Tue, 16 Mar 2021 10:45:55 +0000,
 Quentin Perret <qperret@google.com> wrote:
 > 
-> On Tuesday 16 Mar 2021 at 10:13:03 (+0000), Marc Zyngier wrote:
-> > diff --git a/arch/arm64/kvm/hyp/fpsimd.S b/arch/arm64/kvm/hyp/fpsimd.S
-> > index 01f114aa47b0..e4010d1acb79 100644
-> > --- a/arch/arm64/kvm/hyp/fpsimd.S
-> > +++ b/arch/arm64/kvm/hyp/fpsimd.S
-> > @@ -19,3 +19,13 @@ SYM_FUNC_START(__fpsimd_restore_state)
-> >  	fpsimd_restore	x0, 1
-> >  	ret
-> >  SYM_FUNC_END(__fpsimd_restore_state)
-> > +
-> > +SYM_FUNC_START(__sve_restore_state)
-> > +	sve_load 0, x1, x2, 3, x4
-> > +	ret
-> > +SYM_FUNC_END(__sve_restore_state)
+> On Tuesday 16 Mar 2021 at 10:13:10 (+0000), Marc Zyngier wrote:
+> > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> > index c4afe3d3397f..9108ccc80653 100644
+> > --- a/arch/arm64/include/asm/kvm_host.h
+> > +++ b/arch/arm64/include/asm/kvm_host.h
+> > @@ -593,7 +593,9 @@ int kvm_test_age_hva(struct kvm *kvm, unsigned long hva);
+> >  void kvm_arm_halt_guest(struct kvm *kvm);
+> >  void kvm_arm_resume_guest(struct kvm *kvm);
+> >  
+> > -#define kvm_call_hyp_nvhe(f, ...)						\
+> > +static inline void __kvm_reset_sve_vq(void) {}
 > 
-> Nit: maybe this could be named __sve_load_state() for consistency with
-> the EL1 version?
+> Why is this one needed? With an explicit call to kvm_call_hyp_nvhe() you
+> shouldn't need to provide a VHE implementation I think.
 
-Well, we already have the discrepancy for fpsimd in the same file, so
-I opted for another kind of consistency...
+Did I mention that I positively hate kvm_call_hyp_nvhe()? ;-)
 
-> 
-> > +SYM_FUNC_START(__sve_save_state)
-> > +	sve_save 0, x1, 2
-> > +	ret
-> > +SYM_FUNC_END(__sve_restore_state)
-> 
-> SYM_FUNC_END(__sve_save_state) here?
-
-Yup, good catch.
+But yes, you are right, this can be further simplified.
 
 Thanks,
 
