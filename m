@@ -2,156 +2,157 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 89A2433D3C5
-	for <lists+kvm@lfdr.de>; Tue, 16 Mar 2021 13:25:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 48E9633D3CA
+	for <lists+kvm@lfdr.de>; Tue, 16 Mar 2021 13:26:59 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230497AbhCPMYS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 16 Mar 2021 08:24:18 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:47906 "EHLO
+        id S231247AbhCPM0f (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 16 Mar 2021 08:26:35 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:44873 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231397AbhCPMYK (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 16 Mar 2021 08:24:10 -0400
+        by vger.kernel.org with ESMTP id S231366AbhCPM0S (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 16 Mar 2021 08:26:18 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1615897445;
+        s=mimecast20190719; t=1615897577;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=f+velte/fa3kpJGZogNSMgY/6Q8TU5X9HHuGgoFSDow=;
-        b=QHwGIyzCt6awTbU5WSVmtnsoL3GhOTF+mPmmFmaBRmchswjMgHvYtkhKHqXbiDPJ1LgGl1
-        Ex/zL3jfHTk/JkDti4xigqnzM3oHDp3aARe0LPqt/ickhkWjCsuiNsKv4qVDCyrR5kIBgm
-        SLeYVDJ9coNvBwpEhpCK9f25XrRAEw8=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-533-BnkJIvedMcG2yzjPZY8NXw-1; Tue, 16 Mar 2021 08:24:04 -0400
-X-MC-Unique: BnkJIvedMcG2yzjPZY8NXw-1
-Received: by mail-ed1-f69.google.com with SMTP id q25so2797117eds.16
-        for <kvm@vger.kernel.org>; Tue, 16 Mar 2021 05:24:03 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=f+velte/fa3kpJGZogNSMgY/6Q8TU5X9HHuGgoFSDow=;
-        b=neWViE+41Fzspb4X16wSG3Sxjh7Q/j6re9pyDe9bingdd1QCnVd7JzYkzv4inCV4RV
-         A+gzc+4qjTE0I3FikTS+JSMbNYpHEvWiYNCX/WOYAPV6RnSilQ3iwSz7HRkMPXj4UGsD
-         LfCkHhQp+o7vKlcOPXcYurDmV8klnO9i90/XH7jDmKg4rj6u+o0EYZZMZX2LhrMvmZuj
-         ztkYIlYWmMfhH7g1DEqgpeRaXH7e2QYbUOl2ApmgCi5mRMOItlyoJ5PYxYMn+ceP8sTj
-         1KoLjK3FFD6lbZgPL4Jd2QtZNRphhaHFIK3xSKOidI3vjRw0AiS7eNAsL9pbY6Ht0MIX
-         4hXw==
-X-Gm-Message-State: AOAM530KnQzBA4wz+UXXxDFEKUNwiyB2cZyh0bLywYZtMvbbsTOFcQtC
-        bej2KQYquSO55Z2pD7mxUw3Bn7KlRKe/QLm+vsuJuxlqiELfI+In0LiLTVaUJsPxUMz11aKY2DE
-        EP9wAC6F/eri5
-X-Received: by 2002:a17:906:8a65:: with SMTP id hy5mr29970886ejc.250.1615897442960;
-        Tue, 16 Mar 2021 05:24:02 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJygiymhAP2eMHj6Ubnmds4z/SbDItno3AkEo622Y3zkesWILS7TdSu7M90fTn4cbPMcExbUQA==
-X-Received: by 2002:a17:906:8a65:: with SMTP id hy5mr29970878ejc.250.1615897442821;
-        Tue, 16 Mar 2021 05:24:02 -0700 (PDT)
-Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id q25sm6299288edt.51.2021.03.16.05.24.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 16 Mar 2021 05:24:02 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>
-Subject: Re: [PATCH 3/4] KVM: x86: hyper-v: Track Hyper-V TSC page status
-In-Reply-To: <87lfao8m7s.fsf@vitty.brq.redhat.com>
-References: <20210315143706.859293-1-vkuznets@redhat.com>
- <20210315143706.859293-4-vkuznets@redhat.com>
- <YE96DDyEZ3zVgb8p@google.com> <87lfao8m7s.fsf@vitty.brq.redhat.com>
-Date:   Tue, 16 Mar 2021 13:24:01 +0100
-Message-ID: <87a6r38exq.fsf@vitty.brq.redhat.com>
+        bh=fRoMuOzEzyH5RJam2WbDC++uh24ZthJANFvh2AkX42s=;
+        b=hm+s+IDLPRO7g4buPSK7+1HzlgmOMIYMhHo4xCRCQSOBMzEZTgXuz/CjitsrL12bI2hB2v
+        lYJ1EEtj8MzPJt6mKMgQXfI81EnaQfxsjCHFdj9jCbkg7qzKqaN6AvM200ISJi/sg7bPY4
+        1dcst+6izFHYd6swwW/TYx+ERU4cOi8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-98-xK0D7bVQPNWaEpjtq2TNqg-1; Tue, 16 Mar 2021 08:26:13 -0400
+X-MC-Unique: xK0D7bVQPNWaEpjtq2TNqg-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D6B59760C0;
+        Tue, 16 Mar 2021 12:26:11 +0000 (UTC)
+Received: from gondolin (ovpn-113-185.ams2.redhat.com [10.36.113.185])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id A125219C81;
+        Tue, 16 Mar 2021 12:26:02 +0000 (UTC)
+Date:   Tue, 16 Mar 2021 13:25:59 +0100
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     Alex Williamson <alex.williamson@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>, kvm@vger.kernel.org,
+        linux-doc@vger.kernel.org, "Raj, Ashok" <ashok.raj@intel.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Christoph Hellwig <hch@lst.de>,
+        Leon Romanovsky <leonro@nvidia.com>,
+        Max Gurtovoy <mgurtovoy@nvidia.com>,
+        Tarun Gupta <targupta@nvidia.com>,
+        Liu Yi L <yi.l.liu@intel.com>
+Subject: Re: [PATCH v2 03/14] vfio: Split creation of a vfio_device into
+ init and register ops
+Message-ID: <20210316132559.6e6bc79a.cohuck@redhat.com>
+In-Reply-To: <3-v2-20d933792272+4ff-vfio1_jgg@nvidia.com>
+References: <0-v2-20d933792272+4ff-vfio1_jgg@nvidia.com>
+        <3-v2-20d933792272+4ff-vfio1_jgg@nvidia.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Vitaly Kuznetsov <vkuznets@redhat.com> writes:
+On Fri, 12 Mar 2021 20:55:55 -0400
+Jason Gunthorpe <jgg@nvidia.com> wrote:
 
-> Sean Christopherson <seanjc@google.com> writes:
->
->> On Mon, Mar 15, 2021, Vitaly Kuznetsov wrote:
->>> Create an infrastructure for tracking Hyper-V TSC page status, i.e. if it
->>> was updated from guest/host side or if we've failed to set it up (because
->>> e.g. guest wrote some garbage to HV_X64_MSR_REFERENCE_TSC) and there's no
->>> need to retry.
->>> 
->>> Also, in a hypothetical situation when we are in 'always catchup' mode for
->>> TSC we can now avoid contending 'hv->hv_lock' on every guest enter by
->>> setting the state to HV_TSC_PAGE_BROKEN after compute_tsc_page_parameters()
->>> returns false.
->>> 
->>> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
->>> ---
->>> diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
->>> index eefb85b86fe8..2a8d078b16cb 100644
->>> --- a/arch/x86/kvm/hyperv.c
->>> +++ b/arch/x86/kvm/hyperv.c
->>> @@ -1087,7 +1087,7 @@ void kvm_hv_setup_tsc_page(struct kvm *kvm,
->>>  	BUILD_BUG_ON(sizeof(tsc_seq) != sizeof(hv->tsc_ref.tsc_sequence));
->>>  	BUILD_BUG_ON(offsetof(struct ms_hyperv_tsc_page, tsc_sequence) != 0);
->>>  
->>> -	if (!(hv->hv_tsc_page & HV_X64_MSR_TSC_REFERENCE_ENABLE))
->>> +	if (hv->hv_tsc_page_status == HV_TSC_PAGE_BROKEN)
->>>  		return;
->>>  
->>>  	mutex_lock(&hv->hv_lock);
->>
->> ...
->>
->>> @@ -1133,6 +1133,12 @@ void kvm_hv_setup_tsc_page(struct kvm *kvm,
->>>  	hv->tsc_ref.tsc_sequence = tsc_seq;
->>>  	kvm_write_guest(kvm, gfn_to_gpa(gfn),
->>>  			&hv->tsc_ref, sizeof(hv->tsc_ref.tsc_sequence));
->>> +
->>> +	hv->hv_tsc_page_status = HV_TSC_PAGE_SET;
->>> +	goto out_unlock;
->>> +
->>> +out_err:
->>> +	hv->hv_tsc_page_status = HV_TSC_PAGE_BROKEN;
->>>  out_unlock:
->>>  	mutex_unlock(&hv->hv_lock);
->>>  }
->>> @@ -1193,8 +1199,13 @@ static int kvm_hv_set_msr_pw(struct kvm_vcpu *vcpu, u32 msr, u64 data,
->>>  	}
->>>  	case HV_X64_MSR_REFERENCE_TSC:
->>>  		hv->hv_tsc_page = data;
->>> -		if (hv->hv_tsc_page & HV_X64_MSR_TSC_REFERENCE_ENABLE)
->>> +		if (hv->hv_tsc_page & HV_X64_MSR_TSC_REFERENCE_ENABLE) {
->>> +			if (!host)
->>> +				hv->hv_tsc_page_status = HV_TSC_PAGE_GUEST_CHANGED;
->>> +			else
->>> +				hv->hv_tsc_page_status = HV_TSC_PAGE_HOST_CHANGED;
->>
->> Writing the status without taking hv->hv_lock could cause the update to be lost,
->> e.g. if a different vCPU fails kvm_hv_setup_tsc_page() at the same time, its
->> write to set status to HV_TSC_PAGE_BROKEN would race with this write.
->>
->
-> Oh, right you are, the lock was somewhere in my brain :-) Will do in
-> v2.
+> This makes the struct vfio_pci_device part of the public interface so it
+> can be used with container_of and so forth, as is typical for a Linux
+> subystem.
+> 
+> This is the first step to bring some type-safety to the vfio interface by
+> allowing the replacement of 'void *' and 'struct device *' inputs with a
+> simple and clear 'struct vfio_pci_device *'
+> 
+> For now the self-allocating vfio_add_group_dev() interface is kept so each
+> user can be updated as a separate patch.
+> 
+> The expected usage pattern is
+> 
+>   driver core probe() function:
+>      my_device = kzalloc(sizeof(*mydevice));
+>      vfio_init_group_dev(&my_device->vdev, dev, ops, mydevice);
+>      /* other driver specific prep */
+>      vfio_register_group_dev(&my_device->vdev);
+>      dev_set_drvdata(my_device);
+> 
+>   driver core remove() function:
+>      my_device = dev_get_drvdata(dev);
+>      vfio_unregister_group_dev(&my_device->vdev);
+>      /* other driver specific tear down */
+>      kfree(my_device);
+> 
+> Allowing the driver to be able to use the drvdata and vifo_device to go
 
-Actually no, kvm_hv_set_msr_pw() is only called from
-kvm_hv_set_msr_common() with hv->hv_lock held so we're already
-synchronized.
+s/vifo_device/vfio_device/
 
-... and of course I figured that our by putting another
-mutex_lock()/mutex_unlock() here and then wondering why everything hangs
-:-)
+> to/from its own data.
+> 
+> The pattern also makes it clear that vfio_register_group_dev() must be
+> last in the sequence, as once it is called the core code can immediately
+> start calling ops. The init/register gap is provided to allow for the
+> driver to do setup before ops can be called and thus avoid races.
+> 
+> Reviewed-by: Christoph Hellwig <hch@lst.de>
+> Reviewed-by: Liu Yi L <yi.l.liu@intel.com>
+> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
+> ---
+>  Documentation/driver-api/vfio.rst |  31 ++++----
+>  drivers/vfio/vfio.c               | 123 ++++++++++++++++--------------
+>  include/linux/vfio.h              |  16 ++++
+>  3 files changed, 98 insertions(+), 72 deletions(-)
+> 
+> diff --git a/Documentation/driver-api/vfio.rst b/Documentation/driver-api/vfio.rst
+> index f1a4d3c3ba0bb1..d3a02300913a7f 100644
+> --- a/Documentation/driver-api/vfio.rst
+> +++ b/Documentation/driver-api/vfio.rst
+> @@ -249,18 +249,23 @@ VFIO bus driver API
+>  
+>  VFIO bus drivers, such as vfio-pci make use of only a few interfaces
+>  into VFIO core.  When devices are bound and unbound to the driver,
+> -the driver should call vfio_add_group_dev() and vfio_del_group_dev()
+> -respectively::
+> -
+> -	extern int vfio_add_group_dev(struct device *dev,
+> -				      const struct vfio_device_ops *ops,
+> -				      void *device_data);
+> -
+> -	extern void *vfio_del_group_dev(struct device *dev);
+> -
+> -vfio_add_group_dev() indicates to the core to begin tracking the
+> -iommu_group of the specified dev and register the dev as owned by
+> -a VFIO bus driver.  The driver provides an ops structure for callbacks
+> +the driver should call vfio_register_group_dev() and
+> +vfio_unregister_group_dev() respectively::
+> +
+> +	void vfio_init_group_dev(struct vfio_device *device,
+> +				struct device *dev,
+> +				const struct vfio_device_ops *ops,
+> +				void *device_data);
+> +	int vfio_register_group_dev(struct vfio_device *device);
+> +	void vfio_unregister_group_dev(struct vfio_device *device);
+> +
+> +The driver should embed the vfio_device in its own structure and call
+> +vfio_init_group_dev() to pre-configure it before going to registration.
 
->
->>>  			kvm_make_request(KVM_REQ_MASTERCLOCK_UPDATE, vcpu);
->>> +		}
->>>  		break;
->>>  	case HV_X64_MSR_CRASH_P0 ... HV_X64_MSR_CRASH_P4:
->>>  		return kvm_hv_msr_set_crash_data(kvm,
->>> -- 
->>> 2.30.2
->>> 
->>
+s/it/that structure/ (I guess?)
 
--- 
-Vitaly
+> +vfio_register_group_dev() indicates to the core to begin tracking the
+> +iommu_group of the specified dev and register the dev as owned by a VFIO bus
+> +driver. Once vfio_register_group_dev() returns it is possible for userspace to
+> +start accessing the driver, thus the driver should ensure it is completely
+> +ready before calling it. The driver provides an ops structure for callbacks
+>  similar to a file operations structure::
+>  
+>  	struct vfio_device_ops {
+
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
 
