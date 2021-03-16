@@ -2,46 +2,46 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6EB7C33D5E6
+	by mail.lfdr.de (Postfix) with ESMTP id BF3FA33D5E7
 	for <lists+kvm@lfdr.de>; Tue, 16 Mar 2021 15:38:53 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236697AbhCPOig (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 16 Mar 2021 10:38:36 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:46030 "EHLO
+        id S236841AbhCPOil (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 16 Mar 2021 10:38:41 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:60359 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S236650AbhCPOhy (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 16 Mar 2021 10:37:54 -0400
+        by vger.kernel.org with ESMTP id S236666AbhCPOiA (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 16 Mar 2021 10:38:00 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1615905473;
+        s=mimecast20190719; t=1615905479;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=tVHxxWU0Zpf6w6k4Imqt6vI6WtSdLUURgplrT4qpOdw=;
-        b=WXcIQbH9PaFan3aaUNv2IWp+K0/XjPPa9FGeVNNZyZwS0jpskhEEn3fWUOqruWRV/3cT2w
-        mAUM6GEL0JqS6R293Fi5ESPNHLlu3WUr08br0diUluH9VoUamzq2hFUY4a2SmKzGh/SjKY
-        TF/7eLrHS+jeBhse4u8lY8yzNTmZ5N8=
+        bh=3anau4W1sR3F+1XYiO38M5VgZHOhqYLVsP8561DZzT4=;
+        b=dB+mk7n655EfCufj0S5fp0XiQlISTQfBAI8e1wMW1gmAm8pc2QfKamVOwwNEGACJCKkkNL
+        hgdJX+mu0yViKQ3WSxAukyGJ8EARlP/BOO08ZBrIt4CAb0slX71ACmVSMSCTg40ME4XTmk
+        xjC/s+Z8NT7y8FUrpru3WVn/hQvRvL4=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-370-taj8UvgNNzegh9ZSTcAisw-1; Tue, 16 Mar 2021 10:37:49 -0400
-X-MC-Unique: taj8UvgNNzegh9ZSTcAisw-1
+ us-mta-445-xMZ5r7hVOzurJCflrCKnJQ-1; Tue, 16 Mar 2021 10:37:57 -0400
+X-MC-Unique: xMZ5r7hVOzurJCflrCKnJQ-1
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9F070800FF0;
-        Tue, 16 Mar 2021 14:37:48 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9BFBF94EE1;
+        Tue, 16 Mar 2021 14:37:56 +0000 (UTC)
 Received: from vitty.brq.redhat.com (unknown [10.40.195.229])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id BE48D5D9D3;
-        Tue, 16 Mar 2021 14:37:46 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id EB9305D9D3;
+        Tue, 16 Mar 2021 14:37:48 +0000 (UTC)
 From:   Vitaly Kuznetsov <vkuznets@redhat.com>
 To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Sean Christopherson <seanjc@google.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
         Marcelo Tosatti <mtosatti@redhat.com>
-Subject: [PATCH v2 3/4] KVM: x86: hyper-v: Track Hyper-V TSC page status
-Date:   Tue, 16 Mar 2021 15:37:35 +0100
-Message-Id: <20210316143736.964151-4-vkuznets@redhat.com>
+Subject: [PATCH v2 4/4] KVM: x86: hyper-v: Don't touch TSC page values when guest opted for re-enlightenment
+Date:   Tue, 16 Mar 2021 15:37:36 +0100
+Message-Id: <20210316143736.964151-5-vkuznets@redhat.com>
 In-Reply-To: <20210316143736.964151-1-vkuznets@redhat.com>
 References: <20210316143736.964151-1-vkuznets@redhat.com>
 MIME-Version: 1.0
@@ -51,173 +51,91 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Create an infrastructure for tracking Hyper-V TSC page status, i.e. if it
-was updated from guest/host side or if we've failed to set it up (because
-e.g. guest wrote some garbage to HV_X64_MSR_REFERENCE_TSC) and there's no
-need to retry.
+When guest opts for re-enlightenment notifications upon migration, it is
+in its right to assume that TSC page values never change (as they're only
+supposed to change upon migration and the host has to keep things as they
+are before it receives confirmation from the guest). This is mostly true
+until the guest is migrated somewhere. KVM userspace (e.g. QEMU) will
+trigger masterclock update by writing to HV_X64_MSR_REFERENCE_TSC, by
+calling KVM_SET_CLOCK,... and as TSC value and kvmclock reading drift
+apart (even slightly), the update causes TSC page values to change.
 
-Also, in a hypothetical situation when we are in 'always catchup' mode for
-TSC we can now avoid contending 'hv->hv_lock' on every guest enter by
-setting the state to HV_TSC_PAGE_BROKEN after compute_tsc_page_parameters()
-returns false.
+The issue at hand is that when Hyper-V is migrated, it uses stale (cached)
+TSC page values to compute the difference between its own clocksource
+(provided by KVM) and its guests' TSC pages to program synthetic timers
+and in some cases, when TSC page is updated, this puts all stimer
+expirations in the past. This, in its turn, causes an interrupt storm
+and L2 guests not making much forward progress.
 
-Check for HV_TSC_PAGE_SET state instead of '!hv->tsc_ref.tsc_sequence' in
-get_time_ref_counter() to properly handle the situation when we failed to
-write the updated TSC page values to the guest.
+Note, KVM doesn't fully implement re-enlightenment notification. Basically,
+the support for reenlightenment MSRs is just a stub and userspace is only
+expected to expose the feature when TSC scaling on the expected destination
+hosts is available. With TSC scaling, no real re-enlightenment is needed
+as TSC frequency doesn't change. With TSC scaling becoming ubiquitous, it
+likely makes little sense to fully implement re-enlightenment in KVM.
+
+Prevent TSC page from being updated after migration. In case it's not the
+guest who's initiating the change and when TSC page is already enabled,
+just keep it as it is: TSC value is supposed to be preserved across
+migration and TSC frequency can't change with re-enlightenment enabled.
+The guest is doomed anyway if any of this is not true.
 
 Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
 ---
- arch/x86/include/asm/kvm_host.h | 10 +++++++
- arch/x86/kvm/hyperv.c           | 49 +++++++++++++++++++++++----------
- 2 files changed, 45 insertions(+), 14 deletions(-)
+ arch/x86/kvm/hyperv.c | 26 +++++++++++++++++++++++++-
+ 1 file changed, 25 insertions(+), 1 deletion(-)
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 9bc091ecaaeb..71b14e51fdc0 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -884,12 +884,22 @@ struct kvm_hv_syndbg {
- 	u64 options;
- };
- 
-+enum hv_tsc_page_status {
-+	HV_TSC_PAGE_UNSET = 0,
-+	HV_TSC_PAGE_GUEST_CHANGED,
-+	HV_TSC_PAGE_HOST_CHANGED,
-+	HV_TSC_PAGE_SET,
-+	HV_TSC_PAGE_UPDATING,
-+	HV_TSC_PAGE_BROKEN,
-+};
-+
- /* Hyper-V emulation context */
- struct kvm_hv {
- 	struct mutex hv_lock;
- 	u64 hv_guest_os_id;
- 	u64 hv_hypercall;
- 	u64 hv_tsc_page;
-+	enum hv_tsc_page_status hv_tsc_page_status;
- 
- 	/* Hyper-v based guest crash (NT kernel bugcheck) parameters */
- 	u64 hv_crash_param[HV_X64_MSR_CRASH_PARAMS];
 diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
-index a0e3c49233d4..5c0f10a2b3ab 100644
+index 5c0f10a2b3ab..f98370a39936 100644
 --- a/arch/x86/kvm/hyperv.c
 +++ b/arch/x86/kvm/hyperv.c
-@@ -520,10 +520,10 @@ static u64 get_time_ref_counter(struct kvm *kvm)
- 	u64 tsc;
+@@ -1077,6 +1077,21 @@ static bool compute_tsc_page_parameters(struct pvclock_vcpu_time_info *hv_clock,
+ 	return true;
+ }
  
- 	/*
--	 * The guest has not set up the TSC page or the clock isn't
--	 * stable, fall back to get_kvmclock_ns.
-+	 * Fall back to get_kvmclock_ns() when TSC page hasn't been set up,
-+	 * is broken, disabled or being updated.
- 	 */
--	if (!hv->tsc_ref.tsc_sequence)
-+	if (hv->hv_tsc_page_status != HV_TSC_PAGE_SET)
- 		return div_u64(get_kvmclock_ns(kvm), 100);
- 
- 	vcpu = kvm_get_vcpu(kvm, 0);
-@@ -1087,7 +1087,8 @@ void kvm_hv_setup_tsc_page(struct kvm *kvm,
- 	BUILD_BUG_ON(sizeof(tsc_seq) != sizeof(hv->tsc_ref.tsc_sequence));
- 	BUILD_BUG_ON(offsetof(struct ms_hyperv_tsc_page, tsc_sequence) != 0);
- 
--	if (!(hv->hv_tsc_page & HV_X64_MSR_TSC_REFERENCE_ENABLE))
-+	if (hv->hv_tsc_page_status == HV_TSC_PAGE_BROKEN ||
-+	    hv->hv_tsc_page_status == HV_TSC_PAGE_UNSET)
- 		return;
- 
- 	mutex_lock(&hv->hv_lock);
-@@ -1101,7 +1102,7 @@ void kvm_hv_setup_tsc_page(struct kvm *kvm,
- 	 */
- 	if (unlikely(kvm_read_guest(kvm, gfn_to_gpa(gfn),
++/*
++ * Don't touch TSC page values if the guest has opted for TSC emulation after
++ * migration. KVM doesn't fully support reenlightenment notifications and TSC
++ * access emulation and Hyper-V is known to expect the values in TSC page to
++ * stay constant before TSC access emulation is disabled from guest side
++ * (HV_X64_MSR_TSC_EMULATION_STATUS). KVM userspace is expected to preserve TSC
++ * frequency and guest visible TSC value across migration (and prevent it when
++ * TSC scaling is unsupported).
++ */
++static inline bool tsc_page_update_unsafe(struct kvm_hv *hv)
++{
++	return (hv->hv_tsc_page_status != HV_TSC_PAGE_GUEST_CHANGED) &&
++		hv->hv_tsc_emulation_control;
++}
++
+ void kvm_hv_setup_tsc_page(struct kvm *kvm,
+ 			   struct pvclock_vcpu_time_info *hv_clock)
+ {
+@@ -1104,6 +1119,14 @@ void kvm_hv_setup_tsc_page(struct kvm *kvm,
  				    &tsc_seq, sizeof(tsc_seq))))
--		goto out_unlock;
-+		goto out_err;
+ 		goto out_err;
  
++	if (tsc_seq && tsc_page_update_unsafe(hv)) {
++		if (kvm_read_guest(kvm, gfn_to_gpa(gfn), &hv->tsc_ref, sizeof(hv->tsc_ref)))
++			goto out_err;
++
++		hv->hv_tsc_page_status = HV_TSC_PAGE_SET;
++		goto out_unlock;
++	}
++
  	/*
  	 * While we're computing and writing the parameters, force the
-@@ -1110,15 +1111,15 @@ void kvm_hv_setup_tsc_page(struct kvm *kvm,
- 	hv->tsc_ref.tsc_sequence = 0;
- 	if (kvm_write_guest(kvm, gfn_to_gpa(gfn),
- 			    &hv->tsc_ref, sizeof(hv->tsc_ref.tsc_sequence)))
--		goto out_unlock;
-+		goto out_err;
- 
- 	if (!compute_tsc_page_parameters(hv_clock, &hv->tsc_ref))
--		goto out_unlock;
-+		goto out_err;
- 
- 	/* Ensure sequence is zero before writing the rest of the struct.  */
- 	smp_wmb();
- 	if (kvm_write_guest(kvm, gfn_to_gpa(gfn), &hv->tsc_ref, sizeof(hv->tsc_ref)))
--		goto out_unlock;
-+		goto out_err;
- 
- 	/*
- 	 * Now switch to the TSC page mechanism by writing the sequence.
-@@ -1131,8 +1132,15 @@ void kvm_hv_setup_tsc_page(struct kvm *kvm,
- 	smp_wmb();
- 
- 	hv->tsc_ref.tsc_sequence = tsc_seq;
--	kvm_write_guest(kvm, gfn_to_gpa(gfn),
--			&hv->tsc_ref, sizeof(hv->tsc_ref.tsc_sequence));
-+	if (kvm_write_guest(kvm, gfn_to_gpa(gfn),
-+			    &hv->tsc_ref, sizeof(hv->tsc_ref.tsc_sequence)))
-+		goto out_err;
-+
-+	hv->hv_tsc_page_status = HV_TSC_PAGE_SET;
-+	goto out_unlock;
-+
-+out_err:
-+	hv->hv_tsc_page_status = HV_TSC_PAGE_BROKEN;
- out_unlock:
- 	mutex_unlock(&hv->hv_lock);
- }
-@@ -1142,7 +1150,8 @@ void kvm_hv_invalidate_tsc_page(struct kvm *kvm)
- 	struct kvm_hv *hv = to_kvm_hv(kvm);
+ 	 * guest to use the time reference count MSR.
+@@ -1151,7 +1174,8 @@ void kvm_hv_invalidate_tsc_page(struct kvm *kvm)
  	u64 gfn;
  
--	if (!(hv->hv_tsc_page & HV_X64_MSR_TSC_REFERENCE_ENABLE))
-+	if (hv->hv_tsc_page_status == HV_TSC_PAGE_BROKEN ||
-+	    hv->hv_tsc_page_status == HV_TSC_PAGE_UNSET)
+ 	if (hv->hv_tsc_page_status == HV_TSC_PAGE_BROKEN ||
+-	    hv->hv_tsc_page_status == HV_TSC_PAGE_UNSET)
++	    hv->hv_tsc_page_status == HV_TSC_PAGE_UNSET ||
++	    tsc_page_update_unsafe(hv))
  		return;
  
  	mutex_lock(&hv->hv_lock);
-@@ -1150,11 +1159,16 @@ void kvm_hv_invalidate_tsc_page(struct kvm *kvm)
- 	if (!(hv->hv_tsc_page & HV_X64_MSR_TSC_REFERENCE_ENABLE))
- 		goto out_unlock;
- 
-+	/* Preserve HV_TSC_PAGE_GUEST_CHANGED/HV_TSC_PAGE_HOST_CHANGED states */
-+	if (hv->hv_tsc_page_status == HV_TSC_PAGE_SET)
-+		hv->hv_tsc_page_status = HV_TSC_PAGE_UPDATING;
-+
- 	gfn = hv->hv_tsc_page >> HV_X64_MSR_TSC_REFERENCE_ADDRESS_SHIFT;
- 
- 	hv->tsc_ref.tsc_sequence = 0;
--	kvm_write_guest(kvm, gfn_to_gpa(gfn),
--			&hv->tsc_ref, sizeof(hv->tsc_ref.tsc_sequence));
-+	if (kvm_write_guest(kvm, gfn_to_gpa(gfn),
-+			    &hv->tsc_ref, sizeof(hv->tsc_ref.tsc_sequence)))
-+		hv->hv_tsc_page_status = HV_TSC_PAGE_BROKEN;
- 
- out_unlock:
- 	mutex_unlock(&hv->hv_lock);
-@@ -1216,8 +1230,15 @@ static int kvm_hv_set_msr_pw(struct kvm_vcpu *vcpu, u32 msr, u64 data,
- 	}
- 	case HV_X64_MSR_REFERENCE_TSC:
- 		hv->hv_tsc_page = data;
--		if (hv->hv_tsc_page & HV_X64_MSR_TSC_REFERENCE_ENABLE)
-+		if (hv->hv_tsc_page & HV_X64_MSR_TSC_REFERENCE_ENABLE) {
-+			if (!host)
-+				hv->hv_tsc_page_status = HV_TSC_PAGE_GUEST_CHANGED;
-+			else
-+				hv->hv_tsc_page_status = HV_TSC_PAGE_HOST_CHANGED;
- 			kvm_make_request(KVM_REQ_MASTERCLOCK_UPDATE, vcpu);
-+		} else {
-+			hv->hv_tsc_page_status = HV_TSC_PAGE_UNSET;
-+		}
- 		break;
- 	case HV_X64_MSR_CRASH_P0 ... HV_X64_MSR_CRASH_P4:
- 		return kvm_hv_msr_set_crash_data(kvm,
 -- 
 2.30.2
 
