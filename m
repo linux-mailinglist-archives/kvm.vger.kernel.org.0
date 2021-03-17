@@ -2,166 +2,89 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 79F2133EF0A
-	for <lists+kvm@lfdr.de>; Wed, 17 Mar 2021 12:02:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E449233EF24
+	for <lists+kvm@lfdr.de>; Wed, 17 Mar 2021 12:04:18 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231195AbhCQLCM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 17 Mar 2021 07:02:12 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:40206 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231194AbhCQLBw (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 17 Mar 2021 07:01:52 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1615978912;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=8UuCsD850dkXejHGU+2PtFbLb7htKiE2TVgMOJIoD6g=;
-        b=TbW3tITd4LaxTCkavMSU/yV5TOlLpN1qnHrY8eo4Msr59sU0zC3AG14KPaE5nRANqXCAnU
-        jsRp3F2iGfcrPI+gBXX6xNDKBnabq+uxvenmjEoWO/AWhZ0R9fnMdWnFDrs4WFNbtlEv/A
-        5ml74TcTyPiToT2Foy8lN8VsD66y/qA=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-51-KzaLfGT0PqSpahb-eZivPQ-1; Wed, 17 Mar 2021 07:01:50 -0400
-X-MC-Unique: KzaLfGT0PqSpahb-eZivPQ-1
-Received: by mail-wr1-f70.google.com with SMTP id f3so18205980wrt.14
-        for <kvm@vger.kernel.org>; Wed, 17 Mar 2021 04:01:50 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:cc:references:from:subject:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=8UuCsD850dkXejHGU+2PtFbLb7htKiE2TVgMOJIoD6g=;
-        b=FE6tkA+L0Az9+1MUIV2WPq9JM9FRGduyhmIwGEfmvSdfelBy21w1mwikOIk9VBItgy
-         Zb0ADbUZdLLMN68IigYxefC7cZdjTZSsmvUSHUUAByu3r8B4S4JP8Cp4HvwkdTGKXG45
-         B2Bo11PelQ5+WBIBivJkD4HYVH6qGduNgPXQNX/LCm11po/Sh957Ot8lNe1lEUrS6Oig
-         MLhKh0JZ4gWIgVesgGhssn1xnA6jFRciqamB16giuuvKdyHIf5EIt5VNITdhj13jlVmE
-         HzyCDBgA+Tp50hZhN1J96ksEjOe9XI9Svxx51kbd28hpsLs5iHBqbkbsG4eB31BfN79J
-         +jZQ==
-X-Gm-Message-State: AOAM533NeOa6wAWrIGGgz/QMY8y9C+nZdfl/8P7srIXZt4X2INXx+dYV
-        LOlaGAPRv5AUHPpbKUvhq79DkdPqjSQvuOoihK1Z5guhJcV8omb01gYx7SoV+ONBp1T64E/ODxc
-        FoCRtqVqjCef42k89dsxc05RgzWAryfYn7/MImhE+ppKoWc9rfnbV8oMXOo5vUgOY
-X-Received: by 2002:a5d:570b:: with SMTP id a11mr3773359wrv.281.1615978909108;
-        Wed, 17 Mar 2021 04:01:49 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJy0VbLKaFTaCVqAGRs1rbeHF4D2KRhuHJRPmfB/eQ82N3o85USqkuU5BHbA8VdPUP1BHaQSpw==
-X-Received: by 2002:a5d:570b:: with SMTP id a11mr3773334wrv.281.1615978908914;
-        Wed, 17 Mar 2021 04:01:48 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id e1sm26436179wrd.44.2021.03.17.04.01.47
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 17 Mar 2021 04:01:48 -0700 (PDT)
-To:     Emanuele Giuseppe Esposito <eesposit@redhat.com>,
-        linux-kselftest@vger.kernel.org
-Cc:     Shuah Khan <shuah@kernel.org>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-References: <20210317074426.8224-1-eesposit@redhat.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH] selftests/kvm: add set_boot_cpu_id test
-Message-ID: <c4adbfcd-1c5a-3f7a-7d61-206964256963@redhat.com>
-Date:   Wed, 17 Mar 2021 12:01:46 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.7.0
-MIME-Version: 1.0
-In-Reply-To: <20210317074426.8224-1-eesposit@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+        id S231308AbhCQLDr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 17 Mar 2021 07:03:47 -0400
+Received: from mail.kernel.org ([198.145.29.99]:45528 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S231301AbhCQLDR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 17 Mar 2021 07:03:17 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 027CD64F64;
+        Wed, 17 Mar 2021 11:03:17 +0000 (UTC)
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94)
+        (envelope-from <maz@kernel.org>)
+        id 1lMTxK-002C2j-TG; Wed, 17 Mar 2021 11:03:15 +0000
+Date:   Wed, 17 Mar 2021 11:03:14 +0000
+Message-ID: <87h7lahwjx.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Wanpeng Li <kernellwp@gmail.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, Ben Gardon <bgardon@google.com>,
+        Shakeel Butt <shakeelb@google.com>
+Subject: Re: [PATCH] KVM: arm: memcg awareness
+In-Reply-To: <21d1f531-fe95-224d-0dac-6917d473063d@redhat.com>
+References: <1615959984-7122-1-git-send-email-wanpengli@tencent.com>
+        <87mtv2i1s3.wl-maz@kernel.org>
+        <e5fce698-9e21-5c71-c99b-a9af3f213e8f@redhat.com>
+        <87im5qhwzx.wl-maz@kernel.org>
+        <21d1f531-fe95-224d-0dac-6917d473063d@redhat.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: pbonzini@redhat.com, kernellwp@gmail.com, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, bgardon@google.com, shakeelb@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 17/03/21 08:44, Emanuele Giuseppe Esposito wrote:
-> +	printf("vcpu executing...\n");
-> +	vcpu_run(vm, vcpuid);
-> +	printf("vcpu executed\n");
-> +
-> +	switch (get_ucall(vm, vcpuid, &uc)) {
-> +	case UCALL_SYNC:
-> +		printf("stage %d sync %ld\n", stage, uc.args[1]);
-> +		TEST_ASSERT(!strcmp((const char *)uc.args[0], "hello") &&
-> +			    uc.args[1] == stage + 1,
-> +			    "Stage %d: Unexpected register values vmexit, got %lx",
-> +			    stage + 1, (ulong)uc.args[1]);
-> +		return;
-> +	case UCALL_DONE:
-> +		printf("got done\n");
+On Wed, 17 Mar 2021 10:55:00 +0000,
+Paolo Bonzini <pbonzini@redhat.com> wrote:
+> 
+> On 17/03/21 11:53, Marc Zyngier wrote:
+> > On Wed, 17 Mar 2021 10:40:23 +0000,
+> > Paolo Bonzini <pbonzini@redhat.com> wrote:
+> >> 
+> >> On 17/03/21 10:10, Marc Zyngier wrote:
+> >>>> @@ -366,7 +366,7 @@ static int hyp_map_walker(u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
+> >>>>    	if (WARN_ON(level == KVM_PGTABLE_MAX_LEVELS - 1))
+> >>>>    		return -EINVAL;
+> >>>>    -	childp = (kvm_pte_t *)get_zeroed_page(GFP_KERNEL);
+> >>>> +	childp = (kvm_pte_t *)get_zeroed_page(GFP_KERNEL_ACCOUNT);
+> >>> No, this is wrong.
+> >>> 
+> >>> You cannot account the hypervisor page tables to the guest because we
+> >>> don't ever unmap them, and that we can't distinguish two data
+> >>> structures from two different VMs occupying the same page.
+> >> 
+> >> If you never unmap them, there should at least be a shrinker to get
+> >> rid of unused pages in the event of memory pressure.
+> > 
+> > We don't track where these pages are coming from or whether they can
+> > safely be unmapped. Until we can track such ownership and deal with
+> > page sharing, these mappings have to stay,
+> > 
+> > At most, this represent the amount of memory required to map the whole
+> > of the linear mapping.
+> 
+> Ah, these are the EL2 pages, not the stage2 page tables, right?  If
+> so, sorry for the noise.
 
-You can remove the printfs here.
+Yes, EL2 page tables when running non-VHE. VHE doesn't have that
+problem for obvious reasons. Stage-2 page tables can be completely
+discarded at any point, and the MMU notifiers already deal with that.
 
-> +		return;
-> +	case UCALL_ABORT:
-> +		TEST_ASSERT(false, "%s at %s:%ld\n\tvalues: %#lx, %#lx", (const char *)uc.args[0],
-> +			    __FILE__, uc.args[1], uc.args[2], uc.args[3]);
-> +	default:
-> +		TEST_ASSERT(false, "Unexpected exit: %s",
-> +			    exit_reason_str(vcpu_state(vm, vcpuid)->exit_reason));
-> +	}
-> +}
-> +
-> +static void add_x86_vcpu(struct kvm_vm *vm, uint32_t vcpuid, void *code)
-> +{
-> +	vm_vcpu_add_default(vm, vcpuid, code);
-> +	vcpu_set_cpuid(vm, vcpuid, kvm_get_supported_cpuid());
-> +}
-> +
-> +static void run_vm_bsp(uint32_t bsp_vcpu)
-> +{
-> +	struct kvm_vm *vm;
-> +	int stage;
-> +	void *vcpu0_code, *vcpu1_code;
-> +
-> +	vm = create_vm();
-> +
-> +	vcpu0_code = guest_bsp_vcpu;
-> +	vcpu1_code = guest_not_bsp_vcpu;
-> +
-> +	if (bsp_vcpu == VCPU_ID1) {
-> +		vcpu0_code = guest_not_bsp_vcpu;
-> +		vcpu1_code = guest_bsp_vcpu;
-> +
-> +		vm_ioctl(vm, KVM_SET_BOOT_CPU_ID, (void *) VCPU_ID1);
-> +	}
-> +
-> +	add_x86_vcpu(vm, VCPU_ID0, vcpu0_code);
-> +	add_x86_vcpu(vm, VCPU_ID1, vcpu1_code);
-> +
-> +	for (stage = 0; stage < 2; stage++) {
-> +		run_vcpu(vm, VCPU_ID0, stage);
-> +		run_vcpu(vm, VCPU_ID1, stage);
-> +	}
+	M.
 
-These are just stylistic nits, but:
-
-1) you could pass a bool to add_x86_vcpu, like
-
-	add_x86_vcpu(vm, VCPU_ID0, bsp_vcpu == VCPU_ID0);
-	add_x86_vcpu(vm, VCPU_ID1, bsp_vcpu == VCPU_ID1);
-
-instead of having the vcpu0_code and vcpu1_code pointers.
-
-2) you could move the for loop inside run_vcpu.  This way you can assert 
-that you get UCALL_DONE when stage == 2.
-
-> +	kvm_vm_free(vm);
-> +}
-> +
-> +int main(int argc, char *argv[])
-> +{
-> +	if (!kvm_check_cap(KVM_CAP_SET_BOOT_CPU_ID)) {
-> +		print_skip("set_boot_cpu_id not available");
-> +		return 0;
-> +	}
-> +
-> +	run_vm_bsp(VCPU_ID0);
-> +	run_vm_bsp(VCPU_ID1);
-> +	run_vm_bsp(VCPU_ID0);
-
-Looks good!  Just another small change: since this third test is not 
-adding much, you could instead invoke KVM_SET_BOOT_CPU_ID(VCPU_ID1) 
-*after* the creation of the vCPUs instead of before.  This should fail 
-with -EBUSY, and vcpu 0 will remain the BSP.
-
-Paolo
-
+-- 
+Without deviation from the norm, progress is not possible.
