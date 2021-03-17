@@ -2,427 +2,194 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E2DB233F0FC
-	for <lists+kvm@lfdr.de>; Wed, 17 Mar 2021 14:18:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 52F5233F129
+	for <lists+kvm@lfdr.de>; Wed, 17 Mar 2021 14:31:33 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230443AbhCQNRw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 17 Mar 2021 09:17:52 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:44443 "EHLO
+        id S231134AbhCQNbB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 17 Mar 2021 09:31:01 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:21766 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230241AbhCQNRk (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 17 Mar 2021 09:17:40 -0400
+        by vger.kernel.org with ESMTP id S230331AbhCQNav (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 17 Mar 2021 09:30:51 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1615987059;
+        s=mimecast20190719; t=1615987851;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
+         to:to:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=Re55l15tAzqIwgbcPGT5mg08j9IQc5Vt795kkC6STmU=;
-        b=VY0jmqM+v0RQPrrijgsHz0WSxmc/ljDWlRTUonS93TPz771TIYGMXbB/HwZxygS6ABOlZF
-        a6Y5OB04rZ2av+fe8RLKS74t349wOfMNDAw0arvuNGrMq8mV0qKAuq1H/bFgIOwgqfglm1
-        ZashLht2vikOkGNm/CXmkiyQeQ0h32A=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-162-c4A1-NzvO56VhEvpWm_W_Q-1; Wed, 17 Mar 2021 09:17:37 -0400
-X-MC-Unique: c4A1-NzvO56VhEvpWm_W_Q-1
-Received: by mail-wr1-f70.google.com with SMTP id z6so18361446wrh.11
-        for <kvm@vger.kernel.org>; Wed, 17 Mar 2021 06:17:37 -0700 (PDT)
+        bh=tPNFSfNB6p+yJ3oKcYm7yhqfHOqwB/rvOL94ppns3z4=;
+        b=Bg0PVhhK6GR/SWNed34uy1wTEvaDS1/Y8IMeGJeABJ4q6i/JXPlzyXBVdmxEXmqVeoiZRE
+        9yBnJelQNluuzMZbLT/Lx3UfnB7R93vh17T2qKNYR2sbPPc4QLve2DE+Devxx2PbmhGLLT
+        GYmynaGJuv/RBM4+kcxeV1afUD/oglc=
+Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
+ [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-68-MbbrA2MUM7ySlnl0h_7h5A-1; Wed, 17 Mar 2021 09:30:48 -0400
+X-MC-Unique: MbbrA2MUM7ySlnl0h_7h5A-1
+Received: by mail-ed1-f70.google.com with SMTP id i6so19468302edq.12
+        for <kvm@vger.kernel.org>; Wed, 17 Mar 2021 06:30:48 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=Re55l15tAzqIwgbcPGT5mg08j9IQc5Vt795kkC6STmU=;
-        b=B8vJy0hansfsNd/XP9qpcXM+tB7+5AKQPxHCvEy4sVMGcwncxsrekKPgJKPJvkWYKp
-         8Ag45mZdmadhNhAWkbFUNYHoRV0GlAV/Vu5yVE8n1soKpNQ6d50XxUb/r+NhNQzIfUtj
-         UKGf/2FvYYwdKWbrOoMbh0tt7EtrVPTdL8lWmehjx9BrJMD+o0EmWQmWhuqHzZ3pIzH3
-         /r7XasjC9TcSyTInOgARsq2NaQlUplouvG2hF8C/DxTE2zDpF1h5gY+vgtymb7lcSFW0
-         yODmPsG2taCCtWN/m48SxmN4jb7PWNCAA/buKa4tDWTjSK+JZQPTOqDk3VXihS68Nyv+
-         puJg==
-X-Gm-Message-State: AOAM531r165DcdOE2u9JoQS8judboCUiYJJZqIQOn0VkW3PMu6YOMgqR
-        biNb1+AQBVSu1+K9Z63mvXckTtli/Wxc1rzVsJON42LBlPlGJP2AqUwJ3wv7+k5u0lntZyIVI5W
-        pqd71j59yVC9j
-X-Received: by 2002:a1c:4c10:: with SMTP id z16mr3674536wmf.136.1615987056653;
-        Wed, 17 Mar 2021 06:17:36 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxnMgtlXJkpLBs3ujd4ADqeIXJIIf4RKhRMtfQQ6mbPNllFwEs4kSZuQmcCVjXNxMWuy2nb6w==
-X-Received: by 2002:a1c:4c10:: with SMTP id z16mr3674514wmf.136.1615987056410;
-        Wed, 17 Mar 2021 06:17:36 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id n6sm29845402wrw.63.2021.03.17.06.17.35
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 17 Mar 2021 06:17:35 -0700 (PDT)
-Subject: Re: [PATCH 2/4] KVM: nVMX: Handle dynamic MSR intercept toggling
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Alexander Graf <graf@amazon.com>,
-        Yuan Yao <yaoyuan0329os@gmail.com>
-References: <20210316184436.2544875-1-seanjc@google.com>
- <20210316184436.2544875-3-seanjc@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <66bc75f6-58c5-c67f-f268-220d371022a2@redhat.com>
-Date:   Wed, 17 Mar 2021 14:17:34 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.7.0
+        h=x-gm-message-state:from:to:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=tPNFSfNB6p+yJ3oKcYm7yhqfHOqwB/rvOL94ppns3z4=;
+        b=UZma63vyL+ugHUa0OUSMOzd77Y6FMTckJcRbeZs99vdtNM7tj6aBWefKym6pYk1TgG
+         9Anvk8YSK6Ed+F4LWoVq6h3Zknpwx5EtiVCtw4E1LY1LL+rldn40V+cbPG8MfB5suOMQ
+         Oc+WkIA7tl2VB3J3CX1wSj0St4UgTh47rg/P1HVcwFab1zK+Pu7ogSu48STHoxokN3Ji
+         d5yriiYneq8juJOL0eSW5Yyo1JfX97cnIwU5rGsAJHYKHNJ+JxK0yjR1ubxnPUzY+Hp5
+         GUXx54MY6/sokDr+2DQummVffL5hjGPzNVzfE79bEcJzjTWqJ7HjUKgeURlZDnsBuaG8
+         koWg==
+X-Gm-Message-State: AOAM533ah+VHf64Bh7Lc7OltWZUlRC1F1Qqx3vtEkHVGWxI04wOgf1Hq
+        6j/hGTnPk9qAdd1Vn00N80X9hkQeo0Fw5j2DtVQj5LqWmf9GDQ7Y7e4WRgX1R/VYgF4Gk2IRNgP
+        kOUL68z7+/LB4
+X-Received: by 2002:a05:6402:888:: with SMTP id e8mr41146977edy.51.1615987847496;
+        Wed, 17 Mar 2021 06:30:47 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwtfPFBtob+QS+AgsVD1O9FUMF3KpeNixXiQo7UStUuzmD2EXfxhFGoVaizdbjA5R21sBc89A==
+X-Received: by 2002:a05:6402:888:: with SMTP id e8mr41146943edy.51.1615987847291;
+        Wed, 17 Mar 2021 06:30:47 -0700 (PDT)
+Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id v8sm12698750edx.38.2021.03.17.06.30.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 17 Mar 2021 06:30:46 -0700 (PDT)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Lenny Szubowicz <lszubowi@redhat.com>, pbonzini@redhat.com,
+        seanjc@google.com, wanpengli@tencent.com, jmattson@google.com,
+        joro@8bytes.org, tglx@linutronix.de, mingo@redhat.com,
+        bp@alien8.de, x86@kernel.org, hpa@zytor.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] x86/kvmclock: Stop kvmclocks for hibernate restore
+In-Reply-To: <20210311132847.224406-1-lszubowi@redhat.com>
+References: <20210311132847.224406-1-lszubowi@redhat.com>
+Date:   Wed, 17 Mar 2021 14:30:45 +0100
+Message-ID: <87sg4t7vqy.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20210316184436.2544875-3-seanjc@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 16/03/21 19:44, Sean Christopherson wrote:
-> Always check vmcs01's MSR bitmap when merging L0 and L1 bitmaps for L2,
-> and always update the relevant bits in vmcs02.  This fixes two distinct,
-> but intertwined bugs related to dynamic MSR bitmap modifications.
-> 
-> The first issue is that KVM fails to enable MSR interception in vmcs02
-> for the FS/GS base MSRs if L1 first runs L2 with interception disabled,
-> and later enables interception.
-> 
-> The second issue is that KVM fails to honor userspace MSR filtering when
-> preparing vmcs02.
-> 
-> Fix both issues simultaneous as fixing only one of the issues (doesn't
-> matter which) would create a mess that no one should have to bisect.
-> Fixing only the first bug would exacerbate the MSR filtering issue as
-> userspace would see inconsistent behavior depending on the whims of L1.
-> Fixing only the second bug (MSR filtering) effectively requires fixing
-> the first, as the nVMX code only knows how to transition vmcs02's
-> bitmap from 1->0.
-> 
-> Move the various accessor/mutators buried in vmx.c into vmx.h so that
-> they can be shared by the nested code.
-> 
-> Fixes: 1a155254ff93 ("KVM: x86: Introduce MSR filtering")
-> Fixes: d69129b4e46a ("KVM: nVMX: Disable intercept for FS/GS base MSRs in vmcs02 when possible")
-> Cc: stable@vger.kernel.org
-> Cc: Alexander Graf <graf@amazon.com>
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
+Lenny Szubowicz <lszubowi@redhat.com> writes:
+
+> Turn off host updates to the registered kvmclock memory
+> locations when transitioning to a hibernated kernel in
+> resume_target_kernel().
+>
+> This is accomplished for secondary vcpus by disabling host
+> clock updates for that vcpu when it is put offline. For the
+> primary vcpu, it's accomplished by using the existing call back
+> from save_processor_state() to kvm_save_sched_clock_state().
+>
+> The registered kvmclock memory locations may differ between
+> the currently running kernel and the hibernated kernel, which
+> is being restored and resumed. Kernel memory corruption is thus
+> possible if the host clock updates are allowed to run while the
+> hibernated kernel is relocated to its original physical memory
+> locations.
+>
+> This is similar to the problem solved for kexec by
+> commit 1e977aa12dd4 ("x86: KVM guest: disable clock before rebooting.")
+>
+> Commit 95a3d4454bb1 ("x86/kvmclock: Switch kvmclock data to a
+> PER_CPU variable") innocently increased the exposure for this
+> problem by dynamically allocating the physical pages that are
+> used for host clock updates when the vcpu count exceeds 64.
+> This increases the likelihood that the registered kvmclock
+> locations will differ for vcpus above 64.
+>
+> Reported-by: Xiaoyi Chen <cxiaoyi@amazon.com>
+> Tested-by: Mohamed Aboubakr <mabouba@amazon.com>
+> Signed-off-by: Lenny Szubowicz <lszubowi@redhat.com>
 > ---
->   arch/x86/kvm/vmx/nested.c | 108 +++++++++++++++++---------------------
->   arch/x86/kvm/vmx/vmx.c    |  67 ++---------------------
->   arch/x86/kvm/vmx/vmx.h    |  63 ++++++++++++++++++++++
->   3 files changed, 115 insertions(+), 123 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-> index fd334e4aa6db..aff41a432a56 100644
-> --- a/arch/x86/kvm/vmx/nested.c
-> +++ b/arch/x86/kvm/vmx/nested.c
-> @@ -475,29 +475,6 @@ static int nested_vmx_check_tpr_shadow_controls(struct kvm_vcpu *vcpu,
->   	return 0;
->   }
->   
-> -/*
-> - * Check if MSR is intercepted for L01 MSR bitmap.
-> - */
-> -static bool msr_write_intercepted_l01(struct kvm_vcpu *vcpu, u32 msr)
-> -{
-> -	unsigned long *msr_bitmap;
-> -	int f = sizeof(unsigned long);
-> -
-> -	if (!cpu_has_vmx_msr_bitmap())
-> -		return true;
-> -
-> -	msr_bitmap = to_vmx(vcpu)->vmcs01.msr_bitmap;
-> -
-> -	if (msr <= 0x1fff) {
-> -		return !!test_bit(msr, msr_bitmap + 0x800 / f);
-> -	} else if ((msr >= 0xc0000000) && (msr <= 0xc0001fff)) {
-> -		msr &= 0x1fff;
-> -		return !!test_bit(msr, msr_bitmap + 0xc00 / f);
-> -	}
-> -
-> -	return true;
-> -}
-> -
->   /*
->    * If a msr is allowed by L0, we should check whether it is allowed by L1.
->    * The corresponding bit will be cleared unless both of L0 and L1 allow it.
-> @@ -551,6 +528,34 @@ static inline void enable_x2apic_msr_intercepts(unsigned long *msr_bitmap)
->   	}
->   }
->   
-> +#define BUILD_NVMX_MSR_INTERCEPT_HELPER(rw)					\
-> +static inline									\
-> +void nested_vmx_set_msr_##rw##_intercept(struct vcpu_vmx *vmx,			\
-> +					 unsigned long *msr_bitmap_l1,		\
-> +					 unsigned long *msr_bitmap_l0, u32 msr)	\
-> +{										\
-> +	if (vmx_test_msr_bitmap_##rw(vmx->vmcs01.msr_bitmap, msr) ||		\
-> +	    vmx_test_msr_bitmap_##rw(msr_bitmap_l1, msr))			\
-> +		vmx_set_msr_bitmap_##rw(msr_bitmap_l0, msr);			\
-> +	else									\
-> +		vmx_clear_msr_bitmap_##rw(msr_bitmap_l0, msr);			\
-> +}
-> +BUILD_NVMX_MSR_INTERCEPT_HELPER(read)
-> +BUILD_NVMX_MSR_INTERCEPT_HELPER(write)
-> +
-> +static inline void nested_vmx_set_intercept_for_msr(struct vcpu_vmx *vmx,
-> +						    unsigned long *msr_bitmap_l1,
-> +						    unsigned long *msr_bitmap_l0,
-> +						    u32 msr, int types)
-> +{
-> +	if (types & MSR_TYPE_R)
-> +		nested_vmx_set_msr_read_intercept(vmx, msr_bitmap_l1,
-> +						  msr_bitmap_l0, msr);
-> +	if (types & MSR_TYPE_W)
-> +		nested_vmx_set_msr_write_intercept(vmx, msr_bitmap_l1,
-> +						   msr_bitmap_l0, msr);
-> +}
-> +
->   /*
->    * Merge L0's and L1's MSR bitmap, return false to indicate that
->    * we do not use the hardware.
-> @@ -558,10 +563,11 @@ static inline void enable_x2apic_msr_intercepts(unsigned long *msr_bitmap)
->   static inline bool nested_vmx_prepare_msr_bitmap(struct kvm_vcpu *vcpu,
->   						 struct vmcs12 *vmcs12)
->   {
-> +	struct vcpu_vmx *vmx = to_vmx(vcpu);
->   	int msr;
->   	unsigned long *msr_bitmap_l1;
-> -	unsigned long *msr_bitmap_l0 = to_vmx(vcpu)->nested.vmcs02.msr_bitmap;
-> -	struct kvm_host_map *map = &to_vmx(vcpu)->nested.msr_bitmap_map;
-> +	unsigned long *msr_bitmap_l0 = vmx->nested.vmcs02.msr_bitmap;
-> +	struct kvm_host_map *map = &vmx->nested.msr_bitmap_map;
->   
->   	/* Nothing to do if the MSR bitmap is not in use.  */
->   	if (!cpu_has_vmx_msr_bitmap() ||
-> @@ -612,42 +618,26 @@ static inline bool nested_vmx_prepare_msr_bitmap(struct kvm_vcpu *vcpu,
->   		}
->   	}
->   
-> -	/* KVM unconditionally exposes the FS/GS base MSRs to L1. */
-> -	nested_vmx_disable_intercept_for_msr(msr_bitmap_l1, msr_bitmap_l0,
-> -					     MSR_FS_BASE, MSR_TYPE_RW);
-> -
-> -	nested_vmx_disable_intercept_for_msr(msr_bitmap_l1, msr_bitmap_l0,
-> -					     MSR_GS_BASE, MSR_TYPE_RW);
-> -
-> -	nested_vmx_disable_intercept_for_msr(msr_bitmap_l1, msr_bitmap_l0,
-> -					     MSR_KERNEL_GS_BASE, MSR_TYPE_RW);
-> -
->   	/*
-> -	 * Checking the L0->L1 bitmap is trying to verify two things:
-> -	 *
-> -	 * 1. L0 gave a permission to L1 to actually passthrough the MSR. This
-> -	 *    ensures that we do not accidentally generate an L02 MSR bitmap
-> -	 *    from the L12 MSR bitmap that is too permissive.
-> -	 * 2. That L1 or L2s have actually used the MSR. This avoids
-> -	 *    unnecessarily merging of the bitmap if the MSR is unused. This
-> -	 *    works properly because we only update the L01 MSR bitmap lazily.
-> -	 *    So even if L0 should pass L1 these MSRs, the L01 bitmap is only
-> -	 *    updated to reflect this when L1 (or its L2s) actually write to
-> -	 *    the MSR.
-> +	 * Always check vmcs01's bitmap to honor userspace MSR filters and any
-> +	 * other runtime changes to vmcs01's bitmap, e.g. dynamic pass-through.
->   	 */
-> -	if (!msr_write_intercepted_l01(vcpu, MSR_IA32_SPEC_CTRL))
-> -		nested_vmx_disable_intercept_for_msr(
-> -					msr_bitmap_l1, msr_bitmap_l0,
-> -					MSR_IA32_SPEC_CTRL,
-> -					MSR_TYPE_R | MSR_TYPE_W);
-> -
-> -	if (!msr_write_intercepted_l01(vcpu, MSR_IA32_PRED_CMD))
-> -		nested_vmx_disable_intercept_for_msr(
-> -					msr_bitmap_l1, msr_bitmap_l0,
-> -					MSR_IA32_PRED_CMD,
-> -					MSR_TYPE_W);
-> -
-> -	kvm_vcpu_unmap(vcpu, &to_vmx(vcpu)->nested.msr_bitmap_map, false);
-> +	nested_vmx_set_intercept_for_msr(vmx, msr_bitmap_l1, msr_bitmap_l0,
-> +					 MSR_FS_BASE, MSR_TYPE_RW);
-> +
-> +	nested_vmx_set_intercept_for_msr(vmx, msr_bitmap_l1, msr_bitmap_l0,
-> +					 MSR_GS_BASE, MSR_TYPE_RW);
-> +
-> +	nested_vmx_set_intercept_for_msr(vmx, msr_bitmap_l1, msr_bitmap_l0,
-> +					 MSR_KERNEL_GS_BASE, MSR_TYPE_RW);
-> +
-> +	nested_vmx_set_intercept_for_msr(vmx, msr_bitmap_l1, msr_bitmap_l0,
-> +					 MSR_IA32_SPEC_CTRL, MSR_TYPE_RW);
-> +
-> +	nested_vmx_set_intercept_for_msr(vmx, msr_bitmap_l1, msr_bitmap_l0,
-> +					 MSR_IA32_PRED_CMD, MSR_TYPE_W);
-> +
-> +	kvm_vcpu_unmap(vcpu, &vmx->nested.msr_bitmap_map, false);
->   
->   	return true;
->   }
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index c8a4a548e96b..9972e5d1c44e 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -879,29 +879,6 @@ void vmx_update_exception_bitmap(struct kvm_vcpu *vcpu)
->   	vmcs_write32(EXCEPTION_BITMAP, eb);
->   }
->   
-> -/*
-> - * Check if MSR is intercepted for currently loaded MSR bitmap.
-> - */
-> -static bool msr_write_intercepted(struct kvm_vcpu *vcpu, u32 msr)
-> -{
-> -	unsigned long *msr_bitmap;
-> -	int f = sizeof(unsigned long);
-> -
-> -	if (!cpu_has_vmx_msr_bitmap())
-> -		return true;
-> -
-> -	msr_bitmap = to_vmx(vcpu)->loaded_vmcs->msr_bitmap;
-> -
-> -	if (msr <= 0x1fff) {
-> -		return !!test_bit(msr, msr_bitmap + 0x800 / f);
-> -	} else if ((msr >= 0xc0000000) && (msr <= 0xc0001fff)) {
-> -		msr &= 0x1fff;
-> -		return !!test_bit(msr, msr_bitmap + 0xc00 / f);
-> -	}
-> -
-> -	return true;
-> -}
-> -
->   static void clear_atomic_switch_msr_special(struct vcpu_vmx *vmx,
->   		unsigned long entry, unsigned long exit)
->   {
-> @@ -3709,46 +3686,6 @@ void free_vpid(int vpid)
->   	spin_unlock(&vmx_vpid_lock);
->   }
->   
-> -static void vmx_clear_msr_bitmap_read(ulong *msr_bitmap, u32 msr)
-> -{
-> -	int f = sizeof(unsigned long);
-> -
-> -	if (msr <= 0x1fff)
-> -		__clear_bit(msr, msr_bitmap + 0x000 / f);
-> -	else if ((msr >= 0xc0000000) && (msr <= 0xc0001fff))
-> -		__clear_bit(msr & 0x1fff, msr_bitmap + 0x400 / f);
-> -}
-> -
-> -static void vmx_clear_msr_bitmap_write(ulong *msr_bitmap, u32 msr)
-> -{
-> -	int f = sizeof(unsigned long);
-> -
-> -	if (msr <= 0x1fff)
-> -		__clear_bit(msr, msr_bitmap + 0x800 / f);
-> -	else if ((msr >= 0xc0000000) && (msr <= 0xc0001fff))
-> -		__clear_bit(msr & 0x1fff, msr_bitmap + 0xc00 / f);
-> -}
-> -
-> -static void vmx_set_msr_bitmap_read(ulong *msr_bitmap, u32 msr)
-> -{
-> -	int f = sizeof(unsigned long);
-> -
-> -	if (msr <= 0x1fff)
-> -		__set_bit(msr, msr_bitmap + 0x000 / f);
-> -	else if ((msr >= 0xc0000000) && (msr <= 0xc0001fff))
-> -		__set_bit(msr & 0x1fff, msr_bitmap + 0x400 / f);
-> -}
-> -
-> -static void vmx_set_msr_bitmap_write(ulong *msr_bitmap, u32 msr)
-> -{
-> -	int f = sizeof(unsigned long);
-> -
-> -	if (msr <= 0x1fff)
-> -		__set_bit(msr, msr_bitmap + 0x800 / f);
-> -	else if ((msr >= 0xc0000000) && (msr <= 0xc0001fff))
-> -		__set_bit(msr & 0x1fff, msr_bitmap + 0xc00 / f);
-> -}
-> -
->   static __always_inline void vmx_disable_intercept_for_msr(struct kvm_vcpu *vcpu,
->   							  u32 msr, int type)
->   {
-> @@ -6722,7 +6659,9 @@ static fastpath_t vmx_vcpu_run(struct kvm_vcpu *vcpu)
->   	 * If the L02 MSR bitmap does not intercept the MSR, then we need to
->   	 * save it.
->   	 */
-> -	if (unlikely(!msr_write_intercepted(vcpu, MSR_IA32_SPEC_CTRL)))
-> +	if (unlikely(cpu_has_vmx_msr_bitmap() &&
-> +		     vmx_test_msr_bitmap_write(vmx->loaded_vmcs->msr_bitmap,
-> +					       MSR_IA32_SPEC_CTRL)))
->   		vmx->spec_ctrl = native_read_msr(MSR_IA32_SPEC_CTRL);
->   
->   	x86_spec_ctrl_restore_host(vmx->spec_ctrl, 0);
-> diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
-> index 0fb3236b0283..a6000c91b897 100644
-> --- a/arch/x86/kvm/vmx/vmx.h
-> +++ b/arch/x86/kvm/vmx/vmx.h
-> @@ -393,6 +393,69 @@ void vmx_set_intercept_for_msr(struct kvm_vcpu *vcpu,
->   	u32 msr, int type, bool value);
->   void vmx_update_cpu_dirty_logging(struct kvm_vcpu *vcpu);
->   
-> +static inline bool vmx_test_msr_bitmap_read(ulong *msr_bitmap, u32 msr)
-> +{
-> +	int f = sizeof(unsigned long);
-> +
-> +	if (msr <= 0x1fff)
-> +		return test_bit(msr, msr_bitmap + 0x000 / f);
-> +	else if ((msr >= 0xc0000000) && (msr <= 0xc0001fff))
-> +		return test_bit(msr & 0x1fff, msr_bitmap + 0x400 / f);
-> +	return true;
-> +}
-> +
-> +static inline bool vmx_test_msr_bitmap_write(ulong *msr_bitmap, u32 msr)
-> +{
-> +	int f = sizeof(unsigned long);
-> +
-> +	if (msr <= 0x1fff)
-> +		return test_bit(msr, msr_bitmap + 0x800 / f);
-> +	else if ((msr >= 0xc0000000) && (msr <= 0xc0001fff))
-> +		return test_bit(msr & 0x1fff, msr_bitmap + 0xc00 / f);
-> +	return true;
-> +}
-> +
-> +static inline void vmx_clear_msr_bitmap_read(ulong *msr_bitmap, u32 msr)
-> +{
-> +	int f = sizeof(unsigned long);
-> +
-> +	if (msr <= 0x1fff)
-> +		__clear_bit(msr, msr_bitmap + 0x000 / f);
-> +	else if ((msr >= 0xc0000000) && (msr <= 0xc0001fff))
-> +		__clear_bit(msr & 0x1fff, msr_bitmap + 0x400 / f);
-> +}
-> +
-> +static inline void vmx_clear_msr_bitmap_write(ulong *msr_bitmap, u32 msr)
-> +{
-> +	int f = sizeof(unsigned long);
-> +
-> +	if (msr <= 0x1fff)
-> +		__clear_bit(msr, msr_bitmap + 0x800 / f);
-> +	else if ((msr >= 0xc0000000) && (msr <= 0xc0001fff))
-> +		__clear_bit(msr & 0x1fff, msr_bitmap + 0xc00 / f);
-> +}
-> +
-> +static inline void vmx_set_msr_bitmap_read(ulong *msr_bitmap, u32 msr)
-> +{
-> +	int f = sizeof(unsigned long);
-> +
-> +	if (msr <= 0x1fff)
-> +		__set_bit(msr, msr_bitmap + 0x000 / f);
-> +	else if ((msr >= 0xc0000000) && (msr <= 0xc0001fff))
-> +		__set_bit(msr & 0x1fff, msr_bitmap + 0x400 / f);
-> +}
-> +
-> +static inline void vmx_set_msr_bitmap_write(ulong *msr_bitmap, u32 msr)
-> +{
-> +	int f = sizeof(unsigned long);
-> +
-> +	if (msr <= 0x1fff)
-> +		__set_bit(msr, msr_bitmap + 0x800 / f);
-> +	else if ((msr >= 0xc0000000) && (msr <= 0xc0001fff))
-> +		__set_bit(msr & 0x1fff, msr_bitmap + 0xc00 / f);
-> +}
-> +
-> +
->   static inline u8 vmx_get_rvi(void)
->   {
->   	return vmcs_read16(GUEST_INTR_STATUS) & 0xff;
-> 
+>  arch/x86/kernel/kvmclock.c | 34 ++++++++++++++++++++++++++++++++--
+>  1 file changed, 32 insertions(+), 2 deletions(-)
+>
+> diff --git a/arch/x86/kernel/kvmclock.c b/arch/x86/kernel/kvmclock.c
+> index aa593743acf6..291ffca41afb 100644
+> --- a/arch/x86/kernel/kvmclock.c
+> +++ b/arch/x86/kernel/kvmclock.c
+> @@ -187,8 +187,18 @@ static void kvm_register_clock(char *txt)
+>  	pr_info("kvm-clock: cpu %d, msr %llx, %s", smp_processor_id(), pa, txt);
+>  }
+>  
+> +/*
+> + * Turn off host clock updates to the registered memory location when the
+> + * cpu clock context is saved via save_processor_state(). Enables correct
+> + * handling of the primary cpu clock when transitioning to a hibernated
+> + * kernel in resume_target_kernel(), where the old and new registered
+> + * memory locations may differ.
+> + */
+>  static void kvm_save_sched_clock_state(void)
+>  {
+> +	native_write_msr(msr_kvm_system_time, 0, 0);
+> +	kvm_disable_steal_time();
+> +	pr_info("kvm-clock: cpu %d, clock stopped", smp_processor_id());
+>  }
 
-Feel free to squash patch 3 in this one or reorder it before; it makes 
-sense to make them macros when you go from 4 to 6 functions.
+Nitpick: should we rename kvm_save_sched_clock_state() to something more
+generic, like kvm_disable_host_clock_updates() to indicate, that what it
+does is not only sched clock related?
 
-Paolo
+>  
+>  static void kvm_restore_sched_clock_state(void)
+> @@ -311,9 +321,23 @@ static int kvmclock_setup_percpu(unsigned int cpu)
+>  	return p ? 0 : -ENOMEM;
+>  }
+>  
+> +/*
+> + * Turn off host clock updates to the registered memory location when a
+> + * cpu is placed offline. Enables correct handling of secondary cpu clocks
+> + * when transitioning to a hibernated kernel in resume_target_kernel(),
+> + * where the old and new registered memory locations may differ.
+> + */
+> +static int kvmclock_cpu_offline(unsigned int cpu)
+> +{
+> +	native_write_msr(msr_kvm_system_time, 0, 0);
+> +	pr_info("kvm-clock: cpu %d, clock stopped", cpu);
+
+I'd say this pr_info() is superfluous: on a system with hundereds of
+vCPUs users will get flooded with 'clock stopped' messages which don't
+actually mean much: in case native_write_msr() fails the error gets
+reported in dmesg anyway. I'd suggest we drop this and pr_info() in
+kvm_save_sched_clock_state().
+
+> +	return 0;
+
+Why don't we disable steal time accounting here? MSR_KVM_STEAL_TIME is
+also per-cpu. Can we merge kvm_save_sched_clock_state() with
+kvmclock_cpu_offline() maybe?
+
+> +}
+> +
+>  void __init kvmclock_init(void)
+>  {
+>  	u8 flags;
+> +	int cpuhp_prepare;
+>  
+>  	if (!kvm_para_available() || !kvmclock)
+>  		return;
+> @@ -325,8 +349,14 @@ void __init kvmclock_init(void)
+>  		return;
+>  	}
+>  
+> -	if (cpuhp_setup_state(CPUHP_BP_PREPARE_DYN, "kvmclock:setup_percpu",
+> -			      kvmclock_setup_percpu, NULL) < 0) {
+> +	cpuhp_prepare = cpuhp_setup_state(CPUHP_BP_PREPARE_DYN,
+> +					  "kvmclock:setup_percpu",
+> +					  kvmclock_setup_percpu, NULL);
+> +	if (cpuhp_prepare < 0)
+> +		return;
+> +	if (cpuhp_setup_state(CPUHP_AP_ONLINE_DYN, "kvmclock:cpu_offline",
+> +			      NULL, kvmclock_cpu_offline) < 0) {
+> +		cpuhp_remove_state(cpuhp_prepare);
+
+In case we fail to set up kvmclock_cpu_offline() callback we get broken
+hybernation but without kvmclock_setup_percpu() call we get a broken
+guest (as kvmclock() may be the only reliable clocksource) so I'm not
+exactly sure we're active in a best way with cpuhp_remove_state()
+here. I don't feel strong though, I think it can stay but in that case
+I'd add a pr_warn() at least.
+
+>  		return;
+>  	}
+
+-- 
+Vitaly
 
