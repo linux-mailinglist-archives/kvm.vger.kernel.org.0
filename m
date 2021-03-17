@@ -2,98 +2,85 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2583A33ECF0
-	for <lists+kvm@lfdr.de>; Wed, 17 Mar 2021 10:26:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DC48D33ED4A
+	for <lists+kvm@lfdr.de>; Wed, 17 Mar 2021 10:45:13 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229683AbhCQJ0U (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 17 Mar 2021 05:26:20 -0400
-Received: from lizzard.sbs.de ([194.138.37.39]:45725 "EHLO lizzard.sbs.de"
+        id S229752AbhCQJoi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 17 Mar 2021 05:44:38 -0400
+Received: from mx2.suse.de ([195.135.220.15]:42366 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229751AbhCQJ0E (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 17 Mar 2021 05:26:04 -0400
-Received: from mail2.sbs.de (mail2.sbs.de [192.129.41.66])
-        by lizzard.sbs.de (8.15.2/8.15.2) with ESMTPS id 12H9PcBs027629
-        (version=TLSv1.2 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 17 Mar 2021 10:25:38 +0100
-Received: from [167.87.41.130] ([167.87.41.130])
-        by mail2.sbs.de (8.15.2/8.15.2) with ESMTP id 12H9KaQL031246;
-        Wed, 17 Mar 2021 10:20:36 +0100
-Subject: Re: [PATCH 2/3] KVM: x86: guest debug: don't inject interrupts while
- single stepping
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Maxim Levitsky <mlevitsk@redhat.com>,
-        kvm list <kvm@vger.kernel.org>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Kieran Bingham <kbingham@kernel.org>,
-        Jessica Yu <jeyu@kernel.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
-        Joerg Roedel <joro@8bytes.org>,
-        Jim Mattson <jmattson@google.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
+        id S229535AbhCQJoJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 17 Mar 2021 05:44:09 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+        t=1615974248; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=15SYZUOsoJrtHlD7au1IPSvMhYe6ENPbMXJkbZtfksA=;
+        b=dnwcW+yYQOAKzjFfBsPO6BtIwTwnPdajOyVerDHNue20QLH8yCOrCRdlnUJR1xMcwzyYwt
+        QXg49q5jxymBUMCTic3MEhn9xxxc/k490Pw3Ur9tcuOkA/oQbHaYG9wtxEd/XblLvuGhOM
+        BPLp23zWhfiMnPN3eGIQakgwhhpAZTU=
+Received: from relay2.suse.de (unknown [195.135.221.27])
+        by mx2.suse.de (Postfix) with ESMTP id 00502AB8C;
+        Wed, 17 Mar 2021 09:44:07 +0000 (UTC)
+Date:   Wed, 17 Mar 2021 10:44:06 +0100
+From:   Michal Hocko <mhocko@suse.com>
+To:     Wanpeng Li <kernellwp@gmail.com>
+Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Ingo Molnar <mingo@redhat.com>
-References: <1259724f-1bdb-6229-2772-3192f6d17a4a@siemens.com>
- <bede3450413a7c5e7e55b19a47c8f079edaa55a2.camel@redhat.com>
- <ca41fe98-0e5d-3b4c-8ed8-bdd7cd5bc60f@siemens.com>
- <71ae8b75c30fd0f87e760216ad310ddf72d31c7b.camel@redhat.com>
- <2a44c302-744e-2794-59f6-c921b895726d@siemens.com>
- <1d27b215a488f8b8fc175e97c5ab973cc811922d.camel@redhat.com>
- <727e5ef1-f771-1301-88d6-d76f05540b01@siemens.com>
- <e2cd978e357155dbab21a523bb8981973bd10da7.camel@redhat.com>
- <CAMS+r+XFLsFRFLGLaAH3_EnBcxOmyN-XiZqcmKEx2utjNErYsQ@mail.gmail.com>
- <31c0bba9-0399-1f15-a59b-a8f035e366e8@siemens.com>
- <YFDqSisnoWD5wVdP@google.com>
-From:   Jan Kiszka <jan.kiszka@siemens.com>
-Message-ID: <d94f9c87-9609-4e7f-04d0-546d27671e51@siemens.com>
-Date:   Wed, 17 Mar 2021 10:20:36 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.8.0
+        Marc Zyngier <maz@kernel.org>
+Subject: Re: [PATCH] KVM: arm: memcg awareness
+Message-ID: <YFHPZjyUn3AsQnN2@dhcp22.suse.cz>
+References: <1615959984-7122-1-git-send-email-wanpengli@tencent.com>
+ <YFG2Z1q9MJGr8Zek@dhcp22.suse.cz>
+ <CANRm+Cxi4qupXkYyZpPbvHcLkuWGxin4+w7EC+z0+Aidi5+B5A@mail.gmail.com>
+ <CANRm+CwLBAPwwZzHB8U2SDMHKer_NtOKfAk52=EHUpG-SqxJWg@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <YFDqSisnoWD5wVdP@google.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CANRm+CwLBAPwwZzHB8U2SDMHKer_NtOKfAk52=EHUpG-SqxJWg@mail.gmail.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 16.03.21 18:26, Sean Christopherson wrote:
-> On Tue, Mar 16, 2021, Jan Kiszka wrote:
->> On 16.03.21 17:50, Sean Christopherson wrote:
->>> Rather than block all events in KVM, what about having QEMU "pause" the timer?
->>> E.g. save MSR_TSC_DEADLINE and APIC_TMICT (or inspect the guest to find out
->>> which flavor it's using), clear them to zero, then restore both when
->>> single-stepping is disabled.  I think that will work?
->>>
->>
->> No one can stop the clock, and timers are only one source of interrupts.
->> Plus they do not all come from QEMU, some also from KVM or in-kernel
->> sources directly.
+On Wed 17-03-21 16:04:51, Wanpeng Li wrote:
+> On Wed, 17 Mar 2021 at 16:04, Wanpeng Li <kernellwp@gmail.com> wrote:
+> >
+> > On Wed, 17 Mar 2021 at 15:57, Michal Hocko <mhocko@suse.com> wrote:
+> > >
+> > > On Wed 17-03-21 13:46:24, Wanpeng Li wrote:
+> > > > From: Wanpeng Li <wanpengli@tencent.com>
+> > > >
+> > > > KVM allocations in the arm kvm code which are tied to the life
+> > > > of the VM process should be charged to the VM process's cgroup.
+> > >
+> > > How much memory are we talking about?
+> > >
+> > > > This will help the memcg controler to do the right decisions.
+> > >
+> > > This is a bit vague. What is the right decision? AFAICS none of that
+> > > memory is considered during oom victim selection. The only thing memcg
+> > > controler can help with is to contain and account this additional
+> > > memory. This might help to better isolate multiple workloads on the same
+> > > system. Maybe this is what you wanted to say? Or maybe this is a way to
+> > > prevent untrusted users from consuming a lot of memory?
+> >
 > 
-> But are any other sources of interrupts a chronic problem?  I 100% agree that
-
-If you are debugging a problem, you are not interested in seening
-problems of the debugger, only real ones of your target. IOW: Yes, they
-are, even if less likely - for idle VMs.
-
-> this would not be a robust solution, but neither is blocking events in KVM.  At
-> least with this approach, the blast radius is somewhat contained.
+> https://patchwork.kernel.org/project/kvm/patch/20190211190252.198101-1-bgardon@google.com/
 > 
->> Would quickly become a mess.
-> 
-> Maybe, but it'd be Qemu's mess ;-)
-> 
+> > It is explained in this patchset for x86 kvm which is upstream, I
+> > think I don't need to copy and paste. :)
 
-Nope, it would spread to KVM as well, as indicated above.
+How is one supposed to know that? If you want to spare some typing then
+you could have referenced 4183683918ef ("kvm: vmx: Add memcg accounting
+to KVM allocations").
 
-Jan
-
+Btw. that explanation is rather vague as well. It doesn't explain any of
+my above questions. It is not my take to judge whether these are
+important for the respective maintainers I just want to point out that
+once somebody revisits this code and try to find out why the accounting
+has been added then this will be far from clear because "memcg doing the
+right thing" doesn't tell much in itself.
 -- 
-Siemens AG, T RDA IOT
-Corporate Competence Center Embedded Linux
+Michal Hocko
+SUSE Labs
