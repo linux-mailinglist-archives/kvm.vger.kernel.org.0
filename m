@@ -2,73 +2,243 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1999733EA73
-	for <lists+kvm@lfdr.de>; Wed, 17 Mar 2021 08:24:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 45C0433EAB6
+	for <lists+kvm@lfdr.de>; Wed, 17 Mar 2021 08:45:41 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230048AbhCQHXf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 17 Mar 2021 03:23:35 -0400
-Received: from casper.infradead.org ([90.155.50.34]:47140 "EHLO
-        casper.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229469AbhCQHW7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 17 Mar 2021 03:22:59 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=VgWremH0I10zTIm6kNKr7I2+jlh/Pgq8sbo0UnUFG0E=; b=EfM8/Q3qa7owXrxD2xbByTMBCc
-        UUhCwPxAvE3Qk7tC5abxDLcA9s5y2ZKUPGF5hWctwYKb4Nn2nX04O4+uaY+ZLbGh4YfR/oJTx/q4B
-        /7i++JYLd03hMb5X7tbEoXnY/CeLk88Q1DAzIiCQ4wyiMEx0gFta3wGDp9wO/I01tnKk0eCkP5ds2
-        1TRRkJ5dwk6DTrqIfCQlcBYjRdqkEZn+U1ADNC7qlhKZZUDT+ee5BIW6rr89U0o8640JvoEHVxuh1
-        /P7Sg724uFmxdbapDmMOr71b0Nh9XTVcei7a4V/hvQsdGJGzYw8OCfw2U3qWhTJ6y+8d31Yo41GV5
-        SmA58zaA==;
-Received: from hch by casper.infradead.org with local (Exim 4.94 #2 (Red Hat Linux))
-        id 1lMQW0-001Ckh-8P; Wed, 17 Mar 2021 07:22:49 +0000
-Date:   Wed, 17 Mar 2021 07:22:48 +0000
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Daniel Vetter <daniel.vetter@ffwll.ch>
-Cc:     Christoph Hellwig <hch@infradead.org>,
-        DRI Development <dri-devel@lists.freedesktop.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        KVM list <kvm@vger.kernel.org>, Linux MM <linux-mm@kvack.org>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        linux-samsung-soc <linux-samsung-soc@vger.kernel.org>,
-        "open list:DMA BUFFER SHARING FRAMEWORK" 
-        <linux-media@vger.kernel.org>, Tomasz Figa <tfiga@chromium.org>,
-        Hans Verkuil <hverkuil-cisco@xs4all.nl>,
-        Daniel Vetter <daniel.vetter@intel.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        Kees Cook <keescook@chromium.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        John Hubbard <jhubbard@nvidia.com>,
-        J??r??me Glisse <jglisse@redhat.com>, Jan Kara <jack@suse.cz>,
-        Pawel Osciak <pawel@osciak.com>,
-        Marek Szyprowski <m.szyprowski@samsung.com>,
-        Kyungmin Park <kyungmin.park@samsung.com>,
-        Laurent Dufour <ldufour@linux.ibm.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Daniel Jordan <daniel.m.jordan@oracle.com>,
-        Michel Lespinasse <walken@google.com>
-Subject: Re: [PATCH 2/3] media/videobuf1|2: Mark follow_pfn usage as unsafe
-Message-ID: <20210317072248.GA284559@infradead.org>
-References: <20210316153303.3216674-1-daniel.vetter@ffwll.ch>
- <20210316153303.3216674-3-daniel.vetter@ffwll.ch>
- <20210316154549.GA60450@infradead.org>
- <CAKMK7uF8Lv0P4TuoctjUiVHtRzAnXf9a50JaYgm0rV+v+7=LFw@mail.gmail.com>
+        id S229944AbhCQHpI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 17 Mar 2021 03:45:08 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:54961 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230037AbhCQHog (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 17 Mar 2021 03:44:36 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1615967076;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=E7lOQe7PvDbVUdX18nkCBlvg+ruDLnYJ/lmRsra5G8U=;
+        b=Hdn+pKCAW143O6ufoaYicbSy4P9pRnI1bawc3hymBYS9XTVreXTCIgCzwrKlNp0VBi3/zS
+        mzIv7UesSWjjlJCshCyVr9qgnnpTqazm4XTtEqgduyUi2IcooQJLsJPG2E1yhbXDX7Hj4h
+        2nHCMqpMUgvqnvOukHgJw5m+2YXQEss=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-168-ChyaVYWaPBurYg5UPcvknA-1; Wed, 17 Mar 2021 03:44:32 -0400
+X-MC-Unique: ChyaVYWaPBurYg5UPcvknA-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6989C1007467;
+        Wed, 17 Mar 2021 07:44:31 +0000 (UTC)
+Received: from localhost.localdomain.com (ovpn-113-104.ams2.redhat.com [10.36.113.104])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 5D75D6268D;
+        Wed, 17 Mar 2021 07:44:29 +0000 (UTC)
+From:   Emanuele Giuseppe Esposito <eesposit@redhat.com>
+To:     linux-kselftest@vger.kernel.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: [PATCH] selftests/kvm: add set_boot_cpu_id test
+Date:   Wed, 17 Mar 2021 08:44:26 +0100
+Message-Id: <20210317074426.8224-1-eesposit@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAKMK7uF8Lv0P4TuoctjUiVHtRzAnXf9a50JaYgm0rV+v+7=LFw@mail.gmail.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Mar 16, 2021 at 04:52:44PM +0100, Daniel Vetter wrote:
-> My understanding is mostly, but with some objections. And I kinda
-> don't want to let this die in a bikeshed and then not getting rid of
-> follow_pfn as a result. There's enough people who acked this, and the
-> full removal got some nack from Mauro iirc.
+Test for the KVM_SET_BOOT_CPU_ID ioctl.
+Check that it correctly allows to change the BSP vcpu.
 
-Hmm, ok I must have missed that.  I defintively prefer your series over
-doing nothing, but killing the dead horse ASAP would be even better.
+Signed-off-by: Emanuele Giuseppe Esposito <eesposit@redhat.com>
+---
+ tools/testing/selftests/kvm/.gitignore        |   1 +
+ tools/testing/selftests/kvm/Makefile          |   1 +
+ .../selftests/kvm/x86_64/set_boot_cpu_id.c    | 151 ++++++++++++++++++
+ 3 files changed, 153 insertions(+)
+ create mode 100644 tools/testing/selftests/kvm/x86_64/set_boot_cpu_id.c
+
+diff --git a/tools/testing/selftests/kvm/.gitignore b/tools/testing/selftests/kvm/.gitignore
+index 32b87cc77c8e..43b8aa82aefe 100644
+--- a/tools/testing/selftests/kvm/.gitignore
++++ b/tools/testing/selftests/kvm/.gitignore
+@@ -5,6 +5,7 @@
+ /s390x/resets
+ /s390x/sync_regs_test
+ /x86_64/cr4_cpuid_sync_test
++/x86_64/set_boot_cpu_id
+ /x86_64/debug_regs
+ /x86_64/evmcs_test
+ /x86_64/get_cpuid_test
+diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
+index a6d61f451f88..e7b62666e06e 100644
+--- a/tools/testing/selftests/kvm/Makefile
++++ b/tools/testing/selftests/kvm/Makefile
+@@ -39,6 +39,7 @@ LIBKVM_aarch64 = lib/aarch64/processor.c lib/aarch64/ucall.c
+ LIBKVM_s390x = lib/s390x/processor.c lib/s390x/ucall.c lib/s390x/diag318_test_handler.c
+ 
+ TEST_GEN_PROGS_x86_64 = x86_64/cr4_cpuid_sync_test
++TEST_GEN_PROGS_x86_64 += x86_64/set_boot_cpu_id
+ TEST_GEN_PROGS_x86_64 += x86_64/evmcs_test
+ TEST_GEN_PROGS_x86_64 += x86_64/get_cpuid_test
+ TEST_GEN_PROGS_x86_64 += x86_64/hyperv_cpuid
+diff --git a/tools/testing/selftests/kvm/x86_64/set_boot_cpu_id.c b/tools/testing/selftests/kvm/x86_64/set_boot_cpu_id.c
+new file mode 100644
+index 000000000000..4077be4e4015
+--- /dev/null
++++ b/tools/testing/selftests/kvm/x86_64/set_boot_cpu_id.c
+@@ -0,0 +1,151 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * Test that KVM_SET_BOOT_CPU_ID works as intended
++ *
++ * Copyright (C) 2020, Red Hat, Inc.
++ */
++#define _GNU_SOURCE /* for program_invocation_name */
++#include <fcntl.h>
++#include <stdio.h>
++#include <stdlib.h>
++#include <string.h>
++#include <sys/ioctl.h>
++
++#include "test_util.h"
++#include "kvm_util.h"
++#include "processor.h"
++
++#define N_VCPU 2
++#define VCPU_ID0 0
++#define VCPU_ID1 1
++
++#define WRONG_BSP 2
++
++static uint32_t get_bsp_flag(void)
++{
++	return rdmsr(MSR_IA32_APICBASE) & MSR_IA32_APICBASE_BSP;
++}
++
++static void guest_bsp_vcpu(void *arg)
++{
++	GUEST_SYNC(1);
++
++	GUEST_ASSERT(get_bsp_flag() != 0);
++
++	GUEST_DONE();
++}
++
++static void guest_not_bsp_vcpu(void *arg)
++{
++	GUEST_SYNC(1);
++
++	GUEST_ASSERT(get_bsp_flag() == 0);
++
++	GUEST_DONE();
++}
++
++static void run_vcpu(struct kvm_vm *vm, uint32_t vcpuid, int stage)
++{
++	struct ucall uc;
++
++	printf("vcpu executing...\n");
++	vcpu_run(vm, vcpuid);
++	printf("vcpu executed\n");
++
++	switch (get_ucall(vm, vcpuid, &uc)) {
++	case UCALL_SYNC:
++		printf("stage %d sync %ld\n", stage, uc.args[1]);
++		TEST_ASSERT(!strcmp((const char *)uc.args[0], "hello") &&
++			    uc.args[1] == stage + 1,
++			    "Stage %d: Unexpected register values vmexit, got %lx",
++			    stage + 1, (ulong)uc.args[1]);
++		return;
++	case UCALL_DONE:
++		printf("got done\n");
++		return;
++	case UCALL_ABORT:
++		TEST_ASSERT(false, "%s at %s:%ld\n\tvalues: %#lx, %#lx", (const char *)uc.args[0],
++			    __FILE__, uc.args[1], uc.args[2], uc.args[3]);
++	default:
++		TEST_ASSERT(false, "Unexpected exit: %s",
++			    exit_reason_str(vcpu_state(vm, vcpuid)->exit_reason));
++	}
++}
++
++static void check_wrong_bsp(void)
++{
++	struct kvm_vm *vm;
++	int res;
++
++	vm = vm_create_default(VCPU_ID0, 0, guest_bsp_vcpu);
++
++	res = _kvm_ioctl(vm, KVM_SET_BOOT_CPU_ID, (void *) WRONG_BSP);
++	TEST_ASSERT(res == -1, "KVM_SET_BOOT_CPU_ID set to a non-existent vcpu %d", WRONG_BSP);
++
++	kvm_vm_free(vm);
++}
++
++static struct kvm_vm *create_vm(void)
++{
++	struct kvm_vm *vm;
++	uint64_t vcpu_pages = (DEFAULT_STACK_PGS) * 2;
++	uint64_t extra_pg_pages = vcpu_pages / PTES_PER_MIN_PAGE * N_VCPU;
++	uint64_t pages = DEFAULT_GUEST_PHY_PAGES + vcpu_pages + extra_pg_pages;
++
++	pages = vm_adjust_num_guest_pages(VM_MODE_DEFAULT, pages);
++	vm = vm_create(VM_MODE_DEFAULT, pages, O_RDWR);
++
++	kvm_vm_elf_load(vm, program_invocation_name, 0, 0);
++	vm_create_irqchip(vm);
++
++	return vm;
++}
++
++static void add_x86_vcpu(struct kvm_vm *vm, uint32_t vcpuid, void *code)
++{
++	vm_vcpu_add_default(vm, vcpuid, code);
++	vcpu_set_cpuid(vm, vcpuid, kvm_get_supported_cpuid());
++}
++
++static void run_vm_bsp(uint32_t bsp_vcpu)
++{
++	struct kvm_vm *vm;
++	int stage;
++	void *vcpu0_code, *vcpu1_code;
++
++	vm = create_vm();
++
++	vcpu0_code = guest_bsp_vcpu;
++	vcpu1_code = guest_not_bsp_vcpu;
++
++	if (bsp_vcpu == VCPU_ID1) {
++		vcpu0_code = guest_not_bsp_vcpu;
++		vcpu1_code = guest_bsp_vcpu;
++
++		vm_ioctl(vm, KVM_SET_BOOT_CPU_ID, (void *) VCPU_ID1);
++	}
++
++	add_x86_vcpu(vm, VCPU_ID0, vcpu0_code);
++	add_x86_vcpu(vm, VCPU_ID1, vcpu1_code);
++
++	for (stage = 0; stage < 2; stage++) {
++		run_vcpu(vm, VCPU_ID0, stage);
++		run_vcpu(vm, VCPU_ID1, stage);
++	}
++
++	kvm_vm_free(vm);
++}
++
++int main(int argc, char *argv[])
++{
++	if (!kvm_check_cap(KVM_CAP_SET_BOOT_CPU_ID)) {
++		print_skip("set_boot_cpu_id not available");
++		return 0;
++	}
++
++	run_vm_bsp(VCPU_ID0);
++	run_vm_bsp(VCPU_ID1);
++	run_vm_bsp(VCPU_ID0);
++
++	check_wrong_bsp();
++}
+-- 
+2.29.2
+
