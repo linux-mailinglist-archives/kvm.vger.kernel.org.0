@@ -2,86 +2,111 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 38F0433F6B4
-	for <lists+kvm@lfdr.de>; Wed, 17 Mar 2021 18:25:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 89C0C33F751
+	for <lists+kvm@lfdr.de>; Wed, 17 Mar 2021 18:44:57 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229814AbhCQRYb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 17 Mar 2021 13:24:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36546 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230518AbhCQRYU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 17 Mar 2021 13:24:20 -0400
-Received: from mail-pf1-x42c.google.com (mail-pf1-x42c.google.com [IPv6:2607:f8b0:4864:20::42c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C2A8C06174A
-        for <kvm@vger.kernel.org>; Wed, 17 Mar 2021 10:24:20 -0700 (PDT)
-Received: by mail-pf1-x42c.google.com with SMTP id x26so1596077pfn.0
-        for <kvm@vger.kernel.org>; Wed, 17 Mar 2021 10:24:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=rRAvRzhltoTzPQtf/yR8e3Dd74K9EO0zqzHJWWfU39k=;
-        b=TVhHIE8e9q+oWf3oSYc+aY0MU9ukm6lmZmv4FZJ5W4K25ppzFu5it2w8B7qffhzSRv
-         Mo+L+b5rrbxu7rn8tABYZcU+fmjNnHjAeKQjjEASrzmEBkTNIGwf8yrtMgqQlSncMfLk
-         Eo5O0xosPCyZ/gcJWzQbU6I2ysVv97vbF4+SUEnuTKcQx9ivS9j26pQMCVwXb119U1MB
-         GMIe/vdsL1NSqUvlOGGBk8/L/z6BySr8oqabY2yXIBWb6N4VPp81I7M8gpjk51k0e29M
-         2BEKUibiB6pKdm4ViXspwPv56Plp5iWabxYawFNILH3cXaMHGu0leuLPErM3i+OSxMsK
-         UwAg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=rRAvRzhltoTzPQtf/yR8e3Dd74K9EO0zqzHJWWfU39k=;
-        b=ATx5XyLKNyMa3YBIxum4vHPKcplWu3sppNQi5/5TKZ2LWDfh0/wh3mwhesND2SPzi7
-         yLfewnNDEsJ9wwiBF1frO0b/Qm6G6tPm6rdchrRqbsYZwqyViB2XxgjBylzFQUMB4l9g
-         HLreCMb7a2j0YPvj8KejnUv+8k3o5D2KxrH8X5+e8bCEMj8Qh7/QKwxuXOpQ7piBC2Vx
-         TANOIUCagWSIRsgPCy+2ro5B4J8Oxlz3TqrRGFl7+4StHRCz77c5AfTVpTCXx7WvGn+7
-         Sa1wbf5tec+ElvmF8bnHzKBczTU0szWiDQHCsv8kaX1CkVvy4iBmgPDeXep6KZw0KdQF
-         c1QA==
-X-Gm-Message-State: AOAM5334HZIBSVO6jU2T8UfOzliLCLURRazgnh1AcYsSuhIjFlzxugRK
-        VdsmieDilSk2JCYo/I54fKHzAg==
-X-Google-Smtp-Source: ABdhPJwBDYT+a/TlslGBNP28WC6W30stDoCs/vWDziufpSQtKsns/uOp9AkNKNZWQxzXg7kaHuZg1g==
-X-Received: by 2002:aa7:96cc:0:b029:202:6873:8ab4 with SMTP id h12-20020aa796cc0000b029020268738ab4mr96915pfq.42.1616001859907;
-        Wed, 17 Mar 2021 10:24:19 -0700 (PDT)
-Received: from google.com ([2620:15c:f:10:e113:95c2:2d1:e304])
-        by smtp.gmail.com with ESMTPSA id q184sm19891630pfc.78.2021.03.17.10.24.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 17 Mar 2021 10:24:19 -0700 (PDT)
-Date:   Wed, 17 Mar 2021 10:24:13 -0700
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Alexander Graf <graf@amazon.com>,
-        Yuan Yao <yaoyuan0329os@gmail.com>
-Subject: Re: [PATCH 2/4] KVM: nVMX: Handle dynamic MSR intercept toggling
-Message-ID: <YFI7PTT5W7vzAK+i@google.com>
-References: <20210316184436.2544875-1-seanjc@google.com>
- <20210316184436.2544875-3-seanjc@google.com>
- <66bc75f6-58c5-c67f-f268-220d371022a2@redhat.com>
- <YFIzbz6S5/vyvBJz@google.com>
- <fe8329d4-3b80-7eda-a2ab-be282b4aa31b@redhat.com>
+        id S230411AbhCQRoZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 17 Mar 2021 13:44:25 -0400
+Received: from foss.arm.com ([217.140.110.172]:40604 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S231741AbhCQRoX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 17 Mar 2021 13:44:23 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 26BEFD6E;
+        Wed, 17 Mar 2021 10:44:21 -0700 (PDT)
+Received: from [192.168.0.110] (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 137C83F718;
+        Wed, 17 Mar 2021 10:44:19 -0700 (PDT)
+Subject: Re: [PATCH kvmtool v3 00/22] Unify I/O port and MMIO trap handling
+To:     Andre Przywara <andre.przywara@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>
+Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+        Marc Zyngier <maz@kernel.org>,
+        Sami Mujawar <sami.mujawar@arm.com>
+References: <20210315153350.19988-1-andre.przywara@arm.com>
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+Message-ID: <72c227a7-5854-2cba-fb98-9606dfe79b7d@arm.com>
+Date:   Wed, 17 Mar 2021 17:44:37 +0000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.8.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <fe8329d4-3b80-7eda-a2ab-be282b4aa31b@redhat.com>
+In-Reply-To: <20210315153350.19988-1-andre.przywara@arm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Mar 17, 2021, Paolo Bonzini wrote:
-> On 17/03/21 17:50, Sean Christopherson wrote:
-> > > Feel free to squash patch 3 in this one or reorder it before; it makes sense
-> > > to make them macros when you go from 4 to 6 functions.
-> > I put them in a separate patch so that backporting the fix for the older FS/GS
-> > nVMX bug was at least feasible.  Not worth it?
-> 
-> Going all the way back to 5.2 would almost certainly have other conflicts,
-> so probably not.
+Hi Will, Julien,
 
-I'll do a dry run before posting v2; if it's clean I'll leave things as is, if
-it's a mess I'll move the macro patch earlier.
+On 3/15/21 3:33 PM, Andre Przywara wrote:
+> Hi,
+>
+> this version is addressing Alexandru's comments, fixing mostly minor
+> issues in the naming scheme. The biggest change is to keep the
+> ioport__read/ioport_write wrappers for the serial device.
+> For more details see the changelog below.
+> ==============
+>
+> At the moment we use two separate code paths to handle exits for
+> KVM_EXIT_IO (ioport.c) and KVM_EXIT_MMIO (mmio.c), even though they
+> are semantically very similar. Because the trap handler callback routine
+> is different, devices need to decide on one conduit or need to provide
+> different handler functions for both of them.
+>
+> This is not only unnecessary code duplication, but makes switching
+> devices from I/O port to MMIO a tedious task, even though there is no
+> real difference between the two, especially on ARM and PowerPC.
+>
+> For ARM we aim at providing a flexible memory layout, and also have
+> trouble with the UART and RTC device overlapping with the PCI I/O area,
+> so it seems indicated to tackle this once and for all.
+>
+> The first three patches do some cleanup, to simplify things later.
+>
+> Patch 04/22 lays the groundwork, by extending mmio.c to be able to also
+> register I/O port trap handlers, using the same callback prototype as
+> we use for MMIO.
+>
+> The next 14 patches then convert devices that use the I/O port
+> interface over to the new joint interface. This requires to rework
+> the trap handler routine to adhere to the same prototype as the existing
+> MMIO handlers. For most devices this is done in two steps: a first to
+> introduce the reworked handler routine, and a second to switch to the new
+> joint registration routine. For some devices the first step is trivial,
+> so it's done in one patch.
+>
+> Patch 19/22 then retires the old I/O port interface, by removing ioport.c
+> and friends.
+> Patch 20/22 uses the opportunity to clean up the memory map description,
+> also declares a new region (from 16MB on), where the final two patches
+> switch the UART and the RTC device to. They are now registered
+> on the MMIO "bus", when running on ARM or arm64. This moves them away
+> from the first 64KB, so they are not in the PCI I/O area anymore.
 
-Thanks!
+I have reviewed the series and everything looks fine to me and ready to be merged.
+I have also ran the following tests:
+
+- On my x86_64 desktop, I ran a guest with --sdl, to exercise the vesa device.
+
+- On a rockpro64, I ran kvm-unit-tests for arm64 and arm (kvmtool was compiled for
+arm64); I also ran Linux guests using 4k and 64k pages with and without --force-pci.
+
+- On a Seattle machine, I did PCI passthrough for an Intel 82574L network card and
+ran Linux guests using 4k and 64k pages with and without --force-pci.
+
+- On an odroid-c4 (4 x Cortex-A55), I ran Linux guests using 4k, 16k and 64k pages
+with and without --force-pci.
+
+With this series merged, everything will be in place to bring back the patch that
+adds PCI Express 1.1 support for arm/arm64 [1]. The patch was previously dropped
+because the RTC and UART were overlapping with the PCI I/O space and EDK2 doesn't
+not understand PCI I/O bus addresses above 64k, but this series fixes that by
+moving the addresses of the two devices.
+
+[1] https://www.spinics.net/lists/kvm/msg211304.html
+
+Thanks,
+Alex
