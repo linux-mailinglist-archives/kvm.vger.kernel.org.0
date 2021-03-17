@@ -2,69 +2,68 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2A78233F7B8
-	for <lists+kvm@lfdr.de>; Wed, 17 Mar 2021 19:01:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 83CCE33F8DA
+	for <lists+kvm@lfdr.de>; Wed, 17 Mar 2021 20:14:11 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231805AbhCQSAf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 17 Mar 2021 14:00:35 -0400
-Received: from mail.kernel.org ([198.145.29.99]:42666 "EHLO mail.kernel.org"
+        id S233114AbhCQTNi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 17 Mar 2021 15:13:38 -0400
+Received: from mga12.intel.com ([192.55.52.136]:8490 "EHLO mga12.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231332AbhCQSAX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 17 Mar 2021 14:00:23 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id EFD5264F21;
-        Wed, 17 Mar 2021 18:00:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1616004023;
-        bh=19/EHa8tqrBvjr5N+17FlDNPaZq4lw493X2jfLFSXMU=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=qmtsr6jfQGZvpiPtqAKOYAJGAFJD/3AieD2zGweFccZ92UmjEDsr47puog4UPWImD
-         jL423PnqghvSY69wUYdL60Zq3mOq3jAh3t4deDklE6s7quCvhuz6CcBAwOzGyHqq+3
-         5AsJZo9WM7OkYmHZHutAgu3lCGyF/2AJchbrEb8zrWfchIzb6SujeKEbYjmMjl2yPi
-         L11n1lRaoZlIgP+KHv/yt2TZeVBJekNsyNQYghmVeONuOr9Lpcl290whyZaoQAR2wZ
-         9SGFNkG1qdacKrB/ceUun0OuG0dSEinmoliDwo1IlsZBvyJnSgNWTQitAYeD1TNUhB
-         q+8m8ZGZASQMg==
-Date:   Wed, 17 Mar 2021 18:00:17 +0000
-From:   Will Deacon <will@kernel.org>
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
-        kvm@vger.kernel.org, dave.martin@arm.com, daniel.kiss@arm.com,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        broonie@kernel.org, kernel-team@android.com
-Subject: Re: [PATCH 10/10] KVM: arm64: Enable SVE support for nVHE
-Message-ID: <20210317180017.GB5713@willie-the-truck>
-References: <20210316101312.102925-1-maz@kernel.org>
- <20210316101312.102925-11-maz@kernel.org>
+        id S233087AbhCQTNc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 17 Mar 2021 15:13:32 -0400
+IronPort-SDR: WLmWe9rpunjXhr5K2QOQUonIfEmASXOcQYWbKWQuHUx2xiLEVYHtNAuugnb4UyX29MypROsT18
+ i5VXjXDvA+/Q==
+X-IronPort-AV: E=McAfee;i="6000,8403,9926"; a="168807926"
+X-IronPort-AV: E=Sophos;i="5.81,257,1610438400"; 
+   d="scan'208";a="168807926"
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Mar 2021 12:13:32 -0700
+IronPort-SDR: 0zyacZbowhjkGUsJbAZXH3YgWttC4kcpt3JzOEKd/q9ckHb9R7a34MG21v2lD45kDMR+0V18GI
+ U0UHBJbYMxvg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.81,257,1610438400"; 
+   d="scan'208";a="374274660"
+Received: from fmsmsx606.amr.corp.intel.com ([10.18.126.86])
+  by orsmga006.jf.intel.com with ESMTP; 17 Mar 2021 12:13:32 -0700
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx606.amr.corp.intel.com (10.18.126.86) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2106.2; Wed, 17 Mar 2021 12:13:31 -0700
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2106.2; Wed, 17 Mar 2021 12:13:31 -0700
+Received: from fmsmsx610.amr.corp.intel.com ([10.18.126.90]) by
+ fmsmsx610.amr.corp.intel.com ([10.18.126.90]) with mapi id 15.01.2106.013;
+ Wed, 17 Mar 2021 12:13:31 -0700
+From:   "Derrick, Jonathan" <jonathan.derrick@intel.com>
+To:     "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>
+CC:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Subject: Instantiate mdev device in host?
+Thread-Topic: Instantiate mdev device in host?
+Thread-Index: AQHXG2Ge96qOSw1kSUOuIHrwTXcXUg==
+Date:   Wed, 17 Mar 2021 19:13:30 +0000
+Message-ID: <abb1183682ccc1bc8bb2239bf581a0b635c21804.camel@intel.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.22.254.132]
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <C993C240F859184D813D5391E2CAFAE2@intel.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210316101312.102925-11-maz@kernel.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Mar 16, 2021 at 10:13:12AM +0000, Marc Zyngier wrote:
-> From: Daniel Kiss <daniel.kiss@arm.com>
-> 
-> Now that KVM is equipped to deal with SVE on nVHE, remove the code
-> preventing it from being used as well as the bits of documentation
-> that were mentioning the incompatibility.
-> 
-> Signed-off-by: Daniel Kiss <daniel.kiss@arm.com>
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  arch/arm64/Kconfig                |  7 -------
->  arch/arm64/include/asm/kvm_host.h | 13 -------------
->  arch/arm64/kvm/arm.c              |  5 -----
->  arch/arm64/kvm/reset.c            |  4 ----
->  4 files changed, 29 deletions(-)
-
-Acked-by: Will Deacon <will@kernel.org>
-
-I thought we might need to update the documentation too, but I couldn't
-actually find anywhere that needed it when I looked.
-
-Will
+SGkgS2lydGksIEFsZXgsDQoNCkkndmUgd3JpdHRlbiBhIGhvc3QgbWRldiBkcml2ZXIgZm9yIGEg
+cGNpZSBpbnN0cnVtZW50IHRoYXQgZGl2aWRlcyBpdHMNCnJlc291cmNlcyB0byBhIGd1ZXN0IGRy
+aXZlciBhbmQgbWFuYWdlcyBwZXItaW5zdGFuY2UgaW50ZXJmYWNpbmcuDQoNCldlIGhhdmUgYSB1
+c2UgY2FzZSB3aGVyZSB3ZSBtaWdodCB3YW50IHRvIGRyaXZlIHRoZSBpbnN0cnVtZW50IGRpcmVj
+dGx5DQpmcm9tIHRoZSBob3N0IGluIHRoZSBzYW1lIGFwcGxpY2F0aW9uIHRoYXQgdGhlIG1kZXYg
+Z3Vlc3Qgd291bGQgdXNlLg0KDQpJcyB0aGVyZSBhIHdheSB0byBpbnN0YW50aWF0ZSB0aGUgZW11
+bGF0ZWQgcGNpIGRldmljZSBpbiB0aGUgaG9zdD8NCk9yIGEgcmVjb21tZW5kZWQgd2F5IHRvIGlu
+dGVyZmFjZSBhbiBleGlzdGluZyBwY2kgKGd1ZXN0KSBkcml2ZXIgdG8gdGhlDQp2ZmlvLW1kZXYg
+ZGV2aWNlPw0KDQpCZXN0LA0KSm9uDQo=
