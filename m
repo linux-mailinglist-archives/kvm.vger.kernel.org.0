@@ -2,84 +2,73 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1E88733EE56
+	by mail.lfdr.de (Postfix) with ESMTP id 9A98833EE57
 	for <lists+kvm@lfdr.de>; Wed, 17 Mar 2021 11:33:14 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229863AbhCQKcl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        id S229793AbhCQKcl (ORCPT <rfc822;lists+kvm@lfdr.de>);
         Wed, 17 Mar 2021 06:32:41 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:59758 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229745AbhCQKcZ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 17 Mar 2021 06:32:25 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1615977144;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=IjQypPxm2stMGdffCdELwhKvCRoRLFjgfm/bTiUDhNE=;
-        b=XOKk8AaTWmJmJQulT5gmTD+stlXkQ8VaIA7bag/OIrlilW2VDsEETRiflEw310PWF5POTz
-        gQcn/S4pi5ICCyqVhexhjpnba5G3MB0ZStlV0k18BOUN8KQ3vb/PYXMBEiBiJqqp5eQImt
-        2lbOTSU39PY88vHpyFGS9GT5CzCX8d0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-496-zjpDsgOnN7u6-Gi5EaqtRg-1; Wed, 17 Mar 2021 06:32:20 -0400
-X-MC-Unique: zjpDsgOnN7u6-Gi5EaqtRg-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 755D1190A7A0;
-        Wed, 17 Mar 2021 10:32:18 +0000 (UTC)
-Received: from gondolin (ovpn-113-255.ams2.redhat.com [10.36.113.255])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 42EDD690F4;
-        Wed, 17 Mar 2021 10:32:09 +0000 (UTC)
-Date:   Wed, 17 Mar 2021 11:32:06 +0100
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     kvm@vger.kernel.org, Alex Williamson <alex.williamson@redhat.com>,
-        "Raj, Ashok" <ashok.raj@intel.com>,
-        Christian Ehrhardt <christian.ehrhardt@canonical.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Eric Auger <eric.auger@redhat.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Kevin Tian <kevin.tian@intel.com>,
-        Leon Romanovsky <leonro@nvidia.com>,
-        Max Gurtovoy <mgurtovoy@nvidia.com>,
-        Tarun Gupta <targupta@nvidia.com>
-Subject: Re: [PATCH v2 08/14] vfio/pci: Re-order vfio_pci_probe()
-Message-ID: <20210317113206.2db4a57e.cohuck@redhat.com>
-In-Reply-To: <8-v2-20d933792272+4ff-vfio1_jgg@nvidia.com>
-References: <0-v2-20d933792272+4ff-vfio1_jgg@nvidia.com>
-        <8-v2-20d933792272+4ff-vfio1_jgg@nvidia.com>
-Organization: Red Hat GmbH
+Received: from mail.kernel.org ([198.145.29.99]:39014 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229644AbhCQKcN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 17 Mar 2021 06:32:13 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPS id 0889264F6E
+        for <kvm@vger.kernel.org>; Wed, 17 Mar 2021 10:32:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1615977133;
+        bh=KEdtcMYVlNitNKNhjBe4DkLK/qdt1nOIeJy4rT7a/gw=;
+        h=From:To:Subject:Date:In-Reply-To:References:From;
+        b=Gk1siXnPcyUyqjMmzQAVsUDadIPwE1E882u88dYWod3nJ2rWV+cEPBKjs/6cdcyZz
+         1Ru6CfX6mGjupSpf9Nv8vCv9fMPa3RWau/JTj2WdKtu7NXuzHOQ6MEJG00HqNn6mdb
+         X9kWkxNOktkd5BZsgWl0BMi/ijE9jHUcWpHKn6urt7kCEvO8S66cyf43OM34JiYxHD
+         IgKXRh2MzHmUVDF3KLZ1UaMFWHPaFy8URg2DBcjPLRy2chMAGzAUEFpzkMNAbXsIP/
+         a334h1fZeUt6bND+S3m2QaF39eKvbSt3Fch7pQYMoUkAG++RvKyCf7ZuY3R0b0O12U
+         Nmkcwv/tgBaOw==
+Received: by pdx-korg-bugzilla-2.web.codeaurora.org (Postfix, from userid 48)
+        id 0621A653C5; Wed, 17 Mar 2021 10:32:13 +0000 (UTC)
+From:   bugzilla-daemon@bugzilla.kernel.org
+To:     kvm@vger.kernel.org
+Subject: [Bug 201753] AMD-Vi: Unable to write to IOMMU perf counter
+Date:   Wed, 17 Mar 2021 10:32:12 +0000
+X-Bugzilla-Reason: None
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Product: Virtualization
+X-Bugzilla-Component: kvm
+X-Bugzilla-Version: unspecified
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: david.coe@live.co.uk
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-201753-28872-Zp3gNLcCnD@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-201753-28872@https.bugzilla.kernel.org/>
+References: <bug-201753-28872@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 12 Mar 2021 20:56:00 -0400
-Jason Gunthorpe <jgg@nvidia.com> wrote:
+https://bugzilla.kernel.org/show_bug.cgi?id=3D201753
 
-> vfio_add_group_dev() must be called only after all of the private data in
-> vdev is fully setup and ready, otherwise there could be races with user
-> space instantiating a device file descriptor and starting to call ops.
-> 
-> For instance vfio_pci_reflck_attach() sets vdev->reflck and
-> vfio_pci_open(), called by fops open, unconditionally derefs it, which
-> will crash if things get out of order.
-> 
-> Fixes: cc20d7999000 ("vfio/pci: Introduce VF token")
-> Fixes: e309df5b0c9e ("vfio/pci: Parallelize device open and release")
-> Fixes: 6eb7018705de ("vfio-pci: Move idle devices to D3hot power state")
-> Fixes: ecaa1f6a0154 ("vfio-pci: Add VGA arbiter client")
-> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
-> ---
->  drivers/vfio/pci/vfio_pci.c | 17 +++++++++--------
->  1 file changed, 9 insertions(+), 8 deletions(-)
+--- Comment #24 from David Coe (david.coe@live.co.uk) ---
+Just confirmed BubuXP's Ryzen 2500U result for Suravee's (logged) patch on =
+my
+2400G with the latest Ubuntu 5.8.0-45 kernel. Cold boot is marginally faste=
+r,
+needing 5 x 20 msec, rather than 6 x 20 msecs for warm boot.
 
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+David
 
+--=20
+You may reply to this email to add a comment.
+
+You are receiving this mail because:
+You are watching the assignee of the bug.=
