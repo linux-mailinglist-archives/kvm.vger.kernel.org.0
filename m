@@ -2,131 +2,132 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D4F1233EEA9
-	for <lists+kvm@lfdr.de>; Wed, 17 Mar 2021 11:48:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 63A9D33EEB9
+	for <lists+kvm@lfdr.de>; Wed, 17 Mar 2021 11:50:24 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230119AbhCQKro (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 17 Mar 2021 06:47:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35374 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229952AbhCQKrM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 17 Mar 2021 06:47:12 -0400
-Received: from mail-lf1-x12f.google.com (mail-lf1-x12f.google.com [IPv6:2a00:1450:4864:20::12f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 51A84C06174A
-        for <kvm@vger.kernel.org>; Wed, 17 Mar 2021 03:47:12 -0700 (PDT)
-Received: by mail-lf1-x12f.google.com with SMTP id p21so2210710lfu.11
-        for <kvm@vger.kernel.org>; Wed, 17 Mar 2021 03:47:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=message-id:subject:from:to:cc:date:in-reply-to:references
-         :user-agent:mime-version:content-transfer-encoding;
-        bh=D3+asHosyveO3oNqTVARLLdoW1Ou9vqvVWN+nWXsQeQ=;
-        b=o7bQ1ZzIX+fJXuP1r/bh5GMs42fiAxUxu1QXPWAKpj2w6yKDrhD48H4Rv/5Op+q/OB
-         n8aA07Rf27hMMwO0xxDxgMRi2T9c7sC7TOxpjqeDldO+YxvzDqh+eDCLXkBkmf38bPMK
-         1zN6nLly0EXOcuJViS84zkRAXJPtTNn6LKCyHluSx3QpSciUpfbXwtAjxSeK2ABLxN7S
-         lKAxqCXOpAKXB947hJ0NnPvoH/weFbjtUDbuBLJBmvK3QNnV5JDS63OL9B5E3GaiahnE
-         foRn5mx8oeuPNmhCa5Y2wkRBzbcoRfooIy4dbEH9f/bIzph3yyJdE5dOvGMOCgeb6n0m
-         nITQ==
+        id S230422AbhCQKtx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 17 Mar 2021 06:49:53 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:38101 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230352AbhCQKtt (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 17 Mar 2021 06:49:49 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1615978188;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=4RywPiGpkeJ8ft2kFpbHNdUd62AsRGHndtvEkFVGNC8=;
+        b=dKAorJOGFi2ph4oSJcdEKA24QUimXC+EK3aH3J2xJM7/zHLP6W3bmn7zjH9OeVWRFP4x36
+        Yun6Vkyzk3lX8v7FPBHo9Oi+y+VhRi8crud0nb+gqIJNkznv9+QIB9YK3QKy0BDWxkx6sK
+        0rFtgvIlRsI6QxERr6FOZQXwMso0v4I=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-311-sc8rIVarM_q-q-i9DhhgTw-1; Wed, 17 Mar 2021 06:49:47 -0400
+X-MC-Unique: sc8rIVarM_q-q-i9DhhgTw-1
+Received: by mail-wr1-f71.google.com with SMTP id 9so2624718wrb.16
+        for <kvm@vger.kernel.org>; Wed, 17 Mar 2021 03:49:46 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
-         :references:user-agent:mime-version:content-transfer-encoding;
-        bh=D3+asHosyveO3oNqTVARLLdoW1Ou9vqvVWN+nWXsQeQ=;
-        b=AyxKXirJu1r6uVyh9jPjdQNfzA5ZnOSS7wDFePY4lLR80J86XKOzdogLsRQt2oGcm6
-         LxAzfB7rtr3Bl1olLwTRkjhmkDS7fJm81j3MtnTCNMNmP/7jEDQy86QA8d8iq3Z4iwi3
-         akQ71owyQeFLAyT0z8dzOOBKfAzD53RoUGh7IUeoJLTa9J0PpHDEmEbujZRI5gyOlG/d
-         AoK8gZqJhyPT84B8iqTaKMaFSCXLrd/f+7BuAV/2cTb8TLsmji3ncuJ78/sf7T7mThfB
-         6FxWbfhilD+Qzxmt/5JAHFJOzdhIRpDp5wVJns324TS71KkWBNeFq8iEkfESitp9Piuz
-         jazg==
-X-Gm-Message-State: AOAM532UuTmcD0p1zP/C1Uvp2BlGvoA9/jB8k2mCl4yN3lhhBTtO4XMD
-        Fif/JmZMgMkRhWhOV1c5Nco=
-X-Google-Smtp-Source: ABdhPJwJ6zZpwKWrLon7pi5cJss5vmuxf4IvR48Obhmib/18xZAK9Q/JGreMefi9kf8icV0gQd3HRA==
-X-Received: by 2002:a05:6512:3481:: with SMTP id v1mr1992641lfr.193.1615978030762;
-        Wed, 17 Mar 2021 03:47:10 -0700 (PDT)
-Received: from [192.168.167.128] (37-145-186-126.broadband.corbina.ru. [37.145.186.126])
-        by smtp.gmail.com with ESMTPSA id g14sm3476727ljj.3.2021.03.17.03.47.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 17 Mar 2021 03:47:10 -0700 (PDT)
-Message-ID: <7257025149c6a7369e7e2fd7c6291879c4bc127d.camel@gmail.com>
-Subject: Re: [RFC v3 4/5] KVM: add ioregionfd context
-From:   Elena Afanasova <eafanasova@gmail.com>
-To:     Jason Wang <jasowang@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
-Cc:     stefanha@redhat.com, jag.raman@oracle.com,
-        elena.ufimtseva@oracle.com, mst@redhat.com, cohuck@redhat.com,
-        john.levon@nutanix.com
-Date:   Wed, 17 Mar 2021 03:46:59 -0700
-In-Reply-To: <6ff79d0b-3b6a-73d3-ffbd-e4af9758735f@redhat.com>
-References: <cover.1613828726.git.eafanasova@gmail.com>
-         <4436ef071e55d88ff3996b134cc2303053581242.1613828727.git.eafanasova@gmail.com>
-         <2ee8cb35-3043-fc06-9973-c8bb33a90d40@redhat.com>
-         <2e7dfb1c-fe13-4e6d-ae65-133116866c2a@redhat.com>
-         <c9d8e6a6b533e67192b391dd902e27609121222c.camel@gmail.com>
-         <50823987-d285-7a18-7c46-771f08c3c0ff@redhat.com>
-         <95b1dc00ff533ce004ecc656bd130bd07e29a1f0.camel@gmail.com>
-         <6ff79d0b-3b6a-73d3-ffbd-e4af9758735f@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.4-0ubuntu1 
+        h=x-gm-message-state:to:cc:references:from:subject:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=4RywPiGpkeJ8ft2kFpbHNdUd62AsRGHndtvEkFVGNC8=;
+        b=WlR6307EsValSThYjSQVWJxm2PDnFBygowNkHDyy8dHZFqyZCgwWC0Ktzikss35IH6
+         ee/ak1lKp9aydghQNQhMRip4HVtASZWjyLNGZnUAIuYZeLHnTVneIqBuhsYTF/LY0Ua2
+         NUIUqLyLmDoA0hOtOJy4dcW1bZkvjkcYO9KNssn9RRVlWD3lU6A9hocOnB+9zeBSXl8X
+         8WHKyIEOVoNN6AQtWkritXi9LJpje7+qYq8uIzUsHcFp2BpRcO4dI6mTEhqIpgiHJYkP
+         B3UqKfUG33G8Maht5P9gmMW5lIQk5fS5W1/y0LcObelo4CuKzx91JLP2oPKvf85hjEpw
+         L6Ww==
+X-Gm-Message-State: AOAM530qJ7N/YdI7NeBWVSKWhkwNCeWVncvWy1Pl/0yr0RWtFlbL+oDu
+        RfMgEWiqdXozJgoddCtrxTuNbBsFSJujbatd2AJK6T1y8rVgF888zZAoThr2QPaFWEt0STVZDee
+        J+I7oWvXdbAcdL+f742PV8irTunu5SdzVYDdHX3iNDEOjkbAfpgpH59ZSYAhVYI9o
+X-Received: by 2002:adf:f60b:: with SMTP id t11mr3743439wrp.269.1615978185574;
+        Wed, 17 Mar 2021 03:49:45 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzeBITkSczuPw2QRG3ylbWKh3kqr3A+t3BVC/Hkr6nyjbu75/aKlKIWqvY58OmHj2Y9niHiKA==
+X-Received: by 2002:adf:f60b:: with SMTP id t11mr3743419wrp.269.1615978185372;
+        Wed, 17 Mar 2021 03:49:45 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id a6sm2522437wmm.0.2021.03.17.03.49.44
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 17 Mar 2021 03:49:44 -0700 (PDT)
+To:     Emanuele Giuseppe Esposito <eesposit@redhat.com>,
+        linux-kselftest@vger.kernel.org
+Cc:     Shuah Khan <shuah@kernel.org>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Andrew Jones <drjones@redhat.com>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+References: <20210317074552.8550-1-eesposit@redhat.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH] selftests/kvm: add test for
+ KVM_GET_MSR_FEATURE_INDEX_LIST
+Message-ID: <ac3ba1c0-450e-4e24-c2a2-39d037358758@redhat.com>
+Date:   Wed, 17 Mar 2021 11:49:43 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.7.0
 MIME-Version: 1.0
+In-Reply-To: <20210317074552.8550-1-eesposit@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 2021-03-11 at 11:04 +0800, Jason Wang wrote:
-> 
-> On 2021/3/11 12:41 上午, Elena Afanasova wrote:
-> > On Wed, 2021-03-10 at 15:11 +0100, Paolo Bonzini wrote:
-> > > On 10/03/21 14:20, Elena Afanasova wrote:
-> > > > On Tue, 2021-03-09 at 09:01 +0100, Paolo Bonzini wrote:
-> > > > > On 09/03/21 08:54, Jason Wang wrote:
-> > > > > > > +        return;
-> > > > > > > +
-> > > > > > > +    spin_lock(&ctx->wq.lock);
-> > > > > > > +    wait_event_interruptible_exclusive_locked(ctx->wq,
-> > > > > > > !ctx-
-> > > > > > > > busy);
-> > > > > > 
-> > > > > > Any reason that a simple mutex_lock_interruptible() can't
-> > > > > > work
-> > > > > > here?
-> > > > > 
-> > > > > Or alternatively why can't the callers just take the
-> > > > > spinlock.
-> > > > > 
-> > > > 
-> > > > I'm not sure I understand your question. Do you mean why locked
-> > > > version
-> > > > of wait_event() is used?
-> > > 
-> > > No, I mean why do you need to use ctx->busy and wait_event,
-> > > instead
-> > > of 
-> > > operating directly on the spinlock or on a mutex.
-> > > 
-> > 
-> > When ioregionfd communication is interrupted by a signal
-> > ioctl(KVM_RUN)
-> > has to return to userspace. I'm not sure it's ok to do that with
-> > the
-> > spinlock/mutex being held.
-> 
-> 
-> So you don't answer my question. Why you can't use
-> mutex_lock_interruptible() here?
-> 
-> It looks can do exactly what you want here.
-> 
-> Thanks
-> 
-I think mutex could work here. I used it for the first implementation.
-But is it ok to hold a mutex on kernel->user transitions? Is it correct
-pattern in this case? 
-If ioctl returns to userspace and then ioregionfd is deleted or vcpu fd
-is closed, with a mutex held it will be necessary to unlock it. But I
-think it’s a bit clearer to use wake_up in e.g. kvm_vcpu_release
-instead of mutex_unlock. Paolo, could you please also comment on this?
+On 17/03/21 08:45, Emanuele Giuseppe Esposito wrote:
+> +	struct kvm_msr_list features_list;
+>   
+>   	buffer.header.nmsrs = 1;
+>   	buffer.entry.index = msr_index;
+> +	features_list.nmsrs = 1;
+> +
+>   	kvm_fd = open(KVM_DEV_PATH, O_RDONLY);
+>   	if (kvm_fd < 0)
+>   		exit(KSFT_SKIP);
+>   
+> +	r = ioctl(kvm_fd, KVM_GET_MSR_FEATURE_INDEX_LIST, &features_list);
+> +	TEST_ASSERT(r < 0 && r != -E2BIG, "KVM_GET_MSR_FEATURE_INDEX_LIST IOCTL failed,\n"
+> +		"  rc: %i errno: %i", r, errno);
 
+Careful: because this has nsmrs == 1, you are overwriting an u32 of the 
+stack after struct kvm_msr_list.  You need to use your own struct 
+similar to what is done with "buffer.header" and "buffer.entry".
+
+>   	r = ioctl(kvm_fd, KVM_GET_MSRS, &buffer.header);
+>   	TEST_ASSERT(r == 1, "KVM_GET_MSRS IOCTL failed,\n"
+>   		"  rc: %i errno: %i", r, errno);
 > 
-> 
+
+More in general, this is not a test, but rather a library function used 
+to read a single MSR.
+
+If you would like to add a test for KVM_GET_MSR_FEATURE_INDEX_LIST that 
+would be very welcome.  That would be a new executable.  Looking at the 
+logic for the ioctl, the main purpose of the test should be:
+
+- check that if features_list.nmsrs is too small it will set the nmsrs 
+field and return -E2BIG.
+
+- check that all MSRs returned by KVM_GET_MSR_FEATURE_INDEX_LIST can be 
+accessed with KVM_GET_MSRS
+
+So something like this:
+
+   set nmsrs to 0 and try the ioctl
+   check that it returns -E2BIG and has changed nmsrs
+   if nmsrs != 1 {
+     set nmsrs to 1 and try the ioctl again
+     check that it returns -E2BIG
+   }
+   malloc a buffer with room for struct kvm_msr_list and nmsrs indices
+   set nmsrs in the malloc-ed buffer and try the ioctl again
+   for each index
+     invoke kvm_get_feature_msr to read it
+
+(The test should also be skipped if KVM does not expose the 
+KVM_CAP_GET_MSR_FEATURES capability).
+
+Thanks,
+
+Paolo
 
