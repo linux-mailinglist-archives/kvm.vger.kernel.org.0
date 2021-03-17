@@ -2,135 +2,91 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0BCFD33EB24
-	for <lists+kvm@lfdr.de>; Wed, 17 Mar 2021 09:14:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 61ADE33EB72
+	for <lists+kvm@lfdr.de>; Wed, 17 Mar 2021 09:27:32 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229644AbhCQINa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 17 Mar 2021 04:13:30 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:33818 "EHLO
+        id S229775AbhCQI1B (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 17 Mar 2021 04:27:01 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:25214 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229505AbhCQINC (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 17 Mar 2021 04:13:02 -0400
+        by vger.kernel.org with ESMTP id S229732AbhCQI0d (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 17 Mar 2021 04:26:33 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1615968782;
+        s=mimecast20190719; t=1615969591;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=ADhPq2k0LcRqVj4L2ezqOMeyS6mp96DFeOfcwe+L5Ss=;
-        b=WqXZ4u6OmqOpV2yPP1Zruzrc+WVx/vEo3pAy0sr29RKcvHqG5C71K6X51i/umFjaOk3/BK
-        haIyN7f2lRbfsimchdjoxBRKPIYy6rHhQTKXGxluxDZEkv7tbDD/VEJucbN19LwGsajIO3
-        K3v4xOv1aNIlr6X32wQMpnNjgI9fLTg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-60-szyO-KWNPn2BgkMAYcpQQQ-1; Wed, 17 Mar 2021 04:12:57 -0400
-X-MC-Unique: szyO-KWNPn2BgkMAYcpQQQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 99F1E83DD20;
-        Wed, 17 Mar 2021 08:12:55 +0000 (UTC)
-Received: from gondolin (ovpn-113-255.ams2.redhat.com [10.36.113.255])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id B6E825D74F;
-        Wed, 17 Mar 2021 08:12:46 +0000 (UTC)
-Date:   Wed, 17 Mar 2021 09:12:44 +0100
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     "Tian, Kevin" <kevin.tian@intel.com>,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "Raj, Ashok" <ashok.raj@intel.com>,
-        "Williams, Dan J" <dan.j.williams@intel.com>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        "Christoph Hellwig" <hch@lst.de>,
-        Leon Romanovsky <leonro@nvidia.com>,
-        Max Gurtovoy <mgurtovoy@nvidia.com>,
-        Tarun Gupta <targupta@nvidia.com>
-Subject: Re: [PATCH v2 02/14] vfio: Simplify the lifetime logic for
- vfio_device
-Message-ID: <20210317091244.26457621.cohuck@redhat.com>
-In-Reply-To: <20210316142454.401d77fb@omen.home.shazbot.org>
-References: <0-v2-20d933792272+4ff-vfio1_jgg@nvidia.com>
-        <2-v2-20d933792272+4ff-vfio1_jgg@nvidia.com>
-        <MWHPR11MB18865B08DE53D9E9EE04DA5B8C6B9@MWHPR11MB1886.namprd11.prod.outlook.com>
-        <20210316142454.401d77fb@omen.home.shazbot.org>
-Organization: Red Hat GmbH
+        bh=EwapMQi0nkg7eVnbf33AM5coVysoOM+HGdcBLVsx95o=;
+        b=f/QzM11EGVFDOr1Tc43DKvtcbTyLiMlvmeqvzew7008PcXWVR/UYeHiFysFo6yfqmh8Po5
+        X8G35CihJ32ATZQFav1VDOoBq+kzzJ4XAunclTIog8PuuGbF4PNAK9GkBP1vGTmx57DLM9
+        4mQjlScJEBqzdPge2h1pWlujCOh9TMY=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-125-YWk5vMVDNzmsX_OoKhtgzw-1; Wed, 17 Mar 2021 04:26:29 -0400
+X-MC-Unique: YWk5vMVDNzmsX_OoKhtgzw-1
+Received: by mail-ed1-f71.google.com with SMTP id t27so18929716edi.2
+        for <kvm@vger.kernel.org>; Wed, 17 Mar 2021 01:26:29 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=EwapMQi0nkg7eVnbf33AM5coVysoOM+HGdcBLVsx95o=;
+        b=rvvoSTksTBr6c2erIVzup56deyEA71qXg8/mhr5bl114VHKtZ7fG5n516Z1kMi34K2
+         SnBJkj1p8L0v/GtLtuLSPBhb3c7vRfudhlLWSE54zi8aKTNeKlzpibGMOOE5mzMy7A10
+         Y5IG2ONQ0mlnUxOEr9Au+E7M+DzZOSGvciIFwuh6oE7ExAr62PXDETfGVtwVCqvM7b0Q
+         hW9gix+WvnDNNO0EY6bPlxrcBL60rhlbuHxtiCQH1Lv6PrXRXiFM5z1SZ8D5kfJiykZD
+         S6QH3O4qjDFLzYvMMjJl0GOt3fB5rscJ2Y+HN9gULKBoLCiWCW44b56DF/avnLbv7+2N
+         evEQ==
+X-Gm-Message-State: AOAM53044vGmDsjsf5C/+nq43ooB3r3a2IPkSnc8afMPZhU4XIli3LIr
+        r9W3rrYVdvU5PjRRsTo0/1sulNqw3RNk8l4ZYFcW9LWlJHTNEZ5BSL9eUEuof7cs9e+Kvs5Avxs
+        q+yfLryY8sYEA
+X-Received: by 2002:a05:6402:34c8:: with SMTP id w8mr42273342edc.235.1615969588490;
+        Wed, 17 Mar 2021 01:26:28 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzs2IfIabALxEDPdD531JeAvmlPd3oXH08kwxGnDTWawZHEErYQNxcoHlVJ8xZAWJMW4AVeug==
+X-Received: by 2002:a05:6402:34c8:: with SMTP id w8mr42273327edc.235.1615969588341;
+        Wed, 17 Mar 2021 01:26:28 -0700 (PDT)
+Received: from steredhat (host-79-34-249-199.business.telecomitalia.it. [79.34.249.199])
+        by smtp.gmail.com with ESMTPSA id r19sm11964199edp.52.2021.03.17.01.26.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 17 Mar 2021 01:26:27 -0700 (PDT)
+Date:   Wed, 17 Mar 2021 09:26:25 +0100
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     Laurent Vivier <lvivier@redhat.com>
+Cc:     linux-kernel@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        Jason Wang <jasowang@redhat.com>, netdev@vger.kernel.org,
+        "Michael S. Tsirkin" <mst@redhat.com>, kvm@vger.kernel.org
+Subject: Re: [PATCH] vhost: Fix vhost_vq_reset()
+Message-ID: <20210317082625.euxknnggg4gv7i5m@steredhat>
+References: <20210312140913.788592-1-lvivier@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20210312140913.788592-1-lvivier@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 16 Mar 2021 14:24:54 -0600
-Alex Williamson <alex.williamson@redhat.com> wrote:
+On Fri, Mar 12, 2021 at 03:09:13PM +0100, Laurent Vivier wrote:
+>vhost_reset_is_le() is vhost_init_is_le(), and in the case of
+>cross-endian legacy, vhost_init_is_le() depends on vq->user_be.
+>
+>vq->user_be is set by vhost_disable_cross_endian().
+>
+>But in vhost_vq_reset(), we have:
+>
+>    vhost_reset_is_le(vq);
+>    vhost_disable_cross_endian(vq);
+>
+>And so user_be is used before being set.
+>
+>To fix that, reverse the lines order as there is no other dependency
+>between them.
+>
+>Signed-off-by: Laurent Vivier <lvivier@redhat.com>
+>---
+> drivers/vhost/vhost.c | 2 +-
+> 1 file changed, 1 insertion(+), 1 deletion(-)
 
-> On Tue, 16 Mar 2021 07:38:09 +0000
-> "Tian, Kevin" <kevin.tian@intel.com> wrote:
-> 
-> > > From: Jason Gunthorpe <jgg@nvidia.com>
-> > > Sent: Saturday, March 13, 2021 8:56 AM
-> > > 
-> > > The vfio_device is using a 'sleep until all refs go to zero' pattern for
-> > > its lifetime, but it is indirectly coded by repeatedly scanning the group
-> > > list waiting for the device to be removed on its own.
-> > > 
-> > > Switch this around to be a direct representation, use a refcount to count
-> > > the number of places that are blocking destruction and sleep directly on a
-> > > completion until that counter goes to zero. kfree the device after other
-> > > accesses have been excluded in vfio_del_group_dev(). This is a fairly
-> > > common Linux idiom.
-> > > 
-> > > Due to this we can now remove kref_put_mutex(), which is very rarely used
-> > > in the kernel. Here it is being used to prevent a zero ref device from
-> > > being seen in the group list. Instead allow the zero ref device to
-> > > continue to exist in the device_list and use refcount_inc_not_zero() to
-> > > exclude it once refs go to zero.
-> > > 
-> > > This patch is organized so the next patch will be able to alter the API to
-> > > allow drivers to provide the kfree.
-> > > 
-> > > Reviewed-by: Christoph Hellwig <hch@lst.de>
-> > > Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
-> > > ---
-> > >  drivers/vfio/vfio.c | 79 ++++++++++++++-------------------------------
-> > >  1 file changed, 25 insertions(+), 54 deletions(-)
-> > > 
-
-> > > @@ -935,32 +916,18 @@ void *vfio_del_group_dev(struct device *dev)
-> > >  	WARN_ON(!unbound);
-> > > 
-> > >  	vfio_device_put(device);
-> > > -
-> > > -	/*
-> > > -	 * If the device is still present in the group after the above
-> > > -	 * 'put', then it is in use and we need to request it from the
-> > > -	 * bus driver.  The driver may in turn need to request the
-> > > -	 * device from the user.  We send the request on an arbitrary
-> > > -	 * interval with counter to allow the driver to take escalating
-> > > -	 * measures to release the device if it has the ability to do so.
-> > > -	 */    
-> > 
-> > Above comment still makes sense even with this patch. What about
-> > keeping it? otherwise:  
-> 
-> The comment is not exactly correct after this code change either, the
-> device will always be present in the group after this 'put'.  Instead,
-> the completion now indicates the reference count has reached zero.  If
-> it's worthwhile to keep more context to the request callback, perhaps:
-> 
-> 	/*
-> 	 * If there are still outstanding device references, such as
-> 	 * from the device being in use, periodically kick the optional
-> 	 * device request callback while waiting.
-> 	 */
-
-I like that comment; I don't think it hurts to be a bit verbose here.
-
-> 
-> It's also a little obvious that's what we're doing here even without
-> the comment.  Thanks,
-> 
-> Alex
+Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
 
