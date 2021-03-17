@@ -2,90 +2,76 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id AFA1133ED93
-	for <lists+kvm@lfdr.de>; Wed, 17 Mar 2021 10:56:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8107333EE12
+	for <lists+kvm@lfdr.de>; Wed, 17 Mar 2021 11:08:15 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230239AbhCQJza (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 17 Mar 2021 05:55:30 -0400
-Received: from mga04.intel.com ([192.55.52.120]:59767 "EHLO mga04.intel.com"
+        id S229601AbhCQKHn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 17 Mar 2021 06:07:43 -0400
+Received: from foss.arm.com ([217.140.110.172]:56174 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230114AbhCQJzA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 17 Mar 2021 05:55:00 -0400
-IronPort-SDR: fR03KbjV13NNCytzBp8PFgiMglJRMi18ZhbG8pJF2p59rLD0qK2Rtl8W1Mj4p5uMiuhQwzOXAl
- CEK1M/eX3XUQ==
-X-IronPort-AV: E=McAfee;i="6000,8403,9925"; a="187058688"
-X-IronPort-AV: E=Sophos;i="5.81,255,1610438400"; 
-   d="scan'208";a="187058688"
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Mar 2021 02:55:00 -0700
-IronPort-SDR: Vmg6AY6wcKfV0IP8X/tKaUCRiI5QvL5En6PUE7mhrFwzJ4SCIf0nbIezjQndaH42xvwzLxYryT
- R0h7yv8ejGCw==
-X-IronPort-AV: E=Sophos;i="5.81,255,1610438400"; 
-   d="scan'208";a="405873255"
-Received: from unknown (HELO localhost.localdomain.bj.intel.com) ([10.240.193.73])
-  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Mar 2021 02:54:57 -0700
-From:   Zhu Lingshan <lingshan.zhu@intel.com>
-To:     jasowang@redhat.com, mst@redhat.com, lulu@redhat.com,
-        leonro@nvidia.com
-Cc:     virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Zhu Lingshan <lingshan.zhu@intel.com>
-Subject: [PATCH V5 7/7] vDPA/ifcvf: deduce VIRTIO device ID from pdev ids
-Date:   Wed, 17 Mar 2021 17:49:33 +0800
-Message-Id: <20210317094933.16417-8-lingshan.zhu@intel.com>
-X-Mailer: git-send-email 2.27.0
-In-Reply-To: <20210317094933.16417-1-lingshan.zhu@intel.com>
-References: <20210317094933.16417-1-lingshan.zhu@intel.com>
+        id S229999AbhCQKH0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 17 Mar 2021 06:07:26 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E0CB6D6E;
+        Wed, 17 Mar 2021 03:07:24 -0700 (PDT)
+Received: from e121166-lin.cambridge.arm.com (e121166-lin.cambridge.arm.com [10.1.196.255])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 3AD753F70D;
+        Wed, 17 Mar 2021 03:07:24 -0700 (PDT)
+From:   Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>
+To:     linux-kernel@vger.kernel.org
+Cc:     Marc Zyngier <maz@kernel.org>,
+        LAKML <linux-arm-kernel@lists.infradead.org>,
+        KVM <kvm@vger.kernel.org>
+Subject: [PATCH v3 0/1] GIC v4.1: Disable VSGI support for GIC CPUIF < v4.1
+Date:   Wed, 17 Mar 2021 10:07:18 +0000
+Message-Id: <20210317100719.3331-1-lorenzo.pieralisi@arm.com>
+X-Mailer: git-send-email 2.29.1
+In-Reply-To: <20210302102744.12692-1-lorenzo.pieralisi@arm.com>
+References: <20210302102744.12692-1-lorenzo.pieralisi@arm.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This commit deduces the VIRTIO device ID of a probed
-device from its pdev device ids.
+This patchset is v3 of a previous version [1].
 
-Signed-off-by: Zhu Lingshan <lingshan.zhu@intel.com>
----
- drivers/vdpa/ifcvf/ifcvf_base.h |  1 +
- drivers/vdpa/ifcvf/ifcvf_main.c | 14 +++++++++++++-
- 2 files changed, 14 insertions(+), 1 deletion(-)
+v2 -> v3:
+	- Coalesced all checks in one function (Marc's feedback)
+	- Allow sgi_ops on cpuif mismatch (to keep v4.1 doorbell
+          mechanism that works fine even if GIC CPUIF < v4.1)
 
-diff --git a/drivers/vdpa/ifcvf/ifcvf_base.h b/drivers/vdpa/ifcvf/ifcvf_base.h
-index f77239fc1644..b2eeb16b9c2c 100644
---- a/drivers/vdpa/ifcvf/ifcvf_base.h
-+++ b/drivers/vdpa/ifcvf/ifcvf_base.h
-@@ -127,4 +127,5 @@ int ifcvf_verify_min_features(struct ifcvf_hw *hw, u64 features);
- u16 ifcvf_get_vq_state(struct ifcvf_hw *hw, u16 qid);
- int ifcvf_set_vq_state(struct ifcvf_hw *hw, u16 qid, u16 num);
- struct ifcvf_adapter *vf_to_adapter(struct ifcvf_hw *hw);
-+int ifcvf_probed_virtio_net(struct ifcvf_hw *hw);
- #endif /* _IFCVF_H_ */
-diff --git a/drivers/vdpa/ifcvf/ifcvf_main.c b/drivers/vdpa/ifcvf/ifcvf_main.c
-index ea93ea7fd5df..9fade400b5a4 100644
---- a/drivers/vdpa/ifcvf/ifcvf_main.c
-+++ b/drivers/vdpa/ifcvf/ifcvf_main.c
-@@ -323,7 +323,19 @@ static u32 ifcvf_vdpa_get_generation(struct vdpa_device *vdpa_dev)
- 
- static u32 ifcvf_vdpa_get_device_id(struct vdpa_device *vdpa_dev)
- {
--	return VIRTIO_ID_NET;
-+	struct ifcvf_adapter *adapter = vdpa_to_adapter(vdpa_dev);
-+	struct pci_dev *pdev = adapter->pdev;
-+	u32 ret = -ENODEV;
-+
-+	if (pdev->device < 0x1000 || pdev->device > 0x107f)
-+		return ret;
-+
-+	if (pdev->device < 0x1040)
-+		ret =  pdev->subsystem_device;
-+	else
-+		ret =  pdev->device - 0x1040;
-+
-+	return ret;
- }
- 
- static u32 ifcvf_vdpa_get_vendor_id(struct vdpa_device *vdpa_dev)
+v1 -> v2:
+	- Fixed vGIC behaviour according to v1 [1] review
+	- Removed capability detection - rely on sanitised reg read
+	- Added vsgi specific flag (for gic and kvm)
+
+[1] https://lore.kernel.org/linux-arm-kernel/20210302102744.12692-1-lorenzo.pieralisi@arm.com
+
+-- Original cover letter --
+
+GIC v4.1 introduced changes to the GIC CPU interface; systems that
+integrate CPUs that do not support GIC v4.1 features (as reported in the
+ID_AA64PFR0_EL1.GIC bitfield) and a GIC v4.1 controller must disable in
+software virtual SGIs support since the CPUIF and GIC controller version
+mismatch results in CONSTRAINED UNPREDICTABLE behaviour at architectural
+level.
+
+For systems with CPUs reporting ID_AA64PFR0_EL1.GIC == b0001 integrated
+in a system with a GIC v4.1 it _should_ still be safe to enable vLPIs
+(other than vSGI) since the protocol between the GIC redistributor and
+the GIC CPUIF was not changed from GIC v4.0 to GIC v4.1.
+
+Cc: Marc Zyngier <maz@kernel.org>
+
+Lorenzo Pieralisi (1):
+  irqchip/gic-v4.1: Disable vSGI upon (GIC CPUIF < v4.1) detection
+
+ arch/arm64/kvm/vgic/vgic-mmio-v3.c |  4 ++--
+ drivers/irqchip/irq-gic-v4.c       | 27 +++++++++++++++++++++++++--
+ include/linux/irqchip/arm-gic-v4.h |  2 ++
+ 3 files changed, 29 insertions(+), 4 deletions(-)
+
 -- 
-2.27.0
+2.29.1
 
