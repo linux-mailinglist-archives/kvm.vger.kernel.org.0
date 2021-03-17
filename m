@@ -2,91 +2,135 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 61ADE33EB72
-	for <lists+kvm@lfdr.de>; Wed, 17 Mar 2021 09:27:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B850C33EC3B
+	for <lists+kvm@lfdr.de>; Wed, 17 Mar 2021 10:11:51 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229775AbhCQI1B (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 17 Mar 2021 04:27:01 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:25214 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229732AbhCQI0d (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 17 Mar 2021 04:26:33 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1615969591;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=EwapMQi0nkg7eVnbf33AM5coVysoOM+HGdcBLVsx95o=;
-        b=f/QzM11EGVFDOr1Tc43DKvtcbTyLiMlvmeqvzew7008PcXWVR/UYeHiFysFo6yfqmh8Po5
-        X8G35CihJ32ATZQFav1VDOoBq+kzzJ4XAunclTIog8PuuGbF4PNAK9GkBP1vGTmx57DLM9
-        4mQjlScJEBqzdPge2h1pWlujCOh9TMY=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-125-YWk5vMVDNzmsX_OoKhtgzw-1; Wed, 17 Mar 2021 04:26:29 -0400
-X-MC-Unique: YWk5vMVDNzmsX_OoKhtgzw-1
-Received: by mail-ed1-f71.google.com with SMTP id t27so18929716edi.2
-        for <kvm@vger.kernel.org>; Wed, 17 Mar 2021 01:26:29 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=EwapMQi0nkg7eVnbf33AM5coVysoOM+HGdcBLVsx95o=;
-        b=rvvoSTksTBr6c2erIVzup56deyEA71qXg8/mhr5bl114VHKtZ7fG5n516Z1kMi34K2
-         SnBJkj1p8L0v/GtLtuLSPBhb3c7vRfudhlLWSE54zi8aKTNeKlzpibGMOOE5mzMy7A10
-         Y5IG2ONQ0mlnUxOEr9Au+E7M+DzZOSGvciIFwuh6oE7ExAr62PXDETfGVtwVCqvM7b0Q
-         hW9gix+WvnDNNO0EY6bPlxrcBL60rhlbuHxtiCQH1Lv6PrXRXiFM5z1SZ8D5kfJiykZD
-         S6QH3O4qjDFLzYvMMjJl0GOt3fB5rscJ2Y+HN9gULKBoLCiWCW44b56DF/avnLbv7+2N
-         evEQ==
-X-Gm-Message-State: AOAM53044vGmDsjsf5C/+nq43ooB3r3a2IPkSnc8afMPZhU4XIli3LIr
-        r9W3rrYVdvU5PjRRsTo0/1sulNqw3RNk8l4ZYFcW9LWlJHTNEZ5BSL9eUEuof7cs9e+Kvs5Avxs
-        q+yfLryY8sYEA
-X-Received: by 2002:a05:6402:34c8:: with SMTP id w8mr42273342edc.235.1615969588490;
-        Wed, 17 Mar 2021 01:26:28 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzs2IfIabALxEDPdD531JeAvmlPd3oXH08kwxGnDTWawZHEErYQNxcoHlVJ8xZAWJMW4AVeug==
-X-Received: by 2002:a05:6402:34c8:: with SMTP id w8mr42273327edc.235.1615969588341;
-        Wed, 17 Mar 2021 01:26:28 -0700 (PDT)
-Received: from steredhat (host-79-34-249-199.business.telecomitalia.it. [79.34.249.199])
-        by smtp.gmail.com with ESMTPSA id r19sm11964199edp.52.2021.03.17.01.26.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 17 Mar 2021 01:26:27 -0700 (PDT)
-Date:   Wed, 17 Mar 2021 09:26:25 +0100
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     Laurent Vivier <lvivier@redhat.com>
-Cc:     linux-kernel@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        Jason Wang <jasowang@redhat.com>, netdev@vger.kernel.org,
-        "Michael S. Tsirkin" <mst@redhat.com>, kvm@vger.kernel.org
-Subject: Re: [PATCH] vhost: Fix vhost_vq_reset()
-Message-ID: <20210317082625.euxknnggg4gv7i5m@steredhat>
-References: <20210312140913.788592-1-lvivier@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20210312140913.788592-1-lvivier@redhat.com>
+        id S229588AbhCQJLS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 17 Mar 2021 05:11:18 -0400
+Received: from mail.kernel.org ([198.145.29.99]:48196 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229535AbhCQJLR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 17 Mar 2021 05:11:17 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id A879F64F30;
+        Wed, 17 Mar 2021 09:11:16 +0000 (UTC)
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94)
+        (envelope-from <maz@kernel.org>)
+        id 1lMSCw-002AWF-GT; Wed, 17 Mar 2021 09:11:14 +0000
+Date:   Wed, 17 Mar 2021 09:10:20 +0000
+Message-ID: <87mtv2i1s3.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Wanpeng Li <kernellwp@gmail.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH] KVM: arm: memcg awareness
+In-Reply-To: <1615959984-7122-1-git-send-email-wanpengli@tencent.com>
+References: <1615959984-7122-1-git-send-email-wanpengli@tencent.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: kernellwp@gmail.com, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, pbonzini@redhat.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Mar 12, 2021 at 03:09:13PM +0100, Laurent Vivier wrote:
->vhost_reset_is_le() is vhost_init_is_le(), and in the case of
->cross-endian legacy, vhost_init_is_le() depends on vq->user_be.
->
->vq->user_be is set by vhost_disable_cross_endian().
->
->But in vhost_vq_reset(), we have:
->
->    vhost_reset_is_le(vq);
->    vhost_disable_cross_endian(vq);
->
->And so user_be is used before being set.
->
->To fix that, reverse the lines order as there is no other dependency
->between them.
->
->Signed-off-by: Laurent Vivier <lvivier@redhat.com>
->---
-> drivers/vhost/vhost.c | 2 +-
-> 1 file changed, 1 insertion(+), 1 deletion(-)
+On Wed, 17 Mar 2021 05:46:24 +0000,
+Wanpeng Li <kernellwp@gmail.com> wrote:
+> 
+> From: Wanpeng Li <wanpengli@tencent.com>
+> 
+> KVM allocations in the arm kvm code which are tied to the life 
+> of the VM process should be charged to the VM process's cgroup.
+> This will help the memcg controler to do the right decisions.
+> 
+> Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
+> ---
+>  arch/arm64/kvm/arm.c               |  5 +++--
+>  arch/arm64/kvm/hyp/pgtable.c       |  4 ++--
+>  arch/arm64/kvm/mmu.c               |  4 ++--
+>  arch/arm64/kvm/pmu-emul.c          |  2 +-
+>  arch/arm64/kvm/reset.c             |  2 +-
+>  arch/arm64/kvm/vgic/vgic-debug.c   |  2 +-
+>  arch/arm64/kvm/vgic/vgic-init.c    |  2 +-
+>  arch/arm64/kvm/vgic/vgic-irqfd.c   |  2 +-
+>  arch/arm64/kvm/vgic/vgic-its.c     | 14 +++++++-------
+>  arch/arm64/kvm/vgic/vgic-mmio-v3.c |  2 +-
+>  arch/arm64/kvm/vgic/vgic-v4.c      |  2 +-
+>  11 files changed, 21 insertions(+), 20 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index 7f06ba7..8040874 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -278,9 +278,10 @@ long kvm_arch_dev_ioctl(struct file *filp,
+>  struct kvm *kvm_arch_alloc_vm(void)
+>  {
+>  	if (!has_vhe())
+> -		return kzalloc(sizeof(struct kvm), GFP_KERNEL);
+> +		return kzalloc(sizeof(struct kvm), GFP_KERNEL_ACCOUNT);
+>  
+> -	return vzalloc(sizeof(struct kvm));
+> +	return __vmalloc(sizeof(struct kvm),
+> +			GFP_KERNEL_ACCOUNT | __GFP_ZERO);
+>  }
+>  
+>  void kvm_arch_free_vm(struct kvm *kvm)
+> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+> index 926fc07..a0845d3 100644
+> --- a/arch/arm64/kvm/hyp/pgtable.c
+> +++ b/arch/arm64/kvm/hyp/pgtable.c
+> @@ -366,7 +366,7 @@ static int hyp_map_walker(u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
+>  	if (WARN_ON(level == KVM_PGTABLE_MAX_LEVELS - 1))
+>  		return -EINVAL;
+>  
+> -	childp = (kvm_pte_t *)get_zeroed_page(GFP_KERNEL);
+> +	childp = (kvm_pte_t *)get_zeroed_page(GFP_KERNEL_ACCOUNT);
 
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+No, this is wrong.
 
+You cannot account the hypervisor page tables to the guest because we
+don't ever unmap them, and that we can't distinguish two data
+structures from two different VMs occupying the same page.
+
+>  	if (!childp)
+>  		return -ENOMEM;
+>  
+> @@ -401,7 +401,7 @@ int kvm_pgtable_hyp_init(struct kvm_pgtable *pgt, u32 va_bits)
+>  {
+>  	u64 levels = ARM64_HW_PGTABLE_LEVELS(va_bits);
+>  
+> -	pgt->pgd = (kvm_pte_t *)get_zeroed_page(GFP_KERNEL);
+> +	pgt->pgd = (kvm_pte_t *)get_zeroed_page(GFP_KERNEL_ACCOUNT);
+
+There is no VM in this context. There isn't even any userspace
+whatsoever in the system when this is called.
+
+[...]
+
+> diff --git a/arch/arm64/kvm/vgic/vgic-v4.c b/arch/arm64/kvm/vgic/vgic-v4.c
+> index 66508b0..a80cc37 100644
+> --- a/arch/arm64/kvm/vgic/vgic-v4.c
+> +++ b/arch/arm64/kvm/vgic/vgic-v4.c
+> @@ -227,7 +227,7 @@ int vgic_v4_init(struct kvm *kvm)
+>  	nr_vcpus = atomic_read(&kvm->online_vcpus);
+>  
+>  	dist->its_vm.vpes = kcalloc(nr_vcpus, sizeof(*dist->its_vm.vpes),
+> -				    GFP_KERNEL);
+> +				    GFP_KERNEL_ACCOUNT);
+
+And now for the elephant in the room: what you do for the GICv4 VPTs
+that are allocated for each vPE?
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
