@@ -2,91 +2,131 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6BDE633EE7E
-	for <lists+kvm@lfdr.de>; Wed, 17 Mar 2021 11:41:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D4F1233EEA9
+	for <lists+kvm@lfdr.de>; Wed, 17 Mar 2021 11:48:15 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229937AbhCQKkr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 17 Mar 2021 06:40:47 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:57184 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230064AbhCQKk2 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 17 Mar 2021 06:40:28 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1615977627;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=+uA62LYXXYt34SbzMiUOo/GuFglM+koNWxYIoI0HaWE=;
-        b=d5Z/nXPvdqcfX0LvzoLIcdsg7gNFgr5+v+NexEunJVjgcq5SLhQr7CO8bemWnFaG2WZGJa
-        Dy1f8cJ26CPlkgFsWx6aQZrXhA9U3LeeM1IUQUZ66mvYvM3gOWoLBNPh5CFWlFLem/VoQO
-        xo9fzCJyJJsxpnyeAYgrjmYtIClOaWo=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-602-FPx1zgdFMB-jVigV9UNmXg-1; Wed, 17 Mar 2021 06:40:26 -0400
-X-MC-Unique: FPx1zgdFMB-jVigV9UNmXg-1
-Received: by mail-wr1-f69.google.com with SMTP id h30so18236123wrh.10
-        for <kvm@vger.kernel.org>; Wed, 17 Mar 2021 03:40:26 -0700 (PDT)
+        id S230119AbhCQKro (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 17 Mar 2021 06:47:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35374 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229952AbhCQKrM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 17 Mar 2021 06:47:12 -0400
+Received: from mail-lf1-x12f.google.com (mail-lf1-x12f.google.com [IPv6:2a00:1450:4864:20::12f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 51A84C06174A
+        for <kvm@vger.kernel.org>; Wed, 17 Mar 2021 03:47:12 -0700 (PDT)
+Received: by mail-lf1-x12f.google.com with SMTP id p21so2210710lfu.11
+        for <kvm@vger.kernel.org>; Wed, 17 Mar 2021 03:47:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=message-id:subject:from:to:cc:date:in-reply-to:references
+         :user-agent:mime-version:content-transfer-encoding;
+        bh=D3+asHosyveO3oNqTVARLLdoW1Ou9vqvVWN+nWXsQeQ=;
+        b=o7bQ1ZzIX+fJXuP1r/bh5GMs42fiAxUxu1QXPWAKpj2w6yKDrhD48H4Rv/5Op+q/OB
+         n8aA07Rf27hMMwO0xxDxgMRi2T9c7sC7TOxpjqeDldO+YxvzDqh+eDCLXkBkmf38bPMK
+         1zN6nLly0EXOcuJViS84zkRAXJPtTNn6LKCyHluSx3QpSciUpfbXwtAjxSeK2ABLxN7S
+         lKAxqCXOpAKXB947hJ0NnPvoH/weFbjtUDbuBLJBmvK3QNnV5JDS63OL9B5E3GaiahnE
+         foRn5mx8oeuPNmhCa5Y2wkRBzbcoRfooIy4dbEH9f/bIzph3yyJdE5dOvGMOCgeb6n0m
+         nITQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:cc:references:from:subject:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=+uA62LYXXYt34SbzMiUOo/GuFglM+koNWxYIoI0HaWE=;
-        b=kUYA6Ui1FuPYxq+y3/6DCF9r2H+sNp5SjMMFPRW8NQveBOHdRDFD7IAR5idXWXT5lj
-         I1Rg3kvgVmpz9uLMKG/vNDpe/bllDeaoMlzLor8doER0aX38TXuLMmHr4+hWmTL4y+3Q
-         CVgW7H4ANQ0S0yY8GZah5eLQlcGbt85mhhfWGhylelPK8tMdRApVz4nznd1u8NmzXzna
-         j6uDNe1ZUSZoRLunRK4eUF92egleKrjJiUghO+14aYm92HxbFJ9NamaPRT8E/lyb95HA
-         MrkmimJ6EmFFiit5oXlbSmWTgqBX20AQtw2dZ1xoJvsHjZ1LIX41Y/fRRSl7N9biSFpp
-         IA5g==
-X-Gm-Message-State: AOAM53377AA+G5Lsag0Ti3bdcCKr2u1BN58qh2Hq3g+zZ6ed0qhtmw5v
-        IG/GjdA4aA2JuQm7KQcpvNNAzAuF0I8SGPheaUY1FAfkJIiVaDcXkl9BA2cH24QOeON7fD3zx2n
-        b00DvrXXPZhrg
-X-Received: by 2002:a5d:4904:: with SMTP id x4mr3643789wrq.69.1615977624795;
-        Wed, 17 Mar 2021 03:40:24 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzBZF3gGd+0hYA9nqALSuEG9p1iV25XmceN6jt1DKaC69m024BQgq4l21LRQchOZyC/bGwd1A==
-X-Received: by 2002:a5d:4904:: with SMTP id x4mr3643776wrq.69.1615977624655;
-        Wed, 17 Mar 2021 03:40:24 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id p16sm30048521wrt.54.2021.03.17.03.40.23
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 17 Mar 2021 03:40:24 -0700 (PDT)
-To:     Marc Zyngier <maz@kernel.org>, Wanpeng Li <kernellwp@gmail.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Ben Gardon <bgardon@google.com>,
-        Shakeel Butt <shakeelb@google.com>
-References: <1615959984-7122-1-git-send-email-wanpengli@tencent.com>
- <87mtv2i1s3.wl-maz@kernel.org>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH] KVM: arm: memcg awareness
-Message-ID: <e5fce698-9e21-5c71-c99b-a9af3f213e8f@redhat.com>
-Date:   Wed, 17 Mar 2021 11:40:23 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.7.0
+        h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
+         :references:user-agent:mime-version:content-transfer-encoding;
+        bh=D3+asHosyveO3oNqTVARLLdoW1Ou9vqvVWN+nWXsQeQ=;
+        b=AyxKXirJu1r6uVyh9jPjdQNfzA5ZnOSS7wDFePY4lLR80J86XKOzdogLsRQt2oGcm6
+         LxAzfB7rtr3Bl1olLwTRkjhmkDS7fJm81j3MtnTCNMNmP/7jEDQy86QA8d8iq3Z4iwi3
+         akQ71owyQeFLAyT0z8dzOOBKfAzD53RoUGh7IUeoJLTa9J0PpHDEmEbujZRI5gyOlG/d
+         AoK8gZqJhyPT84B8iqTaKMaFSCXLrd/f+7BuAV/2cTb8TLsmji3ncuJ78/sf7T7mThfB
+         6FxWbfhilD+Qzxmt/5JAHFJOzdhIRpDp5wVJns324TS71KkWBNeFq8iEkfESitp9Piuz
+         jazg==
+X-Gm-Message-State: AOAM532UuTmcD0p1zP/C1Uvp2BlGvoA9/jB8k2mCl4yN3lhhBTtO4XMD
+        Fif/JmZMgMkRhWhOV1c5Nco=
+X-Google-Smtp-Source: ABdhPJwJ6zZpwKWrLon7pi5cJss5vmuxf4IvR48Obhmib/18xZAK9Q/JGreMefi9kf8icV0gQd3HRA==
+X-Received: by 2002:a05:6512:3481:: with SMTP id v1mr1992641lfr.193.1615978030762;
+        Wed, 17 Mar 2021 03:47:10 -0700 (PDT)
+Received: from [192.168.167.128] (37-145-186-126.broadband.corbina.ru. [37.145.186.126])
+        by smtp.gmail.com with ESMTPSA id g14sm3476727ljj.3.2021.03.17.03.47.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 17 Mar 2021 03:47:10 -0700 (PDT)
+Message-ID: <7257025149c6a7369e7e2fd7c6291879c4bc127d.camel@gmail.com>
+Subject: Re: [RFC v3 4/5] KVM: add ioregionfd context
+From:   Elena Afanasova <eafanasova@gmail.com>
+To:     Jason Wang <jasowang@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
+Cc:     stefanha@redhat.com, jag.raman@oracle.com,
+        elena.ufimtseva@oracle.com, mst@redhat.com, cohuck@redhat.com,
+        john.levon@nutanix.com
+Date:   Wed, 17 Mar 2021 03:46:59 -0700
+In-Reply-To: <6ff79d0b-3b6a-73d3-ffbd-e4af9758735f@redhat.com>
+References: <cover.1613828726.git.eafanasova@gmail.com>
+         <4436ef071e55d88ff3996b134cc2303053581242.1613828727.git.eafanasova@gmail.com>
+         <2ee8cb35-3043-fc06-9973-c8bb33a90d40@redhat.com>
+         <2e7dfb1c-fe13-4e6d-ae65-133116866c2a@redhat.com>
+         <c9d8e6a6b533e67192b391dd902e27609121222c.camel@gmail.com>
+         <50823987-d285-7a18-7c46-771f08c3c0ff@redhat.com>
+         <95b1dc00ff533ce004ecc656bd130bd07e29a1f0.camel@gmail.com>
+         <6ff79d0b-3b6a-73d3-ffbd-e4af9758735f@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.4-0ubuntu1 
 MIME-Version: 1.0
-In-Reply-To: <87mtv2i1s3.wl-maz@kernel.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 17/03/21 10:10, Marc Zyngier wrote:
->> @@ -366,7 +366,7 @@ static int hyp_map_walker(u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
->>   	if (WARN_ON(level == KVM_PGTABLE_MAX_LEVELS - 1))
->>   		return -EINVAL;
->>   
->> -	childp = (kvm_pte_t *)get_zeroed_page(GFP_KERNEL);
->> +	childp = (kvm_pte_t *)get_zeroed_page(GFP_KERNEL_ACCOUNT);
-> No, this is wrong.
+On Thu, 2021-03-11 at 11:04 +0800, Jason Wang wrote:
 > 
-> You cannot account the hypervisor page tables to the guest because we
-> don't ever unmap them, and that we can't distinguish two data
-> structures from two different VMs occupying the same page.
+> On 2021/3/11 12:41 上午, Elena Afanasova wrote:
+> > On Wed, 2021-03-10 at 15:11 +0100, Paolo Bonzini wrote:
+> > > On 10/03/21 14:20, Elena Afanasova wrote:
+> > > > On Tue, 2021-03-09 at 09:01 +0100, Paolo Bonzini wrote:
+> > > > > On 09/03/21 08:54, Jason Wang wrote:
+> > > > > > > +        return;
+> > > > > > > +
+> > > > > > > +    spin_lock(&ctx->wq.lock);
+> > > > > > > +    wait_event_interruptible_exclusive_locked(ctx->wq,
+> > > > > > > !ctx-
+> > > > > > > > busy);
+> > > > > > 
+> > > > > > Any reason that a simple mutex_lock_interruptible() can't
+> > > > > > work
+> > > > > > here?
+> > > > > 
+> > > > > Or alternatively why can't the callers just take the
+> > > > > spinlock.
+> > > > > 
+> > > > 
+> > > > I'm not sure I understand your question. Do you mean why locked
+> > > > version
+> > > > of wait_event() is used?
+> > > 
+> > > No, I mean why do you need to use ctx->busy and wait_event,
+> > > instead
+> > > of 
+> > > operating directly on the spinlock or on a mutex.
+> > > 
+> > 
+> > When ioregionfd communication is interrupted by a signal
+> > ioctl(KVM_RUN)
+> > has to return to userspace. I'm not sure it's ok to do that with
+> > the
+> > spinlock/mutex being held.
+> 
+> 
+> So you don't answer my question. Why you can't use
+> mutex_lock_interruptible() here?
+> 
+> It looks can do exactly what you want here.
+> 
+> Thanks
+> 
+I think mutex could work here. I used it for the first implementation.
+But is it ok to hold a mutex on kernel->user transitions? Is it correct
+pattern in this case? 
+If ioctl returns to userspace and then ioregionfd is deleted or vcpu fd
+is closed, with a mutex held it will be necessary to unlock it. But I
+think it’s a bit clearer to use wake_up in e.g. kvm_vcpu_release
+instead of mutex_unlock. Paolo, could you please also comment on this?
 
-If you never unmap them, there should at least be a shrinker to get rid 
-of unused pages in the event of memory pressure.
-
-Paolo
+> 
+> 
 
