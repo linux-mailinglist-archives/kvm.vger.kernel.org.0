@@ -2,116 +2,129 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 276CE33FBC1
-	for <lists+kvm@lfdr.de>; Thu, 18 Mar 2021 00:18:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9716633FBC6
+	for <lists+kvm@lfdr.de>; Thu, 18 Mar 2021 00:26:06 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229723AbhCQXRl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 17 Mar 2021 19:17:41 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:15154 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229494AbhCQXRl (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 17 Mar 2021 19:17:41 -0400
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 12HN40hK113226;
-        Wed, 17 Mar 2021 19:17:38 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=HwTFj9YWtjFoFZ5fUL/TzRKtrvD01QdclZb5heatb5E=;
- b=DGiOz2pytOubrRitLQ75yfB0/tSjs0bmwTqkY93t201E+cL/Y9PYqx3B/fdwoCowv2dX
- zIaTyQosFjzsgt/GyNPqqfttFBBchUNP+8x8HEqeglHbXFitUrui0V6I9pQK6iYixlZb
- 4U5YryPLUo6OfTu1LoDqxt42uVtBu3TjxEmITg52YN9pi3Xws+cIkrhPNp2JQzL8avD1
- zK/7LmQwRXW4hOX312uo6NSj05zy/HsKqXIf6fQfjSEgJiM3UUWONiVM5oM50LlyYF0u
- tq1LZrPPxQ0cHiywrPg12Kid2CJTHw2J6zULOzC1dAsmiKe7KAOuQZOug0YEG5+uX6oQ hg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 37bnrehtma-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 17 Mar 2021 19:17:38 -0400
-Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 12HN5Hii120950;
-        Wed, 17 Mar 2021 19:17:38 -0400
-Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 37bnrehtkj-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 17 Mar 2021 19:17:37 -0400
-Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
-        by ppma05fra.de.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 12HNDI53001296;
-        Wed, 17 Mar 2021 23:17:35 GMT
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
-        by ppma05fra.de.ibm.com with ESMTP id 378n18a7rb-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 17 Mar 2021 23:17:35 +0000
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
-        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 12HNHWpF39846396
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 17 Mar 2021 23:17:32 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id A7B52A4051;
-        Wed, 17 Mar 2021 23:17:32 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C26CBA4040;
-        Wed, 17 Mar 2021 23:17:31 +0000 (GMT)
-Received: from li-e979b1cc-23ba-11b2-a85c-dfd230f6cf82 (unknown [9.171.80.101])
-        by d06av23.portsmouth.uk.ibm.com (Postfix) with SMTP;
-        Wed, 17 Mar 2021 23:17:31 +0000 (GMT)
-Date:   Thu, 18 Mar 2021 00:17:29 +0100
-From:   Halil Pasic <pasic@linux.ibm.com>
-To:     Tony Krowiak <akrowiak@linux.ibm.com>
-Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, stable@vger.kernel.org,
-        borntraeger@de.ibm.com, cohuck@redhat.com, kwankhede@nvidia.com,
-        pbonzini@redhat.com, alex.williamson@redhat.com,
-        pasic@linux.vnet.ibm.com
-Subject: Re: [PATCH v4 1/1] s390/vfio-ap: fix circular lockdep when
- setting/clearing crypto masks
-Message-ID: <20210318001729.06cdb8d6.pasic@linux.ibm.com>
-In-Reply-To: <20210310150559.8956-2-akrowiak@linux.ibm.com>
-References: <20210310150559.8956-1-akrowiak@linux.ibm.com>
-        <20210310150559.8956-2-akrowiak@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+        id S229570AbhCQXZ3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 17 Mar 2021 19:25:29 -0400
+Received: from mail-mw2nam10on2088.outbound.protection.outlook.com ([40.107.94.88]:52320
+        "EHLO NAM10-MW2-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S229558AbhCQXZN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 17 Mar 2021 19:25:13 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=hjO/j139lqeo1VG2nHOieUh08VDvVxCRLZwVYXRfs3RIxtsoc46sVpDcN29L3eS6+WQMfITW+lVeETGnTe8tU06NcQj0F7bGaDxfOLmBjr+j4TNcdx5AoV2/EHNxoytSPeeo8loIFfMnURkqNqtmali73bOkRtil/6r01c3JUyNsIzyEXuih/fvwyUjkoFuduumhQFAI/10UPlK3rWRaCXH9bO+bo6LJpnD8ZcSbIIOV/T+09AhlJHOyHvRdW4XJKu0/B/ON2vM1e4KovFZJFj6hSmSlY7ODzKaOdWrksGVFQ49+ZVm3JEH5/Z/IB5YJ6+zhPwFhxreksQvpjGNSNg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=RXKARkoFp1dic6jAGHd0TEe2hsGLz84FGCsP66KbpBE=;
+ b=KXEITzPPHhjyqSVPS4Pa6ldG7VXAG2k0PPdNi9qW6IXCn+9e6eud8LMOLazIX2Ek0QqiUHq49lgVbd939VfPYjJLtwBUu3+cfgXk3bPROx2m8DaRpUVaWtW/PEgoQMmAqkznQKDguMJa4YdIfarFutu4AvBgpAs9qqDTf8FXFiEpQOtB9bgs77q0AgDmrzLuwtll/Ujk03AcH3DdITaEehjiCgBsTgLdMD+occIqtE3MN6YeMgAM2nh28hmITXzZqPziRVg1B6e/u0g7/vYpd27rz86Yqzka/pyTM3V73HILpsSvnsCG7Lcj2okMWE3PNrqKY1fal08JRpHB18nSpA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.112.34) smtp.rcpttodomain=oss.nxp.com smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=none sp=none pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=RXKARkoFp1dic6jAGHd0TEe2hsGLz84FGCsP66KbpBE=;
+ b=AoqMbI+iREuslF86f/1JIF38IK8lAhhvTQKY0+SEZckcPEsre606ltXWZtXLlzId3jWj3BnGHBZvfL8bBAZiwqQD1wLXEq7UsuS5dpTpHn1Fll+ltXnKfwhSy0oxZMPdT+t+fFtsMa7REGt994niII0pJrj750viRKO8DfenFdB1QTYOUbGqOt2PDmtAS0rrK8TP5FZeEiVZ2FR6anTYLjVyzCM1bqcNNdSQWcyiaKr9uoZyly8fuxDs3szvN15moLPR2577tk1Rk88YPU6NIYfegw3h1x0Bay57TrGvGKFbOXpKUk7PTEtWsBb9SxiRcYeatX149NC9Qc9St08NWQ==
+Received: from BN6PR17CA0011.namprd17.prod.outlook.com (2603:10b6:404:65::21)
+ by DM6PR12MB2635.namprd12.prod.outlook.com (2603:10b6:5:45::23) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3846.38; Wed, 17 Mar
+ 2021 23:25:11 +0000
+Received: from BN8NAM11FT007.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:404:65:cafe::79) by BN6PR17CA0011.outlook.office365.com
+ (2603:10b6:404:65::21) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3955.18 via Frontend
+ Transport; Wed, 17 Mar 2021 23:25:11 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.112.34)
+ smtp.mailfrom=nvidia.com; oss.nxp.com; dkim=none (message not signed)
+ header.d=none;oss.nxp.com; dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.112.34 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.112.34; helo=mail.nvidia.com;
+Received: from mail.nvidia.com (216.228.112.34) by
+ BN8NAM11FT007.mail.protection.outlook.com (10.13.177.109) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ 15.20.3955.18 via Frontend Transport; Wed, 17 Mar 2021 23:25:11 +0000
+Received: from [172.27.0.0] (172.20.145.6) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Wed, 17 Mar
+ 2021 23:25:06 +0000
+Subject: Re: [PATCH v2 14/14] vfio: Remove device_data from the vfio bus
+ driver API
+To:     Jason Gunthorpe <jgg@nvidia.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        "Jonathan Corbet" <corbet@lwn.net>,
+        Diana Craciun <diana.craciun@oss.nxp.com>,
+        "Eric Auger" <eric.auger@redhat.com>, <kvm@vger.kernel.org>,
+        Kirti Wankhede <kwankhede@nvidia.com>,
+        <linux-doc@vger.kernel.org>
+CC:     "Raj, Ashok" <ashok.raj@intel.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        "Christoph Hellwig" <hch@lst.de>,
+        Leon Romanovsky <leonro@nvidia.com>,
+        Tarun Gupta <targupta@nvidia.com>
+References: <14-v2-20d933792272+4ff-vfio1_jgg@nvidia.com>
+From:   Max Gurtovoy <mgurtovoy@nvidia.com>
+Message-ID: <696b9873-1d96-0c5a-166c-c2a5ae7b66b8@nvidia.com>
+Date:   Thu, 18 Mar 2021 01:24:57 +0200
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.8.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.761
- definitions=2021-03-17_13:2021-03-17,2021-03-17 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 mlxscore=0
- lowpriorityscore=0 adultscore=0 bulkscore=0 suspectscore=0 phishscore=0
- mlxlogscore=910 clxscore=1015 spamscore=0 priorityscore=1501
- impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2103170163
+In-Reply-To: <14-v2-20d933792272+4ff-vfio1_jgg@nvidia.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-Originating-IP: [172.20.145.6]
+X-ClientProxiedBy: HQMAIL101.nvidia.com (172.20.187.10) To
+ HQMAIL107.nvidia.com (172.20.187.13)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 6db0c0be-ec1b-41f6-0f64-08d8e99be91f
+X-MS-TrafficTypeDiagnostic: DM6PR12MB2635:
+X-Microsoft-Antispam-PRVS: <DM6PR12MB263564F5123C0BE9D9D46EF1DE6A9@DM6PR12MB2635.namprd12.prod.outlook.com>
+X-MS-Exchange-Transport-Forked: True
+X-MS-Oob-TLC-OOBClassifiers: OLM:202;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: +Y7rat7956+/1Sw0i7+6p3ERQ7ACsrF+cG046BG9eB4SwU4JDWGwR49/USzKnFHgvK/1XLkmBZD/mnezbZFPQ6e3C6UKMXv0rk4RPEYRUooZKer3PtEodCOztHgLiUrC/thsi4OX9GEQnEb+8mIGT5sf67cOO6bgmSpYbBh1OF8TM/HDmfg6pm+J1sUNFnClxul2Sb3oZ7rLHKpHDGpMhD0ZxfPprK6ZWXqK5Nqlo0oejR4RuXjvjH2L6QczHUfO9bI8iKINWFn7bJh0f4CeokNz/sUUCB9RZ2VHmce62SDH4V21qBxcAoSXLY8h+77UveBJzkW4Q7Ld1m/g7qi6MJDzdvuV2acvbH02txaswa0eU8wOd5WI4O6Gs0JtItTj+qi7ywr4EVbT40a69YLL3iMUFQOvWjVFSXGqo2s3/TsDQtAUtkjhNiipvvrFRcxlGVD+kG6AWYOulWwfrw65n7IWOn3xHztah/ACasKX9PZqLZAn4zNPCXwrjCjkUOZPVYOBQZehPx4I+/h9svxxEGwqNJQdnfvb+6djU6VYpu/TDZ5dg1UGwA6zndKKQ7TjmYhKTgqaDHI3RwSEHEb+iHYSrjaTCIqjhxEIXbCyONlIb4Z1ds8pVlBfDB40hEOgEP7FCMqj+eKrgMYquw19udmcRcvNfCdfp0RmeVoN/oGwveRudbXnwKraL8LYLGoI4g/hsVqztXOrrlZBVusMJ6F/zMzlrhhhcdvRR0qhC6Q=
+X-Forefront-Antispam-Report: CIP:216.228.112.34;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:schybrid03.nvidia.com;CAT:NONE;SFS:(4636009)(376002)(346002)(136003)(396003)(39860400002)(46966006)(36840700001)(4326008)(16526019)(8676002)(34020700004)(107886003)(36906005)(478600001)(186003)(7416002)(31696002)(7636003)(70206006)(82740400003)(356005)(316002)(31686004)(336012)(70586007)(2906002)(16576012)(54906003)(36756003)(8936002)(82310400003)(47076005)(86362001)(2616005)(426003)(53546011)(5660300002)(4744005)(110136005)(26005)(83380400001)(36860700001)(6666004)(43740500002);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Mar 2021 23:25:11.1625
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6db0c0be-ec1b-41f6-0f64-08d8e99be91f
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.112.34];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource: BN8NAM11FT007.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB2635
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 10 Mar 2021 10:05:59 -0500
-Tony Krowiak <akrowiak@linux.ibm.com> wrote:
 
-> -		ret = vfio_ap_mdev_reset_queues(mdev);
-> +		matrix_mdev = mdev_get_drvdata(mdev);
+On 3/13/2021 2:56 AM, Jason Gunthorpe wrote:
+> There are no longer any users, so it can go away. Everything is using
+> container_of now.
+>
+> Reviewed-by: Christoph Hellwig <hch@lst.de>
+> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
+> ---
+>   Documentation/driver-api/vfio.rst            |  3 +--
+>   drivers/vfio/fsl-mc/vfio_fsl_mc.c            |  5 +++--
+>   drivers/vfio/mdev/vfio_mdev.c                |  2 +-
+>   drivers/vfio/pci/vfio_pci.c                  |  2 +-
+>   drivers/vfio/platform/vfio_platform_common.c |  2 +-
+>   drivers/vfio/vfio.c                          | 12 +-----------
+>   include/linux/vfio.h                         |  4 +---
+>   7 files changed, 9 insertions(+), 21 deletions(-)
 
-Is it guaranteed that matrix_mdev can't be NULL here? If yes, please
-remind me of the mechanism that ensures this.
 
-> +
-> +		/*
-> +		 * If the KVM pointer is in the process of being set, wait until
-> +		 * the process has completed.
-> +		 */
-> +		wait_event_cmd(matrix_mdev->wait_for_kvm,
-> +			       matrix_mdev->kvm_busy == false,
-> +			       mutex_unlock(&matrix_dev->lock),
-> +			       mutex_lock(&matrix_dev->lock));
-> +
-> +		if (matrix_mdev->kvm)
-> +			ret = vfio_ap_mdev_reset_queues(mdev);
-> +		else
-> +			ret = -ENODEV;
+Looks good,
 
-Didn't we agree to make the call to vfio_ap_mdev_reset_queues()
-unconditional again (for reference please take look at 
-Message-ID: <64afa72c-2d6a-2ca1-e576-34e15fa579ed@linux.ibm.com>)?
+Reviewed-by: Max Gurtovoy <mgurtovoy@nvidia.com>
 
-Regards,
-Halil
