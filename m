@@ -2,105 +2,278 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 10EEA340619
-	for <lists+kvm@lfdr.de>; Thu, 18 Mar 2021 13:51:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AE31334068C
+	for <lists+kvm@lfdr.de>; Thu, 18 Mar 2021 14:11:30 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231271AbhCRMux (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 18 Mar 2021 08:50:53 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:49962 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230408AbhCRMud (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 18 Mar 2021 08:50:33 -0400
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 12ICiAjn013582;
-        Thu, 18 Mar 2021 08:50:33 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=27jgHEWQsE2tGa6PgzumrpphZFRLUHhCxry1FPK3/Ts=;
- b=GHqrI+C4ThuywBeTGPZSRk3RkQJu2/Amc+Jffk5g+LwvYtUB0a0/BTgVfzq0JRX53Vj9
- 9IiQYt6gZcPXhPStMFS6GyEoHq0S39YXVFIVzqZWCXmEmEMaQRB18ULNs8u/tGqBk0FT
- VTeQMJDm9H4yZtLVG9G53nY1ufLoB3LtoVzwDKNueJ57nq9bBd6e0a2NlJPIikPyUkRf
- Dd7sNSa20PdtvbEAl6qyrW28i7hMEowz44AePrUusyLSqgN3K4O+elm0gJxqzKRvwCP0
- DZi6TdNLNeEnRMifPkkfj3Gs3dOvl4qHyNHURQcGV34oQHPICBMIY4oaHCvNOLLX77iN jQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 37bnrf4v4t-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 18 Mar 2021 08:50:33 -0400
-Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 12ICiNER014406;
-        Thu, 18 Mar 2021 08:50:33 -0400
-Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 37bnrf4v3k-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 18 Mar 2021 08:50:33 -0400
-Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
-        by ppma01fra.de.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 12ICmLUs031714;
-        Thu, 18 Mar 2021 12:50:30 GMT
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
-        by ppma01fra.de.ibm.com with ESMTP id 378n18ahmh-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 18 Mar 2021 12:50:30 +0000
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
-        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 12ICoSj234275672
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 18 Mar 2021 12:50:28 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 89EC0A4057;
-        Thu, 18 Mar 2021 12:50:28 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 8969CA4053;
-        Thu, 18 Mar 2021 12:50:27 +0000 (GMT)
-Received: from localhost.localdomain (unknown [9.145.24.61])
-        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu, 18 Mar 2021 12:50:27 +0000 (GMT)
-From:   Janosch Frank <frankja@linux.ibm.com>
-To:     kvm@vger.kernel.org
-Cc:     thuth@redhat.com, david@redhat.com, cohuck@redhat.com,
-        linux-s390@vger.kernel.org
-Subject: [kvm-unit-tests PATCH 3/3] s390x: run: Skip PV tests when tcg is the accelerator
-Date:   Thu, 18 Mar 2021 12:50:15 +0000
-Message-Id: <20210318125015.45502-4-frankja@linux.ibm.com>
-X-Mailer: git-send-email 2.27.0
-In-Reply-To: <20210318125015.45502-1-frankja@linux.ibm.com>
-References: <20210318125015.45502-1-frankja@linux.ibm.com>
+        id S231475AbhCRNK4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 18 Mar 2021 09:10:56 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:27103 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231281AbhCRNKZ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 18 Mar 2021 09:10:25 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1616073024;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=V6o6reARlIilafLO9a/wNJL1a7idpLiAeBV+WQ1/MRc=;
+        b=YRm3/JtyIe6hODDOJj8K6v4AFYiq2H/HM2zNiNu77N6HpxuJAerOjOneu77AmMWI0vy+E0
+        rA+JBZOgijtl2JYSdQaVC3JQwQq2K29LiAjDe7Ozu0wgCZfM5zm0CYjbwkVJFn4oiZfi3G
+        6xtD9www3fR/j5v3i5Otpfgm6ux5YbM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-533-luo3D5NYNdyyo51VqoGbgA-1; Thu, 18 Mar 2021 09:10:20 -0400
+X-MC-Unique: luo3D5NYNdyyo51VqoGbgA-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CD278801817;
+        Thu, 18 Mar 2021 13:10:18 +0000 (UTC)
+Received: from [10.36.112.6] (ovpn-112-6.ams2.redhat.com [10.36.112.6])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 1C47660862;
+        Thu, 18 Mar 2021 13:10:08 +0000 (UTC)
+Subject: Re: [PATCH v2 02/14] vfio: Simplify the lifetime logic for
+ vfio_device
+To:     Jason Gunthorpe <jgg@nvidia.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org
+Cc:     "Raj, Ashok" <ashok.raj@intel.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Christoph Hellwig <hch@lst.de>,
+        Leon Romanovsky <leonro@nvidia.com>,
+        Max Gurtovoy <mgurtovoy@nvidia.com>,
+        Tarun Gupta <targupta@nvidia.com>
+References: <2-v2-20d933792272+4ff-vfio1_jgg@nvidia.com>
+From:   Auger Eric <eric.auger@redhat.com>
+Message-ID: <f3c09162-89f0-43fb-0dc2-1c0f0bca482d@redhat.com>
+Date:   Thu, 18 Mar 2021 14:10:06 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.7.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.761
- definitions=2021-03-18_04:2021-03-17,2021-03-18 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 mlxscore=0
- lowpriorityscore=0 adultscore=0 bulkscore=0 suspectscore=0 phishscore=0
- mlxlogscore=999 clxscore=1015 spamscore=0 priorityscore=1501
- impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2103180095
+In-Reply-To: <2-v2-20d933792272+4ff-vfio1_jgg@nvidia.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-TCG doesn't support PV.
+Hi,
+On 3/13/21 1:55 AM, Jason Gunthorpe wrote:
+> The vfio_device is using a 'sleep until all refs go to zero' pattern for
+> its lifetime, but it is indirectly coded by repeatedly scanning the group
+> list waiting for the device to be removed on its own.
+> 
+> Switch this around to be a direct representation, use a refcount to count
+> the number of places that are blocking destruction and sleep directly on a
+> completion until that counter goes to zero. kfree the device after other
+> accesses have been excluded in vfio_del_group_dev(). This is a fairly
+> common Linux idiom.
+> 
+> Due to this we can now remove kref_put_mutex(), which is very rarely used
+> in the kernel. Here it is being used to prevent a zero ref device from
+> being seen in the group list. Instead allow the zero ref device to
+> continue to exist in the device_list and use refcount_inc_not_zero() to
+> exclude it once refs go to zero.
+> 
+> This patch is organized so the next patch will be able to alter the API to
+> allow drivers to provide the kfree.
+> 
+> Reviewed-by: Christoph Hellwig <hch@lst.de>
+> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
 
-Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
----
- s390x/run | 5 +++++
- 1 file changed, 5 insertions(+)
+Thanks
 
-diff --git a/s390x/run b/s390x/run
-index df7ef5ca..82922701 100755
---- a/s390x/run
-+++ b/s390x/run
-@@ -19,6 +19,11 @@ else
-     ACCEL=$DEF_ACCEL
- fi
- 
-+if [ "${1: -7}" == ".pv.bin" ] || [ "${TESTNAME: -3}" == "_PV" ] && [ $ACCEL == "tcg" ]; then
-+	echo "Protected Virtualization isn't supported under TCG"
-+	exit 2
-+fi
-+
- M='-machine s390-ccw-virtio'
- M+=",accel=$ACCEL"
- command="$qemu -nodefaults -nographic $M"
--- 
-2.27.0
+Eric
+
+> ---
+>  drivers/vfio/vfio.c | 79 ++++++++++++++-------------------------------
+>  1 file changed, 25 insertions(+), 54 deletions(-)
+> 
+> diff --git a/drivers/vfio/vfio.c b/drivers/vfio/vfio.c
+> index 15d8e678e5563a..32660e8a69ae20 100644
+> --- a/drivers/vfio/vfio.c
+> +++ b/drivers/vfio/vfio.c
+> @@ -46,7 +46,6 @@ static struct vfio {
+>  	struct mutex			group_lock;
+>  	struct cdev			group_cdev;
+>  	dev_t				group_devt;
+> -	wait_queue_head_t		release_q;
+>  } vfio;
+>  
+>  struct vfio_iommu_driver {
+> @@ -91,7 +90,8 @@ struct vfio_group {
+>  };
+>  
+>  struct vfio_device {
+> -	struct kref			kref;
+> +	refcount_t			refcount;
+> +	struct completion		comp;
+>  	struct device			*dev;
+>  	const struct vfio_device_ops	*ops;
+>  	struct vfio_group		*group;
+> @@ -544,7 +544,8 @@ struct vfio_device *vfio_group_create_device(struct vfio_group *group,
+>  	if (!device)
+>  		return ERR_PTR(-ENOMEM);
+>  
+> -	kref_init(&device->kref);
+> +	refcount_set(&device->refcount, 1);
+> +	init_completion(&device->comp);
+>  	device->dev = dev;
+>  	/* Our reference on group is moved to the device */
+>  	device->group = group;
+> @@ -560,35 +561,17 @@ struct vfio_device *vfio_group_create_device(struct vfio_group *group,
+>  	return device;
+>  }
+>  
+> -static void vfio_device_release(struct kref *kref)
+> -{
+> -	struct vfio_device *device = container_of(kref,
+> -						  struct vfio_device, kref);
+> -	struct vfio_group *group = device->group;
+> -
+> -	list_del(&device->group_next);
+> -	group->dev_counter--;
+> -	mutex_unlock(&group->device_lock);
+> -
+> -	dev_set_drvdata(device->dev, NULL);
+> -
+> -	kfree(device);
+> -
+> -	/* vfio_del_group_dev may be waiting for this device */
+> -	wake_up(&vfio.release_q);
+> -}
+> -
+>  /* Device reference always implies a group reference */
+>  void vfio_device_put(struct vfio_device *device)
+>  {
+> -	struct vfio_group *group = device->group;
+> -	kref_put_mutex(&device->kref, vfio_device_release, &group->device_lock);
+> +	if (refcount_dec_and_test(&device->refcount))
+> +		complete(&device->comp);
+>  }
+>  EXPORT_SYMBOL_GPL(vfio_device_put);
+>  
+> -static void vfio_device_get(struct vfio_device *device)
+> +static bool vfio_device_try_get(struct vfio_device *device)
+>  {
+> -	kref_get(&device->kref);
+> +	return refcount_inc_not_zero(&device->refcount);
+>  }
+>  
+>  static struct vfio_device *vfio_group_get_device(struct vfio_group *group,
+> @@ -598,8 +581,7 @@ static struct vfio_device *vfio_group_get_device(struct vfio_group *group,
+>  
+>  	mutex_lock(&group->device_lock);
+>  	list_for_each_entry(device, &group->device_list, group_next) {
+> -		if (device->dev == dev) {
+> -			vfio_device_get(device);
+> +		if (device->dev == dev && vfio_device_try_get(device)) {
+>  			mutex_unlock(&group->device_lock);
+>  			return device;
+>  		}
+> @@ -883,9 +865,8 @@ static struct vfio_device *vfio_device_get_from_name(struct vfio_group *group,
+>  			ret = !strcmp(dev_name(it->dev), buf);
+>  		}
+>  
+> -		if (ret) {
+> +		if (ret && vfio_device_try_get(it)) {
+>  			device = it;
+> -			vfio_device_get(device);
+>  			break;
+>  		}
+>  	}
+> @@ -908,13 +889,13 @@ EXPORT_SYMBOL_GPL(vfio_device_data);
+>   * removed.  Open file descriptors for the device... */
+>  void *vfio_del_group_dev(struct device *dev)
+>  {
+> -	DEFINE_WAIT_FUNC(wait, woken_wake_function);
+>  	struct vfio_device *device = dev_get_drvdata(dev);
+>  	struct vfio_group *group = device->group;
+>  	void *device_data = device->device_data;
+>  	struct vfio_unbound_dev *unbound;
+>  	unsigned int i = 0;
+>  	bool interrupted = false;
+> +	long rc;
+>  
+>  	/*
+>  	 * When the device is removed from the group, the group suddenly
+> @@ -935,32 +916,18 @@ void *vfio_del_group_dev(struct device *dev)
+>  	WARN_ON(!unbound);
+>  
+>  	vfio_device_put(device);
+> -
+> -	/*
+> -	 * If the device is still present in the group after the above
+> -	 * 'put', then it is in use and we need to request it from the
+> -	 * bus driver.  The driver may in turn need to request the
+> -	 * device from the user.  We send the request on an arbitrary
+> -	 * interval with counter to allow the driver to take escalating
+> -	 * measures to release the device if it has the ability to do so.
+> -	 */
+> -	add_wait_queue(&vfio.release_q, &wait);
+> -
+> -	do {
+> -		device = vfio_group_get_device(group, dev);
+> -		if (!device)
+> -			break;
+> -
+> +	rc = try_wait_for_completion(&device->comp);
+> +	while (rc <= 0) {
+>  		if (device->ops->request)
+>  			device->ops->request(device_data, i++);
+>  
+> -		vfio_device_put(device);
+> -
+>  		if (interrupted) {
+> -			wait_woken(&wait, TASK_UNINTERRUPTIBLE, HZ * 10);
+> +			rc = wait_for_completion_timeout(&device->comp,
+> +							 HZ * 10);
+>  		} else {
+> -			wait_woken(&wait, TASK_INTERRUPTIBLE, HZ * 10);
+> -			if (signal_pending(current)) {
+> +			rc = wait_for_completion_interruptible_timeout(
+> +				&device->comp, HZ * 10);
+> +			if (rc < 0) {
+>  				interrupted = true;
+>  				dev_warn(dev,
+>  					 "Device is currently in use, task"
+> @@ -969,10 +936,13 @@ void *vfio_del_group_dev(struct device *dev)
+>  					 current->comm, task_pid_nr(current));
+>  			}
+>  		}
+> +	}
+>  
+> -	} while (1);
+> +	mutex_lock(&group->device_lock);
+> +	list_del(&device->group_next);
+> +	group->dev_counter--;
+> +	mutex_unlock(&group->device_lock);
+>  
+> -	remove_wait_queue(&vfio.release_q, &wait);
+>  	/*
+>  	 * In order to support multiple devices per group, devices can be
+>  	 * plucked from the group while other devices in the group are still
+> @@ -992,6 +962,8 @@ void *vfio_del_group_dev(struct device *dev)
+>  
+>  	/* Matches the get in vfio_group_create_device() */
+>  	vfio_group_put(group);
+> +	dev_set_drvdata(dev, NULL);
+> +	kfree(device);
+>  
+>  	return device_data;
+>  }
+> @@ -2362,7 +2334,6 @@ static int __init vfio_init(void)
+>  	mutex_init(&vfio.iommu_drivers_lock);
+>  	INIT_LIST_HEAD(&vfio.group_list);
+>  	INIT_LIST_HEAD(&vfio.iommu_drivers_list);
+> -	init_waitqueue_head(&vfio.release_q);
+>  
+>  	ret = misc_register(&vfio_dev);
+>  	if (ret) {
+> 
 
