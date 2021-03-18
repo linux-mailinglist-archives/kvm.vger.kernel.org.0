@@ -2,53 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2BE55341074
+	by mail.lfdr.de (Postfix) with ESMTP id 9C115341075
 	for <lists+kvm@lfdr.de>; Thu, 18 Mar 2021 23:44:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232625AbhCRWnw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 18 Mar 2021 18:43:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49386 "EHLO
+        id S232676AbhCRWnx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 18 Mar 2021 18:43:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49398 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230368AbhCRWnP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 18 Mar 2021 18:43:15 -0400
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9AF3AC06174A
-        for <kvm@vger.kernel.org>; Thu, 18 Mar 2021 15:43:15 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id p136so50604449ybc.21
-        for <kvm@vger.kernel.org>; Thu, 18 Mar 2021 15:43:15 -0700 (PDT)
+        with ESMTP id S231327AbhCRWnQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 18 Mar 2021 18:43:16 -0400
+Received: from mail-qv1-xf49.google.com (mail-qv1-xf49.google.com [IPv6:2607:f8b0:4864:20::f49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6D286C061761
+        for <kvm@vger.kernel.org>; Thu, 18 Mar 2021 15:43:16 -0700 (PDT)
+Received: by mail-qv1-xf49.google.com with SMTP id k92so27319899qva.20
+        for <kvm@vger.kernel.org>; Thu, 18 Mar 2021 15:43:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=reply-to:date:message-id:mime-version:subject:from:to:cc;
-        bh=0DUdG6+uWcR80QCYp/6dg/L+XaUC6ThjbkuOe9VdQD4=;
-        b=rAO86R5j7uv4k/gpsuCAsovgD5YfUhw4FLglkgm4h7+p85RHSq/nnDXbxvuRXggadC
-         BhBBZEmGhaHL+67IutzvTP6EtzLXXsZaeuFsUkCZgli5NUv2jLmkH6lg4E21PpyvysaG
-         KGbwfNrO+0clC0HPUZmed5uQrPxzZGVKNu2eqXfvvg1dpPzVLJ+bEjMNQPvYIGewY9+Z
-         Pp/YP0CXLj+BhhIn6sZvC8lKusbU8LrJ72HIc4mqBg0pYNNnn4fsWgaFpTN7X5Wf0nnV
-         Kg9O2wQ+6Al9VfEBv0JaCix/A/zW2G5aNUpVNJpdhBebPLbM8sB0nw1CYKVjCXYJPbsz
-         SBWg==
+        h=reply-to:date:in-reply-to:message-id:mime-version:references
+         :subject:from:to:cc;
+        bh=LHYEZM9eJX+3KRVU4MESjmSMC7YXVpqZMPFe9FopAas=;
+        b=NuBjfZphhg+t0yUNouMJZqezRqwHvm1NbPplza1EC1QohvNXzwb8Weo6fXxKwDlB4d
+         kKJOquCaOv+sp/AMSBtYaq4uk0g8bVI+rgZN7AFl34BcwecUAEDBBHNVNdaFGMP4+2qi
+         fCtsSr8ogszr9PKuFp04/AX13x9dbJajYoVZJ7sJEVs81YPKjiZuaUcGZjSi4LNUEm/b
+         63r0tB41uAegtWhvA0Z3mlmjPT70Ume6SWVZKGkarEsIAR6RW5CpvH6mQVGJd1k3yhLk
+         0hP84WDJTAPDVxaAmvbfSr4QXjNWdiz2NE6Pco4BEtgENhti/EP7bgwBz8z94RjnWXEE
+         iRtQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:reply-to:date:message-id:mime-version:subject
-         :from:to:cc;
-        bh=0DUdG6+uWcR80QCYp/6dg/L+XaUC6ThjbkuOe9VdQD4=;
-        b=EmAoRyoAUX5Dt4s2vH08M20ycpCppPb4zJ/HNnY6b9zRcSgj1ELfF6kkTFgRU1Cls+
-         jmOGbJWaT871tVbI1jsInWeUqqaxBRQ+nOiZ41a2NvJ+319Znz0n7bbrkFIoXVLyrqC3
-         LU2SehGhYHXhhVVY5/gsbIfjixQBaZw9p0BxDDe8NRii7og/gIv/+fZwB5SCfVw/Esph
-         C8cFUwk+Cuy9d8FVgQ12VcKxCsDyArRMe+y0oiGg5U022p/UbguW/hlodgIHgvYlcZzo
-         FWHUuqL3cKrlD9A6DPDJaTbcKlc1wue8FNS22V+Ew6TJ4QZkcM90XOLoMNE3VLUwNwz1
-         2R9w==
-X-Gm-Message-State: AOAM530nlx0IhEKoeihvghoEVubuXDVP6XPSEwGAZa9j9ox5mSBXMEO+
-        Mk06nljS4kQDu0vnnqNW+GWIU8nTFU4=
-X-Google-Smtp-Source: ABdhPJyvkQoAFfVRCK5CJFRkWxaQyuTnUU/i5AYciu9HvCGCvlfImdoL2rAEO67g0ZMcWGsMZnS7Sssob3M=
+        h=x-gm-message-state:reply-to:date:in-reply-to:message-id
+         :mime-version:references:subject:from:to:cc;
+        bh=LHYEZM9eJX+3KRVU4MESjmSMC7YXVpqZMPFe9FopAas=;
+        b=UVcAafv2VV3qlZ5IpBZYQNS85A/d16ul38G8TEnA6MNTmteTio6Dc7Yitn31BGLiT0
+         f9PA0ykjzKKjQ/92gHprT5QSEmm4SYYJXVLHszJbfijaUpmAMb2Nt/eYNogAK8BgcU8o
+         bGNP3XD4jis1414q+QPaeFZ91QGs1vv0C49WmMhqhl2pxNUZGPuEJe/FZSJ+HbGQ18Vw
+         b5TG/xR4HdU8P8EDvyp0Uy034+y9lZqa/Hz8pWFo6dIL7M4P0s2NPRdnE3lW5CH0xNee
+         DCw3cr++XC8ynBMQIWG+rm5WfFqnJEYT9cA4r5ZfvLMYanpaG8FvS82PIR1dZMuoteF9
+         6/wA==
+X-Gm-Message-State: AOAM532yoQasWw9/1z3plL/wYGiElWS0FxUAytB+U+mcayHB9JhEQDPL
+        V6/nqZiRO+GJZ2t5aNYHbYYqt12j4ms=
+X-Google-Smtp-Source: ABdhPJzozdNPA/jYPGhKTFdmEoV5slQMriUqp5y8REWuVDg5t6zuWNkiWVruLeFy4F1O0fOf2lFzyqFLHVo=
 X-Received: from seanjc798194.pdx.corp.google.com ([2620:15c:f:10:25e0:6b8b:f878:23d1])
- (user=seanjc job=sendgmr) by 2002:a25:bb41:: with SMTP id b1mr2306208ybk.249.1616107393323;
- Thu, 18 Mar 2021 15:43:13 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a0c:b59f:: with SMTP id g31mr6567486qve.28.1616107395569;
+ Thu, 18 Mar 2021 15:43:15 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Thu, 18 Mar 2021 15:43:06 -0700
-Message-Id: <20210318224310.3274160-1-seanjc@google.com>
+Date:   Thu, 18 Mar 2021 15:43:07 -0700
+In-Reply-To: <20210318224310.3274160-1-seanjc@google.com>
+Message-Id: <20210318224310.3274160-2-seanjc@google.com>
 Mime-Version: 1.0
+References: <20210318224310.3274160-1-seanjc@google.com>
 X-Mailer: git-send-email 2.31.0.rc2.261.g7f71774620-goog
-Subject: [PATCH v2 0/4] KVM: x86: MSR filtering and related fixes
+Subject: [PATCH v2 1/4] KVM: x86: Protect userspace MSR filter with SRCU, and
+ set atomically-ish
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Sean Christopherson <seanjc@google.com>,
@@ -63,39 +67,307 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Rework the MSR filtering implementation to treat a given filter instance
-as an atomic unit, and to properly protect it with SRCU.
+Fix a plethora of issues with MSR filtering by installing the resulting
+filter as an atomic bundle instead of updating the live filter one range
+at a time.  The KVM_X86_SET_MSR_FILTER ioctl() isn't truly atomic, as
+the hardware MSR bitmaps won't be updated until the next VM-Enter, but
+the relevant software struct is atomically updated, which is what KVM
+really needs.
 
-Fix two nVMX bugs related to MSR filtering (one directly, one indirectly),
-and additional cleanup on top.
+Similar to the approach used for modifying memslots, make arch.msr_filter
+a SRCU-protected pointer, do all the work configuring the new filter
+outside of kvm->lock, and then acquire kvm->lock only when the new filter
+has been vetted and created.  That way vCPU readers either see the old
+filter or the new filter in their entirety, not some half-baked state.
 
-Regarding the macro insanity in patch 03, I verified the before and after
-binary output for vmx_set_intercept_for_msr() was identical, again.  This
-required wrapping "if (msr <= 0x1fff)" with (un)likely in both the before
-and after versions; gcc made seemingly random choices without forcing it
-to favor a specific branch.
+Yuan Yao pointed out a use-after-free in ksm_msr_allowed() due to a
+TOCTOU bug, but that's just the tip of the iceberg...
 
-v2:
-  - Collect R-b. [Paolo, Alex].
-  - Make the macro insanity slightly less insane. [Paolo]
+  - Nothing is __rcu annotated, making it nigh impossible to audit the
+    code for correctness.
+  - kvm_add_msr_filter() has an unpaired smp_wmb().  Violation of kernel
+    coding style aside, the lack of a smb_rmb() anywhere casts all code
+    into doubt.
+  - kvm_clear_msr_filter() has a double free TOCTOU bug, as it grabs
+    count before taking the lock.
+  - kvm_clear_msr_filter() also has memory leak due to the same TOCTOU bug.
 
-v1: https://lkml.kernel.org/r/20210316184436.2544875-1-seanjc@google.com
+The entire approach of updating the live filter is also flawed.  While
+installing a new filter is inherently racy if vCPUs are running, fixing
+the above issues also makes it trivial to ensure certain behavior is
+deterministic, e.g. KVM can provide deterministic behavior for MSRs with
+identical settings in the old and new filters.  An atomic update of the
+filter also prevents KVM from getting into a half-baked state, e.g. if
+installing a filter fails, the existing approach would leave the filter
+in a half-baked state, having already committed whatever bits of the
+filter were already processed.
 
-Sean Christopherson (4):
-  KVM: x86: Protect userspace MSR filter with SRCU, and set
-    atomically-ish
-  KVM: nVMX: Handle dynamic MSR intercept toggling
-  KVM: VMX: Macrofy the MSR bitmap getters and setters
-  KVM: nVMX: Clean up x2APIC MSR handling for L2
+[*] https://lkml.kernel.org/r/20210312083157.25403-1-yaoyuan0329os@gmail.com
 
+Fixes: 1a155254ff93 ("KVM: x86: Introduce MSR filtering")
+Cc: stable@vger.kernel.org
+Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+Reviewed-by: Alexander Graf <graf@amazon.com>
+Reported-by: Yuan Yao <yaoyuan0329os@gmail.com>
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
  Documentation/virt/kvm/api.rst  |   6 +-
- arch/x86/include/asm/kvm_host.h |  17 ++--
- arch/x86/kvm/vmx/nested.c       | 161 +++++++++++++-------------------
- arch/x86/kvm/vmx/vmx.c          |  67 +------------
- arch/x86/kvm/vmx/vmx.h          |  28 ++++++
- arch/x86/kvm/x86.c              | 109 ++++++++++++---------
- 6 files changed, 172 insertions(+), 216 deletions(-)
+ arch/x86/include/asm/kvm_host.h |  17 ++---
+ arch/x86/kvm/x86.c              | 109 +++++++++++++++++++-------------
+ 3 files changed, 78 insertions(+), 54 deletions(-)
 
+diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+index 38e327d4b479..2898d3e86b08 100644
+--- a/Documentation/virt/kvm/api.rst
++++ b/Documentation/virt/kvm/api.rst
+@@ -4806,8 +4806,10 @@ If an MSR access is not permitted through the filtering, it generates a
+ allows user space to deflect and potentially handle various MSR accesses
+ into user space.
+ 
+-If a vCPU is in running state while this ioctl is invoked, the vCPU may
+-experience inconsistent filtering behavior on MSR accesses.
++Note, invoking this ioctl with a vCPU is running is inherently racy.  However,
++KVM does guarantee that vCPUs will see either the previous filter or the new
++filter, e.g. MSRs with identical settings in both the old and new filter will
++have deterministic behavior.
+ 
+ 4.127 KVM_XEN_HVM_SET_ATTR
+ --------------------------
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index a52f973bdff6..84198c403a48 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -931,6 +931,12 @@ enum kvm_irqchip_mode {
+ 	KVM_IRQCHIP_SPLIT,        /* created with KVM_CAP_SPLIT_IRQCHIP */
+ };
+ 
++struct kvm_x86_msr_filter {
++	u8 count;
++	bool default_allow:1;
++	struct msr_bitmap_range ranges[16];
++};
++
+ #define APICV_INHIBIT_REASON_DISABLE    0
+ #define APICV_INHIBIT_REASON_HYPERV     1
+ #define APICV_INHIBIT_REASON_NESTED     2
+@@ -1025,16 +1031,11 @@ struct kvm_arch {
+ 	bool guest_can_read_msr_platform_info;
+ 	bool exception_payload_enabled;
+ 
++	bool bus_lock_detection_enabled;
++
+ 	/* Deflect RDMSR and WRMSR to user space when they trigger a #GP */
+ 	u32 user_space_msr_mask;
+-
+-	struct {
+-		u8 count;
+-		bool default_allow:1;
+-		struct msr_bitmap_range ranges[16];
+-	} msr_filter;
+-
+-	bool bus_lock_detection_enabled;
++	struct kvm_x86_msr_filter __rcu *msr_filter;
+ 
+ 	struct kvm_pmu_event_filter __rcu *pmu_event_filter;
+ 	struct task_struct *nx_lpage_recovery_thread;
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index a9d95f90a048..c55769620b9a 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -1529,35 +1529,44 @@ EXPORT_SYMBOL_GPL(kvm_enable_efer_bits);
+ 
+ bool kvm_msr_allowed(struct kvm_vcpu *vcpu, u32 index, u32 type)
+ {
++	struct kvm_x86_msr_filter *msr_filter;
++	struct msr_bitmap_range *ranges;
+ 	struct kvm *kvm = vcpu->kvm;
+-	struct msr_bitmap_range *ranges = kvm->arch.msr_filter.ranges;
+-	u32 count = kvm->arch.msr_filter.count;
+-	u32 i;
+-	bool r = kvm->arch.msr_filter.default_allow;
++	bool allowed;
+ 	int idx;
++	u32 i;
+ 
+-	/* MSR filtering not set up or x2APIC enabled, allow everything */
+-	if (!count || (index >= 0x800 && index <= 0x8ff))
++	/* x2APIC MSRs do not support filtering. */
++	if (index >= 0x800 && index <= 0x8ff)
+ 		return true;
+ 
+-	/* Prevent collision with set_msr_filter */
+ 	idx = srcu_read_lock(&kvm->srcu);
+ 
+-	for (i = 0; i < count; i++) {
++	msr_filter = srcu_dereference(kvm->arch.msr_filter, &kvm->srcu);
++	if (!msr_filter) {
++		allowed = true;
++		goto out;
++	}
++
++	allowed = msr_filter->default_allow;
++	ranges = msr_filter->ranges;
++
++	for (i = 0; i < msr_filter->count; i++) {
+ 		u32 start = ranges[i].base;
+ 		u32 end = start + ranges[i].nmsrs;
+ 		u32 flags = ranges[i].flags;
+ 		unsigned long *bitmap = ranges[i].bitmap;
+ 
+ 		if ((index >= start) && (index < end) && (flags & type)) {
+-			r = !!test_bit(index - start, bitmap);
++			allowed = !!test_bit(index - start, bitmap);
+ 			break;
+ 		}
+ 	}
+ 
++out:
+ 	srcu_read_unlock(&kvm->srcu, idx);
+ 
+-	return r;
++	return allowed;
+ }
+ EXPORT_SYMBOL_GPL(kvm_msr_allowed);
+ 
+@@ -5389,25 +5398,34 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
+ 	return r;
+ }
+ 
+-static void kvm_clear_msr_filter(struct kvm *kvm)
++static struct kvm_x86_msr_filter *kvm_alloc_msr_filter(bool default_allow)
++{
++	struct kvm_x86_msr_filter *msr_filter;
++
++	msr_filter = kzalloc(sizeof(*msr_filter), GFP_KERNEL_ACCOUNT);
++	if (!msr_filter)
++		return NULL;
++
++	msr_filter->default_allow = default_allow;
++	return msr_filter;
++}
++
++static void kvm_free_msr_filter(struct kvm_x86_msr_filter *msr_filter)
+ {
+ 	u32 i;
+-	u32 count = kvm->arch.msr_filter.count;
+-	struct msr_bitmap_range ranges[16];
+ 
+-	mutex_lock(&kvm->lock);
+-	kvm->arch.msr_filter.count = 0;
+-	memcpy(ranges, kvm->arch.msr_filter.ranges, count * sizeof(ranges[0]));
+-	mutex_unlock(&kvm->lock);
+-	synchronize_srcu(&kvm->srcu);
++	if (!msr_filter)
++		return;
+ 
+-	for (i = 0; i < count; i++)
+-		kfree(ranges[i].bitmap);
++	for (i = 0; i < msr_filter->count; i++)
++		kfree(msr_filter->ranges[i].bitmap);
++
++	kfree(msr_filter);
+ }
+ 
+-static int kvm_add_msr_filter(struct kvm *kvm, struct kvm_msr_filter_range *user_range)
++static int kvm_add_msr_filter(struct kvm_x86_msr_filter *msr_filter,
++			      struct kvm_msr_filter_range *user_range)
+ {
+-	struct msr_bitmap_range *ranges = kvm->arch.msr_filter.ranges;
+ 	struct msr_bitmap_range range;
+ 	unsigned long *bitmap = NULL;
+ 	size_t bitmap_size;
+@@ -5441,11 +5459,9 @@ static int kvm_add_msr_filter(struct kvm *kvm, struct kvm_msr_filter_range *user
+ 		goto err;
+ 	}
+ 
+-	/* Everything ok, add this range identifier to our global pool */
+-	ranges[kvm->arch.msr_filter.count] = range;
+-	/* Make sure we filled the array before we tell anyone to walk it */
+-	smp_wmb();
+-	kvm->arch.msr_filter.count++;
++	/* Everything ok, add this range identifier. */
++	msr_filter->ranges[msr_filter->count] = range;
++	msr_filter->count++;
+ 
+ 	return 0;
+ err:
+@@ -5456,10 +5472,11 @@ static int kvm_add_msr_filter(struct kvm *kvm, struct kvm_msr_filter_range *user
+ static int kvm_vm_ioctl_set_msr_filter(struct kvm *kvm, void __user *argp)
+ {
+ 	struct kvm_msr_filter __user *user_msr_filter = argp;
++	struct kvm_x86_msr_filter *new_filter, *old_filter;
+ 	struct kvm_msr_filter filter;
+ 	bool default_allow;
+-	int r = 0;
+ 	bool empty = true;
++	int r = 0;
+ 	u32 i;
+ 
+ 	if (copy_from_user(&filter, user_msr_filter, sizeof(filter)))
+@@ -5472,25 +5489,32 @@ static int kvm_vm_ioctl_set_msr_filter(struct kvm *kvm, void __user *argp)
+ 	if (empty && !default_allow)
+ 		return -EINVAL;
+ 
+-	kvm_clear_msr_filter(kvm);
++	new_filter = kvm_alloc_msr_filter(default_allow);
++	if (!new_filter)
++		return -ENOMEM;
+ 
+-	kvm->arch.msr_filter.default_allow = default_allow;
+-
+-	/*
+-	 * Protect from concurrent calls to this function that could trigger
+-	 * a TOCTOU violation on kvm->arch.msr_filter.count.
+-	 */
+-	mutex_lock(&kvm->lock);
+ 	for (i = 0; i < ARRAY_SIZE(filter.ranges); i++) {
+-		r = kvm_add_msr_filter(kvm, &filter.ranges[i]);
+-		if (r)
+-			break;
++		r = kvm_add_msr_filter(new_filter, &filter.ranges[i]);
++		if (r) {
++			kvm_free_msr_filter(new_filter);
++			return r;
++		}
+ 	}
+ 
++	mutex_lock(&kvm->lock);
++
++	/* The per-VM filter is protected by kvm->lock... */
++	old_filter = srcu_dereference_check(kvm->arch.msr_filter, &kvm->srcu, 1);
++
++	rcu_assign_pointer(kvm->arch.msr_filter, new_filter);
++	synchronize_srcu(&kvm->srcu);
++
++	kvm_free_msr_filter(old_filter);
++
+ 	kvm_make_all_cpus_request(kvm, KVM_REQ_MSR_FILTER_CHANGED);
+ 	mutex_unlock(&kvm->lock);
+ 
+-	return r;
++	return 0;
+ }
+ 
+ long kvm_arch_vm_ioctl(struct file *filp,
+@@ -10693,8 +10717,6 @@ void kvm_arch_pre_destroy_vm(struct kvm *kvm)
+ 
+ void kvm_arch_destroy_vm(struct kvm *kvm)
+ {
+-	u32 i;
+-
+ 	if (current->mm == kvm->mm) {
+ 		/*
+ 		 * Free memory regions allocated on behalf of userspace,
+@@ -10710,8 +10732,7 @@ void kvm_arch_destroy_vm(struct kvm *kvm)
+ 		mutex_unlock(&kvm->slots_lock);
+ 	}
+ 	static_call_cond(kvm_x86_vm_destroy)(kvm);
+-	for (i = 0; i < kvm->arch.msr_filter.count; i++)
+-		kfree(kvm->arch.msr_filter.ranges[i].bitmap);
++	kvm_free_msr_filter(srcu_dereference_check(kvm->arch.msr_filter, &kvm->srcu, 1));
+ 	kvm_pic_destroy(kvm);
+ 	kvm_ioapic_destroy(kvm);
+ 	kvm_free_vcpus(kvm);
 -- 
 2.31.0.rc2.261.g7f71774620-goog
 
