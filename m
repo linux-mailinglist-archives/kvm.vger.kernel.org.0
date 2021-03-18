@@ -2,107 +2,204 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E7A24340BA2
-	for <lists+kvm@lfdr.de>; Thu, 18 Mar 2021 18:22:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 84901340BE6
+	for <lists+kvm@lfdr.de>; Thu, 18 Mar 2021 18:33:37 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232307AbhCRRWT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 18 Mar 2021 13:22:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35636 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232281AbhCRRWG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 18 Mar 2021 13:22:06 -0400
-Received: from mail-pf1-x430.google.com (mail-pf1-x430.google.com [IPv6:2607:f8b0:4864:20::430])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2314FC06175F
-        for <kvm@vger.kernel.org>; Thu, 18 Mar 2021 10:22:06 -0700 (PDT)
-Received: by mail-pf1-x430.google.com with SMTP id x126so3951711pfc.13
-        for <kvm@vger.kernel.org>; Thu, 18 Mar 2021 10:22:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=+zrC/2pN/qc0ZP+joKAbaps/MruXf28Rv4f5cOXi7Dc=;
-        b=Lr4w7CS01/YiT8pPA94i4qxdH8NUb6mRWSa4tgsgw/pQLsKrWkot9A236IjKLqRztU
-         tBLCqbeY1r6/MfWsMYTKmClPPqPyduDADnujqPm033KQlvthHF06knyLlG1ru9jXz1t0
-         ZChrV8zTKJCppm+dKwJeTA5LpaSMBMxlSw2CODlKGZieWpu47bw6/3qrYRh6QBr2VwEx
-         GT0xUCR57aCN97aA6LtkNpXOjJ4E78DgJqcPiIvcg4oEc5iy+egr87JYLvGjTInd4fpg
-         gaUZATkxr8TRlstns+fcJhcX/mXFEbqBRyWGvRLUX8WuSZTo7usP0tGXNXYAYYTal4Lz
-         TA1g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=+zrC/2pN/qc0ZP+joKAbaps/MruXf28Rv4f5cOXi7Dc=;
-        b=JullS88H5bvKXIeOMxO98ZdCU++pSZeOViis3Nfynu4HQzC2drfxXlpdeCF+pRr98y
-         UDqeK/Se03QwNzOJQn2zm6etPT9wlaXOWn1UdTxE7Cm90RjguujB9jGiotY1T63hM8xd
-         PTGA3YUfEl1HAFtAeWEK46NsJADybQr7TM4wyBqEzo/bvetkpMmyAxIBwzVQ7A36RHzg
-         PuQ/pU/p0AIvQEvYsJgc8F4I3cTsMtei8dbpqvs9plb2toAafoWZDIjK3V10xLGUT11q
-         KW60EDlGwqLz0rD/Vj8/ysL7FufsVMl2d5vsbVyMhJ+gs2ycwtBk4PAhc2IZFTKfqgsm
-         WS8A==
-X-Gm-Message-State: AOAM5309zaH20sekfp4ZYvpkFfFr1/2A3Mk8/fMjd2W1SOOR/t9Uxod2
-        d5n3duSex0eVNJQnY9nk3+3b3dIJr2OMFQ==
-X-Google-Smtp-Source: ABdhPJxn+Splpv0+LjpjvGFtyxXBgvHGN8pdP+SLW1lNh8ZUGZnyJwrs6nJzn62U6fuuKsf4fQdnFA==
-X-Received: by 2002:a63:2582:: with SMTP id l124mr7893687pgl.338.1616088125511;
-        Thu, 18 Mar 2021 10:22:05 -0700 (PDT)
-Received: from google.com (240.111.247.35.bc.googleusercontent.com. [35.247.111.240])
-        by smtp.gmail.com with ESMTPSA id z4sm2713747pgv.73.2021.03.18.10.22.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 18 Mar 2021 10:22:04 -0700 (PDT)
-Date:   Thu, 18 Mar 2021 17:22:01 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Maxim Levitsky <mlevitsk@redhat.com>
-Cc:     Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        linux-kernel@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        id S229601AbhCRRdF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 18 Mar 2021 13:33:05 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:35037 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229467AbhCRRca (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 18 Mar 2021 13:32:30 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1616088749;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=5og1yr1tqvFs5wbS70bwULgR4G/77BVByoguDkryFDU=;
+        b=HJMXKR4iXcT2RYsxid5+DiVU6aBPo9CzI0P2KU9WQfp7IM/8JQZXwjSNCNxUhLkb+aXLm4
+        GaeWGOddvR2oDziD8IK1i7/x8R0URTgCctgx1kJGQYC9Oa5GwlO3u7MY3JR7/t3ROV6zVG
+        /SIKSX04VG8F3Y9Q/FmiHaX6Yrxk100=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-569-__qF_4xuNYyRtjGkfzQypQ-1; Thu, 18 Mar 2021 13:32:28 -0400
+X-MC-Unique: __qF_4xuNYyRtjGkfzQypQ-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C8D211927800;
+        Thu, 18 Mar 2021 17:32:26 +0000 (UTC)
+Received: from fuller.cnet (ovpn-112-2.gru2.redhat.com [10.97.112.2])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 4E7925D9CA;
+        Thu, 18 Mar 2021 17:32:26 +0000 (UTC)
+Received: by fuller.cnet (Postfix, from userid 1000)
+        id D7A234188684; Thu, 18 Mar 2021 13:57:56 -0300 (-03)
+Date:   Thu, 18 Mar 2021 13:57:56 -0300
+From:   Marcelo Tosatti <mtosatti@redhat.com>
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
         Wanpeng Li <wanpengli@tencent.com>,
-        Kieran Bingham <kbingham@kernel.org>,
-        Jessica Yu <jeyu@kernel.org>,
-        Jan Kiszka <jan.kiszka@siemens.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
-        Jim Mattson <jmattson@google.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@suse.de>
-Subject: Re: [PATCH 3/3] KVM: SVM: allow to intercept all exceptions for debug
-Message-ID: <YFOMOV/u69LEpnh8@google.com>
-References: <20210315221020.661693-1-mlevitsk@redhat.com>
- <20210315221020.661693-4-mlevitsk@redhat.com>
- <YFBtI55sVzIJ15U+@8bytes.org>
- <4116d6ce75a85faccfe7a2b3967528f0561974ae.camel@redhat.com>
- <YFMbLWLlGgbOJuN/@8bytes.org>
- <8ba6676471dc8c8219e35d6a1695febaea20bb0b.camel@redhat.com>
- <YFN2HGG7ZTdamM7k@8bytes.org>
- <YFOBTITk7EkGdzR2@google.com>
- <7169229dde171c8e10fb276ff8e1a869af99b39d.camel@redhat.com>
+        Jim Mattson <jmattson@google.com>
+Subject: Re: [PATCH v2 6/4] selftests: kvm: Add basic Hyper-V clocksources
+ tests
+Message-ID: <20210318165756.GA36190@fuller.cnet>
+References: <20210316143736.964151-1-vkuznets@redhat.com>
+ <20210318140949.1065740-1-vkuznets@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <7169229dde171c8e10fb276ff8e1a869af99b39d.camel@redhat.com>
+In-Reply-To: <20210318140949.1065740-1-vkuznets@redhat.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Mar 18, 2021, Maxim Levitsky wrote:
-> On Thu, 2021-03-18 at 16:35 +0000, Sean Christopherson wrote:
-> > Skipping SEV-ES guests should not be difficult; KVM could probably even
-> > print a message stating that the debug hook is being ignored.  One thought would
-> > be to snapshot debug_intercept_exceptions at VM creation, and simply zero it out
-> > for incompatible guests.  That would also allow changing debug_intercept_exceptions
-> > without reloading KVM, which IMO would be very convenient.
-> > 
-> So all right I'll disable this for SEV-ES. 
+On Thu, Mar 18, 2021 at 03:09:49PM +0100, Vitaly Kuznetsov wrote:
+> Introduce a new selftest for Hyper-V clocksources (MSR-based reference TSC
+> and TSC page). As a starting point, test the following:
+> 1) Reference TSC is 1Ghz clock.
+> 2) Reference TSC and TSC page give the same reading.
+> 3) TSC page gets updated upon KVM_SET_CLOCK call.
+> 4) TSC page does not get updated when guest opted for reenlightenment.
+> 5) Disabled TSC page doesn't get updated.
+> 
+> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+> ---
+>  tools/testing/selftests/kvm/.gitignore        |   1 +
+>  tools/testing/selftests/kvm/Makefile          |   1 +
+>  .../selftests/kvm/x86_64/hyperv_clock.c       | 233 ++++++++++++++++++
+>  3 files changed, 235 insertions(+)
+>  create mode 100644 tools/testing/selftests/kvm/x86_64/hyperv_clock.c
+> 
+> diff --git a/tools/testing/selftests/kvm/.gitignore b/tools/testing/selftests/kvm/.gitignore
+> index 32b87cc77c8e..22be05c55f13 100644
+> --- a/tools/testing/selftests/kvm/.gitignore
+> +++ b/tools/testing/selftests/kvm/.gitignore
+> @@ -9,6 +9,7 @@
+>  /x86_64/evmcs_test
+>  /x86_64/get_cpuid_test
+>  /x86_64/kvm_pv_test
+> +/x86_64/hyperv_clock
+>  /x86_64/hyperv_cpuid
+>  /x86_64/mmio_warning_test
+>  /x86_64/platform_info_test
+> diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
+> index a6d61f451f88..c3672e9087d3 100644
+> --- a/tools/testing/selftests/kvm/Makefile
+> +++ b/tools/testing/selftests/kvm/Makefile
+> @@ -41,6 +41,7 @@ LIBKVM_s390x = lib/s390x/processor.c lib/s390x/ucall.c lib/s390x/diag318_test_ha
+>  TEST_GEN_PROGS_x86_64 = x86_64/cr4_cpuid_sync_test
+>  TEST_GEN_PROGS_x86_64 += x86_64/evmcs_test
+>  TEST_GEN_PROGS_x86_64 += x86_64/get_cpuid_test
+> +TEST_GEN_PROGS_x86_64 += x86_64/hyperv_clock
+>  TEST_GEN_PROGS_x86_64 += x86_64/hyperv_cpuid
+>  TEST_GEN_PROGS_x86_64 += x86_64/kvm_pv_test
+>  TEST_GEN_PROGS_x86_64 += x86_64/mmio_warning_test
+> diff --git a/tools/testing/selftests/kvm/x86_64/hyperv_clock.c b/tools/testing/selftests/kvm/x86_64/hyperv_clock.c
+> new file mode 100644
+> index 000000000000..39d6491d8458
+> --- /dev/null
+> +++ b/tools/testing/selftests/kvm/x86_64/hyperv_clock.c
+> @@ -0,0 +1,233 @@
+> +// SPDX-License-Identifier: GPL-2.0-only
+> +/*
+> + * Copyright (C) 2021, Red Hat, Inc.
+> + *
+> + * Tests for Hyper-V clocksources
+> + */
+> +#include "test_util.h"
+> +#include "kvm_util.h"
+> +#include "processor.h"
+> +
+> +struct ms_hyperv_tsc_page {
+> +	volatile u32 tsc_sequence;
+> +	u32 reserved1;
+> +	volatile u64 tsc_scale;
+> +	volatile s64 tsc_offset;
+> +} __packed;
+> +
+> +#define HV_X64_MSR_GUEST_OS_ID			0x40000000
+> +#define HV_X64_MSR_TIME_REF_COUNT		0x40000020
+> +#define HV_X64_MSR_REFERENCE_TSC		0x40000021
+> +#define HV_X64_MSR_TSC_FREQUENCY		0x40000022
+> +#define HV_X64_MSR_REENLIGHTENMENT_CONTROL	0x40000106
+> +#define HV_X64_MSR_TSC_EMULATION_CONTROL	0x40000107
+> +
+> +/* Simplified mul_u64_u64_shr() */
+> +static inline u64 mul_u64_u64_shr64(u64 a, u64 b)
+> +{
+> +	union {
+> +		u64 ll;
+> +		struct {
+> +			u32 low, high;
+> +		} l;
+> +	} rm, rn, rh, a0, b0;
+> +	u64 c;
+> +
+> +	a0.ll = a;
+> +	b0.ll = b;
+> +
+> +	rm.ll = (u64)a0.l.low * b0.l.high;
+> +	rn.ll = (u64)a0.l.high * b0.l.low;
+> +	rh.ll = (u64)a0.l.high * b0.l.high;
+> +
+> +	rh.l.low = c = rm.l.high + rn.l.high + rh.l.low;
+> +	rh.l.high = (c >> 32) + rh.l.high;
+> +
+> +	return rh.ll;
+> +}
+> +
+> +static inline void nop_loop(void)
+> +{
+> +	int i;
+> +
+> +	for (i = 0; i < 1000000; i++)
+> +		asm volatile("nop");
+> +}
+> +
+> +static inline void check_tsc_msr_rdtsc(void)
+> +{
+> +	u64 tsc_freq, r1, r2, t1, t2;
+> +	s64 delta_ns;
+> +
+> +	tsc_freq = rdmsr(HV_X64_MSR_TSC_FREQUENCY);
+> +	GUEST_ASSERT(tsc_freq > 0);
+> +
+> +	/* First, check MSR-based clocksource */
+> +	r1 = rdtsc();
+> +	t1 = rdmsr(HV_X64_MSR_TIME_REF_COUNT);
+> +	nop_loop();
+> +	r2 = rdtsc();
+> +	t2 = rdmsr(HV_X64_MSR_TIME_REF_COUNT);
+> +
+> +	GUEST_ASSERT(t2 > t1);
+> +
+> +	/* HV_X64_MSR_TIME_REF_COUNT is in 100ns */
+> +	delta_ns = ((t2 - t1) * 100) - ((r2 - r1) * 1000000000 / tsc_freq);
+> +	if (delta_ns < 0)
+> +		delta_ns = -delta_ns;
 
-Belated thought.  KVM doesn't know a guest will be an SEV-ES guest until
-sev_es_guest_init(), and KVM currently doesn't prevent creating vCPUs before
-KVM_SEV_ES_INIT.  But, I'm 99% confident that's a KVM bug.  For your purposes,
-I think you can assume kvm->arch.debug_intercept_exceptions will _not_ change
-after vCPU creation.
+I think this should be monotonically increasing: 
 
-> The idea to change the debug_intercept_exceptions on the fly is also a good idea,
-> I will implement it in next version of the patches.
+1.	r1 = rdtsc();
+2.	t1 = rdmsr(HV_X64_MSR_TIME_REF_COUNT);
+3.	nop_loop();
+4.	r2 = rdtsc();
+5.	t2 = rdmsr(HV_X64_MSR_TIME_REF_COUNT);	
 
-Can you also move the module param to x86?  It doesn't need to be wired up for
-VMX right away, but it makes sense to do it at some point, and ideally folks
-won't have to update their scripts when that happens.
+	=>
+
+	r1 <= t1 <= r2 <= t2
+
+> +
+> +	/* 1% tolerance */
+> +	GUEST_ASSERT(delta_ns * 100 < (t2 - t1) * 100);
+> +}
+
+Doesnt an unbounded schedule-out/schedule-in (which resembles
+overloaded host) of the qemu-kvm vcpu in any of the 
+points 1,2,3,4,5 break the assertion above?
+
+
