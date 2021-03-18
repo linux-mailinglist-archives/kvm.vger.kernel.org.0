@@ -2,132 +2,296 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0FBB834090E
-	for <lists+kvm@lfdr.de>; Thu, 18 Mar 2021 16:40:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B32EA340915
+	for <lists+kvm@lfdr.de>; Thu, 18 Mar 2021 16:43:06 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231648AbhCRPkW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 18 Mar 2021 11:40:22 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:28589 "EHLO
+        id S231923AbhCRPmd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 18 Mar 2021 11:42:33 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:58829 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231273AbhCRPkA (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 18 Mar 2021 11:40:00 -0400
+        by vger.kernel.org with ESMTP id S231901AbhCRPmP (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 18 Mar 2021 11:42:15 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1616081999;
+        s=mimecast20190719; t=1616082134;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=Z6n174q6cXzDs/Hg1NtNa/fztkMIalwwlrv76GiJi+4=;
-        b=CP3ijalE+05ebYIWW2hoPyOgTIFB8NIW8INR/gujNvdshLjT4Zvs96/Er4r+cUKjj+azeW
-        9bNftFl2+StP78q4mRbBiRYehFV5nuIeUovwSwnC5sjRLDXy7hU4UNP2agdeHekGYH5CAB
-        6ew0m2N6U802HJgZDcTSTxV+bstd0z0=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-449-86wAUf3oMB6QBm04BqtPKw-1; Thu, 18 Mar 2021 11:39:57 -0400
-X-MC-Unique: 86wAUf3oMB6QBm04BqtPKw-1
-Received: by mail-wm1-f70.google.com with SMTP id r18so11953309wmq.5
-        for <kvm@vger.kernel.org>; Thu, 18 Mar 2021 08:39:57 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=Z6n174q6cXzDs/Hg1NtNa/fztkMIalwwlrv76GiJi+4=;
-        b=ZSAMy42t9w9xkXp1j11oEcIUvMDvSWG7EE4Dzf8Z/e0PcYMi3FF9haBAr3U9deJvPD
-         4eENwPOyzhMlE79P/IhLRQFcjJ7sfKElFgd44dY7soIHvF3qpHrfeM/BoSBYz4fh8D2Q
-         92Ah1q1QRYj3v9H9NEtfd7J3cF5NONq5/Ubbn0X77A4UXlcTdcxdqYFt3LZ3WqQ7dkBN
-         0X9BBH+af0IaoJ4hUCWxYRYGD+CQkrfLY42mli0DaTOlKfZHSC4TjbGJDOcreOZeY+KY
-         62dXa1ZkC7za5GYP/33FkuPtY5940NJN85ApfFhJdD3aly85nU3PiB99vqoeBwseB2U6
-         6BYQ==
-X-Gm-Message-State: AOAM533N6XexfJCW8rfD9Iy3CEw1BLqZSebxaBNQfBvqlE4wfgLWDbNy
-        eQWAF36Ino/1eVYYNaERTTFcp5Qn0sLEbGnTc05MHIMHaljEJg2g0BELomze8r9Y/5bHN2FIIte
-        q2dwFxrN6qQ6m//IWIcqwUGrw67nmFMg70Vd4weKsb4tJ0nn08PxpgOY5Goxn62uY
-X-Received: by 2002:a1c:6a12:: with SMTP id f18mr4304179wmc.31.1616081996491;
-        Thu, 18 Mar 2021 08:39:56 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJybgfAQG1Vp7DCkIhgHZxt6yWB7EsvxvHpIYhYjGgsBWmptisVOOyAnOQMvkZlUmz+20fqWDg==
-X-Received: by 2002:a1c:6a12:: with SMTP id f18mr4304157wmc.31.1616081996238;
-        Thu, 18 Mar 2021 08:39:56 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id w6sm3457685wrl.49.2021.03.18.08.39.53
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 18 Mar 2021 08:39:55 -0700 (PDT)
-Subject: Re: [PATCH v2 1/2] kvm/kvm_util: add _vm_ioctl
-To:     Emanuele Giuseppe Esposito <eesposit@redhat.com>,
-        linux-kselftest@vger.kernel.org
-Cc:     Shuah Khan <shuah@kernel.org>, Andrew Jones <drjones@redhat.com>,
-        Peter Xu <peterx@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-References: <20210318151624.490861-1-eesposit@redhat.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <f240b088-9595-67d8-fd04-9c7ffa8805f4@redhat.com>
-Date:   Thu, 18 Mar 2021 16:39:53 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.7.0
+        bh=QeFI2HseGZSsd+lR2NSQGxAFgpdpTkPaeFK7ggBaIVU=;
+        b=gO2y1CJr8kCRalTjF2jGtXO9uW8RIhWdG4hpCWu0NRx8ltpD63nZIKVLjhfwOk8dVVb78r
+        g+l+wXFNVoiBfCIzcSOfvWLFCIo5jQvdNsfKlfBA92fhpjdh4T5IN2pozz7HTQaKqwr6Oi
+        KBjRx4OELaQk9FkAjEg5qHQudlMo25U=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-298-dt-Z2dRQNuuYg3YAJbJsqA-1; Thu, 18 Mar 2021 11:42:12 -0400
+X-MC-Unique: dt-Z2dRQNuuYg3YAJbJsqA-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AFE28EC1A1;
+        Thu, 18 Mar 2021 15:42:11 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.40.196.5])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id F31BF5D6AB;
+        Thu, 18 Mar 2021 15:42:06 +0000 (UTC)
+Date:   Thu, 18 Mar 2021 16:42:04 +0100
+From:   Andrew Jones <drjones@redhat.com>
+To:     Janosch Frank <frankja@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, lvivier@redhat.com, thuth@redhat.com,
+        david@redhat.com, pbonzini@redhat.com, cohuck@redhat.com
+Subject: Re: [kvm-unit-tests RFC 2/2] scripts: Set ACCEL in run_tests.sh if
+ empty
+Message-ID: <20210318154204.3qvzyq3pbb2x57vc@kamzik.brq.redhat.com>
+References: <20210318124500.45447-1-frankja@linux.ibm.com>
+ <20210318124500.45447-3-frankja@linux.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <20210318151624.490861-1-eesposit@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210318124500.45447-3-frankja@linux.ibm.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 18/03/21 16:16, Emanuele Giuseppe Esposito wrote:
-> As in kvm_ioctl and _kvm_ioctl, add
-> the respective _vm_ioctl for vm_ioctl.
+On Thu, Mar 18, 2021 at 12:45:00PM +0000, Janosch Frank wrote:
+> The current checks compare the env ACCEL to the unittests.conf
+> provided accel. That's all fine as long as the user always specifies
+> the ACCEL env variable.
 > 
-> _vm_ioctl invokes an ioctl using the vm fd,
-> leaving the caller to test the result.
-
-Slightly better subject: "selftests/kvm: add _vm_ioctl".
-
-Queued both, but next time please include a cover letter too.
-
-Thanks!
-
-Paolo
-
+> If that's not the case and KVM is not available or if a test specifies
+> tcg and we start a qemu with the kvm acceleration as it's the default
+> we'll run into problems.
 > 
-> Signed-off-by: Emanuele Giuseppe Esposito <eesposit@redhat.com>
+> So let's fetch the accelerator before calling the arch/run script and
+> check it against the test's specified accel. Yes, we now do that
+> twice, once in the run_tests.sh and one in arch/run, but I don't think
+> there's a good way around it since you can execute arch/run
+> without run_tests.sh.
+> 
+> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
 > ---
->   tools/testing/selftests/kvm/include/kvm_util.h | 1 +
->   tools/testing/selftests/kvm/lib/kvm_util.c     | 7 ++++++-
->   2 files changed, 7 insertions(+), 1 deletion(-)
+>  run_tests.sh          |  6 ++++
+>  s390x/run             |  6 +++-
+>  scripts/accel.bash    | 63 +++++++++++++++++++++++++++++++++++++++++
+>  scripts/arch-run.bash | 66 ++-----------------------------------------
+>  scripts/runtime.bash  |  2 +-
+>  5 files changed, 77 insertions(+), 66 deletions(-)
+>  create mode 100644 scripts/accel.bash
 > 
-> diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
-> index 2d7eb6989e83..d53a5f7cad61 100644
-> --- a/tools/testing/selftests/kvm/include/kvm_util.h
-> +++ b/tools/testing/selftests/kvm/include/kvm_util.h
-> @@ -133,6 +133,7 @@ void vcpu_ioctl(struct kvm_vm *vm, uint32_t vcpuid, unsigned long ioctl,
->   int _vcpu_ioctl(struct kvm_vm *vm, uint32_t vcpuid, unsigned long ioctl,
->   		void *arg);
->   void vm_ioctl(struct kvm_vm *vm, unsigned long ioctl, void *arg);
-> +int _vm_ioctl(struct kvm_vm *vm, unsigned long cmd, void *arg);
->   void kvm_ioctl(struct kvm_vm *vm, unsigned long ioctl, void *arg);
->   int _kvm_ioctl(struct kvm_vm *vm, unsigned long ioctl, void *arg);
->   void vm_mem_region_set_flags(struct kvm_vm *vm, uint32_t slot, uint32_t flags);
-> diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-> index e5fbf16f725b..b8849a1aca79 100644
-> --- a/tools/testing/selftests/kvm/lib/kvm_util.c
-> +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-> @@ -1697,11 +1697,16 @@ void vm_ioctl(struct kvm_vm *vm, unsigned long cmd, void *arg)
->   {
->   	int ret;
->   
-> -	ret = ioctl(vm->fd, cmd, arg);
-> +	ret = _vm_ioctl(vm, cmd, arg);
->   	TEST_ASSERT(ret == 0, "vm ioctl %lu failed, rc: %i errno: %i (%s)",
->   		cmd, ret, errno, strerror(errno));
->   }
->   
-> +int _vm_ioctl(struct kvm_vm *vm, unsigned long cmd, void *arg)
+> diff --git a/run_tests.sh b/run_tests.sh
+> index 65108e73..9ccb97bd 100755
+> --- a/run_tests.sh
+> +++ b/run_tests.sh
+> @@ -10,6 +10,7 @@ if [ ! -f config.mak ]; then
+>  fi
+>  source config.mak
+>  source scripts/common.bash
+> +source scripts/accel.bash
+>  
+>  function usage()
+>  {
+> @@ -164,6 +165,11 @@ if [[ $tap_output == "yes" ]]; then
+>      echo "TAP version 13"
+>  fi
+>  
+> +qemu=$(search_qemu_binary)
+> +if [ -z "$ACCEL" ]; then
+> +    ACCEL=$(get_qemu_accelerator)
+> +fi
+> +
+>  trap "wait; exit 130" SIGINT
+>  
+>  (
+> diff --git a/s390x/run b/s390x/run
+> index 2ec6da70..df7ef5ca 100755
+> --- a/s390x/run
+> +++ b/s390x/run
+> @@ -12,8 +12,12 @@ fi
+>  qemu=$(search_qemu_binary) ||
+>  	exit $?
+>  
+> -ACCEL=$(get_qemu_accelerator) ||
+> +if [ -z "$DEF_ACCEL "]; then
+> +    ACCEL=$(get_qemu_accelerator) ||
+>  	exit $?
+> +else
+> +    ACCEL=$DEF_ACCEL
+> +fi
+>  
+>  M='-machine s390-ccw-virtio'
+>  M+=",accel=$ACCEL"
+> diff --git a/scripts/accel.bash b/scripts/accel.bash
+> new file mode 100644
+> index 00000000..ea12412a
+> --- /dev/null
+> +++ b/scripts/accel.bash
+> @@ -0,0 +1,63 @@
+> +search_qemu_binary ()
 > +{
-> +	return ioctl(vm->fd, cmd, arg);
+> +	local save_path=$PATH
+> +	local qemucmd qemu
+> +
+> +	export PATH=$PATH:/usr/libexec
+> +	for qemucmd in ${QEMU:-qemu-system-$ARCH_NAME qemu-kvm}; do
+> +		if $qemucmd --help 2>/dev/null | grep -q 'QEMU'; then
+> +			qemu="$qemucmd"
+> +			break
+> +		fi
+> +	done
+> +
+> +	if [ -z "$qemu" ]; then
+> +		echo "A QEMU binary was not found." >&2
+> +		echo "You can set a custom location by using the QEMU=<path> environment variable." >&2
+> +		return 2
+> +	fi
+> +	command -v $qemu
+> +	export PATH=$save_path
 > +}
 > +
->   /*
->    * KVM system ioctl
->    *
-> 
+> +kvm_available ()
+> +{
+> +	if $($qemu -accel kvm 2> /dev/null); then
+> +		return 0;
+> +	else
+> +		return 1;
+> +	fi
+> +
+> +	[ "$HOST" = "$ARCH_NAME" ] ||
+> +		( [ "$HOST" = aarch64 ] && [ "$ARCH" = arm ] ) ||
+> +		( [ "$HOST" = x86_64 ] && [ "$ARCH" = i386 ] )
+> +}
+> +
+> +hvf_available ()
+> +{
+> +	[ "$(sysctl -n kern.hv_support 2>/dev/null)" = "1" ] || return 1
+> +	[ "$HOST" = "$ARCH_NAME" ] ||
+> +		( [ "$HOST" = x86_64 ] && [ "$ARCH" = i386 ] )
+> +}
+> +
+> +get_qemu_accelerator ()
+> +{
+> +	if [ "$ACCEL" = "kvm" ] && ! kvm_available; then
+> +		echo "KVM is needed, but not available on this host" >&2
+> +		return 2
+> +	fi
+> +	if [ "$ACCEL" = "hvf" ] && ! hvf_available; then
+> +		echo "HVF is needed, but not available on this host" >&2
+> +		return 2
+> +	fi
+> +
+> +	if [ "$ACCEL" ]; then
+> +		echo $ACCEL
+> +	elif kvm_available; then
+> +		echo kvm
+> +	elif hvf_available; then
+> +		echo hvf
+> +	else
+> +		echo tcg
+> +	fi
+> +}
+> diff --git a/scripts/arch-run.bash b/scripts/arch-run.bash
+> index 8cc9a61e..85c07792 100644
+> --- a/scripts/arch-run.bash
+> +++ b/scripts/arch-run.bash
+> @@ -24,6 +24,8 @@
+>  # 1..127 - FAILURE (could be QEMU, a run script, or the unittest)
+>  # >= 128 - Signal (signum = status - 128)
+>  ##############################################################################
+> +source scripts/accel.bash
+> +
+>  run_qemu ()
+>  {
+>  	local stdout errors ret sig
+> @@ -171,28 +173,6 @@ migration_cmd ()
+>  	fi
+>  }
+>  
+> -search_qemu_binary ()
+> -{
+> -	local save_path=$PATH
+> -	local qemucmd qemu
+> -
+> -	export PATH=$PATH:/usr/libexec
+> -	for qemucmd in ${QEMU:-qemu-system-$ARCH_NAME qemu-kvm}; do
+> -		if $qemucmd --help 2>/dev/null | grep -q 'QEMU'; then
+> -			qemu="$qemucmd"
+> -			break
+> -		fi
+> -	done
+> -
+> -	if [ -z "$qemu" ]; then
+> -		echo "A QEMU binary was not found." >&2
+> -		echo "You can set a custom location by using the QEMU=<path> environment variable." >&2
+> -		return 2
+> -	fi
+> -	command -v $qemu
+> -	export PATH=$save_path
+> -}
+> -
+>  initrd_create ()
+>  {
+>  	if [ "$ENVIRON_DEFAULT" = "yes" ]; then
+> @@ -339,45 +319,3 @@ trap_exit_push ()
+>  	local old_exit=$(trap -p EXIT | sed "s/^[^']*'//;s/'[^']*$//")
+>  	trap -- "$1; $old_exit" EXIT
+>  }
+> -
+> -kvm_available ()
+> -{
+> -	if $($qemu -accel kvm 2> /dev/null); then
+> -		return 0;
+> -	else
+> -		return 1;
+> -	fi
+> -
+> -	[ "$HOST" = "$ARCH_NAME" ] ||
+> -		( [ "$HOST" = aarch64 ] && [ "$ARCH" = arm ] ) ||
+> -		( [ "$HOST" = x86_64 ] && [ "$ARCH" = i386 ] )
+> -}
+> -
+> -hvf_available ()
+> -{
+> -	[ "$(sysctl -n kern.hv_support 2>/dev/null)" = "1" ] || return 1
+> -	[ "$HOST" = "$ARCH_NAME" ] ||
+> -		( [ "$HOST" = x86_64 ] && [ "$ARCH" = i386 ] )
+> -}
+> -
+> -get_qemu_accelerator ()
+> -{
+> -	if [ "$ACCEL" = "kvm" ] && ! kvm_available; then
+> -		echo "KVM is needed, but not available on this host" >&2
+> -		return 2
+> -	fi
+> -	if [ "$ACCEL" = "hvf" ] && ! hvf_available; then
+> -		echo "HVF is needed, but not available on this host" >&2
+> -		return 2
+> -	fi
+> -
+> -	if [ "$ACCEL" ]; then
+> -		echo $ACCEL
+> -	elif kvm_available; then
+> -		echo kvm
+> -	elif hvf_available; then
+> -		echo hvf
+> -	else
+> -		echo tcg
+> -	fi
+> -}
+> diff --git a/scripts/runtime.bash b/scripts/runtime.bash
+> index 132389c7..5d444db4 100644
+> --- a/scripts/runtime.bash
+> +++ b/scripts/runtime.bash
+> @@ -30,7 +30,7 @@ premature_failure()
+>  get_cmdline()
+>  {
+>      local kernel=$1
+> -    echo "TESTNAME=$testname TIMEOUT=$timeout ACCEL=$accel $RUNTIME_arch_run $kernel -smp $smp $opts"
+> +    echo "TESTNAME=$testname TIMEOUT=$timeout DEF_ACCEL=$accel $RUNTIME_arch_run $kernel -smp $smp $opts"
+
+I think this name change can break any $TEST_DIR/run files that aren't
+updated to check DEF_ACCEL. This patch only updates the runner for s390.
+
+Also, it'd be better to do the code movement (scripts/accel.bash) of this
+patch separately with a patch that does not have any functional change.
+
+Thanks,
+drew
 
