@@ -2,128 +2,245 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B2EBE34054F
-	for <lists+kvm@lfdr.de>; Thu, 18 Mar 2021 13:17:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CA855340562
+	for <lists+kvm@lfdr.de>; Thu, 18 Mar 2021 13:22:22 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230414AbhCRMQf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 18 Mar 2021 08:16:35 -0400
-Received: from wforward4-smtp.messagingengine.com ([64.147.123.34]:60597 "EHLO
-        wforward4-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229745AbhCRMP7 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 18 Mar 2021 08:15:59 -0400
-X-Greylist: delayed 428 seconds by postgrey-1.27 at vger.kernel.org; Thu, 18 Mar 2021 08:15:58 EDT
-Received: from compute3.internal (compute3.nyi.internal [10.202.2.43])
-        by mailforward.west.internal (Postfix) with ESMTP id A999B10F1;
-        Thu, 18 Mar 2021 08:08:49 -0400 (EDT)
-Received: from mailfrontend2 ([10.202.2.163])
-  by compute3.internal (MEProxy); Thu, 18 Mar 2021 08:08:50 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:content-transfer-encoding:date:from
-        :in-reply-to:message-id:mime-version:references:subject:to
-        :x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
-        fm2; bh=NGzHtoARk93S0Tgw0eEPpKCgVsQ+Q4Wm9hnrZZO4FmY=; b=jZHqVPOU
-        UecSYHxGkA8BUHgLPS7Iehd62BtEPK66AfLFc7gHhzUSgdB+oE81FnW7Vdq1Rqte
-        Bwh3V0/WLtGKdeD6eIizkXT0vwcxhnoOhtlD+MWqBrcVZY9nz/Lm9XN68AzjO9f7
-        Asu6R3OH9kZKF/o9XGRumKmTt2HH0JADdIwKTjEOa2vRa+CKfyK7z//evAXsxqo1
-        4cSDHtinxly8eU/iQJ4/j7Rwqv8+Yt+xbGgRcmEHLlFp5J4qo6AQIieSB9H4QQPR
-        OZg4li6SFQAnKJNOeEsycc9HnQJfXsEAmDCcEE6x1JHfrx52GdM5NNiP7OD1KEih
-        i8QKMgpYKFoVuw==
-X-ME-Sender: <xms:z0JTYDqdtwU8It-iOdcXVepIy1YkLhe-x2DuCQpQ3cIMV5lmolah8Q>
-    <xme:z0JTYNmOXQzb6sRVLez_7O640ZUW2cJxWy4GdL8eq1VZpwL5xtDpk_009-wREePd-
-    Ht9q-_0Qjn5go-2nmk>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeduledrudefiedgfeejucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
-    cujfgurhephffvufffkffojghfggfgsedtkeertdertddtnecuhfhrohhmpeffrghvihgu
-    ucfgughmohhnughsohhnuceouggrvhhiugdrvggumhhonhgushhonhesohhrrggtlhgvrd
-    gtohhmqeenucggtffrrghtthgvrhhnpedufeetjefgfefhtdejhfehtdfftefhteekhefg
-    leehfffhiefhgeelgfejtdehkeenucfkphepkedurddukeejrddviedrvdefkeenucevlh
-    hushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegurghvihgurdgv
-    ughmohhnughsohhnsehorhgrtghlvgdrtghomh
-X-ME-Proxy: <xmx:z0JTYNG9XdFxX5dNr3VJDIRumOvXs2GXu5TwVssF3LcEYBxNPXVwrg>
-    <xmx:z0JTYOqEylkh8h5bc7FAfSXjV6TesRKdGwgsiFrifOr-OPbNP1CGDw>
-    <xmx:z0JTYB7dW7Fcwhi_qXM2M7u9mWcX7fKJYtIv1w3jz7aOxA5p5gtFZA>
-    <xmx:0UJTYCP45hf2rGOR98g2F2FFr5qYssEok7oc216lJefqInepHOGjy26frW7fY2wz>
-Received: from disaster-area.hh.sledj.net (disaster-area.hh.sledj.net [81.187.26.238])
-        by mail.messagingengine.com (Postfix) with ESMTPA id B17311080068;
-        Thu, 18 Mar 2021 08:08:46 -0400 (EDT)
-Received: from localhost (disaster-area.hh.sledj.net [local])
-        by disaster-area.hh.sledj.net (OpenSMTPD) with ESMTPA id a47fd1a8;
-        Thu, 18 Mar 2021 12:08:41 +0000 (UTC)
-From:   David Edmondson <david.edmondson@oracle.com>
-To:     linux-kernel@vger.kernel.org
-Cc:     Ingo Molnar <mingo@redhat.com>, Joerg Roedel <joro@8bytes.org>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        Wanpeng Li <wanpengli@tencent.com>, x86@kernel.org,
-        Borislav Petkov <bp@alien8.de>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Sean Christopherson <seanjc@google.com>,
+        id S230204AbhCRMVv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 18 Mar 2021 08:21:51 -0400
+Received: from gecko.sbs.de ([194.138.37.40]:40076 "EHLO gecko.sbs.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229747AbhCRMVn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 18 Mar 2021 08:21:43 -0400
+Received: from mail2.sbs.de (mail2.sbs.de [192.129.41.66])
+        by gecko.sbs.de (8.15.2/8.15.2) with ESMTPS id 12ICL3Aq031719
+        (version=TLSv1.2 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 18 Mar 2021 13:21:03 +0100
+Received: from [167.87.41.130] ([167.87.41.130])
+        by mail2.sbs.de (8.15.2/8.15.2) with ESMTP id 12ICL22G003851;
+        Thu, 18 Mar 2021 13:21:02 +0100
+From:   Jan Kiszka <jan.kiszka@siemens.com>
+Subject: Re: [PATCH 2/3] KVM: x86: guest debug: don't inject interrupts while
+ single stepping
+To:     Maxim Levitsky <mlevitsk@redhat.com>,
+        Sean Christopherson <seanjc@google.com>
+Cc:     kvm@vger.kernel.org, Vitaly Kuznetsov <vkuznets@redhat.com>,
+        linux-kernel@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Kieran Bingham <kbingham@kernel.org>,
+        Jessica Yu <jeyu@kernel.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
+        Joerg Roedel <joro@8bytes.org>,
         Jim Mattson <jmattson@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        David Edmondson <david.edmondson@oracle.com>
-Subject: [PATCH v5 5/5] KVM: x86: dump_vmcs should include the autoload/autostore MSR lists
-Date:   Thu, 18 Mar 2021 12:08:41 +0000
-Message-Id: <20210318120841.133123-6-david.edmondson@oracle.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20210318120841.133123-1-david.edmondson@oracle.com>
-References: <20210318120841.133123-1-david.edmondson@oracle.com>
+        Borislav Petkov <bp@alien8.de>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Ingo Molnar <mingo@redhat.com>
+References: <20210315221020.661693-1-mlevitsk@redhat.com>
+ <20210315221020.661693-3-mlevitsk@redhat.com> <YE/vtYYwMakERzTS@google.com>
+ <1259724f-1bdb-6229-2772-3192f6d17a4a@siemens.com>
+ <bede3450413a7c5e7e55b19a47c8f079edaa55a2.camel@redhat.com>
+ <ca41fe98-0e5d-3b4c-8ed8-bdd7cd5bc60f@siemens.com>
+ <71ae8b75c30fd0f87e760216ad310ddf72d31c7b.camel@redhat.com>
+Message-ID: <cdb5210f-9eda-6a77-9625-26d76cf5ec6b@siemens.com>
+Date:   Thu, 18 Mar 2021 13:21:01 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.8.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <71ae8b75c30fd0f87e760216ad310ddf72d31c7b.camel@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When dumping the current VMCS state, include the MSRs that are being
-automatically loaded/stored during VM entry/exit.
+On 16.03.21 13:34, Maxim Levitsky wrote:
+> On Tue, 2021-03-16 at 12:27 +0100, Jan Kiszka wrote:
+>> On 16.03.21 11:59, Maxim Levitsky wrote:
+>>> On Tue, 2021-03-16 at 10:16 +0100, Jan Kiszka wrote:
+>>>> On 16.03.21 00:37, Sean Christopherson wrote:
+>>>>> On Tue, Mar 16, 2021, Maxim Levitsky wrote:
+>>>>>> This change greatly helps with two issues:
+>>>>>>
+>>>>>> * Resuming from a breakpoint is much more reliable.
+>>>>>>
+>>>>>>   When resuming execution from a breakpoint, with interrupts enabled, more often
+>>>>>>   than not, KVM would inject an interrupt and make the CPU jump immediately to
+>>>>>>   the interrupt handler and eventually return to the breakpoint, to trigger it
+>>>>>>   again.
+>>>>>>
+>>>>>>   From the user point of view it looks like the CPU never executed a
+>>>>>>   single instruction and in some cases that can even prevent forward progress,
+>>>>>>   for example, when the breakpoint is placed by an automated script
+>>>>>>   (e.g lx-symbols), which does something in response to the breakpoint and then
+>>>>>>   continues the guest automatically.
+>>>>>>   If the script execution takes enough time for another interrupt to arrive,
+>>>>>>   the guest will be stuck on the same breakpoint RIP forever.
+>>>>>>
+>>>>>> * Normal single stepping is much more predictable, since it won't land the
+>>>>>>   debugger into an interrupt handler, so it is much more usable.
+>>>>>>
+>>>>>>   (If entry to an interrupt handler is desired, the user can still place a
+>>>>>>   breakpoint at it and resume the guest, which won't activate this workaround
+>>>>>>   and let the gdb still stop at the interrupt handler)
+>>>>>>
+>>>>>> Since this change is only active when guest is debugged, it won't affect
+>>>>>> KVM running normal 'production' VMs.
+>>>>>>
+>>>>>>
+>>>>>> Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+>>>>>> Tested-by: Stefano Garzarella <sgarzare@redhat.com>
+>>>>>> ---
+>>>>>>  arch/x86/kvm/x86.c | 6 ++++++
+>>>>>>  1 file changed, 6 insertions(+)
+>>>>>>
+>>>>>> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+>>>>>> index a9d95f90a0487..b75d990fcf12b 100644
+>>>>>> --- a/arch/x86/kvm/x86.c
+>>>>>> +++ b/arch/x86/kvm/x86.c
+>>>>>> @@ -8458,6 +8458,12 @@ static void inject_pending_event(struct kvm_vcpu *vcpu, bool *req_immediate_exit
+>>>>>>  		can_inject = false;
+>>>>>>  	}
+>>>>>>  
+>>>>>> +	/*
+>>>>>> +	 * Don't inject interrupts while single stepping to make guest debug easier
+>>>>>> +	 */
+>>>>>> +	if (vcpu->guest_debug & KVM_GUESTDBG_SINGLESTEP)
+>>>>>> +		return;
+>>>>>
+>>>>> Is this something userspace can deal with?  E.g. disable IRQs and/or set NMI
+>>>>> blocking at the start of single-stepping, unwind at the end?  Deviating this far
+>>>>> from architectural behavior will end in tears at some point.
+>>>>>
+>>>>
+>>>> Does this happen to address this suspicious workaround in the kernel?
+>>>>
+>>>>         /*
+>>>>          * The kernel doesn't use TF single-step outside of:
+>>>>          *
+>>>>          *  - Kprobes, consumed through kprobe_debug_handler()
+>>>>          *  - KGDB, consumed through notify_debug()
+>>>>          *
+>>>>          * So if we get here with DR_STEP set, something is wonky.
+>>>>          *
+>>>>          * A known way to trigger this is through QEMU's GDB stub,
+>>>>          * which leaks #DB into the guest and causes IST recursion.
+>>>>          */
+>>>>         if (WARN_ON_ONCE(dr6 & DR_STEP))
+>>>>                 regs->flags &= ~X86_EFLAGS_TF;
+>>>>
+>>>> (arch/x86/kernel/traps.c, exc_debug_kernel)
+>>>>
+>>>> I wonder why this got merged while no one fixed QEMU/KVM, for years? Oh,
+>>>> yeah, question to myself as well, dancing around broken guest debugging
+>>>> for a long time while trying to fix other issues...
+>>>
+>>> To be honest I didn't see that warning even once, but I can imagine KVM
+>>> leaking #DB due to bugs in that code. That area historically didn't receive
+>>> much attention since it can only be triggered by
+>>> KVM_GET/SET_GUEST_DEBUG which isn't used in production.
+>>
+>> I've triggered it recently while debugging a guest, that's why I got
+>> aware of the code path. Long ago, all this used to work (soft BPs,
+>> single-stepping etc.)
+>>
+>>> The only issue that I on the other hand  did
+>>> see which is mostly gdb fault is that it fails to remove a software breakpoint
+>>> when resuming over it, if that breakpoint's python handler messes up 
+>>> with gdb's symbols, which is what lx-symbols does.
+>>>
+>>> And that despite the fact that lx-symbol doesn't mess with the object
+>>> (that is the kernel) where the breakpoint is defined.
+>>>
+>>> Just adding/removing one symbol file is enough to trigger this issue.
+>>>
+>>> Since lx-symbols already works this around when it reloads all symbols,
+>>> I extended that workaround to happen also when loading/unloading 
+>>> only a single symbol file.
+>>
+>> You have no issue with interactive debugging when NOT using gdb scripts
+>> / lx-symbol?
+> 
+> To be honest I don't use guest debugging that much,
+> so I probably missed some issues.
+> 
+> Now that I fixed lx-symbols though I'll probably use 
+> guest debugging much more.
+> I will keep an eye on any issues that I find.
+> 
+> The main push to fix lx-symbols actually came
+> from me wanting to understand if there is something
+> broken with KVM's guest debugging knowing that
+> lx-symbols crashes the guest when module is loaded
+> after lx-symbols was executed.
+> 
+> That lx-symbols related guest crash I traced to issue 
+> with gdb as I explained, and the lack of blocking of the interrupts 
+> on single step is not a bug but more a missing feature
+> that should be implemented to make single step easier to use.
+> 
+> Another issue which isn't a bug is that you can't place a software
+> breakpoint if kernel is not loaded (since there is no code in memory)
+> or if the kernel haven't done basic paging initialization 
+> (since there is no paging yet to know where to place the breakpoint).
+> Hardware breakpoints work for this fine though.
+> 
+> So in summary I haven't found any major issues with KVM's guest debug
+> yet.
+> 
+> If I do notice issues with guest debug, I will try to isolate
+> and debug them.
+> For the issue that you mentioned, do you have a way to reproduce it?
 
-Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
-Signed-off-by: David Edmondson <david.edmondson@oracle.com>
----
- arch/x86/kvm/vmx/vmx.c | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
+To pick this up again, I did some experiments and was easily able to
+reproduce the main problem:
 
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 0a41a8ec2bd9..e001c3bb4334 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -5787,6 +5787,16 @@ static void vmx_dump_dtsel(char *name, uint32_t limit)
- 	       vmcs_readl(limit + GUEST_GDTR_BASE - GUEST_GDTR_LIMIT));
- }
- 
-+static void vmx_dump_msrs(char *name, struct vmx_msrs *m)
-+{
-+	unsigned int i;
-+	struct vmx_msr_entry *e;
-+
-+	pr_err("MSR %s:\n", name);
-+	for (i = 0, e = m->val; i < m->nr; ++i, ++e)
-+		pr_err("  %2d: msr=0x%08x value=0x%016llx\n", i, e->index, e->value);
-+}
-+
- void dump_vmcs(struct kvm_vcpu *vcpu)
- {
- 	struct vcpu_vmx *vmx = to_vmx(vcpu);
-@@ -5868,6 +5878,10 @@ void dump_vmcs(struct kvm_vcpu *vcpu)
- 	if (secondary_exec_control & SECONDARY_EXEC_VIRTUAL_INTR_DELIVERY)
- 		pr_err("InterruptStatus = %04x\n",
- 		       vmcs_read16(GUEST_INTR_STATUS));
-+	if (vmcs_read32(VM_ENTRY_MSR_LOAD_COUNT) > 0)
-+		vmx_dump_msrs("guest autoload", &vmx->msr_autoload.guest);
-+	if (vmcs_read32(VM_EXIT_MSR_STORE_COUNT) > 0)
-+		vmx_dump_msrs("guest autostore", &vmx->msr_autostore.guest);
- 
- 	pr_err("*** Host State ***\n");
- 	pr_err("RIP = 0x%016lx  RSP = 0x%016lx\n",
-@@ -5897,6 +5911,8 @@ void dump_vmcs(struct kvm_vcpu *vcpu)
- 	    vmexit_ctl & VM_EXIT_LOAD_IA32_PERF_GLOBAL_CTRL)
- 		pr_err("PerfGlobCtl = 0x%016llx\n",
- 		       vmcs_read64(HOST_IA32_PERF_GLOBAL_CTRL));
-+	if (vmcs_read32(VM_EXIT_MSR_LOAD_COUNT) > 0)
-+		vmx_dump_msrs("host autoload", &vmx->msr_autoload.host);
- 
- 	pr_err("*** Control State ***\n");
- 	pr_err("PinBased=%08x CPUBased=%08x SecondaryExec=%08x\n",
+ - checkout linux master (1df27313f50 yesterday)
+ - build a fitting host kernel with KVM
+ - build a target kernel with defconfig + CONFIG_KVM_GUEST +
+   CONFIG_DEBUG_INFO, no gdb scripts for now
+ - boot the guest
+
+   qemu-system-x86_64 linux.img -enable-kvm -smp 4 -s
+      -kernel bzImage -append "console=ttyS0 root=... nokaslr"
+
+ - gdb vmlinux
+ - tar rem :1234
+ - b __x64_sys_execve
+ - continue whenever you hit the breakpoint, and the guest will
+   eventually hang
+ - or stepi, and you may end up in the interrupt handler
+ - specifically doing that on the serial console or setting the bp in
+   early boot exposes the issue
+
+I've also seen
+
+WARNING: CPU: 3 PID: 751 at ../arch/x86/kernel/traps.c:915
+exc_debug+0x16b/0x1c0
+
+from time to time.
+
+When I apply this patch to the host, the problems are gone.
+
+Interestingly, my OpenSUSE 5.3.18-lp152.66-default does not show this
+behavior and /seems/ stable from quick testing. Not sure if there were
+changes in upstream between that baseline and head or if Suse is
+carrying a local fix.
+
+In any case, I think we need the following:
+
+ - default disabling of event injections when guest debugging injected
+   TF
+ - possibly some control interface to allow events BUT then avoids any
+   TF injection to prevent guest state corruptions
+ - exposure of that interface to the gdb frontend, maybe by making it
+   available via the QEMU monitor (monitor ...)
+ - a for kvm-unit-tests to trigger the above corner cases
+
+Jan
+
 -- 
-2.30.2
-
+Siemens AG, T RDA IOT
+Corporate Competence Center Embedded Linux
