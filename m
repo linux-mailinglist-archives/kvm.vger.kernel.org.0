@@ -2,25 +2,25 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0B9EE340628
-	for <lists+kvm@lfdr.de>; Thu, 18 Mar 2021 13:54:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5A409340626
+	for <lists+kvm@lfdr.de>; Thu, 18 Mar 2021 13:54:41 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231317AbhCRMyI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 18 Mar 2021 08:54:08 -0400
-Received: from mail.kernel.org ([198.145.29.99]:54338 "EHLO mail.kernel.org"
+        id S231338AbhCRMyJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 18 Mar 2021 08:54:09 -0400
+Received: from mail.kernel.org ([198.145.29.99]:54372 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231244AbhCRMxj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 18 Mar 2021 08:53:39 -0400
+        id S231270AbhCRMxl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 18 Mar 2021 08:53:41 -0400
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id C046464E86;
-        Thu, 18 Mar 2021 12:53:38 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id EA7C864E28;
+        Thu, 18 Mar 2021 12:53:40 +0000 (UTC)
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.lan)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.94)
         (envelope-from <maz@kernel.org>)
-        id 1lMrim-002OZW-K6; Thu, 18 Mar 2021 12:25:48 +0000
+        id 1lMrin-002OZW-8d; Thu, 18 Mar 2021 12:25:49 +0000
 From:   Marc Zyngier <maz@kernel.org>
 To:     kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
         kvm@vger.kernel.org
@@ -32,9 +32,9 @@ Cc:     dave.martin@arm.com, daniel.kiss@arm.com,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
         broonie@kernel.org, ascull@google.com, qperret@google.com,
         kernel-team@android.com
-Subject: [PATCH v2 10/11] KVM: arm64: Save/restore SVE state for nVHE
-Date:   Thu, 18 Mar 2021 12:25:31 +0000
-Message-Id: <20210318122532.505263-11-maz@kernel.org>
+Subject: [PATCH v2 11/11] KVM: arm64: Enable SVE support for nVHE
+Date:   Thu, 18 Mar 2021 12:25:32 +0000
+Message-Id: <20210318122532.505263-12-maz@kernel.org>
 X-Mailer: git-send-email 2.29.2
 In-Reply-To: <20210318122532.505263-1-maz@kernel.org>
 References: <20210318122532.505263-1-maz@kernel.org>
@@ -48,140 +48,102 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Implement the SVE save/restore for nVHE, following a similar
-logic to that of the VHE implementation:
+From: Daniel Kiss <daniel.kiss@arm.com>
 
-- the SVE state is switched on trap from EL1 to EL2
+Now that KVM is equipped to deal with SVE on nVHE, remove the code
+preventing it from being used as well as the bits of documentation
+that were mentioning the incompatibility.
 
-- no further changes to ZCR_EL2 occur as long as the guest isn't
-  preempted or exit to userspace
-
-- ZCR_EL2 is reset to its default value on the first SVE access from
-  the host EL1, and ZCR_EL1 restored to the default guest value in
-  vcpu_put()
-
+Acked-by: Will Deacon <will@kernel.org>
+Signed-off-by: Daniel Kiss <daniel.kiss@arm.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/fpsimd.c                 | 10 +++++--
- arch/arm64/kvm/hyp/include/hyp/switch.h | 37 +++++++++----------------
- arch/arm64/kvm/hyp/nvhe/switch.c        |  4 +--
- 3 files changed, 23 insertions(+), 28 deletions(-)
+ arch/arm64/Kconfig                |  7 -------
+ arch/arm64/include/asm/kvm_host.h | 13 -------------
+ arch/arm64/kvm/arm.c              |  5 -----
+ arch/arm64/kvm/reset.c            |  4 ----
+ 4 files changed, 29 deletions(-)
 
-diff --git a/arch/arm64/kvm/fpsimd.c b/arch/arm64/kvm/fpsimd.c
-index 14ea05c5134a..5621020b28de 100644
---- a/arch/arm64/kvm/fpsimd.c
-+++ b/arch/arm64/kvm/fpsimd.c
-@@ -121,11 +121,17 @@ void kvm_arch_vcpu_put_fp(struct kvm_vcpu *vcpu)
- 	local_irq_save(flags);
+diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
+index 1f212b47a48a..2690543799fb 100644
+--- a/arch/arm64/Kconfig
++++ b/arch/arm64/Kconfig
+@@ -1686,7 +1686,6 @@ endmenu
+ config ARM64_SVE
+ 	bool "ARM Scalable Vector Extension support"
+ 	default y
+-	depends on !KVM || ARM64_VHE
+ 	help
+ 	  The Scalable Vector Extension (SVE) is an extension to the AArch64
+ 	  execution state which complements and extends the SIMD functionality
+@@ -1715,12 +1714,6 @@ config ARM64_SVE
+ 	  booting the kernel.  If unsure and you are not observing these
+ 	  symptoms, you should assume that it is safe to say Y.
  
- 	if (vcpu->arch.flags & KVM_ARM64_FP_ENABLED) {
--		if (guest_has_sve)
-+		if (guest_has_sve) {
- 			__vcpu_sys_reg(vcpu, ZCR_EL1) = read_sysreg_el1(SYS_ZCR);
+-	  CPUs that support SVE are architecturally required to support the
+-	  Virtualization Host Extensions (VHE), so the kernel makes no
+-	  provision for supporting SVE alongside KVM without VHE enabled.
+-	  Thus, you will need to enable CONFIG_ARM64_VHE if you want to support
+-	  KVM in the same kernel image.
+-
+ config ARM64_MODULE_PLTS
+ 	bool "Use PLTs to allow module memory to spill over into vmalloc area"
+ 	depends on MODULES
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index e59b16008868..08f500b2551a 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -694,19 +694,6 @@ static inline void kvm_init_host_cpu_context(struct kvm_cpu_context *cpu_ctxt)
+ 	ctxt_sys_reg(cpu_ctxt, MPIDR_EL1) = read_cpuid_mpidr();
+ }
  
-+			/* Restore the VL that was saved when bound to the CPU */
-+			if (!has_vhe())
-+				sve_cond_update_zcr_vq(vcpu_sve_max_vq(vcpu) - 1,
-+						       SYS_ZCR_EL1);
-+		}
-+
- 		fpsimd_save_and_flush_cpu_state();
--	} else if (host_has_sve) {
-+	} else if (has_vhe() && host_has_sve) {
- 		/*
- 		 * The FPSIMD/SVE state in the CPU has not been touched, and we
- 		 * have SVE (and VHE): CPACR_EL1 (alias CPTR_EL2) has been
-diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-index 8071e1cad289..8a5c57e93e40 100644
---- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-+++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-@@ -217,25 +217,19 @@ static inline void __hyp_sve_restore_guest(struct kvm_vcpu *vcpu)
- /* Check for an FPSIMD/SVE trap and handle as appropriate */
- static inline bool __hyp_handle_fpsimd(struct kvm_vcpu *vcpu)
- {
--	bool vhe, sve_guest, sve_host;
-+	bool sve_guest, sve_host;
- 	u8 esr_ec;
-+	u64 reg;
- 
- 	if (!system_supports_fpsimd())
- 		return false;
- 
+-static inline bool kvm_arch_requires_vhe(void)
+-{
 -	/*
--	 * Currently system_supports_sve() currently implies has_vhe(),
--	 * so the check is redundant. However, has_vhe() can be determined
--	 * statically and helps the compiler remove dead code.
+-	 * The Arm architecture specifies that implementation of SVE
+-	 * requires VHE also to be implemented.  The KVM code for arm64
+-	 * relies on this when SVE is present:
 -	 */
--	if (has_vhe() && system_supports_sve()) {
-+	if (system_supports_sve()) {
- 		sve_guest = vcpu_has_sve(vcpu);
- 		sve_host = vcpu->arch.flags & KVM_ARM64_HOST_SVE_IN_USE;
--		vhe = true;
- 	} else {
- 		sve_guest = false;
- 		sve_host = false;
--		vhe = has_vhe();
- 	}
- 
- 	esr_ec = kvm_vcpu_trap_get_class(vcpu);
-@@ -244,31 +238,26 @@ static inline bool __hyp_handle_fpsimd(struct kvm_vcpu *vcpu)
- 		return false;
- 
- 	/* Don't handle SVE traps for non-SVE vcpus here: */
--	if (!sve_guest)
--		if (esr_ec != ESR_ELx_EC_FP_ASIMD)
--			return false;
-+	if (!sve_guest && esr_ec != ESR_ELx_EC_FP_ASIMD)
-+		return false;
- 
- 	/* Valid trap.  Switch the context: */
+-	if (system_supports_sve())
+-		return true;
 -
--	if (vhe) {
--		u64 reg = read_sysreg(cpacr_el1) | CPACR_EL1_FPEN;
+-	return false;
+-}
 -
-+	if (has_vhe()) {
-+		reg = CPACR_EL1_FPEN;
- 		if (sve_guest)
- 			reg |= CPACR_EL1_ZEN;
+ void kvm_arm_vcpu_ptrauth_trap(struct kvm_vcpu *vcpu);
  
--		write_sysreg(reg, cpacr_el1);
-+		sysreg_clear_set(cpacr_el1, 0, reg);
- 	} else {
--		write_sysreg(read_sysreg(cptr_el2) & ~(u64)CPTR_EL2_TFP,
--			     cptr_el2);
+ static inline void kvm_arch_hardware_unsetup(void) {}
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index fc4c95dd2d26..ef92b7d32ebd 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -1889,11 +1889,6 @@ int kvm_arch_init(void *opaque)
+ 
+ 	in_hyp_mode = is_kernel_in_hyp_mode();
+ 
+-	if (!in_hyp_mode && kvm_arch_requires_vhe()) {
+-		kvm_pr_unimpl("CPU unsupported in non-VHE mode, not initializing\n");
+-		return -ENODEV;
 -	}
-+		reg = CPTR_EL2_TFP;
-+		if (sve_guest)
-+			reg |= CPTR_EL2_TZ;
+-
+ 	if (cpus_have_final_cap(ARM64_WORKAROUND_DEVICE_LOAD_ACQUIRE) ||
+ 	    cpus_have_final_cap(ARM64_WORKAROUND_1508412))
+ 		kvm_info("Guests without required CPU erratum workarounds can deadlock system!\n" \
+diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
+index 47f3f035f3ea..f08b1e7ebf68 100644
+--- a/arch/arm64/kvm/reset.c
++++ b/arch/arm64/kvm/reset.c
+@@ -74,10 +74,6 @@ static int kvm_vcpu_enable_sve(struct kvm_vcpu *vcpu)
+ 	if (!system_supports_sve())
+ 		return -EINVAL;
  
-+		sysreg_clear_set(cptr_el2, reg, 0);
-+	}
- 	isb();
+-	/* Verify that KVM startup enforced this when SVE was detected: */
+-	if (WARN_ON(!has_vhe()))
+-		return -EINVAL;
+-
+ 	vcpu->arch.sve_max_vl = kvm_sve_max_vl;
  
- 	if (vcpu->arch.flags & KVM_ARM64_FP_HOST) {
--		/*
--		 * In the SVE case, VHE is assumed: it is enforced by
--		 * Kconfig and kvm_arch_init().
--		 */
- 		if (sve_host)
- 			__hyp_sve_save_host(vcpu);
- 		else
-diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
-index 60adc7ff4caa..b3fc0169268f 100644
---- a/arch/arm64/kvm/hyp/nvhe/switch.c
-+++ b/arch/arm64/kvm/hyp/nvhe/switch.c
-@@ -41,9 +41,9 @@ static void __activate_traps(struct kvm_vcpu *vcpu)
- 	__activate_traps_common(vcpu);
- 
- 	val = CPTR_EL2_DEFAULT;
--	val |= CPTR_EL2_TTA | CPTR_EL2_TZ | CPTR_EL2_TAM;
-+	val |= CPTR_EL2_TTA | CPTR_EL2_TAM;
- 	if (!update_fp_enabled(vcpu)) {
--		val |= CPTR_EL2_TFP;
-+		val |= CPTR_EL2_TFP | CPTR_EL2_TZ;
- 		__activate_traps_fpsimd32(vcpu);
- 	}
- 
+ 	/*
 -- 
 2.29.2
 
