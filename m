@@ -2,34 +2,35 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 59156340551
-	for <lists+kvm@lfdr.de>; Thu, 18 Mar 2021 13:17:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B2EBE34054F
+	for <lists+kvm@lfdr.de>; Thu, 18 Mar 2021 13:17:08 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231161AbhCRMQg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 18 Mar 2021 08:16:36 -0400
-Received: from wforward4-smtp.messagingengine.com ([64.147.123.34]:56909 "EHLO
+        id S230414AbhCRMQf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 18 Mar 2021 08:16:35 -0400
+Received: from wforward4-smtp.messagingengine.com ([64.147.123.34]:60597 "EHLO
         wforward4-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230453AbhCRMQA (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 18 Mar 2021 08:16:00 -0400
-Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
-        by mailforward.west.internal (Postfix) with ESMTP id 0BF1010DE;
-        Thu, 18 Mar 2021 08:08:47 -0400 (EDT)
-Received: from mailfrontend1 ([10.202.2.162])
-  by compute5.internal (MEProxy); Thu, 18 Mar 2021 08:08:48 -0400
+        by vger.kernel.org with ESMTP id S229745AbhCRMP7 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 18 Mar 2021 08:15:59 -0400
+X-Greylist: delayed 428 seconds by postgrey-1.27 at vger.kernel.org; Thu, 18 Mar 2021 08:15:58 EDT
+Received: from compute3.internal (compute3.nyi.internal [10.202.2.43])
+        by mailforward.west.internal (Postfix) with ESMTP id A999B10F1;
+        Thu, 18 Mar 2021 08:08:49 -0400 (EDT)
+Received: from mailfrontend2 ([10.202.2.163])
+  by compute3.internal (MEProxy); Thu, 18 Mar 2021 08:08:50 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
         messagingengine.com; h=cc:content-transfer-encoding:date:from
         :in-reply-to:message-id:mime-version:references:subject:to
         :x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
-        fm2; bh=1tDfeZNzarbZPIdRl+chseNu1T4hPmJuxutIG/HKblo=; b=ew1adpk8
-        4K1DD6XVy+7Jsn2aCifh+qvcH3Tz75eb2KGFdBgVb6+CUQ79Kklcl+vjpa9pHBQ/
-        Eywy5x+mpsYPRCdJXtKS+pa9buCN4axxaCyWHA9fyUlrc9UQMjJItXk9/6WmkISG
-        +HU+YH9hneGxVmY04YDR3zHxSX7t5s74yBqGwNm4pEPXnWj3gTp4gDlmY1uPvcgY
-        hQX50UHmHg4Qeya24WTcZD7OCfU/4v/MNelmN+qsMkVaeGmhiWgXoqsb2x9Kg+aE
-        NZtcYk68PTk/s3AYOfBNTtjn5QXhBOtm0BT1OGoKjktkWV21CXqNuUP67C3oXGnx
-        qZmmEZlY4qfahA==
-X-ME-Sender: <xms:z0JTYC0LUpgFh-6VkEhmbv4bNqcgug3DOHvJOzk7bQu3EsY_WR3jtg>
-    <xme:z0JTYFFMayysJUamWLZPSpFwOWT5AIHsMCpS7zyZt_MZJWqqwGVkobAPiqROmAyXi
-    VWE05ljs97jwxiiRXg>
+        fm2; bh=NGzHtoARk93S0Tgw0eEPpKCgVsQ+Q4Wm9hnrZZO4FmY=; b=jZHqVPOU
+        UecSYHxGkA8BUHgLPS7Iehd62BtEPK66AfLFc7gHhzUSgdB+oE81FnW7Vdq1Rqte
+        Bwh3V0/WLtGKdeD6eIizkXT0vwcxhnoOhtlD+MWqBrcVZY9nz/Lm9XN68AzjO9f7
+        Asu6R3OH9kZKF/o9XGRumKmTt2HH0JADdIwKTjEOa2vRa+CKfyK7z//evAXsxqo1
+        4cSDHtinxly8eU/iQJ4/j7Rwqv8+Yt+xbGgRcmEHLlFp5J4qo6AQIieSB9H4QQPR
+        OZg4li6SFQAnKJNOeEsycc9HnQJfXsEAmDCcEE6x1JHfrx52GdM5NNiP7OD1KEih
+        i8QKMgpYKFoVuw==
+X-ME-Sender: <xms:z0JTYDqdtwU8It-iOdcXVepIy1YkLhe-x2DuCQpQ3cIMV5lmolah8Q>
+    <xme:z0JTYNmOXQzb6sRVLez_7O640ZUW2cJxWy4GdL8eq1VZpwL5xtDpk_009-wREePd-
+    Ht9q-_0Qjn5go-2nmk>
 X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeduledrudefiedgfeejucetufdoteggodetrfdotf
     fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
     uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
@@ -39,15 +40,15 @@ X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeduledrudefiedgfeejucetufdoteggod
     leehfffhiefhgeelgfejtdehkeenucfkphepkedurddukeejrddviedrvdefkeenucevlh
     hushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegurghvihgurdgv
     ughmohhnughsohhnsehorhgrtghlvgdrtghomh
-X-ME-Proxy: <xmx:z0JTYK6cTOC9BmR2Haf8VNhVsiCOCJ8QMzb_cr5j8YGCnPpUhzYMuA>
-    <xmx:z0JTYD12ru7Qw486eU0dezgMpjZr8Wwe4T_b8TbqqG-CmjgV3VMdEQ>
-    <xmx:z0JTYFHqAoGN6zRsHShkrtsHgu6ke0nJyAm9OXgrYxgFin8tD_LnGQ>
-    <xmx:z0JTYD-BW3kZk_Rhq2zUmFh3XNnsffcDX9DxQw0uxwbyDnD3hi-MJRNC0IXdZvKV>
+X-ME-Proxy: <xmx:z0JTYNG9XdFxX5dNr3VJDIRumOvXs2GXu5TwVssF3LcEYBxNPXVwrg>
+    <xmx:z0JTYOqEylkh8h5bc7FAfSXjV6TesRKdGwgsiFrifOr-OPbNP1CGDw>
+    <xmx:z0JTYB7dW7Fcwhi_qXM2M7u9mWcX7fKJYtIv1w3jz7aOxA5p5gtFZA>
+    <xmx:0UJTYCP45hf2rGOR98g2F2FFr5qYssEok7oc216lJefqInepHOGjy26frW7fY2wz>
 Received: from disaster-area.hh.sledj.net (disaster-area.hh.sledj.net [81.187.26.238])
-        by mail.messagingengine.com (Postfix) with ESMTPA id 2F1A324005A;
+        by mail.messagingengine.com (Postfix) with ESMTPA id B17311080068;
         Thu, 18 Mar 2021 08:08:46 -0400 (EDT)
 Received: from localhost (disaster-area.hh.sledj.net [local])
-        by disaster-area.hh.sledj.net (OpenSMTPD) with ESMTPA id 45a94d5e;
+        by disaster-area.hh.sledj.net (OpenSMTPD) with ESMTPA id a47fd1a8;
         Thu, 18 Mar 2021 12:08:41 +0000 (UTC)
 From:   David Edmondson <david.edmondson@oracle.com>
 To:     linux-kernel@vger.kernel.org
@@ -61,9 +62,9 @@ Cc:     Ingo Molnar <mingo@redhat.com>, Joerg Roedel <joro@8bytes.org>,
         Jim Mattson <jmattson@google.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         David Edmondson <david.edmondson@oracle.com>
-Subject: [PATCH v5 4/5] KVM: x86: dump_vmcs should show the effective EFER
-Date:   Thu, 18 Mar 2021 12:08:40 +0000
-Message-Id: <20210318120841.133123-5-david.edmondson@oracle.com>
+Subject: [PATCH v5 5/5] KVM: x86: dump_vmcs should include the autoload/autostore MSR lists
+Date:   Thu, 18 Mar 2021 12:08:41 +0000
+Message-Id: <20210318120841.133123-6-david.edmondson@oracle.com>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20210318120841.133123-1-david.edmondson@oracle.com>
 References: <20210318120841.133123-1-david.edmondson@oracle.com>
@@ -73,93 +74,56 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-If EFER is not being loaded from the VMCS, show the effective value by
-reference to the MSR autoload list or calculation.
+When dumping the current VMCS state, include the MSRs that are being
+automatically loaded/stored during VM entry/exit.
 
-Suggested-by: Sean Christopherson <seanjc@google.com>
+Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
 Signed-off-by: David Edmondson <david.edmondson@oracle.com>
 ---
- arch/x86/kvm/vmx/vmx.c | 20 ++++++++++++++++----
- arch/x86/kvm/vmx/vmx.h |  2 +-
- 2 files changed, 17 insertions(+), 5 deletions(-)
+ arch/x86/kvm/vmx/vmx.c | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
 
 diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 67e574deced1..0a41a8ec2bd9 100644
+index 0a41a8ec2bd9..e001c3bb4334 100644
 --- a/arch/x86/kvm/vmx/vmx.c
 +++ b/arch/x86/kvm/vmx/vmx.c
-@@ -5787,11 +5787,13 @@ static void vmx_dump_dtsel(char *name, uint32_t limit)
+@@ -5787,6 +5787,16 @@ static void vmx_dump_dtsel(char *name, uint32_t limit)
  	       vmcs_readl(limit + GUEST_GDTR_BASE - GUEST_GDTR_LIMIT));
  }
  
--void dump_vmcs(void)
-+void dump_vmcs(struct kvm_vcpu *vcpu)
++static void vmx_dump_msrs(char *name, struct vmx_msrs *m)
++{
++	unsigned int i;
++	struct vmx_msr_entry *e;
++
++	pr_err("MSR %s:\n", name);
++	for (i = 0, e = m->val; i < m->nr; ++i, ++e)
++		pr_err("  %2d: msr=0x%08x value=0x%016llx\n", i, e->index, e->value);
++}
++
+ void dump_vmcs(struct kvm_vcpu *vcpu)
  {
-+	struct vcpu_vmx *vmx = to_vmx(vcpu);
- 	u32 vmentry_ctl, vmexit_ctl;
- 	u32 cpu_based_exec_ctrl, pin_based_exec_ctrl, secondary_exec_control;
- 	unsigned long cr4;
-+	int efer_slot;
+ 	struct vcpu_vmx *vmx = to_vmx(vcpu);
+@@ -5868,6 +5878,10 @@ void dump_vmcs(struct kvm_vcpu *vcpu)
+ 	if (secondary_exec_control & SECONDARY_EXEC_VIRTUAL_INTR_DELIVERY)
+ 		pr_err("InterruptStatus = %04x\n",
+ 		       vmcs_read16(GUEST_INTR_STATUS));
++	if (vmcs_read32(VM_ENTRY_MSR_LOAD_COUNT) > 0)
++		vmx_dump_msrs("guest autoload", &vmx->msr_autoload.guest);
++	if (vmcs_read32(VM_EXIT_MSR_STORE_COUNT) > 0)
++		vmx_dump_msrs("guest autostore", &vmx->msr_autostore.guest);
  
- 	if (!dump_invalid_vmcs) {
- 		pr_warn_ratelimited("set kvm_intel.dump_invalid_vmcs=1 to dump internal KVM state.\n");
-@@ -5837,8 +5839,18 @@ void dump_vmcs(void)
- 	vmx_dump_sel("LDTR:", GUEST_LDTR_SELECTOR);
- 	vmx_dump_dtsel("IDTR:", GUEST_IDTR_LIMIT);
- 	vmx_dump_sel("TR:  ", GUEST_TR_SELECTOR);
-+	efer_slot = vmx_find_loadstore_msr_slot(&vmx->msr_autoload.guest, MSR_EFER);
- 	if (vmentry_ctl & VM_ENTRY_LOAD_IA32_EFER)
- 		pr_err("EFER= 0x%016llx\n", vmcs_read64(GUEST_IA32_EFER));
-+	else if (efer_slot >= 0)
-+		pr_err("EFER= 0x%016llx (autoload)\n",
-+		       vmx->msr_autoload.guest.val[efer_slot].value);
-+	else if (vmentry_ctl & VM_ENTRY_IA32E_MODE)
-+		pr_err("EFER= 0x%016llx (effective)\n",
-+		       vcpu->arch.efer | (EFER_LMA | EFER_LME));
-+	else
-+		pr_err("EFER= 0x%016llx (effective)\n",
-+		       vcpu->arch.efer & ~(EFER_LMA | EFER_LME));
- 	if (vmentry_ctl & VM_ENTRY_LOAD_IA32_PAT)
- 		pr_err("PAT = 0x%016llx\n", vmcs_read64(GUEST_IA32_PAT));
- 	pr_err("DebugCtl = 0x%016llx  DebugExceptions = 0x%016lx\n",
-@@ -5993,7 +6005,7 @@ static int __vmx_handle_exit(struct kvm_vcpu *vcpu, fastpath_t exit_fastpath)
- 	}
+ 	pr_err("*** Host State ***\n");
+ 	pr_err("RIP = 0x%016lx  RSP = 0x%016lx\n",
+@@ -5897,6 +5911,8 @@ void dump_vmcs(struct kvm_vcpu *vcpu)
+ 	    vmexit_ctl & VM_EXIT_LOAD_IA32_PERF_GLOBAL_CTRL)
+ 		pr_err("PerfGlobCtl = 0x%016llx\n",
+ 		       vmcs_read64(HOST_IA32_PERF_GLOBAL_CTRL));
++	if (vmcs_read32(VM_EXIT_MSR_LOAD_COUNT) > 0)
++		vmx_dump_msrs("host autoload", &vmx->msr_autoload.host);
  
- 	if (exit_reason.failed_vmentry) {
--		dump_vmcs();
-+		dump_vmcs(vcpu);
- 		vcpu->run->exit_reason = KVM_EXIT_FAIL_ENTRY;
- 		vcpu->run->fail_entry.hardware_entry_failure_reason
- 			= exit_reason.full;
-@@ -6002,7 +6014,7 @@ static int __vmx_handle_exit(struct kvm_vcpu *vcpu, fastpath_t exit_fastpath)
- 	}
- 
- 	if (unlikely(vmx->fail)) {
--		dump_vmcs();
-+		dump_vmcs(vcpu);
- 		vcpu->run->exit_reason = KVM_EXIT_FAIL_ENTRY;
- 		vcpu->run->fail_entry.hardware_entry_failure_reason
- 			= vmcs_read32(VM_INSTRUCTION_ERROR);
-@@ -6088,7 +6100,7 @@ static int __vmx_handle_exit(struct kvm_vcpu *vcpu, fastpath_t exit_fastpath)
- unexpected_vmexit:
- 	vcpu_unimpl(vcpu, "vmx: unexpected exit reason 0x%x\n",
- 		    exit_reason.full);
--	dump_vmcs();
-+	dump_vmcs(vcpu);
- 	vcpu->run->exit_reason = KVM_EXIT_INTERNAL_ERROR;
- 	vcpu->run->internal.suberror =
- 			KVM_INTERNAL_ERROR_UNEXPECTED_EXIT_REASON;
-diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
-index 89da5e1251f1..c35af2daa0bd 100644
---- a/arch/x86/kvm/vmx/vmx.h
-+++ b/arch/x86/kvm/vmx/vmx.h
-@@ -543,6 +543,6 @@ static inline bool vmx_guest_state_valid(struct kvm_vcpu *vcpu)
- 	return is_unrestricted_guest(vcpu) || __vmx_guest_state_valid(vcpu);
- }
- 
--void dump_vmcs(void);
-+void dump_vmcs(struct kvm_vcpu *vcpu);
- 
- #endif /* __KVM_X86_VMX_H */
+ 	pr_err("*** Control State ***\n");
+ 	pr_err("PinBased=%08x CPUBased=%08x SecondaryExec=%08x\n",
 -- 
 2.30.2
 
