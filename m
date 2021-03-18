@@ -2,27 +2,27 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1A02034018C
-	for <lists+kvm@lfdr.de>; Thu, 18 Mar 2021 10:13:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AF7BD3401A0
+	for <lists+kvm@lfdr.de>; Thu, 18 Mar 2021 10:15:13 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229787AbhCRJMZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 18 Mar 2021 05:12:25 -0400
-Received: from mail.kernel.org ([198.145.29.99]:57404 "EHLO mail.kernel.org"
+        id S229823AbhCRJOl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 18 Mar 2021 05:14:41 -0400
+Received: from mail.kernel.org ([198.145.29.99]:57674 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229705AbhCRJMW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 18 Mar 2021 05:12:22 -0400
+        id S229512AbhCRJOS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 18 Mar 2021 05:14:18 -0400
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 5AC7D64F2A;
-        Thu, 18 Mar 2021 09:12:22 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 79EAA64F18;
+        Thu, 18 Mar 2021 09:14:18 +0000 (UTC)
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.misterjones.org)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.94)
         (envelope-from <maz@kernel.org>)
-        id 1lMohY-002MgB-8H; Thu, 18 Mar 2021 09:12:20 +0000
-Date:   Thu, 18 Mar 2021 09:12:19 +0000
-Message-ID: <875z1oj05o.wl-maz@kernel.org>
+        id 1lMojQ-002MiV-KY; Thu, 18 Mar 2021 09:14:16 +0000
+Date:   Thu, 18 Mar 2021 09:14:15 +0000
+Message-ID: <874kh8j02g.wl-maz@kernel.org>
 From:   Marc Zyngier <maz@kernel.org>
 To:     Will Deacon <will@kernel.org>
 Cc:     kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
@@ -32,11 +32,11 @@ Cc:     kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
         Julien Thierry <julien.thierry.kdev@gmail.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
         broonie@kernel.org, kernel-team@android.com
-Subject: Re: [PATCH 09/10] KVM: arm64: Save/restore SVE state for nVHE
-In-Reply-To: <20210317175734.GA5713@willie-the-truck>
+Subject: Re: [PATCH 10/10] KVM: arm64: Enable SVE support for nVHE
+In-Reply-To: <20210317180017.GB5713@willie-the-truck>
 References: <20210316101312.102925-1-maz@kernel.org>
-        <20210316101312.102925-10-maz@kernel.org>
-        <20210317175734.GA5713@willie-the-truck>
+        <20210316101312.102925-11-maz@kernel.org>
+        <20210317180017.GB5713@willie-the-truck>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -50,57 +50,34 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 17 Mar 2021 17:57:35 +0000,
+On Wed, 17 Mar 2021 18:00:17 +0000,
 Will Deacon <will@kernel.org> wrote:
 > 
-> On Tue, Mar 16, 2021 at 10:13:11AM +0000, Marc Zyngier wrote:
-> > Implement the SVE save/restore for nVHE, following a similar
-> > logic to that of the VHE implementation:
+> On Tue, Mar 16, 2021 at 10:13:12AM +0000, Marc Zyngier wrote:
+> > From: Daniel Kiss <daniel.kiss@arm.com>
 > > 
-> > - the SVE state is switched on trap from EL1 to EL2
+> > Now that KVM is equipped to deal with SVE on nVHE, remove the code
+> > preventing it from being used as well as the bits of documentation
+> > that were mentioning the incompatibility.
 > > 
-> > - no further changes to ZCR_EL2 occur as long as the guest isn't
-> >   preempted or exit to userspace
-> > 
-> > - on vcpu_put(), ZCR_EL2 is reset to its default value, and ZCR_EL1
-> >   restored to the default guest value
-> > 
+> > Signed-off-by: Daniel Kiss <daniel.kiss@arm.com>
 > > Signed-off-by: Marc Zyngier <maz@kernel.org>
 > > ---
-> >  arch/arm64/kvm/fpsimd.c                 | 15 ++++++++--
-> >  arch/arm64/kvm/hyp/include/hyp/switch.h | 37 +++++++++----------------
-> >  arch/arm64/kvm/hyp/nvhe/switch.c        |  4 +--
-> >  3 files changed, 28 insertions(+), 28 deletions(-)
-> > 
-> > diff --git a/arch/arm64/kvm/fpsimd.c b/arch/arm64/kvm/fpsimd.c
-> > index b5f95abd23f5..cc6cdea69596 100644
-> > --- a/arch/arm64/kvm/fpsimd.c
-> > +++ b/arch/arm64/kvm/fpsimd.c
-> > @@ -121,11 +121,22 @@ void kvm_arch_vcpu_put_fp(struct kvm_vcpu *vcpu)
-> >  	local_irq_save(flags);
-> >  
-> >  	if (vcpu->arch.flags & KVM_ARM64_FP_ENABLED) {
-> > -		if (guest_has_sve)
-> > +		if (guest_has_sve) {
-> >  			__vcpu_sys_reg(vcpu, ZCR_EL1) = read_sysreg_el1(SYS_ZCR);
-> >  
-> > +			/* Restore the VL that was saved when bound to the CPU */
-> > +			if (!has_vhe()) {
-> > +				u64 zcr;
-> > +
-> > +				kvm_call_hyp(__kvm_reset_sve_vq);
+> >  arch/arm64/Kconfig                |  7 -------
+> >  arch/arm64/include/asm/kvm_host.h | 13 -------------
+> >  arch/arm64/kvm/arm.c              |  5 -----
+> >  arch/arm64/kvm/reset.c            |  4 ----
+> >  4 files changed, 29 deletions(-)
 > 
-> What would go wrong if we did this unconditionally on return to the host, or
-> is it just a performance thing to move work off the fast path where we
-> return back to the same vCPU?
+> Acked-by: Will Deacon <will@kernel.org>
+> 
+> I thought we might need to update the documentation too, but I couldn't
+> actually find anywhere that needed it when I looked.
 
-Nothing would go wrong, but we'd also need to re-adjust it on entry if
-the FPSIMD file is dirty, making it doubly painful on the fast path.
+I though as well we had something either in api.rst or sve.rst, but
+couldn't find anything either.
 
-Doing the reset on vcpu_put() ensures this is only done once, either
-on preemption or on return to userspace, at the expense of an EL2
-round trip. That's consistent with what we do in general for CPU state
-that doesn't directly affect the execution of the kernel.
+Thanks,
 
 	M.
 
