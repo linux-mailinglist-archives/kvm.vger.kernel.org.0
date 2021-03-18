@@ -2,93 +2,112 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DE3D133FCA6
-	for <lists+kvm@lfdr.de>; Thu, 18 Mar 2021 02:23:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6F5DF33FD5E
+	for <lists+kvm@lfdr.de>; Thu, 18 Mar 2021 03:45:50 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230185AbhCRBXZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 17 Mar 2021 21:23:25 -0400
-Received: from mail.kernel.org ([198.145.29.99]:60132 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229512AbhCRBWw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 17 Mar 2021 21:22:52 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPS id 3183B64F5E
-        for <kvm@vger.kernel.org>; Thu, 18 Mar 2021 01:22:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1616030572;
-        bh=t4jf2oRX+1pTbQ28haR+KVrY/u9mSWWExT6m90CdiiU=;
-        h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=KTEpobjhs/H8GEb06SqswaR4102nWGd18cUH/ZbW0BiE+bfj02Dkzg4wkZ4OE0u35
-         6izvI0jWvqgkhwMwnUZRtxY+00IthqAT204BlwvrkeAkziagKpID7i6kldh1zUXPby
-         rxDuGAc+zio8rJxi3rpI4sZNh6x/ogLD3AC8DaW5q8Y0NOtstv+s8RVKmR5H2INTg0
-         uCeHmyhqZ0fzjPa1kaP4kFWVinrbSOWgmHmaPZ1jSd5SSg5BrwI5ZfRlc5i9OtDkYE
-         A4Ehai6G6yEnV3rrn2HU2CF0npCbfiXFW0VapALYKZW0B3gNBkdpm5zx8G16BADYr0
-         flVJU02Z5zMOA==
-Received: by pdx-korg-bugzilla-2.web.codeaurora.org (Postfix, from userid 48)
-        id 27843653C7; Thu, 18 Mar 2021 01:22:52 +0000 (UTC)
-From:   bugzilla-daemon@bugzilla.kernel.org
-To:     kvm@vger.kernel.org
-Subject: [Bug 201753] AMD-Vi: Unable to write to IOMMU perf counter
-Date:   Thu, 18 Mar 2021 01:22:51 +0000
-X-Bugzilla-Reason: None
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Product: Virtualization
-X-Bugzilla-Component: kvm
-X-Bugzilla-Version: unspecified
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: kitchm@tutanota.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: cc
-Message-ID: <bug-201753-28872-RdZc6ZE6ap@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-201753-28872@https.bugzilla.kernel.org/>
-References: <bug-201753-28872@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        id S231149AbhCRCpR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 17 Mar 2021 22:45:17 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:55355 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230495AbhCRCos (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 17 Mar 2021 22:44:48 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1616035488;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=RYfa5a2DxRoWjWb7ZGXHEAtX1EgdbLByNOKHYZ6ZtLI=;
+        b=ZbF7JGZrycSWl1Rt0lV/Nr8/gGunT7yqqk/Y643KnAxlutoA9dn3s6MRr8KZr3BJ3yPSdI
+        mJ+zvuaI3Slu+E1Gq88BDyLEeXb1rUiuTRsI1HB5RHl4gE6MlwLOa/pmETHsyJMidUVXUI
+        nYBxEkWtZw5kOC9uF57zPBNL7tZW6oU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-573-lMa46TAUM-qfCQ9m7ytemQ-1; Wed, 17 Mar 2021 22:44:46 -0400
+X-MC-Unique: lMa46TAUM-qfCQ9m7ytemQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E6DA581744F;
+        Thu, 18 Mar 2021 02:44:44 +0000 (UTC)
+Received: from wangxiaodeMacBook-Air.local (ovpn-13-131.pek2.redhat.com [10.72.13.131])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id C163E503EE;
+        Thu, 18 Mar 2021 02:44:38 +0000 (UTC)
+Subject: Re: [PATCH V5 7/7] vDPA/ifcvf: deduce VIRTIO device ID from pdev ids
+To:     Zhu Lingshan <lingshan.zhu@intel.com>, mst@redhat.com,
+        lulu@redhat.com, leonro@nvidia.com
+Cc:     virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20210317094933.16417-1-lingshan.zhu@intel.com>
+ <20210317094933.16417-8-lingshan.zhu@intel.com>
+From:   Jason Wang <jasowang@redhat.com>
+Message-ID: <1ba4d913-b237-8faf-fec8-b844448c26f0@redhat.com>
+Date:   Thu, 18 Mar 2021 10:44:37 +0800
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.16; rv:78.0)
+ Gecko/20100101 Thunderbird/78.8.1
 MIME-Version: 1.0
+In-Reply-To: <20210317094933.16417-8-lingshan.zhu@intel.com>
+Content-Type: text/plain; charset=gbk; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D201753
 
-kitchm@tutanota.com changed:
+ÔÚ 2021/3/17 ÏÂÎç5:49, Zhu Lingshan Ð´µÀ:
+> This commit deduces the VIRTIO device ID of a probed
+> device from its pdev device ids.
+>
+> Signed-off-by: Zhu Lingshan <lingshan.zhu@intel.com>
+> ---
+>   drivers/vdpa/ifcvf/ifcvf_base.h |  1 +
+>   drivers/vdpa/ifcvf/ifcvf_main.c | 14 +++++++++++++-
+>   2 files changed, 14 insertions(+), 1 deletion(-)
+>
+> diff --git a/drivers/vdpa/ifcvf/ifcvf_base.h b/drivers/vdpa/ifcvf/ifcvf_base.h
+> index f77239fc1644..b2eeb16b9c2c 100644
+> --- a/drivers/vdpa/ifcvf/ifcvf_base.h
+> +++ b/drivers/vdpa/ifcvf/ifcvf_base.h
+> @@ -127,4 +127,5 @@ int ifcvf_verify_min_features(struct ifcvf_hw *hw, u64 features);
+>   u16 ifcvf_get_vq_state(struct ifcvf_hw *hw, u16 qid);
+>   int ifcvf_set_vq_state(struct ifcvf_hw *hw, u16 qid, u16 num);
+>   struct ifcvf_adapter *vf_to_adapter(struct ifcvf_hw *hw);
+> +int ifcvf_probed_virtio_net(struct ifcvf_hw *hw);
+>   #endif /* _IFCVF_H_ */
+> diff --git a/drivers/vdpa/ifcvf/ifcvf_main.c b/drivers/vdpa/ifcvf/ifcvf_main.c
+> index ea93ea7fd5df..9fade400b5a4 100644
+> --- a/drivers/vdpa/ifcvf/ifcvf_main.c
+> +++ b/drivers/vdpa/ifcvf/ifcvf_main.c
+> @@ -323,7 +323,19 @@ static u32 ifcvf_vdpa_get_generation(struct vdpa_device *vdpa_dev)
+>   
+>   static u32 ifcvf_vdpa_get_device_id(struct vdpa_device *vdpa_dev)
+>   {
+> -	return VIRTIO_ID_NET;
+> +	struct ifcvf_adapter *adapter = vdpa_to_adapter(vdpa_dev);
+> +	struct pci_dev *pdev = adapter->pdev;
+> +	u32 ret = -ENODEV;
+> +
+> +	if (pdev->device < 0x1000 || pdev->device > 0x107f)
+> +		return ret;
+> +
+> +	if (pdev->device < 0x1040)
+> +		ret =  pdev->subsystem_device;
+> +	else
+> +		ret =  pdev->device - 0x1040;
+> +
+> +	return ret;
+>   }
 
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-                 CC|                            |kitchm@tutanota.com
 
---- Comment #25 from kitchm@tutanota.com ---
-I do not know if this will help your testing, but I am using MSI 450-A Pro =
-and
-AMD Ryzen 3 2200G with Radeon Vega Graphics.  When booting into Debian 10 I
-have always seen the error message that states:
-"Unable to write to  IOMMU perf counter"
-It flashes at the top of the screen as the first item then goes away only t=
-o be
-rewritten at the top of the boot process steps.  It only last a moment and =
-then
-everything boots normally.
+It would be better to keep the comment.
 
-However, I just updated to the latest BIOS version and it hung at that point
-every time.  The BIOS version was Beta, so re-flashing to the older version
-solved the problem.  It is now back to its normal behavior.
+But anyway
 
-I'm not into manual kernel changes or configuring from source, so I'm sorry=
- if
-I can't help more.
+Acked-by: Jason Wang <jasowang@redhat.com>
 
-Hope this info helps your research, and thanks for it.  Keep up the great w=
-ork.
 
---=20
-You may reply to this email to add a comment.
 
-You are receiving this mail because:
-You are watching the assignee of the bug.=
+>   
+>   static u32 ifcvf_vdpa_get_vendor_id(struct vdpa_device *vdpa_dev)
+
