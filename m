@@ -2,27 +2,27 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BFDA03407D8
-	for <lists+kvm@lfdr.de>; Thu, 18 Mar 2021 15:30:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4CFA83407EA
+	for <lists+kvm@lfdr.de>; Thu, 18 Mar 2021 15:33:21 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231396AbhCRO3a (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 18 Mar 2021 10:29:30 -0400
-Received: from mail.kernel.org ([198.145.29.99]:43066 "EHLO mail.kernel.org"
+        id S231430AbhCROct (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 18 Mar 2021 10:32:49 -0400
+Received: from mail.kernel.org ([198.145.29.99]:43322 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231238AbhCRO3F (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 18 Mar 2021 10:29:05 -0400
+        id S231322AbhCROca (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 18 Mar 2021 10:32:30 -0400
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 619D964EE1;
-        Thu, 18 Mar 2021 14:29:05 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 720D164EFD;
+        Thu, 18 Mar 2021 14:32:30 +0000 (UTC)
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.misterjones.org)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.94)
         (envelope-from <maz@kernel.org>)
-        id 1lMte3-002Q6d-FD; Thu, 18 Mar 2021 14:29:03 +0000
-Date:   Thu, 18 Mar 2021 14:29:02 +0000
-Message-ID: <871rccilht.wl-maz@kernel.org>
+        id 1lMthM-002Q85-BE; Thu, 18 Mar 2021 14:32:28 +0000
+Date:   Thu, 18 Mar 2021 14:32:27 +0000
+Message-ID: <87zgz0h6ro.wl-maz@kernel.org>
 From:   Marc Zyngier <maz@kernel.org>
 To:     Will Deacon <will@kernel.org>
 Cc:     kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
@@ -33,11 +33,11 @@ Cc:     kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
         broonie@kernel.org, ascull@google.com, qperret@google.com,
         kernel-team@android.com
-Subject: Re: [PATCH v2 09/11] KVM: arm64: Trap host SVE accesses when the FPSIMD state is dirty
-In-Reply-To: <20210318141144.GE7055@willie-the-truck>
+Subject: Re: [PATCH v2 10/11] KVM: arm64: Save/restore SVE state for nVHE
+In-Reply-To: <20210318141358.GF7055@willie-the-truck>
 References: <20210318122532.505263-1-maz@kernel.org>
-        <20210318122532.505263-10-maz@kernel.org>
-        <20210318141144.GE7055@willie-the-truck>
+        <20210318122532.505263-11-maz@kernel.org>
+        <20210318141358.GF7055@willie-the-truck>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -51,21 +51,56 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 18 Mar 2021 14:11:44 +0000,
+On Thu, 18 Mar 2021 14:13:58 +0000,
 Will Deacon <will@kernel.org> wrote:
 > 
-> On Thu, Mar 18, 2021 at 12:25:30PM +0000, Marc Zyngier wrote:
-> > ZCR_EL2 controls the upper bound for ZCR_EL1, and is set to
-> > a potentially lower limit when the guest uses SVE. In order
-> > to restore the SVE state on the EL1 host, we must first
-> > reset ZCR_EL2 to its original value.
+> On Thu, Mar 18, 2021 at 12:25:31PM +0000, Marc Zyngier wrote:
+> > Implement the SVE save/restore for nVHE, following a similar
+> > logic to that of the VHE implementation:
 > > 
-> > To make it as lazy as possible on the EL1 host side, set
-> > the SVE trapping in place when returning exiting from
+> > - the SVE state is switched on trap from EL1 to EL2
+> > 
+> > - no further changes to ZCR_EL2 occur as long as the guest isn't
+> >   preempted or exit to userspace
+> > 
+> > - ZCR_EL2 is reset to its default value on the first SVE access from
+> >   the host EL1, and ZCR_EL1 restored to the default guest value in
+> >   vcpu_put()
+> > 
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> >  arch/arm64/kvm/fpsimd.c                 | 10 +++++--
+> >  arch/arm64/kvm/hyp/include/hyp/switch.h | 37 +++++++++----------------
+> >  arch/arm64/kvm/hyp/nvhe/switch.c        |  4 +--
+> >  3 files changed, 23 insertions(+), 28 deletions(-)
+> > 
+> > diff --git a/arch/arm64/kvm/fpsimd.c b/arch/arm64/kvm/fpsimd.c
+> > index 14ea05c5134a..5621020b28de 100644
+> > --- a/arch/arm64/kvm/fpsimd.c
+> > +++ b/arch/arm64/kvm/fpsimd.c
+> > @@ -121,11 +121,17 @@ void kvm_arch_vcpu_put_fp(struct kvm_vcpu *vcpu)
+> >  	local_irq_save(flags);
+> >  
+> >  	if (vcpu->arch.flags & KVM_ARM64_FP_ENABLED) {
+> > -		if (guest_has_sve)
+> > +		if (guest_has_sve) {
+> >  			__vcpu_sys_reg(vcpu, ZCR_EL1) = read_sysreg_el1(SYS_ZCR);
+> >  
+> > +			/* Restore the VL that was saved when bound to the CPU */
+> > +			if (!has_vhe())
+> > +				sve_cond_update_zcr_vq(vcpu_sve_max_vq(vcpu) - 1,
+> > +						       SYS_ZCR_EL1);
 > 
-> "returning exiting"?
+> You end up reading ZCR_EL1 twice here, but it's probably not the end of the
+> world.
 
-Meh. Kept the latter.
+True, but I'd expect read accesses to ZCR_EL1 to be reasonably fast,
+something we can't expect from writes.
+
+> 
+> Anyway:
+> 
+> Acked-by: Will Deacon <will@kernel.org>
 
 Thanks,
 
