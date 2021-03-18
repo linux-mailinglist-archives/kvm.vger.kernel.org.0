@@ -2,39 +2,39 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 485B633FDC2
-	for <lists+kvm@lfdr.de>; Thu, 18 Mar 2021 04:25:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A5BB833FDDC
+	for <lists+kvm@lfdr.de>; Thu, 18 Mar 2021 04:33:38 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230458AbhCRDYr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 17 Mar 2021 23:24:47 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:49417 "EHLO
+        id S230478AbhCRDdA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 17 Mar 2021 23:33:00 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:49867 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230493AbhCRDY1 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 17 Mar 2021 23:24:27 -0400
+        by vger.kernel.org with ESMTP id S229702AbhCRDcZ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 17 Mar 2021 23:32:25 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1616037866;
+        s=mimecast20190719; t=1616038344;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=Sk99JE96HUPSTLu/4JDMtH8mhmtCcHHNeKecLnAG+NE=;
-        b=hbkEy4e4gzO0lf3fZMdx+5koTXY+AYY0cZMug/uzBGRp7FlHV84W0ZAIUbbeFAUKJ+8Mh/
-        /KQc3B28+nIoBYysnNEnS8QHO1cHBpakrtKhvAtIIbWKXpkruI8wbokdb+UarGwl4CacBN
-        NjVsV9LZL7M2AcS/5IZkev/BdHRMi4Y=
+        bh=jLTPt0xOZQl9IIcVBTaP1P5SgdeBnCH6KEmvNhfyD0k=;
+        b=AEgF7MEhf4DplFSfJ8eT+AI25s1ztyeJ534JLSgNSs+oEOI0K3HXd+sIPg0HKg5Cm7hzeo
+        7yZ5u1fszkvA0VGWQbI+YodlRkwVUPufyDskjjVsCamwoz5WpPi5d39dtFjPcI6ctmE6ti
+        lIDCEWtGWDzOOZBUIhEiUcFCtglfVWM=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-444-9PzC1WQ9N_6YW8Wemxs-EQ-1; Wed, 17 Mar 2021 23:24:25 -0400
-X-MC-Unique: 9PzC1WQ9N_6YW8Wemxs-EQ-1
+ us-mta-211-e1GUImQ-P96rYKksfeWs3g-1; Wed, 17 Mar 2021 23:32:22 -0400
+X-MC-Unique: e1GUImQ-P96rYKksfeWs3g-1
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7641B81744F;
-        Thu, 18 Mar 2021 03:24:23 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 846D31084C83;
+        Thu, 18 Mar 2021 03:32:20 +0000 (UTC)
 Received: from wangxiaodeMacBook-Air.local (ovpn-13-131.pek2.redhat.com [10.72.13.131])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 192966C330;
-        Thu, 18 Mar 2021 03:24:06 +0000 (UTC)
-Subject: Re: [PATCH v4 10/14] vhost/vdpa: Remove the restriction that only
- supports virtio-net devices
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 923922B431;
+        Thu, 18 Mar 2021 03:31:58 +0000 (UTC)
+Subject: Re: [PATCH v4 14/14] vdpa_sim_blk: add support for vdpa management
+ tool
 To:     Stefano Garzarella <sgarzare@redhat.com>,
         virtualization@lists.linux-foundation.org
 Cc:     netdev@vger.kernel.org, Xie Yongji <xieyongji@bytedance.com>,
@@ -44,14 +44,14 @@ Cc:     netdev@vger.kernel.org, Xie Yongji <xieyongji@bytedance.com>,
         Parav Pandit <parav@nvidia.com>,
         "Michael S. Tsirkin" <mst@redhat.com>, kvm@vger.kernel.org
 References: <20210315163450.254396-1-sgarzare@redhat.com>
- <20210315163450.254396-11-sgarzare@redhat.com>
+ <20210315163450.254396-15-sgarzare@redhat.com>
 From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <011fb2bf-bee5-7fb6-0abc-17ddf7026476@redhat.com>
-Date:   Thu, 18 Mar 2021 11:24:05 +0800
+Message-ID: <94bb9e5a-a1b9-2e0d-d5ec-c6a3eaebea88@redhat.com>
+Date:   Thu, 18 Mar 2021 11:31:54 +0800
 User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.16; rv:78.0)
  Gecko/20100101 Thunderbird/78.8.1
 MIME-Version: 1.0
-In-Reply-To: <20210315163450.254396-11-sgarzare@redhat.com>
+In-Reply-To: <20210315163450.254396-15-sgarzare@redhat.com>
 Content-Type: text/plain; charset=gbk; format=flowed
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
@@ -61,16 +61,35 @@ X-Mailing-List: kvm@vger.kernel.org
 
 
 ÔÚ 2021/3/16 ÉÏÎç12:34, Stefano Garzarella Ð´µÀ:
-> From: Xie Yongji <xieyongji@bytedance.com>
+> Enable the user to create vDPA block simulator devices using the
+> vdpa management tool:
 >
-> Since the config checks are done by the vDPA drivers, we can remove the
-> virtio-net restriction and we should be able to support all kinds of
-> virtio devices.
+>      # Show vDPA supported devices
+>      $ vdpa mgmtdev show
+>      vdpasim_blk:
+>        supported_classes block
 >
-> <linux/virtio_net.h> is not needed anymore, but we need to include
-> <linux/slab.h> to avoid compilation failures.
+>      # Create a vDPA block device named as 'blk0' from the management
+>      # device vdpasim:
+>      $ vdpa dev add mgmtdev vdpasim_blk name blk0
 >
-> Signed-off-by: Xie Yongji <xieyongji@bytedance.com>
+>      # Show the info of the 'blk0' device just created
+>      $ vdpa dev show blk0 -jp
+>      {
+>          "dev": {
+>              "blk0": {
+>                  "type": "block",
+>                  "mgmtdev": "vdpasim_blk",
+>                  "vendor_id": 0,
+>                  "max_vqs": 1,
+>                  "max_vq_size": 256
+>              }
+>          }
+>      }
+>
+>      # Delete the vDPA device after its use
+>      $ vdpa dev del blk0
+>
 > Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
 
 
@@ -78,36 +97,124 @@ Acked-by: Jason Wang <jasowang@redhat.com>
 
 
 > ---
->   drivers/vhost/vdpa.c | 6 +-----
->   1 file changed, 1 insertion(+), 5 deletions(-)
+>   drivers/vdpa/vdpa_sim/vdpa_sim_blk.c | 76 +++++++++++++++++++++++-----
+>   1 file changed, 63 insertions(+), 13 deletions(-)
 >
-> diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
-> index 7ae4080e57d8..850ed4b62942 100644
-> --- a/drivers/vhost/vdpa.c
-> +++ b/drivers/vhost/vdpa.c
-> @@ -16,12 +16,12 @@
->   #include <linux/cdev.h>
->   #include <linux/device.h>
->   #include <linux/mm.h>
-> +#include <linux/slab.h>
->   #include <linux/iommu.h>
->   #include <linux/uuid.h>
->   #include <linux/vdpa.h>
->   #include <linux/nospec.h>
->   #include <linux/vhost.h>
-> -#include <linux/virtio_net.h>
+> diff --git a/drivers/vdpa/vdpa_sim/vdpa_sim_blk.c b/drivers/vdpa/vdpa_sim/vdpa_sim_blk.c
+> index 643ae3bc62c0..5bfe1c281645 100644
+> --- a/drivers/vdpa/vdpa_sim/vdpa_sim_blk.c
+> +++ b/drivers/vdpa/vdpa_sim/vdpa_sim_blk.c
+> @@ -37,7 +37,6 @@
+>   #define VDPASIM_BLK_SEG_MAX	32
+>   #define VDPASIM_BLK_VQ_NUM	1
 >   
->   #include "vhost.h"
+> -static struct vdpasim *vdpasim_blk_dev;
+>   static char vdpasim_blk_id[VIRTIO_BLK_ID_BYTES] = "vdpa_blk_sim";
 >   
-> @@ -1018,10 +1018,6 @@ static int vhost_vdpa_probe(struct vdpa_device *vdpa)
->   	int minor;
->   	int r;
+>   static bool vdpasim_blk_check_range(u64 start_sector, size_t range_size)
+> @@ -241,11 +240,23 @@ static void vdpasim_blk_get_config(struct vdpasim *vdpasim, void *config)
+>   	blk_config->blk_size = cpu_to_vdpasim32(vdpasim, SECTOR_SIZE);
+>   }
 >   
-> -	/* Currently, we only accept the network devices. */
-> -	if (ops->get_device_id(vdpa) != VIRTIO_ID_NET)
-> -		return -ENOTSUPP;
-> -
->   	v = kzalloc(sizeof(*v), GFP_KERNEL | __GFP_RETRY_MAYFAIL);
->   	if (!v)
->   		return -ENOMEM;
+> -static int __init vdpasim_blk_init(void)
+> +static void vdpasim_blk_mgmtdev_release(struct device *dev)
+> +{
+> +}
+> +
+> +static struct device vdpasim_blk_mgmtdev = {
+> +	.init_name = "vdpasim_blk",
+> +	.release = vdpasim_blk_mgmtdev_release,
+> +};
+> +
+> +static int vdpasim_blk_dev_add(struct vdpa_mgmt_dev *mdev, const char *name)
+>   {
+>   	struct vdpasim_dev_attr dev_attr = {};
+> +	struct vdpasim *simdev;
+>   	int ret;
+>   
+> +	dev_attr.mgmt_dev = mdev;
+> +	dev_attr.name = name;
+>   	dev_attr.id = VIRTIO_ID_BLOCK;
+>   	dev_attr.supported_features = VDPASIM_BLK_FEATURES;
+>   	dev_attr.nvqs = VDPASIM_BLK_VQ_NUM;
+> @@ -254,29 +265,68 @@ static int __init vdpasim_blk_init(void)
+>   	dev_attr.work_fn = vdpasim_blk_work;
+>   	dev_attr.buffer_size = VDPASIM_BLK_CAPACITY << SECTOR_SHIFT;
+>   
+> -	vdpasim_blk_dev = vdpasim_create(&dev_attr);
+> -	if (IS_ERR(vdpasim_blk_dev)) {
+> -		ret = PTR_ERR(vdpasim_blk_dev);
+> -		goto out;
+> -	}
+> +	simdev = vdpasim_create(&dev_attr);
+> +	if (IS_ERR(simdev))
+> +		return PTR_ERR(simdev);
+>   
+> -	ret = vdpa_register_device(&vdpasim_blk_dev->vdpa, VDPASIM_BLK_VQ_NUM);
+> +	ret = _vdpa_register_device(&simdev->vdpa, VDPASIM_BLK_VQ_NUM);
+>   	if (ret)
+>   		goto put_dev;
+>   
+>   	return 0;
+>   
+>   put_dev:
+> -	put_device(&vdpasim_blk_dev->vdpa.dev);
+> -out:
+> +	put_device(&simdev->vdpa.dev);
+>   	return ret;
+>   }
+>   
+> -static void __exit vdpasim_blk_exit(void)
+> +static void vdpasim_blk_dev_del(struct vdpa_mgmt_dev *mdev,
+> +				struct vdpa_device *dev)
+>   {
+> -	struct vdpa_device *vdpa = &vdpasim_blk_dev->vdpa;
+> +	struct vdpasim *simdev = container_of(dev, struct vdpasim, vdpa);
+> +
+> +	_vdpa_unregister_device(&simdev->vdpa);
+> +}
+> +
+> +static const struct vdpa_mgmtdev_ops vdpasim_blk_mgmtdev_ops = {
+> +	.dev_add = vdpasim_blk_dev_add,
+> +	.dev_del = vdpasim_blk_dev_del
+> +};
+>   
+> -	vdpa_unregister_device(vdpa);
+> +static struct virtio_device_id id_table[] = {
+> +	{ VIRTIO_ID_BLOCK, VIRTIO_DEV_ANY_ID },
+> +	{ 0 },
+> +};
+> +
+> +static struct vdpa_mgmt_dev mgmt_dev = {
+> +	.device = &vdpasim_blk_mgmtdev,
+> +	.id_table = id_table,
+> +	.ops = &vdpasim_blk_mgmtdev_ops,
+> +};
+> +
+> +static int __init vdpasim_blk_init(void)
+> +{
+> +	int ret;
+> +
+> +	ret = device_register(&vdpasim_blk_mgmtdev);
+> +	if (ret)
+> +		return ret;
+> +
+> +	ret = vdpa_mgmtdev_register(&mgmt_dev);
+> +	if (ret)
+> +		goto parent_err;
+> +
+> +	return 0;
+> +
+> +parent_err:
+> +	device_unregister(&vdpasim_blk_mgmtdev);
+> +	return ret;
+> +}
+> +
+> +static void __exit vdpasim_blk_exit(void)
+> +{
+> +	vdpa_mgmtdev_unregister(&mgmt_dev);
+> +	device_unregister(&vdpasim_blk_mgmtdev);
+>   }
+>   
+>   module_init(vdpasim_blk_init)
 
