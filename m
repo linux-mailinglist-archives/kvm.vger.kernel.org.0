@@ -2,104 +2,167 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 47D0F3401FC
-	for <lists+kvm@lfdr.de>; Thu, 18 Mar 2021 10:25:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2613D340219
+	for <lists+kvm@lfdr.de>; Thu, 18 Mar 2021 10:33:14 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229843AbhCRJZD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 18 Mar 2021 05:25:03 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:52024 "EHLO
+        id S229646AbhCRJcm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 18 Mar 2021 05:32:42 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:28682 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229927AbhCRJYi (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 18 Mar 2021 05:24:38 -0400
+        by vger.kernel.org with ESMTP id S229736AbhCRJcf (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 18 Mar 2021 05:32:35 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1616059478;
+        s=mimecast20190719; t=1616059948;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=nykiyaeCBaGeYOGatXJD1GHSD/9h0gHc7oJWiCYB0Xs=;
-        b=FktoBDO5YE2lZwVi+NOwIFS9ppnq8xWXZbL9gZzFbASwp9XEAfuiaRT3d558enuEokVhlY
-        WOF314Jg1sXJjfgPxJ3dTPwnjetrXaJ9vBdYqjAXvY2UMHKxffVuTsWviwhDznc3ots7MB
-        E6JR9/84O+ZcgnKButm1NMICeB/Ix+Y=
+        bh=hzmvOFYyhdKH4Hq1n07t/xm6UA0pgEWz5UpHRQtMk/w=;
+        b=iP/6/z9fo4dfqA7RO0JCTCoY49kwkSxmQp4dkx1F1BHYLQUlU6gCi1AVLKMIyp/+BGdu0L
+        wFjJsN89UrEhdscKx1H2b3O/PlYDGAKIsEbHg+fWWDZRa7UNtMb+ynuVE8F/as42wEYNzc
+        tyXH6ZBhoyaRzA7VpAil6OlOqe/zJlQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-20-LJKfGCoxN-KNvB0lGcxgKQ-1; Thu, 18 Mar 2021 05:24:34 -0400
-X-MC-Unique: LJKfGCoxN-KNvB0lGcxgKQ-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+ us-mta-342-S78n606HPXCgPGoECDAaTw-1; Thu, 18 Mar 2021 05:32:24 -0400
+X-MC-Unique: S78n606HPXCgPGoECDAaTw-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 836A41084C83;
-        Thu, 18 Mar 2021 09:24:32 +0000 (UTC)
-Received: from starship (unknown [10.35.206.84])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 305C010013C1;
-        Thu, 18 Mar 2021 09:24:26 +0000 (UTC)
-Message-ID: <8ba6676471dc8c8219e35d6a1695febaea20bb0b.camel@redhat.com>
-Subject: Re: [PATCH 3/3] KVM: SVM: allow to intercept all exceptions for
- debug
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Joerg Roedel <joro@8bytes.org>
-Cc:     kvm@vger.kernel.org, Vitaly Kuznetsov <vkuznets@redhat.com>,
-        linux-kernel@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Kieran Bingham <kbingham@kernel.org>,
-        Jessica Yu <jeyu@kernel.org>,
-        Jan Kiszka <jan.kiszka@siemens.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
-        Sean Christopherson <seanjc@google.com>,
-        Jim Mattson <jmattson@google.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@suse.de>
-Date:   Thu, 18 Mar 2021 11:24:25 +0200
-In-Reply-To: <YFMbLWLlGgbOJuN/@8bytes.org>
-References: <20210315221020.661693-1-mlevitsk@redhat.com>
-         <20210315221020.661693-4-mlevitsk@redhat.com> <YFBtI55sVzIJ15U+@8bytes.org>
-         <4116d6ce75a85faccfe7a2b3967528f0561974ae.camel@redhat.com>
-         <YFMbLWLlGgbOJuN/@8bytes.org>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C96FA10866A0;
+        Thu, 18 Mar 2021 09:32:22 +0000 (UTC)
+Received: from [10.36.112.6] (ovpn-112-6.ams2.redhat.com [10.36.112.6])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 3AE0217D04;
+        Thu, 18 Mar 2021 09:32:15 +0000 (UTC)
+Subject: Re: [PATCH v2 01/14] vfio: Remove extra put/gets around
+ vfio_device->group
+To:     Jason Gunthorpe <jgg@nvidia.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org
+Cc:     "Raj, Ashok" <ashok.raj@intel.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Christoph Hellwig <hch@lst.de>,
+        Leon Romanovsky <leonro@nvidia.com>,
+        Max Gurtovoy <mgurtovoy@nvidia.com>,
+        Tarun Gupta <targupta@nvidia.com>
+References: <1-v2-20d933792272+4ff-vfio1_jgg@nvidia.com>
+From:   Auger Eric <eric.auger@redhat.com>
+Message-ID: <c5551f77-3071-06bc-ff15-1c606185c9ee@redhat.com>
+Date:   Thu, 18 Mar 2021 10:32:13 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.7.0
 MIME-Version: 1.0
+In-Reply-To: <1-v2-20d933792272+4ff-vfio1_jgg@nvidia.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 2021-03-18 at 10:19 +0100, Joerg Roedel wrote:
-> On Tue, Mar 16, 2021 at 12:51:20PM +0200, Maxim Levitsky wrote:
-> > I agree but what is wrong with that? 
-> > This is a debug feature, and it only can be enabled by the root,
-> > and so someone might actually want this case to happen
-> > (e.g to see if a SEV guest can cope with extra #VC exceptions).
-> 
-> That doesn't make sense, we know that and SEV-ES guest can't cope with
-> extra #VC exceptions, so there is no point in testing this. It is more a
-> way to shot oneself into the foot for the user and a potential source of
-> bug reports for SEV-ES guests.
+Hi Jason,
 
-But again this is a debug feature, and it is intended to allow the user
-to shoot himself in the foot. Bug reports for a debug feature
-are autoclosed. It is no different from say poking kernel memory with
-its built-in gdbstub, for example.
+On 3/13/21 1:55 AM, Jason Gunthorpe wrote:
+> The vfio_device->group value has a get obtained during
+> vfio_add_group_dev() which gets moved from the stack to vfio_device->group
+> in vfio_group_create_device().
+> 
+> The reference remains until we reach the end of vfio_del_group_dev() when
+> it is put back.
+> 
+> Thus anything that already has a kref on the vfio_device is guaranteed a
+> valid group pointer. Remove all the extra reference traffic.
+> 
+> It is tricky to see, but the get at the start of vfio_del_group_dev() is
+> actually pairing with the put hidden inside vfio_device_put() a few lines
+> below.
+> 
+> A later patch merges vfio_group_create_device() into vfio_add_group_dev()
+> which makes the ownership and error flow on the create side easier to
+> follow.
+> 
+> Reviewed-by: Christoph Hellwig <hch@lst.de>
+> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
 
-Best regards,
-	Maxim Levitsky
+Thanks
 
-> 
-> 
-> > I have nothing against not allowing this for SEV-ES guests though.
-> > What do you think?
-> 
-> I think SEV-ES guests should only have the intercept bits set which
-> guests acutally support
+Eric
 
+> ---
+>  drivers/vfio/vfio.c | 21 ++-------------------
+>  1 file changed, 2 insertions(+), 19 deletions(-)
 > 
-> Regards,
+> diff --git a/drivers/vfio/vfio.c b/drivers/vfio/vfio.c
+> index 38779e6fd80cb4..15d8e678e5563a 100644
+> --- a/drivers/vfio/vfio.c
+> +++ b/drivers/vfio/vfio.c
+> @@ -546,14 +546,12 @@ struct vfio_device *vfio_group_create_device(struct vfio_group *group,
+>  
+>  	kref_init(&device->kref);
+>  	device->dev = dev;
+> +	/* Our reference on group is moved to the device */
+>  	device->group = group;
+>  	device->ops = ops;
+>  	device->device_data = device_data;
+>  	dev_set_drvdata(dev, device);
+>  
+> -	/* No need to get group_lock, caller has group reference */
+> -	vfio_group_get(group);
+> -
+>  	mutex_lock(&group->device_lock);
+>  	list_add(&device->group_next, &group->device_list);
+>  	group->dev_counter++;
+> @@ -585,13 +583,11 @@ void vfio_device_put(struct vfio_device *device)
+>  {
+>  	struct vfio_group *group = device->group;
+>  	kref_put_mutex(&device->kref, vfio_device_release, &group->device_lock);
+> -	vfio_group_put(group);
+>  }
+>  EXPORT_SYMBOL_GPL(vfio_device_put);
+>  
+>  static void vfio_device_get(struct vfio_device *device)
+>  {
+> -	vfio_group_get(device->group);
+>  	kref_get(&device->kref);
+>  }
+>  
+> @@ -841,14 +837,6 @@ int vfio_add_group_dev(struct device *dev,
+>  		vfio_group_put(group);
+>  		return PTR_ERR(device);
+>  	}
+> -
+> -	/*
+> -	 * Drop all but the vfio_device reference.  The vfio_device holds
+> -	 * a reference to the vfio_group, which holds a reference to the
+> -	 * iommu_group.
+> -	 */
+> -	vfio_group_put(group);
+> -
+>  	return 0;
+>  }
+>  EXPORT_SYMBOL_GPL(vfio_add_group_dev);
+> @@ -928,12 +916,6 @@ void *vfio_del_group_dev(struct device *dev)
+>  	unsigned int i = 0;
+>  	bool interrupted = false;
+>  
+> -	/*
+> -	 * The group exists so long as we have a device reference.  Get
+> -	 * a group reference and use it to scan for the device going away.
+> -	 */
+> -	vfio_group_get(group);
+> -
+>  	/*
+>  	 * When the device is removed from the group, the group suddenly
+>  	 * becomes non-viable; the device has a driver (until the unbind
+> @@ -1008,6 +990,7 @@ void *vfio_del_group_dev(struct device *dev)
+>  	if (list_empty(&group->device_list))
+>  		wait_event(group->container_q, !group->container);
+>  
+> +	/* Matches the get in vfio_group_create_device() */
+>  	vfio_group_put(group);
+>  
+>  	return device_data;
 > 
-> 	Joerg
-> 
-
 
