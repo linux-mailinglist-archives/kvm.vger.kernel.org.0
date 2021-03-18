@@ -2,64 +2,83 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1CCD7340CDD
-	for <lists+kvm@lfdr.de>; Thu, 18 Mar 2021 19:24:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 229C4340D04
+	for <lists+kvm@lfdr.de>; Thu, 18 Mar 2021 19:31:57 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232523AbhCRSYW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 18 Mar 2021 14:24:22 -0400
-Received: from mail.kernel.org ([198.145.29.99]:40598 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232440AbhCRSYM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 18 Mar 2021 14:24:12 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPS id A5A7D64F1D;
-        Thu, 18 Mar 2021 18:24:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1616091851;
-        bh=mm5Gj2cRzymNcWhINozh1pQMZ8f06QUkUYUCX5wN1zQ=;
-        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-        b=B5G9Nw7oh0SL8uCt7TnQRKu0AEzIPKfSfK09VntyzyU2POAnVxFpSfpXF1b422qBw
-         clJSwBHwJe+YjmnbAO8JXaUTZggOXhQJw8QOsPE/GAtmjY94tdjSF/nyWB0Dtw7AVh
-         6cigBZqpvdLdNJ5fqXHOiKP0EBzggCgei7vcgeRuBP+2fwTJsCmzZUjjrAbYCvh5u9
-         ORQhgCkBjkQMFB3eyCCrI1GXX61JUWF69GWaGeXM+tGWSgZ/TX2ySXStJvSOhvd+tA
-         zOabVCrcoVkFltxCxEoB0UPh9NKLzpWflay/zbVhQZidpH4DL4d44HQFz8afjua1gK
-         KrB87wpGxDtVw==
-Received: from pdx-korg-docbuild-2.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by pdx-korg-docbuild-2.ci.codeaurora.org (Postfix) with ESMTP id 9F42360191;
-        Thu, 18 Mar 2021 18:24:11 +0000 (UTC)
-Subject: Re: [GIT PULL] vhost: cleanups and fixes
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <20210318141135-mutt-send-email-mst@kernel.org>
-References: <20210318141135-mutt-send-email-mst@kernel.org>
-X-PR-Tracked-List-Id: <stable.vger.kernel.org>
-X-PR-Tracked-Message-Id: <20210318141135-mutt-send-email-mst@kernel.org>
-X-PR-Tracked-Remote: https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
-X-PR-Tracked-Commit-Id: 0bde59c1723a29e294765c96dbe5c7fb639c2f96
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: bf152b0b41dc141c8d32eb6e974408f5804f4d00
-Message-Id: <161609185164.1841.2155981862734069676.pr-tracker-bot@kernel.org>
-Date:   Thu, 18 Mar 2021 18:24:11 +0000
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        gdawar.xilinx@gmail.com, jasowang@redhat.com,
-        lingshan.zhu@intel.com, lvivier@redhat.com, mst@redhat.com,
-        parav@nvidia.com, sgarzare@redhat.com, stable@vger.kernel.org,
-        tangbin@cmss.chinamobile.com, xianting_tian@126.com
+        id S230164AbhCRSbZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 18 Mar 2021 14:31:25 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:27146 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231590AbhCRSbR (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 18 Mar 2021 14:31:17 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1616092276;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=0mw/nf+8C6A4qj8FRDm7YP6EnE67XsUZD9T0VjBOeds=;
+        b=Ugud/K9WhLbutfzY03Sj6dbcYqtt0kFeE9Ln12dPMR0fybL0i9Go+Sxlvlx1UTabZE/fD5
+        3pVizKHMjmFzt1/YOCO3QVhHEfC+wJp0fWNpPIMjZXPh/Kvj4SfZS6Wra/kGH+gmEdqF43
+        BIkYtGu+hGd1kbNk/o9i6OzN/TFiIrY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-330-_3Zb7MdKMvmHMTN_EGnyFw-1; Thu, 18 Mar 2021 14:31:14 -0400
+X-MC-Unique: _3Zb7MdKMvmHMTN_EGnyFw-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6D3C91034B34;
+        Thu, 18 Mar 2021 18:31:13 +0000 (UTC)
+Received: from fuller.cnet (ovpn-112-2.gru2.redhat.com [10.97.112.2])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 055A860CD7;
+        Thu, 18 Mar 2021 18:31:13 +0000 (UTC)
+Received: by fuller.cnet (Postfix, from userid 1000)
+        id 75D704188684; Thu, 18 Mar 2021 15:30:42 -0300 (-03)
+Date:   Thu, 18 Mar 2021 15:30:42 -0300
+From:   Marcelo Tosatti <mtosatti@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org,
+        Sean Christopherson <seanjc@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>
+Subject: Re: [PATCH v2 2/4] KVM: x86: hyper-v: Prevent using not-yet-updated
+ TSC page by secondary CPUs
+Message-ID: <20210318183042.GA42884@fuller.cnet>
+References: <20210316143736.964151-1-vkuznets@redhat.com>
+ <20210316143736.964151-3-vkuznets@redhat.com>
+ <20210318170208.GB36190@fuller.cnet>
+ <20210318180446.GA41953@fuller.cnet>
+ <5634f6c9-bee9-ae07-c8ce-8e79bd2bd1a7@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <5634f6c9-bee9-ae07-c8ce-8e79bd2bd1a7@redhat.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The pull request you sent on Thu, 18 Mar 2021 14:11:35 -0400:
+On Thu, Mar 18, 2021 at 07:05:49PM +0100, Paolo Bonzini wrote:
+> On 18/03/21 19:04, Marcelo Tosatti wrote:
+> > > 
+> > > Not clear why this is necessary, if the choice was to not touch TSC page
+> > > at all, when invariant TSC is supported on the host...
+> > 	
+> > 	s/invariant TSC/TSC scaling/
+> > 
+> > > Ah, OK, this is not for the migration with iTSC on destination case,
+> > > but any call to kvm_gen_update_masterclock, correct?
+> 
+> Yes, any update can be racy.
+> 
+> Paolo
 
-> https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
+Which makes an unrelated KVM_REQ_MASTERCLOCK_UPDATE -> kvm_gen_update_masterclock 
+sequence to inadvertedly reduce performance a possibility, unless i am
+missing something.
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/bf152b0b41dc141c8d32eb6e974408f5804f4d00
+Ah, OK, it should be enabled again at KVM_REQ_CLOCK_UPDATE.
 
-Thank you!
+Nevermind, then.
 
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
