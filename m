@@ -2,112 +2,210 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6F5DF33FD5E
-	for <lists+kvm@lfdr.de>; Thu, 18 Mar 2021 03:45:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id ECBA933FDBB
+	for <lists+kvm@lfdr.de>; Thu, 18 Mar 2021 04:22:39 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231149AbhCRCpR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 17 Mar 2021 22:45:17 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:55355 "EHLO
+        id S231304AbhCRDWG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 17 Mar 2021 23:22:06 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:41049 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230495AbhCRCos (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 17 Mar 2021 22:44:48 -0400
+        by vger.kernel.org with ESMTP id S230458AbhCRDV5 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 17 Mar 2021 23:21:57 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1616035488;
+        s=mimecast20190719; t=1616037713;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=RYfa5a2DxRoWjWb7ZGXHEAtX1EgdbLByNOKHYZ6ZtLI=;
-        b=ZbF7JGZrycSWl1Rt0lV/Nr8/gGunT7yqqk/Y643KnAxlutoA9dn3s6MRr8KZr3BJ3yPSdI
-        mJ+zvuaI3Slu+E1Gq88BDyLEeXb1rUiuTRsI1HB5RHl4gE6MlwLOa/pmETHsyJMidUVXUI
-        nYBxEkWtZw5kOC9uF57zPBNL7tZW6oU=
+        bh=5BT+nyobozNFdq5yfy7SyD1H7/XRWbsPpCZgxk5rh1U=;
+        b=XgisLkuLWuzteGJARcJ1ww5Jcqcs0pjPDugz1Q++lMS0G2ESTVUdUXRy5yCX0FvaBEIEuN
+        JJHVycHggJ/VtFEj4O46EkkBq4QpEWfW6vo5fYs53A/pLJEbV/b/RVMbqRy9vqFaIhaMgM
+        xulDi4FZo6unFRwJF6CPOWwkziuNbgQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-573-lMa46TAUM-qfCQ9m7ytemQ-1; Wed, 17 Mar 2021 22:44:46 -0400
-X-MC-Unique: lMa46TAUM-qfCQ9m7ytemQ-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+ us-mta-335-1ZSKFoxxP1CgTNolxexCQg-1; Wed, 17 Mar 2021 23:21:51 -0400
+X-MC-Unique: 1ZSKFoxxP1CgTNolxexCQg-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E6DA581744F;
-        Thu, 18 Mar 2021 02:44:44 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7460C81620;
+        Thu, 18 Mar 2021 03:21:49 +0000 (UTC)
 Received: from wangxiaodeMacBook-Air.local (ovpn-13-131.pek2.redhat.com [10.72.13.131])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id C163E503EE;
-        Thu, 18 Mar 2021 02:44:38 +0000 (UTC)
-Subject: Re: [PATCH V5 7/7] vDPA/ifcvf: deduce VIRTIO device ID from pdev ids
-To:     Zhu Lingshan <lingshan.zhu@intel.com>, mst@redhat.com,
-        lulu@redhat.com, leonro@nvidia.com
-Cc:     virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20210317094933.16417-1-lingshan.zhu@intel.com>
- <20210317094933.16417-8-lingshan.zhu@intel.com>
+        by smtp.corp.redhat.com (Postfix) with ESMTP id BA61666A05;
+        Thu, 18 Mar 2021 03:21:38 +0000 (UTC)
+Subject: Re: [PATCH v4 08/14] vdpa: add get_config_size callback in
+ vdpa_config_ops
+To:     Stefano Garzarella <sgarzare@redhat.com>,
+        virtualization@lists.linux-foundation.org
+Cc:     netdev@vger.kernel.org, Xie Yongji <xieyongji@bytedance.com>,
+        Laurent Vivier <lvivier@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        linux-kernel@vger.kernel.org, Max Gurtovoy <mgurtovoy@nvidia.com>,
+        Parav Pandit <parav@nvidia.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>, kvm@vger.kernel.org
+References: <20210315163450.254396-1-sgarzare@redhat.com>
+ <20210315163450.254396-9-sgarzare@redhat.com>
 From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <1ba4d913-b237-8faf-fec8-b844448c26f0@redhat.com>
-Date:   Thu, 18 Mar 2021 10:44:37 +0800
+Message-ID: <ce53cce5-bbb5-53cd-a927-b44ffe0509a7@redhat.com>
+Date:   Thu, 18 Mar 2021 11:21:37 +0800
 User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.16; rv:78.0)
  Gecko/20100101 Thunderbird/78.8.1
 MIME-Version: 1.0
-In-Reply-To: <20210317094933.16417-8-lingshan.zhu@intel.com>
+In-Reply-To: <20210315163450.254396-9-sgarzare@redhat.com>
 Content-Type: text/plain; charset=gbk; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
-在 2021/3/17 下午5:49, Zhu Lingshan 写道:
-> This commit deduces the VIRTIO device ID of a probed
-> device from its pdev device ids.
+在 2021/3/16 上午12:34, Stefano Garzarella 写道:
+> This new callback is used to get the size of the configuration space
+> of vDPA devices.
 >
-> Signed-off-by: Zhu Lingshan <lingshan.zhu@intel.com>
-> ---
->   drivers/vdpa/ifcvf/ifcvf_base.h |  1 +
->   drivers/vdpa/ifcvf/ifcvf_main.c | 14 +++++++++++++-
->   2 files changed, 14 insertions(+), 1 deletion(-)
->
-> diff --git a/drivers/vdpa/ifcvf/ifcvf_base.h b/drivers/vdpa/ifcvf/ifcvf_base.h
-> index f77239fc1644..b2eeb16b9c2c 100644
-> --- a/drivers/vdpa/ifcvf/ifcvf_base.h
-> +++ b/drivers/vdpa/ifcvf/ifcvf_base.h
-> @@ -127,4 +127,5 @@ int ifcvf_verify_min_features(struct ifcvf_hw *hw, u64 features);
->   u16 ifcvf_get_vq_state(struct ifcvf_hw *hw, u16 qid);
->   int ifcvf_set_vq_state(struct ifcvf_hw *hw, u16 qid, u16 num);
->   struct ifcvf_adapter *vf_to_adapter(struct ifcvf_hw *hw);
-> +int ifcvf_probed_virtio_net(struct ifcvf_hw *hw);
->   #endif /* _IFCVF_H_ */
-> diff --git a/drivers/vdpa/ifcvf/ifcvf_main.c b/drivers/vdpa/ifcvf/ifcvf_main.c
-> index ea93ea7fd5df..9fade400b5a4 100644
-> --- a/drivers/vdpa/ifcvf/ifcvf_main.c
-> +++ b/drivers/vdpa/ifcvf/ifcvf_main.c
-> @@ -323,7 +323,19 @@ static u32 ifcvf_vdpa_get_generation(struct vdpa_device *vdpa_dev)
->   
->   static u32 ifcvf_vdpa_get_device_id(struct vdpa_device *vdpa_dev)
->   {
-> -	return VIRTIO_ID_NET;
-> +	struct ifcvf_adapter *adapter = vdpa_to_adapter(vdpa_dev);
-> +	struct pci_dev *pdev = adapter->pdev;
-> +	u32 ret = -ENODEV;
-> +
-> +	if (pdev->device < 0x1000 || pdev->device > 0x107f)
-> +		return ret;
-> +
-> +	if (pdev->device < 0x1040)
-> +		ret =  pdev->subsystem_device;
-> +	else
-> +		ret =  pdev->device - 0x1040;
-> +
-> +	return ret;
->   }
+> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
 
-
-It would be better to keep the comment.
-
-But anyway
 
 Acked-by: Jason Wang <jasowang@redhat.com>
 
 
-
+> ---
+>   include/linux/vdpa.h              | 4 ++++
+>   drivers/vdpa/ifcvf/ifcvf_main.c   | 6 ++++++
+>   drivers/vdpa/mlx5/net/mlx5_vnet.c | 6 ++++++
+>   drivers/vdpa/vdpa_sim/vdpa_sim.c  | 9 +++++++++
+>   drivers/vdpa/virtio_pci/vp_vdpa.c | 8 ++++++++
+>   5 files changed, 33 insertions(+)
+>
+> diff --git a/include/linux/vdpa.h b/include/linux/vdpa.h
+> index 15fa085fab05..1b094c1531f2 100644
+> --- a/include/linux/vdpa.h
+> +++ b/include/linux/vdpa.h
+> @@ -150,6 +150,9 @@ struct vdpa_iova_range {
+>    * @set_status:			Set the device status
+>    *				@vdev: vdpa device
+>    *				@status: virtio device status
+> + * @get_config_size:		Get the size of the configuration space
+> + *				@vdev: vdpa device
+> + *				Returns size_t: configuration size
+>    * @get_config:			Read from device specific configuration space
+>    *				@vdev: vdpa device
+>    *				@offset: offset from the beginning of
+> @@ -231,6 +234,7 @@ struct vdpa_config_ops {
+>   	u32 (*get_vendor_id)(struct vdpa_device *vdev);
+>   	u8 (*get_status)(struct vdpa_device *vdev);
+>   	void (*set_status)(struct vdpa_device *vdev, u8 status);
+> +	size_t (*get_config_size)(struct vdpa_device *vdev);
+>   	void (*get_config)(struct vdpa_device *vdev, unsigned int offset,
+>   			   void *buf, unsigned int len);
+>   	void (*set_config)(struct vdpa_device *vdev, unsigned int offset,
+> diff --git a/drivers/vdpa/ifcvf/ifcvf_main.c b/drivers/vdpa/ifcvf/ifcvf_main.c
+> index d555a6a5d1ba..017ab07040c7 100644
+> --- a/drivers/vdpa/ifcvf/ifcvf_main.c
+> +++ b/drivers/vdpa/ifcvf/ifcvf_main.c
+> @@ -332,6 +332,11 @@ static u32 ifcvf_vdpa_get_vq_align(struct vdpa_device *vdpa_dev)
+>   	return IFCVF_QUEUE_ALIGNMENT;
+>   }
 >   
->   static u32 ifcvf_vdpa_get_vendor_id(struct vdpa_device *vdpa_dev)
+> +static size_t ifcvf_vdpa_get_config_size(struct vdpa_device *vdpa_dev)
+> +{
+> +	return sizeof(struct virtio_net_config);
+> +}
+> +
+>   static void ifcvf_vdpa_get_config(struct vdpa_device *vdpa_dev,
+>   				  unsigned int offset,
+>   				  void *buf, unsigned int len)
+> @@ -392,6 +397,7 @@ static const struct vdpa_config_ops ifc_vdpa_ops = {
+>   	.get_device_id	= ifcvf_vdpa_get_device_id,
+>   	.get_vendor_id	= ifcvf_vdpa_get_vendor_id,
+>   	.get_vq_align	= ifcvf_vdpa_get_vq_align,
+> +	.get_config_size	= ifcvf_vdpa_get_config_size,
+>   	.get_config	= ifcvf_vdpa_get_config,
+>   	.set_config	= ifcvf_vdpa_set_config,
+>   	.set_config_cb  = ifcvf_vdpa_set_config_cb,
+> diff --git a/drivers/vdpa/mlx5/net/mlx5_vnet.c b/drivers/vdpa/mlx5/net/mlx5_vnet.c
+> index 71397fdafa6a..f6e03bf49e3e 100644
+> --- a/drivers/vdpa/mlx5/net/mlx5_vnet.c
+> +++ b/drivers/vdpa/mlx5/net/mlx5_vnet.c
+> @@ -1814,6 +1814,11 @@ static void mlx5_vdpa_set_status(struct vdpa_device *vdev, u8 status)
+>   	ndev->mvdev.status |= VIRTIO_CONFIG_S_FAILED;
+>   }
+>   
+> +static size_t mlx5_vdpa_get_config_size(struct vdpa_device *vdev)
+> +{
+> +	return sizeof(struct virtio_net_config);
+> +}
+> +
+>   static void mlx5_vdpa_get_config(struct vdpa_device *vdev, unsigned int offset, void *buf,
+>   				 unsigned int len)
+>   {
+> @@ -1900,6 +1905,7 @@ static const struct vdpa_config_ops mlx5_vdpa_ops = {
+>   	.get_vendor_id = mlx5_vdpa_get_vendor_id,
+>   	.get_status = mlx5_vdpa_get_status,
+>   	.set_status = mlx5_vdpa_set_status,
+> +	.get_config_size = mlx5_vdpa_get_config_size,
+>   	.get_config = mlx5_vdpa_get_config,
+>   	.set_config = mlx5_vdpa_set_config,
+>   	.get_generation = mlx5_vdpa_get_generation,
+> diff --git a/drivers/vdpa/vdpa_sim/vdpa_sim.c b/drivers/vdpa/vdpa_sim/vdpa_sim.c
+> index 14dc2d3d983e..98f793bc9376 100644
+> --- a/drivers/vdpa/vdpa_sim/vdpa_sim.c
+> +++ b/drivers/vdpa/vdpa_sim/vdpa_sim.c
+> @@ -462,6 +462,13 @@ static void vdpasim_set_status(struct vdpa_device *vdpa, u8 status)
+>   	spin_unlock(&vdpasim->lock);
+>   }
+>   
+> +static size_t vdpasim_get_config_size(struct vdpa_device *vdpa)
+> +{
+> +	struct vdpasim *vdpasim = vdpa_to_sim(vdpa);
+> +
+> +	return vdpasim->dev_attr.config_size;
+> +}
+> +
+>   static void vdpasim_get_config(struct vdpa_device *vdpa, unsigned int offset,
+>   			     void *buf, unsigned int len)
+>   {
+> @@ -598,6 +605,7 @@ static const struct vdpa_config_ops vdpasim_config_ops = {
+>   	.get_vendor_id          = vdpasim_get_vendor_id,
+>   	.get_status             = vdpasim_get_status,
+>   	.set_status             = vdpasim_set_status,
+> +	.get_config_size        = vdpasim_get_config_size,
+>   	.get_config             = vdpasim_get_config,
+>   	.set_config             = vdpasim_set_config,
+>   	.get_generation         = vdpasim_get_generation,
+> @@ -625,6 +633,7 @@ static const struct vdpa_config_ops vdpasim_batch_config_ops = {
+>   	.get_vendor_id          = vdpasim_get_vendor_id,
+>   	.get_status             = vdpasim_get_status,
+>   	.set_status             = vdpasim_set_status,
+> +	.get_config_size        = vdpasim_get_config_size,
+>   	.get_config             = vdpasim_get_config,
+>   	.set_config             = vdpasim_set_config,
+>   	.get_generation         = vdpasim_get_generation,
+> diff --git a/drivers/vdpa/virtio_pci/vp_vdpa.c b/drivers/vdpa/virtio_pci/vp_vdpa.c
+> index 1321a2fcd088..dc27ec970884 100644
+> --- a/drivers/vdpa/virtio_pci/vp_vdpa.c
+> +++ b/drivers/vdpa/virtio_pci/vp_vdpa.c
+> @@ -295,6 +295,13 @@ static u32 vp_vdpa_get_vq_align(struct vdpa_device *vdpa)
+>   	return PAGE_SIZE;
+>   }
+>   
+> +static size_t vp_vdpa_get_config_size(struct vdpa_device *vdpa)
+> +{
+> +	struct virtio_pci_modern_device *mdev = vdpa_to_mdev(vdpa);
+> +
+> +	return mdev->device_len;
+> +}
+> +
+>   static void vp_vdpa_get_config(struct vdpa_device *vdpa,
+>   			       unsigned int offset,
+>   			       void *buf, unsigned int len)
+> @@ -354,6 +361,7 @@ static const struct vdpa_config_ops vp_vdpa_ops = {
+>   	.get_device_id	= vp_vdpa_get_device_id,
+>   	.get_vendor_id	= vp_vdpa_get_vendor_id,
+>   	.get_vq_align	= vp_vdpa_get_vq_align,
+> +	.get_config_size = vp_vdpa_get_config_size,
+>   	.get_config	= vp_vdpa_get_config,
+>   	.set_config	= vp_vdpa_set_config,
+>   	.set_config_cb  = vp_vdpa_set_config_cb,
 
