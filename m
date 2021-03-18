@@ -2,186 +2,175 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C643B34098D
-	for <lists+kvm@lfdr.de>; Thu, 18 Mar 2021 17:04:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 464243409F8
+	for <lists+kvm@lfdr.de>; Thu, 18 Mar 2021 17:20:54 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231899AbhCRQDi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 18 Mar 2021 12:03:38 -0400
-Received: from gecko.sbs.de ([194.138.37.40]:58806 "EHLO gecko.sbs.de"
+        id S232009AbhCRQUT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 18 Mar 2021 12:20:19 -0400
+Received: from foss.arm.com ([217.140.110.172]:44310 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231593AbhCRQDT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 18 Mar 2021 12:03:19 -0400
-Received: from mail2.sbs.de (mail2.sbs.de [192.129.41.66])
-        by gecko.sbs.de (8.15.2/8.15.2) with ESMTPS id 12IG2l5U015670
-        (version=TLSv1.2 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 18 Mar 2021 17:02:47 +0100
-Received: from [167.87.7.84] ([167.87.7.84])
-        by mail2.sbs.de (8.15.2/8.15.2) with ESMTP id 12IG2jHq005027;
-        Thu, 18 Mar 2021 17:02:45 +0100
-Subject: Re: [PATCH 2/3] KVM: x86: guest debug: don't inject interrupts while
- single stepping
-To:     Maxim Levitsky <mlevitsk@redhat.com>,
-        Sean Christopherson <seanjc@google.com>
-Cc:     kvm list <kvm@vger.kernel.org>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Kieran Bingham <kbingham@kernel.org>,
-        Jessica Yu <jeyu@kernel.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
-        Joerg Roedel <joro@8bytes.org>,
-        Jim Mattson <jmattson@google.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Ingo Molnar <mingo@redhat.com>
-References: <20210315221020.661693-3-mlevitsk@redhat.com>
- <YE/vtYYwMakERzTS@google.com>
- <1259724f-1bdb-6229-2772-3192f6d17a4a@siemens.com>
- <bede3450413a7c5e7e55b19a47c8f079edaa55a2.camel@redhat.com>
- <ca41fe98-0e5d-3b4c-8ed8-bdd7cd5bc60f@siemens.com>
- <71ae8b75c30fd0f87e760216ad310ddf72d31c7b.camel@redhat.com>
- <2a44c302-744e-2794-59f6-c921b895726d@siemens.com>
- <1d27b215a488f8b8fc175e97c5ab973cc811922d.camel@redhat.com>
- <727e5ef1-f771-1301-88d6-d76f05540b01@siemens.com>
- <e2cd978e357155dbab21a523bb8981973bd10da7.camel@redhat.com>
- <CAMS+r+XFLsFRFLGLaAH3_EnBcxOmyN-XiZqcmKEx2utjNErYsQ@mail.gmail.com>
- <31c0bba9-0399-1f15-a59b-a8f035e366e8@siemens.com>
- <f6c6eee97772264eff62a8c1dafa325c82173d64.camel@redhat.com>
-From:   Jan Kiszka <jan.kiszka@siemens.com>
-Message-ID: <7d39a4c9-553d-29fc-b12e-ebbe505f823a@siemens.com>
-Date:   Thu, 18 Mar 2021 17:02:45 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.8.0
+        id S232065AbhCRQUC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 18 Mar 2021 12:20:02 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 918EE31B;
+        Thu, 18 Mar 2021 09:20:01 -0700 (PDT)
+Received: from monolith.localdoman (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D207B3F792;
+        Thu, 18 Mar 2021 09:20:00 -0700 (PDT)
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+To:     drjones@redhat.com, kvm@vger.kernel.org,
+        kvmarm@lists.cs.columbia.edu
+Cc:     pbonzini@redhat.com
+Subject: [kvm-unit-tests PATCH v2] configure: arm/arm64: Add --earlycon option to set UART type and address
+Date:   Thu, 18 Mar 2021 16:20:22 +0000
+Message-Id: <20210318162022.84482-1-alexandru.elisei@arm.com>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
-In-Reply-To: <f6c6eee97772264eff62a8c1dafa325c82173d64.camel@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-[only saw this now, or delivery to me was delayed - anyway]
+Currently, the UART early address is set indirectly with the --vmm option
+and there are only two possible values: if the VMM is qemu (the default),
+then the UART address is set to 0x09000000; if the VMM is kvmtool, then the
+UART address is set to 0x3f8.
 
-On 16.03.21 19:02, Maxim Levitsky wrote:
-> On Tue, 2021-03-16 at 18:01 +0100, Jan Kiszka wrote:
->> On 16.03.21 17:50, Sean Christopherson wrote:
->>> On Tue, Mar 16, 2021, Maxim Levitsky wrote:
->>>> On Tue, 2021-03-16 at 16:31 +0100, Jan Kiszka wrote:
->>>>> Back then, when I was hacking on the gdb-stub and KVM support, the
->>>>> monitor trap flag was not yet broadly available, but the idea to once
->>>>> use it was already there. Now it can be considered broadly available,
->>>>> but it would still require some changes to get it in.
->>>>>
->>>>> Unfortunately, we don't have such thing with SVM, even recent versions,
->>>>> right? So, a proper way of avoiding diverting event injections while we
->>>>> are having the guest in an "incorrect" state should definitely be the goal.
->>>> Yes, I am not aware of anything like monitor trap on SVM.
->>>>
->>>>> Given that KVM knows whether TF originates solely from guest debugging
->>>>> or was (also) injected by the guest, we should be able to identify the
->>>>> cases where your approach is best to apply. And that without any extra
->>>>> control knob that everyone will only forget to set.
->>>> Well I think that the downside of this patch is that the user might actually
->>>> want to single step into an interrupt handler, and this patch makes it a bit
->>>> more complicated, and changes the default behavior.
->>>
->>> Yes.  And, as is, this also blocks NMIs and SMIs.  I suspect it also doesn't
->>> prevent weirdness if the guest is running in L2, since IRQs for L1 will cause
->>> exits from L2 during nested_ops->check_events().
->>>
->>>> I have no objections though to use this patch as is, or at least make this
->>>> the new default with a new flag to override this.
->>>
->>> That's less bad, but IMO still violates the principle of least surprise, e.g.
->>> someone that is single-stepping a guest and is expecting an IRQ to fire will be
->>> all kinds of confused if they see all the proper IRR, ISR, EFLAGS.IF, etc...
->>> settings, but no interrupt.
->>
->> From my practical experience with debugging guests via single step,
->> seeing an interrupt in that case is everything but handy and generally
->> also not expected (though logical, I agree). IOW: When there is a knob
->> for it, it will remain off in 99% of the time.
->>
->> But I see the point of having some control, in an ideal world also an
->> indication that there are pending events, permitting the user to decide
->> what to do. But I suspect the gdb frontend and protocol does not easily
->> permit that.
-> 
-> Qemu gdbstub actually does have control over suppression of the interrupts
-> over a single step and it is even enabled by default:
-> 
-> https://qemu.readthedocs.io/en/latest/system/gdb.html
-> (advanced debug options)
-> 
+The upstream kvmtool commit 45b4968e0de1 ("hw/serial: ARM/arm64: Use MMIO
+at higher addresses") changed the UART address to 0x1000000, and
+kvm-unit-tests so far hasn't had mechanism to let the user set a specific
+address, which means that for recent versions of kvmtool the early UART
+won't be available.
 
-Ah, cool! Absolutely in line with what we need.
+This situation will only become worse as kvm-unit-tests gains support to
+run as an EFI app, as each platform will have their own UART type and
+address.
 
-> However it is currently only implemented in TCG (software emulator) mode 
-> and not in KVM mode (I can argue that this is a qemu bug).
+To address both issues, a new configure option is added, --earlycon. The
+syntax and semantics are identical to the kernel parameter with the same
+name. For example, for kvmtool, --earlycon=uart,mmio,0x1000000 will set the
+correct UART address. Specifying this option will overwrite the UART
+address set by --vmm.
 
-Maybe the behavior of old KVM was not exposing the issue, thus no one
-cared. As I wrote in the other mail today, even some recent kernel do
-not seem to break single-stepping, for yet unknown reasons.
+At the moment, the UART type and register width parameters are ignored
+since both qemu's and kvmtool's UART emulation use the same offset for the
+TX register and no other registers are used by kvm-unit-tests, but the
+parameters will become relevant once EFI support is added.
 
-> 
-> So my plan was to add a new kvm guest debug flag KVM_GUESTDBG_BLOCKEVENTS,
-> and let qemu enable it when its 'NOIRQ' mode is enabled (it is by default).
-> 
-> However due to the discussion in this thread about the leakage of the RFLAGS.TF,
-> I wonder if kvm should by default suppress events and have something like
-> KVM_GUESTDBG_SSTEP_ALLOW_EVENTS to override this and wire 
-> that to qemu's NOIRQ=false case.
-> 
-> This will allow older qemu to work correctly and new qemu will be able to choose
-> the old less ideal behavior.
+Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+---
+Besides working with current versions of kvmtool, this will also make early
+console work if the user specifies a custom memory layout [1] (patches are
+old, but I plan to pick them up at some point in the future).
 
-Sounds very reasonable to me.
+Changes in v2:
+* kvmtool patches were merged, so I reworked the commit message to point to
+  the corresponding kvmtool commit.
+* Restricted pl011 register size to 32 bits, as per Arm Base System
+  Architecture 1.0 (DEN0094A), and to match Linux.
+* Reworked the way the fields are extracted to make it more precise
+  (without the -s argument, the entire string is echo'ed when no delimiter
+  is found).
+* The changes are not trivial, so I dropped Drew's Reviewed-by.
 
-> 
->>
->>>> Sean Christopherson, what do you think?
->>>
->>> Rather than block all events in KVM, what about having QEMU "pause" the timer?
->>> E.g. save MSR_TSC_DEADLINE and APIC_TMICT (or inspect the guest to find out
->>> which flavor it's using), clear them to zero, then restore both when
->>> single-stepping is disabled.  I think that will work?
->>>
->>
->> No one can stop the clock, and timers are only one source of interrupts.
->> Plus they do not all come from QEMU, some also from KVM or in-kernel
->> sources directly. Would quickly become a mess.
-> 
-> This, plus as we see, even changing with RFLAGS.TF leaks it.
+[1] https://lore.kernel.org/kvm/1569245722-23375-1-git-send-email-alexandru.elisei@arm.com/
 
-As I wrote: When we take events, the leakage must be stopped for that
-case. But that might be a bit more tricky because we need to stop on the
-first instruction in the interrupt handler, thus need some TF, but we
-must also remove it again from the flags saved for the interrupt context
-on the guest's interrupt/exception handler stack.
+ configure | 61 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 61 insertions(+)
 
-> Changing things like MSR_TSC_DEADLINE will also make it visible to the guest,
-> sooner or later and is a mess that I rather not get into.
-> 
-> It is _possible_ to disable timer interrupts 'out of band', but that is messy too
-> if done from userspace. For example, what if the timer interrupt is already pending
-> in local apic, when qemu decides to single step?
-> 
-> Also with gdbstub the user doesn't have to stop all vcpus (there is a non-stop mode),
-> in which only some vcpus are stopped which is actually a very cool feature,
-> and of course running vcpus can raise events.
-> 
-> Also interrupts can indeed come from things like vhost.
-> 
-
-Exactly.
-
-Jan
-
+diff --git a/configure b/configure
+index cdcd34e94030..137b165db18f 100755
+--- a/configure
++++ b/configure
+@@ -26,6 +26,7 @@ errata_force=0
+ erratatxt="$srcdir/errata.txt"
+ host_key_document=
+ page_size=
++earlycon=
+ 
+ usage() {
+     cat <<-EOF
+@@ -54,6 +55,18 @@ usage() {
+ 	    --page-size=PAGE_SIZE
+ 	                           Specify the page size (translation granule) (4k, 16k or
+ 	                           64k, default is 64k, arm64 only)
++	    --earlycon=EARLYCON
++	                           Specify the UART name, type and address (optional, arm and
++	                           arm64 only). The specified address will overwrite the UART
++	                           address set by the --vmm option. EARLYCON can be on of (case
++	                           sensitive):
++	               uart[8250],mmio,ADDR
++	                           Specify an 8250 compatible UART at address ADDR. Supported
++	                           register stride is 8 bit only.
++	               pl011,ADDR
++	               pl011,mmio32,ADDR
++	                           Specify a PL011 compatible UART at address ADDR. Supported
++	                           register stride is 32 bit only.
+ EOF
+     exit 1
+ }
+@@ -112,6 +125,9 @@ while [[ "$1" = -* ]]; do
+ 	--page-size)
+ 	    page_size="$arg"
+ 	    ;;
++	--earlycon)
++	    earlycon="$arg"
++	    ;;
+ 	--help)
+ 	    usage
+ 	    ;;
+@@ -170,6 +186,51 @@ elif [ "$arch" = "arm" ] || [ "$arch" = "arm64" ]; then
+         echo '--vmm must be one of "qemu" or "kvmtool"!'
+         usage
+     fi
++
++    if [ "$earlycon" ]; then
++        # Append delimiter and use cut -s to prevent cut from ignoring the field
++        # argument if no delimiter is specified by the user.
++        earlycon="$earlycon,"
++        name=$(echo $earlycon|cut -sd',' -f1)
++        if [ "$name" != "uart" ] && [ "$name" != "uart8250" ] &&
++                [ "$name" != "pl011" ]; then
++            echo "unknown earlycon name: $name"
++            usage
++        fi
++
++        if [ "$name" = "pl011" ]; then
++            type_addr=$(echo $earlycon|cut -sd',' -f2)
++            if [ -z "$type_addr" ]; then
++                echo "missing earlycon address"
++                usage
++            fi
++            addr=$(echo $earlycon|cut -sd',' -f3)
++            if [ -z "$addr" ]; then
++                addr=$type_addr
++            else
++                if [ "$type_addr" != "mmio32" ]; then
++                    echo "unknown $name earlycon type: $type_addr"
++                    usage
++                fi
++            fi
++        else
++            type=$(echo $earlycon|cut -sd',' -f2)
++            if [ -z "$type" ]; then
++                echo "missing $name earlycon type"
++                usage
++            fi
++            if [ "$type" != "mmio" ]; then
++                echo "unknown $name earlycon type: $type"
++                usage
++            fi
++            addr=$(echo $earlycon|cut -sd',' -f3)
++            if [ -z "$addr" ]; then
++                echo "missing earlycon address"
++                usage
++            fi
++        fi
++        arm_uart_early_addr=$addr
++    fi
+ elif [ "$arch" = "ppc64" ]; then
+     testdir=powerpc
+     firmware="$testdir/boot_rom.bin"
 -- 
-Siemens AG, T RDA IOT
-Corporate Competence Center Embedded Linux
+2.30.2
+
