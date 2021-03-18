@@ -2,192 +2,124 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C206534107B
-	for <lists+kvm@lfdr.de>; Thu, 18 Mar 2021 23:45:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 75D263410FC
+	for <lists+kvm@lfdr.de>; Fri, 19 Mar 2021 00:25:52 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233221AbhCRWn4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 18 Mar 2021 18:43:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49430 "EHLO
+        id S231954AbhCRXZR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 18 Mar 2021 19:25:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58438 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232503AbhCRWnX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 18 Mar 2021 18:43:23 -0400
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 37866C06174A
-        for <kvm@vger.kernel.org>; Thu, 18 Mar 2021 15:43:23 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id 127so50046110ybc.19
-        for <kvm@vger.kernel.org>; Thu, 18 Mar 2021 15:43:23 -0700 (PDT)
+        with ESMTP id S231824AbhCRXZI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 18 Mar 2021 19:25:08 -0400
+Received: from mail-ot1-x335.google.com (mail-ot1-x335.google.com [IPv6:2607:f8b0:4864:20::335])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4461BC06174A
+        for <kvm@vger.kernel.org>; Thu, 18 Mar 2021 16:25:08 -0700 (PDT)
+Received: by mail-ot1-x335.google.com with SMTP id k14-20020a9d7dce0000b02901b866632f29so6838760otn.1
+        for <kvm@vger.kernel.org>; Thu, 18 Mar 2021 16:25:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=reply-to:date:in-reply-to:message-id:mime-version:references
-         :subject:from:to:cc;
-        bh=1L+9lJpNp7J82u8N+nWZfaJrNB467GIkhUgouUBgX1A=;
-        b=Ns4hn+Cm38G8KktGdmCcDEaDZhKu9bZZgQazz7PyEoR+V0VC0jn/T4UDFfOv0jp6cK
-         HKTUehDXiabOIJEmov51KsVzGhfp2GKVr9zO7Gh12AeCKXtaqHYirkfljTEqjNjFY1EB
-         lQorNY8gkhM135aIIyWOE1zq3YzkZo3i79CNPyyCPoQrTc09WZ5he3RHFGWiwY6xLqw/
-         5TyfbMXEmatfms8d2T8yLBs/L1QkqPjCIMy+I1qSa7uQgtAWmEFUQmGGS7LV2N1Wu6M4
-         XtSDl3piXlaiss6qL2n0zIgMgcmjHfoSXQZJ/RozpsW4MWFp88oPn8NLesQBoVabmk8O
-         BEpg==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=TJHCMzvDoOOFLKNBK9gJ5aBbtoQqOTfITOWVCVPOp4E=;
+        b=s+kAb3glI5ajffbYbYZhXXFPFsCR0bDlxUlpJXaw/gigN3KK3HxAe1lsRHdWlML+p1
+         18dAfIuXNzQ/edKjdjcHinBFSabx+5im4v12u6xIMDiISY+VCDbwuC00a8PQlzkqSaHF
+         vAEL5UYkssrGouKOxT6cvwMvvmG/5v0RkDEsuBw7ns1dpTP80zvOwnQY/n+jSgCHxYrV
+         NLL/jwh6eqv77u5GAk4eMNlTmO1BRZ6GPkK27ar+QiUGhxW2KCOCfFjLbrT74hKi0i/W
+         LanMHl01/o/+86j1/1hY4b+6GCW0OoC0yTj95g0jb9sz6Qw/d4uF3Lvh9hPHMK1CNG7k
+         mDGw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:reply-to:date:in-reply-to:message-id
-         :mime-version:references:subject:from:to:cc;
-        bh=1L+9lJpNp7J82u8N+nWZfaJrNB467GIkhUgouUBgX1A=;
-        b=jgOctqts3PKfwJ/GGim+koToNn//sxDSedKL24URhqGXj5VEWp0aUJkM9g5NTMKrmc
-         6Qah9k3HUh02o8VVfUP2d/2dgNZbnWTM9c+KfsMlOiQuqtx0aaQ131nb4nt7nuw5B6Ge
-         L5dbrSggwMBt4ncpN/cFFxO2+VjNTIFIjXKmBQOdJNdofoYhzQSaON+EnHNMC96INu1K
-         32Ku6Nju9n5aO2qwvPAOg5ydKbnhi1qDnQwXz3Z0jBO2IAn53xn8FQ+lI9GQxL/iXGYt
-         n1O8ClKr8B60cAooAVcPwIMeJzHUp6hhwH2taI33SRaqQgick6JtyTOboIdO++BDR75t
-         dgHQ==
-X-Gm-Message-State: AOAM530jIVw1ldfoMX0iDznvr/Aag/bX7v01l3ZOE81GFbsqWjZFpj2X
-        tHX/I/c+la88LDYRPYXs1/Uey4dD+qI=
-X-Google-Smtp-Source: ABdhPJwwTJRd0BuDJ+GgYU89A4UQxSdfhSeDOq9f7SOu95IyLgNBPSJ3LyU+VylpQ/EPLpXHWDXsGv+QqoE=
-X-Received: from seanjc798194.pdx.corp.google.com ([2620:15c:f:10:25e0:6b8b:f878:23d1])
- (user=seanjc job=sendgmr) by 2002:a25:accd:: with SMTP id x13mr2417534ybd.88.1616107402509;
- Thu, 18 Mar 2021 15:43:22 -0700 (PDT)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Thu, 18 Mar 2021 15:43:10 -0700
-In-Reply-To: <20210318224310.3274160-1-seanjc@google.com>
-Message-Id: <20210318224310.3274160-5-seanjc@google.com>
-Mime-Version: 1.0
-References: <20210318224310.3274160-1-seanjc@google.com>
-X-Mailer: git-send-email 2.31.0.rc2.261.g7f71774620-goog
-Subject: [PATCH v2 4/4] KVM: nVMX: Clean up x2APIC MSR handling for L2
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Alexander Graf <graf@amazon.com>,
-        Yuan Yao <yaoyuan0329os@gmail.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=TJHCMzvDoOOFLKNBK9gJ5aBbtoQqOTfITOWVCVPOp4E=;
+        b=PMacfv0APkyv2if5Xt1n9UEuAjUesjvYrt8cp+IA7AVhlkqpxDyb/jViYDdZQ64Z9s
+         GwNx1UeK3znqm6i4KeBp902hSpTG6hNP3yDnE53SpUxTZ+sXULYYNHOHIMZKoySe7x6v
+         fioAC29N675cX3FZfQtKOmY81hwWwDLer+4nhFE1+PHCpS/Oj5XOoU5BRiG0LUa0L/L+
+         OAS8pJtFy1GT53T7zW02q9W52Fc96uHKDQUK5PqvzDHVfRvHpebbWgjahSa3kbjTxaDP
+         fQ/S950ls3ZSIKjERaTWsjFcTDyyeZsH63Bm3aYHXA+Nh/gc3PvX56GzvXlSvUPw1pbg
+         p4YQ==
+X-Gm-Message-State: AOAM532XVxNZKYlAlFKlTMP+yNQKZCN437OMz1PvgYvL6cKtzyvEoXDs
+        DZhkhaEpDh7ZJeesFMs74Vl9Lb0TXz6NNbaPPPesUg==
+X-Google-Smtp-Source: ABdhPJyj39gOA85ZUELpJM9blyYfb+mLUNNWmehmzXz7QqPoDgQZvRWXkXRECc6a5SvrNz0PFEGnLLjan7kzq085lPI=
+X-Received: by 2002:a05:6830:22c3:: with SMTP id q3mr9252681otc.56.1616109907375;
+ Thu, 18 Mar 2021 16:25:07 -0700 (PDT)
+MIME-Version: 1.0
+References: <20190123223925.7558-1-sean.j.christopherson@intel.com> <20190123223925.7558-4-sean.j.christopherson@intel.com>
+In-Reply-To: <20190123223925.7558-4-sean.j.christopherson@intel.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Thu, 18 Mar 2021 16:24:56 -0700
+Message-ID: <CALMp9eTow8rdn2zerJgX+4XiVW0bZ=XGWCxJqCwr0wO_G9PTzg@mail.gmail.com>
+Subject: Re: [PATCH 3/3] KVM: nVMX: Ignore limit checks on VMX instructions
+ using flat segments
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        kvm list <kvm@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Clean up the x2APIC MSR bitmap intereption code for L2, which is the last
-holdout of open coded bitmap manipulations.  Freshen up the SDM/PRM
-comment, rename the function to make it abundantly clear the funky
-behavior is x2APIC specific, and explain _why_ vmcs01's bitmap is ignored
-(the previous comment was flat out wrong for x2APIC behavior).
+On Wed, Jan 23, 2019 at 2:39 PM Sean Christopherson
+<sean.j.christopherson@intel.com> wrote:
+>
+> Regarding segments with a limit=3D=3D0xffffffff, the SDM officially state=
+s:
+>
+>     When the effective limit is FFFFFFFFH (4 GBytes), these accesses may
+>     or may not cause the indicated exceptions.  Behavior is
+>     implementation-specific and may vary from one execution to another.
+>
+> In practice, all CPUs that support VMX ignore limit checks for "flat
+> segments", i.e. an expand-up data or code segment with base=3D0 and
+> limit=3D0xffffffff.  This is subtly different than wrapping the effective
+> address calculation based on the address size, as the flat segment
+> behavior also applies to accesses that would wrap the 4g boundary, e.g.
+> a 4-byte access starting at 0xffffffff will access linear addresses
+> 0xffffffff, 0x0, 0x1 and 0x2.
+>
+> Fixes: f9eb4af67c9d ("KVM: nVMX: VMX instructions: add checks for #GP/#SS=
+ exceptions")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> ---
+>  arch/x86/kvm/vmx/nested.c | 12 +++++++++---
+>  1 file changed, 9 insertions(+), 3 deletions(-)
+>
+> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+> index bc8e3fc6724d..537c4899cf20 100644
+> --- a/arch/x86/kvm/vmx/nested.c
+> +++ b/arch/x86/kvm/vmx/nested.c
+> @@ -4097,10 +4097,16 @@ int get_vmx_mem_address(struct kvm_vcpu *vcpu, un=
+signed long exit_qualification,
+>                 /* Protected mode: #GP(0)/#SS(0) if the segment is unusab=
+le.
+>                  */
+>                 exn =3D (s.unusable !=3D 0);
+> -               /* Protected mode: #GP(0)/#SS(0) if the memory
+> -                * operand is outside the segment limit.
+> +
+> +               /*
+> +                * Protected mode: #GP(0)/#SS(0) if the memory operand is
+> +                * outside the segment limit.  All CPUs that support VMX =
+ignore
+> +                * limit checks for flat segments, i.e. segments with bas=
+e=3D=3D0,
+> +                * limit=3D=3D0xffffffff and of type expand-up data or co=
+de.
+>                  */
+> -               exn =3D exn || (off + sizeof(u64) > s.limit);
+> +               if (!(s.base =3D=3D 0 && s.limit =3D=3D 0xffffffff &&
+> +                    ((s.type & 8) || !(s.type & 4))))
+> +                       exn =3D exn || (off + sizeof(u64) > s.limit);
 
-No functional change intended.
+I know I signed off on this, but looking at it again, I don't think
+this is correct for expand-down segments.
 
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- arch/x86/kvm/vmx/nested.c | 53 +++++++++++----------------------------
- arch/x86/kvm/vmx/vmx.h    |  8 ++++++
- 2 files changed, 22 insertions(+), 39 deletions(-)
+From the SDM:
 
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index aff41a432a56..49eeffb79823 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -476,44 +476,19 @@ static int nested_vmx_check_tpr_shadow_controls(struct kvm_vcpu *vcpu,
- }
- 
- /*
-- * If a msr is allowed by L0, we should check whether it is allowed by L1.
-- * The corresponding bit will be cleared unless both of L0 and L1 allow it.
-+ * For x2APIC MSRs, ignore the vmcs01 bitmap.  L1 can enable x2APIC without L1
-+ * itself utilizing x2APIC.  All MSRs were previously set to be intercepted,
-+ * only the disable intercept case needs to be handled.
-  */
--static void nested_vmx_disable_intercept_for_msr(unsigned long *msr_bitmap_l1,
--					       unsigned long *msr_bitmap_nested,
--					       u32 msr, int type)
-+static void nested_vmx_disable_intercept_for_x2apic_msr(unsigned long *msr_bitmap_l1,
-+							unsigned long *msr_bitmap_l0,
-+							u32 msr, int type)
- {
--	int f = sizeof(unsigned long);
-+	if (type & MSR_TYPE_R && !vmx_test_msr_bitmap_read(msr_bitmap_l1, msr))
-+		vmx_clear_msr_bitmap_read(msr_bitmap_l0, msr);
- 
--	/*
--	 * See Intel PRM Vol. 3, 20.6.9 (MSR-Bitmap Address). Early manuals
--	 * have the write-low and read-high bitmap offsets the wrong way round.
--	 * We can control MSRs 0x00000000-0x00001fff and 0xc0000000-0xc0001fff.
--	 */
--	if (msr <= 0x1fff) {
--		if (type & MSR_TYPE_R &&
--		   !test_bit(msr, msr_bitmap_l1 + 0x000 / f))
--			/* read-low */
--			__clear_bit(msr, msr_bitmap_nested + 0x000 / f);
--
--		if (type & MSR_TYPE_W &&
--		   !test_bit(msr, msr_bitmap_l1 + 0x800 / f))
--			/* write-low */
--			__clear_bit(msr, msr_bitmap_nested + 0x800 / f);
--
--	} else if ((msr >= 0xc0000000) && (msr <= 0xc0001fff)) {
--		msr &= 0x1fff;
--		if (type & MSR_TYPE_R &&
--		   !test_bit(msr, msr_bitmap_l1 + 0x400 / f))
--			/* read-high */
--			__clear_bit(msr, msr_bitmap_nested + 0x400 / f);
--
--		if (type & MSR_TYPE_W &&
--		   !test_bit(msr, msr_bitmap_l1 + 0xc00 / f))
--			/* write-high */
--			__clear_bit(msr, msr_bitmap_nested + 0xc00 / f);
--
--	}
-+	if (type & MSR_TYPE_W && !vmx_test_msr_bitmap_write(msr_bitmap_l1, msr))
-+		vmx_clear_msr_bitmap_write(msr_bitmap_l0, msr);
- }
- 
- static inline void enable_x2apic_msr_intercepts(unsigned long *msr_bitmap)
-@@ -582,7 +557,7 @@ static inline bool nested_vmx_prepare_msr_bitmap(struct kvm_vcpu *vcpu,
- 	/*
- 	 * To keep the control flow simple, pay eight 8-byte writes (sixteen
- 	 * 4-byte writes on 32-bit systems) up front to enable intercepts for
--	 * the x2APIC MSR range and selectively disable them below.
-+	 * the x2APIC MSR range and selectively toggle those relevant to L2.
- 	 */
- 	enable_x2apic_msr_intercepts(msr_bitmap_l0);
- 
-@@ -601,17 +576,17 @@ static inline bool nested_vmx_prepare_msr_bitmap(struct kvm_vcpu *vcpu,
- 			}
- 		}
- 
--		nested_vmx_disable_intercept_for_msr(
-+		nested_vmx_disable_intercept_for_x2apic_msr(
- 			msr_bitmap_l1, msr_bitmap_l0,
- 			X2APIC_MSR(APIC_TASKPRI),
- 			MSR_TYPE_R | MSR_TYPE_W);
- 
- 		if (nested_cpu_has_vid(vmcs12)) {
--			nested_vmx_disable_intercept_for_msr(
-+			nested_vmx_disable_intercept_for_x2apic_msr(
- 				msr_bitmap_l1, msr_bitmap_l0,
- 				X2APIC_MSR(APIC_EOI),
- 				MSR_TYPE_W);
--			nested_vmx_disable_intercept_for_msr(
-+			nested_vmx_disable_intercept_for_x2apic_msr(
- 				msr_bitmap_l1, msr_bitmap_l0,
- 				X2APIC_MSR(APIC_SELF_IPI),
- 				MSR_TYPE_W);
-diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
-index 42c25fc79427..03ab9ccd95d2 100644
---- a/arch/x86/kvm/vmx/vmx.h
-+++ b/arch/x86/kvm/vmx/vmx.h
-@@ -393,6 +393,14 @@ void vmx_set_intercept_for_msr(struct kvm_vcpu *vcpu,
- 	u32 msr, int type, bool value);
- void vmx_update_cpu_dirty_logging(struct kvm_vcpu *vcpu);
- 
-+/*
-+ * Note, early Intel manuals have the write-low and read-high bitmap offsets
-+ * the wrong way round.  The bitmaps control MSRs 0x00000000-0x00001fff and
-+ * 0xc0000000-0xc0001fff.  The former (low) uses bytes 0-0x3ff for reads and
-+ * 0x800-0xbff for writes.  The latter (high) uses 0x400-0x7ff for reads and
-+ * 0xc00-0xfff for writes.  MSRs not covered by either of the ranges always
-+ * VM-Exit.
-+ */
- #define __BUILD_VMX_MSR_BITMAP_HELPER(rtype, action, bitop, access, base)      \
- static inline rtype vmx_##action##_msr_bitmap_##access(unsigned long *bitmap,  \
- 						       u32 msr)		       \
--- 
-2.31.0.rc2.261.g7f71774620-goog
-
+> For expand-down segments, the segment limit has the reverse function; the=
+ offset can range from the segment limit plus 1 to FFFFFFFFH or FFFFH, depe=
+nding on the setting of the B flag. Offsets less than or equal to the segme=
+nt limit generate general-protection exceptions or stack-fault exceptions.
