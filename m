@@ -2,227 +2,132 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2F8EC340A69
-	for <lists+kvm@lfdr.de>; Thu, 18 Mar 2021 17:43:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AD3EF340AAC
+	for <lists+kvm@lfdr.de>; Thu, 18 Mar 2021 17:51:39 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232186AbhCRQma (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 18 Mar 2021 12:42:30 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:37392 "EHLO
+        id S232249AbhCRQvI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 18 Mar 2021 12:51:08 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:36767 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232185AbhCRQmG (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 18 Mar 2021 12:42:06 -0400
+        by vger.kernel.org with ESMTP id S232252AbhCRQuk (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 18 Mar 2021 12:50:40 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1616085725;
+        s=mimecast20190719; t=1616086239;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=kX2zQnoPDL9myLXwoBUVguGMe20BFhMVAa6s8sui3hM=;
-        b=L9qN/eHeHeRoAFq+c+ubtZRBJBVe0vLGadJ4PMVUEt8+oyhs3GA08OQn1mIjS8KrcByvlk
-        dZ17NmY/sLE/ZQkP+m5M/72RQIElKlTsv41KHmvBmT3vFJ2RZ2yMdKnxbjxe8qvZY84tjS
-        IPzkRbE1Cr9oIaFF3gviGM91gg/wmHc=
+        bh=eaZF20iybSS0n6S+DWZ/YEzP0JGngaW3uy7AT+FG30M=;
+        b=LE/+yKNlaWFmotv2cQ7YywQOR4fhdCU0TytGW+jFATZNLrikm/vbvDv/AjfV5nSnPZiQ16
+        IloyKY978pNRucjW/WVDYRX4an8z82e+NUaFHEMoSEb58m6YMTv2BvuIO1kj3lCyx1mFuQ
+        JI/8BvxMNzO+idtCTbQMimSEP06GiEo=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-473-ZNlHvmrXNSaQMGynjEf9Pw-1; Thu, 18 Mar 2021 12:42:03 -0400
-X-MC-Unique: ZNlHvmrXNSaQMGynjEf9Pw-1
+ us-mta-507-9p2IkOtePyyzCgESQUKmVA-1; Thu, 18 Mar 2021 12:50:37 -0400
+X-MC-Unique: 9p2IkOtePyyzCgESQUKmVA-1
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8046F107B784;
-        Thu, 18 Mar 2021 16:42:02 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.40.196.5])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 2152E5B4A6;
-        Thu, 18 Mar 2021 16:42:00 +0000 (UTC)
-Date:   Thu, 18 Mar 2021 17:41:57 +0100
-From:   Andrew Jones <drjones@redhat.com>
-To:     Alexandru Elisei <alexandru.elisei@arm.com>
-Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
-        pbonzini@redhat.com
-Subject: Re: [kvm-unit-tests PATCH v2] configure: arm/arm64: Add --earlycon
- option to set UART type and address
-Message-ID: <20210318164157.xervbl23zvqmqdli@kamzik.brq.redhat.com>
-References: <20210318162022.84482-1-alexandru.elisei@arm.com>
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9436A18C8C02;
+        Thu, 18 Mar 2021 16:50:35 +0000 (UTC)
+Received: from [10.36.112.6] (ovpn-112-6.ams2.redhat.com [10.36.112.6])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 3740D50DD0;
+        Thu, 18 Mar 2021 16:50:28 +0000 (UTC)
+Subject: Re: [PATCH v2 08/14] vfio/pci: Re-order vfio_pci_probe()
+To:     Jason Gunthorpe <jgg@nvidia.com>, kvm@vger.kernel.org
+Cc:     Alex Williamson <alex.williamson@redhat.com>,
+        "Raj, Ashok" <ashok.raj@intel.com>,
+        Christian Ehrhardt <christian.ehrhardt@canonical.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Christoph Hellwig <hch@lst.de>,
+        Kevin Tian <kevin.tian@intel.com>,
+        Leon Romanovsky <leonro@nvidia.com>,
+        Max Gurtovoy <mgurtovoy@nvidia.com>,
+        Tarun Gupta <targupta@nvidia.com>
+References: <8-v2-20d933792272+4ff-vfio1_jgg@nvidia.com>
+From:   Auger Eric <eric.auger@redhat.com>
+Message-ID: <c68db5c7-873f-595d-19f9-19d6b2bee4a5@redhat.com>
+Date:   Thu, 18 Mar 2021 17:50:26 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210318162022.84482-1-alexandru.elisei@arm.com>
+In-Reply-To: <8-v2-20d933792272+4ff-vfio1_jgg@nvidia.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Mar 18, 2021 at 04:20:22PM +0000, Alexandru Elisei wrote:
-> Currently, the UART early address is set indirectly with the --vmm option
-> and there are only two possible values: if the VMM is qemu (the default),
-> then the UART address is set to 0x09000000; if the VMM is kvmtool, then the
-> UART address is set to 0x3f8.
+Hi Jason,
+
+On 3/13/21 1:56 AM, Jason Gunthorpe wrote:
+> vfio_add_group_dev() must be called only after all of the private data in
+> vdev is fully setup and ready, otherwise there could be races with user
+> space instantiating a device file descriptor and starting to call ops.
 > 
-> The upstream kvmtool commit 45b4968e0de1 ("hw/serial: ARM/arm64: Use MMIO
-> at higher addresses") changed the UART address to 0x1000000, and
-> kvm-unit-tests so far hasn't had mechanism to let the user set a specific
-> address, which means that for recent versions of kvmtool the early UART
-> won't be available.
-> 
-> This situation will only become worse as kvm-unit-tests gains support to
-> run as an EFI app, as each platform will have their own UART type and
-> address.
-> 
-> To address both issues, a new configure option is added, --earlycon. The
-> syntax and semantics are identical to the kernel parameter with the same
-> name. For example, for kvmtool, --earlycon=uart,mmio,0x1000000 will set the
-> correct UART address. Specifying this option will overwrite the UART
-> address set by --vmm.
-> 
-> At the moment, the UART type and register width parameters are ignored
-> since both qemu's and kvmtool's UART emulation use the same offset for the
-> TX register and no other registers are used by kvm-unit-tests, but the
-> parameters will become relevant once EFI support is added.
-> 
-> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> For instance vfio_pci_reflck_attach() sets vdev->reflck and
+> vfio_pci_open(), called by fops open, unconditionally derefs it, which
+> will crash if things get out of order.>
+> Fixes: cc20d7999000 ("vfio/pci: Introduce VF token")
+> Fixes: e309df5b0c9e ("vfio/pci: Parallelize device open and release")
+> Fixes: 6eb7018705de ("vfio-pci: Move idle devices to D3hot power state")
+> Fixes: ecaa1f6a0154 ("vfio-pci: Add VGA arbiter client")
+> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
+
+Thanks
+
+Eric
 > ---
-> Besides working with current versions of kvmtool, this will also make early
-> console work if the user specifies a custom memory layout [1] (patches are
-> old, but I plan to pick them up at some point in the future).
+>  drivers/vfio/pci/vfio_pci.c | 17 +++++++++--------
+>  1 file changed, 9 insertions(+), 8 deletions(-)
 > 
-> Changes in v2:
-> * kvmtool patches were merged, so I reworked the commit message to point to
->   the corresponding kvmtool commit.
-> * Restricted pl011 register size to 32 bits, as per Arm Base System
->   Architecture 1.0 (DEN0094A), and to match Linux.
-> * Reworked the way the fields are extracted to make it more precise
->   (without the -s argument, the entire string is echo'ed when no delimiter
->   is found).
-
-You can also drop 'cut' and just do something like
-
-IFS=, read -r name type_addr addr <<<"$earlycon"
-
-> * The changes are not trivial, so I dropped Drew's Reviewed-by.
-> 
-> [1] https://lore.kernel.org/kvm/1569245722-23375-1-git-send-email-alexandru.elisei@arm.com/
-> 
->  configure | 61 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 61 insertions(+)
-> 
-> diff --git a/configure b/configure
-> index cdcd34e94030..137b165db18f 100755
-> --- a/configure
-> +++ b/configure
-> @@ -26,6 +26,7 @@ errata_force=0
->  erratatxt="$srcdir/errata.txt"
->  host_key_document=
->  page_size=
-> +earlycon=
+> diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
+> index f95b58376156a0..0e7682e7a0b478 100644
+> --- a/drivers/vfio/pci/vfio_pci.c
+> +++ b/drivers/vfio/pci/vfio_pci.c
+> @@ -2030,13 +2030,9 @@ static int vfio_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+>  	INIT_LIST_HEAD(&vdev->vma_list);
+>  	init_rwsem(&vdev->memory_lock);
 >  
->  usage() {
->      cat <<-EOF
-> @@ -54,6 +55,18 @@ usage() {
->  	    --page-size=PAGE_SIZE
->  	                           Specify the page size (translation granule) (4k, 16k or
->  	                           64k, default is 64k, arm64 only)
-> +	    --earlycon=EARLYCON
-> +	                           Specify the UART name, type and address (optional, arm and
-> +	                           arm64 only). The specified address will overwrite the UART
-> +	                           address set by the --vmm option. EARLYCON can be on of (case
-
-'on of' typo still here
-
-> +	                           sensitive):
-> +	               uart[8250],mmio,ADDR
-> +	                           Specify an 8250 compatible UART at address ADDR. Supported
-> +	                           register stride is 8 bit only.
-> +	               pl011,ADDR
-> +	               pl011,mmio32,ADDR
-> +	                           Specify a PL011 compatible UART at address ADDR. Supported
-> +	                           register stride is 32 bit only.
->  EOF
->      exit 1
->  }
-> @@ -112,6 +125,9 @@ while [[ "$1" = -* ]]; do
->  	--page-size)
->  	    page_size="$arg"
->  	    ;;
-> +	--earlycon)
-> +	    earlycon="$arg"
-> +	    ;;
->  	--help)
->  	    usage
->  	    ;;
-> @@ -170,6 +186,51 @@ elif [ "$arch" = "arm" ] || [ "$arch" = "arm64" ]; then
->          echo '--vmm must be one of "qemu" or "kvmtool"!'
->          usage
->      fi
-> +
-> +    if [ "$earlycon" ]; then
-> +        # Append delimiter and use cut -s to prevent cut from ignoring the field
-> +        # argument if no delimiter is specified by the user.
-> +        earlycon="$earlycon,"
-> +        name=$(echo $earlycon|cut -sd',' -f1)
-> +        if [ "$name" != "uart" ] && [ "$name" != "uart8250" ] &&
-> +                [ "$name" != "pl011" ]; then
-> +            echo "unknown earlycon name: $name"
-> +            usage
-> +        fi
-> +
-> +        if [ "$name" = "pl011" ]; then
-> +            type_addr=$(echo $earlycon|cut -sd',' -f2)
-> +            if [ -z "$type_addr" ]; then
-> +                echo "missing earlycon address"
-> +                usage
-> +            fi
-> +            addr=$(echo $earlycon|cut -sd',' -f3)
-> +            if [ -z "$addr" ]; then
-
-Don't you need
-
-  if [ "$type_addr" = "mmio32" ]; then
-     echo "missing earlycon address"
-     usage
-  fi
-
-here to avoid accepting
-
-  pl011,mmio32
-
-and then assigning mmio32 to the address?
-
-And/or should we do a quick sanity check on the address?
-Something like
-
-  [[ $addr =~ ^0?x?[0-9a-f]+$ ]]
-
-
-> +                addr=$type_addr
-> +            else
-> +                if [ "$type_addr" != "mmio32" ]; then
-> +                    echo "unknown $name earlycon type: $type_addr"
-> +                    usage
-> +                fi
-> +            fi
-> +        else
-> +            type=$(echo $earlycon|cut -sd',' -f2)
-> +            if [ -z "$type" ]; then
-> +                echo "missing $name earlycon type"
-> +                usage
-> +            fi
-> +            if [ "$type" != "mmio" ]; then
-> +                echo "unknown $name earlycon type: $type"
-> +                usage
-> +            fi
-> +            addr=$(echo $earlycon|cut -sd',' -f3)
-> +            if [ -z "$addr" ]; then
-> +                echo "missing earlycon address"
-> +                usage
-> +            fi
-> +        fi
-> +        arm_uart_early_addr=$addr
-> +    fi
->  elif [ "$arch" = "ppc64" ]; then
->      testdir=powerpc
->      firmware="$testdir/boot_rom.bin"
-> -- 
-> 2.30.2
+> -	ret = vfio_add_group_dev(&pdev->dev, &vfio_pci_ops, vdev);
+> -	if (ret)
+> -		goto out_free;
+> -
+>  	ret = vfio_pci_reflck_attach(vdev);
+>  	if (ret)
+> -		goto out_del_group_dev;
+> +		goto out_free;
+>  	ret = vfio_pci_vf_init(vdev);
+>  	if (ret)
+>  		goto out_reflck;
+> @@ -2060,15 +2056,20 @@ static int vfio_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+>  		vfio_pci_set_power_state(vdev, PCI_D3hot);
+>  	}
+>  
+> -	return ret;
+> +	ret = vfio_add_group_dev(&pdev->dev, &vfio_pci_ops, vdev);
+> +	if (ret)
+> +		goto out_power;
+> +	return 0;
+>  
+> +out_power:
+> +	if (!disable_idle_d3)
+> +		vfio_pci_set_power_state(vdev, PCI_D0);
+>  out_vf:
+>  	vfio_pci_vf_uninit(vdev);
+>  out_reflck:
+>  	vfio_pci_reflck_put(vdev->reflck);
+> -out_del_group_dev:
+> -	vfio_del_group_dev(&pdev->dev);
+>  out_free:
+> +	kfree(vdev->pm_save);
+>  	kfree(vdev);
+>  out_group_put:
+>  	vfio_iommu_group_put(group, &pdev->dev);
 > 
-
-Thanks,
-drew
 
