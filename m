@@ -2,124 +2,166 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 75D263410FC
-	for <lists+kvm@lfdr.de>; Fri, 19 Mar 2021 00:25:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7F85A34114D
+	for <lists+kvm@lfdr.de>; Fri, 19 Mar 2021 01:00:47 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231954AbhCRXZR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 18 Mar 2021 19:25:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58438 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231824AbhCRXZI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 18 Mar 2021 19:25:08 -0400
-Received: from mail-ot1-x335.google.com (mail-ot1-x335.google.com [IPv6:2607:f8b0:4864:20::335])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4461BC06174A
-        for <kvm@vger.kernel.org>; Thu, 18 Mar 2021 16:25:08 -0700 (PDT)
-Received: by mail-ot1-x335.google.com with SMTP id k14-20020a9d7dce0000b02901b866632f29so6838760otn.1
-        for <kvm@vger.kernel.org>; Thu, 18 Mar 2021 16:25:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=TJHCMzvDoOOFLKNBK9gJ5aBbtoQqOTfITOWVCVPOp4E=;
-        b=s+kAb3glI5ajffbYbYZhXXFPFsCR0bDlxUlpJXaw/gigN3KK3HxAe1lsRHdWlML+p1
-         18dAfIuXNzQ/edKjdjcHinBFSabx+5im4v12u6xIMDiISY+VCDbwuC00a8PQlzkqSaHF
-         vAEL5UYkssrGouKOxT6cvwMvvmG/5v0RkDEsuBw7ns1dpTP80zvOwnQY/n+jSgCHxYrV
-         NLL/jwh6eqv77u5GAk4eMNlTmO1BRZ6GPkK27ar+QiUGhxW2KCOCfFjLbrT74hKi0i/W
-         LanMHl01/o/+86j1/1hY4b+6GCW0OoC0yTj95g0jb9sz6Qw/d4uF3Lvh9hPHMK1CNG7k
-         mDGw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=TJHCMzvDoOOFLKNBK9gJ5aBbtoQqOTfITOWVCVPOp4E=;
-        b=PMacfv0APkyv2if5Xt1n9UEuAjUesjvYrt8cp+IA7AVhlkqpxDyb/jViYDdZQ64Z9s
-         GwNx1UeK3znqm6i4KeBp902hSpTG6hNP3yDnE53SpUxTZ+sXULYYNHOHIMZKoySe7x6v
-         fioAC29N675cX3FZfQtKOmY81hwWwDLer+4nhFE1+PHCpS/Oj5XOoU5BRiG0LUa0L/L+
-         OAS8pJtFy1GT53T7zW02q9W52Fc96uHKDQUK5PqvzDHVfRvHpebbWgjahSa3kbjTxaDP
-         fQ/S950ls3ZSIKjERaTWsjFcTDyyeZsH63Bm3aYHXA+Nh/gc3PvX56GzvXlSvUPw1pbg
-         p4YQ==
-X-Gm-Message-State: AOAM532XVxNZKYlAlFKlTMP+yNQKZCN437OMz1PvgYvL6cKtzyvEoXDs
-        DZhkhaEpDh7ZJeesFMs74Vl9Lb0TXz6NNbaPPPesUg==
-X-Google-Smtp-Source: ABdhPJyj39gOA85ZUELpJM9blyYfb+mLUNNWmehmzXz7QqPoDgQZvRWXkXRECc6a5SvrNz0PFEGnLLjan7kzq085lPI=
-X-Received: by 2002:a05:6830:22c3:: with SMTP id q3mr9252681otc.56.1616109907375;
- Thu, 18 Mar 2021 16:25:07 -0700 (PDT)
+        id S233088AbhCSAAL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 18 Mar 2021 20:00:11 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:45968 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230316AbhCSAAC (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 18 Mar 2021 20:00:02 -0400
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 12INY35d094321;
+        Thu, 18 Mar 2021 20:00:02 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=ivTiJWbGDsEtE3GvdJeKaLJ5TjbJ9stwGEwR143CR7w=;
+ b=RKiQrzy448vuACAHjwq4aeriwig8JXHgtaYGwc67qD+TIE22Ks2tG/F5pNM3otFCKxN2
+ InzPo6mWJICPay498RXM24kqaRsCu3eJW40IPY92k6Jlu1hyINzQ1v3yahRtBx5es74+
+ F8GxAnzZikBPRk/Ic/VCdjjJBUqtgDPFv4HyPb70+eADGDRSbTVzi/FA1DUM/MBqHPeR
+ 74TrH9dwR8Smo2Tff54GN1egM02nsCeeL7oEGvjAXUFExTfzbDw77S61tjjyl7b9uxk5
+ dbPTtFuvTwq70hLZjUdgk9caGCnEPqSu/XbCsKuXAv9bU04yiLn75HzTz9H2NWyMnHC4 rg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 37c302j5p6-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 18 Mar 2021 20:00:01 -0400
+Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 12INZKDh096838;
+        Thu, 18 Mar 2021 20:00:01 -0400
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 37c302j5my-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 18 Mar 2021 20:00:01 -0400
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+        by ppma06ams.nl.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 12INujVx028122;
+        Thu, 18 Mar 2021 23:59:59 GMT
+Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
+        by ppma06ams.nl.ibm.com with ESMTP id 37b30p22nr-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 18 Mar 2021 23:59:59 +0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 12INxcNO36831642
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 18 Mar 2021 23:59:39 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id EBC76AE059;
+        Thu, 18 Mar 2021 23:59:55 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 2DE48AE057;
+        Thu, 18 Mar 2021 23:59:55 +0000 (GMT)
+Received: from li-e979b1cc-23ba-11b2-a85c-dfd230f6cf82 (unknown [9.171.84.212])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with SMTP;
+        Thu, 18 Mar 2021 23:59:55 +0000 (GMT)
+Date:   Fri, 19 Mar 2021 00:59:53 +0100
+From:   Halil Pasic <pasic@linux.ibm.com>
+To:     Tony Krowiak <akrowiak@linux.ibm.com>
+Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, stable@vger.kernel.org,
+        borntraeger@de.ibm.com, cohuck@redhat.com, kwankhede@nvidia.com,
+        pbonzini@redhat.com, alex.williamson@redhat.com,
+        pasic@linux.vnet.ibm.com
+Subject: Re: [PATCH v4 1/1] s390/vfio-ap: fix circular lockdep when
+ setting/clearing crypto masks
+Message-ID: <20210319005953.7e6425bd.pasic@linux.ibm.com>
+In-Reply-To: <ab9d54a1-afe7-caca-4e5e-99fca9ea2972@linux.ibm.com>
+References: <20210310150559.8956-1-akrowiak@linux.ibm.com>
+        <20210310150559.8956-2-akrowiak@linux.ibm.com>
+        <20210318001729.06cdb8d6.pasic@linux.ibm.com>
+        <ab9d54a1-afe7-caca-4e5e-99fca9ea2972@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-References: <20190123223925.7558-1-sean.j.christopherson@intel.com> <20190123223925.7558-4-sean.j.christopherson@intel.com>
-In-Reply-To: <20190123223925.7558-4-sean.j.christopherson@intel.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Thu, 18 Mar 2021 16:24:56 -0700
-Message-ID: <CALMp9eTow8rdn2zerJgX+4XiVW0bZ=XGWCxJqCwr0wO_G9PTzg@mail.gmail.com>
-Subject: Re: [PATCH 3/3] KVM: nVMX: Ignore limit checks on VMX instructions
- using flat segments
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        kvm list <kvm@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.761
+ definitions=2021-03-18_18:2021-03-17,2021-03-18 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 phishscore=0
+ clxscore=1015 mlxlogscore=999 impostorscore=0 malwarescore=0
+ lowpriorityscore=0 suspectscore=0 spamscore=0 mlxscore=0 adultscore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2103180169
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jan 23, 2019 at 2:39 PM Sean Christopherson
-<sean.j.christopherson@intel.com> wrote:
->
-> Regarding segments with a limit=3D=3D0xffffffff, the SDM officially state=
-s:
->
->     When the effective limit is FFFFFFFFH (4 GBytes), these accesses may
->     or may not cause the indicated exceptions.  Behavior is
->     implementation-specific and may vary from one execution to another.
->
-> In practice, all CPUs that support VMX ignore limit checks for "flat
-> segments", i.e. an expand-up data or code segment with base=3D0 and
-> limit=3D0xffffffff.  This is subtly different than wrapping the effective
-> address calculation based on the address size, as the flat segment
-> behavior also applies to accesses that would wrap the 4g boundary, e.g.
-> a 4-byte access starting at 0xffffffff will access linear addresses
-> 0xffffffff, 0x0, 0x1 and 0x2.
->
-> Fixes: f9eb4af67c9d ("KVM: nVMX: VMX instructions: add checks for #GP/#SS=
- exceptions")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-> ---
->  arch/x86/kvm/vmx/nested.c | 12 +++++++++---
->  1 file changed, 9 insertions(+), 3 deletions(-)
->
-> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-> index bc8e3fc6724d..537c4899cf20 100644
-> --- a/arch/x86/kvm/vmx/nested.c
-> +++ b/arch/x86/kvm/vmx/nested.c
-> @@ -4097,10 +4097,16 @@ int get_vmx_mem_address(struct kvm_vcpu *vcpu, un=
-signed long exit_qualification,
->                 /* Protected mode: #GP(0)/#SS(0) if the segment is unusab=
-le.
->                  */
->                 exn =3D (s.unusable !=3D 0);
-> -               /* Protected mode: #GP(0)/#SS(0) if the memory
-> -                * operand is outside the segment limit.
-> +
-> +               /*
-> +                * Protected mode: #GP(0)/#SS(0) if the memory operand is
-> +                * outside the segment limit.  All CPUs that support VMX =
-ignore
-> +                * limit checks for flat segments, i.e. segments with bas=
-e=3D=3D0,
-> +                * limit=3D=3D0xffffffff and of type expand-up data or co=
-de.
->                  */
-> -               exn =3D exn || (off + sizeof(u64) > s.limit);
-> +               if (!(s.base =3D=3D 0 && s.limit =3D=3D 0xffffffff &&
-> +                    ((s.type & 8) || !(s.type & 4))))
-> +                       exn =3D exn || (off + sizeof(u64) > s.limit);
+On Thu, 18 Mar 2021 14:38:53 -0400
+Tony Krowiak <akrowiak@linux.ibm.com> wrote:
 
-I know I signed off on this, but looking at it again, I don't think
-this is correct for expand-down segments.
+> On 3/17/21 7:17 PM, Halil Pasic wrote:
+> > On Wed, 10 Mar 2021 10:05:59 -0500
+> > Tony Krowiak <akrowiak@linux.ibm.com> wrote:
+> >  
+> >> -		ret = vfio_ap_mdev_reset_queues(mdev);
+> >> +		matrix_mdev = mdev_get_drvdata(mdev);  
+> > Is it guaranteed that matrix_mdev can't be NULL here? If yes, please
+> > remind me of the mechanism that ensures this.
+> >  
+> >> +
+> >> +		/*
+> >> +		 * If the KVM pointer is in the process of being set, wait until
+> >> +		 * the process has completed.
+> >> +		 */
+> >> +		wait_event_cmd(matrix_mdev->wait_for_kvm,
+> >> +			       matrix_mdev->kvm_busy == false,
+> >> +			       mutex_unlock(&matrix_dev->lock),
+> >> +			       mutex_lock(&matrix_dev->lock));
+> >> +
+> >> +		if (matrix_mdev->kvm)
+> >> +			ret = vfio_ap_mdev_reset_queues(mdev);
+> >> +		else
+> >> +			ret = -ENODEV;  
+> > Didn't we agree to make the call to vfio_ap_mdev_reset_queues()
+> > unconditional again (for reference please take look at
+> > Message-ID: <64afa72c-2d6a-2ca1-e576-34e15fa579ed@linux.ibm.com>)?  
+> 
+> How about this:
 
-From the SDM:
+Looks good. I will check the mdev code if the checkeck is really
+needed. I'm curious when the sysfs files associated with a new mdev are
+created. My guess is that this one comes in via a device specific file
+(not the parent like in case of the create), and that those may be
+created after the create. But we can get rid of the check any time so I
+really don't see it as something that would preclude merging this.
 
-> For expand-down segments, the segment limit has the reverse function; the=
- offset can range from the segment limit plus 1 to FFFFFFFFH or FFFFH, depe=
-nding on the setting of the B flag. Offsets less than or equal to the segme=
-nt limit generate general-protection exceptions or stack-fault exceptions.
+Regards,
+Halil
+
+> 
+> static ssize_t vfio_ap_mdev_ioctl(struct mdev_device *mdev,
+>                      unsigned int cmd, unsigned long arg)
+> {
+>      int ret = 0;
+>      struct ap_matrix_mdev *matrix_mdev;
+> 
+>      ...
+>      case VFIO_DEVICE_RESET:
+>          matrix_mdev = mdev_get_drvdata(mdev);
+>          WARN(!matrix_mdev, "Driver data missing from mdev!!");
+> 
+>          if (matrix_mdev) {
+>              /*
+>               * If the KVM pointer is in the process of being set, wait 
+> until
+>               * the process has completed.
+>               */
+>              wait_event_cmd(matrix_mdev->wait_for_kvm,
+>                         matrix_mdev->kvm_busy == false,
+> mutex_unlock(&matrix_dev->lock),
+> mutex_lock(&matrix_dev->lock));
+> 
+>              ret = vfio_ap_mdev_reset_queues(mdev);
+>          }
+>          break;
+>      ...
+> 
+>      return ret;
+> }
+> 
+> >
+> > Regards,
+> > Halil  
+> 
+
