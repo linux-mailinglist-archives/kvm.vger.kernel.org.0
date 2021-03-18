@@ -2,135 +2,91 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1A3C5340C31
-	for <lists+kvm@lfdr.de>; Thu, 18 Mar 2021 18:54:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8CA3D340C47
+	for <lists+kvm@lfdr.de>; Thu, 18 Mar 2021 18:56:57 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232292AbhCRRyQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 18 Mar 2021 13:54:16 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:20560 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S231701AbhCRRyM (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 18 Mar 2021 13:54:12 -0400
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 12IHYGmd110707;
-        Thu, 18 Mar 2021 13:54:10 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=qLCwOqi9nd43vs0sC/0uaogdbKlQGtsnrdpGyMt5BJs=;
- b=isZDdiLBECrzDrBfVyYWnCyjmp7QYlffD7yjzpfqfI75oPT3bfQKDV3pUwIWqzSQAjeL
- xF2H5wUrhb9TCx+bLH1FFXq+5bQEuL6iUHr4IrCU6vGiscHx6WdwHDJkZeICaqsyQKf8
- IvmhU/r9xPdPT9Z7QhOMWDKSDswBqELWT99REn1BNy4k3UuaW80lok3cguXpmscYqCMN
- 0/Xtg18FkFBVZV9uj8y7hCqGzu93bIzI58n62/m+FUS+j3mjBbAPt38p42KDV7uImWjx
- omds7FNgzJqZIcSdQRhQfrU9OGa2pJL3oo/GlYhewWchBIPGUobWZ7TayC5qvKdtGjJy ww== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 37by16g5us-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 18 Mar 2021 13:54:10 -0400
-Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 12IHYjXl112318;
-        Thu, 18 Mar 2021 13:54:10 -0400
-Received: from ppma04wdc.us.ibm.com (1a.90.2fa9.ip4.static.sl-reverse.com [169.47.144.26])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 37by16g5uj-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 18 Mar 2021 13:54:10 -0400
-Received: from pps.filterd (ppma04wdc.us.ibm.com [127.0.0.1])
-        by ppma04wdc.us.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 12IHq5xV006661;
-        Thu, 18 Mar 2021 17:54:09 GMT
-Received: from b01cxnp22035.gho.pok.ibm.com (b01cxnp22035.gho.pok.ibm.com [9.57.198.25])
-        by ppma04wdc.us.ibm.com with ESMTP id 378n19gekv-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 18 Mar 2021 17:54:09 +0000
-Received: from b01ledav005.gho.pok.ibm.com (b01ledav005.gho.pok.ibm.com [9.57.199.110])
-        by b01cxnp22035.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 12IHs8tN32637184
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 18 Mar 2021 17:54:09 GMT
-Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id E298FAE05F;
-        Thu, 18 Mar 2021 17:54:08 +0000 (GMT)
-Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 8E19CAE05C;
-        Thu, 18 Mar 2021 17:54:07 +0000 (GMT)
-Received: from cpe-66-24-58-13.stny.res.rr.com (unknown [9.85.150.254])
-        by b01ledav005.gho.pok.ibm.com (Postfix) with ESMTP;
-        Thu, 18 Mar 2021 17:54:07 +0000 (GMT)
-Subject: Re: [PATCH v4 1/1] s390/vfio-ap: fix circular lockdep when
- setting/clearing crypto masks
-To:     Halil Pasic <pasic@linux.ibm.com>
-Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, stable@vger.kernel.org,
-        borntraeger@de.ibm.com, cohuck@redhat.com, kwankhede@nvidia.com,
-        pbonzini@redhat.com, alex.williamson@redhat.com,
-        pasic@linux.vnet.ibm.com
-References: <20210310150559.8956-1-akrowiak@linux.ibm.com>
- <20210310150559.8956-2-akrowiak@linux.ibm.com>
- <20210318001729.06cdb8d6.pasic@linux.ibm.com>
-From:   Tony Krowiak <akrowiak@linux.ibm.com>
-Message-ID: <d98ab0e1-dca3-0ea7-2478-387e3698900e@linux.ibm.com>
-Date:   Thu, 18 Mar 2021 13:54:06 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+        id S232488AbhCRR4Z (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 18 Mar 2021 13:56:25 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:49574 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232319AbhCRR4G (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 18 Mar 2021 13:56:06 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1616090165;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=yJwKGGb6xUVv2uEIdalH0fpIFBKMebltv5Li4eKnJWw=;
+        b=AYk/2jd10wBDcsPrbMUA7kUB8Ap+V8QIn3j/mxDusEzMIyindXdHYSgpWkBLufVPHjAR25
+        RwBKyFolV0k7HxvwGbiD4DIbAcBfcJpB7OwnTalPBacmIOVhMPirDi6S7s61WL9iTj+UGv
+        m9WiFNDyLrqqQov7caNrx6sQEF2zxGs=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-515-VM2tPDYXM5CJIXqD_HAj8w-1; Thu, 18 Mar 2021 13:56:02 -0400
+X-MC-Unique: VM2tPDYXM5CJIXqD_HAj8w-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9A1378189D7;
+        Thu, 18 Mar 2021 17:56:00 +0000 (UTC)
+Received: from fuller.cnet (ovpn-112-2.gru2.redhat.com [10.97.112.2])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 0B3126064B;
+        Thu, 18 Mar 2021 17:56:00 +0000 (UTC)
+Received: by fuller.cnet (Postfix, from userid 1000)
+        id DEE0A4188684; Thu, 18 Mar 2021 14:55:15 -0300 (-03)
+Date:   Thu, 18 Mar 2021 14:55:15 -0300
+From:   Marcelo Tosatti <mtosatti@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org,
+        Sean Christopherson <seanjc@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>
+Subject: Re: [PATCH v2 6/4] selftests: kvm: Add basic Hyper-V clocksources
+ tests
+Message-ID: <20210318175515.GA40821@fuller.cnet>
+References: <20210316143736.964151-1-vkuznets@redhat.com>
+ <20210318140949.1065740-1-vkuznets@redhat.com>
+ <20210318165756.GA36190@fuller.cnet>
+ <4882dc8f-30bf-f049-f770-24811bb96b54@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20210318001729.06cdb8d6.pasic@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.761
- definitions=2021-03-18_09:2021-03-17,2021-03-18 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 adultscore=0
- impostorscore=0 suspectscore=0 mlxlogscore=999 clxscore=1015 mlxscore=0
- lowpriorityscore=0 bulkscore=0 spamscore=0 priorityscore=1501
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2103180124
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <4882dc8f-30bf-f049-f770-24811bb96b54@redhat.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Thu, Mar 18, 2021 at 06:50:35PM +0100, Paolo Bonzini wrote:
+> On 18/03/21 17:57, Marcelo Tosatti wrote:
+> > I think this should be monotonically increasing:
+> > 
+> > 1.	r1 = rdtsc();
+> > 2.	t1 = rdmsr(HV_X64_MSR_TIME_REF_COUNT);
+> > 3.	nop_loop();
+> > 4.	r2 = rdtsc();
+> > 5.	t2 = rdmsr(HV_X64_MSR_TIME_REF_COUNT);	
+> > 
+> > > 
+> > > +	/* 1% tolerance */
+> > > +	GUEST_ASSERT(delta_ns * 100 < (t2 - t1) * 100);
+> > > +}
+> > 
+> > Doesnt an unbounded schedule-out/schedule-in (which resembles
+> > overloaded host) of the qemu-kvm vcpu in any of the points 1,2,3,4,5
+> > break the assertion above?
+> 
+> 
+> Yes, there's a window of a handful of instructions (at least on
+> non-preemptible kernels).  If anyone ever hits it, we can run the test 100
+> times and check that it passes at least 95 or 99 of them.
+> 
+> Paolo
 
+Yep, sounds like a good solution.
 
-On 3/17/21 7:17 PM, Halil Pasic wrote:
-> On Wed, 10 Mar 2021 10:05:59 -0500
-> Tony Krowiak <akrowiak@linux.ibm.com> wrote:
->
->> -		ret = vfio_ap_mdev_reset_queues(mdev);
->> +		matrix_mdev = mdev_get_drvdata(mdev);
-> Is it guaranteed that matrix_mdev can't be NULL here? If yes, please
-> remind me of the mechanism that ensures this.
-
-The matrix_mdev is set as drvdata when the mdev is created and
-is only cleared when the mdev is removed. Likewise, this function
-is a callback defined by by vfio in the vfio_ap_matrix_ops structure
-when the matrix_dev is registered and is intended to handle ioctl
-calls from userspace during the lifetime of the mdev. While I can't
-speak definitively to the guarantee, I think it is extremely unlikely
-that matrix_mdev would be NULL at this point. On the other hand,
-it wouldn't hurt to check for NULL and log an error or warning
-message (I prefer an error here) if NULL.
-
->
->> +
->> +		/*
->> +		 * If the KVM pointer is in the process of being set, wait until
->> +		 * the process has completed.
->> +		 */
->> +		wait_event_cmd(matrix_mdev->wait_for_kvm,
->> +			       matrix_mdev->kvm_busy == false,
->> +			       mutex_unlock(&matrix_dev->lock),
->> +			       mutex_lock(&matrix_dev->lock));
->> +
->> +		if (matrix_mdev->kvm)
->> +			ret = vfio_ap_mdev_reset_queues(mdev);
->> +		else
->> +			ret = -ENODEV;
-> Didn't we agree to make the call to vfio_ap_mdev_reset_queues()
-> unconditional again (for reference please take look at
-> Message-ID: <64afa72c-2d6a-2ca1-e576-34e15fa579ed@linux.ibm.com>)?
-
-Yes, we did agree to that and I changed it at the time. That change
-got lost somehow; I'll reinstate it.
-
->
-> Regards,
-> Halil
+However this makes me wonder on the validity of the test: what its
+trying to verify, again? (i would check the monotonicity that 
+is r1 <= t1 <= r2 <= t2 as well, without the nop_loop in between).
 
