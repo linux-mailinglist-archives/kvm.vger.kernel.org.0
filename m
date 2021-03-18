@@ -2,80 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E2D1A340D7F
-	for <lists+kvm@lfdr.de>; Thu, 18 Mar 2021 19:46:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 93FFD340DFC
+	for <lists+kvm@lfdr.de>; Thu, 18 Mar 2021 20:16:33 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232479AbhCRSqZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 18 Mar 2021 14:46:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54446 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232673AbhCRSqR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 18 Mar 2021 14:46:17 -0400
-Received: from mail-pg1-x530.google.com (mail-pg1-x530.google.com [IPv6:2607:f8b0:4864:20::530])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 94330C06175F
-        for <kvm@vger.kernel.org>; Thu, 18 Mar 2021 11:46:17 -0700 (PDT)
-Received: by mail-pg1-x530.google.com with SMTP id y27so2031555pga.9
-        for <kvm@vger.kernel.org>; Thu, 18 Mar 2021 11:46:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=Bf0Dt0STxVme8E7nNHr9X3FypHJvzfOBAA6p3/VdKOs=;
-        b=f4U7f0b0xTtH72mR0AURUneWkNYBzDnPg87aC2lPFJRIjbEVwaeJx1JvRtNRtvS2ib
-         nTERXzmVPsbFXSraCX/EG1Cis+s1l4Nn+BiMAIOPcrLjS0HMgr+Rro4OLNbf6eyhiNN6
-         1MbcvGkNuV0hUxMD4m/A3DLlfi5YEmRaBLujIL82wZjdgAqrcJNPc9KD+NEW/TXEhOmo
-         HK0kXFcpzDREZoawv2//shVPXvrZLKF2nqlgY3gGEJh0IRmF+cZP7lg9BlNSICE2wDlI
-         mrQ8VLTnwPAm/PdEUI2TK06Uc1NFVm3i4zxvD0UPtMohF+anAcDwsG0kWakBz/aRQ/Sg
-         NRWA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=Bf0Dt0STxVme8E7nNHr9X3FypHJvzfOBAA6p3/VdKOs=;
-        b=Y7DCUTUekr8QTcpY/UYJjFr2CRHcYBkGR5xtLzqSF4CmDIm/4Qv+4MrAHjKvKEYY69
-         FogpIzf8uSC+Aj10gS9jQIKt7h1541H8FrvNfZke4YG0F0dgn78MbVpYe9OEiqCyz2gL
-         y4BTVdzmbfPLs9apIRIHw1zdUG8VeVl5OuRk8qMKLJqHzL0KqKOnwEwGiuTUfE00j7IN
-         RV9LoILREsx6K1bi4euwkAgYRlAdJKY7qDdmjbfYKl8QWPZjBZtP8JOVkhBy2YbnFszb
-         tQ22Yc+W4p2OBBlhkEIbHX/uV4U74RU+JfTdqN/UIRIy7w5XDSf0+S8n2ypC6GHoBG7E
-         rFEQ==
-X-Gm-Message-State: AOAM5316ktZANPiv3wfegP+LPbJVOtxF4E4dN0nLXg4Jww6hzVLDpJSg
-        W52BO8GT/M9VhdmZEoJa0z1rgA==
-X-Google-Smtp-Source: ABdhPJwFxywHp7L5YJi90JSdTwq+RSG30E/0m9h/OlAzFFlrxlPlHWRYwoUGnnXZsl5VQFWZec+LCw==
-X-Received: by 2002:a65:5543:: with SMTP id t3mr8130155pgr.275.1616093177008;
-        Thu, 18 Mar 2021 11:46:17 -0700 (PDT)
-Received: from google.com (240.111.247.35.bc.googleusercontent.com. [35.247.111.240])
-        by smtp.gmail.com with ESMTPSA id c72sm3075133pfb.165.2021.03.18.11.46.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 18 Mar 2021 11:46:16 -0700 (PDT)
-Date:   Thu, 18 Mar 2021 18:46:12 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Andrew Jones <drjones@redhat.com>,
-        Emanuele Giuseppe Esposito <eesposit@redhat.com>,
-        linux-kselftest@vger.kernel.org, Shuah Khan <shuah@kernel.org>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] selftests/kvm: add get_msr_index_features
-Message-ID: <YFOf9Jc3eFw6+dZX@google.com>
-References: <20210318145629.486450-1-eesposit@redhat.com>
- <20210318170316.6vah7x2ws4bimmdf@kamzik.brq.redhat.com>
- <c08773f1-4b84-bb19-cda8-c8ac6ffffdaf@redhat.com>
+        id S232774AbhCRTP7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 18 Mar 2021 15:15:59 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:44278 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232728AbhCRTPq (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 18 Mar 2021 15:15:46 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1616094945;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=UrN6I/K64VfQCttfF8qXoz5SoRAyjeSvtF00DW1eR4I=;
+        b=KunJ3BS6ddKULC7PI8y+mTiQ3DFKpdQtYicC9jFs4jTKMOJgxLkTAxlgdljnym/Foqg7UE
+        60egEGQBMuA8GboAy6xg+LmZ/WxuqtqQEc/LNK3pDErznSx8ovpQgPLW7fbkiKPer+cz7u
+        Yf8igH+arbD5dI/Mzm0B8mXgh7y14ds=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-361-3LcEhTwLPCSXOj0Z9u-Bog-1; Thu, 18 Mar 2021 15:15:41 -0400
+X-MC-Unique: 3LcEhTwLPCSXOj0Z9u-Bog-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2EC1018C89C4;
+        Thu, 18 Mar 2021 19:15:40 +0000 (UTC)
+Received: from omen.home.shazbot.org (ovpn-112-255.phx2.redhat.com [10.3.112.255])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id A60215D9C6;
+        Thu, 18 Mar 2021 19:15:39 +0000 (UTC)
+Date:   Thu, 18 Mar 2021 13:15:39 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        steven.sistare@oracle.com, jgg@nvidia.com,
+        daniel.m.jordan@oracle.com
+Subject: [GIT PULL] VFIO fixes for v5.12-rc4
+Message-ID: <20210318131539.1c66212d@omen.home.shazbot.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <c08773f1-4b84-bb19-cda8-c8ac6ffffdaf@redhat.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Mar 18, 2021, Paolo Bonzini wrote:
-> On 18/03/21 18:03, Andrew Jones wrote:
-> > > 
-> > >  TEST_GEN_PROGS_x86_64 = x86_64/cr4_cpuid_sync_test
-> > > +TEST_GEN_PROGS_x86_64 += x86_64/get_msr_index_features
-> > 
-> > Maybe we should give up trying to keep an alphabetic order.
-> 
-> FWIW I had fixed that but yeah maybe we should just give up.
+Hi Linus,
 
-Never!  What if we make offenders wear a dunce cap at the next KVM Forum?
+The following changes since commit 1e28eed17697bcf343c6743f0028cc3b5dd88bf0:
+
+  Linux 5.12-rc3 (2021-03-14 14:41:02 -0700)
+
+are available in the Git repository at:
+
+  git://github.com/awilliam/linux-vfio.git tags/vfio-v5.12-rc4
+
+for you to fetch changes up to 4ab4fcfce5b540227d80eb32f1db45ab615f7c92:
+
+  vfio/type1: fix vaddr_get_pfns() return in vfio_pin_page_external() (2021-03-16 10:39:29 -0600)
+
+----------------------------------------------------------------
+VFIO fixes for v5.12-rc4
+
+ - Fix 32-bit issue with new unmap-all flag (Steve Sistare)
+
+ - Various Kconfig changes for better coverage (Jason Gunthorpe)
+
+ - Fix to batch pinning support (Daniel Jordan)
+
+----------------------------------------------------------------
+Daniel Jordan (1):
+      vfio/type1: fix vaddr_get_pfns() return in vfio_pin_page_external()
+
+Jason Gunthorpe (4):
+      vfio: IOMMU_API should be selected
+      vfio-platform: Add COMPILE_TEST to VFIO_PLATFORM
+      ARM: amba: Allow some ARM_AMBA users to compile with COMPILE_TEST
+      vfio: Depend on MMU
+
+Steve Sistare (1):
+      vfio/type1: fix unmap all on ILP32
+
+ drivers/vfio/Kconfig            |  4 ++--
+ drivers/vfio/platform/Kconfig   |  4 ++--
+ drivers/vfio/vfio_iommu_type1.c | 20 ++++++++++++--------
+ include/linux/amba/bus.h        | 11 +++++++++++
+ 4 files changed, 27 insertions(+), 12 deletions(-)
+
