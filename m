@@ -2,53 +2,53 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 187F23406D8
+	by mail.lfdr.de (Postfix) with ESMTP id 64E9A3406DA
 	for <lists+kvm@lfdr.de>; Thu, 18 Mar 2021 14:27:42 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229745AbhCRN1K (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 18 Mar 2021 09:27:10 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:30550 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S230305AbhCRN0h (ORCPT
+        id S231222AbhCRN1M (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 18 Mar 2021 09:27:12 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:29518 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230318AbhCRN0h (ORCPT
         <rfc822;kvm@vger.kernel.org>); Thu, 18 Mar 2021 09:26:37 -0400
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 12ID398g158279
-        for <kvm@vger.kernel.org>; Thu, 18 Mar 2021 09:26:36 -0400
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 12ID3j1V082602
+        for <kvm@vger.kernel.org>; Thu, 18 Mar 2021 09:26:37 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
  : date : message-id : in-reply-to : references; s=pp1;
- bh=5aYjvPrPRtE5Jz4ifeBji0Grqkm1aFAX39SteY+rSe0=;
- b=I/8cr9BvKKbq8AGAlxGtJntaV5UMUTJjGd2DJWyvfj9TMq8BPQdIaB1wGWKZ9ZuqMd+e
- T/PiuPsieCQAhJxvNHJT6CeUqEWktpmbO3ffWwSjPP49lFpiAmPDNkzj+t9tTsB+9pUj
- SEeSGYkkZLLb1lON9D3On4TM9Zyd70oUXwQ/HAVrLQhNOMbyBfNP/drsV7G7k4Ez/VQy
- 7ZIr20smeTsK2rM+dxiT7CZ8d+sweWUZp2Iu9bEjDcNQhm4jJ4TW0SEelR5yyDSuIOYg
- Qpmy0Un1SkYJm8NkfXhWemnH4F6Q/bqJkPCJVWqGF6c9Q7tWBZPPWNDeCf7jHDRsE9si 8g== 
+ bh=tWnXqxqaoqMQz43RYzpZH3QHV9Cc1g7x7rRtodZqNVg=;
+ b=bRgsLQ08Sy4+R4sYN5ZEju3+FLG52QO0SFqfxQe2a/0dZyVYTM+kij0Frms+/D+Ftl7H
+ xf/l9rjV8AyvFdX+3agBNv6Uw4CEcxPD57fltLE6eBVQcin4jCPdvXliySEudihP8pk5
+ 38X6hy9ItXvzo+m2vlIYcKF/A+NihReQ2MN+UBoyCwZqK6y/sDLwh80YOax9wQwbOgAd
+ Dj7j6USqDebEqBX5WMt9fG/bk10bZtPExz8NZjhiz/zlXU8+pa7psK0TElADjRmBtt3j
+ 4KxI03isEvS4kWgzc0zOUwjjX8qPVMw1s5uAjlyCO9j0kjIapfU+dbPftqA6iZpB00mC bg== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 37byr3dkjf-1
+        by mx0a-001b2d01.pphosted.com with ESMTP id 37c30214vt-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Thu, 18 Mar 2021 09:26:36 -0400
-Received: from m0098414.ppops.net (m0098414.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 12ID3bk8160435
-        for <kvm@vger.kernel.org>; Thu, 18 Mar 2021 09:26:36 -0400
-Received: from ppma06fra.de.ibm.com (48.49.7a9f.ip4.static.sl-reverse.com [159.122.73.72])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 37byr3dkhq-1
+        for <kvm@vger.kernel.org>; Thu, 18 Mar 2021 09:26:37 -0400
+Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 12ID4Ndl085803
+        for <kvm@vger.kernel.org>; Thu, 18 Mar 2021 09:26:37 -0400
+Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 37c30214v2-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 18 Mar 2021 09:26:36 -0400
-Received: from pps.filterd (ppma06fra.de.ibm.com [127.0.0.1])
-        by ppma06fra.de.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 12IDNWeE030235;
+        Thu, 18 Mar 2021 09:26:37 -0400
+Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
+        by ppma03fra.de.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 12IDN3Q4024645;
         Thu, 18 Mar 2021 13:26:34 GMT
 Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
-        by ppma06fra.de.ibm.com with ESMTP id 378mnhahsb-1
+        by ppma03fra.de.ibm.com with ESMTP id 378n18ahm0-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
         Thu, 18 Mar 2021 13:26:34 +0000
 Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 12IDQVGw30802268
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 12IDQV1h27918644
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
         Thu, 18 Mar 2021 13:26:31 GMT
 Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 5BCE94C058;
+        by IMSVA (Postfix) with ESMTP id B006C4C04E;
         Thu, 18 Mar 2021 13:26:31 +0000 (GMT)
 Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 17C394C059;
+        by IMSVA (Postfix) with ESMTP id 73D9C4C044;
         Thu, 18 Mar 2021 13:26:31 +0000 (GMT)
 Received: from oc3016276355.ibm.com (unknown [9.145.64.4])
         by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
@@ -57,101 +57,155 @@ From:   Pierre Morel <pmorel@linux.ibm.com>
 To:     kvm@vger.kernel.org
 Cc:     frankja@linux.ibm.com, david@redhat.com, thuth@redhat.com,
         cohuck@redhat.com, imbrenda@linux.ibm.com
-Subject: [kvm-unit-tests PATCH v1 4/6] s390x: lib: css: add expectations to wait for interrupt
-Date:   Thu, 18 Mar 2021 14:26:26 +0100
-Message-Id: <1616073988-10381-5-git-send-email-pmorel@linux.ibm.com>
+Subject: [kvm-unit-tests PATCH v1 5/6] s390x: css: testing ssch error response
+Date:   Thu, 18 Mar 2021 14:26:27 +0100
+Message-Id: <1616073988-10381-6-git-send-email-pmorel@linux.ibm.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1616073988-10381-1-git-send-email-pmorel@linux.ibm.com>
 References: <1616073988-10381-1-git-send-email-pmorel@linux.ibm.com>
 X-TM-AS-GCONF: 00
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.761
  definitions=2021-03-18_07:2021-03-17,2021-03-18 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 suspectscore=0
- priorityscore=1501 impostorscore=0 mlxscore=0 phishscore=0 mlxlogscore=801
- malwarescore=0 bulkscore=0 adultscore=0 spamscore=0 lowpriorityscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
- definitions=main-2103180097
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 phishscore=0
+ clxscore=1015 mlxlogscore=999 impostorscore=0 malwarescore=0
+ lowpriorityscore=0 suspectscore=0 spamscore=0 mlxscore=0 adultscore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2103180097
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When waiting for an interrupt we may need to check the cause of
-the interrupt depending on the test case.
-
-Let's provide the tests the possibility to check if the last valid
-IRQ received is for the expected instruction.
+Checking error response on various eroneous SSCH instructions:
+- ORB alignment
+- ORB above 2G
+- CCW above 2G
+- bad ORB flags
 
 Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
 ---
- lib/s390x/css.h     |  2 +-
- lib/s390x/css_lib.c | 11 ++++++++++-
- s390x/css.c         |  4 ++--
- 3 files changed, 13 insertions(+), 4 deletions(-)
+ s390x/css.c | 102 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 102 insertions(+)
 
-diff --git a/lib/s390x/css.h b/lib/s390x/css.h
-index 65fc335..add3b4e 100644
---- a/lib/s390x/css.h
-+++ b/lib/s390x/css.h
-@@ -316,7 +316,7 @@ void css_irq_io(void);
- int css_residual_count(unsigned int schid);
- 
- void enable_io_isc(uint8_t isc);
--int wait_and_check_io_completion(int schid);
-+int wait_and_check_io_completion(int schid, uint32_t pending);
- 
- /*
-  * CHSC definitions
-diff --git a/lib/s390x/css_lib.c b/lib/s390x/css_lib.c
-index 211c73c..4cdd7ad 100644
---- a/lib/s390x/css_lib.c
-+++ b/lib/s390x/css_lib.c
-@@ -537,7 +537,7 @@ struct ccw1 *ccw_alloc(int code, void *data, int count, unsigned char flags)
-  * completion.
-  * Only report failures.
-  */
--int wait_and_check_io_completion(int schid)
-+int wait_and_check_io_completion(int schid, uint32_t pending)
- {
- 	int ret = 0;
- 	struct irq_entry *irq = NULL;
-@@ -569,6 +569,15 @@ int wait_and_check_io_completion(int schid)
- 		goto end;
- 	}
- 
-+	if (pending) {
-+		if (!(pending & irq->irb.scsw.ctrl)) {
-+			report_info("%08x : %s", schid, dump_scsw_flags(irq->irb.scsw.ctrl));
-+			report_info("expect   : %s", dump_scsw_flags(pending));
-+			ret = -1;
-+			goto end;
-+		}
-+	}
-+
- 	/* clear and halt pending are valid even without secondary or primary status */
- 	if (irq->irb.scsw.ctrl & (SCSW_FC_CLEAR | SCSW_FC_HALT)) {
- 		ret = 0;
 diff --git a/s390x/css.c b/s390x/css.c
-index c340c53..a6a9773 100644
+index a6a9773..1c891f8 100644
 --- a/s390x/css.c
 +++ b/s390x/css.c
-@@ -94,7 +94,7 @@ static void test_sense(void)
- 		goto error;
- 	}
- 
--	if (wait_and_check_io_completion(test_device_sid) < 0)
-+	if (wait_and_check_io_completion(test_device_sid, SCSW_FC_START) < 0)
- 		goto error;
- 
- 	/* Test transfer completion */
-@@ -137,7 +137,7 @@ static void sense_id(void)
- {
- 	assert(!start_ccw1_chain(test_device_sid, ccw));
- 
--	assert(wait_and_check_io_completion(test_device_sid) >= 0);
-+	assert(wait_and_check_io_completion(test_device_sid, SCSW_FC_START) >= 0);
+@@ -51,6 +51,107 @@ static void test_enable(void)
+ 	report(cc == 0, "Enable subchannel %08x", test_device_sid);
  }
  
- static void css_init(void)
++static void test_ssch(void)
++{
++	struct orb orb = {
++		.intparm = test_device_sid,
++		.ctrl = ORB_CTRL_ISIC | ORB_CTRL_FMT | ORB_LPM_DFLT,
++	};
++	int i;
++	phys_addr_t base, top;
++
++	assert(css_enable(test_device_sid, IO_SCH_ISC) == 0);
++	assert(register_io_int_func(css_irq_io) == 0);
++
++	/* ORB address should be aligned on 32 bits */
++	report_prefix_push("ORB alignment");
++	expect_pgm_int();
++	ssch(test_device_sid, (void *)0x110002);
++	check_pgm_int_code(PGM_INT_CODE_SPECIFICATION);
++	report_prefix_pop();
++
++	/* ORB address should be lower than 2G */
++	report_prefix_push("ORB Address above 2G");
++	expect_pgm_int();
++	ssch(test_device_sid, (void *)0x80000000);
++	check_pgm_int_code(PGM_INT_CODE_ADDRESSING);
++	report_prefix_pop();
++
++	phys_alloc_get_unused(&base, &top);
++	report_info("base %08lx, top %08lx", base, top);
++
++	/* ORB address should be available we check 1G*/
++	report_prefix_push("ORB Address must be available");
++	if (top < 0x40000000) {
++		expect_pgm_int();
++		ssch(test_device_sid, (void *)0x40000000);
++		check_pgm_int_code(PGM_INT_CODE_ADDRESSING);
++	} else {
++		report_skip("guest started with more than 1G memory");
++	}
++	report_prefix_pop();
++
++	report_prefix_push("CCW address above 2G");
++	orb.cpa = 0x80000000;
++	expect_pgm_int();
++	ssch(test_device_sid, &orb);
++	check_pgm_int_code(PGM_INT_CODE_OPERAND);
++	report_prefix_pop();
++
++	senseid = alloc_io_mem(sizeof(*senseid), 0);
++	assert(senseid);
++	orb.cpa = (uint64_t)ccw_alloc(CCW_CMD_SENSE_ID, senseid,
++				      sizeof(*senseid), CCW_F_SLI);
++	assert(orb.cpa);
++
++	report_prefix_push("Disabled subchannel");
++	assert(css_disable(test_device_sid) == 0);
++	report(ssch(test_device_sid, &orb) == 3, "CC = 3");
++	assert(css_enable(test_device_sid, IO_SCH_ISC) == 0);
++	report_prefix_pop();
++
++	/*
++	 * Check sending a second SSCH before clearing the status with TSCH
++	 * the subchannel is left disabled.
++	 */
++	report_prefix_push("SSCH on channel with status pending");
++	assert(css_enable(test_device_sid, IO_SCH_ISC) == 0);
++	assert(ssch(test_device_sid, &orb) == 0);
++	report(ssch(test_device_sid, &orb) == 1, "CC = 1");
++	/* now we clear the status */
++	assert(wait_and_check_io_completion(test_device_sid, SCSW_FC_START) == 0);
++	assert(css_disable(test_device_sid) == 0);
++	report_prefix_pop();
++
++	report_prefix_push("ORB MIDAW unsupported");
++	assert(css_enable(test_device_sid, IO_SCH_ISC) == 0);
++	orb.ctrl |= ORB_CTRL_MIDAW;
++	expect_pgm_int();
++	ssch(test_device_sid, &orb);
++	check_pgm_int_code(PGM_INT_CODE_OPERAND);
++	report_prefix_pop();
++	orb.ctrl = 0;
++
++	for (i = 0; i < 5; i++) {
++		char buffer[30];
++
++		orb.ctrl = (0x02 << i);
++		snprintf(buffer, 30, "ORB reserved ctrl flags %02x", orb.ctrl);
++		report_prefix_push(buffer);
++		expect_pgm_int();
++		ssch(test_device_sid, &orb);
++		check_pgm_int_code(PGM_INT_CODE_OPERAND);
++		report_prefix_pop();
++	}
++
++	report_prefix_push("ORB wrong ctrl flags");
++	orb.ctrl |= 0x040000;
++	expect_pgm_int();
++	ssch(test_device_sid, &orb);
++	check_pgm_int_code(PGM_INT_CODE_OPERAND);
++	report_prefix_pop();
++}
++
+ /*
+  * test_sense
+  * Pre-requisites:
+@@ -339,6 +440,7 @@ static struct {
+ 	{ "initialize CSS (chsc)", css_init },
+ 	{ "enumerate (stsch)", test_enumerate },
+ 	{ "enable (msch)", test_enable },
++	{ "start subchannel", test_ssch },
+ 	{ "sense (ssch/tsch)", test_sense },
+ 	{ "measurement block (schm)", test_schm },
+ 	{ "measurement block format0", test_schm_fmt0 },
 -- 
 2.17.1
 
