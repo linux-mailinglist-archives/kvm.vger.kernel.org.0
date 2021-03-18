@@ -2,167 +2,114 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2613D340219
-	for <lists+kvm@lfdr.de>; Thu, 18 Mar 2021 10:33:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 597D43402B5
+	for <lists+kvm@lfdr.de>; Thu, 18 Mar 2021 11:05:57 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229646AbhCRJcm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 18 Mar 2021 05:32:42 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:28682 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229736AbhCRJcf (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 18 Mar 2021 05:32:35 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1616059948;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=hzmvOFYyhdKH4Hq1n07t/xm6UA0pgEWz5UpHRQtMk/w=;
-        b=iP/6/z9fo4dfqA7RO0JCTCoY49kwkSxmQp4dkx1F1BHYLQUlU6gCi1AVLKMIyp/+BGdu0L
-        wFjJsN89UrEhdscKx1H2b3O/PlYDGAKIsEbHg+fWWDZRa7UNtMb+ynuVE8F/as42wEYNzc
-        tyXH6ZBhoyaRzA7VpAil6OlOqe/zJlQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-342-S78n606HPXCgPGoECDAaTw-1; Thu, 18 Mar 2021 05:32:24 -0400
-X-MC-Unique: S78n606HPXCgPGoECDAaTw-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C96FA10866A0;
-        Thu, 18 Mar 2021 09:32:22 +0000 (UTC)
-Received: from [10.36.112.6] (ovpn-112-6.ams2.redhat.com [10.36.112.6])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 3AE0217D04;
-        Thu, 18 Mar 2021 09:32:15 +0000 (UTC)
-Subject: Re: [PATCH v2 01/14] vfio: Remove extra put/gets around
- vfio_device->group
-To:     Jason Gunthorpe <jgg@nvidia.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org
-Cc:     "Raj, Ashok" <ashok.raj@intel.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Christoph Hellwig <hch@lst.de>,
-        Leon Romanovsky <leonro@nvidia.com>,
-        Max Gurtovoy <mgurtovoy@nvidia.com>,
-        Tarun Gupta <targupta@nvidia.com>
-References: <1-v2-20d933792272+4ff-vfio1_jgg@nvidia.com>
-From:   Auger Eric <eric.auger@redhat.com>
-Message-ID: <c5551f77-3071-06bc-ff15-1c606185c9ee@redhat.com>
-Date:   Thu, 18 Mar 2021 10:32:13 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.7.0
+        id S229649AbhCRKFY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 18 Mar 2021 06:05:24 -0400
+Received: from mail.kernel.org ([198.145.29.99]:40038 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229600AbhCRKFD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 18 Mar 2021 06:05:03 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 4AE6464F38;
+        Thu, 18 Mar 2021 10:05:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1616061903;
+        bh=KddoL2XE4uBf99evSPlBM3odoKUqV8uiIdkiEMeuARg=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=YwxOfGYU2tGsaOJ4g3FJ8E2dmNIGYdQiKcKsPfiwIeTC6Akd6uuzqZDMBpTXYBB8C
+         wPaxvzP0yq1Vb3qFQoqyLMJS8Gi3b1oLhYw96Ir5KL91s1b8FT4LTQ9ZSOV3DLyru8
+         uMRu/5KLQnx+jSW5UazRXg4hPcGVZ0j+pKxU8FAJ391aT1AjdCbgdJebQFGFsU7QjU
+         1TSDU/T3sLV7GiDb16dvnjpb5lpJ0VQF+4mBFldm8m5kVBb+9089v4/iE2nT9rZkiZ
+         T0z3vUwUI6gksslbP92OCnvL7/lqYzpscNm70Jeu4kN5FXBVFkxfQvWNx7VprqWH0+
+         zAjfub8bIx6HQ==
+From:   Will Deacon <will@kernel.org>
+To:     Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Andre Przywara <andre.przywara@arm.com>
+Cc:     catalin.marinas@arm.com, kernel-team@android.com,
+        Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
+        Sami Mujawar <sami.mujawar@arm.com>,
+        Marc Zyngier <maz@kernel.org>, kvm@vger.kernel.org,
+        Alexandru Elisei <alexandru.elisei@arm.com>
+Subject: Re: [PATCH kvmtool v3 00/22] Unify I/O port and MMIO trap handling
+Date:   Thu, 18 Mar 2021 10:04:55 +0000
+Message-Id: <161606068634.550587.17439092982108275200.b4-ty@kernel.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20210315153350.19988-1-andre.przywara@arm.com>
+References: <20210315153350.19988-1-andre.przywara@arm.com>
 MIME-Version: 1.0
-In-Reply-To: <1-v2-20d933792272+4ff-vfio1_jgg@nvidia.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Jason,
+On Mon, 15 Mar 2021 15:33:28 +0000, Andre Przywara wrote:
+> this version is addressing Alexandru's comments, fixing mostly minor
+> issues in the naming scheme. The biggest change is to keep the
+> ioport__read/ioport_write wrappers for the serial device.
+> For more details see the changelog below.
+> ==============
+> 
+> At the moment we use two separate code paths to handle exits for
+> KVM_EXIT_IO (ioport.c) and KVM_EXIT_MMIO (mmio.c), even though they
+> are semantically very similar. Because the trap handler callback routine
+> is different, devices need to decide on one conduit or need to provide
+> different handler functions for both of them.
+> 
+> [...]
 
-On 3/13/21 1:55 AM, Jason Gunthorpe wrote:
-> The vfio_device->group value has a get obtained during
-> vfio_add_group_dev() which gets moved from the stack to vfio_device->group
-> in vfio_group_create_device().
-> 
-> The reference remains until we reach the end of vfio_del_group_dev() when
-> it is put back.
-> 
-> Thus anything that already has a kref on the vfio_device is guaranteed a
-> valid group pointer. Remove all the extra reference traffic.
-> 
-> It is tricky to see, but the get at the start of vfio_del_group_dev() is
-> actually pairing with the put hidden inside vfio_device_put() a few lines
-> below.
-> 
-> A later patch merges vfio_group_create_device() into vfio_add_group_dev()
-> which makes the ownership and error flow on the create side easier to
-> follow.
-> 
-> Reviewed-by: Christoph Hellwig <hch@lst.de>
-> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
+Applied to kvmtool (master), thanks!
 
-Thanks
+[01/22] ioport: Remove ioport__setup_arch()
+        https://git.kernel.org/will/kvmtool/c/97531eb2ca70
+[02/22] hw/serial: Use device abstraction for FDT generator function
+        https://git.kernel.org/will/kvmtool/c/a81be31eee6e
+[03/22] ioport: Retire .generate_fdt_node functionality
+        https://git.kernel.org/will/kvmtool/c/9bc7e2ce343e
+[04/22] mmio: Extend handling to include ioport emulation
+        https://git.kernel.org/will/kvmtool/c/96f0c86ce221
+[05/22] hw/i8042: Clean up data types
+        https://git.kernel.org/will/kvmtool/c/fc7696277b29
+[06/22] hw/i8042: Refactor trap handler
+        https://git.kernel.org/will/kvmtool/c/f7ef3dc0cd28
+[07/22] hw/i8042: Switch to new trap handlers
+        https://git.kernel.org/will/kvmtool/c/d24bedb1cc9a
+[08/22] x86/ioport: Refactor trap handlers
+        https://git.kernel.org/will/kvmtool/c/82304999f936
+[09/22] x86/ioport: Switch to new trap handlers
+        https://git.kernel.org/will/kvmtool/c/3adbcb235020
+[10/22] hw/rtc: Refactor trap handlers
+        https://git.kernel.org/will/kvmtool/c/8c45f36430bd
+[11/22] hw/rtc: Switch to new trap handler
+        https://git.kernel.org/will/kvmtool/c/123ee474b97b
+[12/22] hw/vesa: Switch trap handling to use MMIO handler
+        https://git.kernel.org/will/kvmtool/c/38ae332ffcec
+[13/22] hw/serial: Refactor trap handler
+        https://git.kernel.org/will/kvmtool/c/47a510600e08
+[14/22] hw/serial: Switch to new trap handlers
+        https://git.kernel.org/will/kvmtool/c/59866df60b4b
+[15/22] vfio: Refactor ioport trap handler
+        https://git.kernel.org/will/kvmtool/c/a4a0dac75469
+[16/22] vfio: Switch to new ioport trap handlers
+        https://git.kernel.org/will/kvmtool/c/579bc61f8798
+[17/22] virtio: Switch trap handling to use MMIO handler
+        https://git.kernel.org/will/kvmtool/c/205eaa794be7
+[18/22] pci: Switch trap handling to use MMIO handler
+        https://git.kernel.org/will/kvmtool/c/1f56b9d10a28
+[19/22] Remove ioport specific routines
+        https://git.kernel.org/will/kvmtool/c/7e19cb54a7cc
+[20/22] arm: Reorganise and document memory map
+        https://git.kernel.org/will/kvmtool/c/f01cc778bd65
+[21/22] hw/serial: ARM/arm64: Use MMIO at higher addresses
+        https://git.kernel.org/will/kvmtool/c/45b4968e0de1
+[22/22] hw/rtc: ARM/arm64: Use MMIO at higher addresses
+        https://git.kernel.org/will/kvmtool/c/382eaad7b695
 
-Eric
+Cheers,
+-- 
+Will
 
-> ---
->  drivers/vfio/vfio.c | 21 ++-------------------
->  1 file changed, 2 insertions(+), 19 deletions(-)
-> 
-> diff --git a/drivers/vfio/vfio.c b/drivers/vfio/vfio.c
-> index 38779e6fd80cb4..15d8e678e5563a 100644
-> --- a/drivers/vfio/vfio.c
-> +++ b/drivers/vfio/vfio.c
-> @@ -546,14 +546,12 @@ struct vfio_device *vfio_group_create_device(struct vfio_group *group,
->  
->  	kref_init(&device->kref);
->  	device->dev = dev;
-> +	/* Our reference on group is moved to the device */
->  	device->group = group;
->  	device->ops = ops;
->  	device->device_data = device_data;
->  	dev_set_drvdata(dev, device);
->  
-> -	/* No need to get group_lock, caller has group reference */
-> -	vfio_group_get(group);
-> -
->  	mutex_lock(&group->device_lock);
->  	list_add(&device->group_next, &group->device_list);
->  	group->dev_counter++;
-> @@ -585,13 +583,11 @@ void vfio_device_put(struct vfio_device *device)
->  {
->  	struct vfio_group *group = device->group;
->  	kref_put_mutex(&device->kref, vfio_device_release, &group->device_lock);
-> -	vfio_group_put(group);
->  }
->  EXPORT_SYMBOL_GPL(vfio_device_put);
->  
->  static void vfio_device_get(struct vfio_device *device)
->  {
-> -	vfio_group_get(device->group);
->  	kref_get(&device->kref);
->  }
->  
-> @@ -841,14 +837,6 @@ int vfio_add_group_dev(struct device *dev,
->  		vfio_group_put(group);
->  		return PTR_ERR(device);
->  	}
-> -
-> -	/*
-> -	 * Drop all but the vfio_device reference.  The vfio_device holds
-> -	 * a reference to the vfio_group, which holds a reference to the
-> -	 * iommu_group.
-> -	 */
-> -	vfio_group_put(group);
-> -
->  	return 0;
->  }
->  EXPORT_SYMBOL_GPL(vfio_add_group_dev);
-> @@ -928,12 +916,6 @@ void *vfio_del_group_dev(struct device *dev)
->  	unsigned int i = 0;
->  	bool interrupted = false;
->  
-> -	/*
-> -	 * The group exists so long as we have a device reference.  Get
-> -	 * a group reference and use it to scan for the device going away.
-> -	 */
-> -	vfio_group_get(group);
-> -
->  	/*
->  	 * When the device is removed from the group, the group suddenly
->  	 * becomes non-viable; the device has a driver (until the unbind
-> @@ -1008,6 +990,7 @@ void *vfio_del_group_dev(struct device *dev)
->  	if (list_empty(&group->device_list))
->  		wait_event(group->container_q, !group->container);
->  
-> +	/* Matches the get in vfio_group_create_device() */
->  	vfio_group_put(group);
->  
->  	return device_data;
-> 
-
+https://fixes.arm64.dev
+https://next.arm64.dev
+https://will.arm64.dev
