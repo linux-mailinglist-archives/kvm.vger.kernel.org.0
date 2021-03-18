@@ -2,153 +2,140 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 54565340D4A
-	for <lists+kvm@lfdr.de>; Thu, 18 Mar 2021 19:40:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 12A05340D52
+	for <lists+kvm@lfdr.de>; Thu, 18 Mar 2021 19:41:05 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232694AbhCRSj2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 18 Mar 2021 14:39:28 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:20956 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232749AbhCRSi7 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 18 Mar 2021 14:38:59 -0400
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 12IIWdqL109310;
-        Thu, 18 Mar 2021 14:38:58 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=3pXLc1EHvvY6bcYFLNFDof1vErVH0o5UoU0NC2YAHs8=;
- b=SXPkbWjikvUVuCR5v49xNKzBE8pXbYHNhn/xuGw/BZ3pcVa1b+bR1K/UMz6AaFU2j+u+
- G7s9kYR32CyZuLZykG4iex5NnWyhp070D09RG9f8XoWL26o1FqFctnW+iddYF5bE+5cr
- h5UEMtQ1G4YVZlrC2Say+S0DTjg+SNh05E++V2chwgM1Y9jSVlrXNoVTKI16gu9jSWGd
- JNQQXB2a9gvuquxwx0bXkTDwTfhdGZ5iuY/OFaxqwKgMInQnCPPuFw5QkswJFN/TVcCR
- SgUhd/6/AxoXCqGmrVYm4ZOipxnW9RTaNpoTwRugiMfQtVcBEhRCyFnXWk9vEBQB02JH Vg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 37cbxugjn2-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 18 Mar 2021 14:38:58 -0400
-Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 12IIX2H4113779;
-        Thu, 18 Mar 2021 14:38:58 -0400
-Received: from ppma02dal.us.ibm.com (a.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.10])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 37cbxugjmr-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 18 Mar 2021 14:38:58 -0400
-Received: from pps.filterd (ppma02dal.us.ibm.com [127.0.0.1])
-        by ppma02dal.us.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 12IIaC6M030601;
-        Thu, 18 Mar 2021 18:38:57 GMT
-Received: from b01cxnp22035.gho.pok.ibm.com (b01cxnp22035.gho.pok.ibm.com [9.57.198.25])
-        by ppma02dal.us.ibm.com with ESMTP id 378n1ajw7w-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 18 Mar 2021 18:38:57 +0000
-Received: from b01ledav005.gho.pok.ibm.com (b01ledav005.gho.pok.ibm.com [9.57.199.110])
-        by b01cxnp22035.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 12IIcugs28049686
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 18 Mar 2021 18:38:56 GMT
-Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 67C65AE05F;
-        Thu, 18 Mar 2021 18:38:56 +0000 (GMT)
-Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 90D13AE062;
-        Thu, 18 Mar 2021 18:38:54 +0000 (GMT)
-Received: from cpe-66-24-58-13.stny.res.rr.com (unknown [9.85.150.254])
-        by b01ledav005.gho.pok.ibm.com (Postfix) with ESMTP;
-        Thu, 18 Mar 2021 18:38:54 +0000 (GMT)
-Subject: Re: [PATCH v4 1/1] s390/vfio-ap: fix circular lockdep when
- setting/clearing crypto masks
-To:     Halil Pasic <pasic@linux.ibm.com>
-Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, stable@vger.kernel.org,
-        borntraeger@de.ibm.com, cohuck@redhat.com, kwankhede@nvidia.com,
-        pbonzini@redhat.com, alex.williamson@redhat.com,
-        pasic@linux.vnet.ibm.com
-References: <20210310150559.8956-1-akrowiak@linux.ibm.com>
- <20210310150559.8956-2-akrowiak@linux.ibm.com>
- <20210318001729.06cdb8d6.pasic@linux.ibm.com>
-From:   Tony Krowiak <akrowiak@linux.ibm.com>
-Message-ID: <ab9d54a1-afe7-caca-4e5e-99fca9ea2972@linux.ibm.com>
-Date:   Thu, 18 Mar 2021 14:38:53 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
-MIME-Version: 1.0
-In-Reply-To: <20210318001729.06cdb8d6.pasic@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.761
- definitions=2021-03-18_12:2021-03-17,2021-03-18 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 mlxscore=0
- adultscore=0 impostorscore=0 mlxlogscore=912 malwarescore=0
- lowpriorityscore=0 clxscore=1015 priorityscore=1501 spamscore=0
- phishscore=0 suspectscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2009150000 definitions=main-2103180131
+        id S232667AbhCRSkc convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Thu, 18 Mar 2021 14:40:32 -0400
+Received: from mail.kernel.org ([198.145.29.99]:44454 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S232653AbhCRSkR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 18 Mar 2021 14:40:17 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 4421D64F30;
+        Thu, 18 Mar 2021 18:40:17 +0000 (UTC)
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94)
+        (envelope-from <maz@kernel.org>)
+        id 1lMxZ9-002St3-20; Thu, 18 Mar 2021 18:40:15 +0000
+Date:   Thu, 18 Mar 2021 18:40:13 +0000
+Message-ID: <87y2ekgvaq.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
+        kvm@vger.kernel.org
+Cc:     dave.martin@arm.com, daniel.kiss@arm.com,
+        Will Deacon <will@kernel.org>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        broonie@kernel.org, ascull@google.com, qperret@google.com,
+        kernel-team@android.com
+Subject: Re: [PATCH v2 09/11] KVM: arm64: Trap host SVE accesses when the FPSIMD state is dirty
+In-Reply-To: <20210318122532.505263-10-maz@kernel.org>
+References: <20210318122532.505263-1-maz@kernel.org>
+        <20210318122532.505263-10-maz@kernel.org>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8BIT
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, dave.martin@arm.com, daniel.kiss@arm.com, will@kernel.org, catalin.marinas@arm.com, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, broonie@kernel.org, ascull@google.com, qperret@google.com, kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Thu, 18 Mar 2021 12:25:30 +0000,
+Marc Zyngier <maz@kernel.org> wrote:
+> 
+> ZCR_EL2 controls the upper bound for ZCR_EL1, and is set to
+> a potentially lower limit when the guest uses SVE. In order
+> to restore the SVE state on the EL1 host, we must first
+> reset ZCR_EL2 to its original value.
+> 
+> To make it as lazy as possible on the EL1 host side, set
+> the SVE trapping in place when returning exiting from
+> the guest. On the first EL1 access to SVE, ZCR_EL2 will
+> be restored to its full glory.
+> 
+> Suggested-by: Andrew Scull <ascull@google.com>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/kvm/hyp/nvhe/hyp-main.c | 4 ++++
+>  arch/arm64/kvm/hyp/nvhe/switch.c   | 9 +++++++--
+>  2 files changed, 11 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> index f012f8665ecc..8d04d69edd15 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> @@ -177,6 +177,10 @@ void handle_trap(struct kvm_cpu_context *host_ctxt)
+>  	case ESR_ELx_EC_SMC64:
+>  		handle_host_smc(host_ctxt);
+>  		break;
+> +	case ESR_ELx_EC_SVE:
+> +		sve_cond_update_zcr_vq(ZCR_ELx_LEN_MASK, SYS_ZCR_EL2);
+> +		sysreg_clear_set(cptr_el2, CPTR_EL2_TZ, 0);
+> +		break;
+
+It turns out that my last test-run was flawed, as my model was stuck
+with VHE, meaning this snippet was never run. If it ran, I would have
+noticed that CPTR_EL2.TZ being set results in the ZCR_EL2 access to
+trap at EL2, meaning the above explodes very quickly.
+
+I've queued the below patch on top of the existing series, which cures
+the issue and let the tests run for real this time.
+
+Thanks to Will for the timely report, and apologies for the lousy
+testing...
+
+	M.
+
+From 5b08709313718e95ba06ef49aa82f964a605bd9c Mon Sep 17 00:00:00 2001
+From: Marc Zyngier <maz@kernel.org>
+Date: Thu, 18 Mar 2021 18:30:26 +0000
+Subject: [PATCH] KVM: arm64: Fix host's ZCR_EL2 restore on nVHE
+
+We re-enter the EL1 host with CPTR_EL2.TZ set in order to
+be able to lazily restore ZCR_EL2 when required.
+
+However, the same CPTR_EL2 configuration also leads to trapping
+when ZCR_EL2 is accessed from EL2. Duh!
+
+Clear CPTR_EL2.TZ *before* writing to ZCR_EL2.
+
+Fixes: beed09067b42 ("KVM: arm64: Trap host SVE accesses when the FPSIMD state is dirty")
+Reported-by: Will Deacon <will@kernel.org>
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+---
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+index 8d04d69edd15..84a702dc4a92 100644
+--- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
++++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+@@ -178,8 +178,9 @@ void handle_trap(struct kvm_cpu_context *host_ctxt)
+ 		handle_host_smc(host_ctxt);
+ 		break;
+ 	case ESR_ELx_EC_SVE:
+-		sve_cond_update_zcr_vq(ZCR_ELx_LEN_MASK, SYS_ZCR_EL2);
+ 		sysreg_clear_set(cptr_el2, CPTR_EL2_TZ, 0);
++		isb();
++		sve_cond_update_zcr_vq(ZCR_ELx_LEN_MASK, SYS_ZCR_EL2);
+ 		break;
+ 	default:
+ 		hyp_panic();
+-- 
+2.29.2
 
 
-On 3/17/21 7:17 PM, Halil Pasic wrote:
-> On Wed, 10 Mar 2021 10:05:59 -0500
-> Tony Krowiak <akrowiak@linux.ibm.com> wrote:
->
->> -		ret = vfio_ap_mdev_reset_queues(mdev);
->> +		matrix_mdev = mdev_get_drvdata(mdev);
-> Is it guaranteed that matrix_mdev can't be NULL here? If yes, please
-> remind me of the mechanism that ensures this.
->
->> +
->> +		/*
->> +		 * If the KVM pointer is in the process of being set, wait until
->> +		 * the process has completed.
->> +		 */
->> +		wait_event_cmd(matrix_mdev->wait_for_kvm,
->> +			       matrix_mdev->kvm_busy == false,
->> +			       mutex_unlock(&matrix_dev->lock),
->> +			       mutex_lock(&matrix_dev->lock));
->> +
->> +		if (matrix_mdev->kvm)
->> +			ret = vfio_ap_mdev_reset_queues(mdev);
->> +		else
->> +			ret = -ENODEV;
-> Didn't we agree to make the call to vfio_ap_mdev_reset_queues()
-> unconditional again (for reference please take look at
-> Message-ID: <64afa72c-2d6a-2ca1-e576-34e15fa579ed@linux.ibm.com>)?
-
-How about this:
-
-static ssize_t vfio_ap_mdev_ioctl(struct mdev_device *mdev,
-                     unsigned int cmd, unsigned long arg)
-{
-     int ret = 0;
-     struct ap_matrix_mdev *matrix_mdev;
-
-     ...
-     case VFIO_DEVICE_RESET:
-         matrix_mdev = mdev_get_drvdata(mdev);
-         WARN(!matrix_mdev, "Driver data missing from mdev!!");
-
-         if (matrix_mdev) {
-             /*
-              * If the KVM pointer is in the process of being set, wait 
-until
-              * the process has completed.
-              */
-             wait_event_cmd(matrix_mdev->wait_for_kvm,
-                        matrix_mdev->kvm_busy == false,
-mutex_unlock(&matrix_dev->lock),
-mutex_lock(&matrix_dev->lock));
-
-             ret = vfio_ap_mdev_reset_queues(mdev);
-         }
-         break;
-     ...
-
-     return ret;
-}
-
->
-> Regards,
-> Halil
-
+-- 
+Without deviation from the norm, progress is not possible.
