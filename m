@@ -2,131 +2,99 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D97D3340606
-	for <lists+kvm@lfdr.de>; Thu, 18 Mar 2021 13:48:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4EB7F340614
+	for <lists+kvm@lfdr.de>; Thu, 18 Mar 2021 13:51:24 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231308AbhCRMsH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 18 Mar 2021 08:48:07 -0400
-Received: from szxga04-in.huawei.com ([45.249.212.190]:14091 "EHLO
-        szxga04-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230477AbhCRMri (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 18 Mar 2021 08:47:38 -0400
-Received: from DGGEMS404-HUB.china.huawei.com (unknown [172.30.72.60])
-        by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4F1RZq72Rsz19GKH;
-        Thu, 18 Mar 2021 20:45:39 +0800 (CST)
-Received: from [10.174.184.135] (10.174.184.135) by
- DGGEMS404-HUB.china.huawei.com (10.3.19.204) with Microsoft SMTP Server id
- 14.3.498.0; Thu, 18 Mar 2021 20:47:27 +0800
-Subject: Re: [RFC PATCH v1 0/4] vfio: Add IOPF support for VFIO passthrough
-To:     "Tian, Kevin" <kevin.tian@intel.com>,
-        Alex Williamson <alex.williamson@redhat.com>
-CC:     Cornelia Huck <cohuck@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Jean-Philippe Brucker <jean-philippe@linaro.org>,
-        Eric Auger <eric.auger@redhat.com>,
-        Lu Baolu <baolu.lu@linux.intel.com>,
-        "wanghaibin.wang@huawei.com" <wanghaibin.wang@huawei.com>,
-        "yuzenghui@huawei.com" <yuzenghui@huawei.com>,
-        "Liu, Yi L" <yi.l.liu@intel.com>,
-        "Pan, Jacob jun" <jacob.jun.pan@intel.com>
-References: <20210125090402.1429-1-lushenming@huawei.com>
- <20210129155730.3a1d49c5@omen.home.shazbot.org>
- <MWHPR11MB188684B42632FD0B9B5CA1C08CB69@MWHPR11MB1886.namprd11.prod.outlook.com>
- <47bf7612-4fb0-c0bb-fa19-24c4e3d01d3f@huawei.com>
- <MWHPR11MB1886C71A751B48EF626CAC938CB39@MWHPR11MB1886.namprd11.prod.outlook.com>
- <4f904b23-e434-d42b-15a9-a410f3b4edb9@huawei.com>
- <MWHPR11MB188656845973A662A7E96BDA8C699@MWHPR11MB1886.namprd11.prod.outlook.com>
- <c152f419-acc4-ee33-dab1-ff0f9baf2f24@huawei.com>
- <MWHPR11MB1886498515951BCE98F9336A8C699@MWHPR11MB1886.namprd11.prod.outlook.com>
-From:   Shenming Lu <lushenming@huawei.com>
-Message-ID: <4e2c9f05-9a87-4aca-71d3-c329d7638aae@huawei.com>
-Date:   Thu, 18 Mar 2021 20:47:16 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.2.2
+        id S231201AbhCRMuv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 18 Mar 2021 08:50:51 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:64562 "EHLO
+        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230169AbhCRMu3 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 18 Mar 2021 08:50:29 -0400
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 12ICXbTe073086;
+        Thu, 18 Mar 2021 08:50:29 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=wy7Ore6Cp8Ux222orPtud4aOxSWm5tRjOCOuomNuypA=;
+ b=RuCxw1fnO+is0b6Qfg1x/De7moTE0oHyfBNOY6W99MoKOh66eSrdl4YAYwl+fFlIQEsr
+ oo4rl/l7l6O/rt4M/tqNvLVaMr+vHfvzcwOX8ZOWYpViv/fNEL6Ko+j/TeVYvrxSYMUE
+ rvtCYAHxgsT/6ypVnXWJHQbOnr0Ib3zjzh3aro5bQVgy83cQzB1m8iO7bWljvZbxZyUa
+ //Vp3Rf5XxUJbW75zPS8FOZXg2Lrhh28lGLO4/pzd7sgJzKH+SOynNvnMvkQy7E/thfN
+ DQctn2N7llASy9qnqgZkbJRF6ikhAvJxOZt3WcWby4UDjvzYXZ5lIpKd3mkcqg+/wMWf SQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 37bnrn4fc7-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 18 Mar 2021 08:50:29 -0400
+Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 12ICXpUJ074455;
+        Thu, 18 Mar 2021 08:50:28 -0400
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 37bnrn4fbk-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 18 Mar 2021 08:50:28 -0400
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+        by ppma06ams.nl.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 12ICmjXR007435;
+        Thu, 18 Mar 2021 12:50:26 GMT
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
+        by ppma06ams.nl.ibm.com with ESMTP id 37b30p1m2s-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 18 Mar 2021 12:50:26 +0000
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 12ICoOtI328306
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 18 Mar 2021 12:50:24 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 87866A4053;
+        Thu, 18 Mar 2021 12:50:24 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 6A11CA4051;
+        Thu, 18 Mar 2021 12:50:23 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.145.24.61])
+        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Thu, 18 Mar 2021 12:50:23 +0000 (GMT)
+From:   Janosch Frank <frankja@linux.ibm.com>
+To:     kvm@vger.kernel.org
+Cc:     thuth@redhat.com, david@redhat.com, cohuck@redhat.com,
+        linux-s390@vger.kernel.org
+Subject: [kvm-unit-tests PATCH 0/3] scripts: Fix PV run handling
+Date:   Thu, 18 Mar 2021 12:50:12 +0000
+Message-Id: <20210318125015.45502-1-frankja@linux.ibm.com>
+X-Mailer: git-send-email 2.27.0
 MIME-Version: 1.0
-In-Reply-To: <MWHPR11MB1886498515951BCE98F9336A8C699@MWHPR11MB1886.namprd11.prod.outlook.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.174.184.135]
-X-CFilter-Loop: Reflected
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.761
+ definitions=2021-03-18_07:2021-03-17,2021-03-18 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 suspectscore=0
+ bulkscore=0 mlxlogscore=999 phishscore=0 lowpriorityscore=0 malwarescore=0
+ impostorscore=0 adultscore=0 spamscore=0 priorityscore=1501 mlxscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
+ definitions=main-2103180095
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2021/3/18 20:32, Tian, Kevin wrote:
->> From: Shenming Lu <lushenming@huawei.com>
->> Sent: Thursday, March 18, 2021 7:54 PM
->>
->> On 2021/3/18 17:07, Tian, Kevin wrote:
->>>> From: Shenming Lu <lushenming@huawei.com>
->>>> Sent: Thursday, March 18, 2021 3:53 PM
->>>>
->>>> On 2021/2/4 14:52, Tian, Kevin wrote:>>> In reality, many
->>>>>>> devices allow I/O faulting only in selective contexts. However, there
->>>>>>> is no standard way (e.g. PCISIG) for the device to report whether
->>>>>>> arbitrary I/O fault is allowed. Then we may have to maintain device
->>>>>>> specific knowledge in software, e.g. in an opt-in table to list devices
->>>>>>> which allows arbitrary faults. For devices which only support selective
->>>>>>> faulting, a mediator (either through vendor extensions on vfio-pci-core
->>>>>>> or a mdev wrapper) might be necessary to help lock down non-
->> faultable
->>>>>>> mappings and then enable faulting on the rest mappings.
->>>>>>
->>>>>> For devices which only support selective faulting, they could tell it to the
->>>>>> IOMMU driver and let it filter out non-faultable faults? Do I get it wrong?
->>>>>
->>>>> Not exactly to IOMMU driver. There is already a vfio_pin_pages() for
->>>>> selectively page-pinning. The matter is that 'they' imply some device
->>>>> specific logic to decide which pages must be pinned and such knowledge
->>>>> is outside of VFIO.
->>>>>
->>>>> From enabling p.o.v we could possibly do it in phased approach. First
->>>>> handles devices which tolerate arbitrary DMA faults, and then extends
->>>>> to devices with selective-faulting. The former is simpler, but with one
->>>>> main open whether we want to maintain such device IDs in a static
->>>>> table in VFIO or rely on some hints from other components (e.g. PF
->>>>> driver in VF assignment case). Let's see how Alex thinks about it.
->>>>
->>>> Hi Kevin,
->>>>
->>>> You mentioned selective-faulting some time ago. I still have some doubt
->>>> about it:
->>>> There is already a vfio_pin_pages() which is used for limiting the IOMMU
->>>> group dirty scope to pinned pages, could it also be used for indicating
->>>> the faultable scope is limited to the pinned pages and the rest mappings
->>>> is non-faultable that should be pinned and mapped immediately? But it
->>>> seems to be a little weird and not exactly to what you meant... I will
->>>> be grateful if you can help to explain further. :-)
->>>>
->>>
->>> The opposite, i.e. the vendor driver uses vfio_pin_pages to lock down
->>> pages that are not faultable (based on its specific knowledge) and then
->>> the rest memory becomes faultable.
->>
->> Ahh...
->> Thus, from the perspective of VFIO IOMMU, if IOPF enabled for such device,
->> only the page faults within the pinned range are valid in the registered
->> iommu fault handler...
->> I have another question here, for the IOMMU backed devices, they are
->> already
->> all pinned and mapped when attaching, is there a need to call
->> vfio_pin_pages()
->> to lock down pages for them? Did I miss something?...
->>
-> 
-> If a device is marked as supporting I/O page fault (fully or selectively), 
-> there should be no pinning at attach or DMA_MAP time (suppose as 
-> this series does). Then for devices with selective-faulting its vendor 
-> driver will lock down the pages which are not faultable at run-time, 
-> e.g. when intercepting guest registration of a ring buffer...
+There are some issues that make our current PV handling in
+run_tests.sh and s390x/run a bit awkward:
 
-Get it. Thanks a lot for this! :-)
+ * With ACCEL=tcg or if KVM is not available we will try to run PV
+   tests which won't work
+ * If a host key cert has been specified but it does not exists then
+   the compilation will break
 
-Shenming
+This series is based on the common script fixes I just sent out.
 
-> 
-> Thanks
-> Kevin
-> 
+Janosch Frank (3):
+  s390x: Don't run PV testcases under tcg
+  configure: s390x: Check if the host key document exists
+  s390x: run: Skip PV tests when tcg is the accelerator
+
+ configure               | 5 +++++
+ s390x/run               | 5 +++++
+ scripts/s390x/func.bash | 3 +++
+ 3 files changed, 13 insertions(+)
+
+-- 
+2.27.0
+
