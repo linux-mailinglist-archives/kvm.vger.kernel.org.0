@@ -2,172 +2,195 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4DAEA342178
-	for <lists+kvm@lfdr.de>; Fri, 19 Mar 2021 17:10:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 01BE8342197
+	for <lists+kvm@lfdr.de>; Fri, 19 Mar 2021 17:18:04 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230337AbhCSQKB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 19 Mar 2021 12:10:01 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:44350 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230177AbhCSQJd (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 19 Mar 2021 12:09:33 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1616170172;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=1I3gDClOrML3K1MwDJ3AQs0luwCHTgaIywIrNOZ7RnU=;
-        b=HGYp/fIavSFAKRltESZ2SQbuWkBiVVeTvRKY44pXMzL3ZdO1FkPQ3CrEUozj52g2CC2gP8
-        ZVMN+L6euGGpVtD4q1WazanywXl5U/Yc1eLJC0+NcZMjz3nQfsivDdvXT3map1Q0H5YKze
-        dtkOS1SXJJpBWMyso+eHj26HvMKhdMU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-150-aIQtqWArOvOtOHatcAZUpQ-1; Fri, 19 Mar 2021 12:09:27 -0400
-X-MC-Unique: aIQtqWArOvOtOHatcAZUpQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BD6F5800D53;
-        Fri, 19 Mar 2021 16:09:26 +0000 (UTC)
-Received: from gondolin (ovpn-112-229.ams2.redhat.com [10.36.112.229])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 33C915C1D1;
-        Fri, 19 Mar 2021 16:09:22 +0000 (UTC)
-Date:   Fri, 19 Mar 2021 17:09:19 +0100
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Pierre Morel <pmorel@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, frankja@linux.ibm.com, david@redhat.com,
-        thuth@redhat.com, imbrenda@linux.ibm.com
-Subject: Re: [kvm-unit-tests PATCH v1 3/6] s390x: lib: css: upgrading IRQ
- handling
-Message-ID: <20210319170919.172ee8d5.cohuck@redhat.com>
-In-Reply-To: <d5e2e4cf-8f76-2099-f0d6-edcb32696bf2@linux.ibm.com>
-References: <1616073988-10381-1-git-send-email-pmorel@linux.ibm.com>
-        <1616073988-10381-4-git-send-email-pmorel@linux.ibm.com>
-        <20210319120105.182c8684.cohuck@redhat.com>
-        <d5e2e4cf-8f76-2099-f0d6-edcb32696bf2@linux.ibm.com>
-Organization: Red Hat GmbH
+        id S229942AbhCSQRb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 19 Mar 2021 12:17:31 -0400
+Received: from mail-dm6nam12on2075.outbound.protection.outlook.com ([40.107.243.75]:64992
+        "EHLO NAM12-DM6-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S229926AbhCSQR0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 19 Mar 2021 12:17:26 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=lRI1lCymGRnd83prHk6xjx0mY2LfdvbAns0JmaLcOSjYnVvDWeGIA/xfVZpaR8bz7p8v/deKb/NgTnpr/Y3R9svNLk4HsjijcTEeRGNgQDmLeX452o3Q62iq6X+mmS4ROUUp8okNHudrUZwXLhYDJ4TCT9sVQFoLtK/4BKsC++SOamcGRCOcQrTxD/RM5lA/gLLFEyYpDGFoNGxGvtFXpc+pa5A5Xt+nMHnYK/aW4viyrbzcBF8xmVFz+4wufwmLS8jXw96xF8ufo9MkInj/tPSQvM19iVPPZyqAZ3+yO6fNEc3sNt4UPkUZewtcgtDqH6xWJP2oV68PqLPNwhGBKA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=roTPGZxTTaPbkmoKKx8YKFS/UM82Opq+Hy/dvt8wAoo=;
+ b=YzL4+jjRhcLUoOEHg65sl2rHYK5X0G4AJlhv9EpeH9EW81QYl2uWmG4SC9PtGMXaVWd+H0PyW1G8U4UAsvWwpVfb//nrTxUAqEkcEuGgVhJ60lCGmyKpeMIpxDFlfgg6qmge7MEump7bN5dtmDHWUa7I2prbBqvh88lSftA7ihk/hSZ7oZIH9iT4oe0FwddCqxRGqRi2LxJU6XXQ3B7inttVmA5ymGdOlO/rX43Y9W95ruyf34boQ3yxViXKyrLoMvoQDwWZvYn9AZp/ZnzEUetfq8rjyP8yWVIFrS0JxsOVEYS1+Mn0A1+hbTAkxPzPfTB8xOIMDnBVVM5upSLY1Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=roTPGZxTTaPbkmoKKx8YKFS/UM82Opq+Hy/dvt8wAoo=;
+ b=QAYiPf9g8R/r1T3CnWsVubcn6OLY7nDKt7k5KRzVpht9RsZBW04jK57GsRTXLnOVcN9KGjnn2s2Y7cOcJGIwj9PmAiYNJ5z0o5/NZN/IoZfGqL835zB5QHIGuutNdYJo4QTIFLIVkb4S+XsdKOX901ozy7R5VQzA8kDiUs6AG7i/3lv+xsYoCUM5rY73TKWtdpHgOWO81dVZ7gY53d4QsSNKM5378iGCjL21on8thjXi3ePWcMuoRO8wAcPlJPunIZgnOiLEWA0+RZxOdwVUy43Ngp7Gs5l2AXD202Y7Ta9w4bKZV/2tgpZXIK7vSiaRJePo/E+4Cz+BJVm8DSX/4A==
+Authentication-Results: redhat.com; dkim=none (message not signed)
+ header.d=none;redhat.com; dmarc=none action=none header.from=nvidia.com;
+Received: from DM6PR12MB3834.namprd12.prod.outlook.com (2603:10b6:5:14a::12)
+ by DM6PR12MB3114.namprd12.prod.outlook.com (2603:10b6:5:11e::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3955.18; Fri, 19 Mar
+ 2021 16:17:24 +0000
+Received: from DM6PR12MB3834.namprd12.prod.outlook.com
+ ([fe80::1c62:7fa3:617b:ab87]) by DM6PR12MB3834.namprd12.prod.outlook.com
+ ([fe80::1c62:7fa3:617b:ab87%6]) with mapi id 15.20.3955.018; Fri, 19 Mar 2021
+ 16:17:24 +0000
+Date:   Fri, 19 Mar 2021 13:17:22 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     Max Gurtovoy <mgurtovoy@nvidia.com>,
+        Alexey Kardashevskiy <aik@ozlabs.ru>, cohuck@redhat.com,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        liranl@nvidia.com, oren@nvidia.com, tzahio@nvidia.com,
+        leonro@nvidia.com, yarong@nvidia.com, aviadye@nvidia.com,
+        shahafs@nvidia.com, artemp@nvidia.com, kwankhede@nvidia.com,
+        ACurrid@nvidia.com, cjia@nvidia.com, yishaih@nvidia.com,
+        mjrosato@linux.ibm.com, hch@lst.de
+Subject: Re: [PATCH 8/9] vfio/pci: export nvlink2 support into vendor
+ vfio_pci drivers
+Message-ID: <20210319161722.GY2356281@nvidia.com>
+References: <20210309083357.65467-1-mgurtovoy@nvidia.com>
+ <20210309083357.65467-9-mgurtovoy@nvidia.com>
+ <19e73e58-c7a9-03ce-65a7-50f37d52ca15@ozlabs.ru>
+ <8941cf42-0c40-776e-6c02-9227146d3d66@nvidia.com>
+ <20210319092341.14bb179a@omen.home.shazbot.org>
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20210319092341.14bb179a@omen.home.shazbot.org>
+X-Originating-IP: [142.162.115.133]
+X-ClientProxiedBy: BL1PR13CA0412.namprd13.prod.outlook.com
+ (2603:10b6:208:2c2::27) To DM6PR12MB3834.namprd12.prod.outlook.com
+ (2603:10b6:5:14a::12)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from mlx.ziepe.ca (142.162.115.133) by BL1PR13CA0412.namprd13.prod.outlook.com (2603:10b6:208:2c2::27) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3977.14 via Frontend Transport; Fri, 19 Mar 2021 16:17:24 +0000
+Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1lNHoQ-00HM4X-Oy; Fri, 19 Mar 2021 13:17:22 -0300
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: b823e249-31ee-4cc8-b4fc-08d8eaf27b41
+X-MS-TrafficTypeDiagnostic: DM6PR12MB3114:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <DM6PR12MB3114F451178F1EA4261A8364C2689@DM6PR12MB3114.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: oqrFLbU4QXSs5X49srqmBDZE+8TUZPZ/3UyHJfyabYfdE76DLu2brHR38WRl14KF/mnYCOoaPiETvXiVu5LCqgJ97fLMAEp05N9D6E0USCZbvjOw02Yc8NFvho7qVNNYByIygP8c6EHnO4jG0ja7z4QFweKknh7cbxMT95II7ptCWnKcO2I5bpcW+LIYGwC4n6pfLF9XTDXMvCRh35GUWC+8m8AInGu2cGkEUHrmgqLHgTvxwUWEMllO9lAYQlua+wLSwwMNv9cTw5jMWoGvQzlz4TTPU1AVP1Q2YeP1ryVaQUqfoPfP/hxSrqkcAsZR4S3crv05A4sa/B3aEdheldKO1LQt6T9iEobcCsrdt7vT7Vsg9NkeghFF3uCq4+HPdgxEjS2eZK4rOB7vviZn9Ugm2E6XvRAZD0N37mox3xKXfGKcrGPd7SMYn7YQlISSfqDJ5Um958TMQPRb+eQSoDBfiSmNAS40SX5WgpJJjzLVrD8u3oIJeRoAfyW7pq6LDqH7N2rzcDPQGOepHjJ2dawT7LmKtZjgE/cjEZ6DOY3s8smUzzl9GX5zSwYyqy6crI8tDDvga+0Mcw6cral4MkYzMjfhNF+y/lGr6BXDgB3dpM4EBSig860Y1nJiZYdfW78dFto/7RMRvdeQM+gObbpRaDdS21HhAvr6KZlvq30=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB3834.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(136003)(396003)(366004)(39860400002)(346002)(376002)(66946007)(2906002)(54906003)(26005)(38100700001)(53546011)(66556008)(4326008)(66476007)(86362001)(8936002)(6916009)(33656002)(83380400001)(2616005)(8676002)(186003)(36756003)(9746002)(5660300002)(426003)(1076003)(478600001)(9786002)(316002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData: =?utf-8?B?bFJVZkJVT1czMUZCQXg3Z0haT2l0bjh2cEVQUUN1RDU1VEpKYjVzbldIdlU1?=
+ =?utf-8?B?dVRPY3BQQVFsMUVOSzR1WTZ6blNPRW1icnhvcy80WVVnYTNlY09raTFmOVF5?=
+ =?utf-8?B?YTh1akNaemkxdTBrM1pTeko5b2dub1FIUTJ5S09HSTU1VjdFQStQeGJxYjRk?=
+ =?utf-8?B?ZmZXR29xcDVDaGp3MllWQVMvMGthYzRzOThJMXhERGFJRVYwSjA1ZVhLekFz?=
+ =?utf-8?B?ais5amRBNnNWYUs0czN5cWw5Zlk0cVZkRlhkaEpnQkNjMEY0aVBmc3k0MTF5?=
+ =?utf-8?B?Y1hGMXBORDlnWThkWG9xTjRwN2ZvVzNSMWpyN0NhTDVzSk0wYXFIaDdZZzgw?=
+ =?utf-8?B?Z1pIelR6YjAxRDAyYUxJN3dTVzFqbDBsdXRWWlU1ODVZbFlhYUY1NFBUT1Zm?=
+ =?utf-8?B?ekdveEQ0MkwwT05rKzYzY2FVZ1FEVStYRkhXWW55a0hnbTBtRU5EWitRNmlp?=
+ =?utf-8?B?SDdDeHhvamFCUWk2cVhWdUhtODlHTkhDMFlJQ29MS2pXelBLMDgrRFU4Tkpn?=
+ =?utf-8?B?dFM2eXNIeVJ1UU0xS0ZWbkRHbDdWMk55ZkhaUHh1ZkJTck5naWlhTXJYTk50?=
+ =?utf-8?B?SXpaMDZnUk9iUFVMNFBvT1h1ei9SQ2RFc1FKY3BIZHV3dm4xcHJLVWJieVNN?=
+ =?utf-8?B?T3AwdFFNeFcyWWtublc1SmhNVGg2K2lIN0Y4VXY0UnhTalVVekhndjVEcUFF?=
+ =?utf-8?B?WjQzMmNLZ3JreUYvUjJzNnBveUE5ei9kcVIxSFVEOExxSkFtSXlCUTNGZit4?=
+ =?utf-8?B?THhTdVB2eE1JMjhmcjY3NG1jOTFVNmhqNzdBMGo3K3pwbnU0WnNxaGpEQWg1?=
+ =?utf-8?B?djhjV1FuL3BieTJMUk1pcmRPVkk2QWk3SlJIMlEydURZcjdQQnVkNU50bko3?=
+ =?utf-8?B?RHpRQzNoRk1YYTNuZWRVUXFxYVRFNnJFTFNJemswTGRLbWdSVUZ5QWk2L1ox?=
+ =?utf-8?B?MURCQXBZV1ArTVNHZTF0T0pvakI3SkR1clF4YVNseHRic1RjdTNhYVQzZ1dR?=
+ =?utf-8?B?bUErRzVjVmZBSjNQWkJWb0RkeitCSHFyWDQxamhmTEdBb1A3ZXdrNlAxMzYv?=
+ =?utf-8?B?eEc1YndRYTN4UkxLRVJzOUtWVVdsaGhoaFIrVG5sTWVLbXJ0azlSWVlxVjFG?=
+ =?utf-8?B?RWxMNnpUc2pzd29ad3FKL1k5Vlc5WmNYR1RjK0dCUHpWSXA0KzBwM2VrY1Q1?=
+ =?utf-8?B?MTdmczF3M21sdk1KM1kxdTAvSjdkTXJFaGIyVSt4Y0c2bVE1bFB2dnNxTjNw?=
+ =?utf-8?B?YXVDTWRaNmQxYmdPV0U5QkQ1THBqZDBtMk9oQ01pZnJIZGx0RVdKZXVJOElv?=
+ =?utf-8?B?b0NreXJ4d2JaL09NSjVBcXhKa3lQRDR2WVdhWkhEMi9pNzk1VnNjZnQ3TU9J?=
+ =?utf-8?B?V25Eb1BGdEZrQ3NGTmorWnNVaG8xelVKenNZNkNoMDFBd2FHNll5SHQzbjdy?=
+ =?utf-8?B?QkY2WXZHTWdJcWdjeHFkRDJXY2xPS1FGaktKOFhQbEpxVE5YNkZBM2hiUFFL?=
+ =?utf-8?B?bldyeXlwTGJXaTRMME5ETkR6TEkvVW1jTzYxQU9WZy85bkRBZUgrYXRxNnZO?=
+ =?utf-8?B?Mlc1cTA0N1drcS9VaFdMb1ZOU0tSaGlEVnh5NFRuZzRDci9HNE9McHJiZTlX?=
+ =?utf-8?B?alBjbkFkdDFaQmdqYm1xKzF6MFRUV0FHekpZS2RzRVJXTG1tdnlRWDAyalUx?=
+ =?utf-8?B?VWRSckhqMFIxVkhLTkM1KzJqbWVQeld2RXFMN3VKWjJvZFRLTUREN0dkQTll?=
+ =?utf-8?B?Y0NNSERwc2hWdFR2VHU1b05zOW1sMURoM2FSbHZwRysyZlJLaU9hTTExcEJT?=
+ =?utf-8?B?b2t3Z0pRMXJ0UklNV2cyZz09?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: b823e249-31ee-4cc8-b4fc-08d8eaf27b41
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB3834.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Mar 2021 16:17:24.6032
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: MHkY/PrsmQz651mQIEytU/3rKxhzmMtqrYnxrw3NVqq0gX5PfGhrVX9i4dCzkNlz
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB3114
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 19 Mar 2021 16:55:15 +0100
-Pierre Morel <pmorel@linux.ibm.com> wrote:
-
-> On 3/19/21 12:01 PM, Cornelia Huck wrote:
-> > On Thu, 18 Mar 2021 14:26:25 +0100
-> > Pierre Morel <pmorel@linux.ibm.com> wrote:
-
-> >> @@ -422,38 +464,38 @@ static struct irb irb;
-> >>   void css_irq_io(void)
-> >>   {
-> >>   	int ret = 0;
-> >> -	char *flags;
-> >> -	int sid;
-> >> +	struct irq_entry *irq;
-> >>   
-> >>   	report_prefix_push("Interrupt");
-> >> -	sid = lowcore_ptr->subsys_id_word;
-> >> +	irq = alloc_irq();
-> >> +	assert(irq);
-> >> +
-> >> +	irq->sid = lowcore_ptr->subsys_id_word;
-> >>   	/* Lowlevel set the SID as interrupt parameter. */
-> >> -	if (lowcore_ptr->io_int_param != sid) {
-> >> +	if (lowcore_ptr->io_int_param != irq->sid) {
-> >>   		report(0,
-> >>   		       "io_int_param: %x differs from subsys_id_word: %x",
-> >> -		       lowcore_ptr->io_int_param, sid);
-> >> +		       lowcore_ptr->io_int_param, irq->sid);
-> >>   		goto pop;
-> >>   	}
-> >>   	report_prefix_pop();
-> >>   
-> >>   	report_prefix_push("tsch");
-> >> -	ret = tsch(sid, &irb);
-> >> +	ret = tsch(irq->sid, &irq->irb);
-> >>   	switch (ret) {
-> >>   	case 1:
-> >> -		dump_irb(&irb);
-> >> -		flags = dump_scsw_flags(irb.scsw.ctrl);
-> >> -		report(0,
-> >> -		       "I/O interrupt, but tsch returns CC 1 for subchannel %08x. SCSW flags: %s",
-> >> -		       sid, flags);
-> >> +		report_info("no status pending on %08x : %s", irq->sid,
-> >> +			    dump_scsw_flags(irq->irb.scsw.ctrl));  
+On Fri, Mar 19, 2021 at 09:23:41AM -0600, Alex Williamson wrote:
+> On Wed, 10 Mar 2021 14:57:57 +0200
+> Max Gurtovoy <mgurtovoy@nvidia.com> wrote:
+> > On 3/10/2021 8:39 AM, Alexey Kardashevskiy wrote:
+> > > On 09/03/2021 19:33, Max Gurtovoy wrote:  
+> > >> +static const struct pci_device_id nvlink2gpu_vfio_pci_table[] = {
+> > >> +    { PCI_VDEVICE(NVIDIA, 0x1DB1) }, /* GV100GL-A NVIDIA Tesla 
+> > >> V100-SXM2-16GB */
+> > >> +    { PCI_VDEVICE(NVIDIA, 0x1DB5) }, /* GV100GL-A NVIDIA Tesla 
+> > >> V100-SXM2-32GB */
+> > >> +    { PCI_VDEVICE(NVIDIA, 0x1DB8) }, /* GV100GL-A NVIDIA Tesla 
+> > >> V100-SXM3-32GB */
+> > >> +    { PCI_VDEVICE(NVIDIA, 0x1DF5) }, /* GV100GL-B NVIDIA Tesla 
+> > >> V100-SXM2-16GB */  
+> > >
+> > >
+> > > Where is this list from?
+> > >
+> > > Also, how is this supposed to work at the boot time? Will the kernel 
+> > > try binding let's say this one and nouveau? Which one is going to win?  
 > > 
-> > This is not what you are looking at here, though?
-> > 
-> > The problem is that the hypervisor gave you cc 1 (stored, not status
-> > pending) while you just got an interrupt; the previous message logged
-> > that, while the new one does not. (The scsw flags are still
-> > interesting, as it gives further information about the mismatch.)  
+> > At boot time nouveau driver will win since the vfio drivers don't 
+> > declare MODULE_DEVICE_TABLE
 > 
-> I can keep the old message.
-> How ever I do not think it is a reason to report a failure.
-> Do you agree with replaacing report(0,) with report_info()
+> This still seems troublesome, AIUI the MODULE_DEVICE_TABLE is
+> responsible for creating aliases so that kmod can figure out which
+> modules to load, but what happens if all these vfio-pci modules are
+> built into the kernel or the modules are already loaded?
 
-I don't really see how we could get an I/O interrupt for a subchannel
-that is not status pending, unless we have other code racing with this
-one that cleared the status pending already (and that would be a bug in
-our test program.) Or are you aware in anything in the architecture
-that could make the status pending go away again (other than the
-subchannel becoming not operational?)
+I think we talked about this.. We still need a better way to control
+binding of VFIO modules - now that we have device-specific modules we
+must have these match tables to control what devices they connect
+to.
 
-> 
-> >   
-> >>   		break;
-> >>   	case 2:
-> >>   		report(0, "tsch returns unexpected CC 2");
-> >>   		break;
-> >>   	case 3:
-> >> -		report(0, "tsch reporting sch %08x as not operational", sid);
-> >> +		report(0, "tsch reporting sch %08x as not operational", irq->sid);
-> >>   		break;
-> >>   	case 0:
-> >>   		/* Stay humble on success */
-> >> +		save_irq(irq);
-> >>   		break;
-> >>   	}
-> >>   pop:
-> >> @@ -498,47 +540,70 @@ struct ccw1 *ccw_alloc(int code, void *data, int count, unsigned char flags)
-> >>   int wait_and_check_io_completion(int schid)
-> >>   {
-> >>   	int ret = 0;
-> >> -
-> >> -	wait_for_interrupt(PSW_MASK_IO);
-> >> +	struct irq_entry *irq = NULL;
-> >>   
-> >>   	report_prefix_push("check I/O completion");
-> >>   
-> >> -	if (lowcore_ptr->io_int_param != schid) {
-> >> +	disable_io_irq();
-> >> +	irq = get_irq();
-> >> +	while (!irq) {
-> >> +		wait_for_interrupt(PSW_MASK_IO);
-> >> +		disable_io_irq();  
-> > 
-> > Isn't the disable_io_irq() redundant here?  
-> 
-> No because wait for interrupt re-enable the interrupts
-> I will add a comment
+Previously things used the binding of vfio_pci as the "switch" and
+hardcoded all the matches inside it.
 
-Hm, I thought it restored the previous status.
+I'm still keen to try the "driver flavour" idea I outlined earlier,
+but it is hard to say what will resonate with Greg.
 
-> 
-> > 
-> > (In general, I'm a bit confused about the I/O interrupt handling here.
-> > Might need to read through the whole thing again.)
+> In the former case, I think it boils down to link order while the
+> latter is generally considered even less deterministic since it depends
+> on module load order.  So if one of these vfio modules should get
+> loaded before the native driver, I think devices could bind here first.
 
-But also see this comment :)
+At this point - "don't link these statically", we could have a kconfig
+to prevent it.
 
-> >   
-> >> +		irq = get_irq();
-> >> +		report_info("next try");
-> >> +	}
-> >> +	enable_io_irq();
+> Are there tricks/extensions we could use in driver overrides, for
+> example maybe a compatibility alias such that one of these vfio-pci
+> variants could match "vfio-pci"?
 
+driver override is not really useful as soon as you have a match table
+as its operation is to defeat the match table entirely. :(
+
+Again, this is still more of a outline how things will look as we must
+get through this before we can attempt to do something in the driver
+core with Greg.
+
+We could revise this series to not register drivers at all and keep
+the uAPI view exactly as is today. This would allow enough code to
+show Greg how some driver flavour thing would work.
+
+If soemthing can't be done in the driver core, I'd propse to keep the
+same basic outline Max has here, but make registering the "compat"
+dynamic - it is basically a sub-driver design at that point and we
+give up achieving module autoloading.
+
+Jason
