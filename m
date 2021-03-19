@@ -2,28 +2,28 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B0FDD341672
-	for <lists+kvm@lfdr.de>; Fri, 19 Mar 2021 08:24:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7D511341674
+	for <lists+kvm@lfdr.de>; Fri, 19 Mar 2021 08:24:36 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234150AbhCSHYI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 19 Mar 2021 03:24:08 -0400
+        id S234370AbhCSHYJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 19 Mar 2021 03:24:09 -0400
 Received: from mga05.intel.com ([192.55.52.43]:22827 "EHLO mga05.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S234324AbhCSHXk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 19 Mar 2021 03:23:40 -0400
-IronPort-SDR: a3tN6oMVu3EXBH+jH2Lr5d+G/98214K41bPCdbPeSTzjtO/lLDvk+yYjMzL3RBJAOBYOL3joaY
- MNuR48xyooQg==
-X-IronPort-AV: E=McAfee;i="6000,8403,9927"; a="274910922"
+        id S234325AbhCSHXo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 19 Mar 2021 03:23:44 -0400
+IronPort-SDR: l/0kZVrgWNtR67NAxku+JoO69A/qwIl3LURyiD/HdMG7Y3tYPRhZrMwOlIbZ+nbCrQy8NLAVM/
+ rWYwzPxtjLaA==
+X-IronPort-AV: E=McAfee;i="6000,8403,9927"; a="274910937"
 X-IronPort-AV: E=Sophos;i="5.81,261,1610438400"; 
-   d="scan'208";a="274910922"
+   d="scan'208";a="274910937"
 Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Mar 2021 00:23:40 -0700
-IronPort-SDR: 1PF6eMBY6XbzRRoCegqw4JS4FOm/23aqMYLdpiiVbQyqr6T44eFYF/DZ3MJG3Qkr6NEmQodjQA
- 8KhMqHsZuV8Q==
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Mar 2021 00:23:44 -0700
+IronPort-SDR: KQQxTHfofVNyK4JImziLJe/Ldq4qBUDTMYEHRG/QSrNwhLBIWc1xG1hM7lB+NfcKOXsfSh78ne
+ P17kN/K/YQ9w==
 X-IronPort-AV: E=Sophos;i="5.81,261,1610438400"; 
-   d="scan'208";a="413409589"
+   d="scan'208";a="413409637"
 Received: from dlmeisen-mobl1.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.255.229.165])
-  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Mar 2021 00:23:36 -0700
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Mar 2021 00:23:40 -0700
 From:   Kai Huang <kai.huang@intel.com>
 To:     kvm@vger.kernel.org, linux-sgx@vger.kernel.org, x86@kernel.org
 Cc:     linux-kernel@vger.kernel.org, seanjc@google.com, jarkko@kernel.org,
@@ -31,9 +31,9 @@ Cc:     linux-kernel@vger.kernel.org, seanjc@google.com, jarkko@kernel.org,
         haitao.huang@intel.com, pbonzini@redhat.com, bp@alien8.de,
         tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com,
         Kai Huang <kai.huang@intel.com>
-Subject: [PATCH v3 12/25] x86/sgx: Add helper to update SGX_LEPUBKEYHASHn MSRs
-Date:   Fri, 19 Mar 2021 20:23:07 +1300
-Message-Id: <dfb7cd39d4dd62ea27703b64afdd8bccb579f623.1616136308.git.kai.huang@intel.com>
+Subject: [PATCH v3 13/25] x86/sgx: Add helpers to expose ECREATE and EINIT to KVM
+Date:   Fri, 19 Mar 2021 20:23:08 +1300
+Message-Id: <20e09daf559aa5e9e680a0b4b5fba940f1bad86e.1616136308.git.kai.huang@intel.com>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <cover.1616136307.git.kai.huang@intel.com>
 References: <cover.1616136307.git.kai.huang@intel.com>
@@ -43,81 +43,171 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add a helper to update SGX_LEPUBKEYHASHn MSRs.  SGX virtualization also
-needs to update those MSRs based on guest's "virtual" SGX_LEPUBKEYHASHn
-before EINIT from guest.
+From: Sean Christopherson <sean.j.christopherson@intel.com>
 
-Acked-by: Dave Hansen <dave.hansen@intel.com>
-Acked-by: Jarkko Sakkinen <jarkko@kernel.org>
+The host kernel must intercept ECREATE to impose policies on guests, and
+intercept EINIT to be able to write guest's virtual SGX_LEPUBKEYHASH MSR
+values to hardware before running guest's EINIT so it can run correctly
+according to hardware behavior.
+
+Provide wrappers around __ecreate() and __einit() to hide the ugliness
+of overloading the ENCLS return value to encode multiple error formats
+in a single int.  KVM will trap-and-execute ECREATE and EINIT as part
+of SGX virtualization, and reflect ENCLS execution result to guest by
+setting up guest's GPRs, or on an exception, injecting the correct fault
+based on return value of __ecreate() and __einit().
+
+Use host userspace addresses (provided by KVM based on guest physical
+address of ENCLS parameters) to execute ENCLS/EINIT when possible.
+Accesses to both EPC and memory originating from ENCLS are subject to
+segmentation and paging mechanisms.  It's also possible to generate
+kernel mappings for ENCLS parameters by resolving PFN but using
+__uaccess_xx() is simpler.
+
+Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 Signed-off-by: Kai Huang <kai.huang@intel.com>
 ---
- arch/x86/kernel/cpu/sgx/ioctl.c |  5 ++---
- arch/x86/kernel/cpu/sgx/main.c  | 17 +++++++++++++++++
- arch/x86/kernel/cpu/sgx/sgx.h   |  2 ++
- 3 files changed, 21 insertions(+), 3 deletions(-)
+v2->v3:
+ - Updated to use addr,size directly for access_ok()s.
 
-diff --git a/arch/x86/kernel/cpu/sgx/ioctl.c b/arch/x86/kernel/cpu/sgx/ioctl.c
-index dc18ced04ad8..2a0aed446d6c 100644
---- a/arch/x86/kernel/cpu/sgx/ioctl.c
-+++ b/arch/x86/kernel/cpu/sgx/ioctl.c
-@@ -495,7 +495,7 @@ static int sgx_encl_init(struct sgx_encl *encl, struct sgx_sigstruct *sigstruct,
- 			 void *token)
- {
- 	u64 mrsigner[4];
--	int i, j, k;
-+	int i, j;
- 	void *addr;
- 	int ret;
+---
+ arch/x86/include/asm/sgx.h     |   7 +++
+ arch/x86/kernel/cpu/sgx/virt.c | 109 +++++++++++++++++++++++++++++++++
+ 2 files changed, 116 insertions(+)
+
+diff --git a/arch/x86/include/asm/sgx.h b/arch/x86/include/asm/sgx.h
+index 3b025afec0a7..954042e04102 100644
+--- a/arch/x86/include/asm/sgx.h
++++ b/arch/x86/include/asm/sgx.h
+@@ -365,4 +365,11 @@ struct sgx_sigstruct {
+  * comment!
+  */
  
-@@ -544,8 +544,7 @@ static int sgx_encl_init(struct sgx_encl *encl, struct sgx_sigstruct *sigstruct,
++#ifdef CONFIG_X86_SGX_KVM
++int sgx_virt_ecreate(struct sgx_pageinfo *pageinfo, void __user *secs,
++		     int *trapnr);
++int sgx_virt_einit(void __user *sigstruct, void __user *token,
++		   void __user *secs, u64 *lepubkeyhash, int *trapnr);
++#endif
++
+ #endif /* _ASM_X86_SGX_H */
+diff --git a/arch/x86/kernel/cpu/sgx/virt.c b/arch/x86/kernel/cpu/sgx/virt.c
+index 29d8d28b4695..eaff7d72e47f 100644
+--- a/arch/x86/kernel/cpu/sgx/virt.c
++++ b/arch/x86/kernel/cpu/sgx/virt.c
+@@ -258,3 +258,112 @@ int __init sgx_vepc_init(void)
  
- 			preempt_disable();
- 
--			for (k = 0; k < 4; k++)
--				wrmsrl(MSR_IA32_SGXLEPUBKEYHASH0 + k, mrsigner[k]);
-+			sgx_update_lepubkeyhash(mrsigner);
- 
- 			ret = __einit(sigstruct, token, addr);
- 
-diff --git a/arch/x86/kernel/cpu/sgx/main.c b/arch/x86/kernel/cpu/sgx/main.c
-index b73114150ff8..b95168427056 100644
---- a/arch/x86/kernel/cpu/sgx/main.c
-+++ b/arch/x86/kernel/cpu/sgx/main.c
-@@ -727,6 +727,23 @@ static bool __init sgx_page_cache_init(void)
- 	return true;
+ 	return misc_register(&sgx_vepc_dev);
  }
- 
 +
-+/*
-+ * Update the SGX_LEPUBKEYHASH MSRs to the values specified by caller.
-+ * Bare-metal driver requires to update them to hash of enclave's signer
-+ * before EINIT. KVM needs to update them to guest's virtual MSR values
-+ * before doing EINIT from guest.
++/**
++ * sgx_virt_ecreate() - Run ECREATE on behalf of guest
++ * @pageinfo:	Pointer to PAGEINFO structure
++ * @secs:	Userspace pointer to SECS page
++ * @trapnr:	trap number injected to guest in case of ECREATE error
++ *
++ * Run ECREATE on behalf of guest after KVM traps ECREATE for the purpose
++ * of enforcing policies of guest's enclaves, and return the trap number
++ * which should be injected to guest in case of any ECREATE error.
++ *
++ * Return:
++ * - 0:		ECREATE was successful.
++ * - -EFAULT:	ECREATE returned error.
 + */
-+void sgx_update_lepubkeyhash(u64 *lepubkeyhash)
++int sgx_virt_ecreate(struct sgx_pageinfo *pageinfo, void __user *secs,
++		     int *trapnr)
 +{
-+	int i;
++	int ret;
 +
-+	WARN_ON_ONCE(preemptible());
++	/*
++	 * @secs is an untrusted, userspace-provided address.  It comes from
++	 * KVM and is assumed to be a valid pointer which points somewhere in
++	 * userspace.  This can fault and call SGX or other fault handlers when
++	 * userspace mapping @secs doesn't exist.
++	 *
++	 * Add a WARN() to make sure @secs is already valid userspace pointer
++	 * from caller (KVM), who should already have handled invalid pointer
++	 * case (for instance, made by malicious guest).  All other checks,
++	 * such as alignment of @secs, are deferred to ENCLS itself.
++	 */
++	WARN_ON_ONCE(!access_ok(secs, PAGE_SIZE));
++	__uaccess_begin();
++	ret = __ecreate(pageinfo, (void *)secs);
++	__uaccess_end();
 +
-+	for (i = 0; i < 4; i++)
-+		wrmsrl(MSR_IA32_SGXLEPUBKEYHASH0 + i, lepubkeyhash[i]);
++	if (encls_faulted(ret)) {
++		*trapnr = ENCLS_TRAPNR(ret);
++		return -EFAULT;
++	}
++
++	/* ECREATE doesn't return an error code, it faults or succeeds. */
++	WARN_ON_ONCE(ret);
++	return 0;
++}
++EXPORT_SYMBOL_GPL(sgx_virt_ecreate);
++
++static int __sgx_virt_einit(void __user *sigstruct, void __user *token,
++			    void __user *secs)
++{
++	int ret;
++
++	/*
++	 * Make sure all userspace pointers from caller (KVM) are valid.
++	 * All other checks deferred to ENCLS itself.  Also see comment
++	 * for @secs in sgx_virt_ecreate().
++	 */
++#define SGX_EINITTOKEN_SIZE	304
++	WARN_ON_ONCE(!access_ok(sigstruct, sizeof(struct sgx_sigstruct)) ||
++		     !access_ok(token, SGX_EINITTOKEN_SIZE) ||
++		     !access_ok(secs, PAGE_SIZE));
++	__uaccess_begin();
++	ret =  __einit((void *)sigstruct, (void *)token, (void *)secs);
++	__uaccess_end();
++
++	return ret;
 +}
 +
- static int __init sgx_init(void)
- {
- 	int ret;
-diff --git a/arch/x86/kernel/cpu/sgx/sgx.h b/arch/x86/kernel/cpu/sgx/sgx.h
-index 5086b240d269..f0f2a92bb8d0 100644
---- a/arch/x86/kernel/cpu/sgx/sgx.h
-+++ b/arch/x86/kernel/cpu/sgx/sgx.h
-@@ -89,4 +89,6 @@ static inline int __init sgx_vepc_init(void)
- }
- #endif
- 
-+void sgx_update_lepubkeyhash(u64 *lepubkeyhash);
++/**
++ * sgx_virt_einit() - Run EINIT on behalf of guest
++ * @sigstruct:		Userspace pointer to SIGSTRUCT structure
++ * @token:		Userspace pointer to EINITTOKEN structure
++ * @secs:		Userspace pointer to SECS page
++ * @lepubkeyhash:	Pointer to guest's *virtual* SGX_LEPUBKEYHASH MSR values
++ * @trapnr:		trap number injected to guest in case of EINIT error
++ *
++ * Run EINIT on behalf of guest after KVM traps EINIT. If SGX_LC is available
++ * in host, SGX driver may rewrite the hardware values at wish, therefore KVM
++ * needs to update hardware values to guest's virtual MSR values in order to
++ * ensure EINIT is executed with expected hardware values.
++ *
++ * Return:
++ * - 0:		EINIT was successful.
++ * - -EFAULT:	EINIT returned error.
++ */
++int sgx_virt_einit(void __user *sigstruct, void __user *token,
++		   void __user *secs, u64 *lepubkeyhash, int *trapnr)
++{
++	int ret;
 +
- #endif /* _X86_SGX_H */
++	if (!boot_cpu_has(X86_FEATURE_SGX_LC)) {
++		ret = __sgx_virt_einit(sigstruct, token, secs);
++	} else {
++		preempt_disable();
++
++		sgx_update_lepubkeyhash(lepubkeyhash);
++
++		ret = __sgx_virt_einit(sigstruct, token, secs);
++		preempt_enable();
++	}
++
++	if (encls_faulted(ret)) {
++		*trapnr = ENCLS_TRAPNR(ret);
++		return -EFAULT;
++	}
++
++	return ret;
++}
++EXPORT_SYMBOL_GPL(sgx_virt_einit);
 -- 
 2.30.2
 
