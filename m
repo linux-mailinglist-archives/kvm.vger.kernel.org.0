@@ -2,74 +2,97 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E1A31342208
-	for <lists+kvm@lfdr.de>; Fri, 19 Mar 2021 17:37:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 82700342255
+	for <lists+kvm@lfdr.de>; Fri, 19 Mar 2021 17:43:49 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230159AbhCSQh0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 19 Mar 2021 12:37:26 -0400
-Received: from mail.kernel.org ([198.145.29.99]:56140 "EHLO mail.kernel.org"
+        id S231157AbhCSQmy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 19 Mar 2021 12:42:54 -0400
+Received: from mail.kernel.org ([198.145.29.99]:57558 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229996AbhCSQhX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 19 Mar 2021 12:37:23 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPS id 846EB6198E
-        for <kvm@vger.kernel.org>; Fri, 19 Mar 2021 16:37:23 +0000 (UTC)
+        id S230176AbhCSQml (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 19 Mar 2021 12:42:41 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 5594B6197D;
+        Fri, 19 Mar 2021 16:42:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1616171843;
-        bh=zmTb9dIhUSk0kD66jFhHnlnJTveUVyigOog5ciyssJM=;
-        h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=aETtL6s8loFiSsTAZrms1IswjhffZ5vBn+EEHZ8FJjdS6wDrySSd5kTVMrAK2AdJw
-         2tEsk0czItIiJNfAEvKjjv21+qYgZiotAZAPlNGDUuUGY6Nf78QADnrLbnIgWoegDs
-         FgUbOE2AEcRbAyk/aeJjMwv1p0CeWwx9AAiMBGNvZfavghJ6pdeAfY4HEY+FkrKX2Z
-         ZLFHy2aSIlSiedO2b1MB79JSIKuzhrlZdmaG0ZDTKWEShj4yByl2KB/Hzd8ZGHFrEC
-         VZGwvzQ2UOxKz02XFiP2pWsk7ZI4SncR51SCrj2HBwrC0zB8GVmSyHC8WLRMgfozl+
-         iwZv9rQ4tpZVQ==
-Received: by pdx-korg-bugzilla-2.web.codeaurora.org (Postfix, from userid 48)
-        id 815A662A52; Fri, 19 Mar 2021 16:37:23 +0000 (UTC)
-From:   bugzilla-daemon@bugzilla.kernel.org
-To:     kvm@vger.kernel.org
-Subject: [Bug 201753] AMD-Vi: Unable to write to IOMMU perf counter
-Date:   Fri, 19 Mar 2021 16:37:22 +0000
-X-Bugzilla-Reason: None
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Product: Virtualization
-X-Bugzilla-Component: kvm
-X-Bugzilla-Version: unspecified
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: ledufff@hotmail.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-201753-28872-zkpQ1tnLfr@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-201753-28872@https.bugzilla.kernel.org/>
-References: <bug-201753-28872@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        s=k20201202; t=1616172160;
+        bh=VvUapEq2wKe3jRL/2pb7xke5nb1W78nB9EG7oF+dI0E=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=JTaq5qq1C71cvBEa8m+Q0Nbhc5upiRJe/SjVFYBRLZmkfeAbqo/sg0DGGYx68+PEr
+         AWfGuefxzylcaIlKZfkJoJalo4AYTnupqTIT3Py1VpRyxq5fX2ntvqQvftDyNnngbO
+         eV2Nm0OCgW7zid1MmShZ7DlFiwSEYWxROortaSSIMROq14ShsblOK2r8/C8gxlBg/W
+         pXXPUDRmuYRixaNLV6DYomItoSXmxWiuW5Abk+no/FSr1/1agoOWvWaaSwjqFGHqt5
+         ymTlHQmKKXuUV5amaO4XQUXo2MP2DlRXaNo7dj6OYJqqRPGTIHQEZpFFq8qip8iWbh
+         YSGn80oH4OfaQ==
+Date:   Fri, 19 Mar 2021 16:42:36 +0000
+From:   Mark Brown <broonie@kernel.org>
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
+        kvm@vger.kernel.org, dave.martin@arm.com, daniel.kiss@arm.com,
+        Will Deacon <will@kernel.org>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>, ascull@google.com,
+        qperret@google.com, kernel-team@android.com
+Subject: Re: [PATCH v2 05/11] arm64: sve: Provide a conditional update
+ accessor for ZCR_ELx
+Message-ID: <20210319164236.GH5619@sirena.org.uk>
+References: <20210318122532.505263-1-maz@kernel.org>
+ <20210318122532.505263-6-maz@kernel.org>
 MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+        protocol="application/pgp-signature"; boundary="GBDnBH7+ZvLx8QD4"
+Content-Disposition: inline
+In-Reply-To: <20210318122532.505263-6-maz@kernel.org>
+X-Cookie: No purchase necessary.
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D201753
 
---- Comment #31 from Neil (ledufff@hotmail.com) ---
-Hah.  It's true,  cold booted and IOMMU was implemented, but after the seco=
-nd
-reboot, I got:
+--GBDnBH7+ZvLx8QD4
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-[    0.857880] pci 0000:00:00.2: AMD-Vi: Unable to read/write to IOMMU perf
-counter.
+On Thu, Mar 18, 2021 at 12:25:26PM +0000, Marc Zyngier wrote:
 
-my system: linux 5.10.23-200.fc33.x86_64,  thinkpad e495 / AMD Ryzen 3500u
+> A common pattern is to conditionally update ZCR_ELx in order
+> to avoid the "self-synchronizing" effect that writing to this
+> register has.
+>=20
+> Let's provide an accessor that does exactly this.
 
---=20
-You may reply to this email to add a comment.
+Reviewed-by: Mark Brown <broonie@kernel.org>
 
-You are receiving this mail because:
-You are watching the assignee of the bug.=
+> +#define sve_cond_update_zcr_vq(val, reg)		\
+> +	do {						\
+> +		u64 __zcr =3D read_sysreg_s((reg));	\
+> +		u64 __new =3D __zcr & ~ZCR_ELx_LEN_MASK;	\
+> +		__new |=3D (val) & ZCR_ELx_LEN_MASK;	\
+> +		if (__zcr !=3D __new)			\
+> +			write_sysreg_s(__new, (reg));	\
+> +	} while (0)
+> +
+
+Do compilers actually do much better with this than with a static
+inline like the other functions in this header?  Seems like something
+they should be figuring out.
+
+--GBDnBH7+ZvLx8QD4
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmBU1HsACgkQJNaLcl1U
+h9CM/gf+N7nbcXjDF0+HU24muCH+sUwbBDrs3PP+0I2Sqcmu0zMshrnD7tuL5xNU
+lWckrtiVBzELjoz0UfVEl+sh+pzeh7fUZHEB3Bbz4AFQYxJhusvp3auTiN8DfWs4
+YM6T4hoSYAE8QpnPtz2N8llENkU5mudFoRnp6cZHK/7nGp/A5c+ZTsBp01UO8p/C
+vl+eSWW7J07t5txdE8m19+a8GTmyHbI9Fl8Op5jR+9rfcRarVTcpMIszYwc+bwan
+O2DTbyC8ZeHKjCxpwh1zIXCy2WgUUFWHW/XOPZmhWooOfWlZQy67j/9jLgJs/cCi
+qwMvWZUBJaRClgmANXsPOg92w13MLg==
+=QV3R
+-----END PGP SIGNATURE-----
+
+--GBDnBH7+ZvLx8QD4--
