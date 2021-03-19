@@ -2,119 +2,140 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D810934187D
-	for <lists+kvm@lfdr.de>; Fri, 19 Mar 2021 10:36:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5FE3A3418C7
+	for <lists+kvm@lfdr.de>; Fri, 19 Mar 2021 10:51:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229519AbhCSJfo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 19 Mar 2021 05:35:44 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:40969 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229634AbhCSJfe (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 19 Mar 2021 05:35:34 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1616146533;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=v0qSmwIT5N+CbjMy2lvgAIyfnAl4gMgwXlTqcR5dsag=;
-        b=bezFqpcagTONGEyC9kqGieFtN94L2rIh9NIj4Z/JF6c8jERdESjwrsYwowsSV9hwHpazfv
-        5+uOUBCB20ICbi7WsRIwH+Hq6CLc7z60vj0ig65BNi/7AvmvKulUZgdGqUFGT0P1cJtctX
-        Sa5IIqkz+RrliegGr5i45qAYfRwr8Dk=
-Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
- [209.85.218.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-546-hDymj2bIPoaXUBe-fKj7nQ-1; Fri, 19 Mar 2021 05:35:31 -0400
-X-MC-Unique: hDymj2bIPoaXUBe-fKj7nQ-1
-Received: by mail-ej1-f72.google.com with SMTP id en21so17972745ejc.2
-        for <kvm@vger.kernel.org>; Fri, 19 Mar 2021 02:35:31 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=v0qSmwIT5N+CbjMy2lvgAIyfnAl4gMgwXlTqcR5dsag=;
-        b=ZnIGhlQnpq+MlL6WQX/mKMxkQSdaa/MtkswAl7NrVEDYrR/0JlLQat+zqmgNfY7XQF
-         2a1FiCEtBD1llN1S03esg81/eXJJbvmv7sSiwVzGv7VciVnXF1EH3S9Rt+DqPcRuHV5/
-         hV6e9/WE5d0FgZMUoZpY0s66qphYlMMNchoys3cQzVrqrFePhGsnNMGqPGOqDm/MBe2i
-         Q7mUWFHjdZ7dej+r/evVBjfWByqO0sNLK81YRsyBSIuzOOAZ4Da06oVzMZPWoBGLa0wx
-         ZASX6a2iMWm3BQeFbX472Dw8T/uq9E+k5XPbGoCyeZ/8jJrbZKMP0R0N2dgeSDBCZq7D
-         IMxw==
-X-Gm-Message-State: AOAM532G5TpIcY3wCW8n6RlWVKFKxxn7Kcqrv88iLil5l5vTlF3kG1J7
-        R8VD+voNv6FauX+yjPHfhvk6PwyQYrPsLgvJhXznWziiI1S0a6O50Wu4F1ukn/lMDnllyKDap/9
-        eYSNUr8ph20l+
-X-Received: by 2002:a17:907:3e9e:: with SMTP id hs30mr3328232ejc.66.1616146530576;
-        Fri, 19 Mar 2021 02:35:30 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJw5JS4NgKbP2/KFgVMB0LU0zJpx5iQ2opWHV1CnrZu6Fttiu0mu/Qis3+kFVpCLudDWFXHy1g==
-X-Received: by 2002:a17:907:3e9e:: with SMTP id hs30mr3328219ejc.66.1616146530446;
-        Fri, 19 Mar 2021 02:35:30 -0700 (PDT)
-Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id eo22sm3367524ejc.0.2021.03.19.02.35.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 19 Mar 2021 02:35:30 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Marcelo Tosatti <mtosatti@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org, Sean Christopherson <seanjc@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>
-Subject: Re: [PATCH v2 6/4] selftests: kvm: Add basic Hyper-V clocksources
- tests
-In-Reply-To: <20210318175515.GA40821@fuller.cnet>
-References: <20210316143736.964151-1-vkuznets@redhat.com>
- <20210318140949.1065740-1-vkuznets@redhat.com>
- <20210318165756.GA36190@fuller.cnet>
- <4882dc8f-30bf-f049-f770-24811bb96b54@redhat.com>
- <20210318175515.GA40821@fuller.cnet>
-Date:   Fri, 19 Mar 2021 10:35:29 +0100
-Message-ID: <87pmzv5vvi.fsf@vitty.brq.redhat.com>
+        id S229844AbhCSJur (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 19 Mar 2021 05:50:47 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:49726 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S229849AbhCSJuQ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 19 Mar 2021 05:50:16 -0400
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 12J9XGBW045542
+        for <kvm@vger.kernel.org>; Fri, 19 Mar 2021 05:50:15 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=Zxrd1J2FOLv48g8E9CkzQnqKdR0rXVqE6afvTTI5idU=;
+ b=cr/y6NG+4hlZWOMjr+3WPjOjGIB7c5VqfKlOMu7WJPykGyZzI9dP7FWw3JY90dlg6yWL
+ WkrGP5VfUAIjyo3YwTR++mRtxFQ2unToaPkWLHF0Yq4p1bxgJfSel7mICU/8PLYK4iU7
+ mRMPJJ3LpGbqbLf5wi6NV1e8KymGmkyebulJ3UZVc3+u82ISVDWWWlr1bm3MfKo7Q/Qc
+ tADFpK+eHgCKK39bXPzJuKfy8G+5BkzJsupINzq5Yiepm3AiAAAS/OzFloibrfDui0Dd
+ olrchOR+c8Sgt9ejTviVoMGRheRSyVRQIF8aMYsAkBM4kbPRTRg4c0bOGRWmLVZG+TjW IQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 37c10ggvq1-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Fri, 19 Mar 2021 05:50:15 -0400
+Received: from m0098416.ppops.net (m0098416.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 12J9Yolb054040
+        for <kvm@vger.kernel.org>; Fri, 19 Mar 2021 05:50:15 -0400
+Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 37c10ggvp4-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 19 Mar 2021 05:50:15 -0400
+Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
+        by ppma03fra.de.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 12J9gnMd029729;
+        Fri, 19 Mar 2021 09:50:13 GMT
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
+        by ppma03fra.de.ibm.com with ESMTP id 378n18ay84-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 19 Mar 2021 09:50:13 +0000
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 12J9oA9p36635110
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 19 Mar 2021 09:50:10 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 4837BA405B;
+        Fri, 19 Mar 2021 09:50:10 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 07752A405C;
+        Fri, 19 Mar 2021 09:50:10 +0000 (GMT)
+Received: from oc3016276355.ibm.com (unknown [9.145.64.79])
+        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Fri, 19 Mar 2021 09:50:09 +0000 (GMT)
+Subject: Re: [kvm-unit-tests PATCH v1 4/6] s390x: lib: css: add expectations
+ to wait for interrupt
+To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     david@redhat.com, thuth@redhat.com, cohuck@redhat.com,
+        imbrenda@linux.ibm.com
+References: <1616073988-10381-1-git-send-email-pmorel@linux.ibm.com>
+ <1616073988-10381-5-git-send-email-pmorel@linux.ibm.com>
+ <c9a38bd8-f091-d3e4-dea5-0ffd9f1cdf12@linux.ibm.com>
+From:   Pierre Morel <pmorel@linux.ibm.com>
+Message-ID: <02a90318-2af5-d4eb-7329-425585bf51d3@linux.ibm.com>
+Date:   Fri, 19 Mar 2021 10:50:09 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.8.0
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <c9a38bd8-f091-d3e4-dea5-0ffd9f1cdf12@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.761
+ definitions=2021-03-19_03:2021-03-17,2021-03-19 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501 mlxscore=0
+ malwarescore=0 bulkscore=0 clxscore=1015 suspectscore=0 mlxlogscore=999
+ adultscore=0 phishscore=0 lowpriorityscore=0 impostorscore=0 spamscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
+ definitions=main-2103190067
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Marcelo Tosatti <mtosatti@redhat.com> writes:
 
-> On Thu, Mar 18, 2021 at 06:50:35PM +0100, Paolo Bonzini wrote:
->> On 18/03/21 17:57, Marcelo Tosatti wrote:
->> > I think this should be monotonically increasing:
->> > 
->> > 1.	r1 = rdtsc();
->> > 2.	t1 = rdmsr(HV_X64_MSR_TIME_REF_COUNT);
->> > 3.	nop_loop();
->> > 4.	r2 = rdtsc();
->> > 5.	t2 = rdmsr(HV_X64_MSR_TIME_REF_COUNT);	
->> > 
->> > > 
->> > > +	/* 1% tolerance */
->> > > +	GUEST_ASSERT(delta_ns * 100 < (t2 - t1) * 100);
->> > > +}
->> > 
->> > Doesnt an unbounded schedule-out/schedule-in (which resembles
->> > overloaded host) of the qemu-kvm vcpu in any of the points 1,2,3,4,5
->> > break the assertion above?
->> 
->> 
->> Yes, there's a window of a handful of instructions (at least on
->> non-preemptible kernels).  If anyone ever hits it, we can run the test 100
->> times and check that it passes at least 95 or 99 of them.
->> 
->> Paolo
->
-> Yep, sounds like a good solution.
->
-> However this makes me wonder on the validity of the test: what its
-> trying to verify, again? (i would check the monotonicity that 
-> is r1 <= t1 <= r2 <= t2 as well, without the nop_loop in between).
 
-This particular place tests that Reference TSC
-(HV_X64_MSR_TIME_REF_COUNT) is a 1Ghz clock. We test it against raw
-TSC. TSC frequency is known to us (HV_X64_MSR_TSC_FREQUENCY) so we can
-compare the delta after nop_loop().
+On 3/19/21 10:09 AM, Janosch Frank wrote:
+> On 3/18/21 2:26 PM, Pierre Morel wrote:
+>> When waiting for an interrupt we may need to check the cause of
+>> the interrupt depending on the test case.
+>>
+>> Let's provide the tests the possibility to check if the last valid
+>> IRQ received is for the expected instruction.
+> 
+> s/instruction/command/?
 
-We can't directly compare r1 and t1 (and r2 and t2) here because we
-don't know the base precisely. We could've probably reset TSC to 0 and
-kvmclock (which converts to Reference TSC) to 0 and compare after. For
-now, we just check that Reference TSC is ticking as it should.
+Right, instruction may not be the optimal wording.
+I/O architecture description have some strange (for me) wording, the 
+best is certainly to stick on this.
+
+Then I will use "the expected function" here.
+
+> 
+> We're checking for some value in an IO structure, right?
+> Instruction makes me expect an actual processor instruction.
+> 
+> Is there another word that can be used to describe what we're checking
+> here? If yes please also add it to the "pending" variable. "pending_fc"
+> or "pending_scsw_fc" for example.
+
+Pending is used to specify that the instruction has been accepted but 
+the according function is still pending, i.e. not finished and will stay 
+pending for a normal operation until the device active bit is set.
+
+So pending is not the right word, what we check here is the function 
+control, indicating the function the status refers too.
+
+> 
+>>
+...snip...
+
+>>    * Only report failures.
+>>    */
+>> -int wait_and_check_io_completion(int schid)
+>> +int wait_and_check_io_completion(int schid, uint32_t pending)
+
+
+Consequently I will change "pending" with "function_ctrl"
+
+Thanks for forcing clarification
+I hope Connie will agree with this :)
+
+Regards,
+Pierre
+
 
 -- 
-Vitaly
-
+Pierre Morel
+IBM Lab Boeblingen
