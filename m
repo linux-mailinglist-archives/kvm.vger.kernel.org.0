@@ -2,157 +2,220 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 315693421E6
-	for <lists+kvm@lfdr.de>; Fri, 19 Mar 2021 17:29:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 397A23421FC
+	for <lists+kvm@lfdr.de>; Fri, 19 Mar 2021 17:34:50 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230113AbhCSQ3X (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 19 Mar 2021 12:29:23 -0400
-Received: from mail-mw2nam10on2073.outbound.protection.outlook.com ([40.107.94.73]:60705
-        "EHLO NAM10-MW2-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S229785AbhCSQ2w (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 19 Mar 2021 12:28:52 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Mui8RGXizF0itMt1C5kmmzJ7RSemWTYqG7dLe/nhv6aPazP4wJX6EdSuy85Fpm5GKDWxiGrnVHEJhkMJ/NvMAjeRGp0L7SJabAlHWvMetBAIjUQ/YNDRDQzv0yjEHGZmXCyF0GBjG3ZA0RCwTwEAIzwcOuf5NG8yAUPTzo7X9jAUDux6l7rjfxy+HqmWP3pEDYp8WaENPHzSb0Ve1DsMw5oCZFZNZ7YRE0h7p7qpww4oxv4alrKjxz5EOQMxvtGIB9A5kAJ/YYcPdGjljMzaEsJdlB8yGi5RSRpXLSZzQKgSaRM9uHojAJN0TS7c4jkGjW184iRE5HbUN95mMpOAag==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=6LlR/Zxn+0Iz7PjYIpXQ/aTHPeOZ0cRBJNugiIOGY8w=;
- b=nvsKvtqvtfIUmuDSVnipRoJ2tDHZL1UjbVj/lnDMc9Ywn4p8e1zQ/fqkAWA9D/K/PsBb6c0pr94frLF2oNqMiDKJI8N6KcCzDwX+OpGeRYAB7h3OTklZJKVcxJ3uOexo2xj6CLmOuljijJ69hpkPGiooAqYc+raIpVaddmAlNeGwpNeW/WASWc8Qd4HuehimDVakSFGNwo435mOMixnDZvGpQo29i6A8Xs+4FBTIlaKj80Qpyvjhyo539zJen1MYXlo0++PpnWAG+bpS7lLF4aMhUdtYJrL1nHhAIw4dDzltk0XW9cqH7eATS1jzrgejd/CwL45jznu4KIfsAN9Ujw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=6LlR/Zxn+0Iz7PjYIpXQ/aTHPeOZ0cRBJNugiIOGY8w=;
- b=lx+9nhqHVN4l2W43zA1k1510UXjBOhWH0zjDgVFCd4Rl00YZN1Mi+S+xlchm37PkgouVQ5GIJI3iEeev8A8Zk7u4X64VJwBlg8sQTEsBbwX9w+774M2TfBeAxGLaoY8tSIz5hPQ7qCwmaNQotz8xZOp+mjhZhiwuxQBFzlCkycIPfvLB+v+biBOx1xufOudL+GyWcK653x2MAncX7UM9pEh5yeTPmOyy9NJPXvGiQvgpLSLrRwof+I+cBVl9LGAapnZi29yoZDDYwbYi7F/7+dq8Brzk1/KQKjQh6A2cHJrsFyUnLKS6imVwz42FhHHlO89jNNuZ1JM8v8IQYWPYyw==
-Authentication-Results: lst.de; dkim=none (message not signed)
- header.d=none;lst.de; dmarc=none action=none header.from=nvidia.com;
-Received: from DM6PR12MB3834.namprd12.prod.outlook.com (2603:10b6:5:14a::12)
- by DM5PR12MB1545.namprd12.prod.outlook.com (2603:10b6:4:7::23) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3955.18; Fri, 19 Mar 2021 16:28:51 +0000
-Received: from DM6PR12MB3834.namprd12.prod.outlook.com
- ([fe80::1c62:7fa3:617b:ab87]) by DM6PR12MB3834.namprd12.prod.outlook.com
- ([fe80::1c62:7fa3:617b:ab87%6]) with mapi id 15.20.3955.018; Fri, 19 Mar 2021
- 16:28:51 +0000
-Date:   Fri, 19 Mar 2021 13:28:48 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Alex Williamson <alex.williamson@redhat.com>,
-        Max Gurtovoy <mgurtovoy@nvidia.com>,
-        Alexey Kardashevskiy <aik@ozlabs.ru>, cohuck@redhat.com,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        liranl@nvidia.com, oren@nvidia.com, tzahio@nvidia.com,
-        leonro@nvidia.com, yarong@nvidia.com, aviadye@nvidia.com,
-        shahafs@nvidia.com, artemp@nvidia.com, kwankhede@nvidia.com,
-        ACurrid@nvidia.com, cjia@nvidia.com, yishaih@nvidia.com,
-        mjrosato@linux.ibm.com
-Subject: Re: [PATCH 8/9] vfio/pci: export nvlink2 support into vendor
- vfio_pci drivers
-Message-ID: <20210319162848.GZ2356281@nvidia.com>
-References: <20210309083357.65467-1-mgurtovoy@nvidia.com>
- <20210309083357.65467-9-mgurtovoy@nvidia.com>
- <19e73e58-c7a9-03ce-65a7-50f37d52ca15@ozlabs.ru>
- <8941cf42-0c40-776e-6c02-9227146d3d66@nvidia.com>
- <20210319092341.14bb179a@omen.home.shazbot.org>
- <20210319161722.GY2356281@nvidia.com>
- <20210319162033.GA18218@lst.de>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210319162033.GA18218@lst.de>
-X-Originating-IP: [142.162.115.133]
-X-ClientProxiedBy: MN2PR05CA0051.namprd05.prod.outlook.com
- (2603:10b6:208:236::20) To DM6PR12MB3834.namprd12.prod.outlook.com
- (2603:10b6:5:14a::12)
+        id S230158AbhCSQeN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 19 Mar 2021 12:34:13 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:59808 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S230186AbhCSQeL (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 19 Mar 2021 12:34:11 -0400
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 12JGXEGa061988
+        for <kvm@vger.kernel.org>; Fri, 19 Mar 2021 12:34:10 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=ZZ8SV8iYmJZKUaeLILsejeIKLPfijm6zW5QRQZpq8n0=;
+ b=M0wNOdgyy+JsAQhdbS1Kss0bR/txHEoB8zr2DmEo647Vv3Mn9bB8SIf3dH9HwDJxfjs7
+ hzjHy5pWfHuv7bQa9bq14F7vUj8LBoM19hVzBIltx81o8Zbfdx8ApkR4O0hcjxnQibjP
+ t4O1gY08/6JwYTSWdMe7EfC1H/uNYoqwLTC2mEEUWo3T3CYGs7V0buUZh58r2KctbQZ8
+ H5LN8i5ZfPBNhre3hyjJjLt1ee5dqe5UanDdQerz+CP7hZgDCeFq7d3YQD16qA/XWSOc
+ +dgco4FeASXM0kotS07a7i4XqkxW5FrsLHoC6mWExJOdFc+h451roYJLXhOv68379pLX mQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 37byr4kac1-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Fri, 19 Mar 2021 12:34:10 -0400
+Received: from m0098414.ppops.net (m0098414.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 12JGXU3W063009
+        for <kvm@vger.kernel.org>; Fri, 19 Mar 2021 12:34:10 -0400
+Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 37byr4kab3-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 19 Mar 2021 12:34:09 -0400
+Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
+        by ppma05fra.de.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 12JGXWA9008941;
+        Fri, 19 Mar 2021 16:34:08 GMT
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
+        by ppma05fra.de.ibm.com with ESMTP id 378n18b4n0-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 19 Mar 2021 16:34:07 +0000
+Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 12JGY4h837945706
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 19 Mar 2021 16:34:05 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id D6F284203F;
+        Fri, 19 Mar 2021 16:34:04 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 3E0C242041;
+        Fri, 19 Mar 2021 16:34:04 +0000 (GMT)
+Received: from oc3016276355.ibm.com (unknown [9.145.3.9])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Fri, 19 Mar 2021 16:34:04 +0000 (GMT)
+Subject: Re: [kvm-unit-tests PATCH v1 3/6] s390x: lib: css: upgrading IRQ
+ handling
+To:     Cornelia Huck <cohuck@redhat.com>
+Cc:     kvm@vger.kernel.org, frankja@linux.ibm.com, david@redhat.com,
+        thuth@redhat.com, imbrenda@linux.ibm.com
+References: <1616073988-10381-1-git-send-email-pmorel@linux.ibm.com>
+ <1616073988-10381-4-git-send-email-pmorel@linux.ibm.com>
+ <20210319120105.182c8684.cohuck@redhat.com>
+ <d5e2e4cf-8f76-2099-f0d6-edcb32696bf2@linux.ibm.com>
+ <20210319170919.172ee8d5.cohuck@redhat.com>
+From:   Pierre Morel <pmorel@linux.ibm.com>
+Message-ID: <ba363893-e88c-f22f-cc91-e06ce804ad1e@linux.ibm.com>
+Date:   Fri, 19 Mar 2021 17:34:03 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.8.0
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from mlx.ziepe.ca (142.162.115.133) by MN2PR05CA0051.namprd05.prod.outlook.com (2603:10b6:208:236::20) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3977.9 via Frontend Transport; Fri, 19 Mar 2021 16:28:50 +0000
-Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1lNHzV-00HMIP-0H; Fri, 19 Mar 2021 13:28:49 -0300
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 3c4580e4-b5fc-489b-8a6b-08d8eaf4141a
-X-MS-TrafficTypeDiagnostic: DM5PR12MB1545:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <DM5PR12MB154526E98BC103EB07DC607EC2689@DM5PR12MB1545.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: VPDb9EAUTn4iCqyIXY2f9//jovYl4HJZRQWw5wYJ3+Rfmf5KsSvgctzttxCFVg/wV5CkQir+EqhQbPkSnDV6csMkeNLkHFmpENT52A2oUfgxC5Ct0dV7uuRCOmOSH5G/742eQN7ZPgl07VGI5XhhXQhT4In1qygYDDBZypulyTfqlXRUUsY1i1naz1mCWoWkLxXorlvN2yBPTHnmQ9BhAScHZ2RBN9OiGbso5u4HEmpBF3Ht7f0EDLxuRJb6B0VsDiD8oNVjwVClw40Kt4TAflrfOBxgkt+SL5xrdhtOi5kp+ES39u3i94btkKPiQzbxG5Q/fta4U5Ed/dOSDEv3CZqvq0c/9z2itn79rftjupXZZ9bAISEhKMsQerDk5/MwDnB4n8chbJ/E9iR/zn5nIKLCrX7X8tdcHlkpPyLkMCPQPUb8uRywxfdcMED5oLWulJl+WhijMO4t28u5Ts+YJ/7fhtgk6wMWlFBAOwGDSvM1AAsCbNXsuHjNxtnXL0PhQqYeUeyv/XmHql/IFihlu/G7WdSgjbS/KLFuX1NEAc6BHsTp3s3K3ew7Wh0rsX/8jSyyBV0Donwt/rU1aY20OUkkVX1QDZOy/eo4VPzoxWf68ortla46eMVuGSMDH6LUNB/ZMqdOEUC+RzZH208qMyF6CAlTcOWsGdZh4oHLbhE=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB3834.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(136003)(376002)(396003)(39860400002)(366004)(346002)(478600001)(9746002)(4326008)(66946007)(8676002)(6916009)(66476007)(5660300002)(83380400001)(1076003)(86362001)(9786002)(26005)(38100700001)(36756003)(186003)(316002)(426003)(8936002)(2616005)(66556008)(54906003)(2906002)(33656002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: =?us-ascii?Q?o8bykUjXFHcYmrdGNFPXHgrz/Y8i+diffvKxgQF262GakJTrh5gcAcGSCDcv?=
- =?us-ascii?Q?tQxFdC7MLv+Zla+wwTbU2c1c/CaEEhNQUCW+ZJ3eYQsutHnZ5St1wt/r1+jS?=
- =?us-ascii?Q?0gIM5dvnfSSMEtAqpdtctfXztoJzj9YTHSFhBh39iW16N38uTRB4YmtJxt1N?=
- =?us-ascii?Q?ytZgFqdkbtDWy6SBxNQqr4w1W48lPtrDR6i2N/CN9Fz+NdptzjphV7ivrJ+C?=
- =?us-ascii?Q?x1rcUquB8k2fymaBgqBba+q2xwpVtbkGfQoLNXdXdnPbFXhCNdRGVj/pgUH7?=
- =?us-ascii?Q?10PvRcndl67BRpusSku4F3mxMCxrD+O+o29banEjP31MagLahhE1VFpo/N17?=
- =?us-ascii?Q?im4aOCI49pEHoPmThZerH9O9QuW5WbAdF4pOz0Y/MTff78B7gd2oCSNTSiPW?=
- =?us-ascii?Q?ObQXyJi5y36mbJ+FwXjNS/IoEg9e2rHf/kF73iOJ8LOei/NmQUAC1w/G/T40?=
- =?us-ascii?Q?dni/x8e15c8EkHjk+kS+uTCcHb2UlCDZRKx9WiNbSAC7zNBTualbN1IAOPFU?=
- =?us-ascii?Q?IfhMSaO1/ccmGGHF4Q+5WJYrjsILSmylzSJr49z7TFWMQjPB5kDeCXxbjN/2?=
- =?us-ascii?Q?VvVebVeXSluZ4A1VtsAsr841R+MO91mrKoWBwCFaqdwLa2VnNqLsz1h50xak?=
- =?us-ascii?Q?JftdM3MOuAAiXOwT4VFA0hKkVbK01GvVuzbU+VSatyF8PIgQ8YDEC0iMzj6l?=
- =?us-ascii?Q?suy4+uIvF8Jcb/JJCgufC6s0Bxmi342cRJUE6YDg3Ri5tHbb8A6EQ5+AF0Zn?=
- =?us-ascii?Q?bHkz7hbwEUTPRaDYKRbmX3n1D4gD8BQc15d09YzpRZ0w8vJBbO9ni5MLaWtP?=
- =?us-ascii?Q?KzTWoQPB1q0R+9YLbENDW63Ge5imWN/g/oWxw5EvgmB9eqkS7l/sHcE2m4I8?=
- =?us-ascii?Q?iFPHoML3b/RXS3jgW+p0/bR9C3xlJED5ct2s2Er8wtmu92ydjAU+PAS6/ExK?=
- =?us-ascii?Q?Cny6iZbvCVzmE3rjr6IEkI57He9Xmy3nL5/MVVcvDnabmj8qCzgQei8Kv5Zm?=
- =?us-ascii?Q?bh1OF62R3jxhW9+UaOE3SzFK15ApTBIkxOYI4a8GeXuazeUGhaOYI0MpwZpA?=
- =?us-ascii?Q?DB7z+Ou64ib6flwo0b41csDRTVeP+u9EPLohyN72cXuGC75Cg0Gjp18mp7ED?=
- =?us-ascii?Q?fJq79ws309wGAH8xQsxQSbH9ttGEUupULGLno8eUvo96sClD/8uCd6OYXxIK?=
- =?us-ascii?Q?IRZoFKHy3ALKdCHK2gfuLph4xnLOfAGoc8ztxdPuhlZzDSWavwh3TnBwm6BS?=
- =?us-ascii?Q?3ih7uEYLG6vVWn8HEnqjv0a7xdCSXz6oqK1cm+zK8LOO78hzXEsPuCu+XMSk?=
- =?us-ascii?Q?D+34uzEaUyDHUsLXOxvlf63Eh3gyFtmIJdY4QPfZzIGsxQ=3D=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3c4580e4-b5fc-489b-8a6b-08d8eaf4141a
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB3834.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Mar 2021 16:28:50.8845
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: UxllXnyvJaBpgWERniLVIM34ATr8IOxShwlptXECcJUe0uLFmJgcV54Yn9fWnjSC
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR12MB1545
+In-Reply-To: <20210319170919.172ee8d5.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.761
+ definitions=2021-03-19_06:2021-03-19,2021-03-19 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 suspectscore=0
+ priorityscore=1501 impostorscore=0 mlxscore=0 phishscore=0 mlxlogscore=999
+ malwarescore=0 bulkscore=0 adultscore=0 spamscore=0 lowpriorityscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
+ definitions=main-2103190114
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Mar 19, 2021 at 05:20:33PM +0100, Christoph Hellwig wrote:
-> On Fri, Mar 19, 2021 at 01:17:22PM -0300, Jason Gunthorpe wrote:
-> > I think we talked about this.. We still need a better way to control
-> > binding of VFIO modules - now that we have device-specific modules we
-> > must have these match tables to control what devices they connect
-> > to.
-> > 
-> > Previously things used the binding of vfio_pci as the "switch" and
-> > hardcoded all the matches inside it.
-> > 
-> > I'm still keen to try the "driver flavour" idea I outlined earlier,
-> > but it is hard to say what will resonate with Greg.
+
+
+On 3/19/21 5:09 PM, Cornelia Huck wrote:
+> On Fri, 19 Mar 2021 16:55:15 +0100
+> Pierre Morel <pmorel@linux.ibm.com> wrote:
 > 
-> IMHO the only model that really works and makes sense is to turn the
-> whole model around and make vfio a library called by the actual driver
-> for the device.  That is any device that needs device specific
-> funtionality simply needs a proper in-kernel driver, which then can be
-> switched to a vfio mode where all the normal subsystems are unbound
-> from the device, and VFIO functionality is found to it all while _the_
-> driver that controls the PCI ID is still in charge of it.
+>> On 3/19/21 12:01 PM, Cornelia Huck wrote:
+>>> On Thu, 18 Mar 2021 14:26:25 +0100
+>>> Pierre Morel <pmorel@linux.ibm.com> wrote:
+> 
+>>>> @@ -422,38 +464,38 @@ static struct irb irb;
+>>>>    void css_irq_io(void)
+>>>>    {
+>>>>    	int ret = 0;
+>>>> -	char *flags;
+>>>> -	int sid;
+>>>> +	struct irq_entry *irq;
+>>>>    
+>>>>    	report_prefix_push("Interrupt");
+>>>> -	sid = lowcore_ptr->subsys_id_word;
+>>>> +	irq = alloc_irq();
+>>>> +	assert(irq);
+>>>> +
+>>>> +	irq->sid = lowcore_ptr->subsys_id_word;
+>>>>    	/* Lowlevel set the SID as interrupt parameter. */
+>>>> -	if (lowcore_ptr->io_int_param != sid) {
+>>>> +	if (lowcore_ptr->io_int_param != irq->sid) {
+>>>>    		report(0,
+>>>>    		       "io_int_param: %x differs from subsys_id_word: %x",
+>>>> -		       lowcore_ptr->io_int_param, sid);
+>>>> +		       lowcore_ptr->io_int_param, irq->sid);
+>>>>    		goto pop;
+>>>>    	}
+>>>>    	report_prefix_pop();
+>>>>    
+>>>>    	report_prefix_push("tsch");
+>>>> -	ret = tsch(sid, &irb);
+>>>> +	ret = tsch(irq->sid, &irq->irb);
+>>>>    	switch (ret) {
+>>>>    	case 1:
+>>>> -		dump_irb(&irb);
+>>>> -		flags = dump_scsw_flags(irb.scsw.ctrl);
+>>>> -		report(0,
+>>>> -		       "I/O interrupt, but tsch returns CC 1 for subchannel %08x. SCSW flags: %s",
+>>>> -		       sid, flags);
+>>>> +		report_info("no status pending on %08x : %s", irq->sid,
+>>>> +			    dump_scsw_flags(irq->irb.scsw.ctrl));
+>>>
+>>> This is not what you are looking at here, though?
+>>>
+>>> The problem is that the hypervisor gave you cc 1 (stored, not status
+>>> pending) while you just got an interrupt; the previous message logged
+>>> that, while the new one does not. (The scsw flags are still
+>>> interesting, as it gives further information about the mismatch.)
+>>
+>> I can keep the old message.
+>> How ever I do not think it is a reason to report a failure.
+>> Do you agree with replaacing report(0,) with report_info()
+> 
+> I don't really see how we could get an I/O interrupt for a subchannel
+> that is not status pending, unless we have other code racing with this
+> one that cleared the status pending already (and that would be a bug in
+> our test program.) Or are you aware in anything in the architecture
+> that could make the status pending go away again (other than the
+> subchannel becoming not operational?)
 
-Yes, this is what I want to strive for with Greg.
+:) no
+I really messed up with this patch.
+sorry, can only do better
 
-It would also resolve alot of the uncomfortable code I see in VFIO
-using the driver core. For instance, when a device is moved to 'vfio
-mode' it can go through and *lock* the entire group of devices to
-'vfio mode' or completely fail.
 
-This would replace all the protective code that is all about ensuring
-the admin doesn't improperly mix & match in-kernel and vfio drivers
-within a security domain.
+> 
+>>
+>>>    
+>>>>    		break;
+>>>>    	case 2:
+>>>>    		report(0, "tsch returns unexpected CC 2");
+>>>>    		break;
+>>>>    	case 3:
+>>>> -		report(0, "tsch reporting sch %08x as not operational", sid);
+>>>> +		report(0, "tsch reporting sch %08x as not operational", irq->sid);
+>>>>    		break;
+>>>>    	case 0:
+>>>>    		/* Stay humble on success */
+>>>> +		save_irq(irq);
+>>>>    		break;
+>>>>    	}
+>>>>    pop:
+>>>> @@ -498,47 +540,70 @@ struct ccw1 *ccw_alloc(int code, void *data, int count, unsigned char flags)
+>>>>    int wait_and_check_io_completion(int schid)
+>>>>    {
+>>>>    	int ret = 0;
+>>>> -
+>>>> -	wait_for_interrupt(PSW_MASK_IO);
+>>>> +	struct irq_entry *irq = NULL;
+>>>>    
+>>>>    	report_prefix_push("check I/O completion");
+>>>>    
+>>>> -	if (lowcore_ptr->io_int_param != schid) {
+>>>> +	disable_io_irq();
+>>>> +	irq = get_irq();
+>>>> +	while (!irq) {
+>>>> +		wait_for_interrupt(PSW_MASK_IO);
+>>>> +		disable_io_irq();
+>>>
+>>> Isn't the disable_io_irq() redundant here?
+>>
+>> No because wait for interrupt re-enable the interrupts
+>> I will add a comment
+> 
+> Hm, I thought it restored the previous status.
+> 
+>>
+>>>
+>>> (In general, I'm a bit confused about the I/O interrupt handling here.
+>>> Might need to read through the whole thing again.)
+> 
+> But also see this comment :)
+> 
 
-The wrinkle I don't yet have an easy answer to is how to load vfio_pci
-as a universal "default" within the driver core lazy bind scheme and
-still have working module autoloading... I'm hoping to get some
-research into this..
+Oh you mean the comment were it restores the psw mask.
+yes,I see it now.
+hum
+yes, this patch is awful. really sorry
 
-Jason
+please do not lose more time I must really rework the all series.
+
+Regards,
+Pierre
+
+-- 
+Pierre Morel
+IBM Lab Boeblingen
