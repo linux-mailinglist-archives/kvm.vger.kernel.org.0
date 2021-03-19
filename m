@@ -2,93 +2,238 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3FFCF3422A9
-	for <lists+kvm@lfdr.de>; Fri, 19 Mar 2021 17:59:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5CD6B342376
+	for <lists+kvm@lfdr.de>; Fri, 19 Mar 2021 18:37:37 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230259AbhCSQ6z (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 19 Mar 2021 12:58:55 -0400
-Received: from mail.kernel.org ([198.145.29.99]:60630 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230235AbhCSQ61 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 19 Mar 2021 12:58:27 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 7927261953;
-        Fri, 19 Mar 2021 16:58:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1616173107;
-        bh=oWRlc58V9GPpmhVKr28TgLiGNUEVGrMp7yMwubglgCM=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=oP3rci4WbJRzdmIiKwS/z2XA5+6ILC5H/WgwOYc3fDAojChlIHPmnnhBzFyt1di/+
-         1VrXpQImknmbD+9jP8HIUldavxYWsTFQTGKFZLNvl4xw0NlT4dWsUKfu0MvQjAw59u
-         z+DzsNMqay0XAhB568J9x/MsmLEtfQCxkngjxxcq0ldf/OGCQCCJV9K/ZtRnNXKpxh
-         y8ljQVbhpd8ih378xH/9A/NpRr6L0hamGq+fO9h3QBgyX+gRxwE7Kk1CEufthB4Lnf
-         4iiVo+iesTvnonBZBL4zsqUTLIQAq71owzvEim+UBdJgrP0F/ZVbEG6AaMMZ2yaPzh
-         y18u+bItojd5A==
-Date:   Fri, 19 Mar 2021 16:58:22 +0000
-From:   Mark Brown <broonie@kernel.org>
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
-        kvm@vger.kernel.org, dave.martin@arm.com, daniel.kiss@arm.com,
-        Will Deacon <will@kernel.org>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>, ascull@google.com,
-        qperret@google.com, kernel-team@android.com
-Subject: Re: [PATCH v2 05/11] arm64: sve: Provide a conditional update
- accessor for ZCR_ELx
-Message-ID: <20210319165822.GI5619@sirena.org.uk>
-References: <20210318122532.505263-1-maz@kernel.org>
- <20210318122532.505263-6-maz@kernel.org>
- <20210319164236.GH5619@sirena.org.uk>
- <45a7868d83eaaef2e5d0f6e730c9c8f2@kernel.org>
+        id S230105AbhCSRhG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 19 Mar 2021 13:37:06 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:23027 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230097AbhCSRgi (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 19 Mar 2021 13:36:38 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1616175397;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=5eOAQHQd0/ZycZbF0USh+JA+Y7XaAJwV/qd8pF9Pi6w=;
+        b=HbuMnL3d/+gQnFeMmpJ0mDTj5k3r/XXE6qVRrcnOpW/4/lZGqSgsoGRwsGFgQnb0RE815R
+        TWSAji2PYb4J+WstkYetIYHYJgo2eB6PPpM3rcLYX3HVgKK46ztZK5vNUatzK9QGoPDbcL
+        LSoHaYUw7APlVKSp1zi7OunStdtvCMo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-575-ioeMyaxZNX6ROX7Fw6K4TA-1; Fri, 19 Mar 2021 13:36:33 -0400
+X-MC-Unique: ioeMyaxZNX6ROX7Fw6K4TA-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id ECF39107B768;
+        Fri, 19 Mar 2021 17:36:29 +0000 (UTC)
+Received: from [10.36.113.141] (ovpn-113-141.ams2.redhat.com [10.36.113.141])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 3EB5160C04;
+        Fri, 19 Mar 2021 17:36:18 +0000 (UTC)
+Subject: Re: [PATCH v14 07/13] iommu/smmuv3: Implement cache_invalidate
+To:     "chenxiang (M)" <chenxiang66@hisilicon.com>,
+        eric.auger.pro@gmail.com, iommu@lists.linux-foundation.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        kvmarm@lists.cs.columbia.edu, will@kernel.org, maz@kernel.org,
+        robin.murphy@arm.com, joro@8bytes.org, alex.williamson@redhat.com,
+        tn@semihalf.com, zhukeqian1@huawei.com
+Cc:     jean-philippe@linaro.org, wangxingang5@huawei.com,
+        lushenming@huawei.com, jiangkunkun@huawei.com,
+        vivek.gautam@arm.com, vsethi@nvidia.com, zhangfei.gao@linaro.org,
+        linuxarm@openeuler.org
+References: <20210223205634.604221-1-eric.auger@redhat.com>
+ <20210223205634.604221-8-eric.auger@redhat.com>
+ <c10c6405-5efe-5a41-2b3a-f3af85a528ba@hisilicon.com>
+From:   Auger Eric <eric.auger@redhat.com>
+Message-ID: <d5dcb7fe-2e09-b1fb-24d6-36249f047632@redhat.com>
+Date:   Fri, 19 Mar 2021 18:36:17 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.7.0
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-        protocol="application/pgp-signature"; boundary="Q59ABw34pTSIagmi"
-Content-Disposition: inline
-In-Reply-To: <45a7868d83eaaef2e5d0f6e730c9c8f2@kernel.org>
-X-Cookie: No purchase necessary.
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <c10c6405-5efe-5a41-2b3a-f3af85a528ba@hisilicon.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Hi Chenxiang,
 
---Q59ABw34pTSIagmi
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+On 3/4/21 8:55 AM, chenxiang (M) wrote:
+> Hi Eric,
+> 
+> 
+> 在 2021/2/24 4:56, Eric Auger 写道:
+>> Implement domain-selective, pasid selective and page-selective
+>> IOTLB invalidations.
+>>
+>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>>
+>> ---
+>>
+>> v13 -> v14:
+>> - Add domain invalidation
+>> - do global inval when asid is not provided with addr
+>>   granularity
+>>
+>> v7 -> v8:
+>> - ASID based invalidation using iommu_inv_pasid_info
+>> - check ARCHID/PASID flags in addr based invalidation
+>> - use __arm_smmu_tlb_inv_context and __arm_smmu_tlb_inv_range_nosync
+>>
+>> v6 -> v7
+>> - check the uapi version
+>>
+>> v3 -> v4:
+>> - adapt to changes in the uapi
+>> - add support for leaf parameter
+>> - do not use arm_smmu_tlb_inv_range_nosync or arm_smmu_tlb_inv_context
+>>   anymore
+>>
+>> v2 -> v3:
+>> - replace __arm_smmu_tlb_sync by arm_smmu_cmdq_issue_sync
+>>
+>> v1 -> v2:
+>> - properly pass the asid
+>> ---
+>>  drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c | 74 +++++++++++++++++++++
+>>  1 file changed, 74 insertions(+)
+>>
+>> diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
+>> index 4c19a1114de4..df3adc49111c 100644
+>> --- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
+>> +++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
+>> @@ -2949,6 +2949,79 @@ static void arm_smmu_detach_pasid_table(struct iommu_domain *domain)
+>>  	mutex_unlock(&smmu_domain->init_mutex);
+>>  }
+>>  
+>> +static int
+>> +arm_smmu_cache_invalidate(struct iommu_domain *domain, struct device *dev,
+>> +			  struct iommu_cache_invalidate_info *inv_info)
+>> +{
+>> +	struct arm_smmu_cmdq_ent cmd = {.opcode = CMDQ_OP_TLBI_NSNH_ALL};
+>> +	struct arm_smmu_domain *smmu_domain = to_smmu_domain(domain);
+>> +	struct arm_smmu_device *smmu = smmu_domain->smmu;
+>> +
+>> +	if (smmu_domain->stage != ARM_SMMU_DOMAIN_NESTED)
+>> +		return -EINVAL;
+>> +
+>> +	if (!smmu)
+>> +		return -EINVAL;
+>> +
+>> +	if (inv_info->version != IOMMU_CACHE_INVALIDATE_INFO_VERSION_1)
+>> +		return -EINVAL;
+>> +
+>> +	if (inv_info->cache & IOMMU_CACHE_INV_TYPE_PASID ||
+>> +	    inv_info->cache & IOMMU_CACHE_INV_TYPE_DEV_IOTLB) {
+>> +		return -ENOENT;
+>> +	}
+>> +
+>> +	if (!(inv_info->cache & IOMMU_CACHE_INV_TYPE_IOTLB))
+>> +		return -EINVAL;
+>> +
+>> +	/* IOTLB invalidation */
+>> +
+>> +	switch (inv_info->granularity) {
+>> +	case IOMMU_INV_GRANU_PASID:
+>> +	{
+>> +		struct iommu_inv_pasid_info *info =
+>> +			&inv_info->granu.pasid_info;
+>> +
+>> +		if (info->flags & IOMMU_INV_ADDR_FLAGS_PASID)
+>> +			return -ENOENT;
+>> +		if (!(info->flags & IOMMU_INV_PASID_FLAGS_ARCHID))
+>> +			return -EINVAL;
+>> +
+>> +		__arm_smmu_tlb_inv_context(smmu_domain, info->archid);
+>> +		return 0;
+>> +	}
+>> +	case IOMMU_INV_GRANU_ADDR:
+>> +	{
+>> +		struct iommu_inv_addr_info *info = &inv_info->granu.addr_info;
+>> +		size_t size = info->nb_granules * info->granule_size;
+>> +		bool leaf = info->flags & IOMMU_INV_ADDR_FLAGS_LEAF;
+>> +
+>> +		if (info->flags & IOMMU_INV_ADDR_FLAGS_PASID)
+>> +			return -ENOENT;
+>> +
+>> +		if (!(info->flags & IOMMU_INV_ADDR_FLAGS_ARCHID))
+>> +			break;
+>> +
+>> +		arm_smmu_tlb_inv_range_domain(info->addr, size,
+>> +					      info->granule_size, leaf,
+>> +					      info->archid, smmu_domain);
+> 
+> Is it possible to add a check before the function to make sure that
+> info->granule_size can be recognized by SMMU?
+> There is a scenario which will cause TLBI issue: RIL feature is enabled
+> on guest but is disabled on host, and then on
+> host it just invalidate 4K/2M/1G once a time, but from QEMU,
+> info->nb_granules is always 1 and info->granule_size = size,
+> if size is not equal to 4K or 2M or 1G (for example size = granule_size
+> is 5M), it will only part of the size it wants to invalidate.
+> 
+> I think maybe we can add a check here: if RIL is not enabled and also
+> size is not the granule_size (4K/2M/1G) supported by
+> SMMU hardware, can we just simply use the smallest granule_size
+> supported by hardware all the time?
+> 
+>> +
+>> +		arm_smmu_cmdq_issue_sync(smmu);
+>> +		return 0;
+>> +	}
+>> +	case IOMMU_INV_GRANU_DOMAIN:
+>> +		break;
+> 
+> I check the qemu code
+> (https://github.com/eauger/qemu/tree/v5.2.0-2stage-rfcv8), for opcode
+> CMD_TLBI_NH_ALL or CMD_TLBI_NSNH_ALL from guest OS
+> it calls smmu_inv_notifiers_all() to unamp all notifiers of all mr's,
+> but it seems not set event.entry.granularity which i think it should set
+> IOMMU_INV_GRAN_ADDR.
+this is because IOMMU_INV_GRAN_ADDR = 0. But for clarity I should rather
+set it explicitly ;-)
+> BTW, for opcode CMD_TLBI_NH_ALL or CMD_TLBI_NSNH_ALL, it needs to unmap
+> size = 0x1000000000000 on 48bit system (it may spend much time),  maybe
+> it is better
+> to set it as IOMMU_INV_GRANU_DOMAIN, then in host OS, send TLBI_NH_ALL
+> directly when IOMMU_INV_GRANU_DOMAIN.
+Yes you're right. If the host does not support RIL then it is an issue.
+This is going to be fixed in the next version.
 
-On Fri, Mar 19, 2021 at 04:51:46PM +0000, Marc Zyngier wrote:
-> On 2021-03-19 16:42, Mark Brown wrote:
+Thank you for the report!
 
-> > Do compilers actually do much better with this than with a static
-> > inline like the other functions in this header?  Seems like something
-> > they should be figuring out.
+Best Regards
 
-> It's not about performance or anything of the sort: in most cases
-> where we end-up using this, it is on the back of an exception.
-> So performance is the least of our worries.
+Eric
+> 
+> 
+>> +	default:
+>> +		return -EINVAL;
+>> +	}
+>> +
+>> +	/* Global S1 invalidation */
+>> +	cmd.tlbi.vmid   = smmu_domain->s2_cfg.vmid;
+>> +	arm_smmu_cmdq_issue_cmd(smmu, &cmd);
+>> +	arm_smmu_cmdq_issue_sync(smmu);
+>> +	return 0;
+>> +}
+>> +
+>>  static bool arm_smmu_dev_has_feature(struct device *dev,
+>>  				     enum iommu_dev_features feat)
+>>  {
+>> @@ -3048,6 +3121,7 @@ static struct iommu_ops arm_smmu_ops = {
+>>  	.put_resv_regions	= generic_iommu_put_resv_regions,
+>>  	.attach_pasid_table	= arm_smmu_attach_pasid_table,
+>>  	.detach_pasid_table	= arm_smmu_detach_pasid_table,
+>> +	.cache_invalidate	= arm_smmu_cache_invalidate,
+>>  	.dev_has_feat		= arm_smmu_dev_has_feature,
+>>  	.dev_feat_enabled	= arm_smmu_dev_feature_enabled,
+>>  	.dev_enable_feat	= arm_smmu_dev_enable_feature,
+> 
 
-> However, the "reg" parameter to read/write_sysreg_s() cannot
-> be a variable, because it is directly fed to the assembler.
-> If you want to use functions, you need to specialise them per
-> register. At this point, I'm pretty happy with a #define.
-
-Ah, that makes sense - it was more of a "that's weird" than "that's
-actually a problem", hence the Reviwed-by.
-
---Q59ABw34pTSIagmi
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmBU2C0ACgkQJNaLcl1U
-h9Ajqwf9EMDQaypMDIWe3hvFmJpocQXYj8Z8pZV17DmNX8BsxorubMG4MZYXbAy3
-Y6KQsdym6h98d123L43yudMJDZh1lUz5sxWtvbpTMkWShEaYWskz+Jt9u5FmVmRt
-SKwrNpvVWtBUCKlmY2StbkfvvjAvHFrdP6dkSFUpNjXOORWvWFxEy3ON4Wh4/anX
-1U+GXJN/udEiv1Gs2h1b+UWW7z2eDpfNImt1A/KekSoXH+6CiAc/DzV0PA3xelo/
-YC4JLIPlLsdBT0wXPmY3pgAATgWM2j0cg/XLPZfylA88kgurHWHaZmq7H+rYO9xI
-Jrx+XlOA0rjFsAI+OlH5tBWUdb72IQ==
-=agRA
------END PGP SIGNATURE-----
-
---Q59ABw34pTSIagmi--
