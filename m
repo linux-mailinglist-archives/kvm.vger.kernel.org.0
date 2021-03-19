@@ -2,247 +2,67 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EF41D34178F
-	for <lists+kvm@lfdr.de>; Fri, 19 Mar 2021 09:36:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9C44A3417C7
+	for <lists+kvm@lfdr.de>; Fri, 19 Mar 2021 09:54:26 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234365AbhCSIfw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 19 Mar 2021 04:35:52 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:39098 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234315AbhCSIfY (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 19 Mar 2021 04:35:24 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1616142923;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=+QMJk0xgpg3V22PAHodfaQYWUflqcQBZtDZTxUZTHuk=;
-        b=Gr8OqUrKAZhquXnUMFtzoY5KUKScIzBacnuxfyGEHEabomp0g/ezOer/wCW1wpHOD5rvqS
-        bKqZ/NgIRaX56GPo1C1JiJyQ/PZqIo/MXqxISkIa0e9wobiBL6VYs78WPG7QoQ4ch2NKdZ
-        Q+ZRKidh1BFs7ZaRQCbsfaS/Gm8N9ws=
-Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
- [209.85.218.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-171-y2b_F9yhMX-2milmeckbmA-1; Fri, 19 Mar 2021 04:35:21 -0400
-X-MC-Unique: y2b_F9yhMX-2milmeckbmA-1
-Received: by mail-ej1-f72.google.com with SMTP id si4so18028064ejb.23
-        for <kvm@vger.kernel.org>; Fri, 19 Mar 2021 01:35:21 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=+QMJk0xgpg3V22PAHodfaQYWUflqcQBZtDZTxUZTHuk=;
-        b=euF8lLf/Jb9WVYrF8CynPnsaMGRiXw2ddqGSdGSsk3yaEwlq4RL2Q+1CPubVsXGEXN
-         oWrgsfNGAEjds4IKjFCH0CJgzD8T4IaqqK2e2kzd3gcJFC9jvRP+tBx1Nk8WYjFHgr/+
-         /kkl63IaVPGrfdMI3A3Go86L5PCWPh7SK+w+/bYghEL7xLxcJcsRmYmUyHwYvXpqjo9X
-         YT/jM8v427EpL7tMBBUkUaj4kg/dik+pVUTPUMBYX9PIz/sLfqujmHdPo4udIAEdRMX1
-         Oze1RBVHZEHSskED25W5LxeP1KgQ3mCmWHfhH4tueHctPZEwbL4M57BEkHIEvodE0HVt
-         4n3A==
-X-Gm-Message-State: AOAM532qMo6bQYB7bJUB+e+lUovc1UcNz56nJVvVmxB5ekoy4vlfSERT
-        SMkoQJgHQsQXBl4bq+LnzfdYk/xRPgYyjqFvQIkOT8041WZyLsNzQHXdSnLZaGotpogHe+SIbtT
-        ShhfKwVZcLhLzA5n6Izel/A1CNABlax3As6i8mcOwSap8+ZxBwbmHNb+AeSWZDrHv
-X-Received: by 2002:aa7:c3c1:: with SMTP id l1mr8284855edr.208.1616142920597;
-        Fri, 19 Mar 2021 01:35:20 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxDxmUWVwsC44ioClgn8Ff3bGZXB3ot3x/r/wYXMKPZjfZw0XThD6htydxrQJ+sGSY24K1ITg==
-X-Received: by 2002:aa7:c3c1:: with SMTP id l1mr8284833edr.208.1616142920417;
-        Fri, 19 Mar 2021 01:35:20 -0700 (PDT)
-Received: from localhost.localdomain ([194.230.155.135])
-        by smtp.gmail.com with ESMTPSA id v8sm3609424edx.38.2021.03.19.01.35.12
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 19 Mar 2021 01:35:19 -0700 (PDT)
-Subject: Re: [PATCH v2 2/2] selftests/kvm: add set_boot_cpu_id test
-To:     Andrew Jones <drjones@redhat.com>
-Cc:     linux-kselftest@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Shuah Khan <shuah@kernel.org>, Peter Xu <peterx@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-References: <20210318151624.490861-1-eesposit@redhat.com>
- <20210318151624.490861-2-eesposit@redhat.com>
- <20210318162036.sf6vgq2ntbgulpzb@kamzik.brq.redhat.com>
-From:   Emanuele Giuseppe Esposito <eesposit@redhat.com>
-Message-ID: <a81f1f39-8ff0-4fd9-d859-57569c437f39@redhat.com>
-Date:   Fri, 19 Mar 2021 09:34:40 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.8.0
-MIME-Version: 1.0
-In-Reply-To: <20210318162036.sf6vgq2ntbgulpzb@kamzik.brq.redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+        id S229745AbhCSIxx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 19 Mar 2021 04:53:53 -0400
+Received: from out30-56.freemail.mail.aliyun.com ([115.124.30.56]:42757 "EHLO
+        out30-56.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229624AbhCSIxV (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 19 Mar 2021 04:53:21 -0400
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R701e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04420;MF=jiapeng.chong@linux.alibaba.com;NM=1;PH=DS;RN=14;SR=0;TI=SMTPD_---0USZNPTU_1616143992;
+Received: from j63c13417.sqa.eu95.tbsite.net(mailfrom:jiapeng.chong@linux.alibaba.com fp:SMTPD_---0USZNPTU_1616143992)
+          by smtp.aliyun-inc.com(127.0.0.1);
+          Fri, 19 Mar 2021 16:53:18 +0800
+From:   Jiapeng Chong <jiapeng.chong@linux.alibaba.com>
+To:     pbonzini@redhat.com
+Cc:     seanjc@google.com, vkuznets@redhat.com, wanpengli@tencent.com,
+        jmattson@google.com, joro@8bytes.org, tglx@linutronix.de,
+        mingo@redhat.com, bp@alien8.de, x86@kernel.org, hpa@zytor.com,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Jiapeng Chong <jiapeng.chong@linux.alibaba.com>
+Subject: [PATCH] KVM: x86: Remove unused variable rc
+Date:   Fri, 19 Mar 2021 16:53:12 +0800
+Message-Id: <1616143992-30228-1-git-send-email-jiapeng.chong@linux.alibaba.com>
+X-Mailer: git-send-email 1.8.3.1
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Fix the following coccicheck warnings:
 
+./arch/x86/kvm/emulate.c:4985:5-7: Unneeded variable: "rc". Return
+"X86EMUL_CONTINUE" on line 5019.
 
-On 18/03/2021 17:20, Andrew Jones wrote:
-> On Thu, Mar 18, 2021 at 04:16:24PM +0100, Emanuele Giuseppe Esposito wrote:
->> Test for the KVM_SET_BOOT_CPU_ID ioctl.
->> Check that it correctly allows to change the BSP vcpu.
->>
->> v1 -> v2:
->> - remove unnecessary printf
->> - move stage for loop inside run_vcpu
->> - test EBUSY when calling KVM_SET_BOOT_CPU_ID after vcpu
->>    creation and execution
->> - introduce _vm_ioctl
-> 
-> This information should be in the cover-letter. Or, for a single patch (no
-> cover-letter needed submission), then it should go below the '---' under
-> your s-o-b.
-> 
->>
+Reported-by: Abaci Robot <abaci@linux.alibaba.com>
+Signed-off-by: Jiapeng Chong <jiapeng.chong@linux.alibaba.com>
+---
+ arch/x86/kvm/emulate.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
 
->> +static void add_x86_vcpu(struct kvm_vm *vm, uint32_t vcpuid, bool bsp_code)
->> +{
->> +	if (bsp_code)
->> +		vm_vcpu_add_default(vm, vcpuid, guest_bsp_vcpu);
->> +	else
->> +		vm_vcpu_add_default(vm, vcpuid, guest_not_bsp_vcpu);
->> +
->> +	vcpu_set_cpuid(vm, vcpuid, kvm_get_supported_cpuid());
->> +}
->> +
->> +static void run_vm_bsp(uint32_t bsp_vcpu)
-> 
-> I think the 'bsp' suffixes and prefixes make the purpose of this function
-> and its argument more confusing. Just
-> 
->   static void run_vm(uint32_t vcpu)
-> 
-> would be more clear to me.
-
-The idea here was "run vm with this vcpu as BSP", implicitly assuming 
-that there are alwasy 2 vcpu inside, so we are picking one as BSP.
-
-Maybe
-
-run_vm_2_vcpu(uint32_t bsp_vcpid)
-
-is better?
-
-> 
->> +{
->> +	struct kvm_vm *vm;
->> +	bool is_bsp_vcpu1 = bsp_vcpu == VCPU_ID1;
-> 
-> Could add another define
-> 
->   #define BSP_VCPU VCPU_ID1
-> 
-> And then instead of creating the above bool, just do
-> 
->   if (vcpu == BSP_VCPU)
-
-I think it will be even more confusing to have BSP_VCPU fixed to 
-VCPU_ID1, because in the tests before and after I use VCPU_ID0 as BSP.
-
-	run_vm_bsp(VCPU_ID0);
-	run_vm_bsp(VCPU_ID1);
-	run_vm_bsp(VCPU_ID0);
-
-> 
->> +
->> +	vm = create_vm();
->> +
->> +	if (is_bsp_vcpu1)
->> +		vm_ioctl(vm, KVM_SET_BOOT_CPU_ID, (void *) VCPU_ID1);
-> 
-> Does this ioctl need to be called before creating the vcpus? The
-> documentation in Documentation/virt/kvm/api.rst doesn't say that.
-
-Yes, it has to be called before creating the vcpus, as also shown in the 
-test function "check_set_bsp_busy". KVM checks that created_vcpus is 0 
-before setting the bsp field.
-
-arch/x86/kvm/x86.c
-		case KVM_SET_BOOT_CPU_ID:
-		...
-		if (kvm->created_vcpus)
-			r = -EBUSY;
-		else
-			kvm->arch.bsp_vcpu_id = arg;
-
-I will update the documentation to include also this information.
-
-> If it can be called after creating the vcpus, then
-> vm_create_default_with_vcpus() can be used and there's no need
-> for the create_vm() and add_x86_vcpu() functions.
-
-Just use the
-> same guest code for both, but pass the cpu index to the guest
-> code function allowing something like
-> 
->     if (cpu == BSP_VCPU)
-> 	GUEST_ASSERT(get_bsp_flag() != 0);
->     else
-> 	GUEST_ASSERT(get_bsp_flag() == 0);
-> 
-I might be wrong, but there seems not to be an easy way to pass 
-arguments to the guest function.
-
-Thank you,
-Emanuele
-> 
->> +
->> +	add_x86_vcpu(vm, VCPU_ID0, !is_bsp_vcpu1);
->> +	add_x86_vcpu(vm, VCPU_ID1, is_bsp_vcpu1);
->> +
->> +	run_vcpu(vm, VCPU_ID0);
->> +	run_vcpu(vm, VCPU_ID1);
->> +
->> +	kvm_vm_free(vm);
->> +}
->> +
->> +static void check_set_bsp_busy(void)
->> +{
->> +	struct kvm_vm *vm;
->> +	int res;
->> +
->> +	vm = create_vm();
->> +
->> +	add_x86_vcpu(vm, VCPU_ID0, true);
->> +	add_x86_vcpu(vm, VCPU_ID1, false);
->> +
->> +	res = _vm_ioctl(vm, KVM_SET_BOOT_CPU_ID, (void *) VCPU_ID1);
->> +	TEST_ASSERT(res == -1 && errno == EBUSY, "KVM_SET_BOOT_CPU_ID set after adding vcpu");
->> +
->> +	run_vcpu(vm, VCPU_ID0);
->> +	run_vcpu(vm, VCPU_ID1);
->> +
->> +	res = _vm_ioctl(vm, KVM_SET_BOOT_CPU_ID, (void *) VCPU_ID1);
->> +	TEST_ASSERT(res == -1 && errno == EBUSY, "KVM_SET_BOOT_CPU_ID set to a terminated vcpu");
->> +
->> +	kvm_vm_free(vm);
->> +}
->> +
->> +int main(int argc, char *argv[])
->> +{
->> +	if (!kvm_check_cap(KVM_CAP_SET_BOOT_CPU_ID)) {
->> +		print_skip("set_boot_cpu_id not available");
->> +		return 0;
-> 
-> Should be exit(KSFT_SKIP);
-> 
->> +	}
->> +
->> +	run_vm_bsp(VCPU_ID0);
->> +	run_vm_bsp(VCPU_ID1);
->> +	run_vm_bsp(VCPU_ID0);
->> +
->> +	check_set_bsp_busy();
-> 
-> Don't you get a compiler warning here saying there's no return from a
-> function that returns int?
-> 
->> +}
->> -- 
->> 2.29.2
->>
-> 
-> Thanks,
-> drew
-> 
+diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
+index f7970ba..8ae1e16 100644
+--- a/arch/x86/kvm/emulate.c
++++ b/arch/x86/kvm/emulate.c
+@@ -4982,8 +4982,6 @@ static unsigned imm_size(struct x86_emulate_ctxt *ctxt)
+ static int decode_imm(struct x86_emulate_ctxt *ctxt, struct operand *op,
+ 		      unsigned size, bool sign_extension)
+ {
+-	int rc = X86EMUL_CONTINUE;
+-
+ 	op->type = OP_IMM;
+ 	op->bytes = size;
+ 	op->addr.mem.ea = ctxt->_eip;
+@@ -5016,7 +5014,7 @@ static int decode_imm(struct x86_emulate_ctxt *ctxt, struct operand *op,
+ 		}
+ 	}
+ done:
+-	return rc;
++	return X86EMUL_CONTINUE;
+ }
+ 
+ static int decode_operand(struct x86_emulate_ctxt *ctxt, struct operand *op,
+-- 
+1.8.3.1
 
