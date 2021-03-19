@@ -2,28 +2,28 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CC52A341CDC
-	for <lists+kvm@lfdr.de>; Fri, 19 Mar 2021 13:25:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D5FF1341CDA
+	for <lists+kvm@lfdr.de>; Fri, 19 Mar 2021 13:25:39 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230028AbhCSMY6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        id S230026AbhCSMY6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
         Fri, 19 Mar 2021 08:24:58 -0400
-Received: from foss.arm.com ([217.140.110.172]:48410 "EHLO foss.arm.com"
+Received: from foss.arm.com ([217.140.110.172]:48416 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229933AbhCSMYd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 19 Mar 2021 08:24:33 -0400
+        id S230268AbhCSMYe (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 19 Mar 2021 08:24:34 -0400
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 2F397ED1;
-        Fri, 19 Mar 2021 05:24:33 -0700 (PDT)
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 1D4AB101E;
+        Fri, 19 Mar 2021 05:24:34 -0700 (PDT)
 Received: from localhost.localdomain (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 759943F70D;
-        Fri, 19 Mar 2021 05:24:32 -0700 (PDT)
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 63A643F70D;
+        Fri, 19 Mar 2021 05:24:33 -0700 (PDT)
 From:   Nikos Nikoleris <nikos.nikoleris@arm.com>
 To:     kvm@vger.kernel.org
 Cc:     drjones@redhat.com, alexandru.elisei@arm.com,
         Nikos Nikoleris <nikos.nikoleris@arm.com>
-Subject: [kvm-unit-tests PATCH 2/4] arm/arm64: Read system registers to get the state of the MMU
-Date:   Fri, 19 Mar 2021 12:24:12 +0000
-Message-Id: <20210319122414.129364-3-nikos.nikoleris@arm.com>
+Subject: [kvm-unit-tests PATCH 3/4] arm/arm64: Track whether thread_info has been initialized
+Date:   Fri, 19 Mar 2021 12:24:13 +0000
+Message-Id: <20210319122414.129364-4-nikos.nikoleris@arm.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20210319122414.129364-1-nikos.nikoleris@arm.com>
 References: <20210319122414.129364-1-nikos.nikoleris@arm.com>
@@ -34,152 +34,74 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When we are in EL1 we can directly tell if the local cpu's MMU is on
-by reading a system register (SCTRL/SCTRL_EL1). In EL0, we use the
-relevant cpumask. This way we don't have to rely on the cpu id in
-thread_info when we are in setup executing in EL1. In subsequent
-patches we resolve the problem of identifying safely whether we are
-executing in EL1 or EL0.
+Introduce a new flag in the thread_info to track whether a thread_info
+struct is initialized yet or not.
 
 Signed-off-by: Nikos Nikoleris <nikos.nikoleris@arm.com>
 ---
- lib/arm/asm/mmu-api.h     |  7 +------
- lib/arm/asm/processor.h   |  7 +++++++
- lib/arm64/asm/processor.h |  1 +
- lib/arm/mmu.c             | 16 ++++++++--------
- lib/arm/processor.c       |  5 +++++
- lib/arm64/processor.c     |  5 +++++
- 6 files changed, 27 insertions(+), 14 deletions(-)
+ lib/arm/asm/thread_info.h | 1 +
+ lib/arm/processor.c       | 5 +++--
+ lib/arm64/processor.c     | 5 +++--
+ 3 files changed, 7 insertions(+), 4 deletions(-)
 
-diff --git a/lib/arm/asm/mmu-api.h b/lib/arm/asm/mmu-api.h
-index 3d04d03..05fc12b 100644
---- a/lib/arm/asm/mmu-api.h
-+++ b/lib/arm/asm/mmu-api.h
-@@ -5,12 +5,7 @@
- #include <stdbool.h>
- 
- extern pgd_t *mmu_idmap;
--extern unsigned int mmu_disabled_cpu_count;
--extern bool __mmu_enabled(void);
--static inline bool mmu_enabled(void)
--{
--	return mmu_disabled_cpu_count == 0 || __mmu_enabled();
--}
-+extern bool mmu_enabled(void);
- extern void mmu_mark_enabled(int cpu);
- extern void mmu_mark_disabled(int cpu);
- extern void mmu_enable(pgd_t *pgtable);
-diff --git a/lib/arm/asm/processor.h b/lib/arm/asm/processor.h
-index 273366d..af54c09 100644
---- a/lib/arm/asm/processor.h
-+++ b/lib/arm/asm/processor.h
-@@ -67,11 +67,13 @@ extern int mpidr_to_cpu(uint64_t mpidr);
- 	((mpidr >> MPIDR_LEVEL_SHIFT(level)) & 0xff)
- 
- extern void start_usr(void (*func)(void *arg), void *arg, unsigned long sp_usr);
-+extern bool __mmu_enabled(void);
- extern bool is_user(void);
- 
- #define CNTVCT		__ACCESS_CP15_64(1, c14)
- #define CNTFRQ		__ACCESS_CP15(c14, 0, c0, 0)
- #define CTR		__ACCESS_CP15(c0, 0, c0, 1)
-+#define SCTRL		__ACCESS_CP15(c1, 0, c0, 0)
- 
- static inline u64 get_cntvct(void)
- {
-@@ -89,6 +91,11 @@ static inline u32 get_ctr(void)
- 	return read_sysreg(CTR);
+diff --git a/lib/arm/asm/thread_info.h b/lib/arm/asm/thread_info.h
+index eaa7258..926c2a3 100644
+--- a/lib/arm/asm/thread_info.h
++++ b/lib/arm/asm/thread_info.h
+@@ -45,6 +45,7 @@ static inline void *thread_stack_alloc(void)
  }
  
-+static inline u32 get_sctrl(void)
-+{
-+	return read_sysreg(SCTRL);
-+}
-+
- extern unsigned long dcache_line_size;
+ #define TIF_USER_MODE		(1U << 0)
++#define TIF_VALID		(1U << 1)
  
- #endif /* _ASMARM_PROCESSOR_H_ */
-diff --git a/lib/arm64/asm/processor.h b/lib/arm64/asm/processor.h
-index 771b2d1..8e2037e 100644
---- a/lib/arm64/asm/processor.h
-+++ b/lib/arm64/asm/processor.h
-@@ -98,6 +98,7 @@ extern int mpidr_to_cpu(uint64_t mpidr);
- 
- extern void start_usr(void (*func)(void *arg), void *arg, unsigned long sp_usr);
- extern bool is_user(void);
-+extern bool __mmu_enabled(void);
- 
- static inline u64 get_cntvct(void)
- {
-diff --git a/lib/arm/mmu.c b/lib/arm/mmu.c
-index a1862a5..d806c63 100644
---- a/lib/arm/mmu.c
-+++ b/lib/arm/mmu.c
-@@ -24,10 +24,9 @@ extern unsigned long etext;
- pgd_t *mmu_idmap;
- 
- /* CPU 0 starts with disabled MMU */
--static cpumask_t mmu_disabled_cpumask = { {1} };
--unsigned int mmu_disabled_cpu_count = 1;
-+static cpumask_t mmu_enabled_cpumask = { {0} };
- 
--bool __mmu_enabled(void)
-+bool mmu_enabled(void)
- {
- 	int cpu = current_thread_info()->cpu;
- 
-@@ -38,19 +37,20 @@ bool __mmu_enabled(void)
- 	 * spinlock, atomic bitop, etc., otherwise we'll recurse.
- 	 * [cpumask_]test_bit is safe though.
- 	 */
--	return !cpumask_test_cpu(cpu, &mmu_disabled_cpumask);
-+	if (is_user())
-+		return cpumask_test_cpu(cpu, &mmu_enabled_cpumask);
-+	else
-+		return __mmu_enabled();
- }
- 
- void mmu_mark_enabled(int cpu)
- {
--	if (cpumask_test_and_clear_cpu(cpu, &mmu_disabled_cpumask))
--		--mmu_disabled_cpu_count;
-+	cpumask_set_cpu(cpu, &mmu_enabled_cpumask);
- }
- 
- void mmu_mark_disabled(int cpu)
- {
--	if (!cpumask_test_and_set_cpu(cpu, &mmu_disabled_cpumask))
--		++mmu_disabled_cpu_count;
-+	cpumask_clear_cpu(cpu, &mmu_enabled_cpumask);
- }
- 
- extern void asm_mmu_enable(phys_addr_t pgtable);
+ struct thread_info {
+ 	int cpu;
 diff --git a/lib/arm/processor.c b/lib/arm/processor.c
-index 773337e..a2d39a4 100644
+index a2d39a4..702fbc3 100644
 --- a/lib/arm/processor.c
 +++ b/lib/arm/processor.c
-@@ -145,3 +145,8 @@ bool is_user(void)
+@@ -119,7 +119,7 @@ void thread_info_init(struct thread_info *ti, unsigned int flags)
  {
- 	return current_thread_info()->flags & TIF_USER_MODE;
+ 	memset(ti, 0, sizeof(struct thread_info));
+ 	ti->cpu = mpidr_to_cpu(get_mpidr());
+-	ti->flags = flags;
++	ti->flags = flags | TIF_VALID;
  }
-+
-+bool __mmu_enabled(void)
-+{
-+	return get_sctrl() & CR_M;
-+}
+ 
+ void start_usr(void (*func)(void *arg), void *arg, unsigned long sp_usr)
+@@ -143,7 +143,8 @@ void start_usr(void (*func)(void *arg), void *arg, unsigned long sp_usr)
+ 
+ bool is_user(void)
+ {
+-	return current_thread_info()->flags & TIF_USER_MODE;
++	struct thread_info *ti = current_thread_info();
++	return (ti->flags & TIF_VALID) && (ti->flags & TIF_USER_MODE);
+ }
+ 
+ bool __mmu_enabled(void)
 diff --git a/lib/arm64/processor.c b/lib/arm64/processor.c
-index 2a024e3..ef55862 100644
+index ef55862..231d71e 100644
 --- a/lib/arm64/processor.c
 +++ b/lib/arm64/processor.c
-@@ -257,3 +257,8 @@ bool is_user(void)
+@@ -227,7 +227,7 @@ static void __thread_info_init(struct thread_info *ti, unsigned int flags)
  {
- 	return current_thread_info()->flags & TIF_USER_MODE;
+ 	memset(ti, 0, sizeof(struct thread_info));
+ 	ti->cpu = mpidr_to_cpu(get_mpidr());
+-	ti->flags = flags;
++	ti->flags = flags | TIF_VALID;
  }
-+
-+bool __mmu_enabled(void)
-+{
-+	return read_sysreg(sctlr_el1) & SCTLR_EL1_M;
-+}
+ 
+ void thread_info_init(struct thread_info *ti, unsigned int flags)
+@@ -255,7 +255,8 @@ void start_usr(void (*func)(void *arg), void *arg, unsigned long sp_usr)
+ 
+ bool is_user(void)
+ {
+-	return current_thread_info()->flags & TIF_USER_MODE;
++	struct thread_info *ti = current_thread_info();
++	return (ti->flags & TIF_VALID) && (ti->flags & TIF_USER_MODE);
+ }
+ 
+ bool __mmu_enabled(void)
 -- 
 2.25.1
 
