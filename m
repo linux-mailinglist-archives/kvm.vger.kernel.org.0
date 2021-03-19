@@ -2,50 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CC33B341670
-	for <lists+kvm@lfdr.de>; Fri, 19 Mar 2021 08:24:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 339A134167C
+	for <lists+kvm@lfdr.de>; Fri, 19 Mar 2021 08:25:15 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233902AbhCSHYD convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Fri, 19 Mar 2021 03:24:03 -0400
-Received: from [105.162.58.22] ([105.162.58.22]:64593 "EHLO mail.detahost.com"
-        rhost-flags-FAIL-FAIL-OK-FAIL) by vger.kernel.org with ESMTP
-        id S234227AbhCSHXb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 19 Mar 2021 03:23:31 -0400
-Message-ID: <0e5736b34792af6c4fb117444f9ba3cfec1bb84a1c@yandex.ru>
-Reply-To: "Kenya Bulk email Marketing" <info@datahost.co.ke>
-From:   "Kenya Bulk email Marketing" <hevja@yandex.ru>
-To:     <kvm@vger.kernel.org>
-Subject: Kenya bulk email marketing - Target over 1.8 Million Kenyans via email
-Date:   Fri, 19 Mar 2021 10:23:25 +0300
-Organization: Kenya Bulk Email
+        id S234424AbhCSHYd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 19 Mar 2021 03:24:33 -0400
+Received: from mga12.intel.com ([192.55.52.136]:44045 "EHLO mga12.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S234338AbhCSHYA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 19 Mar 2021 03:24:00 -0400
+IronPort-SDR: lCPJvSA/xP09BD7mO1STJ+lBRrA5YRZNtmVJQqLglibrD6kloLIdDcT+IB6LZS/w8vepcJY4ld
+ ojxoPt4gps/g==
+X-IronPort-AV: E=McAfee;i="6000,8403,9927"; a="169143671"
+X-IronPort-AV: E=Sophos;i="5.81,261,1610438400"; 
+   d="scan'208";a="169143671"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Mar 2021 00:24:00 -0700
+IronPort-SDR: Fcqq+fniPhenlhk5eqgER+QdjlKOr5WDZf7DfRcRQB1wLRNEy5CLFJTsIw1JGn0oI4r9hl6rCx
+ Lxbesx+vO4sg==
+X-IronPort-AV: E=Sophos;i="5.81,261,1610438400"; 
+   d="scan'208";a="413409809"
+Received: from dlmeisen-mobl1.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.255.229.165])
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Mar 2021 00:23:55 -0700
+From:   Kai Huang <kai.huang@intel.com>
+To:     kvm@vger.kernel.org, x86@kernel.org, linux-sgx@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org, seanjc@google.com, jarkko@kernel.org,
+        luto@kernel.org, dave.hansen@intel.com, rick.p.edgecombe@intel.com,
+        haitao.huang@intel.com, pbonzini@redhat.com, bp@alien8.de,
+        tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com,
+        jmattson@google.com, joro@8bytes.org, vkuznets@redhat.com,
+        wanpengli@tencent.com, Kai Huang <kai.huang@intel.com>
+Subject: [PATCH v3 15/25] KVM: x86: Export kvm_mmu_gva_to_gpa_{read,write}() for SGX (VMX)
+Date:   Fri, 19 Mar 2021 20:23:39 +1300
+Message-Id: <2d499bb53ec1811c60497fa15f1ee5830324d189.1616136308.git.kai.huang@intel.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <cover.1616136307.git.kai.huang@intel.com>
+References: <cover.1616136307.git.kai.huang@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8";
-Content-Transfer-Encoding: 8BIT
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Gain more clients on top of your existing clients on a daily basis 24/7/365 via Bulk email marketing - GUARANTEED
-Get A Personal Mail Server For Your Company / Organization Fully Setup & Configured & 1.8Million Kenyan Emails Loaded
-  - Why A Personal Mail Server For Bulk Mail Marketing
-  - Send mass email on a daily basis 24/7/365 days
-  - The mass mail server comes with its own logins to view the mass emailing progress
-  - The mass mail server comes with 1.8Million clean Kenyan emails already loaded.
-  - You only add the subject and the content of the email
-  - The mass mail server can send up to 100,000 emails per day all delivered straight to inbox
-  - We Monitor your mail mail server 24/7  to ensure full deliverability
-  - Be able to add you own email list in the mail server
-  - Gain New Clients Today on Top Of Your Existing Clients.
-As they say, Mass Marketing is the True fuel for business growth.
-Reach 100,000+ People in a Day & Notice the Difference.
-Bulk Email Marketing - Most cost effective alternative to TV & Radio Ads
-Reach approximately 100,000 people on a daily basis. 24/7/365 With your own personal mail server at a cost of Kshs 10,000 per month. (Offer Valid for 7days ONLY)
-We also have a mobile phone numbers database segmented per county, and we provide Bulk SMS  at  60cents/sms, sender ID Kshs.8300
+From: Sean Christopherson <sean.j.christopherson@intel.com>
 
-Contact Us Today
-Regards
-George K. Mariene
-Wyzer Technologies Limited
-Tel: +254 707 559 080 | +254 721 351 269
-www.textsms.co.ke | www.datahost.co.ke  
-18, Msanduku Road | Off Mbaazi Avenue | Lavington | Nairobi
+Export the gva_to_gpa() helpers for use by SGX virtualization when
+executing ENCLS[ECREATE] and ENCLS[EINIT] on behalf of the guest.
+To execute ECREATE and EINIT, KVM must obtain the GPA of the target
+Secure Enclave Control Structure (SECS) in order to get its
+corresponding HVA.
+
+Because the SECS must reside in the Enclave Page Cache (EPC), copying
+the SECS's data to a host-controlled buffer via existing exported
+helpers is not a viable option as the EPC is not readable or writable
+by the kernel.
+
+SGX virtualization will also use gva_to_gpa() to obtain HVAs for
+non-EPC pages in order to pass user pointers directly to ECREATE and
+EINIT, which avoids having to copy pages worth of data into the kernel.
+
+Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+Acked-by: Jarkko Sakkinen <jarkko@kernel.org>
+Signed-off-by: Kai Huang <kai.huang@intel.com>
+---
+ arch/x86/kvm/x86.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 47e021bdcc94..d2da5abcf395 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -5959,6 +5959,7 @@ gpa_t kvm_mmu_gva_to_gpa_read(struct kvm_vcpu *vcpu, gva_t gva,
+ 	u32 access = (static_call(kvm_x86_get_cpl)(vcpu) == 3) ? PFERR_USER_MASK : 0;
+ 	return vcpu->arch.walk_mmu->gva_to_gpa(vcpu, gva, access, exception);
+ }
++EXPORT_SYMBOL_GPL(kvm_mmu_gva_to_gpa_read);
+ 
+  gpa_t kvm_mmu_gva_to_gpa_fetch(struct kvm_vcpu *vcpu, gva_t gva,
+ 				struct x86_exception *exception)
+@@ -5975,6 +5976,7 @@ gpa_t kvm_mmu_gva_to_gpa_write(struct kvm_vcpu *vcpu, gva_t gva,
+ 	access |= PFERR_WRITE_MASK;
+ 	return vcpu->arch.walk_mmu->gva_to_gpa(vcpu, gva, access, exception);
+ }
++EXPORT_SYMBOL_GPL(kvm_mmu_gva_to_gpa_write);
+ 
+ /* uses this to access any guest's mapped memory without checking CPL */
+ gpa_t kvm_mmu_gva_to_gpa_system(struct kvm_vcpu *vcpu, gva_t gva,
+-- 
+2.30.2
+
