@@ -2,140 +2,113 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5FE3A3418C7
-	for <lists+kvm@lfdr.de>; Fri, 19 Mar 2021 10:51:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7B90A3418EB
+	for <lists+kvm@lfdr.de>; Fri, 19 Mar 2021 10:57:14 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229844AbhCSJur (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 19 Mar 2021 05:50:47 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:49726 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S229849AbhCSJuQ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 19 Mar 2021 05:50:16 -0400
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 12J9XGBW045542
-        for <kvm@vger.kernel.org>; Fri, 19 Mar 2021 05:50:15 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=Zxrd1J2FOLv48g8E9CkzQnqKdR0rXVqE6afvTTI5idU=;
- b=cr/y6NG+4hlZWOMjr+3WPjOjGIB7c5VqfKlOMu7WJPykGyZzI9dP7FWw3JY90dlg6yWL
- WkrGP5VfUAIjyo3YwTR++mRtxFQ2unToaPkWLHF0Yq4p1bxgJfSel7mICU/8PLYK4iU7
- mRMPJJ3LpGbqbLf5wi6NV1e8KymGmkyebulJ3UZVc3+u82ISVDWWWlr1bm3MfKo7Q/Qc
- tADFpK+eHgCKK39bXPzJuKfy8G+5BkzJsupINzq5Yiepm3AiAAAS/OzFloibrfDui0Dd
- olrchOR+c8Sgt9ejTviVoMGRheRSyVRQIF8aMYsAkBM4kbPRTRg4c0bOGRWmLVZG+TjW IQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 37c10ggvq1-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Fri, 19 Mar 2021 05:50:15 -0400
-Received: from m0098416.ppops.net (m0098416.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 12J9Yolb054040
-        for <kvm@vger.kernel.org>; Fri, 19 Mar 2021 05:50:15 -0400
-Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 37c10ggvp4-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 19 Mar 2021 05:50:15 -0400
-Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
-        by ppma03fra.de.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 12J9gnMd029729;
-        Fri, 19 Mar 2021 09:50:13 GMT
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
-        by ppma03fra.de.ibm.com with ESMTP id 378n18ay84-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 19 Mar 2021 09:50:13 +0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 12J9oA9p36635110
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 19 Mar 2021 09:50:10 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 4837BA405B;
-        Fri, 19 Mar 2021 09:50:10 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 07752A405C;
-        Fri, 19 Mar 2021 09:50:10 +0000 (GMT)
-Received: from oc3016276355.ibm.com (unknown [9.145.64.79])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Fri, 19 Mar 2021 09:50:09 +0000 (GMT)
-Subject: Re: [kvm-unit-tests PATCH v1 4/6] s390x: lib: css: add expectations
- to wait for interrupt
-To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     david@redhat.com, thuth@redhat.com, cohuck@redhat.com,
-        imbrenda@linux.ibm.com
-References: <1616073988-10381-1-git-send-email-pmorel@linux.ibm.com>
- <1616073988-10381-5-git-send-email-pmorel@linux.ibm.com>
- <c9a38bd8-f091-d3e4-dea5-0ffd9f1cdf12@linux.ibm.com>
-From:   Pierre Morel <pmorel@linux.ibm.com>
-Message-ID: <02a90318-2af5-d4eb-7329-425585bf51d3@linux.ibm.com>
-Date:   Fri, 19 Mar 2021 10:50:09 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.8.0
+        id S229524AbhCSJ4l (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 19 Mar 2021 05:56:41 -0400
+Received: from mail.kernel.org ([198.145.29.99]:39748 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229925AbhCSJ4g (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 19 Mar 2021 05:56:36 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPS id D830764F81
+        for <kvm@vger.kernel.org>; Fri, 19 Mar 2021 09:56:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1616147795;
+        bh=WPLpAsxZDAZmlkMIgIPfYu0O9w9G5IYbaAmN/2zfbEQ=;
+        h=From:To:Subject:Date:In-Reply-To:References:From;
+        b=BP/KoDhxcs3WskLY/aBQUxVKIVKeSWkETCuNSppczvQYK6A15254N9W4CHqFKqCGw
+         zRvkZnMkyHFzpS2CN0UvooviR42opxfywJ+2bV1szOh6vz+1/ovP08YGlG9faEOgE9
+         K24leYlWW/3KaEqMokWbVTBB4+jVImspfyfIzd4gdRRaoULAdfOuunpVZg6RjG925y
+         07uLcnfeUi9pqtXMgMyoVrQ1HwNCpZulO/WTFhgJz4ljIuZoWcNWAMn27a2KVXdaEA
+         oVXNTWdCBP8Dmaz6L6iwRjsqP16EpdgKAm9y2bC3N2BT7c0kiw0n7QYi2SCM8Kt5dz
+         2TykMUyCov6MQ==
+Received: by pdx-korg-bugzilla-2.web.codeaurora.org (Postfix, from userid 48)
+        id D3ABB653CF; Fri, 19 Mar 2021 09:56:35 +0000 (UTC)
+From:   bugzilla-daemon@bugzilla.kernel.org
+To:     kvm@vger.kernel.org
+Subject: [Bug 201753] AMD-Vi: Unable to write to IOMMU perf counter
+Date:   Fri, 19 Mar 2021 09:56:35 +0000
+X-Bugzilla-Reason: None
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Product: Virtualization
+X-Bugzilla-Component: kvm
+X-Bugzilla-Version: unspecified
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: info@felicetufo.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-201753-28872-IimVxkKWrp@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-201753-28872@https.bugzilla.kernel.org/>
+References: <bug-201753-28872@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 MIME-Version: 1.0
-In-Reply-To: <c9a38bd8-f091-d3e4-dea5-0ffd9f1cdf12@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.761
- definitions=2021-03-19_03:2021-03-17,2021-03-19 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501 mlxscore=0
- malwarescore=0 bulkscore=0 clxscore=1015 suspectscore=0 mlxlogscore=999
- adultscore=0 phishscore=0 lowpriorityscore=0 impostorscore=0 spamscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
- definitions=main-2103190067
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+https://bugzilla.kernel.org/show_bug.cgi?id=3D201753
 
+--- Comment #30 from Felice Tufo (info@felicetufo.com) ---
+Hello, a little update to my previous message: same machine, same kernel, b=
+ut
+this time the patch works. So it seems that also on the same HW the timings=
+ are
+not so predictable...
 
-On 3/19/21 10:09 AM, Janosch Frank wrote:
-> On 3/18/21 2:26 PM, Pierre Morel wrote:
->> When waiting for an interrupt we may need to check the cause of
->> the interrupt depending on the test case.
->>
->> Let's provide the tests the possibility to check if the last valid
->> IRQ received is for the expected instruction.
-> 
-> s/instruction/command/?
+[    1.844903] pci 0000:00:00.2: AMD-Vi: IOMMU performance counters support=
+ed
+[    1.845157] pci 0000:00:00.2: can't derive routing for PCI INT A
+[    1.845160] pci 0000:00:00.2: PCI INT A: not connected
+[    1.845213] pci 0000:00:01.0: Adding to iommu group 0
+[    1.845240] pci 0000:00:01.3: Adding to iommu group 1
+[    1.845267] pci 0000:00:02.0: Adding to iommu group 2
+[    1.845284] pci 0000:00:02.1: Adding to iommu group 3
+[    1.845301] pci 0000:00:02.2: Adding to iommu group 4
+[    1.845318] pci 0000:00:02.4: Adding to iommu group 5
+[    1.845349] pci 0000:00:08.0: Adding to iommu group 6
+[    1.845368] pci 0000:00:08.1: Adding to iommu group 6
+[    1.845394] pci 0000:00:14.0: Adding to iommu group 7
+[    1.845411] pci 0000:00:14.3: Adding to iommu group 7
+[    1.845469] pci 0000:00:18.0: Adding to iommu group 8
+[    1.845484] pci 0000:00:18.1: Adding to iommu group 8
+[    1.845500] pci 0000:00:18.2: Adding to iommu group 8
+[    1.845515] pci 0000:00:18.3: Adding to iommu group 8
+[    1.845530] pci 0000:00:18.4: Adding to iommu group 8
+[    1.845545] pci 0000:00:18.5: Adding to iommu group 8
+[    1.845559] pci 0000:00:18.6: Adding to iommu group 8
+[    1.845574] pci 0000:00:18.7: Adding to iommu group 8
+[    1.845592] pci 0000:01:00.0: Adding to iommu group 9
+[    1.845611] pci 0000:02:00.0: Adding to iommu group 10
+[    1.845629] pci 0000:03:00.0: Adding to iommu group 11
+[    1.845646] pci 0000:04:00.0: Adding to iommu group 12
+[    1.845665] pci 0000:05:00.0: Adding to iommu group 6
+[    1.845674] pci 0000:05:00.1: Adding to iommu group 6
+[    1.845683] pci 0000:05:00.2: Adding to iommu group 6
+[    1.845691] pci 0000:05:00.3: Adding to iommu group 6
+[    1.845699] pci 0000:05:00.4: Adding to iommu group 6
+[    1.845706] pci 0000:05:00.5: Adding to iommu group 6
+[    1.845714] pci 0000:05:00.6: Adding to iommu group 6
+[    1.848251] pci 0000:00:00.2: AMD-Vi: Found IOMMU cap 0x40
+[    1.848257] pci 0000:00:00.2: AMD-Vi: Extended features
+(0x206d73ef22254ade):
+[    1.848258]  PPR X2APIC NX GT IA GA PC GA_vAPIC
+[    1.848263] AMD-Vi: Interrupt remapping enabled
+[    1.848264] AMD-Vi: Virtual APIC enabled
+[    1.848264] AMD-Vi: X2APIC enabled
+[    1.848490] AMD-Vi: Lazy IO/TLB flushing enabled
 
-Right, instruction may not be the optimal wording.
-I/O architecture description have some strange (for me) wording, the 
-best is certainly to stick on this.
+--=20
+You may reply to this email to add a comment.
 
-Then I will use "the expected function" here.
-
-> 
-> We're checking for some value in an IO structure, right?
-> Instruction makes me expect an actual processor instruction.
-> 
-> Is there another word that can be used to describe what we're checking
-> here? If yes please also add it to the "pending" variable. "pending_fc"
-> or "pending_scsw_fc" for example.
-
-Pending is used to specify that the instruction has been accepted but 
-the according function is still pending, i.e. not finished and will stay 
-pending for a normal operation until the device active bit is set.
-
-So pending is not the right word, what we check here is the function 
-control, indicating the function the status refers too.
-
-> 
->>
-...snip...
-
->>    * Only report failures.
->>    */
->> -int wait_and_check_io_completion(int schid)
->> +int wait_and_check_io_completion(int schid, uint32_t pending)
-
-
-Consequently I will change "pending" with "function_ctrl"
-
-Thanks for forcing clarification
-I hope Connie will agree with this :)
-
-Regards,
-Pierre
-
-
--- 
-Pierre Morel
-IBM Lab Boeblingen
+You are receiving this mail because:
+You are watching the assignee of the bug.=
