@@ -2,61 +2,111 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 45F7D341607
-	for <lists+kvm@lfdr.de>; Fri, 19 Mar 2021 07:39:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5CBE434165E
+	for <lists+kvm@lfdr.de>; Fri, 19 Mar 2021 08:23:29 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233962AbhCSGit (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 19 Mar 2021 02:38:49 -0400
-Received: from mail.kernel.org ([198.145.29.99]:57252 "EHLO mail.kernel.org"
+        id S234137AbhCSHW4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 19 Mar 2021 03:22:56 -0400
+Received: from mga14.intel.com ([192.55.52.115]:59402 "EHLO mga14.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S233756AbhCSGia (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 19 Mar 2021 02:38:30 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id F2B0764F6E;
-        Fri, 19 Mar 2021 06:38:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1616135909;
-        bh=WReteb2mCylWusAoTA8szB/y6Qt2E2GZ2/ED476EScY=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=lFxSb+v7lajn1iZEpoxQY8+KE98fsREmDgQBnE4AAoVlJ41wU+a8ftARuwtCQujHo
-         2KN3DTR/b42JyuFm6D07DEmFOeJKeN8D7q8NZs8FG6uoz7GgzopZ6tbka4NzOSaquT
-         AvyTmCWug8Unr+Hr36NZS4O7YBRqb3PdxSHsvk/s=
-Date:   Fri, 19 Mar 2021 07:38:26 +0100
-From:   Greg KH <gregkh@linuxfoundation.org>
-To:     Isaku Yamahata <isaku.yamahata@intel.com>
-Cc:     linux-kernel@vger.kernel.org, stable@vger.kernel.org,
-        x86@kernel.org, kvm@vger.kernel.org, brijesh.singh@amd.com,
-        tglx@linutronix.de, bp@alien8.de, isaku.yamahata@gmail.com,
-        thomas.lendacky@amd.com,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: Re: [PATCH] X86: __set_clr_pte_enc() miscalculates physical address
-Message-ID: <YFRG4maiL0CeFhGM@kroah.com>
-References: <81abbae1657053eccc535c16151f63cd049dcb97.1616098294.git.isaku.yamahata@intel.com>
+        id S234168AbhCSHWf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 19 Mar 2021 03:22:35 -0400
+IronPort-SDR: QD/x6QbE3d4QiXI3s5T2V8hw9nUYgmY1CDCPuGO6JMk8a+tmBJvoPWV/o5/OREYh3Xda1f7HF1
+ t9YiweWugdZw==
+X-IronPort-AV: E=McAfee;i="6000,8403,9927"; a="189222109"
+X-IronPort-AV: E=Sophos;i="5.81,261,1610438400"; 
+   d="scan'208";a="189222109"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Mar 2021 00:22:35 -0700
+IronPort-SDR: ed42vW7y4IWWkFm1KTmRfBEu3a4rTD9KmDRu7JHDeYOobOLmh2VNPJefR46n1qAo1SD2ddlQP7
+ w2M4wUBjyimw==
+X-IronPort-AV: E=Sophos;i="5.81,261,1610438400"; 
+   d="scan'208";a="413409177"
+Received: from dlmeisen-mobl1.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.255.229.165])
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Mar 2021 00:22:30 -0700
+From:   Kai Huang <kai.huang@intel.com>
+To:     kvm@vger.kernel.org, x86@kernel.org, linux-sgx@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org, seanjc@google.com, jarkko@kernel.org,
+        luto@kernel.org, dave.hansen@intel.com, rick.p.edgecombe@intel.com,
+        haitao.huang@intel.com, pbonzini@redhat.com, bp@alien8.de,
+        tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com,
+        Kai Huang <kai.huang@intel.com>
+Subject: [PATCH v3 01/25] x86/cpufeatures: Make SGX_LC feature bit depend on SGX bit
+Date:   Fri, 19 Mar 2021 20:22:17 +1300
+Message-Id: <5d4220fd0a39f52af024d3fa166231c1d498dd10.1616136308.git.kai.huang@intel.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <cover.1616136307.git.kai.huang@intel.com>
+References: <cover.1616136307.git.kai.huang@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <81abbae1657053eccc535c16151f63cd049dcb97.1616098294.git.isaku.yamahata@intel.com>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Mar 18, 2021 at 01:26:57PM -0700, Isaku Yamahata wrote:
-> __set_clr_pte_enc() miscalculates physical address to operate.
-> pfn is in unit of PG_LEVEL_4K, not PGL_LEVEL_{2M, 1G}.
-> Shift size to get physical address should be PAGE_SHIFT,
-> not page_level_shift().
-> 
-> Fixes: dfaaec9033b8 ("x86: Add support for changing memory encryption attribute in early boot")
-> Reviewed-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
-> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
-> ---
->  arch/x86/mm/mem_encrypt.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+Move SGX_LC feature bit to CPUID dependency table to make clearing all
+SGX feature bits easier. Also remove clear_sgx_caps() since it is just
+a wrapper of setup_clear_cpu_cap(X86_FEATURE_SGX) now.
 
-<formletter>
+Suggested-by: Sean Christopherson <seanjc@google.com>
+Acked-by: Dave Hansen <dave.hansen@intel.com>
+Acked-by: Jarkko Sakkinen <jarkko@kernel.org>
+Reviewed-by: Sean Christopherson <seanjc@google.com>
+Signed-off-by: Kai Huang <kai.huang@intel.com>
+---
+ arch/x86/kernel/cpu/cpuid-deps.c |  1 +
+ arch/x86/kernel/cpu/feat_ctl.c   | 12 +++---------
+ 2 files changed, 4 insertions(+), 9 deletions(-)
 
-This is not the correct way to submit patches for inclusion in the
-stable kernel tree.  Please read:
-    https://www.kernel.org/doc/html/latest/process/stable-kernel-rules.html
-for how to do this properly.
+diff --git a/arch/x86/kernel/cpu/cpuid-deps.c b/arch/x86/kernel/cpu/cpuid-deps.c
+index 42af31b64c2c..d40f8e0a54ce 100644
+--- a/arch/x86/kernel/cpu/cpuid-deps.c
++++ b/arch/x86/kernel/cpu/cpuid-deps.c
+@@ -72,6 +72,7 @@ static const struct cpuid_dep cpuid_deps[] = {
+ 	{ X86_FEATURE_AVX512_FP16,		X86_FEATURE_AVX512BW  },
+ 	{ X86_FEATURE_ENQCMD,			X86_FEATURE_XSAVES    },
+ 	{ X86_FEATURE_PER_THREAD_MBA,		X86_FEATURE_MBA       },
++	{ X86_FEATURE_SGX_LC,			X86_FEATURE_SGX	      },
+ 	{}
+ };
+ 
+diff --git a/arch/x86/kernel/cpu/feat_ctl.c b/arch/x86/kernel/cpu/feat_ctl.c
+index 3b1b01f2b248..27533a6e04fa 100644
+--- a/arch/x86/kernel/cpu/feat_ctl.c
++++ b/arch/x86/kernel/cpu/feat_ctl.c
+@@ -93,15 +93,9 @@ static void init_vmx_capabilities(struct cpuinfo_x86 *c)
+ }
+ #endif /* CONFIG_X86_VMX_FEATURE_NAMES */
+ 
+-static void clear_sgx_caps(void)
+-{
+-	setup_clear_cpu_cap(X86_FEATURE_SGX);
+-	setup_clear_cpu_cap(X86_FEATURE_SGX_LC);
+-}
+-
+ static int __init nosgx(char *str)
+ {
+-	clear_sgx_caps();
++	setup_clear_cpu_cap(X86_FEATURE_SGX);
+ 
+ 	return 0;
+ }
+@@ -116,7 +110,7 @@ void init_ia32_feat_ctl(struct cpuinfo_x86 *c)
+ 
+ 	if (rdmsrl_safe(MSR_IA32_FEAT_CTL, &msr)) {
+ 		clear_cpu_cap(c, X86_FEATURE_VMX);
+-		clear_sgx_caps();
++		clear_cpu_cap(c, X86_FEATURE_SGX);
+ 		return;
+ 	}
+ 
+@@ -177,6 +171,6 @@ void init_ia32_feat_ctl(struct cpuinfo_x86 *c)
+ 	    !(msr & FEAT_CTL_SGX_LC_ENABLED) || !enable_sgx) {
+ 		if (enable_sgx)
+ 			pr_err_once("SGX disabled by BIOS\n");
+-		clear_sgx_caps();
++		clear_cpu_cap(c, X86_FEATURE_SGX);
+ 	}
+ }
+-- 
+2.30.2
 
-</formletter>
