@@ -2,117 +2,85 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 07A353426CA
-	for <lists+kvm@lfdr.de>; Fri, 19 Mar 2021 21:26:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 42891342716
+	for <lists+kvm@lfdr.de>; Fri, 19 Mar 2021 21:44:25 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230335AbhCSUZ4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 19 Mar 2021 16:25:56 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:35800 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230206AbhCSUZZ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 19 Mar 2021 16:25:25 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1616185520;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=PMF1Va7K5vPqZ+/8veih9JjawoEvPslxFD06HPVOZ3Y=;
-        b=A9khCmcUNGk/BtEfdnTxnJjOQ8Js0qt9Qmu3/zX3RlPg1MAYeXrNbcKjdDXrYt/UHftgaM
-        Q3ZaixwLCi1II2muTDCy7uqOj2jQrBhkW4IH5t6Ir7nVnv32o+whHlv81cnPJQlMfFWr/r
-        6zhKLxupEs0V1YAjT3qE9UsnDs7h1IQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-350-dBMOzxH6M_2ICz1x-dzqSw-1; Fri, 19 Mar 2021 16:25:18 -0400
-X-MC-Unique: dBMOzxH6M_2ICz1x-dzqSw-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5554F801817;
-        Fri, 19 Mar 2021 20:25:17 +0000 (UTC)
-Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 0231F1A874;
-        Fri, 19 Mar 2021 20:25:16 +0000 (UTC)
-From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     torvalds@linux-foundation.org
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: [GIT PULL] KVM changes for Linux 5.12-rc4
-Date:   Fri, 19 Mar 2021 16:25:16 -0400
-Message-Id: <20210319202516.2235406-1-pbonzini@redhat.com>
+        id S230219AbhCSUnq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 19 Mar 2021 16:43:46 -0400
+Received: from mail.kernel.org ([198.145.29.99]:60456 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S230092AbhCSUnU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 19 Mar 2021 16:43:20 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPS id 8457361989
+        for <kvm@vger.kernel.org>; Fri, 19 Mar 2021 20:43:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1616186600;
+        bh=mHSpIH9ybVmZsfU9VFMdM5LDTuGMQwxopt5lZ2u2OxE=;
+        h=From:To:Subject:Date:In-Reply-To:References:From;
+        b=JL1Ooc7CStasbZfrfNA6fhKYcEeZdvPzy7JjNe8/bI59n5yrdVykY6Z6e00+ifbLn
+         UM+Plclc98VO7maBhoaO1LxZpIOP42+uwzqYZNh4kbhW2ctlEdGnrEJd6y3WIrVEze
+         RnZhrWL05Sp7JrLmt/me/5WEu0RUdMLlAdhyJDBPbbe8n9eLjI3IOGn+FkXk0gJNoS
+         CQpAcBv0JllwxWHfdMWa+pR7Lz0f/FcO/f3R3AWxnhQB5wq6MHjzLAvueehvlvih6z
+         I13kpn9KcG6ddzhpXXqd7vn4FQNBIkn+8Yr76GXcY9/peuy42WajErOx2FH4oSwzGg
+         c6NdYKq+RIAkw==
+Received: by pdx-korg-bugzilla-2.web.codeaurora.org (Postfix, from userid 48)
+        id 8177562A50; Fri, 19 Mar 2021 20:43:20 +0000 (UTC)
+From:   bugzilla-daemon@bugzilla.kernel.org
+To:     kvm@vger.kernel.org
+Subject: [Bug 201753] AMD-Vi: Unable to write to IOMMU perf counter
+Date:   Fri, 19 Mar 2021 20:43:19 +0000
+X-Bugzilla-Reason: None
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Product: Virtualization
+X-Bugzilla-Component: kvm
+X-Bugzilla-Version: unspecified
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: david.coe@live.co.uk
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-201753-28872-UhhJcL5Nis@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-201753-28872@https.bugzilla.kernel.org/>
+References: <bug-201753-28872@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Linus,
+https://bugzilla.kernel.org/show_bug.cgi?id=3D201753
 
-The following changes since commit 1e28eed17697bcf343c6743f0028cc3b5dd88bf0:
+--- Comment #32 from David Coe (david.coe@live.co.uk) ---
+I'm pretty sure this is because IOMMU (for some Ryzens) unlatches after 5 t=
+ries
+on cold boot and 6 tries on warm. Suravee, alas, has set his patch at 5 x 20
+msecs just on the 'dither' point!
 
-  Linux 5.12-rc3 (2021-03-14 14:41:02 -0700)
+Some time mid-next week I'll lay my sticky hands on a 4700U laptop. I have
+images re-compiled for Ubuntu's kernel 5.8.0-45 (20.10) and 5.11.0-11 (21.0=
+4)
+patched at 25 x 20 msecs and logged. Ditto with Alex's oh-so-simple patch.
 
-are available in the Git repository at:
+If all goes well(!), I'll draw up a nice, comparative table of mine and
+everybody else's data so we can draw some conclusions. If you scan the
+Debian/Ubuntu kernel changelog, you'll find a long list of 'cherry-picked'
+patches for both AMD and Intel for IOMMU. It is very much a work-in-progress
+still!
 
-  https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
+Best regards and many thanks all for input.
 
-for you to fetch changes up to 9ce3746d64132a561bceab6421715e7c04e85074:
+David
 
-  documentation/kvm: additional explanations on KVM_SET_BOOT_CPU_ID (2021-03-19 05:31:32 -0400)
+--=20
+You may reply to this email to add a comment.
 
-----------------------------------------------------------------
-x86:
-* new selftests
-* fixes for migration with HyperV re-enlightenment enabled
-* fix RCU/SRCU usage
-* fixes for local_irq_restore misuse false positive
-
-----------------------------------------------------------------
-Ben Gardon (3):
-      KVM: x86/mmu: Fix RCU usage in handle_removed_tdp_mmu_page
-      KVM: x86/mmu: Fix RCU usage when atomically zapping SPTEs
-      KVM: x86/mmu: Factor out tdp_iter_return_to_root
-
-Emanuele Giuseppe Esposito (4):
-      selftests: kvm: add get_msr_index_features
-      selftests: kvm: add _vm_ioctl
-      selftests: kvm: add set_boot_cpu_id test
-      documentation/kvm: additional explanations on KVM_SET_BOOT_CPU_ID
-
-Sean Christopherson (2):
-      KVM: x86/mmu: Store the address space ID in the TDP iterator
-      KVM: x86: Protect userspace MSR filter with SRCU, and set atomically-ish
-
-Vitaly Kuznetsov (5):
-      KVM: x86: hyper-v: Limit guest to writing zero to HV_X64_MSR_TSC_EMULATION_STATUS
-      KVM: x86: hyper-v: Prevent using not-yet-updated TSC page by secondary CPUs
-      KVM: x86: hyper-v: Track Hyper-V TSC page status
-      KVM: x86: hyper-v: Don't touch TSC page values when guest opted for re-enlightenment
-      selftests: kvm: Add basic Hyper-V clocksources tests
-
-Wanpeng Li (2):
-      KVM: X86: Fix missing local pCPU when executing wbinvd on all dirty pCPUs
-      x86/kvm: Fix broken irq restoration in kvm_wait
-
- Documentation/virt/kvm/api.rst                     |   9 +-
- arch/x86/include/asm/kvm_host.h                    |  34 ++-
- arch/x86/kernel/kvm.c                              |  23 +-
- arch/x86/kvm/hyperv.c                              |  91 +++++++-
- arch/x86/kvm/hyperv.h                              |   1 +
- arch/x86/kvm/mmu/mmu_internal.h                    |   5 +
- arch/x86/kvm/mmu/tdp_iter.c                        |  30 ++-
- arch/x86/kvm/mmu/tdp_iter.h                        |   4 +-
- arch/x86/kvm/mmu/tdp_mmu.c                         |  40 ++--
- arch/x86/kvm/x86.c                                 | 113 +++++----
- tools/testing/selftests/kvm/.gitignore             |   3 +
- tools/testing/selftests/kvm/Makefile               |   3 +
- tools/testing/selftests/kvm/include/kvm_util.h     |   2 +
- tools/testing/selftests/kvm/lib/kvm_util.c         |   7 +-
- .../testing/selftests/kvm/lib/kvm_util_internal.h  |   2 -
- .../selftests/kvm/x86_64/get_msr_index_features.c  | 134 +++++++++++
- tools/testing/selftests/kvm/x86_64/hyperv_clock.c  | 260 +++++++++++++++++++++
- .../testing/selftests/kvm/x86_64/set_boot_cpu_id.c | 166 +++++++++++++
- 18 files changed, 807 insertions(+), 120 deletions(-)
- create mode 100644 tools/testing/selftests/kvm/x86_64/get_msr_index_features.c
- create mode 100644 tools/testing/selftests/kvm/x86_64/hyperv_clock.c
- create mode 100644 tools/testing/selftests/kvm/x86_64/set_boot_cpu_id.c
-
+You are receiving this mail because:
+You are watching the assignee of the bug.=
