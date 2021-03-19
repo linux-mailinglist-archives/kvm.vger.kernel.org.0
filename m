@@ -2,238 +2,99 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5CD6B342376
+	by mail.lfdr.de (Postfix) with ESMTP id E8EEE342379
 	for <lists+kvm@lfdr.de>; Fri, 19 Mar 2021 18:37:37 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230105AbhCSRhG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 19 Mar 2021 13:37:06 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:23027 "EHLO
+        id S230195AbhCSRhI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 19 Mar 2021 13:37:08 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:35473 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230097AbhCSRgi (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 19 Mar 2021 13:36:38 -0400
+        by vger.kernel.org with ESMTP id S229926AbhCSRgw (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 19 Mar 2021 13:36:52 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1616175397;
+        s=mimecast20190719; t=1616175411;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=5eOAQHQd0/ZycZbF0USh+JA+Y7XaAJwV/qd8pF9Pi6w=;
-        b=HbuMnL3d/+gQnFeMmpJ0mDTj5k3r/XXE6qVRrcnOpW/4/lZGqSgsoGRwsGFgQnb0RE815R
-        TWSAji2PYb4J+WstkYetIYHYJgo2eB6PPpM3rcLYX3HVgKK46ztZK5vNUatzK9QGoPDbcL
-        LSoHaYUw7APlVKSp1zi7OunStdtvCMo=
+        bh=XvK0V0qzHhIii8GbFFuNd+vQ7faSsEtxcOA7tbbvbKQ=;
+        b=jGdAhyB4T3ZzsoTw1s2bxaePEuo96qHdWz6ltD7J8astTT9z1H4Ix7zzutxfMWuBd/d2Qe
+        LYS7wvticANZ8Lnbo2deuGSOSGAO3szBbrOTtzOfoNoj0TeoGa9NYAYhdY2RYY6BZXnNhc
+        GtG8ogDrO8IfZVTmQXCuZBX7CtlrqJk=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-575-ioeMyaxZNX6ROX7Fw6K4TA-1; Fri, 19 Mar 2021 13:36:33 -0400
-X-MC-Unique: ioeMyaxZNX6ROX7Fw6K4TA-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+ us-mta-4-_igWD4-vM_2pE7XfVsgbcw-1; Fri, 19 Mar 2021 13:36:47 -0400
+X-MC-Unique: _igWD4-vM_2pE7XfVsgbcw-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id ECF39107B768;
-        Fri, 19 Mar 2021 17:36:29 +0000 (UTC)
-Received: from [10.36.113.141] (ovpn-113-141.ams2.redhat.com [10.36.113.141])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 3EB5160C04;
-        Fri, 19 Mar 2021 17:36:18 +0000 (UTC)
-Subject: Re: [PATCH v14 07/13] iommu/smmuv3: Implement cache_invalidate
-To:     "chenxiang (M)" <chenxiang66@hisilicon.com>,
-        eric.auger.pro@gmail.com, iommu@lists.linux-foundation.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        kvmarm@lists.cs.columbia.edu, will@kernel.org, maz@kernel.org,
-        robin.murphy@arm.com, joro@8bytes.org, alex.williamson@redhat.com,
-        tn@semihalf.com, zhukeqian1@huawei.com
-Cc:     jean-philippe@linaro.org, wangxingang5@huawei.com,
-        lushenming@huawei.com, jiangkunkun@huawei.com,
-        vivek.gautam@arm.com, vsethi@nvidia.com, zhangfei.gao@linaro.org,
-        linuxarm@openeuler.org
-References: <20210223205634.604221-1-eric.auger@redhat.com>
- <20210223205634.604221-8-eric.auger@redhat.com>
- <c10c6405-5efe-5a41-2b3a-f3af85a528ba@hisilicon.com>
-From:   Auger Eric <eric.auger@redhat.com>
-Message-ID: <d5dcb7fe-2e09-b1fb-24d6-36249f047632@redhat.com>
-Date:   Fri, 19 Mar 2021 18:36:17 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.7.0
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B74B2800D53;
+        Fri, 19 Mar 2021 17:36:44 +0000 (UTC)
+Received: from omen.home.shazbot.org (ovpn-112-120.phx2.redhat.com [10.3.112.120])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 5E0611C936;
+        Fri, 19 Mar 2021 17:36:43 +0000 (UTC)
+Date:   Fri, 19 Mar 2021 11:36:42 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jason Gunthorpe <jgg@nvidia.com>,
+        Max Gurtovoy <mgurtovoy@nvidia.com>,
+        Alexey Kardashevskiy <aik@ozlabs.ru>, cohuck@redhat.com,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        liranl@nvidia.com, oren@nvidia.com, tzahio@nvidia.com,
+        leonro@nvidia.com, yarong@nvidia.com, aviadye@nvidia.com,
+        shahafs@nvidia.com, artemp@nvidia.com, kwankhede@nvidia.com,
+        ACurrid@nvidia.com, cjia@nvidia.com, yishaih@nvidia.com,
+        mjrosato@linux.ibm.com
+Subject: Re: [PATCH 8/9] vfio/pci: export nvlink2 support into vendor
+ vfio_pci drivers
+Message-ID: <20210319113642.4a9b0be1@omen.home.shazbot.org>
+In-Reply-To: <20210319163449.GA19186@lst.de>
+References: <20210309083357.65467-1-mgurtovoy@nvidia.com>
+        <20210309083357.65467-9-mgurtovoy@nvidia.com>
+        <19e73e58-c7a9-03ce-65a7-50f37d52ca15@ozlabs.ru>
+        <8941cf42-0c40-776e-6c02-9227146d3d66@nvidia.com>
+        <20210319092341.14bb179a@omen.home.shazbot.org>
+        <20210319161722.GY2356281@nvidia.com>
+        <20210319162033.GA18218@lst.de>
+        <20210319162848.GZ2356281@nvidia.com>
+        <20210319163449.GA19186@lst.de>
 MIME-Version: 1.0
-In-Reply-To: <c10c6405-5efe-5a41-2b3a-f3af85a528ba@hisilicon.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Chenxiang,
+On Fri, 19 Mar 2021 17:34:49 +0100
+Christoph Hellwig <hch@lst.de> wrote:
 
-On 3/4/21 8:55 AM, chenxiang (M) wrote:
-> Hi Eric,
-> 
-> 
-> 在 2021/2/24 4:56, Eric Auger 写道:
->> Implement domain-selective, pasid selective and page-selective
->> IOTLB invalidations.
->>
->> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->>
->> ---
->>
->> v13 -> v14:
->> - Add domain invalidation
->> - do global inval when asid is not provided with addr
->>   granularity
->>
->> v7 -> v8:
->> - ASID based invalidation using iommu_inv_pasid_info
->> - check ARCHID/PASID flags in addr based invalidation
->> - use __arm_smmu_tlb_inv_context and __arm_smmu_tlb_inv_range_nosync
->>
->> v6 -> v7
->> - check the uapi version
->>
->> v3 -> v4:
->> - adapt to changes in the uapi
->> - add support for leaf parameter
->> - do not use arm_smmu_tlb_inv_range_nosync or arm_smmu_tlb_inv_context
->>   anymore
->>
->> v2 -> v3:
->> - replace __arm_smmu_tlb_sync by arm_smmu_cmdq_issue_sync
->>
->> v1 -> v2:
->> - properly pass the asid
->> ---
->>  drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c | 74 +++++++++++++++++++++
->>  1 file changed, 74 insertions(+)
->>
->> diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
->> index 4c19a1114de4..df3adc49111c 100644
->> --- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
->> +++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
->> @@ -2949,6 +2949,79 @@ static void arm_smmu_detach_pasid_table(struct iommu_domain *domain)
->>  	mutex_unlock(&smmu_domain->init_mutex);
->>  }
->>  
->> +static int
->> +arm_smmu_cache_invalidate(struct iommu_domain *domain, struct device *dev,
->> +			  struct iommu_cache_invalidate_info *inv_info)
->> +{
->> +	struct arm_smmu_cmdq_ent cmd = {.opcode = CMDQ_OP_TLBI_NSNH_ALL};
->> +	struct arm_smmu_domain *smmu_domain = to_smmu_domain(domain);
->> +	struct arm_smmu_device *smmu = smmu_domain->smmu;
->> +
->> +	if (smmu_domain->stage != ARM_SMMU_DOMAIN_NESTED)
->> +		return -EINVAL;
->> +
->> +	if (!smmu)
->> +		return -EINVAL;
->> +
->> +	if (inv_info->version != IOMMU_CACHE_INVALIDATE_INFO_VERSION_1)
->> +		return -EINVAL;
->> +
->> +	if (inv_info->cache & IOMMU_CACHE_INV_TYPE_PASID ||
->> +	    inv_info->cache & IOMMU_CACHE_INV_TYPE_DEV_IOTLB) {
->> +		return -ENOENT;
->> +	}
->> +
->> +	if (!(inv_info->cache & IOMMU_CACHE_INV_TYPE_IOTLB))
->> +		return -EINVAL;
->> +
->> +	/* IOTLB invalidation */
->> +
->> +	switch (inv_info->granularity) {
->> +	case IOMMU_INV_GRANU_PASID:
->> +	{
->> +		struct iommu_inv_pasid_info *info =
->> +			&inv_info->granu.pasid_info;
->> +
->> +		if (info->flags & IOMMU_INV_ADDR_FLAGS_PASID)
->> +			return -ENOENT;
->> +		if (!(info->flags & IOMMU_INV_PASID_FLAGS_ARCHID))
->> +			return -EINVAL;
->> +
->> +		__arm_smmu_tlb_inv_context(smmu_domain, info->archid);
->> +		return 0;
->> +	}
->> +	case IOMMU_INV_GRANU_ADDR:
->> +	{
->> +		struct iommu_inv_addr_info *info = &inv_info->granu.addr_info;
->> +		size_t size = info->nb_granules * info->granule_size;
->> +		bool leaf = info->flags & IOMMU_INV_ADDR_FLAGS_LEAF;
->> +
->> +		if (info->flags & IOMMU_INV_ADDR_FLAGS_PASID)
->> +			return -ENOENT;
->> +
->> +		if (!(info->flags & IOMMU_INV_ADDR_FLAGS_ARCHID))
->> +			break;
->> +
->> +		arm_smmu_tlb_inv_range_domain(info->addr, size,
->> +					      info->granule_size, leaf,
->> +					      info->archid, smmu_domain);
-> 
-> Is it possible to add a check before the function to make sure that
-> info->granule_size can be recognized by SMMU?
-> There is a scenario which will cause TLBI issue: RIL feature is enabled
-> on guest but is disabled on host, and then on
-> host it just invalidate 4K/2M/1G once a time, but from QEMU,
-> info->nb_granules is always 1 and info->granule_size = size,
-> if size is not equal to 4K or 2M or 1G (for example size = granule_size
-> is 5M), it will only part of the size it wants to invalidate.
-> 
-> I think maybe we can add a check here: if RIL is not enabled and also
-> size is not the granule_size (4K/2M/1G) supported by
-> SMMU hardware, can we just simply use the smallest granule_size
-> supported by hardware all the time?
-> 
->> +
->> +		arm_smmu_cmdq_issue_sync(smmu);
->> +		return 0;
->> +	}
->> +	case IOMMU_INV_GRANU_DOMAIN:
->> +		break;
-> 
-> I check the qemu code
-> (https://github.com/eauger/qemu/tree/v5.2.0-2stage-rfcv8), for opcode
-> CMD_TLBI_NH_ALL or CMD_TLBI_NSNH_ALL from guest OS
-> it calls smmu_inv_notifiers_all() to unamp all notifiers of all mr's,
-> but it seems not set event.entry.granularity which i think it should set
-> IOMMU_INV_GRAN_ADDR.
-this is because IOMMU_INV_GRAN_ADDR = 0. But for clarity I should rather
-set it explicitly ;-)
-> BTW, for opcode CMD_TLBI_NH_ALL or CMD_TLBI_NSNH_ALL, it needs to unmap
-> size = 0x1000000000000 on 48bit system (it may spend much time),  maybe
-> it is better
-> to set it as IOMMU_INV_GRANU_DOMAIN, then in host OS, send TLBI_NH_ALL
-> directly when IOMMU_INV_GRANU_DOMAIN.
-Yes you're right. If the host does not support RIL then it is an issue.
-This is going to be fixed in the next version.
+> On Fri, Mar 19, 2021 at 01:28:48PM -0300, Jason Gunthorpe wrote:
+> > The wrinkle I don't yet have an easy answer to is how to load vfio_pci
+> > as a universal "default" within the driver core lazy bind scheme and
+> > still have working module autoloading... I'm hoping to get some
+> > research into this..  
 
-Thank you for the report!
+What about using MODULE_SOFTDEP("pre: ...") in the vfio-pci base
+driver, which would load all the known variants in order to influence
+the match, and therefore probe ordering?
 
-Best Regards
+If we coupled that with wildcard support in driver_override, ex.
+"vfio_pci*", and used consistent module naming, I think we'd only need
+to teach userspace about this wildcard and binding to a specific module
+would come for free.  This assumes we drop the per-variant id_table and
+use the probe function to skip devices without the necessary
+requirements, either wrong device or missing the tables we expect to
+expose.
 
-Eric
-> 
-> 
->> +	default:
->> +		return -EINVAL;
->> +	}
->> +
->> +	/* Global S1 invalidation */
->> +	cmd.tlbi.vmid   = smmu_domain->s2_cfg.vmid;
->> +	arm_smmu_cmdq_issue_cmd(smmu, &cmd);
->> +	arm_smmu_cmdq_issue_sync(smmu);
->> +	return 0;
->> +}
->> +
->>  static bool arm_smmu_dev_has_feature(struct device *dev,
->>  				     enum iommu_dev_features feat)
->>  {
->> @@ -3048,6 +3121,7 @@ static struct iommu_ops arm_smmu_ops = {
->>  	.put_resv_regions	= generic_iommu_put_resv_regions,
->>  	.attach_pasid_table	= arm_smmu_attach_pasid_table,
->>  	.detach_pasid_table	= arm_smmu_detach_pasid_table,
->> +	.cache_invalidate	= arm_smmu_cache_invalidate,
->>  	.dev_has_feat		= arm_smmu_dev_has_feature,
->>  	.dev_feat_enabled	= arm_smmu_dev_feature_enabled,
->>  	.dev_enable_feat	= arm_smmu_dev_enable_feature,
-> 
+> Should we even load it by default?  One answer would be that the sysfs
+> file to switch to vfio mode goes into the core PCI layer, and that core
+> PCI code would contain a hack^H^H^H^Hhook to first load and bind vfio_pci
+> for that device.
+
+Generally we don't want to be the default driver for anything (I think
+mdev devices are the exception).  Assignment to userspace or VM is a
+niche use case.  Thanks,
+
+Alex
 
