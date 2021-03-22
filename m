@@ -2,201 +2,62 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 41852343DEA
-	for <lists+kvm@lfdr.de>; Mon, 22 Mar 2021 11:31:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 27BE3343DF7
+	for <lists+kvm@lfdr.de>; Mon, 22 Mar 2021 11:33:10 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230294AbhCVKbG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 22 Mar 2021 06:31:06 -0400
-Received: from foss.arm.com ([217.140.110.172]:57088 "EHLO foss.arm.com"
+        id S230214AbhCVKcj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 22 Mar 2021 06:32:39 -0400
+Received: from mail.skyhub.de ([5.9.137.197]:33994 "EHLO mail.skyhub.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230046AbhCVKay (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 22 Mar 2021 06:30:54 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 190FA1063;
-        Mon, 22 Mar 2021 03:30:54 -0700 (PDT)
-Received: from [192.168.0.110] (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 934DB3F718;
-        Mon, 22 Mar 2021 03:30:53 -0700 (PDT)
-Subject: Re: [kvm-unit-tests PATCH 2/4] arm/arm64: Read system registers to
- get the state of the MMU
-To:     Nikos Nikoleris <nikos.nikoleris@arm.com>, kvm@vger.kernel.org
-Cc:     drjones@redhat.com
-References: <20210319122414.129364-1-nikos.nikoleris@arm.com>
- <20210319122414.129364-3-nikos.nikoleris@arm.com>
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <b951ed2e-cd3b-3b87-7fee-b7ac8518121e@arm.com>
-Date:   Mon, 22 Mar 2021 10:30:43 +0000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.8.1
+        id S230173AbhCVKbo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 22 Mar 2021 06:31:44 -0400
+Received: from zn.tnic (p200300ec2f06670063ce2fe2d87b4e47.dip0.t-ipconnect.de [IPv6:2003:ec:2f06:6700:63ce:2fe2:d87b:4e47])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id D6BE41EC04D1;
+        Mon, 22 Mar 2021 11:31:38 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1616409098;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=A7X6xqWwvrumHxCzhE/jGhlXXWmEGnnV8W9n3h7zfrM=;
+        b=fj4dFah2LjRf9lhNjzR/HlbwH48kifin9iJOUdTZmYEdAiilXgsbAeb5WHR8m96PB7Sn0L
+        lHKxRt3adznDjYY6mQ7MGn3t68KdPDS8Ezj8B8o5waytw+6P6DI6iv8YzvEp1MOijTLE6e
+        Hu/AHI4jQw9pBhZf2S2ejjsBZpxCJ+A=
+Date:   Mon, 22 Mar 2021 11:31:37 +0100
+From:   Borislav Petkov <bp@alien8.de>
+To:     Kai Huang <kai.huang@intel.com>
+Cc:     Jarkko Sakkinen <jarkko@kernel.org>, kvm@vger.kernel.org,
+        x86@kernel.org, linux-sgx@vger.kernel.org,
+        linux-kernel@vger.kernel.org, seanjc@google.com, luto@kernel.org,
+        dave.hansen@intel.com, rick.p.edgecombe@intel.com,
+        haitao.huang@intel.com, pbonzini@redhat.com, tglx@linutronix.de,
+        mingo@redhat.com, hpa@zytor.com, jethro@fortanix.com,
+        b.thiel@posteo.de, jmattson@google.com, joro@8bytes.org,
+        vkuznets@redhat.com, wanpengli@tencent.com, corbet@lwn.net
+Subject: Re: [PATCH v3 00/25] KVM SGX virtualization support
+Message-ID: <20210322103137.GB6481@zn.tnic>
+References: <cover.1616136307.git.kai.huang@intel.com>
+ <YFS6kTe1SuAjiMFN@kernel.org>
+ <d876e5abb1a7e4fce160bfcb217bf3ab675f44a8.camel@intel.com>
 MIME-Version: 1.0
-In-Reply-To: <20210319122414.129364-3-nikos.nikoleris@arm.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
+Content-Disposition: inline
+In-Reply-To: <d876e5abb1a7e4fce160bfcb217bf3ab675f44a8.camel@intel.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Nikos,
+On Mon, Mar 22, 2021 at 11:03:28PM +1300, Kai Huang wrote:
+> If there's no other comments, should I send another version
 
-On 3/19/21 12:24 PM, Nikos Nikoleris wrote:
-> When we are in EL1 we can directly tell if the local cpu's MMU is on
-> by reading a system register (SCTRL/SCTRL_EL1). In EL0, we use the
-> relevant cpumask. This way we don't have to rely on the cpu id in
-> thread_info when we are in setup executing in EL1. In subsequent
-> patches we resolve the problem of identifying safely whether we are
-> executing in EL1 or EL0.
+No need.
 
-The commit message doesn't explain why mmu_disabled_cpu_count has been removed. It
-also doesn't explain why the disabled cpumask has been replaced with an enabled
-cpumask.
+Thx.
 
-Other than that, it is a good idea to stop mmu_enabled() from checking the cpumask
-because marking the MMU as enabled/disabled requires modifying the cpumask, which
-calls mmu_enabled(). That's not a problem at EL0 because EL0 cannot turn on or off
-the MMU.
+-- 
+Regards/Gruss,
+    Boris.
 
-Thanks,
-
-Alex
-
->
-> Signed-off-by: Nikos Nikoleris <nikos.nikoleris@arm.com>
-> ---
->  lib/arm/asm/mmu-api.h     |  7 +------
->  lib/arm/asm/processor.h   |  7 +++++++
->  lib/arm64/asm/processor.h |  1 +
->  lib/arm/mmu.c             | 16 ++++++++--------
->  lib/arm/processor.c       |  5 +++++
->  lib/arm64/processor.c     |  5 +++++
->  6 files changed, 27 insertions(+), 14 deletions(-)
->
-> diff --git a/lib/arm/asm/mmu-api.h b/lib/arm/asm/mmu-api.h
-> index 3d04d03..05fc12b 100644
-> --- a/lib/arm/asm/mmu-api.h
-> +++ b/lib/arm/asm/mmu-api.h
-> @@ -5,12 +5,7 @@
->  #include <stdbool.h>
->  
->  extern pgd_t *mmu_idmap;
-> -extern unsigned int mmu_disabled_cpu_count;
-> -extern bool __mmu_enabled(void);
-> -static inline bool mmu_enabled(void)
-> -{
-> -	return mmu_disabled_cpu_count == 0 || __mmu_enabled();
-> -}
-> +extern bool mmu_enabled(void);
->  extern void mmu_mark_enabled(int cpu);
->  extern void mmu_mark_disabled(int cpu);
->  extern void mmu_enable(pgd_t *pgtable);
-> diff --git a/lib/arm/asm/processor.h b/lib/arm/asm/processor.h
-> index 273366d..af54c09 100644
-> --- a/lib/arm/asm/processor.h
-> +++ b/lib/arm/asm/processor.h
-> @@ -67,11 +67,13 @@ extern int mpidr_to_cpu(uint64_t mpidr);
->  	((mpidr >> MPIDR_LEVEL_SHIFT(level)) & 0xff)
->  
->  extern void start_usr(void (*func)(void *arg), void *arg, unsigned long sp_usr);
-> +extern bool __mmu_enabled(void);
->  extern bool is_user(void);
->  
->  #define CNTVCT		__ACCESS_CP15_64(1, c14)
->  #define CNTFRQ		__ACCESS_CP15(c14, 0, c0, 0)
->  #define CTR		__ACCESS_CP15(c0, 0, c0, 1)
-> +#define SCTRL		__ACCESS_CP15(c1, 0, c0, 0)
->  
->  static inline u64 get_cntvct(void)
->  {
-> @@ -89,6 +91,11 @@ static inline u32 get_ctr(void)
->  	return read_sysreg(CTR);
->  }
->  
-> +static inline u32 get_sctrl(void)
-> +{
-> +	return read_sysreg(SCTRL);
-> +}
-> +
->  extern unsigned long dcache_line_size;
->  
->  #endif /* _ASMARM_PROCESSOR_H_ */
-> diff --git a/lib/arm64/asm/processor.h b/lib/arm64/asm/processor.h
-> index 771b2d1..8e2037e 100644
-> --- a/lib/arm64/asm/processor.h
-> +++ b/lib/arm64/asm/processor.h
-> @@ -98,6 +98,7 @@ extern int mpidr_to_cpu(uint64_t mpidr);
->  
->  extern void start_usr(void (*func)(void *arg), void *arg, unsigned long sp_usr);
->  extern bool is_user(void);
-> +extern bool __mmu_enabled(void);
->  
->  static inline u64 get_cntvct(void)
->  {
-> diff --git a/lib/arm/mmu.c b/lib/arm/mmu.c
-> index a1862a5..d806c63 100644
-> --- a/lib/arm/mmu.c
-> +++ b/lib/arm/mmu.c
-> @@ -24,10 +24,9 @@ extern unsigned long etext;
->  pgd_t *mmu_idmap;
->  
->  /* CPU 0 starts with disabled MMU */
-> -static cpumask_t mmu_disabled_cpumask = { {1} };
-> -unsigned int mmu_disabled_cpu_count = 1;
-> +static cpumask_t mmu_enabled_cpumask = { {0} };
->  
-> -bool __mmu_enabled(void)
-> +bool mmu_enabled(void)
->  {
->  	int cpu = current_thread_info()->cpu;
->  
-> @@ -38,19 +37,20 @@ bool __mmu_enabled(void)
->  	 * spinlock, atomic bitop, etc., otherwise we'll recurse.
->  	 * [cpumask_]test_bit is safe though.
->  	 */
-> -	return !cpumask_test_cpu(cpu, &mmu_disabled_cpumask);
-> +	if (is_user())
-> +		return cpumask_test_cpu(cpu, &mmu_enabled_cpumask);
-> +	else
-> +		return __mmu_enabled();
->  }
->  
->  void mmu_mark_enabled(int cpu)
->  {
-> -	if (cpumask_test_and_clear_cpu(cpu, &mmu_disabled_cpumask))
-> -		--mmu_disabled_cpu_count;
-> +	cpumask_set_cpu(cpu, &mmu_enabled_cpumask);
->  }
->  
->  void mmu_mark_disabled(int cpu)
->  {
-> -	if (!cpumask_test_and_set_cpu(cpu, &mmu_disabled_cpumask))
-> -		++mmu_disabled_cpu_count;
-> +	cpumask_clear_cpu(cpu, &mmu_enabled_cpumask);
->  }
->  
->  extern void asm_mmu_enable(phys_addr_t pgtable);
-> diff --git a/lib/arm/processor.c b/lib/arm/processor.c
-> index 773337e..a2d39a4 100644
-> --- a/lib/arm/processor.c
-> +++ b/lib/arm/processor.c
-> @@ -145,3 +145,8 @@ bool is_user(void)
->  {
->  	return current_thread_info()->flags & TIF_USER_MODE;
->  }
-> +
-> +bool __mmu_enabled(void)
-> +{
-> +	return get_sctrl() & CR_M;
-> +}
-> diff --git a/lib/arm64/processor.c b/lib/arm64/processor.c
-> index 2a024e3..ef55862 100644
-> --- a/lib/arm64/processor.c
-> +++ b/lib/arm64/processor.c
-> @@ -257,3 +257,8 @@ bool is_user(void)
->  {
->  	return current_thread_info()->flags & TIF_USER_MODE;
->  }
-> +
-> +bool __mmu_enabled(void)
-> +{
-> +	return read_sysreg(sctlr_el1) & SCTLR_EL1_M;
-> +}
+https://people.kernel.org/tglx/notes-about-netiquette
