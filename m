@@ -2,92 +2,98 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E0334343926
-	for <lists+kvm@lfdr.de>; Mon, 22 Mar 2021 07:05:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 44D75343952
+	for <lists+kvm@lfdr.de>; Mon, 22 Mar 2021 07:19:27 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229930AbhCVGEl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 22 Mar 2021 02:04:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53136 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229786AbhCVGEi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 22 Mar 2021 02:04:38 -0400
-Received: from mail-qt1-x832.google.com (mail-qt1-x832.google.com [IPv6:2607:f8b0:4864:20::832])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1C67BC061574;
-        Sun, 21 Mar 2021 23:04:38 -0700 (PDT)
-Received: by mail-qt1-x832.google.com with SMTP id u7so11506822qtq.12;
-        Sun, 21 Mar 2021 23:04:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=lwaHqCUEUERMsP+lSCCck+2lPknx9eDdkaf0NX52J94=;
-        b=as2anY9IFqju8x6xmgL5aH/SQphhMHkDAgXdwcLNMU13gTcRuXYE44AmAZWjM5gwE2
-         8X+J8KJmgUqvCplTWsiw7JMWKfmGSG+x0mEgk+jP3CpO7C7gVynfY1qpWd0x99BI5AiA
-         zQc+CMFC6jwVg3l3r+CgB2o7XLnmmjKaKP0sANg4RODIJDlfVRKZyV7ffhHP5ilHvusw
-         a++3Q7Oes0TARj/hVRgkwbtBiL/ruQmHxPKdTjUMdirGsw8oXLIYS606FamkJBThHCwb
-         tq+pB75OVLo2ZhXd4Tofnqw/I1+bspgyHBbpOGo5UKg6PaLGK8RS94T6LNXnlphRSKO2
-         vesA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=lwaHqCUEUERMsP+lSCCck+2lPknx9eDdkaf0NX52J94=;
-        b=fEuFvrFbo2zAJSmoWEXbtsIpIhnmqrJShX92RvC4i9wuM3b0ED14IPSOZ5S2ltTohm
-         1fceRfy/QDMfXy8wK/7a2mi+IgyXWa5EGZpo2cb2RGtf3Fxegkw3XxT9vS+NjeuzGLMe
-         doJ0XMkVtJ1Dsp5Xhjv+wEXNEdpAgKuFl0p6gvCYby+8FOw3Oc/XUvXoCnm16feDD8+3
-         QmGYQFe/onbiT8cr62cBFn43D++WzUSx++Xuxtmot3YMGfWiw4S/dgRgmDzpTg6TyouG
-         LX/V/CvSlgQdpZkVAEM9VyYwURscnwWz3e0UZ7Q7kW26txwhiE5GKI6MPvKRKk0qZfAE
-         squQ==
-X-Gm-Message-State: AOAM530Zz/wgwKPZZa15877/XsedWl2pBGaR1FJjHR/0OLYVrtgIuzkR
-        lEPH/0Fr+8BiY0ooaxWyvIw=
-X-Google-Smtp-Source: ABdhPJyX6kPawbK5ls3W+DAKqZ3kKOxuwuIlod6H79ptvldVx6BkKPOe2vmjJ39w3EYwDOHkRRO/cw==
-X-Received: by 2002:a05:622a:114:: with SMTP id u20mr8193244qtw.317.1616393077407;
-        Sun, 21 Mar 2021 23:04:37 -0700 (PDT)
-Received: from localhost.localdomain ([37.19.198.40])
-        by smtp.gmail.com with ESMTPSA id r7sm8387041qtm.88.2021.03.21.23.04.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 21 Mar 2021 23:04:36 -0700 (PDT)
-From:   Bhaskar Chowdhury <unixbhaskar@gmail.com>
-To:     pbonzini@redhat.com, seanjc@google.com, vkuznets@redhat.com,
-        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
-        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, x86@kernel.org,
-        hpa@zytor.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     rdunlap@infradead.org, Bhaskar Chowdhury <unixbhaskar@gmail.com>
-Subject: [PATCH V2] KVM: x86: A typo fix
-Date:   Mon, 22 Mar 2021 11:34:09 +0530
-Message-Id: <20210322060409.2605006-1-unixbhaskar@gmail.com>
-X-Mailer: git-send-email 2.31.0
+        id S229547AbhCVGSw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 22 Mar 2021 02:18:52 -0400
+Received: from mga02.intel.com ([134.134.136.20]:35103 "EHLO mga02.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229771AbhCVGSr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 22 Mar 2021 02:18:47 -0400
+IronPort-SDR: 6QIDA+Mjo+qMqYlN78DmRyr/7NpCf8BMpzZw7x0N9CYBU6qnYl7zB0Q44kL6dntjFZQI2b1Xk1
+ vemT67/PHOhA==
+X-IronPort-AV: E=McAfee;i="6000,8403,9930"; a="177341164"
+X-IronPort-AV: E=Sophos;i="5.81,268,1610438400"; 
+   d="scan'208";a="177341164"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Mar 2021 23:18:46 -0700
+IronPort-SDR: YTveGvMP9t0Ge6gSWq4Ybq4PyunSpEJbJ9fw6pikIrAx9W88+KSNkm1c2gLfkFVWjI8uD/IZPn
+ 6oU+qk3J89NA==
+X-IronPort-AV: E=Sophos;i="5.81,268,1610438400"; 
+   d="scan'208";a="407672739"
+Received: from likexu-mobl1.ccr.corp.intel.com (HELO [10.238.4.93]) ([10.238.4.93])
+  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Mar 2021 23:18:42 -0700
+Subject: Re: [PATCH v4 00/11] KVM: x86/pmu: Guest Architectural LBR Enabling
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        x86@kernel.org, wei.w.wang@intel.com, linux-kernel@vger.kernel.org,
+        Like Xu <like.xu@linux.intel.com>
+References: <20210314155225.206661-1-like.xu@linux.intel.com>
+From:   "Xu, Like" <like.xu@intel.com>
+Message-ID: <c73abc8d-a67b-6a6d-b052-682b8cf32351@intel.com>
+Date:   Mon, 22 Mar 2021 14:18:40 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.8.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20210314155225.206661-1-like.xu@linux.intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Hi, do we have any comments on this patch set?
 
-s/resued/reused/
-
-
-Signed-off-by: Bhaskar Chowdhury <unixbhaskar@gmail.com>
----
- Changes from V1:
- As Ingo found the correct word for replacement, so incorporating.
-
- arch/x86/include/asm/kvm_host.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 3768819693e5..e37c2ebc02e5 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -1488,7 +1488,7 @@ extern u64 kvm_mce_cap_supported;
- /*
-  * EMULTYPE_NO_DECODE - Set when re-emulating an instruction (after completing
-  *			userspace I/O) to indicate that the emulation context
-- *			should be resued as is, i.e. skip initialization of
-+ *			should be reused as is, i.e. skip initialization of
-  *			emulation context, instruction fetch and decode.
-  *
-  * EMULTYPE_TRAP_UD - Set when emulating an intercepted #UD from hardware.
---
-2.31.0
+On 2021/3/14 23:52, Like Xu wrote:
+> Hi geniuses,
+>
+> Please help review the new version of Arch LBR enabling patch set.
+>
+> The Architectural Last Branch Records (LBRs) is publiced
+> in the 319433-040 release of Intel Architecture Instruction
+> Set Extensions and Future Features Programming Reference[0].
+> ---
+> v3->v4 Changelog:
+> - Add one more host patch to reuse ARCH_LBR_CTL_MASK;
+> - Add reserve_lbr_buffers() instead of using GFP_ATOMIC;
+> - Fia a bug in the arch_lbr_depth_is_valid();
+> - Add LBR_CTL_EN to unify DEBUGCTLMSR_LBR and ARCH_LBR_CTL_LBREN;
+> - Add vmx->host_lbrctlmsr to save/restore host values;
+> - Add KVM_SUPPORTED_XSS to refactoring supported_xss;
+> - Clear Arch_LBR ans its XSS bit if it's not supported;
+> - Add negative testing to the related kvm-unit-tests;
+> - Refine code and commit messages;
+>
+> Previous:
+> https://lore.kernel.org/kvm/20210303135756.1546253-1-like.xu@linux.intel.com/
+>
+> Like Xu (11):
+>    KVM: vmx/pmu: Add MSR_ARCH_LBR_DEPTH emulation for Arch LBR
+>    KVM: vmx/pmu: Add MSR_ARCH_LBR_CTL emulation for Arch LBR
+>    KVM: vmx/pmu: Add Arch LBR emulation and its VMCS field
+>    KVM: x86: Expose Architectural LBR CPUID leaf
+>    KVM: x86: Refine the matching and clearing logic for supported_xss
+>    KVM: x86: Add XSAVE Support for Architectural LBRs
+>
+>   arch/x86/events/core.c           |   8 ++-
+>   arch/x86/events/intel/bts.c      |   2 +-
+>   arch/x86/events/intel/core.c     |   6 +-
+>   arch/x86/events/intel/lbr.c      |  28 +++++----
+>   arch/x86/events/perf_event.h     |   8 ++-
+>   arch/x86/include/asm/msr-index.h |   1 +
+>   arch/x86/include/asm/vmx.h       |   4 ++
+>   arch/x86/kvm/cpuid.c             |  25 +++++++-
+>   arch/x86/kvm/vmx/capabilities.h  |  25 +++++---
+>   arch/x86/kvm/vmx/pmu_intel.c     | 103 ++++++++++++++++++++++++++++---
+>   arch/x86/kvm/vmx/vmx.c           |  50 +++++++++++++--
+>   arch/x86/kvm/vmx/vmx.h           |   4 ++
+>   arch/x86/kvm/x86.c               |   6 +-
+>   13 files changed, 227 insertions(+), 43 deletions(-)
+>
 
