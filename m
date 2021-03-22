@@ -2,125 +2,126 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4F21E344F56
-	for <lists+kvm@lfdr.de>; Mon, 22 Mar 2021 19:57:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2140C344F58
+	for <lists+kvm@lfdr.de>; Mon, 22 Mar 2021 19:57:52 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232285AbhCVS5W (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 22 Mar 2021 14:57:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50824 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231174AbhCVS4q (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 22 Mar 2021 14:56:46 -0400
-Received: from mail-pf1-x42e.google.com (mail-pf1-x42e.google.com [IPv6:2607:f8b0:4864:20::42e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C8A18C061762
-        for <kvm@vger.kernel.org>; Mon, 22 Mar 2021 11:56:45 -0700 (PDT)
-Received: by mail-pf1-x42e.google.com with SMTP id 11so11650491pfn.9
-        for <kvm@vger.kernel.org>; Mon, 22 Mar 2021 11:56:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=meEW8j4RJB41y0aX/BJ31GvzjYBgkYNc3Bk1g56lS4c=;
-        b=FYmy8/b9CYLzWuaCW800x0BLr+B35vF+M0Wn/b6s6DoGAhFqP0wmC9sMN8clixXNOo
-         YpnnM9O8JHfSQ0O1sMRNIoLwYxkeS3xqyrQgefQwaxgn5zEuQio774WS6/rbxTgrISB3
-         Y7GHo0MzN1lhWqMvBYZ/z5/T5rscgDFOd11Qo7RHaAbBLSopLzxjGyQY/oPBaBROzAAF
-         qWhhDFkTwvcemMmgYzkbd3bzIEjb8jvdhFenNfjD8bSRm34h8h/0w9h/6js8wPV7A/R/
-         T/mYAY/yNGNgBvwJ98yIWbJEqxZgw3nhMit2cxBc28EmvynZSe02lZATQ/4uUENcQG05
-         Mcrw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=meEW8j4RJB41y0aX/BJ31GvzjYBgkYNc3Bk1g56lS4c=;
-        b=CTaesLDNJtv5Hq5VvpAYLriBqvg92aYrEKPpdb6+5aVWuGxAxaDOYYnbgG35nGdBWW
-         f1EtwNXjK3vWFwlyQZhK8E8ie3yPvj2AV80M3wIirGoWJ1vrxVFR8krHiPd5h09ETGDT
-         C/gM1sQxBPQa5fXw9wqf9IOKXggrKOLUWTQP0h3TpoeTtbU6viwF14Md77rCUCSmCB9W
-         wdQiaf1ca+KdJaIriejU1xui3D40Huj6N4xDXFB7sUuE4u85lGLi94k+P4CCXBJxRUeO
-         SthC9W2OQ9HpT4FDN7W6RibyVTCOXUcACHAlLAXGIzXHDW9Gnk66zrc8MZLHOhQN3Y1n
-         pSEA==
-X-Gm-Message-State: AOAM530GTzGNuMtdIuKQ/T6wx2widohrEpketnkNI8jS/5LXThizlSh5
-        BkT1UI22tL2QoKA7SyjzqXqmXw==
-X-Google-Smtp-Source: ABdhPJzlx7ODCtnwxOp81NiIrkrB0U3rG9st5XhGj7tk9HWPo8fcJAB/pG4keSmRYjCwKoAN0krdHg==
-X-Received: by 2002:a17:902:7407:b029:e4:9645:fdf6 with SMTP id g7-20020a1709027407b02900e49645fdf6mr1085992pll.19.1616439405020;
-        Mon, 22 Mar 2021 11:56:45 -0700 (PDT)
-Received: from google.com ([2620:15c:f:10:f8cd:ad3d:e69f:e006])
-        by smtp.gmail.com with ESMTPSA id a30sm14514984pfr.66.2021.03.22.11.56.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 22 Mar 2021 11:56:44 -0700 (PDT)
-Date:   Mon, 22 Mar 2021 11:56:37 -0700
-From:   Sean Christopherson <seanjc@google.com>
-To:     Borislav Petkov <bp@alien8.de>
-Cc:     Kai Huang <kai.huang@intel.com>, kvm@vger.kernel.org,
-        x86@kernel.org, linux-sgx@vger.kernel.org,
-        linux-kernel@vger.kernel.org, jarkko@kernel.org, luto@kernel.org,
-        dave.hansen@intel.com, rick.p.edgecombe@intel.com,
-        haitao.huang@intel.com, pbonzini@redhat.com, tglx@linutronix.de,
-        mingo@redhat.com, hpa@zytor.com
-Subject: Re: [PATCH v3 03/25] x86/sgx: Wipe out EREMOVE from
- sgx_free_epc_page()
-Message-ID: <YFjoZQwB7e3oQW8l@google.com>
-References: <cover.1616136307.git.kai.huang@intel.com>
- <062acb801926b2ade2f9fe1672afb7113453a741.1616136308.git.kai.huang@intel.com>
- <20210322181646.GG6481@zn.tnic>
+        id S231202AbhCVS51 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 22 Mar 2021 14:57:27 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:21299 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230511AbhCVS44 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 22 Mar 2021 14:56:56 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1616439415;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=Rmxk6W1K4JaaHy3riMqy1nF6KWzopa5q4ig8BRJZZZs=;
+        b=N9I8tN4Ua49gbT1B8v9Y4hXBab2hShJV1yNpXvM//0Z4HP9C/hrXd2Ibo6pgwvIFbwi3EY
+        xpszvxfQMmD490iX3NLHf95+klO4NONkDdZmI3kgUHeSjJEAdHV6MxmCjG6nmFejuypG7a
+        UBE41/OiLXIvLk0N2yAiUn6QTw1sPzg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-494-scZlzYnRPcKvxaiQIAjJng-1; Mon, 22 Mar 2021 14:56:51 -0400
+X-MC-Unique: scZlzYnRPcKvxaiQIAjJng-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 305F383DD2E;
+        Mon, 22 Mar 2021 18:56:50 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.40.194.23])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 87D4610023BE;
+        Mon, 22 Mar 2021 18:56:48 +0000 (UTC)
+Date:   Mon, 22 Mar 2021 19:56:45 +0100
+From:   Andrew Jones <drjones@redhat.com>
+To:     Andre Przywara <andre.przywara@arm.com>
+Cc:     Nikos Nikoleris <nikos.nikoleris@arm.com>, kvm@vger.kernel.org,
+        pbonzini@redhat.com, alexandru.elisei@arm.com
+Subject: Re: [kvm-unit-tests PATCH v2 0/4] Fix the devicetree parser for
+ stdout-path
+Message-ID: <20210322185645.6j6cagld5u6l5qiq@kamzik.brq.redhat.com>
+References: <20210318180727.116004-1-nikos.nikoleris@arm.com>
+ <20210322085336.2lxg457refhvntls@kamzik.brq.redhat.com>
+ <20210322180445.7164b991@slackpad.fritz.box>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210322181646.GG6481@zn.tnic>
+In-Reply-To: <20210322180445.7164b991@slackpad.fritz.box>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Mar 22, 2021, Borislav Petkov wrote:
-> On Fri, Mar 19, 2021 at 08:22:19PM +1300, Kai Huang wrote:
-> > +/**
-> > + * sgx_encl_free_epc_page - free EPC page assigned to an enclave
-> > + * @page:	EPC page to be freed
-> > + *
-> > + * Free EPC page assigned to an enclave.  It does EREMOVE for the page, and
-> > + * only upon success, it puts the page back to free page list.  Otherwise, it
-> > + * gives a WARNING to indicate page is leaked, and require reboot to retrieve
-> > + * leaked pages.
-> > + */
-> > +void sgx_encl_free_epc_page(struct sgx_epc_page *page)
-> > +{
-> > +	int ret;
-> > +
-> > +	WARN_ON_ONCE(page->flags & SGX_EPC_PAGE_RECLAIMER_TRACKED);
-> > +
-> > +	/*
-> > +	 * Give a message to remind EPC page is leaked when EREMOVE fails,
-> > +	 * and requires machine reboot to get leaked pages back. This can
-> > +	 * be improved in future by adding stats of leaked pages, etc.
-> > +	 */
-> > +#define EREMOVE_ERROR_MESSAGE \
-> > +	"EREMOVE returned %d (0x%x).  EPC page leaked.  Reboot required to retrieve leaked pages."
+On Mon, Mar 22, 2021 at 06:04:45PM +0000, Andre Przywara wrote:
+> On Mon, 22 Mar 2021 09:53:36 +0100
+> Andrew Jones <drjones@redhat.com> wrote:
 > 
-> A reboot? Seriously? Why?
+> > On Thu, Mar 18, 2021 at 06:07:23PM +0000, Nikos Nikoleris wrote:
+> > > This set of patches fixes the way we parse the stdout-path
+> > > property in the DT. The stdout-path property is used to set up
+> > > the console. Prior to this, the code ignored the fact that
+> > > stdout-path is made of the path to the uart node as well as
+> > > parameters. As a result, it would fail to find the relevant DT
+> > > node. In addition to minor fixes in the device tree code, this
+> > > series pulls a new version of libfdt from upstream.
+> > > 
+> > > v1: https://lore.kernel.org/kvm/20210316152405.50363-1-nikos.nikoleris@arm.com/
+> > > 
+> > > Changes in v2:
+> > >   - Added strtoul and minor fix in strrchr
+> > >   - Fixes in libfdt_clean
+> > >   - Minor fix in lib/libfdt/README
+> > > 
+> > > Thanks,
+> > > 
+> > > Nikos
+> > >  
+> > 
+> > Applied to arm/queue
 > 
-> How are you going to explain to cloud people that they need to reboot
-> their fat server? The same cloud people who want to make sure Intel
-> supports late microcode loading no matter the effort just so to avoid
-> rebooting the machine.
+> So I understand that this is a bit late now, but is this really the way
+> forward: to just implement libc functions as we go, from scratch, and
+> merge them without any real testing?
+> I understand that hacking up strchr() is fun, but when it comes to
+> those string parsing functions, it gets a bit hairy, and I feel like we
+> are dismissing decades of experience here by implementing stuff from
+> scratch. At the very least we should run some unit tests (!) on newly
+> introduced C library functions?
+
+Who says I didn't test the new string functions? Did you come up with a
+test case that breaks something?
+
 > 
-> But now all of a sudden, if they wanna have SGX enclaves in guests, they
-> need to get prepared for potential rebooting.
+> Or probably the better alternative: we pick some existing C library,
+> and start to borrow implementations from there? Is klibc[1] a good
+> choice, maybe?
 
-Not necessarily.  This can only trigger in the host, and thus require a host
-reboot, if the host is also running enclaves.  If the CSP is not running
-enclaves, or is running its enclaves in a separate VM, then this path cannot be
-reached.
+The trivial functions like strchr don't really scare me much. And the
+more complicated functions don't always adapt to our framework.
+I just looked at klibc's strtol. It doesn't have any error handling;
+not the errno type specified in the man page and not the type we do in
+kvm-unit-tests (asserts). IOW, our implementation is even more complete.
 
-> I sure hope I'm missing something...
+Anyway, after like 15 years of development, kvm-unit-tests only has
+20 string, 3 stdlib, and 4 printf functions. I'm not too worried
+about overly reinventing the wheel just yet :-)
 
-EREMOVE can only fail if there's a kernel or hardware bug (or a VMM bug if
-running as a guest).  IME, nearly every kernel/KVM bug that I introduced that
-led to EREMOVE failure was also quite fatal to SGX, i.e. this is just the canary
-in the coal mine.
+Thanks,
+drew
 
-It's certainly possible to add more sophisticated error handling, e.g. through
-the pages onto a list and periodically try to recover them.  But, since the vast
-majority of bugs that cause EREMOVE failure are fatal to SGX, implementing
-sophisticated handling is quite low on the list of priorities.
 
-Dave wanted the "page leaked" error message so that it's abundantly clear that
-the kernel is leaking pages on EREMOVE failure and that the WARN isn't "benign".
+> 
+> Cheers,
+> Andre
+> 
+> [1] https://git.kernel.org/pub/scm/libs/klibc/klibc.git/
+> 
+> 
+> > 
+> > https://gitlab.com/rhdrjones/kvm-unit-tests/-/commits/arm/queue
+> > 
+> > Thanks,
+> > drew 
+> > 
+> 
+
