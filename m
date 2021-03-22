@@ -2,93 +2,110 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 155B4344FAE
-	for <lists+kvm@lfdr.de>; Mon, 22 Mar 2021 20:12:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CDE6A344FB4
+	for <lists+kvm@lfdr.de>; Mon, 22 Mar 2021 20:16:43 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232224AbhCVTMY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 22 Mar 2021 15:12:24 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:48821 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231782AbhCVTMG (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 22 Mar 2021 15:12:06 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1616440323;
+        id S230467AbhCVTQK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 22 Mar 2021 15:16:10 -0400
+Received: from mail.skyhub.de ([5.9.137.197]:43944 "EHLO mail.skyhub.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229854AbhCVTPl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 22 Mar 2021 15:15:41 -0400
+Received: from zn.tnic (p200300ec2f066700d1873920611831f8.dip0.t-ipconnect.de [IPv6:2003:ec:2f06:6700:d187:3920:6118:31f8])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 565F61EC030E;
+        Mon, 22 Mar 2021 20:15:40 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1616440540;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=UfnyDJKd+AIhgsgjhm7fjzOjPp4nvTJYPKMus8kh4Is=;
-        b=bcI7cGLe1VaPHFnfFGAygbBQvRmRm6Uj120jXr/uSJ8N+Kpxhzps0Yzw5aKFELXgDsZ938
-        C8cXWjlmhkJCKWgDQ1mNxFZFHe93xvtGmdxnOi+cpn/+4JU3tBnawt2OtlOeSenKtApKYU
-        wcZs07JSh6pNQvvMuo12H/kve++jgy8=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-222-cwzgFPBPNd690bXxy4CTTw-1; Mon, 22 Mar 2021 15:12:01 -0400
-X-MC-Unique: cwzgFPBPNd690bXxy4CTTw-1
-Received: by mail-wr1-f70.google.com with SMTP id s10so26590944wre.0
-        for <kvm@vger.kernel.org>; Mon, 22 Mar 2021 12:12:01 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=UfnyDJKd+AIhgsgjhm7fjzOjPp4nvTJYPKMus8kh4Is=;
-        b=WLJTaw2NI7XLpe31FIkNfXMKLJ7mx0VEtrM/7BswhCaYyC5SNANGSALE7/3xjHL++4
-         OH1bIau7JryL/Pu0oQWaXmOcZBqfG/fwnzO6ploJhnkEcrUNLSQc7Satv3eA3hZ+yM9P
-         05HHdNO7xbMsYIOaO5F7qtkxklM6ExaDdxtaAkrp+aIVtp73odLtd/9S5iMRbYdsT8r+
-         ybtKZ+YKNTI4GGpO2/48+0BVHKHInw/0no+6RxcV7Ese08R5CdRYnBYg4pymIGMUDfVT
-         SsQFucbmUO4FgowjDN+ekrmT7wVGgTrAkc3JJrUZn4hZrlmIAcaAe0tLPsEEcIidPiQU
-         owcg==
-X-Gm-Message-State: AOAM533wppDOox8e9zZpMq9E8fSCO3ZTmqeCTj1dYO8ebw3iMAA3hqXM
-        filckIjzz8a1LfCuYeHDtoUmcxQV0CDHSYy9FocNS8XVeOyeEVm45+/lAN73jJHq6+dX8/7L9Xm
-        3/WAHHfyBMpZt
-X-Received: by 2002:adf:d1cd:: with SMTP id b13mr71229wrd.47.1616440320267;
-        Mon, 22 Mar 2021 12:12:00 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJz/cLnNqtKWv7V1/Fpeb5aRH7hZpgdnHA/Zo2qiXqHKF8asFjWbETSgysqD6vFP3G2Q+t5LNw==
-X-Received: by 2002:adf:d1cd:: with SMTP id b13mr71209wrd.47.1616440320100;
-        Mon, 22 Mar 2021 12:12:00 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id x11sm347291wme.9.2021.03.22.12.11.58
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 22 Mar 2021 12:11:59 -0700 (PDT)
-Subject: Re: [PATCH v3 03/25] x86/sgx: Wipe out EREMOVE from
- sgx_free_epc_page()
-To:     Sean Christopherson <seanjc@google.com>,
-        Borislav Petkov <bp@alien8.de>
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=iJX3GF2CgIaOQc27uz5DRc8byMVlS9HWNPA5d8fZkIo=;
+        b=ltFg2Gv+bV8xd96ltmseD8+Cag/9qRazqx2m9QiOIO39sZM9++/YnT+naK5uyi15xSQDSb
+        5EHFoFX+MyhOXKQTlBd7K7A24f3AcS1M3lMZgdSiP3tfd3uaydumPdKuYqATgwtLK+KPUd
+        6rZyWTa/A7M2jphlW/okYIgwfH27+g4=
+Date:   Mon, 22 Mar 2021 20:15:40 +0100
+From:   Borislav Petkov <bp@alien8.de>
+To:     Sean Christopherson <seanjc@google.com>
 Cc:     Kai Huang <kai.huang@intel.com>, kvm@vger.kernel.org,
         x86@kernel.org, linux-sgx@vger.kernel.org,
         linux-kernel@vger.kernel.org, jarkko@kernel.org, luto@kernel.org,
         dave.hansen@intel.com, rick.p.edgecombe@intel.com,
-        haitao.huang@intel.com, tglx@linutronix.de, mingo@redhat.com,
-        hpa@zytor.com
+        haitao.huang@intel.com, pbonzini@redhat.com, tglx@linutronix.de,
+        mingo@redhat.com, hpa@zytor.com
+Subject: Re: [PATCH v3 03/25] x86/sgx: Wipe out EREMOVE from
+ sgx_free_epc_page()
+Message-ID: <20210322191540.GH6481@zn.tnic>
 References: <cover.1616136307.git.kai.huang@intel.com>
  <062acb801926b2ade2f9fe1672afb7113453a741.1616136308.git.kai.huang@intel.com>
- <20210322181646.GG6481@zn.tnic> <YFjoZQwB7e3oQW8l@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <a2e01d7b-255d-bf64-f258-f3b7f211fc2a@redhat.com>
-Date:   Mon, 22 Mar 2021 20:11:57 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.7.0
+ <20210322181646.GG6481@zn.tnic>
+ <YFjoZQwB7e3oQW8l@google.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 In-Reply-To: <YFjoZQwB7e3oQW8l@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 22/03/21 19:56, Sean Christopherson wrote:
+On Mon, Mar 22, 2021 at 11:56:37AM -0700, Sean Christopherson wrote:
+> Not necessarily.  This can only trigger in the host, and thus require a host
+> reboot, if the host is also running enclaves.  If the CSP is not running
+> enclaves, or is running its enclaves in a separate VM, then this path cannot be
+> reached.
+
+That's what I meant. Rebooting guests is a lot easier, ofc.
+
+Or are you saying, this can trigger *only* when they're running enclaves
+on the *host* too?
+
 > EREMOVE can only fail if there's a kernel or hardware bug (or a VMM bug if
-> running as a guest).  IME, nearly every kernel/KVM bug that I introduced that
-> led to EREMOVE failure was also quite fatal to SGX, i.e. this is just the canary
-> in the coal mine.
+> running as a guest). 
 
-That was my recollection as well from previous threads but, to be fair 
-to Boris, the commit message is a lot more scary (and, which is what 
-triggers me, puts the blame on KVM).  It just says "KVM does not track 
-how guest pages are used, which means that SGX virtualization use of 
-EREMOVE might fail".
+We get those on a daily basis.
 
-Paolo
+> IME, nearly every kernel/KVM bug that I introduced that led to EREMOVE
+> failure was also quite fatal to SGX, i.e. this is just the canary in
+> the coal mine.
+>
+> It's certainly possible to add more sophisticated error handling, e.g. through
+> the pages onto a list and periodically try to recover them.  But, since the vast
+> majority of bugs that cause EREMOVE failure are fatal to SGX, implementing
+> sophisticated handling is quite low on the list of priorities.
+> 
+> Dave wanted the "page leaked" error message so that it's abundantly clear that
+> the kernel is leaking pages on EREMOVE failure and that the WARN isn't "benign".
 
+So this sounds to me like this should BUG too eventually.
+
+Or is this one of those "this should never happen" things so no one
+should worry?
+
+Whatever it is, if an admin sees this message in dmesg and doesn't get a
+lengthy explanation what she/he is supposed to do, I don't think she/he
+will be as relaxed.
+
+Hell, people open bugs for correctable ECCs and are asking whether they
+need to replace their hardware.
+
+So let's play this out: put yourself in an admin's shoes and tell me how
+should an admin react when she/he sees that?
+
+Should the kernel probably also say: "Don't worry, you have enough
+memory and what's a 4K, who cares? You'll reboot eventually."
+
+Or should the kernel say "You need to reboot ASAP."
+
+And so on...
+
+So what is the scenario here and what kind of reaction is that message
+supposed to cause, recovery action, blabla, the whole spiel?
+
+Thx.
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
