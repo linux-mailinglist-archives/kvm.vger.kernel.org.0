@@ -2,440 +2,173 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CC6A834405C
-	for <lists+kvm@lfdr.de>; Mon, 22 Mar 2021 13:02:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7EDD7344085
+	for <lists+kvm@lfdr.de>; Mon, 22 Mar 2021 13:12:14 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230253AbhCVMBt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 22 Mar 2021 08:01:49 -0400
-Received: from foss.arm.com ([217.140.110.172]:58302 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230262AbhCVMBW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 22 Mar 2021 08:01:22 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 42ADA1063;
-        Mon, 22 Mar 2021 05:01:21 -0700 (PDT)
-Received: from [192.168.0.110] (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 818BE3F718;
-        Mon, 22 Mar 2021 05:01:20 -0700 (PDT)
-Subject: Re: [kvm-unit-tests PATCH 2/6] arm/arm64: Remove dcache_line_size
- global variable
-To:     Andre Przywara <andre.przywara@arm.com>
-Cc:     drjones@redhat.com, kvm@vger.kernel.org,
-        kvmarm@lists.cs.columbia.edu
-References: <20210227104201.14403-1-alexandru.elisei@arm.com>
- <20210227104201.14403-3-alexandru.elisei@arm.com>
- <20210304150031.7805c75e@slackpad.fritz.box>
- <ce582839-edef-c055-b0a3-6261397b6b8d@arm.com>
- <20210316154002.3d9e0575@slackpad.fritz.box>
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <96eaa6ab-a379-b69c-d813-9362477cd196@arm.com>
-Date:   Mon, 22 Mar 2021 12:01:47 +0000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.8.1
+        id S229764AbhCVMLg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 22 Mar 2021 08:11:36 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:37131 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230046AbhCVMLE (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 22 Mar 2021 08:11:04 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1616415063;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=vnhtieZpahpelU+t3Df5KXSLUwwj4GJ8KlluqBDp3oc=;
+        b=S7pSBBmACb9t51tuMntTID5q5Uw8D1hhr69qR+IipGTzqJeoXi7jwbknKLo89SsRKhbCef
+        fUm0Z3XeUtNjtHbFjDHv464DEfkOfpsl2pzxx19BjXMi6b6qV/LoDK7zIzhQuiz0WGmdyC
+        yNMSp8e8eDm8zFLqashPlk8XLwQWw6w=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-151-xpOtqZrDOA24SdXDiDh6_A-1; Mon, 22 Mar 2021 08:11:02 -0400
+X-MC-Unique: xpOtqZrDOA24SdXDiDh6_A-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CDF0680006E;
+        Mon, 22 Mar 2021 12:11:00 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.40.194.23])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 7226317D85;
+        Mon, 22 Mar 2021 12:10:59 +0000 (UTC)
+From:   Andrew Jones <drjones@redhat.com>
+To:     kvm@vger.kernel.org
+Cc:     Nikos Nikoleris <nikos.nikoleris@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>
+Subject: [PATCH kvm-unit-tests] arm/arm64: Zero BSS and stack at startup
+Date:   Mon, 22 Mar 2021 13:10:58 +0100
+Message-Id: <20210322121058.62072-1-drjones@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20210316154002.3d9e0575@slackpad.fritz.box>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Andre,
+So far we've counted on QEMU or kvmtool implicitly zeroing all memory.
+With our goal of eventually supporting bare-metal targets with
+target-efi we should explicitly zero any memory we expect to be zeroed
+ourselves. This obviously includes the BSS, but also the bootcpu's
+stack, as the bootcpu's thread-info lives in the stack and may get
+used in early setup to get the cpu index. Note, this means we still
+assume the bootcpu's cpu index to be zero. That assumption can be
+removed later.
 
-On 3/16/21 3:40 PM, Andre Przywara wrote:
-> On Mon, 15 Mar 2021 15:46:09 +0000
-> Alexandru Elisei <alexandru.elisei@arm.com> wrote:
->
-> Hi Alex,
->
->> On 3/4/21 3:00 PM, Andre Przywara wrote:
->>> On Sat, 27 Feb 2021 10:41:57 +0000
->>> Alexandru Elisei <alexandru.elisei@arm.com> wrote:
->>>  
->>>> Compute the dcache line size when doing dcache maintenance instead of using
->>>> a global variable computed in setup(), which allows us to do dcache
->>>> maintenance at any point in the boot process. This will be useful for
->>>> running as an EFI app and it also aligns our implementation to that of the
->>>> Linux kernel.  
->>> Can you add that this changes the semantic of dcache_by_line_op to use
->>> the size instead of the end address?  
->> Sure, I can do that. The dcache_by_line_op was never visible to code outside
->> assembly, and it was only used by asm_mmu_disable, so no other callers are
->> affected by this change.
-> Thanks, just a short sentence suffices. I was just mentioning this
-> since many cache-op wrappers I have seen use (start,stop) pairs, while
-> I actually think (start,length) is more practical. So it just deserves
-> a short mentioning in case anyone was familiar with the previous
-> arguments and wonders what's going on.
->
->>>  
->>>> For consistency, the arm code has been similary modified.
->>>>
->>>> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
->>>> ---
->>>>  lib/arm/asm/assembler.h   | 44 ++++++++++++++++++++++++++++++++
->>>>  lib/arm/asm/processor.h   |  7 ------
->>>>  lib/arm64/asm/assembler.h | 53 +++++++++++++++++++++++++++++++++++++++
->>>>  lib/arm64/asm/processor.h |  7 ------
->>>>  lib/arm/setup.c           |  7 ------
->>>>  arm/cstart.S              | 18 +++----------
->>>>  arm/cstart64.S            | 16 ++----------
->>>>  7 files changed, 102 insertions(+), 50 deletions(-)
->>>>  create mode 100644 lib/arm/asm/assembler.h
->>>>  create mode 100644 lib/arm64/asm/assembler.h
->>>>
->>>> diff --git a/lib/arm/asm/assembler.h b/lib/arm/asm/assembler.h
->>>> new file mode 100644
->>>> index 000000000000..6b932df86204
->>>> --- /dev/null
->>>> +++ b/lib/arm/asm/assembler.h
->>>> @@ -0,0 +1,44 @@
->>>> +/* SPDX-License-Identifier: GPL-2.0 */
->>>> +/*
->>>> + * Based on several files from Linux version v5.10: arch/arm/mm/proc-macros.S,
->>>> + * arch/arm/mm/proc-v7.S.
->>>> + */
->>>> +
->>>> +/*
->>>> + * dcache_line_size - get the minimum D-cache line size from the CTR register
->>> `> + * on ARMv7.  
->> Well, it's in the arm directory and there's a file with the same name under
->> lib/arm64/asm/, so I don't think there's any room for confusion here.
-> Mmh, this v7 line was already in there, and I didn't complain, it was
-> apparently just a stray character sneaking in the reply which made this
-> look like a comment?
+Cc: Nikos Nikoleris <nikos.nikoleris@arm.com>
+Cc: Alexandru Elisei <alexandru.elisei@arm.com>
+Signed-off-by: Andrew Jones <drjones@redhat.com>
+---
+ arm/cstart.S   | 22 ++++++++++++++++++++++
+ arm/cstart64.S | 23 ++++++++++++++++++++++-
+ arm/flat.lds   |  6 ++++++
+ 3 files changed, 50 insertions(+), 1 deletion(-)
 
-I guess so, my bad.
+diff --git a/arm/cstart.S b/arm/cstart.S
+index ef936ae2f874..6de461ef94bf 100644
+--- a/arm/cstart.S
++++ b/arm/cstart.S
+@@ -15,12 +15,34 @@
+ 
+ #define THREAD_START_SP ((THREAD_SIZE - S_FRAME_SIZE * 8) & ~7)
+ 
++.macro zero_range, tmp1, tmp2, tmp3, tmp4
++	mov	\tmp3, #0
++	mov	\tmp4, #0
++9998:	cmp	\tmp1, \tmp2
++	beq	9997f
++	strd	\tmp3, \tmp4, [\tmp1]
++	add	\tmp1, \tmp1, #8
++	b	9998b
++9997:
++.endm
++
++
+ .arm
+ 
+ .section .init
+ 
+ .globl start
+ start:
++	/* zero BSS */
++	ldr	r4, =bss
++	ldr	r5, =ebss
++	zero_range r4, r5, r6, r7
++
++	/* zero stack */
++	ldr	r4, =stackbase
++	ldr	r5, =stacktop
++	zero_range r4, r5, r6, r7
++
+ 	/*
+ 	 * set stack, making room at top of stack for cpu0's
+ 	 * exception stacks. Must start wtih stackptr, not
+diff --git a/arm/cstart64.S b/arm/cstart64.S
+index 0428014aa58a..4dc5989ef50c 100644
+--- a/arm/cstart64.S
++++ b/arm/cstart64.S
+@@ -13,6 +13,15 @@
+ #include <asm/page.h>
+ #include <asm/pgtable-hwdef.h>
+ 
++.macro zero_range, tmp1, tmp2
++9998:	cmp	\tmp1, \tmp2
++	b.eq	9997f
++	stp	xzr, xzr, [\tmp1]
++	add	\tmp1, \tmp1, #16
++	b	9998b
++9997:
++.endm
++
+ .section .init
+ 
+ /*
+@@ -51,7 +60,19 @@ start:
+ 	b	1b
+ 
+ 1:
+-	/* set up stack */
++	/* zero BSS */
++	adrp	x4, bss
++	add	x4, x4, :lo12:bss
++	adrp    x5, ebss
++	add     x5, x5, :lo12:ebss
++	zero_range x4, x5
++
++	/* zero and set up stack */
++	adrp	x4, stackbase
++	add	x4, x4, :lo12:stackbase
++	adrp    x5, stacktop
++	add     x5, x5, :lo12:stacktop
++	zero_range x4, x5
+ 	mov	x4, #1
+ 	msr	spsel, x4
+ 	isb
+diff --git a/arm/flat.lds b/arm/flat.lds
+index 25f8d03cba87..8eab3472e2f2 100644
+--- a/arm/flat.lds
++++ b/arm/flat.lds
+@@ -17,7 +17,11 @@ SECTIONS
+ 
+     .rodata   : { *(.rodata*) }
+     .data     : { *(.data) }
++    . = ALIGN(16);
++    PROVIDE(bss = .);
+     .bss      : { *(.bss) }
++    . = ALIGN(16);
++    PROVIDE(ebss = .);
+     . = ALIGN(64K);
+     PROVIDE(edata = .);
+ 
+@@ -26,6 +30,8 @@ SECTIONS
+      * sp must be 16 byte aligned for arm64, and 8 byte aligned for arm
+      * sp must always be strictly less than the true stacktop
+      */
++    . = ALIGN(16);
++    PROVIDE(stackbase = .);
+     . += 64K;
+     . = ALIGN(64K);
+     PROVIDE(stackptr = . - 16);
+-- 
+2.26.3
 
->
->>>> + */
->>>> +	.macro	dcache_line_size, reg, tmp
->>>> +	mrc	p15, 0, \tmp, c0, c0, 1		// read ctr
->>>> +	lsr	\tmp, \tmp, #16
->>>> +	and	\tmp, \tmp, #0xf		// cache line size encoding
->>>> +	mov	\reg, #4			// bytes per word
->>>> +	mov	\reg, \reg, lsl \tmp		// actual cache line size
->>>> +	.endm
->>>> +
->>>> +/*
->>>> + * Macro to perform a data cache maintenance for the interval
->>>> + * [addr, addr + size).
->>>> + *
->>>> + * 	op:		operation to execute
->>>> + * 	domain		domain used in the dsb instruction
->>>> + * 	addr:		starting virtual address of the region
->>>> + * 	size:		size of the region
->>>> + * 	Corrupts:	addr, size, tmp1, tmp2
->>>> + */
->>>> +	.macro dcache_by_line_op op, domain, addr, size, tmp1, tmp2
->>>> +	dcache_line_size \tmp1, \tmp2
->>>> +	add	\size, \addr, \size
->>>> +	sub	\tmp2, \tmp1, #1
->>>> +	bic	\addr, \addr, \tmp2  
->>> Just a nit, but since my brain was in assembly land: We could skip tmp2,
->>> by adding back #1 to tmp1 after the bic.
->>> Same for the arm64 code.  
->> Using one less temporary register wouldn't help with register pressure:
->>
->> - On arm, registers r0-r3 are used, which ARM IHI 0042F says that they can be used
->> as scratch registers and the caller will save their contents before the calling
->> the function (or not use them at all).
->>
->> - On arm64, register x0-x3 are used, which have a similar usage according to ARM
->> IHI 0055B.
->>
->> Using one less temporary register means one more instruction, but not relevant
->> since the macro will perform writes, as even invalidation is transformed to a
->> clean + invalidate under virtualization.
-> I am not talking about micro-optimisation here, but this is a *macro*,
-> not a function, so could potentially be used in multiple different
-> places, for instance inside leaf functions. And maybe that already uses
-> two registers on its own, so can't spare three extra ones?
->
-> Was just a hint, anyway ...
->
->> The reason I chose to keep the macro unchanged for arm64 is that it matches the
->> Linux definition, and I think it's better to try not to deviate too much from it,
->> as in the long it will make maintenance easier for everyone.
->> For arm, I wrote it this way to match the arm64 definition.
->>
->>>  
->>>> +9998:
->>>> +	.ifc	\op, dccimvac
->>>> +	mcr	p15, 0, \addr, c7, c14, 1
->>>> +	.else
->>>> +	.err
->>>> +	.endif
->>>> +	add	\addr, \addr, \tmp1
->>>> +	cmp	\addr, \size
->>>> +	blo	9998b
->>>> +	dsb	\domain
->>>> +	.endm
->>>> diff --git a/lib/arm/asm/processor.h b/lib/arm/asm/processor.h
->>>> index 273366d1fe1c..3c36eac903f0 100644
->>>> --- a/lib/arm/asm/processor.h
->>>> +++ b/lib/arm/asm/processor.h
->>>> @@ -9,11 +9,6 @@
->>>>  #include <asm/sysreg.h>
->>>>  #include <asm/barrier.h>  
->>> Do we want the same protection against inclusion from C here as in the
->>> arm64 version?  
->> We do, I will add it in the next iteration.
->>
->>>  
->>>> -#define CTR_DMINLINE_SHIFT	16
->>>> -#define CTR_DMINLINE_MASK	(0xf << 16)
->>>> -#define CTR_DMINLINE(x)	\
->>>> -	(((x) & CTR_DMINLINE_MASK) >> CTR_DMINLINE_SHIFT)
->>>> -
->>>>  enum vector {
->>>>  	EXCPTN_RST,
->>>>  	EXCPTN_UND,
->>>> @@ -89,6 +84,4 @@ static inline u32 get_ctr(void)
->>>>  	return read_sysreg(CTR);
->>>>  }
->>>>  
->>>> -extern unsigned long dcache_line_size;
->>>> -
->>>>  #endif /* _ASMARM_PROCESSOR_H_ */
->>>> diff --git a/lib/arm64/asm/assembler.h b/lib/arm64/asm/assembler.h
->>>> new file mode 100644
->>>> index 000000000000..f801c0c43d02
->>>> --- /dev/null
->>>> +++ b/lib/arm64/asm/assembler.h
->>>> @@ -0,0 +1,53 @@
->>>> +/* SPDX-License-Identifier: GPL-2.0-only */
->>>> +/*
->>>> + * Based on the file arch/arm64/include/asm/assembled.h from Linux v5.10, which
->>>> + * in turn is based on arch/arm/include/asm/assembler.h and
->>>> + * arch/arm/mm/proc-macros.S
->>>> + *
->>>> + * Copyright (C) 1996-2000 Russell King
->>>> + * Copyright (C) 2012 ARM Ltd.
->>>> + */
->>>> +#ifndef __ASSEMBLY__
->>>> +#error "Only include this from assembly code"
->>>> +#endif
->>>> +
->>>> +#ifndef __ASM_ASSEMBLER_H
->>>> +#define __ASM_ASSEMBLER_H
->>>> +
->>>> +/*
->>>> + * raw_dcache_line_size - get the minimum D-cache line size on this CPU
->>>> + * from the CTR register.
->>>> + */
->>>> +	.macro	raw_dcache_line_size, reg, tmp
->>>> +	mrs	\tmp, ctr_el0			// read CTR
->>>> +	ubfm	\tmp, \tmp, #16, #19		// cache line size encoding  
->>> this encoding of ubfm is supposed to be written as:
->>> 	ubfx \tmp, \tmp, #16, #4
->>> This is also what objdump makes of the above.  
->> I would rather keep it the same as Linux.
-> Which means I need to send a patch there? ;-)
-
-Only if you want to try to convince people that ubfx is better than ubfm :)
-
-> I am all for copying from reliable sources, but that doesn't mean that
-> we can't improve on them.
->
-> The ARM ARM says that ubfx is the preferred disassembly for this opcode.
-> Plus there is a ubfx in AArch32 (with the exact same semantic and
-> arguments), but no ubfm.
->
-> It's just that my brain expects ubfx when extracting bits from a
-> register, and I needed to wade through the exact definition of ubfm to
-> understand what it does.
->
-> So your choice, just wanted to point that out.
-
-I think you've convinced me. I'm also more familiar with ubfx, the Arm ARM says
-that ubfm is usually accessed via one of its aliases, and Linux seems to be moving
-away from using ubfm (the only instances that I've found were
-{raw_,}dcache_line_size which are very old, I think from the initial arm64
-architecture enablement). I'll use ubfx instead.
-
-Thanks,
-
-Alex
-
->
-> Cheers,
-> Andre
->
->>> The rest looks good, I convinced myself that the assembly algorithms are
->>> correct.  
->> Thanks, much appreciated!
->>
->> Thanks,
->>
->> Alex
->>
->>> Cheers,
->>> Andre
->>>
->>>  
->>>> +	mov	\reg, #4			// bytes per word
->>>> +	lsl	\reg, \reg, \tmp		// actual cache line size
->>>> +	.endm
->>>> +
->>>> +/*
->>>> + * Macro to perform a data cache maintenance for the interval
->>>> + * [addr, addr + size). Use the raw value for the dcache line size because
->>>> + * kvm-unit-tests has no concept of scheduling.
->>>> + *
->>>> + * 	op:		operation passed to dc instruction
->>>> + * 	domain:		domain used in dsb instruciton
->>>> + * 	addr:		starting virtual address of the region
->>>> + * 	size:		size of the region
->>>> + * 	Corrupts:	addr, size, tmp1, tmp2
->>>> + */
->>>> +
->>>> +	.macro dcache_by_line_op op, domain, addr, size, tmp1, tmp2
->>>> +	raw_dcache_line_size \tmp1, \tmp2
->>>> +	add	\size, \addr, \size
->>>> +	sub	\tmp2, \tmp1, #1
->>>> +	bic	\addr, \addr, \tmp2
->>>> +9998:
->>>> +	dc	\op, \addr
->>>> +	add	\addr, \addr, \tmp1
->>>> +	cmp	\addr, \size
->>>> +	b.lo	9998b
->>>> +	dsb	\domain
->>>> +	.endm
->>>> +
->>>> +#endif	/* __ASM_ASSEMBLER_H */
->>>> diff --git a/lib/arm64/asm/processor.h b/lib/arm64/asm/processor.h
->>>> index 771b2d1e0c94..cdc2463e1981 100644
->>>> --- a/lib/arm64/asm/processor.h
->>>> +++ b/lib/arm64/asm/processor.h
->>>> @@ -16,11 +16,6 @@
->>>>  #define SCTLR_EL1_A	(1 << 1)
->>>>  #define SCTLR_EL1_M	(1 << 0)
->>>>  
->>>> -#define CTR_DMINLINE_SHIFT	16
->>>> -#define CTR_DMINLINE_MASK	(0xf << 16)
->>>> -#define CTR_DMINLINE(x)	\
->>>> -	(((x) & CTR_DMINLINE_MASK) >> CTR_DMINLINE_SHIFT)
->>>> -
->>>>  #ifndef __ASSEMBLY__
->>>>  #include <asm/ptrace.h>
->>>>  #include <asm/esr.h>
->>>> @@ -115,8 +110,6 @@ static inline u64 get_ctr(void)
->>>>  	return read_sysreg(ctr_el0);
->>>>  }
->>>>  
->>>> -extern unsigned long dcache_line_size;
->>>> -
->>>>  static inline unsigned long get_id_aa64mmfr0_el1(void)
->>>>  {
->>>>  	return read_sysreg(id_aa64mmfr0_el1);
->>>> diff --git a/lib/arm/setup.c b/lib/arm/setup.c
->>>> index 066524f8bf61..751ba980000a 100644
->>>> --- a/lib/arm/setup.c
->>>> +++ b/lib/arm/setup.c
->>>> @@ -42,8 +42,6 @@ static struct mem_region __initial_mem_regions[NR_INITIAL_MEM_REGIONS + 1];
->>>>  struct mem_region *mem_regions = __initial_mem_regions;
->>>>  phys_addr_t __phys_offset, __phys_end;
->>>>  
->>>> -unsigned long dcache_line_size;
->>>> -
->>>>  int mpidr_to_cpu(uint64_t mpidr)
->>>>  {
->>>>  	int i;
->>>> @@ -72,11 +70,6 @@ static void cpu_init(void)
->>>>  	ret = dt_for_each_cpu_node(cpu_set, NULL);
->>>>  	assert(ret == 0);
->>>>  	set_cpu_online(0, true);
->>>> -	/*
->>>> -	 * DminLine is log2 of the number of words in the smallest cache line; a
->>>> -	 * word is 4 bytes.
->>>> -	 */
->>>> -	dcache_line_size = 1 << (CTR_DMINLINE(get_ctr()) + 2);
->>>>  }
->>>>  
->>>>  unsigned int mem_region_get_flags(phys_addr_t paddr)
->>>> diff --git a/arm/cstart.S b/arm/cstart.S
->>>> index ef936ae2f874..954748b00f64 100644
->>>> --- a/arm/cstart.S
->>>> +++ b/arm/cstart.S
->>>> @@ -7,6 +7,7 @@
->>>>   */
->>>>  #define __ASSEMBLY__
->>>>  #include <auxinfo.h>
->>>> +#include <asm/assembler.h>
->>>>  #include <asm/thread_info.h>
->>>>  #include <asm/asm-offsets.h>
->>>>  #include <asm/pgtable-hwdef.h>
->>>> @@ -197,20 +198,6 @@ asm_mmu_enable:
->>>>  
->>>>  	mov     pc, lr
->>>>  
->>>> -.macro dcache_clean_inval domain, start, end, tmp1, tmp2
->>>> -	ldr	\tmp1, =dcache_line_size
->>>> -	ldr	\tmp1, [\tmp1]
->>>> -	sub	\tmp2, \tmp1, #1
->>>> -	bic	\start, \start, \tmp2
->>>> -9998:
->>>> -	/* DCCIMVAC */
->>>> -	mcr	p15, 0, \start, c7, c14, 1
->>>> -	add	\start, \start, \tmp1
->>>> -	cmp	\start, \end
->>>> -	blo	9998b
->>>> -	dsb	\domain
->>>> -.endm
->>>> -
->>>>  .globl asm_mmu_disable
->>>>  asm_mmu_disable:
->>>>  	/* SCTLR */
->>>> @@ -223,7 +210,8 @@ asm_mmu_disable:
->>>>  	ldr	r0, [r0]
->>>>  	ldr	r1, =__phys_end
->>>>  	ldr	r1, [r1]
->>>> -	dcache_clean_inval sy, r0, r1, r2, r3
->>>> +	sub	r1, r1, r0
->>>> +	dcache_by_line_op dccimvac, sy, r0, r1, r2, r3
->>>>  	isb
->>>>  
->>>>  	mov     pc, lr
->>>> diff --git a/arm/cstart64.S b/arm/cstart64.S
->>>> index fc1930bcdb53..046bd3914098 100644
->>>> --- a/arm/cstart64.S
->>>> +++ b/arm/cstart64.S
->>>> @@ -8,6 +8,7 @@
->>>>  #define __ASSEMBLY__
->>>>  #include <auxinfo.h>
->>>>  #include <asm/asm-offsets.h>
->>>> +#include <asm/assembler.h>
->>>>  #include <asm/ptrace.h>
->>>>  #include <asm/processor.h>
->>>>  #include <asm/page.h>
->>>> @@ -204,20 +205,6 @@ asm_mmu_enable:
->>>>  
->>>>  	ret
->>>>  
->>>> -/* Taken with small changes from arch/arm64/incluse/asm/assembler.h */
->>>> -.macro dcache_by_line_op op, domain, start, end, tmp1, tmp2
->>>> -	adrp	\tmp1, dcache_line_size
->>>> -	ldr	\tmp1, [\tmp1, :lo12:dcache_line_size]
->>>> -	sub	\tmp2, \tmp1, #1
->>>> -	bic	\start, \start, \tmp2
->>>> -9998:
->>>> -	dc	\op , \start
->>>> -	add	\start, \start, \tmp1
->>>> -	cmp	\start, \end
->>>> -	b.lo	9998b
->>>> -	dsb	\domain
->>>> -.endm
->>>> -
->>>>  .globl asm_mmu_disable
->>>>  asm_mmu_disable:
->>>>  	mrs	x0, sctlr_el1
->>>> @@ -230,6 +217,7 @@ asm_mmu_disable:
->>>>  	ldr	x0, [x0, :lo12:__phys_offset]
->>>>  	adrp	x1, __phys_end
->>>>  	ldr	x1, [x1, :lo12:__phys_end]
->>>> +	sub	x1, x1, x0
->>>>  	dcache_by_line_op civac, sy, x0, x1, x2, x3
->>>>  	isb
->>>>    
