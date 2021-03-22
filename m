@@ -2,302 +2,447 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5C3D5344317
-	for <lists+kvm@lfdr.de>; Mon, 22 Mar 2021 13:51:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1136834457D
+	for <lists+kvm@lfdr.de>; Mon, 22 Mar 2021 14:21:38 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231501AbhCVMsf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 22 Mar 2021 08:48:35 -0400
-Received: from mail-vi1eur05on2043.outbound.protection.outlook.com ([40.107.21.43]:30144
-        "EHLO EUR05-VI1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S231617AbhCVMq3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 22 Mar 2021 08:46:29 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=armh.onmicrosoft.com;
- s=selector2-armh-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=wh+YCoA1nqHbz0lLilJ1vcS31vA4jr5+fX+MIVuSoB0=;
- b=zTGAVUOUSzRUCndNRp18ozfsDSxIVR2pHIIP5+s6uvrce7Mc9hbnTDmUh6PS3uuzkMY53Fa79IO698pt+IwddkjR4TTpgWdWFnfLQbqRND+v6W+zjJYBxN7LCF/qETUuz/SjyJXd3B+cJtITqekTafZnTI19PJX5+ZZKKRXtW8M=
-Received: from AM5P194CA0003.EURP194.PROD.OUTLOOK.COM (2603:10a6:203:8f::13)
- by VE1PR08MB5246.eurprd08.prod.outlook.com (2603:10a6:803:111::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3955.18; Mon, 22 Mar
- 2021 12:46:25 +0000
-Received: from AM5EUR03FT050.eop-EUR03.prod.protection.outlook.com
- (2603:10a6:203:8f:cafe::dd) by AM5P194CA0003.outlook.office365.com
- (2603:10a6:203:8f::13) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3955.18 via Frontend
- Transport; Mon, 22 Mar 2021 12:46:25 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 63.35.35.123)
- smtp.mailfrom=arm.com; vger.kernel.org; dkim=pass (signature was verified)
- header.d=armh.onmicrosoft.com;vger.kernel.org; dmarc=pass action=none
- header.from=arm.com;
-Received-SPF: Pass (protection.outlook.com: domain of arm.com designates
- 63.35.35.123 as permitted sender) receiver=protection.outlook.com;
- client-ip=63.35.35.123; helo=64aa7808-outbound-1.mta.getcheckrecipient.com;
-Received: from 64aa7808-outbound-1.mta.getcheckrecipient.com (63.35.35.123) by
- AM5EUR03FT050.mail.protection.outlook.com (10.152.17.47) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3955.18 via Frontend Transport; Mon, 22 Mar 2021 12:46:25 +0000
-Received: ("Tessian outbound 04b74cf98e3c:v87"); Mon, 22 Mar 2021 12:46:25 +0000
-X-CheckRecipientChecked: true
-X-CR-MTA-CID: cd6ee26ab33c4353
-X-CR-MTA-TID: 64aa7808
-Received: from ab3abfca9eed.2
-        by 64aa7808-outbound-1.mta.getcheckrecipient.com id 5EDC6A08-DA3B-4F32-AD14-0DFD015C637D.1;
-        Mon, 22 Mar 2021 12:46:19 +0000
-Received: from EUR03-AM5-obe.outbound.protection.outlook.com
-    by 64aa7808-outbound-1.mta.getcheckrecipient.com with ESMTPS id ab3abfca9eed.2
-    (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384);
-    Mon, 22 Mar 2021 12:46:19 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=oMvJNNiXoS8WSGk8+/lsfytPQS/PvRhJbn2Xx0KrxZkQ2kLPcrQwhPdGYC/vSNogCxvYujmDiAYr9i9M8cqngSfIzeGqGHcAMcmRrDZkdfgiVpqZSzuer2azS1VsLbQCwRcEd5TAHoMVW9Ghm4DpuyFMDRM05F85hv7G5koagnp2/JN2pJRSl9V5QU4+Gb4gLTbKS8OLYrlPP9mHbr8SawipZNVW+SDo6qjCu5s7s3U4/kINpJGJljvCL0MfNFaHoTZjjyIIEwG4ljG21+jprSpaPUziAz5/+dAz8jquISPeiLgPvlYLkDsa+5r1kIsSxLkuIaP8XuKq9wD0MUdZ7w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=wh+YCoA1nqHbz0lLilJ1vcS31vA4jr5+fX+MIVuSoB0=;
- b=bk2ggMMUbj0SA5227/BpHH+zoq5dAvvpP5xxee4p01Q6508TSJG401gEqmm2eeaPbWl5RlMjVaQ/gaMw+KBfopBdW3FRJAmb4G/jJ2qjrNBOieSYMS7UwsMiHqb9jV6HlAL6A9DBlHuX6b8C7Q2iqY4wu7+46DfLIDix5MUWCFTaP7SceV1U+ChvakT7AGGqtDMWT/ZnBlUUSst57I5p+9cfN2KqWlCCsA0BPWE+qppARNecfYCffBwy9I/4TxK6cgXjtffH/oJlyxEWkVXgMShvcYsc5DPZWiWQjROdGkXu7r2nvt19qoI8NsSd6lT5Se1FYVk1FIf/6kaKBsfreQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=arm.com; dmarc=pass action=none header.from=arm.com; dkim=pass
- header.d=arm.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=armh.onmicrosoft.com;
- s=selector2-armh-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=wh+YCoA1nqHbz0lLilJ1vcS31vA4jr5+fX+MIVuSoB0=;
- b=zTGAVUOUSzRUCndNRp18ozfsDSxIVR2pHIIP5+s6uvrce7Mc9hbnTDmUh6PS3uuzkMY53Fa79IO698pt+IwddkjR4TTpgWdWFnfLQbqRND+v6W+zjJYBxN7LCF/qETUuz/SjyJXd3B+cJtITqekTafZnTI19PJX5+ZZKKRXtW8M=
-Authentication-Results-Original: arm.com; dkim=none (message not signed)
- header.d=none;arm.com; dmarc=none action=none header.from=arm.com;
-Received: from VI1PR08MB3550.eurprd08.prod.outlook.com (2603:10a6:803:84::21)
- by VE1PR08MB5629.eurprd08.prod.outlook.com (2603:10a6:800:1a6::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3955.18; Mon, 22 Mar
- 2021 12:46:10 +0000
-Received: from VI1PR08MB3550.eurprd08.prod.outlook.com
- ([fe80::8834:fa36:9de8:e6e0]) by VI1PR08MB3550.eurprd08.prod.outlook.com
- ([fe80::8834:fa36:9de8:e6e0%7]) with mapi id 15.20.3955.024; Mon, 22 Mar 2021
- 12:46:10 +0000
-Subject: Re: [PATCH kvm-unit-tests] arm/arm64: Zero BSS and stack at startup
-To:     Andrew Jones <drjones@redhat.com>, kvm@vger.kernel.org
-Cc:     Alexandru Elisei <alexandru.elisei@arm.com>
-References: <20210322121058.62072-1-drjones@redhat.com>
-From:   Nikos Nikoleris <nikos.nikoleris@arm.com>
-Message-ID: <fe2ddcd5-1b1d-7e42-87cc-1a9d2a0e81dc@arm.com>
-Date:   Mon, 22 Mar 2021 12:46:08 +0000
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.16; rv:78.0)
- Gecko/20100101 Thunderbird/78.8.1
-In-Reply-To: <20210322121058.62072-1-drjones@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-X-Originating-IP: [2a01:4b00:88be:aa00:e1b6:307a:e182:1112]
-X-ClientProxiedBy: LO2P265CA0394.GBRP265.PROD.OUTLOOK.COM
- (2603:10a6:600:f::22) To VI1PR08MB3550.eurprd08.prod.outlook.com
- (2603:10a6:803:84::21)
+        id S231616AbhCVNVG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 22 Mar 2021 09:21:06 -0400
+Received: from szxga02-in.huawei.com ([45.249.212.188]:3495 "EHLO
+        szxga02-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231208AbhCVNTO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 22 Mar 2021 09:19:14 -0400
+Received: from DGGEML404-HUB.china.huawei.com (unknown [172.30.72.53])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4F3w5X4llCzRSjH;
+        Mon, 22 Mar 2021 21:17:20 +0800 (CST)
+Received: from dggpemm500023.china.huawei.com (7.185.36.83) by
+ DGGEML404-HUB.china.huawei.com (10.3.17.39) with Microsoft SMTP Server (TLS)
+ id 14.3.498.0; Mon, 22 Mar 2021 21:19:08 +0800
+Received: from [10.174.187.128] (10.174.187.128) by
+ dggpemm500023.china.huawei.com (7.185.36.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id
+ 15.1.2106.2; Mon, 22 Mar 2021 21:19:08 +0800
+Subject: Re: [RFC PATCH 3/4] KVM: arm64: Install the block entry before
+ unmapping the page mappings
+To:     Alexandru Elisei <alexandru.elisei@arm.com>
+CC:     Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
+        "Catalin Marinas" <catalin.marinas@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        James Morse <james.morse@arm.com>,
+        "Suzuki K Poulose" <suzuki.poulose@arm.com>,
+        Quentin Perret <qperret@google.com>,
+        "Gavin Shan" <gshan@redhat.com>, <kvmarm@lists.cs.columbia.edu>,
+        <linux-arm-kernel@lists.infradead.org>, <kvm@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>
+References: <20210208112250.163568-1-wangyanan55@huawei.com>
+ <20210208112250.163568-4-wangyanan55@huawei.com>
+ <33a9999e-2cc5-52ca-3da8-38f7e7702529@arm.com>
+ <93c13a04-6fcc-7544-d6ed-2ebb81d209fe@huawei.com>
+ <1b8be8a3-2fb9-be8a-a052-44872355f8cb@arm.com>
+ <b84f41b8-3555-9c8a-126e-34d97643fc95@huawei.com>
+ <3083ca86-9d22-5da5-867d-aa4b5ccec3ff@arm.com>
+From:   "wangyanan (Y)" <wangyanan55@huawei.com>
+Message-ID: <4d57390a-6113-957b-94b7-205a23ae4c8f@huawei.com>
+Date:   Mon, 22 Mar 2021 21:19:07 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.4.0
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from C02W217MHV2R.local (2a01:4b00:88be:aa00:e1b6:307a:e182:1112) by LO2P265CA0394.GBRP265.PROD.OUTLOOK.COM (2603:10a6:600:f::22) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3955.24 via Frontend Transport; Mon, 22 Mar 2021 12:46:09 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: 19e1ef2b-ec7e-4d63-22ee-08d8ed308134
-X-MS-TrafficTypeDiagnostic: VE1PR08MB5629:|VE1PR08MB5246:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <VE1PR08MB524697BE7E169D10D95E78D5F7659@VE1PR08MB5246.eurprd08.prod.outlook.com>
-x-checkrecipientrouted: true
-NoDisclaimer: true
-X-MS-Oob-TLC-OOBClassifiers: OLM:10000;OLM:10000;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam-Untrusted: BCL:0;
-X-Microsoft-Antispam-Message-Info-Original: epMES0ym81qMZUlQO/l8BScbDFO5DKNni8p7aelHHRlYu36JBtu7pPhl6E6Wr5QfbAR/SmellzMAS+/xtljFNIkQss4gEZ0xkuES3AvxNZ46v0eS34K6hhtw61ahNGfPnpS5EHCAx6arjNWF+frWtKZv+8YorCw5w2jQR0mGIEz5sVPV00lzFF+IUwX73uWi1Ks66GqpNNACTRD+or2aV29CI+/4ThTeiDJz626XmcQdMfVLLDjVLRBHMLvw6kW7C6UnJKjBa7bRKLviTRhBLOZfoCQDd08VC/0jWfgz78ql7kyxgpr00+/U+68Xir90QH/lK0bax5/jGA5Ue3DawocxGu0xonyjnJOU/jnTnoF+EWUiY805p14WIEw2wlc2U86DslGmcNkN31P9uE1UMusgEmGpkyzEenAoL+yf3LbHQRlEGIXcbSr+IxtWzbhtXO35jeTWynv1ZL/6ce6Dq1/YGPpAqjUERA3bfdVjYBjCUdYkkJXDlNrJ0UzMMjjmEKn8vBlOhuct/ZI3oJQeExtlLb3q8VhvdarumqaL1YTsvlNCVfqc4Yu+ckuTCjhOPWH1tz0D8Vh9LVzvjaIMZzw9zN5uUJLEOeFqyXP9c4GjaFv37U6BofGvMo3KF3voHKcuAGMKnc8W3JKtfGn0htvLkHSkIz9GnzWKHG2GDGfr6bnsOE/kv1ulACNWm0S//Vi4u8ZcObVJwJnGbQijcw==
-X-Forefront-Antispam-Report-Untrusted: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:VI1PR08MB3550.eurprd08.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(376002)(346002)(136003)(366004)(396003)(39860400002)(478600001)(31686004)(36756003)(6512007)(5660300002)(6506007)(16526019)(8676002)(186003)(53546011)(316002)(4326008)(83380400001)(86362001)(2906002)(66946007)(44832011)(52116002)(2616005)(8936002)(66556008)(66476007)(6486002)(31696002)(38100700001)(45980500001)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: =?utf-8?B?d3FRRFlTRDF1UVRIZ0hhV0xsbHNFVE1YQkZsOFZIdVpibFArSW16eE5DcDUx?=
- =?utf-8?B?Y1dHT05GYXlRM3lOTWRtdXNZTkJFdlB0b2N5K2FxVUZYMUlYZzc2cmFJalBV?=
- =?utf-8?B?aTZMYy9DOFY0KzdLTmJyTUZWRDBKS2JMOXZpTkdSTU1ueVdYUkpXKzB4bnRp?=
- =?utf-8?B?WGZwMnRYbm81TzNla2phUldPU21XU2tldGlJemxTa2hwbG5Nd0c2c2l1djdW?=
- =?utf-8?B?S1lPZE9wQzdCd0JBMmhNM1Q4dDZ6TFYrZ2JxSTVOVE5RVUhZYXF3Q0hEbWR5?=
- =?utf-8?B?Zjc4VVFTU1lwRkpuVThIMHI1cmhqVzIzUGhUb1cydTF4ZFEraEVhVGNOWXQ1?=
- =?utf-8?B?UmZMUXRqSThyaVByRE9xVDFDU3FpRGR0bHROY0V5a3MwUC9ubDkrR3hZdUJY?=
- =?utf-8?B?OWlvWGI0bEVMcGxrQmExVmxud2FzRmNlM1oyNlowQ3FIYVVjWG5Lb2I5N1ps?=
- =?utf-8?B?Y2owS3ZsQTB1Q0pTQ09VdzY3S28rdEVDUldidlI4WEl2d0ZKVDQyYzhyQVZO?=
- =?utf-8?B?OGREU3Z6Y3p2VHB2SEluRXJQZWlzOUcxdHRWVWE5YURUYmYwcDJmODZQOGN2?=
- =?utf-8?B?MEluejc5Z0JKN3hydjhvOVZscFpxdS9tSDNKRlljSkVVM0pBc0N1SGZ2a3E3?=
- =?utf-8?B?K1RkM0VpRVBuUUJBNHFja0E5Z3R5aHQxRzJoOFkyWTFnK1VjaUNEeXN5L1Ey?=
- =?utf-8?B?OXpOSjFPSWk2Rk9mbkZmMWZhSUljVzVYTGlsczFlZmhKY0JxQ1JzZnpWWjJY?=
- =?utf-8?B?dUFRbSs3VmpYK1dFeFdNeDQ3OFYzNU1ZeFg0c2U2eS9pZ0cwT0lJeVR4a0R1?=
- =?utf-8?B?dWNjWlBRdGIxT1ZyT0tWblFKZWhaSUsxLzdpOVZxMDhVVDhNRzJqNjVIZDIy?=
- =?utf-8?B?NWoyVFhMOUJEOVA2UCtodjcvTmE4NXlzdFJObFpIV3Z4VE9QczdIU0JoWlpv?=
- =?utf-8?B?N1E3dTNyRURpQ0J0NzJLUm5qUzFCMnFlZnM2UXVCVUpxcWRLUXpSWHUzMHgr?=
- =?utf-8?B?aHQ4WjZKMTByZTAxS1FhUFE5WHZKdkkyNFhqWjR6NDhQZHFXTWY1ZGFQQ0Iz?=
- =?utf-8?B?NXJlMTFCSGFscjliVmpsemFtTkZRN0RCcU1LN0RYUTBrSXNpYldsQ2pBKytw?=
- =?utf-8?B?QzNzOU1wUjJkTDRMMFJRaE5oclcybm9DaHZHOUVmTjBLUVJ4eTFUYnFGZFE4?=
- =?utf-8?B?NTBMSkQxVFNzaDBST3ZKS0JXWHVCYytQSTQ4cWtvU3ZpMHR5UlVsR0NKbmF2?=
- =?utf-8?B?RHJLWlp2UW1WaGdqL1RmOUtERGFwcnkreTFkczliZHdUN2dhYlNiWGpTaHVY?=
- =?utf-8?B?ZEV4czIrWHh1L3NrWDJZZEpyMW1DeUZDL2lQN2VWVU4rUU9VYmxBWE8zWUtJ?=
- =?utf-8?B?S2JwTjh4QVZuUGxSUFZ6aTNMSXhwOWVoT05nUkI0dS9YcFBEcUx6NTBEVjc1?=
- =?utf-8?B?Ujc3bG11c0hnYzNKUml4Tk9xWXR1ODJoa2xCMnZyTy9VZ0xRd2ZuZDNvRzJG?=
- =?utf-8?B?WmNQVGhJbit5K2RCc0FXOVFpS2p2bkZYc3RNemFML2dobHdCb3djTlB3NGhC?=
- =?utf-8?B?a1NmeWF1TVduWEZtaEhVNHBiTityZWNQTEFaa2JFVkFaTVFTdDdja1VreGJM?=
- =?utf-8?B?akZrUU1aOE1jajdnakxRc3lrQ3doclhXeVFCWDRvL1BEUFluU2xubFYzV1p6?=
- =?utf-8?B?S0VRTGpuckJ4WTFTODg3NDhwa1JLVUc5MWdkeWV4ci9KU3poM1VBTmVESE55?=
- =?utf-8?B?dHhQSWU5NG05bUFmZHBwZnpWaEUvMzZaTmNXZkx3M21rTTVBU1RwY0tuUGN5?=
- =?utf-8?B?c001T1J0eEtlQzlvbDBXWEV0enNweWloNnd3czVDTklFb2RUVFFvdjFSVEx2?=
- =?utf-8?Q?Z+CDASN0sY4J4?=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VE1PR08MB5629
-Original-Authentication-Results: arm.com; dkim=none (message not signed)
- header.d=none;arm.com; dmarc=none action=none header.from=arm.com;
-X-EOPAttributedMessage: 0
-X-MS-Exchange-Transport-CrossTenantHeadersStripped: AM5EUR03FT050.eop-EUR03.prod.protection.outlook.com
-X-MS-Office365-Filtering-Correlation-Id-Prvs: b700b485-307a-4c3e-d2a8-08d8ed3077df
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: JgUdfzmbI4tReR/PoK+vo81Rx06yEnpS2MzXS6VktrXKp1LB0RLVQANMFWuSCH3wHafLyq/6l5PpJ1TEXfOvGwGZrFuwMueOiTCexLAYz1gtq1QaFMToM+zIdEUk6DYh2Ebx9jCJJ9YseSEmt/sP9Q71DqOXrvnPSgfDnKhaPwJUJ77jhNoy6JnzNFYoNsfB6lU3CJt8wIRm86uklI2tGJ3FQMxRs0FTcnBZ5tnzLAWMKvU80GDQYUA/9LOf6JjM2rfTcDZktv0O06Ju5KRmOowL+2YmwyOA4t3BYZhcww1g4mq2JD5Z1ZNkiKhzc8Hugdzd/1xawBuEQhbdsk94cA47XHT49hx11VBVWkq0ymHBFN1yxFUsRbsp/y8N8lQjwMlXNdGYfcv9UZS/DnLwNjOSfyHJQmzTx+uIR+tUeQtKrVJkERADtc0VSTF1armwzIkpncQCWoZ+YVHErXsBDJK/ZP3gTQIl1WJuELaz1nizX3NjNaj6NeJ27kgoV1+AnYZ5zHpiFjSGrhTyBjfcl+4JTJWX6ZuH75OjzWECwnh9BTFysHILSYjFL/9JT9dviE8jTAHblZFucAImI2OQ8dC/1n8wzHfFSPoGH8MCO6HAbjkCXsDdGXjaQNIeGn/jM2jDCMmrFih2gfSDDHpr6LSBQD3CYE72mwd/pEoRQkIb5fM+dlBF/nrKG8UwGnT+
-X-Forefront-Antispam-Report: CIP:63.35.35.123;CTRY:IE;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:64aa7808-outbound-1.mta.getcheckrecipient.com;PTR:ec2-63-35-35-123.eu-west-1.compute.amazonaws.com;CAT:NONE;SFS:(4636009)(346002)(396003)(376002)(136003)(39860400002)(36840700001)(46966006)(36860700001)(16526019)(82310400003)(356005)(186003)(36756003)(31696002)(478600001)(2906002)(70206006)(53546011)(81166007)(70586007)(26005)(5660300002)(6506007)(83380400001)(44832011)(6486002)(8936002)(336012)(4326008)(86362001)(6512007)(31686004)(47076005)(8676002)(82740400003)(316002)(2616005)(43740500002);DIR:OUT;SFP:1101;
-X-OriginatorOrg: arm.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Mar 2021 12:46:25.4266
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 19e1ef2b-ec7e-4d63-22ee-08d8ed308134
-X-MS-Exchange-CrossTenant-Id: f34e5979-57d9-4aaa-ad4d-b122a662184d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=f34e5979-57d9-4aaa-ad4d-b122a662184d;Ip=[63.35.35.123];Helo=[64aa7808-outbound-1.mta.getcheckrecipient.com]
-X-MS-Exchange-CrossTenant-AuthSource: AM5EUR03FT050.eop-EUR03.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VE1PR08MB5246
+In-Reply-To: <3083ca86-9d22-5da5-867d-aa4b5ccec3ff@arm.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-Originating-IP: [10.174.187.128]
+X-ClientProxiedBy: dggeme702-chm.china.huawei.com (10.1.199.98) To
+ dggpemm500023.china.huawei.com (7.185.36.83)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 22/03/2021 12:10, Andrew Jones wrote:
-> So far we've counted on QEMU or kvmtool implicitly zeroing all memory.
-> With our goal of eventually supporting bare-metal targets with
-> target-efi we should explicitly zero any memory we expect to be zeroed
-> ourselves. This obviously includes the BSS, but also the bootcpu's
-> stack, as the bootcpu's thread-info lives in the stack and may get
-> used in early setup to get the cpu index. Note, this means we still
-> assume the bootcpu's cpu index to be zero. That assumption can be
-> removed later.
->
-> Cc: Nikos Nikoleris <nikos.nikoleris@arm.com>
-> Cc: Alexandru Elisei <alexandru.elisei@arm.com>
-> Signed-off-by: Andrew Jones <drjones@redhat.com>
+Hi Alex,
 
-Thanks for this Drew!
+On 2021/3/19 23:07, Alexandru Elisei wrote:
+> Hi Yanan,
+>
+> Sorry for taking so long to reply, been busy with other things unfortunately.
+Still appreciate your patient reply! :)
+> I
+> did notice that you sent a new version of this series, but I would like to
+> continue our discussion on this patch, since it's easier to get the full context.
+>
+> On 3/4/21 7:07 AM, wangyanan (Y) wrote:
+>> Hi Alex,
+>>
+>> On 2021/3/4 1:27, Alexandru Elisei wrote:
+>>> Hi Yanan,
+>>>
+>>> On 3/3/21 11:04 AM, wangyanan (Y) wrote:
+>>>> Hi Alex,
+>>>>
+>>>> On 2021/3/3 1:13, Alexandru Elisei wrote:
+>>>>> Hello,
+>>>>>
+>>>>> On 2/8/21 11:22 AM, Yanan Wang wrote:
+>>>>>> When KVM needs to coalesce the normal page mappings into a block mapping,
+>>>>>> we currently invalidate the old table entry first followed by invalidation
+>>>>>> of TLB, then unmap the page mappings, and install the block entry at last.
+>>>>>>
+>>>>>> It will cost a long time to unmap the numerous page mappings, which means
+>>>>>> there will be a long period when the table entry can be found invalid.
+>>>>>> If other vCPUs access any guest page within the block range and find the
+>>>>>> table entry invalid, they will all exit from guest with a translation fault
+>>>>>> which is not necessary. And KVM will make efforts to handle these faults,
+>>>>>> especially when performing CMOs by block range.
+>>>>>>
+>>>>>> So let's quickly install the block entry at first to ensure uninterrupted
+>>>>>> memory access of the other vCPUs, and then unmap the page mappings after
+>>>>>> installation. This will reduce most of the time when the table entry is
+>>>>>> invalid, and avoid most of the unnecessary translation faults.
+>>>>> I'm not convinced I've fully understood what is going on yet, but it seems to me
+>>>>> that the idea is sound. Some questions and comments below.
+>>>> What I am trying to do in this patch is to adjust the order of rebuilding block
+>>>> mappings from page mappings.
+>>>> Take the rebuilding of 1G block mappings as an example.
+>>>> Before this patch, the order is like:
+>>>> 1) invalidate the table entry of the 1st level(PUD)
+>>>> 2) flush TLB by VMID
+>>>> 3) unmap the old PMD/PTE tables
+>>>> 4) install the new block entry to the 1st level(PUD)
+>>>>
+>>>> So entry in the 1st level can be found invalid by other vcpus in 1), 2), and 3),
+>>>> and it's a long time in 3) to unmap
+>>>> the numerous old PMD/PTE tables, which means the total time of the entry being
+>>>> invalid is long enough to
+>>>> affect the performance.
+>>>>
+>>>> After this patch, the order is like:
+>>>> 1) invalidate the table ebtry of the 1st level(PUD)
+>>>> 2) flush TLB by VMID
+>>>> 3) install the new block entry to the 1st level(PUD)
+>>>> 4) unmap the old PMD/PTE tables
+>>>>
+>>>> The change ensures that period of entry in the 1st level(PUD) being invalid is
+>>>> only in 1) and 2),
+>>>> so if other vcpus access memory within 1G, there will be less chance to find the
+>>>> entry invalid
+>>>> and as a result trigger an unnecessary translation fault.
+>>> Thank you for the explanation, that was my understand of it also, and I believe
+>>> your idea is correct. I was more concerned that I got some of the details wrong,
+>>> and you have kindly corrected me below.
+>>>
+>>>>>> Signed-off-by: Yanan Wang <wangyanan55@huawei.com>
+>>>>>> ---
+>>>>>>     arch/arm64/kvm/hyp/pgtable.c | 26 ++++++++++++--------------
+>>>>>>     1 file changed, 12 insertions(+), 14 deletions(-)
+>>>>>>
+>>>>>> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+>>>>>> index 78a560446f80..308c36b9cd21 100644
+>>>>>> --- a/arch/arm64/kvm/hyp/pgtable.c
+>>>>>> +++ b/arch/arm64/kvm/hyp/pgtable.c
+>>>>>> @@ -434,6 +434,7 @@ struct stage2_map_data {
+>>>>>>         kvm_pte_t            attr;
+>>>>>>           kvm_pte_t            *anchor;
+>>>>>> +    kvm_pte_t            *follow;
+>>>>>>           struct kvm_s2_mmu        *mmu;
+>>>>>>         struct kvm_mmu_memory_cache    *memcache;
+>>>>>> @@ -553,15 +554,14 @@ static int stage2_map_walk_table_pre(u64 addr, u64 end,
+>>>>>> u32 level,
+>>>>>>         if (!kvm_block_mapping_supported(addr, end, data->phys, level))
+>>>>>>             return 0;
+>>>>>>     -    kvm_set_invalid_pte(ptep);
+>>>>>> -
+>>>>>>         /*
+>>>>>> -     * Invalidate the whole stage-2, as we may have numerous leaf
+>>>>>> -     * entries below us which would otherwise need invalidating
+>>>>>> -     * individually.
+>>>>>> +     * If we need to coalesce existing table entries into a block here,
+>>>>>> +     * then install the block entry first and the sub-level page mappings
+>>>>>> +     * will be unmapped later.
+>>>>>>          */
+>>>>>> -    kvm_call_hyp(__kvm_tlb_flush_vmid, data->mmu);
+>>>>>>         data->anchor = ptep;
+>>>>>> +    data->follow = kvm_pte_follow(*ptep);
+>>>>>> +    stage2_coalesce_tables_into_block(addr, level, ptep, data);
+>>>>> Here's how stage2_coalesce_tables_into_block() is implemented from the previous
+>>>>> patch (it might be worth merging it with this patch, I found it impossible to
+>>>>> judge if the function is correct without seeing how it is used and what is
+>>>>> replacing):
+>>>> Ok, will do this if v2 is going to be post.
+>>>>> static void stage2_coalesce_tables_into_block(u64 addr, u32 level,
+>>>>>                              kvm_pte_t *ptep,
+>>>>>                              struct stage2_map_data *data)
+>>>>> {
+>>>>>        u64 granule = kvm_granule_size(level), phys = data->phys;
+>>>>>        kvm_pte_t new = kvm_init_valid_leaf_pte(phys, data->attr, level);
+>>>>>
+>>>>>        kvm_set_invalid_pte(ptep);
+>>>>>
+>>>>>        /*
+>>>>>         * Invalidate the whole stage-2, as we may have numerous leaf entries
+>>>>>         * below us which would otherwise need invalidating individually.
+>>>>>         */
+>>>>>        kvm_call_hyp(__kvm_tlb_flush_vmid, data->mmu);
+>>>>>        smp_store_release(ptep, new);
+>>>>>        data->phys += granule;
+>>>>> }
+>>>>>
+>>>>> This works because __kvm_pgtable_visit() saves the *ptep value before calling
+>>>>> the
+>>>>> pre callback, and it visits the next level table based on the initial pte value,
+>>>>> not the new value written by stage2_coalesce_tables_into_block().
+>>>> Right. So before replacing the initial pte value with the new value, we have
+>>>> to use
+>>>> *data->follow = kvm_pte_follow(*ptep)* in stage2_map_walk_table_pre() to save
+>>>> the initial pte value in advance. And data->follow will be used when  we start to
+>>>> unmap the old sub-level tables later.
+>>> Right, stage2_map_walk_table_post() will use data->follow to free the table page
+>>> which is no longer needed because we've replaced the entire next level table with
+>>> a block mapping.
+>>>
+>>>>> Assuming the first patch in the series is merged ("KVM: arm64: Move the clean of
+>>>>> dcache to the map handler"), this function is missing the CMOs from
+>>>>> stage2_map_walker_try_leaf().
+>>>> Yes, the CMOs are not performed in stage2_coalesce_tables_into_block() currently,
+>>>> because I thought they were not needed when we rebuild the block mappings from
+>>>> normal page mappings.
+>>> This assumes that the *only* situation when we replace a table entry with a block
+>>> mapping is when the next level table (or tables) is *fully* populated. Is there a
+>>> way to prove that this is true? I think it's important to prove it unequivocally,
+>>> because if there's a corner case where this doesn't happen and we remove the
+>>> dcache maintenance, we can end up with hard to reproduce and hard to diagnose
+>>> errors in a guest.
+>> So there is still one thing left about this patch to determine, and that is
+>> whether we can straightly
+>> discard CMOs in stage2_coalesce_tables_into_block() or we should distinguish
+>> different situations.
+>>
+>> Now we know that the situation you have described won't happen, then I think we
+>> will only end up
+>> in stage2_coalesce_tables_into_block() in the following situation:
+>> 1) KVM create a new block mapping in stage2_map_walker_try_leaf() for the first
+>> time, if guest accesses
+>>      memory backed by a THP/HUGETLB huge page. And CMOs will be performed here.
+>> 2) KVM split this block mapping in dirty logging, and build only one new page
+>> mapping.
+>> 3) KVM will build other new page mappings in dirty logging lazily, if guest
+>> access any other pages
+>>      within the block. *In this stage, pages in this block may be fully mapped,
+>> or may be not.*
+>> 4) After dirty logging is disabled, KVM decides to rebuild the block mapping.
+>>
+>> Do we still have to perform CMOs when rebuilding the block mapping in step 4, if
+>> pages in the block
+>> were not fully mapped in step 3 ? I'm not completely sure about this.
+> Did some digging and this is my understanding of what is happening. Please correct
+> me if I get something wrong.
+>
+> When the kernel coalesces the userspace PTEs into a transparent hugepage, KVM will
+> unmap the old mappings and mark the PMD table as invalidated via the MMU
+> notifiers. To have a table at the PMD level while the corresponding entry is a
+> block mapping in the userspace translation tables, it means that the table was
+> created *after* the userspace block mapping was created.
+>
+> user_mem_abort() will create a PAGE_SIZE mapping when the backing userspace
+> mapping is a block mapping in the following situations:
+>
+> 1. The start of the userspace block mapping is not aligned to the start of the
+> stage 2 block mapping (see fault_supports_stage2_huge_mapping()).
+>
+> 2. The stage 2 block mapping falls outside the memslot (see
+> fault_supports_stage2_huge_mapping()).
+>
+> 3. The memslot logs dirty pages.
+>
+> For 1 and 2, the only scenario in which we can use a stage 2 block mapping for the
+> faulting IPA is if the memslot is modified, and that means the IPA range will have
+> been unmapped first, which destroys the PMD table entry (kvm_set_memslot() will
+> call kvm_arch_flush_shadow_memslot because change == KVM_MR_MOVE).
+>
+> This leaves us with scenario 3. We can get in this scenario if the memslot is
+> logging and the userspace mapping has been coalesced into a transparent huge page
+> before dirty logging was set or if the userspace mapping is a hugetlb page. To
+> allow a block mapping at stage 2, we first need to remove the
+> KVM_MEM_LOG_DIRTY_PAGES flag from the memslot. Then we need to get a dabt in the
+> IPA range backed by the userspace block mapping. At this point there's nothing to
+> guarantee that the *entire* IPA range backed by the userspace block mapping is
+> mapped at stage 2.
+I get your point and I think you are correct.
+We can't ensure that dirty logging happens after *all* the stage 2 block 
+mappings
+have been created for the first time by user_mem_abort(). So it's 
+possible that we
+create a PAGE_SIZE mapping for the IPA backed by a huge page in dirty 
+logging
+and the corresponding IPA range has never been mapped by block in stage 
+2 before.
+When KVM needs to coalesce page mappings into a block after dirty 
+logging, it actually
+ends up creating the block mapping for the first time and CMOs are 
+needed in this case.
 
-Good point about BSS too, I was worried about thread_info but in
-target-efi BSS will be a problem too.
+So in summary, the key point of the need of CMOs is whether the next 
+level table (or tables)
+is *fully* populated (you have mentioned before). But checking whether 
+the tables are fully
+populated needs another PTW for the IPA range which will add new complexity.
 
-Reviewed-by: Nikos Nikoleris <nikos.nikoleris@arm.com>
+I think the most concise and straight way is to still uniformly perform 
+CMOs when we need
+to coalesce tables into a block. And that's exactly what the previous 
+code logic does.
 
-> ---
->   arm/cstart.S   | 22 ++++++++++++++++++++++
->   arm/cstart64.S | 23 ++++++++++++++++++++++-
->   arm/flat.lds   |  6 ++++++
->   3 files changed, 50 insertions(+), 1 deletion(-)
+Thanks,
+
+Yanan
+> In this case, we definitely need to do dcache maintenance because the guest might
+> be running with the MMU off and doing loads from from PoC (assuming not FWB), and
+> whatever userspace wrote in the guest memory (like the kernel image) might still
+> be in the dcache. We also need to do the icache inval after the dcache clean +
+> inval because instruction fetches can be cached even if the MMU is off.
 >
-> diff --git a/arm/cstart.S b/arm/cstart.S
-> index ef936ae2f874..6de461ef94bf 100644
-> --- a/arm/cstart.S
-> +++ b/arm/cstart.S
-> @@ -15,12 +15,34 @@
+> Thanks,
 >
->   #define THREAD_START_SP ((THREAD_SIZE - S_FRAME_SIZE * 8) & ~7)
+> Alex
 >
-> +.macro zero_range, tmp1, tmp2, tmp3, tmp4
-> +     mov     \tmp3, #0
-> +     mov     \tmp4, #0
-> +9998:        cmp     \tmp1, \tmp2
-> +     beq     9997f
-> +     strd    \tmp3, \tmp4, [\tmp1]
-> +     add     \tmp1, \tmp1, #8
-> +     b       9998b
-> +9997:
-> +.endm
-> +
-> +
->   .arm
->
->   .section .init
->
->   .globl start
->   start:
-> +     /* zero BSS */
-> +     ldr     r4, =3Dbss
-> +     ldr     r5, =3Debss
-> +     zero_range r4, r5, r6, r7
-> +
-> +     /* zero stack */
-> +     ldr     r4, =3Dstackbase
-> +     ldr     r5, =3Dstacktop
-> +     zero_range r4, r5, r6, r7
-> +
->       /*
->        * set stack, making room at top of stack for cpu0's
->        * exception stacks. Must start wtih stackptr, not
-> diff --git a/arm/cstart64.S b/arm/cstart64.S
-> index 0428014aa58a..4dc5989ef50c 100644
-> --- a/arm/cstart64.S
-> +++ b/arm/cstart64.S
-> @@ -13,6 +13,15 @@
->   #include <asm/page.h>
->   #include <asm/pgtable-hwdef.h>
->
-> +.macro zero_range, tmp1, tmp2
-> +9998:        cmp     \tmp1, \tmp2
-> +     b.eq    9997f
-> +     stp     xzr, xzr, [\tmp1]
-> +     add     \tmp1, \tmp1, #16
-> +     b       9998b
-> +9997:
-> +.endm
-> +
->   .section .init
->
->   /*
-> @@ -51,7 +60,19 @@ start:
->       b       1b
->
->   1:
-> -     /* set up stack */
-> +     /* zero BSS */
-> +     adrp    x4, bss
-> +     add     x4, x4, :lo12:bss
-> +     adrp    x5, ebss
-> +     add     x5, x5, :lo12:ebss
-> +     zero_range x4, x5
-> +
-> +     /* zero and set up stack */
-> +     adrp    x4, stackbase
-> +     add     x4, x4, :lo12:stackbase
-> +     adrp    x5, stacktop
-> +     add     x5, x5, :lo12:stacktop
-> +     zero_range x4, x5
->       mov     x4, #1
->       msr     spsel, x4
->       isb
-> diff --git a/arm/flat.lds b/arm/flat.lds
-> index 25f8d03cba87..8eab3472e2f2 100644
-> --- a/arm/flat.lds
-> +++ b/arm/flat.lds
-> @@ -17,7 +17,11 @@ SECTIONS
->
->       .rodata   : { *(.rodata*) }
->       .data     : { *(.data) }
-> +    . =3D ALIGN(16);
-> +    PROVIDE(bss =3D .);
->       .bss      : { *(.bss) }
-> +    . =3D ALIGN(16);
-> +    PROVIDE(ebss =3D .);
->       . =3D ALIGN(64K);
->       PROVIDE(edata =3D .);
->
-> @@ -26,6 +30,8 @@ SECTIONS
->        * sp must be 16 byte aligned for arm64, and 8 byte aligned for arm
->        * sp must always be strictly less than the true stacktop
->        */
-> +    . =3D ALIGN(16);
-> +    PROVIDE(stackbase =3D .);
->       . +=3D 64K;
->       . =3D ALIGN(64K);
->       PROVIDE(stackptr =3D . - 16);
->
-IMPORTANT NOTICE: The contents of this email and any attachments are confid=
-ential and may also be privileged. If you are not the intended recipient, p=
-lease notify the sender immediately and do not disclose the contents to any=
- other person, use it for any purpose, or store or copy the information in =
-any medium. Thank you.
+>> Thanks,
+>>
+>> Yanan
+>>>> At least, they are not needed if we rebuild the block mappings backed by
+>>>> hugetlbfs
+>>>> pages, because we must have built the new block mappings for the first time
+>>>> before
+>>>> and now need to rebuild them after they were split in dirty logging. Can we
+>>>> agree on this?
+>>>> Then let's see the following situation.
+>>>>> I can think of the following situation where they
+>>>>> are needed:
+>>>>>
+>>>>> 1. The 2nd level (PMD) table that will be turned into a block is mapped at
+>>>>> stage 2
+>>>>> because one of the pages in the 3rd level (PTE) table it points to is
+>>>>> accessed by
+>>>>> the guest.
+>>>>>
+>>>>> 2. The kernel decides to turn the userspace mapping into a transparent huge page
+>>>>> and calls the mmu notifier to remove the mapping from stage 2. The 2nd level
+>>>>> table
+>>>>> is still valid.
+>>>> I have a question here. Won't the PMD entry been invalidated too in this case?
+>>>> If remove of the stage2 mapping by mmu notifier is an unmap operation of a range,
+>>>> then it's correct and reasonable to both invalidate the PMD entry and free the
+>>>> PTE table.
+>>>> As I know, kvm_pgtable_stage2_unmap() does so when unmapping a range.
+>>>>
+>>>> And if I was right about this, we will not end up in
+>>>> stage2_coalesce_tables_into_block()
+>>>> like step 3 describes, but in stage2_map_walker_try_leaf() instead. Because the
+>>>> PMD entry
+>>>> is invalid, so KVM will create the new 2M block mapping.
+>>> Looking at the code for stage2_unmap_walker(), I believe you are correct. After
+>>> the entire PTE table has been unmapped, the function will mark the PMD entry as
+>>> invalid. In the situation I described, at step 3 we would end up in the leaf
+>>> mapper function because the PMD entry is invalid. My example was wrong.
+>>>
+>>>> If I'm wrong about this, then I think this is a valid situation.
+>>>>> 3. Guest accesses a page which is not the page it accessed at step 1, which
+>>>>> causes
+>>>>> a translation fault. KVM decides we can use a PMD block mapping to map the
+>>>>> address
+>>>>> and we end up in stage2_coalesce_tables_into_block(). We need CMOs in this case
+>>>>> because the guest accesses memory it didn't access before.
+>>>>>
+>>>>> What do you think, is that a valid situation?
+>>>>>>         return 0;
+>>>>>>     }
+>>>>>>     @@ -614,20 +614,18 @@ static int stage2_map_walk_table_post(u64 addr, u64
+>>>>>> end, u32 level,
+>>>>>>                           kvm_pte_t *ptep,
+>>>>>>                           struct stage2_map_data *data)
+>>>>>>     {
+>>>>>> -    int ret = 0;
+>>>>>> -
+>>>>>>         if (!data->anchor)
+>>>>>>             return 0;
+>>>>>>     -    free_page((unsigned long)kvm_pte_follow(*ptep));
+>>>>>> -    put_page(virt_to_page(ptep));
+>>>>>> -
+>>>>>> -    if (data->anchor == ptep) {
+>>>>>> +    if (data->anchor != ptep) {
+>>>>>> +        free_page((unsigned long)kvm_pte_follow(*ptep));
+>>>>>> +        put_page(virt_to_page(ptep));
+>>>>>> +    } else {
+>>>>>> +        free_page((unsigned long)data->follow);
+>>>>>>             data->anchor = NULL;
+>>>>>> -        ret = stage2_map_walk_leaf(addr, end, level, ptep, data);
+>>>>> stage2_map_walk_leaf() -> stage2_map_walk_table_post calls put_page() and
+>>>>> get_page() once in our case (valid old mapping). It looks to me like we're
+>>>>> missing
+>>>>> a put_page() call when the function is called for the anchor. Have you found the
+>>>>> call to be unnecessary?
+>>>> Before this patch:
+>>>> When we find data->anchor == ptep, put_page() has been called once in advance
+>>>> for the anchor
+>>>> in stage2_map_walk_table_post(). Then we call stage2_map_walk_leaf() ->
+>>>> stage2_map_walker_try_leaf()
+>>>> to install the block entry, and only get_page() will be called once in
+>>>> stage2_map_walker_try_leaf().
+>>>> There is a put_page() followed by a get_page() for the anchor, and there will
+>>>> not be a problem about
+>>>> page_counts.
+>>> This is how I'm reading the code before your patch:
+>>>
+>>> - stage2_map_walk_table_post() returns early if there is no anchor.
+>>>
+>>> - stage2_map_walk_table_pre() sets the anchor and marks the entry as invalid. The
+>>> entry was a table so the leaf visitor is not called in __kvm_pgtable_visit().
+>>>
+>>> - __kvm_pgtable_visit() visits the next level table.
+>>>
+>>> - stage2_map_walk_table_post() calls put_page(), calls stage2_map_walk_leaf() ->
+>>> stage2_map_walker_try_leaf(). The old entry was invalidated by the pre visitor, so
+>>> it only calls get_page() (and not put_page() + get_page().
+>>>
+>>> I agree with your conclusion, I didn't realize that because the pre visitor marks
+>>> the entry as invalid, stage2_map_walker_try_leaf() will not call put_page().
+>>>
+>>>> After this patch:
+>>>> Before we find data->anchor == ptep and after it, there is not a put_page() call
+>>>> for the anchor.
+>>>> This is because that we didn't call get_page() either in
+>>>> stage2_coalesce_tables_into_block() when
+>>>> install the block entry. So I think there will not be a problem too.
+>>> I agree, the refcount will be identical.
+>>>
+>>>> Is above the right answer for your point?
+>>> Yes, thank you clearing that up for me.
+>>>
+>>> Thanks,
+>>>
+>>> Alex
+>>>
+>>>>>>         }
+>>>>>>     -    return ret;
+>>>>>> +    return 0;
+>>>>> I think it's correct for this function to succeed unconditionally. The error was
+>>>>> coming from stage2_map_walk_leaf() -> stage2_map_walker_try_leaf(). The function
+>>>>> can return an error code if block mapping is not supported, which we know is
+>>>>> supported because we have an anchor, and if only the permissions are different
+>>>>> between the old and the new entry, but in our case we've changed both the valid
+>>>>> and type bits.
+>>>> Agreed. Besides, we will definitely not end up updating an old valid entry for
+>>>> the anchor
+>>>> in stage2_map_walker_try_leaf(), because *anchor has already been invalidated in
+>>>> stage2_map_walk_table_pre() before set the anchor, so it will look like a build
+>>>> of new mapping.
+>>>>
+>>>> Thanks,
+>>>>
+>>>> Yanan
+>>>>> Thanks,
+>>>>>
+>>>>> Alex
+>>>>>
+>>>>>>     }
+>>>>>>       /*
+>>>>> .
+>>> .
+> .
