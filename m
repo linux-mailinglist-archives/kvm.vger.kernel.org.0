@@ -2,21 +2,21 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8A4A1343915
-	for <lists+kvm@lfdr.de>; Mon, 22 Mar 2021 07:03:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A55C634391A
+	for <lists+kvm@lfdr.de>; Mon, 22 Mar 2021 07:03:40 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230079AbhCVGDK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 22 Mar 2021 02:03:10 -0400
-Received: from szxga05-in.huawei.com ([45.249.212.191]:14050 "EHLO
-        szxga05-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230018AbhCVGCk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 22 Mar 2021 02:02:40 -0400
+        id S230125AbhCVGDR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 22 Mar 2021 02:03:17 -0400
+Received: from szxga04-in.huawei.com ([45.249.212.190]:14122 "EHLO
+        szxga04-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229875AbhCVGCo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 22 Mar 2021 02:02:44 -0400
 Received: from DGGEMS412-HUB.china.huawei.com (unknown [172.30.72.58])
-        by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4F3kP41QwnzNq3Y;
-        Mon, 22 Mar 2021 14:00:08 +0800 (CST)
+        by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4F3kPn19bLz19GH0;
+        Mon, 22 Mar 2021 14:00:45 +0800 (CST)
 Received: from DESKTOP-7FEPK9S.china.huawei.com (10.174.184.135) by
  DGGEMS412-HUB.china.huawei.com (10.3.19.212) with Microsoft SMTP Server id
- 14.3.498.0; Mon, 22 Mar 2021 14:02:31 +0800
+ 14.3.498.0; Mon, 22 Mar 2021 14:02:33 +0800
 From:   Shenming Lu <lushenming@huawei.com>
 To:     Marc Zyngier <maz@kernel.org>, Eric Auger <eric.auger@redhat.com>,
         "Will Deacon" <will@kernel.org>,
@@ -28,9 +28,9 @@ CC:     Alex Williamson <alex.williamson@redhat.com>,
         Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
         <wanghaibin.wang@huawei.com>, <yuzenghui@huawei.com>,
         <lushenming@huawei.com>
-Subject: [PATCH v5 5/6] KVM: arm64: GICv4.1: Restore VLPI pending state to physical side
-Date:   Mon, 22 Mar 2021 14:01:57 +0800
-Message-ID: <20210322060158.1584-6-lushenming@huawei.com>
+Subject: [PATCH v5 6/6] KVM: arm64: GICv4.1: Give a chance to save VLPI state
+Date:   Mon, 22 Mar 2021 14:01:58 +0800
+Message-ID: <20210322060158.1584-7-lushenming@huawei.com>
 X-Mailer: git-send-email 2.27.0.windows.1
 In-Reply-To: <20210322060158.1584-1-lushenming@huawei.com>
 References: <20210322060158.1584-1-lushenming@huawei.com>
@@ -43,57 +43,50 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Zenghui Yu <yuzenghui@huawei.com>
+Before GICv4.1, we don't have direct access to the VLPI state. So
+we simply let it fail early when encountering any VLPI in saving.
 
-When setting the forwarding path of a VLPI (switch to the HW mode),
-we can also transfer the pending state from irq->pending_latch to
-VPT (especially in migration, the pending states of VLPIs are restored
-into kvm’s vgic first). And we currently send "INT+VSYNC" to trigger
-a VLPI to pending.
+But now we don't have to return -EACCES directly if on GICv4.1. Let’s
+change the hard code and give a chance to save the VLPI state (and
+preserve the UAPI).
 
-Signed-off-by: Zenghui Yu <yuzenghui@huawei.com>
 Signed-off-by: Shenming Lu <lushenming@huawei.com>
 ---
- arch/arm64/kvm/vgic/vgic-v4.c | 19 +++++++++++++++++++
- 1 file changed, 19 insertions(+)
+ Documentation/virt/kvm/devices/arm-vgic-its.rst | 2 +-
+ arch/arm64/kvm/vgic/vgic-its.c                  | 6 +++---
+ 2 files changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/arch/arm64/kvm/vgic/vgic-v4.c b/arch/arm64/kvm/vgic/vgic-v4.c
-index ac029ba3d337..c1845d8f5f7e 100644
---- a/arch/arm64/kvm/vgic/vgic-v4.c
-+++ b/arch/arm64/kvm/vgic/vgic-v4.c
-@@ -404,6 +404,7 @@ int kvm_vgic_v4_set_forwarding(struct kvm *kvm, int virq,
- 	struct vgic_its *its;
- 	struct vgic_irq *irq;
- 	struct its_vlpi_map map;
-+	unsigned long flags;
- 	int ret;
+diff --git a/Documentation/virt/kvm/devices/arm-vgic-its.rst b/Documentation/virt/kvm/devices/arm-vgic-its.rst
+index 6c304fd2b1b4..d257eddbae29 100644
+--- a/Documentation/virt/kvm/devices/arm-vgic-its.rst
++++ b/Documentation/virt/kvm/devices/arm-vgic-its.rst
+@@ -80,7 +80,7 @@ KVM_DEV_ARM_VGIC_GRP_CTRL
+     -EFAULT  Invalid guest ram access
+     -EBUSY   One or more VCPUS are running
+     -EACCES  The virtual ITS is backed by a physical GICv4 ITS, and the
+-	     state is not available
++	     state is not available without GICv4.1
+     =======  ==========================================================
  
- 	if (!vgic_supports_direct_msis(kvm))
-@@ -449,6 +450,24 @@ int kvm_vgic_v4_set_forwarding(struct kvm *kvm, int virq,
- 	irq->host_irq	= virq;
- 	atomic_inc(&map.vpe->vlpi_count);
+ KVM_DEV_ARM_VGIC_GRP_ITS_REGS
+diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
+index 40cbaca81333..ec7543a9617c 100644
+--- a/arch/arm64/kvm/vgic/vgic-its.c
++++ b/arch/arm64/kvm/vgic/vgic-its.c
+@@ -2218,10 +2218,10 @@ static int vgic_its_save_itt(struct vgic_its *its, struct its_device *device)
+ 		/*
+ 		 * If an LPI carries the HW bit, this means that this
+ 		 * interrupt is controlled by GICv4, and we do not
+-		 * have direct access to that state. Let's simply fail
+-		 * the save operation...
++		 * have direct access to that state without GICv4.1.
++		 * Let's simply fail the save operation...
+ 		 */
+-		if (ite->irq->hw)
++		if (ite->irq->hw && !kvm_vgic_global_state.has_gicv4_1)
+ 			return -EACCES;
  
-+	/* Transfer pending state */
-+	raw_spin_lock_irqsave(&irq->irq_lock, flags);
-+	if (irq->pending_latch) {
-+		ret = irq_set_irqchip_state(irq->host_irq,
-+					    IRQCHIP_STATE_PENDING,
-+					    irq->pending_latch);
-+		WARN_RATELIMIT(ret, "IRQ %d", irq->host_irq);
-+
-+		/*
-+		 * Clear pending_latch and communicate this state
-+		 * change via vgic_queue_irq_unlock.
-+		 */
-+		irq->pending_latch = false;
-+		vgic_queue_irq_unlock(kvm, irq, flags);
-+	} else {
-+		raw_spin_unlock_irqrestore(&irq->irq_lock, flags);
-+	}
-+
- out:
- 	mutex_unlock(&its->its_lock);
- 	return ret;
+ 		ret = vgic_its_save_ite(its, device, ite, gpa, ite_esz);
 -- 
 2.19.1
 
