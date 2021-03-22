@@ -2,81 +2,82 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A8B4E3448E8
-	for <lists+kvm@lfdr.de>; Mon, 22 Mar 2021 16:12:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8EC7D3448F4
+	for <lists+kvm@lfdr.de>; Mon, 22 Mar 2021 16:13:46 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231511AbhCVPLg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 22 Mar 2021 11:11:36 -0400
-Received: from verein.lst.de ([213.95.11.211]:56205 "EHLO verein.lst.de"
+        id S231421AbhCVPNO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 22 Mar 2021 11:13:14 -0400
+Received: from mail.kernel.org ([198.145.29.99]:39578 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230129AbhCVPL3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 22 Mar 2021 11:11:29 -0400
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id CDA3268BFE; Mon, 22 Mar 2021 16:11:25 +0100 (CET)
-Date:   Mon, 22 Mar 2021 16:11:25 +0100
-From:   Christoph Hellwig <hch@lst.de>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     Alex Williamson <alex.williamson@redhat.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Max Gurtovoy <mgurtovoy@nvidia.com>,
-        Alexey Kardashevskiy <aik@ozlabs.ru>, cohuck@redhat.com,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        liranl@nvidia.com, oren@nvidia.com, tzahio@nvidia.com,
-        leonro@nvidia.com, yarong@nvidia.com, aviadye@nvidia.com,
-        shahafs@nvidia.com, artemp@nvidia.com, kwankhede@nvidia.com,
-        ACurrid@nvidia.com, cjia@nvidia.com, yishaih@nvidia.com,
-        mjrosato@linux.ibm.com
-Subject: Re: [PATCH 8/9] vfio/pci: export nvlink2 support into vendor
- vfio_pci drivers
-Message-ID: <20210322151125.GA1051@lst.de>
-References: <20210309083357.65467-9-mgurtovoy@nvidia.com> <19e73e58-c7a9-03ce-65a7-50f37d52ca15@ozlabs.ru> <8941cf42-0c40-776e-6c02-9227146d3d66@nvidia.com> <20210319092341.14bb179a@omen.home.shazbot.org> <20210319161722.GY2356281@nvidia.com> <20210319162033.GA18218@lst.de> <20210319162848.GZ2356281@nvidia.com> <20210319163449.GA19186@lst.de> <20210319113642.4a9b0be1@omen.home.shazbot.org> <20210319200749.GB2356281@nvidia.com>
+        id S231548AbhCVPMz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 22 Mar 2021 11:12:55 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id B2B9861990;
+        Mon, 22 Mar 2021 15:12:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+        s=korg; t=1616425965;
+        bh=XaGJOXpYJ2i+MQsioxl6Tg28Kym8UEMe4b4RpcUBm8U=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=I4suPRlqsJeGbJ3kRh4ME6/eP0O/yqXU+Rr96XxgbYcvuIrIDXw4eyoxUAx3shFY3
+         EKQL2w6YUEMhzsE51MWi0icihMdRehucbnlG5qw1sdZzfAj/vvYpPzhT2/9Vzwoh7k
+         dHoP/0Vx5qwqfEnfs1Yzmdpu1roVfSG7U9Med5yw=
+Date:   Mon, 22 Mar 2021 16:12:42 +0100
+From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Michael Ellerman <mpe@ellerman.id.au>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Jason Gunthorpe <jgg@nvidia.com>,
+        David Airlie <airlied@linux.ie>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        dri-devel@lists.freedesktop.org, Paul Mackerras <paulus@samba.org>,
+        linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, linux-api@vger.kernel.org
+Subject: Re: remove the nvlink2 pci_vfio subdriver
+Message-ID: <YFiz6sIJluL/u2Cu@kroah.com>
+References: <20210322150155.797882-1-hch@lst.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210319200749.GB2356281@nvidia.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <20210322150155.797882-1-hch@lst.de>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Mar 19, 2021 at 05:07:49PM -0300, Jason Gunthorpe wrote:
-> The way the driver core works is to first match against the already
-> loaded driver list, then trigger an event for module loading and when
-> new drivers are registered they bind to unbound devices.
+On Mon, Mar 22, 2021 at 04:01:53PM +0100, Christoph Hellwig wrote:
+> Hi all,
 > 
-> So, the trouble is the event through userspace because the kernel
-> can't just go on to use vfio_pci until it knows userspace has failed
-> to satisfy the load request.
+> the nvlink2 vfio subdriver is a weird beast.  It supports a hardware
+> feature without any open source component - what would normally be
+> the normal open source userspace that we require for kernel drivers,
+> although in this particular case user space could of course be a
+> kernel driver in a VM.  It also happens to be a complete mess that
+> does not properly bind to PCI IDs, is hacked into the vfio_pci driver
+> and also pulles in over 1000 lines of code always build into powerpc
+> kernels that have Power NV support enabled.  Because of all these
+> issues and the lack of breaking userspace when it is removed I think
+> the best idea is to simply kill.
 > 
-> One answer is to have userspace udev have the "hook" here and when a
-> vfio flavour mod alias is requested on a PCI device it swaps in
-> vfio_pci if it can't find an alternative.
-> 
-> The dream would be a system with no vfio modules loaded could do some
-> 
->  echo "vfio" > /sys/bus/pci/xxx/driver_flavour
-> 
-> And a module would be loaded and a struct vfio_device is created for
-> that device. Very easy for the user.
+> Diffstat:
+>  arch/powerpc/platforms/powernv/npu-dma.c     |  705 ---------------------------
+>  b/arch/powerpc/include/asm/opal.h            |    3 
+>  b/arch/powerpc/include/asm/pci-bridge.h      |    1 
+>  b/arch/powerpc/include/asm/pci.h             |    7 
+>  b/arch/powerpc/platforms/powernv/Makefile    |    2 
+>  b/arch/powerpc/platforms/powernv/opal-call.c |    2 
+>  b/arch/powerpc/platforms/powernv/pci-ioda.c  |  185 -------
+>  b/arch/powerpc/platforms/powernv/pci.c       |   11 
+>  b/arch/powerpc/platforms/powernv/pci.h       |   17 
+>  b/arch/powerpc/platforms/pseries/pci.c       |   23 
+>  b/drivers/vfio/pci/Kconfig                   |    6 
+>  b/drivers/vfio/pci/Makefile                  |    1 
+>  b/drivers/vfio/pci/vfio_pci.c                |   18 
+>  b/drivers/vfio/pci/vfio_pci_private.h        |   14 
+>  b/include/uapi/linux/vfio.h                  |   40 -
+>  drivers/vfio/pci/vfio_pci_nvlink2.c          |  490 ------------------
+>  16 files changed, 8 insertions(+), 1517 deletions(-)
 
-Maybe I did not communicate my suggestion last week very well.  My
-idea is that there are no different pci_drivers vs vfio or not,
-but different personalities of the same driver.
+I thought this was supposed to be removed a few years ago!
 
-So the interface would still look somewhat like your suggestion above,
-although I'd prefer something like:
+Anyway, no objection from me:
 
-   echo 1 > /sys/bus/pci/xxx/use_vfio
-
-How would the flow look like for the various cases?
-
- a) if a driver is bound, and it supports the enable_vfio method that
-    is called, and everything is controller by the driver, which uses
-    symbols exorted from vfio/vfio_pci to implement the functionality
- b) if a driver is bound, but does not support the enable_vfio method
-    it is unbound and vfio_pci is bound instead, continue at c)
- c) use the normal current vfio flow
-
-do the reverse on a
-
-echo 0 > /sys/bus/pci/xxx/use_vfio
+Acked-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
