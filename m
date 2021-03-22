@@ -2,78 +2,201 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1C1C8343D8F
-	for <lists+kvm@lfdr.de>; Mon, 22 Mar 2021 11:14:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 41852343DEA
+	for <lists+kvm@lfdr.de>; Mon, 22 Mar 2021 11:31:35 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229692AbhCVKNf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 22 Mar 2021 06:13:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50148 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229991AbhCVKNI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 22 Mar 2021 06:13:08 -0400
-Received: from mail-yb1-xb41.google.com (mail-yb1-xb41.google.com [IPv6:2607:f8b0:4864:20::b41])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A8380C061764
-        for <kvm@vger.kernel.org>; Mon, 22 Mar 2021 03:13:07 -0700 (PDT)
-Received: by mail-yb1-xb41.google.com with SMTP id 8so5942408ybc.13
-        for <kvm@vger.kernel.org>; Mon, 22 Mar 2021 03:13:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:reply-to:from:date:message-id:subject:to;
-        bh=1P1ylb+0K8r+W1E1V6incN0kq8bWpLVNDCMYMUCyg3s=;
-        b=bzi9vD6E2AUdbZQcvIbscwiGt+DTHszzRZNSiBV+xdfdy2AobAc2RBvwcUXty1qzph
-         schx+6gUrFpQg0kwbHHoMsFJDccEcNvvbjUMxxV6KxIPypgWWbj2LGGKiUec6xy+O3+t
-         p/fW+5MPGtAaHwUiHzDOHJRlA7ZYNtV//X0pXNts//QazAVxCBKOqQXYhFYEzXkTU6Up
-         0nlElbgwuDHWF4fFBdhg0f8lHFfzBWClSKXcII+GyYatrzZnnBOpLcpytN39rwbHfQtU
-         BMyqXek+dvZTu/7zOoCwu/luW8bIUY0aZgEu5k6tvmsaap6jkZXzxxd9Ag3zqERDjWFh
-         Ldtw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:reply-to:from:date:message-id
-         :subject:to;
-        bh=1P1ylb+0K8r+W1E1V6incN0kq8bWpLVNDCMYMUCyg3s=;
-        b=Dttw6mxx2CkaQ5l1fP3LUUfqDas+XKcPGir6gnE593vgdkSc2bGxFrdnpe/6VO3aaJ
-         Dg2Q1nwBLIIakBhbfsj6E7o2OrExDXdI0d0R9wLPNCK6QbAqDImaiz5BTUPXL7zDWFIV
-         cAV0HOmNwNVbCL1G4Vd5jrJM7UrgH3lKhRjrCOBk3Wqscz5uKkYecLQSabfpLV8uq+xA
-         mZtmLetYsZITyAliPDRtMC/RKpyywal9k5daOGyIjgmMhnW9LXV+qmSYYItTZhhSVVdR
-         1ZRbq1AjG1VPknbRQ8T4m54+aa6wSx93sLjksMhHQGJxVvEXYSVYZHO+yf3+OXIhr5wY
-         skbg==
-X-Gm-Message-State: AOAM531jhtGgHY8i1Q4OqbWW/7HzD+yZWJ/CC3BpNT02CkqcyXcC0Ca/
-        XBrnn/B8h7vzAaoC24Tc8SNj/bEAz1R6EDxzAKI=
-X-Google-Smtp-Source: ABdhPJzjNDesOHgKan6gxFJnQcCnxqWFwfXjKBzQkeRAMHPfDcIokyDaoMBrEXJUCuRcGyHQuXGl5HGb2+GMC6unNto=
-X-Received: by 2002:a25:d44f:: with SMTP id m76mr24827956ybf.101.1616407984718;
- Mon, 22 Mar 2021 03:13:04 -0700 (PDT)
+        id S230294AbhCVKbG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 22 Mar 2021 06:31:06 -0400
+Received: from foss.arm.com ([217.140.110.172]:57088 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S230046AbhCVKay (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 22 Mar 2021 06:30:54 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 190FA1063;
+        Mon, 22 Mar 2021 03:30:54 -0700 (PDT)
+Received: from [192.168.0.110] (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 934DB3F718;
+        Mon, 22 Mar 2021 03:30:53 -0700 (PDT)
+Subject: Re: [kvm-unit-tests PATCH 2/4] arm/arm64: Read system registers to
+ get the state of the MMU
+To:     Nikos Nikoleris <nikos.nikoleris@arm.com>, kvm@vger.kernel.org
+Cc:     drjones@redhat.com
+References: <20210319122414.129364-1-nikos.nikoleris@arm.com>
+ <20210319122414.129364-3-nikos.nikoleris@arm.com>
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+Message-ID: <b951ed2e-cd3b-3b87-7fee-b7ac8518121e@arm.com>
+Date:   Mon, 22 Mar 2021 10:30:43 +0000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.8.1
 MIME-Version: 1.0
-Received: by 2002:a05:7108:2b49:0:0:0:0 with HTTP; Mon, 22 Mar 2021 03:13:02
- -0700 (PDT)
-Reply-To: sarandan122@yahoo.com
-From:   Mrs Sarah Daniel <nrevpeter@gmail.com>
-Date:   Mon, 22 Mar 2021 11:13:02 +0100
-Message-ID: <CA+kTmTfLmEmbxVWGSEe7oHH404SBdR=jaPtOmz2GvwgyU51x9w@mail.gmail.com>
-Subject: Donation for charity work of God
-To:     undisclosed-recipients:;
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20210319122414.129364-3-nikos.nikoleris@arm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Donation for charity work of God
+Hi Nikos,
 
-Greetings to you and sorry if this message came to you as a
-surprise.My name is Mrs Sarah Daniel a widow, I found your email
-address through my late husbands internet dater late Mr. Daniel
+On 3/19/21 12:24 PM, Nikos Nikoleris wrote:
+> When we are in EL1 we can directly tell if the local cpu's MMU is on
+> by reading a system register (SCTRL/SCTRL_EL1). In EL0, we use the
+> relevant cpumask. This way we don't have to rely on the cpu id in
+> thread_info when we are in setup executing in EL1. In subsequent
+> patches we resolve the problem of identifying safely whether we are
+> executing in EL1 or EL0.
 
-I am presently admitted at the hospital suffering from a blood cancer
-and Parkinson diseases. I have only about a few months to live and I
-want you to Transfer the sum of ( $6.200,000.00) united states dollars
-to your account so you can assist me Distribute my funds to charity
-homes in your country ,
+The commit message doesn't explain why mmu_disabled_cpu_count has been removed. It
+also doesn't explain why the disabled cpumask has been replaced with an enabled
+cpumask.
 
-I have set aside 20% for you and your family keep while you donate 80%
-to the less privilege people,
+Other than that, it is a good idea to stop mmu_enabled() from checking the cpumask
+because marking the MMU as enabled/disabled requires modifying the cpumask, which
+calls mmu_enabled(). That's not a problem at EL0 because EL0 cannot turn on or off
+the MMU.
 
-I will give you more details or full story as soon as i receive your
-reply as the fund was deposited with a bank
+Thanks,
 
-Remain Blessed
+Alex
 
-Mrs Sarah Daniel
+>
+> Signed-off-by: Nikos Nikoleris <nikos.nikoleris@arm.com>
+> ---
+>  lib/arm/asm/mmu-api.h     |  7 +------
+>  lib/arm/asm/processor.h   |  7 +++++++
+>  lib/arm64/asm/processor.h |  1 +
+>  lib/arm/mmu.c             | 16 ++++++++--------
+>  lib/arm/processor.c       |  5 +++++
+>  lib/arm64/processor.c     |  5 +++++
+>  6 files changed, 27 insertions(+), 14 deletions(-)
+>
+> diff --git a/lib/arm/asm/mmu-api.h b/lib/arm/asm/mmu-api.h
+> index 3d04d03..05fc12b 100644
+> --- a/lib/arm/asm/mmu-api.h
+> +++ b/lib/arm/asm/mmu-api.h
+> @@ -5,12 +5,7 @@
+>  #include <stdbool.h>
+>  
+>  extern pgd_t *mmu_idmap;
+> -extern unsigned int mmu_disabled_cpu_count;
+> -extern bool __mmu_enabled(void);
+> -static inline bool mmu_enabled(void)
+> -{
+> -	return mmu_disabled_cpu_count == 0 || __mmu_enabled();
+> -}
+> +extern bool mmu_enabled(void);
+>  extern void mmu_mark_enabled(int cpu);
+>  extern void mmu_mark_disabled(int cpu);
+>  extern void mmu_enable(pgd_t *pgtable);
+> diff --git a/lib/arm/asm/processor.h b/lib/arm/asm/processor.h
+> index 273366d..af54c09 100644
+> --- a/lib/arm/asm/processor.h
+> +++ b/lib/arm/asm/processor.h
+> @@ -67,11 +67,13 @@ extern int mpidr_to_cpu(uint64_t mpidr);
+>  	((mpidr >> MPIDR_LEVEL_SHIFT(level)) & 0xff)
+>  
+>  extern void start_usr(void (*func)(void *arg), void *arg, unsigned long sp_usr);
+> +extern bool __mmu_enabled(void);
+>  extern bool is_user(void);
+>  
+>  #define CNTVCT		__ACCESS_CP15_64(1, c14)
+>  #define CNTFRQ		__ACCESS_CP15(c14, 0, c0, 0)
+>  #define CTR		__ACCESS_CP15(c0, 0, c0, 1)
+> +#define SCTRL		__ACCESS_CP15(c1, 0, c0, 0)
+>  
+>  static inline u64 get_cntvct(void)
+>  {
+> @@ -89,6 +91,11 @@ static inline u32 get_ctr(void)
+>  	return read_sysreg(CTR);
+>  }
+>  
+> +static inline u32 get_sctrl(void)
+> +{
+> +	return read_sysreg(SCTRL);
+> +}
+> +
+>  extern unsigned long dcache_line_size;
+>  
+>  #endif /* _ASMARM_PROCESSOR_H_ */
+> diff --git a/lib/arm64/asm/processor.h b/lib/arm64/asm/processor.h
+> index 771b2d1..8e2037e 100644
+> --- a/lib/arm64/asm/processor.h
+> +++ b/lib/arm64/asm/processor.h
+> @@ -98,6 +98,7 @@ extern int mpidr_to_cpu(uint64_t mpidr);
+>  
+>  extern void start_usr(void (*func)(void *arg), void *arg, unsigned long sp_usr);
+>  extern bool is_user(void);
+> +extern bool __mmu_enabled(void);
+>  
+>  static inline u64 get_cntvct(void)
+>  {
+> diff --git a/lib/arm/mmu.c b/lib/arm/mmu.c
+> index a1862a5..d806c63 100644
+> --- a/lib/arm/mmu.c
+> +++ b/lib/arm/mmu.c
+> @@ -24,10 +24,9 @@ extern unsigned long etext;
+>  pgd_t *mmu_idmap;
+>  
+>  /* CPU 0 starts with disabled MMU */
+> -static cpumask_t mmu_disabled_cpumask = { {1} };
+> -unsigned int mmu_disabled_cpu_count = 1;
+> +static cpumask_t mmu_enabled_cpumask = { {0} };
+>  
+> -bool __mmu_enabled(void)
+> +bool mmu_enabled(void)
+>  {
+>  	int cpu = current_thread_info()->cpu;
+>  
+> @@ -38,19 +37,20 @@ bool __mmu_enabled(void)
+>  	 * spinlock, atomic bitop, etc., otherwise we'll recurse.
+>  	 * [cpumask_]test_bit is safe though.
+>  	 */
+> -	return !cpumask_test_cpu(cpu, &mmu_disabled_cpumask);
+> +	if (is_user())
+> +		return cpumask_test_cpu(cpu, &mmu_enabled_cpumask);
+> +	else
+> +		return __mmu_enabled();
+>  }
+>  
+>  void mmu_mark_enabled(int cpu)
+>  {
+> -	if (cpumask_test_and_clear_cpu(cpu, &mmu_disabled_cpumask))
+> -		--mmu_disabled_cpu_count;
+> +	cpumask_set_cpu(cpu, &mmu_enabled_cpumask);
+>  }
+>  
+>  void mmu_mark_disabled(int cpu)
+>  {
+> -	if (!cpumask_test_and_set_cpu(cpu, &mmu_disabled_cpumask))
+> -		++mmu_disabled_cpu_count;
+> +	cpumask_clear_cpu(cpu, &mmu_enabled_cpumask);
+>  }
+>  
+>  extern void asm_mmu_enable(phys_addr_t pgtable);
+> diff --git a/lib/arm/processor.c b/lib/arm/processor.c
+> index 773337e..a2d39a4 100644
+> --- a/lib/arm/processor.c
+> +++ b/lib/arm/processor.c
+> @@ -145,3 +145,8 @@ bool is_user(void)
+>  {
+>  	return current_thread_info()->flags & TIF_USER_MODE;
+>  }
+> +
+> +bool __mmu_enabled(void)
+> +{
+> +	return get_sctrl() & CR_M;
+> +}
+> diff --git a/lib/arm64/processor.c b/lib/arm64/processor.c
+> index 2a024e3..ef55862 100644
+> --- a/lib/arm64/processor.c
+> +++ b/lib/arm64/processor.c
+> @@ -257,3 +257,8 @@ bool is_user(void)
+>  {
+>  	return current_thread_info()->flags & TIF_USER_MODE;
+>  }
+> +
+> +bool __mmu_enabled(void)
+> +{
+> +	return read_sysreg(sctlr_el1) & SCTLR_EL1_M;
+> +}
