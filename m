@@ -2,661 +2,440 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9F515344053
-	for <lists+kvm@lfdr.de>; Mon, 22 Mar 2021 13:00:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CC6A834405C
+	for <lists+kvm@lfdr.de>; Mon, 22 Mar 2021 13:02:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229548AbhCVL7n (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 22 Mar 2021 07:59:43 -0400
-Received: from szxga02-in.huawei.com ([45.249.212.188]:3916 "EHLO
-        szxga02-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229467AbhCVL7K (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 22 Mar 2021 07:59:10 -0400
-Received: from dggeml406-hub.china.huawei.com (unknown [172.30.72.55])
-        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4F3tK00XB3z5grS;
-        Mon, 22 Mar 2021 19:57:08 +0800 (CST)
-Received: from dggpemm500023.china.huawei.com (7.185.36.83) by
- dggeml406-hub.china.huawei.com (10.3.17.50) with Microsoft SMTP Server (TLS)
- id 14.3.498.0; Mon, 22 Mar 2021 19:59:05 +0800
-Received: from [10.174.187.128] (10.174.187.128) by
- dggpemm500023.china.huawei.com (7.185.36.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id
- 15.1.2106.2; Mon, 22 Mar 2021 19:59:04 +0800
-Subject: Re: [RFC PATCH v4 9/9] KVM: selftests: Add a test for kvm page table
- code
-To:     Andrew Jones <drjones@redhat.com>
-CC:     <kvm@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        "Ben Gardon" <bgardon@google.com>,
-        Sean Christopherson <seanjc@google.com>,
-        "Vitaly Kuznetsov" <vkuznets@redhat.com>,
-        Peter Xu <peterx@redhat.com>, Marc Zyngier <maz@kernel.org>,
-        Ingo Molnar <mingo@kernel.org>,
-        Adrian Hunter <adrian.hunter@intel.com>,
-        Jiri Olsa <jolsa@redhat.com>,
-        "Arnaldo Carvalho de Melo" <acme@redhat.com>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Michael Kerrisk <mtk.manpages@gmail.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        <wanghaibin.wang@huawei.com>, <yezengruan@huawei.com>,
-        <yuzenghui@huawei.com>
-References: <20210302125751.19080-1-wangyanan55@huawei.com>
- <20210302125751.19080-10-wangyanan55@huawei.com>
- <20210312142006.hqhwazfsonsdqm2i@kamzik.brq.redhat.com>
-From:   "wangyanan (Y)" <wangyanan55@huawei.com>
-Message-ID: <3d8d0fb9-b179-8a01-be1a-fa20f8a257ad@huawei.com>
-Date:   Mon, 22 Mar 2021 19:59:04 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.4.0
+        id S230253AbhCVMBt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 22 Mar 2021 08:01:49 -0400
+Received: from foss.arm.com ([217.140.110.172]:58302 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S230262AbhCVMBW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 22 Mar 2021 08:01:22 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 42ADA1063;
+        Mon, 22 Mar 2021 05:01:21 -0700 (PDT)
+Received: from [192.168.0.110] (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 818BE3F718;
+        Mon, 22 Mar 2021 05:01:20 -0700 (PDT)
+Subject: Re: [kvm-unit-tests PATCH 2/6] arm/arm64: Remove dcache_line_size
+ global variable
+To:     Andre Przywara <andre.przywara@arm.com>
+Cc:     drjones@redhat.com, kvm@vger.kernel.org,
+        kvmarm@lists.cs.columbia.edu
+References: <20210227104201.14403-1-alexandru.elisei@arm.com>
+ <20210227104201.14403-3-alexandru.elisei@arm.com>
+ <20210304150031.7805c75e@slackpad.fritz.box>
+ <ce582839-edef-c055-b0a3-6261397b6b8d@arm.com>
+ <20210316154002.3d9e0575@slackpad.fritz.box>
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+Message-ID: <96eaa6ab-a379-b69c-d813-9362477cd196@arm.com>
+Date:   Mon, 22 Mar 2021 12:01:47 +0000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.8.1
 MIME-Version: 1.0
-In-Reply-To: <20210312142006.hqhwazfsonsdqm2i@kamzik.brq.redhat.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
+In-Reply-To: <20210316154002.3d9e0575@slackpad.fritz.box>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
 Content-Language: en-US
-X-Originating-IP: [10.174.187.128]
-X-ClientProxiedBy: dggeme719-chm.china.huawei.com (10.1.199.115) To
- dggpemm500023.china.huawei.com (7.185.36.83)
-X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Hi Andre,
 
-On 2021/3/12 22:20, Andrew Jones wrote:
-> On Tue, Mar 02, 2021 at 08:57:51PM +0800, Yanan Wang wrote:
->> This test serves as a performance tester and a bug reproducer for
->> kvm page table code (GPA->HPA mappings), so it gives guidance for
->> people trying to make some improvement for kvm.
->>
->> The function guest_code() can cover the conditions where a single vcpu or
->> multiple vcpus access guest pages within the same memory region, in three
->> VM stages(before dirty logging, during dirty logging, after dirty logging).
->> Besides, the backing src memory type(ANONYMOUS/THP/HUGETLB) of the tested
->> memory region can be specified by users, which means normal page mappings
->> or block mappings can be chosen by users to be created in the test.
->>
->> If ANONYMOUS memory is specified, kvm will create normal page mappings
->> for the tested memory region before dirty logging, and update attributes
->> of the page mappings from RO to RW during dirty logging. If THP/HUGETLB
->> memory is specified, kvm will create block mappings for the tested memory
->> region before dirty logging, and split the blcok mappings into normal page
->> mappings during dirty logging, and coalesce the page mappings back into
->> block mappings after dirty logging is stopped.
->>
->> So in summary, as a performance tester, this test can present the
->> performance of kvm creating/updating normal page mappings, or the
->> performance of kvm creating/splitting/recovering block mappings,
->> through execution time.
->>
->> When we need to coalesce the page mappings back to block mappings after
->> dirty logging is stopped, we have to firstly invalidate *all* the TLB
->> entries for the page mappings right before installation of the block entry,
->> because a TLB conflict abort error could occur if we can't invalidate the
->> TLB entries fully. We have hit this TLB conflict twice on aarch64 software
->> implementation and fixed it. As this test can imulate process from dirty
->> logging enabled to dirty logging stopped of a VM with block mappings,
->> so it can also reproduce this TLB conflict abort due to inadequate TLB
->> invalidation when coalescing tables.
->>
->> Signed-off-by: Yanan Wang <wangyanan55@huawei.com>
->> Reviewed-by: Ben Gardon <bgardon@google.com>
->> ---
->>   tools/testing/selftests/kvm/Makefile          |   3 +
->>   .../selftests/kvm/kvm_page_table_test.c       | 476 ++++++++++++++++++
->>   2 files changed, 479 insertions(+)
->>   create mode 100644 tools/testing/selftests/kvm/kvm_page_table_test.c
->>
->> diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
->> index a6d61f451f88..bac81924166d 100644
->> --- a/tools/testing/selftests/kvm/Makefile
->> +++ b/tools/testing/selftests/kvm/Makefile
->> @@ -67,6 +67,7 @@ TEST_GEN_PROGS_x86_64 += x86_64/xen_vmcall_test
->>   TEST_GEN_PROGS_x86_64 += demand_paging_test
->>   TEST_GEN_PROGS_x86_64 += dirty_log_test
->>   TEST_GEN_PROGS_x86_64 += dirty_log_perf_test
->> +TEST_GEN_PROGS_x86_64 += kvm_page_table_test
->>   TEST_GEN_PROGS_x86_64 += hardware_disable_test
->>   TEST_GEN_PROGS_x86_64 += kvm_create_max_vcpus
->>   TEST_GEN_PROGS_x86_64 += memslot_modification_stress_test
->> @@ -78,6 +79,7 @@ TEST_GEN_PROGS_aarch64 += aarch64/get-reg-list-sve
->>   TEST_GEN_PROGS_aarch64 += demand_paging_test
->>   TEST_GEN_PROGS_aarch64 += dirty_log_test
->>   TEST_GEN_PROGS_aarch64 += dirty_log_perf_test
->> +TEST_GEN_PROGS_aarch64 += kvm_page_table_test
->>   TEST_GEN_PROGS_aarch64 += kvm_create_max_vcpus
->>   TEST_GEN_PROGS_aarch64 += set_memory_region_test
->>   TEST_GEN_PROGS_aarch64 += steal_time
->> @@ -87,6 +89,7 @@ TEST_GEN_PROGS_s390x += s390x/resets
->>   TEST_GEN_PROGS_s390x += s390x/sync_regs_test
->>   TEST_GEN_PROGS_s390x += demand_paging_test
->>   TEST_GEN_PROGS_s390x += dirty_log_test
->> +TEST_GEN_PROGS_s390x += kvm_page_table_test
->>   TEST_GEN_PROGS_s390x += kvm_create_max_vcpus
->>   TEST_GEN_PROGS_s390x += set_memory_region_test
-> Please add these three lines in alphabetic order. Also we're missing
-> the .gitignore entry.
-Will fix.
->>   
->> diff --git a/tools/testing/selftests/kvm/kvm_page_table_test.c b/tools/testing/selftests/kvm/kvm_page_table_test.c
->> new file mode 100644
->> index 000000000000..032b49d1483b
->> --- /dev/null
->> +++ b/tools/testing/selftests/kvm/kvm_page_table_test.c
->> @@ -0,0 +1,476 @@
->> +// SPDX-License-Identifier: GPL-2.0
->> +/*
->> + * KVM page table test
->> + *
->> + * Copyright (C) 2021, Huawei, Inc.
->> + *
->> + * Make sure that THP has been enabled or enough HUGETLB pages with specific
->> + * page size have been pre-allocated on your system, if you are planning to
->> + * use hugepages to back the guest memory for testing.
->> + */
->> +
->> +#define _GNU_SOURCE /* for program_invocation_name */
->> +
->> +#include <stdio.h>
->> +#include <stdlib.h>
->> +#include <time.h>
->> +#include <pthread.h>
->> +
->> +#include "test_util.h"
->> +#include "kvm_util.h"
->> +#include "processor.h"
->> +#include "guest_modes.h"
->> +
->> +#define TEST_MEM_SLOT_INDEX             1
->> +
->> +/* Default size(1GB) of the memory for testing */
->> +#define DEFAULT_TEST_MEM_SIZE		(1 << 30)
->> +
->> +/* Default guest test virtual memory offset */
->> +#define DEFAULT_GUEST_TEST_MEM		0xc0000000
->> +
->> +/* Number of guest memory accessing types(read/write) */
->> +#define NUM_ACCESS_TYPES		2
-> This define doesn't really seem necessary.
-Agreed!
->> +
->> +/* Different guest memory accessing stages */
->> +enum test_stage {
->> +	KVM_BEFORE_MAPPINGS,
->> +	KVM_CREATE_MAPPINGS,
->> +	KVM_UPDATE_MAPPINGS,
->> +	KVM_ADJUST_MAPPINGS,
->> +	NUM_TEST_STAGES,
->> +};
->> +
->> +static const char * const test_stage_string[] = {
->> +	"KVM_BEFORE_MAPPINGS",
->> +	"KVM_CREATE_MAPPINGS",
->> +	"KVM_UPDATE_MAPPINGS",
->> +	"KVM_ADJUST_MAPPINGS",
->> +};
->> +
->> +struct perf_test_vcpu_args {
->> +	int vcpu_id;
->> +	bool vcpu_write;
->> +};
->> +
->> +struct perf_test_args {
->> +	struct kvm_vm *vm;
->> +	uint64_t guest_test_virt_mem;
->> +	uint64_t host_page_size;
->> +	uint64_t host_num_pages;
->> +	uint64_t large_page_size;
->> +	uint64_t large_num_pages;
->> +	uint64_t host_pages_per_lpage;
->> +	enum vm_mem_backing_src_type src_type;
->> +	struct perf_test_vcpu_args vcpu_args[KVM_MAX_VCPUS];
->> +};
->> +
->> +/*
->> + * Guest variables. Use addr_gva2hva() if these variables need
->> + * to be changed in host.
->> + */
->> +static enum test_stage guest_test_stage;
->> +
->> +/* Host variables */
->> +static uint32_t nr_vcpus = 1;
->> +static struct perf_test_args perf_test_args;
->> +static enum test_stage *current_stage;
->> +static enum test_stage vcpu_last_completed_stage[KVM_MAX_VCPUS];
->> +static bool host_quit;
->> +
->> +/*
->> + * Guest physical memory offset of the testing memory slot.
->> + * This will be set to the topmost valid physical address minus
->> + * the test memory size.
->> + */
->> +static uint64_t guest_test_phys_mem;
->> +
->> +/*
->> + * Guest virtual memory offset of the testing memory slot.
->> + * Must not conflict with identity mapped test code.
->> + */
->> +static uint64_t guest_test_virt_mem = DEFAULT_GUEST_TEST_MEM;
->> +
->> +static void guest_code(int vcpu_id)
->> +{
->> +	struct perf_test_vcpu_args *vcpu_args = &perf_test_args.vcpu_args[vcpu_id];
->> +	enum vm_mem_backing_src_type src_type = perf_test_args.src_type;
->> +	uint64_t host_page_size = perf_test_args.host_page_size;
->> +	uint64_t host_num_pages = perf_test_args.host_num_pages;
->> +	uint64_t large_page_size = perf_test_args.large_page_size;
->> +	uint64_t large_num_pages = perf_test_args.large_num_pages;
->> +	uint64_t host_pages_per_lpage = perf_test_args.host_pages_per_lpage;
-> Why not just create a short alias for perf_test_args, e.g. p, in order
-> to access these more tersely?
-Yes, it will be better, thanks!
->> +	uint64_t half = host_pages_per_lpage / 2;
->> +	bool vcpu_write;
->> +	enum test_stage stage;
->> +	uint64_t addr;
->> +	int i, j;
->> +
->> +	/* Make sure vCPU args data structure is not corrupt */
->> +	GUEST_ASSERT(vcpu_args->vcpu_id == vcpu_id);
->> +	vcpu_write = vcpu_args->vcpu_write;
->> +
->> +	while (true) {
->> +		stage = READ_ONCE(guest_test_stage);
->> +		addr = perf_test_args.guest_test_virt_mem;
->> +
->> +		switch (stage) {
->> +		/*
->> +		 * Before dirty logging, vCPUs concurrently access the first
->> +		 * 8 bytes of each page (host page/large page) within the same
->> +		 * memory region with different accessing types (read/write).
->> +		 * Then KVM will create normal page mappings or huge block
->> +		 * mappings for them.
->> +		 */
->> +		case KVM_CREATE_MAPPINGS:
->> +			for (i = 0; i < large_num_pages; i++) {
->> +				if (vcpu_write)
->> +					*(uint64_t *)addr = 0x0123456789ABCDEF;
->> +				else
->> +					READ_ONCE(*(uint64_t *)addr);
->> +
->> +				addr += large_page_size;
->> +			}
->> +			break;
->> +
->> +		/*
->> +		 * During dirty logging, KVM will only update attributes of the
->> +		 * normal page mappings from RO to RW if memory backing src type
->> +		 * is anonymous. In other cases, KVM will split the huge block
->> +		 * mappings into normal page mappings if memory backing src type
->> +		 * is THP or HUGETLB.
->> +		 */
->> +		case KVM_UPDATE_MAPPINGS:
->> +			if (src_type == VM_MEM_SRC_ANONYMOUS) {
->> +				for (i = 0; i < host_num_pages; i++) {
->> +					*(uint64_t *)addr = 0x0123456789ABCDEF;
->> +					addr += host_page_size;
->> +				}
->> +				break;
->> +			}
->> +
->> +			for (i = 0; i < large_num_pages; i++) {
->> +				/*
->> +				 * Write to the first host page in each large
->> +				 * page region, and triger break of large pages.
->> +				 */
->> +				*(uint64_t *)addr = 0x0123456789ABCDEF;
->> +
->> +				/*
->> +				 * Access the middle host pages in each large
->> +				 * page region. Since dirty logging is enabled,
->> +				 * this will create new mappings at the smallest
->> +				 * granularity.
->> +				 */
->> +				addr += host_page_size * half;
->> +				for (j = half; j < host_pages_per_lpage; j++) {
->> +					READ_ONCE(*(uint64_t *)addr);
->> +					addr += host_page_size;
->> +				}
->> +			}
->> +			break;
->> +
->> +		/*
->> +		 * After dirty logging is stopped, vCPUs concurrently read
->> +		 * from every single host page. Then KVM will coalesce the
->> +		 * split page mappings back to block mappings. And a TLB
->> +		 * conflict abort could occur here if TLB entries of the
->> +		 * page mappings are not fully invalidated.
->> +		 */
->> +		case KVM_ADJUST_MAPPINGS:
->> +			for (i = 0; i < host_num_pages; i++) {
->> +				READ_ONCE(*(uint64_t *)addr);
->> +				addr += host_page_size;
->> +			}
->> +			break;
->> +
->> +		default:
->> +			break;
->> +		}
->> +
->> +		GUEST_SYNC(1);
->> +	}
->> +}
->> +
->> +static void *vcpu_worker(void *data)
->> +{
->> +	int ret;
->> +	struct perf_test_vcpu_args *vcpu_args = data;
->> +	struct kvm_vm *vm = perf_test_args.vm;
->> +	int vcpu_id = vcpu_args->vcpu_id;
->> +	struct kvm_run *run;
->> +	struct timespec start;
->> +	struct timespec ts_diff;
->> +	enum test_stage stage;
->> +
->> +	vcpu_args_set(vm, vcpu_id, 1, vcpu_id);
->> +	run = vcpu_state(vm, vcpu_id);
->> +
->> +	while (!READ_ONCE(host_quit)) {
->> +		clock_gettime(CLOCK_MONOTONIC_RAW, &start);
->> +		ret = _vcpu_run(vm, vcpu_id);
->> +		ts_diff = timespec_elapsed(start);
->> +
->> +		TEST_ASSERT(ret == 0, "vcpu_run failed: %d\n", ret);
->> +
->> +		TEST_ASSERT(get_ucall(vm, vcpu_id, NULL) == UCALL_SYNC,
->> +			    "Invalid guest sync status: exit_reason=%s\n",
->> +			    exit_reason_str(run->exit_reason));
->> +
->> +		pr_debug("Got sync event from vCPU %d\n", vcpu_id);
->> +		stage = READ_ONCE(*current_stage);
->> +		vcpu_last_completed_stage[vcpu_id] = stage;
->> +		pr_debug("vCPU %d has completed stage %s\n"
->> +			 "execution time is: %ld.%.9lds\n\n",
->> +			 vcpu_id, test_stage_string[stage],
->> +			 ts_diff.tv_sec, ts_diff.tv_nsec);
->> +
->> +		while (stage == READ_ONCE(*current_stage) &&
->> +		       !READ_ONCE(host_quit)) {}
-> Why busy wait instead of using some synchronization? E.g. sem_wait?
+On 3/16/21 3:40 PM, Andre Przywara wrote:
+> On Mon, 15 Mar 2021 15:46:09 +0000
+> Alexandru Elisei <alexandru.elisei@arm.com> wrote:
 >
->> +	}
->> +
->> +	return NULL;
->> +}
->> +
->> +struct test_params {
->> +	uint64_t phys_offset;
->> +	uint64_t test_mem_size;
->> +	enum vm_mem_backing_src_type src_type;
->> +};
->> +
->> +static struct kvm_vm *pre_init_before_test(enum vm_guest_mode mode, void *arg)
->> +{
->> +	struct test_params *p = arg;
->> +	struct perf_test_vcpu_args *vcpu_args;
->> +	enum vm_mem_backing_src_type src_type = p->src_type;
->> +	uint64_t large_page_size = get_backing_src_pagesz(src_type);
->> +	uint64_t test_mem_size = p->test_mem_size, guest_num_pages;
->> +	uint64_t guest_page_size = vm_guest_mode_params[mode].page_size;
->> +	uint64_t host_page_size = getpagesize();
->> +	uint64_t alignment;
->> +	void *host_test_mem;
->> +	struct kvm_vm *vm;
->> +	int vcpu_id;
->> +
->> +	/* Align up the test memory size */
->> +	alignment = max(large_page_size, guest_page_size);
->> +	test_mem_size = (test_mem_size + alignment - 1) & ~(alignment - 1);
->> +
->> +	/* Create a VM with enough guest pages */
->> +	guest_num_pages = test_mem_size / guest_page_size;
->> +	vm = vm_create_with_vcpus(mode, nr_vcpus,
->> +				  guest_num_pages, 0, guest_code, NULL);
->> +
->> +	/* Align down GPA of the testing memslot */
->> +	if (!p->phys_offset)
->> +		guest_test_phys_mem = (vm_get_max_gfn(vm) - guest_num_pages) *
->> +				       guest_page_size;
->> +	else
->> +		guest_test_phys_mem = p->phys_offset;
->> +#ifdef __s390x__
->> +	alignment = max(0x100000, alignment);
->> +#endif
->> +	guest_test_phys_mem &= ~(alignment - 1);
->> +
->> +	/* Set up the shared data structure perf_test_args */
->> +	perf_test_args.vm = vm;
->> +	perf_test_args.guest_test_virt_mem = guest_test_virt_mem;
->> +	perf_test_args.host_page_size = host_page_size;
->> +	perf_test_args.host_num_pages = test_mem_size / host_page_size;
->> +	perf_test_args.large_page_size = large_page_size;
->> +	perf_test_args.large_num_pages = test_mem_size / large_page_size;
->> +	perf_test_args.host_pages_per_lpage = large_page_size / host_page_size;
->> +	perf_test_args.src_type = src_type;
->> +
->> +	for (vcpu_id = 0; vcpu_id < KVM_MAX_VCPUS; vcpu_id++) {
->> +		vcpu_args = &perf_test_args.vcpu_args[vcpu_id];
->> +		vcpu_args->vcpu_id = vcpu_id;
->> +		vcpu_args->vcpu_write = !(vcpu_id % NUM_ACCESS_TYPES);
-> Why the '!'? Is this to ensure vcpu_id=0 is a writer? If so, why?
-Whether to add '!' or not doesn't really matter when there are numerous 
-vcpus,
-but I prefer the vcpu to dirty the pages but not just reading when there 
-is only
-one vcpu configured. I think it's just a personal preference. :)
->> +
->> +		vcpu_last_completed_stage[vcpu_id] = NUM_TEST_STAGES;
->> +	}
->> +
->> +	/* Add an extra memory slot with specified backing src type */
->> +	vm_userspace_mem_region_add(vm, src_type, guest_test_phys_mem,
->> +				    TEST_MEM_SLOT_INDEX, guest_num_pages, 0);
->> +
->> +	/* Do mapping(GVA->GPA) for the testing memory slot */
->> +	virt_map(vm, guest_test_virt_mem, guest_test_phys_mem, guest_num_pages, 0);
->> +
->> +	/* Cache the HVA pointer of the region */
->> +	host_test_mem = addr_gpa2hva(vm, (vm_paddr_t)guest_test_phys_mem);
->> +
->> +	/* Export shared structure perf_test_args to guest */
->> +	ucall_init(vm, NULL);
->> +	sync_global_to_guest(vm, perf_test_args);
->> +
->> +	current_stage = addr_gva2hva(vm, (vm_vaddr_t)(&guest_test_stage));
->> +	*current_stage = NUM_TEST_STAGES;
->> +
->> +	pr_info("Testing guest mode: %s\n", vm_guest_mode_string(mode));
->> +	pr_info("Testing memory backing src type: %s\n",
->> +		vm_mem_backing_src_alias(src_type)->name);
->> +	pr_info("Testing memory backing src granularity: 0x%lx\n",
->> +		large_page_size);
->> +	pr_info("Testing memory size(aligned): 0x%lx\n", test_mem_size);
->> +	pr_info("Guest physical test memory offset: 0x%lx\n",
->> +		guest_test_phys_mem);
->> +	pr_info("Host  virtual  test memory offset: 0x%lx\n",
->> +		(uint64_t)host_test_mem);
->> +	pr_info("Number of testing vCPUs: %d\n", nr_vcpus);
->> +
->> +	return vm;
->> +}
->> +
->> +static void run_test(enum vm_guest_mode mode, void *arg)
->> +{
->> +	pthread_t *vcpu_threads;
->> +	struct kvm_vm *vm;
->> +	int vcpu_id;
->> +	enum test_stage stage;
->> +	struct timespec start;
->> +	struct timespec ts_diff;
->> +
->> +	/* Create VM with vCPUs and make some pre-initialization */
->> +	vm = pre_init_before_test(mode, arg);
->> +
->> +	vcpu_threads = malloc(nr_vcpus * sizeof(*vcpu_threads));
->> +	TEST_ASSERT(vcpu_threads, "Memory allocation failed");
->> +
->> +	host_quit = false;
->> +	stage = KVM_BEFORE_MAPPINGS;
->> +	*current_stage = stage;
->> +
->> +	for (vcpu_id = 0; vcpu_id < nr_vcpus; vcpu_id++) {
->> +		pthread_create(&vcpu_threads[vcpu_id], NULL, vcpu_worker,
->> +			       &perf_test_args.vcpu_args[vcpu_id]);
->> +	}
->> +	for (vcpu_id = 0; vcpu_id < nr_vcpus; vcpu_id++) {
->> +		while (READ_ONCE(vcpu_last_completed_stage[vcpu_id]) != stage)
->> +			pr_debug("Waiting for vCPU %d to complete stage %s\n",
->> +				 vcpu_id, test_stage_string[stage]);
-> I'd do a timed wait on some synchronization and then assert that it
-> doesn't time out. At least the pr_debug() in the loop doesn't look
-> like a good idea.
+> Hi Alex,
 >
->> +	}
->> +	pr_info("Started all vCPUs successfully\n");
->> +
->> +	/* Test the stage of KVM creating mappings */
->> +	clock_gettime(CLOCK_MONOTONIC_RAW, &start);
->> +	stage = KVM_CREATE_MAPPINGS;
->> +	*current_stage = stage;
->> +
->> +	for (vcpu_id = 0; vcpu_id < nr_vcpus; vcpu_id++) {
->> +		while (READ_ONCE(vcpu_last_completed_stage[vcpu_id]) != stage)
->> +			pr_debug("Waiting for vCPU %d to complete stage %s\n",
->> +				 vcpu_id, test_stage_string[stage]);
->> +	}
->> +
->> +	ts_diff = timespec_elapsed(start);
->> +	pr_info("KVM_CREATE_MAPPINGS: total execution time: %ld.%.9lds\n\n",
->> +		ts_diff.tv_sec, ts_diff.tv_nsec);
-> Here the busy loop makes some sense for the time measuring. Alternatively
-> we could still use sem_wait, but have the first vcpu to start record the
-> start time and the last vcpu to finish record the end time. It might be
-> nice to be able to see each individual vcpu's time too.
-The sem_wait() way seems more reasonable than busy waiting, I will 
-adjust the
-corresponding parts in next version.
+>> On 3/4/21 3:00 PM, Andre Przywara wrote:
+>>> On Sat, 27 Feb 2021 10:41:57 +0000
+>>> Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+>>>  
+>>>> Compute the dcache line size when doing dcache maintenance instead of using
+>>>> a global variable computed in setup(), which allows us to do dcache
+>>>> maintenance at any point in the boot process. This will be useful for
+>>>> running as an EFI app and it also aligns our implementation to that of the
+>>>> Linux kernel.  
+>>> Can you add that this changes the semantic of dcache_by_line_op to use
+>>> the size instead of the end address?  
+>> Sure, I can do that. The dcache_by_line_op was never visible to code outside
+>> assembly, and it was only used by asm_mmu_disable, so no other callers are
+>> affected by this change.
+> Thanks, just a short sentence suffices. I was just mentioning this
+> since many cache-op wrappers I have seen use (start,stop) pairs, while
+> I actually think (start,length) is more practical. So it just deserves
+> a short mentioning in case anyone was familiar with the previous
+> arguments and wonders what's going on.
+>
+>>>  
+>>>> For consistency, the arm code has been similary modified.
+>>>>
+>>>> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+>>>> ---
+>>>>  lib/arm/asm/assembler.h   | 44 ++++++++++++++++++++++++++++++++
+>>>>  lib/arm/asm/processor.h   |  7 ------
+>>>>  lib/arm64/asm/assembler.h | 53 +++++++++++++++++++++++++++++++++++++++
+>>>>  lib/arm64/asm/processor.h |  7 ------
+>>>>  lib/arm/setup.c           |  7 ------
+>>>>  arm/cstart.S              | 18 +++----------
+>>>>  arm/cstart64.S            | 16 ++----------
+>>>>  7 files changed, 102 insertions(+), 50 deletions(-)
+>>>>  create mode 100644 lib/arm/asm/assembler.h
+>>>>  create mode 100644 lib/arm64/asm/assembler.h
+>>>>
+>>>> diff --git a/lib/arm/asm/assembler.h b/lib/arm/asm/assembler.h
+>>>> new file mode 100644
+>>>> index 000000000000..6b932df86204
+>>>> --- /dev/null
+>>>> +++ b/lib/arm/asm/assembler.h
+>>>> @@ -0,0 +1,44 @@
+>>>> +/* SPDX-License-Identifier: GPL-2.0 */
+>>>> +/*
+>>>> + * Based on several files from Linux version v5.10: arch/arm/mm/proc-macros.S,
+>>>> + * arch/arm/mm/proc-v7.S.
+>>>> + */
+>>>> +
+>>>> +/*
+>>>> + * dcache_line_size - get the minimum D-cache line size from the CTR register
+>>> `> + * on ARMv7.  
+>> Well, it's in the arm directory and there's a file with the same name under
+>> lib/arm64/asm/, so I don't think there's any room for confusion here.
+> Mmh, this v7 line was already in there, and I didn't complain, it was
+> apparently just a stray character sneaking in the reply which made this
+> look like a comment?
 
->> +
->> +	/* Test the stage of KVM updating mappings */
->> +	vm_mem_region_set_flags(vm, TEST_MEM_SLOT_INDEX,
->> +				KVM_MEM_LOG_DIRTY_PAGES);
->> +
->> +	clock_gettime(CLOCK_MONOTONIC_RAW, &start);
->> +	stage = KVM_UPDATE_MAPPINGS;
->> +	*current_stage = stage;
->> +
->> +	for (vcpu_id = 0; vcpu_id < nr_vcpus; vcpu_id++) {
->> +		while (READ_ONCE(vcpu_last_completed_stage[vcpu_id]) != stage)
->> +			pr_debug("Waiting for vCPU %d to complete stage %s\n",
->> +				 vcpu_id, test_stage_string[stage]);
->> +	}
->> +
->> +	ts_diff = timespec_elapsed(start);
->> +	pr_info("KVM_UPDATE_MAPPINGS: total execution time: %ld.%.9lds\n\n",
->> +		ts_diff.tv_sec, ts_diff.tv_nsec);
->> +
->> +	/* Test the stage of KVM adjusting mappings */
->> +	vm_mem_region_set_flags(vm, TEST_MEM_SLOT_INDEX, 0);
->> +
->> +	clock_gettime(CLOCK_MONOTONIC_RAW, &start);
->> +	stage = KVM_ADJUST_MAPPINGS;
->> +	*current_stage = stage;
->> +
->> +	for (vcpu_id = 0; vcpu_id < nr_vcpus; vcpu_id++) {
->> +		while (READ_ONCE(vcpu_last_completed_stage[vcpu_id]) != stage)
->> +			pr_debug("Waiting for vCPU %d to complete stage %s\n",
->> +				 vcpu_id, test_stage_string[stage]);
->> +	}
->> +
->> +	ts_diff = timespec_elapsed(start);
->> +	pr_info("KVM_ADJUST_MAPPINGS: total execution time: %ld.%.9lds\n\n",
->> +		ts_diff.tv_sec, ts_diff.tv_nsec);
-> Same comments for the last two loops as above about pr_debug and possibly
-> using some synchronization. At least these loops, which are all the same,
-> could be factored out into a function.
->
->> +
->> +	/* Tell the vcpu thread to quit */
->> +	host_quit = true;
->> +	for (vcpu_id = 0; vcpu_id < nr_vcpus; vcpu_id++)
->> +		pthread_join(vcpu_threads[vcpu_id], NULL);
->> +
->> +	free(vcpu_threads);
->> +	ucall_uninit(vm);
->> +	kvm_vm_free(vm);
->> +}
->> +
->> +static void help(char *name)
->> +{
->> +	puts("");
->> +	printf("usage: %s [-h] [-p offset] [-m mode] "
->> +	       "[-b mem size] [-v vcpus] [-s mem type]\n", name);
-> Please hyphenate the parameter names: mem-size, mem-type
-Of course.
+I guess so, my bad.
 
-Thanks for the above detailed suggestions,
-Yanan
->> +	puts("");
->> +	printf(" -p: specify guest physical test memory offset\n"
->> +	       "     Warning: a low offset can conflict with the loaded test code.\n");
->> +	guest_modes_help();
->> +	printf(" -b: specify size of the memory region for testing. e.g. 10M or 3G.\n"
->> +	       "     (default: 1G)\n");
->> +	printf(" -v: specify the number of vCPUs to run\n"
->> +	       "     (default: 1)\n");
->> +	printf(" -s: specify the type of memory that should be used to\n"
->> +	       "     back the guest data region.\n"
->> +	       "     (default: anonymous)\n\n");
->> +	backing_src_help();
->> +	puts("");
->> +	exit(0);
->> +}
->> +
->> +int main(int argc, char *argv[])
->> +{
->> +	int max_vcpus = kvm_check_cap(KVM_CAP_MAX_VCPUS);
->> +	struct test_params p = {
->> +		.test_mem_size = DEFAULT_TEST_MEM_SIZE,
->> +		.src_type = VM_MEM_SRC_ANONYMOUS,
->> +	};
->> +	int opt;
->> +
->> +	guest_modes_append_default();
->> +
->> +	while ((opt = getopt(argc, argv, "hp:m:b:v:s:")) != -1) {
->> +		switch (opt) {
->> +		case 'p':
->> +			p.phys_offset = strtoull(optarg, NULL, 0);
->> +			break;
->> +		case 'm':
->> +			guest_modes_cmdline(optarg);
->> +			break;
->> +		case 'b':
->> +			p.test_mem_size = parse_size(optarg);
->> +			break;
->> +		case 'v':
->> +			nr_vcpus = atoi(optarg);
->> +			TEST_ASSERT(nr_vcpus > 0 && nr_vcpus <= max_vcpus,
->> +				    "Invalid number of vcpus, must be between 1 and %d", max_vcpus);
->> +			break;
->> +		case 's':
->> +			p.src_type = parse_backing_src_type(optarg);
->> +			break;
->> +		case 'h':
->> +		default:
->> +			help(argv[0]);
->> +			break;
->> +		}
->> +	}
->> +
->> +	for_each_guest_mode(run_test, &p);
->> +
->> +	return 0;
->> +}
->> -- 
->> 2.23.0
->>
-> Thanks,
-> drew
 >
-> .
+>>>> + */
+>>>> +	.macro	dcache_line_size, reg, tmp
+>>>> +	mrc	p15, 0, \tmp, c0, c0, 1		// read ctr
+>>>> +	lsr	\tmp, \tmp, #16
+>>>> +	and	\tmp, \tmp, #0xf		// cache line size encoding
+>>>> +	mov	\reg, #4			// bytes per word
+>>>> +	mov	\reg, \reg, lsl \tmp		// actual cache line size
+>>>> +	.endm
+>>>> +
+>>>> +/*
+>>>> + * Macro to perform a data cache maintenance for the interval
+>>>> + * [addr, addr + size).
+>>>> + *
+>>>> + * 	op:		operation to execute
+>>>> + * 	domain		domain used in the dsb instruction
+>>>> + * 	addr:		starting virtual address of the region
+>>>> + * 	size:		size of the region
+>>>> + * 	Corrupts:	addr, size, tmp1, tmp2
+>>>> + */
+>>>> +	.macro dcache_by_line_op op, domain, addr, size, tmp1, tmp2
+>>>> +	dcache_line_size \tmp1, \tmp2
+>>>> +	add	\size, \addr, \size
+>>>> +	sub	\tmp2, \tmp1, #1
+>>>> +	bic	\addr, \addr, \tmp2  
+>>> Just a nit, but since my brain was in assembly land: We could skip tmp2,
+>>> by adding back #1 to tmp1 after the bic.
+>>> Same for the arm64 code.  
+>> Using one less temporary register wouldn't help with register pressure:
+>>
+>> - On arm, registers r0-r3 are used, which ARM IHI 0042F says that they can be used
+>> as scratch registers and the caller will save their contents before the calling
+>> the function (or not use them at all).
+>>
+>> - On arm64, register x0-x3 are used, which have a similar usage according to ARM
+>> IHI 0055B.
+>>
+>> Using one less temporary register means one more instruction, but not relevant
+>> since the macro will perform writes, as even invalidation is transformed to a
+>> clean + invalidate under virtualization.
+> I am not talking about micro-optimisation here, but this is a *macro*,
+> not a function, so could potentially be used in multiple different
+> places, for instance inside leaf functions. And maybe that already uses
+> two registers on its own, so can't spare three extra ones?
+>
+> Was just a hint, anyway ...
+>
+>> The reason I chose to keep the macro unchanged for arm64 is that it matches the
+>> Linux definition, and I think it's better to try not to deviate too much from it,
+>> as in the long it will make maintenance easier for everyone.
+>> For arm, I wrote it this way to match the arm64 definition.
+>>
+>>>  
+>>>> +9998:
+>>>> +	.ifc	\op, dccimvac
+>>>> +	mcr	p15, 0, \addr, c7, c14, 1
+>>>> +	.else
+>>>> +	.err
+>>>> +	.endif
+>>>> +	add	\addr, \addr, \tmp1
+>>>> +	cmp	\addr, \size
+>>>> +	blo	9998b
+>>>> +	dsb	\domain
+>>>> +	.endm
+>>>> diff --git a/lib/arm/asm/processor.h b/lib/arm/asm/processor.h
+>>>> index 273366d1fe1c..3c36eac903f0 100644
+>>>> --- a/lib/arm/asm/processor.h
+>>>> +++ b/lib/arm/asm/processor.h
+>>>> @@ -9,11 +9,6 @@
+>>>>  #include <asm/sysreg.h>
+>>>>  #include <asm/barrier.h>  
+>>> Do we want the same protection against inclusion from C here as in the
+>>> arm64 version?  
+>> We do, I will add it in the next iteration.
+>>
+>>>  
+>>>> -#define CTR_DMINLINE_SHIFT	16
+>>>> -#define CTR_DMINLINE_MASK	(0xf << 16)
+>>>> -#define CTR_DMINLINE(x)	\
+>>>> -	(((x) & CTR_DMINLINE_MASK) >> CTR_DMINLINE_SHIFT)
+>>>> -
+>>>>  enum vector {
+>>>>  	EXCPTN_RST,
+>>>>  	EXCPTN_UND,
+>>>> @@ -89,6 +84,4 @@ static inline u32 get_ctr(void)
+>>>>  	return read_sysreg(CTR);
+>>>>  }
+>>>>  
+>>>> -extern unsigned long dcache_line_size;
+>>>> -
+>>>>  #endif /* _ASMARM_PROCESSOR_H_ */
+>>>> diff --git a/lib/arm64/asm/assembler.h b/lib/arm64/asm/assembler.h
+>>>> new file mode 100644
+>>>> index 000000000000..f801c0c43d02
+>>>> --- /dev/null
+>>>> +++ b/lib/arm64/asm/assembler.h
+>>>> @@ -0,0 +1,53 @@
+>>>> +/* SPDX-License-Identifier: GPL-2.0-only */
+>>>> +/*
+>>>> + * Based on the file arch/arm64/include/asm/assembled.h from Linux v5.10, which
+>>>> + * in turn is based on arch/arm/include/asm/assembler.h and
+>>>> + * arch/arm/mm/proc-macros.S
+>>>> + *
+>>>> + * Copyright (C) 1996-2000 Russell King
+>>>> + * Copyright (C) 2012 ARM Ltd.
+>>>> + */
+>>>> +#ifndef __ASSEMBLY__
+>>>> +#error "Only include this from assembly code"
+>>>> +#endif
+>>>> +
+>>>> +#ifndef __ASM_ASSEMBLER_H
+>>>> +#define __ASM_ASSEMBLER_H
+>>>> +
+>>>> +/*
+>>>> + * raw_dcache_line_size - get the minimum D-cache line size on this CPU
+>>>> + * from the CTR register.
+>>>> + */
+>>>> +	.macro	raw_dcache_line_size, reg, tmp
+>>>> +	mrs	\tmp, ctr_el0			// read CTR
+>>>> +	ubfm	\tmp, \tmp, #16, #19		// cache line size encoding  
+>>> this encoding of ubfm is supposed to be written as:
+>>> 	ubfx \tmp, \tmp, #16, #4
+>>> This is also what objdump makes of the above.  
+>> I would rather keep it the same as Linux.
+> Which means I need to send a patch there? ;-)
+
+Only if you want to try to convince people that ubfx is better than ubfm :)
+
+> I am all for copying from reliable sources, but that doesn't mean that
+> we can't improve on them.
+>
+> The ARM ARM says that ubfx is the preferred disassembly for this opcode.
+> Plus there is a ubfx in AArch32 (with the exact same semantic and
+> arguments), but no ubfm.
+>
+> It's just that my brain expects ubfx when extracting bits from a
+> register, and I needed to wade through the exact definition of ubfm to
+> understand what it does.
+>
+> So your choice, just wanted to point that out.
+
+I think you've convinced me. I'm also more familiar with ubfx, the Arm ARM says
+that ubfm is usually accessed via one of its aliases, and Linux seems to be moving
+away from using ubfm (the only instances that I've found were
+{raw_,}dcache_line_size which are very old, I think from the initial arm64
+architecture enablement). I'll use ubfx instead.
+
+Thanks,
+
+Alex
+
+>
+> Cheers,
+> Andre
+>
+>>> The rest looks good, I convinced myself that the assembly algorithms are
+>>> correct.  
+>> Thanks, much appreciated!
+>>
+>> Thanks,
+>>
+>> Alex
+>>
+>>> Cheers,
+>>> Andre
+>>>
+>>>  
+>>>> +	mov	\reg, #4			// bytes per word
+>>>> +	lsl	\reg, \reg, \tmp		// actual cache line size
+>>>> +	.endm
+>>>> +
+>>>> +/*
+>>>> + * Macro to perform a data cache maintenance for the interval
+>>>> + * [addr, addr + size). Use the raw value for the dcache line size because
+>>>> + * kvm-unit-tests has no concept of scheduling.
+>>>> + *
+>>>> + * 	op:		operation passed to dc instruction
+>>>> + * 	domain:		domain used in dsb instruciton
+>>>> + * 	addr:		starting virtual address of the region
+>>>> + * 	size:		size of the region
+>>>> + * 	Corrupts:	addr, size, tmp1, tmp2
+>>>> + */
+>>>> +
+>>>> +	.macro dcache_by_line_op op, domain, addr, size, tmp1, tmp2
+>>>> +	raw_dcache_line_size \tmp1, \tmp2
+>>>> +	add	\size, \addr, \size
+>>>> +	sub	\tmp2, \tmp1, #1
+>>>> +	bic	\addr, \addr, \tmp2
+>>>> +9998:
+>>>> +	dc	\op, \addr
+>>>> +	add	\addr, \addr, \tmp1
+>>>> +	cmp	\addr, \size
+>>>> +	b.lo	9998b
+>>>> +	dsb	\domain
+>>>> +	.endm
+>>>> +
+>>>> +#endif	/* __ASM_ASSEMBLER_H */
+>>>> diff --git a/lib/arm64/asm/processor.h b/lib/arm64/asm/processor.h
+>>>> index 771b2d1e0c94..cdc2463e1981 100644
+>>>> --- a/lib/arm64/asm/processor.h
+>>>> +++ b/lib/arm64/asm/processor.h
+>>>> @@ -16,11 +16,6 @@
+>>>>  #define SCTLR_EL1_A	(1 << 1)
+>>>>  #define SCTLR_EL1_M	(1 << 0)
+>>>>  
+>>>> -#define CTR_DMINLINE_SHIFT	16
+>>>> -#define CTR_DMINLINE_MASK	(0xf << 16)
+>>>> -#define CTR_DMINLINE(x)	\
+>>>> -	(((x) & CTR_DMINLINE_MASK) >> CTR_DMINLINE_SHIFT)
+>>>> -
+>>>>  #ifndef __ASSEMBLY__
+>>>>  #include <asm/ptrace.h>
+>>>>  #include <asm/esr.h>
+>>>> @@ -115,8 +110,6 @@ static inline u64 get_ctr(void)
+>>>>  	return read_sysreg(ctr_el0);
+>>>>  }
+>>>>  
+>>>> -extern unsigned long dcache_line_size;
+>>>> -
+>>>>  static inline unsigned long get_id_aa64mmfr0_el1(void)
+>>>>  {
+>>>>  	return read_sysreg(id_aa64mmfr0_el1);
+>>>> diff --git a/lib/arm/setup.c b/lib/arm/setup.c
+>>>> index 066524f8bf61..751ba980000a 100644
+>>>> --- a/lib/arm/setup.c
+>>>> +++ b/lib/arm/setup.c
+>>>> @@ -42,8 +42,6 @@ static struct mem_region __initial_mem_regions[NR_INITIAL_MEM_REGIONS + 1];
+>>>>  struct mem_region *mem_regions = __initial_mem_regions;
+>>>>  phys_addr_t __phys_offset, __phys_end;
+>>>>  
+>>>> -unsigned long dcache_line_size;
+>>>> -
+>>>>  int mpidr_to_cpu(uint64_t mpidr)
+>>>>  {
+>>>>  	int i;
+>>>> @@ -72,11 +70,6 @@ static void cpu_init(void)
+>>>>  	ret = dt_for_each_cpu_node(cpu_set, NULL);
+>>>>  	assert(ret == 0);
+>>>>  	set_cpu_online(0, true);
+>>>> -	/*
+>>>> -	 * DminLine is log2 of the number of words in the smallest cache line; a
+>>>> -	 * word is 4 bytes.
+>>>> -	 */
+>>>> -	dcache_line_size = 1 << (CTR_DMINLINE(get_ctr()) + 2);
+>>>>  }
+>>>>  
+>>>>  unsigned int mem_region_get_flags(phys_addr_t paddr)
+>>>> diff --git a/arm/cstart.S b/arm/cstart.S
+>>>> index ef936ae2f874..954748b00f64 100644
+>>>> --- a/arm/cstart.S
+>>>> +++ b/arm/cstart.S
+>>>> @@ -7,6 +7,7 @@
+>>>>   */
+>>>>  #define __ASSEMBLY__
+>>>>  #include <auxinfo.h>
+>>>> +#include <asm/assembler.h>
+>>>>  #include <asm/thread_info.h>
+>>>>  #include <asm/asm-offsets.h>
+>>>>  #include <asm/pgtable-hwdef.h>
+>>>> @@ -197,20 +198,6 @@ asm_mmu_enable:
+>>>>  
+>>>>  	mov     pc, lr
+>>>>  
+>>>> -.macro dcache_clean_inval domain, start, end, tmp1, tmp2
+>>>> -	ldr	\tmp1, =dcache_line_size
+>>>> -	ldr	\tmp1, [\tmp1]
+>>>> -	sub	\tmp2, \tmp1, #1
+>>>> -	bic	\start, \start, \tmp2
+>>>> -9998:
+>>>> -	/* DCCIMVAC */
+>>>> -	mcr	p15, 0, \start, c7, c14, 1
+>>>> -	add	\start, \start, \tmp1
+>>>> -	cmp	\start, \end
+>>>> -	blo	9998b
+>>>> -	dsb	\domain
+>>>> -.endm
+>>>> -
+>>>>  .globl asm_mmu_disable
+>>>>  asm_mmu_disable:
+>>>>  	/* SCTLR */
+>>>> @@ -223,7 +210,8 @@ asm_mmu_disable:
+>>>>  	ldr	r0, [r0]
+>>>>  	ldr	r1, =__phys_end
+>>>>  	ldr	r1, [r1]
+>>>> -	dcache_clean_inval sy, r0, r1, r2, r3
+>>>> +	sub	r1, r1, r0
+>>>> +	dcache_by_line_op dccimvac, sy, r0, r1, r2, r3
+>>>>  	isb
+>>>>  
+>>>>  	mov     pc, lr
+>>>> diff --git a/arm/cstart64.S b/arm/cstart64.S
+>>>> index fc1930bcdb53..046bd3914098 100644
+>>>> --- a/arm/cstart64.S
+>>>> +++ b/arm/cstart64.S
+>>>> @@ -8,6 +8,7 @@
+>>>>  #define __ASSEMBLY__
+>>>>  #include <auxinfo.h>
+>>>>  #include <asm/asm-offsets.h>
+>>>> +#include <asm/assembler.h>
+>>>>  #include <asm/ptrace.h>
+>>>>  #include <asm/processor.h>
+>>>>  #include <asm/page.h>
+>>>> @@ -204,20 +205,6 @@ asm_mmu_enable:
+>>>>  
+>>>>  	ret
+>>>>  
+>>>> -/* Taken with small changes from arch/arm64/incluse/asm/assembler.h */
+>>>> -.macro dcache_by_line_op op, domain, start, end, tmp1, tmp2
+>>>> -	adrp	\tmp1, dcache_line_size
+>>>> -	ldr	\tmp1, [\tmp1, :lo12:dcache_line_size]
+>>>> -	sub	\tmp2, \tmp1, #1
+>>>> -	bic	\start, \start, \tmp2
+>>>> -9998:
+>>>> -	dc	\op , \start
+>>>> -	add	\start, \start, \tmp1
+>>>> -	cmp	\start, \end
+>>>> -	b.lo	9998b
+>>>> -	dsb	\domain
+>>>> -.endm
+>>>> -
+>>>>  .globl asm_mmu_disable
+>>>>  asm_mmu_disable:
+>>>>  	mrs	x0, sctlr_el1
+>>>> @@ -230,6 +217,7 @@ asm_mmu_disable:
+>>>>  	ldr	x0, [x0, :lo12:__phys_offset]
+>>>>  	adrp	x1, __phys_end
+>>>>  	ldr	x1, [x1, :lo12:__phys_end]
+>>>> +	sub	x1, x1, x0
+>>>>  	dcache_by_line_op civac, sy, x0, x1, x2, x3
+>>>>  	isb
+>>>>    
