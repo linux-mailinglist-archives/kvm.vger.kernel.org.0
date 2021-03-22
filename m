@@ -2,55 +2,55 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 37F033451C1
+	by mail.lfdr.de (Postfix) with ESMTP id 876E93451C2
 	for <lists+kvm@lfdr.de>; Mon, 22 Mar 2021 22:28:17 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229868AbhCVV1p (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 22 Mar 2021 17:27:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54972 "EHLO
+        id S230095AbhCVV1q (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 22 Mar 2021 17:27:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55008 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229946AbhCVV12 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 22 Mar 2021 17:27:28 -0400
-Received: from mail-il1-x12f.google.com (mail-il1-x12f.google.com [IPv6:2607:f8b0:4864:20::12f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3C42FC061756
-        for <kvm@vger.kernel.org>; Mon, 22 Mar 2021 14:27:28 -0700 (PDT)
-Received: by mail-il1-x12f.google.com with SMTP id t14so6402822ilu.3
-        for <kvm@vger.kernel.org>; Mon, 22 Mar 2021 14:27:28 -0700 (PDT)
+        with ESMTP id S230055AbhCVV1j (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 22 Mar 2021 17:27:39 -0400
+Received: from mail-io1-xd2c.google.com (mail-io1-xd2c.google.com [IPv6:2607:f8b0:4864:20::d2c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AA8ACC061574
+        for <kvm@vger.kernel.org>; Mon, 22 Mar 2021 14:27:38 -0700 (PDT)
+Received: by mail-io1-xd2c.google.com with SMTP id k25so3408019iob.6
+        for <kvm@vger.kernel.org>; Mon, 22 Mar 2021 14:27:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=SYOrRtrJbYA6OkKkKHgOL4LSFBp7NjwpYOFcZ2Xg8oQ=;
-        b=biL3PS2mco1/8v/xGfzTgWHL3bLRKmF7vVYKp5ZB/GvIwmpppCFqdFFX+Qy2+8Mxq9
-         tce4ujmHdkJWgx/fa8in5R5vM6cR5dx9uguv6hN1HX/wb/UWj/bYiTbXP50gaVX4aWfw
-         YuFL8qCsI2LlyJHAMtvxHUC2OiXv1PZeAYjOLVODLEUJpgsVNc1fzceTa4r8F8kd8nVn
-         uin50Sn//XTWHq+ZgHWuwIZ8f+ZWP0TUHvfK4BdE14jlQtX+m17j+Gfdlao/L0FtQDyI
-         CEl3RBcXcloGRxLDBOn5bhj1VaA5kD2dJJIjPmtBunCWQykJ/vpacgdAeZHqvxvcnEXn
-         nu2g==
+        bh=mWk+o8yYno4oVPKt5FUKRgmtDcCg2vWgufyVv5FBitg=;
+        b=XRbP1uRQOWdGrB5dAQAeGEmFIhRaUHlPu/4JKaV0VZ3eA6OVJucYU5r1WM3Nf+fvRV
+         /dzPCimcl4Sbp/85GuQvk3ZCbmp2wK2iaUjPFUnFccrdrCZWlj5mjNiLYc7CS/x/0TNx
+         cbhjETbsmG5aZZBaClMRf/8ME5otTZWD1IG3ad+lGkI3385I3Uy7x2zEwxrlpXnnIaer
+         M6WlK2Ec2A3mkK2BVEP1I/UpLr+ddrt8pWutT372pFO95hIhCPHp01FdFS1g+nXnhJp6
+         Qb00L92nkOKl2+YefGWJq3kIYDFHGIjgX8WLsB4EJYvivtE9aYjZS6SA0lgRXMa7ZeZ3
+         07Mw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=SYOrRtrJbYA6OkKkKHgOL4LSFBp7NjwpYOFcZ2Xg8oQ=;
-        b=QLZpzu1bhiFU7oU9BP7kymZJ27BwUSq2rXe2rnWUl4nGlbLEmgEFYF3ZpcpMmHaObM
-         ZqZXeBgOW8zQfOWfF5fn1oCVdYhlzVJoCsWGbKi9OUHo1cQBHqz5ACzOG4Z/GYmGWek2
-         G9wuHjBaQhyd4GVG14fAEzD9U9MKVklj4WiSSXuk53AX3JLHC88mHq50IA/R8yXtAOgw
-         uOjl264ealeEB+N1a3Hb1w3sLrooOvKAD6C3x+vLM5eMfnMfj1X4FIMjUCXIcPl9gU0V
-         Ga/21lYpNnaQg9UDzbL1l5dlEVeQ6GwqjjTBby5J5YYgNjXtiW0XMO3GvmmtXW+loOvf
-         jd3w==
-X-Gm-Message-State: AOAM5300TEKLlOuh+SXbkS13MRs6mV52huSPb7pSg73pq6O5znTTpZRC
-        YjwmLnKlvep4SG0JHlUezg6V1yRTinn32OLi31U6Kg==
-X-Google-Smtp-Source: ABdhPJzZkbwtlk9oaydGpj46LBjveF5uHSYOahSD6LgzXTLxdnff96/rkKEKWwbpmABNOz5bIT3EXwJ76WVZprd8XAo=
-X-Received: by 2002:a05:6e02:1094:: with SMTP id r20mr1802712ilj.154.1616448446765;
- Mon, 22 Mar 2021 14:27:26 -0700 (PDT)
+        bh=mWk+o8yYno4oVPKt5FUKRgmtDcCg2vWgufyVv5FBitg=;
+        b=SIYK1R6j8X8yz+aQTxvoDvlaMjEu06pakwkamjaSNUwg4By7PvObYu0Zf94M4pyhZO
+         dn2YVcqpq4TAz4C98GAS06+ClRKH//6Mpw43HBLS/xALy33u/z5MAmkTajhVpyAT9Iyh
+         zKnJ3Hu4a9o/dZ/ZlIkwbOYBbtR7RHt77egqZEqHjFJq0sZ8VX2IP8Tl1rw6KFBGVeqM
+         C+Qwlh0z6ilzdhg+t7Wp63rT6uAVrBchnD/j94iLN5yxiXmWG3TNDDvgwc0TUzJp8Rr0
+         dhGMhxJ0HtsGEBwmi/s4UGiEYFe0wwrtCepNLc/5qf7e0UuL4NyF9y3zMjtYMUIwADHd
+         SOHw==
+X-Gm-Message-State: AOAM530xwD7R14bseftDDw6BcHOvcMOnPzKLS64jXhA7qWFi+Jkgnn4S
+        ZxEMnXrO3VrprK26uAoVxJKbXIdZfbhml+iwpI6iuA==
+X-Google-Smtp-Source: ABdhPJww3mD1TXBJYl00cIfS9T6MiDk6YqDbxQKLNa1BoI+zjPaBX4htazdomOuP9Nr+FxwSsOX5aLF2PfuPnWFhLGI=
+X-Received: by 2002:a02:cbb2:: with SMTP id v18mr1345431jap.4.1616448458015;
+ Mon, 22 Mar 2021 14:27:38 -0700 (PDT)
 MIME-Version: 1.0
-References: <20210319232006.3468382-1-seanjc@google.com> <20210319232006.3468382-3-seanjc@google.com>
-In-Reply-To: <20210319232006.3468382-3-seanjc@google.com>
+References: <20210319232006.3468382-1-seanjc@google.com> <20210319232006.3468382-2-seanjc@google.com>
+In-Reply-To: <20210319232006.3468382-2-seanjc@google.com>
 From:   Ben Gardon <bgardon@google.com>
-Date:   Mon, 22 Mar 2021 14:27:15 -0700
-Message-ID: <CANgfPd_6d+SvJ-rQxP6k5nRmCsRFyUAJ93B0dE3NtpmdPR78wg@mail.gmail.com>
-Subject: Re: [PATCH 2/2] KVM: x86/mmu: Ensure TLBs are flushed when yielding
- during NX zapping
+Date:   Mon, 22 Mar 2021 14:27:27 -0700
+Message-ID: <CANgfPd9Rzk3GwggqGkw2yAH355AnvLAwSihoW2JZ8r3qjSzUWA@mail.gmail.com>
+Subject: Re: [PATCH 1/2] KVM: x86/mmu: Ensure TLBs are flushed when yielding
+ during GFN range zap
 To:     Sean Christopherson <seanjc@google.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
@@ -65,154 +65,115 @@ X-Mailing-List: kvm@vger.kernel.org
 
 On Fri, Mar 19, 2021 at 4:20 PM Sean Christopherson <seanjc@google.com> wrote:
 >
-> Fix two intertwined bugs in the NX huge page zapping that were introduced
-> by the incorporation of the TDP MMU.  Because there is a unified list of
-> NX huge pages, zapping can encounter both TDP MMU and legacy MMU pages,
-> and the two MMUs have different tracking for TLB flushing.  If one flavor
-> needs a flush, but the code for the other flavor yields, KVM will fail to
-> flush before yielding.
+> When flushing a range of GFNs across multiple roots, ensure any pending
+> flush from a previous root is honored before yielding while walking the
+> tables of the current root.
 >
-> First, honor the "flush needed" return from kvm_tdp_mmu_zap_gfn_range(),
-> which does the flush itself if and only if it yields, and otherwise
-> expects the caller to do the flush.  This requires feeding the result
-> into kvm_mmu_remote_flush_or_zap(), and so also fixes the case where the
-> TDP MMU needs a flush, the legacy MMU does not, and the main loop yields.
+> Note, kvm_tdp_mmu_zap_gfn_range() now intentionally overwrites it local
+> "flush" with the result to avoid redundant flushes.  zap_gfn_range()
+> preserves and return the incoming "flush", unless of course the flush was
+> performed prior to yielding and no new flush was triggered.
 >
-> Second, tell the TDP MMU a flush is pending if the list of zapped pages
-> from legacy MMUs is not empty, i.e. the legacy MMU needs a flush.  This
-> fixes the case where the TDP MMU yields, but it iteslf does not require a
-> flush.
->
-> Fixes: 29cf0f5007a2 ("kvm: x86/mmu: NX largepage recovery for TDP MMU")
+> Fixes: 1af4a96025b3 ("KVM: x86/mmu: Yield in TDU MMU iter even if no SPTES changed")
 > Cc: stable@vger.kernel.org
 > Cc: Ben Gardon <bgardon@google.com>
 > Signed-off-by: Sean Christopherson <seanjc@google.com>
 
 Reviewed-By: Ben Gardon <bgardon@google.com>
 
-This preserves an extremely unlikely degenerate case, which could
-cause an unexpected delay.
-The scenario is described below, but I don't think this change needs
-to be blocked on it.
-
 > ---
->  arch/x86/kvm/mmu/mmu.c     | 15 ++++++++++-----
->  arch/x86/kvm/mmu/tdp_mmu.c |  6 +++---
->  arch/x86/kvm/mmu/tdp_mmu.h |  3 ++-
->  3 files changed, 15 insertions(+), 9 deletions(-)
+>  arch/x86/kvm/mmu/tdp_mmu.c | 23 ++++++++++++-----------
+>  1 file changed, 12 insertions(+), 11 deletions(-)
 >
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index c6ed633594a2..413d6259340e 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -5517,7 +5517,8 @@ void kvm_zap_gfn_range(struct kvm *kvm, gfn_t gfn_start, gfn_t gfn_end)
->         }
->
->         if (is_tdp_mmu_enabled(kvm)) {
-> -               flush = kvm_tdp_mmu_zap_gfn_range(kvm, gfn_start, gfn_end);
-> +               flush = kvm_tdp_mmu_zap_gfn_range(kvm, gfn_start, gfn_end,
-> +                                                 false);
->                 if (flush)
->                         kvm_flush_remote_tlbs(kvm);
->         }
-> @@ -5939,6 +5940,8 @@ static void kvm_recover_nx_lpages(struct kvm *kvm)
->         struct kvm_mmu_page *sp;
->         unsigned int ratio;
->         LIST_HEAD(invalid_list);
-> +       bool flush = false;
-> +       gfn_t gfn_end;
->         ulong to_zap;
->
->         rcu_idx = srcu_read_lock(&kvm->srcu);
-> @@ -5960,19 +5963,21 @@ static void kvm_recover_nx_lpages(struct kvm *kvm)
->                                       lpage_disallowed_link);
->                 WARN_ON_ONCE(!sp->lpage_disallowed);
->                 if (is_tdp_mmu_page(sp)) {
-> -                       kvm_tdp_mmu_zap_gfn_range(kvm, sp->gfn,
-> -                               sp->gfn + KVM_PAGES_PER_HPAGE(sp->role.level));
-> +                       gfn_end = sp->gfn + KVM_PAGES_PER_HPAGE(sp->role.level);
-> +                       flush = kvm_tdp_mmu_zap_gfn_range(kvm, sp->gfn, gfn_end,
-> +                                                         flush || !list_empty(&invalid_list));
->                 } else {
->                         kvm_mmu_prepare_zap_page(kvm, sp, &invalid_list);
->                         WARN_ON_ONCE(sp->lpage_disallowed);
->                 }
->
->                 if (need_resched() || rwlock_needbreak(&kvm->mmu_lock)) {
-> -                       kvm_mmu_commit_zap_page(kvm, &invalid_list);
-> +                       kvm_mmu_remote_flush_or_zap(kvm, &invalid_list, flush);
-
-This pattern of waiting until a yield is needed or lock contention is
-detected has always been a little suspect to me because
-kvm_mmu_commit_zap_page does work proportional to the work done before
-the yield was needed. That seems like more work than we should like to
-be doing at that point.
-
-The yield in kvm_tdp_mmu_zap_gfn_range makes that phenomenon even
-worse. Because we can satisfy the need to yield without clearing out
-the invalid list, we can potentially queue many more pages which will
-then all need to have their zaps committed at once. This is an
-admittedly contrived case which could only be hit in a high load
-nested scenario.
-
-It could be fixed by forbidding kvm_tdp_mmu_zap_gfn_range from
-yielding. Since we should only need to zap one SPTE, the yield should
-not be needed within the kvm_tdp_mmu_zap_gfn_range call. To ensure
-that only one SPTE is zapped we would have to specify the root though.
-Otherwise we could end up zapping all the entries for the same GFN
-range under an unrelated root.
-
-Anyway, I can address this in another patch.
-
->                         cond_resched_rwlock_write(&kvm->mmu_lock);
-> +                       flush = false;
->                 }
->         }
-> -       kvm_mmu_commit_zap_page(kvm, &invalid_list);
-> +       kvm_mmu_remote_flush_or_zap(kvm, &invalid_list, flush);
->
->         write_unlock(&kvm->mmu_lock);
->         srcu_read_unlock(&kvm->srcu, rcu_idx);
 > diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-> index 6cf08c3c537f..367f12bf1026 100644
+> index f0c99fa04ef2..6cf08c3c537f 100644
 > --- a/arch/x86/kvm/mmu/tdp_mmu.c
 > +++ b/arch/x86/kvm/mmu/tdp_mmu.c
-> @@ -709,10 +709,10 @@ static bool zap_gfn_range(struct kvm *kvm, struct kvm_mmu_page *root,
->   * SPTEs have been cleared and a TLB flush is needed before releasing the
->   * MMU lock.
->   */
-> -bool kvm_tdp_mmu_zap_gfn_range(struct kvm *kvm, gfn_t start, gfn_t end)
-> +bool kvm_tdp_mmu_zap_gfn_range(struct kvm *kvm, gfn_t start, gfn_t end,
-> +                              bool flush)
+> @@ -86,7 +86,7 @@ static inline struct kvm_mmu_page *tdp_mmu_next_root(struct kvm *kvm,
+>         list_for_each_entry(_root, &_kvm->arch.tdp_mmu_roots, link)
+>
+>  static bool zap_gfn_range(struct kvm *kvm, struct kvm_mmu_page *root,
+> -                         gfn_t start, gfn_t end, bool can_yield);
+> +                         gfn_t start, gfn_t end, bool can_yield, bool flush);
+
+This function is going to acquire so many arguments. Don't need to do
+anything about it here, but this is going to need some kind of cleanup
+at some point.
+I'll have to add another "shared" type arg for running this function
+under the read lock in a series I'm prepping.
+
+
+>
+>  void kvm_tdp_mmu_free_root(struct kvm *kvm, struct kvm_mmu_page *root)
 >  {
->         struct kvm_mmu_page *root;
-> -       bool flush = false;
+> @@ -99,7 +99,7 @@ void kvm_tdp_mmu_free_root(struct kvm *kvm, struct kvm_mmu_page *root)
+>
+>         list_del(&root->link);
+>
+> -       zap_gfn_range(kvm, root, 0, max_gfn, false);
+> +       zap_gfn_range(kvm, root, 0, max_gfn, false, false);
+>
+>         free_page((unsigned long)root->spt);
+>         kmem_cache_free(mmu_page_header_cache, root);
+> @@ -664,20 +664,21 @@ static inline bool tdp_mmu_iter_cond_resched(struct kvm *kvm,
+>   * scheduler needs the CPU or there is contention on the MMU lock. If this
+>   * function cannot yield, it will not release the MMU lock or reschedule and
+>   * the caller must ensure it does not supply too large a GFN range, or the
+> - * operation can cause a soft lockup.
+> + * operation can cause a soft lockup.  Note, in some use cases a flush may be
+> + * required by prior actions.  Ensure the pending flush is performed prior to
+> + * yielding.
+>   */
+>  static bool zap_gfn_range(struct kvm *kvm, struct kvm_mmu_page *root,
+> -                         gfn_t start, gfn_t end, bool can_yield)
+> +                         gfn_t start, gfn_t end, bool can_yield, bool flush)
+>  {
+>         struct tdp_iter iter;
+> -       bool flush_needed = false;
+>
+>         rcu_read_lock();
+>
+>         tdp_root_for_each_pte(iter, root, start, end) {
+>                 if (can_yield &&
+> -                   tdp_mmu_iter_cond_resched(kvm, &iter, flush_needed)) {
+> -                       flush_needed = false;
+> +                   tdp_mmu_iter_cond_resched(kvm, &iter, flush)) {
+> +                       flush = false;
+>                         continue;
+>                 }
+>
+> @@ -695,11 +696,11 @@ static bool zap_gfn_range(struct kvm *kvm, struct kvm_mmu_page *root,
+>                         continue;
+>
+>                 tdp_mmu_set_spte(kvm, &iter, 0);
+> -               flush_needed = true;
+> +               flush = true;
+>         }
+>
+>         rcu_read_unlock();
+> -       return flush_needed;
+> +       return flush;
+>  }
+>
+>  /*
+> @@ -714,7 +715,7 @@ bool kvm_tdp_mmu_zap_gfn_range(struct kvm *kvm, gfn_t start, gfn_t end)
+>         bool flush = false;
 >
 >         for_each_tdp_mmu_root_yield_safe(kvm, root)
->                 flush = zap_gfn_range(kvm, root, start, end, true, flush);
-> @@ -725,7 +725,7 @@ void kvm_tdp_mmu_zap_all(struct kvm *kvm)
->         gfn_t max_gfn = 1ULL << (shadow_phys_bits - PAGE_SHIFT);
->         bool flush;
+> -               flush |= zap_gfn_range(kvm, root, start, end, true);
+> +               flush = zap_gfn_range(kvm, root, start, end, true, flush);
 >
-> -       flush = kvm_tdp_mmu_zap_gfn_range(kvm, 0, max_gfn);
-> +       flush = kvm_tdp_mmu_zap_gfn_range(kvm, 0, max_gfn, false);
->         if (flush)
->                 kvm_flush_remote_tlbs(kvm);
+>         return flush;
 >  }
-> diff --git a/arch/x86/kvm/mmu/tdp_mmu.h b/arch/x86/kvm/mmu/tdp_mmu.h
-> index 3b761c111bff..e39bee52d49e 100644
-> --- a/arch/x86/kvm/mmu/tdp_mmu.h
-> +++ b/arch/x86/kvm/mmu/tdp_mmu.h
-> @@ -8,7 +8,8 @@
->  hpa_t kvm_tdp_mmu_get_vcpu_root_hpa(struct kvm_vcpu *vcpu);
->  void kvm_tdp_mmu_free_root(struct kvm *kvm, struct kvm_mmu_page *root);
+> @@ -931,7 +932,7 @@ static int zap_gfn_range_hva_wrapper(struct kvm *kvm,
+>                                      struct kvm_mmu_page *root, gfn_t start,
+>                                      gfn_t end, unsigned long unused)
+>  {
+> -       return zap_gfn_range(kvm, root, start, end, false);
+> +       return zap_gfn_range(kvm, root, start, end, false, false);
+>  }
 >
-> -bool kvm_tdp_mmu_zap_gfn_range(struct kvm *kvm, gfn_t start, gfn_t end);
-> +bool kvm_tdp_mmu_zap_gfn_range(struct kvm *kvm, gfn_t start, gfn_t end,
-> +                              bool flush);
->  void kvm_tdp_mmu_zap_all(struct kvm *kvm);
->
->  int kvm_tdp_mmu_map(struct kvm_vcpu *vcpu, gpa_t gpa, u32 error_code,
+>  int kvm_tdp_mmu_zap_hva_range(struct kvm *kvm, unsigned long start,
 > --
 > 2.31.0.rc2.261.g7f71774620-goog
 >
