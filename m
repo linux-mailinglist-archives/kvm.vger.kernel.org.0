@@ -2,91 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A55C634391A
-	for <lists+kvm@lfdr.de>; Mon, 22 Mar 2021 07:03:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E0334343926
+	for <lists+kvm@lfdr.de>; Mon, 22 Mar 2021 07:05:11 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230125AbhCVGDR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 22 Mar 2021 02:03:17 -0400
-Received: from szxga04-in.huawei.com ([45.249.212.190]:14122 "EHLO
-        szxga04-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229875AbhCVGCo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 22 Mar 2021 02:02:44 -0400
-Received: from DGGEMS412-HUB.china.huawei.com (unknown [172.30.72.58])
-        by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4F3kPn19bLz19GH0;
-        Mon, 22 Mar 2021 14:00:45 +0800 (CST)
-Received: from DESKTOP-7FEPK9S.china.huawei.com (10.174.184.135) by
- DGGEMS412-HUB.china.huawei.com (10.3.19.212) with Microsoft SMTP Server id
- 14.3.498.0; Mon, 22 Mar 2021 14:02:33 +0800
-From:   Shenming Lu <lushenming@huawei.com>
-To:     Marc Zyngier <maz@kernel.org>, Eric Auger <eric.auger@redhat.com>,
-        "Will Deacon" <will@kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>,
-        <kvmarm@lists.cs.columbia.edu>, <kvm@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>
-CC:     Alex Williamson <alex.williamson@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
-        <wanghaibin.wang@huawei.com>, <yuzenghui@huawei.com>,
-        <lushenming@huawei.com>
-Subject: [PATCH v5 6/6] KVM: arm64: GICv4.1: Give a chance to save VLPI state
-Date:   Mon, 22 Mar 2021 14:01:58 +0800
-Message-ID: <20210322060158.1584-7-lushenming@huawei.com>
-X-Mailer: git-send-email 2.27.0.windows.1
-In-Reply-To: <20210322060158.1584-1-lushenming@huawei.com>
-References: <20210322060158.1584-1-lushenming@huawei.com>
+        id S229930AbhCVGEl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 22 Mar 2021 02:04:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53136 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229786AbhCVGEi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 22 Mar 2021 02:04:38 -0400
+Received: from mail-qt1-x832.google.com (mail-qt1-x832.google.com [IPv6:2607:f8b0:4864:20::832])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1C67BC061574;
+        Sun, 21 Mar 2021 23:04:38 -0700 (PDT)
+Received: by mail-qt1-x832.google.com with SMTP id u7so11506822qtq.12;
+        Sun, 21 Mar 2021 23:04:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=lwaHqCUEUERMsP+lSCCck+2lPknx9eDdkaf0NX52J94=;
+        b=as2anY9IFqju8x6xmgL5aH/SQphhMHkDAgXdwcLNMU13gTcRuXYE44AmAZWjM5gwE2
+         8X+J8KJmgUqvCplTWsiw7JMWKfmGSG+x0mEgk+jP3CpO7C7gVynfY1qpWd0x99BI5AiA
+         zQc+CMFC6jwVg3l3r+CgB2o7XLnmmjKaKP0sANg4RODIJDlfVRKZyV7ffhHP5ilHvusw
+         a++3Q7Oes0TARj/hVRgkwbtBiL/ruQmHxPKdTjUMdirGsw8oXLIYS606FamkJBThHCwb
+         tq+pB75OVLo2ZhXd4Tofnqw/I1+bspgyHBbpOGo5UKg6PaLGK8RS94T6LNXnlphRSKO2
+         vesA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=lwaHqCUEUERMsP+lSCCck+2lPknx9eDdkaf0NX52J94=;
+        b=fEuFvrFbo2zAJSmoWEXbtsIpIhnmqrJShX92RvC4i9wuM3b0ED14IPSOZ5S2ltTohm
+         1fceRfy/QDMfXy8wK/7a2mi+IgyXWa5EGZpo2cb2RGtf3Fxegkw3XxT9vS+NjeuzGLMe
+         doJ0XMkVtJ1Dsp5Xhjv+wEXNEdpAgKuFl0p6gvCYby+8FOw3Oc/XUvXoCnm16feDD8+3
+         QmGYQFe/onbiT8cr62cBFn43D++WzUSx++Xuxtmot3YMGfWiw4S/dgRgmDzpTg6TyouG
+         LX/V/CvSlgQdpZkVAEM9VyYwURscnwWz3e0UZ7Q7kW26txwhiE5GKI6MPvKRKk0qZfAE
+         squQ==
+X-Gm-Message-State: AOAM530Zz/wgwKPZZa15877/XsedWl2pBGaR1FJjHR/0OLYVrtgIuzkR
+        lEPH/0Fr+8BiY0ooaxWyvIw=
+X-Google-Smtp-Source: ABdhPJyX6kPawbK5ls3W+DAKqZ3kKOxuwuIlod6H79ptvldVx6BkKPOe2vmjJ39w3EYwDOHkRRO/cw==
+X-Received: by 2002:a05:622a:114:: with SMTP id u20mr8193244qtw.317.1616393077407;
+        Sun, 21 Mar 2021 23:04:37 -0700 (PDT)
+Received: from localhost.localdomain ([37.19.198.40])
+        by smtp.gmail.com with ESMTPSA id r7sm8387041qtm.88.2021.03.21.23.04.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 21 Mar 2021 23:04:36 -0700 (PDT)
+From:   Bhaskar Chowdhury <unixbhaskar@gmail.com>
+To:     pbonzini@redhat.com, seanjc@google.com, vkuznets@redhat.com,
+        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
+        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, x86@kernel.org,
+        hpa@zytor.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     rdunlap@infradead.org, Bhaskar Chowdhury <unixbhaskar@gmail.com>
+Subject: [PATCH V2] KVM: x86: A typo fix
+Date:   Mon, 22 Mar 2021 11:34:09 +0530
+Message-Id: <20210322060409.2605006-1-unixbhaskar@gmail.com>
+X-Mailer: git-send-email 2.31.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.174.184.135]
-X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Before GICv4.1, we don't have direct access to the VLPI state. So
-we simply let it fail early when encountering any VLPI in saving.
 
-But now we don't have to return -EACCES directly if on GICv4.1. Let’s
-change the hard code and give a chance to save the VLPI state (and
-preserve the UAPI).
+s/resued/reused/
 
-Signed-off-by: Shenming Lu <lushenming@huawei.com>
+
+Signed-off-by: Bhaskar Chowdhury <unixbhaskar@gmail.com>
 ---
- Documentation/virt/kvm/devices/arm-vgic-its.rst | 2 +-
- arch/arm64/kvm/vgic/vgic-its.c                  | 6 +++---
- 2 files changed, 4 insertions(+), 4 deletions(-)
+ Changes from V1:
+ As Ingo found the correct word for replacement, so incorporating.
 
-diff --git a/Documentation/virt/kvm/devices/arm-vgic-its.rst b/Documentation/virt/kvm/devices/arm-vgic-its.rst
-index 6c304fd2b1b4..d257eddbae29 100644
---- a/Documentation/virt/kvm/devices/arm-vgic-its.rst
-+++ b/Documentation/virt/kvm/devices/arm-vgic-its.rst
-@@ -80,7 +80,7 @@ KVM_DEV_ARM_VGIC_GRP_CTRL
-     -EFAULT  Invalid guest ram access
-     -EBUSY   One or more VCPUS are running
-     -EACCES  The virtual ITS is backed by a physical GICv4 ITS, and the
--	     state is not available
-+	     state is not available without GICv4.1
-     =======  ==========================================================
- 
- KVM_DEV_ARM_VGIC_GRP_ITS_REGS
-diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
-index 40cbaca81333..ec7543a9617c 100644
---- a/arch/arm64/kvm/vgic/vgic-its.c
-+++ b/arch/arm64/kvm/vgic/vgic-its.c
-@@ -2218,10 +2218,10 @@ static int vgic_its_save_itt(struct vgic_its *its, struct its_device *device)
- 		/*
- 		 * If an LPI carries the HW bit, this means that this
- 		 * interrupt is controlled by GICv4, and we do not
--		 * have direct access to that state. Let's simply fail
--		 * the save operation...
-+		 * have direct access to that state without GICv4.1.
-+		 * Let's simply fail the save operation...
- 		 */
--		if (ite->irq->hw)
-+		if (ite->irq->hw && !kvm_vgic_global_state.has_gicv4_1)
- 			return -EACCES;
- 
- 		ret = vgic_its_save_ite(its, device, ite, gpa, ite_esz);
--- 
-2.19.1
+ arch/x86/include/asm/kvm_host.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 3768819693e5..e37c2ebc02e5 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -1488,7 +1488,7 @@ extern u64 kvm_mce_cap_supported;
+ /*
+  * EMULTYPE_NO_DECODE - Set when re-emulating an instruction (after completing
+  *			userspace I/O) to indicate that the emulation context
+- *			should be resued as is, i.e. skip initialization of
++ *			should be reused as is, i.e. skip initialization of
+  *			emulation context, instruction fetch and decode.
+  *
+  * EMULTYPE_TRAP_UD - Set when emulating an intercepted #UD from hardware.
+--
+2.31.0
 
