@@ -2,41 +2,46 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 15096344BE7
-	for <lists+kvm@lfdr.de>; Mon, 22 Mar 2021 17:41:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5B627344C02
+	for <lists+kvm@lfdr.de>; Mon, 22 Mar 2021 17:44:57 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230008AbhCVQkm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 22 Mar 2021 12:40:42 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:22184 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231455AbhCVQk2 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 22 Mar 2021 12:40:28 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1616431228;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=KsLjarnjua8MhxR/qpYAR4EVi2H41BnB8tr1ZOD2/wg=;
-        b=Nh6VHoPGfz2wymCvcdG1+2T+sVAiRPGAwOlNOHPqaL7QPfz05gqTIZWG+n1uJl1CClCYhR
-        N0fR42PD07225n1qRdyVzbh77oxqYrxmtHIaWXhJ450OwxFWUQwz0iIPYbly8dckxv/C3w
-        InqRn5F81YkIWSJc5RWBxqcJYh0n30U=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-93-hY-RkdLXOXy1RsR9NwKTnA-1; Mon, 22 Mar 2021 12:40:23 -0400
-X-MC-Unique: hY-RkdLXOXy1RsR9NwKTnA-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DA11A81622;
-        Mon, 22 Mar 2021 16:40:19 +0000 (UTC)
-Received: from omen.home.shazbot.org (ovpn-112-120.phx2.redhat.com [10.3.112.120])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 7C75317195;
-        Mon, 22 Mar 2021 16:40:18 +0000 (UTC)
-Date:   Mon, 22 Mar 2021 10:40:16 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     Christoph Hellwig <hch@lst.de>,
+        id S229673AbhCVQoX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 22 Mar 2021 12:44:23 -0400
+Received: from mail-eopbgr770045.outbound.protection.outlook.com ([40.107.77.45]:58333
+        "EHLO NAM02-SN1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S229931AbhCVQoQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 22 Mar 2021 12:44:16 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Uw2jOde4pn3XXUgdYpJ2odkFTKy2ZJJd9h6ugLOELiF5v463WvVlWg7dfXsWc2/LJBP3e9WQVO+EKfPag3sdqVXmr2xMm+qX9cTWs+r6XEjda4m5bYbl2wkuGllWBTgz38KT4US1gPlG+ix4DRiIhhtrCSw0BowlwK4qK0R23gQMTTdVX9R+65z7/ySdJmTqrd6cS6CeAamcTWcoe1/S2gciyvOSfTDOV3ux+YpEVcgLgfqU446hQsa1/aXWSSpB3ZD4DSQrBKFzdai58zoAKaLzFZ/foJfSX12/jAQexjaNzaJowdbgxMUoKZrKCSotPgGKsdnXqu2xp9xoHDFoPw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=AAdpQdqFv3U3a4Rdp6NSROuvDA1vQ5RHZJ/RflmPmRc=;
+ b=j9idK8sZCqaQn4vmT3HsCn+DEdlgMlRrTHR6zCcTTWzv+7Q/M9Ie+yeRoC2J1DY2c4Vk9t2zI1cE7cZs1gH2/CBRM/01JEgg5T8EGL5XghtEGvf9bW7qodYusDNSn6mHzYkTBp1+GXW/ggyoki0CIegOtRnFUNbhNbeDqB3nr5TJiiEx6QxceU51rHStvXLqd9ukZiAiRx1YCGBLQhTL9CDKfkFX8J/psRRFP7f7+JyufRxRMVMHlyHi0k1Z2j6NHX2KVzDsJGkSUs0iUv8gILzyMC7l9xXCGIs1BUp8bn1kh8go3ijaWGBNqURQRiLh2znHYUf8GprrLCoCbdYJ0Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=AAdpQdqFv3U3a4Rdp6NSROuvDA1vQ5RHZJ/RflmPmRc=;
+ b=qhBXsPbPjbHwjHgA4sd13wit7G2bcYz7ydoR/7dZlOJHEVnViXPEeceSGXcggEnoeJnmi48+Cw0bbAPFNE34Swth9Bbg+JwmfkISaFdXJQMw7loP7WXZMkOR0SHCNwJZ8C/LiT4F0+uIoMNPSXRnKJvzXUDxPsT9AN7ZzFLcyZ7SAZdVo6C93DHFCaw634FOqGCXTtZuCSp36IlDIym+DwfOp7SE2ZYjp/2Y4KJhaZGXPtETBNRMSoSdX4cGaHKS1FUzwDggL8w/0EsRZKnNoYzsHwdaNzIu2tYI5tC8UooOscoML7CVEqRsko/6Q+8YBXoRprHp9FKAEhWQ1yxA3g==
+Authentication-Results: lst.de; dkim=none (message not signed)
+ header.d=none;lst.de; dmarc=none action=none header.from=nvidia.com;
+Received: from DM6PR12MB3834.namprd12.prod.outlook.com (2603:10b6:5:14a::12)
+ by DM6PR12MB3931.namprd12.prod.outlook.com (2603:10b6:5:1cb::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3955.18; Mon, 22 Mar
+ 2021 16:44:13 +0000
+Received: from DM6PR12MB3834.namprd12.prod.outlook.com
+ ([fe80::1c62:7fa3:617b:ab87]) by DM6PR12MB3834.namprd12.prod.outlook.com
+ ([fe80::1c62:7fa3:617b:ab87%6]) with mapi id 15.20.3955.025; Mon, 22 Mar 2021
+ 16:44:13 +0000
+Date:   Mon, 22 Mar 2021 13:44:11 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Alex Williamson <alex.williamson@redhat.com>,
         Max Gurtovoy <mgurtovoy@nvidia.com>,
         Alexey Kardashevskiy <aik@ozlabs.ru>, cohuck@redhat.com,
         kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
@@ -47,257 +52,132 @@ Cc:     Christoph Hellwig <hch@lst.de>,
         mjrosato@linux.ibm.com
 Subject: Re: [PATCH 8/9] vfio/pci: export nvlink2 support into vendor
  vfio_pci drivers
-Message-ID: <20210322104016.36eb3c1f@omen.home.shazbot.org>
-In-Reply-To: <20210321125818.GM2356281@nvidia.com>
-References: <20210319092341.14bb179a@omen.home.shazbot.org>
-        <20210319161722.GY2356281@nvidia.com>
-        <20210319162033.GA18218@lst.de>
-        <20210319162848.GZ2356281@nvidia.com>
-        <20210319163449.GA19186@lst.de>
-        <20210319113642.4a9b0be1@omen.home.shazbot.org>
-        <20210319200749.GB2356281@nvidia.com>
-        <20210319150809.31bcd292@omen.home.shazbot.org>
-        <20210319225943.GH2356281@nvidia.com>
-        <20210319224028.51b01435@x1.home.shazbot.org>
-        <20210321125818.GM2356281@nvidia.com>
+Message-ID: <20210322164411.GV2356281@nvidia.com>
+References: <19e73e58-c7a9-03ce-65a7-50f37d52ca15@ozlabs.ru>
+ <8941cf42-0c40-776e-6c02-9227146d3d66@nvidia.com>
+ <20210319092341.14bb179a@omen.home.shazbot.org>
+ <20210319161722.GY2356281@nvidia.com>
+ <20210319162033.GA18218@lst.de>
+ <20210319162848.GZ2356281@nvidia.com>
+ <20210319163449.GA19186@lst.de>
+ <20210319113642.4a9b0be1@omen.home.shazbot.org>
+ <20210319200749.GB2356281@nvidia.com>
+ <20210322151125.GA1051@lst.de>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210322151125.GA1051@lst.de>
+X-Originating-IP: [206.223.160.26]
+X-ClientProxiedBy: YTXPR0101CA0014.CANPRD01.PROD.OUTLOOK.COM
+ (2603:10b6:b00::27) To DM6PR12MB3834.namprd12.prod.outlook.com
+ (2603:10b6:5:14a::12)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from mlx.ziepe.ca (206.223.160.26) by YTXPR0101CA0014.CANPRD01.PROD.OUTLOOK.COM (2603:10b6:b00::27) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3955.24 via Frontend Transport; Mon, 22 Mar 2021 16:44:12 +0000
+Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1lONf1-0017pA-4L; Mon, 22 Mar 2021 13:44:11 -0300
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 8eea2d73-4efd-46fe-3620-08d8ed51b941
+X-MS-TrafficTypeDiagnostic: DM6PR12MB3931:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <DM6PR12MB39318C63EFD993EF29C8F845C2659@DM6PR12MB3931.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: RK6726gghBLeGGYfkEncgec0hkhdR8MhIZ9kFL6xAYG7jMP2XuXQU5cyH8arAhF4ms3JiAkPSfW7mYR5b63NaZ4TvjOLkaRFmh85GMiTBqRiqMHFvQ4T3kHjMl69/C4CVjPe1lVEz+IxHDECsrOklNXKuU2Len3m08dONMF8PWcDqBDZsGxoimUPaChCmYTqeUGaMBtF5F/lCIePiN/hxt8Vfdub8p9yNDXnZkWtRnKE4tTHB3sypIPw1vdw/BEBW9M7rRbstuuoFrf9sMLVfh9TeogpHcfXMX9Pw4lr0SpL9hTEuZoeO/n9Bey+PUm+qrzzLccK7/qWouikDBW8rIFEnJm7I47sQg1Rn7WVtHU9nQhLGTNOv8dOANjAG/eJpmew9vNtk3Fp0MQynpS4EA57lzOOytVNwUZCP9vh++W/J0T+QSC2OV8FuhMXXEf4WxIClkQKsMqtTHOx2vnZJgITuwMJkl7XeDemCjCtToPCZ37fKeZZi4T2G2CcJDsoo09ZSxKJLuD5cD/jiyXRqB83YBpPMmPZHMHtFfuUk34hZWa+SPzd/DvVTmpvYda7SW0U+kEYyeDQ5WTE3GqE3mGge1aEv0fwiJKAHNBaGCgMhlLesyxUVeXuZMf8zOxAgnd2HbnnV4UzyZlOjA6B2pu3sRPRhetUMILW7Fa6y/g=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB3834.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(346002)(366004)(396003)(136003)(376002)(39860400002)(66946007)(26005)(9786002)(9746002)(478600001)(316002)(6916009)(38100700001)(66476007)(66556008)(8676002)(5660300002)(2906002)(1076003)(4326008)(186003)(83380400001)(33656002)(8936002)(54906003)(86362001)(2616005)(36756003)(426003)(21314003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData: =?us-ascii?Q?rkGLNoM1Zfn8e9enKe2P6FnsVdyDCAQ5KKaoeUp3lznIKqIBcYzFcDwlscHi?=
+ =?us-ascii?Q?5DMONXmdwgpu1nzjTA05Or9Dd6fpMxowInlQzT+tGEZ5pW5AYKWkYvfT8dlS?=
+ =?us-ascii?Q?NxtOwKMv3/9mlv0m9U4U66GIvY8KvDVgmphfmCOw4CTpvcTeSF54eXuJk238?=
+ =?us-ascii?Q?5hU2pHGsvFKh7m1LXjygUp2JUtCj2dBww61cSnw/x7ge0Haxv+FQR0MoQ97Q?=
+ =?us-ascii?Q?d3cR5q3bDt6cKp91kWOk3S4PboZcGR6M7hi9oBeTfh6DXxIgPrjrz0v/IqmA?=
+ =?us-ascii?Q?zjXVM55qvB7IO1HqBjtiHNH6Ci0a4TnONd6OlTajvIJja+PablXgni2zj9S4?=
+ =?us-ascii?Q?/OsVRHxhCRROdmFjTFdk0EkALmPbeamXILpBfWXEseyyaTLtNfe64FSZF2bx?=
+ =?us-ascii?Q?K47IjLDE5qeqVPdKJSiM8Bg8nTZT/8d4tyRMoQSoFYuzSgubxywysXRHfc2N?=
+ =?us-ascii?Q?KXUb1mhdzkgH7LPCc3u71kW+QcK0TFf1B+pnTNYJKCPMXQ42YKr2c+m+GPGM?=
+ =?us-ascii?Q?hfiWzN/ys85nrH3Zx5/ULVgoXqk68qtVnJgnkqobqWkHuCguLWDkZqcVDKua?=
+ =?us-ascii?Q?HjmGuUwxysBNvigoBNutBJLEZ3ZMT2R9wsPGHjwHTEK1UVBsPz/KtUVYZfIp?=
+ =?us-ascii?Q?XlNuZoPkZmoXoZkf7KyW6lw0l5TDqlQttjSBozJImjJDnTU3UPxZo2TXqdTx?=
+ =?us-ascii?Q?CMxF2PSEW7hTGXlDGm5T/WoxiS1rBHCkmeyZzIOIG9wuvqLIg3rPxS45VsPE?=
+ =?us-ascii?Q?K2oghrri43LevnfVneMvVzZhEEqxcKXKbVt4F99KjS+A70r0gxxbhB6Hb0ab?=
+ =?us-ascii?Q?c+pOcqMuhpIVb5rH9a9AoqjSNfEPkil+V+W+7fIs3L8r59FB/oBsV9r5V2Wb?=
+ =?us-ascii?Q?PwCG4iKwi0RggiElYw2qQQ9x6qb0/PIg3ti991DVPcW87I8xgL2UHI4Zq8Mg?=
+ =?us-ascii?Q?FDLPEjIuE44eE0d3u5EPP+yY+79SSz2qOTxnW1dQIgzQC4YCPrD9W2xSc7h2?=
+ =?us-ascii?Q?mdoR93peYmjosYoNBT/abeA6ajMmPP35yJjjfsIlA1diiXOyemkh7xxtVzGL?=
+ =?us-ascii?Q?IO+UrWxp/yAuKDGl9WcSldsxatOnN27r+4HfwKzj/iTOUkelnjhcSlwcs3qK?=
+ =?us-ascii?Q?TDmYaWaXX0i0E1bvapUD8uLKXbrlxmVsEXgE2Vt4FRijAOfGk7XTygFTmj75?=
+ =?us-ascii?Q?QpzbFgUiuXy69X2vUamCYDnUf+oHMySnTc4FD9l6SKLqd4R1zJpr+VTrPjRp?=
+ =?us-ascii?Q?/e+RfoxwOsFom4PtlmvDp5wWslLk1UxNPp7G0kuntiq+zs7la//Y46tuuYs9?=
+ =?us-ascii?Q?Tnvl9DOExHbqP0EkKQ0GDvuC?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8eea2d73-4efd-46fe-3620-08d8ed51b941
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB3834.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Mar 2021 16:44:13.2965
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: rlMW+J0vOzdDZSKOuvkjtiMLFJ2NGARy8E+jlKte2F0Qx83khHfbIQCovsZutdBN
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB3931
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, 21 Mar 2021 09:58:18 -0300
-Jason Gunthorpe <jgg@nvidia.com> wrote:
-
-> On Fri, Mar 19, 2021 at 10:40:28PM -0600, Alex Williamson wrote:
-> 
-> > > Well, today we don't, but Max here adds id_table's to the special
-> > > devices and a MODULE_DEVICE_TABLE would come too if we do the flavours
-> > > thing below.  
+On Mon, Mar 22, 2021 at 04:11:25PM +0100, Christoph Hellwig wrote:
+> On Fri, Mar 19, 2021 at 05:07:49PM -0300, Jason Gunthorpe wrote:
+> > The way the driver core works is to first match against the already
+> > loaded driver list, then trigger an event for module loading and when
+> > new drivers are registered they bind to unbound devices.
 > > 
-> > I think the id_tables are the wrong approach for IGD and NVLink
-> > variants.  
-> 
-> I really disagree with this. Checking for some random bits in firmware
-> and assuming that every device made forever into the future works with
-> this check is not a good way to do compatibility. Christoph made the
-> same point.
-> 
-> We have good processes to maintain id tables, I don't see this as a
-> problem.
-
-The base driver we're discussing here is a meta-driver that binds to
-any PCI endpoint as directed by the user.  There is no id_table.  There
-can't be any id_table unless you're expecting every device vendor to
-submit the exact subset of devices they have tested and condone usage
-with this interface.  The IGD extensions here only extend that
-interface by providing userspace read-only access to a few additional
-pieces of information that we've found to be necessary for certain
-userspace drivers.  The actual device interface is unchanged.  In the
-case of the NVLink extensions, AIUI these are mostly extensions of a
-firmware defined interface for managing aspects of the interconnect to
-the device.  It is actually the "random bits in firmware" that we want
-to expose, the ID of the device is somewhat tangential, we just only
-look for those firmware extensions in association to certain vendor
-devices.
-
-Of course if you start looking at features like migration support,
-that's more than likely not simply an additional region with optional
-information, it would need to interact with the actual state of the
-device.  For those, I would very much support use of a specific
-id_table.  That's not these.
-
-> > > As-is driver_override seems dangerous as overriding the matching table
-> > > could surely allow root userspace to crash the machine. In situations
-> > > with trusted boot/signed modules this shouldn't be.  
+> > So, the trouble is the event through userspace because the kernel
+> > can't just go on to use vfio_pci until it knows userspace has failed
+> > to satisfy the load request.
 > > 
-> > When we're dealing with meta-drivers that can bind to anything, we
-> > shouldn't rely on the match, but should instead verify the driver is
-> > appropriate in the probe callback.  Even without driver_override,
-> > there's the new_id mechanism.  Either method allows the root user to
-> > break driver binding.  Greg has previously stated something to the
-> > effect that users get to keep all the pieces when they break something
-> > by manipulating driver binding.  
-> 
-> Yes, but that is a view where root is allowed to break the kernel, we
-> now have this optional other world where that is not allowed and root
-> access to lots of dangerous things are now disabled.
-> 
-> new_id and driver_override should probably be in that disable list
-> too..
-
-We don't have this other world yet, nor is it clear that we will have
-it.  What sort of id_table is the base vfio-pci driver expected to use?
-There's always a risk that hardware doesn't adhere to the spec or that
-platform firmware might escalate an error that we'd otherwise consider
-mundane from a userspace driver.
-
-> > > While that might not seem too bad with these simple drivers, at least
-> > > the mlx5 migration driver will have a large dependency tree and pull
-> > > in lots of other modules. Even Max's sample from v1 pulls in mlx5_core.ko
-> > > and a bunch of other stuff in its orbit.  
+> > One answer is to have userspace udev have the "hook" here and when a
+> > vfio flavour mod alias is requested on a PCI device it swaps in
+> > vfio_pci if it can't find an alternative.
 > > 
-> > Luckily the mlx5 driver doesn't need to be covered by compatibility
-> > support, so we don't need to set a softdep for it and the module could
-> > be named such that a wildcard driver_override of vfio_pci* shouldn't
-> > logically include that driver.  Users can manually create their own
-> > modprobe.d softdep entry if they'd like to include it.  Otherwise
-> > userspace would need to know to bind to it specifically.  
-> 
-> But now you are giving up on the whole point, which was to
-> automatically load the correct specific module without special admin
-> involvement!
-
-This series only exposed a temporary compatibility interface to provide
-that anyway.  As I understood it, the long term solution was that
-userspace would somehow learn which driver to use for which device.
-That "somehow" isn't clear to me.
-
-> > > This is why I want to try for fine grained autoloading first. It
-> > > really is the elegant solution if we can work it out.  
+> > The dream would be a system with no vfio modules loaded could do some
 > > 
-> > I just don't see how we create a manageable change to userspace.  
-> 
-> I'm not sure I understand. Even if we add a new sysfs to set some
-> flavour then that is a pretty trivial change for userspace to move
-> from driver_override?
-
-Perhaps for some definition of trivial that I'm not familiar with.
-We're talking about changing libvirt and driverctl and every distro and
-user that's created a custom script outside of those.  Even changing
-from "vfio-pci" to "vfio-pci*" is a hurdle.
-
-> > > I don't think we should over-focus on these two firmware triggered
-> > > examples. I looked at the Intel GPU driver and it already only reads
-> > > the firmware thing for certain PCI ID's, we can absolutely generate a
-> > > narrow match table for it. Same is true for the NVIDIA GPU.  
+> >  echo "vfio" > /sys/bus/pci/xxx/driver_flavour
 > > 
-> > I'm not sure we can make this assertion, both only care about the type
-> > of device and existence of associated firmware tables.    
+> > And a module would be loaded and a struct vfio_device is created for
+> > that device. Very easy for the user.
 > 
-> Well, I read through the Intel GPU driver and this is how I felt it
-> works. It doesn't even check the firmware bit unless certain PCI IDs
-> are matched first.
+> Maybe I did not communicate my suggestion last week very well.  My
+> idea is that there are no different pci_drivers vs vfio or not,
+> but different personalities of the same driver.
 
-The IDs being only the PCI vendor ID and class code.  The entire IGD
-extension is only meant to expose a vendor specific, graphics related
-firmware table and collateral config space, so of course we'd restrict
-it to that vendor for a graphics class device in approximately the
-right location in the system.  There's a big difference between that
-and a fixed id_table.
- 
-> For NVIDIA GPU Max checked internally and we saw it looks very much
-> like how Intel GPU works. Only some PCI IDs trigger checking on the
-> feature the firmware thing is linked to.
+This isn't quite the scenario that needs solving. Lets go back to
+Max's V1 posting:
 
-And as Alexey noted, the table came up incomplete.  But also those same
-devices exist on platforms where this extension is completely
-irrelevant.
+The mlx5_vfio_pci.c pci_driver matches this:
 
-> My point is: the actual *drivers* consuming these firmware features do
-> *not* blindly match every PCI device and check for the firmware
-> bit. They all have narrow matches and further only try to use the
-> firmware thing for some subset of PCI IDs that the entire driver
-> supports.
++	{ PCI_DEVICE_SUB(PCI_VENDOR_ID_REDHAT_QUMRANET, 0x1042,
++			 PCI_VENDOR_ID_MELLANOX, PCI_ANY_ID) }, /* Virtio SNAP controllers */
 
-So because we don't check for an Intel specific graphics firmware table
-when binding to Realtek NIC, we can leap to the conclusion that there
-must be a concise id_table we can create for IGD support?
+This overlaps with the match table in
+drivers/virtio/virtio_pci_common.c:
 
-> Given that the actual drivers work this way there is no technical
-> reason vfio-pci can't do this as well.
+        { PCI_DEVICE(PCI_VENDOR_ID_REDHAT_QUMRANET, PCI_ANY_ID) },
 
-There's a giant assumption above that I'm missing.  Are you expecting
-that vendors are actually going to keep up with submitting device IDs
-that they claim to have tested and support with vfio-pci and all other
-devices won't be allowed to bind?  That would single handedly destroy
-any non-enterprise use cases of vfio-pci.
+So, if we do as you propose we have to add something mellanox specific
+to virtio_pci_common which seems to me to just repeating this whole
+problem except in more drivers.
 
-> We don't have to change them of course, they can stay as is if people
-> feel really strongly.
-> 
-> > > Even so, I'm not *so* worried about "over matching" - if IGD or the
-> > > nvidia stuff load on a wide set of devices then they can just not
-> > > enable their extended stuff. It wastes some kernel memory, but it is
-> > > OK.  
-> > 
-> > I'd rather they bind to the base vfio-pci driver if their extended
-> > features are not available.  
-> 
-> Sure it would be nice, but functionally it is no different.
+The general thing that that is happening is people are adding VM
+migration capability to existing standard PCI interfaces like VFIO,
+NVMe, etc
 
-Exactly, the device interface is not changed, so why is it such a
-heinous misstep that we should test for the feature we're trying to
-expose rather than a specific ID and fall through if we don't find it?
+At least in this mlx5 situation the PF driver provides the HW access
+to do the migration and the vfio mlx5 driver provides all the protocol
+and machinery specific to the PCI standard being migrated. They are
+all a little different.
 
-> > > And if some driver *really* gets stuck here the true answer is to
-> > > improve the driver core match capability.
-> > >   
-> > > > devices in the deny-list and non-endpoint devices.  Many drivers
-> > > > clearly place implicit trust in their id_table, others don't.  In the
-> > > > case of meta drivers, I think it's fair to make use of the latter
-> > > > approach.    
-> > > 
-> > > Well, AFAIK, the driver core doesn't have a 'try probe, if it fails
-> > > then try another driver' approach. One device, one driver. Am I
-> > > missing something?  
-> > 
-> > If the driver probe callback fails, really_probe() returns 0 with the
-> > comment:
-> > 
-> >         /*
-> >          * Ignore errors returned by ->probe so that the next driver can try
-> >          * its luck.
-> >          */
-> >         ret = 0;
-> > 
-> > That allows bus_for_each_drv() to continue to iterate.  
-> 
-> Er, but we have no reliable way to order drivers in the list so this
-> still assumes the system has exactly one driver match (even if some of
-> the match is now in code).
-> 
-> It won't work with a "universal" driver without more changes.
-> 
-> (and I couldn't find out why Cornelia added this long ago, or how or
-> even if it actually ended up being used)
+But you could imagine some other implemetnation where the VF might
+have an extra non-standard BAR that is the migration control.
 
-You'd need to go further back than Conny touching it, the original
-import into git had:
+This is why I like having a full stand alone pci_driver as everyone
+implementing this can provide the vfio_device that is appropriate for
+the HW.
 
-void driver_attach(struct device_driver * drv)
-{
-        struct bus_type * bus = drv->bus;
-        struct list_head * entry;
-        int error;
-
-        if (!bus->match)
-                return;
-
-        list_for_each(entry, &bus->devices.list) {
-                struct device * dev = container_of(entry, struct device, bus_list);
-                if (!dev->driver) {
-                        error = driver_probe_device(drv, dev);
-                        if (error && (error != -ENODEV))
-                                /* driver matched but the probe failed */
-                                printk(KERN_WARNING
-                                    "%s: probe of %s failed with error %d\n",
-                                    drv->name, dev->bus_id, error);
-                }
-        }
-}
-
-So unless you want to do some bitkeeper archaeology, we've always
-allowed driver probes to fail and fall through to the next one, not
-even complaining with -ENODEV.  In practice it hasn't been an issue
-because how many drivers do you expect to have that would even try to
-claim a device.  Ordering is only important when there's a catch-all so
-we need to figure out how to make that last among a class of drivers
-that will attempt to claim a device.  The softdep is a bit of a hack to
-do that, I'll admit, but I don't see how the alternate driver flavor
-universe solves having a catch-all either.  Thanks,
-
-Alex
-
+Jason
