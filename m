@@ -2,129 +2,90 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 58C52344DB0
-	for <lists+kvm@lfdr.de>; Mon, 22 Mar 2021 18:47:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BDBC4344E18
+	for <lists+kvm@lfdr.de>; Mon, 22 Mar 2021 19:05:45 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231751AbhCVRrC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 22 Mar 2021 13:47:02 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:31530 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231615AbhCVRqh (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 22 Mar 2021 13:46:37 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1616435194;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=WJwiSS+T6VPqw/HeedjTiXeqD0yZ8fDdEubPYZui8ak=;
-        b=U0FYD1heRbClyWdMFcItKPsf2VF6SbzJUqrpbclAXiu3W+K94Raht7XIGNigWdvCzPCh8w
-        OYlfybUapTnVleoRB2/d3Z7VVztl1tqyAqlcMC9E89OMmhkWPYmdXn2RomdTAderGlVt5W
-        uF/EuRJnank78vLaaWsqHpJ+zy/nmtA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-489-CsGnQE7FPTSOCUMojFYzmw-1; Mon, 22 Mar 2021 13:46:30 -0400
-X-MC-Unique: CsGnQE7FPTSOCUMojFYzmw-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6DA6B18C89D9;
-        Mon, 22 Mar 2021 17:46:27 +0000 (UTC)
-Received: from omen.home.shazbot.org (ovpn-112-120.phx2.redhat.com [10.3.112.120])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 7AC7F60240;
-        Mon, 22 Mar 2021 17:46:24 +0000 (UTC)
-Date:   Mon, 22 Mar 2021 11:46:23 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Michael Ellerman <mpe@ellerman.id.au>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        David Airlie <airlied@linux.ie>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        dri-devel@lists.freedesktop.org, Paul Mackerras <paulus@samba.org>,
-        linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, linux-api@vger.kernel.org,
-        Alexey Kardashevskiy <aik@ozlabs.ru>
-Subject: Re: [PATCH 1/2] vfio/pci: remove vfio_pci_nvlink2
-Message-ID: <20210322114623.2f929b07@omen.home.shazbot.org>
-In-Reply-To: <20210322150155.797882-2-hch@lst.de>
-References: <20210322150155.797882-1-hch@lst.de>
-        <20210322150155.797882-2-hch@lst.de>
+        id S230236AbhCVSFO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 22 Mar 2021 14:05:14 -0400
+Received: from foss.arm.com ([217.140.110.172]:36346 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S231817AbhCVSEw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 22 Mar 2021 14:04:52 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 65454113E;
+        Mon, 22 Mar 2021 11:04:51 -0700 (PDT)
+Received: from slackpad.fritz.box (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 5A7AB3F718;
+        Mon, 22 Mar 2021 11:04:50 -0700 (PDT)
+Date:   Mon, 22 Mar 2021 18:04:45 +0000
+From:   Andre Przywara <andre.przywara@arm.com>
+To:     Andrew Jones <drjones@redhat.com>
+Cc:     Nikos Nikoleris <nikos.nikoleris@arm.com>, kvm@vger.kernel.org,
+        pbonzini@redhat.com, alexandru.elisei@arm.com
+Subject: Re: [kvm-unit-tests PATCH v2 0/4] Fix the devicetree parser for
+ stdout-path
+Message-ID: <20210322180445.7164b991@slackpad.fritz.box>
+In-Reply-To: <20210322085336.2lxg457refhvntls@kamzik.brq.redhat.com>
+References: <20210318180727.116004-1-nikos.nikoleris@arm.com>
+        <20210322085336.2lxg457refhvntls@kamzik.brq.redhat.com>
+Organization: Arm Ltd.
+X-Mailer: Claws Mail 3.17.1 (GTK+ 2.24.31; x86_64-slackware-linux-gnu)
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 22 Mar 2021 16:01:54 +0100
-Christoph Hellwig <hch@lst.de> wrote:
-> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
-> index 8ce36c1d53ca11..db7e782419d5d9 100644
-> --- a/include/uapi/linux/vfio.h
-> +++ b/include/uapi/linux/vfio.h
-> @@ -332,19 +332,6 @@ struct vfio_region_info_cap_type {
->  #define VFIO_REGION_SUBTYPE_INTEL_IGD_HOST_CFG	(2)
->  #define VFIO_REGION_SUBTYPE_INTEL_IGD_LPC_CFG	(3)
->  
-> -/* 10de vendor PCI sub-types */
-> -/*
-> - * NVIDIA GPU NVlink2 RAM is coherent RAM mapped onto the host address space.
-> - */
-> -#define VFIO_REGION_SUBTYPE_NVIDIA_NVLINK2_RAM	(1)
-> -
-> -/* 1014 vendor PCI sub-types */
-> -/*
-> - * IBM NPU NVlink2 ATSD (Address Translation Shootdown) register of NPU
-> - * to do TLB invalidation on a GPU.
-> - */
-> -#define VFIO_REGION_SUBTYPE_IBM_NVLINK2_ATSD	(1)
-> -
->  /* sub-types for VFIO_REGION_TYPE_GFX */
->  #define VFIO_REGION_SUBTYPE_GFX_EDID            (1)
->  
-> @@ -637,33 +624,6 @@ struct vfio_device_migration_info {
->   */
->  #define VFIO_REGION_INFO_CAP_MSIX_MAPPABLE	3
->  
-> -/*
-> - * Capability with compressed real address (aka SSA - small system address)
-> - * where GPU RAM is mapped on a system bus. Used by a GPU for DMA routing
-> - * and by the userspace to associate a NVLink bridge with a GPU.
-> - */
-> -#define VFIO_REGION_INFO_CAP_NVLINK2_SSATGT	4
-> -
-> -struct vfio_region_info_cap_nvlink2_ssatgt {
-> -	struct vfio_info_cap_header header;
-> -	__u64 tgt;
-> -};
-> -
-> -/*
-> - * Capability with an NVLink link speed. The value is read by
-> - * the NVlink2 bridge driver from the bridge's "ibm,nvlink-speed"
-> - * property in the device tree. The value is fixed in the hardware
-> - * and failing to provide the correct value results in the link
-> - * not working with no indication from the driver why.
-> - */
-> -#define VFIO_REGION_INFO_CAP_NVLINK2_LNKSPD	5
-> -
-> -struct vfio_region_info_cap_nvlink2_lnkspd {
-> -	struct vfio_info_cap_header header;
-> -	__u32 link_speed;
-> -	__u32 __pad;
-> -};
-> -
->  /**
->   * VFIO_DEVICE_GET_IRQ_INFO - _IOWR(VFIO_TYPE, VFIO_BASE + 9,
->   *				    struct vfio_irq_info)
+On Mon, 22 Mar 2021 09:53:36 +0100
+Andrew Jones <drjones@redhat.com> wrote:
 
-I'll leave any attempt to defend keeping this code to Alexey, but
-minimally these region sub-types and capability IDs should probably be
-reserved to avoid breaking whatever userspace might exist to consume
-these.  Our ID space is sufficiently large that we don't need to
-recycle them any time soon.  Thanks,
+> On Thu, Mar 18, 2021 at 06:07:23PM +0000, Nikos Nikoleris wrote:
+> > This set of patches fixes the way we parse the stdout-path
+> > property in the DT. The stdout-path property is used to set up
+> > the console. Prior to this, the code ignored the fact that
+> > stdout-path is made of the path to the uart node as well as
+> > parameters. As a result, it would fail to find the relevant DT
+> > node. In addition to minor fixes in the device tree code, this
+> > series pulls a new version of libfdt from upstream.
+> > 
+> > v1: https://lore.kernel.org/kvm/20210316152405.50363-1-nikos.nikoleris@arm.com/
+> > 
+> > Changes in v2:
+> >   - Added strtoul and minor fix in strrchr
+> >   - Fixes in libfdt_clean
+> >   - Minor fix in lib/libfdt/README
+> > 
+> > Thanks,
+> > 
+> > Nikos
+> >  
+> 
+> Applied to arm/queue
 
-Alex
+So I understand that this is a bit late now, but is this really the way
+forward: to just implement libc functions as we go, from scratch, and
+merge them without any real testing?
+I understand that hacking up strchr() is fun, but when it comes to
+those string parsing functions, it gets a bit hairy, and I feel like we
+are dismissing decades of experience here by implementing stuff from
+scratch. At the very least we should run some unit tests (!) on newly
+introduced C library functions?
+
+Or probably the better alternative: we pick some existing C library,
+and start to borrow implementations from there? Is klibc[1] a good
+choice, maybe?
+
+Cheers,
+Andre
+
+[1] https://git.kernel.org/pub/scm/libs/klibc/klibc.git/
+
+
+> 
+> https://gitlab.com/rhdrjones/kvm-unit-tests/-/commits/arm/queue
+> 
+> Thanks,
+> drew 
+> 
 
