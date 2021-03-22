@@ -2,79 +2,275 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 950D8343C1F
-	for <lists+kvm@lfdr.de>; Mon, 22 Mar 2021 09:54:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5A482343C45
+	for <lists+kvm@lfdr.de>; Mon, 22 Mar 2021 10:07:07 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229728AbhCVIyD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 22 Mar 2021 04:54:03 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:32314 "EHLO
+        id S229879AbhCVJGe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 22 Mar 2021 05:06:34 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:20349 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229482AbhCVIxr (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 22 Mar 2021 04:53:47 -0400
+        by vger.kernel.org with ESMTP id S229884AbhCVJGP (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 22 Mar 2021 05:06:15 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1616403226;
+        s=mimecast20190719; t=1616403974;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=pssS4RZUY845Ih5JssJgGRrZ/xA2JgSjfiNKphl/u0Y=;
-        b=GST2x98bJFAdQSAVhrNzLg0x+77rk6PSmBHT/+TRU/jOXAqSpjNQIgi0Cmf3yn5fUbIs3w
-        ocTdJfCM8144hv1evGe6hyBZSvy66jXYaTHISt8G/NlnEKf8PK8tP2mPR1ximClazF0nuw
-        01CKxYPozCrDOyTit2qkIau0AKx+Cac=
+        bh=ceXm904oOVw8lrZ113tpWQUHaEaaD5aBF7KgDgfkeB8=;
+        b=E8sfazosg2hef8PTRiXOHHnwJ839dqOseEbHI5Vmwjigmzx4yLawkEk44aszBt5tRF4r8Q
+        TgdzkHyo1NLABS/86jTcKaSWQWAK+EvSTUKf+xt8vlsEyz5WtVPyUfKLGeRVqgrV3HWFBu
+        R6Pj+6RAUG+gkIoZZ6Upx8Iq4kgAuRc=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-457-LnucKic3PvCeVhpyb6zPZg-1; Mon, 22 Mar 2021 04:53:42 -0400
-X-MC-Unique: LnucKic3PvCeVhpyb6zPZg-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+ us-mta-396-bRF2cYJsOoCFt0j80lMxGA-1; Mon, 22 Mar 2021 05:06:10 -0400
+X-MC-Unique: bRF2cYJsOoCFt0j80lMxGA-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 44A35190A7A3;
-        Mon, 22 Mar 2021 08:53:41 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.40.194.23])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id A919E6A03C;
-        Mon, 22 Mar 2021 08:53:39 +0000 (UTC)
-Date:   Mon, 22 Mar 2021 09:53:36 +0100
-From:   Andrew Jones <drjones@redhat.com>
-To:     Nikos Nikoleris <nikos.nikoleris@arm.com>
-Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, alexandru.elisei@arm.com,
-        andre.przywara@arm.com
-Subject: Re: [kvm-unit-tests PATCH v2 0/4] Fix the devicetree parser for
- stdout-path
-Message-ID: <20210322085336.2lxg457refhvntls@kamzik.brq.redhat.com>
-References: <20210318180727.116004-1-nikos.nikoleris@arm.com>
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C80B31009456;
+        Mon, 22 Mar 2021 09:06:07 +0000 (UTC)
+Received: from [10.36.113.141] (ovpn-113-141.ams2.redhat.com [10.36.113.141])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id C019A62A6F;
+        Mon, 22 Mar 2021 09:05:58 +0000 (UTC)
+Subject: Re: [Linuxarm] Re: [PATCH v14 07/13] iommu/smmuv3: Implement
+ cache_invalidate
+To:     "chenxiang (M)" <chenxiang66@hisilicon.com>,
+        eric.auger.pro@gmail.com, iommu@lists.linux-foundation.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        kvmarm@lists.cs.columbia.edu, will@kernel.org, maz@kernel.org,
+        robin.murphy@arm.com, joro@8bytes.org, alex.williamson@redhat.com,
+        tn@semihalf.com, zhukeqian1@huawei.com
+Cc:     jean-philippe@linaro.org, wangxingang5@huawei.com,
+        lushenming@huawei.com, jiangkunkun@huawei.com,
+        vivek.gautam@arm.com, vsethi@nvidia.com, zhangfei.gao@linaro.org,
+        linuxarm@openeuler.org
+References: <20210223205634.604221-1-eric.auger@redhat.com>
+ <20210223205634.604221-8-eric.auger@redhat.com>
+ <c10c6405-5efe-5a41-2b3a-f3af85a528ba@hisilicon.com>
+ <d5dcb7fe-2e09-b1fb-24d6-36249f047632@redhat.com>
+ <1cf3fa95-45c6-5846-e1c2-12c222ebed46@hisilicon.com>
+From:   Auger Eric <eric.auger@redhat.com>
+Message-ID: <a691418f-5aa8-1d02-3519-732b39cd91cb@redhat.com>
+Date:   Mon, 22 Mar 2021 10:05:56 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210318180727.116004-1-nikos.nikoleris@arm.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+In-Reply-To: <1cf3fa95-45c6-5846-e1c2-12c222ebed46@hisilicon.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Mar 18, 2021 at 06:07:23PM +0000, Nikos Nikoleris wrote:
-> This set of patches fixes the way we parse the stdout-path
-> property in the DT. The stdout-path property is used to set up
-> the console. Prior to this, the code ignored the fact that
-> stdout-path is made of the path to the uart node as well as
-> parameters. As a result, it would fail to find the relevant DT
-> node. In addition to minor fixes in the device tree code, this
-> series pulls a new version of libfdt from upstream.
-> 
-> v1: https://lore.kernel.org/kvm/20210316152405.50363-1-nikos.nikoleris@arm.com/
-> 
-> Changes in v2:
->   - Added strtoul and minor fix in strrchr
->   - Fixes in libfdt_clean
->   - Minor fix in lib/libfdt/README
-> 
-> Thanks,
-> 
-> Nikos
->
+Hi Chenxiang,
 
-Applied to arm/queue
+On 3/22/21 7:40 AM, chenxiang (M) wrote:
+> Hi Eric,
+> 
+> 
+> 在 2021/3/20 1:36, Auger Eric 写道:
+>> Hi Chenxiang,
+>>
+>> On 3/4/21 8:55 AM, chenxiang (M) wrote:
+>>> Hi Eric,
+>>>
+>>>
+>>> 在 2021/2/24 4:56, Eric Auger 写道:
+>>>> Implement domain-selective, pasid selective and page-selective
+>>>> IOTLB invalidations.
+>>>>
+>>>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>>>>
+>>>> ---
+>>>>
+>>>> v13 -> v14:
+>>>> - Add domain invalidation
+>>>> - do global inval when asid is not provided with addr
+>>>>    granularity
+>>>>
+>>>> v7 -> v8:
+>>>> - ASID based invalidation using iommu_inv_pasid_info
+>>>> - check ARCHID/PASID flags in addr based invalidation
+>>>> - use __arm_smmu_tlb_inv_context and __arm_smmu_tlb_inv_range_nosync
+>>>>
+>>>> v6 -> v7
+>>>> - check the uapi version
+>>>>
+>>>> v3 -> v4:
+>>>> - adapt to changes in the uapi
+>>>> - add support for leaf parameter
+>>>> - do not use arm_smmu_tlb_inv_range_nosync or arm_smmu_tlb_inv_context
+>>>>    anymore
+>>>>
+>>>> v2 -> v3:
+>>>> - replace __arm_smmu_tlb_sync by arm_smmu_cmdq_issue_sync
+>>>>
+>>>> v1 -> v2:
+>>>> - properly pass the asid
+>>>> ---
+>>>>   drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c | 74
+>>>> +++++++++++++++++++++
+>>>>   1 file changed, 74 insertions(+)
+>>>>
+>>>> diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
+>>>> b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
+>>>> index 4c19a1114de4..df3adc49111c 100644
+>>>> --- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
+>>>> +++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
+>>>> @@ -2949,6 +2949,79 @@ static void
+>>>> arm_smmu_detach_pasid_table(struct iommu_domain *domain)
+>>>>       mutex_unlock(&smmu_domain->init_mutex);
+>>>>   }
+>>>>   +static int
+>>>> +arm_smmu_cache_invalidate(struct iommu_domain *domain, struct
+>>>> device *dev,
+>>>> +              struct iommu_cache_invalidate_info *inv_info)
+>>>> +{
+>>>> +    struct arm_smmu_cmdq_ent cmd = {.opcode = CMDQ_OP_TLBI_NSNH_ALL};
+>>>> +    struct arm_smmu_domain *smmu_domain = to_smmu_domain(domain);
+>>>> +    struct arm_smmu_device *smmu = smmu_domain->smmu;
+>>>> +
+>>>> +    if (smmu_domain->stage != ARM_SMMU_DOMAIN_NESTED)
+>>>> +        return -EINVAL;
+>>>> +
+>>>> +    if (!smmu)
+>>>> +        return -EINVAL;
+>>>> +
+>>>> +    if (inv_info->version != IOMMU_CACHE_INVALIDATE_INFO_VERSION_1)
+>>>> +        return -EINVAL;
+>>>> +
+>>>> +    if (inv_info->cache & IOMMU_CACHE_INV_TYPE_PASID ||
+>>>> +        inv_info->cache & IOMMU_CACHE_INV_TYPE_DEV_IOTLB) {
+>>>> +        return -ENOENT;
+>>>> +    }
+>>>> +
+>>>> +    if (!(inv_info->cache & IOMMU_CACHE_INV_TYPE_IOTLB))
+>>>> +        return -EINVAL;
+>>>> +
+>>>> +    /* IOTLB invalidation */
+>>>> +
+>>>> +    switch (inv_info->granularity) {
+>>>> +    case IOMMU_INV_GRANU_PASID:
+>>>> +    {
+>>>> +        struct iommu_inv_pasid_info *info =
+>>>> +            &inv_info->granu.pasid_info;
+>>>> +
+>>>> +        if (info->flags & IOMMU_INV_ADDR_FLAGS_PASID)
+>>>> +            return -ENOENT;
+>>>> +        if (!(info->flags & IOMMU_INV_PASID_FLAGS_ARCHID))
+>>>> +            return -EINVAL;
+>>>> +
+>>>> +        __arm_smmu_tlb_inv_context(smmu_domain, info->archid);
+>>>> +        return 0;
+>>>> +    }
+>>>> +    case IOMMU_INV_GRANU_ADDR:
+>>>> +    {
+>>>> +        struct iommu_inv_addr_info *info = &inv_info->granu.addr_info;
+>>>> +        size_t size = info->nb_granules * info->granule_size;
+>>>> +        bool leaf = info->flags & IOMMU_INV_ADDR_FLAGS_LEAF;
+>>>> +
+>>>> +        if (info->flags & IOMMU_INV_ADDR_FLAGS_PASID)
+>>>> +            return -ENOENT;
+>>>> +
+>>>> +        if (!(info->flags & IOMMU_INV_ADDR_FLAGS_ARCHID))
+>>>> +            break;
+>>>> +
+>>>> +        arm_smmu_tlb_inv_range_domain(info->addr, size,
+>>>> +                          info->granule_size, leaf,
+>>>> +                          info->archid, smmu_domain);
+>>> Is it possible to add a check before the function to make sure that
+>>> info->granule_size can be recognized by SMMU?
+>>> There is a scenario which will cause TLBI issue: RIL feature is enabled
+>>> on guest but is disabled on host, and then on
+>>> host it just invalidate 4K/2M/1G once a time, but from QEMU,
+>>> info->nb_granules is always 1 and info->granule_size = size,
+>>> if size is not equal to 4K or 2M or 1G (for example size = granule_size
+>>> is 5M), it will only part of the size it wants to invalidate.
+> 
+> Do you have any idea about this issue?
 
-https://gitlab.com/rhdrjones/kvm-unit-tests/-/commits/arm/queue
+At the QEMU VFIO notifier level, when I fill the struct
+iommu_cache_invalidate_info, I currently miss the granule info, hence
+this weird choice of setting setting info->nb_granules is always 1 and
+info->granule_size = size. I think in arm_smmu_cache_invalidate() I need
+to convert this info back to a the leaf page size, in case the host does
+not support RIL. Just as it is done in  __arm_smmu_tlb_inv_range if RIL
+is supported.
 
-Thanks,
-drew 
+Does it makes sense to you?
+
+Thank you for spotting the issue.
+
+Eric
+> 
+>>>
+>>> I think maybe we can add a check here: if RIL is not enabled and also
+>>> size is not the granule_size (4K/2M/1G) supported by
+>>> SMMU hardware, can we just simply use the smallest granule_size
+>>> supported by hardware all the time?
+>>>
+>>>> +
+>>>> +        arm_smmu_cmdq_issue_sync(smmu);
+>>>> +        return 0;
+>>>> +    }
+>>>> +    case IOMMU_INV_GRANU_DOMAIN:
+>>>> +        break;
+>>> I check the qemu code
+>>> (https://github.com/eauger/qemu/tree/v5.2.0-2stage-rfcv8), for opcode
+>>> CMD_TLBI_NH_ALL or CMD_TLBI_NSNH_ALL from guest OS
+>>> it calls smmu_inv_notifiers_all() to unamp all notifiers of all mr's,
+>>> but it seems not set event.entry.granularity which i think it should set
+>>> IOMMU_INV_GRAN_ADDR.
+>> this is because IOMMU_INV_GRAN_ADDR = 0. But for clarity I should rather
+>> set it explicitly ;-)
+> 
+> ok
+> 
+>>> BTW, for opcode CMD_TLBI_NH_ALL or CMD_TLBI_NSNH_ALL, it needs to unmap
+>>> size = 0x1000000000000 on 48bit system (it may spend much time),  maybe
+>>> it is better
+>>> to set it as IOMMU_INV_GRANU_DOMAIN, then in host OS, send TLBI_NH_ALL
+>>> directly when IOMMU_INV_GRANU_DOMAIN.
+>> Yes you're right. If the host does not support RIL then it is an issue.
+>> This is going to be fixed in the next version.
+> 
+> Great
+> 
+>>
+>> Thank you for the report!
+>>
+>> Best Regards
+>>
+>> Eric
+>>>
+>>>> +    default:
+>>>> +        return -EINVAL;
+>>>> +    }
+>>>> +
+>>>> +    /* Global S1 invalidation */
+>>>> +    cmd.tlbi.vmid   = smmu_domain->s2_cfg.vmid;
+>>>> +    arm_smmu_cmdq_issue_cmd(smmu, &cmd);
+>>>> +    arm_smmu_cmdq_issue_sync(smmu);
+>>>> +    return 0;
+>>>> +}
+>>>> +
+>>>>   static bool arm_smmu_dev_has_feature(struct device *dev,
+>>>>                        enum iommu_dev_features feat)
+>>>>   {
+>>>> @@ -3048,6 +3121,7 @@ static struct iommu_ops arm_smmu_ops = {
+>>>>       .put_resv_regions    = generic_iommu_put_resv_regions,
+>>>>       .attach_pasid_table    = arm_smmu_attach_pasid_table,
+>>>>       .detach_pasid_table    = arm_smmu_detach_pasid_table,
+>>>> +    .cache_invalidate    = arm_smmu_cache_invalidate,
+>>>>       .dev_has_feat        = arm_smmu_dev_has_feature,
+>>>>       .dev_feat_enabled    = arm_smmu_dev_feature_enabled,
+>>>>       .dev_enable_feat    = arm_smmu_dev_enable_feature,
+>> _______________________________________________
+>> Linuxarm mailing list -- linuxarm@openeuler.org
+>> To unsubscribe send an email to linuxarm-leave@openeuler.org
+> 
+> 
 
