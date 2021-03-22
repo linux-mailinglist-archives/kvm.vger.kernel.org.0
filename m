@@ -2,237 +2,175 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E50C33439B4
-	for <lists+kvm@lfdr.de>; Mon, 22 Mar 2021 07:41:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DF0E53439D3
+	for <lists+kvm@lfdr.de>; Mon, 22 Mar 2021 07:43:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230154AbhCVGlO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 22 Mar 2021 02:41:14 -0400
-Received: from szxga05-in.huawei.com ([45.249.212.191]:13999 "EHLO
-        szxga05-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230182AbhCVGk6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 22 Mar 2021 02:40:58 -0400
-Received: from DGGEMS411-HUB.china.huawei.com (unknown [172.30.72.59])
-        by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4F3lFs6xPxzwPYL;
-        Mon, 22 Mar 2021 14:38:57 +0800 (CST)
-Received: from [127.0.0.1] (10.40.193.166) by DGGEMS411-HUB.china.huawei.com
- (10.3.19.211) with Microsoft SMTP Server id 14.3.498.0; Mon, 22 Mar 2021
- 14:40:47 +0800
-Subject: Re: [Linuxarm] Re: [PATCH v14 07/13] iommu/smmuv3: Implement
- cache_invalidate
-To:     Auger Eric <eric.auger@redhat.com>, <eric.auger.pro@gmail.com>,
-        <iommu@lists.linux-foundation.org>, <linux-kernel@vger.kernel.org>,
-        <kvm@vger.kernel.org>, <kvmarm@lists.cs.columbia.edu>,
-        <will@kernel.org>, <maz@kernel.org>, <robin.murphy@arm.com>,
-        <joro@8bytes.org>, <alex.williamson@redhat.com>, <tn@semihalf.com>,
-        <zhukeqian1@huawei.com>
-References: <20210223205634.604221-1-eric.auger@redhat.com>
- <20210223205634.604221-8-eric.auger@redhat.com>
- <c10c6405-5efe-5a41-2b3a-f3af85a528ba@hisilicon.com>
- <d5dcb7fe-2e09-b1fb-24d6-36249f047632@redhat.com>
-CC:     <jean-philippe@linaro.org>, <wangxingang5@huawei.com>,
-        <lushenming@huawei.com>, <jiangkunkun@huawei.com>,
-        <vivek.gautam@arm.com>, <vsethi@nvidia.com>,
-        <zhangfei.gao@linaro.org>, <linuxarm@openeuler.org>
-From:   "chenxiang (M)" <chenxiang66@hisilicon.com>
-Message-ID: <1cf3fa95-45c6-5846-e1c2-12c222ebed46@hisilicon.com>
-Date:   Mon, 22 Mar 2021 14:40:46 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
- Thunderbird/45.2.0
+        id S230015AbhCVGnQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 22 Mar 2021 02:43:16 -0400
+Received: from szxga01-in.huawei.com ([45.249.212.187]:5103 "EHLO
+        szxga01-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230010AbhCVGmr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 22 Mar 2021 02:42:47 -0400
+Received: from DGGEML401-HUB.china.huawei.com (unknown [172.30.72.53])
+        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4F3lJ80TQmzYMsW;
+        Mon, 22 Mar 2021 14:40:56 +0800 (CST)
+Received: from dggpemm500023.china.huawei.com (7.185.36.83) by
+ DGGEML401-HUB.china.huawei.com (10.3.17.32) with Microsoft SMTP Server (TLS)
+ id 14.3.498.0; Mon, 22 Mar 2021 14:42:42 +0800
+Received: from [10.174.187.128] (10.174.187.128) by
+ dggpemm500023.china.huawei.com (7.185.36.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id
+ 15.1.2106.2; Mon, 22 Mar 2021 14:42:41 +0800
+Subject: Re: [RFC PATCH v4 5/9] KVM: selftests: Add a helper to get system
+ configured THP page size
+To:     Andrew Jones <drjones@redhat.com>
+CC:     <kvm@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        "Ben Gardon" <bgardon@google.com>,
+        Sean Christopherson <seanjc@google.com>,
+        "Vitaly Kuznetsov" <vkuznets@redhat.com>,
+        Peter Xu <peterx@redhat.com>, Marc Zyngier <maz@kernel.org>,
+        Ingo Molnar <mingo@kernel.org>,
+        Adrian Hunter <adrian.hunter@intel.com>,
+        Jiri Olsa <jolsa@redhat.com>,
+        "Arnaldo Carvalho de Melo" <acme@redhat.com>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Michael Kerrisk <mtk.manpages@gmail.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        <wanghaibin.wang@huawei.com>, <yezengruan@huawei.com>,
+        <yuzenghui@huawei.com>
+References: <20210302125751.19080-1-wangyanan55@huawei.com>
+ <20210302125751.19080-6-wangyanan55@huawei.com>
+ <20210312113112.laarzqhkslroagha@kamzik.brq.redhat.com>
+From:   "wangyanan (Y)" <wangyanan55@huawei.com>
+Message-ID: <46362177-c514-96fe-6117-4ab9716ee01d@huawei.com>
+Date:   Mon, 22 Mar 2021 14:42:41 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.4.0
 MIME-Version: 1.0
-In-Reply-To: <d5dcb7fe-2e09-b1fb-24d6-36249f047632@redhat.com>
+In-Reply-To: <20210312113112.laarzqhkslroagha@kamzik.brq.redhat.com>
 Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.40.193.166]
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-Originating-IP: [10.174.187.128]
+X-ClientProxiedBy: dggeme704-chm.china.huawei.com (10.1.199.100) To
+ dggpemm500023.china.huawei.com (7.185.36.83)
 X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Eric,
+Hi Drew,
 
-
-在 2021/3/20 1:36, Auger Eric 写道:
-> Hi Chenxiang,
+Thanks for your attention to this series!
+On 2021/3/12 19:31, Andrew Jones wrote:
+> On Tue, Mar 02, 2021 at 08:57:47PM +0800, Yanan Wang wrote:
+>> If we want to have some tests about transparent hugepages, the system
+>> configured THP hugepage size should better be known by the tests, which
+>> can be used for kinds of alignment or guest memory accessing of vcpus...
+>> So it makes sense to add a helper to get the transparent hugepage size.
+>>
+>> With VM_MEM_SRC_ANONYMOUS_THP specified in vm_userspace_mem_region_add(),
+>> we now stat /sys/kernel/mm/transparent_hugepage to check whether THP is
+>> configured in the host kernel before madvise(). Based on this, we can also
+>> read file /sys/kernel/mm/transparent_hugepage/hpage_pmd_size to get THP
+>> hugepage size.
+>>
+>> Signed-off-by: Yanan Wang <wangyanan55@huawei.com>
+>> Reviewed-by: Ben Gardon <bgardon@google.com>
+>> ---
+>>   .../testing/selftests/kvm/include/test_util.h |  2 ++
+>>   tools/testing/selftests/kvm/lib/test_util.c   | 36 +++++++++++++++++++
+>>   2 files changed, 38 insertions(+)
+>>
+>> diff --git a/tools/testing/selftests/kvm/include/test_util.h b/tools/testing/selftests/kvm/include/test_util.h
+>> index b7f41399f22c..ef24c76ba89a 100644
+>> --- a/tools/testing/selftests/kvm/include/test_util.h
+>> +++ b/tools/testing/selftests/kvm/include/test_util.h
+>> @@ -78,6 +78,8 @@ struct vm_mem_backing_src_alias {
+>>   	enum vm_mem_backing_src_type type;
+>>   };
+>>   
+>> +bool thp_configured(void);
+>> +size_t get_trans_hugepagesz(void);
+>>   void backing_src_help(void);
+>>   enum vm_mem_backing_src_type parse_backing_src_type(const char *type_name);
+>>   
+>> diff --git a/tools/testing/selftests/kvm/lib/test_util.c b/tools/testing/selftests/kvm/lib/test_util.c
+>> index c7c0627c6842..f2d133f76c67 100644
+>> --- a/tools/testing/selftests/kvm/lib/test_util.c
+>> +++ b/tools/testing/selftests/kvm/lib/test_util.c
+>> @@ -10,6 +10,7 @@
+>>   #include <limits.h>
+>>   #include <stdlib.h>
+>>   #include <time.h>
+>> +#include <sys/stat.h>
+>>   #include "linux/kernel.h"
+>>   
+>>   #include "test_util.h"
+>> @@ -117,6 +118,41 @@ const struct vm_mem_backing_src_alias backing_src_aliases[] = {
+>>   	{"anonymous_hugetlb", VM_MEM_SRC_ANONYMOUS_HUGETLB,},
+>>   };
+>>   
+>> +bool thp_configured(void)
+>> +{
+>> +	int ret;
+>> +	struct stat statbuf;
+>> +
+>> +	ret = stat("/sys/kernel/mm/transparent_hugepage", &statbuf);
+>> +	TEST_ASSERT(ret == 0 || (ret == -1 && errno == ENOENT),
+>> +		    "Error in stating /sys/kernel/mm/transparent_hugepage: %d",
+>> +		    errno);
+> TEST_ASSERT will already output errno's string. Is that not sufficient? If
+> not, I think extending TEST_ASSERT to output errno too would be fine.
+I think it's a good idea to output the errno together with it's string 
+in TEST_ASSERT,
+it will explicitly indicate that the string is an error information and 
+the errno is much
+easier to be used for debugging than the string. I will make this change 
+a separate
+patch in next version and add your S-b tag.
+>> +
+>> +	return ret == 0;
+>> +}
+>> +
+>> +size_t get_trans_hugepagesz(void)
+>> +{
+>> +	size_t size;
+>> +	char buf[16];
+>> +	FILE *f;
+>> +
+>> +	TEST_ASSERT(thp_configured(), "THP is not configured in host kernel");
+>> +
+>> +	f = fopen("/sys/kernel/mm/transparent_hugepage/hpage_pmd_size", "r");
+>> +	TEST_ASSERT(f != NULL,
+>> +		    "Error in opening transparent_hugepage/hpage_pmd_size: %d",
+>> +		    errno);
+> Same comment as above.
 >
-> On 3/4/21 8:55 AM, chenxiang (M) wrote:
->> Hi Eric,
+>> +
+>> +	if (fread(buf, sizeof(char), sizeof(buf), f) == 0) {
+>> +		fclose(f);
+>> +		TEST_FAIL("Unable to read transparent_hugepage/hpage_pmd_size");
+>> +	}
+>> +
+>> +	size = strtoull(buf, NULL, 10);
+> fscanf with %lld?
+This makes senses. But it should be %ld corresponding to size_t.
+
+Thanks,
+Yanan.
+>> +	return size;
+>> +}
+>> +
+>>   void backing_src_help(void)
+>>   {
+>>   	int i;
+>> -- 
+>> 2.23.0
 >>
->>
->> 在 2021/2/24 4:56, Eric Auger 写道:
->>> Implement domain-selective, pasid selective and page-selective
->>> IOTLB invalidations.
->>>
->>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->>>
->>> ---
->>>
->>> v13 -> v14:
->>> - Add domain invalidation
->>> - do global inval when asid is not provided with addr
->>>    granularity
->>>
->>> v7 -> v8:
->>> - ASID based invalidation using iommu_inv_pasid_info
->>> - check ARCHID/PASID flags in addr based invalidation
->>> - use __arm_smmu_tlb_inv_context and __arm_smmu_tlb_inv_range_nosync
->>>
->>> v6 -> v7
->>> - check the uapi version
->>>
->>> v3 -> v4:
->>> - adapt to changes in the uapi
->>> - add support for leaf parameter
->>> - do not use arm_smmu_tlb_inv_range_nosync or arm_smmu_tlb_inv_context
->>>    anymore
->>>
->>> v2 -> v3:
->>> - replace __arm_smmu_tlb_sync by arm_smmu_cmdq_issue_sync
->>>
->>> v1 -> v2:
->>> - properly pass the asid
->>> ---
->>>   drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c | 74 +++++++++++++++++++++
->>>   1 file changed, 74 insertions(+)
->>>
->>> diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
->>> index 4c19a1114de4..df3adc49111c 100644
->>> --- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
->>> +++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
->>> @@ -2949,6 +2949,79 @@ static void arm_smmu_detach_pasid_table(struct iommu_domain *domain)
->>>   	mutex_unlock(&smmu_domain->init_mutex);
->>>   }
->>>   
->>> +static int
->>> +arm_smmu_cache_invalidate(struct iommu_domain *domain, struct device *dev,
->>> +			  struct iommu_cache_invalidate_info *inv_info)
->>> +{
->>> +	struct arm_smmu_cmdq_ent cmd = {.opcode = CMDQ_OP_TLBI_NSNH_ALL};
->>> +	struct arm_smmu_domain *smmu_domain = to_smmu_domain(domain);
->>> +	struct arm_smmu_device *smmu = smmu_domain->smmu;
->>> +
->>> +	if (smmu_domain->stage != ARM_SMMU_DOMAIN_NESTED)
->>> +		return -EINVAL;
->>> +
->>> +	if (!smmu)
->>> +		return -EINVAL;
->>> +
->>> +	if (inv_info->version != IOMMU_CACHE_INVALIDATE_INFO_VERSION_1)
->>> +		return -EINVAL;
->>> +
->>> +	if (inv_info->cache & IOMMU_CACHE_INV_TYPE_PASID ||
->>> +	    inv_info->cache & IOMMU_CACHE_INV_TYPE_DEV_IOTLB) {
->>> +		return -ENOENT;
->>> +	}
->>> +
->>> +	if (!(inv_info->cache & IOMMU_CACHE_INV_TYPE_IOTLB))
->>> +		return -EINVAL;
->>> +
->>> +	/* IOTLB invalidation */
->>> +
->>> +	switch (inv_info->granularity) {
->>> +	case IOMMU_INV_GRANU_PASID:
->>> +	{
->>> +		struct iommu_inv_pasid_info *info =
->>> +			&inv_info->granu.pasid_info;
->>> +
->>> +		if (info->flags & IOMMU_INV_ADDR_FLAGS_PASID)
->>> +			return -ENOENT;
->>> +		if (!(info->flags & IOMMU_INV_PASID_FLAGS_ARCHID))
->>> +			return -EINVAL;
->>> +
->>> +		__arm_smmu_tlb_inv_context(smmu_domain, info->archid);
->>> +		return 0;
->>> +	}
->>> +	case IOMMU_INV_GRANU_ADDR:
->>> +	{
->>> +		struct iommu_inv_addr_info *info = &inv_info->granu.addr_info;
->>> +		size_t size = info->nb_granules * info->granule_size;
->>> +		bool leaf = info->flags & IOMMU_INV_ADDR_FLAGS_LEAF;
->>> +
->>> +		if (info->flags & IOMMU_INV_ADDR_FLAGS_PASID)
->>> +			return -ENOENT;
->>> +
->>> +		if (!(info->flags & IOMMU_INV_ADDR_FLAGS_ARCHID))
->>> +			break;
->>> +
->>> +		arm_smmu_tlb_inv_range_domain(info->addr, size,
->>> +					      info->granule_size, leaf,
->>> +					      info->archid, smmu_domain);
->> Is it possible to add a check before the function to make sure that
->> info->granule_size can be recognized by SMMU?
->> There is a scenario which will cause TLBI issue: RIL feature is enabled
->> on guest but is disabled on host, and then on
->> host it just invalidate 4K/2M/1G once a time, but from QEMU,
->> info->nb_granules is always 1 and info->granule_size = size,
->> if size is not equal to 4K or 2M or 1G (for example size = granule_size
->> is 5M), it will only part of the size it wants to invalidate.
-
-Do you have any idea about this issue?
-
->>
->> I think maybe we can add a check here: if RIL is not enabled and also
->> size is not the granule_size (4K/2M/1G) supported by
->> SMMU hardware, can we just simply use the smallest granule_size
->> supported by hardware all the time?
->>
->>> +
->>> +		arm_smmu_cmdq_issue_sync(smmu);
->>> +		return 0;
->>> +	}
->>> +	case IOMMU_INV_GRANU_DOMAIN:
->>> +		break;
->> I check the qemu code
->> (https://github.com/eauger/qemu/tree/v5.2.0-2stage-rfcv8), for opcode
->> CMD_TLBI_NH_ALL or CMD_TLBI_NSNH_ALL from guest OS
->> it calls smmu_inv_notifiers_all() to unamp all notifiers of all mr's,
->> but it seems not set event.entry.granularity which i think it should set
->> IOMMU_INV_GRAN_ADDR.
-> this is because IOMMU_INV_GRAN_ADDR = 0. But for clarity I should rather
-> set it explicitly ;-)
-
-ok
-
->> BTW, for opcode CMD_TLBI_NH_ALL or CMD_TLBI_NSNH_ALL, it needs to unmap
->> size = 0x1000000000000 on 48bit system (it may spend much time),  maybe
->> it is better
->> to set it as IOMMU_INV_GRANU_DOMAIN, then in host OS, send TLBI_NH_ALL
->> directly when IOMMU_INV_GRANU_DOMAIN.
-> Yes you're right. If the host does not support RIL then it is an issue.
-> This is going to be fixed in the next version.
-
-Great
-
+> Thanks,
+> drew
 >
-> Thank you for the report!
->
-> Best Regards
->
-> Eric
->>
->>> +	default:
->>> +		return -EINVAL;
->>> +	}
->>> +
->>> +	/* Global S1 invalidation */
->>> +	cmd.tlbi.vmid   = smmu_domain->s2_cfg.vmid;
->>> +	arm_smmu_cmdq_issue_cmd(smmu, &cmd);
->>> +	arm_smmu_cmdq_issue_sync(smmu);
->>> +	return 0;
->>> +}
->>> +
->>>   static bool arm_smmu_dev_has_feature(struct device *dev,
->>>   				     enum iommu_dev_features feat)
->>>   {
->>> @@ -3048,6 +3121,7 @@ static struct iommu_ops arm_smmu_ops = {
->>>   	.put_resv_regions	= generic_iommu_put_resv_regions,
->>>   	.attach_pasid_table	= arm_smmu_attach_pasid_table,
->>>   	.detach_pasid_table	= arm_smmu_detach_pasid_table,
->>> +	.cache_invalidate	= arm_smmu_cache_invalidate,
->>>   	.dev_has_feat		= arm_smmu_dev_has_feature,
->>>   	.dev_feat_enabled	= arm_smmu_dev_feature_enabled,
->>>   	.dev_enable_feat	= arm_smmu_dev_enable_feature,
-> _______________________________________________
-> Linuxarm mailing list -- linuxarm@openeuler.org
-> To unsubscribe send an email to linuxarm-leave@openeuler.org
-
-
+> .
