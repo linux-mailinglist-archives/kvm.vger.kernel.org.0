@@ -2,18 +2,18 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EA46C3468CD
-	for <lists+kvm@lfdr.de>; Tue, 23 Mar 2021 20:18:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6DB6F3468D5
+	for <lists+kvm@lfdr.de>; Tue, 23 Mar 2021 20:21:22 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233329AbhCWTRf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 23 Mar 2021 15:17:35 -0400
-Received: from verein.lst.de ([213.95.11.211]:33892 "EHLO verein.lst.de"
+        id S231539AbhCWTUq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 23 Mar 2021 15:20:46 -0400
+Received: from verein.lst.de ([213.95.11.211]:33912 "EHLO verein.lst.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S233375AbhCWTR2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 23 Mar 2021 15:17:28 -0400
+        id S231953AbhCWTUm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 23 Mar 2021 15:20:42 -0400
 Received: by verein.lst.de (Postfix, from userid 2407)
-        id 6A86D68C4E; Tue, 23 Mar 2021 20:17:26 +0100 (CET)
-Date:   Tue, 23 Mar 2021 20:17:26 +0100
+        id 8C7C568C65; Tue, 23 Mar 2021 20:20:40 +0100 (CET)
+Date:   Tue, 23 Mar 2021 20:20:40 +0100
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jason Gunthorpe <jgg@nvidia.com>
 Cc:     Alex Williamson <alex.williamson@redhat.com>,
@@ -25,27 +25,30 @@ Cc:     Alex Williamson <alex.williamson@redhat.com>,
         Leon Romanovsky <leonro@nvidia.com>,
         Max Gurtovoy <mgurtovoy@nvidia.com>,
         Tarun Gupta <targupta@nvidia.com>
-Subject: Re: [PATCH 07/18] vfio/mdev: Add missing reference counting to
- mdev_type
-Message-ID: <20210323191726.GE17735@lst.de>
-References: <0-v1-7dedf20b2b75+4f785-vfio2_jgg@nvidia.com> <7-v1-7dedf20b2b75+4f785-vfio2_jgg@nvidia.com>
+Subject: Re: [PATCH 08/18] vfio/mdev: Reorganize mdev_device_create()
+Message-ID: <20210323192040.GF17735@lst.de>
+References: <0-v1-7dedf20b2b75+4f785-vfio2_jgg@nvidia.com> <8-v1-7dedf20b2b75+4f785-vfio2_jgg@nvidia.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <7-v1-7dedf20b2b75+4f785-vfio2_jgg@nvidia.com>
+In-Reply-To: <8-v1-7dedf20b2b75+4f785-vfio2_jgg@nvidia.com>
 User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Mar 23, 2021 at 02:55:24PM -0300, Jason Gunthorpe wrote:
-> struct mdev_type holds a pointer to the kref'd object struct mdev_parent,
-> but doesn't hold the kref. The lifetime of the parent becomes implicit
-> because parent_remove_sysfs_files() is supposed to remove all the access
-> before the parent can be freed, but this is very hard to reason about.
-> 
-> Make it obviously correct by adding the missing get.
+>  	up_read(&parent->unreg_sem);
+> -	put_device(&mdev->dev);
+>  mdev_fail:
+>
+>
+>
+> -	mdev_put_parent(parent);
+> +	put_device(&mdev->dev);
 
-Looks good:
+That mdev_fail label is not very descriptive, what about free_device
+instead?
+
+Otherwise looks good:
 
 Reviewed-by: Christoph Hellwig <hch@lst.de>
