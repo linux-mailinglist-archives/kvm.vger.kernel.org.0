@@ -2,92 +2,122 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4C8403464FC
-	for <lists+kvm@lfdr.de>; Tue, 23 Mar 2021 17:24:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 954153464FF
+	for <lists+kvm@lfdr.de>; Tue, 23 Mar 2021 17:24:44 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233062AbhCWQXj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 23 Mar 2021 12:23:39 -0400
-Received: from mail.kernel.org ([198.145.29.99]:40978 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S233150AbhCWQXI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 23 Mar 2021 12:23:08 -0400
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        id S233193AbhCWQYL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 23 Mar 2021 12:24:11 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:32073 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S233049AbhCWQXl (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 23 Mar 2021 12:23:41 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1616516621;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=NQGyXcT3h3Fra4FoZCMnTXACZvTXM9jgtfisKIcA6HM=;
+        b=c8hsqqIvCGd7bExLmkN2saMTHRMxdZJ1lWJlxpBj/gBDufSteH8gMcBA14dCYTN0r+Yy7X
+        sPJEovEUbdPTCbQGaELAUvwY3S2gcbrUrGuQpHv+E95fEbD33/NGO/AsuKqQGU9CXQpHpa
+        b8aCKecqzAHlwGXyD5ZuiUN+DAK8BdY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-100-ZCa_56_mP5OpwkTpiPtsuA-1; Tue, 23 Mar 2021 12:23:39 -0400
+X-MC-Unique: ZCa_56_mP5OpwkTpiPtsuA-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 4B937619B8;
-        Tue, 23 Mar 2021 16:23:08 +0000 (UTC)
-Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=hot-poop.lan)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.94)
-        (envelope-from <maz@kernel.org>)
-        id 1lOjoA-003LOd-7E; Tue, 23 Mar 2021 16:23:06 +0000
-From:   Marc Zyngier <maz@kernel.org>
-To:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org
-Cc:     Ard Biesheuvel <ardb@kernel.org>, kernel-team@android.com,
-        Shameerali Kolothum Thodi 
-        <shameerali.kolothum.thodi@huawei.com>
-Subject: [PATCH] KVM: arm64: Fix CPU interface MMIO compatibility detection
-Date:   Tue, 23 Mar 2021 16:23:01 +0000
-Message-Id: <20210323162301.2049595-1-maz@kernel.org>
-X-Mailer: git-send-email 2.30.0
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8236C190D340
+        for <kvm@vger.kernel.org>; Tue, 23 Mar 2021 16:23:38 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.40.194.23])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 960F55D6AD;
+        Tue, 23 Mar 2021 16:23:37 +0000 (UTC)
+Date:   Tue, 23 Mar 2021 17:23:34 +0100
+From:   Andrew Jones <drjones@redhat.com>
+To:     Thomas Huth <thuth@redhat.com>
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com
+Subject: Re: [PATCH kvm-unit-tests] compiler: Add builtin overflow flag
+Message-ID: <20210323162334.pylagyghpkginrzq@kamzik.brq.redhat.com>
+References: <20210323135801.295407-1-drjones@redhat.com>
+ <9f0b7493-bc1d-6fb7-9fd9-30fd4c294c7f@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, ardb@kernel.org, kernel-team@android.com, shameerali.kolothum.thodi@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <9f0b7493-bc1d-6fb7-9fd9-30fd4c294c7f@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-In order to detect whether a GICv3 CPU interface is MMIO capable,
-we switch ICC_SRE_EL1.SRE to 0 and check whether it sticks.
+On Tue, Mar 23, 2021 at 04:22:58PM +0100, Thomas Huth wrote:
+> On 23/03/2021 14.58, Andrew Jones wrote:
+> > Checking for overflow can difficult, but doing so may be a good
+> > idea to avoid difficult to debug problems. Compilers that provide
+> > builtins for overflow checking allow the checks to be simple
+> > enough that we can use them more liberally. The idea for this
+> > flag is to wrap a calculation that should have overflow checking,
+> > allowing compilers that support it to give us some extra robustness.
+> > For example,
+> > 
+> >    #ifdef COMPILER_HAS_GENERIC_BUILTIN_OVERFLOW
+> >        bool overflow = __builtin_mul_overflow(x, y, &z);
+> >        assert(!overflow);
+> >    #else
+> >        /* Older compiler, hopefully we don't overflow... */
+> >        z = x * y;
+> >    #endif
+> > 
+> > Signed-off-by: Andrew Jones <drjones@redhat.com>
+> > ---
+> >   lib/linux/compiler.h | 14 ++++++++++++++
+> >   1 file changed, 14 insertions(+)
+> > 
+> > diff --git a/lib/linux/compiler.h b/lib/linux/compiler.h
+> > index 2d72f18c36e5..311da9807932 100644
+> > --- a/lib/linux/compiler.h
+> > +++ b/lib/linux/compiler.h
+> > @@ -8,6 +8,20 @@
+> >   #ifndef __ASSEMBLY__
+> > +#define GCC_VERSION (__GNUC__ * 10000           \
+> > +		     + __GNUC_MINOR__ * 100     \
+> > +		     + __GNUC_PATCHLEVEL__)
+> > +
+> > +#ifdef __clang__
+> > +#if __has_builtin(__builtin_mul_overflow) && \
+> > +    __has_builtin(__builtin_add_overflow) && \
+> > +    __has_builtin(__builtin_sub_overflow)
+> > +#define COMPILER_HAS_GENERIC_BUILTIN_OVERFLOW 1
+> > +#endif
+> > +#elif GCC_VERSION >= 50100
+> > +#define COMPILER_HAS_GENERIC_BUILTIN_OVERFLOW 1
+> > +#endif
+> > +
+> >   #include <stdint.h>
+> >   #define barrier()	asm volatile("" : : : "memory")
+> > 
+> 
+> Acked-by: Thomas Huth <thuth@redhat.com>
+> 
+> ... but I wonder:
+> 
+> 1) Whether we still want to support those old compilers that do not have
+> this built-in functions yet ... maybe it's time to declare the older systems
+> as unsupported now?
 
-However, this is only possible if *ALL* of the HCR_EL2 interrupt
-overrides are set, and the CPU is perfectly allowed to ignore
-the write to ICC_SRE_EL1 otherwise. This leads KVM to pretend
-that a whole bunch of ARMv8.0 CPUs aren't MMIO-capable, and
-breaks VMs that should work correctly otherwise.
+I think the CentOS7 test is a good one to have. If for nobody else, then
+the people maintaining and testing RHEL7. So, I'd rather we keep a simple
+fallback in place, but hope that its use is limited.
 
-Fix this by setting IMO/FMO/IMO before touching ICC_SRE_EL1,
-and clear them afterwards. This allows us to reliably detect
-the CPU interface capabilities.
+> 
+> 2) Whether it would make more sense to provide static-inline functions for
+> these arithmetic operations that take care of the overflow handling, so that
+> we do not have #ifdefs in the .c code later all over the place?
 
-Cc: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-Fixes: 9739f6ef053f ("KVM: arm64: Workaround firmware wrongly advertising GICv2-on-v3 compatibility")
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- arch/arm64/kvm/hyp/vgic-v3-sr.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
+We could add macro wrappers for the arbitrary integral type builtin forms
+and/or the predicates forms.
 
-diff --git a/arch/arm64/kvm/hyp/vgic-v3-sr.c b/arch/arm64/kvm/hyp/vgic-v3-sr.c
-index ee3682b9873c..39f8f7f9227c 100644
---- a/arch/arm64/kvm/hyp/vgic-v3-sr.c
-+++ b/arch/arm64/kvm/hyp/vgic-v3-sr.c
-@@ -429,6 +429,13 @@ u64 __vgic_v3_get_gic_config(void)
- 	if (has_vhe())
- 		flags = local_daif_save();
- 
-+	/*
-+	 * Table 11-2 "Permitted ICC_SRE_ELx.SRE settings" indicates
-+	 * that to be able to set ICC_SRE_EL1.SRE to 0, all the
-+	 * interrupt overrides must be set. You've got to love this.
-+	 */
-+	sysreg_clear_set(hcr_el2, 0, HCR_AMO | HCR_FMO | HCR_IMO);
-+	isb();
- 	write_gicreg(0, ICC_SRE_EL1);
- 	isb();
- 
-@@ -436,6 +443,8 @@ u64 __vgic_v3_get_gic_config(void)
- 
- 	write_gicreg(sre, ICC_SRE_EL1);
- 	isb();
-+	sysreg_clear_set(hcr_el2, HCR_AMO | HCR_FMO | HCR_IMO, 0);
-+	isb();
- 
- 	if (has_vhe())
- 		local_daif_restore(flags);
--- 
-2.30.0
+I can take a stab at that and send a v2.
+
+Thanks,
+drew
 
