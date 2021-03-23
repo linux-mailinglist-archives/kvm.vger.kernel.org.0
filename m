@@ -2,62 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D989F34587B
-	for <lists+kvm@lfdr.de>; Tue, 23 Mar 2021 08:21:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8CAAF34589B
+	for <lists+kvm@lfdr.de>; Tue, 23 Mar 2021 08:26:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230119AbhCWHUa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 23 Mar 2021 03:20:30 -0400
-Received: from mail.kernel.org ([198.145.29.99]:37796 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229963AbhCWHUO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 23 Mar 2021 03:20:14 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 86713619AB;
-        Tue, 23 Mar 2021 07:20:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1616484014;
-        bh=xf/FJRT3op6/DF9iLA9eJZ5X6gvMzU0dp2gmxrew8Zw=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=0SLi843WFB3SJZg1fnvsZ7anQHXNe+tpuxQ/BMjEaOPoHHmBW0dcKdyzsuaC4pXqd
-         luEzlgoRzJAgbshLSsQLvskuorTzaTRNSSeoCreTX+NTibG6CB12inl1cjD8JTYh4U
-         yEgwJXtSt6KmGoREjyW3ICqqpWHnu+jo3mYDW3Us=
-Date:   Tue, 23 Mar 2021 08:20:11 +0100
-From:   Greg KH <gregkh@linuxfoundation.org>
-To:     Tom Lendacky <thomas.lendacky@amd.com>
-Cc:     Isaku Yamahata <isaku.yamahata@intel.com>,
-        linux-kernel@vger.kernel.org, stable@vger.kernel.org,
-        x86@kernel.org, kvm@vger.kernel.org, brijesh.singh@amd.com,
-        tglx@linutronix.de, bp@alien8.de, isaku.yamahata@gmail.com,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: Re: [PATCH] X86: __set_clr_pte_enc() miscalculates physical address
-Message-ID: <YFmWq1uuvCiiBhBb@kroah.com>
-References: <81abbae1657053eccc535c16151f63cd049dcb97.1616098294.git.isaku.yamahata@intel.com>
- <0d99865a-30d5-9857-1a53-cc26ada6608c@amd.com>
+        id S230146AbhCWHZv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 23 Mar 2021 03:25:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41842 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230140AbhCWHZa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 23 Mar 2021 03:25:30 -0400
+Received: from mail-ej1-x62f.google.com (mail-ej1-x62f.google.com [IPv6:2a00:1450:4864:20::62f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 56CBFC061756
+        for <kvm@vger.kernel.org>; Tue, 23 Mar 2021 00:25:30 -0700 (PDT)
+Received: by mail-ej1-x62f.google.com with SMTP id ce10so25395113ejb.6
+        for <kvm@vger.kernel.org>; Tue, 23 Mar 2021 00:25:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance-com.20150623.gappssmtp.com; s=20150623;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=Xwa51kxw61uMIow80uqDkY+H/GARiTsVnf3Sas4+BxM=;
+        b=K/Y1f+FygYeHZ5bZBkEb+W+x4FQXWevwHu7nVAHSjHVtzShBuR+2g4FsS0kJzfB6Vy
+         VVwcas8GBISn7nl+PoNKFfW4EktWkZWdfe7V6IXLHkWp1zEZC6hF9n0f+y8hnWEnn678
+         bM2VOCVidgBxJJ7sHbiL6YqHT7ClwnTp1H6GfexhjZX5TAd7sYmJYCVyVM3dPzNdgjXp
+         +Qq1sveuTC1kxYnTl3bnJC7WJ+Z5RIIs1fHT6Tw3rQE53wfy5yPnAQ650qEzQBUAamIp
+         o/HlhyEARhMSvBBR5AeMuhWpQd/mMgr22U1IrIO9bKFBljAaC/j6nTrbC+LGXrHLs8hF
+         AVdA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=Xwa51kxw61uMIow80uqDkY+H/GARiTsVnf3Sas4+BxM=;
+        b=qX+y2NE/l3of/k7Q51QByNsylVlujDMCWs/Ja23vlRP1VRAyHLo30rjhy8LOC6KJWv
+         3ZncEn23JSAUpeqa6uyYGbF8XkEqwHjOe9ghFYKP76JD/FMnmQf9BbBWYipKX+trVzGj
+         TaDL9yoN7K44MnMjPJTMlomZ8Jj0fEGCYywxTO+2byqMaBeKQ4fiVgYxVGX4AqVnJEA4
+         yoq/t6Dz3Li8z8zRaVQ8ZmKGz6/yASOZ20JgjmxSxcwBqCqQhxRUqPH0iVP6AEMFEIzF
+         FrubOrnGPnMvk5aJkH17sq288Dv1eXzXSjIyd6o8MUUGyQpO6dkSPU2ScxxD29DmvkSO
+         b3eg==
+X-Gm-Message-State: AOAM5318xt8fUENkRgTIHfvTmGz5M/Fou9Qzp+QP+cHOW7UeiILifH5l
+        tLP1hYKQCdh1KD+MetCJe1ZUb9+AQzQJt7wB+tGI
+X-Google-Smtp-Source: ABdhPJzJm68SUj19rBv+WCUqBy2FNifWaazEUCLQ3Uhyia48gmLbT4tJs0m9MQ2KYMXowDVwKahrwolbYciM+aEhnp8=
+X-Received: by 2002:a17:907:a042:: with SMTP id gz2mr3554509ejc.174.1616484329008;
+ Tue, 23 Mar 2021 00:25:29 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <0d99865a-30d5-9857-1a53-cc26ada6608c@amd.com>
+References: <20210315053721.189-1-xieyongji@bytedance.com> <20210315053721.189-4-xieyongji@bytedance.com>
+ <38a2ae38-ebf7-3e3b-3439-d95a6f49b48b@redhat.com>
+In-Reply-To: <38a2ae38-ebf7-3e3b-3439-d95a6f49b48b@redhat.com>
+From:   Yongji Xie <xieyongji@bytedance.com>
+Date:   Tue, 23 Mar 2021 15:25:18 +0800
+Message-ID: <CACycT3vg=+08YWLrVPHATwFvCjEzmKuTLdX3=stLQqrsm-+1Vg@mail.gmail.com>
+Subject: Re: Re: [PATCH v5 03/11] vhost-vdpa: protect concurrent access to
+ vhost device iotlb
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        Parav Pandit <parav@nvidia.com>, Bob Liu <bob.liu@oracle.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Matthew Wilcox <willy@infradead.org>, viro@zeniv.linux.org.uk,
+        Jens Axboe <axboe@kernel.dk>, bcrl@kvack.org,
+        Jonathan Corbet <corbet@lwn.net>,
+        =?UTF-8?Q?Mika_Penttil=C3=A4?= <mika.penttila@nextfour.com>,
+        Dan Carpenter <dan.carpenter@oracle.com>,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        kvm@vger.kernel.org, linux-fsdevel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Mar 22, 2021 at 04:02:11PM -0500, Tom Lendacky wrote:
-> On 3/18/21 3:26 PM, Isaku Yamahata wrote:
-> > __set_clr_pte_enc() miscalculates physical address to operate.
-> > pfn is in unit of PG_LEVEL_4K, not PGL_LEVEL_{2M, 1G}.
-> > Shift size to get physical address should be PAGE_SHIFT,
-> > not page_level_shift().
-> > 
-> > Fixes: dfaaec9033b8 ("x86: Add support for changing memory encryption attribute in early boot")
-> > Reviewed-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
-> > Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
-> 
-> Reviewed-by: Tom Lendacky <thomas.lendacky@amd.com>
+On Tue, Mar 23, 2021 at 11:02 AM Jason Wang <jasowang@redhat.com> wrote:
+>
+>
+> =E5=9C=A8 2021/3/15 =E4=B8=8B=E5=8D=881:37, Xie Yongji =E5=86=99=E9=81=93=
+:
+> > Use vhost_dev->mutex to protect vhost device iotlb from
+> > concurrent access.
+> >
+> > Fixes: 4c8cf318("vhost: introduce vDPA-based backend")
+> > Signed-off-by: Xie Yongji <xieyongji@bytedance.com>
+>
+>
+> Acked-by: Jason Wang <jasowang@redhat.com>
+>
+> Please cc stable for next version.
+>
 
-<formletter>
+Sure.
 
-This is not the correct way to submit patches for inclusion in the
-stable kernel tree.  Please read:
-    https://www.kernel.org/doc/html/latest/process/stable-kernel-rules.html
-for how to do this properly.
-
-</formletter>
+Thanks,
+Yongji
