@@ -2,95 +2,121 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 320783460AC
-	for <lists+kvm@lfdr.de>; Tue, 23 Mar 2021 14:59:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 44E603460ED
+	for <lists+kvm@lfdr.de>; Tue, 23 Mar 2021 15:05:15 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232034AbhCWN6y (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 23 Mar 2021 09:58:54 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:56863 "EHLO
+        id S231743AbhCWOEo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 23 Mar 2021 10:04:44 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:52979 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229508AbhCWN6I (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 23 Mar 2021 09:58:08 -0400
+        by vger.kernel.org with ESMTP id S231872AbhCWOEY (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 23 Mar 2021 10:04:24 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1616507887;
+        s=mimecast20190719; t=1616508262;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=XzJmK4D7Fm6Tgm/8V9hEExZ1Vha0jtYTosH2Xs3SWKk=;
-        b=GtDjPdJedzf0eAuHY4jyMXAGW1ZIxgGhxALpYy+xiHqcETcOEct5/jIYbPLYKDaSADrnWn
-        MlaObSIhdgIPs35yt+GFO5Cs44G6bQ7ZoSSNS3MWtDvjCs2DSh/AAZrB4bIe20j9jawWvg
-        polM9GUzKxh93sQW4+jukiELolvbXAk=
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=vxsGWWqSMrKfNxVOuIK22nNbCbQd+8H7DiNIZtQneS8=;
+        b=UwUGSazaUXaBJlzDMIJsdBDkfjEaCV8VIOAuH4ccHE4GSPsDIszTsAyA2yaxZfwPr3TA3T
+        7QWDSJZz1YJYzpG5yZc86DzDkn3OFsMz6iIUx2DzF62HIIxwsMbcKDdSIDw2D2bCEe/HSt
+        dMZaeHBsXRJWLACXdpSSBp5awGhOJc8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-443-Zt63J2q_Mk-XBnIVqkCHqw-1; Tue, 23 Mar 2021 09:58:05 -0400
-X-MC-Unique: Zt63J2q_Mk-XBnIVqkCHqw-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+ us-mta-263-eSjqDlG7Nwy-6LahJk0MOg-1; Tue, 23 Mar 2021 10:04:21 -0400
+X-MC-Unique: eSjqDlG7Nwy-6LahJk0MOg-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6C5EB1007467
-        for <kvm@vger.kernel.org>; Tue, 23 Mar 2021 13:58:04 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A66B388AF0E;
+        Tue, 23 Mar 2021 14:03:55 +0000 (UTC)
 Received: from kamzik.brq.redhat.com (unknown [10.40.194.23])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 28A9719C45;
-        Tue, 23 Mar 2021 13:58:02 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 13F8C5D6D7;
+        Tue, 23 Mar 2021 14:03:44 +0000 (UTC)
+Date:   Tue, 23 Mar 2021 15:03:41 +0100
 From:   Andrew Jones <drjones@redhat.com>
-To:     kvm@vger.kernel.org
-Cc:     pbonzini@redhat.com, thuth@redhat.com
-Subject: [PATCH kvm-unit-tests] compiler: Add builtin overflow flag
-Date:   Tue, 23 Mar 2021 14:58:01 +0100
-Message-Id: <20210323135801.295407-1-drjones@redhat.com>
+To:     Yanan Wang <wangyanan55@huawei.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Ben Gardon <bgardon@google.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Peter Xu <peterx@redhat.com>, Ingo Molnar <mingo@kernel.org>,
+        Adrian Hunter <adrian.hunter@intel.com>,
+        Jiri Olsa <jolsa@redhat.com>,
+        Arnaldo Carvalho de Melo <acme@redhat.com>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Michael Kerrisk <mtk.manpages@gmail.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        wanghaibin.wang@huawei.com, yuzenghui@huawei.com
+Subject: Re: [RFC PATCH v5 02/10] tools headers: Add a macro to get HUGETLB
+ page sizes for mmap
+Message-ID: <20210323140341.nkikwolwzpu6ectp@kamzik.brq.redhat.com>
+References: <20210323135231.24948-1-wangyanan55@huawei.com>
+ <20210323135231.24948-3-wangyanan55@huawei.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210323135231.24948-3-wangyanan55@huawei.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Checking for overflow can difficult, but doing so may be a good
-idea to avoid difficult to debug problems. Compilers that provide
-builtins for overflow checking allow the checks to be simple
-enough that we can use them more liberally. The idea for this
-flag is to wrap a calculation that should have overflow checking,
-allowing compilers that support it to give us some extra robustness.
-For example,
 
-  #ifdef COMPILER_HAS_GENERIC_BUILTIN_OVERFLOW
-      bool overflow = __builtin_mul_overflow(x, y, &z);
-      assert(!overflow);
-  #else
-      /* Older compiler, hopefully we don't overflow... */
-      z = x * y;
-  #endif
+$SUBJECT says "tools headers", but this is actually changing
+a UAPI header and then copying the change to tools.
 
-Signed-off-by: Andrew Jones <drjones@redhat.com>
----
- lib/linux/compiler.h | 14 ++++++++++++++
- 1 file changed, 14 insertions(+)
+Thanks,
+drew
 
-diff --git a/lib/linux/compiler.h b/lib/linux/compiler.h
-index 2d72f18c36e5..311da9807932 100644
---- a/lib/linux/compiler.h
-+++ b/lib/linux/compiler.h
-@@ -8,6 +8,20 @@
- 
- #ifndef __ASSEMBLY__
- 
-+#define GCC_VERSION (__GNUC__ * 10000           \
-+		     + __GNUC_MINOR__ * 100     \
-+		     + __GNUC_PATCHLEVEL__)
-+
-+#ifdef __clang__
-+#if __has_builtin(__builtin_mul_overflow) && \
-+    __has_builtin(__builtin_add_overflow) && \
-+    __has_builtin(__builtin_sub_overflow)
-+#define COMPILER_HAS_GENERIC_BUILTIN_OVERFLOW 1
-+#endif
-+#elif GCC_VERSION >= 50100
-+#define COMPILER_HAS_GENERIC_BUILTIN_OVERFLOW 1
-+#endif
-+
- #include <stdint.h>
- 
- #define barrier()	asm volatile("" : : : "memory")
--- 
-2.26.3
+On Tue, Mar 23, 2021 at 09:52:23PM +0800, Yanan Wang wrote:
+> We know that if a system supports multiple hugetlb page sizes,
+> the desired hugetlb page size can be specified in bits [26:31]
+> of the flag arguments. The value in these 6 bits will be the
+> shift of each hugetlb page size.
+> 
+> So add a macro to get the page size shift and then calculate the
+> corresponding hugetlb page size, using flag x.
+> 
+> Cc: Ben Gardon <bgardon@google.com>
+> Cc: Ingo Molnar <mingo@kernel.org>
+> Cc: Adrian Hunter <adrian.hunter@intel.com>
+> Cc: Jiri Olsa <jolsa@redhat.com>
+> Cc: Arnaldo Carvalho de Melo <acme@redhat.com>
+> Cc: Arnd Bergmann <arnd@arndb.de>
+> Cc: Michael Kerrisk <mtk.manpages@gmail.com>
+> Cc: Thomas Gleixner <tglx@linutronix.de>
+> Suggested-by: Ben Gardon <bgardon@google.com>
+> Signed-off-by: Yanan Wang <wangyanan55@huawei.com>
+> Reviewed-by: Ben Gardon <bgardon@google.com>
+> ---
+>  include/uapi/linux/mman.h       | 2 ++
+>  tools/include/uapi/linux/mman.h | 2 ++
+>  2 files changed, 4 insertions(+)
+> 
+> diff --git a/include/uapi/linux/mman.h b/include/uapi/linux/mman.h
+> index f55bc680b5b0..d72df73b182d 100644
+> --- a/include/uapi/linux/mman.h
+> +++ b/include/uapi/linux/mman.h
+> @@ -41,4 +41,6 @@
+>  #define MAP_HUGE_2GB	HUGETLB_FLAG_ENCODE_2GB
+>  #define MAP_HUGE_16GB	HUGETLB_FLAG_ENCODE_16GB
+>  
+> +#define MAP_HUGE_PAGE_SIZE(x) (1ULL << ((x >> MAP_HUGE_SHIFT) & MAP_HUGE_MASK))
+> +
+>  #endif /* _UAPI_LINUX_MMAN_H */
+> diff --git a/tools/include/uapi/linux/mman.h b/tools/include/uapi/linux/mman.h
+> index f55bc680b5b0..d72df73b182d 100644
+> --- a/tools/include/uapi/linux/mman.h
+> +++ b/tools/include/uapi/linux/mman.h
+> @@ -41,4 +41,6 @@
+>  #define MAP_HUGE_2GB	HUGETLB_FLAG_ENCODE_2GB
+>  #define MAP_HUGE_16GB	HUGETLB_FLAG_ENCODE_16GB
+>  
+> +#define MAP_HUGE_PAGE_SIZE(x) (1ULL << ((x >> MAP_HUGE_SHIFT) & MAP_HUGE_MASK))
+> +
+>  #endif /* _UAPI_LINUX_MMAN_H */
+> -- 
+> 2.19.1
+> 
 
