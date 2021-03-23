@@ -2,93 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C312634654A
-	for <lists+kvm@lfdr.de>; Tue, 23 Mar 2021 17:35:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E6E5934657A
+	for <lists+kvm@lfdr.de>; Tue, 23 Mar 2021 17:39:42 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233303AbhCWQf2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 23 Mar 2021 12:35:28 -0400
-Received: from mail.kernel.org ([198.145.29.99]:43576 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S233150AbhCWQfR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 23 Mar 2021 12:35:17 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 4BAF9619B4;
-        Tue, 23 Mar 2021 16:35:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1616517316;
-        bh=RK+Kv0wxjcx5breQamKbj/qd89hf2M+eHtScR6kIrvA=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=bmf7U7KRA1m3gCUVC68jb1cPk4eb0Ce3ElrG1jzdXzWAn5+SG+L5DJs0n8es+H/Lh
-         oFcl1isxkQlKrWEv2Im4EifesAsn4zgc9iupKF0PhEqpI8o5oV+QEbnQ98S/y4FZoJ
-         hNusdpNZpE+/cIZZKPW2OTOBGC+Us/bvevZUElxI=
-Date:   Tue, 23 Mar 2021 17:35:14 +0100
-From:   Greg KH <gregkh@linuxfoundation.org>
-To:     "Catangiu, Adrian Costin" <acatan@amazon.com>
-Cc:     "Graf (AWS), Alexander" <graf@amazon.de>,
-        "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
-        "rdunlap@infradead.org" <rdunlap@infradead.org>,
-        "arnd@arndb.de" <arnd@arndb.de>,
-        "ebiederm@xmission.com" <ebiederm@xmission.com>,
-        "rppt@kernel.org" <rppt@kernel.org>,
-        "0x7f454c46@gmail.com" <0x7f454c46@gmail.com>,
-        "borntraeger@de.ibm.com" <borntraeger@de.ibm.com>,
-        "Jason@zx2c4.com" <Jason@zx2c4.com>,
-        "jannh@google.com" <jannh@google.com>, "w@1wt.eu" <w@1wt.eu>,
-        "MacCarthaigh, Colm" <colmmacc@amazon.com>,
-        "luto@kernel.org" <luto@kernel.org>,
-        "tytso@mit.edu" <tytso@mit.edu>,
-        "ebiggers@kernel.org" <ebiggers@kernel.org>,
-        "Woodhouse, David" <dwmw@amazon.co.uk>,
-        "bonzini@gnu.org" <bonzini@gnu.org>,
-        "Singh, Balbir" <sblbir@amazon.com>,
-        "Weiss, Radu" <raduweis@amazon.com>,
-        "corbet@lwn.net" <corbet@lwn.net>,
-        "mst@redhat.com" <mst@redhat.com>,
-        "mhocko@kernel.org" <mhocko@kernel.org>,
-        "rafael@kernel.org" <rafael@kernel.org>,
-        "pavel@ucw.cz" <pavel@ucw.cz>,
-        "mpe@ellerman.id.au" <mpe@ellerman.id.au>,
-        "areber@redhat.com" <areber@redhat.com>,
-        "ovzxemul@gmail.com" <ovzxemul@gmail.com>,
-        "avagin@gmail.com" <avagin@gmail.com>,
-        "ptikhomirov@virtuozzo.com" <ptikhomirov@virtuozzo.com>,
-        "gil@azul.com" <gil@azul.com>,
-        "asmehra@redhat.com" <asmehra@redhat.com>,
-        "dgunigun@redhat.com" <dgunigun@redhat.com>,
-        "vijaysun@ca.ibm.com" <vijaysun@ca.ibm.com>,
-        "oridgar@gmail.com" <oridgar@gmail.com>,
-        "ghammer@redhat.com" <ghammer@redhat.com>
-Subject: Re: [PATCH v8] drivers/misc: sysgenid: add system generation id
- driver
-Message-ID: <YFoYwq/RadewiE8I@kroah.com>
-References: <1615213083-29869-1-git-send-email-acatan@amazon.com>
- <YEY2b1QU5RxozL0r@kroah.com>
- <a61c976f-b362-bb60-50a5-04073360e702@amazon.com>
- <YFnlZQZOasOwxUDn@kroah.com>
- <E6E517FF-A37C-427C-B16F-066A965B8F42@amazon.com>
+        id S233062AbhCWQjL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 23 Mar 2021 12:39:11 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:55938 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S233286AbhCWQjF (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 23 Mar 2021 12:39:05 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1616517545;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=D6weZtocFnBCEx2KB5301dgGufT240mULVdpXRdDCN0=;
+        b=bfg7JqGPrqyg8BMc1Fj6gOgARCRpVtYRuLsoR75POGg2cFjWpdy7IBU5C6CnraPGKcB2sg
+        SE3ft30OwJf7yWGQK5OamXV2Qi5zwcIhKDchpRqESY/kN6gSHIM5/upYEC24C2rytvyJBh
+        tT9B2JYKtcP42Xx186B1kgvXBX9U9Eo=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-567-855NUvMkPMqzrJp_aViA3A-1; Tue, 23 Mar 2021 12:39:02 -0400
+X-MC-Unique: 855NUvMkPMqzrJp_aViA3A-1
+Received: by mail-wm1-f69.google.com with SMTP id a3so698416wmm.0
+        for <kvm@vger.kernel.org>; Tue, 23 Mar 2021 09:39:02 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=D6weZtocFnBCEx2KB5301dgGufT240mULVdpXRdDCN0=;
+        b=sKfKvjg4dzAm9+LRajD6yXnZUXhnyEWK04DGKdc7gAybvu8FjysoIslMe8kenkETzs
+         SCRjv0qqv+d+4V76atlJpMSZSmklA2Cul8tsYroIVWHpvYe+DPnugc0n2k/eHoCcB9lD
+         XJesGN/5cFoXOO16oODYvfJ/UhaAO+b8IEMq+lOY2DiP/qb59Ycnu823Jrpu05US1H/T
+         A+lVgMZLlu6Yglwn9U7GcO7P6zhIQWvoTf4jBOePpF5VKr5mRU9ubT4J2lw/XuNONlPV
+         qCmlC6ruKaYOkr+Rrj7oz5/Hfa0fndHKFirGilgta7Aj8E58xEqhZjSD3NhhcMtL3ADw
+         PTBg==
+X-Gm-Message-State: AOAM533mukbJ1W3iZswgsnzAnGHxqXIuEzQ7euNlV+oowKanIFe4SS24
+        Pq0qKQPc+rVW3DtnBLHRepeGAtnDceYtGDC4VxUAbPBW6IlUzowBpDLnI33dkDqN/aKrGmre5nH
+        5L4ML1RW5cBGL
+X-Received: by 2002:adf:8562:: with SMTP id 89mr4930807wrh.101.1616517541374;
+        Tue, 23 Mar 2021 09:39:01 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwKvUUe1NQSERBzHVlgA+GOPmHPOwJubTjgP1O9G/oYv5jEATOiJ0EW7ujfn570henkj75IQA==
+X-Received: by 2002:adf:8562:: with SMTP id 89mr4930777wrh.101.1616517541194;
+        Tue, 23 Mar 2021 09:39:01 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id j136sm3281428wmj.35.2021.03.23.09.38.59
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 23 Mar 2021 09:39:00 -0700 (PDT)
+Subject: Re: [PATCH v3 03/25] x86/sgx: Wipe out EREMOVE from
+ sgx_free_epc_page()
+To:     Borislav Petkov <bp@alien8.de>,
+        Sean Christopherson <seanjc@google.com>
+Cc:     Kai Huang <kai.huang@intel.com>, kvm@vger.kernel.org,
+        x86@kernel.org, linux-sgx@vger.kernel.org,
+        linux-kernel@vger.kernel.org, jarkko@kernel.org, luto@kernel.org,
+        dave.hansen@intel.com, rick.p.edgecombe@intel.com,
+        haitao.huang@intel.com, tglx@linutronix.de, mingo@redhat.com,
+        hpa@zytor.com
+References: <062acb801926b2ade2f9fe1672afb7113453a741.1616136308.git.kai.huang@intel.com>
+ <20210322181646.GG6481@zn.tnic> <YFjoZQwB7e3oQW8l@google.com>
+ <20210322191540.GH6481@zn.tnic> <YFjx3vixDURClgcb@google.com>
+ <20210322210645.GI6481@zn.tnic>
+ <20210323110643.f29e214ebe8ec7a4a3d0bc2e@intel.com>
+ <20210322223726.GJ6481@zn.tnic>
+ <20210323121643.e06403a1bc7819bab7c15d95@intel.com>
+ <YFoNCvBYS2lIYjjc@google.com> <20210323160604.GB4729@zn.tnic>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <41dd6e78-5fe4-259e-cd0b-209de452a760@redhat.com>
+Date:   Tue, 23 Mar 2021 17:38:59 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <E6E517FF-A37C-427C-B16F-066A965B8F42@amazon.com>
+In-Reply-To: <20210323160604.GB4729@zn.tnic>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Mar 23, 2021 at 04:10:27PM +0000, Catangiu, Adrian Costin wrote:
-> Hi Greg,
-> 
-> After your previous reply on this thread we started considering to provide this interface and framework/functionality through a userspace service instead of a kernel interface.
-> The latest iteration on this evolving patch-set doesn’t have strong reasons for living in the kernel anymore - the only objectively strong advantage would be easier driving of ecosystem integration; but I am not sure that's a good enough reason to create a new kernel interface.
-> 
-> I am now looking into adding this through Systemd. Either as a pluggable service or maybe even a systemd builtin offering.
-> 
-> What are your thoughts on it?
+On 23/03/21 17:06, Borislav Petkov wrote:
+>> Practically speaking, "basic" deployments of SGX VMs will be insulated from
+>> this bug.  KVM doesn't support EPC oversubscription, so even if all EPC is
+>> exhausted, new VMs will fail to launch, but existing VMs will continue to chug
+>> along with no ill effects....
+>
+> Ok, so it sounds to me like*at*  *least*  there should be some writeup in
+> Documentation/ explaining to the user what to do when she sees such an
+> EREMOVE failure, perhaps the gist of this thread and then possibly the
+> error message should point to that doc.
 
-I'll gladly drop this patch if it's not needed in the kernel, thanks for
-letting me know.
+That's important, but it's even more important *to developers* that the 
+commit message spells out why this would be a kernel bug more often than 
+not.  I for one do not understand it, and I suspect I'm not alone.
 
-greg k-h
+Maybe (optimistically) once we see that explanation we decide that the 
+documentation is not important.  Sean, Kai, can you explain it?
+
+Paolo
+
