@@ -2,118 +2,266 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D9E023453C2
-	for <lists+kvm@lfdr.de>; Tue, 23 Mar 2021 01:16:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 789053453DC
+	for <lists+kvm@lfdr.de>; Tue, 23 Mar 2021 01:31:13 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230393AbhCWAP5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 22 Mar 2021 20:15:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34458 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230401AbhCWAPg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 22 Mar 2021 20:15:36 -0400
-Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 04A6DC061756
-        for <kvm@vger.kernel.org>; Mon, 22 Mar 2021 17:15:36 -0700 (PDT)
-Received: by mail-pj1-x1031.google.com with SMTP id il9-20020a17090b1649b0290114bcb0d6c2so4104613pjb.0
-        for <kvm@vger.kernel.org>; Mon, 22 Mar 2021 17:15:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=RS6wPVYyUBLVpylUrm+tt5pYjrHAQIAVImbkij7jmxA=;
-        b=UB5HrDlqMb57TL/dG+wUYp3t10QglOWevw6bRuyHyB7j/XFQwT4DPXTJkWjdrWSPMP
-         WY7oRe+j5OC+Ig5e1tJBt5ng9nwC4JIhFn1rOECvFTvDc/4Bfldk889gE0IJ5GBQQbZP
-         RmGiuqikAML8sq6vTC3JuCu62ae4rWcY7I9tSJVdW0F834VTsVIpc3LHUiykMriiVRP9
-         /h+jrTt8t3qkw8bRMHsA1FGFBVaYDZMWj+DTShvxDn+yOTUt0t5pWg9tdjYXuNEcSnQO
-         VpYSh3zTolGEkrBI0c2bj6zHglK1dmF9e/5S0RKMsHBYYfzRpQmv9IY0n2rN6RHedHO8
-         J2eQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=RS6wPVYyUBLVpylUrm+tt5pYjrHAQIAVImbkij7jmxA=;
-        b=VNgjtMHQBWtU80F6HwII6yaWN7MSmUzTynILp+uu2GapUlFZ3hx3Cp2ey5stup0w9I
-         qkDKiwIS9UADHhXs9dEYBDCsjnAk0kIx2nmYklsRy6nOSlajBzlT6/WqY93VRLh0KHa5
-         HJWvTk1RgZWB5+ZK10wRZmgwEKc5rqoTNsIEVorYOK3lrK21W7bPVxD3hYqMgiy3DsEL
-         Xkf0SJONKVbp37DJXaYy3Rb/9yUMrxU9DFOuc/Q1xfEQncG/SnvPwwvKVy6WKIIOk34O
-         2mSLq+mZcjbq0KPGxM1zvPDAjfTyHP5YfoSNFlQBRlKaNYdJdz6HQXOcZEcko1Vgd0FN
-         JNAQ==
-X-Gm-Message-State: AOAM5314MBMkl6v9rJIjLn7ic6WeRoLiBZZdNX18gRmdtnnmtGQAM7hr
-        cjzz4zKalo96GqF6mRpY7uOS3g==
-X-Google-Smtp-Source: ABdhPJzXA0SDIYTNNHtvoEjRYkmSgAP8Xpm9zHAa+s1cmO9DQfg1PI6iwt9jFeArQ2DPvhu1tVIQ4Q==
-X-Received: by 2002:a17:90a:7344:: with SMTP id j4mr1482427pjs.223.1616458535347;
-        Mon, 22 Mar 2021 17:15:35 -0700 (PDT)
-Received: from google.com ([2620:15c:f:10:f8cd:ad3d:e69f:e006])
-        by smtp.gmail.com with ESMTPSA id v11sm4272852pgg.68.2021.03.22.17.15.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 22 Mar 2021 17:15:34 -0700 (PDT)
-Date:   Mon, 22 Mar 2021 17:15:28 -0700
-From:   Sean Christopherson <seanjc@google.com>
-To:     Ben Gardon <bgardon@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH 2/2] KVM: x86/mmu: Ensure TLBs are flushed when yielding
- during NX zapping
-Message-ID: <YFkzIAVOeWS32fdX@google.com>
-References: <20210319232006.3468382-1-seanjc@google.com>
- <20210319232006.3468382-3-seanjc@google.com>
- <CANgfPd_6d+SvJ-rQxP6k5nRmCsRFyUAJ93B0dE3NtpmdPR78wg@mail.gmail.com>
+        id S231160AbhCWAal (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 22 Mar 2021 20:30:41 -0400
+Received: from mga17.intel.com ([192.55.52.151]:62314 "EHLO mga17.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S230417AbhCWAaL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 22 Mar 2021 20:30:11 -0400
+IronPort-SDR: 7qVA7TJT0KGMbOYuYOkFFnhFjocQEhnjiyzdBbNVcyZDMy6qdhLbHoRnhfOD6c6bjKHxHmtXd7
+ PHgg9TGvuXFQ==
+X-IronPort-AV: E=McAfee;i="6000,8403,9931"; a="170337930"
+X-IronPort-AV: E=Sophos;i="5.81,269,1610438400"; 
+   d="scan'208";a="170337930"
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Mar 2021 17:30:10 -0700
+IronPort-SDR: I5wkFm/ZlWsgV0lLkajk1eVIA72pp23foF21QaR1Cr9gjIIu7IbWpAFTYUiGKTCH2FEQfL2TS7
+ ukmYiyZwwGDQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.81,269,1610438400"; 
+   d="scan'208";a="374029466"
+Received: from local-michael-cet-test.sh.intel.com (HELO localhost) ([10.239.159.166])
+  by orsmga003.jf.intel.com with ESMTP; 22 Mar 2021 17:30:08 -0700
+Date:   Tue, 23 Mar 2021 08:43:05 +0800
+From:   Yang Weijiang <weijiang.yang@intel.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Yang Weijiang <weijiang.yang@intel.com>, pbonzini@redhat.com,
+        vkuznets@redhat.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v4 1/3] KVM: nVMX: Sync L2 guest CET states between L1/L2
+Message-ID: <20210323004305.GA3647@local-michael-cet-test.sh.intel.com>
+References: <20210315071841.7045-1-weijiang.yang@intel.com>
+ <20210315071841.7045-2-weijiang.yang@intel.com>
+ <YE+PF1zfkZTTgwxn@google.com>
+ <20210316090347.GA13548@local-michael-cet-test.sh.intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CANgfPd_6d+SvJ-rQxP6k5nRmCsRFyUAJ93B0dE3NtpmdPR78wg@mail.gmail.com>
+In-Reply-To: <20210316090347.GA13548@local-michael-cet-test.sh.intel.com>
+User-Agent: Mutt/1.11.3 (2019-02-01)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Mar 22, 2021, Ben Gardon wrote:
-> On Fri, Mar 19, 2021 at 4:20 PM Sean Christopherson <seanjc@google.com> wrote:
-> > @@ -5960,19 +5963,21 @@ static void kvm_recover_nx_lpages(struct kvm *kvm)
-> >                                       lpage_disallowed_link);
-> >                 WARN_ON_ONCE(!sp->lpage_disallowed);
-> >                 if (is_tdp_mmu_page(sp)) {
-> > -                       kvm_tdp_mmu_zap_gfn_range(kvm, sp->gfn,
-> > -                               sp->gfn + KVM_PAGES_PER_HPAGE(sp->role.level));
-> > +                       gfn_end = sp->gfn + KVM_PAGES_PER_HPAGE(sp->role.level);
-> > +                       flush = kvm_tdp_mmu_zap_gfn_range(kvm, sp->gfn, gfn_end,
-> > +                                                         flush || !list_empty(&invalid_list));
-> >                 } else {
-> >                         kvm_mmu_prepare_zap_page(kvm, sp, &invalid_list);
-> >                         WARN_ON_ONCE(sp->lpage_disallowed);
-> >                 }
-> >
-> >                 if (need_resched() || rwlock_needbreak(&kvm->mmu_lock)) {
-> > -                       kvm_mmu_commit_zap_page(kvm, &invalid_list);
-> > +                       kvm_mmu_remote_flush_or_zap(kvm, &invalid_list, flush);
-> 
-> This pattern of waiting until a yield is needed or lock contention is
-> detected has always been a little suspect to me because
-> kvm_mmu_commit_zap_page does work proportional to the work done before
-> the yield was needed. That seems like more work than we should like to
-> be doing at that point.
-> 
-> The yield in kvm_tdp_mmu_zap_gfn_range makes that phenomenon even
-> worse. Because we can satisfy the need to yield without clearing out
-> the invalid list, we can potentially queue many more pages which will
-> then all need to have their zaps committed at once. This is an
-> admittedly contrived case which could only be hit in a high load
-> nested scenario.
-> 
-> It could be fixed by forbidding kvm_tdp_mmu_zap_gfn_range from
-> yielding. Since we should only need to zap one SPTE, the yield should
-> not be needed within the kvm_tdp_mmu_zap_gfn_range call. To ensure
-> that only one SPTE is zapped we would have to specify the root though.
-> Otherwise we could end up zapping all the entries for the same GFN
-> range under an unrelated root.
+On Tue, Mar 16, 2021 at 05:03:47PM +0800, Yang Weijiang wrote:
 
-Hmm, I originally did exactly that, but changed my mind because this zaps far
-more than 1 SPTE.  This is zapping a SP that could be huge, but is not, which
-means it's guaranteed to have a non-zero number of child SPTEs.  The worst case
-scenario is that SP is a PUD (potential 1gb page) and the leafs are 4k SPTEs.
+Hi, Sean,
+Could you respond my below rely? I'm not sure how to proceed, thanks!
 
-But, I didn't consider the interplay between invalid_list and the TDP MMU
-yielding.  Hrm.
+> On Mon, Mar 15, 2021 at 09:45:11AM -0700, Sean Christopherson wrote:
+> > On Mon, Mar 15, 2021, Yang Weijiang wrote:
+> > > These fields are rarely updated by L1 QEMU/KVM, sync them when L1 is trying to
+> > > read/write them and after they're changed. If CET guest entry-load bit is not
+> > > set by L1 guest, migrate them to L2 manaully.
+> > > 
+> > > Opportunistically remove one blank line and add minor fix for MPX.
+> > > 
+> > > Suggested-by: Sean Christopherson <seanjc@google.com>
+> > > Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
+> > > ---
+> > >  arch/x86/kvm/cpuid.c      |  1 -
+> > >  arch/x86/kvm/vmx/nested.c | 35 +++++++++++++++++++++++++++++++++--
+> > >  arch/x86/kvm/vmx/vmx.h    |  3 +++
+> > >  3 files changed, 36 insertions(+), 3 deletions(-)
+> > > 
+> > > diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+> > > index d191de769093..8692f53b8cd0 100644
+> > > --- a/arch/x86/kvm/cpuid.c
+> > > +++ b/arch/x86/kvm/cpuid.c
+> > > @@ -143,7 +143,6 @@ void kvm_update_cpuid_runtime(struct kvm_vcpu *vcpu)
+> > >  		}
+> > >  		vcpu->arch.guest_supported_xss =
+> > >  			(((u64)best->edx << 32) | best->ecx) & supported_xss;
+> > > -
+> > 
+> > Spurious whitespace deletion.
+> 
+> Yes, Opportunistically did it as said in commit log :-D
+> 
+> > 
+> > >  	} else {
+> > >  		vcpu->arch.guest_supported_xss = 0;
+> > >  	}
+> > > diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+> > > index 9728efd529a1..57ecd8225568 100644
+> > > --- a/arch/x86/kvm/vmx/nested.c
+> > > +++ b/arch/x86/kvm/vmx/nested.c
+> > > @@ -2516,6 +2516,13 @@ static void prepare_vmcs02_rare(struct vcpu_vmx *vmx, struct vmcs12 *vmcs12)
+> > >  	vmcs_write32(VM_ENTRY_MSR_LOAD_COUNT, vmx->msr_autoload.guest.nr);
+> > >  
+> > >  	set_cr4_guest_host_mask(vmx);
+> > > +
+> > > +	if (kvm_cet_supported() && vmx->nested.nested_run_pending &&
+> > > +	    (vmcs12->vm_entry_controls & VM_ENTRY_LOAD_CET_STATE)) {
+> > > +		vmcs_writel(GUEST_SSP, vmcs12->guest_ssp);
+> > > +		vmcs_writel(GUEST_S_CET, vmcs12->guest_s_cet);
+> > > +		vmcs_writel(GUEST_INTR_SSP_TABLE, vmcs12->guest_ssp_tbl);
+> > > +	}
+> > >  }
+> > >  
+> > >  /*
+> > > @@ -2556,6 +2563,15 @@ static int prepare_vmcs02(struct kvm_vcpu *vcpu, struct vmcs12 *vmcs12,
+> > >  	if (kvm_mpx_supported() && (!vmx->nested.nested_run_pending ||
+> > >  	    !(vmcs12->vm_entry_controls & VM_ENTRY_LOAD_BNDCFGS)))
+> > >  		vmcs_write64(GUEST_BNDCFGS, vmx->nested.vmcs01_guest_bndcfgs);
+> > > +
+> > > +	if (kvm_cet_supported() && (!vmx->nested.nested_run_pending ||
+> > > +	    !(vmcs12->vm_entry_controls & VM_ENTRY_LOAD_CET_STATE))) {
+> > 
+> > Not your code per se, since this pattern comes from BNDCFGS and DEBUGCTL, but I
+> > don't see how loading vmcs01 state in this combo is correct:
+> > 
+> >     a. kvm_xxx_supported()              == 1
+> >     b. nested_run_pending               == false
+> >     c. vm_entry_controls.load_xxx_state == true
+> > 
+> > nested_vmx_enter_non_root_mode() only snapshots vmcs01 if 
+> > vm_entry_controls.load_xxx_state == false, which means the above combo is
+> > loading stale values (or more likely, zeros).
+> > 
+> > I _think_ nested_vmx_enter_non_root_mode() just needs to snapshot vmcs01 if
+> > nested_run_pending=false.  For migration, if userspace restores MSRs after
+> > KVM_SET_NESTED_STATE, then what's done here is likely irrelevant.  If userspace
+> > restores MSRs before nested state, then vmcs01 will hold the desired value since
+> > setting MSRs would have written the value into vmcs01.
+> 
+> Then the code nested_vmx_enter_non_root_mode() would look like:
+> 
+> if (kvm_cet_supported() && !vmx->nested.nested_run_pending &&
+>     !(vmcs12->vm_entry_controls & VM_ENTRY_LOAD_CET_STATE)) {
+> 	...
+>     }
+> 
+> I have another concern now, if vm_entry_controls.load_cet_state == false, and L1
+> updated vmcs fields, so the latest states are in vmcs12, but they cannot
+> be synced to vmcs02 because in prepare_vmcs02_rare():
+> 
+> if (kvm_cet_supported() && vmx->nested.nested_run_pending &&
+>     (vmcs12->vm_entry_controls & VM_ENTRY_LOAD_CET_STATE)) {
+> 	...
+>     }
+> 
+> so L2 got stale status. IMO, L1 guest sets vm_entry_controls.load_cet_state == false
+> should be rare case. We can even igore this case :-)
+> 
+> > 
+> > I suspect no one has reported this issue because guests simply don't use MPX,
+> > and up until the recent LBR stuff, KVM effectively zeroed out DEBUGCTL for the
+> > guest.
+> > 
+> So for MPX and DEBUGCTL, is it worth some separate fix patch?
+> 
+> > diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+> > index 45622e9c4449..4184ff601120 100644
+> > --- a/arch/x86/kvm/vmx/nested.c
+> > +++ b/arch/x86/kvm/vmx/nested.c
+> > @@ -3298,10 +3298,11 @@ enum nvmx_vmentry_status nested_vmx_enter_non_root_mode(struct kvm_vcpu *vcpu,
+> >         if (likely(!evaluate_pending_interrupts) && kvm_vcpu_apicv_active(vcpu))
+> >                 evaluate_pending_interrupts |= vmx_has_apicv_interrupt(vcpu);
+> > 
+> > -       if (!(vmcs12->vm_entry_controls & VM_ENTRY_LOAD_DEBUG_CONTROLS))
+> > +       if (!vmx->nested.nested_run_pending ||
+> > +           !(vmcs12->vm_entry_controls & VM_ENTRY_LOAD_DEBUG_CONTROLS))
+> >                 vmx->nested.vmcs01_debugctl = vmcs_read64(GUEST_IA32_DEBUGCTL);
+> > -       if (kvm_mpx_supported() &&
+> > -               !(vmcs12->vm_entry_controls & VM_ENTRY_LOAD_BNDCFGS))
+> > +       if (kvm_mpx_supported() && (!vmx->nested.nested_run_pending ||
+> > +           !(vmcs12->vm_entry_controls & VM_ENTRY_LOAD_BNDCFGS)))
+> >                 vmx->nested.vmcs01_guest_bndcfgs = vmcs_read64(GUEST_BNDCFGS);
+> > 
+> >         /*
+> > 
+> > 
+> > Side topic, all of this code is broken for SMM emulation.  SMI+RSM don't do a
+> > full VM-Exit -> VM-Entry; the CPU forcefully exits non-root, but most state that
+> > is loaded from the VMCS is left untouched.  It's the SMI handler's responsibility
+> > to not enable features, e.g. to not set CR4.CET.  For sane use cases, this
+> > probably doesn't matter as vmcs12 will be configured to context switch state,
+> > but if L1 is doing anything out of the ordinary, SMI+RSM will corrupt state.
+> > 
+> > E.g. if L1 enables MPX in the guest, does not intercept L2 writes to BNDCFGS,
+> > and does not load BNDCFGS on VM-Entry, then SMI+RSM would corrupt BNDCFGS since
+> > the SMI "exit" would clear BNDCFGS, and the RSM "entry" would load zero.  This
+> > is 100% contrived, and probably doesn't impact real world use cases, but it
+> > still bugs me :-)
+> 
+> Exactly, should it be fixed by separate patch or leave it as is?
+> 
+> > 
+> > > +		vmcs_writel(GUEST_SSP, vmx->nested.vmcs01_guest_ssp);
+> > > +		vmcs_writel(GUEST_S_CET, vmx->nested.vmcs01_guest_s_cet);
+> > > +		vmcs_writel(GUEST_INTR_SSP_TABLE,
+> > > +			    vmx->nested.vmcs01_guest_ssp_tbl);
+> > > +	}
+> > > +
+> > >  	vmx_set_rflags(vcpu, vmcs12->guest_rflags);
+> > >  
+> > >  	/* EXCEPTION_BITMAP and CR0_GUEST_HOST_MASK should basically be the
+> > > @@ -3373,8 +3389,14 @@ enum nvmx_vmentry_status nested_vmx_enter_non_root_mode(struct kvm_vcpu *vcpu,
+> > >  	if (!(vmcs12->vm_entry_controls & VM_ENTRY_LOAD_DEBUG_CONTROLS))
+> > >  		vmx->nested.vmcs01_debugctl = vmcs_read64(GUEST_IA32_DEBUGCTL);
+> > >  	if (kvm_mpx_supported() &&
+> > > -		!(vmcs12->vm_entry_controls & VM_ENTRY_LOAD_BNDCFGS))
+> > > +	    !(vmcs12->vm_entry_controls & VM_ENTRY_LOAD_BNDCFGS))
+> > >  		vmx->nested.vmcs01_guest_bndcfgs = vmcs_read64(GUEST_BNDCFGS);
+> > > +	if (kvm_cet_supported() &&
+> > > +	    !(vmcs12->vm_entry_controls & VM_ENTRY_LOAD_CET_STATE)) {
+> > > +		vmx->nested.vmcs01_guest_ssp = vmcs_readl(GUEST_SSP);
+> > > +		vmx->nested.vmcs01_guest_s_cet = vmcs_readl(GUEST_S_CET);
+> > > +		vmx->nested.vmcs01_guest_ssp_tbl = vmcs_readl(GUEST_INTR_SSP_TABLE);
+> > > +	}
+> > >  
+> > >  	/*
+> > >  	 * Overwrite vmcs01.GUEST_CR3 with L1's CR3 if EPT is disabled *and*
+> > > @@ -4001,6 +4023,9 @@ static bool is_vmcs12_ext_field(unsigned long field)
+> > >  	case GUEST_IDTR_BASE:
+> > >  	case GUEST_PENDING_DBG_EXCEPTIONS:
+> > >  	case GUEST_BNDCFGS:
+> > > +	case GUEST_SSP:
+> > > +	case GUEST_INTR_SSP_TABLE:
+> > > +	case GUEST_S_CET:
+> > >  		return true;
+> > >  	default:
+> > >  		break;
+> > > @@ -4050,8 +4075,14 @@ static void sync_vmcs02_to_vmcs12_rare(struct kvm_vcpu *vcpu,
+> > >  	vmcs12->guest_idtr_base = vmcs_readl(GUEST_IDTR_BASE);
+> > >  	vmcs12->guest_pending_dbg_exceptions =
+> > >  		vmcs_readl(GUEST_PENDING_DBG_EXCEPTIONS);
+> > > -	if (kvm_mpx_supported())
+> > > +	if (kvm_mpx_supported() && guest_cpuid_has(vcpu, X86_FEATURE_MPX))
+> > 
+> > Adding the CPUID check for MPX definitely needs to be a separate commit.
+> 
+> Sure, will fix them by separate patch. Thanks for review!
+> 
+> > 
+> > >  		vmcs12->guest_bndcfgs = vmcs_read64(GUEST_BNDCFGS);
+> > > +	if (kvm_cet_supported() && (guest_cpuid_has(vcpu, X86_FEATURE_SHSTK) ||
+> > > +	    guest_cpuid_has(vcpu, X86_FEATURE_IBT))) {
+> > > +		vmcs12->guest_ssp = vmcs_readl(GUEST_SSP);
+> > > +		vmcs12->guest_s_cet = vmcs_readl(GUEST_S_CET);
+> > > +		vmcs12->guest_ssp_tbl = vmcs_readl(GUEST_INTR_SSP_TABLE);
+> > > +	}
+> > >  
+> > >  	vmx->nested.need_sync_vmcs02_to_vmcs12_rare = false;
+> > >  }
+> > > diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
+> > > index 9d3a557949ac..36dc4fdb0909 100644
+> > > --- a/arch/x86/kvm/vmx/vmx.h
+> > > +++ b/arch/x86/kvm/vmx/vmx.h
+> > > @@ -155,6 +155,9 @@ struct nested_vmx {
+> > >  	/* to migrate it to L2 if VM_ENTRY_LOAD_DEBUG_CONTROLS is off */
+> > >  	u64 vmcs01_debugctl;
+> > >  	u64 vmcs01_guest_bndcfgs;
+> > > +	u64 vmcs01_guest_ssp;
+> > > +	u64 vmcs01_guest_s_cet;
+> > > +	u64 vmcs01_guest_ssp_tbl;
+> > >  
+> > >  	/* to migrate it to L1 if L2 writes to L1's CR8 directly */
+> > >  	int l1_tpr_threshold;
+> > > -- 
+> > > 2.26.2
+> > > 
