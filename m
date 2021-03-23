@@ -2,282 +2,155 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A75DC3466FA
-	for <lists+kvm@lfdr.de>; Tue, 23 Mar 2021 18:56:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6BC7B3466F5
+	for <lists+kvm@lfdr.de>; Tue, 23 Mar 2021 18:56:44 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231433AbhCWR4X (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 23 Mar 2021 13:56:23 -0400
-Received: from mail-bn8nam12on2077.outbound.protection.outlook.com ([40.107.237.77]:36673
-        "EHLO NAM12-BN8-obe.outbound.protection.outlook.com"
+        id S231401AbhCWR4R (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 23 Mar 2021 13:56:17 -0400
+Received: from mail-dm6nam10on2067.outbound.protection.outlook.com ([40.107.93.67]:16865
+        "EHLO NAM10-DM6-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S231318AbhCWRzp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 23 Mar 2021 13:55:45 -0400
+        id S231265AbhCWRzm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 23 Mar 2021 13:55:42 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=HmJv8veTe2IMV8pTmKr64BR8DkrG/ZpwxSAita+3Sx+UBXGLph2CTj7bE+kA23LsobOmUWba/VEhhY26IyR45tlFcwbhiSoD/fMTnV6t+zIgI3cAiIM2FoDYSdBZjdd6CKfT8CiL0FgVUj2YBMHCd1vA0KPghqfbK4fGc1osAZbJlliudFQ8ey1iUZMQEL1IIJ/gFKuoj6GFUIpsvoC3swssKenwahitpS84kkvFoHCUXiMNXQKeiKbqtcp6shPRTuelZa+Wbxcf57MyKe9ZaiCjNszQGOx0S7fkpPVikw996GZzcU+UUY6vQks9bRcmDBZoO8serUspzm49CABtaQ==
+ b=Wwmh4dILIE/gqofpXAUD7x+MckWC8aDskKlNcCrvbbjzF9dgoSEaVtsh2wb6FtYR3hLNYB9rZVSiN6Ahd5dxdjSNzYC5X/ZUVIEL1/jcqjWohJ0fePMr4rm07rxmaNfDw84nMkPBRq7zDwC7zKqqxzP9RBjOshv9PzRaP9woJ9DCZY3bjYrDZgePdJzqw1GVNpQ1gl0IEYupapcjH5B343xD5MkKagt/Dc1KOoWFXwkNx5T/qI4+NIcGkKVJTMOVlk54M5AAQgdTbhnai58E7iMxKg36AezlwgBZgca1EFz0Sn5uSoitZefzczPtiUAHbWaCOPU369um0jVb3mInxg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=OdX5m0sjsG9ybbyIjyfC40NWPaxyira/8qCtol2gmZg=;
- b=BisNEjKbmF/J5apZhGDFh4t0tp3jCETIloMseMWxBDJRCXIH3xTzTOi+OYlN/GL6/FS/iWeuIy85bwKhQ5zBfcAznD2JnGlGAqXW52+kq+6S7KKaWb39wkn9gMfFkc4dQeUHJF9aw9qjqM3pZe3G51Zd0Tz3eWDI+kAVkgP7EnF9SJ/WkTBMi28eE3JR94kdiYtZL6IKqIWECRNWuTB4VTfgjLX90qYX34SthQCmJwsilVBiHBUrJVWfJ/0R4/a4+PdK2LHBI5TKjnpFC54Kf0sIfTf6lDh+0fy5QZPwRJDyRhVtTtB/d4cs54bC0rp70F/MUD7cWDwkiBoEK7WVxQ==
+ bh=6zWkoa+pW27gbbX1iiE5kbluK6tMuu5mXSd1YE/2nio=;
+ b=FvPOdyXqSl+R4LJierkESPK+S/2R3sFQCUf9BNCGTBXQd2g1XC62UDCFz27EKSaGo7SD1aZbRnlLrh45OaSVZ09KM0xuhvtEtoNzXWMEmHbuUk9/ZhQaqW/p2ZRHPAB9BDP46Ky7oXgSvNmdkXaJvgWqbAiYXlrgXqfNtmaZ6+G16o75X2EAauUkrLqpkf2dXNAMhKBZ026IcztHTfU4Szps3Jih20lD4J/iwlKAd3XBWEkCF5pc73dqAil3V34u2s9PSIz8Jy1du0KVrARCoyHlEdp0uzh7Pvyc7pP4/NwHOnmcMEQmE5x7KhrhREd0IX0d97k4N8WWa8DgWqTCWg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
  dkim=pass header.d=nvidia.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=OdX5m0sjsG9ybbyIjyfC40NWPaxyira/8qCtol2gmZg=;
- b=ZlQ+etOQQdAUO9343H7kgxkyM2fPNuRJBsO3H/RIKq3Px18nB5eKSN3Mreh2OWw1X3Oxw6amngAj0Y0TQJ+KZpQJERRQxSTrBYabIURpaeHOLPrVImAmBvUGmwKNMBHAkZ9Nctl1dR9gkf3KuobUgZGus51fVTCXf6vFvfi7Fcd9UrWaRuXbfJF+0esaFyeuWTOUIcNrZO2mdOuQ/DO9sR3dIzt7bppUcbL8Evb5qqoKvJt1FFwJFEZVB/o7Rq/hZqwXjfs4I8ZnBIktslq4Ch4b+HwKNZj7AAOk7WsnTvq/fcH/djDdS4UOc1rYdH6ChoB3yXrvRiryTEr8LmafUA==
+ bh=6zWkoa+pW27gbbX1iiE5kbluK6tMuu5mXSd1YE/2nio=;
+ b=j1tJx92/ep1MbBMN1sxFXz6Usj3h9Lu+fsOotbN/H1+yIYKosYSJhDQh+Gu+jmzEy/uxefUj/UZhRx+RlAjk3PT9WNitnn1wwtUnp01AYDTIAaqWcVw8nhtX20pKz1Ct9qRZA/7p4hGvRfKHQ8qjzqQnTyBEE1KXlvZG7X8akukXkB0n/ea89s/PkDcUrqFwWTdDzkHmWGMJA0IzlWCSaVPUoBMhXM01b29q9o4CvY3+AbwF3cSTURDFw6nlG6oVk/5D+DNeI5rDlwQX8aCzyoQ43/Ywubc7ZQv0D458HvbjUuTZ6A2zClD8DvO76XjSXCuJwUygkR/s8ALSRgfZAg==
 Authentication-Results: redhat.com; dkim=none (message not signed)
  header.d=none;redhat.com; dmarc=none action=none header.from=nvidia.com;
 Received: from DM6PR12MB3834.namprd12.prod.outlook.com (2603:10b6:5:14a::12)
- by DM6PR12MB4943.namprd12.prod.outlook.com (2603:10b6:5:1bc::21) with
+ by DM6PR12MB4299.namprd12.prod.outlook.com (2603:10b6:5:223::9) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3955.18; Tue, 23 Mar
- 2021 17:55:43 +0000
+ 2021 17:55:41 +0000
 Received: from DM6PR12MB3834.namprd12.prod.outlook.com
  ([fe80::1c62:7fa3:617b:ab87]) by DM6PR12MB3834.namprd12.prod.outlook.com
  ([fe80::1c62:7fa3:617b:ab87%6]) with mapi id 15.20.3955.027; Tue, 23 Mar 2021
- 17:55:43 +0000
+ 17:55:41 +0000
 From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Alex Williamson <alex.williamson@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org,
-        Kirti Wankhede <kwankhede@nvidia.com>
-Cc:     "Raj, Ashok" <ashok.raj@intel.com>,
+To:     Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org
+Cc:     Alex Williamson <alex.williamson@redhat.com>,
+        "Raj, Ashok" <ashok.raj@intel.com>,
+        Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>,
+        Neo Jia <cjia@nvidia.com>,
         Dan Williams <dan.j.williams@intel.com>,
         Christoph Hellwig <hch@lst.de>,
+        Jike Song <jike.song@intel.com>,
+        Kirti Wankhede <kwankhede@nvidia.com>,
         Leon Romanovsky <leonro@nvidia.com>,
         Max Gurtovoy <mgurtovoy@nvidia.com>,
         Tarun Gupta <targupta@nvidia.com>
-Subject: [PATCH 04/18] vfio/mdev: Use struct mdev_type in struct mdev_device
-Date:   Tue, 23 Mar 2021 14:55:21 -0300
-Message-Id: <4-v1-7dedf20b2b75+4f785-vfio2_jgg@nvidia.com>
+Subject: [PATCH 05/18] vfio/mdev: Do not allow a mdev_type to have a NULL parent pointer
+Date:   Tue, 23 Mar 2021 14:55:22 -0300
+Message-Id: <5-v1-7dedf20b2b75+4f785-vfio2_jgg@nvidia.com>
 In-Reply-To: <0-v1-7dedf20b2b75+4f785-vfio2_jgg@nvidia.com>
 References: 
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
 X-Originating-IP: [206.223.160.26]
-X-ClientProxiedBy: MN2PR18CA0014.namprd18.prod.outlook.com
- (2603:10b6:208:23c::19) To DM6PR12MB3834.namprd12.prod.outlook.com
+X-ClientProxiedBy: BL0PR0102CA0036.prod.exchangelabs.com
+ (2603:10b6:207:18::49) To DM6PR12MB3834.namprd12.prod.outlook.com
  (2603:10b6:5:14a::12)
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from mlx.ziepe.ca (206.223.160.26) by MN2PR18CA0014.namprd18.prod.outlook.com (2603:10b6:208:23c::19) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3977.24 via Frontend Transport; Tue, 23 Mar 2021 17:55:39 +0000
-Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1lOlFf-001cgc-Av; Tue, 23 Mar 2021 14:55:35 -0300
+Received: from mlx.ziepe.ca (206.223.160.26) by BL0PR0102CA0036.prod.exchangelabs.com (2603:10b6:207:18::49) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3977.24 via Frontend Transport; Tue, 23 Mar 2021 17:55:38 +0000
+Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1lOlFf-001cgh-Cq; Tue, 23 Mar 2021 14:55:35 -0300
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: d0a28af4-dc40-48ff-f1bc-08d8ee24def0
-X-MS-TrafficTypeDiagnostic: DM6PR12MB4943:
+X-MS-Office365-Filtering-Correlation-Id: 76454c62-caed-4124-5652-08d8ee24de0c
+X-MS-TrafficTypeDiagnostic: DM6PR12MB4299:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <DM6PR12MB4943AA7140E856B1C7011BEBC2649@DM6PR12MB4943.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:5236;
+X-Microsoft-Antispam-PRVS: <DM6PR12MB429961DD83C3C3B70A929079C2649@DM6PR12MB4299.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:619;
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: PucYBGKYrWxlOp3aVZG2NjcI80k1Cry3TqSa8ZOcP4InNg+4W1e8mrV44CpqM4Dgu9yNveerkQdNzVr6Gmv6gUQpaedBnDPdDDBoJROz+nFhYRnFKZ/YxxwrQ9/6P3pHOmLY9RLblIQp0RNUpX3/0WePJmbm0bQVztE3Ym1V2HhDm2dAO1wah+AErlH9/8T/IA1ilviMf7FExxuHnzsdndWEtyEBMu1dBjmGvlTB+EYRWTB5JfkqyVsej9G6LQU/x6SC+THdpL7BdgBEl/2HyBJbEwrJD+CMGyxbtmcNPTLSBnMNKGAwVMod1UOoOsqN1Uhty+LKjfjlTMSNPqN2iUqH2ZPQAUWBSvK5Qvhmg3yWzP2/5yPMbO35jMataVAL6ZF22XOZD56p6mZxu7Km3CV84c3vnac4T9JMgQlgq42iaut3wuVD00BD4v/jwPiW2SvioyqBZbJH4DnJDeLSJEIMg0qEYju0XgMp6jTrtQ/aCmpzvetjpy5kR9a5CzI+nGZsWjA1clobrVjAYcLIxhjTZDZoiHRhq5SE99ug9llYqQb1vB8gwBuQf7aXpTHHhfF0YlDj45ZSpDPDEKqGpg0jaBLMtjZnLz00pmkuajGyq4sbsobrJV+xpjPe7QkvPyhnGQ+TDozh2uWI9i1TcQwZyhgQmFTGQrgMIhc79nI=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB3834.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(396003)(39860400002)(136003)(376002)(366004)(346002)(66476007)(186003)(107886003)(6666004)(8936002)(110136005)(36756003)(426003)(86362001)(54906003)(83380400001)(2616005)(38100700001)(66946007)(5660300002)(478600001)(9746002)(66556008)(8676002)(4326008)(2906002)(26005)(316002)(9786002)(6636002)(4216001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: =?us-ascii?Q?j5pw9UDA/S/YtKRqZaTHMoaYJgppSI2BjxE73JO9F5CLikjpbCB9UT+Jj3E1?=
- =?us-ascii?Q?bzpZEM29QEF9Kf64339c1C3gt1uqYOLhjRwnoVfBXJoTR277zlQJBmIU8oSL?=
- =?us-ascii?Q?kTHyJ32PYb/PdzH8NY9O5qhUd2PeYGrO7V0mRctYfSlq32LwSo78FsMI6B8a?=
- =?us-ascii?Q?+z250k/Hi/MZvlyVmRCRICz1TofCm5eylqjVTjy3lRGn/Wd8td/hFsxptACE?=
- =?us-ascii?Q?YTJ2S6RGCdXXt5FbJ2w+qTYCYu0N/npjlBUDHgVibBVZUjH9qbhDaKpQ1BpH?=
- =?us-ascii?Q?FfmGxXgpPDpURzi7/xl1o73dVl41roK32dorm9XiL0+DETaYZ2gmvQhQlr5S?=
- =?us-ascii?Q?VNiRBbYJkFb/0mCSH/yaQ128adMmo5ZbeyPFBZqkyZMzBWirSC//8dWU49cM?=
- =?us-ascii?Q?XsT1quxT+cnPt1U4hKGuT90fOyaLPDt9TEJQeP3Iw77Wih6c5YRyoI2a+cjm?=
- =?us-ascii?Q?ibq8NrYqvIZqz8zYY3il9Uh+PxdxLySUf13VgkIeS6hRSrHT+jc5Z62u3mCc?=
- =?us-ascii?Q?rsQjPlBsxV7m48rML+C/FMODIMf5x0AtChCg5bqv/b29ROafyM3MajZJUCQu?=
- =?us-ascii?Q?Bh4M/eoeFLCpAfm2+xdS+l9Kx2Jvm4Zi4tgwTsCVeztJ5KnsePqrAglT77G9?=
- =?us-ascii?Q?WX3m00xQDVPYsXpi8VTH2pks6V4Q329r6SaMUZ8G7tpb0cH9M1CiA0MM0enC?=
- =?us-ascii?Q?qWS1RK1+Ep5QHPTCPfG3Q12noIciq+VmlodG0xXmuFAAXKZLZIeLEIPGNL1W?=
- =?us-ascii?Q?+6z7NSEhz9/XBpUyY7Q0PIjSwvzQIZpDErzAZLgwk61j+6bqy5QRbJioODeS?=
- =?us-ascii?Q?UvDKylKLMhTIbi5iOkLwhhOsL/R+gVuDq6lkZNGVOzAFkvrgMGZ4qkDs1ldP?=
- =?us-ascii?Q?tr0N3FksR5XJCXuMmqS6It9VtE2LFFCneGX34X5WDqNUowmaTAiu5+0n3KG8?=
- =?us-ascii?Q?72OBSjKN0kezSTj9jTdnCs32R6xk76HmRGNXQyPqDuehq8VG87tEzyoNLJyj?=
- =?us-ascii?Q?SR/LfJBJXTwLZzX3dGqDGNTSF8SkhhpDgultuw0YZmt7a1h/u+iPZLkKh3El?=
- =?us-ascii?Q?c+lQnI3G0riTfEhgF5vef7QGEJBkh4DxvrK7u50KDRrzl6bGd1ROwgfz8zLj?=
- =?us-ascii?Q?6hmCTrWO0LqpSubfKVDrvtwFJtIPsh9mz3aBGEpe1PI1tnT/Q0UmdiSthtdS?=
- =?us-ascii?Q?98LOhCOWzkZZw/1ySMIvTkz6dJ39gXKecWBVPuYQ3x0pfGXuoW5SuzGN79tz?=
- =?us-ascii?Q?kvGL/qMA88t4SC3nmTXFDedgESiZoaSQmJ4mp+h0on1lY+rHbuRQpYqMIorN?=
- =?us-ascii?Q?iU53BJQBl8lZOtB/EduqVGkZ?=
+X-Microsoft-Antispam-Message-Info: h+IYBBYhevqf9OgPMcuL6teeCixYXZrhFmBb0+Vx8mGYWFidgNA5U6apiQYSGtN7o3YsNch+WwpuC0KOAZabPL4xj2Clx2/EEzSHnuuBZAW9upA63EpX8+BDBBedvyx5gwWfUAHGDReNkWUApxXaEcl9C4JNArdFTpvsCWwD+k6x4SbL9/kYKn+jsdIaMBDWk7iGtkaNCC4ikJjiBO88GRH7xcLoF8xEQDGLg0cN8+dYi1/+5Bj3ZKzmDO6oERE99HJ/h3SJxNtACW8Qg9EPs6pAFSwlnv+O1wr9hGsGgB8E+odcRw3iLKyX10P7B+DXU8ZrXsWzCYMmAkvFtr8iE8rGPTaeJvnMTmD0vUV/HZdgW/KKWkBt2Jo6DBjvpewphW7PYWq98czG7EuRPv7qsm0nnknzwvtP3EGRiF3472jYVIcF5YBgP7dJUJROJBYTyeNRRokMbEcnFe8F2zTFvzYNwJJzbfweacmCz/DwAN41x+CyKd21G65rU7H0lfQplvSmh7XtaNSwq/t5uvfr36kYdhO2QN0jU+TY3Buwqlbghl+GXg1hh35Cmm/AqvnYKBpov1FSVtSg9G8DJJhi8gltvanKWbb7pHP8GR0YL4M55HzpKb7M03V1tnIw1+WzRxRi3yimw2k4apoeFkoeikWyc1/wPLEjj7NOzbSiLRM5ioefNUvuWzm1oKgITsXS
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB3834.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(396003)(366004)(376002)(136003)(346002)(39860400002)(83380400001)(86362001)(66476007)(66946007)(316002)(4326008)(54906003)(426003)(186003)(478600001)(107886003)(66556008)(2616005)(26005)(2906002)(9786002)(9746002)(38100700001)(5660300002)(8936002)(36756003)(6666004)(8676002)(4216001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData: =?us-ascii?Q?I87vg6UyLmFkdXb8mh/drqe876zy+yHTNeNnn43awaaRa6b3/4K9GGuykORc?=
+ =?us-ascii?Q?oO0xyJGCiKph7DLSpgOjCeZ/TS5GvyUtHeBsk5/gUGR8LvgL7XM3Tb0zOXPk?=
+ =?us-ascii?Q?dpmf144wTIhRjqY9fqmnaXjbyvILVSLXi1Hm58GfPj0vSKsBIuzTTbdHaFoq?=
+ =?us-ascii?Q?jNwNLPrlNneNv0ZPRQ257R0whOVPhjznfQrvTdVvKnw4IEOPvSdG83IBb/m7?=
+ =?us-ascii?Q?RhI+iXdd2mQUy4P6eGHkWgJ4BSPIMNKMnYXaNnCsFDjK9a7djOigOdjUASfS?=
+ =?us-ascii?Q?NgZX1IgxLqeVLK63EtMxEmlr8+VUn2mQtOLP1i+FZvyoVjSD+3OSs985DCLA?=
+ =?us-ascii?Q?tGjx0JWqRtcQY9dbjrjlvWm5wG0QAZb5rhhMqau9GGp9y2XT0U/x6sSZRAIp?=
+ =?us-ascii?Q?m5oXQ4JtcmIGoPvAXN0m2fDJYBX065iA3Kwsyc752ySR7Q7KKi+tFa61TzMp?=
+ =?us-ascii?Q?PzDO4LMcM/cQkN13hBC5ISNJKD5B6RcmpWt8bHXaEpe2LRo9onH1OtE4M/ji?=
+ =?us-ascii?Q?N20kyil1RJ2UfodrtL5x0Zzl2TtlRFfUUBUu5bGxeBIOKlzz8mgfsUV6mN02?=
+ =?us-ascii?Q?E0s96zZ586kwCzBsgUvXd/h0jqxbKoKF3R8I2gmebMXBulnspWlXJODNz8Dg?=
+ =?us-ascii?Q?t+jigMYqcFgHq4w4XkKE9sgysywRDG2iU6UcKvMGQJX+klzg4F9cqDlC0x/L?=
+ =?us-ascii?Q?46Vzb9Gb4IBtryMQasJPnIK9BMcLaKg0PB0QpWAQoSO3g55sZ0TvgWP5D9dn?=
+ =?us-ascii?Q?T8c6BiNZPaHLxR71gH4zeg03WdrwP4uOz5meJdD/YYjqyD2SiDJrN33DP0Om?=
+ =?us-ascii?Q?/hHCUCpy8dKrd/za8yIKR10EWmgeD6a7Xgw+ukTSNJhZSuWZo4Ty7ALEfIMk?=
+ =?us-ascii?Q?DIK5LRbbdFnv0VMfGBsXDcVI8SgvYh9RIR53M7mpSzQnOvwvWQP98PmHF8yu?=
+ =?us-ascii?Q?iankvXOdwCRf3g3mb1qiIhk8/+EGHoGXOg4NTJWISndSnW3JjXguAB7S5e9R?=
+ =?us-ascii?Q?pTY9I9I7WtNgiNr+FdQthkO5JUBRmbz+FKsNwHWlvpSNu0XZ9/zCRf1QNBiC?=
+ =?us-ascii?Q?cKAWs/7mH0EiwgIH9Q8DjIiAIKMiJExN6QcErIbUOpct0Iv37FI5wgbOsvZb?=
+ =?us-ascii?Q?E9HzHReUIzSasYtiAHMgXl7PwN1JvM1uOCsnrkaaODFFsI/MEFBWBoKKwj7S?=
+ =?us-ascii?Q?Nemw/wr2QRw1J5FS2+E1AC6745g36byhRKQQMKdZXGhXRHrbC6ah58BfsH3M?=
+ =?us-ascii?Q?C29Fcw0y1UiGiI1Jm+uxIv/s4uCeawB4Ix9vBmzrRHxla4gMDgCfrQHQbniG?=
+ =?us-ascii?Q?53TmTAJUs7SMyT7Q99LQpBH3?=
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: d0a28af4-dc40-48ff-f1bc-08d8ee24def0
+X-MS-Exchange-CrossTenant-Network-Message-Id: 76454c62-caed-4124-5652-08d8ee24de0c
 X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB3834.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Mar 2021 17:55:40.3768
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Mar 2021 17:55:38.9286
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 2UDJXyDB+AOSvS0bkAC2JCbDjEg3sT5lS1g//Da5hKvy/irC/qeaND3H1xZMIbXp
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4943
+X-MS-Exchange-CrossTenant-UserPrincipalName: FZ+/hfIqLOhKiYCA2CvLSka1YBewIfEoqb3IW2RoAIXnrpjQWTAlw3vu0XSj6KF9
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4299
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The kobj pointer in mdev_device is actually pointing at a struct
-mdev_type. Use the proper type so things are understandable.
+There is a small race where the parent is NULL even though the kobj has
+already been made visible in sysfs.
 
-There are a number of places that are confused and passing both the mdev
-and the mtype as function arguments, fix these to derive the mtype
-directly from the mdev to remove the redundancy.
+For instance the attribute_group is made visible in sysfs_create_files()
+and the mdev_type_attr_show() does:
 
+    ret = attr->show(kobj, type->parent->dev, buf);
+
+Which will crash on NULL parent. Move the parent setup to before the type
+pointer leaves the stack frame.
+
+Fixes: 7b96953bc640 ("vfio: Mediated device Core driver")
 Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
 ---
- drivers/vfio/mdev/mdev_core.c    | 16 ++++++----------
- drivers/vfio/mdev/mdev_private.h |  7 +++----
- drivers/vfio/mdev/mdev_sysfs.c   | 15 ++++++++-------
- include/linux/mdev.h             |  4 +++-
- 4 files changed, 20 insertions(+), 22 deletions(-)
+ drivers/vfio/mdev/mdev_sysfs.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/vfio/mdev/mdev_core.c b/drivers/vfio/mdev/mdev_core.c
-index 057922a1707e04..5ca0efa5266bad 100644
---- a/drivers/vfio/mdev/mdev_core.c
-+++ b/drivers/vfio/mdev/mdev_core.c
-@@ -73,11 +73,9 @@ static void mdev_put_parent(struct mdev_parent *parent)
- static void mdev_device_remove_common(struct mdev_device *mdev)
- {
- 	struct mdev_parent *parent;
--	struct mdev_type *type;
- 	int ret;
- 
--	type = to_mdev_type(mdev->type_kobj);
--	mdev_remove_sysfs_files(mdev, type);
-+	mdev_remove_sysfs_files(mdev);
- 	device_del(&mdev->dev);
- 	parent = mdev->parent;
- 	lockdep_assert_held(&parent->unreg_sem);
-@@ -241,13 +239,11 @@ static void mdev_device_release(struct device *dev)
- 	mdev_device_free(mdev);
- }
- 
--int mdev_device_create(struct kobject *kobj,
--		       struct device *dev, const guid_t *uuid)
-+int mdev_device_create(struct mdev_type *type, const guid_t *uuid)
- {
- 	int ret;
- 	struct mdev_device *mdev, *tmp;
- 	struct mdev_parent *parent;
--	struct mdev_type *type = to_mdev_type(kobj);
- 
- 	parent = mdev_get_parent(type->parent);
- 	if (!parent)
-@@ -285,14 +281,14 @@ int mdev_device_create(struct kobject *kobj,
- 	}
- 
- 	device_initialize(&mdev->dev);
--	mdev->dev.parent  = dev;
-+	mdev->dev.parent = parent->dev;
- 	mdev->dev.bus     = &mdev_bus_type;
- 	mdev->dev.release = mdev_device_release;
- 	dev_set_name(&mdev->dev, "%pUl", uuid);
- 	mdev->dev.groups = parent->ops->mdev_attr_groups;
--	mdev->type_kobj = kobj;
-+	mdev->type = type;
- 
--	ret = parent->ops->create(kobj, mdev);
-+	ret = parent->ops->create(&type->kobj, mdev);
- 	if (ret)
- 		goto ops_create_fail;
- 
-@@ -300,7 +296,7 @@ int mdev_device_create(struct kobject *kobj,
- 	if (ret)
- 		goto add_fail;
- 
--	ret = mdev_create_sysfs_files(mdev, type);
-+	ret = mdev_create_sysfs_files(mdev);
- 	if (ret)
- 		goto sysfs_fail;
- 
-diff --git a/drivers/vfio/mdev/mdev_private.h b/drivers/vfio/mdev/mdev_private.h
-index bb60ec4a8d9d21..debf27f95b4f10 100644
---- a/drivers/vfio/mdev/mdev_private.h
-+++ b/drivers/vfio/mdev/mdev_private.h
-@@ -40,11 +40,10 @@ struct mdev_type {
- int  parent_create_sysfs_files(struct mdev_parent *parent);
- void parent_remove_sysfs_files(struct mdev_parent *parent);
- 
--int  mdev_create_sysfs_files(struct mdev_device *mdev, struct mdev_type *type);
--void mdev_remove_sysfs_files(struct mdev_device *mdev, struct mdev_type *type);
-+int  mdev_create_sysfs_files(struct mdev_device *mdev);
-+void mdev_remove_sysfs_files(struct mdev_device *mdev);
- 
--int  mdev_device_create(struct kobject *kobj,
--			struct device *dev, const guid_t *uuid);
-+int mdev_device_create(struct mdev_type *kobj, const guid_t *uuid);
- int  mdev_device_remove(struct mdev_device *dev);
- 
- #endif /* MDEV_PRIVATE_H */
 diff --git a/drivers/vfio/mdev/mdev_sysfs.c b/drivers/vfio/mdev/mdev_sysfs.c
-index 6a5450587b79e9..321b4d13ead7b8 100644
+index 321b4d13ead7b8..5219cdd6dbbc49 100644
 --- a/drivers/vfio/mdev/mdev_sysfs.c
 +++ b/drivers/vfio/mdev/mdev_sysfs.c
-@@ -67,7 +67,7 @@ static ssize_t create_store(struct kobject *kobj, struct device *dev,
- 	if (ret)
- 		return ret;
+@@ -105,6 +105,7 @@ static struct mdev_type *add_mdev_supported_type(struct mdev_parent *parent,
+ 		return ERR_PTR(-ENOMEM);
  
--	ret = mdev_device_create(kobj, dev, &uuid);
-+	ret = mdev_device_create(to_mdev_type(kobj), &uuid);
- 	if (ret)
- 		return ret;
+ 	type->kobj.kset = parent->mdev_types_kset;
++	type->parent = parent;
  
-@@ -249,16 +249,17 @@ static const struct attribute *mdev_device_attrs[] = {
- 	NULL,
- };
+ 	ret = kobject_init_and_add(&type->kobj, &mdev_type_ktype, NULL,
+ 				   "%s-%s", dev_driver_string(parent->dev),
+@@ -132,7 +133,6 @@ static struct mdev_type *add_mdev_supported_type(struct mdev_parent *parent,
+ 	}
  
--int mdev_create_sysfs_files(struct mdev_device *mdev, struct mdev_type *type)
-+int mdev_create_sysfs_files(struct mdev_device *mdev)
- {
- 	struct kobject *kobj = &mdev->dev.kobj;
- 	int ret;
+ 	type->group = group;
+-	type->parent = parent;
+ 	return type;
  
--	ret = sysfs_create_link(type->devices_kobj, kobj, dev_name(&mdev->dev));
-+	ret = sysfs_create_link(mdev->type->devices_kobj, kobj,
-+				dev_name(&mdev->dev));
- 	if (ret)
- 		return ret;
- 
--	ret = sysfs_create_link(kobj, &type->kobj, "mdev_type");
-+	ret = sysfs_create_link(kobj, &mdev->type->kobj, "mdev_type");
- 	if (ret)
- 		goto type_link_failed;
- 
-@@ -271,15 +272,15 @@ int mdev_create_sysfs_files(struct mdev_device *mdev, struct mdev_type *type)
- create_files_failed:
- 	sysfs_remove_link(kobj, "mdev_type");
- type_link_failed:
--	sysfs_remove_link(type->devices_kobj, dev_name(&mdev->dev));
-+	sysfs_remove_link(mdev->type->devices_kobj, dev_name(&mdev->dev));
- 	return ret;
- }
- 
--void mdev_remove_sysfs_files(struct mdev_device *mdev, struct mdev_type *type)
-+void mdev_remove_sysfs_files(struct mdev_device *mdev)
- {
- 	struct kobject *kobj = &mdev->dev.kobj;
- 
- 	sysfs_remove_files(kobj, mdev_device_attrs);
- 	sysfs_remove_link(kobj, "mdev_type");
--	sysfs_remove_link(type->devices_kobj, dev_name(&mdev->dev));
-+	sysfs_remove_link(mdev->type->devices_kobj, dev_name(&mdev->dev));
- }
-diff --git a/include/linux/mdev.h b/include/linux/mdev.h
-index cb771c712da0f4..349e8ac1fe3382 100644
---- a/include/linux/mdev.h
-+++ b/include/linux/mdev.h
-@@ -10,13 +10,15 @@
- #ifndef MDEV_H
- #define MDEV_H
- 
-+struct mdev_type;
-+
- struct mdev_device {
- 	struct device dev;
- 	struct mdev_parent *parent;
- 	guid_t uuid;
- 	void *driver_data;
- 	struct list_head next;
--	struct kobject *type_kobj;
-+	struct mdev_type *type;
- 	struct device *iommu_device;
- 	bool active;
- };
+ attrs_failed:
 -- 
 2.31.0
 
