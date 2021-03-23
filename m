@@ -2,97 +2,62 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9005B3456EC
-	for <lists+kvm@lfdr.de>; Tue, 23 Mar 2021 05:43:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D989F34587B
+	for <lists+kvm@lfdr.de>; Tue, 23 Mar 2021 08:21:11 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229493AbhCWEmu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 23 Mar 2021 00:42:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35374 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229437AbhCWEms (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 23 Mar 2021 00:42:48 -0400
-Received: from mail-ej1-x635.google.com (mail-ej1-x635.google.com [IPv6:2a00:1450:4864:20::635])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CC317C061574;
-        Mon, 22 Mar 2021 21:42:47 -0700 (PDT)
-Received: by mail-ej1-x635.google.com with SMTP id u9so24916981ejj.7;
-        Mon, 22 Mar 2021 21:42:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=UVoLGy/DVv4s3pk1Yx0FAlEBZbJ1Lb3xlELXdAaEJ4o=;
-        b=oS6j9qlosT6UYmptAOm2kR79KEtyJGQHD0LiZ30pp5+HtiH4HN+Ogf5pW8zil3Uzo/
-         CGAus0vUSy78xgNyrDWGM7DxpakafPg7xBt7Dxk4xwp0OpNkhsxTsJQtxaRQ/+KkMl55
-         De3Qpry+UT/n8i8mOLROa7HH4kZfSMhoSB4YVr9deZT/nQ6DhpuAe9B4IYxWMxa5AA4b
-         co+PRn0/Ac2OaUlKbLo38pJG/rOLZrV53PgZZN/IBgPgUpIwKbjUsAHbBoQEckPHh8oN
-         AiBf8GELpAZifndYswSqR1EUeu5DSUfOl23Lznuvth34AAdjtB5Kt0ckguLn05g8Gpfu
-         zaZg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=UVoLGy/DVv4s3pk1Yx0FAlEBZbJ1Lb3xlELXdAaEJ4o=;
-        b=p3ViGSju4n42trR6NebxSo6Rp1bjwpP7c8GZL2er16HJ5zrI45B9EDSEYSkzya+jUd
-         agvFn8OhG01vzldJ0APmT39MyHe7NmgwUUrXmxilaij41o/Y9pdOr2+QCKX6+veCHyJ6
-         i2GIFzYarY9aOLfgsm+29bwIRy8qUXepWeWJ+8SJBAD+QoV+rAkPidPhRA04EsZzgwMU
-         ZmY7N78ce/660LZ1isjsYRACGRvB0E09r21mAJqSjURh1Hl9xJ513ay64z+6BzToTusl
-         kcwep9UbrfHYJdH7IJBFfaCCEtFMESc+YpsBOYCt3G2bcpJlwLUc5O10ryEL5aMXDMzW
-         4lsw==
-X-Gm-Message-State: AOAM531hncL/Nfr6GxGdPGfYh60VWu0RcRBo2XakwNh0ldxwY+PTWHG4
-        QHvWE79OPgYNvAmQsuayNfwjX+QFFsti5al1zQ==
-X-Google-Smtp-Source: ABdhPJzCBJImaAQzKd14Mn+lFtSInQcKqNqdsSb9+PGoZ7nJa047HAGSUuqmEnHvRXC1oWR34cswPMvlgZnlnDjW4Fg=
-X-Received: by 2002:a17:906:f210:: with SMTP id gt16mr3013315ejb.206.1616474566427;
- Mon, 22 Mar 2021 21:42:46 -0700 (PDT)
+        id S230119AbhCWHUa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 23 Mar 2021 03:20:30 -0400
+Received: from mail.kernel.org ([198.145.29.99]:37796 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229963AbhCWHUO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 23 Mar 2021 03:20:14 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 86713619AB;
+        Tue, 23 Mar 2021 07:20:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+        s=korg; t=1616484014;
+        bh=xf/FJRT3op6/DF9iLA9eJZ5X6gvMzU0dp2gmxrew8Zw=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=0SLi843WFB3SJZg1fnvsZ7anQHXNe+tpuxQ/BMjEaOPoHHmBW0dcKdyzsuaC4pXqd
+         luEzlgoRzJAgbshLSsQLvskuorTzaTRNSSeoCreTX+NTibG6CB12inl1cjD8JTYh4U
+         yEgwJXtSt6KmGoREjyW3ICqqpWHnu+jo3mYDW3Us=
+Date:   Tue, 23 Mar 2021 08:20:11 +0100
+From:   Greg KH <gregkh@linuxfoundation.org>
+To:     Tom Lendacky <thomas.lendacky@amd.com>
+Cc:     Isaku Yamahata <isaku.yamahata@intel.com>,
+        linux-kernel@vger.kernel.org, stable@vger.kernel.org,
+        x86@kernel.org, kvm@vger.kernel.org, brijesh.singh@amd.com,
+        tglx@linutronix.de, bp@alien8.de, isaku.yamahata@gmail.com,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
+Subject: Re: [PATCH] X86: __set_clr_pte_enc() miscalculates physical address
+Message-ID: <YFmWq1uuvCiiBhBb@kroah.com>
+References: <81abbae1657053eccc535c16151f63cd049dcb97.1616098294.git.isaku.yamahata@intel.com>
+ <0d99865a-30d5-9857-1a53-cc26ada6608c@amd.com>
 MIME-Version: 1.0
-References: <20210323023726.28343-1-lihaiwei.kernel@gmail.com> <CALMp9eST+qAnXLpzPpORn6piVMNi3xY=P0KmP-cKixtCNAOH9Q@mail.gmail.com>
-In-Reply-To: <CALMp9eST+qAnXLpzPpORn6piVMNi3xY=P0KmP-cKixtCNAOH9Q@mail.gmail.com>
-From:   Haiwei Li <lihaiwei.kernel@gmail.com>
-Date:   Tue, 23 Mar 2021 12:42:11 +0800
-Message-ID: <CAB5KdOb+rwsP0Pf_=_OmQYq94+V0FjqWB0uOA4V1MdUpPd7Rtg@mail.gmail.com>
-Subject: Re: [PATCH] KVM: VMX: Check the corresponding bits according to the
- intel sdm
-To:     Jim Mattson <jmattson@google.com>
-Cc:     LKML <linux-kernel@vger.kernel.org>,
-        kvm list <kvm@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Haiwei Li <lihaiwei@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <0d99865a-30d5-9857-1a53-cc26ada6608c@amd.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Mar 23, 2021 at 11:16 AM Jim Mattson <jmattson@google.com> wrote:
->
-> On Mon, Mar 22, 2021 at 7:37 PM <lihaiwei.kernel@gmail.com> wrote:
-> >
-> > From: Haiwei Li <lihaiwei@tencent.com>
-> >
-> > According to IA-32 SDM Vol.3D "A.1 BASIC VMX INFORMATION", two inspections
-> > are missing.
-> > * Bit 31 is always 0. Earlier versions of this manual specified that the
-> > VMCS revision identifier was a 32-bit field in bits 31:0 of this MSR. For
-> > all processors produced prior to this change, bit 31 of this MSR was read
-> > as 0.
->
-> For all *Intel* processors produced prior to this change, bit 31 of
-> this MSR may have been 0. However, a conforming hypervisor may have
-> selected a full 32-bit VMCS revision identifier with the high bit set
-> for nested VMX. Furthermore, there are other vendors, such as VIA,
-> which have implemented the VMX extensions, and they, too, may have
-> selected a full 32-bit VMCS revision identifier with the high bit set.
-> Intel should know better than to change the documentation after the
-> horse is out of the barn.
+On Mon, Mar 22, 2021 at 04:02:11PM -0500, Tom Lendacky wrote:
+> On 3/18/21 3:26 PM, Isaku Yamahata wrote:
+> > __set_clr_pte_enc() miscalculates physical address to operate.
+> > pfn is in unit of PG_LEVEL_4K, not PGL_LEVEL_{2M, 1G}.
+> > Shift size to get physical address should be PAGE_SHIFT,
+> > not page_level_shift().
+> > 
+> > Fixes: dfaaec9033b8 ("x86: Add support for changing memory encryption attribute in early boot")
+> > Reviewed-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
+> > Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+> 
+> Reviewed-by: Tom Lendacky <thomas.lendacky@amd.com>
 
-Got it, thanks.
+<formletter>
 
->
-> What, exactly, is the value you are adding with this check?
+This is not the correct way to submit patches for inclusion in the
+stable kernel tree.  Please read:
+    https://www.kernel.org/doc/html/latest/process/stable-kernel-rules.html
+for how to do this properly.
 
-I did this just to match the sdm.
-
---
-Haiwei Li
+</formletter>
