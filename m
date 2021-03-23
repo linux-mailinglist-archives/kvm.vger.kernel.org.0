@@ -2,652 +2,206 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 98F43346058
-	for <lists+kvm@lfdr.de>; Tue, 23 Mar 2021 14:54:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CFA96346075
+	for <lists+kvm@lfdr.de>; Tue, 23 Mar 2021 14:57:46 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231853AbhCWNxi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 23 Mar 2021 09:53:38 -0400
-Received: from szxga05-in.huawei.com ([45.249.212.191]:14452 "EHLO
-        szxga05-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231550AbhCWNw7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 23 Mar 2021 09:52:59 -0400
-Received: from DGGEMS413-HUB.china.huawei.com (unknown [172.30.72.59])
-        by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4F4Xnr5F86zwQFP;
-        Tue, 23 Mar 2021 21:50:56 +0800 (CST)
-Received: from DESKTOP-TMVL5KK.china.huawei.com (10.174.187.128) by
- DGGEMS413-HUB.china.huawei.com (10.3.19.213) with Microsoft SMTP Server id
- 14.3.498.0; Tue, 23 Mar 2021 21:52:48 +0800
-From:   Yanan Wang <wangyanan55@huawei.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Andrew Jones <drjones@redhat.com>, <kvm@vger.kernel.org>,
-        <linux-kselftest@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC:     Ben Gardon <bgardon@google.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Peter Xu <peterx@redhat.com>, "Ingo Molnar" <mingo@kernel.org>,
-        Adrian Hunter <adrian.hunter@intel.com>,
-        Jiri Olsa <jolsa@redhat.com>,
-        Arnaldo Carvalho de Melo <acme@redhat.com>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Michael Kerrisk <mtk.manpages@gmail.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        <wanghaibin.wang@huawei.com>, <yuzenghui@huawei.com>,
-        Yanan Wang <wangyanan55@huawei.com>
-Subject: [RFC PATCH v5 10/10] KVM: selftests: Add a test for kvm page table code
-Date:   Tue, 23 Mar 2021 21:52:31 +0800
-Message-ID: <20210323135231.24948-11-wangyanan55@huawei.com>
-X-Mailer: git-send-email 2.8.4.windows.1
-In-Reply-To: <20210323135231.24948-1-wangyanan55@huawei.com>
-References: <20210323135231.24948-1-wangyanan55@huawei.com>
+        id S231734AbhCWN5P (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 23 Mar 2021 09:57:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41702 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231775AbhCWN4m (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 23 Mar 2021 09:56:42 -0400
+Received: from mail-wr1-x42d.google.com (mail-wr1-x42d.google.com [IPv6:2a00:1450:4864:20::42d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 92FC3C061574
+        for <kvm@vger.kernel.org>; Tue, 23 Mar 2021 06:56:41 -0700 (PDT)
+Received: by mail-wr1-x42d.google.com with SMTP id x13so20858593wrs.9
+        for <kvm@vger.kernel.org>; Tue, 23 Mar 2021 06:56:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=sender:subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=p3wcqQCQg37yBHPW67f5Y5HGmvZBnyBJh1NzC0FDdWM=;
+        b=nVws1zt4QCqFbFBjAqJvZaG9GO+JUiTUXKAoTNM7+grxjtxBeweM7Oi1G+vqfLcFvP
+         WT++2PwobsKA9fAE8U1AB4s+iOaQPp2FT6W88Kzn5sK9rHySsy+7a3hu1Hr+/l5bzkhr
+         4FmEyqwJk8nyWEXJj3v0dXDcA//6KfdmZtNWS7aH7n5aZ0TMTxlQYJzbUF9zh1zY08X5
+         CpfYqhC0hqBG6af7sHLW3geiGS0pkQ514W6bmtORxO1nQQCVAlesyxvnODQoTWKSZNg3
+         Z9dpIumATWTe/lnZrM6jcV9PogzGVWECBMkJrPRc7UL1ZaJfMAWCEJbFfQMpWy7dcE4X
+         zUUA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
+         :date:user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=p3wcqQCQg37yBHPW67f5Y5HGmvZBnyBJh1NzC0FDdWM=;
+        b=pftg2xLXybxsNgZg/SgV+KClTZZGgrxKHyPDl645QyykCRkOIcTkEdOCx509wRJigj
+         g8pbDNOIGXnrOauLiLiXoRyLXYGdQg7LPtS04LG4FgZ4ZQat5nrEdfne+D4/VFGDBRgU
+         nCj/CZzOBVcHcY7KIXndsIHsh09/sspr8a3NL39ePAR9fnpvvLLJ3ySPR0wNsYghf3/R
+         f28zlDM5iPLiSR21RYUwqU4UQfko5yz86/sZkL2whSmm12NddjB1WBCTHmuVENjlxIDS
+         c5xaPLiT89nl5wQTn57nekWTCwstPTV5RgSAKtoL6YSi38gRrmpkHEnEhQTNfwp3e7c1
+         8ujA==
+X-Gm-Message-State: AOAM531UC0jF102Ny6OJhRUE2Nh5PhBRbOIv0QuSzBxHcS1+TBx4FkgF
+        hwYOu/qt0lWBy2Vvqxsjw+U=
+X-Google-Smtp-Source: ABdhPJyIHdexSVASH3HCw8s/LIoz+R0OlSLjWuQXAEa+nQN1EWTwdCMcfNtYeaJw+N5L3oZcM720Cg==
+X-Received: by 2002:a5d:5088:: with SMTP id a8mr4193027wrt.294.1616507800291;
+        Tue, 23 Mar 2021 06:56:40 -0700 (PDT)
+Received: from [192.168.1.36] (17.red-88-21-201.staticip.rima-tde.net. [88.21.201.17])
+        by smtp.gmail.com with ESMTPSA id w131sm2886576wmb.8.2021.03.23.06.56.38
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 23 Mar 2021 06:56:39 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= 
+        <philippe.mathieu.daude@gmail.com>
+Subject: Re: [PATCH V13 2/9] meson.build: Re-enable KVM support for MIPS
+To:     Huacai Chen <chenhuacai@gmail.com>,
+        Jiaxun Yang <jiaxun.yang@flygoat.com>
+Cc:     Huacai Chen <zltjiangshi@gmail.com>,
+        Thomas Huth <thuth@redhat.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Peter Maydell <peter.maydell@linaro.org>,
+        Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
+        QEMU Developers <qemu-devel@nongnu.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Aurelien Jarno <aurelien@aurel32.net>
+References: <1602059975-10115-1-git-send-email-chenhc@lemote.com>
+ <1602059975-10115-3-git-send-email-chenhc@lemote.com>
+ <0dfbe14a-9ddb-0069-9d86-62861c059d12@amsat.org>
+ <CAAhV-H63zhXyUizwOxUtXdQQOR=r82493tgH8NfLmgXF0g8row@mail.gmail.com>
+ <9fc6161e-cf27-b636-97c0-9aca77d0f9cd@amsat.org>
+ <CAAhV-H5wPZQ+TGdZL=mPV4YQcjHarJFoEH-nobr10PdesR-ySg@mail.gmail.com>
+From:   =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <62b12fe2-01db-76c0-b2fd-f730b4157285@amsat.org>
+Date:   Tue, 23 Mar 2021 14:56:38 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.8.0
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.174.187.128]
-X-CFilter-Loop: Reflected
+In-Reply-To: <CAAhV-H5wPZQ+TGdZL=mPV4YQcjHarJFoEH-nobr10PdesR-ySg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This test serves as a performance tester and a bug reproducer for
-kvm page table code (GPA->HPA mappings), so it gives guidance for
-people trying to make some improvement for kvm.
+Hi Huacai,
 
-The function guest_code() can cover the conditions where a single vcpu or
-multiple vcpus access guest pages within the same memory region, in three
-VM stages(before dirty logging, during dirty logging, after dirty logging).
-Besides, the backing src memory type(ANONYMOUS/THP/HUGETLB) of the tested
-memory region can be specified by users, which means normal page mappings
-or block mappings can be chosen by users to be created in the test.
+We are going to tag QEMU v6.0-rc0 today.
 
-If ANONYMOUS memory is specified, kvm will create normal page mappings
-for the tested memory region before dirty logging, and update attributes
-of the page mappings from RO to RW during dirty logging. If THP/HUGETLB
-memory is specified, kvm will create block mappings for the tested memory
-region before dirty logging, and split the blcok mappings into normal page
-mappings during dirty logging, and coalesce the page mappings back into
-block mappings after dirty logging is stopped.
+I only have access to a 64-bit MIPS in little-endian to
+test KVM.
 
-So in summary, as a performance tester, this test can present the
-performance of kvm creating/updating normal page mappings, or the
-performance of kvm creating/splitting/recovering block mappings,
-through execution time.
+Can you test the other configurations please?
+- 32-bit BE
+- 32-bit LE
+- 64-bit BE
 
-When we need to coalesce the page mappings back to block mappings after
-dirty logging is stopped, we have to firstly invalidate *all* the TLB
-entries for the page mappings right before installation of the block entry,
-because a TLB conflict abort error could occur if we can't invalidate the
-TLB entries fully. We have hit this TLB conflict twice on aarch64 software
-implementation and fixed it. As this test can imulate process from dirty
-logging enabled to dirty logging stopped of a VM with block mappings,
-so it can also reproduce this TLB conflict abort due to inadequate TLB
-invalidation when coalescing tables.
+Thanks!
 
-Signed-off-by: Yanan Wang <wangyanan55@huawei.com>
-Reviewed-by: Ben Gardon <bgardon@google.com>
----
- tools/testing/selftests/kvm/.gitignore        |   1 +
- tools/testing/selftests/kvm/Makefile          |   3 +
- .../selftests/kvm/kvm_page_table_test.c       | 512 ++++++++++++++++++
- 3 files changed, 516 insertions(+)
- create mode 100644 tools/testing/selftests/kvm/kvm_page_table_test.c
+Phil.
 
-diff --git a/tools/testing/selftests/kvm/.gitignore b/tools/testing/selftests/kvm/.gitignore
-index 32b87cc77c8e..137ab7273be6 100644
---- a/tools/testing/selftests/kvm/.gitignore
-+++ b/tools/testing/selftests/kvm/.gitignore
-@@ -35,6 +35,7 @@
- /dirty_log_perf_test
- /hardware_disable_test
- /kvm_create_max_vcpus
-+/kvm_page_table_test
- /memslot_modification_stress_test
- /set_memory_region_test
- /steal_time
-diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-index a6d61f451f88..75dc57db36b4 100644
---- a/tools/testing/selftests/kvm/Makefile
-+++ b/tools/testing/selftests/kvm/Makefile
-@@ -69,6 +69,7 @@ TEST_GEN_PROGS_x86_64 += dirty_log_test
- TEST_GEN_PROGS_x86_64 += dirty_log_perf_test
- TEST_GEN_PROGS_x86_64 += hardware_disable_test
- TEST_GEN_PROGS_x86_64 += kvm_create_max_vcpus
-+TEST_GEN_PROGS_x86_64 += kvm_page_table_test
- TEST_GEN_PROGS_x86_64 += memslot_modification_stress_test
- TEST_GEN_PROGS_x86_64 += set_memory_region_test
- TEST_GEN_PROGS_x86_64 += steal_time
-@@ -79,6 +80,7 @@ TEST_GEN_PROGS_aarch64 += demand_paging_test
- TEST_GEN_PROGS_aarch64 += dirty_log_test
- TEST_GEN_PROGS_aarch64 += dirty_log_perf_test
- TEST_GEN_PROGS_aarch64 += kvm_create_max_vcpus
-+TEST_GEN_PROGS_aarch64 += kvm_page_table_test
- TEST_GEN_PROGS_aarch64 += set_memory_region_test
- TEST_GEN_PROGS_aarch64 += steal_time
- 
-@@ -88,6 +90,7 @@ TEST_GEN_PROGS_s390x += s390x/sync_regs_test
- TEST_GEN_PROGS_s390x += demand_paging_test
- TEST_GEN_PROGS_s390x += dirty_log_test
- TEST_GEN_PROGS_s390x += kvm_create_max_vcpus
-+TEST_GEN_PROGS_s390x += kvm_page_table_test
- TEST_GEN_PROGS_s390x += set_memory_region_test
- 
- TEST_GEN_PROGS += $(TEST_GEN_PROGS_$(UNAME_M))
-diff --git a/tools/testing/selftests/kvm/kvm_page_table_test.c b/tools/testing/selftests/kvm/kvm_page_table_test.c
-new file mode 100644
-index 000000000000..bbd5c489d61f
---- /dev/null
-+++ b/tools/testing/selftests/kvm/kvm_page_table_test.c
-@@ -0,0 +1,512 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * KVM page table test
-+ *
-+ * Copyright (C) 2021, Huawei, Inc.
-+ *
-+ * Make sure that THP has been enabled or enough HUGETLB pages with specific
-+ * page size have been pre-allocated on your system, if you are planning to
-+ * use hugepages to back the guest memory for testing.
-+ */
-+
-+#define _GNU_SOURCE /* for program_invocation_name */
-+
-+#include <stdio.h>
-+#include <stdlib.h>
-+#include <time.h>
-+#include <pthread.h>
-+#include <semaphore.h>
-+
-+#include "test_util.h"
-+#include "kvm_util.h"
-+#include "processor.h"
-+#include "guest_modes.h"
-+
-+#define TEST_MEM_SLOT_INDEX             1
-+
-+/* Default size(1GB) of the memory for testing */
-+#define DEFAULT_TEST_MEM_SIZE		(1 << 30)
-+
-+/* Default guest test virtual memory offset */
-+#define DEFAULT_GUEST_TEST_MEM		0xc0000000
-+
-+/*
-+ * In our test, we use thread synchronization functions (e.g. sem_wait)
-+ * for time measurement and they can't fail at all, since a failure will
-+ * impact the time accuracy and vcpus will not run as what we expect.
-+ * So we will use safer versions of the functions.
-+ */
-+#define sem_init_s(sem_ptr, ps, val) \
-+	TEST_ASSERT(sem_init(sem_ptr, ps, val) == 0, "Error in sem_init")
-+#define sem_destroy_s(sem_ptr) \
-+	TEST_ASSERT(sem_destroy(sem_ptr) == 0, "Error in sem_destroy")
-+#define sem_wait_s(sem_ptr) \
-+	TEST_ASSERT(sem_wait(sem_ptr) == 0, "Error in sem_wait")
-+#define sem_post_s(sem_ptr) \
-+	TEST_ASSERT(sem_post(sem_ptr) == 0, "Error in sem_post")
-+
-+/* Different guest memory accessing stages */
-+enum test_stage {
-+	KVM_BEFORE_MAPPINGS,
-+	KVM_CREATE_MAPPINGS,
-+	KVM_UPDATE_MAPPINGS,
-+	KVM_ADJUST_MAPPINGS,
-+	NUM_TEST_STAGES,
-+};
-+
-+static const char * const test_stage_string[] = {
-+	"KVM_BEFORE_MAPPINGS",
-+	"KVM_CREATE_MAPPINGS",
-+	"KVM_UPDATE_MAPPINGS",
-+	"KVM_ADJUST_MAPPINGS",
-+};
-+
-+struct perf_test_vcpu_args {
-+	int vcpu_id;
-+	bool vcpu_write;
-+};
-+
-+struct perf_test_args {
-+	struct kvm_vm *vm;
-+	uint64_t guest_test_virt_mem;
-+	uint64_t host_page_size;
-+	uint64_t host_num_pages;
-+	uint64_t large_page_size;
-+	uint64_t large_num_pages;
-+	uint64_t host_pages_per_lpage;
-+	enum vm_mem_backing_src_type src_type;
-+	struct perf_test_vcpu_args vcpu_args[KVM_MAX_VCPUS];
-+};
-+
-+/*
-+ * Guest variables. Use addr_gva2hva() if these variables need
-+ * to be changed in host.
-+ */
-+static enum test_stage guest_test_stage;
-+
-+/* Host variables */
-+static uint32_t nr_vcpus = 1;
-+static struct perf_test_args perf_test_args;
-+static enum test_stage *current_stage;
-+static bool host_quit;
-+
-+/* Whether the test stage is updated, or completed */
-+static sem_t test_stage_updated;
-+static sem_t test_stage_completed;
-+
-+/*
-+ * Guest physical memory offset of the testing memory slot.
-+ * This will be set to the topmost valid physical address minus
-+ * the test memory size.
-+ */
-+static uint64_t guest_test_phys_mem;
-+
-+/*
-+ * Guest virtual memory offset of the testing memory slot.
-+ * Must not conflict with identity mapped test code.
-+ */
-+static uint64_t guest_test_virt_mem = DEFAULT_GUEST_TEST_MEM;
-+
-+static void guest_code(int vcpu_id)
-+{
-+	struct perf_test_args *p = &perf_test_args;
-+	struct perf_test_vcpu_args *vcpu_args = &p->vcpu_args[vcpu_id];
-+	enum vm_mem_backing_src_type src_type = p->src_type;
-+	uint64_t host_page_size = p->host_page_size;
-+	uint64_t host_num_pages = p->host_num_pages;
-+	uint64_t large_page_size = p->large_page_size;
-+	uint64_t large_num_pages = p->large_num_pages;
-+	uint64_t host_pages_per_lpage = p->host_pages_per_lpage;
-+	uint64_t half = host_pages_per_lpage / 2;
-+	bool vcpu_write;
-+	enum test_stage stage;
-+	uint64_t addr;
-+	int i, j;
-+
-+	/* Make sure vCPU args data structure is not corrupt */
-+	GUEST_ASSERT(vcpu_args->vcpu_id == vcpu_id);
-+	vcpu_write = vcpu_args->vcpu_write;
-+
-+	while (true) {
-+		stage = READ_ONCE(guest_test_stage);
-+		addr = perf_test_args.guest_test_virt_mem;
-+
-+		switch (stage) {
-+		/*
-+		 * Before dirty logging, vCPUs concurrently access the first
-+		 * 8 bytes of each page (host page/large page) within the same
-+		 * memory region with different accessing types (read/write).
-+		 * Then KVM will create normal page mappings or huge block
-+		 * mappings for them.
-+		 */
-+		case KVM_CREATE_MAPPINGS:
-+			for (i = 0; i < large_num_pages; i++) {
-+				if (vcpu_write)
-+					*(uint64_t *)addr = 0x0123456789ABCDEF;
-+				else
-+					READ_ONCE(*(uint64_t *)addr);
-+
-+				addr += large_page_size;
-+			}
-+			break;
-+
-+		/*
-+		 * During dirty logging, KVM will only update attributes of the
-+		 * normal page mappings from RO to RW if memory backing src type
-+		 * is anonymous. In other cases, KVM will split the huge block
-+		 * mappings into normal page mappings if memory backing src type
-+		 * is THP or HUGETLB.
-+		 */
-+		case KVM_UPDATE_MAPPINGS:
-+			if (src_type == VM_MEM_SRC_ANONYMOUS) {
-+				for (i = 0; i < host_num_pages; i++) {
-+					*(uint64_t *)addr = 0x0123456789ABCDEF;
-+					addr += host_page_size;
-+				}
-+				break;
-+			}
-+
-+			for (i = 0; i < large_num_pages; i++) {
-+				/*
-+				 * Write to the first host page in each large
-+				 * page region, and triger break of large pages.
-+				 */
-+				*(uint64_t *)addr = 0x0123456789ABCDEF;
-+
-+				/*
-+				 * Access the middle host pages in each large
-+				 * page region. Since dirty logging is enabled,
-+				 * this will create new mappings at the smallest
-+				 * granularity.
-+				 */
-+				addr += host_page_size * half;
-+				for (j = half; j < host_pages_per_lpage; j++) {
-+					READ_ONCE(*(uint64_t *)addr);
-+					addr += host_page_size;
-+				}
-+			}
-+			break;
-+
-+		/*
-+		 * After dirty logging is stopped, vCPUs concurrently read
-+		 * from every single host page. Then KVM will coalesce the
-+		 * split page mappings back to block mappings. And a TLB
-+		 * conflict abort could occur here if TLB entries of the
-+		 * page mappings are not fully invalidated.
-+		 */
-+		case KVM_ADJUST_MAPPINGS:
-+			for (i = 0; i < host_num_pages; i++) {
-+				READ_ONCE(*(uint64_t *)addr);
-+				addr += host_page_size;
-+			}
-+			break;
-+
-+		default:
-+			break;
-+		}
-+
-+		GUEST_SYNC(1);
-+	}
-+}
-+
-+static void *vcpu_worker(void *data)
-+{
-+	int ret;
-+	struct perf_test_vcpu_args *vcpu_args = data;
-+	struct kvm_vm *vm = perf_test_args.vm;
-+	int vcpu_id = vcpu_args->vcpu_id;
-+	struct kvm_run *run;
-+	struct timespec start;
-+	struct timespec ts_diff;
-+	enum test_stage stage;
-+
-+	vcpu_args_set(vm, vcpu_id, 1, vcpu_id);
-+	run = vcpu_state(vm, vcpu_id);
-+
-+	while (!READ_ONCE(host_quit)) {
-+		clock_gettime(CLOCK_MONOTONIC_RAW, &start);
-+		ret = _vcpu_run(vm, vcpu_id);
-+		ts_diff = timespec_elapsed(start);
-+
-+		TEST_ASSERT(ret == 0, "vcpu_run failed: %d\n", ret);
-+		TEST_ASSERT(get_ucall(vm, vcpu_id, NULL) == UCALL_SYNC,
-+			    "Invalid guest sync status: exit_reason=%s\n",
-+			    exit_reason_str(run->exit_reason));
-+
-+		pr_debug("Got sync event from vCPU %d\n", vcpu_id);
-+		stage = READ_ONCE(*current_stage);
-+
-+		/*
-+		 * Here we can know the execution time of every
-+		 * single vcpu running in different test stages.
-+		 */
-+		pr_debug("vCPU %d has completed stage %s\n"
-+			 "execution time is: %ld.%.9lds\n\n",
-+			 vcpu_id, test_stage_string[stage],
-+			 ts_diff.tv_sec, ts_diff.tv_nsec);
-+
-+		sem_post_s(&test_stage_completed);
-+		sem_wait_s(&test_stage_updated);
-+	}
-+
-+	return NULL;
-+}
-+
-+struct test_params {
-+	uint64_t phys_offset;
-+	uint64_t test_mem_size;
-+	enum vm_mem_backing_src_type src_type;
-+};
-+
-+static struct kvm_vm *pre_init_before_test(enum vm_guest_mode mode, void *arg)
-+{
-+	struct test_params *p = arg;
-+	struct perf_test_vcpu_args *vcpu_args;
-+	enum vm_mem_backing_src_type src_type = p->src_type;
-+	uint64_t large_page_size = get_backing_src_pagesz(src_type);
-+	uint64_t test_mem_size = p->test_mem_size, guest_num_pages;
-+	uint64_t guest_page_size = vm_guest_mode_params[mode].page_size;
-+	uint64_t host_page_size = getpagesize();
-+	uint64_t alignment;
-+	void *host_test_mem;
-+	struct kvm_vm *vm;
-+	int vcpu_id;
-+
-+	/* Align up the test memory size */
-+	alignment = max(large_page_size, guest_page_size);
-+	test_mem_size = (test_mem_size + alignment - 1) & ~(alignment - 1);
-+
-+	/* Create a VM with enough guest pages */
-+	guest_num_pages = test_mem_size / guest_page_size;
-+	vm = vm_create_with_vcpus(mode, nr_vcpus,
-+				  guest_num_pages, 0, guest_code, NULL);
-+
-+	/* Align down GPA of the testing memslot */
-+	if (!p->phys_offset)
-+		guest_test_phys_mem = (vm_get_max_gfn(vm) - guest_num_pages) *
-+				       guest_page_size;
-+	else
-+		guest_test_phys_mem = p->phys_offset;
-+#ifdef __s390x__
-+	alignment = max(0x100000, alignment);
-+#endif
-+	guest_test_phys_mem &= ~(alignment - 1);
-+
-+	/* Set up the shared data structure perf_test_args */
-+	perf_test_args.vm = vm;
-+	perf_test_args.guest_test_virt_mem = guest_test_virt_mem;
-+	perf_test_args.host_page_size = host_page_size;
-+	perf_test_args.host_num_pages = test_mem_size / host_page_size;
-+	perf_test_args.large_page_size = large_page_size;
-+	perf_test_args.large_num_pages = test_mem_size / large_page_size;
-+	perf_test_args.host_pages_per_lpage = large_page_size / host_page_size;
-+	perf_test_args.src_type = src_type;
-+
-+	for (vcpu_id = 0; vcpu_id < KVM_MAX_VCPUS; vcpu_id++) {
-+		vcpu_args = &perf_test_args.vcpu_args[vcpu_id];
-+		vcpu_args->vcpu_id = vcpu_id;
-+		vcpu_args->vcpu_write = !(vcpu_id % 2);
-+	}
-+
-+	/* Add an extra memory slot with specified backing src type */
-+	vm_userspace_mem_region_add(vm, src_type, guest_test_phys_mem,
-+				    TEST_MEM_SLOT_INDEX, guest_num_pages, 0);
-+
-+	/* Do mapping(GVA->GPA) for the testing memory slot */
-+	virt_map(vm, guest_test_virt_mem, guest_test_phys_mem, guest_num_pages, 0);
-+
-+	/* Cache the HVA pointer of the region */
-+	host_test_mem = addr_gpa2hva(vm, (vm_paddr_t)guest_test_phys_mem);
-+
-+	/* Export shared structure perf_test_args to guest */
-+	ucall_init(vm, NULL);
-+	sync_global_to_guest(vm, perf_test_args);
-+
-+	sem_init_s(&test_stage_updated, 0, 0);
-+	sem_init_s(&test_stage_completed, 0, 0);
-+
-+	current_stage = addr_gva2hva(vm, (vm_vaddr_t)(&guest_test_stage));
-+	*current_stage = NUM_TEST_STAGES;
-+
-+	pr_info("Testing guest mode: %s\n", vm_guest_mode_string(mode));
-+	pr_info("Testing memory backing src type: %s\n",
-+		vm_mem_backing_src_alias(src_type)->name);
-+	pr_info("Testing memory backing src granularity: 0x%lx\n",
-+		large_page_size);
-+	pr_info("Testing memory size(aligned): 0x%lx\n", test_mem_size);
-+	pr_info("Guest physical test memory offset: 0x%lx\n",
-+		guest_test_phys_mem);
-+	pr_info("Host  virtual  test memory offset: 0x%lx\n",
-+		(uint64_t)host_test_mem);
-+	pr_info("Number of testing vCPUs: %d\n", nr_vcpus);
-+
-+	return vm;
-+}
-+
-+/* Wake up all the vcpus to run new test stage */
-+static void vcpus_start_new_stage(void)
-+{
-+	int vcpus;
-+
-+	for (vcpus = 1; vcpus <= nr_vcpus; vcpus++)
-+		sem_post_s(&test_stage_updated);
-+
-+	pr_debug("All vcpus have been notified to continue\n");
-+}
-+
-+/* Wait for all the vcpus to complete new test stage */
-+static void vcpus_complete_new_stage(enum test_stage stage)
-+{
-+	int vcpus;
-+
-+	for (vcpus = 1; vcpus <= nr_vcpus; vcpus++) {
-+		sem_wait_s(&test_stage_completed);
-+		pr_debug("%d vcpus have completed stage %s\n",
-+			 vcpus, test_stage_string[stage]);
-+	}
-+
-+	pr_debug("All vcpus have completed stage %s\n",
-+		 test_stage_string[stage]);
-+}
-+
-+static void run_test(enum vm_guest_mode mode, void *arg)
-+{
-+	pthread_t *vcpu_threads;
-+	struct kvm_vm *vm;
-+	int vcpu_id;
-+	struct timespec start;
-+	struct timespec ts_diff;
-+
-+	/* Create VM with vCPUs and make some pre-initialization */
-+	vm = pre_init_before_test(mode, arg);
-+
-+	vcpu_threads = malloc(nr_vcpus * sizeof(*vcpu_threads));
-+	TEST_ASSERT(vcpu_threads, "Memory allocation failed");
-+
-+	host_quit = false;
-+	*current_stage = KVM_BEFORE_MAPPINGS;
-+
-+	for (vcpu_id = 0; vcpu_id < nr_vcpus; vcpu_id++) {
-+		pthread_create(&vcpu_threads[vcpu_id], NULL, vcpu_worker,
-+			       &perf_test_args.vcpu_args[vcpu_id]);
-+	}
-+
-+	pr_info("Started all vCPUs successfully\n");
-+
-+	vcpus_complete_new_stage(*current_stage);
-+
-+	/* Test the stage of KVM creating mappings */
-+	*current_stage = KVM_CREATE_MAPPINGS;
-+
-+	clock_gettime(CLOCK_MONOTONIC_RAW, &start);
-+	vcpus_start_new_stage();
-+	vcpus_complete_new_stage(*current_stage);
-+	ts_diff = timespec_elapsed(start);
-+
-+	pr_info("KVM_CREATE_MAPPINGS: total execution time: %ld.%.9lds\n\n",
-+		ts_diff.tv_sec, ts_diff.tv_nsec);
-+
-+	/* Test the stage of KVM updating mappings */
-+	vm_mem_region_set_flags(vm, TEST_MEM_SLOT_INDEX,
-+				KVM_MEM_LOG_DIRTY_PAGES);
-+
-+	*current_stage = KVM_UPDATE_MAPPINGS;
-+
-+	clock_gettime(CLOCK_MONOTONIC_RAW, &start);
-+	vcpus_start_new_stage();
-+	vcpus_complete_new_stage(*current_stage);
-+	ts_diff = timespec_elapsed(start);
-+
-+	pr_info("KVM_UPDATE_MAPPINGS: total execution time: %ld.%.9lds\n\n",
-+		ts_diff.tv_sec, ts_diff.tv_nsec);
-+
-+	/* Test the stage of KVM adjusting mappings */
-+	vm_mem_region_set_flags(vm, TEST_MEM_SLOT_INDEX, 0);
-+
-+	*current_stage = KVM_ADJUST_MAPPINGS;
-+
-+	clock_gettime(CLOCK_MONOTONIC_RAW, &start);
-+	vcpus_start_new_stage();
-+	vcpus_complete_new_stage(*current_stage);
-+	ts_diff = timespec_elapsed(start);
-+
-+	pr_info("KVM_ADJUST_MAPPINGS: total execution time: %ld.%.9lds\n\n",
-+		ts_diff.tv_sec, ts_diff.tv_nsec);
-+
-+	/* Tell the vcpu thread to quit */
-+	host_quit = true;
-+	vcpus_start_new_stage();
-+
-+	for (vcpu_id = 0; vcpu_id < nr_vcpus; vcpu_id++)
-+		pthread_join(vcpu_threads[vcpu_id], NULL);
-+
-+	sem_destroy_s(&test_stage_updated);
-+	sem_destroy_s(&test_stage_completed);
-+
-+	free(vcpu_threads);
-+	ucall_uninit(vm);
-+	kvm_vm_free(vm);
-+}
-+
-+static void help(char *name)
-+{
-+	puts("");
-+	printf("usage: %s [-h] [-p offset] [-m mode] "
-+	       "[-b mem-size] [-v vcpus] [-s mem-type]\n", name);
-+	puts("");
-+	printf(" -p: specify guest physical test memory offset\n"
-+	       "     Warning: a low offset can conflict with the loaded test code.\n");
-+	guest_modes_help();
-+	printf(" -b: specify size of the memory region for testing. e.g. 10M or 3G.\n"
-+	       "     (default: 1G)\n");
-+	printf(" -v: specify the number of vCPUs to run\n"
-+	       "     (default: 1)\n");
-+	printf(" -s: specify the type of memory that should be used to\n"
-+	       "     back the guest data region.\n"
-+	       "     (default: anonymous)\n\n");
-+	backing_src_help();
-+	puts("");
-+	exit(0);
-+}
-+
-+int main(int argc, char *argv[])
-+{
-+	int max_vcpus = kvm_check_cap(KVM_CAP_MAX_VCPUS);
-+	struct test_params p = {
-+		.test_mem_size = DEFAULT_TEST_MEM_SIZE,
-+		.src_type = VM_MEM_SRC_ANONYMOUS,
-+	};
-+	int opt;
-+
-+	guest_modes_append_default();
-+
-+	while ((opt = getopt(argc, argv, "hp:m:b:v:s:")) != -1) {
-+		switch (opt) {
-+		case 'p':
-+			p.phys_offset = strtoull(optarg, NULL, 0);
-+			break;
-+		case 'm':
-+			guest_modes_cmdline(optarg);
-+			break;
-+		case 'b':
-+			p.test_mem_size = parse_size(optarg);
-+			break;
-+		case 'v':
-+			nr_vcpus = atoi(optarg);
-+			TEST_ASSERT(nr_vcpus > 0 && nr_vcpus <= max_vcpus,
-+				    "Invalid number of vcpus, must be between 1 and %d", max_vcpus);
-+			break;
-+		case 's':
-+			p.src_type = parse_backing_src_type(optarg);
-+			break;
-+		case 'h':
-+		default:
-+			help(argv[0]);
-+			break;
-+		}
-+	}
-+
-+	for_each_guest_mode(run_test, &p);
-+
-+	return 0;
-+}
--- 
-2.19.1
-
+On 11/22/20 4:31 AM, Huacai Chen wrote:
+> +CC Jiaxun
+> 
+> Hi, Jiaxun,
+> 
+> What do you think about?
+> 
+> Huacai
+> 
+> On Fri, Nov 20, 2020 at 6:55 PM Philippe Mathieu-Daudé <f4bug@amsat.org> wrote:
+>>
+>> On 11/20/20 5:28 AM, Huacai Chen wrote:
+>>> On Wed, Nov 18, 2020 at 1:17 AM Philippe Mathieu-Daudé <f4bug@amsat.org> wrote:
+>>>> On 10/7/20 10:39 AM, Huacai Chen wrote:
+>>>>> After converting from configure to meson, KVM support is lost for MIPS,
+>>>>> so re-enable it in meson.build.
+>>>>>
+>>>>> Fixes: fdb75aeff7c212e1afaaa3a43 ("configure: remove target configuration")
+>>>>> Fixes: 8a19980e3fc42239aae054bc9 ("configure: move accelerator logic to meson")
+>>>>> Cc: aolo Bonzini <pbonzini@redhat.com>
+>>>>> Signed-off-by: Huacai Chen <chenhc@lemote.com>
+>>>>> ---
+>>>>>  meson.build | 2 ++
+>>>>>  1 file changed, 2 insertions(+)
+>>>>>
+>>>>> diff --git a/meson.build b/meson.build
+>>>>> index 17c89c8..b407ff4 100644
+>>>>> --- a/meson.build
+>>>>> +++ b/meson.build
+>>>>> @@ -59,6 +59,8 @@ elif cpu == 's390x'
+>>>>>    kvm_targets = ['s390x-softmmu']
+>>>>>  elif cpu in ['ppc', 'ppc64']
+>>>>>    kvm_targets = ['ppc-softmmu', 'ppc64-softmmu']
+>>>>> +elif cpu in ['mips', 'mips64']
+>>>>> +  kvm_targets = ['mips-softmmu', 'mipsel-softmmu', 'mips64-softmmu', 'mips64el-softmmu']
+>>>>
+>>>> Are you sure both 32-bit hosts and targets are supported?
+>>>>
+>>>> I don't have hardware to test. If you are not working with
+>>>> 32-bit hardware I'd remove them.
+>>> When I add MIPS64 KVM support (Loongson-3 is MIPS64), MIPS32 KVM is
+>>> already there. On the kernel side, MIPS32 KVM is supported, but I
+>>> don't know whether it can work well.
+>>
+>> Well, from the history, you inherited from it:
+>>
+>> commit 1fa639e5618029e944ac68d27e32a99dcb85a349
+>> Author: James Hogan <jhogan@kernel.org>
+>> Date:   Sat Dec 21 15:53:06 2019 +0000
+>>
+>>     MAINTAINERS: Orphan MIPS KVM CPUs
+>>
+>>     I haven't been active for 18 months, and don't have the hardware
+>>     set up to test KVM for MIPS, so mark it as orphaned and remove
+>>     myself as maintainer. Hopefully somebody from MIPS can pick this up.
+>>
+>>
+>> commit 134f7f7da12aad99daafbeb2a7ba9dbc6bd40abc
+>> Author: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+>> Date:   Mon Feb 24 12:50:58 2020 +0100
+>>
+>>     MAINTAINERS: Reactivate MIPS KVM CPUs
+>>
+>>     Reactivate MIPS KVM maintainership with a modest goal of keeping
+>>     the support alive, checking common KVM code changes against MIPS
+>>     functionality, etc. (hence the status "Odd Fixes"), with hope that
+>>     this component will be fully maintained at some further, but not
+>>     distant point in future.
+>>
+>>
+>> commit 15d983dee95edff1dc4c0bed71ce02fff877e766
+>> Author: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+>> Date:   Wed Jul 1 20:25:58 2020 +0200
+>>
+>>     MAINTAINERS: Adjust MIPS maintainership (Huacai Chen & Jiaxun Yang)
+>>
+>>     Huacai Chen and Jiaxun Yang step in as new energy [1].
+>>
+>>
+>> commit ca263c0fb9f33cc746e6e3d968b7db80072ecf86
+>> Author: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+>> Date:   Wed Oct 7 22:37:21 2020 +0200
+>>
+>>     MAINTAINERS: Remove myself
+>>
+>>     I have been working on project other than QEMU for some time,
+>>     and would like to devote myself to that project. It is impossible
+>>     for me to find enough time to perform maintainer's duties with
+>>     needed meticulousness and patience.
+>>
+>>
+>> QEMU deprecation process is quite slow, if we release mips-softmmu
+>> and mipsel-softmmu binaries with KVM support in 5.2, and you can not
+>> test them, you will still have to maintain them during 2021...
+>>
+>> If you don't have neither the hardware nor the time, I suggest you
+>> to only release it on 64-bit hosts. Personally I'd even only
+>> announce KVM supported on the little-endian binary only, because
+>> AFAIK you don't test big-endian KVM neither.
+>>
+>> Your call as a maintainer, but remember last RC tag is next
+>> Tuesday (Nov 24) in *4* days, then we release 5.2:
+>> https://wiki.qemu.org/Planning/5.2#Release_Schedule
+>>
+>> Regards,
+>>
+>> Phil.
+> 
