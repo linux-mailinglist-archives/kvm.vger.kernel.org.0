@@ -2,127 +2,349 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 16FE134650C
-	for <lists+kvm@lfdr.de>; Tue, 23 Mar 2021 17:27:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id F33D234653F
+	for <lists+kvm@lfdr.de>; Tue, 23 Mar 2021 17:33:50 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233238AbhCWQ0x (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 23 Mar 2021 12:26:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46232 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233182AbhCWQ0Z (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 23 Mar 2021 12:26:25 -0400
-Received: from mail-il1-x136.google.com (mail-il1-x136.google.com [IPv6:2607:f8b0:4864:20::136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 98E5DC061764
-        for <kvm@vger.kernel.org>; Tue, 23 Mar 2021 09:26:25 -0700 (PDT)
-Received: by mail-il1-x136.google.com with SMTP id t14so8824992ilu.3
-        for <kvm@vger.kernel.org>; Tue, 23 Mar 2021 09:26:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=VUNBxRkAkOtRY1OiV0crY0KIix9dM5aWEuy0SY7J1Gs=;
-        b=dcPE+srCxCWpXsH961eV0+dJ/taytb1qF8u5NYNy5fMwZ+yLZ6+RyfM7CH3my4ba0u
-         A5/N66JLUZSZKXtMVLh/TCz414yazr4GaLu5DgdYXb2vwx8iwuVz9MFGv1qa2shn28YI
-         BVXBpMN7yUnWGzB8/eCxWIfvknwAm5e48moZA19OcRn1tlXH6CDRTSj3gVwZuL24OueV
-         4pKzGh2AGjwBgqNapPJma3PYYsmf5S/Vv6cQp6ECZhNixBR7DDPe4B5dugPAPAs74qAR
-         L4rZ1RbqcDAhCp/7ItDKurx7zA3s9Ps6ia111LLLrN1curCqA9bSts1nYdcjRRf0BKs/
-         J5SQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=VUNBxRkAkOtRY1OiV0crY0KIix9dM5aWEuy0SY7J1Gs=;
-        b=X7Q0tr6S619OCru4TGX5hlRXtH93F0VwnmNO9fZCSPz9V80f4NKlKV2mDab1Nabxuw
-         YpJvJ0s7MwwelMd0ox75ZjgEEDAJ2g2tC4cfzdoVmYG+aWFb10Xjsw/daSMRxMTRosY+
-         gb1CisNqa3gUEBJ3PT+cgiSCu28VGaj2IaAr7qEmANT9fbBFJfuY6oVkkphqo19oQNVa
-         1g08yKWidrjJDGsnmTLhP46wzXVpdejO1IVIR5cxosMJ3Wh7TLAY29YrQ/+/LbLzZ4lB
-         H9uIxO1D+SL9jOHkqpP/Mz7kIeqjTnMqbJWkEtaWKRg0xaabOynLj3cFFONoJF9N7QbB
-         O9/w==
-X-Gm-Message-State: AOAM531cJyUMRi15FqgLC8gJYLIHsd2k0SWuCG1e312tW5n/xLqGJyJg
-        TtD0EKG5supGmlP8aENtBHI7f03vjcEENo4Xl34E1w==
-X-Google-Smtp-Source: ABdhPJxiWIgvPfl8wUjGs53X8G5LEONTes5gCcGWaxRVmCAD2wYkVHXvRFHP1BbC5uR4+LdJF0cev4pnh7ixq56vgvw=
-X-Received: by 2002:a05:6e02:d0e:: with SMTP id g14mr5433785ilj.285.1616516784956;
- Tue, 23 Mar 2021 09:26:24 -0700 (PDT)
+        id S233224AbhCWQdY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 23 Mar 2021 12:33:24 -0400
+Received: from foss.arm.com ([217.140.110.172]:48996 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S231225AbhCWQdB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 23 Mar 2021 12:33:01 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 31778D6E;
+        Tue, 23 Mar 2021 09:33:01 -0700 (PDT)
+Received: from slackpad.fritz.box (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 50F9B3F718;
+        Tue, 23 Mar 2021 09:33:00 -0700 (PDT)
+Date:   Tue, 23 Mar 2021 16:32:54 +0000
+From:   Andre Przywara <andre.przywara@arm.com>
+To:     Alexandru Elisei <alexandru.elisei@arm.com>
+Cc:     drjones@redhat.com, kvm@vger.kernel.org,
+        kvmarm@lists.cs.columbia.edu
+Subject: Re: [kvm-unit-tests PATCH v2 2/6] arm/arm64: Remove
+ dcache_line_size global variable
+Message-ID: <20210323163254.76a1e35a@slackpad.fritz.box>
+In-Reply-To: <20210322150641.58878-3-alexandru.elisei@arm.com>
+References: <20210322150641.58878-1-alexandru.elisei@arm.com>
+        <20210322150641.58878-3-alexandru.elisei@arm.com>
+Organization: Arm Ltd.
+X-Mailer: Claws Mail 3.17.1 (GTK+ 2.24.31; x86_64-slackware-linux-gnu)
 MIME-Version: 1.0
-References: <20210319232006.3468382-1-seanjc@google.com> <20210319232006.3468382-3-seanjc@google.com>
- <CANgfPd_6d+SvJ-rQxP6k5nRmCsRFyUAJ93B0dE3NtpmdPR78wg@mail.gmail.com> <YFkzIAVOeWS32fdX@google.com>
-In-Reply-To: <YFkzIAVOeWS32fdX@google.com>
-From:   Ben Gardon <bgardon@google.com>
-Date:   Tue, 23 Mar 2021 09:26:14 -0700
-Message-ID: <CANgfPd8ti7Wa3YnPxgVsEiUzhOzraEcKoLyXUW9E=Wjz4L-oNA@mail.gmail.com>
-Subject: Re: [PATCH 2/2] KVM: x86/mmu: Ensure TLBs are flushed when yielding
- during NX zapping
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Mar 22, 2021 at 5:15 PM Sean Christopherson <seanjc@google.com> wrote:
->
-> On Mon, Mar 22, 2021, Ben Gardon wrote:
-> > On Fri, Mar 19, 2021 at 4:20 PM Sean Christopherson <seanjc@google.com> wrote:
-> > > @@ -5960,19 +5963,21 @@ static void kvm_recover_nx_lpages(struct kvm *kvm)
-> > >                                       lpage_disallowed_link);
-> > >                 WARN_ON_ONCE(!sp->lpage_disallowed);
-> > >                 if (is_tdp_mmu_page(sp)) {
-> > > -                       kvm_tdp_mmu_zap_gfn_range(kvm, sp->gfn,
-> > > -                               sp->gfn + KVM_PAGES_PER_HPAGE(sp->role.level));
-> > > +                       gfn_end = sp->gfn + KVM_PAGES_PER_HPAGE(sp->role.level);
-> > > +                       flush = kvm_tdp_mmu_zap_gfn_range(kvm, sp->gfn, gfn_end,
-> > > +                                                         flush || !list_empty(&invalid_list));
-> > >                 } else {
-> > >                         kvm_mmu_prepare_zap_page(kvm, sp, &invalid_list);
-> > >                         WARN_ON_ONCE(sp->lpage_disallowed);
-> > >                 }
-> > >
-> > >                 if (need_resched() || rwlock_needbreak(&kvm->mmu_lock)) {
-> > > -                       kvm_mmu_commit_zap_page(kvm, &invalid_list);
-> > > +                       kvm_mmu_remote_flush_or_zap(kvm, &invalid_list, flush);
-> >
-> > This pattern of waiting until a yield is needed or lock contention is
-> > detected has always been a little suspect to me because
-> > kvm_mmu_commit_zap_page does work proportional to the work done before
-> > the yield was needed. That seems like more work than we should like to
-> > be doing at that point.
-> >
-> > The yield in kvm_tdp_mmu_zap_gfn_range makes that phenomenon even
-> > worse. Because we can satisfy the need to yield without clearing out
-> > the invalid list, we can potentially queue many more pages which will
-> > then all need to have their zaps committed at once. This is an
-> > admittedly contrived case which could only be hit in a high load
-> > nested scenario.
-> >
-> > It could be fixed by forbidding kvm_tdp_mmu_zap_gfn_range from
-> > yielding. Since we should only need to zap one SPTE, the yield should
-> > not be needed within the kvm_tdp_mmu_zap_gfn_range call. To ensure
-> > that only one SPTE is zapped we would have to specify the root though.
-> > Otherwise we could end up zapping all the entries for the same GFN
-> > range under an unrelated root.
->
-> Hmm, I originally did exactly that, but changed my mind because this zaps far
-> more than 1 SPTE.  This is zapping a SP that could be huge, but is not, which
-> means it's guaranteed to have a non-zero number of child SPTEs.  The worst case
-> scenario is that SP is a PUD (potential 1gb page) and the leafs are 4k SPTEs.
+On Mon, 22 Mar 2021 15:06:37 +0000
+Alexandru Elisei <alexandru.elisei@arm.com> wrote:
 
-It's true that there are potentially 512^2 child sptes, but the code
-to clear those after the single PUD spte is cleared doesn't yield
-anyway. If the TDP MMU is only  operating with one root (as we would
-expect in most cases), there should only be one chance for it to
-yield.
+> Compute the dcache line size when doing dcache maintenance instead of using
+> a global variable computed in setup(), which allows us to do dcache
+> maintenance at any point in the boot process. This will be useful for
+> running as an EFI app and it also aligns our implementation to that of the
+> Linux kernel. As a result, the dcache_by_line_op assembly has been modified
+> to take a range described by start address and size, instead of start and
+> end addresses.
+> 
+> For consistency, the arm code has been similary modified.
+> 
+> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
 
-I've considered how we could allow the recursive changed spte handlers
-to yield, but it gets complicated quite fast because the caller needs
-to know if it yielded and reset the TDP iterator to the root, and
-there are some cases (mmu notifiers + vCPU path) where yielding is not
-desirable.
+Thanks for the changes, looks good now.
 
->
-> But, I didn't consider the interplay between invalid_list and the TDP MMU
-> yielding.  Hrm.
+Reviewed-by: Andre Przywara <andre.przywara@arm.com>
+
+Cheers,
+Andre
+
+> ---
+>  lib/arm/asm/assembler.h   | 53 ++++++++++++++++++++++++++++++++++++++
+>  lib/arm/asm/processor.h   |  7 -----
+>  lib/arm64/asm/assembler.h | 54 +++++++++++++++++++++++++++++++++++++++
+>  lib/arm64/asm/processor.h |  7 -----
+>  lib/arm/setup.c           |  7 -----
+>  arm/cstart.S              | 18 +++----------
+>  arm/cstart64.S            | 16 ++----------
+>  7 files changed, 112 insertions(+), 50 deletions(-)
+>  create mode 100644 lib/arm/asm/assembler.h
+>  create mode 100644 lib/arm64/asm/assembler.h
+> 
+> diff --git a/lib/arm/asm/assembler.h b/lib/arm/asm/assembler.h
+> new file mode 100644
+> index 000000000000..dfd3c51bf6ad
+> --- /dev/null
+> +++ b/lib/arm/asm/assembler.h
+> @@ -0,0 +1,53 @@
+> +/* SPDX-License-Identifier: GPL-2.0 */
+> +/*
+> + * Based on several files from Linux version v5.10: arch/arm/mm/proc-macros.S,
+> + * arch/arm/mm/proc-v7.S.
+> + */
+> +
+> +#ifndef __ASSEMBLY__
+> +#error "Only include this from assembly code"
+> +#endif
+> +
+> +#ifndef __ASM_ASSEMBLER_H
+> +#define __ASM_ASSEMBLER_H
+> +
+> +/*
+> + * dcache_line_size - get the minimum D-cache line size from the CTR register
+> + * on ARMv7.
+> + */
+> +	.macro	dcache_line_size, reg, tmp
+> +	mrc	p15, 0, \tmp, c0, c0, 1		// read ctr
+> +	lsr	\tmp, \tmp, #16
+> +	and	\tmp, \tmp, #0xf		// cache line size encoding
+> +	mov	\reg, #4			// bytes per word
+> +	mov	\reg, \reg, lsl \tmp		// actual cache line size
+> +	.endm
+> +
+> +/*
+> + * Macro to perform a data cache maintenance for the interval
+> + * [addr, addr + size).
+> + *
+> + * 	op:		operation to execute
+> + * 	domain		domain used in the dsb instruction
+> + * 	addr:		starting virtual address of the region
+> + * 	size:		size of the region
+> + * 	Corrupts:	addr, size, tmp1, tmp2
+> + */
+> +	.macro dcache_by_line_op op, domain, addr, size, tmp1, tmp2
+> +	dcache_line_size \tmp1, \tmp2
+> +	add	\size, \addr, \size
+> +	sub	\tmp2, \tmp1, #1
+> +	bic	\addr, \addr, \tmp2
+> +9998:
+> +	.ifc	\op, dccimvac
+> +	mcr	p15, 0, \addr, c7, c14, 1
+> +	.else
+> +	.err
+> +	.endif
+> +	add	\addr, \addr, \tmp1
+> +	cmp	\addr, \size
+> +	blo	9998b
+> +	dsb	\domain
+> +	.endm
+> +
+> +#endif	/* __ASM_ASSEMBLER_H */
+> diff --git a/lib/arm/asm/processor.h b/lib/arm/asm/processor.h
+> index 273366d1fe1c..3c36eac903f0 100644
+> --- a/lib/arm/asm/processor.h
+> +++ b/lib/arm/asm/processor.h
+> @@ -9,11 +9,6 @@
+>  #include <asm/sysreg.h>
+>  #include <asm/barrier.h>
+>  
+> -#define CTR_DMINLINE_SHIFT	16
+> -#define CTR_DMINLINE_MASK	(0xf << 16)
+> -#define CTR_DMINLINE(x)	\
+> -	(((x) & CTR_DMINLINE_MASK) >> CTR_DMINLINE_SHIFT)
+> -
+>  enum vector {
+>  	EXCPTN_RST,
+>  	EXCPTN_UND,
+> @@ -89,6 +84,4 @@ static inline u32 get_ctr(void)
+>  	return read_sysreg(CTR);
+>  }
+>  
+> -extern unsigned long dcache_line_size;
+> -
+>  #endif /* _ASMARM_PROCESSOR_H_ */
+> diff --git a/lib/arm64/asm/assembler.h b/lib/arm64/asm/assembler.h
+> new file mode 100644
+> index 000000000000..0a6ab9720bdd
+> --- /dev/null
+> +++ b/lib/arm64/asm/assembler.h
+> @@ -0,0 +1,54 @@
+> +/* SPDX-License-Identifier: GPL-2.0-only */
+> +/*
+> + * Based on the file arch/arm64/include/asm/assembled.h from Linux v5.10, which
+> + * in turn is based on arch/arm/include/asm/assembler.h and
+> + * arch/arm/mm/proc-macros.S
+> + *
+> + * Copyright (C) 1996-2000 Russell King
+> + * Copyright (C) 2012 ARM Ltd.
+> + */
+> +
+> +#ifndef __ASSEMBLY__
+> +#error "Only include this from assembly code"
+> +#endif
+> +
+> +#ifndef __ASM_ASSEMBLER_H
+> +#define __ASM_ASSEMBLER_H
+> +
+> +/*
+> + * raw_dcache_line_size - get the minimum D-cache line size on this CPU
+> + * from the CTR register.
+> + */
+> +	.macro	raw_dcache_line_size, reg, tmp
+> +	mrs	\tmp, ctr_el0			// read CTR
+> +	ubfx	\tmp, \tmp, #16, #4		// cache line size encoding
+> +	mov	\reg, #4			// bytes per word
+> +	lsl	\reg, \reg, \tmp		// actual cache line size
+> +	.endm
+> +
+> +/*
+> + * Macro to perform a data cache maintenance for the interval
+> + * [addr, addr + size). Use the raw value for the dcache line size because
+> + * kvm-unit-tests has no concept of scheduling.
+> + *
+> + * 	op:		operation passed to dc instruction
+> + * 	domain:		domain used in dsb instruciton
+> + * 	addr:		starting virtual address of the region
+> + * 	size:		size of the region
+> + * 	Corrupts:	addr, size, tmp1, tmp2
+> + */
+> +
+> +	.macro dcache_by_line_op op, domain, addr, size, tmp1, tmp2
+> +	raw_dcache_line_size \tmp1, \tmp2
+> +	add	\size, \addr, \size
+> +	sub	\tmp2, \tmp1, #1
+> +	bic	\addr, \addr, \tmp2
+> +9998:
+> +	dc	\op, \addr
+> +	add	\addr, \addr, \tmp1
+> +	cmp	\addr, \size
+> +	b.lo	9998b
+> +	dsb	\domain
+> +	.endm
+> +
+> +#endif	/* __ASM_ASSEMBLER_H */
+> diff --git a/lib/arm64/asm/processor.h b/lib/arm64/asm/processor.h
+> index 771b2d1e0c94..cdc2463e1981 100644
+> --- a/lib/arm64/asm/processor.h
+> +++ b/lib/arm64/asm/processor.h
+> @@ -16,11 +16,6 @@
+>  #define SCTLR_EL1_A	(1 << 1)
+>  #define SCTLR_EL1_M	(1 << 0)
+>  
+> -#define CTR_DMINLINE_SHIFT	16
+> -#define CTR_DMINLINE_MASK	(0xf << 16)
+> -#define CTR_DMINLINE(x)	\
+> -	(((x) & CTR_DMINLINE_MASK) >> CTR_DMINLINE_SHIFT)
+> -
+>  #ifndef __ASSEMBLY__
+>  #include <asm/ptrace.h>
+>  #include <asm/esr.h>
+> @@ -115,8 +110,6 @@ static inline u64 get_ctr(void)
+>  	return read_sysreg(ctr_el0);
+>  }
+>  
+> -extern unsigned long dcache_line_size;
+> -
+>  static inline unsigned long get_id_aa64mmfr0_el1(void)
+>  {
+>  	return read_sysreg(id_aa64mmfr0_el1);
+> diff --git a/lib/arm/setup.c b/lib/arm/setup.c
+> index 066524f8bf61..751ba980000a 100644
+> --- a/lib/arm/setup.c
+> +++ b/lib/arm/setup.c
+> @@ -42,8 +42,6 @@ static struct mem_region __initial_mem_regions[NR_INITIAL_MEM_REGIONS + 1];
+>  struct mem_region *mem_regions = __initial_mem_regions;
+>  phys_addr_t __phys_offset, __phys_end;
+>  
+> -unsigned long dcache_line_size;
+> -
+>  int mpidr_to_cpu(uint64_t mpidr)
+>  {
+>  	int i;
+> @@ -72,11 +70,6 @@ static void cpu_init(void)
+>  	ret = dt_for_each_cpu_node(cpu_set, NULL);
+>  	assert(ret == 0);
+>  	set_cpu_online(0, true);
+> -	/*
+> -	 * DminLine is log2 of the number of words in the smallest cache line; a
+> -	 * word is 4 bytes.
+> -	 */
+> -	dcache_line_size = 1 << (CTR_DMINLINE(get_ctr()) + 2);
+>  }
+>  
+>  unsigned int mem_region_get_flags(phys_addr_t paddr)
+> diff --git a/arm/cstart.S b/arm/cstart.S
+> index ef936ae2f874..954748b00f64 100644
+> --- a/arm/cstart.S
+> +++ b/arm/cstart.S
+> @@ -7,6 +7,7 @@
+>   */
+>  #define __ASSEMBLY__
+>  #include <auxinfo.h>
+> +#include <asm/assembler.h>
+>  #include <asm/thread_info.h>
+>  #include <asm/asm-offsets.h>
+>  #include <asm/pgtable-hwdef.h>
+> @@ -197,20 +198,6 @@ asm_mmu_enable:
+>  
+>  	mov     pc, lr
+>  
+> -.macro dcache_clean_inval domain, start, end, tmp1, tmp2
+> -	ldr	\tmp1, =dcache_line_size
+> -	ldr	\tmp1, [\tmp1]
+> -	sub	\tmp2, \tmp1, #1
+> -	bic	\start, \start, \tmp2
+> -9998:
+> -	/* DCCIMVAC */
+> -	mcr	p15, 0, \start, c7, c14, 1
+> -	add	\start, \start, \tmp1
+> -	cmp	\start, \end
+> -	blo	9998b
+> -	dsb	\domain
+> -.endm
+> -
+>  .globl asm_mmu_disable
+>  asm_mmu_disable:
+>  	/* SCTLR */
+> @@ -223,7 +210,8 @@ asm_mmu_disable:
+>  	ldr	r0, [r0]
+>  	ldr	r1, =__phys_end
+>  	ldr	r1, [r1]
+> -	dcache_clean_inval sy, r0, r1, r2, r3
+> +	sub	r1, r1, r0
+> +	dcache_by_line_op dccimvac, sy, r0, r1, r2, r3
+>  	isb
+>  
+>  	mov     pc, lr
+> diff --git a/arm/cstart64.S b/arm/cstart64.S
+> index fc1930bcdb53..046bd3914098 100644
+> --- a/arm/cstart64.S
+> +++ b/arm/cstart64.S
+> @@ -8,6 +8,7 @@
+>  #define __ASSEMBLY__
+>  #include <auxinfo.h>
+>  #include <asm/asm-offsets.h>
+> +#include <asm/assembler.h>
+>  #include <asm/ptrace.h>
+>  #include <asm/processor.h>
+>  #include <asm/page.h>
+> @@ -204,20 +205,6 @@ asm_mmu_enable:
+>  
+>  	ret
+>  
+> -/* Taken with small changes from arch/arm64/incluse/asm/assembler.h */
+> -.macro dcache_by_line_op op, domain, start, end, tmp1, tmp2
+> -	adrp	\tmp1, dcache_line_size
+> -	ldr	\tmp1, [\tmp1, :lo12:dcache_line_size]
+> -	sub	\tmp2, \tmp1, #1
+> -	bic	\start, \start, \tmp2
+> -9998:
+> -	dc	\op , \start
+> -	add	\start, \start, \tmp1
+> -	cmp	\start, \end
+> -	b.lo	9998b
+> -	dsb	\domain
+> -.endm
+> -
+>  .globl asm_mmu_disable
+>  asm_mmu_disable:
+>  	mrs	x0, sctlr_el1
+> @@ -230,6 +217,7 @@ asm_mmu_disable:
+>  	ldr	x0, [x0, :lo12:__phys_offset]
+>  	adrp	x1, __phys_end
+>  	ldr	x1, [x1, :lo12:__phys_end]
+> +	sub	x1, x1, x0
+>  	dcache_by_line_op civac, sy, x0, x1, x2, x3
+>  	isb
+>  
+
