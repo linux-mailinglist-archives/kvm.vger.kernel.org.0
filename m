@@ -2,178 +2,139 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1D5C03481B6
-	for <lists+kvm@lfdr.de>; Wed, 24 Mar 2021 20:17:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5F3723481C0
+	for <lists+kvm@lfdr.de>; Wed, 24 Mar 2021 20:19:00 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237780AbhCXTQO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 24 Mar 2021 15:16:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56020 "EHLO
+        id S237764AbhCXTS1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 24 Mar 2021 15:18:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56376 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238048AbhCXTPs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 24 Mar 2021 15:15:48 -0400
-Received: from mail-pg1-x52f.google.com (mail-pg1-x52f.google.com [IPv6:2607:f8b0:4864:20::52f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 495DEC061763
-        for <kvm@vger.kernel.org>; Wed, 24 Mar 2021 12:15:47 -0700 (PDT)
-Received: by mail-pg1-x52f.google.com with SMTP id u19so15327920pgh.10
-        for <kvm@vger.kernel.org>; Wed, 24 Mar 2021 12:15:47 -0700 (PDT)
+        with ESMTP id S238115AbhCXTRP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 24 Mar 2021 15:17:15 -0400
+Received: from mail-wr1-x42a.google.com (mail-wr1-x42a.google.com [IPv6:2a00:1450:4864:20::42a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 84409C0613F0
+        for <kvm@vger.kernel.org>; Wed, 24 Mar 2021 12:17:14 -0700 (PDT)
+Received: by mail-wr1-x42a.google.com with SMTP id x7so3119995wrw.10
+        for <kvm@vger.kernel.org>; Wed, 24 Mar 2021 12:17:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=/kJ7YygRvPPo4EgHv8aSuiyknAVhOHDcZ/c1aMxcE3w=;
-        b=Hf4bucpwE9xB0JBep7SQCrYcvn2QErPi7pTB6NazD5B/c1FxRuujj2y6kw8Uj8554R
-         +Bl0iz9YNAT93ikYOEOeYC8P5eTXt7nCL41ambFjKK5SVsfAWE/djL3tua90AAAZdqje
-         J5R9tYMDGXYP4JxredZSpLm9qxNFEo1Ls3WsP7tytwAYFtFEpyDhKeY0Uzhc4YKX5dBe
-         Sa5Eqm9Q7LQKT68CACPqgzgKwFtFz7hZ0khxDiblIrLhCBYzCr5fJXiwBJeSCtrk1Kw7
-         lnBQjLrX24qgccV5mYhJp7pPC2dK77DioEL7EDCTO+IGIVR/rRJJa165RcDcH+UHSpLs
-         1Mgw==
+        d=ffwll.ch; s=google;
+        h=date:from:to:cc:subject:message-id:mail-followup-to:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=ks7ShY2KdqBCOa2qudGrTxafbstGO1KxoD94z5nmwd4=;
+        b=bjZoBOViVyL1mHLmUFR7BSZIMAluKI/kXY5E2/ztjZRSCxzbzqraymTeP/LQuXxMd6
+         5YPx58H1VAuhSW12/DzOC9BHGHgBV1J/hhCob2AhjQhBoGcMDaLPjYwGaOGrtjITgpiU
+         twnR7Di8AA6EdQ4WpfeSjtyjUfsAP9baelo+A=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=/kJ7YygRvPPo4EgHv8aSuiyknAVhOHDcZ/c1aMxcE3w=;
-        b=fDQTQVqnkL8ie72wjbm57UHP0ZTmE0hFyJJkfLMb198PdJTXBXOojwR1DuiWLeONfl
-         GOxZFxw60wecvyVxrEiwWkNExqol2SlMyOVP0BDP9wUkbdZfU9i9jJYgy7iAVNHZZQhP
-         RBVz+/mUuzlw8ukqbAZAGLJ42U7dzIfGh2zozXFlhVnXzUdPT6QRIquY4DSeVUxGYyK4
-         kQHTJm/322VwF2AunNrUaFVzZ6BpsJ71gnOXSF5z0tLo4WKvaJhZ7S7iNU+yFSgqRIxQ
-         4brOhT3s3+RFJVFRef2HFIzqtKbEoGTAMCd6a/Vnp+q4YVWlKxaphgQCX0CRO+2TBaKJ
-         iaOQ==
-X-Gm-Message-State: AOAM533PbvIqVOW6KwW5lk9G594qzRBSecza0Hr26TzH6R2FvPSOh4z/
-        SyFvr+I3tBwZ4S/NrCL1AuEQGg==
-X-Google-Smtp-Source: ABdhPJxZq+BMA7uBzsXBlyN2rzb+GYJSGkSeCfaDBGiIe+9dYM6TPX5hru8TiFD69cW7FXlQY7k74A==
-X-Received: by 2002:a63:e214:: with SMTP id q20mr4337778pgh.4.1616613346542;
-        Wed, 24 Mar 2021 12:15:46 -0700 (PDT)
-Received: from google.com (240.111.247.35.bc.googleusercontent.com. [35.247.111.240])
-        by smtp.gmail.com with ESMTPSA id z9sm2896945pgf.87.2021.03.24.12.15.45
+        h=x-gm-message-state:date:from:to:cc:subject:message-id
+         :mail-followup-to:references:mime-version:content-disposition
+         :in-reply-to;
+        bh=ks7ShY2KdqBCOa2qudGrTxafbstGO1KxoD94z5nmwd4=;
+        b=JYiSj9XF1OEl4OLmmCHJ9mchdEeXIywRx3f2E/Gm3qcls73K66Ewx4MCeWXio3dtHQ
+         mzkreHjeK8g1TuExMQQ+AWAIpfduDsAfIsj4NFZYPznPbLX58mDJisOR43KWHaNJZJ4A
+         oO1UgGWm1y/uXAc8goYDFTTKZxiH6OrbXz9yeijobL252VRbU2RcFAV3Lx1E0UPen2nm
+         C1Y+F9Ifyw6JpUzMzoLEUN/RoNrEXQs06jwSwF34Y1ophtKJnA6xm5fuf2OgJK7vj3Ro
+         2u7uhtlt4Njes4/DqR4gq6oNiJxdxVQd7FiqLfgvFsw8s9u/AV1UAtQHBqB/DGUdTX5/
+         2cCQ==
+X-Gm-Message-State: AOAM532FEMWFxd1Kzdrltdcd4oqpQDnDqlCVLlYbx7FcDTgzwXRv0Ftu
+        g9R8SKPJSNOIcErFOpLlhXemEA==
+X-Google-Smtp-Source: ABdhPJz0jKYo0H/XBwWmbtO5rMA4MuyiBVo+Vi9lmrQcQ8si+ZT3Tkgf1DTxMp2/fnyfyvXSPQ76vg==
+X-Received: by 2002:a5d:6312:: with SMTP id i18mr5156957wru.149.1616613433126;
+        Wed, 24 Mar 2021 12:17:13 -0700 (PDT)
+Received: from phenom.ffwll.local ([2a02:168:57f4:0:efd0:b9e5:5ae6:c2fa])
+        by smtp.gmail.com with ESMTPSA id f2sm3344574wmp.20.2021.03.24.12.17.11
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 24 Mar 2021 12:15:45 -0700 (PDT)
-Date:   Wed, 24 Mar 2021 19:15:42 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Krish Sadhukhan <krish.sadhukhan@oracle.com>
-Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, jmattson@google.com
-Subject: Re: [PATCH 2/5 v4] KVM: nSVM: Check addresses of MSR and IO
- permission maps
-Message-ID: <YFuP3tNOLQfXAY1l@google.com>
-References: <20210324175006.75054-1-krish.sadhukhan@oracle.com>
- <20210324175006.75054-3-krish.sadhukhan@oracle.com>
+        Wed, 24 Mar 2021 12:17:12 -0700 (PDT)
+Date:   Wed, 24 Mar 2021 20:17:10 +0100
+From:   Daniel Vetter <daniel@ffwll.ch>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     Daniel Vetter <daniel.vetter@ffwll.ch>,
+        DRI Development <dri-devel@lists.freedesktop.org>,
+        LKML <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org,
+        linux-mm@kvack.org, linux-arm-kernel@lists.infradead.org,
+        linux-samsung-soc@vger.kernel.org, linux-media@vger.kernel.org,
+        3pvd@google.com, Jann Horn <jannh@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Peter Xu <peterx@redhat.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Daniel Vetter <daniel.vetter@intel.com>
+Subject: Re: [PATCH 3/3] mm: unexport follow_pfn
+Message-ID: <YFuQNj10P+uUHD4G@phenom.ffwll.local>
+Mail-Followup-To: Jason Gunthorpe <jgg@nvidia.com>,
+        DRI Development <dri-devel@lists.freedesktop.org>,
+        LKML <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org,
+        linux-mm@kvack.org, linux-arm-kernel@lists.infradead.org,
+        linux-samsung-soc@vger.kernel.org, linux-media@vger.kernel.org,
+        3pvd@google.com, Jann Horn <jannh@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>, Peter Xu <peterx@redhat.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Daniel Vetter <daniel.vetter@intel.com>
+References: <20210316153303.3216674-1-daniel.vetter@ffwll.ch>
+ <20210316153303.3216674-4-daniel.vetter@ffwll.ch>
+ <20210324125211.GA2356281@nvidia.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210324175006.75054-3-krish.sadhukhan@oracle.com>
+In-Reply-To: <20210324125211.GA2356281@nvidia.com>
+X-Operating-System: Linux phenom 5.7.0-1-amd64 
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Mar 24, 2021, Krish Sadhukhan wrote:
-> According to section "Canonicalization and Consistency Checks" in APM vol 2,
-> the following guest state is illegal:
+On Wed, Mar 24, 2021 at 09:52:11AM -0300, Jason Gunthorpe wrote:
+> On Tue, Mar 16, 2021 at 04:33:03PM +0100, Daniel Vetter wrote:
+> > Both kvm (in bd2fae8da794 ("KVM: do not assume PTE is writable after
+> > follow_pfn")) and vfio (in 07956b6269d3 ("vfio/type1: Use
+> > follow_pte()")) have lost their callsites of follow_pfn(). All the
+> > other ones have been switched over to unsafe_follow_pfn because they
+> > cannot be fixed without breaking userspace api.
+> > 
+> > Argueably the vfio code is still racy, but that's kinda a bigger
+> > picture. But since it does leak the pte beyond where it drops the pt
+> > lock, without anything else like an mmu notifier guaranteeing
+> > coherence, the problem is at least clearly visible in the vfio code.
+> > So good enough with me.
+> > 
+> > I've decided to keep the explanation that after dropping the pt lock
+> > you must have an mmu notifier if you keep using the pte somehow by
+> > adjusting it and moving it into the kerneldoc for the new follow_pte()
+> > function.
+> > 
+> > Cc: 3pvd@google.com
+> > Cc: Jann Horn <jannh@google.com>
+> > Cc: Paolo Bonzini <pbonzini@redhat.com>
+> > Cc: Jason Gunthorpe <jgg@nvidia.com>
+> > Cc: Cornelia Huck <cohuck@redhat.com>
+> > Cc: Peter Xu <peterx@redhat.com>
+> > Cc: Alex Williamson <alex.williamson@redhat.com>
+> > Cc: linux-mm@kvack.org
+> > Cc: linux-arm-kernel@lists.infradead.org
+> > Cc: linux-samsung-soc@vger.kernel.org
+> > Cc: linux-media@vger.kernel.org
+> > Cc: kvm@vger.kernel.org
+> > Signed-off-by: Daniel Vetter <daniel.vetter@intel.com>
+> > ---
+> >  include/linux/mm.h |  2 --
+> >  mm/memory.c        | 26 +++++---------------------
+> >  mm/nommu.c         | 13 +------------
+> >  3 files changed, 6 insertions(+), 35 deletions(-)
 > 
->     "The MSR or IOIO intercept tables extend to a physical address that
->      is greater than or equal to the maximum supported physical address."
+> I think this is the right thing to do.
+
+Was just about to smash this into the topic branch for testing in
+linux-next. Feel like an ack on the series, or at least the two mm
+patches?
+-Daniel
+
 > 
-> Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
-> Signed-off-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
-> ---
->  arch/x86/kvm/svm/nested.c | 28 +++++++++++++++++++++-------
->  1 file changed, 21 insertions(+), 7 deletions(-)
+> Alex is working on fixing VFIO and while kvm is still racy using
+> follow pte, I think they are working on it too?
 > 
-> diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
-> index 35891d9a1099..b08d1c595736 100644
-> --- a/arch/x86/kvm/svm/nested.c
-> +++ b/arch/x86/kvm/svm/nested.c
-> @@ -231,7 +231,15 @@ static bool svm_get_nested_state_pages(struct kvm_vcpu *vcpu)
->  	return true;
->  }
->  
-> -static bool nested_vmcb_check_controls(struct vmcb_control_area *control)
-> +static bool nested_svm_check_bitmap_pa(struct kvm_vcpu *vcpu, u64 pa,
-> +				       u8 order)
-> +{
-> +	u64 last_pa = PAGE_ALIGN(pa) + (PAGE_SIZE << order) - 1;
+> Jason
 
-Ugh, I really wish things that "must" happen were actually enforced by hardware.
-
-  The MSRPM must be aligned on a 4KB boundary... The VMRUN instruction ignores
-  the lower 12 bits of the address specified in the VMCB.
-
-So, ignoring an unaligned @pa is correct, but that means
-nested_svm_exit_handled_msr() and nested_svm_intercept_ioio() are busted.
-
-> +	return last_pa > pa && !(last_pa >> cpuid_maxphyaddr(vcpu));
-
-Please use kvm_vcpu_is_legal_gpa().
-
-> +}
-> +
-> +static bool nested_vmcb_check_controls(struct kvm_vcpu *vcpu,
-> +				       struct vmcb_control_area *control)
->  {
->  	if ((vmcb_is_intercept(control, INTERCEPT_VMRUN)) == 0)
->  		return false;
-> @@ -243,12 +251,18 @@ static bool nested_vmcb_check_controls(struct vmcb_control_area *control)
->  	    !npt_enabled)
->  		return false;
->  
-> +	if (!nested_svm_check_bitmap_pa(vcpu, control->msrpm_base_pa,
-> +	    MSRPM_ALLOC_ORDER))
-> +		return false;
-> +	if (!nested_svm_check_bitmap_pa(vcpu, control->iopm_base_pa,
-> +	    IOPM_ALLOC_ORDER))
-
-I strongly dislike using the alloc orders, relying on kernel behavior to
-represent architectural values it sketchy.  Case in point, IOPM_ALLOC_ORDER is a
-16kb size, whereas the actual size of the IOPM is 12kb.  I also called this out
-in v1...
-
-https://lkml.kernel.org/r/YAd9MBkpDjC1MY6E@google.com
-
-> +		return false;
-> +
->  	return true;
->  }
->  
-> -static bool nested_vmcb_checks(struct vcpu_svm *svm, struct vmcb *vmcb12)
-> +static bool nested_vmcb_checks(struct kvm_vcpu *vcpu, struct vmcb *vmcb12)
->  {
-> -	struct kvm_vcpu *vcpu = &svm->vcpu;
->  	bool vmcb12_lma;
->  
->  	if ((vmcb12->save.efer & EFER_SVME) == 0)
-> @@ -268,10 +282,10 @@ static bool nested_vmcb_checks(struct vcpu_svm *svm, struct vmcb *vmcb12)
->  		    kvm_vcpu_is_illegal_gpa(vcpu, vmcb12->save.cr3))
->  			return false;
->  	}
-> -	if (!kvm_is_valid_cr4(&svm->vcpu, vmcb12->save.cr4))
-> +	if (!kvm_is_valid_cr4(vcpu, vmcb12->save.cr4))
->  		return false;
->  
-> -	return nested_vmcb_check_controls(&vmcb12->control);
-> +	return nested_vmcb_check_controls(vcpu, &vmcb12->control);
->  }
->  
->  static void load_nested_vmcb_control(struct vcpu_svm *svm,
-> @@ -515,7 +529,7 @@ int nested_svm_vmrun(struct vcpu_svm *svm)
->  	if (WARN_ON_ONCE(!svm->nested.initialized))
->  		return -EINVAL;
->  
-> -	if (!nested_vmcb_checks(svm, vmcb12)) {
-> +	if (!nested_vmcb_checks(&svm->vcpu, vmcb12)) {
-
-Please use @vcpu directly.  Looks like this needs a rebase, as the prototype for
-nested_svm_vmrun() is wrong relative to kvm/queue.
-
->  		vmcb12->control.exit_code    = SVM_EXIT_ERR;
->  		vmcb12->control.exit_code_hi = 0;
->  		vmcb12->control.exit_info_1  = 0;
-> @@ -1191,7 +1205,7 @@ static int svm_set_nested_state(struct kvm_vcpu *vcpu,
->  		goto out_free;
->  
->  	ret = -EINVAL;
-> -	if (!nested_vmcb_check_controls(ctl))
-> +	if (!nested_vmcb_check_controls(vcpu, ctl))
->  		goto out_free;
->  
->  	/*
-> -- 
-> 2.27.0
-> 
+-- 
+Daniel Vetter
+Software Engineer, Intel Corporation
+http://blog.ffwll.ch
