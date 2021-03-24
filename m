@@ -2,121 +2,122 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3B2A7346EA0
-	for <lists+kvm@lfdr.de>; Wed, 24 Mar 2021 02:23:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7CE11346F08
+	for <lists+kvm@lfdr.de>; Wed, 24 Mar 2021 02:49:32 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234332AbhCXBXX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 23 Mar 2021 21:23:23 -0400
-Received: from new3-smtp.messagingengine.com ([66.111.4.229]:53505 "EHLO
-        new3-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234202AbhCXBWz (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 23 Mar 2021 21:22:55 -0400
-Received: from compute6.internal (compute6.nyi.internal [10.202.2.46])
-        by mailnew.nyi.internal (Postfix) with ESMTP id DE9895809A5;
-        Tue, 23 Mar 2021 21:22:52 -0400 (EDT)
-Received: from imap1 ([10.202.2.51])
-  by compute6.internal (MEProxy); Tue, 23 Mar 2021 21:22:52 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=flygoat.com; h=
-        mime-version:message-id:in-reply-to:references:date:from:to:cc
-        :subject:content-type:content-transfer-encoding; s=fm1; bh=c+ae5
-        ABAYnNsKU013IHA/pxBS9krhy3J/UsGITJ5lDI=; b=zJ/nOvAXvTkEAFmHLygGT
-        LyE2zhB0swVOAJdkXBIv4Es9wjHrpLIbILgV2u44cyCCxnEM67St+YB97+wcWAYI
-        A+HwAjY8y1NmwU2gi30w/7D27Y8eRpBe4KcDT/m5zNseVJpoyq9rY+pqASE+mVUp
-        kTFVdB3Nb6V5z5m618/kG32AWTEVNc7WXnnRuHrbH8JkCMOTBXzBrOJaF2hbAevi
-        weO+g6xCrpQMB8KkKwbLhmMoUxN/IXSwlfO5N8abknOmlPpMrQjdfiJchNjta3uD
-        jxUkDvVAzHjkMF4FqIOaJnzOqIJ7AcFfebTj5obycehOnYaTz+6jbiYPa2XNT7gQ
-        A==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:content-transfer-encoding:content-type
-        :date:from:in-reply-to:message-id:mime-version:references
-        :subject:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
-        :x-sasl-enc; s=fm2; bh=c+ae5ABAYnNsKU013IHA/pxBS9krhy3J/UsGITJ5l
-        DI=; b=Z0D7U2nhXnuYLt3ff/c+g0KBh2P7sRtatgDCjrmUN6/5darvM3Dm7mbiB
-        arw0c+gNEm9zcvTar3/m7lYvoyeAHrQf31FswKh7tOok3qHKb9YaSLzCLsMzTkh8
-        XrVjEBZ6NXCNsKgih8rl4KA/AONfAw77g+BUmT5Nnsj1Pjh99RU1sAY/D+bp868v
-        YKniH3pAsLaSY4/1SX4nGaOCFFt2nQLPuMXhOnBK9S9XaHlZfozYzu6FsO6SQfWL
-        S68yGLhHJx60cws+wOYGN1s6w6no00xm/B2admah1mNa/IDuqeKpVhOke33A4+D6
-        aWFbMbo9VRctKc/tGs1G0wVw0//tA==
-X-ME-Sender: <xms:a5RaYLLIcGHm37Xl-BSFqMIsbS7rJjfcXXaki0FHhKXS_Xa0mTsruQ>
-    <xme:a5RaYPJ7Y3lsBdfrcRQjzox16M4JM7yZPpe0reGim33CzRSQLRzIePzKRiZr1Z0aV
-    9kFBPIT2Vt1LrCvUSU>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeduledrudegjedgfeegucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
-    cujfgurhepofgfggfkjghffffhvffutgfgsehtqhertderreejnecuhfhrohhmpedflfhi
-    rgiguhhnucgjrghnghdfuceojhhirgiguhhnrdihrghnghesfhhlhihgohgrthdrtghomh
-    eqnecuggftrfgrthhtvghrnhepfeetgeekveeftefhgfduheegvdeuuddvieefvddvlefh
-    feehkeetfeeukedtfeejnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrg
-    hilhhfrhhomhepjhhirgiguhhnrdihrghnghesfhhlhihgohgrthdrtghomh
-X-ME-Proxy: <xmx:a5RaYDuKLycdQ1-tCLtBfH_fGDHaBXL-fn6xMWJHYhXVK4EbyTaJtw>
-    <xmx:a5RaYEZJtkJSKvUFR9DZ-ZUSSgXvp-nh6AWK1Za2dkg01qQKVQ6LRQ>
-    <xmx:a5RaYCbbParC6qxNLYz69MIQDIZ3kYMsLfzPTdnsbPrBldgeeCspyg>
-    <xmx:bJRaYIN3kUyoAy98GNtxL7O_VjZqHO9PB8vEffvaTBiVrYCUPYTX2A>
-Received: by mailuser.nyi.internal (Postfix, from userid 501)
-        id A2251130005E; Tue, 23 Mar 2021 21:22:51 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
-User-Agent: Cyrus-JMAP/3.5.0-alpha0-273-g8500d2492d-fm-20210323.002-g8500d249
-Mime-Version: 1.0
-Message-Id: <16018289-0b28-4412-854b-0d30519588ca@www.fastmail.com>
-In-Reply-To: <62b12fe2-01db-76c0-b2fd-f730b4157285@amsat.org>
-References: <1602059975-10115-1-git-send-email-chenhc@lemote.com>
- <1602059975-10115-3-git-send-email-chenhc@lemote.com>
- <0dfbe14a-9ddb-0069-9d86-62861c059d12@amsat.org>
- <CAAhV-H63zhXyUizwOxUtXdQQOR=r82493tgH8NfLmgXF0g8row@mail.gmail.com>
- <9fc6161e-cf27-b636-97c0-9aca77d0f9cd@amsat.org>
- <CAAhV-H5wPZQ+TGdZL=mPV4YQcjHarJFoEH-nobr10PdesR-ySg@mail.gmail.com>
- <62b12fe2-01db-76c0-b2fd-f730b4157285@amsat.org>
-Date:   Wed, 24 Mar 2021 09:22:30 +0800
-From:   "Jiaxun Yang" <jiaxun.yang@flygoat.com>
-To:     =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
-        "Huacai Chen" <chenhuacai@gmail.com>
-Cc:     "Huacai Chen" <zltjiangshi@gmail.com>,
-        "Thomas Huth" <thuth@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "Peter Maydell" <peter.maydell@linaro.org>,
-        "Aleksandar Rikalo" <aleksandar.rikalo@syrmia.com>,
-        "BALATON Zoltan via" <qemu-devel@nongnu.org>,
-        "Paolo Bonzini" <pbonzini@redhat.com>,
-        "Aurelien Jarno" <aurelien@aurel32.net>,
-        "YunQiang Su" <syq@debian.org>
-Subject: Re: [PATCH V13 2/9] meson.build: Re-enable KVM support for MIPS
-Content-Type: text/plain;charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+        id S231838AbhCXBs7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 23 Mar 2021 21:48:59 -0400
+Received: from szxga08-in.huawei.com ([45.249.212.255]:3317 "EHLO
+        szxga08-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231651AbhCXBsx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 23 Mar 2021 21:48:53 -0400
+Received: from DGGEML402-HUB.china.huawei.com (unknown [172.30.72.57])
+        by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4F4rfX5jh6z1476S;
+        Wed, 24 Mar 2021 09:45:40 +0800 (CST)
+Received: from dggpemm500023.china.huawei.com (7.185.36.83) by
+ DGGEML402-HUB.china.huawei.com (10.3.17.38) with Microsoft SMTP Server (TLS)
+ id 14.3.498.0; Wed, 24 Mar 2021 09:48:50 +0800
+Received: from [10.174.187.128] (10.174.187.128) by
+ dggpemm500023.china.huawei.com (7.185.36.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id
+ 15.1.2106.2; Wed, 24 Mar 2021 09:48:50 +0800
+Subject: Re: [RFC PATCH v5 02/10] tools headers: Add a macro to get HUGETLB
+ page sizes for mmap
+To:     Andrew Jones <drjones@redhat.com>
+CC:     Paolo Bonzini <pbonzini@redhat.com>, <kvm@vger.kernel.org>,
+        <linux-kselftest@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        Ben Gardon <bgardon@google.com>,
+        Sean Christopherson <seanjc@google.com>,
+        "Vitaly Kuznetsov" <vkuznets@redhat.com>,
+        Peter Xu <peterx@redhat.com>, Ingo Molnar <mingo@kernel.org>,
+        Adrian Hunter <adrian.hunter@intel.com>,
+        Jiri Olsa <jolsa@redhat.com>,
+        Arnaldo Carvalho de Melo <acme@redhat.com>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Michael Kerrisk <mtk.manpages@gmail.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        <wanghaibin.wang@huawei.com>, <yuzenghui@huawei.com>
+References: <20210323135231.24948-1-wangyanan55@huawei.com>
+ <20210323135231.24948-3-wangyanan55@huawei.com>
+ <20210323140341.nkikwolwzpu6ectp@kamzik.brq.redhat.com>
+From:   "wangyanan (Y)" <wangyanan55@huawei.com>
+Message-ID: <4b4df379-4fe4-abf3-3756-448290309a1d@huawei.com>
+Date:   Wed, 24 Mar 2021 09:48:49 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.4.0
+MIME-Version: 1.0
+In-Reply-To: <20210323140341.nkikwolwzpu6ectp@kamzik.brq.redhat.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-Originating-IP: [10.174.187.128]
+X-ClientProxiedBy: dggeme706-chm.china.huawei.com (10.1.199.102) To
+ dggpemm500023.china.huawei.com (7.185.36.83)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
+On 2021/3/23 22:03, Andrew Jones wrote:
+> $SUBJECT says "tools headers", but this is actually changing
+> a UAPI header and then copying the change to tools.
+Indeed. I think head of the subject should be "mm/hugetlb".
+I will fix it.
 
-On Tue, Mar 23, 2021, at 9:56 PM, Philippe Mathieu-Daud=C3=A9 wrote:
-> Hi Huacai,
->=20
-> We are going to tag QEMU v6.0-rc0 today.
->=20
-> I only have access to a 64-bit MIPS in little-endian to
-> test KVM.
->=20
-> Can you test the other configurations please?
-> - 32-bit BE
-> - 32-bit LE
-> - 64-bit BE
-
-+syq
-As Loongson doesn't have Big-Endian processor and Loongson 3A won't run =
-32bit kernel.
-
-Probably wecan test on boston or malta board?=20
-
-Thanks.=20
-
-
->=20
-> Thanks!
->=20
-> Phil.
->=20
->=20
-[...]
-
---=20
-- Jiaxun
+Thanks,
+Yanan
+> Thanks,
+> drew
+>
+> On Tue, Mar 23, 2021 at 09:52:23PM +0800, Yanan Wang wrote:
+>> We know that if a system supports multiple hugetlb page sizes,
+>> the desired hugetlb page size can be specified in bits [26:31]
+>> of the flag arguments. The value in these 6 bits will be the
+>> shift of each hugetlb page size.
+>>
+>> So add a macro to get the page size shift and then calculate the
+>> corresponding hugetlb page size, using flag x.
+>>
+>> Cc: Ben Gardon <bgardon@google.com>
+>> Cc: Ingo Molnar <mingo@kernel.org>
+>> Cc: Adrian Hunter <adrian.hunter@intel.com>
+>> Cc: Jiri Olsa <jolsa@redhat.com>
+>> Cc: Arnaldo Carvalho de Melo <acme@redhat.com>
+>> Cc: Arnd Bergmann <arnd@arndb.de>
+>> Cc: Michael Kerrisk <mtk.manpages@gmail.com>
+>> Cc: Thomas Gleixner <tglx@linutronix.de>
+>> Suggested-by: Ben Gardon <bgardon@google.com>
+>> Signed-off-by: Yanan Wang <wangyanan55@huawei.com>
+>> Reviewed-by: Ben Gardon <bgardon@google.com>
+>> ---
+>>   include/uapi/linux/mman.h       | 2 ++
+>>   tools/include/uapi/linux/mman.h | 2 ++
+>>   2 files changed, 4 insertions(+)
+>>
+>> diff --git a/include/uapi/linux/mman.h b/include/uapi/linux/mman.h
+>> index f55bc680b5b0..d72df73b182d 100644
+>> --- a/include/uapi/linux/mman.h
+>> +++ b/include/uapi/linux/mman.h
+>> @@ -41,4 +41,6 @@
+>>   #define MAP_HUGE_2GB	HUGETLB_FLAG_ENCODE_2GB
+>>   #define MAP_HUGE_16GB	HUGETLB_FLAG_ENCODE_16GB
+>>   
+>> +#define MAP_HUGE_PAGE_SIZE(x) (1ULL << ((x >> MAP_HUGE_SHIFT) & MAP_HUGE_MASK))
+>> +
+>>   #endif /* _UAPI_LINUX_MMAN_H */
+>> diff --git a/tools/include/uapi/linux/mman.h b/tools/include/uapi/linux/mman.h
+>> index f55bc680b5b0..d72df73b182d 100644
+>> --- a/tools/include/uapi/linux/mman.h
+>> +++ b/tools/include/uapi/linux/mman.h
+>> @@ -41,4 +41,6 @@
+>>   #define MAP_HUGE_2GB	HUGETLB_FLAG_ENCODE_2GB
+>>   #define MAP_HUGE_16GB	HUGETLB_FLAG_ENCODE_16GB
+>>   
+>> +#define MAP_HUGE_PAGE_SIZE(x) (1ULL << ((x >> MAP_HUGE_SHIFT) & MAP_HUGE_MASK))
+>> +
+>>   #endif /* _UAPI_LINUX_MMAN_H */
+>> -- 
+>> 2.19.1
+>>
+> .
