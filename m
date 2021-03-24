@@ -2,122 +2,96 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7CE11346F08
-	for <lists+kvm@lfdr.de>; Wed, 24 Mar 2021 02:49:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AD6E7346F43
+	for <lists+kvm@lfdr.de>; Wed, 24 Mar 2021 03:13:36 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231838AbhCXBs7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 23 Mar 2021 21:48:59 -0400
-Received: from szxga08-in.huawei.com ([45.249.212.255]:3317 "EHLO
-        szxga08-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231651AbhCXBsx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 23 Mar 2021 21:48:53 -0400
-Received: from DGGEML402-HUB.china.huawei.com (unknown [172.30.72.57])
-        by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4F4rfX5jh6z1476S;
-        Wed, 24 Mar 2021 09:45:40 +0800 (CST)
-Received: from dggpemm500023.china.huawei.com (7.185.36.83) by
- DGGEML402-HUB.china.huawei.com (10.3.17.38) with Microsoft SMTP Server (TLS)
- id 14.3.498.0; Wed, 24 Mar 2021 09:48:50 +0800
-Received: from [10.174.187.128] (10.174.187.128) by
- dggpemm500023.china.huawei.com (7.185.36.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id
- 15.1.2106.2; Wed, 24 Mar 2021 09:48:50 +0800
-Subject: Re: [RFC PATCH v5 02/10] tools headers: Add a macro to get HUGETLB
- page sizes for mmap
-To:     Andrew Jones <drjones@redhat.com>
-CC:     Paolo Bonzini <pbonzini@redhat.com>, <kvm@vger.kernel.org>,
-        <linux-kselftest@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        Ben Gardon <bgardon@google.com>,
-        Sean Christopherson <seanjc@google.com>,
-        "Vitaly Kuznetsov" <vkuznets@redhat.com>,
-        Peter Xu <peterx@redhat.com>, Ingo Molnar <mingo@kernel.org>,
-        Adrian Hunter <adrian.hunter@intel.com>,
-        Jiri Olsa <jolsa@redhat.com>,
-        Arnaldo Carvalho de Melo <acme@redhat.com>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Michael Kerrisk <mtk.manpages@gmail.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        <wanghaibin.wang@huawei.com>, <yuzenghui@huawei.com>
-References: <20210323135231.24948-1-wangyanan55@huawei.com>
- <20210323135231.24948-3-wangyanan55@huawei.com>
- <20210323140341.nkikwolwzpu6ectp@kamzik.brq.redhat.com>
-From:   "wangyanan (Y)" <wangyanan55@huawei.com>
-Message-ID: <4b4df379-4fe4-abf3-3756-448290309a1d@huawei.com>
-Date:   Wed, 24 Mar 2021 09:48:49 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.4.0
+        id S231694AbhCXCND convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Tue, 23 Mar 2021 22:13:03 -0400
+Received: from mail-qt1-f180.google.com ([209.85.160.180]:34705 "EHLO
+        mail-qt1-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231267AbhCXCMa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 23 Mar 2021 22:12:30 -0400
+Received: by mail-qt1-f180.google.com with SMTP id c6so16550905qtc.1
+        for <kvm@vger.kernel.org>; Tue, 23 Mar 2021 19:12:18 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=r1ikSccTD60sRnV/AdmISo/VbNun/QvCsZUFGJ30T+8=;
+        b=G8ml1//jhEmKSUXYe5CrGW5N8C2BR4V28IHaqHItPH8nxqwQWWrWxN+rLArEpGcLjR
+         WpeCVQxhKn07+vLCl9bN4MDxssYZmJwVa5AXsVOrrG9RiEGTKJeqf5W6r4xHcPe8FYK9
+         y25+sSnydnO6/fFh34syoVBe5Z8iQNobztc0Uadt1+mWlP30MUmwm+Dd4118mapnUNPB
+         vJxkrfTUgtiLqc1Hr9D8T4sKQKGhDftxjJPWuJvSG9eTzDp9hr2CDgszNKhHtRICQ+17
+         DlMaHihs0NAzWHqqVlrrd3HgclG79OM9X8Ywo0kW7Pe92W1D3+qqCLGoDTkFBdIHSAN4
+         kwhg==
+X-Gm-Message-State: AOAM531MFeYSt5j+q6JAlyqm8pkEwjtDLXMsW1v/WnJgAJEkETLzoBHK
+        pBIvCVvYhCvQJzKX2OpoXHOmA1NRyvb4TtT6Eiyc0w19M+A=
+X-Google-Smtp-Source: ABdhPJyfNZoJirHCeiSeW1gza0K4WFBfeqBuHYbFKHg4bkV+6D6eCveEue+bk3WFQ0YcwbWZIPWaYZMpIKB8MnzGTDs=
+X-Received: by 2002:ac8:4510:: with SMTP id q16mr1097215qtn.241.1616551938316;
+ Tue, 23 Mar 2021 19:12:18 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20210323140341.nkikwolwzpu6ectp@kamzik.brq.redhat.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-Originating-IP: [10.174.187.128]
-X-ClientProxiedBy: dggeme706-chm.china.huawei.com (10.1.199.102) To
- dggpemm500023.china.huawei.com (7.185.36.83)
-X-CFilter-Loop: Reflected
+References: <1602059975-10115-1-git-send-email-chenhc@lemote.com>
+ <1602059975-10115-3-git-send-email-chenhc@lemote.com> <0dfbe14a-9ddb-0069-9d86-62861c059d12@amsat.org>
+ <CAAhV-H63zhXyUizwOxUtXdQQOR=r82493tgH8NfLmgXF0g8row@mail.gmail.com>
+ <9fc6161e-cf27-b636-97c0-9aca77d0f9cd@amsat.org> <CAAhV-H5wPZQ+TGdZL=mPV4YQcjHarJFoEH-nobr10PdesR-ySg@mail.gmail.com>
+ <62b12fe2-01db-76c0-b2fd-f730b4157285@amsat.org> <16018289-0b28-4412-854b-0d30519588ca@www.fastmail.com>
+In-Reply-To: <16018289-0b28-4412-854b-0d30519588ca@www.fastmail.com>
+From:   YunQiang Su <syq@debian.org>
+Date:   Wed, 24 Mar 2021 10:12:08 +0800
+Message-ID: <CAKcpw6Ud2chjGLGmhr03pLd276d9A3eu-2pC0FLLfYcmg3UNqA@mail.gmail.com>
+Subject: Re: [PATCH V13 2/9] meson.build: Re-enable KVM support for MIPS
+To:     Jiaxun Yang <jiaxun.yang@flygoat.com>
+Cc:     =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>,
+        Huacai Chen <chenhuacai@gmail.com>,
+        Huacai Chen <zltjiangshi@gmail.com>,
+        Thomas Huth <thuth@redhat.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Peter Maydell <peter.maydell@linaro.org>,
+        Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
+        BALATON Zoltan via <qemu-devel@nongnu.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Aurelien Jarno <aurelien@aurel32.net>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8BIT
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-On 2021/3/23 22:03, Andrew Jones wrote:
-> $SUBJECT says "tools headers", but this is actually changing
-> a UAPI header and then copying the change to tools.
-Indeed. I think head of the subject should be "mm/hugetlb".
-I will fix it.
-
-Thanks,
-Yanan
-> Thanks,
-> drew
+Jiaxun Yang <jiaxun.yang@flygoat.com> 于2021年3月24日周三 上午9:29写道：
 >
-> On Tue, Mar 23, 2021 at 09:52:23PM +0800, Yanan Wang wrote:
->> We know that if a system supports multiple hugetlb page sizes,
->> the desired hugetlb page size can be specified in bits [26:31]
->> of the flag arguments. The value in these 6 bits will be the
->> shift of each hugetlb page size.
->>
->> So add a macro to get the page size shift and then calculate the
->> corresponding hugetlb page size, using flag x.
->>
->> Cc: Ben Gardon <bgardon@google.com>
->> Cc: Ingo Molnar <mingo@kernel.org>
->> Cc: Adrian Hunter <adrian.hunter@intel.com>
->> Cc: Jiri Olsa <jolsa@redhat.com>
->> Cc: Arnaldo Carvalho de Melo <acme@redhat.com>
->> Cc: Arnd Bergmann <arnd@arndb.de>
->> Cc: Michael Kerrisk <mtk.manpages@gmail.com>
->> Cc: Thomas Gleixner <tglx@linutronix.de>
->> Suggested-by: Ben Gardon <bgardon@google.com>
->> Signed-off-by: Yanan Wang <wangyanan55@huawei.com>
->> Reviewed-by: Ben Gardon <bgardon@google.com>
->> ---
->>   include/uapi/linux/mman.h       | 2 ++
->>   tools/include/uapi/linux/mman.h | 2 ++
->>   2 files changed, 4 insertions(+)
->>
->> diff --git a/include/uapi/linux/mman.h b/include/uapi/linux/mman.h
->> index f55bc680b5b0..d72df73b182d 100644
->> --- a/include/uapi/linux/mman.h
->> +++ b/include/uapi/linux/mman.h
->> @@ -41,4 +41,6 @@
->>   #define MAP_HUGE_2GB	HUGETLB_FLAG_ENCODE_2GB
->>   #define MAP_HUGE_16GB	HUGETLB_FLAG_ENCODE_16GB
->>   
->> +#define MAP_HUGE_PAGE_SIZE(x) (1ULL << ((x >> MAP_HUGE_SHIFT) & MAP_HUGE_MASK))
->> +
->>   #endif /* _UAPI_LINUX_MMAN_H */
->> diff --git a/tools/include/uapi/linux/mman.h b/tools/include/uapi/linux/mman.h
->> index f55bc680b5b0..d72df73b182d 100644
->> --- a/tools/include/uapi/linux/mman.h
->> +++ b/tools/include/uapi/linux/mman.h
->> @@ -41,4 +41,6 @@
->>   #define MAP_HUGE_2GB	HUGETLB_FLAG_ENCODE_2GB
->>   #define MAP_HUGE_16GB	HUGETLB_FLAG_ENCODE_16GB
->>   
->> +#define MAP_HUGE_PAGE_SIZE(x) (1ULL << ((x >> MAP_HUGE_SHIFT) & MAP_HUGE_MASK))
->> +
->>   #endif /* _UAPI_LINUX_MMAN_H */
->> -- 
->> 2.19.1
->>
-> .
+>
+>
+> On Tue, Mar 23, 2021, at 9:56 PM, Philippe Mathieu-Daudé wrote:
+> > Hi Huacai,
+> >
+> > We are going to tag QEMU v6.0-rc0 today.
+> >
+> > I only have access to a 64-bit MIPS in little-endian to
+> > test KVM.
+> >
+> > Can you test the other configurations please?
+> > - 32-bit BE
+> > - 32-bit LE
+> > - 64-bit BE
+>
+
+How to run the test? just run a VM with KVM support on these kernel?
+
+> +syq
+> As Loongson doesn't have Big-Endian processor and Loongson 3A won't run 32bit kernel.
+>
+> Probably wecan test on boston or malta board?
+>
+> Thanks.
+>
+>
+> >
+> > Thanks!
+> >
+> > Phil.
+> >
+> >
+> [...]
+>
+> --
+> - Jiaxun
