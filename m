@@ -2,311 +2,785 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B1D56347281
-	for <lists+kvm@lfdr.de>; Wed, 24 Mar 2021 08:25:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 794213472D0
+	for <lists+kvm@lfdr.de>; Wed, 24 Mar 2021 08:41:21 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231552AbhCXHYx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 24 Mar 2021 03:24:53 -0400
-Received: from mail-io1-f70.google.com ([209.85.166.70]:39066 "EHLO
-        mail-io1-f70.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236074AbhCXHYP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 24 Mar 2021 03:24:15 -0400
-Received: by mail-io1-f70.google.com with SMTP id x6so778846ioj.6
-        for <kvm@vger.kernel.org>; Wed, 24 Mar 2021 00:24:14 -0700 (PDT)
+        id S230070AbhCXHkm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 24 Mar 2021 03:40:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45516 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230146AbhCXHkO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 24 Mar 2021 03:40:14 -0400
+Received: from mail-ej1-x62f.google.com (mail-ej1-x62f.google.com [IPv6:2a00:1450:4864:20::62f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AA6E7C0613DC
+        for <kvm@vger.kernel.org>; Wed, 24 Mar 2021 00:40:08 -0700 (PDT)
+Received: by mail-ej1-x62f.google.com with SMTP id l4so31217426ejc.10
+        for <kvm@vger.kernel.org>; Wed, 24 Mar 2021 00:40:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance-com.20150623.gappssmtp.com; s=20150623;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=OHIaIYExMHEt8rPb+oIFgZan3TrF6ppKBBNq3YXZcCU=;
+        b=is8gwfEAk6QN7NWdKIQ4Tpg0jCJ16z9Z5PIVXXhfr0Hk2tJlfgp2WBICAgiyPU7jiB
+         YovPVbQ/Ii+NhJABmrRNehfO7ECaMmeYe68aXAXJcN4uNvjd9OMWkgPROKgI6bdt5/eI
+         CKvBF1zmwVG2mxYZ9WOC6XKbxdC5OyTTArUr9oOw9R0MldO6zy2RXZjbF4rc+wvUujbn
+         Nu4WTUv+6rDF8tVNyq20nGouaKcbHnQayV1OFo8s1drnujSdoKWnV5rTV0lIuiSPBaCz
+         alzi57b9e6KRIVyQxdPut5Eb13LBUN+PRXZH7iHgjR9mqyAhlKFfGohzlUD+E3qir81H
+         gqFQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
-        bh=EYbKOx85TqkoSHlsdZ0pOMgsPP1FhYyvV9ZfYrYph80=;
-        b=p2uAHS0se2byenfxck7tEmUGG6pOn5UIhO/F5f3Sw0+iovU200CUmSm6iFS2Dmcnyt
-         YNElX0IFHRYVCYAyqM3hdmVcOvij19zIsLUqU1uW1+F8GIR70dm3D+w6DbX40TNTmcHE
-         8k9KtgWgf/wOdoeNYhH/4ROSyQdyu/u5JKT2kiHYoLG1VYez+M4EPsfYxQQgekMFSLah
-         oXLR4qPkGOX7H9aR1M0xuRWNOkwWhoSggVJRxdcJGZHAJQ4kry/Hl4qCDogN1eS0aTgy
-         Ezk35wEttzIaCDpP41UTL3YO83xTm1DeKNcMUks36ONbg/IKj7k1ivxhdBD4PmFbV+54
-         Ig6Q==
-X-Gm-Message-State: AOAM530m6EykZpgw2lBYjmbkCSpSVNImLxIiZ1Xu6d6oeL5286LxVHRL
-        kyW9NwNwrHvXUspVoYnYWmfF2VDZ+CcSJneK1HOKv0wgu5w7
-X-Google-Smtp-Source: ABdhPJyPIMf6wmwfBH5uhTtOclcsa61ldt/kHEQlKfAn4NPg+WyIKHdyaO4CaJ/gfHNt6OwtliQ3PYf2iAH7fOvJu+NOki0j7z4j
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=OHIaIYExMHEt8rPb+oIFgZan3TrF6ppKBBNq3YXZcCU=;
+        b=SLP8jVYVDzpKYk20Au6lPvkI4tGEvp5oLDTyZydbWyVy6hY69NrlO+Brndn1KUCspI
+         D+zHv/lLVmMUxbijbbHRchwENOQpp+4soB4LRa//ejE/zaogMJqeUyR3Nd76PQkStdJQ
+         ITsOxJiQAd28qYH3pGQH4L7Z7HOxTKpgl6cQwEEJ16Ej2f9dBP4PzEOIGcqnmwX7bSki
+         1VZlnSwGEbUauYsRHP7fN3NlsWCXhfBqLZ9Mf7/jHJ+VW68/rj4BRuAZKMeUx9INvmrM
+         uzcAJdhnqKQSQ1wsQaa14+GTiGkIaqzp7PC1RZ2yG/Qm6f+dGrP8513UJFcXBnI2z7Np
+         z00g==
+X-Gm-Message-State: AOAM533voI0JkSsHdJ8p5+hCd+9NO6bO6sAqBRALv6p/GPN3C9IS6eow
+        1mo7dKwpOCqycbvUBGk3P7BUVx+Zu1btPhy9YRS4
+X-Google-Smtp-Source: ABdhPJyAIcvxLcMP57Zx3y6IKCbmFIEKal04Sv5kjApQr7WzicydBkW7F9gusrTOpnp9bubP9MzIex15gJHmluNKAeY=
+X-Received: by 2002:a17:907:3f96:: with SMTP id hr22mr2151161ejc.427.1616571607072;
+ Wed, 24 Mar 2021 00:40:07 -0700 (PDT)
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1a68:: with SMTP id w8mr1641643ilv.129.1616570654237;
- Wed, 24 Mar 2021 00:24:14 -0700 (PDT)
-Date:   Wed, 24 Mar 2021 00:24:14 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <00000000000099aa6805be432fce@google.com>
-Subject: [syzbot] possible deadlock in kvm_synchronize_tsc
-From:   syzbot <syzbot+9a89b866d3fc11acc3b6@syzkaller.appspotmail.com>
-To:     bp@alien8.de, hpa@zytor.com, jmattson@google.com, joro@8bytes.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        mingo@redhat.com, pbonzini@redhat.com, seanjc@google.com,
-        syzkaller-bugs@googlegroups.com, tglx@linutronix.de,
-        vkuznets@redhat.com, wanpengli@tencent.com, x86@kernel.org
+References: <20210315053721.189-1-xieyongji@bytedance.com> <20210315053721.189-9-xieyongji@bytedance.com>
+ <ec5b4146-9844-11b0-c9b0-c657d3328dd4@redhat.com>
+In-Reply-To: <ec5b4146-9844-11b0-c9b0-c657d3328dd4@redhat.com>
+From:   Yongji Xie <xieyongji@bytedance.com>
+Date:   Wed, 24 Mar 2021 15:39:56 +0800
+Message-ID: <CACycT3v_-G6ju-poofXEzYt8QPKWNFHwsS7t=KTLgs-=g+iPQQ@mail.gmail.com>
+Subject: Re: Re: [PATCH v5 08/11] vduse: Implement an MMU-based IOMMU driver
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        Parav Pandit <parav@nvidia.com>, Bob Liu <bob.liu@oracle.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Matthew Wilcox <willy@infradead.org>, viro@zeniv.linux.org.uk,
+        Jens Axboe <axboe@kernel.dk>, bcrl@kvack.org,
+        Jonathan Corbet <corbet@lwn.net>,
+        =?UTF-8?Q?Mika_Penttil=C3=A4?= <mika.penttila@nextfour.com>,
+        Dan Carpenter <dan.carpenter@oracle.com>,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        kvm@vger.kernel.org, linux-fsdevel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hello,
+On Wed, Mar 24, 2021 at 11:54 AM Jason Wang <jasowang@redhat.com> wrote:
+>
+>
+> =E5=9C=A8 2021/3/15 =E4=B8=8B=E5=8D=881:37, Xie Yongji =E5=86=99=E9=81=93=
+:
+> > This implements an MMU-based IOMMU driver to support mapping
+> > kernel dma buffer into userspace. The basic idea behind it is
+> > treating MMU (VA->PA) as IOMMU (IOVA->PA). The driver will set
+> > up MMU mapping instead of IOMMU mapping for the DMA transfer so
+> > that the userspace process is able to use its virtual address to
+> > access the dma buffer in kernel.
+> >
+> > And to avoid security issue, a bounce-buffering mechanism is
+> > introduced to prevent userspace accessing the original buffer
+> > directly.
+> >
+> > Signed-off-by: Xie Yongji <xieyongji@bytedance.com>
+> > ---
+> >   drivers/vdpa/vdpa_user/iova_domain.c | 535 ++++++++++++++++++++++++++=
++++++++++
+> >   drivers/vdpa/vdpa_user/iova_domain.h |  75 +++++
+> >   2 files changed, 610 insertions(+)
+> >   create mode 100644 drivers/vdpa/vdpa_user/iova_domain.c
+> >   create mode 100644 drivers/vdpa/vdpa_user/iova_domain.h
+> >
+> > diff --git a/drivers/vdpa/vdpa_user/iova_domain.c b/drivers/vdpa/vdpa_u=
+ser/iova_domain.c
+> > new file mode 100644
+> > index 000000000000..83de216b0e51
+> > --- /dev/null
+> > +++ b/drivers/vdpa/vdpa_user/iova_domain.c
+> > @@ -0,0 +1,535 @@
+> > +// SPDX-License-Identifier: GPL-2.0-only
+> > +/*
+> > + * MMU-based IOMMU implementation
+> > + *
+> > + * Copyright (C) 2020 Bytedance Inc. and/or its affiliates. All rights=
+ reserved.
+>
+>
+> 2021 as well.
+>
 
-syzbot found the following issue on:
+Sure.
 
-HEAD commit:    1c273e10 Merge tag 'zonefs-5.12-rc4' of git://git.kernel.o..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=1063d14ed00000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=6abda3336c698a07
-dashboard link: https://syzkaller.appspot.com/bug?extid=9a89b866d3fc11acc3b6
-userspace arch: i386
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=10bf56f6d00000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=174e36dcd00000
+>
+> > + *
+> > + * Author: Xie Yongji <xieyongji@bytedance.com>
+> > + *
+> > + */
+> > +
+> > +#include <linux/slab.h>
+> > +#include <linux/file.h>
+> > +#include <linux/anon_inodes.h>
+> > +#include <linux/highmem.h>
+> > +#include <linux/vmalloc.h>
+> > +#include <linux/vdpa.h>
+> > +
+> > +#include "iova_domain.h"
+> > +
+> > +static int vduse_iotlb_add_range(struct vduse_iova_domain *domain,
+> > +                              u64 start, u64 last,
+> > +                              u64 addr, unsigned int perm,
+> > +                              struct file *file, u64 offset)
+> > +{
+> > +     struct vdpa_map_file *map_file;
+> > +     int ret;
+> > +
+> > +     map_file =3D kmalloc(sizeof(*map_file), GFP_ATOMIC);
+> > +     if (!map_file)
+> > +             return -ENOMEM;
+> > +
+> > +     map_file->file =3D get_file(file);
+> > +     map_file->offset =3D offset;
+> > +
+> > +     ret =3D vhost_iotlb_add_range_ctx(domain->iotlb, start, last,
+> > +                                     addr, perm, map_file);
+> > +     if (ret) {
+> > +             fput(map_file->file);
+> > +             kfree(map_file);
+> > +             return ret;
+> > +     }
+> > +     return 0;
+> > +}
+> > +
+> > +static void vduse_iotlb_del_range(struct vduse_iova_domain *domain,
+> > +                               u64 start, u64 last)
+> > +{
+> > +     struct vdpa_map_file *map_file;
+> > +     struct vhost_iotlb_map *map;
+> > +
+> > +     while ((map =3D vhost_iotlb_itree_first(domain->iotlb, start, las=
+t))) {
+> > +             map_file =3D (struct vdpa_map_file *)map->opaque;
+> > +             fput(map_file->file);
+> > +             kfree(map_file);
+> > +             vhost_iotlb_map_free(domain->iotlb, map);
+> > +     }
+> > +}
+> > +
+> > +int vduse_domain_set_map(struct vduse_iova_domain *domain,
+> > +                      struct vhost_iotlb *iotlb)
+> > +{
+> > +     struct vdpa_map_file *map_file;
+> > +     struct vhost_iotlb_map *map;
+> > +     u64 start =3D 0ULL, last =3D ULLONG_MAX;
+> > +     int ret;
+> > +
+> > +     spin_lock(&domain->iotlb_lock);
+> > +     vduse_iotlb_del_range(domain, start, last);
+> > +
+> > +     for (map =3D vhost_iotlb_itree_first(iotlb, start, last); map;
+> > +          map =3D vhost_iotlb_itree_next(map, start, last)) {
+> > +             map_file =3D (struct vdpa_map_file *)map->opaque;
+> > +             ret =3D vduse_iotlb_add_range(domain, map->start, map->la=
+st,
+> > +                                         map->addr, map->perm,
+> > +                                         map_file->file,
+> > +                                         map_file->offset);
+> > +             if (ret)
+> > +                     goto err;
+> > +     }
+> > +     spin_unlock(&domain->iotlb_lock);
+> > +
+> > +     return 0;
+> > +err:
+> > +     vduse_iotlb_del_range(domain, start, last);
+> > +     spin_unlock(&domain->iotlb_lock);
+> > +     return ret;
+> > +}
+> > +
+> > +static void vduse_domain_map_bounce_page(struct vduse_iova_domain *dom=
+ain,
+> > +                                      u64 iova, u64 size, u64 paddr)
+> > +{
+> > +     struct vduse_bounce_map *map;
+> > +     unsigned int index;
+> > +     u64 last =3D iova + size - 1;
+> > +
+> > +     while (iova < last) {
+> > +             map =3D &domain->bounce_maps[iova >> PAGE_SHIFT];
+> > +             index =3D offset_in_page(iova) >> IOVA_ALLOC_ORDER;
+> > +             map->orig_phys[index] =3D paddr;
+> > +             paddr +=3D IOVA_ALLOC_SIZE;
+> > +             iova +=3D IOVA_ALLOC_SIZE;
+> > +     }
+> > +}
+> > +
+> > +static void vduse_domain_unmap_bounce_page(struct vduse_iova_domain *d=
+omain,
+> > +                                        u64 iova, u64 size)
+> > +{
+> > +     struct vduse_bounce_map *map;
+> > +     unsigned int index;
+> > +     u64 last =3D iova + size - 1;
+> > +
+> > +     while (iova < last) {
+> > +             map =3D &domain->bounce_maps[iova >> PAGE_SHIFT];
+> > +             index =3D offset_in_page(iova) >> IOVA_ALLOC_ORDER;
+> > +             map->orig_phys[index] =3D INVALID_PHYS_ADDR;
+> > +             iova +=3D IOVA_ALLOC_SIZE;
+> > +     }
+> > +}
+> > +
+> > +static void do_bounce(phys_addr_t orig, void *addr, size_t size,
+> > +                   enum dma_data_direction dir)
+> > +{
+> > +     unsigned long pfn =3D PFN_DOWN(orig);
+> > +
+> > +     if (PageHighMem(pfn_to_page(pfn))) {
+> > +             unsigned int offset =3D offset_in_page(orig);
+> > +             char *buffer;
+> > +             unsigned int sz =3D 0;
+> > +
+> > +             while (size) {
+> > +                     sz =3D min_t(size_t, PAGE_SIZE - offset, size);
+> > +
+> > +                     buffer =3D kmap_atomic(pfn_to_page(pfn));
+>
+>
+> So kmap_atomic() can autoamtically go with fast path if the page does
+> not belong to highmem.
+>
+> I think we can removce the condition and just use kmap_atomic() for all
+> the cases here.
+>
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+9a89b866d3fc11acc3b6@syzkaller.appspotmail.com
+Looks good to me.
 
-L1TF CPU bug present and SMT on, data leak possible. See CVE-2018-3646 and https://www.kernel.org/doc/html/latest/admin-guide/hw-vuln/l1tf.html for details.
-========================================================
-WARNING: possible irq lock inversion dependency detected
-5.12.0-rc3-syzkaller #0 Not tainted
---------------------------------------------------------
-syz-executor859/8381 just changed the state of lock:
-ffffc9000162a230 (&kvm->arch.pvclock_gtod_sync_lock){+...}-{2:2}, at: spin_lock include/linux/spinlock.h:354 [inline]
-ffffc9000162a230 (&kvm->arch.pvclock_gtod_sync_lock){+...}-{2:2}, at: kvm_synchronize_tsc+0x459/0x1230 arch/x86/kvm/x86.c:2332
-but this lock was taken by another, HARDIRQ-safe lock in the past:
- (&rq->lock){-.-.}-{2:2}
+>
+> > +                     if (dir =3D=3D DMA_TO_DEVICE)
+> > +                             memcpy(addr, buffer + offset, sz);
+> > +                     else
+> > +                             memcpy(buffer + offset, addr, sz);
+> > +                     kunmap_atomic(buffer);
+> > +
+> > +                     size -=3D sz;
+> > +                     pfn++;
+> > +                     addr +=3D sz;
+> > +                     offset =3D 0;
+> > +             }
+> > +     } else if (dir =3D=3D DMA_TO_DEVICE) {
+> > +             memcpy(addr, phys_to_virt(orig), size);
+> > +     } else {
+> > +             memcpy(phys_to_virt(orig), addr, size);
+> > +     }
+> > +}
+> > +
+> > +static void vduse_domain_bounce(struct vduse_iova_domain *domain,
+> > +                             dma_addr_t iova, size_t size,
+> > +                             enum dma_data_direction dir)
+> > +{
+> > +     struct vduse_bounce_map *map;
+> > +     unsigned int index, offset;
+> > +     void *addr;
+> > +     size_t sz;
+> > +
+> > +     while (size) {
+> > +             map =3D &domain->bounce_maps[iova >> PAGE_SHIFT];
+> > +             offset =3D offset_in_page(iova);
+> > +             sz =3D min_t(size_t, IOVA_ALLOC_SIZE, size);
+> > +
+> > +             if (map->bounce_page &&
+> > +                 map->orig_phys[index] !=3D INVALID_PHYS_ADDR) {
+> > +                     addr =3D page_address(map->bounce_page) + offset;
+> > +                     index =3D offset >> IOVA_ALLOC_ORDER;
+> > +                     do_bounce(map->orig_phys[index], addr, sz, dir);
+> > +             }
+> > +             size -=3D sz;
+> > +             iova +=3D sz;
+> > +     }
+> > +}
+> > +
+> > +static struct page *
+> > +vduse_domain_get_mapping_page(struct vduse_iova_domain *domain, u64 io=
+va)
+> > +{
+> > +     u64 start =3D iova & PAGE_MASK;
+> > +     u64 last =3D start + PAGE_SIZE - 1;
+> > +     struct vhost_iotlb_map *map;
+> > +     struct page *page =3D NULL;
+> > +
+> > +     spin_lock(&domain->iotlb_lock);
+> > +     map =3D vhost_iotlb_itree_first(domain->iotlb, start, last);
+> > +     if (!map)
+> > +             goto out;
+> > +
+> > +     page =3D pfn_to_page((map->addr + iova - map->start) >> PAGE_SHIF=
+T);
+> > +     get_page(page);
+> > +out:
+> > +     spin_unlock(&domain->iotlb_lock);
+> > +
+> > +     return page;
+> > +}
+> > +
+> > +static struct page *
+> > +vduse_domain_alloc_bounce_page(struct vduse_iova_domain *domain, u64 i=
+ova)
+> > +{
+> > +     u64 start =3D iova & PAGE_MASK;
+> > +     struct page *page =3D alloc_page(GFP_KERNEL);
+> > +     struct vduse_bounce_map *map;
+> > +
+> > +     if (!page)
+> > +             return NULL;
+> > +
+> > +     spin_lock(&domain->iotlb_lock);
+> > +     map =3D &domain->bounce_maps[iova >> PAGE_SHIFT];
+> > +     if (map->bounce_page) {
+> > +             __free_page(page);
+> > +             goto out;
+> > +     }
+> > +     map->bounce_page =3D page;
+> > +
+> > +     /* paired with vduse_domain_map_page() */
+> > +     smp_mb();
+>
+>
+> So this is suspicious. It's better to explain like, we need make sure A
+> must be done after B.
 
+OK. I see. It's used to protect this pattern:
 
-and interrupts could create inverse lock ordering between them.
+   vduse_domain_alloc_bounce_page:          vduse_domain_map_page:
+   write map->bounce_page                           write map->orig_phys
+   mb()                                                            mb()
+   read map->orig_phys                                 read map->bounce_pag=
+e
 
+Make sure there will always be a path to do bouncing.
 
-other info that might help us debug this:
- Possible interrupt unsafe locking scenario:
+>
+> And it looks to me the iotlb_lock is sufficnet to do the synchronization
+> here. E.g any reason that you don't take it in
+> vduse_domain_map_bounce_page().
+>
 
-       CPU0                    CPU1
-       ----                    ----
-  lock(&kvm->arch.pvclock_gtod_sync_lock);
-                               local_irq_disable();
-                               lock(&rq->lock);
-                               lock(&kvm->arch.pvclock_gtod_sync_lock);
-  <Interrupt>
-    lock(&rq->lock);
+Yes, we can. But the performance in multi-queue cases will go down if
+we use iotlb_lock on this critical path.
 
- *** DEADLOCK ***
+> And what's more, is there anyway to aovid holding the spinlock during
+> bouncing?
+>
 
-1 lock held by syz-executor859/8381:
- #0: ffff8880316e80c8 (&vcpu->mutex){+.+.}-{3:3}, at: kvm_arch_vcpu_postcreate+0x3e/0x180 arch/x86/kvm/x86.c:10180
+Looks like we can't. In the case that multiple page faults happen on
+the same page, we should make sure the bouncing is done before any
+page fault handler returns.
 
-the shortest dependencies between 2nd lock and 1st lock:
- -> (&rq->lock){-.-.}-{2:2} {
-    IN-HARDIRQ-W at:
-                      lock_acquire kernel/locking/lockdep.c:5510 [inline]
-                      lock_acquire+0x1ab/0x740 kernel/locking/lockdep.c:5475
-                      __raw_spin_lock include/linux/spinlock_api_smp.h:142 [inline]
-                      _raw_spin_lock+0x2a/0x40 kernel/locking/spinlock.c:151
-                      rq_lock kernel/sched/sched.h:1321 [inline]
-                      scheduler_tick+0xa4/0x4b0 kernel/sched/core.c:4538
-                      update_process_times+0x191/0x200 kernel/time/timer.c:1801
-                      tick_periodic+0x79/0x230 kernel/time/tick-common.c:100
-                      tick_handle_periodic+0x41/0x120 kernel/time/tick-common.c:112
-                      timer_interrupt+0x3f/0x60 arch/x86/kernel/time.c:57
-                      __handle_irq_event_percpu+0x303/0x8f0 kernel/irq/handle.c:156
-                      handle_irq_event_percpu kernel/irq/handle.c:196 [inline]
-                      handle_irq_event+0x102/0x290 kernel/irq/handle.c:213
-                      handle_level_irq+0x256/0x6e0 kernel/irq/chip.c:650
-                      generic_handle_irq_desc include/linux/irqdesc.h:158 [inline]
-                      handle_irq arch/x86/kernel/irq.c:231 [inline]
-                      __common_interrupt+0x9e/0x200 arch/x86/kernel/irq.c:250
-                      common_interrupt+0x9f/0xd0 arch/x86/kernel/irq.c:240
-                      asm_common_interrupt+0x1e/0x40 arch/x86/include/asm/idtentry.h:623
-                      __raw_spin_unlock_irqrestore include/linux/spinlock_api_smp.h:161 [inline]
-                      _raw_spin_unlock_irqrestore+0x38/0x70 kernel/locking/spinlock.c:191
-                      __setup_irq+0xc72/0x1ce0 kernel/irq/manage.c:1737
-                      request_threaded_irq+0x28a/0x3b0 kernel/irq/manage.c:2127
-                      request_irq include/linux/interrupt.h:160 [inline]
-                      setup_default_timer_irq arch/x86/kernel/time.c:70 [inline]
-                      hpet_time_init+0x28/0x42 arch/x86/kernel/time.c:82
-                      x86_late_time_init+0x58/0x94 arch/x86/kernel/time.c:94
-                      start_kernel+0x3ee/0x496 init/main.c:1028
-                      secondary_startup_64_no_verify+0xb0/0xbb
-    IN-SOFTIRQ-W at:
-                      lock_acquire kernel/locking/lockdep.c:5510 [inline]
-                      lock_acquire+0x1ab/0x740 kernel/locking/lockdep.c:5475
-                      __raw_spin_lock include/linux/spinlock_api_smp.h:142 [inline]
-                      _raw_spin_lock+0x2a/0x40 kernel/locking/spinlock.c:151
-                      rq_lock kernel/sched/sched.h:1321 [inline]
-                      ttwu_queue kernel/sched/core.c:3184 [inline]
-                      try_to_wake_up+0x5e6/0x14a0 kernel/sched/core.c:3464
-                      call_timer_fn+0x1a5/0x6b0 kernel/time/timer.c:1431
-                      expire_timers kernel/time/timer.c:1476 [inline]
-                      __run_timers.part.0+0x67c/0xa50 kernel/time/timer.c:1745
-                      __run_timers kernel/time/timer.c:1726 [inline]
-                      run_timer_softirq+0xb3/0x1d0 kernel/time/timer.c:1758
-                      __do_softirq+0x29b/0x9f6 kernel/softirq.c:345
-                      invoke_softirq kernel/softirq.c:221 [inline]
-                      __irq_exit_rcu kernel/softirq.c:422 [inline]
-                      irq_exit_rcu+0x134/0x200 kernel/softirq.c:434
-                      sysvec_apic_timer_interrupt+0x93/0xc0 arch/x86/kernel/apic/apic.c:1100
-                      asm_sysvec_apic_timer_interrupt+0x12/0x20 arch/x86/include/asm/idtentry.h:632
-                      rep_nop arch/x86/include/asm/vdso/processor.h:13 [inline]
-                      delay_tsc+0x2e/0xb0 arch/x86/lib/delay.c:78
-                      try_check_zero+0x223/0x430 kernel/rcu/srcutree.c:707
-                      srcu_advance_state kernel/rcu/srcutree.c:1229 [inline]
-                      process_srcu+0x2f2/0xe90 kernel/rcu/srcutree.c:1327
-                      process_one_work+0x98d/0x1600 kernel/workqueue.c:2275
-                      worker_thread+0x64c/0x1120 kernel/workqueue.c:2421
-                      kthread+0x3b1/0x4a0 kernel/kthread.c:292
-                      ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:294
-    INITIAL USE at:
-                     lock_acquire kernel/locking/lockdep.c:5510 [inline]
-                     lock_acquire+0x1ab/0x740 kernel/locking/lockdep.c:5475
-                     __raw_spin_lock_irqsave include/linux/spinlock_api_smp.h:110 [inline]
-                     _raw_spin_lock_irqsave+0x39/0x50 kernel/locking/spinlock.c:159
-                     rq_attach_root+0x20/0x2e0 kernel/sched/topology.c:470
-                     sched_init+0x6e8/0xbf3 kernel/sched/core.c:8213
-                     start_kernel+0x18e/0x496 init/main.c:920
-                     secondary_startup_64_no_verify+0xb0/0xbb
-  }
-  ... key      at: [<ffffffff8f39a7c0>] __key.298+0x0/0x40
-  ... acquired at:
-   __raw_spin_lock include/linux/spinlock_api_smp.h:142 [inline]
-   _raw_spin_lock+0x2a/0x40 kernel/locking/spinlock.c:151
-   spin_lock include/linux/spinlock.h:354 [inline]
-   get_kvmclock_ns+0x25/0x390 arch/x86/kvm/x86.c:2587
-   kvm_xen_update_runstate+0x3d/0x2c0 arch/x86/kvm/xen.c:69
-   kvm_xen_update_runstate_guest+0x74/0x320 arch/x86/kvm/xen.c:100
-   kvm_xen_runstate_set_preempted arch/x86/kvm/xen.h:96 [inline]
-   kvm_arch_vcpu_put+0x2d8/0x5a0 arch/x86/kvm/x86.c:4062
-   kvm_sched_out+0xbf/0x100 arch/x86/kvm/../../../virt/kvm/kvm_main.c:4876
-   __fire_sched_out_preempt_notifiers kernel/sched/core.c:3922 [inline]
-   fire_sched_out_preempt_notifiers kernel/sched/core.c:3930 [inline]
-   prepare_task_switch kernel/sched/core.c:4126 [inline]
-   context_switch kernel/sched/core.c:4274 [inline]
-   __schedule+0xfd0/0x21b0 kernel/sched/core.c:5073
-   preempt_schedule_common+0x45/0xc0 kernel/sched/core.c:5233
-   preempt_schedule_thunk+0x16/0x18 arch/x86/entry/thunk_64.S:35
-   __raw_spin_unlock_irqrestore include/linux/spinlock_api_smp.h:161 [inline]
-   _raw_spin_unlock_irqrestore+0x57/0x70 kernel/locking/spinlock.c:191
-   kvm_synchronize_tsc+0x451/0x1230 arch/x86/kvm/x86.c:2330
-   kvm_arch_vcpu_postcreate+0x73/0x180 arch/x86/kvm/x86.c:10183
-   kvm_vm_ioctl_create_vcpu arch/x86/kvm/../../../virt/kvm/kvm_main.c:3239 [inline]
-   kvm_vm_ioctl+0x1b2d/0x2800 arch/x86/kvm/../../../virt/kvm/kvm_main.c:3839
-   kvm_vm_compat_ioctl+0x125/0x230 arch/x86/kvm/../../../virt/kvm/kvm_main.c:4052
-   __do_compat_sys_ioctl+0x1d3/0x230 fs/ioctl.c:842
-   do_syscall_32_irqs_on arch/x86/entry/common.c:77 [inline]
-   __do_fast_syscall_32+0x56/0x90 arch/x86/entry/common.c:140
-   do_fast_syscall_32+0x2f/0x70 arch/x86/entry/common.c:165
-   entry_SYSENTER_compat_after_hwframe+0x4d/0x5c
+>
+> > +
+> > +     vduse_domain_bounce(domain, start, PAGE_SIZE, DMA_TO_DEVICE);
+> > +out:
+> > +     get_page(map->bounce_page);
+> > +     spin_unlock(&domain->iotlb_lock);
+> > +
+> > +     return map->bounce_page;
+> > +}
+> > +
+> > +static void
+> > +vduse_domain_free_bounce_pages(struct vduse_iova_domain *domain)
+> > +{
+> > +     struct vduse_bounce_map *map;
+> > +     unsigned long i, pfn, bounce_pfns;
+> > +
+> > +     bounce_pfns =3D domain->bounce_size >> PAGE_SHIFT;
+> > +
+> > +     for (pfn =3D 0; pfn < bounce_pfns; pfn++) {
+> > +             map =3D &domain->bounce_maps[pfn];
+> > +             for (i =3D 0; i < IOVA_MAPS_PER_PAGE; i++) {
+> > +                     if (WARN_ON(map->orig_phys[i] !=3D INVALID_PHYS_A=
+DDR))
+> > +                             continue;
+> > +             }
+> > +             if (!map->bounce_page)
+> > +                     continue;
+> > +
+> > +             __free_page(map->bounce_page);
+> > +             map->bounce_page =3D NULL;
+> > +     }
+> > +}
+> > +
+> > +void vduse_domain_reset_bounce_map(struct vduse_iova_domain *domain)
+> > +{
+> > +     if (!domain->bounce_map)
+> > +             return;
+> > +
+> > +     spin_lock(&domain->iotlb_lock);
+> > +     if (!domain->bounce_map)
+> > +             goto unlock;
+> > +
+> > +     vduse_iotlb_del_range(domain, 0, domain->bounce_size - 1);
+> > +     domain->bounce_map =3D 0;
+> > +     vduse_domain_free_bounce_pages(domain);
+> > +unlock:
+> > +     spin_unlock(&domain->iotlb_lock);
+> > +}
+> > +
+> > +static int vduse_domain_init_bounce_map(struct vduse_iova_domain *doma=
+in)
+> > +{
+> > +     int ret;
+> > +
+> > +     if (domain->bounce_map)
+> > +             return 0;
+> > +
+> > +     spin_lock(&domain->iotlb_lock);
+> > +     if (domain->bounce_map)
+> > +             goto unlock;
+> > +
+> > +     ret =3D vduse_iotlb_add_range(domain, 0, domain->bounce_size - 1,
+> > +                                 0, VHOST_MAP_RW, domain->file, 0);
+> > +     if (!ret)
+> > +             domain->bounce_map =3D 1;
+> > +unlock:
+> > +     spin_unlock(&domain->iotlb_lock);
+> > +     return ret;
+> > +}
+> > +
+> > +static dma_addr_t
+> > +vduse_domain_alloc_iova(struct iova_domain *iovad,
+> > +                     unsigned long size, unsigned long limit)
+> > +{
+> > +     unsigned long shift =3D iova_shift(iovad);
+> > +     unsigned long iova_len =3D iova_align(iovad, size) >> shift;
+> > +     unsigned long iova_pfn;
+> > +
+> > +     if (iova_len < (1 << (IOVA_RANGE_CACHE_MAX_SIZE - 1)))
+> > +             iova_len =3D roundup_pow_of_two(iova_len);
+> > +     iova_pfn =3D alloc_iova_fast(iovad, iova_len, limit >> shift, tru=
+e);
+> > +
+> > +     return iova_pfn << shift;
+> > +}
+> > +
+> > +static void vduse_domain_free_iova(struct iova_domain *iovad,
+> > +                                dma_addr_t iova, size_t size)
+> > +{
+> > +     unsigned long shift =3D iova_shift(iovad);
+> > +     unsigned long iova_len =3D iova_align(iovad, size) >> shift;
+> > +
+> > +     free_iova_fast(iovad, iova >> shift, iova_len);
+> > +}
+> > +
+> > +dma_addr_t vduse_domain_map_page(struct vduse_iova_domain *domain,
+> > +                              struct page *page, unsigned long offset,
+> > +                              size_t size, enum dma_data_direction dir=
+,
+> > +                              unsigned long attrs)
+> > +{
+> > +     struct iova_domain *iovad =3D &domain->stream_iovad;
+> > +     unsigned long limit =3D domain->bounce_size - 1;
+> > +     phys_addr_t pa =3D page_to_phys(page) + offset;
+> > +     dma_addr_t iova =3D vduse_domain_alloc_iova(iovad, size, limit);
+> > +
+> > +     if (!iova)
+> > +             return DMA_MAPPING_ERROR;
+> > +
+> > +     if (vduse_domain_init_bounce_map(domain)) {
+> > +             vduse_domain_free_iova(iovad, iova, size);
+> > +             return DMA_MAPPING_ERROR;
+> > +     }
+> > +
+> > +     vduse_domain_map_bounce_page(domain, (u64)iova, (u64)size, pa);
+> > +
+> > +     /* paired with vduse_domain_alloc_bounce_page() */
+> > +     smp_mb();
+> > +
+> > +     if (dir =3D=3D DMA_TO_DEVICE || dir =3D=3D DMA_BIDIRECTIONAL)
+> > +             vduse_domain_bounce(domain, iova, size, DMA_TO_DEVICE);
+> > +
+> > +     return iova;
+> > +}
+> > +
+> > +void vduse_domain_unmap_page(struct vduse_iova_domain *domain,
+> > +                          dma_addr_t dma_addr, size_t size,
+> > +                          enum dma_data_direction dir, unsigned long a=
+ttrs)
+> > +{
+> > +     struct iova_domain *iovad =3D &domain->stream_iovad;
+> > +
+> > +     if (dir =3D=3D DMA_FROM_DEVICE || dir =3D=3D DMA_BIDIRECTIONAL)
+> > +             vduse_domain_bounce(domain, dma_addr, size, DMA_FROM_DEVI=
+CE);
+> > +
+> > +     vduse_domain_unmap_bounce_page(domain, (u64)dma_addr, (u64)size);
+> > +     vduse_domain_free_iova(iovad, dma_addr, size);
+> > +}
+> > +
+> > +void *vduse_domain_alloc_coherent(struct vduse_iova_domain *domain,
+> > +                               size_t size, dma_addr_t *dma_addr,
+> > +                               gfp_t flag, unsigned long attrs)
+> > +{
+> > +     struct iova_domain *iovad =3D &domain->consistent_iovad;
+> > +     unsigned long limit =3D domain->iova_limit;
+> > +     dma_addr_t iova =3D vduse_domain_alloc_iova(iovad, size, limit);
+> > +     void *orig =3D alloc_pages_exact(size, flag);
+> > +
+> > +     if (!iova || !orig)
+> > +             goto err;
+> > +
+> > +     spin_lock(&domain->iotlb_lock);
+> > +     if (vduse_iotlb_add_range(domain, (u64)iova, (u64)iova + size - 1=
+,
+> > +                               virt_to_phys(orig), VHOST_MAP_RW,
+> > +                               domain->file, (u64)iova)) {
+> > +             spin_unlock(&domain->iotlb_lock);
+> > +             goto err;
+> > +     }
+> > +     spin_unlock(&domain->iotlb_lock);
+> > +
+> > +     *dma_addr =3D iova;
+> > +
+> > +     return orig;
+> > +err:
+> > +     *dma_addr =3D DMA_MAPPING_ERROR;
+> > +     if (orig)
+> > +             free_pages_exact(orig, size);
+> > +     if (iova)
+> > +             vduse_domain_free_iova(iovad, iova, size);
+> > +
+> > +     return NULL;
+> > +}
+> > +
+> > +void vduse_domain_free_coherent(struct vduse_iova_domain *domain, size=
+_t size,
+> > +                             void *vaddr, dma_addr_t dma_addr,
+> > +                             unsigned long attrs)
+> > +{
+> > +     struct iova_domain *iovad =3D &domain->consistent_iovad;
+> > +     struct vhost_iotlb_map *map;
+> > +     struct vdpa_map_file *map_file;
+> > +     phys_addr_t pa;
+> > +
+> > +     spin_lock(&domain->iotlb_lock);
+> > +     map =3D vhost_iotlb_itree_first(domain->iotlb, (u64)dma_addr,
+> > +                                   (u64)dma_addr + size - 1);
+> > +     if (WARN_ON(!map)) {
+> > +             spin_unlock(&domain->iotlb_lock);
+> > +             return;
+> > +     }
+> > +     map_file =3D (struct vdpa_map_file *)map->opaque;
+> > +     fput(map_file->file);
+> > +     kfree(map_file);
+> > +     pa =3D map->addr;
+> > +     vhost_iotlb_map_free(domain->iotlb, map);
+> > +     spin_unlock(&domain->iotlb_lock);
+> > +
+> > +     vduse_domain_free_iova(iovad, dma_addr, size);
+> > +     free_pages_exact(phys_to_virt(pa), size);
+>
+>
+> I wonder whether we should free the coherent page after munmap().
 
--> (&kvm->arch.pvclock_gtod_sync_lock){+...}-{2:2} {
-   HARDIRQ-ON-W at:
-                    lock_acquire kernel/locking/lockdep.c:5510 [inline]
-                    lock_acquire+0x1ab/0x740 kernel/locking/lockdep.c:5475
-                    __raw_spin_lock include/linux/spinlock_api_smp.h:142 [inline]
-                    _raw_spin_lock+0x2a/0x40 kernel/locking/spinlock.c:151
-                    spin_lock include/linux/spinlock.h:354 [inline]
-                    kvm_synchronize_tsc+0x459/0x1230 arch/x86/kvm/x86.c:2332
-                    kvm_arch_vcpu_postcreate+0x73/0x180 arch/x86/kvm/x86.c:10183
-                    kvm_vm_ioctl_create_vcpu arch/x86/kvm/../../../virt/kvm/kvm_main.c:3239 [inline]
-                    kvm_vm_ioctl+0x1b2d/0x2800 arch/x86/kvm/../../../virt/kvm/kvm_main.c:3839
-                    kvm_vm_compat_ioctl+0x125/0x230 arch/x86/kvm/../../../virt/kvm/kvm_main.c:4052
-                    __do_compat_sys_ioctl+0x1d3/0x230 fs/ioctl.c:842
-                    do_syscall_32_irqs_on arch/x86/entry/common.c:77 [inline]
-                    __do_fast_syscall_32+0x56/0x90 arch/x86/entry/common.c:140
-                    do_fast_syscall_32+0x2f/0x70 arch/x86/entry/common.c:165
-                    entry_SYSENTER_compat_after_hwframe+0x4d/0x5c
-   INITIAL USE at:
-                   lock_acquire kernel/locking/lockdep.c:5510 [inline]
-                   lock_acquire+0x1ab/0x740 kernel/locking/lockdep.c:5475
-                   __raw_spin_lock include/linux/spinlock_api_smp.h:142 [inline]
-                   _raw_spin_lock+0x2a/0x40 kernel/locking/spinlock.c:151
-                   spin_lock include/linux/spinlock.h:354 [inline]
-                   get_kvmclock_ns+0x25/0x390 arch/x86/kvm/x86.c:2587
-                   kvm_xen_update_runstate+0x3d/0x2c0 arch/x86/kvm/xen.c:69
-                   kvm_xen_update_runstate_guest+0x74/0x320 arch/x86/kvm/xen.c:100
-                   kvm_xen_runstate_set_preempted arch/x86/kvm/xen.h:96 [inline]
-                   kvm_arch_vcpu_put+0x2d8/0x5a0 arch/x86/kvm/x86.c:4062
-                   kvm_sched_out+0xbf/0x100 arch/x86/kvm/../../../virt/kvm/kvm_main.c:4876
-                   __fire_sched_out_preempt_notifiers kernel/sched/core.c:3922 [inline]
-                   fire_sched_out_preempt_notifiers kernel/sched/core.c:3930 [inline]
-                   prepare_task_switch kernel/sched/core.c:4126 [inline]
-                   context_switch kernel/sched/core.c:4274 [inline]
-                   __schedule+0xfd0/0x21b0 kernel/sched/core.c:5073
-                   preempt_schedule_common+0x45/0xc0 kernel/sched/core.c:5233
-                   preempt_schedule_thunk+0x16/0x18 arch/x86/entry/thunk_64.S:35
-                   __raw_spin_unlock_irqrestore include/linux/spinlock_api_smp.h:161 [inline]
-                   _raw_spin_unlock_irqrestore+0x57/0x70 kernel/locking/spinlock.c:191
-                   kvm_synchronize_tsc+0x451/0x1230 arch/x86/kvm/x86.c:2330
-                   kvm_arch_vcpu_postcreate+0x73/0x180 arch/x86/kvm/x86.c:10183
-                   kvm_vm_ioctl_create_vcpu arch/x86/kvm/../../../virt/kvm/kvm_main.c:3239 [inline]
-                   kvm_vm_ioctl+0x1b2d/0x2800 arch/x86/kvm/../../../virt/kvm/kvm_main.c:3839
-                   kvm_vm_compat_ioctl+0x125/0x230 arch/x86/kvm/../../../virt/kvm/kvm_main.c:4052
-                   __do_compat_sys_ioctl+0x1d3/0x230 fs/ioctl.c:842
-                   do_syscall_32_irqs_on arch/x86/entry/common.c:77 [inline]
-                   __do_fast_syscall_32+0x56/0x90 arch/x86/entry/common.c:140
-                   do_fast_syscall_32+0x2f/0x70 arch/x86/entry/common.c:165
-                   entry_SYSENTER_compat_after_hwframe+0x4d/0x5c
- }
- ... key      at: [<ffffffff8f371000>] __key.4+0x0/0x40
- ... acquired at:
-   mark_usage kernel/locking/lockdep.c:4387 [inline]
-   __lock_acquire+0x837/0x54c0 kernel/locking/lockdep.c:4854
-   lock_acquire kernel/locking/lockdep.c:5510 [inline]
-   lock_acquire+0x1ab/0x740 kernel/locking/lockdep.c:5475
-   __raw_spin_lock include/linux/spinlock_api_smp.h:142 [inline]
-   _raw_spin_lock+0x2a/0x40 kernel/locking/spinlock.c:151
-   spin_lock include/linux/spinlock.h:354 [inline]
-   kvm_synchronize_tsc+0x459/0x1230 arch/x86/kvm/x86.c:2332
-   kvm_arch_vcpu_postcreate+0x73/0x180 arch/x86/kvm/x86.c:10183
-   kvm_vm_ioctl_create_vcpu arch/x86/kvm/../../../virt/kvm/kvm_main.c:3239 [inline]
-   kvm_vm_ioctl+0x1b2d/0x2800 arch/x86/kvm/../../../virt/kvm/kvm_main.c:3839
-   kvm_vm_compat_ioctl+0x125/0x230 arch/x86/kvm/../../../virt/kvm/kvm_main.c:4052
-   __do_compat_sys_ioctl+0x1d3/0x230 fs/ioctl.c:842
-   do_syscall_32_irqs_on arch/x86/entry/common.c:77 [inline]
-   __do_fast_syscall_32+0x56/0x90 arch/x86/entry/common.c:140
-   do_fast_syscall_32+0x2f/0x70 arch/x86/entry/common.c:165
-   entry_SYSENTER_compat_after_hwframe+0x4d/0x5c
+But we don't know whether this coherent page is still needed by
+userspace. The userspace can call munmap() in any cases.
 
+> Otherwise usersapce can poke kernel pages in this way, e.g the page
+> could be allocated and used by other subsystems?
+>
 
-stack backtrace:
-CPU: 1 PID: 8381 Comm: syz-executor859 Not tainted 5.12.0-rc3-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
-Call Trace:
- __dump_stack lib/dump_stack.c:79 [inline]
- dump_stack+0x141/0x1d7 lib/dump_stack.c:120
- print_irq_inversion_bug kernel/locking/lockdep.c:202 [inline]
- check_usage_backwards kernel/locking/lockdep.c:3951 [inline]
- mark_lock_irq kernel/locking/lockdep.c:4041 [inline]
- mark_lock.cold+0x1d/0x8e kernel/locking/lockdep.c:4478
- mark_usage kernel/locking/lockdep.c:4387 [inline]
- __lock_acquire+0x837/0x54c0 kernel/locking/lockdep.c:4854
- lock_acquire kernel/locking/lockdep.c:5510 [inline]
- lock_acquire+0x1ab/0x740 kernel/locking/lockdep.c:5475
- __raw_spin_lock include/linux/spinlock_api_smp.h:142 [inline]
- _raw_spin_lock+0x2a/0x40 kernel/locking/spinlock.c:151
- spin_lock include/linux/spinlock.h:354 [inline]
- kvm_synchronize_tsc+0x459/0x1230 arch/x86/kvm/x86.c:2332
- kvm_arch_vcpu_postcreate+0x73/0x180 arch/x86/kvm/x86.c:10183
- kvm_vm_ioctl_create_vcpu arch/x86/kvm/../../../virt/kvm/kvm_main.c:3239 [inline]
- kvm_vm_ioctl+0x1b2d/0x2800 arch/x86/kvm/../../../virt/kvm/kvm_main.c:3839
- kvm_vm_compat_ioctl+0x125/0x230 arch/x86/kvm/../../../virt/kvm/kvm_main.c:4052
- __do_compat_sys_ioctl+0x1d3/0x230 fs/ioctl.c:842
- do_syscall_32_irqs_on arch/x86/entry/common.c:77 [inline]
- __do_fast_syscall_32+0x56/0x90 arch/x86/entry/common.c:140
- do_fast_syscall_32+0x2f/0x70 arch/x86/entry/common.c:165
- entry_SYSENTER_compat_after_hwframe+0x4d/0x5c
-RIP: 0023:0xf7fde549
-Code: 03 74 c0 01 10 05 03 74 b8 01 10 06 03 74 b4 01 10 07 03 74 b0 01 10 08 03 74 d8 01 00 00 00 00 00 51 52 55 89 e5 0f 34 cd 80 <5d> 5a 59 c3 90 90 90 90 8d b4 26 00 00 00 00 8d b4 26 00 00 00 00
-RSP: 002b:00000000ff89f2ec EFLAGS: 00000217 ORIG_RAX: 0000000000000036
-RAX: ffffffffffffffda RBX: 0000000000000004 RCX: 000000000000ae41
-RDX: 0000000000000000 RSI: 0000000000000036 RDI: 0000000000000004
-RBP: 000000004038ae7a R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000000 R12: 0000000000000000
-R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000000
+Sorry, I didn't get your point here. What's the relationship between
+this problem and munmap()?
 
+>
+> > +}
+> > +
+> > +static vm_fault_t vduse_domain_mmap_fault(struct vm_fault *vmf)
+> > +{
+> > +     struct vduse_iova_domain *domain =3D vmf->vma->vm_private_data;
+> > +     unsigned long iova =3D vmf->pgoff << PAGE_SHIFT;
+> > +     struct page *page;
+> > +
+> > +     if (!domain)
+> > +             return VM_FAULT_SIGBUS;
+> > +
+> > +     if (iova < domain->bounce_size)
+> > +             page =3D vduse_domain_alloc_bounce_page(domain, iova);
+> > +     else
+> > +             page =3D vduse_domain_get_mapping_page(domain, iova);
+> > +
+> > +     if (!page)
+> > +             return VM_FAULT_SIGBUS;
+> > +
+> > +     vmf->page =3D page;
+> > +
+> > +     return 0;
+> > +}
+> > +
+> > +static const struct vm_operations_struct vduse_domain_mmap_ops =3D {
+> > +     .fault =3D vduse_domain_mmap_fault,
+> > +};
+> > +
+> > +static int vduse_domain_mmap(struct file *file, struct vm_area_struct =
+*vma)
+> > +{
+> > +     struct vduse_iova_domain *domain =3D file->private_data;
+> > +
+> > +     vma->vm_flags |=3D VM_DONTDUMP | VM_DONTEXPAND;
+> > +     vma->vm_private_data =3D domain;
+> > +     vma->vm_ops =3D &vduse_domain_mmap_ops;
+> > +
+> > +     return 0;
+> > +}
+> > +
+> > +static int vduse_domain_release(struct inode *inode, struct file *file=
+)
+> > +{
+> > +     struct vduse_iova_domain *domain =3D file->private_data;
+> > +
+> > +     vduse_domain_reset_bounce_map(domain);
+> > +     put_iova_domain(&domain->stream_iovad);
+> > +     put_iova_domain(&domain->consistent_iovad);
+> > +     vhost_iotlb_free(domain->iotlb);
+> > +     vfree(domain->bounce_maps);
+> > +     kfree(domain);
+> > +
+> > +     return 0;
+> > +}
+> > +
+> > +static const struct file_operations vduse_domain_fops =3D {
+> > +     .mmap =3D vduse_domain_mmap,
+> > +     .release =3D vduse_domain_release,
+> > +};
+> > +
+> > +void vduse_domain_destroy(struct vduse_iova_domain *domain)
+> > +{
+> > +     fput(domain->file);
+> > +}
+> > +
+> > +struct vduse_iova_domain *
+> > +vduse_domain_create(unsigned long iova_limit, size_t bounce_size)
+> > +{
+> > +     struct vduse_iova_domain *domain;
+> > +     struct file *file;
+> > +     struct vduse_bounce_map *map;
+> > +     unsigned long i, pfn, bounce_pfns;
+> > +
+> > +     bounce_pfns =3D PAGE_ALIGN(bounce_size) >> PAGE_SHIFT;
+> > +     if (iova_limit <=3D bounce_size)
+> > +             return NULL;
+> > +
+> > +     domain =3D kzalloc(sizeof(*domain), GFP_KERNEL);
+> > +     if (!domain)
+> > +             return NULL;
+> > +
+> > +     domain->iotlb =3D vhost_iotlb_alloc(0, 0);
+> > +     if (!domain->iotlb)
+> > +             goto err_iotlb;
+> > +
+> > +     domain->iova_limit =3D iova_limit;
+> > +     domain->bounce_size =3D PAGE_ALIGN(bounce_size);
+> > +     domain->bounce_maps =3D vzalloc(bounce_pfns *
+> > +                             sizeof(struct vduse_bounce_map));
+> > +     if (!domain->bounce_maps)
+> > +             goto err_map;
+> > +
+> > +     for (pfn =3D 0; pfn < bounce_pfns; pfn++) {
+> > +             map =3D &domain->bounce_maps[pfn];
+> > +             for (i =3D 0; i < IOVA_MAPS_PER_PAGE; i++)
+> > +                     map->orig_phys[i] =3D INVALID_PHYS_ADDR;
+> > +     }
+> > +     file =3D anon_inode_getfile("[vduse-domain]", &vduse_domain_fops,
+> > +                             domain, O_RDWR);
+> > +     if (IS_ERR(file))
+> > +             goto err_file;
+> > +
+> > +     domain->file =3D file;
+> > +     spin_lock_init(&domain->iotlb_lock);
+> > +     init_iova_domain(&domain->stream_iovad,
+> > +                     IOVA_ALLOC_SIZE, IOVA_START_PFN);
+> > +     init_iova_domain(&domain->consistent_iovad,
+> > +                     PAGE_SIZE, bounce_pfns);
+>
+>
+> Any reason for treating coherent and stream DMA differently (the
+> different granule)?
+>
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+To save space for small I/Os (less than PAGE_SIZE). We can have one
+bounce page for multiple small I/Os.
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-syzbot can test patches for this issue, for details see:
-https://goo.gl/tpsmEJ#testing-patches
+>
+> > +
+> > +     return domain;
+> > +err_file:
+> > +     vfree(domain->bounce_maps);
+> > +err_map:
+> > +     vhost_iotlb_free(domain->iotlb);
+> > +err_iotlb:
+> > +     kfree(domain);
+> > +     return NULL;
+> > +}
+> > +
+> > +int vduse_domain_init(void)
+> > +{
+> > +     return iova_cache_get();
+> > +}
+> > +
+> > +void vduse_domain_exit(void)
+> > +{
+> > +     iova_cache_put();
+> > +}
+> > diff --git a/drivers/vdpa/vdpa_user/iova_domain.h b/drivers/vdpa/vdpa_u=
+ser/iova_domain.h
+> > new file mode 100644
+> > index 000000000000..faeeedfaa786
+> > --- /dev/null
+> > +++ b/drivers/vdpa/vdpa_user/iova_domain.h
+> > @@ -0,0 +1,75 @@
+> > +/* SPDX-License-Identifier: GPL-2.0-only */
+> > +/*
+> > + * MMU-based IOMMU implementation
+> > + *
+> > + * Copyright (C) 2020 Bytedance Inc. and/or its affiliates. All rights=
+ reserved.
+> > + *
+> > + * Author: Xie Yongji <xieyongji@bytedance.com>
+> > + *
+> > + */
+> > +
+> > +#ifndef _VDUSE_IOVA_DOMAIN_H
+> > +#define _VDUSE_IOVA_DOMAIN_H
+> > +
+> > +#include <linux/iova.h>
+> > +#include <linux/dma-mapping.h>
+> > +#include <linux/vhost_iotlb.h>
+> > +
+> > +#define IOVA_START_PFN 1
+> > +
+> > +#define IOVA_ALLOC_ORDER 12
+> > +#define IOVA_ALLOC_SIZE (1 << IOVA_ALLOC_ORDER)
+> > +
+> > +#define IOVA_MAPS_PER_PAGE (1 << (PAGE_SHIFT - IOVA_ALLOC_ORDER))
+> > +
+> > +#define INVALID_PHYS_ADDR (~(phys_addr_t)0)
+> > +
+> > +struct vduse_bounce_map {
+> > +     struct page *bounce_page;
+> > +     u64 orig_phys[IOVA_MAPS_PER_PAGE];
+>
+>
+> Sorry if I had asked this before. But I'm not sure it's worth to have
+> this extra complexitiy. If I read the code correctly, the
+> IOVA_MAPS_PER_PAGE is 1 for the archs that have 4K page. Have you tested
+> the code on the archs that have more than 4K page?
+>
+
+No, I haven't test it. Now I think it's OK to remove this optimization
+in this patchset.
+
+Thanks,
+Yongji
