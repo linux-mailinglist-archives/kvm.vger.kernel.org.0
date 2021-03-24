@@ -2,172 +2,130 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 282313479BE
-	for <lists+kvm@lfdr.de>; Wed, 24 Mar 2021 14:39:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7A041347A5D
+	for <lists+kvm@lfdr.de>; Wed, 24 Mar 2021 15:12:55 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235403AbhCXNij (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 24 Mar 2021 09:38:39 -0400
-Received: from mga01.intel.com ([192.55.52.88]:55550 "EHLO mga01.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S235394AbhCXNiX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 24 Mar 2021 09:38:23 -0400
-IronPort-SDR: 9ZY2IKtrTGjM0IccjpCgM32sgnZwqUVpVfl4TU08bCHkggqDua0NAJ7E7eHUF7L0LE8uZqDuUt
- /MeqkScB75CQ==
-X-IronPort-AV: E=McAfee;i="6000,8403,9932"; a="210811518"
-X-IronPort-AV: E=Sophos;i="5.81,274,1610438400"; 
-   d="scan'208";a="210811518"
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Mar 2021 06:38:23 -0700
-IronPort-SDR: XMEvngJYeoZ5U0X8BS+n8DZzhN7FBdbcoV7p6zkA8p1qvi+3IBxTwZ1rrsSM2xuJNOnNGckoD+
- /Bi6DVBEI9wA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.81,274,1610438400"; 
-   d="scan'208";a="408848110"
-Received: from local-michael-cet-test.sh.intel.com (HELO localhost) ([10.239.159.166])
-  by fmsmga008.fm.intel.com with ESMTP; 24 Mar 2021 06:38:21 -0700
-Date:   Wed, 24 Mar 2021 21:51:15 +0800
-From:   Yang Weijiang <weijiang.yang@intel.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Yang Weijiang <weijiang.yang@intel.com>, pbonzini@redhat.com,
-        vkuznets@redhat.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v4 1/3] KVM: nVMX: Sync L2 guest CET states between L1/L2
-Message-ID: <20210324135115.GA11269@local-michael-cet-test.sh.intel.com>
-References: <20210315071841.7045-1-weijiang.yang@intel.com>
- <20210315071841.7045-2-weijiang.yang@intel.com>
- <YE+PF1zfkZTTgwxn@google.com>
- <20210316090347.GA13548@local-michael-cet-test.sh.intel.com>
- <20210323004305.GA3647@local-michael-cet-test.sh.intel.com>
- <YFoPro1bw07YEaXe@google.com>
+        id S236086AbhCXOMY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 24 Mar 2021 10:12:24 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:7306 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S236110AbhCXOL5 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 24 Mar 2021 10:11:57 -0400
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 12OE4RmE189622
+        for <kvm@vger.kernel.org>; Wed, 24 Mar 2021 10:11:57 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=ZQLEbGr4exhH37nHVMwEPoxlK9f9OaCagtl9ihA5qCI=;
+ b=fDiksexTMd06yviYUJvSCjGXMQtpjjPYnaCVbBFwLqlFrnaSH4gXvNpyQZcMSOLFIPsh
+ R21TpE81XjdR0IIeVWTz5Q9Mu41oA9HGDQnHxPynh4ckurZUID4GYQMg0eIBkOhRNCaB
+ MUJC/lBQEDeMb42ksi8oUaarP1kmbmzIs1+ni27auTwE7aIfK5FBNrHQ1WeJtMAoMLCE
+ 4yGJslo09vCNwiLOFpcUReS5uTsy53F7Iw2Nl2GFTI92R7P+Lp5/6SsV5AJQO1nVZnhd
+ KTsK8mwZ5q7tsERNdZrTRSCDWnxc2fFR47QJ5nCcFeuLWsjnTimuKk6QnKRUuOGR8kNV nw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 37g3k0peqd-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Wed, 24 Mar 2021 10:11:56 -0400
+Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 12OE4Qto189556
+        for <kvm@vger.kernel.org>; Wed, 24 Mar 2021 10:11:56 -0400
+Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 37g3k0pemj-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 24 Mar 2021 10:11:52 -0400
+Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
+        by ppma02fra.de.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 12OEBooO019637;
+        Wed, 24 Mar 2021 14:11:50 GMT
+Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
+        by ppma02fra.de.ibm.com with ESMTP id 37d9d8tah0-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 24 Mar 2021 14:11:50 +0000
+Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
+        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 12OEBms240829330
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 24 Mar 2021 14:11:48 GMT
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 4804E11C04A;
+        Wed, 24 Mar 2021 14:11:48 +0000 (GMT)
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id DBF9711C052;
+        Wed, 24 Mar 2021 14:11:47 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.145.181.34])
+        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Wed, 24 Mar 2021 14:11:47 +0000 (GMT)
+Subject: Re: [kvm-unit-tests RFC 1/2] scripts: Check kvm availability by
+ asking qemu
+To:     Andrew Jones <drjones@redhat.com>
+Cc:     kvm@vger.kernel.org, lvivier@redhat.com, thuth@redhat.com,
+        david@redhat.com, pbonzini@redhat.com, cohuck@redhat.com
+References: <20210318124500.45447-1-frankja@linux.ibm.com>
+ <20210318124500.45447-2-frankja@linux.ibm.com>
+ <20210318153114.ohppqscosrijj7bs@kamzik.brq.redhat.com>
+From:   Janosch Frank <frankja@linux.ibm.com>
+Message-ID: <b161acba-cb8e-d7a6-cbd3-5567ea065a7c@linux.ibm.com>
+Date:   Wed, 24 Mar 2021 15:11:47 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.8.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YFoPro1bw07YEaXe@google.com>
-User-Agent: Mutt/1.11.3 (2019-02-01)
+In-Reply-To: <20210318153114.ohppqscosrijj7bs@kamzik.brq.redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.761
+ definitions=2021-03-24_10:2021-03-24,2021-03-24 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 phishscore=0
+ priorityscore=1501 suspectscore=0 mlxlogscore=999 impostorscore=0
+ lowpriorityscore=0 malwarescore=0 spamscore=0 bulkscore=0 adultscore=0
+ mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2103240107
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Mar 23, 2021 at 03:56:30PM +0000, Sean Christopherson wrote:
-> On Tue, Mar 23, 2021, Yang Weijiang wrote:
-> > On Tue, Mar 16, 2021 at 05:03:47PM +0800, Yang Weijiang wrote:
-> > 
-> > Hi, Sean,
-> > Could you respond my below rely? I'm not sure how to proceed, thanks!
-> > 
-> > > On Mon, Mar 15, 2021 at 09:45:11AM -0700, Sean Christopherson wrote:
-> > > > On Mon, Mar 15, 2021, Yang Weijiang wrote:
+On 3/18/21 4:31 PM, Andrew Jones wrote:
+> On Thu, Mar 18, 2021 at 12:44:59PM +0000, Janosch Frank wrote:
+>> The existence of the /dev/kvm character device doesn't imply that the
+>> kvm module is part of the kernel or that it's always magically loaded
+>> when needed.
+>>
+>> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+>> ---
+>>  arm/run               | 4 ++--
+>>  powerpc/run           | 4 ++--
+>>  s390x/run             | 4 ++--
+>>  scripts/arch-run.bash | 7 +++++--
+>>  x86/run               | 4 ++--
+>>  5 files changed, 13 insertions(+), 10 deletions(-)
+>>
+>> diff --git a/arm/run b/arm/run
+>> index a390ca5a..ca2d44e0 100755
+>> --- a/arm/run
+>> +++ b/arm/run
+>> @@ -10,10 +10,10 @@ if [ -z "$STANDALONE" ]; then
+>>  fi
+>>  processor="$PROCESSOR"
+>>  
+>> -ACCEL=$(get_qemu_accelerator) ||
+>> +qemu=$(search_qemu_binary) ||
+>>  	exit $?
+>>  
+>> -qemu=$(search_qemu_binary) ||
+>> +ACCEL=$(get_qemu_accelerator) ||
+>>  	exit $?
 > 
-> ...
+> How about renaming search_qemu_binary() to set_qemu_accelerator(), which
+> would also ensure QEMU is set (if it doesn't error out on failure) and
+> then call that from get_qemu_accelerator()? That way we don't need to
+> worry about this order of calls nor this lowercase 'qemu' variable being
+> set. Also, we can rename get_qemu_accelerator() to set_qemu_accelerator()
+> and ensure it sets ACCEL.
 > 
-> > > > > @@ -2556,6 +2563,15 @@ static int prepare_vmcs02(struct kvm_vcpu *vcpu, struct vmcs12 *vmcs12,
-> > > > >  	if (kvm_mpx_supported() && (!vmx->nested.nested_run_pending ||
-> > > > >  	    !(vmcs12->vm_entry_controls & VM_ENTRY_LOAD_BNDCFGS)))
-> > > > >  		vmcs_write64(GUEST_BNDCFGS, vmx->nested.vmcs01_guest_bndcfgs);
-> > > > > +
-> > > > > +	if (kvm_cet_supported() && (!vmx->nested.nested_run_pending ||
-> > > > > +	    !(vmcs12->vm_entry_controls & VM_ENTRY_LOAD_CET_STATE))) {
-> > > > 
-> > > > Not your code per se, since this pattern comes from BNDCFGS and DEBUGCTL, but I
-> > > > don't see how loading vmcs01 state in this combo is correct:
-> > > > 
-> > > >     a. kvm_xxx_supported()              == 1
-> > > >     b. nested_run_pending               == false
-> > > >     c. vm_entry_controls.load_xxx_state == true
-> > > > 
-> > > > nested_vmx_enter_non_root_mode() only snapshots vmcs01 if 
-> > > > vm_entry_controls.load_xxx_state == false, which means the above combo is
-> > > > loading stale values (or more likely, zeros).
-> > > > 
-> > > > I _think_ nested_vmx_enter_non_root_mode() just needs to snapshot vmcs01 if
-> > > > nested_run_pending=false.  For migration, if userspace restores MSRs after
-> > > > KVM_SET_NESTED_STATE, then what's done here is likely irrelevant.  If userspace
-> > > > restores MSRs before nested state, then vmcs01 will hold the desired value since
-> > > > setting MSRs would have written the value into vmcs01.
-> > > 
-> > > Then the code nested_vmx_enter_non_root_mode() would look like:
-> > > 
-> > > if (kvm_cet_supported() && !vmx->nested.nested_run_pending &&
-> > >     !(vmcs12->vm_entry_controls & VM_ENTRY_LOAD_CET_STATE)) {
-> > > 	...
-> > >     }
-> > > 
-> > > I have another concern now, if vm_entry_controls.load_cet_state == false, and L1
-> > > updated vmcs fields, so the latest states are in vmcs12, but they cannot
-> > > be synced to vmcs02 because in prepare_vmcs02_rare():
-> > > 
-> > > if (kvm_cet_supported() && vmx->nested.nested_run_pending &&
-> > >     (vmcs12->vm_entry_controls & VM_ENTRY_LOAD_CET_STATE)) {
-> > > 	...
-> > >     }
-> > > 
-> > > so L2 got stale status. IMO, L1 guest sets vm_entry_controls.load_cet_state == false
-> > > should be rare case. We can even igore this case :-)
+> Thanks,
+> drew
 > 
-> Yes, that's an L1 bug if it expects L2 state to come from vmcs12 in that case.
-> Architecturally, the vcms12 value won't be visible to L2 until L1 enables the
-> VM-Entry control, at which point KVM would detect the refreshed vmcs12 and sync
-> the "rare" fields.
 
-Thanks, Sean!
-So I'll change code as below:
-
-if (kvm_cet_supported() && !vmx->nested.nested_run_pending &&
-    !(vmcs12->vm_entry_controls & VM_ENTRY_LOAD_CET_STATE)) {
-      ...
-    }
->
-> > > > I suspect no one has reported this issue because guests simply don't use MPX,
-> > > > and up until the recent LBR stuff, KVM effectively zeroed out DEBUGCTL for the
-> > > > guest.
-> > > > 
-> > > So for MPX and DEBUGCTL, is it worth some separate fix patch?
-> 
-> Yes, assuming my analysis is correct.  That doesn't necessarily need to be your
-> responsibility, though patches are of course welcome :-)
-> 
-> Jim, Paolo, any thoughts?
-> 
-OK, let me wait for Jim and Paolo's comments on this...
-
-> > > > diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-> > > > index 45622e9c4449..4184ff601120 100644
-> > > > --- a/arch/x86/kvm/vmx/nested.c
-> > > > +++ b/arch/x86/kvm/vmx/nested.c
-> > > > @@ -3298,10 +3298,11 @@ enum nvmx_vmentry_status nested_vmx_enter_non_root_mode(struct kvm_vcpu *vcpu,
-> > > >         if (likely(!evaluate_pending_interrupts) && kvm_vcpu_apicv_active(vcpu))
-> > > >                 evaluate_pending_interrupts |= vmx_has_apicv_interrupt(vcpu);
-> > > > 
-> > > > -       if (!(vmcs12->vm_entry_controls & VM_ENTRY_LOAD_DEBUG_CONTROLS))
-> > > > +       if (!vmx->nested.nested_run_pending ||
-> > > > +           !(vmcs12->vm_entry_controls & VM_ENTRY_LOAD_DEBUG_CONTROLS))
-> > > >                 vmx->nested.vmcs01_debugctl = vmcs_read64(GUEST_IA32_DEBUGCTL);
-> > > > -       if (kvm_mpx_supported() &&
-> > > > -               !(vmcs12->vm_entry_controls & VM_ENTRY_LOAD_BNDCFGS))
-> > > > +       if (kvm_mpx_supported() && (!vmx->nested.nested_run_pending ||
-> > > > +           !(vmcs12->vm_entry_controls & VM_ENTRY_LOAD_BNDCFGS)))
-> > > >                 vmx->nested.vmcs01_guest_bndcfgs = vmcs_read64(GUEST_BNDCFGS);
-> > > > 
-> > > >         /*
-> > > > 
-> > > > 
-> > > > Side topic, all of this code is broken for SMM emulation.  SMI+RSM don't do a
-> > > > full VM-Exit -> VM-Entry; the CPU forcefully exits non-root, but most state that
-> > > > is loaded from the VMCS is left untouched.  It's the SMI handler's responsibility
-> > > > to not enable features, e.g. to not set CR4.CET.  For sane use cases, this
-> > > > probably doesn't matter as vmcs12 will be configured to context switch state,
-> > > > but if L1 is doing anything out of the ordinary, SMI+RSM will corrupt state.
-> > > > 
-> > > > E.g. if L1 enables MPX in the guest, does not intercept L2 writes to BNDCFGS,
-> > > > and does not load BNDCFGS on VM-Entry, then SMI+RSM would corrupt BNDCFGS since
-> > > > the SMI "exit" would clear BNDCFGS, and the RSM "entry" would load zero.  This
-> > > > is 100% contrived, and probably doesn't impact real world use cases, but it
-> > > > still bugs me :-)
-> > > 
-> > > Exactly, should it be fixed by separate patch or leave it as is?
-> 
-> Definitely leave it for now, properly fixing the SMI+RSM code goes far beyond
-> basic CET support.
-
-Sure.
-
+I've already broken off the accel.bash change and fixed the arch/run
+problem but this here will have two wait until after my easter vacation
+so don't wait for patches the next ~2 weeks.
