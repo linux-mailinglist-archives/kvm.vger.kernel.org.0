@@ -2,194 +2,179 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 43FE83482FA
-	for <lists+kvm@lfdr.de>; Wed, 24 Mar 2021 21:36:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7A66D348386
+	for <lists+kvm@lfdr.de>; Wed, 24 Mar 2021 22:22:44 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238179AbhCXUfe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 24 Mar 2021 16:35:34 -0400
-Received: from mail-dm3nam07on2065.outbound.protection.outlook.com ([40.107.95.65]:2145
-        "EHLO NAM02-DM3-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S238128AbhCXUf2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 24 Mar 2021 16:35:28 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=AZmhpBCKP9+UZ4X/NQWswXGvtBCvU9I2M1gEgUKzF5Jr+Br/JwIyiIPT6oOv9RzYvIZ/uJpyOJvg/0gxv+a+18rgZocjK3X0CYprkSZpEvGV7GiqwpcOabqK1FaeK8IcT9LpkVHUYNYtMCrY5EgBR1bstvTVq6aruCKCUgBJi+JKIUKyGiUHKHbN90m0XlYWS9x/ge+xPDNAQcuHMoL3Fa867a+GwZddyOmN2heNeWEECFCh3qi7uKbxPXEdMDsdKgV99oNDhOiUpHH1UfM+T6uZJnRVSW5F3dEM5GVKA50b3uERjTMVloVjqQXPwfqwsdULyLPmzr96qECVvAUDcA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=G2wUj88OvbhRalxEeqL0O4smzOrZ3xStGCfjSwzUaek=;
- b=YEp+jtnAdpfT9sKoyYcuKRwp8IX4XUyTPJYZ4ogN4gXSScU1X/ezXWB8ykxPSMtwl8hkRboemGTZte+jZVM7FGWF+HVOlNJ6BRhHsztGL2UphfD+7EQ/8wzW8eh0ZarnspVNe+0JEBjJBgevYOjutZd/awwaH2xtLu2g8Ry3uxIpmqSMsd+wVKQW6RoWUY2TUlV5l0uGEZX7y/ajZZTzIfHS/hAJi85nj38Iw/If300M7jJamXfBhyGTZhylF9FzRZIUp8HU/pXjBSynOXZ+nEBHx8id01EPku0ztJaeMYX99fRlJnJjHJQO78jQatZ8bZDZOyvVJRAX3VJsHVQc2A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=G2wUj88OvbhRalxEeqL0O4smzOrZ3xStGCfjSwzUaek=;
- b=05UqEbEfKKfjJKlEiQgSxo8dbcCtzlIriY2cywRnSpkCWeiUKn3IClnGcqDpnEDy2hXp5A81yLduXpOJblPKV1SnbO4XDc+QAyFT9DOtVfVMvVjQTCTfFaT062PGchZLNaZFCwxIMgdSKvsymUtSErb95B5ElK5YZcyDRDPbjG0=
-Authentication-Results: google.com; dkim=none (message not signed)
- header.d=none;google.com; dmarc=none action=none header.from=amd.com;
-Received: from SN6PR12MB2718.namprd12.prod.outlook.com (2603:10b6:805:6f::22)
- by SN1PR12MB2512.namprd12.prod.outlook.com (2603:10b6:802:31::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3977.25; Wed, 24 Mar
- 2021 20:35:23 +0000
-Received: from SN6PR12MB2718.namprd12.prod.outlook.com
- ([fe80::30fb:2d6c:a0bf:2f1d]) by SN6PR12MB2718.namprd12.prod.outlook.com
- ([fe80::30fb:2d6c:a0bf:2f1d%3]) with mapi id 15.20.3955.027; Wed, 24 Mar 2021
- 20:35:23 +0000
-Cc:     brijesh.singh@amd.com, LKML <linux-kernel@vger.kernel.org>,
-        X86 ML <x86@kernel.org>, kvm list <kvm@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Andi Kleen <ak@linux.intel.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
+        id S238263AbhCXVWN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 24 Mar 2021 17:22:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55060 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S238256AbhCXVVo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 24 Mar 2021 17:21:44 -0400
+Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 52C31C06174A;
+        Wed, 24 Mar 2021 14:21:44 -0700 (PDT)
+Received: from zn.tnic (p200300ec2f0a0800ccd5a0fdd1bb70b4.dip0.t-ipconnect.de [IPv6:2003:ec:2f0a:800:ccd5:a0fd:d1bb:70b4])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 5EADC1EC030E;
+        Wed, 24 Mar 2021 22:21:42 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1616620902;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=T/naVqgYgQ7gTEWYje2ZOptatgEaGVJob9fgoZviZhI=;
+        b=GzdZn4DoJo1AMFpPvW03Z6mJShD4+pDBVxyd122tmECc8+uB/1D7As68VnWiii7Xt4Wyr6
+        g/Ww3b6mpYE5bZ4Uf7o9X4sclyJj7z/shmUcH+NbUUDQTOs5PEKmpcDIIOo8N6skM9zOOA
+        0XAibSIz9kRUem2cKfyErb/R3OewFlM=
+Date:   Wed, 24 Mar 2021 22:21:39 +0100
+From:   Borislav Petkov <bp@alien8.de>
+To:     Babu Moger <babu.moger@amd.com>, Hugh Dickins <hughd@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        kvm list <kvm@vger.kernel.org>, Joerg Roedel <joro@8bytes.org>,
+        the arch/x86 maintainers <x86@kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Ingo Molnar <mingo@redhat.com>,
+        "H . Peter Anvin" <hpa@zytor.com>,
         Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Joerg Roedel <jroedel@suse.de>,
-        "H. Peter Anvin" <hpa@zytor.com>, Tony Luck <tony.luck@intel.com>,
-        Dave Hansen <dave.hansen@intel.com>,
-        "Peter Zijlstra (Intel)" <peterz@infradead.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        David Rientjes <rientjes@google.com>,
+        Makarand Sonare <makarandsonare@google.com>,
         Sean Christopherson <seanjc@google.com>
-Subject: Re: [RFC Part2 PATCH 06/30] x86/fault: dump the RMP entry on #PF
-To:     Andy Lutomirski <luto@amacapital.net>
-References: <20210324170436.31843-1-brijesh.singh@amd.com>
- <20210324170436.31843-7-brijesh.singh@amd.com>
- <CALCETrWH4uPUQHSwgwz5PS8XngJyvjxgWZ85EV5s7VGJX=aa_Q@mail.gmail.com>
-From:   Brijesh Singh <brijesh.singh@amd.com>
-Message-ID: <1802222c-fb6e-3c71-13f0-691b91b83f5d@amd.com>
-Date:   Wed, 24 Mar 2021 15:35:20 -0500
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
- Gecko/20100101 Thunderbird/78.8.1
-In-Reply-To: <CALCETrWH4uPUQHSwgwz5PS8XngJyvjxgWZ85EV5s7VGJX=aa_Q@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-Originating-IP: [70.112.153.56]
-X-ClientProxiedBy: SN4PR0501CA0050.namprd05.prod.outlook.com
- (2603:10b6:803:41::27) To SN6PR12MB2718.namprd12.prod.outlook.com
- (2603:10b6:805:6f::22)
+Subject: Re: [PATCH v6 00/12] SVM cleanup and INVPCID feature support
+Message-ID: <20210324212139.GN5010@zn.tnic>
+References: <78cc2dc7-a2ee-35ac-dd47-8f3f8b62f261@redhat.com>
+ <d7c6211b-05d3-ec3f-111a-f69f09201681@amd.com>
+ <20210311200755.GE5829@zn.tnic>
+ <20210311203206.GF5829@zn.tnic>
+ <2ca37e61-08db-3e47-f2b9-8a7de60757e6@amd.com>
+ <20210311214013.GH5829@zn.tnic>
+ <d3e9e091-0fc8-1e11-ab99-9c8be086f1dc@amd.com>
+ <4a72f780-3797-229e-a938-6dc5b14bec8d@amd.com>
+ <20210311235215.GI5829@zn.tnic>
+ <ed590709-65c8-ca2f-013f-d2c63d5ee0b7@amd.com>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from Brijeshs-MacBook-Pro.local (70.112.153.56) by SN4PR0501CA0050.namprd05.prod.outlook.com (2603:10b6:803:41::27) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3977.10 via Frontend Transport; Wed, 24 Mar 2021 20:35:21 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: 80d430d2-b434-4b6b-e87f-08d8ef045924
-X-MS-TrafficTypeDiagnostic: SN1PR12MB2512:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <SN1PR12MB2512FF4936A0DCEE0967228BE5639@SN1PR12MB2512.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:6108;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: jG+xUl2ohqhzBoJrTSJRcAgmtDS9wgh9LH5UpjeRkF/bvI6OY5ElbmeDmiLn4PPblvzGxC2fKu4CZfo/XSEF+JUZ1muIBjZB+Ynk4FUr0w/fOS6RZJqpW8Msmtdx6MeO5dXY/tloRjtkR2310mIZ+C/xW6ET54ApHkTIjOzq7Jx2ib2eH/t2gguXu8LbMH5AF1w+yRvRFT3fOVswoqztmQEvWecY1VbEYR66cdEmpxDKYCPUb0bq+LvYUKfsv7RdtI7sVArb1K4MxbqV09rl/Z1I7wWUd1tS4HuN0CYkSsGxHM3+XDNkRXPyap6tW6PERctt+KD+i+joN650Q7TfTGHQVYHOfhekEPfUAgff45zKpLenYL8RlfX8p3+AY8REAktj6/kaVheAg2HYVKhWbP4J2tWbTODq3SLeW0hD8+A/S+n5vYz6vAdwhvTJC7bE9JGxmUUtUyoe/DhvOBp9+Uvf8kl7X5hVCXNfPPnWDMHyFzz1S+5oM3T/lzATM+lm1hRPFOIH1PhSqfDXbzLzkj843E/9CYt38HG00XQyaBuQaGs6me9VLSTr7X2CyDlGDnHgIuDpbsZZzrtq0rEOyk4CMaH9Bktne9/V2C12dYbevZR0yqViCxxFVr1euIEeapGgF9Yrv4yErupBi5mmxHf1OxZ3TsBz0A0UWmj9bebH+owLw4vpaerRGzcKhrRE2xLjBqqHJynFXYHlWfbitGlYFf2Y/XBygGFNq1x5OUY=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2718.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(396003)(346002)(136003)(366004)(39860400002)(376002)(66556008)(66476007)(86362001)(31686004)(38100700001)(2616005)(36756003)(956004)(8936002)(8676002)(83380400001)(66946007)(5660300002)(31696002)(53546011)(6506007)(6486002)(4326008)(478600001)(52116002)(2906002)(316002)(16526019)(6916009)(6512007)(26005)(44832011)(54906003)(7416002)(186003)(45980500001)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: =?utf-8?B?N0MwTDB2UFBWMFdhd3NxVEtVVmluMy9wdGZwN2FObDAxcEdWUjluZWJZbVBq?=
- =?utf-8?B?ZFE0L05iaXZ2MVZDQnlaQk5qMWFwVUJPb041RzFrWG8yQzRBU3RvcUpLdnJI?=
- =?utf-8?B?MEsxL3lBWW01UEpralJRK0JKdTI0dThXM3BoMG4zY1J2L3h5WVJGdE1XUXJo?=
- =?utf-8?B?R2xMUmdDWXowMGk5bDRDSDVxZWQ0K1BMZGxDdXVxUVNoZ2J1L2hadW50cGVY?=
- =?utf-8?B?WXVEb2pEMnh2b2lqaDhNZXBaZFhpSlY5S1dybTBGaVJpNkxMRUUyYWtxMDh0?=
- =?utf-8?B?dEJTeitrM2E5bDV2TURQUmtSZERNVmQ3dlhYMTVtTHZncWJMbDZzdXNvREhj?=
- =?utf-8?B?MGJaQ3lkMUxoanVtVTFhdThuS3BqZlBkS01WdHpDL1Q2ZnZQcXpKdjI2ek0v?=
- =?utf-8?B?eWNvdXcrVEY1UDdEN1J6MERydVdrcmlrUkRTLytsOXhwamxWMk9oS0hwaVpO?=
- =?utf-8?B?T0Z4b2RBc1B3Sjg1R3lnWnRkc25EQWwwLzZyaTcvV0VFNW1Od0hVaDVVdURx?=
- =?utf-8?B?YWhBQXBSbGM2NVF6MElJK0JiZWJyWTNyNWpydG5vQitId013T3V0SkhYaXRE?=
- =?utf-8?B?Q3BjaktmOEJJcmRuRzdLdU5mQmp1c256ZE5RejFtd3RCc1NKUXYzb0JubU5s?=
- =?utf-8?B?Y2diVExVM1pqQ00vQjFyd25oVEo4R2VXbnZWdmdpcEh4TTIvNVg1Umo1RkU4?=
- =?utf-8?B?ZkNZakZUTW5yTWdFay9RVlFocXNUbWlHRUM2QTlMa21Oalg5OGRBL3VEVnVX?=
- =?utf-8?B?Y2ZuRVhCVWV0aWJpZkxhQWJtVFROUVRMS1lrU3lCZk12SjRZTzR3YjNuRTFS?=
- =?utf-8?B?OVlUK2lVNTdwbktQZm9OVStlN0NWU0lYTVh2MU1zRGJqVXBzMU1kb0Z5am5x?=
- =?utf-8?B?RmIrZmdZS1FtK0V3cXZ0blBrUzZGSHlXZEdqUURiMDd6VzhLK0xQbDhWazZs?=
- =?utf-8?B?ZWFUcjFUc3dpUWFqRDc4bmhoR2R1d3ovK2ZrUlRONXRVVlV1d0hLOVdseXk3?=
- =?utf-8?B?Und0bjJrWHcrVjFKYS82UExEMFozU0trSEszSFVUMENIdEliUzdRdWJSNk04?=
- =?utf-8?B?a0dJbGhmYW54MnlNNUZ0bW1hR0pVQUs3WEQvWE43b2cwM2MrYzZ3ZzRWa3p4?=
- =?utf-8?B?V0pxNXpSWHN3ZHhnTUlIQjZ2aEhwNFc4VllLNGs5RWVnWjYvUWJZVFZ4cFI3?=
- =?utf-8?B?RW00eWxqZ1ZvaTgzV01DM20xM2NSQVRmRlNrVnJ3N1R3UlB0MmZHdW0wVWhp?=
- =?utf-8?B?ek5FbDdnQ2lMa2xtT25GUWJvVDhGQnV6MDEwam9DYkRJNVluTG1MNGk5YXFU?=
- =?utf-8?B?S0orYjRYZENkQU53RzVIbkxnSUJKd0dYRFQvMEFVTnlDUkEvSUlFNVZCWVZ2?=
- =?utf-8?B?elkvejlId2JGVGw0NjBBNE0yMkZqWC9WazZTMm0xdlpxS1ZuYllpYXdOWFNM?=
- =?utf-8?B?b2VRVCtjZVNpc1dod3RiNzRySWZCbDNlMGY5Wm5QU0pSczVBMVRZN3ZDVUZq?=
- =?utf-8?B?V2RyRW9hWDJ2NGN3VkJGMStINkN4S05EbExXbjhIRlJYd0RTS1J1SXQ1aENi?=
- =?utf-8?B?NEtETkZEOVlPWCtOZG9KZjVLY1B5emlBeEw5Y0VOdWlIcWRaUDRTU2t5QUh5?=
- =?utf-8?B?ZmQ3QVlDUnU3VDRVbzFxcGZxZ2cxS1pJQmdBSU1CR0pIWDZFWklja3BLSEZo?=
- =?utf-8?B?Z2d5OWJBdmcvdktVcXIwTmlYeEJSNkg2UXpwVkdUSzJpTVNmcS9VNit3Ym5L?=
- =?utf-8?Q?VaMXULJe4HeispPr39QAcHYqnd4Lq3YKl0j16qX?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 80d430d2-b434-4b6b-e87f-08d8ef045924
-X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2718.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Mar 2021 20:35:23.1251
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: ccwr/GEcLKOou/U/wN3GjwYuy7/lLNYatEsgOnv5+Ut+/WCIAEFekJyw4qMmDiTo4jtlrYkj4tklqw1iVUEF0w==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN1PR12MB2512
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <ed590709-65c8-ca2f-013f-d2c63d5ee0b7@amd.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Ok,
 
-On 3/24/21 12:47 PM, Andy Lutomirski wrote:
-> On Wed, Mar 24, 2021 at 10:04 AM Brijesh Singh <brijesh.singh@amd.com> wrote:
->> If hardware detects an RMP violation, it will raise a page-fault exception
->> with the RMP bit set. To help the debug, dump the RMP entry of the faulting
->> address.
->>
->> Cc: Thomas Gleixner <tglx@linutronix.de>
->> Cc: Ingo Molnar <mingo@redhat.com>
->> Cc: Borislav Petkov <bp@alien8.de>
->> Cc: Joerg Roedel <jroedel@suse.de>
->> Cc: "H. Peter Anvin" <hpa@zytor.com>
->> Cc: Tony Luck <tony.luck@intel.com>
->> Cc: Dave Hansen <dave.hansen@intel.com>
->> Cc: "Peter Zijlstra (Intel)" <peterz@infradead.org>
->> Cc: Paolo Bonzini <pbonzini@redhat.com>
->> Cc: Tom Lendacky <thomas.lendacky@amd.com>
->> Cc: David Rientjes <rientjes@google.com>
->> Cc: Sean Christopherson <seanjc@google.com>
->> Cc: x86@kernel.org
->> Cc: kvm@vger.kernel.org
->> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
->> ---
->>  arch/x86/mm/fault.c | 75 +++++++++++++++++++++++++++++++++++++++++++++
->>  1 file changed, 75 insertions(+)
->>
->> diff --git a/arch/x86/mm/fault.c b/arch/x86/mm/fault.c
->> index f39b551f89a6..7605e06a6dd9 100644
->> --- a/arch/x86/mm/fault.c
->> +++ b/arch/x86/mm/fault.c
->> @@ -31,6 +31,7 @@
->>  #include <asm/pgtable_areas.h>         /* VMALLOC_START, ...           */
->>  #include <asm/kvm_para.h>              /* kvm_handle_async_pf          */
->>  #include <asm/vdso.h>                  /* fixup_vdso_exception()       */
->> +#include <asm/sev-snp.h>               /* lookup_rmpentry ...          */
->>
->>  #define CREATE_TRACE_POINTS
->>  #include <asm/trace/exceptions.h>
->> @@ -147,6 +148,76 @@ is_prefetch(struct pt_regs *regs, unsigned long error_code, unsigned long addr)
->>  DEFINE_SPINLOCK(pgd_lock);
->>  LIST_HEAD(pgd_list);
->>
->> +static void dump_rmpentry(struct page *page, rmpentry_t *e)
->> +{
->> +       unsigned long paddr = page_to_pfn(page) << PAGE_SHIFT;
->> +
->> +       pr_alert("RMPEntry paddr 0x%lx [assigned=%d immutable=%d pagesize=%d gpa=0x%lx asid=%d "
->> +               "vmsa=%d validated=%d]\n", paddr, rmpentry_assigned(e), rmpentry_immutable(e),
->> +               rmpentry_pagesize(e), rmpentry_gpa(e), rmpentry_asid(e), rmpentry_vmsa(e),
->> +               rmpentry_validated(e));
->> +       pr_alert("RMPEntry paddr 0x%lx %016llx %016llx\n", paddr, e->high, e->low);
->> +}
->> +
->> +static void show_rmpentry(unsigned long address)
->> +{
->> +       struct page *page = virt_to_page(address);
-> This is an error path, and I don't think you have any particular
-> guarantee that virt_to_page(address) is valid.  Please add appropriate
-> validation or use one of the slow lookup helpers.
+some more experimenting Babu and I did lead us to:
 
+---
+diff --git a/arch/x86/include/asm/tlbflush.h b/arch/x86/include/asm/tlbflush.h
+index f5ca15622dc9..259aa4889cad 100644
+--- a/arch/x86/include/asm/tlbflush.h
++++ b/arch/x86/include/asm/tlbflush.h
+@@ -250,6 +250,9 @@ static inline void __native_flush_tlb_single(unsigned long addr)
+ 	 */
+ 	if (kaiser_enabled)
+ 		invpcid_flush_one(X86_CR3_PCID_ASID_USER, addr);
++	else
++		asm volatile("invlpg (%0)" ::"r" (addr) : "memory");
++
+ 	invpcid_flush_one(X86_CR3_PCID_ASID_KERN, addr);
+ }
 
-Noted, thanks for the quick feedback.
+applied on the guest kernel which fixes the issue. And let me add Hugh
+who did that PCID stuff at the time. So lemme summarize for Hugh and to
+ask him nicely to sanity-check me. :-)
+
+Basically, you have an AMD host which supports PCID and INVPCID and you
+boot on it a 4.9 guest. It explodes like the panic below.
+
+What fixes it is this:
+
+diff --git a/arch/x86/include/asm/tlbflush.h b/arch/x86/include/asm/tlbflush.h
+index f5ca15622dc9..259aa4889cad 100644
+--- a/arch/x86/include/asm/tlbflush.h
++++ b/arch/x86/include/asm/tlbflush.h
+@@ -250,6 +250,9 @@ static inline void __native_flush_tlb_single(unsigned long addr)
+ 	 */
+ 	if (kaiser_enabled)
+ 		invpcid_flush_one(X86_CR3_PCID_ASID_USER, addr);
++	else
++		asm volatile("invlpg (%0)" ::"r" (addr) : "memory");
++
+ 	invpcid_flush_one(X86_CR3_PCID_ASID_KERN, addr);
+ }
+
+---
+
+and the reason why it does, IMHO, is because on AMD, kaiser_enabled is
+false because AMD is not affected by Meltdown, which means, there's no
+user/kernel pagetables split.
+
+And that also means, you have global TLB entries which means that if you
+look at that __native_flush_tlb_single() function, it needs to flush
+global TLB entries on CPUs with X86_FEATURE_INVPCID_SINGLE by doing an
+INVLPG in the kaiser_enabled=0 case. Errgo, the above hunk.
+
+But I might be completely off here thus this note...
+
+Thoughts?
+
+Thx.
 
 
+[    1.235726] ------------[ cut here ]------------
+[    1.237515] kernel BUG at /build/linux-dqnRSc/linux-4.9.228/arch/x86/kernel/alternative.c:709!
+[    1.240926] invalid opcode: 0000 [#1] SMP
+[    1.243301] Modules linked in:
+[    1.244585] CPU: 1 PID: 1 Comm: swapper/0 Not tainted 4.9.0-13-amd64 #1 Debian 4.9.228-1
+[    1.247657] Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
+[    1.251249] task: ffff909363e94040 task.stack: ffffa41bc0194000
+[    1.253519] RIP: 0010:[<ffffffff8fa2e40c>]  [<ffffffff8fa2e40c>] text_poke+0x18c/0x240
+[    1.256593] RSP: 0018:ffffa41bc0197d90  EFLAGS: 00010096
+[    1.258657] RAX: 000000000000000f RBX: 0000000001020800 RCX: 00000000feda3203
+[    1.261388] RDX: 00000000178bfbff RSI: 0000000000000000 RDI: ffffffffff57a000
+[    1.264168] RBP: ffffffff8fbd3eca R08: 0000000000000000 R09: 0000000000000003
+[    1.266983] R10: 0000000000000003 R11: 0000000000000112 R12: 0000000000000001
+[    1.269702] R13: ffffa41bc0197dcf R14: 0000000000000286 R15: ffffed1c40407500
+[    1.272572] FS:  0000000000000000(0000) GS:ffff909366300000(0000) knlGS:0000000000000000
+[    1.275791] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[    1.278032] CR2: 0000000000000000 CR3: 0000000010c08000 CR4: 00000000003606f0
+[    1.280815] Stack:
+[    1.281630]  ffffffff8fbd3eca 0000000000000005 ffffa41bc0197e03 ffffffff8fbd3ecb
+[    1.284660]  0000000000000000 0000000000000000 ffffffff8fa2e835 ccffffff8fad4326
+[    1.287729]  1ccd0231874d55d3 ffffffff8fbd3eca ffffa41bc0197e03 ffffffff90203844
+[    1.290852] Call Trace:
+[    1.291782]  [<ffffffff8fbd3eca>] ? swap_entry_free+0x12a/0x300
+[    1.294900]  [<ffffffff8fbd3ecb>] ? swap_entry_free+0x12b/0x300
+[    1.297267]  [<ffffffff8fa2e835>] ? text_poke_bp+0x55/0xe0
+[    1.299473]  [<ffffffff8fbd3eca>] ? swap_entry_free+0x12a/0x300
+[    1.301896]  [<ffffffff8fa2b64c>] ? arch_jump_label_transform+0x9c/0x120
+[    1.304557]  [<ffffffff9073e81f>] ? set_debug_rodata+0xc/0xc
+[    1.306790]  [<ffffffff8fb81d92>] ? __jump_label_update+0x72/0x80
+[    1.309255]  [<ffffffff8fb8206f>] ? static_key_slow_inc+0x8f/0xa0
+[    1.311680]  [<ffffffff8fbd7a57>] ? frontswap_register_ops+0x107/0x1d0
+[    1.314281]  [<ffffffff9077078c>] ? init_zswap+0x282/0x3f6
+[    1.316547]  [<ffffffff9077050a>] ? init_frontswap+0x8c/0x8c
+[    1.318784]  [<ffffffff8fa0223e>] ? do_one_initcall+0x4e/0x180
+[    1.321067]  [<ffffffff9073e81f>] ? set_debug_rodata+0xc/0xc
+[    1.323366]  [<ffffffff9073f08d>] ? kernel_init_freeable+0x16b/0x1ec
+[    1.325873]  [<ffffffff90011d50>] ? rest_init+0x80/0x80
+[    1.327989]  [<ffffffff90011d5a>] ? kernel_init+0xa/0x100
+[    1.330092]  [<ffffffff9001f424>] ? ret_from_fork+0x44/0x70
+[    1.332311] Code: 00 0f a2 4d 85 e4 74 4a 0f b6 45 00 41 38 45 00 75 19 31 c0 83 c0 01 48 63 d0 49 39 d4 76 33 41 0f b6 4c 15 00 38 4c 15 00 74 e9 <0f> 0b 48 89 ef e8 da d6 19 00 48 8d bd 00 10 00 00 48 89 c3 e8 
+[    1.342818] RIP  [<ffffffff8fa2e40c>] text_poke+0x18c/0x240
+[    1.345859]  RSP <ffffa41bc0197d90>
+[    1.347285] ---[ end trace 0a1c5ab5eb16de89 ]---
+[    1.349169] Kernel panic - not syncing: Attempted to kill init! exitcode=0x0000000b
+[    1.349169] 
+[    1.352885] Kernel Offset: 0xea00000 from 0xffffffff81000000 (relocation range: 0xffffffff80000000-0xffffffffbfffffff)
+[    1.357039] ---[ end Kernel panic - not syncing: Attempted to kill init! exitcode=0x0000000b
+[    1.357039] 
+
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
