@@ -2,41 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BCE88347E87
-	for <lists+kvm@lfdr.de>; Wed, 24 Mar 2021 18:05:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1AD30347E8B
+	for <lists+kvm@lfdr.de>; Wed, 24 Mar 2021 18:05:59 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237102AbhCXRFY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 24 Mar 2021 13:05:24 -0400
+        id S237109AbhCXRFZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 24 Mar 2021 13:05:25 -0400
 Received: from mail-bn8nam11on2078.outbound.protection.outlook.com ([40.107.236.78]:50401
         "EHLO NAM11-BN8-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S236969AbhCXREz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 24 Mar 2021 13:04:55 -0400
+        id S236981AbhCXRE4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 24 Mar 2021 13:04:56 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Bthrg5kW6PcX2M/nlcdG4IeDEWaQ1qb7kpdHXIarpaFB5tiwzXsPe81MK6PBUU80M7wXFHEmpigBiqhrm6igXpgKt66khZiaBxmReHg8oeDDt2gGGGQuMFZhuNxXefA7jyQkPIQjDlUdtBX5dY8OMRafphmmw//DSKy+1mR5V5SXTObzaxWSIJhVqjTzOIujB5vDBohVMPOCWs0TPlbktWMzrFgp14o1qf+BJ8Nid8kjeHXSxkPGC3VWDmpZq+IZsZRIFjnpkiW6jLcLPRMYT4jZ7FzxGVnK+Jkx4ZkLeY38UeV7GR4aNxMaX13B8MDKc3jRIC/19Zo9fmFnzkMfsg==
+ b=UFxqFIWasKsJCttmo8Q0mLFvK6kvnft4ZoSYTQRY97nYR6PUin4QWlwS7OyZEHALeZq+JtL/szSiKcRP5Ymyaahi1w/i/8FYDDxUOe4dKqx+fCYYJOxOG0WlzkDQ3WTvGWxl/SHccqhZUw7ImjW4CeCyeyjIMjLZjiLpqWEC+pVd1d8K0RoM5nh4baEPAh/ZP5n25THLCvV/Tdvq60ENOochtKIhGINjbnLCjYTorg8gDPELbg5ohFPm1L2PtTOV4nE0EGctY4lIg02TgNgvC7TT1/2wFw+x2iRXWbNpL5UUJxw+Y32u0VtvIhLHL9F+LGPZMGOYhO6Ch85n/lapdA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=2cDXjFNVFAaRSlS7j6WayXMMTGKYDSSEn4KD++ibe/I=;
- b=nOCyc9b9gZVXOSjSFWC1eWcO2PpKRB9A9g/mTY6JfUBIAs8df9eWzQb9KXOcVdugltZGcUeoKPFK/xZnVPHufoBpyTcOBAfbOk/1OAb9uly/M62YGFgatWRyIKJh/Dvi3wl9+eQ5PBeuJlaMqAIEjH80d4LLZAPojk/cwoPsfUe+aeu7OPLtIKhZz3tOzIxPxFXTur3Rz6IDChqQt3vXgwZEc3wWK8mK73f4fJg5vjt0TakcX2S6iTaWtzdBY3WIVQreJQE+Lf/U6MgKS5+it82S4e4A4oIcl3dyRAY5/HWX8e+DoeU9r5XSi0AsK+93u0NHrekMCdvYU4VGukSkxA==
+ bh=/P8ewgCl43XidADqkdBmkjFX6Sfef4igsqANzNI8R+M=;
+ b=V+WNZf+r5507cj0KOsNpgw8VAY0nUGBbtdoBcj+IvBHXm4yAjfUyz75Ve0Fhjp9Kmv6w6Y+d4rEQGhuQxLHrc4gbuDw+sXwZ58L+3w0tSHET3XQNK7YlJDNM4c06RXveQ05GEPu/FLA8PFcaxStYp4mZ/C8C8jx9s2qUF/fgOz6ce0P8ROIeaA2XkcMJuztmx8YFvSn05xIYpQJHYAYvcW9vS1KYo/nv1J83oTLabB/J9iVwEMreSbm0UQBYn0fk5TNLZMclgRfP7DTboeJZ/ieKsGrN1YQAtMOzyMUMvN9qoNRgyfEeI7pz+VwkPmnqe5IZbtvI6q0qFBgwGloRFw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
  header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=2cDXjFNVFAaRSlS7j6WayXMMTGKYDSSEn4KD++ibe/I=;
- b=pd4P3SzwHC8eTpt7HyPaW41igllN3cB9+pa5GvGklbDO5CUzNmwETJUaKWOjBzt723xfRj6TJw9XbGj6L5RLlF//eUcdO61R7Ymf3bmbz1BNKn6ErK3rh0CEvlViCUlv8mDjoBqvQXvrx9A1uwEfnbQPRSYBJLvi47TEZt/708M=
+ bh=/P8ewgCl43XidADqkdBmkjFX6Sfef4igsqANzNI8R+M=;
+ b=yrR67mFcZZUvmla5flc3pImNu/F491NCm4QDgdy2mbzuseRFemWhxYL7UGlLW4fUdFJmktvSGiTJkFXjocdKo+X62zNMd//K4uFpioAIrWaNUPfU5dWw0X7AhCglX/VqGrGk/CxzAlaObH3nqWDgph4f1TERTSrA8dQJT3C6MhM=
 Authentication-Results: vger.kernel.org; dkim=none (message not signed)
  header.d=none;vger.kernel.org; dmarc=none action=none header.from=amd.com;
 Received: from SN6PR12MB2718.namprd12.prod.outlook.com (2603:10b6:805:6f::22)
  by SA0PR12MB4557.namprd12.prod.outlook.com (2603:10b6:806:9d::10) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3977.24; Wed, 24 Mar
- 2021 17:04:52 +0000
+ 2021 17:04:53 +0000
 Received: from SN6PR12MB2718.namprd12.prod.outlook.com
  ([fe80::30fb:2d6c:a0bf:2f1d]) by SN6PR12MB2718.namprd12.prod.outlook.com
  ([fe80::30fb:2d6c:a0bf:2f1d%3]) with mapi id 15.20.3955.027; Wed, 24 Mar 2021
- 17:04:52 +0000
+ 17:04:53 +0000
 From:   Brijesh Singh <brijesh.singh@amd.com>
 To:     linux-kernel@vger.kernel.org, x86@kernel.org, kvm@vger.kernel.org,
         linux-crypto@vger.kernel.org
@@ -52,9 +52,9 @@ Cc:     ak@linux.intel.com, herbert@gondor.apana.org.au,
         Tom Lendacky <thomas.lendacky@amd.com>,
         David Rientjes <rientjes@google.com>,
         Sean Christopherson <seanjc@google.com>
-Subject: [RFC Part2 PATCH 02/30] x86/sev-snp: add RMP entry lookup helpers
-Date:   Wed, 24 Mar 2021 12:04:08 -0500
-Message-Id: <20210324170436.31843-3-brijesh.singh@amd.com>
+Subject: [RFC Part2 PATCH 03/30] x86: add helper functions for RMPUPDATE and PSMASH instruction
+Date:   Wed, 24 Mar 2021 12:04:09 -0500
+Message-Id: <20210324170436.31843-4-brijesh.singh@amd.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20210324170436.31843-1-brijesh.singh@amd.com>
 References: <20210324170436.31843-1-brijesh.singh@amd.com>
@@ -65,59 +65,63 @@ X-ClientProxiedBy: SA0PR11CA0210.namprd11.prod.outlook.com
  (2603:10b6:805:6f::22)
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from sbrijesh-desktop.amd.com (165.204.77.1) by SA0PR11CA0210.namprd11.prod.outlook.com (2603:10b6:806:1bc::35) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3977.25 via Frontend Transport; Wed, 24 Mar 2021 17:04:51 +0000
+Received: from sbrijesh-desktop.amd.com (165.204.77.1) by SA0PR11CA0210.namprd11.prod.outlook.com (2603:10b6:806:1bc::35) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3977.25 via Frontend Transport; Wed, 24 Mar 2021 17:04:52 +0000
 X-MS-PublicTrafficType: Email
 X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: 95e6e956-b01b-45a3-a6f8-08d8eee6f0cd
+X-MS-Office365-Filtering-Correlation-Id: 2add3e07-d942-4f02-1849-08d8eee6f141
 X-MS-TrafficTypeDiagnostic: SA0PR12MB4557:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <SA0PR12MB455794502291C44A03870C57E5639@SA0PR12MB4557.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:7691;
+X-Microsoft-Antispam-PRVS: <SA0PR12MB4557F160BF6E1A0E16C985B9E5639@SA0PR12MB4557.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:7219;
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: G8ysawRqgCbwERxnaZYWFqsaVSLHpAePAdHpFFyrysTUkWfHj8qUBQ6Uqmoq4kR2NDqOjIthGOKdEFahQF3ib4+lJhLR98Pwho96nF0GSQLfqXvUaeBTYeWP8yQBBjtcKDSwh9O58yjr7miB1pouA0tC5aXAKYiD4Am6a4Z2GiBzcf3fPsTAVytADN3VTSzJd8mbC5NLuTx8cR6YPfM1TMEf6pTwdKWZoQfiARxgeg3z02N5q60DyEuNaJzqfn4OdT0+W8IAR6QpLEn4L0L1XzL7t/YsT5w7IRmSvxuVjRZIqd2THDNTurV4uE9i8MdeR6uibyxST6e7SeKc6iOLYPBJ0g/bMX7yqKbHkrK51so5J313G05qWpArbONGlzHrNqCy8KKe6HhNHz7IBQBmiLktkQZNxI8DWdycHOrM2Q9eWmLDOAhtAfNYcYj1WwxlxBa4CJ9hysviZF/xbiOrJf1dZTJG/wlKb4tOI3J/S7RM1TPsEysa9b2tgcWsvoLXtediiIGKngYHbpsr3qGCk5eZRKOSVSf4ZaPGoODgtf/4RD6vsyEBxTxsGoYOBW+0VsEB/Sb4stKBIpNGXuhkmLC83wWnLVbqH8zpef+lC7Peu+POqwFQD4FOK0y0QEJYcyXtF23+zIE6scCV/jU+LKW8nmmn5Id4KoJprXuabUM=
+X-Microsoft-Antispam-Message-Info: 40RMwpVJISwjVp+jumvTaDBXe3dwkw3H7fZl1b9qMk09vm9L2fzRydhYPFAjdjFolReOke8MUj0eIvXAX639/Inl1SVJRhOZArWvLQ0dokutwIlxMRig8cau6yvRQmfonC8RRtJXfe51RmAOOJi0FrY9A9ADaSU5CsDMsPjigqhTupOuS0u79f8iEnvLwqAgltOzWVex9y8SooAiUQq+OYdOiEm8/uluzVpyVoPmsRGd29ck15aXF30/kcygT0L51zBTEyM+7iuuRh63Poa9fesaZPLKYUO0xdMRYWicqKW+VFmN9bg/VL7j41s6/DMYQfaBuy4LSLZUfe/qcKsC54JYPELkNk7g8gh8JXL/Eo6MODA7k7YXbXghqXNyKIAdVB7DwqqpyGrqY0R69l6oTN4zFsOwmlmavN2ZWWB2ThQ/uJS8OovdbfIxHXZBfOyd/NRiA501Ed0ElQdI8euZfsI1/NZiM124AkQsJcW62fZdEIdb4JNd3pqyCKJ/BSFPBl3t7MoCw6Sbbv8fgMf79l8o82SzyzG+gq+5Koc3qnugbcaP10atGdW6JT8QB8sd/vPh9pyoiEPr9A2LGOa5CZ6TxBOV8FmsEnB94hhjw/yg8Q2ZFT4D6dH0g1MoMTaazBo1HEknVDXnENPJmMIEcfPhk86TI4Io4AlQemxhccQ=
 X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2718.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(376002)(396003)(346002)(136003)(39860400002)(86362001)(54906003)(186003)(44832011)(6666004)(4326008)(38100700001)(26005)(316002)(66476007)(8676002)(16526019)(1076003)(2616005)(83380400001)(5660300002)(6486002)(956004)(52116002)(8936002)(478600001)(7416002)(7696005)(66556008)(36756003)(66946007)(2906002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: =?us-ascii?Q?cxKarHWY07auMEaK0g2kkhLY9xSePl6b9vveS8Ngr2alygTEqLdBNDKJtTVI?=
- =?us-ascii?Q?rT4j40XoH/Ggae9t6Tfki+46kH0hvAlAFuP1Bn9mTQ0THjMExplnViB1VOaX?=
- =?us-ascii?Q?d/awwPYzHz9OtCgV4z9A5qTOC4vyGB7EMJ/2pufzGFoh88Oq++XqF6EYtUpP?=
- =?us-ascii?Q?/8vOIa73m2cl86VArORNOjEq4HuWOirD8WN8niE04HlR11nVgUZXsURJnMfH?=
- =?us-ascii?Q?vVHr+mYgNPmxafiYOSr0Yd5mMaBR9YODXM/uhciyfyoRd7qwaEX6Xvchzv0u?=
- =?us-ascii?Q?lSBGaVghPzlZisFYyhfOjuVqNJMkHP1FkRTQkfDE7FJEGDCWku7UhMwQERoV?=
- =?us-ascii?Q?wyyPNPM/J3EBKtz7le2hf7rgPMVLCUMYEHhnJNHVTIuWy0Bh3qcQdrKZ2EJC?=
- =?us-ascii?Q?7YrePttBQ1VLOeUPBI1VmPTmmSK58ab7z7E/4nHtjk5Oui2a408aXLYyynSI?=
- =?us-ascii?Q?F6yWaSgaGpr88J14QzckXQhj0LIBcJYdcvDkTMHhovKZe9EJ7Byk9aTGf/gn?=
- =?us-ascii?Q?sKCrDHiq1fJR0/9hjVfkV2Kd9fJ17h7DxPWPwfFW08Y2qq8W5aPqCgGsM50p?=
- =?us-ascii?Q?4ds09tN10Njifrkx4ts9Jq8dCE7kdNTQN6Q8zDcQhM2tHYLk+wEqrJaHTy0F?=
- =?us-ascii?Q?4l6LN5efSRXI1Jh0qvDpe/roO7BxOx57EseFodcObpZQjnyTibnhHL/KJJgN?=
- =?us-ascii?Q?0MqT4dAVYGFrOg8h2ASEpnwdlD16wvdhDQojRxzoOVOYtB8d3Q2bwXqB3o4W?=
- =?us-ascii?Q?uLlbLk3mgr740sJ+x2kJYEI3Q+kqVJ99VqI7EnjsMG4DXdJv+3zJcyZKXXAa?=
- =?us-ascii?Q?JLPfT9w99yRTHYUcsmZWPWRa/o1itJ0z+TLvrQKpdQmr/PEwZ1d355RuPOhr?=
- =?us-ascii?Q?8wpDaD+n138/WXNV/LUULVCGYhxIvJEv9BzdGgCb3HHlSFOvbsKXIPq7lesC?=
- =?us-ascii?Q?C7oAtiMEuyk0iilfNeq3u5x9G/2MCTHwC8PAsHo7Ic4bi4rBmD/VP4DVaFym?=
- =?us-ascii?Q?wbQPC1EN6NGlj7yYqQMtSXN5pJTX3DWdxExQcnrLuqprkdIDSFolVYYElkSQ?=
- =?us-ascii?Q?+bfwI11ibjSGzt5JPCkOL8NBFhx2tk8NyEg/A0a5HG5cgr9v2Y7qBg60Uqo4?=
- =?us-ascii?Q?ybWpAvkDcItq05ySBKJUIPvV1hFK4xero4+YhMRzLuM6o7WjqvQDdUn6MGpe?=
- =?us-ascii?Q?KOH3Sj0Fc/PwGke/aaXwZk8WmMyvobfG/a6YMcZjszCoY4weCchx1RgZvAgy?=
- =?us-ascii?Q?Lssbi4RUbrqs6PLAmsjvr5kLU5LBE0rtzPOhwnPSjOmofTL/pM9gakRZm0tn?=
- =?us-ascii?Q?AEFAwnVtpxITHCwtaFFSCqYu?=
+X-MS-Exchange-AntiSpam-MessageData: =?us-ascii?Q?4f6t/NMxyEUcGL8Areu0Fzy0j7UuJzWShBXjYhA2PYL1bGneKh7tGL56GbHb?=
+ =?us-ascii?Q?wR0xciB6Rg1t3OdN89uRcKwcdljS+x+jMIevVGxlnu7RqSjoamyMBR6rvniZ?=
+ =?us-ascii?Q?uAlpxER4A/3RRN+D6t/52ybI82BcSDjTyC/hOYemAH9mfQ/EVfD5yIACibf2?=
+ =?us-ascii?Q?gE7kl55NorKBYwfGyPVDyiZBD7Phapm5dvOFJ3ejs1gFYW6BL3VRPNh2eM48?=
+ =?us-ascii?Q?/R3EQ7y8d9eRpHeDkmHmoOpI2leytP1ioQosw9MwhkhYnIVTHusVnmSplaH+?=
+ =?us-ascii?Q?eq8ftrRIiQxHHNCCobAqUB7FifZoAcbU4+8xj0h9MwPECVA6VXpnB8JneEno?=
+ =?us-ascii?Q?f0PWSgivLu2xhTtHkv2igFc4MCra5kGBLpnfCHFtucR10HeGDpYanMu0OP8z?=
+ =?us-ascii?Q?MTsBacO9AVXw7LocvG+AEhwcVOvNqMt+xpbjGYL1rmKWenYkQ6mCtxBmWgK6?=
+ =?us-ascii?Q?vy17dP5QwPKHhNrdzdHZ16HJr8EEkHrkUJb1tvmoxnCbNzIbqqg2WzXRKAv6?=
+ =?us-ascii?Q?0hgcukaHXQVzDaN519vCI/eYIwk5AXSUnuaKFRbVllzFNrriFyoZzzT1g1bc?=
+ =?us-ascii?Q?+tVEEWsenBbrnZjGBMpz79YZcO82jsaP4bzCYBCQFuZaA4+wQ31pBDsETtU6?=
+ =?us-ascii?Q?APnDxHUZScpWxFyyCZOpKcfsPSpJ4Cb4131219dvmxfx67cTvL+ZvI41FK5O?=
+ =?us-ascii?Q?bfARSHWd5EULeenISPSCcUSNtB0NzlalMGaXVcwxzwPdJ1ctMipY2b7irjIX?=
+ =?us-ascii?Q?eptY9Za3TgX6JjzgZEddiaji17fS9bYL3EQq8uNZHTn3zfq5rBQoh/6wNcWh?=
+ =?us-ascii?Q?sYiZDtTSVZKONDDc53dOaP9k9w+Pi+7elXGmtbppp/w5xA4aaN1mV2GlXM21?=
+ =?us-ascii?Q?ggYCAQITiUwmELUQ3r5C0SGt1RSIz5y92Z4ej0Vpx0n06EY957jGXXbnVxh1?=
+ =?us-ascii?Q?2iP+LID/slAEyEn8BJt/iAIxgcFVpeg++M3W/Dwte/6ED7/L9U8BZ57R9wMT?=
+ =?us-ascii?Q?87zEwen1FYOensovyBWz9GsP/RKBAuO/rZogZuRCK+bCsw82TopGC0iRtYKR?=
+ =?us-ascii?Q?B7wtc7td2/M9/7gsQVFHd+XuqOm+qsJQJYgggNvXpBS5NKb4cAt/HMA9gV6I?=
+ =?us-ascii?Q?aBiw7AeLSC5VWT3k+JF6wSEBELDMWGiW1Y85KDOIRtOsd1xCTJnDSPrXZRUE?=
+ =?us-ascii?Q?xTk5g3p3timpzQ2md9sjp/z8I2cfSUFD/bo0A3Octx/a92VNkZ64TaYyrG6T?=
+ =?us-ascii?Q?6BPvhrCYq6cN261BMH4bUp+LLz2QPBVYu7PWgYhPg3F3IJodWHXpxP+SYDcd?=
+ =?us-ascii?Q?v2KgwiuylFJSUXZuQC7Lw10R?=
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 95e6e956-b01b-45a3-a6f8-08d8eee6f0cd
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2add3e07-d942-4f02-1849-08d8eee6f141
 X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2718.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Mar 2021 17:04:52.4312
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Mar 2021 17:04:53.1788
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 81VWIe+FuX0crAm6RMssgi7CSZvKJXJJ6Y2pkYHL1eylsy8YLo26bmNM7ONk3HMrr+AWZkn/4jT8h+waTAq70A==
+X-MS-Exchange-CrossTenant-UserPrincipalName: geYFke4iVmGLxZVzPKOeqB8z7VAxFjgUrni37C+7V5mm0ZzrlyWgdWI4fihUiM6ndeD2Wlb0s3N3A7ZDJ3F9FQ==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR12MB4557
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The lookup_page_in_rmptable() can be used by the host to read the RMP
-entry for a given page. The RMP entry format is documented in PPR
-section 2.1.5.2.
+The RMPUPDATE instruction writes a new RMP entry in the RMP Table. The
+hypervisor will use the instruction to add pages to the RMP table. See
+APM3 for details on the instruction operations.
+
+The PSMASH instruction expands a 2MB RMP entry into a corresponding set of
+contiguous 4KB-Page RMP entries. The hypervisor will use this instruction
+to adjust the RMP entry without invalidating the previous RMP entry.
 
 Cc: Thomas Gleixner <tglx@linutronix.de>
 Cc: Ingo Molnar <mingo@redhat.com>
@@ -135,113 +139,111 @@ Cc: x86@kernel.org
 Cc: kvm@vger.kernel.org
 Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
 ---
- arch/x86/include/asm/sev-snp.h | 31 +++++++++++++++++++++++++++++++
- arch/x86/mm/mem_encrypt.c      | 32 ++++++++++++++++++++++++++++++++
- 2 files changed, 63 insertions(+)
+ arch/x86/include/asm/sev-snp.h | 27 ++++++++++++++++++++++
+ arch/x86/mm/mem_encrypt.c      | 41 ++++++++++++++++++++++++++++++++++
+ 2 files changed, 68 insertions(+)
 
 diff --git a/arch/x86/include/asm/sev-snp.h b/arch/x86/include/asm/sev-snp.h
-index f7280d5c6158..2aa14b38c5ed 100644
+index 2aa14b38c5ed..199d88a38c76 100644
 --- a/arch/x86/include/asm/sev-snp.h
 +++ b/arch/x86/include/asm/sev-snp.h
-@@ -67,6 +67,35 @@ struct __packed snp_page_state_change {
- #define X86_RMP_PG_LEVEL(level)	(((level) == PG_LEVEL_4K) ? RMP_PG_SIZE_4K : RMP_PG_SIZE_2M)
- #define RMP_X86_PG_LEVEL(level)	(((level) == RMP_PG_SIZE_4K) ? PG_LEVEL_4K : PG_LEVEL_2M)
+@@ -96,6 +96,29 @@ typedef struct rmpentry rmpentry_t;
+ #define rmpentry_gpa(x)		((unsigned long)(x)->info.gpa)
+ #define rmpentry_immutable(x)	((x)->info.immutable)
  
-+/* RMP table entry format (PPR section 2.1.5.2) */
-+struct __packed rmpentry {
-+	union {
-+		struct {
-+			uint64_t assigned:1;
-+			uint64_t pagesize:1;
-+			uint64_t immutable:1;
-+			uint64_t rsvd1:9;
-+			uint64_t gpa:39;
-+			uint64_t asid:10;
-+			uint64_t vmsa:1;
-+			uint64_t validated:1;
-+			uint64_t rsvd2:1;
-+		} info;
-+		uint64_t low;
-+	};
-+	uint64_t high;
-+};
 +
-+typedef struct rmpentry rmpentry_t;
++/* Return code of RMPUPDATE */
++#define RMPUPDATE_SUCCESS		0
++#define RMPUPDATE_FAIL_INPUT		1
++#define RMPUPDATE_FAIL_PERMISSION	2
++#define RMPUPDATE_FAIL_INUSE		3
++#define RMPUPDATE_FAIL_OVERLAP		4
 +
-+#define rmpentry_assigned(x)	((x)->info.assigned)
-+#define rmpentry_pagesize(x)	(RMP_X86_PG_LEVEL((x)->info.pagesize))
-+#define rmpentry_vmsa(x)	((x)->info.vmsa)
-+#define rmpentry_asid(x)	((x)->info.asid)
-+#define rmpentry_validated(x)	((x)->info.validated)
-+#define rmpentry_gpa(x)		((unsigned long)(x)->info.gpa)
-+#define rmpentry_immutable(x)	((x)->info.immutable)
++struct rmpupdate {
++	u64 gpa;
++	u8 assigned;
++	u8 pagesize;
++	u8 immutable;
++	u8 rsvd;
++	u32 asid;
++} __packed;
++
++/* Return code of PSMASH */
++#define PSMASH_FAIL_INPUT		1
++#define PSMASH_FAIL_PERMISSION		2
++#define PSMASH_FAIL_INUSE		3
++#define PSMASH_FAIL_BADADDR		4
 +
  #ifdef CONFIG_AMD_MEM_ENCRYPT
  #include <linux/jump_label.h>
  
-@@ -94,6 +123,7 @@ void __init early_snp_set_memory_shared(unsigned long vaddr, unsigned long paddr
- 		unsigned int npages);
+@@ -124,6 +147,8 @@ void __init early_snp_set_memory_shared(unsigned long vaddr, unsigned long paddr
  int snp_set_memory_shared(unsigned long vaddr, unsigned int npages);
  int snp_set_memory_private(unsigned long vaddr, unsigned int npages);
-+rmpentry_t *lookup_page_in_rmptable(struct page *page, int *level);
+ rmpentry_t *lookup_page_in_rmptable(struct page *page, int *level);
++int rmptable_psmash(struct page *page);
++int rmptable_rmpupdate(struct page *page, struct rmpupdate *e);
  
  extern struct static_key_false snp_enable_key;
  static inline bool snp_key_active(void)
-@@ -124,6 +154,7 @@ early_snp_set_memory_shared(unsigned long vaddr, unsigned long paddr, unsigned i
- static inline int snp_set_memory_shared(unsigned long vaddr, unsigned int npages) { return 0; }
+@@ -155,6 +180,8 @@ static inline int snp_set_memory_shared(unsigned long vaddr, unsigned int npages
  static inline int snp_set_memory_private(unsigned long vaddr, unsigned int npages) { return 0; }
  static inline bool snp_key_active(void) { return false; }
-+static inline rpmentry_t *lookup_page_in_rmptable(struct page *page, int *level) { return NULL; }
+ static inline rpmentry_t *lookup_page_in_rmptable(struct page *page, int *level) { return NULL; }
++static inline int rmptable_psmash(struct page *page) { return -ENXIO; }
++static inline int rmptable_rmpupdate(struct page *page, struct rmpupdate *e) { return -ENXIO; }
  
  #endif /* CONFIG_AMD_MEM_ENCRYPT */
  
 diff --git a/arch/x86/mm/mem_encrypt.c b/arch/x86/mm/mem_encrypt.c
-index 39461b9cb34e..06394b6d56b2 100644
+index 06394b6d56b2..7a0138cb3e17 100644
 --- a/arch/x86/mm/mem_encrypt.c
 +++ b/arch/x86/mm/mem_encrypt.c
-@@ -34,6 +34,8 @@
- 
- #include "mm_internal.h"
- 
-+#define rmptable_page_offset(x)	(0x4000 + (((unsigned long) x) >> 8))
+@@ -644,3 +644,44 @@ rmpentry_t *lookup_page_in_rmptable(struct page *page, int *level)
+ 	return entry;
+ }
+ EXPORT_SYMBOL_GPL(lookup_page_in_rmptable);
 +
- /*
-  * Since SME related variables are set early in the boot process they must
-  * reside in the .data section so as not to be zeroed out when the .bss
-@@ -612,3 +614,33 @@ static int __init mem_encrypt_snp_init(void)
-  * SEV-SNP must be enabled across all CPUs, so make the initialization as a late initcall.
-  */
- late_initcall(mem_encrypt_snp_init);
-+
-+rmpentry_t *lookup_page_in_rmptable(struct page *page, int *level)
++int rmptable_psmash(struct page *page)
 +{
-+	unsigned long phys = page_to_pfn(page) << PAGE_SHIFT;
-+	rmpentry_t *entry, *large_entry;
-+	unsigned long vaddr;
++	unsigned long spa = page_to_pfn(page) << PAGE_SHIFT;
++	int ret;
 +
 +	if (!static_branch_unlikely(&snp_enable_key))
-+		return NULL;
++		return -ENXIO;
 +
-+	vaddr = rmptable_start + rmptable_page_offset(phys);
-+	if (WARN_ON(vaddr > rmptable_end))
-+		return NULL;
++	/* Retry if another processor is modifying the RMP entry. */
++	do {
++		asm volatile(".byte 0xF3, 0x0F, 0x01, 0xFF"
++			      : "=a"(ret)
++			      : "a"(spa)
++			      : "memory", "cc");
++	} while (ret == PSMASH_FAIL_INUSE);
 +
-+	entry = (rmpentry_t *)vaddr;
-+
-+	/*
-+	 * Check if this page is covered by the large RMP entry. This is needed to get
-+	 * the page level used in the RMP entry.
-+	 *
-+	 * e.g. if the page is covered by the large RMP entry then page size is set in the
-+	 *       base RMP entry.
-+	 */
-+	vaddr = rmptable_start + rmptable_page_offset(phys & PMD_MASK);
-+	large_entry = (rmpentry_t *)vaddr;
-+	*level = rmpentry_pagesize(large_entry);
-+
-+	return entry;
++	return ret;
 +}
-+EXPORT_SYMBOL_GPL(lookup_page_in_rmptable);
++EXPORT_SYMBOL_GPL(rmptable_psmash);
++
++int rmptable_rmpupdate(struct page *page, struct rmpupdate *val)
++{
++	unsigned long spa = page_to_pfn(page) << PAGE_SHIFT;
++	bool flush = true;
++	int ret;
++
++	if (!static_branch_unlikely(&snp_enable_key))
++		return -ENXIO;
++
++	/* Retry if another processor is modifying the RMP entry. */
++	do {
++		asm volatile(".byte 0xF2, 0x0F, 0x01, 0xFE"
++			     : "=a"(ret)
++			     : "a"(spa), "c"((unsigned long)val), "d"(flush)
++			     : "memory", "cc");
++	} while (ret == PSMASH_FAIL_INUSE);
++
++	return ret;
++}
++EXPORT_SYMBOL_GPL(rmptable_rmpupdate);
 -- 
 2.17.1
 
