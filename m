@@ -2,90 +2,93 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DEF99347408
-	for <lists+kvm@lfdr.de>; Wed, 24 Mar 2021 09:57:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5A00A347495
+	for <lists+kvm@lfdr.de>; Wed, 24 Mar 2021 10:28:08 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234055AbhCXI5T (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 24 Mar 2021 04:57:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34058 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234427AbhCXI5L (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 24 Mar 2021 04:57:11 -0400
-Received: from mail-ej1-x62a.google.com (mail-ej1-x62a.google.com [IPv6:2a00:1450:4864:20::62a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A75BEC0613DF
-        for <kvm@vger.kernel.org>; Wed, 24 Mar 2021 01:57:10 -0700 (PDT)
-Received: by mail-ej1-x62a.google.com with SMTP id kt15so22065914ejb.12
-        for <kvm@vger.kernel.org>; Wed, 24 Mar 2021 01:57:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance-com.20150623.gappssmtp.com; s=20150623;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=bGrFoUWO78DHinCnOm8Cd58bA9eS8nD5CEjgHc47CWU=;
-        b=xkodvHDrCcm1mswly1za4QGf6ZYnOgQE5f2au/oESMx8I5h2ptJirNaU0N1uFCDLxE
-         e0BNzu7HuM/ULiCLPYp76cMv3qtgpd3RgyVcP6sABo8hVer4WQHhq7spzcrjK6etWmI+
-         KqPmMymhqALvhT5mQgHHVySBkZ8GCjT9yMsA6PsPIGc4csqsTNrPEEvItlctaD1of15B
-         k0NeSlSpm2mAUYeoie9NR1PAK0wxuuLaK7bzAW3WrpXPfvpaHm1Eg7+JDDxseYG6hjVh
-         4jL3ifJ2S3VxMTJIS4uem4cC9e7gaOiVGYtsFCCtnukKZlol9aIAnE6nsYIjG/sfjgxM
-         lc7Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=bGrFoUWO78DHinCnOm8Cd58bA9eS8nD5CEjgHc47CWU=;
-        b=cLxEcUvaS+KWk60i44jSfArg72/VKPzvBmUpC7/INosj/q1PD6//i0qvTk6NBSizoA
-         bAciC1RvSv+AiYHPTF4qPQTPk2SlMQamRXQLHIc5Hn/n4pQbdS2CgcdoGTiPDpq4ulXd
-         8WUkTCha9G3TOr6mmPUvnmSRg8y4LcbDjJgp/NdJga4P2huSO3dft7Ss914uc77GSkag
-         /QWxhs6ZxuTgPj35DatAjCHQkvNLB0UOsO0fdEpGVj1BlsH43OooI1f6FX4BPTRvPjek
-         K17jnTvzPtp2iKdIg+cAF0ho8IdfirPAT9DFXNPkMBmwvRnaOJLcyCwCt+XuuEuFsTCr
-         W/yg==
-X-Gm-Message-State: AOAM531qOqzTKTrFp6WMAf+r/E7tqFLoT+zpXMUab5vFkR4fkduqL8oH
-        DhEc2KmIX7F5pu9/jXetcDQqBn8ro8c7RyLMo/lm
-X-Google-Smtp-Source: ABdhPJy1amFIC8PhAf53lebi6UrN3nLJlRvNr8nkHWtZ1LH1vCCA+ReclSL3bXScIhTgASF5pFEXwnHMDawdZcwejYQ=
-X-Received: by 2002:a17:907:a042:: with SMTP id gz2mr2474707ejc.174.1616576229395;
- Wed, 24 Mar 2021 01:57:09 -0700 (PDT)
+        id S234679AbhCXJ1e (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 24 Mar 2021 05:27:34 -0400
+Received: from mail.kernel.org ([198.145.29.99]:56916 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S231853AbhCXJ1J (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 24 Mar 2021 05:27:09 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 0B160619FF;
+        Wed, 24 Mar 2021 09:27:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1616578028;
+        bh=oxpG75srpKd55D9h43W41NZwTiHebk84Xt19Ctgl830=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=JbgVoipKJU0xRW4XXHjnjo7O8b5hHW6iIB1drH2Oq4v+vIglgOwdXnYeQxoGarPCC
+         yV7jDrBR1YWwjzExlBUxIJiWhSWW2qeZuSwp9lvPJ3dq82HjdfvzLIzt/hO0R4iyrY
+         jVnB1s5PiptLVRKxu4L0LLsIpcTG40eIS6ea6dEdIAWnYJq1k8J7SvdIg5aScQFqus
+         a52MB1wc/7/GT+IXnknPjwBMAJtPe6hrk/TwAC/r2COHEoqonoB53EGJh4XjCU12Kx
+         HCANn6KgiyAk+UsCiaJKmlUZsR/EzN0H3BT3Q1hLUjBHz9whSdm6pA4Y+Xa49mJ5v6
+         FNd3IsH94eZHg==
+Date:   Wed, 24 Mar 2021 11:26:37 +0200
+From:   Jarkko Sakkinen <jarkko@kernel.org>
+To:     Borislav Petkov <bp@alien8.de>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Kai Huang <kai.huang@intel.com>, kvm@vger.kernel.org,
+        x86@kernel.org, linux-sgx@vger.kernel.org,
+        linux-kernel@vger.kernel.org, luto@kernel.org,
+        dave.hansen@intel.com, rick.p.edgecombe@intel.com,
+        haitao.huang@intel.com, pbonzini@redhat.com, tglx@linutronix.de,
+        mingo@redhat.com, hpa@zytor.com
+Subject: Re: [PATCH v3 03/25] x86/sgx: Wipe out EREMOVE from
+ sgx_free_epc_page()
+Message-ID: <YFsFzV58w/UdjP/P@kernel.org>
+References: <20210322181646.GG6481@zn.tnic>
+ <YFjoZQwB7e3oQW8l@google.com>
+ <20210322191540.GH6481@zn.tnic>
+ <YFjx3vixDURClgcb@google.com>
+ <20210322210645.GI6481@zn.tnic>
+ <20210323110643.f29e214ebe8ec7a4a3d0bc2e@intel.com>
+ <20210322223726.GJ6481@zn.tnic>
+ <20210323121643.e06403a1bc7819bab7c15d95@intel.com>
+ <YFoNCvBYS2lIYjjc@google.com>
+ <20210323160604.GB4729@zn.tnic>
 MIME-Version: 1.0
-References: <20210315053721.189-1-xieyongji@bytedance.com> <20210315053721.189-11-xieyongji@bytedance.com>
- <9a2835b1-1f0e-5646-6c77-524e6ccdc613@redhat.com>
-In-Reply-To: <9a2835b1-1f0e-5646-6c77-524e6ccdc613@redhat.com>
-From:   Yongji Xie <xieyongji@bytedance.com>
-Date:   Wed, 24 Mar 2021 16:56:58 +0800
-Message-ID: <CACycT3uosBGNwTEaW7h8GdDvHjoXWR1Se_kszQJ5Vubjp5C8MA@mail.gmail.com>
-Subject: Re: Re: [PATCH v5 10/11] vduse: Add config interrupt support
-To:     Jason Wang <jasowang@redhat.com>
-Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        Parav Pandit <parav@nvidia.com>, Bob Liu <bob.liu@oracle.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Matthew Wilcox <willy@infradead.org>, viro@zeniv.linux.org.uk,
-        Jens Axboe <axboe@kernel.dk>, bcrl@kvack.org,
-        Jonathan Corbet <corbet@lwn.net>,
-        =?UTF-8?Q?Mika_Penttil=C3=A4?= <mika.penttila@nextfour.com>,
-        Dan Carpenter <dan.carpenter@oracle.com>,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        kvm@vger.kernel.org, linux-fsdevel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210323160604.GB4729@zn.tnic>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Mar 24, 2021 at 12:45 PM Jason Wang <jasowang@redhat.com> wrote:
->
->
-> =E5=9C=A8 2021/3/15 =E4=B8=8B=E5=8D=881:37, Xie Yongji =E5=86=99=E9=81=93=
-:
-> > This patch introduces a new ioctl VDUSE_INJECT_CONFIG_IRQ
-> > to support injecting config interrupt.
-> >
-> > Signed-off-by: Xie Yongji <xieyongji@bytedance.com>
->
->
-> I suggest to squash this into path 9.
->
+On Tue, Mar 23, 2021 at 05:06:04PM +0100, Borislav Petkov wrote:
+> On Tue, Mar 23, 2021 at 03:45:14PM +0000, Sean Christopherson wrote:
+> > Practically speaking, "basic" deployments of SGX VMs will be insulated from
+> > this bug.  KVM doesn't support EPC oversubscription, so even if all EPC is
+> > exhausted, new VMs will fail to launch, but existing VMs will continue to chug
+> > along with no ill effects....
+> 
+> Ok, so it sounds to me like *at* *least* there should be some writeup in
+> Documentation/ explaining to the user what to do when she sees such an
+> EREMOVE failure, perhaps the gist of this thread and then possibly the
+> error message should point to that doc.
+> 
+> We will of course have to revisit when this hits the wild and people
+> start (or not) hitting this. But judging by past experience, if it is
+> there, we will hit it. Murphy says so.
+> 
+> Thx.
 
-Will do it in v6.
+We had recently a steady flush of bug reports about a WARN() in tpm_tis
+driver, from all levels of involvement with the kernel. Even people who
+don't know what kernel documentation is, got their message through.
 
-Thanks,
-Yongji
+When a WARN() triggers anywhere in the kernel, what people tend to do is
+that they go to the distro bugzilla, and the issue is quickly escalated
+to the corresponding maintainer.
+
+So, what is the part missing from the equation that should be documented
+to the kernel documentation. This not a counter argument per se, I just
+don't fully understand what is the missing piece that should be put there.
+
+> -- 
+> Regards/Gruss,
+>     Boris.
+> 
+> https://people.kernel.org/tglx/notes-about-netiquette
+> 
+
+/Jarkko
