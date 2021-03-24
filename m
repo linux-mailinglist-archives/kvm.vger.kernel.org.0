@@ -2,41 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8AD9A347EC8
-	for <lists+kvm@lfdr.de>; Wed, 24 Mar 2021 18:08:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CCA7A347EC7
+	for <lists+kvm@lfdr.de>; Wed, 24 Mar 2021 18:07:59 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237428AbhCXRGQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 24 Mar 2021 13:06:16 -0400
+        id S237406AbhCXRGN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 24 Mar 2021 13:06:13 -0400
 Received: from mail-dm6nam11on2061.outbound.protection.outlook.com ([40.107.223.61]:33120
         "EHLO NAM11-DM6-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S236994AbhCXRFQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 24 Mar 2021 13:05:16 -0400
+        id S237068AbhCXRFR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 24 Mar 2021 13:05:17 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=IkF7WI7yuPd6YC5dkwvcziaEnnRlpbf5Or+wtjY3aPJ/hRUJk2Vn6ihufnrAUfkuPXM7EBOvVTP3m5SZO4YglzU/tHPxWojpd32dny8CuIHivOeLNwhsYbbLsaPl7OyCfZG+Uqc9eqXPReksUrBXWphysbP0wdDNIsAWCnEKguZcyDBKRS9lVa1IpPXDA1LjDJVzh/MaJIPr5ZlRxaih9JwhOVK1PLqTGO9iZTaTioaGbvC9c0ifSzoAEfmE9Qc264sfHRf4a7EcLP4MM1ar++xA6ZJ93AZmecYT1xlcMm8UNwSewI1Cdc/R/AFAEWAnKJse79T0OJEoZoS+8jM4Ag==
+ b=YpITB7/XgkT4CAoQKdTX+erCps0VhunE+vgipuTpDp23m3JRk53fAN8k1WpPzhRRtvKR3RLA+aN4VS+Lte/s/6gGpnwVUcLq/pIq+KGxpMzgPZWG9po0TuioKD7rHJWlYSpBHsl2AeO3bYgLU+H5lGpNe1TW/lJxtfiApPCCt8GnTrqkmnEAQrgxrwyY8wOFH9IT/b+COapbR92wM9/lqHAj2C1Ujaf4qkHpf6kSVFOYyGVheMSv/LpfS14vKXk26nl0tu7v3m8Bfi37Mrf8ZTM+pIXJwDWS2htmTF9uXoQ80UeHlcjV5t+g145MLX4vsSkjxoNYKXZpWQUXjJ0EXQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=hIECAcruEgVnm28ZA47pi51qvtvUNQB6wUDCQ0LIx6U=;
- b=oXNjH9j2jPCZDLRfeU6Gx/zs2MoCmxgYFsuBkVgV+buyZfP/r0pdJaI1nRmfJYmjwpvtdTQFnboNe1isHXfRf2wV6wee47rKp6//tuCeDPWRBNQJOauQ/B+D+HwXCWUu3/caOIb6bqbIJ+Z7QCvmMPWxi1K1BTDxo0ZWjqgmK3OTCv1dctEumKK38g1DiZ5vzlmzt3R+1o+jiieMjQReEk33YupTBSVf5Iqno6xvJ/+Zr9S3RUUQBVqh8IyR2Be9X9KTZVEJnUFQja0uEmBRHUz3L8hPc2tgV4otKJ4HfaNWrdcX4F9vEthYvWYg/FwA06iEYyEtjCOJsiVAyQUSaA==
+ bh=U6Oqw9HC1lruIFm7FhqWvtud3iXExTAuuTQZCcScbxs=;
+ b=eO1OSSHx3Qq6/XuZ1y4pB7oA5e/RIM1AZyjF+o3jJCMskC0RG3RFiQNQtiWeHyFrJskFToFgFIi/Pbgi9V+0ENAyy03NklE/KysFBNpArM5TN0M6U9qdeua0duSLLQL0FN7p9cv3ZWSfYjREnpwql2oOdXVymcrKZ7jvNp5Is5WxyAW5/KjVy1CSYQ35tlZGAgcXK/e3QwuhfOwmgzRMAedQ0xZQNqK6agTppK/6LGxKfgN0I+XI7lZ3uy7k2P8ZSgBeZhWumOZ+epRZCLPYptDTZHTgaJDBQVKtBxBisKzL3wzJSg/BcVeKSfGEgJhC499kq89Og8ivNdqebLUDWw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
  header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=hIECAcruEgVnm28ZA47pi51qvtvUNQB6wUDCQ0LIx6U=;
- b=DSU6d1JXVOydq9s+nGn78/sFt5h2fENvphwx748LkATHKjTfIEd+2RlDVRfXuRNPnXcVMnb9jglO8+I1ljbM4VhxKmY2iSAT5D6AhONXyqeF38xelbJgqEsdFhur1/o5dd5oAOhw27Paj7efLmbEXL/4uTvft2p7GwOMFBUdnt0=
+ bh=U6Oqw9HC1lruIFm7FhqWvtud3iXExTAuuTQZCcScbxs=;
+ b=4sX5dnM6spWD6zExsbJ6h7pYlgXakCLL2QMfyRc5qaF4JdJqazYmMqbfTkSKWIjM8AztfwY5iYo+SSPVAQ9QbmNOLD53xtHBGTWPnLdVmi5YRIYeColOQXbUlZ3qdPHC6F02xbRMvafdIDQgDEFa8OBiUZrXYQtq1BAgLhT/R3k=
 Authentication-Results: vger.kernel.org; dkim=none (message not signed)
  header.d=none;vger.kernel.org; dmarc=none action=none header.from=amd.com;
 Received: from SN6PR12MB2718.namprd12.prod.outlook.com (2603:10b6:805:6f::22)
  by SA0PR12MB4382.namprd12.prod.outlook.com (2603:10b6:806:9a::14) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3977.25; Wed, 24 Mar
- 2021 17:05:14 +0000
+ 2021 17:05:15 +0000
 Received: from SN6PR12MB2718.namprd12.prod.outlook.com
  ([fe80::30fb:2d6c:a0bf:2f1d]) by SN6PR12MB2718.namprd12.prod.outlook.com
  ([fe80::30fb:2d6c:a0bf:2f1d%3]) with mapi id 15.20.3955.027; Wed, 24 Mar 2021
- 17:05:14 +0000
+ 17:05:15 +0000
 From:   Brijesh Singh <brijesh.singh@amd.com>
 To:     linux-kernel@vger.kernel.org, x86@kernel.org, kvm@vger.kernel.org,
         linux-crypto@vger.kernel.org
@@ -55,9 +55,9 @@ Cc:     ak@linux.intel.com, herbert@gondor.apana.org.au,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>
-Subject: [RFC Part2 PATCH 28/30] KVM: SVM: add support to handle Page State Change VMGEXIT
-Date:   Wed, 24 Mar 2021 12:04:34 -0500
-Message-Id: <20210324170436.31843-29-brijesh.singh@amd.com>
+Subject: [RFC Part2 PATCH 29/30] KVM: X86: export the kvm_zap_gfn_range() for the SNP use
+Date:   Wed, 24 Mar 2021 12:04:35 -0500
+Message-Id: <20210324170436.31843-30-brijesh.singh@amd.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20210324170436.31843-1-brijesh.singh@amd.com>
 References: <20210324170436.31843-1-brijesh.singh@amd.com>
@@ -68,59 +68,64 @@ X-ClientProxiedBy: SA0PR11CA0210.namprd11.prod.outlook.com
  (2603:10b6:805:6f::22)
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from sbrijesh-desktop.amd.com (165.204.77.1) by SA0PR11CA0210.namprd11.prod.outlook.com (2603:10b6:806:1bc::35) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3977.25 via Frontend Transport; Wed, 24 Mar 2021 17:05:13 +0000
+Received: from sbrijesh-desktop.amd.com (165.204.77.1) by SA0PR11CA0210.namprd11.prod.outlook.com (2603:10b6:806:1bc::35) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3977.25 via Frontend Transport; Wed, 24 Mar 2021 17:05:14 +0000
 X-MS-PublicTrafficType: Email
 X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: 3c15bc95-e9a0-414d-857a-08d8eee6fde6
+X-MS-Office365-Filtering-Correlation-Id: 0651ad6b-d5c7-45c1-9aa9-08d8eee6fe68
 X-MS-TrafficTypeDiagnostic: SA0PR12MB4382:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <SA0PR12MB438294DB0F241F687CA61B61E5639@SA0PR12MB4382.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:6108;
+X-Microsoft-Antispam-PRVS: <SA0PR12MB4382432698656D1199C66128E5639@SA0PR12MB4382.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:2399;
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: XkFmFRR5W7Fla82uirixMCgEwcEb6eLzhS0L2TH5OZFssAVo8PYJ+Bg/V6y+rHg2r4rPk9w5FOGiKx2UAqBaB5wgDYxLx7tWu//yLAb6WQDKpDAZRdQcalcc4HBcQQgEjNTPAtbhJJSUnPOw5gCW8TAhAR5Sg+3aff+rKGgQe2cUPRTlbqTCohQv6M2PwcVfldYQIvlpHsBwFskFObnrRX82z+BIiFQnrbuq8qGlUMd+N3R+93eqgoRVGMmSURKmafdT6U74MZubKy5XvyfmwZsq2zPor4wQlG6IBaZ3CxojVltobwOwc86sdHb7PEz9YI1QTUiU6ZXlLA8ykDjyPRe/346jDUfEdzjLvGNimcw28LBImiWcNlyxz9udVxNPyXaBYlhTbnftsszBkgUR0e6PP7zy/4ri2BI98Rkzjwi9i8dAs2fL2bwCDnWgTgHntSOs+13l/xXS2YH76ldF1wflpFEQkVv5Hx6+296eh6XHuIcxDRBR6fuLrfUyvlp0a/hW7I6qATqeqaD1qW7KGUyMokbAqerYit1PE0CW7AytGa6qi2GBTmhNuULdsM8euSLP4tl1Tj2DujRZmdjFf5a3MpWKl+4w48pCUJ1pPWSU/FZMMARp9tvCqs6n0/q+zny3Jb7zpEVzN2IaxAZb1g==
+X-Microsoft-Antispam-Message-Info: NncvWd+d40Orx8eYWtneAdMp3yBxlSQG8OB3v/Dgava0CU4GU+pfd9hrnYO7JimHS0zMjHCQfqZVj2u9lTAoDIz/BKkhRFhSA1SbWN/wVBDKmbcxjQug/s2ZcWq1aBmAcysEu5dFOL5hFKIyHRJSJ5ZoTIJ99/50iHgImnUSh1AWBa8sHBPO3idCIlhqmM0pVwwUtoJZPF7VPZKGXIWulxkbVl2pIlwN4bk6QqPrF/G6lyK9yC2IxErN7UEcZRcNj0HgZTF2TWi+Jfzo2eHVOEBd2iGlKqBCi6jVp0yNzhjRn+C7Kr1o7GcObZJyMTsaeRjCq3TKSGg3gxEgRt0iWojU5kj9OAcO9WJvnSi2zHGYKekFDJf8iRxlLlztNaCaBWlIWhBOrQnusVnuGpLqUwYCRuj/FbFjKbKh/0k0V25YAM5O0S1tIKZW3IzK5lXYSLcmjCnmymogR88znOfgxGUVYlD0+IK5zVAN8Kqyk2bGcXYWrY0Y0MJKjoiiALhvIkpAuI9bPywE5wRz1bDBPlTVgzmzTJTYw9vcvEnpno9BUVCqhspuvpnTrZNTfQDjl63bgCaLirFP/VNel84Hosu3lcFnrbK5V+/jOcYF9qixXlT8dhIBFiJJdDVx94kSDnXoh91BM8FmnnBlHYLXVQ==
 X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2718.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(396003)(136003)(376002)(346002)(366004)(39860400002)(6666004)(44832011)(66946007)(1076003)(66556008)(66476007)(956004)(36756003)(478600001)(2616005)(83380400001)(8676002)(2906002)(8936002)(26005)(86362001)(5660300002)(52116002)(7696005)(38100700001)(4326008)(54906003)(7416002)(16526019)(6486002)(316002)(186003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: =?us-ascii?Q?uSBdoKekaY6UBAXo6/7ILqfX3ajwc+LtLjpedJgYyclCuXZ873NmHYwhCpee?=
- =?us-ascii?Q?W40OQOXRngeaeCA+8JwwGdioyY/IW6qBStiBNmEDTRE/hYK6jvnjXMMCxdob?=
- =?us-ascii?Q?iWwVkcyOuqw1Ve0iR7dKyLwQ9dbX++cTcmw5sAyBocUsCqwGU1Okg2C8gMRs?=
- =?us-ascii?Q?8CYIVL6O5DfksUxVc9E+ZttuihoZqFTbfaTop7vFIndKyqfupGOKYngVuD50?=
- =?us-ascii?Q?tOwgKzX/zNrUR5IzcosGeKiTRxMhEcSskoGWNklf3VoXsmoKwOieCgv8yNio?=
- =?us-ascii?Q?e6at3X4mrcoNU9QACq7o+O+DH2TdJezOcMAEYwSY06xo8N0fKxjnkHdI1D9E?=
- =?us-ascii?Q?gOAkTYaBqlNSEfYwCET6hqx4zq8QJMagtWCgUFY5zQxF3qfgrnFz8IUiel2D?=
- =?us-ascii?Q?gTMaWuON/UYuG2fOPzstp/aKQfI9V8kP7WrRDwx/j6RoePXoNq4qQXmh4AvL?=
- =?us-ascii?Q?GqLXeKnq6/fCHu7mjw6eIBZFOlIeqjTa2n5uA5OpK1G1aZUzdMiVWP1CA4DK?=
- =?us-ascii?Q?wwMp30sTN0uwGT4I6ww/A3d5D3UbCkTZcEMwkr4bBTyODM7Olgw0OOFBeRBY?=
- =?us-ascii?Q?L50VtmGXGmAWJ8V0evX5Am9xP6lY0MtqmKIM8S41rHymqG12npD+z36WSKR0?=
- =?us-ascii?Q?t4KqHIA0CeDQlWOmkDhf4nJbgklJBMooobH0SvYFOknythPeYtaoRJBtPFsW?=
- =?us-ascii?Q?r7KJuA+WQHMh4zo21IygRHKpoGLNe1AmcI9LhmjDB44v/qCcTkP5z7jqezck?=
- =?us-ascii?Q?OuMBpZsMVeLvul55yenasdiYO+q/pvAw30SOHIQdY8mIxgCK2IJVH0mb9+Lq?=
- =?us-ascii?Q?5sP88EmvEkoGPhbQwdpYIFtJJXyYF63W5Easns2/Vp8wNlusi94bUN8POK2l?=
- =?us-ascii?Q?OF7yRgxHp2n+U5ZjWXxRwqcIyvyfbbSk8D6wM483dTYwKveJbFkWsxLCFr8l?=
- =?us-ascii?Q?i2PEFuV4JsZn3RYcuE0WHEbAdflpGFxxY4nUI5jcjy3ner+emLc05g5FLBsH?=
- =?us-ascii?Q?gpiG3lFAQu2sIQhzf3Yh1KqT0oQrHcptQz9TL4D5gfHWFbUP5ETTeM2FnKAC?=
- =?us-ascii?Q?I5zLEowyKRLHpOq+CPwXK6aMuJv3ATHWdchaBrgliuGOsrq+Wqc7hMXpcRbI?=
- =?us-ascii?Q?AND8cJDhhyIpM5v0B9FZF7SxcMSMECq4WuhFWBQjO2oVUL6lWLk0F23nE9zM?=
- =?us-ascii?Q?pZwqlLs9bSs40zIpdUA50nmxzD/zPxssdSdYQRHI/1PDS7q2BKguVihhypTq?=
- =?us-ascii?Q?n04lvPMZ4/wcLpl5uJuwH3EF80tA7HfiECXZQZ4WKUtzPkWWh/Xjd6QpkifF?=
- =?us-ascii?Q?rcfOwGa5c/ztFHCD1ABWdkLu?=
+X-MS-Exchange-AntiSpam-MessageData: =?us-ascii?Q?os+Y8FLO3XADUNNqty1YBQ+GCeC7ZXU7r7jbUxFbkqWJtIRcJe/Qfevqk2hc?=
+ =?us-ascii?Q?ypBuFwG7RATHHtuB2mLou0VviQVxz88mITYHQwRPr2YfjsF2owM3XB/vJhA5?=
+ =?us-ascii?Q?462jUH9xfB5QtxuUeD/ontZbwaaGTW5b55QB0tBXg6Y9yyk7mz+hjnRCM5c3?=
+ =?us-ascii?Q?06QvHpH1IalRcTlnWAs8gozRsxqj85GIFfMNbnNoqiBIXanmE2LJu2A8yh/w?=
+ =?us-ascii?Q?LyM9oIkWBGRKHBdDPTfU0xTDwlDbqyeg80OXr0Gf4B7chaAcJ9/uJKEW9y+g?=
+ =?us-ascii?Q?IqL2uqakUzTOtcr8ZokshGyPRCt/RPMkiJH2KE0FJ6mptB9yIXtck2gaox23?=
+ =?us-ascii?Q?7N1PbVlGvFIEr9YhGFLfrutEoDaMtXOR4XwIXf+M7ATnrKucqIPsK156khZe?=
+ =?us-ascii?Q?Y0uI3p5dxUl+Wag4C3pp/fu2KOurJO9H//ZEVis79nAyrrMkNxbWhdo73RUd?=
+ =?us-ascii?Q?2k0L3iXDg0Pei5B3xkDMsPFpz0q7u89mB8gAjfx/wBUyRdDXqSr49Wn2w4WX?=
+ =?us-ascii?Q?mQdTwmNYpZaPTGhYg9BzyHqz/x+svEZjKuyZJDSNXvY2EZKUERy5zeoF5j5D?=
+ =?us-ascii?Q?6SKwNxLq4Wx5wBwH9GZQmYnKVGLrMxfteQg7N2jzUSo93aYxFK8nuWlQJfAB?=
+ =?us-ascii?Q?4mMBxlSDKQtjHk+F3FKm/jkVar8kNoxPWL6T4MOaWHTSXtVrVGnju04SeixC?=
+ =?us-ascii?Q?Ovz7mybVb2wuL8pQcueI+6m44v5UfePEdbO0H+j6m2sMQiq6YHYlofvaDP4e?=
+ =?us-ascii?Q?FJx5Z9aJchjWq4nwapKwR+bSBMTCsJIPEvEH3ti4vzTEodDQZGrLQ8ywwG4w?=
+ =?us-ascii?Q?/tkHt36qZQS/XGLe0yfeTJn/s8Y3rmdEVMVP0g8wH5wL2orInokn9JujDG3j?=
+ =?us-ascii?Q?a/LmhnslqRZu/tz32I9fIzMRnMHZEuSjmmORsS4LK+eq0Mn4gas9uNtUIkK1?=
+ =?us-ascii?Q?fHlOvcYg65vOsaA1eynPT0KBD232NIo1cAWzbmOMt0Buka0tM5Q4szGUIqh9?=
+ =?us-ascii?Q?CxOaPzAxXi3gNrtPFSYB2gw+X/XtaZ78LWNuvk8WowrzXUdFelBS4LtIxZSD?=
+ =?us-ascii?Q?1KIbXcgQ5frQK2TNvOizXUJfUDG3vxJvy8Qh/4MAnb3bNyfaqfDTXvnqwV9X?=
+ =?us-ascii?Q?xDB+fcRyXCAi1vsWHqayGGSNDOHIatUH2pZUg9xEHwAEhgmwPiIvQkt0mZW4?=
+ =?us-ascii?Q?16HQX+mk3F28ollyq6hNrpg9cNcSmhaCW025WfuLG9D1dU4UFHOEF5WCCJw5?=
+ =?us-ascii?Q?IbqMoH0OKI2Vpbkspcoy3+tM6DrvziRtOiSzZRdQbXKrzq3ogCAOeDDIZX7G?=
+ =?us-ascii?Q?N3kXwqmgDZ9VCeyB5z7+mGZi?=
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3c15bc95-e9a0-414d-857a-08d8eee6fde6
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0651ad6b-d5c7-45c1-9aa9-08d8eee6fe68
 X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2718.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Mar 2021 17:05:14.4006
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Mar 2021 17:05:15.2891
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 7zZMTchPuhDdxy1zh6RwpzQM0mv3J1m7zfuo7GLqAzuN/tViCvHZd7L+PMXWZ0xcCzRxYNvqk4oLbLEN+GuqIQ==
+X-MS-Exchange-CrossTenant-UserPrincipalName: Pkg7MU5mERkMI9RdzSBiUhrkQGdHtou8YHc65vKOkZBd0nBGx9n+O21iDmzEa/nuVFmQ9izJTXPdJ696yPgLOA==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR12MB4382
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-SEV-SNP VMs can ask the hypervisor to change the page state in the RMP
-table to be private or shared using the Page State Change NAE event
-as defined in the GHCB specification section 4.1.6.
+While resolving the RMP page fault, we may run into cases where the page
+level between the RMP entry and TDP does not match and the 2M RMP entry
+must be split into 4K RMP entries. Or a 2M TDP page need to be broken
+into multiple of 4K pages.
+
+To keep the RMP and TDP page level in sync, we will zap the gfn range
+after splitting the pages in the RMP entry. The zap should force the
+TDP to gets rebuilt with the new page level.
 
 Cc: Thomas Gleixner <tglx@linutronix.de>
 Cc: Ingo Molnar <mingo@redhat.com>
@@ -141,115 +146,49 @@ Cc: x86@kernel.org
 Cc: kvm@vger.kernel.org
 Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
 ---
- arch/x86/kvm/svm/sev.c | 58 ++++++++++++++++++++++++++++++++++++++++++
- arch/x86/kvm/svm/svm.h |  4 +++
- 2 files changed, 62 insertions(+)
+ arch/x86/include/asm/kvm_host.h | 2 ++
+ arch/x86/kvm/mmu.h              | 2 --
+ arch/x86/kvm/mmu/mmu.c          | 1 +
+ 3 files changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index 8f046b45c424..35e7a7bbf878 100644
---- a/arch/x86/kvm/svm/sev.c
-+++ b/arch/x86/kvm/svm/sev.c
-@@ -2141,6 +2141,7 @@ static int sev_es_validate_vmgexit(struct vcpu_svm *svm)
- 	case SVM_VMGEXIT_AP_HLT_LOOP:
- 	case SVM_VMGEXIT_AP_JUMP_TABLE:
- 	case SVM_VMGEXIT_UNSUPPORTED_EVENT:
-+	case SVM_VMGEXIT_PAGE_STATE_CHANGE:
- 		break;
- 	default:
- 		goto vmgexit_err;
-@@ -2425,6 +2426,7 @@ static int __snp_handle_page_state_change(struct kvm_vcpu *vcpu, int op, gpa_t g
- 		case SNP_PAGE_STATE_PRIVATE:
- 			rc = snp_make_page_private(vcpu, gpa, pfn, level);
- 			break;
-+		/* TODO: Add USMASH and PSMASH support */
- 		default:
- 			rc = -EINVAL;
- 			break;
-@@ -2445,6 +2447,53 @@ static int __snp_handle_page_state_change(struct kvm_vcpu *vcpu, int op, gpa_t g
- 	return rc;
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 074605408970..5ea584606885 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -1397,6 +1397,8 @@ void kvm_mmu_zap_all(struct kvm *kvm);
+ void kvm_mmu_invalidate_mmio_sptes(struct kvm *kvm, u64 gen);
+ unsigned long kvm_mmu_calculate_default_mmu_pages(struct kvm *kvm);
+ void kvm_mmu_change_mmu_pages(struct kvm *kvm, unsigned long kvm_nr_mmu_pages);
++void kvm_zap_gfn_range(struct kvm *kvm, gfn_t gfn_start, gfn_t gfn_end);
++
+ 
+ int load_pdptrs(struct kvm_vcpu *vcpu, struct kvm_mmu *mmu, unsigned long cr3);
+ bool pdptrs_changed(struct kvm_vcpu *vcpu);
+diff --git a/arch/x86/kvm/mmu.h b/arch/x86/kvm/mmu.h
+index e7c4e55215bf..5f7ebe4afd63 100644
+--- a/arch/x86/kvm/mmu.h
++++ b/arch/x86/kvm/mmu.h
+@@ -223,8 +223,6 @@ static inline u8 permission_fault(struct kvm_vcpu *vcpu, struct kvm_mmu *mmu,
+ 	return -(u32)fault & errcode;
  }
  
-+static unsigned long snp_handle_page_state_change(struct vcpu_svm *svm, struct ghcb *ghcb)
-+{
-+	struct snp_page_state_entry *entry;
-+	struct kvm_vcpu *vcpu = &svm->vcpu;
-+	struct snp_page_state_change *info;
-+	unsigned long rc;
-+	int level, op;
-+	gpa_t gpa;
-+
-+	if (!sev_snp_guest(vcpu->kvm))
-+		return -ENXIO;
-+
-+	if (!setup_vmgexit_scratch(svm, true, sizeof(ghcb->save.sw_scratch))) {
-+		pr_err("vmgexit: scratch area is not setup.\n");
-+		return -EINVAL;
-+	}
-+
-+	info = (struct snp_page_state_change *)svm->ghcb_sa;
-+	entry = &info->entry[info->header.cur_entry];
-+
-+	if ((info->header.cur_entry >= SNP_PAGE_STATE_CHANGE_MAX_ENTRY) ||
-+	    (info->header.end_entry >= SNP_PAGE_STATE_CHANGE_MAX_ENTRY) ||
-+	    (info->header.cur_entry > info->header.end_entry))
-+		return VMGEXIT_PAGE_STATE_INVALID_HEADER;
-+
-+	while (info->header.cur_entry <= info->header.end_entry) {
-+		entry = &info->entry[info->header.cur_entry];
-+		gpa = gfn_to_gpa(entry->gfn);
-+		level = RMP_X86_PG_LEVEL(entry->pagesize);
-+		op = entry->operation;
-+
-+		if (!IS_ALIGNED(gpa, page_level_size(level))) {
-+			rc = VMGEXIT_PAGE_STATE_INVALID_ENTRY;
-+			goto out;
-+		}
-+
-+		rc = __snp_handle_page_state_change(vcpu, op, gpa, level);
-+		if (rc)
-+			goto out;
-+
-+		info->header.cur_entry++;
-+	}
-+
-+out:
-+	return rc;
-+}
-+
- static int sev_handle_vmgexit_msr_protocol(struct vcpu_svm *svm)
- {
- 	struct vmcb_control_area *control = &svm->vmcb->control;
-@@ -2667,6 +2716,15 @@ int sev_handle_vmgexit(struct vcpu_svm *svm)
- 		ret = 1;
- 		break;
- 	}
-+	case SVM_VMGEXIT_PAGE_STATE_CHANGE: {
-+		unsigned long rc;
-+
-+		ret = 1;
-+
-+		rc = snp_handle_page_state_change(svm, ghcb);
-+		ghcb_set_sw_exit_info_2(ghcb, rc);
-+		break;
-+	}
- 	case SVM_VMGEXIT_UNSUPPORTED_EVENT:
- 		vcpu_unimpl(&svm->vcpu,
- 			    "vmgexit: unsupported event - exit_info_1=%#llx, exit_info_2=%#llx\n",
-diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-index 31bc9cc12c44..9fcfceb4d71e 100644
---- a/arch/x86/kvm/svm/svm.h
-+++ b/arch/x86/kvm/svm/svm.h
-@@ -600,6 +600,10 @@ void svm_vcpu_unblocking(struct kvm_vcpu *vcpu);
- #define	GHCB_MSR_PAGE_STATE_CHANGE_RSVD_POS	12
- #define	GHCB_MSR_PAGE_STATE_CHANGE_RSVD_MASK	0xfffff
+-void kvm_zap_gfn_range(struct kvm *kvm, gfn_t gfn_start, gfn_t gfn_end);
+-
+ int kvm_arch_write_log_dirty(struct kvm_vcpu *vcpu);
  
-+#define VMGEXIT_PAGE_STATE_INVALID_HEADER	0x100000001
-+#define VMGEXIT_PAGE_STATE_INVALID_ENTRY	0x100000002
-+#define VMGEXIT_PAGE_STATE_FIRMWARE_ERROR(x)	((x & 0xffffffff) | 0x200000000)
-+
- #define GHCB_MSR_TERM_REQ		0x100
- #define GHCB_MSR_TERM_REASON_SET_POS	12
- #define GHCB_MSR_TERM_REASON_SET_MASK	0xf
+ int kvm_mmu_post_init_vm(struct kvm *kvm);
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index 147f22bda6e7..1e057e046ca4 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -5569,6 +5569,7 @@ void kvm_zap_gfn_range(struct kvm *kvm, gfn_t gfn_start, gfn_t gfn_end)
+ 
+ 	spin_unlock(&kvm->mmu_lock);
+ }
++EXPORT_SYMBOL_GPL(kvm_zap_gfn_range);
+ 
+ static bool slot_rmap_write_protect(struct kvm *kvm,
+ 				    struct kvm_rmap_head *rmap_head)
 -- 
 2.17.1
 
