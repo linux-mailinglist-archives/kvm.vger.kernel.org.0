@@ -2,30 +2,30 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 46A31347E05
-	for <lists+kvm@lfdr.de>; Wed, 24 Mar 2021 17:45:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id F2B10347E0A
+	for <lists+kvm@lfdr.de>; Wed, 24 Mar 2021 17:45:34 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236702AbhCXQpD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 24 Mar 2021 12:45:03 -0400
+        id S236815AbhCXQpH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 24 Mar 2021 12:45:07 -0400
 Received: from mail-dm6nam12on2040.outbound.protection.outlook.com ([40.107.243.40]:48321
         "EHLO NAM12-DM6-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S236553AbhCXQor (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 24 Mar 2021 12:44:47 -0400
+        id S236560AbhCXQot (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 24 Mar 2021 12:44:49 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=VwZQWtJiLVnuY7WJEHkBhvzvSCJobITSD/zDOXjFSFvnVOXAjAM51tUCwVJwrplimPsY6sMjMJiPacMDoYmG3e6nIZA+Fu1k5R3qbf6TalyH+ou7VmkzkBX6YJZgeWsVDG/HveWSgmQGl30YmbiimDqyMlchuWu9eM6O0oVko0V1ERFbAitwcOwLljg6vU1uuh66rwi2HBQ9/ZRv+Yhhf0JeVOE0T/LbuNxpyeRaUUBSL7d1DAW6rs0Z81QoicpBDmqZ0/9wXJv/YEputfV3ZeFeovI/89hgRO8ccneTrkR2+guM8+SRIr7DWkQ3ryroI6x6KlZjue9qDCYapYXeIA==
+ b=fRJzWC+w9xuXWdv+o8spWmM+GBwtmOlh3XLBc24FjfTpZ9XH//jsxNmnvnyAbsdv+hYIwmAd5hB70uTorbx2jT5TxmUy0q/2UaJhuTclC1uSI0JL03uGEXtfHxKhbGndvnlrpyAdQNUMy2HePJqoDgVQyudqMvdfeEAqc6JeiE6IDvL4uLf/eWTDtVsT7dl92htabrCCrcqcs2M1HtHVo8S5TdVELDfWRaMzqyjZIBsukJTJi/7YopoEQ5nmEyNWb3j1xmqTRM09DuNYwm/Ig0nZ/t9SnS7Q10CvqmUab1qBb5u4ECoZudkhgvDg5sZNiDRCxbY2Oa7qZKesKN+gKQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=EnP60fE2gy7y2piz8SX2c7qivOiO3fgPtq1TQh2z2tQ=;
- b=g2j69NX6WpCkZtV50J4+A1EGhzqHj1ePjEvZvqLlQFiaWVUu8lUFVT1R0FOLYX8Po91dfBIzBnlsU9Nm5XyjS+lDV5ksB6B1PE8TPXX29N3wm5PSVA5X89puDp/TJ5CcT4Jn85PZ8944evfuWBBPBoybv74uhXuLvJiCtSm1Rwl7q5qqTsFofBUFltz1hQunM624wjVEUadvQDXEmLXume2uFo8+EiMj+yU84eiKinsV4TzgfmntqHVwZBWWhTsNZl92x+/HIIR5+cepKd8CfY+fGOn4Rnx2S8WaHfEYlfmMa+EPwQ9jq/6PxfFgSjnA3dDguaZ03KHy42RCW4JuWg==
+ bh=Kk7YGh1gNz++rpOVyhPm3IGG/wga63VPTqGGNnLuMXQ=;
+ b=iRd6OAy5F2eldw8jd7UDqwVJCqNZ0K+bWDx2pssAjYk2YiFdyf2qhECH9ITl2zqHJ6ZjFoztFHav34nIMP1l8+AQ9edJ37MGEg/mNVyRz92BuMiJr3zcW1/qtTDc14FMyJHZpfIcoQXt7RXVvgCQpfIP0zQxktAMHrHRWeI4fkZTBS3xSlK/1oP7btvDtB7FeSHwyxWOPITfNSQy1sxpLrtyi6aTx9kMbXrctPhiv/pqcszrH9mt4nepCXSc3dgnWr3V55qy3pxK+2/DzG0MP9ulQIK85RdrB2QgLAJMIkXAf2WDwKvxbVWwjf88t345utOQXm+N+hmI98sC566WwQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
  header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=EnP60fE2gy7y2piz8SX2c7qivOiO3fgPtq1TQh2z2tQ=;
- b=CMlih/hKluY1TEg5sB9qtNtXC2U8p/+2g7Ug/sXa0+tE+miri7n15nM/wQhAgTljfaFaidhSEg5MJd/dI8WE9N7PPHP+K+4ln7xxlIq0JJaIk+4fyG2XMzLt0cBk6M/2RgUtaod/Q3o7/QSM1CI18u79/ElSJ74/exFoofj8jZ4=
+ bh=Kk7YGh1gNz++rpOVyhPm3IGG/wga63VPTqGGNnLuMXQ=;
+ b=sqNodnwtFJQ9ueUlv8TYQZwn/9B8dcuQLbZpNUbadawG9GldtPEyPUKosRkh1PyvD34GqZDVC/fWmSB1AJeLfFGuawqGiK26vrUSRGBG7kpIi4s2vCvO2Q1ZINUOWysNJtKtd1FLqIDxSWs/7Vd7Bj23ejtSm7Wr550hEO/XA5A=
 Authentication-Results: vger.kernel.org; dkim=none (message not signed)
  header.d=none;vger.kernel.org; dmarc=none action=none header.from=amd.com;
 Received: from SN6PR12MB2718.namprd12.prod.outlook.com (2603:10b6:805:6f::22)
@@ -50,9 +50,9 @@ Cc:     ak@linux.intel.com, Brijesh Singh <brijesh.singh@amd.com>,
         Tom Lendacky <thomas.lendacky@amd.com>,
         David Rientjes <rientjes@google.com>,
         Sean Christopherson <seanjc@google.com>
-Subject: [RFC Part1 PATCH 09/13] x86/kernel: add support to validate memory in early enc attribute change
-Date:   Wed, 24 Mar 2021 11:44:20 -0500
-Message-Id: <20210324164424.28124-10-brijesh.singh@amd.com>
+Subject: [RFC Part1 PATCH 10/13] X86: kernel: make the bss.decrypted section shared in RMP table
+Date:   Wed, 24 Mar 2021 11:44:21 -0500
+Message-Id: <20210324164424.28124-11-brijesh.singh@amd.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20210324164424.28124-1-brijesh.singh@amd.com>
 References: <20210324164424.28124-1-brijesh.singh@amd.com>
@@ -63,79 +63,63 @@ X-ClientProxiedBy: SA0PR11CA0010.namprd11.prod.outlook.com
  (2603:10b6:805:6f::22)
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from sbrijesh-desktop.amd.com (165.204.77.1) by SA0PR11CA0010.namprd11.prod.outlook.com (2603:10b6:806:d3::15) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3977.24 via Frontend Transport; Wed, 24 Mar 2021 16:44:44 +0000
+Received: from sbrijesh-desktop.amd.com (165.204.77.1) by SA0PR11CA0010.namprd11.prod.outlook.com (2603:10b6:806:d3::15) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3977.24 via Frontend Transport; Wed, 24 Mar 2021 16:44:45 +0000
 X-MS-PublicTrafficType: Email
 X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: 3ebc63b1-5c3e-4bf4-7415-08d8eee4210d
+X-MS-Office365-Filtering-Correlation-Id: fed62fe7-75a8-436b-37f7-08d8eee4217f
 X-MS-TrafficTypeDiagnostic: SA0PR12MB4446:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <SA0PR12MB44463A752C111B198FCDE584E5639@SA0PR12MB4446.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:3044;
+X-Microsoft-Antispam-PRVS: <SA0PR12MB4446D3D06F760AC15E3213FEE5639@SA0PR12MB4446.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:3276;
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 6VnGAP/Mv6dgzE3cB6R5VnpN6sOOwuU6uHf43OaA3eyrH/wVEL4+geOkn6iu2LyXV/PfdDvuWirXu0fujsPaxdOFLPI0S8pPoggqWJil3oOYthzvuANFxwH83i/HncXRoZwcNvwkrBnAVSiqKGO5Zd0OMCRYdV/4kpmz5FrtbmXImxXngGan/AtNh/CF9iu0pzJeeUANw5GndTWjK1yCob9n/x2bRiMxGYISRC5HSLnenpkUL42bjsMhlJPoNdqybQiT9SIBGnOM+P/DpRiWj1DJJXtBEV7Xnuxrl44Z/M+FgASvGcoqctI6wVNZ8VYDmZikTsKM5ZjiYTxdsyNS/O7qufw7jNQlaL4+zP/3H07N4TGf4SKFMl9f/X/m+qvqfjj4tdXt0XsWnl/hNzrkHvYN5croGiBF93GpJZksoUdhThwF88B+1bPugkGrhRuu0elth6/5ochqroQjrOaVEJudLtsKNojDDmlyhOQu/4wx2MTzC+JakOigKHeIAlBkOu89q0EicBFPUL7fVgxbVgZOg7cZ1DIFw2AlGDuBm86J3buHaNuKNE4iMbZGuo/IcQjvJkzvm7VOHtcAGMzAgQtlhDM0jtLUqBOa1XMoqiT42uQ+3phdlt9MRzgTvz7xIeieRZ+4WeM9JLhSVa7/yADLF50ilGqeM3dBZmfPTGA=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2718.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(39860400002)(346002)(366004)(136003)(396003)(376002)(8676002)(1076003)(4326008)(6666004)(38100700001)(8936002)(956004)(2616005)(5660300002)(186003)(66946007)(86362001)(44832011)(36756003)(15650500001)(7696005)(6486002)(7416002)(478600001)(66476007)(66556008)(52116002)(316002)(83380400001)(16526019)(2906002)(26005)(54906003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: =?us-ascii?Q?wyvjI4tvQrnfcVoBpix7Rp+U3g+24F/n7cm5myU9Yq65t4zEB1bV1CeU/eh8?=
- =?us-ascii?Q?TWBYVIaisaQxiBswmfKwCimRYqNJFBmTm8x/P0HIIl0ZqBY3OHgrHgppsJhR?=
- =?us-ascii?Q?m1yjBSw7mhGpYEYzyctpzkvsgfTAGz8TN7mW1CSbHIapQO1uHKm7QPmAOOyI?=
- =?us-ascii?Q?+pWcJD3akcPqPIyxWfDn7ZEXmvYj5CmriMWo9A9eCjKaKBGAMWGcJM9zW14z?=
- =?us-ascii?Q?iPl7gvNT3Pn4mc5pgpN6B0sbHHeNUyxHBPyfsnrRWONiKAP0epu0q056kHQQ?=
- =?us-ascii?Q?E4J+UbXVLUjG/SRRwIVse8KZ5eEy+LJPSA0+5QTh+JQiT0Qkuv/HjnYnVfPE?=
- =?us-ascii?Q?5moZbL+mypMbCUz1TWY+5gZiSSGylCP4tWvG3hJ4Ima/+LGCZ02h3mQkMAIE?=
- =?us-ascii?Q?JrXgLdwKxO9u1ESnRXJ2DnkQwNjG7n9HFHT2wCNVaEOT5+QId8xB5R00EiUE?=
- =?us-ascii?Q?HYIlLor4ABEkYacAyg/VhyT+/yap3l+WM4qZepzipQyZSDxDhDvSfe92EJNZ?=
- =?us-ascii?Q?AvXBL+/kReJ4zWuNRdPfkdD8pevvvPw72+RwRr3PR9yY2zdMSiSME9bAuHrQ?=
- =?us-ascii?Q?6PDqgfbRx0oTKh/Ng2GlTVkGDSLHClTFaCmrnl0yGJIJjhqygKaKZyeW7vVl?=
- =?us-ascii?Q?+YSqXNTZ4D1S8R0Y/5FE0QIfyjmQrPv6jYHCNxYyP7mnovkIQnEekJGSBNNC?=
- =?us-ascii?Q?84PmEkxLIJSX+IUPevBV1oMyFgDVjEbni3k7May5Cmn+6GvsmAZxGrcxfaML?=
- =?us-ascii?Q?BWgIOVbg25hRH+b8R1dKtZ5XPjPDPKOynwnU2kMAnVDEzbVUERruXk9jGlqQ?=
- =?us-ascii?Q?L+qMlVUkEpvGBb6C3PjaUrVzRyOgUCAku1sNslpk81TK5ZinjEdRxbtWb0tA?=
- =?us-ascii?Q?QZrgpgCBrZLJrnmPtc3OLatQ7eJhe2cfiohPRWloL2YV8BK7+m7JtWwLan1S?=
- =?us-ascii?Q?zUo5mL5w2W2MJE/4bPDMyoUMIFcOfPCYLLifEMfmbOZ2ynjagPYy2Fkfm0cX?=
- =?us-ascii?Q?IjHlTDt0ukKk3WYyM6oUhFTqT3bDLWrpTfXX28rCgV1p1ERXV89fPwW3wJ7e?=
- =?us-ascii?Q?VyLjKrK0WBkwUZSKuc47j3dSIVbqhzAx2iVlIHo1IhuXbUavWTerGCHD/ipi?=
- =?us-ascii?Q?xJQh3QaFSiqPD7K0gei2KasVroZDTXqg22nWK35IWeCSAcwSXTCTN4wVqj9t?=
- =?us-ascii?Q?4vIudSfTeZtmkcwVlWLm4LJ5GxpswjGL8DyJmahl/2XFjdPtmVMX56oWAoPy?=
- =?us-ascii?Q?y06hg0XYzB09OeT5LpSCqMY5HilMwCDKw1Qovlat2WAXGtseRNKrdX9wfU0U?=
- =?us-ascii?Q?KxBmFCz7X9+OBydeYRAClGMb?=
+X-Microsoft-Antispam-Message-Info: SDGUdJP0FfOsps35D1aVeqoanuPUQ+9Xxdurja8LxG0YoaR7bYm9VA58kPGx3rDKoDLeqVnUSwCzE0NP+9b6Wmq6wueUnzNp/sYUZd5ZPwh5+uRxSR6ynKsUk0ENQ/CPQGZYrUwSBjgfPA7NvfCL9FoUfe6OUlTq4zkjTgnSfum2MV9RYrgoU8CQaCcoYd5hDiMmV+aIWdGZyAqWpxCV6WlHwljdNueo+IeXvds1m5cEZjK9EmMINxx7YBxL4x9BG7Xu/2nAcxRuNfV0UJm9b0FKjrFTO/ltX+qHnSeQTYawZjQ86hjRnk2C+y//zDvT73otkxjTJUvIo9xtGh8DKrvLV1VsbUUXbTFYoZuk7fia+2zxPesCVvZPuRWqnQqKsfxusc3/fJW6rAnaY4zedMIUDSMl5hn9+C0fOcxUikczZNMWYOr/K2uMzgrjezHx6rmuKfLv6UfQbexTuMmpZgF0rQvTa7bDcasYH9q44LDpWDL8NebcqMx6yIyyFEouYOyAms88eMlTfPfPzT48V/uGAihaodj27iAUpqnMxJjyNCHwUTFNDD8Zle7CdZYu5JtmPjajWG44unu3xOP8QEZMAdXHUb1KnmH92mATwBGPx9eepnCY2sHvoif2gvRUnD/Jb3mOGjJJdQQZ1Xg48wKStpdN3kcKs+trppnV9xc=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2718.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(39860400002)(346002)(366004)(136003)(396003)(376002)(8676002)(1076003)(4326008)(6666004)(38100700001)(8936002)(956004)(2616005)(5660300002)(186003)(66946007)(86362001)(44832011)(36756003)(7696005)(6486002)(7416002)(478600001)(66476007)(66556008)(52116002)(316002)(16526019)(2906002)(26005)(54906003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData: =?us-ascii?Q?MI4cBYFwRdtsOvBjanKVDcCx4D6fZoA2Op7Lvk8IwWMPS3S24R/bJDHW6Jev?=
+ =?us-ascii?Q?ef3Qk9/H+hbKRlgXUtU1Gvb8p2jUfde/ZaTux3t8vrsT2J7Q42vHWk0dj0Fh?=
+ =?us-ascii?Q?ZJ5sGMvaJB8TTDjgogqg1Yjb/SwCytmbyoC2xWmOw0Dv7QwdPfntpf1d0jef?=
+ =?us-ascii?Q?adG2BaSiaqZIYlow5gMaA4KO/xdp3G6RqTYql798f2BRybnIbw/e2tw1T1nZ?=
+ =?us-ascii?Q?4fcGLtVtmpwlErapanPE9x4nmbXw0tjRsWebB2akIq6qSk8nMfcHR7Y/gcxY?=
+ =?us-ascii?Q?WiE2FbEbrBOp0mKkptCOSGCaxtPIekONPq4kWp2Sg5Qi+oPgH3UwFSJ6AV4n?=
+ =?us-ascii?Q?MMAoxxpbmoH8JmnNEm+5lgUitlF5+DyTPCmBPl5TUfYQa0qukTkrECYW2Ow6?=
+ =?us-ascii?Q?O6BXfBno5LJvCwWO6vy+rj7qbr41j9ZRHjaIyMi06u4SFJLFLdQYe3ZGcFPe?=
+ =?us-ascii?Q?xa+XleRkqmZydKs9SVcywsGwu1LShFFQZyAUXmxf3H+AhbR2Ue8pb8U5SSLF?=
+ =?us-ascii?Q?SZUcEmh13g1Q0wmkFEhbY1tJiTfiaQXo1JqlEzTWzPBOi77oE3Kschq2+6yU?=
+ =?us-ascii?Q?zCbi/BRMKPkdGdWNtjcocH8p5AXO8oXZOW4C7eeYdJ5PdfV8neNu4ICKg65I?=
+ =?us-ascii?Q?N6H2ac+C93kCz5hB2n4XN+HJNwbOufiMAXdJ33YnNHFIjnlBYlgNuQ12o4Zc?=
+ =?us-ascii?Q?1PU3TK64MR5cH389+bSSgXom2dHsvRoDZxTA8q4Q5GFIQWJ/6YdzTKc8ShUB?=
+ =?us-ascii?Q?Pzeupk+d+vm4gC6WMJM2b1Ewq7CVTpZaXjKY8bQQIMdKJt1K5QCUraAE4bYy?=
+ =?us-ascii?Q?wBjXw6AYRb19D7SVut49hYP96UIbOrLRyoieln1B7bwKqdZ11Tqw3vhILsxK?=
+ =?us-ascii?Q?2jlmxiUHyjQPGwwHmEbxS52LuP3mAE3vSbcgiu+1HeU2bfuV8Z6OctXduyJy?=
+ =?us-ascii?Q?QsEqIaLxrHBNmqYlN2P8ym+hdrERFZFBYZ1TWzTTP30vSF0Jd5knpKhjavMW?=
+ =?us-ascii?Q?s7EAywLTcNOA01M5L1i/KfvEubCREqchzlgSjcDBAzXHzraVFRahurYKq74B?=
+ =?us-ascii?Q?KdzGazkRD6ftw4t11t+78If1T8M+65daTY+GTC53+nwL5Ruo/u6gtEVdAiuh?=
+ =?us-ascii?Q?Gv64+2ijlhXXkOvf9l5Xu2j2WlPhCKt9EcuZ+vTiTjzygm/GafqFPMUoqR/T?=
+ =?us-ascii?Q?EzsMP73G5pDIkz1FOr611DMCEjS2p3hQkUDCos4PkcgFe+TFO04L8SF0vLIt?=
+ =?us-ascii?Q?GJmAlkrEobVHrFL/YkIRs8fJJtNZWYubwd0drBXJDJrfZ4q9ineQHnXLSD+s?=
+ =?us-ascii?Q?2bRUsBSeGh7TW9mMyBIFo4an?=
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3ebc63b1-5c3e-4bf4-7415-08d8eee4210d
+X-MS-Exchange-CrossTenant-Network-Message-Id: fed62fe7-75a8-436b-37f7-08d8eee4217f
 X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2718.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Mar 2021 16:44:44.8898
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Mar 2021 16:44:45.6194
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Tjxc9px0Ll1kBGB2oXXc1kBKbTfUD6Pv4POE8b/hiyzwZ654bg7j5eGPq2LDpbmitNq8Dsti/OScJxjfz081gw==
+X-MS-Exchange-CrossTenant-UserPrincipalName: GDyuhT8psoVP1am/plLuJy2KaBgefvLNb+vZXdiLaWlK1xDc7ZwiEj8/jIp0TrLJLewgScltI0felDmKYdvBmg==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR12MB4446
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The early_set_memory_{encrypt,decrypt}() are used for changing the
-page from decrypted (shared) to encrypted (private) and vice versa.
-When SEV-SNP is active, the page state transition needs to go through
-additional steps.
+The encryption attribute for the bss.decrypted region is cleared in the
+initial page table build. This is because the section contains the data
+that need to be shared between the guest and the hypervisor.
 
-If the page is transitioned from shared to private, then perform the
-following after the encryption attribute is set in the page table:
-
-1. Issue the page state change VMGEXIT to add the page as a private
-   in the RMP table.
-2. Validate the page after its successfully added in the RMP table.
-
-To maintain the security guarantees, if the page is transitioned from
-private to shared, then perform the following before clearing the
-encryption attribute from the page table.
-
-1. Invalidate the page.
-2. Issue the page state change VMGEXIT to make the page shared in the
-   RMP table.
-
-The early_set_memory_{encryot,decrypt} can be called before the full GHCB
-is setup, use the SNP page state MSR protocol VMGEXIT defined in the GHCB
-section 2.3.1 to request the page state change in the RMP table.
+When SEV-SNP is active, just clearing the encryption attribute in the
+page table is not enough. We also need to make the page shared in the
+RMP table.
 
 Cc: Thomas Gleixner <tglx@linutronix.de>
 Cc: Ingo Molnar <mingo@redhat.com>
@@ -153,244 +137,41 @@ Cc: x86@kernel.org
 Cc: kvm@vger.kernel.org
 Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
 ---
- arch/x86/include/asm/sev-snp.h |  20 +++++++
- arch/x86/kernel/sev-snp.c      | 105 +++++++++++++++++++++++++++++++++
- arch/x86/mm/mem_encrypt.c      |  40 ++++++++++++-
- 3 files changed, 163 insertions(+), 2 deletions(-)
+ arch/x86/kernel/head64.c | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
 
-diff --git a/arch/x86/include/asm/sev-snp.h b/arch/x86/include/asm/sev-snp.h
-index 0523eb21abd7..c4b096206062 100644
---- a/arch/x86/include/asm/sev-snp.h
-+++ b/arch/x86/include/asm/sev-snp.h
-@@ -63,6 +63,10 @@ struct __packed snp_page_state_change {
- #define GHCB_REGISTER_GPA_RESP	0x013UL
- #define		GHCB_REGISTER_GPA_RESP_VAL(val)		((val) >> 12)
- 
-+/* Macro to convert the x86 page level to the RMP level and vice versa */
-+#define X86_RMP_PG_LEVEL(level)	(((level) == PG_LEVEL_4K) ? RMP_PG_SIZE_4K : RMP_PG_SIZE_2M)
-+#define RMP_X86_PG_LEVEL(level)	(((level) == RMP_PG_SIZE_4K) ? PG_LEVEL_4K : PG_LEVEL_2M)
-+
- #ifdef CONFIG_AMD_MEM_ENCRYPT
- static inline int __pvalidate(unsigned long vaddr, int rmp_psize, int validate,
- 			      unsigned long *rflags)
-@@ -82,6 +86,11 @@ static inline int __pvalidate(unsigned long vaddr, int rmp_psize, int validate,
- 
- void sev_snp_register_ghcb(unsigned long paddr);
- 
-+void __init early_snp_set_memory_private(unsigned long vaddr, unsigned long paddr,
-+		unsigned int npages);
-+void __init early_snp_set_memory_shared(unsigned long vaddr, unsigned long paddr,
-+		unsigned int npages);
-+
- #else	/* !CONFIG_AMD_MEM_ENCRYPT */
- 
- static inline int __pvalidate(unsigned long vaddr, int psize, int validate, unsigned long *eflags)
-@@ -91,6 +100,17 @@ static inline int __pvalidate(unsigned long vaddr, int psize, int validate, unsi
- 
- static inline void sev_snp_register_ghcb(unsigned long paddr) { }
- 
-+static inline void __init
-+early_snp_set_memory_private(unsigned long vaddr, unsigned long paddr, unsigned int npages)
-+{
-+	return 0;
-+}
-+static inline void __init
-+early_snp_set_memory_shared(unsigned long vaddr, unsigned long paddr, unsigned int npages)
-+{
-+	return 0;
-+}
-+
- #endif /* CONFIG_AMD_MEM_ENCRYPT */
- 
- #endif	/* __ASSEMBLY__ */
-diff --git a/arch/x86/kernel/sev-snp.c b/arch/x86/kernel/sev-snp.c
-index d32225c2b653..ff9b35bfb05c 100644
---- a/arch/x86/kernel/sev-snp.c
-+++ b/arch/x86/kernel/sev-snp.c
-@@ -56,3 +56,108 @@ void sev_snp_register_ghcb(unsigned long paddr)
- 	/* Restore the GHCB MSR value */
- 	sev_es_wr_ghcb_msr(old);
- }
-+
-+static void sev_snp_issue_pvalidate(unsigned long vaddr, unsigned int npages, bool validate)
-+{
-+	unsigned long eflags, vaddr_end, vaddr_next;
-+	int rc;
-+
-+	vaddr = vaddr & PAGE_MASK;
-+	vaddr_end = vaddr + (npages << PAGE_SHIFT);
-+
-+	for (; vaddr < vaddr_end; vaddr = vaddr_next) {
-+		rc = __pvalidate(vaddr, RMP_PG_SIZE_4K, validate, &eflags);
-+
-+		if (rc) {
-+			pr_err("Failed to validate address 0x%lx ret %d\n", vaddr, rc);
-+			goto e_fail;
-+		}
-+
-+		/* Check for the double validation condition */
-+		if (eflags & X86_EFLAGS_CF) {
-+			pr_err("Double %salidation detected (address 0x%lx)\n",
-+					validate ? "v" : "inv", vaddr);
-+			goto e_fail;
-+		}
-+
-+		vaddr_next = vaddr + PAGE_SIZE;
-+	}
-+
-+	return;
-+
-+e_fail:
-+	/* Dump stack for the debugging purpose */
-+	dump_stack();
-+
-+	/* Ask to terminate the guest */
-+	sev_es_terminate(GHCB_SEV_ES_REASON_GENERAL_REQUEST);
-+}
-+
-+static void __init early_snp_set_page_state(unsigned long paddr, unsigned int npages, int op)
-+{
-+	unsigned long paddr_end, paddr_next;
-+	u64 old, val;
-+
-+	paddr = paddr & PAGE_MASK;
-+	paddr_end = paddr + (npages << PAGE_SHIFT);
-+
-+	/* save the old GHCB MSR */
-+	old = sev_es_rd_ghcb_msr();
-+
-+	for (; paddr < paddr_end; paddr = paddr_next) {
-+
-+		/*
-+		 * Use the MSR protocol VMGEXIT to request the page state change. We use the MSR
-+		 * protocol VMGEXIT because in early boot we may not have the full GHCB setup
-+		 * yet.
-+		 */
-+		sev_es_wr_ghcb_msr(GHCB_SNP_PAGE_STATE_REQ_GFN(paddr >> PAGE_SHIFT, op));
-+		VMGEXIT();
-+
-+		val = sev_es_rd_ghcb_msr();
-+
-+		/* Read the response, if the page state change failed then terminate the guest. */
-+		if (GHCB_SEV_GHCB_RESP_CODE(val) != GHCB_SNP_PAGE_STATE_CHANGE_RESP)
-+			sev_es_terminate(GHCB_SEV_ES_REASON_GENERAL_REQUEST);
-+
-+		if (GHCB_SNP_PAGE_STATE_RESP_VAL(val) != 0) {
-+			pr_err("Failed to change page state to '%s' paddr 0x%lx error 0x%llx\n",
-+					op == SNP_PAGE_STATE_PRIVATE ? "private" : "shared",
-+					paddr, GHCB_SNP_PAGE_STATE_RESP_VAL(val));
-+
-+			/* Dump stack for the debugging purpose */
-+			dump_stack();
-+
-+			/* Ask to terminate the guest */
-+			sev_es_terminate(GHCB_SEV_ES_REASON_GENERAL_REQUEST);
-+		}
-+
-+		paddr_next = paddr + PAGE_SIZE;
-+	}
-+
-+	/* Restore the GHCB MSR value */
-+	sev_es_wr_ghcb_msr(old);
-+}
-+
-+void __init early_snp_set_memory_private(unsigned long vaddr, unsigned long paddr,
-+					 unsigned int npages)
-+{
-+	 /* Ask hypervisor to add the memory in RMP table as a 'private'. */
-+	early_snp_set_page_state(paddr, npages, SNP_PAGE_STATE_PRIVATE);
-+
-+	/* Validate the memory region after its added in the RMP table. */
-+	sev_snp_issue_pvalidate(vaddr, npages, true);
-+}
-+
-+void __init early_snp_set_memory_shared(unsigned long vaddr, unsigned long paddr,
-+					unsigned int npages)
-+{
-+	/*
-+	 * We are chaning the memory from private to shared, invalidate the memory region
-+	 * before making it shared in the RMP table.
-+	 */
-+	sev_snp_issue_pvalidate(vaddr, npages, false);
-+
-+	 /* Ask hypervisor to make the memory shared in the RMP table. */
-+	early_snp_set_page_state(paddr, npages, SNP_PAGE_STATE_SHARED);
-+}
-diff --git a/arch/x86/mm/mem_encrypt.c b/arch/x86/mm/mem_encrypt.c
-index 5bd50008fc9a..35af2f21b8f1 100644
---- a/arch/x86/mm/mem_encrypt.c
-+++ b/arch/x86/mm/mem_encrypt.c
-@@ -29,6 +29,7 @@
- #include <asm/processor-flags.h>
- #include <asm/msr.h>
- #include <asm/cmdline.h>
+diff --git a/arch/x86/kernel/head64.c b/arch/x86/kernel/head64.c
+index 5e9beb77cafd..1bf005d38ebc 100644
+--- a/arch/x86/kernel/head64.c
++++ b/arch/x86/kernel/head64.c
+@@ -40,6 +40,7 @@
+ #include <asm/extable.h>
+ #include <asm/trapnr.h>
+ #include <asm/sev-es.h>
 +#include <asm/sev-snp.h>
  
- #include "mm_internal.h"
- 
-@@ -49,6 +50,27 @@ bool sev_enabled __section(".data");
- /* Buffer used for early in-place encryption by BSP, no locking needed */
- static char sme_early_buffer[PAGE_SIZE] __initdata __aligned(PAGE_SIZE);
- 
-+/*
-+ * When SNP is active, this routine changes the page state from private to shared before
-+ * copying the data from the source to destination and restore after the copy. This is required
-+ * because the source address is mapped as decrypted by the caller of the routine.
-+ */
-+static inline void __init snp_aware_memcpy(void *dst, void *src, size_t sz,
-+					   unsigned long paddr, bool dec)
-+{
-+	unsigned long npages = PAGE_ALIGN(sz) >> PAGE_SHIFT;
-+
-+	/* If the paddr need to accessed decrypted, make the page shared before memcpy. */
-+	if (sev_snp_active() && dec)
-+		early_snp_set_memory_shared((unsigned long)__va(paddr), paddr, npages);
-+
-+	memcpy(dst, src, sz);
-+
-+	/* Restore the page state after the memcpy. */
-+	if (sev_snp_active() && dec)
-+		early_snp_set_memory_private((unsigned long)__va(paddr), paddr, npages);
-+}
-+
  /*
-  * This routine does not change the underlying encryption setting of the
-  * page(s) that map this memory. It assumes that eventually the memory is
-@@ -97,8 +119,8 @@ static void __init __sme_early_enc_dec(resource_size_t paddr,
- 		 * Use a temporary buffer, of cache-line multiple size, to
- 		 * avoid data corruption as documented in the APM.
- 		 */
--		memcpy(sme_early_buffer, src, len);
--		memcpy(dst, sme_early_buffer, len);
-+		snp_aware_memcpy(sme_early_buffer, src, len, paddr, enc);
-+		snp_aware_memcpy(dst, sme_early_buffer, len, paddr, !enc);
- 
- 		early_memunmap(dst, len);
- 		early_memunmap(src, len);
-@@ -278,9 +300,23 @@ static void __init __set_clr_pte_enc(pte_t *kpte, int level, bool enc)
- 	else
- 		sme_early_decrypt(pa, size);
- 
-+	/*
-+	 * If SEV-SNP is active, rescind validation of the page in the RMP entry before encryption
-+	 * attribute is changed from C=1 to C=0.
-+	 */
-+	if (sev_snp_active() && !enc)
-+		early_snp_set_memory_shared((unsigned long)__va(pa), pa, 1);
+  * Manage page tables very early on.
+@@ -288,6 +289,19 @@ unsigned long __head __startup_64(unsigned long physaddr,
+ 	if (mem_encrypt_active()) {
+ 		vaddr = (unsigned long)__start_bss_decrypted;
+ 		vaddr_end = (unsigned long)__end_bss_decrypted;
 +
- 	/* Change the page encryption mask. */
- 	new_pte = pfn_pte(pfn, new_prot);
- 	set_pte_atomic(kpte, new_pte);
++		/*
++		 * The bss.decrypted region is mapped decrypted in the initial page table.
++		 * If SEV-SNP is active then transition the page to shared in the RMP table
++		 * so that it is consistent with the page table attribute change below.
++		 */
++		if (sev_snp_active()) {
++			unsigned long npages;
 +
-+	/*
-+	 * If SEV-SNP is active, validate the page in the RMP entry after encryption attribute is
-+	 * changed from C=0 to C=1.
-+	 */
-+	if (sev_snp_active() && enc)
-+		early_snp_set_memory_private((unsigned long)__va(pa), pa, 1);
- }
- 
- static int __init early_set_memory_enc_dec(unsigned long vaddr,
++			npages = PAGE_ALIGN(vaddr_end - vaddr) >> PAGE_SHIFT;
++			early_snp_set_memory_shared(__pa(vaddr), __pa(vaddr), npages);
++		}
++
+ 		for (; vaddr < vaddr_end; vaddr += PMD_SIZE) {
+ 			i = pmd_index(vaddr);
+ 			pmd[i] -= sme_get_me_mask();
 -- 
 2.17.1
 
