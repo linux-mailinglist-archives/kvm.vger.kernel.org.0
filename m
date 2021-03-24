@@ -2,94 +2,99 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1FE2E348459
-	for <lists+kvm@lfdr.de>; Wed, 24 Mar 2021 23:10:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7CE18348542
+	for <lists+kvm@lfdr.de>; Thu, 25 Mar 2021 00:24:40 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235043AbhCXWKP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 24 Mar 2021 18:10:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37306 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232261AbhCXWJ7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 24 Mar 2021 18:09:59 -0400
-Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0925AC0613DE
-        for <kvm@vger.kernel.org>; Wed, 24 Mar 2021 15:09:58 -0700 (PDT)
-Received: by mail-pj1-x1031.google.com with SMTP id bt4so189868pjb.5
-        for <kvm@vger.kernel.org>; Wed, 24 Mar 2021 15:09:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=B8cQEyenOi6P1dFAPnRKGJMuEeOhjBSY7qxP2TEHV/o=;
-        b=lj6TKx0RstOX0gCi1HsZbR1+i32sFs4YgJqVKDqJMqNl9P/JoBwbO2aTapvdiuP0d5
-         DUBzUDV4+r6jkyN2lpepyEX/HLGAKoApLDB3/ZFZ7jrzOOBwRnGPJi32vqtxploDw8q1
-         2xhcRg8iqo4Uoje6GvexvUjTkiOfFCXWqIfDCogdi6ZVYcl3Rv+mv39+uPPb1UJQ0bAq
-         kPBthg+XX84Uy842vs62HsYZxS37Bz66dcdBGKhNLGpXt+qaGBIV9rPIPwlqOLM5a7s5
-         d2YGvho3F6mV31G/8IGY/TAGgIePMext3VqLwc+P0J3CSrRxDdUt2MZENf3sS5fMS1iY
-         xCaw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=B8cQEyenOi6P1dFAPnRKGJMuEeOhjBSY7qxP2TEHV/o=;
-        b=AM4N4Mwdq+Yhgu6ecSSvYEeJyfFNCzPlG86ldZFtQMd0ovh7aIpB3+uTDw/FIzNhSv
-         gB1A9UdEfKtkALmE+z9Ac9FZkZ++rnV4b3/W+RZAGslFWgrPsLaL+hl+YddHs1Rws7qf
-         VyaQUqY1msvUkUUdljI3jDVmET6MSwOGCOxlO3bWqIW1QxNbmRKvyEzJQC3WO4TON68v
-         CI3ldRTISiaoeriJI8RqC67ITJyt/vg9k34vqzzPzOaWDja5f46QkYrCR7Imee6WqbNx
-         SlI+KXWeBHhu9s4OjntbZwae8U64gXzr4aUVvjmz9XqsVzFWpFS3HayEse9qsH6QRPvS
-         oj7g==
-X-Gm-Message-State: AOAM532bRb9wPkMn2NIU1LMn92tbGaYTjfQwWrbPw59fvSIqj955XNG9
-        EjYc9/wfEO/sEYFhRS7pul2QlA==
-X-Google-Smtp-Source: ABdhPJwDnC4jlfo2PQVfu3zVk/BwUUsPMSuyyqmtpRY1Zky6hwjMqnenksH0I1CQfv2uSoDEcNT57g==
-X-Received: by 2002:a17:90a:ab91:: with SMTP id n17mr5749245pjq.4.1616623798097;
-        Wed, 24 Mar 2021 15:09:58 -0700 (PDT)
-Received: from google.com ([2620:0:1008:10:7c86:15f3:3afd:ba78])
-        by smtp.gmail.com with ESMTPSA id d22sm3418535pjx.24.2021.03.24.15.09.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 24 Mar 2021 15:09:57 -0700 (PDT)
-Date:   Wed, 24 Mar 2021 15:09:53 -0700
-From:   Vipin Sharma <vipinsh@google.com>
-To:     Jacob Pan <jacob.jun.pan@intel.com>
-Cc:     tj@kernel.org, mkoutny@suse.com, rdunlap@infradead.org,
-        thomas.lendacky@amd.com, brijesh.singh@amd.com, jon.grimm@amd.com,
-        eric.vantassell@amd.com, pbonzini@redhat.com, hannes@cmpxchg.org,
-        frankja@linux.ibm.com, borntraeger@de.ibm.com, corbet@lwn.net,
-        seanjc@google.com, vkuznets@redhat.com, wanpengli@tencent.com,
-        jmattson@google.com, joro@8bytes.org, tglx@linutronix.de,
-        mingo@redhat.com, bp@alien8.de, hpa@zytor.com, gingell@google.com,
-        rientjes@google.com, dionnaglaze@google.com, kvm@vger.kernel.org,
-        x86@kernel.org, cgroups@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Jacob Pan <jacob.jun.pan@linux.intel.com>
-Subject: Re: [Patch v3 1/2] cgroup: sev: Add misc cgroup controller
-Message-ID: <YFu4sdhT7KexlyES@google.com>
-References: <20210304231946.2766648-1-vipinsh@google.com>
- <20210304231946.2766648-2-vipinsh@google.com>
- <20210319142801.7dcce403@jacob-builder>
- <YFjn7wv/iMO4Isgz@google.com>
- <20210324091701.63c9ce8e@jacob-builder>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210324091701.63c9ce8e@jacob-builder>
+        id S231329AbhCXXX4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 24 Mar 2021 19:23:56 -0400
+Received: from mga04.intel.com ([192.55.52.120]:14556 "EHLO mga04.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229624AbhCXXXt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 24 Mar 2021 19:23:49 -0400
+IronPort-SDR: oJ1+qBYzTuvcMfabBLfz1XKfXgCR7WwHVyDG+1LCEaPCq5EyFHaoqErwjlFaKctBUA3tgnOsls
+ DzZN0hcXlD6A==
+X-IronPort-AV: E=McAfee;i="6000,8403,9933"; a="188513331"
+X-IronPort-AV: E=Sophos;i="5.81,275,1610438400"; 
+   d="scan'208";a="188513331"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Mar 2021 16:23:49 -0700
+IronPort-SDR: TjT8mVaAXncq/9NN9IWUcs+CkXPUg8Ns1ipcpKrJlhQfAUrH7oouXJiLlIjuxBVo0KZw16pRaz
+ j1/zRlw9s9MQ==
+X-IronPort-AV: E=Sophos;i="5.81,275,1610438400"; 
+   d="scan'208";a="415697964"
+Received: from prdubey-mobl1.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.255.230.226])
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Mar 2021 16:23:45 -0700
+Date:   Thu, 25 Mar 2021 12:23:43 +1300
+From:   Kai Huang <kai.huang@intel.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Borislav Petkov <bp@alien8.de>,
+        Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org,
+        x86@kernel.org, linux-sgx@vger.kernel.org,
+        linux-kernel@vger.kernel.org, jarkko@kernel.org, luto@kernel.org,
+        dave.hansen@intel.com, rick.p.edgecombe@intel.com,
+        haitao.huang@intel.com, tglx@linutronix.de, mingo@redhat.com,
+        hpa@zytor.com
+Subject: Re: [PATCH v3 03/25] x86/sgx: Wipe out EREMOVE from
+ sgx_free_epc_page()
+Message-Id: <20210325122343.008120ef70c1a1b16b5657ca@intel.com>
+In-Reply-To: <236c0aa9-92f2-97c8-ab11-d55b9a98c931@redhat.com>
+References: <YFjoZQwB7e3oQW8l@google.com>
+        <20210322191540.GH6481@zn.tnic>
+        <YFjx3vixDURClgcb@google.com>
+        <20210322210645.GI6481@zn.tnic>
+        <20210323110643.f29e214ebe8ec7a4a3d0bc2e@intel.com>
+        <20210322223726.GJ6481@zn.tnic>
+        <20210323121643.e06403a1bc7819bab7c15d95@intel.com>
+        <YFoNCvBYS2lIYjjc@google.com>
+        <20210323160604.GB4729@zn.tnic>
+        <YFoVmxIFjGpqM6Bk@google.com>
+        <20210323163258.GC4729@zn.tnic>
+        <b35f66a10ecc07a1eecb829912d5664886ca169b.camel@intel.com>
+        <236c0aa9-92f2-97c8-ab11-d55b9a98c931@redhat.com>
+X-Mailer: Sylpheed 3.7.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Mar 24, 2021 at 09:17:01AM -0700, Jacob Pan wrote:
-> I didn't mean the users of misc_cgroup will use css directly. I meant if I
-> want to use misc cgruop in ioasid.c, I have to do the following to avoid
-> undefined css:
-> #include <linux/cgroup.h>
-> #include <linux/misc_cgroup.h>
+
 > 
-> So it might be simpler if you do #include <linux/cgroup.h> inside
-> misc_cgroup.h. Then in ioasid.c, I only need to do
-> #include <linux/misc_cgroup.h>.
+> > +/* Error message for EREMOVE failure, when kernel is about to leak EPC page */
+> > +#define EREMOVE_ERROR_MESSAGE \
+> > +       "EREMOVE returned %d (0x%x), kernel bug likely.  EPC page leaked, SGX may become
+> > unusuable.  Please refer to Documentation/x86/sgx.rst for more information."
+> 
+> Rewritten:
+> 
+> EREMOVE returned %d and an EPC page was leaked; SGX may become unusable.
+> This is a kernel bug, refer to Documentation/x86/sgx.rst for more information.
+> 
+> Also please split it across multiple lines.
+> 
+> Paolo
+> 
 
-Sorry, I misunderstood the comment first time. I agree with you, I will
-add cgroup header file in the misc_cgroup.h after  #ifdef
-CONFIG_CGROUP_MISC statement.
+Hi Boris/Paolo,
 
-Thanks
-Vipin
+I changed to below (with slight modification on Paolo's):
+
+/* Error message for EREMOVE failure, when kernel is about to leak EPC page */
+#define EREMOVE_ERROR_MESSAGE \ 
+        "EREMOVE returned %d (0x%x) and an EPC page was leaked.  SGX may become unusuable.  " \
+        "This is likely a kernel bug.  Refer to Documentation/x86/sgx.rst for more information."
+
+I got a checkpatch warning however:
+
+WARNING: It's generally not useful to have the filename in the file
+#60: FILE: Documentation/x86/sgx.rst:223:
++This is likely a kernel bug.  Refer to Documentation/x86/sgx.rst for more
+
+I suppose it is OK? Since the error msg is actually hard-coded in the code,
+and in this document, IMHO we should explicitly call out what error message user
+is supposed to see, when this bug happens, so that user can absolutely know
+he/she is dealing with this particular issue.
+
+
+
