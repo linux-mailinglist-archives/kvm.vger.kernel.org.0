@@ -2,155 +2,131 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 28211347BE5
-	for <lists+kvm@lfdr.de>; Wed, 24 Mar 2021 16:15:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9D98F347CF8
+	for <lists+kvm@lfdr.de>; Wed, 24 Mar 2021 16:48:44 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236566AbhCXPPZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 24 Mar 2021 11:15:25 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:37872 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S236413AbhCXPPI (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 24 Mar 2021 11:15:08 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1616598908;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=eb8//3oSoa3M7nlblO0ZW5ye3nSSfJ2OdQOfZjj4GAw=;
-        b=ChNqRKXl/GSZiDoPe0lpmPnc6wiHpLAE+AHX5w3tOJxxEJ6pta2I7EAxdZoHoVGga4kKUI
-        IUEpFQp3juz/VrmB1cvN8bCrCih7wn4N01mYEWqmdwIDilyqmJ2zMP08kxEk5r0R25N+hS
-        RfanVGGbdsTtP1/4XED8l2F/dBGNCfw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-445-O1Rmx6A-NbeNp0A6gqVntQ-1; Wed, 24 Mar 2021 11:15:05 -0400
-X-MC-Unique: O1Rmx6A-NbeNp0A6gqVntQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EF56783DD23
-        for <kvm@vger.kernel.org>; Wed, 24 Mar 2021 15:15:04 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.40.194.23])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 814A862677;
-        Wed, 24 Mar 2021 15:14:59 +0000 (UTC)
-Date:   Wed, 24 Mar 2021 16:14:55 +0100
-From:   Andrew Jones <drjones@redhat.com>
-To:     kvm@vger.kernel.org
-Cc:     pbonzini@redhat.com, thuth@redhat.com
-Subject: Re: [PATCH kvm-unit-tests v2] compiler: Add builtin overflow flag
- and predicate wrappers
-Message-ID: <20210324151455.7pfhn72bwnl7lrt2@kamzik.brq.redhat.com>
-References: <20210323175424.368223-1-drjones@redhat.com>
+        id S236701AbhCXPsN convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Wed, 24 Mar 2021 11:48:13 -0400
+Received: from frasgout.his.huawei.com ([185.176.79.56]:2738 "EHLO
+        frasgout.his.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S236767AbhCXPrl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 24 Mar 2021 11:47:41 -0400
+Received: from fraeml701-chm.china.huawei.com (unknown [172.18.147.226])
+        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4F5CDX6fSSz683Wv;
+        Wed, 24 Mar 2021 23:42:52 +0800 (CST)
+Received: from lhreml720-chm.china.huawei.com (10.201.108.71) by
+ fraeml701-chm.china.huawei.com (10.206.15.50) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.2106.2; Wed, 24 Mar 2021 16:47:37 +0100
+Received: from lhreml710-chm.china.huawei.com (10.201.108.61) by
+ lhreml720-chm.china.huawei.com (10.201.108.71) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2106.2; Wed, 24 Mar 2021 15:47:37 +0000
+Received: from lhreml710-chm.china.huawei.com ([169.254.81.184]) by
+ lhreml710-chm.china.huawei.com ([169.254.81.184]) with mapi id
+ 15.01.2106.013; Wed, 24 Mar 2021 15:47:37 +0000
+From:   Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+To:     Marc Zyngier <maz@kernel.org>,
+        "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-arm-kernel@lists.infradead.org" 
+        <linux-arm-kernel@lists.infradead.org>
+CC:     Ard Biesheuvel <ardb@kernel.org>,
+        "kernel-team@android.com" <kernel-team@android.com>
+Subject: RE: [PATCH] KVM: arm64: Fix CPU interface MMIO compatibility
+ detection
+Thread-Topic: [PATCH] KVM: arm64: Fix CPU interface MMIO compatibility
+ detection
+Thread-Index: AQHXIADnSRTuVbDHwkyLZJ68PSrFKqqTR4Mw
+Date:   Wed, 24 Mar 2021 15:47:37 +0000
+Message-ID: <e7cb67d609924108ae944935f8493745@huawei.com>
+References: <20210323162301.2049595-1-maz@kernel.org>
+In-Reply-To: <20210323162301.2049595-1-maz@kernel.org>
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.47.93.221]
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210323175424.368223-1-drjones@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Mar 23, 2021 at 06:54:24PM +0100, Andrew Jones wrote:
-> Checking for overflow can be difficult, but doing so may be a good
-> idea to avoid difficult to debug problems. Compilers that provide
-> builtins for overflow checking allow the checks to be simple
-> enough that we can use them more liberally. The idea for this
-> flag is to wrap a calculation that should have overflow checking,
-> allowing compilers that support it to give us some extra robustness.
-> For example,
-> 
->   #ifdef COMPILER_HAS_GENERIC_BUILTIN_OVERFLOW
->       bool overflow = __builtin_mul_overflow(x, y, &z);
->       assert(!overflow);
->   #else
->       /* Older compiler, hopefully we don't overflow... */
->       z = x * y;
->   #endif
-> 
-> This is a bit ugly though, so when possible we can just use the
-> predicate wrappers, which have an always-false fallback, e.g.
-> 
->   /* Old compilers won't assert on overflow. Oh, well... */
->   assert(!check_mul_overflow(x, y));
->   z = x * y;
-> 
-> Signed-off-by: Andrew Jones <drjones@redhat.com>
-> ---
-> 
-> v2: Added predicate wrappers
-> 
->  lib/linux/compiler.h | 33 +++++++++++++++++++++++++++++++++
->  1 file changed, 33 insertions(+)
-> 
-> diff --git a/lib/linux/compiler.h b/lib/linux/compiler.h
-> index 2d72f18c36e5..aa2e3710cf1d 100644
-> --- a/lib/linux/compiler.h
-> +++ b/lib/linux/compiler.h
-> @@ -8,6 +8,39 @@
->  
->  #ifndef __ASSEMBLY__
->  
-> +#define GCC_VERSION (__GNUC__ * 10000           \
-> +		     + __GNUC_MINOR__ * 100     \
-> +		     + __GNUC_PATCHLEVEL__)
-> +
-> +#ifdef __clang__
-> +#if __has_builtin(__builtin_add_overflow) && \
-> +    __has_builtin(__builtin_sub_overflow) && \
-> +    __has_builtin(__builtin_mul_overflow)
-> +#define COMPILER_HAS_GENERIC_BUILTIN_OVERFLOW 1
-> +#define check_add_overflow(a, b) ({			\
-> +	typeof((a) + (b)) __d;				\
-> +	__builtin_add_overflow(a, b, &__d);		\
-> +})
-> +#define check_sub_overflow(a, b) ({			\
-> +	typeof((a) - (b)) __d;				\
-> +	__builtin_sub_overflow(a, b, &__d);		\
-> +})
-> +#define check_mul_overflow(a, b) ({			\
-> +	typeof((a) * (b)) __d;				\
-> +	__builtin_mul_overflow(a, b, &__d);		\
-> +})
-> +#endif
-> +#elif GCC_VERSION >= 50100
-> +#define COMPILER_HAS_GENERIC_BUILTIN_OVERFLOW 1
-> +#define check_add_overflow(a, b) __builtin_add_overflow_p(a, b, (typeof((a) + (b)))0)
-> +#define check_sub_overflow(a, b) __builtin_add_overflow_p(a, b, (typeof((a) - (b)))0)
-> +#define check_mul_overflow(a, b) __builtin_add_overflow_p(a, b, (typeof((a) * (b)))0)
-> +#else
-> +#define check_add_overflow(a, b) (0)
-> +#define check_sub_overflow(a, b) (0)
-> +#define check_mul_overflow(a, b) (0)
-> +#endif
-> +
->  #include <stdint.h>
->  
->  #define barrier()	asm volatile("" : : : "memory")
-> -- 
-> 2.26.3
->
 
-I just wanted to point out that with this patch the relevant part of
-strtoul becomes
 
-        if (is_signed) {
-            long sacc = (long)acc;
-            assert(!check_mul_overflow(sacc, base));
-            assert(!check_add_overflow(sacc * base, c));
-        } else {
-            assert(!check_mul_overflow(acc, base));
-            assert(!check_add_overflow(acc * base, c));
-        }
+> -----Original Message-----
+> From: Marc Zyngier [mailto:maz@kernel.org]
+> Sent: 23 March 2021 16:23
+> To: kvmarm@lists.cs.columbia.edu; kvm@vger.kernel.org;
+> linux-arm-kernel@lists.infradead.org
+> Cc: Ard Biesheuvel <ardb@kernel.org>; kernel-team@android.com; Shameerali
+> Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+> Subject: [PATCH] KVM: arm64: Fix CPU interface MMIO compatibility detection
+> 
+> In order to detect whether a GICv3 CPU interface is MMIO capable,
+> we switch ICC_SRE_EL1.SRE to 0 and check whether it sticks.
+> 
+> However, this is only possible if *ALL* of the HCR_EL2 interrupt
+> overrides are set, and the CPU is perfectly allowed to ignore
+> the write to ICC_SRE_EL1 otherwise. This leads KVM to pretend
+> that a whole bunch of ARMv8.0 CPUs aren't MMIO-capable, and
+> breaks VMs that should work correctly otherwise.
+> 
+> Fix this by setting IMO/FMO/IMO before touching ICC_SRE_EL1,
+> and clear them afterwards. This allows us to reliably detect
+> the CPU interface capabilities.
+> 
 
-        acc = acc * base + c;
+Tested on HiSilicon D06 platform where the original issue(firmware wrongly
+advertising GICv2-on-v3 compatibility) was reported and all seems to be fine.
 
-which looks pretty good to me (if I do say so myself). Unless somebody
-shouts I'll queue this patch in arm/queue tomorrow. I'll need to rebase
-arm/queue to squash in the fixup to strtoul (I hope nobody thinks that
-the arm/queue branch is stable, because it's not!)
+Though not sure whether this fix is relevant to this particular platform,
+FWIW,
 
-I also plan to grab another series from Alexandru, do final testing,
-and send Paolo an MR for the whole lot tomorrow.
+  Tested-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
 
 Thanks,
-drew
+Shameer
+
+> Cc: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+> Fixes: 9739f6ef053f ("KVM: arm64: Workaround firmware wrongly advertising
+> GICv2-on-v3 compatibility")
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/kvm/hyp/vgic-v3-sr.c | 9 +++++++++
+>  1 file changed, 9 insertions(+)
+> 
+> diff --git a/arch/arm64/kvm/hyp/vgic-v3-sr.c
+> b/arch/arm64/kvm/hyp/vgic-v3-sr.c
+> index ee3682b9873c..39f8f7f9227c 100644
+> --- a/arch/arm64/kvm/hyp/vgic-v3-sr.c
+> +++ b/arch/arm64/kvm/hyp/vgic-v3-sr.c
+> @@ -429,6 +429,13 @@ u64 __vgic_v3_get_gic_config(void)
+>  	if (has_vhe())
+>  		flags = local_daif_save();
+> 
+> +	/*
+> +	 * Table 11-2 "Permitted ICC_SRE_ELx.SRE settings" indicates
+> +	 * that to be able to set ICC_SRE_EL1.SRE to 0, all the
+> +	 * interrupt overrides must be set. You've got to love this.
+> +	 */
+> +	sysreg_clear_set(hcr_el2, 0, HCR_AMO | HCR_FMO | HCR_IMO);
+> +	isb();
+>  	write_gicreg(0, ICC_SRE_EL1);
+>  	isb();
+> 
+> @@ -436,6 +443,8 @@ u64 __vgic_v3_get_gic_config(void)
+> 
+>  	write_gicreg(sre, ICC_SRE_EL1);
+>  	isb();
+> +	sysreg_clear_set(hcr_el2, HCR_AMO | HCR_FMO | HCR_IMO, 0);
+> +	isb();
+> 
+>  	if (has_vhe())
+>  		local_daif_restore(flags);
+> --
+> 2.30.0
 
