@@ -2,72 +2,93 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 037B53477D3
-	for <lists+kvm@lfdr.de>; Wed, 24 Mar 2021 13:02:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CE84234781C
+	for <lists+kvm@lfdr.de>; Wed, 24 Mar 2021 13:17:48 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232107AbhCXMCP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 24 Mar 2021 08:02:15 -0400
-Received: from 88-98-93-30.dsl.in-addr.zen.co.uk ([88.98.93.30]:44218 "EHLO
-        sent" rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org with ESMTP
-        id S231960AbhCXMB6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 24 Mar 2021 08:01:58 -0400
-Received: from jlevon by sent with local (Exim 4.93)
-        (envelope-from <john.levon@nutanix.com>)
-        id 1lP2Cv-004d0V-4d; Wed, 24 Mar 2021 12:01:53 +0000
-From:   John Levon <john.levon@nutanix.com>
-To:     john.levon@nutanix.com
-Cc:     jasowang@redhat.com, kvm@vger.kernel.org, levon@movementarian.org,
-        mst@redhat.com, virtualization@lists.linux-foundation.org,
-        David Edmondson <david.edmondson@oracle.com>
-Subject: [RESEND] [PATCH] use pr_warn_ratelimited() for vq_err()
-Date:   Wed, 24 Mar 2021 12:01:29 +0000
-Message-Id: <20210324120129.1103172-1-john.levon@nutanix.com>
-X-Mailer: git-send-email 2.25.1
+        id S233376AbhCXMRZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 24 Mar 2021 08:17:25 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:27380 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S233486AbhCXMRH (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 24 Mar 2021 08:17:07 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1616588226;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=E9F49iv0iMvNhK2Ha5Psl89snw9CgCXbICGGoRQHqgo=;
+        b=agjR4kAMkGySspKyhL8flrXd2Gx0ZFy6mZ1GNF0oy2a/SoDKfWuhZblDdTaN57Z2X5dc7I
+        F9dLwAf1iHcBW0osNLpBY6glAZYKj0nkGH+Ls6Rvy3QTOS8U8ycbnyaS0TWsPYVUOC4dt7
+        0SsacyKDJ91cmvgMMkFD6TaCN5UlHqc=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-378-VlH0Oy-YOFumTvszzqCIVQ-1; Wed, 24 Mar 2021 08:17:03 -0400
+X-MC-Unique: VlH0Oy-YOFumTvszzqCIVQ-1
+Received: by mail-wr1-f72.google.com with SMTP id b6so981815wrq.22
+        for <kvm@vger.kernel.org>; Wed, 24 Mar 2021 05:17:03 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=E9F49iv0iMvNhK2Ha5Psl89snw9CgCXbICGGoRQHqgo=;
+        b=J92OFySwNr3O2cSGdUEhHA4T0IVoPQSWcFA5ZfmBLYmO2yfrG585CU0fmyklOgADpr
+         oJ6pejrhhN5CLV4rnvrPdr2stPyWlOXjPBvL4kpUQ4+Aeb9w+AKvbI7ubpW+FwX4buYc
+         va+HXQ8BuWxb+JfcElYxQ6UjFB70Ia9ot9VoBJPn3OtMxXefDEEf+UjqrlX4ITYeqFIk
+         U1kcbi4T4ONpAi0ROFDRXPewDf3YW0gxggNqHfN1jgFcLkY74aPcTD/F1OW3B+v2mZ1Y
+         1i6lkwbbZ3uRWr/NkbRnXu0GpJZTJ1EK4PspnUb40yhkF9qyhHMouGfzDJv8kohrrO4A
+         /4DQ==
+X-Gm-Message-State: AOAM531rkwPCXAxuw0SCkYekEfneemMehFlhe2TI9FgtFawu3yCRVor7
+        veYBZXT3nkp+vmTwAxigumpb/yBV6OOp8QJScOOLivAyU1dPDtpDBBULQgrD7No0ra+whiVmWRL
+        J+Y8pIBZI9iFn
+X-Received: by 2002:a1c:10f:: with SMTP id 15mr2732457wmb.14.1616588222693;
+        Wed, 24 Mar 2021 05:17:02 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzeb/ON+kOZdzKfxRLK6YPN7H/+pVhXU/ZCNGdjNz0SXLH6TmVovV6hD5q+z3+Sl9n5adX/sQ==
+X-Received: by 2002:a1c:10f:: with SMTP id 15mr2732435wmb.14.1616588222507;
+        Wed, 24 Mar 2021 05:17:02 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:63a7:c72e:ea0e:6045? ([2001:b07:6468:f312:63a7:c72e:ea0e:6045])
+        by smtp.gmail.com with ESMTPSA id c131sm2362100wma.37.2021.03.24.05.17.00
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 24 Mar 2021 05:17:01 -0700 (PDT)
+Subject: Re: [syzbot] possible deadlock in kvm_synchronize_tsc
+To:     syzbot <syzbot+9a89b866d3fc11acc3b6@syzkaller.appspotmail.com>,
+        bp@alien8.de, hpa@zytor.com, jmattson@google.com, joro@8bytes.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        mingo@redhat.com, seanjc@google.com,
+        syzkaller-bugs@googlegroups.com, tglx@linutronix.de,
+        vkuznets@redhat.com, wanpengli@tencent.com, x86@kernel.org
+References: <00000000000099aa6805be432fce@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <dd9de982-e94d-163f-067b-d86d95e947a8@redhat.com>
+Date:   Wed, 24 Mar 2021 13:17:00 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.7.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <00000000000099aa6805be432fce@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-vq_err() is used to report various failure states in vhost code, but by
-default uses pr_debug(), and as a result doesn't record anything unless
-enabled via dynamic debug. We'll change this so we get something recorded
-in the log in these failure cases. Guest VMs (and userspace) can trigger
-some of these messages, so we want to use the pr_warn_ratelimited()
-variant. However, on DEBUG kernels, we'd like to get everything, so we use
-pr_warn() then.
+On 24/03/21 08:24, syzbot wrote:
+> Hello,
+> 
+> syzbot found the following issue on:
+> 
+> HEAD commit:    1c273e10 Merge tag 'zonefs-5.12-rc4' of git://git.kernel.o..
+> git tree:       upstream
+> console output: https://syzkaller.appspot.com/x/log.txt?x=1063d14ed00000
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=6abda3336c698a07
+> dashboard link: https://syzkaller.appspot.com/bug?extid=9a89b866d3fc11acc3b6
+> userspace arch: i386
+> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=10bf56f6d00000
+> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=174e36dcd00000
+> 
+> IMPORTANT: if you fix the issue, please add the following tag to the commit:
+> Reported-by: syzbot+9a89b866d3fc11acc3b6@syzkaller.appspotmail.com
 
-Signed-off-by: John Levon <john.levon@nutanix.com>
-Reviewed-by: David Edmondson <david.edmondson@oracle.com>
----
- drivers/vhost/vhost.h | 14 ++++++++++----
- 1 file changed, 10 insertions(+), 4 deletions(-)
-
-diff --git a/drivers/vhost/vhost.h b/drivers/vhost/vhost.h
-index b063324c7669..10007bd49f84 100644
---- a/drivers/vhost/vhost.h
-+++ b/drivers/vhost/vhost.h
-@@ -228,10 +228,16 @@ int vhost_init_device_iotlb(struct vhost_dev *d, bool enabled);
- void vhost_iotlb_map_free(struct vhost_iotlb *iotlb,
- 			  struct vhost_iotlb_map *map);
- 
--#define vq_err(vq, fmt, ...) do {                                  \
--		pr_debug(pr_fmt(fmt), ##__VA_ARGS__);       \
--		if ((vq)->error_ctx)                               \
--				eventfd_signal((vq)->error_ctx, 1);\
-+#ifdef DEBUG
-+#define vq_pr_warn pr_warn
-+#else
-+#define vq_pr_warn pr_warn_ratelimited
-+#endif
-+
-+#define vq_err(vq, fmt, ...) do {                                \
-+		vq_pr_warn(pr_fmt(fmt), ##__VA_ARGS__);          \
-+		if ((vq)->error_ctx)                             \
-+			eventfd_signal((vq)->error_ctx, 1);      \
- 	} while (0)
- 
- enum {
--- 
-2.25.1
+#syz dup: possible deadlock in scheduler_tick
 
