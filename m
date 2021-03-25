@@ -2,78 +2,70 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 792053496C7
-	for <lists+kvm@lfdr.de>; Thu, 25 Mar 2021 17:29:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A638E3496CA
+	for <lists+kvm@lfdr.de>; Thu, 25 Mar 2021 17:30:34 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229616AbhCYQ2z (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 25 Mar 2021 12:28:55 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:26361 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229669AbhCYQ21 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 25 Mar 2021 12:28:27 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1616689707;
+        id S229744AbhCYQaA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 25 Mar 2021 12:30:00 -0400
+Received: from mail.skyhub.de ([5.9.137.197]:51932 "EHLO mail.skyhub.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229666AbhCYQ32 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 25 Mar 2021 12:29:28 -0400
+Received: from zn.tnic (p200300ec2f0d5d002e2bf1176a5b9def.dip0.t-ipconnect.de [IPv6:2003:ec:2f0d:5d00:2e2b:f117:6a5b:9def])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id ACE2A1EC0324;
+        Thu, 25 Mar 2021 17:29:26 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1616689766;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=DH8v/mJfXUA91yRwJZuk088ZpE3xOULkExoChd07zMA=;
-        b=ULj2nXn/SfcA7hsy0pmmE3DFqcnWYAJXu3BfI2jTjwFMAxw6Q3dvuDvMR3R2GV55JcHczR
-        dS8c3qGAMkmfL9m+4onZd6jX+claNoEo8sTy3Jxcxx8lpFtQNdthacfNeo6i1a3frohyDz
-        4mlKtjodzS2UhYfKSW/vTR0MNTrzQL4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-66-N0usjx7hM_eZNCdtdBLLLw-1; Thu, 25 Mar 2021 12:28:24 -0400
-X-MC-Unique: N0usjx7hM_eZNCdtdBLLLw-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B82FC180FCA2;
-        Thu, 25 Mar 2021 16:28:23 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.40.194.23])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 6B5EE29685;
-        Thu, 25 Mar 2021 16:28:22 +0000 (UTC)
-Date:   Thu, 25 Mar 2021 17:28:19 +0100
-From:   Andrew Jones <drjones@redhat.com>
-To:     kvm@vger.kernel.org
-Cc:     nikos.nikoleris@arm.com, alexandru.elisei@arm.com
-Subject: Re: [PATCH kvm-unit-tests 0/2] arm64: One fix and one improvement
-Message-ID: <20210325162819.fq3f3hflwkl56qfg@kamzik.brq.redhat.com>
-References: <20210325155657.600897-1-drjones@redhat.com>
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=U5AbQYqSWYiIyNY16bCDiOGriUAPmZSlf40Ry/wtqLY=;
+        b=pvgGt8lu2T1nrG6UKKpAqFrefEPVbQlxEf8B0KE7H+xry5fswYBQ77VGZbkqlESRguu88C
+        BcdoA7l9Ya8wPyloj2ZRlmpVWFw47l5Esa1k9d78sYNCOJnnQmOJu8fYCgDLR8ZKFE4g3+
+        ujwyHWx2cHgWPrKiLJ7B6TYeJD82ouA=
+Date:   Thu, 25 Mar 2021 17:29:30 +0100
+From:   Borislav Petkov <bp@alien8.de>
+To:     Brijesh Singh <brijesh.singh@amd.com>
+Cc:     linux-kernel@vger.kernel.org, x86@kernel.org, kvm@vger.kernel.org,
+        ak@linux.intel.com, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        "H. Peter Anvin" <hpa@zytor.com>, Tony Luck <tony.luck@intel.com>,
+        Dave Hansen <dave.hansen@intel.com>,
+        "Peter Zijlstra (Intel)" <peterz@infradead.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        David Rientjes <rientjes@google.com>,
+        Sean Christopherson <seanjc@google.com>
+Subject: Re: [RFC Part1 PATCH 01/13] x86/cpufeatures: Add SEV-SNP CPU feature
+Message-ID: <20210325162930.GF31322@zn.tnic>
+References: <20210324164424.28124-1-brijesh.singh@amd.com>
+ <20210324164424.28124-2-brijesh.singh@amd.com>
+ <20210325105417.GE31322@zn.tnic>
+ <98917857-69d2-971c-d78d-b1d60159c037@amd.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20210325155657.600897-1-drjones@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+In-Reply-To: <98917857-69d2-971c-d78d-b1d60159c037@amd.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Mar 25, 2021 at 04:56:55PM +0100, Andrew Jones wrote:
-> Fix the loading of argc. Nikos reported an issue with its alignment
-> while testing target-efi (aligned to four bytes is OK, as long as we
-> only load four bytes like we should). Also, take a patch developed
-> while working on target-efi which can make debugging a bit more
-> convenient (by doing some subtraction for the test developer).
-> 
-> Andrew Jones (2):
->   arm64: argc is an int
->   arm64: Output PC load offset on unhandled exceptions
-> 
->  arm/cstart64.S        | 2 +-
->  arm/flat.lds          | 1 +
->  lib/arm64/processor.c | 7 +++++++
->  3 files changed, 9 insertions(+), 1 deletion(-)
-> 
-> -- 
-> 2.26.3
->
+On Thu, Mar 25, 2021 at 09:50:20AM -0500, Brijesh Singh wrote:
+> For the early feedback I was trying to find one tree which can be used
+> for building both the guest and hypervisor at once. In future, I will
+> submit the part-1 against the tip/master and part-2 against the
+> kvm/master. thanks
 
-Thanks for the review, Nikos!
+Then I think you could base ontop of current linux-next because it has
+both trees. I presume test-applying the patches on our trees then should
+work. I think...
 
-Applied to arm/queue
+Thx.
 
-https://gitlab.com/rhdrjones/kvm-unit-tests/-/commits/arm/queue
+-- 
+Regards/Gruss,
+    Boris.
 
-Thanks,
-drew 
-
+https://people.kernel.org/tglx/notes-about-netiquette
