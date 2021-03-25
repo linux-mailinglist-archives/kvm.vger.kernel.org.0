@@ -2,117 +2,173 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B9579348DFA
-	for <lists+kvm@lfdr.de>; Thu, 25 Mar 2021 11:28:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A1D85348E06
+	for <lists+kvm@lfdr.de>; Thu, 25 Mar 2021 11:30:40 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230158AbhCYK12 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 25 Mar 2021 06:27:28 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:45638 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230105AbhCYK1B (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 25 Mar 2021 06:27:01 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1616668021;
+        id S230125AbhCYKaH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 25 Mar 2021 06:30:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55446 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230076AbhCYKaE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 25 Mar 2021 06:30:04 -0400
+Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 37B19C06174A;
+        Thu, 25 Mar 2021 03:30:03 -0700 (PDT)
+Received: from zn.tnic (p200300ec2f0d5d00d5a461c7dd3b44f2.dip0.t-ipconnect.de [IPv6:2003:ec:2f0d:5d00:d5a4:61c7:dd3b:44f2])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id AFE6D1EC0501;
+        Thu, 25 Mar 2021 11:30:00 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1616668200;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=YnnJOjLqRsNOiRCl1VmxWYaDtnFLgBh+G/O9tqpx3N4=;
-        b=eQBdZo0ZAFBCEb79grPnk85P9vptY2tbCFgwjUTqUW7IhML5wO6/qWqZ/cZRv/KeEcshyb
-        XjaEx/+lScB3AwZyapjoQF7KfRc3zut3hc43eAVMmXg/QDHZGkGE2j82E+NmsnQL6fBVNk
-        73w75ob4bN3PIrUDeIOEjvN3jpH+H/c=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-462-b_MyKsDWN_6W1eqMR8jYyg-1; Thu, 25 Mar 2021 06:26:59 -0400
-X-MC-Unique: b_MyKsDWN_6W1eqMR8jYyg-1
-Received: by mail-wm1-f71.google.com with SMTP id r18so1495125wmq.5
-        for <kvm@vger.kernel.org>; Thu, 25 Mar 2021 03:26:59 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=YnnJOjLqRsNOiRCl1VmxWYaDtnFLgBh+G/O9tqpx3N4=;
-        b=Jaqy7i7C7FQIPzPD6ioIRTykdgVueD1PCZX9P1rTTC+Xv6SwRRHjEsH8AISXemplaw
-         m/pH37+O3oWua9dzuVnhb1CyUQNuelzP13e/wktOdiFI/NT0frLZOVTp9RXJsCCPZH6R
-         TZaclAO3EuAP5shLUn4Mc/K/Sn7XKnxMLCxffITchNQ4WuhX6YPikLRfh7Im0CBHias3
-         Nfu2g/sZ9fNb7cSH+JfVqC5OKnlqDxwlx1rcDwtBpXmn64rUj75BMB9Ckc5EPOXa7vw7
-         1IP0kWZZ+4f3QGcMzSgNTNaGDVi+1aABWpJotM4lLyUEz4pUAKV66hiR90YD10oMcoRr
-         qBAQ==
-X-Gm-Message-State: AOAM5319svGXp+htqKOvAaGn5H50/u2gmsxC3NRYPAAth79hQVBybGEi
-        k/KNpCMkahVcCpzjdvXE3xlAVINKw4oI0GfyrvXOuvVpaxaGOm4gXj/plO1km66mWgOoXBA5ZjX
-        4MFek5Jtnh+M3
-X-Received: by 2002:adf:fd48:: with SMTP id h8mr8238593wrs.229.1616668018213;
-        Thu, 25 Mar 2021 03:26:58 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwBTujIWNkDzf/wNwRNzZd57i5I9jgY+9t+YqLrMxkr/bkSu6aLA/urK8lINmqRAJa9Wu/cyw==
-X-Received: by 2002:adf:fd48:: with SMTP id h8mr8238578wrs.229.1616668018030;
-        Thu, 25 Mar 2021 03:26:58 -0700 (PDT)
-Received: from steredhat (host-79-34-249-199.business.telecomitalia.it. [79.34.249.199])
-        by smtp.gmail.com with ESMTPSA id p17sm5370291wmq.47.2021.03.25.03.26.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 25 Mar 2021 03:26:57 -0700 (PDT)
-Date:   Thu, 25 Mar 2021 11:26:55 +0100
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     Arseny Krasnov <arseny.krasnov@kaspersky.com>
-Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Jorgen Hansen <jhansen@vmware.com>,
-        Andra Paraschiv <andraprs@amazon.com>,
-        Norbert Slusarek <nslusarek@gmx.net>,
-        Colin Ian King <colin.king@canonical.com>,
-        Alexander Popov <alex.popov@linux.com>, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, stsp2@yandex.ru, oxffffaa@gmail.com
-Subject: Re: [RFC PATCH v7 15/22] virtio/vsock: SEQPACKET support feature bit
-Message-ID: <20210325102655.ujyfpapvwnubcggn@steredhat>
-References: <20210323130716.2459195-1-arseny.krasnov@kaspersky.com>
- <20210323131352.2461534-1-arseny.krasnov@kaspersky.com>
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=CAkDP25OFlShJCPDxQST7B40b5DDqLE/vRJZQKviFIQ=;
+        b=GdX96tqMBdFMRuPKse/S5u+Fn7yuJhdOOt6Xq+BUnlxv1nfU9Ouittcw4nMEYk0s4wgFjl
+        KsRna7lhZb8xuvYmGalsy8QTFdA1sKAVvm+hnk69HcRvajVPAZOIa6v1N4s2mjyV2InLaD
+        HOQj5Arosp7WG6MWL/Xs5JTqzLUsuQg=
+Date:   Thu, 25 Mar 2021 11:29:59 +0100
+From:   Borislav Petkov <bp@alien8.de>
+To:     Hugh Dickins <hughd@google.com>
+Cc:     Babu Moger <babu.moger@amd.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        kvm list <kvm@vger.kernel.org>, Joerg Roedel <joro@8bytes.org>,
+        the arch/x86 maintainers <x86@kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Ingo Molnar <mingo@redhat.com>,
+        "H . Peter Anvin" <hpa@zytor.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Makarand Sonare <makarandsonare@google.com>,
+        Sean Christopherson <seanjc@google.com>
+Subject: [PATCH] x86/tlb: Flush global mappings when KAISER is disabled
+Message-ID: <20210325102959.GD31322@zn.tnic>
+References: <2ca37e61-08db-3e47-f2b9-8a7de60757e6@amd.com>
+ <20210311214013.GH5829@zn.tnic>
+ <d3e9e091-0fc8-1e11-ab99-9c8be086f1dc@amd.com>
+ <4a72f780-3797-229e-a938-6dc5b14bec8d@amd.com>
+ <20210311235215.GI5829@zn.tnic>
+ <ed590709-65c8-ca2f-013f-d2c63d5ee0b7@amd.com>
+ <20210324212139.GN5010@zn.tnic>
+ <alpine.LSU.2.11.2103241651280.9593@eggly.anvils>
+ <alpine.LSU.2.11.2103241913190.10112@eggly.anvils>
+ <20210325095619.GC31322@zn.tnic>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20210323131352.2461534-1-arseny.krasnov@kaspersky.com>
+In-Reply-To: <20210325095619.GC31322@zn.tnic>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Mar 23, 2021 at 04:13:49PM +0300, Arseny Krasnov wrote:
->This adds new virtio vsock specific feature bit which means
->SOCK_SEQPACKET support. Guest negotiates this bit with vhost,
->thus checking that vhost side supports SEQPACKET.
->
->Signed-off-by: Arseny Krasnov <arseny.krasnov@kaspersky.com>
->---
-> include/uapi/linux/virtio_vsock.h | 3 +++
-> 1 file changed, 3 insertions(+)
+Ok,
 
-Since you have this patch, I think you can generalize the title, update 
-the description, and merge here the changes I mentioned in patch 11/22 
-about changes of include/uapi/linux/virtio_vsock.h.
+I tried to be as specific as possible in the commit message so that we
+don't forget. Please lemme know if I've missed something.
 
-So you can have a single patch with the new virtio-spec defines and 
-structs related to SEQPACKET, of course then we move it before patch 11.
+Babu, Jim, I'd appreciate it if you ran this to confirm.
 
-What do you think?
+Thx.
 
-Stefano
+---
+From: Borislav Petkov <bp@suse.de>
+Date: Thu, 25 Mar 2021 11:02:31 +0100
 
->
->diff --git a/include/uapi/linux/virtio_vsock.h b/include/uapi/linux/virtio_vsock.h
->index 692f8078cced..619aaebb355a 100644
->--- a/include/uapi/linux/virtio_vsock.h
->+++ b/include/uapi/linux/virtio_vsock.h
->@@ -38,6 +38,9 @@
-> #include <linux/virtio_ids.h>
-> #include <linux/virtio_config.h>
->
->+/* The feature bitmap for virtio vsock */
->+#define VIRTIO_VSOCK_F_SEQPACKET	0	/* SOCK_SEQPACKET supported */
->+
-> struct virtio_vsock_config {
-> 	__le64 guest_cid;
-> } __attribute__((packed));
->-- 
->2.25.1
->
+Jim Mattson reported that Debian 9 guests using a 4.9-stable kernel
+are exploding during alternatives patching:
 
+  kernel BUG at /build/linux-dqnRSc/linux-4.9.228/arch/x86/kernel/alternative.c:709!
+  invalid opcode: 0000 [#1] SMP
+  Modules linked in:
+  CPU: 1 PID: 1 Comm: swapper/0 Not tainted 4.9.0-13-amd64 #1 Debian 4.9.228-1
+  Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
+  Call Trace:
+   swap_entry_free
+   swap_entry_free
+   text_poke_bp
+   swap_entry_free
+   arch_jump_label_transform
+   set_debug_rodata
+   __jump_label_update
+   static_key_slow_inc
+   frontswap_register_ops
+   init_zswap
+   init_frontswap
+   do_one_initcall
+   set_debug_rodata
+   kernel_init_freeable
+   rest_init
+   kernel_init
+   ret_from_fork
+
+triggering the BUG_ON in text_poke() which verifies whether patched
+instruction bytes have actually landed at the destination.
+
+Further debugging showed that the TLB flush before that check is
+insufficient because there could be global mappings left in the TLB,
+leading to a stale mapping getting used.
+
+I say "global mappings" because the hardware configuration is a new one:
+machine is an AMD, which means, KAISER/PTI doesn't need to be enabled
+there, which also means there's no user/kernel pagetables split and
+therefore the TLB can have global mappings.
+
+And the configuration is new one for a second reason: because that AMD
+machine supports PCID and INVPCID, which leads the CPU detection code to
+set the synthetic X86_FEATURE_INVPCID_SINGLE flag.
+
+Now, __native_flush_tlb_single() does invalidate global mappings when
+X86_FEATURE_INVPCID_SINGLE is *not* set and returns.
+
+When X86_FEATURE_INVPCID_SINGLE is set, however, it invalidates the
+requested address from both PCIDs in the KAISER-enabled case. But if
+KAISER is not enabled and the machine has global mappings in the TLB,
+then those global mappings do not get invalidated, which would lead to
+the above mismatch from using a stale TLB entry.
+
+So make sure to flush those global mappings in the KAISER disabled case.
+
+Co-debugged by Babu Moger <babu.moger@amd.com>.
+
+Reported-by: Jim Mattson <jmattson@google.com>
+Signed-off-by: Borislav Petkov <bp@suse.de>
+Link: https://lkml.kernel.org/r/CALMp9eRDSW66%2BXvbHVF4ohL7XhThoPoT0BrB0TcS0cgk=dkcBg@mail.gmail.com
+---
+ arch/x86/include/asm/tlbflush.h | 11 +++++++----
+ 1 file changed, 7 insertions(+), 4 deletions(-)
+
+diff --git a/arch/x86/include/asm/tlbflush.h b/arch/x86/include/asm/tlbflush.h
+index f5ca15622dc9..2bfa4deb8cae 100644
+--- a/arch/x86/include/asm/tlbflush.h
++++ b/arch/x86/include/asm/tlbflush.h
+@@ -245,12 +245,15 @@ static inline void __native_flush_tlb_single(unsigned long addr)
+ 	 * ASID.  But, userspace flushes are probably much more
+ 	 * important performance-wise.
+ 	 *
+-	 * Make sure to do only a single invpcid when KAISER is
+-	 * disabled and we have only a single ASID.
++	 * In the KAISER disabled case, do an INVLPG to make sure
++	 * the mapping is flushed in case it is a global one.
+ 	 */
+-	if (kaiser_enabled)
++	if (kaiser_enabled) {
+ 		invpcid_flush_one(X86_CR3_PCID_ASID_USER, addr);
+-	invpcid_flush_one(X86_CR3_PCID_ASID_KERN, addr);
++		invpcid_flush_one(X86_CR3_PCID_ASID_KERN, addr);
++	} else {
++		asm volatile("invlpg (%0)" ::"r" (addr) : "memory");
++	}
+ }
+ 
+ static inline void __flush_tlb_all(void)
+-- 
+2.29.2
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
