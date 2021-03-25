@@ -2,39 +2,39 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1F4FA348F2A
-	for <lists+kvm@lfdr.de>; Thu, 25 Mar 2021 12:27:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DC59F348F75
+	for <lists+kvm@lfdr.de>; Thu, 25 Mar 2021 12:28:26 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230489AbhCYL0R (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 25 Mar 2021 07:26:17 -0400
-Received: from mail.kernel.org ([198.145.29.99]:33920 "EHLO mail.kernel.org"
+        id S231219AbhCYL1r (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 25 Mar 2021 07:27:47 -0400
+Received: from mail.kernel.org ([198.145.29.99]:35170 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230156AbhCYLZa (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 25 Mar 2021 07:25:30 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 2A0C661A30;
-        Thu, 25 Mar 2021 11:25:29 +0000 (UTC)
+        id S231178AbhCYL0g (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 25 Mar 2021 07:26:36 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id AC35961A3B;
+        Thu, 25 Mar 2021 11:26:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1616671530;
+        s=k20201202; t=1616671588;
         bh=lQLmD8mWJ5lbA1jcQr4LGTtmStNrM7Wj2L0lbI7A420=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=Bt0qDbF+AVkNZZ5pYtAAgisiShbQecvaEgnb9KzT6WH6GMaVOOJfVo25QRIrmEbie
-         q5NQf4zmn3Bi4tfdbmhZtzu/11k34ywLnv/oZeYu/E6PekMEINgbCakUhucVi3OhVr
-         TbJU+IshuKqYQpemhbVAw+QIlDTEX4jCoAb1o8wDXkEIOtSWC1ZWVHUN4KFKQb7gVh
-         UnGS5V5R0spDdciyA6I9wApSCBkiJoyigmpioxP5pzylaUqHykIK3+c7ndfRrPYTZ9
-         pzXKV+ZBcpOKatkEOb5G1SDMwd7dujkVGWBOAFQS8kyfc2xp3zXxsYwo8H4DKfVle+
-         e48F5pvyMLCzg==
+        b=K7AA6aD1+E8JEo+Xgmj/8l2qZu90cjx1+6xLkV3GLBinVkHeKO59VjWVyej5UOdje
+         ZCJ7heM2ryALK4TbRlODtIuyKfhNIkeDHLgWEB+k6yK5ltMk7mrF2harlMctCKFyS+
+         SOY3eW2kBJFP0iG/qIz3G6TFL/fnf4ON12i2lk2W2FFDnc+43CWfXv+q4ljD+LLPHa
+         vWMDYora9WVg0pxyxUQxedUKBmg98R2xwZzm5/ysdPx35HGD1rNV6DU0TvcViQJRar
+         5NaV3zqgbT+B9h19uJkO+/OBoDR5bin4P9LVf0Ff4w5dtY3WMNojtQokVnQGfRN+wY
+         J3d7P18IUCazw==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Laurent Vivier <lvivier@redhat.com>,
         "Michael S . Tsirkin" <mst@redhat.com>,
         Sasha Levin <sashal@kernel.org>, kvm@vger.kernel.org,
         virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.11 23/44] vhost: Fix vhost_vq_reset()
-Date:   Thu, 25 Mar 2021 07:24:38 -0400
-Message-Id: <20210325112459.1926846-23-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.10 22/39] vhost: Fix vhost_vq_reset()
+Date:   Thu, 25 Mar 2021 07:25:41 -0400
+Message-Id: <20210325112558.1927423-22-sashal@kernel.org>
 X-Mailer: git-send-email 2.30.1
-In-Reply-To: <20210325112459.1926846-1-sashal@kernel.org>
-References: <20210325112459.1926846-1-sashal@kernel.org>
+In-Reply-To: <20210325112558.1927423-1-sashal@kernel.org>
+References: <20210325112558.1927423-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
