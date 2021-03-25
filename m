@@ -2,76 +2,144 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 22B8A348B7D
-	for <lists+kvm@lfdr.de>; Thu, 25 Mar 2021 09:26:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 99A81348B9A
+	for <lists+kvm@lfdr.de>; Thu, 25 Mar 2021 09:34:32 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229574AbhCYI0Z (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 25 Mar 2021 04:26:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56780 "EHLO
+        id S229574AbhCYId5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 25 Mar 2021 04:33:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58446 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229533AbhCYI0U (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 25 Mar 2021 04:26:20 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 77EBAC06174A;
-        Thu, 25 Mar 2021 01:26:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=IzwmhOqvIxwQPFK4E3Oa+CaBwei0j7Z1kHs2r0VicEc=; b=XChpT9BvzSkcKTC2L6pglmtqNW
-        x+opZ3kV2asW/R1xhMVEPkDGdW6thedfIfn6YoDTFki6MY1t4h896/cTLH1MTjKCmfA4ngqa507b8
-        WqI6IhRpwUJDgUk8bEVyxoy3yHed8K1bWqir2Hdk7kV14K5JLpiZnuxtrPTIXiTE/XZiotNkhttx5
-        Bnd3Gw61TRDpDX6hpIPKwjWcrQ34+03fV66mFds8Q/u5F4dupsvAB58YKvJlNEZB6pkcFyA+UVw4X
-        FwcMMISnV5Wf0bZ0+GVp79yQbVdsIdAZjC+tCJtCXnHuC6c2KiXj4Dq+Aci4HMmLSOVCwCT0r9s1S
-        2y9CV1pA==;
-Received: from hch by casper.infradead.org with local (Exim 4.94 #2 (Red Hat Linux))
-        id 1lPLHU-00CXQ9-Os; Thu, 25 Mar 2021 08:24:08 +0000
-Date:   Thu, 25 Mar 2021 08:23:52 +0000
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Yongji Xie <xieyongji@bytedance.com>
-Cc:     Christoph Hellwig <hch@infradead.org>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        Parav Pandit <parav@nvidia.com>, Bob Liu <bob.liu@oracle.com>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Matthew Wilcox <willy@infradead.org>, viro@zeniv.linux.org.uk,
-        Jens Axboe <axboe@kernel.dk>, bcrl@kvack.org,
-        Jonathan Corbet <corbet@lwn.net>,
-        Mika Penttil?? <mika.penttila@nextfour.com>,
-        Dan Carpenter <dan.carpenter@oracle.com>,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        kvm@vger.kernel.org, linux-fsdevel@vger.kernel.org
-Subject: Re: [PATCH v5 01/11] file: Export __receive_fd() to modules
-Message-ID: <20210325082352.GA2988009@infradead.org>
-References: <20210315053721.189-1-xieyongji@bytedance.com>
- <20210315053721.189-2-xieyongji@bytedance.com>
- <20210315090822.GA4166677@infradead.org>
- <CACycT3vrHOExXj6v8ULvUzdLcRkdzS5=TNK6=g4+RWEdN-nOJw@mail.gmail.com>
+        with ESMTP id S229581AbhCYIdt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 25 Mar 2021 04:33:49 -0400
+Received: from mail-ej1-x633.google.com (mail-ej1-x633.google.com [IPv6:2a00:1450:4864:20::633])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0915AC06174A;
+        Thu, 25 Mar 2021 01:33:49 -0700 (PDT)
+Received: by mail-ej1-x633.google.com with SMTP id u21so1481071ejo.13;
+        Thu, 25 Mar 2021 01:33:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=DG509l2PkxXN6P5FW9KJ6L3L9tjWoNFCQPMWavCi9Hs=;
+        b=tYybAzNy2NJo3wOuiJxIdKRRldKtZkmP54NEIFJOjVWqt5vDY0mWJEVte52k+D5F9g
+         KuhhXqVwsMGv945KMjdwiCOPNqqIdnpA/3JZB77lGOEVYLq0EqJHW96JpSMeLRDd5ANg
+         Pc9h1j+q7noYVzO/eAO/yuZCH3oxmRVrtxtrOnhNiNBn86yaeRWpmji6tG+4QLfcbO5O
+         gxxJMJPTHWR+EDZRYSsvS0lMj95/e/3FrcdfQSy1R9r/jqSOErOX+d3S+iUv54yzkCo7
+         k+DjloO4LDmLImGYsOkYz3t1chIGYyE9R1R21fiZm/ttuWr7zVHUjNQaozBJl7Cgf7AJ
+         EGkg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=DG509l2PkxXN6P5FW9KJ6L3L9tjWoNFCQPMWavCi9Hs=;
+        b=rfbhBtRnabieveC8ywnbtao0rNn+MPHYAT0JjfoIn704dwwhKmjv6Rv6pMYaIpYslj
+         fOa8/dlE25fUF5mXkxw5Qu6vh930RfB1EAItXkMWsD1FjjvvyxdhvwBrikvLjk7J6J0t
+         XKtrU9h6sRtukOaHq+6l+H7RFAH0wDscczIzW49OwIrO4l3Gx1l+Myn97RDdwsCfvBx0
+         sr3AGleDNsMn6xXx9qaY6nsNJPbGPLW4IbXnGkub8Gm2lsYA4xby5w/DFNWI4IMKoaHO
+         VfEqxnNmUGiURWZAopP9Y12u0SQ9/PXaxRiPasPI4BcZ+g81CVJJV5kmGjmD5hK4Kytm
+         UiMQ==
+X-Gm-Message-State: AOAM5326BQ9kSoZzmwNkSGif/s+aHuUmFkqMZWgZYh7GWg7m2wWs6xrB
+        EZNCtyzdAHPJMTuuL0S71qdfeMa4+ivUZJHjLA==
+X-Google-Smtp-Source: ABdhPJxE48sFuEwRba6GyLkITt2RlEq+yfl8Kvnhs2WOF1NKQsIeTXnTgoPtATA5mLeluNTQqo3HbEklGWm3WC37epk=
+X-Received: by 2002:a17:906:f210:: with SMTP id gt16mr8092558ejb.206.1616661227783;
+ Thu, 25 Mar 2021 01:33:47 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CACycT3vrHOExXj6v8ULvUzdLcRkdzS5=TNK6=g4+RWEdN-nOJw@mail.gmail.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+References: <20210323084515.1346540-1-vkuznets@redhat.com> <CAB5KdObQ7t4aXFsYioNdVfNt6B+ChJLB5dKsWxAtoXMYpgSoBA@mail.gmail.com>
+ <87czvny7pw.fsf@vitty.brq.redhat.com>
+In-Reply-To: <87czvny7pw.fsf@vitty.brq.redhat.com>
+From:   Haiwei Li <lihaiwei.kernel@gmail.com>
+Date:   Thu, 25 Mar 2021 16:33:08 +0800
+Message-ID: <CAB5KdObOS1V=oGxSeiNfifHYO_20LopiJ2-M-44xA6OTjGa9Qg@mail.gmail.com>
+Subject: Re: [PATCH] KVM: x86/vPMU: Forbid writing to MSR_F15H_PERF MSRs when
+ guest doesn't have X86_FEATURE_PERFCTR_CORE
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     kvm list <kvm@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Wei Huang <wei.huang2@amd.com>, Joerg Roedel <joro@8bytes.org>,
+        LKML <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Mar 15, 2021 at 05:46:43PM +0800, Yongji Xie wrote:
-> On Mon, Mar 15, 2021 at 5:08 PM Christoph Hellwig <hch@infradead.org> wrote:
+On Thu, Mar 25, 2021 at 4:10 PM Vitaly Kuznetsov <vkuznets@redhat.com> wrote:
+>
+> Haiwei Li <lihaiwei.kernel@gmail.com> writes:
+>
+> > On Tue, Mar 23, 2021 at 4:48 PM Vitaly Kuznetsov <vkuznets@redhat.com> wrote:
+> >>
+> >> MSR_F15H_PERF_CTL0-5, MSR_F15H_PERF_CTR0-5 MSRs are only available when
+> >> X86_FEATURE_PERFCTR_CORE CPUID bit was exposed to the guest. KVM, however,
+> >> allows these MSRs unconditionally because kvm_pmu_is_valid_msr() ->
+> >> amd_msr_idx_to_pmc() check always passes and because kvm_pmu_set_msr() ->
+> >> amd_pmu_set_msr() doesn't fail.
+> >>
+> >> In case of a counter (CTRn), no big harm is done as we only increase
+> >> internal PMC's value but in case of an eventsel (CTLn), we go deep into
+> >> perf internals with a non-existing counter.
+> >>
+> >> Note, kvm_get_msr_common() just returns '0' when these MSRs don't exist
+> >> and this also seems to contradict architectural behavior which is #GP
+> >> (I did check one old Opteron host) but changing this status quo is a bit
+> >> scarier.
 > >
-> > On Mon, Mar 15, 2021 at 01:37:11PM +0800, Xie Yongji wrote:
-> > > Export __receive_fd() so that some modules can use
-> > > it to pass file descriptor between processes.
+> > When msr doesn't exist, kvm_get_msr_common() returns KVM_MSR_RET_INVALID
+> > in `default:` and kvm_complete_insn_gp() will inject #GP to guest.
 > >
-> > I really don't think any non-core code should do that, especilly not
-> > modular mere driver code.
-> 
-> Do you see any issue? Now I think we're able to do that with the help
-> of get_unused_fd_flags() and fd_install() in modules. But we may miss
-> some security stuff in this way. So I try to export __receive_fd() and
-> use it instead.
+>
+> I'm looking at the following in kvm_get_msr_common():
+>
+>         switch (msr_info->index) {
+>         ...
+>         case MSR_F15H_PERF_CTL0 ... MSR_F15H_PERF_CTR5:
+>         ...
+>                 if (kvm_pmu_is_valid_msr(vcpu, msr_info->index))
+>                         return kvm_pmu_get_msr(vcpu, msr_info);
+>                 msr_info->data = 0;
+>                 break;
+>         ...
+>         }
+>         return 0;
+>
+> so it's kind of 'always exists' or am I wrong?
 
-The real problem is now what helper to use, but rather that random
-drivers should not just mess with the FD table like that.
+I am sorry. You are right. You were talking about `MSR_F15H_PERF_CTL0
+... MSR_F15H_PERF_CTR5`.
+I thought you were talking about the registers not catched in
+kvm_get_msr_common().
+
+>
+> > Also i have wrote a kvm-unit-test, tested both on amd EPYC and intel
+> > CascadeLake. A #GP error was printed.
+> > Just like:
+> >
+> > Unhandled exception 13 #GP at ip 0000000000400420
+> > error_code=0000      rflags=00010006      cs=00000008
+> > rax=0000000000000000 rcx=0000000000000620 rdx=00000000006164a0
+> > rbx=0000000000009500
+> > rbp=0000000000517490 rsi=0000000000616ae0 rdi=0000000000000001
+> >  r8=0000000000000001  r9=00000000000003f8 r10=000000000000000d
+> > r11=0000000000000000
+> > r12=0000000000000000 r13=0000000000000000 r14=0000000000000000
+> > r15=0000000000000000
+> > cr0=0000000080000011 cr2=0000000000000000 cr3=000000000040b000
+> > cr4=0000000000000020
+> > cr8=0000000000000000
+> > STACK: @400420 400338
+>
+> Did this happen on read or write? The later is expected, the former is
+> not. Could you maybe drop your code here, I'd like to see what's going
+> on.
+
+I did a bad test. The msr tested is not catched in
+kvm_get_msr_common(). As said, I misunderstood
+what you meant.
+
+I have tested your patch and replied. If you have any to test, I'm
+glad to help. :)
+
+--
+Haiwei Li
