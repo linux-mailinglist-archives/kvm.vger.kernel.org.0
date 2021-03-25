@@ -2,98 +2,87 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 05B92348E7B
-	for <lists+kvm@lfdr.de>; Thu, 25 Mar 2021 12:04:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7D728348E88
+	for <lists+kvm@lfdr.de>; Thu, 25 Mar 2021 12:09:14 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230232AbhCYLEX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 25 Mar 2021 07:04:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34574 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229900AbhCYLEQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 25 Mar 2021 07:04:16 -0400
-Received: from mail-ed1-x52f.google.com (mail-ed1-x52f.google.com [IPv6:2a00:1450:4864:20::52f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9B673C061761
-        for <kvm@vger.kernel.org>; Thu, 25 Mar 2021 04:04:15 -0700 (PDT)
-Received: by mail-ed1-x52f.google.com with SMTP id z1so1907074edb.8
-        for <kvm@vger.kernel.org>; Thu, 25 Mar 2021 04:04:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance-com.20150623.gappssmtp.com; s=20150623;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=j2E60y1zApCOo+ENPh4Raxx8g6jv2cSuCJQwpROVgZM=;
-        b=NJGQnx0hgav0GkNAdtKNYFd7qAmAChqCbGdNkXAUa3cC8TQHvdXIjOG60ulPMn73HL
-         mA7Nflw13a2bx1P7QUnfLz54yS/cJ+Ull7wFnwig6BLiedqJxfX5CyYUygAgJ4pdF9xa
-         xcYhu982NODL5AucrVjVrnlv5A9vCfEYPJAipKfO2tFBXZYTb/VExa3Zvno/Rw5kNgo5
-         WyLZxP+lh+89M2hO1MZdYmMLcldZYgIoM77y5S0HwTLg5URwYyKFyn3/bKzIpMl8D2Cr
-         EkrMNUf+M/nxEAToXIbU7k05Dosj/5n7X/mn+VoUgYzebFt4zXmbPtTTsWNrOXymqeQg
-         6Myw==
+        id S230095AbhCYLIm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 25 Mar 2021 07:08:42 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:34203 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229533AbhCYLIh (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 25 Mar 2021 07:08:37 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1616670517;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=fKj3N7qjc3wKOxA3NoAZDiYAxmrNm7GOxG509L79+1k=;
+        b=cu7S7EHiaulfggoULBC4P4taWnfY/OR6EnUoKO/WN792PjJI4fzLuch2hn/dlD6/F1Kntt
+        OKVl8FLVZDRNllWHTLCmxa4/O2NpYGjA2GZwXyUbbIAZhol6X8bWokErwYdeNMaoDqO4sA
+        hgWoGtnty2pz+sQgmurf/iAonWYij0Y=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-355-PzJuig2fPEGjlhoN1k2Uxw-1; Thu, 25 Mar 2021 07:08:35 -0400
+X-MC-Unique: PzJuig2fPEGjlhoN1k2Uxw-1
+Received: by mail-wm1-f72.google.com with SMTP id a65so1117434wmh.1
+        for <kvm@vger.kernel.org>; Thu, 25 Mar 2021 04:08:35 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=j2E60y1zApCOo+ENPh4Raxx8g6jv2cSuCJQwpROVgZM=;
-        b=oBfmR9Ol1tydrtDxc7wcAajmFl/idgq6DKG21UPe3adYAg3bLfP8+CYFHMtAAIyOU2
-         PlX80ryLTVN4WrF2Vo/+RmeLnmwJsh09BFXT4BzWfcYbxcwkY+/TKL4z8Q2RjJXjpb3k
-         CTIv7Iw9paDW5ECG0cE2997ZWlfTCet3G8IzgQHBy4fjjQcNhozB0FNP03+obQm6epNX
-         moIAVkgpzVvbX+1+noPmxtTvzqUKM/oBMbZ65DSsNAjj7QkmeNy4Af/w5e04lyKHsPJD
-         f8tGseE+52VrzVgLSP2IB23/30xExQD2hzP2lclqCuEtmWqsJmi4/6ChQDORPIs9Yggl
-         Wpdw==
-X-Gm-Message-State: AOAM532tGk3n01tSKSZKvXxArC8agocUmyqYqzrAxGDTZEvr6v1wQbNR
-        X6tQI2MbjPOE99oUONBs3r2kuK483wOOKlXu5hlD
-X-Google-Smtp-Source: ABdhPJwfx6x9YQM73q+Dp50D7TkGMmiBWWO++0MkTstakFGwRy8KOMmbPhHLSGmWxz4gE1lZVY0LAsR3u2gni+Bnu6Q=
-X-Received: by 2002:a05:6402:4314:: with SMTP id m20mr8215245edc.5.1616670254143;
- Thu, 25 Mar 2021 04:04:14 -0700 (PDT)
-MIME-Version: 1.0
-References: <20210315053721.189-1-xieyongji@bytedance.com> <20210315053721.189-2-xieyongji@bytedance.com>
- <20210315090822.GA4166677@infradead.org> <CACycT3vrHOExXj6v8ULvUzdLcRkdzS5=TNK6=g4+RWEdN-nOJw@mail.gmail.com>
- <20210325082352.GA2988009@infradead.org>
-In-Reply-To: <20210325082352.GA2988009@infradead.org>
-From:   Yongji Xie <xieyongji@bytedance.com>
-Date:   Thu, 25 Mar 2021 19:04:03 +0800
-Message-ID: <CACycT3ta_FdLD2GMNuJ7QHNucCaf4hHEsUgG0WNZJNQzNk9J9A@mail.gmail.com>
-Subject: Re: Re: [PATCH v5 01/11] file: Export __receive_fd() to modules
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     Christian Brauner <christian.brauner@canonical.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        Parav Pandit <parav@nvidia.com>, Bob Liu <bob.liu@oracle.com>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Matthew Wilcox <willy@infradead.org>, viro@zeniv.linux.org.uk,
-        Jens Axboe <axboe@kernel.dk>, bcrl@kvack.org,
-        Jonathan Corbet <corbet@lwn.net>,
-        "Mika Penttil??" <mika.penttila@nextfour.com>,
-        Dan Carpenter <dan.carpenter@oracle.com>,
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=fKj3N7qjc3wKOxA3NoAZDiYAxmrNm7GOxG509L79+1k=;
+        b=qdW6v/4nBjdo6JXsViq3XWIx8OSwIhcpgBdfSoxherg6gpbcswMbBdkELdGKltgzXj
+         Hbyn8KbbQtQ3VPpPX6zcHB7ZUFHtM6jCeeN9UQqd8eZZHiZTbyBcd6W5bkW1LjQY9U0V
+         +NGN4CaswKk/7ZvcdElDJhz8cXdJkCDNgDTm2WvjBHe+005y64R0JkwycXXtdrnwGck5
+         MiqInTRQjl1aw7RqySgKuASrUbb0uCZCzM35IbXaWSCGRW1xLpNJ8ir29ogRP3y5x8D9
+         43Lryuk7NwzggjdghZken+Lsa2f4KwS5ArrOPZ5G72RW1TdiV6VVFhlnq0PCe4NTDe+V
+         vLcw==
+X-Gm-Message-State: AOAM533PFT5oMpdQmjvC3Zhq5RAe2XUcX7PWEgEdPb3++Pb4zbBCPlFF
+        MDeTXBE7GYh1uv0la1MzCuv7skdSsP80T2AQySv+YiYa4DI3/nF7LQ9/53hjAhbNUu0hr+3vZx8
+        ZSzxnL+pwJmbH
+X-Received: by 2002:a05:600c:204f:: with SMTP id p15mr7394496wmg.165.1616670514584;
+        Thu, 25 Mar 2021 04:08:34 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyiEtLL2V7byI4WDi3Jbt4TeRDQzSQxBNNRwTIXQ/L2sd55YH0ycog2gsdgUk7sVz7dGg2BRg==
+X-Received: by 2002:a05:600c:204f:: with SMTP id p15mr7394472wmg.165.1616670514357;
+        Thu, 25 Mar 2021 04:08:34 -0700 (PDT)
+Received: from steredhat (host-79-34-249-199.business.telecomitalia.it. [79.34.249.199])
+        by smtp.gmail.com with ESMTPSA id w22sm5958086wmi.22.2021.03.25.04.08.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 25 Mar 2021 04:08:33 -0700 (PDT)
+Date:   Thu, 25 Mar 2021 12:08:31 +0100
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     Xie Yongji <xieyongji@bytedance.com>
+Cc:     mst@redhat.com, jasowang@redhat.com, stefanha@redhat.com,
+        parav@nvidia.com, bob.liu@oracle.com, hch@infradead.org,
+        rdunlap@infradead.org, willy@infradead.org,
+        viro@zeniv.linux.org.uk, axboe@kernel.dk, bcrl@kvack.org,
+        corbet@lwn.net, mika.penttila@nextfour.com,
+        dan.carpenter@oracle.com,
         virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
         kvm@vger.kernel.org, linux-fsdevel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [PATCH v5 03/11] vhost-vdpa: protect concurrent access to vhost
+ device iotlb
+Message-ID: <20210325110831.v57e4xg7twzzcu7n@steredhat>
+References: <20210315053721.189-1-xieyongji@bytedance.com>
+ <20210315053721.189-4-xieyongji@bytedance.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20210315053721.189-4-xieyongji@bytedance.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Mar 25, 2021 at 4:25 PM Christoph Hellwig <hch@infradead.org> wrote:
+On Mon, Mar 15, 2021 at 01:37:13PM +0800, Xie Yongji wrote:
+>Use vhost_dev->mutex to protect vhost device iotlb from
+>concurrent access.
 >
-> On Mon, Mar 15, 2021 at 05:46:43PM +0800, Yongji Xie wrote:
-> > On Mon, Mar 15, 2021 at 5:08 PM Christoph Hellwig <hch@infradead.org> wrote:
-> > >
-> > > On Mon, Mar 15, 2021 at 01:37:11PM +0800, Xie Yongji wrote:
-> > > > Export __receive_fd() so that some modules can use
-> > > > it to pass file descriptor between processes.
-> > >
-> > > I really don't think any non-core code should do that, especilly not
-> > > modular mere driver code.
-> >
-> > Do you see any issue? Now I think we're able to do that with the help
-> > of get_unused_fd_flags() and fd_install() in modules. But we may miss
-> > some security stuff in this way. So I try to export __receive_fd() and
-> > use it instead.
->
-> The real problem is now what helper to use, but rather that random
-> drivers should not just mess with the FD table like that.
+>Fixes: 4c8cf318("vhost: introduce vDPA-based backend")
+>Signed-off-by: Xie Yongji <xieyongji@bytedance.com>
+>---
+> drivers/vhost/vdpa.c | 6 +++++-
+> 1 file changed, 5 insertions(+), 1 deletion(-)
 
-I see. I will use receive_fd() instead that only receives and installs
-an fd. This is indeed needed in our cases.
 
-Thanks,
-Yongji
+Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+
