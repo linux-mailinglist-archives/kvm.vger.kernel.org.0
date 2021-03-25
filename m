@@ -2,39 +2,39 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A7A81349648
-	for <lists+kvm@lfdr.de>; Thu, 25 Mar 2021 17:03:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 08F2934964C
+	for <lists+kvm@lfdr.de>; Thu, 25 Mar 2021 17:03:36 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229865AbhCYQDD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 25 Mar 2021 12:03:03 -0400
-Received: from mx13.kaspersky-labs.com ([91.103.66.164]:15295 "EHLO
-        mx13.kaspersky-labs.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229631AbhCYQCa (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 25 Mar 2021 12:02:30 -0400
-Received: from relay13.kaspersky-labs.com (unknown [127.0.0.10])
-        by relay13.kaspersky-labs.com (Postfix) with ESMTP id 4D6FA52190E;
-        Thu, 25 Mar 2021 19:02:27 +0300 (MSK)
+        id S229904AbhCYQDF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 25 Mar 2021 12:03:05 -0400
+Received: from mx12.kaspersky-labs.com ([91.103.66.155]:36091 "EHLO
+        mx12.kaspersky-labs.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229900AbhCYQC4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 25 Mar 2021 12:02:56 -0400
+Received: from relay12.kaspersky-labs.com (unknown [127.0.0.10])
+        by relay12.kaspersky-labs.com (Postfix) with ESMTP id A6628769B2;
+        Thu, 25 Mar 2021 19:02:53 +0300 (MSK)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kaspersky.com;
-        s=mail202102; t=1616688147;
-        bh=utEKFQWw51QLyrDrgZJN35f3SBUwp5SWcZF11LdrQUY=;
+        s=mail202102; t=1616688173;
+        bh=RO1t5ueJP/AnptFtk+OAbsY0AzvoZeOtI+4YZ3NubDY=;
         h=Subject:To:From:Message-ID:Date:MIME-Version:Content-Type;
-        b=GoHwjENLxG8lxct/H8s2NXFGS55erPDbRLPzNNIEVUbB0qY6UqE3mYs6kyz/Ov5hT
-         9TEsyhrtaUrfpWhPp710AF1Iw/9SPpTt06EH4Wq+PUvOiATLvwNCahKnqkCOXNNp47
-         FMXRr810W29l9siLTg8322h/gw9N+o3CXXp7UyRQv/FCqcS0fG8hCyF8dsePRe66kQ
-         CuYUORlvsKJY/EUNoODiITvTWyErtKi5mBGrDtOPXxfY85WvhwCFd/8rtWNsJN5KAO
-         /30i/ABIElClz9/DWhk+FWyvcrh/Q9GDrMWDZwiQ7Zqt07jkcYK6E7pFEpblaepOjb
-         aL7BzgyNwMU9Q==
+        b=HJTOrkYBapAaXySftjIQk1fiLYhzOEJMY/NTIoufvlSrbibuigVvamDmrf7z2pDKu
+         E8ka1cu8jZiqr6TarzVgtfYFJ5HHZJ7gSdL3ERjVm9aqAKV3eZ9gvixY75PSCC+oiP
+         KVSQzZcjIedcMfkPItV6Sic0nYwZ6FIk9KJk8opFgHakDlNse5DkQS1FPK9QcRWm/x
+         YSldbTO+g1fRPGotAmSCU0viwOVv946vsg8hhzLI76JrOn6HLdaV4HwTtc64F9Tpea
+         TzhaIRsG3A4rWwa0ldfZBIpS2vkOPXo7VQD1hIxDpjDpAMP3xOY5t6jCvcN3WgsKcM
+         hFbDOsi3tgziQ==
 Received: from mail-hq2.kaspersky.com (unknown [91.103.66.206])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
         (Client CN "mail-hq2.kaspersky.com", Issuer "Kaspersky MailRelays CA G3" (verified OK))
-        by mailhub13.kaspersky-labs.com (Postfix) with ESMTPS id 61625521925;
-        Thu, 25 Mar 2021 19:02:26 +0300 (MSK)
+        by mailhub12.kaspersky-labs.com (Postfix) with ESMTPS id 63990769BB;
+        Thu, 25 Mar 2021 19:02:53 +0300 (MSK)
 Received: from [10.16.171.77] (10.64.68.128) by hqmailmbx3.avp.ru
  (10.64.67.243) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2176.2; Thu, 25
- Mar 2021 19:02:25 +0300
-Subject: Re: [RFC PATCH v7 11/22] virtio/vsock: dequeue callback for
- SOCK_SEQPACKET
+ Mar 2021 19:02:52 +0300
+Subject: Re: [RFC PATCH v7 12/22] virtio/vsock: fetch length for SEQPACKET
+ record
 To:     Stefano Garzarella <sgarzare@redhat.com>
 CC:     Stefan Hajnoczi <stefanha@redhat.com>,
         "Michael S. Tsirkin" <mst@redhat.com>,
@@ -43,8 +43,8 @@ CC:     Stefan Hajnoczi <stefanha@redhat.com>,
         Jakub Kicinski <kuba@kernel.org>,
         Jorgen Hansen <jhansen@vmware.com>,
         Andra Paraschiv <andraprs@amazon.com>,
-        Norbert Slusarek <nslusarek@gmx.net>,
         Colin Ian King <colin.king@canonical.com>,
+        Norbert Slusarek <nslusarek@gmx.net>,
         Alexander Popov <alex.popov@linux.com>,
         "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
         "virtualization@lists.linux-foundation.org" 
@@ -54,15 +54,15 @@ CC:     Stefan Hajnoczi <stefanha@redhat.com>,
         "stsp2@yandex.ru" <stsp2@yandex.ru>,
         "oxffffaa@gmail.com" <oxffffaa@gmail.com>
 References: <20210323130716.2459195-1-arseny.krasnov@kaspersky.com>
- <20210323131244.2461050-1-arseny.krasnov@kaspersky.com>
- <20210325095623.q44wr2ymavq7axtv@steredhat>
+ <20210323131258.2461163-1-arseny.krasnov@kaspersky.com>
+ <20210325100810.ygmg6vqb2f7rxoyx@steredhat>
 From:   Arseny Krasnov <arseny.krasnov@kaspersky.com>
-Message-ID: <876a149d-f37e-bc03-f8dd-ce33f9d24890@kaspersky.com>
-Date:   Thu, 25 Mar 2021 19:02:25 +0300
+Message-ID: <c854e025-dc10-2549-9485-47992a794552@kaspersky.com>
+Date:   Thu, 25 Mar 2021 19:02:52 +0300
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20210325095623.q44wr2ymavq7axtv@steredhat>
+In-Reply-To: <20210325100810.ygmg6vqb2f7rxoyx@steredhat>
 Content-Type: text/plain; charset="windows-1252"
 Content-Transfer-Encoding: 7bit
 Content-Language: en-US
@@ -108,265 +108,131 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
-On 25.03.2021 12:56, Stefano Garzarella wrote:
-> On Tue, Mar 23, 2021 at 04:12:41PM +0300, Arseny Krasnov wrote:
->> This adds transport callback and it's logic for SEQPACKET dequeue.
->> Callback fetches RW packets from rx queue of socket until whole record
->> is copied(if user's buffer is full, user is not woken up). This is done
->> to not stall sender, because if we wake up user and it leaves syscall,
->> nobody will send credit update for rest of record, and sender will wait
->> for next enter of read syscall at receiver's side. So if user buffer is
->> full, we just send credit update and drop data. If during copy SEQ_BEGIN
->> was found(and not all data was copied), copying is restarted by reset
->> user's iov iterator(previous unfinished data is dropped).
+On 25.03.2021 13:08, Stefano Garzarella wrote:
+> On Tue, Mar 23, 2021 at 04:12:55PM +0300, Arseny Krasnov wrote:
+>> This adds transport callback which tries to fetch record begin marker
+> >from socket's rx queue. It is called from af_vsock.c before reading data
+>> packets of record.
 >>
 >> Signed-off-by: Arseny Krasnov <arseny.krasnov@kaspersky.com>
 >> ---
 >> v6 -> v7:
->> 1) 'struct virtio_vsock_seqpacket_state' now renamed to
->>    'struct virtio_vsock_seq_state'.
->> 2) Field 'seqpacket_state' of 'struct virtio_vsock_sock' now
->>    renamed to 'seq_state'.
->> 3) Current message length to process('user_read_seq_len') is
->>    set to 0 on error or message dequeue completed sucecssfully.
+>> 1) Now 'virtio_transport_seqpacket_seq_get_len()' returns 0, if rx
+>>    queue of socket is empty. Else it returns length of current message
+>>    to handle.
+>> 2) If dequeue callback is called, but there is no detected length of
+>>    message to dequeue, EAGAIN is returned, and outer loop restarts
+>>    receiving.
 >>
->> include/linux/virtio_vsock.h            |  14 +++
->> include/uapi/linux/virtio_vsock.h       |  16 ++++
->> net/vmw_vsock/virtio_transport_common.c | 121 ++++++++++++++++++++++++
->> 3 files changed, 151 insertions(+)
+>> net/vmw_vsock/virtio_transport_common.c | 61 +++++++++++++++++++++++++
+>> 1 file changed, 61 insertions(+)
 >>
->> diff --git a/include/linux/virtio_vsock.h b/include/linux/virtio_vsock.h
->> index dc636b727179..0e3aa395c07c 100644
->> --- a/include/linux/virtio_vsock.h
->> +++ b/include/linux/virtio_vsock.h
->> @@ -18,6 +18,12 @@ enum {
->> 	VSOCK_VQ_MAX    = 3,
->> };
->>
->> +struct virtio_vsock_seq_state {
->> +	u32 user_read_seq_len;
->> +	u32 user_read_copied;
->> +	u32 curr_rx_msg_id;
->> +};
->> +
->> /* Per-socket state (accessed via vsk->trans) */
->> struct virtio_vsock_sock {
->> 	struct vsock_sock *vsk;
->> @@ -36,6 +42,8 @@ struct virtio_vsock_sock {
->> 	u32 rx_bytes;
->> 	u32 buf_alloc;
->> 	struct list_head rx_queue;
->> +
->> +	struct virtio_vsock_seq_state seq_state;
->> };
->>
->> struct virtio_vsock_pkt {
->> @@ -80,6 +88,12 @@ virtio_transport_dgram_dequeue(struct vsock_sock *vsk,
->> 			       struct msghdr *msg,
->> 			       size_t len, int flags);
->>
->> +int
->> +virtio_transport_seqpacket_dequeue(struct vsock_sock *vsk,
->> +				   struct msghdr *msg,
->> +				   int flags,
->> +				   bool *msg_ready,
->> +				   size_t *msg_len);
->> s64 virtio_transport_stream_has_data(struct vsock_sock *vsk);
->> s64 virtio_transport_stream_has_space(struct vsock_sock *vsk);
->>
->> diff --git a/include/uapi/linux/virtio_vsock.h b/include/uapi/linux/virtio_vsock.h
->> index 1d57ed3d84d2..692f8078cced 100644
->> --- a/include/uapi/linux/virtio_vsock.h
->> +++ b/include/uapi/linux/virtio_vsock.h
-> Maybe we can move the following changes to this file (that should match 
-> the virtio-spec discussed in the separate thread) in a separate patch 
-> with a reference to the spec.
->
-> You can include this in the series before this patch.
-Ack
->
->> @@ -63,8 +63,14 @@ struct virtio_vsock_hdr {
->> 	__le32	fwd_cnt;
->> } __attribute__((packed));
->>
->> +struct virtio_vsock_seq_hdr {
->> +	__le32  msg_id;
->> +	__le32  msg_len;
->> +} __attribute__((packed));
->> +
->> enum virtio_vsock_type {
->> 	VIRTIO_VSOCK_TYPE_STREAM = 1,
->> +	VIRTIO_VSOCK_TYPE_SEQPACKET = 2,
->> };
->>
->> enum virtio_vsock_op {
->> @@ -83,6 +89,11 @@ enum virtio_vsock_op {
->> 	VIRTIO_VSOCK_OP_CREDIT_UPDATE = 6,
->> 	/* Request the peer to send the credit info to us */
->> 	VIRTIO_VSOCK_OP_CREDIT_REQUEST = 7,
->> +
->> +	/* Record begin for SOCK_SEQPACKET */
->> +	VIRTIO_VSOCK_OP_SEQ_BEGIN = 8,
->> +	/* Record end for SOCK_SEQPACKET */
->> +	VIRTIO_VSOCK_OP_SEQ_END = 9,
->> };
->>
->> /* VIRTIO_VSOCK_OP_SHUTDOWN flags values */
->> @@ -91,4 +102,9 @@ enum virtio_vsock_shutdown {
->> 	VIRTIO_VSOCK_SHUTDOWN_SEND = 2,
->> };
->>
->> +/* VIRTIO_VSOCK_OP_RW flags values */
->> +enum virtio_vsock_rw {
->> +	VIRTIO_VSOCK_RW_EOR = 1,
->> +};
->> +
->> #endif /* _UAPI_LINUX_VIRTIO_VSOCK_H */
 >> diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
->> index 833104b71a1c..a8f4326e45e8 100644
+>> index a8f4326e45e8..41f05034593e 100644
 >> --- a/net/vmw_vsock/virtio_transport_common.c
 >> +++ b/net/vmw_vsock/virtio_transport_common.c
->> @@ -393,6 +393,114 @@ virtio_transport_stream_do_dequeue(struct vsock_sock *vsk,
->> 	return err;
+>> @@ -399,6 +399,62 @@ static inline void virtio_transport_remove_pkt(struct virtio_vsock_pkt *pkt)
+>> 	virtio_transport_free_pkt(pkt);
 >> }
 >>
->> +static inline void virtio_transport_remove_pkt(struct virtio_vsock_pkt *pkt)
+>> +static size_t virtio_transport_drop_until_seq_begin(struct 
+>> virtio_vsock_sock *vvs)
 >> +{
->> +	list_del(&pkt->list);
->> +	virtio_transport_free_pkt(pkt);
->> +}
+>> +	struct virtio_vsock_pkt *pkt, *n;
+>> +	size_t bytes_dropped = 0;
 >> +
->> +static int virtio_transport_seqpacket_do_dequeue(struct vsock_sock *vsk,
->> +						 struct msghdr *msg,
->> +						 bool *msg_ready)
->> +{
->> +	struct virtio_vsock_sock *vvs = vsk->trans;
->> +	struct virtio_vsock_pkt *pkt;
->> +	int err = 0;
->> +	size_t user_buf_len = msg->msg_iter.count;
->> +
->> +	*msg_ready = false;
->> +	spin_lock_bh(&vvs->rx_lock);
->> +
->> +	while (!*msg_ready && !list_empty(&vvs->rx_queue) && !err) {
->> +		pkt = list_first_entry(&vvs->rx_queue, struct virtio_vsock_pkt, list);
->> +
->> +		switch (le16_to_cpu(pkt->hdr.op)) {
->> +		case VIRTIO_VSOCK_OP_SEQ_BEGIN: {
->> +			/* Unexpected 'SEQ_BEGIN' during record copy:
->> +			 * Leave receive loop, 'EAGAIN' will restart it from
->> +			 * outer receive loop, packet is still in queue and
->> +			 * counters are cleared. So in next loop enter,
->> +			 * 'SEQ_BEGIN' will be dequeued first. User's iov
->> +			 * iterator will be reset in outer loop. Also
->> +			 * send credit update, because some bytes could be
->> +			 * copied. User will never see unfinished record.
->> +			 */
->> +			err = -EAGAIN;
+>> +	list_for_each_entry_safe(pkt, n, &vvs->rx_queue, list) {
+>> +		if (le16_to_cpu(pkt->hdr.op) == VIRTIO_VSOCK_OP_SEQ_BEGIN)
 >> +			break;
->> +		}
->> +		case VIRTIO_VSOCK_OP_SEQ_END: {
->> +			struct virtio_vsock_seq_hdr *seq_hdr;
 >> +
->> +			seq_hdr = (struct virtio_vsock_seq_hdr *)pkt->buf;
->> +			/* First check that whole record is received. */
->> +
->> +			if (vvs->seq_state.user_read_copied !=
->> +			    vvs->seq_state.user_read_seq_len ||
->> +			    le32_to_cpu(seq_hdr->msg_id) !=
->> +			    vvs->seq_state.curr_rx_msg_id) {
->> +				/* Tail of current record and head of 
->> next missed,
->> +				 * so this EOR is from next record. Restart receive.
->> +				 * Current record will be dropped, next headless will
->> +				 * be dropped on next attempt to get record length.
->> +				 */
->> +				err = -EAGAIN;
->> +			} else {
->> +				/* Success. */
->> +				*msg_ready = true;
->> +			}
->> +
->> +			break;
->> +		}
->> +		case VIRTIO_VSOCK_OP_RW: {
->> +			size_t bytes_to_copy;
->> +			size_t pkt_len;
->> +
->> +			pkt_len = (size_t)le32_to_cpu(pkt->hdr.len);
->> +			bytes_to_copy = min(user_buf_len, pkt_len);
->> +
->> +			/* sk_lock is held by caller so no one else can dequeue.
->> +			 * Unlock rx_lock since memcpy_to_msg() may sleep.
->> +			 */
->> +			spin_unlock_bh(&vvs->rx_lock);
->> +
->> +			if (memcpy_to_msg(msg, pkt->buf, bytes_to_copy)) {
->> +				spin_lock_bh(&vvs->rx_lock);
->> +				err = -EINVAL;
->> +				break;
->> +			}
->> +
->> +			spin_lock_bh(&vvs->rx_lock);
->> +			user_buf_len -= bytes_to_copy;
->> +			vvs->seq_state.user_read_copied += pkt_len;
->> +
->> +			if (le32_to_cpu(pkt->hdr.flags) & VIRTIO_VSOCK_RW_EOR)
->> +				msg->msg_flags |= MSG_EOR;
->> +			break;
->> +		}
->> +		default:
->> +			;
->> +		}
->> +
->> +		/* For unexpected 'SEQ_BEGIN', keep such packet in queue,
->> +		 * but drop any other type of packet.
->> +		 */
->> +		if (le16_to_cpu(pkt->hdr.op) != VIRTIO_VSOCK_OP_SEQ_BEGIN) {
->> +			virtio_transport_dec_rx_pkt(vvs, pkt);
->> +			virtio_transport_remove_pkt(pkt);
->> +		}
+>> +		bytes_dropped += le32_to_cpu(pkt->hdr.len);
+>> +		virtio_transport_dec_rx_pkt(vvs, pkt);
+>> +		virtio_transport_remove_pkt(pkt);
 >> +	}
 >> +
->> +	/* Reset current record length on error or whole message received. */
->> +	if (*msg_ready || err)
->> +		vvs->seq_state.user_read_seq_len = 0;
+>> +	return bytes_dropped;
+>> +}
 >> +
+>> +static size_t virtio_transport_seqpacket_seq_get_len(struct vsock_sock *vsk)
+>> +{
+>> +	struct virtio_vsock_seq_hdr *seq_hdr;
+>> +	struct virtio_vsock_sock *vvs;
+>> +	struct virtio_vsock_pkt *pkt;
+>> +	size_t bytes_dropped = 0;
+>> +
+>> +	vvs = vsk->trans;
+>> +
+>> +	spin_lock_bh(&vvs->rx_lock);
+>> +
+>> +	/* Have some record to process, return it's length. */
+>> +	if (vvs->seq_state.user_read_seq_len)
+>> +		goto out;
+>> +
+>> +	/* Fetch all orphaned 'RW' packets and send credit update. */
+>> +	bytes_dropped = virtio_transport_drop_until_seq_begin(vvs);
+>> +
+>> +	if (list_empty(&vvs->rx_queue))
+>> +		goto out;
+>> +
+>> +	pkt = list_first_entry(&vvs->rx_queue, struct virtio_vsock_pkt, list);
+>> +
+>> +	vvs->seq_state.user_read_copied = 0;
+>> +
+>> +	seq_hdr = (struct virtio_vsock_seq_hdr *)pkt->buf;
+>> +	vvs->seq_state.user_read_seq_len = le32_to_cpu(seq_hdr->msg_len);
+>> +	vvs->seq_state.curr_rx_msg_id = le32_to_cpu(seq_hdr->msg_id);
+>> +	virtio_transport_dec_rx_pkt(vvs, pkt);
+>> +	virtio_transport_remove_pkt(pkt);
+>> +out:
 >> +	spin_unlock_bh(&vvs->rx_lock);
 >> +
->> +	virtio_transport_send_credit_update(vsk);
+>> +	if (bytes_dropped)
+>> +		virtio_transport_send_credit_update(vsk);
 >> +
->> +	return err;
+>> +	return vvs->seq_state.user_read_seq_len;
 >> +}
 >> +
->> ssize_t
->> virtio_transport_stream_dequeue(struct vsock_sock *vsk,
->> 				struct msghdr *msg,
->> @@ -405,6 +513,19 @@ virtio_transport_stream_dequeue(struct vsock_sock *vsk,
->> }
->> EXPORT_SYMBOL_GPL(virtio_transport_stream_dequeue);
+>> static int virtio_transport_seqpacket_do_dequeue(struct vsock_sock *vsk,
+>> 						 struct msghdr *msg,
+>> 						 bool *msg_ready)
+>> @@ -522,6 +578,11 @@ virtio_transport_seqpacket_dequeue(struct vsock_sock *vsk,
+>> 	if (flags & MSG_PEEK)
+>> 		return -EOPNOTSUPP;
 >>
->> +int
->> +virtio_transport_seqpacket_dequeue(struct vsock_sock *vsk,
->> +				   struct msghdr *msg,
->> +				   int flags, bool *msg_ready,
->> +				   size_t *msg_len)
->> +{
->> +	if (flags & MSG_PEEK)
->> +		return -EOPNOTSUPP;
+>> +	*msg_len = virtio_transport_seqpacket_seq_get_len(vsk);
 >> +
-> msg_len seems not filled...
->
->
->> +	return virtio_transport_seqpacket_do_dequeue(vsk, msg, 
->> msg_ready);
->> +}
->> +EXPORT_SYMBOL_GPL(virtio_transport_seqpacket_dequeue);
+>> +	if (*msg_len == 0)
+>> +		return -EAGAIN;
 >> +
->> int
->> virtio_transport_dgram_dequeue(struct vsock_sock *vsk,
->> 			       struct msghdr *msg,
->> -- 
->> 2.25.1
+> Okay, I see now, I think you can move this patch before the previous one 
+> or merge them in a single patch, it is better to review and to bisect.
+>
+> As mentioned, I think we can return msg_len if 
+> virtio_transport_seqpacket_do_dequeue() does not fail, otherwise the 
+> error.
+>
+> I mean something like this:
+>
+> static ssize_t virtio_transport_seqpacket_do_dequeue(...)
+> {
+> 	size_t msg_len;
+> 	ssize_t ret;
+>
+> 	msg_len = virtio_transport_seqpacket_seq_get_len(vsk);
+> 	if (msg_len == 0)
+> 		return -EAGAIN;
+>
+> 	ret = virtio_transport_seqpacket_do_dequeue(vsk, msg, msg_ready);
+> 	if (ret < 0)
+> 		return ret;
+>
+> 	return msg_len;
+> }
+Ack
+>
+>> 	return virtio_transport_seqpacket_do_dequeue(vsk, msg, msg_ready);
+>> }
+>> EXPORT_SYMBOL_GPL(virtio_transport_seqpacket_dequeue);
+>> -- 2.25.1
 >>
 >
