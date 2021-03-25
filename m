@@ -2,248 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DC16C348C2E
-	for <lists+kvm@lfdr.de>; Thu, 25 Mar 2021 10:07:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A95BF348C7F
+	for <lists+kvm@lfdr.de>; Thu, 25 Mar 2021 10:16:14 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229730AbhCYJHC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 25 Mar 2021 05:07:02 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:38490 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229659AbhCYJGj (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 25 Mar 2021 05:06:39 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1616663199;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=yTJfubzS7O7K/IVv79ceaGJUkFP1xXgqWQXScYQW8Qg=;
-        b=KPMgKeHe1M4rNt90kQPeg92UwjzdRDdECWr4SfV3d/gt7U2WJjChz7H21XGkJyeKNsXewa
-        iAveY1X/ApWWC/T0/Uci/PPXGuuI6F3Ktbg0rTNSX2lzLloqgls5Jvvi+73OrlPLS9PXRE
-        s6c97C5uizL7xkifrhgzuJvs+rJWREk=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-265-vm8P_PVWPfSsPjOzIOTcpQ-1; Thu, 25 Mar 2021 05:06:37 -0400
-X-MC-Unique: vm8P_PVWPfSsPjOzIOTcpQ-1
-Received: by mail-wm1-f71.google.com with SMTP id j15so1380515wmq.6
-        for <kvm@vger.kernel.org>; Thu, 25 Mar 2021 02:06:37 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=yTJfubzS7O7K/IVv79ceaGJUkFP1xXgqWQXScYQW8Qg=;
-        b=tPhWn7nPnnDz4uQB1z7E1q52Y1yNU8DqJG6vdGYDwXWAZeR9S3IDi154lxvh2audRx
-         FeX7z2PXZdbs/4d0LXR0c84xdINgZ9uEmaXL9JgdJtuEkYBLDLW5iga1adIZH6sKWma5
-         QVqJHL2toRWpIgYS4d3ThObtuh28O5vhQ0W1WBwGU/reY3178m6xCCGuD+12sxhSh3KR
-         x8pyROkWpGw9Cgkb32iVJ9gJeDJJWQAgyWbrx6ZqHVDkhVdh0vLCSnX8HsCVyodwatTN
-         UivkPF0HRrurmd0GWV0Yb7JMtCYRojKl3QGS0LGYvPSH75WLYwN+fwndxf/tfZo154Fn
-         LB7g==
-X-Gm-Message-State: AOAM532O41qXlLULChEn4Ua4RQdB5qj47QnPeSoNTfwVb4CP+a2E1TSF
-        fSy/ddz/rz8H6o3NkjtUn3KHhOicnQkrLWJT7QMOtNJhUqWfYvqjLFbBOEhEqePisVIN1jHMBoU
-        GghEF9rT3rtzj
-X-Received: by 2002:a05:600c:4f8e:: with SMTP id n14mr6987771wmq.34.1616663195628;
-        Thu, 25 Mar 2021 02:06:35 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxor6DwX21nVsRBJYaahvDSiYmgc/i+EkrFRyebbt+hCSZ3Fo4Ng/+V2eKVoZdbnmON15WOqQ==
-X-Received: by 2002:a05:600c:4f8e:: with SMTP id n14mr6987710wmq.34.1616663194922;
-        Thu, 25 Mar 2021 02:06:34 -0700 (PDT)
-Received: from steredhat (host-79-34-249-199.business.telecomitalia.it. [79.34.249.199])
-        by smtp.gmail.com with ESMTPSA id 81sm5626680wmc.11.2021.03.25.02.06.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 25 Mar 2021 02:06:34 -0700 (PDT)
-Date:   Thu, 25 Mar 2021 10:06:31 +0100
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     Arseny Krasnov <arseny.krasnov@kaspersky.com>
-Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Jorgen Hansen <jhansen@vmware.com>,
-        Norbert Slusarek <nslusarek@gmx.net>,
-        Colin Ian King <colin.king@canonical.com>,
-        Andra Paraschiv <andraprs@amazon.com>,
-        Jeff Vander Stoep <jeffv@google.com>,
-        Alexander Popov <alex.popov@linux.com>, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, stsp2@yandex.ru, oxffffaa@gmail.com
-Subject: Re: [RFC PATCH v7 03/22] af_vsock: separate receive data loop
-Message-ID: <20210325090631.4o5lc2kgyb4uzslh@steredhat>
-References: <20210323130716.2459195-1-arseny.krasnov@kaspersky.com>
- <20210323130939.2459901-1-arseny.krasnov@kaspersky.com>
+        id S229873AbhCYJPl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 25 Mar 2021 05:15:41 -0400
+Received: from szxga06-in.huawei.com ([45.249.212.32]:14894 "EHLO
+        szxga06-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229801AbhCYJPR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 25 Mar 2021 05:15:17 -0400
+Received: from DGGEMS408-HUB.china.huawei.com (unknown [172.30.72.58])
+        by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4F5fXy13N9zlVtH;
+        Thu, 25 Mar 2021 17:13:38 +0800 (CST)
+Received: from S00345302A-PC.china.huawei.com (10.47.26.249) by
+ DGGEMS408-HUB.china.huawei.com (10.3.19.208) with Microsoft SMTP Server id
+ 14.3.498.0; Thu, 25 Mar 2021 17:15:07 +0800
+From:   Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+To:     <kvmarm@lists.cs.columbia.edu>, <kvm@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>, <stable@vger.kernel.org>
+CC:     <maz@kernel.org>, <pbonzini@redhat.com>, <linuxarm@huawei.com>
+Subject: [PATCH for-stable-5.10 0/2] Backport for- Work around firmware wrongly advertising GICv2 compatibility 
+Date:   Thu, 25 Mar 2021 09:14:22 +0000
+Message-ID: <20210325091424.26348-1-shameerali.kolothum.thodi@huawei.com>
+X-Mailer: git-send-email 2.12.0.windows.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20210323130939.2459901-1-arseny.krasnov@kaspersky.com>
+Content-Type: text/plain
+X-Originating-IP: [10.47.26.249]
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Mar 23, 2021 at 04:09:36PM +0300, Arseny Krasnov wrote:
->Move STREAM specific data receive logic to '__vsock_stream_recvmsg()'
->dedicated function, while checks, that will be same for both STREAM
->and SEQPACKET sockets, stays in 'vsock_connectible_recvmsg()' shared
->functions.
->
->Signed-off-by: Arseny Krasnov <arseny.krasnov@kaspersky.com>
->---
-> net/vmw_vsock/af_vsock.c | 116 ++++++++++++++++++++++-----------------
-> 1 file changed, 67 insertions(+), 49 deletions(-)
+Backport 2 patches that are required on ARM64 platforms having
+firmware wrongly advertising GICv2 compatibility.
 
-I had already reviewed this in v5 and in v6 you reported the R-b tag.
+Patch 1 has nvhe related conflict resolution while patch 2 is
+cleanly applied.
 
-Usually the tag gets removed if you make changes to the patch or the 
-reviewer is no longer happy. But this doesn't seem to be the case.
+Tested on HiSilicon D06 platform.
 
-So please keep the tags between versions :-)
+Marc Zyngier (2):
+  KVM: arm64: Rename __vgic_v3_get_ich_vtr_el2() to
+    __vgic_v3_get_gic_config()
+  KVM: arm64: Workaround firmware wrongly advertising GICv2-on-v3
+    compatibility
 
+ arch/arm64/include/asm/kvm_asm.h   |  4 +--
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c |  4 +--
+ arch/arm64/kvm/hyp/vgic-v3-sr.c    | 40 ++++++++++++++++++++++++++++--
+ arch/arm64/kvm/vgic/vgic-v3.c      | 12 ++++++---
+ 4 files changed, 51 insertions(+), 9 deletions(-)
 
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
-
->
->diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
->index 421c0303b26f..0bc661e54262 100644
->--- a/net/vmw_vsock/af_vsock.c
->+++ b/net/vmw_vsock/af_vsock.c
->@@ -1895,65 +1895,22 @@ static int vsock_wait_data(struct sock *sk, struct wait_queue_entry *wait,
-> 	return data;
-> }
->
->-static int
->-vsock_connectible_recvmsg(struct socket *sock, struct msghdr *msg, size_t len,
->-			  int flags)
->+static int __vsock_stream_recvmsg(struct sock *sk, struct msghdr *msg,
->+				  size_t len, int flags)
-> {
->-	struct sock *sk;
->-	struct vsock_sock *vsk;
->+	struct vsock_transport_recv_notify_data recv_data;
-> 	const struct vsock_transport *transport;
->-	int err;
->-	size_t target;
->+	struct vsock_sock *vsk;
-> 	ssize_t copied;
->+	size_t target;
-> 	long timeout;
->-	struct vsock_transport_recv_notify_data recv_data;
->+	int err;
->
-> 	DEFINE_WAIT(wait);
->
->-	sk = sock->sk;
-> 	vsk = vsock_sk(sk);
->-	err = 0;
->-
->-	lock_sock(sk);
->-
-> 	transport = vsk->transport;
->
->-	if (!transport || sk->sk_state != TCP_ESTABLISHED) {
->-		/* Recvmsg is supposed to return 0 if a peer performs an
->-		 * orderly shutdown. Differentiate between that case and when a
->-		 * peer has not connected or a local shutdown occured with the
->-		 * SOCK_DONE flag.
->-		 */
->-		if (sock_flag(sk, SOCK_DONE))
->-			err = 0;
->-		else
->-			err = -ENOTCONN;
->-
->-		goto out;
->-	}
->-
->-	if (flags & MSG_OOB) {
->-		err = -EOPNOTSUPP;
->-		goto out;
->-	}
->-
->-	/* We don't check peer_shutdown flag here since peer may actually shut
->-	 * down, but there can be data in the queue that a local socket can
->-	 * receive.
->-	 */
->-	if (sk->sk_shutdown & RCV_SHUTDOWN) {
->-		err = 0;
->-		goto out;
->-	}
->-
->-	/* It is valid on Linux to pass in a zero-length receive buffer.  This
->-	 * is not an error.  We may as well bail out now.
->-	 */
->-	if (!len) {
->-		err = 0;
->-		goto out;
->-	}
->-
-> 	/* We must not copy less than target bytes into the user's buffer
-> 	 * before returning successfully, so we wait for the consume queue to
-> 	 * have that much data to consume before dequeueing.  Note that this
->@@ -2012,6 +1969,67 @@ vsock_connectible_recvmsg(struct socket *sock, struct msghdr *msg, size_t len,
-> 	if (copied > 0)
-> 		err = copied;
->
->+out:
->+	return err;
->+}
->+
->+static int
->+vsock_connectible_recvmsg(struct socket *sock, struct msghdr *msg, size_t len,
->+			  int flags)
->+{
->+	struct sock *sk;
->+	struct vsock_sock *vsk;
->+	const struct vsock_transport *transport;
->+	int err;
->+
->+	DEFINE_WAIT(wait);
->+
->+	sk = sock->sk;
->+	vsk = vsock_sk(sk);
->+	err = 0;
->+
->+	lock_sock(sk);
->+
->+	transport = vsk->transport;
->+
->+	if (!transport || sk->sk_state != TCP_ESTABLISHED) {
->+		/* Recvmsg is supposed to return 0 if a peer performs an
->+		 * orderly shutdown. Differentiate between that case and when a
->+		 * peer has not connected or a local shutdown occurred with the
->+		 * SOCK_DONE flag.
->+		 */
->+		if (sock_flag(sk, SOCK_DONE))
->+			err = 0;
->+		else
->+			err = -ENOTCONN;
->+
->+		goto out;
->+	}
->+
->+	if (flags & MSG_OOB) {
->+		err = -EOPNOTSUPP;
->+		goto out;
->+	}
->+
->+	/* We don't check peer_shutdown flag here since peer may actually shut
->+	 * down, but there can be data in the queue that a local socket can
->+	 * receive.
->+	 */
->+	if (sk->sk_shutdown & RCV_SHUTDOWN) {
->+		err = 0;
->+		goto out;
->+	}
->+
->+	/* It is valid on Linux to pass in a zero-length receive buffer.  This
->+	 * is not an error.  We may as well bail out now.
->+	 */
->+	if (!len) {
->+		err = 0;
->+		goto out;
->+	}
->+
->+	err = __vsock_stream_recvmsg(sk, msg, len, flags);
->+
-> out:
-> 	release_sock(sk);
-> 	return err;
->-- 
->2.25.1
->
+-- 
+2.17.1
 
