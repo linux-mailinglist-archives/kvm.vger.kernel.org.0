@@ -2,39 +2,39 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5C362348FCB
-	for <lists+kvm@lfdr.de>; Thu, 25 Mar 2021 12:30:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0994C349015
+	for <lists+kvm@lfdr.de>; Thu, 25 Mar 2021 12:33:17 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231772AbhCYL3x (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 25 Mar 2021 07:29:53 -0400
+        id S231663AbhCYLb6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 25 Mar 2021 07:31:58 -0400
 Received: from mail.kernel.org ([198.145.29.99]:36054 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231522AbhCYL1c (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 25 Mar 2021 07:27:32 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id E8CC861A5F;
-        Thu, 25 Mar 2021 11:27:11 +0000 (UTC)
+        id S230231AbhCYL3b (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 25 Mar 2021 07:29:31 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 9A7C561A35;
+        Thu, 25 Mar 2021 11:27:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1616671632;
-        bh=khVMeroJE9TqWHtGxQZsHpu5jSfqIAr/VTELrdLP8WQ=;
+        s=k20201202; t=1616671660;
+        bh=uBIhWWjaumqUkT48h+0CFrN6UT3+lsecp0oxcgqB+l0=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=sMFjZpZG/WNB+qnOz5OEH38LmpoxwRBnfQHxp+ihrNlZgi7waj34Xh7LPlFwBu/08
-         GGWqCLULipGqF5mY+HHgkj0MmmTOu+kzj62k74bDufkdzc1wsffhjNB0pHySg2Ik7P
-         Ly/GIzvBHfX1b+8v2zgHs9smxbZPbOVhYwwxkVMTw4aKD0/IjrBF2th1sa9iM9Xyey
-         gw9Fg2ngmLbEf5AtXPanO10KhkNry6BKyS2MtMRoCNwvZsJxN2xfWoPCcbNev8NFaB
-         F2KLe56HC/eYvDd+L15Ua/q+OInkxIPkVwoYnPLO/JuqE0gG4DvD+oV4Rbsmviuc2R
-         t3s+9Zz6TWJcw==
+        b=t1M3trFFjrYvrnqMneur+zObD9A/jRGEniPC/n6NPWLhDXMM16jdk7Oinl+pOqF2s
+         b6Z01I2ZBWrY79cQ93nXaREaaCpAxVujdkR25RydYvTdOV0+bSTibDoMKIbgDXpx/I
+         /48hV/kafooP+jPu64AeBOpNGprxq0Un0FZNi1FtEpgglCCIbVDp+fdptD6NiKBoja
+         FHtSNQluEIUUYjJwWGiR6/VY2O9YX5Pe2MWpomXl913NSFVJK8rjFsSIEzKkP0lfq2
+         DUTMQgZuB2HABebiP4bXD44irf57gNlpiSFIA+zZkq/Q4t9pj1LCSDeg2wq+jDkUKo
+         fbkLc4szhWR4Q==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Laurent Vivier <lvivier@redhat.com>,
         "Michael S . Tsirkin" <mst@redhat.com>,
         Sasha Levin <sashal@kernel.org>, kvm@vger.kernel.org,
         virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.4 16/24] vhost: Fix vhost_vq_reset()
-Date:   Thu, 25 Mar 2021 07:26:42 -0400
-Message-Id: <20210325112651.1927828-16-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.19 12/20] vhost: Fix vhost_vq_reset()
+Date:   Thu, 25 Mar 2021 07:27:16 -0400
+Message-Id: <20210325112724.1928174-12-sashal@kernel.org>
 X-Mailer: git-send-email 2.30.1
-In-Reply-To: <20210325112651.1927828-1-sashal@kernel.org>
-References: <20210325112651.1927828-1-sashal@kernel.org>
+In-Reply-To: <20210325112724.1928174-1-sashal@kernel.org>
+References: <20210325112724.1928174-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -71,10 +71,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
-index 57ab79fbcee9..a279ecacbf60 100644
+index 98b6eb902df9..732327756ee1 100644
 --- a/drivers/vhost/vhost.c
 +++ b/drivers/vhost/vhost.c
-@@ -320,8 +320,8 @@ static void vhost_vq_reset(struct vhost_dev *dev,
+@@ -322,8 +322,8 @@ static void vhost_vq_reset(struct vhost_dev *dev,
  	vq->kick = NULL;
  	vq->call_ctx = NULL;
  	vq->log_ctx = NULL;
