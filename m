@@ -2,144 +2,269 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EF9F934963E
-	for <lists+kvm@lfdr.de>; Thu, 25 Mar 2021 17:00:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2FE5A349643
+	for <lists+kvm@lfdr.de>; Thu, 25 Mar 2021 17:02:33 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229519AbhCYQAK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 25 Mar 2021 12:00:10 -0400
-Received: from mga04.intel.com ([192.55.52.120]:21136 "EHLO mga04.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229533AbhCYP7x (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 25 Mar 2021 11:59:53 -0400
-IronPort-SDR: R3S4Nm4FQWv0vfhnWuU30uTvaZv4kTt8qJML42QMwWu0W5xDoAh6iQtdTr+lpJEZDf18bz+Uaf
- 8cylNA5yOX6g==
-X-IronPort-AV: E=McAfee;i="6000,8403,9934"; a="188663086"
-X-IronPort-AV: E=Sophos;i="5.81,277,1610438400"; 
-   d="scan'208";a="188663086"
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Mar 2021 08:59:52 -0700
-IronPort-SDR: /nZj8Nf7NEa+IfB4El49KWhSTYKLhykaGlZYp3an7m07X/5z2XD7W1qxi/GDT6SuaZ5DSmBR7d
- jNMiZQF9hGhw==
-X-IronPort-AV: E=Sophos;i="5.81,277,1610438400"; 
-   d="scan'208";a="391792943"
-Received: from jeffche1-mobl.amr.corp.intel.com (HELO [10.209.73.71]) ([10.209.73.71])
-  by orsmga002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Mar 2021 08:59:51 -0700
-Subject: Re: [RFC Part2 PATCH 07/30] mm: add support to split the large THP
- based on RMP violation
-To:     Brijesh Singh <brijesh.singh@amd.com>,
-        linux-kernel@vger.kernel.org, x86@kernel.org, kvm@vger.kernel.org,
-        linux-crypto@vger.kernel.org
-Cc:     ak@linux.intel.com, herbert@gondor.apana.org.au,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Joerg Roedel <jroedel@suse.de>,
-        "H. Peter Anvin" <hpa@zytor.com>, Tony Luck <tony.luck@intel.com>,
-        "Peter Zijlstra (Intel)" <peterz@infradead.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        David Rientjes <rientjes@google.com>,
-        Sean Christopherson <seanjc@google.com>
-References: <20210324170436.31843-1-brijesh.singh@amd.com>
- <20210324170436.31843-8-brijesh.singh@amd.com>
- <0edd1350-4865-dd71-5c14-3d57c784d62d@intel.com>
- <86c9d9db-a881-efa4-c937-12fc62ce97e8@amd.com>
-From:   Dave Hansen <dave.hansen@intel.com>
-Autocrypt: addr=dave.hansen@intel.com; keydata=
- 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
- z5cecg==
-Message-ID: <f8bf7e26-26dc-e19a-007c-40b26e0a0a45@intel.com>
-Date:   Thu, 25 Mar 2021 08:59:51 -0700
+        id S229779AbhCYQB7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 25 Mar 2021 12:01:59 -0400
+Received: from mx12.kaspersky-labs.com ([91.103.66.155]:34910 "EHLO
+        mx12.kaspersky-labs.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229639AbhCYQBk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 25 Mar 2021 12:01:40 -0400
+Received: from relay12.kaspersky-labs.com (unknown [127.0.0.10])
+        by relay12.kaspersky-labs.com (Postfix) with ESMTP id 7F83A774AF;
+        Thu, 25 Mar 2021 19:01:31 +0300 (MSK)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kaspersky.com;
+        s=mail202102; t=1616688091;
+        bh=GaY4v6SLTMWQV0TO/GqAJWo5gYlwZP1bauQplvh/hnY=;
+        h=Subject:To:From:Message-ID:Date:MIME-Version:Content-Type;
+        b=ntpbRg4nlFVgOFjRTcmH1LjMSKt8w1JnL008KmxJsgZjhUtWm28BE0Dqq8SdZVb81
+         e7qvh4HOoOMytrcO4ufuN58NeV+JfO+85gay4KkbtU5NOYUdzLdTVhTmotWbZqNgAp
+         6ilRnefsklDqTuCSuDwNE6NzAO4BBjO/+UazWC6L3Hc3btZnpFW1jNhXHEeCUz4YOh
+         WpkJEyCo0wi+oFSh2VZUrcMiCb2gH6YY6htx314y1CX1BcVbf6FQIAS4lhEKKBICgx
+         YG6V3gzSpUWSUu9aSGsr1VoKjgADXuIyR44SSG3fQwNYhHRP8Cuz15ev4LfWGf5Oen
+         LlMgmn8qazO7A==
+Received: from mail-hq2.kaspersky.com (unknown [91.103.66.206])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
+        (Client CN "mail-hq2.kaspersky.com", Issuer "Kaspersky MailRelays CA G3" (verified OK))
+        by mailhub12.kaspersky-labs.com (Postfix) with ESMTPS id 4C9EA7749C;
+        Thu, 25 Mar 2021 19:01:30 +0300 (MSK)
+Received: from [10.16.171.77] (10.64.64.121) by hqmailmbx3.avp.ru
+ (10.64.67.243) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2176.2; Thu, 25
+ Mar 2021 19:01:28 +0300
+Subject: Re: [RFC PATCH v7 04/22] af_vsock: implement SEQPACKET receive loop
+To:     Stefano Garzarella <sgarzare@redhat.com>
+CC:     Stefan Hajnoczi <stefanha@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Jorgen Hansen <jhansen@vmware.com>,
+        Andra Paraschiv <andraprs@amazon.com>,
+        Norbert Slusarek <nslusarek@gmx.net>,
+        Colin Ian King <colin.king@canonical.com>,
+        Jeff Vander Stoep <jeffv@google.com>,
+        Alexander Popov <alex.popov@linux.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "virtualization@lists.linux-foundation.org" 
+        <virtualization@lists.linux-foundation.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "stsp2@yandex.ru" <stsp2@yandex.ru>,
+        "oxffffaa@gmail.com" <oxffffaa@gmail.com>
+References: <20210323130716.2459195-1-arseny.krasnov@kaspersky.com>
+ <20210323131006.2460058-1-arseny.krasnov@kaspersky.com>
+ <20210325093415.mpysybt5vfnsl7fg@steredhat>
+From:   Arseny Krasnov <arseny.krasnov@kaspersky.com>
+Message-ID: <c38d8987-5813-d160-3266-d6c2eadbd816@kaspersky.com>
+Date:   Thu, 25 Mar 2021 19:01:28 +0300
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <86c9d9db-a881-efa4-c937-12fc62ce97e8@amd.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20210325093415.mpysybt5vfnsl7fg@steredhat>
+Content-Type: text/plain; charset="windows-1252"
+Content-Transfer-Encoding: 7bit
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.64.64.121]
+X-ClientProxiedBy: hqmailmbx3.avp.ru (10.64.67.243) To hqmailmbx3.avp.ru
+ (10.64.67.243)
+X-KSE-ServerInfo: hqmailmbx3.avp.ru, 9
+X-KSE-AntiSpam-Interceptor-Info: scan successful
+X-KSE-AntiSpam-Version: 5.9.20, Database issued on: 03/25/2021 15:37:01
+X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
+X-KSE-AntiSpam-Method: none
+X-KSE-AntiSpam-Rate: 0
+X-KSE-AntiSpam-Info: Lua profiles 162675 [Mar 25 2021]
+X-KSE-AntiSpam-Info: LuaCore: 438 438 e169a60cee0e977a975a890ed8ef829a2851344a
+X-KSE-AntiSpam-Info: Version: 5.9.20.0
+X-KSE-AntiSpam-Info: Envelope from: arseny.krasnov@kaspersky.com
+X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
+X-KSE-AntiSpam-Info: kaspersky.com:7.1.1;127.0.0.199:7.1.2;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1
+X-KSE-AntiSpam-Info: Rate: 0
+X-KSE-AntiSpam-Info: Status: not_detected
+X-KSE-AntiSpam-Info: Method: none
+X-KSE-Antiphishing-Info: Clean
+X-KSE-Antiphishing-ScanningType: Deterministic
+X-KSE-Antiphishing-Method: None
+X-KSE-Antiphishing-Bases: 03/25/2021 15:40:00
+X-KSE-AttachmentFiltering-Interceptor-Info: no applicable attachment filtering
+ rules found
+X-KSE-Antivirus-Interceptor-Info: scan successful
+X-KSE-Antivirus-Info: Clean, bases: 25.03.2021 15:18:00
+X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
+X-KSE-AttachmentFiltering-Interceptor-Info: no applicable attachment filtering
+ rules found
+X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
+X-KLMS-Rule-ID: 52
+X-KLMS-Message-Action: clean
+X-KLMS-AntiSpam-Status: not scanned, disabled by settings
+X-KLMS-AntiSpam-Interceptor-Info: not scanned
+X-KLMS-AntiPhishing: Clean, bases: 2021/03/25 14:47:00
+X-KLMS-AntiVirus: Kaspersky Security for Linux Mail Server, version 8.0.3.30, bases: 2021/03/25 13:43:00 #16496755
+X-KLMS-AntiVirus-Status: Clean, skipped
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 3/25/21 8:24 AM, Brijesh Singh wrote:
-> On 3/25/21 9:48 AM, Dave Hansen wrote:
->> On 3/24/21 10:04 AM, Brijesh Singh wrote:
->>> When SEV-SNP is enabled globally in the system, a write from the hypervisor
->>> can raise an RMP violation. We can resolve the RMP violation by splitting
->>> the virtual address to a lower page level.
->>>
->>> e.g
->>> - guest made a page shared in the RMP entry so that the hypervisor
->>>   can write to it.
->>> - the hypervisor has mapped the pfn as a large page. A write access
->>>   will cause an RMP violation if one of the pages within the 2MB region
->>>   is a guest private page.
->>>
->>> The above RMP violation can be resolved by simply splitting the large
->>> page.
->> What if the large page is provided by hugetlbfs?
-> I was not able to find a method to split the large pages in the
-> hugetlbfs. Unfortunately, at this time a VMM cannot use the backing
-> memory from the hugetlbfs pool. An SEV-SNP aware VMM can use either
-> transparent hugepage or small pages.
 
-That's really, really nasty.  Especially since it might not be evident
-until long after boot and the guest is killed.
-
-It's even nastier because hugetlbfs is actually a great fit for SEV-SNP
-memory.  It's physically contiguous, so it would keep you from having to
-fracture the direct map all the way down to 4k, it also can't be
-reclaimed (just like all SEV memory).
-
-I think the minimal thing you can do here is to fail to add memory to
-the RMP in the first place if you can't split it.  That way, users will
-at least fail to _start_ their VM versus dying randomly for no good reason.
-
-Even better would be to come up with a stronger contract between host
-and guest.  I really don't think the host should be exposed to random
-RMP faults on the direct map.  If the guest wants to share memory, then
-it needs to tell the host and give the host an opportunity to move the
-guest physical memory.  It might, for instance, sequester all the shared
-pages in a single spot to minimize direct map fragmentation.
-
-I'll let the other x86 folks chime in on this, but I really think this
-needs a different approach than what's being proposed.
+On 25.03.2021 12:34, Stefano Garzarella wrote:
+> On Tue, Mar 23, 2021 at 04:10:03PM +0300, Arseny Krasnov wrote:
+>> This adds receive loop for SEQPACKET. It looks like receive loop for
+>> STREAM, but there is a little bit difference:
+>> 1) It doesn't call notify callbacks.
+>> 2) It doesn't care about 'SO_SNDLOWAT' and 'SO_RCVLOWAT' values, because
+>>   there is no sense for these values in SEQPACKET case.
+>> 3) It waits until whole record is received or error is found during
+>>   receiving.
+>> 4) It processes and sets 'MSG_TRUNC' flag.
+>>
+>> So to avoid extra conditions for two types of socket inside one loop, two
+>> independent functions were created.
+>>
+>> Signed-off-by: Arseny Krasnov <arseny.krasnov@kaspersky.com>
+>> ---
+>> v6 -> v7:
+>> 'seqpacket_get_len' callback now removed, length of message is returned
+>>  by 'seqpacket_dequeue' callback.
+>>
+>> include/net/af_vsock.h   |  4 ++
+>> net/vmw_vsock/af_vsock.c | 88 +++++++++++++++++++++++++++++++++++++++-
+>> 2 files changed, 91 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/include/net/af_vsock.h b/include/net/af_vsock.h
+>> index b1c717286993..74ac8a4c4168 100644
+>> --- a/include/net/af_vsock.h
+>> +++ b/include/net/af_vsock.h
+>> @@ -135,6 +135,10 @@ struct vsock_transport {
+>> 	bool (*stream_is_active)(struct vsock_sock *);
+>> 	bool (*stream_allow)(u32 cid, u32 port);
+>>
+>> +	/* SEQ_PACKET. */
+>> +	int (*seqpacket_dequeue)(struct vsock_sock *vsk, struct msghdr *msg,
+>> +				 int flags, bool *msg_ready, size_t *record_len);
+>> +
+> Why not using ssize_t as return value and return the length or a 
+> negative value in case of error?
+>
+> In this way we can remove the 'record_len' parameter.
+Ok, i think it is possible
+>
+>> 	/* Notification. */
+>> 	int (*notify_poll_in)(struct vsock_sock *, size_t, bool *);
+>> 	int (*notify_poll_out)(struct vsock_sock *, size_t, bool *);
+>> diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
+>> index 0bc661e54262..fa0c37f97330 100644
+>> --- a/net/vmw_vsock/af_vsock.c
+>> +++ b/net/vmw_vsock/af_vsock.c
+>> @@ -1973,6 +1973,89 @@ static int __vsock_stream_recvmsg(struct sock 
+>> *sk, struct msghdr *msg,
+>> 	return err;
+>> }
+>>
+>> +static int __vsock_seqpacket_recvmsg(struct sock *sk, struct msghdr 
+>> *msg,
+>> +				     size_t len, int flags)
+>> +{
+>> +	const struct vsock_transport *transport;
+>> +	const struct iovec *orig_iov;
+>> +	unsigned long orig_nr_segs;
+>> +	bool msg_ready;
+>> +	struct vsock_sock *vsk;
+>> +	size_t record_len;
+>> +	long timeout;
+>> +	int err = 0;
+>> +	DEFINE_WAIT(wait);
+>> +
+>> +	vsk = vsock_sk(sk);
+>> +	transport = vsk->transport;
+>> +
+>> +	timeout = sock_rcvtimeo(sk, flags & MSG_DONTWAIT);
+>> +	orig_nr_segs = msg->msg_iter.nr_segs;
+>> +	orig_iov = msg->msg_iter.iov;
+>> +	msg_ready = false;
+>> +	record_len = 0;
+>> +
+>> +	while (1) {
+>> +		err = vsock_wait_data(sk, &wait, timeout, NULL, 0);
+>> +
+>> +		if (err <= 0) {
+>> +			/* In case of any loop break(timeout, signal
+>> +			 * interrupt or shutdown), we report user that
+>> +			 * nothing was copied.
+>> +			 */
+>> +			err = 0;
+>> +			break;
+>> +		}
+>> +
+>> +		err = transport->seqpacket_dequeue(vsk, msg, flags, &msg_ready, &record_len);
+>> +
+>> +		if (err < 0) {
+>> +			if (err == -EAGAIN) {
+>> +				iov_iter_init(&msg->msg_iter, READ,
+>> +					      orig_iov, orig_nr_segs,
+>> +					      len);
+>> +				/* Clear 'MSG_EOR' here, because dequeue
+>> +				 * callback above set it again if it was
+>> +				 * set by sender. This 'MSG_EOR' is from
+>> +				 * dropped record.
+>> +				 */
+>> +				msg->msg_flags &= ~MSG_EOR;
+>> +				record_len = 0;
+>> +				continue;
+>> +			}
+>> +
+>> +			err = -ENOMEM;
+>> +			break;
+>> +		}
+>> +
+>> +		if (msg_ready)
+>> +			break;
+>> +	}
+>> +
+>> +	if (sk->sk_err)
+>> +		err = -sk->sk_err;
+>> +	else if (sk->sk_shutdown & RCV_SHUTDOWN)
+>> +		err = 0;
+>> +
+>> +	if (msg_ready) {
+> If 'err' is not 0, should we skip this branch?
+Ack
+>
+>> +		/* User sets MSG_TRUNC, so return real length of
+>> +		 * packet.
+>> +		 */
+>> +		if (flags & MSG_TRUNC)
+>> +			err = record_len;
+>> +		else
+>> +			err = len - msg->msg_iter.count;
+>> +
+>> +		/* Always set MSG_TRUNC if real length of packet is
+>> +		 * bigger than user's buffer.
+>> +		 */
+>> +		if (record_len > len)
+>> +			msg->msg_flags |= MSG_TRUNC;
+>> +	}
+>> +
+>> +	return err;
+>> +}
+>> +
+>> static int
+>> vsock_connectible_recvmsg(struct socket *sock, struct msghdr *msg, size_t len,
+>> 			  int flags)
+>> @@ -2028,7 +2111,10 @@ vsock_connectible_recvmsg(struct socket *sock, struct msghdr *msg, size_t len,
+>> 		goto out;
+>> 	}
+>>
+>> -	err = __vsock_stream_recvmsg(sk, msg, len, flags);
+>> +	if (sk->sk_type == SOCK_STREAM)
+>> +		err = __vsock_stream_recvmsg(sk, msg, len, flags);
+>> +	else
+>> +		err = __vsock_seqpacket_recvmsg(sk, msg, len, flags);
+>>
+>> out:
+>> 	release_sock(sk);
+>> -- 
+>> 2.25.1
+>>
+>
