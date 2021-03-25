@@ -2,102 +2,98 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E58CB34994B
-	for <lists+kvm@lfdr.de>; Thu, 25 Mar 2021 19:15:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3563C3499A8
+	for <lists+kvm@lfdr.de>; Thu, 25 Mar 2021 19:45:46 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230128AbhCYSPO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 25 Mar 2021 14:15:14 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:49517 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230137AbhCYSOq (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 25 Mar 2021 14:14:46 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1616696085;
+        id S229669AbhCYSpO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 25 Mar 2021 14:45:14 -0400
+Received: from Galois.linutronix.de ([193.142.43.55]:49514 "EHLO
+        galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230140AbhCYSou (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 25 Mar 2021 14:44:50 -0400
+From:   Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020; t=1616697888;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=kp7rjFqvtgvZ1JZJ3yQQpORrWHnOdoM9w1+Fw1e9j38=;
-        b=ZvFo+DtrHosJDPIBF0KAK+3Eweqf2WPAIgY5NkNGBOpFohOyt2wa9ayzN6WDU8yS++7uIl
-        YDacns/BAmzeN+3YOCctu+2XisAz3z9xrNO18Ja1nIP3QuPEOIbtY3cgdPIWXSdXo4fUFb
-        ZwKmGJO5IBR5AEKyVeZNrBUAWYiPins=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-572-utzkegUrN7qyeTyYfoBf9w-1; Thu, 25 Mar 2021 14:14:43 -0400
-X-MC-Unique: utzkegUrN7qyeTyYfoBf9w-1
-Received: by mail-wm1-f72.google.com with SMTP id a65so144384wmh.1
-        for <kvm@vger.kernel.org>; Thu, 25 Mar 2021 11:14:43 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=kp7rjFqvtgvZ1JZJ3yQQpORrWHnOdoM9w1+Fw1e9j38=;
-        b=JB1xMj4JG8vxXmaZn5pqQVc9n6dokLuxUh+18UEPgIciN7wU0RmEltrU1oSrm4jRxN
-         OIErPi2sEUGTR6YeF4QIfeuklTsfGf6cPRy5EFiPSI4yzjivGya7p/sBfqUqmj4lkl7i
-         wySqoPvlyMn8RaHdumpMsOYlc0P7jxwCUjbtTUiOs4U2XmVHGnSYIgHErcD5mYalThZr
-         VmkfkQatkc/H/Vxxotu7+FfP3RtaPI72cJerYmqgJve3CZ/D79EZxPxIOh0QVf7De2eE
-         Pa76i6Nk66rEiS/Y2yq7V87Rb8fjpK39bLs3/RjcfSz5f1uZbhV5pohwE4V0TtJ06UTP
-         F8hA==
-X-Gm-Message-State: AOAM530AQLzrzCebMBZdiES7xhdkueZ2evddv1RPegNn+6FvYncBWQxV
-        Uhd5ISlfucMGILLvU9p6cJwNRY+aStjU19v8gPEmWmJ7oc2mDt5SNUkMLOc/MUGj/WmVOChk3tr
-        m0dSyhaJ3TzCa
-X-Received: by 2002:a05:600c:20d3:: with SMTP id y19mr9498989wmm.146.1616696081947;
-        Thu, 25 Mar 2021 11:14:41 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJw+Zepq9Kx6C1wgPXIWc5XVPRRTInJ/jGya9YD1si2qS6bgSzqEzSGcC72NbXhEw/cVHoKUDg==
-X-Received: by 2002:a05:600c:20d3:: with SMTP id y19mr9498980wmm.146.1616696081744;
-        Thu, 25 Mar 2021 11:14:41 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id f16sm8330024wrt.21.2021.03.25.11.14.40
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 25 Mar 2021 11:14:41 -0700 (PDT)
-Subject: Re: [PATCH] tools/kvm_stat: Add restart delay
-To:     Stefan Raspl <raspl@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     borntraeger@de.ibm.com
-References: <20210325122949.1433271-1-raspl@linux.ibm.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <3016e5de-081e-2eea-9513-08c90193d840@redhat.com>
-Date:   Thu, 25 Mar 2021 19:14:40 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.7.0
+        bh=Sc4ikcvtPux6cS4O7kxP+ZUa35wiLI0ZiU6P4R8vLds=;
+        b=gKFxuNfsW+Vl9i0a62FLBGLtEjS1oiWtTzcoKGlxwwcIUkOZ19AIp7e/7xDAtFsOjoO+q0
+        CD5ikVGKd4QBstoT/QVAaj3rc9/mYbGV0TC1z9gxYHlfA0QL/E0FgqWfMcgigg5c24lipg
+        +N9qaY1tUcDHsKpjlKfflwWw1V30P0IBTgMWClvx2+IgQfAqC+ePAwGvMC0kemqjDlQd04
+        nsB3ZNNmPoy14AnvNNwtFmB59GMjC8PZPETs5j5IeVMc9RRt4DkTSHWYQW6hZTOSniCkWf
+        eh9YIIpUbp55YG0oSPoR4gCUkEt+EBaAygJ3ZEx2jY3h6LVsn80P3uLtsoE/Bw==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020e; t=1616697888;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=Sc4ikcvtPux6cS4O7kxP+ZUa35wiLI0ZiU6P4R8vLds=;
+        b=qmchaHgbktj5g1ZW7Fad7vH+aDWR4zgUUjC2juXG48RpTVOp8FNuX94Gq1nnM012a9qPrp
+        vukNwVgphsGYiiBA==
+To:     Marc Zyngier <maz@kernel.org>, Megha Dey <megha.dey@intel.com>
+Cc:     linux-kernel@vger.kernel.org, dave.jiang@intel.com,
+        ashok.raj@intel.com, kevin.tian@intel.com, dwmw@amazon.co.uk,
+        x86@kernel.org, tony.luck@intel.com, dan.j.williams@intel.com,
+        jgg@mellanox.com, kvm@vger.kernel.org,
+        iommu@lists.linux-foundation.org, alex.williamson@redhat.com,
+        bhelgaas@google.com, linux-pci@vger.kernel.org,
+        baolu.lu@linux.intel.com, ravi.v.shankar@intel.com
+Subject: Re: [Patch V2 07/13] irqdomain/msi: Provide msi_alloc/free_store() callbacks
+In-Reply-To: <8735wjrwjm.wl-maz@kernel.org>
+References: <1614370277-23235-1-git-send-email-megha.dey@intel.com> <1614370277-23235-8-git-send-email-megha.dey@intel.com> <8735wjrwjm.wl-maz@kernel.org>
+Date:   Thu, 25 Mar 2021 19:44:48 +0100
+Message-ID: <87lfabvzrz.fsf@nanos.tec.linutronix.de>
 MIME-Version: 1.0
-In-Reply-To: <20210325122949.1433271-1-raspl@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 25/03/21 13:29, Stefan Raspl wrote:
-> If this service is enabled and the system rebooted, Systemd's initial
-> attempt to start this unit file may fail in case the kvm module is not
-> loaded. Since we did not specify a delay for the retries, Systemd
-> restarts with a minimum delay a number of times before giving up and
-> disabling the service. Which means a subsequent kvm module load will
-> have kvm running without monitoring.
-> Adding a delay to fix this.
-> 
-> Signed-off-by: Stefan Raspl <raspl@linux.ibm.com>
-> ---
->   tools/kvm/kvm_stat/kvm_stat.service | 1 +
->   1 file changed, 1 insertion(+)
-> 
-> diff --git a/tools/kvm/kvm_stat/kvm_stat.service b/tools/kvm/kvm_stat/kvm_stat.service
-> index 71aabaffe779..8f13b843d5b4 100644
-> --- a/tools/kvm/kvm_stat/kvm_stat.service
-> +++ b/tools/kvm/kvm_stat/kvm_stat.service
-> @@ -9,6 +9,7 @@ Type=simple
->   ExecStart=/usr/bin/kvm_stat -dtcz -s 10 -L /var/log/kvm_stat.csv
->   ExecReload=/bin/kill -HUP $MAINPID
->   Restart=always
-> +RestartSec=60s
->   SyslogIdentifier=kvm_stat
->   SyslogLevel=debug
->   
-> 
+On Thu, Mar 25 2021 at 17:08, Marc Zyngier wrote:
+> Megha Dey <megha.dey@intel.com> wrote:
+>> @@ -434,6 +434,12 @@ int __msi_domain_alloc_irqs(struct irq_domain *domain, struct device *dev,
+>>  	if (ret)
+>>  		return ret;
+>>  
+>> +	if (ops->msi_alloc_store) {
+>> +		ret = ops->msi_alloc_store(domain, dev, nvec);
+>
+> What is supposed to happen if we get aliasing devices (similar to what
+> we have with devices behind a PCI bridge)?
+>
+> The ITS code goes through all kind of hoops to try and detect this
+> case when sizing the translation tables (in the .prepare callback),
+> and I have the feeling that sizing the message store is analogous.
 
-Queued, thanks.
+No. The message store itself is sized upfront by the underlying 'master'
+device. Each 'master' device has it's own irqdomain.
 
-Paolo
+This is the allocation for the subdevice and this is not part of PCI and
+therefore not subject to PCI aliasing.
+
+  |-----------|
+  |  PCI dev  |         <- driver creates irqdomain and manages MSI
+  |-----------|            Sizing is either fixed (hardware property)
+                           or just managed by that irqdomain/driver
+                           with some hardware constraints
+       |subdev|         <- subdev gets ^^irqdomain assigned and
+                           allocates from it.
+       .....
+       |subdev|
+
+So this is fundamentally different from ITS because ITS has to size the
+translation memory, i.e. where the MSI message is written to by the
+device.
+
+IMS just handles the storage of the message in the (sub)device. So if
+that needs to be supported on ARM then the issue is not with the
+subdevices, the issue is with the 'master' device, but that does not use
+that alloc_store() callback as it provides it with the irqdomain it
+manages.
+
+Thanks,
+
+        tglx
+
 
