@@ -2,89 +2,141 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BED923496AE
-	for <lists+kvm@lfdr.de>; Thu, 25 Mar 2021 17:21:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E24533496B6
+	for <lists+kvm@lfdr.de>; Thu, 25 Mar 2021 17:23:00 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229868AbhCYQUu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 25 Mar 2021 12:20:50 -0400
-Received: from foss.arm.com ([217.140.110.172]:53440 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229951AbhCYQU1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 25 Mar 2021 12:20:27 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 97476143D;
-        Thu, 25 Mar 2021 09:20:26 -0700 (PDT)
-Received: from C02W217MHV2R.local (unknown [10.57.23.40])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 192883F718;
-        Thu, 25 Mar 2021 09:20:25 -0700 (PDT)
-Subject: Re: [PATCH kvm-unit-tests 2/2] arm64: Output PC load offset on
- unhandled exceptions
-To:     Andrew Jones <drjones@redhat.com>, kvm@vger.kernel.org
-Cc:     alexandru.elisei@arm.com
-References: <20210325155657.600897-1-drjones@redhat.com>
- <20210325155657.600897-3-drjones@redhat.com>
-From:   Nikos Nikoleris <nikos.nikoleris@arm.com>
-Message-ID: <34d358f1-7831-cf7d-b059-e67ff1d406ba@arm.com>
-Date:   Thu, 25 Mar 2021 16:20:24 +0000
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.16; rv:78.0)
- Gecko/20100101 Thunderbird/78.8.1
+        id S229839AbhCYQWa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 25 Mar 2021 12:22:30 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:42920 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229934AbhCYQWC (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 25 Mar 2021 12:22:02 -0400
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 12PG4nJp136220
+        for <kvm@vger.kernel.org>; Thu, 25 Mar 2021 12:22:02 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=xxBd/hEmMfEkTD7FnQP30SMG0ZVutARh5b/gJRuVDJ4=;
+ b=E4AgPbzkk4XqlI6vfikmK6z34lGhyTF5IUCNJb+Dy2H10jWcz73bOYY3Eizbrh0JBl9i
+ Z0ZqOOnjSYv8PD0Otkp4yT6cBgVIt+H+tqJnHAZWf0mgIFtOb8q6dU5abLLsf9M3hGuo
+ ZJbXJTTh/sEXDV7XcCSkfdRtEu3YTu9PVxsadAoqv7VbSKyz77agulUj4joAr2/43769
+ 7Y9wxWyLN1jg46bXbtDyDCQVClYC5cnVOpTJZTFuRbdhObuIpQlfBiKuGLub1D4MxB0l
+ IK3emZ08n1TVQ8YhhVU7MAn322znjv0ZDyVb0ce6xnLMX2NCYcLFdMnb3PcRaZYdqefv bg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 37gpm5e9pq-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Thu, 25 Mar 2021 12:22:02 -0400
+Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 12PG4mhw135612
+        for <kvm@vger.kernel.org>; Thu, 25 Mar 2021 12:22:02 -0400
+Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 37gpm5e9ns-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 25 Mar 2021 12:22:02 -0400
+Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
+        by ppma05fra.de.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 12PGIIee010069;
+        Thu, 25 Mar 2021 16:21:59 GMT
+Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
+        by ppma05fra.de.ibm.com with ESMTP id 37d9a6jw4n-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 25 Mar 2021 16:21:59 +0000
+Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 12PGLccU33685906
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 25 Mar 2021 16:21:38 GMT
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id CE19E11C04A;
+        Thu, 25 Mar 2021 16:21:56 +0000 (GMT)
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 927E511C04C;
+        Thu, 25 Mar 2021 16:21:56 +0000 (GMT)
+Received: from oc3016276355.ibm.com (unknown [9.145.41.31])
+        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Thu, 25 Mar 2021 16:21:56 +0000 (GMT)
+Subject: Re: [kvm-unit-tests PATCH v2 3/8] s390x: css: simplify skipping tests
+ on no device
+To:     Claudio Imbrenda <imbrenda@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, frankja@linux.ibm.com, david@redhat.com,
+        thuth@redhat.com, cohuck@redhat.com
+References: <1616665147-32084-1-git-send-email-pmorel@linux.ibm.com>
+ <1616665147-32084-4-git-send-email-pmorel@linux.ibm.com>
+ <20210325162134.3f2f3f9e@ibm-vm>
+From:   Pierre Morel <pmorel@linux.ibm.com>
+Message-ID: <ab5c40d0-a35f-53e9-74d5-9463d98f5bcd@linux.ibm.com>
+Date:   Thu, 25 Mar 2021 17:21:56 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.8.0
 MIME-Version: 1.0
-In-Reply-To: <20210325155657.600897-3-drjones@redhat.com>
+In-Reply-To: <20210325162134.3f2f3f9e@ibm-vm>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.761
+ definitions=2021-03-25_04:2021-03-24,2021-03-25 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 clxscore=1015
+ impostorscore=0 lowpriorityscore=0 priorityscore=1501 mlxscore=0
+ phishscore=0 bulkscore=0 mlxlogscore=999 suspectscore=0 spamscore=0
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2103250114
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 25/03/2021 15:56, Andrew Jones wrote:
-> Since for arm64 we can load the unit tests at different addresses,
-> then let's make it easier to debug by calculating the PC offset for
-> the user. The offset can then be directly used when looking at the
-> disassembly of the test's elf file.
-> 
-> Signed-off-by: Andrew Jones <drjones@redhat.com
-Reviewed-by: Nikos Nikoleris <nikos.nikoleris@arm.com>
 
-> ---
->   arm/flat.lds          | 1 +
->   lib/arm64/processor.c | 7 +++++++
->   2 files changed, 8 insertions(+)
+
+On 3/25/21 4:21 PM, Claudio Imbrenda wrote:
+> On Thu, 25 Mar 2021 10:39:02 +0100
+> Pierre Morel <pmorel@linux.ibm.com> wrote:
 > 
-> diff --git a/arm/flat.lds b/arm/flat.lds
-> index 4d43cdfeab41..6ed377c0eaa0 100644
-> --- a/arm/flat.lds
-> +++ b/arm/flat.lds
-> @@ -1,6 +1,7 @@
->   
->   SECTIONS
->   {
-> +    PROVIDE(_text = .);
->       .text : { *(.init) *(.text) *(.text.*) }
->       . = ALIGN(64K);
->       PROVIDE(etext = .);
-> diff --git a/lib/arm64/processor.c b/lib/arm64/processor.c
-> index ef558625e284..831207c16587 100644
-> --- a/lib/arm64/processor.c
-> +++ b/lib/arm64/processor.c
-> @@ -99,12 +99,19 @@ bool get_far(unsigned int esr, unsigned long *far)
->   	return false;
->   }
->   
-> +extern unsigned long _text;
-> +
->   static void bad_exception(enum vector v, struct pt_regs *regs,
->   			  unsigned int esr, bool esr_valid, bool bad_vector)
->   {
->   	unsigned long far;
->   	bool far_valid = get_far(esr, &far);
->   	unsigned int ec = esr >> ESR_EL1_EC_SHIFT;
-> +	uintptr_t text = (uintptr_t)&_text;
-> +
-> +	printf("Load address: %" PRIxPTR "\n", text);
-> +	printf("PC: %" PRIxPTR " PC offset: %" PRIxPTR "\n",
-> +	       (uintptr_t)regs->pc, (uintptr_t)regs->pc - text);
->   
->   	if (bad_vector) {
->   		if (v < VECTOR_MAX)
+>> We will lhave to test if a device is present for every tests
+>> in the future.
+>> Let's provide a macro to check if the device is present and
+>> to skip the tests if it is not.
+>>
+>> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+>> ---
+>>   s390x/css.c | 27 +++++++++++----------------
+>>   1 file changed, 11 insertions(+), 16 deletions(-)
+>>
+>> diff --git a/s390x/css.c b/s390x/css.c
+>> index c340c53..16723f6 100644
+>> --- a/s390x/css.c
+>> +++ b/s390x/css.c
+>> @@ -27,6 +27,13 @@ static int test_device_sid;
+>>   static struct senseid *senseid;
+>>   struct ccw1 *ccw;
+>>   
+>> +#define NODEV_SKIP(dev) do {
+>> 	\
+>> +				if (!(dev)) {
+>> 	\
+>> +					report_skip("No
+>> device");	\
+>> +					return;
+>> 		\
+>> +				}
+>> 	\
+>> +			} while (0)
 > 
+> I wonder if you can add for example which device is not present (might
+> help with debugging)
+
+potentially any CSS device would be OK for most of the tests.
+For simplicity we use virtio-net-ccw because it does not require any 
+argument for allowing us to sense it.
+
+When we need a more specific device I will add information.
+
+> 
+> in any case:
+> 
+> Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+
+Thanks,
+Pierre
+
+-- 
+Pierre Morel
+IBM Lab Boeblingen
