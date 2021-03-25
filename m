@@ -2,173 +2,143 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A1D85348E06
-	for <lists+kvm@lfdr.de>; Thu, 25 Mar 2021 11:30:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id ED3E9348E3A
+	for <lists+kvm@lfdr.de>; Thu, 25 Mar 2021 11:41:09 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230125AbhCYKaH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 25 Mar 2021 06:30:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55446 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230076AbhCYKaE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 25 Mar 2021 06:30:04 -0400
-Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 37B19C06174A;
-        Thu, 25 Mar 2021 03:30:03 -0700 (PDT)
-Received: from zn.tnic (p200300ec2f0d5d00d5a461c7dd3b44f2.dip0.t-ipconnect.de [IPv6:2003:ec:2f0d:5d00:d5a4:61c7:dd3b:44f2])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id AFE6D1EC0501;
-        Thu, 25 Mar 2021 11:30:00 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1616668200;
+        id S230220AbhCYKk3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 25 Mar 2021 06:40:29 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:33448 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229988AbhCYKkE (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 25 Mar 2021 06:40:04 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1616668801;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=CAkDP25OFlShJCPDxQST7B40b5DDqLE/vRJZQKviFIQ=;
-        b=GdX96tqMBdFMRuPKse/S5u+Fn7yuJhdOOt6Xq+BUnlxv1nfU9Ouittcw4nMEYk0s4wgFjl
-        KsRna7lhZb8xuvYmGalsy8QTFdA1sKAVvm+hnk69HcRvajVPAZOIa6v1N4s2mjyV2InLaD
-        HOQj5Arosp7WG6MWL/Xs5JTqzLUsuQg=
-Date:   Thu, 25 Mar 2021 11:29:59 +0100
-From:   Borislav Petkov <bp@alien8.de>
-To:     Hugh Dickins <hughd@google.com>
-Cc:     Babu Moger <babu.moger@amd.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        kvm list <kvm@vger.kernel.org>, Joerg Roedel <joro@8bytes.org>,
-        the arch/x86 maintainers <x86@kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Ingo Molnar <mingo@redhat.com>,
-        "H . Peter Anvin" <hpa@zytor.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Makarand Sonare <makarandsonare@google.com>,
-        Sean Christopherson <seanjc@google.com>
-Subject: [PATCH] x86/tlb: Flush global mappings when KAISER is disabled
-Message-ID: <20210325102959.GD31322@zn.tnic>
-References: <2ca37e61-08db-3e47-f2b9-8a7de60757e6@amd.com>
- <20210311214013.GH5829@zn.tnic>
- <d3e9e091-0fc8-1e11-ab99-9c8be086f1dc@amd.com>
- <4a72f780-3797-229e-a938-6dc5b14bec8d@amd.com>
- <20210311235215.GI5829@zn.tnic>
- <ed590709-65c8-ca2f-013f-d2c63d5ee0b7@amd.com>
- <20210324212139.GN5010@zn.tnic>
- <alpine.LSU.2.11.2103241651280.9593@eggly.anvils>
- <alpine.LSU.2.11.2103241913190.10112@eggly.anvils>
- <20210325095619.GC31322@zn.tnic>
+         in-reply-to:in-reply-to:references:references;
+        bh=/kpD2aeNiHkluUl+lY5UKmHgOwXffwSQz+l4fa/jph4=;
+        b=GmwtQNZ33xU9eqVbzpTARK59qsB5UjVZwZOJr3LlZFF3kZdVBeoScFOD6JKSsHr1wgfnPt
+        pzXdqUvVLS9lxRlkJE0rh4Qriv1CtvDAlo3aFlwPV8vBrfn0PjNhlotX1oY29+muGtTPB0
+        kcbwATJ53g7EJ8/5ub1pnRN6lGA8G64=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-225-2Wj8hp4YPMi3tAZmsKefuw-1; Thu, 25 Mar 2021 06:39:55 -0400
+X-MC-Unique: 2Wj8hp4YPMi3tAZmsKefuw-1
+Received: by mail-wm1-f70.google.com with SMTP id o9so1086829wmq.9
+        for <kvm@vger.kernel.org>; Thu, 25 Mar 2021 03:39:54 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=/kpD2aeNiHkluUl+lY5UKmHgOwXffwSQz+l4fa/jph4=;
+        b=uLk+mmq7lujLNyv5y/uCGcgKKHroVEZ8UhthAja3KJt195Y5pv6ImKIn6K2WB/9WQC
+         jkisXJYfedeOc5Tv4f24B0U3/W6bIIu/9A+OVOayUbOhh+RF/m79iaM/Y3RrvNLmMPP2
+         zdXBqgHkYOP2rr4x+dCj5hsL4/W0xdTpWHqyt1YzJAbDbwk0LjD+7+Bsgm+gfMjOkfdJ
+         91Mbw7XTxVbXi9RVHK1zI/fchkZkj9bx+McfJtp7r5gc1F2WMH5XBxWcPcMvt568r0bR
+         jJudFQcPoMWpF723Zqbh+oWvrORRi83zy8wfoFrLTdTC1gCbrc3P03CquG1+LmqyJF5Q
+         PMXg==
+X-Gm-Message-State: AOAM533/iSsb3X8sB5vT0g/KdLFTYnfS4wUVeXFkXFcx8e7NA8YytlAh
+        Eu24j1WBDMPKOCWzuuq4IyTzo+t4YyfOsbNKsNseroeHMmWPpNsXP/nCoKTO0KZPRH2tGkVNrLh
+        DSVYPSMjNjMsk
+X-Received: by 2002:a5d:56d0:: with SMTP id m16mr8193219wrw.355.1616668793959;
+        Thu, 25 Mar 2021 03:39:53 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxSTH23goWjAebsKh2RhkZfdPUdCAZpsy4s0EXvpQEhvBoOO6j7qufPnU+Ca8egdJ+gYncnng==
+X-Received: by 2002:a5d:56d0:: with SMTP id m16mr8193189wrw.355.1616668793779;
+        Thu, 25 Mar 2021 03:39:53 -0700 (PDT)
+Received: from steredhat (host-79-34-249-199.business.telecomitalia.it. [79.34.249.199])
+        by smtp.gmail.com with ESMTPSA id c2sm6099603wmr.22.2021.03.25.03.39.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 25 Mar 2021 03:39:53 -0700 (PDT)
+Date:   Thu, 25 Mar 2021 11:39:50 +0100
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     Arseny Krasnov <arseny.krasnov@kaspersky.com>
+Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Jorgen Hansen <jhansen@vmware.com>,
+        Andra Paraschiv <andraprs@amazon.com>,
+        Colin Ian King <colin.king@canonical.com>,
+        Norbert Slusarek <nslusarek@gmx.net>,
+        Jeff Vander Stoep <jeffv@google.com>,
+        Alexander Popov <alex.popov@linux.com>, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, stsp2@yandex.ru, oxffffaa@gmail.com
+Subject: Re: [RFC PATCH v7 16/22] virtio/vsock: setup SEQPACKET ops for
+ transport
+Message-ID: <20210325103950.7k75hntees5ppgbm@steredhat>
+References: <20210323130716.2459195-1-arseny.krasnov@kaspersky.com>
+ <20210323131406.2461651-1-arseny.krasnov@kaspersky.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Content-Disposition: inline
-In-Reply-To: <20210325095619.GC31322@zn.tnic>
+In-Reply-To: <20210323131406.2461651-1-arseny.krasnov@kaspersky.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Ok,
+On Tue, Mar 23, 2021 at 04:14:03PM +0300, Arseny Krasnov wrote:
+>This adds SEQPACKET ops for virtio transport and 'seqpacket_allow()'
+>callback.
+>
+>Signed-off-by: Arseny Krasnov <arseny.krasnov@kaspersky.com>
+>---
+> net/vmw_vsock/virtio_transport.c | 12 ++++++++++++
+> 1 file changed, 12 insertions(+)
 
-I tried to be as specific as possible in the commit message so that we
-don't forget. Please lemme know if I've missed something.
+Sorry for not mentioning this in the previous review, but maybe we can 
+merge this patch with "virtio/vsock: SEQPACKET feature bit support", so 
+we have a single patch when we fully enable the SEQPACKET support in 
+this transport.
 
-Babu, Jim, I'd appreciate it if you ran this to confirm.
+Anyway, I don't have a strong opinion on that.
 
-Thx.
+What do you think?
 
----
-From: Borislav Petkov <bp@suse.de>
-Date: Thu, 25 Mar 2021 11:02:31 +0100
+Stefano
 
-Jim Mattson reported that Debian 9 guests using a 4.9-stable kernel
-are exploding during alternatives patching:
+>
+>diff --git a/net/vmw_vsock/virtio_transport.c 
+>b/net/vmw_vsock/virtio_transport.c
+>index 2700a63ab095..83ae2078c847 100644
+>--- a/net/vmw_vsock/virtio_transport.c
+>+++ b/net/vmw_vsock/virtio_transport.c
+>@@ -443,6 +443,8 @@ static void virtio_vsock_rx_done(struct virtqueue *vq)
+> 	queue_work(virtio_vsock_workqueue, &vsock->rx_work);
+> }
+>
+>+static bool virtio_transport_seqpacket_allow(void);
+>+
+> static struct virtio_transport virtio_transport = {
+> 	.transport = {
+> 		.module                   = THIS_MODULE,
+>@@ -469,6 +471,10 @@ static struct virtio_transport virtio_transport = {
+> 		.stream_is_active         = virtio_transport_stream_is_active,
+> 		.stream_allow             = virtio_transport_stream_allow,
+>
+>+		.seqpacket_dequeue        = virtio_transport_seqpacket_dequeue,
+>+		.seqpacket_enqueue        = virtio_transport_seqpacket_enqueue,
+>+		.seqpacket_allow          = virtio_transport_seqpacket_allow,
+>+
+> 		.notify_poll_in           = virtio_transport_notify_poll_in,
+> 		.notify_poll_out          = virtio_transport_notify_poll_out,
+> 		.notify_recv_init         = virtio_transport_notify_recv_init,
+>@@ -483,8 +489,14 @@ static struct virtio_transport virtio_transport = {
+> 	},
+>
+> 	.send_pkt = virtio_transport_send_pkt,
+>+	.seqpacket_allow = false
+> };
+>
+>+static bool virtio_transport_seqpacket_allow(void)
+>+{
+>+	return virtio_transport.seqpacket_allow;
+>+}
+>+
+> static void virtio_transport_rx_work(struct work_struct *work)
+> {
+> 	struct virtio_vsock *vsock =
+>-- 2.25.1
+>
 
-  kernel BUG at /build/linux-dqnRSc/linux-4.9.228/arch/x86/kernel/alternative.c:709!
-  invalid opcode: 0000 [#1] SMP
-  Modules linked in:
-  CPU: 1 PID: 1 Comm: swapper/0 Not tainted 4.9.0-13-amd64 #1 Debian 4.9.228-1
-  Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
-  Call Trace:
-   swap_entry_free
-   swap_entry_free
-   text_poke_bp
-   swap_entry_free
-   arch_jump_label_transform
-   set_debug_rodata
-   __jump_label_update
-   static_key_slow_inc
-   frontswap_register_ops
-   init_zswap
-   init_frontswap
-   do_one_initcall
-   set_debug_rodata
-   kernel_init_freeable
-   rest_init
-   kernel_init
-   ret_from_fork
-
-triggering the BUG_ON in text_poke() which verifies whether patched
-instruction bytes have actually landed at the destination.
-
-Further debugging showed that the TLB flush before that check is
-insufficient because there could be global mappings left in the TLB,
-leading to a stale mapping getting used.
-
-I say "global mappings" because the hardware configuration is a new one:
-machine is an AMD, which means, KAISER/PTI doesn't need to be enabled
-there, which also means there's no user/kernel pagetables split and
-therefore the TLB can have global mappings.
-
-And the configuration is new one for a second reason: because that AMD
-machine supports PCID and INVPCID, which leads the CPU detection code to
-set the synthetic X86_FEATURE_INVPCID_SINGLE flag.
-
-Now, __native_flush_tlb_single() does invalidate global mappings when
-X86_FEATURE_INVPCID_SINGLE is *not* set and returns.
-
-When X86_FEATURE_INVPCID_SINGLE is set, however, it invalidates the
-requested address from both PCIDs in the KAISER-enabled case. But if
-KAISER is not enabled and the machine has global mappings in the TLB,
-then those global mappings do not get invalidated, which would lead to
-the above mismatch from using a stale TLB entry.
-
-So make sure to flush those global mappings in the KAISER disabled case.
-
-Co-debugged by Babu Moger <babu.moger@amd.com>.
-
-Reported-by: Jim Mattson <jmattson@google.com>
-Signed-off-by: Borislav Petkov <bp@suse.de>
-Link: https://lkml.kernel.org/r/CALMp9eRDSW66%2BXvbHVF4ohL7XhThoPoT0BrB0TcS0cgk=dkcBg@mail.gmail.com
----
- arch/x86/include/asm/tlbflush.h | 11 +++++++----
- 1 file changed, 7 insertions(+), 4 deletions(-)
-
-diff --git a/arch/x86/include/asm/tlbflush.h b/arch/x86/include/asm/tlbflush.h
-index f5ca15622dc9..2bfa4deb8cae 100644
---- a/arch/x86/include/asm/tlbflush.h
-+++ b/arch/x86/include/asm/tlbflush.h
-@@ -245,12 +245,15 @@ static inline void __native_flush_tlb_single(unsigned long addr)
- 	 * ASID.  But, userspace flushes are probably much more
- 	 * important performance-wise.
- 	 *
--	 * Make sure to do only a single invpcid when KAISER is
--	 * disabled and we have only a single ASID.
-+	 * In the KAISER disabled case, do an INVLPG to make sure
-+	 * the mapping is flushed in case it is a global one.
- 	 */
--	if (kaiser_enabled)
-+	if (kaiser_enabled) {
- 		invpcid_flush_one(X86_CR3_PCID_ASID_USER, addr);
--	invpcid_flush_one(X86_CR3_PCID_ASID_KERN, addr);
-+		invpcid_flush_one(X86_CR3_PCID_ASID_KERN, addr);
-+	} else {
-+		asm volatile("invlpg (%0)" ::"r" (addr) : "memory");
-+	}
- }
- 
- static inline void __flush_tlb_all(void)
--- 
-2.29.2
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
