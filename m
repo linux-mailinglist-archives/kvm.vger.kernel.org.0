@@ -2,54 +2,54 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 886F5348DB9
-	for <lists+kvm@lfdr.de>; Thu, 25 Mar 2021 11:10:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7733A348DD7
+	for <lists+kvm@lfdr.de>; Thu, 25 Mar 2021 11:19:54 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230093AbhCYKJl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 25 Mar 2021 06:09:41 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:27423 "EHLO
+        id S230076AbhCYKTV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 25 Mar 2021 06:19:21 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:27714 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230155AbhCYKJT (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 25 Mar 2021 06:09:19 -0400
+        by vger.kernel.org with ESMTP id S229616AbhCYKSt (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 25 Mar 2021 06:18:49 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1616666959;
+        s=mimecast20190719; t=1616667529;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=kHwyM01WyqgWKCfJirzSlimPQ/XDp3q0BkoluHcHB6k=;
-        b=OZlZqvDSASd+2XrkeMQs1YXRFqryjJKYedeQkbAhTi6YZh/wdRetle2swy5EuhIQ0VV0KF
-        kdyPh7wYeDnGUzo+Taessuj/U30o27HE8ZSQqbGWxypqeSnfmyKsYb/0LS9ztK8tKjA5/A
-        e0rPUU/vATfuTCPnEgEe8NAn+dZREuk=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-295-V85tL7bUPH2JZaR-aOWpRQ-1; Thu, 25 Mar 2021 06:09:17 -0400
-X-MC-Unique: V85tL7bUPH2JZaR-aOWpRQ-1
-Received: by mail-wm1-f70.google.com with SMTP id o9-20020a05600c4fc9b029010cea48b602so750347wmq.0
-        for <kvm@vger.kernel.org>; Thu, 25 Mar 2021 03:09:17 -0700 (PDT)
+        bh=hUhrozeu57DSs+XU36A+D781UPvSZ/VpjRmqBL1uGQ0=;
+        b=FONTRsjJjC/rk1fizVb+9htdcnzf3NKOKIfJziWoz+bXUOt7wDRTDoUBiLT4zlpFdng+w/
+        mkRQ5swGZMn6fhCJxjT+GtIi8cjie9p6wW04u6IcrY1MYVVXX1dx54ySdxvxbwuA2nUh+E
+        GlAzUdCHEtUtcWpszk56cn+2Vm8D2Gc=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-13-yA0T5nbdPyWGGE1MkVqQ3A-1; Thu, 25 Mar 2021 06:18:47 -0400
+X-MC-Unique: yA0T5nbdPyWGGE1MkVqQ3A-1
+Received: by mail-wm1-f71.google.com with SMTP id r18so1487214wmq.5
+        for <kvm@vger.kernel.org>; Thu, 25 Mar 2021 03:18:47 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=kHwyM01WyqgWKCfJirzSlimPQ/XDp3q0BkoluHcHB6k=;
-        b=e8J2Bm2UEN2Dd1rd0N61bjrRDzpjFC75ilzOIOO0IygC66bV9/oJHTA/auzNMnrMFQ
-         ck5fYbAONrqKf5tMkVswV9bZGJnfguOoayWomyFbXHwnfRAxxjOtQlBnsmlPk2yzzvcT
-         QvlHrTMLAuJssDnWU/kJXbYNPUBZXedYZ3OOhWhd+l+ktaF6KYw9xUWvLYdLywLpywMw
-         UoSMvFfaPEc4RRxPjBxjxJCU5pEmYJOPL06ZNeA263DAlC4uEMjFjO9J10Alt6jEtM+P
-         8e/GU8vXrqP56JgKQLhjocogMKPmhzJNzUVvuyh0haInB6B0dPMynxKrAfQvh6paDvYU
-         jotA==
-X-Gm-Message-State: AOAM53118BKiDopqw8JmqeWMW2+/dZ9qmAqJ9yRxCKHoewfLenM0fJfN
-        qbj/Qai+Ej35/Klzyz7wt+T0G1XWYJ10Vg3megy4yfYDKnFv/9QlV0ISwieHfbgn+QmIUqaW0pm
-        mnd8h6mNEAzbj
-X-Received: by 2002:adf:a18a:: with SMTP id u10mr8019014wru.197.1616666956447;
-        Thu, 25 Mar 2021 03:09:16 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyzyIyWOSmU8uyQs1/B6aVWJTTtn53k7n4EHV1c4wLdktCa9Xv2dMFQu8Wdv5ezJuNgAsU+aw==
-X-Received: by 2002:adf:a18a:: with SMTP id u10mr8018978wru.197.1616666956222;
-        Thu, 25 Mar 2021 03:09:16 -0700 (PDT)
+        bh=hUhrozeu57DSs+XU36A+D781UPvSZ/VpjRmqBL1uGQ0=;
+        b=W0BzAabD1Batd05e9quy96hYF3Qs8KF5/FXmX0J+3mKwCIaEzVVyNQ6TVcH9nYNMn3
+         l8z0zpUs39oyu5E8n/fSJnBDpEjBUISxCURrJ46lgXjLtICAWEauLTlA0XKeBFvOOQZp
+         2jgAPSY+UZLpb1l8uj6bYmy8h8LZOE4VcBQsaG8j03jC0AEIQ0J14rIqdBx3Y8iy5jcr
+         lFajiIuinbtf87GOrRdTfSUsz9Rtcd5DEmKS6NDqAjXbDWG5YLqpCVA4/6IdkxLrlpY+
+         xtpOEEWpecOwAc4DJZTip3qgtO9pVcTT9CIP3ns1ryFmtBDjyJQoetqAcv6mW/2PP06n
+         XJ4A==
+X-Gm-Message-State: AOAM53396IbxpKz1fxDBH3+ovtVcYffy488+mGcH929AHlk/jINsarIr
+        Yc0DL3GgWDQIdP8ZibOWjuMHzFtaZiz0UEjZWPVgte/TuhUtTNHvnII7r/t+xbE8viju2bQv8/i
+        UOdw/ONZ3GG71
+X-Received: by 2002:adf:f54c:: with SMTP id j12mr8113113wrp.264.1616667524631;
+        Thu, 25 Mar 2021 03:18:44 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzBlfzI+IvG48qHisDpU2ibEIiKoa3byd0gc11GfyaF7IgQ3ryeVPTESrDxVp1YDKp4p64vHw==
+X-Received: by 2002:adf:f54c:: with SMTP id j12mr8113089wrp.264.1616667524435;
+        Thu, 25 Mar 2021 03:18:44 -0700 (PDT)
 Received: from steredhat (host-79-34-249-199.business.telecomitalia.it. [79.34.249.199])
-        by smtp.gmail.com with ESMTPSA id s83sm6216998wms.16.2021.03.25.03.09.15
+        by smtp.gmail.com with ESMTPSA id m11sm7294285wri.44.2021.03.25.03.18.43
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 25 Mar 2021 03:09:15 -0700 (PDT)
-Date:   Thu, 25 Mar 2021 11:09:13 +0100
+        Thu, 25 Mar 2021 03:18:44 -0700 (PDT)
+Date:   Thu, 25 Mar 2021 11:18:41 +0100
 From:   Stefano Garzarella <sgarzare@redhat.com>
 To:     Arseny Krasnov <arseny.krasnov@kaspersky.com>
 Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
@@ -58,41 +58,214 @@ Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
         "David S. Miller" <davem@davemloft.net>,
         Jakub Kicinski <kuba@kernel.org>,
         Jorgen Hansen <jhansen@vmware.com>,
-        Andra Paraschiv <andraprs@amazon.com>,
         Norbert Slusarek <nslusarek@gmx.net>,
+        Andra Paraschiv <andraprs@amazon.com>,
         Colin Ian King <colin.king@canonical.com>,
+        Jeff Vander Stoep <jeffv@google.com>,
         Alexander Popov <alex.popov@linux.com>, kvm@vger.kernel.org,
         virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
         linux-kernel@vger.kernel.org, stsp2@yandex.ru, oxffffaa@gmail.com
-Subject: Re: [RFC PATCH v7 13/22] virtio/vsock: add SEQPACKET receive logic
-Message-ID: <20210325100913.7rewuc4wn7zwtrqf@steredhat>
+Subject: Re: [RFC PATCH v7 14/22] virtio/vsock: rest of SOCK_SEQPACKET support
+Message-ID: <20210325101841.o7gs7peafxwb7rfd@steredhat>
 References: <20210323130716.2459195-1-arseny.krasnov@kaspersky.com>
- <20210323131316.2461284-1-arseny.krasnov@kaspersky.com>
+ <20210323131332.2461409-1-arseny.krasnov@kaspersky.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii; format=flowed
 Content-Disposition: inline
-In-Reply-To: <20210323131316.2461284-1-arseny.krasnov@kaspersky.com>
+In-Reply-To: <20210323131332.2461409-1-arseny.krasnov@kaspersky.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Mar 23, 2021 at 04:13:13PM +0300, Arseny Krasnov wrote:
->This modifies current receive logic for SEQPACKET support:
->1) Inserts 'SEQ_BEGIN' packet to socket's rx queue.
->2) Inserts 'RW' packet to socket's rx queue, but without merging with
->   buffer of last packet in queue.
->3) Performs check for packet and socket types on receive(if mismatch,
->   then reset connection).
+On Tue, Mar 23, 2021 at 04:13:29PM +0300, Arseny Krasnov wrote:
+>This adds rest of logic for SEQPACKET:
+>1) SEQPACKET specific functions which send SEQ_BEGIN/SEQ_END.
+>   Note that both functions may sleep to wait enough space for
+>   SEQPACKET header.
+>2) SEQ_BEGIN/SEQ_END in TAP packet capture.
+>3) Send SHUTDOWN on socket close for SEQPACKET type.
+>4) Set SEQPACKET packet type during send.
+>5) Set MSG_EOR in flags for SEQPACKET during send.
+>6) 'seqpacket_allow' flag to virtio transport.
 >
 >Signed-off-by: Arseny Krasnov <arseny.krasnov@kaspersky.com>
 >---
 > v6 -> v7:
-> In 'virtio_transport_recv_pkt()', 'sock_put()' is added, when type of
-> received packet does not match to the type of socket.
+> In 'virtio_transport_seqpacket_enqueue()', 'next_tx_msg_id' is updated
+> in both cases when message send successfully or error occured.
 >
-> net/vmw_vsock/virtio_transport_common.c | 64 +++++++++++++++++--------
-> 1 file changed, 45 insertions(+), 19 deletions(-)
+> include/linux/virtio_vsock.h            |  7 ++
+> net/vmw_vsock/virtio_transport_common.c | 88 ++++++++++++++++++++++++-
+> 2 files changed, 93 insertions(+), 2 deletions(-)
+>
+>diff --git a/include/linux/virtio_vsock.h b/include/linux/virtio_vsock.h
+>index 0e3aa395c07c..ab5f56fd7251 100644
+>--- a/include/linux/virtio_vsock.h
+>+++ b/include/linux/virtio_vsock.h
+>@@ -22,6 +22,7 @@ struct virtio_vsock_seq_state {
+> 	u32 user_read_seq_len;
+> 	u32 user_read_copied;
+> 	u32 curr_rx_msg_id;
+>+	u32 next_tx_msg_id;
+> };
+>
+> /* Per-socket state (accessed via vsk->trans) */
+>@@ -76,6 +77,8 @@ struct virtio_transport {
+>
+> 	/* Takes ownership of the packet */
+> 	int (*send_pkt)(struct virtio_vsock_pkt *pkt);
+>+
+>+	bool seqpacket_allow;
+> };
+>
+> ssize_t
+>@@ -89,6 +92,10 @@ virtio_transport_dgram_dequeue(struct vsock_sock *vsk,
+> 			       size_t len, int flags);
+>
+> int
+>+virtio_transport_seqpacket_enqueue(struct vsock_sock *vsk,
+>+				   struct msghdr *msg,
+>+				   size_t len);
+>+int
+> virtio_transport_seqpacket_dequeue(struct vsock_sock *vsk,
+> 				   struct msghdr *msg,
+> 				   int flags,
+>diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
+>index bfe0d7026bf8..01a56c7da8bd 100644
+>--- a/net/vmw_vsock/virtio_transport_common.c
+>+++ b/net/vmw_vsock/virtio_transport_common.c
+>@@ -139,6 +139,8 @@ static struct sk_buff *virtio_transport_build_skb(void *opaque)
+> 		break;
+> 	case VIRTIO_VSOCK_OP_CREDIT_UPDATE:
+> 	case VIRTIO_VSOCK_OP_CREDIT_REQUEST:
+>+	case VIRTIO_VSOCK_OP_SEQ_BEGIN:
+>+	case VIRTIO_VSOCK_OP_SEQ_END:
+> 		hdr->op = cpu_to_le16(AF_VSOCK_OP_CONTROL);
+> 		break;
+> 	default:
+>@@ -187,7 +189,12 @@ static int virtio_transport_send_pkt_info(struct vsock_sock *vsk,
+> 	struct virtio_vsock_pkt *pkt;
+> 	u32 pkt_len = info->pkt_len;
+>
+>-	info->type = VIRTIO_VSOCK_TYPE_STREAM;
+>+	info->type = virtio_transport_get_type(sk_vsock(vsk));
+>+
+>+	if (info->type == VIRTIO_VSOCK_TYPE_SEQPACKET &&
+>+	    info->msg &&
+>+	    info->msg->msg_flags & MSG_EOR)
+>+		info->flags |= VIRTIO_VSOCK_RW_EOR;
+>
+> 	t_ops = virtio_transport_get_ops(vsk);
+> 	if (unlikely(!t_ops))
+>@@ -401,6 +408,43 @@ virtio_transport_stream_do_dequeue(struct vsock_sock *vsk,
+> 	return err;
+> }
+>
+>+static int virtio_transport_seqpacket_send_ctrl(struct vsock_sock *vsk,
+>+						int type,
+>+						size_t len,
+>+						int flags)
+>+{
+>+	struct virtio_vsock_sock *vvs = vsk->trans;
+>+	struct virtio_vsock_pkt_info info = {
+>+		.op = type,
+>+		.vsk = vsk,
+>+		.pkt_len = sizeof(struct virtio_vsock_seq_hdr)
+>+	};
+>+
+>+	struct virtio_vsock_seq_hdr seq_hdr = {
+>+		.msg_id = cpu_to_le32(vvs->seq_state.next_tx_msg_id),
+>+		.msg_len = cpu_to_le32(len)
+>+	};
+>+
+>+	struct kvec seq_hdr_kiov = {
+>+		.iov_base = (void *)&seq_hdr,
+>+		.iov_len = sizeof(struct virtio_vsock_seq_hdr)
+>+	};
+>+
+>+	struct msghdr msg = {0};
+>+
+>+	//XXX: do we need 'vsock_transport_send_notify_data' pointer?
+>+	if (vsock_wait_space(sk_vsock(vsk),
+>+			     sizeof(struct virtio_vsock_seq_hdr),
+>+			     flags, NULL))
+>+		return -1;
+>+
+>+	iov_iter_kvec(&msg.msg_iter, WRITE, &seq_hdr_kiov, 1, sizeof(seq_hdr));
+>+
+>+	info.msg = &msg;
+>+
+>+	return virtio_transport_send_pkt_info(vsk, &info);
+>+}
+>+
+> static inline void virtio_transport_remove_pkt(struct virtio_vsock_pkt *pkt)
+> {
+> 	list_del(&pkt->list);
+>@@ -595,6 +639,46 @@ virtio_transport_seqpacket_dequeue(struct vsock_sock *vsk,
+> }
+> EXPORT_SYMBOL_GPL(virtio_transport_seqpacket_dequeue);
+>
+>+int
+>+virtio_transport_seqpacket_enqueue(struct vsock_sock *vsk,
+>+				   struct msghdr *msg,
+>+				   size_t len)
+>+{
+>+	int written = -1;
+>+
+>+	if (msg->msg_iter.iov_offset == 0) {
+>+		/* Send SEQBEGIN. */
+>+		if (virtio_transport_seqpacket_send_ctrl(vsk,
+>+							 VIRTIO_VSOCK_OP_SEQ_BEGIN,
+>+							 len,
+>+							 msg->msg_flags) < 0)
+>+			goto out;
+>+	}
+>+
+>+	written = virtio_transport_stream_enqueue(vsk, msg, len);
+>+
+>+	if (written < 0)
+>+		goto out;
+>+
+>+	if (msg->msg_iter.count == 0) {
+>+		/* Send SEQEND. */
+>+		virtio_transport_seqpacket_send_ctrl(vsk,
+>+						     VIRTIO_VSOCK_OP_SEQ_END,
+>+						     0,
+>+						     msg->msg_flags);
 
+What happen if this fail?
 
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+In the previous version we returned -1, now we return the bytes 
+transmitted, is that right?
+
+The rest LGTM.
+
+>+	}
+>+out:
+>+	/* Update next id on error or message transmission done. */
+>+	if (written < 0 || msg->msg_iter.count == 0) {
+>+		struct virtio_vsock_sock *vvs = vsk->trans;
+>+
+>+		vvs->seq_state.next_tx_msg_id++;
+>+	}
+>+
+>+	return written;
+>+}
+>+EXPORT_SYMBOL_GPL(virtio_transport_seqpacket_enqueue);
+>+
+> int
+> virtio_transport_dgram_dequeue(struct vsock_sock *vsk,
+> 			       struct msghdr *msg,
+>@@ -1014,7 +1098,7 @@ void virtio_transport_release(struct vsock_sock *vsk)
+> 	struct sock *sk = &vsk->sk;
+> 	bool remove_sock = true;
+>
+>-	if (sk->sk_type == SOCK_STREAM)
+>+	if (sk->sk_type == SOCK_STREAM || sk->sk_type == SOCK_SEQPACKET)
+> 		remove_sock = virtio_transport_close(vsk);
+>
+> 	list_for_each_entry_safe(pkt, tmp, &vvs->rx_queue, list) {
+>-- 
+>2.25.1
+>
 
