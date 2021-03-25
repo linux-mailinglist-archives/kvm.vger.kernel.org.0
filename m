@@ -2,83 +2,207 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4637034857A
-	for <lists+kvm@lfdr.de>; Thu, 25 Mar 2021 00:46:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6EDE73485A0
+	for <lists+kvm@lfdr.de>; Thu, 25 Mar 2021 01:07:03 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232145AbhCXXqZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 24 Mar 2021 19:46:25 -0400
-Received: from mga11.intel.com ([192.55.52.93]:28668 "EHLO mga11.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231776AbhCXXqX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 24 Mar 2021 19:46:23 -0400
-IronPort-SDR: 0yg8jhW3/RFc/VbixZ+UKiADnCC3pIzA0qitYI9xlCfmcwEKgaicEKdbdeajQsZ11QVyC1PmCd
- ukLXgo4jiMLw==
-X-IronPort-AV: E=McAfee;i="6000,8403,9933"; a="187510834"
-X-IronPort-AV: E=Sophos;i="5.81,276,1610438400"; 
-   d="scan'208";a="187510834"
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Mar 2021 16:46:18 -0700
-IronPort-SDR: becDvmU/sSYGsrDcxsDl7XVDu+9fsoD3ntXwYljT3NnLts/iltaKLJpB26YfXpxhfweFL75bwR
- 0BGShzVGylpg==
-X-IronPort-AV: E=Sophos;i="5.81,276,1610438400"; 
-   d="scan'208";a="409080256"
-Received: from prdubey-mobl1.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.255.230.226])
-  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Mar 2021 16:46:14 -0700
-Date:   Thu, 25 Mar 2021 12:46:11 +1300
-From:   Kai Huang <kai.huang@intel.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Borislav Petkov <bp@alien8.de>,
-        Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org,
-        x86@kernel.org, linux-sgx@vger.kernel.org,
-        linux-kernel@vger.kernel.org, jarkko@kernel.org, luto@kernel.org,
-        dave.hansen@intel.com, rick.p.edgecombe@intel.com,
-        haitao.huang@intel.com, tglx@linutronix.de, mingo@redhat.com,
-        hpa@zytor.com
-Subject: Re: [PATCH v3 03/25] x86/sgx: Wipe out EREMOVE from
- sgx_free_epc_page()
-Message-Id: <20210325124611.a9dce500b0bcbb1836580719@intel.com>
-In-Reply-To: <8e833f7c-ea24-1044-4c69-780a84b47ce1@redhat.com>
-References: <YFjoZQwB7e3oQW8l@google.com>
-        <20210322191540.GH6481@zn.tnic>
-        <YFjx3vixDURClgcb@google.com>
-        <20210322210645.GI6481@zn.tnic>
-        <20210323110643.f29e214ebe8ec7a4a3d0bc2e@intel.com>
-        <20210322223726.GJ6481@zn.tnic>
-        <20210323121643.e06403a1bc7819bab7c15d95@intel.com>
-        <YFoNCvBYS2lIYjjc@google.com>
-        <20210323160604.GB4729@zn.tnic>
-        <YFoVmxIFjGpqM6Bk@google.com>
-        <20210323163258.GC4729@zn.tnic>
-        <b35f66a10ecc07a1eecb829912d5664886ca169b.camel@intel.com>
-        <236c0aa9-92f2-97c8-ab11-d55b9a98c931@redhat.com>
-        <20210325122343.008120ef70c1a1b16b5657ca@intel.com>
-        <8e833f7c-ea24-1044-4c69-780a84b47ce1@redhat.com>
-X-Mailer: Sylpheed 3.7.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+        id S234876AbhCYAGY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 24 Mar 2021 20:06:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34150 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231902AbhCYAGH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 24 Mar 2021 20:06:07 -0400
+Received: from mail-ot1-x335.google.com (mail-ot1-x335.google.com [IPv6:2607:f8b0:4864:20::335])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1C17AC06174A
+        for <kvm@vger.kernel.org>; Wed, 24 Mar 2021 17:06:07 -0700 (PDT)
+Received: by mail-ot1-x335.google.com with SMTP id k14-20020a9d7dce0000b02901b866632f29so321029otn.1
+        for <kvm@vger.kernel.org>; Wed, 24 Mar 2021 17:06:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:in-reply-to:message-id:references
+         :user-agent:mime-version;
+        bh=4Qs/sgDqugGRTTL6PsWyD8H8wV2UUkQBgt4/HJljqEw=;
+        b=upbMDEkW6thi8wcyYRSamL9Yi7OPLl8Q7k6cQgtFc7ziEdsoVtqvE1WHVuZIxxuK0r
+         p4H3pGSa1OVOkxWpwwekBJL0cDcgfkVVvMp5om7G1ygkLcU1OQEFfQ1msjEAQKMR62Qj
+         tQ4mfunfAgFRrs3SctxdCib9b70e6AbiWuqnOkE6FtsfjbzDZ5Q7ULwWt/BpRXtYxqt9
+         YTkyJ0rClpZ+GL+aWyh+Z/soO1y5G4e67qRWS7NMw90cUeO8DWak4pKph32KxMv1V7Ow
+         wQ7JY7w66R26suGkamQeiKYEXPOL+BidVrg05G7FfIebntJekkIPW3IlFQ7IFIv0Bvv2
+         ZPkg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:in-reply-to:message-id
+         :references:user-agent:mime-version;
+        bh=4Qs/sgDqugGRTTL6PsWyD8H8wV2UUkQBgt4/HJljqEw=;
+        b=onwutPidA/fOKpXmglePsx/Pzfojfb9DRSIxYI6iVNi+JeFVJPec8ighLLKdwzomnK
+         8w+6r9dLA5RjrU04K06o9mdkrctfrLHAwFG6yP0w1C8ATPAZubz8iKG4EXgO39lYAAy6
+         FVZBmlChjyrn522asjsiIKvO15frl5OF89XDJoxEE9Pe/K6/69rMOhL96ZEYzTGaG5dC
+         nGyh153a+vECNMr+tMZ7yBXOoZExEhgVLFaYYC6V4f1a34AKwYJ5M5zq64A6mnNtngnN
+         Iwn4kNhAv2D6Bw0P534q3GKZsmIMUQLhu4EncpUriCvbqlL38Aagt6HrBaT73X0lLkHy
+         Oeag==
+X-Gm-Message-State: AOAM532SzSPnp4Jhd9z4L75nj0ZVh4J4PVnm+RaL6gvT4ErmA7sF55qL
+        NneWu2MvRQ9JEQ2ssRmzNmcHPA==
+X-Google-Smtp-Source: ABdhPJzP4x6IABBkCCAgBvTaA2NT7oOvAc50/0OSf8S4sryxHjJucsjHL0w5hj7M7s6jtFidhApm0g==
+X-Received: by 2002:a9d:4792:: with SMTP id b18mr5206672otf.350.1616630765984;
+        Wed, 24 Mar 2021 17:06:05 -0700 (PDT)
+Received: from eggly.attlocal.net (172-10-233-147.lightspeed.sntcca.sbcglobal.net. [172.10.233.147])
+        by smtp.gmail.com with ESMTPSA id w12sm919622oti.53.2021.03.24.17.06.04
+        (version=TLS1 cipher=ECDHE-ECDSA-AES128-SHA bits=128/128);
+        Wed, 24 Mar 2021 17:06:05 -0700 (PDT)
+Date:   Wed, 24 Mar 2021 17:05:43 -0700 (PDT)
+From:   Hugh Dickins <hughd@google.com>
+X-X-Sender: hugh@eggly.anvils
+To:     Borislav Petkov <bp@alien8.de>
+cc:     Babu Moger <babu.moger@amd.com>, Hugh Dickins <hughd@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        kvm list <kvm@vger.kernel.org>, Joerg Roedel <joro@8bytes.org>,
+        the arch/x86 maintainers <x86@kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Ingo Molnar <mingo@redhat.com>,
+        "H . Peter Anvin" <hpa@zytor.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Makarand Sonare <makarandsonare@google.com>,
+        Sean Christopherson <seanjc@google.com>
+Subject: Re: [PATCH v6 00/12] SVM cleanup and INVPCID feature support
+In-Reply-To: <20210324212139.GN5010@zn.tnic>
+Message-ID: <alpine.LSU.2.11.2103241651280.9593@eggly.anvils>
+References: <78cc2dc7-a2ee-35ac-dd47-8f3f8b62f261@redhat.com> <d7c6211b-05d3-ec3f-111a-f69f09201681@amd.com> <20210311200755.GE5829@zn.tnic> <20210311203206.GF5829@zn.tnic> <2ca37e61-08db-3e47-f2b9-8a7de60757e6@amd.com> <20210311214013.GH5829@zn.tnic>
+ <d3e9e091-0fc8-1e11-ab99-9c8be086f1dc@amd.com> <4a72f780-3797-229e-a938-6dc5b14bec8d@amd.com> <20210311235215.GI5829@zn.tnic> <ed590709-65c8-ca2f-013f-d2c63d5ee0b7@amd.com> <20210324212139.GN5010@zn.tnic>
+User-Agent: Alpine 2.11 (LSU 23 2013-08-11)
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 25 Mar 2021 00:39:01 +0100 Paolo Bonzini wrote:
-> On 25/03/21 00:23, Kai Huang wrote:
-> > I changed to below (with slight modification on Paolo's):
-> > 
-> > /* Error message for EREMOVE failure, when kernel is about to leak EPC page */
-> > #define EREMOVE_ERROR_MESSAGE \
-> >          "EREMOVE returned %d (0x%x) and an EPC page was leaked.  SGX may become unusuable.  " \
-> >          "This is likely a kernel bug.  Refer to Documentation/x86/sgx.rst for more information."
-> > 
-> > I got a checkpatch warning however:
-> > 
-> > WARNING: It's generally not useful to have the filename in the file
-> > #60: FILE: Documentation/x86/sgx.rst:223:
-> > +This is likely a kernel bug.  Refer to Documentation/x86/sgx.rst for more
-> 
-> Yeah, this is more or less a false positive.
-> 
-> Paolo
-> 
+On Wed, 24 Mar 2021, Borislav Petkov wrote:
 
-Thanks.
+> Ok,
+> 
+> some more experimenting Babu and I did lead us to:
+> 
+> ---
+> diff --git a/arch/x86/include/asm/tlbflush.h b/arch/x86/include/asm/tlbflush.h
+> index f5ca15622dc9..259aa4889cad 100644
+> --- a/arch/x86/include/asm/tlbflush.h
+> +++ b/arch/x86/include/asm/tlbflush.h
+> @@ -250,6 +250,9 @@ static inline void __native_flush_tlb_single(unsigned long addr)
+>  	 */
+>  	if (kaiser_enabled)
+>  		invpcid_flush_one(X86_CR3_PCID_ASID_USER, addr);
+> +	else
+> +		asm volatile("invlpg (%0)" ::"r" (addr) : "memory");
+> +
+>  	invpcid_flush_one(X86_CR3_PCID_ASID_KERN, addr);
+>  }
+> 
+> applied on the guest kernel which fixes the issue. And let me add Hugh
+> who did that PCID stuff at the time. So lemme summarize for Hugh and to
+> ask him nicely to sanity-check me. :-)
+
+Just a brief interim note to assure you that I'm paying attention,
+but wow, it's a long time since I gave any thought down here!
+Trying to page it all back in...
+
+I see no harm in your workaround if it works, but it's not as if
+this is a previously untried path: so I'm suspicious how an issue
+here with Globals could have gone unnoticed for so long, and need
+to understand it better.
+
+Hugh
+
+> 
+> Basically, you have an AMD host which supports PCID and INVPCID and you
+> boot on it a 4.9 guest. It explodes like the panic below.
+> 
+> What fixes it is this:
+> 
+> diff --git a/arch/x86/include/asm/tlbflush.h b/arch/x86/include/asm/tlbflush.h
+> index f5ca15622dc9..259aa4889cad 100644
+> --- a/arch/x86/include/asm/tlbflush.h
+> +++ b/arch/x86/include/asm/tlbflush.h
+> @@ -250,6 +250,9 @@ static inline void __native_flush_tlb_single(unsigned long addr)
+>  	 */
+>  	if (kaiser_enabled)
+>  		invpcid_flush_one(X86_CR3_PCID_ASID_USER, addr);
+> +	else
+> +		asm volatile("invlpg (%0)" ::"r" (addr) : "memory");
+> +
+>  	invpcid_flush_one(X86_CR3_PCID_ASID_KERN, addr);
+>  }
+> 
+> ---
+> 
+> and the reason why it does, IMHO, is because on AMD, kaiser_enabled is
+> false because AMD is not affected by Meltdown, which means, there's no
+> user/kernel pagetables split.
+> 
+> And that also means, you have global TLB entries which means that if you
+> look at that __native_flush_tlb_single() function, it needs to flush
+> global TLB entries on CPUs with X86_FEATURE_INVPCID_SINGLE by doing an
+> INVLPG in the kaiser_enabled=0 case. Errgo, the above hunk.
+> 
+> But I might be completely off here thus this note...
+> 
+> Thoughts?
+> 
+> Thx.
+> 
+> 
+> [    1.235726] ------------[ cut here ]------------
+> [    1.237515] kernel BUG at /build/linux-dqnRSc/linux-4.9.228/arch/x86/kernel/alternative.c:709!
+> [    1.240926] invalid opcode: 0000 [#1] SMP
+> [    1.243301] Modules linked in:
+> [    1.244585] CPU: 1 PID: 1 Comm: swapper/0 Not tainted 4.9.0-13-amd64 #1 Debian 4.9.228-1
+> [    1.247657] Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
+> [    1.251249] task: ffff909363e94040 task.stack: ffffa41bc0194000
+> [    1.253519] RIP: 0010:[<ffffffff8fa2e40c>]  [<ffffffff8fa2e40c>] text_poke+0x18c/0x240
+> [    1.256593] RSP: 0018:ffffa41bc0197d90  EFLAGS: 00010096
+> [    1.258657] RAX: 000000000000000f RBX: 0000000001020800 RCX: 00000000feda3203
+> [    1.261388] RDX: 00000000178bfbff RSI: 0000000000000000 RDI: ffffffffff57a000
+> [    1.264168] RBP: ffffffff8fbd3eca R08: 0000000000000000 R09: 0000000000000003
+> [    1.266983] R10: 0000000000000003 R11: 0000000000000112 R12: 0000000000000001
+> [    1.269702] R13: ffffa41bc0197dcf R14: 0000000000000286 R15: ffffed1c40407500
+> [    1.272572] FS:  0000000000000000(0000) GS:ffff909366300000(0000) knlGS:0000000000000000
+> [    1.275791] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> [    1.278032] CR2: 0000000000000000 CR3: 0000000010c08000 CR4: 00000000003606f0
+> [    1.280815] Stack:
+> [    1.281630]  ffffffff8fbd3eca 0000000000000005 ffffa41bc0197e03 ffffffff8fbd3ecb
+> [    1.284660]  0000000000000000 0000000000000000 ffffffff8fa2e835 ccffffff8fad4326
+> [    1.287729]  1ccd0231874d55d3 ffffffff8fbd3eca ffffa41bc0197e03 ffffffff90203844
+> [    1.290852] Call Trace:
+> [    1.291782]  [<ffffffff8fbd3eca>] ? swap_entry_free+0x12a/0x300
+> [    1.294900]  [<ffffffff8fbd3ecb>] ? swap_entry_free+0x12b/0x300
+> [    1.297267]  [<ffffffff8fa2e835>] ? text_poke_bp+0x55/0xe0
+> [    1.299473]  [<ffffffff8fbd3eca>] ? swap_entry_free+0x12a/0x300
+> [    1.301896]  [<ffffffff8fa2b64c>] ? arch_jump_label_transform+0x9c/0x120
+> [    1.304557]  [<ffffffff9073e81f>] ? set_debug_rodata+0xc/0xc
+> [    1.306790]  [<ffffffff8fb81d92>] ? __jump_label_update+0x72/0x80
+> [    1.309255]  [<ffffffff8fb8206f>] ? static_key_slow_inc+0x8f/0xa0
+> [    1.311680]  [<ffffffff8fbd7a57>] ? frontswap_register_ops+0x107/0x1d0
+> [    1.314281]  [<ffffffff9077078c>] ? init_zswap+0x282/0x3f6
+> [    1.316547]  [<ffffffff9077050a>] ? init_frontswap+0x8c/0x8c
+> [    1.318784]  [<ffffffff8fa0223e>] ? do_one_initcall+0x4e/0x180
+> [    1.321067]  [<ffffffff9073e81f>] ? set_debug_rodata+0xc/0xc
+> [    1.323366]  [<ffffffff9073f08d>] ? kernel_init_freeable+0x16b/0x1ec
+> [    1.325873]  [<ffffffff90011d50>] ? rest_init+0x80/0x80
+> [    1.327989]  [<ffffffff90011d5a>] ? kernel_init+0xa/0x100
+> [    1.330092]  [<ffffffff9001f424>] ? ret_from_fork+0x44/0x70
+> [    1.332311] Code: 00 0f a2 4d 85 e4 74 4a 0f b6 45 00 41 38 45 00 75 19 31 c0 83 c0 01 48 63 d0 49 39 d4 76 33 41 0f b6 4c 15 00 38 4c 15 00 74 e9 <0f> 0b 48 89 ef e8 da d6 19 00 48 8d bd 00 10 00 00 48 89 c3 e8 
+> [    1.342818] RIP  [<ffffffff8fa2e40c>] text_poke+0x18c/0x240
+> [    1.345859]  RSP <ffffa41bc0197d90>
+> [    1.347285] ---[ end trace 0a1c5ab5eb16de89 ]---
+> [    1.349169] Kernel panic - not syncing: Attempted to kill init! exitcode=0x0000000b
+> [    1.349169] 
+> [    1.352885] Kernel Offset: 0xea00000 from 0xffffffff81000000 (relocation range: 0xffffffff80000000-0xffffffffbfffffff)
+> [    1.357039] ---[ end Kernel panic - not syncing: Attempted to kill init! exitcode=0x0000000b
+> [    1.357039] 
+> 
+> 
+> -- 
+> Regards/Gruss,
+>     Boris.
+> 
+> https://people.kernel.org/tglx/notes-about-netiquette
+> 
