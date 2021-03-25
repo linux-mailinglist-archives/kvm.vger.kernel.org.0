@@ -2,27 +2,27 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E8081349883
-	for <lists+kvm@lfdr.de>; Thu, 25 Mar 2021 18:45:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 64AE63498BB
+	for <lists+kvm@lfdr.de>; Thu, 25 Mar 2021 18:54:17 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229961AbhCYRod (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 25 Mar 2021 13:44:33 -0400
-Received: from mail.kernel.org ([198.145.29.99]:48968 "EHLO mail.kernel.org"
+        id S230085AbhCYRxo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 25 Mar 2021 13:53:44 -0400
+Received: from mail.kernel.org ([198.145.29.99]:50646 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229616AbhCYRoA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 25 Mar 2021 13:44:00 -0400
+        id S230198AbhCYRxR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 25 Mar 2021 13:53:17 -0400
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 47F8D61A1E;
-        Thu, 25 Mar 2021 17:44:00 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 6D9C961A2C;
+        Thu, 25 Mar 2021 17:53:17 +0000 (UTC)
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.misterjones.org)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.94)
         (envelope-from <maz@kernel.org>)
-        id 1lPU1W-003nbD-6t; Thu, 25 Mar 2021 17:43:58 +0000
-Date:   Thu, 25 Mar 2021 17:43:57 +0000
-Message-ID: <87zgyrqgbm.wl-maz@kernel.org>
+        id 1lPUAV-003ngb-6P; Thu, 25 Mar 2021 17:53:15 +0000
+Date:   Thu, 25 Mar 2021 17:53:14 +0000
+Message-ID: <87y2ebqfw5.wl-maz@kernel.org>
 From:   Marc Zyngier <maz@kernel.org>
 To:     Megha Dey <megha.dey@intel.com>
 Cc:     tglx@linutronix.de, linux-kernel@vger.kernel.org,
@@ -32,10 +32,10 @@ Cc:     tglx@linutronix.de, linux-kernel@vger.kernel.org,
         iommu@lists.linux-foundation.org, alex.williamson@redhat.com,
         bhelgaas@google.com, linux-pci@vger.kernel.org,
         baolu.lu@linux.intel.com, ravi.v.shankar@intel.com
-Subject: Re: [Patch V2 12/13] irqchip: Add IMS (Interrupt Message Store) driver
-In-Reply-To: <1614370277-23235-13-git-send-email-megha.dey@intel.com>
+Subject: Re: [Patch V2 13/13] genirq/msi: Provide helpers to return Linux IRQ/dev_msi hw IRQ number
+In-Reply-To: <1614370277-23235-14-git-send-email-megha.dey@intel.com>
 References: <1614370277-23235-1-git-send-email-megha.dey@intel.com>
-        <1614370277-23235-13-git-send-email-megha.dey@intel.com>
+        <1614370277-23235-14-git-send-email-megha.dey@intel.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -49,93 +49,95 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 26 Feb 2021 20:11:16 +0000,
+On Fri, 26 Feb 2021 20:11:17 +0000,
 Megha Dey <megha.dey@intel.com> wrote:
 > 
-> Generic IMS(Interrupt Message Store) irq chips and irq domain
-> implementations for IMS based devices which store the interrupt messages
-> in an array in device memory.
+> From: Dave Jiang <dave.jiang@intel.com>
 > 
-> Allocation and freeing of interrupts happens via the generic
-> msi_domain_alloc/free_irqs() interface. No special purpose IMS magic
-> required as long as the interrupt domain is stored in the underlying
-> device struct. The irq_set_auxdata() is used to program the pasid into
-> the IMS entry.
-> 
-> [Megha: Fixed compile time errors
->         Added necessary dependencies to IMS_MSI_ARRAY config
->         Fixed polarity of IMS_VECTOR_CTRL
->         Added reads after writes to flush writes to device
->         Added set_desc ops to IMS msi domain ops
->         Tested the IMS infrastructure with the IDXD driver]
+> Add new helpers to get the Linux IRQ number and device specific index
+> for given device-relative vector so that the drivers don't need to
+> allocate their own arrays to keep track of the vectors and hwirq for
+> the multi vector device MSI case.
 > 
 > Reviewed-by: Tony Luck <tony.luck@intel.com>
-> Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+> Signed-off-by: Dave Jiang <dave.jiang@intel.com>
 > Signed-off-by: Megha Dey <megha.dey@intel.com>
 > ---
->  drivers/irqchip/Kconfig             |  14 +++
->  drivers/irqchip/Makefile            |   1 +
->  drivers/irqchip/irq-ims-msi.c       | 211 ++++++++++++++++++++++++++++++++++++
->  include/linux/irqchip/irq-ims-msi.h |  68 ++++++++++++
->  4 files changed, 294 insertions(+)
->  create mode 100644 drivers/irqchip/irq-ims-msi.c
->  create mode 100644 include/linux/irqchip/irq-ims-msi.h
+>  include/linux/msi.h |  2 ++
+>  kernel/irq/msi.c    | 44 ++++++++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 46 insertions(+)
 > 
-> diff --git a/drivers/irqchip/Kconfig b/drivers/irqchip/Kconfig
-> index e74fa20..2fb0c24 100644
-> --- a/drivers/irqchip/Kconfig
-> +++ b/drivers/irqchip/Kconfig
-> @@ -586,4 +586,18 @@ config MST_IRQ
->  	help
->  	  Support MStar Interrupt Controller.
+> diff --git a/include/linux/msi.h b/include/linux/msi.h
+> index 24abec0..d60a6ba 100644
+> --- a/include/linux/msi.h
+> +++ b/include/linux/msi.h
+> @@ -451,6 +451,8 @@ struct irq_domain *platform_msi_create_irq_domain(struct fwnode_handle *fwnode,
+>  int platform_msi_domain_alloc_irqs(struct device *dev, unsigned int nvec,
+>  				   irq_write_msi_msg_t write_msi_msg);
+>  void platform_msi_domain_free_irqs(struct device *dev);
+> +int msi_irq_vector(struct device *dev, unsigned int nr);
+> +int dev_msi_hwirq(struct device *dev, unsigned int nr);
 >  
-> +config IMS_MSI
-> +	depends on PCI
-> +	select DEVICE_MSI
-> +	bool
-> +
-> +config IMS_MSI_ARRAY
-> +	bool "IMS Interrupt Message Store MSI controller for device memory storage arrays"
-> +	depends on PCI
-> +	select IMS_MSI
-> +	select GENERIC_MSI_IRQ_DOMAIN
-> +	help
-> +	  Support for IMS Interrupt Message Store MSI controller
-> +	  with IMS slot storage in a slot array in device memory
-> +
->  endmenu
-> diff --git a/drivers/irqchip/Makefile b/drivers/irqchip/Makefile
-> index c59b95a..e903201 100644
-> --- a/drivers/irqchip/Makefile
-> +++ b/drivers/irqchip/Makefile
-> @@ -113,3 +113,4 @@ obj-$(CONFIG_LOONGSON_PCH_MSI)		+= irq-loongson-pch-msi.o
->  obj-$(CONFIG_MST_IRQ)			+= irq-mst-intc.o
->  obj-$(CONFIG_SL28CPLD_INTC)		+= irq-sl28cpld.o
->  obj-$(CONFIG_MACH_REALTEK_RTL)		+= irq-realtek-rtl.o
-> +obj-$(CONFIG_IMS_MSI)			+= irq-ims-msi.o
-> diff --git a/drivers/irqchip/irq-ims-msi.c b/drivers/irqchip/irq-ims-msi.c
-> new file mode 100644
-> index 0000000..fa23207
-> --- /dev/null
-> +++ b/drivers/irqchip/irq-ims-msi.c
-> @@ -0,0 +1,211 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +// (C) Copyright 2021 Thomas Gleixner <tglx@linutronix.de>
-> +/*
-> + * Shared interrupt chips and irq domains for IMS devices
+>  /* When an MSI domain is used as an intermediate domain */
+>  int msi_domain_prepare_irqs(struct irq_domain *domain, struct device *dev,
+> diff --git a/kernel/irq/msi.c b/kernel/irq/msi.c
+> index 047b59d..f2a8f55 100644
+> --- a/kernel/irq/msi.c
+> +++ b/kernel/irq/msi.c
+> @@ -581,4 +581,48 @@ struct msi_domain_info *msi_get_domain_info(struct irq_domain *domain)
+>  	return (struct msi_domain_info *)domain->host_data;
+>  }
+>  
+> +/**
+> + * msi_irq_vector - Get the Linux IRQ number of a device vector
+> + * @dev: device to operate on
+> + * @nr: device-relative interrupt vector index (0-based).
+> + *
+> + * Returns the Linux IRQ number of a device vector.
 > + */
-> +#include <linux/device.h>
-> +#include <linux/slab.h>
-> +#include <linux/msi.h>
-> +#include <linux/irq.h>
-> +#include <linux/irqdomain.h>
+> +int msi_irq_vector(struct device *dev, unsigned int nr)
+> +{
+> +	struct msi_desc *entry;
+> +	int i = 0;
 > +
-> +#include <linux/irqchip/irq-ims-msi.h>
-> +
-> +#ifdef CONFIG_IMS_MSI_ARRAY
+> +	for_each_msi_entry(entry, dev) {
+> +		if (i == nr)
+> +			return entry->irq;
+> +		i++;
 
-Given that this covers the whole driver, what is this #defined used
-for? You might as well make the driver depend on this config option.
+This obviously doesn't work with Multi-MSI, does it?
+
+> +	}
+> +	WARN_ON_ONCE(1);
+> +	return -EINVAL;
+> +}
+> +EXPORT_SYMBOL_GPL(msi_irq_vector);
+> +
+> +/**
+> + * dev_msi_hwirq - Get the device MSI hw IRQ number of a device vector
+> + * @dev: device to operate on
+> + * @nr: device-relative interrupt vector index (0-based).
+> + *
+> + * Return the dev_msi hw IRQ number of a device vector.
+> + */
+> +int dev_msi_hwirq(struct device *dev, unsigned int nr)
+> +{
+> +	struct msi_desc *entry;
+> +	int i = 0;
+> +
+> +	for_each_msi_entry(entry, dev) {
+> +		if (i == nr)
+> +			return entry->device_msi.hwirq;
+> +		i++;
+> +	}
+> +	WARN_ON_ONCE(1);
+> +	return -EINVAL;
+> +}
+> +EXPORT_SYMBOL_GPL(dev_msi_hwirq);
+> +
+>  #endif /* CONFIG_GENERIC_MSI_IRQ_DOMAIN */
+
+And what uses these helpers?
 
 Thanks,
 
