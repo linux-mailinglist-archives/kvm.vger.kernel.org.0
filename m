@@ -2,126 +2,149 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 10B3034960A
-	for <lists+kvm@lfdr.de>; Thu, 25 Mar 2021 16:50:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 60947349616
+	for <lists+kvm@lfdr.de>; Thu, 25 Mar 2021 16:52:36 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230186AbhCYPtz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 25 Mar 2021 11:49:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40648 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230322AbhCYPtW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 25 Mar 2021 11:49:22 -0400
-Received: from mail-pf1-x433.google.com (mail-pf1-x433.google.com [IPv6:2607:f8b0:4864:20::433])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9FA58C06175F
-        for <kvm@vger.kernel.org>; Thu, 25 Mar 2021 08:49:22 -0700 (PDT)
-Received: by mail-pf1-x433.google.com with SMTP id m11so2459960pfc.11
-        for <kvm@vger.kernel.org>; Thu, 25 Mar 2021 08:49:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=+lt5248YpMtf4xb83RL4Cd0DB6PM3CB7sU5dXZjCKCg=;
-        b=H7MhmTlD65xIev+aJ32j6Bto7F/9TwLWCXxVg0nspUvRLHREsXHuICULh01gli1BuV
-         Pa8ULuYRVVIs68flsZwdtqVHvVAHyCKsUGAMvWsI5sm5K/XCE9qQb2JKW1t83ORYZjnt
-         6WOVccT0+PoHp5as8mGLacMQar3FDl7RQ5GZ2p3O40OCzY+yhRmTu5jWo0peD4ZN22qK
-         fcM0oHqFLDsJQKOHuYLULG2QJzxIDf/4jfJnrIX2xq/ZvpwUMRq8ZUb48x7QN5ysvCdU
-         sBoulpcmnapJVCuqsIKC9oiospjjecMUWhgLQtcha9viPRlwP9hUv/72uJu7rHzq0wgd
-         9k5w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=+lt5248YpMtf4xb83RL4Cd0DB6PM3CB7sU5dXZjCKCg=;
-        b=J9jilc8PMRC5rlVngS6BAXdYJWoG2jK/p3umBENBDmyt195oE1Zr8wlMwZV6kXTuEr
-         BoFZdEUY0ecW53+DQYSr2jeIiYUAOngr+4TBWooTsHLVyanTIG6jS59MpXQmcVsW1Jj1
-         C5uDz40cRkEAa7g0tSpxymOZEIe0z1wpbti8jftlGFS3FpjMXvmsei2G6oCH7YyqMscv
-         PfbNOjhiBmV/cwi0is2FB/4PLvcsfnHzua5UhvwwI6FVN5/3ptwlDWkv0c7u+rqU6hDe
-         D+h7/E8x1M1en+c51uc7NOpMSdbVo9SBv2BeNYuqkbLZt+9vGHWKr5PjmKFu1bMhQwR7
-         Jdtw==
-X-Gm-Message-State: AOAM531kBPZ9+/2Z0y4tJSUg5ThfDAhu4B9XzJM2dH1lGkfSf/xuYrDf
-        82pMKCX49GVbH7gw0VpdmrXS7g==
-X-Google-Smtp-Source: ABdhPJy1Q9nAZXnJoWdjU++34Eac5UuDfoe2pmwSVJgVSNuVgXhvD3caBy53fVKVh3CaPMM+I5CUqQ==
-X-Received: by 2002:a63:3689:: with SMTP id d131mr5251886pga.261.1616687361920;
-        Thu, 25 Mar 2021 08:49:21 -0700 (PDT)
-Received: from google.com (240.111.247.35.bc.googleusercontent.com. [35.247.111.240])
-        by smtp.gmail.com with ESMTPSA id x19sm6334521pfi.220.2021.03.25.08.49.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 25 Mar 2021 08:49:21 -0700 (PDT)
-Date:   Thu, 25 Mar 2021 15:49:17 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Haiwei Li <lihaiwei.kernel@gmail.com>
-Cc:     LKML <linux-kernel@vger.kernel.org>,
-        kvm list <kvm@vger.kernel.org>,
+        id S229771AbhCYPwE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 25 Mar 2021 11:52:04 -0400
+Received: from mga02.intel.com ([134.134.136.20]:48480 "EHLO mga02.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S230228AbhCYPvo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 25 Mar 2021 11:51:44 -0400
+IronPort-SDR: +Hb5QyJEn954Y6zpaopSgrCZfNP02PdgOf7Fl09BUBZvCJLD87p7x+jAYM3su3B8+ld250YHL5
+ V2z+UndWd5TQ==
+X-IronPort-AV: E=McAfee;i="6000,8403,9934"; a="178079080"
+X-IronPort-AV: E=Sophos;i="5.81,277,1610438400"; 
+   d="scan'208";a="178079080"
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Mar 2021 08:51:43 -0700
+IronPort-SDR: 6m8atIa7mAPD7OzC2EyPSszUjlu5y7Td/6SyOPKJes6UWU8wzfO3M0e0TtnyyY16fwE214R+fH
+ G6WIdpj49ZgA==
+X-IronPort-AV: E=Sophos;i="5.81,277,1610438400"; 
+   d="scan'208";a="391789207"
+Received: from jeffche1-mobl.amr.corp.intel.com (HELO [10.209.73.71]) ([10.209.73.71])
+  by orsmga002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Mar 2021 08:51:43 -0700
+Subject: Re: [RFC Part2 PATCH 01/30] x86: Add the host SEV-SNP initialization
+ support
+To:     Brijesh Singh <brijesh.singh@amd.com>,
+        linux-kernel@vger.kernel.org, x86@kernel.org, kvm@vger.kernel.org,
+        linux-crypto@vger.kernel.org
+Cc:     ak@linux.intel.com, herbert@gondor.apana.org.au,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Joerg Roedel <jroedel@suse.de>,
+        "H. Peter Anvin" <hpa@zytor.com>, Tony Luck <tony.luck@intel.com>,
+        "Peter Zijlstra (Intel)" <peterz@infradead.org>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Haiwei Li <lihaiwei@tencent.com>
-Subject: Re: [PATCH] KVM: VMX: Check the corresponding bits according to the
- intel sdm
-Message-ID: <YFyw/VRhRCZlqc1X@google.com>
-References: <20210323023726.28343-1-lihaiwei.kernel@gmail.com>
- <CAB5KdOZq+2ETburoMv6Vnnj3MFAuvwnSBsSmiBO=nH1Ajdp5_g@mail.gmail.com>
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        David Rientjes <rientjes@google.com>,
+        Sean Christopherson <seanjc@google.com>
+References: <20210324170436.31843-1-brijesh.singh@amd.com>
+ <20210324170436.31843-2-brijesh.singh@amd.com>
+ <696b8d42-8825-9df5-54a3-fa55f2d0f421@intel.com>
+ <7cbafc72-f740-59b0-01f8-cd926ab7e010@amd.com>
+From:   Dave Hansen <dave.hansen@intel.com>
+Autocrypt: addr=dave.hansen@intel.com; keydata=
+ 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
+ z5cecg==
+Message-ID: <8411ae2b-1a4a-d124-ffcb-ff351adac90e@intel.com>
+Date:   Thu, 25 Mar 2021 08:51:42 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAB5KdOZq+2ETburoMv6Vnnj3MFAuvwnSBsSmiBO=nH1Ajdp5_g@mail.gmail.com>
+In-Reply-To: <7cbafc72-f740-59b0-01f8-cd926ab7e010@amd.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Mar 25, 2021, Haiwei Li wrote:
-> On Tue, Mar 23, 2021 at 10:37 AM <lihaiwei.kernel@gmail.com> wrote:
-> >
-> > From: Haiwei Li <lihaiwei@tencent.com>
-> >
-> > According to IA-32 SDM Vol.3D "A.1 BASIC VMX INFORMATION", two inspections
-> > are missing.
-> > * Bit 31 is always 0. Earlier versions of this manual specified that the
-> > VMCS revision identifier was a 32-bit field in bits 31:0 of this MSR. For
-> > all processors produced prior to this change, bit 31 of this MSR was read
-> > as 0.
-> > * The values of bits 47:45 and bits 63:57 are reserved and are read as 0.
-> >
-> > Signed-off-by: Haiwei Li <lihaiwei@tencent.com>
-> > ---
-> >  arch/x86/kvm/vmx/vmx.c | 14 ++++++++++++++
-> >  1 file changed, 14 insertions(+)
-> >
-> > diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> > index 32cf828..0d6d13c 100644
-> > --- a/arch/x86/kvm/vmx/vmx.c
-> > +++ b/arch/x86/kvm/vmx/vmx.c
-> > @@ -2577,6 +2577,20 @@ static __init int setup_vmcs_config(struct vmcs_config *vmcs_conf,
-> >
-> >         rdmsr(MSR_IA32_VMX_BASIC, vmx_msr_low, vmx_msr_high);
-> >
-> > +       /*
-> > +        * IA-32 SDM Vol 3D: Bit 31 is always 0.
-> > +        * For all earlier processors, bit 31 of this MSR was read as 0.
-> > +        */
-> > +       if (vmx_msr_low & (1u<<31))
-> > +               return -EIO;
+On 3/25/21 8:31 AM, Brijesh Singh wrote:
 > 
-> Drop this code as Jim said.
+> On 3/25/21 9:58 AM, Dave Hansen wrote:
+>>> +static int __init mem_encrypt_snp_init(void)
+>>> +{
+>>> +	if (!boot_cpu_has(X86_FEATURE_SEV_SNP))
+>>> +		return 1;
+>>> +
+>>> +	if (rmptable_init()) {
+>>> +		setup_clear_cpu_cap(X86_FEATURE_SEV_SNP);
+>>> +		return 1;
+>>> +	}
+>>> +
+>>> +	static_branch_enable(&snp_enable_key);
+>>> +
+>>> +	return 0;
+>>> +}
+>> Could you explain a bit why 'snp_enable_key' is needed in addition to
+>> X86_FEATURE_SEV_SNP?
 > 
-> > +
-> > +       /*
-> > +        * IA-32 SDM Vol 3D: bits 47:45 and bits 63:57 are reserved and are read
-> > +        * as 0.
-> > +        */
-> > +       if (vmx_msr_high & 0xfe00e000)
-> > +               return -EIO;
 > 
-> Is this ok? Can we pick up the part? :)
+> The X86_FEATURE_SEV_SNP indicates that hardware supports the feature --
+> this does not necessary means that SEV-SNP is enabled in the host.
 
-No.  "Reserved and are read as 0" does not guarantee the bits will always be
-reserved.  There are very few bits used for feature enumeration in x86 that are
-guaranteed to be '0' for all eternity.
+I think you're confusing the CPUID bit that initially populates
+X86_FEATURE_SEV_SNP with the X86_FEATURE bit.  We clear X86_FEATURE bits
+all the time for features that the kernel turns off, even while the
+hardware supports it.
 
-The whole point of reserving bits in registers is so that the CPU vendor, Intel
-in this case, can introduce new features and enumerate them to software without
-colliding with existing features or breaking software.  E.g. if Intel adds a new
-feature and uses any of these bits to enumerate the feature, this check would
-prevent KVM from loading on CPUs that support the feature.
+Look at what we do in init_ia32_feat_ctl() for SGX, for instance.  We
+then go on to use X86_FEATURE_SGX at runtime to see if SGX was disabled,
+even though the hardware supports it.
+
+>> For a lot of features, we just use cpu_feature_enabled(), which does
+>> both compile-time and static_cpu_has().  This whole series seems to lack
+>> compile-time disables for the code that it adds, like the code it adds
+>> to arch/x86/mm/fault.c or even mm/memory.c.
+> 
+> Noted, I will add the #ifdef  to make sure that its compiled out when
+> the config does not have the AMD_MEM_ENCRYPTION enabled.
+
+IS_ENABLED() tends to be nicer for these things.
+
+Even better is if you coordinate these with your X86_FEATURE_SEV_SNP
+checks.  Then, put X86_FEATURE_SEV_SNP in disabled-features.h, and you
+can use cpu_feature_enabled(X86_FEATURE_SEV_SNP) as both a
+(statically-patched) runtime *AND* compile-time check without an
+explicit #ifdefs.
