@@ -2,144 +2,68 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 99A81348B9A
-	for <lists+kvm@lfdr.de>; Thu, 25 Mar 2021 09:34:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BCA76348BBE
+	for <lists+kvm@lfdr.de>; Thu, 25 Mar 2021 09:43:42 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229574AbhCYId5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 25 Mar 2021 04:33:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58446 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229581AbhCYIdt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 25 Mar 2021 04:33:49 -0400
-Received: from mail-ej1-x633.google.com (mail-ej1-x633.google.com [IPv6:2a00:1450:4864:20::633])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0915AC06174A;
-        Thu, 25 Mar 2021 01:33:49 -0700 (PDT)
-Received: by mail-ej1-x633.google.com with SMTP id u21so1481071ejo.13;
-        Thu, 25 Mar 2021 01:33:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=DG509l2PkxXN6P5FW9KJ6L3L9tjWoNFCQPMWavCi9Hs=;
-        b=tYybAzNy2NJo3wOuiJxIdKRRldKtZkmP54NEIFJOjVWqt5vDY0mWJEVte52k+D5F9g
-         KuhhXqVwsMGv945KMjdwiCOPNqqIdnpA/3JZB77lGOEVYLq0EqJHW96JpSMeLRDd5ANg
-         Pc9h1j+q7noYVzO/eAO/yuZCH3oxmRVrtxtrOnhNiNBn86yaeRWpmji6tG+4QLfcbO5O
-         gxxJMJPTHWR+EDZRYSsvS0lMj95/e/3FrcdfQSy1R9r/jqSOErOX+d3S+iUv54yzkCo7
-         k+DjloO4LDmLImGYsOkYz3t1chIGYyE9R1R21fiZm/ttuWr7zVHUjNQaozBJl7Cgf7AJ
-         EGkg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=DG509l2PkxXN6P5FW9KJ6L3L9tjWoNFCQPMWavCi9Hs=;
-        b=rfbhBtRnabieveC8ywnbtao0rNn+MPHYAT0JjfoIn704dwwhKmjv6Rv6pMYaIpYslj
-         fOa8/dlE25fUF5mXkxw5Qu6vh930RfB1EAItXkMWsD1FjjvvyxdhvwBrikvLjk7J6J0t
-         XKtrU9h6sRtukOaHq+6l+H7RFAH0wDscczIzW49OwIrO4l3Gx1l+Myn97RDdwsCfvBx0
-         sr3AGleDNsMn6xXx9qaY6nsNJPbGPLW4IbXnGkub8Gm2lsYA4xby5w/DFNWI4IMKoaHO
-         VfEqxnNmUGiURWZAopP9Y12u0SQ9/PXaxRiPasPI4BcZ+g81CVJJV5kmGjmD5hK4Kytm
-         UiMQ==
-X-Gm-Message-State: AOAM5326BQ9kSoZzmwNkSGif/s+aHuUmFkqMZWgZYh7GWg7m2wWs6xrB
-        EZNCtyzdAHPJMTuuL0S71qdfeMa4+ivUZJHjLA==
-X-Google-Smtp-Source: ABdhPJxE48sFuEwRba6GyLkITt2RlEq+yfl8Kvnhs2WOF1NKQsIeTXnTgoPtATA5mLeluNTQqo3HbEklGWm3WC37epk=
-X-Received: by 2002:a17:906:f210:: with SMTP id gt16mr8092558ejb.206.1616661227783;
- Thu, 25 Mar 2021 01:33:47 -0700 (PDT)
+        id S229617AbhCYInJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 25 Mar 2021 04:43:09 -0400
+Received: from mail.skyhub.de ([5.9.137.197]:51432 "EHLO mail.skyhub.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229508AbhCYImn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 25 Mar 2021 04:42:43 -0400
+Received: from zn.tnic (p200300ec2f0d5d00784c9f440731cfd1.dip0.t-ipconnect.de [IPv6:2003:ec:2f0d:5d00:784c:9f44:731:cfd1])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 030AB1EC03D2;
+        Thu, 25 Mar 2021 09:42:41 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1616661762;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=5ZA3QbgvQdCV0S/1PKyxIMsyoHrm2ajnvhq1m8bUFS4=;
+        b=gUAsMvF+oHBbUDQCUolS8KhswjoZQQopp+MOsFfLpaw3pIEIUxd0Mw2xCskJlCLkiCMTeY
+        vW6oLKsIxk2AGr3bdZLrqXwdVbqV7vKTg0/ZVws8qk7U4iQaolX1r2Agwt9KLwuG/OnY+8
+        FpafXLjYbKxr37MOnhefcV403D4mpFk=
+Date:   Thu, 25 Mar 2021 09:42:41 +0100
+From:   Borislav Petkov <bp@alien8.de>
+To:     Kai Huang <kai.huang@intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org,
+        x86@kernel.org, linux-sgx@vger.kernel.org,
+        linux-kernel@vger.kernel.org, jarkko@kernel.org, luto@kernel.org,
+        dave.hansen@intel.com, rick.p.edgecombe@intel.com,
+        haitao.huang@intel.com, tglx@linutronix.de, mingo@redhat.com,
+        hpa@zytor.com
+Subject: Re: [PATCH v3 03/25] x86/sgx: Wipe out EREMOVE from
+ sgx_free_epc_page()
+Message-ID: <20210325084241.GA31322@zn.tnic>
+References: <20210323121643.e06403a1bc7819bab7c15d95@intel.com>
+ <YFoNCvBYS2lIYjjc@google.com>
+ <20210323160604.GB4729@zn.tnic>
+ <YFoVmxIFjGpqM6Bk@google.com>
+ <20210323163258.GC4729@zn.tnic>
+ <b35f66a10ecc07a1eecb829912d5664886ca169b.camel@intel.com>
+ <236c0aa9-92f2-97c8-ab11-d55b9a98c931@redhat.com>
+ <20210325122343.008120ef70c1a1b16b5657ca@intel.com>
+ <8e833f7c-ea24-1044-4c69-780a84b47ce1@redhat.com>
+ <20210325124611.a9dce500b0bcbb1836580719@intel.com>
 MIME-Version: 1.0
-References: <20210323084515.1346540-1-vkuznets@redhat.com> <CAB5KdObQ7t4aXFsYioNdVfNt6B+ChJLB5dKsWxAtoXMYpgSoBA@mail.gmail.com>
- <87czvny7pw.fsf@vitty.brq.redhat.com>
-In-Reply-To: <87czvny7pw.fsf@vitty.brq.redhat.com>
-From:   Haiwei Li <lihaiwei.kernel@gmail.com>
-Date:   Thu, 25 Mar 2021 16:33:08 +0800
-Message-ID: <CAB5KdObOS1V=oGxSeiNfifHYO_20LopiJ2-M-44xA6OTjGa9Qg@mail.gmail.com>
-Subject: Re: [PATCH] KVM: x86/vPMU: Forbid writing to MSR_F15H_PERF MSRs when
- guest doesn't have X86_FEATURE_PERFCTR_CORE
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     kvm list <kvm@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Wei Huang <wei.huang2@amd.com>, Joerg Roedel <joro@8bytes.org>,
-        LKML <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20210325124611.a9dce500b0bcbb1836580719@intel.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Mar 25, 2021 at 4:10 PM Vitaly Kuznetsov <vkuznets@redhat.com> wrote:
->
-> Haiwei Li <lihaiwei.kernel@gmail.com> writes:
->
-> > On Tue, Mar 23, 2021 at 4:48 PM Vitaly Kuznetsov <vkuznets@redhat.com> wrote:
-> >>
-> >> MSR_F15H_PERF_CTL0-5, MSR_F15H_PERF_CTR0-5 MSRs are only available when
-> >> X86_FEATURE_PERFCTR_CORE CPUID bit was exposed to the guest. KVM, however,
-> >> allows these MSRs unconditionally because kvm_pmu_is_valid_msr() ->
-> >> amd_msr_idx_to_pmc() check always passes and because kvm_pmu_set_msr() ->
-> >> amd_pmu_set_msr() doesn't fail.
-> >>
-> >> In case of a counter (CTRn), no big harm is done as we only increase
-> >> internal PMC's value but in case of an eventsel (CTLn), we go deep into
-> >> perf internals with a non-existing counter.
-> >>
-> >> Note, kvm_get_msr_common() just returns '0' when these MSRs don't exist
-> >> and this also seems to contradict architectural behavior which is #GP
-> >> (I did check one old Opteron host) but changing this status quo is a bit
-> >> scarier.
-> >
-> > When msr doesn't exist, kvm_get_msr_common() returns KVM_MSR_RET_INVALID
-> > in `default:` and kvm_complete_insn_gp() will inject #GP to guest.
-> >
->
-> I'm looking at the following in kvm_get_msr_common():
->
->         switch (msr_info->index) {
->         ...
->         case MSR_F15H_PERF_CTL0 ... MSR_F15H_PERF_CTR5:
->         ...
->                 if (kvm_pmu_is_valid_msr(vcpu, msr_info->index))
->                         return kvm_pmu_get_msr(vcpu, msr_info);
->                 msr_info->data = 0;
->                 break;
->         ...
->         }
->         return 0;
->
-> so it's kind of 'always exists' or am I wrong?
+... so you could send the final version of this patch as a reply to this
+thread, now that everyone agrees, so that I can continue going through
+the rest.
 
-I am sorry. You are right. You were talking about `MSR_F15H_PERF_CTL0
-... MSR_F15H_PERF_CTR5`.
-I thought you were talking about the registers not catched in
-kvm_get_msr_common().
+Thx.
 
->
-> > Also i have wrote a kvm-unit-test, tested both on amd EPYC and intel
-> > CascadeLake. A #GP error was printed.
-> > Just like:
-> >
-> > Unhandled exception 13 #GP at ip 0000000000400420
-> > error_code=0000      rflags=00010006      cs=00000008
-> > rax=0000000000000000 rcx=0000000000000620 rdx=00000000006164a0
-> > rbx=0000000000009500
-> > rbp=0000000000517490 rsi=0000000000616ae0 rdi=0000000000000001
-> >  r8=0000000000000001  r9=00000000000003f8 r10=000000000000000d
-> > r11=0000000000000000
-> > r12=0000000000000000 r13=0000000000000000 r14=0000000000000000
-> > r15=0000000000000000
-> > cr0=0000000080000011 cr2=0000000000000000 cr3=000000000040b000
-> > cr4=0000000000000020
-> > cr8=0000000000000000
-> > STACK: @400420 400338
->
-> Did this happen on read or write? The later is expected, the former is
-> not. Could you maybe drop your code here, I'd like to see what's going
-> on.
+-- 
+Regards/Gruss,
+    Boris.
 
-I did a bad test. The msr tested is not catched in
-kvm_get_msr_common(). As said, I misunderstood
-what you meant.
-
-I have tested your patch and replied. If you have any to test, I'm
-glad to help. :)
-
---
-Haiwei Li
+https://people.kernel.org/tglx/notes-about-netiquette
