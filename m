@@ -2,220 +2,112 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 06602349667
-	for <lists+kvm@lfdr.de>; Thu, 25 Mar 2021 17:06:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6E2B434967A
+	for <lists+kvm@lfdr.de>; Thu, 25 Mar 2021 17:13:16 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229669AbhCYQGQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 25 Mar 2021 12:06:16 -0400
-Received: from mx13.kaspersky-labs.com ([91.103.66.164]:17018 "EHLO
-        mx13.kaspersky-labs.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229890AbhCYQFz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 25 Mar 2021 12:05:55 -0400
-Received: from relay13.kaspersky-labs.com (unknown [127.0.0.10])
-        by relay13.kaspersky-labs.com (Postfix) with ESMTP id 0AC49520D49;
-        Thu, 25 Mar 2021 19:05:52 +0300 (MSK)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kaspersky.com;
-        s=mail202102; t=1616688352;
-        bh=9RzzHlBe+GQemI1wr+cKUwYGdNaJc4AH1/494l+hZds=;
-        h=Subject:To:From:Message-ID:Date:MIME-Version:Content-Type;
-        b=tn6S0EkWMuVQ2073d3IZSKNb2/6Ufpzrhgv62D34ciufFdwmKXczAeEY3xZwIMPrJ
-         PGrcdiOASqzp8xG/+kNoqUPqJJJuc7hGpQZzdPAwP4Sw7Os8PLfpGBpg2XeosmR0zA
-         dyhuqnieoZNz4xuzGDRul7LbFbLzA66MySXCMpKbCiigeySKWPqmWYZYuS0+Bb55N1
-         gmRW8wD7AlAuSL2AFMYUFH3BY6xSsjQZlsd7+R6mR4ttfOsaGgxvLIKbgYcFBEoTeH
-         jwfJVsMREFGn2WUD/Eez9oSEjhG7LIag8Cngmto17FM9wuXsIqus2CYVAL3yiR8lRK
-         J2+aNRZ/338IQ==
-Received: from mail-hq2.kaspersky.com (unknown [91.103.66.206])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
-        (Client CN "mail-hq2.kaspersky.com", Issuer "Kaspersky MailRelays CA G3" (verified OK))
-        by mailhub13.kaspersky-labs.com (Postfix) with ESMTPS id 9D20D520D1A;
-        Thu, 25 Mar 2021 19:05:51 +0300 (MSK)
-Received: from [10.16.171.77] (10.64.68.129) by hqmailmbx3.avp.ru
- (10.64.67.243) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2176.2; Thu, 25
- Mar 2021 19:05:50 +0300
-Subject: Re: [RFC PATCH v7 00/22] virtio/vsock: introduce SOCK_SEQPACKET
- support
-To:     Stefano Garzarella <sgarzare@redhat.com>
-CC:     Stefan Hajnoczi <stefanha@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Jorgen Hansen <jhansen@vmware.com>,
-        Andra Paraschiv <andraprs@amazon.com>,
-        Norbert Slusarek <nslusarek@gmx.net>,
-        Colin Ian King <colin.king@canonical.com>,
-        Jeff Vander Stoep <jeffv@google.com>,
-        Alexander Popov <alex.popov@linux.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "stsp2@yandex.ru" <stsp2@yandex.ru>,
-        "oxffffaa@gmail.com" <oxffffaa@gmail.com>
-References: <20210323130716.2459195-1-arseny.krasnov@kaspersky.com>
- <20210325105259.dujvq7honiwigfyg@steredhat>
-From:   Arseny Krasnov <arseny.krasnov@kaspersky.com>
-Message-ID: <de21977d-9e75-aa17-6b4d-fd2ee8e724fd@kaspersky.com>
-Date:   Thu, 25 Mar 2021 19:05:50 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        id S229519AbhCYQMp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 25 Mar 2021 12:12:45 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:43126 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S229533AbhCYQM0 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 25 Mar 2021 12:12:26 -0400
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 12PG4YEi018836
+        for <kvm@vger.kernel.org>; Thu, 25 Mar 2021 12:12:26 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=M9roaPPxh5PtBsRrWi4oFK35+Klwz4YNbZuSTsCRnCc=;
+ b=m6NmR2FDJL6h4CdIRSBJ1IKDUBvrXsd3kw7nPsKM79jxFYeZQtuSrVauR2S3MNgkl4pj
+ VWkmrvfy1pfQAuSztNp2uuZHPEGEYgalAQRv6PfQZhXreGffL9To+RrAoXRIRKqCObSw
+ 3AT6JMCXxqB/6STAe5Jb+bRtW32njYw1L/2GeGaGyewzbLNdOw0SyJoIhc1ES/bKLYhD
+ Uep86H2lyuFmZdUBnq9o0YzF+thgYqs9vjlZqYq3HUZDfvl9x+UMh3Wmj2ZPLF0c0I+U
+ GY+OheLHQlYNVEklLyt+V33ZzPuacpsCPzNChS6mpBuOqIWlMmSJYPlmX/zoAr7jGW5t eg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 37gq0bdchc-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Thu, 25 Mar 2021 12:12:25 -0400
+Received: from m0098413.ppops.net (m0098413.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 12PG5gp4030904
+        for <kvm@vger.kernel.org>; Thu, 25 Mar 2021 12:12:25 -0400
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 37gq0bdbx1-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 25 Mar 2021 12:12:24 -0400
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 12PG8EbV010726;
+        Thu, 25 Mar 2021 16:10:11 GMT
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
+        by ppma03ams.nl.ibm.com with ESMTP id 37df68d411-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 25 Mar 2021 16:10:11 +0000
+Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 12PGA82U17629520
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 25 Mar 2021 16:10:08 GMT
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 82D2E11C05B;
+        Thu, 25 Mar 2021 16:10:08 +0000 (GMT)
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 50D7611C069;
+        Thu, 25 Mar 2021 16:10:08 +0000 (GMT)
+Received: from oc3016276355.ibm.com (unknown [9.145.41.31])
+        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Thu, 25 Mar 2021 16:10:08 +0000 (GMT)
+Subject: Re: [kvm-unit-tests PATCH v2 1/8] s390x: lib: css: disabling a
+ subchannel
+To:     Claudio Imbrenda <imbrenda@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, frankja@linux.ibm.com, david@redhat.com,
+        thuth@redhat.com, cohuck@redhat.com
+References: <1616665147-32084-1-git-send-email-pmorel@linux.ibm.com>
+ <1616665147-32084-2-git-send-email-pmorel@linux.ibm.com>
+ <20210325155235.4e0faa40@ibm-vm>
+From:   Pierre Morel <pmorel@linux.ibm.com>
+Message-ID: <4fa21a17-9d82-153e-459f-5ca1265b06db@linux.ibm.com>
+Date:   Thu, 25 Mar 2021 17:10:08 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.8.0
 MIME-Version: 1.0
-In-Reply-To: <20210325105259.dujvq7honiwigfyg@steredhat>
-Content-Type: text/plain; charset="windows-1252"
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <20210325155235.4e0faa40@ibm-vm>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-X-Originating-IP: [10.64.68.129]
-X-ClientProxiedBy: hqmailmbx3.avp.ru (10.64.67.243) To hqmailmbx3.avp.ru
- (10.64.67.243)
-X-KSE-ServerInfo: hqmailmbx3.avp.ru, 9
-X-KSE-AntiSpam-Interceptor-Info: scan successful
-X-KSE-AntiSpam-Version: 5.9.20, Database issued on: 03/25/2021 15:49:07
-X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
-X-KSE-AntiSpam-Method: none
-X-KSE-AntiSpam-Rate: 0
-X-KSE-AntiSpam-Info: Lua profiles 162675 [Mar 25 2021]
-X-KSE-AntiSpam-Info: LuaCore: 438 438 e169a60cee0e977a975a890ed8ef829a2851344a
-X-KSE-AntiSpam-Info: Version: 5.9.20.0
-X-KSE-AntiSpam-Info: Envelope from: arseny.krasnov@kaspersky.com
-X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
-X-KSE-AntiSpam-Info: d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;kaspersky.com:7.1.1;127.0.0.199:7.1.2
-X-KSE-AntiSpam-Info: Rate: 0
-X-KSE-AntiSpam-Info: Status: not_detected
-X-KSE-AntiSpam-Info: Method: none
-X-KSE-Antiphishing-Info: Clean
-X-KSE-Antiphishing-ScanningType: Deterministic
-X-KSE-Antiphishing-Method: None
-X-KSE-Antiphishing-Bases: 03/25/2021 15:51:00
-X-KSE-AttachmentFiltering-Interceptor-Info: no applicable attachment filtering
- rules found
-X-KSE-Antivirus-Interceptor-Info: scan successful
-X-KSE-Antivirus-Info: Clean, bases: 25.03.2021 15:18:00
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
-X-KSE-AttachmentFiltering-Interceptor-Info: no applicable attachment filtering
- rules found
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
-X-KLMS-Rule-ID: 52
-X-KLMS-Message-Action: clean
-X-KLMS-AntiSpam-Status: not scanned, disabled by settings
-X-KLMS-AntiSpam-Interceptor-Info: not scanned
-X-KLMS-AntiPhishing: Clean, bases: 2021/03/25 14:47:00
-X-KLMS-AntiVirus: Kaspersky Security for Linux Mail Server, version 8.0.3.30, bases: 2021/03/25 13:43:00 #16496755
-X-KLMS-AntiVirus-Status: Clean, skipped
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.761
+ definitions=2021-03-25_04:2021-03-24,2021-03-25 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 bulkscore=0
+ adultscore=0 priorityscore=1501 suspectscore=0 mlxscore=0 malwarescore=0
+ mlxlogscore=999 phishscore=0 clxscore=1015 spamscore=0 lowpriorityscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
+ definitions=main-2103250114
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
-On 25.03.2021 13:52, Stefano Garzarella wrote:
-> Hi Arseny,
->
-> On Tue, Mar 23, 2021 at 04:07:13PM +0300, Arseny Krasnov wrote:
->> 	This patchset implements support of SOCK_SEQPACKET for virtio
->> transport.
->> 	As SOCK_SEQPACKET guarantees to save record boundaries, so to
->> do it, two new packet operations were added: first for start of record
->> and second to mark end of record(SEQ_BEGIN and SEQ_END later). Also,
->> both operations carries metadata - to maintain boundaries and payload
->> integrity. Metadata is introduced by adding special header with two
->> fields - message id and message length:
+
+On 3/25/21 3:52 PM, Claudio Imbrenda wrote:
+> On Thu, 25 Mar 2021 10:39:00 +0100
+> Pierre Morel <pmorel@linux.ibm.com> wrote:
+> 
+>> Some tests require to disable a subchannel.
+>> Let's implement the css_disable() function.
 >>
->> 	struct virtio_vsock_seq_hdr {
->> 		__le32  msg_id;
->> 		__le32  msg_len;
->> 	} __attribute__((packed));
->>
->> 	This header is transmitted as payload of SEQ_BEGIN and SEQ_END
->> packets(buffer of second virtio descriptor in chain) in the same way as
->> data transmitted in RW packets. Payload was chosen as buffer for this
->> header to avoid touching first virtio buffer which carries header of
->> packet, because someone could check that size of this buffer is equal
->> to size of packet header. To send record, packet with start marker is
->> sent first(it's header carries length of record and id),then all data
->> is sent as usual 'RW' packets and finally SEQ_END is sent(it carries
->> id of message, which is equal to id of SEQ_BEGIN), also after sending
->> SEQ_END id is incremented. On receiver's side,size of record is known
-> >from packet with start record marker. To check that no packets were
->> dropped by transport, 'msg_id's of two sequential SEQ_BEGIN and SEQ_END
->> are checked to be equal and length of data between two markers is
->> compared to then length in SEQ_BEGIN header.
->> 	Now as  packets of one socket are not reordered neither on
->> vsock nor on vhost transport layers, such markers allows to restore
->> original record on receiver's side. If user's buffer is smaller that
->> record length, when all out of size data is dropped.
->> 	Maximum length of datagram is not limited as in stream socket,
->> because same credit logic is used. Difference with stream socket is
->> that user is not woken up until whole record is received or error
->> occurred. Implementation also supports 'MSG_EOR' and 'MSG_TRUNC' flags.
->> 	Tests also implemented.
->>
->> 	Thanks to stsp2@yandex.ru for encouragements and initial design
->> recommendations.
->>
->> Arseny Krasnov (22):
->>  af_vsock: update functions for connectible socket
->>  af_vsock: separate wait data loop
->>  af_vsock: separate receive data loop
->>  af_vsock: implement SEQPACKET receive loop
->>  af_vsock: separate wait space loop
->>  af_vsock: implement send logic for SEQPACKET
->>  af_vsock: rest of SEQPACKET support
->>  af_vsock: update comments for stream sockets
->>  virtio/vsock: set packet's type in virtio_transport_send_pkt_info()
->>  virtio/vsock: simplify credit update function API
->>  virtio/vsock: dequeue callback for SOCK_SEQPACKET
->>  virtio/vsock: fetch length for SEQPACKET record
->>  virtio/vsock: add SEQPACKET receive logic
->>  virtio/vsock: rest of SOCK_SEQPACKET support
->>  virtio/vsock: SEQPACKET support feature bit
->>  virtio/vsock: setup SEQPACKET ops for transport
->>  vhost/vsock: setup SEQPACKET ops for transport
->>  vsock/loopback: setup SEQPACKET ops for transport
->>  vhost/vsock: SEQPACKET feature bit support
->>  virtio/vsock: SEQPACKET feature bit support
->>  vsock_test: add SOCK_SEQPACKET tests
->>  virtio/vsock: update trace event for SEQPACKET
->>
->> drivers/vhost/vsock.c                        |  21 +-
->> include/linux/virtio_vsock.h                 |  21 +
->> include/net/af_vsock.h                       |   9 +
->> .../events/vsock_virtio_transport_common.h   |  48 +-
->> include/uapi/linux/virtio_vsock.h            |  19 +
->> net/vmw_vsock/af_vsock.c                     | 581 +++++++++++------
->> net/vmw_vsock/virtio_transport.c             |  17 +
->> net/vmw_vsock/virtio_transport_common.c      | 379 +++++++++--
->> net/vmw_vsock/vsock_loopback.c               |  12 +
->> tools/testing/vsock/util.c                   |  32 +-
->> tools/testing/vsock/util.h                   |   3 +
->> tools/testing/vsock/vsock_test.c             | 126 ++++
->> 12 files changed, 1015 insertions(+), 253 deletions(-)
->>
->> v6 -> v7:
->> General changelog:
->> - virtio transport callback for message length now removed
->>   from transport. Length of record is returned by dequeue
->>   callback.
->>
->> - function which tries to get message length now returns 0
->>   when rx queue is empty. Also length of current message in
->>   progress is set to 0, when message processed or error
->>   happens.
->>
->> - patches for virtio feature bit moved after patches with
->>   transport ops.
->>
->> Per patch changelog:
->>  see every patch after '---' line.
-> I reviewed the series and I left some comments, I think we are at a good 
-> point, but we should have the specification accepted before merging this 
-> series to avoid having to change the implementation later.
-I'll prepare new version of specification patch
->
-> What do you think?
-Agree, Thank You
->
-> Thanks,
-> Stefano
->
->
+...snip...
+>> +	/* Read the SCHIB for this subchannel */
+>> +	cc = stsch(schid, &schib);
+>> +	if (cc) {
+>> +		report_info("stsch: sch %08x failed with cc=%d",
+>> schid, cc);
+> 
+> KVM unit tests allow up to 120 columns per line, please use them, the
+> code will be more readable; this applies for all broken lines, not just
+> in this patch.
+
+Oh someone did not read the README!
+thanks.
+
+
+-- 
+Pierre Morel
+IBM Lab Boeblingen
