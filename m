@@ -2,140 +2,98 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5ED6A348E69
-	for <lists+kvm@lfdr.de>; Thu, 25 Mar 2021 11:54:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 05B92348E7B
+	for <lists+kvm@lfdr.de>; Thu, 25 Mar 2021 12:04:57 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230280AbhCYKy3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 25 Mar 2021 06:54:29 -0400
-Received: from mail.skyhub.de ([5.9.137.197]:48318 "EHLO mail.skyhub.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229989AbhCYKyZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 25 Mar 2021 06:54:25 -0400
-Received: from zn.tnic (p200300ec2f0d5d00d5a461c7dd3b44f2.dip0.t-ipconnect.de [IPv6:2003:ec:2f0d:5d00:d5a4:61c7:dd3b:44f2])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 227771EC0324;
-        Thu, 25 Mar 2021 11:54:18 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1616669658;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=7hQS1Zk4qijEwSa8ikJ/1MafWKIbpZjK368ZCUsmpSc=;
-        b=TQ4JVvY3LA9P2yMKv3TIftb763w1/WQ8HbiESPBe828tIOtw8TQtCNb4GrpnyH/vbyBqu+
-        x1XAxcWxMALsGGhNDAvjsVLO8QtmxRsKRhYA3LR90lKLexAgVbgfKsyK5RTMK5hLIPsqRr
-        qbim9y+qmIpmiujOlhDXd03p/hos4Gs=
-Date:   Thu, 25 Mar 2021 11:54:17 +0100
-From:   Borislav Petkov <bp@alien8.de>
-To:     Brijesh Singh <brijesh.singh@amd.com>
-Cc:     linux-kernel@vger.kernel.org, x86@kernel.org, kvm@vger.kernel.org,
-        ak@linux.intel.com, Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        "H. Peter Anvin" <hpa@zytor.com>, Tony Luck <tony.luck@intel.com>,
-        Dave Hansen <dave.hansen@intel.com>,
-        "Peter Zijlstra (Intel)" <peterz@infradead.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        David Rientjes <rientjes@google.com>,
-        Sean Christopherson <seanjc@google.com>
-Subject: Re: [RFC Part1 PATCH 01/13] x86/cpufeatures: Add SEV-SNP CPU feature
-Message-ID: <20210325105417.GE31322@zn.tnic>
-References: <20210324164424.28124-1-brijesh.singh@amd.com>
- <20210324164424.28124-2-brijesh.singh@amd.com>
+        id S230232AbhCYLEX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 25 Mar 2021 07:04:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34574 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229900AbhCYLEQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 25 Mar 2021 07:04:16 -0400
+Received: from mail-ed1-x52f.google.com (mail-ed1-x52f.google.com [IPv6:2a00:1450:4864:20::52f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9B673C061761
+        for <kvm@vger.kernel.org>; Thu, 25 Mar 2021 04:04:15 -0700 (PDT)
+Received: by mail-ed1-x52f.google.com with SMTP id z1so1907074edb.8
+        for <kvm@vger.kernel.org>; Thu, 25 Mar 2021 04:04:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance-com.20150623.gappssmtp.com; s=20150623;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=j2E60y1zApCOo+ENPh4Raxx8g6jv2cSuCJQwpROVgZM=;
+        b=NJGQnx0hgav0GkNAdtKNYFd7qAmAChqCbGdNkXAUa3cC8TQHvdXIjOG60ulPMn73HL
+         mA7Nflw13a2bx1P7QUnfLz54yS/cJ+Ull7wFnwig6BLiedqJxfX5CyYUygAgJ4pdF9xa
+         xcYhu982NODL5AucrVjVrnlv5A9vCfEYPJAipKfO2tFBXZYTb/VExa3Zvno/Rw5kNgo5
+         WyLZxP+lh+89M2hO1MZdYmMLcldZYgIoM77y5S0HwTLg5URwYyKFyn3/bKzIpMl8D2Cr
+         EkrMNUf+M/nxEAToXIbU7k05Dosj/5n7X/mn+VoUgYzebFt4zXmbPtTTsWNrOXymqeQg
+         6Myw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=j2E60y1zApCOo+ENPh4Raxx8g6jv2cSuCJQwpROVgZM=;
+        b=oBfmR9Ol1tydrtDxc7wcAajmFl/idgq6DKG21UPe3adYAg3bLfP8+CYFHMtAAIyOU2
+         PlX80ryLTVN4WrF2Vo/+RmeLnmwJsh09BFXT4BzWfcYbxcwkY+/TKL4z8Q2RjJXjpb3k
+         CTIv7Iw9paDW5ECG0cE2997ZWlfTCet3G8IzgQHBy4fjjQcNhozB0FNP03+obQm6epNX
+         moIAVkgpzVvbX+1+noPmxtTvzqUKM/oBMbZ65DSsNAjj7QkmeNy4Af/w5e04lyKHsPJD
+         f8tGseE+52VrzVgLSP2IB23/30xExQD2hzP2lclqCuEtmWqsJmi4/6ChQDORPIs9Yggl
+         Wpdw==
+X-Gm-Message-State: AOAM532tGk3n01tSKSZKvXxArC8agocUmyqYqzrAxGDTZEvr6v1wQbNR
+        X6tQI2MbjPOE99oUONBs3r2kuK483wOOKlXu5hlD
+X-Google-Smtp-Source: ABdhPJwfx6x9YQM73q+Dp50D7TkGMmiBWWO++0MkTstakFGwRy8KOMmbPhHLSGmWxz4gE1lZVY0LAsR3u2gni+Bnu6Q=
+X-Received: by 2002:a05:6402:4314:: with SMTP id m20mr8215245edc.5.1616670254143;
+ Thu, 25 Mar 2021 04:04:14 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20210324164424.28124-2-brijesh.singh@amd.com>
+References: <20210315053721.189-1-xieyongji@bytedance.com> <20210315053721.189-2-xieyongji@bytedance.com>
+ <20210315090822.GA4166677@infradead.org> <CACycT3vrHOExXj6v8ULvUzdLcRkdzS5=TNK6=g4+RWEdN-nOJw@mail.gmail.com>
+ <20210325082352.GA2988009@infradead.org>
+In-Reply-To: <20210325082352.GA2988009@infradead.org>
+From:   Yongji Xie <xieyongji@bytedance.com>
+Date:   Thu, 25 Mar 2021 19:04:03 +0800
+Message-ID: <CACycT3ta_FdLD2GMNuJ7QHNucCaf4hHEsUgG0WNZJNQzNk9J9A@mail.gmail.com>
+Subject: Re: Re: [PATCH v5 01/11] file: Export __receive_fd() to modules
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     Christian Brauner <christian.brauner@canonical.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        Parav Pandit <parav@nvidia.com>, Bob Liu <bob.liu@oracle.com>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Matthew Wilcox <willy@infradead.org>, viro@zeniv.linux.org.uk,
+        Jens Axboe <axboe@kernel.dk>, bcrl@kvack.org,
+        Jonathan Corbet <corbet@lwn.net>,
+        "Mika Penttil??" <mika.penttila@nextfour.com>,
+        Dan Carpenter <dan.carpenter@oracle.com>,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        kvm@vger.kernel.org, linux-fsdevel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Mar 24, 2021 at 11:44:12AM -0500, Brijesh Singh wrote:
-> Add CPU feature detection for Secure Encrypted Virtualization with
-> Secure Nested Paging. This feature adds a strong memory integrity
-> protection to help prevent malicious hypervisor-based attacks like
-> data replay, memory re-mapping, and more.
-> 
-> Cc: Thomas Gleixner <tglx@linutronix.de>
-> Cc: Ingo Molnar <mingo@redhat.com>
-> Cc: Borislav Petkov <bp@alien8.de>
-> Cc: Joerg Roedel <jroedel@suse.de>
-> Cc: "H. Peter Anvin" <hpa@zytor.com>
-> Cc: Tony Luck <tony.luck@intel.com>
-> Cc: Dave Hansen <dave.hansen@intel.com>
-> Cc: "Peter Zijlstra (Intel)" <peterz@infradead.org>
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: Tom Lendacky <thomas.lendacky@amd.com>
-> Cc: David Rientjes <rientjes@google.com>
-> Cc: Sean Christopherson <seanjc@google.com>
-> Cc: x86@kernel.org
-> Cc: kvm@vger.kernel.org
-> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
-> ---
->  arch/x86/include/asm/cpufeatures.h | 1 +
->  arch/x86/kernel/cpu/amd.c          | 3 ++-
->  arch/x86/kernel/cpu/scattered.c    | 1 +
->  3 files changed, 4 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/x86/include/asm/cpufeatures.h b/arch/x86/include/asm/cpufeatures.h
-> index 84b887825f12..a5b369f10bcd 100644
-> --- a/arch/x86/include/asm/cpufeatures.h
-> +++ b/arch/x86/include/asm/cpufeatures.h
-> @@ -238,6 +238,7 @@
->  #define X86_FEATURE_VMW_VMMCALL		( 8*32+19) /* "" VMware prefers VMMCALL hypercall instruction */
->  #define X86_FEATURE_SEV_ES		( 8*32+20) /* AMD Secure Encrypted Virtualization - Encrypted State */
->  #define X86_FEATURE_VM_PAGE_FLUSH	( 8*32+21) /* "" VM Page Flush MSR is supported */
-> +#define X86_FEATURE_SEV_SNP		( 8*32+22) /* AMD Secure Encrypted Virtualization - Secure Nested Paging */
+On Thu, Mar 25, 2021 at 4:25 PM Christoph Hellwig <hch@infradead.org> wrote:
+>
+> On Mon, Mar 15, 2021 at 05:46:43PM +0800, Yongji Xie wrote:
+> > On Mon, Mar 15, 2021 at 5:08 PM Christoph Hellwig <hch@infradead.org> wrote:
+> > >
+> > > On Mon, Mar 15, 2021 at 01:37:11PM +0800, Xie Yongji wrote:
+> > > > Export __receive_fd() so that some modules can use
+> > > > it to pass file descriptor between processes.
+> > >
+> > > I really don't think any non-core code should do that, especilly not
+> > > modular mere driver code.
+> >
+> > Do you see any issue? Now I think we're able to do that with the help
+> > of get_unused_fd_flags() and fd_install() in modules. But we may miss
+> > some security stuff in this way. So I try to export __receive_fd() and
+> > use it instead.
+>
+> The real problem is now what helper to use, but rather that random
+> drivers should not just mess with the FD table like that.
 
-That leaf got a separate word now: word 19.
+I see. I will use receive_fd() instead that only receives and installs
+an fd. This is indeed needed in our cases.
 
-For the future: pls redo your patches against tip/master because it has
-the latest state of affairs in tip-land.
-
->  /* Intel-defined CPU features, CPUID level 0x00000007:0 (EBX), word 9 */
->  #define X86_FEATURE_FSGSBASE		( 9*32+ 0) /* RDFSBASE, WRFSBASE, RDGSBASE, WRGSBASE instructions*/
-> diff --git a/arch/x86/kernel/cpu/amd.c b/arch/x86/kernel/cpu/amd.c
-> index f8ca66f3d861..39f7a4b5b04c 100644
-> --- a/arch/x86/kernel/cpu/amd.c
-> +++ b/arch/x86/kernel/cpu/amd.c
-> @@ -586,7 +586,7 @@ static void early_detect_mem_encrypt(struct cpuinfo_x86 *c)
->  	 *	      If BIOS has not enabled SME then don't advertise the
->  	 *	      SME feature (set in scattered.c).
->  	 *   For SEV: If BIOS has not enabled SEV then don't advertise the
-> -	 *            SEV and SEV_ES feature (set in scattered.c).
-> +	 *            SEV, SEV_ES and SEV_SNP feature (set in scattered.c).
-
-So you can remove the "scattered.c" references in the comments here.
-
->  	 *
->  	 *   In all cases, since support for SME and SEV requires long mode,
->  	 *   don't advertise the feature under CONFIG_X86_32.
-> @@ -618,6 +618,7 @@ static void early_detect_mem_encrypt(struct cpuinfo_x86 *c)
->  clear_sev:
->  		setup_clear_cpu_cap(X86_FEATURE_SEV);
->  		setup_clear_cpu_cap(X86_FEATURE_SEV_ES);
-> +		setup_clear_cpu_cap(X86_FEATURE_SEV_SNP);
->  	}
->  }
->  
-> diff --git a/arch/x86/kernel/cpu/scattered.c b/arch/x86/kernel/cpu/scattered.c
-> index 236924930bf0..eaec1278dc2e 100644
-> --- a/arch/x86/kernel/cpu/scattered.c
-> +++ b/arch/x86/kernel/cpu/scattered.c
-> @@ -45,6 +45,7 @@ static const struct cpuid_bit cpuid_bits[] = {
->  	{ X86_FEATURE_SEV_ES,		CPUID_EAX,  3, 0x8000001f, 0 },
->  	{ X86_FEATURE_SME_COHERENT,	CPUID_EAX, 10, 0x8000001f, 0 },
->  	{ X86_FEATURE_VM_PAGE_FLUSH,	CPUID_EAX,  2, 0x8000001f, 0 },
-> +	{ X86_FEATURE_SEV_SNP,		CPUID_EAX,  4, 0x8000001f, 0 },
->  	{ 0, 0, 0, 0, 0 }
->  };
-
-And this too.
-
-Thx.
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
+Thanks,
+Yongji
