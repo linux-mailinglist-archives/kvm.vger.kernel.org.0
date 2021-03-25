@@ -2,39 +2,39 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DC59F348F75
-	for <lists+kvm@lfdr.de>; Thu, 25 Mar 2021 12:28:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5C362348FCB
+	for <lists+kvm@lfdr.de>; Thu, 25 Mar 2021 12:30:29 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231219AbhCYL1r (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 25 Mar 2021 07:27:47 -0400
-Received: from mail.kernel.org ([198.145.29.99]:35170 "EHLO mail.kernel.org"
+        id S231772AbhCYL3x (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 25 Mar 2021 07:29:53 -0400
+Received: from mail.kernel.org ([198.145.29.99]:36054 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231178AbhCYL0g (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 25 Mar 2021 07:26:36 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id AC35961A3B;
-        Thu, 25 Mar 2021 11:26:27 +0000 (UTC)
+        id S231522AbhCYL1c (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 25 Mar 2021 07:27:32 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id E8CC861A5F;
+        Thu, 25 Mar 2021 11:27:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1616671588;
-        bh=lQLmD8mWJ5lbA1jcQr4LGTtmStNrM7Wj2L0lbI7A420=;
+        s=k20201202; t=1616671632;
+        bh=khVMeroJE9TqWHtGxQZsHpu5jSfqIAr/VTELrdLP8WQ=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=K7AA6aD1+E8JEo+Xgmj/8l2qZu90cjx1+6xLkV3GLBinVkHeKO59VjWVyej5UOdje
-         ZCJ7heM2ryALK4TbRlODtIuyKfhNIkeDHLgWEB+k6yK5ltMk7mrF2harlMctCKFyS+
-         SOY3eW2kBJFP0iG/qIz3G6TFL/fnf4ON12i2lk2W2FFDnc+43CWfXv+q4ljD+LLPHa
-         vWMDYora9WVg0pxyxUQxedUKBmg98R2xwZzm5/ysdPx35HGD1rNV6DU0TvcViQJRar
-         5NaV3zqgbT+B9h19uJkO+/OBoDR5bin4P9LVf0Ff4w5dtY3WMNojtQokVnQGfRN+wY
-         J3d7P18IUCazw==
+        b=sMFjZpZG/WNB+qnOz5OEH38LmpoxwRBnfQHxp+ihrNlZgi7waj34Xh7LPlFwBu/08
+         GGWqCLULipGqF5mY+HHgkj0MmmTOu+kzj62k74bDufkdzc1wsffhjNB0pHySg2Ik7P
+         Ly/GIzvBHfX1b+8v2zgHs9smxbZPbOVhYwwxkVMTw4aKD0/IjrBF2th1sa9iM9Xyey
+         gw9Fg2ngmLbEf5AtXPanO10KhkNry6BKyS2MtMRoCNwvZsJxN2xfWoPCcbNev8NFaB
+         F2KLe56HC/eYvDd+L15Ua/q+OInkxIPkVwoYnPLO/JuqE0gG4DvD+oV4Rbsmviuc2R
+         t3s+9Zz6TWJcw==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Laurent Vivier <lvivier@redhat.com>,
         "Michael S . Tsirkin" <mst@redhat.com>,
         Sasha Levin <sashal@kernel.org>, kvm@vger.kernel.org,
         virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.10 22/39] vhost: Fix vhost_vq_reset()
-Date:   Thu, 25 Mar 2021 07:25:41 -0400
-Message-Id: <20210325112558.1927423-22-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.4 16/24] vhost: Fix vhost_vq_reset()
+Date:   Thu, 25 Mar 2021 07:26:42 -0400
+Message-Id: <20210325112651.1927828-16-sashal@kernel.org>
 X-Mailer: git-send-email 2.30.1
-In-Reply-To: <20210325112558.1927423-1-sashal@kernel.org>
-References: <20210325112558.1927423-1-sashal@kernel.org>
+In-Reply-To: <20210325112651.1927828-1-sashal@kernel.org>
+References: <20210325112651.1927828-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -71,12 +71,12 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
-index a262e12c6dc2..5ccb0705beae 100644
+index 57ab79fbcee9..a279ecacbf60 100644
 --- a/drivers/vhost/vhost.c
 +++ b/drivers/vhost/vhost.c
-@@ -332,8 +332,8 @@ static void vhost_vq_reset(struct vhost_dev *dev,
- 	vq->error_ctx = NULL;
+@@ -320,8 +320,8 @@ static void vhost_vq_reset(struct vhost_dev *dev,
  	vq->kick = NULL;
+ 	vq->call_ctx = NULL;
  	vq->log_ctx = NULL;
 -	vhost_reset_is_le(vq);
  	vhost_disable_cross_endian(vq);
