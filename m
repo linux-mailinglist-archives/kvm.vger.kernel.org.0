@@ -2,284 +2,222 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A4398348651
-	for <lists+kvm@lfdr.de>; Thu, 25 Mar 2021 02:18:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DD820348709
+	for <lists+kvm@lfdr.de>; Thu, 25 Mar 2021 03:44:50 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230145AbhCYBRm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 24 Mar 2021 21:17:42 -0400
-Received: from userp2130.oracle.com ([156.151.31.86]:45654 "EHLO
-        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239579AbhCYBRK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 24 Mar 2021 21:17:10 -0400
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
-        by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 12P1GBnQ172855;
-        Thu, 25 Mar 2021 01:16:11 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
- references : from : message-id : date : in-reply-to : content-type :
- content-transfer-encoding : mime-version; s=corp-2020-01-29;
- bh=KhCULEwl/dTT21xwu3O2cJFj40SBhVqZQ2OLIrQSM/c=;
- b=RrRBpsHsZqd8iEZByHnqjS1fq0AxHN76lFEsMrB0iVgD4J19J6+/51kgkR6O6befmmLV
- pN8llzTZGfWBKOF8J5k9QbVC6cGgzxZde0L9hRusxYjMwukm5KCP36Je9rmKS7cbtK7k
- qhcfD6BSwTX+OIl42+7UyWSkszOOqBs7avg5A5i/JsoSch/9zUqBdhpuyd8SReVxVGTf
- x7WUNfSC/MoFevevws5Zf93n1Qzn9xurQq/6rRD0RwiFh4Iytk4JJwyLlCq1tdYfZ3mB
- 1fsvIGXwPT1Jo5gnFiVuIvYGGZCuQW/q3tHQW0i69eDwB4dvXZKMGiKFfuOctY/F4qGh Kw== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
-        by userp2130.oracle.com with ESMTP id 37d8frcq41-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 25 Mar 2021 01:16:11 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
-        by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 12P1EUJO162429;
-        Thu, 25 Mar 2021 01:16:10 GMT
-Received: from nam10-mw2-obe.outbound.protection.outlook.com (mail-mw2nam10lp2107.outbound.protection.outlook.com [104.47.55.107])
-        by aserp3020.oracle.com with ESMTP id 37dty19ns4-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 25 Mar 2021 01:16:10 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=WL9QD5k9YJb/ac0ZP+gV9IJl49/nAM78A5nFeKwYgdt2vEsBa56ihwrM4UetYmAD2Hh2o8GQDmU5e7XME94hBpVBdCHqVav/qcMkd92EgyP1wUYRwAIAQKx9TdY5HagZnYXwzYOT7bzFjvG6EkYLbaGirEuIA27B0tMUSdUTTmN9FdAZXw7u0uBib+i8lr6fMR8c6TWYX6FvPj8VEB9Sntinv423eizElJNftAvW3q30+GFerBfdZalOVdBCwFla0pUHrmnbSxRa/WMaibAmZB5feoMbgFV/sXNa97tdc7rsmgYHXeFvLEOhhm1tzL3HDxdJ9Klb4KBMKWS88jcCyQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=KhCULEwl/dTT21xwu3O2cJFj40SBhVqZQ2OLIrQSM/c=;
- b=TwOOkK3pIfy7+5xiTJ4KjZtF+J6oYoHSNb1lEKYGb3xDlJEoaqgbdFu95czFwg7vB0FWH8C/hTLKdHSMmuFV/YxiXjmYVJVZHygONQCbZCVcW+cHMNEPFvTTyH8avtFRaN7QCh/skhs/co5qyd5yfPahD0yAE70l8VLMnQiMxmNVbaqo8EmYV4n2BZEmJdiNQaKJ2Fn1kHUd6Be4/NjX3G0n2BawdoV80gTDpqLvZMlc2cqKfl3oacPIxQizzSczyCSyZMFHjgnuHDvplQGR3zWnZ7hCHrT33H1p5FW9i8wpAHIpCIY3ONwnECXkMjuzgZJXivKPbfN3J7vRpqsg7Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
+        id S235124AbhCYCoT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 24 Mar 2021 22:44:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39826 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232829AbhCYCns (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 24 Mar 2021 22:43:48 -0400
+Received: from mail-qv1-xf36.google.com (mail-qv1-xf36.google.com [IPv6:2607:f8b0:4864:20::f36])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9B1D1C06174A
+        for <kvm@vger.kernel.org>; Wed, 24 Mar 2021 19:43:46 -0700 (PDT)
+Received: by mail-qv1-xf36.google.com with SMTP id o19so504618qvu.0
+        for <kvm@vger.kernel.org>; Wed, 24 Mar 2021 19:43:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=KhCULEwl/dTT21xwu3O2cJFj40SBhVqZQ2OLIrQSM/c=;
- b=Ur6FfNxXbciqGFjkUcSrnRB2BCZGjUzdcy7B/LdDf5FPDtwGNpGkgwhL3rTX/+ZSdA2cbfzXoZeh3THJdlbORTmp83yPEpmRF5G3MIGVP8ErSZuQsvzG+4ps58/SF/NJ7p+BnlF9IPNw15dUfiHaiy2Lv98OVuBbCkclNMIA7X0=
-Authentication-Results: google.com; dkim=none (message not signed)
- header.d=none;google.com; dmarc=none action=none header.from=oracle.com;
-Received: from SN6PR10MB3021.namprd10.prod.outlook.com (2603:10b6:805:cc::19)
- by SA2PR10MB4793.namprd10.prod.outlook.com (2603:10b6:806:110::24) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3977.25; Thu, 25 Mar
- 2021 01:16:08 +0000
-Received: from SN6PR10MB3021.namprd10.prod.outlook.com
- ([fe80::1871:3741:cc17:bcf7]) by SN6PR10MB3021.namprd10.prod.outlook.com
- ([fe80::1871:3741:cc17:bcf7%7]) with mapi id 15.20.3955.025; Thu, 25 Mar 2021
- 01:16:08 +0000
-Subject: Re: [PATCH 2/5 v4] KVM: nSVM: Check addresses of MSR and IO
- permission maps
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, jmattson@google.com
-References: <20210324175006.75054-1-krish.sadhukhan@oracle.com>
- <20210324175006.75054-3-krish.sadhukhan@oracle.com>
- <YFuP3tNOLQfXAY1l@google.com>
-From:   Krish Sadhukhan <krish.sadhukhan@oracle.com>
-Message-ID: <66e5e78f-f280-16b9-9c92-32db335dbbd6@oracle.com>
-Date:   Wed, 24 Mar 2021 18:16:05 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.0
-In-Reply-To: <YFuP3tNOLQfXAY1l@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-Originating-IP: [2606:b400:8301:1010::16aa]
-X-ClientProxiedBy: CH0PR03CA0025.namprd03.prod.outlook.com
- (2603:10b6:610:b0::30) To SN6PR10MB3021.namprd10.prod.outlook.com
- (2603:10b6:805:cc::19)
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:in-reply-to:message-id:references
+         :user-agent:mime-version;
+        bh=KPgNseh8yYhheSsYQuED4Rz4kqyVes0PKuxx8Zc5Pzk=;
+        b=BdIRT1S5lkykj3PvB/gG74m7dcanhvDfxsY84m9i/OkWLHWNw6KkyuuSD1aE/8W0nn
+         hnAXpKxLL2vzXDs6ek8vgALNt0Xj2b+Zh52/nTXHCKdl+jUPO8X67v40EPD2WSyallrs
+         BKUvrT+pexeE2vRqu+JPiUZT1Aha1NBgQqQDsezN8OVmrplKEzfFId0XzsOsXy7cu84d
+         Fifq1EhNAZyhoCgUH6qCNUmfXXJYhxuPpYBHwd7lJ6f0teYtEcmCOp//h18PWoSXGpu+
+         eYlTvIPFjjWXxFXBBEdfZ5z2zx2mXgAR7FSgGEP0M2/Eu2rXAEe6AfxFlMOe9NFZFCus
+         3s4g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:in-reply-to:message-id
+         :references:user-agent:mime-version;
+        bh=KPgNseh8yYhheSsYQuED4Rz4kqyVes0PKuxx8Zc5Pzk=;
+        b=NEbjl/tizA5wR52uIvdlIWprGAAWMRswjYTD6JUxRMIGV5kOqDxvZtqeVzHodDsEaP
+         1Fk5gMzvia6IWlyRsUUGVcYnhI2/UNtwIqS1P8d8jeEMT4QTt2rBNOzkOXR5cO54QAQl
+         59fIrXJZlLETYg4gUi/D/RQ/of81mBvXRrsOwxwl00/aV3oLol8hKME2UMOdoNauoguX
+         2s9+o1feYXQVaXsVtugtRf3I/Q/vhD4KSDajaN0CSk6ROt0OmBJgm5wnkXCi4tKLBH0b
+         mzxLVCY/Tuau8c0NBih8qvQ8o+jnRzNNOh9Fp5OkeOIeGG5XoLaReayJaZT8PZj1QSVs
+         PNHg==
+X-Gm-Message-State: AOAM531j675oexAVWVmIAWLwEx3iaajVYuITOmdZ7HWVXA/+SveDNGJf
+        Rfuk4wn8Np9vhumG3QF4Eqt/Cg==
+X-Google-Smtp-Source: ABdhPJwcyeXHhO8Q3sUImkphN8YEfHa9SN9UJo5Q0zYpmr3RNeLZ8JXaXB7Mf8ncQ4rzefPHRXy05w==
+X-Received: by 2002:ad4:584d:: with SMTP id de13mr6421434qvb.17.1616640225605;
+        Wed, 24 Mar 2021 19:43:45 -0700 (PDT)
+Received: from eggly.attlocal.net (172-10-233-147.lightspeed.sntcca.sbcglobal.net. [172.10.233.147])
+        by smtp.gmail.com with ESMTPSA id b1sm3243761qkk.117.2021.03.24.19.43.43
+        (version=TLS1 cipher=ECDHE-ECDSA-AES128-SHA bits=128/128);
+        Wed, 24 Mar 2021 19:43:45 -0700 (PDT)
+Date:   Wed, 24 Mar 2021 19:43:29 -0700 (PDT)
+From:   Hugh Dickins <hughd@google.com>
+X-X-Sender: hugh@eggly.anvils
+To:     Borislav Petkov <bp@alien8.de>
+cc:     Hugh Dickins <hughd@google.com>, Babu Moger <babu.moger@amd.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        kvm list <kvm@vger.kernel.org>, Joerg Roedel <joro@8bytes.org>,
+        the arch/x86 maintainers <x86@kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Ingo Molnar <mingo@redhat.com>,
+        "H . Peter Anvin" <hpa@zytor.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Makarand Sonare <makarandsonare@google.com>,
+        Sean Christopherson <seanjc@google.com>
+Subject: Re: [PATCH v6 00/12] SVM cleanup and INVPCID feature support
+In-Reply-To: <alpine.LSU.2.11.2103241651280.9593@eggly.anvils>
+Message-ID: <alpine.LSU.2.11.2103241913190.10112@eggly.anvils>
+References: <78cc2dc7-a2ee-35ac-dd47-8f3f8b62f261@redhat.com> <d7c6211b-05d3-ec3f-111a-f69f09201681@amd.com> <20210311200755.GE5829@zn.tnic> <20210311203206.GF5829@zn.tnic> <2ca37e61-08db-3e47-f2b9-8a7de60757e6@amd.com> <20210311214013.GH5829@zn.tnic>
+ <d3e9e091-0fc8-1e11-ab99-9c8be086f1dc@amd.com> <4a72f780-3797-229e-a938-6dc5b14bec8d@amd.com> <20210311235215.GI5829@zn.tnic> <ed590709-65c8-ca2f-013f-d2c63d5ee0b7@amd.com> <20210324212139.GN5010@zn.tnic> <alpine.LSU.2.11.2103241651280.9593@eggly.anvils>
+User-Agent: Alpine 2.11 (LSU 23 2013-08-11)
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from localhost.localdomain (2606:b400:8301:1010::16aa) by CH0PR03CA0025.namprd03.prod.outlook.com (2603:10b6:610:b0::30) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3977.26 via Frontend Transport; Thu, 25 Mar 2021 01:16:07 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: b3ab46c6-598d-45f3-59e9-08d8ef2b91d9
-X-MS-TrafficTypeDiagnostic: SA2PR10MB4793:
-X-Microsoft-Antispam-PRVS: <SA2PR10MB4793B17B7BB5BDF809389ECD81629@SA2PR10MB4793.namprd10.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:8882;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: fHbOLtIMwF9PlAFywohifKrml7JtDo/EetUduEg1N2TsidqxVae0fImZOpKrNps5ryhU5oK10hARn09ANuSbn8i0yNbhVMABDGGHELRbo/TnsWs4uvwEnuNDcflyOvUzZqjJvlDQrTucsrZKsbSelRo88rnYXSQnQTUeewte6gcwpn47u1Y9lca20IZ5Op8xxQaSVjHaGD+bqu+EbJxfuX1IzNHcBBGMu6FwPGRfHfUxuW65/Q4VMS6O8eqdPjo0UkOJOghnvqcuB0M2RdcHenTxsjeOwJBCjIli2h9TU6Hm5Tc2mgkdtWAQVLDpIeT9iffZrCQ5hstksJO7+p/+ZDV8wxb6A1nSDvsXhXLpDJxt3ThCii+NTUFjvYqW2JvX7JEP1/xa330uNe/qjDcK4L7izkMtnOpCBPXjlG7pWquaGmytmhp0cJHtKGSSlHKWQb8X1jy11GkVhjyt0KwvUAM8SfGwpuD86F00IBxIxi5TsL9FSoBAwnHQnwlb1PVwti2k3jPsOYEcD8FrdxJ9b89y/kEiBSEumIEgnBDNjJRfqLormf24tij2Q+XOOkoZYZSyrjAoYfCo8UgfZix0Pw8KrBpQeizJSaFCQb8IwfuwaWgQfAthJ3nzDmkBh0u+gYpjgoxwMzAmAw4pweh/s+IYk6+for+KT+xd2xhG2M/K/f2BQMiB9WST5qbUX9l6HPlh29X4nyUwdRE5arXxm/twLM1PC8UwMVpj0U8GHC+8LXLzOzChWDy9XJWAR04wMu7oOD9MfB/FWpJFFwiChDAOSvKWtOBr7dxxWrT6N7A=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR10MB3021.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(136003)(396003)(376002)(346002)(366004)(39860400002)(31686004)(31696002)(5660300002)(83380400001)(2616005)(38100700001)(36756003)(66476007)(66946007)(86362001)(66556008)(478600001)(6512007)(16526019)(186003)(316002)(2906002)(8936002)(4326008)(8676002)(6916009)(966005)(6506007)(44832011)(6486002)(53546011)(45980500001)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: =?utf-8?B?NEVkZnMyb29lV3gybzgwVE1EQ2NPL2w0MHJka3dZUUVWaThwTGtnVFdVcWtU?=
- =?utf-8?B?NDlnNDRKd0ZzMHFsemZzdldWMGMwYjRTV2laWXBLazlqbkxyZmhTa1VrRVNl?=
- =?utf-8?B?eDZzOUpwSEJLVyt4MjNwQ2IraEY1MjluUVdDK09oSmZNbkFHY3RRbDJPV3BJ?=
- =?utf-8?B?b2tLQytzSnlwcEY5ckROckY3aER5bWg0YjE0b0p1Y0xtQlV4YmNMK1lrSmlF?=
- =?utf-8?B?MWw0ZmhCekhsTkR2UHBOdjZsM3Y4RE4vdlhOU1FqZ0M1SkdCNUhHYUxYK3ZY?=
- =?utf-8?B?WGNpL0F4Wk1icGluUXhVanlnSmw0eURpdEhpWW9PL3M4TmNNUjRDUXZneXh1?=
- =?utf-8?B?ZWhBS3pqanhETzEvcjdxa3lXZFlaMzFBeVVndDlyYUgxN0FTY0duVmYxRkk3?=
- =?utf-8?B?MmI0WU81eEdGNlQwL0hSTUswcVNZeU5GbDhJeHdNb3VVSS95cHpvSHNLelB5?=
- =?utf-8?B?amlmamRzWm5wU1g2MDRQUVF6eklicUttd0w0WEMyc3g1QTNmaTllcU1JT3Za?=
- =?utf-8?B?UWRBdHJpQ0xueitSS1dPbXNxLzBaTHZqc0tIMkgxSEZIbEdDeWRpZXgvZ1Zu?=
- =?utf-8?B?dDBrR1pPRkx4cFgyYjliU09JSmw3N2E3cmFJdW5LSVRrTXFnQXlkSkppRU1u?=
- =?utf-8?B?ZGRHN1lJeVFQWXQyNlRqNEJjN29HdFNrdGVVaHdQazFCbUNBd0NHV2szdyty?=
- =?utf-8?B?MmhRZ2p4UU80NXJHR1NnUFN3UUFMa1RZalJIcExQVmUzYW4yRGpTd2Z1Q3p6?=
- =?utf-8?B?NmJpaTJqMmdNenlNY1dNVHdlU3dtODRObnVNTHBEZ1B2S0I0RVVYc3ZWSHVz?=
- =?utf-8?B?TGxvYjhRNklZbVNwYzNHejJZdytwNDVEUk9zMDlCVHBLelJ6L0JYUTMyZk50?=
- =?utf-8?B?NmhKTUplQjNpdXJLa09vZXNYL2dZMzJUWWNxNzV2SzliYVVVT3Q4Uko1WWM1?=
- =?utf-8?B?c3U2MkZzNTlVaVZXSk5Db3U4Q3k2RDRPN3dsbGtnOGQ2QkNDS1B4RHZlM0R0?=
- =?utf-8?B?cHQzRVZhRXAwZDQwc1h0aWFoa2prWjVrU09zZU5TM2RZMVdxNWdUOUljaDdm?=
- =?utf-8?B?R3dUUTdxczhpREM1cWpEYlRNVHBXcEEvclpXWk5EMUZIUzdTNGhveE0yUWM4?=
- =?utf-8?B?bHgyK1c5ckl2WlNCeXdEcTJvWldvS1ZLQVJlTGRmNUJqVThTOTByZVhVcWxZ?=
- =?utf-8?B?NXR3d0V6cXN0SnFGZzk0UE1zSm9WT0QvQjVDbWE1YzZoSFNOcDNFSmw1cGky?=
- =?utf-8?B?ZnMxeUNVYldmS2Z0SHF6MkxCd3NsbE95dXRoWWFwWFRqTnpTOU1ZSk1qZVdO?=
- =?utf-8?B?bHV6K3gvald3SWRCTmNvTnhwQmErNHU3VmFjZTJROG1SQVNVK2xzV0FNSHpu?=
- =?utf-8?B?MGQvNnNPL25tellwdmhqR3JsWkJkdG4wWlc1akp1Tm1aODIvV0FmVEdZRTU5?=
- =?utf-8?B?NkRDV2hqbmo5MEt6aW1mYU1jR3pwbTNrZXRNSlBmTDhoOTFNQm9ubUtPNkJ4?=
- =?utf-8?B?MkltOTdRbm9yWUhXdTMvWDRCV0tHTFJHNDdlTlJGcXVrTWlGYzNuRm9JWVFB?=
- =?utf-8?B?ZjBDRnJtY0pUTG1hMFhpYlA4WnJFOFN3WUhOUE1pc05zcGo2NXNQTUFhSjM0?=
- =?utf-8?B?T3BJSUpiaTJUTWlLZkg2anZucjZ4QUlTcjFvMGxqUTJnYUdLay9zczNoWGVk?=
- =?utf-8?B?dHl6Q2h0VnZHWVBQVXN1MTVhbVVCSkJqUWVvTWN2Z2liMnlWOTNHem1JQkpO?=
- =?utf-8?B?Q0EzNFdweUpSWW9seCtoczEyWVJka0I2MEpqSjFsdlpuRncrNTEvREViTGoy?=
- =?utf-8?B?QnQyNitoT1JBWTM2c1NWdz09?=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: b3ab46c6-598d-45f3-59e9-08d8ef2b91d9
-X-MS-Exchange-CrossTenant-AuthSource: SN6PR10MB3021.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Mar 2021 01:16:08.4276
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: i5Ra8GaGcZOe++ZcScUVwDlrYt//vT7/+zQ22n5ds3ksbUShwbx7HoVuWhJo5PInCSEpmsXsBNFYRyer/dE6dvn8EXKGIjsauAcnBGQf2fE=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA2PR10MB4793
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=9933 signatures=668683
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 mlxlogscore=999
- malwarescore=0 phishscore=0 bulkscore=0 mlxscore=0 suspectscore=0
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2103250006
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=9933 signatures=668683
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 lowpriorityscore=0 priorityscore=1501
- impostorscore=0 spamscore=0 mlxscore=0 suspectscore=0 mlxlogscore=999
- phishscore=0 bulkscore=0 adultscore=0 malwarescore=0 clxscore=1015
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
- definitions=main-2103250006
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Wed, 24 Mar 2021, Hugh Dickins wrote:
+> On Wed, 24 Mar 2021, Borislav Petkov wrote:
+> 
+> > Ok,
+> > 
+> > some more experimenting Babu and I did lead us to:
+> > 
+> > ---
+> > diff --git a/arch/x86/include/asm/tlbflush.h b/arch/x86/include/asm/tlbflush.h
+> > index f5ca15622dc9..259aa4889cad 100644
+> > --- a/arch/x86/include/asm/tlbflush.h
+> > +++ b/arch/x86/include/asm/tlbflush.h
+> > @@ -250,6 +250,9 @@ static inline void __native_flush_tlb_single(unsigned long addr)
+> >  	 */
+> >  	if (kaiser_enabled)
+> >  		invpcid_flush_one(X86_CR3_PCID_ASID_USER, addr);
+> > +	else
+> > +		asm volatile("invlpg (%0)" ::"r" (addr) : "memory");
+> > +
+> >  	invpcid_flush_one(X86_CR3_PCID_ASID_KERN, addr);
+> >  }
+> > 
+> > applied on the guest kernel which fixes the issue. And let me add Hugh
+> > who did that PCID stuff at the time. So lemme summarize for Hugh and to
+> > ask him nicely to sanity-check me. :-)
+> 
+> Just a brief interim note to assure you that I'm paying attention,
+> but wow, it's a long time since I gave any thought down here!
+> Trying to page it all back in...
+> 
+> I see no harm in your workaround if it works, but it's not as if
+> this is a previously untried path: so I'm suspicious how an issue
+> here with Globals could have gone unnoticed for so long, and need
+> to understand it better.
 
-On 3/24/21 12:15 PM, Sean Christopherson wrote:
-> On Wed, Mar 24, 2021, Krish Sadhukhan wrote:
->> According to section "Canonicalization and Consistency Checks" in APM vol 2,
->> the following guest state is illegal:
->>
->>      "The MSR or IOIO intercept tables extend to a physical address that
->>       is greater than or equal to the maximum supported physical address."
->>
->> Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
->> Signed-off-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
->> ---
->>   arch/x86/kvm/svm/nested.c | 28 +++++++++++++++++++++-------
->>   1 file changed, 21 insertions(+), 7 deletions(-)
->>
->> diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
->> index 35891d9a1099..b08d1c595736 100644
->> --- a/arch/x86/kvm/svm/nested.c
->> +++ b/arch/x86/kvm/svm/nested.c
->> @@ -231,7 +231,15 @@ static bool svm_get_nested_state_pages(struct kvm_vcpu *vcpu)
->>   	return true;
->>   }
->>   
->> -static bool nested_vmcb_check_controls(struct vmcb_control_area *control)
->> +static bool nested_svm_check_bitmap_pa(struct kvm_vcpu *vcpu, u64 pa,
->> +				       u8 order)
->> +{
->> +	u64 last_pa = PAGE_ALIGN(pa) + (PAGE_SIZE << order) - 1;
-> Ugh, I really wish things that "must" happen were actually enforced by hardware.
->
->    The MSRPM must be aligned on a 4KB boundary... The VMRUN instruction ignores
->    the lower 12 bits of the address specified in the VMCB.
->
-> So, ignoring an unaligned @pa is correct, but that means
-> nested_svm_exit_handled_msr() and nested_svm_intercept_ioio() are busted.
+Right, after looking into it more, I completely agree with you:
+the Kaiser series (in both 4.4-stable and 4.9-stable) was simply
+wrong to lose that invlpg - fine in the kaiser case when we don't
+enable Globals at all, but plain wrong in the !kaiser_enabled case.
+One way or another, we have somehow got away with it for three years.
 
+I do agree with Paolo that the PCID_ASID_KERN flush would be better
+moved under the "if (kaiser_enabled)" now. (And if this were ongoing
+development, I'd want to rewrite the function altogether: but no,
+these old stable trees are not the place for that.)
 
-How about we call PAGE_ALIGN() on the addresses where they are allocated 
-i.e., in svm_vcpu_alloc_msrpm() and in svm_hardware_setup() ? That way 
-even if we are not checking for alignment here, we are still good.
+Boris, may I leave both -stable fixes to you?
+Let me know if you'd prefer me to clean up my mess.
 
->
->> +	return last_pa > pa && !(last_pa >> cpuid_maxphyaddr(vcpu));
-> Please use kvm_vcpu_is_legal_gpa().
->
->> +}
->> +
->> +static bool nested_vmcb_check_controls(struct kvm_vcpu *vcpu,
->> +				       struct vmcb_control_area *control)
->>   {
->>   	if ((vmcb_is_intercept(control, INTERCEPT_VMRUN)) == 0)
->>   		return false;
->> @@ -243,12 +251,18 @@ static bool nested_vmcb_check_controls(struct vmcb_control_area *control)
->>   	    !npt_enabled)
->>   		return false;
->>   
->> +	if (!nested_svm_check_bitmap_pa(vcpu, control->msrpm_base_pa,
->> +	    MSRPM_ALLOC_ORDER))
->> +		return false;
->> +	if (!nested_svm_check_bitmap_pa(vcpu, control->iopm_base_pa,
->> +	    IOPM_ALLOC_ORDER))
-> I strongly dislike using the alloc orders, relying on kernel behavior to
-> represent architectural values it sketchy.  Case in point, IOPM_ALLOC_ORDER is a
-> 16kb size, whereas the actual size of the IOPM is 12kb.
+Thanks a lot for tracking this down,
+Hugh
 
-
-You're right, the IOPM check is wrong.
-
->   I also called this out
-> in v1...
->
-> https://urldefense.com/v3/__https://lkml.kernel.org/r/YAd9MBkpDjC1MY6E@google.com__;!!GqivPVa7Brio!PkV46MQtWW8toodVKSwtWy_wKBPlsT8ME0Y_NND8Xs05NJir6WSNS4ndmhVuqW9N3Jef$
-
-
-OK, I will define the actual size.
-
-BTW, can we can switch to alloc_pages_exact() instead of alloc_pages() 
-for allocating the IOPM bitmap ? The IOPM stays allocated throughout the 
-lifetime of the guest and hence it won't impact performance much.
-
->> +		return false;
->> +
->>   	return true;
->>   }
->>   
->> -static bool nested_vmcb_checks(struct vcpu_svm *svm, struct vmcb *vmcb12)
->> +static bool nested_vmcb_checks(struct kvm_vcpu *vcpu, struct vmcb *vmcb12)
->>   {
->> -	struct kvm_vcpu *vcpu = &svm->vcpu;
->>   	bool vmcb12_lma;
->>   
->>   	if ((vmcb12->save.efer & EFER_SVME) == 0)
->> @@ -268,10 +282,10 @@ static bool nested_vmcb_checks(struct vcpu_svm *svm, struct vmcb *vmcb12)
->>   		    kvm_vcpu_is_illegal_gpa(vcpu, vmcb12->save.cr3))
->>   			return false;
->>   	}
->> -	if (!kvm_is_valid_cr4(&svm->vcpu, vmcb12->save.cr4))
->> +	if (!kvm_is_valid_cr4(vcpu, vmcb12->save.cr4))
->>   		return false;
->>   
->> -	return nested_vmcb_check_controls(&vmcb12->control);
->> +	return nested_vmcb_check_controls(vcpu, &vmcb12->control);
->>   }
->>   
->>   static void load_nested_vmcb_control(struct vcpu_svm *svm,
->> @@ -515,7 +529,7 @@ int nested_svm_vmrun(struct vcpu_svm *svm)
->>   	if (WARN_ON_ONCE(!svm->nested.initialized))
->>   		return -EINVAL;
->>   
->> -	if (!nested_vmcb_checks(svm, vmcb12)) {
->> +	if (!nested_vmcb_checks(&svm->vcpu, vmcb12)) {
-> Please use @vcpu directly.
-
-
-It's all cleaned up in patch# 3.
-
->    Looks like this needs a rebase, as the prototype for
-> nested_svm_vmrun() is wrong relative to kvm/queue.
->
->>   		vmcb12->control.exit_code    = SVM_EXIT_ERR;
->>   		vmcb12->control.exit_code_hi = 0;
->>   		vmcb12->control.exit_info_1  = 0;
->> @@ -1191,7 +1205,7 @@ static int svm_set_nested_state(struct kvm_vcpu *vcpu,
->>   		goto out_free;
->>   
->>   	ret = -EINVAL;
->> -	if (!nested_vmcb_check_controls(ctl))
->> +	if (!nested_vmcb_check_controls(vcpu, ctl))
->>   		goto out_free;
->>   
->>   	/*
->> -- 
->> 2.27.0
->>
+> > 
+> > Basically, you have an AMD host which supports PCID and INVPCID and you
+> > boot on it a 4.9 guest. It explodes like the panic below.
+> > 
+> > What fixes it is this:
+> > 
+> > diff --git a/arch/x86/include/asm/tlbflush.h b/arch/x86/include/asm/tlbflush.h
+> > index f5ca15622dc9..259aa4889cad 100644
+> > --- a/arch/x86/include/asm/tlbflush.h
+> > +++ b/arch/x86/include/asm/tlbflush.h
+> > @@ -250,6 +250,9 @@ static inline void __native_flush_tlb_single(unsigned long addr)
+> >  	 */
+> >  	if (kaiser_enabled)
+> >  		invpcid_flush_one(X86_CR3_PCID_ASID_USER, addr);
+> > +	else
+> > +		asm volatile("invlpg (%0)" ::"r" (addr) : "memory");
+> > +
+> >  	invpcid_flush_one(X86_CR3_PCID_ASID_KERN, addr);
+> >  }
+> > 
+> > ---
+> > 
+> > and the reason why it does, IMHO, is because on AMD, kaiser_enabled is
+> > false because AMD is not affected by Meltdown, which means, there's no
+> > user/kernel pagetables split.
+> > 
+> > And that also means, you have global TLB entries which means that if you
+> > look at that __native_flush_tlb_single() function, it needs to flush
+> > global TLB entries on CPUs with X86_FEATURE_INVPCID_SINGLE by doing an
+> > INVLPG in the kaiser_enabled=0 case. Errgo, the above hunk.
+> > 
+> > But I might be completely off here thus this note...
+> > 
+> > Thoughts?
+> > 
+> > Thx.
+> > 
+> > 
+> > [    1.235726] ------------[ cut here ]------------
+> > [    1.237515] kernel BUG at /build/linux-dqnRSc/linux-4.9.228/arch/x86/kernel/alternative.c:709!
+> > [    1.240926] invalid opcode: 0000 [#1] SMP
+> > [    1.243301] Modules linked in:
+> > [    1.244585] CPU: 1 PID: 1 Comm: swapper/0 Not tainted 4.9.0-13-amd64 #1 Debian 4.9.228-1
+> > [    1.247657] Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
+> > [    1.251249] task: ffff909363e94040 task.stack: ffffa41bc0194000
+> > [    1.253519] RIP: 0010:[<ffffffff8fa2e40c>]  [<ffffffff8fa2e40c>] text_poke+0x18c/0x240
+> > [    1.256593] RSP: 0018:ffffa41bc0197d90  EFLAGS: 00010096
+> > [    1.258657] RAX: 000000000000000f RBX: 0000000001020800 RCX: 00000000feda3203
+> > [    1.261388] RDX: 00000000178bfbff RSI: 0000000000000000 RDI: ffffffffff57a000
+> > [    1.264168] RBP: ffffffff8fbd3eca R08: 0000000000000000 R09: 0000000000000003
+> > [    1.266983] R10: 0000000000000003 R11: 0000000000000112 R12: 0000000000000001
+> > [    1.269702] R13: ffffa41bc0197dcf R14: 0000000000000286 R15: ffffed1c40407500
+> > [    1.272572] FS:  0000000000000000(0000) GS:ffff909366300000(0000) knlGS:0000000000000000
+> > [    1.275791] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> > [    1.278032] CR2: 0000000000000000 CR3: 0000000010c08000 CR4: 00000000003606f0
+> > [    1.280815] Stack:
+> > [    1.281630]  ffffffff8fbd3eca 0000000000000005 ffffa41bc0197e03 ffffffff8fbd3ecb
+> > [    1.284660]  0000000000000000 0000000000000000 ffffffff8fa2e835 ccffffff8fad4326
+> > [    1.287729]  1ccd0231874d55d3 ffffffff8fbd3eca ffffa41bc0197e03 ffffffff90203844
+> > [    1.290852] Call Trace:
+> > [    1.291782]  [<ffffffff8fbd3eca>] ? swap_entry_free+0x12a/0x300
+> > [    1.294900]  [<ffffffff8fbd3ecb>] ? swap_entry_free+0x12b/0x300
+> > [    1.297267]  [<ffffffff8fa2e835>] ? text_poke_bp+0x55/0xe0
+> > [    1.299473]  [<ffffffff8fbd3eca>] ? swap_entry_free+0x12a/0x300
+> > [    1.301896]  [<ffffffff8fa2b64c>] ? arch_jump_label_transform+0x9c/0x120
+> > [    1.304557]  [<ffffffff9073e81f>] ? set_debug_rodata+0xc/0xc
+> > [    1.306790]  [<ffffffff8fb81d92>] ? __jump_label_update+0x72/0x80
+> > [    1.309255]  [<ffffffff8fb8206f>] ? static_key_slow_inc+0x8f/0xa0
+> > [    1.311680]  [<ffffffff8fbd7a57>] ? frontswap_register_ops+0x107/0x1d0
+> > [    1.314281]  [<ffffffff9077078c>] ? init_zswap+0x282/0x3f6
+> > [    1.316547]  [<ffffffff9077050a>] ? init_frontswap+0x8c/0x8c
+> > [    1.318784]  [<ffffffff8fa0223e>] ? do_one_initcall+0x4e/0x180
+> > [    1.321067]  [<ffffffff9073e81f>] ? set_debug_rodata+0xc/0xc
+> > [    1.323366]  [<ffffffff9073f08d>] ? kernel_init_freeable+0x16b/0x1ec
+> > [    1.325873]  [<ffffffff90011d50>] ? rest_init+0x80/0x80
+> > [    1.327989]  [<ffffffff90011d5a>] ? kernel_init+0xa/0x100
+> > [    1.330092]  [<ffffffff9001f424>] ? ret_from_fork+0x44/0x70
+> > [    1.332311] Code: 00 0f a2 4d 85 e4 74 4a 0f b6 45 00 41 38 45 00 75 19 31 c0 83 c0 01 48 63 d0 49 39 d4 76 33 41 0f b6 4c 15 00 38 4c 15 00 74 e9 <0f> 0b 48 89 ef e8 da d6 19 00 48 8d bd 00 10 00 00 48 89 c3 e8 
+> > [    1.342818] RIP  [<ffffffff8fa2e40c>] text_poke+0x18c/0x240
+> > [    1.345859]  RSP <ffffa41bc0197d90>
+> > [    1.347285] ---[ end trace 0a1c5ab5eb16de89 ]---
+> > [    1.349169] Kernel panic - not syncing: Attempted to kill init! exitcode=0x0000000b
+> > [    1.349169] 
+> > [    1.352885] Kernel Offset: 0xea00000 from 0xffffffff81000000 (relocation range: 0xffffffff80000000-0xffffffffbfffffff)
+> > [    1.357039] ---[ end Kernel panic - not syncing: Attempted to kill init! exitcode=0x0000000b
+> > [    1.357039] 
+> > 
+> > 
+> > -- 
+> > Regards/Gruss,
+> >     Boris.
+> > 
+> > https://people.kernel.org/tglx/notes-about-netiquette
