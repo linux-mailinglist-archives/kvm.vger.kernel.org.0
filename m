@@ -2,136 +2,76 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E0FF7348B34
-	for <lists+kvm@lfdr.de>; Thu, 25 Mar 2021 09:11:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 22B8A348B7D
+	for <lists+kvm@lfdr.de>; Thu, 25 Mar 2021 09:26:59 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229626AbhCYIKu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 25 Mar 2021 04:10:50 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:32738 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229574AbhCYIKZ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 25 Mar 2021 04:10:25 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1616659824;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=+UtRoqVjed4aeKlxkJktBDTzmzBfPqmMyTKVge7J/2I=;
-        b=YWGYbQwGkuV8CxBf3XWBb7iCNyK5wGTC8ukluJ7dfiQR7CYC6DYTr3FEkmaI2CMBoNY63D
-        XSIb9SFE+vWo69rUTjS/OMLn/G+v0YgfkcE3YW4StrMDNM/Ch31nwK3EgB2+1vG0DWQxKw
-        S2jdLfqACkxCssBPJD0Z8NQyG13FD38=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-208-COu4ap35OQibjXgDEqDn-A-1; Thu, 25 Mar 2021 04:10:22 -0400
-X-MC-Unique: COu4ap35OQibjXgDEqDn-A-1
-Received: by mail-ed1-f71.google.com with SMTP id w16so2278002edc.22
-        for <kvm@vger.kernel.org>; Thu, 25 Mar 2021 01:10:22 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=+UtRoqVjed4aeKlxkJktBDTzmzBfPqmMyTKVge7J/2I=;
-        b=bkb5kKoVXz21bPipnAVuInKXi+Nzc/jOi/A3KxzqAbOvFgmq7NCBBxtEl4Crfk32JD
-         N61yCGpaFEYUbxnE8/x41cMArK80nZ3wIhrTDcUWFICii/0ITcGYfJ5OMNZFBhhifbXP
-         Lx1xxvuk3HmTb8mPN81Sr3U8kY+n3dOL+DofM27b3exIsimFylvFIf4sq06ez9EaDDip
-         uUdOOxDgqtbB/q6DOFrFY4zH/cVkkl32XNdnRIM1hNE1MPKOxd1ASINtLZVKDkSr9DhE
-         g2YJsNwgL8SWWVfKW4mr5yB7CgGWGG2Xg9djTkfIEdVmB97Yj5zmnLIEuRLy9ayck6gp
-         +TwA==
-X-Gm-Message-State: AOAM533hJeyZsI+Nzx+gHkvBKCvB+1R6WXxgaAkYLy3va8xzLWIfETe3
-        dTQlHztWWHnLksotULrgCm1Cmi1jNru4ZNsGAvJDbbcpD0BK7kE2MYjSuhhhs7iiaJzeLbxAPyy
-        p0qK5ExBjS4Un
-X-Received: by 2002:a05:6402:3487:: with SMTP id v7mr7642727edc.302.1616659821064;
-        Thu, 25 Mar 2021 01:10:21 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzCH7/kZCaLKJLGLs+892JY4VEzBJJej4rycGn0YPjm5aY4RIiCSuOOUBxCB9OIoN9ZZxkMAg==
-X-Received: by 2002:a05:6402:3487:: with SMTP id v7mr7642711edc.302.1616659820812;
-        Thu, 25 Mar 2021 01:10:20 -0700 (PDT)
-Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id v8sm2297629edc.30.2021.03.25.01.10.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 25 Mar 2021 01:10:20 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Haiwei Li <lihaiwei.kernel@gmail.com>
-Cc:     kvm list <kvm@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Wei Huang <wei.huang2@amd.com>, Joerg Roedel <joro@8bytes.org>,
-        LKML <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] KVM: x86/vPMU: Forbid writing to MSR_F15H_PERF MSRs
- when guest doesn't have X86_FEATURE_PERFCTR_CORE
-In-Reply-To: <CAB5KdObQ7t4aXFsYioNdVfNt6B+ChJLB5dKsWxAtoXMYpgSoBA@mail.gmail.com>
-References: <20210323084515.1346540-1-vkuznets@redhat.com>
- <CAB5KdObQ7t4aXFsYioNdVfNt6B+ChJLB5dKsWxAtoXMYpgSoBA@mail.gmail.com>
-Date:   Thu, 25 Mar 2021 09:10:19 +0100
-Message-ID: <87czvny7pw.fsf@vitty.brq.redhat.com>
+        id S229574AbhCYI0Z (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 25 Mar 2021 04:26:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56780 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229533AbhCYI0U (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 25 Mar 2021 04:26:20 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 77EBAC06174A;
+        Thu, 25 Mar 2021 01:26:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=IzwmhOqvIxwQPFK4E3Oa+CaBwei0j7Z1kHs2r0VicEc=; b=XChpT9BvzSkcKTC2L6pglmtqNW
+        x+opZ3kV2asW/R1xhMVEPkDGdW6thedfIfn6YoDTFki6MY1t4h896/cTLH1MTjKCmfA4ngqa507b8
+        WqI6IhRpwUJDgUk8bEVyxoy3yHed8K1bWqir2Hdk7kV14K5JLpiZnuxtrPTIXiTE/XZiotNkhttx5
+        Bnd3Gw61TRDpDX6hpIPKwjWcrQ34+03fV66mFds8Q/u5F4dupsvAB58YKvJlNEZB6pkcFyA+UVw4X
+        FwcMMISnV5Wf0bZ0+GVp79yQbVdsIdAZjC+tCJtCXnHuC6c2KiXj4Dq+Aci4HMmLSOVCwCT0r9s1S
+        2y9CV1pA==;
+Received: from hch by casper.infradead.org with local (Exim 4.94 #2 (Red Hat Linux))
+        id 1lPLHU-00CXQ9-Os; Thu, 25 Mar 2021 08:24:08 +0000
+Date:   Thu, 25 Mar 2021 08:23:52 +0000
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Yongji Xie <xieyongji@bytedance.com>
+Cc:     Christoph Hellwig <hch@infradead.org>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        Parav Pandit <parav@nvidia.com>, Bob Liu <bob.liu@oracle.com>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Matthew Wilcox <willy@infradead.org>, viro@zeniv.linux.org.uk,
+        Jens Axboe <axboe@kernel.dk>, bcrl@kvack.org,
+        Jonathan Corbet <corbet@lwn.net>,
+        Mika Penttil?? <mika.penttila@nextfour.com>,
+        Dan Carpenter <dan.carpenter@oracle.com>,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        kvm@vger.kernel.org, linux-fsdevel@vger.kernel.org
+Subject: Re: [PATCH v5 01/11] file: Export __receive_fd() to modules
+Message-ID: <20210325082352.GA2988009@infradead.org>
+References: <20210315053721.189-1-xieyongji@bytedance.com>
+ <20210315053721.189-2-xieyongji@bytedance.com>
+ <20210315090822.GA4166677@infradead.org>
+ <CACycT3vrHOExXj6v8ULvUzdLcRkdzS5=TNK6=g4+RWEdN-nOJw@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CACycT3vrHOExXj6v8ULvUzdLcRkdzS5=TNK6=g4+RWEdN-nOJw@mail.gmail.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Haiwei Li <lihaiwei.kernel@gmail.com> writes:
+On Mon, Mar 15, 2021 at 05:46:43PM +0800, Yongji Xie wrote:
+> On Mon, Mar 15, 2021 at 5:08 PM Christoph Hellwig <hch@infradead.org> wrote:
+> >
+> > On Mon, Mar 15, 2021 at 01:37:11PM +0800, Xie Yongji wrote:
+> > > Export __receive_fd() so that some modules can use
+> > > it to pass file descriptor between processes.
+> >
+> > I really don't think any non-core code should do that, especilly not
+> > modular mere driver code.
+> 
+> Do you see any issue? Now I think we're able to do that with the help
+> of get_unused_fd_flags() and fd_install() in modules. But we may miss
+> some security stuff in this way. So I try to export __receive_fd() and
+> use it instead.
 
-> On Tue, Mar 23, 2021 at 4:48 PM Vitaly Kuznetsov <vkuznets@redhat.com> wrote:
->>
->> MSR_F15H_PERF_CTL0-5, MSR_F15H_PERF_CTR0-5 MSRs are only available when
->> X86_FEATURE_PERFCTR_CORE CPUID bit was exposed to the guest. KVM, however,
->> allows these MSRs unconditionally because kvm_pmu_is_valid_msr() ->
->> amd_msr_idx_to_pmc() check always passes and because kvm_pmu_set_msr() ->
->> amd_pmu_set_msr() doesn't fail.
->>
->> In case of a counter (CTRn), no big harm is done as we only increase
->> internal PMC's value but in case of an eventsel (CTLn), we go deep into
->> perf internals with a non-existing counter.
->>
->> Note, kvm_get_msr_common() just returns '0' when these MSRs don't exist
->> and this also seems to contradict architectural behavior which is #GP
->> (I did check one old Opteron host) but changing this status quo is a bit
->> scarier.
->
-> When msr doesn't exist, kvm_get_msr_common() returns KVM_MSR_RET_INVALID
-> in `default:` and kvm_complete_insn_gp() will inject #GP to guest.
->
-
-I'm looking at the following in kvm_get_msr_common():
-
-        switch (msr_info->index) {
-        ...
- 	case MSR_F15H_PERF_CTL0 ... MSR_F15H_PERF_CTR5:
-        ...
-		if (kvm_pmu_is_valid_msr(vcpu, msr_info->index))
-			return kvm_pmu_get_msr(vcpu, msr_info);
-		msr_info->data = 0;
-		break;
-        ...
-	}
-	return 0;
-
-so it's kind of 'always exists' or am I wrong?
-
-> Also i have wrote a kvm-unit-test, tested both on amd EPYC and intel
-> CascadeLake. A #GP error was printed.
-> Just like:
->
-> Unhandled exception 13 #GP at ip 0000000000400420
-> error_code=0000      rflags=00010006      cs=00000008
-> rax=0000000000000000 rcx=0000000000000620 rdx=00000000006164a0
-> rbx=0000000000009500
-> rbp=0000000000517490 rsi=0000000000616ae0 rdi=0000000000000001
->  r8=0000000000000001  r9=00000000000003f8 r10=000000000000000d
-> r11=0000000000000000
-> r12=0000000000000000 r13=0000000000000000 r14=0000000000000000
-> r15=0000000000000000
-> cr0=0000000080000011 cr2=0000000000000000 cr3=000000000040b000
-> cr4=0000000000000020
-> cr8=0000000000000000
-> STACK: @400420 400338
-
-Did this happen on read or write? The later is expected, the former is
-not. Could you maybe drop your code here, I'd like to see what's going
-on.
-
--- 
-Vitaly
-
+The real problem is now what helper to use, but rather that random
+drivers should not just mess with the FD table like that.
