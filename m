@@ -2,112 +2,78 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CFB563496B8
-	for <lists+kvm@lfdr.de>; Thu, 25 Mar 2021 17:24:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 792053496C7
+	for <lists+kvm@lfdr.de>; Thu, 25 Mar 2021 17:29:27 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229547AbhCYQXd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 25 Mar 2021 12:23:33 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:64568 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S229614AbhCYQXc (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 25 Mar 2021 12:23:32 -0400
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 12PG4WWi008625
-        for <kvm@vger.kernel.org>; Thu, 25 Mar 2021 12:23:31 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=EuGxQA9ffcz+hjEPju+ED92jgzR2RZLkbLMzi7XLBBI=;
- b=OEWa/FrehGcMwtZuoaIg+88e3wdhWsP4sfr64+83ieGKIF/3hfSV7/+JSsrCAv+q8ssU
- eDozuA+444gM3E4MD9WwtJohdnphH7PL5d9PZmzW0/quk9Gt23cmHgG5C1TbLSoe22Yc
- aYep5Nsfk+FGg8EgzUpG8NaWzjvYxBDVIvc9ey3zrdgd7EgR47uj/FeqTG6far1f9xcW
- b/PVzaKbt1e4jVoR4C4bEUKV+lVg7Bze8w3f+nDIVB8Kiiq0qf3JcM1vJfu4NwXo1/7Y
- KA8usLgwzgIT0XttFbl7DTHxYmc3HakPX7dtjwHzhlfg+5O+F5FQknwMuwyfman9qMBl Yw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 37gvavkmfh-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Thu, 25 Mar 2021 12:23:31 -0400
-Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 12PG4W3O008690
-        for <kvm@vger.kernel.org>; Thu, 25 Mar 2021 12:23:31 -0400
-Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 37gvavkmey-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 25 Mar 2021 12:23:31 -0400
-Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
-        by ppma04fra.de.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 12PGMN4M006611;
-        Thu, 25 Mar 2021 16:23:29 GMT
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
-        by ppma04fra.de.ibm.com with ESMTP id 37d9byawmx-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 25 Mar 2021 16:23:29 +0000
-Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 12PGNQso38404488
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 25 Mar 2021 16:23:26 GMT
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 2549411C050;
-        Thu, 25 Mar 2021 16:23:26 +0000 (GMT)
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id DD0E211C04A;
-        Thu, 25 Mar 2021 16:23:25 +0000 (GMT)
-Received: from oc3016276355.ibm.com (unknown [9.145.41.31])
-        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu, 25 Mar 2021 16:23:25 +0000 (GMT)
-Subject: Re: [kvm-unit-tests PATCH v2 4/8] s390x: lib: css: separate wait for
- IRQ and check I/O completion
-To:     Claudio Imbrenda <imbrenda@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, frankja@linux.ibm.com, david@redhat.com,
-        thuth@redhat.com, cohuck@redhat.com
-References: <1616665147-32084-1-git-send-email-pmorel@linux.ibm.com>
- <1616665147-32084-5-git-send-email-pmorel@linux.ibm.com>
- <20210325162408.798bbaba@ibm-vm>
-From:   Pierre Morel <pmorel@linux.ibm.com>
-Message-ID: <8f1063da-dc26-1fac-d5de-21b466dfa224@linux.ibm.com>
-Date:   Thu, 25 Mar 2021 17:23:25 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.8.0
+        id S229616AbhCYQ2z (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 25 Mar 2021 12:28:55 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:26361 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229669AbhCYQ21 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 25 Mar 2021 12:28:27 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1616689707;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=DH8v/mJfXUA91yRwJZuk088ZpE3xOULkExoChd07zMA=;
+        b=ULj2nXn/SfcA7hsy0pmmE3DFqcnWYAJXu3BfI2jTjwFMAxw6Q3dvuDvMR3R2GV55JcHczR
+        dS8c3qGAMkmfL9m+4onZd6jX+claNoEo8sTy3Jxcxx8lpFtQNdthacfNeo6i1a3frohyDz
+        4mlKtjodzS2UhYfKSW/vTR0MNTrzQL4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-66-N0usjx7hM_eZNCdtdBLLLw-1; Thu, 25 Mar 2021 12:28:24 -0400
+X-MC-Unique: N0usjx7hM_eZNCdtdBLLLw-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B82FC180FCA2;
+        Thu, 25 Mar 2021 16:28:23 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.40.194.23])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 6B5EE29685;
+        Thu, 25 Mar 2021 16:28:22 +0000 (UTC)
+Date:   Thu, 25 Mar 2021 17:28:19 +0100
+From:   Andrew Jones <drjones@redhat.com>
+To:     kvm@vger.kernel.org
+Cc:     nikos.nikoleris@arm.com, alexandru.elisei@arm.com
+Subject: Re: [PATCH kvm-unit-tests 0/2] arm64: One fix and one improvement
+Message-ID: <20210325162819.fq3f3hflwkl56qfg@kamzik.brq.redhat.com>
+References: <20210325155657.600897-1-drjones@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20210325162408.798bbaba@ibm-vm>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.761
- definitions=2021-03-25_04:2021-03-24,2021-03-25 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0 mlxscore=0
- mlxlogscore=986 adultscore=0 suspectscore=0 clxscore=1015 malwarescore=0
- phishscore=0 impostorscore=0 spamscore=0 priorityscore=1501 bulkscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
- definitions=main-2103250114
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210325155657.600897-1-drjones@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-On 3/25/21 4:24 PM, Claudio Imbrenda wrote:
-> On Thu, 25 Mar 2021 10:39:03 +0100
-> Pierre Morel <pmorel@linux.ibm.com> wrote:
+On Thu, Mar 25, 2021 at 04:56:55PM +0100, Andrew Jones wrote:
+> Fix the loading of argc. Nikos reported an issue with its alignment
+> while testing target-efi (aligned to four bytes is OK, as long as we
+> only load four bytes like we should). Also, take a patch developed
+> while working on target-efi which can make debugging a bit more
+> convenient (by doing some subtraction for the test developer).
 > 
->> We will may want to check the result of an I/O without waiting
->> for an interrupt.
->> For example because we do not handle interrupt.
->> Let's separate waiting for interrupt and the I/O complretion check.
->                                                     ^^^^^^^^^^^
->                                                     completion
-
-completed :)
-
+> Andrew Jones (2):
+>   arm64: argc is an int
+>   arm64: Output PC load offset on unhandled exceptions
 > 
->> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+>  arm/cstart64.S        | 2 +-
+>  arm/flat.lds          | 1 +
+>  lib/arm64/processor.c | 7 +++++++
+>  3 files changed, 9 insertions(+), 1 deletion(-)
 > 
-> Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+> -- 
+> 2.26.3
+>
+
+Thanks for the review, Nikos!
+
+Applied to arm/queue
+
+https://gitlab.com/rhdrjones/kvm-unit-tests/-/commits/arm/queue
 
 Thanks,
-Pierre
+drew 
 
-
--- 
-Pierre Morel
-IBM Lab Boeblingen
