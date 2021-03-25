@@ -2,247 +2,72 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 08AA1348D1A
-	for <lists+kvm@lfdr.de>; Thu, 25 Mar 2021 10:38:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3F994348D23
+	for <lists+kvm@lfdr.de>; Thu, 25 Mar 2021 10:39:14 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230013AbhCYJiL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 25 Mar 2021 05:38:11 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:55156 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230050AbhCYJhr (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 25 Mar 2021 05:37:47 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1616665066;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=tJmprqj60mO2lWaw1IZSUhyFWeosKgCMkgr1erB7bTU=;
-        b=VFMPkwSl64OX4uOj9AfIU1Q14K7Ag9Jyw2JvSp/5uJzM75SLrjAeS0K1ZwXZsS0rCB9pUZ
-        BXSvkn9QRQpBH8RRYJj47TO+U9gvlPTP7tBcze7cb83tWRgAr+zk1hKz8RaiB1jqS0WwZt
-        zL3eCYEz/eYQZ7VqyXHTJkhYORYn6B8=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-105-g_uRUnYGPAqu147MgCHEgA-1; Thu, 25 Mar 2021 05:37:41 -0400
-X-MC-Unique: g_uRUnYGPAqu147MgCHEgA-1
-Received: by mail-wr1-f70.google.com with SMTP id e9so1809917wrg.6
-        for <kvm@vger.kernel.org>; Thu, 25 Mar 2021 02:37:41 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=tJmprqj60mO2lWaw1IZSUhyFWeosKgCMkgr1erB7bTU=;
-        b=A1k/p/zwR1SktQyfGrn9ByoculD+z+720dnn9LISXVPqC4+ZPOdHBm0DBECJzCPmUA
-         LzCONv3IytQLTuAPMGQRYQyjK5+7RRNQiZOGwx95ToOOjE7V/5zEBzjsXY78VItiSQL4
-         dJdYee+O24yTLyvu0I3VAm2ILG5SdOwt4GZv7DZ6y+jmvex/gicjrArAfNQFNh0TnvHA
-         mWiSjJV2qFKEyxm+7tH72MUFSqkj6gBzL0a5cl2qeeI4Eb76C/pJrcMuql9b8x4KB2kB
-         VnpXT6udVKvjfnRbxER4rm6dYHOYCZYspTIaQntI9uC9TNZbaauEwDckluNqizmjBYoG
-         faoQ==
-X-Gm-Message-State: AOAM530oIFbj7rNt7qGC4EAqEmdsJVX1UEckItFEG5co57+h0VwrDLMn
-        SbBj+8hIbTRy6VAGsdftFUe+OOfAkZTvteNEaxQtKjba4LK4OUzPZHlizZjIRFYC7PP97ds8NA2
-        FtDu99jTIi3h7
-X-Received: by 2002:a5d:5708:: with SMTP id a8mr6788635wrv.185.1616665060172;
-        Thu, 25 Mar 2021 02:37:40 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwV06+jKR3eGl0aPDByqeGSXW8O7S5acvZEyvhMLUS/1hiKAP9QZVVCu+j26QpWA3McP4CQHw==
-X-Received: by 2002:a5d:5708:: with SMTP id a8mr6788616wrv.185.1616665059991;
-        Thu, 25 Mar 2021 02:37:39 -0700 (PDT)
-Received: from steredhat (host-79-34-249-199.business.telecomitalia.it. [79.34.249.199])
-        by smtp.gmail.com with ESMTPSA id r14sm7036453wrw.91.2021.03.25.02.37.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 25 Mar 2021 02:37:39 -0700 (PDT)
-Date:   Thu, 25 Mar 2021 10:37:36 +0100
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     Arseny Krasnov <arseny.krasnov@kaspersky.com>
-Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Jorgen Hansen <jhansen@vmware.com>,
-        Colin Ian King <colin.king@canonical.com>,
-        Andra Paraschiv <andraprs@amazon.com>,
-        Norbert Slusarek <nslusarek@gmx.net>,
-        Alexander Popov <alex.popov@linux.com>, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, stsp2@yandex.ru, oxffffaa@gmail.com
-Subject: Re: [RFC PATCH v7 05/22] af_vsock: separate wait space loop
-Message-ID: <20210325093736.h43s47ylrxcjd2qd@steredhat>
-References: <20210323130716.2459195-1-arseny.krasnov@kaspersky.com>
- <20210323131026.2460194-1-arseny.krasnov@kaspersky.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20210323131026.2460194-1-arseny.krasnov@kaspersky.com>
+        id S229730AbhCYJim (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 25 Mar 2021 05:38:42 -0400
+Received: from mga17.intel.com ([192.55.52.151]:18947 "EHLO mga17.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S230094AbhCYJiT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 25 Mar 2021 05:38:19 -0400
+IronPort-SDR: SGauGk6ApO6mi6JkjJt1DZGOTWMx0j2h9H+EyH7SZzO2EU70DO3rEmE3Gn56OMGv98rLnCXTYs
+ RUlUKqABn4Ww==
+X-IronPort-AV: E=McAfee;i="6000,8403,9933"; a="170870908"
+X-IronPort-AV: E=Sophos;i="5.81,277,1610438400"; 
+   d="scan'208";a="170870908"
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Mar 2021 02:38:18 -0700
+IronPort-SDR: tA3Bge5c+pwXbvzz43HtmiT5cWh/fKRQlTCMjbwrkGQ7hfNQM1UqRp8rrT99TOVSqKYZi0DaqP
+ EmvueFcSl1kQ==
+X-IronPort-AV: E=Sophos;i="5.81,277,1610438400"; 
+   d="scan'208";a="443326428"
+Received: from phanl-mobl1.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.251.4.149])
+  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Mar 2021 02:38:15 -0700
+Date:   Thu, 25 Mar 2021 22:38:13 +1300
+From:   Kai Huang <kai.huang@intel.com>
+To:     Borislav Petkov <bp@alien8.de>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org,
+        x86@kernel.org, linux-sgx@vger.kernel.org,
+        linux-kernel@vger.kernel.org, jarkko@kernel.org, luto@kernel.org,
+        dave.hansen@intel.com, rick.p.edgecombe@intel.com,
+        haitao.huang@intel.com, tglx@linutronix.de, mingo@redhat.com,
+        hpa@zytor.com
+Subject: Re: [PATCH v3 03/25] x86/sgx: Wipe out EREMOVE from
+ sgx_free_epc_page()
+Message-Id: <20210325223813.2397c0f3f035fbc2b809d558@intel.com>
+In-Reply-To: <20210325084241.GA31322@zn.tnic>
+References: <20210323121643.e06403a1bc7819bab7c15d95@intel.com>
+        <YFoNCvBYS2lIYjjc@google.com>
+        <20210323160604.GB4729@zn.tnic>
+        <YFoVmxIFjGpqM6Bk@google.com>
+        <20210323163258.GC4729@zn.tnic>
+        <b35f66a10ecc07a1eecb829912d5664886ca169b.camel@intel.com>
+        <236c0aa9-92f2-97c8-ab11-d55b9a98c931@redhat.com>
+        <20210325122343.008120ef70c1a1b16b5657ca@intel.com>
+        <8e833f7c-ea24-1044-4c69-780a84b47ce1@redhat.com>
+        <20210325124611.a9dce500b0bcbb1836580719@intel.com>
+        <20210325084241.GA31322@zn.tnic>
+X-Mailer: Sylpheed 3.7.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Mar 23, 2021 at 04:10:23PM +0300, Arseny Krasnov wrote:
->This moves loop that waits for space on send to separate function,
->because it will be used for SEQ_BEGIN/SEQ_END sending before and
->after data transmission. Waiting for SEQ_BEGIN/SEQ_END is needed
->because such packets carries SEQPACKET header that couldn't be
->fragmented by credit mechanism, so to avoid it, sender waits until
->enough space will be ready.
->
->Signed-off-by: Arseny Krasnov <arseny.krasnov@kaspersky.com>
->---
-> include/net/af_vsock.h   |  2 +
-> net/vmw_vsock/af_vsock.c | 99 +++++++++++++++++++++++++---------------
-> 2 files changed, 63 insertions(+), 38 deletions(-)
+On Thu, 25 Mar 2021 09:42:41 +0100 Borislav Petkov wrote:
+> ... so you could send the final version of this patch as a reply to this
+> thread, now that everyone agrees, so that I can continue going through
+> the rest.
+> 
 
-I had already reviewed this one as well and it doesn't seem to have 
-changed :-)
+I have sent it by replying to this patch.
 
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+[PATCH v4 03/25] x86/sgx: Wipe out EREMOVE from sgx_free_epc_page()
 
->
->diff --git a/include/net/af_vsock.h b/include/net/af_vsock.h
->index 74ac8a4c4168..7232f6c42a36 100644
->--- a/include/net/af_vsock.h
->+++ b/include/net/af_vsock.h
->@@ -204,6 +204,8 @@ void vsock_remove_sock(struct vsock_sock *vsk);
-> void vsock_for_each_connected_socket(void (*fn)(struct sock *sk));
-> int vsock_assign_transport(struct vsock_sock *vsk, struct vsock_sock *psk);
-> bool vsock_find_cid(unsigned int cid);
->+int vsock_wait_space(struct sock *sk, size_t space, int flags,
->+		     struct vsock_transport_send_notify_data *send_data);
->
-> /**** TAP ****/
->
->diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
->index fa0c37f97330..617ffe42693d 100644
->--- a/net/vmw_vsock/af_vsock.c
->+++ b/net/vmw_vsock/af_vsock.c
->@@ -1692,6 +1692,65 @@ static int vsock_connectible_getsockopt(struct socket *sock,
-> 	return 0;
-> }
->
->+int vsock_wait_space(struct sock *sk, size_t space, int flags,
->+		     struct vsock_transport_send_notify_data *send_data)
->+{
->+	const struct vsock_transport *transport;
->+	struct vsock_sock *vsk;
->+	long timeout;
->+	int err;
->+
->+	DEFINE_WAIT_FUNC(wait, woken_wake_function);
->+
->+	vsk = vsock_sk(sk);
->+	transport = vsk->transport;
->+	timeout = sock_sndtimeo(sk, flags & MSG_DONTWAIT);
->+	err = 0;
->+
->+	add_wait_queue(sk_sleep(sk), &wait);
->+
->+	while (vsock_stream_has_space(vsk) < space &&
->+	       sk->sk_err == 0 &&
->+	       !(sk->sk_shutdown & SEND_SHUTDOWN) &&
->+	       !(vsk->peer_shutdown & RCV_SHUTDOWN)) {
->+
->+		/* Don't wait for non-blocking sockets. */
->+		if (timeout == 0) {
->+			err = -EAGAIN;
->+			goto out_err;
->+		}
->+
->+		if (send_data) {
->+			err = transport->notify_send_pre_block(vsk, send_data);
->+			if (err < 0)
->+				goto out_err;
->+		}
->+
->+		release_sock(sk);
->+		timeout = wait_woken(&wait, TASK_INTERRUPTIBLE, timeout);
->+		lock_sock(sk);
->+		if (signal_pending(current)) {
->+			err = sock_intr_errno(timeout);
->+			goto out_err;
->+		} else if (timeout == 0) {
->+			err = -EAGAIN;
->+			goto out_err;
->+		}
->+	}
->+
->+	if (sk->sk_err) {
->+		err = -sk->sk_err;
->+	} else if ((sk->sk_shutdown & SEND_SHUTDOWN) ||
->+		   (vsk->peer_shutdown & RCV_SHUTDOWN)) {
->+		err = -EPIPE;
->+	}
->+
->+out_err:
->+	remove_wait_queue(sk_sleep(sk), &wait);
->+	return err;
->+}
->+EXPORT_SYMBOL_GPL(vsock_wait_space);
->+
-> static int vsock_connectible_sendmsg(struct socket *sock, struct msghdr *msg,
-> 				     size_t len)
-> {
->@@ -1699,10 +1758,8 @@ static int vsock_connectible_sendmsg(struct socket *sock, struct msghdr *msg,
-> 	struct vsock_sock *vsk;
-> 	const struct vsock_transport *transport;
-> 	ssize_t total_written;
->-	long timeout;
-> 	int err;
-> 	struct vsock_transport_send_notify_data send_data;
->-	DEFINE_WAIT_FUNC(wait, woken_wake_function);
->
-> 	sk = sock->sk;
-> 	vsk = vsock_sk(sk);
->@@ -1740,9 +1797,6 @@ static int vsock_connectible_sendmsg(struct socket *sock, struct msghdr *msg,
-> 		goto out;
-> 	}
->
->-	/* Wait for room in the produce queue to enqueue our user's data. */
->-	timeout = sock_sndtimeo(sk, msg->msg_flags & MSG_DONTWAIT);
->-
-> 	err = transport->notify_send_init(vsk, &send_data);
-> 	if (err < 0)
-> 		goto out;
->@@ -1750,39 +1804,8 @@ static int vsock_connectible_sendmsg(struct socket *sock, struct msghdr *msg,
-> 	while (total_written < len) {
-> 		ssize_t written;
->
->-		add_wait_queue(sk_sleep(sk), &wait);
->-		while (vsock_stream_has_space(vsk) == 0 &&
->-		       sk->sk_err == 0 &&
->-		       !(sk->sk_shutdown & SEND_SHUTDOWN) &&
->-		       !(vsk->peer_shutdown & RCV_SHUTDOWN)) {
->-
->-			/* Don't wait for non-blocking sockets. */
->-			if (timeout == 0) {
->-				err = -EAGAIN;
->-				remove_wait_queue(sk_sleep(sk), &wait);
->-				goto out_err;
->-			}
->-
->-			err = transport->notify_send_pre_block(vsk, &send_data);
->-			if (err < 0) {
->-				remove_wait_queue(sk_sleep(sk), &wait);
->-				goto out_err;
->-			}
->-
->-			release_sock(sk);
->-			timeout = wait_woken(&wait, TASK_INTERRUPTIBLE, timeout);
->-			lock_sock(sk);
->-			if (signal_pending(current)) {
->-				err = sock_intr_errno(timeout);
->-				remove_wait_queue(sk_sleep(sk), &wait);
->-				goto out_err;
->-			} else if (timeout == 0) {
->-				err = -EAGAIN;
->-				remove_wait_queue(sk_sleep(sk), &wait);
->-				goto out_err;
->-			}
->-		}
->-		remove_wait_queue(sk_sleep(sk), &wait);
->+		if (vsock_wait_space(sk, 1, msg->msg_flags, &send_data))
->+			goto out_err;
->
-> 		/* These checks occur both as part of and after the loop
-> 		 * conditional since we need to check before and after
->-- 
->2.25.1
->
+Btw, with this patch being changed, I think there's a place in patch 5 should
+also be changed. I have replied patch 5. Please take a look.
 
+Thanks.
