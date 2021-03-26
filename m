@@ -2,123 +2,296 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id AF77D34AF49
-	for <lists+kvm@lfdr.de>; Fri, 26 Mar 2021 20:23:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EDFA934AF8F
+	for <lists+kvm@lfdr.de>; Fri, 26 Mar 2021 20:50:05 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230194AbhCZTWf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 26 Mar 2021 15:22:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58636 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230114AbhCZTWN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 26 Mar 2021 15:22:13 -0400
-Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B9C5C0613AA;
-        Fri, 26 Mar 2021 12:22:13 -0700 (PDT)
-Received: from zn.tnic (p200300ec2f075f009137b2b45d3c68fe.dip0.t-ipconnect.de [IPv6:2003:ec:2f07:5f00:9137:b2b4:5d3c:68fe])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 9D5BD1EC053B;
-        Fri, 26 Mar 2021 20:22:11 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1616786531;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=2PK6VlpQ7yr3XeTWBabuXpI2dtKVX7LC4l+bJOdrm2E=;
-        b=PqW4Sb8lMqhsFmDJX1/qoKQJ2Ht2id/fUYuzq7SVcF1zJuYIMepXk0Z1gBGJVTE45kdcec
-        gQhaLj3R+k1Q0mLzEMytfC2GL8aBOdqkiXGdTpPOKDUFg7gWddtzw1bRF11LAxwxrI+x/S
-        F8yd+Fl//rUGXtqxCerzt1fWSh24b1s=
-Date:   Fri, 26 Mar 2021 20:22:14 +0100
-From:   Borislav Petkov <bp@alien8.de>
-To:     Brijesh Singh <brijesh.singh@amd.com>
-Cc:     linux-kernel@vger.kernel.org, x86@kernel.org, kvm@vger.kernel.org,
-        ak@linux.intel.com, Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        "H. Peter Anvin" <hpa@zytor.com>, Tony Luck <tony.luck@intel.com>,
-        Dave Hansen <dave.hansen@intel.com>,
-        "Peter Zijlstra (Intel)" <peterz@infradead.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        David Rientjes <rientjes@google.com>,
-        Sean Christopherson <seanjc@google.com>
-Subject: Re: [RFC Part1 PATCH 03/13] x86: add a helper routine for the
- PVALIDATE instruction
-Message-ID: <20210326192214.GK25229@zn.tnic>
-References: <20210324164424.28124-1-brijesh.singh@amd.com>
- <20210324164424.28124-4-brijesh.singh@amd.com>
- <20210326143026.GB27507@zn.tnic>
- <9c9773d1-c494-2dfe-cd2a-95e3cfdfa09f@amd.com>
+        id S230334AbhCZTtf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 26 Mar 2021 15:49:35 -0400
+Received: from mail.kernel.org ([198.145.29.99]:55332 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S230150AbhCZTtP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 26 Mar 2021 15:49:15 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id EF2EF6196C;
+        Fri, 26 Mar 2021 19:49:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1616788155;
+        bh=lAxCHO3mwbr8j2AnnBzP3nXUOrdvyMEE2z/EuSlIbfE=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=GsdDHx35gVb6OrOsB9zBnJHrV4Q/7lE6Tau01U9EJ1T3ftL6Vg5W4VB3j+kYSHQ2U
+         lFcqLQeHKxDCIBzUByhB6fIx2egkA5NL3LC2Q4OdNdu8+PbmA3xoiWJIvrcU+9Fs0w
+         G4Xi/rDnB7r+jAhGxTu0VPMoLqlrWsjApD4UE1xpJs8qHYuPOL0AsXv7DhAns0N9a8
+         ksvfWqztoxNOk7L54CBrW8dX+6h8vwCNc01+aI+hS3ej6m0GJvWaj5aPP8TBweNfdS
+         1VAaGmyVMK6Jxd0F3ivqYB1l5Dkhb+ruWnPqu3HmCBA4lbbcHl6okva5iAm455lakP
+         jpaF7mgMPRXcw==
+Date:   Fri, 26 Mar 2021 21:48:45 +0200
+From:   Jarkko Sakkinen <jarkko@kernel.org>
+To:     Kai Huang <kai.huang@intel.com>
+Cc:     kvm@vger.kernel.org, x86@kernel.org, linux-sgx@vger.kernel.org,
+        linux-kernel@vger.kernel.org, seanjc@google.com, luto@kernel.org,
+        dave.hansen@intel.com, rick.p.edgecombe@intel.com,
+        haitao.huang@intel.com, pbonzini@redhat.com, bp@alien8.de,
+        tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com
+Subject: Re: [PATCH v4 03/25] x86/sgx: Wipe out EREMOVE from
+ sgx_free_epc_page()
+Message-ID: <YF46ndD3rdotgOpl@kernel.org>
+References: <062acb801926b2ade2f9fe1672afb7113453a741.1616136308.git.kai.huang@intel.com>
+ <20210325093057.122834-1-kai.huang@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <9c9773d1-c494-2dfe-cd2a-95e3cfdfa09f@amd.com>
+In-Reply-To: <20210325093057.122834-1-kai.huang@intel.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Mar 26, 2021 at 10:42:56AM -0500, Brijesh Singh wrote:
-> There is no strong reason for a separate sev-snp.h. I will add a
-> pre-patch to rename sev-es.h to sev.h and add SNP stuff to it.
-
-Thx.
-
-> I was trying to adhere to existing functions which uses a direct
-> instruction opcode.
-
-That's not really always the case:
-
-arch/x86/include/asm/special_insns.h
-
-The "__" prefixed things should mean lower abstraction level helpers and
-we drop the ball on those sometimes.
-
-> It's not duplicate error code. The EAX returns an actual error code. The
-> rFlags contains additional information. We want both the codes available
-> to the caller so that it can make a proper decision.
+On Thu, Mar 25, 2021 at 10:30:57PM +1300, Kai Huang wrote:
+> EREMOVE takes a page and removes any association between that page and
+> an enclave.  It must be run on a page before it can be added into
+> another enclave.  Currently, EREMOVE is run as part of pages being freed
+> into the SGX page allocator.  It is not expected to fail, as it would
+> indicate a use-after-free of EPC.  Rather than add the page back to the
+> pool of available EPC, the kernel intentionally leaks the page to avoid
+> additional errors in the future.
 > 
-> e.g.
+> However, KVM does not track how guest pages are used, which means that
+> SGX virtualization use of EREMOVE might fail.  Specifically, it is
+> legitimate that EREMOVE returns SGX_CHILD_PRESENT for EPC assigned to
+> KVM guest, because KVM/kernel doesn't track SECS pages.
 > 
-> 1. A callers validate an address 0x1000. The instruction validated it
-> and return success.
-
-Your function returns PVALIDATE_SUCCESS.
-
-> 2. Caller asked to validate the same address again. The instruction will
-> return success but since the address was validated before hence
-> rFlags.CF will be set to indicate that PVALIDATE instruction did not
-> made any change in the RMP table.
-
-Your function returns PVALIDATE_VALIDATED_ALREADY or so.
-
-> You are correct that currently I am using only carry flag. So far we
-> don't need other flags. What do you think about something like this:
+> To allow SGX/KVM to introduce a more permissive EREMOVE helper and to
+> let the SGX virtualization code use the allocator directly, break out
+> the EREMOVE call from the SGX page allocator.  Rename the original
+> sgx_free_epc_page() to sgx_encl_free_epc_page(), indicating that it is
+> used to free EPC page assigned host enclave. Replace sgx_free_epc_page()
+> with sgx_encl_free_epc_page() in all call sites so there's no functional
+> change.
 > 
-> * Add a new user defined error code
+> At the same time improve error message when EREMOVE fails, and add
+> documentation to explain to user what is the bug and suggest user what
+> to do when this bug happens, although extremely unlikely.
 > 
->  #define PVALIDATE_FAIL_NOUPDATE        255 /* The error is returned if
-> rFlags.CF set */
+> Signed-off-by: Kai Huang <kai.huang@intel.com>
+> ---
+>  Documentation/x86/sgx.rst       | 27 +++++++++++++++++++++++++++
+>  arch/x86/kernel/cpu/sgx/encl.c  | 32 +++++++++++++++++++++++++++-----
+>  arch/x86/kernel/cpu/sgx/encl.h  |  1 +
+>  arch/x86/kernel/cpu/sgx/ioctl.c |  6 +++---
+>  arch/x86/kernel/cpu/sgx/main.c  | 14 +++++---------
+>  arch/x86/kernel/cpu/sgx/sgx.h   |  5 +++++
+>  6 files changed, 68 insertions(+), 17 deletions(-)
+> 
+> diff --git a/Documentation/x86/sgx.rst b/Documentation/x86/sgx.rst
+> index eaee1368b4fd..5ec7d17e65e0 100644
+> --- a/Documentation/x86/sgx.rst
+> +++ b/Documentation/x86/sgx.rst
+> @@ -209,3 +209,30 @@ An application may be loaded into a container enclave which is specially
+>  configured with a library OS and run-time which permits the application to run.
+>  The enclave run-time and library OS work together to execute the application
+>  when a thread enters the enclave.
+> +
+> +Impact of Potential Kernel SGX Bugs
+> +===================================
+> +
+> +EPC leaks
+> +---------
+> +
+> +EPC leaks can happen if kernel SGX bug happens, when a WARNING with below
+> +message is shown in dmesg:
+> +
+> +"...EREMOVE returned ... and an EPC page was leaked.  SGX may become unusuable.
+> +This is likely a kernel bug.  Refer to Documentation/x86/sgx.rst for more
+> +information."
+> +
+> +This is effectively a kernel use-after-free of EPC, and due to the way SGX
+> +works, the bug is detected at freeing. Rather than add the page back to the pool
+> +of available EPC, the kernel intentionally leaks the page to avoid additional
+> +errors in the future.
+> +
+> +When this happens, kernel will likely soon leak majority of EPC pages, and SGX
+> +will likely become unusable. However while this may be fatal to SGX, other
+> +kernel functionalities are unlikely to be impacted, and should continue to work.
+> +
+> +As a result, when this happpens, user should stop running any new SGX workloads,
+> +(or just any new workloads), and migrate all valuable workloads. Although a
+> +machine reboot can recover all EPC, the bug should be reported to Linux
+> +developers.
+> diff --git a/arch/x86/kernel/cpu/sgx/encl.c b/arch/x86/kernel/cpu/sgx/encl.c
+> index 7449ef33f081..26c0987153de 100644
+> --- a/arch/x86/kernel/cpu/sgx/encl.c
+> +++ b/arch/x86/kernel/cpu/sgx/encl.c
+> @@ -78,7 +78,7 @@ static struct sgx_epc_page *sgx_encl_eldu(struct sgx_encl_page *encl_page,
+>  
+>  	ret = __sgx_encl_eldu(encl_page, epc_page, secs_page);
+>  	if (ret) {
+> -		sgx_free_epc_page(epc_page);
+> +		sgx_encl_free_epc_page(epc_page);
+>  		return ERR_PTR(ret);
+>  	}
+>  
+> @@ -404,7 +404,7 @@ void sgx_encl_release(struct kref *ref)
+>  			if (sgx_unmark_page_reclaimable(entry->epc_page))
+>  				continue;
+>  
+> -			sgx_free_epc_page(entry->epc_page);
+> +			sgx_encl_free_epc_page(entry->epc_page);
+>  			encl->secs_child_cnt--;
+>  			entry->epc_page = NULL;
+>  		}
+> @@ -415,7 +415,7 @@ void sgx_encl_release(struct kref *ref)
+>  	xa_destroy(&encl->page_array);
+>  
+>  	if (!encl->secs_child_cnt && encl->secs.epc_page) {
+> -		sgx_free_epc_page(encl->secs.epc_page);
+> +		sgx_encl_free_epc_page(encl->secs.epc_page);
+>  		encl->secs.epc_page = NULL;
+>  	}
+>  
+> @@ -423,7 +423,7 @@ void sgx_encl_release(struct kref *ref)
+>  		va_page = list_first_entry(&encl->va_pages, struct sgx_va_page,
+>  					   list);
+>  		list_del(&va_page->list);
+> -		sgx_free_epc_page(va_page->epc_page);
+> +		sgx_encl_free_epc_page(va_page->epc_page);
+>  		kfree(va_page);
+>  	}
+>  
+> @@ -686,7 +686,7 @@ struct sgx_epc_page *sgx_alloc_va_page(void)
+>  	ret = __epa(sgx_get_epc_virt_addr(epc_page));
+>  	if (ret) {
+>  		WARN_ONCE(1, "EPA returned %d (0x%x)", ret, ret);
+> -		sgx_free_epc_page(epc_page);
+> +		sgx_encl_free_epc_page(epc_page);
+>  		return ERR_PTR(-EFAULT);
+>  	}
+>  
+> @@ -735,3 +735,25 @@ bool sgx_va_page_full(struct sgx_va_page *va_page)
+>  
+>  	return slot == SGX_VA_SLOT_COUNT;
+>  }
+> +
+> +/**
+> + * sgx_encl_free_epc_page - free EPC page assigned to an enclave
+> + * @page:	EPC page to be freed
+> + *
+> + * Free EPC page assigned to an enclave.  It does EREMOVE for the page, and
+> + * only upon success, it puts the page back to free page list.  Otherwise, it
+> + * gives a WARNING to indicate page is leaked, and require reboot to retrieve
+> + * leaked pages.
+> + */
+> +void sgx_encl_free_epc_page(struct sgx_epc_page *page)
+> +{
+> +	int ret;
+> +
+> +	WARN_ON_ONCE(page->flags & SGX_EPC_PAGE_RECLAIMER_TRACKED);
+> +
+> +	ret = __eremove(sgx_get_epc_virt_addr(page));
+> +	if (WARN_ONCE(ret, EREMOVE_ERROR_MESSAGE, ret, ret))
+> +		return;
+> +
+> +	sgx_free_epc_page(page);
+> +}
+> diff --git a/arch/x86/kernel/cpu/sgx/encl.h b/arch/x86/kernel/cpu/sgx/encl.h
+> index d8d30ccbef4c..6e74f85b6264 100644
+> --- a/arch/x86/kernel/cpu/sgx/encl.h
+> +++ b/arch/x86/kernel/cpu/sgx/encl.h
+> @@ -115,5 +115,6 @@ struct sgx_epc_page *sgx_alloc_va_page(void);
+>  unsigned int sgx_alloc_va_slot(struct sgx_va_page *va_page);
+>  void sgx_free_va_slot(struct sgx_va_page *va_page, unsigned int offset);
+>  bool sgx_va_page_full(struct sgx_va_page *va_page);
+> +void sgx_encl_free_epc_page(struct sgx_epc_page *page);
+>  
+>  #endif /* _X86_ENCL_H */
+> diff --git a/arch/x86/kernel/cpu/sgx/ioctl.c b/arch/x86/kernel/cpu/sgx/ioctl.c
+> index 90a5caf76939..772b9c648cf1 100644
+> --- a/arch/x86/kernel/cpu/sgx/ioctl.c
+> +++ b/arch/x86/kernel/cpu/sgx/ioctl.c
+> @@ -47,7 +47,7 @@ static void sgx_encl_shrink(struct sgx_encl *encl, struct sgx_va_page *va_page)
+>  	encl->page_cnt--;
+>  
+>  	if (va_page) {
+> -		sgx_free_epc_page(va_page->epc_page);
+> +		sgx_encl_free_epc_page(va_page->epc_page);
+>  		list_del(&va_page->list);
+>  		kfree(va_page);
+>  	}
+> @@ -117,7 +117,7 @@ static int sgx_encl_create(struct sgx_encl *encl, struct sgx_secs *secs)
+>  	return 0;
+>  
+>  err_out:
+> -	sgx_free_epc_page(encl->secs.epc_page);
+> +	sgx_encl_free_epc_page(encl->secs.epc_page);
+>  	encl->secs.epc_page = NULL;
+>  
+>  err_out_backing:
+> @@ -365,7 +365,7 @@ static int sgx_encl_add_page(struct sgx_encl *encl, unsigned long src,
+>  	mmap_read_unlock(current->mm);
+>  
+>  err_out_free:
+> -	sgx_free_epc_page(epc_page);
+> +	sgx_encl_free_epc_page(epc_page);
+>  	kfree(encl_page);
+>  
+>  	return ret;
+> diff --git a/arch/x86/kernel/cpu/sgx/main.c b/arch/x86/kernel/cpu/sgx/main.c
+> index 13a7599ce7d4..b227629b1e9c 100644
+> --- a/arch/x86/kernel/cpu/sgx/main.c
+> +++ b/arch/x86/kernel/cpu/sgx/main.c
+> @@ -294,7 +294,7 @@ static void sgx_reclaimer_write(struct sgx_epc_page *epc_page,
+>  
+>  		sgx_encl_ewb(encl->secs.epc_page, &secs_backing);
+>  
+> -		sgx_free_epc_page(encl->secs.epc_page);
+> +		sgx_encl_free_epc_page(encl->secs.epc_page);
+>  		encl->secs.epc_page = NULL;
+>  
+>  		sgx_encl_put_backing(&secs_backing, true);
+> @@ -609,19 +609,15 @@ struct sgx_epc_page *sgx_alloc_epc_page(void *owner, bool reclaim)
+>   * sgx_free_epc_page() - Free an EPC page
+>   * @page:	an EPC page
+>   *
+> - * Call EREMOVE for an EPC page and insert it back to the list of free pages.
+> + * Put the EPC page back to the list of free pages. It's the caller's
+> + * responsibility to make sure that the page is in uninitialized state. In other
+> + * words, do EREMOVE, EWB or whatever operation is necessary before calling
+> + * this function.
+>   */
+>  void sgx_free_epc_page(struct sgx_epc_page *page)
+>  {
+>  	struct sgx_epc_section *section = &sgx_epc_sections[page->section];
+>  	struct sgx_numa_node *node = section->node;
+> -	int ret;
+> -
+> -	WARN_ON_ONCE(page->flags & SGX_EPC_PAGE_RECLAIMER_TRACKED);
+> -
+> -	ret = __eremove(sgx_get_epc_virt_addr(page));
+> -	if (WARN_ONCE(ret, "EREMOVE returned %d (0x%x)", ret, ret))
+> -		return;
+>  
+>  	spin_lock(&node->lock);
+>  
+> diff --git a/arch/x86/kernel/cpu/sgx/sgx.h b/arch/x86/kernel/cpu/sgx/sgx.h
+> index 653af8ca1a25..6b21a165500e 100644
+> --- a/arch/x86/kernel/cpu/sgx/sgx.h
+> +++ b/arch/x86/kernel/cpu/sgx/sgx.h
+> @@ -13,6 +13,11 @@
+>  #undef pr_fmt
+>  #define pr_fmt(fmt) "sgx: " fmt
+>  
+> +/* Error message for EREMOVE failure, when kernel is about to leak EPC page */
+> +#define EREMOVE_ERROR_MESSAGE \
+> +	"EREMOVE returned %d (0x%x) and an EPC page was leaked.  SGX may become unusuable.  " \
+> +	"This is likely a kernel bug.  Refer to Documentation/x86/sgx.rst for more information."
 
-Or that.
 
-> * Remove the rFlags parameters from the __pvalidate()
+Why this needs to be here and not open coded where it is used?
 
-Yes, it seems unnecessary at the moment. And I/O function arguments are
-always yuck.
+> +
+>  #define SGX_MAX_EPC_SECTIONS		8
+>  #define SGX_EEXTEND_BLOCK_SIZE		256
+>  #define SGX_NR_TO_SCAN			16
+> -- 
+> 2.30.2
+> 
+> 
 
-> * Update the __pvalidate to check the rFlags.CF and if set then return
-> the new user-defined error code.
-
-Yap, you can convert all that to pvalidate() return values, methinks,
-and then make that function simpler for callers because they should
-not have to deal with rFLAGS - only return values to denote what the
-function did.
-
-Thx.
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
+/Jarkko
