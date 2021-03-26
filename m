@@ -2,33 +2,34 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E510C34AF0D
-	for <lists+kvm@lfdr.de>; Fri, 26 Mar 2021 20:13:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AF77D34AF49
+	for <lists+kvm@lfdr.de>; Fri, 26 Mar 2021 20:23:08 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230236AbhCZTM5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 26 Mar 2021 15:12:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56562 "EHLO
+        id S230194AbhCZTWf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 26 Mar 2021 15:22:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58636 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230127AbhCZTMk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 26 Mar 2021 15:12:40 -0400
+        with ESMTP id S230114AbhCZTWN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 26 Mar 2021 15:22:13 -0400
 Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5897FC0613AA;
-        Fri, 26 Mar 2021 12:12:40 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B9C5C0613AA;
+        Fri, 26 Mar 2021 12:22:13 -0700 (PDT)
 Received: from zn.tnic (p200300ec2f075f009137b2b45d3c68fe.dip0.t-ipconnect.de [IPv6:2003:ec:2f07:5f00:9137:b2b4:5d3c:68fe])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id D92241EC0535;
-        Fri, 26 Mar 2021 20:12:38 +0100 (CET)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 9D5BD1EC053B;
+        Fri, 26 Mar 2021 20:22:11 +0100 (CET)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1616785959;
+        t=1616786531;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=xPoD7Y7agYIOnUh5UGVci7NJzqRAA7R3UL2aY0ysLXQ=;
-        b=pkPIi/ODjRlP0l7fE4c5U8L5CQc/kikY71qzYMM9vH0UkxdaEvvBb4MXbg5LwPTIbzfFFs
-        z8Ly2eld96S01DDWL2TPkAzgDk2bsgVww4qmktE2knmpkOLL4E3ySb0qAFnXSB6Ny663Z8
-        Dzcbedwjtzz4IbnwWhlyUY7io+pPTHs=
-Date:   Fri, 26 Mar 2021 20:12:41 +0100
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=2PK6VlpQ7yr3XeTWBabuXpI2dtKVX7LC4l+bJOdrm2E=;
+        b=PqW4Sb8lMqhsFmDJX1/qoKQJ2Ht2id/fUYuzq7SVcF1zJuYIMepXk0Z1gBGJVTE45kdcec
+        gQhaLj3R+k1Q0mLzEMytfC2GL8aBOdqkiXGdTpPOKDUFg7gWddtzw1bRF11LAxwxrI+x/S
+        F8yd+Fl//rUGXtqxCerzt1fWSh24b1s=
+Date:   Fri, 26 Mar 2021 20:22:14 +0100
 From:   Borislav Petkov <bp@alien8.de>
 To:     Brijesh Singh <brijesh.singh@amd.com>
 Cc:     linux-kernel@vger.kernel.org, x86@kernel.org, kvm@vger.kernel.org,
@@ -43,51 +44,76 @@ Cc:     linux-kernel@vger.kernel.org, x86@kernel.org, kvm@vger.kernel.org,
         Sean Christopherson <seanjc@google.com>
 Subject: Re: [RFC Part1 PATCH 03/13] x86: add a helper routine for the
  PVALIDATE instruction
-Message-ID: <20210326191241.GJ25229@zn.tnic>
+Message-ID: <20210326192214.GK25229@zn.tnic>
 References: <20210324164424.28124-1-brijesh.singh@amd.com>
  <20210324164424.28124-4-brijesh.singh@amd.com>
  <20210326143026.GB27507@zn.tnic>
  <9c9773d1-c494-2dfe-cd2a-95e3cfdfa09f@amd.com>
- <bddf2257-4178-c230-c40f-389db529a950@amd.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <bddf2257-4178-c230-c40f-389db529a950@amd.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <9c9773d1-c494-2dfe-cd2a-95e3cfdfa09f@amd.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Mar 26, 2021 at 01:22:24PM -0500, Brijesh Singh wrote:
-> Should I do the same for the sev-es.c ? Currently, I am keeping all the
-> SEV-SNP specific changes in sev-snp.{c,h}. After a rename of
-> sev-es.{c,h} from both the arch/x86/kernel and arch-x86/boot/compressed
-> I can add the SNP specific stuff to it.
+On Fri, Mar 26, 2021 at 10:42:56AM -0500, Brijesh Singh wrote:
+> There is no strong reason for a separate sev-snp.h. I will add a
+> pre-patch to rename sev-es.h to sev.h and add SNP stuff to it.
+
+Thx.
+
+> I was trying to adhere to existing functions which uses a direct
+> instruction opcode.
+
+That's not really always the case:
+
+arch/x86/include/asm/special_insns.h
+
+The "__" prefixed things should mean lower abstraction level helpers and
+we drop the ball on those sometimes.
+
+> It's not duplicate error code. The EAX returns an actual error code. The
+> rFlags contains additional information. We want both the codes available
+> to the caller so that it can make a proper decision.
 > 
-> Thoughts ?
+> e.g.
+> 
+> 1. A callers validate an address 0x1000. The instruction validated it
+> and return success.
 
-SNP depends on the whole functionality in SEV-ES, right? Which means,
-SNP will need all the functionality of sev-es.c.
+Your function returns PVALIDATE_SUCCESS.
 
-But sev-es.c is a lot more code than the header and snp is
+> 2. Caller asked to validate the same address again. The instruction will
+> return success but since the address was validated before hence
+> rFlags.CF will be set to indicate that PVALIDATE instruction did not
+> made any change in the RMP table.
 
- arch/x86/kernel/sev-snp.c               | 269 ++++++++++++++++++++++++
+Your function returns PVALIDATE_VALIDATED_ALREADY or so.
 
-oh well, not so much.
+> You are correct that currently I am using only carry flag. So far we
+> don't need other flags. What do you think about something like this:
+> 
+> * Add a new user defined error code
+> 
+>  #define PVALIDATE_FAIL_NOUPDATE        255 /* The error is returned if
+> rFlags.CF set */
 
-I guess a single
+Or that.
 
-arch/x86/kernel/sev.c
+> * Remove the rFlags parameters from the __pvalidate()
 
-is probably ok.
+Yes, it seems unnecessary at the moment. And I/O function arguments are
+always yuck.
 
-We can always do arch/x86/kernel/sev/ later and split stuff then when it
-starts getting real fat and impacts complication times.
+> * Update the __pvalidate to check the rFlags.CF and if set then return
+> the new user-defined error code.
 
-Btw, there's also arch/x86/kernel/sev-es-shared.c and that can be
-
-arch/x86/kernel/sev-shared.c
-
-then.
+Yap, you can convert all that to pvalidate() return values, methinks,
+and then make that function simpler for callers because they should
+not have to deal with rFLAGS - only return values to denote what the
+function did.
 
 Thx.
 
