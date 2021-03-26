@@ -2,27 +2,27 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8C98334A55D
-	for <lists+kvm@lfdr.de>; Fri, 26 Mar 2021 11:15:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D8A5434A5AA
+	for <lists+kvm@lfdr.de>; Fri, 26 Mar 2021 11:33:24 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229622AbhCZKOl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 26 Mar 2021 06:14:41 -0400
-Received: from mail.kernel.org ([198.145.29.99]:49630 "EHLO mail.kernel.org"
+        id S229882AbhCZKcw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 26 Mar 2021 06:32:52 -0400
+Received: from mail.kernel.org ([198.145.29.99]:53522 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229474AbhCZKOc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 26 Mar 2021 06:14:32 -0400
+        id S229474AbhCZKcu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 26 Mar 2021 06:32:50 -0400
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 17F4161942;
-        Fri, 26 Mar 2021 10:14:32 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id DF24E61A48;
+        Fri, 26 Mar 2021 10:32:49 +0000 (UTC)
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=wait-a-minute.misterjones.org)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.94)
         (envelope-from <maz@kernel.org>)
-        id 1lPjU5-003xNw-Rc; Fri, 26 Mar 2021 10:14:29 +0000
-Date:   Fri, 26 Mar 2021 10:14:30 +0000
-Message-ID: <87wntufchl.wl-maz@kernel.org>
+        id 1lPjln-003xXC-LI; Fri, 26 Mar 2021 10:32:47 +0000
+Date:   Fri, 26 Mar 2021 10:32:45 +0000
+Message-ID: <87v99efbn6.wl-maz@kernel.org>
 From:   Marc Zyngier <maz@kernel.org>
 To:     Thomas Gleixner <tglx@linutronix.de>
 Cc:     Megha Dey <megha.dey@intel.com>, linux-kernel@vger.kernel.org,
@@ -32,12 +32,12 @@ Cc:     Megha Dey <megha.dey@intel.com>, linux-kernel@vger.kernel.org,
         iommu@lists.linux-foundation.org, alex.williamson@redhat.com,
         bhelgaas@google.com, linux-pci@vger.kernel.org,
         baolu.lu@linux.intel.com, ravi.v.shankar@intel.com
-Subject: Re: [Patch V2 07/13] irqdomain/msi: Provide msi_alloc/free_store() callbacks
-In-Reply-To: <87lfabvzrz.fsf@nanos.tec.linutronix.de>
+Subject: Re: [Patch V2 08/13] genirq: Set auxiliary data for an interrupt
+In-Reply-To: <87im5fvz2z.fsf@nanos.tec.linutronix.de>
 References: <1614370277-23235-1-git-send-email-megha.dey@intel.com>
-        <1614370277-23235-8-git-send-email-megha.dey@intel.com>
-        <8735wjrwjm.wl-maz@kernel.org>
-        <87lfabvzrz.fsf@nanos.tec.linutronix.de>
+        <1614370277-23235-9-git-send-email-megha.dey@intel.com>
+        <871rc3rvuc.wl-maz@kernel.org>
+        <87im5fvz2z.fsf@nanos.tec.linutronix.de>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -51,33 +51,67 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 25 Mar 2021 18:44:48 +0000,
+On Thu, 25 Mar 2021 18:59:48 +0000,
 Thomas Gleixner <tglx@linutronix.de> wrote:
 > 
-> On Thu, Mar 25 2021 at 17:08, Marc Zyngier wrote:
-> > Megha Dey <megha.dey@intel.com> wrote:
-> >> @@ -434,6 +434,12 @@ int __msi_domain_alloc_irqs(struct irq_domain *domain, struct device *dev,
-> >>  	if (ret)
-> >>  		return ret;
-> >>  
-> >> +	if (ops->msi_alloc_store) {
-> >> +		ret = ops->msi_alloc_store(domain, dev, nvec);
+> On Thu, Mar 25 2021 at 17:23, Marc Zyngier wrote:
+> >> +{
+> >> +	struct irq_desc *desc;
+> >> +	struct irq_data *data;
+> >> +	unsigned long flags;
+> >> +	int res = -ENODEV;
+> >> +
+> >> +	desc = irq_get_desc_buslock(irq, &flags, 0);
+> >> +	if (!desc)
+> >> +		return -EINVAL;
+> >> +
+> >> +	for (data = &desc->irq_data; data; data = irqd_get_parent_data(data)) {
+> >> +		if (data->chip->irq_set_auxdata) {
+> >> +			res = data->chip->irq_set_auxdata(data, which, val);
 > >
-> > What is supposed to happen if we get aliasing devices (similar to what
-> > we have with devices behind a PCI bridge)?
+> > And this is where things can break: because you don't define what
+> > 'which' is, you can end-up with two stacked layers clashing in their
+> > interpretation of 'which', potentially doing the wrong thing.
 > >
-> > The ITS code goes through all kind of hoops to try and detect this
-> > case when sizing the translation tables (in the .prepare callback),
-> > and I have the feeling that sizing the message store is analogous.
+> > Short of having a global, cross architecture definition of all the
+> > possible states, this is frankly dodgy.
 > 
-> No. The message store itself is sized upfront by the underlying 'master'
-> device. Each 'master' device has it's own irqdomain.
+> My bad, I suggested this in the first place.
 > 
-> This is the allocation for the subdevice and this is not part of PCI and
-> therefore not subject to PCI aliasing.
+> So what you suggest is to make 'which' an enum and have that in
+> include/linux/whatever.h so we end up with unique identifiers accross
+> architectures, irqdomains and whatever, right?
 
-Fair enough. If we are guaranteed that there is no aliasing, then this
-point is moot.
+Exactly. As long as 'which' is unique and unambiguous, we can solve
+the stacking issue (which is oddly starting to smell like the ghost of
+the SVR3 STREAMS... /me runs ;-).
+
+Once we have that, I can start killing the irq_set_vcpu_affinity()
+abuse I have been guilty of over the past years. Even more, we could
+kill irq_set_vcpu_affinity() altogether, because we have a generic way
+of passing side-band information from a driver down to the IRQ stack.
+
+> That makes a lot of sense.
+> 
+> Though that leaves the question of the data type for 'val'. While u64 is
+> probably good enough for most stuff, anything which needs more than that
+> is left out (again). union as arguments are horrible especially if you
+> need the counterpart irq_get_auxdata() for which you need a pointer and
+> then you can't do a forward declaration. Something like this might work
+> though and avoid to make the pointer business unconditional:
+> 
+>         struct irq_auxdata {
+>                union {
+>         	     u64        val;
+>                      struct foo *foo;
+>                };
+>         };
+
+I guess that at some point, irq_get_auxdata() will become a
+requirement so we might as well bite the bullet now, and the above
+looks like a good start to me.
+
+Thanks,
 
 	M.
 
