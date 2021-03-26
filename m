@@ -2,148 +2,173 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 73AFE34A813
-	for <lists+kvm@lfdr.de>; Fri, 26 Mar 2021 14:26:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 69CE034A9C0
+	for <lists+kvm@lfdr.de>; Fri, 26 Mar 2021 15:31:24 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230080AbhCZNZj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 26 Mar 2021 09:25:39 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:3104 "EHLO
-        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229744AbhCZNZS (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 26 Mar 2021 09:25:18 -0400
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 12QD4s0u037376;
-        Fri, 26 Mar 2021 09:25:16 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=yTEHzE0d5rgCp5gfrs++sWR+G5T0kyGFfT/9zOOv+eY=;
- b=L8FQb0MJS+XH/1+GrR1Czz5RuaQic/+eJFEv/iENx0UqGKtmJc7CWcTPlq3jKjjkdMpv
- Sq2TmbbGMt2vWa1pLT8p6wq6ZyOExi/KnRTSh83k7us64XiVDJ0XhTGvS2GJGGSGVrvn
- sRqlM7JvsLnsdS2+8/sI16SO+aYWraDq1Xm1tBvUebikVglhe/yS3jpzVOABsg5qvZw+
- JIPwuhhU/zKWtJc8TKs5Q2d9/mPStAsfEpzP0NDNPO1yMvd/uGUrgocWjuz+1uOC1oBG
- qcMyQGJ4GXgb43hyNex0xDU+yO165BCT8xNcJeb2arOr0SfP79UjJAcAeQloXiHZLsXI pA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 37h75dp1yc-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 26 Mar 2021 09:25:16 -0400
-Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 12QDJkD9115413;
-        Fri, 26 Mar 2021 09:25:16 -0400
-Received: from ppma04wdc.us.ibm.com (1a.90.2fa9.ip4.static.sl-reverse.com [169.47.144.26])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 37h75dp1y0-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 26 Mar 2021 09:25:15 -0400
-Received: from pps.filterd (ppma04wdc.us.ibm.com [127.0.0.1])
-        by ppma04wdc.us.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 12QDGWZ2014330;
-        Fri, 26 Mar 2021 13:25:15 GMT
-Received: from b01cxnp23034.gho.pok.ibm.com (b01cxnp23034.gho.pok.ibm.com [9.57.198.29])
-        by ppma04wdc.us.ibm.com with ESMTP id 37h14h5ckp-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 26 Mar 2021 13:25:15 +0000
-Received: from b01ledav004.gho.pok.ibm.com (b01ledav004.gho.pok.ibm.com [9.57.199.109])
-        by b01cxnp23034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 12QDPEec33227262
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 26 Mar 2021 13:25:15 GMT
-Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id E204D112062;
-        Fri, 26 Mar 2021 13:25:14 +0000 (GMT)
-Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 5FA78112065;
-        Fri, 26 Mar 2021 13:25:14 +0000 (GMT)
-Received: from cpe-66-24-58-13.stny.res.rr.com (unknown [9.85.149.97])
-        by b01ledav004.gho.pok.ibm.com (Postfix) with ESMTP;
-        Fri, 26 Mar 2021 13:25:14 +0000 (GMT)
-Subject: Re: [PATCH v5 1/1] s390/vfio-ap: fix circular lockdep when
- setting/clearing crypto masks
-To:     Halil Pasic <pasic@linux.ibm.com>
-Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, stable@vger.kernel.org,
-        borntraeger@de.ibm.com, cohuck@redhat.com, kwankhede@nvidia.com,
-        pbonzini@redhat.com, alex.williamson@redhat.com,
-        pasic@linux.vnet.ibm.com
-References: <20210325124640.23995-1-akrowiak@linux.ibm.com>
- <20210325124640.23995-2-akrowiak@linux.ibm.com>
- <20210325213210.62cb11b9.pasic@linux.ibm.com>
-From:   Tony Krowiak <akrowiak@linux.ibm.com>
-Message-ID: <4973feca-4eee-7139-26e6-1b926c017263@linux.ibm.com>
-Date:   Fri, 26 Mar 2021 09:25:14 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+        id S230080AbhCZOar (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 26 Mar 2021 10:30:47 -0400
+Received: from mail.skyhub.de ([5.9.137.197]:40658 "EHLO mail.skyhub.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229908AbhCZOaf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 26 Mar 2021 10:30:35 -0400
+Received: from zn.tnic (p200300ec2f075f0023f9e598b0fb3457.dip0.t-ipconnect.de [IPv6:2003:ec:2f07:5f00:23f9:e598:b0fb:3457])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 5B94D1EC052C;
+        Fri, 26 Mar 2021 15:30:34 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1616769034;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=oJkolnL9jjg81qljwrUuZ1hFVB/MeYbUdPDzJrA7TaA=;
+        b=RqBGPN32FfzzHmc1/a0E6NVvybDsMbmjnjZRdaKi8+XReCeSIyFqRCMt/iAWqODxuC9NR0
+        rf5959QvQ4wv3lvBFR7NmOHb+Fb+BP9MVdMKWRpMj9/ZqxJOdYiNBojBinue0WCGpJ51bK
+        nyo7OTxp/G2xKb9DsbZSzpPowPFnRqY=
+Date:   Fri, 26 Mar 2021 15:30:26 +0100
+From:   Borislav Petkov <bp@alien8.de>
+To:     Brijesh Singh <brijesh.singh@amd.com>
+Cc:     linux-kernel@vger.kernel.org, x86@kernel.org, kvm@vger.kernel.org,
+        ak@linux.intel.com, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        "H. Peter Anvin" <hpa@zytor.com>, Tony Luck <tony.luck@intel.com>,
+        Dave Hansen <dave.hansen@intel.com>,
+        "Peter Zijlstra (Intel)" <peterz@infradead.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        David Rientjes <rientjes@google.com>,
+        Sean Christopherson <seanjc@google.com>
+Subject: Re: [RFC Part1 PATCH 03/13] x86: add a helper routine for the
+ PVALIDATE instruction
+Message-ID: <20210326143026.GB27507@zn.tnic>
+References: <20210324164424.28124-1-brijesh.singh@amd.com>
+ <20210324164424.28124-4-brijesh.singh@amd.com>
 MIME-Version: 1.0
-In-Reply-To: <20210325213210.62cb11b9.pasic@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: CDWOdLx8MJgpB0FOURAFBtbTSM4jko47
-X-Proofpoint-ORIG-GUID: MANubsScoTQwJ0YObvjP5J89Ayk0dy7Q
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.761
- definitions=2021-03-26_06:2021-03-26,2021-03-26 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 mlxscore=0
- suspectscore=0 adultscore=0 priorityscore=1501 malwarescore=0
- mlxlogscore=999 lowpriorityscore=0 phishscore=0 bulkscore=0 clxscore=1011
- spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2103250000 definitions=main-2103260098
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20210324164424.28124-4-brijesh.singh@amd.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Wed, Mar 24, 2021 at 11:44:14AM -0500, Brijesh Singh wrote:
+>  arch/x86/include/asm/sev-snp.h | 52 ++++++++++++++++++++++++++++++++++
 
+Hmm, a separate header.
 
-On 3/25/21 4:32 PM, Halil Pasic wrote:
-> On Thu, 25 Mar 2021 08:46:40 -0400
-> Tony Krowiak <akrowiak@linux.ibm.com> wrote:
->
->> This patch fixes a lockdep splat introduced by commit f21916ec4826
->> ("s390/vfio-ap: clean up vfio_ap resources when KVM pointer invalidated").
->> The lockdep splat only occurs when starting a Secure Execution guest.
->> Crypto virtualization (vfio_ap) is not yet supported for SE guests;
->> however, in order to avoid this problem when support becomes available,
->> this fix is being provided.
->>
->> The circular locking dependency was introduced when the setting of the
->> masks in the guest's APCB was executed while holding the matrix_dev->lock.
->> While the lock is definitely needed to protect the setting/unsetting of the
->> matrix_mdev->kvm pointer, it is not necessarily critical for setting the
->> masks; so, the matrix_dev->lock will be released while the masks are being
->> set or cleared.
->>
->> Keep in mind, however, that another process that takes the matrix_dev->lock
->> can get control while the masks in the guest's APCB are being set or
->> cleared as a result of the driver being notified that the KVM pointer
->> has been set or unset. This could result in invalid access to the
->> matrix_mdev->kvm pointer by the intervening process. To avoid this
->> scenario, two new fields are being added to the ap_matrix_mdev struct:
->>
->> struct ap_matrix_mdev {
->> 	...
->> 	bool kvm_busy;
->> 	wait_queue_head_t wait_for_kvm;
->>     ...
->> };
->>
->> The functions that handle notification that the KVM pointer value has
->> been set or cleared will set the kvm_busy flag to true until they are done
->> processing at which time they will set it to false and wake up the tasks on
->> the matrix_mdev->wait_for_kvm wait queue. Functions that require
->> access to matrix_mdev->kvm will sleep on the wait queue until they are
->> awakened at which time they can safely access the matrix_mdev->kvm
->> field.
->>
->> Fixes: f21916ec4826 ("s390/vfio-ap: clean up vfio_ap resources when KVM pointer invalidated")
->> Cc: stable@vger.kernel.org
->> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
-> Reviewed-by: Halil Pasic <pasic@linux.ibm.com>
->
-> I intend to give a couple of work-days to others, and if nobody objects
-> merge this. (I will wait till Tuesday.)
+Yeah, I know we did sev-es.h but I think it all should be in a single
+sev.h which contains all AMD-specific memory encryption declarations.
+It's not like it is going to be huge or so, by the looks of how big
+sev-es.h is.
 
-Thanks Halil.
+Or is there a particular need to have a separate snp header?
 
->
-> I've tested it and it does silence the lockdep splat.
->
-> Regards,
-> Halil
+If not, please do a pre-patch which renames sev-es.h to sev.h and then
+add the SNP stuff to it.
 
+>  1 file changed, 52 insertions(+)
+>  create mode 100644 arch/x86/include/asm/sev-snp.h
+> 
+> diff --git a/arch/x86/include/asm/sev-snp.h b/arch/x86/include/asm/sev-snp.h
+> new file mode 100644
+> index 000000000000..5a6d1367cab7
+> --- /dev/null
+> +++ b/arch/x86/include/asm/sev-snp.h
+> @@ -0,0 +1,52 @@
+> +/* SPDX-License-Identifier: GPL-2.0 */
+> +/*
+> + * AMD SEV Secure Nested Paging Support
+> + *
+> + * Copyright (C) 2021 Advanced Micro Devices, Inc.
+> + *
+> + * Author: Brijesh Singh <brijesh.singh@amd.com>
+> + */
+> +
+> +#ifndef __ASM_SECURE_NESTED_PAGING_H
+> +#define __ASM_SECURE_NESTED_PAGING_H
+> +
+> +#ifndef __ASSEMBLY__
+> +#include <asm/irqflags.h> /* native_save_fl() */
+
+Where is that used? Looks like leftovers.
+
+> +
+> +/* Return code of __pvalidate */
+> +#define PVALIDATE_SUCCESS		0
+> +#define PVALIDATE_FAIL_INPUT		1
+> +#define PVALIDATE_FAIL_SIZEMISMATCH	6
+> +
+> +/* RMP page size */
+> +#define RMP_PG_SIZE_2M			1
+> +#define RMP_PG_SIZE_4K			0
+> +
+> +#ifdef CONFIG_AMD_MEM_ENCRYPT
+> +static inline int __pvalidate(unsigned long vaddr, int rmp_psize, int validate,
+
+Why the "__" prefix?
+
+> +			      unsigned long *rflags)
+> +{
+> +	unsigned long flags;
+> +	int rc;
+> +
+> +	asm volatile(".byte 0xF2, 0x0F, 0x01, 0xFF\n\t"
+> +		     "pushf; pop %0\n\t"
+
+Ewww, PUSHF is expensive.
+
+> +		     : "=rm"(flags), "=a"(rc)
+> +		     : "a"(vaddr), "c"(rmp_psize), "d"(validate)
+> +		     : "memory", "cc");
+> +
+> +	*rflags = flags;
+> +	return rc;
+
+Hmm, rc *and* rflags. Manual says "Upon completion, a return code is
+stored in EAX. rFLAGS bits OF, ZF, AF, PF and SF are set based on this
+return code."
+
+So what exactly does that mean and is the return code duplicated in
+rFLAGS?
+
+If so, can you return a single value which has everything you need to
+know?
+
+I see that you're using the retval only for the carry flag to check
+whether the page has already been validated so I think you could define
+a set of return value defines from that function which callers can
+check.
+
+And looking above again, you do have PVALIDATE_* defines except that
+nothing's using them. Use them please.
+
+Also, for how to do condition code checks properly, see how the
+CC_SET/CC_OUT macros are used.
+
+> +}
+> +
+> +#else	/* !CONFIG_AMD_MEM_ENCRYPT */
+
+This else-ifdeffery can go too if you move the ifdeffery inside the
+function:
+
+static inline int __pvalidate(unsigned long vaddr, int rmp_psize, int validate,
+{
+	int rc = 0;
+
+#fidef CONFIG_AMD_MEM_ENCRYPT
+
+	...
+
+#endif
+
+	return rc;
+}
+
+Thx.
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
