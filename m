@@ -2,126 +2,128 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D8BFC349DC3
-	for <lists+kvm@lfdr.de>; Fri, 26 Mar 2021 01:25:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B24DF349E20
+	for <lists+kvm@lfdr.de>; Fri, 26 Mar 2021 01:41:17 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229664AbhCZAZ0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 25 Mar 2021 20:25:26 -0400
-Received: from maynard.decadent.org.uk ([95.217.213.242]:35630 "EHLO
-        maynard.decadent.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229854AbhCZAZP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 25 Mar 2021 20:25:15 -0400
-X-Greylist: delayed 1697 seconds by postgrey-1.27 at vger.kernel.org; Thu, 25 Mar 2021 20:25:15 EDT
-Received: from [2a02:1811:d34:3700:3b8d:b310:d327:e418] (helo=deadeye)
-        by maynard with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.92)
-        (envelope-from <ben@decadent.org.uk>)
-        id 1lPZqF-000196-4c; Fri, 26 Mar 2021 00:56:43 +0100
-Received: from ben by deadeye with local (Exim 4.94)
-        (envelope-from <ben@decadent.org.uk>)
-        id 1lPZqD-00210q-FM; Fri, 26 Mar 2021 00:56:41 +0100
-Message-ID: <7e2ab5dbd76773c03f6e27af6fb8254c13e6402f.camel@decadent.org.uk>
-Subject: Re: [PATCH] x86/tlb: Flush global mappings when KAISER is disabled
-From:   Ben Hutchings <ben@decadent.org.uk>
-To:     Sasha Levin <sashal@kernel.org>, Borislav Petkov <bp@alien8.de>
-Cc:     stable <stable@vger.kernel.org>, Hugh Dickins <hughd@google.com>,
-        Babu Moger <babu.moger@amd.com>,
+        id S229946AbhCZAkq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 25 Mar 2021 20:40:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42082 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229761AbhCZAkd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 25 Mar 2021 20:40:33 -0400
+Received: from mail-qt1-x82e.google.com (mail-qt1-x82e.google.com [IPv6:2607:f8b0:4864:20::82e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9FCA2C06174A;
+        Thu, 25 Mar 2021 17:40:30 -0700 (PDT)
+Received: by mail-qt1-x82e.google.com with SMTP id 1so2534046qtb.0;
+        Thu, 25 Mar 2021 17:40:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=WudPpAp2zodSuwqYyO3R50R/8DSntKfLN/wH7uYSYrM=;
+        b=Vn0/vMYaXMe4R2XpupDYgbUI/t7lV9nXGuYlJoSC+dKymcCPiqM9rgCQOKQ9RTxykZ
+         jlHhgZdCnCYFfa7lkUGZKHhQeeLn0D5tPJUvM7RsykxlwbhizYawUTci8sAmPalZmKJR
+         fTQqFPWmEbqkQUcgjcGclbf4y3S943k7/o1/mojMBgPHGBRW9eCRKUEN+8NPXGjbJV8G
+         +CzWvTBSst/kjYaWzvZGy4UVC4huLEGjeFoEBLNxfY3a0gvbYO/mHMvEsOy0ElCTj64A
+         lfYtc/9BFTHCwJ//X0KMU535ukgBGASMOY+0xsvg3kWdu87FSjbA9tO+ljQjfQ9d2BFF
+         p9zA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=WudPpAp2zodSuwqYyO3R50R/8DSntKfLN/wH7uYSYrM=;
+        b=ij0ivtTy/AgEsgrb61nDpQRgV/g5tFQaMSVL8/YYI51OvyHQyXNSn5OTi/xHla+7u5
+         +b5z+T6h2SEUcJcT/5yYJTrJ+W6j7/mYGqFsN7boLL0ffJAlE4lY+Fsp7vfZRG77o+J+
+         GfnZ8+iqDLz9QftToyje3TM4nHyUikbFM2HVv1okaWiziK/7PVxN+DFKlTl8aFM79t2L
+         gzgnbTVEa+nQA5MJE6r3oo2UB30qRoa9KA9Ya0jhVqmw0I7wiQPr820Ug/tjIFONvhdO
+         xUOfZCHnFUhGhZ5Iqbg05NzY2tgzGubV6v/SRn/FqAPW6vx9trZp0DcFLZLn5Yqc+NMv
+         TS2Q==
+X-Gm-Message-State: AOAM533KP4o7ExnGkqwLyEijtnTSoXN4PoZWcLzosQpIc4B95vmfzZ9x
+        8Lj0+v2Yk68RN8HA7ussoxjre5sCjXzQ+X+L4g==
+X-Google-Smtp-Source: ABdhPJxRCD7nd51OEfyYS8niDY3sOe6LstmYPCFWeARW1SukhlDnBXKn6l7EiJnsSp+ZNR0r4+9HHBrg8XfmWJzupI8=
+X-Received: by 2002:aed:2ee7:: with SMTP id k94mr10029267qtd.135.1616719229894;
+ Thu, 25 Mar 2021 17:40:29 -0700 (PDT)
+MIME-Version: 1.0
+References: <20210323023726.28343-1-lihaiwei.kernel@gmail.com>
+ <CAB5KdOZq+2ETburoMv6Vnnj3MFAuvwnSBsSmiBO=nH1Ajdp5_g@mail.gmail.com> <YFyw/VRhRCZlqc1X@google.com>
+In-Reply-To: <YFyw/VRhRCZlqc1X@google.com>
+From:   Haiwei Li <lihaiwei.kernel@gmail.com>
+Date:   Fri, 26 Mar 2021 08:39:50 +0800
+Message-ID: <CAB5KdOZHdQeTiYWKebLZG0XgPsybHs1EMqM7=zQ+JoNK1QpkNQ@mail.gmail.com>
+Subject: Re: [PATCH] KVM: VMX: Check the corresponding bits according to the
+ intel sdm
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     LKML <linux-kernel@vger.kernel.org>,
+        kvm list <kvm@vger.kernel.org>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
-        kvm list <kvm@vger.kernel.org>, Joerg Roedel <joro@8bytes.org>,
-        the arch/x86 maintainers <x86@kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Ingo Molnar <mingo@redhat.com>,
-        "H . Peter Anvin" <hpa@zytor.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Makarand Sonare <makarandsonare@google.com>,
-        Sean Christopherson <seanjc@google.com>, carnil@debian.org
-Date:   Fri, 26 Mar 2021 00:56:23 +0100
-In-Reply-To: <YF0anj5TFU5D8tXD@sashalap>
-References: <4a72f780-3797-229e-a938-6dc5b14bec8d@amd.com>
-         <20210311235215.GI5829@zn.tnic>
-         <ed590709-65c8-ca2f-013f-d2c63d5ee0b7@amd.com>
-         <20210324212139.GN5010@zn.tnic>
-         <alpine.LSU.2.11.2103241651280.9593@eggly.anvils>
-         <alpine.LSU.2.11.2103241913190.10112@eggly.anvils>
-         <20210325095619.GC31322@zn.tnic> <20210325102959.GD31322@zn.tnic>
-         <20210325200942.GJ31322@zn.tnic> <YFz0Z8/6eeYI72fq@sashalap>
-         <YF0anj5TFU5D8tXD@sashalap>
-Content-Type: multipart/signed; micalg="pgp-sha512";
-        protocol="application/pgp-signature"; boundary="=-BZCkuB3+koKnPKrmigAc"
-User-Agent: Evolution 3.38.2-1 
-MIME-Version: 1.0
-X-SA-Exim-Connect-IP: 2a02:1811:d34:3700:3b8d:b310:d327:e418
-X-SA-Exim-Mail-From: ben@decadent.org.uk
-X-SA-Exim-Scanned: No (on maynard); SAEximRunCond expanded to false
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Haiwei Li <lihaiwei@tencent.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Thu, Mar 25, 2021 at 11:49 PM Sean Christopherson <seanjc@google.com> wrote:
+>
+> On Thu, Mar 25, 2021, Haiwei Li wrote:
+> > On Tue, Mar 23, 2021 at 10:37 AM <lihaiwei.kernel@gmail.com> wrote:
+> > >
+> > > From: Haiwei Li <lihaiwei@tencent.com>
+> > >
+> > > According to IA-32 SDM Vol.3D "A.1 BASIC VMX INFORMATION", two inspections
+> > > are missing.
+> > > * Bit 31 is always 0. Earlier versions of this manual specified that the
+> > > VMCS revision identifier was a 32-bit field in bits 31:0 of this MSR. For
+> > > all processors produced prior to this change, bit 31 of this MSR was read
+> > > as 0.
+> > > * The values of bits 47:45 and bits 63:57 are reserved and are read as 0.
+> > >
+> > > Signed-off-by: Haiwei Li <lihaiwei@tencent.com>
+> > > ---
+> > >  arch/x86/kvm/vmx/vmx.c | 14 ++++++++++++++
+> > >  1 file changed, 14 insertions(+)
+> > >
+> > > diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> > > index 32cf828..0d6d13c 100644
+> > > --- a/arch/x86/kvm/vmx/vmx.c
+> > > +++ b/arch/x86/kvm/vmx/vmx.c
+> > > @@ -2577,6 +2577,20 @@ static __init int setup_vmcs_config(struct vmcs_config *vmcs_conf,
+> > >
+> > >         rdmsr(MSR_IA32_VMX_BASIC, vmx_msr_low, vmx_msr_high);
+> > >
+> > > +       /*
+> > > +        * IA-32 SDM Vol 3D: Bit 31 is always 0.
+> > > +        * For all earlier processors, bit 31 of this MSR was read as 0.
+> > > +        */
+> > > +       if (vmx_msr_low & (1u<<31))
+> > > +               return -EIO;
+> >
+> > Drop this code as Jim said.
+> >
+> > > +
+> > > +       /*
+> > > +        * IA-32 SDM Vol 3D: bits 47:45 and bits 63:57 are reserved and are read
+> > > +        * as 0.
+> > > +        */
+> > > +       if (vmx_msr_high & 0xfe00e000)
+> > > +               return -EIO;
+> >
+> > Is this ok? Can we pick up the part? :)
+>
+> No.  "Reserved and are read as 0" does not guarantee the bits will always be
+> reserved.  There are very few bits used for feature enumeration in x86 that are
+> guaranteed to be '0' for all eternity.
+>
+> The whole point of reserving bits in registers is so that the CPU vendor, Intel
+> in this case, can introduce new features and enumerate them to software without
+> colliding with existing features or breaking software.  E.g. if Intel adds a new
+> feature and uses any of these bits to enumerate the feature, this check would
+> prevent KVM from loading on CPUs that support the feature.
 
---=-BZCkuB3+koKnPKrmigAc
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Got it, only explicit restrictions should be checked. Thanks.
 
-On Thu, 2021-03-25 at 19:19 -0400, Sasha Levin wrote:
-> On Thu, Mar 25, 2021 at 04:36:55PM -0400, Sasha Levin wrote:
-> > On Thu, Mar 25, 2021 at 09:09:42PM +0100, Borislav Petkov wrote:
-> > > Hi stable folks,
-> > >=20
-> > > the patch below fixes kernels 4.4 and 4.9 booting on AMD platforms wi=
-th
-> > > PCID support. It doesn't have an upstream counterpart because it patc=
-hes
-> > > the KAISER code which didn't go upstream. It applies fine to both of =
-the
-> > > aforementioned kernels - please pick it up.
-> >=20
-> > Queued up for 4.9 and 4.4, thanks!
-> >=20
-> > > Jim Mattson reported that Debian 9 guests using a 4.9-stable kernel
-> > > are exploding during alternatives patching:
-> >=20
-> > (Cc Ben & Salvatore)
-> >=20
-> > I'm not sure if 4.9 or Debian is still alive or not, but FYI...
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 *on
->=20
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 :)
-
-We're supporting both 4.9 and 4.19 in Debian 9.  The general rule is we
-carry on with the same stable kernel branch for the whole 5 year
-support period, but add the option of using the kernel version from the
-next stable release.
-
-Ben.
-
---=20
-Ben Hutchings
-Teamwork is essential - it allows you to blame someone else.
-
---=-BZCkuB3+koKnPKrmigAc
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAABCgAdFiEErCspvTSmr92z9o8157/I7JWGEQkFAmBdIygACgkQ57/I7JWG
-EQmePRAAou+cNc9EAXhWMu8MifMJaX2sqIkYtavWuhzOsy6IuDpi129ppi2m/7kv
-rzTjBYKj7AYz0N/az8lPhEtOPE3mfiusppv2a1f4HnHWkjRZMegw9JKjR9cANxN3
-ZaXrvPRciV0Afv4KVsPTX2NhqQwjMILB646X69/CmOgmq8KP5OQQ4wM7RpIleeWA
-Q/MDBD0HO9lIr/16HxSOUUhhezZHBxE27tNjWMRrWALntlKUxc6Z/upr3A89Uyte
-ggEYiI7JIp4jTbvG7GW7qyMSYT2zs69iE17TayzZQUl4L2iSfDDI2jQtg4OgKDel
-XEkwUy/S7PHP5hSHglwf+W+ef1e3946z3J9eJ5XFDPDR0WIj/+dFNzKBi/iM+1JW
-SQyZ1XHNEYXDW9WrfGKaqYpZEefcjZhCvYmhHFrmWUaYS0upb7vM2Un56BRufNJ9
-34k2BKCFs4e5G7HDeVBSIQ2LChvx+05b0KVP83I9m5ghGr3kVOgH2L6sCPiEeAPF
-E53DBNf8lL7xiwL10HERNUVgxLbE7yp+K0JKC9B6CTOr/VDUEilQmGb16j4EIucc
-HiPlqUiomHTcaExu/lSBET3HZxunTWGoA1ju+C/rlE6mjK+JKP7dRhpxbq7KUmBS
-bW6vzaiys+AJJm/9paGDCiYvjAynu/wZT/PY62TpWp0LjZDHq1M=
-=CDeP
------END PGP SIGNATURE-----
-
---=-BZCkuB3+koKnPKrmigAc--
+--
+Haiwei Li
