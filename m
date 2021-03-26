@@ -2,143 +2,274 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2D7AC34A5BA
-	for <lists+kvm@lfdr.de>; Fri, 26 Mar 2021 11:42:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 955B934A5F4
+	for <lists+kvm@lfdr.de>; Fri, 26 Mar 2021 11:57:50 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229839AbhCZKmE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 26 Mar 2021 06:42:04 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:24844 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S229738AbhCZKlk (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 26 Mar 2021 06:41:40 -0400
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 12QAbUSI057425
-        for <kvm@vger.kernel.org>; Fri, 26 Mar 2021 06:41:39 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=CGNZEOqWO+DxOmZL5w020AS5R6fKIrObI+eO3xc3dnY=;
- b=owl/GSE4/Q/et9HmlbU5F7F3v177Cq7tsfLUzHaRToDLC8ou1C+ffjKBReQOIUufWjGa
- o/qkXnyaBJ7nxNuqYhqSOcWAzCr54o5gwMvxsfMfNrXDo4KOQ3jhhrV/IV9/Dzl3RKgB
- 8Um24WfieIThVtoPQjmBX8fOdMsz7fHxuH6SJpdqoED3Z4ybf9sszfwtUKv0kIgHyN81
- 9YIyXJgVN1OgVcy1g8HybAgH49HIVNYv/LNP9WmFT/l39HDlFJYEi/6PtSBFuMHFN+jB
- idQO9bZi4mATqiu/0jKiqxM4tITuBZ8Xi/pzI4q605jg3cpVMtwpkqQM5crQHAshuOpO Ow== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 37hccfatt0-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Fri, 26 Mar 2021 06:41:39 -0400
-Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 12QAbm2l058861
-        for <kvm@vger.kernel.org>; Fri, 26 Mar 2021 06:41:39 -0400
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 37hccfatsq-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 26 Mar 2021 06:41:39 -0400
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 12QAfawM002854;
-        Fri, 26 Mar 2021 10:41:37 GMT
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
-        by ppma06ams.nl.ibm.com with ESMTP id 37h1510j8x-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 26 Mar 2021 10:41:37 +0000
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
-        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 12QAfYam20316646
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 26 Mar 2021 10:41:34 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 8905BA4051;
-        Fri, 26 Mar 2021 10:41:34 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 4A51EA4053;
-        Fri, 26 Mar 2021 10:41:34 +0000 (GMT)
-Received: from oc3016276355.ibm.com (unknown [9.145.63.51])
-        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Fri, 26 Mar 2021 10:41:34 +0000 (GMT)
-Subject: Re: [kvm-unit-tests PATCH v2 6/8] s390x: css: testing ssch error
- response
-To:     Claudio Imbrenda <imbrenda@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, frankja@linux.ibm.com, david@redhat.com,
-        thuth@redhat.com, cohuck@redhat.com
-References: <1616665147-32084-1-git-send-email-pmorel@linux.ibm.com>
- <1616665147-32084-7-git-send-email-pmorel@linux.ibm.com>
- <20210325170257.2e753967@ibm-vm>
-From:   Pierre Morel <pmorel@linux.ibm.com>
-Message-ID: <12260eaf-1fc8-00ce-f500-b56e7ad7ae2a@linux.ibm.com>
-Date:   Fri, 26 Mar 2021 11:41:34 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.8.0
+        id S229908AbhCZK5R (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 26 Mar 2021 06:57:17 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:43942 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230046AbhCZK5G (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 26 Mar 2021 06:57:06 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1616756226;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=ybgJAU+E9X4MewO2iZMuUGolW/fCwKow8qeXjGXj+WQ=;
+        b=fuPDhS6NDT0GWz2pCdbdjavaUGokFiukE7VlNwqUi0OjE6DRtCL4Sl6jWU18ykGh8aE9st
+        oQNhlbNkpsICrk4rjh3kkx3BTdF0dpFqrJIMQxerxoNB88/jUGVPXcl29L3CfesYZdKq9V
+        NTHobcglS8JK4xaX6H+h5KXTawTEEgs=
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
+ [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-307-pwSFBPWfOBektfL2HvhtjQ-1; Fri, 26 Mar 2021 06:57:04 -0400
+X-MC-Unique: pwSFBPWfOBektfL2HvhtjQ-1
+Received: by mail-ed1-f72.google.com with SMTP id p6so4175866edq.21
+        for <kvm@vger.kernel.org>; Fri, 26 Mar 2021 03:57:03 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=ybgJAU+E9X4MewO2iZMuUGolW/fCwKow8qeXjGXj+WQ=;
+        b=jlbjGtktHOXNK1BZZ+v1MV8rh63w2a8LopCMCKw93epG7hdQwY7jFCbbzB/1fxFsPj
+         3IAn0X4Cgko1v+Ou96XAkurbHyqE8arZ3zyZ7yqnzTAPTN05PQ91XQyTIdrISnXYQETS
+         eV+dgbmj+3/KyzgylLx6on+50foV/LFr1i17jhSMg923aPehQMAGx/UjR5bM1sEf9HSI
+         I8OcJvyse/5yCvo1MKjXRl6qL0Pycz0Xr6fB+zpk2fcaK3OtJA/x5//ZmVp3RSXfbcAm
+         XvO6QrfYnZEuJYqoXXitdeQ1b8z6cgVGED048JEz99aipnoBVsnMysTDqEYRVxy6YFEq
+         aYWA==
+X-Gm-Message-State: AOAM5329/waHsrllUBn8+VH7E/cy4K+tVedT4hMtU2JSRaryx7/TLakQ
+        PowdnJza8OkS31rucWBRqGUewJG6WFMOBdS+e74X7dRITapnMpJ+G5vFOS0XPyO/51+usWGdh2y
+        08xjCU6KZ+3+W
+X-Received: by 2002:a17:906:2314:: with SMTP id l20mr14775308eja.178.1616756222775;
+        Fri, 26 Mar 2021 03:57:02 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzCY/ftGgArG8rMqGeFgWHC7rzPfRxqnn1LJxvMr65neZ1dzHdTRf0m0kz4VcZoFCZlIWcKdQ==
+X-Received: by 2002:a17:906:2314:: with SMTP id l20mr14775291eja.178.1616756222518;
+        Fri, 26 Mar 2021 03:57:02 -0700 (PDT)
+Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id q26sm3699419eja.45.2021.03.26.03.57.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 26 Mar 2021 03:57:02 -0700 (PDT)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Lenny Szubowicz <lszubowi@redhat.com>
+Cc:     pbonzini@redhat.com, seanjc@google.com, wanpengli@tencent.com,
+        jmattson@google.com, joro@8bytes.org, tglx@linutronix.de,
+        mingo@redhat.com, bp@alien8.de, x86@kernel.org, hpa@zytor.com,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] x86/kvmclock: Stop kvmclocks for hibernate restore
+In-Reply-To: <5048babd-a40b-5a95-9dee-ab13367de6cb@redhat.com>
+References: <20210311132847.224406-1-lszubowi@redhat.com>
+ <87sg4t7vqy.fsf@vitty.brq.redhat.com>
+ <5048babd-a40b-5a95-9dee-ab13367de6cb@redhat.com>
+Date:   Fri, 26 Mar 2021 11:57:01 +0100
+Message-ID: <87mtuqchdu.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20210325170257.2e753967@ibm-vm>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: hnQ0ZQxEHx9SPzR-DrHlTQd1Ix3y_KGm
-X-Proofpoint-GUID: D6kqeUXF-gx-2epNb2AHux3lzj58zLdk
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.761
- definitions=2021-03-26_03:2021-03-26,2021-03-26 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 bulkscore=0
- lowpriorityscore=0 impostorscore=0 clxscore=1015 priorityscore=1501
- suspectscore=0 adultscore=0 phishscore=0 malwarescore=0 mlxscore=0
- mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2103250000 definitions=main-2103260077
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Lenny Szubowicz <lszubowi@redhat.com> writes:
 
+> On 3/17/21 9:30 AM, Vitaly Kuznetsov wrote:
+>> Lenny Szubowicz <lszubowi@redhat.com> writes:
+>> 
+>>> Turn off host updates to the registered kvmclock memory
+>>> locations when transitioning to a hibernated kernel in
+>>> resume_target_kernel().
+>>>
+>>> This is accomplished for secondary vcpus by disabling host
+>>> clock updates for that vcpu when it is put offline. For the
+>>> primary vcpu, it's accomplished by using the existing call back
+>>> from save_processor_state() to kvm_save_sched_clock_state().
+>>>
+>>> The registered kvmclock memory locations may differ between
+>>> the currently running kernel and the hibernated kernel, which
+>>> is being restored and resumed. Kernel memory corruption is thus
+>>> possible if the host clock updates are allowed to run while the
+>>> hibernated kernel is relocated to its original physical memory
+>>> locations.
+>>>
+>>> This is similar to the problem solved for kexec by
+>>> commit 1e977aa12dd4 ("x86: KVM guest: disable clock before rebooting.")
+>>>
+>>> Commit 95a3d4454bb1 ("x86/kvmclock: Switch kvmclock data to a
+>>> PER_CPU variable") innocently increased the exposure for this
+>>> problem by dynamically allocating the physical pages that are
+>>> used for host clock updates when the vcpu count exceeds 64.
+>>> This increases the likelihood that the registered kvmclock
+>>> locations will differ for vcpus above 64.
+>>>
+>>> Reported-by: Xiaoyi Chen <cxiaoyi@amazon.com>
+>>> Tested-by: Mohamed Aboubakr <mabouba@amazon.com>
+>>> Signed-off-by: Lenny Szubowicz <lszubowi@redhat.com>
+>>> ---
+>>>   arch/x86/kernel/kvmclock.c | 34 ++++++++++++++++++++++++++++++++--
+>>>   1 file changed, 32 insertions(+), 2 deletions(-)
+>>>
+>>> diff --git a/arch/x86/kernel/kvmclock.c b/arch/x86/kernel/kvmclock.c
+>>> index aa593743acf6..291ffca41afb 100644
+>>> --- a/arch/x86/kernel/kvmclock.c
+>>> +++ b/arch/x86/kernel/kvmclock.c
+>>> @@ -187,8 +187,18 @@ static void kvm_register_clock(char *txt)
+>>>   	pr_info("kvm-clock: cpu %d, msr %llx, %s", smp_processor_id(), pa, txt);
+>>>   }
+>>>   
+>>> +/*
+>>> + * Turn off host clock updates to the registered memory location when the
+>>> + * cpu clock context is saved via save_processor_state(). Enables correct
+>>> + * handling of the primary cpu clock when transitioning to a hibernated
+>>> + * kernel in resume_target_kernel(), where the old and new registered
+>>> + * memory locations may differ.
+>>> + */
+>>>   static void kvm_save_sched_clock_state(void)
+>>>   {
+>>> +	native_write_msr(msr_kvm_system_time, 0, 0);
+>>> +	kvm_disable_steal_time();
+>>> +	pr_info("kvm-clock: cpu %d, clock stopped", smp_processor_id());
+>>>   }
+>> 
+>> Nitpick: should we rename kvm_save_sched_clock_state() to something more
+>> generic, like kvm_disable_host_clock_updates() to indicate, that what it
+>> does is not only sched clock related?
+>
+> I see your rationale. But if I rename kvm_save_sched_clock_state()
+> then shouldn't I also rename kvm_restore_sched_clock_state().
+> The names appear to reflect the callback that invokes them,
+> from save_processor_state()/restore_state(), rather than what these
+> functions need to do.
+>
+>          x86_platform.save_sched_clock_state = kvm_save_sched_clock_state;
+>          x86_platform.restore_sched_clock_state = kvm_restore_sched_clock_state;
+>   
+> For V2 of my patch, I kept these names as they were. But if you have a strong
+> desire for a different name, then I think both routines should be renamed
+> similarly, since they are meant to be a complimentary pair.
+>
+>> 
+>>>   
+>>>   static void kvm_restore_sched_clock_state(void)
+>>> @@ -311,9 +321,23 @@ static int kvmclock_setup_percpu(unsigned int cpu)
+>>>   	return p ? 0 : -ENOMEM;
+>>>   }
+>>>   
+>>> +/*
+>>> + * Turn off host clock updates to the registered memory location when a
+>>> + * cpu is placed offline. Enables correct handling of secondary cpu clocks
+>>> + * when transitioning to a hibernated kernel in resume_target_kernel(),
+>>> + * where the old and new registered memory locations may differ.
+>>> + */
+>>> +static int kvmclock_cpu_offline(unsigned int cpu)
+>>> +{
+>>> +	native_write_msr(msr_kvm_system_time, 0, 0);
+>>> +	pr_info("kvm-clock: cpu %d, clock stopped", cpu);
+>> 
+>> I'd say this pr_info() is superfluous: on a system with hundereds of
+>> vCPUs users will get flooded with 'clock stopped' messages which don't
+>> actually mean much: in case native_write_msr() fails the error gets
+>> reported in dmesg anyway. I'd suggest we drop this and pr_info() in
+>> kvm_save_sched_clock_state().
+>> 
+>
+> Agreed. I was essentially using it as a pr_debug(). Gone in V2.
+>
+>>> +	return 0;
+>> 
+>> Why don't we disable steal time accounting here? MSR_KVM_STEAL_TIME is
+>> also per-cpu. Can we merge kvm_save_sched_clock_state() with
+>> kvmclock_cpu_offline() maybe?
+>> 
+>
+> kvm_cpu_down_prepare() in arch/x86/kernel/kvm.c already calls
+> kvm_disable_steal_time() when a vcpu is placed offline.
+> So there is no need to do that in kvmclock_cpu_offline().
+>
+> In the case of the hibernation resume code path, resume_target_kernel()
+> in kernel/power/hibernate.c, the secondary cpus are placed offline,
+> but the primary is not. Instead, we are going to be switching contexts
+> of the primary cpu from the boot kernel to the kernel that was restored
+> from the hibernation image.
+>
+> This is where save_processor_state()/restore_processor_state() and kvm_save_sched_clock_state()/restore_sched_clock_state() come into play
+> to stop the kvmclock of the boot kernel's primary cpu and restart
+> the kvmclock of restored hibernated kernel's primary cpu.
+>
+> And in this case, no one is calling kvm_disable_steal_time(),
+> so kvm_save_sched_clock_state() is doing it. (This is very similar
+> to the reason why kvm_crash_shutdown() in kvmclock.c needs to call
+> kvm_disable_steal_time())
+>
+> However, I'm now wondering if kvm_restore_sched_clock_state()
+> needs to add a call to the equivalent of kvm_register_steal_time(),
+> because otherwise no one will do that for the primary vcpu
+> on resume from hibernation.
 
-On 3/25/21 5:02 PM, Claudio Imbrenda wrote:
-> On Thu, 25 Mar 2021 10:39:05 +0100
-> Pierre Morel <pmorel@linux.ibm.com> wrote:
-> 
+In case this is true, steal time accounting is not our only
+problem. kvm_guest_cpu_init(), which is called from
+smp_prepare_boot_cpu() hook also sets up Async PF an PV EOI and both
+these features establish a shared guest-host memory region, in this
+doesn't happen upon resume from hibernation we're in trouble.
 
-...snip...
+smp_prepare_boot_cpu() hook is called very early from start_kernel() but
+what happens when we switch to the context of the hibernated kernel?
 
+I'm going to set up an environement and check what's going on.
 
-Trying to follow your comment, I have some questions:
-
-
->> +	/* 2- ORB address should be lower than 2G */
->> +	report_prefix_push("ORB Address above 2G");
->> +	expect_pgm_int();
->> +	ssch(test_device_sid, (void *)0x80000000);
-> 
-> another hardcoded address... you should try allocating memory over 2G,
-> and try to use it. put a check if there is enough memory, and skip if
-> you do not have enough memory, like you did below
-
-How can I allocate memory above 2G?
-
-> 
->> +	check_pgm_int_code(PGM_INT_CODE_ADDRESSING);
->> +	report_prefix_pop();
->> +
->> +	/* 3- ORB address should be available we check 1G*/
->> +	top = get_ram_size();
->> +	report_prefix_push("ORB Address must be available");
->> +	if (top < 0x40000000) {
->> +		expect_pgm_int();
->> +		ssch(test_device_sid, (void *)0x40000000);
->> +		check_pgm_int_code(PGM_INT_CODE_ADDRESSING);
->> +	} else {
->> +		report_skip("guest started with more than 1G
->> memory");
-> 
-> this is what I meant above. you will need to run this test both with 1G
-> and with 3G of ram (look at the SCLP test, it has the same issue)
-
-I do not understand, if I test with 3G RAM, I suppose that the framework 
-works right and I have my 3G RAM available.
-Then I can check with an address under 1G and recheck with an address 
-above 1G.
-
-What is the purpose to check with only 1G memory?
-
-
-Regards,
-Pierre
+>
+>>> +}
+>>> +
+>>>   void __init kvmclock_init(void)
+>>>   {
+>>>   	u8 flags;
+>>> +	int cpuhp_prepare;
+>>>   
+>>>   	if (!kvm_para_available() || !kvmclock)
+>>>   		return;
+>>> @@ -325,8 +349,14 @@ void __init kvmclock_init(void)
+>>>   		return;
+>>>   	}
+>>>   
+>>> -	if (cpuhp_setup_state(CPUHP_BP_PREPARE_DYN, "kvmclock:setup_percpu",
+>>> -			      kvmclock_setup_percpu, NULL) < 0) {
+>>> +	cpuhp_prepare = cpuhp_setup_state(CPUHP_BP_PREPARE_DYN,
+>>> +					  "kvmclock:setup_percpu",
+>>> +					  kvmclock_setup_percpu, NULL);
+>>> +	if (cpuhp_prepare < 0)
+>>> +		return;
+>>> +	if (cpuhp_setup_state(CPUHP_AP_ONLINE_DYN, "kvmclock:cpu_offline",
+>>> +			      NULL, kvmclock_cpu_offline) < 0) {
+>>> +		cpuhp_remove_state(cpuhp_prepare);
+>> 
+>> In case we fail to set up kvmclock_cpu_offline() callback we get broken
+>> hybernation but without kvmclock_setup_percpu() call we get a broken
+>> guest (as kvmclock() may be the only reliable clocksource) so I'm not
+>> exactly sure we're active in a best way with cpuhp_remove_state()
+>> here. I don't feel strong though, I think it can stay but in that case
+>> I'd add a pr_warn() at least.
+>
+> Something is seriously broken if either of these cpuhp_setup_state()
+> calls fail. I first considered using the "down" callback of the
+> CPUHP_BP_PREPARE_DYN state, as in:
+>
+>          if (cpuhp_setup_state(CPUHP_BP_PREPARE_DYN, "kvmclock:setup_percpu",
+> 			      kvmclock_setup_percpu, kvmclock_cpu_offline) < 0) {
+>
+> This would have minimized the change, but I wasn't comfortable with how late
+> it would be called. Other examples in the kernel, including kvm.c, use
+> CPUHP_AP_ONLINE_DYN for cpu online/offline events.
+>
+> But I do agree that a failure of either cpuhp_setup_state() should not
+> be silent. So in V2 I added a pr_err().
+>
+> Thank you for your review comments.
+>
+>                          -Lenny.
+>
+>> 
+>>>   		return;
+>>>   	}
+>> 
+>
 
 -- 
-Pierre Morel
-IBM Lab Boeblingen
+Vitaly
+
