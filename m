@@ -2,128 +2,154 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B24DF349E20
-	for <lists+kvm@lfdr.de>; Fri, 26 Mar 2021 01:41:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4DBA5349E5C
+	for <lists+kvm@lfdr.de>; Fri, 26 Mar 2021 02:03:56 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229946AbhCZAkq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 25 Mar 2021 20:40:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42082 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229761AbhCZAkd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 25 Mar 2021 20:40:33 -0400
-Received: from mail-qt1-x82e.google.com (mail-qt1-x82e.google.com [IPv6:2607:f8b0:4864:20::82e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9FCA2C06174A;
-        Thu, 25 Mar 2021 17:40:30 -0700 (PDT)
-Received: by mail-qt1-x82e.google.com with SMTP id 1so2534046qtb.0;
-        Thu, 25 Mar 2021 17:40:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=WudPpAp2zodSuwqYyO3R50R/8DSntKfLN/wH7uYSYrM=;
-        b=Vn0/vMYaXMe4R2XpupDYgbUI/t7lV9nXGuYlJoSC+dKymcCPiqM9rgCQOKQ9RTxykZ
-         jlHhgZdCnCYFfa7lkUGZKHhQeeLn0D5tPJUvM7RsykxlwbhizYawUTci8sAmPalZmKJR
-         fTQqFPWmEbqkQUcgjcGclbf4y3S943k7/o1/mojMBgPHGBRW9eCRKUEN+8NPXGjbJV8G
-         +CzWvTBSst/kjYaWzvZGy4UVC4huLEGjeFoEBLNxfY3a0gvbYO/mHMvEsOy0ElCTj64A
-         lfYtc/9BFTHCwJ//X0KMU535ukgBGASMOY+0xsvg3kWdu87FSjbA9tO+ljQjfQ9d2BFF
-         p9zA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=WudPpAp2zodSuwqYyO3R50R/8DSntKfLN/wH7uYSYrM=;
-        b=ij0ivtTy/AgEsgrb61nDpQRgV/g5tFQaMSVL8/YYI51OvyHQyXNSn5OTi/xHla+7u5
-         +b5z+T6h2SEUcJcT/5yYJTrJ+W6j7/mYGqFsN7boLL0ffJAlE4lY+Fsp7vfZRG77o+J+
-         GfnZ8+iqDLz9QftToyje3TM4nHyUikbFM2HVv1okaWiziK/7PVxN+DFKlTl8aFM79t2L
-         gzgnbTVEa+nQA5MJE6r3oo2UB30qRoa9KA9Ya0jhVqmw0I7wiQPr820Ug/tjIFONvhdO
-         xUOfZCHnFUhGhZ5Iqbg05NzY2tgzGubV6v/SRn/FqAPW6vx9trZp0DcFLZLn5Yqc+NMv
-         TS2Q==
-X-Gm-Message-State: AOAM533KP4o7ExnGkqwLyEijtnTSoXN4PoZWcLzosQpIc4B95vmfzZ9x
-        8Lj0+v2Yk68RN8HA7ussoxjre5sCjXzQ+X+L4g==
-X-Google-Smtp-Source: ABdhPJxRCD7nd51OEfyYS8niDY3sOe6LstmYPCFWeARW1SukhlDnBXKn6l7EiJnsSp+ZNR0r4+9HHBrg8XfmWJzupI8=
-X-Received: by 2002:aed:2ee7:: with SMTP id k94mr10029267qtd.135.1616719229894;
- Thu, 25 Mar 2021 17:40:29 -0700 (PDT)
+        id S230093AbhCZBDX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 25 Mar 2021 21:03:23 -0400
+Received: from mga04.intel.com ([192.55.52.120]:22628 "EHLO mga04.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229854AbhCZBCx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 25 Mar 2021 21:02:53 -0400
+IronPort-SDR: DaGmn5RlIn0/dsj3Q1EaDJ8S3K3bgS+XhLo8TeISuPufzMe9s2l10dfTZhFpG/FR3Ysb5sGg1t
+ KCyASR91apSQ==
+X-IronPort-AV: E=McAfee;i="6000,8403,9934"; a="188765481"
+X-IronPort-AV: E=Sophos;i="5.81,278,1610438400"; 
+   d="scan'208";a="188765481"
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Mar 2021 18:02:53 -0700
+IronPort-SDR: UDjVUON9MNVL2rohRWqpB9EM7W7/zF4vDcaB4PowV6aLek7/WP4/rjNZWtDjs4gYTRNHM2jka3
+ JoITW8peb0vw==
+X-IronPort-AV: E=Sophos;i="5.81,278,1610438400"; 
+   d="scan'208";a="525855122"
+Received: from meghadey-mobl1.amr.corp.intel.com (HELO [10.209.174.55]) ([10.209.174.55])
+  by orsmga004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Mar 2021 18:02:50 -0700
+Subject: Re: [Patch V2 13/13] genirq/msi: Provide helpers to return Linux
+ IRQ/dev_msi hw IRQ number
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     tglx@linutronix.de, linux-kernel@vger.kernel.org,
+        dave.jiang@intel.com, ashok.raj@intel.com, kevin.tian@intel.com,
+        dwmw@amazon.co.uk, x86@kernel.org, tony.luck@intel.com,
+        dan.j.williams@intel.com, jgg@mellanox.com, kvm@vger.kernel.org,
+        iommu@lists.linux-foundation.org, alex.williamson@redhat.com,
+        bhelgaas@google.com, linux-pci@vger.kernel.org,
+        baolu.lu@linux.intel.com, ravi.v.shankar@intel.com
+References: <1614370277-23235-1-git-send-email-megha.dey@intel.com>
+ <1614370277-23235-14-git-send-email-megha.dey@intel.com>
+ <87y2ebqfw5.wl-maz@kernel.org>
+From:   "Dey, Megha" <megha.dey@intel.com>
+Message-ID: <5bed6fea-32e1-d909-0a5c-439d0f0a7dfe@intel.com>
+Date:   Thu, 25 Mar 2021 18:02:43 -0700
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.7.1
 MIME-Version: 1.0
-References: <20210323023726.28343-1-lihaiwei.kernel@gmail.com>
- <CAB5KdOZq+2ETburoMv6Vnnj3MFAuvwnSBsSmiBO=nH1Ajdp5_g@mail.gmail.com> <YFyw/VRhRCZlqc1X@google.com>
-In-Reply-To: <YFyw/VRhRCZlqc1X@google.com>
-From:   Haiwei Li <lihaiwei.kernel@gmail.com>
-Date:   Fri, 26 Mar 2021 08:39:50 +0800
-Message-ID: <CAB5KdOZHdQeTiYWKebLZG0XgPsybHs1EMqM7=zQ+JoNK1QpkNQ@mail.gmail.com>
-Subject: Re: [PATCH] KVM: VMX: Check the corresponding bits according to the
- intel sdm
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     LKML <linux-kernel@vger.kernel.org>,
-        kvm list <kvm@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Haiwei Li <lihaiwei@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <87y2ebqfw5.wl-maz@kernel.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Mar 25, 2021 at 11:49 PM Sean Christopherson <seanjc@google.com> wrote:
->
-> On Thu, Mar 25, 2021, Haiwei Li wrote:
-> > On Tue, Mar 23, 2021 at 10:37 AM <lihaiwei.kernel@gmail.com> wrote:
-> > >
-> > > From: Haiwei Li <lihaiwei@tencent.com>
-> > >
-> > > According to IA-32 SDM Vol.3D "A.1 BASIC VMX INFORMATION", two inspections
-> > > are missing.
-> > > * Bit 31 is always 0. Earlier versions of this manual specified that the
-> > > VMCS revision identifier was a 32-bit field in bits 31:0 of this MSR. For
-> > > all processors produced prior to this change, bit 31 of this MSR was read
-> > > as 0.
-> > > * The values of bits 47:45 and bits 63:57 are reserved and are read as 0.
-> > >
-> > > Signed-off-by: Haiwei Li <lihaiwei@tencent.com>
-> > > ---
-> > >  arch/x86/kvm/vmx/vmx.c | 14 ++++++++++++++
-> > >  1 file changed, 14 insertions(+)
-> > >
-> > > diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> > > index 32cf828..0d6d13c 100644
-> > > --- a/arch/x86/kvm/vmx/vmx.c
-> > > +++ b/arch/x86/kvm/vmx/vmx.c
-> > > @@ -2577,6 +2577,20 @@ static __init int setup_vmcs_config(struct vmcs_config *vmcs_conf,
-> > >
-> > >         rdmsr(MSR_IA32_VMX_BASIC, vmx_msr_low, vmx_msr_high);
-> > >
-> > > +       /*
-> > > +        * IA-32 SDM Vol 3D: Bit 31 is always 0.
-> > > +        * For all earlier processors, bit 31 of this MSR was read as 0.
-> > > +        */
-> > > +       if (vmx_msr_low & (1u<<31))
-> > > +               return -EIO;
-> >
-> > Drop this code as Jim said.
-> >
-> > > +
-> > > +       /*
-> > > +        * IA-32 SDM Vol 3D: bits 47:45 and bits 63:57 are reserved and are read
-> > > +        * as 0.
-> > > +        */
-> > > +       if (vmx_msr_high & 0xfe00e000)
-> > > +               return -EIO;
-> >
-> > Is this ok? Can we pick up the part? :)
->
-> No.  "Reserved and are read as 0" does not guarantee the bits will always be
-> reserved.  There are very few bits used for feature enumeration in x86 that are
-> guaranteed to be '0' for all eternity.
->
-> The whole point of reserving bits in registers is so that the CPU vendor, Intel
-> in this case, can introduce new features and enumerate them to software without
-> colliding with existing features or breaking software.  E.g. if Intel adds a new
-> feature and uses any of these bits to enumerate the feature, this check would
-> prevent KVM from loading on CPUs that support the feature.
+Hi Marc,
 
-Got it, only explicit restrictions should be checked. Thanks.
+On 3/25/2021 10:53 AM, Marc Zyngier wrote:
+> On Fri, 26 Feb 2021 20:11:17 +0000,
+> Megha Dey <megha.dey@intel.com> wrote:
+>> From: Dave Jiang <dave.jiang@intel.com>
+>>
+>> Add new helpers to get the Linux IRQ number and device specific index
+>> for given device-relative vector so that the drivers don't need to
+>> allocate their own arrays to keep track of the vectors and hwirq for
+>> the multi vector device MSI case.
+>>
+>> Reviewed-by: Tony Luck <tony.luck@intel.com>
+>> Signed-off-by: Dave Jiang <dave.jiang@intel.com>
+>> Signed-off-by: Megha Dey <megha.dey@intel.com>
+>> ---
+>>   include/linux/msi.h |  2 ++
+>>   kernel/irq/msi.c    | 44 ++++++++++++++++++++++++++++++++++++++++++++
+>>   2 files changed, 46 insertions(+)
+>>
+>> diff --git a/include/linux/msi.h b/include/linux/msi.h
+>> index 24abec0..d60a6ba 100644
+>> --- a/include/linux/msi.h
+>> +++ b/include/linux/msi.h
+>> @@ -451,6 +451,8 @@ struct irq_domain *platform_msi_create_irq_domain(struct fwnode_handle *fwnode,
+>>   int platform_msi_domain_alloc_irqs(struct device *dev, unsigned int nvec,
+>>   				   irq_write_msi_msg_t write_msi_msg);
+>>   void platform_msi_domain_free_irqs(struct device *dev);
+>> +int msi_irq_vector(struct device *dev, unsigned int nr);
+>> +int dev_msi_hwirq(struct device *dev, unsigned int nr);
+>>   
+>>   /* When an MSI domain is used as an intermediate domain */
+>>   int msi_domain_prepare_irqs(struct irq_domain *domain, struct device *dev,
+>> diff --git a/kernel/irq/msi.c b/kernel/irq/msi.c
+>> index 047b59d..f2a8f55 100644
+>> --- a/kernel/irq/msi.c
+>> +++ b/kernel/irq/msi.c
+>> @@ -581,4 +581,48 @@ struct msi_domain_info *msi_get_domain_info(struct irq_domain *domain)
+>>   	return (struct msi_domain_info *)domain->host_data;
+>>   }
+>>   
+>> +/**
+>> + * msi_irq_vector - Get the Linux IRQ number of a device vector
+>> + * @dev: device to operate on
+>> + * @nr: device-relative interrupt vector index (0-based).
+>> + *
+>> + * Returns the Linux IRQ number of a device vector.
+>> + */
+>> +int msi_irq_vector(struct device *dev, unsigned int nr)
+>> +{
+>> +	struct msi_desc *entry;
+>> +	int i = 0;
+>> +
+>> +	for_each_msi_entry(entry, dev) {
+>> +		if (i == nr)
+>> +			return entry->irq;
+>> +		i++;
+> This obviously doesn't work with Multi-MSI, does it?
 
---
-Haiwei Li
+This API is only for devices that support device MSI interrupts. They 
+follow MSI-x format and don't support multi MSI (part of MSI).
+
+Not sure if I am missing something here, can you please let me know?
+
+>
+>> +	}
+>> +	WARN_ON_ONCE(1);
+>> +	return -EINVAL;
+>> +}
+>> +EXPORT_SYMBOL_GPL(msi_irq_vector);
+>> +
+>> +/**
+>> + * dev_msi_hwirq - Get the device MSI hw IRQ number of a device vector
+>> + * @dev: device to operate on
+>> + * @nr: device-relative interrupt vector index (0-based).
+>> + *
+>> + * Return the dev_msi hw IRQ number of a device vector.
+>> + */
+>> +int dev_msi_hwirq(struct device *dev, unsigned int nr)
+>> +{
+>> +	struct msi_desc *entry;
+>> +	int i = 0;
+>> +
+>> +	for_each_msi_entry(entry, dev) {
+>> +		if (i == nr)
+>> +			return entry->device_msi.hwirq;
+>> +		i++;
+>> +	}
+>> +	WARN_ON_ONCE(1);
+>> +	return -EINVAL;
+>> +}
+>> +EXPORT_SYMBOL_GPL(dev_msi_hwirq);
+>> +
+>>   #endif /* CONFIG_GENERIC_MSI_IRQ_DOMAIN */
+> And what uses these helpers?]
+These helpers are to be used by a driver series(Intel's IDXD driver) 
+which is currently stuck due to VFIO refactoring.
+>
+> Thanks,
+>
+> 	M.
+>
