@@ -2,108 +2,111 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 05E1534A434
-	for <lists+kvm@lfdr.de>; Fri, 26 Mar 2021 10:22:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 828D234A4D5
+	for <lists+kvm@lfdr.de>; Fri, 26 Mar 2021 10:46:59 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229768AbhCZJVJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 26 Mar 2021 05:21:09 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:27882 "EHLO
+        id S229639AbhCZJq2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 26 Mar 2021 05:46:28 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:42282 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229463AbhCZJUm (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 26 Mar 2021 05:20:42 -0400
+        by vger.kernel.org with ESMTP id S230007AbhCZJp4 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 26 Mar 2021 05:45:56 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1616750441;
+        s=mimecast20190719; t=1616751955;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=sdhTk6wzAnjUFDmSctBcFuCS/lpBkxpexyEOMArdKoQ=;
-        b=SzpGRXMYG6s6Vfajchht3MyJPjcS9nFwpZGLduZ8U7jVwgD2gAXe3e1ZesDrgQVa1umHbq
-        L9Dfmjv7b29qnDiAqWQaQJaLAL8iv9ufYh+j0XAdj7E+OpcLsEpXd6ZHtj4hz/cv3n6VBi
-        nTGRGrM3NVN5L47LCRB2UCgYJErNHf8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-61-r5yGTcGKPcSlIiXY76Rzvg-1; Fri, 26 Mar 2021 05:20:39 -0400
-X-MC-Unique: r5yGTcGKPcSlIiXY76Rzvg-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DD337100E351;
-        Fri, 26 Mar 2021 09:20:37 +0000 (UTC)
-Received: from [10.36.112.13] (ovpn-112-13.ams2.redhat.com [10.36.112.13])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 136CF712B8;
-        Fri, 26 Mar 2021 09:20:10 +0000 (UTC)
-Subject: Re: [PATCH 1/4] vfio/type1: fix a couple of spelling mistakes
-To:     Zhen Lei <thunder.leizhen@huawei.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>, kvm <kvm@vger.kernel.org>,
-        Kirti Wankhede <kwankhede@nvidia.com>,
-        linux-kernel <linux-kernel@vger.kernel.org>
-References: <20210326083528.1329-1-thunder.leizhen@huawei.com>
- <20210326083528.1329-2-thunder.leizhen@huawei.com>
-From:   Auger Eric <eric.auger@redhat.com>
-Message-ID: <458e56e7-9e38-e88b-50e3-9487635827c7@redhat.com>
-Date:   Fri, 26 Mar 2021 10:20:07 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.7.0
+        bh=XG6h7spL153kovHcC5yY8ljihAEwgHllcDY8/MH1Mnw=;
+        b=eNNBsbcjNu/AaFkiPl7YpYBdRiEoafBoFy+D7GTo94lIjKSb14qsI1taRenyVeUIsyA0QH
+        46Wzgs7uXJ6dbCoATI8zz8W+Pt7P97P19X98K5a5kT7zpE9Z4oq2ATvyr+I1KceZezLige
+        sLJezCfkgORqHyU2COpbgM/3P/72jAI=
+Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
+ [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-304-8LR39xFSNs6dyP4mvT5nAw-1; Fri, 26 Mar 2021 05:45:53 -0400
+X-MC-Unique: 8LR39xFSNs6dyP4mvT5nAw-1
+Received: by mail-ed1-f70.google.com with SMTP id m8so4121336edv.11
+        for <kvm@vger.kernel.org>; Fri, 26 Mar 2021 02:45:53 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=XG6h7spL153kovHcC5yY8ljihAEwgHllcDY8/MH1Mnw=;
+        b=l7VlqsbFh4vFIQqnn4yD6cBwyjyXAWKX1tLD82J+RyZQdF1Jx6AUjO7CL+4lkXjrRX
+         2nNmaEZGYfxGhJ+CoTzLxS1eptfkVDqIdLNsYB0IwtFRERZicfqMJ6NdEfJhrTrm1pNm
+         5d7BRHGzG+ohdXhMl2R/X2LJ/DDigftMpULTcZmuUpcPE8Q9mFL/pkYONheddCK6lWdX
+         zu0anC0f8DupVZt4EpDNs0PPO2iQO7HurjDVZbo2PWaE0Daz/wg5BPTLyj1Dw9QFYIV8
+         1uWRSYFNqO3HJtCJi5kWkpkKP1iLy3NOo9gnXXPxGHfOYIfNS1R/cTK9hJY5A+2BbGl+
+         bQ6A==
+X-Gm-Message-State: AOAM532Y+qNeVFVvPQfvgVoWRYexfe23lPQ+T78+Hjt8Z9/s/Hp5iSG7
+        w8j/mp5Q/8niY+5OP3S0ER9rjT6Wb8Nv97MFUAZ5sD765TLTBVuVIYEZMFwRwBV99lNvGD4G9jD
+        MJuCxx2aj0VdP
+X-Received: by 2002:a17:907:7651:: with SMTP id kj17mr14296317ejc.127.1616751952762;
+        Fri, 26 Mar 2021 02:45:52 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyE0k8X5SPvpAMb7ckZxoBBS75iJ7ZWfhqplxSPtWKx+vvCBL/3M4zUeuYeVDlKoAevFSdZew==
+X-Received: by 2002:a17:907:7651:: with SMTP id kj17mr14296294ejc.127.1616751952545;
+        Fri, 26 Mar 2021 02:45:52 -0700 (PDT)
+Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id va9sm728410ejb.31.2021.03.26.02.45.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 26 Mar 2021 02:45:51 -0700 (PDT)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Dongli Zhang <dongli.zhang@oracle.com>, kvm@vger.kernel.org,
+        x86@kernel.org
+Cc:     pbonzini@redhat.com, seanjc@google.com, wanpengli@tencent.com,
+        jmattson@google.com, joro@8bytes.org, tglx@linutronix.de,
+        mingo@redhat.com, bp@alien8.de, hpa@zytor.com,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/1] KVM: x86: remove unused declaration of kvm_write_tsc()
+In-Reply-To: <20210326070334.12310-1-dongli.zhang@oracle.com>
+References: <20210326070334.12310-1-dongli.zhang@oracle.com>
+Date:   Fri, 26 Mar 2021 10:45:50 +0100
+Message-ID: <87sg4ickoh.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20210326083528.1329-2-thunder.leizhen@huawei.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi,
+Dongli Zhang <dongli.zhang@oracle.com> writes:
 
-On 3/26/21 9:35 AM, Zhen Lei wrote:
-> There are several spelling mistakes, as follows:
-> userpsace ==> userspace
-> Accouting ==> Accounting
-> exlude ==> exclude
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
+> The kvm_write_tsc() was not used since commit 0c899c25d754 ("KVM: x86: do
+> not attempt TSC synchronization on guest writes"). Remove its unused
+> declaration.
 
-Thanks
+It's not just not used, it's not present. Let me try to rephrase the
+commit message a bit:
 
-Eric
-> 
-> Signed-off-by: Zhen Lei <thunder.leizhen@huawei.com>
+"
+Commit 0c899c25d754 ("KVM: x86: do not attempt TSC synchronization on
+guest writes") renamed kvm_write_tsc() to kvm_synchronize_tsc() and made
+it 'static'. Remove the leftover declaration from x86.h
+
+Fixes: 0c899c25d754 ("KVM: x86: do not attempt TSC synchronization on
+guest writes")
+"
+
+The subject line should probably also get adjusted like
+"KVM: x86: remove dangling declaration of kvm_write_tsc()"
+
+>
+> Signed-off-by: Dongli Zhang <dongli.zhang@oracle.com>
 > ---
->  drivers/vfio/vfio_iommu_type1.c | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
-> 
-> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-> index be444407664af74..21cf1d123036c82 100644
-> --- a/drivers/vfio/vfio_iommu_type1.c
-> +++ b/drivers/vfio/vfio_iommu_type1.c
-> @@ -16,7 +16,7 @@
->   * IOMMU to support the IOMMU API and have few to no restrictions around
->   * the IOVA range that can be mapped.  The Type1 IOMMU is currently
->   * optimized for relatively static mappings of a userspace process with
-> - * userpsace pages pinned into memory.  We also assume devices and IOMMU
-> + * userspace pages pinned into memory.  We also assume devices and IOMMU
->   * domains are PCI based as the IOMMU API is still centered around a
->   * device/bus interface rather than a group interface.
->   */
-> @@ -871,7 +871,7 @@ static int vfio_iommu_type1_pin_pages(void *iommu_data,
+>  arch/x86/kvm/x86.h | 1 -
+>  1 file changed, 1 deletion(-)
+>
+> diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
+> index 39eb04887141..9035e34aa156 100644
+> --- a/arch/x86/kvm/x86.h
+> +++ b/arch/x86/kvm/x86.h
+> @@ -250,7 +250,6 @@ static inline bool kvm_vcpu_latch_init(struct kvm_vcpu *vcpu)
+>  void kvm_write_wall_clock(struct kvm *kvm, gpa_t wall_clock, int sec_hi_ofs);
+>  void kvm_inject_realmode_interrupt(struct kvm_vcpu *vcpu, int irq, int inc_eip);
 >  
->  	/*
->  	 * If iommu capable domain exist in the container then all pages are
-> -	 * already pinned and accounted. Accouting should be done if there is no
-> +	 * already pinned and accounted. Accounting should be done if there is no
->  	 * iommu capable domain in the container.
->  	 */
->  	do_accounting = !IS_IOMMU_CAP_DOMAIN_IN_CONTAINER(iommu);
-> @@ -2171,7 +2171,7 @@ static int vfio_iommu_resv_exclude(struct list_head *iova,
->  				continue;
->  			/*
->  			 * Insert a new node if current node overlaps with the
-> -			 * reserve region to exlude that from valid iova range.
-> +			 * reserve region to exclude that from valid iova range.
->  			 * Note that, new node is inserted before the current
->  			 * node and finally the current node is deleted keeping
->  			 * the list updated and sorted.
-> 
+> -void kvm_write_tsc(struct kvm_vcpu *vcpu, struct msr_data *msr);
+>  u64 get_kvmclock_ns(struct kvm *kvm);
+>  
+>  int kvm_read_guest_virt(struct kvm_vcpu *vcpu,
+
+-- 
+Vitaly
 
