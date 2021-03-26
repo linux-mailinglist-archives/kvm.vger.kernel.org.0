@@ -2,111 +2,84 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 828D234A4D5
-	for <lists+kvm@lfdr.de>; Fri, 26 Mar 2021 10:46:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8C98334A55D
+	for <lists+kvm@lfdr.de>; Fri, 26 Mar 2021 11:15:16 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229639AbhCZJq2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 26 Mar 2021 05:46:28 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:42282 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230007AbhCZJp4 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 26 Mar 2021 05:45:56 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1616751955;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=XG6h7spL153kovHcC5yY8ljihAEwgHllcDY8/MH1Mnw=;
-        b=eNNBsbcjNu/AaFkiPl7YpYBdRiEoafBoFy+D7GTo94lIjKSb14qsI1taRenyVeUIsyA0QH
-        46Wzgs7uXJ6dbCoATI8zz8W+Pt7P97P19X98K5a5kT7zpE9Z4oq2ATvyr+I1KceZezLige
-        sLJezCfkgORqHyU2COpbgM/3P/72jAI=
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
- [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-304-8LR39xFSNs6dyP4mvT5nAw-1; Fri, 26 Mar 2021 05:45:53 -0400
-X-MC-Unique: 8LR39xFSNs6dyP4mvT5nAw-1
-Received: by mail-ed1-f70.google.com with SMTP id m8so4121336edv.11
-        for <kvm@vger.kernel.org>; Fri, 26 Mar 2021 02:45:53 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=XG6h7spL153kovHcC5yY8ljihAEwgHllcDY8/MH1Mnw=;
-        b=l7VlqsbFh4vFIQqnn4yD6cBwyjyXAWKX1tLD82J+RyZQdF1Jx6AUjO7CL+4lkXjrRX
-         2nNmaEZGYfxGhJ+CoTzLxS1eptfkVDqIdLNsYB0IwtFRERZicfqMJ6NdEfJhrTrm1pNm
-         5d7BRHGzG+ohdXhMl2R/X2LJ/DDigftMpULTcZmuUpcPE8Q9mFL/pkYONheddCK6lWdX
-         zu0anC0f8DupVZt4EpDNs0PPO2iQO7HurjDVZbo2PWaE0Daz/wg5BPTLyj1Dw9QFYIV8
-         1uWRSYFNqO3HJtCJi5kWkpkKP1iLy3NOo9gnXXPxGHfOYIfNS1R/cTK9hJY5A+2BbGl+
-         bQ6A==
-X-Gm-Message-State: AOAM532Y+qNeVFVvPQfvgVoWRYexfe23lPQ+T78+Hjt8Z9/s/Hp5iSG7
-        w8j/mp5Q/8niY+5OP3S0ER9rjT6Wb8Nv97MFUAZ5sD765TLTBVuVIYEZMFwRwBV99lNvGD4G9jD
-        MJuCxx2aj0VdP
-X-Received: by 2002:a17:907:7651:: with SMTP id kj17mr14296317ejc.127.1616751952762;
-        Fri, 26 Mar 2021 02:45:52 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyE0k8X5SPvpAMb7ckZxoBBS75iJ7ZWfhqplxSPtWKx+vvCBL/3M4zUeuYeVDlKoAevFSdZew==
-X-Received: by 2002:a17:907:7651:: with SMTP id kj17mr14296294ejc.127.1616751952545;
-        Fri, 26 Mar 2021 02:45:52 -0700 (PDT)
-Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id va9sm728410ejb.31.2021.03.26.02.45.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 26 Mar 2021 02:45:51 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Dongli Zhang <dongli.zhang@oracle.com>, kvm@vger.kernel.org,
-        x86@kernel.org
-Cc:     pbonzini@redhat.com, seanjc@google.com, wanpengli@tencent.com,
-        jmattson@google.com, joro@8bytes.org, tglx@linutronix.de,
-        mingo@redhat.com, bp@alien8.de, hpa@zytor.com,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 1/1] KVM: x86: remove unused declaration of kvm_write_tsc()
-In-Reply-To: <20210326070334.12310-1-dongli.zhang@oracle.com>
-References: <20210326070334.12310-1-dongli.zhang@oracle.com>
-Date:   Fri, 26 Mar 2021 10:45:50 +0100
-Message-ID: <87sg4ickoh.fsf@vitty.brq.redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+        id S229622AbhCZKOl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 26 Mar 2021 06:14:41 -0400
+Received: from mail.kernel.org ([198.145.29.99]:49630 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229474AbhCZKOc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 26 Mar 2021 06:14:32 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 17F4161942;
+        Fri, 26 Mar 2021 10:14:32 +0000 (UTC)
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=wait-a-minute.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94)
+        (envelope-from <maz@kernel.org>)
+        id 1lPjU5-003xNw-Rc; Fri, 26 Mar 2021 10:14:29 +0000
+Date:   Fri, 26 Mar 2021 10:14:30 +0000
+Message-ID: <87wntufchl.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Thomas Gleixner <tglx@linutronix.de>
+Cc:     Megha Dey <megha.dey@intel.com>, linux-kernel@vger.kernel.org,
+        dave.jiang@intel.com, ashok.raj@intel.com, kevin.tian@intel.com,
+        dwmw@amazon.co.uk, x86@kernel.org, tony.luck@intel.com,
+        dan.j.williams@intel.com, jgg@mellanox.com, kvm@vger.kernel.org,
+        iommu@lists.linux-foundation.org, alex.williamson@redhat.com,
+        bhelgaas@google.com, linux-pci@vger.kernel.org,
+        baolu.lu@linux.intel.com, ravi.v.shankar@intel.com
+Subject: Re: [Patch V2 07/13] irqdomain/msi: Provide msi_alloc/free_store() callbacks
+In-Reply-To: <87lfabvzrz.fsf@nanos.tec.linutronix.de>
+References: <1614370277-23235-1-git-send-email-megha.dey@intel.com>
+        <1614370277-23235-8-git-send-email-megha.dey@intel.com>
+        <8735wjrwjm.wl-maz@kernel.org>
+        <87lfabvzrz.fsf@nanos.tec.linutronix.de>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: tglx@linutronix.de, megha.dey@intel.com, linux-kernel@vger.kernel.org, dave.jiang@intel.com, ashok.raj@intel.com, kevin.tian@intel.com, dwmw@amazon.co.uk, x86@kernel.org, tony.luck@intel.com, dan.j.williams@intel.com, jgg@mellanox.com, kvm@vger.kernel.org, iommu@lists.linux-foundation.org, alex.williamson@redhat.com, bhelgaas@google.com, linux-pci@vger.kernel.org, baolu.lu@linux.intel.com, ravi.v.shankar@intel.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Dongli Zhang <dongli.zhang@oracle.com> writes:
+On Thu, 25 Mar 2021 18:44:48 +0000,
+Thomas Gleixner <tglx@linutronix.de> wrote:
+> 
+> On Thu, Mar 25 2021 at 17:08, Marc Zyngier wrote:
+> > Megha Dey <megha.dey@intel.com> wrote:
+> >> @@ -434,6 +434,12 @@ int __msi_domain_alloc_irqs(struct irq_domain *domain, struct device *dev,
+> >>  	if (ret)
+> >>  		return ret;
+> >>  
+> >> +	if (ops->msi_alloc_store) {
+> >> +		ret = ops->msi_alloc_store(domain, dev, nvec);
+> >
+> > What is supposed to happen if we get aliasing devices (similar to what
+> > we have with devices behind a PCI bridge)?
+> >
+> > The ITS code goes through all kind of hoops to try and detect this
+> > case when sizing the translation tables (in the .prepare callback),
+> > and I have the feeling that sizing the message store is analogous.
+> 
+> No. The message store itself is sized upfront by the underlying 'master'
+> device. Each 'master' device has it's own irqdomain.
+> 
+> This is the allocation for the subdevice and this is not part of PCI and
+> therefore not subject to PCI aliasing.
 
-> The kvm_write_tsc() was not used since commit 0c899c25d754 ("KVM: x86: do
-> not attempt TSC synchronization on guest writes"). Remove its unused
-> declaration.
+Fair enough. If we are guaranteed that there is no aliasing, then this
+point is moot.
 
-It's not just not used, it's not present. Let me try to rephrase the
-commit message a bit:
-
-"
-Commit 0c899c25d754 ("KVM: x86: do not attempt TSC synchronization on
-guest writes") renamed kvm_write_tsc() to kvm_synchronize_tsc() and made
-it 'static'. Remove the leftover declaration from x86.h
-
-Fixes: 0c899c25d754 ("KVM: x86: do not attempt TSC synchronization on
-guest writes")
-"
-
-The subject line should probably also get adjusted like
-"KVM: x86: remove dangling declaration of kvm_write_tsc()"
-
->
-> Signed-off-by: Dongli Zhang <dongli.zhang@oracle.com>
-> ---
->  arch/x86/kvm/x86.h | 1 -
->  1 file changed, 1 deletion(-)
->
-> diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
-> index 39eb04887141..9035e34aa156 100644
-> --- a/arch/x86/kvm/x86.h
-> +++ b/arch/x86/kvm/x86.h
-> @@ -250,7 +250,6 @@ static inline bool kvm_vcpu_latch_init(struct kvm_vcpu *vcpu)
->  void kvm_write_wall_clock(struct kvm *kvm, gpa_t wall_clock, int sec_hi_ofs);
->  void kvm_inject_realmode_interrupt(struct kvm_vcpu *vcpu, int irq, int inc_eip);
->  
-> -void kvm_write_tsc(struct kvm_vcpu *vcpu, struct msr_data *msr);
->  u64 get_kvmclock_ns(struct kvm *kvm);
->  
->  int kvm_read_guest_virt(struct kvm_vcpu *vcpu,
+	M.
 
 -- 
-Vitaly
-
+Without deviation from the norm, progress is not possible.
