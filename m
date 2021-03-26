@@ -2,296 +2,187 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EDFA934AF8F
-	for <lists+kvm@lfdr.de>; Fri, 26 Mar 2021 20:50:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CA9ED34AFBC
+	for <lists+kvm@lfdr.de>; Fri, 26 Mar 2021 21:02:31 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230334AbhCZTtf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 26 Mar 2021 15:49:35 -0400
-Received: from mail.kernel.org ([198.145.29.99]:55332 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230150AbhCZTtP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 26 Mar 2021 15:49:15 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id EF2EF6196C;
-        Fri, 26 Mar 2021 19:49:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1616788155;
-        bh=lAxCHO3mwbr8j2AnnBzP3nXUOrdvyMEE2z/EuSlIbfE=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=GsdDHx35gVb6OrOsB9zBnJHrV4Q/7lE6Tau01U9EJ1T3ftL6Vg5W4VB3j+kYSHQ2U
-         lFcqLQeHKxDCIBzUByhB6fIx2egkA5NL3LC2Q4OdNdu8+PbmA3xoiWJIvrcU+9Fs0w
-         G4Xi/rDnB7r+jAhGxTu0VPMoLqlrWsjApD4UE1xpJs8qHYuPOL0AsXv7DhAns0N9a8
-         ksvfWqztoxNOk7L54CBrW8dX+6h8vwCNc01+aI+hS3ej6m0GJvWaj5aPP8TBweNfdS
-         1VAaGmyVMK6Jxd0F3ivqYB1l5Dkhb+ruWnPqu3HmCBA4lbbcHl6okva5iAm455lakP
-         jpaF7mgMPRXcw==
-Date:   Fri, 26 Mar 2021 21:48:45 +0200
-From:   Jarkko Sakkinen <jarkko@kernel.org>
-To:     Kai Huang <kai.huang@intel.com>
-Cc:     kvm@vger.kernel.org, x86@kernel.org, linux-sgx@vger.kernel.org,
-        linux-kernel@vger.kernel.org, seanjc@google.com, luto@kernel.org,
-        dave.hansen@intel.com, rick.p.edgecombe@intel.com,
-        haitao.huang@intel.com, pbonzini@redhat.com, bp@alien8.de,
-        tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com
-Subject: Re: [PATCH v4 03/25] x86/sgx: Wipe out EREMOVE from
- sgx_free_epc_page()
-Message-ID: <YF46ndD3rdotgOpl@kernel.org>
-References: <062acb801926b2ade2f9fe1672afb7113453a741.1616136308.git.kai.huang@intel.com>
- <20210325093057.122834-1-kai.huang@intel.com>
+        id S230347AbhCZUCA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 26 Mar 2021 16:02:00 -0400
+Received: from mail-co1nam11on2078.outbound.protection.outlook.com ([40.107.220.78]:35617
+        "EHLO NAM11-CO1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S230337AbhCZUBe (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 26 Mar 2021 16:01:34 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=RA/m+KkCZcrGZ6PsTBeN0z3PFovWQlhJ6lYBpgV2ZB9VtOIAHhbtzycMN8HS69x5wnGfKO4z8lewwI+vBo7GPjn5rKOpfHZJimSLzkXH90Sm+GSWc5Tomdz6RqGDm/1LRjaaYZDKnMedXp7VSEZEkyddyGeTpcW44tiJcfjxs1oWPfA7+XmhX4XVlDA0MFAgX1OwhWq/WK2EoWO/71YLKcesrF6pTCYVY1lPidv2qoD89X70o32D28AJ6RuI/0cZpjQSv0lj69kXPygJrlJn6Da385x8R4e/TKFy7TK+xonjXlAfAigxUYvkPn71Fxll9VXU6SUqO0Vp26iqO95pOA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=3fPdvwQjaudddbhEMS/Qm4ajG9ibQ/VaB45+RWaAfqA=;
+ b=VDOepq/RYacAH7hbSlBIjkTNZk4Am3cwYCqqHV5+mM+iMKlc+o7zDUNnVfKxIsY44SBjlR1NN/sIJUNFez/ox3CLfRCsAyjIqJ1c+Ub/rFkUhxmA4JA4sQg+nJfdwLViWG4YV6OIm42KlAjWCTeSpkOov9mjUOlv87TvQU1QKI+rwGQvL9Pow8GsalDgPRIcupqU3g4UUmPuMefTpWJI9Qd0dwl13bhFrN4MwQlqWPSDx7ZYQw6whC1CSktrzb0aGiwH+b6oUlNcXE9+1gjEMCh51UBzE3TuxDZozPPShmEkLldJF4CZPs6JzPNQ/2o98MP99AWF75cyIh9P6Qsrlg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=3fPdvwQjaudddbhEMS/Qm4ajG9ibQ/VaB45+RWaAfqA=;
+ b=LotDSENJPq3oU+eScsRJufx3XeJcXEQTf18SSz8zAe1AJRohswMTQZwb4Rgt5BY3yxyd/GUrwp0diH9U25DbPgtgv0N798TG/fyNNq4TPbI7NoU/7Ii/SK7DWfQRt8hSQ2ELDchLkNWBnk7NdtvzUno+ucN/0+2r+IK5lASMPq4=
+Authentication-Results: google.com; dkim=none (message not signed)
+ header.d=none;google.com; dmarc=none action=none header.from=amd.com;
+Received: from SN6PR12MB2718.namprd12.prod.outlook.com (2603:10b6:805:6f::22)
+ by SN1PR12MB2416.namprd12.prod.outlook.com (2603:10b6:802:2f::30) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3977.26; Fri, 26 Mar
+ 2021 20:01:30 +0000
+Received: from SN6PR12MB2718.namprd12.prod.outlook.com
+ ([fe80::30fb:2d6c:a0bf:2f1d]) by SN6PR12MB2718.namprd12.prod.outlook.com
+ ([fe80::30fb:2d6c:a0bf:2f1d%3]) with mapi id 15.20.3955.027; Fri, 26 Mar 2021
+ 20:01:30 +0000
+Cc:     brijesh.singh@amd.com, linux-kernel@vger.kernel.org,
+        x86@kernel.org, kvm@vger.kernel.org, ak@linux.intel.com,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        "H. Peter Anvin" <hpa@zytor.com>, Tony Luck <tony.luck@intel.com>,
+        Dave Hansen <dave.hansen@intel.com>,
+        "Peter Zijlstra (Intel)" <peterz@infradead.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        David Rientjes <rientjes@google.com>,
+        Sean Christopherson <seanjc@google.com>
+Subject: Re: [RFC Part1 PATCH 03/13] x86: add a helper routine for the
+ PVALIDATE instruction
+To:     Borislav Petkov <bp@alien8.de>
+References: <20210324164424.28124-1-brijesh.singh@amd.com>
+ <20210324164424.28124-4-brijesh.singh@amd.com>
+ <20210326143026.GB27507@zn.tnic>
+ <9c9773d1-c494-2dfe-cd2a-95e3cfdfa09f@amd.com>
+ <20210326192214.GK25229@zn.tnic>
+From:   Brijesh Singh <brijesh.singh@amd.com>
+Message-ID: <17a1d149-5536-0fb7-e441-cdf9cf7fa78e@amd.com>
+Date:   Fri, 26 Mar 2021 15:01:27 -0500
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
+ Gecko/20100101 Thunderbird/78.8.1
+In-Reply-To: <20210326192214.GK25229@zn.tnic>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-Originating-IP: [70.112.153.56]
+X-ClientProxiedBy: SA9PR13CA0133.namprd13.prod.outlook.com
+ (2603:10b6:806:27::18) To SN6PR12MB2718.namprd12.prod.outlook.com
+ (2603:10b6:805:6f::22)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210325093057.122834-1-kai.huang@intel.com>
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from Brijeshs-MacBook-Pro.local (70.112.153.56) by SA9PR13CA0133.namprd13.prod.outlook.com (2603:10b6:806:27::18) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3999.16 via Frontend Transport; Fri, 26 Mar 2021 20:01:29 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-HT: Tenant
+X-MS-Office365-Filtering-Correlation-Id: 4da2ab46-9f30-4494-bc9d-08d8f091f284
+X-MS-TrafficTypeDiagnostic: SN1PR12MB2416:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <SN1PR12MB2416BD7BADF0C3B9AE3712B5E5619@SN1PR12MB2416.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:8273;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 8rK7Gut0IKWRbmQdrkWMoAMYoldF8S2tnPCKryACxt6WmkWHRtlb84L931OhvozKmdMD5sLwlhpCxCem6EIBL9lgZNkp9BCpG7JTPX5UPNxkfxJJ9Xa/c/NFZgygCk2mhPgQ+bJ6IjfhYrK0WB1A3KbnEjMDKB0TK0sPGgUPzFWdK3/ruw727ARBIkFgJiKhUYkNUeamRKcslY7JhVRhc9KzjWqW/5eiV4Q6s6TVr9OyJ2nyx7QmR01LcpfnkbT2e3cRxAcr4PFqWOwKvzCjzky8OXPb/djYL7plOYsGpJlpgPcFlS1VeETPkMsvrmWlw9yBDJ6QLXC8gCAxkmf1fzKMVHYviCxWeGH9lYJYTiwg9AMaPd4oHkrHLX8GhUDz76g7owDOvp58rtp69E2RI+c6bNaij8aULCL82+4sNzuLVSkFXNraHXkgrhEcquG1DOLYyGENs6v4tzTxeaZpT4RJGUHPOgsINmxzveQD8RwXkU4yFFnmmIeRML++yWcfWVHyzpJZZ4YzCqNjOZJqv5561sQEDt5VAtoa3xYa2Vjpyle7IsW04AxeCRslPPHKu4ybhvTFq1V6C62MORtIdSMgpAipQKA6b8ny6NKrUdNUeO3u/KH8v5rjCIaXVnkrvLgem4PwZmbmqxHbcTYE2Zzf4mblTxsBzf1NGy60iVdvqffHInWuQUa7AbfaGopV219oNar4I6nGdHbY/Us+fp1yNCGIEYnSZFgvqUPnLBA=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2718.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(136003)(39860400002)(366004)(396003)(376002)(346002)(478600001)(6512007)(956004)(8936002)(6486002)(2616005)(7416002)(54906003)(4326008)(5660300002)(31686004)(2906002)(38100700001)(8676002)(316002)(44832011)(6916009)(186003)(66556008)(26005)(36756003)(86362001)(31696002)(52116002)(83380400001)(6506007)(66476007)(53546011)(66946007)(16526019)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData: =?utf-8?B?QzVOWW1jVjBPdHRxZGpCbS9XQmk3cmlBMHFiUEFKb2U4Q2hUcWRqVGZJZURY?=
+ =?utf-8?B?endZakovNFNOWHpPVXNrYkJ3UEg4RVQrUkFGT1NNckwydW0wRWsxem9iK2RG?=
+ =?utf-8?B?VHlhcTkyK2JlVDdJd2Z0cHdMQkRXbG96enIwOE50NTBGeWw5VXVyOS9BVVBn?=
+ =?utf-8?B?ZVE3YmFkRzlzNnYrREZCY3c3RHQ0dktsYUJOWjMyZldpSjNKNSs0TFhUa3Zy?=
+ =?utf-8?B?UkFQTDNLQ280cmp4dUpSdmZkRVJoVzRwczlFdmpBOEtabHNpOW1yblFESFN2?=
+ =?utf-8?B?bld3T00vL2kxWlRoVStwdDF1M0pYYXc0UEExdkkranZVeHhUKzVLSzNDSUx4?=
+ =?utf-8?B?NkdtL3pUK0ZqYjd0SEQ4MXFVeFJyN0lSeDlTU3IrNHdmNloweWNZdFppS3gz?=
+ =?utf-8?B?dXN6T0F5M3FCcndBSktSWXk2dkNMdC9qK0tpa1hvTkMyTE5wYjM1WGFQNmxE?=
+ =?utf-8?B?cUtwY3ZVbWpKcGE3S2hSV01EdTJLd3I5ajZlYlNCT3lIbWh2ME9wYWxMeVdL?=
+ =?utf-8?B?NklqajZ6Z3hwZ012Wmt1Nkx5TDdlRGJPaEsxOTh6b3o1Y1NtK0Zia2pOajVX?=
+ =?utf-8?B?blhtS3BQeHIwZDhxUW1VMVZhaWVpL01DZG5za25ERzVLRGtxdlFwR2s1SjNx?=
+ =?utf-8?B?RTNlMUF6RFkvWmYrQUR0U2RqU0QzY0lJb0RlWlBzaHU3aGhIVVVtNHQvNnlu?=
+ =?utf-8?B?ekM3UEJVRXZrVGJhSUJGVUttSTdGNmFNOXgwSGFXN0tQdVUwdzVGb0lqaHZl?=
+ =?utf-8?B?QnJBVkRiaklLQmp5czJhYnB0QkRCWTU2dnpXdXhoTU1mZHF3ZkJ3MVJtQ2ZY?=
+ =?utf-8?B?OVA3V2FWWlBZYWNlaG1HZlNNRS9GNEptZVVhY2F4cjZ4ZUt0bjN6S2RmYURm?=
+ =?utf-8?B?azcrNUpXVVBaSVJlZ25tYTVKa01EZWpSS1lEWHdBblBzcXVsU2tLRkVjeit6?=
+ =?utf-8?B?Y2N4RFlFODVYclNHTjhDZVJMV3p0YllIRXNCRktqczMxeDQyc1liZ2hrdWZm?=
+ =?utf-8?B?b3UrWlhFeThSeW1WY3Bud0xYSlBTZ3VrZ0pVVnlCSjd0VkpjZ3Jud0FlT2g2?=
+ =?utf-8?B?STllbmNPbDQyNVhLdndpSGExVEl6VjcvVXJnR21DS280YTZ3SmFOaDRFOXdy?=
+ =?utf-8?B?NG1EbUhVaVRXOE9UY0JTL25wMlU3SW56cXJjdlBKQy9LQ1NUM2VjdVRZWTN6?=
+ =?utf-8?B?TFBjU0Z6b2JDUEVnSXhXS202QXdCSFRrbGV0dDVOeUFScGgyRXlXdGhRL0pN?=
+ =?utf-8?B?VmtKMVY3eXpCcjBybWROWTRJaTdnVjczeE9ta2ZOQ2ZmcG5POFAwejhZVVdL?=
+ =?utf-8?B?aGFwOGtxNzcwRDNiQ21YVDEwaFlhNjZTb2RNMHlDcjg2Zk5GQzBQbFExZ0ZS?=
+ =?utf-8?B?Wk5PV1A1OUhzY08wMW9rekRJTERnZUczQjZ1eE5IZFNGQ3ZBamNPZnE4VjBl?=
+ =?utf-8?B?c09VRmhTSjlMTW5tRk83Y3pLdnpwbEJnSEtMT1lmd1NERGNkenA1WG9NZDY4?=
+ =?utf-8?B?MlFmZ1NtdDUyMjlHRDdiUnVkU3BaRzJPNnNOblFHWGJOSFpUajVFeG82V096?=
+ =?utf-8?B?b0dJS04xOTVqaXpZRFdwRm54QndFbmVYaU9MSU0wdlV5SDNDdGZZQWFPQ3pE?=
+ =?utf-8?B?RVBkVEtreldiMm9EcHc1V2NnelRUd09CTGVWZXhRWFV1NUl6eVRVRnBtbita?=
+ =?utf-8?B?bUVYK0FtdXBiOG5Od3NHMUo2bmdJV1JRc1hWY1JDU0JNa0RHUHdqNkloeFkz?=
+ =?utf-8?Q?Elo9vNcx44CJC0frchngwim49Ks3krsEsuRSUJL?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4da2ab46-9f30-4494-bc9d-08d8f091f284
+X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2718.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Mar 2021 20:01:30.6672
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: EafeBVuVi0gueSIxoxlGKK5tjQPYLeTZG6mMOatj/OUTJyDsYCUhuZy1TQjsoamumbamPnUgTUHk4u3gvvEJyA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN1PR12MB2416
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Mar 25, 2021 at 10:30:57PM +1300, Kai Huang wrote:
-> EREMOVE takes a page and removes any association between that page and
-> an enclave.  It must be run on a page before it can be added into
-> another enclave.  Currently, EREMOVE is run as part of pages being freed
-> into the SGX page allocator.  It is not expected to fail, as it would
-> indicate a use-after-free of EPC.  Rather than add the page back to the
-> pool of available EPC, the kernel intentionally leaks the page to avoid
-> additional errors in the future.
-> 
-> However, KVM does not track how guest pages are used, which means that
-> SGX virtualization use of EREMOVE might fail.  Specifically, it is
-> legitimate that EREMOVE returns SGX_CHILD_PRESENT for EPC assigned to
-> KVM guest, because KVM/kernel doesn't track SECS pages.
-> 
-> To allow SGX/KVM to introduce a more permissive EREMOVE helper and to
-> let the SGX virtualization code use the allocator directly, break out
-> the EREMOVE call from the SGX page allocator.  Rename the original
-> sgx_free_epc_page() to sgx_encl_free_epc_page(), indicating that it is
-> used to free EPC page assigned host enclave. Replace sgx_free_epc_page()
-> with sgx_encl_free_epc_page() in all call sites so there's no functional
-> change.
-> 
-> At the same time improve error message when EREMOVE fails, and add
-> documentation to explain to user what is the bug and suggest user what
-> to do when this bug happens, although extremely unlikely.
-> 
-> Signed-off-by: Kai Huang <kai.huang@intel.com>
-> ---
->  Documentation/x86/sgx.rst       | 27 +++++++++++++++++++++++++++
->  arch/x86/kernel/cpu/sgx/encl.c  | 32 +++++++++++++++++++++++++++-----
->  arch/x86/kernel/cpu/sgx/encl.h  |  1 +
->  arch/x86/kernel/cpu/sgx/ioctl.c |  6 +++---
->  arch/x86/kernel/cpu/sgx/main.c  | 14 +++++---------
->  arch/x86/kernel/cpu/sgx/sgx.h   |  5 +++++
->  6 files changed, 68 insertions(+), 17 deletions(-)
-> 
-> diff --git a/Documentation/x86/sgx.rst b/Documentation/x86/sgx.rst
-> index eaee1368b4fd..5ec7d17e65e0 100644
-> --- a/Documentation/x86/sgx.rst
-> +++ b/Documentation/x86/sgx.rst
-> @@ -209,3 +209,30 @@ An application may be loaded into a container enclave which is specially
->  configured with a library OS and run-time which permits the application to run.
->  The enclave run-time and library OS work together to execute the application
->  when a thread enters the enclave.
-> +
-> +Impact of Potential Kernel SGX Bugs
-> +===================================
-> +
-> +EPC leaks
-> +---------
-> +
-> +EPC leaks can happen if kernel SGX bug happens, when a WARNING with below
-> +message is shown in dmesg:
-> +
-> +"...EREMOVE returned ... and an EPC page was leaked.  SGX may become unusuable.
-> +This is likely a kernel bug.  Refer to Documentation/x86/sgx.rst for more
-> +information."
-> +
-> +This is effectively a kernel use-after-free of EPC, and due to the way SGX
-> +works, the bug is detected at freeing. Rather than add the page back to the pool
-> +of available EPC, the kernel intentionally leaks the page to avoid additional
-> +errors in the future.
-> +
-> +When this happens, kernel will likely soon leak majority of EPC pages, and SGX
-> +will likely become unusable. However while this may be fatal to SGX, other
-> +kernel functionalities are unlikely to be impacted, and should continue to work.
-> +
-> +As a result, when this happpens, user should stop running any new SGX workloads,
-> +(or just any new workloads), and migrate all valuable workloads. Although a
-> +machine reboot can recover all EPC, the bug should be reported to Linux
-> +developers.
-> diff --git a/arch/x86/kernel/cpu/sgx/encl.c b/arch/x86/kernel/cpu/sgx/encl.c
-> index 7449ef33f081..26c0987153de 100644
-> --- a/arch/x86/kernel/cpu/sgx/encl.c
-> +++ b/arch/x86/kernel/cpu/sgx/encl.c
-> @@ -78,7 +78,7 @@ static struct sgx_epc_page *sgx_encl_eldu(struct sgx_encl_page *encl_page,
->  
->  	ret = __sgx_encl_eldu(encl_page, epc_page, secs_page);
->  	if (ret) {
-> -		sgx_free_epc_page(epc_page);
-> +		sgx_encl_free_epc_page(epc_page);
->  		return ERR_PTR(ret);
->  	}
->  
-> @@ -404,7 +404,7 @@ void sgx_encl_release(struct kref *ref)
->  			if (sgx_unmark_page_reclaimable(entry->epc_page))
->  				continue;
->  
-> -			sgx_free_epc_page(entry->epc_page);
-> +			sgx_encl_free_epc_page(entry->epc_page);
->  			encl->secs_child_cnt--;
->  			entry->epc_page = NULL;
->  		}
-> @@ -415,7 +415,7 @@ void sgx_encl_release(struct kref *ref)
->  	xa_destroy(&encl->page_array);
->  
->  	if (!encl->secs_child_cnt && encl->secs.epc_page) {
-> -		sgx_free_epc_page(encl->secs.epc_page);
-> +		sgx_encl_free_epc_page(encl->secs.epc_page);
->  		encl->secs.epc_page = NULL;
->  	}
->  
-> @@ -423,7 +423,7 @@ void sgx_encl_release(struct kref *ref)
->  		va_page = list_first_entry(&encl->va_pages, struct sgx_va_page,
->  					   list);
->  		list_del(&va_page->list);
-> -		sgx_free_epc_page(va_page->epc_page);
-> +		sgx_encl_free_epc_page(va_page->epc_page);
->  		kfree(va_page);
->  	}
->  
-> @@ -686,7 +686,7 @@ struct sgx_epc_page *sgx_alloc_va_page(void)
->  	ret = __epa(sgx_get_epc_virt_addr(epc_page));
->  	if (ret) {
->  		WARN_ONCE(1, "EPA returned %d (0x%x)", ret, ret);
-> -		sgx_free_epc_page(epc_page);
-> +		sgx_encl_free_epc_page(epc_page);
->  		return ERR_PTR(-EFAULT);
->  	}
->  
-> @@ -735,3 +735,25 @@ bool sgx_va_page_full(struct sgx_va_page *va_page)
->  
->  	return slot == SGX_VA_SLOT_COUNT;
->  }
-> +
-> +/**
-> + * sgx_encl_free_epc_page - free EPC page assigned to an enclave
-> + * @page:	EPC page to be freed
-> + *
-> + * Free EPC page assigned to an enclave.  It does EREMOVE for the page, and
-> + * only upon success, it puts the page back to free page list.  Otherwise, it
-> + * gives a WARNING to indicate page is leaked, and require reboot to retrieve
-> + * leaked pages.
-> + */
-> +void sgx_encl_free_epc_page(struct sgx_epc_page *page)
-> +{
-> +	int ret;
-> +
-> +	WARN_ON_ONCE(page->flags & SGX_EPC_PAGE_RECLAIMER_TRACKED);
-> +
-> +	ret = __eremove(sgx_get_epc_virt_addr(page));
-> +	if (WARN_ONCE(ret, EREMOVE_ERROR_MESSAGE, ret, ret))
-> +		return;
-> +
-> +	sgx_free_epc_page(page);
-> +}
-> diff --git a/arch/x86/kernel/cpu/sgx/encl.h b/arch/x86/kernel/cpu/sgx/encl.h
-> index d8d30ccbef4c..6e74f85b6264 100644
-> --- a/arch/x86/kernel/cpu/sgx/encl.h
-> +++ b/arch/x86/kernel/cpu/sgx/encl.h
-> @@ -115,5 +115,6 @@ struct sgx_epc_page *sgx_alloc_va_page(void);
->  unsigned int sgx_alloc_va_slot(struct sgx_va_page *va_page);
->  void sgx_free_va_slot(struct sgx_va_page *va_page, unsigned int offset);
->  bool sgx_va_page_full(struct sgx_va_page *va_page);
-> +void sgx_encl_free_epc_page(struct sgx_epc_page *page);
->  
->  #endif /* _X86_ENCL_H */
-> diff --git a/arch/x86/kernel/cpu/sgx/ioctl.c b/arch/x86/kernel/cpu/sgx/ioctl.c
-> index 90a5caf76939..772b9c648cf1 100644
-> --- a/arch/x86/kernel/cpu/sgx/ioctl.c
-> +++ b/arch/x86/kernel/cpu/sgx/ioctl.c
-> @@ -47,7 +47,7 @@ static void sgx_encl_shrink(struct sgx_encl *encl, struct sgx_va_page *va_page)
->  	encl->page_cnt--;
->  
->  	if (va_page) {
-> -		sgx_free_epc_page(va_page->epc_page);
-> +		sgx_encl_free_epc_page(va_page->epc_page);
->  		list_del(&va_page->list);
->  		kfree(va_page);
->  	}
-> @@ -117,7 +117,7 @@ static int sgx_encl_create(struct sgx_encl *encl, struct sgx_secs *secs)
->  	return 0;
->  
->  err_out:
-> -	sgx_free_epc_page(encl->secs.epc_page);
-> +	sgx_encl_free_epc_page(encl->secs.epc_page);
->  	encl->secs.epc_page = NULL;
->  
->  err_out_backing:
-> @@ -365,7 +365,7 @@ static int sgx_encl_add_page(struct sgx_encl *encl, unsigned long src,
->  	mmap_read_unlock(current->mm);
->  
->  err_out_free:
-> -	sgx_free_epc_page(epc_page);
-> +	sgx_encl_free_epc_page(epc_page);
->  	kfree(encl_page);
->  
->  	return ret;
-> diff --git a/arch/x86/kernel/cpu/sgx/main.c b/arch/x86/kernel/cpu/sgx/main.c
-> index 13a7599ce7d4..b227629b1e9c 100644
-> --- a/arch/x86/kernel/cpu/sgx/main.c
-> +++ b/arch/x86/kernel/cpu/sgx/main.c
-> @@ -294,7 +294,7 @@ static void sgx_reclaimer_write(struct sgx_epc_page *epc_page,
->  
->  		sgx_encl_ewb(encl->secs.epc_page, &secs_backing);
->  
-> -		sgx_free_epc_page(encl->secs.epc_page);
-> +		sgx_encl_free_epc_page(encl->secs.epc_page);
->  		encl->secs.epc_page = NULL;
->  
->  		sgx_encl_put_backing(&secs_backing, true);
-> @@ -609,19 +609,15 @@ struct sgx_epc_page *sgx_alloc_epc_page(void *owner, bool reclaim)
->   * sgx_free_epc_page() - Free an EPC page
->   * @page:	an EPC page
->   *
-> - * Call EREMOVE for an EPC page and insert it back to the list of free pages.
-> + * Put the EPC page back to the list of free pages. It's the caller's
-> + * responsibility to make sure that the page is in uninitialized state. In other
-> + * words, do EREMOVE, EWB or whatever operation is necessary before calling
-> + * this function.
->   */
->  void sgx_free_epc_page(struct sgx_epc_page *page)
->  {
->  	struct sgx_epc_section *section = &sgx_epc_sections[page->section];
->  	struct sgx_numa_node *node = section->node;
-> -	int ret;
-> -
-> -	WARN_ON_ONCE(page->flags & SGX_EPC_PAGE_RECLAIMER_TRACKED);
-> -
-> -	ret = __eremove(sgx_get_epc_virt_addr(page));
-> -	if (WARN_ONCE(ret, "EREMOVE returned %d (0x%x)", ret, ret))
-> -		return;
->  
->  	spin_lock(&node->lock);
->  
-> diff --git a/arch/x86/kernel/cpu/sgx/sgx.h b/arch/x86/kernel/cpu/sgx/sgx.h
-> index 653af8ca1a25..6b21a165500e 100644
-> --- a/arch/x86/kernel/cpu/sgx/sgx.h
-> +++ b/arch/x86/kernel/cpu/sgx/sgx.h
-> @@ -13,6 +13,11 @@
->  #undef pr_fmt
->  #define pr_fmt(fmt) "sgx: " fmt
->  
-> +/* Error message for EREMOVE failure, when kernel is about to leak EPC page */
-> +#define EREMOVE_ERROR_MESSAGE \
-> +	"EREMOVE returned %d (0x%x) and an EPC page was leaked.  SGX may become unusuable.  " \
-> +	"This is likely a kernel bug.  Refer to Documentation/x86/sgx.rst for more information."
+
+On 3/26/21 2:22 PM, Borislav Petkov wrote:
+> On Fri, Mar 26, 2021 at 10:42:56AM -0500, Brijesh Singh wrote:
+>> There is no strong reason for a separate sev-snp.h. I will add a
+>> pre-patch to rename sev-es.h to sev.h and add SNP stuff to it.
+> Thx.
+>
+>> I was trying to adhere to existing functions which uses a direct
+>> instruction opcode.
+> That's not really always the case:
+>
+> arch/x86/include/asm/special_insns.h
+>
+> The "__" prefixed things should mean lower abstraction level helpers and
+> we drop the ball on those sometimes.
+>
+>> It's not duplicate error code. The EAX returns an actual error code. The
+>> rFlags contains additional information. We want both the codes available
+>> to the caller so that it can make a proper decision.
+>>
+>> e.g.
+>>
+>> 1. A callers validate an address 0x1000. The instruction validated it
+>> and return success.
+> Your function returns PVALIDATE_SUCCESS.
+>
+>> 2. Caller asked to validate the same address again. The instruction will
+>> return success but since the address was validated before hence
+>> rFlags.CF will be set to indicate that PVALIDATE instruction did not
+>> made any change in the RMP table.
+> Your function returns PVALIDATE_VALIDATED_ALREADY or so.
+>
+>> You are correct that currently I am using only carry flag. So far we
+>> don't need other flags. What do you think about something like this:
+>>
+>> * Add a new user defined error code
+>>
+>>  #define PVALIDATE_FAIL_NOUPDATE        255 /* The error is returned if
+>> rFlags.CF set */
+> Or that.
+>
+>> * Remove the rFlags parameters from the __pvalidate()
+> Yes, it seems unnecessary at the moment. And I/O function arguments are
+> always yuck.
+>
+>> * Update the __pvalidate to check the rFlags.CF and if set then return
+>> the new user-defined error code.
+> Yap, you can convert all that to pvalidate() return values, methinks,
+> and then make that function simpler for callers because they should
+> not have to deal with rFLAGS - only return values to denote what the
+> function did.
 
 
-Why this needs to be here and not open coded where it is used?
+Ack. I will made the required changes in next version.
 
-> +
->  #define SGX_MAX_EPC_SECTIONS		8
->  #define SGX_EEXTEND_BLOCK_SIZE		256
->  #define SGX_NR_TO_SCAN			16
-> -- 
-> 2.30.2
-> 
-> 
-
-/Jarkko
+>
+> Thx.
+>
