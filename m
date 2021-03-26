@@ -2,92 +2,91 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D3C9C34A04E
-	for <lists+kvm@lfdr.de>; Fri, 26 Mar 2021 04:37:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0A08834A062
+	for <lists+kvm@lfdr.de>; Fri, 26 Mar 2021 04:54:11 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230478AbhCZDg1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 25 Mar 2021 23:36:27 -0400
-Received: from mga11.intel.com ([192.55.52.93]:57166 "EHLO mga11.intel.com"
+        id S230317AbhCZDxj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 25 Mar 2021 23:53:39 -0400
+Received: from mga06.intel.com ([134.134.136.31]:27789 "EHLO mga06.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230434AbhCZDgQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 25 Mar 2021 23:36:16 -0400
-IronPort-SDR: tSjRMcMZv2hnqYBfB3uC/u9k0IYVcIwPru1W/X7RYf0KdcU/5ng0iiocONsy9gLBhEDxVcEgw9
- Fa7R/pE+F/HA==
-X-IronPort-AV: E=McAfee;i="6000,8403,9934"; a="187775101"
+        id S230345AbhCZDxb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 25 Mar 2021 23:53:31 -0400
+IronPort-SDR: MJQoJmeeyeiD10Bn0qLTIOC7yrk3KmYMcFUdIIDqMDx27OG9eK2/b0eKE3U0NdIz7wOW9sWTkj
+ LpT54JPnILmg==
+X-IronPort-AV: E=McAfee;i="6000,8403,9934"; a="252426014"
 X-IronPort-AV: E=Sophos;i="5.81,279,1610438400"; 
-   d="scan'208";a="187775101"
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Mar 2021 20:36:15 -0700
-IronPort-SDR: RL4luNzm2zuhV0TyScQPEtBFvMDwuZuyJVcYEms/9+WkDI4zIDwxEa28Yjys6kv5yjHUVtyPGn
- DvEd9Mr6MXpQ==
+   d="scan'208";a="252426014"
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Mar 2021 20:53:29 -0700
+IronPort-SDR: dQh2rP15n9uarG+qM8UDUSRD/TTmBofm3AaWgJbYqF5ZN31mxa4dBXE56hxVngxEHuTpR7JoL+
+ Cw0kOQTFhOnw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.81,279,1610438400"; 
-   d="scan'208";a="377102315"
-Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
-  by orsmga006.jf.intel.com with ESMTP; 25 Mar 2021 20:36:15 -0700
-Received: from fmsmsx609.amr.corp.intel.com (10.18.126.89) by
- fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+   d="scan'208";a="375334022"
+Received: from fmsmsx604.amr.corp.intel.com ([10.18.126.84])
+  by orsmga003.jf.intel.com with ESMTP; 25 Mar 2021 20:53:15 -0700
+Received: from fmsmsx612.amr.corp.intel.com (10.18.126.92) by
+ fmsmsx604.amr.corp.intel.com (10.18.126.84) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2106.2; Thu, 25 Mar 2021 20:36:14 -0700
-Received: from fmsmsx609.amr.corp.intel.com (10.18.126.89) by
- fmsmsx609.amr.corp.intel.com (10.18.126.89) with Microsoft SMTP Server
+ 15.1.2106.2; Thu, 25 Mar 2021 20:53:14 -0700
+Received: from fmsmsx604.amr.corp.intel.com (10.18.126.84) by
+ fmsmsx612.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2106.2; Thu, 25 Mar 2021 20:36:14 -0700
-Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
- fmsmsx609.amr.corp.intel.com (10.18.126.89) with Microsoft SMTP Server
+ 15.1.2106.2; Thu, 25 Mar 2021 20:53:13 -0700
+Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
+ fmsmsx604.amr.corp.intel.com (10.18.126.84) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2106.2
- via Frontend Transport; Thu, 25 Mar 2021 20:36:14 -0700
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (104.47.70.107)
- by edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
+ via Frontend Transport; Thu, 25 Mar 2021 20:53:13 -0700
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (104.47.56.173)
+ by edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2106.2; Thu, 25 Mar 2021 20:36:14 -0700
+ 15.1.2106.2; Thu, 25 Mar 2021 20:53:13 -0700
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=R97SnI0M7ts8ER0thXc6eTH06ZmwabtMef3P9n04yIyex32U2W3KyZcgfV4rUskY5iZJ4BeMoF1lbDFSmu5GHm6S2tqMq5bdTcQZ4aZkRw4yg2ubv0w5lkZgz4UUTlUT0DE5+zX5r0yGvxXwlqT7oN0NSBCXKwnTVjHF/to9y9VAYDXwkcLCOjQYuWZzrkCP0IpInTiW4/IjupIltvgTje1mcjr7hz3/dWfTNaCE4j9vZ8wo8cxHh4YY56Wa3fIYTg/SMpsZtGxVkaZiPrhmgQp8T7gf5lr9hKED3SXPohJCRxoihxmYBbw2JRU3hbPZ9WVJJOcG5OYXhPaFDQx5ng==
+ b=VArC/sQ+fvRkpXAQJ8ORWMugGHH3aRIrpVCi/TaAy2Y7sqkLo/Kx/IcOfz7jqraZ8sVpez7HWpl6RPSB3wBzc32GgXlTo/hC5Nhxawrbh1nj8ciptzPsR1qfjw/WKAz+TLgJe3Uecp3WjsF9PQcj0lL7+Ru1eqRauhTmDPRUIuZ9F4GCxXZH1VdtTwHY42x6mBvTMk4ZKD3fvgwAnafE/5lAx3IDZ7Xx8s08OSyyo7m4cvVz0ZpWb8m5TAEYqDMSMC/JQwqffxkg3Rxnj459Rp8n8qL7vc/VAmV0EqxN+lXxEaK/lLlGKoo0nn1x/yJaj5y2mcxosEerqMcpP9JE5g==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=aePzA7zgvrOMtADitgHWm5JYSF9mLIpoIrTgF4vKbRg=;
- b=MpNGkfaJSuCI9U1q0eGhjsh1iRmwtPbAxtJHvfvViCAel3YARJGXz3brji92gH8Cstl3u1tdWr/VlIAkjA3rhQaP8KgfiJwchoKymNWgUD8PmvgfTE6IJ0ycvikX3FWFVvlkerej+Grw/egOkkdZrmX1jpByvpPG9+isZ+D7heAbHuLasRKls8C3QjTCLyEaU9sOKFZ6mZbStOY/RJAxoPdArG5bkmQJ3CZx2abGC9hVcHd3lDE5kQiTsYt3c31THHp28tYTZIqkfWn9EkUi8jkC0o98wn+zz4BAE/vpoL/ZO+gAzwNkX1CHo/G5+BTDMtMXrK3O1aqphR9mlE33uw==
+ bh=+QIF0rToPwnXjJGFF9GJFMN2mrYm+YPpwEXfT3sBNFU=;
+ b=g63Oc0sgzvblgqxdQXIdEzJvNl/cIO42UdZcb2XTPhyd86gbfrTo+SWVhbBsKaqKSPZaPh6IIIgClhs6GGKV+Mwitc/RjuNKBOFvs1wNutjIQyMhhWQ3efL3GDrCh7bGQ4sHn1bBCx5TEAo9z76+8tcvCpqyHrX0Q4mqndsscJqZNjmoFwuH70prP1aEb1CAPmDV9EGArbfQ89qftICdl69ulL+2PeUkYPys3EEMsfWu/jCAGXf8h5mXVD4lzWPOLHcPVPpUCdn83k9ZFsbQ2iEg4CV6DvoYW0x+d1DEf5owm7FqXlLoks1pCRHzdAs68Ja7ZffvsV0f/4PwwIseFQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
  dkim=pass header.d=intel.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=intel.onmicrosoft.com;
  s=selector2-intel-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=aePzA7zgvrOMtADitgHWm5JYSF9mLIpoIrTgF4vKbRg=;
- b=lfW/UXubSEBw6wbPDGAaf64t8kaUOQoCybO1UD3WDrTuIWONPfOvLZEqPCkINu+ObWgsoiV7qcV1kwAOyfGiAAbccvMidtcguneBfCb31vxccpBExzWcUY7qmBQxRxujVU88osAbqbWviHh2afT1ukj7JtRso9dEmFuHZB5t+uM=
+ bh=+QIF0rToPwnXjJGFF9GJFMN2mrYm+YPpwEXfT3sBNFU=;
+ b=ZIRCfEwIySXMLmbZkVVddLbjdt9xfTiqxUNOydyYIeK361UM+w+SPmUijVQ/eRQlSKP9CNnYVYaakVLHcIOoTb0ewgYy4KF2axupnkNwY7IhnwBsTLqVZlV49GAOB9chl5bbZ+eoxNYxFtwpKb9EEzqvI6YGwyXNVEorCDsvdII=
 Received: from MWHPR11MB1886.namprd11.prod.outlook.com (2603:10b6:300:110::9)
- by MWHPR11MB1518.namprd11.prod.outlook.com (2603:10b6:301:c::10) with
+ by MWHPR11MB0078.namprd11.prod.outlook.com (2603:10b6:301:67::38) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3977.26; Fri, 26 Mar
- 2021 03:36:12 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3955.24; Fri, 26 Mar
+ 2021 03:53:10 +0000
 Received: from MWHPR11MB1886.namprd11.prod.outlook.com
  ([fe80::75b0:a8e9:60cb:7a29]) by MWHPR11MB1886.namprd11.prod.outlook.com
  ([fe80::75b0:a8e9:60cb:7a29%9]) with mapi id 15.20.3977.026; Fri, 26 Mar 2021
- 03:36:12 +0000
+ 03:53:10 +0000
 From:   "Tian, Kevin" <kevin.tian@intel.com>
-To:     "Tian, Kevin" <kevin.tian@intel.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Jason Gunthorpe <jgg@nvidia.com>
-CC:     Alex Williamson <alex.williamson@redhat.com>,
+To:     Jason Gunthorpe <jgg@nvidia.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
         Cornelia Huck <cohuck@redhat.com>,
         "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "Kirti Wankhede" <kwankhede@nvidia.com>,
-        "Raj, Ashok" <ashok.raj@intel.com>,
+        Kirti Wankhede <kwankhede@nvidia.com>
+CC:     "Raj, Ashok" <ashok.raj@intel.com>,
         "Williams, Dan J" <dan.j.williams@intel.com>,
+        Christoph Hellwig <hch@lst.de>,
         Leon Romanovsky <leonro@nvidia.com>,
         Max Gurtovoy <mgurtovoy@nvidia.com>,
         Tarun Gupta <targupta@nvidia.com>
-Subject: RE: [PATCH 08/18] vfio/mdev: Reorganize mdev_device_create()
-Thread-Topic: [PATCH 08/18] vfio/mdev: Reorganize mdev_device_create()
-Thread-Index: AQHXIA3q9lE4ogaG6kK1jMCZehbxM6qR8xwAgAOt21CAAAEVQA==
-Date:   Fri, 26 Mar 2021 03:36:12 +0000
-Message-ID: <MWHPR11MB1886CC39AD587271CFA0D9448C619@MWHPR11MB1886.namprd11.prod.outlook.com>
+Subject: RE: [PATCH 10/18] vfio/mdev: Remove duplicate storage of parent in
+ mdev_device
+Thread-Topic: [PATCH 10/18] vfio/mdev: Remove duplicate storage of parent in
+ mdev_device
+Thread-Index: AQHXIA314QKI26uvGE6aXFr+EROjYaqVpK7w
+Date:   Fri, 26 Mar 2021 03:53:10 +0000
+Message-ID: <MWHPR11MB18864F0836984277A52BB4CB8C619@MWHPR11MB1886.namprd11.prod.outlook.com>
 References: <0-v1-7dedf20b2b75+4f785-vfio2_jgg@nvidia.com>
- <8-v1-7dedf20b2b75+4f785-vfio2_jgg@nvidia.com>
- <20210323192040.GF17735@lst.de>
- <MWHPR11MB1886DED32FA634ACF81BD0B78C619@MWHPR11MB1886.namprd11.prod.outlook.com>
-In-Reply-To: <MWHPR11MB1886DED32FA634ACF81BD0B78C619@MWHPR11MB1886.namprd11.prod.outlook.com>
+ <10-v1-7dedf20b2b75+4f785-vfio2_jgg@nvidia.com>
+In-Reply-To: <10-v1-7dedf20b2b75+4f785-vfio2_jgg@nvidia.com>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach: 
@@ -95,81 +94,243 @@ X-MS-TNEF-Correlator:
 dlp-version: 11.5.1.3
 dlp-product: dlpe-windows
 dlp-reaction: no-action
-authentication-results: intel.com; dkim=none (message not signed)
- header.d=none;intel.com; dmarc=none action=none header.from=intel.com;
+authentication-results: nvidia.com; dkim=none (message not signed)
+ header.d=none;nvidia.com; dmarc=none action=none header.from=intel.com;
 x-originating-ip: [192.198.147.220]
 x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: c0cafe7b-5643-461b-1e29-08d8f0084d78
-x-ms-traffictypediagnostic: MWHPR11MB1518:
+x-ms-office365-filtering-correlation-id: 5c72b7f8-97d4-48f8-503b-08d8f00aac6b
+x-ms-traffictypediagnostic: MWHPR11MB0078:
 x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr,ExtFwd
 x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <MWHPR11MB15180134B1B84260E2755AF88C619@MWHPR11MB1518.namprd11.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:1388;
+x-microsoft-antispam-prvs: <MWHPR11MB0078490BCE99C52A6A45DB2C8C619@MWHPR11MB0078.namprd11.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:3276;
 x-ms-exchange-senderadcheck: 1
 x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: mLsBqAcn4Jrym70i9rcSOhvd3dKUem+d9w6nrXnmJYwSgYcyt1BHxa7MVWmh+jqbUF87QQXDdKRfEtbn37cj0Lk7AvCDumgDHcyyablNcd6qOUPvjT/N0ctYUqY3rSaHzEcImyx4IHnw0eZn2XFdm7o0zRDSdd5En506b0lADyOsQDH+OpXJMl+4J6Srw3mQ9iGb3TPDuiCkIKON5Ln+Y4GAkAIcKnPW+3YFbb+iccaPCPHoI55GmnzP8Ol0beujxrYsOTliN0CHjMpk6jZqyOP/V2Cxp3X5tcjCSO8gZxi1diszaDDeuPqdtSLHqMW97TR7Hu+Yzl82EycXMVWid0nPHP2n6YAcAgml9pFgJ04tROWH3zXoFoCnUGxVL7Tq9sQNu0WmrfGM55cEf5+cwI8Ph7nxBibjVVZlE0HxAkTf05E3qRcNiFilkMLo+qGW/imM9NwdCh3M1jqK2J6NfmaaSWu4aVpqa7n/9c3sCnyuFfacGCJAUI3C4LnDmouB5/4YHHVV1z0rqQU0UP0PM28NzTyRAtuAL67uUGnHJJdLEVJDLm84IpcemR10TdAaAXikJol10ul0rIV4MQ+RYMwdoxvDksayRWLv9VoMLme/UtTvYqd8XemUnehfs7ZE9cWrJ1YMIxkPpi/LtvYwkzgHdnpJ9D/3ZAJnE3DsjGA=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MWHPR11MB1886.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(366004)(346002)(136003)(396003)(39860400002)(376002)(478600001)(66476007)(9686003)(66446008)(7696005)(64756008)(66556008)(76116006)(2940100002)(55016002)(83380400001)(7416002)(66946007)(54906003)(4326008)(86362001)(316002)(110136005)(33656002)(8936002)(71200400001)(8676002)(4744005)(26005)(6506007)(2906002)(186003)(38100700001)(52536014)(5660300002);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata: =?us-ascii?Q?zfQqOpC4Gpvcrl75xUluP8aIYJD1TpKEQ2sjqm+b2riGwwjtJ16XVpuiDyUY?=
- =?us-ascii?Q?z4Q3y7lmc5V7vH7a0hXT6+cPVoXwF/h2cEvDJqsa1u7/ohbIAAEe5PXEo/O2?=
- =?us-ascii?Q?Hup0hs4KFbTdHpnSpqoCYo5I/J9OSSFzs+rj3rwa2duBsOs0w0CkWRlVqSlC?=
- =?us-ascii?Q?Y3RMVCXfqLkDNdax18LEzIl0l3EwE/DubQ4s4l1kJrg1PulY+aXA2CNpZzpL?=
- =?us-ascii?Q?/pRLOVdAQuoRoWHY+Gt2czyAjyhSeYaN9Eq05DvA5Wp89ljUAmhsvRV8+mnH?=
- =?us-ascii?Q?YitaSqeJV53DERzOYuV81ml0JM6ISUFnopFhsqqitiwbNQDGEm3gx5vhJEYr?=
- =?us-ascii?Q?n/yHQecnbd0+747cKwo+ahOWceWPor7lVU1wha5zi7keIxaI/swBnvrnCbsh?=
- =?us-ascii?Q?nm9EDYp0Inm8EFneSygy56qAVZlurIBQJq5DzmaHMLKL2MZXP7gvkFYkqtv6?=
- =?us-ascii?Q?Vl1S0Ns0UBEACaxGTk4xfUdnEziQAsfVcSgJRx+M0n4aYSwG8m82gIeRwaPf?=
- =?us-ascii?Q?W1PB/hUGoFqMF9sIpTpE60/EzyqM/QVLZY6yp64pFxCdgibPso+VKCtPq0R2?=
- =?us-ascii?Q?wEE3AiCCweu2Xaj0FJ9mTmfF67/An3vqHTlvkJIAxhV7cqxfpWQR3UMMfxzZ?=
- =?us-ascii?Q?LNClmvqILfAR/n7ZLpykIvBH8uqshJnza2pPcQtRDqo6wm426ETjAnFCVAg+?=
- =?us-ascii?Q?VGEG6SSANxQ/yb5Dgzamnn2SbW4YsuFhAKAK4IlOZwEn0wLhkZlFp7vo8VMg?=
- =?us-ascii?Q?vJPhHbf66jMC9pVRD2QG5w+/MyheUNz5DsZ9Y0RwYyqS/mcH2R1xtcFA/dED?=
- =?us-ascii?Q?4EvnXlvbmdWe1ug3MJpDaXHQTQ8AS9BPFogEPxbKAOWkN3OTxbPxiQTNn9K3?=
- =?us-ascii?Q?GzFgk/6Zamrtx/YK67l/3ueEuJu8ncnrTsqFXrNjiSTVwuvYZpXtU8mDEzA6?=
- =?us-ascii?Q?njf+iuFdQtpGyQC2CU1UdrvMicMoJbXOE1pc6VcnprOVLlE687/Kh9D67uGX?=
- =?us-ascii?Q?Gw/ujELuyrExf1XLo71Y4ppjtjoVlQ7FSJdqhOBd9nMPpDjY0yPw8ak2ryDd?=
- =?us-ascii?Q?JDZqtcrkqXpn4I5/B7o5gZ54Nrzrb1TmL7Bf3bxF1ohAkNG9rqtsAl4jxlmi?=
- =?us-ascii?Q?zrZCX3gyxybtPSaSqfqbPxyvvNECupc98Qo+Cm7rmOWmrKiqaSoq+5+12xUe?=
- =?us-ascii?Q?CNqF8YhCkS1BA8IGPvQnWOvOv/Q4T43BtygOlVBPN2n22wNphmydA4vI7nqA?=
- =?us-ascii?Q?slQQaW5kpreVdVmgkdtseyK2u4heZOQzO8btBfXpXcGd0aewHEz53WcQqSpT?=
- =?us-ascii?Q?44qy/DdNd/R2KEoLjWi5vGHt?=
+x-microsoft-antispam-message-info: nBDLM1YkbqE0+GQcEKgeaTe6gJVkQw26smoXkrLGXO9X+MHOxAeqhubSwFJFyw3AWXwzdfPXaQ5TZk5a7WSXEENeooWcwyu6JktTcT1AF5NrvAbYSwDq5zGM1O6nPgkh4EnzX7VFYBHLumIiO27601fRQRTS9u69D0Dr7/XIkiUg78d5MZeDkHEfdakCtQFnfnjofCFaKOqGMH4OPIEMIGYBL7Az0Rm30GOd5Z3OkP9Jn8itbFkz6DmIw3tx7p38NrBVxXTi3MX81LZT9NTb/4der7VHL14xMNBQEHvUpde1Cqu2GWx8lb8soIYvs0p2W/MPD4nIe7l6Ou7eKBnXtvBWDyfK6In8WZZ/mkdLP6oCwGfraCSXjlRF3K3jWleanhGf+RMiF+buBpvctzEGR6NNKyy6j96zz3nTktQuQ2xfhJtXZS8d+qNczeoMndgo92ZVE9FXgI3V12mE2TsCw2r8Hz3KJW4YN4hddq49UWKRWMVl3W2vtNX7kjsHK51nTk95/CMG8xG8VtE8DNtJZG+EK1753YIKBHlDw2bbgqGkI7kpKfjWCITLVhAly7c8YtHx9/Hkq5YAxiC1rl+MES488wV58S4xfZ9dEVgXJW24g52n1lHMzq4EwtAOzM3VDvLECc6hI+DACkMf/OnN0193fJAuIPWdwxbkMeTuz+w=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MWHPR11MB1886.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(346002)(136003)(396003)(366004)(39860400002)(376002)(76116006)(6506007)(7696005)(33656002)(26005)(83380400001)(38100700001)(86362001)(478600001)(5660300002)(55016002)(66556008)(71200400001)(64756008)(66446008)(66476007)(52536014)(186003)(66946007)(54906003)(8936002)(2906002)(8676002)(4326008)(9686003)(7416002)(110136005)(316002);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata: =?us-ascii?Q?fLkgkDlTsQ+8MnTX/rKl39ob0wn0nOIbA+Xfg2ucO44dRyk+TMOWTIkPjksn?=
+ =?us-ascii?Q?Xzg00zwdyizFRFGPH/TB44qNipuWWvaCd7OFxfoRvaE6xJ3ViTrjBlkPmZ0o?=
+ =?us-ascii?Q?t3ymOBchI96zkFsrPVEfV35lcR25UqTmsA5rveWkgj/RL2DyhOnrC+L/yQxS?=
+ =?us-ascii?Q?8yN+TJCS21g9RF3SDRkVJGaDhkrV6gcl/lixXVBp3ccDiLQ+LVbVRjzU3WY3?=
+ =?us-ascii?Q?b9pXzrdm8EEldNBVrqnVSv5F0fViJzS16Kf2tl8jlVL+Jp/biOG7Z24Eepfp?=
+ =?us-ascii?Q?lre+gxYrhS1SEWCU7QH1+vBlrfjJpZX4UAel3DCjd9yqCxMvyQHtYjMbKcFC?=
+ =?us-ascii?Q?IjK9/y+cX3bSksQbb6om0XKRJ9B+coMlg2r8K9Ila6hn3mJaxyA9Yas54HrW?=
+ =?us-ascii?Q?TmtDMnZ3J2uWGTInAesibRw8UdkUKC1t0BAjQ03udBrMgR4w9jYlReIHH/Ll?=
+ =?us-ascii?Q?8CQbNC1g7IEvR6+jPPwOTgSTNEZDtnhSzsoHhiR4ehseumLSXyhzBugCY6sq?=
+ =?us-ascii?Q?wzJxdwKzodKvb26whcboV+yMixrDa4/VesRdQDAK3qkjj3vbD9G80rx5QNGL?=
+ =?us-ascii?Q?6Wl7+77ulIuTc/7xHUVo5JsIZotwxHwpFHCvySHVC7U+9StZxI5wfqfWUJq3?=
+ =?us-ascii?Q?tExpfxfYjA7PWKpgSpFJFN8+02JMEvZRhKziMjXKaoUEQRWQQ2m0esU+N2EI?=
+ =?us-ascii?Q?uch+8T2MRKMPW/mkYiuAeJczVfFZM1BmBekeAJJAuBzBO8Y5U6PJO7tW+LzD?=
+ =?us-ascii?Q?RVrnI3ZLNlPXhztCxpWIIKHYtLE/JoLK8yCRzmY7VhYIgl6u2uwjLXYQyDIA?=
+ =?us-ascii?Q?gxPbGNqSaa7kQVeYOZmnsu60YjL0gFvL9y7P6cw0fRmMriSAc9wRNnVFzmK5?=
+ =?us-ascii?Q?DxB63PCjUm39L5UpBewb5VshZyO//64M+58X0A5KkmNBkGAQIMbyZeWBXsbY?=
+ =?us-ascii?Q?+3uQ3POlHlIbHOpjGDv6x00ZM2pC+Bznr3XDPQkWdegUF0XQzJbnS1AquuhG?=
+ =?us-ascii?Q?d8X/1wjmo6mRDLT6jWMM1FlrncHlPy1dSuUT4Pkuek3vtu3aw+2xkm8kQJMY?=
+ =?us-ascii?Q?u62Y1U5j1k5XgihafNgyoDLFwwH5ocI5nIXM3KLRmov9VtK8WOqaIvNyUkO/?=
+ =?us-ascii?Q?GB4kxKICLlmXEZuxMjd9DOu7IzmFrKw1vpEbiS+Ewzx9/EJoyxt6epojEQTS?=
+ =?us-ascii?Q?GJ+7AenAEyozHpHkTe3wV3LHldrUzbKtIkhspM/0tBM7Ol/pWgYriESo49nZ?=
+ =?us-ascii?Q?qeyTq1CTqaT1D7GxJzjVtmXEeC7txOXMrpA+Qs4u0Zktxo0EVCjgZpdNZ57L?=
+ =?us-ascii?Q?mTkIBCTTzx1/f2S/4cibm0MD?=
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
 X-MS-Exchange-CrossTenant-AuthAs: Internal
 X-MS-Exchange-CrossTenant-AuthSource: MWHPR11MB1886.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c0cafe7b-5643-461b-1e29-08d8f0084d78
-X-MS-Exchange-CrossTenant-originalarrivaltime: 26 Mar 2021 03:36:12.1588
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5c72b7f8-97d4-48f8-503b-08d8f00aac6b
+X-MS-Exchange-CrossTenant-originalarrivaltime: 26 Mar 2021 03:53:10.4609
  (UTC)
 X-MS-Exchange-CrossTenant-fromentityheader: Hosted
 X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
 X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: pjoPl4QWjG9ltFDm9Zi1Xy5pltPfFgLuhno9eu7jnulImIUIrs07QTpxpoYAQ+1IjD+QM8EyrK/Inp400V7QXQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MWHPR11MB1518
+X-MS-Exchange-CrossTenant-userprincipalname: UnDd2M7n4yKkxxqcSXUWNW5zjXWkfK6MwtRGUJEEl5W0c7JgabBn36IMuFeyfB+PUXH1V6q0We4PsOfteprmFQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MWHPR11MB0078
 X-OriginatorOrg: intel.com
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> From: Tian, Kevin <kevin.tian@intel.com>
-> Sent: Friday, March 26, 2021 11:34 AM
+> From: Jason Gunthorpe <jgg@nvidia.com>
+> Sent: Wednesday, March 24, 2021 1:55 AM
 >=20
-> > From: Christoph Hellwig <hch@lst.de>
-> > Sent: Wednesday, March 24, 2021 3:21 AM
-> >
-> > >  	up_read(&parent->unreg_sem);
-> > > -	put_device(&mdev->dev);
-> > >  mdev_fail:
-> > >
-> > >
-> > >
-> > > -	mdev_put_parent(parent);
-> > > +	put_device(&mdev->dev);
-> >
-> > That mdev_fail label is not very descriptive, what about free_device
-> > instead?
-> >
+> mdev_device->type->parent is the same thing.
 >=20
-> There is only one goto to this place after this patch. Possibly just
-> call it trylock_fail.
+> The struct mdev_device was relying on the kref on the mdev_parent to also
+> indirectly hold a kref on the mdev_type pointer. Now that the type holds =
+a
+> kref on the parent we can directly kref the mdev_type and remove this
+> implicit relationship.
+>=20
+> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
+> ---
+>  drivers/vfio/mdev/mdev_core.c | 13 +++++--------
+>  drivers/vfio/mdev/vfio_mdev.c | 14 +++++++-------
+>  include/linux/mdev.h          |  1 -
+>  3 files changed, 12 insertions(+), 16 deletions(-)
+>=20
+> diff --git a/drivers/vfio/mdev/mdev_core.c
+> b/drivers/vfio/mdev/mdev_core.c
+> index 4b5e372ed58f26..493df3da451339 100644
+> --- a/drivers/vfio/mdev/mdev_core.c
+> +++ b/drivers/vfio/mdev/mdev_core.c
+> @@ -29,7 +29,7 @@ static DEFINE_MUTEX(mdev_list_lock);
+>=20
+>  struct device *mdev_parent_dev(struct mdev_device *mdev)
+>  {
+> -	return mdev->parent->dev;
+> +	return mdev->type->parent->dev;
+>  }
+>  EXPORT_SYMBOL(mdev_parent_dev);
+>=20
+> @@ -58,12 +58,11 @@ void mdev_release_parent(struct kref *kref)
+>  /* Caller must hold parent unreg_sem read or write lock */
+>  static void mdev_device_remove_common(struct mdev_device *mdev)
+>  {
+> -	struct mdev_parent *parent;
+> +	struct mdev_parent *parent =3D mdev->type->parent;
 
-oops, please forget this comment as another goto comes in next patch...
+What about having a wrapper here, like mdev_parent_dev? For
+readability it's not necessary to show that the parent is indirectly
+retrieved through mdev_type.
+
+>  	int ret;
+>=20
+>  	mdev_remove_sysfs_files(mdev);
+>  	device_del(&mdev->dev);
+> -	parent =3D mdev->parent;
+>  	lockdep_assert_held(&parent->unreg_sem);
+>  	ret =3D parent->ops->remove(mdev);
+>  	if (ret)
+> @@ -212,7 +211,7 @@ static void mdev_device_release(struct device *dev)
+>  	struct mdev_device *mdev =3D to_mdev_device(dev);
+>=20
+>  	/* Pairs with the get in mdev_device_create() */
+> -	mdev_put_parent(mdev->parent);
+> +	kobject_put(&mdev->type->kobj);
+
+Maybe keep mdev_get/put_parent and change them to accept "struct
+mdev_device *" parameter like other places.
+
+>=20
+>  	mutex_lock(&mdev_list_lock);
+>  	list_del(&mdev->next);
+> @@ -250,9 +249,8 @@ int mdev_device_create(struct mdev_type *type,
+> const guid_t *uuid)
+>  	mdev->dev.release =3D mdev_device_release;
+>  	mdev->dev.groups =3D parent->ops->mdev_attr_groups;
+>  	mdev->type =3D type;
+> -	mdev->parent =3D parent;
+>  	/* Pairs with the put in mdev_device_release() */
+> -	mdev_get_parent(parent);
+> +	kobject_get(&type->kobj);
+>=20
+>  	guid_copy(&mdev->uuid, uuid);
+>  	list_add(&mdev->next, &mdev_list);
+> @@ -300,7 +298,7 @@ int mdev_device_create(struct mdev_type *type,
+> const guid_t *uuid)
+>  int mdev_device_remove(struct mdev_device *mdev)
+>  {
+>  	struct mdev_device *tmp;
+> -	struct mdev_parent *parent;
+> +	struct mdev_parent *parent =3D mdev->type->parent;
+>=20
+>  	mutex_lock(&mdev_list_lock);
+>  	list_for_each_entry(tmp, &mdev_list, next) {
+> @@ -321,7 +319,6 @@ int mdev_device_remove(struct mdev_device *mdev)
+>  	mdev->active =3D false;
+>  	mutex_unlock(&mdev_list_lock);
+>=20
+> -	parent =3D mdev->parent;
+>  	/* Check if parent unregistration has started */
+>  	if (!down_read_trylock(&parent->unreg_sem))
+>  		return -ENODEV;
+> diff --git a/drivers/vfio/mdev/vfio_mdev.c b/drivers/vfio/mdev/vfio_mdev.=
+c
+> index cc9507ed85a181..922729071c5a8e 100644
+> --- a/drivers/vfio/mdev/vfio_mdev.c
+> +++ b/drivers/vfio/mdev/vfio_mdev.c
+> @@ -24,7 +24,7 @@
+>  static int vfio_mdev_open(struct vfio_device *core_vdev)
+>  {
+>  	struct mdev_device *mdev =3D to_mdev_device(core_vdev->dev);
+> -	struct mdev_parent *parent =3D mdev->parent;
+> +	struct mdev_parent *parent =3D mdev->type->parent;
+>=20
+>  	int ret;
+>=20
+> @@ -44,7 +44,7 @@ static int vfio_mdev_open(struct vfio_device
+> *core_vdev)
+>  static void vfio_mdev_release(struct vfio_device *core_vdev)
+>  {
+>  	struct mdev_device *mdev =3D to_mdev_device(core_vdev->dev);
+> -	struct mdev_parent *parent =3D mdev->parent;
+> +	struct mdev_parent *parent =3D mdev->type->parent;
+>=20
+>  	if (likely(parent->ops->release))
+>  		parent->ops->release(mdev);
+> @@ -56,7 +56,7 @@ static long vfio_mdev_unlocked_ioctl(struct vfio_device
+> *core_vdev,
+>  				     unsigned int cmd, unsigned long arg)
+>  {
+>  	struct mdev_device *mdev =3D to_mdev_device(core_vdev->dev);
+> -	struct mdev_parent *parent =3D mdev->parent;
+> +	struct mdev_parent *parent =3D mdev->type->parent;
+>=20
+>  	if (unlikely(!parent->ops->ioctl))
+>  		return -EINVAL;
+> @@ -68,7 +68,7 @@ static ssize_t vfio_mdev_read(struct vfio_device
+> *core_vdev, char __user *buf,
+>  			      size_t count, loff_t *ppos)
+>  {
+>  	struct mdev_device *mdev =3D to_mdev_device(core_vdev->dev);
+> -	struct mdev_parent *parent =3D mdev->parent;
+> +	struct mdev_parent *parent =3D mdev->type->parent;
+>=20
+>  	if (unlikely(!parent->ops->read))
+>  		return -EINVAL;
+> @@ -81,7 +81,7 @@ static ssize_t vfio_mdev_write(struct vfio_device
+> *core_vdev,
+>  			       loff_t *ppos)
+>  {
+>  	struct mdev_device *mdev =3D to_mdev_device(core_vdev->dev);
+> -	struct mdev_parent *parent =3D mdev->parent;
+> +	struct mdev_parent *parent =3D mdev->type->parent;
+>=20
+>  	if (unlikely(!parent->ops->write))
+>  		return -EINVAL;
+> @@ -93,7 +93,7 @@ static int vfio_mdev_mmap(struct vfio_device
+> *core_vdev,
+>  			  struct vm_area_struct *vma)
+>  {
+>  	struct mdev_device *mdev =3D to_mdev_device(core_vdev->dev);
+> -	struct mdev_parent *parent =3D mdev->parent;
+> +	struct mdev_parent *parent =3D mdev->type->parent;
+>=20
+>  	if (unlikely(!parent->ops->mmap))
+>  		return -EINVAL;
+> @@ -104,7 +104,7 @@ static int vfio_mdev_mmap(struct vfio_device
+> *core_vdev,
+>  static void vfio_mdev_request(struct vfio_device *core_vdev, unsigned in=
+t
+> count)
+>  {
+>  	struct mdev_device *mdev =3D to_mdev_device(core_vdev->dev);
+> -	struct mdev_parent *parent =3D mdev->parent;
+> +	struct mdev_parent *parent =3D mdev->type->parent;
+>=20
+>  	if (parent->ops->request)
+>  		parent->ops->request(mdev, count);
+> diff --git a/include/linux/mdev.h b/include/linux/mdev.h
+> index 349e8ac1fe3382..fb582adda28a9b 100644
+> --- a/include/linux/mdev.h
+> +++ b/include/linux/mdev.h
+> @@ -14,7 +14,6 @@ struct mdev_type;
+>=20
+>  struct mdev_device {
+>  	struct device dev;
+> -	struct mdev_parent *parent;
+>  	guid_t uuid;
+>  	void *driver_data;
+>  	struct list_head next;
+> --
+> 2.31.0
+
