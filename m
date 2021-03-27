@@ -2,89 +2,90 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E379034B247
-	for <lists+kvm@lfdr.de>; Fri, 26 Mar 2021 23:47:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D38C534B7D7
+	for <lists+kvm@lfdr.de>; Sat, 27 Mar 2021 16:05:45 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230139AbhCZWrJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 26 Mar 2021 18:47:09 -0400
-Received: from mail.kernel.org ([198.145.29.99]:60582 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229969AbhCZWqn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 26 Mar 2021 18:46:43 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id A214961A21;
-        Fri, 26 Mar 2021 22:46:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1616798803;
-        bh=Wm2cdmh8jurooirWZ/ts+cDzC6mutuJ2k4F8lj5bCxI=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=QNGcgjv68Z/fo6F78HoYrYy3OBszT5C5uDy2AGEqk2xPQ0t9QdUH0bZhxbDnGVfhP
-         5GJ8NNnuIcLf0TpsSu3Jh6suvITERruDpzYbFZVr3JB58CFG6ZMPhamwGj5vuGBfww
-         V4aS4Gv2EMDsvjV9krs4YLYxXhE0zwDfRLUQIRZ2YAgzzDLAeQ1BPtBENeF+jb/tEX
-         WvIi6Cylg84aFojnQH1znDyF25IJINiEybRTGhkBtS/mYv69xIU97bDYAvKh1WVSip
-         FpAi7WFtd6oPa3uHA1whFH+vYiHjTgaPxWSFw9j6FIZa/fXH4ImFgmKYBv6kWB4apU
-         brNAlXzHU/z5Q==
-Date:   Sat, 27 Mar 2021 00:46:12 +0200
-From:   Jarkko Sakkinen <jarkko@kernel.org>
-To:     Kai Huang <kai.huang@intel.com>
-Cc:     kvm@vger.kernel.org, x86@kernel.org, linux-sgx@vger.kernel.org,
-        linux-kernel@vger.kernel.org, seanjc@google.com, luto@kernel.org,
-        dave.hansen@intel.com, rick.p.edgecombe@intel.com,
-        haitao.huang@intel.com, pbonzini@redhat.com, bp@alien8.de,
-        tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com,
-        jethro@fortanix.com, b.thiel@posteo.de, jmattson@google.com,
-        joro@8bytes.org, vkuznets@redhat.com, wanpengli@tencent.com,
-        corbet@lwn.net
-Subject: Re: [PATCH v3 00/25] KVM SGX virtualization support
-Message-ID: <YF5kNPP2VyzcTuTY@kernel.org>
-References: <cover.1616136307.git.kai.huang@intel.com>
+        id S230126AbhC0PFM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 27 Mar 2021 11:05:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56850 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229980AbhC0PFL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 27 Mar 2021 11:05:11 -0400
+Received: from mail-pl1-x642.google.com (mail-pl1-x642.google.com [IPv6:2607:f8b0:4864:20::642])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E24A1C0613B1
+        for <kvm@vger.kernel.org>; Sat, 27 Mar 2021 08:05:10 -0700 (PDT)
+Received: by mail-pl1-x642.google.com with SMTP id f17so2320396plr.0
+        for <kvm@vger.kernel.org>; Sat, 27 Mar 2021 08:05:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:reply-to:from:date:message-id:subject:to
+         :content-transfer-encoding;
+        bh=RGIngbuYWNz40FkyM3rogyIk5fhQZeojcuxaqaxU6Os=;
+        b=cbFKSj2UHOat6At8AJEh29onrr4HnP1zEkXQJ6IW4+gxRES5E/MmQp+owXixhqb6Wu
+         mJfaheixep4ZPiH+HORfi9Gg9oaVTHUTg90oPPum34VY2S89D5hJB+n716ysh9FzisNH
+         PoHD547kNG0Kyx8Mr1/N2nPeEU3ovoRcNYIntHEJNRB49FZltwxUEu/tM+eKYBQPxne4
+         V6/51+V1rkNJ7rx+IG+TCPegisxTjoLuMkyFgTgmbSGxfzcbR+iSuEbUNXcfZ8doMjSI
+         +QLRNIoGXcqHUsqyhxlLLrt22yDuXYL5Yc/0b33nwOYNYL4c+gbg1tTUg9bcW9zEcvGb
+         aYsQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:reply-to:from:date:message-id
+         :subject:to:content-transfer-encoding;
+        bh=RGIngbuYWNz40FkyM3rogyIk5fhQZeojcuxaqaxU6Os=;
+        b=WUhUzPgB8QCnPtWImfvrLVRQrMD07jUGO0nyGQdKdADzQSTP1HNj3iDAyn3lovs/s1
+         qsY6pdq2PNiNlDJrpDSHa31g5/oWEOgpl62tcBhG/9GGSVX79p0KXKHQb1U4Hl7RnJE4
+         7rZNbbUD6DJwito14NuUst5KxvafPeM6C9iZWC0YRlQUwAJxwMm8XhNeK+6KUMaBASx1
+         cdztjV01nTBQnzLEFvGObGMXvhurHu8MAwfTBPC9KX8LRw1Ck/NKo19PdQtKRrRr+NBa
+         e1X4w2m3R2zULQkiD3Tu3yhPOFGZ5/GPCaddSBNBxr80y+mEaShnPXRJhaCKmC4jqqAx
+         AfcQ==
+X-Gm-Message-State: AOAM53129FJnAMhHZIOMdVsIlVbds+4d10FM1Y4RLflQxhfpzxkuN6Of
+        AGK/bS5kphQrC8/Y32DobB/nhwfd/zwtFV6/uGg=
+X-Google-Smtp-Source: ABdhPJxMAv1vcHkI0hgQB249DoagF0koi4WpBd8JXdL2yPsYp36OgnV5CI1seWAQTEwNFN8tIj6SLR3cDHuoqswoHb4=
+X-Received: by 2002:a17:90a:d507:: with SMTP id t7mr19115779pju.54.1616857510129;
+ Sat, 27 Mar 2021 08:05:10 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <cover.1616136307.git.kai.huang@intel.com>
+Received: by 2002:a05:6a10:d5a5:0:0:0:0 with HTTP; Sat, 27 Mar 2021 08:05:09
+ -0700 (PDT)
+Reply-To: canilamalak1@gmail.com
+From:   CANILA MALAK <mrsnicole.benoite1894@gmail.com>
+Date:   Sat, 27 Mar 2021 08:05:09 -0700
+Message-ID: <CAFFRX1Hm8OPFEyL27_X9Oi43r5JU9qvxY+MrBNdfmh9jN02VKA@mail.gmail.com>
+Subject: My name is Mrs CANILA R MALAK from France,
+To:     undisclosed-recipients:;
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Mar 19, 2021 at 08:29:27PM +1300, Kai Huang wrote:
-> This series adds KVM SGX virtualization support. The first 14 patches starting
-> with x86/sgx or x86/cpu.. are necessary changes to x86 and SGX core/driver to
-> support KVM SGX virtualization, while the rest are patches to KVM subsystem.
-> 
-> This series is based against latest tip/x86/sgx, which has Jarkko's NUMA
-> allocation support.
-> 
-> You can also get the code from upstream branch of kvm-sgx repo on github:
-> 
->         https://github.com/intel/kvm-sgx.git upstream
-> 
-> It also requires Qemu changes to create VM with SGX support. You can find Qemu
-> repo here:
-> 
-> 	https://github.com/intel/qemu-sgx.git upstream
-> 
-> Please refer to README.md of above qemu-sgx repo for detail on how to create
-> guest with SGX support. At meantime, for your quick reference you can use below
-> command to create SGX guest:
-> 
-> 	#qemu-system-x86_64 -smp 4 -m 2G -drive file=<your_vm_image>,if=virtio \
-> 		-cpu host,+sgx_provisionkey \
-> 		-sgx-epc id=epc1,memdev=mem1 \
-> 		-object memory-backend-epc,id=mem1,size=64M,prealloc
-> 
-> Please note that the SGX relevant part is:
-> 
-> 		-cpu host,+sgx_provisionkey \
-> 		-sgx-epc id=epc1,memdev=mem1 \
-> 		-object memory-backend-epc,id=mem1,size=64M,prealloc
-> 
-> And you can change other parameters of your qemu command based on your needs.
+My name is Mrs CANILA R MALAK from France,
 
-Please also put tested-by from me to all patches (including pure KVM
-patches):
+I know that this message might come to you as surprise because we
+don't know each other nor have we ever met before but accept it with
+an open and positive mind. I have a Very important request that made
+me to contact you; I was diagnosed with ovarian cancer disease which
+doctors have confirmed and announced to me that i have just few days
+to leave, Now that I=E2=80=99m ending the race like this, without any famil=
+y
+members and no child, I just came across your email contact from my
+personal search.
 
-Tested-by: Jarkko Sakkinen <jarkko@kernel.org>
+I=E2=80=99m a business woman from France dealing with gold exportation here=
+ in
+Republic of Burkina Faso. I have decided to hand over the sum of ($4.5
+Million Dollar) in my account to you for the help of orphanage
+homes/the needy once in your location to fulfill my wish on earth. But
+before handing over my data=E2=80=99s to you, kindly assure me that you wil=
+l
+take only 50% of the money and share the rest to orphanage homes/the
+needy once in your country, Return to enable me forward to you the
+bank contact details now that I have access to Internet in the
+hospital to enable you contact the bank, always check your e-mail
+always remember me for doing good.
+Please don't forget to reply me in my Private
+E-mail:(canilamalak1@gmail.com)
 
-I did the basic test, i.e. run selftest in a VM. I think that is
-sufficient at this point.
+Your early response will be appreciated.
 
-/Jarkko
+Yours Faithfully,
+Mrs CANILA R MALAK
