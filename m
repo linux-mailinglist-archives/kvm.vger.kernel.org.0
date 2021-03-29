@@ -2,137 +2,157 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7DCCA34D454
-	for <lists+kvm@lfdr.de>; Mon, 29 Mar 2021 17:54:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D8D5A34D4B4
+	for <lists+kvm@lfdr.de>; Mon, 29 Mar 2021 18:18:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230212AbhC2Px6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 29 Mar 2021 11:53:58 -0400
-Received: from mail-io1-f71.google.com ([209.85.166.71]:52298 "EHLO
-        mail-io1-f71.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231199AbhC2Px0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 29 Mar 2021 11:53:26 -0400
-Received: by mail-io1-f71.google.com with SMTP id d4so1847698iop.19
-        for <kvm@vger.kernel.org>; Mon, 29 Mar 2021 08:53:26 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
-        bh=xexZrPOC/JkSM7BGy7xMMywLm9VNuEHIelH+LRXXkPk=;
-        b=B96nyURPx94ck0rQuYhasGZgINkKspCCgFBBgE6reUErgVXPpWN9X3jMyABcmb3QRK
-         xXsYn31T8EDyBA0kuihrFx8S4TGIiJfP0yZRqyCbinSHMtq12nP5DuUwG0Nwz5y+KcWl
-         xw3TaFZCzoSa9cDIqMAxiFukKLpeVoae74QryLYm6/tgHxXz913JfgeQDYlIxhZ+Mjg+
-         GoOxGhFOwDaCLGQmSPrxwim/s3p7Wh/g2epxpGcxvTHJXLKNiZanm1rvnWNSA5492Vbp
-         nWN5pHMgcFiq9BeEYHSMNNFgt5kL63bX4SP5D2V9BRP9AFD69Y7xlXdVrOF5RmJd6SQT
-         HF/w==
-X-Gm-Message-State: AOAM532OShQCx5LxApKqp2zHiMXu2RRwq6EzuW7eIePvyp757tJv7GCz
-        bfpoO34ECD5uRqH7Dj7Xq0BkPi3mqpdda8ZpLr3fTOsKx9pj
-X-Google-Smtp-Source: ABdhPJzYbRh6VfoSvFixhIbacAK24HM3mTeepga8rAAZQyQiQ8uydiubagx8ofleAiQxtZwE3S+Ks1tmHz1uMhndnkGK1UWoZRLo
+        id S229709AbhC2QSF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 29 Mar 2021 12:18:05 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:33806 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229502AbhC2QR5 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 29 Mar 2021 12:17:57 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1617034675;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=afFiru8tgewiCPEWvVuZJcoILIxwgOgjKVHcSX1Mu/I=;
+        b=JqS8BPdOaTX5nWLeCsEEnvd382a/AACXD/ah7sYq3nJNofAcc6KUGtbnXzs86Qi0AOU9Gt
+        uKmG6bhQA72ymrX187ukpkF49gIVxPvdOFGwY3eQmL0o7QUCmJiarn3sH+fLBKia8fgIwe
+        bQd2gdsrKrGcrq7j0bUcUMC1fypfi4w=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-424-TdxLCmguO12pLsLjNrScaw-1; Mon, 29 Mar 2021 12:17:39 -0400
+X-MC-Unique: TdxLCmguO12pLsLjNrScaw-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D3DF91085943;
+        Mon, 29 Mar 2021 16:17:38 +0000 (UTC)
+Received: from localhost (ovpn-114-227.ams2.redhat.com [10.36.114.227])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 674B160C13;
+        Mon, 29 Mar 2021 16:17:35 +0000 (UTC)
+Date:   Mon, 29 Mar 2021 17:17:34 +0100
+From:   Stefan Hajnoczi <stefanha@redhat.com>
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     Elena Afanasova <eafanasova@gmail.com>, kvm@vger.kernel.org,
+        jag.raman@oracle.com, elena.ufimtseva@oracle.com,
+        pbonzini@redhat.com, mst@redhat.com, cohuck@redhat.com,
+        john.levon@nutanix.com
+Subject: Re: [RFC v3 3/5] KVM: implement wire protocol
+Message-ID: <YGH9niCJ9J1DiPtb@stefanha-x1.localdomain>
+References: <cover.1613828726.git.eafanasova@gmail.com>
+ <dad3d025bcf15ece11d9df0ff685e8ab0a4f2edd.1613828727.git.eafanasova@gmail.com>
+ <f9b5c5cf-63a4-d085-8c99-8d03d29d3f58@redhat.com>
+ <5c1c5682b29558a8d2053b4201fbb135e9a61790.camel@gmail.com>
+ <24e7211c-e168-3f47-f789-5f1d743d79c5@redhat.com>
 MIME-Version: 1.0
-X-Received: by 2002:a02:7f8c:: with SMTP id r134mr24510700jac.95.1617033206064;
- Mon, 29 Mar 2021 08:53:26 -0700 (PDT)
-Date:   Mon, 29 Mar 2021 08:53:26 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000d6689d05beaee1c9@google.com>
-Subject: [syzbot] WARNING: refcount bug in nfc_llcp_local_put
-From:   syzbot <syzbot+0aabbccfb4ec7b744ffd@syzkaller.appspotmail.com>
-To:     akpm@linux-foundation.org, bp@alien8.de, davem@davemloft.net,
-        hpa@zytor.com, jmattson@google.com, joro@8bytes.org,
-        kuba@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        mark.rutland@arm.com, masahiroy@kernel.org, mingo@redhat.com,
-        netdev@vger.kernel.org, pbonzini@redhat.com, peterz@infradead.org,
-        rafael.j.wysocki@intel.com, rostedt@goodmis.org, seanjc@google.com,
-        syzkaller-bugs@googlegroups.com, tglx@linutronix.de,
-        vkuznets@redhat.com, wanpengli@tencent.com, will@kernel.org,
-        x86@kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="eSCY88W5gB26qvsn"
+Content-Disposition: inline
+In-Reply-To: <24e7211c-e168-3f47-f789-5f1d743d79c5@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hello,
 
-syzbot found the following issue on:
+--eSCY88W5gB26qvsn
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-HEAD commit:    75887e88 Merge branch '40GbE' of git://git.kernel.org/pub/..
-git tree:       net
-console output: https://syzkaller.appspot.com/x/log.txt?x=131a634ed00000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=5adab0bdee099d7a
-dashboard link: https://syzkaller.appspot.com/bug?extid=0aabbccfb4ec7b744ffd
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=15bcd6f6d00000
+On Fri, Mar 26, 2021 at 02:21:29PM +0800, Jason Wang wrote:
+>=20
+> =E5=9C=A8 2021/3/17 =E4=B8=8B=E5=8D=889:08, Elena Afanasova =E5=86=99=E9=
+=81=93:
+> > On Tue, 2021-03-09 at 14:19 +0800, Jason Wang wrote:
+> > > On 2021/2/21 8:04 =E4=B8=8B=E5=8D=88, Elena Afanasova wrote:
+> > > > Add ioregionfd blocking read/write operations.
+> > > >=20
+> > > > Signed-off-by: Elena Afanasova <eafanasova@gmail.com>
+> > > > ---
+> > > > v3:
+> > > >    - change wire protocol license
+> > > >    - remove ioregionfd_cmd info and drop appropriate macros
+> > > >    - fix ioregionfd state machine
+> > > >    - add sizeless ioregions support
+> > > >    - drop redundant check in ioregion_read/write()
+> > > >=20
+> > > >    include/uapi/linux/ioregion.h |  30 +++++++
+> > > >    virt/kvm/ioregion.c           | 162
+> > > > +++++++++++++++++++++++++++++++++-
+> > > >    2 files changed, 190 insertions(+), 2 deletions(-)
+> > > >    create mode 100644 include/uapi/linux/ioregion.h
+> > > >=20
+> > > > diff --git a/include/uapi/linux/ioregion.h
+> > > > b/include/uapi/linux/ioregion.h
+> > > > new file mode 100644
+> > > > index 000000000000..58f9b5ba6186
+> > > > --- /dev/null
+> > > > +++ b/include/uapi/linux/ioregion.h
+> > > > @@ -0,0 +1,30 @@
+> > > > +/* SPDX-License-Identifier: ((GPL-2.0-only WITH Linux-syscall-
+> > > > note) OR BSD-3-Clause) */
+> > > > +#ifndef _UAPI_LINUX_IOREGION_H
+> > > > +#define _UAPI_LINUX_IOREGION_H
+> > > > +
+> > > > +/* Wire protocol */
+> > > > +
+> > > > +struct ioregionfd_cmd {
+> > > > +	__u8 cmd;
+> > > > +	__u8 size_exponent : 4;
+> > > > +	__u8 resp : 1;
+> > > > +	__u8 padding[6];
+> > > > +	__u64 user_data;
+> > > > +	__u64 offset;
+> > > > +	__u64 data;
+> > > > +};
+> > > Sorry if I've asked this before. Do we need a id for each
+> > > request/response? E.g an ioregion fd could be used by multiple
+> > > vCPUS.
+> > > VCPU needs to have a way to find which request belongs to itself or
+> > > not?
+> > >=20
+> > I don=E2=80=99t think the id is necessary here since all requests/respo=
+nses are
+> > serialized.
+>=20
+>=20
+> It's probably fine for the first version but it will degrate the performa=
+nce
+> e.g if the ioregionfd is used for multiple queues (e.g doorbell). The des=
+ign
+> should have the capability to allow the extension like this.
 
-The issue was bisected to:
+If there is only one doorbell register and one ioregionfd then trying to
+process multiple queues in userspace is going to be slow. Adding cmd IDs
+doesn't fix this because userspace won't be able to destribute cmds to
+multiple queue threads efficiently.
 
-commit 997acaf6b4b59c6a9c259740312a69ea549cc684
-Author: Mark Rutland <mark.rutland@arm.com>
-Date:   Mon Jan 11 15:37:07 2021 +0000
+Multiple queues should either use multiple doorbell registers or
+ioregionfd needs something like datamatch to dispatch the MMIO/PIO
+access to the appropriate queue's ioregionfd. In both cases cmd IDs
+aren't necessary.
 
-    lockdep: report broken irq restoration
+Can you think of a case where cmd IDs are needed?
 
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=12279b4ed00000
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=11279b4ed00000
-console output: https://syzkaller.appspot.com/x/log.txt?x=16279b4ed00000
+Stefan
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+0aabbccfb4ec7b744ffd@syzkaller.appspotmail.com
-Fixes: 997acaf6b4b5 ("lockdep: report broken irq restoration")
+--eSCY88W5gB26qvsn
+Content-Type: application/pgp-signature; name="signature.asc"
 
-------------[ cut here ]------------
-refcount_t: underflow; use-after-free.
-WARNING: CPU: 0 PID: 11133 at lib/refcount.c:28 refcount_warn_saturate+0x1d1/0x1e0 lib/refcount.c:28
-Modules linked in:
-CPU: 1 PID: 11133 Comm: syz-executor.0 Not tainted 5.12.0-rc4-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
-RIP: 0010:refcount_warn_saturate+0x1d1/0x1e0 lib/refcount.c:28
-Code: e9 db fe ff ff 48 89 df e8 fc ee ee fd e9 8a fe ff ff e8 42 44 ab fd 48 c7 c7 c0 d8 c1 89 c6 05 eb 44 e9 09 01 e8 7c 9b fc 04 <0f> 0b e9 af fe ff ff 0f 1f 84 00 00 00 00 00 41 56 41 55 41 54 55
-RSP: 0018:ffffc900033f7b10 EFLAGS: 00010286
-RAX: 0000000000000000 RBX: 0000000000000000 RCX: 0000000000000000
-RDX: ffff888040038000 RSI: ffffffff815c4d15 RDI: fffff5200067ef54
-RBP: 0000000000000003 R08: 0000000000000000 R09: 0000000000000000
-R10: ffffffff815bdaae R11: 0000000000000000 R12: 0000000000000000
-R13: ffff88814429f018 R14: ffffffff8dab2ec0 R15: ffff888030b20d38
-FS:  0000000001fa6400(0000) GS:ffff8880b9d00000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000000000540198 CR3: 00000000142c1000 CR4: 00000000001506e0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- __refcount_sub_and_test include/linux/refcount.h:283 [inline]
- __refcount_dec_and_test include/linux/refcount.h:315 [inline]
- refcount_dec_and_test include/linux/refcount.h:333 [inline]
- kref_put include/linux/kref.h:64 [inline]
- nfc_llcp_local_put net/nfc/llcp_core.c:183 [inline]
- nfc_llcp_local_put+0x1ab/0x200 net/nfc/llcp_core.c:178
- llcp_sock_destruct+0x81/0x150 net/nfc/llcp_sock.c:950
- __sk_destruct+0x4b/0x900 net/core/sock.c:1795
- sk_destruct+0xbd/0xe0 net/core/sock.c:1839
- __sk_free+0xef/0x3d0 net/core/sock.c:1850
- sock_wfree+0x129/0x240 net/core/sock.c:2074
- skb_release_head_state+0x9f/0x250 net/core/skbuff.c:712
- skb_release_all net/core/skbuff.c:723 [inline]
- __kfree_skb net/core/skbuff.c:739 [inline]
- kfree_skb net/core/skbuff.c:757 [inline]
- kfree_skb+0xfa/0x3f0 net/core/skbuff.c:751
- skb_queue_purge+0x14/0x30 net/core/skbuff.c:3133
- nfc_llcp_socket_release+0x2e/0x870 net/nfc/llcp_core.c:73
- local_cleanup+0x18/0xb0 net/nfc/llcp_core.c:155
- local_release net/nfc/llcp_core.c:174 [inline]
- kref_put include/linux/kref.h:65 [inline]
- nfc_llcp_local_put net/nfc/llcp_core.c:183 [inline]
- nfc_llcp_local_put+0x18c/0x200 net/nfc/llcp_core.c:178
- llcp_sock_destruct+0x81/0x150 net/nfc/llcp_sock.c:950
- __sk_destruct+0x4b/0x900 net/core/sock.c:1795
- sk_destruct+0xbd/0xe0 net/core/sock.c:1839
- __sk_free+0xef/0x3d0 net/core/sock.c:1850
- sk_free+0x78/0xa0 net/core/sock.c:1861
+-----BEGIN PGP SIGNATURE-----
 
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAmBh/Z0ACgkQnKSrs4Gr
+c8hR0AgAx51ZwhqQhykMXbQny17AtdsipxDudNLuYdEtVUUV9JMipDnKnVBbU1gm
+075DJpPu+BTVdhowv1SR7sVlzTxD3IsyLUj0+SCuiwOc6ecOmnVA3oLS+FWYQfR4
+tGQYO4XDb+UWPRiYSBe8Rfo6Osy4qvPrZP/eX0cqUoqWChg7FDFZPPdPg40o8Beu
+yJ8l5R3bAggCxFDtB95jdI9Os5VKArL0VOcuccXcqrHjQw4SFRY9d35LIZ4eQw5/
+/gjuL04JrIMgj5qDdQUK/BcnNfMbMGZ0h01kD9VvC6lxI3N2ADwtBwbbaYHaIvI1
+K67WOIwAGpFqKSnwrS8SQ1fMjW6eOA==
+=KRTL
+-----END PGP SIGNATURE-----
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+--eSCY88W5gB26qvsn--
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
-syzbot can test patches for this issue, for details see:
-https://goo.gl/tpsmEJ#testing-patches
