@@ -2,157 +2,185 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D8D5A34D4B4
-	for <lists+kvm@lfdr.de>; Mon, 29 Mar 2021 18:18:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C8E1A34D5DB
+	for <lists+kvm@lfdr.de>; Mon, 29 Mar 2021 19:16:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229709AbhC2QSF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 29 Mar 2021 12:18:05 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:33806 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229502AbhC2QR5 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 29 Mar 2021 12:17:57 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1617034675;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=afFiru8tgewiCPEWvVuZJcoILIxwgOgjKVHcSX1Mu/I=;
-        b=JqS8BPdOaTX5nWLeCsEEnvd382a/AACXD/ah7sYq3nJNofAcc6KUGtbnXzs86Qi0AOU9Gt
-        uKmG6bhQA72ymrX187ukpkF49gIVxPvdOFGwY3eQmL0o7QUCmJiarn3sH+fLBKia8fgIwe
-        bQd2gdsrKrGcrq7j0bUcUMC1fypfi4w=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-424-TdxLCmguO12pLsLjNrScaw-1; Mon, 29 Mar 2021 12:17:39 -0400
-X-MC-Unique: TdxLCmguO12pLsLjNrScaw-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D3DF91085943;
-        Mon, 29 Mar 2021 16:17:38 +0000 (UTC)
-Received: from localhost (ovpn-114-227.ams2.redhat.com [10.36.114.227])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 674B160C13;
-        Mon, 29 Mar 2021 16:17:35 +0000 (UTC)
-Date:   Mon, 29 Mar 2021 17:17:34 +0100
-From:   Stefan Hajnoczi <stefanha@redhat.com>
-To:     Jason Wang <jasowang@redhat.com>
-Cc:     Elena Afanasova <eafanasova@gmail.com>, kvm@vger.kernel.org,
-        jag.raman@oracle.com, elena.ufimtseva@oracle.com,
-        pbonzini@redhat.com, mst@redhat.com, cohuck@redhat.com,
-        john.levon@nutanix.com
-Subject: Re: [RFC v3 3/5] KVM: implement wire protocol
-Message-ID: <YGH9niCJ9J1DiPtb@stefanha-x1.localdomain>
-References: <cover.1613828726.git.eafanasova@gmail.com>
- <dad3d025bcf15ece11d9df0ff685e8ab0a4f2edd.1613828727.git.eafanasova@gmail.com>
- <f9b5c5cf-63a4-d085-8c99-8d03d29d3f58@redhat.com>
- <5c1c5682b29558a8d2053b4201fbb135e9a61790.camel@gmail.com>
- <24e7211c-e168-3f47-f789-5f1d743d79c5@redhat.com>
+        id S230212AbhC2RPh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 29 Mar 2021 13:15:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53236 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231246AbhC2RPQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 29 Mar 2021 13:15:16 -0400
+Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 35345C061574
+        for <kvm@vger.kernel.org>; Mon, 29 Mar 2021 10:15:14 -0700 (PDT)
+Received: by mail-pj1-x102e.google.com with SMTP id bt4so6307634pjb.5
+        for <kvm@vger.kernel.org>; Mon, 29 Mar 2021 10:15:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=4EOZ8Sb48l4lF5h6fA0NMs053uNtaYhsr8erjsTM8FY=;
+        b=dJa0dz3LkHSAQnB1HnfNX988JAywvpjQ2nQa+OOmU1Q1d2DwIEnZq29hhBDzKdRxXE
+         H2+gweAaru8FyL51vYdLZqQk+LlgGHXWU2s0AkLYMYDGjnZcmDOvU8R/mKFAC+qU1vIX
+         XPAyDzVe8NSuyaZAg0cXmd0jGKW4a2IDnsE1zs/Ez/37HUKafd/J/R1ziPJCuX+I4Dpf
+         Tw0jZTkcRBH3XrdNeYIA3KmJtNNy2CR8lFZ8Dx508atoQ9r9BethZLU06XK+K63gTZ+l
+         2+FqHVY9ZlBOQ7IBm6r/u4vCEUGjGPj33ZrHyK8p+/GuDZNRufuBgGCB6P0PiBFmDIx3
+         BvRA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=4EOZ8Sb48l4lF5h6fA0NMs053uNtaYhsr8erjsTM8FY=;
+        b=etWg7a0dQGTmcG4UyOudbNBUHJbizG2yVuATZU3zbCK/J/RWC00MYE+0tzmEYsi+8F
+         krrLZo5xbINvscBuVl/Hp/KmVLlf+Unn4Hmj2sMMde5Xic/2jVuVhSQmvCzzNlTfbNKJ
+         gdWQIFkgf7jWA3rIWD7qQqQVbyuCh/B5Z+agFnI2iQZ2pELHK9H1LhD3svyN6J7Z4Glh
+         O42bdKqSwBV71qcbzElWAYsNfzOXHCnKsnItkZSBm34YBblOG1ts8Fm2CH+ito5OUUA2
+         1TY+IQEyP+23D2qLY37t7uE53EtxN+yJq2cnpRM7rJCcY8twS/ZHIeGicvgrfJkeD8lz
+         O1Cw==
+X-Gm-Message-State: AOAM530jSe/Xp3ctC2ygH9NJ769L9F+xcOkdAMIjPgAfQjICs5ZuGB07
+        sGdwpzp9Mq3v+pwvpAFdNjjEfa+HZd9fvQ==
+X-Google-Smtp-Source: ABdhPJwUSjt0rB7FD0ZPLYYja1hZE1EpzcLffmT9z2Qr4zlV7MsvSmN97Oxmu4wf1Gm80JBrMXnHnQ==
+X-Received: by 2002:a17:90b:3884:: with SMTP id mu4mr152309pjb.128.1617038113480;
+        Mon, 29 Mar 2021 10:15:13 -0700 (PDT)
+Received: from google.com (240.111.247.35.bc.googleusercontent.com. [35.247.111.240])
+        by smtp.gmail.com with ESMTPSA id d2sm7379997pgp.47.2021.03.29.10.15.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 29 Mar 2021 10:15:12 -0700 (PDT)
+Date:   Mon, 29 Mar 2021 17:15:08 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Wanpeng Li <kernellwp@gmail.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>
+Subject: Re: [PATCH] KVM: X86: Properly account for guest CPU time when
+ considering context tracking
+Message-ID: <YGILHM7CHpjXtxaH@google.com>
+References: <1617011036-11734-1-git-send-email-wanpengli@tencent.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="eSCY88W5gB26qvsn"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <24e7211c-e168-3f47-f789-5f1d743d79c5@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+In-Reply-To: <1617011036-11734-1-git-send-email-wanpengli@tencent.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
++Thomas
 
---eSCY88W5gB26qvsn
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On Mon, Mar 29, 2021, Wanpeng Li wrote:
+> From: Wanpeng Li <wanpengli@tencent.com>
+> 
+> The bugzilla https://bugzilla.kernel.org/show_bug.cgi?id=209831 
+> reported that the guest time remains 0 when running a while true 
+> loop in the guest.
+> 
+> The commit 87fa7f3e98a131 ("x86/kvm: Move context tracking where it 
+> belongs") moves guest_exit_irqoff() close to vmexit breaks the 
+> tick-based time accouting when the ticks that happen after IRQs are 
+> disabled are incorrectly accounted to the host/system time. This is 
+> because we exit the guest state too early.
+> 
+> vtime-based time accounting is tied to context tracking, keep the 
+> guest_exit_irqoff() around vmexit code when both vtime-based time 
+> accounting and specific cpu is context tracking mode active. 
+> Otherwise, leave guest_exit_irqoff() after handle_exit_irqoff() 
+> and explicit IRQ window for tick-based time accouting.
+> 
+> Fixes: 87fa7f3e98a131 ("x86/kvm: Move context tracking where it belongs")
+> Cc: Sean Christopherson <seanjc@google.com>
+> Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
+> ---
+>  arch/x86/kvm/svm/svm.c | 3 ++-
+>  arch/x86/kvm/vmx/vmx.c | 3 ++-
+>  arch/x86/kvm/x86.c     | 2 ++
+>  3 files changed, 6 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+> index 58a45bb..55fb5ce 100644
+> --- a/arch/x86/kvm/svm/svm.c
+> +++ b/arch/x86/kvm/svm/svm.c
+> @@ -3812,7 +3812,8 @@ static noinstr void svm_vcpu_enter_exit(struct kvm_vcpu *vcpu,
+>  	 * into world and some more.
+>  	 */
+>  	lockdep_hardirqs_off(CALLER_ADDR0);
+> -	guest_exit_irqoff();
+> +	if (vtime_accounting_enabled_this_cpu())
+> +		guest_exit_irqoff();
+>  
+>  	instrumentation_begin();
+>  	trace_hardirqs_off_finish();
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index 32cf828..85695b3 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -6689,7 +6689,8 @@ static noinstr void vmx_vcpu_enter_exit(struct kvm_vcpu *vcpu,
+>  	 * into world and some more.
+>  	 */
+>  	lockdep_hardirqs_off(CALLER_ADDR0);
+> -	guest_exit_irqoff();
+> +	if (vtime_accounting_enabled_this_cpu())
+> +		guest_exit_irqoff();
 
-On Fri, Mar 26, 2021 at 02:21:29PM +0800, Jason Wang wrote:
->=20
-> =E5=9C=A8 2021/3/17 =E4=B8=8B=E5=8D=889:08, Elena Afanasova =E5=86=99=E9=
-=81=93:
-> > On Tue, 2021-03-09 at 14:19 +0800, Jason Wang wrote:
-> > > On 2021/2/21 8:04 =E4=B8=8B=E5=8D=88, Elena Afanasova wrote:
-> > > > Add ioregionfd blocking read/write operations.
-> > > >=20
-> > > > Signed-off-by: Elena Afanasova <eafanasova@gmail.com>
-> > > > ---
-> > > > v3:
-> > > >    - change wire protocol license
-> > > >    - remove ioregionfd_cmd info and drop appropriate macros
-> > > >    - fix ioregionfd state machine
-> > > >    - add sizeless ioregions support
-> > > >    - drop redundant check in ioregion_read/write()
-> > > >=20
-> > > >    include/uapi/linux/ioregion.h |  30 +++++++
-> > > >    virt/kvm/ioregion.c           | 162
-> > > > +++++++++++++++++++++++++++++++++-
-> > > >    2 files changed, 190 insertions(+), 2 deletions(-)
-> > > >    create mode 100644 include/uapi/linux/ioregion.h
-> > > >=20
-> > > > diff --git a/include/uapi/linux/ioregion.h
-> > > > b/include/uapi/linux/ioregion.h
-> > > > new file mode 100644
-> > > > index 000000000000..58f9b5ba6186
-> > > > --- /dev/null
-> > > > +++ b/include/uapi/linux/ioregion.h
-> > > > @@ -0,0 +1,30 @@
-> > > > +/* SPDX-License-Identifier: ((GPL-2.0-only WITH Linux-syscall-
-> > > > note) OR BSD-3-Clause) */
-> > > > +#ifndef _UAPI_LINUX_IOREGION_H
-> > > > +#define _UAPI_LINUX_IOREGION_H
-> > > > +
-> > > > +/* Wire protocol */
-> > > > +
-> > > > +struct ioregionfd_cmd {
-> > > > +	__u8 cmd;
-> > > > +	__u8 size_exponent : 4;
-> > > > +	__u8 resp : 1;
-> > > > +	__u8 padding[6];
-> > > > +	__u64 user_data;
-> > > > +	__u64 offset;
-> > > > +	__u64 data;
-> > > > +};
-> > > Sorry if I've asked this before. Do we need a id for each
-> > > request/response? E.g an ioregion fd could be used by multiple
-> > > vCPUS.
-> > > VCPU needs to have a way to find which request belongs to itself or
-> > > not?
-> > >=20
-> > I don=E2=80=99t think the id is necessary here since all requests/respo=
-nses are
-> > serialized.
->=20
->=20
-> It's probably fine for the first version but it will degrate the performa=
-nce
-> e.g if the ioregionfd is used for multiple queues (e.g doorbell). The des=
-ign
-> should have the capability to allow the extension like this.
+This looks ok, as CONFIG_CONTEXT_TRACKING and CONFIG_VIRT_CPU_ACCOUNTING_GEN are
+selected by CONFIG_NO_HZ_FULL=y, and can't be enabled independently, e.g. the
+rcu_user_exit() call won't be delayed because it will never be called in the
+!vtime case.  But it still feels wrong poking into those details, e.g. it'll
+be weird and/or wrong guest_exit_irqoff() gains stuff that isn't vtime specific.
+Maybe that will never happen though?  And of course, my hack alternative also
+pokes into the details[*].
 
-If there is only one doorbell register and one ioregionfd then trying to
-process multiple queues in userspace is going to be slow. Adding cmd IDs
-doesn't fix this because userspace won't be able to destribute cmds to
-multiple queue threads efficiently.
+Thomas, do you have an input on the least awful way to handle this?  My horrible
+hack was to force PF_VCPU around the window where KVM handles IRQs after guest
+exit.
 
-Multiple queues should either use multiple doorbell registers or
-ioregionfd needs something like datamatch to dispatch the MMIO/PIO
-access to the appropriate queue's ioregionfd. In both cases cmd IDs
-aren't necessary.
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index d9f931c63293..6ddf341cd755 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -9118,6 +9118,13 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
+ 	vcpu->mode = OUTSIDE_GUEST_MODE;
+ 	smp_wmb();
 
-Can you think of a case where cmd IDs are needed?
++	/*
++	 * Temporarily pretend this task is running a vCPU when potentially
++	 * processing an IRQ exit, including the below opening of an IRQ
++	 * window.  Tick-based accounting of guest time relies on PF_VCPU
++	 * being set when the tick IRQ handler runs.
++	 */
++	current->flags |= PF_VCPU;
+ 	static_call(kvm_x86_handle_exit_irqoff)(vcpu);
 
-Stefan
+ 	/*
+@@ -9132,6 +9139,7 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
+ 	++vcpu->stat.exits;
+ 	local_irq_disable();
+ 	kvm_after_interrupt(vcpu);
++	current->flags &= ~PF_VCPU;
 
---eSCY88W5gB26qvsn
-Content-Type: application/pgp-signature; name="signature.asc"
+ 	if (lapic_in_kernel(vcpu)) {
+ 		s64 delta = vcpu->arch.apic->lapic_timer.advance_expire_delta;
 
------BEGIN PGP SIGNATURE-----
+[*]https://lkml.kernel.org/r/20210206004218.312023-1-seanjc@google.com
 
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAmBh/Z0ACgkQnKSrs4Gr
-c8hR0AgAx51ZwhqQhykMXbQny17AtdsipxDudNLuYdEtVUUV9JMipDnKnVBbU1gm
-075DJpPu+BTVdhowv1SR7sVlzTxD3IsyLUj0+SCuiwOc6ecOmnVA3oLS+FWYQfR4
-tGQYO4XDb+UWPRiYSBe8Rfo6Osy4qvPrZP/eX0cqUoqWChg7FDFZPPdPg40o8Beu
-yJ8l5R3bAggCxFDtB95jdI9Os5VKArL0VOcuccXcqrHjQw4SFRY9d35LIZ4eQw5/
-/gjuL04JrIMgj5qDdQUK/BcnNfMbMGZ0h01kD9VvC6lxI3N2ADwtBwbbaYHaIvI1
-K67WOIwAGpFqKSnwrS8SQ1fMjW6eOA==
-=KRTL
------END PGP SIGNATURE-----
-
---eSCY88W5gB26qvsn--
-
+>  	instrumentation_begin();
+>  	trace_hardirqs_off_finish();
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index fe806e8..234c8b3 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -9185,6 +9185,8 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
+>  	++vcpu->stat.exits;
+>  	local_irq_disable();
+>  	kvm_after_interrupt(vcpu);
+> +	if (!vtime_accounting_enabled_this_cpu())
+> +		guest_exit_irqoff();
+>  
+>  	if (lapic_in_kernel(vcpu)) {
+>  		s64 delta = vcpu->arch.apic->lapic_timer.advance_expire_delta;
+> -- 
+> 2.7.4
+> 
