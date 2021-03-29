@@ -2,107 +2,107 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C873F34CF55
-	for <lists+kvm@lfdr.de>; Mon, 29 Mar 2021 13:49:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DF0B434D007
+	for <lists+kvm@lfdr.de>; Mon, 29 Mar 2021 14:26:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231301AbhC2Lse (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 29 Mar 2021 07:48:34 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:34525 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231341AbhC2LsR (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 29 Mar 2021 07:48:17 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1617018496;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=H7dNXYaOTclqUn9MijXwZ7hg6tnWG/YqlnOo2zWP1Ro=;
-        b=aupr5yL80KkkTA31hXUEMh1s8+jLN7tkboWzmRKn6rabNFiEsrv8Simg46cuDGGX+klrSd
-        Z1L8GKDI4GNXhzkq1ivAM455YlYL10MHUeK9gjh5qHk3eUR9MOI0RO4sPXmALkdYTp77lS
-        0yPu0LXJr1VXLCVGdnPY2PC8oYWJR9c=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-560-ZJ2Y8tAYM0One8UwMiFmqA-1; Mon, 29 Mar 2021 07:48:15 -0400
-X-MC-Unique: ZJ2Y8tAYM0One8UwMiFmqA-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3201A180FCAF;
-        Mon, 29 Mar 2021 11:48:14 +0000 (UTC)
-Received: from vitty.brq.redhat.com (unknown [10.40.195.155])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 72CC71001B2C;
-        Mon, 29 Mar 2021 11:48:09 +0000 (UTC)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>
-Subject: [PATCH v2 2/2] selftests: kvm: Check that TSC page value is small after KVM_SET_CLOCK(0)
-Date:   Mon, 29 Mar 2021 13:48:00 +0200
-Message-Id: <20210329114800.164066-3-vkuznets@redhat.com>
-In-Reply-To: <20210329114800.164066-1-vkuznets@redhat.com>
-References: <20210329114800.164066-1-vkuznets@redhat.com>
+        id S231195AbhC2MZx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 29 Mar 2021 08:25:53 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:28894 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231150AbhC2MZ1 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 29 Mar 2021 08:25:27 -0400
+Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 12TC3MgN008493
+        for <kvm@vger.kernel.org>; Mon, 29 Mar 2021 08:25:23 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=4NlLNNWIDR4WiYitPFcDwOGvqKapIekGe2LLxUnwLY4=;
+ b=hJuDfPHT/HOWtqDMD7slD/7/v4B0DBpfDkkYlIY9BwM7r5/5VxX9YIyKuCMyv6hChUjx
+ QKagNBeak7rZcwPGaCWhMeQC0dSi7/Nv4t/b32yYGG1kOd8jmHzwJaapkjwiT4BJ7HqD
+ iiD47mokoFiknoDR5FF7xnB2MvFPIW9Xli40eblOxN5bE3Uh/oix+HR9xd9XY0ynZQOQ
+ w6l8tYTP8DHz9cWiC5ecyLKydtwLAJADX0kLFpZeWZGXhvJrYlgXyOaYshdHi+DhxvPJ
+ 2BUxXR88zDGs7tdXfmhlAZgj3K5mqJVIi7+RbYeZlZquJ14RIgmVDD+Jcm7eoFRroXP3 ag== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 37jhsrp5ev-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Mon, 29 Mar 2021 08:25:23 -0400
+Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 12TC3OB8008827
+        for <kvm@vger.kernel.org>; Mon, 29 Mar 2021 08:25:22 -0400
+Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 37jhsrp5e3-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 29 Mar 2021 08:25:22 -0400
+Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
+        by ppma04fra.de.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 12TCMe7f001901;
+        Mon, 29 Mar 2021 12:25:20 GMT
+Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
+        by ppma04fra.de.ibm.com with ESMTP id 37hvb88xex-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 29 Mar 2021 12:25:20 +0000
+Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
+        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 12TCPHcK27853250
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 29 Mar 2021 12:25:17 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 3217A42047;
+        Mon, 29 Mar 2021 12:25:17 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id C294242041;
+        Mon, 29 Mar 2021 12:25:16 +0000 (GMT)
+Received: from oc3016276355.ibm.com (unknown [9.145.39.64])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Mon, 29 Mar 2021 12:25:16 +0000 (GMT)
+Subject: Re: [kvm-unit-tests PATCH v2 2/8] s390x: lib: css: SCSW bit
+ definitions
+To:     Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org
+Cc:     frankja@linux.ibm.com, david@redhat.com, cohuck@redhat.com,
+        imbrenda@linux.ibm.com
+References: <1616665147-32084-1-git-send-email-pmorel@linux.ibm.com>
+ <1616665147-32084-3-git-send-email-pmorel@linux.ibm.com>
+ <f2c2b1a9-d1ae-624b-7c1c-0636dcaa36c3@redhat.com>
+From:   Pierre Morel <pmorel@linux.ibm.com>
+Message-ID: <a57e70de-a633-38a1-03ec-47610ca4c56d@linux.ibm.com>
+Date:   Mon, 29 Mar 2021 14:25:11 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.8.0
 MIME-Version: 1.0
+In-Reply-To: <f2c2b1a9-d1ae-624b-7c1c-0636dcaa36c3@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: tbrXf9ShpFWht67pRI4HCKfZUI-4ty4z
+X-Proofpoint-ORIG-GUID: WY30unYWasmL-lnKQO4VJQcpKE4VsNUQ
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.761
+ definitions=2021-03-29_08:2021-03-26,2021-03-29 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 spamscore=0
+ phishscore=0 impostorscore=0 bulkscore=0 suspectscore=0 clxscore=1015
+ priorityscore=1501 mlxscore=0 mlxlogscore=999 adultscore=0
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2103250000 definitions=main-2103290095
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add a test for the issue when KVM_SET_CLOCK(0) call could cause
-TSC page value to go very big because of a signedness issue around
-hv_clock->system_time.
 
-Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
----
- tools/testing/selftests/kvm/x86_64/hyperv_clock.c | 13 +++++++++++--
- 1 file changed, 11 insertions(+), 2 deletions(-)
 
-diff --git a/tools/testing/selftests/kvm/x86_64/hyperv_clock.c b/tools/testing/selftests/kvm/x86_64/hyperv_clock.c
-index ffbc4555c6e2..7f1d2765572c 100644
---- a/tools/testing/selftests/kvm/x86_64/hyperv_clock.c
-+++ b/tools/testing/selftests/kvm/x86_64/hyperv_clock.c
-@@ -80,19 +80,24 @@ static inline void check_tsc_msr_rdtsc(void)
- 	GUEST_ASSERT(delta_ns * 100 < (t2 - t1) * 100);
- }
- 
-+static inline u64 get_tscpage_ts(struct ms_hyperv_tsc_page *tsc_page)
-+{
-+	return mul_u64_u64_shr64(rdtsc(), tsc_page->tsc_scale) + tsc_page->tsc_offset;
-+}
-+
- static inline void check_tsc_msr_tsc_page(struct ms_hyperv_tsc_page *tsc_page)
- {
- 	u64 r1, r2, t1, t2;
- 
- 	/* Compare TSC page clocksource with HV_X64_MSR_TIME_REF_COUNT */
--	t1 = mul_u64_u64_shr64(rdtsc(), tsc_page->tsc_scale) + tsc_page->tsc_offset;
-+	t1 = get_tscpage_ts(tsc_page);
- 	r1 = rdmsr(HV_X64_MSR_TIME_REF_COUNT);
- 
- 	/* 10 ms tolerance */
- 	GUEST_ASSERT(r1 >= t1 && r1 - t1 < 100000);
- 	nop_loop();
- 
--	t2 = mul_u64_u64_shr64(rdtsc(), tsc_page->tsc_scale) + tsc_page->tsc_offset;
-+	t2 = get_tscpage_ts(tsc_page);
- 	r2 = rdmsr(HV_X64_MSR_TIME_REF_COUNT);
- 	GUEST_ASSERT(r2 >= t1 && r2 - t2 < 100000);
- }
-@@ -130,7 +135,11 @@ static void guest_main(struct ms_hyperv_tsc_page *tsc_page, vm_paddr_t tsc_page_
- 
- 	tsc_offset = tsc_page->tsc_offset;
- 	/* Call KVM_SET_CLOCK from userspace, check that TSC page was updated */
-+
- 	GUEST_SYNC(7);
-+	/* Sanity check TSC page timestamp, it should be close to 0 */
-+	GUEST_ASSERT(get_tscpage_ts(tsc_page) < 100000);
-+
- 	GUEST_ASSERT(tsc_page->tsc_offset != tsc_offset);
- 
- 	nop_loop();
+On 3/29/21 10:09 AM, Thomas Huth wrote:
+> On 25/03/2021 10.39, Pierre Morel wrote:
+>> We need the SCSW definitions to test clear and halt subchannel.
+>>
+>> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+>> ---
+>>   lib/s390x/css.h | 23 +++++++++++++++++++++++
+>>   1 file changed, 23 insertions(+)
+> 
+> Reviewed-by: Thomas Huth <thuth@redhat.com>
+> 
+
+Thanks,
+Pierre
+
 -- 
-2.30.2
-
+Pierre Morel
+IBM Lab Boeblingen
