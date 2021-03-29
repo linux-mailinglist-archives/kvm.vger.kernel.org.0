@@ -2,133 +2,124 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E311234C9E3
-	for <lists+kvm@lfdr.de>; Mon, 29 Mar 2021 10:34:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 91C9C34CB1B
+	for <lists+kvm@lfdr.de>; Mon, 29 Mar 2021 10:46:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233584AbhC2IeH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 29 Mar 2021 04:34:07 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:58293 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234173AbhC2IcL (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 29 Mar 2021 04:32:11 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1617006730;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=ObFkKjmmp7RTnpzRxT5oLl+7kjuZKBWeAXwqd8L+S6A=;
-        b=OQ9q5m9O+oWm/1oabu2PKJzP2YxMDqJ/+BjrqX6aGuAx5GgnVCNmJjOfB2kseY4yk12Tw3
-        bqf0O4CHnWzNv61An4TTmLn5KyfaVW2VM3WKvEDuBFQrAwNZmrJm700VIvqKJOSHgA+sRQ
-        /Gw9YqniOfZ0uDfhOrX+0XBFPQ1Zm+s=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-414-MtoKnWnvObKNqqLaqWavBg-1; Mon, 29 Mar 2021 04:32:07 -0400
-X-MC-Unique: MtoKnWnvObKNqqLaqWavBg-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DA18019251A0;
-        Mon, 29 Mar 2021 08:32:06 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-112-129.ams2.redhat.com [10.36.112.129])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 0B4EB5D9F0;
-        Mon, 29 Mar 2021 08:32:01 +0000 (UTC)
-Subject: Re: [kvm-unit-tests PATCH v2 5/8] s390x: lib: css: add SCSW ctrl
- expectations to check I/O completion
-From:   Thomas Huth <thuth@redhat.com>
-To:     Pierre Morel <pmorel@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     frankja@linux.ibm.com, david@redhat.com, cohuck@redhat.com,
-        imbrenda@linux.ibm.com
-References: <1616665147-32084-1-git-send-email-pmorel@linux.ibm.com>
- <1616665147-32084-6-git-send-email-pmorel@linux.ibm.com>
- <b1ccfed0-5a1c-323d-2176-39513fbde391@redhat.com>
-Message-ID: <036a0962-e46c-7105-3f2a-d61c26e53226@redhat.com>
-Date:   Mon, 29 Mar 2021 10:32:00 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.8.0
+        id S233233AbhC2InT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 29 Mar 2021 04:43:19 -0400
+Received: from mail-dm6nam10on2067.outbound.protection.outlook.com ([40.107.93.67]:15687
+        "EHLO NAM10-DM6-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S235085AbhC2ImQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 29 Mar 2021 04:42:16 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Oi7K5u7lrb94aufqCu+QrRzSLyyaVAQQ8xFjqABpj1UZQuCDtMCAIHrG/LvoBQf6UG9WqeOgD7hPDiiAr9yNYWXklwg9hseWIVYHkWblGqnrCKRmMXJhGjWmeTLRurlQjvYTVartrwhustCdSMWW/Dvycggkp8/1opXubno/5Aw84qek/mq5S5C9gvlPLDQ1olhfQ3NfsYbfR8lxSFHReyXWDNcrKpjW/R1lcGGW5JkrjXmGfUbGYwL/WXb37GfwGrbAleF+hAk4JSka0eoaz1YMaI3rLI/WQ6mA7IazD2lpGrmuNvMcVirCotZlAH1qdW1RqiVveQunoiOWeWJexQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=B7+FX24AYYzrLbuFO7i0N0uUs+vX1u2qdAFtJT34yqQ=;
+ b=d4A4vMVymGRCijyEJq5tJAMs3e11hk+PGhjZkqEGre8Mu9DFo0bZegn2TJg0/MgQ9p5LHI0HZzd61WotJ1vD4P6gI1PkEAuOU/yVdCk+N/hp+g6u6aLmRybk267BVuYJ1nQcCTp2TpyQy5GAaMPLAiuZ1RpSbnZLM1YWcclN4qxEb18lCHcBf4iztQnAKZ3ZoDrpisQ00+rG5UwSjhtBH0nsy2aifOCb/GUoSJnQ4L2iV+1GKksAtcqVhvtickGSkKeQBVSg+ZyXlt735s0ePjzH9NOq65GhpLHQDKpsRX1Ek2nQOVM690No4SH7qCBkLbkw91ZHxACR2GlUVNOyVg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.112.34) smtp.rcpttodomain=redhat.com smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=none sp=none pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=B7+FX24AYYzrLbuFO7i0N0uUs+vX1u2qdAFtJT34yqQ=;
+ b=KKCFR+eGXQpQXIX729IWPon3hv9Chq3ltHycJKgwLLENE8M+SnTW70tbSyirhkswQ4PNdEjpLybdEwsx7dHXEuVDM9ynl7yRXAoyT5pzX4TJD+iRugOlfMbgWjIeK06c+awzijpFyvLPfSHy1sOTz71ayI0KwaBKTRhCCbRYhW7MJtcrqy+EDn+kPknWrQaMp3pk8+vP4/7mhkl7mKUbAUsBMeMSVNLqCUXcALABN+johdKzC4JAse2fWoCmG6uCpi26iWJpyMZhUf7CXrYrWKb6Wk6w5DjQREMoM6V4WDPPkVVuhJzl3Oqy1xua0FJYAx7dOf+QQ/d1d0VyicO2JA==
+Received: from MWHPR01CA0046.prod.exchangelabs.com (2603:10b6:300:101::32) by
+ BN6PR12MB1156.namprd12.prod.outlook.com (2603:10b6:404:1f::18) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.3977.25; Mon, 29 Mar 2021 08:42:14 +0000
+Received: from CO1NAM11FT065.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:300:101:cafe::a7) by MWHPR01CA0046.outlook.office365.com
+ (2603:10b6:300:101::32) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3977.24 via Frontend
+ Transport; Mon, 29 Mar 2021 08:42:14 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.112.34)
+ smtp.mailfrom=nvidia.com; redhat.com; dkim=none (message not signed)
+ header.d=none;redhat.com; dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.112.34 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.112.34; helo=mail.nvidia.com;
+Received: from mail.nvidia.com (216.228.112.34) by
+ CO1NAM11FT065.mail.protection.outlook.com (10.13.174.62) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ 15.20.3955.18 via Frontend Transport; Mon, 29 Mar 2021 08:42:13 +0000
+Received: from [172.27.15.73] (172.20.145.6) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Mon, 29 Mar
+ 2021 08:42:09 +0000
+Subject: Re: [PATCH 05/18] vfio/mdev: Do not allow a mdev_type to have a NULL
+ parent pointer
+To:     Jason Gunthorpe <jgg@nvidia.com>,
+        Cornelia Huck <cohuck@redhat.com>, <kvm@vger.kernel.org>
+CC:     Alex Williamson <alex.williamson@redhat.com>,
+        "Raj, Ashok" <ashok.raj@intel.com>,
+        Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>,
+        Neo Jia <cjia@nvidia.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Jike Song <jike.song@intel.com>,
+        Kirti Wankhede <kwankhede@nvidia.com>,
+        Leon Romanovsky <leonro@nvidia.com>,
+        Tarun Gupta <targupta@nvidia.com>
+References: <5-v1-7dedf20b2b75+4f785-vfio2_jgg@nvidia.com>
+From:   Max Gurtovoy <mgurtovoy@nvidia.com>
+Message-ID: <caebee40-0a26-ca2c-9888-7dc107c3c626@nvidia.com>
+Date:   Mon, 29 Mar 2021 11:42:02 +0300
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.9.0
 MIME-Version: 1.0
-In-Reply-To: <b1ccfed0-5a1c-323d-2176-39513fbde391@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <5-v1-7dedf20b2b75+4f785-vfio2_jgg@nvidia.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 7bit
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Originating-IP: [172.20.145.6]
+X-ClientProxiedBy: HQMAIL111.nvidia.com (172.20.187.18) To
+ HQMAIL107.nvidia.com (172.20.187.13)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: cfb57694-65a1-4e0c-a80a-08d8f28e8cf4
+X-MS-TrafficTypeDiagnostic: BN6PR12MB1156:
+X-Microsoft-Antispam-PRVS: <BN6PR12MB11568AB2556F370F5B03C288DE7E9@BN6PR12MB1156.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:5516;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 67051l7HFxnTMwjyfy7JrDOckEnKKmHcx9rY6QIRmLiWGrCPITvdUdMWc7xUSkfBORS1ICngYc5OGOoaixTGG9/L6LrjNOHw5Zr5FEu3FutCGqqsidsC15GuR4pJKhkDG/8SPRh7tEtIYjLTUROi6GYtFjMq3aUDGKA//xWaBmIMtrJJWgGOFa/neLhvrY3rr8s5+T7br4JHrEgX3Tnmsb/iXU5PqYe+ydCokuNbbdyyDFsu7L781DsxzUy6gNH560SS8LUc16GDIc3sQ7QPafdIKLNbMGMZ1Q5dfhzk4Zv74BwFHr7k94654n8+GDSMt38NqxdPI0f1FHhp5muUY0xi420+6ZHuowKf/LT7fdRjfImTu7/oKxv7WdoZrmVdo/pfx0ijaOmpqoZQD2sHVDIDGbAqn+6admSGTaO56Bw3ETEcRw9gfHMCSNhKvh9CA8avlrR9Imy40cKiA7QG2Me4xhhKz9qnxpGzV0atVx3pih7jpPFxyQK2IR9Ep6iJYDZZ27v1XvppqUJToxoEVoMRemhy3ve0iJWKqxbH+H2Ezq+z+KbpDyDspBV2Kmp6ebANGaZZ3w/2FV/jTOQTlkN+TVvSPPC6DPFewYBmw2AKMkx+xjrx46KZrjW9CpyJCs8N5SNgoTuKwSOU0yueZpFNzE9ksrQx2d2Il0tVrp+Rrt5nsiCGaPaSzUVhp657
+X-Forefront-Antispam-Report: CIP:216.228.112.34;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:schybrid03.nvidia.com;CAT:NONE;SFS:(4636009)(136003)(39860400002)(396003)(376002)(346002)(46966006)(36840700001)(6666004)(478600001)(356005)(2616005)(26005)(4744005)(70206006)(54906003)(5660300002)(31686004)(70586007)(16576012)(53546011)(82310400003)(110136005)(186003)(8676002)(107886003)(7636003)(82740400003)(4326008)(36906005)(36860700001)(86362001)(16526019)(36756003)(47076005)(31696002)(8936002)(2906002)(336012)(316002)(426003)(43740500002);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Mar 2021 08:42:13.6087
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: cfb57694-65a1-4e0c-a80a-08d8f28e8cf4
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.112.34];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource: CO1NAM11FT065.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN6PR12MB1156
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 29/03/2021 10.27, Thomas Huth wrote:
-> On 25/03/2021 10.39, Pierre Morel wrote:
->> When checking for an I/O completion may need to check the cause of
->> the interrupt depending on the test case.
->>
->> Let's provide the tests the possibility to check if the last
->> valid IRQ received is for the function expected after executing
->> an instruction or sequence of instructions and if all ctrl flags
->> of the SCSW are set as expected.
->>
->> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
->> ---
->>   lib/s390x/css.h     |  4 ++--
->>   lib/s390x/css_lib.c | 21 ++++++++++++++++-----
->>   s390x/css.c         |  4 ++--
->>   3 files changed, 20 insertions(+), 9 deletions(-)
->>
->> diff --git a/lib/s390x/css.h b/lib/s390x/css.h
->> index 5d1e1f0..1603781 100644
->> --- a/lib/s390x/css.h
->> +++ b/lib/s390x/css.h
->> @@ -316,8 +316,8 @@ void css_irq_io(void);
->>   int css_residual_count(unsigned int schid);
->>   void enable_io_isc(uint8_t isc);
->> -int wait_and_check_io_completion(int schid);
->> -int check_io_completion(int schid);
->> +int wait_and_check_io_completion(int schid, uint32_t ctrl);
->> +int check_io_completion(int schid, uint32_t ctrl);
->>   /*
->>    * CHSC definitions
->> diff --git a/lib/s390x/css_lib.c b/lib/s390x/css_lib.c
->> index 1e5c409..55e70e6 100644
->> --- a/lib/s390x/css_lib.c
->> +++ b/lib/s390x/css_lib.c
->> @@ -488,21 +488,25 @@ struct ccw1 *ccw_alloc(int code, void *data, int 
->> count, unsigned char flags)
->>   /* wait_and_check_io_completion:
->>    * @schid: the subchannel ID
->> + * @ctrl : expected SCSW control flags
->>    */
->> -int wait_and_check_io_completion(int schid)
->> +int wait_and_check_io_completion(int schid, uint32_t ctrl)
->>   {
->>       wait_for_interrupt(PSW_MASK_IO);
->> -    return check_io_completion(schid);
->> +    return check_io_completion(schid, ctrl);
->>   }
->>   /* check_io_completion:
->>    * @schid: the subchannel ID
->> + * @ctrl : expected SCSW control flags
->>    *
->> - * Makes the most common check to validate a successful I/O
->> - * completion.
->> + * If the ctrl parameter is not null check the IRB SCSW ctrl
->> + * against the ctrl parameter.
->> + * Otherwise, makes the most common check to validate a successful
->> + * I/O completion.
->>    * Only report failures.
->>    */
->> -int check_io_completion(int schid)
->> +int check_io_completion(int schid, uint32_t ctrl)
->>   {
->>       int ret = 0;
->> @@ -515,6 +519,13 @@ int check_io_completion(int schid)
->>           goto end;
->>       }
->> +    if (ctrl && (ctrl ^ irb.scsw.ctrl)) {
-> 
-> With the xor, you can only check for enabled bits ... do we also want to 
-> check for disabled bits, or is this always out of scope?
 
-Never mind, I think I just did not have enough coffee yet, the check should 
-be fine. But couldn't you simply use "!=" instead of "^" here?
+On 3/23/2021 7:55 PM, Jason Gunthorpe wrote:
+> There is a small race where the parent is NULL even though the kobj has
+> already been made visible in sysfs.
+>
+> For instance the attribute_group is made visible in sysfs_create_files()
+> and the mdev_type_attr_show() does:
+>
+>      ret = attr->show(kobj, type->parent->dev, buf);
+>
+> Which will crash on NULL parent. Move the parent setup to before the type
+> pointer leaves the stack frame.
+>
+> Fixes: 7b96953bc640 ("vfio: Mediated device Core driver")
+> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
+> ---
 
-  Thomas
+Looks good,
+
+Reviewed-by: Max Gurtovoy <mgurtovoy@nvidia.com>
 
