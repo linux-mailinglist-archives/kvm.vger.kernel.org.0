@@ -2,119 +2,95 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3FABB34CBB2
-	for <lists+kvm@lfdr.de>; Mon, 29 Mar 2021 10:54:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E33D334CC03
+	for <lists+kvm@lfdr.de>; Mon, 29 Mar 2021 11:05:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234412AbhC2IvP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 29 Mar 2021 04:51:15 -0400
-Received: from mail-dm3nam07on2074.outbound.protection.outlook.com ([40.107.95.74]:12693
-        "EHLO NAM02-DM3-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S231596AbhC2Iur (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 29 Mar 2021 04:50:47 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=FspYOasyER17DYKOqS5iKVaak+Ch+UVKxZCIaV8Xhu6cCXEC8bn6yr/Uz7RLpGIS1dl1cHm0pDinitHiXfioigNqSBjriQn/apw5xs8DJjOcwVcLnE3stt6CYpYLalAAsheUzTW9fIce9B1kQkUYPM5gzxJ5PKdfMqaSzsQdEJTfPCvqHSdmdn2+VPkOUNTUuXTleKhBSxJygzD6FtWM8hqPYiMT/i30aqsRMsP3KnBheSH36uYF+p0lybUH+Kr2Rr+K6FfPqzHODqQf4rcLRMBtgBuq6JuDWFEqCC5ncliN6vTfLYEZsiEbvwtGb1vO47xlvslIlhJnR46rqFodhg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=4ZICGZbCttH1NIeMBd9EkPLd2BenznACgSMbLqpQ048=;
- b=fBBEHCJkgUBuwmxjnJZ49IWgB3qAa4Vy+JrujtavQOVIzwx9+mdE/RPoPwovOI75UmxiyqkY+EqPLmBCHP6QXKWlrim2Rbf3JZNp+Evy7uUS7vYi87Av9oHTk/wtwECRbNDnYoO4fVbmQp+m6TveFbps3SpVGZKsU3uul9pgs3SQpaPTtbNq6OWuIz2jPlQT4oYLAyGqBmjafK842UC+Mh+QThSWBNLr6eqaQ/bZNXejs4pvd6hb2E10R7KDl3RdJTNfZ4rdaqvSdvqID/H9SW361hM5QI+43+6Qv9WVyjXa/8PynIYDn72fEFSvm3nluVm5dZU0UbRt1xBj1sBb9A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.112.34) smtp.rcpttodomain=redhat.com smtp.mailfrom=nvidia.com;
- dmarc=pass (p=none sp=none pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=4ZICGZbCttH1NIeMBd9EkPLd2BenznACgSMbLqpQ048=;
- b=tNxOMKt/7yRWhEwQU/19Hv9DAxThbgxopUnowCN5zaahz1gKaR22YqMBTqDJv1XOk9w9RH8vZ5g5h5UmdDKpOIEK4kWRjaDs1ohw8fgQD5h988HFt4upObgAHROSDoSCnkFBo9JCJ08CY7pI2cNUiVwWDsoPcrDKA0TVYOtEnMhh236HkvgnFXit6rBTME3xo7mK4l3oO3DL8YcelSlRoBqENLf2xyTC8/KLavLpOd6pRt+i4Jih3M6R6lWB92+ynvV1vm1CZTovw+2utBAERG9MGHRcvuXYn29KXxuMxz1kvRIeALb5huBz7JZvqWVVve1WqJGqEGDQ4unMDot11w==
-Received: from MWHPR1401CA0015.namprd14.prod.outlook.com
- (2603:10b6:301:4b::25) by MWHPR1201MB2527.namprd12.prod.outlook.com
- (2603:10b6:300:df::19) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3977.29; Mon, 29 Mar
- 2021 08:50:45 +0000
-Received: from CO1NAM11FT067.eop-nam11.prod.protection.outlook.com
- (2603:10b6:301:4b:cafe::6b) by MWHPR1401CA0015.outlook.office365.com
- (2603:10b6:301:4b::25) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3977.25 via Frontend
- Transport; Mon, 29 Mar 2021 08:50:45 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.112.34)
- smtp.mailfrom=nvidia.com; redhat.com; dkim=none (message not signed)
- header.d=none;redhat.com; dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.112.34 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.112.34; helo=mail.nvidia.com;
-Received: from mail.nvidia.com (216.228.112.34) by
- CO1NAM11FT067.mail.protection.outlook.com (10.13.174.212) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- 15.20.3955.18 via Frontend Transport; Mon, 29 Mar 2021 08:50:45 +0000
-Received: from [172.27.15.73] (172.20.145.6) by HQMAIL107.nvidia.com
- (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Mon, 29 Mar
- 2021 08:50:41 +0000
-Subject: Re: [PATCH 09/18] vfio/mdev: Add missing error handling to
- dev_set_name()
-To:     Jason Gunthorpe <jgg@nvidia.com>,
-        Cornelia Huck <cohuck@redhat.com>, <kvm@vger.kernel.org>
-CC:     Alex Williamson <alex.williamson@redhat.com>,
-        "Raj, Ashok" <ashok.raj@intel.com>,
-        Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>,
-        Neo Jia <cjia@nvidia.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Jike Song <jike.song@intel.com>,
-        Kirti Wankhede <kwankhede@nvidia.com>,
-        Leon Romanovsky <leonro@nvidia.com>,
-        Tarun Gupta <targupta@nvidia.com>
-References: <9-v1-7dedf20b2b75+4f785-vfio2_jgg@nvidia.com>
-From:   Max Gurtovoy <mgurtovoy@nvidia.com>
-Message-ID: <9f2c8ad9-1366-5308-677a-c9727537663b@nvidia.com>
-Date:   Mon, 29 Mar 2021 11:50:39 +0300
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.9.0
+        id S235105AbhC2IzA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 29 Mar 2021 04:55:00 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:44552 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S236177AbhC2Iw5 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 29 Mar 2021 04:52:57 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1617007976;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=Ow3OA1zz0sZgFQjgYK1itMYGQWEYDycsctQNZitiGSo=;
+        b=Go+AeN+SgywL8g8xaKHZ4gB5mM5Po1482n/dM70mL2gIikvaVOW4hA56fT5+80wSWyhB8P
+        yJxwZ+LS3ivFLEoDuVU14ZgYLTqS0bdudigvJnEuZ/gDp7SGSKtaYgaILLAnCoeFIlkcbx
+        UnxgLmpzDRTD4eLrT2Olqv/BCdHIFY0=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-197-_uefPF8WNvOx4cEMeZQ5kQ-1; Mon, 29 Mar 2021 04:52:54 -0400
+X-MC-Unique: _uefPF8WNvOx4cEMeZQ5kQ-1
+Received: by mail-wm1-f70.google.com with SMTP id k132so1355666wma.1
+        for <kvm@vger.kernel.org>; Mon, 29 Mar 2021 01:52:54 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=Ow3OA1zz0sZgFQjgYK1itMYGQWEYDycsctQNZitiGSo=;
+        b=iFNb74u70MvoK8uHR+9sRgWAI/7s92Dd1egpbOS7YZLddV7Hphf6fyo0TzehUL6sTq
+         Lf4bk23dfXgHWJpw72fn94bj6PECE7/7jA99VCje90e7Jk9y25ILXQ1YF09JAlvEkuK+
+         JtsiNFtQYk2SBg9UgpuO2ODSevb8bSMnYUvlG7XMQieAo4iPNPOjoxUVR8DeW6BbD5sT
+         II5ChVehy1nOJa6HOgTcbWA/YgxPhB2vzrjWq+vyTDSV70zg7zazuzsyNuhU2S8Te2LV
+         VIE2v5XslOEAI3EQRbP9xQm0KsZ2ocIIvOP7FQvCnpBMDiDW5wMlVZUHbXE6mqdjzC9n
+         amOA==
+X-Gm-Message-State: AOAM531gaLKozdt5aDiSnt4oMlVA/YLQGTCrZrRUjVslKOhOZi6IchQx
+        LwSxk28dsGi+wC7VRxWNTzASenKpJgaBtuldIo9ZAPYGgsKeTZReLH/ukE/NLdNZKKg5hP/0e9B
+        Af/a7eR5n2Jh6
+X-Received: by 2002:adf:ee4f:: with SMTP id w15mr27575553wro.199.1617007973440;
+        Mon, 29 Mar 2021 01:52:53 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJy14ggZeyOKD8MLg/euq/YSevg+wh8nYXfPT6TAJxwjaDv2zhx7W6453bwTkfCmynppamOy1g==
+X-Received: by 2002:adf:ee4f:: with SMTP id w15mr27575538wro.199.1617007973184;
+        Mon, 29 Mar 2021 01:52:53 -0700 (PDT)
+Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id s9sm26301602wmh.31.2021.03.29.01.52.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 29 Mar 2021 01:52:52 -0700 (PDT)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Wei Huang <wei.huang2@amd.com>, Joerg Roedel <joro@8bytes.org>,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] KVM: x86/vPMU: Forbid writing to MSR_F15H_PERF MSRs
+ when guest doesn't have X86_FEATURE_PERFCTR_CORE
+In-Reply-To: <a40090f1-23a1-fca0-3105-b5e48ee5c86e@redhat.com>
+References: <20210323084515.1346540-1-vkuznets@redhat.com>
+ <a40090f1-23a1-fca0-3105-b5e48ee5c86e@redhat.com>
+Date:   Mon, 29 Mar 2021 10:52:51 +0200
+Message-ID: <874kgubau4.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <9-v1-7dedf20b2b75+4f785-vfio2_jgg@nvidia.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-Originating-IP: [172.20.145.6]
-X-ClientProxiedBy: HQMAIL105.nvidia.com (172.20.187.12) To
- HQMAIL107.nvidia.com (172.20.187.13)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 25261077-3356-4714-6570-08d8f28fbe12
-X-MS-TrafficTypeDiagnostic: MWHPR1201MB2527:
-X-Microsoft-Antispam-PRVS: <MWHPR1201MB25277AAFC116C55DF29C4FE3DE7E9@MWHPR1201MB2527.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:3968;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: eGoCrCrEncQFEZQzp4LHotgiMvvJPvI2YtNnVYZIX4FelMisT3zM81s8GADxYHaBG8QoU6ZlyABTpHIlbzL7ACuSAoukvPVr9T3SPTeT4sALa1nUrZAds1qBJlK0Gu92bRDTbE7EdNSReHAVS2t22DMN3wVFEguWRD43rknC71uLCL4g5dM7cbYwAYMI/YBjV/thvPl5C6/ByjUhgZjhgdugapGz1fD2Po2PEHPolYeb9ulev7zihqQZkwOPhJR380/BTxZQdZZNCDWfahWYRPypy5j9/rJen/9ceufHdRsbyMmANNDMK9gOi5uAi5HIpgf0O2URzwzfC8loSSgXegMdVZs9nuwAnzwQvgZNRbVNr03ev8mAP1Lc/ewRI0HJKzVgxRgef6N0VYEoazGYEFxZ2HHjF/ymJAaL8aDd7KpuYfE1gTr8GZXaSdZBevBDRzqLCSsqw0q/Gj31/TVETojCOVPY6sPx3vhnowey199h8WCNH1aOeoVpsBGD8IpMLSNy974hGmiuQK6CmJBZQG581VRT9CUx5u5shnw5hN6pzN1pbz0iYEbUas3pZ5rBAmYfrV7GPkOAy38aREnsYLkI5u6eR+B/+ESPrc4W837JOEm2DKmpDwkEb9e+lnXJaP3SDW5sDMlm07SFjmoNxC8yb/y2bUoTZtH1fmMcICrLsDd6FqwYyhZtsQ3JN41m
-X-Forefront-Antispam-Report: CIP:216.228.112.34;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:schybrid03.nvidia.com;CAT:NONE;SFS:(4636009)(376002)(136003)(39860400002)(346002)(396003)(36840700001)(46966006)(8676002)(426003)(336012)(53546011)(356005)(31686004)(36756003)(4744005)(8936002)(2906002)(7636003)(2616005)(26005)(31696002)(16526019)(82740400003)(186003)(316002)(54906003)(70586007)(86362001)(70206006)(16576012)(82310400003)(36860700001)(83380400001)(4326008)(36906005)(478600001)(47076005)(110136005)(107886003)(5660300002)(43740500002);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Mar 2021 08:50:45.4857
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 25261077-3356-4714-6570-08d8f28fbe12
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.112.34];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource: CO1NAM11FT067.eop-nam11.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MWHPR1201MB2527
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Paolo Bonzini <pbonzini@redhat.com> writes:
 
-On 3/23/2021 7:55 PM, Jason Gunthorpe wrote:
-> This can fail, and seems to be a popular target for syzkaller error
-> injection. Check the error return and unwind with put_device().
+> On 23/03/21 09:45, Vitaly Kuznetsov wrote:
+>> MSR_F15H_PERF_CTL0-5, MSR_F15H_PERF_CTR0-5 MSRs are only available when
+>> X86_FEATURE_PERFCTR_CORE CPUID bit was exposed to the guest. KVM, however,
+>> allows these MSRs unconditionally because kvm_pmu_is_valid_msr() ->
+>> amd_msr_idx_to_pmc() check always passes and because kvm_pmu_set_msr() ->
+>> amd_pmu_set_msr() doesn't fail.
+>> 
+>> In case of a counter (CTRn), no big harm is done as we only increase
+>> internal PMC's value but in case of an eventsel (CTLn), we go deep into
+>> perf internals with a non-existing counter.
+>> 
+>> Note, kvm_get_msr_common() just returns '0' when these MSRs don't exist
+>> and this also seems to contradict architectural behavior which is #GP
+>> (I did check one old Opteron host) but changing this status quo is a bit
+>> scarier.
 >
-> Fixes: 7b96953bc640 ("vfio: Mediated device Core driver")
-> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
-> ---
->   drivers/vfio/mdev/mdev_core.c | 4 +++-
->   1 file changed, 3 insertions(+), 1 deletion(-)
+> Hmm, since these do have a cpuid bit it may not be that scary.
 
-Looks good,
+Well, if you're not scared I can send a patch)
 
-Reviewed-by: Max Gurtovoy <mgurtovoy@nvidia.com>
+-- 
+Vitaly
 
