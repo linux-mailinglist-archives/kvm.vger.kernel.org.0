@@ -2,750 +2,188 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C11A134D112
-	for <lists+kvm@lfdr.de>; Mon, 29 Mar 2021 15:26:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A516034D122
+	for <lists+kvm@lfdr.de>; Mon, 29 Mar 2021 15:30:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230432AbhC2N0S (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 29 Mar 2021 09:26:18 -0400
-Received: from szxga01-in.huawei.com ([45.249.212.187]:5115 "EHLO
-        szxga01-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231419AbhC2NZs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 29 Mar 2021 09:25:48 -0400
-Received: from DGGEML403-HUB.china.huawei.com (unknown [172.30.72.56])
-        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4F8Cvp61LDzYQ9w;
-        Mon, 29 Mar 2021 21:23:50 +0800 (CST)
-Received: from dggpemm500023.china.huawei.com (7.185.36.83) by
- DGGEML403-HUB.china.huawei.com (10.3.17.33) with Microsoft SMTP Server (TLS)
- id 14.3.498.0; Mon, 29 Mar 2021 21:25:43 +0800
-Received: from [10.174.187.128] (10.174.187.128) by
- dggpemm500023.china.huawei.com (7.185.36.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id
- 15.1.2106.2; Mon, 29 Mar 2021 21:25:43 +0800
-Subject: Re: [RFC PATCH v5 10/10] KVM: selftests: Add a test for kvm page
- table code
-To:     Andrew Jones <drjones@redhat.com>
-CC:     Paolo Bonzini <pbonzini@redhat.com>, <kvm@vger.kernel.org>,
-        <linux-kselftest@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        Ben Gardon <bgardon@google.com>,
-        Sean Christopherson <seanjc@google.com>,
-        "Vitaly Kuznetsov" <vkuznets@redhat.com>,
-        Peter Xu <peterx@redhat.com>, Ingo Molnar <mingo@kernel.org>,
-        Adrian Hunter <adrian.hunter@intel.com>,
-        Jiri Olsa <jolsa@redhat.com>,
-        Arnaldo Carvalho de Melo <acme@redhat.com>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Michael Kerrisk <mtk.manpages@gmail.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        <wanghaibin.wang@huawei.com>, <yuzenghui@huawei.com>
-References: <20210323135231.24948-1-wangyanan55@huawei.com>
- <20210323135231.24948-11-wangyanan55@huawei.com>
- <20210329113840.qd2xutul3sifem36@kamzik.brq.redhat.com>
-From:   "wangyanan (Y)" <wangyanan55@huawei.com>
-Message-ID: <3377dc5b-3a86-70ff-0816-05e94c670e90@huawei.com>
-Date:   Mon, 29 Mar 2021 21:25:42 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.4.0
+        id S231509AbhC2NaB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 29 Mar 2021 09:30:01 -0400
+Received: from mail-dm6nam12on2051.outbound.protection.outlook.com ([40.107.243.51]:31489
+        "EHLO NAM12-DM6-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S231219AbhC2N3o (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 29 Mar 2021 09:29:44 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=hzqoqRLa5LkFcUV6uv3fGlS+/foSAGw3G8aEB0pRQ4ACZrMGuEQ9FC1eIZvAbgEA4A/pi6ro4vOTzO2KXroWzrRaICiKc2WErHLYLfIJjFSV+g0zJm2iezZ1kPoQggUoY0UkQQYjfky8ArFVEr1KV6Pdhxdl1smc1f8wTfrSfAwOjT9Y6d2VCTDnK2uSueGl8zbP+YwmGN4ZxW50WDSBROjltnHP7LVTWEyy/AH2PsZeanRFsTF/2B2P5CB4s1zSnHSxX2AhfAKX6y3lXIw3/+q0m/zYH55YWDLNQMaLZf09u8jPU8goEjI97eOGfWhLX9DWkFfsa0KQ7ftNqI9wfA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=729qrDSQ9IEErNxVk5ewoli8SlnFr5eZUF7zON8xjyI=;
+ b=ofQV84pIc+qhc0CZCbkSOjKneEFQQjayLaoRxUGjrX7g7/2KiWQyWWj6xwOidxP1S9Jg9UOnReTA4xwcvRWC7HgJ7luXEhsvfKxvIzhvMIBjRS3hFkoXsAGmynHgGG35nV1gOvozbVzAzY7I09orC/RjbUMS6TmoK2myTDreuuFUQ4/9ol3R2FQIaqcUwjOFfM8C5l3AzstBy/ejXBE5Zr2QBJ8n01TPFb6PtY8repzG5TlaepobJHioJr/a3rFR2/SH1AOdHReSnammXtz7+IoZ/QB7SW14Mxg1T+Br75rXMJ0V3uKj54G+EtHw8dcUDekwrLM0fC1Av8SQ/UsqEw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=729qrDSQ9IEErNxVk5ewoli8SlnFr5eZUF7zON8xjyI=;
+ b=VSc0h2Bfbz5jCVrPyZLZWwgyg3dDFYA6J0AlLm/CzXLkr4zD1ZT+Rt1/V0SbCziRhSyBmmZqdtC6TSL6tD0EvtuM7rlNPIri/t/1VHEy19vcjvaXFkzuUIFeQC2GA5FSgJ5Ax2BUxXCYT0VibhvOIfMIFzayc1pJgzT/pD257xyVW+UIoqVYI+AdVQRofe/aUVicXifHoAivnVynduBsUJL6CIxwP878pz5zoBc+7kpTo0XlWssDNDDYBj2eoIdwgSOUpmiAtDHwysKoxWjCVl13ocHfc+I6El88nSmon9n+PUdHnhi9jWF+WuwFNjMDoEW3VthhFMNgeh30rHBJSA==
+Authentication-Results: ffwll.ch; dkim=none (message not signed)
+ header.d=none;ffwll.ch; dmarc=none action=none header.from=nvidia.com;
+Received: from DM6PR12MB3834.namprd12.prod.outlook.com (2603:10b6:5:14a::12)
+ by DM6PR12MB3514.namprd12.prod.outlook.com (2603:10b6:5:183::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3977.24; Mon, 29 Mar
+ 2021 13:29:42 +0000
+Received: from DM6PR12MB3834.namprd12.prod.outlook.com
+ ([fe80::1c62:7fa3:617b:ab87]) by DM6PR12MB3834.namprd12.prod.outlook.com
+ ([fe80::1c62:7fa3:617b:ab87%6]) with mapi id 15.20.3977.033; Mon, 29 Mar 2021
+ 13:29:42 +0000
+Date:   Mon, 29 Mar 2021 10:29:39 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Daniel Vetter <daniel.vetter@ffwll.ch>
+Cc:     DRI Development <dri-devel@lists.freedesktop.org>,
+        LKML <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org,
+        linux-mm@kvack.org, linux-arm-kernel@lists.infradead.org,
+        linux-samsung-soc@vger.kernel.org, linux-media@vger.kernel.org,
+        Daniel Vetter <daniel.vetter@intel.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Kees Cook <keescook@chromium.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        John Hubbard <jhubbard@nvidia.com>,
+        =?utf-8?B?SsOpcsO0bWU=?= Glisse <jglisse@redhat.com>,
+        Jan Kara <jack@suse.cz>
+Subject: Re: [PATCH 1/3] mm: Add unsafe_follow_pfn
+Message-ID: <20210329132939.GA1168773@nvidia.com>
+References: <20210316153303.3216674-1-daniel.vetter@ffwll.ch>
+ <20210316153303.3216674-2-daniel.vetter@ffwll.ch>
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20210316153303.3216674-2-daniel.vetter@ffwll.ch>
+X-Originating-IP: [142.162.115.133]
+X-ClientProxiedBy: BL1PR13CA0081.namprd13.prod.outlook.com
+ (2603:10b6:208:2b8::26) To DM6PR12MB3834.namprd12.prod.outlook.com
+ (2603:10b6:5:14a::12)
 MIME-Version: 1.0
-In-Reply-To: <20210329113840.qd2xutul3sifem36@kamzik.brq.redhat.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-Originating-IP: [10.174.187.128]
-X-ClientProxiedBy: dggeme704-chm.china.huawei.com (10.1.199.100) To
- dggpemm500023.china.huawei.com (7.185.36.83)
-X-CFilter-Loop: Reflected
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from mlx.ziepe.ca (142.162.115.133) by BL1PR13CA0081.namprd13.prod.outlook.com (2603:10b6:208:2b8::26) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3999.16 via Frontend Transport; Mon, 29 Mar 2021 13:29:41 +0000
+Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1lQrxb-004u4f-U4; Mon, 29 Mar 2021 10:29:39 -0300
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 8e84875c-1522-4706-6b60-08d8f2b6b578
+X-MS-TrafficTypeDiagnostic: DM6PR12MB3514:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <DM6PR12MB3514105C66A9516B629D6A24C27E9@DM6PR12MB3514.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:3383;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 6I89oTpVCFgoeCQdG6nQu7k8Y1TitSzTwFzUD03mWssD5Vd0/AnQRPp4vtZjT3cPuEyPNMD0bB93FtpiGRkbrR6ViqYmNMnXNGxCJBqilZtTUT6z/QFOmjGs3vogFqlSIqmkbclKhZS2LL3wqoBpOk1G20szal4illaTkD25JOerAxRz6TERce3EmaBvYwHpvDeZMwNqe+ZaKoZGhknbPg80Up7VZdyliIBrFBn1QT3G9mGizOO7dBSsKmqozfto9AbU2stzubo0LIn97mZ7xMXkJRKca/Nzo+vRVGUXun01cMmc/IJT5Mwq61MlnWQxyMb1VmAU85//khozhti6Ww/M9NkYiBUXl/9+eqqpkgxuC/38MNTzZlT3aL48BhLXLnzlNP+iSf4EviPWj8sEu1GLuF5zEqZAP/5RHcOnFToSvXUp++ytimUY8FDLmm+LSh0YU7/nVlGyJvE1VAvDwx8zWTlh36TUF0ggikJAwStWS1bnLYypOVQom3K2eFT/K/EOEkb1CyRZ6UXagS6dUjt+X4S8II4J2GOhJ7ofvyKdPXSjyH0lCpUNkO1kjANtEf7gywnVTSPRwr7mPzJTjQRT1axci/yB6O0GdV2DstFLq2VRutLx3aBIALMGM1LSMjljvcDKFxfLicG6NwX4ciYR+nEEFwtdggufB1i5zK8=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB3834.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(39860400002)(396003)(136003)(376002)(346002)(4326008)(33656002)(7416002)(54906003)(2906002)(38100700001)(26005)(478600001)(6916009)(36756003)(83380400001)(8676002)(66574015)(316002)(8936002)(9786002)(9746002)(5660300002)(86362001)(66556008)(66476007)(2616005)(186003)(426003)(1076003)(66946007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData: =?utf-8?B?ZnlFc3lNQTVPUEdlbFBnZ1N1Vzg4dmMwM2o3TUwvOVcvaEh3Tml3ek1HSlFR?=
+ =?utf-8?B?dDBSQzJKS3lxaVgydHVIRzJkaUd1T011QzlLYjlmaUhoVStCTTg4aHM0bmtO?=
+ =?utf-8?B?L0FWTlZoN0NsOU1INDByZlEvQk0vcyt5Z2ZhTmFpNWRtUFJtMDY5QzgweWtX?=
+ =?utf-8?B?UUNua0luODIrT29kVVN5cEVpRFg4SzdGNVZHekp1VytVRTZraVlZM1pxd3FD?=
+ =?utf-8?B?ZDNaeThDdzY4M1RYcmJROFhuNWZmc2YySlJ0c1ZEME13TXJSOGF2UVVqTTNG?=
+ =?utf-8?B?K1M5c1B0bmtTTThodmM0Sm0rRDVKTXJUQWlwTUlLeWQ3MFF2VStxeFl2S3FR?=
+ =?utf-8?B?MnYxR2xDUXl2UFdJT0Z2aVFzSE1xNE54S1Y4aFBIUU10SHk4dkJyTzI4aGND?=
+ =?utf-8?B?eUt1R0h5QnhlcE9HbUM3SDloWVdqMHZyakwyZC9YZnpqTDVuaFMrQU84YU1J?=
+ =?utf-8?B?UnYvTFdjZ0NKejMzSHpSUmNIRk4wTjB4NEk4VDdLcEE3L2I0VHQ5ZmpXTFJQ?=
+ =?utf-8?B?ZFlldGI3dDJlMWdCM2FOZzcvWm80VkduYjZvbVhDUW9DbFBiaFN4MU9Rdld4?=
+ =?utf-8?B?RHhmbHJCLzVQdlU2akRYQS9FSkpEVDdsMVc5SXpRMWpUUm9pcjl0SDFNR3Bp?=
+ =?utf-8?B?TWxld3EwbnIyTjhkZ3hBSXRteDBxRlFiSVRwVllnUngxczFHcEVta0g3NHF2?=
+ =?utf-8?B?Y0I5aFFid28wOHI3RWRTUnNCVWxtdCt6aWpQVHdWSTV6WkNBS0lNT1l0SlRY?=
+ =?utf-8?B?YjVQU25XSjJIamwveS9EQmFZWUN0eG0rbFVDa0dCb0tPUmhHdnZNNFNROEU5?=
+ =?utf-8?B?VStqejRMVkhIVzVkSkdtcmFhN2pTMHg1UGRXa1dUTmxhekFiOE5QQ3lpSnN1?=
+ =?utf-8?B?NWZNQXliNGU5SzdoUWt1MXlXY0xIb2tkMndaT2dxS0lOUVU2eC90NXhIMzBI?=
+ =?utf-8?B?aDdnNDFqd0haeWR2YUkyeHdNWm1GeWJmU2FyK2NsMEoxYVZDSXhvaUdlUGo2?=
+ =?utf-8?B?T3N3ZnBaY1RhdWpmRlRUVzB6di9Gck5Uci9LOFZJQ1lpQ2s1TFVVR2EyTmFK?=
+ =?utf-8?B?NkNoOThZMm44U2RQdUd2NGl5bnFabitmdHhVTkR2OERTTFBEeDhEZk5GNW5D?=
+ =?utf-8?B?K044Z01rSUY0Sk91T3YwMitBQm5tYVlmbEs3SFRCUEpKVldTTlhtWTd0bHVB?=
+ =?utf-8?B?a3dxUndmZkpkNmZkK3pWZ3hhY1c1em9keU5WU0V6azBsZ0x2a3I4ektWM1F4?=
+ =?utf-8?B?YmEwVkU0VExydEplV0dyOExjNVBwWkJnRU10YzZoZ3RTMm0ydE5nSHVMaGw4?=
+ =?utf-8?B?eEtIR1lBd1VKRmVSVDVaVWR3Y3AyR01ENFk1R3RwR1FhUTVlMGVTZUF3Zzcw?=
+ =?utf-8?B?WDhBTEpKUFZ3SEdramhVM2tYaVBselB2L2FubTRybVpIQS9tK050Q3h6My9K?=
+ =?utf-8?B?YktaOVJDUkJBVi9YdklXVTRHQnRnbTZYS3lmNUhHQzRaSFAyNXp1T0t3Y1NC?=
+ =?utf-8?B?Y0IzUUo5TlJiSU0vNXBTL29rRGZjTGRlTHVVTlJmcXFiNFdYbzlweHdrb3Y3?=
+ =?utf-8?B?VDVXYkdaeDQ2cE45TzN4bkVNVkg2MTZjbEdwdDlKUGpqc1llMldoWmo4bG9m?=
+ =?utf-8?B?ODMzZ1pCWnVlQTdqUS9FYVo5eE05QVBxZVIvaUFSZU0za0ZHajlabjlhUzc2?=
+ =?utf-8?B?aWhLN1NkVU5yajZaY0t5TWMyalNKbktRVGY0dVJNOUlIaCtzaDRlbkdSblNw?=
+ =?utf-8?Q?UQXiITZZYz6tU8FZl4AlgxGueCpz3WtS/HUHmoS?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8e84875c-1522-4706-6b60-08d8f2b6b578
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB3834.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Mar 2021 13:29:42.0809
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: IsG1ZgaZN4VriPnotgDifhDjwtODr+Sv2l3nKXn58smn2UpLfJ5mjA5PAodrSIko
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB3514
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Drew,
-Thanks for having a look.
-On 2021/3/29 19:38, Andrew Jones wrote:
-> On Tue, Mar 23, 2021 at 09:52:31PM +0800, Yanan Wang wrote:
->> This test serves as a performance tester and a bug reproducer for
->> kvm page table code (GPA->HPA mappings), so it gives guidance for
->> people trying to make some improvement for kvm.
->>
->> The function guest_code() can cover the conditions where a single vcpu or
->> multiple vcpus access guest pages within the same memory region, in three
->> VM stages(before dirty logging, during dirty logging, after dirty logging).
->> Besides, the backing src memory type(ANONYMOUS/THP/HUGETLB) of the tested
->> memory region can be specified by users, which means normal page mappings
->> or block mappings can be chosen by users to be created in the test.
->>
->> If ANONYMOUS memory is specified, kvm will create normal page mappings
->> for the tested memory region before dirty logging, and update attributes
->> of the page mappings from RO to RW during dirty logging. If THP/HUGETLB
->> memory is specified, kvm will create block mappings for the tested memory
->> region before dirty logging, and split the blcok mappings into normal page
->> mappings during dirty logging, and coalesce the page mappings back into
->> block mappings after dirty logging is stopped.
->>
->> So in summary, as a performance tester, this test can present the
->> performance of kvm creating/updating normal page mappings, or the
->> performance of kvm creating/splitting/recovering block mappings,
->> through execution time.
->>
->> When we need to coalesce the page mappings back to block mappings after
->> dirty logging is stopped, we have to firstly invalidate *all* the TLB
->> entries for the page mappings right before installation of the block entry,
->> because a TLB conflict abort error could occur if we can't invalidate the
->> TLB entries fully. We have hit this TLB conflict twice on aarch64 software
->> implementation and fixed it. As this test can imulate process from dirty
->> logging enabled to dirty logging stopped of a VM with block mappings,
->> so it can also reproduce this TLB conflict abort due to inadequate TLB
->> invalidation when coalescing tables.
->>
->> Signed-off-by: Yanan Wang <wangyanan55@huawei.com>
->> Reviewed-by: Ben Gardon <bgardon@google.com>
->> ---
->>   tools/testing/selftests/kvm/.gitignore        |   1 +
->>   tools/testing/selftests/kvm/Makefile          |   3 +
->>   .../selftests/kvm/kvm_page_table_test.c       | 512 ++++++++++++++++++
->>   3 files changed, 516 insertions(+)
->>   create mode 100644 tools/testing/selftests/kvm/kvm_page_table_test.c
->>
->> diff --git a/tools/testing/selftests/kvm/.gitignore b/tools/testing/selftests/kvm/.gitignore
->> index 32b87cc77c8e..137ab7273be6 100644
->> --- a/tools/testing/selftests/kvm/.gitignore
->> +++ b/tools/testing/selftests/kvm/.gitignore
->> @@ -35,6 +35,7 @@
->>   /dirty_log_perf_test
->>   /hardware_disable_test
->>   /kvm_create_max_vcpus
->> +/kvm_page_table_test
->>   /memslot_modification_stress_test
->>   /set_memory_region_test
->>   /steal_time
->> diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
->> index a6d61f451f88..75dc57db36b4 100644
->> --- a/tools/testing/selftests/kvm/Makefile
->> +++ b/tools/testing/selftests/kvm/Makefile
->> @@ -69,6 +69,7 @@ TEST_GEN_PROGS_x86_64 += dirty_log_test
->>   TEST_GEN_PROGS_x86_64 += dirty_log_perf_test
->>   TEST_GEN_PROGS_x86_64 += hardware_disable_test
->>   TEST_GEN_PROGS_x86_64 += kvm_create_max_vcpus
->> +TEST_GEN_PROGS_x86_64 += kvm_page_table_test
->>   TEST_GEN_PROGS_x86_64 += memslot_modification_stress_test
->>   TEST_GEN_PROGS_x86_64 += set_memory_region_test
->>   TEST_GEN_PROGS_x86_64 += steal_time
->> @@ -79,6 +80,7 @@ TEST_GEN_PROGS_aarch64 += demand_paging_test
->>   TEST_GEN_PROGS_aarch64 += dirty_log_test
->>   TEST_GEN_PROGS_aarch64 += dirty_log_perf_test
->>   TEST_GEN_PROGS_aarch64 += kvm_create_max_vcpus
->> +TEST_GEN_PROGS_aarch64 += kvm_page_table_test
->>   TEST_GEN_PROGS_aarch64 += set_memory_region_test
->>   TEST_GEN_PROGS_aarch64 += steal_time
->>   
->> @@ -88,6 +90,7 @@ TEST_GEN_PROGS_s390x += s390x/sync_regs_test
->>   TEST_GEN_PROGS_s390x += demand_paging_test
->>   TEST_GEN_PROGS_s390x += dirty_log_test
->>   TEST_GEN_PROGS_s390x += kvm_create_max_vcpus
->> +TEST_GEN_PROGS_s390x += kvm_page_table_test
->>   TEST_GEN_PROGS_s390x += set_memory_region_test
->>   
->>   TEST_GEN_PROGS += $(TEST_GEN_PROGS_$(UNAME_M))
->> diff --git a/tools/testing/selftests/kvm/kvm_page_table_test.c b/tools/testing/selftests/kvm/kvm_page_table_test.c
->> new file mode 100644
->> index 000000000000..bbd5c489d61f
->> --- /dev/null
->> +++ b/tools/testing/selftests/kvm/kvm_page_table_test.c
->> @@ -0,0 +1,512 @@
->> +// SPDX-License-Identifier: GPL-2.0
->> +/*
->> + * KVM page table test
->> + *
->> + * Copyright (C) 2021, Huawei, Inc.
->> + *
->> + * Make sure that THP has been enabled or enough HUGETLB pages with specific
->> + * page size have been pre-allocated on your system, if you are planning to
->> + * use hugepages to back the guest memory for testing.
->> + */
->> +
->> +#define _GNU_SOURCE /* for program_invocation_name */
->> +
->> +#include <stdio.h>
->> +#include <stdlib.h>
->> +#include <time.h>
->> +#include <pthread.h>
->> +#include <semaphore.h>
->> +
->> +#include "test_util.h"
->> +#include "kvm_util.h"
->> +#include "processor.h"
->> +#include "guest_modes.h"
->> +
->> +#define TEST_MEM_SLOT_INDEX             1
->> +
->> +/* Default size(1GB) of the memory for testing */
->> +#define DEFAULT_TEST_MEM_SIZE		(1 << 30)
->> +
->> +/* Default guest test virtual memory offset */
->> +#define DEFAULT_GUEST_TEST_MEM		0xc0000000
->> +
->> +/*
->> + * In our test, we use thread synchronization functions (e.g. sem_wait)
->> + * for time measurement and they can't fail at all, since a failure will
->> + * impact the time accuracy and vcpus will not run as what we expect.
->> + * So we will use safer versions of the functions.
->> + */
->> +#define sem_init_s(sem_ptr, ps, val) \
->> +	TEST_ASSERT(sem_init(sem_ptr, ps, val) == 0, "Error in sem_init")
->> +#define sem_destroy_s(sem_ptr) \
->> +	TEST_ASSERT(sem_destroy(sem_ptr) == 0, "Error in sem_destroy")
->> +#define sem_wait_s(sem_ptr) \
->> +	TEST_ASSERT(sem_wait(sem_ptr) == 0, "Error in sem_wait")
->> +#define sem_post_s(sem_ptr) \
->> +	TEST_ASSERT(sem_post(sem_ptr) == 0, "Error in sem_post")
-> I'd rather not do this. I'd prefer to see
->
->   ret = sem_*(...);
->   TEST_ASSERT(ret == 0, ...);
->
-> at the callsites.
-Ok, I will make some adjustment.
->> +
->> +/* Different guest memory accessing stages */
->> +enum test_stage {
->> +	KVM_BEFORE_MAPPINGS,
->> +	KVM_CREATE_MAPPINGS,
->> +	KVM_UPDATE_MAPPINGS,
->> +	KVM_ADJUST_MAPPINGS,
->> +	NUM_TEST_STAGES,
->> +};
->> +
->> +static const char * const test_stage_string[] = {
->> +	"KVM_BEFORE_MAPPINGS",
->> +	"KVM_CREATE_MAPPINGS",
->> +	"KVM_UPDATE_MAPPINGS",
->> +	"KVM_ADJUST_MAPPINGS",
->> +};
->> +
->> +struct perf_test_vcpu_args {
->> +	int vcpu_id;
->> +	bool vcpu_write;
->> +};
->> +
->> +struct perf_test_args {
->> +	struct kvm_vm *vm;
->> +	uint64_t guest_test_virt_mem;
->> +	uint64_t host_page_size;
->> +	uint64_t host_num_pages;
->> +	uint64_t large_page_size;
->> +	uint64_t large_num_pages;
->> +	uint64_t host_pages_per_lpage;
->> +	enum vm_mem_backing_src_type src_type;
->> +	struct perf_test_vcpu_args vcpu_args[KVM_MAX_VCPUS];
->> +};
-> The above two structure names already have declarations in
-> include/perf_test_util.h. Using those names here is a bit confusing. I
-> suggest new names or extending the ones in perf_test_util.h, if the
-> extensions make sense for other perf tests. If extending the structures
-> makes sense in general, but these specific extensions don't, then you
-> can consider adding 'void *data' pointers allowing them to be extended
-> arbitrarily.
-I think I prefer using other new names for these two structures in this 
-test,
-because most of the structure members are specific for this test and are
-quite different from declarations in include/perf_test_util.h so that the
-extensions don't really make sense for other perf tests.
->> +
->> +/*
->> + * Guest variables. Use addr_gva2hva() if these variables need
->> + * to be changed in host.
->> + */
->> +static enum test_stage guest_test_stage;
->> +
->> +/* Host variables */
->> +static uint32_t nr_vcpus = 1;
->> +static struct perf_test_args perf_test_args;
->> +static enum test_stage *current_stage;
->> +static bool host_quit;
->> +
->> +/* Whether the test stage is updated, or completed */
->> +static sem_t test_stage_updated;
->> +static sem_t test_stage_completed;
->> +
->> +/*
->> + * Guest physical memory offset of the testing memory slot.
->> + * This will be set to the topmost valid physical address minus
->> + * the test memory size.
->> + */
->> +static uint64_t guest_test_phys_mem;
->> +
->> +/*
->> + * Guest virtual memory offset of the testing memory slot.
->> + * Must not conflict with identity mapped test code.
->> + */
->> +static uint64_t guest_test_virt_mem = DEFAULT_GUEST_TEST_MEM;
->> +
->> +static void guest_code(int vcpu_id)
->> +{
->> +	struct perf_test_args *p = &perf_test_args;
->> +	struct perf_test_vcpu_args *vcpu_args = &p->vcpu_args[vcpu_id];
->> +	enum vm_mem_backing_src_type src_type = p->src_type;
->> +	uint64_t host_page_size = p->host_page_size;
->> +	uint64_t host_num_pages = p->host_num_pages;
->> +	uint64_t large_page_size = p->large_page_size;
->> +	uint64_t large_num_pages = p->large_num_pages;
->> +	uint64_t host_pages_per_lpage = p->host_pages_per_lpage;
-> My suggestion to create the 'p' alias was to avoid creating all
-> these local variables. E.g. instead of creating host_page_size,
-> just use p->host_page_size wherever it's needed.
->
->> +	uint64_t half = host_pages_per_lpage / 2;
->> +	bool vcpu_write;
->> +	enum test_stage stage;
->> +	uint64_t addr;
->> +	int i, j;
->> +
->> +	/* Make sure vCPU args data structure is not corrupt */
->> +	GUEST_ASSERT(vcpu_args->vcpu_id == vcpu_id);
-> I'm OK with this sanity check, but I don't see how the args could be
-> corrupt. Maybe they could be poorly initialized or there could be a
-> missing sync_global_to_guest() though.
->
->> +	vcpu_write = vcpu_args->vcpu_write;
-> Another unnecessary local variable.
->
->> +
->> +	while (true) {
->> +		stage = READ_ONCE(guest_test_stage);
-> Another unnecessary local variable. I'd just put the READ_ONCE(...)
-> in the switch(). Also, before this loop I'd do
->
->   current_stage = &guest_test_stage;
->
-> allowing the switch to use READ_ONCE(*current_stage), which makes
-> it easier to understand how it relates to the host code.
-Thanks for above suggestions for guest_code(). I agree and will fix them.
->> +		addr = perf_test_args.guest_test_virt_mem;
->> +
->> +		switch (stage) {
->> +		/*
->> +		 * Before dirty logging, vCPUs concurrently access the first
->> +		 * 8 bytes of each page (host page/large page) within the same
->> +		 * memory region with different accessing types (read/write).
->> +		 * Then KVM will create normal page mappings or huge block
->> +		 * mappings for them.
->> +		 */
->> +		case KVM_CREATE_MAPPINGS:
->> +			for (i = 0; i < large_num_pages; i++) {
->> +				if (vcpu_write)
->> +					*(uint64_t *)addr = 0x0123456789ABCDEF;
->> +				else
->> +					READ_ONCE(*(uint64_t *)addr);
->> +
->> +				addr += large_page_size;
->> +			}
->> +			break;
->> +
->> +		/*
->> +		 * During dirty logging, KVM will only update attributes of the
->> +		 * normal page mappings from RO to RW if memory backing src type
->> +		 * is anonymous. In other cases, KVM will split the huge block
->> +		 * mappings into normal page mappings if memory backing src type
->> +		 * is THP or HUGETLB.
->> +		 */
->> +		case KVM_UPDATE_MAPPINGS:
->> +			if (src_type == VM_MEM_SRC_ANONYMOUS) {
->> +				for (i = 0; i < host_num_pages; i++) {
->> +					*(uint64_t *)addr = 0x0123456789ABCDEF;
->> +					addr += host_page_size;
->> +				}
->> +				break;
->> +			}
->> +
->> +			for (i = 0; i < large_num_pages; i++) {
->> +				/*
->> +				 * Write to the first host page in each large
->> +				 * page region, and triger break of large pages.
->> +				 */
->> +				*(uint64_t *)addr = 0x0123456789ABCDEF;
->> +
->> +				/*
->> +				 * Access the middle host pages in each large
->> +				 * page region. Since dirty logging is enabled,
->> +				 * this will create new mappings at the smallest
->> +				 * granularity.
->> +				 */
->> +				addr += host_page_size * half;
->> +				for (j = half; j < host_pages_per_lpage; j++) {
->> +					READ_ONCE(*(uint64_t *)addr);
->> +					addr += host_page_size;
->> +				}
->> +			}
->> +			break;
->> +
->> +		/*
->> +		 * After dirty logging is stopped, vCPUs concurrently read
->> +		 * from every single host page. Then KVM will coalesce the
->> +		 * split page mappings back to block mappings. And a TLB
->> +		 * conflict abort could occur here if TLB entries of the
->> +		 * page mappings are not fully invalidated.
->> +		 */
->> +		case KVM_ADJUST_MAPPINGS:
->> +			for (i = 0; i < host_num_pages; i++) {
->> +				READ_ONCE(*(uint64_t *)addr);
->> +				addr += host_page_size;
->> +			}
->> +			break;
->> +
->> +		default:
-> How about this do nothing break be applied only to KVM_BEFORE_MAPPINGS
-> and the default case be a GUEST_ASSERT?
-Nice idea. It will also indicate that there totally are four stages
-in accord to structure test_stage.
-> Or does there also need to be
-> a QUIT?
->
->> +			break;
->> +		}
->> +
->> +		GUEST_SYNC(1);
->> +	}
->> +}
->> +
->> +static void *vcpu_worker(void *data)
->> +{
->> +	int ret;
->> +	struct perf_test_vcpu_args *vcpu_args = data;
->> +	struct kvm_vm *vm = perf_test_args.vm;
->> +	int vcpu_id = vcpu_args->vcpu_id;
->> +	struct kvm_run *run;
->> +	struct timespec start;
->> +	struct timespec ts_diff;
->> +	enum test_stage stage;
->> +
->> +	vcpu_args_set(vm, vcpu_id, 1, vcpu_id);
->> +	run = vcpu_state(vm, vcpu_id);
->> +
->> +	while (!READ_ONCE(host_quit)) {
->> +		clock_gettime(CLOCK_MONOTONIC_RAW, &start);
->> +		ret = _vcpu_run(vm, vcpu_id);
->> +		ts_diff = timespec_elapsed(start);
->> +
->> +		TEST_ASSERT(ret == 0, "vcpu_run failed: %d\n", ret);
->> +		TEST_ASSERT(get_ucall(vm, vcpu_id, NULL) == UCALL_SYNC,
->> +			    "Invalid guest sync status: exit_reason=%s\n",
->> +			    exit_reason_str(run->exit_reason));
->> +
->> +		pr_debug("Got sync event from vCPU %d\n", vcpu_id);
->> +		stage = READ_ONCE(*current_stage);
->> +
->> +		/*
->> +		 * Here we can know the execution time of every
->> +		 * single vcpu running in different test stages.
->> +		 */
->> +		pr_debug("vCPU %d has completed stage %s\n"
->> +			 "execution time is: %ld.%.9lds\n\n",
->> +			 vcpu_id, test_stage_string[stage],
->> +			 ts_diff.tv_sec, ts_diff.tv_nsec);
->> +
->> +		sem_post_s(&test_stage_completed);
->> +		sem_wait_s(&test_stage_updated);
-> Shouldn't this wait be at the top of the loop?
->
->> +	}
->> +
->> +	return NULL;
->> +}
->> +
->> +struct test_params {
->> +	uint64_t phys_offset;
->> +	uint64_t test_mem_size;
->> +	enum vm_mem_backing_src_type src_type;
->> +};
->> +
->> +static struct kvm_vm *pre_init_before_test(enum vm_guest_mode mode, void *arg)
->> +{
->> +	struct test_params *p = arg;
->> +	struct perf_test_vcpu_args *vcpu_args;
->> +	enum vm_mem_backing_src_type src_type = p->src_type;
->> +	uint64_t large_page_size = get_backing_src_pagesz(src_type);
->> +	uint64_t test_mem_size = p->test_mem_size, guest_num_pages;
->> +	uint64_t guest_page_size = vm_guest_mode_params[mode].page_size;
->> +	uint64_t host_page_size = getpagesize();
->> +	uint64_t alignment;
->> +	void *host_test_mem;
->> +	struct kvm_vm *vm;
->> +	int vcpu_id;
->> +
->> +	/* Align up the test memory size */
->> +	alignment = max(large_page_size, guest_page_size);
->> +	test_mem_size = (test_mem_size + alignment - 1) & ~(alignment - 1);
-> We have align() in lib/kvm_util.c. I see it's static though. We should
-> probably expose that by making it a static inline in test_util.h
-Yes, I know the align() function. But exposure of the function and the
-corresponding fix of the tests is already what Sean's previous patch did.
-Maybe I should leave it for Sean to fix uniformly when his v2 will be
-posted after this series is queued.
->> +
->> +	/* Create a VM with enough guest pages */
->> +	guest_num_pages = test_mem_size / guest_page_size;
->> +	vm = vm_create_with_vcpus(mode, nr_vcpus,
->> +				  guest_num_pages, 0, guest_code, NULL);
->> +
->> +	/* Align down GPA of the testing memslot */
->> +	if (!p->phys_offset)
->> +		guest_test_phys_mem = (vm_get_max_gfn(vm) - guest_num_pages) *
->> +				       guest_page_size;
->> +	else
->> +		guest_test_phys_mem = p->phys_offset;
->> +#ifdef __s390x__
->> +	alignment = max(0x100000, alignment);
->> +#endif
->> +	guest_test_phys_mem &= ~(alignment - 1);
->> +
->> +	/* Set up the shared data structure perf_test_args */
->> +	perf_test_args.vm = vm;
->> +	perf_test_args.guest_test_virt_mem = guest_test_virt_mem;
->> +	perf_test_args.host_page_size = host_page_size;
->> +	perf_test_args.host_num_pages = test_mem_size / host_page_size;
->> +	perf_test_args.large_page_size = large_page_size;
->> +	perf_test_args.large_num_pages = test_mem_size / large_page_size;
->> +	perf_test_args.host_pages_per_lpage = large_page_size / host_page_size;
->> +	perf_test_args.src_type = src_type;
->> +
->> +	for (vcpu_id = 0; vcpu_id < KVM_MAX_VCPUS; vcpu_id++) {
->> +		vcpu_args = &perf_test_args.vcpu_args[vcpu_id];
->> +		vcpu_args->vcpu_id = vcpu_id;
->> +		vcpu_args->vcpu_write = !(vcpu_id % 2);
->> +	}
->> +
->> +	/* Add an extra memory slot with specified backing src type */
->> +	vm_userspace_mem_region_add(vm, src_type, guest_test_phys_mem,
->> +				    TEST_MEM_SLOT_INDEX, guest_num_pages, 0);
->> +
->> +	/* Do mapping(GVA->GPA) for the testing memory slot */
->> +	virt_map(vm, guest_test_virt_mem, guest_test_phys_mem, guest_num_pages, 0);
->> +
->> +	/* Cache the HVA pointer of the region */
->> +	host_test_mem = addr_gpa2hva(vm, (vm_paddr_t)guest_test_phys_mem);
->> +
->> +	/* Export shared structure perf_test_args to guest */
->> +	ucall_init(vm, NULL);
->> +	sync_global_to_guest(vm, perf_test_args);
->> +
->> +	sem_init_s(&test_stage_updated, 0, 0);
->> +	sem_init_s(&test_stage_completed, 0, 0);
->> +
->> +	current_stage = addr_gva2hva(vm, (vm_vaddr_t)(&guest_test_stage));
->> +	*current_stage = NUM_TEST_STAGES;
->> +
->> +	pr_info("Testing guest mode: %s\n", vm_guest_mode_string(mode));
->> +	pr_info("Testing memory backing src type: %s\n",
->> +		vm_mem_backing_src_alias(src_type)->name);
->> +	pr_info("Testing memory backing src granularity: 0x%lx\n",
->> +		large_page_size);
->> +	pr_info("Testing memory size(aligned): 0x%lx\n", test_mem_size);
->> +	pr_info("Guest physical test memory offset: 0x%lx\n",
->> +		guest_test_phys_mem);
->> +	pr_info("Host  virtual  test memory offset: 0x%lx\n",
->> +		(uint64_t)host_test_mem);
->> +	pr_info("Number of testing vCPUs: %d\n", nr_vcpus);
->> +
->> +	return vm;
->> +}
->> +
->> +/* Wake up all the vcpus to run new test stage */
->> +static void vcpus_start_new_stage(void)
->> +{
->> +	int vcpus;
->> +
->> +	for (vcpus = 1; vcpus <= nr_vcpus; vcpus++)
-> nit: vcpus = 0; vcpus < nr_vcpus; is more traditional.
-Ok, will fix.
->> +		sem_post_s(&test_stage_updated);
->> +
->> +	pr_debug("All vcpus have been notified to continue\n");
->> +}
->> +
->> +/* Wait for all the vcpus to complete new test stage */
->> +static void vcpus_complete_new_stage(enum test_stage stage)
->> +{
->> +	int vcpus;
->> +
->> +	for (vcpus = 1; vcpus <= nr_vcpus; vcpus++) {
->> +		sem_wait_s(&test_stage_completed);
->> +		pr_debug("%d vcpus have completed stage %s\n",
->> +			 vcpus, test_stage_string[stage]);
->> +	}
->> +
->> +	pr_debug("All vcpus have completed stage %s\n",
->> +		 test_stage_string[stage]);
->> +}
->> +
->> +static void run_test(enum vm_guest_mode mode, void *arg)
->> +{
->> +	pthread_t *vcpu_threads;
->> +	struct kvm_vm *vm;
->> +	int vcpu_id;
->> +	struct timespec start;
->> +	struct timespec ts_diff;
->> +
->> +	/* Create VM with vCPUs and make some pre-initialization */
->> +	vm = pre_init_before_test(mode, arg);
->> +
->> +	vcpu_threads = malloc(nr_vcpus * sizeof(*vcpu_threads));
->> +	TEST_ASSERT(vcpu_threads, "Memory allocation failed");
->> +
->> +	host_quit = false;
->> +	*current_stage = KVM_BEFORE_MAPPINGS;
->> +
->> +	for (vcpu_id = 0; vcpu_id < nr_vcpus; vcpu_id++) {
->> +		pthread_create(&vcpu_threads[vcpu_id], NULL, vcpu_worker,
->> +			       &perf_test_args.vcpu_args[vcpu_id]);
->> +	}
->> +
->> +	pr_info("Started all vCPUs successfully\n");
->> +
->> +	vcpus_complete_new_stage(*current_stage);
-> With the sem_wait in vcpu_working moved to the top of the loop, I'd
-> write the last two lines as
->
->   vcpus_start_new_stage();
->   vcpus_complete_new_stage(*current_stage);
->   pr_info("Started all vCPUs successfully\n");
-Yes, it will look better.
->> +
->> +	/* Test the stage of KVM creating mappings */
->> +	*current_stage = KVM_CREATE_MAPPINGS;
->> +
->> +	clock_gettime(CLOCK_MONOTONIC_RAW, &start);
->> +	vcpus_start_new_stage();
->> +	vcpus_complete_new_stage(*current_stage);
->> +	ts_diff = timespec_elapsed(start);
->> +
->> +	pr_info("KVM_CREATE_MAPPINGS: total execution time: %ld.%.9lds\n\n",
->> +		ts_diff.tv_sec, ts_diff.tv_nsec);
->> +
->> +	/* Test the stage of KVM updating mappings */
->> +	vm_mem_region_set_flags(vm, TEST_MEM_SLOT_INDEX,
->> +				KVM_MEM_LOG_DIRTY_PAGES);
->> +
->> +	*current_stage = KVM_UPDATE_MAPPINGS;
->> +
->> +	clock_gettime(CLOCK_MONOTONIC_RAW, &start);
->> +	vcpus_start_new_stage();
->> +	vcpus_complete_new_stage(*current_stage);
->> +	ts_diff = timespec_elapsed(start);
->> +
->> +	pr_info("KVM_UPDATE_MAPPINGS: total execution time: %ld.%.9lds\n\n",
->> +		ts_diff.tv_sec, ts_diff.tv_nsec);
->> +
->> +	/* Test the stage of KVM adjusting mappings */
->> +	vm_mem_region_set_flags(vm, TEST_MEM_SLOT_INDEX, 0);
->> +
->> +	*current_stage = KVM_ADJUST_MAPPINGS;
->> +
->> +	clock_gettime(CLOCK_MONOTONIC_RAW, &start);
->> +	vcpus_start_new_stage();
->> +	vcpus_complete_new_stage(*current_stage);
->> +	ts_diff = timespec_elapsed(start);
->> +
->> +	pr_info("KVM_ADJUST_MAPPINGS: total execution time: %ld.%.9lds\n\n",
->> +		ts_diff.tv_sec, ts_diff.tv_nsec);
->> +
->> +	/* Tell the vcpu thread to quit */
->> +	host_quit = true;
->> +	vcpus_start_new_stage();
-> Looks like besides this one the vcpus_start_new_stage and
-> vcpus_complete_new_stage calls always come together. Maybe
-> they could be merged into one function and this one could be handled
-> differently.
-Makes sense.
->
->> +
->> +	for (vcpu_id = 0; vcpu_id < nr_vcpus; vcpu_id++)
->> +		pthread_join(vcpu_threads[vcpu_id], NULL);
->> +
->> +	sem_destroy_s(&test_stage_updated);
->> +	sem_destroy_s(&test_stage_completed);
->> +
->> +	free(vcpu_threads);
->> +	ucall_uninit(vm);
->> +	kvm_vm_free(vm);
->> +}
->> +
->> +static void help(char *name)
->> +{
->> +	puts("");
->> +	printf("usage: %s [-h] [-p offset] [-m mode] "
->> +	       "[-b mem-size] [-v vcpus] [-s mem-type]\n", name);
->> +	puts("");
->> +	printf(" -p: specify guest physical test memory offset\n"
->> +	       "     Warning: a low offset can conflict with the loaded test code.\n");
->> +	guest_modes_help();
->> +	printf(" -b: specify size of the memory region for testing. e.g. 10M or 3G.\n"
->> +	       "     (default: 1G)\n");
->> +	printf(" -v: specify the number of vCPUs to run\n"
->> +	       "     (default: 1)\n");
->> +	printf(" -s: specify the type of memory that should be used to\n"
->> +	       "     back the guest data region.\n"
->> +	       "     (default: anonymous)\n\n");
->                                             ^ is this extra \n needed?
-The extra \n adds an empty line before followed list of different backing
-source types, which possibly makes it easier to be read for users.
-No strong feelings about either way actually.
->> +	backing_src_help();
->> +	puts("");
->> +	exit(0);
->> +}
->> +
->> +int main(int argc, char *argv[])
->> +{
->> +	int max_vcpus = kvm_check_cap(KVM_CAP_MAX_VCPUS);
->> +	struct test_params p = {
->> +		.test_mem_size = DEFAULT_TEST_MEM_SIZE,
->> +		.src_type = VM_MEM_SRC_ANONYMOUS,
->> +	};
->> +	int opt;
->> +
->> +	guest_modes_append_default();
->> +
->> +	while ((opt = getopt(argc, argv, "hp:m:b:v:s:")) != -1) {
->> +		switch (opt) {
->> +		case 'p':
->> +			p.phys_offset = strtoull(optarg, NULL, 0);
->> +			break;
->> +		case 'm':
->> +			guest_modes_cmdline(optarg);
->> +			break;
->> +		case 'b':
->> +			p.test_mem_size = parse_size(optarg);
->> +			break;
->> +		case 'v':
->> +			nr_vcpus = atoi(optarg);
->> +			TEST_ASSERT(nr_vcpus > 0 && nr_vcpus <= max_vcpus,
->> +				    "Invalid number of vcpus, must be between 1 and %d", max_vcpus);
->> +			break;
->> +		case 's':
->> +			p.src_type = parse_backing_src_type(optarg);
->> +			break;
->> +		case 'h':
->> +		default:
->> +			help(argv[0]);
->> +			break;
-> nit: I'd replace this break with an exit() and not exit from help().
-Makes sense.
->> +		}
->> +	}
->> +
->> +	for_each_guest_mode(run_test, &p);
->> +
->> +	return 0;
->> +}
->> -- 
->> 2.19.1
->>
-> My comments are mainly just a bunch of nits, so
->
-> Reviewed-by: Andrew Jones <drjones@redhat.com>
-Thanks again,
-Yanan
->
-> Thanks,
-> drew
->
-> .
+On Tue, Mar 16, 2021 at 04:33:01PM +0100, Daniel Vetter wrote:
+> Way back it was a reasonable assumptions that iomem mappings never
+> change the pfn range they point at. But this has changed:
+> 
+> - gpu drivers dynamically manage their memory nowadays, invalidating
+> ptes with unmap_mapping_range when buffers get moved
+> 
+> - contiguous dma allocations have moved from dedicated carvetouts to
+> cma regions. This means if we miss the unmap the pfn might contain
+> pagecache or anon memory (well anything allocated with GFP_MOVEABLE)
+> 
+> - even /dev/mem now invalidates mappings when the kernel requests that
+> iomem region when CONFIG_IO_STRICT_DEVMEM is set, see 3234ac664a87
+> ("/dev/mem: Revoke mappings when a driver claims the region")
+> 
+> Accessing pfns obtained from ptes without holding all the locks is
+> therefore no longer a good idea.
+> 
+> Unfortunately there's some users where this is not fixable (like v4l
+> userptr of iomem mappings) or involves a pile of work (vfio type1
+> iommu). For now annotate these as unsafe and splat appropriately.
+> 
+> This patch adds an unsafe_follow_pfn, which later patches will then
+> roll out to all appropriate places.
+> 
+> Also mark up follow_pfn as EXPORT_SYMBOL_GPL. The only safe way to use
+> that by drivers/modules is together with an mmu_notifier, and that's
+> all _GPL stuff.
+> 
+> Signed-off-by: Daniel Vetter <daniel.vetter@intel.com>
+> Cc: Christoph Hellwig <hch@infradead.org>
+> Cc: Jason Gunthorpe <jgg@ziepe.ca>
+> Cc: Kees Cook <keescook@chromium.org>
+> Cc: Dan Williams <dan.j.williams@intel.com>
+> Cc: Andrew Morton <akpm@linux-foundation.org>
+> Cc: John Hubbard <jhubbard@nvidia.com>
+> Cc: Jérôme Glisse <jglisse@redhat.com>
+> Cc: Jan Kara <jack@suse.cz>
+> Cc: Dan Williams <dan.j.williams@intel.com>
+> Cc: linux-mm@kvack.org
+> Cc: linux-arm-kernel@lists.infradead.org
+> Cc: linux-samsung-soc@vger.kernel.org
+> Cc: linux-media@vger.kernel.org
+> Cc: kvm@vger.kernel.org
+> Signed-off-by: Daniel Vetter <daniel.vetter@ffwll.ch>
+> --
+> v5: Suggestions from Christoph
+> - reindent for less weirdness
+> - use IS_ENABLED instead of #ifdef
+> - same checks for nommu, for consistency
+> - EXPORT_SYMBOL_GPL for follow_pfn.
+> - kerneldoc was already updated in previous versions to explain when
+>   follow_pfn can be used safely
+> ---
+>  include/linux/mm.h |  2 ++
+>  mm/memory.c        | 34 ++++++++++++++++++++++++++++++++--
+>  mm/nommu.c         | 27 ++++++++++++++++++++++++++-
+>  security/Kconfig   | 13 +++++++++++++
+>  4 files changed, 73 insertions(+), 3 deletions(-)
+
+Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
+
+Jason
