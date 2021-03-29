@@ -2,134 +2,154 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B81E034CD44
-	for <lists+kvm@lfdr.de>; Mon, 29 Mar 2021 11:45:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E2E2834CE63
+	for <lists+kvm@lfdr.de>; Mon, 29 Mar 2021 13:01:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231862AbhC2Jog (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 29 Mar 2021 05:44:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39116 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231661AbhC2JoL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 29 Mar 2021 05:44:11 -0400
-Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 45760C061574;
-        Mon, 29 Mar 2021 02:44:10 -0700 (PDT)
-Received: by mail-pj1-x102e.google.com with SMTP id kr3-20020a17090b4903b02900c096fc01deso5646699pjb.4;
-        Mon, 29 Mar 2021 02:44:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id;
-        bh=U5U4X+ZOhi4vgTgaFmTIVBDWOm8KVT4HEd/HA9LL9Zg=;
-        b=DlatJVXkwqLPHmaVGR45p/BOWtcCxdavc35cLcf00aTgyWgqryDueTSl1vW8kxxBII
-         QuBWhR7SRW/ojJsXogmNVx1sXCkbmilH1C7Kw4sZ/XHsrQt7eACRMgnY7/N9LH7b/Gam
-         3y39+pTcse9g45vH7WegK0gdUgdofxWrQZ8w31NaI0AAhrLcZtOhD2iQ1/sb0HxUqygF
-         wX/Mt/71CHLgpZVXVZeCA1SiC5Uir1FFLmJnZftO47eeF/doW9zKaLjzXaSis/fGKedR
-         3jU+KXRZZtISrvHYdasYok5VHX5nxpr3ltxMAj/nzntl0nLGeWrkG4m9c07xdvIGyk8Z
-         opFw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id;
-        bh=U5U4X+ZOhi4vgTgaFmTIVBDWOm8KVT4HEd/HA9LL9Zg=;
-        b=mThAy4Y98c8YKTdeq1EHhXzJQJtmRQo6JEvlJ7ryKrgltJO9LXGUSjMm5wAvFEP9lv
-         SLxGTNRaKVGAE4/XqSzetLXY3eqjjqQVjfXJSEOYQ13Nkyc2i4to7HSQoaSXA0MDSFUw
-         Ici+P1w5E0WPNOMea/zzR/6IgzwgN1szyNvCOFPKhb0f1EootnWwiMkH2skbNde/js2j
-         0HMwL+vZop8+WVgPsrEvOUiCo2zCi0lpXnNaxz8NPEJP68sSSRmgAArrOtrOLXmVsoEu
-         tiIF9rE/kV9iq4O4/cgDdBrER06SNxB/cas2PY/ItN9byVaXNOwSYrkVaYvWuqsL2+h+
-         nV/A==
-X-Gm-Message-State: AOAM530NS28s6gfTPcUkOBuS3BvtdSoTcfCNIBJfc5+5fS3DZ0gToJ8e
-        lzeVX8yfmOn7HU0+MZ63I9flyg5kl/k=
-X-Google-Smtp-Source: ABdhPJwzAifXMNB/rOR9vWitJtHt9JOBN4qz/C2AqKhgh6EHTSUfZ+yHjV8cBOJZo6E5k2AfGIrqTQ==
-X-Received: by 2002:a17:902:e889:b029:e7:1490:9da5 with SMTP id w9-20020a170902e889b02900e714909da5mr22000247plg.20.1617011049985;
-        Mon, 29 Mar 2021 02:44:09 -0700 (PDT)
-Received: from localhost.localdomain ([103.7.29.6])
-        by smtp.googlemail.com with ESMTPSA id f15sm15749610pgg.84.2021.03.29.02.44.07
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 29 Mar 2021 02:44:09 -0700 (PDT)
-From:   Wanpeng Li <kernellwp@gmail.com>
-X-Google-Original-From: Wanpeng Li <wanpengli@tencent.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>
-Subject: [PATCH] KVM: X86: Properly account for guest CPU time when considering context tracking
-Date:   Mon, 29 Mar 2021 17:43:56 +0800
-Message-Id: <1617011036-11734-1-git-send-email-wanpengli@tencent.com>
-X-Mailer: git-send-email 2.7.4
+        id S232206AbhC2LAv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 29 Mar 2021 07:00:51 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:5218 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S232758AbhC2LAp (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 29 Mar 2021 07:00:45 -0400
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 12TAZBJn143084
+        for <kvm@vger.kernel.org>; Mon, 29 Mar 2021 07:00:44 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=bjG//lJaiCc3GN8Xb/Ok4FXq7HrvqZTBOSDox1zosK8=;
+ b=WRrz5EiM/lV1KKHhBep8RAvrSbJKs0DanwUEUuch9FzrmZlBUGLUQnrS7gfv7sdm99UO
+ ppZQMnk4G8N03qPGUvvaL0c6CyKYiPStAFuXlp6lmoa0wJi5KbkVHgLSwbSBPYnxX+YT
+ fi7PiB51Q+fcjyFeee0SfudLpG45CJ6U7xPqQkYrm+k4VcXPy3+bci7b03/8tLQFqOTs
+ HIRQ9K2nm7Ct9dq7e9RAhbeK0xSIrPj0+b+l+Nr0f8nK1hLXLnTmr78up+IftgYN1Kra
+ miVHvPH8wv9TRMfK4XA0voGbT9QgRpMB8juj9QkByVAgb982rqiWhHiUwaivRhNppX/V sA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 37jj5yuvwq-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Mon, 29 Mar 2021 07:00:44 -0400
+Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 12TAigHC181117
+        for <kvm@vger.kernel.org>; Mon, 29 Mar 2021 07:00:44 -0400
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 37jj5yuvw4-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 29 Mar 2021 07:00:44 -0400
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+        by ppma06ams.nl.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 12TAqPEm032135;
+        Mon, 29 Mar 2021 11:00:42 GMT
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
+        by ppma06ams.nl.ibm.com with ESMTP id 37huyh9qyp-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 29 Mar 2021 11:00:42 +0000
+Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 12TB0dJu42008854
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 29 Mar 2021 11:00:39 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 985774203F;
+        Mon, 29 Mar 2021 11:00:39 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 3983442045;
+        Mon, 29 Mar 2021 11:00:39 +0000 (GMT)
+Received: from oc3016276355.ibm.com (unknown [9.145.39.64])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Mon, 29 Mar 2021 11:00:39 +0000 (GMT)
+Subject: Re: [kvm-unit-tests PATCH v2 4/8] s390x: lib: css: separate wait for
+ IRQ and check I/O completion
+To:     Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org
+Cc:     frankja@linux.ibm.com, david@redhat.com, cohuck@redhat.com,
+        imbrenda@linux.ibm.com
+References: <1616665147-32084-1-git-send-email-pmorel@linux.ibm.com>
+ <1616665147-32084-5-git-send-email-pmorel@linux.ibm.com>
+ <8a8430c6-a345-22aa-29ae-5df77b5d3b9c@redhat.com>
+From:   Pierre Morel <pmorel@linux.ibm.com>
+Message-ID: <72eb6ac1-8bb8-99c6-24a0-0bb36bd40c69@linux.ibm.com>
+Date:   Mon, 29 Mar 2021 13:00:38 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.8.0
+MIME-Version: 1.0
+In-Reply-To: <8a8430c6-a345-22aa-29ae-5df77b5d3b9c@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: RotftaE8M6iToVgNntuVi1RXRDf8Iobc
+X-Proofpoint-ORIG-GUID: pKaT62MvEc277Y52rqKa8JBbdX9-3Oeg
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.761
+ definitions=2021-03-29_05:2021-03-26,2021-03-29 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
+ lowpriorityscore=0 bulkscore=0 phishscore=0 mlxlogscore=999
+ priorityscore=1501 clxscore=1015 malwarescore=0 mlxscore=0 spamscore=0
+ adultscore=0 suspectscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2103250000 definitions=main-2103290082
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Wanpeng Li <wanpengli@tencent.com>
 
-The bugzilla https://bugzilla.kernel.org/show_bug.cgi?id=209831 
-reported that the guest time remains 0 when running a while true 
-loop in the guest.
 
-The commit 87fa7f3e98a131 ("x86/kvm: Move context tracking where it 
-belongs") moves guest_exit_irqoff() close to vmexit breaks the 
-tick-based time accouting when the ticks that happen after IRQs are 
-disabled are incorrectly accounted to the host/system time. This is 
-because we exit the guest state too early.
+On 3/29/21 10:21 AM, Thomas Huth wrote:
+> On 25/03/2021 10.39, Pierre Morel wrote:
+>> We will may want to check the result of an I/O without waiting
+>> for an interrupt.
+>> For example because we do not handle interrupt.
+>> Let's separate waiting for interrupt and the I/O complretion check.
+>>
+>> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+>> ---
+>>   lib/s390x/css.h     |  1 +
+>>   lib/s390x/css_lib.c | 13 ++++++++++---
+>>   2 files changed, 11 insertions(+), 3 deletions(-)
+>>
+>> diff --git a/lib/s390x/css.h b/lib/s390x/css.h
+>> index 0058355..5d1e1f0 100644
+>> --- a/lib/s390x/css.h
+>> +++ b/lib/s390x/css.h
+>> @@ -317,6 +317,7 @@ int css_residual_count(unsigned int schid);
+>>   void enable_io_isc(uint8_t isc);
+>>   int wait_and_check_io_completion(int schid);
+>> +int check_io_completion(int schid);
+>>   /*
+>>    * CHSC definitions
+>> diff --git a/lib/s390x/css_lib.c b/lib/s390x/css_lib.c
+>> index f5c4f37..1e5c409 100644
+>> --- a/lib/s390x/css_lib.c
+>> +++ b/lib/s390x/css_lib.c
+>> @@ -487,18 +487,25 @@ struct ccw1 *ccw_alloc(int code, void *data, int 
+>> count, unsigned char flags)
+>>   }
+>>   /* wait_and_check_io_completion:
+>> + * @schid: the subchannel ID
+>> + */
+>> +int wait_and_check_io_completion(int schid)
+>> +{
+>> +    wait_for_interrupt(PSW_MASK_IO);
+>> +    return check_io_completion(schid);
+>> +}
+>> +
+>> +/* check_io_completion:
+>>    * @schid: the subchannel ID
+>>    *
+>>    * Makes the most common check to validate a successful I/O
+>>    * completion.
+>>    * Only report failures.
+>>    */
+>> -int wait_and_check_io_completion(int schid)
+>> +int check_io_completion(int schid)
+>>   {
+>>       int ret = 0;
+>> -    wait_for_interrupt(PSW_MASK_IO);
+>> -
+>>       report_prefix_push("check I/O completion");
+>>       if (lowcore_ptr->io_int_param != schid) {
+>>
+> 
+> Reviewed-by: Thomas Huth <thuth@redhat.com>
+> 
 
-vtime-based time accounting is tied to context tracking, keep the 
-guest_exit_irqoff() around vmexit code when both vtime-based time 
-accounting and specific cpu is context tracking mode active. 
-Otherwise, leave guest_exit_irqoff() after handle_exit_irqoff() 
-and explicit IRQ window for tick-based time accouting.
+Thanks,
+Pierre
 
-Fixes: 87fa7f3e98a131 ("x86/kvm: Move context tracking where it belongs")
-Cc: Sean Christopherson <seanjc@google.com>
-Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
----
- arch/x86/kvm/svm/svm.c | 3 ++-
- arch/x86/kvm/vmx/vmx.c | 3 ++-
- arch/x86/kvm/x86.c     | 2 ++
- 3 files changed, 6 insertions(+), 2 deletions(-)
-
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index 58a45bb..55fb5ce 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -3812,7 +3812,8 @@ static noinstr void svm_vcpu_enter_exit(struct kvm_vcpu *vcpu,
- 	 * into world and some more.
- 	 */
- 	lockdep_hardirqs_off(CALLER_ADDR0);
--	guest_exit_irqoff();
-+	if (vtime_accounting_enabled_this_cpu())
-+		guest_exit_irqoff();
- 
- 	instrumentation_begin();
- 	trace_hardirqs_off_finish();
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 32cf828..85695b3 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -6689,7 +6689,8 @@ static noinstr void vmx_vcpu_enter_exit(struct kvm_vcpu *vcpu,
- 	 * into world and some more.
- 	 */
- 	lockdep_hardirqs_off(CALLER_ADDR0);
--	guest_exit_irqoff();
-+	if (vtime_accounting_enabled_this_cpu())
-+		guest_exit_irqoff();
- 
- 	instrumentation_begin();
- 	trace_hardirqs_off_finish();
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index fe806e8..234c8b3 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -9185,6 +9185,8 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
- 	++vcpu->stat.exits;
- 	local_irq_disable();
- 	kvm_after_interrupt(vcpu);
-+	if (!vtime_accounting_enabled_this_cpu())
-+		guest_exit_irqoff();
- 
- 	if (lapic_in_kernel(vcpu)) {
- 		s64 delta = vcpu->arch.apic->lapic_timer.advance_expire_delta;
 -- 
-2.7.4
-
+Pierre Morel
+IBM Lab Boeblingen
