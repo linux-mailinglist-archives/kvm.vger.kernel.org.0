@@ -2,104 +2,102 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 23BB334CD2E
-	for <lists+kvm@lfdr.de>; Mon, 29 Mar 2021 11:40:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9328134CD3D
+	for <lists+kvm@lfdr.de>; Mon, 29 Mar 2021 11:42:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231761AbhC2JkU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 29 Mar 2021 05:40:20 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:43092 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231784AbhC2Jj6 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 29 Mar 2021 05:39:58 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1617010797;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=XH1p60GLm1qMEaeWBYCic3Rl4rfDvGvY/I2BlpVV/RY=;
-        b=gGZ8iOoaQFBq8fDw2J88AJqJST0eHpelW8M+IBIpNDB7yMjBu3qejyvsTN4JxTav9AlhWr
-        Za2CggjNtvbJitXMq361DbbhGWSc0Bl9dsrK0M74BMOX62t0mvUdQYl7ARxoYOKdGjiVgC
-        uuaxv+RaNQPUjf2CH5QHxuUiPtc22S0=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-316-iSunCkH0O-KAw27O7j8wGQ-1; Mon, 29 Mar 2021 05:39:55 -0400
-X-MC-Unique: iSunCkH0O-KAw27O7j8wGQ-1
-Received: by mail-wm1-f70.google.com with SMTP id c9so1410258wme.5
-        for <kvm@vger.kernel.org>; Mon, 29 Mar 2021 02:39:55 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=XH1p60GLm1qMEaeWBYCic3Rl4rfDvGvY/I2BlpVV/RY=;
-        b=hI6zQlb6X/8DqGlOh76b4SXFJAYrDBx6Dc5/4jpXpAyttx8NER99KBjfzL4eH7y0yx
-         2lo/wsrO5zGiJ5bUV56Qaaa4z5hB0bX4fMGuUgxn2WhknTOqRLOu+8GsmkZ8mLlpzLfy
-         ncWGz6pZFVJu3tUxiIfQEjt5iC1NK0rD9j2KH1GLjjC+iLOybbWG34Gax4I8WTdT6vT7
-         oIRpgkxmgxxT4Dtz18J5XE/MrA00HACdAtxVxbRLjUOSF81yuLOFY6cCmVVNuH+ZBYWl
-         iCa18b305r8SP+lrUSJfPppKJBSROKoiZQb7WV4Jk2PvNvUa/QwBb4R7wAp+kusqUb2V
-         XEOA==
-X-Gm-Message-State: AOAM53254gIP9CvRpld4XZzvEGwVwINePBgTuT/ijZtaQV69i4w61/D4
-        YEYey1WDUJO9qKle+JkAbJ/8h7qZ2JAavZT2K5He7YuFVyrFnE4tHhLAwkcq7qgDc2Kjj+AquuG
-        AOK9fc29kIuv+
-X-Received: by 2002:a05:600c:203:: with SMTP id 3mr23780397wmi.88.1617010794684;
-        Mon, 29 Mar 2021 02:39:54 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxdSnNJS7HC+pi2XoA8apSkQkFQkiLJqju8IpJxHu6Mftlx0OI7Nd1JagHG7r7oN3w6uh/2pw==
-X-Received: by 2002:a05:600c:203:: with SMTP id 3mr23780386wmi.88.1617010794459;
-        Mon, 29 Mar 2021 02:39:54 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e? ([2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e])
-        by smtp.gmail.com with ESMTPSA id j13sm28646969wrt.29.2021.03.29.02.39.52
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 29 Mar 2021 02:39:53 -0700 (PDT)
-Subject: Re: [PATCH] KVM: x86/vPMU: Forbid writing to MSR_F15H_PERF MSRs when
- guest doesn't have X86_FEATURE_PERFCTR_CORE
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Wei Huang <wei.huang2@amd.com>, Joerg Roedel <joro@8bytes.org>,
-        linux-kernel@vger.kernel.org
-References: <20210323084515.1346540-1-vkuznets@redhat.com>
- <a40090f1-23a1-fca0-3105-b5e48ee5c86e@redhat.com>
- <874kgubau4.fsf@vitty.brq.redhat.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <d7310ec0-4c4c-0d1c-5725-5377b539344a@redhat.com>
-Date:   Mon, 29 Mar 2021 11:39:51 +0200
+        id S231707AbhC2Jl5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 29 Mar 2021 05:41:57 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:47878 "EHLO
+        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232282AbhC2Jlt (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 29 Mar 2021 05:41:49 -0400
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 12T9YUKR196502
+        for <kvm@vger.kernel.org>; Mon, 29 Mar 2021 05:41:48 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : from : to : cc
+ : references : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=0CFZPgpyYzeSzPVTHm/XkXHhDOEDPIDIIVZLMlKm+OE=;
+ b=i3qHKe+ZU/YCwU0EBjqTeE1RGnVmPlk2i2opBSTf7SCfpnD9Rq5YO5PTd5VMsMFlmpy2
+ WOegrz9OKWYp30mkMyno3lkxO85aqb8uoYr0W8xfq8CZUaB4ulmmSsiXJxaicyCWAQli
+ qkGB35x62D0YfYdMU8lq7Qd4O9640pC53V3+FHz7r2H4J/ZBF7QbkfuyXBEE51sq70zv
+ LUE+kEfGrZRrswW/HgB2WCK3ixX6t+QHXFdK/2Zs5yuxJrpctdP3s789jS/MMebzCzsP
+ Yuu8lbvPzgoW80gbNjfpxivrc/LL5PQwZpyMXCRR6FzivH59bDXOrTA5DcQNa2kl6uIg 1w== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 37jj98skp5-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Mon, 29 Mar 2021 05:41:48 -0400
+Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 12T9YhwY001793
+        for <kvm@vger.kernel.org>; Mon, 29 Mar 2021 05:41:48 -0400
+Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 37jj98sknn-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 29 Mar 2021 05:41:48 -0400
+Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
+        by ppma04fra.de.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 12T9S7Zj020941;
+        Mon, 29 Mar 2021 09:41:46 GMT
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
+        by ppma04fra.de.ibm.com with ESMTP id 37hvb88vf4-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 29 Mar 2021 09:41:46 +0000
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 12T9fhBu21037512
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 29 Mar 2021 09:41:43 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 4B7744C044;
+        Mon, 29 Mar 2021 09:41:43 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 1FA2A4C040;
+        Mon, 29 Mar 2021 09:41:15 +0000 (GMT)
+Received: from oc3016276355.ibm.com (unknown [9.145.173.162])
+        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Mon, 29 Mar 2021 09:41:09 +0000 (GMT)
+Subject: Re: [kvm-unit-tests PATCH v2 6/8] s390x: css: testing ssch error
+ response
+From:   Pierre Morel <pmorel@linux.ibm.com>
+To:     kvm@vger.kernel.org
+Cc:     frankja@linux.ibm.com, david@redhat.com, thuth@redhat.com,
+        cohuck@redhat.com, imbrenda@linux.ibm.com
+References: <1616665147-32084-1-git-send-email-pmorel@linux.ibm.com>
+ <1616665147-32084-7-git-send-email-pmorel@linux.ibm.com>
+Message-ID: <61b918e0-8179-1b1f-cad4-86294d113fdd@linux.ibm.com>
+Date:   Mon, 29 Mar 2021 11:40:59 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.7.0
+ Thunderbird/78.8.0
 MIME-Version: 1.0
-In-Reply-To: <874kgubau4.fsf@vitty.brq.redhat.com>
+In-Reply-To: <1616665147-32084-7-git-send-email-pmorel@linux.ibm.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: At7xQfnSWwLiss_RmlpHqMIooMMA0Y7c
+X-Proofpoint-ORIG-GUID: GXssxwGLb12pYpj7ts-BtR9i8D3b7TUc
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.761
+ definitions=2021-03-29_05:2021-03-26,2021-03-29 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 clxscore=1015
+ adultscore=0 impostorscore=0 suspectscore=0 lowpriorityscore=0
+ priorityscore=1501 mlxscore=0 malwarescore=0 phishscore=0 spamscore=0
+ mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2103250000 definitions=main-2103290073
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 29/03/21 10:52, Vitaly Kuznetsov wrote:
-> Paolo Bonzini <pbonzini@redhat.com> writes:
-> 
->> On 23/03/21 09:45, Vitaly Kuznetsov wrote:
->>> MSR_F15H_PERF_CTL0-5, MSR_F15H_PERF_CTR0-5 MSRs are only available when
->>> X86_FEATURE_PERFCTR_CORE CPUID bit was exposed to the guest. KVM, however,
->>> allows these MSRs unconditionally because kvm_pmu_is_valid_msr() ->
->>> amd_msr_idx_to_pmc() check always passes and because kvm_pmu_set_msr() ->
->>> amd_pmu_set_msr() doesn't fail.
->>>
->>> In case of a counter (CTRn), no big harm is done as we only increase
->>> internal PMC's value but in case of an eventsel (CTLn), we go deep into
->>> perf internals with a non-existing counter.
->>>
->>> Note, kvm_get_msr_common() just returns '0' when these MSRs don't exist
->>> and this also seems to contradict architectural behavior which is #GP
->>> (I did check one old Opteron host) but changing this status quo is a bit
->>> scarier.
->>
->> Hmm, since these do have a cpuid bit it may not be that scary.
-> 
-> Well, if you're not scared I can send a patch)
 
-Go ahead.
 
-Paolo
+On 3/25/21 10:39 AM, Pierre Morel wrote:
+> Checking error response on various eroneous SSCH instructions:
+> - ORB alignment
+> - ORB above 2G
 
+! seems I made an error here, I do not find from where I got that ORB 
+must be under 2G.
+...
+
+
+
+-- 
+Pierre Morel
+IBM Lab Boeblingen
