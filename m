@@ -2,164 +2,172 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EE7FB34C523
-	for <lists+kvm@lfdr.de>; Mon, 29 Mar 2021 09:43:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9C72334C579
+	for <lists+kvm@lfdr.de>; Mon, 29 Mar 2021 10:01:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230450AbhC2Hmx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 29 Mar 2021 03:42:53 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:64930 "EHLO
-        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231142AbhC2Hmq (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 29 Mar 2021 03:42:46 -0400
-Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 12T7XQeu041166
-        for <kvm@vger.kernel.org>; Mon, 29 Mar 2021 03:42:46 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=1DhbxlhYbuCEc2xixRJOuMvBgPOcumzYZqqNmBnPHac=;
- b=EEk8ZCH0OrI521TgyHkD+DHJM1vSMdlWNAfWMo6hiyERigVzzN63Ljm+d90TK0jr7xA7
- QnNCXSDSPM/wsZT/jYvKALyXTf1ZpulF183OYabe2puDChhY5n2c8utrWGLgTh1CiCgz
- X1Etay/UuD75wUI0tsk1WOlN4kVgeIaDOnHeEVXfD4G5TVihK7ZdEzwxbsH4j3ebpM7I
- mlWWq6r7XIDophhoYhEt6x1qHzuzYCgLuMZbrdfj23e5kQ1SXY6Pkk3yRW19lB6bJ/oW
- Q+/SNwbVDgwB+VsUWre5KRKABR6Y2wDHhG8ufnuq3rYk5zXyk2hOcvVdGTmkcKWAwV2e YQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 37jpme31kj-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Mon, 29 Mar 2021 03:42:45 -0400
-Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 12T7XidX042012
-        for <kvm@vger.kernel.org>; Mon, 29 Mar 2021 03:42:45 -0400
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 37jpme31jh-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 29 Mar 2021 03:42:45 -0400
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 12T7WdQ2017982;
-        Mon, 29 Mar 2021 07:42:43 GMT
-Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
-        by ppma04ams.nl.ibm.com with ESMTP id 37hvb8hjv9-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 29 Mar 2021 07:42:43 +0000
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 12T7gL7L34144528
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 29 Mar 2021 07:42:22 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id DC5B64C04E;
-        Mon, 29 Mar 2021 07:42:40 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 12C674C04A;
-        Mon, 29 Mar 2021 07:42:40 +0000 (GMT)
-Received: from oc3016276355.ibm.com (unknown [9.145.173.162])
-        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Mon, 29 Mar 2021 07:42:39 +0000 (GMT)
-Subject: Re: [kvm-unit-tests PATCH v2 6/8] s390x: css: testing ssch error
- response
-To:     Claudio Imbrenda <imbrenda@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, frankja@linux.ibm.com, david@redhat.com,
-        thuth@redhat.com, cohuck@redhat.com
+        id S231509AbhC2IAt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 29 Mar 2021 04:00:49 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:57408 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231472AbhC2IAi (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 29 Mar 2021 04:00:38 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1617004838;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=s4TH4xT94b+6YIUHfgIhTtKd1QJnaofOrzeq1/cImcY=;
+        b=F0BpYE622sKp1/YaUJ9FBMqj/YUztbd3zmjQgmSXBNCTrEzul1fsSzcDMgVrhXgeu8GDtf
+        S4QsemqMWVX5/xMP9n2L7tuoxbkAew+0gRJvmL2aFLdqMUwuBSxQTB/YzEL3Z5K3bjBCi9
+        kxN3OKjzERsAZgjDQOJ4V2PsdkDMVrU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-340-16FfA3qzOpmX6lPkDyXkxQ-1; Mon, 29 Mar 2021 04:00:35 -0400
+X-MC-Unique: 16FfA3qzOpmX6lPkDyXkxQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AC510185303A;
+        Mon, 29 Mar 2021 08:00:34 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-112-129.ams2.redhat.com [10.36.112.129])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id C5704909F6;
+        Mon, 29 Mar 2021 08:00:22 +0000 (UTC)
+Subject: Re: [kvm-unit-tests PATCH v2 1/8] s390x: lib: css: disabling a
+ subchannel
+To:     Pierre Morel <pmorel@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     frankja@linux.ibm.com, david@redhat.com, cohuck@redhat.com,
+        imbrenda@linux.ibm.com
 References: <1616665147-32084-1-git-send-email-pmorel@linux.ibm.com>
- <1616665147-32084-7-git-send-email-pmorel@linux.ibm.com>
- <20210325170257.2e753967@ibm-vm>
- <12260eaf-1fc8-00ce-f500-b56e7ad7ae2a@linux.ibm.com>
- <20210326115855.21427c7d@ibm-vm>
-From:   Pierre Morel <pmorel@linux.ibm.com>
-Message-ID: <dfd959d6-453c-5c06-d0b1-5b657e72c8d4@linux.ibm.com>
-Date:   Mon, 29 Mar 2021 09:42:39 +0200
+ <1616665147-32084-2-git-send-email-pmorel@linux.ibm.com>
+From:   Thomas Huth <thuth@redhat.com>
+Message-ID: <82844be1-dd8f-e205-0966-309bf7c732f6@redhat.com>
+Date:   Mon, 29 Mar 2021 10:00:21 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.8.0
 MIME-Version: 1.0
-In-Reply-To: <20210326115855.21427c7d@ibm-vm>
+In-Reply-To: <1616665147-32084-2-git-send-email-pmorel@linux.ibm.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: lu-nBtiebg9f1rLNvef5-XaBQm-VdES8
-X-Proofpoint-ORIG-GUID: W6o68waw0ae3PlcE8vJP2PWalBw4EoKo
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.761
- definitions=2021-03-29_04:2021-03-26,2021-03-29 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 lowpriorityscore=0
- bulkscore=0 phishscore=0 malwarescore=0 mlxlogscore=999 priorityscore=1501
- impostorscore=0 adultscore=0 clxscore=1015 spamscore=0 suspectscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2103250000
- definitions=main-2103290057
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-On 3/26/21 11:58 AM, Claudio Imbrenda wrote:
-> On Fri, 26 Mar 2021 11:41:34 +0100
-> Pierre Morel <pmorel@linux.ibm.com> wrote:
+On 25/03/2021 10.39, Pierre Morel wrote:
+> Some tests require to disable a subchannel.
+> Let's implement the css_disable() function.
 > 
->> On 3/25/21 5:02 PM, Claudio Imbrenda wrote:
->>> On Thu, 25 Mar 2021 10:39:05 +0100
->>> Pierre Morel <pmorel@linux.ibm.com> wrote:
->>>    
->>
->> ...snip...
->>
->>
->> Trying to follow your comment, I have some questions:
->>
->>
->>>> +	/* 2- ORB address should be lower than 2G */
->>>> +	report_prefix_push("ORB Address above 2G");
->>>> +	expect_pgm_int();
->>>> +	ssch(test_device_sid, (void *)0x80000000);
->>>
->>> another hardcoded address... you should try allocating memory over
->>> 2G, and try to use it. put a check if there is enough memory, and
->>> skip if you do not have enough memory, like you did below
->>
->> How can I allocate memory above 2G?
+> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+> ---
+>   lib/s390x/css.h     |  1 +
+>   lib/s390x/css_lib.c | 67 +++++++++++++++++++++++++++++++++++++++++++++
+>   2 files changed, 68 insertions(+)
 > 
-> alloc_pages_flags(order, AREA_NORMAL)
+> diff --git a/lib/s390x/css.h b/lib/s390x/css.h
+> index 7e3d261..b0de3a3 100644
+> --- a/lib/s390x/css.h
+> +++ b/lib/s390x/css.h
+> @@ -284,6 +284,7 @@ int css_enumerate(void);
+>   #define IO_SCH_ISC      3
+>   int css_enable(int schid, int isc);
+>   bool css_enabled(int schid);
+> +int css_disable(int schid);
+>   
+>   /* Library functions */
+>   int start_ccw1_chain(unsigned int sid, struct ccw1 *ccw);
+> diff --git a/lib/s390x/css_lib.c b/lib/s390x/css_lib.c
+> index efc7057..f5c4f37 100644
+> --- a/lib/s390x/css_lib.c
+> +++ b/lib/s390x/css_lib.c
+> @@ -186,6 +186,73 @@ bool css_enabled(int schid)
+>   	}
+>   	return true;
+>   }
+> +
+> +/*
+> + * css_disable: disable the subchannel
+> + * @schid: Subchannel Identifier
+> + * Return value:
+> + *   On success: 0
+> + *   On error the CC of the faulty instruction
+> + *      or -1 if the retry count is exceeded.
+> + */
+> +int css_disable(int schid)
+> +{
+> +	struct pmcw *pmcw = &schib.pmcw;
+> +	int retry_count = 0;
+> +	int cc;
+> +
+> +	/* Read the SCHIB for this subchannel */
+> +	cc = stsch(schid, &schib);
+> +	if (cc) {
+> +		report_info("stsch: sch %08x failed with cc=%d", schid, cc);
+> +		return cc;
+> +	}
+> +
+> +	if (!(pmcw->flags & PMCW_ENABLE)) {
+> +		report_info("stsch: sch %08x already disabled", schid);
+> +		return 0;
+> +	}
+> +
+> +retry:
+
+I have to saythat I really dislike writing loops with gotos if it can be 
+avoided easily. What about:
+
+for (retry_count = 0; retry_count < MAX_ENABLE_RETRIES; retry_count++) ?
+
+(and maybe rename that variable to "retries" to keep it short?)
+
+> +	/* Update the SCHIB to disable the subchannel */
+> +	pmcw->flags &= ~PMCW_ENABLE;
+> +
+> +	/* Tell the CSS we want to modify the subchannel */
+> +	cc = msch(schid, &schib);
+> +	/*
+> +	 * If the subchannel is status pending or if a function is in progress,
+> +	 * we consider both cases as errors.
+> +	 */
+> +	if (cc) {
+> +		report_info("msch: sch %08x failed with cc=%d", schid, cc);
+> +		return cc;
+> +	}
+> +
+> +	/* Read the SCHIB again to verify the enablement */
+
+"verify the disablement" ?
+
+> +	cc = stsch(schid, &schib);
+> +	if (cc) {
+> +		report_info("stsch: updating sch %08x failed with cc=%d",
+> +			    schid, cc);
+> +		return cc;
+> +	}
+> +
+> +	if (!(pmcw->flags & PMCW_ENABLE)) {
+> +		if (retry_count)
+> +			report_info("stsch: sch %08x successfully disabled after %d retries",
+> +				    schid, retry_count);
+> +		return 0;
+> +	}
+> +
+> +	if (retry_count++ < MAX_ENABLE_RETRIES) {
+> +		/* the hardware was not ready, give it some time */
+> +		mdelay(10);
+> +		goto retry;
+> +	}
+> +
+> +	report_info("msch: modifying sch %08x failed after %d retries. pmcw flags: %04x",
+> +		    schid, retry_count, pmcw->flags);
+> +	return -1;
+> +}
+>   /*
+>    * css_enable: enable the subchannel with the specified ISC
+>    * @schid: Subchannel Identifier
 > 
-> btw that allocation will fail if there is no free memory available
-> above 2G
-> 
->>>    
->>>> +	check_pgm_int_code(PGM_INT_CODE_ADDRESSING);
->>>> +	report_prefix_pop();
->>>> +
->>>> +	/* 3- ORB address should be available we check 1G*/
->>>> +	top = get_ram_size();
->>>> +	report_prefix_push("ORB Address must be available");
->>>> +	if (top < 0x40000000) {
->>>> +		expect_pgm_int();
->>>> +		ssch(test_device_sid, (void *)0x40000000);
->>>> +		check_pgm_int_code(PGM_INT_CODE_ADDRESSING);
->>>> +	} else {
->>>> +		report_skip("guest started with more than 1G
->>>> memory");
->>>
->>> this is what I meant above. you will need to run this test both
->>> with 1G and with 3G of ram (look at the SCLP test, it has the same
->>> issue)
->>
->> I do not understand, if I test with 3G RAM, I suppose that the
->> framework works right and I have my 3G RAM available.
->> Then I can check with an address under 1G and recheck with an address
->> above 1G.
->>
->> What is the purpose to check with only 1G memory?
-> 
-> you need to run this test twice, once with 1G and once with 3G.
-> it's the same test, so it can't know if it is being run with 1G or
-> 3G, so you have to test for it.
-> 
-> when you need a valid address above 2G, you need to make sure you have
-> that much memory, and when you want an invalid address between 1G and
-> 2G, you have to make sure you have no more than 1G.
 
-OK, thanks
+  Thomas
 
-
-
-
--- 
-Pierre Morel
-IBM Lab Boeblingen
