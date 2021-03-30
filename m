@@ -2,114 +2,113 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1E90F34E9BC
-	for <lists+kvm@lfdr.de>; Tue, 30 Mar 2021 15:58:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E12BF34EA06
+	for <lists+kvm@lfdr.de>; Tue, 30 Mar 2021 16:13:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232007AbhC3N6Q (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 30 Mar 2021 09:58:16 -0400
-Received: from mail.kernel.org ([198.145.29.99]:37064 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232053AbhC3N6I (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 30 Mar 2021 09:58:08 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 68E7D619BD;
-        Tue, 30 Mar 2021 13:58:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1617112687;
-        bh=hYRhNMLlTmRS49zqmK73a4rY3ELSUI6jQmXx6ZVo0cc=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=NxQyKHu5yHesTmxq2PlalF5XHUJ/+Rz412pFuRTbOozoN7Mb60JpgX7hut5OdEhIO
-         3lhluE7Xa6MpXg3B8jJjwxAjN02v/8u9IIZbCapDIo4/QtFBPU0zmQmESgHa2t7Seu
-         6BfPY0dg5NZYx/R7AOola1TbKI9OxKnLxPZP+rpYYr6+R5Ndgmvd/j0LAJoV9qX48G
-         HdxYp8mDmAdckAQuEcf27Px7bJMTyHZRvvOYlBEvaxIhQdMxNFZle45RAuCX5K6jbI
-         VaV9P5LlYytyR5H+pRG+Kw1836+9tx7uFAyXMe0zIdPnrbYLEXjvHvSEw1AHvXRIao
-         Ee9HUuuOMjrmw==
-Date:   Tue, 30 Mar 2021 14:58:02 +0100
-From:   Will Deacon <will@kernel.org>
-To:     Robin Murphy <robin.murphy@arm.com>
-Cc:     Christoph Hellwig <hch@lst.de>, Joerg Roedel <joro@8bytes.org>,
-        Li Yang <leoyang.li@nxp.com>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Lu Baolu <baolu.lu@linux.intel.com>,
-        linuxppc-dev@lists.ozlabs.org, linux-arm-msm@vger.kernel.org,
-        dri-devel@lists.freedesktop.org, freedreno@lists.freedesktop.org,
-        iommu@lists.linux-foundation.org,
-        linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
-Subject: Re: [PATCH 16/18] iommu: remove DOMAIN_ATTR_DMA_USE_FLUSH_QUEUE
-Message-ID: <20210330135801.GA6187@willie-the-truck>
-References: <20210316153825.135976-1-hch@lst.de>
- <20210316153825.135976-17-hch@lst.de>
- <20210330131149.GP5908@willie-the-truck>
- <a6952aa7-4d7e-54f0-339e-e15f88596dcc@arm.com>
+        id S231594AbhC3ONS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 30 Mar 2021 10:13:18 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:20654 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231803AbhC3ONC (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 30 Mar 2021 10:13:02 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1617113582;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=Hyd2xCYibl1HZruNMHz3cEH8jei/5ja38vogxu4xMX8=;
+        b=A7Nfh7dnGDS4ONoVPtaP7m7G+TdEPe8klFvZ25hFTf1u8FrqlqynoW0GXg2qMsjQltB9in
+        dWB9YM6mt8Bl4yOaN+Zi4Hp0B11X3c7GlnQ7kuZ5AtabbJ4j4HWkgMw+VDFD2Q19fp0MU6
+        p+I41YF1xFL5wVBTCX0BYn/zIl6Ubf0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-190-TedcgJzbPOSutpJjOsqwUA-1; Tue, 30 Mar 2021 10:12:58 -0400
+X-MC-Unique: TedcgJzbPOSutpJjOsqwUA-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 85D961083E81;
+        Tue, 30 Mar 2021 14:12:57 +0000 (UTC)
+Received: from fuller.cnet (ovpn-112-4.gru2.redhat.com [10.97.112.4])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 12B895D740;
+        Tue, 30 Mar 2021 14:12:57 +0000 (UTC)
+Received: by fuller.cnet (Postfix, from userid 1000)
+        id 495A1416D862; Tue, 30 Mar 2021 11:12:32 -0300 (-03)
+Date:   Tue, 30 Mar 2021 11:12:32 -0300
+From:   Marcelo Tosatti <mtosatti@redhat.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>
+Subject: Re: [PATCH v2 1/2] KVM: x86: hyper-v: Properly divide maybe-negative
+ 'hv_clock->system_time' in compute_tsc_page_parameters()
+Message-ID: <20210330141232.GA10559@fuller.cnet>
+References: <20210329114800.164066-1-vkuznets@redhat.com>
+ <20210329114800.164066-2-vkuznets@redhat.com>
+ <YGINPcQxyco2WueO@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <a6952aa7-4d7e-54f0-339e-e15f88596dcc@arm.com>
+In-Reply-To: <YGINPcQxyco2WueO@google.com>
 User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Mar 30, 2021 at 02:19:38PM +0100, Robin Murphy wrote:
-> On 2021-03-30 14:11, Will Deacon wrote:
-> > On Tue, Mar 16, 2021 at 04:38:22PM +0100, Christoph Hellwig wrote:
-> > > From: Robin Murphy <robin.murphy@arm.com>
-> > > 
-> > > Instead make the global iommu_dma_strict paramete in iommu.c canonical by
-> > > exporting helpers to get and set it and use those directly in the drivers.
-> > > 
-> > > This make sure that the iommu.strict parameter also works for the AMD and
-> > > Intel IOMMU drivers on x86.  As those default to lazy flushing a new
-> > > IOMMU_CMD_LINE_STRICT is used to turn the value into a tristate to
-> > > represent the default if not overriden by an explicit parameter.
-> > > 
-> > > Signed-off-by: Robin Murphy <robin.murphy@arm.com>.
-> > > [ported on top of the other iommu_attr changes and added a few small
-> > >   missing bits]
-> > > Signed-off-by: Christoph Hellwig <hch@lst.de>
-> > > ---
-> > >   drivers/iommu/amd/iommu.c                   | 23 +-------
-> > >   drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c | 50 +---------------
-> > >   drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h |  1 -
-> > >   drivers/iommu/arm/arm-smmu/arm-smmu.c       | 27 +--------
-> > >   drivers/iommu/dma-iommu.c                   |  9 +--
-> > >   drivers/iommu/intel/iommu.c                 | 64 ++++-----------------
-> > >   drivers/iommu/iommu.c                       | 27 ++++++---
-> > >   include/linux/iommu.h                       |  4 +-
-> > >   8 files changed, 40 insertions(+), 165 deletions(-)
+On Mon, Mar 29, 2021 at 05:24:13PM +0000, Sean Christopherson wrote:
+> On Mon, Mar 29, 2021, Vitaly Kuznetsov wrote:
+> > When guest time is reset with KVM_SET_CLOCK(0), it is possible for
+> > hv_clock->system_time to become a small negative number. This happens
+> > because in KVM_SET_CLOCK handling we set kvm->arch.kvmclock_offset based
+> > on get_kvmclock_ns(kvm) but when KVM_REQ_CLOCK_UPDATE is handled,
+> > kvm_guest_time_update() does
 > > 
-> > I really like this cleanup, but I can't help wonder if it's going in the
-> > wrong direction. With SoCs often having multiple IOMMU instances and a
-> > distinction between "trusted" and "untrusted" devices, then having the
-> > flush-queue enabled on a per-IOMMU or per-domain basis doesn't sound
-> > unreasonable to me, but this change makes it a global property.
-> 
-> The intent here was just to streamline the existing behaviour of stuffing a
-> global property into a domain attribute then pulling it out again in the
-> illusion that it was in any way per-domain. We're still checking
-> dev_is_untrusted() before making an actual decision, and it's not like we
-> can't add more factors at that point if we want to.
-
-Like I say, the cleanup is great. I'm just wondering whether there's a
-better way to express the complicated logic to decide whether or not to use
-the flush queue than what we end up with:
-
-	if (!cookie->fq_domain && (!dev || !dev_is_untrusted(dev)) &&
-	    domain->ops->flush_iotlb_all && !iommu_get_dma_strict())
-
-which is mixing up globals, device properties and domain properties. The
-result is that the driver code ends up just using the global to determine
-whether or not to pass IO_PGTABLE_QUIRK_NON_STRICT to the page-table code,
-which is a departure from the current way of doing things.
-
-> > For example, see the recent patch from Lu Baolu:
+> > hv_clock.system_time = ka->master_kernel_ns + v->kvm->arch.kvmclock_offset;
 > > 
-> > https://lore.kernel.org/r/20210225061454.2864009-1-baolu.lu@linux.intel.com
+> > And 'master_kernel_ns' represents the last time when masterclock
+> > got updated, it can precede KVM_SET_CLOCK() call. Normally, this is not a
+> > problem, the difference is very small, e.g. I'm observing
+> > hv_clock.system_time = -70 ns. The issue comes from the fact that
+> > 'hv_clock.system_time' is stored as unsigned and 'system_time / 100' in
+> > compute_tsc_page_parameters() becomes a very big number.
+> > 
+> > Use div_s64() to get the proper result when dividing maybe-negative
+> > 'hv_clock.system_time' by 100.
+> > 
+> > Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+> > ---
+> >  arch/x86/kvm/hyperv.c | 9 ++++++---
+> >  1 file changed, 6 insertions(+), 3 deletions(-)
+> > 
+> > diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
+> > index f98370a39936..0529b892f634 100644
+> > --- a/arch/x86/kvm/hyperv.c
+> > +++ b/arch/x86/kvm/hyperv.c
+> > @@ -1070,10 +1070,13 @@ static bool compute_tsc_page_parameters(struct pvclock_vcpu_time_info *hv_clock,
+> >  				hv_clock->tsc_to_system_mul,
+> >  				100);
+> >  
+> > -	tsc_ref->tsc_offset = hv_clock->system_time;
+> > -	do_div(tsc_ref->tsc_offset, 100);
+> > -	tsc_ref->tsc_offset -=
+> > +	/*
+> > +	 * Note: 'hv_clock->system_time' despite being 'u64' can hold a negative
+> > +	 * value here, thus div_s64().
+> > +	 */
 > 
-> Erm, this patch is based on that one, it's right there in the context :/
+> Will anything break if hv_clock.system_time is made a s64?
 
-Ah, sorry, I didn't spot that! I was just trying to illustrate that this
-is per-device.
+IMHO hv_clock.system_time represents an unsigned value:
 
-Will
+        system_time:
+                a host notion of monotonic time, including sleep
+                time at the time this structure was last updated. Unit is
+                nanoseconds.
+
+
+Delta between values is not transmitted through this variable, 
+so unclear what negative values would mean.
+
+
