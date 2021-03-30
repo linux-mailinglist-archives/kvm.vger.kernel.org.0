@@ -2,133 +2,203 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4A43234DD98
-	for <lists+kvm@lfdr.de>; Tue, 30 Mar 2021 03:34:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7FE8634DDDC
+	for <lists+kvm@lfdr.de>; Tue, 30 Mar 2021 03:59:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230204AbhC3BeM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 29 Mar 2021 21:34:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47412 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229842AbhC3BeE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 29 Mar 2021 21:34:04 -0400
-Received: from mail-ot1-x32a.google.com (mail-ot1-x32a.google.com [IPv6:2607:f8b0:4864:20::32a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E248CC061762;
-        Mon, 29 Mar 2021 18:34:03 -0700 (PDT)
-Received: by mail-ot1-x32a.google.com with SMTP id 68-20020a9d0f4a0000b02901b663e6258dso14069595ott.13;
-        Mon, 29 Mar 2021 18:34:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=d3Jpagx3DhvHP/1KqfdL+Qn6Aesr5PznlWbZNZ/71p0=;
-        b=u8IDKhGJkGoc1FKr0T4btNSrxT8GaCAz+MB2nDU04XFaZev53IWDSbawcc0ddCuVna
-         V3K53nMstT6wG3VyOUf19IGUjKoH/FUXRWYZW9LeipF/BlaVYl17GBsQ04TiGQef+uub
-         w+VF3H1nzAyOmR4bEUPE/AjroE5oMhDTohs6+Y8TflXfE/X3AYRnIR0ETbULZ6tey8WE
-         6Rs58ZBoy4/liGjRWB8DfmwvW1uVU7YLVpXantv7HfggqQ16kCJlRZUU7uNfUi8QoQtd
-         4BDUFA70qLSes3i+ocTiLaTvbi1qTzLSJF2NJYgBnRqzoOLrrl6v0HS9Z4gFeVDVUgR/
-         gvyw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=d3Jpagx3DhvHP/1KqfdL+Qn6Aesr5PznlWbZNZ/71p0=;
-        b=VFoWI2ZQ8cs3hLWnqCG+7KJDaDCz4F2oPj+3fIQBs4aBCxV98nxL3Mm7rPVj3H3oQA
-         Dio6I9QaxcxUjL/LZ5of+xM6sLL2HjDLoqSmxwyF0VypjI4onsOsGvCD7iAti79Wknc8
-         Pt+eavZ00CzkPuK3BAzSD2P+e4Cen+v/DzfNgcI7mMF9gMI36ucBIuol4uSbBEzqxCIU
-         Eqvi/lNyJchFsilPCoq4gH+OllJuxPUL4gh5J/pTrNbzz81lcS8D+86i9FshJCf+0rZc
-         gLP0juR8L4/kKbEbFhLeQsBAMr+1ZvpZlGWl7CO57NxsTVDxdVt9DlUCzAsPsFjGkh47
-         3Hsw==
-X-Gm-Message-State: AOAM530+eIwQ86ORTKGT2XN1e/LxDUhDp+W9IIU06s5GO+VeEzdNA3AD
-        808I9mFXQYqY1lKMylicsM/bB/S/Z94x5eSo+SY=
-X-Google-Smtp-Source: ABdhPJyg/2vAyonkuB5bZTTHsXI4S8QOwTwh1Bj7Qv33RIsUA8ERrRlQv15OpWPxJcxNHhK2qd37w5CB9zXsRLyPQ9M=
-X-Received: by 2002:a9d:470b:: with SMTP id a11mr24115745otf.254.1617068043225;
- Mon, 29 Mar 2021 18:34:03 -0700 (PDT)
+        id S230434AbhC3B6e (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 29 Mar 2021 21:58:34 -0400
+Received: from mga05.intel.com ([192.55.52.43]:61672 "EHLO mga05.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229842AbhC3B6E (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 29 Mar 2021 21:58:04 -0400
+IronPort-SDR: Q2pFH/D6ic7dDEl0Q1dHQMgSfJ3pWEO0E7i5ard5okAqYK7qH/fqMsTKecj0DZvfPAVKSsd9SW
+ kP67cPlWH1LA==
+X-IronPort-AV: E=McAfee;i="6000,8403,9938"; a="276831829"
+X-IronPort-AV: E=Sophos;i="5.81,289,1610438400"; 
+   d="scan'208";a="276831829"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Mar 2021 18:58:03 -0700
+IronPort-SDR: 4kBCccE83dlaNL80D5bdqGzxLDPB7kdzuqN0OJRCEslhjw4WhqBUSoiX0wmZgPL78MoAakqoM1
+ Cwyk1mFWeGBQ==
+X-IronPort-AV: E=Sophos;i="5.81,289,1610438400"; 
+   d="scan'208";a="454801775"
+Received: from meghadey-mobl1.amr.corp.intel.com (HELO [10.209.158.242]) ([10.209.158.242])
+  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Mar 2021 18:57:54 -0700
+Subject: Re: [Patch V2 13/13] genirq/msi: Provide helpers to return Linux
+ IRQ/dev_msi hw IRQ number
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     tglx@linutronix.de, linux-kernel@vger.kernel.org,
+        dave.jiang@intel.com, ashok.raj@intel.com, kevin.tian@intel.com,
+        dwmw@amazon.co.uk, x86@kernel.org, tony.luck@intel.com,
+        dan.j.williams@intel.com, jgg@mellanox.com, kvm@vger.kernel.org,
+        iommu@lists.linux-foundation.org, alex.williamson@redhat.com,
+        bhelgaas@google.com, linux-pci@vger.kernel.org,
+        baolu.lu@linux.intel.com, ravi.v.shankar@intel.com
+References: <1614370277-23235-1-git-send-email-megha.dey@intel.com>
+ <1614370277-23235-14-git-send-email-megha.dey@intel.com>
+ <87y2ebqfw5.wl-maz@kernel.org>
+ <5bed6fea-32e1-d909-0a5c-439d0f0a7dfe@intel.com>
+ <87r1k2f4w2.wl-maz@kernel.org>
+From:   "Dey, Megha" <megha.dey@intel.com>
+Message-ID: <64602269-5c82-46ce-b2a0-2586e68e258f@intel.com>
+Date:   Tue, 30 Mar 2021 07:27:40 +0530
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.9.0
 MIME-Version: 1.0
-References: <1617011036-11734-1-git-send-email-wanpengli@tencent.com> <YGILHM7CHpjXtxaH@google.com>
-In-Reply-To: <YGILHM7CHpjXtxaH@google.com>
-From:   Wanpeng Li <kernellwp@gmail.com>
-Date:   Tue, 30 Mar 2021 09:33:51 +0800
-Message-ID: <CANRm+CxXAt7z5H1v_Zpjg44Ka09eWc7gaJ7HRq9USUurjqrG3A@mail.gmail.com>
-Subject: Re: [PATCH] KVM: X86: Properly account for guest CPU time when
- considering context tracking
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <87r1k2f4w2.wl-maz@kernel.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 30 Mar 2021 at 01:15, Sean Christopherson <seanjc@google.com> wrote:
->
-> +Thomas
->
-> On Mon, Mar 29, 2021, Wanpeng Li wrote:
-> > From: Wanpeng Li <wanpengli@tencent.com>
-> >
-> > The bugzilla https://bugzilla.kernel.org/show_bug.cgi?id=209831
-> > reported that the guest time remains 0 when running a while true
-> > loop in the guest.
-> >
-> > The commit 87fa7f3e98a131 ("x86/kvm: Move context tracking where it
-> > belongs") moves guest_exit_irqoff() close to vmexit breaks the
-> > tick-based time accouting when the ticks that happen after IRQs are
-> > disabled are incorrectly accounted to the host/system time. This is
-> > because we exit the guest state too early.
-> >
-> > vtime-based time accounting is tied to context tracking, keep the
-> > guest_exit_irqoff() around vmexit code when both vtime-based time
-> > accounting and specific cpu is context tracking mode active.
-> > Otherwise, leave guest_exit_irqoff() after handle_exit_irqoff()
-> > and explicit IRQ window for tick-based time accouting.
-> >
-> > Fixes: 87fa7f3e98a131 ("x86/kvm: Move context tracking where it belongs")
-> > Cc: Sean Christopherson <seanjc@google.com>
-> > Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
-> > ---
-> >  arch/x86/kvm/svm/svm.c | 3 ++-
-> >  arch/x86/kvm/vmx/vmx.c | 3 ++-
-> >  arch/x86/kvm/x86.c     | 2 ++
-> >  3 files changed, 6 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> > index 58a45bb..55fb5ce 100644
-> > --- a/arch/x86/kvm/svm/svm.c
-> > +++ b/arch/x86/kvm/svm/svm.c
-> > @@ -3812,7 +3812,8 @@ static noinstr void svm_vcpu_enter_exit(struct kvm_vcpu *vcpu,
-> >        * into world and some more.
-> >        */
-> >       lockdep_hardirqs_off(CALLER_ADDR0);
-> > -     guest_exit_irqoff();
-> > +     if (vtime_accounting_enabled_this_cpu())
-> > +             guest_exit_irqoff();
-> >
-> >       instrumentation_begin();
-> >       trace_hardirqs_off_finish();
-> > diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> > index 32cf828..85695b3 100644
-> > --- a/arch/x86/kvm/vmx/vmx.c
-> > +++ b/arch/x86/kvm/vmx/vmx.c
-> > @@ -6689,7 +6689,8 @@ static noinstr void vmx_vcpu_enter_exit(struct kvm_vcpu *vcpu,
-> >        * into world and some more.
-> >        */
-> >       lockdep_hardirqs_off(CALLER_ADDR0);
-> > -     guest_exit_irqoff();
-> > +     if (vtime_accounting_enabled_this_cpu())
-> > +             guest_exit_irqoff();
->
-> This looks ok, as CONFIG_CONTEXT_TRACKING and CONFIG_VIRT_CPU_ACCOUNTING_GEN are
-> selected by CONFIG_NO_HZ_FULL=y, and can't be enabled independently, e.g. the
-> rcu_user_exit() call won't be delayed because it will never be called in the
-> !vtime case.  But it still feels wrong poking into those details, e.g. it'll
-> be weird and/or wrong guest_exit_irqoff() gains stuff that isn't vtime specific.
+Hi Marc,
 
-Could you elaborate what's the meaning of "it'll be weird and/or wrong
-guest_exit_irqoff() gains stuff that isn't vtime specific."?
-
-    Wanpeng
+On 3/26/2021 6:28 PM, Marc Zyngier wrote:
+> On Fri, 26 Mar 2021 01:02:43 +0000,
+> "Dey, Megha" <megha.dey@intel.com> wrote:
+>> Hi Marc,
+>>
+>> On 3/25/2021 10:53 AM, Marc Zyngier wrote:
+>>> On Fri, 26 Feb 2021 20:11:17 +0000,
+>>> Megha Dey <megha.dey@intel.com> wrote:
+>>>> From: Dave Jiang <dave.jiang@intel.com>
+>>>>
+>>>> Add new helpers to get the Linux IRQ number and device specific index
+>>>> for given device-relative vector so that the drivers don't need to
+>>>> allocate their own arrays to keep track of the vectors and hwirq for
+>>>> the multi vector device MSI case.
+>>>>
+>>>> Reviewed-by: Tony Luck <tony.luck@intel.com>
+>>>> Signed-off-by: Dave Jiang <dave.jiang@intel.com>
+>>>> Signed-off-by: Megha Dey <megha.dey@intel.com>
+>>>> ---
+>>>>    include/linux/msi.h |  2 ++
+>>>>    kernel/irq/msi.c    | 44 ++++++++++++++++++++++++++++++++++++++++++++
+>>>>    2 files changed, 46 insertions(+)
+>>>>
+>>>> diff --git a/include/linux/msi.h b/include/linux/msi.h
+>>>> index 24abec0..d60a6ba 100644
+>>>> --- a/include/linux/msi.h
+>>>> +++ b/include/linux/msi.h
+>>>> @@ -451,6 +451,8 @@ struct irq_domain *platform_msi_create_irq_domain(struct fwnode_handle *fwnode,
+>>>>    int platform_msi_domain_alloc_irqs(struct device *dev, unsigned int nvec,
+>>>>    				   irq_write_msi_msg_t write_msi_msg);
+>>>>    void platform_msi_domain_free_irqs(struct device *dev);
+>>>> +int msi_irq_vector(struct device *dev, unsigned int nr);
+>>>> +int dev_msi_hwirq(struct device *dev, unsigned int nr);
+>>>>      /* When an MSI domain is used as an intermediate domain */
+>>>>    int msi_domain_prepare_irqs(struct irq_domain *domain, struct device *dev,
+>>>> diff --git a/kernel/irq/msi.c b/kernel/irq/msi.c
+>>>> index 047b59d..f2a8f55 100644
+>>>> --- a/kernel/irq/msi.c
+>>>> +++ b/kernel/irq/msi.c
+>>>> @@ -581,4 +581,48 @@ struct msi_domain_info *msi_get_domain_info(struct irq_domain *domain)
+>>>>    	return (struct msi_domain_info *)domain->host_data;
+>>>>    }
+>>>>    +/**
+>>>> + * msi_irq_vector - Get the Linux IRQ number of a device vector
+>>>> + * @dev: device to operate on
+>>>> + * @nr: device-relative interrupt vector index (0-based).
+>>>> + *
+>>>> + * Returns the Linux IRQ number of a device vector.
+>>>> + */
+>>>> +int msi_irq_vector(struct device *dev, unsigned int nr)
+>>>> +{
+>>>> +	struct msi_desc *entry;
+>>>> +	int i = 0;
+>>>> +
+>>>> +	for_each_msi_entry(entry, dev) {
+>>>> +		if (i == nr)
+>>>> +			return entry->irq;
+>>>> +		i++;
+>>> This obviously doesn't work with Multi-MSI, does it?
+>> This API is only for devices that support device MSI interrupts. They
+>> follow MSI-x format and don't support multi MSI (part of MSI).
+>>
+>> Not sure if I am missing something here, can you please let me know?
+> Nothing in the prototype of the function indicates this limitation,
+> nor does the documentation. And I'm not sure why you should exclude
+> part of the MSI functionality here. It can't be for performance
+> reason, so you might as well make sure this works for all the MSI
+> variants:
+>
+> int msi_irq_vector(struct device *dev, unsigned int nr)
+> {
+> 	struct msi_desc *entry;
+> 	int irq, index = 0;
+>
+> 	for_each_msi_vector(entry, irq, dev) {
+> 		if (index == nr}
+> 			return irq;
+> 		index++;
+> 	}
+>
+> 	return WARN_ON_ONCE(-EINVAL);
+> }
+Ok, got it!
+>>>> +	}
+>>>> +	WARN_ON_ONCE(1);
+>>>> +	return -EINVAL;
+>>>> +}
+>>>> +EXPORT_SYMBOL_GPL(msi_irq_vector);
+>>>> +
+>>>> +/**
+>>>> + * dev_msi_hwirq - Get the device MSI hw IRQ number of a device vector
+>>>> + * @dev: device to operate on
+>>>> + * @nr: device-relative interrupt vector index (0-based).
+>>>> + *
+>>>> + * Return the dev_msi hw IRQ number of a device vector.
+>>>> + */
+>>>> +int dev_msi_hwirq(struct device *dev, unsigned int nr)
+>>>> +{
+>>>> +	struct msi_desc *entry;
+>>>> +	int i = 0;
+>>>> +
+>>>> +	for_each_msi_entry(entry, dev) {
+>>>> +		if (i == nr)
+>>>> +			return entry->device_msi.hwirq;
+>>>> +		i++;
+>>>> +	}
+>>>> +	WARN_ON_ONCE(1);
+>>>> +	return -EINVAL;
+>>>> +}
+> And this helper would be more generally useful if it returned the n-th
+> msi_desc entry rather than some obscure field in a substructure.
+>
+> struct msi_desc *msi_get_nth_desc(struct device *dev, unsigned int nth)
+> {
+> 	struct msi_desc *entry = NULL;
+> 	unsigned int i = 0;
+>
+> 	for_each_msi_entry(entry, dev) {
+> 		if (i == nth)
+> 			return entry;
+>
+> 		i++;
+> 	}
+>
+> 	WARN_ON_ONCE(!entry);
+> 	return entry;
+> }
+>
+> You can always wrap it for your particular use case.
+Yeah, makes sense.
+>
+>>>> +EXPORT_SYMBOL_GPL(dev_msi_hwirq);
+>>>> +
+>>>>    #endif /* CONFIG_GENERIC_MSI_IRQ_DOMAIN */
+>>> And what uses these helpers?]
+>> These helpers are to be used by a driver series(Intel's IDXD driver)
+>> which is currently stuck due to VFIO refactoring.
+> Then I's suggest you keep the helpers together with the actual user,
+> unless this can generally be useful to existing users (exported
+> symbols without in-tree users is always a bit odd).
+Yeah in the next submission, we will submit this patch series along with 
+the user driver patch series.
+>
+> Thanks,
+>
+> 	M.
+>
