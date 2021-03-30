@@ -2,28 +2,28 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4265034E771
-	for <lists+kvm@lfdr.de>; Tue, 30 Mar 2021 14:23:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 63A5134E79D
+	for <lists+kvm@lfdr.de>; Tue, 30 Mar 2021 14:41:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231980AbhC3MXC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 30 Mar 2021 08:23:02 -0400
-Received: from mail.kernel.org ([198.145.29.99]:39950 "EHLO mail.kernel.org"
+        id S231938AbhC3Mk3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 30 Mar 2021 08:40:29 -0400
+Received: from mail.kernel.org ([198.145.29.99]:44966 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231946AbhC3MWk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 30 Mar 2021 08:22:40 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 007BD619B4;
-        Tue, 30 Mar 2021 12:22:37 +0000 (UTC)
+        id S231434AbhC3MkP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 30 Mar 2021 08:40:15 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id E982E60232;
+        Tue, 30 Mar 2021 12:40:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1617106960;
-        bh=/aM64zjLfZ9icJTYRZuJLiDfQTnTZcq/QS8CixcectI=;
+        s=k20201202; t=1617108015;
+        bh=IX2YifXUPutEwODCiJ5FkZ7svmqC2sPBx3924aa48Yg=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=WK5wU8QzM2RAlf0A2tPmCsCSrZ6xX/6kymJwUDezvxGq+zEpbtRiqJE6Tk7/uqfXS
-         ZWuDra3MPyeLzukYzhLpHEZ3cyApoLPN1Alj/vVZbTad1wWRWYgHApBLjKb+OSQQ0b
-         khQj7nJ4uP5lzLP8zR1ohRZgZhkeZk+WPpSV+7k/5QZjHX0PjUYGMkFTEn/AilCqDm
-         1+QXeCSskrL3TI3hIq3qv28Ukt2hJG6SDrmUXCr60YaJvYVyhLEqb4KEM4eG9XEBlX
-         4YOreXixQ5uL+t7JzueqrMXfoiokiQNL24aC6BcZ2UBMoW/bDqocR+rtAu2Jrsoavg
-         9z/uGdduijzXQ==
-Date:   Tue, 30 Mar 2021 13:22:34 +0100
+        b=nWgQteGwA5KJlS2JEm1DqLRTwpQa9MxXWOIN5GJCMFtjX0INuGG/yNdjsVWCFpiYJ
+         oxPSJpF11duop8M2scavelMol6/AT8NTEQVpD99bNW9C8YnpWrW5SilD7uovqWEsBw
+         9NXGPUDX+nSIkkaLAjXvH1N0TCwIw2ZKe5EClUtTpNYe36xPYxZpRn+GOishndd0RZ
+         XkYFeNPS5aTR5cbmGiWYvlLf/h/vfoDZLBLAT/a/UKQp/8Kfhx8IIcqRyN0qW/Vx0V
+         DJqO0c48Fq0jOR6T0u+2L2HLBIx3MQrqTW4L44QcFkRIAs0f/QJTlssAZuY9kevdw9
+         EsfSKgPiTPvmQ==
+Date:   Tue, 30 Mar 2021 13:40:09 +0100
 From:   Will Deacon <will@kernel.org>
 To:     Christoph Hellwig <hch@lst.de>
 Cc:     Joerg Roedel <joro@8bytes.org>, Li Yang <leoyang.li@nxp.com>,
@@ -35,82 +35,107 @@ Cc:     Joerg Roedel <joro@8bytes.org>, Li Yang <leoyang.li@nxp.com>,
         iommu@lists.linux-foundation.org,
         linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
         virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
-Subject: Re: [PATCH 05/18] iommu/fsl_pamu: remove support for multiple windows
-Message-ID: <20210330122234.GE5908@willie-the-truck>
+Subject: Re: [PATCH 06/18] iommu/fsl_pamu: remove ->domain_window_enable
+Message-ID: <20210330124009.GF5908@willie-the-truck>
 References: <20210316153825.135976-1-hch@lst.de>
- <20210316153825.135976-6-hch@lst.de>
+ <20210316153825.135976-7-hch@lst.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210316153825.135976-6-hch@lst.de>
+In-Reply-To: <20210316153825.135976-7-hch@lst.de>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Mar 16, 2021 at 04:38:11PM +0100, Christoph Hellwig wrote:
-> The only domains allocated forces use of a single window.  Remove all
-> the code related to multiple window support, as well as the need for
-> qman_portal to force a single window.
+On Tue, Mar 16, 2021 at 04:38:12PM +0100, Christoph Hellwig wrote:
+> The only thing that fsl_pamu_window_enable does for the current caller
+> is to fill in the prot value in the only dma_window structure, and to
+> propagate a few values from the iommu_domain_geometry struture into the
+> dma_window.  Remove the dma_window entirely, hardcode the prot value and
+> otherwise use the iommu_domain_geometry structure instead.
 > 
-> Remove the now unused DOMAIN_ATTR_WINDOWS iommu_attr.
+> Remove the now unused ->domain_window_enable iommu method.
 > 
 > Signed-off-by: Christoph Hellwig <hch@lst.de>
 > Acked-by: Li Yang <leoyang.li@nxp.com>
 > ---
->  drivers/iommu/fsl_pamu.c            | 264 +-------------------------
->  drivers/iommu/fsl_pamu.h            |  10 +-
->  drivers/iommu/fsl_pamu_domain.c     | 275 +++++-----------------------
->  drivers/iommu/fsl_pamu_domain.h     |  12 +-
->  drivers/soc/fsl/qbman/qman_portal.c |   7 -
->  include/linux/iommu.h               |   1 -
->  6 files changed, 59 insertions(+), 510 deletions(-)
-
-[...]
-
-> +	set_bf(ppaace->impl_attr, PAACE_IA_ATM, PAACE_ATM_WINDOW_XLATE);
-> +	ppaace->twbah = rpn >> 20;
-> +	set_bf(ppaace->win_bitfields, PAACE_WIN_TWBAL, rpn);
-> +	set_bf(ppaace->addr_bitfields, PAACE_AF_AP, prot);
-> +	set_bf(ppaace->impl_attr, PAACE_IA_WCE, 0);
-> +	set_bf(ppaace->addr_bitfields, PPAACE_AF_MW, 0);
->  	mb();
-
-(I wonder what on Earth that mb() is doing...)
-
-> diff --git a/drivers/iommu/fsl_pamu_domain.h b/drivers/iommu/fsl_pamu_domain.h
-> index 53d359d66fe577..b9236fb5a8f82e 100644
-> --- a/drivers/iommu/fsl_pamu_domain.h
-> +++ b/drivers/iommu/fsl_pamu_domain.h
-> @@ -17,23 +17,13 @@ struct dma_window {
->  };
+>  drivers/iommu/fsl_pamu_domain.c     | 182 +++-------------------------
+>  drivers/iommu/fsl_pamu_domain.h     |  17 ---
+>  drivers/iommu/iommu.c               |  11 --
+>  drivers/soc/fsl/qbman/qman_portal.c |   7 --
+>  include/linux/iommu.h               |  17 ---
+>  5 files changed, 14 insertions(+), 220 deletions(-)
+> 
+> diff --git a/drivers/iommu/fsl_pamu_domain.c b/drivers/iommu/fsl_pamu_domain.c
+> index e6bdd38fc18409..fd2bc88b690465 100644
+> --- a/drivers/iommu/fsl_pamu_domain.c
+> +++ b/drivers/iommu/fsl_pamu_domain.c
+> @@ -54,34 +54,18 @@ static int __init iommu_init_mempool(void)
+>  	return 0;
+>  }
 >  
->  struct fsl_dma_domain {
-> -	/*
-> -	 * Number of windows assocaited with this domain.
-> -	 * During domain initialization, it is set to the
-> -	 * the maximum number of subwindows allowed for a LIODN.
-> -	 * Minimum value for this is 1 indicating a single PAMU
-> -	 * window, without any sub windows. Value can be set/
-> -	 * queried by set_attr/get_attr API for DOMAIN_ATTR_WINDOWS.
-> -	 * Value can only be set once the geometry has been configured.
-> -	 */
-> -	u32				win_cnt;
->  	/*
->  	 * win_arr contains information of the configured
->  	 * windows for a domain. This is allocated only
->  	 * when the number of windows for the domain are
->  	 * set.
->  	 */
+> -static phys_addr_t get_phys_addr(struct fsl_dma_domain *dma_domain, dma_addr_t iova)
+> -{
+> -	struct dma_window *win_ptr = &dma_domain->win_arr[0];
+> -	struct iommu_domain_geometry *geom;
+> -
+> -	geom = &dma_domain->iommu_domain.geometry;
+> -
+> -	if (win_ptr->valid)
+> -		return win_ptr->paddr + (iova & (win_ptr->size - 1));
+> -
+> -	return 0;
+> -}
+> -
+>  /* Map the DMA window corresponding to the LIODN */
+>  static int map_liodn(int liodn, struct fsl_dma_domain *dma_domain)
+>  {
+>  	int ret;
+> -	struct dma_window *wnd = &dma_domain->win_arr[0];
+> -	phys_addr_t wnd_addr = dma_domain->iommu_domain.geometry.aperture_start;
+> +	struct iommu_domain_geometry *geom = &dma_domain->iommu_domain.geometry;
+>  	unsigned long flags;
+>  
+>  	spin_lock_irqsave(&iommu_lock, flags);
+> -	ret = pamu_config_ppaace(liodn, wnd_addr,
+> -				 wnd->size,
+> -				 ~(u32)0,
+> -				 wnd->paddr >> PAMU_PAGE_SHIFT,
+> -				 dma_domain->snoop_id, dma_domain->stash_id,
+> -				 wnd->prot);
+> +	ret = pamu_config_ppaace(liodn, geom->aperture_start,
+> +				 geom->aperture_end - 1, ~(u32)0,
 
-The last part of this comment is now stale ^^
+You're passing 'geom->aperture_end - 1' as the size here, but the old code
+seemed to _add_ 1:
 
-> -	struct dma_window		*win_arr;
-> +	struct dma_window		win_arr[1];
->  	/* list of devices associated with the domain */
->  	struct list_head		devices;
->  	/* dma_domain states:
+> -static int fsl_pamu_window_enable(struct iommu_domain *domain, u32 wnd_nr,
+> -				  phys_addr_t paddr, u64 size, int prot)
+> -{
+> -	struct fsl_dma_domain *dma_domain = to_fsl_dma_domain(domain);
+> -	struct dma_window *wnd;
+> -	int pamu_prot = 0;
+> -	int ret;
+> -	unsigned long flags;
+> -	u64 win_size;
+> -
+> -	if (prot & IOMMU_READ)
+> -		pamu_prot |= PAACE_AP_PERMS_QUERY;
+> -	if (prot & IOMMU_WRITE)
+> -		pamu_prot |= PAACE_AP_PERMS_UPDATE;
+> -
+> -	spin_lock_irqsave(&dma_domain->domain_lock, flags);
+> -	if (wnd_nr > 0) {
+> -		pr_debug("Invalid window index\n");
+> -		spin_unlock_irqrestore(&dma_domain->domain_lock, flags);
+> -		return -EINVAL;
+> -	}
+> -
+> -	win_size = (domain->geometry.aperture_end + 1) >> ilog2(1);
 
-Acked-by: Will Deacon <will@kernel.org>
+here ^^ when calculating the exclusive upper bound. In other words, I think
+'1ULL << 36' used to get passed to pamu_config_ppaace(). Is that an
+intentional change?
 
 Will
