@@ -2,125 +2,81 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8ACCF34EE03
-	for <lists+kvm@lfdr.de>; Tue, 30 Mar 2021 18:36:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C3C9F34EE49
+	for <lists+kvm@lfdr.de>; Tue, 30 Mar 2021 18:48:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232134AbhC3Qfy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 30 Mar 2021 12:35:54 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:42134 "EHLO
+        id S232415AbhC3QqU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 30 Mar 2021 12:46:20 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:42547 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232032AbhC3Qfj (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 30 Mar 2021 12:35:39 -0400
+        by vger.kernel.org with ESMTP id S232529AbhC3Qpi (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 30 Mar 2021 12:45:38 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1617122139;
+        s=mimecast20190719; t=1617122738;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=sqtWosuqNKDa02gZMmemB9CDs97xM6L47pP8D8NZrVU=;
-        b=dDL8kU5ebES4Ubck0bIexyzj7SP1NUbFJntMphFmpUeAyoviizenPPCUCJzCfXhafYoRsH
-        NnH9nqLTdGWB4YSIdJC5ZnTo7c22ffwlHV2d5Q4/Mm3kon+mYvbImBtNwe9Lxu8zAI3cWC
-        1w65eJ8Favirrz0zJgsrBwAF3+f0yNU=
+         content-transfer-encoding:content-transfer-encoding;
+        bh=zzc2KTIEFsB3osEymwowtqBBc0fZZdXcHQvsko2yUzo=;
+        b=T/JBsC2ImjM4bYtOMs7VZnTt0UmqPSmm6JMCWjj9ZdXKzbN/k/pn8/2fwxG5fk/ovJSdx6
+        MvEUw4Br6hqJfm9NlrJLGtjfapcoiSe84KcopZrauixshlDOPVe0R0Nfr4b07ziqPqTTP4
+        0FcANRFYEAt5t0NlvrHMliRRgm30YgM=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-516-G-wn3Ys_OA2Fmo20TxtE-w-1; Tue, 30 Mar 2021 12:35:34 -0400
-X-MC-Unique: G-wn3Ys_OA2Fmo20TxtE-w-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+ us-mta-347-ljLN9JOIOR-Zyrx8eNaKZg-1; Tue, 30 Mar 2021 12:45:36 -0400
+X-MC-Unique: ljLN9JOIOR-Zyrx8eNaKZg-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E67BA18C89DD;
-        Tue, 30 Mar 2021 16:35:31 +0000 (UTC)
-Received: from gondolin (ovpn-113-155.ams2.redhat.com [10.36.113.155])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 141165D740;
-        Tue, 30 Mar 2021 16:35:22 +0000 (UTC)
-Date:   Tue, 30 Mar 2021 18:35:20 +0200
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     David Airlie <airlied@linux.ie>,
-        Tony Krowiak <akrowiak@linux.ibm.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        dri-devel@lists.freedesktop.org,
-        Eric Farman <farman@linux.ibm.com>,
-        Harald Freudenberger <freude@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        intel-gfx@lists.freedesktop.org,
-        intel-gvt-dev@lists.freedesktop.org,
-        Jani Nikula <jani.nikula@linux.intel.com>,
-        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
-        kvm@vger.kernel.org, Kirti Wankhede <kwankhede@nvidia.com>,
-        linux-s390@vger.kernel.org,
-        Peter Oberparleiter <oberpar@linux.ibm.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Pierre Morel <pmorel@linux.ibm.com>,
-        Rodrigo Vivi <rodrigo.vivi@intel.com>,
-        Vineeth Vijayan <vneethv@linux.ibm.com>,
-        Zhenyu Wang <zhenyuw@linux.intel.com>,
-        Zhi Wang <zhi.a.wang@intel.com>,
-        "Raj, Ashok" <ashok.raj@intel.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Leon Romanovsky <leonro@nvidia.com>,
-        Max Gurtovoy <mgurtovoy@nvidia.com>,
-        Tarun Gupta <targupta@nvidia.com>
-Subject: Re: [PATCH 18/18] vfio/mdev: Correct the function signatures for
- the mdev_type_attributes
-Message-ID: <20210330183520.07c8aa47.cohuck@redhat.com>
-In-Reply-To: <18-v1-7dedf20b2b75+4f785-vfio2_jgg@nvidia.com>
-References: <0-v1-7dedf20b2b75+4f785-vfio2_jgg@nvidia.com>
-        <18-v1-7dedf20b2b75+4f785-vfio2_jgg@nvidia.com>
-Organization: Red Hat GmbH
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 944E71005D64;
+        Tue, 30 Mar 2021 16:45:34 +0000 (UTC)
+Received: from omen (ovpn-112-120.phx2.redhat.com [10.3.112.120])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 36EB75C1D1;
+        Tue, 30 Mar 2021 16:45:34 +0000 (UTC)
+Date:   Tue, 30 Mar 2021 10:45:33 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>, jgg@nvidia.com,
+        daniel.m.jordan@oracle.com
+Subject: [GIT PULL] VFIO fixes for v5.12-rc6
+Message-ID: <20210330104533.4ab8d840@omen>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 23 Mar 2021 14:55:35 -0300
-Jason Gunthorpe <jgg@nvidia.com> wrote:
+Hi Linus,
 
-> The driver core standard is to pass in the properly typed object, the
-> properly typed attribute and the buffer data. It stems from the root
-> kobject method:
-> 
->   ssize_t (*show)(struct kobject *kobj, struct kobj_attribute *attr,..)
-> 
-> Each subclass of kobject should provide their own function with the same
-> signature but more specific types, eg struct device uses:
-> 
->   ssize_t (*show)(struct device *dev, struct device_attribute *attr,..)
-> 
-> In this case the existing signature is:
-> 
->   ssize_t (*show)(struct kobject *kobj, struct device *dev,..)
-> 
-> Where kobj is a 'struct mdev_type *' and dev is 'mdev_type->parent->dev'.
-> 
-> Change the mdev_type related sysfs attribute functions to:
-> 
->   ssize_t (*show)(struct mdev_type *mtype, struct mdev_type_attribute *attr,..)
-> 
-> In order to restore type safety and match the driver core standard
-> 
-> There are no current users of 'attr', but if it is ever needed it would be
-> hard to add in retroactively, so do it now.
-> 
-> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
-> ---
->  drivers/gpu/drm/i915/gvt/gvt.c    | 21 +++++++++++----------
->  drivers/s390/cio/vfio_ccw_ops.c   | 15 +++++++++------
->  drivers/s390/crypto/vfio_ap_ops.c | 12 +++++++-----
->  drivers/vfio/mdev/mdev_core.c     | 14 ++++++++++++--
->  drivers/vfio/mdev/mdev_sysfs.c    | 11 ++++++-----
->  include/linux/mdev.h              | 11 +++++++----
->  samples/vfio-mdev/mbochs.c        | 26 +++++++++++++++-----------
->  samples/vfio-mdev/mdpy.c          | 24 ++++++++++++++----------
->  samples/vfio-mdev/mtty.c          | 18 +++++++++---------
->  9 files changed, 90 insertions(+), 62 deletions(-)
+The following changes since commit 0d02ec6b3136c73c09e7859f0d0e4e2c4c07b49b:
 
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+  Linux 5.12-rc4 (2021-03-21 14:56:43 -0700)
+
+are available in the Git repository at:
+
+  git://github.com/awilliam/linux-vfio.git tags/vfio-v5.12-rc6
+
+for you to fetch changes up to e0146a108ce4d2c22b9510fd12268e3ee72a0161:
+
+  vfio/nvlink: Add missing SPAPR_TCE_IOMMU depends (2021-03-29 14:48:00 -0600)
+
+----------------------------------------------------------------
+VFIO fixes for v5.12-rc6
+
+ - Fix pfnmap batch carryover (Daniel Jordan)
+
+ - Fix nvlink Kconfig dependency (Jason Gunthorpe)
+
+----------------------------------------------------------------
+Daniel Jordan (1):
+      vfio/type1: Empty batch for pfnmap pages
+
+Jason Gunthorpe (1):
+      vfio/nvlink: Add missing SPAPR_TCE_IOMMU depends
+
+ drivers/vfio/pci/Kconfig        | 2 +-
+ drivers/vfio/vfio_iommu_type1.c | 6 ++++++
+ 2 files changed, 7 insertions(+), 1 deletion(-)
 
