@@ -2,110 +2,65 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B0BE634E825
-	for <lists+kvm@lfdr.de>; Tue, 30 Mar 2021 14:59:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 10A3034E835
+	for <lists+kvm@lfdr.de>; Tue, 30 Mar 2021 15:01:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232030AbhC3M7W (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 30 Mar 2021 08:59:22 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:25152 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S232021AbhC3M7H (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 30 Mar 2021 08:59:07 -0400
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 12UCYK37136833
-        for <kvm@vger.kernel.org>; Tue, 30 Mar 2021 08:59:06 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=rumlZ3bVz4BjDUI4xAglYAvzcbx6DwBBx/ktAUz6PvU=;
- b=q2Xof/nsof12nzbnAKwUXCMtIzaTEcLEWjgY86bd84rL64lAmcYrvVkTmuAjDLn4GucA
- uNVZABY+xXTXF5N/Jq7M924xrRKz+olieceLbuAviGlmBv7zfom61LmzfbcO5dKMNEZc
- GZmktfQzM9j8BBIoZu5u8qort3BrY5uDMka3CuLl4eSCmvApHpwrWMdwsmkRSinWBrcJ
- 4WueEzWTrxnZ2qp34S5XzGwU4jJxeGYkPQnuDW6mxK1R8O7a2cjFLmbQY2dRYhr/xpqF
- IiOK5U5jI7xSBqWy085lArSRgyw3m6dtORLH8sHhArXYRbY4Wx41nnG/x7rlUuUs/esa Bg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 37jjb60uf0-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Tue, 30 Mar 2021 08:59:06 -0400
-Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 12UCYLwX136968
-        for <kvm@vger.kernel.org>; Tue, 30 Mar 2021 08:59:06 -0400
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 37jjb60ued-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 30 Mar 2021 08:59:05 -0400
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 12UCvtJe013114;
-        Tue, 30 Mar 2021 12:59:04 GMT
-Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
-        by ppma03ams.nl.ibm.com with ESMTP id 37hvb8aqvw-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 30 Mar 2021 12:59:04 +0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 12UCwg8O19202378
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 30 Mar 2021 12:58:42 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 7EA12AE056;
-        Tue, 30 Mar 2021 12:59:01 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 4069BAE04D;
-        Tue, 30 Mar 2021 12:59:01 +0000 (GMT)
-Received: from oc3016276355.ibm.com (unknown [9.145.144.252])
-        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue, 30 Mar 2021 12:59:01 +0000 (GMT)
-Subject: Re: [kvm-unit-tests PATCH v2 2/8] s390x: lib: css: SCSW bit
- definitions
-To:     Cornelia Huck <cohuck@redhat.com>
-Cc:     kvm@vger.kernel.org, frankja@linux.ibm.com, david@redhat.com,
-        thuth@redhat.com, imbrenda@linux.ibm.com
-References: <1616665147-32084-1-git-send-email-pmorel@linux.ibm.com>
- <1616665147-32084-3-git-send-email-pmorel@linux.ibm.com>
- <20210330134931.169d071d.cohuck@redhat.com>
-From:   Pierre Morel <pmorel@linux.ibm.com>
-Message-ID: <ef2c3b68-f792-7f00-110f-f92b4e6542bc@linux.ibm.com>
-Date:   Tue, 30 Mar 2021 14:59:01 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.8.0
+        id S232105AbhC3NA4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 30 Mar 2021 09:00:56 -0400
+Received: from mail.kernel.org ([198.145.29.99]:49588 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S232081AbhC3NAZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 30 Mar 2021 09:00:25 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 6723461959;
+        Tue, 30 Mar 2021 13:00:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1617109224;
+        bh=m3TvkxvqPC7Tpakpaq16UQpVjJGrx5gC57aV7gCm8GE=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=q+OSrGSvrWc7WYths8Js73WEMx795hdLZQgMXoL3dU2M1loRm7gpXJPstw5r96wE+
+         MHERTkZdUmMqt0s1BPvMPCPEFoJZkJamnTKDq4K4rys4fqbm/nejUkGZhZ84T7bvZv
+         Ler6sSRcp45AsVGHeW+zKyc/iZ0K+xWrwbiiAvOv9AdkdKTu7n28KdSWcWg3TCBiwH
+         efhhakrMIGdlWHG5y8cLowYyjKPeJvPwVS1ZDVu/G3v2OfwKusR9D1kPYvmwIyRcwB
+         RPVE1raY7AUORsYfBkgmuAg8ie5APSgAugC4iRu1nKmYUKDnrH6tc0xtIdlm9sb2o9
+         UNwLXhfk0L68Q==
+Date:   Tue, 30 Mar 2021 14:00:19 +0100
+From:   Will Deacon <will@kernel.org>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Joerg Roedel <joro@8bytes.org>, Li Yang <leoyang.li@nxp.com>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        David Woodhouse <dwmw2@infradead.org>,
+        Lu Baolu <baolu.lu@linux.intel.com>,
+        linuxppc-dev@lists.ozlabs.org, linux-arm-msm@vger.kernel.org,
+        dri-devel@lists.freedesktop.org, freedreno@lists.freedesktop.org,
+        iommu@lists.linux-foundation.org,
+        linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
+Subject: Re: [PATCH 13/18] iommu: remove DOMAIN_ATTR_GEOMETRY
+Message-ID: <20210330130019.GM5908@willie-the-truck>
+References: <20210316153825.135976-1-hch@lst.de>
+ <20210316153825.135976-14-hch@lst.de>
 MIME-Version: 1.0
-In-Reply-To: <20210330134931.169d071d.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: CRX5xDuY1brC1Oqgm2E1_2Tv19_xt6ll
-X-Proofpoint-ORIG-GUID: 3AaFMQ131QM__di8EPDkUNVdBnZ5nkGq
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.761
- definitions=2021-03-30_03:2021-03-30,2021-03-30 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999 bulkscore=0
- mlxscore=0 impostorscore=0 adultscore=0 lowpriorityscore=0 clxscore=1015
- spamscore=0 priorityscore=1501 phishscore=0 malwarescore=0 suspectscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2103250000
- definitions=main-2103300090
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210316153825.135976-14-hch@lst.de>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-On 3/30/21 1:49 PM, Cornelia Huck wrote:
-> On Thu, 25 Mar 2021 10:39:01 +0100
-> Pierre Morel <pmorel@linux.ibm.com> wrote:
+On Tue, Mar 16, 2021 at 04:38:19PM +0100, Christoph Hellwig wrote:
+> The geometry information can be trivially queried from the iommu_domain
+> struture.
 > 
->> We need the SCSW definitions to test clear and halt subchannel.
->>
->> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
->> ---
->>   lib/s390x/css.h | 23 +++++++++++++++++++++++
->>   1 file changed, 23 insertions(+)
-> 
-> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
-> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> Acked-by: Li Yang <leoyang.li@nxp.com>
+> ---
+>  drivers/iommu/iommu.c           | 20 +++-----------------
+>  drivers/vfio/vfio_iommu_type1.c | 26 ++++++++++++--------------
+>  drivers/vhost/vdpa.c            | 10 +++-------
+>  include/linux/iommu.h           |  1 -
+>  4 files changed, 18 insertions(+), 39 deletions(-)
 
-Thanks,
-Pierre
+Acked-by: Will Deacon <will@kernel.org>
 
-
--- 
-Pierre Morel
-IBM Lab Boeblingen
+Will
