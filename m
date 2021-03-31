@@ -2,137 +2,155 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 670823504FD
-	for <lists+kvm@lfdr.de>; Wed, 31 Mar 2021 18:48:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 444973505FE
+	for <lists+kvm@lfdr.de>; Wed, 31 Mar 2021 20:08:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233999AbhCaQr5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 31 Mar 2021 12:47:57 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:56922 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234003AbhCaQrs (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 31 Mar 2021 12:47:48 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1617209267;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=0ix2mfUcEg/DOypNDwaacoOT966lSJ+UT8pzFrJ6uHI=;
-        b=VTPeHIDD/uPp9CsY4tysGMAe6xtFzZpTYWx0dq2IW5mjsKc0ik6xI/z80di2ozirgxoLIx
-        yRy7fPZdZLv0MHj0BeVxgg0rTjImk8q2TzW2nIoG+JogbTZMW5Upyg4IW1FOVXn1mtZR2J
-        /3ZEI6JPQoVRtn39GxAzebkkrjrwRM4=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-392-1R0oN_EROkG3nLeeI2OIiQ-1; Wed, 31 Mar 2021 12:47:45 -0400
-X-MC-Unique: 1R0oN_EROkG3nLeeI2OIiQ-1
-Received: by mail-ej1-f69.google.com with SMTP id au15so1069905ejc.8
-        for <kvm@vger.kernel.org>; Wed, 31 Mar 2021 09:47:45 -0700 (PDT)
+        id S234824AbhCaSHh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 31 Mar 2021 14:07:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36542 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234788AbhCaSHa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 31 Mar 2021 14:07:30 -0400
+Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D31CC061574
+        for <kvm@vger.kernel.org>; Wed, 31 Mar 2021 11:07:30 -0700 (PDT)
+Received: by mail-pj1-x102b.google.com with SMTP id nh23-20020a17090b3657b02900c0d5e235a8so1693747pjb.0
+        for <kvm@vger.kernel.org>; Wed, 31 Mar 2021 11:07:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=fzUxfJHs4m96o0h93XY6hLbrWDklPfvA/cxbRjLDuiE=;
+        b=AW9hN1Djcg4K3j6y1d6rLhacaldp5/qFhVVlaCM4Y4E4DJEIsgt2V+ZwiR2/a+Dazb
+         1JRokka2xSlR+ur/y4YTI5lunennSWPSD6CCusxkJwPorqyEwKEiZHy3jxOSbXjsIztY
+         CL2ZvlWfAFL4bxmN1KzcCzGxE72CVrjbkQA36b76+r7MAKX2GuYTIg4fHXGUizObFMGr
+         qh2q7GOSLeDC8hiM1lbp5K+V3Pr6tbnPU6z460UOE0JuPs6kxAj1rLgbjpxzYV18kUlX
+         62h2/pIh85HeBtJv5VaQXUJ3OYSnMML6O9vO1R/AkJUgrjd3zbEdDT4qVPfZstkbhIb0
+         7nwQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=0ix2mfUcEg/DOypNDwaacoOT966lSJ+UT8pzFrJ6uHI=;
-        b=WSobn4mbet9oL/WVW2D0m8zUGvizbXAL7wOfDNO+zxDrubko8doqF4jhLLUJ5oNrIQ
-         MNMRl0Ss6KFwrFlXhC9Ukzf06/ndjrVVTPI8IGNyE4oEKbfpfprPivU4wK/uSCfG48D5
-         zNmjHPasVfNxscbCeSRPQTcNxXFjYc4wugYAWbvoJnide6m5NSCayzi9btbvec/NH0Pt
-         WkLQq3c8NCRM16l9IHkO2rYHwPIBoT3FO0Zc1shPTCbgY0cJvBIzTREX1ZOuWeFlIEGn
-         RGKUd1RofU7Kruaf4OrlecXxYBJSVm7DGiv21pVNWmRDfQQqJzJJDeeGbabvmPhD9b5T
-         9t9A==
-X-Gm-Message-State: AOAM530eOhhCoTaOEKu4JhUC72a3QtOFONFdR6/KaFyFhOEkeL+GObMy
-        R+ZB5+VxZyHHjWjNUkcH0mSBNl06ddGUwSQK5hQehQLD3yqRSr/gtc6dUCXqkGjUXQmoLtwbkcG
-        gHMJTSLWrXgCf
-X-Received: by 2002:a17:906:1182:: with SMTP id n2mr4597701eja.234.1617209264755;
-        Wed, 31 Mar 2021 09:47:44 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJymG2hf8oxiTqtfGgyXFzM/nXfYjs4CdYmJnVTC5zNGPoNEIpchzu0nS+pvIuCk4GHAjhT9jA==
-X-Received: by 2002:a17:906:1182:: with SMTP id n2mr4597673eja.234.1617209264605;
-        Wed, 31 Mar 2021 09:47:44 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id p24sm2057269edt.5.2021.03.31.09.47.43
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 31 Mar 2021 09:47:43 -0700 (PDT)
-Subject: Re: [PATCH 16/18] KVM: Don't take mmu_lock for range invalidation
- unless necessary
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Marc Zyngier <maz@kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Paul Mackerras <paulus@ozlabs.org>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        linux-mips@vger.kernel.org, kvm@vger.kernel.org,
-        kvm-ppc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Ben Gardon <bgardon@google.com>
-References: <20210326021957.1424875-1-seanjc@google.com>
- <20210326021957.1424875-17-seanjc@google.com>
- <6e7dc7d0-f5dc-85d9-1c50-d23b761b5ff3@redhat.com>
- <YGSmMeSOPcjxRwf6@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <56ea69fe-87b0-154b-e286-efce9233864e@redhat.com>
-Date:   Wed, 31 Mar 2021 18:47:42 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.7.0
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=fzUxfJHs4m96o0h93XY6hLbrWDklPfvA/cxbRjLDuiE=;
+        b=QUQypZCrfIsY0Ae/wiZokLokWlMW3XjVZ5ELGR2C/JapTpM/PGW9l9Z8A6fGcpYCb8
+         t6/G8SN7acsSWRgqykHx+kYH7kLgU5RQ44ryhsWvvzmOFRXXJG5a1NVPlr43jIdgUocL
+         JK4lgkQuNYgJBAumtFyMr6LchvEuIUDOaQCib7Twc2V2BuQ5UtnYOiQO8Tinmy+WHe29
+         p0vLohCJvkLPhFC5g8bPxa2voJtmURIVxFacNTRUN73s3+dCVmoxOTOx33c0nth0Ac2t
+         4/wrj7jdV8QyDL7EFO/1inDHfAlmkObBDEa969aP/g1tpPS8mYo/r/hSiNR2Y4HJS2QR
+         cAkA==
+X-Gm-Message-State: AOAM5330OW58PvRMquhusG0DFtf3uF412mywoseccDxSlQWmcYfjvr8z
+        pUlP3TjEsWv6CcC7HPsG+0EI+A==
+X-Google-Smtp-Source: ABdhPJwVLzSBQTNx4xs+d36/l5KaNndW79U3YjxOAWpxY+JuSKFrSViByfpBlr1uaqpRCR1PsNJC3A==
+X-Received: by 2002:a17:90a:8b16:: with SMTP id y22mr4558382pjn.191.1617214049909;
+        Wed, 31 Mar 2021 11:07:29 -0700 (PDT)
+Received: from google.com (240.111.247.35.bc.googleusercontent.com. [35.247.111.240])
+        by smtp.gmail.com with ESMTPSA id e1sm2979522pfi.175.2021.03.31.11.07.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 31 Mar 2021 11:07:29 -0700 (PDT)
+Date:   Wed, 31 Mar 2021 18:07:25 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Yang Li <yang.lee@linux.alibaba.com>
+Cc:     pbonzini@redhat.com, vkuznets@redhat.com, wanpengli@tencent.com,
+        jmattson@google.com, joro@8bytes.org, tglx@linutronix.de,
+        mingo@redhat.com, bp@alien8.de, x86@kernel.org, hpa@zytor.com,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] KVM: x86: Fix potential memory access error
+Message-ID: <YGS6XS87HYJdVPFQ@google.com>
+References: <1617182122-112315-1-git-send-email-yang.lee@linux.alibaba.com>
 MIME-Version: 1.0
-In-Reply-To: <YGSmMeSOPcjxRwf6@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1617182122-112315-1-git-send-email-yang.lee@linux.alibaba.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 31/03/21 18:41, Sean Christopherson wrote:
->> That said, the easiest way to avoid this would be to always update
->> mmu_notifier_count.
-> Updating mmu_notifier_count requires taking mmu_lock, which would defeat the
-> purpose of these shenanigans.
-
-Okay; I wasn't sure if the problem was contention with page faults in 
-general, or just the long critical sections from the MMU notifier 
-callbacks.  Still updating mmu_notifier_count unconditionally is a good 
-way to break up the patch in two and keep one commit just for the rwsem 
-nastiness.
-
->>> +#if defined(CONFIG_MMU_NOTIFIER) && defined(KVM_ARCH_WANT_MMU_NOTIFIER)
->>> +	down_write(&kvm->mmu_notifier_slots_lock);
->>> +#endif
->>>   	rcu_assign_pointer(kvm->memslots[as_id], slots);
->>> +#if defined(CONFIG_MMU_NOTIFIER) && defined(KVM_ARCH_WANT_MMU_NOTIFIER)
->>> +	up_write(&kvm->mmu_notifier_slots_lock);
->>> +#endif
->> Please do this unconditionally, the cost is minimal if the rwsem is not
->> contended (as is the case if the architecture doesn't use MMU notifiers at
->> all).
-> It's not the cost, it's that mmu_notifier_slots_lock doesn't exist.  That's an
-> easily solved problem, but then the lock wouldn't be initialized since
-> kvm_init_mmu_notifier() is a nop.  That's again easy to solve, but IMO would
-> look rather weird.  I guess the counter argument is that __kvm_memslots()
-> wouldn't need #ifdeffery.
-
-Yep.  Less #ifdefs usually wins. :)
-
-> These are the to ideas I've come up with:
+On Wed, Mar 31, 2021, Yang Li wrote:
+> Using __set_bit() to set a bit in an integer is not a good idea, since
+> the function expects an unsigned long as argument, which can be 64bit wide.
+> Coverity reports this problem as
 > 
-> Option 1:
-> 	static int kvm_init_mmu_notifier(struct kvm *kvm)
-> 	{
-> 		init_rwsem(&kvm->mmu_notifier_slots_lock);
+> High:Out-of-bounds access(INCOMPATIBLE_CAST)
+> CWE119: Out-of-bounds access to a scalar
+> Pointer "&vcpu->arch.regs_avail" points to an object whose effective
+> type is "unsigned int" (32 bits, unsigned) but is dereferenced as a
+> wider "unsigned long" (64 bits, unsigned). This may lead to memory
+> corruption.
 > 
-> 	#if defined(CONFIG_MMU_NOTIFIER) && defined(KVM_ARCH_WANT_MMU_NOTIFIER)
-> 		kvm->mmu_notifier.ops = &kvm_mmu_notifier_ops;
-> 		return mmu_notifier_register(&kvm->mmu_notifier, current->mm);
-> 	#else
-> 		return 0;
-> 	#endif
-> 	}
+> /home/heyuan.shy/git-repo/linux/arch/x86/kvm/kvm_cache_regs.h:
+> kvm_register_is_available
+> 
+> Just use BIT instead.
 
-Option 2 is also okay I guess, but the simplest is option 1 + just init 
-it in kvm_create_vm.
+Meh, we're hosed either way.  Using BIT() will either result in undefined
+behavior due to SHL shifting beyond the size of a u64, or setting random bits
+if the truncated shift ends up being less than 63.
 
-Paolo
+I suppose one could argue that undefined behavior is better than memory
+corruption, but KVM is very broken if 'reg' is out-of-bounds so IMO it's not
+worth changing.  There are only two call sites that don't use a hardcoded value,
+and both are guarded by WARN.  kvm_register_write() bails without calling
+kvm_register_mark_dirty(), so that's guaranteed safe.  vmx_cache_reg() WARNs
+after kvm_register_mark_available(), but except for kvm_register_read(), all
+calls to vmx_cache_reg() use a hardcoded value, and kvm_register_read() also
+WARNs and bails.
 
+Note, all of the above holds true for kvm_register_is_{available,dirty}(), too.
+
+So in the current code, it's impossible for this to be a problem.  Theoretically
+future code could introduce bugs, but IMO we should never accept code that uses
+a non-hardcoded 'reg' and doesn't pre-validate.
+
+The number of uops is basically a wash because "BTS <reg>, <mem>" is fairly
+expensive; depending on the uarch, the difference is ~1-2 uops in favor of BIT().
+On the flip side, __set_bit() shaves 8 bytes.  Of course, none these flows are
+anywhere near that senstive.
+
+TL;DR: I'm not opposed to using BIT(), I just don't see the point.
+
+
+__set_bit():
+   0x00000000000104e6 <+6>:	mov    %esi,%eax
+   0x00000000000104e8 <+8>:	mov    %rdi,%rbp
+   0x00000000000104eb <+11>:	sub    $0x8,%rsp
+   0x00000000000104ef <+15>:	bts    %rax,0x2a0(%rdi)
+
+|= BIT():
+   0x0000000000010556 <+6>:	mov    %esi,%ecx
+   0x0000000000010558 <+8>:	mov    $0x1,%eax
+   0x000000000001055d <+13>:	mov    %rdi,%rbp
+   0x0000000000010560 <+16>:	sub    $0x8,%rsp
+   0x0000000000010564 <+20>:	shl    %cl,%rax
+   0x0000000000010567 <+23>:	or     %eax,0x2a0(%rdi)
+
+> Reported-by: Abaci Robot <abaci@linux.alibaba.com>
+> Signed-off-by: Yang Li <yang.lee@linux.alibaba.com>
+> ---
+>  arch/x86/kvm/kvm_cache_regs.h | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/kvm_cache_regs.h b/arch/x86/kvm/kvm_cache_regs.h
+> index 2e11da2..cfa45d88 100644
+> --- a/arch/x86/kvm/kvm_cache_regs.h
+> +++ b/arch/x86/kvm/kvm_cache_regs.h
+> @@ -52,14 +52,14 @@ static inline bool kvm_register_is_dirty(struct kvm_vcpu *vcpu,
+>  static inline void kvm_register_mark_available(struct kvm_vcpu *vcpu,
+>  					       enum kvm_reg reg)
+>  {
+> -	__set_bit(reg, (unsigned long *)&vcpu->arch.regs_avail);
+> +	vcpu->arch.regs_avail |= BIT(reg);
+>  }
+>  
+>  static inline void kvm_register_mark_dirty(struct kvm_vcpu *vcpu,
+>  					   enum kvm_reg reg)
+>  {
+> -	__set_bit(reg, (unsigned long *)&vcpu->arch.regs_avail);
+> -	__set_bit(reg, (unsigned long *)&vcpu->arch.regs_dirty);
+> +	vcpu->arch.regs_avail |= BIT(reg);
+> +	vcpu->arch.regs_dirty |= BIT(reg);
+>  }
+>  
+>  static inline unsigned long kvm_register_read(struct kvm_vcpu *vcpu, int reg)
+> -- 
+> 1.8.3.1
+> 
