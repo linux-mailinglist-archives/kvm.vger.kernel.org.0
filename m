@@ -2,56 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D50513508EF
-	for <lists+kvm@lfdr.de>; Wed, 31 Mar 2021 23:10:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 783DB3508F1
+	for <lists+kvm@lfdr.de>; Wed, 31 Mar 2021 23:10:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231278AbhCaVJ7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 31 Mar 2021 17:09:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47700 "EHLO
+        id S232931AbhCaVKB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 31 Mar 2021 17:10:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47710 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232682AbhCaVJ1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 31 Mar 2021 17:09:27 -0400
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 586A4C06175F
-        for <kvm@vger.kernel.org>; Wed, 31 Mar 2021 14:09:26 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id 71so525013ybl.0
-        for <kvm@vger.kernel.org>; Wed, 31 Mar 2021 14:09:26 -0700 (PDT)
+        with ESMTP id S232817AbhCaVJa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 31 Mar 2021 17:09:30 -0400
+Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C29FFC061761
+        for <kvm@vger.kernel.org>; Wed, 31 Mar 2021 14:09:29 -0700 (PDT)
+Received: by mail-pl1-x649.google.com with SMTP id y10so1735448plt.21
+        for <kvm@vger.kernel.org>; Wed, 31 Mar 2021 14:09:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=D3yhdA0SbfOZ8/HUhdVLoEpIVed7C/spdyqXqc6kmuA=;
-        b=di+hCO0vOSPxyz7cYAcvQmi7yiDWrPABjxVZkRfxNGs8qhYE9c2E6mTpZMfg7Vj31i
-         RdoWErxhipOlndt6dMpiDVYG3ScVEtG0T0/JCFyGUsIsJ2R4evxFGtTslj2BA6fLvDC0
-         +kwYrUs/PFU1Oe85mAC3V3pkvPCJzzeptD3T3/fS0VTYxpF9rGsT2JLTRUS5UyeJAduR
-         W56W0X7YibxX3GtSuO56ffZpSM+lLk/9VuNXNF2tIQtImhOw4qrl0dqY0mLGHSD2Tzu5
-         FHI+bhZUHj/YJWXH6DJ6KbWM6XdbK+wVXJgQTpmag4sUX2OLNwSlrldrnZuk9tza6X+w
-         YcqQ==
+        bh=rflZjTREsJ/gYfIbS3+5us9ybJwv9yTRsjWAKMCJ5Y4=;
+        b=oob7KpmemiWewo+Ci8QQhYn901DVVDpmFfmk2PhtTZNXo8tdI6jt3YAIhheWN4y/a/
+         NjUWpruPwj6lc0IEr9hrDP6eFSZepprjHVb3e8sP+t+zMOHnE/I9vKOkyzzwzZjIjZy3
+         mVeKkPALWk8XtaO8huIX/XvvOvJLwiK5qmdvwPSpFkoznXPL7PHj3QIfEuzxDP4fKsvG
+         7OFquoGYhQPjY8zs4Swlmy/sZTNnydpGw1cTshXhfmLyp6pCtMGLVd48F+D+B/fbYEjX
+         0KxJjSeOzeEX9g/68/zwsIe6OpJbbmSOtQyRgKbQ92SwDaZEkUUc82P0Bn3vsyfsvDR4
+         slJA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=D3yhdA0SbfOZ8/HUhdVLoEpIVed7C/spdyqXqc6kmuA=;
-        b=uiePJlRAjqYicg/ocNNMP5wE3JL0vqtUO7jFHKQT4uNZTl3tmEPpdIyhx7pd++bLmL
-         DMA7pN6EUaKEoDCdJkH1G+SZFaCa4fPJAkfqbfkLLpM+RP+ZC4r7evMgQZXJ4QLMqbGv
-         m1v0xf5f9WaXaJWF6x2n31jC6MWwiNfWdTb4cS/XE1I9jJyPU9AQFSggt4869LIlX9bE
-         LOhnqOS30NvPAoc/t7MnHiAbBh/2wQgPUc7gBEaR/kKBobrCiquOWzUssW1SvZWT6VKY
-         bbJyS4b9nmtN8bbST8RGu0/9x5bgdzFzShqCX89yigUk1Y7hZJurizsbu7St2o473dA5
-         8LEw==
-X-Gm-Message-State: AOAM533ruyu9jgHaoWMfVHx/vQfwU4H3g9wPl9iDInDYKBWZ5gVltwD6
-        oLdZuWgk+nrPbZ5YkQ1R1jefWiz/q6TY
-X-Google-Smtp-Source: ABdhPJyaBZsZ03PKHBu8tZ1QHlTBf/TrAMVN7LxSvfPVD5I8vxcHe6hXUeftn5uPbOL3KC+i6X7asymswkgg
+        bh=rflZjTREsJ/gYfIbS3+5us9ybJwv9yTRsjWAKMCJ5Y4=;
+        b=fB+yyNaJ7/nEX6B73joOzddaJoK0+X/3LuhsV0vRV5eblVqeUCY/J3qEEBh8xf0rNf
+         hNADjw04DfyRjim/pxPz1d3xq8e9AJOQvYwMKd7nuQLF9dLa/ngJpC6EyXWeAqdlcBDi
+         TkfBtTMKBBAayQz6J6NazdAvFGs5WenkLX2OaVu//H7S+TbPPq598cG83LGR1v/QXNJi
+         aYd4VXPuTbEwn6IuFDJluNeWMFA5QjVbFJ73P7aIuIH8HqFw5pmZrURgTsTCGvcRpLr2
+         7FtwDBO+zC9wO39QHNn0m5CJLYO3j3S01jBcJPf89FhGy0byYLTgswdxp01r5+LlR4Jd
+         0FLw==
+X-Gm-Message-State: AOAM531nulVzIkYMPH4/937S8d696Ioj3PUWbvnDMQNdmvR+bgEERc09
+        aiuXywuO8TFD0vVE+JBljYsCk83pH3vn
+X-Google-Smtp-Source: ABdhPJwnq8zO7FqwGFOoGocE4klDVpKwN7Hey65gI/W+fuTsGzvz/nAsWGBZ+Es+tBL9ISU0/BdhrvwYi8jq
 X-Received: from bgardon.sea.corp.google.com ([2620:15c:100:202:8026:6888:3d55:3842])
- (user=bgardon job=sendgmr) by 2002:a25:7809:: with SMTP id
- t9mr7038269ybc.99.1617224965618; Wed, 31 Mar 2021 14:09:25 -0700 (PDT)
-Date:   Wed, 31 Mar 2021 14:08:37 -0700
+ (user=bgardon job=sendgmr) by 2002:a17:90a:8b97:: with SMTP id
+ z23mr39673pjn.1.1617224968753; Wed, 31 Mar 2021 14:09:28 -0700 (PDT)
+Date:   Wed, 31 Mar 2021 14:08:38 -0700
 In-Reply-To: <20210331210841.3996155-1-bgardon@google.com>
-Message-Id: <20210331210841.3996155-10-bgardon@google.com>
+Message-Id: <20210331210841.3996155-11-bgardon@google.com>
 Mime-Version: 1.0
 References: <20210331210841.3996155-1-bgardon@google.com>
 X-Mailer: git-send-email 2.31.0.291.g576ba9dcdaf-goog
-Subject: [PATCH 09/13] KVM: x86/mmu: Allow zap gfn range to operate under the
- mmu read lock
+Subject: [PATCH 10/13] KVM: x86/mmu: Allow zapping collapsible SPTEs to use
+ MMU read lock
 From:   Ben Gardon <bgardon@google.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Cc:     Paolo Bonzini <pbonzini@redhat.com>, Peter Xu <peterx@redhat.com>,
@@ -70,226 +70,57 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-To reduce lock contention and interference with page fault handlers,
-allow the TDP MMU function to zap a GFN range to operate under the MMU
-read lock.
+To speed the process of disabling dirty logging, change the TDP MMU
+function which zaps collapsible SPTEs to run under the MMU read lock.
 
 Signed-off-by: Ben Gardon <bgardon@google.com>
 ---
- arch/x86/kvm/mmu/mmu.c     |  15 ++++--
- arch/x86/kvm/mmu/tdp_mmu.c | 102 ++++++++++++++++++++++++++-----------
- arch/x86/kvm/mmu/tdp_mmu.h |   6 ++-
- 3 files changed, 87 insertions(+), 36 deletions(-)
+ arch/x86/kvm/mmu/mmu.c     |  9 ++++++---
+ arch/x86/kvm/mmu/tdp_mmu.c | 17 +++++++++++++----
+ 2 files changed, 19 insertions(+), 7 deletions(-)
 
 diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 667d64daa82c..dcbfc784cf2f 100644
+index dcbfc784cf2f..81967b4e7d76 100644
 --- a/arch/x86/kvm/mmu/mmu.c
 +++ b/arch/x86/kvm/mmu/mmu.c
-@@ -3155,7 +3155,7 @@ static void mmu_free_root_page(struct kvm *kvm, hpa_t *root_hpa,
- 	sp = to_shadow_page(*root_hpa & PT64_BASE_ADDR_MASK);
+@@ -5610,10 +5610,13 @@ void kvm_mmu_zap_collapsible_sptes(struct kvm *kvm,
  
- 	if (is_tdp_mmu_page(sp))
--		kvm_tdp_mmu_put_root(kvm, sp);
-+		kvm_tdp_mmu_put_root(kvm, sp, false);
- 	else if (!--sp->root_count && sp->role.invalid)
- 		kvm_mmu_prepare_zap_page(kvm, sp, invalid_list);
- 
-@@ -5514,13 +5514,17 @@ void kvm_zap_gfn_range(struct kvm *kvm, gfn_t gfn_start, gfn_t gfn_end)
- 		}
- 	}
- 
-+	write_unlock(&kvm->mmu_lock);
+ 	write_lock(&kvm->mmu_lock);
+ 	slot_handle_leaf(kvm, slot, kvm_mmu_zap_collapsible_spte, true);
+-
+-	if (is_tdp_mmu_enabled(kvm))
+-		kvm_tdp_mmu_zap_collapsible_sptes(kvm, slot);
+ 	write_unlock(&kvm->mmu_lock);
 +
- 	if (is_tdp_mmu_enabled(kvm)) {
--		flush = kvm_tdp_mmu_zap_gfn_range(kvm, gfn_start, gfn_end);
++	if (is_tdp_mmu_enabled(kvm)) {
 +		read_lock(&kvm->mmu_lock);
-+		flush = kvm_tdp_mmu_zap_gfn_range(kvm, gfn_start, gfn_end,
-+						  true);
- 		if (flush)
- 			kvm_flush_remote_tlbs(kvm);
--	}
- 
--	write_unlock(&kvm->mmu_lock);
++		kvm_tdp_mmu_zap_collapsible_sptes(kvm, memslot);
 +		read_unlock(&kvm->mmu_lock);
 +	}
  }
  
- static bool slot_rmap_write_protect(struct kvm *kvm,
-@@ -5959,7 +5963,8 @@ static void kvm_recover_nx_lpages(struct kvm *kvm)
- 		WARN_ON_ONCE(!sp->lpage_disallowed);
- 		if (is_tdp_mmu_page(sp)) {
- 			kvm_tdp_mmu_zap_gfn_range(kvm, sp->gfn,
--				sp->gfn + KVM_PAGES_PER_HPAGE(sp->role.level));
-+				sp->gfn + KVM_PAGES_PER_HPAGE(sp->role.level),
-+				false);
- 		} else {
- 			kvm_mmu_prepare_zap_page(kvm, sp, &invalid_list);
- 			WARN_ON_ONCE(sp->lpage_disallowed);
+ void kvm_arch_flush_remote_tlbs_memslot(struct kvm *kvm,
 diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-index d255125059c4..0e99e4675dd4 100644
+index 0e99e4675dd4..862acb868abd 100644
 --- a/arch/x86/kvm/mmu/tdp_mmu.c
 +++ b/arch/x86/kvm/mmu/tdp_mmu.c
-@@ -27,6 +27,15 @@ void kvm_mmu_init_tdp_mmu(struct kvm *kvm)
- 	INIT_LIST_HEAD(&kvm->arch.tdp_mmu_pages);
- }
- 
-+static __always_inline void kvm_lockdep_assert_mmu_lock_held(struct kvm *kvm,
-+							     bool shared)
-+{
-+	if (shared)
-+		lockdep_assert_held_read(&kvm->mmu_lock);
-+	else
-+		lockdep_assert_held_write(&kvm->mmu_lock);
-+}
-+
- void kvm_mmu_uninit_tdp_mmu(struct kvm *kvm)
- {
- 	if (!kvm->arch.tdp_mmu_enabled)
-@@ -42,7 +51,7 @@ void kvm_mmu_uninit_tdp_mmu(struct kvm *kvm)
- }
- 
- static bool zap_gfn_range(struct kvm *kvm, struct kvm_mmu_page *root,
--			  gfn_t start, gfn_t end, bool can_yield);
-+			  gfn_t start, gfn_t end, bool can_yield, bool shared);
- 
- static void tdp_mmu_free_sp(struct kvm_mmu_page *sp)
- {
-@@ -66,11 +75,12 @@ static void tdp_mmu_free_sp_rcu_callback(struct rcu_head *head)
- 	tdp_mmu_free_sp(sp);
- }
- 
--void kvm_tdp_mmu_put_root(struct kvm *kvm, struct kvm_mmu_page *root)
-+void kvm_tdp_mmu_put_root(struct kvm *kvm, struct kvm_mmu_page *root,
-+			  bool shared)
- {
- 	gfn_t max_gfn = 1ULL << (shadow_phys_bits - PAGE_SHIFT);
- 
--	lockdep_assert_held_write(&kvm->mmu_lock);
-+	kvm_lockdep_assert_mmu_lock_held(kvm, shared);
- 
- 	if (!refcount_dec_and_test(&root->tdp_mmu_root_count))
- 		return;
-@@ -81,7 +91,7 @@ void kvm_tdp_mmu_put_root(struct kvm *kvm, struct kvm_mmu_page *root)
- 	list_del_rcu(&root->link);
- 	spin_unlock(&kvm->arch.tdp_mmu_pages_lock);
- 
--	zap_gfn_range(kvm, root, 0, max_gfn, false);
-+	zap_gfn_range(kvm, root, 0, max_gfn, false, shared);
- 
- 	call_rcu(&root->rcu_head, tdp_mmu_free_sp_rcu_callback);
- }
-@@ -94,11 +104,11 @@ void kvm_tdp_mmu_put_root(struct kvm *kvm, struct kvm_mmu_page *root)
-  * function will return NULL.
-  */
- static struct kvm_mmu_page *tdp_mmu_next_root(struct kvm *kvm,
--					      struct kvm_mmu_page *prev_root)
-+					      struct kvm_mmu_page *prev_root,
-+					      bool shared)
- {
- 	struct kvm_mmu_page *next_root;
- 
--	lockdep_assert_held_write(&kvm->mmu_lock);
- 
- 	rcu_read_lock();
- 
-@@ -117,7 +127,7 @@ static struct kvm_mmu_page *tdp_mmu_next_root(struct kvm *kvm,
- 	rcu_read_unlock();
- 
- 	if (prev_root)
--		kvm_tdp_mmu_put_root(kvm, prev_root);
-+		kvm_tdp_mmu_put_root(kvm, prev_root, shared);
- 
- 	return next_root;
- }
-@@ -127,11 +137,15 @@ static struct kvm_mmu_page *tdp_mmu_next_root(struct kvm *kvm,
-  * This makes it safe to release the MMU lock and yield within the loop, but
-  * if exiting the loop early, the caller must drop the reference to the most
-  * recent root. (Unless keeping a live reference is desirable.)
-+ *
-+ * If shared is set, this function is operating under the MMU lock in read
-+ * mode. In the unlikely event that this thread must free a root, the lock
-+ * will be temporarily dropped and reacquired in write mode.
-  */
--#define for_each_tdp_mmu_root_yield_safe(_kvm, _root)	\
--	for (_root = tdp_mmu_next_root(_kvm, NULL);	\
--	     _root;					\
--	     _root = tdp_mmu_next_root(_kvm, _root))
-+#define for_each_tdp_mmu_root_yield_safe(_kvm, _root, _shared)	\
-+	for (_root = tdp_mmu_next_root(_kvm, NULL, _shared);	\
-+	     _root;						\
-+	     _root = tdp_mmu_next_root(_kvm, _root, _shared))
- 
- /* Only safe under the MMU lock in write mode, without yielding. */
- #define for_each_tdp_mmu_root(_kvm, _root)				\
-@@ -632,7 +646,8 @@ static inline void tdp_mmu_set_spte_no_dirty_log(struct kvm *kvm,
-  * Return false if a yield was not needed.
-  */
- static inline bool tdp_mmu_iter_cond_resched(struct kvm *kvm,
--					     struct tdp_iter *iter, bool flush)
-+					     struct tdp_iter *iter, bool flush,
-+					     bool shared)
- {
- 	/* Ensure forward progress has been made before yielding. */
- 	if (iter->next_last_level_gfn == iter->yielded_gfn)
-@@ -644,7 +659,11 @@ static inline bool tdp_mmu_iter_cond_resched(struct kvm *kvm,
- 		if (flush)
- 			kvm_flush_remote_tlbs(kvm);
- 
--		cond_resched_rwlock_write(&kvm->mmu_lock);
-+		if (shared)
-+			cond_resched_rwlock_read(&kvm->mmu_lock);
-+		else
-+			cond_resched_rwlock_write(&kvm->mmu_lock);
-+
- 		rcu_read_lock();
- 
- 		WARN_ON(iter->gfn > iter->next_last_level_gfn);
-@@ -662,23 +681,33 @@ static inline bool tdp_mmu_iter_cond_resched(struct kvm *kvm,
-  * non-root pages mapping GFNs strictly within that range. Returns true if
-  * SPTEs have been cleared and a TLB flush is needed before releasing the
-  * MMU lock.
-+ *
-  * If can_yield is true, will release the MMU lock and reschedule if the
-  * scheduler needs the CPU or there is contention on the MMU lock. If this
-  * function cannot yield, it will not release the MMU lock or reschedule and
-  * the caller must ensure it does not supply too large a GFN range, or the
-  * operation can cause a soft lockup.
-+ *
-+ * If shared is true, this thread holds the MMU lock in read mode and must
-+ * account for the possibility that other threads are modifying the paging
-+ * structures concurrently. If shared is false, this thread should hold the
-+ * MMU lock in write mode.
-  */
- static bool zap_gfn_range(struct kvm *kvm, struct kvm_mmu_page *root,
--			  gfn_t start, gfn_t end, bool can_yield)
-+			  gfn_t start, gfn_t end, bool can_yield, bool shared)
- {
- 	struct tdp_iter iter;
- 	bool flush_needed = false;
- 
-+	kvm_lockdep_assert_mmu_lock_held(kvm, shared);
-+
+@@ -1335,7 +1335,8 @@ static void zap_collapsible_spte_range(struct kvm *kvm,
  	rcu_read_lock();
  
  	tdp_root_for_each_pte(iter, root, start, end) {
+-		if (tdp_mmu_iter_cond_resched(kvm, &iter, spte_set, false)) {
 +retry:
- 		if (can_yield &&
--		    tdp_mmu_iter_cond_resched(kvm, &iter, flush_needed)) {
-+		    tdp_mmu_iter_cond_resched(kvm, &iter, flush_needed,
-+					      shared)) {
- 			flush_needed = false;
++		if (tdp_mmu_iter_cond_resched(kvm, &iter, spte_set, true)) {
+ 			spte_set = false;
  			continue;
  		}
-@@ -696,8 +725,17 @@ static bool zap_gfn_range(struct kvm *kvm, struct kvm_mmu_page *root,
- 		    !is_last_spte(iter.old_spte, iter.level))
+@@ -1350,8 +1351,14 @@ static void zap_collapsible_spte_range(struct kvm *kvm,
+ 							    pfn, PG_LEVEL_NUM))
  			continue;
  
 -		tdp_mmu_set_spte(kvm, &iter, 0);
--		flush_needed = true;
-+		if (!shared) {
-+			tdp_mmu_set_spte(kvm, &iter, 0);
-+			flush_needed = true;
-+		} else if (!tdp_mmu_zap_spte_atomic(kvm, &iter)) {
+-
++		if (!tdp_mmu_zap_spte_atomic(kvm, &iter)) {
 +			/*
 +			 * The iter must explicitly re-read the SPTE because
 +			 * the atomic cmpxchg failed.
@@ -297,132 +128,20 @@ index d255125059c4..0e99e4675dd4 100644
 +			iter.old_spte = READ_ONCE(*rcu_dereference(iter.sptep));
 +			goto retry;
 +		}
+ 		spte_set = true;
  	}
  
- 	rcu_read_unlock();
-@@ -709,14 +747,20 @@ static bool zap_gfn_range(struct kvm *kvm, struct kvm_mmu_page *root,
-  * non-root pages mapping GFNs strictly within that range. Returns true if
-  * SPTEs have been cleared and a TLB flush is needed before releasing the
-  * MMU lock.
-+ *
-+ * If shared is true, this thread holds the MMU lock in read mode and must
-+ * account for the possibility that other threads are modifying the paging
-+ * structures concurrently. If shared is false, this thread should hold the
-+ * MMU in write mode.
-  */
--bool kvm_tdp_mmu_zap_gfn_range(struct kvm *kvm, gfn_t start, gfn_t end)
-+bool kvm_tdp_mmu_zap_gfn_range(struct kvm *kvm, gfn_t start, gfn_t end,
-+			       bool shared)
- {
- 	struct kvm_mmu_page *root;
- 	bool flush = false;
- 
--	for_each_tdp_mmu_root_yield_safe(kvm, root)
--		flush |= zap_gfn_range(kvm, root, start, end, true);
-+	for_each_tdp_mmu_root_yield_safe(kvm, root, shared)
-+		flush |= zap_gfn_range(kvm, root, start, end, true, shared);
- 
- 	return flush;
- }
-@@ -726,7 +770,7 @@ void kvm_tdp_mmu_zap_all(struct kvm *kvm)
- 	gfn_t max_gfn = 1ULL << (shadow_phys_bits - PAGE_SHIFT);
- 	bool flush;
- 
--	flush = kvm_tdp_mmu_zap_gfn_range(kvm, 0, max_gfn);
-+	flush = kvm_tdp_mmu_zap_gfn_range(kvm, 0, max_gfn, false);
- 	if (flush)
- 		kvm_flush_remote_tlbs(kvm);
- }
-@@ -893,7 +937,7 @@ static __always_inline int kvm_tdp_mmu_handle_hva_range(struct kvm *kvm,
- 	int ret = 0;
- 	int as_id;
- 
--	for_each_tdp_mmu_root_yield_safe(kvm, root) {
-+	for_each_tdp_mmu_root_yield_safe(kvm, root, false) {
- 		as_id = kvm_mmu_page_as_id(root);
- 		slots = __kvm_memslots(kvm, as_id);
- 		kvm_for_each_memslot(memslot, slots) {
-@@ -933,7 +977,7 @@ static int zap_gfn_range_hva_wrapper(struct kvm *kvm,
- 				     struct kvm_mmu_page *root, gfn_t start,
- 				     gfn_t end, unsigned long unused)
- {
--	return zap_gfn_range(kvm, root, start, end, false);
-+	return zap_gfn_range(kvm, root, start, end, false, false);
- }
- 
- int kvm_tdp_mmu_zap_hva_range(struct kvm *kvm, unsigned long start,
-@@ -1098,7 +1142,7 @@ static bool wrprot_gfn_range(struct kvm *kvm, struct kvm_mmu_page *root,
- 
- 	for_each_tdp_pte_min_level(iter, root->spt, root->role.level,
- 				   min_level, start, end) {
--		if (tdp_mmu_iter_cond_resched(kvm, &iter, false))
-+		if (tdp_mmu_iter_cond_resched(kvm, &iter, false, false))
- 			continue;
- 
- 		if (!is_shadow_present_pte(iter.old_spte) ||
-@@ -1128,7 +1172,7 @@ bool kvm_tdp_mmu_wrprot_slot(struct kvm *kvm, struct kvm_memory_slot *slot,
- 	int root_as_id;
- 	bool spte_set = false;
- 
--	for_each_tdp_mmu_root_yield_safe(kvm, root) {
-+	for_each_tdp_mmu_root_yield_safe(kvm, root, false) {
- 		root_as_id = kvm_mmu_page_as_id(root);
- 		if (root_as_id != slot->as_id)
- 			continue;
-@@ -1157,7 +1201,7 @@ static bool clear_dirty_gfn_range(struct kvm *kvm, struct kvm_mmu_page *root,
- 	rcu_read_lock();
- 
- 	tdp_root_for_each_leaf_pte(iter, root, start, end) {
--		if (tdp_mmu_iter_cond_resched(kvm, &iter, false))
-+		if (tdp_mmu_iter_cond_resched(kvm, &iter, false, false))
- 			continue;
- 
- 		if (spte_ad_need_write_protect(iter.old_spte)) {
-@@ -1193,7 +1237,7 @@ bool kvm_tdp_mmu_clear_dirty_slot(struct kvm *kvm, struct kvm_memory_slot *slot)
- 	int root_as_id;
- 	bool spte_set = false;
- 
--	for_each_tdp_mmu_root_yield_safe(kvm, root) {
-+	for_each_tdp_mmu_root_yield_safe(kvm, root, false) {
- 		root_as_id = kvm_mmu_page_as_id(root);
- 		if (root_as_id != slot->as_id)
- 			continue;
-@@ -1291,7 +1335,7 @@ static void zap_collapsible_spte_range(struct kvm *kvm,
- 	rcu_read_lock();
- 
- 	tdp_root_for_each_pte(iter, root, start, end) {
--		if (tdp_mmu_iter_cond_resched(kvm, &iter, spte_set)) {
-+		if (tdp_mmu_iter_cond_resched(kvm, &iter, spte_set, false)) {
- 			spte_set = false;
- 			continue;
- 		}
-@@ -1326,7 +1370,7 @@ void kvm_tdp_mmu_zap_collapsible_sptes(struct kvm *kvm,
+@@ -1370,7 +1377,9 @@ void kvm_tdp_mmu_zap_collapsible_sptes(struct kvm *kvm,
  	struct kvm_mmu_page *root;
  	int root_as_id;
  
--	for_each_tdp_mmu_root_yield_safe(kvm, root) {
-+	for_each_tdp_mmu_root_yield_safe(kvm, root, false) {
+-	for_each_tdp_mmu_root_yield_safe(kvm, root, false) {
++	lockdep_assert_held_read(&kvm->mmu_lock);
++
++	for_each_tdp_mmu_root_yield_safe(kvm, root, true) {
  		root_as_id = kvm_mmu_page_as_id(root);
  		if (root_as_id != slot->as_id)
  			continue;
-diff --git a/arch/x86/kvm/mmu/tdp_mmu.h b/arch/x86/kvm/mmu/tdp_mmu.h
-index 9961df505067..855e58856815 100644
---- a/arch/x86/kvm/mmu/tdp_mmu.h
-+++ b/arch/x86/kvm/mmu/tdp_mmu.h
-@@ -13,9 +13,11 @@ __must_check static inline bool kvm_tdp_mmu_get_root(struct kvm *kvm,
- 	return refcount_inc_not_zero(&root->tdp_mmu_root_count);
- }
- 
--void kvm_tdp_mmu_put_root(struct kvm *kvm, struct kvm_mmu_page *root);
-+void kvm_tdp_mmu_put_root(struct kvm *kvm, struct kvm_mmu_page *root,
-+			  bool shared);
- 
--bool kvm_tdp_mmu_zap_gfn_range(struct kvm *kvm, gfn_t start, gfn_t end);
-+bool kvm_tdp_mmu_zap_gfn_range(struct kvm *kvm, gfn_t start, gfn_t end,
-+			       bool shared);
- void kvm_tdp_mmu_zap_all(struct kvm *kvm);
- 
- int kvm_tdp_mmu_map(struct kvm_vcpu *vcpu, gpa_t gpa, u32 error_code,
 -- 
 2.31.0.291.g576ba9dcdaf-goog
 
