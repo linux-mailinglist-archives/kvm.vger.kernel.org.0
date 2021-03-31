@@ -2,78 +2,119 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BD14C350174
-	for <lists+kvm@lfdr.de>; Wed, 31 Mar 2021 15:39:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 59F473501C6
+	for <lists+kvm@lfdr.de>; Wed, 31 Mar 2021 15:59:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235908AbhCaNjb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 31 Mar 2021 09:39:31 -0400
-Received: from foss.arm.com ([217.140.110.172]:42456 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S235772AbhCaNjF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 31 Mar 2021 09:39:05 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 13C4DD6E;
-        Wed, 31 Mar 2021 06:39:05 -0700 (PDT)
-Received: from [192.168.0.110] (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id F1DCF3F694;
-        Wed, 31 Mar 2021 06:39:03 -0700 (PDT)
-Subject: Re: [PATCH] KVM: arm64: Elect Alexandru as a replacement for Julien
- as a reviewer
-To:     Marc Zyngier <maz@kernel.org>, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-Cc:     James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        kernel-team@android.com,
-        Julien Thierry <julien.thierry.kdev@gmail.com>
-References: <20210331131620.4005931-1-maz@kernel.org>
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <4a55b56b-5a47-9ccd-566c-f75961a85970@arm.com>
-Date:   Wed, 31 Mar 2021 14:39:36 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.9.0
+        id S235755AbhCaN7V (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 31 Mar 2021 09:59:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39234 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235771AbhCaN7T (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 31 Mar 2021 09:59:19 -0400
+Received: from mail-ej1-x62f.google.com (mail-ej1-x62f.google.com [IPv6:2a00:1450:4864:20::62f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F38CC06174A
+        for <kvm@vger.kernel.org>; Wed, 31 Mar 2021 06:59:18 -0700 (PDT)
+Received: by mail-ej1-x62f.google.com with SMTP id b7so30242281ejv.1
+        for <kvm@vger.kernel.org>; Wed, 31 Mar 2021 06:59:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance-com.20150623.gappssmtp.com; s=20150623;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=ghwcCn9upZo2ScDVOGrOotVx0dDg7jQeJeG/I9cIPPU=;
+        b=vav4qwDMP7i6EjFBmJn6551WnKNbAVSoVqU8Z6vejfTYXV3iFII7fDe2WExeA2RqIE
+         bM0wcMOanXWeLSY/nP0Do802ZmKO/aUAHizmV0KSHY/TC35KvM6J529BYc3Ka5q5oIg2
+         JJ0Dx8PRWRPm1KNIxfQvbITACKqd/Y6JEK49c8tWJIE6tfF6boqcbVW+HWfls+Lp2Z00
+         aA0h6jX4e2O1hDWbFzomMcDWmFxBBdpbnH2EeFhj9grLKotics7yHAfigpEwqxdlab+7
+         C4ZcVQgjB7QD4+1MiKiGV0biSoNHR8mHUKfo3B1T5f9CG3TCZCgCB/Lgn/JHdfWgO5xa
+         Zowg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=ghwcCn9upZo2ScDVOGrOotVx0dDg7jQeJeG/I9cIPPU=;
+        b=GdRql839Cmm7E1xpvWBcWBMYmjHLPO6oM37tyBpLpUjruSOsWllidW4XFCyiwTr4tM
+         T7pd0y2hsb3hRfhl4UK+29D/6KNb4o32sibWDbCHI16aNoQ5OGhmxTyCaI6YxIJzl46f
+         d/8ixgH9t219wVzmK1pEaXF24YVW7YSx+BCQlEsX3dq1srGO3UP0Qbd1HURNVWiPqkeR
+         GDfSy6fYJskcELs5XXk4Px+ljp+w+0m6Doh6Q+QaoSOjmu78wSa/PvtBPgzwG866SspW
+         PkYm8s0uIQHfqasXwK9UYjxcOUwrKZpWItKBlfbMWDciJUW3HdqjZIVQyTTrzkPsVawh
+         IVZg==
+X-Gm-Message-State: AOAM531nPBWUIBGqClVdrQlBGnKUeVQjS7w2KVvztQ0CmHB1Q7XlhoX7
+        01nDyST8HuaA5UWuqhJ9sqBHyKt52gU83DkKL37K
+X-Google-Smtp-Source: ABdhPJy1F+1dndmaWxm19LJTyn2LKz2YWhIRQirh52O3KYWsmxmJWiuRe+aQHvYGuBIKQa4hIAktI/HirP2Vh0GTAVU=
+X-Received: by 2002:a17:906:86c6:: with SMTP id j6mr3559138ejy.197.1617199157271;
+ Wed, 31 Mar 2021 06:59:17 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20210331131620.4005931-1-maz@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
+References: <20210331080519.172-1-xieyongji@bytedance.com> <20210331080519.172-2-xieyongji@bytedance.com>
+ <20210331091545.lr572rwpyvrnji3w@wittgenstein> <CACycT3vRhurgcuNvEW7JKuhCQdy__5ZX=5m1AFnVKDk8UwUa7A@mail.gmail.com>
+ <20210331122315.uas3n44vgxz5z5io@wittgenstein>
+In-Reply-To: <20210331122315.uas3n44vgxz5z5io@wittgenstein>
+From:   Yongji Xie <xieyongji@bytedance.com>
+Date:   Wed, 31 Mar 2021 21:59:07 +0800
+Message-ID: <CACycT3vm_XvitXV+kXivAhrfwN6U0Nm5kZwcYhY+GrriVAKq8g@mail.gmail.com>
+Subject: Re: Re: [PATCH v6 01/10] file: Export receive_fd() to modules
+To:     Christian Brauner <christian.brauner@ubuntu.com>
+Cc:     Christoph Hellwig <hch@infradead.org>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        Parav Pandit <parav@nvidia.com>,
+        Christian Brauner <christian.brauner@canonical.com>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Matthew Wilcox <willy@infradead.org>, viro@zeniv.linux.org.uk,
+        Jens Axboe <axboe@kernel.dk>, bcrl@kvack.org,
+        Jonathan Corbet <corbet@lwn.net>,
+        =?UTF-8?Q?Mika_Penttil=C3=A4?= <mika.penttila@nextfour.com>,
+        Dan Carpenter <dan.carpenter@oracle.com>,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        kvm@vger.kernel.org, linux-fsdevel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Marc,
-
-On 3/31/21 2:16 PM, Marc Zyngier wrote:
-> Julien's bandwidth for KVM reviewing has been pretty low lately,
-> and Alexandru has accepted to step in and help with the reviewing.
+On Wed, Mar 31, 2021 at 8:23 PM Christian Brauner
+<christian.brauner@ubuntu.com> wrote:
 >
-> Many thanks to both!
+> On Wed, Mar 31, 2021 at 07:32:33PM +0800, Yongji Xie wrote:
+> > On Wed, Mar 31, 2021 at 5:15 PM Christian Brauner
+> > <christian.brauner@ubuntu.com> wrote:
+> > >
+> > > On Wed, Mar 31, 2021 at 04:05:10PM +0800, Xie Yongji wrote:
+> > > > Export receive_fd() so that some modules can use
+> > > > it to pass file descriptor between processes without
+> > > > missing any security stuffs.
+> > > >
+> > > > Signed-off-by: Xie Yongji <xieyongji@bytedance.com>
+> > > > ---
+> > >
+> > > Yeah, as I said in the other mail I'd be comfortable with exposing just
+> > > this variant of the helper.
+> >
+> > Thanks, I got it now.
+> >
+> > > Maybe this should be a separate patch bundled together with Christoph's
+> > > patch to split parts of receive_fd() into a separate helper.
+> >
+> > Do we need to add the seccomp notifier into the separate helper? In
+> > our case, the file passed to the separate helper is from another
+> > process.
+>
+> Not sure what you mean. Christoph has proposed
+> https://lore.kernel.org/linux-fsdevel/20210325082209.1067987-2-hch@lst.de
+> I was just saying that if we think this patch is useful we might bundle
+> it together with the
+> EXPORT_SYMBOL(receive_fd)
+> part here, convert all drivers that currently open-code get_unused_fd()
+> + fd_install() to use receive_fd(), and make this a separate patchset.
+>
 
-Happy to help!
-
-Acked-by: Alexandru Elisei <alexandru.elisei@arm.com>
+Yes, I see. We can split the parts (get_unused_fd() + fd_install()) of
+receive_fd() into a separate helper and convert all drivers to use
+that. What I mean is that I also would like to use
+security_file_receive() in my modules. So I'm not sure if it's ok to
+add security_file_receive() into the separate helper. Or do I need to
+export security_file_receive() separately?
 
 Thanks,
-
-Alex
-
->
-> Cc: Julien Thierry <julien.thierry.kdev@gmail.com>
-> Cc: Alexandru Elisei <alexandru.elisei@arm.com>
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  MAINTAINERS | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index aa84121c5611..803bd0551512 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -9765,7 +9765,7 @@ F:	virt/kvm/*
->  KERNEL VIRTUAL MACHINE FOR ARM64 (KVM/arm64)
->  M:	Marc Zyngier <maz@kernel.org>
->  R:	James Morse <james.morse@arm.com>
-> -R:	Julien Thierry <julien.thierry.kdev@gmail.com>
-> +R:	Alexandru Elisei <alexandru.elisei@arm.com>
->  R:	Suzuki K Poulose <suzuki.poulose@arm.com>
->  L:	linux-arm-kernel@lists.infradead.org (moderated for non-subscribers)
->  L:	kvmarm@lists.cs.columbia.edu
+Yongji
