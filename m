@@ -2,119 +2,111 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 718E53509BD
-	for <lists+kvm@lfdr.de>; Wed, 31 Mar 2021 23:48:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D92EB350A2A
+	for <lists+kvm@lfdr.de>; Thu,  1 Apr 2021 00:22:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232290AbhCaVr7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 31 Mar 2021 17:47:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56304 "EHLO
+        id S232585AbhCaWWU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 31 Mar 2021 18:22:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35452 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229959AbhCaVr4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 31 Mar 2021 17:47:56 -0400
-Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 05302C061574
-        for <kvm@vger.kernel.org>; Wed, 31 Mar 2021 14:47:56 -0700 (PDT)
-Received: by mail-pj1-x1035.google.com with SMTP id il9-20020a17090b1649b0290114bcb0d6c2so1929602pjb.0
-        for <kvm@vger.kernel.org>; Wed, 31 Mar 2021 14:47:56 -0700 (PDT)
+        with ESMTP id S232825AbhCaWV6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 31 Mar 2021 18:21:58 -0400
+Received: from mail-pl1-x62f.google.com (mail-pl1-x62f.google.com [IPv6:2607:f8b0:4864:20::62f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F390C061574
+        for <kvm@vger.kernel.org>; Wed, 31 Mar 2021 15:21:58 -0700 (PDT)
+Received: by mail-pl1-x62f.google.com with SMTP id h8so8644559plt.7
+        for <kvm@vger.kernel.org>; Wed, 31 Mar 2021 15:21:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=8xelLMkxcC6WtOofiMih6F32tqKnPtSyw2jgK+CDHu4=;
-        b=lRekl3fx/1xVTY4VSWAcqWY60kFcYfE3ex87ZMiyF3YMama3alXemQAvey4ua2Q2NU
-         eIzwbu8ulmg+dSFPJ/LLw9M8TUwNtZ6Kf+zsLYX2btGWc+Mt6r+WqI3nE4cuuPodpDWB
-         vkPyVKuV4l3DmqBnpyedy5K2ELlMSQALGThaUNGPrMsL7lsHqmcjeklTCzt6GLWxXFOh
-         fcNEDPnE/MDmfK1tIflC1u5mhPxRa8t1lqjHjJZcz8mlLg7SmVa3KnKTiibQ3TVoVdfM
-         W0WQ/smihKucHGWCEceoSVORhE99fiU+/wSW3je405yKPyFBfEyxm9lRJkvzLqkv3YeD
-         nlyw==
+        bh=TNLJMnrWivn3GFXa2+TzAqtoU0ub+N8TkRxfn0l4Flg=;
+        b=gQ9/NBVl4giS83ythLJ0Bf81bKdwuuKhPnKsxUuqiWwWf/EMxGPzvbYRbSyqotN4vm
+         22EKYNZKYhFvYdFjNrdwZD1oXdiJNoVE5omarseI/GrnGjOB5BDydz49ERLb9MK7dKlQ
+         By0u36NM/69ysYdyMdruTfzpIIE7UpbEMJtt7lzi+QwhAFRgyRU9s9CkGN8ph6GDFzx3
+         SlTfRLDjSw0ce8sRcyWWtdKK5kWDL1z4pIK78F5XOkVRJHNHGWulas6YmOsXa4jh+JLQ
+         0/sZic99pWXb3wv/EXvA27ef5u8Dt+Ye2h2mcpxzWjrzfI9/X2Tu6eccjmANnNLF/94e
+         kEYQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=8xelLMkxcC6WtOofiMih6F32tqKnPtSyw2jgK+CDHu4=;
-        b=YRBz6NGZRJR1dWsbEA2VL/71G8JBSzWZp42hVQRPIidcA01p+VChs5spORv/v3Uw4x
-         /YMPwknDO+wNz965GfV8VZSqJp8wGDLEfN73SWyNHSPSrj+/lNVmN+kUKbL730GZq+1H
-         8yeOgYYpvK5T+ZEncz0c9Y8tGRg5n0WIcwIJSbGCz73RxgSuLEQy6U4LcN3w3mj6oFZn
-         CcyTCdKhOijD1SSZyqIYwv6MZotZS0k+X5UEP01HP8mBPmZUnY7T9dg8f5xoT+PxwLmX
-         XvQiLncbYJbY0WhOVe9yieTuo4PrweC19lvUjqyx/AB2U1SqWBAUOxSPJkzjy5xX+zuG
-         7r4Q==
-X-Gm-Message-State: AOAM533SbtOhdq+hDoe6LwdCT9yGiFPbQNioBbSCyJ0RprDonDFvE/Im
-        pTgmOeJwiE7TZVHO9zKdbhj6vQ==
-X-Google-Smtp-Source: ABdhPJyZugl5lfedBulyUfvB1YGfF9LGCaOpUeSH521YqKnnt+A07YJz3hlU79HRomGEJDuqkrmSZg==
-X-Received: by 2002:a17:90b:1987:: with SMTP id mv7mr5273831pjb.152.1617227275455;
-        Wed, 31 Mar 2021 14:47:55 -0700 (PDT)
+        bh=TNLJMnrWivn3GFXa2+TzAqtoU0ub+N8TkRxfn0l4Flg=;
+        b=nySY1qHTLu4QdWMSD/nY0M/tYbqd0Q7rjJ3zR347VlTVq8UfNdd2HEbcq/iLxno9Np
+         Tjg+v2p4KqwH1sZR0IHJPMpL6U9A3F6mQmgjyFe4mJlKv9YoZu+4gYHG0O14xHh8jc2S
+         rjCIywQRhK9qE0NcvBdxhQfCUklAxtuI4ZpRG9wmZ5S8Y6g/XodWBAlxJ0lX77PqQSq7
+         a2j/cj2HU3WNQjljuQ+fial/hs2avP+8lq2GGqggZnQXuJjXe+gKJN1WGZcGkl8dlOpk
+         4WtP1CxH+yP4Tkb2BPDI4/DACz7YihmDsEDJdQLPfVzzEz6LbSR/2knHO1xWUdkVbb5G
+         dubA==
+X-Gm-Message-State: AOAM531rhqGgHopA+UKvw6M9Y/v18kSdvzQAakD5SHHN44x2+qp+Jq6J
+        +4NF7r4KL5IjSg1pCiJ/++bU1Q==
+X-Google-Smtp-Source: ABdhPJw11PZCJPfSeDHa53TUna9HFcJfFsVjGOJ7EGP/H4fwhQeTvZqLMv5AwD/nK53ex5x3+kL+Yw==
+X-Received: by 2002:a17:90b:3553:: with SMTP id lt19mr5528995pjb.222.1617229317806;
+        Wed, 31 Mar 2021 15:21:57 -0700 (PDT)
 Received: from google.com (240.111.247.35.bc.googleusercontent.com. [35.247.111.240])
-        by smtp.gmail.com with ESMTPSA id a30sm3300970pfr.66.2021.03.31.14.47.54
+        by smtp.gmail.com with ESMTPSA id 138sm3260059pfv.192.2021.03.31.15.21.56
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 31 Mar 2021 14:47:54 -0700 (PDT)
-Date:   Wed, 31 Mar 2021 21:47:51 +0000
+        Wed, 31 Mar 2021 15:21:57 -0700 (PDT)
+Date:   Wed, 31 Mar 2021 22:21:53 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Marc Zyngier <maz@kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Paul Mackerras <paulus@ozlabs.org>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
+To:     Ben Gardon <bgardon@google.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Peter Xu <peterx@redhat.com>, Peter Shier <pshier@google.com>,
+        Peter Feiner <pfeiner@google.com>,
+        Junaid Shahid <junaids@google.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        linux-mips@vger.kernel.org, kvm@vger.kernel.org,
-        kvm-ppc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Ben Gardon <bgardon@google.com>
-Subject: Re: [PATCH 16/18] KVM: Don't take mmu_lock for range invalidation
- unless necessary
-Message-ID: <YGTuB3/JRvUwH64K@google.com>
-References: <20210326021957.1424875-1-seanjc@google.com>
- <20210326021957.1424875-17-seanjc@google.com>
- <6e7dc7d0-f5dc-85d9-1c50-d23b761b5ff3@redhat.com>
- <YGSmMeSOPcjxRwf6@google.com>
- <56ea69fe-87b0-154b-e286-efce9233864e@redhat.com>
- <YGTRzf/4i9Y8XR2c@google.com>
- <0e30625f-934d-9084-e293-cb3bcbc9e4b8@redhat.com>
- <YGTkLMAzk88wOiZm@google.com>
- <345ab567-386f-9080-f9cb-0e17fa90a852@redhat.com>
+        Yulei Zhang <yulei.kernel@gmail.com>,
+        Wanpeng Li <kernellwp@gmail.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Xiao Guangrong <xiaoguangrong.eric@gmail.com>
+Subject: Re: [PATCH 07/13] KVM: x86/mmu: Make TDP MMU root refcount atomic
+Message-ID: <YGT2AV6lhDG5yLkW@google.com>
+References: <20210331210841.3996155-1-bgardon@google.com>
+ <20210331210841.3996155-8-bgardon@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <345ab567-386f-9080-f9cb-0e17fa90a852@redhat.com>
+In-Reply-To: <20210331210841.3996155-8-bgardon@google.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Mar 31, 2021, Paolo Bonzini wrote:
-> On 31/03/21 23:05, Sean Christopherson wrote:
-> > > Wouldn't it be incorrect to lock a mutex (e.g. inside*another*  MMU
-> > > notifier's invalidate callback) while holding an rwlock_t?  That makes sense
-> > > because anybody that's busy waiting in write_lock potentially cannot be
-> > > preempted until the other task gets the mutex.  This is a potential
-> > > deadlock.
-> > 
-> > Yes?  I don't think I follow your point though.  Nesting a spinlock or rwlock
-> > inside a rwlock is ok, so long as the locks are always taken in the same order,
-> > i.e. it's never mmu_lock -> mmu_notifier_slots_lock.
+On Wed, Mar 31, 2021, Ben Gardon wrote:
+> In order to parallelize more operations for the TDP MMU, make the
+> refcount on TDP MMU roots atomic, so that a future patch can allow
+> multiple threads to take a reference on the root concurrently, while
+> holding the MMU lock in read mode.
 > 
-> *Another* MMU notifier could nest a mutex inside KVM's rwlock.
-> 
-> But... is it correct that the MMU notifier invalidate callbacks are always
-> called with the mmap_sem taken (sometimes for reading, e.g.
-> try_to_merge_with_ksm_page->try_to_merge_one_page->write_protect_page)?
+> Signed-off-by: Ben Gardon <bgardon@google.com>
+> ---
 
-No :-(
+...
 
-File-based invalidations through the rmaps do not take mmap_sem.  They get at
-the VMAs via the address_space's interval tree, which is protected by its own
-i_mmap_rwsem.
+> @@ -88,10 +88,12 @@ static struct kvm_mmu_page *tdp_mmu_next_root(struct kvm *kvm,
+>  		next_root = list_first_entry(&kvm->arch.tdp_mmu_roots,
+>  					     typeof(*next_root), link);
+>  
+> +	while (!list_entry_is_head(next_root, &kvm->arch.tdp_mmu_roots, link) &&
+> +	       !kvm_tdp_mmu_get_root(kvm, next_root))
+> +		next_root = list_next_entry(next_root, link);
+> +
+>  	if (list_entry_is_head(next_root, &kvm->arch.tdp_mmu_roots, link))
+>  		next_root = NULL;
+> -	else
+> -		kvm_tdp_mmu_get_root(kvm, next_root);
+>  
+>  	if (prev_root)
+>  		kvm_tdp_mmu_put_root(kvm, prev_root);
+> @@ -158,14 +160,13 @@ hpa_t kvm_tdp_mmu_get_vcpu_root_hpa(struct kvm_vcpu *vcpu)
+>  
+>  	/* Check for an existing root before allocating a new one. */
+>  	for_each_tdp_mmu_root(kvm, root) {
+> -		if (root->role.word == role.word) {
+> -			kvm_tdp_mmu_get_root(kvm, root);
+> +		if (root->role.word == role.word &&
+> +		    kvm_tdp_mmu_get_root(kvm, root))
 
-E.g. try_to_unmap() -> rmap_walk_file() -> try_to_unmap_one() 
-
-> We could take it temporarily in install_memslots, since the MMU notifier's mm
-> is stored in kvm->mm.
-> 
-> In this case, a pair of kvm_mmu_notifier_lock/unlock functions would be the
-> best way to abstract it.
-> 
-> Paolo
-> 
+I'm not opposed to changing this logic while making the refcount atomic, but it
+needs to be explained in the changelog.  As is, the changelog makes it sound
+like the patch is a pure refactoring of the type.
