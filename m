@@ -2,51 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 404C434FB19
-	for <lists+kvm@lfdr.de>; Wed, 31 Mar 2021 10:07:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 53ACB34FB27
+	for <lists+kvm@lfdr.de>; Wed, 31 Mar 2021 10:07:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234089AbhCaIGv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 31 Mar 2021 04:06:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47378 "EHLO
+        id S234195AbhCaIG4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 31 Mar 2021 04:06:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47396 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234098AbhCaIGZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 31 Mar 2021 04:06:25 -0400
-Received: from mail-pl1-x629.google.com (mail-pl1-x629.google.com [IPv6:2607:f8b0:4864:20::629])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 59583C061760
-        for <kvm@vger.kernel.org>; Wed, 31 Mar 2021 01:06:25 -0700 (PDT)
-Received: by mail-pl1-x629.google.com with SMTP id e14so7495552plj.2
-        for <kvm@vger.kernel.org>; Wed, 31 Mar 2021 01:06:25 -0700 (PDT)
+        with ESMTP id S234228AbhCaIGk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 31 Mar 2021 04:06:40 -0400
+Received: from mail-pg1-x534.google.com (mail-pg1-x534.google.com [IPv6:2607:f8b0:4864:20::534])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DFB45C061760
+        for <kvm@vger.kernel.org>; Wed, 31 Mar 2021 01:06:28 -0700 (PDT)
+Received: by mail-pg1-x534.google.com with SMTP id q10so2449930pgj.2
+        for <kvm@vger.kernel.org>; Wed, 31 Mar 2021 01:06:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=bytedance-com.20150623.gappssmtp.com; s=20150623;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=b7apvPbQfTG1FYg2uNsocmvMG/QdC7c4RuzNmrGKxtc=;
-        b=A3wAmnxCijyv4JmqyD+7kgtLs8qirdeNzXs9OkQLZgeSTN5oUQUq0roBMJbBPxt+/9
-         KCpvVlFgxw9ZZn26eKmnOXdTk/yUg65g4D7FuF+OkmhsVMHtXbzEo9csOzlt61WDfo5l
-         otQaPwZTrHtFhq2LaSUvhBbnk3a4qdoG8SzepxCM1HjSG+y4FAJrbwjVnc8KQwZGJR1e
-         CfGVzDy1y8PTrPtOC8GzgLs4uQqr400S/WFl8PXrgHskVyafDc7WUeOP2bcK8aupMQhG
-         i7D6kXW2EKvhLjAVavOvYtm/r8NX8BoRCI40+VVdhnIMvk6XnOHXiH9lgCy/TfikG8TD
-         wozA==
+        bh=f7Vhf0sKPolvZdmmoQbWwDj+eTIPxki+8IuZB8c0Kq4=;
+        b=r75Rzrne30uVZcUUdNkOzD94W4ROnkMv7fAN57hx5SsqQiycs7arb/U8T5gr66kqY2
+         fsJYjTgVulWItUoSriq/FcqQzPwx3Fz0XkL0dAwW6DR6TiQZ5fh9zqob5EY+4Shmuo59
+         UI6B0NIdzdqg38KAIztpGrWMwp/WjmNC3nfJE9c7zNUk4GE3UIQHNBQrvi1D/vVoIO+h
+         hsdx37JQ3jSo2oFjNRGiYasaDMC3P1a1pxm9YUHLvG+1y1GhwqybDH8jya7I36j0Of6Q
+         RB3uA8sHEhyNHiGFYH28UOTktfqnH1hbLdQ+8d4laajfaXV5EVw6897aE7LGfaIq5Agv
+         Oyzw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=b7apvPbQfTG1FYg2uNsocmvMG/QdC7c4RuzNmrGKxtc=;
-        b=ZMyUXMPt3xX1hZurpl2MylxlEFTwUqTU4prsMC/0d1Kwt1Ws9J/1SgNkay0IxYeLQV
-         tKJMd+c5QKySxrWP2DC8mvfyfxiQKPkstFQA0LXibqdVd8l/ruupp8QsQZUns+fyhP4r
-         Fo1tU3IKLIp98nQkpc5938A2/zcliRuVorx8usUW2kB8ZTQ/OgAbFvapMR7WJhxqDj6G
-         E59SwSBAWBixx8ldWppaVW12ZDW7aCW1Gx+To2/0DuxfELddYB5PwzxXaqJMXWLblnGA
-         fe7XYgv8B0iSWW5iil3DKgpX+/ks69o5zMnSTIEfrxsj48eQH92TnAdwWejl3ZJZ2DQX
-         hj3A==
-X-Gm-Message-State: AOAM530G3c3/lJ/cXch8ANdOs6wjJ1CrEoOIJRw2Wn4ad2O/PEyY4/uz
-        RD7UH4731LGPzLIri2kyocCT
-X-Google-Smtp-Source: ABdhPJxHUvXwhgpDdQBLTdQxkUD9V2flhkuKgUAC1U22SyapfEwojQlQDvAYR/WYJKJ9peQYTPOWLw==
-X-Received: by 2002:a17:902:7b82:b029:e7:32bc:92 with SMTP id w2-20020a1709027b82b02900e732bc0092mr1917558pll.34.1617177984900;
-        Wed, 31 Mar 2021 01:06:24 -0700 (PDT)
+        bh=f7Vhf0sKPolvZdmmoQbWwDj+eTIPxki+8IuZB8c0Kq4=;
+        b=LAmuzS5LdjzRqtDaE+uSD4DkDDZrSSWeZPlHLGqOxraHDrJZ9b64SH89ymc+qT2U5+
+         lclf5wviLtIvMp7mDqgJy42KSp45+WGdSMVaaULVcs7dwB2GlHbF8yjVpb5YnJZkRTIG
+         kt+EOV4XEJR6YoFYbY1JZp9ip5eWA9xOs/FxgITaXhEVf3pvAdQBZUr4xQYmO2wg6CFc
+         xtGP4XbRrT6TX6ODsG1mLL1Uh4h9edgYF2Iq9Rh5kC6NdHkQILiFjJW4YmYFHqvEy04i
+         3ZvqzKckQmnm1RwTKqShXTsjP2iK74w0X+/Umd4givyF8hPck8p1+CL9U4uPU9hhtgUl
+         4OiQ==
+X-Gm-Message-State: AOAM53308kk8ms0HLJT/IQPCpSg3Ro1WIYKofyOCVRxz6RAi40N/sXsN
+        dXxcR0UyvnbCA0ASfIKmg9DC
+X-Google-Smtp-Source: ABdhPJw5SdAYJYwggqFPCWKc2zs9T35K7EWcA/8fPQg9WcIHxPAKmkso7yE0S4NhyNQOP74BaSA/yw==
+X-Received: by 2002:a63:1144:: with SMTP id 4mr2075169pgr.333.1617177988462;
+        Wed, 31 Mar 2021 01:06:28 -0700 (PDT)
 Received: from localhost ([139.177.225.243])
-        by smtp.gmail.com with ESMTPSA id p2sm1643371pgm.24.2021.03.31.01.06.23
+        by smtp.gmail.com with ESMTPSA id 4sm1293560pjl.51.2021.03.31.01.06.27
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 31 Mar 2021 01:06:24 -0700 (PDT)
+        Wed, 31 Mar 2021 01:06:28 -0700 (PDT)
 From:   Xie Yongji <xieyongji@bytedance.com>
 To:     mst@redhat.com, jasowang@redhat.com, stefanha@redhat.com,
         sgarzare@redhat.com, parav@nvidia.com, hch@infradead.org,
@@ -56,9 +56,9 @@ To:     mst@redhat.com, jasowang@redhat.com, stefanha@redhat.com,
         dan.carpenter@oracle.com
 Cc:     virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
         kvm@vger.kernel.org, linux-fsdevel@vger.kernel.org
-Subject: [PATCH v6 02/10] eventfd: Increase the recursion depth of eventfd_signal()
-Date:   Wed, 31 Mar 2021 16:05:11 +0800
-Message-Id: <20210331080519.172-3-xieyongji@bytedance.com>
+Subject: [PATCH v6 03/10] vhost-vdpa: protect concurrent access to vhost device iotlb
+Date:   Wed, 31 Mar 2021 16:05:12 +0800
+Message-Id: <20210331080519.172-4-xieyongji@bytedance.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20210331080519.172-1-xieyongji@bytedance.com>
 References: <20210331080519.172-1-xieyongji@bytedance.com>
@@ -68,60 +68,44 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Increase the recursion depth of eventfd_signal() to 1. This
-is the maximum recursion depth we have found so far, which
-can be triggered with the following call chain:
+Use vhost_dev->mutex to protect vhost device iotlb from
+concurrent access.
 
-    kvm_io_bus_write                        [kvm]
-      --> ioeventfd_write                   [kvm]
-        --> eventfd_signal                  [eventfd]
-          --> vhost_poll_wakeup             [vhost]
-            --> vduse_vdpa_kick_vq          [vduse]
-              --> eventfd_signal            [eventfd]
-
+Fixes: 4c8cf318("vhost: introduce vDPA-based backend")
+Cc: stable@vger.kernel.org
 Signed-off-by: Xie Yongji <xieyongji@bytedance.com>
 Acked-by: Jason Wang <jasowang@redhat.com>
+Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
 ---
- fs/eventfd.c            | 2 +-
- include/linux/eventfd.h | 5 ++++-
- 2 files changed, 5 insertions(+), 2 deletions(-)
+ drivers/vhost/vdpa.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-diff --git a/fs/eventfd.c b/fs/eventfd.c
-index e265b6dd4f34..cc7cd1dbedd3 100644
---- a/fs/eventfd.c
-+++ b/fs/eventfd.c
-@@ -71,7 +71,7 @@ __u64 eventfd_signal(struct eventfd_ctx *ctx, __u64 n)
- 	 * it returns true, the eventfd_signal() call should be deferred to a
- 	 * safe context.
- 	 */
--	if (WARN_ON_ONCE(this_cpu_read(eventfd_wake_count)))
-+	if (WARN_ON_ONCE(this_cpu_read(eventfd_wake_count) > EFD_WAKE_DEPTH))
- 		return 0;
+diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
+index 3947fbc2d1d5..63b28d3aee7c 100644
+--- a/drivers/vhost/vdpa.c
++++ b/drivers/vhost/vdpa.c
+@@ -725,9 +725,11 @@ static int vhost_vdpa_process_iotlb_msg(struct vhost_dev *dev,
+ 	const struct vdpa_config_ops *ops = vdpa->config;
+ 	int r = 0;
  
- 	spin_lock_irqsave(&ctx->wqh.lock, flags);
-diff --git a/include/linux/eventfd.h b/include/linux/eventfd.h
-index fa0a524baed0..886d99cd38ef 100644
---- a/include/linux/eventfd.h
-+++ b/include/linux/eventfd.h
-@@ -29,6 +29,9 @@
- #define EFD_SHARED_FCNTL_FLAGS (O_CLOEXEC | O_NONBLOCK)
- #define EFD_FLAGS_SET (EFD_SHARED_FCNTL_FLAGS | EFD_SEMAPHORE)
- 
-+/* Maximum recursion depth */
-+#define EFD_WAKE_DEPTH 1
++	mutex_lock(&dev->mutex);
 +
- struct eventfd_ctx;
- struct file;
+ 	r = vhost_dev_check_owner(dev);
+ 	if (r)
+-		return r;
++		goto unlock;
  
-@@ -47,7 +50,7 @@ DECLARE_PER_CPU(int, eventfd_wake_count);
+ 	switch (msg->type) {
+ 	case VHOST_IOTLB_UPDATE:
+@@ -748,6 +750,8 @@ static int vhost_vdpa_process_iotlb_msg(struct vhost_dev *dev,
+ 		r = -EINVAL;
+ 		break;
+ 	}
++unlock:
++	mutex_unlock(&dev->mutex);
  
- static inline bool eventfd_signal_count(void)
- {
--	return this_cpu_read(eventfd_wake_count);
-+	return this_cpu_read(eventfd_wake_count) > EFD_WAKE_DEPTH;
+ 	return r;
  }
- 
- #else /* CONFIG_EVENTFD */
 -- 
 2.11.0
 
