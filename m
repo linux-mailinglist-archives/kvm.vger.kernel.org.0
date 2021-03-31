@@ -2,108 +2,138 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 588D335008D
-	for <lists+kvm@lfdr.de>; Wed, 31 Mar 2021 14:42:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 51EE23500F9
+	for <lists+kvm@lfdr.de>; Wed, 31 Mar 2021 15:10:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235386AbhCaMmQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 31 Mar 2021 08:42:16 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:55940 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S235470AbhCaMln (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 31 Mar 2021 08:41:43 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1617194502;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=H7dNXYaOTclqUn9MijXwZ7hg6tnWG/YqlnOo2zWP1Ro=;
-        b=QMFkUeM3/FhzJ3hVyDmAsSxF/Hat94myuKhCr5lPpMnl+/uBDo/s1sQmlqw1sXEAXQRrkb
-        1ImL4e3CUAbEXiGyscm2WWOb5rUxdl/SXkylcYObFABms0JAWv41hDvDg0xA6KrSGrAlIL
-        uOl5paXvDlnP7mZWCSUfvmr1vvbfJ2k=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-238-YZromXsBOru0T6J7NaNcQA-1; Wed, 31 Mar 2021 08:41:41 -0400
-X-MC-Unique: YZromXsBOru0T6J7NaNcQA-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 14270108BD0C;
-        Wed, 31 Mar 2021 12:41:40 +0000 (UTC)
-Received: from vitty.brq.redhat.com (unknown [10.40.193.13])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 01E9B60861;
-        Wed, 31 Mar 2021 12:41:37 +0000 (UTC)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH v3 2/2] selftests: kvm: Check that TSC page value is small after KVM_SET_CLOCK(0)
-Date:   Wed, 31 Mar 2021 14:41:30 +0200
-Message-Id: <20210331124130.337992-3-vkuznets@redhat.com>
-In-Reply-To: <20210331124130.337992-1-vkuznets@redhat.com>
-References: <20210331124130.337992-1-vkuznets@redhat.com>
+        id S235662AbhCaNJz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 31 Mar 2021 09:09:55 -0400
+Received: from foss.arm.com ([217.140.110.172]:41848 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S235733AbhCaNJp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 31 Mar 2021 09:09:45 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 55658D6E;
+        Wed, 31 Mar 2021 06:09:44 -0700 (PDT)
+Received: from [10.57.24.208] (unknown [10.57.24.208])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 3D9523F694;
+        Wed, 31 Mar 2021 06:09:42 -0700 (PDT)
+Subject: Re: [PATCH 16/18] iommu: remove DOMAIN_ATTR_DMA_USE_FLUSH_QUEUE
+To:     Will Deacon <will@kernel.org>
+Cc:     freedreno@lists.freedesktop.org, kvm@vger.kernel.org,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        linuxppc-dev@lists.ozlabs.org, dri-devel@lists.freedesktop.org,
+        Li Yang <leoyang.li@nxp.com>, iommu@lists.linux-foundation.org,
+        netdev@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        David Woodhouse <dwmw2@infradead.org>,
+        Christoph Hellwig <hch@lst.de>,
+        linux-arm-kernel@lists.infradead.org
+References: <20210316153825.135976-1-hch@lst.de>
+ <20210316153825.135976-17-hch@lst.de>
+ <20210330131149.GP5908@willie-the-truck>
+ <a6952aa7-4d7e-54f0-339e-e15f88596dcc@arm.com>
+ <20210330135801.GA6187@willie-the-truck>
+ <578d6aa5-4239-f5d7-2e9f-686b18e52bba@arm.com>
+ <20210331114947.GA7626@willie-the-truck>
+From:   Robin Murphy <robin.murphy@arm.com>
+Message-ID: <ef895942-e115-7878-ab86-37e8a1614df5@arm.com>
+Date:   Wed, 31 Mar 2021 14:09:37 +0100
+User-Agent: Mozilla/5.0 (Windows NT 10.0; rv:78.0) Gecko/20100101
+ Thunderbird/78.9.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+In-Reply-To: <20210331114947.GA7626@willie-the-truck>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add a test for the issue when KVM_SET_CLOCK(0) call could cause
-TSC page value to go very big because of a signedness issue around
-hv_clock->system_time.
+On 2021-03-31 12:49, Will Deacon wrote:
+> On Tue, Mar 30, 2021 at 05:28:19PM +0100, Robin Murphy wrote:
+>> On 2021-03-30 14:58, Will Deacon wrote:
+>>> On Tue, Mar 30, 2021 at 02:19:38PM +0100, Robin Murphy wrote:
+>>>> On 2021-03-30 14:11, Will Deacon wrote:
+>>>>> On Tue, Mar 16, 2021 at 04:38:22PM +0100, Christoph Hellwig wrote:
+>>>>>> From: Robin Murphy <robin.murphy@arm.com>
+>>>>>>
+>>>>>> Instead make the global iommu_dma_strict paramete in iommu.c canonical by
+>>>>>> exporting helpers to get and set it and use those directly in the drivers.
+>>>>>>
+>>>>>> This make sure that the iommu.strict parameter also works for the AMD and
+>>>>>> Intel IOMMU drivers on x86.  As those default to lazy flushing a new
+>>>>>> IOMMU_CMD_LINE_STRICT is used to turn the value into a tristate to
+>>>>>> represent the default if not overriden by an explicit parameter.
+>>>>>>
+>>>>>> Signed-off-by: Robin Murphy <robin.murphy@arm.com>.
+>>>>>> [ported on top of the other iommu_attr changes and added a few small
+>>>>>>     missing bits]
+>>>>>> Signed-off-by: Christoph Hellwig <hch@lst.de>
+>>>>>> ---
+>>>>>>     drivers/iommu/amd/iommu.c                   | 23 +-------
+>>>>>>     drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c | 50 +---------------
+>>>>>>     drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h |  1 -
+>>>>>>     drivers/iommu/arm/arm-smmu/arm-smmu.c       | 27 +--------
+>>>>>>     drivers/iommu/dma-iommu.c                   |  9 +--
+>>>>>>     drivers/iommu/intel/iommu.c                 | 64 ++++-----------------
+>>>>>>     drivers/iommu/iommu.c                       | 27 ++++++---
+>>>>>>     include/linux/iommu.h                       |  4 +-
+>>>>>>     8 files changed, 40 insertions(+), 165 deletions(-)
+>>>>>
+>>>>> I really like this cleanup, but I can't help wonder if it's going in the
+>>>>> wrong direction. With SoCs often having multiple IOMMU instances and a
+>>>>> distinction between "trusted" and "untrusted" devices, then having the
+>>>>> flush-queue enabled on a per-IOMMU or per-domain basis doesn't sound
+>>>>> unreasonable to me, but this change makes it a global property.
+>>>>
+>>>> The intent here was just to streamline the existing behaviour of stuffing a
+>>>> global property into a domain attribute then pulling it out again in the
+>>>> illusion that it was in any way per-domain. We're still checking
+>>>> dev_is_untrusted() before making an actual decision, and it's not like we
+>>>> can't add more factors at that point if we want to.
+>>>
+>>> Like I say, the cleanup is great. I'm just wondering whether there's a
+>>> better way to express the complicated logic to decide whether or not to use
+>>> the flush queue than what we end up with:
+>>>
+>>> 	if (!cookie->fq_domain && (!dev || !dev_is_untrusted(dev)) &&
+>>> 	    domain->ops->flush_iotlb_all && !iommu_get_dma_strict())
+>>>
+>>> which is mixing up globals, device properties and domain properties. The
+>>> result is that the driver code ends up just using the global to determine
+>>> whether or not to pass IO_PGTABLE_QUIRK_NON_STRICT to the page-table code,
+>>> which is a departure from the current way of doing things.
+>>
+>> But previously, SMMU only ever saw the global policy piped through the
+>> domain attribute by iommu_group_alloc_default_domain(), so there's no
+>> functional change there.
+> 
+> For DMA domains sure, but I don't think that's the case for unmanaged
+> domains such as those used by VFIO.
 
-Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
----
- tools/testing/selftests/kvm/x86_64/hyperv_clock.c | 13 +++++++++++--
- 1 file changed, 11 insertions(+), 2 deletions(-)
+Eh? This is only relevant to DMA domains anyway. Flush queues are part 
+of the IOVA allocator that VFIO doesn't even use. It's always been the 
+case that unmanaged domains only use strict invalidation.
 
-diff --git a/tools/testing/selftests/kvm/x86_64/hyperv_clock.c b/tools/testing/selftests/kvm/x86_64/hyperv_clock.c
-index ffbc4555c6e2..7f1d2765572c 100644
---- a/tools/testing/selftests/kvm/x86_64/hyperv_clock.c
-+++ b/tools/testing/selftests/kvm/x86_64/hyperv_clock.c
-@@ -80,19 +80,24 @@ static inline void check_tsc_msr_rdtsc(void)
- 	GUEST_ASSERT(delta_ns * 100 < (t2 - t1) * 100);
- }
- 
-+static inline u64 get_tscpage_ts(struct ms_hyperv_tsc_page *tsc_page)
-+{
-+	return mul_u64_u64_shr64(rdtsc(), tsc_page->tsc_scale) + tsc_page->tsc_offset;
-+}
-+
- static inline void check_tsc_msr_tsc_page(struct ms_hyperv_tsc_page *tsc_page)
- {
- 	u64 r1, r2, t1, t2;
- 
- 	/* Compare TSC page clocksource with HV_X64_MSR_TIME_REF_COUNT */
--	t1 = mul_u64_u64_shr64(rdtsc(), tsc_page->tsc_scale) + tsc_page->tsc_offset;
-+	t1 = get_tscpage_ts(tsc_page);
- 	r1 = rdmsr(HV_X64_MSR_TIME_REF_COUNT);
- 
- 	/* 10 ms tolerance */
- 	GUEST_ASSERT(r1 >= t1 && r1 - t1 < 100000);
- 	nop_loop();
- 
--	t2 = mul_u64_u64_shr64(rdtsc(), tsc_page->tsc_scale) + tsc_page->tsc_offset;
-+	t2 = get_tscpage_ts(tsc_page);
- 	r2 = rdmsr(HV_X64_MSR_TIME_REF_COUNT);
- 	GUEST_ASSERT(r2 >= t1 && r2 - t2 < 100000);
- }
-@@ -130,7 +135,11 @@ static void guest_main(struct ms_hyperv_tsc_page *tsc_page, vm_paddr_t tsc_page_
- 
- 	tsc_offset = tsc_page->tsc_offset;
- 	/* Call KVM_SET_CLOCK from userspace, check that TSC page was updated */
-+
- 	GUEST_SYNC(7);
-+	/* Sanity check TSC page timestamp, it should be close to 0 */
-+	GUEST_ASSERT(get_tscpage_ts(tsc_page) < 100000);
-+
- 	GUEST_ASSERT(tsc_page->tsc_offset != tsc_offset);
- 
- 	nop_loop();
--- 
-2.30.2
+>> Obviously some of the above checks could be factored out into some kind of
+>> iommu_use_flush_queue() helper that IOMMU drivers can also call if they need
+>> to keep in sync. Or maybe we just allow iommu-dma to set
+>> IO_PGTABLE_QUIRK_NON_STRICT directly via iommu_set_pgtable_quirks() if we're
+>> treating that as a generic thing now.
+> 
+> I think a helper that takes a domain would be a good starting point.
 
+You mean device, right? The one condition we currently have is at the 
+device level, and there's really nothing inherent to the domain itself 
+that matters (since the type is implicitly IOMMU_DOMAIN_DMA to even care 
+about this).
+
+Another idea that's just come to mind is now that IOMMU_DOMAIN_DMA has a 
+standard meaning, maybe we could split out a separate 
+IOMMU_DOMAIN_DMA_STRICT type such that it can all propagate from 
+iommu_get_def_domain_type()? That feels like it might be quite 
+promising, but I'd still do it as an improvement on top of this patch, 
+since it's beyond just cleaning up the abuse of domain attributes to 
+pass a command-line option around.
+
+Robin.
