@@ -2,699 +2,127 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E3F8634FE51
-	for <lists+kvm@lfdr.de>; Wed, 31 Mar 2021 12:51:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8A1AF34FEC4
+	for <lists+kvm@lfdr.de>; Wed, 31 Mar 2021 12:59:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235086AbhCaKus (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 31 Mar 2021 06:50:48 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:49445 "EHLO
+        id S235085AbhCaK7D (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 31 Mar 2021 06:59:03 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:39553 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234883AbhCaKuk (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 31 Mar 2021 06:50:40 -0400
+        by vger.kernel.org with ESMTP id S235113AbhCaK6s (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 31 Mar 2021 06:58:48 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1617187839;
+        s=mimecast20190719; t=1617188328;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=K86fwwRt3x+/sobik8nvlY4HBVdEdJ4URAAUvyRr474=;
-        b=JAtwFhprctDUyzqVH4ke66wz9jFA7yiQi5a6aQJd2PvBeIw9avoMcSeyuuJOsD8lCdS79Y
-        QSASOGS99D910ru/UP11mwOow7fI6CslnCi4hV7eDdhh2xn5ek1QIcRoA/QT2bJARlZSOS
-        jgrKuFSTSdjPbanmddFv/O04WSc7KJs=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-593-s3lupObvMkmkyCTNqr3dAw-1; Wed, 31 Mar 2021 06:50:36 -0400
-X-MC-Unique: s3lupObvMkmkyCTNqr3dAw-1
-Received: by mail-wr1-f71.google.com with SMTP id p12so791301wrn.18
-        for <kvm@vger.kernel.org>; Wed, 31 Mar 2021 03:50:36 -0700 (PDT)
+        bh=xWU5TMKCjhzVBEH8qMRMQ/zcHa91RtsSwCRdI3QSHW4=;
+        b=eezDCj4N4mfNGgrVm/ej0/Xp4QQSPhiSFl3CFwVJTk5egLbLW2OVZWvlrCnNsINV0tPlL2
+        yy4Etk3BHy61fA5Gnc69y22GrfnNGpqp5/5E4YtAheEwtf/cXmmO7atTfkAnvDj8gl/xs1
+        0HIsnyNz7MrPFAXvmdMJLUGHDVca+7U=
+Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
+ [209.85.218.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-100-y4tMBSHHOHmew-KmkZT9xw-1; Wed, 31 Mar 2021 06:58:46 -0400
+X-MC-Unique: y4tMBSHHOHmew-KmkZT9xw-1
+Received: by mail-ej1-f71.google.com with SMTP id e13so607394ejd.21
+        for <kvm@vger.kernel.org>; Wed, 31 Mar 2021 03:58:46 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=K86fwwRt3x+/sobik8nvlY4HBVdEdJ4URAAUvyRr474=;
-        b=aStod+SrmhDTeeQnbrkJGx2qmIJDLPNTwQoALnbVFE1RBpRjJu+lnh7F9mi9o828N4
-         auETUeOb/3CcnJSEx5rg0XSnxYew7O2b1n67z/2k1uU/Em8eLJzgY/qhbrTEkRmvVJ1n
-         WLzogbdUo+LkzfurKYo3TfT2juQecuaFkEkvVNz9X5Q4iZBvZpxbHefeBmUC5tG1i6wW
-         aiwGN6r5wJ+sSUqTwNOAzH2zPxEkrNv0+3KfG5Y1t9C6sNaNg7TiyXWKcVyhgyvqG5+z
-         hDFtdpIlpf8a6MdYxH/YPeUM2Oh/qw3Bwq1+lz17ToLYzggLbF6zq9EMNHTW/DXUQCS1
-         GCkw==
-X-Gm-Message-State: AOAM531vjSkhc0RMg/avsFloGdezW3OF3jB7w+eQp2A6GaYa8DHr+sEG
-        4WRU512eG+k4h6BmvRRT3QZMuZA3Vz0D5JaK4C2binrDSkjlT1mjucAGiqQ8H28uW7ktSruw4WV
-        IiMKWuuAesQMI
-X-Received: by 2002:adf:f3cf:: with SMTP id g15mr2983910wrp.57.1617187835279;
-        Wed, 31 Mar 2021 03:50:35 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyIC8/Tr16sPK/2ZAP1ZkJs01IWqyNA+wZvds0fSxxtRjJOG5bN9sU4mEiY6qpT7l8bVZX1Gg==
-X-Received: by 2002:adf:f3cf:: with SMTP id g15mr2983871wrp.57.1617187834744;
-        Wed, 31 Mar 2021 03:50:34 -0700 (PDT)
-Received: from steredhat (host-79-34-249-199.business.telecomitalia.it. [79.34.249.199])
-        by smtp.gmail.com with ESMTPSA id a13sm3588406wrp.31.2021.03.31.03.50.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 31 Mar 2021 03:50:34 -0700 (PDT)
-Date:   Wed, 31 Mar 2021 12:50:31 +0200
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     Stefan Hajnoczi <stefanha@redhat.com>
-Cc:     davem@davemloft.net, kuba@kernel.org, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-        syzkaller-bugs@googlegroups.com,
-        virtualization@lists.linux-foundation.org,
-        syzbot <syzbot+24452624fc4c571eedd9@syzkaller.appspotmail.com>
-Subject: Re: memory leak in virtio_transport_send_pkt_info
-Message-ID: <20210331105031.ewh4cq2xfe3pcn2v@steredhat>
-References: <00000000000069a2e905bad5d02e@google.com>
- <YGQ7EhQ+hlSUdf1C@stefanha-x1.localdomain>
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=xWU5TMKCjhzVBEH8qMRMQ/zcHa91RtsSwCRdI3QSHW4=;
+        b=UittL1xOo8FVxSlcECSyXoAKn06ouHkp4yeWv4do5GG4Dd8SyRK81e8qyOZMK2ZYoZ
+         EMoO5v71ExZzbVintNkBcqSyjF58IA+eGYUilYQdlz/3u3qvFhLkemU3MPXenH/g0URa
+         G9AmwQUbgPJtRIrBBLWjk/nR//N0GCU8GTsu/J6a06BjK7ygvnhlwLFeAT2t59gvjVWq
+         GAyl653/6ZOWT8Du3X4nzbWA6usVhqavK8VZI5fDmPSDEJuArsNZ6k1drFLMYdg+0Tgy
+         tKtRkCShqI2XyiIxuIIzE9hj3HNEJlSulV36vSkfKT9pxsZXyDfRo42Ypsu35A5nmNrY
+         kJlg==
+X-Gm-Message-State: AOAM530XIYZRuZ23txSfBAziJzD+DxfOFeBuoJqnjs15yCL2dRGiMkSb
+        fk861iiJw3c0Or97+8zshPDQlQof5EjU4kyORf3gvfMEf6+HihUGjEQBw/lnXIHp+NXJaZfJ9hz
+        yY6gRr2OVuo6W
+X-Received: by 2002:a17:906:f0c8:: with SMTP id dk8mr2886566ejb.300.1617188325281;
+        Wed, 31 Mar 2021 03:58:45 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwC4DVCQ5zAoVUBlqhYUB60RzKONa5jzI6wIXVgLfsl+qRAw4oEVA4ohMWyi771lhN1AsQsTQ==
+X-Received: by 2002:a17:906:f0c8:: with SMTP id dk8mr2886553ejb.300.1617188325064;
+        Wed, 31 Mar 2021 03:58:45 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e? ([2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e])
+        by smtp.gmail.com with ESMTPSA id a22sm1265537edu.14.2021.03.31.03.58.42
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 31 Mar 2021 03:58:43 -0700 (PDT)
+Subject: Re: [PATCH v2 1/2] KVM: x86: hyper-v: Properly divide maybe-negative
+ 'hv_clock->system_time' in compute_tsc_page_parameters()
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Marcelo Tosatti <mtosatti@redhat.com>
+Cc:     kvm@vger.kernel.org, Sean Christopherson <seanjc@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>
+References: <20210329114800.164066-1-vkuznets@redhat.com>
+ <20210329114800.164066-2-vkuznets@redhat.com>
+ <20210330131236.GA5932@fuller.cnet> <87ft0cu2eq.fsf@vitty.brq.redhat.com>
+ <4d7f375c-c912-fbeb-edd1-03d742d49dcb@redhat.com>
+ <87a6qju97s.fsf@vitty.brq.redhat.com>
+ <7c6f61e9-f2a6-46dc-7ab6-dc6ae86c7b60@redhat.com>
+ <871rbvtzi8.fsf@vitty.brq.redhat.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <de306f6d-6a64-b340-4d76-a51fbde8d2de@redhat.com>
+Date:   Wed, 31 Mar 2021 12:58:42 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <YGQ7EhQ+hlSUdf1C@stefanha-x1.localdomain>
+In-Reply-To: <871rbvtzi8.fsf@vitty.brq.redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Mar 31, 2021 at 10:04:18AM +0100, Stefan Hajnoczi wrote:
->On Mon, Feb 08, 2021 at 08:39:30AM -0800, syzbot wrote:
->> Hello,
->>
->> syzbot found the following issue on:
->>
->> HEAD commit:    9f29bd8b Merge tag 'fs_for_v5.11-rc5' of git://git.kernel...
->> git tree:       upstream
->> console output: https://syzkaller.appspot.com/x/log.txt?x=11e435af500000
->> kernel config:  https://syzkaller.appspot.com/x/.config?x=162a0109d6ff731f
->> dashboard link: https://syzkaller.appspot.com/bug?extid=24452624fc4c571eedd9
->> compiler:       gcc (GCC) 10.1.0-syz 20200507
->> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=135dd494d00000
->> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=128787e7500000
->>
->> IMPORTANT: if you fix the issue, please add the following tag to the commit:
->> Reported-by: syzbot+24452624fc4c571eedd9@syzkaller.appspotmail.com
->
->Hi Stefano,
->Looks like tx packets are still queued when the syzkaller leak check
->runs. I don't see a fix for this in linux.git. Have you already looked
->at this?
+On 31/03/21 11:59, Vitaly Kuznetsov wrote:
+> Paolo Bonzini <pbonzini@redhat.com> writes:
+>> On 31/03/21 08:29, Vitaly Kuznetsov wrote:
+>>> I'm leaning towards making a v3 and depending on how complex it's going
+>>> to look like we can decide which way to go.
+> 
+> Ok, I convinced myself this is correct:
+> 
+> @@ -5744,8 +5745,22 @@ long kvm_arch_vm_ioctl(struct file *filp,
+>                   * pvclock_update_vm_gtod_copy().
+>                   */
+>                  kvm_gen_update_masterclock(kvm);
+> -               now_ns = get_kvmclock_ns(kvm);
+> -               kvm->arch.kvmclock_offset += user_ns.clock - now_ns;
+> +
+> +               /*
+> +                * This pairs with kvm_guest_time_update(): when masterclock is
+> +                * in use, we use master_kernel_ns + kvmclock_offset to set
+> +                * unsigned 'system_time' so if we use get_kvmclock_ns() (which
+> +                * is slightly ahead) here we risk going negative on unsigned
+> +                * 'system_time' when 'user_ns.clock' is very small.
+> +                */
+> +               spin_lock(&ka->pvclock_gtod_sync_lock);
+> +               if (kvm->arch.use_master_clock)
+> +                       now_ns = ka->master_kernel_ns;
+> +               else
+> +                       now_ns = get_kvmclock_base_ns();
+> +               ka->kvmclock_offset = user_ns.clock - now_ns;
+> +               spin_unlock(&ka->pvclock_gtod_sync_lock);
+> +
+>                  kvm_make_all_cpus_request(kvm, KVM_REQ_CLOCK_UPDATE);
+>                  break;
+>          }
+> 
+> In !masterclock case kvm_guest_time_update() uses get_kvmclock_base_ns()
+> (and get_kvmclock_ns() is just get_kvmclock_base_ns() + ka->kvmclock_offset)
+> so we're good. Also, it looks like a good idea to put the whole
+> calculation under spinlock here.
 
-I missed this report.
-Looking at the reproducer it seems to happen when we send a message to a 
-socket not yet accept()ed.
+Yes, sounds good.
 
-I'll take a closer look over the next few days, thanks for bringing it 
-up.
+Note that I posted a series that changes pvclock_gtod_sync_lock to use 
+spin_lock_irqsave/spin_unlock_irqrestore, so please base your patch on 
+those and switch to spin_lock_irq.
 
-Stefano
-
->
->Stefan
->
->>
->> executing program
->> BUG: memory leak
->> unreferenced object 0xffff88811477d380 (size 96):
->>   comm "syz-executor196", pid 8793, jiffies 4294968272 (age 26.670s)
->>   hex dump (first 32 bytes):
->>     01 00 00 00 00 00 00 00 ff ff ff ff 00 00 00 00  ................
->>     ba 34 8c fe 00 00 00 00 00 00 01 00 01 00 05 00  .4..............
->>   backtrace:
->>     [<0000000051681be3>] kmalloc include/linux/slab.h:552 [inline]
->>     [<0000000051681be3>] kzalloc include/linux/slab.h:682 [inline]
->>     [<0000000051681be3>] virtio_transport_alloc_pkt+0x41/0x290 net/vmw_vsock/virtio_transport_common.c:51
->>     [<0000000036c2d6e6>] virtio_transport_send_pkt_info+0x105/0x1b0 net/vmw_vsock/virtio_transport_common.c:209
->>     [<00000000dd27435f>] virtio_transport_stream_enqueue+0x58/0x80 net/vmw_vsock/virtio_transport_common.c:674
->>     [<00000000d7e8274a>] vsock_stream_sendmsg+0x4f7/0x590 net/vmw_vsock/af_vsock.c:1800
->>     [<00000000d2b531e6>] sock_sendmsg_nosec net/socket.c:652 [inline]
->>     [<00000000d2b531e6>] sock_sendmsg+0x56/0x80 net/socket.c:672
->>     [<00000000803a63df>] ____sys_sendmsg+0x17a/0x390 net/socket.c:2345
->>     [<000000009d42f642>] ___sys_sendmsg+0x8b/0xd0 net/socket.c:2399
->>     [<000000000a37ed0e>] __sys_sendmmsg+0xed/0x290 net/socket.c:2489
->>     [<00000000324c1c73>] __do_sys_sendmmsg net/socket.c:2518 [inline]
->>     [<00000000324c1c73>] __se_sys_sendmmsg net/socket.c:2515 [inline]
->>     [<00000000324c1c73>] __x64_sys_sendmmsg+0x24/0x30 net/socket.c:2515
->>     [<000000004e7b2960>] do_syscall_64+0x2d/0x70 arch/x86/entry/common.c:46
->>     [<000000002615f594>] entry_SYSCALL_64_after_hwframe+0x44/0xa9
->>
->> BUG: memory leak
->> unreferenced object 0xffff88811477d280 (size 96):
->>   comm "syz-executor196", pid 8793, jiffies 4294968272 (age 26.670s)
->>   hex dump (first 32 bytes):
->>     01 00 00 00 00 00 00 00 ff ff ff ff 00 00 00 00  ................
->>     ba 34 8c fe 00 00 00 00 00 00 01 00 01 00 05 00  .4..............
->>   backtrace:
->>     [<0000000051681be3>] kmalloc include/linux/slab.h:552 [inline]
->>     [<0000000051681be3>] kzalloc include/linux/slab.h:682 [inline]
->>     [<0000000051681be3>] virtio_transport_alloc_pkt+0x41/0x290 net/vmw_vsock/virtio_transport_common.c:51
->>     [<0000000036c2d6e6>] virtio_transport_send_pkt_info+0x105/0x1b0 net/vmw_vsock/virtio_transport_common.c:209
->>     [<00000000dd27435f>] virtio_transport_stream_enqueue+0x58/0x80 net/vmw_vsock/virtio_transport_common.c:674
->>     [<00000000d7e8274a>] vsock_stream_sendmsg+0x4f7/0x590 net/vmw_vsock/af_vsock.c:1800
->>     [<00000000d2b531e6>] sock_sendmsg_nosec net/socket.c:652 [inline]
->>     [<00000000d2b531e6>] sock_sendmsg+0x56/0x80 net/socket.c:672
->>     [<00000000803a63df>] ____sys_sendmsg+0x17a/0x390 net/socket.c:2345
->>     [<000000009d42f642>] ___sys_sendmsg+0x8b/0xd0 net/socket.c:2399
->>     [<000000000a37ed0e>] __sys_sendmmsg+0xed/0x290 net/socket.c:2489
->>     [<00000000324c1c73>] __do_sys_sendmmsg net/socket.c:2518 [inline]
->>     [<00000000324c1c73>] __se_sys_sendmmsg net/socket.c:2515 [inline]
->>     [<00000000324c1c73>] __x64_sys_sendmmsg+0x24/0x30 net/socket.c:2515
->>     [<000000004e7b2960>] do_syscall_64+0x2d/0x70 arch/x86/entry/common.c:46
->>     [<000000002615f594>] entry_SYSCALL_64_after_hwframe+0x44/0xa9
->>
->> BUG: memory leak
->> unreferenced object 0xffff88811477d200 (size 96):
->>   comm "syz-executor196", pid 8793, jiffies 4294968272 (age 26.670s)
->>   hex dump (first 32 bytes):
->>     01 00 00 00 00 00 00 00 ff ff ff ff 00 00 00 00  ................
->>     ba 34 8c fe 00 00 00 00 00 00 01 00 01 00 05 00  .4..............
->>   backtrace:
->>     [<0000000051681be3>] kmalloc include/linux/slab.h:552 [inline]
->>     [<0000000051681be3>] kzalloc include/linux/slab.h:682 [inline]
->>     [<0000000051681be3>] virtio_transport_alloc_pkt+0x41/0x290 net/vmw_vsock/virtio_transport_common.c:51
->>     [<0000000036c2d6e6>] virtio_transport_send_pkt_info+0x105/0x1b0 net/vmw_vsock/virtio_transport_common.c:209
->>     [<00000000dd27435f>] virtio_transport_stream_enqueue+0x58/0x80 net/vmw_vsock/virtio_transport_common.c:674
->>     [<00000000d7e8274a>] vsock_stream_sendmsg+0x4f7/0x590 net/vmw_vsock/af_vsock.c:1800
->>     [<00000000d2b531e6>] sock_sendmsg_nosec net/socket.c:652 [inline]
->>     [<00000000d2b531e6>] sock_sendmsg+0x56/0x80 net/socket.c:672
->>     [<00000000803a63df>] ____sys_sendmsg+0x17a/0x390 net/socket.c:2345
->>     [<000000009d42f642>] ___sys_sendmsg+0x8b/0xd0 net/socket.c:2399
->>     [<000000000a37ed0e>] __sys_sendmmsg+0xed/0x290 net/socket.c:2489
->>     [<00000000324c1c73>] __do_sys_sendmmsg net/socket.c:2518 [inline]
->>     [<00000000324c1c73>] __se_sys_sendmmsg net/socket.c:2515 [inline]
->>     [<00000000324c1c73>] __x64_sys_sendmmsg+0x24/0x30 net/socket.c:2515
->>     [<000000004e7b2960>] do_syscall_64+0x2d/0x70 arch/x86/entry/common.c:46
->>     [<000000002615f594>] entry_SYSCALL_64_after_hwframe+0x44/0xa9
->>
->> BUG: memory leak
->> unreferenced object 0xffff88811477d180 (size 96):
->>   comm "syz-executor196", pid 8793, jiffies 4294968272 (age 26.670s)
->>   hex dump (first 32 bytes):
->>     01 00 00 00 00 00 00 00 ff ff ff ff 00 00 00 00  ................
->>     ba 34 8c fe 00 00 00 00 00 00 01 00 01 00 05 00  .4..............
->>   backtrace:
->>     [<0000000051681be3>] kmalloc include/linux/slab.h:552 [inline]
->>     [<0000000051681be3>] kzalloc include/linux/slab.h:682 [inline]
->>     [<0000000051681be3>] virtio_transport_alloc_pkt+0x41/0x290 net/vmw_vsock/virtio_transport_common.c:51
->>     [<0000000036c2d6e6>] virtio_transport_send_pkt_info+0x105/0x1b0 net/vmw_vsock/virtio_transport_common.c:209
->>     [<00000000dd27435f>] virtio_transport_stream_enqueue+0x58/0x80 net/vmw_vsock/virtio_transport_common.c:674
->>     [<00000000d7e8274a>] vsock_stream_sendmsg+0x4f7/0x590 net/vmw_vsock/af_vsock.c:1800
->>     [<00000000d2b531e6>] sock_sendmsg_nosec net/socket.c:652 [inline]
->>     [<00000000d2b531e6>] sock_sendmsg+0x56/0x80 net/socket.c:672
->>     [<00000000803a63df>] ____sys_sendmsg+0x17a/0x390 net/socket.c:2345
->>     [<000000009d42f642>] ___sys_sendmsg+0x8b/0xd0 net/socket.c:2399
->>     [<000000000a37ed0e>] __sys_sendmmsg+0xed/0x290 net/socket.c:2489
->>     [<00000000324c1c73>] __do_sys_sendmmsg net/socket.c:2518 [inline]
->>     [<00000000324c1c73>] __se_sys_sendmmsg net/socket.c:2515 [inline]
->>     [<00000000324c1c73>] __x64_sys_sendmmsg+0x24/0x30 net/socket.c:2515
->>     [<000000004e7b2960>] do_syscall_64+0x2d/0x70 arch/x86/entry/common.c:46
->>     [<000000002615f594>] entry_SYSCALL_64_after_hwframe+0x44/0xa9
->>
->> BUG: memory leak
->> unreferenced object 0xffff88811477d380 (size 96):
->>   comm "syz-executor196", pid 8793, jiffies 4294968272 (age 29.040s)
->>   hex dump (first 32 bytes):
->>     01 00 00 00 00 00 00 00 ff ff ff ff 00 00 00 00  ................
->>     ba 34 8c fe 00 00 00 00 00 00 01 00 01 00 05 00  .4..............
->>   backtrace:
->>     [<0000000051681be3>] kmalloc include/linux/slab.h:552 [inline]
->>     [<0000000051681be3>] kzalloc include/linux/slab.h:682 [inline]
->>     [<0000000051681be3>] virtio_transport_alloc_pkt+0x41/0x290 net/vmw_vsock/virtio_transport_common.c:51
->>     [<0000000036c2d6e6>] virtio_transport_send_pkt_info+0x105/0x1b0 net/vmw_vsock/virtio_transport_common.c:209
->>     [<00000000dd27435f>] virtio_transport_stream_enqueue+0x58/0x80 net/vmw_vsock/virtio_transport_common.c:674
->>     [<00000000d7e8274a>] vsock_stream_sendmsg+0x4f7/0x590 net/vmw_vsock/af_vsock.c:1800
->>     [<00000000d2b531e6>] sock_sendmsg_nosec net/socket.c:652 [inline]
->>     [<00000000d2b531e6>] sock_sendmsg+0x56/0x80 net/socket.c:672
->>     [<00000000803a63df>] ____sys_sendmsg+0x17a/0x390 net/socket.c:2345
->>     [<000000009d42f642>] ___sys_sendmsg+0x8b/0xd0 net/socket.c:2399
->>     [<000000000a37ed0e>] __sys_sendmmsg+0xed/0x290 net/socket.c:2489
->>     [<00000000324c1c73>] __do_sys_sendmmsg net/socket.c:2518 [inline]
->>     [<00000000324c1c73>] __se_sys_sendmmsg net/socket.c:2515 [inline]
->>     [<00000000324c1c73>] __x64_sys_sendmmsg+0x24/0x30 net/socket.c:2515
->>     [<000000004e7b2960>] do_syscall_64+0x2d/0x70 arch/x86/entry/common.c:46
->>     [<000000002615f594>] entry_SYSCALL_64_after_hwframe+0x44/0xa9
->>
->> BUG: memory leak
->> unreferenced object 0xffff88811477d280 (size 96):
->>   comm "syz-executor196", pid 8793, jiffies 4294968272 (age 29.040s)
->>   hex dump (first 32 bytes):
->>     01 00 00 00 00 00 00 00 ff ff ff ff 00 00 00 00  ................
->>     ba 34 8c fe 00 00 00 00 00 00 01 00 01 00 05 00  .4..............
->>   backtrace:
->>     [<0000000051681be3>] kmalloc include/linux/slab.h:552 [inline]
->>     [<0000000051681be3>] kzalloc include/linux/slab.h:682 [inline]
->>     [<0000000051681be3>] virtio_transport_alloc_pkt+0x41/0x290 net/vmw_vsock/virtio_transport_common.c:51
->>     [<0000000036c2d6e6>] virtio_transport_send_pkt_info+0x105/0x1b0 net/vmw_vsock/virtio_transport_common.c:209
->>     [<00000000dd27435f>] virtio_transport_stream_enqueue+0x58/0x80 net/vmw_vsock/virtio_transport_common.c:674
->>     [<00000000d7e8274a>] vsock_stream_sendmsg+0x4f7/0x590 net/vmw_vsock/af_vsock.c:1800
->>     [<00000000d2b531e6>] sock_sendmsg_nosec net/socket.c:652 [inline]
->>     [<00000000d2b531e6>] sock_sendmsg+0x56/0x80 net/socket.c:672
->>     [<00000000803a63df>] ____sys_sendmsg+0x17a/0x390 net/socket.c:2345
->>     [<000000009d42f642>] ___sys_sendmsg+0x8b/0xd0 net/socket.c:2399
->>     [<000000000a37ed0e>] __sys_sendmmsg+0xed/0x290 net/socket.c:2489
->>     [<00000000324c1c73>] __do_sys_sendmmsg net/socket.c:2518 [inline]
->>     [<00000000324c1c73>] __se_sys_sendmmsg net/socket.c:2515 [inline]
->>     [<00000000324c1c73>] __x64_sys_sendmmsg+0x24/0x30 net/socket.c:2515
->>     [<000000004e7b2960>] do_syscall_64+0x2d/0x70 arch/x86/entry/common.c:46
->>     [<000000002615f594>] entry_SYSCALL_64_after_hwframe+0x44/0xa9
->>
->> BUG: memory leak
->> unreferenced object 0xffff88811477d200 (size 96):
->>   comm "syz-executor196", pid 8793, jiffies 4294968272 (age 29.040s)
->>   hex dump (first 32 bytes):
->>     01 00 00 00 00 00 00 00 ff ff ff ff 00 00 00 00  ................
->>     ba 34 8c fe 00 00 00 00 00 00 01 00 01 00 05 00  .4..............
->>   backtrace:
->>     [<0000000051681be3>] kmalloc include/linux/slab.h:552 [inline]
->>     [<0000000051681be3>] kzalloc include/linux/slab.h:682 [inline]
->>     [<0000000051681be3>] virtio_transport_alloc_pkt+0x41/0x290 net/vmw_vsock/virtio_transport_common.c:51
->>     [<0000000036c2d6e6>] virtio_transport_send_pkt_info+0x105/0x1b0 net/vmw_vsock/virtio_transport_common.c:209
->>     [<00000000dd27435f>] virtio_transport_stream_enqueue+0x58/0x80 net/vmw_vsock/virtio_transport_common.c:674
->>     [<00000000d7e8274a>] vsock_stream_sendmsg+0x4f7/0x590 net/vmw_vsock/af_vsock.c:1800
->>     [<00000000d2b531e6>] sock_sendmsg_nosec net/socket.c:652 [inline]
->>     [<00000000d2b531e6>] sock_sendmsg+0x56/0x80 net/socket.c:672
->>     [<00000000803a63df>] ____sys_sendmsg+0x17a/0x390 net/socket.c:2345
->>     [<000000009d42f642>] ___sys_sendmsg+0x8b/0xd0 net/socket.c:2399
->>     [<000000000a37ed0e>] __sys_sendmmsg+0xed/0x290 net/socket.c:2489
->>     [<00000000324c1c73>] __do_sys_sendmmsg net/socket.c:2518 [inline]
->>     [<00000000324c1c73>] __se_sys_sendmmsg net/socket.c:2515 [inline]
->>     [<00000000324c1c73>] __x64_sys_sendmmsg+0x24/0x30 net/socket.c:2515
->>     [<000000004e7b2960>] do_syscall_64+0x2d/0x70 arch/x86/entry/common.c:46
->>     [<000000002615f594>] entry_SYSCALL_64_after_hwframe+0x44/0xa9
->>
->> BUG: memory leak
->> unreferenced object 0xffff88811477d180 (size 96):
->>   comm "syz-executor196", pid 8793, jiffies 4294968272 (age 29.040s)
->>   hex dump (first 32 bytes):
->>     01 00 00 00 00 00 00 00 ff ff ff ff 00 00 00 00  ................
->>     ba 34 8c fe 00 00 00 00 00 00 01 00 01 00 05 00  .4..............
->>   backtrace:
->>     [<0000000051681be3>] kmalloc include/linux/slab.h:552 [inline]
->>     [<0000000051681be3>] kzalloc include/linux/slab.h:682 [inline]
->>     [<0000000051681be3>] virtio_transport_alloc_pkt+0x41/0x290 net/vmw_vsock/virtio_transport_common.c:51
->>     [<0000000036c2d6e6>] virtio_transport_send_pkt_info+0x105/0x1b0 net/vmw_vsock/virtio_transport_common.c:209
->>     [<00000000dd27435f>] virtio_transport_stream_enqueue+0x58/0x80 net/vmw_vsock/virtio_transport_common.c:674
->>     [<00000000d7e8274a>] vsock_stream_sendmsg+0x4f7/0x590 net/vmw_vsock/af_vsock.c:1800
->>     [<00000000d2b531e6>] sock_sendmsg_nosec net/socket.c:652 [inline]
->>     [<00000000d2b531e6>] sock_sendmsg+0x56/0x80 net/socket.c:672
->>     [<00000000803a63df>] ____sys_sendmsg+0x17a/0x390 net/socket.c:2345
->>     [<000000009d42f642>] ___sys_sendmsg+0x8b/0xd0 net/socket.c:2399
->>     [<000000000a37ed0e>] __sys_sendmmsg+0xed/0x290 net/socket.c:2489
->>     [<00000000324c1c73>] __do_sys_sendmmsg net/socket.c:2518 [inline]
->>     [<00000000324c1c73>] __se_sys_sendmmsg net/socket.c:2515 [inline]
->>     [<00000000324c1c73>] __x64_sys_sendmmsg+0x24/0x30 net/socket.c:2515
->>     [<000000004e7b2960>] do_syscall_64+0x2d/0x70 arch/x86/entry/common.c:46
->>     [<000000002615f594>] entry_SYSCALL_64_after_hwframe+0x44/0xa9
->>
->> BUG: memory leak
->> unreferenced object 0xffff88811477d380 (size 96):
->>   comm "syz-executor196", pid 8793, jiffies 4294968272 (age 29.100s)
->>   hex dump (first 32 bytes):
->>     01 00 00 00 00 00 00 00 ff ff ff ff 00 00 00 00  ................
->>     ba 34 8c fe 00 00 00 00 00 00 01 00 01 00 05 00  .4..............
->>   backtrace:
->>     [<0000000051681be3>] kmalloc include/linux/slab.h:552 [inline]
->>     [<0000000051681be3>] kzalloc include/linux/slab.h:682 [inline]
->>     [<0000000051681be3>] virtio_transport_alloc_pkt+0x41/0x290 net/vmw_vsock/virtio_transport_common.c:51
->>     [<0000000036c2d6e6>] virtio_transport_send_pkt_info+0x105/0x1b0 net/vmw_vsock/virtio_transport_common.c:209
->>     [<00000000dd27435f>] virtio_transport_stream_enqueue+0x58/0x80 net/vmw_vsock/virtio_transport_common.c:674
->>     [<00000000d7e8274a>] vsock_stream_sendmsg+0x4f7/0x590 net/vmw_vsock/af_vsock.c:1800
->>     [<00000000d2b531e6>] sock_sendmsg_nosec net/socket.c:652 [inline]
->>     [<00000000d2b531e6>] sock_sendmsg+0x56/0x80 net/socket.c:672
->>     [<00000000803a63df>] ____sys_sendmsg+0x17a/0x390 net/socket.c:2345
->>     [<000000009d42f642>] ___sys_sendmsg+0x8b/0xd0 net/socket.c:2399
->>     [<000000000a37ed0e>] __sys_sendmmsg+0xed/0x290 net/socket.c:2489
->>     [<00000000324c1c73>] __do_sys_sendmmsg net/socket.c:2518 [inline]
->>     [<00000000324c1c73>] __se_sys_sendmmsg net/socket.c:2515 [inline]
->>     [<00000000324c1c73>] __x64_sys_sendmmsg+0x24/0x30 net/socket.c:2515
->>     [<000000004e7b2960>] do_syscall_64+0x2d/0x70 arch/x86/entry/common.c:46
->>     [<000000002615f594>] entry_SYSCALL_64_after_hwframe+0x44/0xa9
->>
->> BUG: memory leak
->> unreferenced object 0xffff88811477d280 (size 96):
->>   comm "syz-executor196", pid 8793, jiffies 4294968272 (age 29.100s)
->>   hex dump (first 32 bytes):
->>     01 00 00 00 00 00 00 00 ff ff ff ff 00 00 00 00  ................
->>     ba 34 8c fe 00 00 00 00 00 00 01 00 01 00 05 00  .4..............
->>   backtrace:
->>     [<0000000051681be3>] kmalloc include/linux/slab.h:552 [inline]
->>     [<0000000051681be3>] kzalloc include/linux/slab.h:682 [inline]
->>     [<0000000051681be3>] virtio_transport_alloc_pkt+0x41/0x290 net/vmw_vsock/virtio_transport_common.c:51
->>     [<0000000036c2d6e6>] virtio_transport_send_pkt_info+0x105/0x1b0 net/vmw_vsock/virtio_transport_common.c:209
->>     [<00000000dd27435f>] virtio_transport_stream_enqueue+0x58/0x80 net/vmw_vsock/virtio_transport_common.c:674
->>     [<00000000d7e8274a>] vsock_stream_sendmsg+0x4f7/0x590 net/vmw_vsock/af_vsock.c:1800
->>     [<00000000d2b531e6>] sock_sendmsg_nosec net/socket.c:652 [inline]
->>     [<00000000d2b531e6>] sock_sendmsg+0x56/0x80 net/socket.c:672
->>     [<00000000803a63df>] ____sys_sendmsg+0x17a/0x390 net/socket.c:2345
->>     [<000000009d42f642>] ___sys_sendmsg+0x8b/0xd0 net/socket.c:2399
->>     [<000000000a37ed0e>] __sys_sendmmsg+0xed/0x290 net/socket.c:2489
->>     [<00000000324c1c73>] __do_sys_sendmmsg net/socket.c:2518 [inline]
->>     [<00000000324c1c73>] __se_sys_sendmmsg net/socket.c:2515 [inline]
->>     [<00000000324c1c73>] __x64_sys_sendmmsg+0x24/0x30 net/socket.c:2515
->>     [<000000004e7b2960>] do_syscall_64+0x2d/0x70 arch/x86/entry/common.c:46
->>     [<000000002615f594>] entry_SYSCALL_64_after_hwframe+0x44/0xa9
->>
->> BUG: memory leak
->> unreferenced object 0xffff88811477d200 (size 96):
->>   comm "syz-executor196", pid 8793, jiffies 4294968272 (age 29.100s)
->>   hex dump (first 32 bytes):
->>     01 00 00 00 00 00 00 00 ff ff ff ff 00 00 00 00  ................
->>     ba 34 8c fe 00 00 00 00 00 00 01 00 01 00 05 00  .4..............
->>   backtrace:
->>     [<0000000051681be3>] kmalloc include/linux/slab.h:552 [inline]
->>     [<0000000051681be3>] kzalloc include/linux/slab.h:682 [inline]
->>     [<0000000051681be3>] virtio_transport_alloc_pkt+0x41/0x290 net/vmw_vsock/virtio_transport_common.c:51
->>     [<0000000036c2d6e6>] virtio_transport_send_pkt_info+0x105/0x1b0 net/vmw_vsock/virtio_transport_common.c:209
->>     [<00000000dd27435f>] virtio_transport_stream_enqueue+0x58/0x80 net/vmw_vsock/virtio_transport_common.c:674
->>     [<00000000d7e8274a>] vsock_stream_sendmsg+0x4f7/0x590 net/vmw_vsock/af_vsock.c:1800
->>     [<00000000d2b531e6>] sock_sendmsg_nosec net/socket.c:652 [inline]
->>     [<00000000d2b531e6>] sock_sendmsg+0x56/0x80 net/socket.c:672
->>     [<00000000803a63df>] ____sys_sendmsg+0x17a/0x390 net/socket.c:2345
->>     [<000000009d42f642>] ___sys_sendmsg+0x8b/0xd0 net/socket.c:2399
->>     [<000000000a37ed0e>] __sys_sendmmsg+0xed/0x290 net/socket.c:2489
->>     [<00000000324c1c73>] __do_sys_sendmmsg net/socket.c:2518 [inline]
->>     [<00000000324c1c73>] __se_sys_sendmmsg net/socket.c:2515 [inline]
->>     [<00000000324c1c73>] __x64_sys_sendmmsg+0x24/0x30 net/socket.c:2515
->>     [<000000004e7b2960>] do_syscall_64+0x2d/0x70 arch/x86/entry/common.c:46
->>     [<000000002615f594>] entry_SYSCALL_64_after_hwframe+0x44/0xa9
->>
->> BUG: memory leak
->> unreferenced object 0xffff88811477d180 (size 96):
->>   comm "syz-executor196", pid 8793, jiffies 4294968272 (age 29.100s)
->>   hex dump (first 32 bytes):
->>     01 00 00 00 00 00 00 00 ff ff ff ff 00 00 00 00  ................
->>     ba 34 8c fe 00 00 00 00 00 00 01 00 01 00 05 00  .4..............
->>   backtrace:
->>     [<0000000051681be3>] kmalloc include/linux/slab.h:552 [inline]
->>     [<0000000051681be3>] kzalloc include/linux/slab.h:682 [inline]
->>     [<0000000051681be3>] virtio_transport_alloc_pkt+0x41/0x290 net/vmw_vsock/virtio_transport_common.c:51
->>     [<0000000036c2d6e6>] virtio_transport_send_pkt_info+0x105/0x1b0 net/vmw_vsock/virtio_transport_common.c:209
->>     [<00000000dd27435f>] virtio_transport_stream_enqueue+0x58/0x80 net/vmw_vsock/virtio_transport_common.c:674
->>     [<00000000d7e8274a>] vsock_stream_sendmsg+0x4f7/0x590 net/vmw_vsock/af_vsock.c:1800
->>     [<00000000d2b531e6>] sock_sendmsg_nosec net/socket.c:652 [inline]
->>     [<00000000d2b531e6>] sock_sendmsg+0x56/0x80 net/socket.c:672
->>     [<00000000803a63df>] ____sys_sendmsg+0x17a/0x390 net/socket.c:2345
->>     [<000000009d42f642>] ___sys_sendmsg+0x8b/0xd0 net/socket.c:2399
->>     [<000000000a37ed0e>] __sys_sendmmsg+0xed/0x290 net/socket.c:2489
->>     [<00000000324c1c73>] __do_sys_sendmmsg net/socket.c:2518 [inline]
->>     [<00000000324c1c73>] __se_sys_sendmmsg net/socket.c:2515 [inline]
->>     [<00000000324c1c73>] __x64_sys_sendmmsg+0x24/0x30 net/socket.c:2515
->>     [<000000004e7b2960>] do_syscall_64+0x2d/0x70 arch/x86/entry/common.c:46
->>     [<000000002615f594>] entry_SYSCALL_64_after_hwframe+0x44/0xa9
->>
->> BUG: memory leak
->> unreferenced object 0xffff88811477d380 (size 96):
->>   comm "syz-executor196", pid 8793, jiffies 4294968272 (age 29.160s)
->>   hex dump (first 32 bytes):
->>     01 00 00 00 00 00 00 00 ff ff ff ff 00 00 00 00  ................
->>     ba 34 8c fe 00 00 00 00 00 00 01 00 01 00 05 00  .4..............
->>   backtrace:
->>     [<0000000051681be3>] kmalloc include/linux/slab.h:552 [inline]
->>     [<0000000051681be3>] kzalloc include/linux/slab.h:682 [inline]
->>     [<0000000051681be3>] virtio_transport_alloc_pkt+0x41/0x290 net/vmw_vsock/virtio_transport_common.c:51
->>     [<0000000036c2d6e6>] virtio_transport_send_pkt_info+0x105/0x1b0 net/vmw_vsock/virtio_transport_common.c:209
->>     [<00000000dd27435f>] virtio_transport_stream_enqueue+0x58/0x80 net/vmw_vsock/virtio_transport_common.c:674
->>     [<00000000d7e8274a>] vsock_stream_sendmsg+0x4f7/0x590 net/vmw_vsock/af_vsock.c:1800
->>     [<00000000d2b531e6>] sock_sendmsg_nosec net/socket.c:652 [inline]
->>     [<00000000d2b531e6>] sock_sendmsg+0x56/0x80 net/socket.c:672
->>     [<00000000803a63df>] ____sys_sendmsg+0x17a/0x390 net/socket.c:2345
->>     [<000000009d42f642>] ___sys_sendmsg+0x8b/0xd0 net/socket.c:2399
->>     [<000000000a37ed0e>] __sys_sendmmsg+0xed/0x290 net/socket.c:2489
->>     [<00000000324c1c73>] __do_sys_sendmmsg net/socket.c:2518 [inline]
->>     [<00000000324c1c73>] __se_sys_sendmmsg net/socket.c:2515 [inline]
->>     [<00000000324c1c73>] __x64_sys_sendmmsg+0x24/0x30 net/socket.c:2515
->>     [<000000004e7b2960>] do_syscall_64+0x2d/0x70 arch/x86/entry/common.c:46
->>     [<000000002615f594>] entry_SYSCALL_64_after_hwframe+0x44/0xa9
->>
->> BUG: memory leak
->> unreferenced object 0xffff88811477d280 (size 96):
->>   comm "syz-executor196", pid 8793, jiffies 4294968272 (age 29.160s)
->>   hex dump (first 32 bytes):
->>     01 00 00 00 00 00 00 00 ff ff ff ff 00 00 00 00  ................
->>     ba 34 8c fe 00 00 00 00 00 00 01 00 01 00 05 00  .4..............
->>   backtrace:
->>     [<0000000051681be3>] kmalloc include/linux/slab.h:552 [inline]
->>     [<0000000051681be3>] kzalloc include/linux/slab.h:682 [inline]
->>     [<0000000051681be3>] virtio_transport_alloc_pkt+0x41/0x290 net/vmw_vsock/virtio_transport_common.c:51
->>     [<0000000036c2d6e6>] virtio_transport_send_pkt_info+0x105/0x1b0 net/vmw_vsock/virtio_transport_common.c:209
->>     [<00000000dd27435f>] virtio_transport_stream_enqueue+0x58/0x80 net/vmw_vsock/virtio_transport_common.c:674
->>     [<00000000d7e8274a>] vsock_stream_sendmsg+0x4f7/0x590 net/vmw_vsock/af_vsock.c:1800
->>     [<00000000d2b531e6>] sock_sendmsg_nosec net/socket.c:652 [inline]
->>     [<00000000d2b531e6>] sock_sendmsg+0x56/0x80 net/socket.c:672
->>     [<00000000803a63df>] ____sys_sendmsg+0x17a/0x390 net/socket.c:2345
->>     [<000000009d42f642>] ___sys_sendmsg+0x8b/0xd0 net/socket.c:2399
->>     [<000000000a37ed0e>] __sys_sendmmsg+0xed/0x290 net/socket.c:2489
->>     [<00000000324c1c73>] __do_sys_sendmmsg net/socket.c:2518 [inline]
->>     [<00000000324c1c73>] __se_sys_sendmmsg net/socket.c:2515 [inline]
->>     [<00000000324c1c73>] __x64_sys_sendmmsg+0x24/0x30 net/socket.c:2515
->>     [<000000004e7b2960>] do_syscall_64+0x2d/0x70 arch/x86/entry/common.c:46
->>     [<000000002615f594>] entry_SYSCALL_64_after_hwframe+0x44/0xa9
->>
->> BUG: memory leak
->> unreferenced object 0xffff88811477d200 (size 96):
->>   comm "syz-executor196", pid 8793, jiffies 4294968272 (age 29.160s)
->>   hex dump (first 32 bytes):
->>     01 00 00 00 00 00 00 00 ff ff ff ff 00 00 00 00  ................
->>     ba 34 8c fe 00 00 00 00 00 00 01 00 01 00 05 00  .4..............
->>   backtrace:
->>     [<0000000051681be3>] kmalloc include/linux/slab.h:552 [inline]
->>     [<0000000051681be3>] kzalloc include/linux/slab.h:682 [inline]
->>     [<0000000051681be3>] virtio_transport_alloc_pkt+0x41/0x290 net/vmw_vsock/virtio_transport_common.c:51
->>     [<0000000036c2d6e6>] virtio_transport_send_pkt_info+0x105/0x1b0 net/vmw_vsock/virtio_transport_common.c:209
->>     [<00000000dd27435f>] virtio_transport_stream_enqueue+0x58/0x80 net/vmw_vsock/virtio_transport_common.c:674
->>     [<00000000d7e8274a>] vsock_stream_sendmsg+0x4f7/0x590 net/vmw_vsock/af_vsock.c:1800
->>     [<00000000d2b531e6>] sock_sendmsg_nosec net/socket.c:652 [inline]
->>     [<00000000d2b531e6>] sock_sendmsg+0x56/0x80 net/socket.c:672
->>     [<00000000803a63df>] ____sys_sendmsg+0x17a/0x390 net/socket.c:2345
->>     [<000000009d42f642>] ___sys_sendmsg+0x8b/0xd0 net/socket.c:2399
->>     [<000000000a37ed0e>] __sys_sendmmsg+0xed/0x290 net/socket.c:2489
->>     [<00000000324c1c73>] __do_sys_sendmmsg net/socket.c:2518 [inline]
->>     [<00000000324c1c73>] __se_sys_sendmmsg net/socket.c:2515 [inline]
->>     [<00000000324c1c73>] __x64_sys_sendmmsg+0x24/0x30 net/socket.c:2515
->>     [<000000004e7b2960>] do_syscall_64+0x2d/0x70 arch/x86/entry/common.c:46
->>     [<000000002615f594>] entry_SYSCALL_64_after_hwframe+0x44/0xa9
->>
->> BUG: memory leak
->> unreferenced object 0xffff88811477d180 (size 96):
->>   comm "syz-executor196", pid 8793, jiffies 4294968272 (age 29.160s)
->>   hex dump (first 32 bytes):
->>     01 00 00 00 00 00 00 00 ff ff ff ff 00 00 00 00  ................
->>     ba 34 8c fe 00 00 00 00 00 00 01 00 01 00 05 00  .4..............
->>   backtrace:
->>     [<0000000051681be3>] kmalloc include/linux/slab.h:552 [inline]
->>     [<0000000051681be3>] kzalloc include/linux/slab.h:682 [inline]
->>     [<0000000051681be3>] virtio_transport_alloc_pkt+0x41/0x290 net/vmw_vsock/virtio_transport_common.c:51
->>     [<0000000036c2d6e6>] virtio_transport_send_pkt_info+0x105/0x1b0 net/vmw_vsock/virtio_transport_common.c:209
->>     [<00000000dd27435f>] virtio_transport_stream_enqueue+0x58/0x80 net/vmw_vsock/virtio_transport_common.c:674
->>     [<00000000d7e8274a>] vsock_stream_sendmsg+0x4f7/0x590 net/vmw_vsock/af_vsock.c:1800
->>     [<00000000d2b531e6>] sock_sendmsg_nosec net/socket.c:652 [inline]
->>     [<00000000d2b531e6>] sock_sendmsg+0x56/0x80 net/socket.c:672
->>     [<00000000803a63df>] ____sys_sendmsg+0x17a/0x390 net/socket.c:2345
->>     [<000000009d42f642>] ___sys_sendmsg+0x8b/0xd0 net/socket.c:2399
->>     [<000000000a37ed0e>] __sys_sendmmsg+0xed/0x290 net/socket.c:2489
->>     [<00000000324c1c73>] __do_sys_sendmmsg net/socket.c:2518 [inline]
->>     [<00000000324c1c73>] __se_sys_sendmmsg net/socket.c:2515 [inline]
->>     [<00000000324c1c73>] __x64_sys_sendmmsg+0x24/0x30 net/socket.c:2515
->>     [<000000004e7b2960>] do_syscall_64+0x2d/0x70 arch/x86/entry/common.c:46
->>     [<000000002615f594>] entry_SYSCALL_64_after_hwframe+0x44/0xa9
->>
->> BUG: memory leak
->> unreferenced object 0xffff88811477d380 (size 96):
->>   comm "syz-executor196", pid 8793, jiffies 4294968272 (age 29.230s)
->>   hex dump (first 32 bytes):
->>     01 00 00 00 00 00 00 00 ff ff ff ff 00 00 00 00  ................
->>     ba 34 8c fe 00 00 00 00 00 00 01 00 01 00 05 00  .4..............
->>   backtrace:
->>     [<0000000051681be3>] kmalloc include/linux/slab.h:552 [inline]
->>     [<0000000051681be3>] kzalloc include/linux/slab.h:682 [inline]
->>     [<0000000051681be3>] virtio_transport_alloc_pkt+0x41/0x290 net/vmw_vsock/virtio_transport_common.c:51
->>     [<0000000036c2d6e6>] virtio_transport_send_pkt_info+0x105/0x1b0 net/vmw_vsock/virtio_transport_common.c:209
->>     [<00000000dd27435f>] virtio_transport_stream_enqueue+0x58/0x80 net/vmw_vsock/virtio_transport_common.c:674
->>     [<00000000d7e8274a>] vsock_stream_sendmsg+0x4f7/0x590 net/vmw_vsock/af_vsock.c:1800
->>     [<00000000d2b531e6>] sock_sendmsg_nosec net/socket.c:652 [inline]
->>     [<00000000d2b531e6>] sock_sendmsg+0x56/0x80 net/socket.c:672
->>     [<00000000803a63df>] ____sys_sendmsg+0x17a/0x390 net/socket.c:2345
->>     [<000000009d42f642>] ___sys_sendmsg+0x8b/0xd0 net/socket.c:2399
->>     [<000000000a37ed0e>] __sys_sendmmsg+0xed/0x290 net/socket.c:2489
->>     [<00000000324c1c73>] __do_sys_sendmmsg net/socket.c:2518 [inline]
->>     [<00000000324c1c73>] __se_sys_sendmmsg net/socket.c:2515 [inline]
->>     [<00000000324c1c73>] __x64_sys_sendmmsg+0x24/0x30 net/socket.c:2515
->>     [<000000004e7b2960>] do_syscall_64+0x2d/0x70 arch/x86/entry/common.c:46
->>     [<000000002615f594>] entry_SYSCALL_64_after_hwframe+0x44/0xa9
->>
->> BUG: memory leak
->> unreferenced object 0xffff88811477d280 (size 96):
->>   comm "syz-executor196", pid 8793, jiffies 4294968272 (age 29.230s)
->>   hex dump (first 32 bytes):
->>     01 00 00 00 00 00 00 00 ff ff ff ff 00 00 00 00  ................
->>     ba 34 8c fe 00 00 00 00 00 00 01 00 01 00 05 00  .4..............
->>   backtrace:
->>     [<0000000051681be3>] kmalloc include/linux/slab.h:552 [inline]
->>     [<0000000051681be3>] kzalloc include/linux/slab.h:682 [inline]
->>     [<0000000051681be3>] virtio_transport_alloc_pkt+0x41/0x290 net/vmw_vsock/virtio_transport_common.c:51
->>     [<0000000036c2d6e6>] virtio_transport_send_pkt_info+0x105/0x1b0 net/vmw_vsock/virtio_transport_common.c:209
->>     [<00000000dd27435f>] virtio_transport_stream_enqueue+0x58/0x80 net/vmw_vsock/virtio_transport_common.c:674
->>     [<00000000d7e8274a>] vsock_stream_sendmsg+0x4f7/0x590 net/vmw_vsock/af_vsock.c:1800
->>     [<00000000d2b531e6>] sock_sendmsg_nosec net/socket.c:652 [inline]
->>     [<00000000d2b531e6>] sock_sendmsg+0x56/0x80 net/socket.c:672
->>     [<00000000803a63df>] ____sys_sendmsg+0x17a/0x390 net/socket.c:2345
->>     [<000000009d42f642>] ___sys_sendmsg+0x8b/0xd0 net/socket.c:2399
->>     [<000000000a37ed0e>] __sys_sendmmsg+0xed/0x290 net/socket.c:2489
->>     [<00000000324c1c73>] __do_sys_sendmmsg net/socket.c:2518 [inline]
->>     [<00000000324c1c73>] __se_sys_sendmmsg net/socket.c:2515 [inline]
->>     [<00000000324c1c73>] __x64_sys_sendmmsg+0x24/0x30 net/socket.c:2515
->>     [<000000004e7b2960>] do_syscall_64+0x2d/0x70 arch/x86/entry/common.c:46
->>     [<000000002615f594>] entry_SYSCALL_64_after_hwframe+0x44/0xa9
->>
->> BUG: memory leak
->> unreferenced object 0xffff88811477d200 (size 96):
->>   comm "syz-executor196", pid 8793, jiffies 4294968272 (age 29.230s)
->>   hex dump (first 32 bytes):
->>     01 00 00 00 00 00 00 00 ff ff ff ff 00 00 00 00  ................
->>     ba 34 8c fe 00 00 00 00 00 00 01 00 01 00 05 00  .4..............
->>   backtrace:
->>     [<0000000051681be3>] kmalloc include/linux/slab.h:552 [inline]
->>     [<0000000051681be3>] kzalloc include/linux/slab.h:682 [inline]
->>     [<0000000051681be3>] virtio_transport_alloc_pkt+0x41/0x290 net/vmw_vsock/virtio_transport_common.c:51
->>     [<0000000036c2d6e6>] virtio_transport_send_pkt_info+0x105/0x1b0 net/vmw_vsock/virtio_transport_common.c:209
->>     [<00000000dd27435f>] virtio_transport_stream_enqueue+0x58/0x80 net/vmw_vsock/virtio_transport_common.c:674
->>     [<00000000d7e8274a>] vsock_stream_sendmsg+0x4f7/0x590 net/vmw_vsock/af_vsock.c:1800
->>     [<00000000d2b531e6>] sock_sendmsg_nosec net/socket.c:652 [inline]
->>     [<00000000d2b531e6>] sock_sendmsg+0x56/0x80 net/socket.c:672
->>     [<00000000803a63df>] ____sys_sendmsg+0x17a/0x390 net/socket.c:2345
->>     [<000000009d42f642>] ___sys_sendmsg+0x8b/0xd0 net/socket.c:2399
->>     [<000000000a37ed0e>] __sys_sendmmsg+0xed/0x290 net/socket.c:2489
->>     [<00000000324c1c73>] __do_sys_sendmmsg net/socket.c:2518 [inline]
->>     [<00000000324c1c73>] __se_sys_sendmmsg net/socket.c:2515 [inline]
->>     [<00000000324c1c73>] __x64_sys_sendmmsg+0x24/0x30 net/socket.c:2515
->>     [<000000004e7b2960>] do_syscall_64+0x2d/0x70 arch/x86/entry/common.c:46
->>     [<000000002615f594>] entry_SYSCALL_64_after_hwframe+0x44/0xa9
->>
->> BUG: memory leak
->> unreferenced object 0xffff88811477d180 (size 96):
->>   comm "syz-executor196", pid 8793, jiffies 4294968272 (age 29.230s)
->>   hex dump (first 32 bytes):
->>     01 00 00 00 00 00 00 00 ff ff ff ff 00 00 00 00  ................
->>     ba 34 8c fe 00 00 00 00 00 00 01 00 01 00 05 00  .4..............
->>   backtrace:
->>     [<0000000051681be3>] kmalloc include/linux/slab.h:552 [inline]
->>     [<0000000051681be3>] kzalloc include/linux/slab.h:682 [inline]
->>     [<0000000051681be3>] virtio_transport_alloc_pkt+0x41/0x290 net/vmw_vsock/virtio_transport_common.c:51
->>     [<0000000036c2d6e6>] virtio_transport_send_pkt_info+0x105/0x1b0 net/vmw_vsock/virtio_transport_common.c:209
->>     [<00000000dd27435f>] virtio_transport_stream_enqueue+0x58/0x80 net/vmw_vsock/virtio_transport_common.c:674
->>     [<00000000d7e8274a>] vsock_stream_sendmsg+0x4f7/0x590 net/vmw_vsock/af_vsock.c:1800
->>     [<00000000d2b531e6>] sock_sendmsg_nosec net/socket.c:652 [inline]
->>     [<00000000d2b531e6>] sock_sendmsg+0x56/0x80 net/socket.c:672
->>     [<00000000803a63df>] ____sys_sendmsg+0x17a/0x390 net/socket.c:2345
->>     [<000000009d42f642>] ___sys_sendmsg+0x8b/0xd0 net/socket.c:2399
->>     [<000000000a37ed0e>] __sys_sendmmsg+0xed/0x290 net/socket.c:2489
->>     [<00000000324c1c73>] __do_sys_sendmmsg net/socket.c:2518 [inline]
->>     [<00000000324c1c73>] __se_sys_sendmmsg net/socket.c:2515 [inline]
->>     [<00000000324c1c73>] __x64_sys_sendmmsg+0x24/0x30 net/socket.c:2515
->>     [<000000004e7b2960>] do_syscall_64+0x2d/0x70 arch/x86/entry/common.c:46
->>     [<000000002615f594>] entry_SYSCALL_64_after_hwframe+0x44/0xa9
->>
->> BUG: memory leak
->> unreferenced object 0xffff88811477d380 (size 96):
->>   comm "syz-executor196", pid 8793, jiffies 4294968272 (age 29.290s)
->>   hex dump (first 32 bytes):
->>     01 00 00 00 00 00 00 00 ff ff ff ff 00 00 00 00  ................
->>     ba 34 8c fe 00 00 00 00 00 00 01 00 01 00 05 00  .4..............
->>   backtrace:
->>     [<0000000051681be3>] kmalloc include/linux/slab.h:552 [inline]
->>     [<0000000051681be3>] kzalloc include/linux/slab.h:682 [inline]
->>     [<0000000051681be3>] virtio_transport_alloc_pkt+0x41/0x290 net/vmw_vsock/virtio_transport_common.c:51
->>     [<0000000036c2d6e6>] virtio_transport_send_pkt_info+0x105/0x1b0 net/vmw_vsock/virtio_transport_common.c:209
->>     [<00000000dd27435f>] virtio_transport_stream_enqueue+0x58/0x80 net/vmw_vsock/virtio_transport_common.c:674
->>     [<00000000d7e8274a>] vsock_stream_sendmsg+0x4f7/0x590 net/vmw_vsock/af_vsock.c:1800
->>     [<00000000d2b531e6>] sock_sendmsg_nosec net/socket.c:652 [inline]
->>     [<00000000d2b531e6>] sock_sendmsg+0x56/0x80 net/socket.c:672
->>     [<00000000803a63df>] ____sys_sendmsg+0x17a/0x390 net/socket.c:2345
->>     [<000000009d42f642>] ___sys_sendmsg+0x8b/0xd0 net/socket.c:2399
->>     [<000000000a37ed0e>] __sys_sendmmsg+0xed/0x290 net/socket.c:2489
->>     [<00000000324c1c73>] __do_sys_sendmmsg net/socket.c:2518 [inline]
->>     [<00000000324c1c73>] __se_sys_sendmmsg net/socket.c:2515 [inline]
->>     [<00000000324c1c73>] __x64_sys_sendmmsg+0x24/0x30 net/socket.c:2515
->>     [<000000004e7b2960>] do_syscall_64+0x2d/0x70 arch/x86/entry/common.c:46
->>     [<000000002615f594>] entry_SYSCALL_64_after_hwframe+0x44/0xa9
->>
->> BUG: memory leak
->> unreferenced object 0xffff88811477d280 (size 96):
->>   comm "syz-executor196", pid 8793, jiffies 4294968272 (age 29.290s)
->>   hex dump (first 32 bytes):
->>     01 00 00 00 00 00 00 00 ff ff ff ff 00 00 00 00  ................
->>     ba 34 8c fe 00 00 00 00 00 00 01 00 01 00 05 00  .4..............
->>   backtrace:
->>     [<0000000051681be3>] kmalloc include/linux/slab.h:552 [inline]
->>     [<0000000051681be3>] kzalloc include/linux/slab.h:682 [inline]
->>     [<0000000051681be3>] virtio_transport_alloc_pkt+0x41/0x290 net/vmw_vsock/virtio_transport_common.c:51
->>     [<0000000036c2d6e6>] virtio_transport_send_pkt_info+0x105/0x1b0 net/vmw_vsock/virtio_transport_common.c:209
->>     [<00000000dd27435f>] virtio_transport_stream_enqueue+0x58/0x80 net/vmw_vsock/virtio_transport_common.c:674
->>     [<00000000d7e8274a>] vsock_stream_sendmsg+0x4f7/0x590 net/vmw_vsock/af_vsock.c:1800
->>     [<00000000d2b531e6>] sock_sendmsg_nosec net/socket.c:652 [inline]
->>     [<00000000d2b531e6>] sock_sendmsg+0x56/0x80 net/socket.c:672
->>     [<00000000803a63df>] ____sys_sendmsg+0x17a/0x390 net/socket.c:2345
->>     [<000000009d42f642>] ___sys_sendmsg+0x8b/0xd0 net/socket.c:2399
->>     [<000000000a37ed0e>] __sys_sendmmsg+0xed/0x290 net/socket.c:2489
->>     [<00000000324c1c73>] __do_sys_sendmmsg net/socket.c:2518 [inline]
->>     [<00000000324c1c73>] __se_sys_sendmmsg net/socket.c:2515 [inline]
->>     [<00000000324c1c73>] __x64_sys_sendmmsg+0x24/0x30 net/socket.c:2515
->>     [<000000004e7b2960>] do_syscall_64+0x2d/0x70 arch/x86/entry/common.c:46
->>     [<000000002615f594>] entry_SYSCALL_64_after_hwframe+0x44/0xa9
->>
->> BUG: memory leak
->> unreferenced object 0xffff88811477d200 (size 96):
->>   comm "syz-executor196", pid 8793, jiffies 4294968272 (age 29.290s)
->>   hex dump (first 32 bytes):
->>     01 00 00 00 00 00 00 00 ff ff ff ff 00 00 00 00  ................
->>     ba 34 8c fe 00 00 00 00 00 00 01 00 01 00 05 00  .4..............
->>   backtrace:
->>     [<0000000051681be3>] kmalloc include/linux/slab.h:552 [inline]
->>     [<0000000051681be3>] kzalloc include/linux/slab.h:682 [inline]
->>     [<0000000051681be3>] virtio_transport_alloc_pkt+0x41/0x290 net/vmw_vsock/virtio_transport_common.c:51
->>     [<0000000036c2d6e6>] virtio_transport_send_pkt_info+0x105/0x1b0 net/vmw_vsock/virtio_transport_common.c:209
->>     [<00000000dd27435f>] virtio_transport_stream_enqueue+0x58/0x80 net/vmw_vsock/virtio_transport_common.c:674
->>     [<00000000d7e8274a>] vsock_stream_sendmsg+0x4f7/0x590 net/vmw_vsock/af_vsock.c:1800
->>     [<00000000d2b531e6>] sock_sendmsg_nosec net/socket.c:652 [inline]
->>     [<00000000d2b531e6>] sock_sendmsg+0x56/0x80 net/socket.c:672
->>     [<00000000803a63df>] ____sys_sendmsg+0x17a/0x390 net/socket.c:2345
->>     [<000000009d42f642>] ___sys_sendmsg+0x8b/0xd0 net/socket.c:2399
->>     [<000000000a37ed0e>] __sys_sendmmsg+0xed/0x290 net/socket.c:2489
->>     [<00000000324c1c73>] __do_sys_sendmmsg net/socket.c:2518 [inline]
->>     [<00000000324c1c73>] __se_sys_sendmmsg net/socket.c:2515 [inline]
->>     [<00000000324c1c73>] __x64_sys_sendmmsg+0x24/0x30 net/socket.c:2515
->>     [<000000004e7b2960>] do_syscall_64+0x2d/0x70 arch/x86/entry/common.c:46
->>     [<000000002615f594>] entry_SYSCALL_64_after_hwframe+0x44/0xa9
->>
->> BUG: memory leak
->> unreferenced object 0xffff88811477d180 (size 96):
->>   comm "syz-executor196", pid 8793, jiffies 4294968272 (age 29.290s)
->>   hex dump (first 32 bytes):
->>     01 00 00 00 00 00 00 00 ff ff ff ff 00 00 00 00  ................
->>     ba 34 8c fe 00 00 00 00 00 00 01 00 01 00 05 00  .4..............
->>   backtrace:
->>     [<0000000051681be3>] kmalloc include/linux/slab.h:552 [inline]
->>     [<0000000051681be3>] kzalloc include/linux/slab.h:682 [inline]
->>     [<0000000051681be3>] virtio_transport_alloc_pkt+0x41/0x290 net/vmw_vsock/virtio_transport_common.c:51
->>     [<0000000036c2d6e6>] virtio_transport_send_pkt_info+0x105/0x1b0 net/vmw_vsock/virtio_transport_common.c:209
->>     [<00000000dd27435f>] virtio_transport_stream_enqueue+0x58/0x80 net/vmw_vsock/virtio_transport_common.c:674
->>     [<00000000d7e8274a>] vsock_stream_sendmsg+0x4f7/0x590 net/vmw_vsock/af_vsock.c:1800
->>     [<00000000d2b531e6>] sock_sendmsg_nosec net/socket.c:652 [inline]
->>     [<00000000d2b531e6>] sock_sendmsg+0x56/0x80 net/socket.c:672
->>     [<00000000803a63df>] ____sys_sendmsg+0x17a/0x390 net/socket.c:2345
->>     [<000000009d42f642>] ___sys_sendmsg+0x8b/0xd0 net/socket.c:2399
->>     [<000000000a37ed0e>] __sys_sendmmsg+0xed/0x290 net/socket.c:2489
->>     [<00000000324c1c73>] __do_sys_sendmmsg net/socket.c:2518 [inline]
->>     [<00000000324c1c73>] __se_sys_sendmmsg net/socket.c:2515 [inline]
->>     [<00000000324c1c73>] __x64_sys_sendmmsg+0x24/0x30 net/socket.c:2515
->>     [<000000004e7b2960>] do_syscall_64+0x2d/0x70 arch/x86/entry/common.c:46
->>     [<000000002615f594>] entry_SYSCALL_64_after_hwframe+0x44/0xa9
->>
->> executing program
->> executing program
->>
->>
->> ---
->> This report is generated by a bot. It may contain errors.
->> See https://goo.gl/tpsmEJ for more information about syzbot.
->> syzbot engineers can be reached at syzkaller@googlegroups.com.
->>
->> syzbot will keep track of this issue. See:
->> https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
->> syzbot can test patches for this issue, for details see:
->> https://goo.gl/tpsmEJ#testing-patches
->>
-
+Paolo
 
