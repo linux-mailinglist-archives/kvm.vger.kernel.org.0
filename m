@@ -2,209 +2,153 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B35DF34FAE3
-	for <lists+kvm@lfdr.de>; Wed, 31 Mar 2021 09:57:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 42F8D34FAEB
+	for <lists+kvm@lfdr.de>; Wed, 31 Mar 2021 09:58:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233838AbhCaH5G (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 31 Mar 2021 03:57:06 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:45033 "EHLO
+        id S234127AbhCaH5k (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 31 Mar 2021 03:57:40 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:54631 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234039AbhCaH4v (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 31 Mar 2021 03:56:51 -0400
+        by vger.kernel.org with ESMTP id S234188AbhCaH5Y (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 31 Mar 2021 03:57:24 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1617177410;
+        s=mimecast20190719; t=1617177444;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=qTxlbCttfevuY4Yr7YqkiF6Z72PQYaAdmOgBQY9mW7c=;
-        b=PFpsKqUCpqHTMzg/RLSVlfOc3BLfSyt2Y3efJNXFxSINcLECB0PMAdJMaMtPMdpeDtlDxc
-        aGdb+P/qafq/d8nEwoKDsTAIWO+LKnstKaE6j6pxZHKLDje5kyjQwsPEsmE/EJV33Ttca+
-        Ux+c3XUkrZZj2GB6RI0EqgqlySa7pY0=
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
- [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-3-hrH6SCMhPn-Hrh4zJqAEpA-1; Wed, 31 Mar 2021 03:56:48 -0400
-X-MC-Unique: hrH6SCMhPn-Hrh4zJqAEpA-1
-Received: by mail-ed1-f70.google.com with SMTP id q25so662778eds.16
-        for <kvm@vger.kernel.org>; Wed, 31 Mar 2021 00:56:48 -0700 (PDT)
+        bh=QzUhMnMU3zQi7kbLUex8emke2jBdKMAGI8Tet8F4dtw=;
+        b=PICz9S+uBtGk/mte47jDU1AGrkdflPKcD5bU88EEagj46Oqn1uIHDo/bIGCl0/x62ltz4e
+        NzPRIUwYEUu16rBRMCTz5vVNLPe0CGgBV1F7pjtpj10uBlurF3ClfpS7Il8yt2yAXV0gqB
+        PjSHJgEzf/9ugPVOYl1jllwv0YcX9co=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-259-csWZemZ-Md-AGrIj2M3Ekg-1; Wed, 31 Mar 2021 03:57:22 -0400
+X-MC-Unique: csWZemZ-Md-AGrIj2M3Ekg-1
+Received: by mail-wm1-f70.google.com with SMTP id f77so128535wmf.7
+        for <kvm@vger.kernel.org>; Wed, 31 Mar 2021 00:57:22 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=qTxlbCttfevuY4Yr7YqkiF6Z72PQYaAdmOgBQY9mW7c=;
-        b=T+pXszC0QcydJWgOiEFC6w7Ipxw3fWO6i4dEKENczEm+Q1dRdXk7t3zVKb2Eoigb6/
-         mtg6zfQeRwzROL2HnHE9Z7GcP6bkQEa48w+SGz5wyiLW2UfCWzPcxHKDZPD7RuIgnKQN
-         rXiH3d8JNBVkvHdTc6z9iqsvfAMl/qUsFub5h5ZDIdyLJVdOVvNAu//Ery+pGVHOAr+0
-         7GoKx18Fbv+PSzKhDseU66JdLqJ78p9h2fFYuoK9dmzAn9fLrgHAdL8WdQLIRcSTOaUx
-         cc1lWqqgD04rznITy/bCKXjA9sqgbCVblcNoRxLPhGz6ox1861nYr3tOmcvVZqOnhTaM
-         xtCg==
-X-Gm-Message-State: AOAM531e3gvpgs87aSGH5MtQh8wsNFxugf0bR64xzMvotzlESxjsF08F
-        jGxJnowtx/MDVIN4BtlywZvGZ9RGVriAWAS2NwnXFQfdYGOusPwdl20TRCKWkEffdBzRsMNbo/b
-        0/nzyYNtXk0Yw
-X-Received: by 2002:a17:906:5acd:: with SMTP id x13mr2131018ejs.211.1617177407678;
-        Wed, 31 Mar 2021 00:56:47 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyFxYg86aXW6gt6mF+7enQi7KHzpNTvnxSHMsXQA0W96uafrJeZq+ZXQBRq2t4vfe7cU2hWCg==
-X-Received: by 2002:a17:906:5acd:: with SMTP id x13mr2131005ejs.211.1617177407440;
-        Wed, 31 Mar 2021 00:56:47 -0700 (PDT)
-Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id lk12sm665521ejb.14.2021.03.31.00.56.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 31 Mar 2021 00:56:46 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Emanuele Giuseppe Esposito <eesposit@redhat.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=QzUhMnMU3zQi7kbLUex8emke2jBdKMAGI8Tet8F4dtw=;
+        b=jqvQfCX7JzOYq16luEH8++5VCwwbQk6qHKbRlQSlnVwn4gii39aa1DMu+gbVMGdsXH
+         8Em0KzeShhKwBjNrvgrjVGv2xxXZM2guWaj8RfX6nEaQ+/7Zoiq8SPCryU7N/BzGbiXP
+         hUXaDOuNHCi9PgsqjgjCc5ztJIE1K5jJD/xBsFa8tKXBY29zx+AJE4MyvolBaYH959dE
+         /7KvIJKYvzyfaUbtm/XXXIpMQOx//zdNgEkSNMoSKgUnGNgpAPFxpd5ScCnCBxjioXA3
+         58up2RUk85ZFfUnV/YzeWhuzw3CACSLrT/O94TBCh0OF7HJvYt6YVGWJSvbza4jUkD2A
+         6ZTg==
+X-Gm-Message-State: AOAM530VAlj327SCcK8Oi27XYj7z65PNDDFRZ/c3xO5tMSm/npp4XUbf
+        kLQJjbMOddQvhtIGJyd/s28MKDAOnIvNBleI6oNiAPWuArzmdKhE7OiwCTKwYt/fbs4XC7CMxyM
+        WxHluYjSCk5vl
+X-Received: by 2002:a05:600c:190a:: with SMTP id j10mr1935787wmq.140.1617177441043;
+        Wed, 31 Mar 2021 00:57:21 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyg+EcdGfruRX3HrpM78c15MOqjXD+Pq6QPq9lrCE+nNtYrHVJVg0glnjf7PSn4UemOs7R8Kw==
+X-Received: by 2002:a05:600c:190a:: with SMTP id j10mr1935760wmq.140.1617177440807;
+        Wed, 31 Mar 2021 00:57:20 -0700 (PDT)
+Received: from [192.168.10.118] ([93.56.169.140])
+        by smtp.gmail.com with ESMTPSA id b65sm2631515wmh.4.2021.03.31.00.57.18
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 31 Mar 2021 00:57:19 -0700 (PDT)
+Subject: Re: [PATCH 00/18] KVM: Consolidate and optimize MMU notifiers
+To:     Sean Christopherson <seanjc@google.com>,
+        Marc Zyngier <maz@kernel.org>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Paul Mackerras <paulus@ozlabs.org>
+Cc:     James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>, Shuah Khan <shuah@kernel.org>,
-        Alexander Graf <graf@amazon.com>,
-        Andrew Jones <drjones@redhat.com>, linux-doc@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        Sean Christopherson <seanjc@google.com>
-Subject: Re: [PATCH 1/4] kvm: cpuid: adjust the returned nent field of
- kvm_cpuid2 for KVM_GET_SUPPORTED_CPUID and KVM_GET_EMULATED_CPUID
-In-Reply-To: <1be7c716-8160-926e-6d76-fb15b4adc066@redhat.com>
-References: <20210330185841.44792-1-eesposit@redhat.com>
- <20210330185841.44792-2-eesposit@redhat.com> <YGPmDbO++agqdqQL@google.com>
- <1be7c716-8160-926e-6d76-fb15b4adc066@redhat.com>
-Date:   Wed, 31 Mar 2021 09:56:45 +0200
-Message-ID: <877dlnu56q.fsf@vitty.brq.redhat.com>
+        Joerg Roedel <joro@8bytes.org>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        linux-mips@vger.kernel.org, kvm@vger.kernel.org,
+        kvm-ppc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Ben Gardon <bgardon@google.com>
+References: <20210326021957.1424875-1-seanjc@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <a2ca8cb2-5c91-b971-9b6e-65cf9ee97ffa@redhat.com>
+Date:   Wed, 31 Mar 2021 09:57:17 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.7.0
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <20210326021957.1424875-1-seanjc@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Emanuele Giuseppe Esposito <eesposit@redhat.com> writes:
+On 26/03/21 03:19, Sean Christopherson wrote:
+> The end goal of this series is to optimize the MMU notifiers to take
+> mmu_lock if and only if the notification is relevant to KVM, i.e. the hva
+> range overlaps a memslot.   Large VMs (hundreds of vCPUs) are very
+> sensitive to mmu_lock being taken for write at inopportune times, and
+> such VMs also tend to be "static", e.g. backed by HugeTLB with minimal
+> page shenanigans.  The vast majority of notifications for these VMs will
+> be spurious (for KVM), and eliding mmu_lock for spurious notifications
+> avoids an otherwise unacceptable disruption to the guest.
+> 
+> To get there without potentially degrading performance, e.g. due to
+> multiple memslot lookups, especially on non-x86 where the use cases are
+> largely unknown (from my perspective), first consolidate the MMU notifier
+> logic by moving the hva->gfn lookups into common KVM.
+> 
+> Applies on my TDP MMU TLB flushing bug fixes[*], which conflict horribly
+> with the TDP MMU changes in this series.  That code applies on kvm/queue
+> (commit 4a98623d5d90, "KVM: x86/mmu: Mark the PAE roots as decrypted for
+> shadow paging").
+> 
+> Speaking of conflicts, Ben will soon be posting a series to convert a
+> bunch of TDP MMU flows to take mmu_lock only for read.  Presumably there
+> will be an absurd number of conflicts; Ben and I will sort out the
+> conflicts in whichever series loses the race.
+> 
+> Well tested on Intel and AMD.  Compile tested for arm64, MIPS, PPC,
+> PPC e500, and s390.  Absolutely needs to be tested for real on non-x86,
+> I give it even odds that I introduced an off-by-one bug somewhere.
+> 
+> [*] https://lkml.kernel.org/r/20210325200119.1359384-1-seanjc@google.com
+> 
+> 
+> Patches 1-7 are x86 specific prep patches to play nice with moving
+> the hva->gfn memslot lookups into common code.  There ended up being waaay
+> more of these than I expected/wanted, but I had a hell of a time getting
+> the flushing logic right when shuffling the memslot and address space
+> loops.  In the end, I was more confident I got things correct by batching
+> the flushes.
+> 
+> Patch 8 moves the existing API prototypes into common code.  It could
+> technically be dropped since the old APIs are gone in the end, but I
+> thought the switch to the new APIs would suck a bit less this way.
+> 
+> Patch 9 moves arm64's MMU notifier tracepoints into common code so that
+> they are not lost when arm64 is converted to the new APIs, and so that all
+> architectures can benefit.
+> 
+> Patch 10 moves x86's memslot walkers into common KVM.  I chose x86 purely
+> because I could actually test it.  All architectures use nearly identical
+> code, so I don't think it actually matters in the end.
+> 
+> Patches 11-13 move arm64, MIPS, and PPC to the new APIs.
+> 
+> Patch 14 yanks out the old APIs.
+> 
+> Patch 15 adds the mmu_lock elision, but only for unpaired notifications.
+> 
+> Patch 16 adds mmu_lock elision for paired .invalidate_range_{start,end}().
+> This is quite nasty and no small part of me thinks the patch should be
+> burned with fire (I won't spoil it any further), but it's also the most
+> problematic scenario for our particular use case.  :-/
+> 
+> Patches 17-18 are additional x86 cleanups.
 
-> On 31/03/2021 05:01, Sean Christopherson wrote:
->> On Tue, Mar 30, 2021, Emanuele Giuseppe Esposito wrote:
->>> Calling the kvm KVM_GET_[SUPPORTED/EMULATED]_CPUID ioctl requires
->>> a nent field inside the kvm_cpuid2 struct to be big enough to contain
->>> all entries that will be set by kvm.
->>> Therefore if the nent field is too high, kvm will adjust it to the
->>> right value. If too low, -E2BIG is returned.
->>>
->>> However, when filling the entries do_cpuid_func() requires an
->>> additional entry, so if the right nent is known in advance,
->>> giving the exact number of entries won't work because it has to be increased
->>> by one.
->>>
->>> Signed-off-by: Emanuele Giuseppe Esposito <eesposit@redhat.com>
->>> ---
->>>   arch/x86/kvm/cpuid.c | 6 ++++++
->>>   1 file changed, 6 insertions(+)
->>>
->>> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
->>> index 6bd2f8b830e4..5412b48b9103 100644
->>> --- a/arch/x86/kvm/cpuid.c
->>> +++ b/arch/x86/kvm/cpuid.c
->>> @@ -975,6 +975,12 @@ int kvm_dev_ioctl_get_cpuid(struct kvm_cpuid2 *cpuid,
->>>   
->>>   	if (cpuid->nent < 1)
->>>   		return -E2BIG;
->>> +
->>> +	/* if there are X entries, we need to allocate at least X+1
->>> +	 * entries but return the actual number of entries
->>> +	 */
->>> +	cpuid->nent++;
->> 
->> I don't see how this can be correct.
->> 
->> If this bonus entry really is needed, then won't that be reflected in array.nent?
->> I.e won't KVM overrun the userspace buffer?
->> 
->> If it's not reflected in array.nent, that would imply there's an off-by-one check
->> somewhere, or KVM is creating an entry that it doesn't copy to userspace.  The
->> former seems unlikely as there are literally only two checks against maxnent,
->> and they both look correct (famous last words...).
->> 
->> KVM does decrement array->nent in one specific case (CPUID.0xD.2..64), i.e. a
->> false positive is theoretically possible, but that carries a WARN and requires a
->> kernel or CPU bug as well.  And fudging nent for that case would still break
->> normal use cases due to the overrun problem.
->> 
->> What am I missing?
->
-> (Maybe I should have put this series as RFC)
->
-> The problem I see and noticed while doing the KVM_GET_EMULATED_CPUID 
-> selftest is the following: assume there are 3 kvm emulated entries, and 
-> the user sets cpuid->nent = 3. This should work because kvm sets 3 
-> array->entries[], and copies them to user space.
->
-> However, when the 3rd entry is populated inside kvm (array->entries[2]), 
-> array->nent is increased once more (do_host_cpuid and 
-> __do_cpuid_func_emulated). At that point, the loop in 
-> kvm_dev_ioctl_get_cpuid and get_cpuid_func can potentially iterate once 
-> more, going into the
->
-> if (array->nent >= array->maxnent)
-> 	return -E2BIG;
->
-> in __do_cpuid_func_emulated and do_host_cpuid, returning the error. I 
-> agree that we need that check there because the following code tries to 
-> access the array entry at array->nent index, but from what I understand 
-> that access can be potentially useless because it might just jump to the 
-> default entry in the switch statement and not set the entry, leaving 
-> array->nent to 3.
+Queued and 1-9 and 18, thanks.  There's a small issue in patch 10 that 
+prevented me from committing 10-15, but they mostly look good.
 
-The problem seems to be exclusive to __do_cpuid_func_emulated(),
-do_host_cpuid() always does
-
-entry = &array->entries[array->nent++];
-
-Something like (completely untested and stupid):
-
-diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-index 6bd2f8b830e4..54dcabd3abec 100644
---- a/arch/x86/kvm/cpuid.c
-+++ b/arch/x86/kvm/cpuid.c
-@@ -565,14 +565,22 @@ static struct kvm_cpuid_entry2 *do_host_cpuid(struct kvm_cpuid_array *array,
-        return entry;
- }
- 
-+static bool cpuid_func_emulated(u32 func)
-+{
-+       return (func == 0) || (func == 1) || (func == 7);
-+}
-+
- static int __do_cpuid_func_emulated(struct kvm_cpuid_array *array, u32 func)
- {
-        struct kvm_cpuid_entry2 *entry;
- 
-+       if (!cpuid_func_emulated())
-+               return 0;
-+
-        if (array->nent >= array->maxnent)
-                return -E2BIG;
- 
--       entry = &array->entries[array->nent];
-+       entry = &array->entries[array->nent++];
-        entry->function = func;
-        entry->index = 0;
-        entry->flags = 0;
-@@ -580,18 +588,14 @@ static int __do_cpuid_func_emulated(struct kvm_cpuid_array *array, u32 func)
-        switch (func) {
-        case 0:
-                entry->eax = 7;
--               ++array->nent;
-                break;
-        case 1:
-                entry->ecx = F(MOVBE);
--               ++array->nent;
-                break;
-        case 7:
-                entry->flags |= KVM_CPUID_FLAG_SIGNIFCANT_INDEX;
-                entry->eax = 0;
-                entry->ecx = F(RDPID);
--               ++array->nent;
--       default:
-                break;
-        }
-
-should do the job, right?
-
-
--- 
-Vitaly
+Paolo
 
