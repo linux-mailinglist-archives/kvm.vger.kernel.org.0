@@ -2,76 +2,89 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6057334FCFB
-	for <lists+kvm@lfdr.de>; Wed, 31 Mar 2021 11:34:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4D1CC34FD11
+	for <lists+kvm@lfdr.de>; Wed, 31 Mar 2021 11:37:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234696AbhCaJe1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 31 Mar 2021 05:34:27 -0400
-Received: from mail.kernel.org ([198.145.29.99]:49150 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S234822AbhCaJeF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 31 Mar 2021 05:34:05 -0400
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id BC20061874;
-        Wed, 31 Mar 2021 09:34:04 +0000 (UTC)
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-        (Exim 4.94)
-        (envelope-from <maz@kernel.org>)
-        id 1lRXEg-004ruN-N0; Wed, 31 Mar 2021 10:34:02 +0100
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-Date:   Wed, 31 Mar 2021 10:34:02 +0100
-From:   Marc Zyngier <maz@kernel.org>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Paul Mackerras <paulus@ozlabs.org>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        id S234577AbhCaJhL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 31 Mar 2021 05:37:11 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:54775 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S234685AbhCaJhA (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 31 Mar 2021 05:37:00 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1617183419;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=vPSZ7dxb3qsEMs5x97M5ADT7+JZHTIsRy6tbsYraIFw=;
+        b=YFEGcB27X2Sbqt6blKROjTe52Or9JgUBbJK9U18YwGeURAzbyq1rYhhBAONr1szMhgxz1i
+        4nSUYA6yk0XzkJpjW39PrgFFB3DfkAmm7tEjDX9xs260Jo5lTH+O6vq1JnxnrvBrxx3bg3
+        BRJSH8qYx58cFktRQvurrA2w58/g34k=
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-75-OhfnrDiROguNs47H5DBN4Q-1; Wed, 31 Mar 2021 05:36:56 -0400
+X-MC-Unique: OhfnrDiROguNs47H5DBN4Q-1
+Received: by mail-ed1-f69.google.com with SMTP id r19so814099edv.3
+        for <kvm@vger.kernel.org>; Wed, 31 Mar 2021 02:36:55 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=vPSZ7dxb3qsEMs5x97M5ADT7+JZHTIsRy6tbsYraIFw=;
+        b=mzdiVZUF/fVGj9SzH926afIwvfFlCGdOVI9IJ1hXqEZ1xXRMvLbGCFciTSj7UNj3vN
+         0DABuaKJBvixrrJXU4luLWtFW9wRdsrPYmaGjyb/iqy7LNkgX8ng+7uSfE2hn64SV52r
+         U6RPYOahc1FHmziKPLiXBB45gKEKefGOrRT1NWBnjNutSCwZj+z/caw7AZWs4wb4jd/7
+         dAkg3jXGbjGj6cN4u96ckymMxBt97Fem3TGzWoyDm02XMIjEucPIqNjeNeBxGQjHCuk2
+         hB7nrGsS6fD7Gxp+Qt2mswkPHZJSSb/Dz3iEOqWhGWVlmRVyoj0rvx7A5V0ic+QvH9yy
+         ZHfw==
+X-Gm-Message-State: AOAM531DjGlmCHeQd6tgAZDbeFiVNXG5MWDHu41dFYwCkFrgSAAVCu7q
+        D8uobsAAew/YzGBNPNXzmR4INxr9h8tD2dxBBZ3RET4eIWdXwsRg1ensWpszQRya3Id0gefSBq1
+        ToMfHigPEis+c
+X-Received: by 2002:a17:906:ecfb:: with SMTP id qt27mr2486128ejb.245.1617183414923;
+        Wed, 31 Mar 2021 02:36:54 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJy0v85wpb8v1x9/F+l+ofzwyNdWiaBvwk7qCS7BunYpFql/vZ7HE5GkHFgjuu+1rqE7pfFRSA==
+X-Received: by 2002:a17:906:ecfb:: with SMTP id qt27mr2486118ejb.245.1617183414792;
+        Wed, 31 Mar 2021 02:36:54 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e? ([2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e])
+        by smtp.gmail.com with ESMTPSA id q20sm825485ejs.41.2021.03.31.02.36.53
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 31 Mar 2021 02:36:53 -0700 (PDT)
+Subject: Re: [PATCH 0/2] KVM: x86/mmu: TDP MMU fixes/cleanups
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        linux-mips@vger.kernel.org, kvm@vger.kernel.org,
-        kvm-ppc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Ben Gardon <bgardon@google.com>
-Subject: Re: [PATCH 00/18] KVM: Consolidate and optimize MMU notifiers
-In-Reply-To: <a2ca8cb2-5c91-b971-9b6e-65cf9ee97ffa@redhat.com>
-References: <20210326021957.1424875-1-seanjc@google.com>
- <a2ca8cb2-5c91-b971-9b6e-65cf9ee97ffa@redhat.com>
-User-Agent: Roundcube Webmail/1.4.11
-Message-ID: <e50f6f28c0446cd328e475859ef05dc4@kernel.org>
-X-Sender: maz@kernel.org
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: pbonzini@redhat.com, seanjc@google.com, chenhuacai@kernel.org, aleksandar.qemu.devel@gmail.com, paulus@ozlabs.org, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, linux-mips@vger.kernel.org, kvm@vger.kernel.org, kvm-ppc@vger.kernel.org, linux-kernel@vger.kernel.org, bgardon@google.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Ben Gardon <bgardon@google.com>
+References: <20210331004942.2444916-1-seanjc@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <f57e4005-5a71-7fed-8328-88fddadd1443@redhat.com>
+Date:   Wed, 31 Mar 2021 11:36:51 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.7.0
+MIME-Version: 1.0
+In-Reply-To: <20210331004942.2444916-1-seanjc@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2021-03-31 08:57, Paolo Bonzini wrote:
+On 31/03/21 02:49, Sean Christopherson wrote:
+> Two minor fixes/cleanups for the TDP MMU, found by inspection.
+> 
+> Sean Christopherson (2):
+>    KVM: x86/mmu: Remove spurious clearing of dirty bit from TDP MMU SPTE
+>    KVM: x86/mmu: Simplify code for aging SPTEs in TDP MMU
+> 
+>   arch/x86/kvm/mmu/tdp_mmu.c | 6 ++----
+>   1 file changed, 2 insertions(+), 4 deletions(-)
+> 
 
-> Queued and 1-9 and 18, thanks.  There's a small issue in patch 10 that
-> prevented me from committing 10-15, but they mostly look good.
+Queued, thanks.
 
-Can you please push the resulting merge somewhere?
+Paolo
 
-I'm concerned that it will conflict in interesting way with other stuff
-that is on its way on the arm64 side, not to mentiobn that this hasn't
-been tested at all on anything but x86 (and given the series was posted
-on Friday, that's a bit of a short notice).
-
-Thanks,
-
-         M.
--- 
-Jazz is not dead. It just smells funny...
