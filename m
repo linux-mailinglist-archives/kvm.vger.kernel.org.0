@@ -2,94 +2,83 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 504FE34F717
-	for <lists+kvm@lfdr.de>; Wed, 31 Mar 2021 05:03:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 161F634F758
+	for <lists+kvm@lfdr.de>; Wed, 31 Mar 2021 05:20:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233396AbhCaDC3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 30 Mar 2021 23:02:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38602 "EHLO
+        id S233067AbhCaDTs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 30 Mar 2021 23:19:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42326 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233240AbhCaDC0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 30 Mar 2021 23:02:26 -0400
-Received: from mail-oi1-x22e.google.com (mail-oi1-x22e.google.com [IPv6:2607:f8b0:4864:20::22e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 27F0BC061574;
-        Tue, 30 Mar 2021 20:02:25 -0700 (PDT)
-Received: by mail-oi1-x22e.google.com with SMTP id w70so18712612oie.0;
-        Tue, 30 Mar 2021 20:02:25 -0700 (PDT)
+        with ESMTP id S233305AbhCaDTo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 30 Mar 2021 23:19:44 -0400
+Received: from mail-qt1-x84a.google.com (mail-qt1-x84a.google.com [IPv6:2607:f8b0:4864:20::84a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 87A3AC061574
+        for <kvm@vger.kernel.org>; Tue, 30 Mar 2021 20:19:43 -0700 (PDT)
+Received: by mail-qt1-x84a.google.com with SMTP id c20so393212qtw.9
+        for <kvm@vger.kernel.org>; Tue, 30 Mar 2021 20:19:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=bJZNjW6b9Y+KVB3MOg16iUNyNSm6MhWVVSvFrHV9UWQ=;
-        b=FOmnFOR1c/h9UlaYgC7AWT1hE4TEodNUbA5b9UxJ8iyJZ9rIc9okyseUDrKEXd8KXm
-         +Q9NoLlljEpxYt3qj88mEvIsgAac4BE1bxcp9tWPDIxj7Vn2s+S0MKJbfXNgsLSxxa9F
-         26i/kh6PXpGY2P74ronATJnJmwWA6SEQEEodKUKvvWPKZfWK0SEYnB6BVm7FFb1kU5+I
-         H01X4orqFRKLvFviz/N5LAaceJ9+8qSZMf9VGQ2syhYFoDYNnFIhQiyjyc9hZ3FqDnNI
-         oOxe8j9M9UFVHDdQaN/5LJRm2+YebUPMp+9P6PJ6MJiw/olxXNsVbuvM1BwPf3KI5BUm
-         6Psg==
+        d=google.com; s=20161025;
+        h=reply-to:date:message-id:mime-version:subject:from:to:cc;
+        bh=sOb7NEJl+AeolkpzxTyofNZTvUzELB1nvc8i4lV36jE=;
+        b=Zqz0CV+RXQXP0rMDlz3xJUcyTKSY1zFb9tXpomz40KtHRTkLeBkZVgwftostW065T7
+         pooHfG4ZqWULR3W+CVG+y3i+Dar99SHYWQ80D9CjKZDArcuVduSZe8nQxWUtzCSoid1l
+         x4Bn0G8xXyYA7Dj6D1cIeA8CfDiBE2Le80GmG76I+RUSoHXupjZhP8RmtabpOY7K9BVh
+         OnRAxvs5NivcMBNjNDCqWS/l6x3c1aV9OG4HCkbHFGlTqaiQedolTVpG8bdD+MCYcDfh
+         XG7I/yLHfw36ZrJADjl2cOe5NZhehs2d/wx9XXCDgYicJ8mpBsK/Yvu7afXKorV/DPfv
+         eDyg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=bJZNjW6b9Y+KVB3MOg16iUNyNSm6MhWVVSvFrHV9UWQ=;
-        b=jzp26DvUVg9GDlvOUZP6gHBr5uh3Wl1GkJefLmK+MU+zO1sZiH4mICsYqeWwbgDDZe
-         CTeaOEMSe188Jjr8HHq4ggmx9X/Plk040p9FXb4AMIRtubd28O5coE3pCs90qDMfJTkf
-         k2aTNgkYshvuMBC2Y1Akr2n1ULNfCQdcCK/rK4ETTX6w3ucqZl/Uc6h1Wj/QNf4Sq5l5
-         OpHT7+tSUqvjcxdr3fFpG1l0NtR4xNDAgKSqgovOV0l0PwimmfGQijF29415WF8Qv/IN
-         0l0u8GECORVxVN2A3XmGyfvRwhz/29ELWFvXv0fwUHafhMxxMLuGxU6t7m6obTHqipnx
-         jcdA==
-X-Gm-Message-State: AOAM530QnaVoQSpmjFlGyA5jGxmQJYLS+j2p/PuwjmjRYLTqPwG4zcQL
-        zku06P4lbdMpw5HxukHMvBbu9TcsDs5NSjss307hLh65
-X-Google-Smtp-Source: ABdhPJxwP2S/PgnhvDY1OVZDMgm111Cl9KRSXSyCRChRbXqTEKz8OU+Yjm2t4CWKRuyMJb2DPeT78q0RxUd2YkI16c4=
-X-Received: by 2002:aca:4748:: with SMTP id u69mr737357oia.5.1617159744637;
- Tue, 30 Mar 2021 20:02:24 -0700 (PDT)
-MIME-Version: 1.0
-References: <20210331023025.2485960-1-seanjc@google.com> <20210331023025.2485960-2-seanjc@google.com>
-In-Reply-To: <20210331023025.2485960-2-seanjc@google.com>
-From:   Wanpeng Li <kernellwp@gmail.com>
-Date:   Wed, 31 Mar 2021 11:02:12 +0800
-Message-ID: <CANRm+CwowrYPSnFNc11j5aT2JNw_k+NOh1apoxc3raVD4RVaAg@mail.gmail.com>
-Subject: Re: [PATCH 1/2] KVM: Account memory allocations for 'struct kvm_vcpu'
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        h=x-gm-message-state:reply-to:date:message-id:mime-version:subject
+         :from:to:cc;
+        bh=sOb7NEJl+AeolkpzxTyofNZTvUzELB1nvc8i4lV36jE=;
+        b=XZWXwBmZXdp2zuKLwBfDLklEiDGwoRTD/VG0iX/BHI7XDZDduJwFtD85wwL0PwJzip
+         nTM/r6+RKavAC+M+RaqhvC1F+6o4cPWsbypa0wng6BL7yjrZXiwjpYrH7CfUOhXiluyx
+         xiD9zkvn/TUh6whisEVi4Td0fTrUqOlO/AgpUksXc/z524A9nL4UieQHhnNPMf7wKNMA
+         dQ9DvlQUhegOd9FXEtBHE6ylg5eoWcbxI6ZQ3sW/D6RtFguf6s0a/EyPDZIXoaoQCtwE
+         Cf/TuJIWEP1l82l8/eLEzVXBudL7qGZIr/AsVa8NPxReQtc+LPK21eq4CwG1tTzhyOdf
+         yayg==
+X-Gm-Message-State: AOAM5336iAfvvG+UPVuyC+NRHeE5q0x/i/5c6OZ+pjJZPQpcFgfzewGE
+        xhQrKSvuUZFFLl5JVIxnjPoagKJr2ps=
+X-Google-Smtp-Source: ABdhPJzE5U8A8ThHZ+AOEEXZHsflheOnyjBhFkAVDOvh8sw/PKf8FDxFaU8+8WBEldeAhey6VoOuVnLoxnE=
+X-Received: from seanjc798194.pdx.corp.google.com ([2620:15c:f:10:6c6b:5d63:9b3b:4a77])
+ (user=seanjc job=sendgmr) by 2002:a0c:9e0f:: with SMTP id p15mr1222038qve.27.1617160782533;
+ Tue, 30 Mar 2021 20:19:42 -0700 (PDT)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date:   Tue, 30 Mar 2021 20:19:33 -0700
+Message-Id: <20210331031936.2495277-1-seanjc@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.31.0.291.g576ba9dcdaf-goog
+Subject: [PATCH 0/3] KVM: SVM: SEV{-ES} bug fixes
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 31 Mar 2021 at 10:32, Sean Christopherson <seanjc@google.com> wrote:
->
-> Use GFP_KERNEL_ACCOUNT for the vCPU allocations, the vCPUs are very much
-> tied to a single task/VM.  For x86, the allocations were accounted up
-> until the allocation code was moved to common KVM.  For all other
-> architectures, vCPU allocations were never previously accounted, but only
-> because most architectures lack accounting in general (for KVM).
->
-> Fixes: e529ef66e6b5 ("KVM: Move vcpu alloc and init invocation to common code")
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->  virt/kvm/kvm_main.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index 383df23514b9..3884e9f30251 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -3182,7 +3182,7 @@ static int kvm_vm_ioctl_create_vcpu(struct kvm *kvm, u32 id)
->         if (r)
->                 goto vcpu_decrement;
->
-> -       vcpu = kmem_cache_zalloc(kvm_vcpu_cache, GFP_KERNEL);
-> +       vcpu = kmem_cache_zalloc(kvm_vcpu_cache, GFP_KERNEL_ACCOUNT);
+Misc bug fixes in SEV/SEV-ES to protect against a malicious userspace.
+All found by inspection, I didn't actually crash the host to to prove that
+userspace could hose the kernel in any of these cases.  Boot tested an SEV
+guest, though the SEV-ES side of patch 2 is essentially untested as I
+don't have an SEV-ES setup at this time.
 
-kvm_vcpu_cache is created with SLAB_ACCOUNT flag in kvm_init(), this
-flag will guarantee further slab alloc will be charged to memcg.
-Please refer to memcg_slab_pre_alloc_hook(). So the patch is
-unnecessary.
+Sean Christopherson (3):
+  KVM: SVM: Use online_vcpus, not created_vcpus, to iterate over vCPUs
+  KVM: SVM: Do not set sev->es_active until KVM_SEV_ES_INIT completes
+  KVM: SVM: Do not allow SEV/SEV-ES initialization after vCPUs are
+    created
 
-    Wanpeng
+ arch/x86/kvm/svm/sev.c | 37 ++++++++++++++++++-------------------
+ 1 file changed, 18 insertions(+), 19 deletions(-)
+
+-- 
+2.31.0.291.g576ba9dcdaf-goog
+
