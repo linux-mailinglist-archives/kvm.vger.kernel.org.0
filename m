@@ -2,69 +2,78 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C06B134FC4A
-	for <lists+kvm@lfdr.de>; Wed, 31 Mar 2021 11:14:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2B06D34FC5E
+	for <lists+kvm@lfdr.de>; Wed, 31 Mar 2021 11:16:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234553AbhCaJN5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 31 Mar 2021 05:13:57 -0400
-Received: from szxga07-in.huawei.com ([45.249.212.35]:15833 "EHLO
-        szxga07-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230385AbhCaJNc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 31 Mar 2021 05:13:32 -0400
-Received: from DGGEMS405-HUB.china.huawei.com (unknown [172.30.72.60])
-        by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4F9LCc41hqz9tpr;
-        Wed, 31 Mar 2021 17:11:24 +0800 (CST)
-Received: from [10.174.184.42] (10.174.184.42) by
- DGGEMS405-HUB.china.huawei.com (10.3.19.205) with Microsoft SMTP Server id
- 14.3.498.0; Wed, 31 Mar 2021 17:13:20 +0800
-Subject: Re: [RFC PATCH v2 0/2] kvm/arm64: Try stage2 block mapping for host
- device MMIO
-To:     <linux-kernel@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>, <kvm@vger.kernel.org>,
-        <kvmarm@lists.cs.columbia.edu>, Will Deacon <will@kernel.org>,
-        Marc Zyngier <maz@kernel.org>
-References: <20210316134338.18052-1-zhukeqian1@huawei.com>
-CC:     Catalin Marinas <catalin.marinas@arm.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        <wanghaibin.wang@huawei.com>, <jiangkunkun@huawei.com>,
-        <yuzenghui@huawei.com>, <lushenming@huawei.com>
-From:   Keqian Zhu <zhukeqian1@huawei.com>
-Message-ID: <1870563d-4da8-60d6-22e4-242ac820f5ba@huawei.com>
-Date:   Wed, 31 Mar 2021 17:13:19 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
- Thunderbird/45.7.1
-MIME-Version: 1.0
-In-Reply-To: <20210316134338.18052-1-zhukeqian1@huawei.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.174.184.42]
-X-CFilter-Loop: Reflected
+        id S234661AbhCaJPh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 31 Mar 2021 05:15:37 -0400
+Received: from out30-44.freemail.mail.aliyun.com ([115.124.30.44]:47953 "EHLO
+        out30-44.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S234349AbhCaJP0 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 31 Mar 2021 05:15:26 -0400
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R861e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04426;MF=yang.lee@linux.alibaba.com;NM=1;PH=DS;RN=14;SR=0;TI=SMTPD_---0UTwZ0zg_1617182123;
+Received: from j63c13417.sqa.eu95.tbsite.net(mailfrom:yang.lee@linux.alibaba.com fp:SMTPD_---0UTwZ0zg_1617182123)
+          by smtp.aliyun-inc.com(127.0.0.1);
+          Wed, 31 Mar 2021 17:15:24 +0800
+From:   Yang Li <yang.lee@linux.alibaba.com>
+To:     pbonzini@redhat.com
+Cc:     seanjc@google.com, vkuznets@redhat.com, wanpengli@tencent.com,
+        jmattson@google.com, joro@8bytes.org, tglx@linutronix.de,
+        mingo@redhat.com, bp@alien8.de, x86@kernel.org, hpa@zytor.com,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Yang Li <yang.lee@linux.alibaba.com>
+Subject: [PATCH] KVM: x86: Fix potential memory access error
+Date:   Wed, 31 Mar 2021 17:15:22 +0800
+Message-Id: <1617182122-112315-1-git-send-email-yang.lee@linux.alibaba.com>
+X-Mailer: git-send-email 1.8.3.1
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Kind ping...
+Using __set_bit() to set a bit in an integer is not a good idea, since
+the function expects an unsigned long as argument, which can be 64bit wide.
+Coverity reports this problem as
 
-On 2021/3/16 21:43, Keqian Zhu wrote:
-> Hi all,
-> 
-> We have two pathes to build stage2 mapping for MMIO regions.
-> 
-> Create time's path and stage2 fault path.
-> 
-> Patch#1 removes the creation time's mapping of MMIO regions
-> Patch#2 tries stage2 block mapping for host device MMIO at fault path
-> 
-> Thanks,
-> Keqian
-> 
-> Keqian Zhu (2):
->   kvm/arm64: Remove the creation time's mapping of MMIO regions
->   kvm/arm64: Try stage2 block mapping for host device MMIO
-> 
->  arch/arm64/kvm/mmu.c | 80 +++++++++++++++++++++++---------------------
->  1 file changed, 41 insertions(+), 39 deletions(-)
-> 
+High:Out-of-bounds access(INCOMPATIBLE_CAST)
+CWE119: Out-of-bounds access to a scalar
+Pointer "&vcpu->arch.regs_avail" points to an object whose effective
+type is "unsigned int" (32 bits, unsigned) but is dereferenced as a
+wider "unsigned long" (64 bits, unsigned). This may lead to memory
+corruption.
+
+/home/heyuan.shy/git-repo/linux/arch/x86/kvm/kvm_cache_regs.h:
+kvm_register_is_available
+
+Just use BIT instead.
+
+Reported-by: Abaci Robot <abaci@linux.alibaba.com>
+Signed-off-by: Yang Li <yang.lee@linux.alibaba.com>
+---
+ arch/x86/kvm/kvm_cache_regs.h | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/arch/x86/kvm/kvm_cache_regs.h b/arch/x86/kvm/kvm_cache_regs.h
+index 2e11da2..cfa45d88 100644
+--- a/arch/x86/kvm/kvm_cache_regs.h
++++ b/arch/x86/kvm/kvm_cache_regs.h
+@@ -52,14 +52,14 @@ static inline bool kvm_register_is_dirty(struct kvm_vcpu *vcpu,
+ static inline void kvm_register_mark_available(struct kvm_vcpu *vcpu,
+ 					       enum kvm_reg reg)
+ {
+-	__set_bit(reg, (unsigned long *)&vcpu->arch.regs_avail);
++	vcpu->arch.regs_avail |= BIT(reg);
+ }
+ 
+ static inline void kvm_register_mark_dirty(struct kvm_vcpu *vcpu,
+ 					   enum kvm_reg reg)
+ {
+-	__set_bit(reg, (unsigned long *)&vcpu->arch.regs_avail);
+-	__set_bit(reg, (unsigned long *)&vcpu->arch.regs_dirty);
++	vcpu->arch.regs_avail |= BIT(reg);
++	vcpu->arch.regs_dirty |= BIT(reg);
+ }
+ 
+ static inline unsigned long kvm_register_read(struct kvm_vcpu *vcpu, int reg)
+-- 
+1.8.3.1
+
