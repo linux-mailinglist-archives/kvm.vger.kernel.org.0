@@ -2,76 +2,82 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3BE6934F9BC
-	for <lists+kvm@lfdr.de>; Wed, 31 Mar 2021 09:22:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D507434FA98
+	for <lists+kvm@lfdr.de>; Wed, 31 Mar 2021 09:43:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233690AbhCaHVb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 31 Mar 2021 03:21:31 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:38389 "EHLO
+        id S234194AbhCaHmc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 31 Mar 2021 03:42:32 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:47034 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234032AbhCaHVR (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 31 Mar 2021 03:21:17 -0400
+        by vger.kernel.org with ESMTP id S234329AbhCaHmX (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 31 Mar 2021 03:42:23 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1617175276;
+        s=mimecast20190719; t=1617176543;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=TiW3s6POuiBtrk66pwAu3NhlizCTRO+r/CxAonDvxF8=;
-        b=STkOkzFiqbPHGwNfLFJM0Z2FsOsDXTQptK8sAQQLhPWf+V0OZu+w9LHsKgyxAPg5TduLTc
-        i2E6+nOb5ERZp+uPe2/tUIUM5qRnvLKS71JeXTl/XL3AV1A7dFvWBITJ9Ztm/aaVeOvOOX
-        7pp+4TXvi6hBy2tYlF5lZqbTGEc7+OA=
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
- [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-195-oSfpCV42MgS_4FsQw-HKIQ-1; Wed, 31 Mar 2021 03:21:14 -0400
-X-MC-Unique: oSfpCV42MgS_4FsQw-HKIQ-1
-Received: by mail-ed1-f70.google.com with SMTP id m8so627098edv.11
-        for <kvm@vger.kernel.org>; Wed, 31 Mar 2021 00:21:14 -0700 (PDT)
+        bh=HCixOYNQFJEmCwNjkKeRd8lCZMOXCEBzJPf2kb2CuW8=;
+        b=FV0TGc/4JFgtF3ZHi8r0i1zAQ8g1XwjjgkpVPtagq7lcpAB1cRNSDWpyXl12fuZiqRG8Qj
+        ztjRolBIam0TBr8NdjYAJSCQk6BjKdGptX9NRZ7v0T89uu0Z8r1wvfav9lz/YUMrWUMIHB
+        leGXVKQORg2ZblogyhyVklDpnuiYuYE=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-113-up16NgqlNfOLkuCQ2EC4Yg-1; Wed, 31 Mar 2021 03:41:41 -0400
+X-MC-Unique: up16NgqlNfOLkuCQ2EC4Yg-1
+Received: by mail-wm1-f69.google.com with SMTP id n17so115800wmi.2
+        for <kvm@vger.kernel.org>; Wed, 31 Mar 2021 00:41:40 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=TiW3s6POuiBtrk66pwAu3NhlizCTRO+r/CxAonDvxF8=;
-        b=Q/bYTEwW049nNnancHYibm/swftx+pdNv8osW0Kw1T2fTe/DAsWuw800cyHv9LagMM
-         F/mYKoavgT5HPHTOjQLJazArhVMDDVl5f2+IxXuXJ4zu8bLPo0e8p9cU9h2DXEBV+o54
-         8QzvaE1BFrZLHyKWsEsbYjWrvwRUZ402jtouXIq9PULEhKUaGejeGhzjemik+cXkYyU6
-         /Eco5JypkOjcq/YvjWzkiSoAmT88tV0FNfQ0jwSNdM/1mS3OhcVCXZhor1InQ6304FGv
-         4LOvwy3xkKFTBRAQaVOfwQndyfelk+hU4g1+EzokReWlIv/UXrBLvG1uJO1xf8Lme6gm
-         lt5A==
-X-Gm-Message-State: AOAM531auCR5rolu527a4KN/+KzZ8l34LvX6YClCajUlXSZYW0OQYEMl
-        zmkmNU1+dTcaO4pKytclSfaf2kppO4aOYnOC2Y2zLMucGBML5o4zwjDFith69jFkxk8KWtWaGUO
-        UdiQzvPNr5PG0
-X-Received: by 2002:aa7:c88e:: with SMTP id p14mr1915442eds.119.1617175273360;
-        Wed, 31 Mar 2021 00:21:13 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxwOtUMcLcAd9P6nCkRIJO4s2Udkyqh4y7phmUPuSIFRQtTdU6xxywBbPo3oVrvHX/7u38Zsg==
-X-Received: by 2002:aa7:c88e:: with SMTP id p14mr1915403eds.119.1617175273039;
-        Wed, 31 Mar 2021 00:21:13 -0700 (PDT)
-Received: from localhost.localdomain ([194.230.155.154])
-        by smtp.gmail.com with ESMTPSA id s11sm838337edt.27.2021.03.31.00.21.11
+        bh=HCixOYNQFJEmCwNjkKeRd8lCZMOXCEBzJPf2kb2CuW8=;
+        b=iyOVa8q61K+lh7IEgYIgF8UCwawvDuyKGRnmH30jWHfbBIfyVbF7e9f+zLUfs2fky9
+         I+hoNgibgtVEt6kEdTYdGDZJpekHDFcW/+HAs574KS2NZ/Mcu4in7Fqozmx7JqwlpOKR
+         t+6Vczk3M8STkQb301KmMm125hD+4ospmJaSYBoUkHIClEbPxMwV++f6oLy+5tuBPkmi
+         elzbBHtgytA1YaN84VOKmxx5VY8H7Z0UQ/vrn7lj3PbwDD1UsFlpTcUSoJrV6yUC7J1k
+         yZ35UoPrHPl3b3etwgYj3GN4UyMJMsDs1sEtLBFc42zFtPFfZp6C1TPCQsZ3Iu/uJvx/
+         J1Mw==
+X-Gm-Message-State: AOAM532HMnKbfUUe2ZBfnN5FuX50yI0xWg4nPcfssl6qOYccSWFboNSl
+        oc5jcEi2cCryXD4lmZoG+m8hZKC3Rs22Qw8O/uwlV/EdQMiJxtznCuMuvr7BwiXQoG241m5mr6k
+        fX0uDBGnTjC2t
+X-Received: by 2002:a1c:b789:: with SMTP id h131mr1904506wmf.106.1617176499782;
+        Wed, 31 Mar 2021 00:41:39 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxiHmYD2Le+p2rRCHafUQsuCWJvR5BP1vyRx1fx+QhpZoWEEC9/7YIvjmyyJZB+n8xVLiTOmA==
+X-Received: by 2002:a1c:b789:: with SMTP id h131mr1904488wmf.106.1617176499531;
+        Wed, 31 Mar 2021 00:41:39 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e? ([2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e])
+        by smtp.gmail.com with ESMTPSA id a131sm2662492wmc.48.2021.03.31.00.41.36
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 31 Mar 2021 00:21:12 -0700 (PDT)
-Subject: Re: [PATCH 1/4] kvm: cpuid: adjust the returned nent field of
- kvm_cpuid2 for KVM_GET_SUPPORTED_CPUID and KVM_GET_EMULATED_CPUID
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
+        Wed, 31 Mar 2021 00:41:38 -0700 (PDT)
+Subject: Re: [PATCH 12/18] KVM: MIPS/MMU: Convert to the gfn-based MMU
+ notifier callbacks
+To:     Sean Christopherson <seanjc@google.com>,
+        Marc Zyngier <maz@kernel.org>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Paul Mackerras <paulus@ozlabs.org>
+Cc:     James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>, Shuah Khan <shuah@kernel.org>,
-        Alexander Graf <graf@amazon.com>,
-        Andrew Jones <drjones@redhat.com>, linux-doc@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
-References: <20210330185841.44792-1-eesposit@redhat.com>
- <20210330185841.44792-2-eesposit@redhat.com> <YGPmDbO++agqdqQL@google.com>
-From:   Emanuele Giuseppe Esposito <eesposit@redhat.com>
-Message-ID: <1be7c716-8160-926e-6d76-fb15b4adc066@redhat.com>
-Date:   Wed, 31 Mar 2021 09:21:10 +0200
+        Joerg Roedel <joro@8bytes.org>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        linux-mips@vger.kernel.org, kvm@vger.kernel.org,
+        kvm-ppc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Ben Gardon <bgardon@google.com>
+References: <20210326021957.1424875-1-seanjc@google.com>
+ <20210326021957.1424875-13-seanjc@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <26c87b3e-7a89-6cfa-1410-25486b114f32@redhat.com>
+Date:   Wed, 31 Mar 2021 09:41:34 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.8.1
+ Thunderbird/78.7.0
 MIME-Version: 1.0
-In-Reply-To: <YGPmDbO++agqdqQL@google.com>
+In-Reply-To: <20210326021957.1424875-13-seanjc@google.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -79,106 +85,189 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-On 31/03/2021 05:01, Sean Christopherson wrote:
-> On Tue, Mar 30, 2021, Emanuele Giuseppe Esposito wrote:
->> Calling the kvm KVM_GET_[SUPPORTED/EMULATED]_CPUID ioctl requires
->> a nent field inside the kvm_cpuid2 struct to be big enough to contain
->> all entries that will be set by kvm.
->> Therefore if the nent field is too high, kvm will adjust it to the
->> right value. If too low, -E2BIG is returned.
->>
->> However, when filling the entries do_cpuid_func() requires an
->> additional entry, so if the right nent is known in advance,
->> giving the exact number of entries won't work because it has to be increased
->> by one.
->>
->> Signed-off-by: Emanuele Giuseppe Esposito <eesposit@redhat.com>
->> ---
->>   arch/x86/kvm/cpuid.c | 6 ++++++
->>   1 file changed, 6 insertions(+)
->>
->> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
->> index 6bd2f8b830e4..5412b48b9103 100644
->> --- a/arch/x86/kvm/cpuid.c
->> +++ b/arch/x86/kvm/cpuid.c
->> @@ -975,6 +975,12 @@ int kvm_dev_ioctl_get_cpuid(struct kvm_cpuid2 *cpuid,
->>   
->>   	if (cpuid->nent < 1)
->>   		return -E2BIG;
->> +
->> +	/* if there are X entries, we need to allocate at least X+1
->> +	 * entries but return the actual number of entries
->> +	 */
->> +	cpuid->nent++;
+On 26/03/21 03:19, Sean Christopherson wrote:
+> Move MIPS to the gfn-based MMU notifier APIs, which do the hva->gfn
+> lookup in common code, and whose code is nearly identical to MIPS'
+> lookup.
 > 
-> I don't see how this can be correct.
+> No meaningful functional change intended, though the exact order of
+> operations is slightly different since the memslot lookups occur before
+> calling into arch code.
 > 
-> If this bonus entry really is needed, then won't that be reflected in array.nent?
-> I.e won't KVM overrun the userspace buffer?
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+
+I'll post a couple patches to enable more coalescing of the flushes, but 
+this particular patch is okay.
+
+Paolo
+
+> ---
+>   arch/mips/include/asm/kvm_host.h |  1 +
+>   arch/mips/kvm/mmu.c              | 97 ++++++--------------------------
+>   2 files changed, 17 insertions(+), 81 deletions(-)
 > 
-> If it's not reflected in array.nent, that would imply there's an off-by-one check
-> somewhere, or KVM is creating an entry that it doesn't copy to userspace.  The
-> former seems unlikely as there are literally only two checks against maxnent,
-> and they both look correct (famous last words...).
-> 
-> KVM does decrement array->nent in one specific case (CPUID.0xD.2..64), i.e. a
-> false positive is theoretically possible, but that carries a WARN and requires a
-> kernel or CPU bug as well.  And fudging nent for that case would still break
-> normal use cases due to the overrun problem.
-> 
-> What am I missing?
-
-(Maybe I should have put this series as RFC)
-
-The problem I see and noticed while doing the KVM_GET_EMULATED_CPUID 
-selftest is the following: assume there are 3 kvm emulated entries, and 
-the user sets cpuid->nent = 3. This should work because kvm sets 3 
-array->entries[], and copies them to user space.
-
-However, when the 3rd entry is populated inside kvm (array->entries[2]), 
-array->nent is increased once more (do_host_cpuid and 
-__do_cpuid_func_emulated). At that point, the loop in 
-kvm_dev_ioctl_get_cpuid and get_cpuid_func can potentially iterate once 
-more, going into the
-
-if (array->nent >= array->maxnent)
-	return -E2BIG;
-
-in __do_cpuid_func_emulated and do_host_cpuid, returning the error. I 
-agree that we need that check there because the following code tries to 
-access the array entry at array->nent index, but from what I understand 
-that access can be potentially useless because it might just jump to the 
-default entry in the switch statement and not set the entry, leaving 
-array->nent to 3. Therefore with 3 kvm entries, the user would need to 
-set cpuid->nent = 4 in order to work, even though only 3 entries are set.
-
-There is no user space overflow because kvm uses array.nent in 
-kvm_dev_ioctl_get_cpuid to specify how many entries to copy to the user.
-My fix simply pre-increments the nent field on behalf of user space, so 
-that an additional allocation is performed just in case but if not 
-filled, it will not be copied to userspace.
-
-Of course any better solution is very welcome :)
-
-If you are wondering how a user can know in advance the exact number of 
-nentries, the only way is to initially invoke the ioctl with cpuid->nent 
-= 1000 or simply KVM_MAX_CPUID_ENTRIES, and kvm will not only set the 
-entries but also adjust the nent field. In my case it was returning 3, 
-but without this fix a successive KVM_GET_EMULATED_CPUID ioctl with nent 
-= 3 would just return -E2BIG.
-
-Thank you,
-Emanuele
-
-> 
->> +
->>   	if (cpuid->nent > KVM_MAX_CPUID_ENTRIES)
->>   		cpuid->nent = KVM_MAX_CPUID_ENTRIES;
->>   
->> -- 
->> 2.30.2
->>
+> diff --git a/arch/mips/include/asm/kvm_host.h b/arch/mips/include/asm/kvm_host.h
+> index feaa77036b67..374a3c8806e8 100644
+> --- a/arch/mips/include/asm/kvm_host.h
+> +++ b/arch/mips/include/asm/kvm_host.h
+> @@ -967,6 +967,7 @@ enum kvm_mips_fault_result kvm_trap_emul_gva_fault(struct kvm_vcpu *vcpu,
+>   						   bool write);
+>   
+>   #define KVM_ARCH_WANT_MMU_NOTIFIER
+> +#define KVM_ARCH_WANT_NEW_MMU_NOTIFIER_APIS
+>   
+>   /* Emulation */
+>   int kvm_get_inst(u32 *opc, struct kvm_vcpu *vcpu, u32 *out);
+> diff --git a/arch/mips/kvm/mmu.c b/arch/mips/kvm/mmu.c
+> index 3dabeda82458..3dc885df2e32 100644
+> --- a/arch/mips/kvm/mmu.c
+> +++ b/arch/mips/kvm/mmu.c
+> @@ -439,85 +439,36 @@ static int kvm_mips_mkold_gpa_pt(struct kvm *kvm, gfn_t start_gfn,
+>   				  end_gfn << PAGE_SHIFT);
+>   }
+>   
+> -static int handle_hva_to_gpa(struct kvm *kvm,
+> -			     unsigned long start,
+> -			     unsigned long end,
+> -			     int (*handler)(struct kvm *kvm, gfn_t gfn,
+> -					    gpa_t gfn_end,
+> -					    struct kvm_memory_slot *memslot,
+> -					    void *data),
+> -			     void *data)
+> +bool kvm_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range)
+>   {
+> -	struct kvm_memslots *slots;
+> -	struct kvm_memory_slot *memslot;
+> -	int ret = 0;
+> -
+> -	slots = kvm_memslots(kvm);
+> -
+> -	/* we only care about the pages that the guest sees */
+> -	kvm_for_each_memslot(memslot, slots) {
+> -		unsigned long hva_start, hva_end;
+> -		gfn_t gfn, gfn_end;
+> -
+> -		hva_start = max(start, memslot->userspace_addr);
+> -		hva_end = min(end, memslot->userspace_addr +
+> -					(memslot->npages << PAGE_SHIFT));
+> -		if (hva_start >= hva_end)
+> -			continue;
+> -
+> -		/*
+> -		 * {gfn(page) | page intersects with [hva_start, hva_end)} =
+> -		 * {gfn_start, gfn_start+1, ..., gfn_end-1}.
+> -		 */
+> -		gfn = hva_to_gfn_memslot(hva_start, memslot);
+> -		gfn_end = hva_to_gfn_memslot(hva_end + PAGE_SIZE - 1, memslot);
+> -
+> -		ret |= handler(kvm, gfn, gfn_end, memslot, data);
+> -	}
+> -
+> -	return ret;
+> -}
+> -
+> -
+> -static int kvm_unmap_hva_handler(struct kvm *kvm, gfn_t gfn, gfn_t gfn_end,
+> -				 struct kvm_memory_slot *memslot, void *data)
+> -{
+> -	kvm_mips_flush_gpa_pt(kvm, gfn, gfn_end);
+> -	return 1;
+> -}
+> -
+> -int kvm_unmap_hva_range(struct kvm *kvm, unsigned long start, unsigned long end,
+> -			unsigned flags)
+> -{
+> -	handle_hva_to_gpa(kvm, start, end, &kvm_unmap_hva_handler, NULL);
+> +	kvm_mips_flush_gpa_pt(kvm, range->start, range->end);
+>   
+>   	kvm_mips_callbacks->flush_shadow_all(kvm);
+>   	return 0;
+>   }
+>   
+> -static int kvm_set_spte_handler(struct kvm *kvm, gfn_t gfn, gfn_t gfn_end,
+> -				struct kvm_memory_slot *memslot, void *data)
+> +static bool __kvm_set_spte_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
+>   {
+> -	gpa_t gpa = gfn << PAGE_SHIFT;
+> -	pte_t hva_pte = *(pte_t *)data;
+> +	gpa_t gpa = range->start << PAGE_SHIFT;
+> +	pte_t hva_pte = range->pte;
+>   	pte_t *gpa_pte = kvm_mips_pte_for_gpa(kvm, NULL, gpa);
+>   	pte_t old_pte;
+>   
+>   	if (!gpa_pte)
+> -		return 0;
+> +		return false;
+>   
+>   	/* Mapping may need adjusting depending on memslot flags */
+>   	old_pte = *gpa_pte;
+> -	if (memslot->flags & KVM_MEM_LOG_DIRTY_PAGES && !pte_dirty(old_pte))
+> +	if (range->slot->flags & KVM_MEM_LOG_DIRTY_PAGES && !pte_dirty(old_pte))
+>   		hva_pte = pte_mkclean(hva_pte);
+> -	else if (memslot->flags & KVM_MEM_READONLY)
+> +	else if (range->slot->flags & KVM_MEM_READONLY)
+>   		hva_pte = pte_wrprotect(hva_pte);
+>   
+>   	set_pte(gpa_pte, hva_pte);
+>   
+>   	/* Replacing an absent or old page doesn't need flushes */
+>   	if (!pte_present(old_pte) || !pte_young(old_pte))
+> -		return 0;
+> +		return false;
+>   
+>   	/* Pages swapped, aged, moved, or cleaned require flushes */
+>   	return !pte_present(hva_pte) ||
+> @@ -526,27 +477,21 @@ static int kvm_set_spte_handler(struct kvm *kvm, gfn_t gfn, gfn_t gfn_end,
+>   	       (pte_dirty(old_pte) && !pte_dirty(hva_pte));
+>   }
+>   
+> -int kvm_set_spte_hva(struct kvm *kvm, unsigned long hva, pte_t pte)
+> +bool kvm_set_spte_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
+>   {
+> -	unsigned long end = hva + PAGE_SIZE;
+> -	int ret;
+> -
+> -	ret = handle_hva_to_gpa(kvm, hva, end, &kvm_set_spte_handler, &pte);
+> -	if (ret)
+> +	if (__kvm_set_spte_gfn(kvm, range))
+>   		kvm_mips_callbacks->flush_shadow_all(kvm);
+> -	return 0;
+> +	return false;
+>   }
+>   
+> -static int kvm_age_hva_handler(struct kvm *kvm, gfn_t gfn, gfn_t gfn_end,
+> -			       struct kvm_memory_slot *memslot, void *data)
+> +bool kvm_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
+>   {
+> -	return kvm_mips_mkold_gpa_pt(kvm, gfn, gfn_end);
+> +	return kvm_mips_mkold_gpa_pt(kvm, range->start, range->end);
+>   }
+>   
+> -static int kvm_test_age_hva_handler(struct kvm *kvm, gfn_t gfn, gfn_t gfn_end,
+> -				    struct kvm_memory_slot *memslot, void *data)
+> +bool kvm_test_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
+>   {
+> -	gpa_t gpa = gfn << PAGE_SHIFT;
+> +	gpa_t gpa = range->start << PAGE_SHIFT;
+>   	pte_t *gpa_pte = kvm_mips_pte_for_gpa(kvm, NULL, gpa);
+>   
+>   	if (!gpa_pte)
+> @@ -554,16 +499,6 @@ static int kvm_test_age_hva_handler(struct kvm *kvm, gfn_t gfn, gfn_t gfn_end,
+>   	return pte_young(*gpa_pte);
+>   }
+>   
+> -int kvm_age_hva(struct kvm *kvm, unsigned long start, unsigned long end)
+> -{
+> -	return handle_hva_to_gpa(kvm, start, end, kvm_age_hva_handler, NULL);
+> -}
+> -
+> -int kvm_test_age_hva(struct kvm *kvm, unsigned long hva)
+> -{
+> -	return handle_hva_to_gpa(kvm, hva, hva, kvm_test_age_hva_handler, NULL);
+> -}
+> -
+>   /**
+>    * _kvm_mips_map_page_fast() - Fast path GPA fault handler.
+>    * @vcpu:		VCPU pointer.
 > 
 
