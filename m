@@ -2,109 +2,118 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A5A6F34FC92
-	for <lists+kvm@lfdr.de>; Wed, 31 Mar 2021 11:23:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8834934FCC3
+	for <lists+kvm@lfdr.de>; Wed, 31 Mar 2021 11:28:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234534AbhCaJWf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 31 Mar 2021 05:22:35 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:44046 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234568AbhCaJWF (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 31 Mar 2021 05:22:05 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1617182524;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=zVTROcBb9bzk8v36Iv2BqaLwng0q/XnAhHIMpKNn/Ys=;
-        b=J7OQhVGOOFbTrGOOalIS61arlTXGZTMGd+Pp2qw+5dNfaKNe0yJ95hBbc4cGQa+xZcnfhL
-        PEY0DJQa6i/rxbmZX6xgITlBrjaPfi5je2wAKQh8btuTABKK/iWOkOzdxypdR3GKdV95OM
-        N4jboCb3HOuPojYhKJgAZIuSmgXIqBs=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-410-Mt34MXa8NpiN-2friIKHbQ-1; Wed, 31 Mar 2021 05:22:02 -0400
-X-MC-Unique: Mt34MXa8NpiN-2friIKHbQ-1
-Received: by mail-ed1-f69.google.com with SMTP id q25so773196eds.16
-        for <kvm@vger.kernel.org>; Wed, 31 Mar 2021 02:22:02 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=zVTROcBb9bzk8v36Iv2BqaLwng0q/XnAhHIMpKNn/Ys=;
-        b=WyacIhxVpMXPzPYYeDqKRjITUo2tGUpvd5AE//eHjuYj47DFpg35eotJLdWvqMpfZF
-         8KjGc2PFMbgpiokqdKZ/OHyvkJ6Y67P9xcLa0oQrdKbc2LPuhzsGZvKT2J1vK1o2ofNI
-         zEdXDgKfTlj4EJYFAUYgJSmD9QXL4HagXs8J8MCDgCg88ghUs0DT+oPOyvkrnbS83yc3
-         bh/PaX9EM5Yh7AD/dRzHXt9ch7Vo8wOCHjA+vivfOfQ0voxkRUF7p/wl9Uzi5lYep2eI
-         0lVUuVDYIjznXbTswNf1k0dRtwvAvsszRfTRd5dgMmOBqNJG9zUiMrhPyjEhMYMHYMCP
-         WUZw==
-X-Gm-Message-State: AOAM530ijavXGmYGFeFblP2xeTnF17gbR+NpLvKvuJHKBYskhj8Nh2Dp
-        ORIyUbd+LL3ET4zibqs1cIxTeTMi7r4KP4cIk4wIBq6FvWElciza+o/0B0ANA+u4KROeogeGljb
-        dHv+rbbQdGO2J
-X-Received: by 2002:a17:906:26c9:: with SMTP id u9mr2490738ejc.520.1617182521410;
-        Wed, 31 Mar 2021 02:22:01 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwKa9uTF2uTziE05IHjX/X7hZq3YmL9WZwLFu1Pz7aA1dpsCjRo6rR9QXD1luH8TZAUg/dkxw==
-X-Received: by 2002:a17:906:26c9:: with SMTP id u9mr2490728ejc.520.1617182521264;
-        Wed, 31 Mar 2021 02:22:01 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e? ([2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e])
-        by smtp.gmail.com with ESMTPSA id q19sm786118ejy.50.2021.03.31.02.21.59
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 31 Mar 2021 02:22:00 -0700 (PDT)
-Subject: Re: [PATCH v16 00/17] KVM RISC-V Support
-To:     Anup Patel <anup@brainfault.org>,
-        Palmer Dabbelt <palmerdabbelt@google.com>
-Cc:     Anup Patel <Anup.Patel@wdc.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Alexander Graf <graf@amazon.com>,
-        Atish Patra <Atish.Patra@wdc.com>,
-        Alistair Francis <Alistair.Francis@wdc.com>,
-        Damien Le Moal <Damien.LeMoal@wdc.com>,
-        KVM General <kvm@vger.kernel.org>,
-        kvm-riscv@lists.infradead.org,
-        linux-riscv <linux-riscv@lists.infradead.org>,
-        "linux-kernel@vger.kernel.org List" <linux-kernel@vger.kernel.org>
-References: <20210115121846.114528-1-anup.patel@wdc.com>
- <mhng-a4e92a0a-085d-4be0-863e-6af99dc27c18@palmerdabbelt-glaptop>
- <CAAhSdy0F7gisk=FZXN7jmqFLVB3456WunwVXhkrnvNuWtrhWWA@mail.gmail.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <a49a7142-104e-fdaa-4a6a-619505695229@redhat.com>
-Date:   Wed, 31 Mar 2021 11:21:58 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.7.0
+        id S234710AbhCaJ11 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 31 Mar 2021 05:27:27 -0400
+Received: from aserp2130.oracle.com ([141.146.126.79]:38712 "EHLO
+        aserp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234711AbhCaJ1J (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 31 Mar 2021 05:27:09 -0400
+Received: from pps.filterd (aserp2130.oracle.com [127.0.0.1])
+        by aserp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 12V9Ov1P189484;
+        Wed, 31 Mar 2021 09:26:44 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
+ : subject : message-id : references : mime-version : content-type :
+ in-reply-to; s=corp-2020-01-29;
+ bh=KPySmHLqAP61MyIasZoJ5OyxdVnPRXNfupUZxb+81o4=;
+ b=CNdULtE6FqBc1YNYMuecY1hB4+Y+Egnrln6yDmvtd7+uCZD2hxu+6kYad9UAJV196U0I
+ WImipTF6nRHSHNksC77MniLcPIJ/VHI+6Kg2I3gVkwuBbML8ujXC/3RjF4fFWkZGi/ZY
+ shWoHk2FxL7uIoYuoxIL7d8mAK5RcK59ysBgkQ4qyxXBxxYpuAFi1+P5JCY8//MI8JtU
+ Uyfu4iVZreoOezdTkZuQfoshBWlGhvLiQbHBXJI1/IoqAmvgujegOu3P0WO2KQHYsYsT
+ HjqiSXvF7xdGcEZWN1KuGJRla2F/sQxQ3iCcFh6VtXR8cHDl/HwksIFGsiAuiQo135uJ QQ== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+        by aserp2130.oracle.com with ESMTP id 37mafv1k9r-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 31 Mar 2021 09:26:44 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+        by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 12V9JcZT067590;
+        Wed, 31 Mar 2021 09:26:43 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+        by aserp3030.oracle.com with ESMTP id 37mabp6beh-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 31 Mar 2021 09:26:43 +0000
+Received: from abhmp0011.oracle.com (abhmp0011.oracle.com [141.146.116.17])
+        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 12V9Qa8G007579;
+        Wed, 31 Mar 2021 09:26:36 GMT
+Received: from kadam (/102.36.221.92)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Wed, 31 Mar 2021 02:26:36 -0700
+Date:   Wed, 31 Mar 2021 12:26:24 +0300
+From:   Dan Carpenter <dan.carpenter@oracle.com>
+To:     Christian Brauner <christian.brauner@ubuntu.com>
+Cc:     Xie Yongji <xieyongji@bytedance.com>, hch@infradead.org,
+        mst@redhat.com, jasowang@redhat.com, stefanha@redhat.com,
+        sgarzare@redhat.com, parav@nvidia.com,
+        christian.brauner@canonical.com, rdunlap@infradead.org,
+        willy@infradead.org, viro@zeniv.linux.org.uk, axboe@kernel.dk,
+        bcrl@kvack.org, corbet@lwn.net, mika.penttila@nextfour.com,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        kvm@vger.kernel.org, linux-fsdevel@vger.kernel.org
+Subject: Re: [PATCH v6 01/10] file: Export receive_fd() to modules
+Message-ID: <20210331092624.GI2088@kadam>
+References: <20210331080519.172-1-xieyongji@bytedance.com>
+ <20210331080519.172-2-xieyongji@bytedance.com>
+ <20210331091545.lr572rwpyvrnji3w@wittgenstein>
 MIME-Version: 1.0
-In-Reply-To: <CAAhSdy0F7gisk=FZXN7jmqFLVB3456WunwVXhkrnvNuWtrhWWA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210331091545.lr572rwpyvrnji3w@wittgenstein>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-Proofpoint-IMR: 1
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=9939 signatures=668683
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 phishscore=0
+ malwarescore=0 mlxlogscore=999 adultscore=0 spamscore=0 mlxscore=0
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2103300000 definitions=main-2103310068
+X-Proofpoint-ORIG-GUID: YHYYseNx9ByGLpeYrfNz0NmGPzPCiw_B
+X-Proofpoint-GUID: YHYYseNx9ByGLpeYrfNz0NmGPzPCiw_B
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=9939 signatures=668683
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 clxscore=1011 adultscore=0
+ impostorscore=0 bulkscore=0 spamscore=0 lowpriorityscore=0 mlxlogscore=999
+ priorityscore=1501 phishscore=0 malwarescore=0 mlxscore=0 suspectscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2103300000
+ definitions=main-2103310068
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 30/03/21 07:48, Anup Patel wrote:
+On Wed, Mar 31, 2021 at 11:15:45AM +0200, Christian Brauner wrote:
+> On Wed, Mar 31, 2021 at 04:05:10PM +0800, Xie Yongji wrote:
+> > Export receive_fd() so that some modules can use
+> > it to pass file descriptor between processes without
+> > missing any security stuffs.
+> > 
+> > Signed-off-by: Xie Yongji <xieyongji@bytedance.com>
+> > ---
 > 
-> It seems Andrew does not want to freeze H-extension until we have virtualization
-> aware interrupt controller (such as RISC-V AIA specification) and IOMMU. Lot
-> of us feel that these things can be done independently because RISC-V
-> H-extension already has provisions for external interrupt controller with
-> virtualization support.
+> Yeah, as I said in the other mail I'd be comfortable with exposing just
+> this variant of the helper.
+> Maybe this should be a separate patch bundled together with Christoph's
+> patch to split parts of receive_fd() into a separate helper.
+> This would also allow us to simplify a few other codepaths in drivers as
+> well btw. I just took a hasty stab at two of them:
+> 
+> diff --git a/drivers/android/binder.c b/drivers/android/binder.c
+> index c119736ca56a..3c716bf6d84b 100644
+> --- a/drivers/android/binder.c
+> +++ b/drivers/android/binder.c
+> @@ -3728,8 +3728,9 @@ static int binder_apply_fd_fixups(struct binder_proc *proc,
+>         int ret = 0;
+> 
+>         list_for_each_entry(fixup, &t->fd_fixups, fixup_entry) {
+> -               int fd = get_unused_fd_flags(O_CLOEXEC);
+> +               int fd = receive_fd(fixup->file, O_CLOEXEC);
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Assignment duplicated on the next line.
 
-Yes, frankly that's pretty ridiculous as it's perfectly possible to 
-emulate the interrupt controller in software (and an IOMMU is not needed 
-at all if you are okay with emulated or paravirtualized devices---which 
-is almost always the case except for partitioning hypervisors).
+> 
+> +               fd = receive_fd(fixup->file, O_CLOEXEC);
+>                 if (fd < 0) {
+>                         binder_debug(BINDER_DEBUG_TRANSACTION,
+>                                      "failed fd fixup txn %d fd %d\n",
 
-Palmer, are you okay with merging RISC-V KVM?  Or should we place it in 
-drivers/staging/riscv/kvm?
-
-Either way, the best way to do it would be like this:
-
-1) you apply patch 1 in a topic branch
-
-2) you merge the topic branch in the risc-v tree
-
-3) Anup merges the topic branch too and sends me a pull request.
-
-Paolo
+regards,
+dan carpenter
 
