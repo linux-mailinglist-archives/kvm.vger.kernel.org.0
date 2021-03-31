@@ -2,58 +2,54 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DEB2E3508AC
-	for <lists+kvm@lfdr.de>; Wed, 31 Mar 2021 23:01:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A64F73508C2
+	for <lists+kvm@lfdr.de>; Wed, 31 Mar 2021 23:06:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230071AbhCaVAp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 31 Mar 2021 17:00:45 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:46301 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230284AbhCaVA1 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 31 Mar 2021 17:00:27 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1617224427;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=2LQqUVLUZYdl8RcTGPBOfvhnoH130Hf3/RpFvvu9duY=;
-        b=LygfMteufjDOoCwfEYkC2x8VvYk8LX3FbgkDA1/Bs0ggKwf0rqgabZabBpNHe91pELQ7In
-        cqLsUGBosN3suqR7TPJ4wYLbbkD7/VUhgWoRAV6w+oUkpai1uxWYEgUPqh9Et4+ADO6sFc
-        LpFSpHgXv4MBAMEdWAF8IsBmCWncAYA=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-560-O1fyjCVpMg-z7FR27Dpq0Q-1; Wed, 31 Mar 2021 17:00:22 -0400
-X-MC-Unique: O1fyjCVpMg-z7FR27Dpq0Q-1
-Received: by mail-ej1-f69.google.com with SMTP id v27so1358746ejq.0
-        for <kvm@vger.kernel.org>; Wed, 31 Mar 2021 14:00:22 -0700 (PDT)
+        id S229486AbhCaVGE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 31 Mar 2021 17:06:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46876 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230239AbhCaVFx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 31 Mar 2021 17:05:53 -0400
+Received: from mail-pf1-x429.google.com (mail-pf1-x429.google.com [IPv6:2607:f8b0:4864:20::429])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B0164C061760
+        for <kvm@vger.kernel.org>; Wed, 31 Mar 2021 14:05:53 -0700 (PDT)
+Received: by mail-pf1-x429.google.com with SMTP id q5so15430015pfh.10
+        for <kvm@vger.kernel.org>; Wed, 31 Mar 2021 14:05:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=OsMJWVQ5QwySc9J0D6/CmIltvLje627dYrulaN3pAYw=;
+        b=Wc7aKMlkMupX5QKCwfzZVYqMCo1X7BRsT/Kkkx7EwXhoN5RNV7t4FFC66e9PTmv1hx
+         B5fa6/ZZRBlZ7u8xuFDL9LYZr/z14+WE4xRb24HmRER5FPe8woSMl7enlu5vXfvWMl1b
+         ME7U4jYEdyICvfRyN6+B26dJ3dEizwHNQsWpWevkiP4PnR+3Jmdg2xy/JJIDOEUUXaQ0
+         ltEvaex2B8+pIp7NiAF68Y5qiyuu4234eP6u6hPNTVxaQ9AE8rdIKMAy3U8FEPBYR1GF
+         8MWtaTrm5lKR+WYnx0BpHgfhq0fkF/UBhRko1T8H4itpPFwtvOhfmo0NCytN/FJUUsy1
+         332w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=2LQqUVLUZYdl8RcTGPBOfvhnoH130Hf3/RpFvvu9duY=;
-        b=WMmvY3I1gfCqsvz/HeO6YKiAOUXEPGPpdstPhjzGG01jDN9vnqF6d6Y96tetOMBuxK
-         veIHM1eEb3OrSX46SvxT1FNck6gdCTfjXeONFxYa8lomQHd98yDv1qVcXBvUu5sH9mZ7
-         09BOaVApoh/RAQ8RiY3zPZXaIERYQusc4SfQGWnq4IsVUy9pOVYHMZEzKnPwPyZAG98w
-         m/VimPH+XZI9LgVfaQp62NCnJEFG9syFi4ZJE9tWlY9dPXNFYGwGKI4371v2HNm1ZOdA
-         AA7H/PEaTBJrtMaQwaNHrtKhjLFefhXVfqdlNQ4v3s9Emp2S/djJs9JemQq6BacQZhdu
-         n5Ng==
-X-Gm-Message-State: AOAM531uLt3/a6HktY0wQRciCTVsUkZ8AGnit2GFx6SX+n8smhqlRzsp
-        zCWsmb0z11xSAKGUdbKrNtb6E9GwrX+LAoGaunmOnahxKGzoN0YIyH8xam4WUlRHdeHfa9GeAyt
-        +qotXfu7sgLQN
-X-Received: by 2002:aa7:d3ca:: with SMTP id o10mr6104414edr.374.1617224421720;
-        Wed, 31 Mar 2021 14:00:21 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJw50R87T4Vu7z/jVciLQACACQ+dsOT5/iwXfrDvSvIyaxglINHwXnv99OCNOBQhJmcFA6BI0w==
-X-Received: by 2002:aa7:d3ca:: with SMTP id o10mr6104376edr.374.1617224421543;
-        Wed, 31 Mar 2021 14:00:21 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id x21sm2291820eds.53.2021.03.31.14.00.20
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 31 Mar 2021 14:00:20 -0700 (PDT)
-Subject: Re: [PATCH 16/18] KVM: Don't take mmu_lock for range invalidation
- unless necessary
-To:     Sean Christopherson <seanjc@google.com>
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=OsMJWVQ5QwySc9J0D6/CmIltvLje627dYrulaN3pAYw=;
+        b=QW3sKiz59BWc41A7tRj8ic3/UAUwtyqeKJsWb86N8CjqJJ1pDCtzvLqmeXUg3aEBhp
+         9EobfoOKZL9UEOuP8nqlBdL/8VhzUDllC868WFuVFJOguvm2xF0ySrosCV1vqvmzeqau
+         Dla/ywy6C5qyH2WoGc128CdBpgDpkgWilnqkhIzCEMXKX1IaNEn+4PYc9LMeI8VfkDM9
+         jgDHNd0ErUuBRoMepRFAoGj9G+sGQPCZegLLRXp6YdOXCQLL9Wp04874hWdNGM/jDrgB
+         J51dAu/1CrSRdGCjKt7n/FD67hSQT7pjWvia5W6+KYtWN5UeBUia1zLU19CRzfMf45Oj
+         UH1Q==
+X-Gm-Message-State: AOAM533NDrtLVcBigV6JjtrDQ71LbxyuLeOjYCWADGP0OVt0uuLaOqgv
+        rR/0zf5FA5n55y3M8+H9plE9gQ==
+X-Google-Smtp-Source: ABdhPJyf0uPjw7GKqed+RHpnFRPgnZODnH1LNH3LjT1TYsTNjhWE3dnO3pT+GkRqgzOjMV1yU6flMQ==
+X-Received: by 2002:a62:6497:0:b029:220:d96a:8a79 with SMTP id y145-20020a6264970000b0290220d96a8a79mr4625909pfb.23.1617224752934;
+        Wed, 31 Mar 2021 14:05:52 -0700 (PDT)
+Received: from google.com (240.111.247.35.bc.googleusercontent.com. [35.247.111.240])
+        by smtp.gmail.com with ESMTPSA id na18sm2894150pjb.30.2021.03.31.14.05.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 31 Mar 2021 14:05:52 -0700 (PDT)
+Date:   Wed, 31 Mar 2021 21:05:48 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Marc Zyngier <maz@kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
         Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
         Paul Mackerras <paulus@ozlabs.org>,
@@ -68,34 +64,50 @@ Cc:     Marc Zyngier <maz@kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
         linux-mips@vger.kernel.org, kvm@vger.kernel.org,
         kvm-ppc@vger.kernel.org, linux-kernel@vger.kernel.org,
         Ben Gardon <bgardon@google.com>
+Subject: Re: [PATCH 16/18] KVM: Don't take mmu_lock for range invalidation
+ unless necessary
+Message-ID: <YGTkLMAzk88wOiZm@google.com>
 References: <20210326021957.1424875-1-seanjc@google.com>
  <20210326021957.1424875-17-seanjc@google.com>
  <6e7dc7d0-f5dc-85d9-1c50-d23b761b5ff3@redhat.com>
- <YGTg/AWdieMM/mS7@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <60357fd0-d412-fe47-8023-8107a60ade7e@redhat.com>
-Date:   Wed, 31 Mar 2021 23:00:19 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.7.0
+ <YGSmMeSOPcjxRwf6@google.com>
+ <56ea69fe-87b0-154b-e286-efce9233864e@redhat.com>
+ <YGTRzf/4i9Y8XR2c@google.com>
+ <0e30625f-934d-9084-e293-cb3bcbc9e4b8@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <YGTg/AWdieMM/mS7@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <0e30625f-934d-9084-e293-cb3bcbc9e4b8@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 31/03/21 22:52, Sean Christopherson wrote:
-> 100% agree with introducing on_lock separately from the conditional locking.
+On Wed, Mar 31, 2021, Paolo Bonzini wrote:
+> On 31/03/21 21:47, Sean Christopherson wrote:
+> > Rereading things, a small chunk of the rwsem nastiness can go away.  I don't see
+> > any reason to use rw_semaphore instead of rwlock_t.
 > 
-> Not so sure about introducing conditional locking and then converting non-x86
-> archs.  I'd prefer to keep the conditional locking after arch conversion.
-> If something does go awry, it would be nice to be able to preciesly bisect to
-> the conditional locking.  Ditto if it needs to be reverted because it breaks an
-> arch.
+> Wouldn't it be incorrect to lock a mutex (e.g. inside *another* MMU
+> notifier's invalidate callback) while holding an rwlock_t?  That makes sense
+> because anybody that's busy waiting in write_lock potentially cannot be
+> preempted until the other task gets the mutex.  This is a potential
+> deadlock.
 
-Ok, that sounds good too.
+Yes?  I don't think I follow your point though.  Nesting a spinlock or rwlock
+inside a rwlock is ok, so long as the locks are always taken in the same order,
+i.e. it's never mmu_lock -> mmu_notifier_slots_lock.
 
-Paolo
+> I also thought of busy waiting on down_read_trylock if the MMU notifier
+> cannot block, but that would also be invalid for the opposite reason (the
+> down_write task might be asleep, waiting for other readers to release the
+> task, and the down_read_trylock busy loop might not let that task run).
+> 
+> > And that's _already_ the worst case since notifications are currently
+> > serialized by mmu_lock.
+> 
+> But right now notifications are not a single critical section, they're two,
+> aren't they?
 
+Ah, crud, yes.  Holding a spinlock across the entire start() ... end() would be
+bad, especially when the notifier can block since that opens up the possibility
+of the task sleeping/blocking/yielding while the spinlock is held.  Bummer.
