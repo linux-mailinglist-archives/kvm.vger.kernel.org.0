@@ -2,124 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7641434FFBD
-	for <lists+kvm@lfdr.de>; Wed, 31 Mar 2021 13:51:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8C9D3350015
+	for <lists+kvm@lfdr.de>; Wed, 31 Mar 2021 14:21:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235273AbhCaLuE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 31 Mar 2021 07:50:04 -0400
-Received: from mail.kernel.org ([198.145.29.99]:58328 "EHLO mail.kernel.org"
+        id S235487AbhCaMVL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 31 Mar 2021 08:21:11 -0400
+Received: from mga14.intel.com ([192.55.52.115]:10878 "EHLO mga14.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S235287AbhCaLty (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 31 Mar 2021 07:49:54 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id EC88860249;
-        Wed, 31 Mar 2021 11:49:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1617191393;
-        bh=9Tvk8pMagcUqHlxEfpmAq3P1z5xVSb6AxBC9iuF3UAo=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=kMlovUr/+JWR2ZHUYmDPMJ2ndHmdrz5lm7unGTt4nXLsAYiYuNHKr5e0oMkxx6fDz
-         QR2rHHP5l9HS5rEud3McAg/yhn1jEjy25vdtAyZhr/OaEDrBLA51RShgMt6ADFGgKk
-         uQaFZLkdzt19pPW2qgqzcDG9l8DRiLheZZlrvUgMDXhydKLRJqDVIU4Tnw+ks2cwPl
-         dKj97SK7OA1MiDUHwOiBDXkDUo1pSJ37y/5yx0ulUHqGh/GEBy/gsrfNl6Wm5GhbkI
-         DEukmD+vjCBTbLqtDliJ10g6+dV8RwrdEMhaaSt1c6K7yQWHZYOPwwIVQ8ExC6hyFf
-         jZwkG9F4BmZKw==
-Date:   Wed, 31 Mar 2021 12:49:47 +0100
-From:   Will Deacon <will@kernel.org>
-To:     Robin Murphy <robin.murphy@arm.com>
-Cc:     Christoph Hellwig <hch@lst.de>, Joerg Roedel <joro@8bytes.org>,
-        Li Yang <leoyang.li@nxp.com>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Lu Baolu <baolu.lu@linux.intel.com>,
-        linuxppc-dev@lists.ozlabs.org, linux-arm-msm@vger.kernel.org,
-        dri-devel@lists.freedesktop.org, freedreno@lists.freedesktop.org,
-        iommu@lists.linux-foundation.org,
-        linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
-Subject: Re: [PATCH 16/18] iommu: remove DOMAIN_ATTR_DMA_USE_FLUSH_QUEUE
-Message-ID: <20210331114947.GA7626@willie-the-truck>
-References: <20210316153825.135976-1-hch@lst.de>
- <20210316153825.135976-17-hch@lst.de>
- <20210330131149.GP5908@willie-the-truck>
- <a6952aa7-4d7e-54f0-339e-e15f88596dcc@arm.com>
- <20210330135801.GA6187@willie-the-truck>
- <578d6aa5-4239-f5d7-2e9f-686b18e52bba@arm.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <578d6aa5-4239-f5d7-2e9f-686b18e52bba@arm.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+        id S235289AbhCaMU4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 31 Mar 2021 08:20:56 -0400
+IronPort-SDR: hyHlmO4d+qUvp2U8p81kHEl5/PEvTtq4K/ijcLoepbEz0iLlg4jCz4OOASBtz7lqqHhHmAbNIZ
+ gC9XX8ztgflw==
+X-IronPort-AV: E=McAfee;i="6000,8403,9939"; a="191472601"
+X-IronPort-AV: E=Sophos;i="5.81,293,1610438400"; 
+   d="scan'208";a="191472601"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Mar 2021 05:20:48 -0700
+IronPort-SDR: DFRP9CKn4qqWlB9oUSS6aBdCdsx/WHAppkGubpuzrtS6asZXzpH/1hOE8B8ICKbElp0stjOH8W
+ uoYqAbXZSJrQ==
+X-IronPort-AV: E=Sophos;i="5.81,293,1610438400"; 
+   d="scan'208";a="412136132"
+Received: from mwamucix-mobl3.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.251.24.224])
+  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Mar 2021 05:20:44 -0700
+Date:   Thu, 1 Apr 2021 01:20:39 +1300
+From:   Kai Huang <kai.huang@intel.com>
+To:     Kai Huang <kai.huang@intel.com>
+Cc:     Boris Petkov <bp@alien8.de>, <seanjc@google.com>,
+        <kvm@vger.kernel.org>, <x86@kernel.org>,
+        <linux-sgx@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <jarkko@kernel.org>, <luto@kernel.org>, <dave.hansen@intel.com>,
+        <rick.p.edgecombe@intel.com>, <haitao.huang@intel.com>,
+        <pbonzini@redhat.com>, <tglx@linutronix.de>, <mingo@redhat.com>,
+        <hpa@zytor.com>
+Subject: Re: [PATCH v3 05/25] x86/sgx: Introduce virtual EPC for use by KVM
+ guests
+Message-Id: <20210401012039.c78f02ea2ba9f1e5fd504621@intel.com>
+In-Reply-To: <20210331215345.cad098cfcfcaabf489243807@intel.com>
+References: <cover.1616136307.git.kai.huang@intel.com>
+        <0c38ced8c8e5a69872db4d6a1c0dabd01e07cad7.1616136308.git.kai.huang@intel.com>
+        <20210326150320.GF25229@zn.tnic>
+        <20210331141032.db59586da8ba2cccf7b46f77@intel.com>
+        <D4ECF8D3-C483-4E75-AD41-2CEFDF56B12D@alien8.de>
+        <20210331195138.2af97ec1bb4b5e4202f2600d@intel.com>
+        <3889C4C6-48E2-4C97-A074-180EB18BDA29@alien8.de>
+        <20210331215345.cad098cfcfcaabf489243807@intel.com>
+X-Mailer: Sylpheed 3.7.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Mar 30, 2021 at 05:28:19PM +0100, Robin Murphy wrote:
-> On 2021-03-30 14:58, Will Deacon wrote:
-> > On Tue, Mar 30, 2021 at 02:19:38PM +0100, Robin Murphy wrote:
-> > > On 2021-03-30 14:11, Will Deacon wrote:
-> > > > On Tue, Mar 16, 2021 at 04:38:22PM +0100, Christoph Hellwig wrote:
-> > > > > From: Robin Murphy <robin.murphy@arm.com>
-> > > > > 
-> > > > > Instead make the global iommu_dma_strict paramete in iommu.c canonical by
-> > > > > exporting helpers to get and set it and use those directly in the drivers.
-> > > > > 
-> > > > > This make sure that the iommu.strict parameter also works for the AMD and
-> > > > > Intel IOMMU drivers on x86.  As those default to lazy flushing a new
-> > > > > IOMMU_CMD_LINE_STRICT is used to turn the value into a tristate to
-> > > > > represent the default if not overriden by an explicit parameter.
-> > > > > 
-> > > > > Signed-off-by: Robin Murphy <robin.murphy@arm.com>.
-> > > > > [ported on top of the other iommu_attr changes and added a few small
-> > > > >    missing bits]
-> > > > > Signed-off-by: Christoph Hellwig <hch@lst.de>
-> > > > > ---
-> > > > >    drivers/iommu/amd/iommu.c                   | 23 +-------
-> > > > >    drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c | 50 +---------------
-> > > > >    drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h |  1 -
-> > > > >    drivers/iommu/arm/arm-smmu/arm-smmu.c       | 27 +--------
-> > > > >    drivers/iommu/dma-iommu.c                   |  9 +--
-> > > > >    drivers/iommu/intel/iommu.c                 | 64 ++++-----------------
-> > > > >    drivers/iommu/iommu.c                       | 27 ++++++---
-> > > > >    include/linux/iommu.h                       |  4 +-
-> > > > >    8 files changed, 40 insertions(+), 165 deletions(-)
-> > > > 
-> > > > I really like this cleanup, but I can't help wonder if it's going in the
-> > > > wrong direction. With SoCs often having multiple IOMMU instances and a
-> > > > distinction between "trusted" and "untrusted" devices, then having the
-> > > > flush-queue enabled on a per-IOMMU or per-domain basis doesn't sound
-> > > > unreasonable to me, but this change makes it a global property.
-> > > 
-> > > The intent here was just to streamline the existing behaviour of stuffing a
-> > > global property into a domain attribute then pulling it out again in the
-> > > illusion that it was in any way per-domain. We're still checking
-> > > dev_is_untrusted() before making an actual decision, and it's not like we
-> > > can't add more factors at that point if we want to.
+On Wed, 31 Mar 2021 21:53:45 +1300 Kai Huang wrote:
+> On Wed, 31 Mar 2021 09:44:39 +0200 Boris Petkov wrote:
+> > On March 31, 2021 8:51:38 AM GMT+02:00, Kai Huang <kai.huang@intel.com> wrote:
+> > >How about adding explanation to Documentation/x86/sgx.rst?
 > > 
-> > Like I say, the cleanup is great. I'm just wondering whether there's a
-> > better way to express the complicated logic to decide whether or not to use
-> > the flush queue than what we end up with:
-> > 
-> > 	if (!cookie->fq_domain && (!dev || !dev_is_untrusted(dev)) &&
-> > 	    domain->ops->flush_iotlb_all && !iommu_get_dma_strict())
-> > 
-> > which is mixing up globals, device properties and domain properties. The
-> > result is that the driver code ends up just using the global to determine
-> > whether or not to pass IO_PGTABLE_QUIRK_NON_STRICT to the page-table code,
-> > which is a departure from the current way of doing things.
+> > Sure, and then we should point users at it. The thing is also indexed by search engines so hopefully people will find it.
 > 
-> But previously, SMMU only ever saw the global policy piped through the
-> domain attribute by iommu_group_alloc_default_domain(), so there's no
-> functional change there.
+> Thanks. Will do and send out new patch for review.
+> 
+Hi Boris,
 
-For DMA domains sure, but I don't think that's the case for unmanaged
-domains such as those used by VFIO.
+Could you help to review whether below change is OK?
 
-> Obviously some of the above checks could be factored out into some kind of
-> iommu_use_flush_queue() helper that IOMMU drivers can also call if they need
-> to keep in sync. Or maybe we just allow iommu-dma to set
-> IO_PGTABLE_QUIRK_NON_STRICT directly via iommu_set_pgtable_quirks() if we're
-> treating that as a generic thing now.
+diff --git a/Documentation/x86/sgx.rst b/Documentation/x86/sgx.rst
+index 5ec7d17e65e0..49a840718a4d 100644
+--- a/Documentation/x86/sgx.rst
++++ b/Documentation/x86/sgx.rst
+@@ -236,3 +236,19 @@ As a result, when this happpens, user should stop running
+any new SGX workloads, (or just any new workloads), and migrate all valuable
+workloads. Although a machine reboot can recover all EPC, the bug should be
+reported to Linux developers.
++
++Virtual EPC
++===========
++
++Separated from SGX driver for creating and running enclaves in host, SGX core
++also supports virtual EPC driver to support KVM SGX virtualization. Unlike SGX
++driver, EPC page allocated via virtual EPC driver is "raw" EPC page and doesn't
++have specific enclave associated. This is because KVM doesn't track how guest
++uses EPC pages.
++
++As a result, SGX core page reclaimer doesn't support reclaiming EPC pages
++allocated to KVM guests via virtual EPC driver. If user wants to deploy both
++host SGX applications and KVM SGX guests on the same machine, user should
++reserve enough EPC (by taking out total virtual EPC size of all SGX VMs from
++physical EPC size) for host SGX applications so they can run with acceptable
++performance.
 
-I think a helper that takes a domain would be a good starting point.
+In my local, I have squashed above change to this patch, and also added below
+paragraph to the commit message:
 
-Will
+    Also add documenetation to explain what is virtual EPC, and suggest
+    users should be aware of virtual EPC pages are not reclaimable and take
+    this into account when deploying both host SGX applications and KVM SGX
+    guests on the same machine.
