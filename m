@@ -2,155 +2,223 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 444973505FE
-	for <lists+kvm@lfdr.de>; Wed, 31 Mar 2021 20:08:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2F5C935065A
+	for <lists+kvm@lfdr.de>; Wed, 31 Mar 2021 20:32:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234824AbhCaSHh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 31 Mar 2021 14:07:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36542 "EHLO
+        id S235128AbhCaSbc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 31 Mar 2021 14:31:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41628 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234788AbhCaSHa (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 31 Mar 2021 14:07:30 -0400
-Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D31CC061574
-        for <kvm@vger.kernel.org>; Wed, 31 Mar 2021 11:07:30 -0700 (PDT)
-Received: by mail-pj1-x102b.google.com with SMTP id nh23-20020a17090b3657b02900c0d5e235a8so1693747pjb.0
-        for <kvm@vger.kernel.org>; Wed, 31 Mar 2021 11:07:30 -0700 (PDT)
+        with ESMTP id S235087AbhCaSbP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 31 Mar 2021 14:31:15 -0400
+Received: from mail-pf1-x432.google.com (mail-pf1-x432.google.com [IPv6:2607:f8b0:4864:20::432])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D66FC061574
+        for <kvm@vger.kernel.org>; Wed, 31 Mar 2021 11:31:15 -0700 (PDT)
+Received: by mail-pf1-x432.google.com with SMTP id g15so15199801pfq.3
+        for <kvm@vger.kernel.org>; Wed, 31 Mar 2021 11:31:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=fzUxfJHs4m96o0h93XY6hLbrWDklPfvA/cxbRjLDuiE=;
-        b=AW9hN1Djcg4K3j6y1d6rLhacaldp5/qFhVVlaCM4Y4E4DJEIsgt2V+ZwiR2/a+Dazb
-         1JRokka2xSlR+ur/y4YTI5lunennSWPSD6CCusxkJwPorqyEwKEiZHy3jxOSbXjsIztY
-         CL2ZvlWfAFL4bxmN1KzcCzGxE72CVrjbkQA36b76+r7MAKX2GuYTIg4fHXGUizObFMGr
-         qh2q7GOSLeDC8hiM1lbp5K+V3Pr6tbnPU6z460UOE0JuPs6kxAj1rLgbjpxzYV18kUlX
-         62h2/pIh85HeBtJv5VaQXUJ3OYSnMML6O9vO1R/AkJUgrjd3zbEdDT4qVPfZstkbhIb0
-         7nwQ==
+        bh=P8G42q6zwMTsL78Dmf5N77/DWaHOJqpmtJu1f11p4Wk=;
+        b=BF5DIg9LW5TabTQT0PvARh9x0vkxp/pQsO65oAGCDgMkbMXtvAgcgJJbDQ016zFjTS
+         2xrivQ+LI1nqnS3uA6M1BFXG8PfYfoa7ir+pkuPa38tJ4mTLKSgoSrv5CuGfLqeAeTp0
+         7GDd9fTXfPwzAxtQHZy1kbEe7G9QdCU/DTXEOGEoyXH/QybxjoUOgD/y/vzFbPROnXGz
+         png0/4BmC2XPfUYrTXVUasASEqoy9eQfLb3w1n/j5T8PZCLV3qjMdwQ8cZf+64xqo97O
+         2yBGSKFqSnQh183nqkxoZwsa3K7f+BbahEJ6cdjV6XjVJmAMjIhe/OaVCqceu1iBwf9A
+         LAxw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=fzUxfJHs4m96o0h93XY6hLbrWDklPfvA/cxbRjLDuiE=;
-        b=QUQypZCrfIsY0Ae/wiZokLokWlMW3XjVZ5ELGR2C/JapTpM/PGW9l9Z8A6fGcpYCb8
-         t6/G8SN7acsSWRgqykHx+kYH7kLgU5RQ44ryhsWvvzmOFRXXJG5a1NVPlr43jIdgUocL
-         JK4lgkQuNYgJBAumtFyMr6LchvEuIUDOaQCib7Twc2V2BuQ5UtnYOiQO8Tinmy+WHe29
-         p0vLohCJvkLPhFC5g8bPxa2voJtmURIVxFacNTRUN73s3+dCVmoxOTOx33c0nth0Ac2t
-         4/wrj7jdV8QyDL7EFO/1inDHfAlmkObBDEa969aP/g1tpPS8mYo/r/hSiNR2Y4HJS2QR
-         cAkA==
-X-Gm-Message-State: AOAM5330OW58PvRMquhusG0DFtf3uF412mywoseccDxSlQWmcYfjvr8z
-        pUlP3TjEsWv6CcC7HPsG+0EI+A==
-X-Google-Smtp-Source: ABdhPJwVLzSBQTNx4xs+d36/l5KaNndW79U3YjxOAWpxY+JuSKFrSViByfpBlr1uaqpRCR1PsNJC3A==
-X-Received: by 2002:a17:90a:8b16:: with SMTP id y22mr4558382pjn.191.1617214049909;
-        Wed, 31 Mar 2021 11:07:29 -0700 (PDT)
+        bh=P8G42q6zwMTsL78Dmf5N77/DWaHOJqpmtJu1f11p4Wk=;
+        b=eqfyskKVb573dOLO7J5tkrsueV529rFvhaleZqVVfk//PX76Ao6TP0RaWKGQUsICoX
+         pOsehF8uUz69m48J6/2ak9jAxxbrfICspXhGuGclumG/x2rrcKTFtFqwqYdEueEX35Jh
+         HMhhBLQwW8rr4gOE9h2JMISzra6hf2/P7PUA9FsySG9lbnPA4RT+YcvyFf0F07a89NhZ
+         epVg9+4/w0XCfDTyYH3kbxVmmhVeKGyb0MznpdV1taOnJKIFSt0w4CTA6nZUjtTalOiO
+         QHFYcFisD1nIfI7TsjeXu6PCaJIn9QVEDU4ix8bEnsxH0MZRE6ZzP6i8PrMp8GyoWXjt
+         sQ+w==
+X-Gm-Message-State: AOAM530pS4FOD3QV9pQNDGdHLS07KeDw2jRkOiWyg+CLIEbcCiKSALSk
+        zQc6iYj0ZgpOIKrefljj5Udbrg==
+X-Google-Smtp-Source: ABdhPJyJO9WCN8tCTCDKmSpbQeksq6+Qax21Pugu6+mRyYIjw7wFy2q9EGXJ5J0tGbfVX/LgxCus4A==
+X-Received: by 2002:aa7:818e:0:b029:215:2466:3994 with SMTP id g14-20020aa7818e0000b029021524663994mr4333347pfi.48.1617215474808;
+        Wed, 31 Mar 2021 11:31:14 -0700 (PDT)
 Received: from google.com (240.111.247.35.bc.googleusercontent.com. [35.247.111.240])
-        by smtp.gmail.com with ESMTPSA id e1sm2979522pfi.175.2021.03.31.11.07.29
+        by smtp.gmail.com with ESMTPSA id z16sm3009330pfc.139.2021.03.31.11.31.13
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 31 Mar 2021 11:07:29 -0700 (PDT)
-Date:   Wed, 31 Mar 2021 18:07:25 +0000
+        Wed, 31 Mar 2021 11:31:14 -0700 (PDT)
+Date:   Wed, 31 Mar 2021 18:31:10 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     Yang Li <yang.lee@linux.alibaba.com>
-Cc:     pbonzini@redhat.com, vkuznets@redhat.com, wanpengli@tencent.com,
-        jmattson@google.com, joro@8bytes.org, tglx@linutronix.de,
-        mingo@redhat.com, bp@alien8.de, x86@kernel.org, hpa@zytor.com,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] KVM: x86: Fix potential memory access error
-Message-ID: <YGS6XS87HYJdVPFQ@google.com>
-References: <1617182122-112315-1-git-send-email-yang.lee@linux.alibaba.com>
+To:     Emanuele Giuseppe Esposito <eesposit@redhat.com>
+Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>, Shuah Khan <shuah@kernel.org>,
+        Alexander Graf <graf@amazon.com>,
+        Andrew Jones <drjones@redhat.com>, linux-doc@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH v2 1/4] kvm: cpuid: adjust the returned nent field of
+ kvm_cpuid2 for KVM_GET_SUPPORTED_CPUID and KVM_GET_EMULATED_CPUID
+Message-ID: <YGS/7hQo91cVuXbB@google.com>
+References: <20210331122649.38323-1-eesposit@redhat.com>
+ <20210331122649.38323-2-eesposit@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1617182122-112315-1-git-send-email-yang.lee@linux.alibaba.com>
+In-Reply-To: <20210331122649.38323-2-eesposit@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Mar 31, 2021, Yang Li wrote:
-> Using __set_bit() to set a bit in an integer is not a good idea, since
-> the function expects an unsigned long as argument, which can be 64bit wide.
-> Coverity reports this problem as
+On Wed, Mar 31, 2021, Emanuele Giuseppe Esposito wrote:
+> Calling the kvm KVM_GET_[SUPPORTED/EMULATED]_CPUID ioctl requires
+> a nent field inside the kvm_cpuid2 struct to be big enough to contain
+> all entries that will be set by kvm.
+> Therefore if the nent field is too high, kvm will adjust it to the
+> right value. If too low, -E2BIG is returned.
 > 
-> High:Out-of-bounds access(INCOMPATIBLE_CAST)
-> CWE119: Out-of-bounds access to a scalar
-> Pointer "&vcpu->arch.regs_avail" points to an object whose effective
-> type is "unsigned int" (32 bits, unsigned) but is dereferenced as a
-> wider "unsigned long" (64 bits, unsigned). This may lead to memory
-> corruption.
-> 
-> /home/heyuan.shy/git-repo/linux/arch/x86/kvm/kvm_cache_regs.h:
-> kvm_register_is_available
-> 
-> Just use BIT instead.
+> However, when filling the entries do_cpuid_func() requires an
+> additional entry, so if the right nent is known in advance,
+> giving the exact number of entries won't work because it has to be 
+> increased by one.
 
-Meh, we're hosed either way.  Using BIT() will either result in undefined
-behavior due to SHL shifting beyond the size of a u64, or setting random bits
-if the truncated shift ends up being less than 63.
+I'd strong prefer to reword the shortlog and changelog.  It's not immediately
+obvious what this is changing without the context from the v1 thread.  E.g.
 
-I suppose one could argue that undefined behavior is better than memory
-corruption, but KVM is very broken if 'reg' is out-of-bounds so IMO it's not
-worth changing.  There are only two call sites that don't use a hardcoded value,
-and both are guarded by WARN.  kvm_register_write() bails without calling
-kvm_register_mark_dirty(), so that's guaranteed safe.  vmx_cache_reg() WARNs
-after kvm_register_mark_available(), but except for kvm_register_read(), all
-calls to vmx_cache_reg() use a hardcoded value, and kvm_register_read() also
-WARNs and bails.
+  KVM: x86: Fix a spurious -E2BIG in KVM_GET_EMULATED_CPUID
 
-Note, all of the above holds true for kvm_register_is_{available,dirty}(), too.
+  When retrieving emulated CPUID entries, check for an insufficient array size
+  if and only if KVM is actually inserting an entry.  If userspace has a priori
+  knowledge of the exact array size, KVM_GET_EMULATED_CPUID will incorrectly
+  fail due to effectively requiring an extra, unused entry.
 
-So in the current code, it's impossible for this to be a problem.  Theoretically
-future code could introduce bugs, but IMO we should never accept code that uses
-a non-hardcoded 'reg' and doesn't pre-validate.
-
-The number of uops is basically a wash because "BTS <reg>, <mem>" is fairly
-expensive; depending on the uarch, the difference is ~1-2 uops in favor of BIT().
-On the flip side, __set_bit() shaves 8 bytes.  Of course, none these flows are
-anywhere near that senstive.
-
-TL;DR: I'm not opposed to using BIT(), I just don't see the point.
-
-
-__set_bit():
-   0x00000000000104e6 <+6>:	mov    %esi,%eax
-   0x00000000000104e8 <+8>:	mov    %rdi,%rbp
-   0x00000000000104eb <+11>:	sub    $0x8,%rsp
-   0x00000000000104ef <+15>:	bts    %rax,0x2a0(%rdi)
-
-|= BIT():
-   0x0000000000010556 <+6>:	mov    %esi,%ecx
-   0x0000000000010558 <+8>:	mov    $0x1,%eax
-   0x000000000001055d <+13>:	mov    %rdi,%rbp
-   0x0000000000010560 <+16>:	sub    $0x8,%rsp
-   0x0000000000010564 <+20>:	shl    %cl,%rax
-   0x0000000000010567 <+23>:	or     %eax,0x2a0(%rdi)
-
-> Reported-by: Abaci Robot <abaci@linux.alibaba.com>
-> Signed-off-by: Yang Li <yang.lee@linux.alibaba.com>
+> Signed-off-by: Emanuele Giuseppe Esposito <eesposit@redhat.com>
 > ---
->  arch/x86/kvm/kvm_cache_regs.h | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
+>  arch/x86/kvm/cpuid.c | 35 ++++++++++++++++++-----------------
+>  1 file changed, 18 insertions(+), 17 deletions(-)
 > 
-> diff --git a/arch/x86/kvm/kvm_cache_regs.h b/arch/x86/kvm/kvm_cache_regs.h
-> index 2e11da2..cfa45d88 100644
-> --- a/arch/x86/kvm/kvm_cache_regs.h
-> +++ b/arch/x86/kvm/kvm_cache_regs.h
-> @@ -52,14 +52,14 @@ static inline bool kvm_register_is_dirty(struct kvm_vcpu *vcpu,
->  static inline void kvm_register_mark_available(struct kvm_vcpu *vcpu,
->  					       enum kvm_reg reg)
+> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+> index 6bd2f8b830e4..02a51f921548 100644
+> --- a/arch/x86/kvm/cpuid.c
+> +++ b/arch/x86/kvm/cpuid.c
+> @@ -567,34 +567,34 @@ static struct kvm_cpuid_entry2 *do_host_cpuid(struct kvm_cpuid_array *array,
+>  
+>  static int __do_cpuid_func_emulated(struct kvm_cpuid_array *array, u32 func)
 >  {
-> -	__set_bit(reg, (unsigned long *)&vcpu->arch.regs_avail);
-> +	vcpu->arch.regs_avail |= BIT(reg);
+> -	struct kvm_cpuid_entry2 *entry;
+> -
+> -	if (array->nent >= array->maxnent)
+> -		return -E2BIG;
+> +	struct kvm_cpuid_entry2 entry;
+>  
+> -	entry = &array->entries[array->nent];
+> -	entry->function = func;
+> -	entry->index = 0;
+> -	entry->flags = 0;
+> +	entry.function = func;
+> +	entry.index = 0;
+> +	entry.flags = 0;
+
+Depending on the leaf, eax/ebx/ecx/edx will be left uninitialized.  This wasn't
+a bug before since @array is zeroed on allocation.
+
+What about pre-checking @func?  I don't particular like the duplicate checks,
+but none of the solutions are particularly elegant.  E.g.
+
+diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+index 6bd2f8b830e4..9824947bd5ad 100644
+--- a/arch/x86/kvm/cpuid.c
++++ b/arch/x86/kvm/cpuid.c
+@@ -565,14 +565,18 @@ static struct kvm_cpuid_entry2 *do_host_cpuid(struct kvm_cpuid_array *array,
+        return entry;
+ }
+
+-static int __do_cpuid_func_emulated(struct kvm_cpuid_array *array, u32 func)
++static noinline int __do_cpuid_func_emulated(struct kvm_cpuid_array *array, u32 func)
+ {
+        struct kvm_cpuid_entry2 *entry;
+
++       if (func != 0 && func != 1 && func != 7)
++               return 0;
++
+        if (array->nent >= array->maxnent)
+                return -E2BIG;
+
+-       entry = &array->entries[array->nent];
++       entry = &array->entries[array->nent++];
++
+        entry->function = func;
+        entry->index = 0;
+        entry->flags = 0;
+@@ -580,19 +584,17 @@ static int __do_cpuid_func_emulated(struct kvm_cpuid_array *array, u32 func)
+        switch (func) {
+        case 0:
+                entry->eax = 7;
+-               ++array->nent;
+                break;
+        case 1:
+                entry->ecx = F(MOVBE);
+-               ++array->nent;
+                break;
+        case 7:
+                entry->flags |= KVM_CPUID_FLAG_SIGNIFCANT_INDEX;
+                entry->eax = 0;
+                entry->ecx = F(RDPID);
+-               ++array->nent;
+-       default:
+                break;
++       default:
++               BUG();
+        }
+
+        return 0
+
+
+>  
+>  	switch (func) {
+>  	case 0:
+> -		entry->eax = 7;
+> -		++array->nent;
+> +		entry.eax = 7;
+>  		break;
+>  	case 1:
+> -		entry->ecx = F(MOVBE);
+> -		++array->nent;
+> +		entry.ecx = F(MOVBE);
+>  		break;
+>  	case 7:
+> -		entry->flags |= KVM_CPUID_FLAG_SIGNIFCANT_INDEX;
+> -		entry->eax = 0;
+> -		entry->ecx = F(RDPID);
+> -		++array->nent;
+> -	default:
+> +		entry.flags |= KVM_CPUID_FLAG_SIGNIFCANT_INDEX;
+> +		entry.eax = 0;
+> +		entry.ecx = F(RDPID);
+>  		break;
+> +	default:
+> +		goto out;
+>  	}
+>  
+> +	if (array->nent >= array->maxnent)
+> +		return -E2BIG;
+> +
+> +	memcpy(&array->entries[array->nent++], &entry, sizeof(entry));
+> +
+> +out:
+>  	return 0;
 >  }
 >  
->  static inline void kvm_register_mark_dirty(struct kvm_vcpu *vcpu,
->  					   enum kvm_reg reg)
->  {
-> -	__set_bit(reg, (unsigned long *)&vcpu->arch.regs_avail);
-> -	__set_bit(reg, (unsigned long *)&vcpu->arch.regs_dirty);
-> +	vcpu->arch.regs_avail |= BIT(reg);
-> +	vcpu->arch.regs_dirty |= BIT(reg);
->  }
+> @@ -975,6 +975,7 @@ int kvm_dev_ioctl_get_cpuid(struct kvm_cpuid2 *cpuid,
 >  
->  static inline unsigned long kvm_register_read(struct kvm_vcpu *vcpu, int reg)
+>  	if (cpuid->nent < 1)
+>  		return -E2BIG;
+> +
+>  	if (cpuid->nent > KVM_MAX_CPUID_ENTRIES)
+>  		cpuid->nent = KVM_MAX_CPUID_ENTRIES;
+>  
 > -- 
-> 1.8.3.1
+> 2.30.2
 > 
