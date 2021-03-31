@@ -2,52 +2,52 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A2818350A32
-	for <lists+kvm@lfdr.de>; Thu,  1 Apr 2021 00:28:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E2520350A40
+	for <lists+kvm@lfdr.de>; Thu,  1 Apr 2021 00:30:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232367AbhCaW1q (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 31 Mar 2021 18:27:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36666 "EHLO
+        id S232540AbhCaW3z (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 31 Mar 2021 18:29:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37138 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232540AbhCaW1g (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 31 Mar 2021 18:27:36 -0400
-Received: from mail-pf1-x430.google.com (mail-pf1-x430.google.com [IPv6:2607:f8b0:4864:20::430])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DEC1AC06175F
-        for <kvm@vger.kernel.org>; Wed, 31 Mar 2021 15:27:35 -0700 (PDT)
-Received: by mail-pf1-x430.google.com with SMTP id a12so34972pfc.7
-        for <kvm@vger.kernel.org>; Wed, 31 Mar 2021 15:27:35 -0700 (PDT)
+        with ESMTP id S232728AbhCaW3p (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 31 Mar 2021 18:29:45 -0400
+Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A1DE0C06175F
+        for <kvm@vger.kernel.org>; Wed, 31 Mar 2021 15:29:45 -0700 (PDT)
+Received: by mail-pj1-x1030.google.com with SMTP id kr3-20020a17090b4903b02900c096fc01deso2033318pjb.4
+        for <kvm@vger.kernel.org>; Wed, 31 Mar 2021 15:29:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=WpLA/8+oNDyuMS3mRjh7CIaKNZs3vVlk+cUQzEEw+V0=;
-        b=rSblG82rx/HZ2AiRUDoBIpQUlWfYIRlhssFYQBQP3Rf4waNr1zlMADu9Yc7DIMqk45
-         eZzdBd+QD0SBjyUPJbkAakPUoVu+xKWadHTrDjKulfRheuEXsn1PZuO08QRDCGGbDoNB
-         8d5hJghzXoYOC1CCSCgUC8g/C2wxb0v0yaZWai+R8LVzfzO+T8X8s118gAFgNRKJMWA3
-         zEMzpqAX6HQ4LYpAeHc6KVW3UVBdoYL3oUYwruEPAw4UWDpBzFvKPHCkBX95emRe1an8
-         5/DIHIXxdxhtbL+KR0mj0NaofnhgrrpUVFk2VsFdEy4p9x1OVkV7cR9EA3C2xXNSXIMY
-         nKKg==
+        bh=HQnN7NHkGrBqjYvsj3wUwlnZQNzy2q4PClXlOY6uvRo=;
+        b=iMortkY8rwQv5R7gzR0AH0Oxd0HCB4DK5l1TiZ3ve7TnLIFgCiWjIpKP+NloeK+b9O
+         zSrISieAwqCV24o3jmvORHzvnF51sh0lGvseB8cKG0ukduU1iViOeOGYm+j8+q7F5Q5g
+         tgaOd7p9dRIRqoKb6qQN1etdZwuoSfZZVZmzimuk0ZdUCscdKaJ2Bq7MXY7c12nf+gPg
+         uN0Sh1HWip/Zh2/oV3ZFHVciR0KrTXGmPX0BW51K7smQgsodSeA5K4PFuUVMQhicHHhD
+         1PO/V6rZhymhCrAU+Sxc/U7WY6h6g4aFVwL5oQdzxtLBBzGAsPrZUPbIoIinHKX44LUt
+         he9g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=WpLA/8+oNDyuMS3mRjh7CIaKNZs3vVlk+cUQzEEw+V0=;
-        b=aTOaHpDe6WgWNiV9ZTL0dOrQggu0VVnkMRhykf5+oFCqPKzWDGX/gYpuW8kEx3kc2W
-         ok5uHaRrTEnSeSZz3F8CuGCRqMt5NeybdnrTMKGqP2vZGm/qG7rj9Ve17EL/uvOspgvW
-         fVbUBjanQm5hzmcxUTDzfEWGm3ee8tcdN3XuMZCF6FPrHxEyOjpUknuvq0hOSxBm7zB5
-         pCwtq0wxGdnqWgPvC1iiKy0m+LXARoyocgEV39qYZ5kbYyyb5GCT2cxCBeLVutAQ31QZ
-         WbRXsPJGK2Xk+bpGWIWqcKxeEwggEdn86HWN7BpSqicPnkxwoUBjoy4dhcSvZbrNVTgf
-         Wd4g==
-X-Gm-Message-State: AOAM532SOL4tpBU4dDmdZjGHGwlkH/B+TWcuAw2UnX4DDjpsGglJwQxN
-        B5B5eE0/dFWXcefhT3/6YHb76Q==
-X-Google-Smtp-Source: ABdhPJz/NNSLb+31u+PTD2jSbK2k/r80/7e6SA3cFJYq2N69TCi83el/dCjQj51hSg3AXxUO0r5Dqw==
-X-Received: by 2002:a63:d43:: with SMTP id 3mr5029669pgn.5.1617229655137;
-        Wed, 31 Mar 2021 15:27:35 -0700 (PDT)
+        bh=HQnN7NHkGrBqjYvsj3wUwlnZQNzy2q4PClXlOY6uvRo=;
+        b=HMyWELQT6h8sjQS0NdYqXOUwaOW9NYo/llDjbEejeVKaADrtfs0G3lwJMMva1m5JQB
+         j85q906fnAwlsYByzdiJeFC75oknMf/XiYp67M9rGywAqb1UHnBMB2Yv1oRJOmds44eN
+         1dMYcrhr+4LHvD8NMmZOqFA8bvB6k3dK8QHr65MPUlZ0rrPiMlVBxseA4x4ES3WYN/71
+         vkA8W83vBWC03YyXy/KfY0ZsrH2N34wY0InKU/Jm3amtn38eTBWACDIikyzwWPXZUL/U
+         lSn/b53NLZFMk8q3stiPb0tEgOdN6agiMuUOO4LvbucjR9c5BrLjYcEfDLCbt3Dog6Vs
+         UcPg==
+X-Gm-Message-State: AOAM533rA6j3sWO14Z1lGbFwZYsKh6d4eMy15kRPmVLvSEAAsqGXMjTK
+        jPoAnjQE1qZTqjunjWAqUqRaZ1Lfz9rrPg==
+X-Google-Smtp-Source: ABdhPJyiTBSLw8Alpaud1ZG3omKJVcfMmSNJty1jR3bl8poG6iVDs95yRzpoIBXCxqUqOa62CjHuwQ==
+X-Received: by 2002:a17:90a:e656:: with SMTP id ep22mr5325358pjb.60.1617229785114;
+        Wed, 31 Mar 2021 15:29:45 -0700 (PDT)
 Received: from google.com (240.111.247.35.bc.googleusercontent.com. [35.247.111.240])
-        by smtp.gmail.com with ESMTPSA id ds3sm3120454pjb.23.2021.03.31.15.27.34
+        by smtp.gmail.com with ESMTPSA id c6sm3619564pfj.99.2021.03.31.15.29.44
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 31 Mar 2021 15:27:34 -0700 (PDT)
-Date:   Wed, 31 Mar 2021 22:27:30 +0000
+        Wed, 31 Mar 2021 15:29:44 -0700 (PDT)
+Date:   Wed, 31 Mar 2021 22:29:40 +0000
 From:   Sean Christopherson <seanjc@google.com>
 To:     Ben Gardon <bgardon@google.com>
 Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
@@ -60,50 +60,42 @@ Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         Wanpeng Li <kernellwp@gmail.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Xiao Guangrong <xiaoguangrong.eric@gmail.com>
-Subject: Re: [PATCH 12/13] KVM: x86/mmu: Fast invalidation for TDP MMU
-Message-ID: <YGT3UmSKVQFaY1Fd@google.com>
+Subject: Re: [PATCH 13/13] KVM: x86/mmu: Tear down roots in fast invalidation
+ thread
+Message-ID: <YGT31GoDhVSXlgP4@google.com>
 References: <20210331210841.3996155-1-bgardon@google.com>
- <20210331210841.3996155-13-bgardon@google.com>
+ <20210331210841.3996155-14-bgardon@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210331210841.3996155-13-bgardon@google.com>
+In-Reply-To: <20210331210841.3996155-14-bgardon@google.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On Wed, Mar 31, 2021, Ben Gardon wrote:
-> Provide a real mechanism for fast invalidation by marking roots as
-> invalid so that their reference count will quickly fall to zero
-> and they will be torn down.
-> 
-> One negative side affect of this approach is that a vCPU thread will
-> likely drop the last reference to a root and be saddled with the work of
-> tearing down an entire paging structure. This issue will be resolved in
-> a later commit.
-> 
-> Signed-off-by: Ben Gardon <bgardon@google.com>
 > ---
-
-...
-
-> +/*
-> + * This function depends on running in the same MMU lock cirical section as
-> + * kvm_reload_remote_mmus. Since this is in the same critical section, no new
-> + * roots will be created between this function and the MMU reload signals
-> + * being sent.
-
-Eww.  That goes beyond just adding a lockdep assertion here.  I know you want to
-isolate the TDP MMU as much as possible, but this really feels like it should be
-open coded in kvm_mmu_zap_all_fast().  And assuming this lands after as_id is
-added to for_each_tdp_mmu_root(), it's probably easier to open code anyways, e.g.
-use list_for_each_entry() directly instead of bouncing through an iterator.
-
-> + */
-> +void kvm_tdp_mmu_invalidate_roots(struct kvm *kvm)
-> +{
-> +	struct kvm_mmu_page *root;
+>  arch/x86/kvm/mmu/mmu.c     |  6 ++++
+>  arch/x86/kvm/mmu/tdp_mmu.c | 74 +++++++++++++++++++++++++++++++++++++-
+>  arch/x86/kvm/mmu/tdp_mmu.h |  1 +
+>  3 files changed, 80 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index 49b7097fb55b..22742619698d 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -5455,6 +5455,12 @@ static void kvm_mmu_zap_all_fast(struct kvm *kvm)
+>  	kvm_zap_obsolete_pages(kvm);
+>  
+>  	write_unlock(&kvm->mmu_lock);
 > +
-> +	for_each_tdp_mmu_root(kvm, root)
-> +		root->role.invalid = true;
-> +}
+> +	if (is_tdp_mmu_enabled(kvm)) {
+> +		read_lock(&kvm->mmu_lock);
+> +		kvm_tdp_mmu_zap_all_fast(kvm);
+
+Purely because it exists first, I think we should follow the legacy MMU's
+terminology, i.e. kvm_tdp_mmu_zap_obsolete_pages().
+
+> +		read_unlock(&kvm->mmu_lock);
+> +	}
+>  }
