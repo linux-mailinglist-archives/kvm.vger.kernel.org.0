@@ -2,119 +2,118 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8FB1A34F834
-	for <lists+kvm@lfdr.de>; Wed, 31 Mar 2021 07:00:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6A73A34F8C7
+	for <lists+kvm@lfdr.de>; Wed, 31 Mar 2021 08:30:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233660AbhCaE7p (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 31 Mar 2021 00:59:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35418 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233629AbhCaE7a (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 31 Mar 2021 00:59:30 -0400
-Received: from mail-ot1-x334.google.com (mail-ot1-x334.google.com [IPv6:2607:f8b0:4864:20::334])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 98210C061574;
-        Tue, 30 Mar 2021 21:59:23 -0700 (PDT)
-Received: by mail-ot1-x334.google.com with SMTP id k14-20020a9d7dce0000b02901b866632f29so17840165otn.1;
-        Tue, 30 Mar 2021 21:59:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=IuFbiB26Sb3dU7rtk02ZCczKB4Gc8hOz5qs5qATXub8=;
-        b=WWO7bmjzkeWN+EV+FTJNZ40JsxeXUFjaknr+X6i2DLvgsdvg5UF2OnYFNeHRBQIRCA
-         KgjqwTUS0d9Sl8ALq9rDb1wEzlAD9ZYLkOJK7/3GraRMsBcwpBjdCme0rZKmP82pgbHZ
-         ruxhbh6fIl85qoEW0QmonZloAnxtyM7VX8pV7Y4u4QrJSszfkKaBNpVGeNTZsekg7nm9
-         bSHY19ehHY/8r/6OyDDyzxbUwWYOSxvTFpyyxTepwf0ENWRGSgii45wc0WOXrLV+rwUN
-         qzRoHzF6VNJW4k86kPVNE9gUh8eT9j2BDN0yRMUNUgIQ7xApoTX0vmFfilEvqr/ZiPB4
-         BOJw==
+        id S233720AbhCaGaI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 31 Mar 2021 02:30:08 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:43392 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232805AbhCaG3s (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 31 Mar 2021 02:29:48 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1617172188;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=KsBkRz/pehE5Lrr3mHu0jJhAfh1UXjetDU1Y6wyJ97E=;
+        b=UgKKJUxHDMdW7xEG635Pcaw/cciJeSD4CDJlHYTfAS5v40POXuI2rg7IFmS8JOG5jh7EPm
+        lpr+9FQ8EHS4LBlMdaS0BDqBTMorH2PrZMZESBLh4pZuT2H4lr7CvF8L0Ek25pPHAUKwBm
+        ZCE1aDbBtSDXRkTxZ2pgifEpT8TmyvA=
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-195-0KdozZrROKiP3Ji2M-Vspg-1; Wed, 31 Mar 2021 02:29:46 -0400
+X-MC-Unique: 0KdozZrROKiP3Ji2M-Vspg-1
+Received: by mail-ed1-f69.google.com with SMTP id bm8so573410edb.4
+        for <kvm@vger.kernel.org>; Tue, 30 Mar 2021 23:29:45 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=IuFbiB26Sb3dU7rtk02ZCczKB4Gc8hOz5qs5qATXub8=;
-        b=AJyEAzfZedXYb8ZTcoRm8aFD15SjSMKxwNFw4IGqwaRAesGLIIvOa8yLxvQxZ31gRN
-         B5LpQDwtbi1Sajs/kg+a8ZM4LAwfpZ55SCiOIAyuxzpoXnK1HEGYuV1wXigP9qjNeOSI
-         GmFDtKuFmM639F02EJUpJiXGFkApp6jXBY12z08BjdjXjil3u9hrL80GmpP/KXThlr89
-         L1m/GbX2kK9II2vYcGCtVtDu3Q8pB8n82f102XEUjQabplGsWMziqxZlgAJ+umH5gx8e
-         I4d9Kb5YFMZdGXafF8JdNREjdcIcc8EAH3c71enPEEPtXXviQ15Y96pb+bCL6x4bgODv
-         /kGg==
-X-Gm-Message-State: AOAM530g3BXAfFV8z/lBnzlIzzRFzk8Mejp2gFSv97NoPhRz4LN08OIn
-        3debi3MaWCH5QdD5gVtOowe1vIhuUDLLaKOog3bSHRiQoRc=
-X-Google-Smtp-Source: ABdhPJyNUdNj7gtOw1A943gOBRthVUofJ7aBbkkqjoFB0AKv2WAv8kdYtex1JIOhWvpSQ3+mQ3hHpGfVdz6La5s+e2w=
-X-Received: by 2002:a05:6830:22c3:: with SMTP id q3mr1196612otc.56.1617166763033;
- Tue, 30 Mar 2021 21:59:23 -0700 (PDT)
-MIME-Version: 1.0
-References: <20210331023025.2485960-1-seanjc@google.com> <20210331023025.2485960-2-seanjc@google.com>
- <CANRm+CwowrYPSnFNc11j5aT2JNw_k+NOh1apoxc3raVD4RVaAg@mail.gmail.com> <YGPrZyIutYQGldO2@google.com>
-In-Reply-To: <YGPrZyIutYQGldO2@google.com>
-From:   Wanpeng Li <kernellwp@gmail.com>
-Date:   Wed, 31 Mar 2021 12:59:11 +0800
-Message-ID: <CANRm+Cxe0ygrFm=TWZP0_uVEyaCTfq2SoaXRotUGR-anAXOQpQ@mail.gmail.com>
-Subject: Re: [PATCH 1/2] KVM: Account memory allocations for 'struct kvm_vcpu'
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=KsBkRz/pehE5Lrr3mHu0jJhAfh1UXjetDU1Y6wyJ97E=;
+        b=t9g3V4/+ID+M+9L8zOZiWm+G+HW+BhOE0CGUUSe7WrcmNtuA0iY7N/r39ehI6YETXO
+         214e3/Vk3bRUROmmIXqEkruYSXd6u5KcC07zx5dYIxGMk1zrVfnwIrpSHm5nfxXpmMb4
+         CUlA0tDyprGdaKt/C/YZjkd5BKYv9YebiG60/UZsvz3mNNr/0Jx3cVNeR5KDR2y4yc81
+         Rc16CkLwKr7qWTMY/c9ZkpmL93yjeCKuZcU/sSsf/UAAjOvPs9kDMWqiFXdm77EHt2sF
+         acEnvHxI/+2M3YlQHP9lEWFx9ukVcuImMMsgV6SF6KqDkLwPQPMfUilZNqfK1N9l3+y3
+         8NqA==
+X-Gm-Message-State: AOAM533sdFLA/iUUCjsfj5g9+++2vrn49Gen/Poy8dAaoe5pH6V6sLz3
+        DvGcQPlSB+ZunSgnIJjZ+9FweJyG7saBCb1Az9AchbPgsgWedrbLxly4wPRtdp869rigSbaVBhv
+        TCjCkLUqjcEuj
+X-Received: by 2002:a17:906:2ac1:: with SMTP id m1mr1855426eje.472.1617172185000;
+        Tue, 30 Mar 2021 23:29:45 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwzE+Fgj7SYZNfyH5TFY8mu0yKgA/ECBrO+uxDJZf/9zIwyHuu0IZY7dMNFih5VSCFIjJnd3Q==
+X-Received: by 2002:a17:906:2ac1:: with SMTP id m1mr1855416eje.472.1617172184870;
+        Tue, 30 Mar 2021 23:29:44 -0700 (PDT)
+Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id o20sm741619eds.65.2021.03.30.23.29.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 30 Mar 2021 23:29:44 -0700 (PDT)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org, Sean Christopherson <seanjc@google.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+        Marcelo Tosatti <mtosatti@redhat.com>
+Subject: Re: [PATCH v2 1/2] KVM: x86: hyper-v: Properly divide
+ maybe-negative 'hv_clock->system_time' in compute_tsc_page_parameters()
+In-Reply-To: <4d7f375c-c912-fbeb-edd1-03d742d49dcb@redhat.com>
+References: <20210329114800.164066-1-vkuznets@redhat.com>
+ <20210329114800.164066-2-vkuznets@redhat.com>
+ <20210330131236.GA5932@fuller.cnet> <87ft0cu2eq.fsf@vitty.brq.redhat.com>
+ <4d7f375c-c912-fbeb-edd1-03d742d49dcb@redhat.com>
+Date:   Wed, 31 Mar 2021 08:29:43 +0200
+Message-ID: <87a6qju97s.fsf@vitty.brq.redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 31 Mar 2021 at 11:24, Sean Christopherson <seanjc@google.com> wrote:
->
-> On Wed, Mar 31, 2021, Wanpeng Li wrote:
-> > On Wed, 31 Mar 2021 at 10:32, Sean Christopherson <seanjc@google.com> wrote:
-> > >
-> > > Use GFP_KERNEL_ACCOUNT for the vCPU allocations, the vCPUs are very much
-> > > tied to a single task/VM.  For x86, the allocations were accounted up
-> > > until the allocation code was moved to common KVM.  For all other
-> > > architectures, vCPU allocations were never previously accounted, but only
-> > > because most architectures lack accounting in general (for KVM).
-> > >
-> > > Fixes: e529ef66e6b5 ("KVM: Move vcpu alloc and init invocation to common code")
-> > > Signed-off-by: Sean Christopherson <seanjc@google.com>
-> > > ---
-> > >  virt/kvm/kvm_main.c | 2 +-
-> > >  1 file changed, 1 insertion(+), 1 deletion(-)
-> > >
-> > > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> > > index 383df23514b9..3884e9f30251 100644
-> > > --- a/virt/kvm/kvm_main.c
-> > > +++ b/virt/kvm/kvm_main.c
-> > > @@ -3182,7 +3182,7 @@ static int kvm_vm_ioctl_create_vcpu(struct kvm *kvm, u32 id)
-> > >         if (r)
-> > >                 goto vcpu_decrement;
-> > >
-> > > -       vcpu = kmem_cache_zalloc(kvm_vcpu_cache, GFP_KERNEL);
-> > > +       vcpu = kmem_cache_zalloc(kvm_vcpu_cache, GFP_KERNEL_ACCOUNT);
-> >
-> > kvm_vcpu_cache is created with SLAB_ACCOUNT flag in kvm_init(), this
-> > flag will guarantee further slab alloc will be charged to memcg.
-> > Please refer to memcg_slab_pre_alloc_hook(). So the patch is
-> > unnecessary.
->
-> Hmm, I missed that.  However, AFICT only SLAB/SLUB enforce SLAB_ACCOUNT, SLOB
-> does not appear to honor the flag.   The caveat to SLOB is that the
-> GFP_KERNEL_ACCOUNT will only come into play when allocating new pages, and so
-> allocations smaller than a page will be accounted incorrectly (I think).
-> But, a vcpu is larger than a page (on x86), which means the vcpu allocation will
-> always be correctly accounted.
->
-> I've no idea if anyone actually uses KVM+SLOB, let alone cares about accounting
+Paolo Bonzini <pbonzini@redhat.com> writes:
 
-I asked maintainer Christoph in 2013, he told me "Well, I have never
-seen non experimental systems that use SLOB. Others have claimed they
-exist. It's mostly of academic interest."
-
-> in the that case.  But, it would be nice for KVM to be consistent with the other
-> kmem_cache usage in KVM, all of which do double up on SLAB_ACCOUNT +
-> GFP_KERNEL_ACCOUNT.
+> On 30/03/21 16:44, Vitaly Kuznetsov wrote:
+>> We could've solved the problem by reducing the precision a bit and
+>> instead of doing
+>> 
+>>   now_ns = get_kvmclock_ns(kvm);
+>> 
+>> in KVM_SET_CLOCK() handling we could do
+>> 
+>>   now_ns = ka->master_kernel_ns
+>> 
+>> and that would make vcpu->hv_clock.system_time == 0 after
+>> kvm_guest_time_update() but it'd hurt 'normal' use-cases to fix the
+>> corner case.
 >
-> Maybe rewrite the changelog and drop the Fixes?
+> Marcelo is right, and I guess instead of a negative system time you 
+> *should* have a slightly larger tsc_timestamp that corresponds to a zero 
+> system_time.  E.g. instead of -70 ns in the system time you'd have 210 
+> more clock cycles in the tsc_timestamp and 0 in the system time.
+>
+> In the end it's impossible to achieve absolute precision; does the 
+> KVM_SET_CLOCK value refer to the nanosecond value before entering the 
+> kernel, or after, or what?  The difference is much more than these 70 
+> ns.  So what you propose above seems to be really the best solution 
+> within the constraints of the KVM_SET_CLOCK API (a better API, which 
+> Maxim had started working on and I should revisit, would pass a 
+> TSC+nanosecond pair).
 
-Agreed.
+I'm leaning towards making a v3 and depending on how complex it's going
+to look like we can decide which way to go.
 
-    Wanpeng
+>
+> On the other hand you'd have to take into account what happens if the 
+> masterclock is not in use, which would make things a bit more complex 
+> than what you sketched. 
+
+(I really wish we establish a plan to get rid of !masterclock logic some
+day ... )
+
+> If guests probably do not look at the 
+> system_time and just add it blindly to the result, then treating 
+> system_time as signed as in v2 is the easiest.
+
+-- 
+Vitaly
+
