@@ -2,100 +2,81 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8C9D3350015
-	for <lists+kvm@lfdr.de>; Wed, 31 Mar 2021 14:21:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 25C1735001B
+	for <lists+kvm@lfdr.de>; Wed, 31 Mar 2021 14:24:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235487AbhCaMVL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 31 Mar 2021 08:21:11 -0400
-Received: from mga14.intel.com ([192.55.52.115]:10878 "EHLO mga14.intel.com"
+        id S235412AbhCaMXy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 31 Mar 2021 08:23:54 -0400
+Received: from mail.kernel.org ([198.145.29.99]:36924 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S235289AbhCaMU4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 31 Mar 2021 08:20:56 -0400
-IronPort-SDR: hyHlmO4d+qUvp2U8p81kHEl5/PEvTtq4K/ijcLoepbEz0iLlg4jCz4OOASBtz7lqqHhHmAbNIZ
- gC9XX8ztgflw==
-X-IronPort-AV: E=McAfee;i="6000,8403,9939"; a="191472601"
-X-IronPort-AV: E=Sophos;i="5.81,293,1610438400"; 
-   d="scan'208";a="191472601"
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Mar 2021 05:20:48 -0700
-IronPort-SDR: DFRP9CKn4qqWlB9oUSS6aBdCdsx/WHAppkGubpuzrtS6asZXzpH/1hOE8B8ICKbElp0stjOH8W
- uoYqAbXZSJrQ==
-X-IronPort-AV: E=Sophos;i="5.81,293,1610438400"; 
-   d="scan'208";a="412136132"
-Received: from mwamucix-mobl3.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.251.24.224])
-  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Mar 2021 05:20:44 -0700
-Date:   Thu, 1 Apr 2021 01:20:39 +1300
-From:   Kai Huang <kai.huang@intel.com>
-To:     Kai Huang <kai.huang@intel.com>
-Cc:     Boris Petkov <bp@alien8.de>, <seanjc@google.com>,
-        <kvm@vger.kernel.org>, <x86@kernel.org>,
-        <linux-sgx@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <jarkko@kernel.org>, <luto@kernel.org>, <dave.hansen@intel.com>,
-        <rick.p.edgecombe@intel.com>, <haitao.huang@intel.com>,
-        <pbonzini@redhat.com>, <tglx@linutronix.de>, <mingo@redhat.com>,
-        <hpa@zytor.com>
-Subject: Re: [PATCH v3 05/25] x86/sgx: Introduce virtual EPC for use by KVM
- guests
-Message-Id: <20210401012039.c78f02ea2ba9f1e5fd504621@intel.com>
-In-Reply-To: <20210331215345.cad098cfcfcaabf489243807@intel.com>
-References: <cover.1616136307.git.kai.huang@intel.com>
-        <0c38ced8c8e5a69872db4d6a1c0dabd01e07cad7.1616136308.git.kai.huang@intel.com>
-        <20210326150320.GF25229@zn.tnic>
-        <20210331141032.db59586da8ba2cccf7b46f77@intel.com>
-        <D4ECF8D3-C483-4E75-AD41-2CEFDF56B12D@alien8.de>
-        <20210331195138.2af97ec1bb4b5e4202f2600d@intel.com>
-        <3889C4C6-48E2-4C97-A074-180EB18BDA29@alien8.de>
-        <20210331215345.cad098cfcfcaabf489243807@intel.com>
-X-Mailer: Sylpheed 3.7.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+        id S235347AbhCaMXY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 31 Mar 2021 08:23:24 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 20F7F61957;
+        Wed, 31 Mar 2021 12:23:17 +0000 (UTC)
+Date:   Wed, 31 Mar 2021 14:23:15 +0200
+From:   Christian Brauner <christian.brauner@ubuntu.com>
+To:     Yongji Xie <xieyongji@bytedance.com>
+Cc:     Christoph Hellwig <hch@infradead.org>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        Parav Pandit <parav@nvidia.com>,
+        Christian Brauner <christian.brauner@canonical.com>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Matthew Wilcox <willy@infradead.org>, viro@zeniv.linux.org.uk,
+        Jens Axboe <axboe@kernel.dk>, bcrl@kvack.org,
+        Jonathan Corbet <corbet@lwn.net>,
+        Mika =?utf-8?B?UGVudHRpbMOk?= <mika.penttila@nextfour.com>,
+        Dan Carpenter <dan.carpenter@oracle.com>,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        kvm@vger.kernel.org, linux-fsdevel@vger.kernel.org
+Subject: Re: [PATCH v6 01/10] file: Export receive_fd() to modules
+Message-ID: <20210331122315.uas3n44vgxz5z5io@wittgenstein>
+References: <20210331080519.172-1-xieyongji@bytedance.com>
+ <20210331080519.172-2-xieyongji@bytedance.com>
+ <20210331091545.lr572rwpyvrnji3w@wittgenstein>
+ <CACycT3vRhurgcuNvEW7JKuhCQdy__5ZX=5m1AFnVKDk8UwUa7A@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <CACycT3vRhurgcuNvEW7JKuhCQdy__5ZX=5m1AFnVKDk8UwUa7A@mail.gmail.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 31 Mar 2021 21:53:45 +1300 Kai Huang wrote:
-> On Wed, 31 Mar 2021 09:44:39 +0200 Boris Petkov wrote:
-> > On March 31, 2021 8:51:38 AM GMT+02:00, Kai Huang <kai.huang@intel.com> wrote:
-> > >How about adding explanation to Documentation/x86/sgx.rst?
-> > 
-> > Sure, and then we should point users at it. The thing is also indexed by search engines so hopefully people will find it.
+On Wed, Mar 31, 2021 at 07:32:33PM +0800, Yongji Xie wrote:
+> On Wed, Mar 31, 2021 at 5:15 PM Christian Brauner
+> <christian.brauner@ubuntu.com> wrote:
+> >
+> > On Wed, Mar 31, 2021 at 04:05:10PM +0800, Xie Yongji wrote:
+> > > Export receive_fd() so that some modules can use
+> > > it to pass file descriptor between processes without
+> > > missing any security stuffs.
+> > >
+> > > Signed-off-by: Xie Yongji <xieyongji@bytedance.com>
+> > > ---
+> >
+> > Yeah, as I said in the other mail I'd be comfortable with exposing just
+> > this variant of the helper.
 > 
-> Thanks. Will do and send out new patch for review.
+> Thanks, I got it now.
 > 
-Hi Boris,
+> > Maybe this should be a separate patch bundled together with Christoph's
+> > patch to split parts of receive_fd() into a separate helper.
+> 
+> Do we need to add the seccomp notifier into the separate helper? In
+> our case, the file passed to the separate helper is from another
+> process.
 
-Could you help to review whether below change is OK?
+Not sure what you mean. Christoph has proposed
+https://lore.kernel.org/linux-fsdevel/20210325082209.1067987-2-hch@lst.de
+I was just saying that if we think this patch is useful we might bundle
+it together with the
+EXPORT_SYMBOL(receive_fd)
+part here, convert all drivers that currently open-code get_unused_fd()
++ fd_install() to use receive_fd(), and make this a separate patchset.
 
-diff --git a/Documentation/x86/sgx.rst b/Documentation/x86/sgx.rst
-index 5ec7d17e65e0..49a840718a4d 100644
---- a/Documentation/x86/sgx.rst
-+++ b/Documentation/x86/sgx.rst
-@@ -236,3 +236,19 @@ As a result, when this happpens, user should stop running
-any new SGX workloads, (or just any new workloads), and migrate all valuable
-workloads. Although a machine reboot can recover all EPC, the bug should be
-reported to Linux developers.
-+
-+Virtual EPC
-+===========
-+
-+Separated from SGX driver for creating and running enclaves in host, SGX core
-+also supports virtual EPC driver to support KVM SGX virtualization. Unlike SGX
-+driver, EPC page allocated via virtual EPC driver is "raw" EPC page and doesn't
-+have specific enclave associated. This is because KVM doesn't track how guest
-+uses EPC pages.
-+
-+As a result, SGX core page reclaimer doesn't support reclaiming EPC pages
-+allocated to KVM guests via virtual EPC driver. If user wants to deploy both
-+host SGX applications and KVM SGX guests on the same machine, user should
-+reserve enough EPC (by taking out total virtual EPC size of all SGX VMs from
-+physical EPC size) for host SGX applications so they can run with acceptable
-+performance.
+I don't think that needs to hinder reviewing your series though.
 
-In my local, I have squashed above change to this patch, and also added below
-paragraph to the commit message:
-
-    Also add documenetation to explain what is virtual EPC, and suggest
-    users should be aware of virtual EPC pages are not reclaimable and take
-    this into account when deploying both host SGX applications and KVM SGX
-    guests on the same machine.
+Christian
