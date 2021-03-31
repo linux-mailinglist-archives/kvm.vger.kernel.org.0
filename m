@@ -2,56 +2,55 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2B9DD3508DF
+	by mail.lfdr.de (Postfix) with ESMTP id 7E0653508E0
 	for <lists+kvm@lfdr.de>; Wed, 31 Mar 2021 23:10:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232801AbhCaVJ3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 31 Mar 2021 17:09:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47592 "EHLO
+        id S232833AbhCaVJa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 31 Mar 2021 17:09:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47610 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230145AbhCaVJG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 31 Mar 2021 17:09:06 -0400
-Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F36EBC061574
-        for <kvm@vger.kernel.org>; Wed, 31 Mar 2021 14:09:05 -0700 (PDT)
-Received: by mail-pg1-x54a.google.com with SMTP id p64so2082769pga.10
-        for <kvm@vger.kernel.org>; Wed, 31 Mar 2021 14:09:05 -0700 (PDT)
+        with ESMTP id S232757AbhCaVJJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 31 Mar 2021 17:09:09 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AED69C061574
+        for <kvm@vger.kernel.org>; Wed, 31 Mar 2021 14:09:08 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id n13so3605756ybp.14
+        for <kvm@vger.kernel.org>; Wed, 31 Mar 2021 14:09:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=5cGMGQJTbkr5kU0eiDceomPmZqJS09u6WPxL5yh8vXM=;
-        b=YuSbzqubyPg9lGhelarJ0gPJaiq9A7VtEK4raWqxa3kluRenhZ/sDnwtMZcgJAC01h
-         a2HY1mt+bol9Jp0IBrZcRbmbogMxHXEk3oM6GimEh4DIxKPaqsHacH3bbc7rXdJ5CZpu
-         +Cha9JokZYmBBPz7Hs6sfDRv/X7Sj/TkG37YJuC5E1SpQD+HxtybpDMfil+mC3dQRVam
-         XzAJNpYUs5dBBRX5vXOaUjlQuk1eTpvhlCG8Irdi2zstVh+91YWrEyMZ4D40hsU1oZTT
-         g8DfzEntCefXyIV0ov6nZQYr4xxqWbUUDVzoHLfIBydfEiJWl7OhuyKIUCv+VtIDZhas
-         bmyA==
+        bh=foMxttOwu6SYavjwnG7oqUJ2WlokRAISZJZJ0feAVWI=;
+        b=HzxTpFc/w24AxMwjTtlYMwP/8TI8y0GPxp/iMkyEs8ZgTb5INW2FMmZ0BvrnErb0th
+         vnhXeNY52N5SBFtKxNlrSJTx2m90miUf/WEck1JveNYjPzVo96FX9aJBMeBEueAJSt5J
+         /fCjKv9wLbyN7K51nHzWtvcmpc8Qv5vvtsGipYUGvmaDiMyusliXiIZkdiStcBvUYz1A
+         DKBUoHDVbnjSGSRvVG9Oh4iU+yGVlrG2JD5UM+bN7GKkNbGK+qPcVWayK8ePB36GogGl
+         kglGA3fvGdmSEdiwU5bEagRZnwlmsK6eqDpr/KoDbJPBmX6P2HdeZfalogN12hfkfCOt
+         nXQQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=5cGMGQJTbkr5kU0eiDceomPmZqJS09u6WPxL5yh8vXM=;
-        b=t07WyPKUnUbBLZIf9vkjwul5E9F2rSUPAyfFLQuEhei0VAxU1Y4aduRTfOr6BstMcs
-         zV3m8JOaaTuvT/M3YK9uqHx3ZFzNL/juGXp3br5srFivJvALFB1jkUeXOohDH4Ga/QIB
-         aeR/1h83VZi0Ay4ncFWCR/zKYjz8CYWcvw/fqK6HkkHNp+JwXFNPFJEPUVq7u/JMsbE4
-         3iUssp78eKQ/ETCfrMfXSw5PQYo6ou4Oi2BjBGQrzI4dCTsjJL2KRT3uyUbypkoOdRpo
-         Xln9UmjIUg72kxpYimfyRlRadgrXI3syMIG97T7TKMoi7M+MwJtLNbaTthP6xU+IhoNU
-         JlOw==
-X-Gm-Message-State: AOAM531f0N+F29aGUvIHc8fGZ6AKltES5cFSUp10XSZO2rWe7hcUy92r
-        RD3bqGq9ZbLjGjI5QbHkDi1VWySTi3R+
-X-Google-Smtp-Source: ABdhPJxT/t5xzDWAujo721CFZ5zRE1k8mgJcTaGSxm7XXc2GXJdaMMuhNAJD5r0d6AJXVQ/a03h5Wf12Rpwz
+        bh=foMxttOwu6SYavjwnG7oqUJ2WlokRAISZJZJ0feAVWI=;
+        b=IsmBmC78MDyiZXon9JsF2skMSPoxrZ8QJcm+DisP3zzBrkNRt0k2wz54wmJQFjtoz3
+         iM9hek1cUKpZYAx+ZjnfCQaw9I7h20V2019C5+eIov4bDf6+EJ/m2VLkWsGIP3FuEJ2M
+         rn0PfShD5xOKnn/bpSZlmiLGzKp8lZkLGGSlcneyEg/n/PHUA5I4uQttgojsWZLOiJjT
+         gFNvX1tHKvjkxy/NhuRtM5jZ9QsmCvyO0ln931lupvSI9j04lVbw0vGc2bQtp2PlgZ2P
+         LRZPf79pogAE4+DzliVMP9RJ0um+kCRy0T9sAez+EYu+zp4GsMFYK7GzYsgrqI7AUFbY
+         p8aA==
+X-Gm-Message-State: AOAM532jWLBOGPk30A67mCZuXh3JMJj1YUHV1J43D+irL5nw+rR8dbPT
+        k96F1VWQEeDOG4/US4FThhB32F3/SUlR
+X-Google-Smtp-Source: ABdhPJyeLb8XwRV0troRnkuHZqf7A5YX/XYnXQT2L3T51rF0GWkqeTSsx2jj9AFTCqsKyHNf1fLEUQ4iCBtd
 X-Received: from bgardon.sea.corp.google.com ([2620:15c:100:202:8026:6888:3d55:3842])
- (user=bgardon job=sendgmr) by 2002:a17:902:b182:b029:e6:5e:f2ce with SMTP id
- s2-20020a170902b182b02900e6005ef2cemr4836767plr.50.1617224945456; Wed, 31 Mar
- 2021 14:09:05 -0700 (PDT)
-Date:   Wed, 31 Mar 2021 14:08:30 -0700
+ (user=bgardon job=sendgmr) by 2002:a25:d093:: with SMTP id
+ h141mr7341271ybg.292.1617224947988; Wed, 31 Mar 2021 14:09:07 -0700 (PDT)
+Date:   Wed, 31 Mar 2021 14:08:31 -0700
 In-Reply-To: <20210331210841.3996155-1-bgardon@google.com>
-Message-Id: <20210331210841.3996155-3-bgardon@google.com>
+Message-Id: <20210331210841.3996155-4-bgardon@google.com>
 Mime-Version: 1.0
 References: <20210331210841.3996155-1-bgardon@google.com>
 X-Mailer: git-send-email 2.31.0.291.g576ba9dcdaf-goog
-Subject: [PATCH 02/13] KVM: x86/mmu: Move kvm_mmu_(get|put)_root to TDP MMU
+Subject: [PATCH 03/13] KVM: x86/mmu: use tdp_mmu_free_sp to free roots
 From:   Ben Gardon <bgardon@google.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Cc:     Paolo Bonzini <pbonzini@redhat.com>, Peter Xu <peterx@redhat.com>,
@@ -70,129 +69,56 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The TDP MMU is almost the only user of kvm_mmu_get_root and
-kvm_mmu_put_root. There is only one use of put_root in mmu.c for the
-legacy / shadow MMU. Open code that one use and move the get / put
-functions to the TDP MMU so they can be extended in future commits.
+Minor cleanup to deduplicate the code used to free a struct kvm_mmu_page
+in the TDP MMU.
 
 No functional change intended.
 
 Signed-off-by: Ben Gardon <bgardon@google.com>
 ---
- arch/x86/kvm/mmu/mmu.c          | 10 ++++------
- arch/x86/kvm/mmu/mmu_internal.h | 16 ----------------
- arch/x86/kvm/mmu/tdp_mmu.c      |  6 +++---
- arch/x86/kvm/mmu/tdp_mmu.h      | 18 ++++++++++++++++++
- 4 files changed, 25 insertions(+), 25 deletions(-)
+ arch/x86/kvm/mmu/tdp_mmu.c | 15 +++++++--------
+ 1 file changed, 7 insertions(+), 8 deletions(-)
 
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index f75cbb0fcc9c..618cc011f446 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -3154,12 +3154,10 @@ static void mmu_free_root_page(struct kvm *kvm, hpa_t *root_hpa,
+diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+index 1929cc7a42ac..5a2698d64957 100644
+--- a/arch/x86/kvm/mmu/tdp_mmu.c
++++ b/arch/x86/kvm/mmu/tdp_mmu.c
+@@ -88,6 +88,12 @@ static inline struct kvm_mmu_page *tdp_mmu_next_root(struct kvm *kvm,
+ static bool zap_gfn_range(struct kvm *kvm, struct kvm_mmu_page *root,
+ 			  gfn_t start, gfn_t end, bool can_yield);
  
- 	sp = to_shadow_page(*root_hpa & PT64_BASE_ADDR_MASK);
++static void tdp_mmu_free_sp(struct kvm_mmu_page *sp)
++{
++	free_page((unsigned long)sp->spt);
++	kmem_cache_free(mmu_page_header_cache, sp);
++}
++
+ void kvm_tdp_mmu_free_root(struct kvm *kvm, struct kvm_mmu_page *root)
+ {
+ 	gfn_t max_gfn = 1ULL << (shadow_phys_bits - PAGE_SHIFT);
+@@ -101,8 +107,7 @@ void kvm_tdp_mmu_free_root(struct kvm *kvm, struct kvm_mmu_page *root)
  
--	if (kvm_mmu_put_root(kvm, sp)) {
--		if (is_tdp_mmu_page(sp))
--			kvm_tdp_mmu_free_root(kvm, sp);
--		else if (sp->role.invalid)
--			kvm_mmu_prepare_zap_page(kvm, sp, invalid_list);
--	}
-+	if (is_tdp_mmu_page(sp) && kvm_tdp_mmu_put_root(kvm, sp))
-+		kvm_tdp_mmu_free_root(kvm, sp);
-+	else if (!--sp->root_count && sp->role.invalid)
-+		kvm_mmu_prepare_zap_page(kvm, sp, invalid_list);
+ 	zap_gfn_range(kvm, root, 0, max_gfn, false);
  
- 	*root_hpa = INVALID_PAGE;
+-	free_page((unsigned long)root->spt);
+-	kmem_cache_free(mmu_page_header_cache, root);
++	tdp_mmu_free_sp(root);
  }
-diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_internal.h
-index fc88f62d7bd9..788dcf77c957 100644
---- a/arch/x86/kvm/mmu/mmu_internal.h
-+++ b/arch/x86/kvm/mmu/mmu_internal.h
-@@ -118,22 +118,6 @@ bool kvm_mmu_slot_gfn_write_protect(struct kvm *kvm,
- void kvm_flush_remote_tlbs_with_address(struct kvm *kvm,
- 					u64 start_gfn, u64 pages);
  
--static inline void kvm_mmu_get_root(struct kvm *kvm, struct kvm_mmu_page *sp)
+ static union kvm_mmu_page_role page_role_for_level(struct kvm_vcpu *vcpu,
+@@ -164,12 +169,6 @@ hpa_t kvm_tdp_mmu_get_vcpu_root_hpa(struct kvm_vcpu *vcpu)
+ 	return __pa(root->spt);
+ }
+ 
+-static void tdp_mmu_free_sp(struct kvm_mmu_page *sp)
 -{
--	BUG_ON(!sp->root_count);
--	lockdep_assert_held(&kvm->mmu_lock);
--
--	++sp->root_count;
--}
--
--static inline bool kvm_mmu_put_root(struct kvm *kvm, struct kvm_mmu_page *sp)
--{
--	lockdep_assert_held(&kvm->mmu_lock);
--	--sp->root_count;
--
--	return !sp->root_count;
+-	free_page((unsigned long)sp->spt);
+-	kmem_cache_free(mmu_page_header_cache, sp);
 -}
 -
  /*
-  * Return values of handle_mmio_page_fault, mmu.page_fault, and fast_page_fault().
-  *
-diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-index 6d4f4e305163..1929cc7a42ac 100644
---- a/arch/x86/kvm/mmu/tdp_mmu.c
-+++ b/arch/x86/kvm/mmu/tdp_mmu.c
-@@ -43,7 +43,7 @@ void kvm_mmu_uninit_tdp_mmu(struct kvm *kvm)
- 
- static void tdp_mmu_put_root(struct kvm *kvm, struct kvm_mmu_page *root)
- {
--	if (kvm_mmu_put_root(kvm, root))
-+	if (kvm_tdp_mmu_put_root(kvm, root))
- 		kvm_tdp_mmu_free_root(kvm, root);
- }
- 
-@@ -55,7 +55,7 @@ static inline bool tdp_mmu_next_root_valid(struct kvm *kvm,
- 	if (list_entry_is_head(root, &kvm->arch.tdp_mmu_roots, link))
- 		return false;
- 
--	kvm_mmu_get_root(kvm, root);
-+	kvm_tdp_mmu_get_root(kvm, root);
- 	return true;
- 
- }
-@@ -150,7 +150,7 @@ hpa_t kvm_tdp_mmu_get_vcpu_root_hpa(struct kvm_vcpu *vcpu)
- 	/* Check for an existing root before allocating a new one. */
- 	for_each_tdp_mmu_root(kvm, root) {
- 		if (root->role.word == role.word) {
--			kvm_mmu_get_root(kvm, root);
-+			kvm_tdp_mmu_get_root(kvm, root);
- 			goto out;
- 		}
- 	}
-diff --git a/arch/x86/kvm/mmu/tdp_mmu.h b/arch/x86/kvm/mmu/tdp_mmu.h
-index 683d1d69c8c8..2dc3b3ba48fb 100644
---- a/arch/x86/kvm/mmu/tdp_mmu.h
-+++ b/arch/x86/kvm/mmu/tdp_mmu.h
-@@ -8,6 +8,24 @@
- hpa_t kvm_tdp_mmu_get_vcpu_root_hpa(struct kvm_vcpu *vcpu);
- void kvm_tdp_mmu_free_root(struct kvm *kvm, struct kvm_mmu_page *root);
- 
-+static inline void kvm_tdp_mmu_get_root(struct kvm *kvm,
-+					struct kvm_mmu_page *root)
-+{
-+	BUG_ON(!root->root_count);
-+	lockdep_assert_held(&kvm->mmu_lock);
-+
-+	++root->root_count;
-+}
-+
-+static inline bool kvm_tdp_mmu_put_root(struct kvm *kvm,
-+					struct kvm_mmu_page *root)
-+{
-+	lockdep_assert_held(&kvm->mmu_lock);
-+	--root->root_count;
-+
-+	return !root->root_count;
-+}
-+
- bool kvm_tdp_mmu_zap_gfn_range(struct kvm *kvm, gfn_t start, gfn_t end);
- void kvm_tdp_mmu_zap_all(struct kvm *kvm);
- 
+  * This is called through call_rcu in order to free TDP page table memory
+  * safely with respect to other kernel threads that may be operating on
 -- 
 2.31.0.291.g576ba9dcdaf-goog
 
