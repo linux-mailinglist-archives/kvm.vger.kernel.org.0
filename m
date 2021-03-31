@@ -2,133 +2,73 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7C89D35027B
-	for <lists+kvm@lfdr.de>; Wed, 31 Mar 2021 16:38:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1A44B350323
+	for <lists+kvm@lfdr.de>; Wed, 31 Mar 2021 17:18:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235991AbhCaOiT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 31 Mar 2021 10:38:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47600 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236101AbhCaOiG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 31 Mar 2021 10:38:06 -0400
-Received: from mail-ed1-x52d.google.com (mail-ed1-x52d.google.com [IPv6:2a00:1450:4864:20::52d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B0EC9C06175F
-        for <kvm@vger.kernel.org>; Wed, 31 Mar 2021 07:38:05 -0700 (PDT)
-Received: by mail-ed1-x52d.google.com with SMTP id x21so22600131eds.4
-        for <kvm@vger.kernel.org>; Wed, 31 Mar 2021 07:38:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance-com.20150623.gappssmtp.com; s=20150623;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=t0v3tO8WIVOu3cbWCEHO7EWG9rbszGj09tVtwGQ2u48=;
-        b=INkoj9BwuZXkzj7sifj66MsgCXXWy3vXWevwiRC7rleg4ICwFcQXUyosm4ihnob25Z
-         DfDIx5MVnO5DYfDmqvyRhhVn2eR8d8ftwqixz0sT20gZWzCsWOUe/aoQG2c6/Q6tmGH+
-         YDCpIxnNZqYZhAmkwLMEet6Wgrb8r9DyhIKV73wK/tA+Bo3PxGZd5EoGMN2mAqTq2RXZ
-         SItPzmoMCV/ocg9XNCDl0oGTg28rLhjjsOEIiZMSYlU7u8Xl+/dubyoD8/C54HFDuSRt
-         OaFZ05JUUF2nINRx6OSYhjVki4amAOtENRF0VakR6TC3Yu6LAuwPFmgQenZO2vER5zpl
-         aFHw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=t0v3tO8WIVOu3cbWCEHO7EWG9rbszGj09tVtwGQ2u48=;
-        b=ZFjz7DvvK0fbPlpSeR+gjMswpsNAczlcBv942Qj+fhWP3lxJX5qu8K0ETYvoySB/P9
-         J68C7QiphsdMAyMuLoQOt0wD/6k/1agMDSwVxJwRz26IMdLBgdnErVpI/CvKWzf+QUQv
-         MRl/iCyXHP0tEu6X57jXHYoXpLclUmpjwGLD7PXGB2rhSi9DJK73DI2Ve+FByXkvX84c
-         vIQ1+J4dGMlTr1zXmjkeK/GvUwgufm8zgJFfiVARVB43i0p9G4Nr9wZKcFJwob9Kg3n9
-         07cEUIx2xEPoPWUsUKbm/yXgyYSOIhiWqDHVLh5LSqwYs4FNqFX6V5Hn4AXVboGpMtN3
-         CN0Q==
-X-Gm-Message-State: AOAM531xsnrPYRwdyfC3WNPAE8K8DgStJOA0mpYttPT97QUfHy0siZpG
-        25fAui0Z5JCWiXspSd/cuSVKOi1hCkU+v9LPawAu
-X-Google-Smtp-Source: ABdhPJyuVH4uhYsCsfz9A35iRVq47A0bNBHoLadKLLbXfwa65wg7f400ZenSxaRizbI1OEn6gVbiThn7HQ9rJqWPoSk=
-X-Received: by 2002:a05:6402:180b:: with SMTP id g11mr4039186edy.195.1617201484431;
- Wed, 31 Mar 2021 07:38:04 -0700 (PDT)
+        id S236270AbhCaPSB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 31 Mar 2021 11:18:01 -0400
+Received: from condef-08.nifty.com ([202.248.20.73]:45436 "EHLO
+        condef-08.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S236342AbhCaPRj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 31 Mar 2021 11:17:39 -0400
+X-Greylist: delayed 398 seconds by postgrey-1.27 at vger.kernel.org; Wed, 31 Mar 2021 11:17:38 EDT
+Received: from conuserg-08.nifty.com ([10.126.8.71])by condef-08.nifty.com with ESMTP id 12VF7Uew010895
+        for <kvm@vger.kernel.org>; Thu, 1 Apr 2021 00:07:51 +0900
+Received: from localhost.localdomain (133-32-232-101.west.xps.vectant.ne.jp [133.32.232.101]) (authenticated)
+        by conuserg-08.nifty.com with ESMTP id 12VF77DF021201;
+        Thu, 1 Apr 2021 00:07:08 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-08.nifty.com 12VF77DF021201
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
+        s=dec2015msa; t=1617203228;
+        bh=ARbRFUFLNuhizfOq+rbCISdwf0ZvC9EkFJQtTKtjlps=;
+        h=From:To:Cc:Subject:Date:From;
+        b=0BXLesIP5v+3wtn3FQqyG2ppqrZdnq9H6gl0+IA5olp+NBiyCMNfCxmwDLQuR2eEI
+         fl2kirvxTPzE5h+DkZRpO+kgavsmYNHxX6EA9+PAyIdGzYus1o3X6twC+Trr1bC9sJ
+         XLYKukwdDHj7ON3/wu+41FoyMeD6G34UM93Cwa18iw8q+lICyienKgDyKE0iANeqDk
+         bYfB0qMC99jkoUkhkEVUxfJIepDIsm7lV3ru0xALDquISA9GngQcrMXyd8ON/31gSm
+         RzLmoIJDGR3HGPhB9AUota4bXQ/Tuswa/CExOvGPjpK9qDD5SNrH5OA6LSyNzF/uMV
+         GY0ArNoN6PO3Q==
+X-Nifty-SrcIP: [133.32.232.101]
+From:   Masahiro Yamada <masahiroy@kernel.org>
+To:     linux-mips@linux-mips.org
+Cc:     Masahiro Yamada <masahiroy@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-mips@vger.kernel.org
+Subject: [PATCH 1/2] mips: replace deprecated EXTRA_CFLAGS with ccflags-y
+Date:   Thu,  1 Apr 2021 00:06:56 +0900
+Message-Id: <20210331150658.38919-1-masahiroy@kernel.org>
+X-Mailer: git-send-email 2.27.0
 MIME-Version: 1.0
-References: <20210331080519.172-1-xieyongji@bytedance.com> <20210331080519.172-2-xieyongji@bytedance.com>
- <20210331091545.lr572rwpyvrnji3w@wittgenstein> <CACycT3vRhurgcuNvEW7JKuhCQdy__5ZX=5m1AFnVKDk8UwUa7A@mail.gmail.com>
- <20210331122315.uas3n44vgxz5z5io@wittgenstein> <CACycT3vm_XvitXV+kXivAhrfwN6U0Nm5kZwcYhY+GrriVAKq8g@mail.gmail.com>
- <20210331140759.rxfpfcavzus3lomp@wittgenstein>
-In-Reply-To: <20210331140759.rxfpfcavzus3lomp@wittgenstein>
-From:   Yongji Xie <xieyongji@bytedance.com>
-Date:   Wed, 31 Mar 2021 22:37:55 +0800
-Message-ID: <CACycT3vnmobQTPqENTwE_4idUzurgQzmcpMnsPSNzZb8=WYYbg@mail.gmail.com>
-Subject: Re: Re: [PATCH v6 01/10] file: Export receive_fd() to modules
-To:     Christian Brauner <christian.brauner@ubuntu.com>
-Cc:     Christoph Hellwig <hch@infradead.org>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        Parav Pandit <parav@nvidia.com>,
-        Christian Brauner <christian.brauner@canonical.com>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Matthew Wilcox <willy@infradead.org>, viro@zeniv.linux.org.uk,
-        Jens Axboe <axboe@kernel.dk>, bcrl@kvack.org,
-        Jonathan Corbet <corbet@lwn.net>,
-        =?UTF-8?Q?Mika_Penttil=C3=A4?= <mika.penttila@nextfour.com>,
-        Dan Carpenter <dan.carpenter@oracle.com>,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        kvm@vger.kernel.org, linux-fsdevel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Mar 31, 2021 at 10:08 PM Christian Brauner
-<christian.brauner@ubuntu.com> wrote:
->
-> On Wed, Mar 31, 2021 at 09:59:07PM +0800, Yongji Xie wrote:
-> > On Wed, Mar 31, 2021 at 8:23 PM Christian Brauner
-> > <christian.brauner@ubuntu.com> wrote:
-> > >
-> > > On Wed, Mar 31, 2021 at 07:32:33PM +0800, Yongji Xie wrote:
-> > > > On Wed, Mar 31, 2021 at 5:15 PM Christian Brauner
-> > > > <christian.brauner@ubuntu.com> wrote:
-> > > > >
-> > > > > On Wed, Mar 31, 2021 at 04:05:10PM +0800, Xie Yongji wrote:
-> > > > > > Export receive_fd() so that some modules can use
-> > > > > > it to pass file descriptor between processes without
-> > > > > > missing any security stuffs.
-> > > > > >
-> > > > > > Signed-off-by: Xie Yongji <xieyongji@bytedance.com>
-> > > > > > ---
-> > > > >
-> > > > > Yeah, as I said in the other mail I'd be comfortable with exposing just
-> > > > > this variant of the helper.
-> > > >
-> > > > Thanks, I got it now.
-> > > >
-> > > > > Maybe this should be a separate patch bundled together with Christoph's
-> > > > > patch to split parts of receive_fd() into a separate helper.
-> > > >
-> > > > Do we need to add the seccomp notifier into the separate helper? In
-> > > > our case, the file passed to the separate helper is from another
-> > > > process.
-> > >
-> > > Not sure what you mean. Christoph has proposed
-> > > https://lore.kernel.org/linux-fsdevel/20210325082209.1067987-2-hch@lst.de
-> > > I was just saying that if we think this patch is useful we might bundle
-> > > it together with the
-> > > EXPORT_SYMBOL(receive_fd)
-> > > part here, convert all drivers that currently open-code get_unused_fd()
-> > > + fd_install() to use receive_fd(), and make this a separate patchset.
-> > >
-> >
-> > Yes, I see. We can split the parts (get_unused_fd() + fd_install()) of
-> > receive_fd() into a separate helper and convert all drivers to use
-> > that. What I mean is that I also would like to use
-> > security_file_receive() in my modules. So I'm not sure if it's ok to
-> > add security_file_receive() into the separate helper. Or do I need to
-> > export security_file_receive() separately?
->
-> I think I confused you which is my bad. What you do here is - in my
-> opinion - correct.
-> I'm just saying that exporting receive_fd() allows further cleanups and
-> your export here could go on top of Christoph's change in a separate
-> series.
->
+As Documentation/kbuild/makefiles.rst says, EXTRA_CFLAGS is deprecated.
+Replace it with ccflags-y.
 
-Oh, I get you now! I'm glad to do that.
+Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+---
 
-Thanks,
-Yongji
+ arch/mips/kvm/Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/arch/mips/kvm/Makefile b/arch/mips/kvm/Makefile
+index 506c4ac0ba1c..7d42d624a7b9 100644
+--- a/arch/mips/kvm/Makefile
++++ b/arch/mips/kvm/Makefile
+@@ -4,7 +4,7 @@
+ 
+ common-objs-y = $(addprefix ../../../virt/kvm/, kvm_main.o coalesced_mmio.o eventfd.o)
+ 
+-EXTRA_CFLAGS += -Ivirt/kvm -Iarch/mips/kvm
++ccflags-y += -Ivirt/kvm -Iarch/mips/kvm
+ 
+ common-objs-$(CONFIG_CPU_HAS_MSA) += msa.o
+ 
+-- 
+2.27.0
+
