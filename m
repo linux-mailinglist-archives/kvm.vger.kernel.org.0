@@ -2,141 +2,128 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D449C34F6A4
-	for <lists+kvm@lfdr.de>; Wed, 31 Mar 2021 04:31:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 801E434F715
+	for <lists+kvm@lfdr.de>; Wed, 31 Mar 2021 05:03:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233257AbhCaCbD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 30 Mar 2021 22:31:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59916 "EHLO
+        id S233360AbhCaDC2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 30 Mar 2021 23:02:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38430 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233080AbhCaCae (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 30 Mar 2021 22:30:34 -0400
-Received: from mail-qv1-xf49.google.com (mail-qv1-xf49.google.com [IPv6:2607:f8b0:4864:20::f49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0823AC061574
-        for <kvm@vger.kernel.org>; Tue, 30 Mar 2021 19:30:34 -0700 (PDT)
-Received: by mail-qv1-xf49.google.com with SMTP id i7so311666qvh.22
-        for <kvm@vger.kernel.org>; Tue, 30 Mar 2021 19:30:33 -0700 (PDT)
+        with ESMTP id S233067AbhCaDBt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 30 Mar 2021 23:01:49 -0400
+Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E752C061760
+        for <kvm@vger.kernel.org>; Tue, 30 Mar 2021 20:01:38 -0700 (PDT)
+Received: by mail-pl1-x636.google.com with SMTP id o2so7173963plg.1
+        for <kvm@vger.kernel.org>; Tue, 30 Mar 2021 20:01:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=reply-to:date:in-reply-to:message-id:mime-version:references
-         :subject:from:to:cc;
-        bh=9ngxz5QAuEGilGZvxilVYqHe1BwKjT3flmnusOi2/fI=;
-        b=LicNR0ZkoiCXiKVmO0Ds1YFkeaxDw5kP7hrokUUJ0H/UfOMARURimbTR8ystlpw3LE
-         DTG2R/6GZcZWFnTEKaTKUSI+5X/+ZROOXtoGen04R9T9IrAtnHe5lgDOqRHfhAXtu6en
-         gfysf/mhPrr+0dmQPfeCQdg0G41X4orl90ynZN7tF9L5WvGZDP5jJBIHlmflCjmQBWA4
-         xT+MTcqVUXUtNm7ErI84r4YaLK752It8TaLMCpDBZ/LzWUrTqBJfoXPWmBx7R5koeZoo
-         SVIXqGKmsNtjyJtU7BKhIkMEEfm90yy93p5gA5Or1bwgdk+G1pjY1I7iKZ3BPML9rNSm
-         A2pA==
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=stnuRek4sOjIWVbHiF6Zw30QkQ1wKjPo9ZYhQ5gXeIc=;
+        b=niXRWlsP6nWYOz464OcK85FUi8OH0IvOD5tYyB/n4qHA/fz+1UeCwrVgIj9QbSKuJs
+         9In3WzOp3YhE4aF7+nrgA0j3qQcaR2Ip29sgsP1IuNG6cdVgq7gY8lZe1WCrD2TQJenI
+         ORcasWtvvKCFXDM/Fh4//SyDQ3gtU63zmWQ5KS7tS8Pbb5W9fhidBezi8/AEOg9HbmjZ
+         k6fL5ju5NVz4MXfKI88aR2rVlZ6HFrSrEYbWH8lTzBYqcWo/QJTstjygBi1tebOXObXF
+         d0d5C2yxDVZJemqMLcwdyWiLGKNjvdqITv++rg+ZHPn6OK5imYyRQZqVtPmkWcscIftT
+         zYJg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:reply-to:date:in-reply-to:message-id
-         :mime-version:references:subject:from:to:cc;
-        bh=9ngxz5QAuEGilGZvxilVYqHe1BwKjT3flmnusOi2/fI=;
-        b=R0WxBzFyWWK0lwowX2rU35as/JF2udmPozxt2g8xJZu72iarrc5vA57YP8zgZoN/4k
-         zAfb+S1fXeH256uw2n0aU3z0QT8ZcQp0SbnDK3/dlV5iVqFIaWi3y80cSBw00KvuvYmm
-         VISfds23l39SnYyA1fSSIz9bxkC+6iFagYCvjs9C+sCJ/BNz+Jtwdn8/lXNmPgWNKWeE
-         /FR7KQYToYSJxy11s6NPXd34CLbVVLxb7TY5c89pSszAGmObr0auNrxnc6buOFegVyR2
-         js3p1lvEd10Jp107w5V1/Y6l1H5sz+bxtfYPKIOhXbwZaKUe6fonXVBLwGlF+PF7Ffqz
-         ic+Q==
-X-Gm-Message-State: AOAM531gILT92C/H9mTnQkKB/BJS8StMypCfF/XfDEhfRKPLP33HUjby
-        LSBInMVsAFQxTAkqqqItZf64qUkZgJA=
-X-Google-Smtp-Source: ABdhPJzuedRPX2SVO40eFzTyVbFitDzVxdBK989CVi+aohDw/Pi7chg4NgBOrFfsM8w4yFLDCK0+NvuKbzg=
-X-Received: from seanjc798194.pdx.corp.google.com ([2620:15c:f:10:6c6b:5d63:9b3b:4a77])
- (user=seanjc job=sendgmr) by 2002:a0c:f092:: with SMTP id g18mr930054qvk.11.1617157833106;
- Tue, 30 Mar 2021 19:30:33 -0700 (PDT)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Tue, 30 Mar 2021 19:30:25 -0700
-In-Reply-To: <20210331023025.2485960-1-seanjc@google.com>
-Message-Id: <20210331023025.2485960-3-seanjc@google.com>
-Mime-Version: 1.0
-References: <20210331023025.2485960-1-seanjc@google.com>
-X-Mailer: git-send-email 2.31.0.291.g576ba9dcdaf-goog
-Subject: [PATCH 2/2] KVM: x86: Account a variety of miscellaneous allocations
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=stnuRek4sOjIWVbHiF6Zw30QkQ1wKjPo9ZYhQ5gXeIc=;
+        b=icin1MkEzhYQz+68XWFqxonPrgIyPqwiZi4mNhWXo4XOrZBa9PY3ut7Ju+U8epKVQ6
+         aCm1kpXLlJMEYBCNENHx5y7eujtmtwE1Nn+fm2yt9e72z3z5opl9kS/usR1Xpdz7KvRp
+         1l2RhmYjMcIazcmW9BrLL+FVUSugdrOLeGiX+wLGBpV3T9HJJJosmqJeJ753dmzGTNCa
+         sH8NG5IVy7HcWTTairrMb//uAVhhQH3erOO2OgowQpMvuFan6Z5hnYurz5IBe9Fwba/Y
+         RUQmPxe4tva5t77TDG2W+Nmpwr6/apuMCys7asVc3nhNa2A6PYZxSswtPYqc63U3X6uU
+         Zliw==
+X-Gm-Message-State: AOAM531RVQW3tieI+b1wDmxMBa8H0BuCVm+6XU37QgntqnwH9H3+6uNw
+        F+lLvSDD7tI0w6cBFLqafu0uSA==
+X-Google-Smtp-Source: ABdhPJzGQXAE+cVEv4iUgsow9YdddJYSNGV5fSw+Q1hZhK7KifScyxTT+YTaUQqGdwqKrP1GWz8PZg==
+X-Received: by 2002:a17:902:c408:b029:e7:3242:5690 with SMTP id k8-20020a170902c408b02900e732425690mr1241746plk.85.1617159697700;
+        Tue, 30 Mar 2021 20:01:37 -0700 (PDT)
+Received: from google.com (240.111.247.35.bc.googleusercontent.com. [35.247.111.240])
+        by smtp.gmail.com with ESMTPSA id w84sm360419pfc.142.2021.03.30.20.01.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 30 Mar 2021 20:01:36 -0700 (PDT)
+Date:   Wed, 31 Mar 2021 03:01:33 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
+To:     Emanuele Giuseppe Esposito <eesposit@redhat.com>
+Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>, Shuah Khan <shuah@kernel.org>,
+        Alexander Graf <graf@amazon.com>,
+        Andrew Jones <drjones@redhat.com>, linux-doc@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH 1/4] kvm: cpuid: adjust the returned nent field of
+ kvm_cpuid2 for KVM_GET_SUPPORTED_CPUID and KVM_GET_EMULATED_CPUID
+Message-ID: <YGPmDbO++agqdqQL@google.com>
+References: <20210330185841.44792-1-eesposit@redhat.com>
+ <20210330185841.44792-2-eesposit@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210330185841.44792-2-eesposit@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Switch to GFP_KERNEL_ACCOUNT for a handful of allocations that are
-clearly associated with a single task/VM.
+On Tue, Mar 30, 2021, Emanuele Giuseppe Esposito wrote:
+> Calling the kvm KVM_GET_[SUPPORTED/EMULATED]_CPUID ioctl requires
+> a nent field inside the kvm_cpuid2 struct to be big enough to contain
+> all entries that will be set by kvm.
+> Therefore if the nent field is too high, kvm will adjust it to the
+> right value. If too low, -E2BIG is returned.
+> 
+> However, when filling the entries do_cpuid_func() requires an
+> additional entry, so if the right nent is known in advance,
+> giving the exact number of entries won't work because it has to be increased
+> by one.
+> 
+> Signed-off-by: Emanuele Giuseppe Esposito <eesposit@redhat.com>
+> ---
+>  arch/x86/kvm/cpuid.c | 6 ++++++
+>  1 file changed, 6 insertions(+)
+> 
+> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+> index 6bd2f8b830e4..5412b48b9103 100644
+> --- a/arch/x86/kvm/cpuid.c
+> +++ b/arch/x86/kvm/cpuid.c
+> @@ -975,6 +975,12 @@ int kvm_dev_ioctl_get_cpuid(struct kvm_cpuid2 *cpuid,
+>  
+>  	if (cpuid->nent < 1)
+>  		return -E2BIG;
+> +
+> +	/* if there are X entries, we need to allocate at least X+1
+> +	 * entries but return the actual number of entries
+> +	 */
+> +	cpuid->nent++;
 
-Note, there are a several SEV allocations that aren't accounted, but
-those can (hopefully) be fixed by using the local stack for memory.
+I don't see how this can be correct.
 
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- arch/x86/kvm/svm/nested.c | 4 ++--
- arch/x86/kvm/svm/sev.c    | 6 +++---
- arch/x86/kvm/vmx/vmx.c    | 2 +-
- 3 files changed, 6 insertions(+), 6 deletions(-)
+If this bonus entry really is needed, then won't that be reflected in array.nent?
+I.e won't KVM overrun the userspace buffer?
 
-diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
-index 8523f60adb92..4f9e8b80ef99 100644
---- a/arch/x86/kvm/svm/nested.c
-+++ b/arch/x86/kvm/svm/nested.c
-@@ -1234,8 +1234,8 @@ static int svm_set_nested_state(struct kvm_vcpu *vcpu,
- 		return -EINVAL;
- 
- 	ret  = -ENOMEM;
--	ctl  = kzalloc(sizeof(*ctl),  GFP_KERNEL);
--	save = kzalloc(sizeof(*save), GFP_KERNEL);
-+	ctl  = kzalloc(sizeof(*ctl),  GFP_KERNEL_ACCOUNT);
-+	save = kzalloc(sizeof(*save), GFP_KERNEL_ACCOUNT);
- 	if (!ctl || !save)
- 		goto out_free;
- 
-diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index 83e00e524513..883ce6bf23b9 100644
---- a/arch/x86/kvm/svm/sev.c
-+++ b/arch/x86/kvm/svm/sev.c
-@@ -637,7 +637,7 @@ static int sev_launch_measure(struct kvm *kvm, struct kvm_sev_cmd *argp)
- 		}
- 
- 		ret = -ENOMEM;
--		blob = kmalloc(params.len, GFP_KERNEL);
-+		blob = kmalloc(params.len, GFP_KERNEL_ACCOUNT);
- 		if (!blob)
- 			goto e_free;
- 
-@@ -1074,7 +1074,7 @@ static int sev_get_attestation_report(struct kvm *kvm, struct kvm_sev_cmd *argp)
- 		}
- 
- 		ret = -ENOMEM;
--		blob = kmalloc(params.len, GFP_KERNEL);
-+		blob = kmalloc(params.len, GFP_KERNEL_ACCOUNT);
- 		if (!blob)
- 			goto e_free;
- 
-@@ -1775,7 +1775,7 @@ static bool setup_vmgexit_scratch(struct vcpu_svm *svm, bool sync, u64 len)
- 			       len, GHCB_SCRATCH_AREA_LIMIT);
- 			return false;
- 		}
--		scratch_va = kzalloc(len, GFP_KERNEL);
-+		scratch_va = kzalloc(len, GFP_KERNEL_ACCOUNT);
- 		if (!scratch_va)
- 			return false;
- 
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index c8a4a548e96b..5ab25376d718 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -562,7 +562,7 @@ static int hv_enable_direct_tlbflush(struct kvm_vcpu *vcpu)
- 	 * evmcs in singe VM shares same assist page.
- 	 */
- 	if (!*p_hv_pa_pg)
--		*p_hv_pa_pg = kzalloc(PAGE_SIZE, GFP_KERNEL);
-+		*p_hv_pa_pg = kzalloc(PAGE_SIZE, GFP_KERNEL_ACCOUNT);
- 
- 	if (!*p_hv_pa_pg)
- 		return -ENOMEM;
--- 
-2.31.0.291.g576ba9dcdaf-goog
+If it's not reflected in array.nent, that would imply there's an off-by-one check
+somewhere, or KVM is creating an entry that it doesn't copy to userspace.  The
+former seems unlikely as there are literally only two checks against maxnent,
+and they both look correct (famous last words...).
 
+KVM does decrement array->nent in one specific case (CPUID.0xD.2..64), i.e. a
+false positive is theoretically possible, but that carries a WARN and requires a
+kernel or CPU bug as well.  And fudging nent for that case would still break
+normal use cases due to the overrun problem.
+
+What am I missing?
+
+> +
+>  	if (cpuid->nent > KVM_MAX_CPUID_ENTRIES)
+>  		cpuid->nent = KVM_MAX_CPUID_ENTRIES;
+>  
+> -- 
+> 2.30.2
+> 
