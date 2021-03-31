@@ -2,55 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 43180350995
-	for <lists+kvm@lfdr.de>; Wed, 31 Mar 2021 23:36:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5644135099C
+	for <lists+kvm@lfdr.de>; Wed, 31 Mar 2021 23:37:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231974AbhCaVgM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 31 Mar 2021 17:36:12 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:24973 "EHLO
+        id S232417AbhCaVgq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 31 Mar 2021 17:36:46 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:53076 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229662AbhCaVfn (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 31 Mar 2021 17:35:43 -0400
+        by vger.kernel.org with ESMTP id S232406AbhCaVgm (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 31 Mar 2021 17:36:42 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1617226542;
+        s=mimecast20190719; t=1617226601;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=QQUIznWNci7QLnwuJm69/wWy4z3NEw65AzCUXnTQPwI=;
-        b=B0t700AwuWfk00HLBYsci5Cw25mSrM6nxdaYPYLNBlYc6cZSCq7r3+SIFALdkG/HjLewUH
-        AypAYgl+7i+1fE8te8y2RnriywZRo5I04C6XQKGmBR4ZWa8uhPrTJ6Bou+ViC2VxLuhSKk
-        ZvsRLkUj7u2JZ0zxJRUjHkVrKb/GBzU=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-187-DnSp12fIOQqGG3TKW3OxOA-1; Wed, 31 Mar 2021 17:35:40 -0400
-X-MC-Unique: DnSp12fIOQqGG3TKW3OxOA-1
-Received: by mail-ej1-f69.google.com with SMTP id e13so1375890ejd.21
-        for <kvm@vger.kernel.org>; Wed, 31 Mar 2021 14:35:40 -0700 (PDT)
+        bh=CEkfAOJSRgLmrcmogejiwM3z3x7Jp11CwOAYIRJU/eA=;
+        b=DR44VXlC8jHkZkJKWv8FNgqSwqGA5qwsqFTT5czsc1F8JBuxYJNqDjt82X008IRklDA7OP
+        fGr/8RVQQbojNplVc2zaYSH8hgmgefyx6b79InU1q1Q1fY8thwASZShSKq7EZQRdwaywIE
+        adHI7X3JfuOgT99niJ6BiFnkkDbNnHA=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-258-XWhacGcuN8qGZDfVHoJMyA-1; Wed, 31 Mar 2021 17:36:38 -0400
+X-MC-Unique: XWhacGcuN8qGZDfVHoJMyA-1
+Received: by mail-wm1-f69.google.com with SMTP id o9-20020a05600c4fc9b029010cea48b602so2356820wmq.0
+        for <kvm@vger.kernel.org>; Wed, 31 Mar 2021 14:36:37 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:cc:references:from:subject:message-id:date
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=QQUIznWNci7QLnwuJm69/wWy4z3NEw65AzCUXnTQPwI=;
-        b=iH88ZSqOZRZ64PG6HVDBeToHPX2T3Q6k9aW+z4qULbPKfkVXO9EexdMZ7eQUsyrMiR
-         6lo7lE5pl3+tDe68Cf5SWEzWLU8kb/RktSeZkBdM8fAVrzdO0wZX0AhhMNP0OfQ0rEDT
-         PKqL2zJOeHgX8VYz+6o1RolO6I2Bs36z/xafPrUTXKvijrc6kdzBsIH4sxgqCXos+u6O
-         95uRiV+9BPIsYlPCnfQWSwXgd3JAZFTEFNF8KMtC/vrComnPd5r2Kxl1Ie00Y8CLYhDG
-         zWylgpHtCpXbrp6E7v1O/1451UzGFcA2cTYSEE/CEwyJ/hFbI+Ii/Cvyg5eFndtPp0xC
-         2e4Q==
-X-Gm-Message-State: AOAM533u7YKECy/3Ztt7hmg1tFcyAK+JwygcI5jUiSJLlIicsldf6Dm2
-        cE0CyX1Ziny+ZM/Gty1cPwdCJwz6zM+rl617x9zZv0eUJqwKBnWJKgBzP0oKKW4+oY1wN4JHYl5
-        nKC+VDXhV/dTU
-X-Received: by 2002:a17:906:4d18:: with SMTP id r24mr5674543eju.493.1617226539406;
-        Wed, 31 Mar 2021 14:35:39 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwqLuIZRAxqmNZY+xbCQNtWOLNhNwqjzyhv1KwZdcnD5ToTgWvG1r7yCpG0AD5klE6UQn/quw==
-X-Received: by 2002:a17:906:4d18:: with SMTP id r24mr5674529eju.493.1617226539171;
-        Wed, 31 Mar 2021 14:35:39 -0700 (PDT)
+        bh=CEkfAOJSRgLmrcmogejiwM3z3x7Jp11CwOAYIRJU/eA=;
+        b=hRkM8mZO56zmN34+I6JiA5dSfjaESRggkIQwc4ddJrrvTHzxS/3ZRLRQ8SJDmzjL26
+         rn0xg71xMn8xWEKek6DwG659Y4Naxu3nWbEh3oxTUPw5/AkJl0HYd3I7hZLKOQLnUS4q
+         Tfd7ZVaYo4QDYcuJdJKx+qDybBLuu9MygZa8jp+78GN/ZGJfWePL0j+aPM9AUA9tzf0o
+         eiVRgS/M+5+nwune2Ul3aTH58oDl1tY41ewl0ZN01QBwtH+9S9q3bjiZbXAWBvEz+D5l
+         +Ws+KnrqM+sc/qIBwe0NSLNFYH48xN3wP2LiEsIGaPBLli4b1MP1EuJQWz3iILjy8pQ1
+         +z8A==
+X-Gm-Message-State: AOAM530TFgoyzC14c+6mbwX1veUSEsxVw25aQWd08JIc4fO94JLjmsf+
+        DOez8rXA3nIN/YFgY/WjwyuGtX+t5NxCH20+bWhHyvPwznXBy7M+jFcnhrCMyC5GYWP/XnLamcV
+        te1l1InRk+3hs
+X-Received: by 2002:a5d:6a81:: with SMTP id s1mr5824716wru.401.1617226596853;
+        Wed, 31 Mar 2021 14:36:36 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzxj/Cy9ZlL8PU/jQIPYrj7YXyx+xnD7LhAYpJqpR2c8LjROVyn4i4Jg6Wqcll5JYmuGcjgzQ==
+X-Received: by 2002:a5d:6a81:: with SMTP id s1mr5824690wru.401.1617226596681;
+        Wed, 31 Mar 2021 14:36:36 -0700 (PDT)
 Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id h22sm1846899eji.80.2021.03.31.14.35.37
+        by smtp.gmail.com with ESMTPSA id u63sm5728603wmg.24.2021.03.31.14.36.35
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 31 Mar 2021 14:35:38 -0700 (PDT)
+        Wed, 31 Mar 2021 14:36:36 -0700 (PDT)
+Subject: Re: [PATCH 16/18] KVM: Don't take mmu_lock for range invalidation
+ unless necessary
 To:     Sean Christopherson <seanjc@google.com>
 Cc:     Marc Zyngier <maz@kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
         Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
@@ -73,44 +75,43 @@ References: <20210326021957.1424875-1-seanjc@google.com>
  <56ea69fe-87b0-154b-e286-efce9233864e@redhat.com>
  <YGTRzf/4i9Y8XR2c@google.com>
  <0e30625f-934d-9084-e293-cb3bcbc9e4b8@redhat.com>
- <YGTkLMAzk88wOiZm@google.com>
+ <YGTkLMAzk88wOiZm@google.com> <YGToGBvdfPiCr3WA@google.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH 16/18] KVM: Don't take mmu_lock for range invalidation
- unless necessary
-Message-ID: <345ab567-386f-9080-f9cb-0e17fa90a852@redhat.com>
-Date:   Wed, 31 Mar 2021 23:35:37 +0200
+Message-ID: <743a31e7-03ba-0c64-86ac-c5a0aac4121c@redhat.com>
+Date:   Wed, 31 Mar 2021 23:36:34 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.7.0
 MIME-Version: 1.0
-In-Reply-To: <YGTkLMAzk88wOiZm@google.com>
+In-Reply-To: <YGToGBvdfPiCr3WA@google.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 31/03/21 23:05, Sean Christopherson wrote:
->> Wouldn't it be incorrect to lock a mutex (e.g. inside*another*  MMU
->> notifier's invalidate callback) while holding an rwlock_t?  That makes sense
->> because anybody that's busy waiting in write_lock potentially cannot be
->> preempted until the other task gets the mutex.  This is a potential
->> deadlock.
->
-> Yes?  I don't think I follow your point though.  Nesting a spinlock or rwlock
-> inside a rwlock is ok, so long as the locks are always taken in the same order,
-> i.e. it's never mmu_lock -> mmu_notifier_slots_lock.
+On 31/03/21 23:22, Sean Christopherson wrote:
+> On a related topic, any preference on whether to have an explicit "must_lock"
+> flag (what I posted), or derive the logic based on other params?
+> 
+> The helper I posted does:
+> 
+> 	if (range->must_lock &&
+> 	    kvm_mmu_lock_and_check_handler(kvm, range, &locked))
+> 		goto out_unlock;
+> 
+> but it could be:
+> 
+> 	if (!IS_KVM_NULL_FN(range->on_lock) && !range->may_block &&
+> 	    kvm_mmu_lock_and_check_handler(kvm, range, &locked))
+> 		goto out_unlock;
+> 
+> The generated code should be nearly identical on a modern compiler, so it's
+> purely a question of aesthetics.  I slightly prefer the explicit "must_lock" to
+> avoid spreading out the logic too much, but it also feels a bit superfluous.
 
-*Another* MMU notifier could nest a mutex inside KVM's rwlock.
-
-But... is it correct that the MMU notifier invalidate callbacks are 
-always called with the mmap_sem taken (sometimes for reading, e.g. 
-try_to_merge_with_ksm_page->try_to_merge_one_page->write_protect_page)? 
-  We could take it temporarily in install_memslots, since the MMU 
-notifier's mm is stored in kvm->mm.
-
-In this case, a pair of kvm_mmu_notifier_lock/unlock functions would be 
-the best way to abstract it.
+I do as well, but I hope we don't need any lock after all as in the 
+email I've just sent.
 
 Paolo
 
