@@ -2,146 +2,133 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 744D335195F
-	for <lists+kvm@lfdr.de>; Thu,  1 Apr 2021 20:02:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5FBEB351C1A
+	for <lists+kvm@lfdr.de>; Thu,  1 Apr 2021 20:45:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235416AbhDARxE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 1 Apr 2021 13:53:04 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:40320 "EHLO
+        id S236840AbhDASNK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 1 Apr 2021 14:13:10 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:60877 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234531AbhDARoE (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 1 Apr 2021 13:44:04 -0400
+        by vger.kernel.org with ESMTP id S238817AbhDASKM (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 1 Apr 2021 14:10:12 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1617299044;
+        s=mimecast20190719; t=1617300611;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=98iVITrp+QoQaOvmHFzYOL2p801lu1RcC2838VOSYvw=;
-        b=CZM+eGV8HtYLzfjwqLdPS+WQw0YMjjUPBst8p1g5NKB4EL+qXKip7oCBPegrsltqd6ph++
-        FL+jZj+cAW0GTp6Bus0oS9H55N2/3zSNAoHScGJKP3I3wjYsdfV2PKwQBPK3nXFDjSA7VP
-        6vbbnVyRZmgBBAXeSBbQbN27ga7xAbE=
+        bh=cc3k8MO13oibHy+9e3XEGxkpJb9ZoYiN6eARau7Wqk8=;
+        b=hvFDMM8ADLPRBWUVVE1dWk9MDHiOZVMe/ruPLYDia/S22msT57XSGrESVaf94VnSNlXWwK
+        trFX5B84CxEikEFtpxuh8Z0C/MgdKE6h2xZLP46nmZipkT5071v+txLdqBpwgNMBSx0Wyc
+        sLADgfNLSsEAa3iSiTtUG6YS/YJEGOQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-127-Y_Ye3OZyN3qad7yzaRZVwg-1; Thu, 01 Apr 2021 13:13:05 -0400
-X-MC-Unique: Y_Ye3OZyN3qad7yzaRZVwg-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+ us-mta-529-7sofkHCGOwurHwhGCrWEYQ-1; Thu, 01 Apr 2021 07:43:52 -0400
+X-MC-Unique: 7sofkHCGOwurHwhGCrWEYQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1BEDC8189C8;
-        Thu,  1 Apr 2021 17:13:03 +0000 (UTC)
-Received: from starship (unknown [10.35.206.58])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id EC7015D6D1;
-        Thu,  1 Apr 2021 17:12:59 +0000 (UTC)
-Message-ID: <889f4565fb9b86e77ed22da6cbbe649311744f16.camel@redhat.com>
-Subject: Re: [PATCH 1/4] KVM: x86: pending exceptions must not be blocked by
- an injected event
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
-Cc:     Thomas Gleixner <tglx@linutronix.de>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Jim Mattson <jmattson@google.com>,
-        "open list:X86 ARCHITECTURE (32-BIT AND 64-BIT)" 
-        <linux-kernel@vger.kernel.org>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Joerg Roedel <joro@8bytes.org>,
-        Ingo Molnar <mingo@redhat.com>,
-        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
-        Sean Christopherson <seanjc@google.com>
-Date:   Thu, 01 Apr 2021 20:12:58 +0300
-In-Reply-To: <4f6a321a-bc44-fe2f-37f5-6b22bc7fae1c@redhat.com>
-References: <20210401143817.1030695-1-mlevitsk@redhat.com>
-         <20210401143817.1030695-2-mlevitsk@redhat.com>
-         <4f6a321a-bc44-fe2f-37f5-6b22bc7fae1c@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 93E7B801814;
+        Thu,  1 Apr 2021 11:43:50 +0000 (UTC)
+Received: from [10.36.112.13] (ovpn-112-13.ams2.redhat.com [10.36.112.13])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id E04B716917;
+        Thu,  1 Apr 2021 11:43:47 +0000 (UTC)
+Subject: Re: [PATCH v4 1/8] KVM: arm64: vgic-v3: Fix some error codes when
+ setting RDIST base
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     eric.auger.pro@gmail.com, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+        drjones@redhat.com, alexandru.elisei@arm.com, james.morse@arm.com,
+        suzuki.poulose@arm.com, shuah@kernel.org, pbonzini@redhat.com
+References: <20210401085238.477270-1-eric.auger@redhat.com>
+ <20210401085238.477270-2-eric.auger@redhat.com>
+ <87wntmp99c.wl-maz@kernel.org>
+From:   Auger Eric <eric.auger@redhat.com>
+Message-ID: <419be8ac-6fbb-a712-a398-311ca68d52f9@redhat.com>
+Date:   Thu, 1 Apr 2021 13:43:46 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.8.0
 MIME-Version: 1.0
+In-Reply-To: <87wntmp99c.wl-maz@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 2021-04-01 at 19:05 +0200, Paolo Bonzini wrote:
-> On 01/04/21 16:38, Maxim Levitsky wrote:
-> > Injected interrupts/nmi should not block a pending exception,
-> > but rather be either lost if nested hypervisor doesn't
-> > intercept the pending exception (as in stock x86), or be delivered
-> > in exitintinfo/IDT_VECTORING_INFO field, as a part of a VMexit
-> > that corresponds to the pending exception.
-> > 
-> > The only reason for an exception to be blocked is when nested run
-> > is pending (and that can't really happen currently
-> > but still worth checking for).
-> > 
-> > Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
-> 
-> This patch would be an almost separate bugfix, right?  I am going to 
-> queue this, but a confirmation would be helpful.
+Hi Marc,
 
-Yes, this patch doesn't depend on anything else.
-Thanks!
-Best regards,
-	Maxim Levitsky
-
+On 4/1/21 12:52 PM, Marc Zyngier wrote:
+> Hi Eric,
 > 
-> Paolo
+> On Thu, 01 Apr 2021 09:52:31 +0100,
+> Eric Auger <eric.auger@redhat.com> wrote:
+>>
+>> KVM_DEV_ARM_VGIC_GRP_ADDR group doc says we should return
+>> -EEXIST in case the base address of the redist is already set.
+>> We currently return -EINVAL.
+>>
+>> However we need to return -EINVAL in case a legacy REDIST address
+>> is attempted to be set while REDIST_REGIONS were set. This case
+>> is discriminated by looking at the count field.
+>>
+>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>>
+>> ---
+>>
+>> v1 -> v2:
+>> - simplify the check sequence
+>> ---
+>>  arch/arm64/kvm/vgic/vgic-mmio-v3.c | 15 +++++++--------
+>>  1 file changed, 7 insertions(+), 8 deletions(-)
+>>
+>> diff --git a/arch/arm64/kvm/vgic/vgic-mmio-v3.c b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
+>> index 15a6c98ee92f0..013b737b658f8 100644
+>> --- a/arch/arm64/kvm/vgic/vgic-mmio-v3.c
+>> +++ b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
+>> @@ -791,10 +791,6 @@ static int vgic_v3_insert_redist_region(struct kvm *kvm, uint32_t index,
+>>  	size_t size = count * KVM_VGIC_V3_REDIST_SIZE;
+>>  	int ret;
+>>  
+>> -	/* single rdist region already set ?*/
+>> -	if (!count && !list_empty(rd_regions))
+>> -		return -EINVAL;
+>> -
+>>  	/* cross the end of memory ? */
+>>  	if (base + size < base)
+>>  		return -EINVAL;
+>> @@ -805,11 +801,14 @@ static int vgic_v3_insert_redist_region(struct kvm *kvm, uint32_t index,
+>>  	} else {
+>>  		rdreg = list_last_entry(rd_regions,
+>>  					struct vgic_redist_region, list);
+>> -		if (index != rdreg->index + 1)
+>> -			return -EINVAL;
+>>  
+>> -		/* Cannot add an explicitly sized regions after legacy region */
+>> -		if (!rdreg->count)
+>> +		if ((!count) != (!rdreg->count))
+>> +			return -EINVAL; /* Mix REDIST and REDIST_REGION */
 > 
-> > ---
-> >   arch/x86/kvm/svm/nested.c |  8 +++++++-
-> >   arch/x86/kvm/vmx/nested.c | 10 ++++++++--
-> >   2 files changed, 15 insertions(+), 3 deletions(-)
-> > 
-> > diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
-> > index 8523f60adb92..34a37b2bd486 100644
-> > --- a/arch/x86/kvm/svm/nested.c
-> > +++ b/arch/x86/kvm/svm/nested.c
-> > @@ -1062,7 +1062,13 @@ static int svm_check_nested_events(struct kvm_vcpu *vcpu)
-> >   	}
-> >   
-> >   	if (vcpu->arch.exception.pending) {
-> > -		if (block_nested_events)
-> > +		/*
-> > +		 * Only a pending nested run can block a pending exception.
-> > +		 * Otherwise an injected NMI/interrupt should either be
-> > +		 * lost or delivered to the nested hypervisor in the EXITINTINFO
-> > +		 * vmcb field, while delivering the pending exception.
-> > +		 */
-> > +		if (svm->nested.nested_run_pending)
-> >                           return -EBUSY;
-> >   		if (!nested_exit_on_exception(svm))
-> >   			return 0;
-> > diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-> > index fd334e4aa6db..c3ba842fc07f 100644
-> > --- a/arch/x86/kvm/vmx/nested.c
-> > +++ b/arch/x86/kvm/vmx/nested.c
-> > @@ -3806,9 +3806,15 @@ static int vmx_check_nested_events(struct kvm_vcpu *vcpu)
-> >   
-> >   	/*
-> >   	 * Process any exceptions that are not debug traps before MTF.
-> > +	 *
-> > +	 * Note that only a pending nested run can block a pending exception.
-> > +	 * Otherwise an injected NMI/interrupt should either be
-> > +	 * lost or delivered to the nested hypervisor in the IDT_VECTORING_INFO,
-> > +	 * while delivering the pending exception.
-> >   	 */
-> > +
-> >   	if (vcpu->arch.exception.pending && !vmx_pending_dbg_trap(vcpu)) {
-> > -		if (block_nested_events)
-> > +		if (vmx->nested.nested_run_pending)
-> >   			return -EBUSY;
-> >   		if (!nested_vmx_check_exception(vcpu, &exit_qual))
-> >   			goto no_vmexit;
-> > @@ -3825,7 +3831,7 @@ static int vmx_check_nested_events(struct kvm_vcpu *vcpu)
-> >   	}
-> >   
-> >   	if (vcpu->arch.exception.pending) {
-> > -		if (block_nested_events)
-> > +		if (vmx->nested.nested_run_pending)
-> >   			return -EBUSY;
-> >   		if (!nested_vmx_check_exception(vcpu, &exit_qual))
-> >   			goto no_vmexit;
-> > 
+> Urgh... The triple negation killed me. Can we come up with a more
+> intuitive expression? Something like:
 
+Yes sometimes I can be "different" ;-)
+> 
+> 		/* Don't mix single region and discrete redist regions */
+> 		if (!count && rdreg->count)
+> 			return -EINVAL;>
+> Does it capture what you want to express?
+
+yes it does!
+
+Thanks
+
+Eric
+> 
+> Thanks,
+> 
+> 	M.
+> 
 
