@@ -2,101 +2,110 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B5F1D351AA5
-	for <lists+kvm@lfdr.de>; Thu,  1 Apr 2021 20:07:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 99BDA351974
+	for <lists+kvm@lfdr.de>; Thu,  1 Apr 2021 20:02:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236458AbhDASC1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 1 Apr 2021 14:02:27 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:54939 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S236894AbhDAR7D (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 1 Apr 2021 13:59:03 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1617299942;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=brX6QE7MjhEomBWAbXjkcHLjpu7FoC0JOK5oa38RZow=;
-        b=D67cJFB6ZY6iS03xATTYd97yObyFeEf8X9/nPc4jUFkBb5DMUO4ZE8B7LeHF8+z4BbJyIi
-        0U+wCBUn7o+VsvGWmEwpZMclzerPPSFx+S97A/N7vRwZ4WXB840JTk1CefXxGlHIIGCTvj
-        27X1QCb7F/RKA0gphULAtPLzm15q5Tw=
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
- [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-440-GHPtw8yPOeaAzO71xCtfDg-1; Thu, 01 Apr 2021 11:57:36 -0400
-X-MC-Unique: GHPtw8yPOeaAzO71xCtfDg-1
-Received: by mail-ed1-f70.google.com with SMTP id m8so3060609edv.11
-        for <kvm@vger.kernel.org>; Thu, 01 Apr 2021 08:57:36 -0700 (PDT)
+        id S235786AbhDARxm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 1 Apr 2021 13:53:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59778 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S237114AbhDARu3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 1 Apr 2021 13:50:29 -0400
+Received: from mail-pl1-x629.google.com (mail-pl1-x629.google.com [IPv6:2607:f8b0:4864:20::629])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 39BA3C02FEB0
+        for <kvm@vger.kernel.org>; Thu,  1 Apr 2021 09:23:04 -0700 (PDT)
+Received: by mail-pl1-x629.google.com with SMTP id g10so1266272plt.8
+        for <kvm@vger.kernel.org>; Thu, 01 Apr 2021 09:23:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=tD+X9BuSKumVuODrS7ew+s56RfGVj55Vw8zUed5E1dQ=;
+        b=b0yftv4xYST/PHsMhQ7VQUcEa/nNBbEpF+RJLTdGj1yGdsIIOhVvznJPXhAKOgcgrx
+         HAGvwGO2hi88fQRtPCWLs1BpGDqSQ0qcLXjLzO8MlBG4jHriu3rrZlvA42wE8LNuX/Fr
+         4xdWlPmu2lcnYh2YC1ciLz4MPciden90dX/kioMhjaC/j8B/Dk7gjgOAzVq6bFsrKOvA
+         Rw45Ihhg7JDLF03Vng8Sk5QgEspPdJUA5DyyG67THT7pHBSQ46icHHGjcqhSzxPetv6O
+         3aXmunw+MHJIZS4VOWhQtBE9wh/bHozCc3KsuxBOZuV+qaR12u7c0dntFbqU1PF18eKr
+         WgpA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=brX6QE7MjhEomBWAbXjkcHLjpu7FoC0JOK5oa38RZow=;
-        b=R2LHPtwdiEXKV2G2g2lvJCvhdN6mF+7wMaBfsKPWBR/NrDO6Pjn02qWzLuQqPmwp1b
-         oiEwTIbhFysrAi2teIdcLDpzxFGpN+yLkCAMs6XeHBzLYIKpNRHEcyth2CTNk3IvKzmb
-         SrodIlU1Am1cAUk9RhCCrSYXJbRs5AuTlbKjhbzw15vwikXQj4NIQ5ZDzZfsH6wIb5Wg
-         BEA3/haQaJKwBMx8QwvNz18gV1dr7i3tJSm75ajtk+cUu3YBYRUmKBfS4DCGCZgVa1Zm
-         vLGIkzaGf5Hd4q7jUSzRrRQJz781YU3y54iN48jPr3FvNqDQ2iilMmcpoeSaM4vc9F+N
-         6Mng==
-X-Gm-Message-State: AOAM531LAJNNAJlGeT18jRD/Lzi//t6WYC+gA+zziOQh3O/x6uMsF4P4
-        lLX/Z3/2SUjLUKR25GIRc0UdLT705WkPSrobtv7n7SALkpaZ5jH6gnd/g2w8TJ2ULG8WYns6K/w
-        QdMVGy2C7mTR1
-X-Received: by 2002:a17:906:3a94:: with SMTP id y20mr9608600ejd.35.1617292655268;
-        Thu, 01 Apr 2021 08:57:35 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzGPBwotTdYkotuMCSsl5dzzf7/fFbVRH67ssRnZNdW0bRpfE22hOEqP36Ibs2QHciTPGMSCQ==
-X-Received: by 2002:a17:906:3a94:: with SMTP id y20mr9608575ejd.35.1617292655051;
-        Thu, 01 Apr 2021 08:57:35 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id s13sm3841034edr.86.2021.04.01.08.57.33
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 01 Apr 2021 08:57:34 -0700 (PDT)
-Subject: Re: [PATCH v2 2/2] KVM: nSVM: improve SYSENTER emulation on AMD
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org
-Cc:     Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Ingo Molnar <mingo@redhat.com>,
-        "open list:X86 ARCHITECTURE (32-BIT AND 64-BIT)" 
-        <linux-kernel@vger.kernel.org>, "H. Peter Anvin" <hpa@zytor.com>,
-        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Borislav Petkov <bp@alien8.de>,
-        Sean Christopherson <seanjc@google.com>,
-        Joerg Roedel <joro@8bytes.org>
-References: <20210401111928.996871-1-mlevitsk@redhat.com>
- <20210401111928.996871-3-mlevitsk@redhat.com>
- <87h7kqrwb2.fsf@vitty.brq.redhat.com>
- <6f138606-d6c3-d332-9dc2-9ba4796fd4ce@redhat.com>
- <87zgyic984.fsf@vitty.brq.redhat.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <b63e6c63-d781-3aef-a7b8-6b07d3c3568d@redhat.com>
-Date:   Thu, 1 Apr 2021 17:57:33 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.7.0
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=tD+X9BuSKumVuODrS7ew+s56RfGVj55Vw8zUed5E1dQ=;
+        b=nl/JOQYrPCvNNW/DZQEZVFtOAIexfsqEevYWUvCXprsOoDBCxuaSGRO/u0s0WabZMG
+         MdG6T5eZO1Aodx4PEdUb3YlfEDCHkI0K4M3k4NJO2AA87o1YyIHzMNSrN0wOrzrH6coP
+         /RtWcVabbYR60Jqk84/3DM2SrIL5QoXuNJH6jc9uaCkWw6AdbfjMSGpJBB7nwt2rPoIv
+         DvpHbDeqQunz2ZfwHPeVdVa6+i/9GwORh0+Iqg2pgMZFVBTR4NLXOFMZDmm2hJNXkQFF
+         BxV2EtKOA/R1dm9/m3iDhhe/uM2TLkdS+CSPiDcMPtMJ3TCNt57SK5yWRcs9EO8Yx3dh
+         zA3w==
+X-Gm-Message-State: AOAM5325h6CEWeEH809pl90OCg4aGw9WWK4rjMkheNlNdT0r86OSi0Wh
+        G5z9rFmqDqvf38C/X4y515aVig==
+X-Google-Smtp-Source: ABdhPJxA+80V8X8+S9LBr6ks6kcnWa3Io5Z5gpYddSyqtvTMFfjHXGTv/ayoHfoc+ROuWFYuNUqIUg==
+X-Received: by 2002:a17:90a:4005:: with SMTP id u5mr9648330pjc.6.1617294183436;
+        Thu, 01 Apr 2021 09:23:03 -0700 (PDT)
+Received: from google.com (240.111.247.35.bc.googleusercontent.com. [35.247.111.240])
+        by smtp.gmail.com with ESMTPSA id x3sm5781480pfn.181.2021.04.01.09.23.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 01 Apr 2021 09:23:02 -0700 (PDT)
+Date:   Thu, 1 Apr 2021 16:22:59 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     Yang Li <yang.lee@linux.alibaba.com>, pbonzini@redhat.com,
+        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
+        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, x86@kernel.org,
+        hpa@zytor.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] KVM: x86: Fix potential memory access error
+Message-ID: <YGXzY5h1eCQj6aU0@google.com>
+References: <1617182122-112315-1-git-send-email-yang.lee@linux.alibaba.com>
+ <YGS6XS87HYJdVPFQ@google.com>
+ <87mtuis77m.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <87zgyic984.fsf@vitty.brq.redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87mtuis77m.fsf@vitty.brq.redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 01/04/21 17:31, Vitaly Kuznetsov wrote:
->>>> +		svm->sysenter_eip_hi = guest_cpuid_is_intel(vcpu) ? (data >> 32) : 0;
->>> (Personal taste) I'd suggest we keep the whole 'sysenter_eip'/'sysenter_esp'
->>> even if we only use the upper 32 bits of it. That would reduce the code
->>> churn a little bit (no need to change 'struct vcpu_svm').
->> Would there really be less changes?  Consider that you'd have to look at
->> the VMCB anyway because svm_get_msr can be reached not just for guest
->> RDMSR but also for ioctls.
->>
-> I was thinking about the hunk in arch/x86/kvm/svm/svm.h tweaking
-> vcpu_svm. My opinion is not strong at all here)
+On Thu, Apr 01, 2021, Vitaly Kuznetsov wrote:
+> Sean Christopherson <seanjc@google.com> writes:
+> 
+> > On Wed, Mar 31, 2021, Yang Li wrote:
+> >> Using __set_bit() to set a bit in an integer is not a good idea, since
+> >> the function expects an unsigned long as argument, which can be 64bit wide.
+> >> Coverity reports this problem as
+> >> 
+> >> High:Out-of-bounds access(INCOMPATIBLE_CAST)
+> >> CWE119: Out-of-bounds access to a scalar
+> >> Pointer "&vcpu->arch.regs_avail" points to an object whose effective
+> >> type is "unsigned int" (32 bits, unsigned) but is dereferenced as a
+> >> wider "unsigned long" (64 bits, unsigned). This may lead to memory
+> >> corruption.
+> >> 
+> >> /home/heyuan.shy/git-repo/linux/arch/x86/kvm/kvm_cache_regs.h:
+> >> kvm_register_is_available
+> >> 
+> >> Just use BIT instead.
+> >
+> > Meh, we're hosed either way.  Using BIT() will either result in undefined
+> > behavior due to SHL shifting beyond the size of a u64, or setting random bits
+> > if the truncated shift ends up being less than 63.
+> >
+> 
+> A stupid question: why can't we just make 'regs_avail'/'regs_dirty'
+> 'unsigned long' and drop a bunch of '(unsigned long *)' casts? 
 
-Ah okay, if it's just that I would consider the change a benefit, not a 
-problem with this patch.
+It wouldn't break anything, but it would create a weird situation where x86-64
+has more bits for tracking registers than i386.  Obviously not the end of the
+world, but it's also not clearly an improvement across the board.
 
-Paolo
+We could do something like:
 
+  	DECLARE_BITMAP(regs_avail, NR_VCPU_TRACKED_REGS);
+	DECLARE_BITMAP(regs_dirty, NR_VCPU_TRACKED_REGS);
+
+but that would complicate the vendor code, e.g. vmx_register_cache_reset().
+
+The casting crud is quite contained, and likely isn't going to expand anytime
+soon.  So, at least for me, this is one of the few cases where I'm content to
+let sleeping dogs lie. :-)
