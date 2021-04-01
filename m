@@ -2,55 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 431AD35240F
-	for <lists+kvm@lfdr.de>; Fri,  2 Apr 2021 01:41:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7909E352412
+	for <lists+kvm@lfdr.de>; Fri,  2 Apr 2021 01:41:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236397AbhDAXiR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 1 Apr 2021 19:38:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51462 "EHLO
+        id S236389AbhDAXiU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 1 Apr 2021 19:38:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51494 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236284AbhDAXiJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 1 Apr 2021 19:38:09 -0400
-Received: from mail-qt1-x84a.google.com (mail-qt1-x84a.google.com [IPv6:2607:f8b0:4864:20::84a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DAA04C06178C
-        for <kvm@vger.kernel.org>; Thu,  1 Apr 2021 16:38:08 -0700 (PDT)
-Received: by mail-qt1-x84a.google.com with SMTP id b18so4044122qte.21
-        for <kvm@vger.kernel.org>; Thu, 01 Apr 2021 16:38:08 -0700 (PDT)
+        with ESMTP id S236321AbhDAXiQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 1 Apr 2021 19:38:16 -0400
+Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 29A66C061797
+        for <kvm@vger.kernel.org>; Thu,  1 Apr 2021 16:38:11 -0700 (PDT)
+Received: by mail-pg1-x549.google.com with SMTP id j4so4070853pgs.18
+        for <kvm@vger.kernel.org>; Thu, 01 Apr 2021 16:38:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=fVPoZK10rbW/sWCKlsGNCSQYscZnz2kgphabjqMmfzM=;
-        b=ZDFK3UVlkGJWGHGbOLGMNIFNnlxM8sIyvZBjvKBxNU7Mh6KtoXihkXSL5rGaPfVVw+
-         0au+OqbsD92YWKzPa6nTGeOWVSdm3X3JxaJsSxMGsKnRL0PfXUr4nXFbbBhkztjoaWvc
-         QAicl/BQnTBZWaD0+6yhN+caM8P2JWjYe6MWOBj/m/nJ2/BtWWz7XY+iMBdIy30gk61Y
-         A4DuG/a5t4CmtpgCHxTW1xxeTvzqH+VditXXRkxPW5kR3dq6IDcMr9S/i0A8FtGLAfZp
-         EGDCO0uKO1WKAmaH1PC6wbNtr3Wh2jIsLs2T0dIjOFbBmrx/85n3Ja0B3LaecEl6Zuf+
-         s5yw==
+        bh=jyvW4LNHh147mdThm9gosLlXYiBlNPi18fgfUMETNdI=;
+        b=Ls53YaRSYleBvtnGSnOtnGhpJ+KAGk+cAjcd6YVP/n1m+LchacpRgKeT3kK2zR8rfI
+         w4ph7/7nn7Oo/slE/ICq8USQGPcNNLOWpHko7IsGkAwKaSE2fizCBw+EkZWa6STw6OeJ
+         wDwd6hx59PKT0yqYjwxfm9TPEeDA582DN1F8kRcudjoqevO7NxCPcXN/Dytliaz8Z2tg
+         U/24p0P6U+CiIvCzCBl8YWSgqkmvqo44c98AB1Niv9JraoS2SeB5peAUh2feiu8sm25X
+         X24W/lgHQEqHVevHOMTc86AzOiqBHnZ0wsoRPaX9oWHgicSnZ/0HiZAJ+c1YQVUwlFvv
+         0AQw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=fVPoZK10rbW/sWCKlsGNCSQYscZnz2kgphabjqMmfzM=;
-        b=GMsKIxbgV3k6tTnQJDo10D4fKA3uSUVHk+bZzxdaRlp86YNy9NooKjpUdhxnXDebBz
-         POyE3vbLRFoh/YBlOzvWzVz6Ej8WmLAmIs6yhAVFi3950SPyxbTf37XfWE14MHCjGZJ9
-         HCT3QrrzJFpm8SszCn9mkWK39B70vGUuxYzf+4idQ92JNZ9cnpNfsrjZ6Dr6wSuznnZV
-         /Q79YEj900R9HCXgE37aXM7gJj2P5TtpV9M3ifKxi026HgibdorIa4si1MXL6VaiOt1D
-         8QWSY3A2W8WY5l7RkT9StHu0Q+T0SuZXKcnLd4IY6Jf0waOjeV2pCaX57hfO+jH4sdTS
-         wcrQ==
-X-Gm-Message-State: AOAM530kftf98WASNA2VXQwC5Vl0rIZBH1H1JPtrvl+qbl3/iA4yfVlT
-        TKjzDNZc7iBUz7rcQTIrnhFUa0kKp6e4
-X-Google-Smtp-Source: ABdhPJy3DjSB6LnYpqcpR9OF0VpRbdFeYIra9rOadwaQyRGOaPToqSVvf5SQZ+7Nz08k44Y6MFnu9v+X/9n8
+        bh=jyvW4LNHh147mdThm9gosLlXYiBlNPi18fgfUMETNdI=;
+        b=EXRezf2SZZiXFVbu5xb6D5UMKCjX25Eh6gSqr2iv9VXQcPUM2sPg9dql+rSu86rcjq
+         nWzdfvyTXPitAP3qG1d0hEpxMzDKCxB4RQtx+nNilpN0+7Jzzbkwjbsf3kPgSrgsyptn
+         MMvB5yafJ8K46xgiaasL4YENrnztT0FlGBl7OFA1pvTh1dAzxzbNfEEJLFlpbT6PZ3wn
+         Kcwa74mTqzx26XZLrK0fcatL8BcccS9ZTIkp07tGLjbVQXsVukAJmKmtICTja+WPRoAJ
+         SEUTDs3ykmnYPWtC1BaSpcVpvkSEIabsuZG/14VazCMp3JcgfIK0XbquGErgkgxSlW2+
+         tu2Q==
+X-Gm-Message-State: AOAM532nIh+w6rMmlTYj3XaVjDGpS9CVrvhNYUd3wjkyrZDMzrTdE7KS
+        9+Sq+9uiMieu/lFxex0YIaaVKgLHluwk
+X-Google-Smtp-Source: ABdhPJxQDpBYMeHhgFid5KdIpSvqSiyYK3tQXEPJMuHmLxfp8z14DglaxX1A9e7pcuiYwLUiiF4Od+d8RuU9
 X-Received: from bgardon.sea.corp.google.com ([2620:15c:100:202:e088:88b8:ea4a:22b6])
- (user=bgardon job=sendgmr) by 2002:a05:6214:122f:: with SMTP id
- p15mr10707612qvv.3.1617320288078; Thu, 01 Apr 2021 16:38:08 -0700 (PDT)
-Date:   Thu,  1 Apr 2021 16:37:29 -0700
+ (user=bgardon job=sendgmr) by 2002:a17:902:d351:b029:e8:ba10:e6f5 with SMTP
+ id l17-20020a170902d351b02900e8ba10e6f5mr1117239plk.82.1617320290640; Thu, 01
+ Apr 2021 16:38:10 -0700 (PDT)
+Date:   Thu,  1 Apr 2021 16:37:30 -0700
 In-Reply-To: <20210401233736.638171-1-bgardon@google.com>
-Message-Id: <20210401233736.638171-7-bgardon@google.com>
+Message-Id: <20210401233736.638171-8-bgardon@google.com>
 Mime-Version: 1.0
 References: <20210401233736.638171-1-bgardon@google.com>
 X-Mailer: git-send-email 2.31.0.208.g409f899ff0-goog
-Subject: [PATCH v2 06/13] KVM: x86/mmu: Make TDP MMU root refcount atomic
+Subject: [PATCH v2 07/13] KVM: x86/mmu: handle cmpxchg failure in kvm_tdp_mmu_get_root
 From:   Ben Gardon <bgardon@google.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Cc:     Paolo Bonzini <pbonzini@redhat.com>, Peter Xu <peterx@redhat.com>,
@@ -69,82 +70,76 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-In order to parallelize more operations for the TDP MMU, make the
-refcount on TDP MMU roots atomic, so that a future patch can allow
-multiple threads to take a reference on the root concurrently, while
-holding the MMU lock in read mode.
+To reduce dependence on the MMU write lock, don't rely on the assumption
+that the atomic operation in kvm_tdp_mmu_get_root will always succeed.
+By not relying on that assumption, threads do not need to hold the MMU
+lock in write mode in order to take a reference on a TDP MMU root.
+
+In the root iterator, this change means that some roots might have to be
+skipped if they are found to have a zero refcount. This will still never
+happen as of this patch, but a future patch will need that flexibility to
+make the root iterator safe under the MMU read lock.
 
 Signed-off-by: Ben Gardon <bgardon@google.com>
 ---
+ arch/x86/kvm/mmu/tdp_mmu.c | 11 ++++++-----
+ arch/x86/kvm/mmu/tdp_mmu.h | 13 +++----------
+ 2 files changed, 9 insertions(+), 15 deletions(-)
 
-Changelog
-v2:
---	Split failure handling for kvm_tdp_mmu_get_root out into a
-	seperate commit.
-
- arch/x86/kvm/mmu/mmu_internal.h |  6 +++++-
- arch/x86/kvm/mmu/tdp_mmu.c      |  4 ++--
- arch/x86/kvm/mmu/tdp_mmu.h      | 10 +++++++---
- 3 files changed, 14 insertions(+), 6 deletions(-)
-
-diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_internal.h
-index 9347d73996b5..f63d0fdb8567 100644
---- a/arch/x86/kvm/mmu/mmu_internal.h
-+++ b/arch/x86/kvm/mmu/mmu_internal.h
-@@ -50,7 +50,11 @@ struct kvm_mmu_page {
- 	u64 *spt;
- 	/* hold the gfn of each spte inside spt */
- 	gfn_t *gfns;
--	int root_count;          /* Currently serving as active root */
-+	/* Currently serving as active root */
-+	union {
-+		int root_count;
-+		refcount_t tdp_mmu_root_count;
-+	};
- 	unsigned int unsync_children;
- 	struct kvm_rmap_head parent_ptes; /* rmap pointers to parent sptes */
- 	DECLARE_BITMAP(unsync_child_bitmap, 512);
 diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-index 670c5e3ad80e..697ea882a3e4 100644
+index 697ea882a3e4..886bc170f2a5 100644
 --- a/arch/x86/kvm/mmu/tdp_mmu.c
 +++ b/arch/x86/kvm/mmu/tdp_mmu.c
-@@ -56,7 +56,7 @@ void kvm_tdp_mmu_put_root(struct kvm *kvm, struct kvm_mmu_page *root)
+@@ -88,10 +88,12 @@ static struct kvm_mmu_page *tdp_mmu_next_root(struct kvm *kvm,
+ 		next_root = list_first_entry(&kvm->arch.tdp_mmu_roots,
+ 					     typeof(*next_root), link);
  
- 	lockdep_assert_held_write(&kvm->mmu_lock);
++	while (!list_entry_is_head(next_root, &kvm->arch.tdp_mmu_roots, link) &&
++	       !kvm_tdp_mmu_get_root(kvm, next_root))
++		next_root = list_next_entry(next_root, link);
++
+ 	if (list_entry_is_head(next_root, &kvm->arch.tdp_mmu_roots, link))
+ 		next_root = NULL;
+-	else
+-		kvm_tdp_mmu_get_root(kvm, next_root);
  
--	if (--root->root_count)
-+	if (!refcount_dec_and_test(&root->tdp_mmu_root_count))
- 		return;
+ 	if (prev_root)
+ 		kvm_tdp_mmu_put_root(kvm, prev_root);
+@@ -161,10 +163,9 @@ hpa_t kvm_tdp_mmu_get_vcpu_root_hpa(struct kvm_vcpu *vcpu)
  
- 	WARN_ON(!root->tdp_mmu_page);
-@@ -168,7 +168,7 @@ hpa_t kvm_tdp_mmu_get_vcpu_root_hpa(struct kvm_vcpu *vcpu)
+ 	/* Check for an existing root before allocating a new one. */
+ 	for_each_tdp_mmu_root(kvm, root, kvm_mmu_role_as_id(role)) {
+-		if (root->role.word == role.word) {
+-			kvm_tdp_mmu_get_root(kvm, root);
++		if (root->role.word == role.word &&
++		    kvm_tdp_mmu_get_root(kvm, root))
+ 			goto out;
+-		}
  	}
  
  	root = alloc_tdp_mmu_page(vcpu, 0, vcpu->arch.mmu->shadow_root_level);
--	root->root_count = 1;
-+	refcount_set(&root->tdp_mmu_root_count, 1);
- 
- 	list_add(&root->link, &kvm->arch.tdp_mmu_roots);
- 
 diff --git a/arch/x86/kvm/mmu/tdp_mmu.h b/arch/x86/kvm/mmu/tdp_mmu.h
-index d4e32ac5f4c9..1ec7914ecff9 100644
+index 1ec7914ecff9..f0a26214e999 100644
 --- a/arch/x86/kvm/mmu/tdp_mmu.h
 +++ b/arch/x86/kvm/mmu/tdp_mmu.h
-@@ -10,10 +10,14 @@ hpa_t kvm_tdp_mmu_get_vcpu_root_hpa(struct kvm_vcpu *vcpu);
- static inline void kvm_tdp_mmu_get_root(struct kvm *kvm,
- 					struct kvm_mmu_page *root)
- {
--	BUG_ON(!root->root_count);
--	lockdep_assert_held(&kvm->mmu_lock);
-+	lockdep_assert_held_write(&kvm->mmu_lock);
+@@ -7,17 +7,10 @@
  
--	++root->root_count;
-+	/*
-+	 * This should never fail since roots are removed from the roots
-+	 * list under the MMU write lock when their reference count falls
-+	 * to zero.
-+	 */
-+	refcount_inc_not_zero(&root->tdp_mmu_root_count);
+ hpa_t kvm_tdp_mmu_get_vcpu_root_hpa(struct kvm_vcpu *vcpu);
+ 
+-static inline void kvm_tdp_mmu_get_root(struct kvm *kvm,
+-					struct kvm_mmu_page *root)
++__must_check static inline bool kvm_tdp_mmu_get_root(struct kvm *kvm,
++						     struct kvm_mmu_page *root)
+ {
+-	lockdep_assert_held_write(&kvm->mmu_lock);
+-
+-	/*
+-	 * This should never fail since roots are removed from the roots
+-	 * list under the MMU write lock when their reference count falls
+-	 * to zero.
+-	 */
+-	refcount_inc_not_zero(&root->tdp_mmu_root_count);
++	return refcount_inc_not_zero(&root->tdp_mmu_root_count);
  }
  
  void kvm_tdp_mmu_put_root(struct kvm *kvm, struct kvm_mmu_page *root);
