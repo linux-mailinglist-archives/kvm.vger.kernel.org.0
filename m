@@ -2,156 +2,107 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 10A173510CF
-	for <lists+kvm@lfdr.de>; Thu,  1 Apr 2021 10:25:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BD163351133
+	for <lists+kvm@lfdr.de>; Thu,  1 Apr 2021 10:53:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229459AbhDAIZC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 1 Apr 2021 04:25:02 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:10098 "EHLO
-        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233050AbhDAIYu (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 1 Apr 2021 04:24:50 -0400
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 13184atQ012640
-        for <kvm@vger.kernel.org>; Thu, 1 Apr 2021 04:24:49 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : from : to : cc
- : references : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=+evbQ4+cmuFlhSFjbQzlqskkftjaWwOuYejc2xaSfX0=;
- b=oUoD+uCxs/E8VB+LeMp/1VW+4SBApkhQ7aQSnLYLyYVrChXuzDdbjC/Vhav09Bm5TXg8
- bQzTyMN7Qx1UTqtSxRDj5+4G01oW27CL02PvQNn6aseinl8hv8xioSv/qudhXL9z2Lmd
- yYMLcMlL6akZgbb/WOqR7T44m2p8494HXu0KnmXTnYOR4wIsWdW3+UFT4wgJ2YvVCbub
- 5ziZpO1xinAdsen8ieEnfnOrIYBSmYx89U3Ysbmtv6T5Q81/F/PUtbQdkhoo6/s9qtEy
- ETkyPcNURwTZy9aO5d/iw2zM/C1QbKrO5O0j5uzJH4c3RdMFgCL0/fnRTgekSGW+0boi rA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 37n2eru7dr-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Thu, 01 Apr 2021 04:24:49 -0400
-Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 13185bqt016185
-        for <kvm@vger.kernel.org>; Thu, 1 Apr 2021 04:24:48 -0400
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 37n2eru7d8-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 01 Apr 2021 04:24:48 -0400
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 13188Rsx025339;
-        Thu, 1 Apr 2021 08:24:47 GMT
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
-        by ppma06ams.nl.ibm.com with ESMTP id 37n28v8at3-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 01 Apr 2021 08:24:46 +0000
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
-        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 1318Ohd236503858
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 1 Apr 2021 08:24:44 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id D8FEC52052;
-        Thu,  1 Apr 2021 08:24:43 +0000 (GMT)
-Received: from oc3016276355.ibm.com (unknown [9.145.23.196])
-        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 96D1852057;
-        Thu,  1 Apr 2021 08:24:43 +0000 (GMT)
-Subject: Re: [kvm-unit-tests PATCH v2 4/8] s390x: lib: css: separate wait for
- IRQ and check I/O completion
-From:   Pierre Morel <pmorel@linux.ibm.com>
-To:     kvm@vger.kernel.org
-Cc:     frankja@linux.ibm.com, david@redhat.com, thuth@redhat.com,
-        cohuck@redhat.com, imbrenda@linux.ibm.com
-References: <1616665147-32084-1-git-send-email-pmorel@linux.ibm.com>
- <1616665147-32084-5-git-send-email-pmorel@linux.ibm.com>
-Message-ID: <da1235fa-e79e-81d1-333c-95c6ef885f26@linux.ibm.com>
-Date:   Thu, 1 Apr 2021 10:24:43 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.8.0
+        id S233662AbhDAIxN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 1 Apr 2021 04:53:13 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:25253 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229459AbhDAIwr (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 1 Apr 2021 04:52:47 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1617267166;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=BP9WZNqxIzPCA5LtPAzAvwf0rm1qTrzO8RqIvNWUBDg=;
+        b=Rg3rDWb/f1dPfILyOdVRc42JL0x2MHNDK3Zm9JA4nkvrjIEauCN/5yTMDg/R3pobRk8uDv
+        X2NtO3ITHi6S6ZCkzfmXpTgYEcaFGO5unNzUSGOk+0pjxqo57K1VHywUE+Xeu803xRndOE
+        HWA1Ox8D+brqc541ksGRVPtomg5qdfE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-265-37QGPauRPAqjbxf-145CTA-1; Thu, 01 Apr 2021 04:52:44 -0400
+X-MC-Unique: 37QGPauRPAqjbxf-145CTA-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id ED606802B7F;
+        Thu,  1 Apr 2021 08:52:42 +0000 (UTC)
+Received: from laptop.redhat.com (ovpn-112-13.ams2.redhat.com [10.36.112.13])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 0924E5D9DE;
+        Thu,  1 Apr 2021 08:52:39 +0000 (UTC)
+From:   Eric Auger <eric.auger@redhat.com>
+To:     eric.auger.pro@gmail.com, eric.auger@redhat.com,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        kvmarm@lists.cs.columbia.edu, maz@kernel.org, drjones@redhat.com,
+        alexandru.elisei@arm.com
+Cc:     james.morse@arm.com, suzuki.poulose@arm.com, shuah@kernel.org,
+        pbonzini@redhat.com
+Subject: [PATCH v4 0/8] KVM/ARM: Some vgic fixes and init sequence KVM selftests
+Date:   Thu,  1 Apr 2021 10:52:30 +0200
+Message-Id: <20210401085238.477270-1-eric.auger@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1616665147-32084-5-git-send-email-pmorel@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: i7mE8FGcV3aXaDEUaFTJLVxpMyYG_HRt
-X-Proofpoint-ORIG-GUID: Op_7NCSt1nCVEH1A1fY6WuaTksEzSGUU
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.761
- definitions=2021-04-01_03:2021-03-31,2021-04-01 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 mlxscore=0
- mlxlogscore=999 impostorscore=0 adultscore=0 malwarescore=0 clxscore=1015
- priorityscore=1501 spamscore=0 lowpriorityscore=0 phishscore=0
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2103310000 definitions=main-2104010056
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+While writting vgic v3 init sequence KVM selftests I noticed some
+relatively minor issues. This was also the opportunity to try to
+fix the issue laterly reported by Zenghui, related to the RDIST_TYPER
+last bit emulation. The final patch is a first batch of VGIC init
+sequence selftests. Of course they can be augmented with a lot more
+register access tests, but let's try to move forward incrementally ...
+
+Best Regards
+
+Eric
+
+This series can be found at:
+https://github.com/eauger/linux/tree/vgic_kvmselftests_v4
+
+History:
+v3 -> v4:
+- take into account Drew's comment on the kvm selftests. No
+  change to the KVM related patches compared to v3
+v2 ->v3:
+- reworked last bit read accessor to handle contiguous redist
+  regions and rdist not registered in ascending order
+- removed [PATCH 5/9] KVM: arm: move has_run_once after the
+  map_resources
+v1 -> v2:
+- Took into account all comments from Marc and Alexandru's except
+  the has_run_once still after the map_resources (this would oblige
+  me to revisit in depth the selftests)
 
 
-On 3/25/21 10:39 AM, Pierre Morel wrote:
-> We will may want to check the result of an I/O without waiting
-> for an interrupt.
-> For example because we do not handle interrupt.
-> Let's separate waiting for interrupt and the I/O complretion check.
-> 
-> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
-> ---
->   lib/s390x/css.h     |  1 +
->   lib/s390x/css_lib.c | 13 ++++++++++---
->   2 files changed, 11 insertions(+), 3 deletions(-)
-> 
-> diff --git a/lib/s390x/css.h b/lib/s390x/css.h
-> index 0058355..5d1e1f0 100644
-> --- a/lib/s390x/css.h
-> +++ b/lib/s390x/css.h
-> @@ -317,6 +317,7 @@ int css_residual_count(unsigned int schid);
->   
->   void enable_io_isc(uint8_t isc);
->   int wait_and_check_io_completion(int schid);
-> +int check_io_completion(int schid);
->   
->   /*
->    * CHSC definitions
-> diff --git a/lib/s390x/css_lib.c b/lib/s390x/css_lib.c
-> index f5c4f37..1e5c409 100644
-> --- a/lib/s390x/css_lib.c
-> +++ b/lib/s390x/css_lib.c
-> @@ -487,18 +487,25 @@ struct ccw1 *ccw_alloc(int code, void *data, int count, unsigned char flags)
->   }
->   
->   /* wait_and_check_io_completion:
-> + * @schid: the subchannel ID
-> + */
-> +int wait_and_check_io_completion(int schid)
-> +{
-> +	wait_for_interrupt(PSW_MASK_IO);
-> +	return check_io_completion(schid);
-> +}
-> +
-> +/* check_io_completion:
->    * @schid: the subchannel ID
->    *
->    * Makes the most common check to validate a successful I/O
->    * completion.
->    * Only report failures.
->    */
-> -int wait_and_check_io_completion(int schid)
-> +int check_io_completion(int schid)
->   {
->   	int ret = 0;
->   
-> -	wait_for_interrupt(PSW_MASK_IO);
-> -
->   	report_prefix_push("check I/O completion");
->   
->   	if (lowcore_ptr->io_int_param != schid) {
-> 
+Eric Auger (8):
+  KVM: arm64: vgic-v3: Fix some error codes when setting RDIST base
+  KVM: arm64: Fix KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION read
+  KVM: arm64: vgic-v3: Fix error handling in vgic_v3_set_redist_base()
+  KVM: arm/arm64: vgic: Reset base address on kvm_vgic_dist_destroy()
+  docs: kvm: devices/arm-vgic-v3: enhance KVM_DEV_ARM_VGIC_CTRL_INIT doc
+  KVM: arm64: Simplify argument passing to vgic_uaccess_[read|write]
+  KVM: arm64: vgic-v3: Expose GICR_TYPER.Last for userspace
+  KVM: selftests: aarch64/vgic-v3 init sequence tests
 
-Hum, sorry, it seems I forgot here --^ to move the check on io_int_param 
-inside the interrupt routine.
-I change this for the next spin
-
-regards,
-Pierre
-
-
+ .../virt/kvm/devices/arm-vgic-v3.rst          |   2 +-
+ arch/arm64/kvm/vgic/vgic-init.c               |  13 +-
+ arch/arm64/kvm/vgic/vgic-kvm-device.c         |   3 +
+ arch/arm64/kvm/vgic/vgic-mmio-v3.c            | 116 +++-
+ arch/arm64/kvm/vgic/vgic-mmio.c               |  10 +-
+ arch/arm64/kvm/vgic/vgic.h                    |   1 +
+ include/kvm/arm_vgic.h                        |   3 +
+ tools/testing/selftests/kvm/.gitignore        |   1 +
+ tools/testing/selftests/kvm/Makefile          |   1 +
+ .../testing/selftests/kvm/aarch64/vgic_init.c | 652 ++++++++++++++++++
+ .../testing/selftests/kvm/include/kvm_util.h  |   9 +
+ tools/testing/selftests/kvm/lib/kvm_util.c    |  77 +++
+ 12 files changed, 838 insertions(+), 50 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/aarch64/vgic_init.c
 
 -- 
-Pierre Morel
-IBM Lab Boeblingen
+2.26.3
+
