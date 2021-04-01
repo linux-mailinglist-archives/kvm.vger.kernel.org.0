@@ -2,198 +2,127 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6BF263513A9
-	for <lists+kvm@lfdr.de>; Thu,  1 Apr 2021 12:32:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B52513513AC
+	for <lists+kvm@lfdr.de>; Thu,  1 Apr 2021 12:33:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234109AbhDAKc0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 1 Apr 2021 06:32:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51904 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233834AbhDAKcK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 1 Apr 2021 06:32:10 -0400
-Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ABFD9C061788;
-        Thu,  1 Apr 2021 03:32:10 -0700 (PDT)
-Received: from zn.tnic (p200300ec2f088700f80405624ee7667c.dip0.t-ipconnect.de [IPv6:2003:ec:2f08:8700:f804:562:4ee7:667c])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id C0A5B1EC026D;
-        Thu,  1 Apr 2021 12:32:08 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1617273128;
+        id S234158AbhDAKcz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 1 Apr 2021 06:32:55 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:51667 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S234130AbhDAKc2 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 1 Apr 2021 06:32:28 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1617273137;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=WiMljJvd1azKBbqtGB/1+/4VHq+5lF5xSbnFQGYS58k=;
-        b=m9clS+6Wv/pBosROUpasjui17oUVvfZ7KCMRCYs9a/YODdMNCNrbDQBpyGcmPmqGm0dqyJ
-        igkzV6AYfSZ+H0juuLaaWtiNPZBquOfQ0r8V3sww0XtAFmu9lwfRuHsU3Izy6BUnWvdK4X
-        Ch6FGeYUTqFqBqKNe8+wwcSs6YzWZ6c=
-Date:   Thu, 1 Apr 2021 12:32:08 +0200
-From:   Borislav Petkov <bp@alien8.de>
-To:     Brijesh Singh <brijesh.singh@amd.com>
-Cc:     linux-kernel@vger.kernel.org, x86@kernel.org, kvm@vger.kernel.org,
-        ak@linux.intel.com, Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        "H. Peter Anvin" <hpa@zytor.com>, Tony Luck <tony.luck@intel.com>,
-        Dave Hansen <dave.hansen@intel.com>,
-        "Peter Zijlstra (Intel)" <peterz@infradead.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        David Rientjes <rientjes@google.com>,
-        Sean Christopherson <seanjc@google.com>
-Subject: Re: [RFC Part1 PATCH 04/13] x86/sev-snp: define page state change
- VMGEXIT structure
-Message-ID: <20210401103208.GA28954@zn.tnic>
-References: <20210324164424.28124-1-brijesh.singh@amd.com>
- <20210324164424.28124-5-brijesh.singh@amd.com>
+        bh=1eUiXnpnH6n4/oGTREYOSpo6rDfrAd7KXaTmdQGW+OU=;
+        b=BCLmn9iGp7XYYXfgFZqqrDI4KoF7pWCi6dZbOu2vPm8mcK9Nzrse+W7Ec2qf4csdc9VJeH
+        S8nbARbx9yA385f41JFkfteEq3Stm5xK9INEkoRgqFL5mRBlRl/38bVbh0SKWZoMU4Lwgp
+        ZWXGNkr43b9XvzdqTWCYmdmCxU3SN3w=
+Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
+ [209.85.218.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-309-IniLebvnMIWig_4HkIexuQ-1; Thu, 01 Apr 2021 06:32:16 -0400
+X-MC-Unique: IniLebvnMIWig_4HkIexuQ-1
+Received: by mail-ej1-f70.google.com with SMTP id t21so2028707ejf.14
+        for <kvm@vger.kernel.org>; Thu, 01 Apr 2021 03:32:16 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:to:cc:references:from:subject:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=1eUiXnpnH6n4/oGTREYOSpo6rDfrAd7KXaTmdQGW+OU=;
+        b=s/bz6cQ1ZyqbMBZcLnmAm7klNDIAoL9Nie24nqOkS7jdxtHdN5BC3IU+bPCBsmadfJ
+         h9vcdvnSGH0uqHoox+rSOZLQCZs/h1MiLyKMPr5mZx1u8qiCtkFRCcfSnlqCJmhLV3zQ
+         ecKrRLR5E4gAO0b/oHJer5gEsLsesvGKgD399NML/W0fUoorWR2FrjFpcQ5ycKjS5HYE
+         VRO9ZsKWKmvBjm1xsRxUgLVpgeTiX0QS2DREym65inQ4Tl2IPwDJy/ZaCbhe5L3u6tRi
+         A9R1Cu6r+7oPYHW1Zh9aYqb5wMqfQ9ZlolvyuyHyPRvsvzF5ZRVWL7oqGiNvDEpvkQrv
+         b4xw==
+X-Gm-Message-State: AOAM532L8tuGVcYVD+6gyVnqx4vPIvEZffPgyPBt/vWZhIiLo35J9AhK
+        AgvhSIZ/1CchzFYqlbpkcIG0vyTtNuErze9xU5Z6KpLQ3t/mvYG13GUbd6D174K3/X+LfECFuXu
+        dCnru2FAWTXh/
+X-Received: by 2002:a17:906:170f:: with SMTP id c15mr8251969eje.358.1617273135173;
+        Thu, 01 Apr 2021 03:32:15 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxp7pLCchsEQe6GRgziondNEofsHQiuq/17gNPT5UApEqlYEhzeOqXUMZuIdD/PwJTrvx7Wlw==
+X-Received: by 2002:a17:906:170f:: with SMTP id c15mr8251959eje.358.1617273134980;
+        Thu, 01 Apr 2021 03:32:14 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id y24sm3386648eds.23.2021.04.01.03.32.13
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 01 Apr 2021 03:32:14 -0700 (PDT)
+To:     Ben Gardon <bgardon@google.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Cc:     Peter Xu <peterx@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Peter Shier <pshier@google.com>,
+        Peter Feiner <pfeiner@google.com>,
+        Junaid Shahid <junaids@google.com>,
+        Jim Mattson <jmattson@google.com>,
+        Yulei Zhang <yulei.kernel@gmail.com>,
+        Wanpeng Li <kernellwp@gmail.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Xiao Guangrong <xiaoguangrong.eric@gmail.com>
+References: <20210202185734.1680553-1-bgardon@google.com>
+ <20210202185734.1680553-21-bgardon@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH v2 20/28] KVM: x86/mmu: Use atomic ops to set SPTEs in TDP
+ MMU map
+Message-ID: <f4fca4d7-8795-533e-d2d9-89a73e1a9004@redhat.com>
+Date:   Thu, 1 Apr 2021 12:32:13 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+In-Reply-To: <20210202185734.1680553-21-bgardon@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20210324164424.28124-5-brijesh.singh@amd.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Mar 24, 2021 at 11:44:15AM -0500, Brijesh Singh wrote:
-> An SNP-active guest will use the page state change VNAE MGEXIT defined in
-
-I guess this was supposed to mean "NAE VMGEXIT" but pls write "NAE" out
-at least once so that reader can find its way around the spec.
-
-> the GHCB specification section 4.1.6 to ask the hypervisor to make the
-> guest page private or shared in the RMP table. In addition to the
-> private/shared, the guest can also ask the hypervisor to split or
-> combine multiple 4K validated pages as a single 2M page or vice versa.
+On 02/02/21 19:57, Ben Gardon wrote:
+> @@ -720,7 +790,8 @@ int kvm_tdp_mmu_map(struct kvm_vcpu *vcpu, gpa_t gpa, u32 error_code,
+>   		 */
+>   		if (is_shadow_present_pte(iter.old_spte) &&
+>   		    is_large_pte(iter.old_spte)) {
+> -			tdp_mmu_set_spte(vcpu->kvm, &iter, 0);
+> +			if (!tdp_mmu_set_spte_atomic(vcpu->kvm, &iter, 0))
+> +				break;
+>   
+>   			kvm_flush_remote_tlbs_with_address(vcpu->kvm, iter.gfn,
+>   					KVM_PAGES_PER_HPAGE(iter.level));
+>
+>  			/*
+>  			 * The iter must explicitly re-read the spte here
+>  			 * because the new value informs the !present
+>                          * path below.
+>                          */
+>                         iter.old_spte = READ_ONCE(*rcu_dereference(iter.sptep));
+>                 }
 > 
-> Cc: Thomas Gleixner <tglx@linutronix.de>
-> Cc: Ingo Molnar <mingo@redhat.com>
-> Cc: Borislav Petkov <bp@alien8.de>
-> Cc: Joerg Roedel <jroedel@suse.de>
-> Cc: "H. Peter Anvin" <hpa@zytor.com>
-> Cc: Tony Luck <tony.luck@intel.com>
-> Cc: Dave Hansen <dave.hansen@intel.com>
-> Cc: "Peter Zijlstra (Intel)" <peterz@infradead.org>
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: Tom Lendacky <thomas.lendacky@amd.com>
-> Cc: David Rientjes <rientjes@google.com>
-> Cc: Sean Christopherson <seanjc@google.com>
-> Cc: x86@kernel.org
-> Cc: kvm@vger.kernel.org
-> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
-> ---
->  arch/x86/include/asm/sev-snp.h  | 34 +++++++++++++++++++++++++++++++++
->  arch/x86/include/uapi/asm/svm.h |  1 +
->  2 files changed, 35 insertions(+)
-> 
-> diff --git a/arch/x86/include/asm/sev-snp.h b/arch/x86/include/asm/sev-snp.h
-> index 5a6d1367cab7..f514dad276f2 100644
-> --- a/arch/x86/include/asm/sev-snp.h
-> +++ b/arch/x86/include/asm/sev-snp.h
-> @@ -22,6 +22,40 @@
->  #define RMP_PG_SIZE_2M			1
->  #define RMP_PG_SIZE_4K			0
->  
-> +/* Page State Change MSR Protocol */
-> +#define GHCB_SNP_PAGE_STATE_CHANGE_REQ	0x0014
-> +#define		GHCB_SNP_PAGE_STATE_REQ_GFN(v, o)	(GHCB_SNP_PAGE_STATE_CHANGE_REQ | \
-> +							 ((unsigned long)((o) & 0xf) << 52) | \
-> +							 (((v) << 12) & 0xffffffffffffff))
+>                 if (!is_shadow_present_pte(iter.old_spte)) {
 
-This macro needs to be more readable and I'm not sure the masking is
-correct. IOW, something like this perhaps:
+Would it be easier to reason about this code by making it retry, like:
 
-#define GHCB_SNP_PAGE_STATE_REQ_GFN(va, operation)	\
-	((((operation) & 0xf) << 52) | ((va) & GENMASK_ULL(51, 12)) | GHCB_SNP_PAGE_STATE_CHANGE_REQ)
+retry:
+                 if (is_shadow_present_pte(iter.old_spte)) {
+			if (is_large_pte(iter.old_spte)) {
+	                        if (!tdp_mmu_zap_spte_atomic(vcpu->kvm, &iter))
+	                                break;
 
-where you have each GHCBData element at the proper place, msb to lsb.
-Now, GHCB spec says:
+				/*
+				 * The iter must explicitly re-read the SPTE because
+				 * the atomic cmpxchg failed.
+				 */
+	                        iter.old_spte = READ_ONCE(*rcu_dereference(iter.sptep));
+				goto retry;
+			}
+                 } else {
+			...
+		}
 
-	"GHCBData[51:12] – Guest physical frame number"
+?
 
-and I'm not clear as to what this macro takes: a virtual address or a
-pfn. If it is a pfn, then you need to do:
+Paolo
 
-	(((pfn) << 12) & GENMASK_ULL(51, 0))
-
-but if it is a virtual address you need to do what I have above. Since
-you do "<< 12" then it must be a pfn already but then you should call
-the argument "pfn" so that it is clear what it takes.
-
-Your mask above covers [55:0] but [55:52] is the page operation so the
-high bit in that mask needs to be 51.
-
-AFAICT, ofc.
-
-> +#define	SNP_PAGE_STATE_PRIVATE		1
-> +#define	SNP_PAGE_STATE_SHARED		2
-> +#define	SNP_PAGE_STATE_PSMASH		3
-> +#define	SNP_PAGE_STATE_UNSMASH		4
-> +
-> +#define GHCB_SNP_PAGE_STATE_CHANGE_RESP	0x0015
-> +#define		GHCB_SNP_PAGE_STATE_RESP_VAL(val)	((val) >> 32)
-	  ^^^^^^^^^^^^
-
-Some stray tabs here and above, pls pay attention to vertical alignment too.
-
-> +
-> +/* Page State Change NAE event */
-> +#define SNP_PAGE_STATE_CHANGE_MAX_ENTRY		253
-> +struct __packed snp_page_state_header {
-> +	uint16_t cur_entry;
-> +	uint16_t end_entry;
-> +	uint32_t reserved;
-> +};
-> +
-> +struct __packed snp_page_state_entry {
-> +	uint64_t cur_page:12;
-> +	uint64_t gfn:40;
-> +	uint64_t operation:4;
-> +	uint64_t pagesize:1;
-> +	uint64_t reserved:7;
-> +};
-
-Any particular reason for the uint<width>_t types or can you use our
-shorter u<width> types?
-
-> +
-> +struct __packed snp_page_state_change {
-> +	struct snp_page_state_header header;
-> +	struct snp_page_state_entry entry[SNP_PAGE_STATE_CHANGE_MAX_ENTRY];
-
-Also, looking further into the patchset, I wonder if it would make sense
-to do:
-
-s/PAGE_STATE_CHANGE/PSC/g
-
-to avoid breaking lines of huge statements:
-
-+	if ((GHCB_SEV_GHCB_RESP_CODE(val) != GHCB_SNP_PAGE_STATE_CHANGE_RESP) ||
-+	    (GHCB_SNP_PAGE_STATE_RESP_VAL(val) != 0))
-+		sev_es_terminate(GHCB_SEV_ES_REASON_GENERAL_REQUEST);
-
-and turn them into something more readable
-
-+	if ((GHCB_SEV_GHCB_RESP_CODE(val) != GHCB_SNP_PSC_RESP) ||
-+	    (GHCB_SNP_PSC_RESP_VAL(val)))
-+		sev_es_terminate(GHCB_SEV_ES_REASON_GENERAL_REQUEST);
-
-Also, you have GHCB_SEV and GHCB_SNP prefixes and I wonder whether we
-even need them and have everything be prefixed simply GHCB_ because that
-is the protocol, after all.
-
-Which will then turn the above into:
-
-+	if ((GHCB_RESP_CODE(val) != GHCB_PSC_RESP) || (GHCB_PSC_RESP_VAL(val)))
-+		sev_es_terminate(GHCB_REASON_GENERAL_REQUEST);
-
-Oh yeah baby! :-)
-
-Thx.
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
