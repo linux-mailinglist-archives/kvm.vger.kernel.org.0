@@ -2,107 +2,130 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 53D783519F9
-	for <lists+kvm@lfdr.de>; Thu,  1 Apr 2021 20:04:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 73645351972
+	for <lists+kvm@lfdr.de>; Thu,  1 Apr 2021 20:02:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234726AbhDAR5T (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 1 Apr 2021 13:57:19 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:21800 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S235716AbhDARxW (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 1 Apr 2021 13:53:22 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1617299602;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=86yUsgQjiqkoygVn0PivbCanpSWHlnKkBTF8/03d7ag=;
-        b=bhWHhzEh92iDHf7xKSyeuvqO6lmUJZT6+idwQGg+bcOAx859geOyxP6cqfat+2CmuNlW19
-        sHQNVMtEKxJ0V9P0Zl3p+4lG6Z9RlqSWdY+CFpljeqBPAxTgFvDE8oElfiwIVeyB6L0Vyo
-        5GpuikO8GbGOSDzgz2AfZFaOjcA8L3Q=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-570-eA3kwBiuNSm9oH95AoFUYg-1; Thu, 01 Apr 2021 07:20:34 -0400
-X-MC-Unique: eA3kwBiuNSm9oH95AoFUYg-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id ED2F0800D53;
-        Thu,  1 Apr 2021 11:20:32 +0000 (UTC)
-Received: from starship (unknown [10.35.206.58])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id BF65A6F44D;
-        Thu,  1 Apr 2021 11:20:29 +0000 (UTC)
-Message-ID: <526d400a09fea6037e9903c67fc4eaec18c04d24.camel@redhat.com>
-Subject: Re: [PATCH 0/2] KVM: x86: nSVM: fixes for SYSENTER emulation
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     kvm@vger.kernel.org
-Cc:     linux-kernel@vger.kernel.org, Jim Mattson <jmattson@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Ingo Molnar <mingo@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Borislav Petkov <bp@alien8.de>
-Date:   Thu, 01 Apr 2021 14:20:28 +0300
-In-Reply-To: <20210401111614.996018-1-mlevitsk@redhat.com>
-References: <20210401111614.996018-1-mlevitsk@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+        id S236013AbhDARxk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 1 Apr 2021 13:53:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59942 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235969AbhDARtP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 1 Apr 2021 13:49:15 -0400
+Received: from mail-pg1-x546.google.com (mail-pg1-x546.google.com [IPv6:2607:f8b0:4864:20::546])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4AB00C08EC6F
+        for <kvm@vger.kernel.org>; Thu,  1 Apr 2021 06:48:21 -0700 (PDT)
+Received: by mail-pg1-x546.google.com with SMTP id i1so3223351pgg.20
+        for <kvm@vger.kernel.org>; Thu, 01 Apr 2021 06:48:21 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
+        bh=V1YPBBmXV6Zf6ofFKc69jLxBo6I+75nDp0+ssUeEtEM=;
+        b=tw55L5oNwUS5UO2/kvDirRBthSYvqZs+BTPN/5jOR29sgq5xWbQgI7lDoaxTTi3EKT
+         YHe4ulPJfqOzxRoumatxz96Fvmt6ThOMBzsc01IndpGbCEu7CtM/lktP/dGYANDYXJvn
+         //bISsKvA1avlMALNsUuwEj+FTaJX95+g3v/EzQUwuOMBIoYjtvW8m/KHsHMuO8pfmf8
+         x2xRGbnpeldt62t4jLBWMb5kODTmfJ50Xm11r4mGXLqZ+HMO5yo8mAEJBTjCBIbTt+Vq
+         rK7Bi/qSe1HeUPinRxqNm97WeDj/Zg/jg7gTp0gxS7fRjvO7EHy0je344ZkLre/QkHXY
+         /W2g==
+X-Gm-Message-State: AOAM5329qobzKbyPiQ6RfEy2QXk3+D/soDHEcmENTacAniJ6UH1ErdiG
+        PHsUvZiQQAa1J5jJsM2NDTblT1hrYQltbOapIbhoKNdFYTEL
+X-Google-Smtp-Source: ABdhPJx/5tqNGXQlJ27uFdO6oc1q+y5cAbEhG+gQ0NtMiUPsSxdE1cBf9c1xnuC34oj9gnsTFZUhqBMyOMroa7wQiaswaike9eKr
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Received: by 2002:a05:6e02:20cd:: with SMTP id 13mr6179334ilq.126.1617276559816;
+ Thu, 01 Apr 2021 04:29:19 -0700 (PDT)
+Date:   Thu, 01 Apr 2021 04:29:19 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000d9fefa05bee78afd@google.com>
+Subject: [syzbot] WARNING in bpf_test_run
+From:   syzbot <syzbot+774c590240616eaa3423@syzkaller.appspotmail.com>
+To:     akpm@linux-foundation.org, andrii@kernel.org, ast@kernel.org,
+        bp@alien8.de, bpf@vger.kernel.org, daniel@iogearbox.net,
+        davem@davemloft.net, hawk@kernel.org, hpa@zytor.com,
+        jmattson@google.com, john.fastabend@gmail.com, joro@8bytes.org,
+        kafai@fb.com, kpsingh@kernel.org, kuba@kernel.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        mark.rutland@arm.com, masahiroy@kernel.org, mingo@redhat.com,
+        netdev@vger.kernel.org, pbonzini@redhat.com, peterz@infradead.org,
+        rafael.j.wysocki@intel.com, rostedt@goodmis.org, seanjc@google.com,
+        songliubraving@fb.com, syzkaller-bugs@googlegroups.com,
+        tglx@linutronix.de, vkuznets@redhat.com, wanpengli@tencent.com,
+        will@kernel.org, x86@kernel.org, yhs@fb.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 2021-04-01 at 14:16 +0300, Maxim Levitsky wrote:
-> This is a result of a deep rabbit hole dive in regard to why
-> currently the nested migration of 32 bit guests
-> is totally broken on AMD.
+Hello,
 
-Please ignore this patch series, I didn't update the patch version.
+syzbot found the following issue on:
 
-Best regards,
-	Maxim Levitsky
+HEAD commit:    36e79851 libbpf: Preserve empty DATASEC BTFs during static..
+git tree:       bpf-next
+console output: https://syzkaller.appspot.com/x/log.txt?x=1569bb06d00000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=7eff0f22b8563a5f
+dashboard link: https://syzkaller.appspot.com/bug?extid=774c590240616eaa3423
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=17556b7cd00000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1772be26d00000
 
-> 
-> It turns out that due to slight differences between the original AMD64
-> implementation and the Intel's remake, SYSENTER instruction behaves a
-> bit differently on Intel, and to support migration from Intel to AMD we
-> try to emulate those differences away.
-> 
-> Sadly that collides with virtual vmload/vmsave feature that is used in nesting.
-> The problem was that when it is enabled,
-> on migration (and otherwise when userspace reads MSR_IA32_SYSENTER_{EIP|ESP},
-> wrong value were returned, which leads to #DF in the
-> nested guest when the wrong value is loaded back.
-> 
-> The patch I prepared carefully fixes this, by mostly disabling that
-> SYSCALL emulation when we don't spoof the Intel's vendor ID, and if we do,
-> and yet somehow SVM is enabled (this is a very rare edge case), then
-> virtual vmload/save is force disabled.
-> 
-> V2: incorporated review feedback from Paulo.
-> 
-> Best regards,
->         Maxim Levitsky
-> 
-> Maxim Levitsky (2):
->   KVM: x86: add guest_cpuid_is_intel
->   KVM: nSVM: improve SYSENTER emulation on AMD
-> 
->  arch/x86/kvm/cpuid.h   |  8 ++++
->  arch/x86/kvm/svm/svm.c | 99 +++++++++++++++++++++++++++---------------
->  arch/x86/kvm/svm/svm.h |  6 +--
->  3 files changed, 76 insertions(+), 37 deletions(-)
-> 
-> -- 
-> 2.26.2
-> 
+The issue was bisected to:
+
+commit 997acaf6b4b59c6a9c259740312a69ea549cc684
+Author: Mark Rutland <mark.rutland@arm.com>
+Date:   Mon Jan 11 15:37:07 2021 +0000
+
+    lockdep: report broken irq restoration
+
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=10197016d00000
+final oops:     https://syzkaller.appspot.com/x/report.txt?x=12197016d00000
+console output: https://syzkaller.appspot.com/x/log.txt?x=14197016d00000
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+774c590240616eaa3423@syzkaller.appspotmail.com
+Fixes: 997acaf6b4b5 ("lockdep: report broken irq restoration")
+
+------------[ cut here ]------------
+WARNING: CPU: 0 PID: 8725 at include/linux/bpf-cgroup.h:193 bpf_cgroup_storage_set include/linux/bpf-cgroup.h:193 [inline]
+WARNING: CPU: 0 PID: 8725 at include/linux/bpf-cgroup.h:193 bpf_test_run+0x65e/0xaa0 net/bpf/test_run.c:109
+Modules linked in:
+CPU: 0 PID: 8725 Comm: syz-executor927 Not tainted 5.12.0-rc4-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
+RIP: 0010:bpf_cgroup_storage_set include/linux/bpf-cgroup.h:193 [inline]
+RIP: 0010:bpf_test_run+0x65e/0xaa0 net/bpf/test_run.c:109
+Code: e9 29 fe ff ff e8 b2 9d 3a fa 41 83 c6 01 bf 08 00 00 00 44 89 f6 e8 51 a5 3a fa 41 83 fe 08 0f 85 74 fc ff ff e8 92 9d 3a fa <0f> 0b bd f0 ff ff ff e9 5c fd ff ff e8 81 9d 3a fa 83 c5 01 bf 08
+RSP: 0018:ffffc900017bfaf0 EFLAGS: 00010293
+RAX: 0000000000000000 RBX: ffffc90000f29000 RCX: 0000000000000000
+RDX: ffff88801bc68000 RSI: ffffffff8739543e RDI: 0000000000000003
+RBP: 0000000000000007 R08: 0000000000000008 R09: 0000000000000001
+R10: ffffffff8739542f R11: 0000000000000000 R12: dffffc0000000000
+R13: ffff888021dd54c0 R14: 0000000000000008 R15: 0000000000000000
+FS:  00007f00157d7700(0000) GS:ffff8880b9c00000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f0015795718 CR3: 00000000157ae000 CR4: 00000000001506f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ bpf_prog_test_run_skb+0xabc/0x1c70 net/bpf/test_run.c:628
+ bpf_prog_test_run kernel/bpf/syscall.c:3132 [inline]
+ __do_sys_bpf+0x218b/0x4f40 kernel/bpf/syscall.c:4411
+ do_syscall_64+0x2d/0x70 arch/x86/entry/common.c:46
+ entry_SYSCALL_64_after_hwframe+0x44/0xae
+RIP: 0033:0x446199
+Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 11 15 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007f00157d72f8 EFLAGS: 00000246 ORIG_RAX: 0000000000000141
+RAX: ffffffffffffffda RBX: 00000000004cb440 RCX: 0000000000446199
+RDX: 0000000000000028 RSI: 0000000020000080 RDI: 000000000000000a
+RBP: 000000000049b074 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: f9abde7200f522cd
+R13: 3952ddf3af240c07 R14: 1631e0d82d3fa99d R15: 00000000004cb448
 
 
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+syzbot can test patches for this issue, for details see:
+https://goo.gl/tpsmEJ#testing-patches
