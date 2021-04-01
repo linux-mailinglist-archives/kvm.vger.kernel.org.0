@@ -2,244 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B3688351236
-	for <lists+kvm@lfdr.de>; Thu,  1 Apr 2021 11:30:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1A1F6351247
+	for <lists+kvm@lfdr.de>; Thu,  1 Apr 2021 11:32:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233553AbhDAJ2x (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 1 Apr 2021 05:28:53 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:44256 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233793AbhDAJ2l (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 1 Apr 2021 05:28:41 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1617269320;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=CdAJIUk4E0rZzWrFLM7OQdm2JVVzi0mVz8CuYgR6iRQ=;
-        b=ToJ0UwdOd4Qh4AGmWgAdUtFFtLWpwYKTAdqUFsrrWdB8U6G/hqzYeSlJvJJAlJXdr3buYK
-        sU0pzgzb6HUEGcyXpLJErLkTthybYHZV9Ua6In6wat7cqhcpg1dAYcQ1WDZzGkqgjNJa75
-        IgPtvHOyA7ngF8uXw8GVCHUj8J01gJU=
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
- [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-287-hAiHCAWcNq6gvS94zISaoA-1; Thu, 01 Apr 2021 05:28:39 -0400
-X-MC-Unique: hAiHCAWcNq6gvS94zISaoA-1
-Received: by mail-ed1-f70.google.com with SMTP id t27so2551997edi.2
-        for <kvm@vger.kernel.org>; Thu, 01 Apr 2021 02:28:38 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=CdAJIUk4E0rZzWrFLM7OQdm2JVVzi0mVz8CuYgR6iRQ=;
-        b=Vvk+P5Eedz9aPklbiqrN3MUv+QRNWWVP+JxGx523xngbjlHMjnykIslN8H6j3vBw4v
-         37uCrl2io/OSJkrZ3s+Z1DTkA2vJhB5m31GahFgYUppZ+du/5B4Lx2OjRprXFxz23ULL
-         /V9/utS8EkwmRpMYy9HVPy4f6vTj6Uilo5u2LR1J29lCgUfAqe6EFOI8NGDc8tECUkpm
-         eYXl4DOJbrnZH7kLvbfuAe4wbycz+1JMD48Fe2jm0nFY60XNtwqNZsebPaClznaBNDvD
-         ULPao05zzB1Dbid+0kxY9GKH+udypweUQvnFAMEZ7rSVGUxySZjlyH+reO0F3fmsEdcw
-         iouA==
-X-Gm-Message-State: AOAM533mcd8XYOsrAZBosKpNHau39sdXiFhoC/nt0xq9p/nZOhyVRFUr
-        TaXKmzgNYIPvK/Z0LnPX7VGY2HnoKXoOlTqrNYS/bD0TYMSSpfqWVLtDsdp+T7TslfUBDlq7X0s
-        VuQTyYTHcqzrj
-X-Received: by 2002:a17:906:e16:: with SMTP id l22mr8099314eji.173.1617269317930;
-        Thu, 01 Apr 2021 02:28:37 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzIlGvqJGxpSAvkxwuKoS+tfRvPYTtyqOWPe5X29pYmiMYvtWLlSZhmpHnmVGL4jZJzfGGOcA==
-X-Received: by 2002:a17:906:e16:: with SMTP id l22mr8099291eji.173.1617269317705;
-        Thu, 01 Apr 2021 02:28:37 -0700 (PDT)
-Received: from localhost.localdomain ([194.230.155.195])
-        by smtp.gmail.com with ESMTPSA id t17sm3215284edr.36.2021.04.01.02.28.35
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 01 Apr 2021 02:28:37 -0700 (PDT)
-Subject: Re: [PATCH v2 1/4] kvm: cpuid: adjust the returned nent field of
- kvm_cpuid2 for KVM_GET_SUPPORTED_CPUID and KVM_GET_EMULATED_CPUID
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>, Shuah Khan <shuah@kernel.org>,
-        Alexander Graf <graf@amazon.com>,
-        Andrew Jones <drjones@redhat.com>, linux-doc@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
-References: <20210331122649.38323-1-eesposit@redhat.com>
- <20210331122649.38323-2-eesposit@redhat.com> <YGS/7hQo91cVuXbB@google.com>
-From:   Emanuele Giuseppe Esposito <eesposit@redhat.com>
-Message-ID: <c0f9e1b6-e751-a06f-e753-6603f17a6bce@redhat.com>
-Date:   Thu, 1 Apr 2021 11:28:33 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.8.1
+        id S233701AbhDAJa3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 1 Apr 2021 05:30:29 -0400
+Received: from verein.lst.de ([213.95.11.211]:38951 "EHLO verein.lst.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S233912AbhDAJaC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 1 Apr 2021 05:30:02 -0400
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id 3942A68B05; Thu,  1 Apr 2021 11:29:58 +0200 (CEST)
+Date:   Thu, 1 Apr 2021 11:29:57 +0200
+From:   Christoph Hellwig <hch@lst.de>
+To:     Will Deacon <will@kernel.org>
+Cc:     Christoph Hellwig <hch@lst.de>, Joerg Roedel <joro@8bytes.org>,
+        Li Yang <leoyang.li@nxp.com>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        David Woodhouse <dwmw2@infradead.org>,
+        Lu Baolu <baolu.lu@linux.intel.com>,
+        linuxppc-dev@lists.ozlabs.org, linux-arm-msm@vger.kernel.org,
+        dri-devel@lists.freedesktop.org, freedreno@lists.freedesktop.org,
+        iommu@lists.linux-foundation.org,
+        linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
+Subject: Re: [PATCH 05/18] iommu/fsl_pamu: remove support for multiple
+ windows
+Message-ID: <20210401092957.GB2934@lst.de>
+References: <20210316153825.135976-1-hch@lst.de> <20210316153825.135976-6-hch@lst.de> <20210330122234.GE5908@willie-the-truck>
 MIME-Version: 1.0
-In-Reply-To: <YGS/7hQo91cVuXbB@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210330122234.GE5908@willie-the-truck>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Tue, Mar 30, 2021 at 01:22:34PM +0100, Will Deacon wrote:
+> >  	 * win_arr contains information of the configured
+> >  	 * windows for a domain. This is allocated only
+> >  	 * when the number of windows for the domain are
+> >  	 * set.
+> >  	 */
+> 
+> The last part of this comment is now stale ^^
 
-
-On 31/03/2021 20:31, Sean Christopherson wrote:
-> On Wed, Mar 31, 2021, Emanuele Giuseppe Esposito wrote:
->> Calling the kvm KVM_GET_[SUPPORTED/EMULATED]_CPUID ioctl requires
->> a nent field inside the kvm_cpuid2 struct to be big enough to contain
->> all entries that will be set by kvm.
->> Therefore if the nent field is too high, kvm will adjust it to the
->> right value. If too low, -E2BIG is returned.
->>
->> However, when filling the entries do_cpuid_func() requires an
->> additional entry, so if the right nent is known in advance,
->> giving the exact number of entries won't work because it has to be
->> increased by one.
-> 
-> I'd strong prefer to reword the shortlog and changelog.  It's not immediately
-> obvious what this is changing without the context from the v1 thread.  E.g.
-> 
->    KVM: x86: Fix a spurious -E2BIG in KVM_GET_EMULATED_CPUID
-> 
->    When retrieving emulated CPUID entries, check for an insufficient array size
->    if and only if KVM is actually inserting an entry.  If userspace has a priori
->    knowledge of the exact array size, KVM_GET_EMULATED_CPUID will incorrectly
->    fail due to effectively requiring an extra, unused entry.
-
-I will update it with v3, thanks.
-
-> 
->> Signed-off-by: Emanuele Giuseppe Esposito <eesposit@redhat.com>
->> ---
->>   arch/x86/kvm/cpuid.c | 35 ++++++++++++++++++-----------------
->>   1 file changed, 18 insertions(+), 17 deletions(-)
->>
->> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
->> index 6bd2f8b830e4..02a51f921548 100644
->> --- a/arch/x86/kvm/cpuid.c
->> +++ b/arch/x86/kvm/cpuid.c
->> @@ -567,34 +567,34 @@ static struct kvm_cpuid_entry2 *do_host_cpuid(struct kvm_cpuid_array *array,
->>   
->>   static int __do_cpuid_func_emulated(struct kvm_cpuid_array *array, u32 func)
->>   {
->> -	struct kvm_cpuid_entry2 *entry;
->> -
->> -	if (array->nent >= array->maxnent)
->> -		return -E2BIG;
->> +	struct kvm_cpuid_entry2 entry;
->>   
->> -	entry = &array->entries[array->nent];
->> -	entry->function = func;
->> -	entry->index = 0;
->> -	entry->flags = 0;
->> +	entry.function = func;
->> +	entry.index = 0;
->> +	entry.flags = 0;
-> 
-> Depending on the leaf, eax/ebx/ecx/edx will be left uninitialized.  This wasn't
-> a bug before since @array is zeroed on allocation.
-> 
-> What about pre-checking @func?  I don't particular like the duplicate checks,
-> but none of the solutions are particularly elegant.  E.g.
-You're right, I should have zeroed it. I agree that memsetting and 
-memcopying is not elegant either, but unless I am missing something and 
-it changes the intended behavior, IMHO this avoids duplicate checks and 
-makes it simpler to add a new 'func'.
-
-Emanuele
-> 
-> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-> index 6bd2f8b830e4..9824947bd5ad 100644
-> --- a/arch/x86/kvm/cpuid.c
-> +++ b/arch/x86/kvm/cpuid.c
-> @@ -565,14 +565,18 @@ static struct kvm_cpuid_entry2 *do_host_cpuid(struct kvm_cpuid_array *array,
->          return entry;
->   }
-> 
-> -static int __do_cpuid_func_emulated(struct kvm_cpuid_array *array, u32 func)
-> +static noinline int __do_cpuid_func_emulated(struct kvm_cpuid_array *array, u32 func)
->   {
->          struct kvm_cpuid_entry2 *entry;
-> 
-> +       if (func != 0 && func != 1 && func != 7)
-> +               return 0;
-> +
->          if (array->nent >= array->maxnent)
->                  return -E2BIG;
-> 
-> -       entry = &array->entries[array->nent];
-> +       entry = &array->entries[array->nent++];
-> +
->          entry->function = func;
->          entry->index = 0;
->          entry->flags = 0;
-> @@ -580,19 +584,17 @@ static int __do_cpuid_func_emulated(struct kvm_cpuid_array *array, u32 func)
->          switch (func) {
->          case 0:
->                  entry->eax = 7;
-> -               ++array->nent;
->                  break;
->          case 1:
->                  entry->ecx = F(MOVBE);
-> -               ++array->nent;
->                  break;
->          case 7:
->                  entry->flags |= KVM_CPUID_FLAG_SIGNIFCANT_INDEX;
->                  entry->eax = 0;
->                  entry->ecx = F(RDPID);
-> -               ++array->nent;
-> -       default:
->                  break;
-> +       default:
-> +               BUG();
->          }
-> 
->          return 0
-> 
-> 
->>   
->>   	switch (func) {
->>   	case 0:
->> -		entry->eax = 7;
->> -		++array->nent;
->> +		entry.eax = 7;
->>   		break;
->>   	case 1:
->> -		entry->ecx = F(MOVBE);
->> -		++array->nent;
->> +		entry.ecx = F(MOVBE);
->>   		break;
->>   	case 7:
->> -		entry->flags |= KVM_CPUID_FLAG_SIGNIFCANT_INDEX;
->> -		entry->eax = 0;
->> -		entry->ecx = F(RDPID);
->> -		++array->nent;
->> -	default:
->> +		entry.flags |= KVM_CPUID_FLAG_SIGNIFCANT_INDEX;
->> +		entry.eax = 0;
->> +		entry.ecx = F(RDPID);
->>   		break;
->> +	default:
->> +		goto out;
->>   	}
->>   
->> +	if (array->nent >= array->maxnent)
->> +		return -E2BIG;
->> +
->> +	memcpy(&array->entries[array->nent++], &entry, sizeof(entry));
->> +
->> +out:
->>   	return 0;
->>   }
->>   
->> @@ -975,6 +975,7 @@ int kvm_dev_ioctl_get_cpuid(struct kvm_cpuid2 *cpuid,
->>   
->>   	if (cpuid->nent < 1)
->>   		return -E2BIG;
->> +
->>   	if (cpuid->nent > KVM_MAX_CPUID_ENTRIES)
->>   		cpuid->nent = KVM_MAX_CPUID_ENTRIES;
->>   
->> -- 
->> 2.30.2
->>
-> 
-
+I've updated it, although the comment will go away entirely a little
+bit later anyway.
