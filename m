@@ -2,271 +2,265 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A58A0351AA1
-	for <lists+kvm@lfdr.de>; Thu,  1 Apr 2021 20:07:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C65FD351A9D
+	for <lists+kvm@lfdr.de>; Thu,  1 Apr 2021 20:07:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236264AbhDASCZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 1 Apr 2021 14:02:25 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:20483 "EHLO
+        id S235414AbhDASCX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 1 Apr 2021 14:02:23 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:24905 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234866AbhDAR6T (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 1 Apr 2021 13:58:19 -0400
+        by vger.kernel.org with ESMTP id S235986AbhDAR6L (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 1 Apr 2021 13:58:11 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1617299896;
+        s=mimecast20190719; t=1617299890;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=IeSCqCBagWzFXJCY1w7HB1qDOO9KpHIs4Tyewq8aOvs=;
-        b=bfDDatFi6U62JtAXbut2417zAPLhEld8fUfnXiiUDfijvOZSBc1SfbACLk9u7yRo2TtpTu
-        lGz6W+j4UkwyzuBTS0fvCq67z1+R+4ICBH/Q7DY8RLJ2RSCLGIxltKaQMjZGc6Y6lgV21q
-        dvuD2Av8YUO0/kvzkB/6VD6/UnTNe74=
+         to:to:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=MqiD/niNzs8sPdCIMyr36j8rRSsuwo1vckKf82UwdpU=;
+        b=EtRR1FaQ7n2jde3ICyjYWn0q3XBhfPUT7Vufza2ukRFZnaaj4VPLeZhP6Y6k4tqu/Vrij7
+        bDH0bO+PJz63jnht1dHI7nwDqmJmPrFhjs3oJYr1jEZ0FyEVSuMLpoz85hLbQWkZPgHkSk
+        cKwmmyUl49OQJQr4Jsms9ZdYmQPPA+E=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-221-tafvrKJ1O3-YC537vN-qRQ-1; Thu, 01 Apr 2021 09:57:12 -0400
-X-MC-Unique: tafvrKJ1O3-YC537vN-qRQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+ us-mta-581-ANfHcb41OpqlxX3p4ARpgQ-1; Thu, 01 Apr 2021 09:55:27 -0400
+X-MC-Unique: ANfHcb41OpqlxX3p4ARpgQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 807611853020;
-        Thu,  1 Apr 2021 13:57:08 +0000 (UTC)
-Received: from localhost.localdomain (unknown [10.35.206.58])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 8A617627DD;
-        Thu,  1 Apr 2021 13:56:27 +0000 (UTC)
-From:   Maxim Levitsky <mlevitsk@redhat.com>
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 128CC1084D94
+        for <kvm@vger.kernel.org>; Thu,  1 Apr 2021 13:55:15 +0000 (UTC)
+Received: from virtlab511.virt.lab.eng.bos.redhat.com (virtlab511.virt.lab.eng.bos.redhat.com [10.19.152.198])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id D4131424D
+        for <kvm@vger.kernel.org>; Thu,  1 Apr 2021 13:55:14 +0000 (UTC)
+From:   Paolo Bonzini <pbonzini@redhat.com>
 To:     kvm@vger.kernel.org
-Cc:     x86@kernel.org (maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)),
-        Ingo Molnar <mingo@redhat.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Sean Christopherson <seanjc@google.com>,
-        Marc Zyngier <maz@kernel.org>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        linux-kernel@vger.kernel.org (open list),
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Jonathan Corbet <corbet@lwn.net>, Jessica Yu <jeyu@kernel.org>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Jan Kiszka <jan.kiszka@siemens.com>,
-        Will Deacon <will@kernel.org>,
-        kvmarm@lists.cs.columbia.edu (open list:KERNEL VIRTUAL MACHINE FOR
-        ARM64 (KVM/arm64)), Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Jim Mattson <jmattson@google.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        David Hildenbrand <david@redhat.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        linux-s390@vger.kernel.org (open list:S390),
-        Heiko Carstens <hca@linux.ibm.com>,
-        Kieran Bingham <kbingham@kernel.org>,
-        linux-doc@vger.kernel.org (open list:DOCUMENTATION),
-        linux-arm-kernel@lists.infradead.org (moderated list:KERNEL VIRTUAL
-        MACHINE FOR ARM64 (KVM/arm64)), James Morse <james.morse@arm.com>
-Subject: [PATCH v2 9/9] KVM: SVM: implement force_intercept_exceptions_mask
-Date:   Thu,  1 Apr 2021 16:54:51 +0300
-Message-Id: <20210401135451.1004564-10-mlevitsk@redhat.com>
-In-Reply-To: <20210401135451.1004564-1-mlevitsk@redhat.com>
-References: <20210401135451.1004564-1-mlevitsk@redhat.com>
+Subject: [PATCH kvm-unit-tests] x86: msr: test vendor-specific behavior for MSR_IA32_SYSENTER_ESP and MSR_IA32_SYSENTER_EIP
+Date:   Thu,  1 Apr 2021 09:55:14 -0400
+Message-Id: <20210401135514.1095274-1-pbonzini@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Currently #TS interception is only done once.
-Also exception interception is not enabled for SEV guests.
+These MSRs are only 32 bits wide on AMD processors, and KVM will emulate
+this starting with Linux 5.12.  Add support for this in the msr.flat
+test.
 
-Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+Unfortunately QEMU does not have this behavior, so we have to disable the
+tests in CI.
+
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- arch/x86/include/asm/kvm_host.h |  2 +
- arch/x86/kvm/svm/svm.c          | 70 +++++++++++++++++++++++++++++++++
- arch/x86/kvm/svm/svm.h          |  6 ++-
- arch/x86/kvm/x86.c              |  5 ++-
- 4 files changed, 80 insertions(+), 3 deletions(-)
+ .gitlab-ci.yml                |  6 ++--
+ ci/cirrus-ci-fedora.yml       |  1 -
+ ci/cirrus-ci-macos-x86-64.yml |  1 -
+ lib/x86/processor.h           | 20 ++++++++++++
+ x86/msr.c                     | 59 +++++++++++++++++++++++++----------
+ 5 files changed, 65 insertions(+), 22 deletions(-)
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 8c529ae9dbbe..d15ae64a2c4e 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -1574,6 +1574,8 @@ int kvm_emulate_rdpmc(struct kvm_vcpu *vcpu);
- void kvm_queue_exception(struct kvm_vcpu *vcpu, unsigned nr);
- void kvm_queue_exception_e(struct kvm_vcpu *vcpu, unsigned nr, u32 error_code);
- void kvm_queue_exception_p(struct kvm_vcpu *vcpu, unsigned nr, unsigned long payload);
-+void kvm_queue_exception_e_p(struct kvm_vcpu *vcpu, unsigned nr,
-+			     u32 error_code, unsigned long payload);
- void kvm_requeue_exception(struct kvm_vcpu *vcpu, unsigned nr);
- void kvm_requeue_exception_e(struct kvm_vcpu *vcpu, unsigned nr, u32 error_code);
- void kvm_inject_page_fault(struct kvm_vcpu *vcpu, struct x86_exception *fault);
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index 2aa951bc470c..de7fd7922ec7 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -220,6 +220,8 @@ static const u32 msrpm_ranges[] = {0, 0xc0000000, 0xc0010000};
- #define MSRS_RANGE_SIZE 2048
- #define MSRS_IN_RANGE (MSRS_RANGE_SIZE * 8 / 2)
+diff --git a/.gitlab-ci.yml b/.gitlab-ci.yml
+index b7c0571..4aebb97 100644
+--- a/.gitlab-ci.yml
++++ b/.gitlab-ci.yml
+@@ -74,7 +74,7 @@ build-x86_64:
+      ioapic-split smptest smptest3 vmexit_cpuid vmexit_mov_from_cr8
+      vmexit_mov_to_cr8 vmexit_inl_pmtimer  vmexit_ipi vmexit_ipi_halt
+      vmexit_ple_round_robin vmexit_tscdeadline vmexit_tscdeadline_immed
+-     eventinj msr port80 setjmp sieve syscall tsc rmap_chain umip intel_iommu
++     eventinj port80 setjmp sieve syscall tsc rmap_chain umip intel_iommu
+      rdpru pku pks smap tsc_adjust xsave
+      | tee results.txt
+  - if grep -q FAIL results.txt ; then exit 1 ; fi
+@@ -103,7 +103,7 @@ build-clang:
+      ioapic-split smptest smptest3 vmexit_cpuid vmexit_mov_from_cr8
+      vmexit_mov_to_cr8 vmexit_inl_pmtimer  vmexit_ipi vmexit_ipi_halt
+      vmexit_ple_round_robin vmexit_tscdeadline vmexit_tscdeadline_immed
+-     eventinj msr port80 setjmp syscall tsc rmap_chain umip intel_iommu
++     eventinj port80 setjmp syscall tsc rmap_chain umip intel_iommu
+      rdpru pku pks smap tsc_adjust xsave
+      | tee results.txt
+  - grep -q PASS results.txt && ! grep -q FAIL results.txt
+@@ -119,7 +119,7 @@ build-centos7:
+  - ../configure --arch=x86_64 --disable-pretty-print-stacks
+  - make -j2
+  - ACCEL=tcg ./run_tests.sh
+-     msr vmexit_cpuid vmexit_mov_from_cr8 vmexit_mov_to_cr8 vmexit_inl_pmtimer
++     vmexit_cpuid vmexit_mov_from_cr8 vmexit_mov_to_cr8 vmexit_inl_pmtimer
+      vmexit_ple_round_robin vmexit_tscdeadline vmexit_tscdeadline_immed port80
+      setjmp sieve tsc rmap_chain umip
+      | tee results.txt
+diff --git a/ci/cirrus-ci-fedora.yml b/ci/cirrus-ci-fedora.yml
+index aba6ae7..a6b9cea 100644
+--- a/ci/cirrus-ci-fedora.yml
++++ b/ci/cirrus-ci-fedora.yml
+@@ -33,7 +33,6 @@ fedora_task:
+         ioapic
+         ioapic-split
+         kvmclock_test
+-        msr
+         pcid
+         pcid-disabled
+         rdpru
+diff --git a/ci/cirrus-ci-macos-x86-64.yml b/ci/cirrus-ci-macos-x86-64.yml
+index dcb8f6d..f72c8e1 100644
+--- a/ci/cirrus-ci-macos-x86-64.yml
++++ b/ci/cirrus-ci-macos-x86-64.yml
+@@ -18,7 +18,6 @@ macos_task:
+          eventinj
+          intel_iommu
+          ioapic-split
+-         msr
+          realmode
+          rmap_chain
+          setjmp
+diff --git a/lib/x86/processor.h b/lib/x86/processor.h
+index dda57a1..aefaa9f 100644
+--- a/lib/x86/processor.h
++++ b/lib/x86/processor.h
+@@ -174,6 +174,26 @@ static inline u8 cpuid_maxphyaddr(void)
+ #define	X86_FEATURE_NPT			(CPUID(0x8000000A, 0, EDX, 0))
+ #define	X86_FEATURE_NRIPS		(CPUID(0x8000000A, 0, EDX, 3))
  
-+static int svm_handle_invalid_exit(struct kvm_vcpu *vcpu, u64 exit_code);
++#define CPUID_VENDOR_AuthenticAMD_ebx 0x68747541
++#define CPUID_VENDOR_AuthenticAMD_ecx 0x444d4163
++#define CPUID_VENDOR_AuthenticAMD_edx 0x69746e65
 +
- u32 svm_msrpm_offset(u32 msr)
++#define CPUID_VENDOR_AMDisbetterI_ebx 0x69444d41
++#define CPUID_VENDOR_AMDisbetterI_ecx 0x21726574
++#define CPUID_VENDOR_AMDisbetterI_edx 0x74656273
++
++#define CPUID_VENDOR_HygonGenuine_ebx 0x6f677948
++#define CPUID_VENDOR_HygonGenuine_ecx 0x656e6975
++#define CPUID_VENDOR_HygonGenuine_edx 0x6e65476e
++
++#define CPUID_VENDOR_GenuineIntel_ebx 0x756e6547
++#define CPUID_VENDOR_GenuineIntel_ecx 0x6c65746e
++#define CPUID_VENDOR_GenuineIntel_edx 0x49656e69
++
++#define CPUID_VENDOR_CentaurHauls_ebx 0x746e6543
++#define CPUID_VENDOR_CentaurHauls_ecx 0x736c7561
++#define CPUID_VENDOR_CentaurHauls_edx 0x48727561
++
+ 
+ static inline bool this_cpu_has(u64 feature)
  {
- 	u32 offset;
-@@ -1113,6 +1115,22 @@ static void svm_check_invpcid(struct vcpu_svm *svm)
- 	}
- }
- 
-+static void svm_init_force_exceptions_intercepts(struct vcpu_svm *svm)
-+{
-+	int exc;
-+
-+	svm->force_intercept_exceptions_mask = force_intercept_exceptions_mask;
-+	for (exc = 0 ; exc < 32 ; exc++) {
-+		if (!(svm->force_intercept_exceptions_mask & (1 << exc)))
-+			continue;
-+
-+		/* Those are defined to have undefined behavior in the SVM spec */
-+		if (exc != 2 && exc != 9)
-+			continue;
-+		set_exception_intercept(svm, exc);
-+	}
-+}
-+
- static void init_vmcb(struct kvm_vcpu *vcpu)
- {
- 	struct vcpu_svm *svm = to_svm(vcpu);
-@@ -1288,6 +1306,9 @@ static void init_vmcb(struct kvm_vcpu *vcpu)
- 
- 	enable_gif(svm);
- 
-+	if (!sev_es_guest(vcpu->kvm))
-+		svm_init_force_exceptions_intercepts(svm);
-+
- }
- 
- static void svm_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
-@@ -1913,6 +1934,17 @@ static int pf_interception(struct kvm_vcpu *vcpu)
- 	u64 fault_address = svm->vmcb->control.exit_info_2;
- 	u64 error_code = svm->vmcb->control.exit_info_1;
- 
-+	if ((svm->force_intercept_exceptions_mask & (1 << PF_VECTOR)))
-+		if (npt_enabled && !vcpu->arch.apf.host_apf_flags) {
-+			/* If the #PF was only intercepted for debug, inject
-+			 * it directly to the guest, since the kvm's mmu code
-+			 * is not ready to deal with such page faults.
-+			 */
-+			kvm_queue_exception_e_p(vcpu, PF_VECTOR,
-+						error_code, fault_address);
-+			return 1;
-+		}
-+
- 	return kvm_handle_page_fault(vcpu, error_code, fault_address,
- 			static_cpu_has(X86_FEATURE_DECODEASSISTS) ?
- 			svm->vmcb->control.insn_bytes : NULL,
-@@ -1988,6 +2020,40 @@ static int ac_interception(struct kvm_vcpu *vcpu)
- 	return 1;
- }
- 
-+static int gen_exc_interception(struct kvm_vcpu *vcpu)
-+{
-+	/*
-+	 * Generic exception intercept handler which forwards a guest exception
-+	 * as-is to the guest.
-+	 * For exceptions that don't have a special intercept handler.
-+	 *
-+	 * Used only for 'force_intercept_exceptions_mask' KVM debug feature.
-+	 */
-+	struct vcpu_svm *svm = to_svm(vcpu);
-+	int exc = svm->vmcb->control.exit_code - SVM_EXIT_EXCP_BASE;
-+
-+	/* SVM doesn't provide us with an error code for the #DF */
-+	u32 err_code = exc == DF_VECTOR ? 0 : svm->vmcb->control.exit_info_1;
-+
-+	if (!(svm->force_intercept_exceptions_mask & (1 << exc)))
-+		return svm_handle_invalid_exit(vcpu, svm->vmcb->control.exit_code);
-+
-+	if (exc == TS_VECTOR) {
-+		/*
-+		 * SVM doesn't provide us with an error code to be able to
-+		 * re-inject the #TS exception, so just disable its
-+		 * intercept, and let the guest re-execute the instruction.
-+		 */
-+		vmcb_clr_intercept(&svm->vmcb01.ptr->control,
-+				   INTERCEPT_EXCEPTION_OFFSET + TS_VECTOR);
-+		recalc_intercepts(svm);
-+	} else if (x86_exception_has_error_code(exc))
-+		kvm_queue_exception_e(vcpu, exc, err_code);
-+	else
-+		kvm_queue_exception(vcpu, exc);
-+	return 1;
-+}
-+
- static bool is_erratum_383(void)
- {
- 	int err, i;
-@@ -3051,6 +3117,10 @@ static int (*const svm_exit_handlers[])(struct kvm_vcpu *vcpu) = {
- 	[SVM_EXIT_WRITE_DR5]			= dr_interception,
- 	[SVM_EXIT_WRITE_DR6]			= dr_interception,
- 	[SVM_EXIT_WRITE_DR7]			= dr_interception,
-+
-+	[SVM_EXIT_EXCP_BASE ...
-+	SVM_EXIT_EXCP_BASE + 31]		= gen_exc_interception,
-+
- 	[SVM_EXIT_EXCP_BASE + DB_VECTOR]	= db_interception,
- 	[SVM_EXIT_EXCP_BASE + BP_VECTOR]	= bp_interception,
- 	[SVM_EXIT_EXCP_BASE + UD_VECTOR]	= ud_interception,
-diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-index 8e276c4fb33d..79d0aea87753 100644
---- a/arch/x86/kvm/svm/svm.h
-+++ b/arch/x86/kvm/svm/svm.h
-@@ -183,6 +183,7 @@ struct vcpu_svm {
- 	bool ghcb_sa_free;
- 
- 	bool guest_state_loaded;
-+	u32 force_intercept_exceptions_mask;
+diff --git a/x86/msr.c b/x86/msr.c
+index ce5dabe..30588d0 100644
+--- a/x86/msr.c
++++ b/x86/msr.c
+@@ -8,12 +8,14 @@ struct msr_info {
+     int index;
+     const char *name;
+     struct tc {
+-        int valid;
++        u8 vendor;
+         unsigned long long value;
+         unsigned long long expected;
+     } val_pairs[20];
  };
  
- struct svm_cpu_data {
-@@ -333,8 +334,11 @@ static inline void clr_exception_intercept(struct vcpu_svm *svm, u32 bit)
- 	struct vmcb *vmcb = svm->vmcb01.ptr;
++#define INTEL 1
++#define AMD 2
  
- 	WARN_ON_ONCE(bit >= 32);
--	vmcb_clr_intercept(&vmcb->control, INTERCEPT_EXCEPTION_OFFSET + bit);
+ #define addr_64 0x0000123456789abcULL
+ #define addr_ul (unsigned long)addr_64
+@@ -21,42 +23,44 @@ struct msr_info {
+ struct msr_info msr_info[] =
+ {
+     { .index = 0x00000174, .name = "IA32_SYSENTER_CS",
+-      .val_pairs = {{ .valid = 1, .value = 0x1234, .expected = 0x1234}}
++      .val_pairs = {{ .vendor = ~0, .value = 0x1234, .expected = 0x1234}}
+     },
+     { .index = 0x00000175, .name = "MSR_IA32_SYSENTER_ESP",
+-      .val_pairs = {{ .valid = 1, .value = addr_ul, .expected = addr_ul}}
++      .val_pairs = {{ .vendor = INTEL, .value = addr_ul, .expected = addr_ul},
++                    { .vendor = AMD, .value = addr_ul, .expected = 0x56789abc}},
+     },
+-    { .index = 0x00000176, .name = "IA32_SYSENTER_EIP",
+-      .val_pairs = {{ .valid = 1, .value = addr_ul, .expected = addr_ul}}
++    { .index = 0x00000176, .name = "MSR_IA32_SYSENTER_EIP",
++      .val_pairs = {{ .vendor = INTEL, .value = addr_ul, .expected = addr_ul},
++                    { .vendor = AMD, .value = addr_ul, .expected = 0x56789abc}},
+     },
+     { .index = 0x000001a0, .name = "MSR_IA32_MISC_ENABLE",
+       // reserved: 1:2, 4:6, 8:10, 13:15, 17, 19:21, 24:33, 35:63
+-      .val_pairs = {{ .valid = 1, .value = 0x400c51889, .expected = 0x400c51889}}
++      .val_pairs = {{ .vendor = ~0, .value = 0x400c51889, .expected = 0x400c51889}}
+     },
+     { .index = 0x00000277, .name = "MSR_IA32_CR_PAT",
+-      .val_pairs = {{ .valid = 1, .value = 0x07070707, .expected = 0x07070707}}
++      .val_pairs = {{ .vendor = ~0, .value = 0x07070707, .expected = 0x07070707}}
+     },
+     { .index = 0xc0000100, .name = "MSR_FS_BASE",
+-      .val_pairs = {{ .valid = 1, .value = addr_64, .expected = addr_64}}
++      .val_pairs = {{ .vendor = ~0, .value = addr_64, .expected = addr_64}}
+     },
+     { .index = 0xc0000101, .name = "MSR_GS_BASE",
+-      .val_pairs = {{ .valid = 1, .value = addr_64, .expected = addr_64}}
++      .val_pairs = {{ .vendor = ~0, .value = addr_64, .expected = addr_64}}
+     },
+     { .index = 0xc0000102, .name = "MSR_KERNEL_GS_BASE",
+-      .val_pairs = {{ .valid = 1, .value = addr_64, .expected = addr_64}}
++      .val_pairs = {{ .vendor = ~0, .value = addr_64, .expected = addr_64}}
+     },
+ #ifdef __x86_64__
+     { .index = 0xc0000080, .name = "MSR_EFER",
+-      .val_pairs = {{ .valid = 1, .value = 0xD00, .expected = 0xD00}}
++      .val_pairs = {{ .vendor = ~0, .value = 0xD00, .expected = 0xD00}}
+     },
+     { .index = 0xc0000082, .name = "MSR_LSTAR",
+-      .val_pairs = {{ .valid = 1, .value = addr_64, .expected = addr_64}}
++      .val_pairs = {{ .vendor = ~0, .value = addr_64, .expected = addr_64}}
+     },
+     { .index = 0xc0000083, .name = "MSR_CSTAR",
+-      .val_pairs = {{ .valid = 1, .value = addr_64, .expected = addr_64}}
++      .val_pairs = {{ .vendor = ~0, .value = addr_64, .expected = addr_64}}
+     },
+     { .index = 0xc0000084, .name = "MSR_SYSCALL_MASK",
+-      .val_pairs = {{ .valid = 1, .value = 0xffffffff, .expected = 0xffffffff}}
++      .val_pairs = {{ .vendor = ~0, .value = 0xffffffff, .expected = 0xffffffff}}
+     },
+ #endif
  
-+	if ((1 << bit) & svm->force_intercept_exceptions_mask)
-+		return;
+@@ -99,12 +103,33 @@ static void test_msr_rw(int msr_index, unsigned long long input, unsigned long l
+ int main(int ac, char **av)
+ {
+     int i, j;
++    int vendor = 0;
++    struct cpuid cpuid0 = cpuid(0);
 +
-+	vmcb_clr_intercept(&vmcb->control, INTERCEPT_EXCEPTION_OFFSET + bit);
- 	recalc_intercepts(svm);
- }
- 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 1a51031d64d8..ae57816fe6d9 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -630,12 +630,13 @@ void kvm_queue_exception_p(struct kvm_vcpu *vcpu, unsigned nr,
- }
- EXPORT_SYMBOL_GPL(kvm_queue_exception_p);
- 
--static void kvm_queue_exception_e_p(struct kvm_vcpu *vcpu, unsigned nr,
--				    u32 error_code, unsigned long payload)
-+void kvm_queue_exception_e_p(struct kvm_vcpu *vcpu, unsigned nr,
-+			     u32 error_code, unsigned long payload)
- {
- 	kvm_multiple_exception(vcpu, nr, true, error_code,
- 			       true, payload, false);
- }
-+EXPORT_SYMBOL_GPL(kvm_queue_exception_e_p);
- 
- int kvm_complete_insn_gp(struct kvm_vcpu *vcpu, int err)
- {
++    if (cpuid0.b == CPUID_VENDOR_GenuineIntel_ebx &&
++        cpuid0.c == CPUID_VENDOR_GenuineIntel_ecx &&
++        cpuid0.d == CPUID_VENDOR_GenuineIntel_edx)
++        vendor = INTEL;
++
++    else if (cpuid0.b == CPUID_VENDOR_AuthenticAMD_ebx &&
++             cpuid0.c == CPUID_VENDOR_AuthenticAMD_ecx &&
++             cpuid0.d == CPUID_VENDOR_AuthenticAMD_edx)
++        vendor = AMD;
++
++    else if (cpuid0.b == CPUID_VENDOR_AMDisbetterI_ebx &&
++             cpuid0.c == CPUID_VENDOR_AMDisbetterI_ecx &&
++             cpuid0.d == CPUID_VENDOR_AMDisbetterI_edx)
++        vendor = AMD;
++
++    else if (cpuid0.b == CPUID_VENDOR_HygonGenuine_ebx &&
++             cpuid0.c == CPUID_VENDOR_HygonGenuine_ecx &&
++             cpuid0.d == CPUID_VENDOR_HygonGenuine_edx)
++        vendor = AMD;
++
+     for (i = 0 ; i < sizeof(msr_info) / sizeof(msr_info[0]); i++) {
+         for (j = 0; j < sizeof(msr_info[i].val_pairs) / sizeof(msr_info[i].val_pairs[0]); j++) {
+-            if (msr_info[i].val_pairs[j].valid) {
++            if (msr_info[i].val_pairs[j].vendor & vendor) {
+                 test_msr_rw(msr_info[i].index, msr_info[i].val_pairs[j].value, msr_info[i].val_pairs[j].expected);
+-            } else {
+-                break;
+             }
+         }
+     }
 -- 
 2.26.2
 
