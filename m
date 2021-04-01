@@ -2,225 +2,170 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 04130352034
-	for <lists+kvm@lfdr.de>; Thu,  1 Apr 2021 21:57:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A4509352066
+	for <lists+kvm@lfdr.de>; Thu,  1 Apr 2021 22:09:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235548AbhDAT46 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 1 Apr 2021 15:56:58 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:39723 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S235136AbhDAT45 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 1 Apr 2021 15:56:57 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1617307017;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=4B8rrR2ZlPDVkEWIjOjrV74gMnzPRF/GWjn8bfBWXkA=;
-        b=BJiF6RErYoRYl693n9FXnibwr4HLUboeKDPtKTep+DOtkHTDEmB8S2knKcvedrRDlbTY21
-        4yyM4FVIyCTiSu+eUJgND1bTYt9hBeZhIIpQ+YODZiwhwlpWw+1usLgkABKeOGExq1XISx
-        h2sMbIxiS4yRajwlh+m9CFeLQVBMCGQ=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-265-pepbjSyCPJCDMNQ_ebwt4Q-1; Thu, 01 Apr 2021 15:56:55 -0400
-X-MC-Unique: pepbjSyCPJCDMNQ_ebwt4Q-1
-Received: by mail-wm1-f71.google.com with SMTP id b20-20020a7bc2540000b029010f7732a35fso3484006wmj.1
-        for <kvm@vger.kernel.org>; Thu, 01 Apr 2021 12:56:55 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:cc:references:from:subject:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=4B8rrR2ZlPDVkEWIjOjrV74gMnzPRF/GWjn8bfBWXkA=;
-        b=qY9TmOAeoF3dSLVfv+VJTMCZ5LHBfo56D9EkOoPLB6QwVkoii7e2KQ69vnijISX1/1
-         5txMLcZDdmjCrX9h0grI6JBL5h9J0YsUmLlfehdO5pe30/mPGUHP3jAz1XoevH4Uxv/n
-         x2WH/T+dyo3KftJoiBNfi1YDCXpZw50Bl7651g56u8SXeuJc/gzxR4s3ravymk/VmNrq
-         y8IXsTjrwpjMQd4uljLRgWaMuOm+d/FqhPFyKH0+o3PHrpV/DlrNsKnaBlKYMn4vKZkK
-         2bWhQsFSf1ZKLCDIW3n5Vw6ybOY2cvtWYFd4Gb18jbHtuv1SYwf4SHRv376MI2IE38k7
-         bEqw==
-X-Gm-Message-State: AOAM5317sypkO6ztrudgxuHLvWe9qpiYH9JS0xRYrDWEKQypHJpDzSg3
-        voUIsvTHQEZDQ58JTskT4IyOJCQiMRMa4F+UeUPAte/UHq5FGJturJA7pnBF6z0q6jMNYH69jgj
-        zrAWrj+sEvygt
-X-Received: by 2002:a05:6000:221:: with SMTP id l1mr11561495wrz.370.1617307014543;
-        Thu, 01 Apr 2021 12:56:54 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyiZ2uzEHFPKu2AQ2TtBFKkRmD/mD6mhiDw22xCxwVoWlYuBzyOZfFCCd4sEmt6QQkM2FUR/g==
-X-Received: by 2002:a05:6000:221:: with SMTP id l1mr11561454wrz.370.1617307014001;
-        Thu, 01 Apr 2021 12:56:54 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e? ([2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e])
-        by smtp.gmail.com with ESMTPSA id b12sm11950894wrf.39.2021.04.01.12.56.51
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 01 Apr 2021 12:56:53 -0700 (PDT)
-To:     Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org
-Cc:     Thomas Gleixner <tglx@linutronix.de>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Jim Mattson <jmattson@google.com>,
-        "open list:X86 ARCHITECTURE (32-BIT AND 64-BIT)" 
-        <linux-kernel@vger.kernel.org>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Joerg Roedel <joro@8bytes.org>,
-        Ingo Molnar <mingo@redhat.com>,
-        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
-        Sean Christopherson <seanjc@google.com>
-References: <20210401143817.1030695-1-mlevitsk@redhat.com>
- <20210401143817.1030695-4-mlevitsk@redhat.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH 3/4] KVM: x86: correctly merge pending and injected
- exception
-Message-ID: <c4f06a75-412c-d546-9ce7-4bf4cc49d102@redhat.com>
-Date:   Thu, 1 Apr 2021 21:56:50 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.7.0
-MIME-Version: 1.0
-In-Reply-To: <20210401143817.1030695-4-mlevitsk@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+        id S235431AbhDAUJZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 1 Apr 2021 16:09:25 -0400
+Received: from aserp2120.oracle.com ([141.146.126.78]:39114 "EHLO
+        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235441AbhDAUJY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 1 Apr 2021 16:09:24 -0400
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+        by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 131K3uBO169124;
+        Thu, 1 Apr 2021 20:09:21 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
+ subject : date : message-id : content-transfer-encoding : content-type :
+ mime-version; s=corp-2020-01-29;
+ bh=uWERgh9ZNrR2nUt3jUJqojV2/ReFRZpkHTfavMn0fSM=;
+ b=Kk9Mf988zzoTK82TbD/78PU/NUiedVZrJxIxqW1snwS4k9NQdWO2RfsF7bfmYoqjWKYm
+ hiYWEbMd+oZQAAMA1lq5ip5lHbWMnDwUbLrjjKtEtK8nRGtzaitD3WGz24FkZzaqAGkX
+ fFHkGwlGuM7nW3WPayKQheuD/g6tgHyWpnMu2lNG05ID+FUxvxFs01N5VLpxEjArn13v
+ uXrUyKmac1wy7PEOfVHdiIFQ87je6PIq0A3/by8tduy7Ujt48Qq3q9AI9ro36Xh5G15E
+ 0bdqZd4t0QqsOlEVCmnQ2htWkrBxCstRm5X+3qbJYHn0/N+YssRGaad8sag7JtfIj+gC 6A== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+        by aserp2120.oracle.com with ESMTP id 37n2akk3bn-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 01 Apr 2021 20:09:21 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+        by userp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 131K0kXc043054;
+        Thu, 1 Apr 2021 20:09:20 GMT
+Received: from nam04-co1-obe.outbound.protection.outlook.com (mail-co1nam04lp2057.outbound.protection.outlook.com [104.47.45.57])
+        by userp3020.oracle.com with ESMTP id 37n2pb03xp-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 01 Apr 2021 20:09:20 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=nprB4sMlF8ElKqXMVmf8wqwYcwZKcq4xgXE1sax34TkY9CKwolbco12R3tRQsIUU3yYp0AGHzlLDCSbWhpm4Jf/AKTWIBPPac8UorKK1UdweqhrwfBc17fJR34swuhpsucBh/9tcAGan2Iaq73quKtvUTmzZmjNuZVomzHcB1S6pTcobgthUO3Jo5R8ltYtfMQ1o2TfsrpTL1diqv7NvkBkJGmAxoCN5auHkQLTuJy/AXISQu9Y/KTCCar1qZH4MUvCgz1+WEfjmsTo+l1d3kHBr6u0ijz9HerC+vsXDofv36Fl8gCDmMoSQKFXe5WcLxA/P8kbm7qO2uKC9T2h8ww==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=uWERgh9ZNrR2nUt3jUJqojV2/ReFRZpkHTfavMn0fSM=;
+ b=MWhd1OAROeX15tue6q0TNULAiN0ntFSrtZgbpRFZlcSm1pjXSQ6+YC0hZBZoP2h2//L3nM8hfUa7BTilcfVq+8M+7k0HRgY1olFdrLI5M9l5jtqMeCl83Wn/u6eoSezGLNpf7r0uT5IOJLbBw7RmoY0IS0lnp4Idj5U527xxBYRO2UgqEgMn5mCx+cNaYftPEZWK0rO6J9M+ofarG0Cf64RpCHAf/pif64jvmrhB5f3IusVR+o6z3AtRlqDzhM4Yo9AXXpQ93tdjc6yjc/Zie7fLOet3CLp/U2/1JhTAwOMXA6KPMFOKUB22bGG9LF0L7doirfQZ7w4LgQtxSgiltQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=uWERgh9ZNrR2nUt3jUJqojV2/ReFRZpkHTfavMn0fSM=;
+ b=NxZ5D4uFWpI3x0Sc3d5/A6mZvYs0qmfeg13SINoQoJVnjDGZSE6TisCDhltDN5rNmRIxuIXn5z+Jnlt8r1DODfbpWOvTniZR0uOYIaV5htHIey1rTMDhuOq5Ebl3DcksE4QrK2USMfRL8DKUXwlWlKkvbwUDLeXeFKltDDA4PdM=
+Authentication-Results: vger.kernel.org; dkim=none (message not signed)
+ header.d=none;vger.kernel.org; dmarc=none action=none header.from=oracle.com;
+Received: from DM6PR10MB3019.namprd10.prod.outlook.com (2603:10b6:5:6f::23) by
+ DM5PR1001MB2091.namprd10.prod.outlook.com (2603:10b6:4:2c::21) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.3977.33; Thu, 1 Apr 2021 20:09:19 +0000
+Received: from DM6PR10MB3019.namprd10.prod.outlook.com
+ ([fe80::35bb:f60f:d7e1:7b2b]) by DM6PR10MB3019.namprd10.prod.outlook.com
+ ([fe80::35bb:f60f:d7e1:7b2b%3]) with mapi id 15.20.3977.033; Thu, 1 Apr 2021
+ 20:09:19 +0000
+From:   Krish Sadhukhan <krish.sadhukhan@oracle.com>
+To:     kvm@vger.kernel.org
+Cc:     pbonzini@redhat.com, jmattson@google.com, seanjc@google.com
+Subject: [PATCH 0/5 v5] KVM: nSVM: Check addresses of MSR bitmap and IO bitmap tables on vmrun of nested guests
+Date:   Thu,  1 Apr 2021 15:20:28 -0400
+Message-Id: <20210401192033.91150-1-krish.sadhukhan@oracle.com>
+X-Mailer: git-send-email 2.25.4
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [138.3.201.29]
+X-ClientProxiedBy: BYAPR21CA0015.namprd21.prod.outlook.com
+ (2603:10b6:a03:114::25) To DM6PR10MB3019.namprd10.prod.outlook.com
+ (2603:10b6:5:6f::23)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from ban25x6uut29.us.oracle.com (138.3.201.29) by BYAPR21CA0015.namprd21.prod.outlook.com (2603:10b6:a03:114::25) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4020.0 via Frontend Transport; Thu, 1 Apr 2021 20:09:17 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 9f5fb2c8-f738-4f3d-82e1-08d8f54a082f
+X-MS-TrafficTypeDiagnostic: DM5PR1001MB2091:
+X-Microsoft-Antispam-PRVS: <DM5PR1001MB2091CC8636882B46BE25162E817B9@DM5PR1001MB2091.namprd10.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:6790;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: SXmi+EigRlLkFSUi84dj+8oTB6yONzaxXe6O5c+wBGS3lLsdVo/i9xaDpeZA9u5rJv0406Q71WPlzIWHUXL3g1pwS22SmJmMEaVJWlcG3apJy6a2mdgITOmZFXzuGpKed4jHGSWqFniMxGpjgqbcn/5jAny3fSZkGeKJa5zcjd+AeiBSaJUEMI19Ut2cT3Tv0ekxpbAdRs8uCzgr0KL1tkTmvXP/zW6uOQ98siXoKk/sN5EWa6TqqUEHk1oUAD0PiszvUzyppmI7X1BUkB2OjcEjBYhMJ5o1I/WqjUWio5VL3I5aMSSSlZ1nTBElynkIEnnU5MRWppThOPFGcRki5Q3qYATtXgK3biHwQwP6kHiSWkAHBLeglAGQRacjaqraqIxIxy3/vWhIVFQM/MyhFNhFZh6dtDa6TF6bX9PXNyr4jt24QByGDhYHirDJlZpxXr8Xz+IyjFkNbW82qa1JDW0l7/QYlXNVTNfTkxDK14EgUHMZnWOhrfjNOjY/fB/tvTd8Y9zb17ZueTwcqX+0/9n58CpDlG1kyqy1aEWhep+WOmcwpJM1C4Wlld6m4TU4OZJdn2a/qhFo+ccdUXTrNCavCFXZCSUvuBBt2gq2Gco63N7chYGMrdPamoPgwC6JCe2SsQIo/FnnOzoHCF8goA==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR10MB3019.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(376002)(136003)(346002)(366004)(39860400002)(396003)(66476007)(86362001)(2616005)(66946007)(4326008)(2906002)(186003)(6486002)(6666004)(36756003)(316002)(38100700001)(8936002)(7696005)(478600001)(5660300002)(8676002)(16526019)(66556008)(83380400001)(6916009)(44832011)(956004)(26005)(1076003)(52116002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData: =?us-ascii?Q?qMi7geoCQMtIYajGiPmKYZzM+La12VJt3ZJRRoI1FXcHrO/cb6AnIa1/GWdQ?=
+ =?us-ascii?Q?gTKaNCu8n2aYv+71IE9P2TJLwo/CiTyl2FxVnl8q+gcwF8hbg5pgnmLj3muM?=
+ =?us-ascii?Q?eabTzF60TaVcUoRmD2pD87uNA/WRWJpIQraVnqq9ZaltXBrszoT8N7O6rEWe?=
+ =?us-ascii?Q?k1sM/q09g3KmiYF1DlXh6pJYzzzq092CMcKhjHm8aztLxlN7errwIpEDyhrf?=
+ =?us-ascii?Q?Q+ik81Awu3H1JJS+iQDeDZp/1nLveRSi/cjRZvoUnW443CDqW0jlqp2wJhuv?=
+ =?us-ascii?Q?PLqaCNbePAzbOGvIuhz2O4m6NYb3Ewf0rKZKm9NU+936JCPSN0n2KNzYuIHh?=
+ =?us-ascii?Q?z0AB9nAAh0TmiH3zRGdUxTFclPFrjBnbKGQsAJzTxtPgw+vbo+iF/5o6HQuA?=
+ =?us-ascii?Q?MGFkSwsM/Rpv0HwPolnwER9YO7t2UkMF9D+yXTxNTjnpTh0D43pxjwPvg+ln?=
+ =?us-ascii?Q?fmiiJMz+WJZvcEcODH62Mhvh6l5GafBGyGoeuyhiRbWxTj0B7B1FZv/fwdHY?=
+ =?us-ascii?Q?QoVvms0M2cOKw2iqXaBNAeGP+6Fi+iFYQLRlpZWkwQWAMFAhyKwpa3Gpu0lv?=
+ =?us-ascii?Q?fihGDyJ8Myal/MLFaKRuNZY/XiztVjOKwfe718+LXPlE1kCz/l2HWlbQ13gI?=
+ =?us-ascii?Q?xUNyn3F3Mn00YmU3nEQBw3W8qXsoZZxfISeRTvXu1G0mttEVxwVUs2lAUEOD?=
+ =?us-ascii?Q?WOPjkxqalGCPOgMCZW2cKrLoB27+knEW1XRUvFAs5TtwmX8nedEerTOpbX1u?=
+ =?us-ascii?Q?ljtrq6fCP6PQvbVZ43HiR0FbLo5AflxC/Vgkh9ealRy+d+HJsBweo5f+XCqm?=
+ =?us-ascii?Q?SAoUeFG4K3mIY1X6KSRXdxWUC8Yr7YBcSw0TB6DR8pMk/JyU/o8yeVYn297Q?=
+ =?us-ascii?Q?JYRAoPGvbyOio77VTqyda5Fwz3vsKYgUJGUgONM37jUwJD8xLcFByy3cEcRP?=
+ =?us-ascii?Q?ARm9Tq4mBS5T7/W2vednd4N+0IgqIvB6HTqBwY7yrr7LFQZmSMpvHMdMVx3Y?=
+ =?us-ascii?Q?xStvkjHP3Hy4w6FeFe2KaTmfLuqMifHEHPMt/dCNwXrHUxoSqUyuTcKelWYG?=
+ =?us-ascii?Q?LZZAPSiJ+Jtb5eIrwnpxlKS2cNs23mFZqQ+W3opA1EOxQOWUVcDfiwwzsZJq?=
+ =?us-ascii?Q?AGA27yvkmob/1xoovJZ0Y8R5jq3m6ZSBhB9R+wYNjMrub6Yvv0xNFI2j/7ok?=
+ =?us-ascii?Q?sC711Nmx4s6q7/jkkRJbdWT7v8aXJYUuRJ4YNBL1DDexh/zdQjqUJIT/5OuG?=
+ =?us-ascii?Q?M2527XE5RPEMn2fVYNGY+krmF2VpP6Ad80b2bfL/FJmjppBm33zBecjLfOLD?=
+ =?us-ascii?Q?NUNL+Pm6CvWlLi6CMZye88k6?=
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9f5fb2c8-f738-4f3d-82e1-08d8f54a082f
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR10MB3019.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Apr 2021 20:09:19.0099
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: NRuzPIWp6PHdy4DccuBqQ75S/KCW36m/C4BK1REI10M9mls5gaJzZbKeVNKn21/I6PZKcSli3kNjwQwH5STKg7JIH34URy+g/H5ZTc2Lcl8=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR1001MB2091
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=9941 signatures=668683
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 mlxlogscore=999
+ adultscore=0 bulkscore=0 mlxscore=0 spamscore=0 malwarescore=0
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2103310000 definitions=main-2104010128
+X-Proofpoint-ORIG-GUID: CNuQdGe6emIXG1svYnwZl9hjQRegRIVA
+X-Proofpoint-GUID: CNuQdGe6emIXG1svYnwZl9hjQRegRIVA
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=9941 signatures=668683
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0 impostorscore=0 phishscore=0
+ bulkscore=0 adultscore=0 clxscore=1015 malwarescore=0 priorityscore=1501
+ suspectscore=0 spamscore=0 mlxlogscore=999 lowpriorityscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2103310000
+ definitions=main-2104010128
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 01/04/21 16:38, Maxim Levitsky wrote:
-> +static int kvm_do_deliver_pending_exception(struct kvm_vcpu *vcpu)
-> +{
-> +	int class1, class2, ret;
-> +
-> +	/* try to deliver current pending exception as VM exit */
-> +	if (is_guest_mode(vcpu)) {
-> +		ret = kvm_x86_ops.nested_ops->deliver_exception_as_vmexit(vcpu);
-> +		if (ret || !vcpu->arch.pending_exception.valid)
-> +			return ret;
-> +	}
-> +
-> +	/* No injected exception, so just deliver the payload and inject it */
-> +	if (!vcpu->arch.injected_exception.valid) {
-> +		trace_kvm_inj_exception(vcpu->arch.pending_exception.nr,
-> +					vcpu->arch.pending_exception.has_error_code,
-> +					vcpu->arch.pending_exception.error_code);
-> +queue:
+v4 -> v5:
+        1. In patch# 1, the actual size of the MSRPM and IOPM tables are now
+	   defined. The initialization code for the tables has been adjusted
+	   accordingly.
+	2. In patch# 2, the checks have been adjusted based on the actual
+	   size of the tables. The check for IOPM has also been fixed.
+	3. In patch# 4, a new test case has been added. This new test uses
+	   an address whose last byte touched the limit of the maximum
+	   physical address.
 
-If you move the queue label to the top of the function, you can "goto queue" for #DF as well and you don't need to call kvm_do_deliver_pending_exception again.  In fact you can merge this function and kvm_deliver_pending_exception completely:
+[PATCH 1/5 v5] KVM: SVM: Define actual size of IOPM and MSRPM tables
+[PATCH 2/5 v5] nSVM: Check addresses of MSR and IO permission maps
+[PATCH 3/5 v5] KVM: nSVM: Cleanup in nested_svm_vmrun()
+[PATCH 4/5 v5] nSVM: Test addresses of MSR and IO permissions maps
+[PATCH 5/5 v5] SVM: Use ALIGN macro when aligning 'io_bitmap_area'
 
+ arch/x86/kvm/svm/nested.c | 59 +++++++++++++++++++++++++++++------------------
+ arch/x86/kvm/svm/svm.c    | 20 ++++++++--------
+ arch/x86/kvm/svm/svm.h    |  3 +++
+ 3 files changed, 50 insertions(+), 32 deletions(-)
 
-static int kvm_deliver_pending_exception_as_vmexit(struct kvm_vcpu *vcpu)
-{
-	WARN_ON(!vcpu->arch.pending_exception.valid);
-	if (is_guest_mode(vcpu))
-		return kvm_x86_ops.nested_ops->deliver_exception_as_vmexit(vcpu);
-	else
-		return 0;
-}
+Krish Sadhukhan (3):
+      KVM: SVM: Define actual size of IOPM and MSRPM tables
+      nSVM: Check addresses of MSR and IO permission maps
+      KVM: nSVM: Cleanup in nested_svm_vmrun()
 
-static int kvm_merge_injected_exception(struct kvm_vcpu *vcpu)
-{
-	/*
-	 * First check if the pending exception takes precedence
-	 * over the injected one, which will be reported in the
-	 * vmexit info.
-	 */
-	ret = kvm_deliver_pending_exception_as_vmexit(vcpu);
-	if (ret || !vcpu->arch.pending_exception.valid)
-		return ret;
+ x86/svm.c       |  2 +-
+ x86/svm_tests.c | 42 +++++++++++++++++++++++++++++++++++++++++-
+ 2 files changed, 42 insertions(+), 2 deletions(-)
 
-	if (vcpu->arch.injected_exception.nr == DF_VECTOR) {
-		...
-		return 0;
-	}
-	...
-	if ((class1 == EXCPT_CONTRIBUTORY && class2 == EXCPT_CONTRIBUTORY)
-	    || (class1 == EXCPT_PF && class2 != EXCPT_BENIGN)) {
-		...
-	}
-	vcpu->arch.injected_exception.valid = false;
-}
-
-static int kvm_deliver_pending_exception(struct kvm_vcpu *vcpu)
-{
-	if (!vcpu->arch.pending_exception.valid)
-		return 0;
-
-	if (vcpu->arch.injected_exception.valid)
-		kvm_merge_injected_exception(vcpu);
-
-	ret = kvm_deliver_pending_exception_as_vmexit(vcpu));
-	if (ret || !vcpu->arch.pending_exception.valid)
-		return ret;
-
-	trace_kvm_inj_exception(vcpu->arch.pending_exception.nr,
-				vcpu->arch.pending_exception.has_error_code,
-				vcpu->arch.pending_exception.error_code);
-	...
-}
-
-Note that if the pending exception is a page fault, its payload
-must be delivered to CR2 before converting it to a double fault.
-
-Going forward to vmx.c:
-
-> 
->  	if (mtf_pending) {
->  		if (block_nested_events)
->  			return -EBUSY;
-> +
->  		nested_vmx_update_pending_dbg(vcpu);
-
-Should this instead "WARN_ON(vmx_pending_dbg_trap(vcpu));" since
-the pending-#DB-plus-MTF combination is handled in
-vmx_deliver_exception_as_vmexit?...
-
-> 
-> +
-> +	if (vmx->nested.mtf_pending && vmx_pending_dbg_trap(vcpu)) {
-> +		/*
-> +		 * A pending monitor trap takes precedence over pending
-> +		 * debug exception which is 'stashed' into
-> +		 * 'GUEST_PENDING_DBG_EXCEPTIONS'
-> +		 */
-> +
-> +		nested_vmx_update_pending_dbg(vcpu);
-> +		vmx->nested.mtf_pending = false;
-> +		nested_vmx_vmexit(vcpu, EXIT_REASON_MONITOR_TRAP_FLAG, 0, 0);
-> +		return 0;
-> +	}
-
-... though this is quite ugly, even more so if you add the case of an
-INIT with a pending #DB.  The problem is that INIT and MTF have higher
-priority than debug exceptions.
-
-The good thing is that an INIT or MTF plus #DB cannot happen with
-nested_run_pending == 1, so it will always be inject right away.
-
-There is precedent with KVM_GET_* modifying the CPU state; in
-particular, KVM_GET_MPSTATE can modify CS and RIP and even cause a
-vmexit via kvm_apic_accept_events.  And in fact, because
-kvm_apic_accept_events calls kvm_check_nested_events, calling it
-from KVM_GET_VCPU_EVENTS would fix the problem: the injected exception
-would go into the IDT-vectored exit field, while the pending exception
-would go into GUEST_PENDING_DBG_EXCEPTION and disappear.
-
-However, you cannot do kvm_apic_accept_events twice because there would
-be a race with INIT: a #DB exception could be first stored by
-KVM_GET_VCPU_EVENTS, then disappear when kvm_apic_accept_events
-KVM_GET_MPSTATE is called.
-
-Fortunately, the correct order for KVM_GET_* events is first
-KVM_GET_VCPU_EVENTS and then KVM_GET_MPSTATE.  So perhaps
-instead of calling kvm_deliver_pending_exception on vmexit,
-KVM_GET_VCPU_EVENTS could call kvm_apic_accept_events (and thus
-kvm_check_nested_events) instead of KVM_GET_MPSTATE.  In addition:
-nested_ops.check_events would be split in two, with high-priority
-events (triple fault, now in kvm_check_nested_events; INIT; MTF)
-remaining in the first and interrupts in the second, tentatively
-named check_interrupts).
-
-I'll take a look at cleaning up the current mess we have around
-kvm_apic_accept_events, where most of the calls do not have to
-handle guest mode at all.
-
-Thanks for this work and for showing that it's possible to fix the
-underlying mess with exception vmexit.  It may be a bit more
-complicated than this, but it's a great start.
-
-Paolo
+Krish Sadhukhan (2):
+      nSVM: Test addresses of MSR and IO permissions maps
+      SVM: Use ALIGN macro when aligning 'io_bitmap_area'
 
