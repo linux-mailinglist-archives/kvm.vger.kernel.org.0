@@ -2,184 +2,97 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4ADDA351C17
-	for <lists+kvm@lfdr.de>; Thu,  1 Apr 2021 20:45:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7F34B351E91
+	for <lists+kvm@lfdr.de>; Thu,  1 Apr 2021 20:55:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236008AbhDASMv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 1 Apr 2021 14:12:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35378 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238593AbhDASJk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 1 Apr 2021 14:09:40 -0400
-Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C0CFC0225A6;
-        Thu,  1 Apr 2021 08:27:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=desiato.20200630; h=Mime-Version:Content-Type:References:
-        In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=0Rh/o3WGiI9T1gSDcX8qs2RqGvoMWR3ll+0rzFebk0M=; b=UPcRZXu87DG7BqpzN1f44UaSb2
-        Y6bGfpXgdxcWPG/2suvme6+kyRwVfhKHaVtrKTLYOoFYxfuv9ha/JXTM8DjRfMxisz2+zsTB0hMU1
-        OI8d+1BBMWmiFcU3A8xPC7xAE4E0giXUC/vnoN2SN+/WaBY58G8OKzTRUis/UBYf5v9FtaH0CqnZo
-        jivB2HleTY6JJjTzTRGUlfd8sE545gvw1PlYcPSgLt393bLysW9ZPKnz5LKOYD5Iq25Zdbq4ECMyn
-        TQpUj/PGUHvBG6SHWlDmCbXcQRyjb3OZ8OJlMsEs2PIQxXPrYmDUOXUB/uR/VrQN5iT/5OYa1DtBg
-        hU4EzkJQ==;
-Received: from dyn-234.woodhou.se ([90.155.92.234])
-        by desiato.infradead.org with esmtpsa (Exim 4.94 #2 (Red Hat Linux))
-        id 1lRzEI-00A1K8-6V; Thu, 01 Apr 2021 15:27:31 +0000
-Message-ID: <1b37ba872b4d2e6186f8e172b95c36d92153d952.camel@infradead.org>
-Subject: Re: [EXTERNAL] [PATCH 2/2] KVM: x86: disable interrupts while
- pvclock_gtod_sync_lock is taken
-From:   David Woodhouse <dwmw2@infradead.org>
-To:     Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Cc:     mtosatti@redhat.com, vkuznets@redhat.com,
-        syzbot+b282b65c2c68492df769@syzkaller.appspotmail.com
-Date:   Thu, 01 Apr 2021 16:27:29 +0100
-In-Reply-To: <20210330165958.3094759-3-pbonzini@redhat.com>
-References: <20210330165958.3094759-1-pbonzini@redhat.com>
-         <20210330165958.3094759-3-pbonzini@redhat.com>
-Content-Type: multipart/signed; micalg="sha-256";
-        protocol="application/x-pkcs7-signature";
-        boundary="=-py4ZqdinrzMRuQwZTg/A"
-X-Mailer: Evolution 3.28.5-0ubuntu0.18.04.2 
-Mime-Version: 1.0
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by desiato.infradead.org. See http://www.infradead.org/rpr.html
+        id S236454AbhDASno (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 1 Apr 2021 14:43:44 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:29287 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S237214AbhDASdD (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 1 Apr 2021 14:33:03 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1617301981;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=zV8gIwvUm/KU6YRC6HTfZNfZbn7owoKKDfoum0B8FQg=;
+        b=HOsMbCNlsc5dnN1kqa3CFueKiy/ZqlGFJP2GV688DnITeIy73HwhV9F9hi4LUD+4+vt2HD
+        vIvFxPs6QqkSS69WXlFpsKjrxBvC24tfmi/X17JLo91vCFsmFjABMzU3YbS5xWunRPVqZu
+        ojExcdzka0ZmcKmp3x8mjrrMFnAETrs=
+Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
+ [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-430-D6KiXHksP924FMNonTS-8Q-1; Thu, 01 Apr 2021 11:31:25 -0400
+X-MC-Unique: D6KiXHksP924FMNonTS-8Q-1
+Received: by mail-ed1-f70.google.com with SMTP id k8so3006512edn.19
+        for <kvm@vger.kernel.org>; Thu, 01 Apr 2021 08:31:25 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=zV8gIwvUm/KU6YRC6HTfZNfZbn7owoKKDfoum0B8FQg=;
+        b=WPzf0xdz4K2+WMWhvXl+5WBznYaure6MV+iXz19emAsuECqzFNySbSl9S4EcG5VFPq
+         7SuXhSXxGwnLRjVFVgrdnwxNMp7dJg/8ZzA6aTBBrtIpaEg3M4X0rIj9blFVw3JT9rYk
+         0CpSJi4qGBGyncXkr2X+08cRWyDDkbb+rlGCJsoopfSWMOkzDGk/Qtwj36p9/oCwcsHJ
+         Cjf6A59tB2CQs8ces0XXTRJL7YWBAJEWNjJATDuqKC5vDDIphxd7im4C1iPS8TKeWouW
+         yJQrxyLghxykWlgpWliOiKtS8i8fbVYuHfAcBmcZDRdML6/+/G6u38L3TjLCq395jtES
+         udFA==
+X-Gm-Message-State: AOAM5334Bu7ZkPQNmi0Bdoo8vvEj8STBg6Y6ZtJmK7VRUlTGP4CNwfWj
+        7AhNd9zBW7NCWyqQaOdgru9NuIHqFxAqK1wmkqD1e1dztLpOy76hgvU8jSsOATp2pKIHdF/VWOn
+        rCL2fa0ebgeeD
+X-Received: by 2002:a17:907:76b3:: with SMTP id jw19mr9506193ejc.202.1617291084874;
+        Thu, 01 Apr 2021 08:31:24 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJw2OyaXOnqsMAdV9O9/OpOj49/Etytctob8p7D5zvVV46D//28nISt7Li1rmBfAywC50ToRKA==
+X-Received: by 2002:a17:907:76b3:: with SMTP id jw19mr9506170ejc.202.1617291084698;
+        Thu, 01 Apr 2021 08:31:24 -0700 (PDT)
+Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id a17sm2918642ejf.20.2021.04.01.08.31.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 01 Apr 2021 08:31:24 -0700 (PDT)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org
+Cc:     Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        "open list:X86 ARCHITECTURE (32-BIT AND 64-BIT)" 
+        <linux-kernel@vger.kernel.org>, "H. Peter Anvin" <hpa@zytor.com>,
+        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Borislav Petkov <bp@alien8.de>,
+        Sean Christopherson <seanjc@google.com>,
+        Joerg Roedel <joro@8bytes.org>
+Subject: Re: [PATCH v2 2/2] KVM: nSVM: improve SYSENTER emulation on AMD
+In-Reply-To: <6f138606-d6c3-d332-9dc2-9ba4796fd4ce@redhat.com>
+References: <20210401111928.996871-1-mlevitsk@redhat.com>
+ <20210401111928.996871-3-mlevitsk@redhat.com>
+ <87h7kqrwb2.fsf@vitty.brq.redhat.com>
+ <6f138606-d6c3-d332-9dc2-9ba4796fd4ce@redhat.com>
+Date:   Thu, 01 Apr 2021 17:31:23 +0200
+Message-ID: <87zgyic984.fsf@vitty.brq.redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Paolo Bonzini <pbonzini@redhat.com> writes:
 
---=-py4ZqdinrzMRuQwZTg/A
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+> On 01/04/21 15:03, Vitaly Kuznetsov wrote:
+>>> +		svm->sysenter_eip_hi = guest_cpuid_is_intel(vcpu) ? (data >> 32) : 0;
+>> 
+>> (Personal taste) I'd suggest we keep the whole 'sysenter_eip'/'sysenter_esp'
+>> even if we only use the upper 32 bits of it. That would reduce the code
+>> churn a little bit (no need to change 'struct vcpu_svm').
+>
+> Would there really be less changes?  Consider that you'd have to look at 
+> the VMCB anyway because svm_get_msr can be reached not just for guest 
+> RDMSR but also for ioctls.
+>
 
-On Tue, 2021-03-30 at 12:59 -0400, Paolo Bonzini wrote:
-> @@ -2686,13 +2688,13 @@ static int kvm_guest_time_update(struct
-> kvm_vcpu *v)
->          * If the host uses TSC clock, then passthrough TSC as stable
->          * to the guest.
->          */
-> -       spin_lock(&ka->pvclock_gtod_sync_lock);
-> +       spin_lock_irqsave(&ka->pvclock_gtod_sync_lock, flags);
->         use_master_clock =3D ka->use_master_clock;
->         if (use_master_clock) {
->                 host_tsc =3D ka->master_cycle_now;
->                 kernel_ns =3D ka->master_kernel_ns;
->         }
-> -       spin_unlock(&ka->pvclock_gtod_sync_lock);
-> +       spin_unlock_irqrestore(&ka->pvclock_gtod_sync_lock, flags);
->=20
->         /* Keep irq disabled to prevent changes to the clock */
->         local_irq_save(flags);
+I was thinking about the hunk in arch/x86/kvm/svm/svm.h tweaking
+vcpu_svm. My opinion is not strong at all here)
 
-That seems a little gratuitous at the end; restoring the flags as part
-of the spin_unlock_irqrestore() and then immediately calling
-local_irq_save().
-
-Is something going to complain if we just use spin_unlock() there and
-then later restore the flags with the existing local_irq_restore()?
-
-Or should we move the local_irq_save() up above the existing
-spin_lock() and leave the spin lock/unlock as they are?
-
---=-py4ZqdinrzMRuQwZTg/A
-Content-Type: application/x-pkcs7-signature; name="smime.p7s"
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Transfer-Encoding: base64
-
-MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCECow
-ggUcMIIEBKADAgECAhEA4rtJSHkq7AnpxKUY8ZlYZjANBgkqhkiG9w0BAQsFADCBlzELMAkGA1UE
-BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgG
-A1UEChMRQ09NT0RPIENBIExpbWl0ZWQxPTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhl
-bnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1haWwgQ0EwHhcNMTkwMTAyMDAwMDAwWhcNMjIwMTAxMjM1
-OTU5WjAkMSIwIAYJKoZIhvcNAQkBFhNkd213MkBpbmZyYWRlYWQub3JnMIIBIjANBgkqhkiG9w0B
-AQEFAAOCAQ8AMIIBCgKCAQEAsv3wObLTCbUA7GJqKj9vHGf+Fa+tpkO+ZRVve9EpNsMsfXhvFpb8
-RgL8vD+L133wK6csYoDU7zKiAo92FMUWaY1Hy6HqvVr9oevfTV3xhB5rQO1RHJoAfkvhy+wpjo7Q
-cXuzkOpibq2YurVStHAiGqAOMGMXhcVGqPuGhcVcVzVUjsvEzAV9Po9K2rpZ52FE4rDkpDK1pBK+
-uOAyOkgIg/cD8Kugav5tyapydeWMZRJQH1vMQ6OVT24CyAn2yXm2NgTQMS1mpzStP2ioPtTnszIQ
-Ih7ASVzhV6csHb8Yrkx8mgllOyrt9Y2kWRRJFm/FPRNEurOeNV6lnYAXOymVJwIDAQABo4IB0zCC
-Ac8wHwYDVR0jBBgwFoAUgq9sjPjF/pZhfOgfPStxSF7Ei8AwHQYDVR0OBBYEFLfuNf820LvaT4AK
-xrGK3EKx1DE7MA4GA1UdDwEB/wQEAwIFoDAMBgNVHRMBAf8EAjAAMB0GA1UdJQQWMBQGCCsGAQUF
-BwMEBggrBgEFBQcDAjBGBgNVHSAEPzA9MDsGDCsGAQQBsjEBAgEDBTArMCkGCCsGAQUFBwIBFh1o
-dHRwczovL3NlY3VyZS5jb21vZG8ubmV0L0NQUzBaBgNVHR8EUzBRME+gTaBLhklodHRwOi8vY3Js
-LmNvbW9kb2NhLmNvbS9DT01PRE9SU0FDbGllbnRBdXRoZW50aWNhdGlvbmFuZFNlY3VyZUVtYWls
-Q0EuY3JsMIGLBggrBgEFBQcBAQR/MH0wVQYIKwYBBQUHMAKGSWh0dHA6Ly9jcnQuY29tb2RvY2Eu
-Y29tL0NPTU9ET1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcnQwJAYI
-KwYBBQUHMAGGGGh0dHA6Ly9vY3NwLmNvbW9kb2NhLmNvbTAeBgNVHREEFzAVgRNkd213MkBpbmZy
-YWRlYWQub3JnMA0GCSqGSIb3DQEBCwUAA4IBAQALbSykFusvvVkSIWttcEeifOGGKs7Wx2f5f45b
-nv2ghcxK5URjUvCnJhg+soxOMoQLG6+nbhzzb2rLTdRVGbvjZH0fOOzq0LShq0EXsqnJbbuwJhK+
-PnBtqX5O23PMHutP1l88AtVN+Rb72oSvnD+dK6708JqqUx2MAFLMevrhJRXLjKb2Mm+/8XBpEw+B
-7DisN4TMlLB/d55WnT9UPNHmQ+3KFL7QrTO8hYExkU849g58Dn3Nw3oCbMUgny81ocrLlB2Z5fFG
-Qu1AdNiBA+kg/UxzyJZpFbKfCITd5yX49bOriL692aMVDyqUvh8fP+T99PqorH4cIJP6OxSTdxKM
-MIIFHDCCBASgAwIBAgIRAOK7SUh5KuwJ6cSlGPGZWGYwDQYJKoZIhvcNAQELBQAwgZcxCzAJBgNV
-BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAY
-BgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMT0wOwYDVQQDEzRDT01PRE8gUlNBIENsaWVudCBBdXRo
-ZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTE5MDEwMjAwMDAwMFoXDTIyMDEwMTIz
-NTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCASIwDQYJKoZIhvcN
-AQEBBQADggEPADCCAQoCggEBALL98Dmy0wm1AOxiaio/bxxn/hWvraZDvmUVb3vRKTbDLH14bxaW
-/EYC/Lw/i9d98CunLGKA1O8yogKPdhTFFmmNR8uh6r1a/aHr301d8YQea0DtURyaAH5L4cvsKY6O
-0HF7s5DqYm6tmLq1UrRwIhqgDjBjF4XFRqj7hoXFXFc1VI7LxMwFfT6PStq6WedhROKw5KQytaQS
-vrjgMjpICIP3A/CroGr+bcmqcnXljGUSUB9bzEOjlU9uAsgJ9sl5tjYE0DEtZqc0rT9oqD7U57My
-ECIewElc4VenLB2/GK5MfJoJZTsq7fWNpFkUSRZvxT0TRLqznjVepZ2AFzsplScCAwEAAaOCAdMw
-ggHPMB8GA1UdIwQYMBaAFIKvbIz4xf6WYXzoHz0rcUhexIvAMB0GA1UdDgQWBBS37jX/NtC72k+A
-CsaxitxCsdQxOzAOBgNVHQ8BAf8EBAMCBaAwDAYDVR0TAQH/BAIwADAdBgNVHSUEFjAUBggrBgEF
-BQcDBAYIKwYBBQUHAwIwRgYDVR0gBD8wPTA7BgwrBgEEAbIxAQIBAwUwKzApBggrBgEFBQcCARYd
-aHR0cHM6Ly9zZWN1cmUuY29tb2RvLm5ldC9DUFMwWgYDVR0fBFMwUTBPoE2gS4ZJaHR0cDovL2Ny
-bC5jb21vZG9jYS5jb20vQ09NT0RPUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFp
-bENBLmNybDCBiwYIKwYBBQUHAQEEfzB9MFUGCCsGAQUFBzAChklodHRwOi8vY3J0LmNvbW9kb2Nh
-LmNvbS9DT01PRE9SU0FDbGllbnRBdXRoZW50aWNhdGlvbmFuZFNlY3VyZUVtYWlsQ0EuY3J0MCQG
-CCsGAQUFBzABhhhodHRwOi8vb2NzcC5jb21vZG9jYS5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
-cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAC20spBbrL71ZEiFrbXBHonzhhirO1sdn+X+O
-W579oIXMSuVEY1LwpyYYPrKMTjKECxuvp24c829qy03UVRm742R9Hzjs6tC0oatBF7KpyW27sCYS
-vj5wbal+TttzzB7rT9ZfPALVTfkW+9qEr5w/nSuu9PCaqlMdjABSzHr64SUVy4ym9jJvv/FwaRMP
-gew4rDeEzJSwf3eeVp0/VDzR5kPtyhS+0K0zvIWBMZFPOPYOfA59zcN6AmzFIJ8vNaHKy5QdmeXx
-RkLtQHTYgQPpIP1Mc8iWaRWynwiE3ecl+PWzq4i+vdmjFQ8qlL4fHz/k/fT6qKx+HCCT+jsUk3cS
-jDCCBeYwggPOoAMCAQICEGqb4Tg7/ytrnwHV2binUlYwDQYJKoZIhvcNAQEMBQAwgYUxCzAJBgNV
-BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAY
-BgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMSswKQYDVQQDEyJDT01PRE8gUlNBIENlcnRpZmljYXRp
-b24gQXV0aG9yaXR5MB4XDTEzMDExMDAwMDAwMFoXDTI4MDEwOTIzNTk1OVowgZcxCzAJBgNVBAYT
-AkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAYBgNV
-BAoTEUNPTU9ETyBDQSBMaW1pdGVkMT0wOwYDVQQDEzRDT01PRE8gUlNBIENsaWVudCBBdXRoZW50
-aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
-AQEAvrOeV6wodnVAFsc4A5jTxhh2IVDzJXkLTLWg0X06WD6cpzEup/Y0dtmEatrQPTRI5Or1u6zf
-+bGBSyD9aH95dDSmeny1nxdlYCeXIoymMv6pQHJGNcIDpFDIMypVpVSRsivlJTRENf+RKwrB6vcf
-WlP8dSsE3Rfywq09N0ZfxcBa39V0wsGtkGWC+eQKiz4pBZYKjrc5NOpG9qrxpZxyb4o4yNNwTqza
-aPpGRqXB7IMjtf7tTmU2jqPMLxFNe1VXj9XB1rHvbRikw8lBoNoSWY66nJN/VCJv5ym6Q0mdCbDK
-CMPybTjoNCQuelc0IAaO4nLUXk0BOSxSxt8kCvsUtQIDAQABo4IBPDCCATgwHwYDVR0jBBgwFoAU
-u69+Aj36pvE8hI6t7jiY7NkyMtQwHQYDVR0OBBYEFIKvbIz4xf6WYXzoHz0rcUhexIvAMA4GA1Ud
-DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMBEGA1UdIAQKMAgwBgYEVR0gADBMBgNVHR8E
-RTBDMEGgP6A9hjtodHRwOi8vY3JsLmNvbW9kb2NhLmNvbS9DT01PRE9SU0FDZXJ0aWZpY2F0aW9u
-QXV0aG9yaXR5LmNybDBxBggrBgEFBQcBAQRlMGMwOwYIKwYBBQUHMAKGL2h0dHA6Ly9jcnQuY29t
-b2RvY2EuY29tL0NPTU9ET1JTQUFkZFRydXN0Q0EuY3J0MCQGCCsGAQUFBzABhhhodHRwOi8vb2Nz
-cC5jb21vZG9jYS5jb20wDQYJKoZIhvcNAQEMBQADggIBAHhcsoEoNE887l9Wzp+XVuyPomsX9vP2
-SQgG1NgvNc3fQP7TcePo7EIMERoh42awGGsma65u/ITse2hKZHzT0CBxhuhb6txM1n/y78e/4ZOs
-0j8CGpfb+SJA3GaBQ+394k+z3ZByWPQedXLL1OdK8aRINTsjk/H5Ns77zwbjOKkDamxlpZ4TKSDM
-KVmU/PUWNMKSTvtlenlxBhh7ETrN543j/Q6qqgCWgWuMAXijnRglp9fyadqGOncjZjaaSOGTTFB+
-E2pvOUtY+hPebuPtTbq7vODqzCM6ryEhNhzf+enm0zlpXK7q332nXttNtjv7VFNYG+I31gnMrwfH
-M5tdhYF/8v5UY5g2xANPECTQdu9vWPoqNSGDt87b3gXb1AiGGaI06vzgkejL580ul+9hz9D0S0U4
-jkhJiA7EuTecP/CFtR72uYRBcunwwH3fciPjviDDAI9SnC/2aPY8ydehzuZutLbZdRJ5PDEJM/1t
-yZR2niOYihZ+FCbtf3D9mB12D4ln9icgc7CwaxpNSCPt8i/GqK2HsOgkL3VYnwtx7cJUmpvVdZ4o
-gnzgXtgtdk3ShrtOS1iAN2ZBXFiRmjVzmehoMof06r1xub+85hFQzVxZx5/bRaTKTlL8YXLI8nAb
-R9HWdFqzcOoB/hxfEyIQpx9/s81rgzdEZOofSlZHynoSMYIDyjCCA8YCAQEwga0wgZcxCzAJBgNV
-BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAY
-BgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMT0wOwYDVQQDEzRDT01PRE8gUlNBIENsaWVudCBBdXRo
-ZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA4rtJSHkq7AnpxKUY8ZlYZjANBglghkgB
-ZQMEAgEFAKCCAe0wGAYJKoZIhvcNAQkDMQsGCSqGSIb3DQEHATAcBgkqhkiG9w0BCQUxDxcNMjEw
-NDAxMTUyNzI5WjAvBgkqhkiG9w0BCQQxIgQgTJVinczhpmJkBGTSot9dQCMGbwqmfbgyY+xlJzA3
-U4Ywgb4GCSsGAQQBgjcQBDGBsDCBrTCBlzELMAkGA1UEBhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIg
-TWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgGA1UEChMRQ09NT0RPIENBIExpbWl0ZWQx
-PTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhlbnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1h
-aWwgQ0ECEQDiu0lIeSrsCenEpRjxmVhmMIHABgsqhkiG9w0BCRACCzGBsKCBrTCBlzELMAkGA1UE
-BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgG
-A1UEChMRQ09NT0RPIENBIExpbWl0ZWQxPTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhl
-bnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1haWwgQ0ECEQDiu0lIeSrsCenEpRjxmVhmMA0GCSqGSIb3
-DQEBAQUABIIBAB3jF3FmJMvMAH1aRGwBJF3mWY/scHhoBjRz7nSjzXmYnhY83mewy5GVhNOOZPUv
-XTvId5CiResozLrTEoiz3bJzqdFgoMQPFLvCOEGLKVA94QjctJTQDE2+cRZmRHiocD51rktm3RaH
-/fbP0+FMtr6fuP5eHswH8/AePez6DngkiNRrOhpWUEujpaXjl72PpEHUg8fNQxBp7mIMuzuaf9e2
-vUVbtY4wS1GFwCxAr4QulFyp15kVIJOt/SZD+KwC4fe17mmNZomLseoviX6Z5faM7P225iwujkt9
-8K0td2luG0FynXZvCtetFBgtemr/ZeBxJzM3OfJJdQZ3+tWady8AAAAAAAA=
-
-
---=-py4ZqdinrzMRuQwZTg/A--
+-- 
+Vitaly
 
