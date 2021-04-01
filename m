@@ -2,311 +2,458 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DF53035196F
-	for <lists+kvm@lfdr.de>; Thu,  1 Apr 2021 20:02:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 972BE351A35
+	for <lists+kvm@lfdr.de>; Thu,  1 Apr 2021 20:04:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235951AbhDARxf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 1 Apr 2021 13:53:35 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:54843 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S236708AbhDARrJ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 1 Apr 2021 13:47:09 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1617299228;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=xgaCLmzhVP8BWkI8VaMq4SbWTSTLRgyQeKwSSE2Q0Jw=;
-        b=FqmuWT/nrIdQhSWhecJlUVVehMn9Z+A/B5gFwXITuhPGmM8EzVzNx2JhDiOs3aUn1icfCq
-        0hxpeX3RmWjOG18puoLFQ4K2Up1JiOz7bTJKMjhyFb3ZsRg9z88pxaXTRCI8J1fSTgBroe
-        xWewW/cPERWfQ6uWgEiR4XomPrCv1+A=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-476-tq8aRKXoPX24TlKSLyD0VA-1; Thu, 01 Apr 2021 10:46:16 -0400
-X-MC-Unique: tq8aRKXoPX24TlKSLyD0VA-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 942F910055C3;
-        Thu,  1 Apr 2021 14:45:54 +0000 (UTC)
-Received: from localhost.localdomain (unknown [10.35.206.58])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 4F9595C649;
-        Thu,  1 Apr 2021 14:45:52 +0000 (UTC)
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     qemu-devel@nongnu.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Eduardo Habkost <ehabkost@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>, kvm@vger.kernel.org,
-        Richard Henderson <richard.henderson@linaro.org>,
-        Maxim Levitsky <mlevitsk@redhat.com>
-Subject: [PATCH 2/2] KVM: use KVM_{GET|SET}_SREGS2 when supported by kvm.
-Date:   Thu,  1 Apr 2021 17:45:45 +0300
-Message-Id: <20210401144545.1031704-3-mlevitsk@redhat.com>
-In-Reply-To: <20210401144545.1031704-1-mlevitsk@redhat.com>
-References: <20210401144545.1031704-1-mlevitsk@redhat.com>
+        id S236791AbhDAR6k (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 1 Apr 2021 13:58:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33010 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S236731AbhDARzM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 1 Apr 2021 13:55:12 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 698F1C02D570;
+        Thu,  1 Apr 2021 08:53:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
+        :Reply-To:Content-Type:Content-ID:Content-Description;
+        bh=Mcd9YKStQwtPRlA/IOVvOPHTAIrb/F5XzcvQ6yKGdKs=; b=MCEBW6j2RAqoHmWQRBSWlcGrXZ
+        12/MxNejbltQ/ANTTDDkuzYtxy9us8FV3WNUT+jQLUwfPdUq6fDbrjdJ8yanyTtWou94ZsXy7B8b3
+        ro9eoGZ49oW0aS0J7rGmo0DtDlibRKDsoW066YGiJNeULMuRrXOkOYDAfro1HTfjO9q0omE7+iLjs
+        HLNwz/IS9bNh9NM321qcEHoWh1qX9H0EUofNXYi2F6nEv0MODkepsAz06Olu/LynDJGtxw2B6zjpI
+        E/gpBLeVjhSvhRTCK9nTYVbkli8TyrCDP6Zrfq2I8FPLjW1CtX33BvMtcz6GN7jAzxR0KvNMwxpx8
+        kh7gSwVw==;
+Received: from [2001:4bb8:180:7517:83e4:a809:b0aa:ca74] (helo=localhost)
+        by bombadil.infradead.org with esmtpsa (Exim 4.94 #2 (Red Hat Linux))
+        id 1lRzdN-00Cib9-IH; Thu, 01 Apr 2021 15:53:26 +0000
+From:   Christoph Hellwig <hch@lst.de>
+To:     Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
+        Li Yang <leoyang.li@nxp.com>
+Cc:     Michael Ellerman <mpe@ellerman.id.au>,
+        David Woodhouse <dwmw2@infradead.org>,
+        Lu Baolu <baolu.lu@linux.intel.com>,
+        linuxppc-dev@lists.ozlabs.org, linux-arm-msm@vger.kernel.org,
+        dri-devel@lists.freedesktop.org, freedreno@lists.freedesktop.org,
+        iommu@lists.linux-foundation.org,
+        linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
+Subject: [PATCH 06/20] iommu/fsl_pamu: remove ->domain_window_enable
+Date:   Thu,  1 Apr 2021 17:52:42 +0200
+Message-Id: <20210401155256.298656-7-hch@lst.de>
+X-Mailer: git-send-email 2.30.1
+In-Reply-To: <20210401155256.298656-1-hch@lst.de>
+References: <20210401155256.298656-1-hch@lst.de>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This allows qemu to make PDPTRs be part of the migration
-stream and thus not reload them after a migration which
-is against X86 spec.
+The only thing that fsl_pamu_window_enable does for the current caller
+is to fill in the prot value in the only dma_window structure, and to
+propagate a few values from the iommu_domain_geometry struture into the
+dma_window.  Remove the dma_window entirely, hardcode the prot value and
+otherwise use the iommu_domain_geometry structure instead.
 
-Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+Remove the now unused ->domain_window_enable iommu method.
+
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+Acked-by: Li Yang <leoyang.li@nxp.com>
 ---
- accel/kvm/kvm-all.c   |   4 ++
- include/sysemu/kvm.h  |   4 ++
- target/i386/cpu.h     |   1 +
- target/i386/kvm/kvm.c | 101 +++++++++++++++++++++++++++++++++++++++++-
- target/i386/machine.c |  33 ++++++++++++++
- 5 files changed, 141 insertions(+), 2 deletions(-)
+ drivers/iommu/fsl_pamu_domain.c     | 182 +++-------------------------
+ drivers/iommu/fsl_pamu_domain.h     |  15 ---
+ drivers/iommu/iommu.c               |  11 --
+ drivers/soc/fsl/qbman/qman_portal.c |   7 --
+ include/linux/iommu.h               |  17 ---
+ 5 files changed, 14 insertions(+), 218 deletions(-)
 
-diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-index b6d9f92f15..082b791b01 100644
---- a/accel/kvm/kvm-all.c
-+++ b/accel/kvm/kvm-all.c
-@@ -142,6 +142,7 @@ bool kvm_msi_via_irqfd_allowed;
- bool kvm_gsi_routing_allowed;
- bool kvm_gsi_direct_mapping;
- bool kvm_allowed;
-+bool kvm_sregs2;
- bool kvm_readonly_mem_allowed;
- bool kvm_vm_attributes_allowed;
- bool kvm_direct_msi_allowed;
-@@ -2186,6 +2187,9 @@ static int kvm_init(MachineState *ms)
-     kvm_ioeventfd_any_length_allowed =
-         (kvm_check_extension(s, KVM_CAP_IOEVENTFD_ANY_LENGTH) > 0);
+diff --git a/drivers/iommu/fsl_pamu_domain.c b/drivers/iommu/fsl_pamu_domain.c
+index e6bdd38fc18409..689035e9d40955 100644
+--- a/drivers/iommu/fsl_pamu_domain.c
++++ b/drivers/iommu/fsl_pamu_domain.c
+@@ -54,34 +54,18 @@ static int __init iommu_init_mempool(void)
+ 	return 0;
+ }
  
-+    kvm_sregs2 =
-+        (kvm_check_extension(s, KVM_CAP_SREGS2) > 0);
+-static phys_addr_t get_phys_addr(struct fsl_dma_domain *dma_domain, dma_addr_t iova)
+-{
+-	struct dma_window *win_ptr = &dma_domain->win_arr[0];
+-	struct iommu_domain_geometry *geom;
+-
+-	geom = &dma_domain->iommu_domain.geometry;
+-
+-	if (win_ptr->valid)
+-		return win_ptr->paddr + (iova & (win_ptr->size - 1));
+-
+-	return 0;
+-}
+-
+ /* Map the DMA window corresponding to the LIODN */
+ static int map_liodn(int liodn, struct fsl_dma_domain *dma_domain)
+ {
+ 	int ret;
+-	struct dma_window *wnd = &dma_domain->win_arr[0];
+-	phys_addr_t wnd_addr = dma_domain->iommu_domain.geometry.aperture_start;
++	struct iommu_domain_geometry *geom = &dma_domain->iommu_domain.geometry;
+ 	unsigned long flags;
+ 
+ 	spin_lock_irqsave(&iommu_lock, flags);
+-	ret = pamu_config_ppaace(liodn, wnd_addr,
+-				 wnd->size,
+-				 ~(u32)0,
+-				 wnd->paddr >> PAMU_PAGE_SHIFT,
+-				 dma_domain->snoop_id, dma_domain->stash_id,
+-				 wnd->prot);
++	ret = pamu_config_ppaace(liodn, geom->aperture_start,
++				 geom->aperture_end + 1, ~(u32)0,
++				 0, dma_domain->snoop_id, dma_domain->stash_id,
++				 PAACE_AP_PERMS_QUERY | PAACE_AP_PERMS_UPDATE);
+ 	spin_unlock_irqrestore(&iommu_lock, flags);
+ 	if (ret)
+ 		pr_debug("PAACE configuration failed for liodn %d\n", liodn);
+@@ -89,33 +73,6 @@ static int map_liodn(int liodn, struct fsl_dma_domain *dma_domain)
+ 	return ret;
+ }
+ 
+-/* Update window/subwindow mapping for the LIODN */
+-static int update_liodn(int liodn, struct fsl_dma_domain *dma_domain, u32 wnd_nr)
+-{
+-	int ret;
+-	struct dma_window *wnd = &dma_domain->win_arr[wnd_nr];
+-	phys_addr_t wnd_addr;
+-	unsigned long flags;
+-
+-	spin_lock_irqsave(&iommu_lock, flags);
+-
+-	wnd_addr = dma_domain->iommu_domain.geometry.aperture_start;
+-
+-	ret = pamu_config_ppaace(liodn, wnd_addr,
+-				 wnd->size,
+-				 ~(u32)0,
+-				 wnd->paddr >> PAMU_PAGE_SHIFT,
+-				 dma_domain->snoop_id, dma_domain->stash_id,
+-				 wnd->prot);
+-	if (ret)
+-		pr_debug("Window reconfiguration failed for liodn %d\n",
+-			 liodn);
+-
+-	spin_unlock_irqrestore(&iommu_lock, flags);
+-
+-	return ret;
+-}
+-
+ static int update_liodn_stash(int liodn, struct fsl_dma_domain *dma_domain,
+ 			      u32 val)
+ {
+@@ -172,26 +129,6 @@ static int pamu_set_liodn(int liodn, struct device *dev,
+ 	return ret;
+ }
+ 
+-static int check_size(u64 size, dma_addr_t iova)
+-{
+-	/*
+-	 * Size must be a power of two and at least be equal
+-	 * to PAMU page size.
+-	 */
+-	if ((size & (size - 1)) || size < PAMU_PAGE_SIZE) {
+-		pr_debug("Size too small or not a power of two\n");
+-		return -EINVAL;
+-	}
+-
+-	/* iova must be page size aligned */
+-	if (iova & (size - 1)) {
+-		pr_debug("Address is not aligned with window size\n");
+-		return -EINVAL;
+-	}
+-
+-	return 0;
+-}
+-
+ static void remove_device_ref(struct device_domain_info *info)
+ {
+ 	unsigned long flags;
+@@ -257,13 +194,10 @@ static void attach_device(struct fsl_dma_domain *dma_domain, int liodn, struct d
+ static phys_addr_t fsl_pamu_iova_to_phys(struct iommu_domain *domain,
+ 					 dma_addr_t iova)
+ {
+-	struct fsl_dma_domain *dma_domain = to_fsl_dma_domain(domain);
+-
+ 	if (iova < domain->geometry.aperture_start ||
+ 	    iova > domain->geometry.aperture_end)
+ 		return 0;
+-
+-	return get_phys_addr(dma_domain, iova);
++	return iova;
+ }
+ 
+ static bool fsl_pamu_capable(enum iommu_cap cap)
+@@ -279,7 +213,6 @@ static void fsl_pamu_domain_free(struct iommu_domain *domain)
+ 	detach_device(NULL, dma_domain);
+ 
+ 	dma_domain->enabled = 0;
+-	dma_domain->mapped = 0;
+ 
+ 	kmem_cache_free(fsl_pamu_domain_cache, dma_domain);
+ }
+@@ -323,84 +256,6 @@ static int update_domain_stash(struct fsl_dma_domain *dma_domain, u32 val)
+ 	return ret;
+ }
+ 
+-/* Update domain mappings for all LIODNs associated with the domain */
+-static int update_domain_mapping(struct fsl_dma_domain *dma_domain, u32 wnd_nr)
+-{
+-	struct device_domain_info *info;
+-	int ret = 0;
+-
+-	list_for_each_entry(info, &dma_domain->devices, link) {
+-		ret = update_liodn(info->liodn, dma_domain, wnd_nr);
+-		if (ret)
+-			break;
+-	}
+-	return ret;
+-}
+-
+-
+-static int fsl_pamu_window_enable(struct iommu_domain *domain, u32 wnd_nr,
+-				  phys_addr_t paddr, u64 size, int prot)
+-{
+-	struct fsl_dma_domain *dma_domain = to_fsl_dma_domain(domain);
+-	struct dma_window *wnd;
+-	int pamu_prot = 0;
+-	int ret;
+-	unsigned long flags;
+-	u64 win_size;
+-
+-	if (prot & IOMMU_READ)
+-		pamu_prot |= PAACE_AP_PERMS_QUERY;
+-	if (prot & IOMMU_WRITE)
+-		pamu_prot |= PAACE_AP_PERMS_UPDATE;
+-
+-	spin_lock_irqsave(&dma_domain->domain_lock, flags);
+-	if (wnd_nr > 0) {
+-		pr_debug("Invalid window index\n");
+-		spin_unlock_irqrestore(&dma_domain->domain_lock, flags);
+-		return -EINVAL;
+-	}
+-
+-	win_size = (domain->geometry.aperture_end + 1) >> ilog2(1);
+-	if (size > win_size) {
+-		pr_debug("Invalid window size\n");
+-		spin_unlock_irqrestore(&dma_domain->domain_lock, flags);
+-		return -EINVAL;
+-	}
+-
+-	if (dma_domain->enabled) {
+-		pr_debug("Disable the window before updating the mapping\n");
+-		spin_unlock_irqrestore(&dma_domain->domain_lock, flags);
+-		return -EBUSY;
+-	}
+-
+-	ret = check_size(size, domain->geometry.aperture_start);
+-	if (ret) {
+-		pr_debug("Aperture start not aligned to the size\n");
+-		spin_unlock_irqrestore(&dma_domain->domain_lock, flags);
+-		return -EINVAL;
+-	}
+-
+-	wnd = &dma_domain->win_arr[wnd_nr];
+-	if (!wnd->valid) {
+-		wnd->paddr = paddr;
+-		wnd->size = size;
+-		wnd->prot = pamu_prot;
+-
+-		ret = update_domain_mapping(dma_domain, wnd_nr);
+-		if (!ret) {
+-			wnd->valid = 1;
+-			dma_domain->mapped++;
+-		}
+-	} else {
+-		pr_debug("Disable the window before updating the mapping\n");
+-		ret = -EBUSY;
+-	}
+-
+-	spin_unlock_irqrestore(&dma_domain->domain_lock, flags);
+-
+-	return ret;
+-}
+-
+ /*
+  * Attach the LIODN to the DMA domain and configure the geometry
+  * and window mappings.
+@@ -434,15 +289,14 @@ static int handle_attach_device(struct fsl_dma_domain *dma_domain,
+ 				     &domain->geometry);
+ 		if (ret)
+ 			break;
+-		if (dma_domain->mapped) {
+-			/*
+-			 * Create window/subwindow mapping for
+-			 * the LIODN.
+-			 */
+-			ret = map_liodn(liodn[i], dma_domain);
+-			if (ret)
+-				break;
+-		}
 +
-     kvm_state = s;
++		/*
++		 * Create window/subwindow mapping for
++		 * the LIODN.
++		 */
++		ret = map_liodn(liodn[i], dma_domain);
++		if (ret)
++			break;
+ 	}
+ 	spin_unlock_irqrestore(&dma_domain->domain_lock, flags);
  
-     ret = kvm_arch_init(ms, s);
-diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
-index a1ab1ee12d..b3d4538c55 100644
---- a/include/sysemu/kvm.h
-+++ b/include/sysemu/kvm.h
-@@ -32,6 +32,7 @@
- #ifdef CONFIG_KVM_IS_POSSIBLE
+@@ -552,13 +406,6 @@ static int configure_domain_dma_state(struct fsl_dma_domain *dma_domain, bool en
+ 	int ret;
  
- extern bool kvm_allowed;
-+extern bool kvm_sregs2;
- extern bool kvm_kernel_irqchip;
- extern bool kvm_split_irqchip;
- extern bool kvm_async_interrupts_allowed;
-@@ -139,6 +140,9 @@ extern bool kvm_msi_use_devid;
-  */
- #define kvm_gsi_direct_mapping() (kvm_gsi_direct_mapping)
+ 	spin_lock_irqsave(&dma_domain->domain_lock, flags);
+-
+-	if (enable && !dma_domain->mapped) {
+-		pr_debug("Can't enable DMA domain without valid mapping\n");
+-		spin_unlock_irqrestore(&dma_domain->domain_lock, flags);
+-		return -ENODEV;
+-	}
+-
+ 	dma_domain->enabled = enable;
+ 	list_for_each_entry(info, &dma_domain->devices, link) {
+ 		ret = (enable) ? pamu_enable_liodn(info->liodn) :
+@@ -717,7 +564,6 @@ static const struct iommu_ops fsl_pamu_ops = {
+ 	.domain_free    = fsl_pamu_domain_free,
+ 	.attach_dev	= fsl_pamu_attach_device,
+ 	.detach_dev	= fsl_pamu_detach_device,
+-	.domain_window_enable = fsl_pamu_window_enable,
+ 	.iova_to_phys	= fsl_pamu_iova_to_phys,
+ 	.domain_set_attr = fsl_pamu_set_domain_attr,
+ 	.probe_device	= fsl_pamu_probe_device,
+diff --git a/drivers/iommu/fsl_pamu_domain.h b/drivers/iommu/fsl_pamu_domain.h
+index d3523ee9999d83..13ee06e0ef0136 100644
+--- a/drivers/iommu/fsl_pamu_domain.h
++++ b/drivers/iommu/fsl_pamu_domain.h
+@@ -9,24 +9,10 @@
  
-+
-+#define kvm_supports_sregs2() (kvm_sregs2)
-+
+ #include "fsl_pamu.h"
+ 
+-struct dma_window {
+-	phys_addr_t paddr;
+-	u64 size;
+-	int valid;
+-	int prot;
+-};
+-
+ struct fsl_dma_domain {
+-	/*
+-	 * win_arr contains information of the configured
+-	 * windows for a domain.
+-	 */
+-	struct dma_window		win_arr[1];
+ 	/* list of devices associated with the domain */
+ 	struct list_head		devices;
+ 	/* dma_domain states:
+-	 * mapped - A particular mapping has been created
+-	 * within the configured geometry.
+ 	 * enabled - DMA has been enabled for the given
+ 	 * domain. This translates to setting of the
+ 	 * valid bit for the primary PAACE in the PAMU
+@@ -35,7 +21,6 @@ struct fsl_dma_domain {
+ 	 * enabled for it.
+ 	 *
+ 	 */
+-	int				mapped;
+ 	int				enabled;
+ 	/* stash_id obtained from the stash attribute details */
+ 	u32				stash_id;
+diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
+index d0b0a15dba8413..b212bf0261820b 100644
+--- a/drivers/iommu/iommu.c
++++ b/drivers/iommu/iommu.c
+@@ -2610,17 +2610,6 @@ size_t iommu_map_sg_atomic(struct iommu_domain *domain, unsigned long iova,
+ 	return __iommu_map_sg(domain, iova, sg, nents, prot, GFP_ATOMIC);
+ }
+ 
+-int iommu_domain_window_enable(struct iommu_domain *domain, u32 wnd_nr,
+-			       phys_addr_t paddr, u64 size, int prot)
+-{
+-	if (unlikely(domain->ops->domain_window_enable == NULL))
+-		return -ENODEV;
+-
+-	return domain->ops->domain_window_enable(domain, wnd_nr, paddr, size,
+-						 prot);
+-}
+-EXPORT_SYMBOL_GPL(iommu_domain_window_enable);
+-
  /**
-  * kvm_readonly_mem_enabled:
-  *
-diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-index 570f916878..4595d47409 100644
---- a/target/i386/cpu.h
-+++ b/target/i386/cpu.h
-@@ -1422,6 +1422,7 @@ typedef struct CPUX86State {
-     SegmentCache idt; /* only base and limit are used */
+  * report_iommu_fault() - report about an IOMMU fault to the IOMMU framework
+  * @domain: the iommu domain where the fault has happened
+diff --git a/drivers/soc/fsl/qbman/qman_portal.c b/drivers/soc/fsl/qbman/qman_portal.c
+index 3d56ec4b373b4b..9ee1663f422cbf 100644
+--- a/drivers/soc/fsl/qbman/qman_portal.c
++++ b/drivers/soc/fsl/qbman/qman_portal.c
+@@ -65,13 +65,6 @@ static void portal_set_cpu(struct qm_portal_config *pcfg, int cpu)
+ 			__func__, ret);
+ 		goto out_domain_free;
+ 	}
+-	ret = iommu_domain_window_enable(pcfg->iommu_domain, 0, 0, 1ULL << 36,
+-					 IOMMU_READ | IOMMU_WRITE);
+-	if (ret < 0) {
+-		dev_err(dev, "%s(): iommu_domain_window_enable() = %d",
+-			__func__, ret);
+-		goto out_domain_free;
+-	}
+ 	ret = iommu_attach_device(pcfg->iommu_domain, dev);
+ 	if (ret < 0) {
+ 		dev_err(dev, "%s(): iommu_device_attach() = %d", __func__,
+diff --git a/include/linux/iommu.h b/include/linux/iommu.h
+index 861c3558c878bf..f7baa81887a8bc 100644
+--- a/include/linux/iommu.h
++++ b/include/linux/iommu.h
+@@ -203,7 +203,6 @@ struct iommu_iotlb_gather {
+  * @get_resv_regions: Request list of reserved regions for a device
+  * @put_resv_regions: Free list of reserved regions for a device
+  * @apply_resv_region: Temporary helper call-back for iova reserved ranges
+- * @domain_window_enable: Configure and enable a particular window for a domain
+  * @of_xlate: add OF master IDs to iommu grouping
+  * @is_attach_deferred: Check if domain attach should be deferred from iommu
+  *                      driver init to device driver init (default no)
+@@ -261,10 +260,6 @@ struct iommu_ops {
+ 				  struct iommu_domain *domain,
+ 				  struct iommu_resv_region *region);
  
-     target_ulong cr[5]; /* NOTE: cr1 is unused */
-+    uint64_t pdptrs[4];
-     int32_t a20_mask;
+-	/* Window handling functions */
+-	int (*domain_window_enable)(struct iommu_domain *domain, u32 wnd_nr,
+-				    phys_addr_t paddr, u64 size, int prot);
+-
+ 	int (*of_xlate)(struct device *dev, struct of_phandle_args *args);
+ 	bool (*is_attach_deferred)(struct iommu_domain *domain, struct device *dev);
  
-     BNDReg bnd_regs[4];
-diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
-index 7fe9f52710..71769f82ae 100644
---- a/target/i386/kvm/kvm.c
-+++ b/target/i386/kvm/kvm.c
-@@ -2514,6 +2514,59 @@ static int kvm_put_sregs(X86CPU *cpu)
-     return kvm_vcpu_ioctl(CPU(cpu), KVM_SET_SREGS, &sregs);
+@@ -505,11 +500,6 @@ extern int iommu_domain_get_attr(struct iommu_domain *domain, enum iommu_attr,
+ extern int iommu_domain_set_attr(struct iommu_domain *domain, enum iommu_attr,
+ 				 void *data);
+ 
+-/* Window handling function prototypes */
+-extern int iommu_domain_window_enable(struct iommu_domain *domain, u32 wnd_nr,
+-				      phys_addr_t offset, u64 size,
+-				      int prot);
+-
+ extern int report_iommu_fault(struct iommu_domain *domain, struct device *dev,
+ 			      unsigned long iova, int flags);
+ 
+@@ -735,13 +725,6 @@ static inline void iommu_iotlb_sync(struct iommu_domain *domain,
+ {
  }
  
-+static int kvm_put_sregs2(X86CPU *cpu)
-+{
-+    CPUX86State *env = &cpu->env;
-+    struct kvm_sregs2 sregs;
-+    int i;
-+
-+    if ((env->eflags & VM_MASK)) {
-+        set_v8086_seg(&sregs.cs, &env->segs[R_CS]);
-+        set_v8086_seg(&sregs.ds, &env->segs[R_DS]);
-+        set_v8086_seg(&sregs.es, &env->segs[R_ES]);
-+        set_v8086_seg(&sregs.fs, &env->segs[R_FS]);
-+        set_v8086_seg(&sregs.gs, &env->segs[R_GS]);
-+        set_v8086_seg(&sregs.ss, &env->segs[R_SS]);
-+    } else {
-+        set_seg(&sregs.cs, &env->segs[R_CS]);
-+        set_seg(&sregs.ds, &env->segs[R_DS]);
-+        set_seg(&sregs.es, &env->segs[R_ES]);
-+        set_seg(&sregs.fs, &env->segs[R_FS]);
-+        set_seg(&sregs.gs, &env->segs[R_GS]);
-+        set_seg(&sregs.ss, &env->segs[R_SS]);
-+    }
-+
-+    set_seg(&sregs.tr, &env->tr);
-+    set_seg(&sregs.ldt, &env->ldt);
-+
-+    sregs.idt.limit = env->idt.limit;
-+    sregs.idt.base = env->idt.base;
-+    memset(sregs.idt.padding, 0, sizeof sregs.idt.padding);
-+    sregs.gdt.limit = env->gdt.limit;
-+    sregs.gdt.base = env->gdt.base;
-+    memset(sregs.gdt.padding, 0, sizeof sregs.gdt.padding);
-+
-+    sregs.cr0 = env->cr[0];
-+    sregs.cr2 = env->cr[2];
-+    sregs.cr3 = env->cr[3];
-+    sregs.cr4 = env->cr[4];
-+
-+    sregs.cr8 = cpu_get_apic_tpr(cpu->apic_state);
-+    sregs.apic_base = cpu_get_apic_base(cpu->apic_state);
-+
-+    sregs.efer = env->efer;
-+
-+    for (i = 0; i < 4; i++) {
-+        sregs.pdptrs[i] = env->pdptrs[i];
-+    }
-+
-+    sregs.flags = 0;
-+    sregs.padding = 0;
-+
-+    return kvm_vcpu_ioctl(CPU(cpu), KVM_SET_SREGS2, &sregs);
-+}
-+
-+
- static void kvm_msr_buf_reset(X86CPU *cpu)
+-static inline int iommu_domain_window_enable(struct iommu_domain *domain,
+-					     u32 wnd_nr, phys_addr_t paddr,
+-					     u64 size, int prot)
+-{
+-	return -ENODEV;
+-}
+-
+ static inline phys_addr_t iommu_iova_to_phys(struct iommu_domain *domain, dma_addr_t iova)
  {
-     memset(cpu->kvm_msr_buf, 0, MSR_BUF_SIZE);
-@@ -3175,6 +3228,49 @@ static int kvm_get_sregs(X86CPU *cpu)
-     return 0;
- }
- 
-+static int kvm_get_sregs2(X86CPU *cpu)
-+{
-+    CPUX86State *env = &cpu->env;
-+    struct kvm_sregs2 sregs;
-+    int i, ret;
-+
-+    ret = kvm_vcpu_ioctl(CPU(cpu), KVM_GET_SREGS2, &sregs);
-+    if (ret < 0) {
-+        return ret;
-+    }
-+
-+    get_seg(&env->segs[R_CS], &sregs.cs);
-+    get_seg(&env->segs[R_DS], &sregs.ds);
-+    get_seg(&env->segs[R_ES], &sregs.es);
-+    get_seg(&env->segs[R_FS], &sregs.fs);
-+    get_seg(&env->segs[R_GS], &sregs.gs);
-+    get_seg(&env->segs[R_SS], &sregs.ss);
-+
-+    get_seg(&env->tr, &sregs.tr);
-+    get_seg(&env->ldt, &sregs.ldt);
-+
-+    env->idt.limit = sregs.idt.limit;
-+    env->idt.base = sregs.idt.base;
-+    env->gdt.limit = sregs.gdt.limit;
-+    env->gdt.base = sregs.gdt.base;
-+
-+    env->cr[0] = sregs.cr0;
-+    env->cr[2] = sregs.cr2;
-+    env->cr[3] = sregs.cr3;
-+    env->cr[4] = sregs.cr4;
-+
-+    env->efer = sregs.efer;
-+
-+    for (i = 0; i < 4; i++) {
-+        env->pdptrs[i] = sregs.pdptrs[i];
-+    }
-+
-+    /* changes to apic base and cr8/tpr are read back via kvm_arch_post_run */
-+    x86_update_hflags(env);
-+
-+    return 0;
-+}
-+
- static int kvm_get_msrs(X86CPU *cpu)
- {
-     CPUX86State *env = &cpu->env;
-@@ -4000,7 +4096,8 @@ int kvm_arch_put_registers(CPUState *cpu, int level)
-     assert(cpu_is_stopped(cpu) || qemu_cpu_is_self(cpu));
- 
-     /* must be before kvm_put_nested_state so that EFER.SVME is set */
--    ret = kvm_put_sregs(x86_cpu);
-+    ret = kvm_supports_sregs2() ? kvm_put_sregs2(x86_cpu) :
-+                                  kvm_put_sregs(x86_cpu);
-     if (ret < 0) {
-         return ret;
-     }
-@@ -4105,7 +4202,7 @@ int kvm_arch_get_registers(CPUState *cs)
-     if (ret < 0) {
-         goto out;
-     }
--    ret = kvm_get_sregs(cpu);
-+    ret = kvm_supports_sregs2() ? kvm_get_sregs2(cpu) : kvm_get_sregs(cpu);
-     if (ret < 0) {
-         goto out;
-     }
-diff --git a/target/i386/machine.c b/target/i386/machine.c
-index 137604ddb8..c145a1cfb7 100644
---- a/target/i386/machine.c
-+++ b/target/i386/machine.c
-@@ -1396,6 +1396,38 @@ static const VMStateDescription vmstate_msr_tsx_ctrl = {
-     }
- };
- 
-+static bool pdptrs_needed(void *opaque)
-+{
-+    X86CPU *cpu = opaque;
-+    CPUX86State *env = &cpu->env;
-+
-+    if (!kvm_supports_sregs2()) {
-+        return false;
-+    }
-+
-+    if (!(env->cr[0] & CR0_PG_MASK)) {
-+        return false;
-+    }
-+
-+    if (env->efer & MSR_EFER_LMA) {
-+        return false;
-+    }
-+
-+    return env->cr[4] & CR4_PAE_MASK;
-+}
-+
-+static const VMStateDescription vmstate_pdptrs = {
-+    .name = "cpu/pdptrs",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .needed = pdptrs_needed,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_UINT64_ARRAY(env.pdptrs, X86CPU, 4),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
-+
- VMStateDescription vmstate_x86_cpu = {
-     .name = "cpu",
-     .version_id = 12,
-@@ -1531,6 +1563,7 @@ VMStateDescription vmstate_x86_cpu = {
-         &vmstate_nested_state,
- #endif
-         &vmstate_msr_tsx_ctrl,
-+        &vmstate_pdptrs,
-         NULL
-     }
- };
+ 	return 0;
 -- 
-2.26.2
+2.30.1
 
