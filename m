@@ -2,104 +2,98 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2377235173D
-	for <lists+kvm@lfdr.de>; Thu,  1 Apr 2021 19:41:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B18853518AA
+	for <lists+kvm@lfdr.de>; Thu,  1 Apr 2021 19:49:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1356144AbhCDA3V (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 3 Mar 2021 19:29:21 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36782 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1347487AbhCCQuN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 3 Mar 2021 11:50:13 -0500
-Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 789CCC061764
-        for <kvm@vger.kernel.org>; Wed,  3 Mar 2021 08:49:32 -0800 (PST)
-Received: by mail-pl1-x62c.google.com with SMTP id s7so7162732plg.5
-        for <kvm@vger.kernel.org>; Wed, 03 Mar 2021 08:49:32 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=w89dhafdcTBvPIF85pqTILGa/UQI997YGnl2uzLm600=;
-        b=sjAKSKtdd0qE8aGrV/g7K5tp0Ut2VV3W8GjrebN5IOnnr2u+ye1uUb3f62HiAPRgXp
-         QUaFAhKpGHJFh064Js9Fj32CPj/zpSFMdphLhK9awrj3OHBjjZnFj+g6c4sM9IcZ2/f9
-         kaIpcn+DnNZG8OGlDfeECHdukgD9ikS7k4B3wdOFR8iYV0tbLVd1E8hovsZYW9gMCYc3
-         ApM4s5x/O6tg+/mVUAr4Q7V+SOnEUJQbw8Bwcd3/1er4hJ3d39L0cqBc4fR2gR2VqDmq
-         20I9w0hEi5aR1k7F4Z40pfe9y1gN/zpABnqxCyu4xPjRE+9Ke0UOqAXMmQuCHwwqbNUJ
-         YdyQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=w89dhafdcTBvPIF85pqTILGa/UQI997YGnl2uzLm600=;
-        b=SdD+z3fQe0ZUoBBZRaBVv3J58SnthrY1i76DukKlTfI2MxkANMV85N6s+KAUvN/7+B
-         mukkLV4vEpQfa1WtkGlHbd/bB2E1ocB6JNPXv2qcdc0e9XUqwKceqD2I7eigGf60FF5F
-         dqC9/doCCvf8DXfTHGhicccSVoIYB4pWu5Rdi6ohnDBPOJ/1STAds3OpzF4SaoBIrrGa
-         VKlv4pHCGKwn0FoSpLhSa/dEnccCb3x2JMWbekF5noQtTEaY66FkSHa0caTIHGFiIVlD
-         ObDrXVOf/wKAQiEkHGGkWPh6Iz30wFiTrUsmizAlfcHI9KrxXwe3buhqXQBGiK7Ts78V
-         S5BQ==
-X-Gm-Message-State: AOAM5320GVxLut4NO7y7wEwVl+1W0pClpnQFGEy0UMMdW21iqCYaJR/e
-        JJY9qPKl7Mp2dYLEylk11RIdkg==
-X-Google-Smtp-Source: ABdhPJygoIGT3E2Mq7v4KxLMZzcbXTD1z+JRgPMCk5eKtTzlmhUO+vNxMmor202/49XuL7QJt0DXRQ==
-X-Received: by 2002:a17:902:ff15:b029:e4:51ae:e1ee with SMTP id f21-20020a170902ff15b02900e451aee1eemr85184plj.83.1614790170916;
-        Wed, 03 Mar 2021 08:49:30 -0800 (PST)
-Received: from google.com ([2620:15c:f:10:805d:6324:3372:6183])
-        by smtp.gmail.com with ESMTPSA id x11sm7841144pjh.0.2021.03.03.08.49.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 03 Mar 2021 08:49:30 -0800 (PST)
-Date:   Wed, 3 Mar 2021 08:49:23 -0800
-From:   Sean Christopherson <seanjc@google.com>
-To:     Like Xu <like.xu@linux.intel.com>
-Cc:     Peter Zijlstra <peterz@infradead.org>,
+        id S235025AbhDARrA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 1 Apr 2021 13:47:00 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:32337 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S235169AbhDARmW (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 1 Apr 2021 13:42:22 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1617298942;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=6tYRJ1YPm2YiHZpNplHwmZcadjvns9Uy/SktMSxJfhw=;
+        b=O74nDNps+K7mgMbGeV8pKAA0J3x+6+oZAaK2igZ1xpuRiBfASpZ2NjcUxRzym9Dw01od/c
+        r9Thw/Y3JwTRFRtlpz8RHqfikUYv1n8v6M/Ap+VfX6PQ8LUisz6RbkF1SM6dmmSKwJoeS/
+        ZSRP2aCDEPu5qiVG09eSVmesfHoCyxk=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-361-c_-25MNsOuaopDL9pXv0Sw-1; Thu, 01 Apr 2021 07:16:23 -0400
+X-MC-Unique: c_-25MNsOuaopDL9pXv0Sw-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D713480063;
+        Thu,  1 Apr 2021 11:16:19 +0000 (UTC)
+Received: from localhost.localdomain (unknown [10.35.206.58])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 06D8A73A69;
+        Thu,  1 Apr 2021 11:16:15 +0000 (UTC)
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     kvm@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org, Jim Mattson <jmattson@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Ingo Molnar <mingo@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>,
-        Kan Liang <kan.liang@linux.intel.com>,
-        Dave Hansen <dave.hansen@intel.com>, wei.w.wang@intel.com,
-        Borislav Petkov <bp@alien8.de>, kvm@vger.kernel.org,
-        x86@kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 1/9] perf/x86/intel: Fix a comment about guest LBR
- support
-Message-ID: <YD++EyC0z2Vtu6uB@google.com>
-References: <20210303135756.1546253-1-like.xu@linux.intel.com>
- <20210303135756.1546253-2-like.xu@linux.intel.com>
+        x86@kernel.org (maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)),
+        Thomas Gleixner <tglx@linutronix.de>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Maxim Levitsky <mlevitsk@redhat.com>
+Subject: [PATCH 0/2] KVM: x86: nSVM: fixes for SYSENTER emulation
+Date:   Thu,  1 Apr 2021 14:16:12 +0300
+Message-Id: <20210401111614.996018-1-mlevitsk@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210303135756.1546253-2-like.xu@linux.intel.com>
+Content-Transfer-Encoding: quoted-printable
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Mar 03, 2021, Like Xu wrote:
-> Starting from v5.12, KVM reports guest LBR and extra_regs
-> support when the host has relevant support.
-> 
-> Cc: Peter Zijlstra <peterz@infradead.org>
-> Reviewed-by: Kan Liang <kan.liang@linux.intel.com>
-> Signed-off-by: Like Xu <like.xu@linux.intel.com>
-> ---
->  arch/x86/events/intel/core.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/arch/x86/events/intel/core.c b/arch/x86/events/intel/core.c
-> index d4569bfa83e3..a32acc7733a7 100644
-> --- a/arch/x86/events/intel/core.c
-> +++ b/arch/x86/events/intel/core.c
-> @@ -5565,7 +5565,7 @@ __init int intel_pmu_init(void)
->  
->  	/*
->  	 * Access LBR MSR may cause #GP under certain circumstances.
-> -	 * E.g. KVM doesn't support LBR MSR
-> +	 * E.g. KVM doesn't support LBR MSR before v5.12.
+This is a result of a deep rabbit hole dive in regard to why=0D
+currently the nested migration of 32 bit guests=0D
+is totally broken on AMD.=0D
+=0D
+It turns out that due to slight differences between the original AMD64=0D
+implementation and the Intel's remake, SYSENTER instruction behaves a=0D
+bit differently on Intel, and to support migration from Intel to AMD we=0D
+try to emulate those differences away.=0D
+=0D
+Sadly that collides with virtual vmload/vmsave feature that is used in nest=
+ing.=0D
+The problem was that when it is enabled,=0D
+on migration (and otherwise when userspace reads MSR_IA32_SYSENTER_{EIP|ESP=
+},=0D
+wrong value were returned, which leads to #DF in the=0D
+nested guest when the wrong value is loaded back.=0D
+=0D
+The patch I prepared carefully fixes this, by mostly disabling that=0D
+SYSCALL emulation when we don't spoof the Intel's vendor ID, and if we do,=
+=0D
+and yet somehow SVM is enabled (this is a very rare edge case), then=0D
+virtual vmload/save is force disabled.=0D
+=0D
+V2: incorporated review feedback from Paulo.=0D
+=0D
+Best regards,=0D
+        Maxim Levitsky=0D
+=0D
+Maxim Levitsky (2):=0D
+  KVM: x86: add guest_cpuid_is_intel=0D
+  KVM: nSVM: improve SYSENTER emulation on AMD=0D
+=0D
+ arch/x86/kvm/cpuid.h   |  8 ++++=0D
+ arch/x86/kvm/svm/svm.c | 99 +++++++++++++++++++++++++++---------------=0D
+ arch/x86/kvm/svm/svm.h |  6 +--=0D
+ 3 files changed, 76 insertions(+), 37 deletions(-)=0D
+=0D
+-- =0D
+2.26.2=0D
+=0D
 
-Just delete this part of the comment.
-
->  	 * Check all LBT MSR here.
->  	 * Disable LBR access if any LBR MSRs can not be accessed.
->  	 */
-> -- 
-> 2.29.2
-> 
