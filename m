@@ -2,89 +2,132 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7D9573518AE
-	for <lists+kvm@lfdr.de>; Thu,  1 Apr 2021 19:49:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 159633517BB
+	for <lists+kvm@lfdr.de>; Thu,  1 Apr 2021 19:47:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236380AbhDARrH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 1 Apr 2021 13:47:07 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:33751 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S235223AbhDARm0 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 1 Apr 2021 13:42:26 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1617298946;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=FIS/0wQGTd5OK3BSslmwGX7RkKLHKjJnfRIzlG6zbaM=;
-        b=V29QjL5AGlfYxOZsKL7ipNev9ipJUHXCvFQejsOHPGdxJlHM9p/nlY43zQLVRJaQNiW9ym
-        /BM5ILTiJ/jK9Hs2J+Pgio8yI6coTILfd8xxDojkvLw6uLj93tOeYJmDjFiB3RxJSOyVXy
-        2xM5mK+BYtu82J4ullOCwf0Y6DrUR0s=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-256-8mIH6vSUOoe_4kFyAEEnQg-1; Thu, 01 Apr 2021 07:16:25 -0400
-X-MC-Unique: 8mIH6vSUOoe_4kFyAEEnQg-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3787E8030C9;
-        Thu,  1 Apr 2021 11:16:24 +0000 (UTC)
-Received: from localhost.localdomain (unknown [10.35.206.58])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 4293B1378E;
-        Thu,  1 Apr 2021 11:16:20 +0000 (UTC)
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     kvm@vger.kernel.org
-Cc:     linux-kernel@vger.kernel.org, Jim Mattson <jmattson@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Ingo Molnar <mingo@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        x86@kernel.org (maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)),
-        Thomas Gleixner <tglx@linutronix.de>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Maxim Levitsky <mlevitsk@redhat.com>
-Subject: [PATCH 1/2] KVM: x86: add guest_cpuid_is_intel
-Date:   Thu,  1 Apr 2021 14:16:13 +0300
-Message-Id: <20210401111614.996018-2-mlevitsk@redhat.com>
-In-Reply-To: <20210401111614.996018-1-mlevitsk@redhat.com>
-References: <20210401111614.996018-1-mlevitsk@redhat.com>
+        id S233817AbhDARmm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 1 Apr 2021 13:42:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57248 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234650AbhDARi6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 1 Apr 2021 13:38:58 -0400
+Received: from mail-qt1-x82c.google.com (mail-qt1-x82c.google.com [IPv6:2607:f8b0:4864:20::82c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D7BFC0613BD
+        for <kvm@vger.kernel.org>; Thu,  1 Apr 2021 05:19:35 -0700 (PDT)
+Received: by mail-qt1-x82c.google.com with SMTP id y12so1249410qtx.11
+        for <kvm@vger.kernel.org>; Thu, 01 Apr 2021 05:19:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=Vgr/Zl3BDXRnrq2J6EE+e/3R7mQgt/D2Dsj5nuE2w0M=;
+        b=JpAs1vzPTjz4W8rdx9Lqz6nBqd13qCgN3+erq91mh4WGoo/LZS5fEquo+DACiJnKkX
+         QrRXi051hfgjTbJbWkb4DYzvsW7dd5nBrV1B7iZhANXyvf9JPdE2B/K8FL9e62txVK7G
+         0X/gpOxbofNzmLf0GAqzpX8sBfJtZmAM5AgY6NsA+fMjUnX+sBbt/uAKoHA8hXKR3thw
+         I4MqU09EK54ap9j94WYb6DERRr6dM1RBsJqJQLblOPlbmso1274vL9Xp0KegLKnMSTTI
+         OwoDTz18mnTz8i5OKZzE0CwVDjue/qX8moZSc4OPC55MzH1GtPpdWvMfTcPBykbbhtQ4
+         E5jg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=Vgr/Zl3BDXRnrq2J6EE+e/3R7mQgt/D2Dsj5nuE2w0M=;
+        b=gNLyQjGznqNB2VvyYlnqJ3wFcBfcu0fpHPnVkm7pgKOb4nN1mgKH2aC3f0WdRzlC27
+         V/v9zn5o5hlxDheLj3C55DIJpNxbBN4DXw7CnEGD94eg9tr0G7r+HX90g2ZdaPnDaXyD
+         /oHWS66ItKvh+TeZdU5bphlsYM16XuAMedSk/G1XBtjMdqhxf4Xzlz/+iI3xRQZoTwli
+         fb+7p2F7SWoj4vcKeiTQlY1C8oe/1YYrF8EKH79Mhslden5oIo0dtaIBSSWacdWqKdJN
+         TUGNyFFcsnWcms3mQ0L8i1rjwE6PLwUGxrugOkeuQ1AtdKfnkQJkovhVQkSXpMsA8ft0
+         nEng==
+X-Gm-Message-State: AOAM533srKU56S7UrwI8ZAExGYYvGgqHVREyjumljJGZF+VTVEcbr2a/
+        KMEbAwJYbNtw9PGX1BK2CxAR4w==
+X-Google-Smtp-Source: ABdhPJz6ns0s4EMUeoQopcXj71hOMnL0XWBbKVYAuaGM2OabeF39OGOUzeq0Rc+BHh/xNK4055cz0A==
+X-Received: by 2002:ac8:7f52:: with SMTP id g18mr6906607qtk.250.1617279574765;
+        Thu, 01 Apr 2021 05:19:34 -0700 (PDT)
+Received: from ziepe.ca (hlfxns017vw-142-162-115-133.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.162.115.133])
+        by smtp.gmail.com with ESMTPSA id s28sm3807098qkj.73.2021.04.01.05.19.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 01 Apr 2021 05:19:34 -0700 (PDT)
+Received: from jgg by mlx with local (Exim 4.94)
+        (envelope-from <jgg@ziepe.ca>)
+        id 1lRwIP-006jdH-LT; Thu, 01 Apr 2021 09:19:33 -0300
+Date:   Thu, 1 Apr 2021 09:19:33 -0300
+From:   Jason Gunthorpe <jgg@ziepe.ca>
+To:     Dan Carpenter <dan.carpenter@oracle.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        syzbot <syzbot+015dd7cdbbbc2c180c65@syzkaller.appspotmail.com>,
+        akpm@linux-foundation.org, bp@alien8.de, daniel.vetter@ffwll.ch,
+        daniel.vetter@intel.com, hpa@zytor.com, jmattson@google.com,
+        jmorris@namei.org, joro@8bytes.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-media@vger.kernel.org,
+        linux-mm@kvack.org, linux-security-module@vger.kernel.org,
+        m.szyprowski@samsung.com, mchehab@kernel.org, mingo@redhat.com,
+        seanjc@google.com, serge@hallyn.com,
+        syzkaller-bugs@googlegroups.com, tfiga@chromium.org,
+        tglx@linutronix.de, vkuznets@redhat.com, wanpengli@tencent.com,
+        x86@kernel.org
+Subject: Re: [syzbot] WARNING in unsafe_follow_pfn
+Message-ID: <20210401121933.GA2710221@ziepe.ca>
+References: <000000000000ca9a6005bec29ebe@google.com>
+ <2db3c803-6a94-9345-261a-a2bb74370c02@redhat.com>
+ <20210331042922.GE2065@kadam>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210331042922.GE2065@kadam>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This is similar to existing 'guest_cpuid_is_amd_or_hygon'
+On Wed, Mar 31, 2021 at 07:29:22AM +0300, Dan Carpenter wrote:
+> On Tue, Mar 30, 2021 at 07:04:30PM +0200, Paolo Bonzini wrote:
+> > On 30/03/21 17:26, syzbot wrote:
+> > > Hello,
+> > > 
+> > > syzbot found the following issue on:
+> > > 
+> > > HEAD commit:    93129492 Add linux-next specific files for 20210326
+> > > git tree:       linux-next
+> > > console output: https://syzkaller.appspot.com/x/log.txt?x=169ab21ad00000
+> > > kernel config:  https://syzkaller.appspot.com/x/.config?x=6f2f73285ea94c45
+> > > dashboard link: https://syzkaller.appspot.com/bug?extid=015dd7cdbbbc2c180c65
+> > > syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=119b8d06d00000
+> > > C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=112e978ad00000
+> > > 
+> > > The issue was bisected to:
+> > > 
+> > > commit d40b9fdee6dc819d8fc35f70c345cbe0394cde4c
+> > > Author: Daniel Vetter <daniel.vetter@ffwll.ch>
+> > > Date:   Tue Mar 16 15:33:01 2021 +0000
+> > > 
+> > >      mm: Add unsafe_follow_pfn
+> > > 
+> > > bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=122d2016d00000
+> > > final oops:     https://syzkaller.appspot.com/x/report.txt?x=112d2016d00000
+> > > console output: https://syzkaller.appspot.com/x/log.txt?x=162d2016d00000
+> > > 
+> > > IMPORTANT: if you fix the issue, please add the following tag to the commit:
+> > > Reported-by: syzbot+015dd7cdbbbc2c180c65@syzkaller.appspotmail.com
+> > > Fixes: d40b9fdee6dc ("mm: Add unsafe_follow_pfn")
+> > 
+> > This is basically intentional because get_vaddr_frames is broken, isn't it?
+> > I think it needs to be ignored in syzkaller.
+> 
+> What?
+> 
+> The bisect is wrong (because it's blaming the commit which added the
+> warning instead of the commit which added the buggy caller) but the
+> warning is correct.
+> 
+> Plus users are going to be seeing this as well.  According to the commit
+> message for 69bacee7f9ad ("mm: Add unsafe_follow_pfn") "Unfortunately
+> there's some users where this is not fixable (like v4l userptr of iomem
+> mappings)".  It sort of seems crazy to dump this giant splat and then
+> tell users to ignore it forever because it can't be fixed...  0_0
 
-Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
----
- arch/x86/kvm/cpuid.h | 8 ++++++++
- 1 file changed, 8 insertions(+)
+I think the discussion conclusion was that this interface should not
+be used by userspace anymore, it is obsolete by some new interface?
 
-diff --git a/arch/x86/kvm/cpuid.h b/arch/x86/kvm/cpuid.h
-index 2a0c5064497f..ded84d244f19 100644
---- a/arch/x86/kvm/cpuid.h
-+++ b/arch/x86/kvm/cpuid.h
-@@ -248,6 +248,14 @@ static inline bool guest_cpuid_is_amd_or_hygon(struct kvm_vcpu *vcpu)
- 		is_guest_vendor_hygon(best->ebx, best->ecx, best->edx));
- }
- 
-+static inline bool guest_cpuid_is_intel(struct kvm_vcpu *vcpu)
-+{
-+	struct kvm_cpuid_entry2 *best;
-+
-+	best = kvm_find_cpuid_entry(vcpu, 0, 0);
-+	return best && is_guest_vendor_intel(best->ebx, best->ecx, best->edx);
-+}
-+
- static inline int guest_cpuid_family(struct kvm_vcpu *vcpu)
- {
- 	struct kvm_cpuid_entry2 *best;
--- 
-2.26.2
+It should be protected by some kconfig and the kconfig should be
+turned off for syzkaller runs.
 
+Jason
