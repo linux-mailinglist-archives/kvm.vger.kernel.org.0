@@ -2,132 +2,200 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 159633517BB
-	for <lists+kvm@lfdr.de>; Thu,  1 Apr 2021 19:47:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4D17A3518F5
+	for <lists+kvm@lfdr.de>; Thu,  1 Apr 2021 19:49:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233817AbhDARmm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 1 Apr 2021 13:42:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57248 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234650AbhDARi6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 1 Apr 2021 13:38:58 -0400
-Received: from mail-qt1-x82c.google.com (mail-qt1-x82c.google.com [IPv6:2607:f8b0:4864:20::82c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D7BFC0613BD
-        for <kvm@vger.kernel.org>; Thu,  1 Apr 2021 05:19:35 -0700 (PDT)
-Received: by mail-qt1-x82c.google.com with SMTP id y12so1249410qtx.11
-        for <kvm@vger.kernel.org>; Thu, 01 Apr 2021 05:19:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=Vgr/Zl3BDXRnrq2J6EE+e/3R7mQgt/D2Dsj5nuE2w0M=;
-        b=JpAs1vzPTjz4W8rdx9Lqz6nBqd13qCgN3+erq91mh4WGoo/LZS5fEquo+DACiJnKkX
-         QrRXi051hfgjTbJbWkb4DYzvsW7dd5nBrV1B7iZhANXyvf9JPdE2B/K8FL9e62txVK7G
-         0X/gpOxbofNzmLf0GAqzpX8sBfJtZmAM5AgY6NsA+fMjUnX+sBbt/uAKoHA8hXKR3thw
-         I4MqU09EK54ap9j94WYb6DERRr6dM1RBsJqJQLblOPlbmso1274vL9Xp0KegLKnMSTTI
-         OwoDTz18mnTz8i5OKZzE0CwVDjue/qX8moZSc4OPC55MzH1GtPpdWvMfTcPBykbbhtQ4
-         E5jg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=Vgr/Zl3BDXRnrq2J6EE+e/3R7mQgt/D2Dsj5nuE2w0M=;
-        b=gNLyQjGznqNB2VvyYlnqJ3wFcBfcu0fpHPnVkm7pgKOb4nN1mgKH2aC3f0WdRzlC27
-         V/v9zn5o5hlxDheLj3C55DIJpNxbBN4DXw7CnEGD94eg9tr0G7r+HX90g2ZdaPnDaXyD
-         /oHWS66ItKvh+TeZdU5bphlsYM16XuAMedSk/G1XBtjMdqhxf4Xzlz/+iI3xRQZoTwli
-         fb+7p2F7SWoj4vcKeiTQlY1C8oe/1YYrF8EKH79Mhslden5oIo0dtaIBSSWacdWqKdJN
-         TUGNyFFcsnWcms3mQ0L8i1rjwE6PLwUGxrugOkeuQ1AtdKfnkQJkovhVQkSXpMsA8ft0
-         nEng==
-X-Gm-Message-State: AOAM533srKU56S7UrwI8ZAExGYYvGgqHVREyjumljJGZF+VTVEcbr2a/
-        KMEbAwJYbNtw9PGX1BK2CxAR4w==
-X-Google-Smtp-Source: ABdhPJz6ns0s4EMUeoQopcXj71hOMnL0XWBbKVYAuaGM2OabeF39OGOUzeq0Rc+BHh/xNK4055cz0A==
-X-Received: by 2002:ac8:7f52:: with SMTP id g18mr6906607qtk.250.1617279574765;
-        Thu, 01 Apr 2021 05:19:34 -0700 (PDT)
-Received: from ziepe.ca (hlfxns017vw-142-162-115-133.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.162.115.133])
-        by smtp.gmail.com with ESMTPSA id s28sm3807098qkj.73.2021.04.01.05.19.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 01 Apr 2021 05:19:34 -0700 (PDT)
-Received: from jgg by mlx with local (Exim 4.94)
-        (envelope-from <jgg@ziepe.ca>)
-        id 1lRwIP-006jdH-LT; Thu, 01 Apr 2021 09:19:33 -0300
-Date:   Thu, 1 Apr 2021 09:19:33 -0300
-From:   Jason Gunthorpe <jgg@ziepe.ca>
-To:     Dan Carpenter <dan.carpenter@oracle.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        syzbot <syzbot+015dd7cdbbbc2c180c65@syzkaller.appspotmail.com>,
-        akpm@linux-foundation.org, bp@alien8.de, daniel.vetter@ffwll.ch,
-        daniel.vetter@intel.com, hpa@zytor.com, jmattson@google.com,
-        jmorris@namei.org, joro@8bytes.org, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-media@vger.kernel.org,
-        linux-mm@kvack.org, linux-security-module@vger.kernel.org,
-        m.szyprowski@samsung.com, mchehab@kernel.org, mingo@redhat.com,
-        seanjc@google.com, serge@hallyn.com,
-        syzkaller-bugs@googlegroups.com, tfiga@chromium.org,
-        tglx@linutronix.de, vkuznets@redhat.com, wanpengli@tencent.com,
-        x86@kernel.org
-Subject: Re: [syzbot] WARNING in unsafe_follow_pfn
-Message-ID: <20210401121933.GA2710221@ziepe.ca>
-References: <000000000000ca9a6005bec29ebe@google.com>
- <2db3c803-6a94-9345-261a-a2bb74370c02@redhat.com>
- <20210331042922.GE2065@kadam>
+        id S235902AbhDARsi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 1 Apr 2021 13:48:38 -0400
+Received: from szxga02-in.huawei.com ([45.249.212.188]:3933 "EHLO
+        szxga02-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235990AbhDARq1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 1 Apr 2021 13:46:27 -0400
+Received: from DGGEML401-HUB.china.huawei.com (unknown [172.30.72.57])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4FB2jD59sfz5j7n;
+        Thu,  1 Apr 2021 20:36:00 +0800 (CST)
+Received: from dggema765-chm.china.huawei.com (10.1.198.207) by
+ DGGEML401-HUB.china.huawei.com (10.3.17.32) with Microsoft SMTP Server (TLS)
+ id 14.3.498.0; Thu, 1 Apr 2021 20:38:05 +0800
+Received: from [10.174.185.210] (10.174.185.210) by
+ dggema765-chm.china.huawei.com (10.1.198.207) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.2106.2; Thu, 1 Apr 2021 20:38:05 +0800
+Subject: Re: [PATCH v14 06/13] iommu/smmuv3: Allow stage 1 invalidation with
+ unmanaged ASIDs
+To:     Eric Auger <eric.auger@redhat.com>, <eric.auger.pro@gmail.com>,
+        <iommu@lists.linux-foundation.org>, <linux-kernel@vger.kernel.org>,
+        <kvm@vger.kernel.org>, <kvmarm@lists.cs.columbia.edu>,
+        <will@kernel.org>, <maz@kernel.org>, <robin.murphy@arm.com>,
+        <joro@8bytes.org>, <alex.williamson@redhat.com>, <tn@semihalf.com>,
+        <zhukeqian1@huawei.com>
+CC:     <jacob.jun.pan@linux.intel.com>, <yi.l.liu@intel.com>,
+        <wangxingang5@huawei.com>, <jean-philippe@linaro.org>,
+        <zhangfei.gao@linaro.org>, <zhangfei.gao@gmail.com>,
+        <vivek.gautam@arm.com>, <shameerali.kolothum.thodi@huawei.com>,
+        <yuzenghui@huawei.com>, <nicoleotsuka@gmail.com>,
+        <lushenming@huawei.com>, <vsethi@nvidia.com>,
+        <wanghaibin.wang@huawei.com>, Keqian Zhu <zhukeqian1@huawei.com>
+References: <20210223205634.604221-1-eric.auger@redhat.com>
+ <20210223205634.604221-7-eric.auger@redhat.com>
+From:   Kunkun Jiang <jiangkunkun@huawei.com>
+Message-ID: <901720e6-6ca5-eb9a-1f24-0ca479bcfecc@huawei.com>
+Date:   Thu, 1 Apr 2021 20:37:52 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.8.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210331042922.GE2065@kadam>
+In-Reply-To: <20210223205634.604221-7-eric.auger@redhat.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-Originating-IP: [10.174.185.210]
+X-ClientProxiedBy: dggeme712-chm.china.huawei.com (10.1.199.108) To
+ dggema765-chm.china.huawei.com (10.1.198.207)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Mar 31, 2021 at 07:29:22AM +0300, Dan Carpenter wrote:
-> On Tue, Mar 30, 2021 at 07:04:30PM +0200, Paolo Bonzini wrote:
-> > On 30/03/21 17:26, syzbot wrote:
-> > > Hello,
-> > > 
-> > > syzbot found the following issue on:
-> > > 
-> > > HEAD commit:    93129492 Add linux-next specific files for 20210326
-> > > git tree:       linux-next
-> > > console output: https://syzkaller.appspot.com/x/log.txt?x=169ab21ad00000
-> > > kernel config:  https://syzkaller.appspot.com/x/.config?x=6f2f73285ea94c45
-> > > dashboard link: https://syzkaller.appspot.com/bug?extid=015dd7cdbbbc2c180c65
-> > > syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=119b8d06d00000
-> > > C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=112e978ad00000
-> > > 
-> > > The issue was bisected to:
-> > > 
-> > > commit d40b9fdee6dc819d8fc35f70c345cbe0394cde4c
-> > > Author: Daniel Vetter <daniel.vetter@ffwll.ch>
-> > > Date:   Tue Mar 16 15:33:01 2021 +0000
-> > > 
-> > >      mm: Add unsafe_follow_pfn
-> > > 
-> > > bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=122d2016d00000
-> > > final oops:     https://syzkaller.appspot.com/x/report.txt?x=112d2016d00000
-> > > console output: https://syzkaller.appspot.com/x/log.txt?x=162d2016d00000
-> > > 
-> > > IMPORTANT: if you fix the issue, please add the following tag to the commit:
-> > > Reported-by: syzbot+015dd7cdbbbc2c180c65@syzkaller.appspotmail.com
-> > > Fixes: d40b9fdee6dc ("mm: Add unsafe_follow_pfn")
-> > 
-> > This is basically intentional because get_vaddr_frames is broken, isn't it?
-> > I think it needs to be ignored in syzkaller.
-> 
-> What?
-> 
-> The bisect is wrong (because it's blaming the commit which added the
-> warning instead of the commit which added the buggy caller) but the
-> warning is correct.
-> 
-> Plus users are going to be seeing this as well.  According to the commit
-> message for 69bacee7f9ad ("mm: Add unsafe_follow_pfn") "Unfortunately
-> there's some users where this is not fixable (like v4l userptr of iomem
-> mappings)".  It sort of seems crazy to dump this giant splat and then
-> tell users to ignore it forever because it can't be fixed...  0_0
+Hi Eric,
 
-I think the discussion conclusion was that this interface should not
-be used by userspace anymore, it is obsolete by some new interface?
+On 2021/2/24 4:56, Eric Auger wrote:
+> With nested stage support, soon we will need to invalidate
+> S1 contexts and ranges tagged with an unmanaged asid, this
+> latter being managed by the guest. So let's introduce 2 helpers
+> that allow to invalidate with externally managed ASIDs
+>
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>
+> ---
+>
+> v13 -> v14
+> - Actually send the NH_ASID command (reported by Xingang Wang)
+> ---
+>   drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c | 38 ++++++++++++++++-----
+>   1 file changed, 29 insertions(+), 9 deletions(-)
+>
+> diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
+> index 5579ec4fccc8..4c19a1114de4 100644
+> --- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
+> +++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
+> @@ -1843,9 +1843,9 @@ int arm_smmu_atc_inv_domain(struct arm_smmu_domain *smmu_domain, int ssid,
+>   }
+>   
+>   /* IO_PGTABLE API */
+> -static void arm_smmu_tlb_inv_context(void *cookie)
+> +static void __arm_smmu_tlb_inv_context(struct arm_smmu_domain *smmu_domain,
+> +				       int ext_asid)
+>   {
+> -	struct arm_smmu_domain *smmu_domain = cookie;
+>   	struct arm_smmu_device *smmu = smmu_domain->smmu;
+>   	struct arm_smmu_cmdq_ent cmd;
+>   
+> @@ -1856,7 +1856,13 @@ static void arm_smmu_tlb_inv_context(void *cookie)
+>   	 * insertion to guarantee those are observed before the TLBI. Do be
+>   	 * careful, 007.
+>   	 */
+> -	if (smmu_domain->stage == ARM_SMMU_DOMAIN_S1) {
+> +	if (ext_asid >= 0) { /* guest stage 1 invalidation */
+> +		cmd.opcode	= CMDQ_OP_TLBI_NH_ASID;
+> +		cmd.tlbi.asid	= ext_asid;
+> +		cmd.tlbi.vmid	= smmu_domain->s2_cfg.vmid;
+> +		arm_smmu_cmdq_issue_cmd(smmu, &cmd);
+> +		arm_smmu_cmdq_issue_sync(smmu);
+> +	} else if (smmu_domain->stage == ARM_SMMU_DOMAIN_S1) {
+>   		arm_smmu_tlb_inv_asid(smmu, smmu_domain->s1_cfg.cd.asid);
+>   	} else {
+>   		cmd.opcode	= CMDQ_OP_TLBI_S12_VMALL;
+> @@ -1867,6 +1873,13 @@ static void arm_smmu_tlb_inv_context(void *cookie)
+>   	arm_smmu_atc_inv_domain(smmu_domain, 0, 0, 0);
+>   }
+>   
+> +static void arm_smmu_tlb_inv_context(void *cookie)
+> +{
+> +	struct arm_smmu_domain *smmu_domain = cookie;
+> +
+> +	__arm_smmu_tlb_inv_context(smmu_domain, -1);
+> +}
+> +
+>   static void __arm_smmu_tlb_inv_range(struct arm_smmu_cmdq_ent *cmd,
+>   				     unsigned long iova, size_t size,
+>   				     size_t granule,
+> @@ -1926,9 +1939,10 @@ static void __arm_smmu_tlb_inv_range(struct arm_smmu_cmdq_ent *cmd,
+>   	arm_smmu_cmdq_batch_submit(smmu, &cmds);
+>   }
+>   
+Here is the part of code in __arm_smmu_tlb_inv_range():
+>         if (smmu->features & ARM_SMMU_FEAT_RANGE_INV) {
+>                 /* Get the leaf page size */
+>                 tg = __ffs(smmu_domain->domain.pgsize_bitmap);
+>
+>                 /* Convert page size of 12,14,16 (log2) to 1,2,3 */
+>                 cmd->tlbi.tg = (tg - 10) / 2;
+>
+>                 /* Determine what level the granule is at */
+>                 cmd->tlbi.ttl = 4 - ((ilog2(granule) - 3) / (tg - 3));
+>
+>                 num_pages = size >> tg;
+>         }
+When pSMMU supports RIL, we get the leaf page size by __ffs(smmu_domain->
+domain.pgsize_bitmap). In nested mode, it is determined by host 
+PAGE_SIZE. If
+the host kernel and guest kernel has different translation granule (e.g. 
+host 16K,
+guest 4K), __arm_smmu_tlb_inv_range() will issue an incorrect tlbi command.
 
-It should be protected by some kconfig and the kconfig should be
-turned off for syzkaller runs.
+Do you have any idea about this issue?
 
-Jason
+Best Regards,
+Kunkun Jiang
+> -static void arm_smmu_tlb_inv_range_domain(unsigned long iova, size_t size,
+> -					  size_t granule, bool leaf,
+> -					  struct arm_smmu_domain *smmu_domain)
+> +static void
+> +arm_smmu_tlb_inv_range_domain(unsigned long iova, size_t size,
+> +			      size_t granule, bool leaf, int ext_asid,
+> +			      struct arm_smmu_domain *smmu_domain)
+>   {
+>   	struct arm_smmu_cmdq_ent cmd = {
+>   		.tlbi = {
+> @@ -1936,7 +1950,12 @@ static void arm_smmu_tlb_inv_range_domain(unsigned long iova, size_t size,
+>   		},
+>   	};
+>   
+> -	if (smmu_domain->stage == ARM_SMMU_DOMAIN_S1) {
+> +	if (ext_asid >= 0) {  /* guest stage 1 invalidation */
+> +		cmd.opcode	= smmu_domain->smmu->features & ARM_SMMU_FEAT_E2H ?
+> +				  CMDQ_OP_TLBI_EL2_VA : CMDQ_OP_TLBI_NH_VA;
+> +		cmd.tlbi.asid	= ext_asid;
+> +		cmd.tlbi.vmid	= smmu_domain->s2_cfg.vmid;
+> +	} else if (smmu_domain->stage == ARM_SMMU_DOMAIN_S1) {
+>   		cmd.opcode	= smmu_domain->smmu->features & ARM_SMMU_FEAT_E2H ?
+>   				  CMDQ_OP_TLBI_EL2_VA : CMDQ_OP_TLBI_NH_VA;
+>   		cmd.tlbi.asid	= smmu_domain->s1_cfg.cd.asid;
+> @@ -1944,6 +1963,7 @@ static void arm_smmu_tlb_inv_range_domain(unsigned long iova, size_t size,
+>   		cmd.opcode	= CMDQ_OP_TLBI_S2_IPA;
+>   		cmd.tlbi.vmid	= smmu_domain->s2_cfg.vmid;
+>   	}
+> +
+>   	__arm_smmu_tlb_inv_range(&cmd, iova, size, granule, smmu_domain);
+>   
+>   	/*
+> @@ -1982,7 +2002,7 @@ static void arm_smmu_tlb_inv_page_nosync(struct iommu_iotlb_gather *gather,
+>   static void arm_smmu_tlb_inv_walk(unsigned long iova, size_t size,
+>   				  size_t granule, void *cookie)
+>   {
+> -	arm_smmu_tlb_inv_range_domain(iova, size, granule, false, cookie);
+> +	arm_smmu_tlb_inv_range_domain(iova, size, granule, false, -1, cookie);
+>   }
+>   
+>   static const struct iommu_flush_ops arm_smmu_flush_ops = {
+> @@ -2523,7 +2543,7 @@ static void arm_smmu_iotlb_sync(struct iommu_domain *domain,
+>   
+>   	arm_smmu_tlb_inv_range_domain(gather->start,
+>   				      gather->end - gather->start + 1,
+> -				      gather->pgsize, true, smmu_domain);
+> +				      gather->pgsize, true, -1, smmu_domain);
+>   }
+>   
+>   static phys_addr_t
+
+
