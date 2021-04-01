@@ -2,63 +2,63 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id AC24C351AAE
-	for <lists+kvm@lfdr.de>; Thu,  1 Apr 2021 20:07:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 07E7A351B42
+	for <lists+kvm@lfdr.de>; Thu,  1 Apr 2021 20:09:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236586AbhDASCn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 1 Apr 2021 14:02:43 -0400
-Received: from esa5.hgst.iphmx.com ([216.71.153.144]:55706 "EHLO
-        esa5.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236982AbhDAR7V (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 1 Apr 2021 13:59:21 -0400
+        id S236401AbhDASHF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 1 Apr 2021 14:07:05 -0400
+Received: from esa3.hgst.iphmx.com ([216.71.153.141]:24325 "EHLO
+        esa3.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235348AbhDASBn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 1 Apr 2021 14:01:43 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1617299961; x=1648835961;
+  t=1617300103; x=1648836103;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:content-transfer-encoding:mime-version;
-  bh=Cv7WX2EE1SbRar1JoxqAaBKIwtCLmzEkTXxez0zd1NE=;
-  b=VefwTBhqIY/1qCC4APKzzLMz5g5BPkoqQIOB0+PPaxZLVTKK0nwI7TcU
-   vtTYNMNetITR44ih321obiVfUwA5W3E4MLTiufxWqEmqgpmKqkhGW8seJ
-   7Ly6pxJTH3sS6s6NUhGE+nFP3Wmro/NDFXiuviuNQxYO/PJPa0XoePxPY
-   Blbxs23rymC+hOpGXzrUVFVSvgFWCEcxTacI1+hQsisuC1cMW/YmgStq2
-   2jqr3gKhXLDh9yTh1RljvOH0cDW+gg23xAPMnUB2K2zvKhwMO85MWTffp
-   v6z5nmsGYw7aYvAxtbpEzoitEPCZhp8WN56N+vuWzSCIhvcs4lJ7L+3OG
+  bh=FkjyrHsZ7iKMxVlnxosiKw3iNRUHB1XFuvwXtws64QM=;
+  b=QnNq7uourC6fQ1fvKm5gObS64ju43HqaRpKIoP7f0p46wGZt75InDKJN
+   5A9nl+FDlgvK+KLEgOZc1kSRM+uAyLWWm0AbX08wVC+GLJSmCcu9JOLpq
+   T0oPO3a9xeP2ZMgkR6fWDqJNWl9l56OvbnYWX7SfcsY9TgLu3uSrpej1s
+   Qk5NeWNXeQ0Xf5JVLaomvxk6DUeuj9oTtfmhfJNV9sfVl+SsMLgrGp8w1
+   tzAGmove255bzMxbWf1ngL68Qb9ImGyCN8XErw7yTZ5jWDdX5o2h7dEqr
+   esMA7TfGAjHfVU2cboLkWd+Uk7Fq3SE5kNOAwuwwZz/IhjzxETAnKYAm8
    g==;
-IronPort-SDR: WSFNYfDvccBw5H31ocTZJiVYzQ3t/pK67Q3lEGB+wSDHzpNIt+Gd+2J8q5/wNa3y20OU+5AfjI
- ubQXlWsj+A/RlnPdtbGff1C3JkF+47IJxrrY333YcSXgSf4Anu6anE2NzGuc/V4sAs6/sFpTu3
- r7KX+m1mjd8VeWYKKwCfEU3sjysX2HTy2qmQOqz/jACfMiez8Q61uRalCRWIHJQXawadZ6Riyi
- SplCFtyFGTNAAMcBCTWuK6hBOJ3a+ZloPHa1KuIRa/JWDRHWpjqbe1V937ArcH/Xfrpduu5PY2
- g5Y=
+IronPort-SDR: UKQA7EKhGjyK9A0K7X2p3lvPIedfJD2o53GhsZZcyFQ+JkFnd95nTrcbMMh67rxrLHucgGxgkw
+ +tH+ADh4cL7vDuLuA1jVDJPCpFXRS06B8dWEp2uO4u5tuh4plHq8F4v14rSYrxyHNQ0aClXZHm
+ cje9MSdP8BhRNCcmCaDdx9m3JBelXQph/6pMCMn15nLpz0XAbhefbXhZVgtpZonmj8lMNWZBQ1
+ ungNyUSyy4WCYexPxxhTTdgnkX1LeHY3VK4Jb/U3n5qRs2q5nwTCgh31OFMVp1WKhtxLM46o0r
+ BAk=
 X-IronPort-AV: E=Sophos;i="5.81,296,1610380800"; 
-   d="scan'208";a="163561074"
-Received: from mail-co1nam11lp2177.outbound.protection.outlook.com (HELO NAM11-CO1-obe.outbound.protection.outlook.com) ([104.47.56.177])
-  by ob1.hgst.iphmx.com with ESMTP; 01 Apr 2021 21:37:33 +0800
+   d="scan'208";a="168041508"
+Received: from mail-dm6nam12lp2176.outbound.protection.outlook.com (HELO NAM12-DM6-obe.outbound.protection.outlook.com) ([104.47.59.176])
+  by ob1.hgst.iphmx.com with ESMTP; 01 Apr 2021 21:37:47 +0800
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=lvP+TWZEpgm60+UTpZ9xfcBDASt+MN50cn2cvf/g4uRSRL9X+WwVqKQaEqie5zoumMgMXaLMqko9tGAG6vssiDkkm5jsBvZeU70kL46XDwTkMqxrOoK6VkDev/cbfKuLNDn59YINAsBDNsdTuu9PQ656rRk/Ty6YM0URZPbYhPKctvMFkb2M3smlljsE/4g441Vb0UhzHPwuzd3huE+OXxhOwcNVyCGM9KenJDvlnMkxOv22xuZnpz99FSwpvsJ15trAJppvmMRn0QzyfgWlzDtbWbwr9jpTm4tCHcZ6oOJlUSUhEHM8rDwU1yNR66I+nta2D+0vqijqTOGEyprIMA==
+ b=kipMnIi4FiauZqZv+BVWmFfLxadm6B87/swYZsbAMUHqWIXV5Jcj+/OOFkBSWtEAfsOsg854cfSkLZIlwo638obxbP5nnGelxoDT9Yv0dV9pbUcz+h50wkJHVr1kKTVOafKugoxCOuVImBVl4HeLpPuBRepMFr/eOfi3+Y8nu3SD26/nxx+bvw6aeBU02JiSLOrvXRC1HadJ9NquiTC91MEFMPCpR7d78BXAlMK8SxV3CbbawPXakAkvl7H6GARrhMWv0nBO8KK8P+fdKbgvAWH6oKlqG3pOGRzwNcsSpSiyvpOaX3UOKsLFFptswjua1OVbCtg6QhzwPzmPt3AWEw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=4Jj3CxBbVd76X3DYsqH5OF8ruAN4DCs8ldmy6Vz7apg=;
- b=gV7bP5caEIPotXURMyAbZNOnaVJ9S65zCt9MuLdNmnwEvCzqp5CgAGdW9w+qHYuT0VrtydYzkcG6gjK0HEwR/F2igUCg2+ckx6Rvz5pA7A3IfKy4MnWXUhodHE9insif680JV60ZS12H8lWd7xkpA9xq29XWDlke2+6jRQ+YXoV5LwV+YaCVcnfQQpSMtUoKetpdRYOKIB23njLaSlrOmO6BGxpJGFIuBJKRiKw7ZFtc+q9UJnsw6rNquKxLHr66fkBecs8EN5u02WUtANHO5GJPIcZauaUnrCYty1XiyG3Cyd5N6sf6Z/4N5kK2BWuLtYZQmRtNxIORg3yJ7VkFOw==
+ bh=JQ5ZHY+ol5QA2+krLfHcmhjpsV56mK4iyXlk+aWiMP0=;
+ b=kJjh+ikiidPBANAAAnEcihI7oTrqwucpDLdbrWEyI1iQi1ANa+kORxAnwo2jIpsA+cceHN6qTvx9a1TypCrGNH3Dutv6UDtWKgtB4WQxRB0r13R6ffzCTkciRSNNcyUer94MSJCWJvuXhr3sw+UL/8VdrmHHMfsMGoqdG2jJUDZKajEkkO8qVFA3nW7EjMrCGstoCwExxDD00ZrHNO60xibXbrioufuE9ZctWTPi3fD1HuUjl2rSV9jIZQd6ZLBb1UnZvn23ilLq2DLLTsX0kYTvJsM0ZkwQhcGvM9eMw4oFSVsb6RT2ybbvqojvI6OjYFV7V2HPCo58/EaeCYBnbQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
  header.d=wdc.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=4Jj3CxBbVd76X3DYsqH5OF8ruAN4DCs8ldmy6Vz7apg=;
- b=Tj6HQ0a0A9+Nr4KbMuw1ZG9fp7bhUiArDBFIixtFy4RbqoSfyyFXXFpuyf/z7wSdbpdiUvWQlg2YlWBMz5f7CAbQxvD+3Vi/mYiDo8lgJabfPsj9ME/rhS4LkSWXOFqqNd2Iq7cVBA7bQIAzEveloGIxyhhDhFtIaV0uDVYeylI=
+ bh=JQ5ZHY+ol5QA2+krLfHcmhjpsV56mK4iyXlk+aWiMP0=;
+ b=UVS4UQb7boQaZcTb6QPgjrWhLFr8x5iI5Qz9WyN9hh6e2aXw9Z3XkuEC/ETenJrlp21TL6D4GXYsSM7PtAyJDFWWnDjQ9B7AGJDmHKHQPm3pCrIJegOThh7sZU/qYNktv8Hb5l57aowFYT0sYqF1PG3IHRBbdLRc0omTXI040KI=
 Authentication-Results: dabbelt.com; dkim=none (message not signed)
  header.d=none;dabbelt.com; dmarc=none action=none header.from=wdc.com;
 Received: from DM6PR04MB6201.namprd04.prod.outlook.com (2603:10b6:5:127::32)
  by DM6PR04MB6528.namprd04.prod.outlook.com (2603:10b6:5:20a::20) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3999.28; Thu, 1 Apr
- 2021 13:37:32 +0000
+ 2021 13:37:45 +0000
 Received: from DM6PR04MB6201.namprd04.prod.outlook.com
  ([fe80::38c0:cc46:192b:1868]) by DM6PR04MB6201.namprd04.prod.outlook.com
  ([fe80::38c0:cc46:192b:1868%7]) with mapi id 15.20.3977.033; Thu, 1 Apr 2021
- 13:37:32 +0000
+ 13:37:45 +0000
 From:   Anup Patel <anup.patel@wdc.com>
 To:     Palmer Dabbelt <palmer@dabbelt.com>,
         Palmer Dabbelt <palmerdabbelt@google.com>,
@@ -71,10 +71,11 @@ Cc:     Alexander Graf <graf@amazon.com>,
         Damien Le Moal <damien.lemoal@wdc.com>,
         Anup Patel <anup@brainfault.org>, kvm@vger.kernel.org,
         kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
-        linux-kernel@vger.kernel.org, Anup Patel <anup.patel@wdc.com>
-Subject: [PATCH v17 09/17] RISC-V: KVM: Implement VMID allocator
-Date:   Thu,  1 Apr 2021 19:04:27 +0530
-Message-Id: <20210401133435.383959-10-anup.patel@wdc.com>
+        linux-kernel@vger.kernel.org, Anup Patel <anup.patel@wdc.com>,
+        Yifei Jiang <jiangyifei@huawei.com>
+Subject: [PATCH v17 10/17] RISC-V: KVM: Implement stage2 page table programming
+Date:   Thu,  1 Apr 2021 19:04:28 +0530
+Message-Id: <20210401133435.383959-11-anup.patel@wdc.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20210401133435.383959-1-anup.patel@wdc.com>
 References: <20210401133435.383959-1-anup.patel@wdc.com>
@@ -86,425 +87,904 @@ X-ClientProxiedBy: MA1PR01CA0104.INDPRD01.PROD.OUTLOOK.COM
  (2603:10b6:5:127::32)
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from wdc.com (122.179.112.210) by MA1PR01CA0104.INDPRD01.PROD.OUTLOOK.COM (2603:1096:a00:1::20) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3999.28 via Frontend Transport; Thu, 1 Apr 2021 13:37:15 +0000
+Received: from wdc.com (122.179.112.210) by MA1PR01CA0104.INDPRD01.PROD.OUTLOOK.COM (2603:1096:a00:1::20) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3999.28 via Frontend Transport; Thu, 1 Apr 2021 13:37:35 +0000
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: a4ef0fc9-d327-47b4-7319-08d8f5134d36
+X-MS-Office365-Filtering-Correlation-Id: 554078e4-0845-4da2-0896-08d8f5135521
 X-MS-TrafficTypeDiagnostic: DM6PR04MB6528:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <DM6PR04MB652839622D54E76D1AA969498D7B9@DM6PR04MB6528.namprd04.prod.outlook.com>
+X-Microsoft-Antispam-PRVS: <DM6PR04MB6528122B29357C28BD4CE9C38D7B9@DM6PR04MB6528.namprd04.prod.outlook.com>
 WDCIPOUTBOUND: EOP-TRUE
-X-MS-Oob-TLC-OOBClassifiers: OLM:8273;
+X-MS-Oob-TLC-OOBClassifiers: OLM:5516;
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: VazmdDQTTQyJHXLODQgGNS7EmpiFGqADanHFm7NPI7+9MJhQTNksJdzi/b46DM8OfitS6BWv80CM9N3ukGiEpajV2O7MrDJsSrC2VXqngizEU5mIX/pGx5uAf0vzQxvVejsisxUtNWBY46NVcZnxO0JnwV/ZExMVnxGAZJzpJwOhA3HKzg/Dko3q+goZeO4Z1izl8xmh8vGBhrVAgf6xsLpAmK5Yjkx+dJm9pWGRb+jWhxKabK0COjrP6NpwF9ZJKOAxXVXR7GANW+ZiER1xffbPYs5LHmC5gJcB7CsvtIXMBhBxRDyInd/jve7TU3kKY+qiSIV0nc6paIKLK1A3ucoVOl/ymXRF2nMVaCUg3Fu24O1eeQvGkWtJDx+yqo7wMwNolEd2weUNMwCLt1nmPg5WIv1O7WB+lpN10c8WsCP3orTmJPaTBlibpbJi/CUeWYqonMw93+eYoa2x2/XNBJ/9Cg5KhuzEuyvz4vrWUH0Yx37JJeRvH7plJwmuzRt+Qo/s4IhHWrZXX/VOQl0OV1g87FKkDtVgO3cFb2j6yM4/rhextHIrym9QUDP884e7/A2ko+x760RKx8hNY1TLUuuik00orNQSsMiF/nhccKCeU7ASRBrRHgIk6nSX3i7/noENcBmgDMGHAn1yvRSAkNLY6f/ik6zAwaAv0+e/huc=
+X-Microsoft-Antispam-Message-Info: KOFFQubq6Mv8ymrjXWKok+CbKGRQQnpeqc6dTghn81HglVbUSWlJ0Gqm+juGVV178lA7rsy/IrU55wCEZsCwPjAaUAmAoqJC729/5fVcdmQtNGvCCQ5jLucslzQobK2iJvW1cqPcPhCcM5m08LfFP5NKiYAb2FYnLS+9BPLMOiXB4ZRqUwBb6762ipRGtUOD46c5os9x9HyN7nl6M8aNkro5Ta2OCozQH6IaKd9XR1vh6T8hu29zBK24gnhepgp1jh+44GmO9MiZPodXhig7+E/xB6ZtVbedqFyuL2/hPyvaGytrWQRxx9OY3TMc63m03KmSJAT0tECE2zqJ9OyGiGZv3Z2N2hZ+PkNGOnR9qetGS/xSbAkzT1Ji73VyK4IhVAmBe+WHBm2cl/pRWzGfNIBMs3mjRfx4Mbd/YYe6wI7uN1brW6s+3K9TTpKd/J2cZO0ktZa9y5kZv72oZa6fWp3xif9n9LloSVVGpPr6gd7hxPFz0q+UdOG3v6WqbSfbA0uUlxlvYGiOmcVv5EolKMK4vyJUlbXvnxhziYk3H+nlcGt/zXAviWw40heiWefh4RQ+o+eQeJoVNupACBnFHQvBWsjF1MZQjpfq0XWkXj9htMpWNaY8JELFPFvXt7zMkng3GxaXcyi5921hxyGg2B7Wd80pmsXVNW/418+ZJcA=
 X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR04MB6201.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(136003)(366004)(376002)(396003)(346002)(39860400002)(8886007)(16526019)(36756003)(186003)(4326008)(956004)(2616005)(6666004)(316002)(66556008)(478600001)(26005)(66476007)(2906002)(54906003)(7416002)(1076003)(8936002)(55016002)(86362001)(83380400001)(8676002)(52116002)(110136005)(7696005)(5660300002)(38100700001)(30864003)(44832011)(66946007);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData: =?us-ascii?Q?pBZSXNaNVOOEpcDNDrR/uMy35qT8rNmySHv3a1bAI+l9KPx3NiY9rbSZhimD?=
- =?us-ascii?Q?PNk1Z/1AL4kDXvhGIt9VO5PdqklW3sSays9FSirzzMtbztOnkruTTl9nkNfe?=
- =?us-ascii?Q?3TiFsLZXb9KgzPA1bA/rkmGQ+XM7V1S8EeBu5WytltQDfTz5kGcHYsx9rW9I?=
- =?us-ascii?Q?gZOR71ISi+/wNJd5C9CEgt63xXi33wSJG0GvIGtbXo76LGh6AjgiuLhZK/xl?=
- =?us-ascii?Q?t+IDTi2Gqid2GkA6IEnuWqCXHri59vQqlvJOeZeT/3+RaBCTLiztP5MrR2wT?=
- =?us-ascii?Q?1MXcI7SLeyvAl/1g2+kuFMBZYytvkatVgdGYncBPWCA9TYxIIPmuv/BiwCIQ?=
- =?us-ascii?Q?FFM4+6uEjYoYbxdTktvcZt4BrLaYan2Esqdy896G8UpDUW9RCCkU5LTa/5Oo?=
- =?us-ascii?Q?PNS2RwCYsruiM6obq7/+tIbT0l65keMFZxX05Hyv97adQTCChj3MlAQ1itnp?=
- =?us-ascii?Q?yv1QTDzEe4w3A+SaTesC6hM/BMpdQf394ihDoHM085Adarp3MQdY2IwpPxFC?=
- =?us-ascii?Q?ik25HzBPpobgsyR7jDGrCTEHqL46m7nUvSeJF6X48HDC392AKGJqfX7lTe9y?=
- =?us-ascii?Q?wQTKtD9MiUkEuGQfFxtqiMMf3DGAs51GlEUMlgCYAl+YICsWNXcwilJQeKoD?=
- =?us-ascii?Q?Cu5JSFQ8bnB2I8ne5hUyhbRmXV9XpxYDbotj8tp7SiyebKsyG6UpU0GrTxfh?=
- =?us-ascii?Q?JxRCYVH1uFfUsHKilusg6RZ/VOFicoVGTl5p/kXMy9d5L4Nx4MNuvDd6Rygd?=
- =?us-ascii?Q?Wtl+qOofK+5HhFJrAF6wHLHobOTatnC7CIjeIxksP28/i2B1QnrltvRDm/8W?=
- =?us-ascii?Q?EIUCbjif0Rnv2YNe5/bT0rlWDBG+KcnJS5zWLBZ0zWXmadvvL+F1WY+AFUIE?=
- =?us-ascii?Q?Xp4m2OKEVc6Ujw/TTNnbjbOAahdCazpiBICShIbrt4OXkrUkfLXVBzONl363?=
- =?us-ascii?Q?Jv8ObDwhgFBUyqcn0kUqTPTS7w9allP2QeduHQLlYVk0vr//iQ2hEmyAApq2?=
- =?us-ascii?Q?WZQGXGXSL05MfU66Fc3AlM+2mtdews1ANrPNht+3A53wLi2wxoo8zcKH0Dnw?=
- =?us-ascii?Q?L4OX19PALgteUHgXDTsv55FpkTrfG/Em+SLMRHI/yuI9y+Xjp8chSLO+xrRP?=
- =?us-ascii?Q?U75t1av1WNOgNesSJ5kq6ZL1nq1JdIQZKaARWbbc2iSLwBngahoIKuX6G/5I?=
- =?us-ascii?Q?RIAMyMoPzrupun+YuVb2R0cB7XHRM4J6fS8lJyvBDlqFtJlWk7eNmNVervdV?=
- =?us-ascii?Q?XR29pDK9M/mPGHcgAlyssz6P8PDFzkHilF18lmCPRQ+mRsgzuKn/LeUEOgJs?=
- =?us-ascii?Q?F87PkPKstGMwjhCiSU60sGJUOLo//vVpy/kv5A5nQDfE7g=3D=3D?=
+X-MS-Exchange-AntiSpam-MessageData: =?us-ascii?Q?usCCadAIPplAbWzSMyjayhUiTUixF7Hecq8GvaFLemcMvcaNBsgKQDQkEh4z?=
+ =?us-ascii?Q?S+CdugunlXvfn/6LW2HvHOdEnzshYKuBL5cb6jlyPJrL3Jq9aDnzXN/8fmE+?=
+ =?us-ascii?Q?5Q3MXXh2VhjsI93G4gBLE4Z5pcGtZMcb4ngxmsbjsOH1a7uAQGkp/wqS6veI?=
+ =?us-ascii?Q?HIwTmmBiq7hNLgWae/S6Xp9xlRtYC4UC3E97ci53MoTUbnUSWYOMkNbSPZtK?=
+ =?us-ascii?Q?9hNCJ1YCFC4wLPcE0jjqU4KXg0mRC0oz/nzGz59kl3NGlCIwE7OdUJXRBrmw?=
+ =?us-ascii?Q?HEW/swOV8M6pgs3CVBx0lzzyNDUQxp+/pY5uzSDhZXbXO+g2rpuf9FVLy++r?=
+ =?us-ascii?Q?o9aG2Thnf7Ua8aQXX3+iCnVBXrk7CuIQbXjMv9fVdLbrW0Gif7hrymZdpmlp?=
+ =?us-ascii?Q?zkVEZPONM/M9vxt8NE2zPdB3XzZ/BG2ojkL/McQEYs9M2tLfY8L7xm03qOa6?=
+ =?us-ascii?Q?Qk+aTGYcuJC/ey4JMcQ3xOJW2mB5Xc2/I4nS5hdHg4qCKn+AfXw3Z607Zs5j?=
+ =?us-ascii?Q?ZW5yOtSJpk+eZJFZqjIUAcJUyrvU4fvwGMuSI7Ft9sJEW+nNy4dUHLJJa6//?=
+ =?us-ascii?Q?e9cuGqHzb9zA6fzNxxQ+kGS1mYkFawmfjZToBtpAIvScAMaIgnN2ywCXEdrq?=
+ =?us-ascii?Q?YJYcS0BjfRGFjceDJnn/6BfwsBqmlXUSqJBM3zmgt0BDQd405ied+cFkrTjh?=
+ =?us-ascii?Q?Pa00ZJ5L/PO/IYXIx7wX8fydAkk3nWdaxsoGcPYhUmYraMLjh2gomRCtLcM3?=
+ =?us-ascii?Q?Q6YzCEifdnlHWPpu/p9exUpDNdQ3JbByLScezdE+JejTMmdBCRd7R6LzZ2Tm?=
+ =?us-ascii?Q?hnCWNj7XLXXLySU1YOjnOTvvTTmmDTjAA8vX8Zx3sI4V5qwDJUMjMv5aAXcE?=
+ =?us-ascii?Q?LLHiIhyIc9/l58/L1WpgKi/wrtGR9cIDm5MkEhbjpd1jyHOrp13ZLc68V0r5?=
+ =?us-ascii?Q?5L1Bfk5DbL1ifuyJVL7ceD7Pbz6e/5cOGsfhWBNVlni2wphE9O1Rgv4BizDT?=
+ =?us-ascii?Q?WA2YUBnW3Dky+zVeRvf/dz/YiV7lxyCGTHvuvAjyxaf3KsEQN6zEQNyVCGbK?=
+ =?us-ascii?Q?6a3bwAqgOi1NXYuXFbjGejaPiWHi2yi0DPgcem0qsdBkuBmknGBVRcwRaKtt?=
+ =?us-ascii?Q?vwUmkfITngWJ4lDukmVstXmhlqTTRJhL6eAvv68HJ/lQH3zgtXmvcZAjXDCS?=
+ =?us-ascii?Q?GxdQ8H98F9Iqtc5h4RaYRWt+NO9e9/wTKGQsRq6wJmKXCoI1dTr4PtgU1j+W?=
+ =?us-ascii?Q?c4SWg/uJvulcPT1KVWyBP3mPXRltMhuhzW2ckEPcDbqkHwA5r2tBc+w8gA6s?=
+ =?us-ascii?Q?g5HCVRDBhDWASfiLnCpLHQ9cdh0p4hJqBpQkuxssfsEruA=3D=3D?=
 X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a4ef0fc9-d327-47b4-7319-08d8f5134d36
+X-MS-Exchange-CrossTenant-Network-Message-Id: 554078e4-0845-4da2-0896-08d8f5135521
 X-MS-Exchange-CrossTenant-AuthSource: DM6PR04MB6201.namprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Apr 2021 13:37:32.5300
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Apr 2021 13:37:45.8154
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: b61c8803-16f3-4c35-9b17-6f65f441df86
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: HGQ7wyTPBiJqL4eLEYeSEK93b6PSa8h9/llKbJhfZAOYcOpdJMajqsT66LcdOK44Q2ebpZuslm1Qj88NBHZqLQ==
+X-MS-Exchange-CrossTenant-UserPrincipalName: 4yslB0UCDacNnDrGCC/WiNn3DYFOY51a90HEX43Km56BX9exvmk/veKWvLvatd8kg6HMX3jgIjHKseVC5Mx7GA==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR04MB6528
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-We implement a simple VMID allocator for Guests/VMs which:
-1. Detects number of VMID bits at boot-time
-2. Uses atomic number to track VMID version and increments
-   VMID version whenever we run-out of VMIDs
-3. Flushes Guest TLBs on all host CPUs whenever we run-out
-   of VMIDs
-4. Force updates HW Stage2 VMID for each Guest VCPU whenever
-   VMID changes using VCPU request KVM_REQ_UPDATE_HGATP
+This patch implements all required functions for programming
+the stage2 page table for each Guest/VM.
 
+At high-level, the flow of stage2 related functions is similar
+from KVM ARM/ARM64 implementation but the stage2 page table
+format is quite different for KVM RISC-V.
+
+[jiangyifei: stage2 dirty log support]
+Signed-off-by: Yifei Jiang <jiangyifei@huawei.com>
 Signed-off-by: Anup Patel <anup.patel@wdc.com>
 Acked-by: Paolo Bonzini <pbonzini@redhat.com>
 Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
-Reviewed-by: Alexander Graf <graf@amazon.com>
 ---
- arch/riscv/include/asm/kvm_host.h |  24 ++++++
- arch/riscv/kvm/Makefile           |   3 +-
- arch/riscv/kvm/main.c             |   4 +
- arch/riscv/kvm/tlb.S              |  74 ++++++++++++++++++
- arch/riscv/kvm/vcpu.c             |   9 +++
- arch/riscv/kvm/vm.c               |   6 ++
- arch/riscv/kvm/vmid.c             | 120 ++++++++++++++++++++++++++++++
- 7 files changed, 239 insertions(+), 1 deletion(-)
- create mode 100644 arch/riscv/kvm/tlb.S
- create mode 100644 arch/riscv/kvm/vmid.c
+ arch/riscv/include/asm/kvm_host.h     |  12 +
+ arch/riscv/include/asm/pgtable-bits.h |   1 +
+ arch/riscv/kvm/Kconfig                |   1 +
+ arch/riscv/kvm/main.c                 |  19 +
+ arch/riscv/kvm/mmu.c                  | 650 +++++++++++++++++++++++++-
+ arch/riscv/kvm/vm.c                   |   6 -
+ 6 files changed, 673 insertions(+), 16 deletions(-)
 
 diff --git a/arch/riscv/include/asm/kvm_host.h b/arch/riscv/include/asm/kvm_host.h
-index 7541018314a4..8612d8b35322 100644
+index 8612d8b35322..f80c394312b8 100644
 --- a/arch/riscv/include/asm/kvm_host.h
 +++ b/arch/riscv/include/asm/kvm_host.h
-@@ -26,6 +26,7 @@
- #define KVM_REQ_SLEEP \
- 	KVM_ARCH_REQ_FLAGS(0, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
- #define KVM_REQ_VCPU_RESET		KVM_ARCH_REQ(1)
-+#define KVM_REQ_UPDATE_HGATP		KVM_ARCH_REQ(2)
- 
- struct kvm_vm_stat {
- 	ulong remote_tlb_flush;
-@@ -48,7 +49,19 @@ struct kvm_vcpu_stat {
- struct kvm_arch_memory_slot {
+@@ -75,6 +75,13 @@ struct kvm_mmio_decode {
+ 	int return_handled;
  };
  
-+struct kvm_vmid {
-+	/*
-+	 * Writes to vmid_version and vmid happen with vmid_lock held
-+	 * whereas reads happen without any lock held.
-+	 */
-+	unsigned long vmid_version;
-+	unsigned long vmid;
++#define KVM_MMU_PAGE_CACHE_NR_OBJS	32
++
++struct kvm_mmu_page_cache {
++	int nobjs;
++	void *objects[KVM_MMU_PAGE_CACHE_NR_OBJS];
 +};
 +
- struct kvm_arch {
-+	/* stage2 vmid */
-+	struct kvm_vmid vmid;
-+
- 	/* stage2 page table */
- 	pgd_t *pgd;
- 	phys_addr_t pgd_phys;
-@@ -179,6 +192,11 @@ static inline void kvm_arch_vcpu_uninit(struct kvm_vcpu *vcpu) {}
- static inline void kvm_arch_sched_in(struct kvm_vcpu *vcpu, int cpu) {}
- static inline void kvm_arch_vcpu_block_finish(struct kvm_vcpu *vcpu) {}
+ struct kvm_cpu_trap {
+ 	unsigned long sepc;
+ 	unsigned long scause;
+@@ -176,6 +183,9 @@ struct kvm_vcpu_arch {
+ 	/* MMIO instruction details */
+ 	struct kvm_mmio_decode mmio_decode;
  
-+void __kvm_riscv_hfence_gvma_vmid_gpa(unsigned long gpa, unsigned long vmid);
-+void __kvm_riscv_hfence_gvma_vmid(unsigned long vmid);
-+void __kvm_riscv_hfence_gvma_gpa(unsigned long gpa);
-+void __kvm_riscv_hfence_gvma_all(void);
++	/* Cache pages needed to program page tables with spinlock held */
++	struct kvm_mmu_page_cache mmu_page_cache;
 +
- int kvm_riscv_stage2_map(struct kvm_vcpu *vcpu,
- 			 struct kvm_memory_slot *memslot,
- 			 gpa_t gpa, unsigned long hva, bool is_write);
-@@ -187,6 +205,12 @@ int kvm_riscv_stage2_alloc_pgd(struct kvm *kvm);
+ 	/* VCPU power-off state */
+ 	bool power_off;
+ 
+@@ -204,6 +214,8 @@ void kvm_riscv_stage2_flush_cache(struct kvm_vcpu *vcpu);
+ int kvm_riscv_stage2_alloc_pgd(struct kvm *kvm);
  void kvm_riscv_stage2_free_pgd(struct kvm *kvm);
  void kvm_riscv_stage2_update_hgatp(struct kvm_vcpu *vcpu);
++void kvm_riscv_stage2_mode_detect(void);
++unsigned long kvm_riscv_stage2_mode(void);
  
-+void kvm_riscv_stage2_vmid_detect(void);
-+unsigned long kvm_riscv_stage2_vmid_bits(void);
-+int kvm_riscv_stage2_vmid_init(struct kvm *kvm);
-+bool kvm_riscv_stage2_vmid_ver_changed(struct kvm_vmid *vmid);
-+void kvm_riscv_stage2_vmid_update(struct kvm_vcpu *vcpu);
-+
- void __kvm_riscv_unpriv_trap(void);
+ void kvm_riscv_stage2_vmid_detect(void);
+ unsigned long kvm_riscv_stage2_vmid_bits(void);
+diff --git a/arch/riscv/include/asm/pgtable-bits.h b/arch/riscv/include/asm/pgtable-bits.h
+index bbaeb5d35842..be49d62fcc2b 100644
+--- a/arch/riscv/include/asm/pgtable-bits.h
++++ b/arch/riscv/include/asm/pgtable-bits.h
+@@ -26,6 +26,7 @@
  
- unsigned long kvm_riscv_vcpu_unpriv_read(struct kvm_vcpu *vcpu,
-diff --git a/arch/riscv/kvm/Makefile b/arch/riscv/kvm/Makefile
-index 54991cc55c00..b32f60edf48c 100644
---- a/arch/riscv/kvm/Makefile
-+++ b/arch/riscv/kvm/Makefile
-@@ -9,6 +9,7 @@ ccflags-y := -Ivirt/kvm -Iarch/riscv/kvm
+ #define _PAGE_SPECIAL   _PAGE_SOFT
+ #define _PAGE_TABLE     _PAGE_PRESENT
++#define _PAGE_LEAF      (_PAGE_READ | _PAGE_WRITE | _PAGE_EXEC)
  
- kvm-objs := $(common-objs-y)
- 
--kvm-objs += main.o vm.o mmu.o vcpu.o vcpu_exit.o vcpu_switch.o
-+kvm-objs += main.o vm.o vmid.o tlb.o mmu.o
-+kvm-objs += vcpu.o vcpu_exit.o vcpu_switch.o
- 
- obj-$(CONFIG_KVM)	+= kvm.o
+ /*
+  * _PAGE_PROT_NONE is set on not-present pages (and ignored by the hardware) to
+diff --git a/arch/riscv/kvm/Kconfig b/arch/riscv/kvm/Kconfig
+index b42979f84042..633063edaee8 100644
+--- a/arch/riscv/kvm/Kconfig
++++ b/arch/riscv/kvm/Kconfig
+@@ -23,6 +23,7 @@ config KVM
+ 	select PREEMPT_NOTIFIERS
+ 	select ANON_INODES
+ 	select KVM_MMIO
++	select KVM_GENERIC_DIRTYLOG_READ_PROTECT
+ 	select HAVE_KVM_VCPU_ASYNC_IOCTL
+ 	select HAVE_KVM_EVENTFD
+ 	select SRCU
 diff --git a/arch/riscv/kvm/main.c b/arch/riscv/kvm/main.c
-index 47926f0c175d..49a4941e3838 100644
+index 49a4941e3838..421ecf4e6360 100644
 --- a/arch/riscv/kvm/main.c
 +++ b/arch/riscv/kvm/main.c
-@@ -79,8 +79,12 @@ int kvm_arch_init(void *opaque)
+@@ -64,6 +64,8 @@ void kvm_arch_hardware_disable(void)
+ 
+ int kvm_arch_init(void *opaque)
+ {
++	const char *str;
++
+ 	if (!riscv_isa_extension_available(NULL, h)) {
+ 		kvm_info("hypervisor extension not available\n");
+ 		return -ENODEV;
+@@ -79,10 +81,27 @@ int kvm_arch_init(void *opaque)
  		return -ENODEV;
  	}
  
-+	kvm_riscv_stage2_vmid_detect();
++	kvm_riscv_stage2_mode_detect();
 +
+ 	kvm_riscv_stage2_vmid_detect();
+ 
  	kvm_info("hypervisor extension available\n");
  
-+	kvm_info("VMID %ld bits available\n", kvm_riscv_stage2_vmid_bits());
-+
- 	return 0;
- }
- 
-diff --git a/arch/riscv/kvm/tlb.S b/arch/riscv/kvm/tlb.S
-new file mode 100644
-index 000000000000..c858570f0856
---- /dev/null
-+++ b/arch/riscv/kvm/tlb.S
-@@ -0,0 +1,74 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+/*
-+ * Copyright (C) 2019 Western Digital Corporation or its affiliates.
-+ *
-+ * Authors:
-+ *     Anup Patel <anup.patel@wdc.com>
-+ */
-+
-+#include <linux/linkage.h>
-+#include <asm/asm.h>
-+
-+	.text
-+	.altmacro
-+	.option norelax
-+
-+	/*
-+	 * Instruction encoding of hfence.gvma is:
-+	 * HFENCE.GVMA rs1, rs2
-+	 * HFENCE.GVMA zero, rs2
-+	 * HFENCE.GVMA rs1
-+	 * HFENCE.GVMA
-+	 *
-+	 * rs1!=zero and rs2!=zero ==> HFENCE.GVMA rs1, rs2
-+	 * rs1==zero and rs2!=zero ==> HFENCE.GVMA zero, rs2
-+	 * rs1!=zero and rs2==zero ==> HFENCE.GVMA rs1
-+	 * rs1==zero and rs2==zero ==> HFENCE.GVMA
-+	 *
-+	 * Instruction encoding of HFENCE.GVMA is:
-+	 * 0110001 rs2(5) rs1(5) 000 00000 1110011
-+	 */
-+
-+ENTRY(__kvm_riscv_hfence_gvma_vmid_gpa)
-+	/*
-+	 * rs1 = a0 (GPA)
-+	 * rs2 = a1 (VMID)
-+	 * HFENCE.GVMA a0, a1
-+	 * 0110001 01011 01010 000 00000 1110011
-+	 */
-+	.word 0x62b50073
-+	ret
-+ENDPROC(__kvm_riscv_hfence_gvma_vmid_gpa)
-+
-+ENTRY(__kvm_riscv_hfence_gvma_vmid)
-+	/*
-+	 * rs1 = zero
-+	 * rs2 = a0 (VMID)
-+	 * HFENCE.GVMA zero, a0
-+	 * 0110001 01010 00000 000 00000 1110011
-+	 */
-+	.word 0x62a00073
-+	ret
-+ENDPROC(__kvm_riscv_hfence_gvma_vmid)
-+
-+ENTRY(__kvm_riscv_hfence_gvma_gpa)
-+	/*
-+	 * rs1 = a0 (GPA)
-+	 * rs2 = zero
-+	 * HFENCE.GVMA a0
-+	 * 0110001 00000 01010 000 00000 1110011
-+	 */
-+	.word 0x62050073
-+	ret
-+ENDPROC(__kvm_riscv_hfence_gvma_gpa)
-+
-+ENTRY(__kvm_riscv_hfence_gvma_all)
-+	/*
-+	 * rs1 = zero
-+	 * rs2 = zero
-+	 * HFENCE.GVMA
-+	 * 0110001 00000 00000 000 00000 1110011
-+	 */
-+	.word 0x62000073
-+	ret
-+ENDPROC(__kvm_riscv_hfence_gvma_all)
-diff --git a/arch/riscv/kvm/vcpu.c b/arch/riscv/kvm/vcpu.c
-index bf42afad9d9d..dcb2014cb2fc 100644
---- a/arch/riscv/kvm/vcpu.c
-+++ b/arch/riscv/kvm/vcpu.c
-@@ -622,6 +622,12 @@ static void kvm_riscv_check_vcpu_requests(struct kvm_vcpu *vcpu)
- 
- 		if (kvm_check_request(KVM_REQ_VCPU_RESET, vcpu))
- 			kvm_riscv_reset_vcpu(vcpu);
-+
-+		if (kvm_check_request(KVM_REQ_UPDATE_HGATP, vcpu))
-+			kvm_riscv_stage2_update_hgatp(vcpu);
-+
-+		if (kvm_check_request(KVM_REQ_TLB_FLUSH, vcpu))
-+			__kvm_riscv_hfence_gvma_all();
- 	}
- }
- 
-@@ -667,6 +673,8 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
- 		/* Check conditions before entering the guest */
- 		cond_resched();
- 
-+		kvm_riscv_stage2_vmid_update(vcpu);
-+
- 		kvm_riscv_check_vcpu_requests(vcpu);
- 
- 		preempt_disable();
-@@ -703,6 +711,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
- 		kvm_riscv_update_hvip(vcpu);
- 
- 		if (ret <= 0 ||
-+		    kvm_riscv_stage2_vmid_ver_changed(&vcpu->kvm->arch.vmid) ||
- 		    kvm_request_pending(vcpu)) {
- 			vcpu->mode = OUTSIDE_GUEST_MODE;
- 			local_irq_enable();
-diff --git a/arch/riscv/kvm/vm.c b/arch/riscv/kvm/vm.c
-index 496a86a74236..282d67617229 100644
---- a/arch/riscv/kvm/vm.c
-+++ b/arch/riscv/kvm/vm.c
-@@ -26,6 +26,12 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
- 	if (r)
- 		return r;
- 
-+	r = kvm_riscv_stage2_vmid_init(kvm);
-+	if (r) {
-+		kvm_riscv_stage2_free_pgd(kvm);
-+		return r;
++	switch (kvm_riscv_stage2_mode()) {
++	case HGATP_MODE_SV32X4:
++		str = "Sv32x4";
++		break;
++	case HGATP_MODE_SV39X4:
++		str = "Sv39x4";
++		break;
++	case HGATP_MODE_SV48X4:
++		str = "Sv48x4";
++		break;
++	default:
++		return -ENODEV;
 +	}
++	kvm_info("using %s G-stage page table format\n", str);
 +
- 	return 0;
- }
+ 	kvm_info("VMID %ld bits available\n", kvm_riscv_stage2_vmid_bits());
  
-diff --git a/arch/riscv/kvm/vmid.c b/arch/riscv/kvm/vmid.c
-new file mode 100644
-index 000000000000..2c6253b293bc
---- /dev/null
-+++ b/arch/riscv/kvm/vmid.c
-@@ -0,0 +1,120 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * Copyright (C) 2019 Western Digital Corporation or its affiliates.
-+ *
-+ * Authors:
-+ *     Anup Patel <anup.patel@wdc.com>
-+ */
-+
-+#include <linux/bitops.h>
-+#include <linux/cpumask.h>
-+#include <linux/errno.h>
-+#include <linux/err.h>
-+#include <linux/module.h>
-+#include <linux/kvm_host.h>
-+#include <asm/csr.h>
+ 	return 0;
+diff --git a/arch/riscv/kvm/mmu.c b/arch/riscv/kvm/mmu.c
+index 8ec10ef861e7..4c533a41b887 100644
+--- a/arch/riscv/kvm/mmu.c
++++ b/arch/riscv/kvm/mmu.c
+@@ -17,11 +17,415 @@
+ #include <linux/sched/signal.h>
+ #include <asm/page.h>
+ #include <asm/pgtable.h>
 +#include <asm/sbi.h>
 +
-+static unsigned long vmid_version = 1;
-+static unsigned long vmid_next;
-+static unsigned long vmid_bits;
-+static DEFINE_SPINLOCK(vmid_lock);
++#ifdef CONFIG_64BIT
++static unsigned long stage2_mode = (HGATP_MODE_SV39X4 << HGATP_MODE_SHIFT);
++static unsigned long stage2_pgd_levels = 3;
++#define stage2_index_bits	9
++#else
++static unsigned long stage2_mode = (HGATP_MODE_SV32X4 << HGATP_MODE_SHIFT);
++static unsigned long stage2_pgd_levels = 2;
++#define stage2_index_bits	10
++#endif
 +
-+void kvm_riscv_stage2_vmid_detect(void)
++#define stage2_pgd_xbits	2
++#define stage2_pgd_size	(1UL << (HGATP_PAGE_SHIFT + stage2_pgd_xbits))
++#define stage2_gpa_bits	(HGATP_PAGE_SHIFT + \
++			 (stage2_pgd_levels * stage2_index_bits) + \
++			 stage2_pgd_xbits)
++#define stage2_gpa_size	((gpa_t)(1ULL << stage2_gpa_bits))
++
++static inline unsigned long stage2_pte_index(gpa_t addr, u32 level)
 +{
-+	unsigned long old;
++	unsigned long mask;
++	unsigned long shift = HGATP_PAGE_SHIFT + (stage2_index_bits * level);
 +
-+	/* Figure-out number of VMID bits in HW */
-+	old = csr_read(CSR_HGATP);
-+	csr_write(CSR_HGATP, old | HGATP_VMID_MASK);
-+	vmid_bits = csr_read(CSR_HGATP);
-+	vmid_bits = (vmid_bits & HGATP_VMID_MASK) >> HGATP_VMID_SHIFT;
-+	vmid_bits = fls_long(vmid_bits);
-+	csr_write(CSR_HGATP, old);
++	if (level == (stage2_pgd_levels - 1))
++		mask = (PTRS_PER_PTE * (1UL << stage2_pgd_xbits)) - 1;
++	else
++		mask = PTRS_PER_PTE - 1;
 +
-+	/* We polluted local TLB so flush all guest TLB */
-+	__kvm_riscv_hfence_gvma_all();
-+
-+	/* We don't use VMID bits if they are not sufficient */
-+	if ((1UL << vmid_bits) < num_possible_cpus())
-+		vmid_bits = 0;
++	return (addr >> shift) & mask;
 +}
 +
-+unsigned long kvm_riscv_stage2_vmid_bits(void)
++static inline unsigned long stage2_pte_page_vaddr(pte_t pte)
 +{
-+	return vmid_bits;
++	return (unsigned long)pfn_to_virt(pte_val(pte) >> _PAGE_PFN_SHIFT);
 +}
 +
-+int kvm_riscv_stage2_vmid_init(struct kvm *kvm)
++static int stage2_page_size_to_level(unsigned long page_size, u32 *out_level)
 +{
-+	/* Mark the initial VMID and VMID version invalid */
-+	kvm->arch.vmid.vmid_version = 0;
-+	kvm->arch.vmid.vmid = 0;
++	u32 i;
++	unsigned long psz = 1UL << 12;
++
++	for (i = 0; i < stage2_pgd_levels; i++) {
++		if (page_size == (psz << (i * stage2_index_bits))) {
++			*out_level = i;
++			return 0;
++		}
++	}
++
++	return -EINVAL;
++}
++
++static int stage2_level_to_page_size(u32 level, unsigned long *out_pgsize)
++{
++	if (stage2_pgd_levels < level)
++		return -EINVAL;
++
++	*out_pgsize = 1UL << (12 + (level * stage2_index_bits));
 +
 +	return 0;
 +}
 +
-+bool kvm_riscv_stage2_vmid_ver_changed(struct kvm_vmid *vmid)
++static int stage2_cache_topup(struct kvm_mmu_page_cache *pcache,
++			      int min, int max)
 +{
-+	if (!vmid_bits)
-+		return false;
++	void *page;
 +
-+	return unlikely(READ_ONCE(vmid->vmid_version) !=
-+			READ_ONCE(vmid_version));
++	BUG_ON(max > KVM_MMU_PAGE_CACHE_NR_OBJS);
++	if (pcache->nobjs >= min)
++		return 0;
++	while (pcache->nobjs < max) {
++		page = (void *)__get_free_page(GFP_KERNEL | __GFP_ZERO);
++		if (!page)
++			return -ENOMEM;
++		pcache->objects[pcache->nobjs++] = page;
++	}
++
++	return 0;
 +}
 +
-+void kvm_riscv_stage2_vmid_update(struct kvm_vcpu *vcpu)
++static void stage2_cache_flush(struct kvm_mmu_page_cache *pcache)
 +{
-+	int i;
-+	struct kvm_vcpu *v;
++	while (pcache && pcache->nobjs)
++		free_page((unsigned long)pcache->objects[--pcache->nobjs]);
++}
++
++static void *stage2_cache_alloc(struct kvm_mmu_page_cache *pcache)
++{
++	void *p;
++
++	if (!pcache)
++		return NULL;
++
++	BUG_ON(!pcache->nobjs);
++	p = pcache->objects[--pcache->nobjs];
++
++	return p;
++}
++
++static bool stage2_get_leaf_entry(struct kvm *kvm, gpa_t addr,
++				  pte_t **ptepp, u32 *ptep_level)
++{
++	pte_t *ptep;
++	u32 current_level = stage2_pgd_levels - 1;
++
++	*ptep_level = current_level;
++	ptep = (pte_t *)kvm->arch.pgd;
++	ptep = &ptep[stage2_pte_index(addr, current_level)];
++	while (ptep && pte_val(*ptep)) {
++		if (pte_val(*ptep) & _PAGE_LEAF) {
++			*ptep_level = current_level;
++			*ptepp = ptep;
++			return true;
++		}
++
++		if (current_level) {
++			current_level--;
++			*ptep_level = current_level;
++			ptep = (pte_t *)stage2_pte_page_vaddr(*ptep);
++			ptep = &ptep[stage2_pte_index(addr, current_level)];
++		} else {
++			ptep = NULL;
++		}
++	}
++
++	return false;
++}
++
++static void stage2_remote_tlb_flush(struct kvm *kvm, u32 level, gpa_t addr)
++{
 +	struct cpumask hmask;
-+	struct kvm_vmid *vmid = &vcpu->kvm->arch.vmid;
++	unsigned long size = PAGE_SIZE;
++	struct kvm_vmid *vmid = &kvm->arch.vmid;
 +
-+	if (!kvm_riscv_stage2_vmid_ver_changed(vmid))
++	if (stage2_level_to_page_size(level, &size))
 +		return;
-+
-+	spin_lock(&vmid_lock);
++	addr &= ~(size - 1);
 +
 +	/*
-+	 * We need to re-check the vmid_version here to ensure that if
-+	 * another vcpu already allocated a valid vmid for this vm.
++	 * TODO: Instead of cpu_online_mask, we should only target CPUs
++	 * where the Guest/VM is running.
 +	 */
-+	if (!kvm_riscv_stage2_vmid_ver_changed(vmid)) {
-+		spin_unlock(&vmid_lock);
-+		return;
++	preempt_disable();
++	riscv_cpuid_to_hartid_mask(cpu_online_mask, &hmask);
++	sbi_remote_hfence_gvma_vmid(cpumask_bits(&hmask), addr, size,
++				    READ_ONCE(vmid->vmid));
++	preempt_enable();
++}
++
++static int stage2_set_pte(struct kvm *kvm, u32 level,
++			   struct kvm_mmu_page_cache *pcache,
++			   gpa_t addr, const pte_t *new_pte)
++{
++	u32 current_level = stage2_pgd_levels - 1;
++	pte_t *next_ptep = (pte_t *)kvm->arch.pgd;
++	pte_t *ptep = &next_ptep[stage2_pte_index(addr, current_level)];
++
++	if (current_level < level)
++		return -EINVAL;
++
++	while (current_level != level) {
++		if (pte_val(*ptep) & _PAGE_LEAF)
++			return -EEXIST;
++
++		if (!pte_val(*ptep)) {
++			next_ptep = stage2_cache_alloc(pcache);
++			if (!next_ptep)
++				return -ENOMEM;
++			*ptep = pfn_pte(PFN_DOWN(__pa(next_ptep)),
++					__pgprot(_PAGE_TABLE));
++		} else {
++			if (pte_val(*ptep) & _PAGE_LEAF)
++				return -EEXIST;
++			next_ptep = (pte_t *)stage2_pte_page_vaddr(*ptep);
++		}
++
++		current_level--;
++		ptep = &next_ptep[stage2_pte_index(addr, current_level)];
 +	}
 +
-+	/* First user of a new VMID version? */
-+	if (unlikely(vmid_next == 0)) {
-+		WRITE_ONCE(vmid_version, READ_ONCE(vmid_version) + 1);
-+		vmid_next = 1;
++	*ptep = *new_pte;
++	if (pte_val(*ptep) & _PAGE_LEAF)
++		stage2_remote_tlb_flush(kvm, current_level, addr);
++
++	return 0;
++}
++
++static int stage2_map_page(struct kvm *kvm,
++			   struct kvm_mmu_page_cache *pcache,
++			   gpa_t gpa, phys_addr_t hpa,
++			   unsigned long page_size,
++			   bool page_rdonly, bool page_exec)
++{
++	int ret;
++	u32 level = 0;
++	pte_t new_pte;
++	pgprot_t prot;
++
++	ret = stage2_page_size_to_level(page_size, &level);
++	if (ret)
++		return ret;
++
++	/*
++	 * A RISC-V implementation can choose to either:
++	 * 1) Update 'A' and 'D' PTE bits in hardware
++	 * 2) Generate page fault when 'A' and/or 'D' bits are not set
++	 *    PTE so that software can update these bits.
++	 *
++	 * We support both options mentioned above. To achieve this, we
++	 * always set 'A' and 'D' PTE bits at time of creating stage2
++	 * mapping. To support KVM dirty page logging with both options
++	 * mentioned above, we will write-protect stage2 PTEs to track
++	 * dirty pages.
++	 */
++
++	if (page_exec) {
++		if (page_rdonly)
++			prot = PAGE_READ_EXEC;
++		else
++			prot = PAGE_WRITE_EXEC;
++	} else {
++		if (page_rdonly)
++			prot = PAGE_READ;
++		else
++			prot = PAGE_WRITE;
++	}
++	new_pte = pfn_pte(PFN_DOWN(hpa), prot);
++	new_pte = pte_mkdirty(new_pte);
++
++	return stage2_set_pte(kvm, level, pcache, gpa, &new_pte);
++}
++
++enum stage2_op {
++	STAGE2_OP_NOP = 0,	/* Nothing */
++	STAGE2_OP_CLEAR,	/* Clear/Unmap */
++	STAGE2_OP_WP,		/* Write-protect */
++};
++
++static void stage2_op_pte(struct kvm *kvm, gpa_t addr,
++			  pte_t *ptep, u32 ptep_level, enum stage2_op op)
++{
++	int i, ret;
++	pte_t *next_ptep;
++	u32 next_ptep_level;
++	unsigned long next_page_size, page_size;
++
++	ret = stage2_level_to_page_size(ptep_level, &page_size);
++	if (ret)
++		return;
++
++	BUG_ON(addr & (page_size - 1));
++
++	if (!pte_val(*ptep))
++		return;
++
++	if (ptep_level && !(pte_val(*ptep) & _PAGE_LEAF)) {
++		next_ptep = (pte_t *)stage2_pte_page_vaddr(*ptep);
++		next_ptep_level = ptep_level - 1;
++		ret = stage2_level_to_page_size(next_ptep_level,
++						&next_page_size);
++		if (ret)
++			return;
++
++		if (op == STAGE2_OP_CLEAR)
++			set_pte(ptep, __pte(0));
++		for (i = 0; i < PTRS_PER_PTE; i++)
++			stage2_op_pte(kvm, addr + i * next_page_size,
++					&next_ptep[i], next_ptep_level, op);
++		if (op == STAGE2_OP_CLEAR)
++			put_page(virt_to_page(next_ptep));
++	} else {
++		if (op == STAGE2_OP_CLEAR)
++			set_pte(ptep, __pte(0));
++		else if (op == STAGE2_OP_WP)
++			set_pte(ptep, __pte(pte_val(*ptep) & ~_PAGE_WRITE));
++		stage2_remote_tlb_flush(kvm, ptep_level, addr);
++	}
++}
++
++static void stage2_unmap_range(struct kvm *kvm, gpa_t start, gpa_t size)
++{
++	int ret;
++	pte_t *ptep;
++	u32 ptep_level;
++	bool found_leaf;
++	unsigned long page_size;
++	gpa_t addr = start, end = start + size;
++
++	while (addr < end) {
++		found_leaf = stage2_get_leaf_entry(kvm, addr,
++						   &ptep, &ptep_level);
++		ret = stage2_level_to_page_size(ptep_level, &page_size);
++		if (ret)
++			break;
++
++		if (!found_leaf)
++			goto next;
++
++		if (!(addr & (page_size - 1)) && ((end - addr) >= page_size))
++			stage2_op_pte(kvm, addr, ptep,
++				      ptep_level, STAGE2_OP_CLEAR);
++
++next:
++		addr += page_size;
++	}
++}
++
++static void stage2_wp_range(struct kvm *kvm, gpa_t start, gpa_t end)
++{
++	int ret;
++	pte_t *ptep;
++	u32 ptep_level;
++	bool found_leaf;
++	gpa_t addr = start;
++	unsigned long page_size;
++
++	while (addr < end) {
++		found_leaf = stage2_get_leaf_entry(kvm, addr,
++						   &ptep, &ptep_level);
++		ret = stage2_level_to_page_size(ptep_level, &page_size);
++		if (ret)
++			break;
++
++		if (!found_leaf)
++			goto next;
++
++		if (!(addr & (page_size - 1)) && ((end - addr) >= page_size))
++			stage2_op_pte(kvm, addr, ptep,
++				      ptep_level, STAGE2_OP_WP);
++
++next:
++		addr += page_size;
++	}
++}
++
++static void stage2_wp_memory_region(struct kvm *kvm, int slot)
++{
++	struct kvm_memslots *slots = kvm_memslots(kvm);
++	struct kvm_memory_slot *memslot = id_to_memslot(slots, slot);
++	phys_addr_t start = memslot->base_gfn << PAGE_SHIFT;
++	phys_addr_t end = (memslot->base_gfn + memslot->npages) << PAGE_SHIFT;
++
++	spin_lock(&kvm->mmu_lock);
++	stage2_wp_range(kvm, start, end);
++	spin_unlock(&kvm->mmu_lock);
++	kvm_flush_remote_tlbs(kvm);
++}
++
++static int stage2_ioremap(struct kvm *kvm, gpa_t gpa, phys_addr_t hpa,
++			  unsigned long size, bool writable)
++{
++	pte_t pte;
++	int ret = 0;
++	unsigned long pfn;
++	phys_addr_t addr, end;
++	struct kvm_mmu_page_cache pcache = { 0, };
++
++	end = (gpa + size + PAGE_SIZE - 1) & PAGE_MASK;
++	pfn = __phys_to_pfn(hpa);
++
++	for (addr = gpa; addr < end; addr += PAGE_SIZE) {
++		pte = pfn_pte(pfn, PAGE_KERNEL);
++
++		if (!writable)
++			pte = pte_wrprotect(pte);
++
++		ret = stage2_cache_topup(&pcache,
++					 stage2_pgd_levels,
++					 KVM_MMU_PAGE_CACHE_NR_OBJS);
++		if (ret)
++			goto out;
++
++		spin_lock(&kvm->mmu_lock);
++		ret = stage2_set_pte(kvm, 0, &pcache, addr, &pte);
++		spin_unlock(&kvm->mmu_lock);
++		if (ret)
++			goto out;
++
++		pfn++;
++	}
++
++out:
++	stage2_cache_flush(&pcache);
++	return ret;
++
++}
++
++void kvm_arch_mmu_enable_log_dirty_pt_masked(struct kvm *kvm,
++					     struct kvm_memory_slot *slot,
++					     gfn_t gfn_offset,
++					     unsigned long mask)
++{
++	phys_addr_t base_gfn = slot->base_gfn + gfn_offset;
++	phys_addr_t start = (base_gfn +  __ffs(mask)) << PAGE_SHIFT;
++	phys_addr_t end = (base_gfn + __fls(mask) + 1) << PAGE_SHIFT;
++
++	stage2_wp_range(kvm, start, end);
++}
+ 
+ void kvm_arch_sync_dirty_log(struct kvm *kvm, struct kvm_memory_slot *memslot)
+ {
+ }
+ 
++void kvm_arch_flush_remote_tlbs_memslot(struct kvm *kvm,
++					struct kvm_memory_slot *memslot)
++{
++	kvm_flush_remote_tlbs(kvm);
++}
++
+ void kvm_arch_free_memslot(struct kvm *kvm, struct kvm_memory_slot *free)
+ {
+ }
+@@ -32,7 +436,7 @@ void kvm_arch_memslots_updated(struct kvm *kvm, u64 gen)
+ 
+ void kvm_arch_flush_shadow_all(struct kvm *kvm)
+ {
+-	/* TODO: */
++	kvm_riscv_stage2_free_pgd(kvm);
+ }
+ 
+ void kvm_arch_flush_shadow_memslot(struct kvm *kvm,
+@@ -46,7 +450,13 @@ void kvm_arch_commit_memory_region(struct kvm *kvm,
+ 				const struct kvm_memory_slot *new,
+ 				enum kvm_mr_change change)
+ {
+-	/* TODO: */
++	/*
++	 * At this point memslot has been committed and there is an
++	 * allocated dirty_bitmap[], dirty pages will be tracked while
++	 * the memory slot is write protected.
++	 */
++	if (change != KVM_MR_DELETE && mem->flags & KVM_MEM_LOG_DIRTY_PAGES)
++		stage2_wp_memory_region(kvm, mem->slot);
+ }
+ 
+ int kvm_arch_prepare_memory_region(struct kvm *kvm,
+@@ -54,35 +464,255 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
+ 				const struct kvm_userspace_memory_region *mem,
+ 				enum kvm_mr_change change)
+ {
+-	/* TODO: */
+-	return 0;
++	hva_t hva = mem->userspace_addr;
++	hva_t reg_end = hva + mem->memory_size;
++	bool writable = !(mem->flags & KVM_MEM_READONLY);
++	int ret = 0;
++
++	if (change != KVM_MR_CREATE && change != KVM_MR_MOVE &&
++			change != KVM_MR_FLAGS_ONLY)
++		return 0;
++
++	/*
++	 * Prevent userspace from creating a memory region outside of the GPA
++	 * space addressable by the KVM guest GPA space.
++	 */
++	if ((memslot->base_gfn + memslot->npages) >=
++	    (stage2_gpa_size >> PAGE_SHIFT))
++		return -EFAULT;
++
++	mmap_read_lock(current->mm);
++
++	/*
++	 * A memory region could potentially cover multiple VMAs, and
++	 * any holes between them, so iterate over all of them to find
++	 * out if we can map any of them right now.
++	 *
++	 *     +--------------------------------------------+
++	 * +---------------+----------------+   +----------------+
++	 * |   : VMA 1     |      VMA 2     |   |    VMA 3  :    |
++	 * +---------------+----------------+   +----------------+
++	 *     |               memory region                |
++	 *     +--------------------------------------------+
++	 */
++	do {
++		struct vm_area_struct *vma = find_vma(current->mm, hva);
++		hva_t vm_start, vm_end;
++
++		if (!vma || vma->vm_start >= reg_end)
++			break;
 +
 +		/*
-+		 * We ran out of VMIDs so we increment vmid_version and
-+		 * start assigning VMIDs from 1.
-+		 *
-+		 * This also means existing VMIDs assignement to all Guest
-+		 * instances is invalid and we have force VMID re-assignement
-+		 * for all Guest instances. The Guest instances that were not
-+		 * running will automatically pick-up new VMIDs because will
-+		 * call kvm_riscv_stage2_vmid_update() whenever they enter
-+		 * in-kernel run loop. For Guest instances that are already
-+		 * running, we force VM exits on all host CPUs using IPI and
-+		 * flush all Guest TLBs.
++		 * Mapping a read-only VMA is only allowed if the
++		 * memory region is configured as read-only.
 +		 */
-+		riscv_cpuid_to_hartid_mask(cpu_online_mask, &hmask);
-+		sbi_remote_hfence_gvma(cpumask_bits(&hmask), 0, 0);
++		if (writable && !(vma->vm_flags & VM_WRITE)) {
++			ret = -EPERM;
++			break;
++		}
++
++		/* Take the intersection of this VMA with the memory region */
++		vm_start = max(hva, vma->vm_start);
++		vm_end = min(reg_end, vma->vm_end);
++
++		if (vma->vm_flags & VM_PFNMAP) {
++			gpa_t gpa = mem->guest_phys_addr +
++				    (vm_start - mem->userspace_addr);
++			phys_addr_t pa;
++
++			pa = (phys_addr_t)vma->vm_pgoff << PAGE_SHIFT;
++			pa += vm_start - vma->vm_start;
++
++			/* IO region dirty page logging not allowed */
++			if (memslot->flags & KVM_MEM_LOG_DIRTY_PAGES) {
++				ret = -EINVAL;
++				goto out;
++			}
++
++			ret = stage2_ioremap(kvm, gpa, pa,
++					     vm_end - vm_start, writable);
++			if (ret)
++				break;
++		}
++		hva = vm_end;
++	} while (hva < reg_end);
++
++	if (change == KVM_MR_FLAGS_ONLY)
++		goto out;
++
++	spin_lock(&kvm->mmu_lock);
++	if (ret)
++		stage2_unmap_range(kvm, mem->guest_phys_addr,
++				   mem->memory_size);
++	spin_unlock(&kvm->mmu_lock);
++
++out:
++	mmap_read_unlock(current->mm);
++	return ret;
+ }
+ 
+ int kvm_riscv_stage2_map(struct kvm_vcpu *vcpu,
+ 			 struct kvm_memory_slot *memslot,
+ 			 gpa_t gpa, unsigned long hva, bool is_write)
+ {
+-	/* TODO: */
+-	return 0;
++	int ret;
++	kvm_pfn_t hfn;
++	bool writeable;
++	short vma_pageshift;
++	gfn_t gfn = gpa >> PAGE_SHIFT;
++	struct vm_area_struct *vma;
++	struct kvm *kvm = vcpu->kvm;
++	struct kvm_mmu_page_cache *pcache = &vcpu->arch.mmu_page_cache;
++	bool logging = (memslot->dirty_bitmap &&
++			!(memslot->flags & KVM_MEM_READONLY)) ? true : false;
++	unsigned long vma_pagesize;
++
++	mmap_read_lock(current->mm);
++
++	vma = find_vma_intersection(current->mm, hva, hva + 1);
++	if (unlikely(!vma)) {
++		kvm_err("Failed to find VMA for hva 0x%lx\n", hva);
++		mmap_read_unlock(current->mm);
++		return -EFAULT;
 +	}
 +
-+	vmid->vmid = vmid_next;
-+	vmid_next++;
-+	vmid_next &= (1 << vmid_bits) - 1;
++	if (is_vm_hugetlb_page(vma))
++		vma_pageshift = huge_page_shift(hstate_vma(vma));
++	else
++		vma_pageshift = PAGE_SHIFT;
++	vma_pagesize = 1ULL << vma_pageshift;
++	if (logging || (vma->vm_flags & VM_PFNMAP))
++		vma_pagesize = PAGE_SIZE;
 +
-+	WRITE_ONCE(vmid->vmid_version, READ_ONCE(vmid_version));
++	if (vma_pagesize == PMD_SIZE || vma_pagesize == PGDIR_SIZE)
++		gfn = (gpa & huge_page_mask(hstate_vma(vma))) >> PAGE_SHIFT;
 +
-+	spin_unlock(&vmid_lock);
++	mmap_read_unlock(current->mm);
 +
-+	/* Request stage2 page table update for all VCPUs */
-+	kvm_for_each_vcpu(i, v, vcpu->kvm)
-+		kvm_make_request(KVM_REQ_UPDATE_HGATP, v);
++	if (vma_pagesize != PGDIR_SIZE &&
++	    vma_pagesize != PMD_SIZE &&
++	    vma_pagesize != PAGE_SIZE) {
++		kvm_err("Invalid VMA page size 0x%lx\n", vma_pagesize);
++		return -EFAULT;
++	}
++
++	/* We need minimum second+third level pages */
++	ret = stage2_cache_topup(pcache, stage2_pgd_levels,
++				 KVM_MMU_PAGE_CACHE_NR_OBJS);
++	if (ret) {
++		kvm_err("Failed to topup stage2 cache\n");
++		return ret;
++	}
++
++	hfn = gfn_to_pfn_prot(kvm, gfn, is_write, &writeable);
++	if (hfn == KVM_PFN_ERR_HWPOISON) {
++		send_sig_mceerr(BUS_MCEERR_AR, (void __user *)hva,
++				vma_pageshift, current);
++		return 0;
++	}
++	if (is_error_noslot_pfn(hfn))
++		return -EFAULT;
++
++	/*
++	 * If logging is active then we allow writable pages only
++	 * for write faults.
++	 */
++	if (logging && !is_write)
++		writeable = false;
++
++	spin_lock(&kvm->mmu_lock);
++
++	if (writeable) {
++		kvm_set_pfn_dirty(hfn);
++		mark_page_dirty(kvm, gfn);
++		ret = stage2_map_page(kvm, pcache, gpa, hfn << PAGE_SHIFT,
++				      vma_pagesize, false, true);
++	} else {
++		ret = stage2_map_page(kvm, pcache, gpa, hfn << PAGE_SHIFT,
++				      vma_pagesize, true, true);
++	}
++
++	if (ret)
++		kvm_err("Failed to map in stage2\n");
++
++	spin_unlock(&kvm->mmu_lock);
++	kvm_set_pfn_accessed(hfn);
++	kvm_release_pfn_clean(hfn);
++	return ret;
+ }
+ 
+ void kvm_riscv_stage2_flush_cache(struct kvm_vcpu *vcpu)
+ {
+-	/* TODO: */
++	stage2_cache_flush(&vcpu->arch.mmu_page_cache);
+ }
+ 
+ int kvm_riscv_stage2_alloc_pgd(struct kvm *kvm)
+ {
+-	/* TODO: */
++	struct page *pgd_page;
++
++	if (kvm->arch.pgd != NULL) {
++		kvm_err("kvm_arch already initialized?\n");
++		return -EINVAL;
++	}
++
++	pgd_page = alloc_pages(GFP_KERNEL | __GFP_ZERO,
++				get_order(stage2_pgd_size));
++	if (!pgd_page)
++		return -ENOMEM;
++	kvm->arch.pgd = page_to_virt(pgd_page);
++	kvm->arch.pgd_phys = page_to_phys(pgd_page);
++
+ 	return 0;
+ }
+ 
+ void kvm_riscv_stage2_free_pgd(struct kvm *kvm)
+ {
+-	/* TODO: */
++	void *pgd = NULL;
++
++	spin_lock(&kvm->mmu_lock);
++	if (kvm->arch.pgd) {
++		stage2_unmap_range(kvm, 0UL, stage2_gpa_size);
++		pgd = READ_ONCE(kvm->arch.pgd);
++		kvm->arch.pgd = NULL;
++		kvm->arch.pgd_phys = 0;
++	}
++	spin_unlock(&kvm->mmu_lock);
++
++	if (pgd)
++		free_pages((unsigned long)pgd, get_order(stage2_pgd_size));
+ }
+ 
+ void kvm_riscv_stage2_update_hgatp(struct kvm_vcpu *vcpu)
+ {
+-	/* TODO: */
++	unsigned long hgatp = stage2_mode;
++	struct kvm_arch *k = &vcpu->kvm->arch;
++
++	hgatp |= (READ_ONCE(k->vmid.vmid) << HGATP_VMID_SHIFT) &
++		 HGATP_VMID_MASK;
++	hgatp |= (k->pgd_phys >> PAGE_SHIFT) & HGATP_PPN;
++
++	csr_write(CSR_HGATP, hgatp);
++
++	if (!kvm_riscv_stage2_vmid_bits())
++		__kvm_riscv_hfence_gvma_all();
 +}
++
++void kvm_riscv_stage2_mode_detect(void)
++{
++#ifdef CONFIG_64BIT
++	/* Try Sv48x4 stage2 mode */
++	csr_write(CSR_HGATP, HGATP_MODE_SV48X4 << HGATP_MODE_SHIFT);
++	if ((csr_read(CSR_HGATP) >> HGATP_MODE_SHIFT) == HGATP_MODE_SV48X4) {
++		stage2_mode = (HGATP_MODE_SV48X4 << HGATP_MODE_SHIFT);
++		stage2_pgd_levels = 4;
++	}
++	csr_write(CSR_HGATP, 0);
++
++	__kvm_riscv_hfence_gvma_all();
++#endif
++}
++
++unsigned long kvm_riscv_stage2_mode(void)
++{
++	return stage2_mode >> HGATP_MODE_SHIFT;
+ }
+diff --git a/arch/riscv/kvm/vm.c b/arch/riscv/kvm/vm.c
+index 282d67617229..6cde69a82252 100644
+--- a/arch/riscv/kvm/vm.c
++++ b/arch/riscv/kvm/vm.c
+@@ -12,12 +12,6 @@
+ #include <linux/uaccess.h>
+ #include <linux/kvm_host.h>
+ 
+-int kvm_vm_ioctl_get_dirty_log(struct kvm *kvm, struct kvm_dirty_log *log)
+-{
+-	/* TODO: To be added later. */
+-	return -EOPNOTSUPP;
+-}
+-
+ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
+ {
+ 	int r;
 -- 
 2.25.1
 
