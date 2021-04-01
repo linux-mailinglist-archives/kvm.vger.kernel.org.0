@@ -2,55 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B52513513AC
-	for <lists+kvm@lfdr.de>; Thu,  1 Apr 2021 12:33:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DCD343513B7
+	for <lists+kvm@lfdr.de>; Thu,  1 Apr 2021 12:37:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234158AbhDAKcz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 1 Apr 2021 06:32:55 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:51667 "EHLO
+        id S234071AbhDAKgl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 1 Apr 2021 06:36:41 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:26783 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234130AbhDAKc2 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 1 Apr 2021 06:32:28 -0400
+        by vger.kernel.org with ESMTP id S233917AbhDAKgU (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 1 Apr 2021 06:36:20 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1617273137;
+        s=mimecast20190719; t=1617273380;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=1eUiXnpnH6n4/oGTREYOSpo6rDfrAd7KXaTmdQGW+OU=;
-        b=BCLmn9iGp7XYYXfgFZqqrDI4KoF7pWCi6dZbOu2vPm8mcK9Nzrse+W7Ec2qf4csdc9VJeH
-        S8nbARbx9yA385f41JFkfteEq3Stm5xK9INEkoRgqFL5mRBlRl/38bVbh0SKWZoMU4Lwgp
-        ZWXGNkr43b9XvzdqTWCYmdmCxU3SN3w=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-309-IniLebvnMIWig_4HkIexuQ-1; Thu, 01 Apr 2021 06:32:16 -0400
-X-MC-Unique: IniLebvnMIWig_4HkIexuQ-1
-Received: by mail-ej1-f70.google.com with SMTP id t21so2028707ejf.14
-        for <kvm@vger.kernel.org>; Thu, 01 Apr 2021 03:32:16 -0700 (PDT)
+        bh=810J1/GaDcVsqpgpBl9h+wW/EjeyXRqZXrkMEl4sg0A=;
+        b=GuGNfii/VBoQFn9nCFBqKzQFHQEtBflr5Y0jb99QedYTMyphlb4oHM0wSc3mV3Hlc97Xpx
+        n+7hCtrpt1WH39Qi2ykynkZ9JQR1za9uTgHPd3ejUf4upR65twVUqSWAp6TN2S1oninsvd
+        pmWqk3KgEConOSIAea8HHfJ6B611SIk=
+Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
+ [209.85.218.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-545-Cn7_2Cq_PbW3xuhLI_f0KA-1; Thu, 01 Apr 2021 06:36:18 -0400
+X-MC-Unique: Cn7_2Cq_PbW3xuhLI_f0KA-1
+Received: by mail-ej1-f71.google.com with SMTP id bn26so2026265ejb.20
+        for <kvm@vger.kernel.org>; Thu, 01 Apr 2021 03:36:18 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:cc:references:from:subject:message-id:date
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=1eUiXnpnH6n4/oGTREYOSpo6rDfrAd7KXaTmdQGW+OU=;
-        b=s/bz6cQ1ZyqbMBZcLnmAm7klNDIAoL9Nie24nqOkS7jdxtHdN5BC3IU+bPCBsmadfJ
-         h9vcdvnSGH0uqHoox+rSOZLQCZs/h1MiLyKMPr5mZx1u8qiCtkFRCcfSnlqCJmhLV3zQ
-         ecKrRLR5E4gAO0b/oHJer5gEsLsesvGKgD399NML/W0fUoorWR2FrjFpcQ5ycKjS5HYE
-         VRO9ZsKWKmvBjm1xsRxUgLVpgeTiX0QS2DREym65inQ4Tl2IPwDJy/ZaCbhe5L3u6tRi
-         A9R1Cu6r+7oPYHW1Zh9aYqb5wMqfQ9ZlolvyuyHyPRvsvzF5ZRVWL7oqGiNvDEpvkQrv
-         b4xw==
-X-Gm-Message-State: AOAM532L8tuGVcYVD+6gyVnqx4vPIvEZffPgyPBt/vWZhIiLo35J9AhK
-        AgvhSIZ/1CchzFYqlbpkcIG0vyTtNuErze9xU5Z6KpLQ3t/mvYG13GUbd6D174K3/X+LfECFuXu
-        dCnru2FAWTXh/
-X-Received: by 2002:a17:906:170f:: with SMTP id c15mr8251969eje.358.1617273135173;
-        Thu, 01 Apr 2021 03:32:15 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxp7pLCchsEQe6GRgziondNEofsHQiuq/17gNPT5UApEqlYEhzeOqXUMZuIdD/PwJTrvx7Wlw==
-X-Received: by 2002:a17:906:170f:: with SMTP id c15mr8251959eje.358.1617273134980;
-        Thu, 01 Apr 2021 03:32:14 -0700 (PDT)
+        bh=810J1/GaDcVsqpgpBl9h+wW/EjeyXRqZXrkMEl4sg0A=;
+        b=dN2TEo6JYiZ7tVkz0cZqVqThWQm9adtbCbuNk1DrJriwHc4gHIWnFpqPwOq8VYJjEk
+         xWBg6oiUeTDVhzt65WWmmLh62ExQ4WhvgFzsW4HyI33qlnUX2jOPfu7OWLwlyGLvBbZu
+         MieC99+fAnZDhI5AUL8CgT7u8Gj3um0KppQrKBjoix/9Jhh6Jft8uoRjzwO+a+Jqnwe6
+         REXnAdqtSOFV0Mmq6UQORlFXhyX3xSR2T9nvpx1Q/rMDGOqZRVtxM5gvpLVbCkTBTAmh
+         MDgRelaZaHTBOY6aj/DmIfWJ5KJRaNgqF5A3RU4R+930Vs9M+yVRrUTvZyClFXV2FCbh
+         2ebQ==
+X-Gm-Message-State: AOAM532ufq0MKR38UYTmF53wfWL451tl66eppRZOKQrnuuyYQW8Nc586
+        z5DQIEhhQblDeo4imeaBg/z2pJkAYg3zDsdYdKHn1aUgCHxxKCMBAenrgtXfsiatmpd5X4JUid6
+        5+aS0tOifgym+
+X-Received: by 2002:a17:907:1614:: with SMTP id hb20mr8375162ejc.77.1617273377239;
+        Thu, 01 Apr 2021 03:36:17 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxU+gqzTF3pii9ZoNjuKrbXXN9nHplHntt5RILHXU3PdnyQp/B39VwFMSuYP0ElcHRac1Zf/Q==
+X-Received: by 2002:a17:907:1614:: with SMTP id hb20mr8375137ejc.77.1617273377031;
+        Thu, 01 Apr 2021 03:36:17 -0700 (PDT)
 Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id y24sm3386648eds.23.2021.04.01.03.32.13
+        by smtp.gmail.com with ESMTPSA id l18sm2523107ejk.86.2021.04.01.03.36.15
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 01 Apr 2021 03:32:14 -0700 (PDT)
+        Thu, 01 Apr 2021 03:36:16 -0700 (PDT)
+Subject: Re: [PATCH 12/13] KVM: x86/mmu: Fast invalidation for TDP MMU
 To:     Ben Gardon <bgardon@google.com>, linux-kernel@vger.kernel.org,
         kvm@vger.kernel.org
 Cc:     Peter Xu <peterx@redhat.com>,
@@ -63,66 +64,42 @@ Cc:     Peter Xu <peterx@redhat.com>,
         Wanpeng Li <kernellwp@gmail.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Xiao Guangrong <xiaoguangrong.eric@gmail.com>
-References: <20210202185734.1680553-1-bgardon@google.com>
- <20210202185734.1680553-21-bgardon@google.com>
+References: <20210331210841.3996155-1-bgardon@google.com>
+ <20210331210841.3996155-13-bgardon@google.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH v2 20/28] KVM: x86/mmu: Use atomic ops to set SPTEs in TDP
- MMU map
-Message-ID: <f4fca4d7-8795-533e-d2d9-89a73e1a9004@redhat.com>
-Date:   Thu, 1 Apr 2021 12:32:13 +0200
+Message-ID: <79548215-b86f-99de-9322-c76ba5a1802d@redhat.com>
+Date:   Thu, 1 Apr 2021 12:36:15 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.7.0
 MIME-Version: 1.0
-In-Reply-To: <20210202185734.1680553-21-bgardon@google.com>
+In-Reply-To: <20210331210841.3996155-13-bgardon@google.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 02/02/21 19:57, Ben Gardon wrote:
-> @@ -720,7 +790,8 @@ int kvm_tdp_mmu_map(struct kvm_vcpu *vcpu, gpa_t gpa, u32 error_code,
->   		 */
->   		if (is_shadow_present_pte(iter.old_spte) &&
->   		    is_large_pte(iter.old_spte)) {
-> -			tdp_mmu_set_spte(vcpu->kvm, &iter, 0);
-> +			if (!tdp_mmu_set_spte_atomic(vcpu->kvm, &iter, 0))
-> +				break;
+On 31/03/21 23:08, Ben Gardon wrote:
 >   
->   			kvm_flush_remote_tlbs_with_address(vcpu->kvm, iter.gfn,
->   					KVM_PAGES_PER_HPAGE(iter.level));
->
->  			/*
->  			 * The iter must explicitly re-read the spte here
->  			 * because the new value informs the !present
->                          * path below.
->                          */
->                         iter.old_spte = READ_ONCE(*rcu_dereference(iter.sptep));
->                 }
-> 
->                 if (!is_shadow_present_pte(iter.old_spte)) {
+> +	if (is_tdp_mmu_enabled(kvm))
+> +		kvm_tdp_mmu_invalidate_roots(kvm);
+> +
+>   	/*
+>   	 * Toggle mmu_valid_gen between '0' and '1'.  Because slots_lock is
+>   	 * held for the entire duration of zapping obsolete pages, it's
+> @@ -5451,9 +5454,6 @@ static void kvm_mmu_zap_all_fast(struct kvm *kvm)
+>   
+>   	kvm_zap_obsolete_pages(kvm);
+>   
+> -	if (is_tdp_mmu_enabled(kvm))
+> -		kvm_tdp_mmu_zap_all(kvm);
+> -
 
-Would it be easier to reason about this code by making it retry, like:
-
-retry:
-                 if (is_shadow_present_pte(iter.old_spte)) {
-			if (is_large_pte(iter.old_spte)) {
-	                        if (!tdp_mmu_zap_spte_atomic(vcpu->kvm, &iter))
-	                                break;
-
-				/*
-				 * The iter must explicitly re-read the SPTE because
-				 * the atomic cmpxchg failed.
-				 */
-	                        iter.old_spte = READ_ONCE(*rcu_dereference(iter.sptep));
-				goto retry;
-			}
-                 } else {
-			...
-		}
-
-?
+This is just cosmetic, but I'd prefer to keep the call to 
+kvm_tdp_mmu_invalidate_roots at the original place, so that it's clear 
+in the next patch that it's two separate parts because of the different 
+locking requirements.
 
 Paolo
 
