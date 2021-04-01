@@ -2,97 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7F34B351E91
-	for <lists+kvm@lfdr.de>; Thu,  1 Apr 2021 20:55:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EDFA4351C1E
+	for <lists+kvm@lfdr.de>; Thu,  1 Apr 2021 20:45:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236454AbhDASno (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 1 Apr 2021 14:43:44 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:29287 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S237214AbhDASdD (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 1 Apr 2021 14:33:03 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1617301981;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=zV8gIwvUm/KU6YRC6HTfZNfZbn7owoKKDfoum0B8FQg=;
-        b=HOsMbCNlsc5dnN1kqa3CFueKiy/ZqlGFJP2GV688DnITeIy73HwhV9F9hi4LUD+4+vt2HD
-        vIvFxPs6QqkSS69WXlFpsKjrxBvC24tfmi/X17JLo91vCFsmFjABMzU3YbS5xWunRPVqZu
-        ojExcdzka0ZmcKmp3x8mjrrMFnAETrs=
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
- [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-430-D6KiXHksP924FMNonTS-8Q-1; Thu, 01 Apr 2021 11:31:25 -0400
-X-MC-Unique: D6KiXHksP924FMNonTS-8Q-1
-Received: by mail-ed1-f70.google.com with SMTP id k8so3006512edn.19
-        for <kvm@vger.kernel.org>; Thu, 01 Apr 2021 08:31:25 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=zV8gIwvUm/KU6YRC6HTfZNfZbn7owoKKDfoum0B8FQg=;
-        b=WPzf0xdz4K2+WMWhvXl+5WBznYaure6MV+iXz19emAsuECqzFNySbSl9S4EcG5VFPq
-         7SuXhSXxGwnLRjVFVgrdnwxNMp7dJg/8ZzA6aTBBrtIpaEg3M4X0rIj9blFVw3JT9rYk
-         0CpSJi4qGBGyncXkr2X+08cRWyDDkbb+rlGCJsoopfSWMOkzDGk/Qtwj36p9/oCwcsHJ
-         Cjf6A59tB2CQs8ces0XXTRJL7YWBAJEWNjJATDuqKC5vDDIphxd7im4C1iPS8TKeWouW
-         yJQrxyLghxykWlgpWliOiKtS8i8fbVYuHfAcBmcZDRdML6/+/G6u38L3TjLCq395jtES
-         udFA==
-X-Gm-Message-State: AOAM5334Bu7ZkPQNmi0Bdoo8vvEj8STBg6Y6ZtJmK7VRUlTGP4CNwfWj
-        7AhNd9zBW7NCWyqQaOdgru9NuIHqFxAqK1wmkqD1e1dztLpOy76hgvU8jSsOATp2pKIHdF/VWOn
-        rCL2fa0ebgeeD
-X-Received: by 2002:a17:907:76b3:: with SMTP id jw19mr9506193ejc.202.1617291084874;
-        Thu, 01 Apr 2021 08:31:24 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJw2OyaXOnqsMAdV9O9/OpOj49/Etytctob8p7D5zvVV46D//28nISt7Li1rmBfAywC50ToRKA==
-X-Received: by 2002:a17:907:76b3:: with SMTP id jw19mr9506170ejc.202.1617291084698;
-        Thu, 01 Apr 2021 08:31:24 -0700 (PDT)
-Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id a17sm2918642ejf.20.2021.04.01.08.31.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 01 Apr 2021 08:31:24 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org
-Cc:     Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Ingo Molnar <mingo@redhat.com>,
-        "open list:X86 ARCHITECTURE (32-BIT AND 64-BIT)" 
-        <linux-kernel@vger.kernel.org>, "H. Peter Anvin" <hpa@zytor.com>,
-        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Borislav Petkov <bp@alien8.de>,
-        Sean Christopherson <seanjc@google.com>,
-        Joerg Roedel <joro@8bytes.org>
-Subject: Re: [PATCH v2 2/2] KVM: nSVM: improve SYSENTER emulation on AMD
-In-Reply-To: <6f138606-d6c3-d332-9dc2-9ba4796fd4ce@redhat.com>
-References: <20210401111928.996871-1-mlevitsk@redhat.com>
- <20210401111928.996871-3-mlevitsk@redhat.com>
- <87h7kqrwb2.fsf@vitty.brq.redhat.com>
- <6f138606-d6c3-d332-9dc2-9ba4796fd4ce@redhat.com>
-Date:   Thu, 01 Apr 2021 17:31:23 +0200
-Message-ID: <87zgyic984.fsf@vitty.brq.redhat.com>
+        id S235949AbhDASNU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 1 Apr 2021 14:13:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35620 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235293AbhDASKu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 1 Apr 2021 14:10:50 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 55874C02D575;
+        Thu,  1 Apr 2021 08:53:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
+        :Reply-To:Content-Type:Content-ID:Content-Description;
+        bh=wDCpF7eA/jBfJE8TX4WtMtbQcLjyYKphl/5zM+AMN4E=; b=LafK1H4R5CszpawGybodA4QlYz
+        djVgVU7nIHYvARbHMtDR3EViy1Cet1N99EQ8Dpy2YiA/KdQtX2BL9Ibiaz0GzoEKwBm0OQxKgWvrl
+        mRD7LaUUdCMLrEZblY5EfqmwSCY3BG94IqbKCTD7u8gHB8BJBKXa/98vOrZjoVjOr29NM+ce+aQvZ
+        bRd8eyGos7K86FuEDzsy8MzyBCYjmeW61WRBRaoCGKQSTPhZ7lFlZV+2F281ghBIfX40mdPPWC5wP
+        +zgDAbAslIshmHmj8X0iesvI5VzGb22t7SAWXCi5XrNYxl1XQGFmhYVbB9YzUdnx62zCxWaFhlLKe
+        6ATDquqQ==;
+Received: from [2001:4bb8:180:7517:83e4:a809:b0aa:ca74] (helo=localhost)
+        by bombadil.infradead.org with esmtpsa (Exim 4.94 #2 (Red Hat Linux))
+        id 1lRzda-00CicQ-Q4; Thu, 01 Apr 2021 15:53:39 +0000
+From:   Christoph Hellwig <hch@lst.de>
+To:     Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
+        Li Yang <leoyang.li@nxp.com>
+Cc:     Michael Ellerman <mpe@ellerman.id.au>,
+        David Woodhouse <dwmw2@infradead.org>,
+        Lu Baolu <baolu.lu@linux.intel.com>,
+        linuxppc-dev@lists.ozlabs.org, linux-arm-msm@vger.kernel.org,
+        dri-devel@lists.freedesktop.org, freedreno@lists.freedesktop.org,
+        iommu@lists.linux-foundation.org,
+        linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
+Subject: [PATCH 11/20] iommu/fsl_pamu: remove the snoop_id field
+Date:   Thu,  1 Apr 2021 17:52:47 +0200
+Message-Id: <20210401155256.298656-12-hch@lst.de>
+X-Mailer: git-send-email 2.30.1
+In-Reply-To: <20210401155256.298656-1-hch@lst.de>
+References: <20210401155256.298656-1-hch@lst.de>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Paolo Bonzini <pbonzini@redhat.com> writes:
+The snoop_id is always set to ~(u32)0.
 
-> On 01/04/21 15:03, Vitaly Kuznetsov wrote:
->>> +		svm->sysenter_eip_hi = guest_cpuid_is_intel(vcpu) ? (data >> 32) : 0;
->> 
->> (Personal taste) I'd suggest we keep the whole 'sysenter_eip'/'sysenter_esp'
->> even if we only use the upper 32 bits of it. That would reduce the code
->> churn a little bit (no need to change 'struct vcpu_svm').
->
-> Would there really be less changes?  Consider that you'd have to look at 
-> the VMCB anyway because svm_get_msr can be reached not just for guest 
-> RDMSR but also for ioctls.
->
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+Acked-by: Will Deacon <will@kernel.org>
+Acked-by: Li Yang <leoyang.li@nxp.com>
+---
+ drivers/iommu/fsl_pamu_domain.c | 5 ++---
+ drivers/iommu/fsl_pamu_domain.h | 1 -
+ 2 files changed, 2 insertions(+), 4 deletions(-)
 
-I was thinking about the hunk in arch/x86/kvm/svm/svm.h tweaking
-vcpu_svm. My opinion is not strong at all here)
-
+diff --git a/drivers/iommu/fsl_pamu_domain.c b/drivers/iommu/fsl_pamu_domain.c
+index c2e7e17570e76d..e9c1e0dd68f084 100644
+--- a/drivers/iommu/fsl_pamu_domain.c
++++ b/drivers/iommu/fsl_pamu_domain.c
+@@ -97,12 +97,12 @@ static int pamu_set_liodn(struct fsl_dma_domain *dma_domain, struct device *dev,
+ 		goto out_unlock;
+ 	ret = pamu_config_ppaace(liodn, geom->aperture_start,
+ 				 geom->aperture_end + 1, omi_index, 0,
+-				 dma_domain->snoop_id, dma_domain->stash_id, 0);
++				 ~(u32)0, dma_domain->stash_id, 0);
+ 	if (ret)
+ 		goto out_unlock;
+ 	ret = pamu_config_ppaace(liodn, geom->aperture_start,
+ 				 geom->aperture_end + 1, ~(u32)0,
+-				 0, dma_domain->snoop_id, dma_domain->stash_id,
++				 0, ~(u32)0, dma_domain->stash_id,
+ 				 PAACE_AP_PERMS_QUERY | PAACE_AP_PERMS_UPDATE);
+ out_unlock:
+ 	spin_unlock_irqrestore(&iommu_lock, flags);
+@@ -210,7 +210,6 @@ static struct iommu_domain *fsl_pamu_domain_alloc(unsigned type)
+ 		return NULL;
+ 
+ 	dma_domain->stash_id = ~(u32)0;
+-	dma_domain->snoop_id = ~(u32)0;
+ 	INIT_LIST_HEAD(&dma_domain->devices);
+ 	spin_lock_init(&dma_domain->domain_lock);
+ 
+diff --git a/drivers/iommu/fsl_pamu_domain.h b/drivers/iommu/fsl_pamu_domain.h
+index 5f4ed253f61b31..95ac1b3cab3b69 100644
+--- a/drivers/iommu/fsl_pamu_domain.h
++++ b/drivers/iommu/fsl_pamu_domain.h
+@@ -13,7 +13,6 @@ struct fsl_dma_domain {
+ 	/* list of devices associated with the domain */
+ 	struct list_head		devices;
+ 	u32				stash_id;
+-	u32				snoop_id;
+ 	struct iommu_domain		iommu_domain;
+ 	spinlock_t			domain_lock;
+ };
 -- 
-Vitaly
+2.30.1
 
