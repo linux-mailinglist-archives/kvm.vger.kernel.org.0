@@ -2,86 +2,235 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E5F643518A8
-	for <lists+kvm@lfdr.de>; Thu,  1 Apr 2021 19:49:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CE3ED3517B0
+	for <lists+kvm@lfdr.de>; Thu,  1 Apr 2021 19:47:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236037AbhDARqy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 1 Apr 2021 13:46:54 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:51281 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S235113AbhDARmQ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 1 Apr 2021 13:42:16 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1617298936;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=hVLqapItOA/EaVZeXNlebDO6Dltek96tn/+vGZSaHts=;
-        b=CPlqqTHClbRM5KPOmYyeBdjuKQT53o+IdXSSWIa9abiIUz1X5P0Vng98p9+5R1Ksf89IXG
-        8UisnqAFxUOfhxa7jCfx9LwPRr4Esn/JeUybeBWNWYWU/cI3647GpfWccptNjXlvnyf9R8
-        Dz6LIaYhdnHSCquPczN4fWnEIGzzG2s=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-396-TujzzwuYMh-MopBdyoSh5w-1; Thu, 01 Apr 2021 13:11:04 -0400
-X-MC-Unique: TujzzwuYMh-MopBdyoSh5w-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        id S234347AbhDARmj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 1 Apr 2021 13:42:39 -0400
+Received: from mail.kernel.org ([198.145.29.99]:40688 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S234600AbhDARiV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 1 Apr 2021 13:38:21 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 08DA681744F;
-        Thu,  1 Apr 2021 17:11:04 +0000 (UTC)
-Received: from starship (unknown [10.35.206.58])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 166885D6D1;
-        Thu,  1 Apr 2021 17:10:57 +0000 (UTC)
-Message-ID: <6db4acb8ce2d1ddb271cd7de465f1db4744ed1d4.camel@redhat.com>
-Subject: Re: [PATCH 2/2] KVM: use KVM_{GET|SET}_SREGS2 when supported by kvm.
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-Cc:     Eduardo Habkost <ehabkost@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>, kvm@vger.kernel.org,
-        Richard Henderson <richard.henderson@linaro.org>
-Date:   Thu, 01 Apr 2021 20:10:56 +0300
-In-Reply-To: <d221fa13-8e3b-0666-ff15-8c86d4e08237@redhat.com>
-References: <20210401144545.1031704-1-mlevitsk@redhat.com>
-         <20210401144545.1031704-3-mlevitsk@redhat.com>
-         <d221fa13-8e3b-0666-ff15-8c86d4e08237@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+        by mail.kernel.org (Postfix) with ESMTPSA id 24BFB613BD;
+        Thu,  1 Apr 2021 17:30:43 +0000 (UTC)
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=wait-a-minute.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94)
+        (envelope-from <maz@kernel.org>)
+        id 1lS19U-0058Gu-1o; Thu, 01 Apr 2021 18:30:40 +0100
+Date:   Thu, 01 Apr 2021 18:30:39 +0100
+Message-ID: <87ft09gbeo.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Auger Eric <eric.auger@redhat.com>
+Cc:     eric.auger.pro@gmail.com, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+        drjones@redhat.com, alexandru.elisei@arm.com, james.morse@arm.com,
+        suzuki.poulose@arm.com, shuah@kernel.org, pbonzini@redhat.com
+Subject: Re: [PATCH v4 7/8] KVM: arm64: vgic-v3: Expose GICR_TYPER.Last for userspace
+In-Reply-To: <b2458147-cd53-8712-9120-7ee9b84152aa@redhat.com>
+References: <20210401085238.477270-1-eric.auger@redhat.com>
+        <20210401085238.477270-8-eric.auger@redhat.com>
+        <87tuoqp1du.wl-maz@kernel.org>
+        <b2458147-cd53-8712-9120-7ee9b84152aa@redhat.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: eric.auger@redhat.com, eric.auger.pro@gmail.com, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, drjones@redhat.com, alexandru.elisei@arm.com, james.morse@arm.com, suzuki.poulose@arm.com, shuah@kernel.org, pbonzini@redhat.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 2021-04-01 at 18:09 +0200, Paolo Bonzini wrote:
-> On 01/04/21 16:45, Maxim Levitsky wrote:
-> > +
-> > +    for (i = 0; i < 4; i++) {
-> > +        sregs.pdptrs[i] = env->pdptrs[i];
-> > +    }
-> > +
-> > +    sregs.flags = 0;
-> > +    sregs.padding = 0;
-> > +
-> > +    return kvm_vcpu_ioctl(CPU(cpu), KVM_SET_SREGS2, &sregs);
-> > +}
-> > +
+On Thu, 01 Apr 2021 18:03:25 +0100,
+Auger Eric <eric.auger@redhat.com> wrote:
 > 
-> This breaks when migrating from old to new kernel, because in that case 
-> the PDPTRs are not initialized.
+> Hi Marc,
+> 
+> On 4/1/21 3:42 PM, Marc Zyngier wrote:
+> > Hi Eric,
+> > 
+> > On Thu, 01 Apr 2021 09:52:37 +0100,
+> > Eric Auger <eric.auger@redhat.com> wrote:
+> >>
+> >> Commit 23bde34771f1 ("KVM: arm64: vgic-v3: Drop the
+> >> reporting of GICR_TYPER.Last for userspace") temporarily fixed
+> >> a bug identified when attempting to access the GICR_TYPER
+> >> register before the redistributor region setting, but dropped
+> >> the support of the LAST bit.
+> >>
+> >> Emulating the GICR_TYPER.Last bit still makes sense for
+> >> architecture compliance though. This patch restores its support
+> >> (if the redistributor region was set) while keeping the code safe.
+> >>
+> >> We introduce a new helper, vgic_mmio_vcpu_rdist_is_last() which
+> >> computes whether a redistributor is the highest one of a series
+> >> of redistributor contributor pages.
+> >>
+> >> The spec says "Indicates whether this Redistributor is the
+> >> highest-numbered Redistributor in a series of contiguous
+> >> Redistributor pages."
+> >>
+> >> The code is a bit convulated since there is no guarantee
+> > 
+> > nit: convoluted
+> > 
+> >> redistributors are added in a given reditributor region in
+> >> ascending order. In that case the current implementation was
+> >> wrong. Also redistributor regions can be contiguous
+> >> and registered in non increasing base address order.
+> >>
+> >> So the index of redistributors are stored in an array within
+> >> the redistributor region structure.
+> >>
+> >> With this new implementation we do not need to have a uaccess
+> >> read accessor anymore.
+> >>
+> >> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> > 
+> > This patch also hurt my head, a lot more than the first one.  See
+> > below.
+> > 
+> >> ---
+> >>  arch/arm64/kvm/vgic/vgic-init.c    |  7 +--
+> >>  arch/arm64/kvm/vgic/vgic-mmio-v3.c | 97 ++++++++++++++++++++----------
+> >>  arch/arm64/kvm/vgic/vgic.h         |  1 +
+> >>  include/kvm/arm_vgic.h             |  3 +
+> >>  4 files changed, 73 insertions(+), 35 deletions(-)
+> >>
+> >> diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/vgic-init.c
+> >> index cf6faa0aeddb2..61150c34c268c 100644
+> >> --- a/arch/arm64/kvm/vgic/vgic-init.c
+> >> +++ b/arch/arm64/kvm/vgic/vgic-init.c
+> >> @@ -190,6 +190,7 @@ int kvm_vgic_vcpu_init(struct kvm_vcpu *vcpu)
+> >>  	int i;
+> >>  
+> >>  	vgic_cpu->rd_iodev.base_addr = VGIC_ADDR_UNDEF;
+> >> +	vgic_cpu->index = vcpu->vcpu_id;
+> > 
+> > Is it so that vgic_cpu->index is always equal to vcpu_id? If so, why
+> > do we need another field? We can always get to the vcpu using a
+> > container_of().
+> > 
+> >>  
+> >>  	INIT_LIST_HEAD(&vgic_cpu->ap_list_head);
+> >>  	raw_spin_lock_init(&vgic_cpu->ap_list_lock);
+> >> @@ -338,10 +339,8 @@ static void kvm_vgic_dist_destroy(struct kvm *kvm)
+> >>  	dist->vgic_dist_base = VGIC_ADDR_UNDEF;
+> >>  
+> >>  	if (dist->vgic_model == KVM_DEV_TYPE_ARM_VGIC_V3) {
+> >> -		list_for_each_entry_safe(rdreg, next, &dist->rd_regions, list) {
+> >> -			list_del(&rdreg->list);
+> >> -			kfree(rdreg);
+> >> -		}
+> >> +		list_for_each_entry_safe(rdreg, next, &dist->rd_regions, list)
+> >> +			vgic_v3_free_redist_region(rdreg);
+> > 
+> > Consider moving the introduction of vgic_v3_free_redist_region() into
+> > a separate patch. On its own, that's a good readability improvement.
+> > 
+> >>  		INIT_LIST_HEAD(&dist->rd_regions);
+> >>  	} else {
+> >>  		dist->vgic_cpu_base = VGIC_ADDR_UNDEF;
+> >> diff --git a/arch/arm64/kvm/vgic/vgic-mmio-v3.c b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
+> >> index 987e366c80008..f6a7eed1d6adb 100644
+> >> --- a/arch/arm64/kvm/vgic/vgic-mmio-v3.c
+> >> +++ b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
+> >> @@ -251,45 +251,57 @@ static void vgic_mmio_write_v3r_ctlr(struct kvm_vcpu *vcpu,
+> >>  		vgic_enable_lpis(vcpu);
+> >>  }
+> >>  
+> >> +static bool vgic_mmio_vcpu_rdist_is_last(struct kvm_vcpu *vcpu)
+> >> +{
+> >> +	struct vgic_dist *vgic = &vcpu->kvm->arch.vgic;
+> >> +	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
+> >> +	struct vgic_redist_region *rdreg = vgic_cpu->rdreg;
+> >> +
+> >> +	if (!rdreg)
+> >> +		return false;
+> >> +
+> >> +	if (rdreg->count && vgic_cpu->rdreg_index == (rdreg->count - 1)) {
+> >> +		/* check whether there is no other contiguous rdist region */
+> >> +		struct list_head *rd_regions = &vgic->rd_regions;
+> >> +		struct vgic_redist_region *iter;
+> >> +
+> >> +		list_for_each_entry(iter, rd_regions, list) {
+> >> +			if (iter->base == rdreg->base + rdreg->count * KVM_VGIC_V3_REDIST_SIZE &&
+> >> +				iter->free_index > 0) {
+> >> +			/* check the first rdist index of this region, if any */
+> >> +				if (vgic_cpu->index < iter->rdist_indices[0])
+> >> +					return false;
+> > 
+> > rdist_indices[] contains the vcpu_id of the vcpu associated with a
+> > given RD in the region. At this stage, you have established that there
+> > is another region that is contiguous with the one associated with our
+> > vcpu. You also know that this adjacent region has a vcpu mapped in
+> > (free_index isn't 0). Isn't that enough to declare that our vcpu isn't
+> > last?  I definitely don't understand what the index comparison does
+> > here.
+> Assume the following case:
+> 2 RDIST region
+> region #0 contains rdist 1, 2, 4
+> region #1, adjacent to #0 contains rdist 3
+> 
+> Spec days:
+> "Indicates whether this Redistributor is the
+> highest-numbered Redistributor in a series of contiguous
+> Redistributor pages."
+> 
+> To me 4 is last and 3 is last too.
 
-True, I haven't thought about it!
-I'll fix this in the next version.
+No, only 3 is last, assuming that region 0 is full. I think the
+phrasing in the spec is just really bad. What this describes is that
+at the end of a set of contiguous set of RDs, that last RD has Last
+set. If two regions are contiguous, that's undistinguishable from a
+single, larger region.
 
-Best regards,
-	Maxim Levitsky
-
+There is no such thing as a "redistributor number" anyway. The closest
+thing there is would be "processor number", but that has nothing to do
+with the RD itself.
 
 > 
-> Paolo
 > 
+> > 
+> > It also seem to me that some of the complexity could be eliminated if
+> > the regions were kept ordered at list insertion time.
+> yes
+> > 
+> >> +			}
+> >> +		}
+> >> +	} else if (vgic_cpu->rdreg_index < rdreg->free_index - 1) {
+> >> +		/* look at the index of next rdist */
+> >> +		int next_rdist_index = rdreg->rdist_indices[vgic_cpu->rdreg_index + 1];
+> >> +
+> >> +		if (vgic_cpu->index < next_rdist_index)
+> >> +			return false;
+> > 
+> > Same thing here. We are in the middle of the allocated part of a
+> > region, which means we cannot be last. I still don't get the index
+> > check.
+> Because within a region, nothing hinders rdist from being allocated in
+> non ascending order. I exercise those cases in the kvmselftests
+> 
+> one single RDIST region with the following rdists allocated there:
+> 1, 3, 2
+> 
+> 3 and 2 are "last", right? Or did I miss something. Yes that's totally
+> not natural to do that kind of allocation but the API allows to do that.
 
+No, only 2 is last. I think you got tripped by the bizarre language in
+the spec, and the behaviour of this Last bit is much simpler than what
+you ended up with.
 
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
