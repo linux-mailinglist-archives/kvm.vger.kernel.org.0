@@ -2,37 +2,37 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 95343351AA3
-	for <lists+kvm@lfdr.de>; Thu,  1 Apr 2021 20:07:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D51C2351A8E
+	for <lists+kvm@lfdr.de>; Thu,  1 Apr 2021 20:06:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236413AbhDASCZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 1 Apr 2021 14:02:25 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:37274 "EHLO
+        id S235451AbhDASB6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 1 Apr 2021 14:01:58 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:57528 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S236613AbhDAR7B (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 1 Apr 2021 13:59:01 -0400
+        by vger.kernel.org with ESMTP id S235931AbhDAR5S (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 1 Apr 2021 13:57:18 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1617299941;
+        s=mimecast20190719; t=1617299836;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=Beke6p3SuuLc9PEBd5EVBwfI5FcHk7u5ME5KWl6tIhg=;
-        b=BE/3S1SRQcU9krpV8ZkcZ6SLjR+BU4vuC5IQEPwp42yklVH/QQwazV9Ur2iBm8afdZMPKi
-        ronHmfMfNoifQXqe9zIBV8iwyVpaJVbbKFr0NInZBKjdN0ezBXckqzOmU037sIhTGMXz/r
-        vgXO9KY8j2nYzkHUHjMZH4cWb26UdCs=
+        bh=NuvXglGlpdJ/QEHoOnrFCNfTazwjmv2hUiB2qqpR7J0=;
+        b=Jye7GeSkBzrxqwy0zimxvYAkC2KSdtxlVDWoMWzH+h1N9FwV8k4Wuy5glWpXEIZ01vObe7
+        ZjsBobGpzrpF5X1pOAEc2KFcNg1pDsvspDUvhzNlX/phEbw7jwSdxUKfN6bu1qqPobFQZ9
+        Ag1XHm5grgum6VUkjk8gv9jYeMbMJ0k=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-99-_HcijJiUNj-mXO3Df2jx2A-1; Thu, 01 Apr 2021 09:55:49 -0400
-X-MC-Unique: _HcijJiUNj-mXO3Df2jx2A-1
+ us-mta-394-YmW1MhWNNkGN89uyV9ZwLg-1; Thu, 01 Apr 2021 09:55:56 -0400
+X-MC-Unique: YmW1MhWNNkGN89uyV9ZwLg-1
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C75BD107BEF6;
-        Thu,  1 Apr 2021 13:55:44 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 363BA802690;
+        Thu,  1 Apr 2021 13:55:53 +0000 (UTC)
 Received: from localhost.localdomain (unknown [10.35.206.58])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 32E505D6B1;
-        Thu,  1 Apr 2021 13:55:32 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 2FC8D5D6B1;
+        Thu,  1 Apr 2021 13:55:44 +0000 (UTC)
 From:   Maxim Levitsky <mlevitsk@redhat.com>
 To:     kvm@vger.kernel.org
 Cc:     x86@kernel.org (maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)),
@@ -70,9 +70,9 @@ Cc:     x86@kernel.org (maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)),
         linux-doc@vger.kernel.org (open list:DOCUMENTATION),
         linux-arm-kernel@lists.infradead.org (moderated list:KERNEL VIRTUAL
         MACHINE FOR ARM64 (KVM/arm64)), James Morse <james.morse@arm.com>
-Subject: [PATCH v2 4/9] KVM: aarch64: implement KVM_CAP_SET_GUEST_DEBUG2
-Date:   Thu,  1 Apr 2021 16:54:46 +0300
-Message-Id: <20210401135451.1004564-5-mlevitsk@redhat.com>
+Subject: [PATCH v2 5/9] KVM: s390x: implement KVM_CAP_SET_GUEST_DEBUG2
+Date:   Thu,  1 Apr 2021 16:54:47 +0300
+Message-Id: <20210401135451.1004564-6-mlevitsk@redhat.com>
 In-Reply-To: <20210401135451.1004564-1-mlevitsk@redhat.com>
 References: <20210401135451.1004564-1-mlevitsk@redhat.com>
 MIME-Version: 1.0
@@ -82,61 +82,44 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Move KVM_GUESTDBG_VALID_MASK to kvm_host.h
-and use it to return the value of this capability.
+Define KVM_GUESTDBG_VALID_MASK and use it to implement this capabiity.
 Compile tested only.
 
 Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
 ---
- arch/arm64/include/asm/kvm_host.h | 4 ++++
- arch/arm64/kvm/arm.c              | 2 ++
- arch/arm64/kvm/guest.c            | 5 -----
- 3 files changed, 6 insertions(+), 5 deletions(-)
+ arch/s390/include/asm/kvm_host.h | 4 ++++
+ arch/s390/kvm/kvm-s390.c         | 3 +++
+ 2 files changed, 7 insertions(+)
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 3d10e6527f7d..613421454ab6 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -401,6 +401,10 @@ struct kvm_vcpu_arch {
- #define KVM_ARM64_PENDING_EXCEPTION	(1 << 8) /* Exception pending */
- #define KVM_ARM64_EXCEPT_MASK		(7 << 9) /* Target EL/MODE */
+diff --git a/arch/s390/include/asm/kvm_host.h b/arch/s390/include/asm/kvm_host.h
+index 6bcfc5614bbc..a3902b57b825 100644
+--- a/arch/s390/include/asm/kvm_host.h
++++ b/arch/s390/include/asm/kvm_host.h
+@@ -700,6 +700,10 @@ struct kvm_hw_bp_info_arch {
+ #define guestdbg_exit_pending(vcpu) (guestdbg_enabled(vcpu) && \
+ 		(vcpu->guest_debug & KVM_GUESTDBG_EXIT_PENDING))
  
-+#define KVM_GUESTDBG_VALID_MASK (KVM_GUESTDBG_ENABLE | \
-+				 KVM_GUESTDBG_USE_SW_BP | \
-+				 KVM_GUESTDBG_USE_HW | \
-+				 KVM_GUESTDBG_SINGLESTEP)
- /*
-  * When KVM_ARM64_PENDING_EXCEPTION is set, KVM_ARM64_EXCEPT_MASK can
-  * take the following values:
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 7f06ba76698d..e575eff76e97 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -208,6 +208,8 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 	case KVM_CAP_VCPU_ATTRIBUTES:
++#define KVM_GUESTDBG_VALID_MASK \
++		(KVM_GUESTDBG_ENABLE | KVM_GUESTDBG_SINGLESTEP |\
++		KVM_GUESTDBG_USE_HW_BP | KVM_GUESTDBG_EXIT_PENDING)
++
+ struct kvm_guestdbg_info_arch {
+ 	unsigned long cr0;
+ 	unsigned long cr9;
+diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+index 2f09e9d7dc95..2049fc8c222a 100644
+--- a/arch/s390/kvm/kvm-s390.c
++++ b/arch/s390/kvm/kvm-s390.c
+@@ -544,6 +544,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+ 	case KVM_CAP_S390_DIAG318:
  		r = 1;
  		break;
 +	case KVM_CAP_SET_GUEST_DEBUG2:
-+		return KVM_GUESTDBG_VALID_MASK;
- 	case KVM_CAP_ARM_SET_DEVICE_ADDR:
- 		r = 1;
- 		break;
-diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
-index 9bbd30e62799..6cb39ee74acd 100644
---- a/arch/arm64/kvm/guest.c
-+++ b/arch/arm64/kvm/guest.c
-@@ -888,11 +888,6 @@ int kvm_arch_vcpu_ioctl_translate(struct kvm_vcpu *vcpu,
- 	return -EINVAL;
- }
- 
--#define KVM_GUESTDBG_VALID_MASK (KVM_GUESTDBG_ENABLE |    \
--			    KVM_GUESTDBG_USE_SW_BP | \
--			    KVM_GUESTDBG_USE_HW | \
--			    KVM_GUESTDBG_SINGLESTEP)
--
- /**
-  * kvm_arch_vcpu_ioctl_set_guest_debug - set up guest debugging
-  * @kvm:	pointer to the KVM struct
++		r = KVM_GUESTDBG_VALID_MASK;
++		break;
+ 	case KVM_CAP_S390_HPAGE_1M:
+ 		r = 0;
+ 		if (hpage && !kvm_is_ucontrol(kvm))
 -- 
 2.26.2
 
