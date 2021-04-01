@@ -2,76 +2,75 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CBEB0351AA8
-	for <lists+kvm@lfdr.de>; Thu,  1 Apr 2021 20:07:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2FAD2351A39
+	for <lists+kvm@lfdr.de>; Thu,  1 Apr 2021 20:04:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236506AbhDASCc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 1 Apr 2021 14:02:32 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:47303 "EHLO
+        id S235971AbhDAR6p (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 1 Apr 2021 13:58:45 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:20016 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S235666AbhDAR7H (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 1 Apr 2021 13:59:07 -0400
+        by vger.kernel.org with ESMTP id S236767AbhDARzR (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 1 Apr 2021 13:55:17 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1617299944;
+        s=mimecast20190719; t=1617299716;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=tB6J9Bg1LN9e67joE8P6cb1rpRW9jAPXApYd6V/ir4w=;
-        b=GuDYPC1tV8ktqtro6F5yuj/4PtBghHsnacrjWzZ5dKuH+TuPcI38+yne+e4vL3e9GsK8Qa
-        1C38XM6CD/6FFe3cBKMA+ZK6y8/9cIbvgs6Jwjx7wlk5+6pikzQQf4JYsMFisqc27TImPY
-        JVu/4SoactJBd+lJYoe5Y29CX1H1cPg=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-537-KjjRVZ2aNdCFuzn64znOzQ-1; Thu, 01 Apr 2021 08:51:49 -0400
-X-MC-Unique: KjjRVZ2aNdCFuzn64znOzQ-1
-Received: by mail-ed1-f72.google.com with SMTP id n20so2801646edr.8
-        for <kvm@vger.kernel.org>; Thu, 01 Apr 2021 05:51:49 -0700 (PDT)
+        bh=OpC0Pma1PFWAjwr0iJYckO0JsmXmNzZhIFWhXwl6Ie0=;
+        b=GbI9sizh/YSXQzaRX6S7Fn3Yx9vOSAz+uW7Bzv3r71X50ahYy1xhoy32/tQMguo1O53zdz
+        IO3HwqtUNvrF+ebBxr7+JNwCcxFhZmM6N8I9OPiVFaHtRc1O5kt94lpTitPOY1UPF7rIvL
+        tx+c1J/A9WYAogQNuDK3ixZ/Y+HNZXM=
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
+ [209.85.218.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-222-nh_W3_pHM3mH_4LrDX9pXg-1; Thu, 01 Apr 2021 08:54:21 -0400
+X-MC-Unique: nh_W3_pHM3mH_4LrDX9pXg-1
+Received: by mail-ej1-f72.google.com with SMTP id v27so2168938ejq.0
+        for <kvm@vger.kernel.org>; Thu, 01 Apr 2021 05:54:21 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=tB6J9Bg1LN9e67joE8P6cb1rpRW9jAPXApYd6V/ir4w=;
-        b=D7oVk7TCwrMtibVW/Vifu5ly5HWTPKLuPohh/PuUkPpwjcEDmRiX+j1fRbj6J/EaRi
-         CZT5GHkEenxdGvJAVsGPtLFam4GWNxYbY7FPBkgLK16iV4h13JxkzhVC91iuRpBGB6P0
-         d5da+f2l21BFl3+Q1kTC6h7D5tFybRlG7eEZHKbfTc1KVYlIgTHFcqZT6+PYBoQlQFwL
-         tKqxbtkYR6UsS9NzppBK9qAAvIeYglRjV8yKD0Klno17DbgE9bK+E8V30wKGmxqjMmTb
-         T9pwQi3EOj7zkYa/IkX+2yP7rZrobKawZBZD5R1sk0etX4IZ3v+lNtu6LNsLSotU0SoT
-         lGcQ==
-X-Gm-Message-State: AOAM532XZxDbUGO4ceYhpaN9A8+98bqHrk604U1SgV0QzTrcq9hpGZxj
-        0WXdpBnth7hftuc1PdH3qPISwNGZC/QDLW/9gHARhT6Z0rNd/1XXMbQA/tvyG3mFOIOfG77/rTW
-        S9U1ckGCU24Ro
-X-Received: by 2002:aa7:d0cb:: with SMTP id u11mr9657124edo.163.1617281508222;
-        Thu, 01 Apr 2021 05:51:48 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwA4lfxUdSNn8+YAmnFxFvTxFUkkH/Qk5o21qSu282vEIncASsgENhDCq+hzeuiR8OkfduwnQ==
-X-Received: by 2002:aa7:d0cb:: with SMTP id u11mr9657113edo.163.1617281508086;
-        Thu, 01 Apr 2021 05:51:48 -0700 (PDT)
+        bh=OpC0Pma1PFWAjwr0iJYckO0JsmXmNzZhIFWhXwl6Ie0=;
+        b=gtFwqC9C30XO32r3vyTMEm6AfUj1WWIRh/labjsjU/hXgwqT4SIJXBGOUVxpvqmiX4
+         ksv5OXqHDU2ivSgVRtfYE9/sqSAH/lg2JXIs6KFBVLEgyunO1VcNqGSSZLYzyHMWdRCo
+         shKXXCfUrNsAr+Q82e88IzFLqTCAR1HetmQCk+if1TofAuoPhl6DeHXk0HYSppx6BaH9
+         2webz/9VBGOrZY16Em/J9mT16fX/pqHrZR1xrz9swtaaFeLpqghIkB2oky7WynbU43Lu
+         fonlDRLzD57+mtEw4zmdFtX7IEU3BM6WWp5qIEeETgiMakFsN7UD0Jdlt75iycYciBzN
+         SNeA==
+X-Gm-Message-State: AOAM53194Jk/tVK/2rRmp/cL5rh1nXG3cAO+KDNWoZ6qkuIDsUWkkise
+        mE8F0QeUjSZKqCavxsK/fg8bJIEaAJvh5MscJ6QvJH7V3DhW/hUqQwPsPgLrZZ35LDbU7ef1dD1
+        q5T1aN2Rs06EG
+X-Received: by 2002:a17:907:76a3:: with SMTP id jw3mr9124305ejc.353.1617281660489;
+        Thu, 01 Apr 2021 05:54:20 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxMYpcr1VxmrLPcRqAXFqV+5+DVqQuWK1tQ2PT+nlPN+mKom8Wytem2m1aqXpphzINgdJwsZQ==
+X-Received: by 2002:a17:907:76a3:: with SMTP id jw3mr9124288ejc.353.1617281660342;
+        Thu, 01 Apr 2021 05:54:20 -0700 (PDT)
 Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id y2sm2697878ejf.30.2021.04.01.05.51.46
+        by smtp.gmail.com with ESMTPSA id gr16sm2753013ejb.44.2021.04.01.05.54.18
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 01 Apr 2021 05:51:47 -0700 (PDT)
-Subject: Re: [PATCH v2 0/2] KVM: x86: nSVM: fixes for SYSENTER emulation
-To:     Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org
-Cc:     Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Ingo Molnar <mingo@redhat.com>,
-        "open list:X86 ARCHITECTURE (32-BIT AND 64-BIT)" 
-        <linux-kernel@vger.kernel.org>, "H. Peter Anvin" <hpa@zytor.com>,
-        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
+        Thu, 01 Apr 2021 05:54:19 -0700 (PDT)
+Subject: Re: [PATCH v5 0/5] KVM: x86: dump_vmcs: don't assume GUEST_IA32_EFER,
+ show MSR autoloads/autosaves
+To:     David Edmondson <david.edmondson@oracle.com>,
+        linux-kernel@vger.kernel.org
+Cc:     Ingo Molnar <mingo@redhat.com>, Joerg Roedel <joro@8bytes.org>,
+        "H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org,
+        Wanpeng Li <wanpengli@tencent.com>, x86@kernel.org,
         Borislav Petkov <bp@alien8.de>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
         Sean Christopherson <seanjc@google.com>,
-        Joerg Roedel <joro@8bytes.org>
-References: <20210401111928.996871-1-mlevitsk@redhat.com>
+        Jim Mattson <jmattson@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>
+References: <20210318120841.133123-1-david.edmondson@oracle.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <6acb7872-37ed-0b24-65a1-ddaa17bae6ef@redhat.com>
-Date:   Thu, 1 Apr 2021 14:51:46 +0200
+Message-ID: <7bbf736c-efd8-6169-171c-098a2869944f@redhat.com>
+Date:   Thu, 1 Apr 2021 14:54:18 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.7.0
 MIME-Version: 1.0
-In-Reply-To: <20210401111928.996871-1-mlevitsk@redhat.com>
+In-Reply-To: <20210318120841.133123-1-david.edmondson@oracle.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -79,40 +78,37 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 01/04/21 13:19, Maxim Levitsky wrote:
-> This is a result of a deep rabbit hole dive in regard to why
-> currently the nested migration of 32 bit guests
-> is totally broken on AMD.
+On 18/03/21 13:08, David Edmondson wrote:
+> v2:
+> - Don't use vcpu->arch.efer when GUEST_IA32_EFER is not available (Paolo).
+> - Dump the MSR autoload/autosave lists (Paolo).
 > 
-> It turns out that due to slight differences between the original AMD64
-> implementation and the Intel's remake, SYSENTER instruction behaves a
-> bit differently on Intel, and to support migration from Intel to AMD we
-> try to emulate those differences away.
+> v3:
+> - Rebase to master.
+> - Check only the load controls (Sean).
+> - Always show the PTPRs from the VMCS if they exist (Jim/Sean).
+> - Dig EFER out of the MSR autoload list if it's there (Paulo).
+> - Calculate and show the effective EFER if it is not coming from
+>    either the VMCS or the MSR autoload list (Sean).
 > 
-> Sadly that collides with virtual vmload/vmsave feature that is used in nesting.
-> The problem was that when it is enabled,
-> on migration (and otherwise when userspace reads MSR_IA32_SYSENTER_{EIP|ESP},
-> wrong value were returned, which leads to #DF in the
-> nested guest when the wrong value is loaded back.
+> v4:
+> - Ensure that each changeset builds with just the previous set.
 > 
-> The patch I prepared carefully fixes this, by mostly disabling that
-> SYSCALL emulation when we don't spoof the Intel's vendor ID, and if we do,
-> and yet somehow SVM is enabled (this is a very rare edge case), then
-> virtual vmload/save is force disabled.
+> v5:
+> - Rebase.
+> - Remove some cruft from changeset comments.
+> - Add S-by as appropriate.
 > 
-> V2: incorporated review feedback from Paulo.
+> David Edmondson (5):
+>    KVM: x86: dump_vmcs should not assume GUEST_IA32_EFER is valid
+>    KVM: x86: dump_vmcs should not conflate EFER and PAT presence in VMCS
+>    KVM: x86: dump_vmcs should consider only the load controls of EFER/PAT
+>    KVM: x86: dump_vmcs should show the effective EFER
+>    KVM: x86: dump_vmcs should include the autoload/autostore MSR lists
 > 
-> Best regards,
->          Maxim Levitsky
-> 
-> Maxim Levitsky (2):
->    KVM: x86: add guest_cpuid_is_intel
->    KVM: nSVM: improve SYSENTER emulation on AMD
-> 
->   arch/x86/kvm/cpuid.h   |  8 ++++
->   arch/x86/kvm/svm/svm.c | 99 +++++++++++++++++++++++++++---------------
->   arch/x86/kvm/svm/svm.h |  6 +--
->   3 files changed, 76 insertions(+), 37 deletions(-)
+>   arch/x86/kvm/vmx/vmx.c | 58 +++++++++++++++++++++++++++++-------------
+>   arch/x86/kvm/vmx/vmx.h |  2 +-
+>   2 files changed, 42 insertions(+), 18 deletions(-)
 > 
 
 Queued, thanks.
