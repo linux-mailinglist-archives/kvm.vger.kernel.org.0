@@ -2,113 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D3631351277
-	for <lists+kvm@lfdr.de>; Thu,  1 Apr 2021 11:38:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E71D435127C
+	for <lists+kvm@lfdr.de>; Thu,  1 Apr 2021 11:39:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233841AbhDAJhh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 1 Apr 2021 05:37:37 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:49264 "EHLO
+        id S233629AbhDAJij (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 1 Apr 2021 05:38:39 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:38789 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233969AbhDAJhS (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 1 Apr 2021 05:37:18 -0400
+        by vger.kernel.org with ESMTP id S234029AbhDAJii (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 1 Apr 2021 05:38:38 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1617269837;
+        s=mimecast20190719; t=1617269918;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=RH2sDzdNOGvw5QWIl0QgZRGAgJAF8G8lvhic4dK8Vwc=;
-        b=XLj6eNRzCgo+d+McyLgExpHhQGjUnaPLbWpTssG8tyd6h12Z+8LzaNWPK7aUcH/Wo4i2VI
-        LUw+PEw6BrlaE2sodz2IAFZAR/V3ntapeJMxoEAcUTxKy4mG+En74Yjza+937gfTrr6N/m
-        rt9qXSXA+uCiKfGsHNGSJsevOfeVLl0=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-451-NqXbJmZIMUiYVEpMk1DD9Q-1; Thu, 01 Apr 2021 05:37:16 -0400
-X-MC-Unique: NqXbJmZIMUiYVEpMk1DD9Q-1
-Received: by mail-ej1-f69.google.com with SMTP id au15so2000807ejc.8
-        for <kvm@vger.kernel.org>; Thu, 01 Apr 2021 02:37:15 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=RH2sDzdNOGvw5QWIl0QgZRGAgJAF8G8lvhic4dK8Vwc=;
-        b=gj4MzaxOeEynLWeA4l85ED1sz7qKx0F8d1j/aneCBYkBeUVSbUnJ2el7SQhV8jjOKY
-         dbVMYoBIA+6owrk6zeWY5b1Rfp7WaGDYyRw02iiTkTGawoLKygjRcksHzWQDqZBtLE7s
-         Zq/I0JV8aHytbz+TvwDmDHTkRXdjnx3CGkavCYNS991XY7sXYHjH3Vts0SrG5/8mbYHI
-         imoXNBpJC3zwGE2/GEEbMqHSwT8MHY5WA2Dq6DBRp2hkxtSOn48OZiMdB80T/r2V8Amf
-         TLexjC04MD7MZjQQaYCTBzTwTIHZ/dxHxGt6ocdnw3D0pbmOfK18bqjB+dSWYW3Z9XXo
-         Klzg==
-X-Gm-Message-State: AOAM5335NL+a0SIoXRiwdoRuaDarpMVebR6+juTZOk/s7mUQtDuqtr0r
-        x31WNmpy2osnryJwh8dtdZMHIH+CJBtvtRt9ZsAeAdzjcYezT0Ci8gzlECI1JntoJSIFmK5izkl
-        BYx2y/ufsXUPT
-X-Received: by 2002:a17:906:4955:: with SMTP id f21mr8488025ejt.74.1617269834782;
-        Thu, 01 Apr 2021 02:37:14 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzg3j2r+DJnsVBQJxe4lGMx6Bsm3dPifq2H1zZ8Ct++IPzqHYBfrdiSXfInIuGdeTLcjj07MQ==
-X-Received: by 2002:a17:906:4955:: with SMTP id f21mr8488007ejt.74.1617269834532;
-        Thu, 01 Apr 2021 02:37:14 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id p9sm3187071eds.66.2021.04.01.02.37.13
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 01 Apr 2021 02:37:13 -0700 (PDT)
-Subject: Re: [PATCH 08/13] KVM: x86/mmu: Protect the tdp_mmu_roots list with
- RCU
-To:     Ben Gardon <bgardon@google.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Cc:     Peter Xu <peterx@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Peter Shier <pshier@google.com>,
-        Peter Feiner <pfeiner@google.com>,
-        Junaid Shahid <junaids@google.com>,
-        Jim Mattson <jmattson@google.com>,
-        Yulei Zhang <yulei.kernel@gmail.com>,
-        Wanpeng Li <kernellwp@gmail.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Xiao Guangrong <xiaoguangrong.eric@gmail.com>
-References: <20210331210841.3996155-1-bgardon@google.com>
- <20210331210841.3996155-9-bgardon@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <a030f6a6-4092-7c70-af4e-148debb801cc@redhat.com>
-Date:   Thu, 1 Apr 2021 11:37:12 +0200
+        bh=3Hn127n4+W9QT98rMhYkTztLXr0yp9CQW2nFtLHdNsg=;
+        b=OiqhED6+Ute+hn6KSkhCxLpV3IF7vfylLmMNc5YRAIQAC+XuJEb3LH0GgcFPGIQkVCJX3y
+        q0IuHn6tRRFOJazEgvoATAyhi7x+NGjHAjdXPmEMcBwdXHPdcLk8yQbpHBoBFd3SwJlIBi
+        E98RO94NyedtTdLATEY+cf11r+LM8BU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-577-duJBAVOJMpCjeWyJ694eNA-1; Thu, 01 Apr 2021 05:38:34 -0400
+X-MC-Unique: duJBAVOJMpCjeWyJ694eNA-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EBE96107B7C3;
+        Thu,  1 Apr 2021 09:38:30 +0000 (UTC)
+Received: from [10.36.112.13] (ovpn-112-13.ams2.redhat.com [10.36.112.13])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 189EB5C8AB;
+        Thu,  1 Apr 2021 09:38:18 +0000 (UTC)
+Subject: Re: [PATCH v14 06/13] iommu/smmuv3: Allow stage 1 invalidation with
+ unmanaged ASIDs
+To:     Zenghui Yu <yuzenghui@huawei.com>
+Cc:     eric.auger.pro@gmail.com, iommu@lists.linux-foundation.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        kvmarm@lists.cs.columbia.edu, will@kernel.org, maz@kernel.org,
+        robin.murphy@arm.com, joro@8bytes.org, alex.williamson@redhat.com,
+        tn@semihalf.com, zhukeqian1@huawei.com,
+        jacob.jun.pan@linux.intel.com, yi.l.liu@intel.com,
+        wangxingang5@huawei.com, jiangkunkun@huawei.com,
+        jean-philippe@linaro.org, zhangfei.gao@linaro.org,
+        zhangfei.gao@gmail.com, vivek.gautam@arm.com,
+        shameerali.kolothum.thodi@huawei.com, nicoleotsuka@gmail.com,
+        lushenming@huawei.com, vsethi@nvidia.com,
+        wanghaibin.wang@huawei.com
+References: <20210223205634.604221-1-eric.auger@redhat.com>
+ <20210223205634.604221-7-eric.auger@redhat.com>
+ <7a270196-2a8d-1b23-ee5f-f977c53d2134@huawei.com>
+From:   Auger Eric <eric.auger@redhat.com>
+Message-ID: <8350e4e2-4607-cfd7-b1a7-1470bf18da6d@redhat.com>
+Date:   Thu, 1 Apr 2021 11:38:16 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.7.0
+ Thunderbird/78.8.0
 MIME-Version: 1.0
-In-Reply-To: <20210331210841.3996155-9-bgardon@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <7a270196-2a8d-1b23-ee5f-f977c53d2134@huawei.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 31/03/21 23:08, Ben Gardon wrote:
-> Protect the contents of the TDP MMU roots list with RCU in preparation
-> for a future patch which will allow the iterator macro to be used under
-> the MMU lock in read mode.
+Hi Zenghui,
+
+On 3/30/21 11:17 AM, Zenghui Yu wrote:
+> On 2021/2/24 4:56, Eric Auger wrote:
+>> @@ -1936,7 +1950,12 @@ static void
+>> arm_smmu_tlb_inv_range_domain(unsigned long iova, size_t size,
+>>           },
+>>       };
+>>   -    if (smmu_domain->stage == ARM_SMMU_DOMAIN_S1) {
+>> +    if (ext_asid >= 0) {  /* guest stage 1 invalidation */
+>> +        cmd.opcode    = smmu_domain->smmu->features &
+>> ARM_SMMU_FEAT_E2H ?
+>> +                  CMDQ_OP_TLBI_EL2_VA : CMDQ_OP_TLBI_NH_VA;
 > 
-> Signed-off-by: Ben Gardon<bgardon@google.com>
-> ---
->   arch/x86/kvm/mmu/tdp_mmu.c | 64 +++++++++++++++++++++-----------------
->   1 file changed, 36 insertions(+), 28 deletions(-)
+> If I understand it correctly, the true nested mode effectively gives us
+> a *NS-EL1* StreamWorld. We should therefore use CMDQ_OP_TLBI_NH_VA to
+> invalidate the stage-1 NS-EL1 entries, no matter E2H is selected or not.
 > 
-> diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-> +	spin_lock(&kvm->arch.tdp_mmu_pages_lock);
-> +	list_del_rcu(&root->link);
-> +	spin_unlock(&kvm->arch.tdp_mmu_pages_lock);
 
+Yes at the moment you're right. Support for nested virt may induce some
+changes here but we are not there. I will fix it and add a comment.
+Thank you!
 
-Please update the comment above tdp_mmu_pages_lock in 
-arch/x86/include/asm/kvm_host.h as well.
+Best Regards
 
->  /* Only safe under the MMU lock in write mode, without yielding. */
->  #define for_each_tdp_mmu_root(_kvm, _root)				\
-> -	list_for_each_entry(_root, &_kvm->arch.tdp_mmu_roots, link)
-> +	list_for_each_entry_rcu(_root, &_kvm->arch.tdp_mmu_roots, link,	\
-> +				lockdep_is_held_write(&kvm->mmu_lock))
-
-This should also add "... || 
-lockdep_is_help(&kvm->arch.tdp_mmu_pages_lock)", if only for 
-documentation purposes.
-
-Paolo
+Eric
 
