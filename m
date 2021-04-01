@@ -2,110 +2,111 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 99BDA351974
-	for <lists+kvm@lfdr.de>; Thu,  1 Apr 2021 20:02:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 90A07351971
+	for <lists+kvm@lfdr.de>; Thu,  1 Apr 2021 20:02:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235786AbhDARxm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 1 Apr 2021 13:53:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59778 "EHLO
+        id S235998AbhDARxj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 1 Apr 2021 13:53:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58392 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237114AbhDARu3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 1 Apr 2021 13:50:29 -0400
-Received: from mail-pl1-x629.google.com (mail-pl1-x629.google.com [IPv6:2607:f8b0:4864:20::629])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 39BA3C02FEB0
-        for <kvm@vger.kernel.org>; Thu,  1 Apr 2021 09:23:04 -0700 (PDT)
-Received: by mail-pl1-x629.google.com with SMTP id g10so1266272plt.8
-        for <kvm@vger.kernel.org>; Thu, 01 Apr 2021 09:23:04 -0700 (PDT)
+        with ESMTP id S236737AbhDARrT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 1 Apr 2021 13:47:19 -0400
+Received: from mail-il1-x12e.google.com (mail-il1-x12e.google.com [IPv6:2607:f8b0:4864:20::12e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4D4E7C03115F
+        for <kvm@vger.kernel.org>; Thu,  1 Apr 2021 09:50:21 -0700 (PDT)
+Received: by mail-il1-x12e.google.com with SMTP id u2so2617359ilk.1
+        for <kvm@vger.kernel.org>; Thu, 01 Apr 2021 09:50:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=tD+X9BuSKumVuODrS7ew+s56RfGVj55Vw8zUed5E1dQ=;
-        b=b0yftv4xYST/PHsMhQ7VQUcEa/nNBbEpF+RJLTdGj1yGdsIIOhVvznJPXhAKOgcgrx
-         HAGvwGO2hi88fQRtPCWLs1BpGDqSQ0qcLXjLzO8MlBG4jHriu3rrZlvA42wE8LNuX/Fr
-         4xdWlPmu2lcnYh2YC1ciLz4MPciden90dX/kioMhjaC/j8B/Dk7gjgOAzVq6bFsrKOvA
-         Rw45Ihhg7JDLF03Vng8Sk5QgEspPdJUA5DyyG67THT7pHBSQ46icHHGjcqhSzxPetv6O
-         3aXmunw+MHJIZS4VOWhQtBE9wh/bHozCc3KsuxBOZuV+qaR12u7c0dntFbqU1PF18eKr
-         WgpA==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=0w+zGLeMzdcB8Xl8lhep34DyBJozrhHS5e3zByXXsOs=;
+        b=kDL/vWg/Yf17Di0EMzIUc6FTgS3eEoyakAdcYbqSWhng1EWqEv0beBVyXtY4oMNxaT
+         N/Pybyl9KFbE5JHW15B9s2JAfmLpaETxhpwtABnrRLesdkJB2k/93y6hre3CvjPCLfUt
+         Tdkll+aURgcxmO+zKx5lfF1YibCZ/hWW/H1MVFume13yOjQqD3JfrTrsyDpw5S+z417O
+         B866pKBWyfTSwcB6LBN6YRPRzxQRne1JjhFvH372zxhUSmvNg4Vk4dPUgVGlyDIOvtP1
+         fMilIuY0gUCwtkcqWF2QTzpaF1YtaaJwLCxzN9lEB4gbAnjTIcmnWfWb5r/XL4GjXdPW
+         CxBw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=tD+X9BuSKumVuODrS7ew+s56RfGVj55Vw8zUed5E1dQ=;
-        b=nl/JOQYrPCvNNW/DZQEZVFtOAIexfsqEevYWUvCXprsOoDBCxuaSGRO/u0s0WabZMG
-         MdG6T5eZO1Aodx4PEdUb3YlfEDCHkI0K4M3k4NJO2AA87o1YyIHzMNSrN0wOrzrH6coP
-         /RtWcVabbYR60Jqk84/3DM2SrIL5QoXuNJH6jc9uaCkWw6AdbfjMSGpJBB7nwt2rPoIv
-         DvpHbDeqQunz2ZfwHPeVdVa6+i/9GwORh0+Iqg2pgMZFVBTR4NLXOFMZDmm2hJNXkQFF
-         BxV2EtKOA/R1dm9/m3iDhhe/uM2TLkdS+CSPiDcMPtMJ3TCNt57SK5yWRcs9EO8Yx3dh
-         zA3w==
-X-Gm-Message-State: AOAM5325h6CEWeEH809pl90OCg4aGw9WWK4rjMkheNlNdT0r86OSi0Wh
-        G5z9rFmqDqvf38C/X4y515aVig==
-X-Google-Smtp-Source: ABdhPJxA+80V8X8+S9LBr6ks6kcnWa3Io5Z5gpYddSyqtvTMFfjHXGTv/ayoHfoc+ROuWFYuNUqIUg==
-X-Received: by 2002:a17:90a:4005:: with SMTP id u5mr9648330pjc.6.1617294183436;
-        Thu, 01 Apr 2021 09:23:03 -0700 (PDT)
-Received: from google.com (240.111.247.35.bc.googleusercontent.com. [35.247.111.240])
-        by smtp.gmail.com with ESMTPSA id x3sm5781480pfn.181.2021.04.01.09.23.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 01 Apr 2021 09:23:02 -0700 (PDT)
-Date:   Thu, 1 Apr 2021 16:22:59 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     Yang Li <yang.lee@linux.alibaba.com>, pbonzini@redhat.com,
-        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
-        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, x86@kernel.org,
-        hpa@zytor.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] KVM: x86: Fix potential memory access error
-Message-ID: <YGXzY5h1eCQj6aU0@google.com>
-References: <1617182122-112315-1-git-send-email-yang.lee@linux.alibaba.com>
- <YGS6XS87HYJdVPFQ@google.com>
- <87mtuis77m.fsf@vitty.brq.redhat.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=0w+zGLeMzdcB8Xl8lhep34DyBJozrhHS5e3zByXXsOs=;
+        b=WL0sf6XYCwDNTTvq32zT8p0SqQdceAO+1gXnj0iXhrdjX0B4hnST1cZtiJjgc4W9Vr
+         El339nA6Eyhph/tmSS4lGmk+v09uK990kQIe8s9ZuKBBhPdEztJsCh1IB7cTcPUurdvx
+         GxEZQ5PLkEfAHjWluZx4NmW5sOEzNBBHj5PsLleGgCjoTI6wLiuZgYGitr+y3eRGrolM
+         R9Hji0jYRgXmdL7nUrKfyIsPyuUPFRR4LdzJc+rpxl7sVUsXg9rtMnlThE32lePnO4rp
+         tgXt2wUBMhb4CcLmNSTkZlOGhEngVwoC7fgg/8SYla9a5wiongagXoo3rKTcAj4Nqk5I
+         +DYg==
+X-Gm-Message-State: AOAM5311imy5ut/ztRXzStP2f+MSB/XtUoy1dMvIUq1zvgkE0+U4j7hX
+        ovFi0b5vybYaCy9o7qefcV5BbOWRUgM+wy2IIM/QTQ==
+X-Google-Smtp-Source: ABdhPJzR7BDh9Ca3MkXwQf+bgt+Bza0FQYsPhBc+iMKM1VlGXSeWit3IupkcyE1arRrDDCtAOdPSXDonDgYOAeXAcKU=
+X-Received: by 2002:a92:8752:: with SMTP id d18mr7088426ilm.283.1617295820655;
+ Thu, 01 Apr 2021 09:50:20 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87mtuis77m.fsf@vitty.brq.redhat.com>
+References: <20210331210841.3996155-1-bgardon@google.com> <20210331210841.3996155-13-bgardon@google.com>
+ <YGT3UmSKVQFaY1Fd@google.com>
+In-Reply-To: <YGT3UmSKVQFaY1Fd@google.com>
+From:   Ben Gardon <bgardon@google.com>
+Date:   Thu, 1 Apr 2021 09:50:09 -0700
+Message-ID: <CANgfPd8=2tcsgoBkMztMjhztGUN-ZMV_mbSb7JHe-sT1i3g+7Q@mail.gmail.com>
+Subject: Re: [PATCH 12/13] KVM: x86/mmu: Fast invalidation for TDP MMU
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Peter Xu <peterx@redhat.com>, Peter Shier <pshier@google.com>,
+        Peter Feiner <pfeiner@google.com>,
+        Junaid Shahid <junaids@google.com>,
+        Jim Mattson <jmattson@google.com>,
+        Yulei Zhang <yulei.kernel@gmail.com>,
+        Wanpeng Li <kernellwp@gmail.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Xiao Guangrong <xiaoguangrong.eric@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Apr 01, 2021, Vitaly Kuznetsov wrote:
-> Sean Christopherson <seanjc@google.com> writes:
-> 
-> > On Wed, Mar 31, 2021, Yang Li wrote:
-> >> Using __set_bit() to set a bit in an integer is not a good idea, since
-> >> the function expects an unsigned long as argument, which can be 64bit wide.
-> >> Coverity reports this problem as
-> >> 
-> >> High:Out-of-bounds access(INCOMPATIBLE_CAST)
-> >> CWE119: Out-of-bounds access to a scalar
-> >> Pointer "&vcpu->arch.regs_avail" points to an object whose effective
-> >> type is "unsigned int" (32 bits, unsigned) but is dereferenced as a
-> >> wider "unsigned long" (64 bits, unsigned). This may lead to memory
-> >> corruption.
-> >> 
-> >> /home/heyuan.shy/git-repo/linux/arch/x86/kvm/kvm_cache_regs.h:
-> >> kvm_register_is_available
-> >> 
-> >> Just use BIT instead.
+On Wed, Mar 31, 2021 at 3:27 PM Sean Christopherson <seanjc@google.com> wrote:
+>
+> On Wed, Mar 31, 2021, Ben Gardon wrote:
+> > Provide a real mechanism for fast invalidation by marking roots as
+> > invalid so that their reference count will quickly fall to zero
+> > and they will be torn down.
 > >
-> > Meh, we're hosed either way.  Using BIT() will either result in undefined
-> > behavior due to SHL shifting beyond the size of a u64, or setting random bits
-> > if the truncated shift ends up being less than 63.
+> > One negative side affect of this approach is that a vCPU thread will
+> > likely drop the last reference to a root and be saddled with the work of
+> > tearing down an entire paging structure. This issue will be resolved in
+> > a later commit.
 > >
-> 
-> A stupid question: why can't we just make 'regs_avail'/'regs_dirty'
-> 'unsigned long' and drop a bunch of '(unsigned long *)' casts? 
+> > Signed-off-by: Ben Gardon <bgardon@google.com>
+> > ---
+>
+> ...
+>
+> > +/*
+> > + * This function depends on running in the same MMU lock cirical section as
+> > + * kvm_reload_remote_mmus. Since this is in the same critical section, no new
+> > + * roots will be created between this function and the MMU reload signals
+> > + * being sent.
+>
+> Eww.  That goes beyond just adding a lockdep assertion here.  I know you want to
+> isolate the TDP MMU as much as possible, but this really feels like it should be
+> open coded in kvm_mmu_zap_all_fast().  And assuming this lands after as_id is
+> added to for_each_tdp_mmu_root(), it's probably easier to open code anyways, e.g.
+> use list_for_each_entry() directly instead of bouncing through an iterator.
 
-It wouldn't break anything, but it would create a weird situation where x86-64
-has more bits for tracking registers than i386.  Obviously not the end of the
-world, but it's also not clearly an improvement across the board.
+Yeah, that's fair. I'll open-code it here. I agree that it will remove
+confusion from the function, though it would be nice to be able to use
+for_each_tdp_mmu_root for the lockdep and rcu annotations.
 
-We could do something like:
 
-  	DECLARE_BITMAP(regs_avail, NR_VCPU_TRACKED_REGS);
-	DECLARE_BITMAP(regs_dirty, NR_VCPU_TRACKED_REGS);
-
-but that would complicate the vendor code, e.g. vmx_register_cache_reset().
-
-The casting crud is quite contained, and likely isn't going to expand anytime
-soon.  So, at least for me, this is one of the few cases where I'm content to
-let sleeping dogs lie. :-)
+>
+> > + */
+> > +void kvm_tdp_mmu_invalidate_roots(struct kvm *kvm)
+> > +{
+> > +     struct kvm_mmu_page *root;
+> > +
+> > +     for_each_tdp_mmu_root(kvm, root)
+> > +             root->role.invalid = true;
+> > +}
