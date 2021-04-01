@@ -2,311 +2,398 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 512BE351B66
-	for <lists+kvm@lfdr.de>; Thu,  1 Apr 2021 20:09:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 78236351A95
+	for <lists+kvm@lfdr.de>; Thu,  1 Apr 2021 20:07:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237534AbhDASIK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 1 Apr 2021 14:08:10 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:58130 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S238320AbhDASGE (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 1 Apr 2021 14:06:04 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1617300364;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=hLVqt2QYW6TOLsN96NJCLqj6SvvzzFLG9Bs0zwK5yJM=;
-        b=ArLx0dCjFpc16YEACH+UDdrjoV6iz4EsigXCGK4Yxktwc2Z8lBfDy7dFwX8Cqx63a9BDhQ
-        SnEcvuj4xuOKWamAzzEzamOae9dnXtv3ce8FHIzI1n+lSFJuhWBNax7qyKOtbJBi+d6815
-        pPIp+t1pCVZjxHHo6XLDxwWHK3fXf9Q=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-183-7CNjpYJzP-GxEowH2hbswQ-1; Thu, 01 Apr 2021 09:03:48 -0400
-X-MC-Unique: 7CNjpYJzP-GxEowH2hbswQ-1
-Received: by mail-ej1-f70.google.com with SMTP id mj6so2184094ejb.11
-        for <kvm@vger.kernel.org>; Thu, 01 Apr 2021 06:03:48 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=hLVqt2QYW6TOLsN96NJCLqj6SvvzzFLG9Bs0zwK5yJM=;
-        b=F/T8vi1NfXPhNaRoFpNO76vcJCP0uxgZ8Kx03GCa55vSAm+0IFhYWS1DnRp4jcfVB7
-         JGXtFuP+Qld2QQe9AaOcSKjFCya2iqM4GkC6PA034ga2dtocemmA2CUcRaPXWw8e0dOQ
-         sO9jwaq83hY2QolhG+uQT40izuX9FPGizR0lVH6zV7agfOtxIA7NQZkEVZCnSUipXTfx
-         uPeh6g8Np4eb6uSrEQXWgRy9kx6uWMUaDXsvUkM1+XyynVf3yF8EQtbrkr14HgkgBMhT
-         hLHxlVUw3IvGGlaYl4oWENFhXEpIKKQmWEQfIQXpT72t1aWdBj71GkbXZK7JfdWE3ago
-         S55w==
-X-Gm-Message-State: AOAM531iBxaLKAmUgilk8SZf6ALPRyq6nuw4oU/RPfqq39+sJbp4eTQ4
-        vwr7dsL3qmp3DRAB0ngZAFwlo7uDGWaxn5+2MwTlGmJiMSurplqFkJKktGx/RUQJCt5VOl8bIPM
-        6SozHy6ACo2lv
-X-Received: by 2002:a17:907:9808:: with SMTP id ji8mr9062293ejc.333.1617282227121;
-        Thu, 01 Apr 2021 06:03:47 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzu00HuRy5493wFcNdLMauC3GnVcaBPNNgBHoztJRng8KFwTyRj9c++l2mYn9EoseVAMj7d8Q==
-X-Received: by 2002:a17:907:9808:: with SMTP id ji8mr9062245ejc.333.1617282226799;
-        Thu, 01 Apr 2021 06:03:46 -0700 (PDT)
-Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id hb19sm2739579ejb.11.2021.04.01.06.03.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 01 Apr 2021 06:03:46 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org
-Cc:     Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Ingo Molnar <mingo@redhat.com>,
-        "open list:X86 ARCHITECTURE (32-BIT AND 64-BIT)" 
-        <linux-kernel@vger.kernel.org>, "H. Peter Anvin" <hpa@zytor.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Borislav Petkov <bp@alien8.de>,
-        Sean Christopherson <seanjc@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Maxim Levitsky <mlevitsk@redhat.com>
-Subject: Re: [PATCH v2 2/2] KVM: nSVM: improve SYSENTER emulation on AMD
-In-Reply-To: <20210401111928.996871-3-mlevitsk@redhat.com>
-References: <20210401111928.996871-1-mlevitsk@redhat.com>
- <20210401111928.996871-3-mlevitsk@redhat.com>
-Date:   Thu, 01 Apr 2021 15:03:45 +0200
-Message-ID: <87h7kqrwb2.fsf@vitty.brq.redhat.com>
-MIME-Version: 1.0
+        id S236138AbhDASCJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 1 Apr 2021 14:02:09 -0400
+Received: from esa4.hgst.iphmx.com ([216.71.154.42]:59599 "EHLO
+        esa4.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S236548AbhDAR6A (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 1 Apr 2021 13:58:00 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1617299881; x=1648835881;
+  h=from:to:cc:subject:date:message-id:
+   content-transfer-encoding:mime-version;
+  bh=73/GetQxONBnna3naBTBIVnHoPDXomMO14Fw9GZFHVU=;
+  b=NaQs8pAfIq2dATvhwf1M6qKvVaTV/BYeglFATbkr9+h6lAkFe8f0+0V/
+   Sf6C5WpmVgtuFaA+iJI5kePKcJnHaWJ6072/yWOlvvzq/3UtbCbtCzFC6
+   kQfm+JKXp/rWQtqPPLDmXtRXQ+P40zpfHLZUvb+h2r3Vp8tazyrfzF2Gn
+   x7DfErwepjJo0zWnhAnpD6a+izp6Bq6sRU29+5c8j5KFG/CaGeSbtcH7A
+   c514r+s9u0HBLymGa1FyuToK2rYx/djF1uxym1tpULo+ivokKGkazPVXw
+   jwGHmc558u/af4NWkrxQbptg2PC79zhSFAgRW4ve4KGxYrkLckiJygrCh
+   A==;
+IronPort-SDR: nu3IYh6FcUDvv5raiwmlEhAoHy3Wa5u0DHPPNZj/t4qZZHXyrGa6RXRiUi0sMlxKxMMwGo3qtZ
+ 0asZFSjbpRH3tIUve0sCrPM9EsCXTzJ72X+Sa+wKMckSo+qJr9WYxVD4qxyJb6cDSm0GqEv3Vx
+ OidGnY7aTaq8IFkcGS6SgWwrExH0u3TPrVo8tq0UcKDMLdKnVAKb0vcab9cc2lu96cO0GFBfq0
+ nmLMTr4m3iQxLZ/auKkDLSDurdUAZMvwewuZk21WntThyMBmR/mUg/2vtVWYAyUsFepKcWj+J2
+ tEU=
+X-IronPort-AV: E=Sophos;i="5.81,296,1610380800"; 
+   d="scan'208";a="163447192"
+Received: from mail-dm3nam07lp2045.outbound.protection.outlook.com (HELO NAM02-DM3-obe.outbound.protection.outlook.com) ([104.47.56.45])
+  by ob1.hgst.iphmx.com with ESMTP; 01 Apr 2021 21:35:20 +0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=gnMX0jBSgmP+7QL0oW7nDdrVkrattvWc4EmhRgN10tXNTFSSexKfPTDzwiA015Y9JM4DXy2vUOSD9DPxOaOuUv4v4mm5c1J3WctCp8jze4feWodNLzpX6MFk3NjkyFWhtpxeWpinIBm2+FhhrTM6Kcf4uHMrUncXNowQMucmvfrPa+dz3SWSfDb4sj5hHVQFGbXX+WNDS7LWi//Wz0Dlgm4UxiSiKyKYKa/km6sfAvhl0xMDV1R3RP4UHq91HX88IGgnQhGkK5lKfmvTE55MSekX4LMryn0nhBoiCYkzoKaDus9sH+yD2/tYSfnEehKpTdReAKHJLYRelie08XdrKQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=3SKoMUbW2eLvAheKEAnL7+DHjQ1AoYVvj7LHQZKt4io=;
+ b=jOEGiUtOY/3+t4y0Qm9JVhsLi4xHXfWRt1EJdT4A/+DtB4tg0BcANPYiuTXpmvpsGRFcetZypyE28uqSnFxAcfX9+npN3vJEfjw2U/+HQUpbCEB8Cfa+IGlHxJIEr6FlgXYK6Vn8aPXMVK7ORTzgV+BaDfYxyrCeP7p0gnvGDHSbM2ih/wIgIQt9SOi4z4TBzxZqx6n4C2T+vJf6tom6bV2g1O+1LLV6+yLCNKDj7PoMyT30NvHJqyos7HLthLEGo0kz/FMiW6LaPUesUgbLPKOb5yraQ+UldTFQnha1WJ/Fj2Jk9qatrCejkVNHHluIDvfB1NsuNHcfZ0Gh3MjfjA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
+ header.d=wdc.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=3SKoMUbW2eLvAheKEAnL7+DHjQ1AoYVvj7LHQZKt4io=;
+ b=Y22+W2/lnpTaEwKHo4yWwP4bQBu2CjAFPA0xRayKnP/LqG08Sg7K/3zWorhXr+6QvNJYI2hBCPYoXeyPhTZo8oLmcKH35S7BjX135YSn2d40OrtIFPU4ZgbBnUt0yw1uWHdH4T+zMlDeA3TQwyARmUhUdKTt3oJ0pGP3VwwHu0k=
+Authentication-Results: dabbelt.com; dkim=none (message not signed)
+ header.d=none;dabbelt.com; dmarc=none action=none header.from=wdc.com;
+Received: from DM6PR04MB6201.namprd04.prod.outlook.com (2603:10b6:5:127::32)
+ by DM6PR04MB3865.namprd04.prod.outlook.com (2603:10b6:5:ac::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3999.28; Thu, 1 Apr
+ 2021 13:35:17 +0000
+Received: from DM6PR04MB6201.namprd04.prod.outlook.com
+ ([fe80::38c0:cc46:192b:1868]) by DM6PR04MB6201.namprd04.prod.outlook.com
+ ([fe80::38c0:cc46:192b:1868%7]) with mapi id 15.20.3977.033; Thu, 1 Apr 2021
+ 13:35:17 +0000
+From:   Anup Patel <anup.patel@wdc.com>
+To:     Palmer Dabbelt <palmer@dabbelt.com>,
+        Palmer Dabbelt <palmerdabbelt@google.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Alexander Graf <graf@amazon.com>,
+        Atish Patra <atish.patra@wdc.com>,
+        Alistair Francis <Alistair.Francis@wdc.com>,
+        Damien Le Moal <damien.lemoal@wdc.com>,
+        Anup Patel <anup@brainfault.org>, kvm@vger.kernel.org,
+        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
+        linux-kernel@vger.kernel.org, Anup Patel <anup.patel@wdc.com>
+Subject: [PATCH v17 00/17] KVM RISC-V Support
+Date:   Thu,  1 Apr 2021 19:04:18 +0530
+Message-Id: <20210401133435.383959-1-anup.patel@wdc.com>
+X-Mailer: git-send-email 2.25.1
+Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
+X-Originating-IP: [122.179.112.210]
+X-ClientProxiedBy: MA1PR01CA0104.INDPRD01.PROD.OUTLOOK.COM
+ (2603:1096:a00:1::20) To DM6PR04MB6201.namprd04.prod.outlook.com
+ (2603:10b6:5:127::32)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from wdc.com (122.179.112.210) by MA1PR01CA0104.INDPRD01.PROD.OUTLOOK.COM (2603:1096:a00:1::20) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3999.28 via Frontend Transport; Thu, 1 Apr 2021 13:35:01 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: b6a41bcf-24ac-46f8-a477-08d8f512fcd4
+X-MS-TrafficTypeDiagnostic: DM6PR04MB3865:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <DM6PR04MB3865269520B5442895B077108D7B9@DM6PR04MB3865.namprd04.prod.outlook.com>
+WDCIPOUTBOUND: EOP-TRUE
+X-MS-Oob-TLC-OOBClassifiers: OLM:79;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: y8KUloPqvd76dcFuZKBZoPw9H8ICb5mZp8zTDMPwN7M57SE+02D3kdB6o+KAPFv0Bi0A2/+aInMTL2FQK0eYRWdjy93VZlB241cd36Ly3I8noANSWa73UMig6boWGAibC1px5cRust4bsVxZNBsgPRgI1+OfA8nh1r+cWmjS6fL9eXv8VsBglF9bp+kpoHFSARtybyQqyOj0miroofUrX26JS2gOtm0a4FuyqyzPrDlkkQgOoKnP3gIQ3my1BNr80ndkScG+1AcO3NM/pq4fsfKrn+6A0VZLQTcQ6VmK7m/sdq2NJ5vRsvZT3xJAm+Vz/0RyhQaF6WM2NCQI8peze4xNgc/z/VULL7JmwF0a1/ZcOrVh0lIhzHo4cSZeLGfSbvPkFuQBc4pk9rluBD4/Ix87htrs+Es/gFUF5ylBLTD1K0fCVOv8pfYMs/x9X9HlKJ+Mqa8D1WgMTGE2xpBqO2PnELguXlIF0aM/VAkBv4CdISVd8mxhgL7FJQDZgzNEyZcITTwmWUZ1+Wx6VZa0liyYl+bnI0yE4OOdSwl3CvT7RVJ50KGCYsbigGMjs08njSc0TVNtB1HnmApvV71cocwCumCR3MdSKfVeJ6/Xy/pgALmWoqPTupZfEUAj5CFKXASL37D6mqaDit/Jik9YfL79TW1aagV0n1j4FmbJ3crYGGuJ3CoYAffZDQCT83ep5xNoIyW9iO3eyAPf3i1TbctjaS/Gzjk9bwg7ED2HZLqlaKKuJ80OpDxg0YvCLsuPs4eUhCLrMddJmvf+aZCYeQ==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR04MB6201.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(346002)(396003)(136003)(376002)(366004)(39860400002)(6666004)(36756003)(55016002)(26005)(2906002)(30864003)(83380400001)(966005)(66556008)(66476007)(5660300002)(66946007)(7416002)(186003)(16526019)(7696005)(956004)(2616005)(8886007)(38100700001)(8936002)(52116002)(44832011)(54906003)(110136005)(8676002)(316002)(86362001)(4326008)(1076003)(478600001)(42580500001);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData: =?us-ascii?Q?CjochSdHlIpFtoqpFPCuQpY4wHKzW6I4TrAz9EYaXXcdfEltT5pNbdBcPZIp?=
+ =?us-ascii?Q?4JtOpeTGGPJa9lDSzmykNwbJAJohR8STx9xTrR7nBW9OuLd4h9eF5+tWmz5v?=
+ =?us-ascii?Q?pOHEmTLLMXJ4ZFHoI4VlyER1VWbt1eH+hgdXxYNlwv+L/S8uJoNKaRMeRdXr?=
+ =?us-ascii?Q?UUlbUGFuUMzHkkI8c+PJMy/hEEpdJpoEby2HmdabPESApABnCjoN0mtnnNlg?=
+ =?us-ascii?Q?9chxLkxerXu88c0gMG4BTZNN+WvHYfCN3D92SwksRD7JrDSS0DPI6CVW+KTH?=
+ =?us-ascii?Q?vNBFQHqIgDPJKiP6NKHGcyCP4FYeHCfNxtym5q8cHA7eYmpjukbUchIFpN+V?=
+ =?us-ascii?Q?+R0uRr+kSlCMVFgR4odK7CDVj9PHZXf3QoOueTpqfG7DUoaNyY6phIAwwryI?=
+ =?us-ascii?Q?ppZPPf8126HigqCJHYWxSS1pm6nHU4tsM1YSBOMQELfg0f1QukCGxIW54DjI?=
+ =?us-ascii?Q?mBhNAAv/KJVlwN+Lg53a1f0vTafHX03FEpK6GT8i2utD7j/Hei3Kmim2X0lG?=
+ =?us-ascii?Q?LDnKK2HiaMhq5L89ouQgG/qobrkuw+EwgaM+gvNrXHEtFiRjyIdiPx/Leys/?=
+ =?us-ascii?Q?n7a+f1hNzGXdxN23svy77m+e5A2HoP8gA8IokCwiz0b55pAfQP1Xg2zDTjZ+?=
+ =?us-ascii?Q?B9coI4CmdF6EkYMeuG6QE9TPfKB10YiUZGpQxa5vOczkf+FEqrTjWmR0k2gG?=
+ =?us-ascii?Q?udxT5SERFJGJKBTm+Su4YHP4YFZfHfnr2qJe7CC8Pn/tS7tFi+4+RzrDbL4z?=
+ =?us-ascii?Q?bUMXKEuh3CA/2OScWXCi6MBYtiokVpVHkzPhKIYIsEHuTQpI3IvEitUdFmX4?=
+ =?us-ascii?Q?NlmrMAprpVUlizu5cMfIk/O3eJT4BjYT549t0Sp8PeMiGc82cGxD6AnvuVZw?=
+ =?us-ascii?Q?QLJ1sNr762IXDC6hr79I5zmtNFXp7hP2Q3xliec3kLS6IzB2LkyNk1eiCbWT?=
+ =?us-ascii?Q?7dusvP+K/tDT6mY8jq1PiTx1cNv4f1UYWfs1/seHK8+BWq0kgX1shL77MXNC?=
+ =?us-ascii?Q?5tNs0sae+6I98t8+5vtp3m4r0tfbFt/0lcvmj30MVVvFMUR/YTZBHA++Txkl?=
+ =?us-ascii?Q?goWqoAjgbxKs6ALEMHKgHFNKo1YHRNJiFMoTEnyBaOUR2o2ZDNyGCP3RbSoL?=
+ =?us-ascii?Q?vZKUIQr7cKAC+2ON0KhBn4xnGlHk1TP0fYN+Se3gq0DsgHA+hZRui7b42Tm9?=
+ =?us-ascii?Q?rD7wM1Ycak972lUzwVNTHQmumkl81s9mhT2lV/2I/t4apKVXfHjqm0rjpgfw?=
+ =?us-ascii?Q?xo26v6ljpi6Iw3XiHmhTgWgNHA32GVxY2pA3x/4eU52n2xHavNqknXMR/FQZ?=
+ =?us-ascii?Q?SWXdiJnCIjfxj6/DLiHyKPwF?=
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: b6a41bcf-24ac-46f8-a477-08d8f512fcd4
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR04MB6201.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Apr 2021 13:35:17.5873
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: XdMrA52+3+nnhc1911yPSlcmgit75E4F6Lz78qEFlxHWpJJkwLAsnHxLka8yvanJSzNAE4pk8s47Zlw+WEVH3A==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR04MB3865
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Maxim Levitsky <mlevitsk@redhat.com> writes:
+This series adds initial KVM RISC-V support. Currently, we are able to boot
+Linux on RV64/RV32 Guest with multiple VCPUs.
 
-> Currently to support Intel->AMD migration, if CPU vendor is GenuineIntel,
-> we emulate the full 64 value for MSR_IA32_SYSENTER_{EIP|ESP}
-> msrs, and we also emulate the sysenter/sysexit instruction in long mode.
->
-> (Emulator does still refuse to emulate sysenter in 64 bit mode, on the
-> ground that the code for that wasn't tested and likely has no users)
->
-> However when virtual vmload/vmsave is enabled, the vmload instruction will
-> update these 32 bit msrs without triggering their msr intercept,
-> which will lead to having stale values in kvm's shadow copy of these msrs,
-> which relies on the intercept to be up to date.
->
-> Fix/optimize this by doing the following:
->
-> 1. Enable the MSR intercepts for SYSENTER MSRs iff vendor=GenuineIntel
->    (This is both a tiny optimization and also ensures that in case
->    the guest cpu vendor is AMD, the msrs will be 32 bit wide as
->    AMD defined).
->
-> 2. Store only high 32 bit part of these msrs on interception and combine
->    it with hardware msr value on intercepted read/writes
->    iff vendor=GenuineIntel.
->
-> 3. Disable vmload/vmsave virtualization if vendor=GenuineIntel.
->    (It is somewhat insane to set vendor=GenuineIntel and still enable
->    SVM for the guest but well whatever).
->    Then zero the high 32 bit parts when kvm intercepts and emulates vmload.
->
-> Thanks a lot to Paulo Bonzini for helping me with fixing this in the most
+Key aspects of KVM RISC-V added by this series are:
+1. No RISC-V specific KVM IOCTL
+2. Minimal possible KVM world-switch which touches only GPRs and few CSRs
+3. Both RV64 and RV32 host supported
+4. Full Guest/VM switch is done via vcpu_get/vcpu_put infrastructure
+5. KVM ONE_REG interface for VCPU register access from user-space
+6. PLIC emulation is done in user-space
+7. Timer and IPI emuation is done in-kernel
+8. Both Sv39x4 and Sv48x4 supported for RV64 host
+9. MMU notifiers supported
+10. Generic dirtylog supported
+11. FP lazy save/restore supported
+12. SBI v0.1 emulation for KVM Guest available
+13. Forward unhandled SBI calls to KVM userspace
+14. Hugepage support for Guest/VM
+15. IOEVENTFD support for Vhost
 
-s/Paulo/Paolo/ :-)
+Here's a brief TODO list which we will work upon after this series:
+1. SBI v0.2 emulation in-kernel
+2. SBI v0.2 hart state management emulation in-kernel
+3. In-kernel PLIC emulation
+4. ..... and more .....
 
-> correct way.
->
-> This patch fixes nested migration of 32 bit nested guests, that was
-> broken because incorrect cached values of SYSENTER msrs were stored in
-> the migration stream if L1 changed these msrs with
-> vmload prior to L2 entry.
->
-> Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
-> ---
->  arch/x86/kvm/svm/svm.c | 99 +++++++++++++++++++++++++++---------------
->  arch/x86/kvm/svm/svm.h |  6 +--
->  2 files changed, 68 insertions(+), 37 deletions(-)
->
-> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> index 271196400495..6c39b0cd6ec6 100644
-> --- a/arch/x86/kvm/svm/svm.c
-> +++ b/arch/x86/kvm/svm/svm.c
-> @@ -95,6 +95,8 @@ static const struct svm_direct_access_msrs {
->  } direct_access_msrs[MAX_DIRECT_ACCESS_MSRS] = {
->  	{ .index = MSR_STAR,				.always = true  },
->  	{ .index = MSR_IA32_SYSENTER_CS,		.always = true  },
-> +	{ .index = MSR_IA32_SYSENTER_EIP,		.always = false },
-> +	{ .index = MSR_IA32_SYSENTER_ESP,		.always = false },
->  #ifdef CONFIG_X86_64
->  	{ .index = MSR_GS_BASE,				.always = true  },
->  	{ .index = MSR_FS_BASE,				.always = true  },
-> @@ -1258,16 +1260,6 @@ static void init_vmcb(struct kvm_vcpu *vcpu)
->  	if (kvm_vcpu_apicv_active(vcpu))
->  		avic_init_vmcb(svm);
->  
-> -	/*
-> -	 * If hardware supports Virtual VMLOAD VMSAVE then enable it
-> -	 * in VMCB and clear intercepts to avoid #VMEXIT.
-> -	 */
-> -	if (vls) {
-> -		svm_clr_intercept(svm, INTERCEPT_VMLOAD);
-> -		svm_clr_intercept(svm, INTERCEPT_VMSAVE);
-> -		svm->vmcb->control.virt_ext |= VIRTUAL_VMLOAD_VMSAVE_ENABLE_MASK;
-> -	}
-> -
->  	if (vgif) {
->  		svm_clr_intercept(svm, INTERCEPT_STGI);
->  		svm_clr_intercept(svm, INTERCEPT_CLGI);
-> @@ -2133,9 +2125,11 @@ static int vmload_vmsave_interception(struct kvm_vcpu *vcpu, bool vmload)
->  
->  	ret = kvm_skip_emulated_instruction(vcpu);
->  
-> -	if (vmload)
-> +	if (vmload) {
->  		nested_svm_vmloadsave(vmcb12, svm->vmcb);
-> -	else
-> +		svm->sysenter_eip_hi = 0;
-> +		svm->sysenter_esp_hi = 0;
-> +	} else
->  		nested_svm_vmloadsave(svm->vmcb, vmcb12);
+This series can be found in riscv_kvm_v17 branch at:
+https//github.com/avpatel/linux.git
 
-Nitpicking: {} are now needed for both branches here.
+Our work-in-progress KVMTOOL RISC-V port can be found in riscv_v7 branch
+at: https//github.com/avpatel/kvmtool.git
 
->  
->  	kvm_vcpu_unmap(vcpu, &map, true);
-> @@ -2677,10 +2671,14 @@ static int svm_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
->  		msr_info->data = svm->vmcb01.ptr->save.sysenter_cs;
->  		break;
->  	case MSR_IA32_SYSENTER_EIP:
-> -		msr_info->data = svm->sysenter_eip;
-> +		msr_info->data = (u32)svm->vmcb01.ptr->save.sysenter_eip;
-> +		if (guest_cpuid_is_intel(vcpu))
-> +			msr_info->data |= (u64)svm->sysenter_eip_hi << 32;
->  		break;
->  	case MSR_IA32_SYSENTER_ESP:
-> -		msr_info->data = svm->sysenter_esp;
-> +		msr_info->data = svm->vmcb01.ptr->save.sysenter_esp;
-> +		if (guest_cpuid_is_intel(vcpu))
-> +			msr_info->data |= (u64)svm->sysenter_esp_hi << 32;
->  		break;
->  	case MSR_TSC_AUX:
->  		if (!boot_cpu_has(X86_FEATURE_RDTSCP))
-> @@ -2885,12 +2883,19 @@ static int svm_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr)
->  		svm->vmcb01.ptr->save.sysenter_cs = data;
->  		break;
->  	case MSR_IA32_SYSENTER_EIP:
-> -		svm->sysenter_eip = data;
-> -		svm->vmcb01.ptr->save.sysenter_eip = data;
-> +		svm->vmcb01.ptr->save.sysenter_eip = (u32)data;
-> +		/*
-> +		 * We only intercept the MSR_IA32_SYSENTER_{EIP|ESP} msrs
-> +		 * when we spoof an Intel vendor ID (for cross vendor migration).
-> +		 * In this case we use this intercept to track the high
-> +		 * 32 bit part of these msrs to support Intel's
-> +		 * implementation of SYSENTER/SYSEXIT.
-> +		 */
-> +		svm->sysenter_eip_hi = guest_cpuid_is_intel(vcpu) ? (data >> 32) : 0;
+The QEMU RISC-V hypervisor emulation is done by Alistair and is available
+in master branch at: https://git.qemu.org/git/qemu.git
 
-(Personal taste) I'd suggest we keep the whole 'sysenter_eip'/'sysenter_esp' 
-even if we only use the upper 32 bits of it. That would reduce the code
-churn a little bit (no need to change 'struct vcpu_svm').
+To play around with KVM RISC-V, refer KVM RISC-V wiki at:
+https://github.com/kvm-riscv/howto/wiki
+https://github.com/kvm-riscv/howto/wiki/KVM-RISCV64-on-QEMU
+https://github.com/kvm-riscv/howto/wiki/KVM-RISCV64-on-Spike
 
->  		break;
->  	case MSR_IA32_SYSENTER_ESP:
-> -		svm->sysenter_esp = data;
-> -		svm->vmcb01.ptr->save.sysenter_esp = data;
-> +		svm->vmcb01.ptr->save.sysenter_esp = (u32)data;
-> +		svm->sysenter_esp_hi = guest_cpuid_is_intel(vcpu) ? (data >> 32) : 0;
->  		break;
->  	case MSR_TSC_AUX:
->  		if (!boot_cpu_has(X86_FEATURE_RDTSCP))
-> @@ -4009,24 +4014,50 @@ static void svm_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
->  			vcpu->arch.reserved_gpa_bits &= ~(1UL << (best->ebx & 0x3f));
->  	}
->  
-> -	if (!kvm_vcpu_apicv_active(vcpu))
-> -		return;
-> +	if (kvm_vcpu_apicv_active(vcpu)) {
-> +		/*
-> +		 * AVIC does not work with an x2APIC mode guest. If the X2APIC feature
-> +		 * is exposed to the guest, disable AVIC.
-> +		 */
-> +		if (guest_cpuid_has(vcpu, X86_FEATURE_X2APIC))
-> +			kvm_request_apicv_update(vcpu->kvm, false,
-> +						 APICV_INHIBIT_REASON_X2APIC);
->  
-> -	/*
-> -	 * AVIC does not work with an x2APIC mode guest. If the X2APIC feature
-> -	 * is exposed to the guest, disable AVIC.
-> -	 */
-> -	if (guest_cpuid_has(vcpu, X86_FEATURE_X2APIC))
-> -		kvm_request_apicv_update(vcpu->kvm, false,
-> -					 APICV_INHIBIT_REASON_X2APIC);
-> +		/*
-> +		 * Currently, AVIC does not work with nested virtualization.
-> +		 * So, we disable AVIC when cpuid for SVM is set in the L1 guest.
-> +		 */
-> +		if (nested && guest_cpuid_has(vcpu, X86_FEATURE_SVM))
-> +			kvm_request_apicv_update(vcpu->kvm, false,
-> +						 APICV_INHIBIT_REASON_NESTED);
-> +	}
->  
-> -	/*
-> -	 * Currently, AVIC does not work with nested virtualization.
-> -	 * So, we disable AVIC when cpuid for SVM is set in the L1 guest.
-> -	 */
-> -	if (nested && guest_cpuid_has(vcpu, X86_FEATURE_SVM))
-> -		kvm_request_apicv_update(vcpu->kvm, false,
-> -					 APICV_INHIBIT_REASON_NESTED);
-> +	if (guest_cpuid_is_intel(vcpu)) {
-> +		/*
-> +		 * We must intercept SYSENTER_EIP and SYSENTER_ESP
-> +		 * accesses because the processor only stores 32 bits.
-> +		 * For the same reason we cannot use virtual VMLOAD/VMSAVE.
-> +		 */
-> +		svm_set_intercept(svm, INTERCEPT_VMLOAD);
-> +		svm_set_intercept(svm, INTERCEPT_VMSAVE);
-> +		svm->vmcb->control.virt_ext &= ~VIRTUAL_VMLOAD_VMSAVE_ENABLE_MASK;
-> +
-> +		set_msr_interception(vcpu, svm->msrpm, MSR_IA32_SYSENTER_EIP, 0, 0);
-> +		set_msr_interception(vcpu, svm->msrpm, MSR_IA32_SYSENTER_ESP, 0, 0);
-> +	} else {
-> +		/*
-> +		 * If hardware supports Virtual VMLOAD VMSAVE then enable it
-> +		 * in VMCB and clear intercepts to avoid #VMEXIT.
-> +		 */
-> +		if (vls) {
-> +			svm_clr_intercept(svm, INTERCEPT_VMLOAD);
-> +			svm_clr_intercept(svm, INTERCEPT_VMSAVE);
-> +			svm->vmcb->control.virt_ext |= VIRTUAL_VMLOAD_VMSAVE_ENABLE_MASK;
-> +		}
-> +		/* No need to intercept these MSRs */
-> +		set_msr_interception(vcpu, svm->msrpm, MSR_IA32_SYSENTER_EIP, 1, 1);
-> +		set_msr_interception(vcpu, svm->msrpm, MSR_IA32_SYSENTER_ESP, 1, 1);
-> +	}
->  }
->  
->  static bool svm_has_wbinvd_exit(void)
-> diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-> index 8e276c4fb33d..fffdd5fb446d 100644
-> --- a/arch/x86/kvm/svm/svm.h
-> +++ b/arch/x86/kvm/svm/svm.h
-> @@ -28,7 +28,7 @@ static const u32 host_save_user_msrs[] = {
->  };
->  #define NR_HOST_SAVE_USER_MSRS ARRAY_SIZE(host_save_user_msrs)
->  
-> -#define MAX_DIRECT_ACCESS_MSRS	18
-> +#define MAX_DIRECT_ACCESS_MSRS	20
->  #define MSRPM_OFFSETS	16
->  extern u32 msrpm_offsets[MSRPM_OFFSETS] __read_mostly;
->  extern bool npt_enabled;
-> @@ -116,8 +116,8 @@ struct vcpu_svm {
->  	struct kvm_vmcb_info *current_vmcb;
->  	struct svm_cpu_data *svm_data;
->  	u32 asid;
-> -	uint64_t sysenter_esp;
-> -	uint64_t sysenter_eip;
-> +	u32 sysenter_esp_hi;
-> +	u32 sysenter_eip_hi;
->  	uint64_t tsc_aux;
->  
->  	u64 msr_decfg;
+Changes since v16:
+ - Rebased on Linux-5.12-rc5
+ - Remove redundant kvm_arch_create_memslot(), kvm_arch_vcpu_setup(),
+   kvm_arch_vcpu_init(), kvm_arch_has_vcpu_debugfs(), and
+   kvm_arch_create_vcpu_debugfs() from PATCH5
+ - Make stage2_wp_memory_region() and stage2_ioremap() as static
+   in PATCH13
+
+Changes since v15:
+ - Rebased on Linux-5.11-rc3
+ - Fixed kvm_stage2_map() to use gfn_to_pfn_prot() for determing
+   writeability of a host pfn.
+ - Use "__u64" in-place of "u64" and "__u32" in-place of "u32" for
+   uapi/asm/kvm.h
+
+Changes since v14:
+ - Rebased on Linux-5.10-rc3
+ - Fixed Stage2 (G-stage) PDG allocation to ensure it is 16KB aligned
+
+Changes since v13:
+ - Rebased on Linux-5.9-rc3
+ - Fixed kvm_riscv_vcpu_set_reg_csr() for SIP updation in PATCH5
+ - Fixed instruction length computation in PATCH7
+ - Added ioeventfd support in PATCH7
+ - Ensure HSTATUS.SPVP is set to correct value before using HLV/HSV
+   intructions in PATCH7
+ - Fixed stage2_map_page() to set PTE 'A' and 'D' bits correctly
+   in PATCH10
+ - Added stage2 dirty page logging in PATCH10
+ - Allow KVM user-space to SET/GET SCOUNTER CSR in PATCH5
+ - Save/restore SCOUNTEREN in PATCH6
+ - Reduced quite a few instructions for __kvm_riscv_switch_to() by
+   using CSR swap instruction in PATCH6
+ - Detect and use Sv48x4 when available in PATCH10
+
+Changes since v12:
+ - Rebased patches on Linux-5.8-rc4
+ - By default enable all counters in HCOUNTEREN
+ - RISC-V H-Extension v0.6.1 spec support
+
+Changes since v11:
+ - Rebased patches on Linux-5.7-rc3
+ - Fixed typo in typecast of stage2_map_size define
+ - Introduced struct kvm_cpu_trap to represent trap details and
+   use it as function parameter wherever applicable
+ - Pass memslot to kvm_riscv_stage2_map() for supporing dirty page
+   logging in future
+ - RISC-V H-Extension v0.6 spec support
+ - Send-out first three patches as separate series so that it can
+   be taken by Palmer for Linux RISC-V
+
+Changes since v10:
+ - Rebased patches on Linux-5.6-rc5
+ - Reduce RISCV_ISA_EXT_MAX from 256 to 64
+ - Separate PATCH for removing N-extension related defines
+ - Added comments as requested by Palmer
+ - Fixed HIDELEG CSR programming
+
+Changes since v9:
+ - Rebased patches on Linux-5.5-rc3
+ - Squash PATCH19 and PATCH20 into PATCH5
+ - Squash PATCH18 into PATCH11
+ - Squash PATCH17 into PATCH16
+ - Added ONE_REG interface for VCPU timer in PATCH13
+ - Use HTIMEDELTA for VCPU timer in PATCH13
+ - Updated KVM RISC-V mailing list in MAINTAINERS entry
+ - Update KVM kconfig option to depend on RISCV_SBI and MMU
+ - Check for SBI v0.2 and SBI v0.2 RFENCE extension at boot-time
+ - Use SBI v0.2 RFENCE extension in VMID implementation
+ - Use SBI v0.2 RFENCE extension in Stage2 MMU implementation
+ - Use SBI v0.2 RFENCE extension in SBI implementation
+ - Moved to RISC-V Hypervisor v0.5 draft spec
+ - Updated Documentation/virt/kvm/api.txt for timer ONE_REG interface
+
+Changes since v8:
+ - Rebased series on Linux-5.4-rc3 and Atish's SBI v0.2 patches
+ - Use HRTIMER_MODE_REL instead of HRTIMER_MODE_ABS in timer emulation
+ - Fixed kvm_riscv_stage2_map() to handle hugepages
+ - Added patch to forward unhandled SBI calls to user-space
+ - Added patch for iterative/recursive stage2 page table programming
+ - Added patch to remove per-CPU vsip_shadow variable
+ - Added patch to fix race-condition in kvm_riscv_vcpu_sync_interrupts()
+
+Changes since v7:
+ - Rebased series on Linux-5.4-rc1 and Atish's SBI v0.2 patches
+ - Removed PATCH1, PATCH3, and PATCH20 because these already merged
+ - Use kernel doc style comments for ISA bitmap functions
+ - Don't parse X, Y, and Z extension in riscv_fill_hwcap() because it will
+   be added in-future
+ - Mark KVM RISC-V kconfig option as EXPERIMENTAL
+ - Typo fix in commit description of PATCH6 of v7 series
+ - Use separate structs for CORE and CSR registers of ONE_REG interface
+ - Explicitly include asm/sbi.h in kvm/vcpu_sbi.c
+ - Removed implicit switch-case fall-through in kvm_riscv_vcpu_exit()
+ - No need to set VSSTATUS.MXR bit in kvm_riscv_vcpu_unpriv_read()
+ - Removed register for instruction length in kvm_riscv_vcpu_unpriv_read()
+ - Added defines for checking/decoding instruction length
+ - Added separate patch to forward unhandled SBI calls to userspace tool
+
+Changes since v6:
+ - Rebased patches on Linux-5.3-rc7
+ - Added "return_handled" in struct kvm_mmio_decode to ensure that
+   kvm_riscv_vcpu_mmio_return() updates SEPC only once
+ - Removed trap_stval parameter from kvm_riscv_vcpu_unpriv_read()
+ - Updated git repo URL in MAINTAINERS entry
+
+Changes since v5:
+ - Renamed KVM_REG_RISCV_CONFIG_TIMEBASE register to
+   KVM_REG_RISCV_CONFIG_TBFREQ register in ONE_REG interface
+ - Update SPEC in kvm_riscv_vcpu_mmio_return() for MMIO exits
+ - Use switch case instead of illegal instruction opcode table for simplicity
+ - Improve comments in stage2_remote_tlb_flush() for a potential remote TLB
+  flush optimization
+ - Handle all unsupported SBI calls in default case of
+   kvm_riscv_vcpu_sbi_ecall() function
+ - Fixed kvm_riscv_vcpu_sync_interrupts() for software interrupts
+ - Improved unprivilege reads to handle traps due to Guest stage1 page table
+ - Added separate patch to document RISC-V specific things in
+   Documentation/virt/kvm/api.txt
+
+Changes since v4:
+ - Rebased patches on Linux-5.3-rc5
+ - Added Paolo's Acked-by and Reviewed-by
+ - Updated mailing list in MAINTAINERS entry
+
+Changes since v3:
+ - Moved patch for ISA bitmap from KVM prep series to this series
+ - Make vsip_shadow as run-time percpu variable instead of compile-time
+ - Flush Guest TLBs on all Host CPUs whenever we run-out of VMIDs
+
+Changes since v2:
+ - Removed references of KVM_REQ_IRQ_PENDING from all patches
+ - Use kvm->srcu within in-kernel KVM run loop
+ - Added percpu vsip_shadow to track last value programmed in VSIP CSR
+ - Added comments about irqs_pending and irqs_pending_mask
+ - Used kvm_arch_vcpu_runnable() in-place-of kvm_riscv_vcpu_has_interrupt()
+   in system_opcode_insn()
+ - Removed unwanted smp_wmb() in kvm_riscv_stage2_vmid_update()
+ - Use kvm_flush_remote_tlbs() in kvm_riscv_stage2_vmid_update()
+ - Use READ_ONCE() in kvm_riscv_stage2_update_hgatp() for vmid
+
+Changes since v1:
+ - Fixed compile errors in building KVM RISC-V as module
+ - Removed unused kvm_riscv_halt_guest() and kvm_riscv_resume_guest()
+ - Set KVM_CAP_SYNC_MMU capability only after MMU notifiers are implemented
+ - Made vmid_version as unsigned long instead of atomic
+ - Renamed KVM_REQ_UPDATE_PGTBL to KVM_REQ_UPDATE_HGATP
+ - Renamed kvm_riscv_stage2_update_pgtbl() to kvm_riscv_stage2_update_hgatp()
+ - Configure HIDELEG and HEDELEG in kvm_arch_hardware_enable()
+ - Updated ONE_REG interface for CSR access to user-space
+ - Removed irqs_pending_lock and use atomic bitops instead
+ - Added separate patch for FP ONE_REG interface
+ - Added separate patch for updating MAINTAINERS file
+
+Anup Patel (13):
+  RISC-V: Add hypervisor extension related CSR defines
+  RISC-V: Add initial skeletal KVM support
+  RISC-V: KVM: Implement VCPU create, init and destroy functions
+  RISC-V: KVM: Implement VCPU interrupts and requests handling
+  RISC-V: KVM: Implement KVM_GET_ONE_REG/KVM_SET_ONE_REG ioctls
+  RISC-V: KVM: Implement VCPU world-switch
+  RISC-V: KVM: Handle MMIO exits for VCPU
+  RISC-V: KVM: Handle WFI exits for VCPU
+  RISC-V: KVM: Implement VMID allocator
+  RISC-V: KVM: Implement stage2 page table programming
+  RISC-V: KVM: Implement MMU notifiers
+  RISC-V: KVM: Document RISC-V specific parts of KVM API
+  RISC-V: KVM: Add MAINTAINERS entry
+
+Atish Patra (4):
+  RISC-V: KVM: Add timer functionality
+  RISC-V: KVM: FP lazy save/restore
+  RISC-V: KVM: Implement ONE REG interface for FP registers
+  RISC-V: KVM: Add SBI v0.1 support
+
+ Documentation/virt/kvm/api.rst          | 193 ++++-
+ MAINTAINERS                             |  11 +
+ arch/riscv/Kconfig                      |   1 +
+ arch/riscv/Makefile                     |   2 +
+ arch/riscv/include/asm/csr.h            |  89 +++
+ arch/riscv/include/asm/kvm_host.h       | 277 +++++++
+ arch/riscv/include/asm/kvm_types.h      |   7 +
+ arch/riscv/include/asm/kvm_vcpu_timer.h |  44 ++
+ arch/riscv/include/asm/pgtable-bits.h   |   1 +
+ arch/riscv/include/uapi/asm/kvm.h       | 128 +++
+ arch/riscv/kernel/asm-offsets.c         | 156 ++++
+ arch/riscv/kvm/Kconfig                  |  36 +
+ arch/riscv/kvm/Makefile                 |  15 +
+ arch/riscv/kvm/main.c                   | 118 +++
+ arch/riscv/kvm/mmu.c                    | 854 ++++++++++++++++++++
+ arch/riscv/kvm/tlb.S                    |  74 ++
+ arch/riscv/kvm/vcpu.c                   | 997 ++++++++++++++++++++++++
+ arch/riscv/kvm/vcpu_exit.c              | 701 +++++++++++++++++
+ arch/riscv/kvm/vcpu_sbi.c               | 173 ++++
+ arch/riscv/kvm/vcpu_switch.S            | 400 ++++++++++
+ arch/riscv/kvm/vcpu_timer.c             | 225 ++++++
+ arch/riscv/kvm/vm.c                     |  81 ++
+ arch/riscv/kvm/vmid.c                   | 120 +++
+ drivers/clocksource/timer-riscv.c       |   8 +
+ include/clocksource/timer-riscv.h       |  16 +
+ include/uapi/linux/kvm.h                |   8 +
+ 26 files changed, 4726 insertions(+), 9 deletions(-)
+ create mode 100644 arch/riscv/include/asm/kvm_host.h
+ create mode 100644 arch/riscv/include/asm/kvm_types.h
+ create mode 100644 arch/riscv/include/asm/kvm_vcpu_timer.h
+ create mode 100644 arch/riscv/include/uapi/asm/kvm.h
+ create mode 100644 arch/riscv/kvm/Kconfig
+ create mode 100644 arch/riscv/kvm/Makefile
+ create mode 100644 arch/riscv/kvm/main.c
+ create mode 100644 arch/riscv/kvm/mmu.c
+ create mode 100644 arch/riscv/kvm/tlb.S
+ create mode 100644 arch/riscv/kvm/vcpu.c
+ create mode 100644 arch/riscv/kvm/vcpu_exit.c
+ create mode 100644 arch/riscv/kvm/vcpu_sbi.c
+ create mode 100644 arch/riscv/kvm/vcpu_switch.S
+ create mode 100644 arch/riscv/kvm/vcpu_timer.c
+ create mode 100644 arch/riscv/kvm/vm.c
+ create mode 100644 arch/riscv/kvm/vmid.c
+ create mode 100644 include/clocksource/timer-riscv.h
 
 -- 
-Vitaly
+2.25.1
 
