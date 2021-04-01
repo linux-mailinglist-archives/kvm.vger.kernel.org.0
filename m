@@ -2,18 +2,18 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 91D3C35125A
-	for <lists+kvm@lfdr.de>; Thu,  1 Apr 2021 11:35:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DAE6935126B
+	for <lists+kvm@lfdr.de>; Thu,  1 Apr 2021 11:37:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229612AbhDAJeX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 1 Apr 2021 05:34:23 -0400
-Received: from verein.lst.de ([213.95.11.211]:39010 "EHLO verein.lst.de"
+        id S233803AbhDAJhE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 1 Apr 2021 05:37:04 -0400
+Received: from verein.lst.de ([213.95.11.211]:39030 "EHLO verein.lst.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S233496AbhDAJeO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 1 Apr 2021 05:34:14 -0400
+        id S229612AbhDAJgq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 1 Apr 2021 05:36:46 -0400
 Received: by verein.lst.de (Postfix, from userid 2407)
-        id 6995C68B05; Thu,  1 Apr 2021 11:34:08 +0200 (CEST)
-Date:   Thu, 1 Apr 2021 11:34:08 +0200
+        id 9A5C868B05; Thu,  1 Apr 2021 11:36:42 +0200 (CEST)
+Date:   Thu, 1 Apr 2021 11:36:42 +0200
 From:   Christoph Hellwig <hch@lst.de>
 To:     Will Deacon <will@kernel.org>
 Cc:     Christoph Hellwig <hch@lst.de>, Joerg Roedel <joro@8bytes.org>,
@@ -26,26 +26,31 @@ Cc:     Christoph Hellwig <hch@lst.de>, Joerg Roedel <joro@8bytes.org>,
         iommu@lists.linux-foundation.org,
         linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
         virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
-Subject: Re: [PATCH 08/18] iommu/fsl_pamu: merge pamu_set_liodn and
- map_liodn
-Message-ID: <20210401093408.GD2934@lst.de>
-References: <20210316153825.135976-1-hch@lst.de> <20210316153825.135976-9-hch@lst.de> <20210330124651.GH5908@willie-the-truck>
+Subject: Re: [PATCH 11/18] iommu/fsl_pamu: remove the snoop_id field
+Message-ID: <20210401093642.GE2934@lst.de>
+References: <20210316153825.135976-1-hch@lst.de> <20210316153825.135976-12-hch@lst.de> <20210330125816.GK5908@willie-the-truck>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210330124651.GH5908@willie-the-truck>
+In-Reply-To: <20210330125816.GK5908@willie-the-truck>
 User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Mar 30, 2021 at 01:46:51PM +0100, Will Deacon wrote:
-> > +	ret = pamu_config_ppaace(liodn, geom->aperture_start,
-> > +				 geom->aperture_end - 1, ~(u32)0,
-> > +				 0, dma_domain->snoop_id, dma_domain->stash_id,
-> > +				 PAACE_AP_PERMS_QUERY | PAACE_AP_PERMS_UPDATE);
-> 
-> There's more '+1' / '-1' confusion here with aperture_end which I'm not
-> managing to follow. What am I missing?
+On Tue, Mar 30, 2021 at 01:58:17PM +0100, Will Deacon wrote:
+> pamu_config_ppaace() takes quite a few useless parameters at this stage,
+> but anyway:
 
-You did not missing anything, I messed this up.   Fixed.
+I'll see it it makes sense to throw in another patch at the end to cut
+it down a bit more.
+
+> Acked-by: Will Deacon <will@kernel.org>
+> 
+> Do you know if this driver is actually useful? Once the complexity has been
+> stripped back, the stubs and default values really stand out.
+
+Yeah.  No idea what the usefulness of this driver is.  Bascially all it
+seems to do is to setup a few registers to allow access to the whole
+physical memory.  But maybe that is required on this hardware to allow
+for any DMA access?
