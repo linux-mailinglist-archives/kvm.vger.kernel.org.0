@@ -2,230 +2,480 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B503F35241C
-	for <lists+kvm@lfdr.de>; Fri,  2 Apr 2021 01:41:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D4DB4352416
+	for <lists+kvm@lfdr.de>; Fri,  2 Apr 2021 01:41:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236471AbhDAXif (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 1 Apr 2021 19:38:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51492 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236421AbhDAXi2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 1 Apr 2021 19:38:28 -0400
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 72276C0613E6
-        for <kvm@vger.kernel.org>; Thu,  1 Apr 2021 16:38:27 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id u128so7415457ybf.12
-        for <kvm@vger.kernel.org>; Thu, 01 Apr 2021 16:38:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
-         :cc;
-        bh=431jpCNAbz4ff8aRGDz2CylqoUFVtLTXMyFJDApsl0M=;
-        b=c/JTkYaCSPcEu9gZ6oGaCnHSmz9zwYtrH6/nMAVzYMC9CA/vu4Hb+k0IEhF2+h+mqc
-         1xGZPaLOj94CcK38WOvvZtz6Nb/eL/syC8a0ObG5snmHCjtITuWcFZTxUAdH79JqxZe4
-         0N6EYf5mTEEz/VxDZr/YlQZd4a2PDcCqSwxYQ+zKpnA3YO3j021KabTs/+6EQdaCYE9b
-         EtKznR+KjTX1GO6F/QTcaANY99+PJ2kJYrUIfrfnRy7jHnBs7zYF0TTFdetHEzaoQQzZ
-         BTMF5ecoa5eZ08stFAE0bzMfz/w0p4B5njtDklYnEaN4tpslOtkOFeBwIs+gI+4/kdul
-         PoZg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=431jpCNAbz4ff8aRGDz2CylqoUFVtLTXMyFJDApsl0M=;
-        b=IoTRJPzXq+VDFjIY4vnpIY0kZ6xFN0DuSmIRXKDLnjGRFhYvXIORQAQ6GLnTG+Xxbz
-         m+/DsCIo8tsFBzpjE7l5I2clRzjgroPGoNo4I2CvPcvpQwx/NYoU7RTBfCTfTGzlYXRW
-         E2SOQrgnPN8BDpqqCSqUxZzbLFVwVv+JGCZuR6AvsguSFX6pGnXH3bxERkshKJwh/PNQ
-         jrQt86H1lxyDK/gxJP2wBwvpE9JFHoUK/lJT8TakVuYu4Ug+i85KohLeIVjffx2YNDw6
-         BnitZ28boBT+PxA3LA9A4La1e3m8GOTgIWSxIVT/k1MaHFdgybO74OefpVrziJw00U1/
-         moxw==
-X-Gm-Message-State: AOAM5314/Wmjurq+rjXfr0L4CYuyef3Zhqwx9OmbizGLBR+u0WAAO/2V
-        xqOSpnFfYOBfUO14DSv9KdYOhRXldIWU
-X-Google-Smtp-Source: ABdhPJxPGWZTAkhYz2+fQtZeS3Keq4NCQuFs2ZA09MoH8cRNcO686wNodJqesSvXqlEYXKi71FfGbFhOm9NO
-X-Received: from bgardon.sea.corp.google.com ([2620:15c:100:202:e088:88b8:ea4a:22b6])
- (user=bgardon job=sendgmr) by 2002:a25:c5c9:: with SMTP id
- v192mr15582738ybe.299.1617320306715; Thu, 01 Apr 2021 16:38:26 -0700 (PDT)
-Date:   Thu,  1 Apr 2021 16:37:36 -0700
-In-Reply-To: <20210401233736.638171-1-bgardon@google.com>
-Message-Id: <20210401233736.638171-14-bgardon@google.com>
+        id S236467AbhDAXi1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 1 Apr 2021 19:38:27 -0400
+Received: from mga11.intel.com ([192.55.52.93]:41053 "EHLO mga11.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S236091AbhDAXiS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 1 Apr 2021 19:38:18 -0400
+IronPort-SDR: Ifp4s/vcy7NKAYbH/S8fHtF+oYe9rs5jXya08YaPtVWfmQ0dv4/EVO+qWbEg1h+remd+FWVCEg
+ ojj9Z2Jh9M4A==
+X-IronPort-AV: E=McAfee;i="6000,8403,9941"; a="189098092"
+X-IronPort-AV: E=Sophos;i="5.81,298,1610438400"; 
+   d="scan'208";a="189098092"
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Apr 2021 16:38:18 -0700
+IronPort-SDR: 3sFfJo6h7KW9c0Odgz7q8F6mdlOt8tYKwGgL09szL1ELp9XIu02YH4y7vpcNEE+yQMhnXDUUV2
+ 6xDgC0rAJMvw==
+X-IronPort-AV: E=Sophos;i="5.81,298,1610438400"; 
+   d="scan'208";a="607778181"
+Received: from nnafsin-mobl1.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.255.231.190])
+  by fmsmga006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Apr 2021 16:38:14 -0700
+Date:   Fri, 2 Apr 2021 12:38:12 +1300
+From:   Kai Huang <kai.huang@intel.com>
+To:     Borislav Petkov <bp@alien8.de>
+Cc:     seanjc@google.com, kvm@vger.kernel.org, x86@kernel.org,
+        linux-sgx@vger.kernel.org, linux-kernel@vger.kernel.org,
+        jarkko@kernel.org, luto@kernel.org, dave.hansen@intel.com,
+        rick.p.edgecombe@intel.com, haitao.huang@intel.com,
+        pbonzini@redhat.com, tglx@linutronix.de, mingo@redhat.com,
+        hpa@zytor.com
+Subject: Re: [PATCH v3 05/25] x86/sgx: Introduce virtual EPC for use by KVM
+ guests
+Message-Id: <20210402123812.c1548cdd1f6536a08461f589@intel.com>
+In-Reply-To: <20210401183159.GD28954@zn.tnic>
+References: <cover.1616136307.git.kai.huang@intel.com>
+        <0c38ced8c8e5a69872db4d6a1c0dabd01e07cad7.1616136308.git.kai.huang@intel.com>
+        <20210326150320.GF25229@zn.tnic>
+        <20210331141032.db59586da8ba2cccf7b46f77@intel.com>
+        <D4ECF8D3-C483-4E75-AD41-2CEFDF56B12D@alien8.de>
+        <20210331195138.2af97ec1bb4b5e4202f2600d@intel.com>
+        <3889C4C6-48E2-4C97-A074-180EB18BDA29@alien8.de>
+        <20210331215345.cad098cfcfcaabf489243807@intel.com>
+        <20210401012039.c78f02ea2ba9f1e5fd504621@intel.com>
+        <20210401183159.GD28954@zn.tnic>
+X-Mailer: Sylpheed 3.7.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
 Mime-Version: 1.0
-References: <20210401233736.638171-1-bgardon@google.com>
-X-Mailer: git-send-email 2.31.0.208.g409f899ff0-goog
-Subject: [PATCH v2 13/13] KVM: x86/mmu: Tear down roots in fast invalidation thread
-From:   Ben Gardon <bgardon@google.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, Peter Xu <peterx@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Peter Shier <pshier@google.com>,
-        Peter Feiner <pfeiner@google.com>,
-        Junaid Shahid <junaids@google.com>,
-        Jim Mattson <jmattson@google.com>,
-        Yulei Zhang <yulei.kernel@gmail.com>,
-        Wanpeng Li <kernellwp@gmail.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Xiao Guangrong <xiaoguangrong.eric@gmail.com>,
-        Ben Gardon <bgardon@google.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-To avoid saddling a vCPU thread with the work of tearing down an entire
-paging structure, take a reference on each root before they become
-obsolete, so that the thread initiating the fast invalidation can tear
-down the paging structure and (most likely) release the last reference.
-As a bonus, this teardown can happen under the MMU lock in read mode so
-as not to block the progress of vCPU threads.
+On Thu, 1 Apr 2021 20:31:59 +0200 Borislav Petkov wrote:
+> On Thu, Apr 01, 2021 at 01:20:39AM +1300, Kai Huang wrote:
+> > Could you help to review whether below change is OK?
+> 
+> I ended up applying this:
 
-Signed-off-by: Ben Gardon <bgardon@google.com>
----
+Thank you!
 
-Changelog
-v2:
---	rename kvm_tdp_mmu_zap_all_fast to
-	kvm_tdp_mmu_zap_invalidated_roots
-
- arch/x86/kvm/mmu/mmu.c     | 21 +++++++++++-
- arch/x86/kvm/mmu/tdp_mmu.c | 68 ++++++++++++++++++++++++++++++++++++++
- arch/x86/kvm/mmu/tdp_mmu.h |  1 +
- 3 files changed, 89 insertions(+), 1 deletion(-)
-
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index ba0c65076200..5f2064ee7220 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -5441,6 +5441,18 @@ static void kvm_mmu_zap_all_fast(struct kvm *kvm)
- 		 * will drop their references and allow the root count to
- 		 * go to 0.
- 		 *
-+		 * Also take a reference on all roots so that this thread
-+		 * can do the bulk of the work required to free the roots
-+		 * once they are invalidated. Without this reference, a
-+		 * vCPU thread might drop the last reference to a root and
-+		 * get stuck with tearing down the entire paging structure.
-+		 *
-+		 * Roots which have a zero refcount should be skipped as
-+		 * they're already being torn down.
-+		 * Already invalid roots should be referenced again so that
-+		 * they aren't freed before kvm_tdp_mmu_zap_all_fast is
-+		 * done with them.
-+		 *
- 		 * This has essentially the same effect for the TDP MMU
- 		 * as updating mmu_valid_gen above does for the shadow
- 		 * MMU.
-@@ -5452,7 +5464,8 @@ static void kvm_mmu_zap_all_fast(struct kvm *kvm)
- 		 * could drop the MMU lock and yield.
- 		 */
- 		list_for_each_entry(root, &kvm->arch.tdp_mmu_roots, link)
--			root->role.invalid = true;
-+			if (refcount_inc_not_zero(&root->tdp_mmu_root_count))
-+				root->role.invalid = true;
- 	}
- 
- 	/*
-@@ -5468,6 +5481,12 @@ static void kvm_mmu_zap_all_fast(struct kvm *kvm)
- 	kvm_zap_obsolete_pages(kvm);
- 
- 	write_unlock(&kvm->mmu_lock);
-+
-+	if (is_tdp_mmu_enabled(kvm)) {
-+		read_lock(&kvm->mmu_lock);
-+		kvm_tdp_mmu_zap_invalidated_roots(kvm);
-+		read_unlock(&kvm->mmu_lock);
-+	}
- }
- 
- static bool kvm_has_zapped_obsolete_pages(struct kvm *kvm)
-diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-index 501722a524a7..0adcfa5750f6 100644
---- a/arch/x86/kvm/mmu/tdp_mmu.c
-+++ b/arch/x86/kvm/mmu/tdp_mmu.c
-@@ -798,6 +798,74 @@ void kvm_tdp_mmu_zap_all(struct kvm *kvm)
- 		kvm_flush_remote_tlbs(kvm);
- }
- 
-+static struct kvm_mmu_page *next_invalidated_root(struct kvm *kvm,
-+						  struct kvm_mmu_page *prev_root)
-+{
-+	struct kvm_mmu_page *next_root;
-+
-+	if (prev_root)
-+		next_root = list_next_or_null_rcu(&kvm->arch.tdp_mmu_roots,
-+						  &prev_root->link,
-+						  typeof(*prev_root), link);
-+	else
-+		next_root = list_first_or_null_rcu(&kvm->arch.tdp_mmu_roots,
-+						   typeof(*next_root), link);
-+
-+	while (next_root && !(next_root->role.invalid &&
-+			      refcount_read(&next_root->tdp_mmu_root_count)))
-+		next_root = list_next_or_null_rcu(&kvm->arch.tdp_mmu_roots,
-+						  &next_root->link,
-+						  typeof(*next_root), link);
-+
-+	return next_root;
-+}
-+
-+/*
-+ * Since kvm_mmu_zap_all_fast has acquired a reference to each
-+ * invalidated root, they will not be freed until this function drops the
-+ * reference. Before dropping that reference, tear down the paging
-+ * structure so that whichever thread does drop the last reference
-+ * only has to do a trivial ammount of work. Since the roots are invalid,
-+ * no new SPTEs should be created under them.
-+ */
-+void kvm_tdp_mmu_zap_invalidated_roots(struct kvm *kvm)
-+{
-+	gfn_t max_gfn = 1ULL << (shadow_phys_bits - PAGE_SHIFT);
-+	struct kvm_mmu_page *next_root;
-+	struct kvm_mmu_page *root;
-+	bool flush = false;
-+
-+	lockdep_assert_held_read(&kvm->mmu_lock);
-+
-+	rcu_read_lock();
-+
-+	root = next_invalidated_root(kvm, NULL);
-+
-+	while (root) {
-+		next_root = next_invalidated_root(kvm, root);
-+
-+		rcu_read_unlock();
-+
-+		flush = zap_gfn_range(kvm, root, 0, max_gfn, true, flush,
-+				      true);
-+
-+		/*
-+		 * Put the reference acquired in
-+		 * kvm_tdp_mmu_invalidate_roots
-+		 */
-+		kvm_tdp_mmu_put_root(kvm, root, true);
-+
-+		root = next_root;
-+
-+		rcu_read_lock();
-+	}
-+
-+	rcu_read_unlock();
-+
-+	if (flush)
-+		kvm_flush_remote_tlbs(kvm);
-+}
-+
- /*
-  * Installs a last-level SPTE to handle a TDP page fault.
-  * (NPT/EPT violation/misconfiguration)
-diff --git a/arch/x86/kvm/mmu/tdp_mmu.h b/arch/x86/kvm/mmu/tdp_mmu.h
-index 8fa3e7421a93..f8db381e3059 100644
---- a/arch/x86/kvm/mmu/tdp_mmu.h
-+++ b/arch/x86/kvm/mmu/tdp_mmu.h
-@@ -47,6 +47,7 @@ static inline bool kvm_tdp_mmu_zap_sp(struct kvm *kvm, struct kvm_mmu_page *sp)
- 					   sp->gfn, end, false, false, false);
- }
- void kvm_tdp_mmu_zap_all(struct kvm *kvm);
-+void kvm_tdp_mmu_zap_invalidated_roots(struct kvm *kvm);
- 
- int kvm_tdp_mmu_map(struct kvm_vcpu *vcpu, gpa_t gpa, u32 error_code,
- 		    int map_writable, int max_level, kvm_pfn_t pfn,
--- 
-2.31.0.208.g409f899ff0-goog
-
+> 
+> ---
+> From: Sean Christopherson <sean.j.christopherson@intel.com>
+> Date: Fri, 19 Mar 2021 20:22:21 +1300
+> Subject: [PATCH] x86/sgx: Introduce virtual EPC for use by KVM guests
+> 
+> Add a misc device /dev/sgx_vepc to allow userspace to allocate "raw"
+> Enclave Page Cache (EPC) without an associated enclave. The intended
+> and only known use case for raw EPC allocation is to expose EPC to a
+> KVM guest, hence the 'vepc' moniker, virt.{c,h} files and X86_SGX_KVM
+> Kconfig.
+> 
+> The SGX driver uses the misc device /dev/sgx_enclave to support
+> userspace in creating an enclave. Each file descriptor returned from
+> opening /dev/sgx_enclave represents an enclave. Unlike the SGX driver,
+> KVM doesn't control how the guest uses the EPC, therefore EPC allocated
+> to a KVM guest is not associated with an enclave, and /dev/sgx_enclave
+> is not suitable for allocating EPC for a KVM guest.
+> 
+> Having separate device nodes for the SGX driver and KVM virtual EPC also
+> allows separate permission control for running host SGX enclaves and KVM
+> SGX guests.
+> 
+> To use /dev/sgx_vepc to allocate a virtual EPC instance with particular
+> size, the hypervisor opens /dev/sgx_vepc, and uses mmap() with the
+> intended size to get an address range of virtual EPC. Then it may use
+> the address range to create one KVM memory slot as virtual EPC for
+> a guest.
+> 
+> Implement the "raw" EPC allocation in the x86 core-SGX subsystem via
+> /dev/sgx_vepc rather than in KVM. Doing so has two major advantages:
+> 
+>   - Does not require changes to KVM's uAPI, e.g. EPC gets handled as
+>     just another memory backend for guests.
+> 
+>   - EPC management is wholly contained in the SGX subsystem, e.g. SGX
+>     does not have to export any symbols, changes to reclaim flows don't
+>     need to be routed through KVM, SGX's dirty laundry doesn't have to
+>     get aired out for the world to see, and so on and so forth.
+> 
+> The virtual EPC pages allocated to guests are currently not reclaimable.
+> Reclaiming an EPC page used by enclave requires a special reclaim
+> mechanism separate from normal page reclaim, and that mechanism is not
+> supported for virutal EPC pages. Due to the complications of handling
+> reclaim conflicts between guest and host, reclaiming virtual EPC pages
+> is significantly more complex than basic support for SGX virtualization.
+> 
+>  [ bp:
+>    - Massage commit message and comments
+>    - use cpu_feature_enabled()
+>    - vertically align struct members init
+>    - massage Virtual EPC clarification text ]
+> 
+> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> Co-developed-by: Kai Huang <kai.huang@intel.com>
+> Signed-off-by: Kai Huang <kai.huang@intel.com>
+> Signed-off-by: Borislav Petkov <bp@suse.de>
+> Acked-by: Dave Hansen <dave.hansen@intel.com>
+> Acked-by: Jarkko Sakkinen <jarkko@kernel.org>
+> Link: https://lkml.kernel.org/r/0c38ced8c8e5a69872db4d6a1c0dabd01e07cad7.1616136308.git.kai.huang@intel.com
+> ---
+>  Documentation/x86/sgx.rst        |  16 ++
+>  arch/x86/Kconfig                 |  12 ++
+>  arch/x86/kernel/cpu/sgx/Makefile |   1 +
+>  arch/x86/kernel/cpu/sgx/sgx.h    |   9 ++
+>  arch/x86/kernel/cpu/sgx/virt.c   | 259 +++++++++++++++++++++++++++++++
+>  5 files changed, 297 insertions(+)
+>  create mode 100644 arch/x86/kernel/cpu/sgx/virt.c
+> 
+> diff --git a/Documentation/x86/sgx.rst b/Documentation/x86/sgx.rst
+> index f90076e67cde..dd0ac96ff9ef 100644
+> --- a/Documentation/x86/sgx.rst
+> +++ b/Documentation/x86/sgx.rst
+> @@ -234,3 +234,19 @@ As a result, when this happpens, user should stop running any new
+>  SGX workloads, (or just any new workloads), and migrate all valuable
+>  workloads. Although a machine reboot can recover all EPC memory, the bug
+>  should be reported to Linux developers.
+> +
+> +
+> +Virtual EPC
+> +===========
+> +
+> +The implementation has also a virtual EPC driver to support SGX enclaves
+> +in guests. Unlike the SGX driver, an EPC page allocated by the virtual
+> +EPC driver doesn't have a specific enclave associated with it. This is
+> +because KVM doesn't track how a guest uses EPC pages.
+> +
+> +As a result, the SGX core page reclaimer doesn't support reclaiming EPC
+> +pages allocated to KVM guests through the virtual EPC driver. If the
+> +user wants to deploy SGX applications both on the host and in guests
+> +on the same machine, the user should reserve enough EPC (by taking out
+> +total virtual EPC size of all SGX VMs from the physical EPC size) for
+> +host SGX applications so they can run with acceptable performance.
+> diff --git a/arch/x86/Kconfig b/arch/x86/Kconfig
+> index 35391e94bd22..007912f67a06 100644
+> --- a/arch/x86/Kconfig
+> +++ b/arch/x86/Kconfig
+> @@ -1942,6 +1942,18 @@ config X86_SGX
+>  
+>  	  If unsure, say N.
+>  
+> +config X86_SGX_KVM
+> +	bool "Software Guard eXtensions (SGX) Virtualization"
+> +	depends on X86_SGX && KVM_INTEL
+> +	help
+> +
+> +	  Enables KVM guests to create SGX enclaves.
+> +
+> +	  This includes support to expose "raw" unreclaimable enclave memory to
+> +	  guests via a device node, e.g. /dev/sgx_vepc.
+> +
+> +	  If unsure, say N.
+> +
+>  config EFI
+>  	bool "EFI runtime service support"
+>  	depends on ACPI
+> diff --git a/arch/x86/kernel/cpu/sgx/Makefile b/arch/x86/kernel/cpu/sgx/Makefile
+> index 91d3dc784a29..9c1656779b2a 100644
+> --- a/arch/x86/kernel/cpu/sgx/Makefile
+> +++ b/arch/x86/kernel/cpu/sgx/Makefile
+> @@ -3,3 +3,4 @@ obj-y += \
+>  	encl.o \
+>  	ioctl.o \
+>  	main.o
+> +obj-$(CONFIG_X86_SGX_KVM)	+= virt.o
+> diff --git a/arch/x86/kernel/cpu/sgx/sgx.h b/arch/x86/kernel/cpu/sgx/sgx.h
+> index 4aa40c627819..4854f3980edd 100644
+> --- a/arch/x86/kernel/cpu/sgx/sgx.h
+> +++ b/arch/x86/kernel/cpu/sgx/sgx.h
+> @@ -84,4 +84,13 @@ void sgx_mark_page_reclaimable(struct sgx_epc_page *page);
+>  int sgx_unmark_page_reclaimable(struct sgx_epc_page *page);
+>  struct sgx_epc_page *sgx_alloc_epc_page(void *owner, bool reclaim);
+>  
+> +#ifdef CONFIG_X86_SGX_KVM
+> +int __init sgx_vepc_init(void);
+> +#else
+> +static inline int __init sgx_vepc_init(void)
+> +{
+> +	return -ENODEV;
+> +}
+> +#endif
+> +
+>  #endif /* _X86_SGX_H */
+> diff --git a/arch/x86/kernel/cpu/sgx/virt.c b/arch/x86/kernel/cpu/sgx/virt.c
+> new file mode 100644
+> index 000000000000..259cc46ad78c
+> --- /dev/null
+> +++ b/arch/x86/kernel/cpu/sgx/virt.c
+> @@ -0,0 +1,259 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/*
+> + * Device driver to expose SGX enclave memory to KVM guests.
+> + *
+> + * Copyright(c) 2021 Intel Corporation.
+> + */
+> +
+> +#include <linux/miscdevice.h>
+> +#include <linux/mm.h>
+> +#include <linux/mman.h>
+> +#include <linux/sched/mm.h>
+> +#include <linux/sched/signal.h>
+> +#include <linux/slab.h>
+> +#include <linux/xarray.h>
+> +#include <asm/sgx.h>
+> +#include <uapi/asm/sgx.h>
+> +
+> +#include "encls.h"
+> +#include "sgx.h"
+> +
+> +struct sgx_vepc {
+> +	struct xarray page_array;
+> +	struct mutex lock;
+> +};
+> +
+> +/*
+> + * Temporary SECS pages that cannot be EREMOVE'd due to having child in other
+> + * virtual EPC instances, and the lock to protect it.
+> + */
+> +static struct mutex zombie_secs_pages_lock;
+> +static struct list_head zombie_secs_pages;
+> +
+> +static int __sgx_vepc_fault(struct sgx_vepc *vepc,
+> +			    struct vm_area_struct *vma, unsigned long addr)
+> +{
+> +	struct sgx_epc_page *epc_page;
+> +	unsigned long index, pfn;
+> +	int ret;
+> +
+> +	WARN_ON(!mutex_is_locked(&vepc->lock));
+> +
+> +	/* Calculate index of EPC page in virtual EPC's page_array */
+> +	index = vma->vm_pgoff + PFN_DOWN(addr - vma->vm_start);
+> +
+> +	epc_page = xa_load(&vepc->page_array, index);
+> +	if (epc_page)
+> +		return 0;
+> +
+> +	epc_page = sgx_alloc_epc_page(vepc, false);
+> +	if (IS_ERR(epc_page))
+> +		return PTR_ERR(epc_page);
+> +
+> +	ret = xa_err(xa_store(&vepc->page_array, index, epc_page, GFP_KERNEL));
+> +	if (ret)
+> +		goto err_free;
+> +
+> +	pfn = PFN_DOWN(sgx_get_epc_phys_addr(epc_page));
+> +
+> +	ret = vmf_insert_pfn(vma, addr, pfn);
+> +	if (ret != VM_FAULT_NOPAGE) {
+> +		ret = -EFAULT;
+> +		goto err_delete;
+> +	}
+> +
+> +	return 0;
+> +
+> +err_delete:
+> +	xa_erase(&vepc->page_array, index);
+> +err_free:
+> +	sgx_free_epc_page(epc_page);
+> +	return ret;
+> +}
+> +
+> +static vm_fault_t sgx_vepc_fault(struct vm_fault *vmf)
+> +{
+> +	struct vm_area_struct *vma = vmf->vma;
+> +	struct sgx_vepc *vepc = vma->vm_private_data;
+> +	int ret;
+> +
+> +	mutex_lock(&vepc->lock);
+> +	ret = __sgx_vepc_fault(vepc, vma, vmf->address);
+> +	mutex_unlock(&vepc->lock);
+> +
+> +	if (!ret)
+> +		return VM_FAULT_NOPAGE;
+> +
+> +	if (ret == -EBUSY && (vmf->flags & FAULT_FLAG_ALLOW_RETRY)) {
+> +		mmap_read_unlock(vma->vm_mm);
+> +		return VM_FAULT_RETRY;
+> +	}
+> +
+> +	return VM_FAULT_SIGBUS;
+> +}
+> +
+> +const struct vm_operations_struct sgx_vepc_vm_ops = {
+> +	.fault = sgx_vepc_fault,
+> +};
+> +
+> +static int sgx_vepc_mmap(struct file *file, struct vm_area_struct *vma)
+> +{
+> +	struct sgx_vepc *vepc = file->private_data;
+> +
+> +	if (!(vma->vm_flags & VM_SHARED))
+> +		return -EINVAL;
+> +
+> +	vma->vm_ops = &sgx_vepc_vm_ops;
+> +	/* Don't copy VMA in fork() */
+> +	vma->vm_flags |= VM_PFNMAP | VM_IO | VM_DONTDUMP | VM_DONTCOPY;
+> +	vma->vm_private_data = vepc;
+> +
+> +	return 0;
+> +}
+> +
+> +static int sgx_vepc_free_page(struct sgx_epc_page *epc_page)
+> +{
+> +	int ret;
+> +
+> +	/*
+> +	 * Take a previously guest-owned EPC page and return it to the
+> +	 * general EPC page pool.
+> +	 *
+> +	 * Guests can not be trusted to have left this page in a good
+> +	 * state, so run EREMOVE on the page unconditionally.  In the
+> +	 * case that a guest properly EREMOVE'd this page, a superfluous
+> +	 * EREMOVE is harmless.
+> +	 */
+> +	ret = __eremove(sgx_get_epc_virt_addr(epc_page));
+> +	if (ret) {
+> +		/*
+> +		 * Only SGX_CHILD_PRESENT is expected, which is because of
+> +		 * EREMOVE'ing an SECS still with child, in which case it can
+> +		 * be handled by EREMOVE'ing the SECS again after all pages in
+> +		 * virtual EPC have been EREMOVE'd. See comments in below in
+> +		 * sgx_vepc_release().
+> +		 *
+> +		 * The user of virtual EPC (KVM) needs to guarantee there's no
+> +		 * logical processor is still running in the enclave in guest,
+> +		 * otherwise EREMOVE will get SGX_ENCLAVE_ACT which cannot be
+> +		 * handled here.
+> +		 */
+> +		WARN_ONCE(ret != SGX_CHILD_PRESENT, EREMOVE_ERROR_MESSAGE,
+> +			  ret, ret);
+> +		return ret;
+> +	}
+> +
+> +	sgx_free_epc_page(epc_page);
+> +
+> +	return 0;
+> +}
+> +
+> +static int sgx_vepc_release(struct inode *inode, struct file *file)
+> +{
+> +	struct sgx_vepc *vepc = file->private_data;
+> +	struct sgx_epc_page *epc_page, *tmp, *entry;
+> +	unsigned long index;
+> +
+> +	LIST_HEAD(secs_pages);
+> +
+> +	xa_for_each(&vepc->page_array, index, entry) {
+> +		/*
+> +		 * Remove all normal, child pages.  sgx_vepc_free_page()
+> +		 * will fail if EREMOVE fails, but this is OK and expected on
+> +		 * SECS pages.  Those can only be EREMOVE'd *after* all their
+> +		 * child pages. Retries below will clean them up.
+> +		 */
+> +		if (sgx_vepc_free_page(entry))
+> +			continue;
+> +
+> +		xa_erase(&vepc->page_array, index);
+> +	}
+> +
+> +	/*
+> +	 * Retry EREMOVE'ing pages.  This will clean up any SECS pages that
+> +	 * only had children in this 'epc' area.
+> +	 */
+> +	xa_for_each(&vepc->page_array, index, entry) {
+> +		epc_page = entry;
+> +		/*
+> +		 * An EREMOVE failure here means that the SECS page still
+> +		 * has children.  But, since all children in this 'sgx_vepc'
+> +		 * have been removed, the SECS page must have a child on
+> +		 * another instance.
+> +		 */
+> +		if (sgx_vepc_free_page(epc_page))
+> +			list_add_tail(&epc_page->list, &secs_pages);
+> +
+> +		xa_erase(&vepc->page_array, index);
+> +	}
+> +
+> +	/*
+> +	 * SECS pages are "pinned" by child pages, and "unpinned" once all
+> +	 * children have been EREMOVE'd.  A child page in this instance
+> +	 * may have pinned an SECS page encountered in an earlier release(),
+> +	 * creating a zombie.  Since some children were EREMOVE'd above,
+> +	 * try to EREMOVE all zombies in the hopes that one was unpinned.
+> +	 */
+> +	mutex_lock(&zombie_secs_pages_lock);
+> +	list_for_each_entry_safe(epc_page, tmp, &zombie_secs_pages, list) {
+> +		/*
+> +		 * Speculatively remove the page from the list of zombies,
+> +		 * if the page is successfully EREMOVE'd it will be added to
+> +		 * the list of free pages.  If EREMOVE fails, throw the page
+> +		 * on the local list, which will be spliced on at the end.
+> +		 */
+> +		list_del(&epc_page->list);
+> +
+> +		if (sgx_vepc_free_page(epc_page))
+> +			list_add_tail(&epc_page->list, &secs_pages);
+> +	}
+> +
+> +	if (!list_empty(&secs_pages))
+> +		list_splice_tail(&secs_pages, &zombie_secs_pages);
+> +	mutex_unlock(&zombie_secs_pages_lock);
+> +
+> +	kfree(vepc);
+> +
+> +	return 0;
+> +}
+> +
+> +static int sgx_vepc_open(struct inode *inode, struct file *file)
+> +{
+> +	struct sgx_vepc *vepc;
+> +
+> +	vepc = kzalloc(sizeof(struct sgx_vepc), GFP_KERNEL);
+> +	if (!vepc)
+> +		return -ENOMEM;
+> +	mutex_init(&vepc->lock);
+> +	xa_init(&vepc->page_array);
+> +
+> +	file->private_data = vepc;
+> +
+> +	return 0;
+> +}
+> +
+> +static const struct file_operations sgx_vepc_fops = {
+> +	.owner		= THIS_MODULE,
+> +	.open		= sgx_vepc_open,
+> +	.release	= sgx_vepc_release,
+> +	.mmap		= sgx_vepc_mmap,
+> +};
+> +
+> +static struct miscdevice sgx_vepc_dev = {
+> +	.minor		= MISC_DYNAMIC_MINOR,
+> +	.name		= "sgx_vepc",
+> +	.nodename	= "sgx_vepc",
+> +	.fops		= &sgx_vepc_fops,
+> +};
+> +
+> +int __init sgx_vepc_init(void)
+> +{
+> +	/* SGX virtualization requires KVM to work */
+> +	if (!cpu_feature_enabled(X86_FEATURE_VMX))
+> +		return -ENODEV;
+> +
+> +	INIT_LIST_HEAD(&zombie_secs_pages);
+> +	mutex_init(&zombie_secs_pages_lock);
+> +
+> +	return misc_register(&sgx_vepc_dev);
+> +}
+> -- 
+> 2.29.2
+> 
+> -- 
+> Regards/Gruss,
+>     Boris.
+> 
+> https://people.kernel.org/tglx/notes-about-netiquette
