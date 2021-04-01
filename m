@@ -2,130 +2,142 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 73645351972
-	for <lists+kvm@lfdr.de>; Thu,  1 Apr 2021 20:02:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EAAA135196B
+	for <lists+kvm@lfdr.de>; Thu,  1 Apr 2021 20:02:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236013AbhDARxk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 1 Apr 2021 13:53:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59942 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235969AbhDARtP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 1 Apr 2021 13:49:15 -0400
-Received: from mail-pg1-x546.google.com (mail-pg1-x546.google.com [IPv6:2607:f8b0:4864:20::546])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4AB00C08EC6F
-        for <kvm@vger.kernel.org>; Thu,  1 Apr 2021 06:48:21 -0700 (PDT)
-Received: by mail-pg1-x546.google.com with SMTP id i1so3223351pgg.20
-        for <kvm@vger.kernel.org>; Thu, 01 Apr 2021 06:48:21 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
-        bh=V1YPBBmXV6Zf6ofFKc69jLxBo6I+75nDp0+ssUeEtEM=;
-        b=tw55L5oNwUS5UO2/kvDirRBthSYvqZs+BTPN/5jOR29sgq5xWbQgI7lDoaxTTi3EKT
-         YHe4ulPJfqOzxRoumatxz96Fvmt6ThOMBzsc01IndpGbCEu7CtM/lktP/dGYANDYXJvn
-         //bISsKvA1avlMALNsUuwEj+FTaJX95+g3v/EzQUwuOMBIoYjtvW8m/KHsHMuO8pfmf8
-         x2xRGbnpeldt62t4jLBWMb5kODTmfJ50Xm11r4mGXLqZ+HMO5yo8mAEJBTjCBIbTt+Vq
-         rK7Bi/qSe1HeUPinRxqNm97WeDj/Zg/jg7gTp0gxS7fRjvO7EHy0je344ZkLre/QkHXY
-         /W2g==
-X-Gm-Message-State: AOAM5329qobzKbyPiQ6RfEy2QXk3+D/soDHEcmENTacAniJ6UH1ErdiG
-        PHsUvZiQQAa1J5jJsM2NDTblT1hrYQltbOapIbhoKNdFYTEL
-X-Google-Smtp-Source: ABdhPJx/5tqNGXQlJ27uFdO6oc1q+y5cAbEhG+gQ0NtMiUPsSxdE1cBf9c1xnuC34oj9gnsTFZUhqBMyOMroa7wQiaswaike9eKr
+        id S235814AbhDARxV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 1 Apr 2021 13:53:21 -0400
+Received: from szxga01-in.huawei.com ([45.249.212.187]:3066 "EHLO
+        szxga01-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S236094AbhDARqA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 1 Apr 2021 13:46:00 -0400
+Received: from DGGEML403-HUB.china.huawei.com (unknown [172.30.72.56])
+        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4FB2h24HlxzWQLW;
+        Thu,  1 Apr 2021 20:34:58 +0800 (CST)
+Received: from dggpemm000003.china.huawei.com (7.185.36.128) by
+ DGGEML403-HUB.china.huawei.com (10.3.17.33) with Microsoft SMTP Server (TLS)
+ id 14.3.498.0; Thu, 1 Apr 2021 20:38:19 +0800
+Received: from lhreml710-chm.china.huawei.com (10.201.108.61) by
+ dggpemm000003.china.huawei.com (7.185.36.128) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2106.2; Thu, 1 Apr 2021 20:38:19 +0800
+Received: from lhreml710-chm.china.huawei.com ([169.254.81.184]) by
+ lhreml710-chm.china.huawei.com ([169.254.81.184]) with mapi id
+ 15.01.2106.013; Thu, 1 Apr 2021 13:38:17 +0100
+From:   Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+To:     Auger Eric <eric.auger@redhat.com>,
+        yuzenghui <yuzenghui@huawei.com>
+CC:     "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
+        "will@kernel.org" <will@kernel.org>,
+        "maz@kernel.org" <maz@kernel.org>,
+        "robin.murphy@arm.com" <robin.murphy@arm.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "tn@semihalf.com" <tn@semihalf.com>,
+        zhukeqian <zhukeqian1@huawei.com>,
+        "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
+        "yi.l.liu@intel.com" <yi.l.liu@intel.com>,
+        wangxingang <wangxingang5@huawei.com>,
+        jiangkunkun <jiangkunkun@huawei.com>,
+        "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
+        "zhangfei.gao@linaro.org" <zhangfei.gao@linaro.org>,
+        "zhangfei.gao@gmail.com" <zhangfei.gao@gmail.com>,
+        "vivek.gautam@arm.com" <vivek.gautam@arm.com>,
+        "nicoleotsuka@gmail.com" <nicoleotsuka@gmail.com>,
+        lushenming <lushenming@huawei.com>,
+        "vsethi@nvidia.com" <vsethi@nvidia.com>,
+        "Wanghaibin (D)" <wanghaibin.wang@huawei.com>
+Subject: RE: [PATCH v14 13/13] iommu/smmuv3: Accept configs with more than one
+ context descriptor
+Thread-Topic: [PATCH v14 13/13] iommu/smmuv3: Accept configs with more than
+ one context descriptor
+Thread-Index: AQHXCibIIJ3XeBlNOUapPYfC9gSwdKqcZ70AgANNIQCAABX1MA==
+Date:   Thu, 1 Apr 2021 12:38:16 +0000
+Message-ID: <27a474c325fc46a092c2e11854baaccc@huawei.com>
+References: <20210223205634.604221-1-eric.auger@redhat.com>
+ <20210223205634.604221-14-eric.auger@redhat.com>
+ <86614466-3c74-3a38-5f2e-6ac2f55c309a@huawei.com>
+ <bf928484-b9da-a4bc-b761-e73483cb2323@redhat.com>
+In-Reply-To: <bf928484-b9da-a4bc-b761-e73483cb2323@redhat.com>
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.47.25.230]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:20cd:: with SMTP id 13mr6179334ilq.126.1617276559816;
- Thu, 01 Apr 2021 04:29:19 -0700 (PDT)
-Date:   Thu, 01 Apr 2021 04:29:19 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000d9fefa05bee78afd@google.com>
-Subject: [syzbot] WARNING in bpf_test_run
-From:   syzbot <syzbot+774c590240616eaa3423@syzkaller.appspotmail.com>
-To:     akpm@linux-foundation.org, andrii@kernel.org, ast@kernel.org,
-        bp@alien8.de, bpf@vger.kernel.org, daniel@iogearbox.net,
-        davem@davemloft.net, hawk@kernel.org, hpa@zytor.com,
-        jmattson@google.com, john.fastabend@gmail.com, joro@8bytes.org,
-        kafai@fb.com, kpsingh@kernel.org, kuba@kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        mark.rutland@arm.com, masahiroy@kernel.org, mingo@redhat.com,
-        netdev@vger.kernel.org, pbonzini@redhat.com, peterz@infradead.org,
-        rafael.j.wysocki@intel.com, rostedt@goodmis.org, seanjc@google.com,
-        songliubraving@fb.com, syzkaller-bugs@googlegroups.com,
-        tglx@linutronix.de, vkuznets@redhat.com, wanpengli@tencent.com,
-        will@kernel.org, x86@kernel.org, yhs@fb.com
-Content-Type: text/plain; charset="UTF-8"
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hello,
-
-syzbot found the following issue on:
-
-HEAD commit:    36e79851 libbpf: Preserve empty DATASEC BTFs during static..
-git tree:       bpf-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=1569bb06d00000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=7eff0f22b8563a5f
-dashboard link: https://syzkaller.appspot.com/bug?extid=774c590240616eaa3423
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=17556b7cd00000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1772be26d00000
-
-The issue was bisected to:
-
-commit 997acaf6b4b59c6a9c259740312a69ea549cc684
-Author: Mark Rutland <mark.rutland@arm.com>
-Date:   Mon Jan 11 15:37:07 2021 +0000
-
-    lockdep: report broken irq restoration
-
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=10197016d00000
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=12197016d00000
-console output: https://syzkaller.appspot.com/x/log.txt?x=14197016d00000
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+774c590240616eaa3423@syzkaller.appspotmail.com
-Fixes: 997acaf6b4b5 ("lockdep: report broken irq restoration")
-
-------------[ cut here ]------------
-WARNING: CPU: 0 PID: 8725 at include/linux/bpf-cgroup.h:193 bpf_cgroup_storage_set include/linux/bpf-cgroup.h:193 [inline]
-WARNING: CPU: 0 PID: 8725 at include/linux/bpf-cgroup.h:193 bpf_test_run+0x65e/0xaa0 net/bpf/test_run.c:109
-Modules linked in:
-CPU: 0 PID: 8725 Comm: syz-executor927 Not tainted 5.12.0-rc4-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
-RIP: 0010:bpf_cgroup_storage_set include/linux/bpf-cgroup.h:193 [inline]
-RIP: 0010:bpf_test_run+0x65e/0xaa0 net/bpf/test_run.c:109
-Code: e9 29 fe ff ff e8 b2 9d 3a fa 41 83 c6 01 bf 08 00 00 00 44 89 f6 e8 51 a5 3a fa 41 83 fe 08 0f 85 74 fc ff ff e8 92 9d 3a fa <0f> 0b bd f0 ff ff ff e9 5c fd ff ff e8 81 9d 3a fa 83 c5 01 bf 08
-RSP: 0018:ffffc900017bfaf0 EFLAGS: 00010293
-RAX: 0000000000000000 RBX: ffffc90000f29000 RCX: 0000000000000000
-RDX: ffff88801bc68000 RSI: ffffffff8739543e RDI: 0000000000000003
-RBP: 0000000000000007 R08: 0000000000000008 R09: 0000000000000001
-R10: ffffffff8739542f R11: 0000000000000000 R12: dffffc0000000000
-R13: ffff888021dd54c0 R14: 0000000000000008 R15: 0000000000000000
-FS:  00007f00157d7700(0000) GS:ffff8880b9c00000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f0015795718 CR3: 00000000157ae000 CR4: 00000000001506f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- bpf_prog_test_run_skb+0xabc/0x1c70 net/bpf/test_run.c:628
- bpf_prog_test_run kernel/bpf/syscall.c:3132 [inline]
- __do_sys_bpf+0x218b/0x4f40 kernel/bpf/syscall.c:4411
- do_syscall_64+0x2d/0x70 arch/x86/entry/common.c:46
- entry_SYSCALL_64_after_hwframe+0x44/0xae
-RIP: 0033:0x446199
-Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 11 15 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007f00157d72f8 EFLAGS: 00000246 ORIG_RAX: 0000000000000141
-RAX: ffffffffffffffda RBX: 00000000004cb440 RCX: 0000000000446199
-RDX: 0000000000000028 RSI: 0000000020000080 RDI: 000000000000000a
-RBP: 000000000049b074 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: f9abde7200f522cd
-R13: 3952ddf3af240c07 R14: 1631e0d82d3fa99d R15: 00000000004cb448
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
-syzbot can test patches for this issue, for details see:
-https://goo.gl/tpsmEJ#testing-patches
+DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogQXVnZXIgRXJpYyBbbWFp
+bHRvOmVyaWMuYXVnZXJAcmVkaGF0LmNvbV0NCj4gU2VudDogMDEgQXByaWwgMjAyMSAxMjo0OQ0K
+PiBUbzogeXV6ZW5naHVpIDx5dXplbmdodWlAaHVhd2VpLmNvbT4NCj4gQ2M6IGVyaWMuYXVnZXIu
+cHJvQGdtYWlsLmNvbTsgaW9tbXVAbGlzdHMubGludXgtZm91bmRhdGlvbi5vcmc7DQo+IGxpbnV4
+LWtlcm5lbEB2Z2VyLmtlcm5lbC5vcmc7IGt2bUB2Z2VyLmtlcm5lbC5vcmc7DQo+IGt2bWFybUBs
+aXN0cy5jcy5jb2x1bWJpYS5lZHU7IHdpbGxAa2VybmVsLm9yZzsgbWF6QGtlcm5lbC5vcmc7DQo+
+IHJvYmluLm11cnBoeUBhcm0uY29tOyBqb3JvQDhieXRlcy5vcmc7IGFsZXgud2lsbGlhbXNvbkBy
+ZWRoYXQuY29tOw0KPiB0bkBzZW1paGFsZi5jb207IHpodWtlcWlhbiA8emh1a2VxaWFuMUBodWF3
+ZWkuY29tPjsNCj4gamFjb2IuanVuLnBhbkBsaW51eC5pbnRlbC5jb207IHlpLmwubGl1QGludGVs
+LmNvbTsgd2FuZ3hpbmdhbmcNCj4gPHdhbmd4aW5nYW5nNUBodWF3ZWkuY29tPjsgamlhbmdrdW5r
+dW4gPGppYW5na3Vua3VuQGh1YXdlaS5jb20+Ow0KPiBqZWFuLXBoaWxpcHBlQGxpbmFyby5vcmc7
+IHpoYW5nZmVpLmdhb0BsaW5hcm8ub3JnOyB6aGFuZ2ZlaS5nYW9AZ21haWwuY29tOw0KPiB2aXZl
+ay5nYXV0YW1AYXJtLmNvbTsgU2hhbWVlcmFsaSBLb2xvdGh1bSBUaG9kaQ0KPiA8c2hhbWVlcmFs
+aS5rb2xvdGh1bS50aG9kaUBodWF3ZWkuY29tPjsgbmljb2xlb3RzdWthQGdtYWlsLmNvbTsNCj4g
+bHVzaGVubWluZyA8bHVzaGVubWluZ0BodWF3ZWkuY29tPjsgdnNldGhpQG52aWRpYS5jb207IFdh
+bmdoYWliaW4gKEQpDQo+IDx3YW5naGFpYmluLndhbmdAaHVhd2VpLmNvbT4NCj4gU3ViamVjdDog
+UmU6IFtQQVRDSCB2MTQgMTMvMTNdIGlvbW11L3NtbXV2MzogQWNjZXB0IGNvbmZpZ3Mgd2l0aCBt
+b3JlIHRoYW4NCj4gb25lIGNvbnRleHQgZGVzY3JpcHRvcg0KPiANCj4gSGkgWmVuZ2h1aSwNCj4g
+DQo+IE9uIDMvMzAvMjEgMTE6MjMgQU0sIFplbmdodWkgWXUgd3JvdGU6DQo+ID4gSGkgRXJpYywN
+Cj4gPg0KPiA+IE9uIDIwMjEvMi8yNCA0OjU2LCBFcmljIEF1Z2VyIHdyb3RlOg0KPiA+PiBJbiBw
+cmVwYXJhdGlvbiBmb3IgdlNWQSwgbGV0J3MgYWNjZXB0IHVzZXJzcGFjZSBwcm92aWRlZCBjb25m
+aWdzDQo+ID4+IHdpdGggbW9yZSB0aGFuIG9uZSBDRC4gV2UgY2hlY2sgdGhlIG1heCBDRCBhZ2Fp
+bnN0IHRoZSBob3N0IGlvbW11DQo+ID4+IGNhcGFiaWxpdHkgYW5kIGFsc28gdGhlIGZvcm1hdCAo
+bGluZWFyIHZlcnN1cyAyIGxldmVsKS4NCj4gPj4NCj4gPj4gU2lnbmVkLW9mZi1ieTogRXJpYyBB
+dWdlciA8ZXJpYy5hdWdlckByZWRoYXQuY29tPg0KPiA+PiBTaWduZWQtb2ZmLWJ5OiBTaGFtZWVy
+IEtvbG90aHVtDQo+IDxzaGFtZWVyYWxpLmtvbG90aHVtLnRob2RpQGh1YXdlaS5jb20+DQo+ID4+
+IC0tLQ0KPiA+PiDCoCBkcml2ZXJzL2lvbW11L2FybS9hcm0tc21tdS12My9hcm0tc21tdS12My5j
+IHwgMTMgKysrKysrKystLS0tLQ0KPiA+PiDCoCAxIGZpbGUgY2hhbmdlZCwgOCBpbnNlcnRpb25z
+KCspLCA1IGRlbGV0aW9ucygtKQ0KPiA+Pg0KPiA+PiBkaWZmIC0tZ2l0IGEvZHJpdmVycy9pb21t
+dS9hcm0vYXJtLXNtbXUtdjMvYXJtLXNtbXUtdjMuYw0KPiA+PiBiL2RyaXZlcnMvaW9tbXUvYXJt
+L2FybS1zbW11LXYzL2FybS1zbW11LXYzLmMNCj4gPj4gaW5kZXggMzMyZDMxYzA2ODBmLi5hYjc0
+YTAyODk4OTMgMTAwNjQ0DQo+ID4+IC0tLSBhL2RyaXZlcnMvaW9tbXUvYXJtL2FybS1zbW11LXYz
+L2FybS1zbW11LXYzLmMNCj4gPj4gKysrIGIvZHJpdmVycy9pb21tdS9hcm0vYXJtLXNtbXUtdjMv
+YXJtLXNtbXUtdjMuYw0KPiA+PiBAQCAtMzAzOCwxNCArMzAzOCwxNyBAQCBzdGF0aWMgaW50DQo+
+IGFybV9zbW11X2F0dGFjaF9wYXNpZF90YWJsZShzdHJ1Y3QNCj4gPj4gaW9tbXVfZG9tYWluICpk
+b21haW4sDQo+ID4+IMKgwqDCoMKgwqDCoMKgwqDCoCBpZiAoc21tdV9kb21haW4tPnMxX2NmZy5z
+ZXQpDQo+ID4+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIGdvdG8gb3V0Ow0KPiA+PiDCoCAt
+wqDCoMKgwqDCoMKgwqAgLyoNCj4gPj4gLcKgwqDCoMKgwqDCoMKgwqAgKiB3ZSBjdXJyZW50bHkg
+c3VwcG9ydCBhIHNpbmdsZSBDRCBzbyBzMWZtdCBhbmQgczFkc3MNCj4gPj4gLcKgwqDCoMKgwqDC
+oMKgwqAgKiBmaWVsZHMgYXJlIGFsc28gaWdub3JlZA0KPiA+PiAtwqDCoMKgwqDCoMKgwqDCoCAq
+Lw0KPiA+PiAtwqDCoMKgwqDCoMKgwqAgaWYgKGNmZy0+cGFzaWRfYml0cykNCj4gPj4gK8KgwqDC
+oMKgwqDCoMKgIGxpc3RfZm9yX2VhY2hfZW50cnkobWFzdGVyLCAmc21tdV9kb21haW4tPmRldmlj
+ZXMsDQo+ID4+IGRvbWFpbl9oZWFkKSB7DQo+ID4+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIGlm
+IChjZmctPnBhc2lkX2JpdHMgPiBtYXN0ZXItPnNzaWRfYml0cykNCj4gPj4gK8KgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoCBnb3RvIG91dDsNCj4gPj4gK8KgwqDCoMKgwqDCoMKgIH0NCj4g
+Pj4gK8KgwqDCoMKgwqDCoMKgIGlmIChjZmctPnZlbmRvcl9kYXRhLnNtbXV2My5zMWZtdCA9PQ0K
+PiA+PiBTVFJUQUJfU1RFXzBfUzFGTVRfNjRLX0wyICYmDQo+ID4+ICvCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqAgIShzbW11LT5mZWF0dXJlcyAmDQo+IEFSTV9TTU1VX0ZFQVRfMl9MVkxf
+Q0RUQUIpKQ0KPiA+PiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBnb3RvIG91dDsNCj4gPj4g
+wqAgwqDCoMKgwqDCoMKgwqDCoMKgIHNtbXVfZG9tYWluLT5zMV9jZmcuY2RjZmcuY2R0YWJfZG1h
+ID0gY2ZnLT5iYXNlX3B0cjsNCj4gPj4gK8KgwqDCoMKgwqDCoMKgIHNtbXVfZG9tYWluLT5zMV9j
+ZmcuczFjZG1heCA9IGNmZy0+cGFzaWRfYml0czsNCj4gPj4gK8KgwqDCoMKgwqDCoMKgIHNtbXVf
+ZG9tYWluLT5zMV9jZmcuczFmbXQgPQ0KPiBjZmctPnZlbmRvcl9kYXRhLnNtbXV2My5zMWZtdDsN
+Cj4gPg0KPiA+IEFuZCB3aGF0IGFib3V0IHRoZSBTSURTUyBmaWVsZD8NCj4gPg0KPiBJIGFkZGVk
+IHRoaXMgcGF0Y2ggdXBvbiBTaGFtZWVyJ3MgcmVxdWVzdCwgdG8gYmUgbW9yZSB2U1ZBIGZyaWVu
+ZGx5Lg0KPiBIb3dlciB0aGlzIHNlcmllcyBkb2VzIG5vdCByZWFsbHkgdGFyZ2V0IG11bHRpcGxl
+IENEIHN1cHBvcnQuIEF0IHRoZQ0KPiBtb21lbnQgdGhlIGRyaXZlciBvbmx5IHN1cHBvcnRzIFNU
+UlRBQl9TVEVfMV9TMURTU19TU0lEMCAoMHgyKSBJIHRoaW5rLg0KPiBBdCB0aGlzIG1vbWVudCBt
+YXliZSBJIGNhbiBvbmx5IGNoZWNrIHRoZSBzMWRzcyBmaWVsZCBpcyAweDIuIE9yIHNpbXBseQ0K
+PiByZW1vdmVzIHRoaXMgcGF0Y2g/DQo+IA0KPiBUaG91Z2h0cz8NCg0KUmlnaHQuIFRoaXMgd2Fz
+IHVzZWZ1bCBmb3IgdlNWQSB0ZXN0cy4gQnV0IHllcywgdG8gcHJvcGVybHkgc3VwcG9ydCBtdWx0
+aXBsZSBDRHMNCndlIG5lZWQgdG8gcGFzcyB0aGUgUzFEU1MgZnJvbSBRZW11LiBBbmQgdGhhdCBy
+ZXF1aXJlcyBmdXJ0aGVyIGNoYW5nZXMuDQpTbyBJIHRoaW5rIGl0J3MgYmV0dGVyIHRvIHJlbW92
+ZSB0aGlzIHBhdGNoIGFuZCByZWplY3QgUzFDRE1BWCAhPSAwIGNhc2VzLg0KDQpUaGFua3MsDQpT
+aGFtZWVyDQogICANCj4gDQo+IEVyaWMNCg0K
