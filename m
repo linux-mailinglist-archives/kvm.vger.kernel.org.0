@@ -2,207 +2,186 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1D146352E03
-	for <lists+kvm@lfdr.de>; Fri,  2 Apr 2021 19:07:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A3379352E3E
+	for <lists+kvm@lfdr.de>; Fri,  2 Apr 2021 19:27:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235759AbhDBRHq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 2 Apr 2021 13:07:46 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:43771 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S235746AbhDBRHn (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 2 Apr 2021 13:07:43 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1617383261;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=pay6FFP22GZUza5aFGS6CFJxV2F4MgiZsF6UU6/dhI8=;
-        b=DDZVbimLiZ0qzr69hFCFHjo7GhHvGBG4n0Zu4WanOtDOYz2bV/iM+Yy6Qu/HXTN33J4iAu
-        wPR5jfQNg7bm/rhCI/TblxM7OG4Ak3OMzbJ7gw8xmfdScIUT1Yzw2namXf/4JuZomm+GbZ
-        4ulwyneJr4uNIz6VHKLp9AV3V8Cj5Jo=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-486-5d_s3RCNMD-mA7f9bTai6g-1; Fri, 02 Apr 2021 13:07:37 -0400
-X-MC-Unique: 5d_s3RCNMD-mA7f9bTai6g-1
-Received: by mail-ej1-f70.google.com with SMTP id mj6so3338663ejb.11
-        for <kvm@vger.kernel.org>; Fri, 02 Apr 2021 10:07:36 -0700 (PDT)
+        id S234775AbhDBR1k (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 2 Apr 2021 13:27:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56474 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234723AbhDBR1k (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 2 Apr 2021 13:27:40 -0400
+Received: from mail-pf1-x432.google.com (mail-pf1-x432.google.com [IPv6:2607:f8b0:4864:20::432])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3BC30C061788
+        for <kvm@vger.kernel.org>; Fri,  2 Apr 2021 10:27:39 -0700 (PDT)
+Received: by mail-pf1-x432.google.com with SMTP id x126so3964178pfc.13
+        for <kvm@vger.kernel.org>; Fri, 02 Apr 2021 10:27:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=0KRHAFf6XYp/bIiHPeRWhSXO2Fw44pBrmTOiP09/NiQ=;
+        b=a18oCvVbYo2yphryIVjdJRy+DbRMfRN0xfjZwQvlwjPcIHY+MygsRh50jP3Xehco+8
+         k5X3gk6Zo2fV+JBa1OCj9K5pYrTlbFIW/w6L0fDuT2TqrR2NZ8v/6WAZvm7Rsn5Qi7lf
+         b0SA2uAmZ1Cjgn4GDNN7dcpsUHIPT8s+M79s6N6lwuT2cyd6Qu0m5CyFN8W93dWln+0p
+         Df35hKz+/kVB2yc5yEXtZNUzmQ+9lE7y+ia7lAvd8iu16TwyefpeI9KYisb+58SOep7c
+         sgMNQuAAHwuqele4MJ4vZy2eXVCBFYBUYTvA/TeyFVVqH3Zm5zhpMpW8m+V0qGBQ1mjX
+         xjjg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=pay6FFP22GZUza5aFGS6CFJxV2F4MgiZsF6UU6/dhI8=;
-        b=CFrM+59JcNpTRbdi60Z5uZAp+UqOX7uawFEZJlteAH+POCfnjnIXwdpj52emv5p+R6
-         Gj2Po9NMTQ3TNTQz1fLx6ac8BZIvD/ouP0gx5aBsvrAnVoPNswKbtC8/TwfW+dOOmLca
-         Zc2AFGf4G2Pfhd+hi3hH4EGO6FBTiRqy8AQmY3DFrFudTTU6eVPgYMkyC/XizGIJwDik
-         1hIATjKIvPsBOJiRHOM6U7hgNc2U5ZU2OpSSDV00WFtom4QTXlQbXmDnAyFhAtawpMOg
-         92REvhXP/0zudwFtE3KDGR/ArSlP1yk6cuvAvQd9h+PUvqZsWyjSo4Dt/a8nUeEy/5/E
-         H2fA==
-X-Gm-Message-State: AOAM531kx8NfjaXy92gWTDcKYxCO3Yx5owPZLr6L2O5Rfrjhmur4Un58
-        GYAw0gtfOM8TkTnLp/vjS2mG5myNIzC8TJopIBdCJ2lPGbLhXvucuEO2hzXBpLd9X6p3Ypz32Qq
-        AMIQy6PrOw3h7
-X-Received: by 2002:a17:906:b7d1:: with SMTP id fy17mr1377126ejb.110.1617383255845;
-        Fri, 02 Apr 2021 10:07:35 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwXsPPad+p73EMnvJYFjYKnSnzORC6vJi4cBRKTJqD3MK+cq9HDx86dIhXgIO61njm5wpECng==
-X-Received: by 2002:a17:906:b7d1:: with SMTP id fy17mr1377082ejb.110.1617383255634;
-        Fri, 02 Apr 2021 10:07:35 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id k12sm5638463edo.50.2021.04.02.10.07.33
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 02 Apr 2021 10:07:34 -0700 (PDT)
-Subject: Re: [PATCH v2 6/9] KVM: x86: implement KVM_GUESTDBG_BLOCKEVENTS
-To:     Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org
-Cc:     "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
-        Ingo Molnar <mingo@redhat.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Sean Christopherson <seanjc@google.com>,
-        Marc Zyngier <maz@kernel.org>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        open list <linux-kernel@vger.kernel.org>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Jonathan Corbet <corbet@lwn.net>, Jessica Yu <jeyu@kernel.org>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Jan Kiszka <jan.kiszka@siemens.com>,
-        Will Deacon <will@kernel.org>,
-        "open list:KERNEL VIRTUAL MACHINE FOR ARM64 (KVM/arm64)" 
-        <kvmarm@lists.cs.columbia.edu>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=0KRHAFf6XYp/bIiHPeRWhSXO2Fw44pBrmTOiP09/NiQ=;
+        b=Dckx36sZ+jlpke11tlm9MknjRP06VL7RxQMgdkGp82WmcAW3dGBJe88MVkL3x2nMSL
+         +gj3oMWDc9qlSR5RsukX12ZxLRzUnK+1mDD5B9ujYrSt/4n/7iR6W6W68grJUNGBODyw
+         l8pH/eUSUz69e1P/qXCDxyAN2ldlFQ6N0yFYeokUO23nlBxkQuEfYsiEdpHPbIsyqV5I
+         v3Eme6pOhTvncC0/uw+bRNYSnOYewHaRZux71Scd4qB84Qb9Dx9WeuuNfBazJNusJ+jv
+         r/VejrdRmmFXGlLkxsMILjubUime1yzjDmfvpQNZ2s8UGL5kmgikJu7dT18vNXWyX655
+         PKmA==
+X-Gm-Message-State: AOAM530JZgEiUJ8lwkrrUDgzvAXGTfvTDJd7IymFWn/A8DfoXsWO2tHg
+        m4XwAAZ7vktad64PlkKirCMr1w==
+X-Google-Smtp-Source: ABdhPJzo+3KlTDJrjXzNNeTy6ALg+P20+MFZnlIQdhKLAx2tZEkAbrp1t5yZq6L3AGKpuwtvSbGthg==
+X-Received: by 2002:a63:4460:: with SMTP id t32mr12530863pgk.139.1617384458489;
+        Fri, 02 Apr 2021 10:27:38 -0700 (PDT)
+Received: from google.com (240.111.247.35.bc.googleusercontent.com. [35.247.111.240])
+        by smtp.gmail.com with ESMTPSA id n5sm8859941pfq.44.2021.04.02.10.27.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 02 Apr 2021 10:27:37 -0700 (PDT)
+Date:   Fri, 2 Apr 2021 17:27:34 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Maxim Levitsky <mlevitsk@redhat.com>
+Cc:     kvm@vger.kernel.org,
+        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
         Jim Mattson <jmattson@google.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        David Hildenbrand <david@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        "open list:S390" <linux-s390@vger.kernel.org>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Kieran Bingham <kbingham@kernel.org>,
-        "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
-        "moderated list:KERNEL VIRTUAL MACHINE FOR ARM64 (KVM/arm64)" 
-        <linux-arm-kernel@lists.infradead.org>,
-        James Morse <james.morse@arm.com>
-References: <20210401135451.1004564-1-mlevitsk@redhat.com>
- <20210401135451.1004564-7-mlevitsk@redhat.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <f9e1ca0c-d6cb-7477-55f2-c4861d8f8704@redhat.com>
-Date:   Fri, 2 Apr 2021 19:07:32 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.7.0
+        Joerg Roedel <joro@8bytes.org>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        "open list:X86 ARCHITECTURE (32-BIT AND 64-BIT)" 
+        <linux-kernel@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Borislav Petkov <bp@alien8.de>, Ingo Molnar <mingo@redhat.com>,
+        "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>
+Subject: Re: [PATCH 1/6] KVM: nVMX: delay loading of PDPTRs to
+ KVM_REQ_GET_NESTED_STATE_PAGES
+Message-ID: <YGdUBvliVWoF0tVl@google.com>
+References: <20210401141814.1029036-1-mlevitsk@redhat.com>
+ <20210401141814.1029036-2-mlevitsk@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20210401135451.1004564-7-mlevitsk@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210401141814.1029036-2-mlevitsk@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 01/04/21 15:54, Maxim Levitsky wrote:
-> KVM_GUESTDBG_BLOCKEVENTS is a guest debug feature that
-> will allow KVM to block all interrupts while running.
-> It is mostly intended to be used together with single stepping,
-> to make it more robust, and has the following benefits:
-> 
-> * Resuming from a breakpoint is much more reliable:
->    When resuming execution from a breakpoint, with interrupts enabled,
->    more often than not, KVM would inject an interrupt and make the CPU
->    jump immediately to the interrupt handler and eventually return to
->    the breakpoint, only to trigger it again.
-> 
->    From the gdb's user point of view it looks like the CPU has never
->    executed a single instruction and in some cases that can even
->    prevent forward progress, for example, when the breakpoint
->    is placed by an automated script (e.g lx-symbols), which does
->    something in response to the breakpoint and then continues
->    the guest automatically.
->    If the script execution takes enough time for another interrupt to
->    arrive, the guest will be stuck on the same breakpoint forever.
-> 
-> * Normal single stepping is much more predictable, since it won't
->    land the debugger into an interrupt handler.
-> 
-> * Chances of RFLAGS.TF being leaked to the guest are reduced:
-> 
->    KVM sets that flag behind the guest's back to single step it,
->    but if the single step lands the vCPU into an
->    interrupt/exception handler the RFLAGS.TF will be leaked to the
->    guest in the form of being pushed to the stack.
->    This doesn't completely eliminate this problem as exceptions
->    can still happen, but at least this eliminates the common
->    case.
-> 
+On Thu, Apr 01, 2021, Maxim Levitsky wrote:
+> Similar to the rest of guest page accesses after migration,
+> this should be delayed to KVM_REQ_GET_NESTED_STATE_PAGES
+> request.
+
+FWIW, I still object to this approach, and this patch has a plethora of issues.
+
+I'm not against deferring various state loading to KVM_RUN, but wholesale moving
+all of GUEST_CR3 processing without in-depth consideration of all the side
+effects is a really bad idea.
+
 > Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
-
-The patch uses BLOCKIRQ instead of BLOCKEVENTS.
-
-Paolo
-
 > ---
->   Documentation/virt/kvm/api.rst  | 1 +
->   arch/x86/include/asm/kvm_host.h | 3 ++-
->   arch/x86/include/uapi/asm/kvm.h | 1 +
->   arch/x86/kvm/x86.c              | 4 ++++
->   4 files changed, 8 insertions(+), 1 deletion(-)
+>  arch/x86/kvm/vmx/nested.c | 14 +++++++++-----
+>  1 file changed, 9 insertions(+), 5 deletions(-)
 > 
-> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-> index 9778b2434c03..a4f2dc84741f 100644
-> --- a/Documentation/virt/kvm/api.rst
-> +++ b/Documentation/virt/kvm/api.rst
-> @@ -3338,6 +3338,7 @@ flags which can include the following:
->     - KVM_GUESTDBG_INJECT_DB:     inject DB type exception [x86]
->     - KVM_GUESTDBG_INJECT_BP:     inject BP type exception [x86]
->     - KVM_GUESTDBG_EXIT_PENDING:  trigger an immediate guest exit [s390]
-> +  - KVM_GUESTDBG_BLOCKIRQ:      avoid injecting interrupts/NMI/SMI [x86]
->   
->   For example KVM_GUESTDBG_USE_SW_BP indicates that software breakpoints
->   are enabled in memory so we need to ensure breakpoint exceptions are
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index cc7c82a449d5..8c529ae9dbbe 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -227,7 +227,8 @@ enum x86_intercept_stage;
->   	KVM_GUESTDBG_USE_HW_BP | \
->   	KVM_GUESTDBG_USE_SW_BP | \
->   	KVM_GUESTDBG_INJECT_BP | \
-> -	KVM_GUESTDBG_INJECT_DB)
-> +	KVM_GUESTDBG_INJECT_DB | \
-> +	KVM_GUESTDBG_BLOCKIRQ)
->   
->   
->   #define PFERR_PRESENT_BIT 0
-> diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kvm.h
-> index 5a3022c8af82..b0f9945067f7 100644
-> --- a/arch/x86/include/uapi/asm/kvm.h
-> +++ b/arch/x86/include/uapi/asm/kvm.h
-> @@ -282,6 +282,7 @@ struct kvm_debug_exit_arch {
->   #define KVM_GUESTDBG_USE_HW_BP		0x00020000
->   #define KVM_GUESTDBG_INJECT_DB		0x00040000
->   #define KVM_GUESTDBG_INJECT_BP		0x00080000
-> +#define KVM_GUESTDBG_BLOCKIRQ		0x00100000
->   
->   /* for KVM_SET_GUEST_DEBUG */
->   struct kvm_guest_debug_arch {
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 956e8e0bd6af..3627ce8fe5bb 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -8460,6 +8460,10 @@ static void inject_pending_event(struct kvm_vcpu *vcpu, bool *req_immediate_exit
->   		can_inject = false;
->   	}
->   
-> +	/* Don't inject interrupts if the user asked to avoid doing so */
-> +	if (vcpu->guest_debug & KVM_GUESTDBG_BLOCKIRQ)
-> +		return;
-> +
->   	/*
->   	 * Finally, inject interrupt events.  If an event cannot be injected
->   	 * due to architectural conditions (e.g. IF=0) a window-open exit
-> 
+> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+> index fd334e4aa6db..b44f1f6b68db 100644
+> --- a/arch/x86/kvm/vmx/nested.c
+> +++ b/arch/x86/kvm/vmx/nested.c
+> @@ -2564,11 +2564,6 @@ static int prepare_vmcs02(struct kvm_vcpu *vcpu, struct vmcs12 *vmcs12,
+>  		return -EINVAL;
+>  	}
+>  
+> -	/* Shadow page tables on either EPT or shadow page tables. */
+> -	if (nested_vmx_load_cr3(vcpu, vmcs12->guest_cr3, nested_cpu_has_ept(vmcs12),
+> -				entry_failure_code))
+> -		return -EINVAL;
+> -
+>  	/*
+>  	 * Immediately write vmcs02.GUEST_CR3.  It will be propagated to vmcs12
+>  	 * on nested VM-Exit, which can occur without actually running L2 and
+> @@ -3109,11 +3104,16 @@ static bool nested_get_evmcs_page(struct kvm_vcpu *vcpu)
+>  static bool nested_get_vmcs12_pages(struct kvm_vcpu *vcpu)
+>  {
+>  	struct vmcs12 *vmcs12 = get_vmcs12(vcpu);
+> +	enum vm_entry_failure_code entry_failure_code;
+>  	struct vcpu_vmx *vmx = to_vmx(vcpu);
+>  	struct kvm_host_map *map;
+>  	struct page *page;
+>  	u64 hpa;
+>  
+> +	if (nested_vmx_load_cr3(vcpu, vmcs12->guest_cr3, nested_cpu_has_ept(vmcs12),
+> +				&entry_failure_code))
 
+This results in KVM_RUN returning 0 without filling vcpu->run->exit_reason.
+Speaking from experience, debugging those types of issues is beyond painful.
+
+It also means CR3 is double loaded in the from_vmentry case.
+
+And it will cause KVM to incorrectly return NVMX_VMENTRY_KVM_INTERNAL_ERROR
+if a consistency check fails when nested_get_vmcs12_pages() is called on
+from_vmentry.  E.g. run unit tests with this and it will silently disappear.
+
+diff --git a/x86/vmx_tests.c b/x86/vmx_tests.c
+index bbb006a..b8ccc69 100644
+--- a/x86/vmx_tests.c
++++ b/x86/vmx_tests.c
+@@ -8172,6 +8172,16 @@ static void test_guest_segment_base_addr_fields(void)
+        vmcs_write(GUEST_AR_ES, ar_saved);
+ }
+
++static void test_guest_cr3(void)
++{
++       u64 cr3_saved = vmcs_read(GUEST_CR3);
++
++       vmcs_write(GUEST_CR3, -1ull);
++       test_guest_state("Bad CR3 fails VM-Enter", true, -1ull, "GUEST_CR3");
++
++       vmcs_write(GUEST_DR7, cr3_saved);
++}
++
+ /*
+  * Check that the virtual CPU checks the VMX Guest State Area as
+  * documented in the Intel SDM.
+@@ -8181,6 +8191,8 @@ static void vmx_guest_state_area_test(void)
+        vmx_set_test_stage(1);
+        test_set_guest(guest_state_test_main);
+
++       test_guest_cr3();
++
+        /*
+         * The IA32_SYSENTER_ESP field and the IA32_SYSENTER_EIP field
+         * must each contain a canonical address.
+
+
+> +		return false;
+> +
+>  	if (nested_cpu_has2(vmcs12, SECONDARY_EXEC_VIRTUALIZE_APIC_ACCESSES)) {
+>  		/*
+>  		 * Translate L1 physical address to host physical
+> @@ -3357,6 +3357,10 @@ enum nvmx_vmentry_status nested_vmx_enter_non_root_mode(struct kvm_vcpu *vcpu,
+>  	}
+>  
+>  	if (from_vmentry) {
+> +		if (nested_vmx_load_cr3(vcpu, vmcs12->guest_cr3,
+> +		    nested_cpu_has_ept(vmcs12), &entry_failure_code))
+
+This alignment is messed up; it looks like two separate function calls.
+
+> +			goto vmentry_fail_vmexit_guest_mode;
+> +
+>  		failed_index = nested_vmx_load_msr(vcpu,
+>  						   vmcs12->vm_entry_msr_load_addr,
+>  						   vmcs12->vm_entry_msr_load_count);
+> -- 
+> 2.26.2
+> 
