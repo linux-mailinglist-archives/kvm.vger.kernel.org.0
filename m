@@ -2,96 +2,132 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C22EF352D2E
-	for <lists+kvm@lfdr.de>; Fri,  2 Apr 2021 18:10:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5105E352D35
+	for <lists+kvm@lfdr.de>; Fri,  2 Apr 2021 18:10:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235716AbhDBP6N (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 2 Apr 2021 11:58:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37130 "EHLO
+        id S236316AbhDBP6P (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 2 Apr 2021 11:58:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37132 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235304AbhDBP6M (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 2 Apr 2021 11:58:12 -0400
-Received: from mail-wr1-x434.google.com (mail-wr1-x434.google.com [IPv6:2a00:1450:4864:20::434])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EAA15C0613E6;
-        Fri,  2 Apr 2021 08:58:10 -0700 (PDT)
-Received: by mail-wr1-x434.google.com with SMTP id v11so5098183wro.7;
-        Fri, 02 Apr 2021 08:58:10 -0700 (PDT)
+        with ESMTP id S235720AbhDBP6N (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 2 Apr 2021 11:58:13 -0400
+Received: from mail-wm1-x32f.google.com (mail-wm1-x32f.google.com [IPv6:2a00:1450:4864:20::32f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9CFF1C0613E6;
+        Fri,  2 Apr 2021 08:58:11 -0700 (PDT)
+Received: by mail-wm1-x32f.google.com with SMTP id j20-20020a05600c1914b029010f31e15a7fso4517567wmq.1;
+        Fri, 02 Apr 2021 08:58:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=sender:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=S0QE5Nife2NIX13JY3vSkhHVDcNV6ya5TJk20SNgM60=;
-        b=NC+pT0qgC9xQpmNaSTJsqEc39jCvteZfOcGp7rQ8n19dtPtGdd30thQtLIPM5zqE74
-         tqh9aqT/1FDmBkauXsR1FiRphQ/jL6Qq8T74rCSJgDAEYvnkvWr0QJ/uIPVYEoPh1ykT
-         E8Jrm6YjqW/7qPJ6kvrWfoeihZzpLEENP4W3MYJgHwKHALs9PY1d5t+b/joXrF8KzBgn
-         +VqgT1AE1Y72XP2vwQ40S9W8h6a20LU1ST9qcY5+AMvOhIiOLPw0w0LxkLG1b6GueSDX
-         NQIMWBSxeG2Q4sYNMMNKM/h3s5f9V4fCowB0tghpxfohDglC36GsrtkvlydeL2HEzMZk
-         g7FA==
+        h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=Kre3cIsJUUiu6GfRt+z3UNvRKui0T9xc/PeVTTZr7ig=;
+        b=ryhHc1JzRHdWPicwK8viSU3MOD5f0eQmm47r5hbvS+5+INAyYGM5jeUruCl/zWWXFv
+         jIdoxhhJ1sZ/ijWxfQcTzuqTpapouUmlJlZtolrY1OqwmAMqf6agR6e+/YWyQlXeVCt6
+         v3OtZXnYow7y0Mr9w4qsK0iTK8lSGIBMz7ZT9fW4mwxeIMwYcPTPmXRHDN3Kf/ST5XdK
+         KWFpklbVNdKGx2q9Kd03pk/Z6mgiGmGexIvgr3VXf0lWDAaAgD+jFoLyCK7FygZxV3/s
+         6HD/8pzAlRWBIpC8N/fIE2Vwgq5ZgXofjpB5HV385leTv90TPkPnPXyzIX50PomWFitr
+         vOKg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
-         :mime-version:content-transfer-encoding;
-        bh=S0QE5Nife2NIX13JY3vSkhHVDcNV6ya5TJk20SNgM60=;
-        b=IbjS3MPudPV3vKsz9g7OBkL6twqWTb01INRcZUjSBHVmBgi1D8pJ6wVjgSKw+J/0fO
-         jOPYfYvUx2vKzPfhZZ/V8uNPkId+YTPB5pWs3DmKUsOifd2icfIatysbW+tvM5rHvPuw
-         FFoV4YZ1cLIfo2DNlwgpKBLvsXh2fIEB052VDVAOOS821Lq13V3BN+zME9Sx5gYkjBqH
-         gSQrGca8QO6ep9BS0rjHsEy9Zdu6aCMMaUOxnDOHBdbwIv/jattu1wOy6cx7uRkt5QAz
-         o/izq+GzLimhqkJrdeaYZBYX7KchXFrLHK+t71s9/R7JScwFjKBOsxz+/V2vk17C6+2I
-         qO/w==
-X-Gm-Message-State: AOAM532gYF1dzG9D6Dare2OMwQt7hbZ8q44wTvBFT3fybBgV7R98VlXd
-        Xt6BahwOEe3MBYxJSKZytlNZA6SXxBQ=
-X-Google-Smtp-Source: ABdhPJwNkDphDY/S8Bx896Z9h9IrXl46gV4kgtBZUbxfi2p8nYXB6gnA9bVu/jBYmNF4nAZvBgVXgw==
-X-Received: by 2002:adf:8562:: with SMTP id 89mr16125989wrh.101.1617379089568;
-        Fri, 02 Apr 2021 08:58:09 -0700 (PDT)
+         :in-reply-to:references:mime-version:content-transfer-encoding;
+        bh=Kre3cIsJUUiu6GfRt+z3UNvRKui0T9xc/PeVTTZr7ig=;
+        b=WnywaZBVkOToXt1Fq2qPbHRyE/3sOeHnV1EQhs6hf6HkdiixIzHdmgb0lL3f81WLY8
+         mik+G1lfUjeeo+2lGe0stDHTAeYq0hfo9r0X3Va+z1NRN5gcwUtdNqfFZ8g9uxi9d5Cr
+         1yaY5kiFJtT8SaK0u1yuSiUg+jlXVpP1UwEEGU/6bkhlXz4MGEEPFdsNwiqzcvBE8HO6
+         tPODEjvBvL/IpYcOXkxLdazwKhN7eGRfvdR9nRcwFY7g0qyNTmykHk1AXaZdYc8mQWCx
+         4Uc9dul53K4nwbiidrBb1RxeW3JmbeHhv7ZAEuPgOYnHnABpJYd4Mhrj/HZUuneJAfYf
+         fydA==
+X-Gm-Message-State: AOAM531izZb5vrf/+5aSUmDbM5BA39tbCdTlyPaU9l4J9Ko/EELku9V0
+        ulaAr64CXmflWW/k+f7jC45MSrKeMG0=
+X-Google-Smtp-Source: ABdhPJxkN/qm1HIJiGhdrsPZwOPx99MtS0WKuuR1c+cS3d4UmftRHekbQfkqHrzcI3HfVcNz5ZQ3bA==
+X-Received: by 2002:a05:600c:1457:: with SMTP id h23mr2284614wmi.118.1617379090365;
+        Fri, 02 Apr 2021 08:58:10 -0700 (PDT)
 Received: from avogadro.lan ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id w11sm2293625wmb.35.2021.04.02.08.58.08
+        by smtp.gmail.com with ESMTPSA id w11sm2293625wmb.35.2021.04.02.08.58.09
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 02 Apr 2021 08:58:09 -0700 (PDT)
+        Fri, 02 Apr 2021 08:58:10 -0700 (PDT)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Cc:     chenhuacai@kernel.org, aleksandar.qemu.devel@gmail.com,
         seanjc@google.com, linux-mips@vger.kernel.org
-Subject: [PATCH 0/4] KVM: MIPS: cleanup TLB flushing callbacks
-Date:   Fri,  2 Apr 2021 17:58:03 +0200
-Message-Id: <20210402155807.49976-1-pbonzini@redhat.com>
+Subject: [PATCH 1/4] KVM: constify kvm_arch_flush_remote_tlbs_memslot
+Date:   Fri,  2 Apr 2021 17:58:04 +0200
+Message-Id: <20210402155807.49976-2-pbonzini@redhat.com>
 X-Mailer: git-send-email 2.30.1
+In-Reply-To: <20210402155807.49976-1-pbonzini@redhat.com>
+References: <20210402155807.49976-1-pbonzini@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This series cleans up the flush_shadow_all and flush_shadow_memslot
-callbacks, turning them into a single function that can be called from
-kvm_arch_flush_remote_tlb.  This lets MIPS use the generic TLB flushing
-code in the MMU notifiers.  With the upcoming refactoring of generic
-MMU notifier code, without this patch MIPS would not be able to
-coalesce TLB flushes anymore across multiple memslots.
+memslots are stored in RCU and there should be no need to
+change them.
 
-Patch 1 is an unrelated cleanup that is needed for the rest to compile
-(due to a call to kvm_arch_flush_remote_tlbs_memslot with a const
-argument).
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ arch/arm64/kvm/arm.c     | 2 +-
+ arch/mips/kvm/mips.c     | 2 +-
+ arch/x86/kvm/mmu/mmu.c   | 2 +-
+ include/linux/kvm_host.h | 2 +-
+ 4 files changed, 4 insertions(+), 4 deletions(-)
 
-Paolo
-
-Paolo Bonzini (4):
-  KVM: constify kvm_arch_flush_remote_tlbs_memslot
-  KVM: MIPS: rework flush_shadow_* callbacks into one that prepares the
-    flush
-  KVM: MIPS: let generic code call prepare_flush_shadow
-  KVM: MIPS: defer flush to generic MMU notifier code
-
- arch/arm64/kvm/arm.c             |  2 +-
- arch/mips/include/asm/kvm_host.h | 12 ++++--------
- arch/mips/kvm/mips.c             | 21 +++++++++++----------
- arch/mips/kvm/mmu.c              | 12 ++----------
- arch/mips/kvm/trap_emul.c        | 13 ++-----------
- arch/mips/kvm/vz.c               | 19 ++++---------------
- arch/x86/kvm/mmu/mmu.c           |  2 +-
- include/linux/kvm_host.h         |  2 +-
- 8 files changed, 26 insertions(+), 57 deletions(-)
-
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index 7f06ba76698d..9141730b7963 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -1268,7 +1268,7 @@ void kvm_arch_sync_dirty_log(struct kvm *kvm, struct kvm_memory_slot *memslot)
+ }
+ 
+ void kvm_arch_flush_remote_tlbs_memslot(struct kvm *kvm,
+-					struct kvm_memory_slot *memslot)
++					const struct kvm_memory_slot *memslot)
+ {
+ 	kvm_flush_remote_tlbs(kvm);
+ }
+diff --git a/arch/mips/kvm/mips.c b/arch/mips/kvm/mips.c
+index 58a8812e2fa5..7db8234a4407 100644
+--- a/arch/mips/kvm/mips.c
++++ b/arch/mips/kvm/mips.c
+@@ -997,7 +997,7 @@ void kvm_arch_sync_dirty_log(struct kvm *kvm, struct kvm_memory_slot *memslot)
+ }
+ 
+ void kvm_arch_flush_remote_tlbs_memslot(struct kvm *kvm,
+-					struct kvm_memory_slot *memslot)
++					const struct kvm_memory_slot *memslot)
+ {
+ 	/* Let implementation handle TLB/GVA invalidation */
+ 	kvm_mips_callbacks->flush_shadow_memslot(kvm, memslot);
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index 0d92a269c5fa..f75c677910c9 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -5616,7 +5616,7 @@ void kvm_mmu_zap_collapsible_sptes(struct kvm *kvm,
+ }
+ 
+ void kvm_arch_flush_remote_tlbs_memslot(struct kvm *kvm,
+-					struct kvm_memory_slot *memslot)
++					const struct kvm_memory_slot *memslot)
+ {
+ 	/*
+ 	 * All current use cases for flushing the TLBs for a specific memslot
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index e6d77353025c..34a974ffc882 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -894,7 +894,7 @@ void kvm_arch_sync_dirty_log(struct kvm *kvm, struct kvm_memory_slot *memslot);
+ 
+ #ifdef CONFIG_KVM_GENERIC_DIRTYLOG_READ_PROTECT
+ void kvm_arch_flush_remote_tlbs_memslot(struct kvm *kvm,
+-					struct kvm_memory_slot *memslot);
++					const struct kvm_memory_slot *memslot);
+ #else /* !CONFIG_KVM_GENERIC_DIRTYLOG_READ_PROTECT */
+ int kvm_vm_ioctl_get_dirty_log(struct kvm *kvm, struct kvm_dirty_log *log);
+ int kvm_get_dirty_log(struct kvm *kvm, struct kvm_dirty_log *log,
 -- 
 2.30.1
+
 
