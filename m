@@ -2,97 +2,237 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EEE8C3527C1
-	for <lists+kvm@lfdr.de>; Fri,  2 Apr 2021 11:01:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 22E973528D2
+	for <lists+kvm@lfdr.de>; Fri,  2 Apr 2021 11:33:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234424AbhDBJBu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 2 Apr 2021 05:01:50 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:36702 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234361AbhDBJBr (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 2 Apr 2021 05:01:47 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1617354106;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=3Wgr1zy01y+2hMqoZJiHMBPPBdaSsAhJT7fsIEsgksQ=;
-        b=O1HW3X5PjqXKgHf391o0BLGG3mOhEYpZjtmWZLYWVxNMGi+lUUo1x0QORQ1o7BHb2JTLeD
-        E7NAC5/9ZGOLm9ey/vSA+vNUY58NxYG98bhzBeTrYqDwNZLVam4paLGhN7MtiD4a08QZ3R
-        rpifLM5t4nplSB4L+lQascwrFCkntJE=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-239-xKlY_gS8PO2vhSfdCeZTAA-1; Fri, 02 Apr 2021 05:01:44 -0400
-X-MC-Unique: xKlY_gS8PO2vhSfdCeZTAA-1
-Received: by mail-wm1-f69.google.com with SMTP id n2so1994073wmi.2
-        for <kvm@vger.kernel.org>; Fri, 02 Apr 2021 02:01:44 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=3Wgr1zy01y+2hMqoZJiHMBPPBdaSsAhJT7fsIEsgksQ=;
-        b=bfy5yUenwhXfYIQVRWIZLNBs2ZfVV3c1mxikL8i0KQSVctEDAdVfPVILPcXDcF/WbS
-         K/6K1hf9+2N5dBWzdDHml6A0iC0CsZHE+9K88YYeJNI9jObXUhPUSOosFw+IQE3yRqtc
-         n68DcWlFiAiLJySEN6YxDUgvUD1+CUora87YWM9PWCxZbBWYtZ83nnOidn1SgxOnJBlL
-         CX/0w+ni12X5GUp0+vIsqzFkfI45vE9z9BTbjv0RCRggBPyQYLBbMGM7KeVf0ieS8qKJ
-         uwEYLmGb67bqMTqotXZshNbAQNnjDe6VU8p1sAvC9XM3zLQf2UcDt6hoQmcOb2+90OVG
-         Ty2Q==
-X-Gm-Message-State: AOAM531jK5gMiNGm92uABvfs5nY50FE34CACX5vAP+dq01a+pgyuUe1W
-        MUtkSB5n4jlP6mRjnzbgBccRXySCdevjk32JN/3EZZPyeIU15Z4csKTpa0W5+zx2NqvVZJzJxhx
-        j3bSXF87JsZDg
-X-Received: by 2002:a5d:5083:: with SMTP id a3mr14413802wrt.38.1617354103856;
-        Fri, 02 Apr 2021 02:01:43 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxC8Q3AXgIj0cWECGITt1mlVk9cxwR3/7wY+0fX0IgzbfGrhe6WcAEzmqK4DpSqIcHCX8JzYw==
-X-Received: by 2002:a5d:5083:: with SMTP id a3mr14413774wrt.38.1617354103679;
-        Fri, 02 Apr 2021 02:01:43 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:63a7:c72e:ea0e:6045? ([2001:b07:6468:f312:63a7:c72e:ea0e:6045])
-        by smtp.gmail.com with ESMTPSA id u8sm14479987wrr.42.2021.04.02.02.01.42
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 02 Apr 2021 02:01:43 -0700 (PDT)
-Subject: Re: [PATCH v2 1/3] KVM: X86: Rename DR6_INIT to DR6_ACTIVE_LOW
-To:     Xiaoyao Li <xiaoyao.li@intel.com>,
-        Chenyi Qiang <chenyi.qiang@intel.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20210202090433.13441-1-chenyi.qiang@intel.com>
- <20210202090433.13441-2-chenyi.qiang@intel.com>
- <3db069ba-b4e0-1288-ec79-66ac44938682@redhat.com>
- <6678520f-e69e-6116-88c9-e9d6cd450934@intel.com>
- <ea9eaa84-999b-82cb-ef40-66fde361704d@redhat.com>
- <dc22f0a2-97c5-d54d-a521-c02f802c2229@intel.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <3d7455a7-dca7-3c60-0c34-3a3ab8f7f1fb@redhat.com>
-Date:   Fri, 2 Apr 2021 11:01:42 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.7.0
-MIME-Version: 1.0
-In-Reply-To: <dc22f0a2-97c5-d54d-a521-c02f802c2229@intel.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+        id S234825AbhDBJdA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 2 Apr 2021 05:33:00 -0400
+Received: from mail.kernel.org ([198.145.29.99]:32962 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229553AbhDBJc7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 2 Apr 2021 05:32:59 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id CCD3A60FED;
+        Fri,  2 Apr 2021 09:32:58 +0000 (UTC)
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=wait-a-minute.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94)
+        (envelope-from <maz@kernel.org>)
+        id 1lSGAi-005HmP-Ly; Fri, 02 Apr 2021 10:32:56 +0100
+Date:   Fri, 02 Apr 2021 10:32:55 +0100
+Message-ID: <87eeftf2uw.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Auger Eric <eric.auger@redhat.com>
+Cc:     eric.auger.pro@gmail.com, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+        drjones@redhat.com, alexandru.elisei@arm.com, james.morse@arm.com,
+        suzuki.poulose@arm.com, shuah@kernel.org, pbonzini@redhat.com
+Subject: Re: [PATCH v4 7/8] KVM: arm64: vgic-v3: Expose GICR_TYPER.Last for userspace
+In-Reply-To: <b913bde9-9f63-919f-3895-973c62452653@redhat.com>
+References: <20210401085238.477270-1-eric.auger@redhat.com>
+        <20210401085238.477270-8-eric.auger@redhat.com>
+        <87tuoqp1du.wl-maz@kernel.org>
+        <b2458147-cd53-8712-9120-7ee9b84152aa@redhat.com>
+        <87ft09gbeo.wl-maz@kernel.org>
+        <b913bde9-9f63-919f-3895-973c62452653@redhat.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: eric.auger@redhat.com, eric.auger.pro@gmail.com, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, drjones@redhat.com, alexandru.elisei@arm.com, james.morse@arm.com, suzuki.poulose@arm.com, shuah@kernel.org, pbonzini@redhat.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 02/04/21 10:53, Xiaoyao Li wrote:
->>
+Hi Eric,
+
+On Thu, 01 Apr 2021 20:16:53 +0100,
+Auger Eric <eric.auger@redhat.com> wrote:
 > 
-> Hi Paolo,
+> Hi Marc,
 > 
-> Fenghua's bare metal support is in tip tree now.
-> https://lore.kernel.org/lkml/20210322135325.682257-1-fenghua.yu@intel.com/
+> On 4/1/21 7:30 PM, Marc Zyngier wrote:
+> > On Thu, 01 Apr 2021 18:03:25 +0100,
+> > Auger Eric <eric.auger@redhat.com> wrote:
+> >>
+> >> Hi Marc,
+> >>
+> >> On 4/1/21 3:42 PM, Marc Zyngier wrote:
+> >>> Hi Eric,
+> >>>
+> >>> On Thu, 01 Apr 2021 09:52:37 +0100,
+> >>> Eric Auger <eric.auger@redhat.com> wrote:
+> >>>>
+> >>>> Commit 23bde34771f1 ("KVM: arm64: vgic-v3: Drop the
+> >>>> reporting of GICR_TYPER.Last for userspace") temporarily fixed
+> >>>> a bug identified when attempting to access the GICR_TYPER
+> >>>> register before the redistributor region setting, but dropped
+> >>>> the support of the LAST bit.
+> >>>>
+> >>>> Emulating the GICR_TYPER.Last bit still makes sense for
+> >>>> architecture compliance though. This patch restores its support
+> >>>> (if the redistributor region was set) while keeping the code safe.
+> >>>>
+> >>>> We introduce a new helper, vgic_mmio_vcpu_rdist_is_last() which
+> >>>> computes whether a redistributor is the highest one of a series
+> >>>> of redistributor contributor pages.
+> >>>>
+> >>>> The spec says "Indicates whether this Redistributor is the
+> >>>> highest-numbered Redistributor in a series of contiguous
+> >>>> Redistributor pages."
+> >>>>
+> >>>> The code is a bit convulated since there is no guarantee
+> >>>
+> >>> nit: convoluted
+> >>>
+> >>>> redistributors are added in a given reditributor region in
+> >>>> ascending order. In that case the current implementation was
+> >>>> wrong. Also redistributor regions can be contiguous
+> >>>> and registered in non increasing base address order.
+> >>>>
+> >>>> So the index of redistributors are stored in an array within
+> >>>> the redistributor region structure.
+> >>>>
+> >>>> With this new implementation we do not need to have a uaccess
+> >>>> read accessor anymore.
+> >>>>
+> >>>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> >>>
+> >>> This patch also hurt my head, a lot more than the first one.  See
+> >>> below.
+> >>>
+> >>>> ---
+> >>>>  arch/arm64/kvm/vgic/vgic-init.c    |  7 +--
+> >>>>  arch/arm64/kvm/vgic/vgic-mmio-v3.c | 97 ++++++++++++++++++++----------
+> >>>>  arch/arm64/kvm/vgic/vgic.h         |  1 +
+> >>>>  include/kvm/arm_vgic.h             |  3 +
+> >>>>  4 files changed, 73 insertions(+), 35 deletions(-)
+> >>>>
+> >>>> diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/vgic-init.c
+> >>>> index cf6faa0aeddb2..61150c34c268c 100644
+> >>>> --- a/arch/arm64/kvm/vgic/vgic-init.c
+> >>>> +++ b/arch/arm64/kvm/vgic/vgic-init.c
+> >>>> @@ -190,6 +190,7 @@ int kvm_vgic_vcpu_init(struct kvm_vcpu *vcpu)
+> >>>>  	int i;
+> >>>>  
+> >>>>  	vgic_cpu->rd_iodev.base_addr = VGIC_ADDR_UNDEF;
+> >>>> +	vgic_cpu->index = vcpu->vcpu_id;
+> >>>
+> >>> Is it so that vgic_cpu->index is always equal to vcpu_id? If so, why
+> >>> do we need another field? We can always get to the vcpu using a
+> >>> container_of().
+> >>>
+> >>>>  
+> >>>>  	INIT_LIST_HEAD(&vgic_cpu->ap_list_head);
+> >>>>  	raw_spin_lock_init(&vgic_cpu->ap_list_lock);
+> >>>> @@ -338,10 +339,8 @@ static void kvm_vgic_dist_destroy(struct kvm *kvm)
+> >>>>  	dist->vgic_dist_base = VGIC_ADDR_UNDEF;
+> >>>>  
+> >>>>  	if (dist->vgic_model == KVM_DEV_TYPE_ARM_VGIC_V3) {
+> >>>> -		list_for_each_entry_safe(rdreg, next, &dist->rd_regions, list) {
+> >>>> -			list_del(&rdreg->list);
+> >>>> -			kfree(rdreg);
+> >>>> -		}
+> >>>> +		list_for_each_entry_safe(rdreg, next, &dist->rd_regions, list)
+> >>>> +			vgic_v3_free_redist_region(rdreg);
+> >>>
+> >>> Consider moving the introduction of vgic_v3_free_redist_region() into
+> >>> a separate patch. On its own, that's a good readability improvement.
+> >>>
+> >>>>  		INIT_LIST_HEAD(&dist->rd_regions);
+> >>>>  	} else {
+> >>>>  		dist->vgic_cpu_base = VGIC_ADDR_UNDEF;
+> >>>> diff --git a/arch/arm64/kvm/vgic/vgic-mmio-v3.c b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
+> >>>> index 987e366c80008..f6a7eed1d6adb 100644
+> >>>> --- a/arch/arm64/kvm/vgic/vgic-mmio-v3.c
+> >>>> +++ b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
+> >>>> @@ -251,45 +251,57 @@ static void vgic_mmio_write_v3r_ctlr(struct kvm_vcpu *vcpu,
+> >>>>  		vgic_enable_lpis(vcpu);
+> >>>>  }
+> >>>>  
+> >>>> +static bool vgic_mmio_vcpu_rdist_is_last(struct kvm_vcpu *vcpu)
+> >>>> +{
+> >>>> +	struct vgic_dist *vgic = &vcpu->kvm->arch.vgic;
+> >>>> +	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
+> >>>> +	struct vgic_redist_region *rdreg = vgic_cpu->rdreg;
+> >>>> +
+> >>>> +	if (!rdreg)
+> >>>> +		return false;
+> >>>> +
+> >>>> +	if (rdreg->count && vgic_cpu->rdreg_index == (rdreg->count - 1)) {
+> >>>> +		/* check whether there is no other contiguous rdist region */
+> >>>> +		struct list_head *rd_regions = &vgic->rd_regions;
+> >>>> +		struct vgic_redist_region *iter;
+> >>>> +
+> >>>> +		list_for_each_entry(iter, rd_regions, list) {
+> >>>> +			if (iter->base == rdreg->base + rdreg->count * KVM_VGIC_V3_REDIST_SIZE &&
+> >>>> +				iter->free_index > 0) {
+> >>>> +			/* check the first rdist index of this region, if any */
+> >>>> +				if (vgic_cpu->index < iter->rdist_indices[0])
+> >>>> +					return false;
+> >>>
+> >>> rdist_indices[] contains the vcpu_id of the vcpu associated with a
+> >>> given RD in the region. At this stage, you have established that there
+> >>> is another region that is contiguous with the one associated with our
+> >>> vcpu. You also know that this adjacent region has a vcpu mapped in
+> >>> (free_index isn't 0). Isn't that enough to declare that our vcpu isn't
+> >>> last?  I definitely don't understand what the index comparison does
+> >>> here.
+> >> Assume the following case:
+> >> 2 RDIST region
+> >> region #0 contains rdist 1, 2, 4
+> >> region #1, adjacent to #0 contains rdist 3
+> >>
+> >> Spec days:
+> >> "Indicates whether this Redistributor is the
+> >> highest-numbered Redistributor in a series of contiguous
+> >> Redistributor pages."
+> >>
+> >> To me 4 is last and 3 is last too.
+> > 
+> > No, only 3 is last, assuming that region 0 is full. I think the
+> > phrasing in the spec is just really bad. What this describes is that
+> > at the end of a set of contiguous set of RDs, that last RD has Last
+> > set. If two regions are contiguous, that's undistinguishable from a
+> > single, larger region.
+> > 
+> > There is no such thing as a "redistributor number" anyway. The closest
+> > thing there is would be "processor number", but that has nothing to do
+> > with the RD itself.
 > 
-> Will the rest KVM patches get into 5.13 together?
+> Hum OK. That's a different understanding of the spec wording indeed. For
+> me redistributor number was the index of the vcpu.
 
-Yes, they will.
+I think that's the source of the confusion. There really is nothing
+like a redistributor number. There is a processor number when
+GICR_TYPER.PTA=0 (that the guest uses as the target CPU when moving a
+LPI), but that's it. The layout is totally dumb, and the last frame in
+a contiguous sequence of frames is, well, last. The content of the
+frames doesn't matter in the least.
 
-Thanks for the notice!
+> But well, you're understanding is definitively simpler to implement and
+> also matches what was implemented for single RDIST region.
 
-Paolo
+That's a key insight. There is no reason why the RD layout would defer
+between a single region and multiple regions.
 
+Think of it from a HW perspective. You design a SoC that has
+"clusters" of CPUs, and you lay down a bunch of RDs, one set per
+cluster. Each set has a "Last" RD frame, and that's all there is to
+it.
+
+I'll try and see if ARM people are willing to clarify the spec (for
+which an update is long overdue).
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
