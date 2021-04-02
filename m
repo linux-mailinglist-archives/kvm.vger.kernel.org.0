@@ -2,70 +2,70 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id ABE23352520
-	for <lists+kvm@lfdr.de>; Fri,  2 Apr 2021 03:33:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C3F2B352524
+	for <lists+kvm@lfdr.de>; Fri,  2 Apr 2021 03:33:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234015AbhDBBdB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 1 Apr 2021 21:33:01 -0400
-Received: from aserp2130.oracle.com ([141.146.126.79]:49852 "EHLO
-        aserp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231179AbhDBBdA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 1 Apr 2021 21:33:00 -0400
-Received: from pps.filterd (aserp2130.oracle.com [127.0.0.1])
-        by aserp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 1321Wr5n063887;
-        Fri, 2 Apr 2021 01:32:56 GMT
+        id S234184AbhDBBdE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 1 Apr 2021 21:33:04 -0400
+Received: from userp2130.oracle.com ([156.151.31.86]:47436 "EHLO
+        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233665AbhDBBdC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 1 Apr 2021 21:33:02 -0400
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+        by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 1321ULi0055454;
+        Fri, 2 Apr 2021 01:32:58 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
  subject : date : message-id : in-reply-to : references :
  content-transfer-encoding : content-type : mime-version;
- s=corp-2020-01-29; bh=YwdOVBRL4lgF1P+4RwcjwaVT/DZRjxi78ki3Vg3kac0=;
- b=YLConeR0OivaBqrmhf5gj0uBklxpJ95kgF2tpHeaO1KcXHDcLsE+hA6WCaDeiKwL3JNN
- dUzVDDwI7ZCuQZGqoJvRNYgbD+8qS2l7ATXpTYIxeW9fdm000zJT0qinGrp5aZDaM3G6
- A4EfPRw4/aoJ6cTzkRE0ef5axogK+nm8LiPjZdVzmutjolDagaioAUh9luqDJEkqVZX1
- 7cJJUJOQ0KDzi41hu7MEcUxwvw2RAb5ZRdk1ZH6AA03igHY19WB5zbwCCDe9Gio9UhID
- nYRDlP6YUJRXfwykKDo+KnmQS1zrGUQgfQ22o3RqrNuxFqL5THB850srxo1ijmqgtLvp TA== 
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
-        by aserp2130.oracle.com with ESMTP id 37n33dugm4-1
+ s=corp-2020-01-29; bh=sJqjwwn/SYPzwAFhYkRmS6LIMupB5Bf29Dd7pLmjO3Q=;
+ b=bo5AKKKYNgNYurXtcIu3rU04yRa5WorHKEgu20TyKlpHtKi1trAvkVXecXtofaOLfCDU
+ L0I1KI5vIfJ7289Ulw91lan0lru3AU+b8d0NfSqnBs1ytq2Jxfxy3TdKmY3mhBAQS7Bo
+ QEAPKkPtMwII+NpzAR52M7j8Pkus4J/+2QXaBoMnjwmZA/UvpzH3lNznPb/F2uzLoQEm
+ Q8RC7htmAArG45RLw7rDWr0rbI1NOhCqRVADVMJouhz28hhhKr3gX3qB0+Am6wOluFob
+ USLkIu0QSJBhGoZ04YY+VZXhCtGDv7GWoRvbMpR9Sdzj7FCf5i8C63dCl9TBMvp8ucuj xA== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+        by userp2130.oracle.com with ESMTP id 37n30sbg2x-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 02 Apr 2021 01:32:56 +0000
-Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
-        by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 1321TkIr150731;
-        Fri, 2 Apr 2021 01:32:56 GMT
-Received: from nam10-mw2-obe.outbound.protection.outlook.com (mail-mw2nam10lp2101.outbound.protection.outlook.com [104.47.55.101])
-        by aserp3030.oracle.com with ESMTP id 37n2at0196-2
+        Fri, 02 Apr 2021 01:32:58 +0000
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+        by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 1321V01v019168;
+        Fri, 2 Apr 2021 01:32:58 GMT
+Received: from nam10-mw2-obe.outbound.protection.outlook.com (mail-mw2nam10lp2105.outbound.protection.outlook.com [104.47.55.105])
+        by aserp3020.oracle.com with ESMTP id 37n2abyyvf-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 02 Apr 2021 01:32:55 +0000
+        Fri, 02 Apr 2021 01:32:57 +0000
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=NuYOqnlPTmJ7ks71M+QnbqB7ScJjNyyPAuPWPMYbwbZEI4bvRlIh//xWd+FBhsRkmIEMKbTTC4ca8MvC088eqOjaobS0G2/Mb/zak7uiA4fWpLt25X3laQvvg5mpbZRiKJmPj+MQK77DPxCPO3Ep8n2xq8NibxH+f7+scLSvgPVkHxvsAHxZBaP84jRWk2A2mRKxzm3ulc1DXuueuDS78rKjHIVDGun8sFQpdrI5gJ/cD629cHa4meAG2uwYZobLLiWcWaRPpoT/Mv5W4MDDAoZ2GxsaSxaWj1CtRlsvXO6MK9AO+Zhn+GZPyphlRQMQusFlnsKhstaKRaUpL3wiJQ==
+ b=HBcv30e8V8LnwX9iFwwAdQ7JkfdgSSGhudwvxsOe0Zj8rAWT5HFQrgH03NcCbI7Nwi5dd3h0SI3rrGyiUweBrg25z6rYghf/61n+EREGVziyRtHaEY/Bjzvkp5ExYG+N8k8DIjh8UaH/uwK8WZFnZVEJsi7BH+d4e3+Wl1HDmBUz5YBJJos2zjKrk8KcdbbBglCfEmrqFV7rHuE7eTzQHOZZo5axyjgUU1P90exa1PG0SgwCAG/Lr/CU6Uj69045YMnUkyqGRAY+46ghgscCEbbN3e2kSR9irLU2eM2G9g7A8RpJha35xJTIQiTgRg0XNc+pO7OKWOmkRgg0ji6TKg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=YwdOVBRL4lgF1P+4RwcjwaVT/DZRjxi78ki3Vg3kac0=;
- b=Qil/jGm4jOQmTtR4as3XFOtWUU6TTAumUWZT9b/2dnEnEclDfMbipazTB7Yq7ZRp4d1i+uOfnE0yVsvAs1wsOQl4Ts/WqRbKNTIl5CcDQ+aZtxHGxh/KHwoxQBBb8RBILclJik/IeQicU6jm1OjX95wVTHyRAQjY/t2KDUrkJq/fC9bwCphVrbx2RealsyPymMMDUW5v8bs7gT9yEzg/GX1ytQgI/DUMZKSXsnmvl0II+aG4HbPjVjdMDyHKa76YaMbu2xItympE/9UGYR669s+ZlZeYWqBqk/Xvh4eTPYtR13Pbv804DZrTzgd1iUipjD533nCL5jZUES32hkiGTA==
+ bh=sJqjwwn/SYPzwAFhYkRmS6LIMupB5Bf29Dd7pLmjO3Q=;
+ b=FD43ikTo6Ww3MFtRxFl9uPrSLru/0iifd9DQlH7c+h+fTnt0+rE7W61dCEUOk0hTCa8eGr4Rxw9TXgvRt3oP+oy0xXFuDhm8E9E0mT+axQaEYOS5aU6QM20F6kbzQg2Fgkv6eYQQZETLLYq5Fu/7pZ+UPdzHcPJwL55304ON5gS/9vRQPIg66fRIbvK4xfySdtnqCLGByD2zsGtFSmq1Clt//5/li83HQMQbMavsEFLNYDUVO9Kv8YjywT499v6BH6JaNQAmhNFu5IU4x1x1Fko5NWFXvRliPuGPWv42wTDzdJnyrzwtR8at31pyLgMfowpPpKkvvE6jJnztuZgWnQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
  dkim=pass header.d=oracle.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=YwdOVBRL4lgF1P+4RwcjwaVT/DZRjxi78ki3Vg3kac0=;
- b=mW1S92JMc5ltYQkMNuWzCNuhWP97Atxmu9tAUn81pj8v/3ieQ4dtxp05lMMr0rhjHKKPkPNXSizot2k5sO5i7vx4IME2f3jK1z+PUXS5rLDVjVHiKcM+8mnSzzYyq7AOMiTRRgQ89GuJI3IqYbaEu60OmeGxcVGT3wOhuPkmHgU=
+ bh=sJqjwwn/SYPzwAFhYkRmS6LIMupB5Bf29Dd7pLmjO3Q=;
+ b=HcKPcuOGASz87SLAQLoU6w8NpXabaQjCDaCHGG9uGKkdnUdc8/aPHkkTXRPawoWhg1rnoaNE/siYephtIg/4GjOvvv9ZdEUjXf0ZXg65+j1PL233EB+sTgveh7gKx0GPclaJES9xLiL0piy+wIxlF92Scumy5cpAC0Ga0bUW4xc=
 Authentication-Results: vger.kernel.org; dkim=none (message not signed)
  header.d=none;vger.kernel.org; dmarc=none action=none header.from=oracle.com;
 Received: from SN6PR10MB3021.namprd10.prod.outlook.com (2603:10b6:805:cc::19)
  by SA2PR10MB4795.namprd10.prod.outlook.com (2603:10b6:806:11d::14) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3999.28; Fri, 2 Apr
- 2021 01:32:54 +0000
+ 2021 01:32:56 +0000
 Received: from SN6PR10MB3021.namprd10.prod.outlook.com
  ([fe80::5911:9489:e05c:2d44]) by SN6PR10MB3021.namprd10.prod.outlook.com
  ([fe80::5911:9489:e05c:2d44%5]) with mapi id 15.20.3999.029; Fri, 2 Apr 2021
- 01:32:54 +0000
+ 01:32:56 +0000
 From:   Krish Sadhukhan <krish.sadhukhan@oracle.com>
 To:     kvm@vger.kernel.org
 Cc:     pbonzini@redhat.com, jmattson@google.com, seanjc@google.com
-Subject: [PATCH 3/5 v6] KVM: nSVM: Cleanup in nested_svm_vmrun()
-Date:   Thu,  1 Apr 2021 20:43:29 -0400
-Message-Id: <20210402004331.91658-4-krish.sadhukhan@oracle.com>
+Subject: [PATCH 4/5 v6] nSVM: Test addresses of MSR and IO permissions maps
+Date:   Thu,  1 Apr 2021 20:43:30 -0400
+Message-Id: <20210402004331.91658-5-krish.sadhukhan@oracle.com>
 X-Mailer: git-send-email 2.25.4
 In-Reply-To: <20210402004331.91658-1-krish.sadhukhan@oracle.com>
 References: <20210402004331.91658-1-krish.sadhukhan@oracle.com>
@@ -77,158 +77,141 @@ X-ClientProxiedBy: SJ0PR13CA0024.namprd13.prod.outlook.com
  (2603:10b6:805:cc::19)
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from ban25x6uut29.us.oracle.com (138.3.201.29) by SJ0PR13CA0024.namprd13.prod.outlook.com (2603:10b6:a03:2c0::29) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4020.9 via Frontend Transport; Fri, 2 Apr 2021 01:32:53 +0000
+Received: from ban25x6uut29.us.oracle.com (138.3.201.29) by SJ0PR13CA0024.namprd13.prod.outlook.com (2603:10b6:a03:2c0::29) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4020.9 via Frontend Transport; Fri, 2 Apr 2021 01:32:55 +0000
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 3c757095-0814-4c5b-9b1d-08d8f5773cea
+X-MS-Office365-Filtering-Correlation-Id: cf0b5b72-5cba-49a5-318d-08d8f5773db6
 X-MS-TrafficTypeDiagnostic: SA2PR10MB4795:
-X-Microsoft-Antispam-PRVS: <SA2PR10MB47959AFDE18043E1309435B2817A9@SA2PR10MB4795.namprd10.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:4714;
+X-Microsoft-Antispam-PRVS: <SA2PR10MB47955EF65F550FE6E7CB361B817A9@SA2PR10MB4795.namprd10.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:486;
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: h6SkGRexuOf2S/Dx57S3uiz+t+AGubtfodCscQ/4iBAYjaXmBizK5OJ2HIqItilrYTx2UfB6hVF1e+UuoCZz9ryeBiqm5HlK2XHovMwmDDEKF+1EWHkPjqR0rDnd2URDlG7lyMoWQwsJCFu5aV0kSqRMu5i2XR5zNs1s774P6qih7uXwr9y8lmXHxj/cUhlaqRfjYJoZYR0RfUtIko1W+KUmqWfsV1i+jV10xaO+PthdGYNL3ZBSm7WrWg9p9fnE2jzTfdTwEOTfZaKWKz7yE0Uxuc8Bx2mQzlYyjYpkBtc9OrCJGJCx9x2mUry7/n75toSCGyU4ksPookRAOf8yk16UffmVdPEDgPQx8/Dq91IvNWoghOc4x/lI9ZNnm3wgNY3cu1nkeBPPQoNdagZy/QXYpadycgIlnj3SKZiCuNfZV/Y9wkHrRBSFRWdptn0dTBGHsRW/yOK8jyimQ0NHBsCfkFB/SGThzUpe2EUnva6OHj6xpf+TE315AWOuhALPoOl4HGk0Ts718hZyBICG8ykpOwFNub5yMPhfqcU5fYyif9kJIpp8QydgYFcRNyrl1xnE1AS9IAH7nWM5oy2xXbHRBnnXgG06FENYfJZ3MCKpRzDTtm1kyoTHN5WEBm04VvQ9rD6hBLvjzPXSNNkAVg==
+X-Microsoft-Antispam-Message-Info: 7yC+9xeWT1ZF9JxKjmdX/V0EdCj5m0ken34qOo6TSnROBix/72dDmhogVzdNdfmX4EFbUaQHVHzmrFXkektwk+qVlb/XrMpPiMVnQ3h4C0XwIRWJe0ZnN3rMQaUGfgtVae48Y7ZERQcQF6qWhRMUieIKVAoGXUZjXTGrrF+ZFEDFFto+JHH/ZXzu6fhzjqVkYmlVUrBJcoid+pvnsgvKK6Mqiw/EXyq1CCA9qlToT9q/IoD99Z5F6brcQelg07sJaG2hChaQxMcRac3R3dRX42CP9o7vgcbLkSbU0Oox2p7bpD0Xtje2767hLHbyNF731Yx39DTkB/RnZc36QzMx023W8ksQJfp6ApO7fWzH1tr+QsmPI8VJF1Jn874qO6N0sgywIxbiArKfGtDIpLm0vYuSY/NP9ZOiSbwzJ3GHD9T1o1UEI2UHSLms1bPcQ/kYSh/oyo7EBSxVGl3c7R0ZPY1gtFN14zZqImr9/ctmuji7fg9QgjgGvXc/K9y7gqB/P4owIkSZG1F/St96l6nIaZA2dVb7R0PywKnI2W98ijEGTa2K7OiALVB2vSOiaDHVOxAC+APxLAfv17bjjK25y+NpFDvbVWYEnKE+cpDoZReRugivgZJaBEUqoyg2jBzQm1G1jdyY8izEuPsUgAKdfQ==
 X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR10MB3021.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(376002)(366004)(346002)(396003)(39860400002)(136003)(6666004)(26005)(36756003)(316002)(83380400001)(1076003)(66556008)(5660300002)(16526019)(66476007)(186003)(7696005)(6486002)(2616005)(44832011)(52116002)(956004)(8936002)(38100700001)(8676002)(6916009)(2906002)(66946007)(86362001)(4326008)(478600001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: =?us-ascii?Q?CI8zCYv7sK7vs5H69N0sBtHkpaWrtvyj4s0exk/7nrBdmCQgRK76/FQd+mxA?=
- =?us-ascii?Q?ZUDoVVmTSYqgK9nR1+jPBlqEVbJvwhgItTryKHqTRIRLh+DY2EBYMij6gqzL?=
- =?us-ascii?Q?MX0+FoPSqXhswEBmup/b0jCaS7m7ZYvsrGkqEYBrgZos0ML6r89MpSQFiJad?=
- =?us-ascii?Q?jHiKCptDQpngDm4LADHhDPX/CvLKzCsAZjmNkYQESipSUYR0E3vEd1mXWdxf?=
- =?us-ascii?Q?4BJotLPGSnK7szbqlTY8YyM/Jk3qb1aCyjyLtMbPkFPMQ8JnUl4d+xWTB4nk?=
- =?us-ascii?Q?dLNY1wK9Am0NwA6DG/pV59efncu1q9i0lpbbX2OacvO9npk7RHpT4m1Yy7jT?=
- =?us-ascii?Q?UXcZblHnsOoL/hIUjJmWl+q4a/euPQYadnvunO/U5/Q76sgVeFCZ3EfEGvBX?=
- =?us-ascii?Q?k6nmN22a9rcRcpl+wkhGboRqp5udY0sM6AneyFNa37UAy3ztkZxUlmjSgrLB?=
- =?us-ascii?Q?fxPA0cGfznudYRsptNKy7AZQt6TADkuj06oxft1AEhyQhIzhOHN2j90DiEcU?=
- =?us-ascii?Q?Gpn86yR8KW1J3jYcEHDc1nDs6IBOuQSlRgs0Qkkf+p3QnZfo0EtAVOR0pvuq?=
- =?us-ascii?Q?zOONLCqIFXDuN05hNRWp9ZCbezc6IxhdpTOwB6AAgcsb/mJdhbJIAjriWyJX?=
- =?us-ascii?Q?g/UYgrRPz8i3xpv2sR4cUOfN0fP4p4kvWqar9nZOEIy1pGSPmkQb4DpRmSdz?=
- =?us-ascii?Q?77avm0pb/+9R+SiB4UflKQp6myrZ4MaD7NLGbbnkyxs+Y7g+OUJGviUPBPve?=
- =?us-ascii?Q?Vm+8bsaYcpFb3hJKlluHQdvs9CcSEBPWANpW9Qha+k94em2hez/7ppKbzwUQ?=
- =?us-ascii?Q?/9TTVbjGR9WBX9ZNkaQO/vH84BYiADRQ+Jcb0bizvirY8B8i6y2ipWXwZwgJ?=
- =?us-ascii?Q?uXlDQBWGsljSxci95qwKFCTJwLJSl81ZGaK04O1cxL+vJpCKEe2m/vsHqRJg?=
- =?us-ascii?Q?+KN2nhpt5d/27iyyMCu2v+Cv1xDiE+Hnu9jV8yeNjV1jVsz+JPNlrWfsOqU8?=
- =?us-ascii?Q?2/OCisn1c0av7dGJwsox1BQ6jewoNXnBBsh2/iMy0J9h6ciIv580e74G3HyN?=
- =?us-ascii?Q?wow5wuqJKGLY9pE9Y2bgAQHf68IkhUc58gH/d8PaKKxqVq5M8yZeeOXAHldg?=
- =?us-ascii?Q?F1uq8dxmCNJiCBjwL/zbTy364I5osLGja3PzZaAW7zxaiw8POHZ+4PFE+2bN?=
- =?us-ascii?Q?YWqkmNwPDdC8VfvYY8291/jJiXPGBagEo75IEqgEXGMcO/HBiQqzkXEu2ggi?=
- =?us-ascii?Q?AmbcQzZuMg9zj1pF77tuYNhEat7zR0iBNMkXyeDjdbc3PvII3JxfWmpImcbt?=
- =?us-ascii?Q?TAc3LubcCjj8aSzaRgAq/rEE?=
+X-MS-Exchange-AntiSpam-MessageData: =?us-ascii?Q?go8flqLgj3BzZrMkXrMHY28AlMQulzU52J+ZL69FVeQl39ya3V/6pTBxd2dh?=
+ =?us-ascii?Q?jha9Jlt3Dr2lMCxChoC6Vb6JByOZXR0AdfzdGSTcCFgR3v0uJWwJHiTrsbWo?=
+ =?us-ascii?Q?6XISy0CBAS3x1VlbqR7Hk2cKpa43FO22TdzpsNpVZWZfY2fC/veAI0PiLcza?=
+ =?us-ascii?Q?fu19P5A7c3x0QXHyAQxsU8jwlztb6E2tImcWXVafqjkBULFQ4vwcAMuISqOa?=
+ =?us-ascii?Q?SV1euTTozFy4oLduoS0DyhqtmEg76RU8uGk/JFuhOT6AOfzxpiphh1DnmPpG?=
+ =?us-ascii?Q?EC6d00gv7iM0sh9ho011IFFYf8AH14y3OgPegR9rBokbvUYpjEs1uhZ5ZktF?=
+ =?us-ascii?Q?P2k6y/6ShJdPk+PYutAQIFUtqW24mqee68X23Ep+LsxMPgRQ830UG1L/rkdN?=
+ =?us-ascii?Q?tqXVlwJKGzry8md0RlJm4DV3P4CSQ4w5gn8eI9bVj4lPoMhbiD7kwgYLw9rr?=
+ =?us-ascii?Q?dBUE+1trK8DTqe6gBv9sr25h/qmQLj+gTFu9V1bwP1MmpXoM7YKUYZcytVy6?=
+ =?us-ascii?Q?VQMtQSh29Sgf2SbsVPegqpIm8DRUrK7EL5026N0ghD0ZwB9gQdpocMNVX07D?=
+ =?us-ascii?Q?YW1CqzKEmVT5uhaZnQTTKx9Y2fYFwGsfWuECWwifY73ffZacGd1rBAOseBXb?=
+ =?us-ascii?Q?MpdGyiQnJu01yZKaIKAEMAFAVtARfO+t4Y66A4V8iF3czKNRNk1IvISedL26?=
+ =?us-ascii?Q?zW/jUgMZkwtCJSPY/f8Z+QfFCXg95g4U00H2Vwxkx5k1oy9C3TdtcWOju50z?=
+ =?us-ascii?Q?1nbUcL0w+CxuuuxV7qSKRIR9eY84g2+WFuRMKA+fen759WqEs4Iv3idZhFA/?=
+ =?us-ascii?Q?OYIok37dg/z002A12GGDqNCD9qyaMWKOb8icnIgkY1RRzy08YAMqm0/5qLQu?=
+ =?us-ascii?Q?O8gHZk/jDcNGTRlk5xoTUYuXF6fxFrSh+l0UTrknCPkmeJVldme+Is/NScyP?=
+ =?us-ascii?Q?qbhqAv1F7iEQJWb7PDPBLdsV+L+PGbXBQE3Y+WFhEBKg0zrmqM/gm0x/TpyU?=
+ =?us-ascii?Q?Nc6qcTuZdVuCyaOpTJdRIfXgH9/akSjeXx0RzfLogjI2+zP8k8BIcsoPw7ha?=
+ =?us-ascii?Q?Y3jB+LkrSmN1qoXobTKgLJT23nZ6e62haN9J6aSv7HlL4DOMhtzga02Hcrpr?=
+ =?us-ascii?Q?wVd3NIac9GmBc4/k8yp+0z9zUnGtU4LUBb4WJjaexU2EjojCmpclpRfU2rv6?=
+ =?us-ascii?Q?qeC+b/D5RLCapx3vOsZFyo2daiwpr0yQjCNxJvHneKObiqfIIXW1R+8zFUDC?=
+ =?us-ascii?Q?uaM/SmWn8xng8G74tSK0+aXKNgIt9HgSfmXguGuOxxE5ZofmAqqpUrGXxEzG?=
+ =?us-ascii?Q?xTjw1+MzHHKpmxwQeG3GcRs5?=
 X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3c757095-0814-4c5b-9b1d-08d8f5773cea
+X-MS-Exchange-CrossTenant-Network-Message-Id: cf0b5b72-5cba-49a5-318d-08d8f5773db6
 X-MS-Exchange-CrossTenant-AuthSource: SN6PR10MB3021.namprd10.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Apr 2021 01:32:54.8534
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Apr 2021 01:32:56.0057
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: f73pWfkRD+UObPD3F9od/9qZ+HtQMyIaM0qTdtyj2A3ID3hHI55QLWwCaM1cBCSnR1IMHnhWt/j5uQ7xgaWOIu22Stxe0jRsOztH5CrhatM=
+X-MS-Exchange-CrossTenant-UserPrincipalName: 35x4o4mV118Mzjs+0rDDbVZqw/4Whbx8VgCejUUJvTHgjGgQQmx3wBsUlcTLpundmffD2eK93sbHvDBWrf8HRWkfBIjzJgojgI0ql4eKOxY=
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA2PR10MB4795
 X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=9941 signatures=668683
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 spamscore=0
- suspectscore=0 bulkscore=0 mlxscore=0 adultscore=0 malwarescore=0
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2103310000 definitions=main-2104020008
-X-Proofpoint-GUID: q9RtLEYXVyTROYlN0m_HKyW0agIsGivg
-X-Proofpoint-ORIG-GUID: q9RtLEYXVyTROYlN0m_HKyW0agIsGivg
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 mlxscore=0 bulkscore=0
+ suspectscore=0 phishscore=0 malwarescore=0 mlxlogscore=999 spamscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2103310000
+ definitions=main-2104020008
+X-Proofpoint-GUID: MCZIioGIFpc0LLV5AMWGqEwAmZqFf304
+X-Proofpoint-ORIG-GUID: MCZIioGIFpc0LLV5AMWGqEwAmZqFf304
 X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=9941 signatures=668683
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 mlxlogscore=999 mlxscore=0
- lowpriorityscore=0 suspectscore=0 priorityscore=1501 phishscore=0
- clxscore=1015 impostorscore=0 malwarescore=0 bulkscore=0 adultscore=0
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 lowpriorityscore=0 impostorscore=0
+ bulkscore=0 priorityscore=1501 suspectscore=0 mlxscore=0 spamscore=0
+ clxscore=1015 mlxlogscore=999 malwarescore=0 adultscore=0 phishscore=0
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2103310000
  definitions=main-2104020008
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Use local variables to derefence svm->vcpu and svm->vmcb as they make the
-code tidier.
+According to section "Canonicalization and Consistency Checks" in APM vol 2,
+the following guest state is illegal:
 
-Suggested-by: Sean Christopherson <seanjc@google.com>
+    "The MSR or IOIO intercept tables extend to a physical address that
+     is greater than or equal to the maximum supported physical address."
+
+Signed-off-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
+(cherry picked from commit 0513cf071255c7d5a1b7a813d017bbdd2d1da263)
 Signed-off-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
 ---
- arch/x86/kvm/svm/nested.c | 31 ++++++++++++++++---------------
- 1 file changed, 16 insertions(+), 15 deletions(-)
+ x86/svm_tests.c | 42 +++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 41 insertions(+), 1 deletion(-)
 
-diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
-index b3988b3a3fd5..3fd51fe63170 100644
---- a/arch/x86/kvm/svm/nested.c
-+++ b/arch/x86/kvm/svm/nested.c
-@@ -517,26 +517,27 @@ int nested_svm_vmrun(struct vcpu_svm *svm)
- {
- 	int ret;
- 	struct vmcb *vmcb12;
-+	struct kvm_vcpu *vcpu = &svm->vcpu;
- 	struct vmcb *hsave = svm->nested.hsave;
- 	struct vmcb *vmcb = svm->vmcb;
- 	struct kvm_host_map map;
- 	u64 vmcb12_gpa;
- 
--	if (is_smm(&svm->vcpu)) {
--		kvm_queue_exception(&svm->vcpu, UD_VECTOR);
-+	if (is_smm(vcpu)) {
-+		kvm_queue_exception(vcpu, UD_VECTOR);
- 		return 1;
- 	}
- 
--	vmcb12_gpa = svm->vmcb->save.rax;
--	ret = kvm_vcpu_map(&svm->vcpu, gpa_to_gfn(vmcb12_gpa), &map);
-+	vmcb12_gpa = vmcb->save.rax;
-+	ret = kvm_vcpu_map(vcpu, gpa_to_gfn(vmcb12_gpa), &map);
- 	if (ret == -EINVAL) {
--		kvm_inject_gp(&svm->vcpu, 0);
-+		kvm_inject_gp(vcpu, 0);
- 		return 1;
- 	} else if (ret) {
--		return kvm_skip_emulated_instruction(&svm->vcpu);
-+		return kvm_skip_emulated_instruction(vcpu);
- 	}
- 
--	ret = kvm_skip_emulated_instruction(&svm->vcpu);
-+	ret = kvm_skip_emulated_instruction(vcpu);
- 
- 	vmcb12 = map.hva;
- 
-@@ -556,8 +557,8 @@ int nested_svm_vmrun(struct vcpu_svm *svm)
- 
- 
- 	/* Clear internal status */
--	kvm_clear_exception_queue(&svm->vcpu);
--	kvm_clear_interrupt_queue(&svm->vcpu);
-+	kvm_clear_exception_queue(vcpu);
-+	kvm_clear_interrupt_queue(vcpu);
- 
- 	/*
- 	 * Save the old vmcb, so we don't need to pick what we save, but can
-@@ -569,17 +570,17 @@ int nested_svm_vmrun(struct vcpu_svm *svm)
- 	hsave->save.ds     = vmcb->save.ds;
- 	hsave->save.gdtr   = vmcb->save.gdtr;
- 	hsave->save.idtr   = vmcb->save.idtr;
--	hsave->save.efer   = svm->vcpu.arch.efer;
--	hsave->save.cr0    = kvm_read_cr0(&svm->vcpu);
-+	hsave->save.efer   = vcpu->arch.efer;
-+	hsave->save.cr0    = kvm_read_cr0(vcpu);
- 	hsave->save.cr4    = svm->vcpu.arch.cr4;
--	hsave->save.rflags = kvm_get_rflags(&svm->vcpu);
--	hsave->save.rip    = kvm_rip_read(&svm->vcpu);
-+	hsave->save.rflags = kvm_get_rflags(vcpu);
-+	hsave->save.rip    = kvm_rip_read(vcpu);
- 	hsave->save.rsp    = vmcb->save.rsp;
- 	hsave->save.rax    = vmcb->save.rax;
- 	if (npt_enabled)
- 		hsave->save.cr3    = vmcb->save.cr3;
- 	else
--		hsave->save.cr3    = kvm_read_cr3(&svm->vcpu);
-+		hsave->save.cr3    = kvm_read_cr3(vcpu);
- 
- 	copy_vmcb_control_area(&hsave->control, &vmcb->control);
- 
-@@ -602,7 +603,7 @@ int nested_svm_vmrun(struct vcpu_svm *svm)
- 	nested_svm_vmexit(svm);
- 
- out:
--	kvm_vcpu_unmap(&svm->vcpu, &map, true);
-+	kvm_vcpu_unmap(vcpu, &map, true);
- 
- 	return ret;
+diff --git a/x86/svm_tests.c b/x86/svm_tests.c
+index 29a0b59..7014c40 100644
+--- a/x86/svm_tests.c
++++ b/x86/svm_tests.c
+@@ -2304,15 +2304,55 @@ static void test_dr(void)
+ 	vmcb->save.dr7 = dr_saved;
  }
+ 
++/*
++ * If the MSR or IOIO intercept table extends to a physical address that
++ * is greater than or equal to the maximum supported physical address, the
++ * guest state is illegal.
++ *
++ * [APM vol 2]
++ */
++static void test_msrpm_iopm_bitmap_addrs(void)
++{
++	u64 saved_intercepts = vmcb->control.intercept;
++	u64 bitmap_addr_1 =
++	    (u64)(((u64)1 << cpuid_maxphyaddr()) - PAGE_SIZE);
++	u64 bitmap_addr_2 =
++	    (u64)(((u64)1 << cpuid_maxphyaddr()) - PAGE_SIZE * 2);
++
++	/*
++	 * MSR bitmap address
++	 */
++	vmcb->control.intercept = saved_intercepts | 1ULL << INTERCEPT_MSR_PROT;
++	vmcb->control.msrpm_base_pa = bitmap_addr_1;
++	report(svm_vmrun() == SVM_EXIT_ERR, "Test MSRPM address: %lx",
++	    bitmap_addr_1);
++	vmcb->control.msrpm_base_pa = bitmap_addr_2;
++	report(svm_vmrun() == SVM_EXIT_ERR, "Test MSRPM address: %lx",
++	    bitmap_addr_2);
++
++	/*
++	 * IOIO bitmap address
++	 */
++	vmcb->control.intercept = saved_intercepts | 1ULL << INTERCEPT_IOIO_PROT;
++	vmcb->control.iopm_base_pa = bitmap_addr_1;
++	report(svm_vmrun() == SVM_EXIT_ERR, "Test IOPM address: %lx",
++	    bitmap_addr_1);
++	vmcb->control.iopm_base_pa = bitmap_addr_2 += 1;
++	report(svm_vmrun() == SVM_EXIT_ERR, "Test IOPM address: %lx",
++	    bitmap_addr_2);
++
++	vmcb->control.intercept = saved_intercepts;
++}
++
+ static void svm_guest_state_test(void)
+ {
+ 	test_set_guest(basic_guest_main);
+-
+ 	test_efer();
+ 	test_cr0();
+ 	test_cr3();
+ 	test_cr4();
+ 	test_dr();
++	test_msrpm_iopm_bitmap_addrs();
+ }
+ 
+ 
 -- 
 2.27.0
 
