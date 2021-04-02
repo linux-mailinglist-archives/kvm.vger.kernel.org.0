@@ -2,402 +2,132 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5775B352B6E
-	for <lists+kvm@lfdr.de>; Fri,  2 Apr 2021 16:42:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C0FC8352C04
+	for <lists+kvm@lfdr.de>; Fri,  2 Apr 2021 18:09:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235721AbhDBOZa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 2 Apr 2021 10:25:30 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:43450 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S235667AbhDBOZ3 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 2 Apr 2021 10:25:29 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1617373528;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=rAMB58E0agGx9x8Dxgo+QqROjxbc9YuDNgjPDh47PBY=;
-        b=fgmnr9fHuS8Flhla1EH3godyQlaLSLC7TK4805pHZ25KbM4PrLskbSgcRm/vLbgIOvRPy+
-        z6AdEANREOgF2UttWfSG85d4Sr4g6YSat4XCwguro8iuWfrcHXdVnvdEDQ7ghZzTY4KFr3
-        rC5Cy5IVnWgmIzkfqVGQQMNb56dYwTY=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-319-oBpm0JPePRyJYKYRmU3UAw-1; Fri, 02 Apr 2021 10:25:26 -0400
-X-MC-Unique: oBpm0JPePRyJYKYRmU3UAw-1
-Received: by mail-wr1-f70.google.com with SMTP id f3so4402736wrt.14
-        for <kvm@vger.kernel.org>; Fri, 02 Apr 2021 07:25:26 -0700 (PDT)
+        id S235140AbhDBO7Z (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 2 Apr 2021 10:59:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52388 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235111AbhDBO7Y (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 2 Apr 2021 10:59:24 -0400
+Received: from mail-pf1-x429.google.com (mail-pf1-x429.google.com [IPv6:2607:f8b0:4864:20::429])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D620C06178A
+        for <kvm@vger.kernel.org>; Fri,  2 Apr 2021 07:59:23 -0700 (PDT)
+Received: by mail-pf1-x429.google.com with SMTP id 11so2051940pfn.9
+        for <kvm@vger.kernel.org>; Fri, 02 Apr 2021 07:59:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=hrWlBAMIox9uyp5vA/6pgwPUQG03jLxXChap4JWk798=;
+        b=Wis80br4QxI0udXSM5bgb12ub29OxkCYgsG+Q5MaHbKjRYNZTxX2dKGqJxK+5x27Ec
+         bCjK5MvvUurkyJh+2dVl5bUVlOF+S5kkzM86t1vFaJEMUN3T8Kr2U41JVg3ikRq9VsY9
+         bmvTxU20lmUiRhm6QGV5OSagHM6CMIS3zcbQPID23xudkFfFOfaNfDFrfAAV9MBGBCbG
+         4fo9i95YmINHH5yrkVF5nSKywYI/L+Mv9lKQ9OfuRtFbwYvD08rHo26eFSvgUFwVqUjF
+         9D9+2OjiT3WWi7P0x9fBHYTDN17PeeBVM5FGjv80+DwDvYvLLhKy7ATI6OvoR6zd0tW3
+         xYMg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=rAMB58E0agGx9x8Dxgo+QqROjxbc9YuDNgjPDh47PBY=;
-        b=XZvYCo+6KVrGCbrSBd0hsmkmFT9o0HA+crjLFVN+jEvoEAGz+I10e0yMhBCs6eLaWw
-         zm+PZfkOlF0BPrY4+pLaqPihqrdGPZkR1WrJDecBvQAcRMG0hEnUGoUDbabEm18L45aM
-         YUQDPpOog8685hf0LuLIP5s9yhAUu7sUBMe9myI8jCOkrXz+HOXd4OmnGjpPAcxE6Mh4
-         /DQTKuD5bMK0sFM1Mnz2V61T2AWeYx8b5kbkM1QCswPEExiEzha5ofwXaYQq744fomsN
-         IyDf/X226Q7Hxr0wj1fH5gBLGgrzmiU9V1VkmYgT6JsQKIMgBkfbulPT/1UsPOzYvwPs
-         jGkg==
-X-Gm-Message-State: AOAM531nfKBNRQ0U1Y0TaCmm/cszKhfmp5DQpMGke3zXY82XwE7so8+b
-        xIr6AfRdsGBB06xBFvnAnfoFLZllMLOgat+DCzTnPhwVusTBZRfoktw/UULthqTpPfGekQqUQ0t
-        gc0u8B6dA/MFX
-X-Received: by 2002:a05:6000:1363:: with SMTP id q3mr15496004wrz.74.1617373525559;
-        Fri, 02 Apr 2021 07:25:25 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJytpHUjHSvQhu8h8uV4GQFi8DygUHUXbEFVfUkS3WiqJ34zXwbd2wuGNjkZa3zI41FdV13UnA==
-X-Received: by 2002:a05:6000:1363:: with SMTP id q3mr15495976wrz.74.1617373525264;
-        Fri, 02 Apr 2021 07:25:25 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id g11sm1554156wme.1.2021.04.02.07.25.23
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 02 Apr 2021 07:25:24 -0700 (PDT)
-Subject: Re: [RFC v2] KVM: x86: Support KVM VMs sharing SEV context
-To:     Nathan Tempelman <natet@google.com>
-Cc:     thomas.lendacky@amd.com, x86@kernel.org, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, srutherford@google.com,
-        seanjc@google.com, rientjes@google.com, brijesh.singh@amd.com,
-        Ashish.Kalra@amd.com, dovmurik@linux.vnet.ibm.com,
-        lersek@redhat.com, jejb@linux.ibm.com, frankeh@us.ibm.com
-References: <20210316014027.3116119-1-natet@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <4bec7d20-57c6-3715-2031-a824afe3fc02@redhat.com>
-Date:   Fri, 2 Apr 2021 16:25:23 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.7.0
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=hrWlBAMIox9uyp5vA/6pgwPUQG03jLxXChap4JWk798=;
+        b=pD2+0gpF/pNxv8dq6bQEmQU123GC7ttS1rHMh7FI7GugFgxuJW+UOZgZBShXCe4AGV
+         xxOvCrI7N+8mTINvFQOX7HFxA8Os0mFCh2abN5vgIOnweTl6J6dOaVg8h1JSRmEMiueU
+         ZxwgfKsz+W/Qt256/vSfJQD9OizLkdYjan2w5FXeVUNe6YhX2fV9S68NYh8jL77OZ8Cr
+         RPKrOMXYZpArZe6yINnCud/ImJ1y3TZ4KxlWJ6do4VM7mezPoNALblTbauluy6aHANjG
+         8jHGzwbC/yOJuEssZYDA9iaggRBH9i19EHAjt3Lk/p6+pbBH8IIsmyoiwhPyK+MDq+mS
+         2iLQ==
+X-Gm-Message-State: AOAM532xgJyt8v/IxJOlbPZmyJXlfF8Abb3afX7hmTfc/Pc4ptsacm++
+        N38JN0+K8VXy/q9bxFyshLOGEg==
+X-Google-Smtp-Source: ABdhPJwt/NANo8uiyFDGCSZL9IUa09CiSHlR3SZWQT4n9NqXGj8DMBBrtVhreCbJVQp+DfbrA8SQSg==
+X-Received: by 2002:a62:7708:0:b029:1ee:f656:51d5 with SMTP id s8-20020a6277080000b02901eef65651d5mr12750775pfc.59.1617375562873;
+        Fri, 02 Apr 2021 07:59:22 -0700 (PDT)
+Received: from google.com (240.111.247.35.bc.googleusercontent.com. [35.247.111.240])
+        by smtp.gmail.com with ESMTPSA id b186sm8540014pfb.170.2021.04.02.07.59.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 02 Apr 2021 07:59:22 -0700 (PDT)
+Date:   Fri, 2 Apr 2021 14:59:18 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Marc Zyngier <maz@kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        linux-mips@vger.kernel.org, kvm@vger.kernel.org,
+        kvm-ppc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Ben Gardon <bgardon@google.com>
+Subject: Re: [PATCH v2 09/10] KVM: Don't take mmu_lock for range invalidation
+ unless necessary
+Message-ID: <YGcxRmzbEr3kPsWE@google.com>
+References: <20210402005658.3024832-1-seanjc@google.com>
+ <20210402005658.3024832-10-seanjc@google.com>
+ <417bd6b5-b7d0-ed22-adae-02150cdbfebe@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20210316014027.3116119-1-natet@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <417bd6b5-b7d0-ed22-adae-02150cdbfebe@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 16/03/21 02:40, Nathan Tempelman wrote:
-> Add a capability for userspace to mirror SEV encryption context from
-> one vm to another. On our side, this is intended to support a
-> Migration Helper vCPU, but it can also be used generically to support
-> other in-guest workloads scheduled by the host. The intention is for
-> the primary guest and the mirror to have nearly identical memslots.
+On Fri, Apr 02, 2021, Paolo Bonzini wrote:
+> On 02/04/21 02:56, Sean Christopherson wrote:
+> > Avoid taking mmu_lock for unrelated .invalidate_range_{start,end}()
+> > notifications.  Because mmu_notifier_count must be modified while holding
+> > mmu_lock for write, and must always be paired across start->end to stay
+> > balanced, lock elision must happen in both or none.  To meet that
+> > requirement, add a rwsem to prevent memslot updates across range_start()
+> > and range_end().
+> > 
+> > Use a rwsem instead of a rwlock since most notifiers _allow_ blocking,
+> > and the lock will be endl across the entire start() ... end() sequence.
+> > If anything in the sequence sleeps, including the caller or a different
+> > notifier, holding the spinlock would be disastrous.
+> > 
+> > For notifiers that _disallow_ blocking, e.g. OOM reaping, simply go down
+> > the slow path of unconditionally acquiring mmu_lock.  The sane
+> > alternative would be to try to acquire the lock and force the notifier
+> > to retry on failure.  But since OOM is currently the _only_ scenario
+> > where blocking is disallowed attempting to optimize a guest that has been
+> > marked for death is pointless.
+> > 
+> > Unconditionally define and use mmu_notifier_slots_lock in the memslots
+> > code, purely to avoid more #ifdefs.  The overhead of acquiring the lock
+> > is negligible when the lock is uncontested, which will always be the case
+> > when the MMU notifiers are not used.
+> > 
+> > Note, technically flag-only memslot updates could be allowed in parallel,
+> > but stalling a memslot update for a relatively short amount of time is
+> > not a scalability issue, and this is all more than complex enough.
 > 
-> The primary benefits of this are that:
-> 1) The VMs do not share KVM contexts (think APIC/MSRs/etc), so they
-> can't accidentally clobber each other.
-> 2) The VMs can have different memory-views, which is necessary for post-copy
-> migration (the migration vCPUs on the target need to read and write to
-> pages, when the primary guest would VMEXIT).
-> 
-> This does not change the threat model for AMD SEV. Any memory involved
-> is still owned by the primary guest and its initial state is still
-> attested to through the normal SEV_LAUNCH_* flows. If userspace wanted
-> to circumvent SEV, they could achieve the same effect by simply attaching
-> a vCPU to the primary VM.
-> This patch deliberately leaves userspace in charge of the memslots for the
-> mirror, as it already has the power to mess with them in the primary guest.
-> 
-> This patch does not support SEV-ES (much less SNP), as it does not
-> handle handing off attested VMSAs to the mirror.
-> 
-> For additional context, we need a Migration Helper because SEV PSP migration
-> is far too slow for our live migration on its own. Using an in-guest
-> migrator lets us speed this up significantly.
-> 
-> Signed-off-by: Nathan Tempelman <natet@google.com>
-> ---
->   Documentation/virt/kvm/api.rst  | 17 +++++++
->   arch/x86/include/asm/kvm_host.h |  1 +
->   arch/x86/kvm/svm/sev.c          | 88 +++++++++++++++++++++++++++++++++
->   arch/x86/kvm/svm/svm.c          |  2 +
->   arch/x86/kvm/svm/svm.h          |  2 +
->   arch/x86/kvm/x86.c              |  7 ++-
->   include/linux/kvm_host.h        |  1 +
->   include/uapi/linux/kvm.h        |  1 +
->   virt/kvm/kvm_main.c             |  6 +++
->   9 files changed, 124 insertions(+), 1 deletion(-)
-> 
-> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-> index 482508ec7cc4..332ba8b5b6f4 100644
-> --- a/Documentation/virt/kvm/api.rst
-> +++ b/Documentation/virt/kvm/api.rst
-> @@ -6213,6 +6213,23 @@ the bus lock vm exit can be preempted by a higher priority VM exit, the exit
->   notifications to userspace can be KVM_EXIT_BUS_LOCK or other reasons.
->   KVM_RUN_BUS_LOCK flag is used to distinguish between them.
->   
-> +7.23 KVM_CAP_VM_COPY_ENC_CONTEXT_FROM
-> +-------------------------------------
-> +
-> +Architectures: x86 SEV enabled
-> +Type: vm
-> +Parameters: args[0] is the fd of the source vm
-> +Returns: 0 on success; ENOTTY on error
-> +
-> +This capability enables userspace to copy encryption context from the vm
-> +indicated by the fd to the vm this is called on.
-> +
-> +This is intended to support in-guest workloads scheduled by the host. This
-> +allows the in-guest workload to maintain its own NPTs and keeps the two vms
-> +from accidentally clobbering each other with interrupts and the like (separate
-> +APIC/MSRs/etc).
-> +
-> +
->   8. Other capabilities.
->   ======================
->   
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index 84499aad01a4..46df415a8e91 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -1334,6 +1334,7 @@ struct kvm_x86_ops {
->   	int (*mem_enc_op)(struct kvm *kvm, void __user *argp);
->   	int (*mem_enc_reg_region)(struct kvm *kvm, struct kvm_enc_region *argp);
->   	int (*mem_enc_unreg_region)(struct kvm *kvm, struct kvm_enc_region *argp);
-> +	int (*vm_copy_enc_context_from)(struct kvm *kvm, unsigned int source_fd);
->   
->   	int (*get_msr_feature)(struct kvm_msr_entry *entry);
->   
-> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-> index 874ea309279f..b2c90c67a0d9 100644
-> --- a/arch/x86/kvm/svm/sev.c
-> +++ b/arch/x86/kvm/svm/sev.c
-> @@ -66,6 +66,11 @@ static int sev_flush_asids(void)
->   	return ret;
->   }
->   
-> +static inline bool is_mirroring_enc_context(struct kvm *kvm)
-> +{
-> +	return to_kvm_svm(kvm)->sev_info.enc_context_owner;
-> +}
-> +
->   /* Must be called with the sev_bitmap_lock held */
->   static bool __sev_recycle_asids(int min_asid, int max_asid)
->   {
-> @@ -1124,6 +1129,10 @@ int svm_mem_enc_op(struct kvm *kvm, void __user *argp)
->   	if (copy_from_user(&sev_cmd, argp, sizeof(struct kvm_sev_cmd)))
->   		return -EFAULT;
->   
-> +	/* enc_context_owner handles all memory enc operations */
-> +	if (is_mirroring_enc_context(kvm))
-> +		return -ENOTTY;
-> +
->   	mutex_lock(&kvm->lock);
->   
->   	switch (sev_cmd.id) {
-> @@ -1186,6 +1195,10 @@ int svm_register_enc_region(struct kvm *kvm,
->   	if (!sev_guest(kvm))
->   		return -ENOTTY;
->   
-> +	/* If kvm is mirroring encryption context it isn't responsible for it */
-> +	if (is_mirroring_enc_context(kvm))
-> +		return -ENOTTY;
-> +
->   	if (range->addr > ULONG_MAX || range->size > ULONG_MAX)
->   		return -EINVAL;
->   
-> @@ -1252,6 +1265,10 @@ int svm_unregister_enc_region(struct kvm *kvm,
->   	struct enc_region *region;
->   	int ret;
->   
-> +	/* If kvm is mirroring encryption context it isn't responsible for it */
-> +	if (is_mirroring_enc_context(kvm))
-> +		return -ENOTTY;
-> +
->   	mutex_lock(&kvm->lock);
->   
->   	if (!sev_guest(kvm)) {
-> @@ -1282,6 +1299,71 @@ int svm_unregister_enc_region(struct kvm *kvm,
->   	return ret;
->   }
->   
-> +int svm_vm_copy_asid_from(struct kvm *kvm, unsigned int source_fd)
-> +{
-> +	struct file *source_kvm_file;
-> +	struct kvm *source_kvm;
-> +	struct kvm_sev_info *mirror_sev;
-> +	unsigned int asid;
-> +	int ret;
-> +
-> +	source_kvm_file = fget(source_fd);
-> +	if (!file_is_kvm(source_kvm_file)) {
-> +		ret = -EBADF;
-> +		goto e_source_put;
-> +	}
-> +
-> +	source_kvm = source_kvm_file->private_data;
-> +	mutex_lock(&source_kvm->lock);
-> +
-> +	if (!sev_guest(source_kvm)) {
-> +		ret = -ENOTTY;
-> +		goto e_source_unlock;
-> +	}
-> +
-> +	/* Mirrors of mirrors should work, but let's not get silly */
-> +	if (is_mirroring_enc_context(source_kvm) || source_kvm == kvm) {
-> +		ret = -ENOTTY;
-> +		goto e_source_unlock;
-> +	}
-> +
-> +	asid = to_kvm_svm(source_kvm)->sev_info.asid;
-> +
-> +	/*
-> +	 * The mirror kvm holds an enc_context_owner ref so its asid can't
-> +	 * disappear until we're done with it
-> +	 */
-> +	kvm_get_kvm(source_kvm);
-> +
-> +	fput(source_kvm_file);
-> +	mutex_unlock(&source_kvm->lock);
-> +	mutex_lock(&kvm->lock);
-> +
-> +	if (sev_guest(kvm)) {
-> +		ret = -ENOTTY;
-> +		goto e_mirror_unlock;
-> +	}
-> +
-> +	/* Set enc_context_owner and copy its encryption context over */
-> +	mirror_sev = &to_kvm_svm(kvm)->sev_info;
-> +	mirror_sev->enc_context_owner = source_kvm;
-> +	mirror_sev->asid = asid;
-> +	mirror_sev->active = true;
-> +
-> +	mutex_unlock(&kvm->lock);
-> +	return 0;
-> +
-> +e_mirror_unlock:
-> +	mutex_unlock(&kvm->lock);
-> +	kvm_put_kvm(source_kvm);
-> +	return ret;
-> +e_source_unlock:
-> +	mutex_unlock(&source_kvm->lock);
-> +e_source_put:
-> +	fput(source_kvm_file);
-> +	return ret;
-> +}
-> +
->   void sev_vm_destroy(struct kvm *kvm)
->   {
->   	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
-> @@ -1293,6 +1375,12 @@ void sev_vm_destroy(struct kvm *kvm)
->   
->   	mutex_lock(&kvm->lock);
->   
-> +	/* If this is a mirror_kvm release the enc_context_owner and skip sev cleanup */
-> +	if (is_mirroring_enc_context(kvm)) {
-> +		kvm_put_kvm(sev->enc_context_owner);
-> +		return;
-> +	}
-> +
->   	/*
->   	 * Ensure that all guest tagged cache entries are flushed before
->   	 * releasing the pages back to the system for use. CLFLUSH will
-> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> index 42d4710074a6..9ffb2bcf5389 100644
-> --- a/arch/x86/kvm/svm/svm.c
-> +++ b/arch/x86/kvm/svm/svm.c
-> @@ -4608,6 +4608,8 @@ static struct kvm_x86_ops svm_x86_ops __initdata = {
->   	.mem_enc_reg_region = svm_register_enc_region,
->   	.mem_enc_unreg_region = svm_unregister_enc_region,
->   
-> +	.vm_copy_enc_context_from = svm_vm_copy_asid_from,
-> +
->   	.can_emulate_instruction = svm_can_emulate_instruction,
->   
->   	.apic_init_signal_blocked = svm_apic_init_signal_blocked,
-> diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-> index 39e071fdab0c..779009839f6a 100644
-> --- a/arch/x86/kvm/svm/svm.h
-> +++ b/arch/x86/kvm/svm/svm.h
-> @@ -65,6 +65,7 @@ struct kvm_sev_info {
->   	unsigned long pages_locked; /* Number of pages locked */
->   	struct list_head regions_list;  /* List of registered regions */
->   	u64 ap_jump_table;	/* SEV-ES AP Jump Table address */
-> +	struct kvm *enc_context_owner; /* Owner of copied encryption context */
->   };
->   
->   struct kvm_svm {
-> @@ -561,6 +562,7 @@ int svm_register_enc_region(struct kvm *kvm,
->   			    struct kvm_enc_region *range);
->   int svm_unregister_enc_region(struct kvm *kvm,
->   			      struct kvm_enc_region *range);
-> +int svm_vm_copy_asid_from(struct kvm *kvm, unsigned int source_fd);
->   void pre_sev_run(struct vcpu_svm *svm, int cpu);
->   void __init sev_hardware_setup(void);
->   void sev_hardware_teardown(void);
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 3fa140383f5d..343cb05c2a24 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -3753,6 +3753,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
->   	case KVM_CAP_X86_USER_SPACE_MSR:
->   	case KVM_CAP_X86_MSR_FILTER:
->   	case KVM_CAP_ENFORCE_PV_FEATURE_CPUID:
-> +	case KVM_CAP_VM_COPY_ENC_CONTEXT_FROM:
->   		r = 1;
->   		break;
->   	case KVM_CAP_XEN_HVM:
-> @@ -4649,7 +4650,6 @@ static int kvm_vcpu_ioctl_enable_cap(struct kvm_vcpu *vcpu,
->   			kvm_update_pv_runtime(vcpu);
->   
->   		return 0;
-> -
->   	default:
->   		return -EINVAL;
->   	}
-> @@ -5321,6 +5321,11 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
->   			kvm->arch.bus_lock_detection_enabled = true;
->   		r = 0;
->   		break;
-> +	case KVM_CAP_VM_COPY_ENC_CONTEXT_FROM:
-> +		r = -ENOTTY;
-> +		if (kvm_x86_ops.vm_copy_enc_context_from)
-> +			r = kvm_x86_ops.vm_copy_enc_context_from(kvm, cap->args[0]);
-> +		return r;
->   	default:
->   		r = -EINVAL;
->   		break;
-> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> index e126ebda36d0..dc5a81115df7 100644
-> --- a/include/linux/kvm_host.h
-> +++ b/include/linux/kvm_host.h
-> @@ -637,6 +637,7 @@ void kvm_exit(void);
->   
->   void kvm_get_kvm(struct kvm *kvm);
->   void kvm_put_kvm(struct kvm *kvm);
-> +bool file_is_kvm(struct file *file);
->   void kvm_put_kvm_no_destroy(struct kvm *kvm);
->   
->   static inline struct kvm_memslots *__kvm_memslots(struct kvm *kvm, int as_id)
-> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> index 63f8f6e95648..9dc00f9baf54 100644
-> --- a/include/uapi/linux/kvm.h
-> +++ b/include/uapi/linux/kvm.h
-> @@ -1077,6 +1077,7 @@ struct kvm_ppc_resize_hpt {
->   #define KVM_CAP_SYS_HYPERV_CPUID 191
->   #define KVM_CAP_DIRTY_LOG_RING 192
->   #define KVM_CAP_X86_BUS_LOCK_EXIT 193
-> +#define KVM_CAP_VM_COPY_ENC_CONTEXT_FROM 194
->   
->   #ifdef KVM_CAP_IRQ_ROUTING
->   
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index 001b9de4e727..5baf82b01e0c 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -4041,6 +4041,12 @@ static struct file_operations kvm_vm_fops = {
->   	KVM_COMPAT(kvm_vm_compat_ioctl),
->   };
->   
-> +bool file_is_kvm(struct file *file)
-> +{
-> +	return file && file->f_op == &kvm_vm_fops;
-> +}
-> +EXPORT_SYMBOL_GPL(file_is_kvm);
-> +
->   static int kvm_dev_ioctl_create_vm(unsigned long type)
->   {
->   	int r;
-> 
+> Proposal for the locking documentation:
 
-Queued, thanks.
+Argh, sorry!  Looks great, I owe you.
 
-Paolo
-
+> diff --git a/Documentation/virt/kvm/locking.rst b/Documentation/virt/kvm/locking.rst
+> index b21a34c34a21..3e4ad7de36cb 100644
+> --- a/Documentation/virt/kvm/locking.rst
+> +++ b/Documentation/virt/kvm/locking.rst
+> @@ -16,6 +16,13 @@ The acquisition orders for mutexes are as follows:
+>  - kvm->slots_lock is taken outside kvm->irq_lock, though acquiring
+>    them together is quite rare.
+> +- The kvm->mmu_notifier_slots_lock rwsem ensures that pairs of
+> +  invalidate_range_start() and invalidate_range_end() callbacks
+> +  use the same memslots array.  kvm->slots_lock is taken outside the
+> +  write-side critical section of kvm->mmu_notifier_slots_lock, so
+> +  MMU notifiers must not take kvm->slots_lock.  No other write-side
+> +  critical sections should be added.
+> +
+>  On x86, vcpu->mutex is taken outside kvm->arch.hyperv.hv_lock.
+>  Everything else is a leaf: no other lock is taken inside the critical
+> 
+> Paolo
+> 
