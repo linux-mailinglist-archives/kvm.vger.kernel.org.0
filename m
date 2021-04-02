@@ -2,78 +2,49 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A67C635271C
-	for <lists+kvm@lfdr.de>; Fri,  2 Apr 2021 09:53:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3112C352798
+	for <lists+kvm@lfdr.de>; Fri,  2 Apr 2021 10:53:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234327AbhDBHxO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 2 Apr 2021 03:53:14 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:32141 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234139AbhDBHxO (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 2 Apr 2021 03:53:14 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1617349993;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=gtlzy39YQrbCMuQYvhfLP48+qlrC818fAyrVAMieLYQ=;
-        b=dokWvtfbSYBQmfriUYD77Mh7bEaILYmDkJjLmGgleS69rApYOnR0lOtSMBDFCaLHps8gzw
-        r0Bz4usyyEdV434Bn8x8sL1vU3STTMycL7mPcmP18XDE9h2hNCxvWy6OGWxdVL5aE+60sR
-        FeGPv3PorpM/6hnSqCzEPw8wteXkJM4=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-253-reVNhPArOs-tB7e2B63mjg-1; Fri, 02 Apr 2021 03:53:11 -0400
-X-MC-Unique: reVNhPArOs-tB7e2B63mjg-1
-Received: by mail-wr1-f72.google.com with SMTP id y5so4017197wrp.2
-        for <kvm@vger.kernel.org>; Fri, 02 Apr 2021 00:53:11 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:cc:references:from:subject:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=gtlzy39YQrbCMuQYvhfLP48+qlrC818fAyrVAMieLYQ=;
-        b=FbjwL1+qNeqCsprT6uR5BiPAmOfJKk+Vph1fvY8jQWv2VVd/AnaLIE9h9aqbN0NboE
-         xfRUk24FXPJQpWlsQKUMyxFBwBEvQJRfqxx/EXsQBu5lw9hoUO1Arr36f7ZbxfQ/iAy9
-         3f/qZlu8BalRg1qcZ9z3lJW2pEVHx56M54oZKIdOHaTPFh66iAaBCezKSU4MDdi6fil/
-         LEl2X7IKmxF3rDv2dpA8XRhO6TKklvkJ4bU3QfxL6yHAUhEDHpa/jYzR2K4tFi2/rhn2
-         Dnmr2n5XUDpWPurgW9ICmX0Y0DKvUHv3Sh/NVODlOrEGRkCQRKLhlY3hSZtEDsx6Xr5M
-         zddA==
-X-Gm-Message-State: AOAM532z+GSj2bXU6/c89I1wHaZkKCIxDrQixW3+DL51EbmOKXvyaR3w
-        aG6hyv4Z6Yc+Kmmez101PeoEals5jjGfaqgGUEJBRzdNLsVKejZQXlZRPMLHRRmZjLSFSqoBYwA
-        pHTf9VVAP202A
-X-Received: by 2002:a5d:4905:: with SMTP id x5mr13819207wrq.201.1617349990154;
-        Fri, 02 Apr 2021 00:53:10 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxKsVTbe00EAM6Tl2WO4eTIgLUD1AUXdrIgvm8mmZyB3vvOZpWnzr9nDa6kSpWjOBIimoZwuw==
-X-Received: by 2002:a5d:4905:: with SMTP id x5mr13819188wrq.201.1617349990009;
-        Fri, 02 Apr 2021 00:53:10 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:63a7:c72e:ea0e:6045? ([2001:b07:6468:f312:63a7:c72e:ea0e:6045])
-        by smtp.gmail.com with ESMTPSA id v3sm11584184wmj.25.2021.04.02.00.53.08
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 02 Apr 2021 00:53:09 -0700 (PDT)
-To:     Ben Gardon <bgardon@google.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Cc:     Peter Xu <peterx@redhat.com>,
+        id S234161AbhDBIxz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 2 Apr 2021 04:53:55 -0400
+Received: from mga01.intel.com ([192.55.52.88]:25624 "EHLO mga01.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229599AbhDBIxz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 2 Apr 2021 04:53:55 -0400
+IronPort-SDR: jXuPEzP7zfuYveaBQpbs3Ao1UGt5ojiZdJKr1Dg/hpCQQ5LiB3J7xLUU3YJBsvyyK+nHuwTqFa
+ 3nFM413yNEXg==
+X-IronPort-AV: E=McAfee;i="6000,8403,9941"; a="212700297"
+X-IronPort-AV: E=Sophos;i="5.81,299,1610438400"; 
+   d="scan'208";a="212700297"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Apr 2021 01:53:54 -0700
+IronPort-SDR: I2hhndY8aDp862URqE4nqmbdWusRQrd5TJ/1EyBo9aXLWAXK/91XfFNcLUK9pD8+3heZuTBliB
+ 7GdIwv8hAfCQ==
+X-IronPort-AV: E=Sophos;i="5.81,299,1610438400"; 
+   d="scan'208";a="419579090"
+Received: from unknown (HELO [10.239.13.106]) ([10.239.13.106])
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Apr 2021 01:53:50 -0700
+Subject: Re: [PATCH v2 1/3] KVM: X86: Rename DR6_INIT to DR6_ACTIVE_LOW
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Chenyi Qiang <chenyi.qiang@intel.com>,
         Sean Christopherson <seanjc@google.com>,
-        Peter Shier <pshier@google.com>,
-        Peter Feiner <pfeiner@google.com>,
-        Junaid Shahid <junaids@google.com>,
-        Jim Mattson <jmattson@google.com>,
-        Yulei Zhang <yulei.kernel@gmail.com>,
-        Wanpeng Li <kernellwp@gmail.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Xiao Guangrong <xiaoguangrong.eric@gmail.com>
-References: <20210401233736.638171-1-bgardon@google.com>
- <20210401233736.638171-10-bgardon@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH v2 09/13] KVM: x86/mmu: Allow zap gfn range to operate
- under the mmu read lock
-Message-ID: <4fc5960f-0b64-1cf5-d2c1-080d82d226a0@redhat.com>
-Date:   Fri, 2 Apr 2021 09:53:08 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.7.0
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20210202090433.13441-1-chenyi.qiang@intel.com>
+ <20210202090433.13441-2-chenyi.qiang@intel.com>
+ <3db069ba-b4e0-1288-ec79-66ac44938682@redhat.com>
+ <6678520f-e69e-6116-88c9-e9d6cd450934@intel.com>
+ <ea9eaa84-999b-82cb-ef40-66fde361704d@redhat.com>
+From:   Xiaoyao Li <xiaoyao.li@intel.com>
+Message-ID: <dc22f0a2-97c5-d54d-a521-c02f802c2229@intel.com>
+Date:   Fri, 2 Apr 2021 16:53:48 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.9.0
 MIME-Version: 1.0
-In-Reply-To: <20210401233736.638171-10-bgardon@google.com>
+In-Reply-To: <ea9eaa84-999b-82cb-ef40-66fde361704d@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
@@ -81,35 +52,46 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 02/04/21 01:37, Ben Gardon wrote:
-> +void kvm_tdp_mmu_put_root(struct kvm *kvm, struct kvm_mmu_page *root,
-> +			  bool shared)
->   {
->   	gfn_t max_gfn = 1ULL << (shadow_phys_bits - PAGE_SHIFT);
->   
-> -	lockdep_assert_held_write(&kvm->mmu_lock);
-> +	kvm_lockdep_assert_mmu_lock_held(kvm, shared);
->   
->   	if (!refcount_dec_and_test(&root->tdp_mmu_root_count))
->   		return;
-> @@ -81,7 +92,7 @@ void kvm_tdp_mmu_put_root(struct kvm *kvm, struct kvm_mmu_page *root)
->   	list_del_rcu(&root->link);
->   	spin_unlock(&kvm->arch.tdp_mmu_pages_lock);
->   
-> -	zap_gfn_range(kvm, root, 0, max_gfn, false, false);
-> +	zap_gfn_range(kvm, root, 0, max_gfn, false, false, shared);
->   
->   	call_rcu(&root->rcu_head, tdp_mmu_free_sp_rcu_callback);
+On 2/3/2021 12:05 AM, Paolo Bonzini wrote:
+> On 02/02/21 16:02, Xiaoyao Li wrote:
+>> On 2/2/2021 10:49 PM, Paolo Bonzini wrote:
+>>> On 02/02/21 10:04, Chenyi Qiang wrote:
+>>>>
+>>>>  #define DR6_FIXED_1    0xfffe0ff0
+>>>> -#define DR6_INIT    0xffff0ff0
+>>>> +/*
+>>>> + * DR6_ACTIVE_LOW is actual the result of DR6_FIXED_1 | 
+>>>> ACTIVE_LOW_BITS.
+>>>> + * We can regard all the current FIXED_1 bits as active_low bits even
+>>>> + * though in no case they will be turned into 0. But if they are 
+>>>> defined
+>>>> + * in the future, it will require no code change.
+>>>> + * At the same time, it can be served as the init/reset value for DR6.
+>>>> + */
+>>>> +#define DR6_ACTIVE_LOW    0xffff0ff0
+>>>>  #define DR6_VOLATILE    0x0001e00f
+>>>>
+>>>
+>>> Committed with some changes in the wording of the comment.
+>>>
+>>> Also, DR6_FIXED_1 is (DR6_ACTIVE_LOW & ~DR6_VOLATILE).
+>>
+>> Maybe we can add BUILD_BUG_ON() to make sure the correctness?
+> 
+> We can even
+> 
+> #define DR_FIXED_1  (DR6_ACTIVE_LOW & ~DR6_VOLATILE)
+> 
+> directly.  I have pushed this patch to kvm/queue, but the other two will 
+> have to wait for Fenghua's bare metal support.
+> 
 
-Instead of patch 13, would it make sense to delay the zap_gfn_range and 
-call_rcu to a work item (either unconditionally, or only if 
-shared==false)?  Then the zap_gfn_range would be able to yield and take 
-the mmu_lock for read, similar to kvm_tdp_mmu_zap_invalidated_roots.
+Hi Paolo,
 
-If done unconditionally, this would also allow removing the "shared" 
-argument to kvm_tdp_mmu_put_root, tdp_mmu_next_root and 
-for_each_tdp_mmu_root_yield_safe, so I would place that change before 
-this patch.
+Fenghua's bare metal support is in tip tree now.
+https://lore.kernel.org/lkml/20210322135325.682257-1-fenghua.yu@intel.com/
 
-Paolo
+Will the rest KVM patches get into 5.13 together?
+
+
 
