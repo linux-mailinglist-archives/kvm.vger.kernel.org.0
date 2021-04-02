@@ -2,56 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A8542353195
+	by mail.lfdr.de (Postfix) with ESMTP id F3E7F353196
 	for <lists+kvm@lfdr.de>; Sat,  3 Apr 2021 01:38:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236401AbhDBXhl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 2 Apr 2021 19:37:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51828 "EHLO
+        id S236431AbhDBXhn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 2 Apr 2021 19:37:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51840 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236077AbhDBXh2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 2 Apr 2021 19:37:28 -0400
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3AA51C0617AB
-        for <kvm@vger.kernel.org>; Fri,  2 Apr 2021 16:37:24 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id v186so10777509ybe.5
-        for <kvm@vger.kernel.org>; Fri, 02 Apr 2021 16:37:24 -0700 (PDT)
+        with ESMTP id S236187AbhDBXh3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 2 Apr 2021 19:37:29 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7034FC06178C
+        for <kvm@vger.kernel.org>; Fri,  2 Apr 2021 16:37:26 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id u128so10749278ybf.12
+        for <kvm@vger.kernel.org>; Fri, 02 Apr 2021 16:37:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=reply-to:date:in-reply-to:message-id:mime-version:references
          :subject:from:to:cc;
-        bh=JMPyfRrNTJEnxRsRF0NXGibkdIDx6g72IvDD8DBLBAc=;
-        b=BsssdWa8zKBgRLN2ZFQnJjPi+nli3qXmA85WjJtirgXqGhT6hleG5Hlh3Oo96+AEW5
-         kiOxRhErqG1FnGD8zZUoR4DZa4wk9+VGHSfx75GDTgBn19sTraD51NEJBVaa4kUiBYCE
-         KgqTDnz5F+UEwEhzlD+YjPwaXYEXQ+Y8A8KEJYFHh5bCBPg4k5pibqokGtCONm8TXBiI
-         BSff4ovCqEVMJYRDR8RSNBRBCG3pIM6+we6FEczBHxRBLOcXAIEB5B0MLyE3dsge/lzu
-         vWBk+8byT/f9a/3TWpxBqw+HQiwWFE8+Tkv+vxcBRzH9sj5FuL4O26bVn6z87lImSWDY
-         tT2g==
+        bh=E+tEX+0Keq6mEUZny7PGNfi9VWWcG1wSqQSbazqbJNw=;
+        b=XhDl5E9d4AuZkPVdZa8kpbt0JbwfynDrxPHFOZw+H+hJJGe8u47wS5Me4Jj7Lc7HG9
+         3FlO/YlunDfKZ6beBeXLPG1B30xDhl+goNIR1ehjOePERfMQbUXbfYMT14ql9AIIfT4c
+         K9OsEGaF0OMpzUdWGASoqYXNiuuDid+J2iGq8P8awYgwawHrXNvw75F05dmWC5ovp2Fy
+         jyM+wdNCe6s+TbQOi4EuQA9Yb4tSIJNj/oMAfz99F63Tc4Wq8WZHjul1KPrT5UGLuRvv
+         /EMDrdfXJULdprK8ipu0uT+2x1Xd6z1njskCgz1SAYWJWuYesMfqig0bL6nuK/x1tgyO
+         4bXA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:reply-to:date:in-reply-to:message-id
          :mime-version:references:subject:from:to:cc;
-        bh=JMPyfRrNTJEnxRsRF0NXGibkdIDx6g72IvDD8DBLBAc=;
-        b=aErJw8W5sOOCrP4XOFEftj9fGDIvNO9haIXwLH1soZpNk6cdBD3WnkMafx+th5r4cn
-         WVgqsKV/RQbiOhtCsZ9EJvOZhhbJzYUGBXjmVaob4IzaOkqi60T3nmwQYEjojQEXulZR
-         3keDhGfP8XC0Z9dqD2GYHhC9Xt6x3/fnuX20US+MHntf05X8xAm7D8MEpZ2xxTYOg0FO
-         gF33JFqfByct63tYSRzmAFkzdVJl8/aTu/OrgRSRGO9d5kQzNXvOMQu7M92CK8LL9pdQ
-         PuMFG0nZGqtifzP+yq6Y6vVgYXgB0fVDbU/tpdqF11F2DKdxHWdTn2094YaBZFbzcGf6
-         geJw==
-X-Gm-Message-State: AOAM532SFQJNbElVM8J7a4okMj96wWF+20X4X2237qvPGSvMcnes925n
-        KzSIpOUUDUBlwK8mNxorO6c0oBhjzFg=
-X-Google-Smtp-Source: ABdhPJzB76SN2pruVxE6ceq8jWS4gfeTFoN+pMwWWvM2TvEx1kPzsXm9gtZbZKYwTDuUyXxj27z4Y1x0yyU=
+        bh=E+tEX+0Keq6mEUZny7PGNfi9VWWcG1wSqQSbazqbJNw=;
+        b=Jmnqyid9tC7IxsXcIykQ2JsABmmGIz/FgsLtRPyFRSJjCXh07+rpWWm7ps6eS20gp8
+         BNJxl77JP4G0H1n6fl1LNA8OLmmQcWG2murdlG8Wm9G8NrkEWLoHqT3jsSyV9rn7xB+S
+         WuMXub/fnzuvDuhhT7DhRQoZLEeFdJmv5Hr7fIFXFmmCyNkdyn2H9wn3MVJewoYiSc4w
+         L1h3JeJs3kloMhlEci0M+TLNWOw7xZar5qca8RCk0SLXqi5XBcvnMkzwdfvZIf6S5qdu
+         H47rb7KbB5IkYubBhkx97fgshhWnsB6vWohq44V4Nlj2AyGtG0crDVn7FC34A/N2rfdq
+         NgBA==
+X-Gm-Message-State: AOAM532QAHrxLQTHt9Wjlg8CZT1nhel7Ls/MtotzMf+4X0HrYq9QKDTB
+        fGEoBvEm49frMV3LjYIZcQt14kR6QbM=
+X-Google-Smtp-Source: ABdhPJyFEqIZ2GVlP9t6PqAT+qYa8JXjo9EO4P37LjMO4Vpg4PasbyIY/F6hhaBUya9xAjlw3xn0dPPoJCI=
 X-Received: from seanjc798194.pdx.corp.google.com ([2620:15c:f:10:24a7:3342:da61:f6aa])
- (user=seanjc job=sendgmr) by 2002:a25:cf81:: with SMTP id f123mr21040804ybg.379.1617406643355;
- Fri, 02 Apr 2021 16:37:23 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a25:9387:: with SMTP id a7mr11840659ybm.221.1617406645675;
+ Fri, 02 Apr 2021 16:37:25 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Fri,  2 Apr 2021 16:37:01 -0700
+Date:   Fri,  2 Apr 2021 16:37:02 -0700
 In-Reply-To: <20210402233702.3291792-1-seanjc@google.com>
-Message-Id: <20210402233702.3291792-5-seanjc@google.com>
+Message-Id: <20210402233702.3291792-6-seanjc@google.com>
 Mime-Version: 1.0
 References: <20210402233702.3291792-1-seanjc@google.com>
 X-Mailer: git-send-email 2.31.0.208.g409f899ff0-goog
-Subject: [PATCH 4/5] crypto: ccp: Use the stack for small SEV command buffers
+Subject: [PATCH 5/5] KVM: SVM: Allocate SEV command structures on local stack
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>,
         Brijesh Singh <brijesh.singh@amd.com>,
@@ -69,84 +69,356 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-For commands with small input/output buffers, use the local stack to
-"allocate" the structures used to communicate with the PSP.   Now that
-__sev_do_cmd_locked() gracefully handles vmalloc'd buffers, there's no
-reason to avoid using the stack, e.g. CONFIG_VMAP_STACK=y will just work.
+Use the local stack to "allocate" the structures used to communicate with
+the PSP.  The largest struct used by KVM, sev_data_launch_secret, clocks
+in at 52 bytes, well within the realm of reasonable stack usage.  The
+smallest structs are a mere 4 bytes, i.e. the pointer for the allocation
+is larger than the allocation itself.
 
+Now that the PSP driver plays nice with vmalloc pointers, putting the
+data on a virtually mapped stack (CONFIG_VMAP_STACK=y) will not cause
+explosions.
+
+Cc: Brijesh Singh <brijesh.singh@amd.com>
+Cc: Tom Lendacky <thomas.lendacky@amd.com>
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- drivers/crypto/ccp/sev-dev.c | 122 ++++++++++++++---------------------
- 1 file changed, 47 insertions(+), 75 deletions(-)
+ arch/x86/kvm/svm/sev.c | 262 +++++++++++++++--------------------------
+ 1 file changed, 96 insertions(+), 166 deletions(-)
 
-diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
-index 6d5882290cfc..6a380d483fce 100644
---- a/drivers/crypto/ccp/sev-dev.c
-+++ b/drivers/crypto/ccp/sev-dev.c
-@@ -402,7 +402,7 @@ static int sev_ioctl_do_pek_csr(struct sev_issue_cmd *argp, bool writable)
+diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+index 5457138c7347..316fd39c7aef 100644
+--- a/arch/x86/kvm/svm/sev.c
++++ b/arch/x86/kvm/svm/sev.c
+@@ -150,35 +150,22 @@ static void sev_asid_free(int asid)
+ 
+ static void sev_unbind_asid(struct kvm *kvm, unsigned int handle)
  {
- 	struct sev_device *sev = psp_master->sev_data;
- 	struct sev_user_data_pek_csr input;
--	struct sev_data_pek_csr *data;
-+	struct sev_data_pek_csr data;
- 	void __user *input_address;
- 	void *blob = NULL;
- 	int ret;
-@@ -413,29 +413,24 @@ static int sev_ioctl_do_pek_csr(struct sev_issue_cmd *argp, bool writable)
- 	if (copy_from_user(&input, (void __user *)argp->data, sizeof(input)))
- 		return -EFAULT;
+-	struct sev_data_decommission *decommission;
+-	struct sev_data_deactivate *data;
++	struct sev_data_decommission decommission;
++	struct sev_data_deactivate deactivate;
+ 
+ 	if (!handle)
+ 		return;
  
 -	data = kzalloc(sizeof(*data), GFP_KERNEL);
 -	if (!data)
+-		return;
+-
+-	/* deactivate handle */
+-	data->handle = handle;
++	deactivate.handle = handle;
+ 
+ 	/* Guard DEACTIVATE against WBINVD/DF_FLUSH used in ASID recycling */
+ 	down_read(&sev_deactivate_lock);
+-	sev_guest_deactivate(data, NULL);
++	sev_guest_deactivate(&deactivate, NULL);
+ 	up_read(&sev_deactivate_lock);
+ 
+-	kfree(data);
+-
+-	decommission = kzalloc(sizeof(*decommission), GFP_KERNEL);
+-	if (!decommission)
+-		return;
+-
+ 	/* decommission handle */
+-	decommission->handle = handle;
+-	sev_guest_decommission(decommission, NULL);
+-
+-	kfree(decommission);
++	decommission.handle = handle;
++	sev_guest_decommission(&decommission, NULL);
+ }
+ 
+ static int sev_guest_init(struct kvm *kvm, struct kvm_sev_cmd *argp)
+@@ -216,19 +203,14 @@ static int sev_guest_init(struct kvm *kvm, struct kvm_sev_cmd *argp)
+ 
+ static int sev_bind_asid(struct kvm *kvm, unsigned int handle, int *error)
+ {
+-	struct sev_data_activate *data;
++	struct sev_data_activate activate;
+ 	int asid = sev_get_asid(kvm);
+ 	int ret;
+ 
+-	data = kzalloc(sizeof(*data), GFP_KERNEL_ACCOUNT);
+-	if (!data)
 -		return -ENOMEM;
 -
- 	/* userspace wants to query CSR length */
--	if (!input.address || !input.length)
-+	if (!input.address || !input.length) {
-+		data.address = 0;
-+		data.len = 0;
- 		goto cmd;
-+	}
+ 	/* activate ASID on the given handle */
+-	data->handle = handle;
+-	data->asid   = asid;
+-	ret = sev_guest_activate(data, error);
+-	kfree(data);
++	activate.handle = handle;
++	activate.asid   = asid;
++	ret = sev_guest_activate(&activate, error);
  
- 	/* allocate a physically contiguous buffer to store the CSR blob */
- 	input_address = (void __user *)input.address;
--	if (input.length > SEV_FW_BLOB_MAX_SIZE) {
--		ret = -EFAULT;
--		goto e_free;
--	}
-+	if (input.length > SEV_FW_BLOB_MAX_SIZE)
-+		return -EFAULT;
+ 	return ret;
+ }
+@@ -258,7 +240,7 @@ static int sev_issue_cmd(struct kvm *kvm, int id, void *data, int *error)
+ static int sev_launch_start(struct kvm *kvm, struct kvm_sev_cmd *argp)
+ {
+ 	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
+-	struct sev_data_launch_start *start;
++	struct sev_data_launch_start start;
+ 	struct kvm_sev_launch_start params;
+ 	void *dh_blob, *session_blob;
+ 	int *error = &argp->error;
+@@ -270,20 +252,16 @@ static int sev_launch_start(struct kvm *kvm, struct kvm_sev_cmd *argp)
+ 	if (copy_from_user(&params, (void __user *)(uintptr_t)argp->data, sizeof(params)))
+ 		return -EFAULT;
  
- 	blob = kmalloc(input.length, GFP_KERNEL);
--	if (!blob) {
--		ret = -ENOMEM;
--		goto e_free;
--	}
-+	if (!blob)
-+		return -ENOMEM;
+-	start = kzalloc(sizeof(*start), GFP_KERNEL_ACCOUNT);
+-	if (!start)
+-		return -ENOMEM;
++	memset(&start, 0, sizeof(start));
  
--	data->address = __psp_pa(blob);
--	data->len = input.length;
-+	data.address = __psp_pa(blob);
-+	data.len = input.length;
+ 	dh_blob = NULL;
+ 	if (params.dh_uaddr) {
+ 		dh_blob = psp_copy_user_blob(params.dh_uaddr, params.dh_len);
+-		if (IS_ERR(dh_blob)) {
+-			ret = PTR_ERR(dh_blob);
+-			goto e_free;
+-		}
++		if (IS_ERR(dh_blob))
++			return PTR_ERR(dh_blob);
  
- cmd:
- 	if (sev->state == SEV_STATE_UNINIT) {
-@@ -444,10 +439,10 @@ static int sev_ioctl_do_pek_csr(struct sev_issue_cmd *argp, bool writable)
- 			goto e_free_blob;
+-		start->dh_cert_address = __sme_set(__pa(dh_blob));
+-		start->dh_cert_len = params.dh_len;
++		start.dh_cert_address = __sme_set(__pa(dh_blob));
++		start.dh_cert_len = params.dh_len;
  	}
  
--	ret = __sev_do_cmd_locked(SEV_CMD_PEK_CSR, data, &argp->error);
-+	ret = __sev_do_cmd_locked(SEV_CMD_PEK_CSR, &data, &argp->error);
+ 	session_blob = NULL;
+@@ -294,40 +272,38 @@ static int sev_launch_start(struct kvm *kvm, struct kvm_sev_cmd *argp)
+ 			goto e_free_dh;
+ 		}
  
- 	 /* If we query the CSR length, FW responded with expected data. */
--	input.length = data->len;
-+	input.length = data.len;
+-		start->session_address = __sme_set(__pa(session_blob));
+-		start->session_len = params.session_len;
++		start.session_address = __sme_set(__pa(session_blob));
++		start.session_len = params.session_len;
+ 	}
  
- 	if (copy_to_user((void __user *)argp->data, &input, sizeof(input))) {
+-	start->handle = params.handle;
+-	start->policy = params.policy;
++	start.handle = params.handle;
++	start.policy = params.policy;
+ 
+ 	/* create memory encryption context */
+-	ret = __sev_issue_cmd(argp->sev_fd, SEV_CMD_LAUNCH_START, start, error);
++	ret = __sev_issue_cmd(argp->sev_fd, SEV_CMD_LAUNCH_START, &start, error);
+ 	if (ret)
+ 		goto e_free_session;
+ 
+ 	/* Bind ASID to this guest */
+-	ret = sev_bind_asid(kvm, start->handle, error);
++	ret = sev_bind_asid(kvm, start.handle, error);
+ 	if (ret)
+ 		goto e_free_session;
+ 
+ 	/* return handle to userspace */
+-	params.handle = start->handle;
++	params.handle = start.handle;
+ 	if (copy_to_user((void __user *)(uintptr_t)argp->data, &params, sizeof(params))) {
+-		sev_unbind_asid(kvm, start->handle);
++		sev_unbind_asid(kvm, start.handle);
  		ret = -EFAULT;
-@@ -461,8 +456,6 @@ static int sev_ioctl_do_pek_csr(struct sev_issue_cmd *argp, bool writable)
+ 		goto e_free_session;
+ 	}
  
+-	sev->handle = start->handle;
++	sev->handle = start.handle;
+ 	sev->fd = argp->sev_fd;
+ 
+ e_free_session:
+ 	kfree(session_blob);
+ e_free_dh:
+ 	kfree(dh_blob);
+-e_free:
+-	kfree(start);
+ 	return ret;
+ }
+ 
+@@ -446,7 +422,7 @@ static int sev_launch_update_data(struct kvm *kvm, struct kvm_sev_cmd *argp)
+ 	unsigned long vaddr, vaddr_end, next_vaddr, npages, pages, size, i;
+ 	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
+ 	struct kvm_sev_launch_update_data params;
+-	struct sev_data_launch_update_data *data;
++	struct sev_data_launch_update_data data;
+ 	struct page **inpages;
+ 	int ret;
+ 
+@@ -456,20 +432,14 @@ static int sev_launch_update_data(struct kvm *kvm, struct kvm_sev_cmd *argp)
+ 	if (copy_from_user(&params, (void __user *)(uintptr_t)argp->data, sizeof(params)))
+ 		return -EFAULT;
+ 
+-	data = kzalloc(sizeof(*data), GFP_KERNEL_ACCOUNT);
+-	if (!data)
+-		return -ENOMEM;
+-
+ 	vaddr = params.uaddr;
+ 	size = params.len;
+ 	vaddr_end = vaddr + size;
+ 
+ 	/* Lock the user memory. */
+ 	inpages = sev_pin_memory(kvm, vaddr, size, &npages, 1);
+-	if (IS_ERR(inpages)) {
+-		ret = PTR_ERR(inpages);
+-		goto e_free;
+-	}
++	if (IS_ERR(inpages))
++		return PTR_ERR(inpages);
+ 
+ 	/*
+ 	 * Flush (on non-coherent CPUs) before LAUNCH_UPDATE encrypts pages in
+@@ -477,6 +447,9 @@ static int sev_launch_update_data(struct kvm *kvm, struct kvm_sev_cmd *argp)
+ 	 */
+ 	sev_clflush_pages(inpages, npages);
+ 
++	data.reserved = 0;
++	data.handle = sev->handle;
++
+ 	for (i = 0; vaddr < vaddr_end; vaddr = next_vaddr, i += pages) {
+ 		int offset, len;
+ 
+@@ -491,10 +464,9 @@ static int sev_launch_update_data(struct kvm *kvm, struct kvm_sev_cmd *argp)
+ 
+ 		len = min_t(size_t, ((pages * PAGE_SIZE) - offset), size);
+ 
+-		data->handle = sev->handle;
+-		data->len = len;
+-		data->address = __sme_page_pa(inpages[i]) + offset;
+-		ret = sev_issue_cmd(kvm, SEV_CMD_LAUNCH_UPDATE_DATA, data, &argp->error);
++		data.len = len;
++		data.address = __sme_page_pa(inpages[i]) + offset;
++		ret = sev_issue_cmd(kvm, SEV_CMD_LAUNCH_UPDATE_DATA, &data, &argp->error);
+ 		if (ret)
+ 			goto e_unpin;
+ 
+@@ -510,8 +482,6 @@ static int sev_launch_update_data(struct kvm *kvm, struct kvm_sev_cmd *argp)
+ 	}
+ 	/* unlock the user pages */
+ 	sev_unpin_memory(kvm, inpages, npages);
+-e_free:
+-	kfree(data);
+ 	return ret;
+ }
+ 
+@@ -563,16 +533,14 @@ static int sev_es_sync_vmsa(struct vcpu_svm *svm)
+ static int sev_launch_update_vmsa(struct kvm *kvm, struct kvm_sev_cmd *argp)
+ {
+ 	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
+-	struct sev_data_launch_update_vmsa *vmsa;
++	struct sev_data_launch_update_vmsa vmsa;
+ 	struct kvm_vcpu *vcpu;
+ 	int i, ret;
+ 
+ 	if (!sev_es_guest(kvm))
+ 		return -ENOTTY;
+ 
+-	vmsa = kzalloc(sizeof(*vmsa), GFP_KERNEL);
+-	if (!vmsa)
+-		return -ENOMEM;
++	vmsa.reserved = 0;
+ 
+ 	kvm_for_each_vcpu(i, vcpu, kvm) {
+ 		struct vcpu_svm *svm = to_svm(vcpu);
+@@ -580,7 +548,7 @@ static int sev_launch_update_vmsa(struct kvm *kvm, struct kvm_sev_cmd *argp)
+ 		/* Perform some pre-encryption checks against the VMSA */
+ 		ret = sev_es_sync_vmsa(svm);
+ 		if (ret)
+-			goto e_free;
++			return ret;
+ 
+ 		/*
+ 		 * The LAUNCH_UPDATE_VMSA command will perform in-place
+@@ -590,27 +558,25 @@ static int sev_launch_update_vmsa(struct kvm *kvm, struct kvm_sev_cmd *argp)
+ 		 */
+ 		clflush_cache_range(svm->vmsa, PAGE_SIZE);
+ 
+-		vmsa->handle = sev->handle;
+-		vmsa->address = __sme_pa(svm->vmsa);
+-		vmsa->len = PAGE_SIZE;
+-		ret = sev_issue_cmd(kvm, SEV_CMD_LAUNCH_UPDATE_VMSA, vmsa,
++		vmsa.handle = sev->handle;
++		vmsa.address = __sme_pa(svm->vmsa);
++		vmsa.len = PAGE_SIZE;
++		ret = sev_issue_cmd(kvm, SEV_CMD_LAUNCH_UPDATE_VMSA, &vmsa,
+ 				    &argp->error);
+ 		if (ret)
+-			goto e_free;
++			return ret;
+ 
+ 		svm->vcpu.arch.guest_state_protected = true;
+ 	}
+ 
+-e_free:
+-	kfree(vmsa);
+-	return ret;
++	return 0;
+ }
+ 
+ static int sev_launch_measure(struct kvm *kvm, struct kvm_sev_cmd *argp)
+ {
+ 	void __user *measure = (void __user *)(uintptr_t)argp->data;
+ 	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
+-	struct sev_data_launch_measure *data;
++	struct sev_data_launch_measure data;
+ 	struct kvm_sev_launch_measure params;
+ 	void __user *p = NULL;
+ 	void *blob = NULL;
+@@ -622,9 +588,7 @@ static int sev_launch_measure(struct kvm *kvm, struct kvm_sev_cmd *argp)
+ 	if (copy_from_user(&params, measure, sizeof(params)))
+ 		return -EFAULT;
+ 
+-	data = kzalloc(sizeof(*data), GFP_KERNEL_ACCOUNT);
+-	if (!data)
+-		return -ENOMEM;
++	memset(&data, 0, sizeof(data));
+ 
+ 	/* User wants to query the blob length */
+ 	if (!params.len)
+@@ -632,23 +596,20 @@ static int sev_launch_measure(struct kvm *kvm, struct kvm_sev_cmd *argp)
+ 
+ 	p = (void __user *)(uintptr_t)params.uaddr;
+ 	if (p) {
+-		if (params.len > SEV_FW_BLOB_MAX_SIZE) {
+-			ret = -EINVAL;
+-			goto e_free;
+-		}
++		if (params.len > SEV_FW_BLOB_MAX_SIZE)
++			return -EINVAL;
+ 
+-		ret = -ENOMEM;
+ 		blob = kmalloc(params.len, GFP_KERNEL_ACCOUNT);
+ 		if (!blob)
+-			goto e_free;
++			return -ENOMEM;
+ 
+-		data->address = __psp_pa(blob);
+-		data->len = params.len;
++		data.address = __psp_pa(blob);
++		data.len = params.len;
+ 	}
+ 
+ cmd:
+-	data->handle = sev->handle;
+-	ret = sev_issue_cmd(kvm, SEV_CMD_LAUNCH_MEASURE, data, &argp->error);
++	data.handle = sev->handle;
++	ret = sev_issue_cmd(kvm, SEV_CMD_LAUNCH_MEASURE, &data, &argp->error);
+ 
+ 	/*
+ 	 * If we query the session length, FW responded with expected data.
+@@ -665,63 +626,50 @@ static int sev_launch_measure(struct kvm *kvm, struct kvm_sev_cmd *argp)
+ 	}
+ 
+ done:
+-	params.len = data->len;
++	params.len = data.len;
+ 	if (copy_to_user(measure, &params, sizeof(params)))
+ 		ret = -EFAULT;
  e_free_blob:
  	kfree(blob);
 -e_free:
@@ -154,208 +426,224 @@ index 6d5882290cfc..6a380d483fce 100644
  	return ret;
  }
  
-@@ -594,7 +587,7 @@ static int sev_ioctl_do_pek_import(struct sev_issue_cmd *argp, bool writable)
+ static int sev_launch_finish(struct kvm *kvm, struct kvm_sev_cmd *argp)
  {
- 	struct sev_device *sev = psp_master->sev_data;
- 	struct sev_user_data_pek_cert_import input;
--	struct sev_data_pek_cert_import *data;
-+	struct sev_data_pek_cert_import data;
- 	void *pek_blob, *oca_blob;
- 	int ret;
+ 	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
+-	struct sev_data_launch_finish *data;
+-	int ret;
++	struct sev_data_launch_finish data;
  
-@@ -604,19 +597,14 @@ static int sev_ioctl_do_pek_import(struct sev_issue_cmd *argp, bool writable)
- 	if (copy_from_user(&input, (void __user *)argp->data, sizeof(input)))
- 		return -EFAULT;
+ 	if (!sev_guest(kvm))
+ 		return -ENOTTY;
  
--	data = kzalloc(sizeof(*data), GFP_KERNEL);
+-	data = kzalloc(sizeof(*data), GFP_KERNEL_ACCOUNT);
 -	if (!data)
 -		return -ENOMEM;
 -
- 	/* copy PEK certificate blobs from userspace */
- 	pek_blob = psp_copy_user_blob(input.pek_cert_address, input.pek_cert_len);
--	if (IS_ERR(pek_blob)) {
--		ret = PTR_ERR(pek_blob);
--		goto e_free;
--	}
-+	if (IS_ERR(pek_blob))
-+		return PTR_ERR(pek_blob);
- 
--	data->pek_cert_address = __psp_pa(pek_blob);
--	data->pek_cert_len = input.pek_cert_len;
-+	data.reserved = 0;
-+	data.pek_cert_address = __psp_pa(pek_blob);
-+	data.pek_cert_len = input.pek_cert_len;
- 
- 	/* copy PEK certificate blobs from userspace */
- 	oca_blob = psp_copy_user_blob(input.oca_cert_address, input.oca_cert_len);
-@@ -625,8 +613,8 @@ static int sev_ioctl_do_pek_import(struct sev_issue_cmd *argp, bool writable)
- 		goto e_free_pek;
- 	}
- 
--	data->oca_cert_address = __psp_pa(oca_blob);
--	data->oca_cert_len = input.oca_cert_len;
-+	data.oca_cert_address = __psp_pa(oca_blob);
-+	data.oca_cert_len = input.oca_cert_len;
- 
- 	/* If platform is not in INIT state then transition it to INIT */
- 	if (sev->state != SEV_STATE_INIT) {
-@@ -635,21 +623,19 @@ static int sev_ioctl_do_pek_import(struct sev_issue_cmd *argp, bool writable)
- 			goto e_free_oca;
- 	}
- 
--	ret = __sev_do_cmd_locked(SEV_CMD_PEK_CERT_IMPORT, data, &argp->error);
-+	ret = __sev_do_cmd_locked(SEV_CMD_PEK_CERT_IMPORT, &data, &argp->error);
- 
- e_free_oca:
- 	kfree(oca_blob);
- e_free_pek:
- 	kfree(pek_blob);
--e_free:
--	kfree(data);
- 	return ret;
- }
- 
- static int sev_ioctl_do_get_id2(struct sev_issue_cmd *argp)
- {
- 	struct sev_user_data_get_id2 input;
--	struct sev_data_get_id *data;
-+	struct sev_data_get_id data;
- 	void __user *input_address;
- 	void *id_blob = NULL;
- 	int ret;
-@@ -663,28 +649,25 @@ static int sev_ioctl_do_get_id2(struct sev_issue_cmd *argp)
- 
- 	input_address = (void __user *)input.address;
- 
--	data = kzalloc(sizeof(*data), GFP_KERNEL);
--	if (!data)
--		return -ENOMEM;
+-	data->handle = sev->handle;
+-	ret = sev_issue_cmd(kvm, SEV_CMD_LAUNCH_FINISH, data, &argp->error);
 -
- 	if (input.address && input.length) {
- 		id_blob = kmalloc(input.length, GFP_KERNEL);
--		if (!id_blob) {
--			kfree(data);
-+		if (!id_blob)
- 			return -ENOMEM;
--		}
- 
--		data->address = __psp_pa(id_blob);
--		data->len = input.length;
-+		data.address = __psp_pa(id_blob);
-+		data.len = input.length;
-+	} else {
-+		data.address = 0;
-+		data.len = 0;
- 	}
- 
--	ret = __sev_do_cmd_locked(SEV_CMD_GET_ID, data, &argp->error);
-+	ret = __sev_do_cmd_locked(SEV_CMD_GET_ID, &data, &argp->error);
- 
- 	/*
- 	 * Firmware will return the length of the ID value (either the minimum
- 	 * required length or the actual length written), return it to the user.
- 	 */
--	input.length = data->len;
-+	input.length = data.len;
- 
- 	if (copy_to_user((void __user *)argp->data, &input, sizeof(input))) {
- 		ret = -EFAULT;
-@@ -692,7 +675,7 @@ static int sev_ioctl_do_get_id2(struct sev_issue_cmd *argp)
- 	}
- 
- 	if (id_blob) {
--		if (copy_to_user(input_address, id_blob, data->len)) {
-+		if (copy_to_user(input_address, id_blob, data.len)) {
- 			ret = -EFAULT;
- 			goto e_free;
- 		}
-@@ -700,7 +683,6 @@ static int sev_ioctl_do_get_id2(struct sev_issue_cmd *argp)
- 
- e_free:
- 	kfree(id_blob);
 -	kfree(data);
- 
- 	return ret;
+-	return ret;
++	data.handle = sev->handle;
++	return sev_issue_cmd(kvm, SEV_CMD_LAUNCH_FINISH, &data, &argp->error);
  }
-@@ -750,7 +732,7 @@ static int sev_ioctl_do_pdh_export(struct sev_issue_cmd *argp, bool writable)
- 	struct sev_device *sev = psp_master->sev_data;
- 	struct sev_user_data_pdh_cert_export input;
- 	void *pdh_blob = NULL, *cert_blob = NULL;
--	struct sev_data_pdh_cert_export *data;
-+	struct sev_data_pdh_cert_export data;
- 	void __user *input_cert_chain_address;
- 	void __user *input_pdh_cert_address;
- 	int ret;
-@@ -768,9 +750,7 @@ static int sev_ioctl_do_pdh_export(struct sev_issue_cmd *argp, bool writable)
- 	if (copy_from_user(&input, (void __user *)argp->data, sizeof(input)))
- 		return -EFAULT;
  
--	data = kzalloc(sizeof(*data), GFP_KERNEL);
+ static int sev_guest_status(struct kvm *kvm, struct kvm_sev_cmd *argp)
+ {
+ 	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
+ 	struct kvm_sev_guest_status params;
+-	struct sev_data_guest_status *data;
++	struct sev_data_guest_status data;
+ 	int ret;
+ 
+ 	if (!sev_guest(kvm))
+ 		return -ENOTTY;
+ 
+-	data = kzalloc(sizeof(*data), GFP_KERNEL_ACCOUNT);
 -	if (!data)
 -		return -ENOMEM;
 +	memset(&data, 0, sizeof(data));
  
- 	/* Userspace wants to query the certificate length. */
- 	if (!input.pdh_cert_address ||
-@@ -782,25 +762,19 @@ static int sev_ioctl_do_pdh_export(struct sev_issue_cmd *argp, bool writable)
- 	input_cert_chain_address = (void __user *)input.cert_chain_address;
- 
- 	/* Allocate a physically contiguous buffer to store the PDH blob. */
--	if (input.pdh_cert_len > SEV_FW_BLOB_MAX_SIZE) {
--		ret = -EFAULT;
+-	data->handle = sev->handle;
+-	ret = sev_issue_cmd(kvm, SEV_CMD_GUEST_STATUS, data, &argp->error);
++	data.handle = sev->handle;
++	ret = sev_issue_cmd(kvm, SEV_CMD_GUEST_STATUS, &data, &argp->error);
+ 	if (ret)
 -		goto e_free;
--	}
-+	if (input.pdh_cert_len > SEV_FW_BLOB_MAX_SIZE)
-+		return -EFAULT;
++		return ret;
  
- 	/* Allocate a physically contiguous buffer to store the cert chain blob. */
--	if (input.cert_chain_len > SEV_FW_BLOB_MAX_SIZE) {
--		ret = -EFAULT;
--		goto e_free;
--	}
-+	if (input.cert_chain_len > SEV_FW_BLOB_MAX_SIZE)
-+		return -EFAULT;
+-	params.policy = data->policy;
+-	params.state = data->state;
+-	params.handle = data->handle;
++	params.policy = data.policy;
++	params.state = data.state;
++	params.handle = data.handle;
  
- 	pdh_blob = kmalloc(input.pdh_cert_len, GFP_KERNEL);
--	if (!pdh_blob) {
--		ret = -ENOMEM;
--		goto e_free;
--	}
-+	if (!pdh_blob)
-+		return -ENOMEM;
+ 	if (copy_to_user((void __user *)(uintptr_t)argp->data, &params, sizeof(params)))
+ 		ret = -EFAULT;
+-e_free:
+-	kfree(data);
++
+ 	return ret;
+ }
  
--	data->pdh_cert_address = __psp_pa(pdh_blob);
--	data->pdh_cert_len = input.pdh_cert_len;
-+	data.pdh_cert_address = __psp_pa(pdh_blob);
-+	data.pdh_cert_len = input.pdh_cert_len;
+@@ -730,23 +678,17 @@ static int __sev_issue_dbg_cmd(struct kvm *kvm, unsigned long src,
+ 			       int *error, bool enc)
+ {
+ 	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
+-	struct sev_data_dbg *data;
+-	int ret;
++	struct sev_data_dbg data;
  
- 	cert_blob = kmalloc(input.cert_chain_len, GFP_KERNEL);
- 	if (!cert_blob) {
-@@ -808,15 +782,15 @@ static int sev_ioctl_do_pdh_export(struct sev_issue_cmd *argp, bool writable)
- 		goto e_free_pdh;
+-	data = kzalloc(sizeof(*data), GFP_KERNEL_ACCOUNT);
+-	if (!data)
+-		return -ENOMEM;
++	data.reserved = 0;
++	data.handle = sev->handle;
++	data.dst_addr = dst;
++	data.src_addr = src;
++	data.len = size;
+ 
+-	data->handle = sev->handle;
+-	data->dst_addr = dst;
+-	data->src_addr = src;
+-	data->len = size;
+-
+-	ret = sev_issue_cmd(kvm,
+-			    enc ? SEV_CMD_DBG_ENCRYPT : SEV_CMD_DBG_DECRYPT,
+-			    data, error);
+-	kfree(data);
+-	return ret;
++	return sev_issue_cmd(kvm,
++			     enc ? SEV_CMD_DBG_ENCRYPT : SEV_CMD_DBG_DECRYPT,
++			     &data, error);
+ }
+ 
+ static int __sev_dbg_decrypt(struct kvm *kvm, unsigned long src_paddr,
+@@ -966,7 +908,7 @@ static int sev_dbg_crypt(struct kvm *kvm, struct kvm_sev_cmd *argp, bool dec)
+ static int sev_launch_secret(struct kvm *kvm, struct kvm_sev_cmd *argp)
+ {
+ 	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
+-	struct sev_data_launch_secret *data;
++	struct sev_data_launch_secret data;
+ 	struct kvm_sev_launch_secret params;
+ 	struct page **pages;
+ 	void *blob, *hdr;
+@@ -998,41 +940,36 @@ static int sev_launch_secret(struct kvm *kvm, struct kvm_sev_cmd *argp)
+ 		goto e_unpin_memory;
  	}
  
--	data->cert_chain_address = __psp_pa(cert_blob);
--	data->cert_chain_len = input.cert_chain_len;
-+	data.cert_chain_address = __psp_pa(cert_blob);
-+	data.cert_chain_len = input.cert_chain_len;
+-	ret = -ENOMEM;
+-	data = kzalloc(sizeof(*data), GFP_KERNEL_ACCOUNT);
+-	if (!data)
+-		goto e_unpin_memory;
++	memset(&data, 0, sizeof(data));
  
+ 	offset = params.guest_uaddr & (PAGE_SIZE - 1);
+-	data->guest_address = __sme_page_pa(pages[0]) + offset;
+-	data->guest_len = params.guest_len;
++	data.guest_address = __sme_page_pa(pages[0]) + offset;
++	data.guest_len = params.guest_len;
+ 
+ 	blob = psp_copy_user_blob(params.trans_uaddr, params.trans_len);
+ 	if (IS_ERR(blob)) {
+ 		ret = PTR_ERR(blob);
+-		goto e_free;
++		goto e_unpin_memory;
+ 	}
+ 
+-	data->trans_address = __psp_pa(blob);
+-	data->trans_len = params.trans_len;
++	data.trans_address = __psp_pa(blob);
++	data.trans_len = params.trans_len;
+ 
+ 	hdr = psp_copy_user_blob(params.hdr_uaddr, params.hdr_len);
+ 	if (IS_ERR(hdr)) {
+ 		ret = PTR_ERR(hdr);
+ 		goto e_free_blob;
+ 	}
+-	data->hdr_address = __psp_pa(hdr);
+-	data->hdr_len = params.hdr_len;
++	data.hdr_address = __psp_pa(hdr);
++	data.hdr_len = params.hdr_len;
+ 
+-	data->handle = sev->handle;
+-	ret = sev_issue_cmd(kvm, SEV_CMD_LAUNCH_UPDATE_SECRET, data, &argp->error);
++	data.handle = sev->handle;
++	ret = sev_issue_cmd(kvm, SEV_CMD_LAUNCH_UPDATE_SECRET, &data, &argp->error);
+ 
+ 	kfree(hdr);
+ 
+ e_free_blob:
+ 	kfree(blob);
+-e_free:
+-	kfree(data);
+ e_unpin_memory:
+ 	/* content of memory is updated, mark pages dirty */
+ 	for (i = 0; i < n; i++) {
+@@ -1047,7 +984,7 @@ static int sev_get_attestation_report(struct kvm *kvm, struct kvm_sev_cmd *argp)
+ {
+ 	void __user *report = (void __user *)(uintptr_t)argp->data;
+ 	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
+-	struct sev_data_attestation_report *data;
++	struct sev_data_attestation_report data;
+ 	struct kvm_sev_attestation_report params;
+ 	void __user *p;
+ 	void *blob = NULL;
+@@ -1059,9 +996,7 @@ static int sev_get_attestation_report(struct kvm *kvm, struct kvm_sev_cmd *argp)
+ 	if (copy_from_user(&params, (void __user *)(uintptr_t)argp->data, sizeof(params)))
+ 		return -EFAULT;
+ 
+-	data = kzalloc(sizeof(*data), GFP_KERNEL_ACCOUNT);
+-	if (!data)
+-		return -ENOMEM;
++	memset(&data, 0, sizeof(data));
+ 
+ 	/* User wants to query the blob length */
+ 	if (!params.len)
+@@ -1069,23 +1004,20 @@ static int sev_get_attestation_report(struct kvm *kvm, struct kvm_sev_cmd *argp)
+ 
+ 	p = (void __user *)(uintptr_t)params.uaddr;
+ 	if (p) {
+-		if (params.len > SEV_FW_BLOB_MAX_SIZE) {
+-			ret = -EINVAL;
+-			goto e_free;
+-		}
++		if (params.len > SEV_FW_BLOB_MAX_SIZE)
++			return -EINVAL;
+ 
+-		ret = -ENOMEM;
+ 		blob = kmalloc(params.len, GFP_KERNEL_ACCOUNT);
+ 		if (!blob)
+-			goto e_free;
++			return -ENOMEM;
+ 
+-		data->address = __psp_pa(blob);
+-		data->len = params.len;
+-		memcpy(data->mnonce, params.mnonce, sizeof(params.mnonce));
++		data.address = __psp_pa(blob);
++		data.len = params.len;
++		memcpy(data.mnonce, params.mnonce, sizeof(params.mnonce));
+ 	}
  cmd:
--	ret = __sev_do_cmd_locked(SEV_CMD_PDH_CERT_EXPORT, data, &argp->error);
-+	ret = __sev_do_cmd_locked(SEV_CMD_PDH_CERT_EXPORT, &data, &argp->error);
+-	data->handle = sev->handle;
+-	ret = sev_issue_cmd(kvm, SEV_CMD_ATTESTATION_REPORT, data, &argp->error);
++	data.handle = sev->handle;
++	ret = sev_issue_cmd(kvm, SEV_CMD_ATTESTATION_REPORT, &data, &argp->error);
+ 	/*
+ 	 * If we query the session length, FW responded with expected data.
+ 	 */
+@@ -1101,13 +1033,11 @@ static int sev_get_attestation_report(struct kvm *kvm, struct kvm_sev_cmd *argp)
+ 	}
  
- 	/* If we query the length, FW responded with expected data. */
--	input.cert_chain_len = data->cert_chain_len;
--	input.pdh_cert_len = data->pdh_cert_len;
-+	input.cert_chain_len = data.cert_chain_len;
-+	input.pdh_cert_len = data.pdh_cert_len;
- 
- 	if (copy_to_user((void __user *)argp->data, &input, sizeof(input))) {
+ done:
+-	params.len = data->len;
++	params.len = data.len;
+ 	if (copy_to_user(report, &params, sizeof(params)))
  		ret = -EFAULT;
-@@ -841,8 +815,6 @@ static int sev_ioctl_do_pdh_export(struct sev_issue_cmd *argp, bool writable)
- 	kfree(cert_blob);
- e_free_pdh:
- 	kfree(pdh_blob);
+ e_free_blob:
+ 	kfree(blob);
 -e_free:
 -	kfree(data);
  	return ret;
