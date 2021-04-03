@@ -2,35 +2,35 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BFC5A3534D4
-	for <lists+kvm@lfdr.de>; Sat,  3 Apr 2021 19:05:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3B55A3534D9
+	for <lists+kvm@lfdr.de>; Sat,  3 Apr 2021 19:13:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236924AbhDCRFX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 3 Apr 2021 13:05:23 -0400
-Received: from pegase1.c-s.fr ([93.17.236.30]:13543 "EHLO pegase1.c-s.fr"
+        id S236932AbhDCRNu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 3 Apr 2021 13:13:50 -0400
+Received: from pegase1.c-s.fr ([93.17.236.30]:55540 "EHLO pegase1.c-s.fr"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S236918AbhDCRFW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 3 Apr 2021 13:05:22 -0400
+        id S236724AbhDCRNt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 3 Apr 2021 13:13:49 -0400
 Received: from localhost (mailhub1-int [192.168.12.234])
-        by localhost (Postfix) with ESMTP id 4FCNb06bB4z9v2Ch;
-        Sat,  3 Apr 2021 19:05:16 +0200 (CEST)
+        by localhost (Postfix) with ESMTP id 4FCNml41kPz9v2DJ;
+        Sat,  3 Apr 2021 19:13:43 +0200 (CEST)
 X-Virus-Scanned: Debian amavisd-new at c-s.fr
 Received: from pegase1.c-s.fr ([192.168.12.234])
         by localhost (pegase1.c-s.fr [192.168.12.234]) (amavisd-new, port 10024)
-        with ESMTP id hny0ZdS1jIdX; Sat,  3 Apr 2021 19:05:16 +0200 (CEST)
+        with ESMTP id 8DTnTeSpR-u2; Sat,  3 Apr 2021 19:13:43 +0200 (CEST)
 Received: from messagerie.si.c-s.fr (messagerie.si.c-s.fr [192.168.25.192])
-        by pegase1.c-s.fr (Postfix) with ESMTP id 4FCNb04fv3z9v2Cg;
-        Sat,  3 Apr 2021 19:05:16 +0200 (CEST)
+        by pegase1.c-s.fr (Postfix) with ESMTP id 4FCNml2tcJz9v2DC;
+        Sat,  3 Apr 2021 19:13:43 +0200 (CEST)
 Received: from localhost (localhost [127.0.0.1])
-        by messagerie.si.c-s.fr (Postfix) with ESMTP id 555818B76D;
-        Sat,  3 Apr 2021 19:05:18 +0200 (CEST)
+        by messagerie.si.c-s.fr (Postfix) with ESMTP id 16DC78B76D;
+        Sat,  3 Apr 2021 19:13:45 +0200 (CEST)
 X-Virus-Scanned: amavisd-new at c-s.fr
 Received: from messagerie.si.c-s.fr ([127.0.0.1])
         by localhost (messagerie.si.c-s.fr [127.0.0.1]) (amavisd-new, port 10023)
-        with ESMTP id 5Y5ip5-gsMdr; Sat,  3 Apr 2021 19:05:18 +0200 (CEST)
+        with ESMTP id YZX0c__H92mI; Sat,  3 Apr 2021 19:13:44 +0200 (CEST)
 Received: from [192.168.4.90] (unknown [192.168.4.90])
-        by messagerie.si.c-s.fr (Postfix) with ESMTP id 714218B76A;
-        Sat,  3 Apr 2021 19:05:17 +0200 (CEST)
+        by messagerie.si.c-s.fr (Postfix) with ESMTP id 323038B76A;
+        Sat,  3 Apr 2021 19:13:44 +0200 (CEST)
 Subject: Re: [PATCH 3/5] crypto: ccp: Play nice with vmalloc'd memory for SEV
  command structs
 To:     Sean Christopherson <seanjc@google.com>,
@@ -47,8 +47,8 @@ Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
 References: <20210402233702.3291792-1-seanjc@google.com>
  <20210402233702.3291792-4-seanjc@google.com>
 From:   Christophe Leroy <christophe.leroy@csgroup.eu>
-Message-ID: <6a87996d-3e0c-4a23-8c43-3fcbdadcc861@csgroup.eu>
-Date:   Sat, 3 Apr 2021 19:05:08 +0200
+Message-ID: <8a9c02a4-e17f-5191-bd93-6c8dd654a30a@csgroup.eu>
+Date:   Sat, 3 Apr 2021 19:13:42 +0200
 User-Agent: Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:78.0) Gecko/20100101
  Thunderbird/78.9.0
 MIME-Version: 1.0
@@ -115,15 +115,15 @@ Le 03/04/2021 à 01:37, Sean Christopherson a écrit :
 >   	buf_len = sev_cmd_buffer_len(cmd);
 > -	if (WARN_ON_ONCE(!!data != !!buf_len))
 > +	if (WARN_ON_ONCE(!!__data != !!buf_len))
+
+Why do you need a double !! ?
+I think !__data != !buf_len should be enough.
+
 >   		return -EINVAL;
 >   
 > -	if (WARN_ON_ONCE(data && is_vmalloc_addr(data)))
 > -		return -EINVAL;
 > +	if (__data && is_vmalloc_addr(__data)) {
-
-I think you want to use !virt_addr_valid() here, because not only vmalloc addresses are a problem. 
-For instance, module addresses are a problem as well.
-
 > +		/*
 > +		 * If the incoming buffer is virtually allocated, copy it to
 > +		 * the driver's scratch buffer as __pa() will not work for such
@@ -147,6 +147,11 @@ For instance, module addresses are a problem as well.
 > +	 * failure in case the caller wants to glean something from the error.
 > +	 */
 > +	if (__data && data != __data)
+
+IIUC, when __data is NULL, data is also NULL, so this double test is useless.
+
+Checking data != __data should be enough
+
 > +		memcpy(__data, data, buf_len);
 > +
 >   	return ret;
