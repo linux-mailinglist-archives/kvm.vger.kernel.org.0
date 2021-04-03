@@ -2,87 +2,89 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D1FC63532EC
-	for <lists+kvm@lfdr.de>; Sat,  3 Apr 2021 09:09:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 53011353349
+	for <lists+kvm@lfdr.de>; Sat,  3 Apr 2021 11:25:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236284AbhDCHJO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 3 Apr 2021 03:09:14 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:33750 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233382AbhDCHJE (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Sat, 3 Apr 2021 03:09:04 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1617433741;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=wnHJ7PNuNi/MgLZsBS26NgmPxT4+w6+zr4G3AhXM1uo=;
-        b=e0xG4bEXRPNl+v+nmlhK1unHSEnuimOv386GNO+CPzxSkqJcZR91W6/nOH5OUm6wjv64Fb
-        FE5RSgU0VRwXSK87MnDwhv6Di9KzXooUx2V1fzt7pxT2whLQkTifyN+0rjRoNHfFll2V2Q
-        +VqR1aikIERBWdTHAuEqnOmUdOErvJI=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-201-Oy13Re7ENSKfOX8OEUdCvQ-1; Sat, 03 Apr 2021 03:08:59 -0400
-X-MC-Unique: Oy13Re7ENSKfOX8OEUdCvQ-1
-Received: by mail-wm1-f70.google.com with SMTP id r18so2630628wmq.5
-        for <kvm@vger.kernel.org>; Sat, 03 Apr 2021 00:08:59 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=wnHJ7PNuNi/MgLZsBS26NgmPxT4+w6+zr4G3AhXM1uo=;
-        b=BoGjSTMB75RIyd/a+fHRGqHJ4DIGJYlCKuxtraLod2W9oIkjMG3ZWbxjPQo67JCQSs
-         EJPZCY13zm33SZX45RhOH1XKekdDR6I0ehxnufCFJN+o6yoiOp1HfjkqA/HMsJAXAJCL
-         k0nze3MoNgTJbEdg6IwuPXbFktvwaCO+IY8efaklndW/84nQV8Dsf9ZNFPzGNMNWhF6s
-         gZ3GhQVKxBipKtyMXrQI5Qxv31d+y5cnCnMaiZp23ubL05FVfA2PGwHygFzLd25vthIb
-         KXlmYWemub4CqwABq2s3PGQLytc9rnbFm583W24wfMXxQn51r6Z2MA6/Dm+L4A6CxhjV
-         v5ig==
-X-Gm-Message-State: AOAM53350/5KyRS/xJcd084QajpJrXaql0FJX6NLfNRzEmgyWyTuAEUm
-        Ij5PclvdK1UjW7rWP8JiHqMSbT1xoDqHyiTiaLN7iG+67L110PoLBgvsrlIEwunnkaRKixEshEa
-        SCMf7GuC0/nd7
-X-Received: by 2002:a05:600c:4c95:: with SMTP id g21mr5493553wmp.132.1617433738528;
-        Sat, 03 Apr 2021 00:08:58 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwKKg6FYFR9/URCAc/S96/zR2Mwi57fYr/pcZK0d8tw1j+m5cU+rIHUFxcv6ps3Tjv0ZNzEmg==
-X-Received: by 2002:a05:600c:4c95:: with SMTP id g21mr5493540wmp.132.1617433738355;
-        Sat, 03 Apr 2021 00:08:58 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id e8sm14835032wme.14.2021.04.03.00.08.56
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 03 Apr 2021 00:08:57 -0700 (PDT)
-Subject: Re: [PATCH 2/4] KVM: MIPS: rework flush_shadow_* callbacks into one
- that prepares the flush
-To:     Huacai Chen <chenhuacai@kernel.org>
-Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        seanjc@google.com, "open list:MIPS" <linux-mips@vger.kernel.org>
-References: <20210402155807.49976-1-pbonzini@redhat.com>
- <20210402155807.49976-3-pbonzini@redhat.com>
- <CAAhV-H4wskLvGD1hhuS2ZDOBNenCcTd_K8GkYn1GOzwnEvTDXQ@mail.gmail.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <3cd7114b-9980-4b4a-bf31-2818c7eb4a15@redhat.com>
-Date:   Sat, 3 Apr 2021 09:08:55 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.7.0
+        id S236617AbhDCJUc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 3 Apr 2021 05:20:32 -0400
+Received: from szxga05-in.huawei.com ([45.249.212.191]:15537 "EHLO
+        szxga05-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S236587AbhDCJUZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 3 Apr 2021 05:20:25 -0400
+Received: from DGGEMS402-HUB.china.huawei.com (unknown [172.30.72.60])
+        by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4FCBCQ5t5kzNrcc;
+        Sat,  3 Apr 2021 17:17:38 +0800 (CST)
+Received: from localhost.localdomain (10.67.165.24) by
+ DGGEMS402-HUB.china.huawei.com (10.3.19.202) with Microsoft SMTP Server id
+ 14.3.498.0; Sat, 3 Apr 2021 17:20:11 +0800
+From:   Zeng Tao <prime.zeng@hisilicon.com>
+To:     <kvm@vger.kernel.org>
+CC:     <pbonzini@redhat.com>, <raspl@de.ibm.com>, <linuxarm@huawei.com>,
+        Zeng Tao <prime.zeng@hisilicon.com>,
+        <linux-kernel@vger.kernel.org>
+Subject: [PATCH] tools/kvm_stat: fix out of date aarch64 kvm_exit reason definations
+Date:   Sat, 3 Apr 2021 17:17:31 +0800
+Message-ID: <1617441453-15560-1-git-send-email-prime.zeng@hisilicon.com>
+X-Mailer: git-send-email 2.8.1
 MIME-Version: 1.0
-In-Reply-To: <CAAhV-H4wskLvGD1hhuS2ZDOBNenCcTd_K8GkYn1GOzwnEvTDXQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
+X-Originating-IP: [10.67.165.24]
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 03/04/21 04:31, Huacai Chen wrote:
-> Hi, Paolo,
-> 
-> TE mode has been removed in the MIPS tree, can we also remove it in
-> KVM tree before this rework?
+Aarch64 kvm exit reason defination is out of date for some time, so in
+this patch:
+1. Sync some newly introduced or missing EC definations.
+2. Change the WFI to WFx.
+3. Fix the comment.
 
-Fortunately I can pull the exact commit that was applied to the MIPS 
-tree, as it was the first patch that was applied to the tree, but next 
-time please send KVM changes through the KVM tree.
+Not all the definations are used or usable for aarch64 kvm, but it's
+better to keep align across the whole kernel.
 
-Paolo
+Signed-off-by: Zeng Tao <prime.zeng@hisilicon.com>
+---
+ tools/kvm/kvm_stat/kvm_stat | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
+
+diff --git a/tools/kvm/kvm_stat/kvm_stat b/tools/kvm/kvm_stat/kvm_stat
+index b0bf56c..63d87fd 100755
+--- a/tools/kvm/kvm_stat/kvm_stat
++++ b/tools/kvm/kvm_stat/kvm_stat
+@@ -154,17 +154,19 @@ SVM_EXIT_REASONS = {
+     'NPF':            0x400,
+ }
+ 
+-# EC definition of HSR (from arch/arm64/include/asm/kvm_arm.h)
++# EC definition of HSR (from arch/arm64/include/asm/esr.h)
+ AARCH64_EXIT_REASONS = {
+     'UNKNOWN':      0x00,
+-    'WFI':          0x01,
++    'WFx':          0x01,
+     'CP15_32':      0x03,
+     'CP15_64':      0x04,
+     'CP14_MR':      0x05,
+     'CP14_LS':      0x06,
+     'FP_ASIMD':     0x07,
+     'CP10_ID':      0x08,
++    'PAC':          0x09,
+     'CP14_64':      0x0C,
++    'BTI':          0x0D,
+     'ILL_ISS':      0x0E,
+     'SVC32':        0x11,
+     'HVC32':        0x12,
+@@ -173,6 +175,10 @@ AARCH64_EXIT_REASONS = {
+     'HVC64':        0x16,
+     'SMC64':        0x17,
+     'SYS64':        0x18,
++    'SVE':          0x19,
++    'ERET':         0x1a,
++    'FPAC':         0x1c,
++    'IMP_DEF':      0x1f,
+     'IABT':         0x20,
+     'IABT_HYP':     0x21,
+     'PC_ALIGN':     0x22,
+-- 
+2.8.1
 
