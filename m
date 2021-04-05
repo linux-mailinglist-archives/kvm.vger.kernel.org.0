@@ -2,98 +2,108 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C25E035452C
-	for <lists+kvm@lfdr.de>; Mon,  5 Apr 2021 18:31:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 58247354531
+	for <lists+kvm@lfdr.de>; Mon,  5 Apr 2021 18:33:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242379AbhDEQbS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 5 Apr 2021 12:31:18 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:35559 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S242368AbhDEQbR (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 5 Apr 2021 12:31:17 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1617640271;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=9lG+nLR5IoYSNGo0IQTIdcrOzj+guXrJm8gXPF7fbQI=;
-        b=Yj3uRqpiww+0TqZHKlgcXM3o6OpbE0pr5HRuCSzsUYxne7tjbLry6qgd4ptMsWyAPZjwcW
-        4AzXg1yV56pUznnwushwdL1EYMe6pmwKTGY8IcTgiyyqmtsQf1+EWt23pxUHZ7UXETpPBy
-        4tKcGsy53NYsHyx0rVjCTJPJQR4YMGU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-154-TM7Gs4ibP2GI3VgXCeSJwQ-1; Mon, 05 Apr 2021 12:31:07 -0400
-X-MC-Unique: TM7Gs4ibP2GI3VgXCeSJwQ-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E83EF802575;
-        Mon,  5 Apr 2021 16:31:05 +0000 (UTC)
-Received: from [10.36.112.13] (ovpn-112-13.ams2.redhat.com [10.36.112.13])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id AB0E01349A;
-        Mon,  5 Apr 2021 16:31:00 +0000 (UTC)
-Subject: Re: [PATCH v5 0/8] KVM/ARM: Some vgic fixes and init sequence KVM
- selftests
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     eric.auger.pro@gmail.com, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
-        drjones@redhat.com, alexandru.elisei@arm.com, james.morse@arm.com,
-        suzuki.poulose@arm.com, shuah@kernel.org, pbonzini@redhat.com
-References: <20210404172243.504309-1-eric.auger@redhat.com>
- <877dlhf3ae.wl-maz@kernel.org>
-From:   Auger Eric <eric.auger@redhat.com>
-Message-ID: <051db106-791c-46e7-d921-23e2bfb68b7e@redhat.com>
-Date:   Mon, 5 Apr 2021 18:30:58 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.8.0
+        id S242396AbhDEQdO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 5 Apr 2021 12:33:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39200 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S238474AbhDEQdN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 5 Apr 2021 12:33:13 -0400
+Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 36E53C061756
+        for <kvm@vger.kernel.org>; Mon,  5 Apr 2021 09:33:07 -0700 (PDT)
+Received: by mail-pj1-x102a.google.com with SMTP id z22-20020a17090a0156b029014d4056663fso1227382pje.0
+        for <kvm@vger.kernel.org>; Mon, 05 Apr 2021 09:33:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=qFylozrlyKKCpuFovX6HAhcTBeCnPIKKmkJLUGerBIo=;
+        b=P7OJP3yWJ32c95Ql6kBfLhVR4ZyxMoPCoYPGS3TPZmhhEje9aNWcjnT4VFuzpD/Som
+         RTZ1PTZmHHDzit+q3mN6so/tOrFovHhdBcRqFxz9DcHeTl9G9XsDt25xq2iZPyuhEx/C
+         BhmDoTXoJCNxoLJ9uhl3T5k6yoH48+oC7BThxzjARs2AcKUoIH+RAa4RdClIYtPrhlyD
+         yj4hW7BMHPn4Ug3J6YwsfkZMxHosFZwH+i3+J1BvxXhpYET0W28pPlxYoYXEFMviQer7
+         Kjx81OaLs3wDg/f05pRMc160V45mFZbMEkiXwTakXkqJxpqxw2laujVycQbqLldeuLHz
+         Hx0w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=qFylozrlyKKCpuFovX6HAhcTBeCnPIKKmkJLUGerBIo=;
+        b=j1UW/h2X4iubp3bWHKrppvcyhDv62Ohzoi+O+nOhx18ehi9ijr/6CHmWDQ1ZZTFRGY
+         WNG+0XVYlrejqEpBrnxUEdAaHw1YfPi00Mvpo5irIw+GikbfRr0Mq+myOD4aVD4Cm5I8
+         BNM85pnpdqZzR2ZLLp8s0FLjEa6z6j2FW1waCWh6fQXgOE5ThNeeG/izOD3I8QWPblaa
+         I4vtvIwcv4eNX7BHg+sL5wUQjcVHf7u2SSYj5dNDI9SnG7VsJqp4LU5aEQTyI0zaQKrG
+         OvWRG+ulvdMDHWH3wRT3oCP80LM4fV3nLCf43aRc2uhkpEvnHCUW34kmKAOG6WklEM57
+         Psvw==
+X-Gm-Message-State: AOAM533QbQo5LelHbPcWlBNa0ftSQ2jl5nY53XxX1ztE372LE0FFUwwu
+        B072lTy8TCh0OlGnFgD/h6hWgA==
+X-Google-Smtp-Source: ABdhPJyVqmt9XH5YGpvHjpubvqt/qVhOP3UrqTiRCe44LbhrbARmsVhpjt3fOrn0uLJLW1Yk1+SR2g==
+X-Received: by 2002:a17:902:ff0b:b029:e8:eb46:1566 with SMTP id f11-20020a170902ff0bb02900e8eb461566mr8956141plj.24.1617640386562;
+        Mon, 05 Apr 2021 09:33:06 -0700 (PDT)
+Received: from google.com (240.111.247.35.bc.googleusercontent.com. [35.247.111.240])
+        by smtp.gmail.com with ESMTPSA id r184sm16214515pfc.107.2021.04.05.09.33.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 05 Apr 2021 09:33:06 -0700 (PDT)
+Date:   Mon, 5 Apr 2021 16:33:02 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Tom Lendacky <thomas.lendacky@amd.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        John Allen <john.allen@amd.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Borislav Petkov <bp@suse.de>
+Subject: Re: [PATCH 2/5] crypto: ccp: Reject SEV commands with mismatching
+ command buffer
+Message-ID: <YGs7vioH8TVzyckx@google.com>
+References: <20210402233702.3291792-1-seanjc@google.com>
+ <20210402233702.3291792-3-seanjc@google.com>
+ <bc82825c-03ff-1b3f-7166-f6e5671f0a4f@amd.com>
 MIME-Version: 1.0
-In-Reply-To: <877dlhf3ae.wl-maz@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <bc82825c-03ff-1b3f-7166-f6e5671f0a4f@amd.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Marc,
+On Mon, Apr 05, 2021, Tom Lendacky wrote:
+> On 4/2/21 6:36 PM, Sean Christopherson wrote:
+> > diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
+> > index 6556d220713b..4c513318f16a 100644
+> > --- a/drivers/crypto/ccp/sev-dev.c
+> > +++ b/drivers/crypto/ccp/sev-dev.c
+> > @@ -141,6 +141,7 @@ static int __sev_do_cmd_locked(int cmd, void *data, int *psp_ret)
+> >  	struct sev_device *sev;
+> >  	unsigned int phys_lsb, phys_msb;
+> >  	unsigned int reg, ret = 0;
+> > +	int buf_len;
+> >  
+> >  	if (!psp || !psp->sev_data)
+> >  		return -ENODEV;
+> > @@ -150,7 +151,11 @@ static int __sev_do_cmd_locked(int cmd, void *data, int *psp_ret)
+> >  
+> >  	sev = psp->sev_data;
+> >  
+> > -	if (data && WARN_ON_ONCE(is_vmalloc_addr(data)))
+> > +	buf_len = sev_cmd_buffer_len(cmd);
+> > +	if (WARN_ON_ONCE(!!data != !!buf_len))
+> 
+> Seems a bit confusing to me.  Can this just be:
+> 
+> 	if (WARN_ON_ONCE(data && !buf_len))
 
-On 4/5/21 12:12 PM, Marc Zyngier wrote:
-> Hi Eric,
-> 
-> On Sun, 04 Apr 2021 18:22:35 +0100,
-> Eric Auger <eric.auger@redhat.com> wrote:
->>
->> While writting vgic v3 init sequence KVM selftests I noticed some
->> relatively minor issues. This was also the opportunity to try to
->> fix the issue laterly reported by Zenghui, related to the RDIST_TYPER
->> last bit emulation. The final patch is a first batch of VGIC init
->> sequence selftests. Of course they can be augmented with a lot more
->> register access tests, but let's try to move forward incrementally ...
->>
->> Best Regards
->>
->> Eric
->>
->> This series can be found at:
->> https://github.com/eauger/linux/tree/vgic_kvmselftests_v5
->>
->> History:
->> v4 -> v5:
->> - rewrite the last bit detection according to Marc's
->>   interpretation of the spec and modify the kvm selftests
->>   accordingly
-> 
-> Have you dropped v4's patch #1? It did seem to fix an actual issue,
-> didn't it?
+Or as Christophe pointed out, "!data != !buf_len".
 
-Hum no that was not my intent :-( Resending ...
+> Or is this also trying to catch the case where buf_len is non-zero but
+> data is NULL?
 
-Eric
-> 
-> Thanks,
-> 
-> 	M.
-> 
+Ya.  It's not necessary to detect "buf_len && !data", but it doesn't incur
+additional cost.  Is there a reason _not_ to disallow that?
 
