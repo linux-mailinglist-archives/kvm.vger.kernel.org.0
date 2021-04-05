@@ -2,67 +2,75 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C208E35466B
-	for <lists+kvm@lfdr.de>; Mon,  5 Apr 2021 19:59:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DC7BE3546C1
+	for <lists+kvm@lfdr.de>; Mon,  5 Apr 2021 20:27:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239940AbhDER7v (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 5 Apr 2021 13:59:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58396 "EHLO
+        id S235036AbhDES1u (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 5 Apr 2021 14:27:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36268 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239855AbhDER7r (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 5 Apr 2021 13:59:47 -0400
-Received: from mail-wr1-x431.google.com (mail-wr1-x431.google.com [IPv6:2a00:1450:4864:20::431])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD35DC061756;
-        Mon,  5 Apr 2021 10:59:40 -0700 (PDT)
-Received: by mail-wr1-x431.google.com with SMTP id f12so5627013wro.0;
-        Mon, 05 Apr 2021 10:59:40 -0700 (PDT)
+        with ESMTP id S234865AbhDES1s (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 5 Apr 2021 14:27:48 -0400
+Received: from mail-il1-x12b.google.com (mail-il1-x12b.google.com [IPv6:2607:f8b0:4864:20::12b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 552D6C061788
+        for <kvm@vger.kernel.org>; Mon,  5 Apr 2021 11:27:40 -0700 (PDT)
+Received: by mail-il1-x12b.google.com with SMTP id c18so4284855iln.7
+        for <kvm@vger.kernel.org>; Mon, 05 Apr 2021 11:27:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=message-id:from:mime-version:content-transfer-encoding
-         :content-description:subject:to:date:reply-to;
-        bh=V+ZL6IBlYhDhqaW2K8qSQL0I2+furW7I5Lbh2PK3hX0=;
-        b=l2T+1pjPiqS4z2wLYCYOTUrk/0QICHmKh2+VkM/gV4oPNIQLjnL+2NaC+fHOKyfdMN
-         ZbRoPOU5ffCLYx5j1BOqEVcmdj16/FUPpdHQ19Q/Zdpt9ILWi+Sd5Pcwo9nujYxUwXSP
-         vC37pDY2/56RuAwnYL+eghBQh7V40w0etvIimwgZvfo1Wtbh5H4T1mouRkEZarDzmgED
-         YMY6AROjBpNru2Q3n3eoHqgkWgjbr83KzGqESm+YW893AvI79Blbit3z0vN/c2z/0VZN
-         /PdZI88hhk6d2StkIoz9iJuMfXx07z2E8MO45TDo09y/g7MM0e3KLVBqvMZfm5IdIu7f
-         kqag==
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=WCxby3Jp5TDKJXrr4ksAkJ+LF8mSCwQ/NlCo5Zzkrdo=;
+        b=IUDndj+NlOsbnvqLrJrA4zHuJt9Vs7IworFD6VxxbROtpkqg0l2ynBlNto+4cLzSjv
+         CBqCXCrn7WDsHK41/JMb2NgQwLVmTdMQTnrxCAXmS8Qdqk1W5NnVnKJWYrVMMN6mJ8sE
+         Sd4VQc3CyR1Po4veid4ACzu0WGqPi+dh7nmptm7mxALpp5JyCX4c3QAX5eLlfGADiWCo
+         BWDXyf8f38hNv/BaDmFZp61lDr0ByYbljch++BE2NJPOHMahZF7ygmcfYx2H9aKCnhRN
+         Aycyc1u6/yoa6o5urIRmSi+f+7FAXxJN3oiSyUEyRw7LA7cQtMgqqMIw4/VK6b6bK/ys
+         FGSg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:from:mime-version
-         :content-transfer-encoding:content-description:subject:to:date
-         :reply-to;
-        bh=V+ZL6IBlYhDhqaW2K8qSQL0I2+furW7I5Lbh2PK3hX0=;
-        b=o+9dP/CSFkzB388yuCwlHK2dIoTVRtiDjkHUa6GLlJ8v8Qt13WMgWe+P6bdh7nlDO3
-         8iwF5aF3wkPUpe4gPARuJO9oAmfsbiHJOG7v++13+qoTiGUaPCVKoqPzObaq3ZXzW919
-         AH5G7nCCS3Zuzmn9mf+Gtfj/jJ3XepnajJyOi48+3YBdmt7yGc8feggbTO9gVkP7hFve
-         uTLepaPxtAdvfUMuUTqXXA5m0tuKWE3c8q3F70jzvptrhRAnh354X+GAYmI5dmJcRZs0
-         6A4U47pdt4w/qktNQM2zYm5ToPYB7xfroMWqeZvHI/AYodcuNOf264hsDS3bK+FJA8us
-         BzJQ==
-X-Gm-Message-State: AOAM532MlI5gTIkcyWpWEclAQ6cRB02FPi4I6h7vtMzMXSChRGxnxa0v
-        I1Sl+YdQmPAo+AlxXUHYrgEbNlzgiy4=
-X-Google-Smtp-Source: ABdhPJz6MDxMzw9xvqjmXw2WBnI3TqceWj5UG8FNzqpQVqz06QmJ2o5xcCpd9qEanZromdmo2x8LkA==
-X-Received: by 2002:a05:6000:2a7:: with SMTP id l7mr30216361wry.30.1617645579514;
-        Mon, 05 Apr 2021 10:59:39 -0700 (PDT)
-Received: from [192.168.1.152] ([102.64.185.200])
-        by smtp.gmail.com with ESMTPSA id j23sm248553wmo.33.2021.04.05.10.59.33
-        (version=TLS1 cipher=AES128-SHA bits=128/128);
-        Mon, 05 Apr 2021 10:59:36 -0700 (PDT)
-Message-ID: <606b5008.1c69fb81.d28d1.0ad5@mx.google.com>
-From:   Vanina curt <mahamadousalissou094@gmail.com>
-X-Google-Original-From: Vanina curt
-Content-Type: text/plain; charset="iso-8859-1"
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=WCxby3Jp5TDKJXrr4ksAkJ+LF8mSCwQ/NlCo5Zzkrdo=;
+        b=jH2G0TgVlHghJ974c0+5pXfJbhQ8ouwCVeirnRphOSUEcW252bRFakBPheqvvK7heh
+         kamJVl8Qr0TkakX0W9OXlCJa47xdOxGsPGq6JIm8Kb+XZtCNyLPNHO/8O/OoDgJIQDvd
+         VXjo/FbSWvY7emQdeLc/kCDHdwUdaACrrHOd673JFOgXwBcZl+1rbpmgUUyS7bpKnumk
+         rkvI936aCWKgSSOxZbAKEzO5fHtoeUjTK7OEA0a7ogFwQu/PGprV7bve9H3wU5t3psfM
+         uUHLmUMQiB1sF060NPBeW2ZHTX0Sbgfgl3WCcP/GSiWILm0weuW9Tn78DBWPK39Yjs1G
+         DuVA==
+X-Gm-Message-State: AOAM530k2Fnlymvg7m96E928bWrZv1zQcA4Iy+XwvbIrB8jYBiqOy76F
+        2YKegzma+j15q/zi9n3gRi2HJ2PnmclGk5cSLySVIw==
+X-Google-Smtp-Source: ABdhPJxS8I/5yEmMhDbQWAaiuF3BBv1UnvC6mGDWjwLfslnVX8VqYQJmI6QNB80ecemQTE2HG6SIkG+u1KcaJimmJtQ=
+X-Received: by 2002:a05:6e02:792:: with SMTP id q18mr8124507ils.212.1617647259435;
+ Mon, 05 Apr 2021 11:27:39 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Description: Mail message body
-Subject: HI,
-To:     Recipients <Vanina@vger.kernel.org>
-Date:   Mon, 05 Apr 2021 17:59:27 +0000
-Reply-To: curtisvani9008@gmail.com
+References: <cover.1617302792.git.ashish.kalra@amd.com> <CAMkAt6oWF23YFiOGW_h+iyhjkaAp6uaMNjYKDXNxvNCWR=vyWw@mail.gmail.com>
+In-Reply-To: <CAMkAt6oWF23YFiOGW_h+iyhjkaAp6uaMNjYKDXNxvNCWR=vyWw@mail.gmail.com>
+From:   Steve Rutherford <srutherford@google.com>
+Date:   Mon, 5 Apr 2021 11:27:03 -0700
+Message-ID: <CABayD+dDFMEBTzSxEax=wJLwg7-xQi2C5smPiOh=Ak6pi72ocw@mail.gmail.com>
+Subject: Re: [PATCH v11 00/13] Add AMD SEV guest live migration support
+To:     Peter Gonda <pgonda@google.com>
+Cc:     Ashish Kalra <Ashish.Kalra@amd.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Joerg Roedel <joro@8bytes.org>, Borislav Petkov <bp@suse.de>,
+        "Lendacky, Thomas" <thomas.lendacky@amd.com>,
+        X86 ML <x86@kernel.org>, kvm list <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Sean Christopherson <seanjc@google.com>,
+        Venu Busireddy <venu.busireddy@oracle.com>,
+        "Singh, Brijesh" <brijesh.singh@amd.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-How are you? I'm Vanina. I picked interest in you and I would like to know =
-more about you and establish relationship with you. i will wait for your re=
-sponse. thank you.
+On Mon, Apr 5, 2021 at 8:17 AM Peter Gonda <pgonda@google.com> wrote:
+>
+> Could this patch set include support for the SEND_CANCEL command?
+>
+That's separate from this patchset. I sent up an implementation last week.
