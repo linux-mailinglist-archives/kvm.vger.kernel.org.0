@@ -2,129 +2,67 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 56F743545C7
-	for <lists+kvm@lfdr.de>; Mon,  5 Apr 2021 19:03:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C208E35466B
+	for <lists+kvm@lfdr.de>; Mon,  5 Apr 2021 19:59:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233360AbhDERDX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 5 Apr 2021 13:03:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46042 "EHLO
+        id S239940AbhDER7v (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 5 Apr 2021 13:59:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58396 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233199AbhDERDW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 5 Apr 2021 13:03:22 -0400
-Received: from mail-pf1-x430.google.com (mail-pf1-x430.google.com [IPv6:2607:f8b0:4864:20::430])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B0D3C061756
-        for <kvm@vger.kernel.org>; Mon,  5 Apr 2021 10:03:15 -0700 (PDT)
-Received: by mail-pf1-x430.google.com with SMTP id s11so8556500pfm.1
-        for <kvm@vger.kernel.org>; Mon, 05 Apr 2021 10:03:15 -0700 (PDT)
+        with ESMTP id S239855AbhDER7r (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 5 Apr 2021 13:59:47 -0400
+Received: from mail-wr1-x431.google.com (mail-wr1-x431.google.com [IPv6:2a00:1450:4864:20::431])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD35DC061756;
+        Mon,  5 Apr 2021 10:59:40 -0700 (PDT)
+Received: by mail-wr1-x431.google.com with SMTP id f12so5627013wro.0;
+        Mon, 05 Apr 2021 10:59:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=H6rn7p+vVu7v3cm9ggHsAaaGPQfvah3STH9aVY90oQ0=;
-        b=sPm3lazYQmNyXZyNZwqe3R9UHhfNsl5/ShT7hPs3TtJJhgVVYq8UgkcXx2rAi/Dcfa
-         V/fxOlwOjx3j/UhDO8hOJfR9dFnx+psTIUzKtGNIzps+yoYpP5ruuljEl4pGNCcWXYOh
-         iImfIRnO/mX63IgjMHuI8b6cZ+ajICxv/9f+e+eAgCyE40Pjl+/09AEP7xxNg4o09aY9
-         SASbcyBaPTgS0V0iwbtvXB8XKL5AfBauJR+IAqlDbtnvo76br0fAQOGODJK+zcEMnKrA
-         GTzev8aA0OHMthRZQRn6Ip5JNcVHZ8atYPOYVn4qB+K2yFZJcKFwv0KQSg3glhzvhsMw
-         OY6Q==
+        d=gmail.com; s=20161025;
+        h=message-id:from:mime-version:content-transfer-encoding
+         :content-description:subject:to:date:reply-to;
+        bh=V+ZL6IBlYhDhqaW2K8qSQL0I2+furW7I5Lbh2PK3hX0=;
+        b=l2T+1pjPiqS4z2wLYCYOTUrk/0QICHmKh2+VkM/gV4oPNIQLjnL+2NaC+fHOKyfdMN
+         ZbRoPOU5ffCLYx5j1BOqEVcmdj16/FUPpdHQ19Q/Zdpt9ILWi+Sd5Pcwo9nujYxUwXSP
+         vC37pDY2/56RuAwnYL+eghBQh7V40w0etvIimwgZvfo1Wtbh5H4T1mouRkEZarDzmgED
+         YMY6AROjBpNru2Q3n3eoHqgkWgjbr83KzGqESm+YW893AvI79Blbit3z0vN/c2z/0VZN
+         /PdZI88hhk6d2StkIoz9iJuMfXx07z2E8MO45TDo09y/g7MM0e3KLVBqvMZfm5IdIu7f
+         kqag==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=H6rn7p+vVu7v3cm9ggHsAaaGPQfvah3STH9aVY90oQ0=;
-        b=eEdnfayRg6EppLaUvHe7h3o+/TOOoG6qRJ6MpoQW7yF6LE4DMobCEWbw1OhMc1fc4L
-         gFmk9JYk6e5bivCgWXoIttO6q4r4eWjAisVwsuqD2c4ojkDNvgW4s5NCyOpH/KvCOih1
-         YIPxYp+jumJcfN9GxVLQJoFvaMlpAA61d3mZyHLPCXIWAU6z5PAxDi1Z+eCBmcSW3YEC
-         ifOlxdNPbGW9qusNQ6CBxyFpE6mss/uba0Fyj2ii8ee5mx740rvo0zKMHeeBEMkF5akO
-         6wPe2Rjou4Kp4yzD82gJbeJjFsjVqUJOmLKP9XvFgpLhfIReALefaqAmmPAclpeZeukI
-         8zBQ==
-X-Gm-Message-State: AOAM531pSx6gCXVfMgCKSlTr6W1DsML5BJ1QvnvBhNusXrEiE8gqQCHS
-        HpNvfmgdKXd9lverSBVxKDMYng==
-X-Google-Smtp-Source: ABdhPJzHaUJR34DNX2bq1apPA9eX7C5JcfO8192VNXCy3QSvBk/c9bga925ePSoKMGO8XMoOp5DIGA==
-X-Received: by 2002:a63:4547:: with SMTP id u7mr6253524pgk.351.1617642194450;
-        Mon, 05 Apr 2021 10:03:14 -0700 (PDT)
-Received: from google.com (240.111.247.35.bc.googleusercontent.com. [35.247.111.240])
-        by smtp.gmail.com with ESMTPSA id h19sm16586915pfc.172.2021.04.05.10.03.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 05 Apr 2021 10:03:13 -0700 (PDT)
-Date:   Mon, 5 Apr 2021 17:03:10 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Maxim Levitsky <mlevitsk@redhat.com>
-Cc:     kvm@vger.kernel.org,
-        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
-        Jim Mattson <jmattson@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        "open list:X86 ARCHITECTURE (32-BIT AND 64-BIT)" 
-        <linux-kernel@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Borislav Petkov <bp@alien8.de>, Ingo Molnar <mingo@redhat.com>,
-        "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>
-Subject: Re: [PATCH 3/6] KVM: x86: introduce kvm_register_clear_available
-Message-ID: <YGtCzhDbnAQVgI+8@google.com>
-References: <20210401141814.1029036-1-mlevitsk@redhat.com>
- <20210401141814.1029036-4-mlevitsk@redhat.com>
+        h=x-gm-message-state:message-id:from:mime-version
+         :content-transfer-encoding:content-description:subject:to:date
+         :reply-to;
+        bh=V+ZL6IBlYhDhqaW2K8qSQL0I2+furW7I5Lbh2PK3hX0=;
+        b=o+9dP/CSFkzB388yuCwlHK2dIoTVRtiDjkHUa6GLlJ8v8Qt13WMgWe+P6bdh7nlDO3
+         8iwF5aF3wkPUpe4gPARuJO9oAmfsbiHJOG7v++13+qoTiGUaPCVKoqPzObaq3ZXzW919
+         AH5G7nCCS3Zuzmn9mf+Gtfj/jJ3XepnajJyOi48+3YBdmt7yGc8feggbTO9gVkP7hFve
+         uTLepaPxtAdvfUMuUTqXXA5m0tuKWE3c8q3F70jzvptrhRAnh354X+GAYmI5dmJcRZs0
+         6A4U47pdt4w/qktNQM2zYm5ToPYB7xfroMWqeZvHI/AYodcuNOf264hsDS3bK+FJA8us
+         BzJQ==
+X-Gm-Message-State: AOAM532MlI5gTIkcyWpWEclAQ6cRB02FPi4I6h7vtMzMXSChRGxnxa0v
+        I1Sl+YdQmPAo+AlxXUHYrgEbNlzgiy4=
+X-Google-Smtp-Source: ABdhPJz6MDxMzw9xvqjmXw2WBnI3TqceWj5UG8FNzqpQVqz06QmJ2o5xcCpd9qEanZromdmo2x8LkA==
+X-Received: by 2002:a05:6000:2a7:: with SMTP id l7mr30216361wry.30.1617645579514;
+        Mon, 05 Apr 2021 10:59:39 -0700 (PDT)
+Received: from [192.168.1.152] ([102.64.185.200])
+        by smtp.gmail.com with ESMTPSA id j23sm248553wmo.33.2021.04.05.10.59.33
+        (version=TLS1 cipher=AES128-SHA bits=128/128);
+        Mon, 05 Apr 2021 10:59:36 -0700 (PDT)
+Message-ID: <606b5008.1c69fb81.d28d1.0ad5@mx.google.com>
+From:   Vanina curt <mahamadousalissou094@gmail.com>
+X-Google-Original-From: Vanina curt
+Content-Type: text/plain; charset="iso-8859-1"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210401141814.1029036-4-mlevitsk@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Content-Description: Mail message body
+Subject: HI,
+To:     Recipients <Vanina@vger.kernel.org>
+Date:   Mon, 05 Apr 2021 17:59:27 +0000
+Reply-To: curtisvani9008@gmail.com
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Apr 01, 2021, Maxim Levitsky wrote:
-> Small refactoring that will be used in the next patch.
-> 
-> Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
-> ---
->  arch/x86/kvm/kvm_cache_regs.h | 7 +++++++
->  arch/x86/kvm/svm/svm.c        | 6 ++----
->  2 files changed, 9 insertions(+), 4 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/kvm_cache_regs.h b/arch/x86/kvm/kvm_cache_regs.h
-> index 2e11da2f5621..07d607947805 100644
-> --- a/arch/x86/kvm/kvm_cache_regs.h
-> +++ b/arch/x86/kvm/kvm_cache_regs.h
-> @@ -55,6 +55,13 @@ static inline void kvm_register_mark_available(struct kvm_vcpu *vcpu,
->  	__set_bit(reg, (unsigned long *)&vcpu->arch.regs_avail);
->  }
->  
-> +static inline void kvm_register_clear_available(struct kvm_vcpu *vcpu,
-
-I don't love the name, because it makes me think too hard about available vs.
-dirty.  :-)   If we drop the optimizations, what if we also drop this patch to
-avoid bikeshedding the name?
-
-> +					       enum kvm_reg reg)
-> +{
-> +	__clear_bit(reg, (unsigned long *)&vcpu->arch.regs_avail);
-> +	__clear_bit(reg, (unsigned long *)&vcpu->arch.regs_dirty);
-> +}
-> +
->  static inline void kvm_register_mark_dirty(struct kvm_vcpu *vcpu,
->  					   enum kvm_reg reg)
->  {
-> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> index 271196400495..2843732299a2 100644
-> --- a/arch/x86/kvm/svm/svm.c
-> +++ b/arch/x86/kvm/svm/svm.c
-> @@ -3880,10 +3880,8 @@ static __no_kcsan fastpath_t svm_vcpu_run(struct kvm_vcpu *vcpu)
->  		vcpu->arch.apf.host_apf_flags =
->  			kvm_read_and_reset_apf_flags();
->  
-> -	if (npt_enabled) {
-> -		vcpu->arch.regs_avail &= ~(1 << VCPU_EXREG_PDPTR);
-> -		vcpu->arch.regs_dirty &= ~(1 << VCPU_EXREG_PDPTR);
-> -	}
-> +	if (npt_enabled)
-> +		kvm_register_clear_available(vcpu, VCPU_EXREG_PDPTR);
->  
->  	/*
->  	 * We need to handle MC intercepts here before the vcpu has a chance to
-> -- 
-> 2.26.2
-> 
+How are you? I'm Vanina. I picked interest in you and I would like to know =
+more about you and establish relationship with you. i will wait for your re=
+sponse. thank you.
