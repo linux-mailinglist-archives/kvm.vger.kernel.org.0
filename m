@@ -2,84 +2,162 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1061C353A3E
-	for <lists+kvm@lfdr.de>; Mon,  5 Apr 2021 02:30:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 49002353C4C
+	for <lists+kvm@lfdr.de>; Mon,  5 Apr 2021 10:16:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231723AbhDEAaZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 4 Apr 2021 20:30:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57202 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231706AbhDEAaX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 4 Apr 2021 20:30:23 -0400
-Received: from mail-lj1-x229.google.com (mail-lj1-x229.google.com [IPv6:2a00:1450:4864:20::229])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80093C061756
-        for <kvm@vger.kernel.org>; Sun,  4 Apr 2021 17:30:17 -0700 (PDT)
-Received: by mail-lj1-x229.google.com with SMTP id u9so11094604ljd.11
-        for <kvm@vger.kernel.org>; Sun, 04 Apr 2021 17:30:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=4djxblumYsM0MYjaTI3gAeclQoo4tMzFZGJUydviNoY=;
-        b=k9XPOH16pkp6wIhN6fUXTfgtf00C1nX1vfWzkAoJCwZhTPryGhPETEbWtKNuql8dcT
-         J66HvvN+nGIGX/hWkB2rtYjC7ogWFD4Rd4IZkQ0bS/rYf5HmIGTyE/ZylI39cDqXlZLQ
-         DrwfgJgtrdAYa4RnReHlFBjkf09I61p5QCpFtdcJBiTqN5do0FBlf/GNBAM4Sa4K9fTt
-         O0Sc6EJP96oqfCYeJaor+ktU4xDDekqEt6oEKns8rGYAeQWl4AQoPK1E7sIISi8w1r2q
-         CU1BS4YW9udqw0T/oEayc0e8nZsTv0pujP4QcRjuay7oCDxyx5293bIck4CW+rAYTTaJ
-         a32w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=4djxblumYsM0MYjaTI3gAeclQoo4tMzFZGJUydviNoY=;
-        b=SZSxn02Oh8kHlWxpC0ZheZqrqhviGh8hitlDEnx7kBYOeE+zlIVCy/S1PmO0NVm5Vh
-         dmIuEygng8c1Pm+yrqmcb0lYJ8w7/TjHOcBp5nVL4RKCWCjj9NSVs8NxpKvUBlpJ3FiD
-         6tbLBwpSv+h2XAtwKjhpBKEp4dmCjno9zLiXZ4TILkTFpdC+aerMTaMPYI4DTIY8Bwhq
-         uyOQ7frUPwK2WlUBTrey9rS91Xm45dHFJYwStbbHkoM1f1D2xcL39Xzo3WhO/qtf5iB+
-         z/XPfKIz6fWERH+RmvKMpKwhhmFnyvWVgMa72niPg75WmfO09zLU0tGpiFQ0T1ETtSnz
-         j1Eg==
-X-Gm-Message-State: AOAM532fxc8cOu145tefiiuKIZjSEJrWlEJvVCzGOIT/iq0T0LmV/c+P
-        PNZnEdSbJjA/ObUn4OXIL6aJtFhAF5acdSW7A642ag==
-X-Google-Smtp-Source: ABdhPJya1pQ3m+PBzENKSEcDzB6ja6iy+5Hr6CE5/UQqlDXSenL4ol3iYtZBtv3DVLGum6BVeQ8oNUuY6m+mGf4u65w=
-X-Received: by 2002:a2e:87d8:: with SMTP id v24mr14196684ljj.387.1617582615756;
- Sun, 04 Apr 2021 17:30:15 -0700 (PDT)
-MIME-Version: 1.0
-References: <20210330044206.2864329-1-vipinsh@google.com> <YGn42SKCPg2HWtQc@mtj.duckdns.org>
-In-Reply-To: <YGn42SKCPg2HWtQc@mtj.duckdns.org>
-From:   Vipin Sharma <vipinsh@google.com>
-Date:   Sun, 4 Apr 2021 17:29:59 -0700
-Message-ID: <CAHVum0fhWSOFRS-t7cF=zCRf_SUoMN5UOYBChWSpmhJVcuMbsg@mail.gmail.com>
-Subject: Re: [PATCH v4 0/3] cgroup: New misc cgroup controller
-To:     Tejun Heo <tj@kernel.org>
-Cc:     =?UTF-8?Q?Michal_Koutn=C3=BD?= <mkoutny@suse.com>,
-        Jacob Pan <jacob.jun.pan@intel.com>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Brijesh <brijesh.singh@amd.com>, Jon <jon.grimm@amd.com>,
-        Eric <eric.vantassell@amd.com>, pbonzini@redhat.com,
-        hannes@cmpxchg.org, Janosch Frank <frankja@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>, corbet@lwn.net,
-        Sean Christopherson <seanjc@google.com>, vkuznets@redhat.com,
-        wanpengli@tencent.com, Jim Mattson <jmattson@google.com>,
-        joro@8bytes.org, tglx@linutronix.de, mingo@redhat.com,
-        bp@alien8.de, hpa@zytor.com, Matt Gingell <gingell@google.com>,
-        David Rientjes <rientjes@google.com>, kvm@vger.kernel.org,
-        x86@kernel.org, cgroups@vger.kernel.org, linux-doc@vger.kernel.org,
+        id S232439AbhDEIPS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 5 Apr 2021 04:15:18 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:32200 "EHLO
+        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232041AbhDEIPR (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 5 Apr 2021 04:15:17 -0400
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 13582swZ022575;
+        Mon, 5 Apr 2021 04:15:01 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=ZRGqmVuj4xVP6vbmS1MFIgNsltpr0gTSaiA/Tf6tNh4=;
+ b=WleZ1lj85f2yXddG57yHAV5SXEhzI/CurtRXR/APJMT7D1VonmAL5sPLujl8E6SowIiY
+ nyusNIGTdT9ksUxOCvhHCmUOKWTksobVExkorh7fnyDqZ4kOFlIhST9uGwjMXPx2MNro
+ F/n3OWxjN3N/zA6H6HzMNdpkUyTB3yT19vCuoPxiR5iF/QisOkw3AESmoHs3s7RweIxc
+ /uo+Dehy0VlHMM+9yOJbEvwJHEZ62sU9PRLIJfeu7MbGEmx/yuemIxolwEK3cSB0blWE
+ s77skG/XMX5eyEzbqt2q8njwPpnYfUJIJdVUf9yM2KEWqYWDyyp4WG5+azb7gAyEM3Qk Wg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 37q5naub2e-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 05 Apr 2021 04:15:01 -0400
+Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 1358F1xs065046;
+        Mon, 5 Apr 2021 04:15:01 -0400
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 37q5naub20-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 05 Apr 2021 04:15:01 -0400
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 1358CB15003038;
+        Mon, 5 Apr 2021 08:14:59 GMT
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
+        by ppma04ams.nl.ibm.com with ESMTP id 37q2n2s410-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 05 Apr 2021 08:14:59 +0000
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 1358Eveg57016710
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 5 Apr 2021 08:14:57 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 5F60AA405F;
+        Mon,  5 Apr 2021 08:14:57 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 18CE6A4054;
+        Mon,  5 Apr 2021 08:14:57 +0000 (GMT)
+Received: from [9.171.48.123] (unknown [9.171.48.123])
+        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Mon,  5 Apr 2021 08:14:57 +0000 (GMT)
+Subject: Re: [PATCH] tools/kvm_stat: fix out of date aarch64 kvm_exit reason
+ definations
+To:     Zeng Tao <prime.zeng@hisilicon.com>, kvm@vger.kernel.org
+Cc:     pbonzini@redhat.com, raspl@de.ibm.com, linuxarm@huawei.com,
         linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+References: <1617441453-15560-1-git-send-email-prime.zeng@hisilicon.com>
+From:   Stefan Raspl <raspl@linux.ibm.com>
+Message-ID: <43db8147-d1c3-4c42-f9cf-a5ab5dd6a808@linux.ibm.com>
+Date:   Mon, 5 Apr 2021 10:14:56 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.8.1
+MIME-Version: 1.0
+In-Reply-To: <1617441453-15560-1-git-send-email-prime.zeng@hisilicon.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: L_K2CPq23TO4PJqNlNSkguxwSc3KDuov
+X-Proofpoint-ORIG-GUID: Ojh2RFMnxgJugyQJ3lp38CeqbmxEpy2d
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.761
+ definitions=2021-04-05_04:2021-04-01,2021-04-05 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 clxscore=1011
+ mlxlogscore=999 priorityscore=1501 impostorscore=0 bulkscore=0
+ adultscore=0 phishscore=0 mlxscore=0 spamscore=0 malwarescore=0
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2104030000 definitions=main-2104050053
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, Apr 4, 2021 at 10:35 AM Tejun Heo <tj@kernel.org> wrote:
->
-> Applied to cgroup/for-5.13. If there are further issues, let's address them
-> incrementally.
->
-> Thanks.
->
-> --
-> tejun
+On 4/3/21 11:17 AM, Zeng Tao wrote:
+> Aarch64 kvm exit reason defination is out of date for some time, so in
+> this patch:
+> 1. Sync some newly introduced or missing EC definations.
+> 2. Change the WFI to WFx.
+> 3. Fix the comment.
+> 
+> Not all the definations are used or usable for aarch64 kvm, but it's
+> better to keep align across the whole kernel.
+> 
+> Signed-off-by: Zeng Tao <prime.zeng@hisilicon.com>
+> ---
+>   tools/kvm/kvm_stat/kvm_stat | 10 ++++++++--
+>   1 file changed, 8 insertions(+), 2 deletions(-)
+> 
+> diff --git a/tools/kvm/kvm_stat/kvm_stat b/tools/kvm/kvm_stat/kvm_stat
+> index b0bf56c..63d87fd 100755
+> --- a/tools/kvm/kvm_stat/kvm_stat
+> +++ b/tools/kvm/kvm_stat/kvm_stat
+> @@ -154,17 +154,19 @@ SVM_EXIT_REASONS = {
+>       'NPF':            0x400,
+>   }
+>   
+> -# EC definition of HSR (from arch/arm64/include/asm/kvm_arm.h)
+> +# EC definition of HSR (from arch/arm64/include/asm/esr.h)
+>   AARCH64_EXIT_REASONS = {
+>       'UNKNOWN':      0x00,
+> -    'WFI':          0x01,
+> +    'WFx':          0x01,
+>       'CP15_32':      0x03,
+>       'CP15_64':      0x04,
+>       'CP14_MR':      0x05,
+>       'CP14_LS':      0x06,
+>       'FP_ASIMD':     0x07,
+>       'CP10_ID':      0x08,
+> +    'PAC':          0x09,
+>       'CP14_64':      0x0C,
+> +    'BTI':          0x0D,
+>       'ILL_ISS':      0x0E,
+>       'SVC32':        0x11,
+>       'HVC32':        0x12,
+> @@ -173,6 +175,10 @@ AARCH64_EXIT_REASONS = {
+>       'HVC64':        0x16,
+>       'SMC64':        0x17,
+>       'SYS64':        0x18,
+> +    'SVE':          0x19,
+> +    'ERET':         0x1a,
+> +    'FPAC':         0x1c,
+> +    'IMP_DEF':      0x1f,
+>       'IABT':         0x20,
+>       'IABT_HYP':     0x21,
+>       'PC_ALIGN':     0x22,
+> 
 
-Thanks Tejun for accepting and guiding through each version of this
-patch series.
+Reviewed-by: Stefan Raspl <raspl@linux.ibm.com>
+
+
+-- 
+
+Mit freundlichen Grüßen / Kind regards
+
+Stefan Raspl
+
+
+Linux on Z
+-------------------------------------------------------------------------------------------------------------------------------------------
+IBM Deutschland
+Schoenaicher Str. 220
+71032 Boeblingen
+Phone: +49-7031-16-2177
+E-Mail: stefan.raspl@de.ibm.com
+-------------------------------------------------------------------------------------------------------------------------------------------
+IBM Deutschland Research & Development GmbH / Vorsitzender des Aufsichtsrats: 
+Gregor Pillen
+Geschäftsführung: Dirk Wittkopp
+Sitz der Gesellschaft: Böblingen / Registergericht: Amtsgericht Stuttgart, HRB 
+243294
