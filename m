@@ -2,57 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E4A37355F05
-	for <lists+kvm@lfdr.de>; Wed,  7 Apr 2021 00:51:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3804E355F08
+	for <lists+kvm@lfdr.de>; Wed,  7 Apr 2021 00:51:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344330AbhDFWua (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 6 Apr 2021 18:50:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40116 "EHLO
+        id S1344467AbhDFWue (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 6 Apr 2021 18:50:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40124 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344259AbhDFWuZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S1344222AbhDFWuZ (ORCPT <rfc822;kvm@vger.kernel.org>);
         Tue, 6 Apr 2021 18:50:25 -0400
-Received: from mail-qt1-x849.google.com (mail-qt1-x849.google.com [IPv6:2607:f8b0:4864:20::849])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6CEA4C0613DA
-        for <kvm@vger.kernel.org>; Tue,  6 Apr 2021 15:50:14 -0700 (PDT)
-Received: by mail-qt1-x849.google.com with SMTP id v22so5636216qtk.11
-        for <kvm@vger.kernel.org>; Tue, 06 Apr 2021 15:50:14 -0700 (PDT)
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E97DFC0613DB
+        for <kvm@vger.kernel.org>; Tue,  6 Apr 2021 15:50:16 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id y13so21718165ybk.20
+        for <kvm@vger.kernel.org>; Tue, 06 Apr 2021 15:50:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=reply-to:date:in-reply-to:message-id:mime-version:references
          :subject:from:to:cc;
-        bh=qeSDdPOEtLNZrGRyxSYQgQknQgwqkWb9I9sk4ziJ/OY=;
-        b=Ga8o+6478WTe8xCs6ZDLhRgmVbg0E75BCEhnCWjj7i5U/bRBxcG3TKKGDrnjWjQPhP
-         YlUD2J8mbYE0aHwukhb+JIRrQr4uORpXru4RoYbEdu8NU62S1heGZuqTiaCjr7UohHYk
-         ToF1rDvEQtdYCR8p6CzPjPKYPK3XwRtg1SUO0aa5WuygwCg5uXS0CeGeNj8BX1NgQTaT
-         nwiBrJWUHnUjmQPWv08jlxXLAjdyEq6b/iVLt/lXQlPp9QZrBxI/eVPurY+5wDiKXfDh
-         HpZLNqRSD+BcRELE6rYzPq2k9kteRJIKsqYuvn3KraV1ETtRIj6pZaTW0hOHG4v66E17
-         jObQ==
+        bh=KV8GfpQpTpZiH9kgk6yjg0OW0xYFz416RtlhJj6iD3k=;
+        b=KliXWp2g9Qy94K28mZN3A9edJ79cTeJZGPIT/dvVPG3nEZODDUlMty1dxIQkzPZVEq
+         IejkcTASBjb+WMZeH44zaRuAjFaZVIMuGhu7on2VJJYY+bNLF/Apuq4bRuOmBVL67atQ
+         YLot98CuvP2rYMp9cm0RdHAP4ekEqLDiG13Rni4yaK13/yGSLQyUNAO/fTg4THwyFmXX
+         uSKH1OLuEKSA7QfoAimnzYpqjRYNnrysg0AzGoEpGIpGHHGBQLj00qNs8Vb/K1J7bqA1
+         3krOcnpp3o9zHUEdQTjLrSPJdaELEDLB6iTLoVRaDsZ+UiYg35XzBr7LA5bx23Oia9Ex
+         WCiQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:reply-to:date:in-reply-to:message-id
          :mime-version:references:subject:from:to:cc;
-        bh=qeSDdPOEtLNZrGRyxSYQgQknQgwqkWb9I9sk4ziJ/OY=;
-        b=CVrmOUOzGyH7XjzIRJalf7M8/fvRgHstru24r+Kuk6LlCJ/5QYqNtxD49eB1YU/p4O
-         hi65XTzhRru2ukZo/jYK1HeRW5TrQisOx4NICyMuoLTuvXoEVNVtFx3h83SAOi4b0hix
-         xrujhIq4TKRvXoH22qC8F+dtZdJ48LIprTZflLgqKIQI6z44D0GrwKe3tszXaFrPOh5E
-         t+2XFXrtT+frDaifq4UMNbnjjJhA3OB3a6zimUaiA6lKtUJih0wzbCRszHOpbCQufxcf
-         srhVsOn3wRJUcXpfYfQnB0uqqHrHfL6B/sQWf/H/uMpOnQ5/G5m5bzQV5lWCqXFRvdhE
-         ucpA==
-X-Gm-Message-State: AOAM533RWqYVEIPxznf0hiL5k82ZDptmWFW7WSjoK8hlF8x9p4g9IYFD
-        pPiZe9lTgYSaSabmCpGk9G0THH8ejxs=
-X-Google-Smtp-Source: ABdhPJyIcg9FGDhdO9rpoL2pPltZjsRaVybBMXUirh1bVIlL7/QgG8RFL7dOmXOb+OkSJdLe0/L4GoYHs3A=
+        bh=KV8GfpQpTpZiH9kgk6yjg0OW0xYFz416RtlhJj6iD3k=;
+        b=IWr+QCyTP/9GNZ7LP0zs67XLv4iy7sBfa8cAP8DELU+G+kz6Z7rhAxAstWSL9z/HMl
+         lBg+/+K6++j/1Eie27ijkuEGwUewDbkl8ghBWcIZ1xe1M0Rz+bKE/hGB992W1PJgukfc
+         trar/B0ir76zE1m9SC0OF6vJNr2zMfgV6TusHg0UV9/1KkJQZbiiKfmf8PSFlkZHLKaM
+         SfWUE3QWnrByNoTXw2hPkTgGuZ2EWd2jh5UXodxF7foPlkfplm5IUkAdT64dDvW63SAt
+         cQVnRQhWj9sb7ov/f8UXo/Scgd1sOllzTQe8C9eEOBht7p2N4e3WLQQdaFtTqMhv/fk7
+         P7Ew==
+X-Gm-Message-State: AOAM5324joSJ1lRVpZLvMXOuRhpuaZjE/ejeb3A2uh/AYmu5LcT6n9Ak
+        KWWvSPRGCguaV/HRvK25wBoo4TAvdg8=
+X-Google-Smtp-Source: ABdhPJy9XGKAT95aAkCt7uMojqdd8CgerWE4Lz4pLzTBfTrY8EHhpYRnvnE0j16oGynVgrxBClvlecyjA0w=
 X-Received: from seanjc798194.pdx.corp.google.com ([2620:15c:f:10:24a1:90fb:182b:777c])
- (user=seanjc job=sendgmr) by 2002:a05:6214:7e4:: with SMTP id
- bp4mr279190qvb.5.1617749413669; Tue, 06 Apr 2021 15:50:13 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a25:da44:: with SMTP id n65mr545254ybf.68.1617749416164;
+ Tue, 06 Apr 2021 15:50:16 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Tue,  6 Apr 2021 15:49:48 -0700
+Date:   Tue,  6 Apr 2021 15:49:49 -0700
 In-Reply-To: <20210406224952.4177376-1-seanjc@google.com>
-Message-Id: <20210406224952.4177376-5-seanjc@google.com>
+Message-Id: <20210406224952.4177376-6-seanjc@google.com>
 Mime-Version: 1.0
 References: <20210406224952.4177376-1-seanjc@google.com>
 X-Mailer: git-send-email 2.31.0.208.g409f899ff0-goog
-Subject: [PATCH v2 4/8] crypto: ccp: Play nice with vmalloc'd memory for SEV
- command structs
+Subject: [PATCH v2 5/8] crypto: ccp: Use the stack for small SEV command buffers
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>,
         Brijesh Singh <brijesh.singh@amd.com>,
@@ -71,119 +70,298 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Copy the incoming @data comman to an internal buffer so that callers can
-put SEV command buffers on the stack without running afoul of
-CONFIG_VMAP_STACK=y, i.e. without bombing on vmalloc'd pointers.  As of
-today, the largest supported command takes a 68 byte buffer, i.e. pretty
-much every command can be put on the stack.  Because sev_cmd_mutex is
-held for the entirety of a transaction, only a single bounce buffer is
-required.
+For commands with small input/output buffers, use the local stack to
+"allocate" the structures used to communicate with the PSP.   Now that
+__sev_do_cmd_locked() gracefully handles vmalloc'd buffers, there's no
+reason to avoid using the stack, e.g. CONFIG_VMAP_STACK=y will just work.
 
-Use the internal buffer unconditionally, as the majority of in-kernel
-users will soon switch to using the stack.  At that point, checking
-virt_addr_valid() becomes (negligible) overhead in most cases, and
-supporting both paths slightly increases complexity.  Since the commands
-are all quite small, the cost of the copies is insignificant compared to
-the latency of communicating with the PSP.
-
-Allocate a full page for the buffer as opportunistic preparation for
-SEV-SNP, which requires the command buffer to be in firmware state for
-commands that trigger memory writes from the PSP firmware.  Using a full
-page now will allow SEV-SNP support to simply transition the page as
-needed.
-
-Cc: Brijesh Singh <brijesh.singh@amd.com>
-Cc: Borislav Petkov <bp@suse.de>
-Cc: Tom Lendacky <thomas.lendacky@amd.com>
-Cc: Christophe Leroy <christophe.leroy@csgroup.eu>
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- drivers/crypto/ccp/sev-dev.c | 28 +++++++++++++++++++++++-----
- drivers/crypto/ccp/sev-dev.h |  2 ++
- 2 files changed, 25 insertions(+), 5 deletions(-)
+ drivers/crypto/ccp/sev-dev.c | 122 ++++++++++++++---------------------
+ 1 file changed, 47 insertions(+), 75 deletions(-)
 
 diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
-index 47a372e07223..4aedbdaffe90 100644
+index 4aedbdaffe90..bb0d6de071e6 100644
 --- a/drivers/crypto/ccp/sev-dev.c
 +++ b/drivers/crypto/ccp/sev-dev.c
-@@ -155,12 +155,17 @@ static int __sev_do_cmd_locked(int cmd, void *data, int *psp_ret)
- 	if (WARN_ON_ONCE(!data != !buf_len))
- 		return -EINVAL;
+@@ -396,7 +396,7 @@ static int sev_ioctl_do_pek_csr(struct sev_issue_cmd *argp, bool writable)
+ {
+ 	struct sev_device *sev = psp_master->sev_data;
+ 	struct sev_user_data_pek_csr input;
+-	struct sev_data_pek_csr *data;
++	struct sev_data_pek_csr data;
+ 	void __user *input_address;
+ 	void *blob = NULL;
+ 	int ret;
+@@ -407,29 +407,24 @@ static int sev_ioctl_do_pek_csr(struct sev_issue_cmd *argp, bool writable)
+ 	if (copy_from_user(&input, (void __user *)argp->data, sizeof(input)))
+ 		return -EFAULT;
  
--	if (data && WARN_ON_ONCE(!virt_addr_valid(data)))
--		return -EINVAL;
-+	/*
-+	 * Copy the incoming data to driver's scratch buffer as __pa() will not
-+	 * work for some memory, e.g. vmalloc'd addresses, and @data may not be
-+	 * physically contiguous.
-+	 */
-+	if (data)
-+		memcpy(sev->cmd_buf, data, buf_len);
+-	data = kzalloc(sizeof(*data), GFP_KERNEL);
+-	if (!data)
+-		return -ENOMEM;
+-
+ 	/* userspace wants to query CSR length */
+-	if (!input.address || !input.length)
++	if (!input.address || !input.length) {
++		data.address = 0;
++		data.len = 0;
+ 		goto cmd;
++	}
  
- 	/* Get the physical address of the command buffer */
--	phys_lsb = data ? lower_32_bits(__psp_pa(data)) : 0;
--	phys_msb = data ? upper_32_bits(__psp_pa(data)) : 0;
-+	phys_lsb = data ? lower_32_bits(__psp_pa(sev->cmd_buf)) : 0;
-+	phys_msb = data ? upper_32_bits(__psp_pa(sev->cmd_buf)) : 0;
+ 	/* allocate a physically contiguous buffer to store the CSR blob */
+ 	input_address = (void __user *)input.address;
+-	if (input.length > SEV_FW_BLOB_MAX_SIZE) {
+-		ret = -EFAULT;
+-		goto e_free;
+-	}
++	if (input.length > SEV_FW_BLOB_MAX_SIZE)
++		return -EFAULT;
  
- 	dev_dbg(sev->dev, "sev command id %#x buffer 0x%08x%08x timeout %us\n",
- 		cmd, phys_msb, phys_lsb, psp_timeout);
-@@ -204,6 +209,13 @@ static int __sev_do_cmd_locked(int cmd, void *data, int *psp_ret)
- 	print_hex_dump_debug("(out): ", DUMP_PREFIX_OFFSET, 16, 2, data,
- 			     buf_len, false);
+ 	blob = kmalloc(input.length, GFP_KERNEL);
+-	if (!blob) {
+-		ret = -ENOMEM;
+-		goto e_free;
+-	}
++	if (!blob)
++		return -ENOMEM;
  
-+	/*
-+	 * Copy potential output from the PSP back to data.  Do this even on
-+	 * failure in case the caller wants to glean something from the error.
-+	 */
-+	if (data)
-+		memcpy(data, sev->cmd_buf, buf_len);
-+
+-	data->address = __psp_pa(blob);
+-	data->len = input.length;
++	data.address = __psp_pa(blob);
++	data.len = input.length;
+ 
+ cmd:
+ 	if (sev->state == SEV_STATE_UNINIT) {
+@@ -438,10 +433,10 @@ static int sev_ioctl_do_pek_csr(struct sev_issue_cmd *argp, bool writable)
+ 			goto e_free_blob;
+ 	}
+ 
+-	ret = __sev_do_cmd_locked(SEV_CMD_PEK_CSR, data, &argp->error);
++	ret = __sev_do_cmd_locked(SEV_CMD_PEK_CSR, &data, &argp->error);
+ 
+ 	 /* If we query the CSR length, FW responded with expected data. */
+-	input.length = data->len;
++	input.length = data.len;
+ 
+ 	if (copy_to_user((void __user *)argp->data, &input, sizeof(input))) {
+ 		ret = -EFAULT;
+@@ -455,8 +450,6 @@ static int sev_ioctl_do_pek_csr(struct sev_issue_cmd *argp, bool writable)
+ 
+ e_free_blob:
+ 	kfree(blob);
+-e_free:
+-	kfree(data);
  	return ret;
  }
  
-@@ -984,6 +996,10 @@ int sev_dev_init(struct psp_device *psp)
- 	if (!sev)
- 		goto e_err;
+@@ -588,7 +581,7 @@ static int sev_ioctl_do_pek_import(struct sev_issue_cmd *argp, bool writable)
+ {
+ 	struct sev_device *sev = psp_master->sev_data;
+ 	struct sev_user_data_pek_cert_import input;
+-	struct sev_data_pek_cert_import *data;
++	struct sev_data_pek_cert_import data;
+ 	void *pek_blob, *oca_blob;
+ 	int ret;
  
-+	sev->cmd_buf = (void *)devm_get_free_pages(dev, GFP_KERNEL, 0);
-+	if (!sev->cmd_buf)
-+		goto e_sev;
-+
- 	psp->sev_data = sev;
+@@ -598,19 +591,14 @@ static int sev_ioctl_do_pek_import(struct sev_issue_cmd *argp, bool writable)
+ 	if (copy_from_user(&input, (void __user *)argp->data, sizeof(input)))
+ 		return -EFAULT;
  
- 	sev->dev = dev;
-@@ -995,7 +1011,7 @@ int sev_dev_init(struct psp_device *psp)
- 	if (!sev->vdata) {
- 		ret = -ENODEV;
- 		dev_err(dev, "sev: missing driver data\n");
--		goto e_sev;
-+		goto e_buf;
+-	data = kzalloc(sizeof(*data), GFP_KERNEL);
+-	if (!data)
+-		return -ENOMEM;
+-
+ 	/* copy PEK certificate blobs from userspace */
+ 	pek_blob = psp_copy_user_blob(input.pek_cert_address, input.pek_cert_len);
+-	if (IS_ERR(pek_blob)) {
+-		ret = PTR_ERR(pek_blob);
+-		goto e_free;
+-	}
++	if (IS_ERR(pek_blob))
++		return PTR_ERR(pek_blob);
+ 
+-	data->pek_cert_address = __psp_pa(pek_blob);
+-	data->pek_cert_len = input.pek_cert_len;
++	data.reserved = 0;
++	data.pek_cert_address = __psp_pa(pek_blob);
++	data.pek_cert_len = input.pek_cert_len;
+ 
+ 	/* copy PEK certificate blobs from userspace */
+ 	oca_blob = psp_copy_user_blob(input.oca_cert_address, input.oca_cert_len);
+@@ -619,8 +607,8 @@ static int sev_ioctl_do_pek_import(struct sev_issue_cmd *argp, bool writable)
+ 		goto e_free_pek;
  	}
  
- 	psp_set_sev_irq_handler(psp, sev_irq_handler, sev);
-@@ -1010,6 +1026,8 @@ int sev_dev_init(struct psp_device *psp)
+-	data->oca_cert_address = __psp_pa(oca_blob);
+-	data->oca_cert_len = input.oca_cert_len;
++	data.oca_cert_address = __psp_pa(oca_blob);
++	data.oca_cert_len = input.oca_cert_len;
  
- e_irq:
- 	psp_clear_sev_irq_handler(psp);
-+e_buf:
-+	devm_free_pages(dev, (unsigned long)sev->cmd_buf);
- e_sev:
- 	devm_kfree(dev, sev);
- e_err:
-diff --git a/drivers/crypto/ccp/sev-dev.h b/drivers/crypto/ccp/sev-dev.h
-index dd5c4fe82914..e1572f408577 100644
---- a/drivers/crypto/ccp/sev-dev.h
-+++ b/drivers/crypto/ccp/sev-dev.h
-@@ -52,6 +52,8 @@ struct sev_device {
- 	u8 api_major;
- 	u8 api_minor;
- 	u8 build;
-+
-+	void *cmd_buf;
- };
+ 	/* If platform is not in INIT state then transition it to INIT */
+ 	if (sev->state != SEV_STATE_INIT) {
+@@ -629,21 +617,19 @@ static int sev_ioctl_do_pek_import(struct sev_issue_cmd *argp, bool writable)
+ 			goto e_free_oca;
+ 	}
  
- int sev_dev_init(struct psp_device *psp);
+-	ret = __sev_do_cmd_locked(SEV_CMD_PEK_CERT_IMPORT, data, &argp->error);
++	ret = __sev_do_cmd_locked(SEV_CMD_PEK_CERT_IMPORT, &data, &argp->error);
+ 
+ e_free_oca:
+ 	kfree(oca_blob);
+ e_free_pek:
+ 	kfree(pek_blob);
+-e_free:
+-	kfree(data);
+ 	return ret;
+ }
+ 
+ static int sev_ioctl_do_get_id2(struct sev_issue_cmd *argp)
+ {
+ 	struct sev_user_data_get_id2 input;
+-	struct sev_data_get_id *data;
++	struct sev_data_get_id data;
+ 	void __user *input_address;
+ 	void *id_blob = NULL;
+ 	int ret;
+@@ -657,28 +643,25 @@ static int sev_ioctl_do_get_id2(struct sev_issue_cmd *argp)
+ 
+ 	input_address = (void __user *)input.address;
+ 
+-	data = kzalloc(sizeof(*data), GFP_KERNEL);
+-	if (!data)
+-		return -ENOMEM;
+-
+ 	if (input.address && input.length) {
+ 		id_blob = kmalloc(input.length, GFP_KERNEL);
+-		if (!id_blob) {
+-			kfree(data);
++		if (!id_blob)
+ 			return -ENOMEM;
+-		}
+ 
+-		data->address = __psp_pa(id_blob);
+-		data->len = input.length;
++		data.address = __psp_pa(id_blob);
++		data.len = input.length;
++	} else {
++		data.address = 0;
++		data.len = 0;
+ 	}
+ 
+-	ret = __sev_do_cmd_locked(SEV_CMD_GET_ID, data, &argp->error);
++	ret = __sev_do_cmd_locked(SEV_CMD_GET_ID, &data, &argp->error);
+ 
+ 	/*
+ 	 * Firmware will return the length of the ID value (either the minimum
+ 	 * required length or the actual length written), return it to the user.
+ 	 */
+-	input.length = data->len;
++	input.length = data.len;
+ 
+ 	if (copy_to_user((void __user *)argp->data, &input, sizeof(input))) {
+ 		ret = -EFAULT;
+@@ -686,7 +669,7 @@ static int sev_ioctl_do_get_id2(struct sev_issue_cmd *argp)
+ 	}
+ 
+ 	if (id_blob) {
+-		if (copy_to_user(input_address, id_blob, data->len)) {
++		if (copy_to_user(input_address, id_blob, data.len)) {
+ 			ret = -EFAULT;
+ 			goto e_free;
+ 		}
+@@ -694,7 +677,6 @@ static int sev_ioctl_do_get_id2(struct sev_issue_cmd *argp)
+ 
+ e_free:
+ 	kfree(id_blob);
+-	kfree(data);
+ 
+ 	return ret;
+ }
+@@ -744,7 +726,7 @@ static int sev_ioctl_do_pdh_export(struct sev_issue_cmd *argp, bool writable)
+ 	struct sev_device *sev = psp_master->sev_data;
+ 	struct sev_user_data_pdh_cert_export input;
+ 	void *pdh_blob = NULL, *cert_blob = NULL;
+-	struct sev_data_pdh_cert_export *data;
++	struct sev_data_pdh_cert_export data;
+ 	void __user *input_cert_chain_address;
+ 	void __user *input_pdh_cert_address;
+ 	int ret;
+@@ -762,9 +744,7 @@ static int sev_ioctl_do_pdh_export(struct sev_issue_cmd *argp, bool writable)
+ 	if (copy_from_user(&input, (void __user *)argp->data, sizeof(input)))
+ 		return -EFAULT;
+ 
+-	data = kzalloc(sizeof(*data), GFP_KERNEL);
+-	if (!data)
+-		return -ENOMEM;
++	memset(&data, 0, sizeof(data));
+ 
+ 	/* Userspace wants to query the certificate length. */
+ 	if (!input.pdh_cert_address ||
+@@ -776,25 +756,19 @@ static int sev_ioctl_do_pdh_export(struct sev_issue_cmd *argp, bool writable)
+ 	input_cert_chain_address = (void __user *)input.cert_chain_address;
+ 
+ 	/* Allocate a physically contiguous buffer to store the PDH blob. */
+-	if (input.pdh_cert_len > SEV_FW_BLOB_MAX_SIZE) {
+-		ret = -EFAULT;
+-		goto e_free;
+-	}
++	if (input.pdh_cert_len > SEV_FW_BLOB_MAX_SIZE)
++		return -EFAULT;
+ 
+ 	/* Allocate a physically contiguous buffer to store the cert chain blob. */
+-	if (input.cert_chain_len > SEV_FW_BLOB_MAX_SIZE) {
+-		ret = -EFAULT;
+-		goto e_free;
+-	}
++	if (input.cert_chain_len > SEV_FW_BLOB_MAX_SIZE)
++		return -EFAULT;
+ 
+ 	pdh_blob = kmalloc(input.pdh_cert_len, GFP_KERNEL);
+-	if (!pdh_blob) {
+-		ret = -ENOMEM;
+-		goto e_free;
+-	}
++	if (!pdh_blob)
++		return -ENOMEM;
+ 
+-	data->pdh_cert_address = __psp_pa(pdh_blob);
+-	data->pdh_cert_len = input.pdh_cert_len;
++	data.pdh_cert_address = __psp_pa(pdh_blob);
++	data.pdh_cert_len = input.pdh_cert_len;
+ 
+ 	cert_blob = kmalloc(input.cert_chain_len, GFP_KERNEL);
+ 	if (!cert_blob) {
+@@ -802,15 +776,15 @@ static int sev_ioctl_do_pdh_export(struct sev_issue_cmd *argp, bool writable)
+ 		goto e_free_pdh;
+ 	}
+ 
+-	data->cert_chain_address = __psp_pa(cert_blob);
+-	data->cert_chain_len = input.cert_chain_len;
++	data.cert_chain_address = __psp_pa(cert_blob);
++	data.cert_chain_len = input.cert_chain_len;
+ 
+ cmd:
+-	ret = __sev_do_cmd_locked(SEV_CMD_PDH_CERT_EXPORT, data, &argp->error);
++	ret = __sev_do_cmd_locked(SEV_CMD_PDH_CERT_EXPORT, &data, &argp->error);
+ 
+ 	/* If we query the length, FW responded with expected data. */
+-	input.cert_chain_len = data->cert_chain_len;
+-	input.pdh_cert_len = data->pdh_cert_len;
++	input.cert_chain_len = data.cert_chain_len;
++	input.pdh_cert_len = data.pdh_cert_len;
+ 
+ 	if (copy_to_user((void __user *)argp->data, &input, sizeof(input))) {
+ 		ret = -EFAULT;
+@@ -835,8 +809,6 @@ static int sev_ioctl_do_pdh_export(struct sev_issue_cmd *argp, bool writable)
+ 	kfree(cert_blob);
+ e_free_pdh:
+ 	kfree(pdh_blob);
+-e_free:
+-	kfree(data);
+ 	return ret;
+ }
+ 
 -- 
 2.31.0.208.g409f899ff0-goog
 
