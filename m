@@ -2,72 +2,103 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2AE5D354B38
-	for <lists+kvm@lfdr.de>; Tue,  6 Apr 2021 05:24:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2DB2A354B3C
+	for <lists+kvm@lfdr.de>; Tue,  6 Apr 2021 05:34:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242302AbhDFDZA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 5 Apr 2021 23:25:00 -0400
-Received: from szxga02-in.huawei.com ([45.249.212.188]:3513 "EHLO
-        szxga02-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230364AbhDFDYy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 5 Apr 2021 23:24:54 -0400
-Received: from DGGEML402-HUB.china.huawei.com (unknown [172.30.72.55])
-        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4FDtBZ2RN9zRYx1;
-        Tue,  6 Apr 2021 11:22:46 +0800 (CST)
-Received: from dggpeml500013.china.huawei.com (7.185.36.41) by
- DGGEML402-HUB.china.huawei.com (10.3.17.38) with Microsoft SMTP Server (TLS)
- id 14.3.498.0; Tue, 6 Apr 2021 11:24:45 +0800
-Received: from [10.174.187.161] (10.174.187.161) by
- dggpeml500013.china.huawei.com (7.185.36.41) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id
- 15.1.2106.2; Tue, 6 Apr 2021 11:24:45 +0800
-To:     <like.xu@linux.intel.com>
-References: <20210329054137.120994-2-like.xu@linux.intel.com>
-Subject: Re: [PATCH v4 01/16] perf/x86/intel: Add x86_pmu.pebs_vmx for Ice
- Lake Servers
-CC:     <andi@firstfloor.org>, "Fangyi (Eric)" <eric.fangyi@huawei.com>,
-        Xiexiangyou <xiexiangyou@huawei.com>,
-        <kan.liang@linux.intel.com>, <kvm@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <wei.w.wang@intel.com>,
-        <x86@kernel.org>
-From:   "Liuxiangdong (Aven, Cloud Infrastructure Service Product Dept.)" 
-        <liuxiangdong5@huawei.com>
-Message-ID: <606BD46F.7050903@huawei.com>
-Date:   Tue, 6 Apr 2021 11:24:31 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:38.0) Gecko/20100101
- Thunderbird/38.1.0
-MIME-Version: 1.0
-In-Reply-To: <20210329054137.120994-2-like.xu@linux.intel.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.174.187.161]
-X-ClientProxiedBy: dggeme704-chm.china.huawei.com (10.1.199.100) To
- dggpeml500013.china.huawei.com (7.185.36.41)
-X-CFilter-Loop: Reflected
+        id S242306AbhDFDeO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 5 Apr 2021 23:34:14 -0400
+Received: from mga17.intel.com ([192.55.52.151]:45584 "EHLO mga17.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S238560AbhDFDeM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 5 Apr 2021 23:34:12 -0400
+IronPort-SDR: SjRezrz+LpJ971R+cczF9pobcpcBosvD54Zgepjqt/51Hq4eVyzOReiD9bz/D4Ws3ze/Ua1H21
+ za/2CR9t+Waw==
+X-IronPort-AV: E=McAfee;i="6000,8403,9945"; a="173049550"
+X-IronPort-AV: E=Sophos;i="5.81,308,1610438400"; 
+   d="scan'208";a="173049550"
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Apr 2021 20:34:05 -0700
+IronPort-SDR: TLr8Nu1ypU+AsAx50MmmG8LA4at8dJwZkiWb5LDo7bbfSHqs50NfbGO9eNSfD9Fqq7UZtj/Dm9
+ 14mShHFdgpJA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.81,308,1610438400"; 
+   d="scan'208";a="440753642"
+Received: from sqa-gate.sh.intel.com (HELO robert-ivt.tsp.org) ([10.239.48.212])
+  by fmsmga004.fm.intel.com with ESMTP; 05 Apr 2021 20:34:02 -0700
+Message-ID: <69c69e29813f32d534b34c84d91f366df58eefe0.camel@linux.intel.com>
+Subject: Re: [RFC PATCH 02/12] x86/cpufeature: Add CPUID.19H:{EBX,ECX} cpuid
+ leaves
+From:   Robert Hoo <robert.hu@linux.intel.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     pbonzini@redhat.com, vkuznets@redhat.com, wanpengli@tencent.com,
+        jmattson@google.com, joro@8bytes.org, chang.seok.bae@intel.com,
+        kvm@vger.kernel.org, robert.hu@intel.com
+Date:   Tue, 06 Apr 2021 11:34:01 +0800
+In-Reply-To: <YGstqj6YH96jrlAl@google.com>
+References: <1611565580-47718-1-git-send-email-robert.hu@linux.intel.com>
+         <1611565580-47718-3-git-send-email-robert.hu@linux.intel.com>
+         <YGstqj6YH96jrlAl@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Mailer: Evolution 3.28.5 (3.28.5-8.el7) 
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi，like.
-Some questions about this new pebs patches set：
-https://lore.kernel.org/kvm/20210329054137.120994-2-like.xu@linux.intel.com/
+On Mon, 2021-04-05 at 15:32 +0000, Sean Christopherson wrote:
+> > diff --git a/arch/x86/include/asm/cpufeatures.h
+> > b/arch/x86/include/asm/cpufeatures.h
+> > index 8f2f050..d4a883a 100644
+> > --- a/arch/x86/include/asm/cpufeatures.h
+> > +++ b/arch/x86/include/asm/cpufeatures.h
+> > @@ -13,7 +13,7 @@
+> >  /*
+> >   * Defines x86 CPU feature bits
+> >   */
+> > -#define NCAPINTS			19	   /* N 32-bit words worth
+> > of info */
+> > +#define NCAPINTS			21	   /* N 32-bit words worth
+> > of info */
+> >  #define NBUGINTS			1	   /* N 32-bit bug flags */
+> >  
+> >  /*
+> > @@ -382,6 +382,15 @@
+> >  #define X86_FEATURE_CORE_CAPABILITIES	(18*32+30) /* ""
+> > IA32_CORE_CAPABILITIES MSR */
+> >  #define X86_FEATURE_SPEC_CTRL_SSBD	(18*32+31) /* "" Speculative
+> > Store Bypass Disable */
+> >  
+> > +/* Intel-defined KeyLocker feature CPUID level 0x00000019 (EBX),
+> > word 20*/
+> > +#define X86_FEATURE_KL_INS_ENABLED  (19*32 + 0) /* "" Key Locker
+> > instructions */
+> > +#define X86_FEATURE_KL_WIDE  (19*32 + 2) /* "" Wide Key Locker
+> > instructions */
+> > +#define X86_FEATURE_IWKEY_BACKUP  (19*32 + 4) /* "" IWKey backup
+> > */
+> > +
+> > +/* Intel-defined KeyLocker feature CPUID level 0x00000019 (ECX),
+> > word 21*/
+> > +#define X86_FEATURE_IWKEY_NOBACKUP  (20*32 + 0) /* "" NoBackup
+> > parameter to LOADIWKEY */
+> > +#define X86_FEATURE_IWKEY_RAND  (20*32 + 1) /* IWKey Randomization
+> > */
+> 
+> These should probably go into a Linux-defined leaf, I'm guessing
+> neither leaf
+> will be anywhere near full, at least in Linux.  KVM's reverse-CPUID
+> code will
+> likely/hopefully be gaining support for scattered leafs in the near
+> future[*],
+> that side of things should be a non-issue if/when this lands.
+> 
+> https://lkml.kernel.org/r/02455fc7521e9f1dc621b57c02c52cd04ce07797.1616136308.git.kai.huang@intel.com
 
-The new hardware facility supporting guest PEBS is only available
-on Intel Ice Lake Server platforms for now.
+Yes, in my internal private tree, I have refactored code based on your
+patch.
 
+BTW, I'm thinking, what if when those new HW-defined leaves got more
+occupied? will then they be moved from the Linux-defined leaves to new
+truely-map-to-HW-definition leaves?
 
-AFAIK， Icelake supports adaptive PEBS and extended PEBS which Skylake 
-doesn't.
-But we can still use IA32_PEBS_ENABLE MSR to indicate general-purpose 
-counter in Skylake.
-Is there anything else that only Icelake supports in this patches set?
-
-
-Besides, we have tried this patches set in Icelake.  We can use pebs(eg: 
-"perf record -e cycles:pp")
-when guest is kernel-5.11, but can't when kernel-4.18.  Is there a 
-minimum guest kernel version requirement?
-
-
-Thanks,
-Xiangdong Liu
