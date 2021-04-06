@@ -2,40 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8FD4D355098
-	for <lists+kvm@lfdr.de>; Tue,  6 Apr 2021 12:12:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A0FC23550C2
+	for <lists+kvm@lfdr.de>; Tue,  6 Apr 2021 12:23:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242469AbhDFKMa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 6 Apr 2021 06:12:30 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:20151 "EHLO
+        id S245073AbhDFKXR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 6 Apr 2021 06:23:17 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:54860 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234019AbhDFKM3 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 6 Apr 2021 06:12:29 -0400
+        by vger.kernel.org with ESMTP id S242846AbhDFKXO (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 6 Apr 2021 06:23:14 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1617703942;
+        s=mimecast20190719; t=1617704586;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=5DZOHw5xnAUj4vS/h0xMRQ76Ng9d8UzoQePr3Ea26wo=;
-        b=X2W6QzzlgXLwlRDzXzOTjumlQTqBYWPmGkkMl3Dm5xFU5VWSl5vPFl9gLXNoqLKZ5x660M
-        /RgsY4f6ayK5WubJlPW4aWnJgImOV/MxFV3DBtQltkaN2euOKP2HmBeNXSZq67fAQevg9H
-        QWctNXNz/CINPBylYRpifrMdGLRXz2Q=
+        bh=XFA+1T51DRXqHeUXo/P3ZvB0hY4DzAOsO3PZnz0QC7k=;
+        b=hdzz3ZCFrreZgFzshtXCFHa3yT78PTnxmJTpMrL/u0Lezx0uxbpVLMxArds0H/Uba+aX0G
+        gVQqZgR41TSKUy+SL0+UIyXBLCofJYlVazsgEiSkRil0/7YFujfagmLUsKl10PR6Up6UUz
+        Dnvq99ecWFBsz3B2Pvj332a/4NjHOo8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-578-x6gvMrAgOKel0WNrbk0Anw-1; Tue, 06 Apr 2021 06:12:20 -0400
-X-MC-Unique: x6gvMrAgOKel0WNrbk0Anw-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+ us-mta-17-cQKMOWESMUS4jgCP-mT35g-1; Tue, 06 Apr 2021 06:23:05 -0400
+X-MC-Unique: cQKMOWESMUS4jgCP-mT35g-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 750EF83DD3F;
-        Tue,  6 Apr 2021 10:12:18 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6B64B1800D50;
+        Tue,  6 Apr 2021 10:23:03 +0000 (UTC)
 Received: from starship (unknown [10.35.206.65])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 5840B59443;
-        Tue,  6 Apr 2021 10:12:14 +0000 (UTC)
-Message-ID: <8ffa121b8be00cd30c93830c476a448cee895abc.camel@redhat.com>
-Subject: Re: [PATCH 5/6] KVM: nSVM: avoid loading PDPTRs after migration
- when possible
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 7D1A25D9D0;
+        Tue,  6 Apr 2021 10:22:59 +0000 (UTC)
+Message-ID: <a60c81d35b3f35950486abd99b14a0931adf6848.camel@redhat.com>
+Subject: Re: [PATCH 1/6] KVM: nVMX: delay loading of PDPTRs to
+ KVM_REQ_GET_NESTED_STATE_PAGES
 From:   Maxim Levitsky <mlevitsk@redhat.com>
 To:     Sean Christopherson <seanjc@google.com>
 Cc:     kvm@vger.kernel.org,
@@ -52,83 +52,152 @@ Cc:     kvm@vger.kernel.org,
         Jonathan Corbet <corbet@lwn.net>,
         Borislav Petkov <bp@alien8.de>, Ingo Molnar <mingo@redhat.com>,
         "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>
-Date:   Tue, 06 Apr 2021 13:12:13 +0300
-In-Reply-To: <YGtCeiyzUrRbbNKG@google.com>
+Date:   Tue, 06 Apr 2021 13:22:58 +0300
+In-Reply-To: <YGdUBvliVWoF0tVl@google.com>
 References: <20210401141814.1029036-1-mlevitsk@redhat.com>
-         <20210401141814.1029036-6-mlevitsk@redhat.com>
-         <YGtCeiyzUrRbbNKG@google.com>
+         <20210401141814.1029036-2-mlevitsk@redhat.com>
+         <YGdUBvliVWoF0tVl@google.com>
 Content-Type: text/plain; charset="UTF-8"
 User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 2021-04-05 at 17:01 +0000, Sean Christopherson wrote:
+On Fri, 2021-04-02 at 17:27 +0000, Sean Christopherson wrote:
 > On Thu, Apr 01, 2021, Maxim Levitsky wrote:
-> > if new KVM_*_SREGS2 ioctls are used, the PDPTRs are
-> > part of the migration state and thus are loaded
-> > by those ioctls.
-> > 
+> > Similar to the rest of guest page accesses after migration,
+> > this should be delayed to KVM_REQ_GET_NESTED_STATE_PAGES
+> > request.
+> 
+> FWIW, I still object to this approach, and this patch has a plethora of issues.
+> 
+> I'm not against deferring various state loading to KVM_RUN, but wholesale moving
+> all of GUEST_CR3 processing without in-depth consideration of all the side
+> effects is a really bad idea.
+It could be, I won't argue about this.
+
+> 
 > > Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
 > > ---
-> >  arch/x86/kvm/svm/nested.c | 15 +++++++++++++--
-> >  1 file changed, 13 insertions(+), 2 deletions(-)
+> >  arch/x86/kvm/vmx/nested.c | 14 +++++++++-----
+> >  1 file changed, 9 insertions(+), 5 deletions(-)
 > > 
-> > diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
-> > index ac5e3e17bda4..b94916548cfa 100644
-> > --- a/arch/x86/kvm/svm/nested.c
-> > +++ b/arch/x86/kvm/svm/nested.c
-> > @@ -373,10 +373,9 @@ static int nested_svm_load_cr3(struct kvm_vcpu *vcpu, unsigned long cr3,
+> > diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+> > index fd334e4aa6db..b44f1f6b68db 100644
+> > --- a/arch/x86/kvm/vmx/nested.c
+> > +++ b/arch/x86/kvm/vmx/nested.c
+> > @@ -2564,11 +2564,6 @@ static int prepare_vmcs02(struct kvm_vcpu *vcpu, struct vmcs12 *vmcs12,
 > >  		return -EINVAL;
+> >  	}
 > >  
-> >  	if (!nested_npt && is_pae_paging(vcpu) &&
-> > -	    (cr3 != kvm_read_cr3(vcpu) || pdptrs_changed(vcpu))) {
-> > +	    (cr3 != kvm_read_cr3(vcpu) || !kvm_register_is_available(vcpu, VCPU_EXREG_PDPTR)))
-> >  		if (CC(!load_pdptrs(vcpu, vcpu->arch.walk_mmu, cr3)))
+> > -	/* Shadow page tables on either EPT or shadow page tables. */
+> > -	if (nested_vmx_load_cr3(vcpu, vmcs12->guest_cr3, nested_cpu_has_ept(vmcs12),
+> > -				entry_failure_code))
+> > -		return -EINVAL;
+> > -
+> >  	/*
+> >  	 * Immediately write vmcs02.GUEST_CR3.  It will be propagated to vmcs12
+> >  	 * on nested VM-Exit, which can occur without actually running L2 and
+> > @@ -3109,11 +3104,16 @@ static bool nested_get_evmcs_page(struct kvm_vcpu *vcpu)
+> >  static bool nested_get_vmcs12_pages(struct kvm_vcpu *vcpu)
+> >  {
+> >  	struct vmcs12 *vmcs12 = get_vmcs12(vcpu);
+> > +	enum vm_entry_failure_code entry_failure_code;
+> >  	struct vcpu_vmx *vmx = to_vmx(vcpu);
+> >  	struct kvm_host_map *map;
+> >  	struct page *page;
+> >  	u64 hpa;
+> >  
+> > +	if (nested_vmx_load_cr3(vcpu, vmcs12->guest_cr3, nested_cpu_has_ept(vmcs12),
+> > +				&entry_failure_code))
 > 
-> What if we ditch the optimizations[*] altogether and just do:
+> This results in KVM_RUN returning 0 without filling vcpu->run->exit_reason.
+> Speaking from experience, debugging those types of issues is beyond painful.
 > 
-> 	if (!nested_npt && is_pae_paging(vcpu) &&
-> 	    CC(!load_pdptrs(vcpu, vcpu->arch.walk_mmu, cr3))
-> 		return -EINVAL;
+> It also means CR3 is double loaded in the from_vmentry case.
 > 
-> Won't that obviate the need for KVM_{GET|SET}_SREGS2 since KVM will always load
-> the PDPTRs from memory?  IMO, nested migration with shadowing paging doesn't
-> warrant this level of optimization complexity.
+> And it will cause KVM to incorrectly return NVMX_VMENTRY_KVM_INTERNAL_ERROR
+> if a consistency check fails when nested_get_vmcs12_pages() is called on
+> from_vmentry.  E.g. run unit tests with this and it will silently disappear.
 
-Its not an optimization, it was done to be 100% within the X86 spec. 
-PDPTRs are internal cpu registers which are loaded only when
-CR3/CR0/CR4 are written by the guest, guest entry loads CR3, or 
-when guest exit loads CR3 (I checked both Intel and AMD manuals).
+I do remember now that you said something about this, but I wasn't able
+to find it in my email. Sorry about this.
+I agree with you.
 
-In addition to that when NPT is enabled, AMD drops this siliness and 
-just treats PDPTRs as normal paging entries, while on Intel side 
-when EPT is enabled, PDPTRs are stored in VMCS.
+I think that a question I should ask is why do we really need to 
+delay accessing guest memory after a migration.
 
-Nested migration is neither of these cases, thus PDPTRs should be 
-stored out of band.
-Same for non nested migration.
+So far I mostly just assumed that we need to do so, thinking that qemu
+updates the memslots or something, or maybe because guest memory
+isn't fully migrated and relies on post-copy to finish it.
 
-This was requested by Jim Mattson, and I went ahead and 
-implemented it, even though I do understand that no sane OS 
-relies on PDPTRs to be unsync v.s the actual page
-table containing them.
+Also I am not against leaving CR3 processing in here and doing only PDPTR load
+in KVM_RUN (and only when *SREG2 API is not used).
+
+> 
+> diff --git a/x86/vmx_tests.c b/x86/vmx_tests.c
+> index bbb006a..b8ccc69 100644
+> --- a/x86/vmx_tests.c
+> +++ b/x86/vmx_tests.c
+> @@ -8172,6 +8172,16 @@ static void test_guest_segment_base_addr_fields(void)
+>         vmcs_write(GUEST_AR_ES, ar_saved);
+>  }
+> 
+> +static void test_guest_cr3(void)
+> +{
+> +       u64 cr3_saved = vmcs_read(GUEST_CR3);
+> +
+> +       vmcs_write(GUEST_CR3, -1ull);
+> +       test_guest_state("Bad CR3 fails VM-Enter", true, -1ull, "GUEST_CR3");
+> +
+> +       vmcs_write(GUEST_DR7, cr3_saved);
+> +}
+> +
+Could you send this test to kvm unit tests?
+
+>  /*
+>   * Check that the virtual CPU checks the VMX Guest State Area as
+>   * documented in the Intel SDM.
+> @@ -8181,6 +8191,8 @@ static void vmx_guest_state_area_test(void)
+>         vmx_set_test_stage(1);
+>         test_set_guest(guest_state_test_main);
+> 
+> +       test_guest_cr3();
+> +
+>         /*
+>          * The IA32_SYSENTER_ESP field and the IA32_SYSENTER_EIP field
+>          * must each contain a canonical address.
+> 
+> 
+> > +		return false;
+> > +
+> >  	if (nested_cpu_has2(vmcs12, SECONDARY_EXEC_VIRTUALIZE_APIC_ACCESSES)) {
+> >  		/*
+> >  		 * Translate L1 physical address to host physical
+> > @@ -3357,6 +3357,10 @@ enum nvmx_vmentry_status nested_vmx_enter_non_root_mode(struct kvm_vcpu *vcpu,
+> >  	}
+> >  
+> >  	if (from_vmentry) {
+> > +		if (nested_vmx_load_cr3(vcpu, vmcs12->guest_cr3,
+> > +		    nested_cpu_has_ept(vmcs12), &entry_failure_code))
+> 
+> This alignment is messed up; it looks like two separate function calls.
+Sorry about this, I see it now.
+> 
+> > +			goto vmentry_fail_vmexit_guest_mode;
+> > +
+> >  		failed_index = nested_vmx_load_msr(vcpu,
+> >  						   vmcs12->vm_entry_msr_load_addr,
+> >  						   vmcs12->vm_entry_msr_load_count);
+> > -- 
+> > 2.26.2
+> > 
+
 
 Best regards,
 	Maxim Levitsky
-
-
-> 
-> [*] For some definitions of "optimization", since the extra pdptrs_changed()
->     check in the existing code is likely a net negative.
-> 
-> >  			return -EINVAL;
-> > -	}
-> >  
-> >  	/*
-> >  	 * TODO: optimize unconditional TLB flush/MMU sync here and in
 
 
