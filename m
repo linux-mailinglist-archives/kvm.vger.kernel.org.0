@@ -2,125 +2,150 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E6EAB354E0F
-	for <lists+kvm@lfdr.de>; Tue,  6 Apr 2021 09:41:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C6D82354E11
+	for <lists+kvm@lfdr.de>; Tue,  6 Apr 2021 09:41:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244361AbhDFHlW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 6 Apr 2021 03:41:22 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:64520 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S237025AbhDFHlM (ORCPT
+        id S244353AbhDFHlY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 6 Apr 2021 03:41:24 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:9110 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S235408AbhDFHlM (ORCPT
         <rfc822;kvm@vger.kernel.org>); Tue, 6 Apr 2021 03:41:12 -0400
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 1367YA9l068718
-        for <kvm@vger.kernel.org>; Tue, 6 Apr 2021 03:41:04 -0400
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 1367X0oQ147229
+        for <kvm@vger.kernel.org>; Tue, 6 Apr 2021 03:41:05 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
  : date : message-id : in-reply-to : references; s=pp1;
- bh=PDvzVSLV3tmrkcFM0KBW8ORAUDODkbz4J8Att9R5QDE=;
- b=cj11lcDwsKIu/Thq1ieIWC2ESCUdh6UKJBK+Wj23TI/mp+NfNva3x3sLa98RJS1PGl4L
- rrwycsJfjtxoVWe3/0v6i+oOkj65CmKAn55R35xdF4aBR0mQTtza2tfgnd2b05K3/xhf
- bAtr4aX9rCxgPq9wRs7GtXqD3igiCIV8S1lmWti2Hoexh2EbYd9ctl80HKhP16Htmqdq
- yK/Tslbj75F0v1c+TytcWh/RGOTI6yG/+Q8/T/8MMvqbXxcbh7+nYv+H3c9OcXDgmZu+
- fglAVc8n7ubs5td1QVszQh4uEL0PmJJzm0tGWhKJijqRcngr0poY9izF1lHl/Ba8jkyS Rw== 
+ bh=sRc4CUmq3qBPPb7nJvUtuxHqfxFAdzHMTDhyhe8zaOM=;
+ b=VxD6ckBJAgHyLgeBlmoau3b69fhPc3XEEjZwQjhUeZ2VW4Gk+NJAy8/GTIE1ynG7WcIj
+ FVbDpFZAGL1uu0w/b5vBaLTI1qTP1HP/f5n6lynlGx2iamshZjrduxjWfUH7C14Dx3jZ
+ QowBYcBdheqR6G+rre4h3rylB3nCGtI3isuOzqKG5LX6Fl1Pr7xcXDyt6H0lAaNme3g7
+ biVXfNTvY7wJW7NmQi8/vuNvVKF+vumwn1aboBm/sA3oGlUCIntT8IaE2jrN/CI7C48I
+ lhnMX4cZgTymZLxJMapbT3jNi8yhGmDdpCYWaCjNj7Sa+y9hDdyLgsLy3ut1iI6o4yfu Iw== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 37q5eatcpt-1
+        by mx0a-001b2d01.pphosted.com with ESMTP id 37q5easpw0-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Tue, 06 Apr 2021 03:41:04 -0400
-Received: from m0098413.ppops.net (m0098413.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 1367Z42f070983
-        for <kvm@vger.kernel.org>; Tue, 6 Apr 2021 03:41:03 -0400
-Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 37q5eatcnk-1
+        for <kvm@vger.kernel.org>; Tue, 06 Apr 2021 03:41:05 -0400
+Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 1367X961001093
+        for <kvm@vger.kernel.org>; Tue, 6 Apr 2021 03:41:05 -0400
+Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 37q5easpux-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 06 Apr 2021 03:41:03 -0400
-Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
-        by ppma01fra.de.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 1367Wp27023881;
+        Tue, 06 Apr 2021 03:41:04 -0400
+Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
+        by ppma05fra.de.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 1367XF8f024813;
         Tue, 6 Apr 2021 07:41:02 GMT
 Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
-        by ppma01fra.de.ibm.com with ESMTP id 37q2nkh0n0-1
+        by ppma05fra.de.ibm.com with ESMTP id 37q2nr90q4-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 06 Apr 2021 07:41:01 +0000
+        Tue, 06 Apr 2021 07:41:02 +0000
 Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 1367exBo40632804
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 1367exOK31785404
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
         Tue, 6 Apr 2021 07:40:59 GMT
 Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 19CE74C066;
+        by IMSVA (Postfix) with ESMTP id 724B24C050;
         Tue,  6 Apr 2021 07:40:59 +0000 (GMT)
 Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id D5BCB4C070;
-        Tue,  6 Apr 2021 07:40:58 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 313954C04E;
+        Tue,  6 Apr 2021 07:40:59 +0000 (GMT)
 Received: from oc3016276355.ibm.com (unknown [9.145.42.152])
         by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue,  6 Apr 2021 07:40:58 +0000 (GMT)
+        Tue,  6 Apr 2021 07:40:59 +0000 (GMT)
 From:   Pierre Morel <pmorel@linux.ibm.com>
 To:     kvm@vger.kernel.org
 Cc:     frankja@linux.ibm.com, david@redhat.com, thuth@redhat.com,
         cohuck@redhat.com, imbrenda@linux.ibm.com
-Subject: [kvm-unit-tests PATCH v3 12/16] s390x: css: Check ORB reserved bits
-Date:   Tue,  6 Apr 2021 09:40:49 +0200
-Message-Id: <1617694853-6881-13-git-send-email-pmorel@linux.ibm.com>
+Subject: [kvm-unit-tests PATCH v3 13/16] s390x: css: checking for CSS extensions
+Date:   Tue,  6 Apr 2021 09:40:50 +0200
+Message-Id: <1617694853-6881-14-git-send-email-pmorel@linux.ibm.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1617694853-6881-1-git-send-email-pmorel@linux.ibm.com>
 References: <1617694853-6881-1-git-send-email-pmorel@linux.ibm.com>
 X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: TAHeBZWSoQ3IoZD2tuEDJhhM2u-kvmAS
-X-Proofpoint-ORIG-GUID: 3L0EW-t4PfFbldcIRxl_IKsn-Mgafd7W
+X-Proofpoint-GUID: _DfYdWem8jWDmdBkSCZM1k4e_shhBUqZ
+X-Proofpoint-ORIG-GUID: b16zBZ6nwB_lPKaAMeq8Sc3pYZmx7dTn
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.761
  definitions=2021-04-06_01:2021-04-01,2021-04-06 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
- priorityscore=1501 mlxscore=0 suspectscore=0 adultscore=0 phishscore=0
- bulkscore=0 mlxlogscore=999 clxscore=1015 spamscore=0 lowpriorityscore=0
- impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 phishscore=0
+ mlxlogscore=999 adultscore=0 mlxscore=0 suspectscore=0 clxscore=1015
+ priorityscore=1501 bulkscore=0 spamscore=0 lowpriorityscore=0
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.12.0-2104030000 definitions=main-2104060050
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Several bits of the ORB are reserved and must be zero.
-Their use will trigger a operand exception.
+We verify that these extensions are not install before running simple
+tests.
 
 Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
 ---
- s390x/css.c | 21 +++++++++++++++++++++
- 1 file changed, 21 insertions(+)
+ lib/s390x/css.h |  2 ++
+ s390x/css.c     | 31 +++++++++++++++++++++++++++++++
+ 2 files changed, 33 insertions(+)
 
+diff --git a/lib/s390x/css.h b/lib/s390x/css.h
+index d824e34..08b2974 100644
+--- a/lib/s390x/css.h
++++ b/lib/s390x/css.h
+@@ -338,7 +338,9 @@ struct chsc_scsc {
+ 	uint8_t reserved[9];
+ 	struct chsc_header res;
+ 	uint32_t res_fmt;
++#define CSSC_ORB_EXTENSIONS		0
+ #define CSSC_EXTENDED_MEASUREMENT_BLOCK 48
++#define CSSC_FC_EXTENSIONS		88
+ 	uint64_t general_char[255];
+ 	uint64_t chsc_char[254];
+ };
 diff --git a/s390x/css.c b/s390x/css.c
-index 56adc16..26f5da6 100644
+index 26f5da6..f8c6688 100644
 --- a/s390x/css.c
 +++ b/s390x/css.c
-@@ -209,6 +209,26 @@ static void ssch_orb_midaw(void)
- 	orb->ctrl = tmp;
+@@ -229,6 +229,35 @@ static void ssch_orb_ctrl(void)
+ 	}
  }
  
-+static void ssch_orb_ctrl(void)
++static void ssch_orb_extension(void)
++{
++	if (!css_test_general_feature(CSSC_ORB_EXTENSIONS)) {
++		report_skip("ORB extensions not installed");
++		return;
++	}
++	/* Place holder for checking ORB extensions */
++	report_info("ORB extensions installed but not tested");
++}
++
++static void ssch_orb_fcx(void)
 +{
 +	uint32_t tmp = orb->ctrl;
-+	char buffer[80];
-+	int i;
 +
-+	/* Check the reserved bits of the ORB CTRL field */
-+	for (i = 26; i <= 30; i++) {
-+		orb->ctrl |= (0x01 << (31 - i));
-+		snprintf(buffer, 80, " %d", i);
-+		report_prefix_push(buffer);
-+		expect_pgm_int();
-+		ssch(test_device_sid, orb);
-+		check_pgm_int_code(PGM_INT_CODE_OPERAND);
-+		report_prefix_pop();
-+
-+		orb->ctrl = tmp;
++	if (!css_test_general_feature(CSSC_FC_EXTENSIONS)) {
++		report_skip("Fibre-channel extensions not installed");
++		return;
 +	}
++
++	report_prefix_push("Channel-Program Type Control");
++	orb->ctrl |= ORB_CTRL_CPTC;
++	expect_pgm_int();
++	ssch(test_device_sid, orb);
++	check_pgm_int_code(PGM_INT_CODE_OPERAND);
++	report_prefix_pop();
++
++	orb->ctrl = tmp;
 +}
 +
  static struct tests ssh_tests[] = {
  	{ "privilege", ssch_privilege },
  	{ "orb cpa zero", ssch_orb_cpa_zero },
-@@ -217,6 +237,7 @@ static struct tests ssh_tests[] = {
- 	{ "CCW access", ssch_ccw_access },
+@@ -238,6 +267,8 @@ static struct tests ssh_tests[] = {
  	{ "CCW in DMA31", ssch_ccw_dma31 },
  	{ "ORB MIDAW unsupported", ssch_orb_midaw },
-+	{ "ORB reserved CTRL bits", ssch_orb_ctrl },
+ 	{ "ORB reserved CTRL bits", ssch_orb_ctrl },
++	{ "ORB extensions", ssch_orb_extension},
++	{ "FC extensions", ssch_orb_fcx},
  	{ NULL, NULL }
  };
  
