@@ -2,139 +2,71 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 20DD7354875
-	for <lists+kvm@lfdr.de>; Tue,  6 Apr 2021 00:06:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8F6F9354A20
+	for <lists+kvm@lfdr.de>; Tue,  6 Apr 2021 03:36:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242657AbhDEWFa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 5 Apr 2021 18:05:30 -0400
-Received: from mail-il1-f200.google.com ([209.85.166.200]:48299 "EHLO
-        mail-il1-f200.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241318AbhDEWFX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 5 Apr 2021 18:05:23 -0400
-Received: by mail-il1-f200.google.com with SMTP id f14so1445901ilu.15
-        for <kvm@vger.kernel.org>; Mon, 05 Apr 2021 15:05:16 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
-        bh=rE9Lgt+L6rHEa2lPaIz2LAbklGrZ/8/l6OV+XVfhjIQ=;
-        b=gr0ITUSW9tzajpzVchfNflRcGqj8d+MJNdF0fhIb2hFiobGyzFQEUmbNeISJ00vR1y
-         BGkac2llj4pEC6skCfFScjCzotZ8DFLUMIoBvdnpMSqXHYEw24ntcEynpLdDZuNuZjhG
-         dlUksXTIwGa5NA4fTyuP6kvGGHNb6Pvs+zjUXL6Q0j56hxSAFIMqO34g/6D6xvJNxDra
-         yZalnI+kIu2DYfbhkCtMSjcEJbTcTTU2agRt/d7hBO+UzcQ3hGrTZGMuTE51LosjxBe+
-         cx2UK/JDwnBkwWapDErwzHKoFX/rrF1TZEAueSSiBt0yzIHvjLOxis578Tuk6iJ+2ye/
-         9pxA==
-X-Gm-Message-State: AOAM533IEP9QRsuiIprbkPaht/aY03ZSVU2YcVrmRgdTe8wW1E/DpXPs
-        2zHjTMaH3c4EEDV0KhlZLwd9XRGwQytIl4Yp5LSvWBHauAV8
-X-Google-Smtp-Source: ABdhPJwsl00yvfIuD6YEyJZUif+FP4TrNvNVIATDR9q3M8i0uQFmnaAG/Sm5oszwt4k13naHE6JC49fHrNIzBfixsVl0+UduvZNv
+        id S242138AbhDFBgs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 5 Apr 2021 21:36:48 -0400
+Received: from mail.kernel.org ([198.145.29.99]:41512 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S241929AbhDFBgs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 5 Apr 2021 21:36:48 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id E2C0B610CC;
+        Tue,  6 Apr 2021 01:36:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1617673001;
+        bh=vAKgY/w88o4JyfifHbYX0gz1dz93+w7bT3qgEGRK2+g=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=BTtGcGh+zFemR4MouSS3Vp9rmKPyS0tvqRX6pInfYGcM69gWMmQhNYTrbXVW9aIKp
+         HN7i7GMMzsQJFGYOgDrNeTAH0bdVBL06oabV6ktBwh7LVcvnaCUFz5JqfwnJrNjgc0
+         eM/LhGT5aI+2cBKz+E/yJ6XCkgKB2Az3nCAI68+CgYtezmlqAerfex6cBbm8f4nHYk
+         af8pKYG+KwwbXIPoZd3gXj4D0XI0BYgCzI9RNY47GWe8So3xBE+1I7pqJbu4cvjt3z
+         524MJRKRuBeVE+g4kgQ0/isjeB8lqJLqv8R2an5H2u1roz1l/ynwPYgU3F7bD1397F
+         nU8Q6IOr25fhg==
+Received: by mail-il1-f178.google.com with SMTP id r17so3943534ilt.0;
+        Mon, 05 Apr 2021 18:36:40 -0700 (PDT)
+X-Gm-Message-State: AOAM531Acu4i75fJuuxTMD/ob7TUwBPjxWcB62hgktKWiZ2LxwnNUwMh
+        ZeG5ZRUQS5uYlPzehpiV5Hprm2PGP77l6ARAiNg=
+X-Google-Smtp-Source: ABdhPJzWSmikNXg5FMS/wC0dVQ759wtwRUK+hMolhUWYKc1R/+lCAuh7T+qb1Tw/ng25rQu0VjJgRKtq5v7y4qpUYpQ=
+X-Received: by 2002:a05:6e02:1286:: with SMTP id y6mr21855088ilq.270.1617673000386;
+ Mon, 05 Apr 2021 18:36:40 -0700 (PDT)
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1a87:: with SMTP id k7mr19967967ilv.69.1617660316511;
- Mon, 05 Apr 2021 15:05:16 -0700 (PDT)
-Date:   Mon, 05 Apr 2021 15:05:16 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000008872ff05bf40e4db@google.com>
-Subject: [syzbot] WARNING: suspicious RCU usage in tcp_bpf_update_proto
-From:   syzbot <syzbot+320a3bc8d80f478c37e4@syzkaller.appspotmail.com>
-To:     akpm@linux-foundation.org, andrii@kernel.org, anton@tuxera.com,
-        ast@kernel.org, bp@alien8.de, bpf@vger.kernel.org,
-        daniel@iogearbox.net, davem@davemloft.net, hpa@zytor.com,
-        jakub@cloudflare.com, jmattson@google.com,
-        john.fastabend@gmail.com, joro@8bytes.org, kafai@fb.com,
-        kpsingh@kernel.org, kuba@kernel.org, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, lmb@cloudflare.com, mingo@redhat.com,
-        netdev@vger.kernel.org, pbonzini@redhat.com, rkovhaev@gmail.com,
-        seanjc@google.com, songliubraving@fb.com,
-        syzkaller-bugs@googlegroups.com, tglx@linutronix.de,
-        torvalds@linux-foundation.org, vkuznets@redhat.com,
-        wanpengli@tencent.com, x86@kernel.org, yhs@fb.com
+References: <20210402155807.49976-1-pbonzini@redhat.com> <20210402155807.49976-3-pbonzini@redhat.com>
+ <CAAhV-H4wskLvGD1hhuS2ZDOBNenCcTd_K8GkYn1GOzwnEvTDXQ@mail.gmail.com> <aab8a915-6e73-3cba-5392-8f940479a011@redhat.com>
+In-Reply-To: <aab8a915-6e73-3cba-5392-8f940479a011@redhat.com>
+From:   Huacai Chen <chenhuacai@kernel.org>
+Date:   Tue, 6 Apr 2021 09:36:28 +0800
+X-Gmail-Original-Message-ID: <CAAhV-H72z9DbbV=_fEhCeeOaP8fQ_qtr4rQMD=f5n08ekG=Ygw@mail.gmail.com>
+Message-ID: <CAAhV-H72z9DbbV=_fEhCeeOaP8fQ_qtr4rQMD=f5n08ekG=Ygw@mail.gmail.com>
+Subject: Re: [PATCH 2/4] KVM: MIPS: rework flush_shadow_* callbacks into one
+ that prepares the flush
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        seanjc@google.com, "open list:MIPS" <linux-mips@vger.kernel.org>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hello,
+Hi, Paolo,
 
-syzbot found the following issue on:
+On Sat, Apr 3, 2021 at 6:43 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+> On 03/04/21 04:31, Huacai Chen wrote:
+> > Hi, Paolo,
+> >
+> > TE mode has been removed in the MIPS tree, can we also remove it in
+> > KVM tree before this rework?
+>
+> I tried the merge and it will be enough for Linus to remove
+> arch/mips/kvm/trap_emul.c.  So I will leave it as is, but next time I'd
+> prefer KVM MIPS changes to go through either my tree or a common topic
+> branch.
+Emmm, the TE removal series is done by Thomas, not me. :)
 
-HEAD commit:    514e1150 net: x25: Queue received packets in the drivers i..
-git tree:       net-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=112a8831d00000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=7eff0f22b8563a5f
-dashboard link: https://syzkaller.appspot.com/bug?extid=320a3bc8d80f478c37e4
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1532d711d00000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=15f44c5ed00000
-
-The issue was bisected to:
-
-commit 4dfe6bd94959222e18d512bdf15f6bf9edb9c27c
-Author: Rustam Kovhaev <rkovhaev@gmail.com>
-Date:   Wed Feb 24 20:00:30 2021 +0000
-
-    ntfs: check for valid standard information attribute
-
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=16207a81d00000
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=15207a81d00000
-console output: https://syzkaller.appspot.com/x/log.txt?x=11207a81d00000
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+320a3bc8d80f478c37e4@syzkaller.appspotmail.com
-Fixes: 4dfe6bd94959 ("ntfs: check for valid standard information attribute")
-
-=============================
-WARNING: suspicious RCU usage
-5.12.0-rc4-syzkaller #0 Not tainted
------------------------------
-include/linux/skmsg.h:286 suspicious rcu_dereference_check() usage!
-
-other info that might help us debug this:
-
-
-rcu_scheduler_active = 2, debug_locks = 1
-1 lock held by syz-executor383/8454:
- #0: ffff888013a99b48 (clock-AF_INET){++..}-{2:2}, at: sk_psock_drop+0x2c/0x460 net/core/skmsg.c:788
-
-stack backtrace:
-CPU: 1 PID: 8454 Comm: syz-executor383 Not tainted 5.12.0-rc4-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
-Call Trace:
- __dump_stack lib/dump_stack.c:79 [inline]
- dump_stack+0x141/0x1d7 lib/dump_stack.c:120
- sk_psock include/linux/skmsg.h:286 [inline]
- tcp_bpf_update_proto+0x530/0x5f0 net/ipv4/tcp_bpf.c:504
- sk_psock_restore_proto include/linux/skmsg.h:408 [inline]
- sk_psock_drop+0xdf/0x460 net/core/skmsg.c:789
- sk_psock_put include/linux/skmsg.h:446 [inline]
- tcp_bpf_recvmsg+0x42d/0x480 net/ipv4/tcp_bpf.c:208
- inet_recvmsg+0x11b/0x5d0 net/ipv4/af_inet.c:852
- sock_recvmsg_nosec net/socket.c:888 [inline]
- sock_recvmsg net/socket.c:906 [inline]
- sock_recvmsg net/socket.c:902 [inline]
- ____sys_recvmsg+0x2c4/0x600 net/socket.c:2569
- ___sys_recvmsg+0x127/0x200 net/socket.c:2611
- do_recvmmsg+0x24d/0x6d0 net/socket.c:2705
- __sys_recvmmsg net/socket.c:2784 [inline]
- __do_sys_recvmmsg net/socket.c:2807 [inline]
- __se_sys_recvmmsg net/socket.c:2800 [inline]
- __x64_sys_recvmmsg+0x20b/0x260 net/socket.c:2800
- do_syscall_64+0x2d/0x70 arch/x86/entry/common.c:46
- entry_SYSCALL_64_after_hwframe+0x44/0xae
-RIP: 0033:0x4468e9
-Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 a1 15 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007f010b0cc318 EFLAGS: 00000246 ORIG_RAX: 000000000000012b
-RAX: ffffffffffffffda RBX: 00000000004cb4e8 RCX: 00000000004468e9
-RDX: 0000000000000422 RSI: 0000000020000540 RDI: 0000000000000004
-RBP: 00000000004cb4e0 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 000000000049b270
-R13: 00007ffe3829a5bf R14: 00007f010b0cc400 R15: 0000000000022000
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
-syzbot can test patches for this issue, for details see:
-https://goo.gl/tpsmEJ#testing-patches
+Huacai
+>
+> Paolo
+>
