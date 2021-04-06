@@ -2,151 +2,170 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E176D3556B2
-	for <lists+kvm@lfdr.de>; Tue,  6 Apr 2021 16:33:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 109743556BB
+	for <lists+kvm@lfdr.de>; Tue,  6 Apr 2021 16:36:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345190AbhDFOdO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 6 Apr 2021 10:33:14 -0400
-Received: from mga17.intel.com ([192.55.52.151]:14736 "EHLO mga17.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1345168AbhDFOdN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 6 Apr 2021 10:33:13 -0400
-IronPort-SDR: Tk5MRMxzqOuNfWRDWHxY2ds2DwXSZHcrIRdmMpw5pNWTK21MrNkSHCDtjqniMO10DSlxbc406i
- fa8GLl1CfStw==
-X-IronPort-AV: E=McAfee;i="6000,8403,9946"; a="173156352"
-X-IronPort-AV: E=Sophos;i="5.81,309,1610438400"; 
-   d="scan'208";a="173156352"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Apr 2021 07:33:04 -0700
-IronPort-SDR: YL1dNphUsw0l80VGVme5Zr/g6N1Prqg0n5R4QnNdQniE/FVpbXDIbH1niH7yIKrcN2Qjelw17o
- F3+DzoXsADng==
-X-IronPort-AV: E=Sophos;i="5.81,309,1610438400"; 
-   d="scan'208";a="418376975"
-Received: from etbenite-mobl1.amr.corp.intel.com (HELO [10.212.54.229]) ([10.212.54.229])
-  by orsmga007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Apr 2021 07:33:02 -0700
-Subject: Re: [RFCv1 7/7] KVM: unmap guest memory using poisoned pages
-To:     David Hildenbrand <david@redhat.com>,
-        "Kirill A. Shutemov" <kirill@shutemov.name>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Sean Christopherson <seanjc@google.com>,
-        Jim Mattson <jmattson@google.com>
-Cc:     David Rientjes <rientjes@google.com>,
-        "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>,
-        "Kleen, Andi" <andi.kleen@intel.com>,
-        "Yamahata, Isaku" <isaku.yamahata@intel.com>, x86@kernel.org,
-        kvm@vger.kernel.org, linux-mm@kvack.org,
-        linux-kernel@vger.kernel.org,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-References: <20210402152645.26680-1-kirill.shutemov@linux.intel.com>
- <20210402152645.26680-8-kirill.shutemov@linux.intel.com>
- <c5f2580d-0733-4523-d1e8-c43b487f0aaf@redhat.com>
-From:   Dave Hansen <dave.hansen@intel.com>
-Autocrypt: addr=dave.hansen@intel.com; keydata=
- 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
- z5cecg==
-Message-ID: <52518f09-7350-ebe9-7ddb-29095cd3a4d9@intel.com>
-Date:   Tue, 6 Apr 2021 07:33:02 -0700
+        id S1345222AbhDFOgu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 6 Apr 2021 10:36:50 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:4208 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1345216AbhDFOgu (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 6 Apr 2021 10:36:50 -0400
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 136EY13U141801;
+        Tue, 6 Apr 2021 10:36:41 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=vcwyT1vP5oGIhr0ABs++F+zbHHYveP26Kmi/Bg16X6w=;
+ b=aU7WTp0HGl1WunD5vHqJiO32IlMAKW0Nrh2iwvX4TB3L3GWoUjGhY8aehC0AV9mWm4CY
+ KYOxvinWqR4fLHySdhdLUviXN3jNFrsZjB2/xcoMcB9PwQ577OJ4XTTMbOtb/gXivvl9
+ enosmJU6sc/fGYAd0n0h6Ehh4ahilaVsWSypjQCfPhJh/IEoz5j5KCuRjfoakrBMXE+D
+ 0b5X+dbGkJWBQgYXkpUJu8lOSLjJg3fPUpFyQKTBm1+EcgT5VldJFYHS0HbVY22JuuDc
+ U/kretBiVZKnXamFCNIBTbmqcggViZFqcGN4na4+bmqe7aBtLEkVaXNAkiFnuK2VuFof rQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 37q5c04uvc-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 06 Apr 2021 10:36:40 -0400
+Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 136EY123141796;
+        Tue, 6 Apr 2021 10:36:40 -0400
+Received: from ppma03wdc.us.ibm.com (ba.79.3fa9.ip4.static.sl-reverse.com [169.63.121.186])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 37q5c04uup-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 06 Apr 2021 10:36:40 -0400
+Received: from pps.filterd (ppma03wdc.us.ibm.com [127.0.0.1])
+        by ppma03wdc.us.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 136ERQXY010099;
+        Tue, 6 Apr 2021 14:36:38 GMT
+Received: from b03cxnp07027.gho.boulder.ibm.com (b03cxnp07027.gho.boulder.ibm.com [9.17.130.14])
+        by ppma03wdc.us.ibm.com with ESMTP id 37qbgydx54-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 06 Apr 2021 14:36:38 +0000
+Received: from b03ledav001.gho.boulder.ibm.com (b03ledav001.gho.boulder.ibm.com [9.17.130.232])
+        by b03cxnp07027.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 136EaZOZ29032776
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 6 Apr 2021 14:36:35 GMT
+Received: from b03ledav001.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 804C16E053;
+        Tue,  6 Apr 2021 14:36:35 +0000 (GMT)
+Received: from b03ledav001.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id A70596E04E;
+        Tue,  6 Apr 2021 14:36:33 +0000 (GMT)
+Received: from cpe-172-100-182-241.stny.res.rr.com (unknown [9.85.175.110])
+        by b03ledav001.gho.boulder.ibm.com (Postfix) with ESMTP;
+        Tue,  6 Apr 2021 14:36:33 +0000 (GMT)
+Subject: Re: [PATCH v14 00/13] s390/vfio-ap: dynamic configuration support
+To:     Halil Pasic <pasic@linux.ibm.com>
+Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, jjherne@linux.ibm.com, freude@linux.ibm.com,
+        borntraeger@de.ibm.com, cohuck@redhat.com, mjrosato@linux.ibm.com,
+        alex.williamson@redhat.com, kwankhede@nvidia.com,
+        fiuczy@linux.ibm.com, frankja@linux.ibm.com, david@redhat.com,
+        hca@linux.ibm.com, gor@linux.ibm.com
+References: <20210331152256.28129-1-akrowiak@linux.ibm.com>
+ <20210401211742.6afd6b14.pasic@linux.ibm.com>
+From:   Tony Krowiak <akrowiak@linux.ibm.com>
+Message-ID: <a6f25bd3-8f7f-2c59-68e3-138db0ef0202@linux.ibm.com>
+Date:   Tue, 6 Apr 2021 10:36:32 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <c5f2580d-0733-4523-d1e8-c43b487f0aaf@redhat.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20210401211742.6afd6b14.pasic@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: trN1l5pQywNV81xhSAB6Gnp3KonUyYMr
+X-Proofpoint-ORIG-GUID: B1xsN-30PaYTXSYWV1JLTeqG2JX-TxZ9
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.761
+ definitions=2021-04-06_03:2021-04-01,2021-04-06 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 impostorscore=0
+ mlxlogscore=999 priorityscore=1501 mlxscore=0 malwarescore=0
+ lowpriorityscore=0 adultscore=0 phishscore=0 bulkscore=0 suspectscore=0
+ spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2104030000 definitions=main-2104060102
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 4/6/21 12:44 AM, David Hildenbrand wrote:
-> On 02.04.21 17:26, Kirill A. Shutemov wrote:
->> TDX architecture aims to provide resiliency against confidentiality and
->> integrity attacks. Towards this goal, the TDX architecture helps enforce
->> the enabling of memory integrity for all TD-private memory.
->>
->> The CPU memory controller computes the integrity check value (MAC) for
->> the data (cache line) during writes, and it stores the MAC with the
->> memory as meta-data. A 28-bit MAC is stored in the ECC bits.
->>
->> Checking of memory integrity is performed during memory reads. If
->> integrity check fails, CPU poisones cache line.
->>
->> On a subsequent consumption (read) of the poisoned data by software,
->> there are two possible scenarios:
->>
->>   - Core determines that the execution can continue and it treats
->>     poison with exception semantics signaled as a #MCE
->>
->>   - Core determines execution cannot continue,and it does an unbreakable
->>     shutdown
->>
->> For more details, see Chapter 14 of Intel TDX Module EAS[1]
->>
->> As some of integrity check failures may lead to system shutdown host
->> kernel must not allow any writes to TD-private memory. This requirment
->> clashes with KVM design: KVM expects the guest memory to be mapped into
->> host userspace (e.g. QEMU).
-> 
-> So what you are saying is that if QEMU would write to such memory, it
-> could crash the kernel? What a broken design.
+Given what I finally was able to figure out, it is interesting to note 
+that this failure only occurred
+when building the kernel with the debug_defconfig configuration. The 
+problem occurs when the
+vfio_ap_mdev_remove_queue() callback is called subsequent to the mdev 
+being removed via the
+vfio_ap_mdev_remove() callback. The failure results because the 
+vfio_ap_queue object representing
+the queue device being removed still has a link to the mdev to which the 
+queue is assigned.
+The fix is to remove the link to the mdev from all vfio_ap_queue objects 
+when the mdev is
+removed. I will provide a new set of patches with the fix included.
 
-IMNHO, the broken design is mapping the memory to userspace in the first
-place.  Why the heck would you actually expose something with the MMU to
-a context that can't possibly meaningfully access or safely write to it?
+On 4/1/21 3:17 PM, Halil Pasic wrote:
+> On Wed, 31 Mar 2021 11:22:43 -0400
+> Tony Krowiak <akrowiak@linux.ibm.com> wrote:
+>
+>> Change log v13-v14:
+>> ------------------
+> When testing I've experienced this kernel panic.
+>
+>
+> [ 4422.479706] vfio_ap matrix: MDEV: Registered
+> [ 4422.516999] vfio_mdev b2013234-18b2-49bf-badd-a4be9c78b120: Adding to iommu group 1
+> [ 4422.517037] vfio_mdev b2013234-18b2-49bf-badd-a4be9c78b120: MDEV: group_id = 1
+> [ 4577.906708] vfio_mdev b2013234-18b2-49bf-badd-a4be9c78b120: Removing from iommu group 1
+> [ 4577.906917] vfio_mdev b2013234-18b2-49bf-badd-a4be9c78b120: MDEV: detaching iommu
+> [ 4577.908093] Unable to handle kernel pointer dereference in virtual kernel address space
+> [ 4577.908097] Failing address: 00000006ec02f000 TEID: 00000006ec02f403
+> [ 4577.908100] Fault in home space mode while using kernel ASCE.
+> [ 4577.908106] AS:000000035eb4c007 R3:0000000000000024
+> [ 4577.908126] Oops: 003b ilc:3 [#1] PREEMPT SMP
+> [ 4577.908132] Modules linked in: vfio_ap vhost_vsock vmw_vsock_virtio_transport_common vsock vhost vhost_iotlb kvm xt_CHECKSUM xt_MASQUERADE xt_conntrack ipt_R
+> EJECT xt_tcpudp nft_compat nf_nat_tftp nft_objref nf_conntrack_tftp nft_counter bridge stp llc nft_fib_inet nft_fib_ipv4 nft_fib_ipv6 nft_fib nft_reject_inet nf
+> _reject_ipv4 nf_reject_ipv6 nft_reject nft_ct nft_chain_nat nf_nat nf_conntrack nf_defrag_ipv6 nf_defrag_ipv4 ip_set nf_tables nfnetlink sunrpc s390_trng eadm_s
+> ch vfio_ccw vfio_mdev mdev vfio_iommu_type1 vfio sch_fq_codel configfs ip_tables x_tables dm_service_time ghash_s390 prng aes_s390 des_s390 libdes sha3_512_s390
+>   sha3_256_s390 sha512_s390 sha256_s390 sha1_s390 sha_common nvme nvme_core zfcp scsi_transport_fc dm_multipath scsi_dh_rdac scsi_dh_emc scsi_dh_alua dm_mirror d
+> m_region_hash dm_log dm_mod rng_core autofs4
+> [ 4577.908181] CPU: 0 PID: 14315 Comm: nose2 Not tainted 5.12.0-rc5-00030-g4cd110385fa2 #55
+> [ 4577.908183] Hardware name: IBM 8561 T01 701 (LPAR)
+> [ 4577.908185] Krnl PSW : 0404e00180000000 000000035d2a50f4 (__lock_acquire+0xdc/0x7c8)
+> [ 4577.908194]            R:0 T:1 IO:0 EX:0 Key:0 M:1 W:0 P:0 AS:3 CC:2 PM:0 RI:0 EA:3
+> [ 4577.908232] Krnl GPRS: 000000039d168d46 00000006ec02f538 000000035e7de940 0000000000000000
+> [ 4577.908235]            0000000000000000 0000000000000000 0000000000000001 00000000f9e04150
+> [ 4577.908237]            000000035fa8b100 006b6b6b680c417f 00000000f9e04150 000000035e61e8d0
+> [ 4577.908239]            000000035fa8b100 0000000000000000 0000038010c4b7d8 0000038010c4b738
+> [ 4577.908247] Krnl Code: 000000035d2a50e4: eb110003000d        sllg    %r1,%r1,3
+> [ 4577.908247]            000000035d2a50ea: b9080012            agr     %r1,%r2
+> [ 4577.908247]           #000000035d2a50ee: e31003b80008        ag      %r1,952
+> [ 4577.908247]           >000000035d2a50f4: eb011000007a        agsi    0(%r1),1
+> [ 4577.908247]            000000035d2a50fa: a718ffff            lhi     %r1,-1
+> [ 4577.908247]            000000035d2a50fe: eb1103a800f8        laa     %r1,%r1,936
+> [ 4577.908247]            000000035d2a5104: ec18026b017e        cij     %r1,1,8,000000035d2a55da
+> [ 4577.908247]            000000035d2a510a: c4180086d01f        lgrl    %r1,000000035e37f148
+> [ 4577.908262] Call Trace:
+> [ 4577.908264]  [<000000035d2a50f4>] __lock_acquire+0xdc/0x7c8
+> [ 4577.908267]  [<000000035d2a41ac>] lock_acquire.part.0+0xec/0x1e8
+> [ 4577.908270]  [<000000035d2a4360>] lock_acquire+0xb8/0x208
+> [ 4577.908272]  [<000000035de6fa2a>] _raw_spin_lock_irqsave+0x6a/0xd8
+> [ 4577.908279]  [<000000035d2874fe>] prepare_to_wait_event+0x2e/0x1e0
+> [ 4577.908281]  [<000003ff805d539a>] vfio_ap_mdev_remove_queue+0x122/0x148 [vfio_ap]
+> [ 4577.908287]  [<000000035de20e94>] ap_device_remove+0x4c/0xf0
+> [ 4577.908292]  [<000000035db268a2>] __device_release_driver+0x18a/0x230
+> [ 4577.908298]  [<000000035db27cf0>] device_driver_detach+0x58/0xd0
+> [ 4577.908301]  [<000000035db25000>] device_reprobe+0x30/0xc0
+> [ 4577.908304]  [<000000035de22570>] __ap_revise_reserved+0x110/0x148
+> [ 4577.908307]  [<000000035db2408c>] bus_for_each_dev+0x7c/0xb8
+> [ 4577.908310]  [<000000035de2290c>] apmask_store+0xd4/0x118
+> [ 4577.908313]  [<000000035d639316>] kernfs_fop_write_iter+0x13e/0x1e0
+> [ 4577.908317]  [<000000035d542d22>] new_sync_write+0x10a/0x198
+> [ 4577.908321]  [<000000035d5433ee>] vfs_write.part.0+0x196/0x290
+> [ 4577.908323]  [<000000035d545f44>] ksys_write+0x6c/0xf8
+> [ 4577.908326]  [<000000035d1ce7ae>] do_syscall+0x7e/0xd0
+> [ 4577.908330]  [<000000035de5fc00>] __do_syscall+0xc0/0xd8
+> [ 4577.908334]  [<000000035de70c22>] system_call+0x72/0x98
+> [ 4577.908337] INFO: lockdep is turned off.
+> [ 4577.908338] Last Breaking-Event-Address:
+> [ 4577.908340]  [<0000038010c4b648>] 0x38010c4b648
+> [ 4577.908345] Kernel panic - not syncing: Fatal exception: panic_on_oops
 
-This started with SEV.  QEMU creates normal memory mappings with the SEV
-C-bit (encryption) disabled.  The kernel plumbs those into NPT, but when
-those are instantiated, they have the C-bit set.  So, we have mismatched
-mappings.  Where does that lead?  The two mappings not only differ in
-the encryption bit, causing one side to read gibberish if the other
-writes: they're not even cache coherent.
-
-That's the situation *TODAY*, even ignoring TDX.
-
-BTW, I'm pretty sure I know the answer to the "why would you expose this
-to userspace" question: it's what QEMU/KVM did alreadhy for
-non-encrypted memory, so this was the quickest way to get SEV working.
-
-So, I don't like the #MC either.  But, this series is a step in the
-right direction for TDX *AND* SEV.
