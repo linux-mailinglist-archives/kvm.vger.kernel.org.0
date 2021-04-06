@@ -2,223 +2,173 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0501F354B20
-	for <lists+kvm@lfdr.de>; Tue,  6 Apr 2021 05:15:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F2A29354B27
+	for <lists+kvm@lfdr.de>; Tue,  6 Apr 2021 05:19:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233464AbhDFDPW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 5 Apr 2021 23:15:22 -0400
-Received: from mail-io1-f71.google.com ([209.85.166.71]:53221 "EHLO
-        mail-io1-f71.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233204AbhDFDPV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 5 Apr 2021 23:15:21 -0400
-Received: by mail-io1-f71.google.com with SMTP id d4so12108211iop.19
-        for <kvm@vger.kernel.org>; Mon, 05 Apr 2021 20:15:13 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
-        bh=MTyOa4fPHpq0/87Y0jha96oeT+k49mXnNFosEwUFhYM=;
-        b=X6fN+WzqaW7rXimrx8F/tlzziNzNRL3t4AMfBUJCPh7aYBZcVBjSbAu5tMVT6/okT+
-         YMREV2GsT0GjeErUH6GvYOrNm4x7hczoOS4dC0KHPkOq0amRJVeBSPi8bzVDHYDX8DPN
-         ygafTyQu7/SGYXMNWM/xxRsc5DLJ+wjNpvu6ZVK0+8JVWrwb5r1rqdppJ/oP7wsokUWK
-         VZqZw0ViE490pVMyx4PrI1z1I0iNuKPpWSEnQwtZ2xNJDFSTK7fcqP0c5UlM8YDrIYXl
-         Y4A+fGfhzowJO+kNRJDrDOOZq/oLScTy0l3XU+U+Lr9etasKtSF++WD7kUSqx46dUiW9
-         Omxw==
-X-Gm-Message-State: AOAM532hOsM1GWxM2/dRKNus+pf93Bm/c8CA7NXlJfTBvXTcwyi+YhhS
-        77CsmXXUGl3wbqIJxUxCoxrKJTI1yxAkhWTI7v+0V0Je5MJQ
-X-Google-Smtp-Source: ABdhPJwPSrXl7HFg867qIRVRxBEkrgbX5jpNhzU39JujPTlQD6QrJugZ8Sc6gLmr7agK725QXp1a/bvAiENuOXzM/i0vBygw/dsg
+        id S243532AbhDFDTn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 5 Apr 2021 23:19:43 -0400
+Received: from mga07.intel.com ([134.134.136.100]:37950 "EHLO mga07.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S231620AbhDFDTi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 5 Apr 2021 23:19:38 -0400
+IronPort-SDR: bJnfiOWR15TmoSqnQjYYgKh9FUMOMFRPOjettzB6PzUHVZCWb0o2xHqOvXwkrMvv9SXtAcx3Uy
+ SsOKvo3q2xHg==
+X-IronPort-AV: E=McAfee;i="6000,8403,9945"; a="256957998"
+X-IronPort-AV: E=Sophos;i="5.81,308,1610438400"; 
+   d="scan'208";a="256957998"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Apr 2021 20:19:30 -0700
+IronPort-SDR: qFrrEfOaOypP8Es0u+Z0lLUPd6o7qANb9FjPShyZMpOjW6lvn9MwNHMEN1bb5U9XtiYo9dVD1N
+ PmfjpNOGlgdQ==
+X-IronPort-AV: E=Sophos;i="5.81,308,1610438400"; 
+   d="scan'208";a="421005662"
+Received: from likexu-mobl1.ccr.corp.intel.com (HELO [10.238.4.93]) ([10.238.4.93])
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Apr 2021 20:19:25 -0700
+Subject: Re: [PATCH v4 00/16] KVM: x86/pmu: Add basic support to enable Guest
+ PEBS via DS
+To:     peterz@infradead.org, Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     eranian@google.com, andi@firstfloor.org, kan.liang@linux.intel.com,
+        wei.w.wang@intel.com, Wanpeng Li <wanpengli@tencent.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        x86@kernel.org, linux-kernel@vger.kernel.org,
+        Like Xu <like.xu@linux.intel.com>
+References: <20210329054137.120994-1-like.xu@linux.intel.com>
+From:   "Xu, Like" <like.xu@intel.com>
+Message-ID: <4a39a825-7d18-b9ca-b0c3-eafec57b3921@intel.com>
+Date:   Tue, 6 Apr 2021 11:19:22 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.9.0
 MIME-Version: 1.0
-X-Received: by 2002:a5d:89d9:: with SMTP id a25mr22242262iot.69.1617678912805;
- Mon, 05 Apr 2021 20:15:12 -0700 (PDT)
-Date:   Mon, 05 Apr 2021 20:15:12 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000f560e805bf453804@google.com>
-Subject: [syzbot] KASAN: use-after-free Write in sk_psock_stop
-From:   syzbot <syzbot+7b6548ae483d6f4c64ae@syzkaller.appspotmail.com>
-To:     akpm@linux-foundation.org, andrii@kernel.org, ast@kernel.org,
-        bp@alien8.de, bpf@vger.kernel.org, daniel@iogearbox.net,
-        davem@davemloft.net, hpa@zytor.com, jakub@cloudflare.com,
-        jmattson@google.com, john.fastabend@gmail.com, joro@8bytes.org,
-        kafai@fb.com, kpsingh@kernel.org, kuba@kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        lmb@cloudflare.com, mark.rutland@arm.com, masahiroy@kernel.org,
-        mingo@redhat.com, netdev@vger.kernel.org, pbonzini@redhat.com,
-        peterz@infradead.org, rafael.j.wysocki@intel.com,
-        rostedt@goodmis.org, seanjc@google.com, songliubraving@fb.com,
-        syzkaller-bugs@googlegroups.com, tglx@linutronix.de,
-        vkuznets@redhat.com, wanpengli@tencent.com, will@kernel.org,
-        x86@kernel.org, yhs@fb.com
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20210329054137.120994-1-like.xu@linux.intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hello,
+Hi all, do we have any comments on this patch set?
 
-syzbot found the following issue on:
+On 2021/3/29 13:41, Like Xu wrote:
+> The guest Precise Event Based Sampling (PEBS) feature can provide
+> an architectural state of the instruction executed after the guest
+> instruction that exactly caused the event. It needs new hardware
+> facility only available on Intel Ice Lake Server platforms. This
+> patch set enables the basic PEBS via DS feature for KVM guests on ICX.
+>
+> We can use PEBS feature on the Linux guest like native:
+>
+>    # perf record -e instructions:ppp ./br_instr a
+>    # perf record -c 100000 -e instructions:pp ./br_instr a
+>
+> To emulate guest PEBS facility for the above perf usages,
+> we need to implement 2 code paths:
+>
+> 1) Fast path
+>
+> This is when the host assigned physical PMC has an identical index as
+> the virtual PMC (e.g. using physical PMC0 to emulate virtual PMC0).
+> This path is used in most common use cases.
+>
+> 2) Slow path
+>
+> This is when the host assigned physical PMC has a different index
+> from the virtual PMC (e.g. using physical PMC1 to emulate virtual PMC0)
+> In this case, KVM needs to rewrite the PEBS records to change the
+> applicable counter indexes to the virtual PMC indexes, which would
+> otherwise contain the physical counter index written by PEBS facility,
+> and switch the counter reset values to the offset corresponding to
+> the physical counter indexes in the DS data structure.
+>
+> The previous version [0] enables both fast path and slow path, which
+> seems a bit more complex as the first step. In this patchset, we want
+> to start with the fast path to get the basic guest PEBS enabled while
+> keeping the slow path disabled. More focused discussion on the slow
+> path [1] is planned to be put to another patchset in the next step.
+>
+> Compared to later versions in subsequent steps, the functionality
+> to support host-guest PEBS both enabled and the functionality to
+> emulate guest PEBS when the counter is cross-mapped are missing
+> in this patch set (neither of these are typical scenarios).
+>
+> With the basic support, the guest can retrieve the correct PEBS
+> information from its own PEBS records on the Ice Lake servers.
+> And we expect it should work when migrating to another Ice Lake
+> and no regression about host perf is expected.
+>
+> Here are the results of pebs test from guest/host for same workload:
+>
+> perf report on guest:
+> # Samples: 2K of event 'instructions:ppp', # Event count (approx.): 1473377250
+> # Overhead  Command   Shared Object      Symbol
+>    57.74%  br_instr  br_instr           [.] lfsr_cond
+>    41.40%  br_instr  br_instr           [.] cmp_end
+>     0.21%  br_instr  [kernel.kallsyms]  [k] __lock_acquire
+>
+> perf report on host:
+> # Samples: 2K of event 'instructions:ppp', # Event count (approx.): 1462721386
+> # Overhead  Command   Shared Object     Symbol
+>    57.90%  br_instr  br_instr          [.] lfsr_cond
+>    41.95%  br_instr  br_instr          [.] cmp_end
+>     0.05%  br_instr  [kernel.vmlinux]  [k] lock_acquire
+>     Conclusion: the profiling results on the guest are similar tothat on the host.
+>
+> Please check more details in each commit and feel free to comment.
+>
+> Previous:
+> [0] https://lore.kernel.org/kvm/20210104131542.495413-1-like.xu@linux.intel.com/
+> [1] https://lore.kernel.org/kvm/20210115191113.nktlnmivc3edstiv@two.firstfloor.org/
+>
+> v3->v4 Changelog:
+> - Update this cover letter and propose a new upstream plan;
+> [PERF]
+> - Drop check host DS and move handler to handle_pmi_common();
+> - Pass "struct kvm_pmu *" to intel_guest_get_msrs();
+> - Propose new assignment logic for perf_guest_switch_msr();
+> - Introduce x86_pmu.pebs_vmx for future capability maintenance;
+> [KVM]
+> - Add kvm_pmu_cap to optimize perf_get_x86_pmu_capability;
+> - Raising PEBS PMI only when OVF_BIT 62 is not set;
+> - Make vmx_icl_pebs_cpu specific for PEBS-PDIR emulation;
+> - Fix a bug for fixed_ctr_ctrl_mask;
+> - Add two minor refactoring patches for reuse;
+>
+> Like Xu (16):
+>    perf/x86/intel: Add x86_pmu.pebs_vmx for Ice Lake Servers
+>    perf/x86/intel: Handle guest PEBS overflow PMI for KVM guest
+>    perf/x86/core: Pass "struct kvm_pmu *" to determine the guest values
+>    KVM: x86/pmu: Set MSR_IA32_MISC_ENABLE_EMON bit when vPMU is enabled
+>    KVM: x86/pmu: Introduce the ctrl_mask value for fixed counter
+>    KVM: x86/pmu: Reprogram guest PEBS event to emulate guest PEBS counter
+>    KVM: x86/pmu: Add IA32_PEBS_ENABLE MSR emulation for extended PEBS
+>    KVM: x86/pmu: Add IA32_DS_AREA MSR emulation to manage guest DS buffer
+>    KVM: x86/pmu: Add PEBS_DATA_CFG MSR emulation to support adaptive PEBS
+>    KVM: x86: Set PEBS_UNAVAIL in IA32_MISC_ENABLE when PEBS is enabled
+>    KVM: x86/pmu: Adjust precise_ip to emulate Ice Lake guest PDIR counter
+>    KVM: x86/pmu: Move pmc_speculative_in_use() to arch/x86/kvm/pmu.h
+>    KVM: x86/pmu: Disable guest PEBS before vm-entry in two cases
+>    KVM: x86/pmu: Add kvm_pmu_cap to optimize perf_get_x86_pmu_capability
+>    KVM: x86/cpuid: Refactor host/guest CPU model consistency check
+>    KVM: x86/pmu: Expose CPUIDs feature bits PDCM, DS, DTES64
+>
+>   arch/x86/events/core.c            |   5 +-
+>   arch/x86/events/intel/core.c      |  93 +++++++++++++++++++++++---
+>   arch/x86/events/perf_event.h      |   5 +-
+>   arch/x86/include/asm/kvm_host.h   |  16 +++++
+>   arch/x86/include/asm/msr-index.h  |   6 ++
+>   arch/x86/include/asm/perf_event.h |   5 +-
+>   arch/x86/kvm/cpuid.c              |  24 ++-----
+>   arch/x86/kvm/cpuid.h              |   5 ++
+>   arch/x86/kvm/pmu.c                |  49 ++++++++++----
+>   arch/x86/kvm/pmu.h                |  37 +++++++++++
+>   arch/x86/kvm/vmx/capabilities.h   |  26 ++++++--
+>   arch/x86/kvm/vmx/pmu_intel.c      | 105 ++++++++++++++++++++++++------
+>   arch/x86/kvm/vmx/vmx.c            |  25 ++++++-
+>   arch/x86/kvm/vmx/vmx.h            |   2 +-
+>   arch/x86/kvm/x86.c                |  14 ++--
+>   15 files changed, 339 insertions(+), 78 deletions(-)
+>
 
-HEAD commit:    f07669df libbpf: Remove redundant semi-colon
-git tree:       bpf-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=1564f0e2d00000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=7eff0f22b8563a5f
-dashboard link: https://syzkaller.appspot.com/bug?extid=7b6548ae483d6f4c64ae
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=16462311d00000
-
-The issue was bisected to:
-
-commit 997acaf6b4b59c6a9c259740312a69ea549cc684
-Author: Mark Rutland <mark.rutland@arm.com>
-Date:   Mon Jan 11 15:37:07 2021 +0000
-
-    lockdep: report broken irq restoration
-
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=12c1c9ced00000
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=11c1c9ced00000
-console output: https://syzkaller.appspot.com/x/log.txt?x=16c1c9ced00000
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+7b6548ae483d6f4c64ae@syzkaller.appspotmail.com
-Fixes: 997acaf6b4b5 ("lockdep: report broken irq restoration")
-
-==================================================================
-BUG: KASAN: use-after-free in __lock_acquire+0x3e6f/0x54c0 kernel/locking/lockdep.c:4770
-Read of size 8 at addr ffff888024f66238 by task syz-executor.1/14202
-
-CPU: 0 PID: 14202 Comm: syz-executor.1 Not tainted 5.12.0-rc4-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
-Call Trace:
- __dump_stack lib/dump_stack.c:79 [inline]
- dump_stack+0x141/0x1d7 lib/dump_stack.c:120
- print_address_description.constprop.0.cold+0x5b/0x2f8 mm/kasan/report.c:232
- __kasan_report mm/kasan/report.c:399 [inline]
- kasan_report.cold+0x7c/0xd8 mm/kasan/report.c:416
- __lock_acquire+0x3e6f/0x54c0 kernel/locking/lockdep.c:4770
- lock_acquire kernel/locking/lockdep.c:5510 [inline]
- lock_acquire+0x1ab/0x740 kernel/locking/lockdep.c:5475
- __raw_spin_lock_bh include/linux/spinlock_api_smp.h:135 [inline]
- _raw_spin_lock_bh+0x2f/0x40 kernel/locking/spinlock.c:175
- spin_lock_bh include/linux/spinlock.h:359 [inline]
- sk_psock_stop+0x2f/0x4d0 net/core/skmsg.c:750
- sock_map_close+0x172/0x390 net/core/sock_map.c:1534
- inet_release+0x12e/0x280 net/ipv4/af_inet.c:431
- __sock_release+0xcd/0x280 net/socket.c:599
- sock_close+0x18/0x20 net/socket.c:1258
- __fput+0x288/0x920 fs/file_table.c:280
- task_work_run+0xdd/0x1a0 kernel/task_work.c:140
- tracehook_notify_resume include/linux/tracehook.h:189 [inline]
- exit_to_user_mode_loop kernel/entry/common.c:174 [inline]
- exit_to_user_mode_prepare+0x249/0x250 kernel/entry/common.c:208
- __syscall_exit_to_user_mode_work kernel/entry/common.c:290 [inline]
- syscall_exit_to_user_mode+0x19/0x60 kernel/entry/common.c:301
- entry_SYSCALL_64_after_hwframe+0x44/0xae
-RIP: 0033:0x466459
-Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 bc ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007f1bde3a3188 EFLAGS: 00000246 ORIG_RAX: 0000000000000003
-RAX: 0000000000000000 RBX: 000000000056bf60 RCX: 0000000000466459
-RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000005
-RBP: 00000000004bf9fb R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 000000000056bf60
-R13: 00007ffe6eb13bbf R14: 00007f1bde3a3300 R15: 0000000000022000
-
-Allocated by task 14202:
- kasan_save_stack+0x1b/0x40 mm/kasan/common.c:38
- kasan_set_track mm/kasan/common.c:46 [inline]
- set_alloc_info mm/kasan/common.c:427 [inline]
- ____kasan_kmalloc mm/kasan/common.c:506 [inline]
- ____kasan_kmalloc mm/kasan/common.c:465 [inline]
- __kasan_kmalloc+0x99/0xc0 mm/kasan/common.c:515
- kmalloc_node include/linux/slab.h:572 [inline]
- kzalloc_node include/linux/slab.h:695 [inline]
- sk_psock_init+0xaf/0x730 net/core/skmsg.c:668
- sock_map_link+0xbf4/0x1020 net/core/sock_map.c:286
- sock_hash_update_common+0xe2/0xa60 net/core/sock_map.c:993
- sock_map_update_elem_sys+0x561/0x680 net/core/sock_map.c:596
- bpf_map_update_value.isra.0+0x36b/0x8d0 kernel/bpf/syscall.c:167
- map_update_elem kernel/bpf/syscall.c:1129 [inline]
- __do_sys_bpf+0x2d6e/0x4f40 kernel/bpf/syscall.c:4384
- do_syscall_64+0x2d/0x70 arch/x86/entry/common.c:46
- entry_SYSCALL_64_after_hwframe+0x44/0xae
-
-Freed by task 9712:
- kasan_save_stack+0x1b/0x40 mm/kasan/common.c:38
- kasan_set_track+0x1c/0x30 mm/kasan/common.c:46
- kasan_set_free_info+0x20/0x30 mm/kasan/generic.c:357
- ____kasan_slab_free mm/kasan/common.c:360 [inline]
- ____kasan_slab_free mm/kasan/common.c:325 [inline]
- __kasan_slab_free+0xf5/0x130 mm/kasan/common.c:367
- kasan_slab_free include/linux/kasan.h:199 [inline]
- slab_free_hook mm/slub.c:1562 [inline]
- slab_free_freelist_hook+0x92/0x210 mm/slub.c:1600
- slab_free mm/slub.c:3161 [inline]
- kfree+0xe5/0x7f0 mm/slub.c:4213
- process_one_work+0x98d/0x1600 kernel/workqueue.c:2275
- worker_thread+0x64c/0x1120 kernel/workqueue.c:2421
- kthread+0x3b1/0x4a0 kernel/kthread.c:292
- ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:294
-
-Last potentially related work creation:
- kasan_save_stack+0x1b/0x40 mm/kasan/common.c:38
- kasan_record_aux_stack+0xe5/0x110 mm/kasan/generic.c:345
- insert_work+0x48/0x370 kernel/workqueue.c:1331
- __queue_work+0x5c1/0xf00 kernel/workqueue.c:1497
- rcu_work_rcufn+0x58/0x80 kernel/workqueue.c:1733
- rcu_do_batch kernel/rcu/tree.c:2559 [inline]
- rcu_core+0x74a/0x12f0 kernel/rcu/tree.c:2794
- __do_softirq+0x29b/0x9f6 kernel/softirq.c:345
-
-Second to last potentially related work creation:
- kasan_save_stack+0x1b/0x40 mm/kasan/common.c:38
- kasan_record_aux_stack+0xe5/0x110 mm/kasan/generic.c:345
- __call_rcu kernel/rcu/tree.c:3039 [inline]
- call_rcu+0xb1/0x740 kernel/rcu/tree.c:3114
- queue_rcu_work+0x82/0xa0 kernel/workqueue.c:1753
- sk_psock_put include/linux/skmsg.h:446 [inline]
- sock_map_unref+0x109/0x190 net/core/sock_map.c:182
- sock_hash_delete_from_link net/core/sock_map.c:918 [inline]
- sock_map_unlink net/core/sock_map.c:1480 [inline]
- sock_map_remove_links+0x389/0x530 net/core/sock_map.c:1492
- sock_map_close+0x12f/0x390 net/core/sock_map.c:1532
- inet_release+0x12e/0x280 net/ipv4/af_inet.c:431
- __sock_release+0xcd/0x280 net/socket.c:599
- sock_close+0x18/0x20 net/socket.c:1258
- __fput+0x288/0x920 fs/file_table.c:280
- task_work_run+0xdd/0x1a0 kernel/task_work.c:140
- tracehook_notify_resume include/linux/tracehook.h:189 [inline]
- exit_to_user_mode_loop kernel/entry/common.c:174 [inline]
- exit_to_user_mode_prepare+0x249/0x250 kernel/entry/common.c:208
- __syscall_exit_to_user_mode_work kernel/entry/common.c:290 [inline]
- syscall_exit_to_user_mode+0x19/0x60 kernel/entry/common.c:301
- entry_SYSCALL_64_after_hwframe+0x44/0xae
-
-The buggy address belongs to the object at ffff888024f66000
- which belongs to the cache kmalloc-2k of size 2048
-The buggy address is located 568 bytes inside of
- 2048-byte region [ffff888024f66000, ffff888024f66800)
-The buggy address belongs to the page:
-page:ffffea000093d800 refcount:1 mapcount:0 mapping:0000000000000000 index:0xffff888024f60000 pfn:0x24f60
-head:ffffea000093d800 order:3 compound_mapcount:0 compound_pincount:0
-flags: 0xfff00000010200(slab|head)
-raw: 00fff00000010200 ffffea0000951000 0000000200000002 ffff888010842000
-raw: ffff888024f60000 0000000080080007 00000001ffffffff 0000000000000000
-page dumped because: kasan: bad access detected
-
-Memory state around the buggy address:
- ffff888024f66100: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
- ffff888024f66180: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
->ffff888024f66200: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-                                        ^
- ffff888024f66280: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
- ffff888024f66300: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-==================================================================
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
-syzbot can test patches for this issue, for details see:
-https://goo.gl/tpsmEJ#testing-patches
