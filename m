@@ -2,170 +2,154 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 109743556BB
-	for <lists+kvm@lfdr.de>; Tue,  6 Apr 2021 16:36:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5F67435571A
+	for <lists+kvm@lfdr.de>; Tue,  6 Apr 2021 16:57:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345222AbhDFOgu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 6 Apr 2021 10:36:50 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:4208 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1345216AbhDFOgu (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 6 Apr 2021 10:36:50 -0400
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 136EY13U141801;
-        Tue, 6 Apr 2021 10:36:41 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=vcwyT1vP5oGIhr0ABs++F+zbHHYveP26Kmi/Bg16X6w=;
- b=aU7WTp0HGl1WunD5vHqJiO32IlMAKW0Nrh2iwvX4TB3L3GWoUjGhY8aehC0AV9mWm4CY
- KYOxvinWqR4fLHySdhdLUviXN3jNFrsZjB2/xcoMcB9PwQ577OJ4XTTMbOtb/gXivvl9
- enosmJU6sc/fGYAd0n0h6Ehh4ahilaVsWSypjQCfPhJh/IEoz5j5KCuRjfoakrBMXE+D
- 0b5X+dbGkJWBQgYXkpUJu8lOSLjJg3fPUpFyQKTBm1+EcgT5VldJFYHS0HbVY22JuuDc
- U/kretBiVZKnXamFCNIBTbmqcggViZFqcGN4na4+bmqe7aBtLEkVaXNAkiFnuK2VuFof rQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 37q5c04uvc-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 06 Apr 2021 10:36:40 -0400
-Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 136EY123141796;
-        Tue, 6 Apr 2021 10:36:40 -0400
-Received: from ppma03wdc.us.ibm.com (ba.79.3fa9.ip4.static.sl-reverse.com [169.63.121.186])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 37q5c04uup-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 06 Apr 2021 10:36:40 -0400
-Received: from pps.filterd (ppma03wdc.us.ibm.com [127.0.0.1])
-        by ppma03wdc.us.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 136ERQXY010099;
-        Tue, 6 Apr 2021 14:36:38 GMT
-Received: from b03cxnp07027.gho.boulder.ibm.com (b03cxnp07027.gho.boulder.ibm.com [9.17.130.14])
-        by ppma03wdc.us.ibm.com with ESMTP id 37qbgydx54-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 06 Apr 2021 14:36:38 +0000
-Received: from b03ledav001.gho.boulder.ibm.com (b03ledav001.gho.boulder.ibm.com [9.17.130.232])
-        by b03cxnp07027.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 136EaZOZ29032776
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 6 Apr 2021 14:36:35 GMT
-Received: from b03ledav001.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 804C16E053;
-        Tue,  6 Apr 2021 14:36:35 +0000 (GMT)
-Received: from b03ledav001.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id A70596E04E;
-        Tue,  6 Apr 2021 14:36:33 +0000 (GMT)
-Received: from cpe-172-100-182-241.stny.res.rr.com (unknown [9.85.175.110])
-        by b03ledav001.gho.boulder.ibm.com (Postfix) with ESMTP;
-        Tue,  6 Apr 2021 14:36:33 +0000 (GMT)
-Subject: Re: [PATCH v14 00/13] s390/vfio-ap: dynamic configuration support
-To:     Halil Pasic <pasic@linux.ibm.com>
-Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, jjherne@linux.ibm.com, freude@linux.ibm.com,
-        borntraeger@de.ibm.com, cohuck@redhat.com, mjrosato@linux.ibm.com,
-        alex.williamson@redhat.com, kwankhede@nvidia.com,
-        fiuczy@linux.ibm.com, frankja@linux.ibm.com, david@redhat.com,
-        hca@linux.ibm.com, gor@linux.ibm.com
-References: <20210331152256.28129-1-akrowiak@linux.ibm.com>
- <20210401211742.6afd6b14.pasic@linux.ibm.com>
-From:   Tony Krowiak <akrowiak@linux.ibm.com>
-Message-ID: <a6f25bd3-8f7f-2c59-68e3-138db0ef0202@linux.ibm.com>
-Date:   Tue, 6 Apr 2021 10:36:32 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+        id S1345094AbhDFO6E (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 6 Apr 2021 10:58:04 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:31145 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S233270AbhDFO6E (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 6 Apr 2021 10:58:04 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1617721075;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=JKDcOIFPZJ62VRJvhDT2hmTM6kAbID3Fjqmj7ekGUOQ=;
+        b=QWOcBxTot9ikVhkkKTuX2WPmgA9zqtsmn9ml90vrICeIy7l8yuRaDOdeqrsN4m0QyVZ8Ie
+        r8BJHlpzO/rj5fCUuBuO/l/lUA/jT6VjgqmtLa+WmCqY+ByfosMqgl6zH3r4BL/1MJtifR
+        uuez+XWpJCnKkihlFsB7OtW8MslSdlQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-254-UtF-KEdZMee-b0oXQVGlcA-1; Tue, 06 Apr 2021 10:57:54 -0400
+X-MC-Unique: UtF-KEdZMee-b0oXQVGlcA-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6C323E99C4;
+        Tue,  6 Apr 2021 14:57:52 +0000 (UTC)
+Received: from [10.36.113.79] (ovpn-113-79.ams2.redhat.com [10.36.113.79])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 35E7A5D9D0;
+        Tue,  6 Apr 2021 14:57:47 +0000 (UTC)
+To:     Dave Hansen <dave.hansen@intel.com>,
+        "Kirill A. Shutemov" <kirill@shutemov.name>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Sean Christopherson <seanjc@google.com>,
+        Jim Mattson <jmattson@google.com>
+Cc:     David Rientjes <rientjes@google.com>,
+        "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>,
+        "Kleen, Andi" <andi.kleen@intel.com>,
+        "Yamahata, Isaku" <isaku.yamahata@intel.com>, x86@kernel.org,
+        kvm@vger.kernel.org, linux-mm@kvack.org,
+        linux-kernel@vger.kernel.org,
+        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+References: <20210402152645.26680-1-kirill.shutemov@linux.intel.com>
+ <20210402152645.26680-8-kirill.shutemov@linux.intel.com>
+ <c5f2580d-0733-4523-d1e8-c43b487f0aaf@redhat.com>
+ <52518f09-7350-ebe9-7ddb-29095cd3a4d9@intel.com>
+From:   David Hildenbrand <david@redhat.com>
+Organization: Red Hat GmbH
+Subject: Re: [RFCv1 7/7] KVM: unmap guest memory using poisoned pages
+Message-ID: <d94d3042-098a-8df7-9ef6-b869851a4134@redhat.com>
+Date:   Tue, 6 Apr 2021 16:57:46 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.8.1
 MIME-Version: 1.0
-In-Reply-To: <20210401211742.6afd6b14.pasic@linux.ibm.com>
+In-Reply-To: <52518f09-7350-ebe9-7ddb-29095cd3a4d9@intel.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
 Content-Language: en-US
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: trN1l5pQywNV81xhSAB6Gnp3KonUyYMr
-X-Proofpoint-ORIG-GUID: B1xsN-30PaYTXSYWV1JLTeqG2JX-TxZ9
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.761
- definitions=2021-04-06_03:2021-04-01,2021-04-06 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 impostorscore=0
- mlxlogscore=999 priorityscore=1501 mlxscore=0 malwarescore=0
- lowpriorityscore=0 adultscore=0 phishscore=0 bulkscore=0 suspectscore=0
- spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2104030000 definitions=main-2104060102
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Given what I finally was able to figure out, it is interesting to note 
-that this failure only occurred
-when building the kernel with the debug_defconfig configuration. The 
-problem occurs when the
-vfio_ap_mdev_remove_queue() callback is called subsequent to the mdev 
-being removed via the
-vfio_ap_mdev_remove() callback. The failure results because the 
-vfio_ap_queue object representing
-the queue device being removed still has a link to the mdev to which the 
-queue is assigned.
-The fix is to remove the link to the mdev from all vfio_ap_queue objects 
-when the mdev is
-removed. I will provide a new set of patches with the fix included.
+On 06.04.21 16:33, Dave Hansen wrote:
+> On 4/6/21 12:44 AM, David Hildenbrand wrote:
+>> On 02.04.21 17:26, Kirill A. Shutemov wrote:
+>>> TDX architecture aims to provide resiliency against confidentiality and
+>>> integrity attacks. Towards this goal, the TDX architecture helps enforce
+>>> the enabling of memory integrity for all TD-private memory.
+>>>
+>>> The CPU memory controller computes the integrity check value (MAC) for
+>>> the data (cache line) during writes, and it stores the MAC with the
+>>> memory as meta-data. A 28-bit MAC is stored in the ECC bits.
+>>>
+>>> Checking of memory integrity is performed during memory reads. If
+>>> integrity check fails, CPU poisones cache line.
+>>>
+>>> On a subsequent consumption (read) of the poisoned data by software,
+>>> there are two possible scenarios:
+>>>
+>>>    - Core determines that the execution can continue and it treats
+>>>      poison with exception semantics signaled as a #MCE
+>>>
+>>>    - Core determines execution cannot continue,and it does an unbreakable
+>>>      shutdown
+>>>
+>>> For more details, see Chapter 14 of Intel TDX Module EAS[1]
+>>>
+>>> As some of integrity check failures may lead to system shutdown host
+>>> kernel must not allow any writes to TD-private memory. This requirment
+>>> clashes with KVM design: KVM expects the guest memory to be mapped into
+>>> host userspace (e.g. QEMU).
+>>
+>> So what you are saying is that if QEMU would write to such memory, it
+>> could crash the kernel? What a broken design.
+> 
+> IMNHO, the broken design is mapping the memory to userspace in the first
+> place.  Why the heck would you actually expose something with the MMU to
+> a context that can't possibly meaningfully access or safely write to it?
 
-On 4/1/21 3:17 PM, Halil Pasic wrote:
-> On Wed, 31 Mar 2021 11:22:43 -0400
-> Tony Krowiak <akrowiak@linux.ibm.com> wrote:
->
->> Change log v13-v14:
->> ------------------
-> When testing I've experienced this kernel panic.
->
->
-> [ 4422.479706] vfio_ap matrix: MDEV: Registered
-> [ 4422.516999] vfio_mdev b2013234-18b2-49bf-badd-a4be9c78b120: Adding to iommu group 1
-> [ 4422.517037] vfio_mdev b2013234-18b2-49bf-badd-a4be9c78b120: MDEV: group_id = 1
-> [ 4577.906708] vfio_mdev b2013234-18b2-49bf-badd-a4be9c78b120: Removing from iommu group 1
-> [ 4577.906917] vfio_mdev b2013234-18b2-49bf-badd-a4be9c78b120: MDEV: detaching iommu
-> [ 4577.908093] Unable to handle kernel pointer dereference in virtual kernel address space
-> [ 4577.908097] Failing address: 00000006ec02f000 TEID: 00000006ec02f403
-> [ 4577.908100] Fault in home space mode while using kernel ASCE.
-> [ 4577.908106] AS:000000035eb4c007 R3:0000000000000024
-> [ 4577.908126] Oops: 003b ilc:3 [#1] PREEMPT SMP
-> [ 4577.908132] Modules linked in: vfio_ap vhost_vsock vmw_vsock_virtio_transport_common vsock vhost vhost_iotlb kvm xt_CHECKSUM xt_MASQUERADE xt_conntrack ipt_R
-> EJECT xt_tcpudp nft_compat nf_nat_tftp nft_objref nf_conntrack_tftp nft_counter bridge stp llc nft_fib_inet nft_fib_ipv4 nft_fib_ipv6 nft_fib nft_reject_inet nf
-> _reject_ipv4 nf_reject_ipv6 nft_reject nft_ct nft_chain_nat nf_nat nf_conntrack nf_defrag_ipv6 nf_defrag_ipv4 ip_set nf_tables nfnetlink sunrpc s390_trng eadm_s
-> ch vfio_ccw vfio_mdev mdev vfio_iommu_type1 vfio sch_fq_codel configfs ip_tables x_tables dm_service_time ghash_s390 prng aes_s390 des_s390 libdes sha3_512_s390
->   sha3_256_s390 sha512_s390 sha256_s390 sha1_s390 sha_common nvme nvme_core zfcp scsi_transport_fc dm_multipath scsi_dh_rdac scsi_dh_emc scsi_dh_alua dm_mirror d
-> m_region_hash dm_log dm_mod rng_core autofs4
-> [ 4577.908181] CPU: 0 PID: 14315 Comm: nose2 Not tainted 5.12.0-rc5-00030-g4cd110385fa2 #55
-> [ 4577.908183] Hardware name: IBM 8561 T01 701 (LPAR)
-> [ 4577.908185] Krnl PSW : 0404e00180000000 000000035d2a50f4 (__lock_acquire+0xdc/0x7c8)
-> [ 4577.908194]            R:0 T:1 IO:0 EX:0 Key:0 M:1 W:0 P:0 AS:3 CC:2 PM:0 RI:0 EA:3
-> [ 4577.908232] Krnl GPRS: 000000039d168d46 00000006ec02f538 000000035e7de940 0000000000000000
-> [ 4577.908235]            0000000000000000 0000000000000000 0000000000000001 00000000f9e04150
-> [ 4577.908237]            000000035fa8b100 006b6b6b680c417f 00000000f9e04150 000000035e61e8d0
-> [ 4577.908239]            000000035fa8b100 0000000000000000 0000038010c4b7d8 0000038010c4b738
-> [ 4577.908247] Krnl Code: 000000035d2a50e4: eb110003000d        sllg    %r1,%r1,3
-> [ 4577.908247]            000000035d2a50ea: b9080012            agr     %r1,%r2
-> [ 4577.908247]           #000000035d2a50ee: e31003b80008        ag      %r1,952
-> [ 4577.908247]           >000000035d2a50f4: eb011000007a        agsi    0(%r1),1
-> [ 4577.908247]            000000035d2a50fa: a718ffff            lhi     %r1,-1
-> [ 4577.908247]            000000035d2a50fe: eb1103a800f8        laa     %r1,%r1,936
-> [ 4577.908247]            000000035d2a5104: ec18026b017e        cij     %r1,1,8,000000035d2a55da
-> [ 4577.908247]            000000035d2a510a: c4180086d01f        lgrl    %r1,000000035e37f148
-> [ 4577.908262] Call Trace:
-> [ 4577.908264]  [<000000035d2a50f4>] __lock_acquire+0xdc/0x7c8
-> [ 4577.908267]  [<000000035d2a41ac>] lock_acquire.part.0+0xec/0x1e8
-> [ 4577.908270]  [<000000035d2a4360>] lock_acquire+0xb8/0x208
-> [ 4577.908272]  [<000000035de6fa2a>] _raw_spin_lock_irqsave+0x6a/0xd8
-> [ 4577.908279]  [<000000035d2874fe>] prepare_to_wait_event+0x2e/0x1e0
-> [ 4577.908281]  [<000003ff805d539a>] vfio_ap_mdev_remove_queue+0x122/0x148 [vfio_ap]
-> [ 4577.908287]  [<000000035de20e94>] ap_device_remove+0x4c/0xf0
-> [ 4577.908292]  [<000000035db268a2>] __device_release_driver+0x18a/0x230
-> [ 4577.908298]  [<000000035db27cf0>] device_driver_detach+0x58/0xd0
-> [ 4577.908301]  [<000000035db25000>] device_reprobe+0x30/0xc0
-> [ 4577.908304]  [<000000035de22570>] __ap_revise_reserved+0x110/0x148
-> [ 4577.908307]  [<000000035db2408c>] bus_for_each_dev+0x7c/0xb8
-> [ 4577.908310]  [<000000035de2290c>] apmask_store+0xd4/0x118
-> [ 4577.908313]  [<000000035d639316>] kernfs_fop_write_iter+0x13e/0x1e0
-> [ 4577.908317]  [<000000035d542d22>] new_sync_write+0x10a/0x198
-> [ 4577.908321]  [<000000035d5433ee>] vfs_write.part.0+0x196/0x290
-> [ 4577.908323]  [<000000035d545f44>] ksys_write+0x6c/0xf8
-> [ 4577.908326]  [<000000035d1ce7ae>] do_syscall+0x7e/0xd0
-> [ 4577.908330]  [<000000035de5fc00>] __do_syscall+0xc0/0xd8
-> [ 4577.908334]  [<000000035de70c22>] system_call+0x72/0x98
-> [ 4577.908337] INFO: lockdep is turned off.
-> [ 4577.908338] Last Breaking-Event-Address:
-> [ 4577.908340]  [<0000038010c4b648>] 0x38010c4b648
-> [ 4577.908345] Kernel panic - not syncing: Fatal exception: panic_on_oops
+I'd say the broken design is being able to crash the machine via a 
+simple memory write, instead of only crashing a single process in case 
+you're doing something nasty. From the evaluation of the problem it 
+feels like this was a CPU design workaround: instead of properly 
+cleaning up when it gets tricky within the core, just crash the machine. 
+And that's a CPU "feature", not a kernel "feature". Now we have to fix 
+broken HW in the kernel - once again.
+
+However, you raise a valid point: it does not make too much sense to to 
+map this into user space. Not arguing against that; but crashing the 
+machine is just plain ugly.
+
+I wonder: why do we even *want* a VMA/mmap describing that memory? 
+Sounds like: for hacking support for that memory type into QEMU/KVM.
+
+This all feels wrong, but I cannot really tell how it could be better. 
+That memory can really only be used (right now?) with hardware 
+virtualization from some point on. From that point on (right from the 
+start?), there should be no VMA/mmap/page tables for user space anymore.
+
+Or am I missing something? Is there still valid user space access?
+
+> 
+> This started with SEV.  QEMU creates normal memory mappings with the SEV
+> C-bit (encryption) disabled.  The kernel plumbs those into NPT, but when
+> those are instantiated, they have the C-bit set.  So, we have mismatched
+> mappings.  Where does that lead?  The two mappings not only differ in
+> the encryption bit, causing one side to read gibberish if the other
+> writes: they're not even cache coherent.
+> 
+> That's the situation *TODAY*, even ignoring TDX.
+> 
+> BTW, I'm pretty sure I know the answer to the "why would you expose this
+> to userspace" question: it's what QEMU/KVM did alreadhy for
+> non-encrypted memory, so this was the quickest way to get SEV working.
+> 
+
+Yes, I guess so. It was the fastest way to "hack" it into QEMU.
+
+Would we ever even want a VMA/mmap/process page tables for that memory? 
+How could user space ever do something *not so nasty* with that memory 
+(in the current context of VMs)?
+
+-- 
+Thanks,
+
+David / dhildenb
 
