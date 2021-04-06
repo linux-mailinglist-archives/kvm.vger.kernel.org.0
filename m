@@ -2,101 +2,170 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D2A6C3552DF
-	for <lists+kvm@lfdr.de>; Tue,  6 Apr 2021 13:55:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6093E355301
+	for <lists+kvm@lfdr.de>; Tue,  6 Apr 2021 13:59:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1343589AbhDFLzV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 6 Apr 2021 07:55:21 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:46667 "EHLO
+        id S1343639AbhDFL7n (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 6 Apr 2021 07:59:43 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:34532 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1343580AbhDFLzU (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 6 Apr 2021 07:55:20 -0400
+        by vger.kernel.org with ESMTP id S1343631AbhDFL7l (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 6 Apr 2021 07:59:41 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1617710112;
+        s=mimecast20190719; t=1617710373;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=Zk7owICe1peTttMqo4Erpsflm67yyAvd+UqYuEsUbmk=;
-        b=cLBqsD6jCcX7knfHDDMhm1h6AJC3Ir6urEURlAMhDjYfso8j9o1qKyG/QuWhd4lGDUW/jO
-        2q1Z0AW2a9uTJ9paR6cD46NQCE+KK3JYKBqikNtN8B3nv+X7Mo6XTGQPG4Lwil1gGuOg6B
-        JJpd9Hkz6J5FB+2EI4lyKdU1DEM7/GI=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-435-eDBIBNsbONevWCwrW_8-fA-1; Tue, 06 Apr 2021 07:55:09 -0400
-X-MC-Unique: eDBIBNsbONevWCwrW_8-fA-1
-Received: by mail-ej1-f69.google.com with SMTP id jx20so1800099ejc.4
-        for <kvm@vger.kernel.org>; Tue, 06 Apr 2021 04:55:09 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=Zk7owICe1peTttMqo4Erpsflm67yyAvd+UqYuEsUbmk=;
-        b=OR6G1x+AAkrQV/z2e8hsGBP/2ofEJKEgAebI23zQGA6PwoJQVeswv5oGUIqk8et6pi
-         LZ11bndyfgJPw0wraOy0KQgr4QvWdpucitHZ/hq7mgOEUA7XEGDnRxPJhYuBI1gjubxb
-         Z/B8aTAI5PqGlxPLaN2ORnm7k3Tgqp3fzSi1VQl1Bx2yDXRcmXRYWjgpkwwCsf5s0lyO
-         pFu8gSkz1DlCI659+JV0/DBYf1Y2w4mTHHC55pelH2McpoypcfhuJdfC1eaBxSq/r8u9
-         +qN1dN+ig5rW9PLpWkcQM1EFDdYnYDRK70e2Vic91JDosJLly/VLcc5lcgROSO4+w5Xr
-         Oe8Q==
-X-Gm-Message-State: AOAM5321T53ftKV9jfiq/I6xJK71BZJtpc4K35bMRNjf2kPQewFF2C1m
-        TK3liJj+LG6DxMdBEjqb/y6WG8b4mFmg9aYtXA6vvYawCehwY/vy0IluyHFJScUjt12DNCh7dsN
-        dTh5wST1sQcmu
-X-Received: by 2002:a05:6402:1051:: with SMTP id e17mr37550608edu.42.1617710108543;
-        Tue, 06 Apr 2021 04:55:08 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzt7vEfqu3E+EtKca7ic/h5hAW9ZOPJVZtu/P5HkIDCwYCqlti8U5tedxVhNiXf8T7tpyjU7A==
-X-Received: by 2002:a05:6402:1051:: with SMTP id e17mr37550593edu.42.1617710108364;
-        Tue, 06 Apr 2021 04:55:08 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id w25sm8547061edq.66.2021.04.06.04.55.07
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 06 Apr 2021 04:55:07 -0700 (PDT)
-Subject: Re: [PATCH 2/4] KVM: MIPS: rework flush_shadow_* callbacks into one
- that prepares the flush
-To:     Thomas Bogendoerfer <tsbogend@alpha.franken.de>
-Cc:     Huacai Chen <chenhuacai@kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        seanjc@google.com, "open list:MIPS" <linux-mips@vger.kernel.org>
-References: <20210402155807.49976-1-pbonzini@redhat.com>
- <20210402155807.49976-3-pbonzini@redhat.com>
- <CAAhV-H4wskLvGD1hhuS2ZDOBNenCcTd_K8GkYn1GOzwnEvTDXQ@mail.gmail.com>
- <aab8a915-6e73-3cba-5392-8f940479a011@redhat.com>
- <CAAhV-H72z9DbbV=_fEhCeeOaP8fQ_qtr4rQMD=f5n08ekG=Ygw@mail.gmail.com>
- <510e59e7-91b0-6754-8fb5-6a936ef47b3c@redhat.com>
- <20210406113957.GB8277@alpha.franken.de>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <c0b70a90-3388-858d-2da7-4d7b62fda6db@redhat.com>
-Date:   Tue, 6 Apr 2021 13:55:06 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.7.0
+        bh=2esLg1da59fOJXVhXC5LxhBQc2Y9aIayppe+mCmRoS0=;
+        b=JcsZGyg/blrTAcR2iUSgx0xigkgz+ps7n+RI+07FRl2COQLTzdFF86kyLpKRQ6R5fF3LdW
+        Eo34GkNr3qUBuORn6qwN8g6klDMajunoVMAPK8VpeiLGZJSd12CnSe4uqIuWipsSb7CV7e
+        S5J+qdP3HbXmUgiBDSyieuCymShruho=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-466-trrCjbsPNv6uojW5o92q1A-1; Tue, 06 Apr 2021 07:59:32 -0400
+X-MC-Unique: trrCjbsPNv6uojW5o92q1A-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C5B6F81746A;
+        Tue,  6 Apr 2021 11:59:28 +0000 (UTC)
+Received: from starship (unknown [10.35.206.65])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id DA0176B8E8;
+        Tue,  6 Apr 2021 11:59:15 +0000 (UTC)
+Message-ID: <27193ea74081023b67ab9c98d7050b1e22655e79.camel@redhat.com>
+Subject: Re: [PATCH v2 0/9] KVM: my debug patch queue
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
+Cc:     "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
+        Ingo Molnar <mingo@redhat.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Sean Christopherson <seanjc@google.com>,
+        Marc Zyngier <maz@kernel.org>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        open list <linux-kernel@vger.kernel.org>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Jonathan Corbet <corbet@lwn.net>, Jessica Yu <jeyu@kernel.org>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Jan Kiszka <jan.kiszka@siemens.com>,
+        Will Deacon <will@kernel.org>,
+        "open list:KERNEL VIRTUAL MACHINE FOR ARM64 (KVM/arm64)" 
+        <kvmarm@lists.cs.columbia.edu>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Jim Mattson <jmattson@google.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        David Hildenbrand <david@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        "open list:S390" <linux-s390@vger.kernel.org>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Kieran Bingham <kbingham@kernel.org>,
+        "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
+        "moderated list:KERNEL VIRTUAL MACHINE FOR ARM64 (KVM/arm64)" 
+        <linux-arm-kernel@lists.infradead.org>,
+        James Morse <james.morse@arm.com>
+Date:   Tue, 06 Apr 2021 14:59:14 +0300
+In-Reply-To: <cb7f918c-932f-d558-76ec-801ed8ed1f62@redhat.com>
+References: <20210401135451.1004564-1-mlevitsk@redhat.com>
+         <cb7f918c-932f-d558-76ec-801ed8ed1f62@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
-In-Reply-To: <20210406113957.GB8277@alpha.franken.de>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
 Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 06/04/21 13:39, Thomas Bogendoerfer wrote:
-> On Tue, Apr 06, 2021 at 08:05:40AM +0200, Paolo Bonzini wrote:
->> On 06/04/21 03:36, Huacai Chen wrote:
->>>> I tried the merge and it will be enough for Linus to remove
->>>> arch/mips/kvm/trap_emul.c.  So I will leave it as is, but next time I'd
->>>> prefer KVM MIPS changes to go through either my tree or a common topic
->>>> branch.
->>> Emmm, the TE removal series is done by Thomas, not me.:)
->>
->> Sure, sorry if the sentence sounded like it was directed to you.  No matter
->> who wrote the code, synchronization between trees is only the maintainers'
->> task. :)
+On Fri, 2021-04-02 at 19:38 +0200, Paolo Bonzini wrote:
+> On 01/04/21 15:54, Maxim Levitsky wrote:
+> > Hi!
+> > 
+> > I would like to publish two debug features which were needed for other stuff
+> > I work on.
+> > 
+> > One is the reworked lx-symbols script which now actually works on at least
+> > gdb 9.1 (gdb 9.2 was reported to fail to load the debug symbols from the kernel
+> > for some reason, not related to this patch) and upstream qemu.
 > 
-> Sorry about the mess. I'll leave arch/mips/kvm to go via your tree then.
+> Queued patches 2-5 for now.  6 is okay but it needs a selftest. (e.g. 
+> using KVM_VCPU_SET_EVENTS) and the correct name for the constant.
 
-No problem.  In this specific case, at some point I'll pull from 
-mips-next, prior to sending the pull request to Linus.  It will look 
-just like other KVM submaintainer pulls.
+Thanks!
+I will do this very soon.
 
-Paolo
+Best regards,
+	Maxim Levitsky
+> 
+> Paolo
+> 
+> > The other feature is the ability to trap all guest exceptions (on SVM for now)
+> > and see them in kvmtrace prior to potential merge to double/triple fault.
+> > 
+> > This can be very useful and I already had to manually patch KVM a few
+> > times for this.
+> > I will, once time permits, implement this feature on Intel as well.
+> > 
+> > V2:
+> > 
+> >   * Some more refactoring and workarounds for lx-symbols script
+> > 
+> >   * added KVM_GUESTDBG_BLOCKEVENTS flag to enable 'block interrupts on
+> >     single step' together with KVM_CAP_SET_GUEST_DEBUG2 capability
+> >     to indicate which guest debug flags are supported.
+> > 
+> >     This is a replacement for unconditional block of interrupts on single
+> >     step that was done in previous version of this patch set.
+> >     Patches to qemu to use that feature will be sent soon.
+> > 
+> >   * Reworked the the 'intercept all exceptions for debug' feature according
+> >     to the review feedback:
+> > 
+> >     - renamed the parameter that enables the feature and
+> >       moved it to common kvm module.
+> >       (only SVM part is currently implemented though)
+> > 
+> >     - disable the feature for SEV guests as was suggested during the review
+> >     - made the vmexit table const again, as was suggested in the review as well.
+> > 
+> > Best regards,
+> > 	Maxim Levitsky
+> > 
+> > Maxim Levitsky (9):
+> >    scripts/gdb: rework lx-symbols gdb script
+> >    KVM: introduce KVM_CAP_SET_GUEST_DEBUG2
+> >    KVM: x86: implement KVM_CAP_SET_GUEST_DEBUG2
+> >    KVM: aarch64: implement KVM_CAP_SET_GUEST_DEBUG2
+> >    KVM: s390x: implement KVM_CAP_SET_GUEST_DEBUG2
+> >    KVM: x86: implement KVM_GUESTDBG_BLOCKEVENTS
+> >    KVM: SVM: split svm_handle_invalid_exit
+> >    KVM: x86: add force_intercept_exceptions_mask
+> >    KVM: SVM: implement force_intercept_exceptions_mask
+> > 
+> >   Documentation/virt/kvm/api.rst    |   4 +
+> >   arch/arm64/include/asm/kvm_host.h |   4 +
+> >   arch/arm64/kvm/arm.c              |   2 +
+> >   arch/arm64/kvm/guest.c            |   5 -
+> >   arch/s390/include/asm/kvm_host.h  |   4 +
+> >   arch/s390/kvm/kvm-s390.c          |   3 +
+> >   arch/x86/include/asm/kvm_host.h   |  12 ++
+> >   arch/x86/include/uapi/asm/kvm.h   |   1 +
+> >   arch/x86/kvm/svm/svm.c            |  87 +++++++++++--
+> >   arch/x86/kvm/svm/svm.h            |   6 +-
+> >   arch/x86/kvm/x86.c                |  14 ++-
+> >   arch/x86/kvm/x86.h                |   2 +
+> >   include/uapi/linux/kvm.h          |   1 +
+> >   kernel/module.c                   |   8 +-
+> >   scripts/gdb/linux/symbols.py      | 203 ++++++++++++++++++++----------
+> >   15 files changed, 272 insertions(+), 84 deletions(-)
+> > 
+
 
