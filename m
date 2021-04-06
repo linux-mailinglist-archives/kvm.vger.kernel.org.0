@@ -2,183 +2,223 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5D99A354B17
-	for <lists+kvm@lfdr.de>; Tue,  6 Apr 2021 05:05:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0501F354B20
+	for <lists+kvm@lfdr.de>; Tue,  6 Apr 2021 05:15:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243516AbhDFDFe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 5 Apr 2021 23:05:34 -0400
-Received: from szxga02-in.huawei.com ([45.249.212.188]:3934 "EHLO
-        szxga02-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243510AbhDFDFd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 5 Apr 2021 23:05:33 -0400
-Received: from dggeml405-hub.china.huawei.com (unknown [172.30.72.53])
-        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4FDsm209M2z5lm9;
-        Tue,  6 Apr 2021 11:03:14 +0800 (CST)
-Received: from dggpemm500023.china.huawei.com (7.185.36.83) by
- dggeml405-hub.china.huawei.com (10.3.17.49) with Microsoft SMTP Server (TLS)
- id 14.3.498.0; Tue, 6 Apr 2021 11:05:22 +0800
-Received: from [10.174.187.128] (10.174.187.128) by
- dggpemm500023.china.huawei.com (7.185.36.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id
- 15.1.2106.2; Tue, 6 Apr 2021 11:05:22 +0800
-Subject: Re: [PATCH v6 00/10] KVM: selftests: some improvement and a new test
- for kvm page table
-To:     Paolo Bonzini <pbonzini@redhat.com>, <kvm@vger.kernel.org>,
-        <linux-kselftest@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC:     Andrew Jones <drjones@redhat.com>, Ben Gardon <bgardon@google.com>,
-        "Sean Christopherson" <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Peter Xu <peterx@redhat.com>, Ingo Molnar <mingo@kernel.org>,
-        Adrian Hunter <adrian.hunter@intel.com>,
-        Jiri Olsa <jolsa@redhat.com>,
-        "Arnaldo Carvalho de Melo" <acme@redhat.com>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Michael Kerrisk <mtk.manpages@gmail.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        <wanghaibin.wang@huawei.com>, <yuzenghui@huawei.com>
-References: <20210330080856.14940-1-wangyanan55@huawei.com>
-From:   "wangyanan (Y)" <wangyanan55@huawei.com>
-Message-ID: <31ab81be-bf14-62f3-d579-9685ccec578a@huawei.com>
-Date:   Tue, 6 Apr 2021 11:05:22 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.4.0
+        id S233464AbhDFDPW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 5 Apr 2021 23:15:22 -0400
+Received: from mail-io1-f71.google.com ([209.85.166.71]:53221 "EHLO
+        mail-io1-f71.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233204AbhDFDPV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 5 Apr 2021 23:15:21 -0400
+Received: by mail-io1-f71.google.com with SMTP id d4so12108211iop.19
+        for <kvm@vger.kernel.org>; Mon, 05 Apr 2021 20:15:13 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
+        bh=MTyOa4fPHpq0/87Y0jha96oeT+k49mXnNFosEwUFhYM=;
+        b=X6fN+WzqaW7rXimrx8F/tlzziNzNRL3t4AMfBUJCPh7aYBZcVBjSbAu5tMVT6/okT+
+         YMREV2GsT0GjeErUH6GvYOrNm4x7hczoOS4dC0KHPkOq0amRJVeBSPi8bzVDHYDX8DPN
+         ygafTyQu7/SGYXMNWM/xxRsc5DLJ+wjNpvu6ZVK0+8JVWrwb5r1rqdppJ/oP7wsokUWK
+         VZqZw0ViE490pVMyx4PrI1z1I0iNuKPpWSEnQwtZ2xNJDFSTK7fcqP0c5UlM8YDrIYXl
+         Y4A+fGfhzowJO+kNRJDrDOOZq/oLScTy0l3XU+U+Lr9etasKtSF++WD7kUSqx46dUiW9
+         Omxw==
+X-Gm-Message-State: AOAM532hOsM1GWxM2/dRKNus+pf93Bm/c8CA7NXlJfTBvXTcwyi+YhhS
+        77CsmXXUGl3wbqIJxUxCoxrKJTI1yxAkhWTI7v+0V0Je5MJQ
+X-Google-Smtp-Source: ABdhPJwPSrXl7HFg867qIRVRxBEkrgbX5jpNhzU39JujPTlQD6QrJugZ8Sc6gLmr7agK725QXp1a/bvAiENuOXzM/i0vBygw/dsg
 MIME-Version: 1.0
-In-Reply-To: <20210330080856.14940-1-wangyanan55@huawei.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-Originating-IP: [10.174.187.128]
-X-ClientProxiedBy: dggeme704-chm.china.huawei.com (10.1.199.100) To
- dggpemm500023.china.huawei.com (7.185.36.83)
-X-CFilter-Loop: Reflected
+X-Received: by 2002:a5d:89d9:: with SMTP id a25mr22242262iot.69.1617678912805;
+ Mon, 05 Apr 2021 20:15:12 -0700 (PDT)
+Date:   Mon, 05 Apr 2021 20:15:12 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000f560e805bf453804@google.com>
+Subject: [syzbot] KASAN: use-after-free Write in sk_psock_stop
+From:   syzbot <syzbot+7b6548ae483d6f4c64ae@syzkaller.appspotmail.com>
+To:     akpm@linux-foundation.org, andrii@kernel.org, ast@kernel.org,
+        bp@alien8.de, bpf@vger.kernel.org, daniel@iogearbox.net,
+        davem@davemloft.net, hpa@zytor.com, jakub@cloudflare.com,
+        jmattson@google.com, john.fastabend@gmail.com, joro@8bytes.org,
+        kafai@fb.com, kpsingh@kernel.org, kuba@kernel.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        lmb@cloudflare.com, mark.rutland@arm.com, masahiroy@kernel.org,
+        mingo@redhat.com, netdev@vger.kernel.org, pbonzini@redhat.com,
+        peterz@infradead.org, rafael.j.wysocki@intel.com,
+        rostedt@goodmis.org, seanjc@google.com, songliubraving@fb.com,
+        syzkaller-bugs@googlegroups.com, tglx@linutronix.de,
+        vkuznets@redhat.com, wanpengli@tencent.com, will@kernel.org,
+        x86@kernel.org, yhs@fb.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Kindly ping...
+Hello,
 
-Hi Paolo,
-Will this series be picked up soon, or is there any other work for me to do?
+syzbot found the following issue on:
 
-Regards,
-Yanan
+HEAD commit:    f07669df libbpf: Remove redundant semi-colon
+git tree:       bpf-next
+console output: https://syzkaller.appspot.com/x/log.txt?x=1564f0e2d00000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=7eff0f22b8563a5f
+dashboard link: https://syzkaller.appspot.com/bug?extid=7b6548ae483d6f4c64ae
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=16462311d00000
+
+The issue was bisected to:
+
+commit 997acaf6b4b59c6a9c259740312a69ea549cc684
+Author: Mark Rutland <mark.rutland@arm.com>
+Date:   Mon Jan 11 15:37:07 2021 +0000
+
+    lockdep: report broken irq restoration
+
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=12c1c9ced00000
+final oops:     https://syzkaller.appspot.com/x/report.txt?x=11c1c9ced00000
+console output: https://syzkaller.appspot.com/x/log.txt?x=16c1c9ced00000
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+7b6548ae483d6f4c64ae@syzkaller.appspotmail.com
+Fixes: 997acaf6b4b5 ("lockdep: report broken irq restoration")
+
+==================================================================
+BUG: KASAN: use-after-free in __lock_acquire+0x3e6f/0x54c0 kernel/locking/lockdep.c:4770
+Read of size 8 at addr ffff888024f66238 by task syz-executor.1/14202
+
+CPU: 0 PID: 14202 Comm: syz-executor.1 Not tainted 5.12.0-rc4-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
+Call Trace:
+ __dump_stack lib/dump_stack.c:79 [inline]
+ dump_stack+0x141/0x1d7 lib/dump_stack.c:120
+ print_address_description.constprop.0.cold+0x5b/0x2f8 mm/kasan/report.c:232
+ __kasan_report mm/kasan/report.c:399 [inline]
+ kasan_report.cold+0x7c/0xd8 mm/kasan/report.c:416
+ __lock_acquire+0x3e6f/0x54c0 kernel/locking/lockdep.c:4770
+ lock_acquire kernel/locking/lockdep.c:5510 [inline]
+ lock_acquire+0x1ab/0x740 kernel/locking/lockdep.c:5475
+ __raw_spin_lock_bh include/linux/spinlock_api_smp.h:135 [inline]
+ _raw_spin_lock_bh+0x2f/0x40 kernel/locking/spinlock.c:175
+ spin_lock_bh include/linux/spinlock.h:359 [inline]
+ sk_psock_stop+0x2f/0x4d0 net/core/skmsg.c:750
+ sock_map_close+0x172/0x390 net/core/sock_map.c:1534
+ inet_release+0x12e/0x280 net/ipv4/af_inet.c:431
+ __sock_release+0xcd/0x280 net/socket.c:599
+ sock_close+0x18/0x20 net/socket.c:1258
+ __fput+0x288/0x920 fs/file_table.c:280
+ task_work_run+0xdd/0x1a0 kernel/task_work.c:140
+ tracehook_notify_resume include/linux/tracehook.h:189 [inline]
+ exit_to_user_mode_loop kernel/entry/common.c:174 [inline]
+ exit_to_user_mode_prepare+0x249/0x250 kernel/entry/common.c:208
+ __syscall_exit_to_user_mode_work kernel/entry/common.c:290 [inline]
+ syscall_exit_to_user_mode+0x19/0x60 kernel/entry/common.c:301
+ entry_SYSCALL_64_after_hwframe+0x44/0xae
+RIP: 0033:0x466459
+Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 bc ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007f1bde3a3188 EFLAGS: 00000246 ORIG_RAX: 0000000000000003
+RAX: 0000000000000000 RBX: 000000000056bf60 RCX: 0000000000466459
+RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000005
+RBP: 00000000004bf9fb R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 000000000056bf60
+R13: 00007ffe6eb13bbf R14: 00007f1bde3a3300 R15: 0000000000022000
+
+Allocated by task 14202:
+ kasan_save_stack+0x1b/0x40 mm/kasan/common.c:38
+ kasan_set_track mm/kasan/common.c:46 [inline]
+ set_alloc_info mm/kasan/common.c:427 [inline]
+ ____kasan_kmalloc mm/kasan/common.c:506 [inline]
+ ____kasan_kmalloc mm/kasan/common.c:465 [inline]
+ __kasan_kmalloc+0x99/0xc0 mm/kasan/common.c:515
+ kmalloc_node include/linux/slab.h:572 [inline]
+ kzalloc_node include/linux/slab.h:695 [inline]
+ sk_psock_init+0xaf/0x730 net/core/skmsg.c:668
+ sock_map_link+0xbf4/0x1020 net/core/sock_map.c:286
+ sock_hash_update_common+0xe2/0xa60 net/core/sock_map.c:993
+ sock_map_update_elem_sys+0x561/0x680 net/core/sock_map.c:596
+ bpf_map_update_value.isra.0+0x36b/0x8d0 kernel/bpf/syscall.c:167
+ map_update_elem kernel/bpf/syscall.c:1129 [inline]
+ __do_sys_bpf+0x2d6e/0x4f40 kernel/bpf/syscall.c:4384
+ do_syscall_64+0x2d/0x70 arch/x86/entry/common.c:46
+ entry_SYSCALL_64_after_hwframe+0x44/0xae
+
+Freed by task 9712:
+ kasan_save_stack+0x1b/0x40 mm/kasan/common.c:38
+ kasan_set_track+0x1c/0x30 mm/kasan/common.c:46
+ kasan_set_free_info+0x20/0x30 mm/kasan/generic.c:357
+ ____kasan_slab_free mm/kasan/common.c:360 [inline]
+ ____kasan_slab_free mm/kasan/common.c:325 [inline]
+ __kasan_slab_free+0xf5/0x130 mm/kasan/common.c:367
+ kasan_slab_free include/linux/kasan.h:199 [inline]
+ slab_free_hook mm/slub.c:1562 [inline]
+ slab_free_freelist_hook+0x92/0x210 mm/slub.c:1600
+ slab_free mm/slub.c:3161 [inline]
+ kfree+0xe5/0x7f0 mm/slub.c:4213
+ process_one_work+0x98d/0x1600 kernel/workqueue.c:2275
+ worker_thread+0x64c/0x1120 kernel/workqueue.c:2421
+ kthread+0x3b1/0x4a0 kernel/kthread.c:292
+ ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:294
+
+Last potentially related work creation:
+ kasan_save_stack+0x1b/0x40 mm/kasan/common.c:38
+ kasan_record_aux_stack+0xe5/0x110 mm/kasan/generic.c:345
+ insert_work+0x48/0x370 kernel/workqueue.c:1331
+ __queue_work+0x5c1/0xf00 kernel/workqueue.c:1497
+ rcu_work_rcufn+0x58/0x80 kernel/workqueue.c:1733
+ rcu_do_batch kernel/rcu/tree.c:2559 [inline]
+ rcu_core+0x74a/0x12f0 kernel/rcu/tree.c:2794
+ __do_softirq+0x29b/0x9f6 kernel/softirq.c:345
+
+Second to last potentially related work creation:
+ kasan_save_stack+0x1b/0x40 mm/kasan/common.c:38
+ kasan_record_aux_stack+0xe5/0x110 mm/kasan/generic.c:345
+ __call_rcu kernel/rcu/tree.c:3039 [inline]
+ call_rcu+0xb1/0x740 kernel/rcu/tree.c:3114
+ queue_rcu_work+0x82/0xa0 kernel/workqueue.c:1753
+ sk_psock_put include/linux/skmsg.h:446 [inline]
+ sock_map_unref+0x109/0x190 net/core/sock_map.c:182
+ sock_hash_delete_from_link net/core/sock_map.c:918 [inline]
+ sock_map_unlink net/core/sock_map.c:1480 [inline]
+ sock_map_remove_links+0x389/0x530 net/core/sock_map.c:1492
+ sock_map_close+0x12f/0x390 net/core/sock_map.c:1532
+ inet_release+0x12e/0x280 net/ipv4/af_inet.c:431
+ __sock_release+0xcd/0x280 net/socket.c:599
+ sock_close+0x18/0x20 net/socket.c:1258
+ __fput+0x288/0x920 fs/file_table.c:280
+ task_work_run+0xdd/0x1a0 kernel/task_work.c:140
+ tracehook_notify_resume include/linux/tracehook.h:189 [inline]
+ exit_to_user_mode_loop kernel/entry/common.c:174 [inline]
+ exit_to_user_mode_prepare+0x249/0x250 kernel/entry/common.c:208
+ __syscall_exit_to_user_mode_work kernel/entry/common.c:290 [inline]
+ syscall_exit_to_user_mode+0x19/0x60 kernel/entry/common.c:301
+ entry_SYSCALL_64_after_hwframe+0x44/0xae
+
+The buggy address belongs to the object at ffff888024f66000
+ which belongs to the cache kmalloc-2k of size 2048
+The buggy address is located 568 bytes inside of
+ 2048-byte region [ffff888024f66000, ffff888024f66800)
+The buggy address belongs to the page:
+page:ffffea000093d800 refcount:1 mapcount:0 mapping:0000000000000000 index:0xffff888024f60000 pfn:0x24f60
+head:ffffea000093d800 order:3 compound_mapcount:0 compound_pincount:0
+flags: 0xfff00000010200(slab|head)
+raw: 00fff00000010200 ffffea0000951000 0000000200000002 ffff888010842000
+raw: ffff888024f60000 0000000080080007 00000001ffffffff 0000000000000000
+page dumped because: kasan: bad access detected
+
+Memory state around the buggy address:
+ ffff888024f66100: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+ ffff888024f66180: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+>ffff888024f66200: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+                                        ^
+ ffff888024f66280: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+ ffff888024f66300: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+==================================================================
 
 
-On 2021/3/30 16:08, Yanan Wang wrote:
-> Hi,
-> This v6 series can mainly include two parts.
-> Rebased on kvm queue branch: https://git.kernel.org/pub/scm/virt/kvm/kvm.git/log/?h=queue
->
-> In the first part, all the known hugetlb backing src types specified
-> with different hugepage sizes are listed, so that we can specify use
-> of hugetlb source of the exact granularity that we want, instead of
-> the system default ones. And as all the known hugetlb page sizes are
-> listed, it's appropriate for all architectures. Besides, a helper that
-> can get granularity of different backing src types(anonumous/thp/hugetlb)
-> is added, so that we can use the accurate backing src granularity for
-> kinds of alignment or guest memory accessing of vcpus.
->
-> In the second part, a new test is added:
-> This test is added to serve as a performance tester and a bug reproducer
-> for kvm page table code (GPA->HPA mappings), it gives guidance for the
-> people trying to make some improvement for kvm. And the following explains
-> what we can exactly do through this test.
->
-> The function guest_code() can cover the conditions where a single vcpu or
-> multiple vcpus access guest pages within the same memory region, in three
-> VM stages(before dirty logging, during dirty logging, after dirty logging).
-> Besides, the backing src memory type(ANONYMOUS/THP/HUGETLB) of the tested
-> memory region can be specified by users, which means normal page mappings
-> or block mappings can be chosen by users to be created in the test.
->
-> If ANONYMOUS memory is specified, kvm will create normal page mappings
-> for the tested memory region before dirty logging, and update attributes
-> of the page mappings from RO to RW during dirty logging. If THP/HUGETLB
-> memory is specified, kvm will create block mappings for the tested memory
-> region before dirty logging, and split the blcok mappings into normal page
-> mappings during dirty logging, and coalesce the page mappings back into
-> block mappings after dirty logging is stopped.
->
-> So in summary, as a performance tester, this test can present the
-> performance of kvm creating/updating normal page mappings, or the
-> performance of kvm creating/splitting/recovering block mappings,
-> through execution time.
->
-> When we need to coalesce the page mappings back to block mappings after
-> dirty logging is stopped, we have to firstly invalidate *all* the TLB
-> entries for the page mappings right before installation of the block entry,
-> because a TLB conflict abort error could occur if we can't invalidate the
-> TLB entries fully. We have hit this TLB conflict twice on aarch64 software
-> implementation and fixed it. As this test can imulate process from dirty
-> logging enabled to dirty logging stopped of a VM with block mappings,
-> so it can also reproduce this TLB conflict abort due to inadequate TLB
-> invalidation when coalescing tables.
->
-> Links about the TLB conflict abort:
-> https://lore.kernel.org/lkml/20201201201034.116760-3-wangyanan55@huawei.com/
->
-> ---
->
-> Change logs:
->
-> v5->v6:
-> - Address Andrew Jones's comments for v5 series
-> - Add Andrew Jones's R-b tags in some patches
-> - Rebased on newest kvm/queue tree
-> - v5: https://lore.kernel.org/lkml/20210323135231.24948-1-wangyanan55@huawei.com/
->
-> v4->v5:
-> - Use synchronization(sem_wait) for time measurement
-> - Add a new patch about TEST_ASSERT(patch 4)
-> - Address Andrew Jones's comments for v4 series
-> - Add Andrew Jones's R-b tags in some patches
-> - v4: https://lore.kernel.org/lkml/20210302125751.19080-1-wangyanan55@huawei.com/
->
-> v3->v4:
-> - Add a helper to get system default hugetlb page size
-> - Add tags of Reviewed-by of Ben in the patches
-> - v3: https://lore.kernel.org/lkml/20210301065916.11484-1-wangyanan55@huawei.com/
->
-> v2->v3:
-> - Add tags of Suggested-by, Reviewed-by in the patches
-> - Add a generic micro to get hugetlb page sizes
-> - Some changes for suggestions about v2 series
-> - v2: https://lore.kernel.org/lkml/20210225055940.18748-1-wangyanan55@huawei.com/
->
-> v1->v2:
-> - Add a patch to sync header files
-> - Add helpers to get granularity of different backing src types
-> - Some changes for suggestions about v1 series
-> - v1: https://lore.kernel.org/lkml/20210208090841.333724-1-wangyanan55@huawei.com/
->
-> ---
->
-> Yanan Wang (10):
->    tools headers: sync headers of asm-generic/hugetlb_encode.h
->    mm/hugetlb: Add a macro to get HUGETLB page sizes for mmap
->    KVM: selftests: Use flag CLOCK_MONOTONIC_RAW for timing
->    KVM: selftests: Print the errno besides error-string in TEST_ASSERT
->    KVM: selftests: Make a generic helper to get vm guest mode strings
->    KVM: selftests: Add a helper to get system configured THP page size
->    KVM: selftests: Add a helper to get system default hugetlb page size
->    KVM: selftests: List all hugetlb src types specified with page sizes
->    KVM: selftests: Adapt vm_userspace_mem_region_add to new helpers
->    KVM: selftests: Add a test for kvm page table code
->
->   include/uapi/linux/mman.h                     |   2 +
->   tools/include/asm-generic/hugetlb_encode.h    |   3 +
->   tools/include/uapi/linux/mman.h               |   2 +
->   tools/testing/selftests/kvm/.gitignore        |   1 +
->   tools/testing/selftests/kvm/Makefile          |   3 +
->   .../selftests/kvm/demand_paging_test.c        |   8 +-
->   .../selftests/kvm/dirty_log_perf_test.c       |  14 +-
->   .../testing/selftests/kvm/include/kvm_util.h  |   4 +-
->   .../testing/selftests/kvm/include/test_util.h |  21 +-
->   .../selftests/kvm/kvm_page_table_test.c       | 506 ++++++++++++++++++
->   tools/testing/selftests/kvm/lib/assert.c      |   4 +-
->   tools/testing/selftests/kvm/lib/kvm_util.c    |  59 +-
->   tools/testing/selftests/kvm/lib/test_util.c   | 163 +++++-
->   tools/testing/selftests/kvm/steal_time.c      |   4 +-
->   14 files changed, 733 insertions(+), 61 deletions(-)
->   create mode 100644 tools/testing/selftests/kvm/kvm_page_table_test.c
->
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+syzbot can test patches for this issue, for details see:
+https://goo.gl/tpsmEJ#testing-patches
