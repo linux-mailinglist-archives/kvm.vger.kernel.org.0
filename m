@@ -2,42 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D95F7355C60
-	for <lists+kvm@lfdr.de>; Tue,  6 Apr 2021 21:40:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E5F62355C69
+	for <lists+kvm@lfdr.de>; Tue,  6 Apr 2021 21:41:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242771AbhDFTlB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 6 Apr 2021 15:41:01 -0400
+        id S244959AbhDFTlG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 6 Apr 2021 15:41:06 -0400
 Received: from mail-bn8nam11on2061.outbound.protection.outlook.com ([40.107.236.61]:28513
         "EHLO NAM11-BN8-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S235234AbhDFTk6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 6 Apr 2021 15:40:58 -0400
+        id S244906AbhDFTlA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 6 Apr 2021 15:41:00 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=DF8Z7pUWlY95h2fa4EacFZN5SmhKZgd1w8xwSxZoq/lWOjux1WejBVE5lKCycZVLdOh8PKQanMxJR+u2N/mZm84hLW8pA2ocYR2XkQafxKxeVudkb+d7c9CPzTm4MLBPS3rNugEp8ThLI7Otj15ERIPHB6RYiuVq8BocH63TE6GHzNJulwy0MHacFMthZegQirV/BOp9ecGntsSb4iyr7fzriGMuxiK6B8HuoOTxzs+doKk8XM92hhhQ2PbVz2ve+5u9eh9HxQD/Pauk/ox0CAI08HTlc95s2cEBFiKxO3AksTSU6cW4B3L+UrZSgAQqM3Ze/CFb6LGp1FUp0GaUHw==
+ b=aZt18h4i1OqkF8J297eelqzB3fqodXfRRw2/wZpjxi4hmg+vJW1u6S/1SqfRnXQKtLoiC9kI0xJS7aP/D0OctZF31CD1J2FuV4AWoX2KD1F/zV5y4O0U3sIc6BaTtzfL3ljOec70VoSvFrplWzZAlWj4o9M18a+2yjadon5HDx1DRNbBWkaM/nXnlWp0QJp2GGmmRsPAAaUfxPo5/anRncs+NvnqZKEHi7iBIe0QoTKCo6QAuzcuK2gUUSJ/f9G11vIwGvUEojiRfmw4ft9BCSganR14iaUSy04LTm+Srw+80KSEUbhPkWn9KPNhiYfQO9bI7vGSqLUSeyUiUolw6w==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=0EThwu+N8z8edP7jiWd3LH+J3xAYs2vWsRfmw4C+N8c=;
- b=nSMNDx4DaefATUtwL6/aK25QRVlAHJpC5tzWctaTB/5+dT9bf1uhPJbAn/za+iMlkr399ri/pvXYth9EhLJZ8tplSs7mSP0E8Wsep4HNnVsMFQNVS815RQmMl4Kfg1FJsA1hJrbxHdZzJ2zCFZFxRwH90O4/MTK4SlKU/OTNhHJWB8ygtfRhFuJhDnJA33SZVAPTD0NG9BytvStNbdj9RDv0T3cuovFDQGhaGhVSYanm5wqO4bLVnMyewedxUW/om2y2VAbnJ5HOc+zDCtvKpDfSrEwBmqD+zn2jv4ldOaGl6rHTkHpGESakWmn3Zvdq04RT01c8742TUPf2ja0Shw==
+ bh=KdyikCyh8+bLONJpcS0zgptCbWcNF4yIX+TOYuX6Xsw=;
+ b=HATk4zHH8Hd66Y0nmxfe5O1b5Lv98Z8xY67q0MENz/QEkPLUD46d55SiImx+ihujdyOdKMe6UDYA2IyEtDAQH9lf8kq2RbpoknUJPU1OBr2TRZhUuc3iihUnr1U493pItRSY3mzNmzhrZSXXRf+lIbTnuMENjRb4WzdO3mzE5yACifJSI4qBUzk6iCTNtjkGDnzVTz+yUZHTFXqBNrOiHzAu1EYkrn0CP/uTw9I9ZGzDiHHPsJJkrXeEFSZqd92zj1LblXh4QtBj7uB249/mE/+V/lD7KBB5YG8nVeHrcdYOG2fgwphqITR2ymaS/lA4IQ15e/YcEQb4Yqvfw3xuHQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
  dkim=pass header.d=nvidia.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=0EThwu+N8z8edP7jiWd3LH+J3xAYs2vWsRfmw4C+N8c=;
- b=EqOVsExl+sXx2kVOJnhsFfB389dVRe2sXNEMvAKMC6PbNZcZ7KFjrjxkE3oEwLeSG3fECFv4KuiUcuJqK60caEKyajqIAl1ZYHihRL1g/13yDn9M9RxHDQuaK9Y7Fiak2GcG4b4Meswx0mikpAra/JCf02QsewLhcMTA2gdM41GampAhbmKyEDQrvUFAUc30AQomvBacQV6eT/00hDGne44LulEAWhmI7NZIawjl01bU4r2QJet7+Usw4NrM51ZG+gI1i0sRY2So+Ej5EzkhSsolPNDedRf4Y/iZFatHG1d40wfmgfSFu1ruCJeCYmbv6eG+YGgZhU5Rcvq1n0w/sw==
+ bh=KdyikCyh8+bLONJpcS0zgptCbWcNF4yIX+TOYuX6Xsw=;
+ b=AwJLSSq+urYOf4nKfl7anpLXLGrR6BqNQwDqNXA2WJT+ulghSRkubeQzktuDF5mDqvlQwr4cBU9sZzsZxttUhm7ZwTauRN1FKXxJuGapYGpr5H1PU0YDSga9I7wxbw4ZXpRn55foXLOj069jTIdyA5cgjgZYfK7Ktfy5RBQkklxFDzCNz5U3Zb6znKkuwfih+fvOdveVwwXLT7tHCdW2u6WUu2PkujgdsIVbG+x0iJOQLZfkzKOKKggGrLBtWns+9nl0qcZwA8Ajy0MwtF1pinNxkXaueDW2V87AmkSxwHD+K6tf11+iM5ki0iJXjkTyoo5pNLcY9kw1Q5d7SteQgA==
 Authentication-Results: redhat.com; dkim=none (message not signed)
  header.d=none;redhat.com; dmarc=none action=none header.from=nvidia.com;
 Received: from DM6PR12MB3834.namprd12.prod.outlook.com (2603:10b6:5:14a::12)
  by DM6PR12MB4235.namprd12.prod.outlook.com (2603:10b6:5:220::12) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3999.27; Tue, 6 Apr
- 2021 19:40:48 +0000
+ 2021 19:40:50 +0000
 Received: from DM6PR12MB3834.namprd12.prod.outlook.com
  ([fe80::1c62:7fa3:617b:ab87]) by DM6PR12MB3834.namprd12.prod.outlook.com
  ([fe80::1c62:7fa3:617b:ab87%6]) with mapi id 15.20.3999.032; Tue, 6 Apr 2021
- 19:40:48 +0000
+ 19:40:50 +0000
 From:   Jason Gunthorpe <jgg@nvidia.com>
 To:     Alex Williamson <alex.williamson@redhat.com>, kvm@vger.kernel.org,
         Kirti Wankhede <kwankhede@nvidia.com>
@@ -49,153 +49,224 @@ Cc:     "Raj, Ashok" <ashok.raj@intel.com>,
         Leon Romanovsky <leonro@nvidia.com>,
         Max Gurtovoy <mgurtovoy@nvidia.com>,
         Tarun Gupta <targupta@nvidia.com>
-Subject: [PATCH v2 06/18] vfio/mdev: Expose mdev_get/put_parent to mdev_private.h
-Date:   Tue,  6 Apr 2021 16:40:29 -0300
-Message-Id: <6-v2-d36939638fc6+d54-vfio2_jgg@nvidia.com>
+Subject: [PATCH v2 08/18] vfio/mdev: Reorganize mdev_device_create()
+Date:   Tue,  6 Apr 2021 16:40:31 -0300
+Message-Id: <8-v2-d36939638fc6+d54-vfio2_jgg@nvidia.com>
 In-Reply-To: <0-v2-d36939638fc6+d54-vfio2_jgg@nvidia.com>
 References: 
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
 X-Originating-IP: [142.162.115.133]
-X-ClientProxiedBy: MN2PR16CA0020.namprd16.prod.outlook.com
- (2603:10b6:208:134::33) To DM6PR12MB3834.namprd12.prod.outlook.com
+X-ClientProxiedBy: BL1PR13CA0148.namprd13.prod.outlook.com
+ (2603:10b6:208:2bb::33) To DM6PR12MB3834.namprd12.prod.outlook.com
  (2603:10b6:5:14a::12)
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from mlx.ziepe.ca (142.162.115.133) by MN2PR16CA0020.namprd16.prod.outlook.com (2603:10b6:208:134::33) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4020.16 via Frontend Transport; Tue, 6 Apr 2021 19:40:44 +0000
-Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1lTrZ4-001mXB-33; Tue, 06 Apr 2021 16:40:42 -0300
+Received: from mlx.ziepe.ca (142.162.115.133) by BL1PR13CA0148.namprd13.prod.outlook.com (2603:10b6:208:2bb::33) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4020.8 via Frontend Transport; Tue, 6 Apr 2021 19:40:45 +0000
+Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1lTrZ4-001mXK-5E; Tue, 06 Apr 2021 16:40:42 -0300
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: ec2fd02a-9e02-43c0-8d7f-08d8f933de68
+X-MS-Office365-Filtering-Correlation-Id: 1f765d9b-def9-4180-feb0-08d8f933df21
 X-MS-TrafficTypeDiagnostic: DM6PR12MB4235:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <DM6PR12MB42352FA9D1DA0E6C7A79351EC2769@DM6PR12MB4235.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:4303;
+X-Microsoft-Antispam-PRVS: <DM6PR12MB4235269319742F6D5B27C9A9C2769@DM6PR12MB4235.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:7219;
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: l4i5xRas3Ah9rOThqImW2hpF2lyhDO2HER4ewqJHP78/aRVWW9476bZp1ley15HKQMQ0JmUyXrldaOWMJNbjtwuXuYEoHlwij0nHqF9eOkmF1+4i/hlkGXZJfIpRIvZMClmxHHI2UuCk2UlmVMy1U0DKNmhyjxdKk+idDfJnCmZElvF/UC9F4KoZshPpbuwXh1XCEquijpJ7OOFP77HSbB5J715o6ndn/PDpz0tbNR1D3pdwBZIRikxqnf9T6j0vNyMKEX0K3odi8arLbzvOyOmvAbiZrODXTUE7QHs0T0AMA4jS6WMcdJjLq9kpSCn8f5H3U5F6HhgD7qgyqwcGJQsda2jrMMETqlwG0SGKT/NHGpHGWW0HPAF2Cf/XnWIzEFrnO9cnTUI6PxldEwaV808OwqWYbVI7MdsW4FM1Q06MhUlWrfNUzuLJZl/ptfwrgQ7mGMrCRn6VGleGe6IAnokygJacIlI4wJcy/RZmE/2bSt2oLKEEDI6NImgRL3QqWl474g+OGNgYGxFXS1JAsANrOrAceB8Wm8CmaUIQDn3t+AsjIoDV4ANkLpdybXjQ2RugX6iQH0ld3h1b1/S8QCEwKU00qxbKvWtA0G6jqYOHXcYoTbTDqkJFVwStWbx+AvwlCNS/ZTyiTAfMea//+p9825bXSUQWSHRzXuBWZlGNVcTNdGVlj0juIuXFMmTB
+X-Microsoft-Antispam-Message-Info: j16lpe+/FD3qvsdLVE5MRlMjDZ/36Kw5PXGIsB89Gek+WX1ftkESp6P6Fas5K8gpdjFCziSO7XwSSYWDS4Jfz2Z+IHoPocyUK/fYGQrAXLPnCX2TMi7ImyTbhInfCFbG1UQauY3kq9NN8oW6d/cp1J0BrTFfcAEvVUYjU70aZVLFdHFs/lJDxAQvs2RRM0/7MYLrAbm3X5jNr6rMbMxr4Am5IWnPcH2VYhgZlz2X/+WSOv+FXC3R7rP/di0SwiujpUYWz0Dsw0UWr9PJwGfYAOiLYDTeyKJ7P+y8SMv73QndiIQYtDcvEc0A+xcFLNRCNE1WfPF7+mjcdSK+cvTvcGK6yx5Dp41nftvTiUkQGAbxWT9ra8gx37iioMcyQC/2MpODm39l3SNiHpTO3t6Rtx9ejQ6Ck0aas4A4LVvn3ErhaejHzoUUgwCkH1VpHZeO6G0Gqx8k3d39YVgaNjJCWKzKjkVKtnlPDvnbaSvrlVWwBqAk5HaXECJj6jx5T1QcIL6+5fr2Se9c4hMptzy/5+rFJW9MIpEd6UYKDHdwBwUafoOn+GaebUEREfv8IaOMsxAZK6/mN8StmXtzUxrDtwCPsHUJg7RTeNaxjJb0XsBMYcA6mCXuIISYBCY+dP6hj6cxDA2nOLW3dCC2PY3bsY6AxtJo/9J++CGg1qOtlxXb/ls9nSVkmvWy8B76jQYM
 X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB3834.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(346002)(376002)(366004)(396003)(136003)(39860400002)(478600001)(54906003)(8676002)(2906002)(86362001)(66556008)(6636002)(83380400001)(6666004)(5660300002)(38100700001)(8936002)(2616005)(66476007)(316002)(426003)(110136005)(107886003)(36756003)(26005)(9786002)(9746002)(186003)(66946007)(4326008)(4216001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: =?us-ascii?Q?ciSpyJ1el7COqPEhnTlwPGXxemVL3+dahV+5TLKrl/SQBOyCW7X7Ll7imK4y?=
- =?us-ascii?Q?Ubh87qY5534kZ4/0Ew5hqJPGHL2pJjz2AK36Trg1hLoD24nL01ApU4f/ovg8?=
- =?us-ascii?Q?1Iv4cnVAgzLR31TpKPRYhULSX5NGsR53g/4z0N86Qse9TaFsdurhJjWygI2i?=
- =?us-ascii?Q?OrEj4UKuQ8zsGUst67n8r72znl3A5FFRoxeAFHRcV5dbVKp5vY9WiDuOUmwP?=
- =?us-ascii?Q?ndQ21rKcNBWTmp1pJ63SyhbVHFKCTZVxjQJq1sNiHj51sqdODU46LS/Ru4Pj?=
- =?us-ascii?Q?iPHZJK7VmHWaZHFTi6y7qdVcIpa+iV5niEeZyRuquiN8ht2J+NKp5jiSg+2q?=
- =?us-ascii?Q?KYQR3zwLDYeSADWPl5sXsrPRHImIE15viMJPLMb7dVGTK7usaKuLE6dK0PDn?=
- =?us-ascii?Q?WUyBCTxjCi1sGDJMlh1395geN4BGH6EoR5ire9bWzmM1MFke17F0ObRiJsp3?=
- =?us-ascii?Q?Y0LuhNeeo3DMAY2jfZMxIAmcmVohK1g9GThX3GaA2qExBSd6sGY0xtNjaEot?=
- =?us-ascii?Q?V8/Ldu7n+xiJSm8L2VdjL3ySjkHufo6f0aPgmwvB9jjZytkDHPXK624wounB?=
- =?us-ascii?Q?uv5iPDZBQy1WiEvXsHIazQANaiOjbTpKFTCOIDOi521JvAdnzPbCrxNkbQZ5?=
- =?us-ascii?Q?bkJmXjNRNzRs3EpCTGBWg5tDWSWj4kQVgCnftcAauqSrhiwg/BrmpakVYhya?=
- =?us-ascii?Q?gEWT/xQ/SvLYVWxuCj8GZ3zDMnEVyzGPtrteA8B00qM/yWtzF83jD/jMniRT?=
- =?us-ascii?Q?NO6uHjd2G8tRLv6P5iy+KcwLzbSI45Ai57QHsJY1ARHERZLIgaoXGg0dvxfh?=
- =?us-ascii?Q?BISLyExz1Y9rPARO/Gg56w3ppwXEihqCWlb+Wev4M1Y+RfDkPNnGMDIqQS3/?=
- =?us-ascii?Q?whU+bp7Jg8pVWfagosb+7Ma21yuU6azfPyC2bgY1vt8XJPm4VOQcrNM3k+eV?=
- =?us-ascii?Q?8we5rtw/av7leCa9nKxOcZs4OSYqlsdDk4UvioH7uu3r53gLCTyxCdOKKnSD?=
- =?us-ascii?Q?m2yBAf/BmmkyceyMwxvm674P1rj4Vxl1zp5It/To4Rhv1XpXRs5oqlfAcHcl?=
- =?us-ascii?Q?r5XpQVDtQbZHgum1vsitT0ev1ddl44+7yxv8GZo6Z6nx9uhp0ioWCoVOxfA8?=
- =?us-ascii?Q?8ayOiJDm87Z9RC4DaFYkH2q/0CZHjtO3ydXRrnLKvxNIVUAqSmOmet38xTd7?=
- =?us-ascii?Q?XiYIDLV0yegMHfHb0Kp2UvLGoqnbD5JC0BqbIwGVeyGQfgkNwDeSM4i+1Jkq?=
- =?us-ascii?Q?a1sdbJ65JSFVmw8XcmrRs2Hb852YSNQXhpS0NHzOy4cUoGAQMt+o6M0jxqUF?=
- =?us-ascii?Q?MOzN3WI/7GI/uFTcFUdsKw6vZpEQw5nLpJ5xQjYeVab9xg=3D=3D?=
+X-MS-Exchange-AntiSpam-MessageData: =?us-ascii?Q?h9mnEjIWxd2/3FJ3DgNj1b4p7ulhVKoxS65WKxRGP0cKWp7hvUAgt+JqEoA9?=
+ =?us-ascii?Q?uPKfPHDEivSyOjl0cJNPCzYt5SWWb5Siw4a144DEuKRUp4hp7yJiUKRxCnDF?=
+ =?us-ascii?Q?RQwywijXIFi1M5Vr8ihhg0LFo3CubYTZJUX/0gtS5vypoReEMhoRGOdtPnYs?=
+ =?us-ascii?Q?F9Rht8wIHpfTEmjWADGUD4jhRpgT0mi2pYBAa9Y10Jn2QIEtUd6/hyv3NHs9?=
+ =?us-ascii?Q?fh4QUmeNiVwU+PEuE9nBV6bsgW7y/fb5pAziYHurZMhAUbItTmC4m4P7EDFJ?=
+ =?us-ascii?Q?fgf7UQt5KbaeuSF4j0TpvkEHD6/G2F0dJcwO/p97Lvumj2nGZttpXdyfv5Qk?=
+ =?us-ascii?Q?uQVxUGf05EO6cRwq1TVK7XOQEij0+nehwVW0pblxmVEaGbY6+8G6H4FNECFU?=
+ =?us-ascii?Q?Yy6Jpl1K6lDL9FN/hDltu2gdI2Ae/dNB2B/YPG+W5FesYICp2dhtfPrT3GBF?=
+ =?us-ascii?Q?+VEUneMYbrSk967bM/3bVSQJqnxikQOVojIDj8u8XN5KBD4Ah3m71SSkPrJ4?=
+ =?us-ascii?Q?ssKrHFsZyxSYIZhPAmiRxaG77QkNyPnKOLXjvcSkAGkWWmTd6yFeYTTGKrMr?=
+ =?us-ascii?Q?jkNa5wGNw3Nm6AN/uKbc+a5fMwJB/eE+m/fi9K9CU4aJ4HIOOgNUr5XbQNUw?=
+ =?us-ascii?Q?7SctqBhylw4NzXWMGkLsDayiLtT95MY0r6NMCQZXc8xSZb/9nSJtdW3dGSvJ?=
+ =?us-ascii?Q?p6M4aQoxngjhKWJjBUPWIuSMSXwvENlzmd64WPvilgxB3os+VN5GI5YS4n22?=
+ =?us-ascii?Q?IUO2SmRMBQFrJp4ybmM9EXAYOXGgFplbr4BS6jnXRjs0YGc1GQhdgKVm7WGU?=
+ =?us-ascii?Q?z8QqVXrHOyQb35QgyksdByQOqxCWmhH3QDaoiNfHG3aPb3tUKAGmqCI2Q9Gw?=
+ =?us-ascii?Q?Oda2J+C1wl1z1ow91z05iUgZZqrbiQ/g9ZsDujl2PiR5HXsnsOwsVxOUawRa?=
+ =?us-ascii?Q?OQOYkFIp7eP5jvJPN5gAOPv0SbY4ncjH8sagZCUrjF9BzfUmP2iTVEfxm9zB?=
+ =?us-ascii?Q?46LlkxGtEFwB5Xh02xxfelLuq/RTfK6ghP0OnVatBy2wnStkB3ImcU0ALXnF?=
+ =?us-ascii?Q?7PscgYhgmkV4yAdQfhY35ZxLSllhw7bhXkGN4+GKPB+jtXVtuZJ8eWOsbXBk?=
+ =?us-ascii?Q?18S/Gk9WXVgCKayLe2PH7zRzubzXhW9+j6Mo9gVhA10cxWULpOE+jOWRQNXO?=
+ =?us-ascii?Q?Y+MwHAmXiW8Oq/hSYiQdirtNVf3eL6GoheylHeIM8ofvxjn4Yre+sXoTbwCH?=
+ =?us-ascii?Q?pLGYvRjlFkhr8glJKLVfwC7145mrABXTCqtCxwjMaccioF6RMkwKbZbQFV6Z?=
+ =?us-ascii?Q?iUfWr+CXdRIUW5dT7UphEjF0X1H+YUzE2u/LNKFxo6sIgg=3D=3D?=
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: ec2fd02a-9e02-43c0-8d7f-08d8f933de68
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1f765d9b-def9-4180-feb0-08d8f933df21
 X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB3834.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Apr 2021 19:40:45.0073
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Apr 2021 19:40:46.5764
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: DdmhO/L3zDan0dHHnGr371ISDozgkqEdbn+x4ZF53zYTkDOYlrJw7BU4CtKtqfMP
+X-MS-Exchange-CrossTenant-UserPrincipalName: WYVhN3IMyEi9OJLdaDfhviLxwcDOoL0z1gnNLU+8tunQEEmee4Jgxy567IQWowVu
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4235
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The next patch will use these in mdev_sysfs.c
+Once the memory for the struct mdev_device is allocated it should
+immediately be device_initialize()'d and filled in so that put_device()
+can always be used to undo the allocation.
 
-While here remove the now dead code checks for NULL, a mdev_type can never
-have a NULL parent.
+Place the mdev_get/put_parent() so that they are clearly protecting the
+mdev->parent pointer. Move the final put to the release function so that
+the lifetime rules are trivial to understand. Update the goto labels to
+follow the normal convention.
+
+Remove mdev_device_free() as the release function via device_put() is now
+usable in all cases.
 
 Reviewed-by: Christoph Hellwig <hch@lst.de>
 Reviewed-by: Kevin Tian <kevin.tian@intel.com>
 Reviewed-by: Cornelia Huck <cohuck@redhat.com>
 Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
 ---
- drivers/vfio/mdev/mdev_core.c    | 23 +++--------------------
- drivers/vfio/mdev/mdev_private.h | 12 ++++++++++++
- 2 files changed, 15 insertions(+), 20 deletions(-)
+ drivers/vfio/mdev/mdev_core.c | 60 ++++++++++++++++-------------------
+ 1 file changed, 27 insertions(+), 33 deletions(-)
 
 diff --git a/drivers/vfio/mdev/mdev_core.c b/drivers/vfio/mdev/mdev_core.c
-index 5ca0efa5266bad..7ec21c907397a5 100644
+index 7ec21c907397a5..f7559835b0610f 100644
 --- a/drivers/vfio/mdev/mdev_core.c
 +++ b/drivers/vfio/mdev/mdev_core.c
-@@ -45,7 +45,7 @@ static struct mdev_parent *__find_parent_device(struct device *dev)
- 	return NULL;
+@@ -71,7 +71,6 @@ static void mdev_device_remove_common(struct mdev_device *mdev)
+ 
+ 	/* Balances with device_initialize() */
+ 	put_device(&mdev->dev);
+-	mdev_put_parent(parent);
  }
  
--static void mdev_release_parent(struct kref *kref)
-+void mdev_release_parent(struct kref *kref)
+ static int mdev_device_remove_cb(struct device *dev, void *data)
+@@ -208,8 +207,13 @@ void mdev_unregister_device(struct device *dev)
+ }
+ EXPORT_SYMBOL(mdev_unregister_device);
+ 
+-static void mdev_device_free(struct mdev_device *mdev)
++static void mdev_device_release(struct device *dev)
  {
- 	struct mdev_parent *parent = container_of(kref, struct mdev_parent,
- 						  ref);
-@@ -55,20 +55,6 @@ static void mdev_release_parent(struct kref *kref)
- 	put_device(dev);
++	struct mdev_device *mdev = to_mdev_device(dev);
++
++	/* Pairs with the get in mdev_device_create() */
++	mdev_put_parent(mdev->parent);
++
+ 	mutex_lock(&mdev_list_lock);
+ 	list_del(&mdev->next);
+ 	mutex_unlock(&mdev_list_lock);
+@@ -218,70 +222,61 @@ static void mdev_device_free(struct mdev_device *mdev)
+ 	kfree(mdev);
  }
  
--static struct mdev_parent *mdev_get_parent(struct mdev_parent *parent)
+-static void mdev_device_release(struct device *dev)
 -{
--	if (parent)
--		kref_get(&parent->ref);
+-	struct mdev_device *mdev = to_mdev_device(dev);
 -
--	return parent;
+-	mdev_device_free(mdev);
 -}
 -
--static void mdev_put_parent(struct mdev_parent *parent)
--{
--	if (parent)
--		kref_put(&parent->ref, mdev_release_parent);
--}
--
- /* Caller must hold parent unreg_sem read or write lock */
- static void mdev_device_remove_common(struct mdev_device *mdev)
- {
-@@ -243,12 +229,9 @@ int mdev_device_create(struct mdev_type *type, const guid_t *uuid)
+ int mdev_device_create(struct mdev_type *type, const guid_t *uuid)
  {
  	int ret;
  	struct mdev_device *mdev, *tmp;
--	struct mdev_parent *parent;
--
--	parent = mdev_get_parent(type->parent);
--	if (!parent)
--		return -EINVAL;
-+	struct mdev_parent *parent = type->parent;
+ 	struct mdev_parent *parent = type->parent;
  
-+	mdev_get_parent(parent);
+-	mdev_get_parent(parent);
  	mutex_lock(&mdev_list_lock);
  
  	/* Check for duplicate */
-diff --git a/drivers/vfio/mdev/mdev_private.h b/drivers/vfio/mdev/mdev_private.h
-index debf27f95b4f10..10eccc35782c4d 100644
---- a/drivers/vfio/mdev/mdev_private.h
-+++ b/drivers/vfio/mdev/mdev_private.h
-@@ -46,4 +46,16 @@ void mdev_remove_sysfs_files(struct mdev_device *mdev);
- int mdev_device_create(struct mdev_type *kobj, const guid_t *uuid);
- int  mdev_device_remove(struct mdev_device *dev);
+ 	list_for_each_entry(tmp, &mdev_list, next) {
+ 		if (guid_equal(&tmp->uuid, uuid)) {
+ 			mutex_unlock(&mdev_list_lock);
+-			ret = -EEXIST;
+-			goto mdev_fail;
++			return -EEXIST;
+ 		}
+ 	}
  
-+void mdev_release_parent(struct kref *kref);
+ 	mdev = kzalloc(sizeof(*mdev), GFP_KERNEL);
+ 	if (!mdev) {
+ 		mutex_unlock(&mdev_list_lock);
+-		ret = -ENOMEM;
+-		goto mdev_fail;
++		return -ENOMEM;
+ 	}
+ 
++	device_initialize(&mdev->dev);
++	mdev->dev.parent  = parent->dev;
++	mdev->dev.bus = &mdev_bus_type;
++	mdev->dev.release = mdev_device_release;
++	mdev->dev.groups = parent->ops->mdev_attr_groups;
++	mdev->type = type;
++	mdev->parent = parent;
++	/* Pairs with the put in mdev_device_release() */
++	mdev_get_parent(parent);
 +
-+static inline void mdev_get_parent(struct mdev_parent *parent)
-+{
-+	kref_get(&parent->ref);
-+}
-+
-+static inline void mdev_put_parent(struct mdev_parent *parent)
-+{
-+	kref_put(&parent->ref, mdev_release_parent);
-+}
-+
- #endif /* MDEV_PRIVATE_H */
+ 	guid_copy(&mdev->uuid, uuid);
+ 	list_add(&mdev->next, &mdev_list);
+ 	mutex_unlock(&mdev_list_lock);
+ 
+-	mdev->parent = parent;
++	dev_set_name(&mdev->dev, "%pUl", uuid);
+ 
+ 	/* Check if parent unregistration has started */
+ 	if (!down_read_trylock(&parent->unreg_sem)) {
+-		mdev_device_free(mdev);
+ 		ret = -ENODEV;
+-		goto mdev_fail;
++		goto out_put_device;
+ 	}
+ 
+-	device_initialize(&mdev->dev);
+-	mdev->dev.parent = parent->dev;
+-	mdev->dev.bus     = &mdev_bus_type;
+-	mdev->dev.release = mdev_device_release;
+-	dev_set_name(&mdev->dev, "%pUl", uuid);
+-	mdev->dev.groups = parent->ops->mdev_attr_groups;
+-	mdev->type = type;
+-
+ 	ret = parent->ops->create(&type->kobj, mdev);
+ 	if (ret)
+-		goto ops_create_fail;
++		goto out_unlock;
+ 
+ 	ret = device_add(&mdev->dev);
+ 	if (ret)
+-		goto add_fail;
++		goto out_remove;
+ 
+ 	ret = mdev_create_sysfs_files(mdev);
+ 	if (ret)
+-		goto sysfs_fail;
++		goto out_del;
+ 
+ 	mdev->active = true;
+ 	dev_dbg(&mdev->dev, "MDEV: created\n");
+@@ -289,15 +284,14 @@ int mdev_device_create(struct mdev_type *type, const guid_t *uuid)
+ 
+ 	return 0;
+ 
+-sysfs_fail:
++out_del:
+ 	device_del(&mdev->dev);
+-add_fail:
++out_remove:
+ 	parent->ops->remove(mdev);
+-ops_create_fail:
++out_unlock:
+ 	up_read(&parent->unreg_sem);
++out_put_device:
+ 	put_device(&mdev->dev);
+-mdev_fail:
+-	mdev_put_parent(parent);
+ 	return ret;
+ }
+ 
 -- 
 2.31.1
 
