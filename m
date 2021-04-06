@@ -2,170 +2,111 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 13711354E12
-	for <lists+kvm@lfdr.de>; Tue,  6 Apr 2021 09:41:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 65977354E1C
+	for <lists+kvm@lfdr.de>; Tue,  6 Apr 2021 09:44:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244391AbhDFHl3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 6 Apr 2021 03:41:29 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:14150 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S244331AbhDFHlN (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 6 Apr 2021 03:41:13 -0400
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 1367ZHt4089677
-        for <kvm@vger.kernel.org>; Tue, 6 Apr 2021 03:41:06 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references; s=pp1;
- bh=z+xqMqKNP2p9v0rJES1t+Iyu6AiUcYSv1H1e2GO0GkI=;
- b=BqCPpIEsKQI7/QXw/C9H82gq0s2ZEHU7vEWNvkL1Law+1MJyD4NxxPTEnbiHvq3PzlCR
- eRbN0u+YQX2r/d8iCDz/p6KmwPdXdnS50/ywMp9tU0TgL3Wkp70SaOB/cpAdwOUzNxQS
- 1HEIspZRQZCC9nuw5oCK76JJqgOMmy3V9d3l3MmKHIaqNkZc3EFFXP2/AjDgiEbL1gVy
- ahMBLHoWnOd4XqGl4H9wa+sAwzse6fs4WVbrmpSYAiMdylai02pqnYlQIzKe3q17ubNn
- WgxvG02AE/zvAalZlcgtcxQkFosUU85To6i/RISQnyxFnDEEIMLPGlqYNzjS+2ZZaxw+ mA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 37q5dv1qu8-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Tue, 06 Apr 2021 03:41:06 -0400
-Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 1367aHVM093526
-        for <kvm@vger.kernel.org>; Tue, 6 Apr 2021 03:41:05 -0400
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 37q5dv1qsd-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 06 Apr 2021 03:41:05 -0400
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 1367XJcH026916;
-        Tue, 6 Apr 2021 07:41:03 GMT
-Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
-        by ppma06ams.nl.ibm.com with ESMTP id 37q2q5hwxv-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 06 Apr 2021 07:41:03 +0000
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 1367eeV835782974
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 6 Apr 2021 07:40:40 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 795984C05E;
-        Tue,  6 Apr 2021 07:41:00 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 2C9C54C040;
-        Tue,  6 Apr 2021 07:41:00 +0000 (GMT)
-Received: from oc3016276355.ibm.com (unknown [9.145.42.152])
-        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue,  6 Apr 2021 07:41:00 +0000 (GMT)
-From:   Pierre Morel <pmorel@linux.ibm.com>
-To:     kvm@vger.kernel.org
-Cc:     frankja@linux.ibm.com, david@redhat.com, thuth@redhat.com,
-        cohuck@redhat.com, imbrenda@linux.ibm.com
-Subject: [kvm-unit-tests PATCH v3 16/16] s390x: css: testing clear subchannel
-Date:   Tue,  6 Apr 2021 09:40:53 +0200
-Message-Id: <1617694853-6881-17-git-send-email-pmorel@linux.ibm.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1617694853-6881-1-git-send-email-pmorel@linux.ibm.com>
-References: <1617694853-6881-1-git-send-email-pmorel@linux.ibm.com>
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: ntor66Bfk_hU-4nrnr2k5738V4j0e6FB
-X-Proofpoint-ORIG-GUID: KxBllOLbq0CWc9elqMcYBrUB_Lv9LfCA
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.761
- definitions=2021-04-06_01:2021-04-01,2021-04-06 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501 mlxscore=0
- mlxlogscore=880 spamscore=0 lowpriorityscore=0 adultscore=0 phishscore=0
- impostorscore=0 suspectscore=0 clxscore=1015 bulkscore=0 malwarescore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2104030000
- definitions=main-2104060050
+        id S233007AbhDFHo0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 6 Apr 2021 03:44:26 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:30018 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232693AbhDFHo0 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 6 Apr 2021 03:44:26 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1617695058;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=FF1uXJ/ehFZn2D0SiRBmUa38k2IDpVhcvasGXt63J3A=;
+        b=YtmaRP3gkAc4e5P+fscZF15Ayy0LbUCXtcKnzKaM6SBSdthCvgZKkOqvXPe0I5g7x64ncq
+        DchLTckc8MtCyNeLoestE1BF4Z71q7Kf0INf7oR2EhNytH8gGMbxjxW5iYbdudakBnVIyo
+        vrReZLiSiXbhesFRf+Vywf+mWcMd3jo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-330-hwQxCJHxMGKyMmXMnWp8dQ-1; Tue, 06 Apr 2021 03:44:14 -0400
+X-MC-Unique: hwQxCJHxMGKyMmXMnWp8dQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EBAB5612A2;
+        Tue,  6 Apr 2021 07:44:12 +0000 (UTC)
+Received: from [10.36.113.79] (ovpn-113-79.ams2.redhat.com [10.36.113.79])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 6FED65D741;
+        Tue,  6 Apr 2021 07:44:08 +0000 (UTC)
+To:     "Kirill A. Shutemov" <kirill@shutemov.name>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Sean Christopherson <seanjc@google.com>,
+        Jim Mattson <jmattson@google.com>
+Cc:     David Rientjes <rientjes@google.com>,
+        "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>,
+        "Kleen, Andi" <andi.kleen@intel.com>,
+        "Yamahata, Isaku" <isaku.yamahata@intel.com>, x86@kernel.org,
+        kvm@vger.kernel.org, linux-mm@kvack.org,
+        linux-kernel@vger.kernel.org,
+        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+References: <20210402152645.26680-1-kirill.shutemov@linux.intel.com>
+ <20210402152645.26680-8-kirill.shutemov@linux.intel.com>
+From:   David Hildenbrand <david@redhat.com>
+Organization: Red Hat GmbH
+Subject: Re: [RFCv1 7/7] KVM: unmap guest memory using poisoned pages
+Message-ID: <c5f2580d-0733-4523-d1e8-c43b487f0aaf@redhat.com>
+Date:   Tue, 6 Apr 2021 09:44:07 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.8.1
+MIME-Version: 1.0
+In-Reply-To: <20210402152645.26680-8-kirill.shutemov@linux.intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Checking return values for CSCH for various configurations.
+On 02.04.21 17:26, Kirill A. Shutemov wrote:
+> TDX architecture aims to provide resiliency against confidentiality and
+> integrity attacks. Towards this goal, the TDX architecture helps enforce
+> the enabling of memory integrity for all TD-private memory.
+> 
+> The CPU memory controller computes the integrity check value (MAC) for
+> the data (cache line) during writes, and it stores the MAC with the
+> memory as meta-data. A 28-bit MAC is stored in the ECC bits.
+> 
+> Checking of memory integrity is performed during memory reads. If
+> integrity check fails, CPU poisones cache line.
+> 
+> On a subsequent consumption (read) of the poisoned data by software,
+> there are two possible scenarios:
+> 
+>   - Core determines that the execution can continue and it treats
+>     poison with exception semantics signaled as a #MCE
+> 
+>   - Core determines execution cannot continue,and it does an unbreakable
+>     shutdown
+> 
+> For more details, see Chapter 14 of Intel TDX Module EAS[1]
+> 
+> As some of integrity check failures may lead to system shutdown host
+> kernel must not allow any writes to TD-private memory. This requirment
+> clashes with KVM design: KVM expects the guest memory to be mapped into
+> host userspace (e.g. QEMU).
 
-Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
----
- s390x/css.c | 64 +++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 64 insertions(+)
+So what you are saying is that if QEMU would write to such memory, it 
+could crash the kernel? What a broken design.
 
-diff --git a/s390x/css.c b/s390x/css.c
-index 0f80a44..00c77c7 100644
---- a/s390x/css.c
-+++ b/s390x/css.c
-@@ -362,6 +362,69 @@ static void test_hsch(void)
- 	free_io_mem(ccw, sizeof(*ccw));
- }
- 
-+static void test_csch(void)
-+{
-+	struct orb orb = {
-+		.intparm = test_device_sid,
-+		.ctrl = ORB_CTRL_ISIC | ORB_CTRL_FMT | ORB_LPM_DFLT,
-+	};
-+	struct ccw1 *ccw;
-+
-+	senseid = alloc_io_mem(sizeof(*senseid), 0);
-+	assert(senseid);
-+	ccw = ccw_alloc(CCW_CMD_SENSE_ID, senseid, sizeof(*senseid), CCW_F_SLI);
-+	assert(ccw);
-+	orb.cpa = (uint64_t)ccw;
-+
-+	/* CSCH is a privilege operation */
-+	report_prefix_push("Privilege");
-+	enter_pstate();
-+	expect_pgm_int();
-+	csch(test_device_sid);
-+	check_pgm_int_code(PGM_INT_CODE_PRIVILEGED_OPERATION);
-+	report_prefix_pop();
-+
-+	/* Basic check for CSCH */
-+	report_prefix_push("CSCH on a quiet subchannel");
-+	assert(css_enable(test_device_sid, 0) == 0);
-+	report(csch(test_device_sid) == 0, "subchannel clear");
-+	report_prefix_pop();
-+
-+	/* now we check the flags */
-+	report_prefix_push("IRQ flags");
-+	assert(tsch(test_device_sid, &irb) == 0);
-+	report(check_io_completion(test_device_sid, SCSW_CSCH_COMPLETED) == 0, "expected");
-+	report_prefix_pop();
-+
-+	/* We want to check if the IRQ flags of SSCH are erased by clear */
-+	report_prefix_push("CSCH on SSCH status pending subchannel");
-+	assert(ssch(test_device_sid, &orb) == 0);
-+	report(csch(test_device_sid) == 0, "subchannel cleared");
-+	assert(tsch(test_device_sid, &irb) == 0);
-+	check_io_completion(test_device_sid, SCSW_CSCH_COMPLETED |
-+			    SCSW_SC_SECONDARY | SCSW_SC_PRIMARY);
-+	report_prefix_pop();
-+
-+	/* Checking CSCH after HSCH */
-+	report_prefix_push("CSCH on a halted subchannel");
-+	assert(hsch(test_device_sid) == 0);
-+	report(csch(test_device_sid) == 0, "subchannel cleared");
-+	assert(tsch(test_device_sid, &irb) == 0);
-+	check_io_completion(test_device_sid, SCSW_CSCH_COMPLETED);
-+	report_prefix_pop();
-+
-+	/* Checking CSCH after CSCH */
-+	report_prefix_push("CSCH on a cleared subchannel");
-+	assert(csch(test_device_sid) == 0);
-+	report(csch(test_device_sid) == 0, "subchannel cleared");
-+	assert(tsch(test_device_sid, &irb) == 0);
-+	check_io_completion(test_device_sid, SCSW_CSCH_COMPLETED);
-+	report_prefix_pop();
-+
-+	free_io_mem(senseid, sizeof(*senseid));
-+	free_io_mem(ccw, sizeof(*ccw));
-+}
-+
- /*
-  * test_sense
-  * Pre-requisites:
-@@ -632,6 +695,7 @@ static struct tests tests[] = {
- 	{ "enable (msch)", test_enable },
- 	{ "start subchannel", test_ssch },
- 	{ "halt subchannel", test_hsch },
-+	{ "clear subchannel", test_csch },
- 	{ "sense (ssch/tsch)", test_sense },
- 	{ "measurement block (schm)", test_schm },
- 	{ "measurement block format0", test_schm_fmt0 },
+"As some of integrity check failures may lead to system shutdown host" 
+-- usually we expect to recover from an MCE by killing the affected 
+process, which would be the right thing to do here.
+
+How can it happen that "Core determines execution cannot continue,and it 
+does an unbreakable shutdown". Who is "Core"? CPU "core", MM "core" ? 
+And why would it decide to do a shutdown instead of just killing the 
+process?
+
 -- 
-2.17.1
+Thanks,
+
+David / dhildenb
 
