@@ -2,41 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9A65D355C6B
-	for <lists+kvm@lfdr.de>; Tue,  6 Apr 2021 21:41:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5B9E0355C6D
+	for <lists+kvm@lfdr.de>; Tue,  6 Apr 2021 21:41:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244935AbhDFTlJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 6 Apr 2021 15:41:09 -0400
-Received: from mail-eopbgr760073.outbound.protection.outlook.com ([40.107.76.73]:37142
-        "EHLO NAM02-CY1-obe.outbound.protection.outlook.com"
+        id S244939AbhDFTlN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 6 Apr 2021 15:41:13 -0400
+Received: from mail-bn8nam11on2061.outbound.protection.outlook.com ([40.107.236.61]:28513
+        "EHLO NAM11-BN8-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S244919AbhDFTlB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 6 Apr 2021 15:41:01 -0400
+        id S244933AbhDFTlD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 6 Apr 2021 15:41:03 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Q5tTlin1FPUd1t99bSg1c+jSW494OixGC1K7ySUAZ+CGO+QKuUBucJ3BHwH9ZWecAVBFP7yVpfPgl2DA7VW2BmTfcFnQpZLFYEr9wZYXd9LdColCsjOFBFm/0TvHDVSiNfK3H8/P/pQs5qmPozkMM9MUXxHEtTRt5KV6elPqysFjRI5ET3dHpFWUWS+pqC9AMeskyaIUKa2DUKjo616loWPB10ezwXXqAu6fmGjacWcisHow6JUx+pBgSjQbbqosZi16fS8IYTKYsmQi+S03rksLuSKr70qFSkQpyFXS/bQmVBLDFUvMhv+h5RoRLR2uaSnp6O94HzyqBTy4eCmYPA==
+ b=Y0qNXX4b7Bi0lFOBCKYyQe1u6UJrJO/KYg0tmY1YuKACoZPeuJt5pdHKrq+O1bqfQS5SdjhB3F5fNVsMkl8JaX00OH2Uqbha/pRSTJsMTil4qKf5C+u4syXcfLEDubTOnDAtfISf6+srUkMzOYVnNZLksBM5ZGfcgYJ1WO7qzUImKdAkYc1g3wWlfu+iHyzqpvMUoIg92XHiJQ09ZaIIUJmumTOy3by/oggrMcyVwV5NrsFiJSKiwTK+sAVqhzjGewmTtZrU+3F2vZXHPVZdp6kjKhM65eGb3RJlIoMqH3Z2rnv63JreWJ8zkZZFMyrTRZAPYIAx2KeJ1ziTWV+yjQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=0FQj00VVNg6rlFwj6jhe1iw9BZC/IV+c6ye6Z6XpS20=;
- b=aau8rw4gtfPfYnHmDXz1QTRoC8p5fjrc+uJLuwX+bn4VZQTxppbMLDWdys82cO6JGCYGbs2wrNWEbVIz71lMtQiWgHW+fovND++E/NVQDrGviGhaXp+bTUDs8eobIkUf/QEtbXLqJw0PBeigNFvxtuJq648aWCuPSkrfiMypJC82JY5TliKhycA9tdoGxeYpco7mi851bmodfV/L6AJhQc2Qj28BvgzmUt2WLg4oWNLhByvR7zSUW6C3TV+7E6QNgEFpPSztOw7QyhydO9XSbUW1RibtQCpN7OpgvOUbDetwaaA6piVd7gfojUa8iqvsDuI9B4NCJN9oNw1OkMSSIA==
+ bh=frn6N4i+YIjRyVdYhcrr5xAtvOnEgR1psIwGgwgPxCA=;
+ b=h63i/e6Qk7k2b8txjI23TMvGnDSCT7SrBgbz7oR60Nx+wT1KSOBtVHgA+yTnDWvWKPg638DXQyjuFqwOJTUXI42U7U6WiEXgy63xMzavGoFBDdXRA+Z2cRXapZURGqs1d3dHmMO6vxJ8GOIBkPAukA3xmKjIJjd7Hjip4n1Vb1SXxmbWGFDS9rFLShqjw1NXS2J6VLgbxF1stvNcyogb32Cl2blhbfB70eV0DnZDq3f174NcfNTok6J223OzFXJ39jLO/HjQ3E1jgFXRmfSXq342zdOaXUjMJTfXta1O6eTM6i2825skZ5pJS9OP/Fcc3LsTwW/PEfVHRId1IpYMsw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
  dkim=pass header.d=nvidia.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=0FQj00VVNg6rlFwj6jhe1iw9BZC/IV+c6ye6Z6XpS20=;
- b=g1uzu8DQ2VaRXrzn1YCzcwbTdV+YW1kjJSNwVd2x9TDSI5Pnu8V3ZITYx1MylyBRZzOoo/MbPZViYJyr4aQqwesGe63N/RQZBbrU7mvR0/wCRTZWw/BhDACDdSIbHAHp/kmtZbB8vxiw3cUqmDZSG10TXHjgBTjF3jK7EGCPdR7CWquwa+q6+X4d7ipBrYO1ZAzmVh9bSGTPiFbzuMd3K5heB1iWrcP/8t+HbeOJLUuGG0wsh9WRUMsBWcxUX5O3VNDPLL/sa28u3R4XrbjZqRmi/RbJM83Q0Fbw7BxC1LefAifXYxkTSeqDPhSRbHwPAjw3yggcDgTK/anwTp9VlQ==
+ bh=frn6N4i+YIjRyVdYhcrr5xAtvOnEgR1psIwGgwgPxCA=;
+ b=pyRTn0hB64stbWdIK9jFkF+cOdG/K7txVtXTKaVvZB2+KGYsDe4f64RrW62M/OZILhigAafnduFf0h8ygoVEO7H6nAP62ubcLi8+XLYeQNriqWEHeQMhZu+jJkBPci6EwSpx/RNoyFZItR+L+ZVdWbmqCw0H8XqFEnghcYsjCQs5w0Ydq9yZKLxPJKTT0hktlKTqO7djeZORLfcYK5fu5U4yjN91JWf9cCCK4kN8nEaNSriZgi0O8P03ES+eOtdIRN7LD90jdo0Yer5HdXwSJekM4mxqLyCEJHLIcc3k7ZdMHIjgtRofnJcnb8gDy04TMre8JcO+i13vCX33Z7k+bA==
 Authentication-Results: redhat.com; dkim=none (message not signed)
  header.d=none;redhat.com; dmarc=none action=none header.from=nvidia.com;
 Received: from DM6PR12MB3834.namprd12.prod.outlook.com (2603:10b6:5:14a::12)
- by DM5PR12MB1546.namprd12.prod.outlook.com (2603:10b6:4:8::23) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.4020.16; Tue, 6 Apr 2021 19:40:52 +0000
+ by DM6PR12MB4235.namprd12.prod.outlook.com (2603:10b6:5:220::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3999.27; Tue, 6 Apr
+ 2021 19:40:52 +0000
 Received: from DM6PR12MB3834.namprd12.prod.outlook.com
  ([fe80::1c62:7fa3:617b:ab87]) by DM6PR12MB3834.namprd12.prod.outlook.com
  ([fe80::1c62:7fa3:617b:ab87%6]) with mapi id 15.20.3999.032; Tue, 6 Apr 2021
- 19:40:51 +0000
+ 19:40:52 +0000
 From:   Jason Gunthorpe <jgg@nvidia.com>
 To:     Alex Williamson <alex.williamson@redhat.com>,
         Jonathan Corbet <corbet@lwn.net>, kvm@vger.kernel.org,
@@ -50,546 +51,234 @@ Cc:     "Raj, Ashok" <ashok.raj@intel.com>,
         Leon Romanovsky <leonro@nvidia.com>,
         Max Gurtovoy <mgurtovoy@nvidia.com>,
         Tarun Gupta <targupta@nvidia.com>
-Subject: [PATCH v2 03/18] vfio/mdev: Add missing typesafety around mdev_device
-Date:   Tue,  6 Apr 2021 16:40:26 -0300
-Message-Id: <3-v2-d36939638fc6+d54-vfio2_jgg@nvidia.com>
+Subject: [PATCH v2 04/18] vfio/mdev: Simplify driver registration
+Date:   Tue,  6 Apr 2021 16:40:27 -0300
+Message-Id: <4-v2-d36939638fc6+d54-vfio2_jgg@nvidia.com>
 In-Reply-To: <0-v2-d36939638fc6+d54-vfio2_jgg@nvidia.com>
 References: 
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
 X-Originating-IP: [142.162.115.133]
-X-ClientProxiedBy: MN2PR16CA0014.namprd16.prod.outlook.com
- (2603:10b6:208:134::27) To DM6PR12MB3834.namprd12.prod.outlook.com
+X-ClientProxiedBy: MN2PR16CA0034.namprd16.prod.outlook.com
+ (2603:10b6:208:134::47) To DM6PR12MB3834.namprd12.prod.outlook.com
  (2603:10b6:5:14a::12)
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from mlx.ziepe.ca (142.162.115.133) by MN2PR16CA0014.namprd16.prod.outlook.com (2603:10b6:208:134::27) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3999.27 via Frontend Transport; Tue, 6 Apr 2021 19:40:47 +0000
-Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1lTrZ3-001mX0-Uf; Tue, 06 Apr 2021 16:40:41 -0300
+Received: from mlx.ziepe.ca (142.162.115.133) by MN2PR16CA0034.namprd16.prod.outlook.com (2603:10b6:208:134::47) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4020.16 via Frontend Transport; Tue, 6 Apr 2021 19:40:48 +0000
+Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1lTrZ3-001mX4-WC; Tue, 06 Apr 2021 16:40:42 -0300
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 401a96d6-dba8-4aa4-8ebf-08d8f933e013
-X-MS-TrafficTypeDiagnostic: DM5PR12MB1546:
+X-MS-Office365-Filtering-Correlation-Id: 607cc7b5-b3a3-4908-c5ed-08d8f933e123
+X-MS-TrafficTypeDiagnostic: DM6PR12MB4235:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <DM5PR12MB154610DB0B0A90D09C3C4040C2769@DM5PR12MB1546.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:6430;
+X-Microsoft-Antispam-PRVS: <DM6PR12MB4235D9D551282F2A5A7259E8C2769@DM6PR12MB4235.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:8273;
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: XtRAI6XCe5057WVp/d/PjuXdLVcerwuui4H2Qh/NF9q63LzI77UwVsCTqzrRM83rB/jt1/xg+WsV7v59jfma9lQzXI925/Z5qNCD8kgW1efDkBFfkCb4h35ELjnvhCXUzh9IS1RovEEATcdXYuW5auH2n8u+dPVfzbxRYO8PQFtY6W6rykZXk4x4venqzRy30x6b4oMwZmouCDhAntewuDJachxSErO7fnou46qWsXZUqUOBkZ3yDccPFNQNuGjLB9TI7HJgFiNv0bdi227YJQJhKQkdFYRCkoeZpv0rpJKvJ1eZGs/8DTn7Jqq+QXGYVJPRWlaXIha/lSKsGKeLCM7V5TWgpzb4tsfOHcuWncSDIXSmgVtt9ku7r5jGvDSQlJrG2oSUgfTwMAUKRVIBXJhqJKK2a3ucRfjhNrYevrxSlOOahHqd/ceAi/YzhuZm9OH1aYJQ/I8/YKn3Am8FDqHs3gdmg8AqTRgRvd7aj3wX32FkdGlHvw9cHxqqBPUVEZmqhy+qyKtg5ZAh91/1ygeTqFtNDmLcbP2UO/y8skI9xG6ikkn8FMl6s+/O1lXowalSc/ENNVRev1SjgAAzvDAU8q9bgSY8NV0Oo0cBtNmpZ8qpSU8/zOYYUxW5KQbqvXOyjxSQl1r92+ezdlOLyLYc99oXl1F7GwZ8v1EK0ooAHDkpSBiN5py9ki7FSxJl
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB3834.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(396003)(136003)(346002)(39860400002)(376002)(366004)(316002)(86362001)(5660300002)(8676002)(186003)(66946007)(4326008)(8936002)(66556008)(66476007)(2906002)(30864003)(38100700001)(83380400001)(9786002)(478600001)(54906003)(426003)(36756003)(9746002)(2616005)(6666004)(110136005)(107886003)(26005)(4216001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: =?us-ascii?Q?p9V3rMW8D3dCqc1kUxPuCStRfyhXlJBVghP12yLeOa1+LhMhd0p3+7L7dooG?=
- =?us-ascii?Q?9iuMqsPSHkfWkcRLV0aTuR/Nkjo6+m2MEigqE7gEyL1ikTJFC3x4xp88z3JJ?=
- =?us-ascii?Q?IbJd8ivTwt1RG/1XaZ1JBXt7hEXjhO0LWzGeadrfaHTfGuykAMoc1EI5O8Wp?=
- =?us-ascii?Q?lXJiDjo9xMPts3mPTAJEECQO88CokSgQ9xkFl0N4L3vb/txufy7ECzl7T+Qd?=
- =?us-ascii?Q?PYT4jlYZyWPCZdPsmxEyoOWXP8xkAtOMGbDOZTGUzs8lsv4PHxSX9rIxzeR/?=
- =?us-ascii?Q?lHTybk8Wyp/7jOvwL4qz4/zwMOj6/FMkAEVFl1OZrgYhvWznwPfY7YODW7Jt?=
- =?us-ascii?Q?ZbWz9t6PnzPslezwDpkrgDZYfNKB/l/LKMwwE4w425Kf3X75OIYKd/SsxBw7?=
- =?us-ascii?Q?ut5Nq7IcLbCYfI2K8muSM3ZVqxk1/LLIae1h57oirFg98NIiA6QsCb3Vqdc2?=
- =?us-ascii?Q?/bJJuKu15mCCG2DxtLFXivWe9oJC3TNXohkGk4qtlT6621ifO1Pr4ddsnG6s?=
- =?us-ascii?Q?M2DanPaYkWbBPdGq6Ygadv3mP2kxO+lHavwk2tFcVBLtK/53TRY/w5vCouJS?=
- =?us-ascii?Q?bp/M+xJKLid4pZRxt13MlK/foX9XzcqQ/9HaIQ0xVUX/occ01TNt3iOSrWDj?=
- =?us-ascii?Q?8HbuwMiOzIYqMG0I8/1G5euuUHPPn0xh0OPdYY0QUFF6wDTP/z7553WiJK9x?=
- =?us-ascii?Q?xHZsjuXoGL8Xt48QhL/wjaTLVXHBgY4JJaGwwHeqy8geV4jOtM1lwjXDJdtc?=
- =?us-ascii?Q?SHNdsT+e9OUWhOdBuyDNEewxrYKIFoM3z8vRr/PLv0axq8VvUAtBnSy6MN76?=
- =?us-ascii?Q?pyhL3BXNzut1Xy0GZYLSZuBwb5aOOlApdrwwjOErZMDhLS6I/uIFkwF25Yp+?=
- =?us-ascii?Q?i7ZWZjzCcjNk7sRVmHDamjooG/yljPEPtq0JPoRgJTSatXjnNvc1vV0K2neA?=
- =?us-ascii?Q?loYi4t5Xn8+bFywUndOIGp22umKH06itos43vkP4jD5XpWvg4EXYH3p2s+Hn?=
- =?us-ascii?Q?1fnR0+zzd+YY9Xs9pFA3OqzBd5eyk7XQW5bxOEFwRiy5lhpp35DozUWJduLS?=
- =?us-ascii?Q?U9A2qxbWnCBD97EbAnGYhhQ26Jt2hbYfXmfVCklqEjaWAQjYg2Dbstw8AXz4?=
- =?us-ascii?Q?5SPwHSwYw7jIbG8jOJuatnzgNJJCPLP/tvAUoVuyP/HojmTFBqWhkZqUHhLM?=
- =?us-ascii?Q?GfHCVvtszXObiuU+YCD+VFDQQoU2U8Aw3kNAgPfYAM8vkc7m4ynV+HHxjQ6v?=
- =?us-ascii?Q?QRAu+/bPf3p5g5yyJMhEUbjb4/v4EicGW/vQEV2/nrKE5yBBDvmjvRGNSELq?=
- =?us-ascii?Q?weeJDVLWo8O7TwnsMStoQYadswFzHyGt0F6ClGIsmG+0Qw=3D=3D?=
+X-Microsoft-Antispam-Message-Info: 72G2QqYTZo1tK8SJkQvEK7+k+BtNOKtKzLcpLcE1L8JJ7Un2eAt8zLav4kf87yfrypXMVRUetv8kE8aSk2k/2kMgqSGvpcOYuPPSl4I9rCyZ/KUprFiwW4XLzurbBChaLhekrSylJm40NB8z7V+zmI08RC69bZZcV2YFVDB3V8MawynetwrjV8PLMyVx05SVO9S0e6RP4n8v466G2ZERFGtGSk9qephHT/1jnNz2RNfvwXNXAUsBIDd539RV87JHMIolystmfv7Q7+Wl8p7ED7tvqu2xAPW9M5M4bKz/tbh98fee2jKDb8vTyE9dTl3cMyKVjIZ0bYMnCiPFEo/9KyEGXypPrJaPTHualYrjhVenvhihCq9NLiXiSgrY4nVQrF8QVLuo/Gsxj/LOxDlfZA1kaQjROgp7x03xs0czTK01HgD8gV9ImCM5JLrNcbt1H/wALDoXOahJoACI8ahoNsVllSerJOolPoRWwVUtMZQTKLcVFrsSsPd+hd9Q8+lFuReaoUfgcUrU8WWgu39pBMD0njnz1WqsWOO3HTFNf5UoOBeKk2Uk9tQXjlbKm+C40nB/aHrrCl0R+VWN8wnQvgtOR4vLO/ut80SS+FnQW0IdTs8+2CO5qhOw3JxVfnbLGCKIhwsTzVN4AzjceeQCqFDW8RESikEobTBbWVTqaqKeHsta5FtHWPvDq/TNHe26
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB3834.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(346002)(376002)(366004)(396003)(136003)(39860400002)(478600001)(54906003)(8676002)(2906002)(86362001)(66556008)(83380400001)(6666004)(5660300002)(38100700001)(8936002)(2616005)(66476007)(316002)(426003)(110136005)(107886003)(36756003)(26005)(9786002)(9746002)(186003)(66946007)(4326008)(4216001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData: =?us-ascii?Q?zFgZMD+7ZTRVXNQqt2yWTiKv62cPgvriLBb8GtxaRISTDbQM/ef4olYtsoWJ?=
+ =?us-ascii?Q?fEe4QX0OK1MgwmZsLQCPiVtqKBvjWWSRwlzUj4Bpea/jqKhLy+kr2ig8Ixzw?=
+ =?us-ascii?Q?qD8Ahe9AmagxvTddRakM46Qh2BAGOR2WpQa7pjNOyV8uMR4IzwiYXzphiNEz?=
+ =?us-ascii?Q?cdK2g6EMA+xztq7t0RE3oDTUPvwi07l3MRKVBPBjPACwFRWfDGC/XUl3k3+p?=
+ =?us-ascii?Q?oBf7Iro6Tf6SrNBp/LqOK9NytAcFE81k9PCXzMv2ym6X/ZoydevVUJQFVdZ8?=
+ =?us-ascii?Q?MYwltOqkLiYPjfpDZgzEWafoEoADVHDn1sPI9733EH/PVTJfkJzI/UXDUeiY?=
+ =?us-ascii?Q?RbE2vTUJoTXH+Hj94KX9PYhJAmxVsEL/PEQ4kmo1fyIHaUFDFeBm5LaHsvfG?=
+ =?us-ascii?Q?0TrAFKrUUaKiH43uxwhfDl4mTd70Y1ww1VkVf8Y3mwQXgb/H9ydrxjDpa0DJ?=
+ =?us-ascii?Q?RvSzv4GNTHBn01K3FeaiIMNhLAZQs8Z9dZeMkg9zisvUkFdItzmSo9WWEMVJ?=
+ =?us-ascii?Q?TB9uVmlxtJ0v0RrWghrQ9TUh6rrK6PhD0vZeXkDKcUMA4AqfOiTCm7AY4owD?=
+ =?us-ascii?Q?QHu4gpqm3kbnVTvdek7ljekliPz0Oy1d/9qjXvAiaMgpKBR0AK/KkVpO3BLQ?=
+ =?us-ascii?Q?87uGN/wFa4XliGefCiX7O+ltqyyoV4mIA8Xe68OKj/fj/W7CaDJiqCpsNKdi?=
+ =?us-ascii?Q?g+m/FOqoxqu+JoIZicADH4K2EpvM/MJagk3RITM6jgFNUOsLxXYjZiEKS/2E?=
+ =?us-ascii?Q?uzPlRvaZwgzAw1Zw0MPScwBpP4ZB/5UrumIL2Qapkvui5fKLZYmFodGIUw4l?=
+ =?us-ascii?Q?7ip70A5NvU2WV2mPjgZ/K+SqA2Py8RZdRBHcXFX50r/ZP0gMD+vtWBV38Hz5?=
+ =?us-ascii?Q?WF50CHE5gy37znUIbf5HX5UyjcaXesyZyzDAmQh4g1CPsEMRcRphKj90yC9i?=
+ =?us-ascii?Q?9cLgx+y873dfv9En6BF7w3Uf9iQWRM99zcW0aPd5EnegmIOP9hI5IobFBEot?=
+ =?us-ascii?Q?YHC8pTLKTApGQQ/rhbV4XDlDRH2ABGzJQKsIeevaKea3lTAnU0futtk6GfLn?=
+ =?us-ascii?Q?9B0qDhWyQTBtE1vF5VDMoG5+nvxEgMUnAJ93DYJrSC0oCBf/rgWOA7JWVoWh?=
+ =?us-ascii?Q?5gSrNdHmGbTj+wyz2sqEAqHCjEyGHmtvqCxSL8q2hOkZEWkW/2OpyeNhVo/S?=
+ =?us-ascii?Q?gtBOZlpPNSLluHL4VOxlc5KSlslzgsbHmIcFzodXJPSARX06GxWrNTwYPPuJ?=
+ =?us-ascii?Q?zPt1I+XcApfJpdwCgo4SeedDua6WycOJE2V7roUcbTIO4RedTl5FO99gHjFG?=
+ =?us-ascii?Q?MlvkFbu0JrTkGiy7lq6EA1C5O1/210J7/2pejTPiQzFVPg=3D=3D?=
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 401a96d6-dba8-4aa4-8ebf-08d8f933e013
+X-MS-Exchange-CrossTenant-Network-Message-Id: 607cc7b5-b3a3-4908-c5ed-08d8f933e123
 X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB3834.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Apr 2021 19:40:47.8357
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Apr 2021 19:40:49.4168
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: TsbparaVvv0Ss7Fimx2EbOWg09ae59KpNrt5YopQal7+Bd186+anuEj2TtunpNaO
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR12MB1546
+X-MS-Exchange-CrossTenant-UserPrincipalName: AWVZmTcGfsYIHpsNnT6NHPmZ6rFymshZ/zKCi0gRYVCvhKmN1SvjyAiKTLlpJ2qr
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4235
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The mdev API should accept and pass a 'struct mdev_device *' in all
-places, not pass a 'struct device *' and cast it internally with
-to_mdev_device(). Particularly in its struct mdev_driver functions, the
-whole point of a bus's struct device_driver wrapper is to provide type
-safety compared to the default struct device_driver.
+This is only done once, we don't need to generate code to initialize a
+structure stored in the ELF .data segment. Fill in the three required
+.driver members directly instead of copying data into them during
+mdev_register_driver().
 
-Further, the driver core standard is for bus drivers to expose their
-device structure in their public headers that can be used with
-container_of() inlines and '&foo->dev' to go between the class levels, and
-'&foo->dev' to be used with dev_err/etc driver core helper functions. Move
-'struct mdev_device' to mdev.h
+Further the to_mdev_driver() function doesn't belong in a public header,
+just inline it into the two places that need it. Finally, we can now
+clearly see that 'drv' derived from dev->driver cannot be NULL, firstly
+because the driver core forbids it, and secondly because NULL won't pass
+through the container_of(). Remove the dead code.
 
-Once done this allows moving some one instruction exported functions to
-static inlines, which in turns allows removing one of the two grotesque
-symbol_get()'s related to mdev in the core code.
-
+Reviewed-by: Christoph Hellwig <hch@lst.de>
 Reviewed-by: Kevin Tian <kevin.tian@intel.com>
 Reviewed-by: Cornelia Huck <cohuck@redhat.com>
 Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
 ---
- .../driver-api/vfio-mediated-device.rst       |  4 +-
- drivers/vfio/mdev/mdev_core.c                 | 64 ++-----------------
- drivers/vfio/mdev/mdev_driver.c               |  4 +-
- drivers/vfio/mdev/mdev_private.h              | 23 +------
- drivers/vfio/mdev/mdev_sysfs.c                | 26 ++++----
- drivers/vfio/mdev/vfio_mdev.c                 |  7 +-
- drivers/vfio/vfio_iommu_type1.c               | 25 ++------
- include/linux/mdev.h                          | 58 +++++++++++++----
- 8 files changed, 83 insertions(+), 128 deletions(-)
+ Documentation/driver-api/vfio-mediated-device.rst |  5 +----
+ drivers/vfio/mdev/mdev_driver.c                   | 15 +++++++--------
+ drivers/vfio/mdev/vfio_mdev.c                     |  8 ++++++--
+ include/linux/mdev.h                              |  6 +-----
+ 4 files changed, 15 insertions(+), 19 deletions(-)
 
 diff --git a/Documentation/driver-api/vfio-mediated-device.rst b/Documentation/driver-api/vfio-mediated-device.rst
-index 25eb7d5b834ba3..c43c1dc3333373 100644
+index c43c1dc3333373..1779b85f014e2f 100644
 --- a/Documentation/driver-api/vfio-mediated-device.rst
 +++ b/Documentation/driver-api/vfio-mediated-device.rst
-@@ -105,8 +105,8 @@ structure to represent a mediated device's driver::
+@@ -98,13 +98,11 @@ structure to represent a mediated device's driver::
+ 
+      /*
+       * struct mdev_driver [2] - Mediated device's driver
+-      * @name: driver name
+       * @probe: called when new device created
+       * @remove: called when device removed
+       * @driver: device driver structure
        */
       struct mdev_driver {
- 	     const char *name;
--	     int  (*probe)  (struct device *dev);
--	     void (*remove) (struct device *dev);
-+	     int  (*probe)  (struct mdev_device *dev);
-+	     void (*remove) (struct mdev_device *dev);
+-	     const char *name;
+ 	     int  (*probe)  (struct mdev_device *dev);
+ 	     void (*remove) (struct mdev_device *dev);
  	     struct device_driver    driver;
-      };
+@@ -115,8 +113,7 @@ to register and unregister itself with the core driver:
  
-diff --git a/drivers/vfio/mdev/mdev_core.c b/drivers/vfio/mdev/mdev_core.c
-index 6de97d25a3f87d..057922a1707e04 100644
---- a/drivers/vfio/mdev/mdev_core.c
-+++ b/drivers/vfio/mdev/mdev_core.c
-@@ -33,36 +33,6 @@ struct device *mdev_parent_dev(struct mdev_device *mdev)
- }
- EXPORT_SYMBOL(mdev_parent_dev);
+ * Register::
  
--void *mdev_get_drvdata(struct mdev_device *mdev)
--{
--	return mdev->driver_data;
--}
--EXPORT_SYMBOL(mdev_get_drvdata);
--
--void mdev_set_drvdata(struct mdev_device *mdev, void *data)
--{
--	mdev->driver_data = data;
--}
--EXPORT_SYMBOL(mdev_set_drvdata);
--
--struct device *mdev_dev(struct mdev_device *mdev)
--{
--	return &mdev->dev;
--}
--EXPORT_SYMBOL(mdev_dev);
--
--struct mdev_device *mdev_from_dev(struct device *dev)
--{
--	return dev_is_mdev(dev) ? to_mdev_device(dev) : NULL;
--}
--EXPORT_SYMBOL(mdev_from_dev);
--
--const guid_t *mdev_uuid(struct mdev_device *mdev)
--{
--	return &mdev->uuid;
--}
--EXPORT_SYMBOL(mdev_uuid);
--
- /* Should be called holding parent_list_lock */
- static struct mdev_parent *__find_parent_device(struct device *dev)
- {
-@@ -107,7 +77,7 @@ static void mdev_device_remove_common(struct mdev_device *mdev)
- 	int ret;
+-    extern int  mdev_register_driver(struct mdev_driver *drv,
+-				   struct module *owner);
++    extern int  mdev_register_driver(struct mdev_driver *drv);
  
- 	type = to_mdev_type(mdev->type_kobj);
--	mdev_remove_sysfs_files(&mdev->dev, type);
-+	mdev_remove_sysfs_files(mdev, type);
- 	device_del(&mdev->dev);
- 	parent = mdev->parent;
- 	lockdep_assert_held(&parent->unreg_sem);
-@@ -122,12 +92,10 @@ static void mdev_device_remove_common(struct mdev_device *mdev)
+ * Unregister::
  
- static int mdev_device_remove_cb(struct device *dev, void *data)
- {
--	if (dev_is_mdev(dev)) {
--		struct mdev_device *mdev;
-+	struct mdev_device *mdev = mdev_from_dev(dev);
- 
--		mdev = to_mdev_device(dev);
-+	if (mdev)
- 		mdev_device_remove_common(mdev);
--	}
- 	return 0;
- }
- 
-@@ -332,7 +300,7 @@ int mdev_device_create(struct kobject *kobj,
- 	if (ret)
- 		goto add_fail;
- 
--	ret = mdev_create_sysfs_files(&mdev->dev, type);
-+	ret = mdev_create_sysfs_files(mdev, type);
- 	if (ret)
- 		goto sysfs_fail;
- 
-@@ -354,13 +322,11 @@ int mdev_device_create(struct kobject *kobj,
- 	return ret;
- }
- 
--int mdev_device_remove(struct device *dev)
-+int mdev_device_remove(struct mdev_device *mdev)
- {
--	struct mdev_device *mdev, *tmp;
-+	struct mdev_device *tmp;
- 	struct mdev_parent *parent;
- 
--	mdev = to_mdev_device(dev);
--
- 	mutex_lock(&mdev_list_lock);
- 	list_for_each_entry(tmp, &mdev_list, next) {
- 		if (tmp == mdev)
-@@ -390,24 +356,6 @@ int mdev_device_remove(struct device *dev)
- 	return 0;
- }
- 
--int mdev_set_iommu_device(struct device *dev, struct device *iommu_device)
--{
--	struct mdev_device *mdev = to_mdev_device(dev);
--
--	mdev->iommu_device = iommu_device;
--
--	return 0;
--}
--EXPORT_SYMBOL(mdev_set_iommu_device);
--
--struct device *mdev_get_iommu_device(struct device *dev)
--{
--	struct mdev_device *mdev = to_mdev_device(dev);
--
--	return mdev->iommu_device;
--}
--EXPORT_SYMBOL(mdev_get_iommu_device);
--
- static int __init mdev_init(void)
- {
- 	return mdev_bus_register();
 diff --git a/drivers/vfio/mdev/mdev_driver.c b/drivers/vfio/mdev/mdev_driver.c
-index 0d3223aee20b83..44c3ba7e56d923 100644
+index 44c3ba7e56d923..041699571b7e55 100644
 --- a/drivers/vfio/mdev/mdev_driver.c
 +++ b/drivers/vfio/mdev/mdev_driver.c
-@@ -48,7 +48,7 @@ static int mdev_probe(struct device *dev)
+@@ -39,7 +39,8 @@ static void mdev_detach_iommu(struct mdev_device *mdev)
+ 
+ static int mdev_probe(struct device *dev)
+ {
+-	struct mdev_driver *drv = to_mdev_driver(dev->driver);
++	struct mdev_driver *drv =
++		container_of(dev->driver, struct mdev_driver, driver);
+ 	struct mdev_device *mdev = to_mdev_device(dev);
+ 	int ret;
+ 
+@@ -47,7 +48,7 @@ static int mdev_probe(struct device *dev)
+ 	if (ret)
  		return ret;
  
- 	if (drv && drv->probe) {
--		ret = drv->probe(dev);
-+		ret = drv->probe(mdev);
+-	if (drv && drv->probe) {
++	if (drv->probe) {
+ 		ret = drv->probe(mdev);
  		if (ret)
  			mdev_detach_iommu(mdev);
- 	}
-@@ -62,7 +62,7 @@ static int mdev_remove(struct device *dev)
+@@ -58,10 +59,11 @@ static int mdev_probe(struct device *dev)
+ 
+ static int mdev_remove(struct device *dev)
+ {
+-	struct mdev_driver *drv = to_mdev_driver(dev->driver);
++	struct mdev_driver *drv =
++		container_of(dev->driver, struct mdev_driver, driver);
  	struct mdev_device *mdev = to_mdev_device(dev);
  
- 	if (drv && drv->remove)
--		drv->remove(dev);
-+		drv->remove(mdev);
+-	if (drv && drv->remove)
++	if (drv->remove)
+ 		drv->remove(mdev);
  
  	mdev_detach_iommu(mdev);
- 
-diff --git a/drivers/vfio/mdev/mdev_private.h b/drivers/vfio/mdev/mdev_private.h
-index 74c2e541146999..bb60ec4a8d9d21 100644
---- a/drivers/vfio/mdev/mdev_private.h
-+++ b/drivers/vfio/mdev/mdev_private.h
-@@ -24,23 +24,6 @@ struct mdev_parent {
- 	struct rw_semaphore unreg_sem;
- };
- 
--struct mdev_device {
--	struct device dev;
--	struct mdev_parent *parent;
--	guid_t uuid;
--	void *driver_data;
--	struct list_head next;
--	struct kobject *type_kobj;
--	struct device *iommu_device;
--	bool active;
--};
--
--static inline struct mdev_device *to_mdev_device(struct device *dev)
--{
--	return container_of(dev, struct mdev_device, dev);
--}
--#define dev_is_mdev(d)		((d)->bus == &mdev_bus_type)
--
- struct mdev_type {
- 	struct kobject kobj;
- 	struct kobject *devices_kobj;
-@@ -57,11 +40,11 @@ struct mdev_type {
- int  parent_create_sysfs_files(struct mdev_parent *parent);
- void parent_remove_sysfs_files(struct mdev_parent *parent);
- 
--int  mdev_create_sysfs_files(struct device *dev, struct mdev_type *type);
--void mdev_remove_sysfs_files(struct device *dev, struct mdev_type *type);
-+int  mdev_create_sysfs_files(struct mdev_device *mdev, struct mdev_type *type);
-+void mdev_remove_sysfs_files(struct mdev_device *mdev, struct mdev_type *type);
- 
- int  mdev_device_create(struct kobject *kobj,
- 			struct device *dev, const guid_t *uuid);
--int  mdev_device_remove(struct device *dev);
-+int  mdev_device_remove(struct mdev_device *dev);
- 
- #endif /* MDEV_PRIVATE_H */
-diff --git a/drivers/vfio/mdev/mdev_sysfs.c b/drivers/vfio/mdev/mdev_sysfs.c
-index 367ff5412a3879..18114f3e090a2a 100644
---- a/drivers/vfio/mdev/mdev_sysfs.c
-+++ b/drivers/vfio/mdev/mdev_sysfs.c
-@@ -225,6 +225,7 @@ int parent_create_sysfs_files(struct mdev_parent *parent)
- static ssize_t remove_store(struct device *dev, struct device_attribute *attr,
- 			    const char *buf, size_t count)
+@@ -79,16 +81,13 @@ EXPORT_SYMBOL_GPL(mdev_bus_type);
+ /**
+  * mdev_register_driver - register a new MDEV driver
+  * @drv: the driver to register
+- * @owner: module owner of driver to be registered
+  *
+  * Returns a negative value on error, otherwise 0.
+  **/
+-int mdev_register_driver(struct mdev_driver *drv, struct module *owner)
++int mdev_register_driver(struct mdev_driver *drv)
  {
-+	struct mdev_device *mdev = to_mdev_device(dev);
- 	unsigned long val;
+ 	/* initialize common driver fields */
+-	drv->driver.name = drv->name;
+ 	drv->driver.bus = &mdev_bus_type;
+-	drv->driver.owner = owner;
  
- 	if (kstrtoul(buf, 0, &val) < 0)
-@@ -233,7 +234,7 @@ static ssize_t remove_store(struct device *dev, struct device_attribute *attr,
- 	if (val && device_remove_file_self(dev, attr)) {
- 		int ret;
- 
--		ret = mdev_device_remove(dev);
-+		ret = mdev_device_remove(mdev);
- 		if (ret)
- 			return ret;
- 	}
-@@ -248,34 +249,37 @@ static const struct attribute *mdev_device_attrs[] = {
- 	NULL,
- };
- 
--int  mdev_create_sysfs_files(struct device *dev, struct mdev_type *type)
-+int mdev_create_sysfs_files(struct mdev_device *mdev, struct mdev_type *type)
- {
-+	struct kobject *kobj = &mdev->dev.kobj;
- 	int ret;
- 
--	ret = sysfs_create_link(type->devices_kobj, &dev->kobj, dev_name(dev));
-+	ret = sysfs_create_link(type->devices_kobj, kobj, dev_name(&mdev->dev));
- 	if (ret)
- 		return ret;
- 
--	ret = sysfs_create_link(&dev->kobj, &type->kobj, "mdev_type");
-+	ret = sysfs_create_link(kobj, &type->kobj, "mdev_type");
- 	if (ret)
- 		goto type_link_failed;
- 
--	ret = sysfs_create_files(&dev->kobj, mdev_device_attrs);
-+	ret = sysfs_create_files(kobj, mdev_device_attrs);
- 	if (ret)
- 		goto create_files_failed;
- 
- 	return ret;
- 
- create_files_failed:
--	sysfs_remove_link(&dev->kobj, "mdev_type");
-+	sysfs_remove_link(kobj, "mdev_type");
- type_link_failed:
--	sysfs_remove_link(type->devices_kobj, dev_name(dev));
-+	sysfs_remove_link(type->devices_kobj, dev_name(&mdev->dev));
- 	return ret;
- }
- 
--void mdev_remove_sysfs_files(struct device *dev, struct mdev_type *type)
-+void mdev_remove_sysfs_files(struct mdev_device *mdev, struct mdev_type *type)
- {
--	sysfs_remove_files(&dev->kobj, mdev_device_attrs);
--	sysfs_remove_link(&dev->kobj, "mdev_type");
--	sysfs_remove_link(type->devices_kobj, dev_name(dev));
-+	struct kobject *kobj = &mdev->dev.kobj;
-+
-+	sysfs_remove_files(kobj, mdev_device_attrs);
-+	sysfs_remove_link(kobj, "mdev_type");
-+	sysfs_remove_link(type->devices_kobj, dev_name(&mdev->dev));
- }
+ 	/* register with core */
+ 	return driver_register(&drv->driver);
 diff --git a/drivers/vfio/mdev/vfio_mdev.c b/drivers/vfio/mdev/vfio_mdev.c
-index ae7e322fbe3c26..91b7b8b9eb9cb8 100644
+index 91b7b8b9eb9cb8..cc9507ed85a181 100644
 --- a/drivers/vfio/mdev/vfio_mdev.c
 +++ b/drivers/vfio/mdev/vfio_mdev.c
-@@ -124,9 +124,8 @@ static const struct vfio_device_ops vfio_mdev_dev_ops = {
- 	.request	= vfio_mdev_request,
+@@ -152,14 +152,18 @@ static void vfio_mdev_remove(struct mdev_device *mdev)
+ }
+ 
+ static struct mdev_driver vfio_mdev_driver = {
+-	.name	= "vfio_mdev",
++	.driver = {
++		.name = "vfio_mdev",
++		.owner = THIS_MODULE,
++		.mod_name = KBUILD_MODNAME,
++	},
+ 	.probe	= vfio_mdev_probe,
+ 	.remove	= vfio_mdev_remove,
  };
  
--static int vfio_mdev_probe(struct device *dev)
-+static int vfio_mdev_probe(struct mdev_device *mdev)
+ static int __init vfio_mdev_init(void)
  {
--	struct mdev_device *mdev = to_mdev_device(dev);
- 	struct vfio_device *vdev;
- 	int ret;
- 
-@@ -144,9 +143,9 @@ static int vfio_mdev_probe(struct device *dev)
- 	return 0;
+-	return mdev_register_driver(&vfio_mdev_driver, THIS_MODULE);
++	return mdev_register_driver(&vfio_mdev_driver);
  }
  
--static void vfio_mdev_remove(struct device *dev)
-+static void vfio_mdev_remove(struct mdev_device *mdev)
- {
--	struct vfio_device *vdev = dev_get_drvdata(dev);
-+	struct vfio_device *vdev = dev_get_drvdata(&mdev->dev);
- 
- 	vfio_unregister_group_dev(vdev);
- 	kfree(vdev);
-diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-index be444407664af7..51749b73075885 100644
---- a/drivers/vfio/vfio_iommu_type1.c
-+++ b/drivers/vfio/vfio_iommu_type1.c
-@@ -1927,28 +1927,13 @@ static bool vfio_iommu_has_sw_msi(struct list_head *group_resv_regions,
- 	return ret;
- }
- 
--static struct device *vfio_mdev_get_iommu_device(struct device *dev)
--{
--	struct device *(*fn)(struct device *dev);
--	struct device *iommu_device;
--
--	fn = symbol_get(mdev_get_iommu_device);
--	if (fn) {
--		iommu_device = fn(dev);
--		symbol_put(mdev_get_iommu_device);
--
--		return iommu_device;
--	}
--
--	return NULL;
--}
--
- static int vfio_mdev_attach_domain(struct device *dev, void *data)
- {
-+	struct mdev_device *mdev = to_mdev_device(dev);
- 	struct iommu_domain *domain = data;
- 	struct device *iommu_device;
- 
--	iommu_device = vfio_mdev_get_iommu_device(dev);
-+	iommu_device = mdev_get_iommu_device(mdev);
- 	if (iommu_device) {
- 		if (iommu_dev_feature_enabled(iommu_device, IOMMU_DEV_FEAT_AUX))
- 			return iommu_aux_attach_device(domain, iommu_device);
-@@ -1961,10 +1946,11 @@ static int vfio_mdev_attach_domain(struct device *dev, void *data)
- 
- static int vfio_mdev_detach_domain(struct device *dev, void *data)
- {
-+	struct mdev_device *mdev = to_mdev_device(dev);
- 	struct iommu_domain *domain = data;
- 	struct device *iommu_device;
- 
--	iommu_device = vfio_mdev_get_iommu_device(dev);
-+	iommu_device = mdev_get_iommu_device(mdev);
- 	if (iommu_device) {
- 		if (iommu_dev_feature_enabled(iommu_device, IOMMU_DEV_FEAT_AUX))
- 			iommu_aux_detach_device(domain, iommu_device);
-@@ -2012,9 +1998,10 @@ static bool vfio_bus_is_mdev(struct bus_type *bus)
- 
- static int vfio_mdev_iommu_device(struct device *dev, void *data)
- {
-+	struct mdev_device *mdev = to_mdev_device(dev);
- 	struct device **old = data, *new;
- 
--	new = vfio_mdev_get_iommu_device(dev);
-+	new = mdev_get_iommu_device(mdev);
- 	if (!new || (*old && *old != new))
- 		return -EINVAL;
- 
+ static void __exit vfio_mdev_exit(void)
 diff --git a/include/linux/mdev.h b/include/linux/mdev.h
-index 27eb383cb95de0..52f7ea19dd0f56 100644
+index 52f7ea19dd0f56..cb771c712da0f4 100644
 --- a/include/linux/mdev.h
 +++ b/include/linux/mdev.h
-@@ -10,7 +10,21 @@
- #ifndef MDEV_H
- #define MDEV_H
- 
--struct mdev_device;
-+struct mdev_device {
-+	struct device dev;
-+	struct mdev_parent *parent;
-+	guid_t uuid;
-+	void *driver_data;
-+	struct list_head next;
-+	struct kobject *type_kobj;
-+	struct device *iommu_device;
-+	bool active;
-+};
-+
-+static inline struct mdev_device *to_mdev_device(struct device *dev)
-+{
-+	return container_of(dev, struct mdev_device, dev);
-+}
- 
- /*
-  * Called by the parent device driver to set the device which represents
-@@ -19,12 +33,17 @@ struct mdev_device;
-  *
-  * @dev: the mediated device that iommu will isolate.
-  * @iommu_device: a pci device which represents the iommu for @dev.
-- *
-- * Return 0 for success, otherwise negative error value.
-  */
--int mdev_set_iommu_device(struct device *dev, struct device *iommu_device);
-+static inline void mdev_set_iommu_device(struct mdev_device *mdev,
-+					 struct device *iommu_device)
-+{
-+	mdev->iommu_device = iommu_device;
-+}
- 
--struct device *mdev_get_iommu_device(struct device *dev);
-+static inline struct device *mdev_get_iommu_device(struct mdev_device *mdev)
-+{
-+	return mdev->iommu_device;
-+}
+@@ -137,21 +137,17 @@ struct mdev_type_attribute mdev_type_attr_##_name =		\
  
  /**
-  * struct mdev_parent_ops - Structure to be registered for each parent device to
-@@ -126,16 +145,25 @@ struct mdev_type_attribute mdev_type_attr_##_name =		\
+  * struct mdev_driver - Mediated device driver
+- * @name: driver name
+  * @probe: called when new device created
+  * @remove: called when device removed
+  * @driver: device driver structure
+  *
   **/
  struct mdev_driver {
- 	const char *name;
--	int  (*probe)(struct device *dev);
--	void (*remove)(struct device *dev);
-+	int (*probe)(struct mdev_device *dev);
-+	void (*remove)(struct mdev_device *dev);
+-	const char *name;
+ 	int (*probe)(struct mdev_device *dev);
+ 	void (*remove)(struct mdev_device *dev);
  	struct device_driver driver;
  };
  
- #define to_mdev_driver(drv)	container_of(drv, struct mdev_driver, driver)
+-#define to_mdev_driver(drv)	container_of(drv, struct mdev_driver, driver)
+-
+ static inline void *mdev_get_drvdata(struct mdev_device *mdev)
+ {
+ 	return mdev->driver_data;
+@@ -170,7 +166,7 @@ extern struct bus_type mdev_bus_type;
+ int mdev_register_device(struct device *dev, const struct mdev_parent_ops *ops);
+ void mdev_unregister_device(struct device *dev);
  
--void *mdev_get_drvdata(struct mdev_device *mdev);
--void mdev_set_drvdata(struct mdev_device *mdev, void *data);
--const guid_t *mdev_uuid(struct mdev_device *mdev);
-+static inline void *mdev_get_drvdata(struct mdev_device *mdev)
-+{
-+	return mdev->driver_data;
-+}
-+static inline void mdev_set_drvdata(struct mdev_device *mdev, void *data)
-+{
-+	mdev->driver_data = data;
-+}
-+static inline const guid_t *mdev_uuid(struct mdev_device *mdev)
-+{
-+	return &mdev->uuid;
-+}
- 
- extern struct bus_type mdev_bus_type;
- 
-@@ -146,7 +174,13 @@ int mdev_register_driver(struct mdev_driver *drv, struct module *owner);
+-int mdev_register_driver(struct mdev_driver *drv, struct module *owner);
++int mdev_register_driver(struct mdev_driver *drv);
  void mdev_unregister_driver(struct mdev_driver *drv);
  
  struct device *mdev_parent_dev(struct mdev_device *mdev);
--struct device *mdev_dev(struct mdev_device *mdev);
--struct mdev_device *mdev_from_dev(struct device *dev);
-+static inline struct device *mdev_dev(struct mdev_device *mdev)
-+{
-+	return &mdev->dev;
-+}
-+static inline struct mdev_device *mdev_from_dev(struct device *dev)
-+{
-+	return dev->bus == &mdev_bus_type ? to_mdev_device(dev) : NULL;
-+}
- 
- #endif /* MDEV_H */
 -- 
 2.31.1
 
