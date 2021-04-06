@@ -2,249 +2,142 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1895D355871
-	for <lists+kvm@lfdr.de>; Tue,  6 Apr 2021 17:48:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 02EA9355880
+	for <lists+kvm@lfdr.de>; Tue,  6 Apr 2021 17:50:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242529AbhDFPse (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 6 Apr 2021 11:48:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60904 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230286AbhDFPsd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 6 Apr 2021 11:48:33 -0400
-Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 997A2C06174A
-        for <kvm@vger.kernel.org>; Tue,  6 Apr 2021 08:48:25 -0700 (PDT)
-Received: by mail-pj1-x1031.google.com with SMTP id z22-20020a17090a0156b029014d4056663fso2984188pje.0
-        for <kvm@vger.kernel.org>; Tue, 06 Apr 2021 08:48:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=laZeNbGTjzk/8Smqz2d9x68PxPq/3zkf2RQckeInUrc=;
-        b=vaMCcVuQU+xkQ7vHYGIarFeeBeCCKzlrZ2nfM2VXj9I8Wes92nRodmUF/F8HuSmt/H
-         tW1vk3pFAT1FlHDOHXUDwDiRE5ITDEGp7r+aajfeqwbNU4PkwLyasn2DyVjmM+vtupZD
-         CV1+/Xh4tC++VDO1/lTkzJm1uzOOWc4VhqSRtLFPcN/wlbNM+DxgPClNn4ejUTB0Vcwe
-         6lgph+AXHd/y5KuQY8hO+vUgDkknPqrfRj8Ljgq+aNOrZ0/BS/tCIAX21j0nwB9KYsNl
-         o0p1zpKo8npjiBSMfdbR2QhIVXuS2Keoaf4af47/Mv2fcTk3FUkfGc0OoYzrgkOafpih
-         7pcA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=laZeNbGTjzk/8Smqz2d9x68PxPq/3zkf2RQckeInUrc=;
-        b=AkHRFiCr2pD4Te58aVETRyVIf9dPb+yiyMCDmkTycjXkK7/89h4fz3MyCufuhcpXe0
-         kj70TYsrNRKWXrb095kNiCmesZT+co0k5LXN38oeTioFbUFKaY9jUIA3KphdYPy8xUt/
-         yGxATs3WN+M/VkpXOBLStGSrFxtzi3xnzprMm0BgLPTuyLCLUWJTuwPe2/D9eFZNWjes
-         1y7RbqYkMcBz4ELuffJtvoSbFatO45tFdzkjz9kg4fxdsMn0Bjj7e8yRWwRuaYoCL9zc
-         0h03JYrYmeLds6EN3Jl27NnI/bfB7qyOSyaF08rG/Rcqz8fy+O4UCTDNY/8agB/oY+nF
-         cLNw==
-X-Gm-Message-State: AOAM533XP0sL5PCx27mF098pgruPMNIilDzVZb818p1E2VT8eXWX3Ujz
-        w4SXBEa5/KzLiSuFJbI6NtR1hjzl2TnKdw==
-X-Google-Smtp-Source: ABdhPJzchvT4Z6SPilEJJK9qhUx/vsuSORYI0NpUvl8rZ2/gXSA8UroDZbeLwaLtfX9hyyufQRDCkg==
-X-Received: by 2002:a17:90a:5106:: with SMTP id t6mr5058538pjh.177.1617724104889;
-        Tue, 06 Apr 2021 08:48:24 -0700 (PDT)
-Received: from google.com (240.111.247.35.bc.googleusercontent.com. [35.247.111.240])
-        by smtp.gmail.com with ESMTPSA id u14sm2817113pji.15.2021.04.06.08.48.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 06 Apr 2021 08:48:24 -0700 (PDT)
-Date:   Tue, 6 Apr 2021 15:48:20 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Ashish Kalra <Ashish.Kalra@amd.com>
-Cc:     pbonzini@redhat.com, tglx@linutronix.de, mingo@redhat.com,
-        hpa@zytor.com, joro@8bytes.org, bp@suse.de,
-        thomas.lendacky@amd.com, x86@kernel.org, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, srutherford@google.com,
-        venu.busireddy@oracle.com, brijesh.singh@amd.com, will@kernel.org,
-        maz@kernel.org, qperret@google.com
-Subject: Re: [PATCH v11 08/13] KVM: X86: Introduce KVM_HC_PAGE_ENC_STATUS
- hypercall
-Message-ID: <YGyCxGsC2+GAtJxy@google.com>
-References: <cover.1617302792.git.ashish.kalra@amd.com>
- <4da0d40c309a21ba3952d06f346b6411930729c9.1617302792.git.ashish.kalra@amd.com>
+        id S1346027AbhDFPux (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 6 Apr 2021 11:50:53 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:36816 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1346008AbhDFPuo (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 6 Apr 2021 11:50:44 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1617724235;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=hnbXBo7tEO27FFpU/yfGuiAx13yYtpbdSKoY6qIhdAc=;
+        b=gspAgKA3sh43Mhi2249Rvx9muH6InR5sd+H4QVFneAkdyCyrAhGipHzkvqBLjHUEi2ODPV
+        DyXduUNBwqfmJgZS8uh+0H43smtpQbsNLdz2tgNaQj/PlPWPfgwtvlyYbyHBPVcJZV0jbL
+        HVfhUcK0dc38TAXoiiI7AMiAetxE7xw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-167-Ni6QRetuOIWAxCCSot0oEw-1; Tue, 06 Apr 2021 11:50:34 -0400
+X-MC-Unique: Ni6QRetuOIWAxCCSot0oEw-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DB3ED10866A3;
+        Tue,  6 Apr 2021 15:50:32 +0000 (UTC)
+Received: from gondolin (ovpn-112-170.ams2.redhat.com [10.36.112.170])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 7D42B60240;
+        Tue,  6 Apr 2021 15:50:27 +0000 (UTC)
+Date:   Tue, 6 Apr 2021 17:50:24 +0200
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Pierre Morel <pmorel@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, frankja@linux.ibm.com, david@redhat.com,
+        thuth@redhat.com, imbrenda@linux.ibm.com
+Subject: Re: [kvm-unit-tests PATCH v3 13/16] s390x: css: checking for CSS
+ extensions
+Message-ID: <20210406175024.44fe7473.cohuck@redhat.com>
+In-Reply-To: <1617694853-6881-14-git-send-email-pmorel@linux.ibm.com>
+References: <1617694853-6881-1-git-send-email-pmorel@linux.ibm.com>
+        <1617694853-6881-14-git-send-email-pmorel@linux.ibm.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <4da0d40c309a21ba3952d06f346b6411930729c9.1617302792.git.ashish.kalra@amd.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Apr 05, 2021, Ashish Kalra wrote:
-> From: Ashish Kalra <ashish.kalra@amd.com>
+On Tue,  6 Apr 2021 09:40:50 +0200
+Pierre Morel <pmorel@linux.ibm.com> wrote:
 
-...
+> We verify that these extensions are not install before running simple
 
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index 3768819693e5..78284ebbbee7 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -1352,6 +1352,8 @@ struct kvm_x86_ops {
->  	int (*complete_emulated_msr)(struct kvm_vcpu *vcpu, int err);
->  
->  	void (*vcpu_deliver_sipi_vector)(struct kvm_vcpu *vcpu, u8 vector);
-> +	int (*page_enc_status_hc)(struct kvm_vcpu *vcpu, unsigned long gpa,
-> +				  unsigned long sz, unsigned long mode);
+s/not install/installed/ ?
+
+Testing extensions that are not installed does not make that much sense
+:)
+
+> tests.
+> 
+> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+> ---
+>  lib/s390x/css.h |  2 ++
+>  s390x/css.c     | 31 +++++++++++++++++++++++++++++++
+>  2 files changed, 33 insertions(+)
+> 
+> diff --git a/lib/s390x/css.h b/lib/s390x/css.h
+> index d824e34..08b2974 100644
+> --- a/lib/s390x/css.h
+> +++ b/lib/s390x/css.h
+> @@ -338,7 +338,9 @@ struct chsc_scsc {
+>  	uint8_t reserved[9];
+>  	struct chsc_header res;
+>  	uint32_t res_fmt;
+> +#define CSSC_ORB_EXTENSIONS		0
+>  #define CSSC_EXTENDED_MEASUREMENT_BLOCK 48
+> +#define CSSC_FC_EXTENSIONS		88
+>  	uint64_t general_char[255];
+>  	uint64_t chsc_char[254];
 >  };
->  
->  struct kvm_x86_nested_ops {
-> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-> index c9795a22e502..fb3a315e5827 100644
-> --- a/arch/x86/kvm/svm/sev.c
-> +++ b/arch/x86/kvm/svm/sev.c
-> @@ -1544,6 +1544,67 @@ static int sev_receive_finish(struct kvm *kvm, struct kvm_sev_cmd *argp)
->  	return ret;
+> diff --git a/s390x/css.c b/s390x/css.c
+> index 26f5da6..f8c6688 100644
+> --- a/s390x/css.c
+> +++ b/s390x/css.c
+> @@ -229,6 +229,35 @@ static void ssch_orb_ctrl(void)
+>  	}
 >  }
 >  
-> +static int sev_complete_userspace_page_enc_status_hc(struct kvm_vcpu *vcpu)
+> +static void ssch_orb_extension(void)
 > +{
-> +	vcpu->run->exit_reason = 0;
-> +	kvm_rax_write(vcpu, vcpu->run->dma_sharing.ret);
-> +	++vcpu->stat.hypercalls;
-> +	return kvm_skip_emulated_instruction(vcpu);
+> +	if (!css_test_general_feature(CSSC_ORB_EXTENSIONS)) {
+> +		report_skip("ORB extensions not installed");
+> +		return;
+> +	}
+> +	/* Place holder for checking ORB extensions */
+> +	report_info("ORB extensions installed but not tested");
 > +}
 > +
-> +int svm_page_enc_status_hc(struct kvm_vcpu *vcpu, unsigned long gpa,
-> +			   unsigned long npages, unsigned long enc)
+> +static void ssch_orb_fcx(void)
 > +{
-> +	kvm_pfn_t pfn_start, pfn_end;
-> +	struct kvm *kvm = vcpu->kvm;
-> +	gfn_t gfn_start, gfn_end;
+> +	uint32_t tmp = orb->ctrl;
 > +
-> +	if (!sev_guest(kvm))
-> +		return -EINVAL;
-> +
-> +	if (!npages)
-> +		return 0;
-
-Parth of me thinks passing a zero size should be an error not a nop.  Either way
-works, just feels a bit weird to allow this to be a nop.
-
-> +
-> +	gfn_start = gpa_to_gfn(gpa);
-
-This should check that @gpa is aligned.
-
-> +	gfn_end = gfn_start + npages;
-> +
-> +	/* out of bound access error check */
-> +	if (gfn_end <= gfn_start)
-> +		return -EINVAL;
-> +
-> +	/* lets make sure that gpa exist in our memslot */
-> +	pfn_start = gfn_to_pfn(kvm, gfn_start);
-> +	pfn_end = gfn_to_pfn(kvm, gfn_end);
-> +
-> +	if (is_error_noslot_pfn(pfn_start) && !is_noslot_pfn(pfn_start)) {
-> +		/*
-> +		 * Allow guest MMIO range(s) to be added
-> +		 * to the shared pages list.
-> +		 */
-> +		return -EINVAL;
+> +	if (!css_test_general_feature(CSSC_FC_EXTENSIONS)) {
+> +		report_skip("Fibre-channel extensions not installed");
+> +		return;
 > +	}
 > +
-> +	if (is_error_noslot_pfn(pfn_end) && !is_noslot_pfn(pfn_end)) {
-> +		/*
-> +		 * Allow guest MMIO range(s) to be added
-> +		 * to the shared pages list.
-> +		 */
-> +		return -EINVAL;
-> +	}
+> +	report_prefix_push("Channel-Program Type Control");
+> +	orb->ctrl |= ORB_CTRL_CPTC;
+> +	expect_pgm_int();
+> +	ssch(test_device_sid, orb);
+> +	check_pgm_int_code(PGM_INT_CODE_OPERAND);
+> +	report_prefix_pop();
 
-I don't think KVM should do any checks beyond gfn_end <= gfn_start.  Just punt
-to userspace and give userspace full say over what is/isn't legal.
-
-> +
-> +	if (enc)
-> +		vcpu->run->exit_reason = KVM_EXIT_DMA_UNSHARE;
-> +	else
-> +		vcpu->run->exit_reason = KVM_EXIT_DMA_SHARE;
-
-Use a single exit and pass "enc" via kvm_run.  I also strongly dislike "DMA",
-there's no guarantee the guest is sharing memory for DMA.
-
-I think we can usurp KVM_EXIT_HYPERCALL for this?  E.g.
-
-	vcpu->run->exit_reason        = KVM_EXIT_HYPERCALL;
-	vcpu->run->hypercall.nr       = KVM_HC_PAGE_ENC_STATUS;
-	vcpu->run->hypercall.args[0]  = gfn_start << PAGE_SHIFT;
-	vcpu->run->hypercall.args[1]  = npages * PAGE_SIZE;
-	vcpu->run->hypercall.args[2]  = enc;
-	vcpu->run->hypercall.longmode = is_64_bit_mode(vcpu);
+I don't quite understand what you're testing here; shouldn't the device
+accept a transport-mode orb if fcx is installed? The problem would be
+if the program consists of ccws instead, so it's more a malformed block
+handling test?
 
 > +
-> +	vcpu->run->dma_sharing.addr = gfn_start;
-
-Addresses and pfns are not the same thing.  If you're passing the size in bytes,
-then it's probably best to pass the gpa, not the gfn.  Same for the params from
-the guest, they should be in the same "domain".
-
-> +	vcpu->run->dma_sharing.len = npages * PAGE_SIZE;
-> +	vcpu->arch.complete_userspace_io =
-> +		sev_complete_userspace_page_enc_status_hc;
-
-I vote to drop the "userspace" part, it's already quite verbose.
-
-	vcpu->arch.complete_userspace_io = sev_complete_page_enc_status_hc;
-
-> +
-> +	return 0;
+> +	orb->ctrl = tmp;
 > +}
 > +
+>  static struct tests ssh_tests[] = {
+>  	{ "privilege", ssch_privilege },
+>  	{ "orb cpa zero", ssch_orb_cpa_zero },
+> @@ -238,6 +267,8 @@ static struct tests ssh_tests[] = {
+>  	{ "CCW in DMA31", ssch_ccw_dma31 },
+>  	{ "ORB MIDAW unsupported", ssch_orb_midaw },
+>  	{ "ORB reserved CTRL bits", ssch_orb_ctrl },
+> +	{ "ORB extensions", ssch_orb_extension},
+> +	{ "FC extensions", ssch_orb_fcx},
+>  	{ NULL, NULL }
+>  };
+>  
 
-..
-
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index f7d12fca397b..ef5c77d59651 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -8273,6 +8273,18 @@ int kvm_emulate_hypercall(struct kvm_vcpu *vcpu)
->  		kvm_sched_yield(vcpu->kvm, a0);
->  		ret = 0;
->  		break;
-> +	case KVM_HC_PAGE_ENC_STATUS: {
-> +		int r;
-> +
-> +		ret = -KVM_ENOSYS;
-> +		if (kvm_x86_ops.page_enc_status_hc) {
-> +			r = kvm_x86_ops.page_enc_status_hc(vcpu, a0, a1, a2);
-
-Use static_call().
-
-> +			if (r >= 0)
-> +				return r;
-> +			ret = r;
-> +		}
-
-Hmm, an alternative to adding a kvm_x86_ops hook would be to tag the VM as
-supporting/allowing the hypercall.  That would clean up this code, ensure VMX
-and SVM don't end up creating a different userspace ABI, and make it easier to
-reuse the hypercall in the future (I'm still hopeful :-) ).  E.g.
-
-	case KVM_HC_PAGE_ENC_STATUS: {
-		u64 gpa = a0, nr_bytes = a1;
-
-		if (!vcpu->kvm->arch.page_enc_hc_enable)
-			break;
-
-		if (!PAGE_ALIGNED(gpa) || !PAGE_ALIGNED(nr_bytes) ||
-		    !nr_bytes || gpa + nr_bytes <= gpa)) {
-			ret = -EINVAL;
-			break;
-		}
-
-	        vcpu->run->exit_reason        = KVM_EXIT_HYPERCALL; 
-        	vcpu->run->hypercall.nr       = KVM_HC_PAGE_ENC_STATUS; 
-	        vcpu->run->hypercall.args[0]  = gpa;
-        	vcpu->run->hypercall.args[1]  = nr_bytes;
-	        vcpu->run->hypercall.args[2]  = enc;                                    
-        	vcpu->run->hypercall.longmode = op_64_bit;
-		vcpu->arch.complete_userspace_io = complete_page_enc_hc;
-		return 0;
-	}
-
-
-> +		break;
-> +	}
->  	default:
->  		ret = -KVM_ENOSYS;
->  		break;
