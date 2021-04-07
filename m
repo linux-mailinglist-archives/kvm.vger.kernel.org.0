@@ -2,74 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9338035666E
-	for <lists+kvm@lfdr.de>; Wed,  7 Apr 2021 10:21:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5B83E3566FF
+	for <lists+kvm@lfdr.de>; Wed,  7 Apr 2021 10:41:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237082AbhDGIVX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 7 Apr 2021 04:21:23 -0400
-Received: from mail.kernel.org ([198.145.29.99]:48638 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S240361AbhDGIVQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 7 Apr 2021 04:21:16 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id AA0A8613E5;
-        Wed,  7 Apr 2021 08:21:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1617783662;
-        bh=01jspTSWm7bLXEJy5cH57gxxdERvRXGSivEgicYhRac=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=jXzc1b5Agkr/7HQxKILvoj1ZXg4WQ4JoGIL8aHE3xU+wUrgoH2CaqRIi8BsJ3m8/q
-         L9TEVVmpKxnFQdouRV6ucHeyJyi4kkv0SH+DH4ECIEmLKIm2dnShkYx4yaMBZ5fXf2
-         +ybd+3fl7i3eA3+pZ4RMV1zsKQc7CiGEPAPVN2Q6b+3WNwMD+dfH25DWa8cM3JBwON
-         d0WPPrljMfeeD1IZiMHAVmE9Jh5ljNJZm0fomiA3mxlnpqgUcQOe6wFL/J9mIljX1Y
-         BO38nXrNBFFs2UV6yByRTjRNQlG5Oz6xmv8FsLUAKPyum8RJvHWbL94HVTiM4jg/ud
-         eApwM31XX4zBw==
-Received: by mail.kernel.org with local (Exim 4.94)
-        (envelope-from <mchehab@kernel.org>)
-        id 1lU3Qq-005i2i-Rj; Wed, 07 Apr 2021 10:21:00 +0200
-From:   Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
-To:     Linux Doc Mailing List <linux-doc@vger.kernel.org>
-Cc:     Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
-        "Jonathan Corbet" <corbet@lwn.net>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Peter Zijlstra <peterz@infradead.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH v2 16/19] docs: vcpu-requests.rst: fix reference for atomic ops
-Date:   Wed,  7 Apr 2021 10:20:55 +0200
-Message-Id: <d6980818e862c08d13747b87054d92ab2b891112.1617783062.git.mchehab+huawei@kernel.org>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <cover.1617783062.git.mchehab+huawei@kernel.org>
-References: <cover.1617783062.git.mchehab+huawei@kernel.org>
+        id S1349623AbhDGIlI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 7 Apr 2021 04:41:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55502 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231909AbhDGIlG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 7 Apr 2021 04:41:06 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5CB30C06174A;
+        Wed,  7 Apr 2021 01:40:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=pm5+BhR2cUpRyMJC2aIbNNtM1LjZJ9DWAVkZw86zhBE=; b=CI5xZ1RXdGdwTpFA766l3JgwrG
+        zo8qhk2L0zX9WsU/pD2KeXwR7ZZTV4YKaE8pXlTiusWDAOV4pdb6Vk/bTOwxJvLeqlciBH0xUjNVI
+        Y8nZ6R0gfcYma3Omn2gStLFmxgcQ+dbIt4+r8E2qgQ1P9sz/wYzyNW8vmdzanUU7VqBiHKVKc8sMV
+        1bCzhFMdws7SmGj0oIRWmQOMEhz6NxcNFmf3cP4Man4zI/x5gRrr4Ll9FusgaPXF4UHMwWjSlWvdY
+        T3Lvl+/EARw7NcJ0m08ozE30L54q7PEPHQLYUwzdL/hFk/tNNQQVbg0aJSbKfGdh1XLSnoAY0i/4Y
+        7CvDZlcQ==;
+Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
+        by casper.infradead.org with esmtpsa (Exim 4.94 #2 (Red Hat Linux))
+        id 1lU3jG-00EBC2-NY; Wed, 07 Apr 2021 08:40:06 +0000
+Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
+        (Client did not present a certificate)
+        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 176E9300119;
+        Wed,  7 Apr 2021 10:40:01 +0200 (CEST)
+Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
+        id 0237424403D8F; Wed,  7 Apr 2021 10:40:00 +0200 (CEST)
+Date:   Wed, 7 Apr 2021 10:40:00 +0200
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     Like Xu <like.xu@linux.intel.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, eranian@google.com,
+        andi@firstfloor.org, kan.liang@linux.intel.com,
+        wei.w.wang@intel.com, Wanpeng Li <wanpengli@tencent.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        x86@kernel.org, linux-kernel@vger.kernel.org,
+        Andi Kleen <ak@linux.intel.com>
+Subject: Re: [PATCH v4 06/16] KVM: x86/pmu: Reprogram guest PEBS event to
+ emulate guest PEBS counter
+Message-ID: <YG1v4KFCPSoKcoyd@hirez.programming.kicks-ass.net>
+References: <20210329054137.120994-1-like.xu@linux.intel.com>
+ <20210329054137.120994-7-like.xu@linux.intel.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Sender: Mauro Carvalho Chehab <mchehab@kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210329054137.120994-7-like.xu@linux.intel.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Changeset f0400a77ebdc ("atomic: Delete obsolete documentation")
-got rid of atomic_ops.rst, pointing that this was superseded by
-Documentation/atomic_*.txt.
+On Mon, Mar 29, 2021 at 01:41:27PM +0800, Like Xu wrote:
 
-Update its reference accordingly.
+> diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
+> index 827886c12c16..3509b18478b9 100644
+> --- a/arch/x86/kvm/pmu.c
+> +++ b/arch/x86/kvm/pmu.c
+> @@ -74,11 +74,20 @@ static void kvm_perf_overflow_intr(struct perf_event *perf_event,
+>  {
+>  	struct kvm_pmc *pmc = perf_event->overflow_handler_context;
+>  	struct kvm_pmu *pmu = pmc_to_pmu(pmc);
+> +	bool skip_pmi = false;
+>  
+>  	if (!test_and_set_bit(pmc->idx, pmu->reprogram_pmi)) {
+> -		__set_bit(pmc->idx, (unsigned long *)&pmu->global_status);
+> +		if (perf_event->attr.precise_ip) {
+> +			/* Indicate PEBS overflow PMI to guest. */
+> +			skip_pmi = test_and_set_bit(GLOBAL_STATUS_BUFFER_OVF_BIT,
+> +				(unsigned long *)&pmu->global_status);
 
-Fixes: f0400a77ebdc ("atomic: Delete obsolete documentation")
-Signed-off-by: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
----
- Documentation/virt/kvm/vcpu-requests.rst | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Is there actual concurrency here, or did you forget to type __?
 
-diff --git a/Documentation/virt/kvm/vcpu-requests.rst b/Documentation/virt/kvm/vcpu-requests.rst
-index 5feb3706a7ae..5f8798e7fdf8 100644
---- a/Documentation/virt/kvm/vcpu-requests.rst
-+++ b/Documentation/virt/kvm/vcpu-requests.rst
-@@ -302,6 +302,6 @@ VCPU returns from the call.
- References
- ==========
- 
--.. [atomic-ops] Documentation/core-api/atomic_ops.rst
-+.. [atomic-ops] Documentation/atomic_bitops.txt and Documentation/atomic_t.txt
- .. [memory-barriers] Documentation/memory-barriers.txt
- .. [lwn-mb] https://lwn.net/Articles/573436/
--- 
-2.30.2
+And in case you're using vim, use something like: set cino=(0:0
 
+> +		} else
+> +			__set_bit(pmc->idx, (unsigned long *)&pmu->global_status);
+>  		kvm_make_request(KVM_REQ_PMU, pmc->vcpu);
+>  
+> +		if (skip_pmi)
+> +			return;
+> +
+>  		/*
+>  		 * Inject PMI. If vcpu was in a guest mode during NMI PMI
+>  		 * can be ejected on a guest mode re-entry. Otherwise we can't
