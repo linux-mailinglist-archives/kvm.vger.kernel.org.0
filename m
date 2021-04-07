@@ -2,219 +2,133 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2B0FD3574B6
-	for <lists+kvm@lfdr.de>; Wed,  7 Apr 2021 20:59:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E8F3135751E
+	for <lists+kvm@lfdr.de>; Wed,  7 Apr 2021 21:45:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1355524AbhDGTAI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 7 Apr 2021 15:00:08 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:46461 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1355518AbhDGTAG (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 7 Apr 2021 15:00:06 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1617821996;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Fq2z9Cciylm7lQWg9/xvcPW8IugFYoqpdT9buVnJ92k=;
-        b=dlNDRmd/xfGozyYXE4WCgR1FduiAOOX83GhWwmmHLUQdMACZTmjaJDGtNfSn3g8klY6Y+I
-        Gz1UQcEg2pGOXhji1+n9f5gLEKS44FzEj6nMhYGhmW18qB6Osw4QMYjoR/afjWE20C7E7t
-        3hw9bUS13ZhK1jaT4lbujHhyBzNhZvE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-442-9o5buXgANw-Qg_Dcm9DpQg-1; Wed, 07 Apr 2021 14:59:55 -0400
-X-MC-Unique: 9o5buXgANw-Qg_Dcm9DpQg-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2C5761006C80;
-        Wed,  7 Apr 2021 18:59:54 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.40.193.185])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id A22F660C5C;
-        Wed,  7 Apr 2021 18:59:51 +0000 (UTC)
-From:   Andrew Jones <drjones@redhat.com>
-To:     kvm@vger.kernel.org
-Cc:     alexandru.elisei@arm.com, nikos.nikoleris@arm.com,
-        andre.przywara@arm.com, eric.auger@redhat.com
-Subject: [PATCH kvm-unit-tests 8/8] arm/arm64: psci: don't assume method is hvc
-Date:   Wed,  7 Apr 2021 20:59:18 +0200
-Message-Id: <20210407185918.371983-9-drjones@redhat.com>
-In-Reply-To: <20210407185918.371983-1-drjones@redhat.com>
-References: <20210407185918.371983-1-drjones@redhat.com>
+        id S1355706AbhDGTp6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 7 Apr 2021 15:45:58 -0400
+Received: from mail-dm6nam11on2066.outbound.protection.outlook.com ([40.107.223.66]:29537
+        "EHLO NAM11-DM6-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1355666AbhDGTp5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 7 Apr 2021 15:45:57 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=dQYjYsF0pOdw0MoGgN3EueSuMTrX5fhbSY2x8bYFpCbr0NUDYFdgd7aRErLRsfRAT2HyeC0qKTLfCbQ1Fi6EaAU4g+GP/mrRWV5XUFPGN8SdFeqtTYyJHLBZhu+S8Jn/svHIJ3piq66tDDo8Xlg2nlijb9m55GxPo443prpN3WAWL2bs4ogkqqmnXnQFoSs6lpLJibfWqXcxdvFr0bwW78/kJIYhV9hi+QVr0OY1ujaxJvSivChnNfaRFX43tAH7JtgKPWr6WRRgItcikQ8PzXG9tP7TkfzRBTMQaCMgmCOELBXklndUpDkd09gvZtwltRoJ20FuiSXVZxubypyL0g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=YnAgSZYvS/lBLIb85UzTFER4j883WqnvBjdX7/4PPE8=;
+ b=b+JXe9DkWzcx2V9UCJnddtpmk+adAL9JxNsAgg5ApsMaefBfp3MyCf70Xs9CIBCmYP0nXz158iQ9dW/bmMetZ1bgUcXSu54WkgOELBivLIBEQJWqyE1rcHZkpn+OqES8QIxj1UHCzwB2PWEZOvczfG+J5iH65zk/ZcQSWuIP1I0o6A5eqCBQs6bpPCGUzvjdzsrZeyvcaE+KGBD2jgV4Z5c++CLcfpLSM0UNqW+ivMvnT49PnshgP1K78+sJnCPRjS70XMT999d3G+aZQyHxdYiu+iwoGKb1CL6BMO20ACRpyBYqMY7v/GrC2811Hmj2CZTpW+ut4wggixqDH0CwRg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=redhat.com smtp.mailfrom=amd.com; dmarc=pass
+ (p=none sp=none pct=100) action=none header.from=amd.com; dkim=none (message
+ not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=YnAgSZYvS/lBLIb85UzTFER4j883WqnvBjdX7/4PPE8=;
+ b=4QPnZbJxG/1+qwopfrid968369nVOcIgOhxgMaThX/N0Y0dY7oPD4Utg4rWdvVJs4IWChny5nyqF9+Z3g8+QnZ4TWY841xVzIrWFpytwSEg+FM5n/DloXztNjidnyWWq76qC9cOUzaZhkZGi5sNtaG+YyJAPEgo4HvR93Cm3tsk=
+Received: from BN9PR03CA0925.namprd03.prod.outlook.com (2603:10b6:408:107::30)
+ by BYAPR12MB2695.namprd12.prod.outlook.com (2603:10b6:a03:71::32) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3999.28; Wed, 7 Apr
+ 2021 19:45:44 +0000
+Received: from BN8NAM11FT045.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:408:107:cafe::15) by BN9PR03CA0925.outlook.office365.com
+ (2603:10b6:408:107::30) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4020.17 via Frontend
+ Transport; Wed, 7 Apr 2021 19:45:44 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; redhat.com; dkim=none (message not signed)
+ header.d=none;redhat.com; dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com;
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ BN8NAM11FT045.mail.protection.outlook.com (10.13.177.47) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.4020.17 via Frontend Transport; Wed, 7 Apr 2021 19:45:44 +0000
+Received: from rsaripalli-Inspiron-5676.amd.com (10.180.168.240) by
+ SATLEXMB04.amd.com (10.181.40.145) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2106.2; Wed, 7 Apr 2021 14:45:43 -0500
+From:   Ramakrishna Saripalli <rsaripal@amd.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        <x86@kernel.org>, "H. Peter Anvin" <hpa@zytor.com>,
+        <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC:     <rsaripal@amd.com>
+Subject: [PATCH 1/1] x86/kvm/svm: Implement support for PSFD
+Date:   Wed, 7 Apr 2021 14:45:12 -0500
+Message-ID: <20210407194512.6922-1-rsaripal@amd.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Content-Type: text/plain
+X-Originating-IP: [10.180.168.240]
+X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 1c038c28-8220-4d00-2687-08d8f9fdbba9
+X-MS-TrafficTypeDiagnostic: BYAPR12MB2695:
+X-Microsoft-Antispam-PRVS: <BYAPR12MB269522A1FB6CFCC0B2CE35589B759@BYAPR12MB2695.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:431;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: aQ8E212MIXEsTdxIkfORqs3qBvnRTPPSQ0UkkFVY+w/679Qz0Wb49NFVPbvcd2TwexXFLuCQf+IvCDaM4BvKXrcTnRmeTVEofC6OW/hxD+F02eWa/hI60psIV1W9Nxt2FgJFRqjsN/+kfNq9dIYpnK17RfPgslKfWkXW4Sse8Xb7aEApELPoM7a9aVXchUEIkPGHJ0Rwo5lQPGYoY9FtP+aKahBig7Z5NyvZ2Uob4ZKNu8yTa/eSYfd3fCcVO4DPMA9VIKimnEx7LltoSxmVJjaLigTp3e+BiNnLrnGB6XR6YS82j/iAvtveqRNY1HwAQLXqauXgf/Jnic5C96vBx4HZVNkd0ZdlEM9wFbE72u5R7qrI+UF3Y1HmEEptaQ/4Z2CZpI2ObEKaRxywjfoHfTTcoP6PCABB0y3ZjaRisXMVEmuMAs71mFDEDTFWJZmAUKxjfF6iSF5djfHpzu2GoARVMGQcZb7xXtBBiVlVPTOlbrTqPnNfTBXqi6ydoboAzdje3wYykY+u6gxh7bzkXajEzfhGqXL/t3R1Ow1EBM+JH/S2K2Eqbig4vDmbxdkheLscbY+i3yvRIM4M/eEXCW9TjrKaqVWQNiHCLfTvy4NxbTNUT1BaqvM5dzUvhAuWY7yT3m5mPto6xvGw6V0kBB9arJYOdTHmifEwvDP7cGqjVNcZo3Y7rmawvu9oWLYLPJhLYWYr6Kd7cwgZPBO7nQ==
+X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(4636009)(39860400002)(136003)(396003)(376002)(346002)(36840700001)(46966006)(47076005)(81166007)(426003)(336012)(356005)(5660300002)(36756003)(2906002)(82310400003)(36860700001)(7696005)(921005)(8676002)(4326008)(478600001)(70586007)(8936002)(316002)(70206006)(16526019)(110136005)(186003)(26005)(6666004)(2616005)(82740400003)(7416002)(83380400001)(1076003)(36900700001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Apr 2021 19:45:44.2942
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1c038c28-8220-4d00-2687-08d8f9fdbba9
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource: BN8NAM11FT045.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR12MB2695
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The method can also be smc and it will be when running on bare metal.
+From: Ramakrishna Saripalli <rk.saripalli@amd.com>
 
-Signed-off-by: Andrew Jones <drjones@redhat.com>
+Expose Predictive Store Forwarding capability to guests.
+Guests enable or disable PSF via SPEC_CTRL MSR.
+
+Signed-off-by: Ramakrishna Saripalli <rk.saripalli@amd.com>
 ---
- arm/selftest.c     | 34 +++++++---------------------------
- lib/arm/asm/psci.h |  9 +++++++--
- lib/arm/psci.c     | 17 +++++++++++++++--
- lib/arm/setup.c    | 22 ++++++++++++++++++++++
- 4 files changed, 51 insertions(+), 31 deletions(-)
+ arch/x86/kvm/cpuid.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/arm/selftest.c b/arm/selftest.c
-index 4495b161cdd5..9f459ed3d571 100644
---- a/arm/selftest.c
-+++ b/arm/selftest.c
-@@ -400,33 +400,13 @@ static void check_vectors(void *arg __unused)
- 	exit(report_summary());
- }
+diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+index 6bd2f8b830e4..9c4af0fef6d7 100644
+--- a/arch/x86/kvm/cpuid.c
++++ b/arch/x86/kvm/cpuid.c
+@@ -448,6 +448,8 @@ void kvm_set_cpu_caps(void)
+ 		kvm_cpu_cap_set(X86_FEATURE_INTEL_STIBP);
+ 	if (boot_cpu_has(X86_FEATURE_AMD_SSBD))
+ 		kvm_cpu_cap_set(X86_FEATURE_SPEC_CTRL_SSBD);
++	if (boot_cpu_has(X86_FEATURE_AMD_PSFD))
++		kvm_cpu_cap_set(X86_FEATURE_AMD_PSFD);
  
--static bool psci_check(void)
-+static void psci_print(void)
- {
--	const struct fdt_property *method;
--	int node, len, ver;
--
--	node = fdt_node_offset_by_compatible(dt_fdt(), -1, "arm,psci-0.2");
--	if (node < 0) {
--		printf("PSCI v0.2 compatibility required\n");
--		return false;
--	}
--
--	method = fdt_get_property(dt_fdt(), node, "method", &len);
--	if (method == NULL) {
--		printf("bad psci device tree node\n");
--		return false;
--	}
--
--	if (len < 4 || strcmp(method->data, "hvc") != 0) {
--		printf("psci method must be hvc\n");
--		return false;
--	}
--
--	ver = psci_invoke(PSCI_0_2_FN_PSCI_VERSION, 0, 0, 0);
--	printf("PSCI version %d.%d\n", PSCI_VERSION_MAJOR(ver),
--				       PSCI_VERSION_MINOR(ver));
--
--	return true;
-+	int ver = psci_invoke(PSCI_0_2_FN_PSCI_VERSION, 0, 0, 0);
-+	report_info("PSCI version: %d.%d", PSCI_VERSION_MAJOR(ver),
-+					  PSCI_VERSION_MINOR(ver));
-+	report_info("PSCI method: %s", psci_invoke == psci_invoke_hvc ?
-+				       "hvc" : "smc");
- }
+ 	kvm_cpu_cap_mask(CPUID_7_1_EAX,
+ 		F(AVX_VNNI) | F(AVX512_BF16)
+@@ -482,7 +484,7 @@ void kvm_set_cpu_caps(void)
+ 	kvm_cpu_cap_mask(CPUID_8000_0008_EBX,
+ 		F(CLZERO) | F(XSAVEERPTR) |
+ 		F(WBNOINVD) | F(AMD_IBPB) | F(AMD_IBRS) | F(AMD_SSBD) | F(VIRT_SSBD) |
+-		F(AMD_SSB_NO) | F(AMD_STIBP) | F(AMD_STIBP_ALWAYS_ON)
++		F(AMD_SSB_NO) | F(AMD_STIBP) | F(AMD_STIBP_ALWAYS_ON) | F(AMD_PSFD)
+ 	);
  
- static void cpu_report(void *data __unused)
-@@ -465,7 +445,7 @@ int main(int argc, char **argv)
- 
- 	} else if (strcmp(argv[1], "smp") == 0) {
- 
--		report(psci_check(), "PSCI version");
-+		psci_print();
- 		on_cpus(cpu_report, NULL);
- 		while (!cpumask_full(&ready))
- 			cpu_relax();
-diff --git a/lib/arm/asm/psci.h b/lib/arm/asm/psci.h
-index 7b956bf5987d..e385ce27f5d1 100644
---- a/lib/arm/asm/psci.h
-+++ b/lib/arm/asm/psci.h
-@@ -3,8 +3,13 @@
- #include <libcflat.h>
- #include <linux/psci.h>
- 
--extern int psci_invoke(unsigned long function_id, unsigned long arg0,
--		       unsigned long arg1, unsigned long arg2);
-+typedef int (*psci_invoke_fn)(unsigned long function_id, unsigned long arg0,
-+			      unsigned long arg1, unsigned long arg2);
-+extern psci_invoke_fn psci_invoke;
-+extern int psci_invoke_hvc(unsigned long function_id, unsigned long arg0,
-+			   unsigned long arg1, unsigned long arg2);
-+extern int psci_invoke_smc(unsigned long function_id, unsigned long arg0,
-+			   unsigned long arg1, unsigned long arg2);
- extern int psci_cpu_on(unsigned long cpuid, unsigned long entry_point);
- extern void psci_system_reset(void);
- extern int cpu_psci_cpu_boot(unsigned int cpu);
-diff --git a/lib/arm/psci.c b/lib/arm/psci.c
-index 936c83948b6a..46300f30822c 100644
---- a/lib/arm/psci.c
-+++ b/lib/arm/psci.c
-@@ -11,9 +11,11 @@
- #include <asm/page.h>
- #include <asm/smp.h>
- 
-+psci_invoke_fn psci_invoke;
-+
- __attribute__((noinline))
--int psci_invoke(unsigned long function_id, unsigned long arg0,
--		unsigned long arg1, unsigned long arg2)
-+int psci_invoke_hvc(unsigned long function_id, unsigned long arg0,
-+		    unsigned long arg1, unsigned long arg2)
- {
- 	asm volatile(
- 		"hvc #0"
-@@ -22,6 +24,17 @@ int psci_invoke(unsigned long function_id, unsigned long arg0,
- 	return function_id;
- }
- 
-+__attribute__((noinline))
-+int psci_invoke_smc(unsigned long function_id, unsigned long arg0,
-+		    unsigned long arg1, unsigned long arg2)
-+{
-+	asm volatile(
-+		"smc #0"
-+	: "+r" (function_id)
-+	: "r" (arg0), "r" (arg1), "r" (arg2));
-+	return function_id;
-+}
-+
- int psci_cpu_on(unsigned long cpuid, unsigned long entry_point)
- {
- #ifdef __arm__
-diff --git a/lib/arm/setup.c b/lib/arm/setup.c
-index 5cda2d919d2b..e595a9e5a167 100644
---- a/lib/arm/setup.c
-+++ b/lib/arm/setup.c
-@@ -25,6 +25,7 @@
- #include <asm/processor.h>
- #include <asm/smp.h>
- #include <asm/timer.h>
-+#include <asm/psci.h>
- 
- #include "io.h"
- 
-@@ -55,6 +56,26 @@ int mpidr_to_cpu(uint64_t mpidr)
- 	return -1;
- }
- 
-+static void psci_set_conduit(void)
-+{
-+	const void *fdt = dt_fdt();
-+	const struct fdt_property *method;
-+	int node, len;
-+
-+	node = fdt_node_offset_by_compatible(fdt, -1, "arm,psci-0.2");
-+	assert_msg(node >= 0, "PSCI v0.2 compatibility required");
-+
-+	method = fdt_get_property(fdt, node, "method", &len);
-+	assert(method != NULL && len == 4);
-+
-+	if (strcmp(method->data, "hvc") == 0)
-+		psci_invoke = psci_invoke_hvc;
-+	else if (strcmp(method->data, "smc") == 0)
-+		psci_invoke = psci_invoke_smc;
-+	else
-+		assert_msg(false, "Unknown PSCI conduit: %s", method->data);
-+}
-+
- static void cpu_set(int fdtnode __unused, u64 regval, void *info __unused)
- {
- 	int cpu = nr_cpus++;
-@@ -259,6 +280,7 @@ void setup(const void *fdt, phys_addr_t freemem_start)
- 	mem_regions_add_assumed();
- 	mem_init(PAGE_ALIGN((unsigned long)freemem));
- 
-+	psci_set_conduit();
- 	cpu_init();
- 
- 	/* cpu_init must be called before thread_info_init */
+ 	/*
 -- 
-2.26.3
+2.25.1
 
