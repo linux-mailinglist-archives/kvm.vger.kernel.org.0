@@ -2,224 +2,196 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 397ED356D57
-	for <lists+kvm@lfdr.de>; Wed,  7 Apr 2021 15:31:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 021F6356D60
+	for <lists+kvm@lfdr.de>; Wed,  7 Apr 2021 15:35:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245054AbhDGNbq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 7 Apr 2021 09:31:46 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:57852 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233670AbhDGNbo (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 7 Apr 2021 09:31:44 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1617802294;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=vJkU8vXKb0BvHUAPz+V+eKFMW3IPbu7jFAYroR0o//I=;
-        b=OVw8NT8eMl4rnBBcv48FPWN+G4RZOoZyMMAgU2KwCrt2sLnPF2brirOIvXVOZ746wRozWr
-        2hIA3JOEbiOCEw2rccVmpeiRCJfekm/XopjWIvV09GniyK/sR/JYCiUQVENuK6OD28cYbv
-        Is9REIsmgyo72h73ugwKbDTersCybN8=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-7-jBECpXWJPBSHmLVPViWpJw-1; Wed, 07 Apr 2021 09:31:33 -0400
-X-MC-Unique: jBECpXWJPBSHmLVPViWpJw-1
-Received: by mail-wr1-f72.google.com with SMTP id y14so1757543wro.23
-        for <kvm@vger.kernel.org>; Wed, 07 Apr 2021 06:31:31 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=vJkU8vXKb0BvHUAPz+V+eKFMW3IPbu7jFAYroR0o//I=;
-        b=Sn4kTDJHMltMVYf2xFsv7U7sAlWB4syNA+lh6Qimj2eb3O+eyYDAzYl/sJLumlDdhF
-         4A9TTF7Zaq80p4esDsQnxumC6kCbluZ4xl3mkJLPCbIwfUncG2eoDmCc2PdHSljLWFNR
-         812VqyXKu9QE2mnc7E3eBCuRrRxj7klgIAGKFwEeYQp4w2cxBQAw1Axbn0nJMtEmKWiP
-         lCj22wcmbqm8T1NtOb29SYf5nqO+eRaYN9ocmw4/7NVZspdJri5sHjExZRcf5NJEDyI4
-         2ad+4Vp4C2kLeyRrU3uHw9rz43zkcaGKb6PzWBriD/YIjRq9LKw2AUBsw0jHB5o8ItlS
-         EjcQ==
-X-Gm-Message-State: AOAM5312HUmiLyVYI2RQ0hHCZN9qiO71eMj2ZWaXP0jWf42akt2Dcbj0
-        /G4HMuLoOkCnDOxr1QlNS+TsDSywoDzDiDji714Qy6/7T2prQvMtkqND2K2TFHElZtojxicDBTF
-        AC6QcjVQcdhaE
-X-Received: by 2002:adf:fd0b:: with SMTP id e11mr550469wrr.347.1617802290841;
-        Wed, 07 Apr 2021 06:31:30 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzwq628wJtz5+hwuBUC2lqHMaUJJqHRIwbBPct9QaQxXpt5xT0WtUpxxEbEiXll2GkmWiz0Pg==
-X-Received: by 2002:adf:fd0b:: with SMTP id e11mr550429wrr.347.1617802290484;
-        Wed, 07 Apr 2021 06:31:30 -0700 (PDT)
-Received: from ?IPv6:2a01:e0a:466:71c0:99e0:ccd6:fcea:5668? ([2a01:e0a:466:71c0:99e0:ccd6:fcea:5668])
-        by smtp.gmail.com with ESMTPSA id u17sm7339826wmq.3.2021.04.07.06.31.29
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 07 Apr 2021 06:31:30 -0700 (PDT)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 14.0 \(3654.60.0.2.21\))
-Subject: Re: [RFCv1 7/7] KVM: unmap guest memory using poisoned pages
-From:   Christophe de Dinechin <cdupontd@redhat.com>
-In-Reply-To: <20210407131647.djajbwhqsmlafsyo@box.shutemov.name>
-Date:   Wed, 7 Apr 2021 15:31:28 +0200
-Cc:     David Hildenbrand <david@redhat.com>,
+        id S1344467AbhDGNfW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 7 Apr 2021 09:35:22 -0400
+Received: from mail-bn7nam10on2085.outbound.protection.outlook.com ([40.107.92.85]:18209
+        "EHLO NAM10-BN7-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S235738AbhDGNfR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 7 Apr 2021 09:35:17 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=MPNkOcZ+5o7zaKP0q+Jb/+EVjl6wi3KYZtXfIyNI3RG4pkUBCKeIZqOLmtIsJZ6AC5P91inmfGoFMUaWMqUFcwuZBDk86LIoIhCxgvLO5op3u97I/YbovECjLD0Uw5kdGi99IvC0jfiFoGprTWwGEC3Cw6MoelUr8B3P4EXElT9M5qyQLuZ3/WIln5hBN0slAr++qLB46hLENRPZFJh63nC/zyuf17kIlqmdfR2PKeLETDd3aBAWDmngKZ2ZNQHmIw0nM0xybU3VUek8odZBPrFNJ6rpGQflAlg/hNd/4WW3zRnu6jmL8nk2ELjzQYTfQpw7V7ybpJOu1rM1o3BFAA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=bebo47eWZfaIOJ0GGmYFJqJbUizQUTSDTTCO18RBufs=;
+ b=i0LcPeDEBQevXem9Zx16Pcn2L/Zz6ollGhs8lXRXSCfkDPPo/jwYFmtmbY6eNstFlE63rWZT7buBuLK3iYwl9jxQlPh8BVolUoyn3/z6mBSBwhrGL5zPr5EblnXhd0RkzrAvjsPv0iNDr57Ius7hBFWSYXY6eGcVi/RiHTjCM7wxRfwNjMFts16kCSPFLFAF4LEeb9VrIY7mJg4d8dw37mHkWNoCV3G7HiuJUwsvyvWJs+BO3Usqb5OEUlPVuyy8L94NvoXwZCmHB/Iu+Hd4pkD0/2vdXR5+UiS9UWZmSktWYFMe1HzfRAwkaah78pFfCqSi1K6Buuzl94424G/ORA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=bebo47eWZfaIOJ0GGmYFJqJbUizQUTSDTTCO18RBufs=;
+ b=ahTmg9JKh95qdMSq4Womqj2Tbk2SeO3GklyS+wQAUPH8dbsmnGfrzA3qopy5FjJeivIp2PAGP/wbMDroBScbyk4xpuaCuTb5MrsOjEI8JYOwnjy3Zplzm3tf42Aj1N8QrA8d7LZIfRuMHEUiAIITz0dxUYcgvtmal8pqm54IXZI=
+Authentication-Results: google.com; dkim=none (message not signed)
+ header.d=none;google.com; dmarc=none action=none header.from=amd.com;
+Received: from SN6PR12MB2718.namprd12.prod.outlook.com (2603:10b6:805:6f::22)
+ by SA0PR12MB4432.namprd12.prod.outlook.com (2603:10b6:806:98::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3999.26; Wed, 7 Apr
+ 2021 13:35:06 +0000
+Received: from SN6PR12MB2718.namprd12.prod.outlook.com
+ ([fe80::9898:5b48:a062:db94]) by SN6PR12MB2718.namprd12.prod.outlook.com
+ ([fe80::9898:5b48:a062:db94%6]) with mapi id 15.20.4020.017; Wed, 7 Apr 2021
+ 13:35:05 +0000
+Cc:     brijesh.singh@amd.com, linux-kernel@vger.kernel.org,
+        x86@kernel.org, kvm@vger.kernel.org, ak@linux.intel.com,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        "H. Peter Anvin" <hpa@zytor.com>, Tony Luck <tony.luck@intel.com>,
         Dave Hansen <dave.hansen@intel.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Sean Christopherson <seanjc@google.com>,
-        Jim Mattson <jmattson@google.com>,
+        "Peter Zijlstra (Intel)" <peterz@infradead.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
         David Rientjes <rientjes@google.com>,
-        "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>,
-        "Kleen, Andi" <andi.kleen@intel.com>,
-        "Yamahata, Isaku" <isaku.yamahata@intel.com>, x86@kernel.org,
-        kvm@vger.kernel.org, linux-mm@kvack.org,
-        linux-kernel@vger.kernel.org,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <C841A818-7BBE-48B5-8CCB-1F8850CA52AD@redhat.com>
-References: <20210402152645.26680-1-kirill.shutemov@linux.intel.com>
- <20210402152645.26680-8-kirill.shutemov@linux.intel.com>
- <c5f2580d-0733-4523-d1e8-c43b487f0aaf@redhat.com>
- <52518f09-7350-ebe9-7ddb-29095cd3a4d9@intel.com>
- <d94d3042-098a-8df7-9ef6-b869851a4134@redhat.com>
- <20210407131647.djajbwhqsmlafsyo@box.shutemov.name>
-To:     "Kirill A. Shutemov" <kirill@shutemov.name>
-X-Mailer: Apple Mail (2.3654.60.0.2.21)
+        Sean Christopherson <seanjc@google.com>
+Subject: Re: [RFC Part1 PATCH 06/13] x86/compressed: rescinds and validate the
+ memory used for the GHCB
+To:     Borislav Petkov <bp@alien8.de>
+References: <20210324164424.28124-1-brijesh.singh@amd.com>
+ <20210324164424.28124-7-brijesh.singh@amd.com>
+ <20210406103358.GL17806@zn.tnic>
+ <c9f60432-2484-be1e-7b08-86dae5aa263f@amd.com>
+ <20210407111604.GA25319@zn.tnic>
+From:   Brijesh Singh <brijesh.singh@amd.com>
+Message-ID: <9f43f7b2-d9aa-429e-eadd-dc3ea4a34d01@amd.com>
+Date:   Wed, 7 Apr 2021 08:35:02 -0500
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
+ Gecko/20100101 Thunderbird/78.9.0
+In-Reply-To: <20210407111604.GA25319@zn.tnic>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-Originating-IP: [165.204.77.11]
+X-ClientProxiedBy: SA9PR13CA0104.namprd13.prod.outlook.com
+ (2603:10b6:806:24::19) To SN6PR12MB2718.namprd12.prod.outlook.com
+ (2603:10b6:805:6f::22)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from Brijeshs-MacBook-Pro.local (165.204.77.11) by SA9PR13CA0104.namprd13.prod.outlook.com (2603:10b6:806:24::19) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4020.11 via Frontend Transport; Wed, 7 Apr 2021 13:35:04 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 2862c218-d2be-4d96-706c-08d8f9c9f431
+X-MS-TrafficTypeDiagnostic: SA0PR12MB4432:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <SA0PR12MB4432E4713108AFCFE02466BFE5759@SA0PR12MB4432.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:6430;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: Pn70IEoTRcIItMdN7mCkauG4RDu12FIqMk1KTFPqnzIGJgzrgut9jKM0CwuU+WLBL47noxER+qUkck0mTMnJjKOK+EA9mT+AI7wAWpThAFH/MBOAAr1MI3Xg8PEuwAUNWsDtD8CmPeoCCd6q5itLhUC/h/pCQRhRmEu2Irc0zY/QF6Ltb/YvtqAaUECW1yQvNff6AsF+yEN5veYt5OXLkrDlOcFE43EItyrv2Rp8wjrXS+EBwxeZGy2PEQtj70dFCTS0GL4BJLoh3D+tTWzZJJmz7eaBVLyXilUJG9qpqlwr7436o0whVfv3/F7EWXTtz8Ynji3kyyEyowtDt8ndNu6hzeEhJ+D0w9MW9V9HC5ZQFqZXJk72ihjLwkbeq7/Y04yM0pTZqQ637XA7+HlQDZkwEBuL6xwv55goe4NwlM7iuki43Q4FqCRDXOJ8aGvz1aleCF+nEaHgZ5txkD/YpR58Ga+yg5u/1CEBMJLuvFSbEUX7QgfMz50dkBEnuZiGJEHAv1Nd28R1pRSZvc2KVGn2K2EXM3B2PvKc6vJhyUb8+73xRKjuI62FARn69wMxdXBIZgc2EklLProQ1GL4CUYc6DRWv8H5RuWHRUDbaz4TmoSJyq2QeDP+NbTJvThaBWB8HdVSkv9qhyVqlBkaWImedkJmlGz7dT0M9JCJtDR6cjK87sPTMTYCHfzwB8PHkEtvOm8uKvk0uXLpEwoZgseGcNLF85hRGFTJf4lyfCSO/o5X1HbkTYtJyZ6Hbdya
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2718.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(376002)(136003)(366004)(39860400002)(346002)(396003)(66556008)(8936002)(66476007)(31696002)(2616005)(66946007)(7416002)(6506007)(4326008)(86362001)(316002)(956004)(6486002)(5660300002)(83380400001)(478600001)(54906003)(38350700001)(31686004)(6512007)(6916009)(44832011)(2906002)(38100700001)(36756003)(186003)(26005)(16526019)(52116002)(53546011)(8676002)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData: =?utf-8?B?TkRUbTFoeFliQmdlbGpqdHVoS1poSGdVSXU5RjhrYWhPanRJMGdJUmdUWU5r?=
+ =?utf-8?B?cC9PQTgyeFVWdnpYT1NNTHRJR05UdU9FNDdHaVdtQkxqTjNldTVBM1RBOEZs?=
+ =?utf-8?B?RTExNkVnZENKN0FYNlZoM3RWVzVFZ2tiR1loMnpSNmFRTXNuU3hWQlM4WDYw?=
+ =?utf-8?B?eVJ1UlI2dFNobE5LOFRqWWZOMjlBcDZ0OUZ2dXpJeDZJV0Y1NzJJRzJWL2dt?=
+ =?utf-8?B?aWNtdThocHVYdTgyVzVZbElKR2cxWHpBKzBRUFlhZzVpRzE2SkpyOG9UUFht?=
+ =?utf-8?B?V1dRWHVQR3dLbTh0YW0yOGMrMU5MVmtSdGNDZG9HaXFWSER0OWtLa2Q4Rm9t?=
+ =?utf-8?B?UjR5UytkUHpWaWdCR0d5dkNnQTdxZ0xuczRUNU1XWDdMeTU3bXRvTjlnQU9v?=
+ =?utf-8?B?YWZOM3VJczg0MXFDUlBEeTI0VHdKZGM2OHhCYktraWh4WTljOVV0OTNUZGJX?=
+ =?utf-8?B?bWRVTkh5bVk0VXJMRlljSUcvb0hZTjRmSW9rYUJjeWNRbFZSci9HbW9ldExB?=
+ =?utf-8?B?VkNpZ3hqTHZJOGppNkhadTBMd1lSQW9ZUm14UEJrQncyMS9WbklXbGFXNDJ3?=
+ =?utf-8?B?Z0FnM05HeFhKSDZRb0xBbVRGYzZqNXJSUEp2YzJaS1FEdkNRVkNSQjZUSTUy?=
+ =?utf-8?B?RSsvU3hFVnpocW5jTnp1YmVXL1FhYzNVOHBwMHZjUlBxd1p4ZmpqN2R1SnVG?=
+ =?utf-8?B?a1dsczIzYTZsY2craEJwOEdoTS9zVGRxN3d3TVlLMFpUR1dXRDhWV0ltcUZo?=
+ =?utf-8?B?enRvbmNzUm8wN0xWWnhiQStWM1g1NFhSOFM5VG5WNjRYdXVjWEtreVVMNTFZ?=
+ =?utf-8?B?U0FOUWhqOHNYaEFYRHJ1MlVacE0xMi9LZmFhNjNzNFRPU00zMEoxNm9neGll?=
+ =?utf-8?B?eEUvNmE5ZDVRTjVBUFpkV3ZuRnJIRTR4SHFyWFhEQXJLN1h2Sm5TQ1o5U29C?=
+ =?utf-8?B?eUI0WWtmR1JEV1FFUnpGbG5KWVVSQXZxZGZ3cE1VQUxoWC8zV3czaVpKYXlX?=
+ =?utf-8?B?eFJYOWpUNElTbGkwamNRUTdLYmZZWm5pa3JrYnZGYTBkd0RNNS9RVCtLYWsw?=
+ =?utf-8?B?bCtxN05JSG5scWtHd1VQVkhidmFxOFg2b09LcVVINTZwcFFINVhTTUZmWi9C?=
+ =?utf-8?B?NjdXMU5reGhjMDMzWGdkRmMwdGV3Z1JGOURKYlkybkZOUlljb3c0ZnlxVlpa?=
+ =?utf-8?B?NktPVmRUdEliQnJwQVF3eGxob1J4bk5nZmJtR3VJQ3VlYUJrbTU2aVlXQjBj?=
+ =?utf-8?B?SUZiVnNkSkhsNkRFckxIa3F5Ymg5bDc0QU9ISHFYSFdqQmdiRStmRXFFY0Vv?=
+ =?utf-8?B?Rjd0TnlaSGJZVytSVVEvV0VEd2FmVkxyd2I4eFhIdnZxTGdVaisvcmVla3Nl?=
+ =?utf-8?B?RHcydEpTS1BKbEloTjFEY29WaDNBNU5wWHFOajR1SUdwejBCSlNPYmhiWUFx?=
+ =?utf-8?B?NExGYndIREhvQlFTcHlaamh6MGlVYlFtemtJNENtR2FnQVVxTUlJTzArcmNY?=
+ =?utf-8?B?TENJMkZ2MjZqcHJ2WGxXZUpMQjNVV0xQN3kvQTRMN01WU2Q5UGJZOExnNUFT?=
+ =?utf-8?B?emtWR2xCd3ZZM1kvbmloN1V3MWZEdEZUakVTVm43R2V5NzdBOVJKTmhxcGR6?=
+ =?utf-8?B?NGNnNDFDYklEQTFTWnBocWtGeEhSZS9BeG96ZWxNSUIreUhVWGN6WWcvUHJq?=
+ =?utf-8?B?c0h4WWUvcUtKVkhoSUY4V3ltc1FZVUMzSmxuYURyUTdVZjZYQktuWVIwUGhC?=
+ =?utf-8?Q?GEzMIAlAyhKw0Q82CSP5xpvtd8wdnukmugsEW1S?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2862c218-d2be-4d96-706c-08d8f9c9f431
+X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2718.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Apr 2021 13:35:05.7216
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: BOrYSiKjVrpruTE42g/pw5l8WTc3Dy7Srs20BOi1q4UX+Kpp96O8qlmIGXd/LE80FlMd99/B8DacZ08KOFQArQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR12MB4432
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
+On 4/7/21 6:16 AM, Borislav Petkov wrote:
+> On Tue, Apr 06, 2021 at 10:47:18AM -0500, Brijesh Singh wrote:
+>> Before the GHCB is established the caller does not need to save and
+>> restore MSRs. The page_state_change() uses the GHCB MSR protocol and it
+>> can be called before and after the GHCB is established hence I am saving
+>> and restoring GHCB MSRs.
+> I think you need to elaborate on that, maybe with an example. What the
+> other sites using the GHCB MSR currently do is:
+>
+> 1. request by writing it
+> 2. read the response
+>
+> None of them save and restore it.
+>
+> So why here?
 
-> On 7 Apr 2021, at 15:16, Kirill A. Shutemov <kirill@shutemov.name> =
-wrote:
->=20
-> On Tue, Apr 06, 2021 at 04:57:46PM +0200, David Hildenbrand wrote:
->> On 06.04.21 16:33, Dave Hansen wrote:
->>> On 4/6/21 12:44 AM, David Hildenbrand wrote:
->>>> On 02.04.21 17:26, Kirill A. Shutemov wrote:
->>>>> TDX architecture aims to provide resiliency against =
-confidentiality and
->>>>> integrity attacks. Towards this goal, the TDX architecture helps =
-enforce
->>>>> the enabling of memory integrity for all TD-private memory.
->>>>>=20
->>>>> The CPU memory controller computes the integrity check value (MAC) =
-for
->>>>> the data (cache line) during writes, and it stores the MAC with =
-the
->>>>> memory as meta-data. A 28-bit MAC is stored in the ECC bits.
->>>>>=20
->>>>> Checking of memory integrity is performed during memory reads. If
->>>>> integrity check fails, CPU poisones cache line.
->>>>>=20
->>>>> On a subsequent consumption (read) of the poisoned data by =
-software,
->>>>> there are two possible scenarios:
->>>>>=20
->>>>>   - Core determines that the execution can continue and it treats
->>>>>     poison with exception semantics signaled as a #MCE
->>>>>=20
->>>>>   - Core determines execution cannot continue,and it does an =
-unbreakable
->>>>>     shutdown
->>>>>=20
->>>>> For more details, see Chapter 14 of Intel TDX Module EAS[1]
->>>>>=20
->>>>> As some of integrity check failures may lead to system shutdown =
-host
->>>>> kernel must not allow any writes to TD-private memory. This =
-requirment
->>>>> clashes with KVM design: KVM expects the guest memory to be mapped =
-into
->>>>> host userspace (e.g. QEMU).
->>>>=20
->>>> So what you are saying is that if QEMU would write to such memory, =
-it
->>>> could crash the kernel? What a broken design.
->>>=20
->>> IMNHO, the broken design is mapping the memory to userspace in the =
-first
->>> place.  Why the heck would you actually expose something with the =
-MMU to
->>> a context that can't possibly meaningfully access or safely write to =
-it?
->>=20
->> I'd say the broken design is being able to crash the machine via a =
-simple
->> memory write, instead of only crashing a single process in case =
-you're doing
->> something nasty. =46rom the evaluation of the problem it feels like =
-this was a
->> CPU design workaround: instead of properly cleaning up when it gets =
-tricky
->> within the core, just crash the machine. And that's a CPU "feature", =
-not a
->> kernel "feature". Now we have to fix broken HW in the kernel - once =
-again.
->>=20
->> However, you raise a valid point: it does not make too much sense to =
-to map
->> this into user space. Not arguing against that; but crashing the =
-machine is
->> just plain ugly.
->>=20
->> I wonder: why do we even *want* a VMA/mmap describing that memory? =
-Sounds
->> like: for hacking support for that memory type into QEMU/KVM.
->>=20
->> This all feels wrong, but I cannot really tell how it could be =
-better. That
->> memory can really only be used (right now?) with hardware =
-virtualization
->> from some point on. =46rom that point on (right from the start?), =
-there should
->> be no VMA/mmap/page tables for user space anymore.
->>=20
->> Or am I missing something? Is there still valid user space access?
->=20
-> There is. For IO (e.g. virtio) the guest mark a range of memory as =
-shared
-> (or unencrypted for AMD SEV). The range is not pre-defined.
->=20
->>> This started with SEV.  QEMU creates normal memory mappings with the =
-SEV
->>> C-bit (encryption) disabled.  The kernel plumbs those into NPT, but =
-when
->>> those are instantiated, they have the C-bit set.  So, we have =
-mismatched
->>> mappings.  Where does that lead?  The two mappings not only differ =
-in
->>> the encryption bit, causing one side to read gibberish if the other
->>> writes: they're not even cache coherent.
->>>=20
->>> That's the situation *TODAY*, even ignoring TDX.
->>>=20
->>> BTW, I'm pretty sure I know the answer to the "why would you expose =
-this
->>> to userspace" question: it's what QEMU/KVM did alreadhy for
->>> non-encrypted memory, so this was the quickest way to get SEV =
-working.
->>>=20
->>=20
->> Yes, I guess so. It was the fastest way to "hack" it into QEMU.
->>=20
->> Would we ever even want a VMA/mmap/process page tables for that =
-memory? How
->> could user space ever do something *not so nasty* with that memory =
-(in the
->> current context of VMs)?
->=20
-> In the future, the memory should be still managable by host MM: =
-migration,
-> swapping, etc. But it's long way there. For now, the guest memory
-> effectively pinned on the host.
+GHCB provides two ways to exit from the guest to the hypervisor. The MSR
+protocol and NAEs. The MSR protocol is generally used before the GHCB is
+established. After the GHCB is established the guests typically uses the
+NAEs. All of the current call sites uses the MSR protocol before the
+GHCB is established so they do not need to save and restore the GHCB.
+The GHCB is established on the first #VC -
+arch/x86/boot/compressed/sev-es.c early_setup_sev_es(). The GHCB page
+must a shared page:
 
-Is there even a theoretical way to restore an encrypted page e.g. from =
-(host)
-swap without breaking the integrity check? Or will that only be possible =
-with
-assistance from within the encrypted enclave?
+early_setup_sev_es()
 
+  set_page_decrypted()
 
->=20
-> --=20
-> Kirill A. Shutemov
->=20
+   sev_snp_set_page_shared()
+
+The sev_snp_set_page_shared() called before the GHCB is established.
+While exiting from the decompression the sev_es_shutdown_ghcb() is
+called to deinit the GHCB.
+
+sev_es_shutdown_ghcb()
+
+  set_page_encrypted()
+
+    sev_snp_set_page_private()
+
+Now that sev_snp_set_private() is called after the GHCB is established.
+
+Since both the sev_snp_set_page_{shared, private}() uses the common
+routine to request the page change hence I choose the Page State Change
+MSR protocol. In one case the page state request happen before and after
+the GHCB is established. We need to save and restore GHCB otherwise will
+be loose the previously established GHCB GPA.
+
+If needed then we can avoid the save and restore. The GHCB  provides a
+page state change NAE that can be used after the GHCB is established. If
+we go with it then code may look like this:
+
+1. Read the GHCB MSR to determine whether the GHCB is established.
+
+2. If GHCB is established then use the page state change NAE
+
+3. If GHCB is not established then use the page state change MSR protocol.
+
+We can eliminate the restore but we still need the rdmsr. The code for
+using the NAE page state is going to be a bit larger. Since it is not in
+the hot path so I felt we stick with MSR protocol for the page state change.
+
+I am open to suggestions. 
+
+-Brijesh
 
