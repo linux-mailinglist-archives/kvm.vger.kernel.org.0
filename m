@@ -2,101 +2,78 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id AF74C3576D3
-	for <lists+kvm@lfdr.de>; Wed,  7 Apr 2021 23:29:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7F43035772F
+	for <lists+kvm@lfdr.de>; Wed,  7 Apr 2021 23:53:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233250AbhDGVaE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 7 Apr 2021 17:30:04 -0400
-Received: from smtp-fw-4101.amazon.com ([72.21.198.25]:18869 "EHLO
-        smtp-fw-4101.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232890AbhDGVaD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 7 Apr 2021 17:30:03 -0400
+        id S232479AbhDGVxK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 7 Apr 2021 17:53:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32878 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229713AbhDGVxH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 7 Apr 2021 17:53:07 -0400
+Received: from mail-pf1-x432.google.com (mail-pf1-x432.google.com [IPv6:2607:f8b0:4864:20::432])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C8E35C061761
+        for <kvm@vger.kernel.org>; Wed,  7 Apr 2021 14:52:55 -0700 (PDT)
+Received: by mail-pf1-x432.google.com with SMTP id x26so346790pfn.0
+        for <kvm@vger.kernel.org>; Wed, 07 Apr 2021 14:52:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.de; i=@amazon.de; q=dns/txt; s=amazon201209;
-  t=1617830994; x=1649366994;
-  h=from:to:cc:subject:date:message-id:mime-version;
-  bh=JJX07rFbUFSCmW7iMNBNJnLHN/ul/VCQMW2GB/8R+9w=;
-  b=XuM5o68lErS/35iEYt03BoBEByEaahVaBHuJa1mkJTjtL7oqtuH4qY75
-   iHu/dvbICz0zXNhP1ddHr25oFnbgtLcCgGPG+q8hNSdhD8CqAcyKizvdw
-   EtNrMXQZ35Xqp6ZkE0YzgelKhIdzmKX9cdTxmNqAbgJBpcmVkHT4Wtduy
-   Y=;
-X-IronPort-AV: E=Sophos;i="5.82,204,1613433600"; 
-   d="scan'208";a="100206498"
-Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO email-inbound-relay-2c-cc689b93.us-west-2.amazon.com) ([10.43.8.2])
-  by smtp-border-fw-out-4101.iad4.amazon.com with ESMTP; 07 Apr 2021 21:29:51 +0000
-Received: from EX13D28EUC003.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan3.pdx.amazon.com [10.236.137.198])
-        by email-inbound-relay-2c-cc689b93.us-west-2.amazon.com (Postfix) with ESMTPS id 18D5C1200AB;
-        Wed,  7 Apr 2021 21:29:50 +0000 (UTC)
-Received: from uc8bbc9586ea454.ant.amazon.com (10.43.162.68) by
- EX13D28EUC003.ant.amazon.com (10.43.164.43) with Microsoft SMTP Server (TLS)
- id 15.0.1497.2; Wed, 7 Apr 2021 21:29:41 +0000
-From:   Siddharth Chandrasekaran <sidcha@amazon.de>
-To:     <kys@microsoft.com>, <haiyangz@microsoft.com>,
-        <sthemmin@microsoft.com>, <wei.liu@kernel.org>,
-        <tglx@linutronix.de>, <mingo@redhat.com>, <bp@alien8.de>,
-        <x86@kernel.org>, <hpa@zytor.com>, <pbonzini@redhat.com>,
-        <seanjc@google.com>, <vkuznets@redhat.com>,
-        <wanpengli@tencent.com>, <jmattson@google.com>, <joro@8bytes.org>
-CC:     <sidcha@amazon.de>, <graf@amazon.com>, <eyakovl@amazon.de>,
-        <linux-hyperv@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <kvm@vger.kernel.org>
-Subject: [PATCH 0/4] Add support for XMM fast hypercalls
-Date:   Wed, 7 Apr 2021 23:29:26 +0200
-Message-ID: <20210407212926.3016-1-sidcha@amazon.de>
-X-Mailer: git-send-email 2.17.1
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=gjI6ZEfbZgwNYw/ZVoTIk/g0t8L7iO2fU8E3vcLBJC0=;
+        b=fykLZS0x3gL8JhSj44N9LDU2kAzBbb6oQChBH6xGwaeHV5umyDspjG8fB+e/gTkRVr
+         ZV1NiXf0npmMX2EVKNTlQyJjEkuea+mLE1TQ0dWElRRdoJD7KPJOP7oGgjvdSHqEzyj0
+         /xUewgbDbijvjbWONXx45iVjBfeutKEx4hgJOLKi+0M8lxrfxn4QN5B6n4Q2VkAQHBqy
+         hplc+bK5zDh71ab2/chnm7J5zEpdl7hWhu0OmmRuM9P327QUmkdypwsCmOAvQu1BrZ+Z
+         KBlFjEFINzk3fGSnP+aXSmLaijWjaWsmn9RYD3y+hsvQlv21itFkVduZKPx++hCStaZe
+         U6/w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=gjI6ZEfbZgwNYw/ZVoTIk/g0t8L7iO2fU8E3vcLBJC0=;
+        b=Bffw/przrZkjFunCAJXkbUjizzrIPt3G8Q8jeAToilYbxO3NB5UhoExvTCm9NPkkHN
+         /jOX+SUy+du93K02bfgUc7YI+i2LIs58PFNCKQ1IQgNZEKOViHnbzOGtHhISY2DegiLI
+         //2BWH2/c0b1MNPqqEWhhQPimCE2DQp4DvB0yWfSsyFAGTuWNDXU7ZJ3dMLjH/5Z/rSd
+         tu5YsT3CU6140vPayH5U6YRusx8nAIaJPwUyeTuPXAxL24wq+k4iugbN97S0J6cr9gwJ
+         iJSilLY7XKdOhH0ZP5ZKErYZF+fL1QvBcHFXp/i6LQ79s7BPuMNT0ORmkxMq6KTKXrm2
+         LiZA==
+X-Gm-Message-State: AOAM533zDlec3Urg/hdtl5cPChyNMYfeCuWCqdJNhbl2NtTUkxoIlUV9
+        1Ih44leOuRnk1dfsuSBbAdPigw==
+X-Google-Smtp-Source: ABdhPJyKsos4AvFJOXIkn+8qiDl1qTc/iuFrUlulvdS1NMsu7qpXf61Pf/ybPApKgjgwigKGwjTZmQ==
+X-Received: by 2002:a63:cf45:: with SMTP id b5mr5055144pgj.372.1617832375043;
+        Wed, 07 Apr 2021 14:52:55 -0700 (PDT)
+Received: from google.com (240.111.247.35.bc.googleusercontent.com. [35.247.111.240])
+        by smtp.gmail.com with ESMTPSA id h7sm22679984pfo.45.2021.04.07.14.52.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 07 Apr 2021 14:52:54 -0700 (PDT)
+Date:   Wed, 7 Apr 2021 21:52:50 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Kai Huang <kai.huang@intel.com>
+Cc:     kvm@vger.kernel.org, linux-sgx@vger.kernel.org,
+        pbonzini@redhat.com, bp@alien8.de, jarkko@kernel.org,
+        dave.hansen@intel.com, luto@kernel.org, rick.p.edgecombe@intel.com,
+        haitao.huang@intel.com
+Subject: Re: [PATCH v4 07/11] KVM: VMX: Add SGX ENCLS[ECREATE] handler to
+ enforce CPUID restrictions
+Message-ID: <YG4pslLOybyOIDTC@google.com>
+References: <cover.1617825858.git.kai.huang@intel.com>
+ <963a2416333290e23773260d824a9e038aed5a53.1617825858.git.kai.huang@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.43.162.68]
-X-ClientProxiedBy: EX13D01UWA003.ant.amazon.com (10.43.160.107) To
- EX13D28EUC003.ant.amazon.com (10.43.164.43)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <963a2416333290e23773260d824a9e038aed5a53.1617825858.git.kai.huang@intel.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hyper-V supports the use of XMM registers to perform fast hypercalls.
-This allows guests to take advantage of the improved performance of the
-fast hypercall interface even though a hypercall may require more than
-(the current maximum of) two general purpose registers.
+On Thu, Apr 08, 2021, Kai Huang wrote:
+> +	/*
+> +	 * Copy contents into kernel memory to prevent TOCTOU attack. E.g. the
+> +	 * guest could do ECREATE w/ SECS.SGX_ATTR_PROVISIONKEY=0, and
+> +	 * simultaneously set SGX_ATTR_PROVISIONKEY to bypass the check to
+> +	 * enforce restriction of access to the PROVISIONKEY.
+> +	 */
+> +	contents = (struct sgx_secs *)__get_free_page(GFP_KERNEL);
 
-The XMM fast hypercall interface uses an additional six XMM registers
-(XMM0 to XMM5) to allow the caller to pass an input parameter block of
-up to 112 bytes. Hyper-V can also return data back to the guest in the
-remaining XMM registers that are not used by the current hypercall.
-
-Although the Hyper-v TLFS mentions that a guest cannot use this feature
-unless the hypervisor advertises support for it, some hypercalls which
-we plan on upstreaming in future uses them anyway. This patchset adds
-necessary infrastructure for handling input/output via XMM registers and
-patches kvm_hv_flush_tlb() to use xmm input arguments.
-
-~ Sid.
-
-Siddharth Chandrasekaran (4):
-  KVM: x86: Move FPU register accessors into fpu.h
-  KVM: hyper-v: Collect hypercall params into struct
-  KVM: x86: kvm_hv_flush_tlb use inputs from XMM registers
-  KVM: hyper-v: Advertise support for fast XMM hypercalls
-
- arch/x86/include/asm/hyperv-tlfs.h |   4 +-
- arch/x86/kvm/emulate.c             | 138 +++--------------
- arch/x86/kvm/fpu.h                 | 140 +++++++++++++++++
- arch/x86/kvm/hyperv.c              | 241 +++++++++++++++++++----------
- 4 files changed, 322 insertions(+), 201 deletions(-)
- create mode 100644 arch/x86/kvm/fpu.h
-
--- 
-2.17.1
-
-
-
-
-Amazon Development Center Germany GmbH
-Krausenstr. 38
-10117 Berlin
-Geschaeftsfuehrung: Christian Schlaeger, Jonathan Weiss
-Eingetragen am Amtsgericht Charlottenburg unter HRB 149173 B
-Sitz: Berlin
-Ust-ID: DE 289 237 879
-
-
-
+This should use GFP_KERNEL_ACCOUNT.
