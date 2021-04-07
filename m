@@ -2,123 +2,128 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 17D02357560
-	for <lists+kvm@lfdr.de>; Wed,  7 Apr 2021 22:03:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 001E735758A
+	for <lists+kvm@lfdr.de>; Wed,  7 Apr 2021 22:08:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1355856AbhDGUDY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 7 Apr 2021 16:03:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36894 "EHLO
+        id S1345454AbhDGUJA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 7 Apr 2021 16:09:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38164 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1355841AbhDGUDX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 7 Apr 2021 16:03:23 -0400
-Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B356C061760
-        for <kvm@vger.kernel.org>; Wed,  7 Apr 2021 13:03:13 -0700 (PDT)
-Received: by mail-pl1-x62d.google.com with SMTP id d8so9894914plh.11
-        for <kvm@vger.kernel.org>; Wed, 07 Apr 2021 13:03:13 -0700 (PDT)
+        with ESMTP id S233523AbhDGUI7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 7 Apr 2021 16:08:59 -0400
+Received: from mail-pg1-x52d.google.com (mail-pg1-x52d.google.com [IPv6:2607:f8b0:4864:20::52d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2E304C06175F
+        for <kvm@vger.kernel.org>; Wed,  7 Apr 2021 13:08:48 -0700 (PDT)
+Received: by mail-pg1-x52d.google.com with SMTP id b17so10231823pgh.7
+        for <kvm@vger.kernel.org>; Wed, 07 Apr 2021 13:08:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=B41V4oqYaXi3FydWXE4zvPEfZIelBL661YH0Myuz09E=;
-        b=boEMul6rkTXaZYoyXAY/38c3XvmUdzsNOME7Pzj2W5uWd10bc3FDMud+mt3Bb2ksCA
-         zKBFXnRwWhQ5qDx5U/o/bk0hoSgZD/0GcDJWk6wdAWYnlFbN62lq5K5cpr2jtosbvqYr
-         RSdnkQk5IUS2uLTlmrS1PrUGcsuqpH+HT2guha3qC72E8eDdUUhwywIxtcFxlvCES8Ix
-         zgKPqaOo+4e4mNerI5oTd3u2xcbm9fqH4vkjDcgpkhqLRiijXFLgTzkZyG7PZ+8hV8hZ
-         Cg3CiM14sQ2PvhmX4r8NcZURs1bjpXLoB31KEdAIaYSJuBAgnbxDIOpRokXX3LavT8Wx
-         /Ubw==
+        bh=xtWZ787MlQUKg7hTVZQgduf2IbH/MKv8i1FMG/FmukA=;
+        b=nRDuuvK2QA1vyj5nKYztc+o90COIxHA0LRuaVf7jhCaPWPWFP9AmCwZevhPJ1rz/Tu
+         zuGn2HQM66SIpnq1XPELoBB7iulqG3lzHzHL6Ge2VZvHTOazhKiqSYjm1O0EQw6X0L9z
+         yfxLfv7eChkGaBsKnuF0j6wMwrgiFYsy1BBa4ue2UgvQgM3/4xkKUuWP1E9MGSDaFzLA
+         s6ykEhkHb2B0VXsmFMRr4eD/D3X9Q/JiyeOJVqRNsYyVNM8gxg34MUmHyMXb8Gk4LniA
+         mKZuXTGs5Kn9J8kl1vuIeJw/SDcTwhu+v7pjtT3sJYQ4J6790ZTokOb3YNqbMRn2jBIk
+         uQXw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=B41V4oqYaXi3FydWXE4zvPEfZIelBL661YH0Myuz09E=;
-        b=hunZFxUz80iPWqog3/A20LaZ0eO4JECImVT9P4TRhX/lHYUpHqVDJl0h2mYZD6wpTc
-         nEgIhXWm9dUfbl/QkSPPS/D8ikgofYslcRgK3638iiwDcIbyvGKVix6pIQJc3RKvkx33
-         47oAzxYRovyi/d3HuD4OzEalg9GGi+Fe4H/rJ/YtpVQRkuiWZyo18+oOYLqRAVvpu3Xz
-         0Ixq7SyVaMFCV50ZhNoDX8uJXwPHxfy4r6p98qQxYNr18DV0NugNAHz575NogQ0cQ4vz
-         0JXnUgqkXXFlzXC8T9E4BKr2qkxIgNb/fRtFuGs6ocdWK0N/FeiZ1Jc2Tfgg7SPdROO/
-         /bFg==
-X-Gm-Message-State: AOAM533bUc3QJ4XBP9p8jdUBZ0Xz9AI3zB8eFF52GOSDgvt+fNkl/g3m
-        5C571C8wn0N7MpVnKHqGPO3iAg==
-X-Google-Smtp-Source: ABdhPJxCyQUB6B2HBH0gDU3LGzEyNg31SjFIXXSlM53qGjpJxYdf1nDQly8G1HFpKGscZcFsr8siig==
-X-Received: by 2002:a17:90a:cb0a:: with SMTP id z10mr5047517pjt.20.1617825792766;
-        Wed, 07 Apr 2021 13:03:12 -0700 (PDT)
+        bh=xtWZ787MlQUKg7hTVZQgduf2IbH/MKv8i1FMG/FmukA=;
+        b=tAgU62g7RheJfayxoAgUhwjKDSPPXZGppUfQW7Z+29zMbsNiOjijdnm7tMp1Fou8vF
+         bvUZqr8sGKXH8me1InZFnGPrKEHkVUaL8VQLpmIXee8aSl39B16k+KH6l3PFXeIQpoUq
+         Uyoe2k/ZDQvvD/vIHWtGGkVXJEQIWLEWgM+wjQsLipVR5hm6TJF6frs9zmM2RnGqPgjT
+         OSEJeK7owJtuK8E3pYayxs/DnNuJ65xxxevfrm2QJfErb/ENuJV6BfPzmtHC6xehdLKD
+         5yn4srEvc9NdRwAwgh53katapQR9VlckzmQ4NN7iD+KvsQHox7JtcC5Rzqa5XM3yuHnq
+         PKOw==
+X-Gm-Message-State: AOAM531y/7xh+fbydTKUe9jZoDSdMIPOq5G02Twav+y8hDLo4ugqbXkV
+        cFGOelRpfMaxGOa2CfGHuR6BWw==
+X-Google-Smtp-Source: ABdhPJwzxgxZWHir+VWtQJP7Vc2wxRavfml6YgqrNIQWgfmqwAsYI0FbVgPBeP2bUadn7+cimqxGxQ==
+X-Received: by 2002:aa7:9e43:0:b029:1f3:a2b3:d9fd with SMTP id z3-20020aa79e430000b02901f3a2b3d9fdmr4445146pfq.74.1617826127566;
+        Wed, 07 Apr 2021 13:08:47 -0700 (PDT)
 Received: from google.com (240.111.247.35.bc.googleusercontent.com. [35.247.111.240])
-        by smtp.gmail.com with ESMTPSA id u17sm5786219pfm.113.2021.04.07.13.03.11
+        by smtp.gmail.com with ESMTPSA id b126sm22346155pga.91.2021.04.07.13.08.46
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 07 Apr 2021 13:03:12 -0700 (PDT)
-Date:   Wed, 7 Apr 2021 20:03:08 +0000
+        Wed, 07 Apr 2021 13:08:46 -0700 (PDT)
+Date:   Wed, 7 Apr 2021 20:08:42 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     Ramakrishna Saripalli <rsaripal@amd.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
+To:     Tom Lendacky <thomas.lendacky@amd.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
         Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Borislav Petkov <bp@alien8.de>, Ingo Molnar <mingo@redhat.com>,
         Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 1/1] x86/kvm/svm: Implement support for PSFD
-Message-ID: <YG4P/EdPN4qGpYUq@google.com>
-References: <20210407194512.6922-1-rsaripal@amd.com>
+        Brijesh Singh <brijesh.singh@amd.com>
+Subject: Re: [PATCH] KVM: SVM: Make sure GHCB is mapped before updating
+Message-ID: <YG4RSl88TSPccRfj@google.com>
+References: <03b349cb19b360d4c2bbeebdd171f99298082d28.1617820214.git.thomas.lendacky@amd.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210407194512.6922-1-rsaripal@amd.com>
+In-Reply-To: <03b349cb19b360d4c2bbeebdd171f99298082d28.1617820214.git.thomas.lendacky@amd.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Apr 07, 2021, Ramakrishna Saripalli wrote:
-> From: Ramakrishna Saripalli <rk.saripalli@amd.com>
+On Wed, Apr 07, 2021, Tom Lendacky wrote:
+> From: Tom Lendacky <thomas.lendacky@amd.com>
 > 
-> Expose Predictive Store Forwarding capability to guests.
+> The sev_vcpu_deliver_sipi_vector() routine will update the GHCB to inform
+> the caller of the AP Reset Hold NAE event that a SIPI has been delivered.
+> However, if a SIPI is performed without a corresponding AP Reset Hold,
+> then the GHCB may not be mapped, which will result in a NULL pointer
+> dereference.
+> 
+> Check that the GHCB is mapped before attempting the update.
 
-Technically KVM is advertising the capability to userspace, e.g. userspace can
-expose the feature to the guest without this patch.
+It's tempting to say the ghcb_set_*() helpers should guard against this, but
+that would add a lot of pollution and the vast majority of uses are very clearly
+in the vmgexit path.  svm_complete_emulated_msr() is the only other case that
+is non-obvious; would it make sense to sanity check svm->ghcb there as well?
 
-> Guests enable or disable PSF via SPEC_CTRL MSR.
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index 019ac836dcd0..abe9c765628f 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -2728,7 +2728,8 @@ static int svm_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+ static int svm_complete_emulated_msr(struct kvm_vcpu *vcpu, int err)
+ {
+        struct vcpu_svm *svm = to_svm(vcpu);
+-       if (!sev_es_guest(vcpu->kvm) || !err)
++
++       if (!err || !sev_es_guest(vcpu->kvm) || !WARN_ON_ONCE(svm->ghcb))
+                return kvm_complete_insn_gp(vcpu, err);
 
-At a (very) quick glance, this requires extra enabling in guest_has_spec_ctrl_msr(),
-otherwise a vCPU with PSF but not the existing features will not be able to set
-MSR_IA32_SPEC_CTRL.PSFD.
+        ghcb_set_sw_exit_info_1(svm->ghcb, 1);
 
-That raises a question: should KVM do extra checks for PSFD on top of the "throw
-noodles at the wall and see what sticks" approach of kvm_spec_ctrl_test_value()?
-The noodle approach is there to handle the mess of cross-vendor features/bits,
-but that doesn't seem to apply to PSFD.
+> Fixes: 647daca25d24 ("KVM: SVM: Add support for booting APs in an SEV-ES guest")
+> Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
 
-> Signed-off-by: Ramakrishna Saripalli <rk.saripalli@amd.com>
+Either way:
+
+Reviewed-by: Sean Christopherson <seanjc@google.com> 
+
 > ---
->  arch/x86/kvm/cpuid.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
+>  arch/x86/kvm/svm/sev.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
 > 
-> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-> index 6bd2f8b830e4..9c4af0fef6d7 100644
-> --- a/arch/x86/kvm/cpuid.c
-> +++ b/arch/x86/kvm/cpuid.c
-> @@ -448,6 +448,8 @@ void kvm_set_cpu_caps(void)
->  		kvm_cpu_cap_set(X86_FEATURE_INTEL_STIBP);
->  	if (boot_cpu_has(X86_FEATURE_AMD_SSBD))
->  		kvm_cpu_cap_set(X86_FEATURE_SPEC_CTRL_SSBD);
-> +	if (boot_cpu_has(X86_FEATURE_AMD_PSFD))
-> +		kvm_cpu_cap_set(X86_FEATURE_AMD_PSFD);
-
-This is unnecessary, it's handled by the F(AMD_PSFD).  The above features have
-special handling to enumerate their Intel equivalent.
-
->  	kvm_cpu_cap_mask(CPUID_7_1_EAX,
->  		F(AVX_VNNI) | F(AVX512_BF16)
-> @@ -482,7 +484,7 @@ void kvm_set_cpu_caps(void)
->  	kvm_cpu_cap_mask(CPUID_8000_0008_EBX,
->  		F(CLZERO) | F(XSAVEERPTR) |
->  		F(WBNOINVD) | F(AMD_IBPB) | F(AMD_IBRS) | F(AMD_SSBD) | F(VIRT_SSBD) |
-> -		F(AMD_SSB_NO) | F(AMD_STIBP) | F(AMD_STIBP_ALWAYS_ON)
-> +		F(AMD_SSB_NO) | F(AMD_STIBP) | F(AMD_STIBP_ALWAYS_ON) | F(AMD_PSFD)
->  	);
->  
->  	/*
+> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+> index 83e00e524513..13758e3b106d 100644
+> --- a/arch/x86/kvm/svm/sev.c
+> +++ b/arch/x86/kvm/svm/sev.c
+> @@ -2105,5 +2105,6 @@ void sev_vcpu_deliver_sipi_vector(struct kvm_vcpu *vcpu, u8 vector)
+>  	 * the guest will set the CS and RIP. Set SW_EXIT_INFO_2 to a
+>  	 * non-zero value.
+>  	 */
+> -	ghcb_set_sw_exit_info_2(svm->ghcb, 1);
+> +	if (svm->ghcb)
+> +		ghcb_set_sw_exit_info_2(svm->ghcb, 1);
+>  }
 > -- 
-> 2.25.1
+> 2.31.0
 > 
