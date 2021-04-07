@@ -2,37 +2,37 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 55238357649
-	for <lists+kvm@lfdr.de>; Wed,  7 Apr 2021 22:50:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4C6CC35764A
+	for <lists+kvm@lfdr.de>; Wed,  7 Apr 2021 22:50:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231283AbhDGUuX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        id S231300AbhDGUuX (ORCPT <rfc822;lists+kvm@lfdr.de>);
         Wed, 7 Apr 2021 16:50:23 -0400
 Received: from mga05.intel.com ([192.55.52.43]:47225 "EHLO mga05.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229586AbhDGUuW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        id S231263AbhDGUuW (ORCPT <rfc822;kvm@vger.kernel.org>);
         Wed, 7 Apr 2021 16:50:22 -0400
-IronPort-SDR: xZA06MqwyggAm8PsvR9yRjvfJyzwEM1ATDt50CTBRFYaF3R+uFGobcaXQrpR9KT8mviRKJVlMl
- 0gIbea6J0bCQ==
-X-IronPort-AV: E=McAfee;i="6000,8403,9947"; a="278660316"
+IronPort-SDR: uZ/X1RdOg/RExx/tth1haYunxcI3x8aLqwJGTBVq+DnG7hTkfe8gXlJ6CkFaVGiIFEFI3/uR8h
+ G9IOPYUnmhlA==
+X-IronPort-AV: E=McAfee;i="6000,8403,9947"; a="278660329"
 X-IronPort-AV: E=Sophos;i="5.82,204,1613462400"; 
-   d="scan'208";a="278660316"
+   d="scan'208";a="278660329"
 Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Apr 2021 13:50:05 -0700
-IronPort-SDR: tST8uTSrSo1cfrvapEv3ufbD0nrMqPAcYcbWxfyJvTW/RU3Gv/i0vlSZ6f46B9TWQICQMZe2Uv
- qityWXXQhqpg==
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Apr 2021 13:50:09 -0700
+IronPort-SDR: JL7khjHskQD1vwjYW+f0EZ8Sq46VG6eNK8k4SUttVoXD2kTHb0zrhqd+cl9YIeykNWyXYovWjS
+ He+Q9knYj+JQ==
 X-IronPort-AV: E=Sophos;i="5.82,204,1613462400"; 
-   d="scan'208";a="415437364"
+   d="scan'208";a="415437384"
 Received: from tkokeray-mobl.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.254.113.100])
-  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Apr 2021 13:50:03 -0700
+  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Apr 2021 13:50:06 -0700
 From:   Kai Huang <kai.huang@intel.com>
 To:     kvm@vger.kernel.org, linux-sgx@vger.kernel.org
 Cc:     seanjc@google.com, pbonzini@redhat.com, bp@alien8.de,
         jarkko@kernel.org, dave.hansen@intel.com, luto@kernel.org,
         rick.p.edgecombe@intel.com, haitao.huang@intel.com,
         Kai Huang <kai.huang@intel.com>
-Subject: [PATCH v4 02/11] KVM: x86: Define new #PF SGX error code bit
-Date:   Thu,  8 Apr 2021 08:49:26 +1200
-Message-Id: <c18902d846ef22bb95cf75a2da87a65a02b4aea3.1617825858.git.kai.huang@intel.com>
+Subject: [PATCH v4 03/11] KVM: x86: Add support for reverse CPUID lookup of scattered features
+Date:   Thu,  8 Apr 2021 08:49:27 +1200
+Message-Id: <1b58bae463398c7f24d9e0a55c1af7cbf304366d.1617825858.git.kai.huang@intel.com>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <cover.1617825858.git.kai.huang@intel.com>
 References: <cover.1617825858.git.kai.huang@intel.com>
@@ -42,41 +42,204 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Sean Christopherson <sean.j.christopherson@intel.com>
+From: Sean Christopherson <seanjc@google.com>
 
-Page faults that are signaled by the SGX Enclave Page Cache Map (EPCM),
-as opposed to the traditional IA32/EPT page tables, set an SGX bit in
-the error code to indicate that the #PF was induced by SGX.  KVM will
-need to emulate this behavior as part of its trap-and-execute scheme for
-virtualizing SGX Launch Control, e.g. to inject SGX-induced #PFs if
-EINIT faults in the host, and to support live migration.
+Introduce a scheme that allows KVM's CPUID magic to support features
+that are scattered in the kernel's feature words.  To advertise and/or
+query guest support for CPUID-based features, KVM requires the bit
+number of an X86_FEATURE_* to match the bit number in its associated
+CPUID entry.  For scattered features, this does not hold true.
 
-Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+Add a framework to allow defining KVM-only words, stored in
+kvm_cpu_caps after the shared kernel caps, that can be used to gather
+the scattered feature bits by translating X86_FEATURE_* flags into their
+KVM-defined feature.
+
+Note, because reverse_cpuid_check() effectively forces kvm_cpu_caps
+lookups to be resolved at compile time, there is no runtime cost for
+translating from kernel-defined to kvm-defined features.
+
+More details here:  https://lkml.kernel.org/r/X/jxCOLG+HUO4QlZ@google.com
+
+Signed-off-by: Sean Christopherson <seanjc@google.com>
 Signed-off-by: Kai Huang <kai.huang@intel.com>
 ---
- arch/x86/include/asm/kvm_host.h | 2 ++
- 1 file changed, 2 insertions(+)
+ arch/x86/kvm/cpuid.c | 32 +++++++++++++++++++++++++++-----
+ arch/x86/kvm/cpuid.h | 39 ++++++++++++++++++++++++++++++++++-----
+ 2 files changed, 61 insertions(+), 10 deletions(-)
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 9bc091ecaaeb..8b1c13056768 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -227,6 +227,7 @@ enum x86_intercept_stage;
- #define PFERR_RSVD_BIT 3
- #define PFERR_FETCH_BIT 4
- #define PFERR_PK_BIT 5
-+#define PFERR_SGX_BIT 15
- #define PFERR_GUEST_FINAL_BIT 32
- #define PFERR_GUEST_PAGE_BIT 33
+diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+index 6bd2f8b830e4..a0e7be9ed449 100644
+--- a/arch/x86/kvm/cpuid.c
++++ b/arch/x86/kvm/cpuid.c
+@@ -28,7 +28,7 @@
+  * Unlike "struct cpuinfo_x86.x86_capability", kvm_cpu_caps doesn't need to be
+  * aligned to sizeof(unsigned long) because it's not accessed via bitops.
+  */
+-u32 kvm_cpu_caps[NCAPINTS] __read_mostly;
++u32 kvm_cpu_caps[NR_KVM_CPU_CAPS] __read_mostly;
+ EXPORT_SYMBOL_GPL(kvm_cpu_caps);
  
-@@ -236,6 +237,7 @@ enum x86_intercept_stage;
- #define PFERR_RSVD_MASK (1U << PFERR_RSVD_BIT)
- #define PFERR_FETCH_MASK (1U << PFERR_FETCH_BIT)
- #define PFERR_PK_MASK (1U << PFERR_PK_BIT)
-+#define PFERR_SGX_MASK (1U << PFERR_SGX_BIT)
- #define PFERR_GUEST_FINAL_MASK (1ULL << PFERR_GUEST_FINAL_BIT)
- #define PFERR_GUEST_PAGE_MASK (1ULL << PFERR_GUEST_PAGE_BIT)
+ static u32 xstate_required_size(u64 xstate_bv, bool compacted)
+@@ -53,6 +53,7 @@ static u32 xstate_required_size(u64 xstate_bv, bool compacted)
+ }
  
+ #define F feature_bit
++#define SF(name) (boot_cpu_has(X86_FEATURE_##name) ? F(name) : 0)
+ 
+ static inline struct kvm_cpuid_entry2 *cpuid_entry2_find(
+ 	struct kvm_cpuid_entry2 *entries, int nent, u32 function, u32 index)
+@@ -347,13 +348,13 @@ int kvm_vcpu_ioctl_get_cpuid2(struct kvm_vcpu *vcpu,
+ 	return r;
+ }
+ 
+-static __always_inline void kvm_cpu_cap_mask(enum cpuid_leafs leaf, u32 mask)
++/* Mask kvm_cpu_caps for @leaf with the raw CPUID capabilities of this CPU. */
++static __always_inline void __kvm_cpu_cap_mask(enum cpuid_leafs leaf)
+ {
+ 	const struct cpuid_reg cpuid = x86_feature_cpuid(leaf * 32);
+ 	struct kvm_cpuid_entry2 entry;
+ 
+ 	reverse_cpuid_check(leaf);
+-	kvm_cpu_caps[leaf] &= mask;
+ 
+ 	cpuid_count(cpuid.function, cpuid.index,
+ 		    &entry.eax, &entry.ebx, &entry.ecx, &entry.edx);
+@@ -361,6 +362,26 @@ static __always_inline void kvm_cpu_cap_mask(enum cpuid_leafs leaf, u32 mask)
+ 	kvm_cpu_caps[leaf] &= *__cpuid_entry_get_reg(&entry, cpuid.reg);
+ }
+ 
++static __always_inline void kvm_cpu_cap_mask(enum cpuid_leafs leaf, u32 mask)
++{
++	/* Use the "init" variant for scattered leafs. */
++	BUILD_BUG_ON(leaf >= NCAPINTS);
++
++	kvm_cpu_caps[leaf] &= mask;
++
++	__kvm_cpu_cap_mask(leaf);
++}
++
++static __always_inline void kvm_cpu_cap_init(enum cpuid_leafs leaf, u32 mask)
++{
++	/* Use the "mask" variant for hardwared-defined leafs. */
++	BUILD_BUG_ON(leaf < NCAPINTS);
++
++	kvm_cpu_caps[leaf] = mask;
++
++	__kvm_cpu_cap_mask(leaf);
++}
++
+ void kvm_set_cpu_caps(void)
+ {
+ 	unsigned int f_nx = is_efer_nx() ? F(NX) : 0;
+@@ -371,12 +392,13 @@ void kvm_set_cpu_caps(void)
+ 	unsigned int f_gbpages = 0;
+ 	unsigned int f_lm = 0;
+ #endif
++	memset(kvm_cpu_caps, 0, sizeof(kvm_cpu_caps));
+ 
+-	BUILD_BUG_ON(sizeof(kvm_cpu_caps) >
++	BUILD_BUG_ON(sizeof(kvm_cpu_caps) - (NKVMCAPINTS * sizeof(*kvm_cpu_caps)) >
+ 		     sizeof(boot_cpu_data.x86_capability));
+ 
+ 	memcpy(&kvm_cpu_caps, &boot_cpu_data.x86_capability,
+-	       sizeof(kvm_cpu_caps));
++	       sizeof(kvm_cpu_caps) - (NKVMCAPINTS * sizeof(*kvm_cpu_caps)));
+ 
+ 	kvm_cpu_cap_mask(CPUID_1_ECX,
+ 		/*
+diff --git a/arch/x86/kvm/cpuid.h b/arch/x86/kvm/cpuid.h
+index 2a0c5064497f..8925a929186c 100644
+--- a/arch/x86/kvm/cpuid.h
++++ b/arch/x86/kvm/cpuid.h
+@@ -7,7 +7,20 @@
+ #include <asm/processor.h>
+ #include <uapi/asm/kvm_para.h>
+ 
+-extern u32 kvm_cpu_caps[NCAPINTS] __read_mostly;
++/*
++ * Hardware-defined CPUID leafs that are scattered in the kernel, but need to
++ * be directly used by KVM.  Note, these word values conflict with the kernel's
++ * "bug" caps, but KVM doesn't use those.
++ */
++enum kvm_only_cpuid_leafs {
++	NR_KVM_CPU_CAPS = NCAPINTS,
++
++	NKVMCAPINTS = NR_KVM_CPU_CAPS - NCAPINTS,
++};
++
++#define X86_KVM_FEATURE(w, f)		((w)*32 + (f))
++
++extern u32 kvm_cpu_caps[NR_KVM_CPU_CAPS] __read_mostly;
+ void kvm_set_cpu_caps(void);
+ 
+ void kvm_update_cpuid_runtime(struct kvm_vcpu *vcpu);
+@@ -100,6 +113,20 @@ static __always_inline void reverse_cpuid_check(unsigned int x86_leaf)
+ 	BUILD_BUG_ON(reverse_cpuid[x86_leaf].function == 0);
+ }
+ 
++/*
++ * Translate feature bits that are scattered in the kernel's cpufeatures word
++ * into KVM feature words that align with hardware's definitions.
++ */
++static __always_inline u32 __feature_translate(int x86_feature)
++{
++	return x86_feature;
++}
++
++static __always_inline u32 __feature_leaf(int x86_feature)
++{
++	return __feature_translate(x86_feature) / 32;
++}
++
+ /*
+  * Retrieve the bit mask from an X86_FEATURE_* definition.  Features contain
+  * the hardware defined bit number (stored in bits 4:0) and a software defined
+@@ -108,6 +135,8 @@ static __always_inline void reverse_cpuid_check(unsigned int x86_leaf)
+  */
+ static __always_inline u32 __feature_bit(int x86_feature)
+ {
++	x86_feature = __feature_translate(x86_feature);
++
+ 	reverse_cpuid_check(x86_feature / 32);
+ 	return 1 << (x86_feature & 31);
+ }
+@@ -116,7 +145,7 @@ static __always_inline u32 __feature_bit(int x86_feature)
+ 
+ static __always_inline struct cpuid_reg x86_feature_cpuid(unsigned int x86_feature)
+ {
+-	unsigned int x86_leaf = x86_feature / 32;
++	unsigned int x86_leaf = __feature_leaf(x86_feature);
+ 
+ 	reverse_cpuid_check(x86_leaf);
+ 	return reverse_cpuid[x86_leaf];
+@@ -308,7 +337,7 @@ static inline bool cpuid_fault_enabled(struct kvm_vcpu *vcpu)
+ 
+ static __always_inline void kvm_cpu_cap_clear(unsigned int x86_feature)
+ {
+-	unsigned int x86_leaf = x86_feature / 32;
++	unsigned int x86_leaf = __feature_leaf(x86_feature);
+ 
+ 	reverse_cpuid_check(x86_leaf);
+ 	kvm_cpu_caps[x86_leaf] &= ~__feature_bit(x86_feature);
+@@ -316,7 +345,7 @@ static __always_inline void kvm_cpu_cap_clear(unsigned int x86_feature)
+ 
+ static __always_inline void kvm_cpu_cap_set(unsigned int x86_feature)
+ {
+-	unsigned int x86_leaf = x86_feature / 32;
++	unsigned int x86_leaf = __feature_leaf(x86_feature);
+ 
+ 	reverse_cpuid_check(x86_leaf);
+ 	kvm_cpu_caps[x86_leaf] |= __feature_bit(x86_feature);
+@@ -324,7 +353,7 @@ static __always_inline void kvm_cpu_cap_set(unsigned int x86_feature)
+ 
+ static __always_inline u32 kvm_cpu_cap_get(unsigned int x86_feature)
+ {
+-	unsigned int x86_leaf = x86_feature / 32;
++	unsigned int x86_leaf = __feature_leaf(x86_feature);
+ 
+ 	reverse_cpuid_check(x86_leaf);
+ 	return kvm_cpu_caps[x86_leaf] & __feature_bit(x86_feature);
 -- 
 2.30.2
 
