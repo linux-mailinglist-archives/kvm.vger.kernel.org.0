@@ -2,309 +2,178 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3BDFD356E0A
-	for <lists+kvm@lfdr.de>; Wed,  7 Apr 2021 16:01:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 09E9B356E22
+	for <lists+kvm@lfdr.de>; Wed,  7 Apr 2021 16:06:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1352727AbhDGOBV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 7 Apr 2021 10:01:21 -0400
-Received: from mail-dm6nam12on2086.outbound.protection.outlook.com ([40.107.243.86]:9952
-        "EHLO NAM12-DM6-obe.outbound.protection.outlook.com"
+        id S1352768AbhDGOGk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 7 Apr 2021 10:06:40 -0400
+Received: from mail-bn7nam10on2062.outbound.protection.outlook.com ([40.107.92.62]:28209
+        "EHLO NAM10-BN7-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S242411AbhDGOBU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 7 Apr 2021 10:01:20 -0400
+        id S234067AbhDGOGj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 7 Apr 2021 10:06:39 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Pyt2eELc2RwGNTtRKTRzPL/Y4ZvSmetZXWxQuo330caQHHr/roH1643SirROpXxkHkgyH/8uV+iV9/+wlHqj6imeJMDWnrwp1GY3ERr462Ryc34Jb7TMXVX4GCGL1p2zou+SCjevTkMJdUaFhbywhGgElOlkBQdHjg5tyRByvXiMqxXlMg/vg9Dnk/Sg6ulk6Noti6P0LwlZvLieishXRcjq5fMobCMVr7KhZ4gSDJ4JBbRqW0Qj32rhejAQbfD4S+ILO9GkxqIXUksJHWmuV8pfearxG9XRrv7m07ZvpN4ZOevL4orW77DbT0tEUna/DXsKVpJ143/LXsbPQgWIAw==
+ b=g11fWSjSY39BNc85r33bEjKuOKgwffpphybMhBkFpxprdqzBhhA7Z4OGTFSejL3fUn5LsAKm0XFC7rnieubepfqbP0HCLb1NbjhJMGPisn2UNCGCldVh2aTn+kI6/ka2GE8xDTwRCCqhKW5ul1RksflGAf6E2OQSuZn11SBCrUg6g1FHRcK5ATKQ0GwHuSrSC9VaUDT9WU6A4bn8plie+PRo/BnzEjElAFyoGqCHWDQDCAx9M87g+Jd0nIGk5O1ApOBtxl0nl27GyKIG5XYNWqfbLU6yFJU+98We6LRGIj5HApAaXXmaIJgpoXMYVYFM/uhwNpK4ac/kEM8sR7tfNQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=sdKB3hDX0lFpidW+dtxWkYpgenVqNJY7lNs/DFDhJYQ=;
- b=UTPY+lTmQbYpj/959+n0LP8w0ZSFjGNszvMjC89R9wlISqG+V+5eSiMduy51RkvXa6qmUc1KUclQ+JpTuVEPPpQ7cc1aO9CrmV+TidA61N8wYHAaPlsdKHpmV97fQTrS55fozKfUExb+QzdV6LomPEhgfmX75QWePT755wuwR/CjZLGLbysmxsvpFA+rXB85Lj6JequvNlNKTvQWiVe236H0Ka+2sVhRBJNqiuxKwt4O2lKftORwpaZaJAXFjkSuT1MpjxLicszt7yF+5P4fRR5TR0IsTT/GF2TQBdAS3XyI1eEKm0M+YncZX1F3ALc/6xEBU6ifogUnv4wplY3eKQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ bh=4+0UMWfLyXXGrCmtJ8R3dhfLnBOs5OMPnyd/1zzbdF4=;
+ b=Gtc9j+T1zxSb/WNf5/nvEINi8MYLSK9L9v8wJEx22IJky7IOJsi9nk4FbnDXc7HkHvtcvAiHhBepJXUM2BV0vsJBajxCM62R2rPOSUG/x7MLAgcm78klhjvc9zobkXxElBNPAGIETS/WBy+O0A8Dngh+z6FYafLevd4rW65PE1p5AH6JfCmcFMjw4m+1cJyE0chXIyvnq3JXbinp5V0AW4itmEjmG3EzGw3qKUO+g3xDHNqIQeZSJlh4wYJbomXWPiQOd4dVcjKKdybCqzf4+MCFdpoc1GDaQRlssmkOevsgrI/r8ov9yvlwhTGZkWDT+Yn53avGq59GxsTRyoaPtg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.112.34) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=none sp=none pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=sdKB3hDX0lFpidW+dtxWkYpgenVqNJY7lNs/DFDhJYQ=;
- b=ASPayxiXoBkF3TdduJyS8zA8E72jV8mLT2mYkLZ2TWRV8o5UY84Gx2uRMqmC+8kspMmKMWR1pZRPjtX7XnwymhhGNJ7p6c2xO5mGwOnY0b5pPGhpxNmJ7lwEnc/BZnFQMI6dHM7gTgzhYHu64atSLXmeeqoxhkfCULgKZcWhrUo=
-Authentication-Results: google.com; dkim=none (message not signed)
- header.d=none;google.com; dmarc=none action=none header.from=amd.com;
-Received: from SN6PR12MB2767.namprd12.prod.outlook.com (2603:10b6:805:75::23)
- by SA0PR12MB4431.namprd12.prod.outlook.com (2603:10b6:806:95::11) with
+ bh=4+0UMWfLyXXGrCmtJ8R3dhfLnBOs5OMPnyd/1zzbdF4=;
+ b=HMCUJDQw55Bub39FWUS9oiHkhRYnzBoFPCVHqNQIEInMyZLoIuTYZBcRvY2fjTsNu52pQjui9CMxRWKeeAltAUO6mRnCYHEmG6E/H3ni1Kp6U5Sonu74yCCjA65LcpKilobANe3hP5wEsE3QV9dl080eyXuzbHFMxlxPLkPJC067IjnHvqUxCNK42+pVHh0xH3uIYa8/nvLaAXA+hH4w41k3mqcBw4sS/E66iKyUbZJxlBsY0xJSwHXFhcACjDaVAiVFwPCC+QlvefmcT/pS/WO9lRyS0u4ncTjxYZc6k/V6mqG8lbUruaNt8Ijxw9aywusqymsEOdQ+vch/684v8g==
+Received: from MWHPR15CA0052.namprd15.prod.outlook.com (2603:10b6:301:4c::14)
+ by CY4PR12MB1128.namprd12.prod.outlook.com (2603:10b6:903:3e::13) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3999.29; Wed, 7 Apr
- 2021 14:01:08 +0000
-Received: from SN6PR12MB2767.namprd12.prod.outlook.com
- ([fe80::24bb:3e53:c95e:cb8e]) by SN6PR12MB2767.namprd12.prod.outlook.com
- ([fe80::24bb:3e53:c95e:cb8e%7]) with mapi id 15.20.3999.032; Wed, 7 Apr 2021
- 14:01:08 +0000
-Date:   Wed, 7 Apr 2021 14:01:01 +0000
-From:   Ashish Kalra <ashish.kalra@amd.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     pbonzini@redhat.com, tglx@linutronix.de, mingo@redhat.com,
-        hpa@zytor.com, joro@8bytes.org, bp@suse.de,
-        thomas.lendacky@amd.com, x86@kernel.org, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, srutherford@google.com,
-        venu.busireddy@oracle.com, brijesh.singh@amd.com, will@kernel.org,
-        maz@kernel.org, qperret@google.com
-Subject: Re: [PATCH v11 08/13] KVM: X86: Introduce KVM_HC_PAGE_ENC_STATUS
- hypercall
-Message-ID: <20210407140044.GA25499@ashkalra_ubuntu_server>
-References: <cover.1617302792.git.ashish.kalra@amd.com>
- <4da0d40c309a21ba3952d06f346b6411930729c9.1617302792.git.ashish.kalra@amd.com>
- <YGyCxGsC2+GAtJxy@google.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YGyCxGsC2+GAtJxy@google.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-Originating-IP: [165.204.77.1]
-X-ClientProxiedBy: SA0PR11CA0187.namprd11.prod.outlook.com
- (2603:10b6:806:1bc::12) To SN6PR12MB2767.namprd12.prod.outlook.com
- (2603:10b6:805:75::23)
+ 2021 14:06:28 +0000
+Received: from CO1NAM11FT047.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:301:4c:cafe::86) by MWHPR15CA0052.outlook.office365.com
+ (2603:10b6:301:4c::14) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4020.17 via Frontend
+ Transport; Wed, 7 Apr 2021 14:06:28 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.112.34)
+ smtp.mailfrom=nvidia.com; vger.kernel.org; dkim=none (message not signed)
+ header.d=none;vger.kernel.org; dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.112.34 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.112.34; helo=mail.nvidia.com;
+Received: from mail.nvidia.com (216.228.112.34) by
+ CO1NAM11FT047.mail.protection.outlook.com (10.13.174.132) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ 15.20.4020.17 via Frontend Transport; Wed, 7 Apr 2021 14:06:28 +0000
+Received: from [172.27.11.15] (172.20.145.6) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Wed, 7 Apr
+ 2021 14:06:25 +0000
+Subject: Re: [PATCH 2/3] virito_pci: add timeout to reset device operation
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+CC:     <kvm@vger.kernel.org>, <virtualization@lists.linux-foundation.org>,
+        <jasowang@redhat.com>, <oren@nvidia.com>, <nitzanc@nvidia.com>
+References: <20210407120924.133294-1-mgurtovoy@nvidia.com>
+ <20210407120924.133294-2-mgurtovoy@nvidia.com>
+ <20210407094228-mutt-send-email-mst@kernel.org>
+From:   Max Gurtovoy <mgurtovoy@nvidia.com>
+Message-ID: <02cc0471-af5f-8cae-51a5-855bbe90021b@nvidia.com>
+Date:   Wed, 7 Apr 2021 17:06:22 +0300
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.9.0
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from ashkalra_ubuntu_server (165.204.77.1) by SA0PR11CA0187.namprd11.prod.outlook.com (2603:10b6:806:1bc::12) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4020.17 via Frontend Transport; Wed, 7 Apr 2021 14:01:06 +0000
+In-Reply-To: <20210407094228-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-Originating-IP: [172.20.145.6]
+X-ClientProxiedBy: HQMAIL101.nvidia.com (172.20.187.10) To
+ HQMAIL107.nvidia.com (172.20.187.13)
+X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: d5812c60-efa2-42ce-2e62-08d8f9cd971d
-X-MS-TrafficTypeDiagnostic: SA0PR12MB4431:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <SA0PR12MB443141CFA6C5024E47BBC0418E759@SA0PR12MB4431.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:6108;
+X-MS-Office365-Filtering-Correlation-Id: 39e66907-1659-4ad5-8911-08d8f9ce5668
+X-MS-TrafficTypeDiagnostic: CY4PR12MB1128:
+X-Microsoft-Antispam-PRVS: <CY4PR12MB112858E2561BA7EE4B0FF032DE759@CY4PR12MB1128.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: +gkp8OzoCpq7GUUycnPm0J38ksRLdVesXTtvgiFi+wnJuVJWPsyKh24+nXA65HLx/FkHQK0teKCQULDlj4RKn8r9eNhXSrC/0Obg7vNukPFQS4HHlFqP8eU36GFO1vc4pJ7tT+0PAMUtXM2Qxidqbe+5YP/qrH8UjgON00Ur4CQ7aSX1rNgL0bZaIEnL2ITL8O9tMZt+vuwRA7Db/TjOH486pIAV3FBywJ5Sw13PsZ8WoJgObxrVv1cFivWRDWbeNBOU4KbP7qTktEHCGxTe8LKnreyLNOeQ+H9FfQcUeWIbQIDv8kCwMVehoxMCt8O9WWqNWnl3nyLrGSUybQ3bpGEf7Kd1xYelbdE1EKVY52mI8lNGfJlq1fSIOpHWt4YD07/Ly3eM42tSZ6J6xpmPCOGUJ4eAylwrvDWtZ4Szosm1UMVOoiYKVBV5SwdZgn46qxs6nooO9Baq8SaZdkcCKpxrZhvcG72jToTPD8JXGDh7Yf1kY4rdIo9s2DtFV2eTUnC++oT/sQjfClsrtsiYiSA+HN14LlgwwsAedYyEHv/QyHnUXw9rhZUOhyKAvtVRR7+DyMh/KrH2/aR3RBprV8Y5zW8QZHKbpOhEltuVaRwy0olgS6O0JnTXOnVjStGzsOzf+3l94ztNXMPGsd4iGs/sjN0L8HbH7fg/K7GXA/oHuLkoKc4Oo+CtMx1XCZtn
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2767.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(376002)(346002)(366004)(136003)(396003)(39860400002)(6496006)(9686003)(2906002)(16526019)(83380400001)(1076003)(8936002)(55016002)(7416002)(6916009)(44832011)(52116002)(26005)(33656002)(6666004)(8676002)(186003)(316002)(38100700001)(38350700001)(478600001)(5660300002)(66946007)(66556008)(66476007)(33716001)(956004)(86362001)(4326008);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: =?us-ascii?Q?cAnwue/BnjCHM+JyovhGn1bxgqZN/lpeR3dojjc283LuHEKCp3heSUCvn1cG?=
- =?us-ascii?Q?Fbnlnp+roSn94JdVtbFlGK8t8rhxb3f62RGbR+C0Qg87zWi746IMLj4I7c3r?=
- =?us-ascii?Q?3ukYG6NE+4xEelA2pDMpYTTNwU0HUipphO60kw3Wu2o8qg1JhfZjSfZEg1pi?=
- =?us-ascii?Q?USq0pM7sbxTuV2Jn/mF2h6YZjivsjHfBmW2O1eb9pw2k/CYt8g9jXkMS48OM?=
- =?us-ascii?Q?A6dMg19TETlBzHCdHwK6y0ggfw/YetBJNao7MyLQbcYws6zjUP7naN7Z+4qF?=
- =?us-ascii?Q?tZRaN6oq4UF1OSt6QAWYiM4hMDxQiZtRUSdV9ynMocJZpgYZcfXL1lj3FDBZ?=
- =?us-ascii?Q?aTkuKxHzyWKYZQQ8BTHyUqqS1A2m9Sj/djhzuo8jd9wwUe/s3xhPOlboDCIs?=
- =?us-ascii?Q?bxpLqxvIE3OLHfd+qBm6x08WRcyIHPEZxDUnRAKw3Kz4ETlX3nY/tyUU37DM?=
- =?us-ascii?Q?fXPQKr1hq3a5qMb5KzUkpuT+LgXIpfMlXBwdPzwzh3vOYVKiu8+5jT0H27Bt?=
- =?us-ascii?Q?3DfnDx9NTkqKqcZaorFxqndC1COsfV9KoaDn6Q48vOSrRfYBqPb5Yuds8TKz?=
- =?us-ascii?Q?fgLlHcIqYeY9yaeahk9CavK7qod9CY7s+6dTuf/oQAMiSJzoRvpFHGWA7RpG?=
- =?us-ascii?Q?5bdelT9ed0ZXJCY/z+13Zb0i3wRrFKOJV9fEyUf24j2MRFCb3Z/aS2sHuNBr?=
- =?us-ascii?Q?CuMleMmXBq6YVXTX86vPa1KlJMt2pUPqlZKTcO8EpPU6HXK16Hx8usrvEcDc?=
- =?us-ascii?Q?deL4nqO5TksALhCbMFXAcKxKB43/4A0ec7f40K8XbUlaZSRe5T+1+yt8vzSX?=
- =?us-ascii?Q?rg6Hz+redVuA8F1Hg3CEUvWe/W+tr8ZSNK9dHapp6ysc8DAgnH8TtLkf/knv?=
- =?us-ascii?Q?upvwRuW3jRab2MMxj6cO9w3/zJ1kR4ng+u3LrHPrKl8T0nPOnbcDxCgqth2p?=
- =?us-ascii?Q?AsuGiQ5mUcmxblZyYXp7sQ4iiXcVtjmN0cvOB+0Svg8MAgml8TtGaVbU5Wl3?=
- =?us-ascii?Q?p+q9/qWsta53bSQ3q6ZiEimgkXehgAE6r6ZcKmdG2TFDWN/JIGDA6+BMHZE0?=
- =?us-ascii?Q?3qxURbG08G4fPcn9vIFd56EAItea05CHK2noJJE99MIS/k5UKi6ef0CxX7Vy?=
- =?us-ascii?Q?CqquBsraDvlvA8eIm0jtEh3VNHlgBqrKCYY5iMezBzShbIY+Gy4gn01h8GEG?=
- =?us-ascii?Q?Q7bo2xGv7WszqTm0GuRvdUQlKQl3TsShUAc2xEC2fLeYd59Y+N/8zAkGobnX?=
- =?us-ascii?Q?j27d57VlR2O5ZkMvmUuoZ57XVC37u4WT0DtAYudVnQ8OcgnMxvA5Bqpqnvi7?=
- =?us-ascii?Q?BDMDRrkYIR9UhJzmHKVDEWxP?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: d5812c60-efa2-42ce-2e62-08d8f9cd971d
-X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2767.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Apr 2021 14:01:08.2932
+X-Microsoft-Antispam-Message-Info: FS+fqACLpW15pqX4vcVZgi3UBFmbr9o1BfCtv6SG240JV1Pli7Kj5WOWY/+4Mptqbh7vwqZu5XXFhiD7Sq1JAssFPJwtTcVuytTGKT+SxP7yngZP95Q1dYOGSH2L6cI0Tu3KX1BdQtaVfqPvSP/iOpWKt1k14cO29ESJvtknjCPYzjs/mAJQIr7BieS2xRklkXgZ+Ivo6yjBe5hmCArht1sP+rSmxUIXJqvFyh9epBKzNOAW6AKVouxf5Wl02WwpEfYXDLfaMnLyZM1xBtR4lSXFs9VkI4mltbmAnwFb/Ir1s4+NopZShu3nR4uMWQOa2BE5ls88ypowIt4S5Rw+wBNF4/jJkaBilOxn40r4NVrewoOdb8L7dDgBSl/vmX7eb6fRtDHrKiXii8oYGHw3uXEl4RFahu4y5YxLClcjm5pmvAUn/fi+P3q/YrK+jGLG/XEQbbcJP6AxmWqBAVNzDkQ9MpxY+YMKovTal5bT1Di3Jya6m4eo7Ot4rfnpPYrrXK5p41Sw+LBiKJLmdCYjVhkVUpLGW2NTC2cU4wkI0mu2xr8fN0oG6ovgNGiJXEa13nPyjuiIar4NkEJaMMPC0/GPKEQiiJu7o8Y26gVuiucbWW2LxUxl1InqlG5jR0jdWACrY5q6QSw8AaPay+zAi8p4nqPCricxHcx9dh5EzmCBovMuif8bds8uOvNelesH
+X-Forefront-Antispam-Report: CIP:216.228.112.34;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:schybrid03.nvidia.com;CAT:NONE;SFS:(4636009)(136003)(39860400002)(376002)(396003)(346002)(36840700001)(46966006)(478600001)(7636003)(6666004)(4326008)(82310400003)(8676002)(82740400003)(31696002)(47076005)(36860700001)(36906005)(6916009)(31686004)(107886003)(70586007)(16526019)(5660300002)(83380400001)(356005)(54906003)(53546011)(36756003)(70206006)(426003)(316002)(336012)(2906002)(16576012)(26005)(8936002)(2616005)(86362001)(186003)(43740500002);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Apr 2021 14:06:28.0136
  (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: PUHI4mkAvnz2I4t0ZPPUYrnxkqXb5PnrwwySrln3GFRKTSQOEgnUCWL/qCArov4nMSjIgtHNsOgV/E1g05ccaw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR12MB4431
+X-MS-Exchange-CrossTenant-Network-Message-Id: 39e66907-1659-4ad5-8911-08d8f9ce5668
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.112.34];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource: CO1NAM11FT047.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY4PR12MB1128
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Apr 06, 2021 at 03:48:20PM +0000, Sean Christopherson wrote:
-> On Mon, Apr 05, 2021, Ashish Kalra wrote:
-> > From: Ashish Kalra <ashish.kalra@amd.com>
-> 
-> ...
-> 
-> > diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> > index 3768819693e5..78284ebbbee7 100644
-> > --- a/arch/x86/include/asm/kvm_host.h
-> > +++ b/arch/x86/include/asm/kvm_host.h
-> > @@ -1352,6 +1352,8 @@ struct kvm_x86_ops {
-> >  	int (*complete_emulated_msr)(struct kvm_vcpu *vcpu, int err);
-> >  
-> >  	void (*vcpu_deliver_sipi_vector)(struct kvm_vcpu *vcpu, u8 vector);
-> > +	int (*page_enc_status_hc)(struct kvm_vcpu *vcpu, unsigned long gpa,
-> > +				  unsigned long sz, unsigned long mode);
-> >  };
-> >  
-> >  struct kvm_x86_nested_ops {
-> > diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-> > index c9795a22e502..fb3a315e5827 100644
-> > --- a/arch/x86/kvm/svm/sev.c
-> > +++ b/arch/x86/kvm/svm/sev.c
-> > @@ -1544,6 +1544,67 @@ static int sev_receive_finish(struct kvm *kvm, struct kvm_sev_cmd *argp)
-> >  	return ret;
-> >  }
-> >  
-> > +static int sev_complete_userspace_page_enc_status_hc(struct kvm_vcpu *vcpu)
-> > +{
-> > +	vcpu->run->exit_reason = 0;
-> > +	kvm_rax_write(vcpu, vcpu->run->dma_sharing.ret);
-> > +	++vcpu->stat.hypercalls;
-> > +	return kvm_skip_emulated_instruction(vcpu);
-> > +}
-> > +
-> > +int svm_page_enc_status_hc(struct kvm_vcpu *vcpu, unsigned long gpa,
-> > +			   unsigned long npages, unsigned long enc)
-> > +{
-> > +	kvm_pfn_t pfn_start, pfn_end;
-> > +	struct kvm *kvm = vcpu->kvm;
-> > +	gfn_t gfn_start, gfn_end;
-> > +
-> > +	if (!sev_guest(kvm))
-> > +		return -EINVAL;
-> > +
-> > +	if (!npages)
-> > +		return 0;
-> 
-> Parth of me thinks passing a zero size should be an error not a nop.  Either way
-> works, just feels a bit weird to allow this to be a nop.
-> 
-> > +
-> > +	gfn_start = gpa_to_gfn(gpa);
-> 
-> This should check that @gpa is aligned.
-> 
-> > +	gfn_end = gfn_start + npages;
-> > +
-> > +	/* out of bound access error check */
-> > +	if (gfn_end <= gfn_start)
-> > +		return -EINVAL;
-> > +
-> > +	/* lets make sure that gpa exist in our memslot */
-> > +	pfn_start = gfn_to_pfn(kvm, gfn_start);
-> > +	pfn_end = gfn_to_pfn(kvm, gfn_end);
-> > +
-> > +	if (is_error_noslot_pfn(pfn_start) && !is_noslot_pfn(pfn_start)) {
-> > +		/*
-> > +		 * Allow guest MMIO range(s) to be added
-> > +		 * to the shared pages list.
-> > +		 */
-> > +		return -EINVAL;
-> > +	}
-> > +
-> > +	if (is_error_noslot_pfn(pfn_end) && !is_noslot_pfn(pfn_end)) {
-> > +		/*
-> > +		 * Allow guest MMIO range(s) to be added
-> > +		 * to the shared pages list.
-> > +		 */
-> > +		return -EINVAL;
-> > +	}
-> 
-> I don't think KVM should do any checks beyond gfn_end <= gfn_start.  Just punt
-> to userspace and give userspace full say over what is/isn't legal.
-> 
-> > +
-> > +	if (enc)
-> > +		vcpu->run->exit_reason = KVM_EXIT_DMA_UNSHARE;
-> > +	else
-> > +		vcpu->run->exit_reason = KVM_EXIT_DMA_SHARE;
-> 
-> Use a single exit and pass "enc" via kvm_run.  I also strongly dislike "DMA",
-> there's no guarantee the guest is sharing memory for DMA.
-> 
-> I think we can usurp KVM_EXIT_HYPERCALL for this?  E.g.
-> 
-> 	vcpu->run->exit_reason        = KVM_EXIT_HYPERCALL;
-> 	vcpu->run->hypercall.nr       = KVM_HC_PAGE_ENC_STATUS;
-> 	vcpu->run->hypercall.args[0]  = gfn_start << PAGE_SHIFT;
-> 	vcpu->run->hypercall.args[1]  = npages * PAGE_SIZE;
-> 	vcpu->run->hypercall.args[2]  = enc;
-> 	vcpu->run->hypercall.longmode = is_64_bit_mode(vcpu);
-> 
-> > +
-> > +	vcpu->run->dma_sharing.addr = gfn_start;
-> 
-> Addresses and pfns are not the same thing.  If you're passing the size in bytes,
-> then it's probably best to pass the gpa, not the gfn.  Same for the params from
-> the guest, they should be in the same "domain".
-> 
-> > +	vcpu->run->dma_sharing.len = npages * PAGE_SIZE;
-> > +	vcpu->arch.complete_userspace_io =
-> > +		sev_complete_userspace_page_enc_status_hc;
-> 
-> I vote to drop the "userspace" part, it's already quite verbose.
-> 
-> 	vcpu->arch.complete_userspace_io = sev_complete_page_enc_status_hc;
-> 
-> > +
-> > +	return 0;
-> > +}
-> > +
-> 
-> ..
-> 
-> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> > index f7d12fca397b..ef5c77d59651 100644
-> > --- a/arch/x86/kvm/x86.c
-> > +++ b/arch/x86/kvm/x86.c
-> > @@ -8273,6 +8273,18 @@ int kvm_emulate_hypercall(struct kvm_vcpu *vcpu)
-> >  		kvm_sched_yield(vcpu->kvm, a0);
-> >  		ret = 0;
-> >  		break;
-> > +	case KVM_HC_PAGE_ENC_STATUS: {
-> > +		int r;
-> > +
-> > +		ret = -KVM_ENOSYS;
-> > +		if (kvm_x86_ops.page_enc_status_hc) {
-> > +			r = kvm_x86_ops.page_enc_status_hc(vcpu, a0, a1, a2);
-> 
-> Use static_call().
-> 
-> > +			if (r >= 0)
-> > +				return r;
-> > +			ret = r;
-> > +		}
-> 
-> Hmm, an alternative to adding a kvm_x86_ops hook would be to tag the VM as
-> supporting/allowing the hypercall.  That would clean up this code, ensure VMX
-> and SVM don't end up creating a different userspace ABI, and make it easier to
-> reuse the hypercall in the future (I'm still hopeful :-) ).  E.g.
-> 
-> 	case KVM_HC_PAGE_ENC_STATUS: {
-> 		u64 gpa = a0, nr_bytes = a1;
-> 
-> 		if (!vcpu->kvm->arch.page_enc_hc_enable)
-> 			break;
-> 
-> 		if (!PAGE_ALIGNED(gpa) || !PAGE_ALIGNED(nr_bytes) ||
-> 		    !nr_bytes || gpa + nr_bytes <= gpa)) {
-> 			ret = -EINVAL;
-> 			break;
-> 		}
-> 
-> 	        vcpu->run->exit_reason        = KVM_EXIT_HYPERCALL; 
->         	vcpu->run->hypercall.nr       = KVM_HC_PAGE_ENC_STATUS; 
-> 	        vcpu->run->hypercall.args[0]  = gpa;
->         	vcpu->run->hypercall.args[1]  = nr_bytes;
-> 	        vcpu->run->hypercall.args[2]  = enc;                                    
->         	vcpu->run->hypercall.longmode = op_64_bit;
-> 		vcpu->arch.complete_userspace_io = complete_page_enc_hc;
-> 		return 0;
-> 	}
 
-I really like the above approach, but one thing that concerns me above
-is the addition of architecture specific code, for example, the page
-encryption stuff as part of the generic x86 KVM code ? 
+On 4/7/2021 4:45 PM, Michael S. Tsirkin wrote:
+> On Wed, Apr 07, 2021 at 12:09:23PM +0000, Max Gurtovoy wrote:
+>> According to the spec after writing 0 to device_status, the driver MUST
+>> wait for a read of device_status to return 0 before reinitializing the
+>> device. In case we have a device that won't return 0, the reset
+>> operation will loop forever and cause the host/vm to stuck. Set timeout
+>> for 3 minutes before giving up on the device.
+>>
+>> Signed-off-by: Max Gurtovoy <mgurtovoy@nvidia.com>
+>> ---
+>>   drivers/virtio/virtio_pci_modern.c | 10 +++++++++-
+>>   1 file changed, 9 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/drivers/virtio/virtio_pci_modern.c b/drivers/virtio/virtio_pci_modern.c
+>> index cc3412a96a17..dcee616e8d21 100644
+>> --- a/drivers/virtio/virtio_pci_modern.c
+>> +++ b/drivers/virtio/virtio_pci_modern.c
+>> @@ -162,6 +162,7 @@ static int vp_reset(struct virtio_device *vdev)
+>>   {
+>>   	struct virtio_pci_device *vp_dev = to_vp_device(vdev);
+>>   	struct virtio_pci_modern_device *mdev = &vp_dev->mdev;
+>> +	unsigned long timeout = jiffies + msecs_to_jiffies(180000);
+>>   
+>>   	/* 0 status means a reset. */
+>>   	vp_modern_set_status(mdev, 0);
+>> @@ -169,9 +170,16 @@ static int vp_reset(struct virtio_device *vdev)
+>>   	 * device_status to return 0 before reinitializing the device.
+>>   	 * This will flush out the status write, and flush in device writes,
+>>   	 * including MSI-X interrupts, if any.
+>> +	 * Set a timeout before giving up on the device.
+>>   	 */
+>> -	while (vp_modern_get_status(mdev))
+>> +	while (vp_modern_get_status(mdev)) {
+>> +		if (time_after(jiffies, timeout)) {
+>> +			dev_err(&vdev->dev, "virtio: device not ready. "
+>> +				"Aborting. Try again later\n");
+>> +			return -EAGAIN;
+>> +		}
+>>   		msleep(1);
+>> +	}
+>>   	/* Flush pending VQ/configuration callbacks. */
+>>   	vp_synchronize_vectors(vdev);
+>>   	return 0;
+> Problem is everyone just ignores the return code from reset.
+> Timing out like that has a chance to cause a lot of trouble
+> if the device remains active - we need to make reset robust.
 
-Especially bits like the page enc hypercall completion callback and
-testing the architecture specific page encryption hypercall enabled
-flag, probably the hypercall completion callback can be named
-something as complete_userspace_hypercall(), as anyway what it does
-inside the callback is all very generic.
+But in commit 1/3 I added a code that doesn't ignore the reset return code.
 
-The above naming may also go well with KVM_EXIT_HYPERCALL exitcode 
-interface.
 
-Thanks,
-Ashish
+>
+> What exactly is going on with the device that
+> get status never returns 0? E.g. maybe it's in a state
+> where it's returning all 1's because it's wedged permanently -
+> using that would be better...
 
-> 
-> 
-> > +		break;
-> > +	}
-> >  	default:
-> >  		ret = -KVM_ENOSYS;
-> >  		break;
+In HW devices you might have situations that the controller is in bad 
+state (maybe bad FW) but still can be seen under the PCI bus.
+
+As long as the device is not returning 0, this is legal. But in today's 
+code, it will cause the kernel to be in endless while loop because of 
+one bad device (that might recover later).
+
+If we have 10 devices, and the first will stuck, all the others will 
+wait forever to be probed.
+
+By Virtio spec, setting FAILED is allowed in case "..driver didn’t like 
+the device for some reason, or even a fatal error during device operation."
+
+For example, in the NVMe spec there is TO (timeout) register that "is 
+the worst case time that host software shall wait for CSTS.RDY to 
+transition from: ..." and the driver wait for this time until it 
+understands that the device is not ready to operate.
+
+I tried to add similar logic to virtio.
+
+>
+>
+>
+>> -- 
+>> 2.25.4
