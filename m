@@ -2,111 +2,78 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E7373356793
-	for <lists+kvm@lfdr.de>; Wed,  7 Apr 2021 11:03:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E1CCD356809
+	for <lists+kvm@lfdr.de>; Wed,  7 Apr 2021 11:28:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1349877AbhDGJDm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 7 Apr 2021 05:03:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60680 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239586AbhDGJDl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 7 Apr 2021 05:03:41 -0400
-Received: from mail-oi1-x22a.google.com (mail-oi1-x22a.google.com [IPv6:2607:f8b0:4864:20::22a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1F462C06174A;
-        Wed,  7 Apr 2021 02:03:30 -0700 (PDT)
-Received: by mail-oi1-x22a.google.com with SMTP id k25so18047268oic.4;
-        Wed, 07 Apr 2021 02:03:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=GPeMpQW+Y5lQJAmVYLhBnP7OU/14j0M55xHvhj50bTE=;
-        b=XB4tkI/D0rx83UvVfaq3nU85IGV7tlB9UDvSrJgv+ASys6/fzFEdJe0I06Cn5SX7l+
-         S9W2dj8sOqFlqUHwOs0pDS9+BlAb5A4xcJW1ivx3Gbv9bWsB3wo7RhJaVt/3AS1YvElB
-         JgqQwj77iFvHbnbjDSoGGCjwpgHAgGg95OhRjCDf2p4zaeTB80SohsWeVuEjwCQpTdgT
-         VXmvirTqYjt9LqTgrVNNH4HekL3A31Cw0s7VEUr2KPluGD0b/wO3wK2dfUmg+pXHxX54
-         kunvhPtnpCfsh15AoWoJFBYPt4XHeNBy4oybuEUYGiG5E/m7CVxZqQ8Mq1d/SHgHI7eP
-         oNew==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=GPeMpQW+Y5lQJAmVYLhBnP7OU/14j0M55xHvhj50bTE=;
-        b=k0PeTJAD5TLMOh4NH15imF24oe1OaTNALJ9Pio8uJqAIbgvCWZVnP1jlTfN21VX3hQ
-         fm95bgz8rAElAOth5PlUgUiT6xintxZFx5w8P6ah/tG7QsNHp0HImQ7wJAdAJP6RXlBp
-         ELye6PbTs9yLg+AN2Hk/WdAwhtdxgS8sW+1Ps7eUcSXWG5YX7LNffijHWU/XbW/uoJT+
-         MOfbux1ds6KOpgCDqTksUnslWaj1Mb+EXwzXfys2+Qi9GWDwrCwU9kgjTA76+mQ5+qn7
-         wo1zSQuGsG0Luvrs0ifRRuRcDJ1ZZM+lXhT+VkKiYxh+xINyc7afztK1vLenGH/hYNbL
-         ZzLQ==
-X-Gm-Message-State: AOAM5318s0oSgjuDozIxne3jt2zSQ9NnHyatpw6fJKwNJ3Cu5Syoe0NS
-        9yyb5I6Af6JHCmxJSWuoCseJW7j2ZO0zMQ+ijNM=
-X-Google-Smtp-Source: ABdhPJxyw/r6k87xfjnQTDJyhr+w2lVLfHwJf0CLBwwmX33evgv2H1n6rqqrXs5cjG5hLKsLujqxo7Z2fW1nZCgMaOc=
-X-Received: by 2002:a54:408a:: with SMTP id i10mr1582600oii.141.1617786209542;
- Wed, 07 Apr 2021 02:03:29 -0700 (PDT)
-MIME-Version: 1.0
-References: <20210406190740.4055679-1-seanjc@google.com>
-In-Reply-To: <20210406190740.4055679-1-seanjc@google.com>
-From:   Wanpeng Li <kernellwp@gmail.com>
-Date:   Wed, 7 Apr 2021 17:03:17 +0800
-Message-ID: <CANRm+CyjA3UPQvZoJBZuW0hfPkc8t_p71v_D5ChC5jftibLdog@mail.gmail.com>
-Subject: Re: [PATCH v2] KVM: Explicitly use GFP_KERNEL_ACCOUNT for 'struct
- kvm_vcpu' allocations
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+        id S1350107AbhDGJ25 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 7 Apr 2021 05:28:57 -0400
+Received: from mail.kernel.org ([198.145.29.99]:38668 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S243648AbhDGJ25 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 7 Apr 2021 05:28:57 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 04E1861132;
+        Wed,  7 Apr 2021 09:28:48 +0000 (UTC)
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94)
+        (envelope-from <maz@kernel.org>)
+        id 1lU4UP-0062HZ-Nm; Wed, 07 Apr 2021 10:28:45 +0100
+Date:   Wed, 07 Apr 2021 10:28:44 +0100
+Message-ID: <87eefmpho3.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     pbonzini@redhat.com, richardcochran@gmail.com
+Cc:     netdev@vger.kernel.org, yangbo.lu@nxp.com, john.stultz@linaro.org,
+        tglx@linutronix.de, seanjc@google.com, Mark.Rutland@arm.com,
+        will@kernel.org, suzuki.poulose@arm.com, Andre.Przywara@arm.com,
+        steven.price@arm.com, lorenzo.pieralisi@arm.com,
+        sudeep.holla@arm.com, linux-kernel@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, Steve.Capper@arm.com, justin.he@arm.com,
+        jianyong.wu@arm.com, kernel-team@android.com,
+        Andre Przywara <andre.przywara@arm.com>
+Subject: Re: [PATCH v19 3/7] ptp: Reorganize ptp_kvm.c to make it arch-independent
+In-Reply-To: <20210330145430.996981-4-maz@kernel.org>
+References: <20210330145430.996981-1-maz@kernel.org>
+        <20210330145430.996981-4-maz@kernel.org>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: pbonzini@redhat.com, richardcochran@gmail.com, netdev@vger.kernel.org, yangbo.lu@nxp.com, john.stultz@linaro.org, tglx@linutronix.de, seanjc@google.com, Mark.Rutland@arm.com, will@kernel.org, suzuki.poulose@arm.com, Andre.Przywara@arm.com, steven.price@arm.com, lorenzo.pieralisi@arm.com, sudeep.holla@arm.com, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, Steve.Capper@arm.com, justin.he@arm.com, jianyong.wu@arm.com, kernel-team@android.com, andre.przywara@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 7 Apr 2021 at 03:07, Sean Christopherson <seanjc@google.com> wrote:
->
-> Use GFP_KERNEL_ACCOUNT when allocating vCPUs to make it more obvious that
-> that the allocations are accounted, to make it easier to audit KVM's
-> allocations in the future, and to be consistent with other cache usage in
-> KVM.
->
-> When using SLAB/SLUB, this is a nop as the cache itself is created with
-> SLAB_ACCOUNT.
->
-> When using SLOB, there are caveats within caveats.  SLOB doesn't honor
-> SLAB_ACCOUNT, so passing GFP_KERNEL_ACCOUNT will result in vCPU
-> allocations now being accounted.   But, even that depends on internal
-> SLOB details as SLOB will only go to the page allocator when its cache is
-> depleted.  That just happens to be extremely likely for vCPUs because the
-> size of kvm_vcpu is larger than the a page for almost all combinations of
-> architecture and page size.  Whether or not the SLOB behavior is by
-> design is unknown; it's just as likely that no SLOB users care about
-> accounding and so no one has bothered to implemented support in SLOB.
-> Regardless, accounting vCPU allocations will not break SLOB+KVM+cgroup
-> users, if any exist.
->
-> Cc: Wanpeng Li <kernellwp@gmail.com>
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
+On Tue, 30 Mar 2021 15:54:26 +0100,
+Marc Zyngier <maz@kernel.org> wrote:
+> 
+> From: Jianyong Wu <jianyong.wu@arm.com>
+> 
+> Currently, the ptp_kvm module contains a lot of x86-specific code.
+> Let's move this code into a new arch-specific file in the same directory,
+> and rename the arch-independent file to ptp_kvm_common.c.
+> 
+> Reviewed-by: Andre Przywara <andre.przywara@arm.com>
+> Signed-off-by: Jianyong Wu <jianyong.wu@arm.com>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> Link: https://lore.kernel.org/r/20201209060932.212364-4-jianyong.wu@arm.com
 
-Reviewed-by: Wanpeng Li <wanpengli@tencent.com>
+Richard, Paolo,
 
-> ---
->
-> v2: Drop the Fixes tag and rewrite the changelog since this is a nop when
->     using SLUB or SLAB. [Wanpeng]
->
->  virt/kvm/kvm_main.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index 0a481e7780f0..580f98386b42 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -3192,7 +3192,7 @@ static int kvm_vm_ioctl_create_vcpu(struct kvm *kvm, u32 id)
->         if (r)
->                 goto vcpu_decrement;
->
-> -       vcpu = kmem_cache_zalloc(kvm_vcpu_cache, GFP_KERNEL);
-> +       vcpu = kmem_cache_zalloc(kvm_vcpu_cache, GFP_KERNEL_ACCOUNT);
->         if (!vcpu) {
->                 r = -ENOMEM;
->                 goto vcpu_decrement;
-> --
-> 2.31.0.208.g409f899ff0-goog
->
+Can I get an Ack on this and patch #7? We're getting pretty close to
+the next merge window, and this series has been going on for a couple
+of years now...
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
