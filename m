@@ -2,183 +2,758 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1CB5E356E2A
-	for <lists+kvm@lfdr.de>; Wed,  7 Apr 2021 16:10:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0EB3D356E3F
+	for <lists+kvm@lfdr.de>; Wed,  7 Apr 2021 16:14:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235734AbhDGOKB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 7 Apr 2021 10:10:01 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:57184 "EHLO
+        id S1348141AbhDGOO1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 7 Apr 2021 10:14:27 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:56301 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S235665AbhDGOJ4 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 7 Apr 2021 10:09:56 -0400
+        by vger.kernel.org with ESMTP id S243083AbhDGOO0 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 7 Apr 2021 10:14:26 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1617804586;
+        s=mimecast20190719; t=1617804857;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=6wyt71cozy65hcX0B0LUSfnZBkpTZqMKxZPexDM1iz8=;
-        b=DC0UvIfFtd9yFaA9VyVQOOpS/+i9Vz8SbwcDqGs19bZz5/L6/XBek8cLeKfRM8q53H4ciH
-        JpcVyP/i13+KDsQA8obufPuO+cxiiEXzFzxNDC7PQWHjY+FRp+NRRPJszCEUdgX5NcgSAb
-        9oikw55YeQwMjKHyzidU6FIQ2dpYOs4=
+        bh=6Uvw9jrG66gcp1mzRYKhDrNKkjZ2KVBKAz93RG1fI04=;
+        b=fF5MZEY3amfW4FxuPntcIcKegw6w5ZKNWkyXsOs7B5H8yhj2QhWvuwgkXsfT5CWP9JCsHC
+        LRxKHpCSW3pYEOMvs/6lhnic+ngRTAF0GGwfeea/hC/HG2oXfKRq3xB+Ic8oYbnff4v+qp
+        OcUK0Hb+jmzBcWklw67dJ2FKjttP+TU=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-398-BoDHzmbMPVG8jxVfU5xRpg-1; Wed, 07 Apr 2021 10:09:42 -0400
-X-MC-Unique: BoDHzmbMPVG8jxVfU5xRpg-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+ us-mta-468-AOWkRk7EMa2OG0dUQag8xQ-1; Wed, 07 Apr 2021 10:14:13 -0400
+X-MC-Unique: AOWkRk7EMa2OG0dUQag8xQ-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 49F2410CE781;
-        Wed,  7 Apr 2021 14:09:40 +0000 (UTC)
-Received: from [10.36.114.68] (ovpn-114-68.ams2.redhat.com [10.36.114.68])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id A565F1B528;
-        Wed,  7 Apr 2021 14:09:36 +0000 (UTC)
-To:     "Kirill A. Shutemov" <kirill@shutemov.name>
-Cc:     Dave Hansen <dave.hansen@intel.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Sean Christopherson <seanjc@google.com>,
-        Jim Mattson <jmattson@google.com>,
-        David Rientjes <rientjes@google.com>,
-        "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>,
-        "Kleen, Andi" <andi.kleen@intel.com>,
-        "Yamahata, Isaku" <isaku.yamahata@intel.com>, x86@kernel.org,
-        kvm@vger.kernel.org, linux-mm@kvack.org,
-        linux-kernel@vger.kernel.org,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-References: <20210402152645.26680-1-kirill.shutemov@linux.intel.com>
- <20210402152645.26680-8-kirill.shutemov@linux.intel.com>
- <c5f2580d-0733-4523-d1e8-c43b487f0aaf@redhat.com>
- <52518f09-7350-ebe9-7ddb-29095cd3a4d9@intel.com>
- <d94d3042-098a-8df7-9ef6-b869851a4134@redhat.com>
- <20210407131647.djajbwhqsmlafsyo@box.shutemov.name>
-From:   David Hildenbrand <david@redhat.com>
-Organization: Red Hat GmbH
-Subject: Re: [RFCv1 7/7] KVM: unmap guest memory using poisoned pages
-Message-ID: <9c81fac4-9ac3-46d9-9ac6-da91312ad21b@redhat.com>
-Date:   Wed, 7 Apr 2021 16:09:35 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.8.1
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 24A4483DD20;
+        Wed,  7 Apr 2021 14:14:12 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.40.193.185])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 380821045E93;
+        Wed,  7 Apr 2021 14:14:08 +0000 (UTC)
+Date:   Wed, 7 Apr 2021 16:14:06 +0200
+From:   Andrew Jones <drjones@redhat.com>
+To:     Eric Auger <eric.auger@redhat.com>
+Cc:     eric.auger.pro@gmail.com, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, maz@kernel.org,
+        alexandru.elisei@arm.com, james.morse@arm.com,
+        suzuki.poulose@arm.com, shuah@kernel.org, pbonzini@redhat.com
+Subject: Re: [PATCH] KVM: selftests: vgic_init kvm selftests fixup
+Message-ID: <20210407141406.wzqgi36h6v7vs2dg@kamzik.brq.redhat.com>
+References: <20210407135937.533141-1-eric.auger@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20210407131647.djajbwhqsmlafsyo@box.shutemov.name>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210407135937.533141-1-eric.auger@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 07.04.21 15:16, Kirill A. Shutemov wrote:
-> On Tue, Apr 06, 2021 at 04:57:46PM +0200, David Hildenbrand wrote:
->> On 06.04.21 16:33, Dave Hansen wrote:
->>> On 4/6/21 12:44 AM, David Hildenbrand wrote:
->>>> On 02.04.21 17:26, Kirill A. Shutemov wrote:
->>>>> TDX architecture aims to provide resiliency against confidentiality and
->>>>> integrity attacks. Towards this goal, the TDX architecture helps enforce
->>>>> the enabling of memory integrity for all TD-private memory.
->>>>>
->>>>> The CPU memory controller computes the integrity check value (MAC) for
->>>>> the data (cache line) during writes, and it stores the MAC with the
->>>>> memory as meta-data. A 28-bit MAC is stored in the ECC bits.
->>>>>
->>>>> Checking of memory integrity is performed during memory reads. If
->>>>> integrity check fails, CPU poisones cache line.
->>>>>
->>>>> On a subsequent consumption (read) of the poisoned data by software,
->>>>> there are two possible scenarios:
->>>>>
->>>>>     - Core determines that the execution can continue and it treats
->>>>>       poison with exception semantics signaled as a #MCE
->>>>>
->>>>>     - Core determines execution cannot continue,and it does an unbreakable
->>>>>       shutdown
->>>>>
->>>>> For more details, see Chapter 14 of Intel TDX Module EAS[1]
->>>>>
->>>>> As some of integrity check failures may lead to system shutdown host
->>>>> kernel must not allow any writes to TD-private memory. This requirment
->>>>> clashes with KVM design: KVM expects the guest memory to be mapped into
->>>>> host userspace (e.g. QEMU).
->>>>
->>>> So what you are saying is that if QEMU would write to such memory, it
->>>> could crash the kernel? What a broken design.
->>>
->>> IMNHO, the broken design is mapping the memory to userspace in the first
->>> place.  Why the heck would you actually expose something with the MMU to
->>> a context that can't possibly meaningfully access or safely write to it?
->>
->> I'd say the broken design is being able to crash the machine via a simple
->> memory write, instead of only crashing a single process in case you're doing
->> something nasty. From the evaluation of the problem it feels like this was a
->> CPU design workaround: instead of properly cleaning up when it gets tricky
->> within the core, just crash the machine. And that's a CPU "feature", not a
->> kernel "feature". Now we have to fix broken HW in the kernel - once again.
->>
->> However, you raise a valid point: it does not make too much sense to to map
->> this into user space. Not arguing against that; but crashing the machine is
->> just plain ugly.
->>
->> I wonder: why do we even *want* a VMA/mmap describing that memory? Sounds
->> like: for hacking support for that memory type into QEMU/KVM.
->>
->> This all feels wrong, but I cannot really tell how it could be better. That
->> memory can really only be used (right now?) with hardware virtualization
->> from some point on. From that point on (right from the start?), there should
->> be no VMA/mmap/page tables for user space anymore.
->>
->> Or am I missing something? Is there still valid user space access?
-> 
-> There is. For IO (e.g. virtio) the guest mark a range of memory as shared
-> (or unencrypted for AMD SEV). The range is not pre-defined.
-> 
 
-Ah right, rings a bell. One obvious alternative would be to let user 
-space only explicitly map what is shared and can be safely accessed, 
-instead of doing it the other way around. But that obviously requires 
-more thought/work and clashes with future MM changes you discuss below.
+Hi Eric,
 
->>> This started with SEV.  QEMU creates normal memory mappings with the SEV
->>> C-bit (encryption) disabled.  The kernel plumbs those into NPT, but when
->>> those are instantiated, they have the C-bit set.  So, we have mismatched
->>> mappings.  Where does that lead?  The two mappings not only differ in
->>> the encryption bit, causing one side to read gibberish if the other
->>> writes: they're not even cache coherent.
->>>
->>> That's the situation *TODAY*, even ignoring TDX.
->>>
->>> BTW, I'm pretty sure I know the answer to the "why would you expose this
->>> to userspace" question: it's what QEMU/KVM did alreadhy for
->>> non-encrypted memory, so this was the quickest way to get SEV working.
->>>
->>
->> Yes, I guess so. It was the fastest way to "hack" it into QEMU.
->>
->> Would we ever even want a VMA/mmap/process page tables for that memory? How
->> could user space ever do something *not so nasty* with that memory (in the
->> current context of VMs)?
-> 
-> In the future, the memory should be still managable by host MM: migration,
-> swapping, etc. But it's long way there. For now, the guest memory
+If $SUBJECT started with 'fixup!' and otherwise matched the original
+subject then this could be automagically squashed in wherever the
+original commit already is.
 
-I was involved in the s390x implementation where this already works, 
-simply because whenever encrypted memory is read/written from the 
-hypervisor, you simple read/write the encrypted data; once the VM 
-accesses that memory, it reads/writes unencrypted memory. For this 
-reason, migration, swapping etc. works fairly naturally.
+Anyway,
 
-I do wonder how x86-64 wants to tackle that; In the far future, will it 
-be valid to again read/write encrypted memory, especially from user space?
+Reviewed-by: Andrew Jones <drjones@redhat.com>
 
-> effectively pinned on the host.
-
-Right, I remember that limitation for SEV.
-
-Thanks!
-
--- 
 Thanks,
+drew
 
-David / dhildenb
+On Wed, Apr 07, 2021 at 03:59:37PM +0200, Eric Auger wrote:
+> Bring some improvements/rationalization over the first version
+> of the vgic_init selftests:
+> 
+> - ucall_init is moved in run_cpu()
+> - vcpu_args_set is not called as not needed
+> - whenever a helper is supposed to succeed, call the non "_" version
+> - helpers do not return -errno, instead errno is checked by the caller
+> - vm_gic struct is used whenever possible, as well as vm_gic_destroy
+> - _kvm_create_device takes an addition fd parameter
+> 
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> Suggested-by: Andrew Jones <drjones@redhat.com>
+> 
+> ---
+> 
+> Applies on top of [PATCH v6 0/9] KVM/ARM: Some vgic fixes
+> and init sequence KVM selftests, put on kvm-arm64/vgic-5.13
+> 
+> The whole patchset can be found at
+> https://github.com/eauger/linux/tree/vgic_kvmselftests_v7
+> ---
+>  .../testing/selftests/kvm/aarch64/vgic_init.c | 275 ++++++++----------
+>  .../testing/selftests/kvm/include/kvm_util.h  |   2 +-
+>  tools/testing/selftests/kvm/lib/kvm_util.c    |  30 +-
+>  3 files changed, 136 insertions(+), 171 deletions(-)
+> 
+> diff --git a/tools/testing/selftests/kvm/aarch64/vgic_init.c b/tools/testing/selftests/kvm/aarch64/vgic_init.c
+> index be1a7c0d0527..682e753fdc59 100644
+> --- a/tools/testing/selftests/kvm/aarch64/vgic_init.c
+> +++ b/tools/testing/selftests/kvm/aarch64/vgic_init.c
+> @@ -27,7 +27,7 @@ struct vm_gic {
+>  	int gic_fd;
+>  };
+>  
+> -int max_ipa_bits;
+> +static int max_ipa_bits;
+>  
+>  /* helper to access a redistributor register */
+>  static int access_redist_reg(int gicv3_fd, int vcpu, int offset,
+> @@ -51,12 +51,8 @@ static void guest_code(void)
+>  /* we don't want to assert on run execution, hence that helper */
+>  static int run_vcpu(struct kvm_vm *vm, uint32_t vcpuid)
+>  {
+> -	int ret;
+> -
+> -	vcpu_args_set(vm, vcpuid, 1);
+> -	ret = _vcpu_ioctl(vm, vcpuid, KVM_RUN, NULL);
+> -	get_ucall(vm, vcpuid, NULL);
+> -
+> +	ucall_init(vm, NULL);
+> +	int ret = _vcpu_ioctl(vm, vcpuid, KVM_RUN, NULL);
+>  	if (ret)
+>  		return -errno;
+>  	return 0;
+> @@ -68,7 +64,6 @@ static struct vm_gic vm_gic_create(void)
+>  
+>  	v.vm = vm_create_default_with_vcpus(NR_VCPUS, 0, 0, guest_code, NULL);
+>  	v.gic_fd = kvm_create_device(v.vm, KVM_DEV_TYPE_ARM_VGIC_V3, false);
+> -	TEST_ASSERT(v.gic_fd > 0, "GICv3 device created");
+>  
+>  	return v;
+>  }
+> @@ -91,66 +86,62 @@ static void subtest_dist_rdist(struct vm_gic *v)
+>  	uint64_t addr;
+>  
+>  	/* Check existing group/attributes */
+> -	ret = _kvm_device_check_attr(v->gic_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
+> -				    KVM_VGIC_V3_ADDR_TYPE_DIST);
+> -	TEST_ASSERT(!ret, "KVM_DEV_ARM_VGIC_GRP_ADDR/KVM_VGIC_V3_ADDR_TYPE_DIST supported");
+> +	kvm_device_check_attr(v->gic_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
+> +			      KVM_VGIC_V3_ADDR_TYPE_DIST);
+>  
+> -	ret = _kvm_device_check_attr(v->gic_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
+> -				    KVM_VGIC_V3_ADDR_TYPE_REDIST);
+> -	TEST_ASSERT(!ret, "KVM_DEV_ARM_VGIC_GRP_ADDR/KVM_VGIC_V3_ADDR_TYPE_REDIST supported");
+> +	kvm_device_check_attr(v->gic_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
+> +			      KVM_VGIC_V3_ADDR_TYPE_REDIST);
+>  
+>  	/* check non existing attribute */
+>  	ret = _kvm_device_check_attr(v->gic_fd, KVM_DEV_ARM_VGIC_GRP_ADDR, 0);
+> -	TEST_ASSERT(ret == -ENXIO, "attribute not supported");
+> +	TEST_ASSERT(ret && errno == ENXIO, "attribute not supported");
+>  
+>  	/* misaligned DIST and REDIST address settings */
+>  	addr = 0x1000;
+>  	ret = _kvm_device_access(v->gic_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
+>  				 KVM_VGIC_V3_ADDR_TYPE_DIST, &addr, true);
+> -	TEST_ASSERT(ret == -EINVAL, "GICv3 dist base not 64kB aligned");
+> +	TEST_ASSERT(ret && errno == EINVAL, "GICv3 dist base not 64kB aligned");
+>  
+>  	ret = _kvm_device_access(v->gic_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
+>  				 KVM_VGIC_V3_ADDR_TYPE_REDIST, &addr, true);
+> -	TEST_ASSERT(ret == -EINVAL, "GICv3 redist base not 64kB aligned");
+> +	TEST_ASSERT(ret && errno == EINVAL, "GICv3 redist base not 64kB aligned");
+>  
+>  	/* out of range address */
+>  	if (max_ipa_bits) {
+>  		addr = 1ULL << max_ipa_bits;
+>  		ret = _kvm_device_access(v->gic_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
+>  					 KVM_VGIC_V3_ADDR_TYPE_DIST, &addr, true);
+> -		TEST_ASSERT(ret == -E2BIG, "dist address beyond IPA limit");
+> +		TEST_ASSERT(ret && errno == E2BIG, "dist address beyond IPA limit");
+>  
+>  		ret = _kvm_device_access(v->gic_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
+>  					 KVM_VGIC_V3_ADDR_TYPE_REDIST, &addr, true);
+> -		TEST_ASSERT(ret == -E2BIG, "redist address beyond IPA limit");
+> +		TEST_ASSERT(ret && errno == E2BIG, "redist address beyond IPA limit");
+>  	}
+>  
+>  	/* set REDIST base address @0x0*/
+>  	addr = 0x00000;
+> -	ret = _kvm_device_access(v->gic_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
+> -				 KVM_VGIC_V3_ADDR_TYPE_REDIST, &addr, true);
+> -	TEST_ASSERT(!ret, "GICv3 redist base set");
+> +	kvm_device_access(v->gic_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
+> +			  KVM_VGIC_V3_ADDR_TYPE_REDIST, &addr, true);
+>  
+>  	/* Attempt to create a second legacy redistributor region */
+>  	addr = 0xE0000;
+>  	ret = _kvm_device_access(v->gic_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
+>  				 KVM_VGIC_V3_ADDR_TYPE_REDIST, &addr, true);
+> -	TEST_ASSERT(ret == -EEXIST, "GICv3 redist base set again");
+> +	TEST_ASSERT(ret && errno == EEXIST, "GICv3 redist base set again");
+>  
+>  	/* Attempt to mix legacy and new redistributor regions */
+>  	addr = REDIST_REGION_ATTR_ADDR(NR_VCPUS, 0x100000, 0, 0);
+>  	ret = _kvm_device_access(v->gic_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
+>  				 KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION, &addr, true);
+> -	TEST_ASSERT(ret == -EINVAL, "attempt to mix GICv3 REDIST and REDIST_REGION");
+> +	TEST_ASSERT(ret && errno == EINVAL, "attempt to mix GICv3 REDIST and REDIST_REGION");
+>  
+>  	/*
+>  	 * Set overlapping DIST / REDIST, cannot be detected here. Will be detected
+>  	 * on first vcpu run instead.
+>  	 */
+>  	addr = 3 * 2 * 0x10000;
+> -	ret = _kvm_device_access(v->gic_fd, KVM_DEV_ARM_VGIC_GRP_ADDR, KVM_VGIC_V3_ADDR_TYPE_DIST,
+> -				 &addr, true);
+> -	TEST_ASSERT(!ret, "dist overlapping rdist");
+> +	kvm_device_access(v->gic_fd, KVM_DEV_ARM_VGIC_GRP_ADDR, KVM_VGIC_V3_ADDR_TYPE_DIST,
+> +			  &addr, true);
+>  }
+>  
+>  /* Test the new REDIST region API */
+> @@ -166,57 +157,59 @@ static void subtest_redist_regions(struct vm_gic *v)
+>  	addr = REDIST_REGION_ATTR_ADDR(NR_VCPUS, 0x100000, 2, 0);
+>  	ret = _kvm_device_access(v->gic_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
+>  				 KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION, &addr, true);
+> -	TEST_ASSERT(ret == -EINVAL, "redist region attr value with flags != 0");
+> +	TEST_ASSERT(ret && errno == EINVAL, "redist region attr value with flags != 0");
+>  
+>  	addr = REDIST_REGION_ATTR_ADDR(0, 0x100000, 0, 0);
+>  	ret = _kvm_device_access(v->gic_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
+>  				 KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION, &addr, true);
+> -	TEST_ASSERT(ret == -EINVAL, "redist region attr value with count== 0");
+> +	TEST_ASSERT(ret && errno == EINVAL, "redist region attr value with count== 0");
+>  
+>  	addr = REDIST_REGION_ATTR_ADDR(2, 0x200000, 0, 1);
+>  	ret = _kvm_device_access(v->gic_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
+>  				 KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION, &addr, true);
+> -	TEST_ASSERT(ret == -EINVAL, "attempt to register the first rdist region with index != 0");
+> +	TEST_ASSERT(ret && errno == EINVAL,
+> +		    "attempt to register the first rdist region with index != 0");
+>  
+>  	addr = REDIST_REGION_ATTR_ADDR(2, 0x201000, 0, 1);
+>  	ret = _kvm_device_access(v->gic_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
+>  				 KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION, &addr, true);
+> -	TEST_ASSERT(ret == -EINVAL, "rdist region with misaligned address");
+> +	TEST_ASSERT(ret && errno == EINVAL, "rdist region with misaligned address");
+>  
+>  	addr = REDIST_REGION_ATTR_ADDR(2, 0x200000, 0, 0);
+> -	ret = _kvm_device_access(v->gic_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
+> -				 KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION, &addr, true);
+> -	TEST_ASSERT(!ret, "First valid redist region with 2 rdist @ 0x200000, index 0");
+> +	kvm_device_access(v->gic_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
+> +			  KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION, &addr, true);
+>  
+>  	addr = REDIST_REGION_ATTR_ADDR(2, 0x200000, 0, 1);
+>  	ret = _kvm_device_access(v->gic_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
+>  				 KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION, &addr, true);
+> -	TEST_ASSERT(ret == -EINVAL, "register an rdist region with already used index");
+> +	TEST_ASSERT(ret && errno == EINVAL, "register an rdist region with already used index");
+>  
+>  	addr = REDIST_REGION_ATTR_ADDR(1, 0x210000, 0, 2);
+>  	ret = _kvm_device_access(v->gic_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
+>  				 KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION, &addr, true);
+> -	TEST_ASSERT(ret == -EINVAL, "register an rdist region overlapping with another one");
+> +	TEST_ASSERT(ret && errno == EINVAL,
+> +		    "register an rdist region overlapping with another one");
+>  
+>  	addr = REDIST_REGION_ATTR_ADDR(1, 0x240000, 0, 2);
+>  	ret = _kvm_device_access(v->gic_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
+>  				 KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION, &addr, true);
+> -	TEST_ASSERT(ret == -EINVAL, "register redist region with index not +1");
+> +	TEST_ASSERT(ret && errno == EINVAL, "register redist region with index not +1");
+>  
+>  	addr = REDIST_REGION_ATTR_ADDR(1, 0x240000, 0, 1);
+> -	ret = _kvm_device_access(v->gic_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
+> -				 KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION, &addr, true);
+> -	TEST_ASSERT(!ret, "register valid redist region with 1 rdist @ 0x220000, index 1");
+> +	kvm_device_access(v->gic_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
+> +			  KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION, &addr, true);
+>  
+>  	addr = REDIST_REGION_ATTR_ADDR(1, 1ULL << max_ipa_bits, 0, 2);
+>  	ret = _kvm_device_access(v->gic_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
+>  				 KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION, &addr, true);
+> -	TEST_ASSERT(ret == -E2BIG, "register redist region with base address beyond IPA range");
+> +	TEST_ASSERT(ret && errno == E2BIG,
+> +		    "register redist region with base address beyond IPA range");
+>  
+>  	addr = 0x260000;
+>  	ret = _kvm_device_access(v->gic_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
+>  				 KVM_VGIC_V3_ADDR_TYPE_REDIST, &addr, true);
+> -	TEST_ASSERT(ret == -EINVAL, "Mix KVM_VGIC_V3_ADDR_TYPE_REDIST and REDIST_REGION");
+> +	TEST_ASSERT(ret && errno == EINVAL,
+> +		    "Mix KVM_VGIC_V3_ADDR_TYPE_REDIST and REDIST_REGION");
+>  
+>  	/*
+>  	 * Now there are 2 redist regions:
+> @@ -240,17 +233,16 @@ static void subtest_redist_regions(struct vm_gic *v)
+>  	addr = REDIST_REGION_ATTR_ADDR(0, 0, 0, 2);
+>  	ret = _kvm_device_access(v->gic_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
+>  				 KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION, &addr, false);
+> -	TEST_ASSERT(ret == -ENOENT, "read characteristics of non existing region");
+> +	TEST_ASSERT(ret && errno == ENOENT, "read characteristics of non existing region");
+>  
+>  	addr = 0x260000;
+> -	ret = _kvm_device_access(v->gic_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
+> -				 KVM_VGIC_V3_ADDR_TYPE_DIST, &addr, true);
+> -	TEST_ASSERT(!ret, "set dist region");
+> +	kvm_device_access(v->gic_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
+> +			  KVM_VGIC_V3_ADDR_TYPE_DIST, &addr, true);
+>  
+>  	addr = REDIST_REGION_ATTR_ADDR(1, 0x260000, 0, 2);
+>  	ret = _kvm_device_access(v->gic_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
+>  				 KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION, &addr, true);
+> -	TEST_ASSERT(ret == -EINVAL, "register redist region colliding with dist");
+> +	TEST_ASSERT(ret && errno == EINVAL, "register redist region colliding with dist");
+>  }
+>  
+>  /*
+> @@ -264,7 +256,6 @@ static void test_vgic_then_vcpus(void)
+>  
+>  	v.vm = vm_create_default(0, 0, guest_code);
+>  	v.gic_fd = kvm_create_device(v.vm, KVM_DEV_TYPE_ARM_VGIC_V3, false);
+> -	TEST_ASSERT(v.gic_fd > 0, "GICv3 device created");
+>  
+>  	subtest_dist_rdist(&v);
+>  
+> @@ -272,7 +263,6 @@ static void test_vgic_then_vcpus(void)
+>  	for (i = 1; i < NR_VCPUS; ++i)
+>  		vm_vcpu_add_default(v.vm, i, guest_code);
+>  
+> -	ucall_init(v.vm, NULL);
+>  	ret = run_vcpu(v.vm, 3);
+>  	TEST_ASSERT(ret == -EINVAL, "dist/rdist overlap detected on 1st vcpu run");
+>  
+> @@ -289,7 +279,6 @@ static void test_vcpus_then_vgic(void)
+>  
+>  	subtest_dist_rdist(&v);
+>  
+> -	ucall_init(v.vm, NULL);
+>  	ret = run_vcpu(v.vm, 3);
+>  	TEST_ASSERT(ret == -EINVAL, "dist/rdist overlap detected on 1st vcpu run");
+>  
+> @@ -305,11 +294,9 @@ static void test_new_redist_regions(void)
+>  
+>  	v = vm_gic_create();
+>  	subtest_redist_regions(&v);
+> -	ret = _kvm_device_access(v.gic_fd, KVM_DEV_ARM_VGIC_GRP_CTRL,
+> -				 KVM_DEV_ARM_VGIC_CTRL_INIT, NULL, true);
+> -	TEST_ASSERT(!ret, "init the vgic");
+> +	kvm_device_access(v.gic_fd, KVM_DEV_ARM_VGIC_GRP_CTRL,
+> +			  KVM_DEV_ARM_VGIC_CTRL_INIT, NULL, true);
+>  
+> -	ucall_init(v.vm, NULL);
+>  	ret = run_vcpu(v.vm, 3);
+>  	TEST_ASSERT(ret == -ENXIO, "running without sufficient number of rdists");
+>  	vm_gic_destroy(&v);
+> @@ -320,11 +307,9 @@ static void test_new_redist_regions(void)
+>  	subtest_redist_regions(&v);
+>  
+>  	addr = REDIST_REGION_ATTR_ADDR(1, 0x280000, 0, 2);
+> -	ret = _kvm_device_access(v.gic_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
+> -				 KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION, &addr, true);
+> -	TEST_ASSERT(!ret, "register a third region allowing to cover the 4 vcpus");
+> +	kvm_device_access(v.gic_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
+> +			  KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION, &addr, true);
+>  
+> -	ucall_init(v.vm, NULL);
+>  	ret = run_vcpu(v.vm, 3);
+>  	TEST_ASSERT(ret == -EBUSY, "running without vgic explicit init");
+>  
+> @@ -335,20 +320,18 @@ static void test_new_redist_regions(void)
+>  	v = vm_gic_create();
+>  	subtest_redist_regions(&v);
+>  
+> -	ret = _kvm_device_access(v.gic_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
+> -				 KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION, dummy, true);
+> -	TEST_ASSERT(ret == -EFAULT, "register a third region allowing to cover the 4 vcpus");
+> +	_kvm_device_access(v.gic_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
+> +			  KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION, dummy, true);
+> +	TEST_ASSERT(ret && errno == EFAULT,
+> +		    "register a third region allowing to cover the 4 vcpus");
+>  
+>  	addr = REDIST_REGION_ATTR_ADDR(1, 0x280000, 0, 2);
+> -	ret = _kvm_device_access(v.gic_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
+> -				 KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION, &addr, true);
+> -	TEST_ASSERT(!ret, "register a third region allowing to cover the 4 vcpus");
+> +	kvm_device_access(v.gic_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
+> +			  KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION, &addr, true);
+>  
+> -	ret = _kvm_device_access(v.gic_fd, KVM_DEV_ARM_VGIC_GRP_CTRL,
+> -				 KVM_DEV_ARM_VGIC_CTRL_INIT, NULL, true);
+> -	TEST_ASSERT(!ret, "init the vgic");
+> +	kvm_device_access(v.gic_fd, KVM_DEV_ARM_VGIC_GRP_CTRL,
+> +			  KVM_DEV_ARM_VGIC_CTRL_INIT, NULL, true);
+>  
+> -	ucall_init(v.vm, NULL);
+>  	ret = run_vcpu(v.vm, 3);
+>  	TEST_ASSERT(!ret, "vcpu run");
+>  
+> @@ -357,76 +340,71 @@ static void test_new_redist_regions(void)
+>  
+>  static void test_typer_accesses(void)
+>  {
+> -	int ret, i, gicv3_fd = -1;
+> +	struct vm_gic v;
+>  	uint64_t addr;
+> -	struct kvm_vm *vm;
+>  	uint32_t val;
+> +	int ret, i;
+>  
+> -	vm = vm_create_default(0, 0, guest_code);
+> +	v.vm = vm_create_default(0, 0, guest_code);
+>  
+> -	gicv3_fd = kvm_create_device(vm, KVM_DEV_TYPE_ARM_VGIC_V3, false);
+> -	TEST_ASSERT(gicv3_fd >= 0, "VGIC_V3 device created");
+> +	v.gic_fd = kvm_create_device(v.vm, KVM_DEV_TYPE_ARM_VGIC_V3, false);
+>  
+> -	vm_vcpu_add_default(vm, 3, guest_code);
+> +	vm_vcpu_add_default(v.vm, 3, guest_code);
+>  
+> -	ret = access_redist_reg(gicv3_fd, 1, GICR_TYPER, &val, false);
+> -	TEST_ASSERT(ret == -EINVAL, "attempting to read GICR_TYPER of non created vcpu");
+> +	ret = access_redist_reg(v.gic_fd, 1, GICR_TYPER, &val, false);
+> +	TEST_ASSERT(ret && errno == EINVAL, "attempting to read GICR_TYPER of non created vcpu");
+>  
+> -	vm_vcpu_add_default(vm, 1, guest_code);
+> +	vm_vcpu_add_default(v.vm, 1, guest_code);
+>  
+> -	ret = access_redist_reg(gicv3_fd, 1, GICR_TYPER, &val, false);
+> -	TEST_ASSERT(ret == -EBUSY, "read GICR_TYPER before GIC initialized");
+> +	ret = access_redist_reg(v.gic_fd, 1, GICR_TYPER, &val, false);
+> +	TEST_ASSERT(ret && errno == EBUSY, "read GICR_TYPER before GIC initialized");
+>  
+> -	vm_vcpu_add_default(vm, 2, guest_code);
+> +	vm_vcpu_add_default(v.vm, 2, guest_code);
+>  
+> -	ret = _kvm_device_access(gicv3_fd, KVM_DEV_ARM_VGIC_GRP_CTRL,
+> -				 KVM_DEV_ARM_VGIC_CTRL_INIT, NULL, true);
+> -	TEST_ASSERT(!ret, "init the vgic after the vcpu creations");
+> +	kvm_device_access(v.gic_fd, KVM_DEV_ARM_VGIC_GRP_CTRL,
+> +			  KVM_DEV_ARM_VGIC_CTRL_INIT, NULL, true);
+>  
+>  	for (i = 0; i < NR_VCPUS ; i++) {
+> -		ret = access_redist_reg(gicv3_fd, 0, GICR_TYPER, &val, false);
+> +		ret = access_redist_reg(v.gic_fd, 0, GICR_TYPER, &val, false);
+>  		TEST_ASSERT(!ret && !val, "read GICR_TYPER before rdist region setting");
+>  	}
+>  
+>  	addr = REDIST_REGION_ATTR_ADDR(2, 0x200000, 0, 0);
+> -	ret = _kvm_device_access(gicv3_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
+> -				 KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION, &addr, true);
+> -	TEST_ASSERT(!ret, "first rdist region with a capacity of 2 rdists");
+> +	kvm_device_access(v.gic_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
+> +			  KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION, &addr, true);
+>  
+>  	/* The 2 first rdists should be put there (vcpu 0 and 3) */
+> -	ret = access_redist_reg(gicv3_fd, 0, GICR_TYPER, &val, false);
+> +	ret = access_redist_reg(v.gic_fd, 0, GICR_TYPER, &val, false);
+>  	TEST_ASSERT(!ret && !val, "read typer of rdist #0");
+>  
+> -	ret = access_redist_reg(gicv3_fd, 3, GICR_TYPER, &val, false);
+> +	ret = access_redist_reg(v.gic_fd, 3, GICR_TYPER, &val, false);
+>  	TEST_ASSERT(!ret && val == 0x310, "read typer of rdist #1");
+>  
+>  	addr = REDIST_REGION_ATTR_ADDR(10, 0x100000, 0, 1);
+> -	ret = _kvm_device_access(gicv3_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
+> +	ret = _kvm_device_access(v.gic_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
+>  				 KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION, &addr, true);
+> -	TEST_ASSERT(ret == -EINVAL, "collision with previous rdist region");
+> +	TEST_ASSERT(ret && errno == EINVAL, "collision with previous rdist region");
+>  
+> -	ret = access_redist_reg(gicv3_fd, 1, GICR_TYPER, &val, false);
+> +	ret = access_redist_reg(v.gic_fd, 1, GICR_TYPER, &val, false);
+>  	TEST_ASSERT(!ret && val == 0x100,
+>  		    "no redist region attached to vcpu #1 yet, last cannot be returned");
+>  
+> -	ret = access_redist_reg(gicv3_fd, 2, GICR_TYPER, &val, false);
+> +	ret = access_redist_reg(v.gic_fd, 2, GICR_TYPER, &val, false);
+>  	TEST_ASSERT(!ret && val == 0x200,
+>  		    "no redist region attached to vcpu #2, last cannot be returned");
+>  
+>  	addr = REDIST_REGION_ATTR_ADDR(10, 0x20000, 0, 1);
+> -	ret = _kvm_device_access(gicv3_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
+> -				 KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION, &addr, true);
+> -	TEST_ASSERT(!ret, "second rdist region");
+> +	kvm_device_access(v.gic_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
+> +			  KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION, &addr, true);
+>  
+> -	ret = access_redist_reg(gicv3_fd, 1, GICR_TYPER, &val, false);
+> +	ret = access_redist_reg(v.gic_fd, 1, GICR_TYPER, &val, false);
+>  	TEST_ASSERT(!ret && val == 0x100, "read typer of rdist #1");
+>  
+> -	ret = access_redist_reg(gicv3_fd, 2, GICR_TYPER, &val, false);
+> +	ret = access_redist_reg(v.gic_fd, 2, GICR_TYPER, &val, false);
+>  	TEST_ASSERT(!ret && val == 0x210,
+>  		    "read typer of rdist #1, last properly returned");
+>  
+> -	close(gicv3_fd);
+> -	kvm_vm_free(vm);
+> +	vm_gic_destroy(&v);
+>  }
+>  
+>  /**
+> @@ -442,127 +420,116 @@ static void test_typer_accesses(void)
+>  static void test_last_bit_redist_regions(void)
+>  {
+>  	uint32_t vcpuids[] = { 0, 3, 5, 4, 1, 2 };
+> -	int ret, gicv3_fd;
+> +	struct vm_gic v;
+>  	uint64_t addr;
+> -	struct kvm_vm *vm;
+>  	uint32_t val;
+> +	int ret;
+>  
+> -	vm = vm_create_default_with_vcpus(6, 0, 0, guest_code, vcpuids);
+> +	v.vm = vm_create_default_with_vcpus(6, 0, 0, guest_code, vcpuids);
+>  
+> -	gicv3_fd = kvm_create_device(vm, KVM_DEV_TYPE_ARM_VGIC_V3, false);
+> -	TEST_ASSERT(gicv3_fd >= 0, "VGIC_V3 device created");
+> +	v.gic_fd = kvm_create_device(v.vm, KVM_DEV_TYPE_ARM_VGIC_V3, false);
+>  
+> -	ret = _kvm_device_access(gicv3_fd, KVM_DEV_ARM_VGIC_GRP_CTRL,
+> -				 KVM_DEV_ARM_VGIC_CTRL_INIT, NULL, true);
+> -	TEST_ASSERT(!ret, "init the vgic after the vcpu creations");
+> +	kvm_device_access(v.gic_fd, KVM_DEV_ARM_VGIC_GRP_CTRL,
+> +			  KVM_DEV_ARM_VGIC_CTRL_INIT, NULL, true);
+>  
+>  	addr = REDIST_REGION_ATTR_ADDR(2, 0x100000, 0, 0);
+> -	ret = _kvm_device_access(gicv3_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
+> -				 KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION, &addr, true);
+> -	TEST_ASSERT(!ret, "rdist region #0 (2 rdist)");
+> +	kvm_device_access(v.gic_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
+> +			  KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION, &addr, true);
+>  
+>  	addr = REDIST_REGION_ATTR_ADDR(2, 0x240000, 0, 1);
+> -	ret = _kvm_device_access(gicv3_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
+> -				 KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION, &addr, true);
+> -	TEST_ASSERT(!ret, "rdist region #1 (1 rdist) contiguous with #2");
+> +	kvm_device_access(v.gic_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
+> +			  KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION, &addr, true);
+>  
+>  	addr = REDIST_REGION_ATTR_ADDR(2, 0x200000, 0, 2);
+> -	ret = _kvm_device_access(gicv3_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
+> -				 KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION, &addr, true);
+> -	TEST_ASSERT(!ret, "rdist region #2 with a capacity of 2 rdists");
+> +	kvm_device_access(v.gic_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
+> +			  KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION, &addr, true);
+>  
+> -	ret = access_redist_reg(gicv3_fd, 0, GICR_TYPER, &val, false);
+> +	ret = access_redist_reg(v.gic_fd, 0, GICR_TYPER, &val, false);
+>  	TEST_ASSERT(!ret && val == 0x000, "read typer of rdist #0");
+>  
+> -	ret = access_redist_reg(gicv3_fd, 1, GICR_TYPER, &val, false);
+> +	ret = access_redist_reg(v.gic_fd, 1, GICR_TYPER, &val, false);
+>  	TEST_ASSERT(!ret && val == 0x100, "read typer of rdist #1");
+>  
+> -	ret = access_redist_reg(gicv3_fd, 2, GICR_TYPER, &val, false);
+> +	ret = access_redist_reg(v.gic_fd, 2, GICR_TYPER, &val, false);
+>  	TEST_ASSERT(!ret && val == 0x200, "read typer of rdist #2");
+>  
+> -	ret = access_redist_reg(gicv3_fd, 3, GICR_TYPER, &val, false);
+> +	ret = access_redist_reg(v.gic_fd, 3, GICR_TYPER, &val, false);
+>  	TEST_ASSERT(!ret && val == 0x310, "read typer of rdist #3");
+>  
+> -	ret = access_redist_reg(gicv3_fd, 5, GICR_TYPER, &val, false);
+> +	ret = access_redist_reg(v.gic_fd, 5, GICR_TYPER, &val, false);
+>  	TEST_ASSERT(!ret && val == 0x500, "read typer of rdist #5");
+>  
+> -	ret = access_redist_reg(gicv3_fd, 4, GICR_TYPER, &val, false);
+> +	ret = access_redist_reg(v.gic_fd, 4, GICR_TYPER, &val, false);
+>  	TEST_ASSERT(!ret && val == 0x410, "read typer of rdist #4");
+>  
+> -	close(gicv3_fd);
+> -	kvm_vm_free(vm);
+> +	vm_gic_destroy(&v);
+>  }
+>  
+>  /* Test last bit with legacy region */
+>  static void test_last_bit_single_rdist(void)
+>  {
+>  	uint32_t vcpuids[] = { 0, 3, 5, 4, 1, 2 };
+> -	int ret, gicv3_fd;
+> +	struct vm_gic v;
+>  	uint64_t addr;
+> -	struct kvm_vm *vm;
+>  	uint32_t val;
+> +	int ret;
+>  
+> -	vm = vm_create_default_with_vcpus(6, 0, 0, guest_code, vcpuids);
+> +	v.vm = vm_create_default_with_vcpus(6, 0, 0, guest_code, vcpuids);
+>  
+> -	gicv3_fd = kvm_create_device(vm, KVM_DEV_TYPE_ARM_VGIC_V3, false);
+> -	TEST_ASSERT(gicv3_fd >= 0, "VGIC_V3 device created");
+> +	v.gic_fd = kvm_create_device(v.vm, KVM_DEV_TYPE_ARM_VGIC_V3, false);
+>  
+> -	ret = _kvm_device_access(gicv3_fd, KVM_DEV_ARM_VGIC_GRP_CTRL,
+> -				 KVM_DEV_ARM_VGIC_CTRL_INIT, NULL, true);
+> -	TEST_ASSERT(!ret, "init the vgic after the vcpu creations");
+> +	kvm_device_access(v.gic_fd, KVM_DEV_ARM_VGIC_GRP_CTRL,
+> +			  KVM_DEV_ARM_VGIC_CTRL_INIT, NULL, true);
+>  
+>  	addr = 0x10000;
+> -	ret = _kvm_device_access(gicv3_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
+> -				 KVM_VGIC_V3_ADDR_TYPE_REDIST, &addr, true);
+> +	kvm_device_access(v.gic_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
+> +			  KVM_VGIC_V3_ADDR_TYPE_REDIST, &addr, true);
+>  
+> -	ret = access_redist_reg(gicv3_fd, 0, GICR_TYPER, &val, false);
+> +	ret = access_redist_reg(v.gic_fd, 0, GICR_TYPER, &val, false);
+>  	TEST_ASSERT(!ret && val == 0x000, "read typer of rdist #0");
+>  
+> -	ret = access_redist_reg(gicv3_fd, 3, GICR_TYPER, &val, false);
+> +	ret = access_redist_reg(v.gic_fd, 3, GICR_TYPER, &val, false);
+>  	TEST_ASSERT(!ret && val == 0x300, "read typer of rdist #1");
+>  
+> -	ret = access_redist_reg(gicv3_fd, 5, GICR_TYPER, &val, false);
+> +	ret = access_redist_reg(v.gic_fd, 5, GICR_TYPER, &val, false);
+>  	TEST_ASSERT(!ret && val == 0x500, "read typer of rdist #2");
+>  
+> -	ret = access_redist_reg(gicv3_fd, 1, GICR_TYPER, &val, false);
+> +	ret = access_redist_reg(v.gic_fd, 1, GICR_TYPER, &val, false);
+>  	TEST_ASSERT(!ret && val == 0x100, "read typer of rdist #3");
+>  
+> -	ret = access_redist_reg(gicv3_fd, 2, GICR_TYPER, &val, false);
+> +	ret = access_redist_reg(v.gic_fd, 2, GICR_TYPER, &val, false);
+>  	TEST_ASSERT(!ret && val == 0x210, "read typer of rdist #3");
+>  
+> -	close(gicv3_fd);
+> -	kvm_vm_free(vm);
+> +	vm_gic_destroy(&v);
+>  }
+>  
+>  void test_kvm_device(void)
+>  {
+>  	struct vm_gic v;
+> -	int ret;
+> +	int ret, fd;
+>  
+>  	v.vm = vm_create_default_with_vcpus(NR_VCPUS, 0, 0, guest_code, NULL);
+>  
+>  	/* try to create a non existing KVM device */
+> -	ret = _kvm_create_device(v.vm, 0, true);
+> -	TEST_ASSERT(ret == -ENODEV, "unsupported device");
+> +	ret = _kvm_create_device(v.vm, 0, true, &fd);
+> +	TEST_ASSERT(ret && errno == ENODEV, "unsupported device");
+>  
+>  	/* trial mode with VGIC_V3 device */
+> -	ret = kvm_create_device(v.vm, KVM_DEV_TYPE_ARM_VGIC_V3, true);
+> +	ret = _kvm_create_device(v.vm, KVM_DEV_TYPE_ARM_VGIC_V3, true, &fd);
+>  	if (ret) {
+>  		print_skip("GICv3 not supported");
+>  		exit(KSFT_SKIP);
+>  	}
+>  	v.gic_fd = kvm_create_device(v.vm, KVM_DEV_TYPE_ARM_VGIC_V3, false);
+> -	TEST_ASSERT(v.gic_fd, "create the GICv3 device");
+>  
+> -	ret = _kvm_create_device(v.vm, KVM_DEV_TYPE_ARM_VGIC_V3, false);
+> -	TEST_ASSERT(ret == -EEXIST, "create GICv3 device twice");
+> +	ret = _kvm_create_device(v.vm, KVM_DEV_TYPE_ARM_VGIC_V3, false, &fd);
+> +	TEST_ASSERT(ret && errno == EEXIST, "create GICv3 device twice");
+>  
+> -	ret = kvm_create_device(v.vm, KVM_DEV_TYPE_ARM_VGIC_V3, true);
+> -	TEST_ASSERT(!ret, "create GICv3 in test mode while the same already is created");
+> +	kvm_create_device(v.vm, KVM_DEV_TYPE_ARM_VGIC_V3, true);
+>  
+> -	if (!_kvm_create_device(v.vm, KVM_DEV_TYPE_ARM_VGIC_V2, true)) {
+> -		ret = kvm_create_device(v.vm, KVM_DEV_TYPE_ARM_VGIC_V2, false);
+> -		TEST_ASSERT(ret == -EINVAL, "create GICv2 while v3 exists");
+> +	if (!_kvm_create_device(v.vm, KVM_DEV_TYPE_ARM_VGIC_V2, true, &fd)) {
+> +		ret = _kvm_create_device(v.vm, KVM_DEV_TYPE_ARM_VGIC_V2, false, &fd);
+> +		TEST_ASSERT(ret && errno == EINVAL, "create GICv2 while v3 exists");
+>  	}
+>  
+>  	vm_gic_destroy(&v);
+> diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
+> index 2b4b325cde01..56ac3cf76168 100644
+> --- a/tools/testing/selftests/kvm/include/kvm_util.h
+> +++ b/tools/testing/selftests/kvm/include/kvm_util.h
+> @@ -227,7 +227,7 @@ void *vcpu_map_dirty_ring(struct kvm_vm *vm, uint32_t vcpuid);
+>  
+>  int _kvm_device_check_attr(int dev_fd, uint32_t group, uint64_t attr);
+>  int kvm_device_check_attr(int dev_fd, uint32_t group, uint64_t attr);
+> -int _kvm_create_device(struct kvm_vm *vm, uint64_t type, bool test);
+> +int _kvm_create_device(struct kvm_vm *vm, uint64_t type, bool test, int *fd);
+>  int kvm_create_device(struct kvm_vm *vm, uint64_t type, bool test);
+>  int _kvm_device_access(int dev_fd, uint32_t group, uint64_t attr,
+>  		       void *val, bool write);
+> diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
+> index db2a252be917..77111241aba7 100644
+> --- a/tools/testing/selftests/kvm/lib/kvm_util.c
+> +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
+> @@ -1744,22 +1744,19 @@ int _kvm_device_check_attr(int dev_fd, uint32_t group, uint64_t attr)
+>  		.attr = attr,
+>  		.flags = 0,
+>  	};
+> -	int ret = ioctl(dev_fd, KVM_HAS_DEVICE_ATTR, &attribute);
+>  
+> -	if (ret == -1)
+> -		return -errno;
+> -	return 0;
+> +	return ioctl(dev_fd, KVM_HAS_DEVICE_ATTR, &attribute);
+>  }
+>  
+>  int kvm_device_check_attr(int dev_fd, uint32_t group, uint64_t attr)
+>  {
+>  	int ret = _kvm_device_check_attr(dev_fd, group, attr);
+>  
+> -	TEST_ASSERT(ret >= 0, "KVM_HAS_DEVICE_ATTR failed, errno: %i", errno);
+> +	TEST_ASSERT(ret >= 0, "KVM_HAS_DEVICE_ATTR failed, rc: %i errno: %i", ret, errno);
+>  	return ret;
+>  }
+>  
+> -int _kvm_create_device(struct kvm_vm *vm, uint64_t type, bool test)
+> +int _kvm_create_device(struct kvm_vm *vm, uint64_t type, bool test, int *fd)
+>  {
+>  	struct kvm_create_device create_dev;
+>  	int ret;
+> @@ -1768,17 +1765,21 @@ int _kvm_create_device(struct kvm_vm *vm, uint64_t type, bool test)
+>  	create_dev.fd = -1;
+>  	create_dev.flags = test ? KVM_CREATE_DEVICE_TEST : 0;
+>  	ret = ioctl(vm_get_fd(vm), KVM_CREATE_DEVICE, &create_dev);
+> -	if (ret == -1)
+> -		return -errno;
+> -	return test ? 0 : create_dev.fd;
+> +	*fd = create_dev.fd;
+> +	return ret;
+>  }
+>  
+>  int kvm_create_device(struct kvm_vm *vm, uint64_t type, bool test)
+>  {
+> -	int ret = _kvm_create_device(vm, type, test);
+> +	int fd, ret;
+>  
+> -	TEST_ASSERT(ret >= 0, "KVM_CREATE_DEVICE IOCTL failed,\n"
+> -		"  errno: %i", errno);
+> +	ret = _kvm_create_device(vm, type, test, &fd);
+> +
+> +	if (!test) {
+> +		TEST_ASSERT(ret >= 0,
+> +			    "KVM_CREATE_DEVICE IOCTL failed, rc: %i errno: %i", ret, errno);
+> +		return fd;
+> +	}
+>  	return ret;
+>  }
+>  
+> @@ -1795,8 +1796,6 @@ int _kvm_device_access(int dev_fd, uint32_t group, uint64_t attr,
+>  
+>  	ret = ioctl(dev_fd, write ? KVM_SET_DEVICE_ATTR : KVM_GET_DEVICE_ATTR,
+>  		    &kvmattr);
+> -	if (ret < 0)
+> -		return -errno;
+>  	return ret;
+>  }
+>  
+> @@ -1805,8 +1804,7 @@ int kvm_device_access(int dev_fd, uint32_t group, uint64_t attr,
+>  {
+>  	int ret = _kvm_device_access(dev_fd, group, attr, val, write);
+>  
+> -	TEST_ASSERT(ret >= 0, "KVM_SET|GET_DEVICE_ATTR IOCTL failed,\n"
+> -		    "  errno: %i", errno);
+> +	TEST_ASSERT(ret >= 0, "KVM_SET|GET_DEVICE_ATTR IOCTL failed, rc: %i errno: %i", ret, errno);
+>  	return ret;
+>  }
+>  
+> -- 
+> 2.26.3
+> 
 
