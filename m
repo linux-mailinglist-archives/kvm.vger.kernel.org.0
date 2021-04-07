@@ -2,29 +2,29 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D61CD357776
-	for <lists+kvm@lfdr.de>; Thu,  8 Apr 2021 00:15:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B8110357777
+	for <lists+kvm@lfdr.de>; Thu,  8 Apr 2021 00:16:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229529AbhDGWQE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 7 Apr 2021 18:16:04 -0400
-Received: from mga18.intel.com ([134.134.136.126]:6863 "EHLO mga18.intel.com"
+        id S229586AbhDGWQ4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 7 Apr 2021 18:16:56 -0400
+Received: from mga02.intel.com ([134.134.136.20]:7779 "EHLO mga02.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229469AbhDGWQD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 7 Apr 2021 18:16:03 -0400
-IronPort-SDR: jhKRl8WJjFwuNjHtr92qypvjoxC/H0RcgmlC7gdSjIR31vEHT6T96kzf90vf8bs1RwMH5BzEh8
- bBYZyN1zMazA==
-X-IronPort-AV: E=McAfee;i="6000,8403,9947"; a="180950759"
+        id S229488AbhDGWQy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 7 Apr 2021 18:16:54 -0400
+IronPort-SDR: mrtA2ilUqJcL+kdpElZrXZqlz1a8Ulwp/YmXl2As/mgRxgOkY4FT0JjVxMxIEPGjQ5X/aCMxFN
+ Ghy1F66CqeWw==
+X-IronPort-AV: E=McAfee;i="6000,8403,9947"; a="180542413"
 X-IronPort-AV: E=Sophos;i="5.82,204,1613462400"; 
-   d="scan'208";a="180950759"
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Apr 2021 15:15:52 -0700
-IronPort-SDR: v8ELuDqiGdeZnUNa8G8KwP1ZNE8zun454H7R0pPUGNbJK2zIlpGeAczCtPE/yX1VtC16iX46iD
- WfEmI9ag3DIw==
+   d="scan'208";a="180542413"
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Apr 2021 15:16:42 -0700
+IronPort-SDR: VmuOV7CgPRY25/6FhTv/nG5dXQPHuuS3RgVwkmQidSmyWz8S4BLAZ1LlD32agqsjU5SM7uMkgO
+ UBkqdxvL7gvw==
 X-IronPort-AV: E=Sophos;i="5.82,204,1613462400"; 
-   d="scan'208";a="598524665"
+   d="scan'208";a="448411778"
 Received: from tkokeray-mobl.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.254.113.100])
-  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Apr 2021 15:15:49 -0700
-Date:   Thu, 8 Apr 2021 10:15:47 +1200
+  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Apr 2021 15:16:40 -0700
+Date:   Thu, 8 Apr 2021 10:16:38 +1200
 From:   Kai Huang <kai.huang@intel.com>
 To:     Sean Christopherson <seanjc@google.com>
 Cc:     kvm@vger.kernel.org, linux-sgx@vger.kernel.org,
@@ -33,11 +33,13 @@ Cc:     kvm@vger.kernel.org, linux-sgx@vger.kernel.org,
         haitao.huang@intel.com
 Subject: Re: [PATCH v4 07/11] KVM: VMX: Add SGX ENCLS[ECREATE] handler to
  enforce CPUID restrictions
-Message-Id: <20210408101547.3d3be1b4efc43f597d44c0f2@intel.com>
-In-Reply-To: <YG4t3DYYNd4eBeNt@google.com>
+Message-Id: <20210408101638.6ce24b50924425308ee7c616@intel.com>
+In-Reply-To: <YG4sh72soS6JC107@google.com>
 References: <cover.1617825858.git.kai.huang@intel.com>
         <963a2416333290e23773260d824a9e038aed5a53.1617825858.git.kai.huang@intel.com>
-        <YG4t3DYYNd4eBeNt@google.com>
+        <YG4pslLOybyOIDTC@google.com>
+        <20210408095822.24d0c709c2680bb78b689ed1@intel.com>
+        <YG4sh72soS6JC107@google.com>
 X-Mailer: Sylpheed 3.7.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
 Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
@@ -46,38 +48,24 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 7 Apr 2021 22:10:36 +0000 Sean Christopherson wrote:
+On Wed, 7 Apr 2021 22:04:55 +0000 Sean Christopherson wrote:
 > On Thu, Apr 08, 2021, Kai Huang wrote:
-> > +	/*
-> > +	 * sgx_virt_ecreate() returns:
-> > +	 *  1) 0:	ECREATE was successful
-> > +	 *  2) -EFAULT:	ECREATE was run but faulted, and trapnr was set to the
-> > +	 *  		exception number.
-> > +	 *  3) -EINVAL:	access_ok() on @secs_hva fails. It's a kernel bug and
-> > +	 *  		sgx_virt_ecreate() aleady gave a warning.
+> > On Wed, 7 Apr 2021 21:52:50 +0000 Sean Christopherson wrote:
+> > > On Thu, Apr 08, 2021, Kai Huang wrote:
+> > > > +	/*
+> > > > +	 * Copy contents into kernel memory to prevent TOCTOU attack. E.g. the
+> > > > +	 * guest could do ECREATE w/ SECS.SGX_ATTR_PROVISIONKEY=0, and
+> > > > +	 * simultaneously set SGX_ATTR_PROVISIONKEY to bypass the check to
+> > > > +	 * enforce restriction of access to the PROVISIONKEY.
+> > > > +	 */
+> > > > +	contents = (struct sgx_secs *)__get_free_page(GFP_KERNEL);
+> > > 
+> > > This should use GFP_KERNEL_ACCOUNT.
+> > 
+> > May I ask why? The page is only a temporary allocation, it will be freed before
+> > this function returns. I guess a 4K page is OK?
 > 
-> Eh, I don't love "kernel bug", all we know is that access_ok() failed.  It's
-> also not all that helpful since it doesn't guide the debugger to any particular
-> code that would prevent access_ok() from failing.
-> 
-> What if this comment simply states the rules/expectations and lets the debugger
-> figure out what's wrong?  E.g.
-> 
-> 	 *  3) -EINVAL: access_ok() on @secs_hva failed.  This should never
-> 	 *              happen as KVM checks host addresses at memslot creation.
-> 	 *              sgx_virt_create() has already warned in this case.
-> 
-> Same goes for sgx_virt_einit() in the next patch.
+> A hard limit should not be violated, even temporarily.  This is also per vCPU,
+> e.g. a 256 vCPU VM could go 1mb over the limit.  
 
-Sure. Will update in next version.
-
-> 
-> > +	 */
-> > +	ret = sgx_virt_ecreate(pageinfo, (void __user *)secs_hva, &trapnr);
-> > +	if (!ret)
-> > +		return kvm_skip_emulated_instruction(vcpu);
-> > +	if (ret == -EFAULT)
-> > +		return sgx_inject_fault(vcpu, secs_gva, trapnr);
-> > +
-> > +	return ret;
-> > +}
+OK. Will change in next version.
