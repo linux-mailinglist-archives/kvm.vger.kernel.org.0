@@ -2,99 +2,86 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6E7D4356FE6
-	for <lists+kvm@lfdr.de>; Wed,  7 Apr 2021 17:13:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9485B357030
+	for <lists+kvm@lfdr.de>; Wed,  7 Apr 2021 17:26:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237991AbhDGPNt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 7 Apr 2021 11:13:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57854 "EHLO
+        id S1353514AbhDGP0L (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 7 Apr 2021 11:26:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60596 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244915AbhDGPNs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 7 Apr 2021 11:13:48 -0400
-Received: from mail-pf1-x429.google.com (mail-pf1-x429.google.com [IPv6:2607:f8b0:4864:20::429])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 68C54C061756;
-        Wed,  7 Apr 2021 08:13:38 -0700 (PDT)
-Received: by mail-pf1-x429.google.com with SMTP id s11so13121283pfm.1;
-        Wed, 07 Apr 2021 08:13:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=8gSjC0WXXO0hyXex8pLBlZgJJ3C7tLcObU3Ri/R7BbE=;
-        b=FWLkxi8L5ScjBYku9DHP82+AoKKDTgiXDj5CeSLW9WZ7l02g+wa9AaAR0DefJ72Tlk
-         tTgx2RnGgHCH7V6Y7E5SnVAdcg2Qo09HuigOiyIL+eJDYdYOn75ia5NROQ4/PPjrB6Im
-         SdotBRwae7sMhDq5ujnlQAXuBRoAhlmZJfv47BFwvls8Zwflvh4WaRpWqiabpGK3Iwq/
-         Aq6IRIvcPC5/A8UNEc3BFAA9FhRnBYjrM5Y2gpSiYEbqE2XxUh3A3jv+Z6g/emsSH9vh
-         +YmcErc3p+N1BR5pfSmgJKXOQbgiltEG/c2v/avbdp2VW3i4xivIhvc6kJ0aw4LTSH5w
-         xqmQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=8gSjC0WXXO0hyXex8pLBlZgJJ3C7tLcObU3Ri/R7BbE=;
-        b=TvjupKdpyzyTloBdlMXo7W42YYn7MRrB/vvT4MwqvZxsB9zeQtbLgGZhmx0wyoZuaX
-         It/lVkX72vtSuz+ltf4SKbzXb+mxWSHmxQ+X+TNTAl4M0ll+joMKPRdcHORl1uCJROqg
-         bkOhpNlMxjHm76vqrJToRsJoOT4l/yemmAo2Im1N5ZjepC+mZIkIDdBKj8ZpXlWLJS8G
-         eSWCTeCMjamfVaYVUczZLZCZAkXp+0eqHRkSmberUJeYovV95LoBxFxrUzta5hP2cV/n
-         rjtBrQ5VYScJM1A1oidOikw3jJoJIP8+7P0ZHqO+7TqSCQITm17jUoGJek9Nx3Jhmtur
-         puvQ==
-X-Gm-Message-State: AOAM5320Red8FgT3rBVdbhJM3fzVbITu8sUe57jbB3pMc3WOFZPb8Q2C
-        FIT71rbkKR1kXf/DzgEFRtc=
-X-Google-Smtp-Source: ABdhPJy5ZPRmaIO7nEBFmAuQOQ0Y8GY3inREsOnbc9BdLsN540bPamng3WsIf87RWRfNOC3QrsUeFA==
-X-Received: by 2002:a05:6a00:2301:b029:204:9bb6:de72 with SMTP id h1-20020a056a002301b02902049bb6de72mr3386966pfh.62.1617808417948;
-        Wed, 07 Apr 2021 08:13:37 -0700 (PDT)
-Received: from hoboy.vegasvil.org ([2601:645:c000:35:e2d5:5eff:fea5:802f])
-        by smtp.gmail.com with ESMTPSA id g5sm23385518pfb.77.2021.04.07.08.13.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 07 Apr 2021 08:13:37 -0700 (PDT)
-Date:   Wed, 7 Apr 2021 08:13:34 -0700
-From:   Richard Cochran <richardcochran@gmail.com>
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     pbonzini@redhat.com, netdev@vger.kernel.org, yangbo.lu@nxp.com,
-        john.stultz@linaro.org, tglx@linutronix.de, seanjc@google.com,
-        Mark.Rutland@arm.com, will@kernel.org, suzuki.poulose@arm.com,
-        Andre.Przywara@arm.com, steven.price@arm.com,
-        lorenzo.pieralisi@arm.com, sudeep.holla@arm.com,
-        linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
-        Steve.Capper@arm.com, justin.he@arm.com, jianyong.wu@arm.com,
-        kernel-team@android.com
-Subject: Re: [PATCH v19 3/7] ptp: Reorganize ptp_kvm.c to make it
- arch-independent
-Message-ID: <20210407151334.GB7379@hoboy.vegasvil.org>
-References: <20210330145430.996981-1-maz@kernel.org>
- <20210330145430.996981-4-maz@kernel.org>
- <87eefmpho3.wl-maz@kernel.org>
+        with ESMTP id S243029AbhDGP0K (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 7 Apr 2021 11:26:10 -0400
+Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 114A2C061756;
+        Wed,  7 Apr 2021 08:26:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=jY0P2UufmdE70kZeDZbxVkRO7U3IMhijRe4MI2XThGo=; b=VaxFPZtMMZoPMFhKnxruK4TAIr
+        Blzrz/XgpiuDBZ+WWc8+cpoWKhwPvAqnZL+zTgyYTPaIPkewMoQL7f5YoMEOEkRZELVXtWH1f4l04
+        bJ6Z22Uk+Uq+MBke9EjkMEwP+rBoH5MP6C4B6hDbMtatH9nwPRVYfS9RKQnhZWi6YZm3fXmEYn2ry
+        0ioRhmAjAKdxJNnzpcY697rSELXkaeUzn9MUNRIsBCUU/iwv3sPRMMXyTjCRlFr9ILPQwrP++T0Zr
+        d6jvQKhgHrSiuUDJENprfbLuIo7Sco1xNphUesmL6fOeEEimdWv3+2DiO6dJnc+rOXg/3bRCxkfAE
+        j/SLCgmw==;
+Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
+        by desiato.infradead.org with esmtpsa (Exim 4.94 #2 (Red Hat Linux))
+        id 1lUA3g-005Gnz-7H; Wed, 07 Apr 2021 15:25:32 +0000
+Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+        (Client did not present a certificate)
+        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id E313A300219;
+        Wed,  7 Apr 2021 17:25:30 +0200 (CEST)
+Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
+        id D2DBF2BF82B41; Wed,  7 Apr 2021 17:25:30 +0200 (CEST)
+Date:   Wed, 7 Apr 2021 17:25:30 +0200
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     Like Xu <like.xu@linux.intel.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, eranian@google.com,
+        andi@firstfloor.org, kan.liang@linux.intel.com,
+        wei.w.wang@intel.com, Wanpeng Li <wanpengli@tencent.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        x86@kernel.org, linux-kernel@vger.kernel.org,
+        Andi Kleen <ak@linux.intel.com>,
+        Luwei Kang <luwei.kang@intel.com>
+Subject: Re: [PATCH v4 07/16] KVM: x86/pmu: Add IA32_PEBS_ENABLE MSR
+ emulation for extended PEBS
+Message-ID: <YG3O6rpx2bSt5D+O@hirez.programming.kicks-ass.net>
+References: <20210329054137.120994-1-like.xu@linux.intel.com>
+ <20210329054137.120994-8-like.xu@linux.intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <87eefmpho3.wl-maz@kernel.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <20210329054137.120994-8-like.xu@linux.intel.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Apr 07, 2021 at 10:28:44AM +0100, Marc Zyngier wrote:
-> On Tue, 30 Mar 2021 15:54:26 +0100,
-> Marc Zyngier <maz@kernel.org> wrote:
-> > 
-> > From: Jianyong Wu <jianyong.wu@arm.com>
-> > 
-> > Currently, the ptp_kvm module contains a lot of x86-specific code.
-> > Let's move this code into a new arch-specific file in the same directory,
-> > and rename the arch-independent file to ptp_kvm_common.c.
-> > 
-> > Reviewed-by: Andre Przywara <andre.przywara@arm.com>
-> > Signed-off-by: Jianyong Wu <jianyong.wu@arm.com>
-> > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > Link: https://lore.kernel.org/r/20201209060932.212364-4-jianyong.wu@arm.com
-> 
-> Richard, Paolo,
-> 
-> Can I get an Ack on this and patch #7? We're getting pretty close to
-> the next merge window, and this series has been going on for a couple
-> of years now...
 
-For both patches:
+On Mon, Mar 29, 2021 at 01:41:28PM +0800, Like Xu wrote:
+> +	if (vcpu->arch.perf_capabilities & PERF_CAP_PEBS_FORMAT) {
+> +		if (vcpu->arch.perf_capabilities & PERF_CAP_PEBS_BASELINE) {
+> +			pmu->pebs_enable_mask = ~pmu->global_ctrl;
+> +			pmu->reserved_bits &= ~ICL_EVENTSEL_ADAPTIVE;
+> +			for (i = 0; i < pmu->nr_arch_fixed_counters; i++)
+> +				pmu->fixed_ctr_ctrl_mask &=
+> +					~(1ULL << (INTEL_PMC_IDX_FIXED + i * 4));
 
-Acked-by: Richard Cochran <richardcochran@gmail.com>
+{ }
+
+> +		} else
+> +			pmu->pebs_enable_mask = ~((1ull << pmu->nr_arch_gp_counters) - 1);
+
+{ }
+
+> +	} else {
+> +		vcpu->arch.perf_capabilities &= ~PERF_CAP_PEBS_MASK;
+
+as you already do here..
+
+> +	}
+>  }
