@@ -2,92 +2,93 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 51A543571CB
-	for <lists+kvm@lfdr.de>; Wed,  7 Apr 2021 18:10:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 63390357289
+	for <lists+kvm@lfdr.de>; Wed,  7 Apr 2021 19:00:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234147AbhDGQJy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 7 Apr 2021 12:09:54 -0400
-Received: from mail.skyhub.de ([5.9.137.197]:57512 "EHLO mail.skyhub.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1354320AbhDGQJk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 7 Apr 2021 12:09:40 -0400
-Received: from zn.tnic (p200300ec2f08fb00aad493ab6ea3c721.dip0.t-ipconnect.de [IPv6:2003:ec:2f08:fb00:aad4:93ab:6ea3:c721])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 3D4571EC0246;
-        Wed,  7 Apr 2021 18:09:29 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1617811769;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=sxVXkcApyvWgRpvz11rKwU3ny4asbFyeyFcDJmEYY4Y=;
-        b=Jti5HoimSVXTmsMwJCv2kI1KP+LX5MCLeIhCghkd+qTJfK6oP6MWmTijWFbADr1GjW+28H
-        axA+m1b0eTCX47GNLKGOpxI+iNKoNXudwQB350WlEEUfcziZXhyp388N+7voUeP62ijsS9
-        GW0RyxaI6h6HNHeX1PqQNTufuzpL4XQ=
-Date:   Wed, 7 Apr 2021 18:09:33 +0200
-From:   Borislav Petkov <bp@alien8.de>
-To:     Vineeth Pillai <viremana@linux.microsoft.com>
-Cc:     Lan Tianyu <Tianyu.Lan@microsoft.com>,
-        Michael Kelley <mikelley@microsoft.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, Wei Liu <wei.liu@kernel.org>,
-        Stephen Hemminger <sthemmin@microsoft.com>,
-        Haiyang Zhang <haiyangz@microsoft.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>,
-        "K. Y. Srinivasan" <kys@microsoft.com>, x86@kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-hyperv@vger.kernel.org
-Subject: Re: [PATCH 1/7] hyperv: Detect Nested virtualization support for SVM
-Message-ID: <20210407160933.GI25319@zn.tnic>
-References: <cover.1617804573.git.viremana@linux.microsoft.com>
- <e14dac75ff1088b2c4bea361954b37e414edd03c.1617804573.git.viremana@linux.microsoft.com>
+        id S1354423AbhDGRAH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 7 Apr 2021 13:00:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53182 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1343608AbhDGRAH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 7 Apr 2021 13:00:07 -0400
+Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8B028C061760
+        for <kvm@vger.kernel.org>; Wed,  7 Apr 2021 09:59:57 -0700 (PDT)
+Received: by mail-pj1-x102b.google.com with SMTP id q6-20020a17090a4306b02900c42a012202so1647801pjg.5
+        for <kvm@vger.kernel.org>; Wed, 07 Apr 2021 09:59:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:in-reply-to:message-id:references
+         :mime-version;
+        bh=Qka4XP86mo9tivOZXeavKjVRjtUNs3I7vqQxIv9BF4o=;
+        b=sKeG7jF4DC6TkXssMwfoL5Yb2M1BIPx0VHweK89YLof7HVvwYTDocHqwKP9iyPbezs
+         eBMc5Fx/A7j66s9Pr/5DHJYgatXOlXejrVfzhzwyPWOfpEH/2OhT3qyGDFRCVxiVW5cH
+         jj49DGK2wrNlvBo44yjLpWvx3KfAQktiCjCPQ54YSK0ylxusD7IiO/AmCxv9jx4Ak6Of
+         g5U5BoNKlaCYQ2dMW3D2isrgvjyEw70ZJwI+I37gxZJMTvnyRRoUnWyUfbkdCitbiH/8
+         R675Wd6nzsuPnsOR6DGaLMsmk3g2Nx/MQvR0+IH6P6a1YlP2TLdodzEWCrOVjV7mTr+L
+         ORRg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:in-reply-to:message-id
+         :references:mime-version;
+        bh=Qka4XP86mo9tivOZXeavKjVRjtUNs3I7vqQxIv9BF4o=;
+        b=fHXEQFFZHm6Zn7ECbEEwbxdaHMt2yHWeHrBnph6Fu2RBNz2iWITYd/P6Q+az2Wk9gR
+         aE6UxVs0rGta6EfTstFH3/0Qz5hdGEBKK6dd3BUJEIGb91h/hf2EGfYlPF+HJEbSoYxj
+         s24cMvL5rrQ1eHr1PCn2Gshuc14Vcob3WDZIftZqYn3QS69TScCIgqmQRiXGAGt+Dhiy
+         xdYscSQ85VlExvHZ8KZD/jyUiuqUxaTsSMg9CRdHS962fWdcw6ctkfqtDyvQtC9N5G8C
+         Du3mODzRP59r0wnJq0BXmvBxy+daMNOqVG4Y0UF2rkT2EkfYUeZye2RDaNmPK7iJRAmV
+         dp7A==
+X-Gm-Message-State: AOAM532KZohZvICpIoQOgdAssOX8Jjbb++UCJFAjEK7pheMS7dz50YGK
+        OsosNySTDKnz6J48QwbaQ/sQYBcXNVAMbw==
+X-Google-Smtp-Source: ABdhPJwRHR+AB/msn9dCF+HMY/knTGJpePFjMSnYGVO76q0g1jJjsff5eYDRDkH7v8g1ezxKMhfgdQ==
+X-Received: by 2002:a17:90a:7064:: with SMTP id f91mr4337107pjk.89.1617814796875;
+        Wed, 07 Apr 2021 09:59:56 -0700 (PDT)
+Received: from [2620:15c:17:3:c4a4:628a:2d06:e140] ([2620:15c:17:3:c4a4:628a:2d06:e140])
+        by smtp.gmail.com with ESMTPSA id u1sm21982451pgg.11.2021.04.07.09.59.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 07 Apr 2021 09:59:56 -0700 (PDT)
+Date:   Wed, 7 Apr 2021 09:59:55 -0700 (PDT)
+From:   David Rientjes <rientjes@google.com>
+To:     Sean Christopherson <seanjc@google.com>
+cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Wanpeng Li <kernellwp@gmail.com>
+Subject: Re: [PATCH v2] KVM: Explicitly use GFP_KERNEL_ACCOUNT for 'struct
+ kvm_vcpu' allocations
+In-Reply-To: <20210406190740.4055679-1-seanjc@google.com>
+Message-ID: <bed5081-1f13-bc1e-6328-b2bb4517c54@google.com>
+References: <20210406190740.4055679-1-seanjc@google.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <e14dac75ff1088b2c4bea361954b37e414edd03c.1617804573.git.viremana@linux.microsoft.com>
+Content-Type: text/plain; charset=US-ASCII
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Apr 07, 2021 at 02:41:22PM +0000, Vineeth Pillai wrote:
-> Detect nested features exposed by Hyper-V if SVM is enabled.
+On Tue, 6 Apr 2021, Sean Christopherson wrote:
+
+> Use GFP_KERNEL_ACCOUNT when allocating vCPUs to make it more obvious that
+> that the allocations are accounted, to make it easier to audit KVM's
+> allocations in the future, and to be consistent with other cache usage in
+> KVM.
 > 
-> Signed-off-by: Vineeth Pillai <viremana@linux.microsoft.com>
-> ---
->  arch/x86/kernel/cpu/mshyperv.c | 10 +++++++++-
->  1 file changed, 9 insertions(+), 1 deletion(-)
+> When using SLAB/SLUB, this is a nop as the cache itself is created with
+> SLAB_ACCOUNT.
 > 
-> diff --git a/arch/x86/kernel/cpu/mshyperv.c b/arch/x86/kernel/cpu/mshyperv.c
-> index 3546d3e21787..4d364acfe95d 100644
-> --- a/arch/x86/kernel/cpu/mshyperv.c
-> +++ b/arch/x86/kernel/cpu/mshyperv.c
-> @@ -325,9 +325,17 @@ static void __init ms_hyperv_init_platform(void)
->  			ms_hyperv.isolation_config_a, ms_hyperv.isolation_config_b);
->  	}
->  
-> -	if (ms_hyperv.hints & HV_X64_ENLIGHTENED_VMCS_RECOMMENDED) {
-> +	/*
-> +	 * AMD does not need enlightened VMCS as VMCB is already a
-> +	 * datastructure in memory. We need to get the nested
-> +	 * features if SVM is enabled.
-> +	 */
-> +	if (boot_cpu_has(X86_FEATURE_SVM) ||
+> When using SLOB, there are caveats within caveats.  SLOB doesn't honor
+> SLAB_ACCOUNT, so passing GFP_KERNEL_ACCOUNT will result in vCPU
+> allocations now being accounted.   But, even that depends on internal
+> SLOB details as SLOB will only go to the page allocator when its cache is
+> depleted.  That just happens to be extremely likely for vCPUs because the
+> size of kvm_vcpu is larger than the a page for almost all combinations of
+> architecture and page size.  Whether or not the SLOB behavior is by
+> design is unknown; it's just as likely that no SLOB users care about
+> accounding and so no one has bothered to implemented support in SLOB.
+> Regardless, accounting vCPU allocations will not break SLOB+KVM+cgroup
+> users, if any exist.
+> 
+> Cc: Wanpeng Li <kernellwp@gmail.com>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
 
-Pls use:
+Always happy to see this ambiguity (SLAB_ACCOUNT vs GFP_KERNEL_ACCOUNT) 
+resolved for slab allocations.
 
-	    cpu_feature_enabled
-
-here.
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
+Acked-by: David Rientjes <rientjes@google.com>
