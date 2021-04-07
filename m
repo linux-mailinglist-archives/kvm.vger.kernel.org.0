@@ -2,94 +2,105 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 27255356935
-	for <lists+kvm@lfdr.de>; Wed,  7 Apr 2021 12:16:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0FBD8356987
+	for <lists+kvm@lfdr.de>; Wed,  7 Apr 2021 12:25:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1350818AbhDGKQW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 7 Apr 2021 06:16:22 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:40193 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1350816AbhDGKQS (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 7 Apr 2021 06:16:18 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1617790568;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=lNJUMS0XqtDA+j/nPopG+vTJOjoz59Du+KS1uqYbIcY=;
-        b=ggGVt4qzIu6mLUBBnapPBmREsbbH3dfSrpUs3IUHZqHlZa9t97w+mPo+FIlHL21zoR4oe1
-        hb3z9FMDyfHLkvOT/+topuPE3tgSHmdlbvDRuS1K3eVc3/Gzis5Psbu3mj2ZJ7LTmuTEIr
-        U/kvMohrCvrHxTaR7MjC6kPTv8bV9P8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-483-sMSMmmX7Mgy8sPnPBlr1pw-1; Wed, 07 Apr 2021 06:16:05 -0400
-X-MC-Unique: sMSMmmX7Mgy8sPnPBlr1pw-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CD0C083DD22;
-        Wed,  7 Apr 2021 10:16:03 +0000 (UTC)
-Received: from gondolin (ovpn-113-88.ams2.redhat.com [10.36.113.88])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 73C9B62A0C;
-        Wed,  7 Apr 2021 10:15:56 +0000 (UTC)
-Date:   Wed, 7 Apr 2021 12:15:54 +0200
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Pierre Morel <pmorel@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, frankja@linux.ibm.com, david@redhat.com,
-        thuth@redhat.com, imbrenda@linux.ibm.com
-Subject: Re: [kvm-unit-tests PATCH v3 12/16] s390x: css: Check ORB reserved
- bits
-Message-ID: <20210407121554.29aa8949.cohuck@redhat.com>
-In-Reply-To: <19cc4cdc-027b-9c72-b4fe-fa8fc2dcbbf0@linux.ibm.com>
-References: <1617694853-6881-1-git-send-email-pmorel@linux.ibm.com>
-        <1617694853-6881-13-git-send-email-pmorel@linux.ibm.com>
-        <20210406175136.1d7d7fa2.cohuck@redhat.com>
-        <19cc4cdc-027b-9c72-b4fe-fa8fc2dcbbf0@linux.ibm.com>
-Organization: Red Hat GmbH
+        id S1351068AbhDGKZD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 7 Apr 2021 06:25:03 -0400
+Received: from mx2.suse.de ([195.135.220.15]:42386 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1351008AbhDGKYy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 7 Apr 2021 06:24:54 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.221.27])
+        by mx2.suse.de (Postfix) with ESMTP id 28651B0B6;
+        Wed,  7 Apr 2021 10:24:44 +0000 (UTC)
+Date:   Wed, 7 Apr 2021 12:24:40 +0200
+From:   Borislav Petkov <bp@suse.de>
+To:     Christophe Leroy <christophe.leroy@csgroup.eu>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        John Allen <john.allen@amd.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 8/8] KVM: SVM: Allocate SEV command structures on
+ local stack
+Message-ID: <20210407102440.GA25732@zn.tnic>
+References: <20210406224952.4177376-1-seanjc@google.com>
+ <20210406224952.4177376-9-seanjc@google.com>
+ <9df3b755-d71a-bfdf-8bee-f2cd2883ea2f@csgroup.eu>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <9df3b755-d71a-bfdf-8bee-f2cd2883ea2f@csgroup.eu>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 7 Apr 2021 12:07:13 +0200
-Pierre Morel <pmorel@linux.ibm.com> wrote:
+First of all, I'd strongly suggest you trim your emails when you reply -
+that would be much appreciated.
 
-> On 4/6/21 5:51 PM, Cornelia Huck wrote:
-> > On Tue,  6 Apr 2021 09:40:49 +0200
-> > Pierre Morel <pmorel@linux.ibm.com> wrote:
-> >   
-> >> Several bits of the ORB are reserved and must be zero.
-> >> Their use will trigger a operand exception.
-> >>
-> >> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
-> >> ---
-> >>   s390x/css.c | 21 +++++++++++++++++++++
-> >>   1 file changed, 21 insertions(+)
-> >>
-> >> diff --git a/s390x/css.c b/s390x/css.c
-> >> index 56adc16..26f5da6 100644
-> >> --- a/s390x/css.c
-> >> +++ b/s390x/css.c
-> >> @@ -209,6 +209,26 @@ static void ssch_orb_midaw(void)
-> >>   	orb->ctrl = tmp;
-> >>   }
-> >>   
-> >> +static void ssch_orb_ctrl(void)
-> >> +{
-> >> +	uint32_t tmp = orb->ctrl;
-> >> +	char buffer[80];
-> >> +	int i;
-> >> +
-> >> +	/* Check the reserved bits of the ORB CTRL field */
-> >> +	for (i = 26; i <= 30; i++) {  
-> > 
-> > This looks very magic; can we get some defines?  
+On Wed, Apr 07, 2021 at 07:24:54AM +0200, Christophe Leroy wrote:
+> > @@ -258,7 +240,7 @@ static int sev_issue_cmd(struct kvm *kvm, int id, void *data, int *error)
+> >   static int sev_launch_start(struct kvm *kvm, struct kvm_sev_cmd *argp)
+> >   {
+> >   	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
+> > -	struct sev_data_launch_start *start;
+> > +	struct sev_data_launch_start start;
 > 
-> OK, I can use something like ORB_FIRST_RESERVED_BIT - ORB_LAST_RESERVED_BIT
+> struct sev_data_launch_start start = {0, 0, 0, 0, 0, 0, 0};
 
-Yep, something like that.
+I don't know how this is any better than using memset...
 
+Also, you can do
+
+	... start = { };
+
+which is certainly the only other alternative to memset, AFAIK.
+
+But whatever you do, you need to look at the resulting asm the compiler
+generates. So let's do that:
+
+Your version:
+
+# arch/x86/kvm/svm/sev.c:261:   struct sev_data_launch_start _tmp = {0, 0, 0, 0, 0, 0, 0};
+        movq    $0, 104(%rsp)   #, MEM[(struct sev_data_launch_start *)_561]
+        movq    $0, 112(%rsp)   #, MEM[(struct sev_data_launch_start *)_561]
+        movq    $0, 120(%rsp)   #, MEM[(struct sev_data_launch_start *)_561]
+        movq    $0, 128(%rsp)   #, MEM[(struct sev_data_launch_start *)_561]
+        movl    $0, 136(%rsp)   #, MEM[(struct sev_data_launch_start *)_561]
+
+
+my version:
+
+# arch/x86/kvm/svm/sev.c:261:   struct sev_data_launch_start _tmp = {};
+        movq    $0, 104(%rsp)   #, MEM[(struct sev_data_launch_start *)_561]
+        movq    $0, 112(%rsp)   #, MEM[(struct sev_data_launch_start *)_561]
+        movq    $0, 120(%rsp)   #, MEM[(struct sev_data_launch_start *)_561]
+        movq    $0, 128(%rsp)   #, MEM[(struct sev_data_launch_start *)_561]
+        movl    $0, 136(%rsp)   #, MEM[(struct sev_data_launch_start *)_561]
+
+
+the memset version:
+
+# arch/x86/kvm/svm/sev.c:269: 	memset(&_tmp, 0, sizeof(_tmp));
+#NO_APP
+	movq	$0, 104(%rsp)	#, MEM <char[1:36]> [(void *)_561]
+	movq	$0, 112(%rsp)	#, MEM <char[1:36]> [(void *)_561]
+	movq	$0, 120(%rsp)	#, MEM <char[1:36]> [(void *)_561]
+	movq	$0, 128(%rsp)	#, MEM <char[1:36]> [(void *)_561]
+	movl	$0, 136(%rsp)	#, MEM <char[1:36]> [(void *)_561]
+
+Ok?
+
+-- 
+Regards/Gruss,
+    Boris.
+
+SUSE Software Solutions Germany GmbH, GF: Felix Imendörffer, HRB 36809, AG Nürnberg
