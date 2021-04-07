@@ -2,118 +2,487 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 95DD435767A
-	for <lists+kvm@lfdr.de>; Wed,  7 Apr 2021 23:07:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B8E31357699
+	for <lists+kvm@lfdr.de>; Wed,  7 Apr 2021 23:20:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231637AbhDGVH2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 7 Apr 2021 17:07:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51124 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229546AbhDGVH2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 7 Apr 2021 17:07:28 -0400
-Received: from mail-pf1-x436.google.com (mail-pf1-x436.google.com [IPv6:2607:f8b0:4864:20::436])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 65818C061760
-        for <kvm@vger.kernel.org>; Wed,  7 Apr 2021 14:07:18 -0700 (PDT)
-Received: by mail-pf1-x436.google.com with SMTP id g15so244125pfq.3
-        for <kvm@vger.kernel.org>; Wed, 07 Apr 2021 14:07:18 -0700 (PDT)
+        id S232316AbhDGVVA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 7 Apr 2021 17:21:00 -0400
+Received: from smtp-fw-4101.amazon.com ([72.21.198.25]:5639 "EHLO
+        smtp-fw-4101.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232208AbhDGVU7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 7 Apr 2021 17:20:59 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=ACcswK5hU55dpZ58cn4BLPhKcaAA2GLfa/PW9xI9wxw=;
-        b=k2NjqpAAfq8AL2/ymsES3ygYDyep6qtZj7Jr/0Ef/MrWol3C+q9Faa9HNB1kHTOpbw
-         ViU6QdmOV2GsCLfmXVIk1EmHkE4Gsr7I6/r+3X0xCRdAhHz+aec5Zly5EogstASwg83W
-         qDQajuqeElWiobeaGXRmVVJBZJr/udWhMkqwXn7E/JMYeW3XtFaSOqtL5cRPs3NUpH6E
-         glJIVgOz+ACksC5Jei05LhdwnJKYrw8qTec6aXuBayZWv7Yd2jPl4EmdoPsRyefvnvDL
-         Yf9Gjh1WAM7hrQNhdg43/u+MkwRn0mQeFPwi3y/AIM8XueDbeWDirc9LaFHUXV683NNv
-         bSRQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=ACcswK5hU55dpZ58cn4BLPhKcaAA2GLfa/PW9xI9wxw=;
-        b=LF4KyenNFlB10nQrvOd017qakD+M9n8kShIiqaVfOhtuXNj1+tkvBu6fM+5ODl6us7
-         X8Cp8yEkGVHg/aQiBxB+NAcJmRHIllt3T+4s8SM+5mDKYVDs/AP8HiH2JGUTDL0TOhL/
-         ZI7CcI/rqsxriNBLFSXih6SauEM48IvPdMx9v/yy4v4CSfLRJfT4jNTOMR9WVOW7sqFx
-         YGoJPzgMLt7PzjhLCrAskk9kw0by7u8sX1z1/BUIL2isv97GXEvNHSc42IpwylAqn1F9
-         akVZ7qlA2VAW8n4mdaBsp61wiuqyJpr6CY4auWRoyoK+M7DTq/BDLSx7lgdiNOcpxvaN
-         tmzg==
-X-Gm-Message-State: AOAM531WDFNWZGX/lD4Ub80RItYxiENPCsnBee/JHAR/w2nbzCIjgeN4
-        g4d/H/A8c/ZTzKxL8+OJl5aZxudrgN6a6g==
-X-Google-Smtp-Source: ABdhPJymaQU7TAe9TM/9iV99KZ4gYN4DNbSqjCPBQ6QuLx0Z1Kg3WUOOMU8TqwpTa0EW8fNmr9FB3g==
-X-Received: by 2002:a63:ea50:: with SMTP id l16mr5225262pgk.70.1617829637653;
-        Wed, 07 Apr 2021 14:07:17 -0700 (PDT)
-Received: from google.com (240.111.247.35.bc.googleusercontent.com. [35.247.111.240])
-        by smtp.gmail.com with ESMTPSA id e6sm22162624pgh.17.2021.04.07.14.07.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 07 Apr 2021 14:07:16 -0700 (PDT)
-Date:   Wed, 7 Apr 2021 21:07:13 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Tom Lendacky <thomas.lendacky@amd.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
+  d=amazon.de; i=@amazon.de; q=dns/txt; s=amazon201209;
+  t=1617830450; x=1649366450;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version;
+  bh=cKk0OAbREUZmDCeFiWyFsrVwk/f3Wr9lxhDgovBejP8=;
+  b=FX5U8+tnxP5pwyZ86kno1HoX7/aRKccZ+cOptCOcUUbTesyvHY2kKeUh
+   TlzrIFBN4qd1HKEDiMbMBnkrr2R5oP5scNviHS7xveYoDrCaI3JiPGvb9
+   6TEcd+6+BEQLPb3c22L+JCL4lfmCy1ZWoZwLKAF/G9f9mRVk+xHnkeduA
+   E=;
+X-IronPort-AV: E=Sophos;i="5.82,204,1613433600"; 
+   d="scan'208";a="100204194"
+Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO email-inbound-relay-2b-4ff6265a.us-west-2.amazon.com) ([10.43.8.2])
+  by smtp-border-fw-out-4101.iad4.amazon.com with ESMTP; 07 Apr 2021 21:20:39 +0000
+Received: from EX13D28EUC003.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan3.pdx.amazon.com [10.236.137.198])
+        by email-inbound-relay-2b-4ff6265a.us-west-2.amazon.com (Postfix) with ESMTPS id 5102FA2225;
+        Wed,  7 Apr 2021 21:20:37 +0000 (UTC)
+Received: from uc8bbc9586ea454.ant.amazon.com (10.43.161.41) by
+ EX13D28EUC003.ant.amazon.com (10.43.164.43) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.2; Wed, 7 Apr 2021 21:20:29 +0000
+From:   Siddharth Chandrasekaran <sidcha@amazon.de>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
-        Borislav Petkov <bp@alien8.de>, Ingo Molnar <mingo@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
         Thomas Gleixner <tglx@linutronix.de>,
-        Brijesh Singh <brijesh.singh@amd.com>
-Subject: Re: [PATCH] KVM: SVM: Make sure GHCB is mapped before updating
-Message-ID: <YG4fAeaTy0HdHCsT@google.com>
-References: <03b349cb19b360d4c2bbeebdd171f99298082d28.1617820214.git.thomas.lendacky@amd.com>
- <YG4RSl88TSPccRfj@google.com>
- <d46ee7c3-6c8c-1f06-605c-c4f2d1888ba4@amd.com>
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        <x86@kernel.org>, "H. Peter Anvin" <hpa@zytor.com>
+CC:     Siddharth Chandrasekaran <sidcha@amazon.de>,
+        Alexander Graf <graf@amazon.com>,
+        Evgeny Iakovlev <eyakovl@amazon.de>, <kvm@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>
+Subject: [PATCH 1/4] KVM: x86: Move FPU register accessors into fpu.h
+Date:   Wed, 7 Apr 2021 23:19:51 +0200
+Message-ID: <20210407211954.32755-2-sidcha@amazon.de>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20210407211954.32755-1-sidcha@amazon.de>
+References: <20210407211954.32755-1-sidcha@amazon.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <d46ee7c3-6c8c-1f06-605c-c4f2d1888ba4@amd.com>
+Content-Type: text/plain
+X-Originating-IP: [10.43.161.41]
+X-ClientProxiedBy: EX13D06UWA003.ant.amazon.com (10.43.160.13) To
+ EX13D28EUC003.ant.amazon.com (10.43.164.43)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Apr 07, 2021, Tom Lendacky wrote:
-> On 4/7/21 3:08 PM, Sean Christopherson wrote:
-> > On Wed, Apr 07, 2021, Tom Lendacky wrote:
-> >> From: Tom Lendacky <thomas.lendacky@amd.com>
-> >>
-> >> The sev_vcpu_deliver_sipi_vector() routine will update the GHCB to inform
-> >> the caller of the AP Reset Hold NAE event that a SIPI has been delivered.
-> >> However, if a SIPI is performed without a corresponding AP Reset Hold,
-> >> then the GHCB may not be mapped, which will result in a NULL pointer
-> >> dereference.
-> >>
-> >> Check that the GHCB is mapped before attempting the update.
-> > 
-> > It's tempting to say the ghcb_set_*() helpers should guard against this, but
-> > that would add a lot of pollution and the vast majority of uses are very clearly
-> > in the vmgexit path.  svm_complete_emulated_msr() is the only other case that
-> > is non-obvious; would it make sense to sanity check svm->ghcb there as well?
-> 
-> Hmm... I'm not sure if we can get here without having taken the VMGEXIT
-> path to start, but it certainly couldn't hurt to add it.
+Hyper-v XMM fast hypercalls use XMM registers to pass input/output
+parameters. To access these, hyperv.c can reuse some FPU register
+accessors defined in emulator.c. Move them to a common location so both
+can access them.
 
-Yeah, AFAICT it should be impossible to reach the callback without a valid ghcb,
-it'd be purely be a sanity check.
+While at it, reorder the parameters of these accessor methods to make
+them more readable.
+
+Cc: Alexander Graf <graf@amazon.com>
+Cc: Evgeny Iakovlev <eyakovl@amazon.de>
+Signed-off-by: Siddharth Chandrasekaran <sidcha@amazon.de>
+---
+ arch/x86/kvm/emulate.c | 138 ++++++----------------------------------
+ arch/x86/kvm/fpu.h     | 140 +++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 158 insertions(+), 120 deletions(-)
+ create mode 100644 arch/x86/kvm/fpu.h
+
+diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
+index f7970ba6219f..296f8f3ce988 100644
+--- a/arch/x86/kvm/emulate.c
++++ b/arch/x86/kvm/emulate.c
+@@ -22,7 +22,6 @@
+ #include "kvm_cache_regs.h"
+ #include "kvm_emulate.h"
+ #include <linux/stringify.h>
+-#include <asm/fpu/api.h>
+ #include <asm/debugreg.h>
+ #include <asm/nospec-branch.h>
  
-> I can submit a v2 with that unless you want to submit it (with one small
-> change below).
+@@ -30,6 +29,7 @@
+ #include "tss.h"
+ #include "mmu.h"
+ #include "pmu.h"
++#include "fpu.h"
+ 
+ /*
+  * Operand types
+@@ -1081,116 +1081,14 @@ static void fetch_register_operand(struct operand *op)
+ 	}
+ }
+ 
+-static void emulator_get_fpu(void)
+-{
+-	fpregs_lock();
+-
+-	fpregs_assert_state_consistent();
+-	if (test_thread_flag(TIF_NEED_FPU_LOAD))
+-		switch_fpu_return();
+-}
+-
+-static void emulator_put_fpu(void)
+-{
+-	fpregs_unlock();
+-}
+-
+-static void read_sse_reg(sse128_t *data, int reg)
+-{
+-	emulator_get_fpu();
+-	switch (reg) {
+-	case 0: asm("movdqa %%xmm0, %0" : "=m"(*data)); break;
+-	case 1: asm("movdqa %%xmm1, %0" : "=m"(*data)); break;
+-	case 2: asm("movdqa %%xmm2, %0" : "=m"(*data)); break;
+-	case 3: asm("movdqa %%xmm3, %0" : "=m"(*data)); break;
+-	case 4: asm("movdqa %%xmm4, %0" : "=m"(*data)); break;
+-	case 5: asm("movdqa %%xmm5, %0" : "=m"(*data)); break;
+-	case 6: asm("movdqa %%xmm6, %0" : "=m"(*data)); break;
+-	case 7: asm("movdqa %%xmm7, %0" : "=m"(*data)); break;
+-#ifdef CONFIG_X86_64
+-	case 8: asm("movdqa %%xmm8, %0" : "=m"(*data)); break;
+-	case 9: asm("movdqa %%xmm9, %0" : "=m"(*data)); break;
+-	case 10: asm("movdqa %%xmm10, %0" : "=m"(*data)); break;
+-	case 11: asm("movdqa %%xmm11, %0" : "=m"(*data)); break;
+-	case 12: asm("movdqa %%xmm12, %0" : "=m"(*data)); break;
+-	case 13: asm("movdqa %%xmm13, %0" : "=m"(*data)); break;
+-	case 14: asm("movdqa %%xmm14, %0" : "=m"(*data)); break;
+-	case 15: asm("movdqa %%xmm15, %0" : "=m"(*data)); break;
+-#endif
+-	default: BUG();
+-	}
+-	emulator_put_fpu();
+-}
+-
+-static void write_sse_reg(sse128_t *data, int reg)
+-{
+-	emulator_get_fpu();
+-	switch (reg) {
+-	case 0: asm("movdqa %0, %%xmm0" : : "m"(*data)); break;
+-	case 1: asm("movdqa %0, %%xmm1" : : "m"(*data)); break;
+-	case 2: asm("movdqa %0, %%xmm2" : : "m"(*data)); break;
+-	case 3: asm("movdqa %0, %%xmm3" : : "m"(*data)); break;
+-	case 4: asm("movdqa %0, %%xmm4" : : "m"(*data)); break;
+-	case 5: asm("movdqa %0, %%xmm5" : : "m"(*data)); break;
+-	case 6: asm("movdqa %0, %%xmm6" : : "m"(*data)); break;
+-	case 7: asm("movdqa %0, %%xmm7" : : "m"(*data)); break;
+-#ifdef CONFIG_X86_64
+-	case 8: asm("movdqa %0, %%xmm8" : : "m"(*data)); break;
+-	case 9: asm("movdqa %0, %%xmm9" : : "m"(*data)); break;
+-	case 10: asm("movdqa %0, %%xmm10" : : "m"(*data)); break;
+-	case 11: asm("movdqa %0, %%xmm11" : : "m"(*data)); break;
+-	case 12: asm("movdqa %0, %%xmm12" : : "m"(*data)); break;
+-	case 13: asm("movdqa %0, %%xmm13" : : "m"(*data)); break;
+-	case 14: asm("movdqa %0, %%xmm14" : : "m"(*data)); break;
+-	case 15: asm("movdqa %0, %%xmm15" : : "m"(*data)); break;
+-#endif
+-	default: BUG();
+-	}
+-	emulator_put_fpu();
+-}
+-
+-static void read_mmx_reg(u64 *data, int reg)
+-{
+-	emulator_get_fpu();
+-	switch (reg) {
+-	case 0: asm("movq %%mm0, %0" : "=m"(*data)); break;
+-	case 1: asm("movq %%mm1, %0" : "=m"(*data)); break;
+-	case 2: asm("movq %%mm2, %0" : "=m"(*data)); break;
+-	case 3: asm("movq %%mm3, %0" : "=m"(*data)); break;
+-	case 4: asm("movq %%mm4, %0" : "=m"(*data)); break;
+-	case 5: asm("movq %%mm5, %0" : "=m"(*data)); break;
+-	case 6: asm("movq %%mm6, %0" : "=m"(*data)); break;
+-	case 7: asm("movq %%mm7, %0" : "=m"(*data)); break;
+-	default: BUG();
+-	}
+-	emulator_put_fpu();
+-}
+-
+-static void write_mmx_reg(u64 *data, int reg)
+-{
+-	emulator_get_fpu();
+-	switch (reg) {
+-	case 0: asm("movq %0, %%mm0" : : "m"(*data)); break;
+-	case 1: asm("movq %0, %%mm1" : : "m"(*data)); break;
+-	case 2: asm("movq %0, %%mm2" : : "m"(*data)); break;
+-	case 3: asm("movq %0, %%mm3" : : "m"(*data)); break;
+-	case 4: asm("movq %0, %%mm4" : : "m"(*data)); break;
+-	case 5: asm("movq %0, %%mm5" : : "m"(*data)); break;
+-	case 6: asm("movq %0, %%mm6" : : "m"(*data)); break;
+-	case 7: asm("movq %0, %%mm7" : : "m"(*data)); break;
+-	default: BUG();
+-	}
+-	emulator_put_fpu();
+-}
+-
+ static int em_fninit(struct x86_emulate_ctxt *ctxt)
+ {
+ 	if (ctxt->ops->get_cr(ctxt, 0) & (X86_CR0_TS | X86_CR0_EM))
+ 		return emulate_nm(ctxt);
+ 
+-	emulator_get_fpu();
++	kvm_fpu_get();
+ 	asm volatile("fninit");
+-	emulator_put_fpu();
++	kvm_fpu_put();
+ 	return X86EMUL_CONTINUE;
+ }
+ 
+@@ -1201,9 +1099,9 @@ static int em_fnstcw(struct x86_emulate_ctxt *ctxt)
+ 	if (ctxt->ops->get_cr(ctxt, 0) & (X86_CR0_TS | X86_CR0_EM))
+ 		return emulate_nm(ctxt);
+ 
+-	emulator_get_fpu();
++	kvm_fpu_get();
+ 	asm volatile("fnstcw %0": "+m"(fcw));
+-	emulator_put_fpu();
++	kvm_fpu_put();
+ 
+ 	ctxt->dst.val = fcw;
+ 
+@@ -1217,9 +1115,9 @@ static int em_fnstsw(struct x86_emulate_ctxt *ctxt)
+ 	if (ctxt->ops->get_cr(ctxt, 0) & (X86_CR0_TS | X86_CR0_EM))
+ 		return emulate_nm(ctxt);
+ 
+-	emulator_get_fpu();
++	kvm_fpu_get();
+ 	asm volatile("fnstsw %0": "+m"(fsw));
+-	emulator_put_fpu();
++	kvm_fpu_put();
+ 
+ 	ctxt->dst.val = fsw;
+ 
+@@ -1238,7 +1136,7 @@ static void decode_register_operand(struct x86_emulate_ctxt *ctxt,
+ 		op->type = OP_XMM;
+ 		op->bytes = 16;
+ 		op->addr.xmm = reg;
+-		read_sse_reg(&op->vec_val, reg);
++		kvm_read_sse_reg(reg, &op->vec_val);
+ 		return;
+ 	}
+ 	if (ctxt->d & Mmx) {
+@@ -1289,7 +1187,7 @@ static int decode_modrm(struct x86_emulate_ctxt *ctxt,
+ 			op->type = OP_XMM;
+ 			op->bytes = 16;
+ 			op->addr.xmm = ctxt->modrm_rm;
+-			read_sse_reg(&op->vec_val, ctxt->modrm_rm);
++			kvm_read_sse_reg(ctxt->modrm_rm, &op->vec_val);
+ 			return rc;
+ 		}
+ 		if (ctxt->d & Mmx) {
+@@ -1866,10 +1764,10 @@ static int writeback(struct x86_emulate_ctxt *ctxt, struct operand *op)
+ 				       op->bytes * op->count);
+ 		break;
+ 	case OP_XMM:
+-		write_sse_reg(&op->vec_val, op->addr.xmm);
++		kvm_write_sse_reg(op->addr.xmm, &op->vec_val);
+ 		break;
+ 	case OP_MM:
+-		write_mmx_reg(&op->mm_val, op->addr.mm);
++		kvm_write_mmx_reg(op->addr.mm, &op->mm_val);
+ 		break;
+ 	case OP_NONE:
+ 		/* no writeback */
+@@ -4124,11 +4022,11 @@ static int em_fxsave(struct x86_emulate_ctxt *ctxt)
+ 	if (rc != X86EMUL_CONTINUE)
+ 		return rc;
+ 
+-	emulator_get_fpu();
++	kvm_fpu_get();
+ 
+ 	rc = asm_safe("fxsave %[fx]", , [fx] "+m"(fx_state));
+ 
+-	emulator_put_fpu();
++	kvm_fpu_put();
+ 
+ 	if (rc != X86EMUL_CONTINUE)
+ 		return rc;
+@@ -4172,7 +4070,7 @@ static int em_fxrstor(struct x86_emulate_ctxt *ctxt)
+ 	if (rc != X86EMUL_CONTINUE)
+ 		return rc;
+ 
+-	emulator_get_fpu();
++	kvm_fpu_get();
+ 
+ 	if (size < __fxstate_size(16)) {
+ 		rc = fxregs_fixup(&fx_state, size);
+@@ -4189,7 +4087,7 @@ static int em_fxrstor(struct x86_emulate_ctxt *ctxt)
+ 		rc = asm_safe("fxrstor %[fx]", : [fx] "m"(fx_state));
+ 
+ out:
+-	emulator_put_fpu();
++	kvm_fpu_put();
+ 
+ 	return rc;
+ }
+@@ -5510,9 +5408,9 @@ static int flush_pending_x87_faults(struct x86_emulate_ctxt *ctxt)
+ {
+ 	int rc;
+ 
+-	emulator_get_fpu();
++	kvm_fpu_get();
+ 	rc = asm_safe("fwait");
+-	emulator_put_fpu();
++	kvm_fpu_put();
+ 
+ 	if (unlikely(rc != X86EMUL_CONTINUE))
+ 		return emulate_exception(ctxt, MF_VECTOR, 0, false);
+@@ -5523,7 +5421,7 @@ static int flush_pending_x87_faults(struct x86_emulate_ctxt *ctxt)
+ static void fetch_possible_mmx_operand(struct operand *op)
+ {
+ 	if (op->type == OP_MM)
+-		read_mmx_reg(&op->mm_val, op->addr.mm);
++		kvm_read_mmx_reg(op->addr.mm, &op->mm_val);
+ }
+ 
+ static int fastop(struct x86_emulate_ctxt *ctxt, fastop_t fop)
+diff --git a/arch/x86/kvm/fpu.h b/arch/x86/kvm/fpu.h
+new file mode 100644
+index 000000000000..3ba12888bf66
+--- /dev/null
++++ b/arch/x86/kvm/fpu.h
+@@ -0,0 +1,140 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++
++#ifndef __KVM_FPU_H_
++#define __KVM_FPU_H_
++
++#include <asm/fpu/api.h>
++
++typedef u32		__attribute__((vector_size(16))) sse128_t;
++#define __sse128_u	union { sse128_t vec; u64 as_u64[2]; u32 as_u32[4]; }
++#define sse128_lo(x)	({ __sse128_u t; t.vec = x; t.as_u64[0]; })
++#define sse128_hi(x)	({ __sse128_u t; t.vec = x; t.as_u64[1]; })
++#define sse128_l0(x)	({ __sse128_u t; t.vec = x; t.as_u32[0]; })
++#define sse128_l1(x)	({ __sse128_u t; t.vec = x; t.as_u32[1]; })
++#define sse128_l2(x)	({ __sse128_u t; t.vec = x; t.as_u32[2]; })
++#define sse128_l3(x)	({ __sse128_u t; t.vec = x; t.as_u32[3]; })
++#define sse128(lo, hi)	({ __sse128_u t; t.as_u64[0] = lo; t.as_u64[1] = hi; t.vec; })
++
++static inline void _kvm_read_sse_reg(int reg, sse128_t *data)
++{
++	switch (reg) {
++	case 0: asm("movdqa %%xmm0, %0" : "=m"(*data)); break;
++	case 1: asm("movdqa %%xmm1, %0" : "=m"(*data)); break;
++	case 2: asm("movdqa %%xmm2, %0" : "=m"(*data)); break;
++	case 3: asm("movdqa %%xmm3, %0" : "=m"(*data)); break;
++	case 4: asm("movdqa %%xmm4, %0" : "=m"(*data)); break;
++	case 5: asm("movdqa %%xmm5, %0" : "=m"(*data)); break;
++	case 6: asm("movdqa %%xmm6, %0" : "=m"(*data)); break;
++	case 7: asm("movdqa %%xmm7, %0" : "=m"(*data)); break;
++#ifdef CONFIG_X86_64
++	case 8: asm("movdqa %%xmm8, %0" : "=m"(*data)); break;
++	case 9: asm("movdqa %%xmm9, %0" : "=m"(*data)); break;
++	case 10: asm("movdqa %%xmm10, %0" : "=m"(*data)); break;
++	case 11: asm("movdqa %%xmm11, %0" : "=m"(*data)); break;
++	case 12: asm("movdqa %%xmm12, %0" : "=m"(*data)); break;
++	case 13: asm("movdqa %%xmm13, %0" : "=m"(*data)); break;
++	case 14: asm("movdqa %%xmm14, %0" : "=m"(*data)); break;
++	case 15: asm("movdqa %%xmm15, %0" : "=m"(*data)); break;
++#endif
++	default: BUG();
++	}
++}
++
++static inline void _kvm_write_sse_reg(int reg, const sse128_t *data)
++{
++	switch (reg) {
++	case 0: asm("movdqa %0, %%xmm0" : : "m"(*data)); break;
++	case 1: asm("movdqa %0, %%xmm1" : : "m"(*data)); break;
++	case 2: asm("movdqa %0, %%xmm2" : : "m"(*data)); break;
++	case 3: asm("movdqa %0, %%xmm3" : : "m"(*data)); break;
++	case 4: asm("movdqa %0, %%xmm4" : : "m"(*data)); break;
++	case 5: asm("movdqa %0, %%xmm5" : : "m"(*data)); break;
++	case 6: asm("movdqa %0, %%xmm6" : : "m"(*data)); break;
++	case 7: asm("movdqa %0, %%xmm7" : : "m"(*data)); break;
++#ifdef CONFIG_X86_64
++	case 8: asm("movdqa %0, %%xmm8" : : "m"(*data)); break;
++	case 9: asm("movdqa %0, %%xmm9" : : "m"(*data)); break;
++	case 10: asm("movdqa %0, %%xmm10" : : "m"(*data)); break;
++	case 11: asm("movdqa %0, %%xmm11" : : "m"(*data)); break;
++	case 12: asm("movdqa %0, %%xmm12" : : "m"(*data)); break;
++	case 13: asm("movdqa %0, %%xmm13" : : "m"(*data)); break;
++	case 14: asm("movdqa %0, %%xmm14" : : "m"(*data)); break;
++	case 15: asm("movdqa %0, %%xmm15" : : "m"(*data)); break;
++#endif
++	default: BUG();
++	}
++}
++
++static inline void _kvm_read_mmx_reg(int reg, u64 *data)
++{
++	switch (reg) {
++	case 0: asm("movq %%mm0, %0" : "=m"(*data)); break;
++	case 1: asm("movq %%mm1, %0" : "=m"(*data)); break;
++	case 2: asm("movq %%mm2, %0" : "=m"(*data)); break;
++	case 3: asm("movq %%mm3, %0" : "=m"(*data)); break;
++	case 4: asm("movq %%mm4, %0" : "=m"(*data)); break;
++	case 5: asm("movq %%mm5, %0" : "=m"(*data)); break;
++	case 6: asm("movq %%mm6, %0" : "=m"(*data)); break;
++	case 7: asm("movq %%mm7, %0" : "=m"(*data)); break;
++	default: BUG();
++	}
++}
++
++static inline void _kvm_write_mmx_reg(int reg, const u64 *data)
++{
++	switch (reg) {
++	case 0: asm("movq %0, %%mm0" : : "m"(*data)); break;
++	case 1: asm("movq %0, %%mm1" : : "m"(*data)); break;
++	case 2: asm("movq %0, %%mm2" : : "m"(*data)); break;
++	case 3: asm("movq %0, %%mm3" : : "m"(*data)); break;
++	case 4: asm("movq %0, %%mm4" : : "m"(*data)); break;
++	case 5: asm("movq %0, %%mm5" : : "m"(*data)); break;
++	case 6: asm("movq %0, %%mm6" : : "m"(*data)); break;
++	case 7: asm("movq %0, %%mm7" : : "m"(*data)); break;
++	default: BUG();
++	}
++}
++
++static inline void kvm_fpu_get(void)
++{
++	fpregs_lock();
++
++	fpregs_assert_state_consistent();
++	if (test_thread_flag(TIF_NEED_FPU_LOAD))
++		switch_fpu_return();
++}
++
++static inline void kvm_fpu_put(void)
++{
++	fpregs_unlock();
++}
++
++static inline void kvm_read_sse_reg(int reg, sse128_t *data)
++{
++	kvm_fpu_get();
++	_kvm_read_sse_reg(reg, data);
++	kvm_fpu_put();
++}
++
++static inline void kvm_write_sse_reg(int reg, const sse128_t *data)
++{
++	kvm_fpu_get();
++	_kvm_write_sse_reg(reg, data);
++	kvm_fpu_put();
++}
++
++static inline void kvm_read_mmx_reg(int reg, u64 *data)
++{
++	kvm_fpu_get();
++	_kvm_read_mmx_reg(reg, data);
++	kvm_fpu_put();
++}
++
++static inline void kvm_write_mmx_reg(int reg, const u64 *data)
++{
++	kvm_fpu_get();
++	_kvm_write_mmx_reg(reg, data);
++	kvm_fpu_put();
++}
++
++#endif
+-- 
+2.17.1
 
-I'd say just throw it into v2.
 
-> > diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> > index 019ac836dcd0..abe9c765628f 100644
-> > --- a/arch/x86/kvm/svm/svm.c
-> > +++ b/arch/x86/kvm/svm/svm.c
-> > @@ -2728,7 +2728,8 @@ static int svm_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
-> >  static int svm_complete_emulated_msr(struct kvm_vcpu *vcpu, int err)
-> >  {
-> >         struct vcpu_svm *svm = to_svm(vcpu);
-> > -       if (!sev_es_guest(vcpu->kvm) || !err)
-> > +
-> > +       if (!err || !sev_es_guest(vcpu->kvm) || !WARN_ON_ONCE(svm->ghcb))
-> 
-> This should be WARN_ON_ONCE(!svm->ghcb), otherwise you'll get the right
-> result, but get a stack trace immediately.
 
-Doh, yep.
+
+Amazon Development Center Germany GmbH
+Krausenstr. 38
+10117 Berlin
+Geschaeftsfuehrung: Christian Schlaeger, Jonathan Weiss
+Eingetragen am Amtsgericht Charlottenburg unter HRB 149173 B
+Sitz: Berlin
+Ust-ID: DE 289 237 879
+
+
+
