@@ -2,69 +2,99 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 636B0356FDB
-	for <lists+kvm@lfdr.de>; Wed,  7 Apr 2021 17:10:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6E7D4356FE6
+	for <lists+kvm@lfdr.de>; Wed,  7 Apr 2021 17:13:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235077AbhDGPKu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 7 Apr 2021 11:10:50 -0400
-Received: from mga17.intel.com ([192.55.52.151]:11223 "EHLO mga17.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S234763AbhDGPKt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 7 Apr 2021 11:10:49 -0400
-IronPort-SDR: vKTmazzJS8E0aS/6k/HuYd8lIT8k+SjLRkQwG/MMcrc6SJzqORTxVcwUc3BDPqtivhniaBmFOo
- spaTL0kfsIxA==
-X-IronPort-AV: E=McAfee;i="6000,8403,9947"; a="173406785"
-X-IronPort-AV: E=Sophos;i="5.82,203,1613462400"; 
-   d="scan'208";a="173406785"
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Apr 2021 08:10:40 -0700
-IronPort-SDR: Nh2sXErIvHnCufsdheEBQ6UWLhutJYLYv3s41okOLzye7V6PJUrqWrrsYr6rigFmkyppdLuIet
- kqmSSIH5M6BA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.82,203,1613462400"; 
-   d="scan'208";a="530238532"
-Received: from tassilo.jf.intel.com (HELO tassilo.localdomain) ([10.54.74.11])
-  by orsmga004.jf.intel.com with ESMTP; 07 Apr 2021 08:10:40 -0700
-Received: by tassilo.localdomain (Postfix, from userid 1000)
-        id 0F76030027C; Wed,  7 Apr 2021 08:10:40 -0700 (PDT)
-From:   Andi Kleen <ak@linux.intel.com>
-To:     David Hildenbrand <david@redhat.com>
-Cc:     "Kirill A. Shutemov" <kirill@shutemov.name>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Sean Christopherson <seanjc@google.com>,
-        Jim Mattson <jmattson@google.com>,
-        David Rientjes <rientjes@google.com>,
-        "Edgecombe\, Rick P" <rick.p.edgecombe@intel.com>,
-        "Kleen\, Andi" <andi.kleen@intel.com>,
-        "Yamahata\, Isaku" <isaku.yamahata@intel.com>, x86@kernel.org,
-        kvm@vger.kernel.org, linux-mm@kvack.org,
-        linux-kernel@vger.kernel.org,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
-        Oscar Salvador <osalvador@suse.de>,
-        Naoya Horiguchi <n-horiguchi@ah.jp.nec.com>
-Subject: Re: [RFCv1 7/7] KVM: unmap guest memory using poisoned pages
-References: <20210402152645.26680-1-kirill.shutemov@linux.intel.com>
-        <20210402152645.26680-8-kirill.shutemov@linux.intel.com>
-        <5e934d94-414c-90de-c58e-34456e4ab1cf@redhat.com>
-Date:   Wed, 07 Apr 2021 08:10:40 -0700
-In-Reply-To: <5e934d94-414c-90de-c58e-34456e4ab1cf@redhat.com> (David
-        Hildenbrand's message of "Wed, 7 Apr 2021 16:55:54 +0200")
-Message-ID: <87v98yuo3z.fsf@linux.intel.com>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
+        id S237991AbhDGPNt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 7 Apr 2021 11:13:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57854 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S244915AbhDGPNs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 7 Apr 2021 11:13:48 -0400
+Received: from mail-pf1-x429.google.com (mail-pf1-x429.google.com [IPv6:2607:f8b0:4864:20::429])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 68C54C061756;
+        Wed,  7 Apr 2021 08:13:38 -0700 (PDT)
+Received: by mail-pf1-x429.google.com with SMTP id s11so13121283pfm.1;
+        Wed, 07 Apr 2021 08:13:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=8gSjC0WXXO0hyXex8pLBlZgJJ3C7tLcObU3Ri/R7BbE=;
+        b=FWLkxi8L5ScjBYku9DHP82+AoKKDTgiXDj5CeSLW9WZ7l02g+wa9AaAR0DefJ72Tlk
+         tTgx2RnGgHCH7V6Y7E5SnVAdcg2Qo09HuigOiyIL+eJDYdYOn75ia5NROQ4/PPjrB6Im
+         SdotBRwae7sMhDq5ujnlQAXuBRoAhlmZJfv47BFwvls8Zwflvh4WaRpWqiabpGK3Iwq/
+         Aq6IRIvcPC5/A8UNEc3BFAA9FhRnBYjrM5Y2gpSiYEbqE2XxUh3A3jv+Z6g/emsSH9vh
+         +YmcErc3p+N1BR5pfSmgJKXOQbgiltEG/c2v/avbdp2VW3i4xivIhvc6kJ0aw4LTSH5w
+         xqmQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=8gSjC0WXXO0hyXex8pLBlZgJJ3C7tLcObU3Ri/R7BbE=;
+        b=TvjupKdpyzyTloBdlMXo7W42YYn7MRrB/vvT4MwqvZxsB9zeQtbLgGZhmx0wyoZuaX
+         It/lVkX72vtSuz+ltf4SKbzXb+mxWSHmxQ+X+TNTAl4M0ll+joMKPRdcHORl1uCJROqg
+         bkOhpNlMxjHm76vqrJToRsJoOT4l/yemmAo2Im1N5ZjepC+mZIkIDdBKj8ZpXlWLJS8G
+         eSWCTeCMjamfVaYVUczZLZCZAkXp+0eqHRkSmberUJeYovV95LoBxFxrUzta5hP2cV/n
+         rjtBrQ5VYScJM1A1oidOikw3jJoJIP8+7P0ZHqO+7TqSCQITm17jUoGJek9Nx3Jhmtur
+         puvQ==
+X-Gm-Message-State: AOAM5320Red8FgT3rBVdbhJM3fzVbITu8sUe57jbB3pMc3WOFZPb8Q2C
+        FIT71rbkKR1kXf/DzgEFRtc=
+X-Google-Smtp-Source: ABdhPJy5ZPRmaIO7nEBFmAuQOQ0Y8GY3inREsOnbc9BdLsN540bPamng3WsIf87RWRfNOC3QrsUeFA==
+X-Received: by 2002:a05:6a00:2301:b029:204:9bb6:de72 with SMTP id h1-20020a056a002301b02902049bb6de72mr3386966pfh.62.1617808417948;
+        Wed, 07 Apr 2021 08:13:37 -0700 (PDT)
+Received: from hoboy.vegasvil.org ([2601:645:c000:35:e2d5:5eff:fea5:802f])
+        by smtp.gmail.com with ESMTPSA id g5sm23385518pfb.77.2021.04.07.08.13.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 07 Apr 2021 08:13:37 -0700 (PDT)
+Date:   Wed, 7 Apr 2021 08:13:34 -0700
+From:   Richard Cochran <richardcochran@gmail.com>
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     pbonzini@redhat.com, netdev@vger.kernel.org, yangbo.lu@nxp.com,
+        john.stultz@linaro.org, tglx@linutronix.de, seanjc@google.com,
+        Mark.Rutland@arm.com, will@kernel.org, suzuki.poulose@arm.com,
+        Andre.Przywara@arm.com, steven.price@arm.com,
+        lorenzo.pieralisi@arm.com, sudeep.holla@arm.com,
+        linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+        Steve.Capper@arm.com, justin.he@arm.com, jianyong.wu@arm.com,
+        kernel-team@android.com
+Subject: Re: [PATCH v19 3/7] ptp: Reorganize ptp_kvm.c to make it
+ arch-independent
+Message-ID: <20210407151334.GB7379@hoboy.vegasvil.org>
+References: <20210330145430.996981-1-maz@kernel.org>
+ <20210330145430.996981-4-maz@kernel.org>
+ <87eefmpho3.wl-maz@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87eefmpho3.wl-maz@kernel.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-David Hildenbrand <david@redhat.com> writes:
+On Wed, Apr 07, 2021 at 10:28:44AM +0100, Marc Zyngier wrote:
+> On Tue, 30 Mar 2021 15:54:26 +0100,
+> Marc Zyngier <maz@kernel.org> wrote:
+> > 
+> > From: Jianyong Wu <jianyong.wu@arm.com>
+> > 
+> > Currently, the ptp_kvm module contains a lot of x86-specific code.
+> > Let's move this code into a new arch-specific file in the same directory,
+> > and rename the arch-independent file to ptp_kvm_common.c.
+> > 
+> > Reviewed-by: Andre Przywara <andre.przywara@arm.com>
+> > Signed-off-by: Jianyong Wu <jianyong.wu@arm.com>
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > Link: https://lore.kernel.org/r/20201209060932.212364-4-jianyong.wu@arm.com
+> 
+> Richard, Paolo,
+> 
+> Can I get an Ack on this and patch #7? We're getting pretty close to
+> the next merge window, and this series has been going on for a couple
+> of years now...
 
-> I have no idea how expensive would be bouncing writes (and reads?)
-> through the kernel. Did you ever experiment with that/evaluate that?
+For both patches:
 
-I would expect it to be quite expensive, as in virtio IO performance
-tanking.
-
--Andi
+Acked-by: Richard Cochran <richardcochran@gmail.com>
