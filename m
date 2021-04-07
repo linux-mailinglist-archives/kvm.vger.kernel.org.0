@@ -2,26 +2,26 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 91AB3356F03
-	for <lists+kvm@lfdr.de>; Wed,  7 Apr 2021 16:42:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 804FE356F05
+	for <lists+kvm@lfdr.de>; Wed,  7 Apr 2021 16:42:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1353102AbhDGOmB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 7 Apr 2021 10:42:01 -0400
-Received: from linux.microsoft.com ([13.77.154.182]:52756 "EHLO
+        id S1353116AbhDGOmE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 7 Apr 2021 10:42:04 -0400
+Received: from linux.microsoft.com ([13.77.154.182]:52758 "EHLO
         linux.microsoft.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235863AbhDGOlv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S235879AbhDGOlv (ORCPT <rfc822;kvm@vger.kernel.org>);
         Wed, 7 Apr 2021 10:41:51 -0400
 Received: from viremana-dev.fwjladdvyuiujdukmejncen4mf.xx.internal.cloudapp.net (unknown [13.66.132.26])
-        by linux.microsoft.com (Postfix) with ESMTPSA id 0296B20B5687;
+        by linux.microsoft.com (Postfix) with ESMTPSA id 1B40120B5688;
         Wed,  7 Apr 2021 07:41:40 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 0296B20B5687
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 1B40120B5688
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
         s=default; t=1617806500;
-        bh=Hv1yBZJGRkgciHJ0+Nq0bCPtERk07NyNFoeSNx3xOCM=;
+        bh=FbbsiSn1b1BNYpNIUbmPn9/HfbTYoqX0ImNm4EZLeCU=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=okpk/wyyRBfLU6qIW3730/v30nQsk+WhYWWjrSnok6vUJJongc9IBEg3I8jxFaNAw
-         aLM140R4mj5ZmFexkD20RwhZdGuwbP6tdQ1ZRFgQrM/ChiJbnETLqEeRNZf/1I8G1I
-         AYK4abo7ojP6T4qoXdX0ca+1Z/BTAWEFCZd8pZ4A=
+        b=Rs0v3XPXKJWMZmDeDX+F64LGzN8yXqebQyhbcxuarNXJ30GXrAe8tl7VkZojYrvQY
+         FPo1SOa98fQjNGmdySrFzMnK0p/sipWdcTl4d2oiRgULB7zCCGrSPrDoDhELr5t7KW
+         ecJ6Zk/Uuy4gomSxo98FBa/bgLW1XSDLwvKij2WE=
 From:   Vineeth Pillai <viremana@linux.microsoft.com>
 To:     Lan Tianyu <Tianyu.Lan@microsoft.com>,
         Michael Kelley <mikelley@microsoft.com>,
@@ -40,9 +40,9 @@ Cc:     Vineeth Pillai <viremana@linux.microsoft.com>,
         "K. Y. Srinivasan" <kys@microsoft.com>, x86@kernel.org,
         kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
         linux-hyperv@vger.kernel.org
-Subject: [PATCH 6/7] KVM: SVM: hyper-v: Enlightened MSR-Bitmap support
-Date:   Wed,  7 Apr 2021 14:41:27 +0000
-Message-Id: <5cf935068a9539146e033276b6d9a6c9b1e42119.1617804573.git.viremana@linux.microsoft.com>
+Subject: [PATCH 7/7] KVM: SVM: hyper-v: Direct Virtual Flush support
+Date:   Wed,  7 Apr 2021 14:41:28 +0000
+Message-Id: <aa634c867aa395aa2d3eae950dfec137f59a62c6.1617804573.git.viremana@linux.microsoft.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <cover.1617804573.git.viremana@linux.microsoft.com>
 References: <cover.1617804573.git.viremana@linux.microsoft.com>
@@ -52,77 +52,98 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Enlightened MSR-Bitmap as per TLFS:
+From Hyper-V TLFS:
+ "The hypervisor exposes hypercalls (HvFlushVirtualAddressSpace,
+  HvFlushVirtualAddressSpaceEx, HvFlushVirtualAddressList, and
+  HvFlushVirtualAddressListEx) that allow operating systems to more
+  efficiently manage the virtual TLB. The L1 hypervisor can choose to
+  allow its guest to use those hypercalls and delegate the responsibility
+  to handle them to the L0 hypervisor. This requires the use of a
+  partition assist page."
 
- "The L1 hypervisor may collaborate with the L0 hypervisor to make MSR
-  accesses more efficient. It can enable enlightened MSR bitmaps by setting
-  the corresponding field in the enlightened VMCS to 1. When enabled, L0
-  hypervisor does not monitor the MSR bitmaps for changes. Instead, the L1
-  hypervisor must invalidate the corresponding clean field after making
-  changes to one of the MSR bitmaps."
-
-Enable this for SVM.
+Add the Direct Virtual Flush support for SVM.
 
 Related VMX changes:
-commit ceef7d10dfb6 ("KVM: x86: VMX: hyper-v: Enlightened MSR-Bitmap support")
+commit 6f6a657c9998 ("KVM/Hyper-V/VMX: Add direct tlb flush support")
 
 Signed-off-by: Vineeth Pillai <viremana@linux.microsoft.com>
 ---
- arch/x86/kvm/svm/svm.c | 27 +++++++++++++++++++++++++++
- 1 file changed, 27 insertions(+)
+ arch/x86/kvm/svm/svm.c | 48 ++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 48 insertions(+)
 
 diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index 6287cab61f15..3562a247b7e8 100644
+index 3562a247b7e8..c6d3f3a7c986 100644
 --- a/arch/x86/kvm/svm/svm.c
 +++ b/arch/x86/kvm/svm/svm.c
-@@ -646,6 +646,27 @@ static bool msr_write_intercepted(struct kvm_vcpu *vcpu, u32 msr)
- 	return !!test_bit(bit_write,  &tmp);
+@@ -440,6 +440,32 @@ static void svm_init_osvw(struct kvm_vcpu *vcpu)
+ 		vcpu->arch.osvw.status |= 1;
  }
  
 +#if IS_ENABLED(CONFIG_HYPERV)
-+static inline void hv_vmcb_dirty_nested_enlightenments(struct kvm_vcpu *vcpu)
++static int hv_enable_direct_tlbflush(struct kvm_vcpu *vcpu)
 +{
-+	struct vmcb *vmcb = to_svm(vcpu)->vmcb;
++	struct hv_enlightenments *hve;
++	struct hv_partition_assist_pg **p_hv_pa_pg =
++			&to_kvm_hv(vcpu->kvm)->hv_pa_pg;
 +
-+	/*
-+	 * vmcb can be NULL if called during early vcpu init.
-+	 * And its okay not to mark vmcb dirty during vcpu init
-+	 * as we mark it dirty unconditionally towards end of vcpu
-+	 * init phase.
-+	 */
-+	if (vmcb && vmcb_is_clean(vmcb, VMCB_HV_NESTED_ENLIGHTENMENTS) &&
-+	    vmcb->hv_enlightenments.hv_enlightenments_control.msr_bitmap)
-+		vmcb_mark_dirty(vmcb, VMCB_HV_NESTED_ENLIGHTENMENTS);
-+}
-+#else
-+static inline void hv_vmcb_dirty_nested_enlightenments(struct kvm_vcpu *vcpu)
-+{
++	if (!*p_hv_pa_pg)
++		*p_hv_pa_pg = kzalloc(PAGE_SIZE, GFP_KERNEL);
++
++	if (!*p_hv_pa_pg)
++		return -ENOMEM;
++
++	hve = (struct hv_enlightenments *)&to_svm(vcpu)->vmcb->hv_enlightenments;
++
++	hve->partition_assist_page = __pa(*p_hv_pa_pg);
++	hve->hv_vm_id = (unsigned long)vcpu->kvm;
++	if (!hve->hv_enlightenments_control.nested_flush_hypercall) {
++		hve->hv_enlightenments_control.nested_flush_hypercall = 1;
++		vmcb_mark_dirty(to_svm(vcpu)->vmcb, VMCB_HV_NESTED_ENLIGHTENMENTS);
++	}
++
++	return 0;
 +}
 +#endif
 +
- static void set_msr_interception_bitmap(struct kvm_vcpu *vcpu, u32 *msrpm,
- 					u32 msr, int read, int write)
+ static int has_svm(void)
  {
-@@ -677,6 +698,9 @@ static void set_msr_interception_bitmap(struct kvm_vcpu *vcpu, u32 *msrpm,
- 	write ? clear_bit(bit_write, &tmp) : set_bit(bit_write, &tmp);
+ 	const char *msg;
+@@ -1034,6 +1060,21 @@ static __init int svm_hardware_setup(void)
+ 		svm_x86_ops.tlb_remote_flush_with_range =
+ 				kvm_hv_remote_flush_tlb_with_range;
+ 	}
++
++	if (ms_hyperv.nested_features & HV_X64_NESTED_DIRECT_FLUSH) {
++		pr_info("kvm: Hyper-V Direct TLB Flush enabled\n");
++		for_each_online_cpu(cpu) {
++			struct hv_vp_assist_page *vp_ap =
++				hv_get_vp_assist_page(cpu);
++
++			if (!vp_ap)
++				continue;
++
++			vp_ap->nested_control.features.directhypercall = 1;
++		}
++		svm_x86_ops.enable_direct_tlbflush =
++				hv_enable_direct_tlbflush;
++	}
+ #endif
  
- 	msrpm[offset] = tmp;
-+
-+	hv_vmcb_dirty_nested_enlightenments(vcpu);
-+
- }
+ 	if (nrips) {
+@@ -3913,6 +3954,13 @@ static __no_kcsan fastpath_t svm_vcpu_run(struct kvm_vcpu *vcpu)
+ 	}
+ 	svm->vmcb->save.cr2 = vcpu->arch.cr2;
  
- void set_msr_interception(struct kvm_vcpu *vcpu, u32 *msrpm, u32 msr,
-@@ -1135,6 +1159,9 @@ static void hv_init_vmcb(struct vmcb *vmcb)
- 	if (npt_enabled &&
- 	    ms_hyperv.nested_features & HV_X64_NESTED_ENLIGHTENED_TLB)
- 		hve->hv_enlightenments_control.enlightened_npt_tlb = 1;
++#if IS_ENABLED(CONFIG_HYPERV)
++	if (svm->vmcb->hv_enlightenments.hv_vp_id != to_hv_vcpu(vcpu)->vp_index) {
++		svm->vmcb->hv_enlightenments.hv_vp_id = to_hv_vcpu(vcpu)->vp_index;
++		vmcb_mark_dirty(svm->vmcb, VMCB_HV_NESTED_ENLIGHTENMENTS);
++	}
++#endif
 +
-+	if (ms_hyperv.nested_features & HV_X64_NESTED_MSR_BITMAP)
-+		hve->hv_enlightenments_control.msr_bitmap = 1;
- }
- #else
- static inline void hv_init_vmcb(struct vmcb *vmcb)
+ 	/*
+ 	 * Run with all-zero DR6 unless needed, so that we can get the exact cause
+ 	 * of a #DB.
 -- 
 2.25.1
 
