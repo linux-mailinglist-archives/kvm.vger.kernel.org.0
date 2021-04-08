@@ -2,95 +2,186 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C687E3588D5
-	for <lists+kvm@lfdr.de>; Thu,  8 Apr 2021 17:48:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 90A763588D6
+	for <lists+kvm@lfdr.de>; Thu,  8 Apr 2021 17:48:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232056AbhDHPsk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 8 Apr 2021 11:48:40 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:60885 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232009AbhDHPsh (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 8 Apr 2021 11:48:37 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1617896905;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=4Ez81rKbVxY5HMvJiqp7/KQr7CIYn4JH0OZcXlzdxz0=;
-        b=FSHl46EB9qkpE0OmnIiN3UTQpJm9zxCtaiGlEHZRELeT0uACzaRQwkCm3BoT9pOWKw9ED4
-        CkIUXJi+e21Hx+B35RQQQwHwXtWLYD4fliUI4DB+kd5GO2m9BqpZooUAIUNvdKJrKfOhi2
-        y5Vhu+ih52RUEGDvHSZ/rxH7lutSitA=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-71-EqYjJeu4OAGgLcK746CHRg-1; Thu, 08 Apr 2021 11:48:24 -0400
-X-MC-Unique: EqYjJeu4OAGgLcK746CHRg-1
-Received: by mail-ed1-f71.google.com with SMTP id dj13so1232167edb.14
-        for <kvm@vger.kernel.org>; Thu, 08 Apr 2021 08:48:22 -0700 (PDT)
+        id S231940AbhDHPss (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 8 Apr 2021 11:48:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41432 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232077AbhDHPsq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 8 Apr 2021 11:48:46 -0400
+Received: from mail-pl1-x62a.google.com (mail-pl1-x62a.google.com [IPv6:2607:f8b0:4864:20::62a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B8A4CC061761
+        for <kvm@vger.kernel.org>; Thu,  8 Apr 2021 08:48:33 -0700 (PDT)
+Received: by mail-pl1-x62a.google.com with SMTP id l1so1253208plg.12
+        for <kvm@vger.kernel.org>; Thu, 08 Apr 2021 08:48:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=BGPQ5W0R+cd+6n67AaZ3In8boiJNYVfmrkdkWy36GTc=;
+        b=qQN04vSWUu3zbQTJ//w5DARl2EiJ3BTTuJfuWYba3RZ+cRE4ITkF8oaOyCp9JfvuQJ
+         gCJ+p54nCRCI0nlBuVacUp1w4NIqSi1KOJKbxx/7T55igzHrtwLEWUQ/lCDpEmbm1IDr
+         O61Ghjt7hZx2UTo+Hztx0/vfFY0/Ci4/DM3O0GpLtZq49ts1oB4hwGk6g4nilhhCCs/R
+         iS34r0FFxLQ0BR2R4msI4FSaAOeteXimZ/YT4BM6J8k/l567acpVt41xjZu1W4uWAhz+
+         mp/DqP1+gBvH7Swcw9pot/JE3QGQ//niKQVVFPLRXqi9FMGRmTsD9MruMJoWPYTU9IaV
+         2ruQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=4Ez81rKbVxY5HMvJiqp7/KQr7CIYn4JH0OZcXlzdxz0=;
-        b=nVbYCJqjj4BFnBTMqCX1R8kF8q1HgnWK0UM7WAdblxDWx4s28H84Na0WtTMe0MZNaX
-         q39b0ovfJnG63nZEf/5N3git4WcykI62P2JHHZbwvgY7ek/oqcX2Mx3s1VZBsdv+GJ9Q
-         vKurrV6cfYYIIXp46igRRpUXTrv9OIdp35MIXzeDC/n3ntj0ZPpxGb/IKyCJq4CNzXks
-         cVXCj74035Ggfghfb3FtuKhVnjyx1OCMlmFE6VEKBhyE0k+wi6GKTvLMe1skbVrMO9Pr
-         vT/T8dhqNxCXwTg8p93IyGO3nKtBwZlezZUg1oIX/xC0sRNbHCe8mMm/zn13yi5c0RM1
-         ggqg==
-X-Gm-Message-State: AOAM533cAADNfXjy2DvSlThQtGR7e9SWCG3KW8Cc8g4VbRSCcFso3Xa2
-        vqspVYmOralcD1AlipyGaOBlffhdSP/jyujH8OSTCrIyNk8RLyh1aNczsyVmedJsOp0OXNcZCgm
-        JCFs5hrguo044sdVsPAAWGKMQ+Lzs00jYKw3VYk2G/9kpx91qTWJXJLVzZM+No94F
-X-Received: by 2002:a17:906:54e:: with SMTP id k14mr9587121eja.149.1617896901561;
-        Thu, 08 Apr 2021 08:48:21 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzXnmeOmLWAVA7akg2Cat3k5vhWt6/ezjq/k2VexhGZEjihjCFyuBbYjICxCCEFeuMNMKh3nQ==
-X-Received: by 2002:a17:906:54e:: with SMTP id k14mr9587084eja.149.1617896901394;
-        Thu, 08 Apr 2021 08:48:21 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e? ([2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e])
-        by smtp.gmail.com with ESMTPSA id o17sm10489411edt.10.2021.04.08.08.48.19
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 08 Apr 2021 08:48:20 -0700 (PDT)
-Subject: Re: [PATCH 0/4] Add support for XMM fast hypercalls
-To:     Siddharth Chandrasekaran <sidcha@amazon.de>
-Cc:     Wei Liu <wei.liu@kernel.org>, kys@microsoft.com,
-        haiyangz@microsoft.com, sthemmin@microsoft.com, tglx@linutronix.de,
-        mingo@redhat.com, bp@alien8.de, x86@kernel.org, hpa@zytor.com,
-        seanjc@google.com, vkuznets@redhat.com, wanpengli@tencent.com,
-        jmattson@google.com, joro@8bytes.org, graf@amazon.com,
-        eyakovl@amazon.de, linux-hyperv@vger.kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-References: <20210407212926.3016-1-sidcha@amazon.de>
- <20210408152817.k4d4hjdqu7hsjllo@liuwe-devbox-debian-v2>
- <033e7d77-d640-2c12-4918-da6b5b7f4e21@redhat.com>
- <20210408154006.GA32315@u366d62d47e3651.ant.amazon.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <53200f24-bd57-1509-aee2-0723aa8a3f6f@redhat.com>
-Date:   Thu, 8 Apr 2021 17:48:19 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.7.0
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=BGPQ5W0R+cd+6n67AaZ3In8boiJNYVfmrkdkWy36GTc=;
+        b=rNAlh5ofNGMTZaZyy5Ca+jXfWe9Wem/TwPBQnqTXaxpo8wl5l3AWs72HXkq7WTU5T8
+         q+mH5g3VPCfYEmXeMW3+6H0imT3wbVpKOf9KCVeAhPNYK0CrIzsEe9LnrtizZpHaZc/p
+         v/URy3SAxK6PDXMSl42meJh0VRlEct+M2mnpeJRyR/AWEtMzTufps4bkz87qI2r+QAZX
+         ddVCMxHCoTk9DTy0wRuu86ruUSpYeYt+l1nPrwhIcvdpMjpGiGF54vfneJpppcThjUro
+         W02Jz7vIJrhcREjDQeiCyjF+CPbonosWwNI0h1l+O4i1hRtIoFSwuIZbdhvppLy2JiZy
+         pguA==
+X-Gm-Message-State: AOAM531xeyGfi/nTo/a7oYwKJIch1llHDYp+ACAkv7nc9J1ZSX9/s7nm
+        +Xshg71/JtwyTeJn4BC+lofsPw==
+X-Google-Smtp-Source: ABdhPJyrt/tPFhwrp2sE3CnrCVPG45zod+fCK3daJozlJMqifLXhq4R6dxdZOQmnDyVQvTc4mD4JMg==
+X-Received: by 2002:a17:902:ed84:b029:e7:1f2b:1eb4 with SMTP id e4-20020a170902ed84b02900e71f2b1eb4mr8496161plj.74.1617896913040;
+        Thu, 08 Apr 2021 08:48:33 -0700 (PDT)
+Received: from google.com (240.111.247.35.bc.googleusercontent.com. [35.247.111.240])
+        by smtp.gmail.com with ESMTPSA id w75sm5954041pfc.135.2021.04.08.08.48.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 08 Apr 2021 08:48:32 -0700 (PDT)
+Date:   Thu, 8 Apr 2021 15:48:28 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Wanpeng Li <kernellwp@gmail.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Ben Gardon <bgardon@google.com>,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>
+Subject: Re: [PATCH v2 07/17] KVM: x86/mmu: Check PDPTRs before allocating
+ PAE roots
+Message-ID: <YG8lzKqL32+JhY0Z@google.com>
+References: <20210305011101.3597423-1-seanjc@google.com>
+ <20210305011101.3597423-8-seanjc@google.com>
+ <CANRm+CzUAzR+D3BtkYpe71sHf_nmtm_Qmh4neqc=US2ETauqyQ@mail.gmail.com>
+ <f6ae3dbb-cfa5-4d8b-26bf-92db6fc9eab1@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20210408154006.GA32315@u366d62d47e3651.ant.amazon.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <f6ae3dbb-cfa5-4d8b-26bf-92db6fc9eab1@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 08/04/21 17:40, Siddharth Chandrasekaran wrote:
->>>> Although the Hyper-v TLFS mentions that a guest cannot use this feature
->>>> unless the hypervisor advertises support for it, some hypercalls which
->>>> we plan on upstreaming in future uses them anyway.
->>> No, please don't do this. Check the feature bit(s) before you issue
->>> hypercalls which rely on the extended interface.
->> Perhaps Siddharth should clarify this, but I read it as Hyper-V being
->> buggy and using XMM arguments unconditionally.
-> The guest is at fault here as it expects Hyper-V to consume arguments
-> from XMM registers for certain hypercalls (that we are working) even if
-> we didn't expose the feature via CPUID bits.
+On Thu, Apr 08, 2021, Paolo Bonzini wrote:
+> On 08/04/21 13:15, Wanpeng Li wrote:
+> > I saw this splatting:
+> > 
+> >   BUG: sleeping function called from invalid context at
+> > arch/x86/kvm/kvm_cache_regs.h:115
+> >    kvm_pdptr_read+0x20/0x60 [kvm]
+> >    kvm_mmu_load+0x3bd/0x540 [kvm]
+> > 
+> > There is a might_sleep() in kvm_pdptr_read(), however, the original
+> > commit didn't explain more. I can send a formal one if the below fix
+> > is acceptable.
 
-What guest is that?
+We don't want to drop mmu_lock, even temporarily.  The reason for holding it
+across the entire sequence is to ensure kvm_mmu_available_pages() isn't violated.
 
-Paolo
+> I think we can just push make_mmu_pages_available down into
+> kvm_mmu_load's callees.  This way it's not necessary to hold the lock
+> until after the PDPTR check:
 
+...
+
+> @@ -4852,14 +4868,10 @@ int kvm_mmu_load(struct kvm_vcpu *vcpu)
+>  	r = mmu_alloc_special_roots(vcpu);
+>  	if (r)
+>  		goto out;
+> -	write_lock(&vcpu->kvm->mmu_lock);
+> -	if (make_mmu_pages_available(vcpu))
+> -		r = -ENOSPC;
+> -	else if (vcpu->arch.mmu->direct_map)
+> +	if (vcpu->arch.mmu->direct_map)
+>  		r = mmu_alloc_direct_roots(vcpu);
+>  	else
+>  		r = mmu_alloc_shadow_roots(vcpu);
+> -	write_unlock(&vcpu->kvm->mmu_lock);
+>  	if (r)
+>  		goto out;
+
+Freaking PDPTRs.  I was really hoping we could keep the lock and pages_available()
+logic outside of the helpers.  What if kvm_mmu_load() reads the PDPTRs and
+passes them into mmu_alloc_shadow_roots()?  Or is that too ugly?
+
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index efb41f31e80a..e3c4938cd665 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -3275,11 +3275,11 @@ static int mmu_alloc_direct_roots(struct kvm_vcpu *vcpu)
+        return 0;
+ }
+
+-static int mmu_alloc_shadow_roots(struct kvm_vcpu *vcpu)
++static int mmu_alloc_shadow_roots(struct kvm_vcpu *vcpu, u64 pdptrs[4])
+ {
+        struct kvm_mmu *mmu = vcpu->arch.mmu;
+-       u64 pdptrs[4], pm_mask;
+        gfn_t root_gfn, root_pgd;
++       u64 pm_mask;
+        hpa_t root;
+        int i;
+
+@@ -3291,11 +3291,8 @@ static int mmu_alloc_shadow_roots(struct kvm_vcpu *vcpu)
+
+        if (mmu->root_level == PT32E_ROOT_LEVEL) {
+                for (i = 0; i < 4; ++i) {
+-                       pdptrs[i] = mmu->get_pdptr(vcpu, i);
+-                       if (!(pdptrs[i] & PT_PRESENT_MASK))
+-                               continue;
+-
+-                       if (mmu_check_root(vcpu, pdptrs[i] >> PAGE_SHIFT))
++                       if ((pdptrs[i] & PT_PRESENT_MASK) &&
++                           mmu_check_root(vcpu, pdptrs[i] >> PAGE_SHIFT))
+                                return 1;
+                }
+        }
+@@ -4844,21 +4841,33 @@ EXPORT_SYMBOL_GPL(kvm_mmu_reset_context);
+
+ int kvm_mmu_load(struct kvm_vcpu *vcpu)
+ {
+-       int r;
++       struct kvm_mmu *mmu = vcpu->arch.mmu;
++       u64 pdptrs[4];
++       int r, i;
+
+-       r = mmu_topup_memory_caches(vcpu, !vcpu->arch.mmu->direct_map);
++       r = mmu_topup_memory_caches(vcpu, !mmu->direct_map);
+        if (r)
+                goto out;
+        r = mmu_alloc_special_roots(vcpu);
+        if (r)
+                goto out;
++
++       /*
++        * On SVM, reading PDPTRs might access guest memory, which might fault
++        * and thus might sleep.  Grab the PDPTRs before acquiring mmu_lock.
++        */
++       if (!mmu->direct_map && mmu->root_level == PT32E_ROOT_LEVEL) {
++               for (i = 0; i < 4; ++i)
++                       pdptrs[i] = mmu->get_pdptr(vcpu, i);
++       }
++
+        write_lock(&vcpu->kvm->mmu_lock);
+        if (make_mmu_pages_available(vcpu))
+                r = -ENOSPC;
+        else if (vcpu->arch.mmu->direct_map)
+                r = mmu_alloc_direct_roots(vcpu);
+        else
+-               r = mmu_alloc_shadow_roots(vcpu);
++               r = mmu_alloc_shadow_roots(vcpu, pdptrs);
+        write_unlock(&vcpu->kvm->mmu_lock);
+        if (r)
+                goto out;
