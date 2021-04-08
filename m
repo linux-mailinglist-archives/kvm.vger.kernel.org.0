@@ -2,238 +2,139 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EA6AD358220
-	for <lists+kvm@lfdr.de>; Thu,  8 Apr 2021 13:40:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EFB5435822B
+	for <lists+kvm@lfdr.de>; Thu,  8 Apr 2021 13:41:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231240AbhDHLlE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 8 Apr 2021 07:41:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42930 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229751AbhDHLlD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 8 Apr 2021 07:41:03 -0400
-Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E5F8DC061760;
-        Thu,  8 Apr 2021 04:40:52 -0700 (PDT)
-Received: from zn.tnic (p200300ec2f09500084b1bf46b8ecfaeb.dip0.t-ipconnect.de [IPv6:2003:ec:2f09:5000:84b1:bf46:b8ec:faeb])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id E7BF11EC04AD;
-        Thu,  8 Apr 2021 13:40:49 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1617882050;
+        id S231336AbhDHLlP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 8 Apr 2021 07:41:15 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:28971 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229921AbhDHLlO (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 8 Apr 2021 07:41:14 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1617882063;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=plX216BNHZpcdz+f4ezGrAm+clkBLv3CioAX+/V0FCI=;
-        b=CM6KwhEJJDYkpU1MkaNUy+O8kqCdbz/v/4nwutkxBp1G82BD4HVmT19fVEb+tKL2QmILHW
-        A69sDsWiAn0b1b0SVbxDnPBdBxoc6CdUBYAJ7cDCzgyWlvWAhUEpr1lsNYeG46ZV0mbu2I
-        FwE67St5EeEOf40dMYLV1NAcZtlsLuM=
-Date:   Thu, 8 Apr 2021 13:40:49 +0200
-From:   Borislav Petkov <bp@alien8.de>
-To:     Brijesh Singh <brijesh.singh@amd.com>
-Cc:     linux-kernel@vger.kernel.org, x86@kernel.org, kvm@vger.kernel.org,
-        ak@linux.intel.com, Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        "H. Peter Anvin" <hpa@zytor.com>, Tony Luck <tony.luck@intel.com>,
-        Dave Hansen <dave.hansen@intel.com>,
-        "Peter Zijlstra (Intel)" <peterz@infradead.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        David Rientjes <rientjes@google.com>,
-        Sean Christopherson <seanjc@google.com>
-Subject: Re: [RFC Part1 PATCH 09/13] x86/kernel: add support to validate
- memory in early enc attribute change
-Message-ID: <20210408114049.GI10192@zn.tnic>
-References: <20210324164424.28124-1-brijesh.singh@amd.com>
- <20210324164424.28124-10-brijesh.singh@amd.com>
+         to:to:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=s9XSwEEi1zJXTpbPUBOMu9HhV0dFlRjs6EwHYbE6+e4=;
+        b=BCqGMbJOfrjxEXjDu0AmwJDqVN1hDW8OvOjjCRNYXhMvLGE1yEFFfOo1BfJNp8NQdCY9uv
+        Fd5Lz11RVCjX3uZZkkrOtfjOPIKnAFGuJ0UFudoxphsoYzKlXQZll4PWvYXfWi8b98WRHQ
+        LikfUekwF6sExdN/PxLALQuUr73igqg=
+Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
+ [209.85.218.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-254-51xpkcPENrunN9tYRMAkxg-1; Thu, 08 Apr 2021 07:41:01 -0400
+X-MC-Unique: 51xpkcPENrunN9tYRMAkxg-1
+Received: by mail-ej1-f69.google.com with SMTP id k26so721229ejs.5
+        for <kvm@vger.kernel.org>; Thu, 08 Apr 2021 04:41:01 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:to:references:from:subject:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=s9XSwEEi1zJXTpbPUBOMu9HhV0dFlRjs6EwHYbE6+e4=;
+        b=OCFpq2ybg66N7tjplPXKQG1KefioeW+JKUN1Kj4dddXoy7Q+Sd+r8hLB+rnLkENXh+
+         aQcN/knTdhD1Q7nuuz51O1fOlZju8c/4kbC2hL1IVs10PhzQIlG7r+LsEQfMsKV4PUtS
+         nsG9JZr9MJuxk0aBzS84iboLrwpokjYbid+C61RsPHZ032Y/qJeah4lSsJa8BV30tCLM
+         kwjRO6zW6NnoYHF9Zu5KvJ3R8cR1SObI7GjZ2wmCeppM9/EcMobg8eJiDnuiFOEXpADd
+         Evu0C1RTO1HVd7bZgwURYd1WMfsDvSm9p0Qh/+Vvdw58LGneMkO6GHWdpPw0SlaC5/Jk
+         zG9A==
+X-Gm-Message-State: AOAM531VPxvyXPP3idqZE8hMKLLavN82eBmjyNxJf1ecFKCG6sQBxxT8
+        pIjFwfk3fqidWz8XsllaQ+rOvabUBJXWZLOb5PZMoYYO2hntIFTqAFLPbvoLe1ExWaYHrxvIsX6
+        Y+Kof68vSuGrk
+X-Received: by 2002:aa7:cf90:: with SMTP id z16mr10682022edx.273.1617882060783;
+        Thu, 08 Apr 2021 04:41:00 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzUNwVjPU6LZkoTiJz3z03af3SU7UKs6cSUJv0KPBteAvMvZy2H6osTmzxUIJoPNr0/d/3eYQ==
+X-Received: by 2002:aa7:cf90:: with SMTP id z16mr10682002edx.273.1617882060615;
+        Thu, 08 Apr 2021 04:41:00 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id t1sm4680038eds.53.2021.04.08.04.40.59
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 08 Apr 2021 04:41:00 -0700 (PDT)
+To:     Jason Gunthorpe <jgg@nvidia.com>,
+        DRI Development <dri-devel@lists.freedesktop.org>,
+        LKML <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org,
+        linux-mm@kvack.org, linux-arm-kernel@lists.infradead.org,
+        linux-samsung-soc@vger.kernel.org, linux-media@vger.kernel.org,
+        3pvd@google.com, Jann Horn <jannh@google.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Peter Xu <peterx@redhat.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Daniel Vetter <daniel.vetter@intel.com>
+References: <20210316153303.3216674-1-daniel.vetter@ffwll.ch>
+ <20210316153303.3216674-4-daniel.vetter@ffwll.ch>
+ <20210329133101.GA1168973@nvidia.com> <YG7VWWkvnv2IPEXt@phenom.ffwll.local>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH 3/3] mm: unexport follow_pfn
+Message-ID: <5f956a46-da38-e72a-edaa-3b746a275f1e@redhat.com>
+Date:   Thu, 8 Apr 2021 13:40:59 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20210324164424.28124-10-brijesh.singh@amd.com>
+In-Reply-To: <YG7VWWkvnv2IPEXt@phenom.ffwll.local>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Mar 24, 2021 at 11:44:20AM -0500, Brijesh Singh wrote:
-> @@ -63,6 +63,10 @@ struct __packed snp_page_state_change {
->  #define GHCB_REGISTER_GPA_RESP	0x013UL
->  #define		GHCB_REGISTER_GPA_RESP_VAL(val)		((val) >> 12)
->  
-> +/* Macro to convert the x86 page level to the RMP level and vice versa */
-> +#define X86_RMP_PG_LEVEL(level)	(((level) == PG_LEVEL_4K) ? RMP_PG_SIZE_4K : RMP_PG_SIZE_2M)
-> +#define RMP_X86_PG_LEVEL(level)	(((level) == RMP_PG_SIZE_4K) ? PG_LEVEL_4K : PG_LEVEL_2M)
+On 08/04/21 12:05, Daniel Vetter wrote:
+> On Mon, Mar 29, 2021 at 10:31:01AM -0300, Jason Gunthorpe wrote:
+>> On Tue, Mar 16, 2021 at 04:33:03PM +0100, Daniel Vetter wrote:
+>>> Both kvm (in bd2fae8da794 ("KVM: do not assume PTE is writable after
+>>> follow_pfn")) and vfio (in 07956b6269d3 ("vfio/type1: Use
+>>> follow_pte()")) have lost their callsites of follow_pfn(). All the
+>>> other ones have been switched over to unsafe_follow_pfn because they
+>>> cannot be fixed without breaking userspace api.
+>>>
+>>> Argueably the vfio code is still racy, but that's kinda a bigger
+>>
+>> vfio and kvm
+> 
+> Hm I thought kvm is non-racy due to the mmu notifier catch races?
 
-Please add those with the patch which uses them for the first time.
+No, but the plan is indeed to have some struct for each page that uses 
+follow_pfn and update it from the MMU notifiers.
 
-Also, it seems to me the names should be
+Paolo
 
-X86_TO_RMP_PG_LEVEL
-RMP_TO_X86_PG_LEVEL
+>>
+>>> picture. But since it does leak the pte beyond where it drops the pt
+>>> lock, without anything else like an mmu notifier guaranteeing
+>>> coherence, the problem is at least clearly visible in the vfio code.
+>>> So good enough with me.
+>>>
+>>> I've decided to keep the explanation that after dropping the pt lock
+>>> you must have an mmu notifier if you keep using the pte somehow by
+>>> adjusting it and moving it into the kerneldoc for the new follow_pte()
+>>> function.
+>>>
+>>> Cc: 3pvd@google.com
+>>> Cc: Jann Horn <jannh@google.com>
+>>> Cc: Paolo Bonzini <pbonzini@redhat.com>
+>>> Cc: Jason Gunthorpe <jgg@nvidia.com>
+>>> Cc: Cornelia Huck <cohuck@redhat.com>
+>>> Cc: Peter Xu <peterx@redhat.com>
+>>> Cc: Alex Williamson <alex.williamson@redhat.com>
+>>> Cc: linux-mm@kvack.org
+>>> Cc: linux-arm-kernel@lists.infradead.org
+>>> Cc: linux-samsung-soc@vger.kernel.org
+>>> Cc: linux-media@vger.kernel.org
+>>> Cc: kvm@vger.kernel.org
+>>> Signed-off-by: Daniel Vetter <daniel.vetter@intel.com>
+>>> ---
+>>>   include/linux/mm.h |  2 --
+>>>   mm/memory.c        | 26 +++++---------------------
+>>>   mm/nommu.c         | 13 +------------
+>>>   3 files changed, 6 insertions(+), 35 deletions(-)
+>>
+>> Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
+> 
+> Thanks for your r-b tags, I'll add them.
+> -Daniel
+> 
+>>
+>> Jason
+> 
 
-...
-
-> @@ -56,3 +56,108 @@ void sev_snp_register_ghcb(unsigned long paddr)
->  	/* Restore the GHCB MSR value */
->  	sev_es_wr_ghcb_msr(old);
->  }
-> +
-> +static void sev_snp_issue_pvalidate(unsigned long vaddr, unsigned int npages, bool validate)
-
-pvalidate_pages() I guess.
-
-> +{
-> +	unsigned long eflags, vaddr_end, vaddr_next;
-> +	int rc;
-> +
-> +	vaddr = vaddr & PAGE_MASK;
-> +	vaddr_end = vaddr + (npages << PAGE_SHIFT);
-> +
-> +	for (; vaddr < vaddr_end; vaddr = vaddr_next) {
-
-Yuck, that vaddr_next gets initialized at the end of the loop. How about
-using a while loop here instead?
-
-	while (vaddr < vaddr_end) {
-
-		...
-
-		vaddr += PAGE_SIZE;
-	}
-
-then you don't need vaddr_next at all. Ditto for all the other loops in
-this patch which iterate over pages.
-
-> +		rc = __pvalidate(vaddr, RMP_PG_SIZE_4K, validate, &eflags);
-
-So this function gets only 4K pages to pvalidate?
-
-> +
-
-^ Superfluous newline.
-
-> +		if (rc) {
-> +			pr_err("Failed to validate address 0x%lx ret %d\n", vaddr, rc);
-
-You can combine the pr_err and dump_stack() below into a WARN() here:
-
-		WARN(rc, ...);
-
-> +			goto e_fail;
-> +		}
-> +
-> +		/* Check for the double validation condition */
-> +		if (eflags & X86_EFLAGS_CF) {
-> +			pr_err("Double %salidation detected (address 0x%lx)\n",
-> +					validate ? "v" : "inv", vaddr);
-> +			goto e_fail;
-> +		}
-
-As before - this should be communicated by a special retval from
-__pvalidate().
-
-> +
-> +		vaddr_next = vaddr + PAGE_SIZE;
-> +	}
-> +
-> +	return;
-> +
-> +e_fail:
-> +	/* Dump stack for the debugging purpose */
-> +	dump_stack();
-> +
-> +	/* Ask to terminate the guest */
-> +	sev_es_terminate(GHCB_SEV_ES_REASON_GENERAL_REQUEST);
-
-Another termination reason to #define.
-
-> +}
-> +
-> +static void __init early_snp_set_page_state(unsigned long paddr, unsigned int npages, int op)
-> +{
-> +	unsigned long paddr_end, paddr_next;
-> +	u64 old, val;
-> +
-> +	paddr = paddr & PAGE_MASK;
-> +	paddr_end = paddr + (npages << PAGE_SHIFT);
-> +
-> +	/* save the old GHCB MSR */
-> +	old = sev_es_rd_ghcb_msr();
-> +
-> +	for (; paddr < paddr_end; paddr = paddr_next) {
-> +
-> +		/*
-> +		 * Use the MSR protocol VMGEXIT to request the page state change. We use the MSR
-> +		 * protocol VMGEXIT because in early boot we may not have the full GHCB setup
-> +		 * yet.
-> +		 */
-> +		sev_es_wr_ghcb_msr(GHCB_SNP_PAGE_STATE_REQ_GFN(paddr >> PAGE_SHIFT, op));
-> +		VMGEXIT();
-
-Yeah, I know we don't always strictly adhere to 80 columns but there's
-no real need not to fit that in 80 cols here so please shorten names and
-comments. Ditto for the rest.
-
-> +
-> +		val = sev_es_rd_ghcb_msr();
-> +
-> +		/* Read the response, if the page state change failed then terminate the guest. */
-> +		if (GHCB_SEV_GHCB_RESP_CODE(val) != GHCB_SNP_PAGE_STATE_CHANGE_RESP)
-> +			sev_es_terminate(GHCB_SEV_ES_REASON_GENERAL_REQUEST);
-
-if (...)
-	goto fail;
-
-and add that fail label at the end so that all the error handling path
-is out of the way.
-
-> +
-> +		if (GHCB_SNP_PAGE_STATE_RESP_VAL(val) != 0) {
-
-s/!= 0//
-
-> +			pr_err("Failed to change page state to '%s' paddr 0x%lx error 0x%llx\n",
-> +					op == SNP_PAGE_STATE_PRIVATE ? "private" : "shared",
-> +					paddr, GHCB_SNP_PAGE_STATE_RESP_VAL(val));
-> +
-> +			/* Dump stack for the debugging purpose */
-> +			dump_stack();
-
-WARN as above.
-
-> @@ -49,6 +50,27 @@ bool sev_enabled __section(".data");
->  /* Buffer used for early in-place encryption by BSP, no locking needed */
->  static char sme_early_buffer[PAGE_SIZE] __initdata __aligned(PAGE_SIZE);
->  
-> +/*
-> + * When SNP is active, this routine changes the page state from private to shared before
-> + * copying the data from the source to destination and restore after the copy. This is required
-> + * because the source address is mapped as decrypted by the caller of the routine.
-> + */
-> +static inline void __init snp_aware_memcpy(void *dst, void *src, size_t sz,
-> +					   unsigned long paddr, bool dec)
-
-snp_memcpy() simply.
-
-> +{
-> +	unsigned long npages = PAGE_ALIGN(sz) >> PAGE_SHIFT;
-> +
-> +	/* If the paddr need to accessed decrypted, make the page shared before memcpy. */
-
-*needs*
-
-> +	if (sev_snp_active() && dec)
-
-Flip that test so that you don't have it twice in the code:
-
-	if (!sev_snp_active()) {
-		memcpy(dst, src, sz);
-	} else {
-		...
-	}
-
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
