@@ -2,183 +2,354 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9AA27357E54
-	for <lists+kvm@lfdr.de>; Thu,  8 Apr 2021 10:44:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 22B19357E8C
+	for <lists+kvm@lfdr.de>; Thu,  8 Apr 2021 10:59:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229714AbhDHIob (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 8 Apr 2021 04:44:31 -0400
-Received: from mga07.intel.com ([134.134.136.100]:46106 "EHLO mga07.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229588AbhDHIob (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 8 Apr 2021 04:44:31 -0400
-IronPort-SDR: HRQzzJjrF9otLwiqVZilH5a7EA/0HWBqrupB715Zu8zzY0boJz7E7surNThLNK66T6cEZ5qk00
- DlC3YBxc4smg==
-X-IronPort-AV: E=McAfee;i="6000,8403,9947"; a="257477051"
-X-IronPort-AV: E=Sophos;i="5.82,205,1613462400"; 
-   d="scan'208";a="257477051"
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Apr 2021 01:44:19 -0700
-IronPort-SDR: ndJ9uh+y3ZENsCyinQKz6gZyzFsEZSAQW9ZLGg0BfUEVJ5Agw6izh9rpXAwEgMwWja+KvegCzE
- HdGPIBFp0/BA==
-X-IronPort-AV: E=Sophos;i="5.82,205,1613462400"; 
-   d="scan'208";a="458736086"
-Received: from likexu-mobl1.ccr.corp.intel.com (HELO [10.238.4.93]) ([10.238.4.93])
-  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Apr 2021 01:44:15 -0700
-Subject: Re: [PATCH v4 08/16] KVM: x86/pmu: Add IA32_DS_AREA MSR emulation to
- manage guest DS buffer
-To:     Peter Zijlstra <peterz@infradead.org>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, eranian@google.com,
-        andi@firstfloor.org, kan.liang@linux.intel.com,
-        wei.w.wang@intel.com, Wanpeng Li <wanpengli@tencent.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        x86@kernel.org, linux-kernel@vger.kernel.org,
-        Andi Kleen <ak@linux.intel.com>,
-        Like Xu <like.xu@linux.intel.com>
-References: <20210329054137.120994-1-like.xu@linux.intel.com>
- <20210329054137.120994-9-like.xu@linux.intel.com>
- <YG3SPsiFJPeXQXhq@hirez.programming.kicks-ass.net>
- <610bfd14-3250-0542-2d93-cbd15f2b4e16@intel.com>
- <YG62VBBix2WVy3XA@hirez.programming.kicks-ass.net>
-From:   "Xu, Like" <like.xu@intel.com>
-Message-ID: <f226e7b0-b419-06d3-cc55-8c8defd51cfc@intel.com>
-Date:   Thu, 8 Apr 2021 16:44:12 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.9.0
+        id S229689AbhDHI7V (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 8 Apr 2021 04:59:21 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:52057 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229588AbhDHI7U (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 8 Apr 2021 04:59:20 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1617872348;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=rJd9cjluF7SSVnX1XRLoAfAtkfIwkqgYvUi/pSMmbxw=;
+        b=E3FWWwroQBTSaOe2sfVh52D7UJtm5mzpd61hg9eAx/YWerc6QK8xSdjne0jVlRT8NHhV1j
+        zDkfAa8wxtiMNK/UQ2aBvGnqNP0NbymFplOhDXkiiE1TxXBqTMdxrd0K8jlDpfGWxS3aYL
+        cmyNaEGMF66FXe3IPB6jFfIPvHZkOro=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-170-oaJCtW7ZOzmgFBdfaTqmYg-1; Thu, 08 Apr 2021 04:59:04 -0400
+X-MC-Unique: oaJCtW7ZOzmgFBdfaTqmYg-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 363271006C84;
+        Thu,  8 Apr 2021 08:59:03 +0000 (UTC)
+Received: from wangxiaodeMacBook-Air.local (ovpn-13-53.pek2.redhat.com [10.72.13.53])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 8AC716B8DD;
+        Thu,  8 Apr 2021 08:58:56 +0000 (UTC)
+Subject: Re: [PATCH v2 1/3] virtio: update reset callback to return status
+To:     Max Gurtovoy <mgurtovoy@nvidia.com>, mst@redhat.com,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org
+Cc:     oren@nvidia.com, nitzanc@nvidia.com, cohuck@redhat.com
+References: <20210408081109.56537-1-mgurtovoy@nvidia.com>
+From:   Jason Wang <jasowang@redhat.com>
+Message-ID: <16fa0e31-a305-3b41-b0d3-ad76aa00177b@redhat.com>
+Date:   Thu, 8 Apr 2021 16:58:54 +0800
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
+ Gecko/20100101 Thunderbird/78.9.0
 MIME-Version: 1.0
-In-Reply-To: <YG62VBBix2WVy3XA@hirez.programming.kicks-ass.net>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20210408081109.56537-1-mgurtovoy@nvidia.com>
+Content-Type: text/plain; charset=gbk; format=flowed
 Content-Transfer-Encoding: 8bit
-Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2021/4/8 15:52, Peter Zijlstra wrote:
-> On Thu, Apr 08, 2021 at 01:39:49PM +0800, Xu, Like wrote:
->> Hi Peter,
->>
->> Thanks for your detailed comments.
->>
->> If you have more comments for other patches, please let me know.
->>
->> On 2021/4/7 23:39, Peter Zijlstra wrote:
->>> On Mon, Mar 29, 2021 at 01:41:29PM +0800, Like Xu wrote:
->>>> @@ -3869,10 +3876,12 @@ static struct perf_guest_switch_msr *intel_guest_get_msrs(int *nr, void *data)
->>>>    		if (arr[1].guest)
->>>>    			arr[0].guest |= arr[1].guest;
->>>> -		else
->>>> +		else {
->>>>    			arr[1].guest = arr[1].host;
->>>> +			arr[2].guest = arr[2].host;
->>>> +		}
->>> What's all this gibberish?
->>>
->>> The way I read that it says:
->>>
->>> 	if guest has PEBS_ENABLED
->>> 		guest GLOBAL_CTRL |= PEBS_ENABLED
->>> 	otherwise
->>> 		guest PEBS_ENABLED = host PEBS_ENABLED
->>> 		guest DS_AREA = host DS_AREA
->>>
->>> which is just completely random garbage afaict. Why would you leak host
->>> msrs into the guest?
->> In fact, this is not a leak at all.
->>
->> When we do "arr[i].guest = arr[i].host;" assignment in the
->> intel_guest_get_msrs(), the KVM will check "if (msrs[i].host ==
->> msrs[i].guest)" and if so, it disables the atomic switch for this msr
->> during vmx transaction in the caller atomic_switch_perf_msrs().
-> Another marvel of bad coding style that function is :-( Lots of missing
-> {} and indentation fail.
 
-Sorry for that and I'll fix them.
+�� 2021/4/8 ����4:11, Max Gurtovoy д��:
+> The reset device operation, usually is an operation that might fail from
+> various reasons. For example, the controller might be in a bad state and
+> can't answer to any request. Usually, the paravirt SW based virtio
+> devices always succeed in reset operation but this is not the case for
+> HW based virtio devices.
+
+
+I would like to know under what condition that the reset operation may 
+fail (except for the case of a bugg guest).
+
 
 >
-> This is terrible though, why would we clear the guest MSRs when it
-> changes PEBS_ENABLED.
+> This commit is also a preparation for adding a timeout mechanism for
+> resetting virtio devices.
+>
+> Signed-off-by: Max Gurtovoy <mgurtovoy@nvidia.com>
+> ---
+>
+> changes from v1:
+>   - update virtio_ccw.c (Cornelia)
+>   - update virtio_uml.c
+>   - update mlxbf-tmfifo.c
 
-The values of arr[1].host and arr[1].guest depend on the arrangement of 
-host perf:
 
-         arr[1].host = cpuc->pebs_enabled & ~cpuc->intel_ctrl_guest_mask;
-         arr[1].guest = cpuc->pebs_enabled & ~cpuc->intel_ctrl_host_mask;
+Note that virtio driver may call reset, so you probably need to convert 
+them.
 
-rather than the guest value of PEBS_ENABLE.
+Thanks
 
-When the value of this msr is different across vmx-transaction,
-we will load arr[1].host after vm-exit and load arr[1].guest before vm-entry.
-
-If the value of this msr is the same before and after vmx-transaction,
-we do nothing and keep the original value on the register.
-
-> The guest had better clear them itself.
-
-I don't understand what you are referring to here.
-
-Can you explain what you think is the correct behavior here ?
-
-> Removing
-> guest DS_AREA just because we don't have any bits set in PEBS_ENABLED is
-> wrong and could very break all sorts of drivers.
-
-Except for PEBS, other features that rely on DS_AREA are not available in 
-the guest .
-
-Can you explain more of your concerns for DS_AREA switch ?
 
 >
->> In that case, the msr value doesn't change and any guest write will be
->> trapped.  If the next check is "msrs[i].host != msrs[i].guest", the
->> atomic switch will be triggered again.
->>
->> Compared to before, this part of the logic has not changed, which helps to
->> reduce overhead.
-> It's unreadable garbage at best. If you don't want it changed, then
-> don't add it to the arr[] thing in the first place.
-
-Thanks, adding GLOBAL_CTRL to arr[] in the last step is a better choice.
-
+> ---
+>   arch/um/drivers/virtio_uml.c             |  4 +++-
+>   drivers/platform/mellanox/mlxbf-tmfifo.c |  4 +++-
+>   drivers/remoteproc/remoteproc_virtio.c   |  4 +++-
+>   drivers/s390/virtio/virtio_ccw.c         |  9 ++++++---
+>   drivers/virtio/virtio.c                  | 22 +++++++++++++++-------
+>   drivers/virtio/virtio_mmio.c             |  3 ++-
+>   drivers/virtio/virtio_pci_legacy.c       |  4 +++-
+>   drivers/virtio/virtio_pci_modern.c       |  3 ++-
+>   drivers/virtio/virtio_vdpa.c             |  4 +++-
+>   include/linux/virtio_config.h            |  5 +++--
+>   10 files changed, 43 insertions(+), 19 deletions(-)
 >
->>> Why would you change guest GLOBAL_CTRL implicitly;
->> This is because in the early part of this function, we have operations:
->>
->>      if (x86_pmu.flags & PMU_FL_PEBS_ALL)
->>          arr[0].guest &= ~cpuc->pebs_enabled;
->>      else
->>          arr[0].guest &= ~(cpuc->pebs_enabled & PEBS_COUNTER_MASK);
->>
->> and if guest has PEBS_ENABLED, we need these bits back for PEBS counters:
->>
->>      arr[0].guest |= arr[1].guest;
-> I don't think that's right, who's to say they were set in the first
-> place? The guest's GLOBAL_CTRL could have had the bits cleared at VMEXIT
-> time.
-
-Please note the guest GLOBAL_CTRL value is stored in the pmu->global_ctrl,
-while the actual loaded value for GLOBAL_CTRL msr after vm-entry is
-"x86_pmu.intel_ctrl & ~cpuc->intel_ctrl_host_mask".
-
-> You can't unconditionally add PEBS_ENABLED into GLOBAL_CTRL,
-> that's wrong.
-
-The determination of the msr values ​​before and after vmx-transaction
-are always in the context of host perf which means the PEBS perf_events
-created by the KVM are all scheduled on and used legally , and it does not
-depend on the guest values at all.
-
->
->>> guest had better wrmsr that himself to control when stuff is enabled.
->> When vm_entry, the msr value of GLOBAL_CTRL on the hardware may be
->> different from trapped value "pmu->global_ctrl" written by the guest.
->>
->> If the perf scheduler cross maps guest counter X to the host counter Y,
->> we have to enable the bit Y in GLOBAL_CTRL before vm_entry rather than X.
-> Sure, but I don't see that happening here.
-
-Just fire questions if we're not on the same page or you're out of KVM context.
-
+> diff --git a/arch/um/drivers/virtio_uml.c b/arch/um/drivers/virtio_uml.c
+> index 91ddf74ca888..b6e66265ed32 100644
+> --- a/arch/um/drivers/virtio_uml.c
+> +++ b/arch/um/drivers/virtio_uml.c
+> @@ -827,11 +827,13 @@ static void vu_set_status(struct virtio_device *vdev, u8 status)
+>   	vu_dev->status = status;
+>   }
+>   
+> -static void vu_reset(struct virtio_device *vdev)
+> +static int vu_reset(struct virtio_device *vdev)
+>   {
+>   	struct virtio_uml_device *vu_dev = to_virtio_uml_device(vdev);
+>   
+>   	vu_dev->status = 0;
+> +
+> +	return 0;
+>   }
+>   
+>   static void vu_del_vq(struct virtqueue *vq)
+> diff --git a/drivers/platform/mellanox/mlxbf-tmfifo.c b/drivers/platform/mellanox/mlxbf-tmfifo.c
+> index bbc4e71a16ff..c192b8ac5d9e 100644
+> --- a/drivers/platform/mellanox/mlxbf-tmfifo.c
+> +++ b/drivers/platform/mellanox/mlxbf-tmfifo.c
+> @@ -980,11 +980,13 @@ static void mlxbf_tmfifo_virtio_set_status(struct virtio_device *vdev,
+>   }
+>   
+>   /* Reset the device. Not much here for now. */
+> -static void mlxbf_tmfifo_virtio_reset(struct virtio_device *vdev)
+> +static int mlxbf_tmfifo_virtio_reset(struct virtio_device *vdev)
+>   {
+>   	struct mlxbf_tmfifo_vdev *tm_vdev = mlxbf_vdev_to_tmfifo(vdev);
+>   
+>   	tm_vdev->status = 0;
+> +
+> +	return 0;
+>   }
+>   
+>   /* Read the value of a configuration field. */
+> diff --git a/drivers/remoteproc/remoteproc_virtio.c b/drivers/remoteproc/remoteproc_virtio.c
+> index 0cc617f76068..ca9573c62c3d 100644
+> --- a/drivers/remoteproc/remoteproc_virtio.c
+> +++ b/drivers/remoteproc/remoteproc_virtio.c
+> @@ -191,7 +191,7 @@ static void rproc_virtio_set_status(struct virtio_device *vdev, u8 status)
+>   	dev_dbg(&vdev->dev, "status: %d\n", status);
+>   }
+>   
+> -static void rproc_virtio_reset(struct virtio_device *vdev)
+> +static int rproc_virtio_reset(struct virtio_device *vdev)
+>   {
+>   	struct rproc_vdev *rvdev = vdev_to_rvdev(vdev);
+>   	struct fw_rsc_vdev *rsc;
+> @@ -200,6 +200,8 @@ static void rproc_virtio_reset(struct virtio_device *vdev)
+>   
+>   	rsc->status = 0;
+>   	dev_dbg(&vdev->dev, "reset !\n");
+> +
+> +	return 0;
+>   }
+>   
+>   /* provide the vdev features as retrieved from the firmware */
+> diff --git a/drivers/s390/virtio/virtio_ccw.c b/drivers/s390/virtio/virtio_ccw.c
+> index 54e686dca6de..52b32555e746 100644
+> --- a/drivers/s390/virtio/virtio_ccw.c
+> +++ b/drivers/s390/virtio/virtio_ccw.c
+> @@ -732,14 +732,15 @@ static int virtio_ccw_find_vqs(struct virtio_device *vdev, unsigned nvqs,
+>   	return ret;
+>   }
+>   
+> -static void virtio_ccw_reset(struct virtio_device *vdev)
+> +static int virtio_ccw_reset(struct virtio_device *vdev)
+>   {
+>   	struct virtio_ccw_device *vcdev = to_vc_device(vdev);
+>   	struct ccw1 *ccw;
+> +	int ret;
+>   
+>   	ccw = ccw_device_dma_zalloc(vcdev->cdev, sizeof(*ccw));
+>   	if (!ccw)
+> -		return;
+> +		return -ENOMEM;
+>   
+>   	/* Zero status bits. */
+>   	vcdev->dma_area->status = 0;
+> @@ -749,8 +750,10 @@ static void virtio_ccw_reset(struct virtio_device *vdev)
+>   	ccw->flags = 0;
+>   	ccw->count = 0;
+>   	ccw->cda = 0;
+> -	ccw_io_helper(vcdev, ccw, VIRTIO_CCW_DOING_RESET);
+> +	ret = ccw_io_helper(vcdev, ccw, VIRTIO_CCW_DOING_RESET);
+>   	ccw_device_dma_free(vcdev->cdev, ccw, sizeof(*ccw));
+> +
+> +	return ret;
+>   }
+>   
+>   static u64 virtio_ccw_get_features(struct virtio_device *vdev)
+> diff --git a/drivers/virtio/virtio.c b/drivers/virtio/virtio.c
+> index 4b15c00c0a0a..ddbfd5b5f3bd 100644
+> --- a/drivers/virtio/virtio.c
+> +++ b/drivers/virtio/virtio.c
+> @@ -338,7 +338,7 @@ int register_virtio_device(struct virtio_device *dev)
+>   	/* Assign a unique device index and hence name. */
+>   	err = ida_simple_get(&virtio_index_ida, 0, 0, GFP_KERNEL);
+>   	if (err < 0)
+> -		goto out;
+> +		goto out_err;
+>   
+>   	dev->index = err;
+>   	dev_set_name(&dev->dev, "virtio%u", dev->index);
+> @@ -349,7 +349,9 @@ int register_virtio_device(struct virtio_device *dev)
+>   
+>   	/* We always start by resetting the device, in case a previous
+>   	 * driver messed it up.  This also tests that code path a little. */
+> -	dev->config->reset(dev);
+> +	err = dev->config->reset(dev);
+> +	if (err)
+> +		goto out_ida;
+>   
+>   	/* Acknowledge that we've seen the device. */
+>   	virtio_add_status(dev, VIRTIO_CONFIG_S_ACKNOWLEDGE);
+> @@ -362,10 +364,14 @@ int register_virtio_device(struct virtio_device *dev)
+>   	 */
+>   	err = device_add(&dev->dev);
+>   	if (err)
+> -		ida_simple_remove(&virtio_index_ida, dev->index);
+> -out:
+> -	if (err)
+> -		virtio_add_status(dev, VIRTIO_CONFIG_S_FAILED);
+> +		goto out_ida;
+> +
+> +	return 0;
+> +
+> +out_ida:
+> +	ida_simple_remove(&virtio_index_ida, dev->index);
+> +out_err:
+> +	virtio_add_status(dev, VIRTIO_CONFIG_S_FAILED);
+>   	return err;
+>   }
+>   EXPORT_SYMBOL_GPL(register_virtio_device);
+> @@ -408,7 +414,9 @@ int virtio_device_restore(struct virtio_device *dev)
+>   
+>   	/* We always start by resetting the device, in case a previous
+>   	 * driver messed it up. */
+> -	dev->config->reset(dev);
+> +	ret = dev->config->reset(dev);
+> +	if (ret)
+> +		goto err;
+>   
+>   	/* Acknowledge that we've seen the device. */
+>   	virtio_add_status(dev, VIRTIO_CONFIG_S_ACKNOWLEDGE);
+> diff --git a/drivers/virtio/virtio_mmio.c b/drivers/virtio/virtio_mmio.c
+> index 56128b9c46eb..12b8f048c48d 100644
+> --- a/drivers/virtio/virtio_mmio.c
+> +++ b/drivers/virtio/virtio_mmio.c
+> @@ -256,12 +256,13 @@ static void vm_set_status(struct virtio_device *vdev, u8 status)
+>   	writel(status, vm_dev->base + VIRTIO_MMIO_STATUS);
+>   }
+>   
+> -static void vm_reset(struct virtio_device *vdev)
+> +static int vm_reset(struct virtio_device *vdev)
+>   {
+>   	struct virtio_mmio_device *vm_dev = to_virtio_mmio_device(vdev);
+>   
+>   	/* 0 status means a reset. */
+>   	writel(0, vm_dev->base + VIRTIO_MMIO_STATUS);
+> +	return 0;
+>   }
+>   
+>   
+> diff --git a/drivers/virtio/virtio_pci_legacy.c b/drivers/virtio/virtio_pci_legacy.c
+> index d62e9835aeec..0b5d95e3efa1 100644
+> --- a/drivers/virtio/virtio_pci_legacy.c
+> +++ b/drivers/virtio/virtio_pci_legacy.c
+> @@ -89,7 +89,7 @@ static void vp_set_status(struct virtio_device *vdev, u8 status)
+>   	iowrite8(status, vp_dev->ioaddr + VIRTIO_PCI_STATUS);
+>   }
+>   
+> -static void vp_reset(struct virtio_device *vdev)
+> +static int vp_reset(struct virtio_device *vdev)
+>   {
+>   	struct virtio_pci_device *vp_dev = to_vp_device(vdev);
+>   	/* 0 status means a reset. */
+> @@ -99,6 +99,8 @@ static void vp_reset(struct virtio_device *vdev)
+>   	ioread8(vp_dev->ioaddr + VIRTIO_PCI_STATUS);
+>   	/* Flush pending VQ/configuration callbacks. */
+>   	vp_synchronize_vectors(vdev);
+> +
+> +	return 0;
+>   }
+>   
+>   static u16 vp_config_vector(struct virtio_pci_device *vp_dev, u16 vector)
+> diff --git a/drivers/virtio/virtio_pci_modern.c b/drivers/virtio/virtio_pci_modern.c
+> index fbd4ebc00eb6..cc3412a96a17 100644
+> --- a/drivers/virtio/virtio_pci_modern.c
+> +++ b/drivers/virtio/virtio_pci_modern.c
+> @@ -158,7 +158,7 @@ static void vp_set_status(struct virtio_device *vdev, u8 status)
+>   	vp_modern_set_status(&vp_dev->mdev, status);
+>   }
+>   
+> -static void vp_reset(struct virtio_device *vdev)
+> +static int vp_reset(struct virtio_device *vdev)
+>   {
+>   	struct virtio_pci_device *vp_dev = to_vp_device(vdev);
+>   	struct virtio_pci_modern_device *mdev = &vp_dev->mdev;
+> @@ -174,6 +174,7 @@ static void vp_reset(struct virtio_device *vdev)
+>   		msleep(1);
+>   	/* Flush pending VQ/configuration callbacks. */
+>   	vp_synchronize_vectors(vdev);
+> +	return 0;
+>   }
+>   
+>   static u16 vp_config_vector(struct virtio_pci_device *vp_dev, u16 vector)
+> diff --git a/drivers/virtio/virtio_vdpa.c b/drivers/virtio/virtio_vdpa.c
+> index e28acf482e0c..5fd4e627a9b0 100644
+> --- a/drivers/virtio/virtio_vdpa.c
+> +++ b/drivers/virtio/virtio_vdpa.c
+> @@ -97,11 +97,13 @@ static void virtio_vdpa_set_status(struct virtio_device *vdev, u8 status)
+>   	return ops->set_status(vdpa, status);
+>   }
+>   
+> -static void virtio_vdpa_reset(struct virtio_device *vdev)
+> +static int virtio_vdpa_reset(struct virtio_device *vdev)
+>   {
+>   	struct vdpa_device *vdpa = vd_get_vdpa(vdev);
+>   
+>   	vdpa_reset(vdpa);
+> +
+> +	return 0;
+>   }
+>   
+>   static bool virtio_vdpa_notify(struct virtqueue *vq)
+> diff --git a/include/linux/virtio_config.h b/include/linux/virtio_config.h
+> index 8519b3ae5d52..d2b0f1699a75 100644
+> --- a/include/linux/virtio_config.h
+> +++ b/include/linux/virtio_config.h
+> @@ -44,9 +44,10 @@ struct virtio_shm_region {
+>    *	status: the new status byte
+>    * @reset: reset the device
+>    *	vdev: the virtio device
+> - *	After this, status and feature negotiation must be done again
+> + *	Upon success, status and feature negotiation must be done again
+>    *	Device must not be reset from its vq/config callbacks, or in
+>    *	parallel with being added/removed.
+> + *	Returns 0 on success or error status.
+>    * @find_vqs: find virtqueues and instantiate them.
+>    *	vdev: the virtio_device
+>    *	nvqs: the number of virtqueues to find
+> @@ -82,7 +83,7 @@ struct virtio_config_ops {
+>   	u32 (*generation)(struct virtio_device *vdev);
+>   	u8 (*get_status)(struct virtio_device *vdev);
+>   	void (*set_status)(struct virtio_device *vdev, u8 status);
+> -	void (*reset)(struct virtio_device *vdev);
+> +	int (*reset)(struct virtio_device *vdev);
+>   	int (*find_vqs)(struct virtio_device *, unsigned nvqs,
+>   			struct virtqueue *vqs[], vq_callback_t *callbacks[],
+>   			const char * const names[], const bool *ctx,
 
