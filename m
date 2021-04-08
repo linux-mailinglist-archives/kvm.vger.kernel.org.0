@@ -2,95 +2,118 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 60DD7358B80
-	for <lists+kvm@lfdr.de>; Thu,  8 Apr 2021 19:37:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7C0B8358B97
+	for <lists+kvm@lfdr.de>; Thu,  8 Apr 2021 19:43:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232523AbhDHRht (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 8 Apr 2021 13:37:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37430 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232374AbhDHRho (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 8 Apr 2021 13:37:44 -0400
-Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 52434C061760
-        for <kvm@vger.kernel.org>; Thu,  8 Apr 2021 10:37:33 -0700 (PDT)
-Received: by mail-pj1-x102b.google.com with SMTP id nh5so1524105pjb.5
-        for <kvm@vger.kernel.org>; Thu, 08 Apr 2021 10:37:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=hVZgbh4zEEXOJBrSWQCq6IMMudTOr92ycubeG9UlX0U=;
-        b=MhfTAti86tKItO88AcfDU5vF5tY1xDstmQO5FJYjR+a5YSx3EvaPy3jEJHDYEQmcK/
-         aPFlk04sIuXReOxM1199liMx0B//1t9w3buF7geu+CRg7GKZKXeDGn+UWxqZyPyQVGcU
-         Eyq3SIB9uZ5xGlXgEiF2UEVu5QqgqSqCcU7gPToN3O3erVl1suY9qRwLSbdkP2Z+VQSF
-         kIWMw9s8VgLBvZg5PxtmrYBxYgCDMUgqDXW05wm9YdBg+JOMYAaBl8c631KgtpCpuhMX
-         SrQmH7WxZAth0w0tHB/FwWpHXWy+zZ1sBcJDgVJDIR+T81R4h0Jj3D3bOpFDa+wsEPwG
-         4tww==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=hVZgbh4zEEXOJBrSWQCq6IMMudTOr92ycubeG9UlX0U=;
-        b=DXCoXEWR95DHJyRqyP6K1kbZzIyExlzbcpEiQz48M0P1TOKSOck2DqEcmlZ70Yxjtu
-         vQrs48QbiBGJxkXdbUu1cgG8MpEoIMHMkE5HazC1kka1qi1munsbk2GUU2PtwfFF5g9P
-         cn5J6/IHxuhzZsdivqdIhEYTG7WHNwxngs6rgXb7NbShXVyU1+Zbclp01chGV1DTj5TN
-         /PvHdwvrqlj8thzwIhdCAsE+mrW17KYoxhD99nBVus5ARy2Q9d4LZsLENaszNhsW4clk
-         qcBNXcywJ35UuAup6j42XxtEUIJI9LObkzi0O/2eTpkwAauUzVYxKI4g452XNKnC3T1d
-         M0jg==
-X-Gm-Message-State: AOAM531t53kwGnv02aamLtE/BX3ZnWTt2RPBsgrZxlK6IFocWi4BJJlj
-        hPH4msS1iOmD1XV6/zligXKWZA==
-X-Google-Smtp-Source: ABdhPJxhENBCnEW26BKzJQRlggIxwanHciEldY60tfSuxbu/j+3CRL/d2SokWC55V/DlHoUVzDqQlQ==
-X-Received: by 2002:a17:90a:b00c:: with SMTP id x12mr3609139pjq.216.1617903452750;
-        Thu, 08 Apr 2021 10:37:32 -0700 (PDT)
-Received: from google.com (240.111.247.35.bc.googleusercontent.com. [35.247.111.240])
-        by smtp.gmail.com with ESMTPSA id x9sm88802pfn.182.2021.04.08.10.37.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 08 Apr 2021 10:37:32 -0700 (PDT)
-Date:   Thu, 8 Apr 2021 17:37:28 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Tom Lendacky <thomas.lendacky@amd.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Borislav Petkov <bp@alien8.de>, Ingo Molnar <mingo@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Brijesh Singh <brijesh.singh@amd.com>
-Subject: Re: [PATCH v2] KVM: SVM: Make sure GHCB is mapped before updating
-Message-ID: <YG8/WHFOPX6H1eJf@google.com>
-References: <1ed85188bee4a602ffad9632cdf5b5b5c0f40957.1617900892.git.thomas.lendacky@amd.com>
- <YG85HxqEAVd9eEu/@google.com>
- <923548be-db20-7eea-33aa-571347a95526@amd.com>
+        id S232377AbhDHRoA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 8 Apr 2021 13:44:00 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:42272 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S231566AbhDHRn7 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 8 Apr 2021 13:43:59 -0400
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 138HXY9U106869;
+        Thu, 8 Apr 2021 13:43:45 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : reply-to : to : cc : date : in-reply-to : references : content-type
+ : mime-version : content-transfer-encoding; s=pp1;
+ bh=kqLUOibyhUwhuOKheUsaVeuC3WX6qO/UlKgURP8z3mU=;
+ b=EGs51LcpoKr9wZ4w/fdAPtf9PGdG3YGtHNsidPuY0nQ7jFCYD7IjVbqrCYKdUZCE7H8f
+ wKMbagkILbwV8V5LgeFCYdWEIr1Ld1/sXQXVT2XJrRezb3lzz/T3yBRBDlTZQKQwEpc4
+ gnD0IphqtUnOtwMw8g2miUdIUdCjfohJN+a76k/x5+BebjUpF700uT0k56b1ZJtHyDGO
+ 5Jl6n2DJExGDVSOZ5EFW6D3EukdPan7PpcgCZpqd4H4nmgKiXHnTOUTaKu/ZEYqhTmpL
+ jxQW7g3u8r+1y3bo70MjQ8y/CnjcEURaXlq7VGqdPAYOcTFn4x40OTh1KhI6HTMLHkKf Sw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 37rwf1qcrx-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 08 Apr 2021 13:43:45 -0400
+Received: from m0098416.ppops.net (m0098416.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 138HXbjb107039;
+        Thu, 8 Apr 2021 13:43:45 -0400
+Received: from ppma04dal.us.ibm.com (7a.29.35a9.ip4.static.sl-reverse.com [169.53.41.122])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 37rwf1qcrk-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 08 Apr 2021 13:43:45 -0400
+Received: from pps.filterd (ppma04dal.us.ibm.com [127.0.0.1])
+        by ppma04dal.us.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 138Hhipd006738;
+        Thu, 8 Apr 2021 17:43:44 GMT
+Received: from b03cxnp07027.gho.boulder.ibm.com (b03cxnp07027.gho.boulder.ibm.com [9.17.130.14])
+        by ppma04dal.us.ibm.com with ESMTP id 37rvc4aaxh-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 08 Apr 2021 17:43:44 +0000
+Received: from b03ledav004.gho.boulder.ibm.com (b03ledav004.gho.boulder.ibm.com [9.17.130.235])
+        by b03cxnp07027.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 138Hhgli23658798
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 8 Apr 2021 17:43:42 GMT
+Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id A087E7805E;
+        Thu,  8 Apr 2021 17:43:42 +0000 (GMT)
+Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 3EDC17805C;
+        Thu,  8 Apr 2021 17:43:39 +0000 (GMT)
+Received: from jarvis.int.hansenpartnership.com (unknown [9.85.189.52])
+        by b03ledav004.gho.boulder.ibm.com (Postfix) with ESMTP;
+        Thu,  8 Apr 2021 17:43:39 +0000 (GMT)
+Message-ID: <936fa1e7755687981bdbc3bad9ecf2354c748381.camel@linux.ibm.com>
+Subject: Re: [RFC v2] KVM: x86: Support KVM VMs sharing SEV context
+From:   James Bottomley <jejb@linux.ibm.com>
+Reply-To: jejb@linux.ibm.com
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Ashish Kalra <ashish.kalra@amd.com>,
+        Nathan Tempelman <natet@google.com>
+Cc:     thomas.lendacky@amd.com, x86@kernel.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, srutherford@google.com,
+        seanjc@google.com, rientjes@google.com, brijesh.singh@amd.com,
+        dovmurik@linux.vnet.ibm.com, lersek@redhat.com, frankeh@us.ibm.com
+Date:   Thu, 08 Apr 2021 10:43:37 -0700
+In-Reply-To: <87bdd3a6-f5eb-91e4-9442-97dfef231640@redhat.com>
+References: <20210316014027.3116119-1-natet@google.com>
+         <20210402115813.GB17630@ashkalra_ubuntu_server>
+         <87bdd3a6-f5eb-91e4-9442-97dfef231640@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.34.4 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <923548be-db20-7eea-33aa-571347a95526@amd.com>
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: 9p72LhukfUR3FxXlfP-qIRKLLGEn7zHs
+X-Proofpoint-ORIG-GUID: Ozv8vcGwL_F7LkToS5aTi5Rbk6Gft_mR
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.761
+ definitions=2021-04-08_04:2021-04-08,2021-04-08 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1011 bulkscore=0
+ malwarescore=0 impostorscore=0 phishscore=0 suspectscore=0
+ lowpriorityscore=0 priorityscore=1501 mlxlogscore=999 mlxscore=0
+ spamscore=0 adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2104060000 definitions=main-2104080117
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Apr 08, 2021, Tom Lendacky wrote:
-> On 4/8/21 12:10 PM, Sean Christopherson wrote:
-> > On Thu, Apr 08, 2021, Tom Lendacky wrote:
-> >> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-> >> index 83e00e524513..7ac67615c070 100644
-> >> --- a/arch/x86/kvm/svm/sev.c
-> >> +++ b/arch/x86/kvm/svm/sev.c
-> >> @@ -2105,5 +2105,8 @@ void sev_vcpu_deliver_sipi_vector(struct kvm_vcpu *vcpu, u8 vector)
-> >>  	 * the guest will set the CS and RIP. Set SW_EXIT_INFO_2 to a
-> >>  	 * non-zero value.
-> >>  	 */
-> >> +	if (WARN_ON_ONCE(!svm->ghcb))
+On Fri, 2021-04-02 at 16:20 +0200, Paolo Bonzini wrote:
+> On 02/04/21 13:58, Ashish Kalra wrote:
+> > Hi Nathan,
 > > 
-> > Isn't this guest triggerable?  I.e. send a SIPI without doing the reset hold?
-> > If so, this should not WARN.
+> > Will you be posting a corresponding Qemu patch for this ?
 > 
-> Yes, it is a guest triggerable event. But a guest shouldn't be doing that,
-> so I thought adding the WARN_ON_ONCE() just to detect it wasn't bad.
-> Definitely wouldn't want a WARN_ON().
+> Hi Ashish,
+> 
+> as far as I know IBM is working on QEMU patches for guest-based 
+> migration helpers.
 
-WARNs are intended only for host issues, e.g. a malicious guest shouldn't be
-able to crash the host when running with panic_on_warn.
+Yes, that's right, we'll take on this part.
+
+> However, it would be nice to collaborate on the low-level (SEC/PEI) 
+> firmware patches to detect whether a CPU is part of the primary VM
+> or the mirror.  If Google has any OVMF patches already done for that,
+> it would be great to combine it with IBM's SEV migration code and
+> merge it into upstream OVMF.
+
+We've reached the stage with our prototyping where not having the OVMF
+support is blocking us from working on QEMU.  If we're going to have to
+reinvent the wheel in OVMF because Google is unwilling to publish the
+patches, can you at least give some hints about how you did it?
+
+Thanks,
+
+James
+
+
