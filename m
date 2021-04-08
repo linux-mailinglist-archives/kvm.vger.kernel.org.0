@@ -2,71 +2,108 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8D91F358D9A
-	for <lists+kvm@lfdr.de>; Thu,  8 Apr 2021 21:43:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A3AF4358DAF
+	for <lists+kvm@lfdr.de>; Thu,  8 Apr 2021 21:48:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232363AbhDHTnW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 8 Apr 2021 15:43:22 -0400
-Received: from mail-io1-f71.google.com ([209.85.166.71]:35518 "EHLO
-        mail-io1-f71.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231451AbhDHTnV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 8 Apr 2021 15:43:21 -0400
-Received: by mail-io1-f71.google.com with SMTP id v24so2113139ion.2
-        for <kvm@vger.kernel.org>; Thu, 08 Apr 2021 12:43:09 -0700 (PDT)
+        id S232504AbhDHTsT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 8 Apr 2021 15:48:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37676 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231918AbhDHTsS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 8 Apr 2021 15:48:18 -0400
+Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 704ACC061760
+        for <kvm@vger.kernel.org>; Thu,  8 Apr 2021 12:48:06 -0700 (PDT)
+Received: by mail-pj1-x1030.google.com with SMTP id q6-20020a17090a4306b02900c42a012202so1972154pjg.5
+        for <kvm@vger.kernel.org>; Thu, 08 Apr 2021 12:48:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=slIcnAT6MK3QWayLyTgibOhZ8J5ecsz1ts63iYPU+Ew=;
+        b=ByChbfV0kxhGhFuxR5Zf9zUMxSisHCNb7EZxRu9oVkdMnRYBIDY6ddCZkdGWprWVam
+         CdOVspgLsS592RuHjp9G9FJSHlZQJqmpFBlpdilPYpry66+rbGF8APvxTCpMU+LVP+HN
+         QL4T1u/sGETU8c6C2GxnWJBXrBsdA+G7HGtb7fpZxm6NqxiGovNWtv82kcghKBGHgCVy
+         rlcZgT8o6fD0KTBrcWn/UKmdS/qIaIcKhWjhO50sc1Mr2In9inzIkHtdnvlB9+QBgO64
+         aSmKjwAp4jAQDca2HHhVdau8m0iVFZScJQf3G7K2kDjB75mqe9/sIBSUWqgmEhfsxuoE
+         uIpg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:date:in-reply-to:message-id:subject
-         :from:to;
-        bh=QAQHHUTa7Tp/+HffxF26prPlCaL4a426RwfTcuHtH+o=;
-        b=iP59ayfvZpeRM5cyfNZYwyXrsCafWYKgF/WShw5MMEwBCnRUPukYYytbg82xvEbURY
-         GuhiyyQCYpIkwjPxbJC33TpKOyeYbYFWBGq7VB51AWE5lTQqJxAIfubgAFyWDfVcSn8y
-         /f2Q6LTYssfDRgQkiMJylUbfNkjP9oy4lyVlmX1b1q44LfDh826RfkTH8PAibiA2hVag
-         ca4NIwKHq1a/YxFo+ERSWTaLzPAacKy7WDQKhfikjW+2bddZ9xjmg/T2K5gdEw/hEW4n
-         ZjnVcDPR0TxOWfGsh28MJg5vBE47AAOiRG8pyiNhTrrXR9PB9TZXKlQzZTW0ZQu+LvtI
-         4+nA==
-X-Gm-Message-State: AOAM532ZLc1rpIMCfi/AfSDC4NBikcKmZAo6NZUpuZcCmbEIXyuzkirC
-        L+s7CwrrYNDK2CyKLMcRust+yX7/EZdliVLd2wDFL231GSXh
-X-Google-Smtp-Source: ABdhPJyn4ilIIDryRqlPdr9Xyrum6gvlbzGTLCpVJ28iXXrYaFVYW1uN84V49TH9mcJWXqqJlGwn40JFc7lEhhEoqq6IyjX7VZXK
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=slIcnAT6MK3QWayLyTgibOhZ8J5ecsz1ts63iYPU+Ew=;
+        b=P/98wWFKFpsD5MOh1FY4e6mC2OtvVyA/0blMEdOqzkby/yU6GIAUFBF8RAL56sx/xz
+         iwWhBE9qWaDMOGgZrmc2T0TAHfg55JHCfU6efTMDQW62OpKzBq8xwwv6GPG3iCa/HOPA
+         PQS/y/7CXrEu10rSKvVJY/ySENIhFBoOwnPVCXmS3kmo+0JaPsdwifYq6Zwe0hU+RHfW
+         EKNwxpxOjZwLdq14gWufJ5QQ34kOUY415PDS8O9nu3yoKrghOXkIBznrVB6xO/wK5tCU
+         IVrfLdgYL1M/KeF0HwYVZoWeVfUQh36D/EKFRTZL0kPWLZgzuYiBPLjVDgGywnZw9j2e
+         2I5g==
+X-Gm-Message-State: AOAM532AOJfTXAtjtmBfVoj6fBDRJgDqvWDf2XVi6fYrQ0FCL+cKIcX7
+        gbaaPnP7GTcTafN7ln0iBZ8Qhw==
+X-Google-Smtp-Source: ABdhPJzKuGi1quyB4B1Wtfaf3Kknfdy/GuUW+JHPGFqXjjZ9gnG75L+DXebSo7BurPh99KbkQlzK0Q==
+X-Received: by 2002:a17:90b:1498:: with SMTP id js24mr652227pjb.83.1617911285864;
+        Thu, 08 Apr 2021 12:48:05 -0700 (PDT)
+Received: from google.com (240.111.247.35.bc.googleusercontent.com. [35.247.111.240])
+        by smtp.gmail.com with ESMTPSA id t19sm256738pfg.38.2021.04.08.12.48.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 08 Apr 2021 12:48:05 -0700 (PDT)
+Date:   Thu, 8 Apr 2021 19:48:01 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Tom Lendacky <thomas.lendacky@amd.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Borislav Petkov <bp@alien8.de>, Ingo Molnar <mingo@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Brijesh Singh <brijesh.singh@amd.com>
+Subject: Re: [PATCH v2] KVM: SVM: Make sure GHCB is mapped before updating
+Message-ID: <YG9d8aOuZKasgw2j@google.com>
+References: <1ed85188bee4a602ffad9632cdf5b5b5c0f40957.1617900892.git.thomas.lendacky@amd.com>
+ <YG85HxqEAVd9eEu/@google.com>
+ <923548be-db20-7eea-33aa-571347a95526@amd.com>
+ <YG8/WHFOPX6H1eJf@google.com>
+ <3c28c9bf-d14e-3f9b-0973-ba4a438aaa33@amd.com>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:20cd:: with SMTP id 13mr8230433ilq.126.1617910989145;
- Thu, 08 Apr 2021 12:43:09 -0700 (PDT)
-Date:   Thu, 08 Apr 2021 12:43:09 -0700
-In-Reply-To: <000000000000430bf505bcef3b00@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000c94d8605bf7b4135@google.com>
-Subject: Re: [syzbot] possible deadlock in io_sq_thread_finish
-From:   syzbot <syzbot+ac39856cb1b332dbbdda@syzkaller.appspotmail.com>
-To:     asml.silence@gmail.com, axboe@kernel.dk, bp@alien8.de,
-        hdanton@sina.com, hpa@zytor.com, io-uring@vger.kernel.org,
-        jmattson@google.com, joro@8bytes.org, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, mingo@redhat.com,
-        pbonzini@redhat.com, seanjc@google.com,
-        syzkaller-bugs@googlegroups.com, tglx@linutronix.de,
-        vkuznets@redhat.com, wanpengli@tencent.com, x86@kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <3c28c9bf-d14e-3f9b-0973-ba4a438aaa33@amd.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-syzbot suspects this issue was fixed by commit:
+On Thu, Apr 08, 2021, Tom Lendacky wrote:
+> 
+> 
+> On 4/8/21 12:37 PM, Sean Christopherson wrote:
+> > On Thu, Apr 08, 2021, Tom Lendacky wrote:
+> >> On 4/8/21 12:10 PM, Sean Christopherson wrote:
+> >>> On Thu, Apr 08, 2021, Tom Lendacky wrote:
+> >>>> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+> >>>> index 83e00e524513..7ac67615c070 100644
+> >>>> --- a/arch/x86/kvm/svm/sev.c
+> >>>> +++ b/arch/x86/kvm/svm/sev.c
+> >>>> @@ -2105,5 +2105,8 @@ void sev_vcpu_deliver_sipi_vector(struct kvm_vcpu *vcpu, u8 vector)
+> >>>>  	 * the guest will set the CS and RIP. Set SW_EXIT_INFO_2 to a
+> >>>>  	 * non-zero value.
+> >>>>  	 */
+> >>>> +	if (WARN_ON_ONCE(!svm->ghcb))
+> >>>
+> >>> Isn't this guest triggerable?  I.e. send a SIPI without doing the reset hold?
+> >>> If so, this should not WARN.
+> >>
+> >> Yes, it is a guest triggerable event. But a guest shouldn't be doing that,
+> >> so I thought adding the WARN_ON_ONCE() just to detect it wasn't bad.
+> >> Definitely wouldn't want a WARN_ON().
+> > 
+> > WARNs are intended only for host issues, e.g. a malicious guest shouldn't be
+> > able to crash the host when running with panic_on_warn.
+> > 
+> 
+> Ah, yeah, forgot about panic_on_warn. I can go back to the original patch
+> or do a pr_warn_once(), any pref?
 
-commit f4e61f0c9add3b00bd5f2df3c814d688849b8707
-Author: Wanpeng Li <wanpengli@tencent.com>
-Date:   Mon Mar 15 06:55:28 2021 +0000
-
-    x86/kvm: Fix broken irq restoration in kvm_wait
-
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=1022d7aad00000
-start commit:   144c79ef Merge tag 'perf-tools-fixes-for-v5.12-2020-03-07'..
-git tree:       upstream
-kernel config:  https://syzkaller.appspot.com/x/.config?x=db9c6adb4986f2f2
-dashboard link: https://syzkaller.appspot.com/bug?extid=ac39856cb1b332dbbdda
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=167574dad00000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=12c8f566d00000
-
-If the result looks correct, please mark the issue as fixed by replying with:
-
-#syz fix: x86/kvm: Fix broken irq restoration in kvm_wait
-
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+No strong preference.  If you think the print would be helpful for ongoing
+development, then it's probably worth adding.
