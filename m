@@ -2,122 +2,101 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BE169358297
-	for <lists+kvm@lfdr.de>; Thu,  8 Apr 2021 14:00:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C40C83582A0
+	for <lists+kvm@lfdr.de>; Thu,  8 Apr 2021 14:01:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230467AbhDHMAc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 8 Apr 2021 08:00:32 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:28305 "EHLO
+        id S231371AbhDHMBd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 8 Apr 2021 08:01:33 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:55864 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230434AbhDHMAb (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 8 Apr 2021 08:00:31 -0400
+        by vger.kernel.org with ESMTP id S231341AbhDHMBb (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 8 Apr 2021 08:01:31 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1617883220;
+        s=mimecast20190719; t=1617883280;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=4jNA22ts4sXV+GUF1Wj8QCzAfhn+4bY8EmKVJ9s6OPc=;
-        b=i371BRCXf0ydmnYZgOpsWYKoI/4+mE1pw/idYPInLqjCs+q2TUR81JuvaG0lNd0Amx/kKp
-        fTRSorl49OHo0QHvw74C3r7Me5CheFrmOsatpqbzfralYlMAMvVMrAPFQUZoRcNlHKru7B
-        tmGSvaQZGq0D0iJuYX9L543lNG1gfEg=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-364-hpfYGHYFMC6SzoSRyLD0Ow-1; Thu, 08 Apr 2021 08:00:17 -0400
-X-MC-Unique: hpfYGHYFMC6SzoSRyLD0Ow-1
-Received: by mail-ed1-f69.google.com with SMTP id q12so913555edv.9
-        for <kvm@vger.kernel.org>; Thu, 08 Apr 2021 05:00:17 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=4jNA22ts4sXV+GUF1Wj8QCzAfhn+4bY8EmKVJ9s6OPc=;
-        b=VqvMetTfnHUxarVk8IL3xNUKYDt4pRGG1jNGlHjt+9zW7VuIH89a9x6EX+ZeNJ9jTy
-         j6YmZdEBEF4v6wEVXfBioCnDFL7BufgJZXryhn8SBbGn74qscDgkf0bPEWY4eOjxWVbL
-         si8vdCss+91uPyfN6apnkt30kRwsvSsu1w4ZhAmNXCFDQrSTQLLjWPj1PNtSqyRxltg0
-         ikRuNt+NCzfl5ZM+mxvfLXIVvsfCjXMUiKnTOsYsLhHAgM+f7DsqHfBWmcLzQTPEDBy5
-         647GsOoLBeKPqdAfzH/Y1fTUphFswQUcge832iRzox5ubYjYqP3BQVm2QN1Nn4osOPbu
-         MdHw==
-X-Gm-Message-State: AOAM530I5Oi3NLSq7nBtvUV/NfjPg5pqpDgoy7hvCpVP4xRSpVyxbIPd
-        bfwMrBaz0zNLwTWJPocU6DIfu2aPBJCI8fZgVqcpCyIsUrRGR1/qEnc7pFb7xUjg+B7T/yS/m2w
-        AH4GnwFQc9/Fw
-X-Received: by 2002:a17:906:2594:: with SMTP id m20mr9661470ejb.124.1617883214265;
-        Thu, 08 Apr 2021 05:00:14 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwCaXWiCiY1qRqSDTSV8wOLTIbsQEr6KIundxcbgi9SLmCTjbsZRz+/AN4KDzZ5Shtv+a3bng==
-X-Received: by 2002:a17:906:2594:: with SMTP id m20mr9661393ejb.124.1617883213903;
-        Thu, 08 Apr 2021 05:00:13 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id a9sm4209509eda.13.2021.04.08.05.00.12
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 08 Apr 2021 05:00:13 -0700 (PDT)
-Subject: Re: [PATCH v2] KVM: Explicitly use GFP_KERNEL_ACCOUNT for 'struct
- kvm_vcpu' allocations
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Wanpeng Li <kernellwp@gmail.com>
-References: <20210406190740.4055679-1-seanjc@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <bf29a3f3-cb55-dbfd-36da-708cc67d1d1a@redhat.com>
-Date:   Thu, 8 Apr 2021 14:00:12 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.7.0
+        bh=zWfFSpWGFp11S+v5Pnk2LNZUzDm7DSVLpGFzZCfF4Do=;
+        b=hf+z7jEjeYzsejqg45nL2NQwuUXsb5TpEAnvFjvnVzLibrMjPevNhX5mKsdSXfwvSRlgCC
+        cMfSFM8cCWFpgGrlm2EC0jfIJC11cNlo9UV7UBUaYdECAuCDPC6eAmKDlNKi+6zD1B/rf+
+        k31pj27ULCYufiLf7rx0RbWdJYrVbgg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-278-lUxhqULDOW2UihqoZlIxzA-1; Thu, 08 Apr 2021 08:01:17 -0400
+X-MC-Unique: lUxhqULDOW2UihqoZlIxzA-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DE6BC10074D3;
+        Thu,  8 Apr 2021 12:00:58 +0000 (UTC)
+Received: from fuller.cnet (ovpn-112-5.gru2.redhat.com [10.97.112.5])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 8BBDF17B2B;
+        Thu,  8 Apr 2021 12:00:58 +0000 (UTC)
+Received: by fuller.cnet (Postfix, from userid 1000)
+        id 9011F41807CE; Thu,  8 Apr 2021 09:00:21 -0300 (-03)
+Date:   Thu, 8 Apr 2021 09:00:21 -0300
+From:   Marcelo Tosatti <mtosatti@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        vkuznets@redhat.com, dwmw@amazon.co.uk
+Subject: Re: [PATCH 1/2] KVM: x86: reduce pvclock_gtod_sync_lock critical
+ sections
+Message-ID: <20210408120021.GA65315@fuller.cnet>
+References: <20210330165958.3094759-1-pbonzini@redhat.com>
+ <20210330165958.3094759-2-pbonzini@redhat.com>
+ <20210407174021.GA30046@fuller.cnet>
+ <51cae826-8973-5113-7e12-8163eab36cb7@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20210406190740.4055679-1-seanjc@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <51cae826-8973-5113-7e12-8163eab36cb7@redhat.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 06/04/21 21:07, Sean Christopherson wrote:
-> Use GFP_KERNEL_ACCOUNT when allocating vCPUs to make it more obvious that
-> that the allocations are accounted, to make it easier to audit KVM's
-> allocations in the future, and to be consistent with other cache usage in
-> KVM.
-> 
-> When using SLAB/SLUB, this is a nop as the cache itself is created with
-> SLAB_ACCOUNT.
-> 
-> When using SLOB, there are caveats within caveats.  SLOB doesn't honor
-> SLAB_ACCOUNT, so passing GFP_KERNEL_ACCOUNT will result in vCPU
-> allocations now being accounted.   But, even that depends on internal
-> SLOB details as SLOB will only go to the page allocator when its cache is
-> depleted.  That just happens to be extremely likely for vCPUs because the
-> size of kvm_vcpu is larger than the a page for almost all combinations of
-> architecture and page size.  Whether or not the SLOB behavior is by
-> design is unknown; it's just as likely that no SLOB users care about
-> accounding and so no one has bothered to implemented support in SLOB.
-> Regardless, accounting vCPU allocations will not break SLOB+KVM+cgroup
-> users, if any exist.
-> 
-> Cc: Wanpeng Li <kernellwp@gmail.com>
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
-> 
-> v2: Drop the Fixes tag and rewrite the changelog since this is a nop when
->      using SLUB or SLAB. [Wanpeng]
-> 
->   virt/kvm/kvm_main.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index 0a481e7780f0..580f98386b42 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -3192,7 +3192,7 @@ static int kvm_vm_ioctl_create_vcpu(struct kvm *kvm, u32 id)
->   	if (r)
->   		goto vcpu_decrement;
->   
-> -	vcpu = kmem_cache_zalloc(kvm_vcpu_cache, GFP_KERNEL);
-> +	vcpu = kmem_cache_zalloc(kvm_vcpu_cache, GFP_KERNEL_ACCOUNT);
->   	if (!vcpu) {
->   		r = -ENOMEM;
->   		goto vcpu_decrement;
-> 
+Hi Paolo,
 
-Queued, thanks.
+On Thu, Apr 08, 2021 at 10:15:16AM +0200, Paolo Bonzini wrote:
+> On 07/04/21 19:40, Marcelo Tosatti wrote:
+> > > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> > > index fe806e894212..0a83eff40b43 100644
+> > > --- a/arch/x86/kvm/x86.c
+> > > +++ b/arch/x86/kvm/x86.c
+> > > @@ -2562,10 +2562,12 @@ static void kvm_gen_update_masterclock(struct kvm *kvm)
+> > >   	kvm_hv_invalidate_tsc_page(kvm);
+> > > -	spin_lock(&ka->pvclock_gtod_sync_lock);
+> > >   	kvm_make_mclock_inprogress_request(kvm);
+> > > +
+> > Might be good to serialize against two kvm_gen_update_masterclock
+> > callers? Otherwise one caller could clear KVM_REQ_MCLOCK_INPROGRESS,
+> > while the other is still at pvclock_update_vm_gtod_copy().
+> 
+> Makes sense, but this stuff has always seemed unnecessarily complicated to
+> me.
+>
+> KVM_REQ_MCLOCK_INPROGRESS is only needed to kick running vCPUs out of the
+> execution loop; 
 
-Paolo
+We do not want vcpus with different system_timestamp/tsc_timestamp
+pair:
+
+ * To avoid that problem, do not allow visibility of distinct
+ * system_timestamp/tsc_timestamp values simultaneously: use a master
+ * copy of host monotonic time values. Update that master copy
+ * in lockstep.
+
+So KVM_REQ_MCLOCK_INPROGRESS also ensures that no vcpu enters 
+guest mode (via vcpu->requests check before VM-entry) with a 
+different system_timestamp/tsc_timestamp pair.
+
+> clearing it in kvm_gen_update_masterclock is unnecessary,
+> because KVM_REQ_CLOCK_UPDATE takes pvclock_gtod_sync_lock too and thus will
+> already wait for pvclock_update_vm_gtod_copy to end.
+> 
+> I think it's possible to use a seqcount in KVM_REQ_CLOCK_UPDATE instead of
+> KVM_REQ_MCLOCK_INPROGRESS.  Both cause the vCPUs to spin. I'll take a look.
+> 
+> Paolo
 
