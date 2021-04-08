@@ -2,411 +2,380 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C2868357A6F
-	for <lists+kvm@lfdr.de>; Thu,  8 Apr 2021 04:36:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4F139357A81
+	for <lists+kvm@lfdr.de>; Thu,  8 Apr 2021 04:42:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229777AbhDHChA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 7 Apr 2021 22:37:00 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:28386 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229600AbhDHChA (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 7 Apr 2021 22:37:00 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1617849409;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=6bIDlF6/Na7KbH3uL/VJXSdSX8DFa729DboJpmqpTTo=;
-        b=jMJtk1sT0TnnnZL5BcyQT00qgM8KSpGk5hpZCqpLvef5qzPjeyFqN0cRphiBUlNup28uFX
-        xmWDvekdmmL66o467et+Yzi1EzmnOYzYaFhR9PO4QzN1wDc9s8d1ZWGqj/K8OCxFRYki2U
-        f8VdkNN58dmZ7SnytlEqXQwf2HA7ZW8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-359-LcXRj1WPM_-7o8OuYqjwTg-1; Wed, 07 Apr 2021 22:36:47 -0400
-X-MC-Unique: LcXRj1WPM_-7o8OuYqjwTg-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3262764157;
-        Thu,  8 Apr 2021 02:36:45 +0000 (UTC)
-Received: from wangxiaodeMacBook-Air.local (ovpn-12-194.pek2.redhat.com [10.72.12.194])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id DBE1D10013D7;
-        Thu,  8 Apr 2021 02:36:31 +0000 (UTC)
-Subject: Re: [PATCH v6 07/10] vdpa: Support transferring virtual addressing
- during DMA mapping
-To:     Xie Yongji <xieyongji@bytedance.com>, mst@redhat.com,
-        stefanha@redhat.com, sgarzare@redhat.com, parav@nvidia.com,
-        hch@infradead.org, christian.brauner@canonical.com,
-        rdunlap@infradead.org, willy@infradead.org,
-        viro@zeniv.linux.org.uk, axboe@kernel.dk, bcrl@kvack.org,
-        corbet@lwn.net, mika.penttila@nextfour.com,
-        dan.carpenter@oracle.com
-Cc:     virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        kvm@vger.kernel.org, linux-fsdevel@vger.kernel.org
-References: <20210331080519.172-1-xieyongji@bytedance.com>
- <20210331080519.172-8-xieyongji@bytedance.com>
-From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <e9bdee99-49b1-3e3b-8769-6e8a9783c418@redhat.com>
-Date:   Thu, 8 Apr 2021 10:36:30 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
- Gecko/20100101 Thunderbird/78.9.0
+        id S229544AbhDHCma (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 7 Apr 2021 22:42:30 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:36563 "EHLO ozlabs.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229510AbhDHCm3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 7 Apr 2021 22:42:29 -0400
+Received: by ozlabs.org (Postfix, from userid 1007)
+        id 4FG5Bx2Z98z9sWH; Thu,  8 Apr 2021 12:42:17 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+        d=gibson.dropbear.id.au; s=201602; t=1617849737;
+        bh=bWvfEMRhjPVbBEeUASqTvqo6s71NbepMBWtxxnDVwoM=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=c1Gii0WtH3/buqbpyY/FUY0LB4CpKP7K6sz25MJj2Esli9wx5HXV+82EkOk+zQFIB
+         wUOpYbvp/gNd++Sy+i0f5Mu403tyExOUxn2D/4Dxqyr6zsM7ZAMxK/xnNkX4MayQdM
+         4QFZya9Zc0z3xNeLzeCJmyFr6Cddsbx5FA+B25EA=
+Date:   Thu, 8 Apr 2021 12:42:11 +1000
+From:   David Gibson <david@gibson.dropbear.id.au>
+To:     Greg Kurz <groug@kaod.org>
+Cc:     Ravi Bangoria <ravi.bangoria@linux.ibm.com>, paulus@samba.org,
+        mpe@ellerman.id.au, mikey@neuling.org, pbonzini@redhat.com,
+        mst@redhat.com, clg@kaod.org, qemu-ppc@nongnu.org,
+        qemu-devel@nongnu.org, kvm@vger.kernel.org, cohuck@redhat.com
+Subject: Re: [PATCH v4 3/3] ppc: Enable 2nd DAWR support on p10
+Message-ID: <YG5tg2aHNR1/5A6H@yekko.fritz.box>
+References: <20210406053833.282907-1-ravi.bangoria@linux.ibm.com>
+ <20210406053833.282907-4-ravi.bangoria@linux.ibm.com>
+ <20210407101041.1a884af7@bahia.lan>
 MIME-Version: 1.0
-In-Reply-To: <20210331080519.172-8-xieyongji@bytedance.com>
-Content-Type: text/plain; charset=gbk; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="YPCAeyqDQqWGqoS2"
+Content-Disposition: inline
+In-Reply-To: <20210407101041.1a884af7@bahia.lan>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
-ÔÚ 2021/3/31 ÏÂÎç4:05, Xie Yongji Ð´µÀ:
-> This patch introduces an attribute for vDPA device to indicate
-> whether virtual address can be used. If vDPA device driver set
-> it, vhost-vdpa bus driver will not pin user page and transfer
-> userspace virtual address instead of physical address during
-> DMA mapping. And corresponding vma->vm_file and offset will be
-> also passed as an opaque pointer.
->
-> Suggested-by: Jason Wang <jasowang@redhat.com>
-> Signed-off-by: Xie Yongji <xieyongji@bytedance.com>
+--YPCAeyqDQqWGqoS2
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
+On Wed, Apr 07, 2021 at 10:10:41AM +0200, Greg Kurz wrote:
+> On Tue,  6 Apr 2021 11:08:33 +0530
+> Ravi Bangoria <ravi.bangoria@linux.ibm.com> wrote:
+>=20
+> > As per the PAPR, bit 0 of byte 64 in pa-features property indicates
+> > availability of 2nd DAWR registers. i.e. If this bit is set, 2nd
+> > DAWR is present, otherwise not. Use KVM_CAP_PPC_DAWR1 capability to
+> > find whether kvm supports 2nd DAWR or not. If it's supported, allow
+> > user to set the pa-feature bit in guest DT using cap-dawr1 machine
+> > capability. Though, watchpoint on powerpc TCG guest is not supported
+> > and thus 2nd DAWR is not enabled for TCG mode.
+> >=20
+> > Signed-off-by: Ravi Bangoria <ravi.bangoria@linux.ibm.com>
+> > ---
+> >  hw/ppc/spapr.c                  |  7 ++++++-
+> >  hw/ppc/spapr_caps.c             | 32 ++++++++++++++++++++++++++++++++
+> >  include/hw/ppc/spapr.h          |  6 +++++-
+> >  target/ppc/cpu.h                |  2 ++
+> >  target/ppc/kvm.c                | 12 ++++++++++++
+> >  target/ppc/kvm_ppc.h            | 12 ++++++++++++
+> >  target/ppc/translate_init.c.inc | 15 +++++++++++++++
+> >  7 files changed, 84 insertions(+), 2 deletions(-)
+> >=20
+> > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> > index 73a06df3b1..6317fad973 100644
+> > --- a/hw/ppc/spapr.c
+> > +++ b/hw/ppc/spapr.c
+> > @@ -238,7 +238,7 @@ static void spapr_dt_pa_features(SpaprMachineState =
+*spapr,
+> >          0x80, 0x00, 0x80, 0x00, 0x80, 0x00, /* 48 - 53 */
+> >          /* 54: DecFP, 56: DecI, 58: SHA */
+> >          0x80, 0x00, 0x80, 0x00, 0x80, 0x00, /* 54 - 59 */
+> > -        /* 60: NM atomic, 62: RNG */
+> > +        /* 60: NM atomic, 62: RNG, 64: DAWR1 (ISA 3.1) */
+> >          0x80, 0x00, 0x80, 0x00, 0x00, 0x00, /* 60 - 65 */
+> >      };
+> >      uint8_t *pa_features =3D NULL;
+> > @@ -279,6 +279,9 @@ static void spapr_dt_pa_features(SpaprMachineState =
+*spapr,
+> >           * in pa-features. So hide it from them. */
+> >          pa_features[40 + 2] &=3D ~0x80; /* Radix MMU */
+> >      }
+> > +    if (spapr_get_cap(spapr, SPAPR_CAP_DAWR1)) {
+> > +        pa_features[66] |=3D 0x80;
+> > +    }
+> > =20
+> >      _FDT((fdt_setprop(fdt, offset, "ibm,pa-features", pa_features, pa_=
+size)));
+> >  }
+> > @@ -2003,6 +2006,7 @@ static const VMStateDescription vmstate_spapr =3D=
+ {
+> >          &vmstate_spapr_cap_ccf_assist,
+> >          &vmstate_spapr_cap_fwnmi,
+> >          &vmstate_spapr_fwnmi,
+> > +        &vmstate_spapr_cap_dawr1,
+> >          NULL
+> >      }
+> >  };
+> > @@ -4542,6 +4546,7 @@ static void spapr_machine_class_init(ObjectClass =
+*oc, void *data)
+> >      smc->default_caps.caps[SPAPR_CAP_LARGE_DECREMENTER] =3D SPAPR_CAP_=
+ON;
+> >      smc->default_caps.caps[SPAPR_CAP_CCF_ASSIST] =3D SPAPR_CAP_ON;
+> >      smc->default_caps.caps[SPAPR_CAP_FWNMI] =3D SPAPR_CAP_ON;
+> > +    smc->default_caps.caps[SPAPR_CAP_DAWR1] =3D SPAPR_CAP_OFF;
+> >      spapr_caps_add_properties(smc);
+> >      smc->irq =3D &spapr_irq_dual;
+> >      smc->dr_phb_enabled =3D true;
+> > diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
+> > index 9ea7ddd1e9..b2770f73c5 100644
+> > --- a/hw/ppc/spapr_caps.c
+> > +++ b/hw/ppc/spapr_caps.c
+> > @@ -523,6 +523,28 @@ static void cap_fwnmi_apply(SpaprMachineState *spa=
+pr, uint8_t val,
+> >      }
+> >  }
+> > =20
+> > +static void cap_dawr1_apply(SpaprMachineState *spapr, uint8_t val,
+> > +                               Error **errp)
+> > +{
+> > +    ERRP_GUARD();
+> > +    if (!val) {
+> > +        return; /* Disable by default */
+> > +    }
+> > +
+> > +    if (tcg_enabled()) {
+> > +        error_setg(errp, "DAWR1 not supported in TCG.");
+> > +        error_append_hint(errp, "Try appending -machine cap-dawr1=3Dof=
+f\n");
+> > +    } else if (kvm_enabled()) {
+> > +        if (!kvmppc_has_cap_dawr1()) {
+> > +            error_setg(errp, "DAWR1 not supported by KVM.");
+> > +            error_append_hint(errp, "Try appending -machine cap-dawr1=
+=3Doff\n");
+> > +        } else if (kvmppc_set_cap_dawr1(val) < 0) {
+> > +            error_setg(errp, "DAWR1 not supported by KVM.");
+>=20
+> Well... technically KVM does support DAWR1 but something went wrong when
+> trying to enable it. In case you need to repost, maybe change the error
+> message in this path, e.g. like in cap_nested_kvm_hv_apply().
 
-Acked-by: Jason Wang <jasowang@redhat.com>
+This won't be going in until 6.1 anyway, so please to update the
+message.
 
+I'd probably prefer to actually wait until the 6.1 tree opens to apply
+this, rather than pre-queueing it in ppc-for-6.1, because there's a
+fairly good chance the header update patch will conflict with someone
+else's during the 6.1 merge flurry.
 
-> ---
->   drivers/vdpa/ifcvf/ifcvf_main.c   |  2 +-
->   drivers/vdpa/mlx5/net/mlx5_vnet.c |  2 +-
->   drivers/vdpa/vdpa.c               |  9 +++-
->   drivers/vdpa/vdpa_sim/vdpa_sim.c  |  2 +-
->   drivers/vdpa/virtio_pci/vp_vdpa.c |  2 +-
->   drivers/vhost/vdpa.c              | 99 ++++++++++++++++++++++++++++++++++-----
->   include/linux/vdpa.h              | 19 ++++++--
->   7 files changed, 116 insertions(+), 19 deletions(-)
->
-> diff --git a/drivers/vdpa/ifcvf/ifcvf_main.c b/drivers/vdpa/ifcvf/ifcvf_main.c
-> index d555a6a5d1ba..aee013f3eb5f 100644
-> --- a/drivers/vdpa/ifcvf/ifcvf_main.c
-> +++ b/drivers/vdpa/ifcvf/ifcvf_main.c
-> @@ -431,7 +431,7 @@ static int ifcvf_probe(struct pci_dev *pdev, const struct pci_device_id *id)
->   	}
->   
->   	adapter = vdpa_alloc_device(struct ifcvf_adapter, vdpa,
-> -				    dev, &ifc_vdpa_ops, NULL);
-> +				    dev, &ifc_vdpa_ops, NULL, false);
->   	if (adapter == NULL) {
->   		IFCVF_ERR(pdev, "Failed to allocate vDPA structure");
->   		return -ENOMEM;
-> diff --git a/drivers/vdpa/mlx5/net/mlx5_vnet.c b/drivers/vdpa/mlx5/net/mlx5_vnet.c
-> index 71397fdafa6a..fb62ebcf464a 100644
-> --- a/drivers/vdpa/mlx5/net/mlx5_vnet.c
-> +++ b/drivers/vdpa/mlx5/net/mlx5_vnet.c
-> @@ -1982,7 +1982,7 @@ static int mlx5v_probe(struct auxiliary_device *adev,
->   	max_vqs = min_t(u32, max_vqs, MLX5_MAX_SUPPORTED_VQS);
->   
->   	ndev = vdpa_alloc_device(struct mlx5_vdpa_net, mvdev.vdev, mdev->device, &mlx5_vdpa_ops,
-> -				 NULL);
-> +				 NULL, false);
->   	if (IS_ERR(ndev))
->   		return PTR_ERR(ndev);
->   
-> diff --git a/drivers/vdpa/vdpa.c b/drivers/vdpa/vdpa.c
-> index 5cffce67cab0..97fbac276c72 100644
-> --- a/drivers/vdpa/vdpa.c
-> +++ b/drivers/vdpa/vdpa.c
-> @@ -71,6 +71,7 @@ static void vdpa_release_dev(struct device *d)
->    * @config: the bus operations that is supported by this device
->    * @size: size of the parent structure that contains private data
->    * @name: name of the vdpa device; optional.
-> + * @use_va: indicate whether virtual address must be used by this device
->    *
->    * Driver should use vdpa_alloc_device() wrapper macro instead of
->    * using this directly.
-> @@ -80,7 +81,8 @@ static void vdpa_release_dev(struct device *d)
->    */
->   struct vdpa_device *__vdpa_alloc_device(struct device *parent,
->   					const struct vdpa_config_ops *config,
-> -					size_t size, const char *name)
-> +					size_t size, const char *name,
-> +					bool use_va)
->   {
->   	struct vdpa_device *vdev;
->   	int err = -EINVAL;
-> @@ -91,6 +93,10 @@ struct vdpa_device *__vdpa_alloc_device(struct device *parent,
->   	if (!!config->dma_map != !!config->dma_unmap)
->   		goto err;
->   
-> +	/* It should only work for the device that use on-chip IOMMU */
-> +	if (use_va && !(config->dma_map || config->set_map))
-> +		goto err;
-> +
->   	err = -ENOMEM;
->   	vdev = kzalloc(size, GFP_KERNEL);
->   	if (!vdev)
-> @@ -106,6 +112,7 @@ struct vdpa_device *__vdpa_alloc_device(struct device *parent,
->   	vdev->index = err;
->   	vdev->config = config;
->   	vdev->features_valid = false;
-> +	vdev->use_va = use_va;
->   
->   	if (name)
->   		err = dev_set_name(&vdev->dev, "%s", name);
-> diff --git a/drivers/vdpa/vdpa_sim/vdpa_sim.c b/drivers/vdpa/vdpa_sim/vdpa_sim.c
-> index ff331f088baf..d26334e9a412 100644
-> --- a/drivers/vdpa/vdpa_sim/vdpa_sim.c
-> +++ b/drivers/vdpa/vdpa_sim/vdpa_sim.c
-> @@ -235,7 +235,7 @@ struct vdpasim *vdpasim_create(struct vdpasim_dev_attr *dev_attr)
->   		ops = &vdpasim_config_ops;
->   
->   	vdpasim = vdpa_alloc_device(struct vdpasim, vdpa, NULL, ops,
-> -				    dev_attr->name);
-> +				    dev_attr->name, false);
->   	if (!vdpasim)
->   		goto err_alloc;
->   
-> diff --git a/drivers/vdpa/virtio_pci/vp_vdpa.c b/drivers/vdpa/virtio_pci/vp_vdpa.c
-> index 1321a2fcd088..03b36aed48d6 100644
-> --- a/drivers/vdpa/virtio_pci/vp_vdpa.c
-> +++ b/drivers/vdpa/virtio_pci/vp_vdpa.c
-> @@ -377,7 +377,7 @@ static int vp_vdpa_probe(struct pci_dev *pdev, const struct pci_device_id *id)
->   		return ret;
->   
->   	vp_vdpa = vdpa_alloc_device(struct vp_vdpa, vdpa,
-> -				    dev, &vp_vdpa_ops, NULL);
-> +				    dev, &vp_vdpa_ops, NULL, false);
->   	if (vp_vdpa == NULL) {
->   		dev_err(dev, "vp_vdpa: Failed to allocate vDPA structure\n");
->   		return -ENOMEM;
-> diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
-> index f9aab9013745..613ea400e0e5 100644
-> --- a/drivers/vhost/vdpa.c
-> +++ b/drivers/vhost/vdpa.c
-> @@ -505,8 +505,28 @@ static void vhost_vdpa_pa_unmap(struct vhost_vdpa *v, u64 start, u64 last)
->   	}
->   }
->   
-> +static void vhost_vdpa_va_unmap(struct vhost_vdpa *v, u64 start, u64 last)
-> +{
-> +	struct vhost_dev *dev = &v->vdev;
-> +	struct vhost_iotlb *iotlb = dev->iotlb;
-> +	struct vhost_iotlb_map *map;
-> +	struct vdpa_map_file *map_file;
-> +
-> +	while ((map = vhost_iotlb_itree_first(iotlb, start, last)) != NULL) {
-> +		map_file = (struct vdpa_map_file *)map->opaque;
-> +		fput(map_file->file);
-> +		kfree(map_file);
-> +		vhost_iotlb_map_free(iotlb, map);
-> +	}
-> +}
-> +
->   static void vhost_vdpa_iotlb_unmap(struct vhost_vdpa *v, u64 start, u64 last)
->   {
-> +	struct vdpa_device *vdpa = v->vdpa;
-> +
-> +	if (vdpa->use_va)
-> +		return vhost_vdpa_va_unmap(v, start, last);
-> +
->   	return vhost_vdpa_pa_unmap(v, start, last);
->   }
->   
-> @@ -541,21 +561,21 @@ static int perm_to_iommu_flags(u32 perm)
->   	return flags | IOMMU_CACHE;
->   }
->   
-> -static int vhost_vdpa_map(struct vhost_vdpa *v,
-> -			  u64 iova, u64 size, u64 pa, u32 perm)
-> +static int vhost_vdpa_map(struct vhost_vdpa *v, u64 iova,
-> +			  u64 size, u64 pa, u32 perm, void *opaque)
->   {
->   	struct vhost_dev *dev = &v->vdev;
->   	struct vdpa_device *vdpa = v->vdpa;
->   	const struct vdpa_config_ops *ops = vdpa->config;
->   	int r = 0;
->   
-> -	r = vhost_iotlb_add_range(dev->iotlb, iova, iova + size - 1,
-> -				  pa, perm);
-> +	r = vhost_iotlb_add_range_ctx(dev->iotlb, iova, iova + size - 1,
-> +				      pa, perm, opaque);
->   	if (r)
->   		return r;
->   
->   	if (ops->dma_map) {
-> -		r = ops->dma_map(vdpa, iova, size, pa, perm, NULL);
-> +		r = ops->dma_map(vdpa, iova, size, pa, perm, opaque);
->   	} else if (ops->set_map) {
->   		if (!v->in_batch)
->   			r = ops->set_map(vdpa, dev->iotlb);
-> @@ -563,13 +583,15 @@ static int vhost_vdpa_map(struct vhost_vdpa *v,
->   		r = iommu_map(v->domain, iova, pa, size,
->   			      perm_to_iommu_flags(perm));
->   	}
-> -
-> -	if (r)
-> +	if (r) {
->   		vhost_iotlb_del_range(dev->iotlb, iova, iova + size - 1);
-> -	else
-> +		return r;
-> +	}
-> +
-> +	if (!vdpa->use_va)
->   		atomic64_add(size >> PAGE_SHIFT, &dev->mm->pinned_vm);
->   
-> -	return r;
-> +	return 0;
->   }
->   
->   static void vhost_vdpa_unmap(struct vhost_vdpa *v, u64 iova, u64 size)
-> @@ -590,6 +612,56 @@ static void vhost_vdpa_unmap(struct vhost_vdpa *v, u64 iova, u64 size)
->   	}
->   }
->   
-> +static int vhost_vdpa_va_map(struct vhost_vdpa *v,
-> +			     u64 iova, u64 size, u64 uaddr, u32 perm)
-> +{
-> +	struct vhost_dev *dev = &v->vdev;
-> +	u64 offset, map_size, map_iova = iova;
-> +	struct vdpa_map_file *map_file;
-> +	struct vm_area_struct *vma;
-> +	int ret;
-> +
-> +	mmap_read_lock(dev->mm);
-> +
-> +	while (size) {
-> +		vma = find_vma(dev->mm, uaddr);
-> +		if (!vma) {
-> +			ret = -EINVAL;
-> +			break;
-> +		}
-> +		map_size = min(size, vma->vm_end - uaddr);
-> +		if (!(vma->vm_file && (vma->vm_flags & VM_SHARED) &&
-> +			!(vma->vm_flags & (VM_IO | VM_PFNMAP))))
-> +			goto next;
-> +
-> +		map_file = kzalloc(sizeof(*map_file), GFP_KERNEL);
-> +		if (!map_file) {
-> +			ret = -ENOMEM;
-> +			break;
-> +		}
-> +		offset = (vma->vm_pgoff << PAGE_SHIFT) + uaddr - vma->vm_start;
-> +		map_file->offset = offset;
-> +		map_file->file = get_file(vma->vm_file);
-> +		ret = vhost_vdpa_map(v, map_iova, map_size, uaddr,
-> +				     perm, map_file);
-> +		if (ret) {
-> +			fput(map_file->file);
-> +			kfree(map_file);
-> +			break;
-> +		}
-> +next:
-> +		size -= map_size;
-> +		uaddr += map_size;
-> +		map_iova += map_size;
-> +	}
-> +	if (ret)
-> +		vhost_vdpa_unmap(v, iova, map_iova - iova);
-> +
-> +	mmap_read_unlock(dev->mm);
-> +
-> +	return ret;
-> +}
-> +
->   static int vhost_vdpa_pa_map(struct vhost_vdpa *v,
->   			     u64 iova, u64 size, u64 uaddr, u32 perm)
->   {
-> @@ -656,7 +728,7 @@ static int vhost_vdpa_pa_map(struct vhost_vdpa *v,
->   				csize = (last_pfn - map_pfn + 1) << PAGE_SHIFT;
->   				ret = vhost_vdpa_map(v, iova, csize,
->   						     map_pfn << PAGE_SHIFT,
-> -						     perm);
-> +						     perm, NULL);
->   				if (ret) {
->   					/*
->   					 * Unpin the pages that are left unmapped
-> @@ -685,7 +757,7 @@ static int vhost_vdpa_pa_map(struct vhost_vdpa *v,
->   
->   	/* Pin the rest chunk */
->   	ret = vhost_vdpa_map(v, iova, (last_pfn - map_pfn + 1) << PAGE_SHIFT,
-> -			     map_pfn << PAGE_SHIFT, perm);
-> +			     map_pfn << PAGE_SHIFT, perm, NULL);
->   out:
->   	if (ret) {
->   		if (nchunks) {
-> @@ -718,6 +790,7 @@ static int vhost_vdpa_process_iotlb_update(struct vhost_vdpa *v,
->   					   struct vhost_iotlb_msg *msg)
->   {
->   	struct vhost_dev *dev = &v->vdev;
-> +	struct vdpa_device *vdpa = v->vdpa;
->   	struct vhost_iotlb *iotlb = dev->iotlb;
->   
->   	if (msg->iova < v->range.first ||
-> @@ -728,6 +801,10 @@ static int vhost_vdpa_process_iotlb_update(struct vhost_vdpa *v,
->   				    msg->iova + msg->size - 1))
->   		return -EEXIST;
->   
-> +	if (vdpa->use_va)
-> +		return vhost_vdpa_va_map(v, msg->iova, msg->size,
-> +					 msg->uaddr, msg->perm);
-> +
->   	return vhost_vdpa_pa_map(v, msg->iova, msg->size, msg->uaddr,
->   				 msg->perm);
->   }
-> diff --git a/include/linux/vdpa.h b/include/linux/vdpa.h
-> index b01f7c9096bf..e67404e4b23e 100644
-> --- a/include/linux/vdpa.h
-> +++ b/include/linux/vdpa.h
-> @@ -44,6 +44,7 @@ struct vdpa_mgmt_dev;
->    * @config: the configuration ops for this device.
->    * @index: device index
->    * @features_valid: were features initialized? for legacy guests
-> + * @use_va: indicate whether virtual address must be used by this device
->    * @nvqs: maximum number of supported virtqueues
->    * @mdev: management device pointer; caller must setup when registering device as part
->    *	  of dev_add() mgmtdev ops callback before invoking _vdpa_register_device().
-> @@ -54,6 +55,7 @@ struct vdpa_device {
->   	const struct vdpa_config_ops *config;
->   	unsigned int index;
->   	bool features_valid;
-> +	bool use_va;
->   	int nvqs;
->   	struct vdpa_mgmt_dev *mdev;
->   };
-> @@ -69,6 +71,16 @@ struct vdpa_iova_range {
->   };
->   
->   /**
-> + * Corresponding file area for device memory mapping
-> + * @file: vma->vm_file for the mapping
-> + * @offset: mapping offset in the vm_file
-> + */
-> +struct vdpa_map_file {
-> +	struct file *file;
-> +	u64 offset;
-> +};
-> +
-> +/**
->    * vDPA_config_ops - operations for configuring a vDPA device.
->    * Note: vDPA device drivers are required to implement all of the
->    * operations unless it is mentioned to be optional in the following
-> @@ -250,14 +262,15 @@ struct vdpa_config_ops {
->   
->   struct vdpa_device *__vdpa_alloc_device(struct device *parent,
->   					const struct vdpa_config_ops *config,
-> -					size_t size, const char *name);
-> +					size_t size, const char *name,
-> +					bool use_va);
->   
-> -#define vdpa_alloc_device(dev_struct, member, parent, config, name)   \
-> +#define vdpa_alloc_device(dev_struct, member, parent, config, name, use_va)   \
->   			  container_of(__vdpa_alloc_device( \
->   				       parent, config, \
->   				       sizeof(dev_struct) + \
->   				       BUILD_BUG_ON_ZERO(offsetof( \
-> -				       dev_struct, member)), name), \
-> +				       dev_struct, member)), name, use_va), \
->   				       dev_struct, member)
->   
->   int vdpa_register_device(struct vdpa_device *vdev, int nvqs);
+>=20
+> Apart from that, LGTM.
+>=20
+> Reviewed-by: Greg Kurz <groug@kaod.org>
+>=20
+> > +            error_append_hint(errp, "Try appending -machine cap-dawr1=
+=3Doff\n");
+> > +        }
+> > +    }
+> > +}
+> > +
+> >  SpaprCapabilityInfo capability_table[SPAPR_CAP_NUM] =3D {
+> >      [SPAPR_CAP_HTM] =3D {
+> >          .name =3D "htm",
+> > @@ -631,6 +653,15 @@ SpaprCapabilityInfo capability_table[SPAPR_CAP_NUM=
+] =3D {
+> >          .type =3D "bool",
+> >          .apply =3D cap_fwnmi_apply,
+> >      },
+> > +    [SPAPR_CAP_DAWR1] =3D {
+> > +        .name =3D "dawr1",
+> > +        .description =3D "Allow 2nd Data Address Watchpoint Register (=
+DAWR1)",
+> > +        .index =3D SPAPR_CAP_DAWR1,
+> > +        .get =3D spapr_cap_get_bool,
+> > +        .set =3D spapr_cap_set_bool,
+> > +        .type =3D "bool",
+> > +        .apply =3D cap_dawr1_apply,
+> > +    },
+> >  };
+> > =20
+> >  static SpaprCapabilities default_caps_with_cpu(SpaprMachineState *spap=
+r,
+> > @@ -771,6 +802,7 @@ SPAPR_CAP_MIG_STATE(nested_kvm_hv, SPAPR_CAP_NESTED=
+_KVM_HV);
+> >  SPAPR_CAP_MIG_STATE(large_decr, SPAPR_CAP_LARGE_DECREMENTER);
+> >  SPAPR_CAP_MIG_STATE(ccf_assist, SPAPR_CAP_CCF_ASSIST);
+> >  SPAPR_CAP_MIG_STATE(fwnmi, SPAPR_CAP_FWNMI);
+> > +SPAPR_CAP_MIG_STATE(dawr1, SPAPR_CAP_DAWR1);
+> > =20
+> >  void spapr_caps_init(SpaprMachineState *spapr)
+> >  {
+> > diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+> > index 5f90bb26d5..51202b7c90 100644
+> > --- a/include/hw/ppc/spapr.h
+> > +++ b/include/hw/ppc/spapr.h
+> > @@ -74,8 +74,10 @@ typedef enum {
+> >  #define SPAPR_CAP_CCF_ASSIST            0x09
+> >  /* Implements PAPR FWNMI option */
+> >  #define SPAPR_CAP_FWNMI                 0x0A
+> > +/* DAWR1 */
+> > +#define SPAPR_CAP_DAWR1                 0x0B
+> >  /* Num Caps */
+> > -#define SPAPR_CAP_NUM                   (SPAPR_CAP_FWNMI + 1)
+> > +#define SPAPR_CAP_NUM                   (SPAPR_CAP_DAWR1 + 1)
+> > =20
+> >  /*
+> >   * Capability Values
+> > @@ -366,6 +368,7 @@ struct SpaprMachineState {
+> >  #define H_SET_MODE_RESOURCE_SET_DAWR0           2
+> >  #define H_SET_MODE_RESOURCE_ADDR_TRANS_MODE     3
+> >  #define H_SET_MODE_RESOURCE_LE                  4
+> > +#define H_SET_MODE_RESOURCE_SET_DAWR1           5
+> > =20
+> >  /* Flags for H_SET_MODE_RESOURCE_LE */
+> >  #define H_SET_MODE_ENDIAN_BIG    0
+> > @@ -921,6 +924,7 @@ extern const VMStateDescription vmstate_spapr_cap_n=
+ested_kvm_hv;
+> >  extern const VMStateDescription vmstate_spapr_cap_large_decr;
+> >  extern const VMStateDescription vmstate_spapr_cap_ccf_assist;
+> >  extern const VMStateDescription vmstate_spapr_cap_fwnmi;
+> > +extern const VMStateDescription vmstate_spapr_cap_dawr1;
+> > =20
+> >  static inline uint8_t spapr_get_cap(SpaprMachineState *spapr, int cap)
+> >  {
+> > diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
+> > index cd02d65303..6a60416559 100644
+> > --- a/target/ppc/cpu.h
+> > +++ b/target/ppc/cpu.h
+> > @@ -1460,9 +1460,11 @@ typedef PowerPCCPU ArchCPU;
+> >  #define SPR_PSPB              (0x09F)
+> >  #define SPR_DPDES             (0x0B0)
+> >  #define SPR_DAWR0             (0x0B4)
+> > +#define SPR_DAWR1             (0x0B5)
+> >  #define SPR_RPR               (0x0BA)
+> >  #define SPR_CIABR             (0x0BB)
+> >  #define SPR_DAWRX0            (0x0BC)
+> > +#define SPR_DAWRX1            (0x0BD)
+> >  #define SPR_HFSCR             (0x0BE)
+> >  #define SPR_VRSAVE            (0x100)
+> >  #define SPR_USPRG0            (0x100)
+> > diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
+> > index 104a308abb..fe3e8a13bb 100644
+> > --- a/target/ppc/kvm.c
+> > +++ b/target/ppc/kvm.c
+> > @@ -89,6 +89,7 @@ static int cap_ppc_count_cache_flush_assist;
+> >  static int cap_ppc_nested_kvm_hv;
+> >  static int cap_large_decr;
+> >  static int cap_fwnmi;
+> > +static int cap_dawr1;
+> > =20
+> >  static uint32_t debug_inst_opcode;
+> > =20
+> > @@ -138,6 +139,7 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
+> >      cap_ppc_nested_kvm_hv =3D kvm_vm_check_extension(s, KVM_CAP_PPC_NE=
+STED_HV);
+> >      cap_large_decr =3D kvmppc_get_dec_bits();
+> >      cap_fwnmi =3D kvm_vm_check_extension(s, KVM_CAP_PPC_FWNMI);
+> > +    cap_dawr1 =3D kvm_vm_check_extension(s, KVM_CAP_PPC_DAWR1);
+> >      /*
+> >       * Note: setting it to false because there is not such capability
+> >       * in KVM at this moment.
+> > @@ -2091,6 +2093,16 @@ int kvmppc_set_fwnmi(PowerPCCPU *cpu)
+> >      return kvm_vcpu_enable_cap(cs, KVM_CAP_PPC_FWNMI, 0);
+> >  }
+> > =20
+> > +bool kvmppc_has_cap_dawr1(void)
+> > +{
+> > +    return !!cap_dawr1;
+> > +}
+> > +
+> > +int kvmppc_set_cap_dawr1(int enable)
+> > +{
+> > +    return kvm_vm_enable_cap(kvm_state, KVM_CAP_PPC_DAWR1, 0, enable);
+> > +}
+> > +
+> >  int kvmppc_smt_threads(void)
+> >  {
+> >      return cap_ppc_smt ? cap_ppc_smt : 1;
+> > diff --git a/target/ppc/kvm_ppc.h b/target/ppc/kvm_ppc.h
+> > index 989f61ace0..47248fbbfd 100644
+> > --- a/target/ppc/kvm_ppc.h
+> > +++ b/target/ppc/kvm_ppc.h
+> > @@ -63,6 +63,8 @@ bool kvmppc_has_cap_htm(void);
+> >  bool kvmppc_has_cap_mmu_radix(void);
+> >  bool kvmppc_has_cap_mmu_hash_v3(void);
+> >  bool kvmppc_has_cap_xive(void);
+> > +bool kvmppc_has_cap_dawr1(void);
+> > +int kvmppc_set_cap_dawr1(int enable);
+> >  int kvmppc_get_cap_safe_cache(void);
+> >  int kvmppc_get_cap_safe_bounds_check(void);
+> >  int kvmppc_get_cap_safe_indirect_branch(void);
+> > @@ -341,6 +343,16 @@ static inline bool kvmppc_has_cap_xive(void)
+> >      return false;
+> >  }
+> > =20
+> > +static inline bool kvmppc_has_cap_dawr1(void)
+> > +{
+> > +    return false;
+> > +}
+> > +
+> > +static inline int kvmppc_set_cap_dawr1(int enable)
+> > +{
+> > +    abort();
+> > +}
+> > +
+> >  static inline int kvmppc_get_cap_safe_cache(void)
+> >  {
+> >      return 0;
+> > diff --git a/target/ppc/translate_init.c.inc b/target/ppc/translate_ini=
+t.c.inc
+> > index 879e6df217..8b76e191f1 100644
+> > --- a/target/ppc/translate_init.c.inc
+> > +++ b/target/ppc/translate_init.c.inc
+> > @@ -7765,6 +7765,20 @@ static void gen_spr_book3s_207_dbg(CPUPPCState *=
+env)
+> >                          KVM_REG_PPC_CIABR, 0x00000000);
+> >  }
+> > =20
+> > +static void gen_spr_book3s_310_dbg(CPUPPCState *env)
+> > +{
+> > +    spr_register_kvm_hv(env, SPR_DAWR1, "DAWR1",
+> > +                        SPR_NOACCESS, SPR_NOACCESS,
+> > +                        SPR_NOACCESS, SPR_NOACCESS,
+> > +                        &spr_read_generic, &spr_write_generic,
+> > +                        KVM_REG_PPC_DAWR1, 0x00000000);
+> > +    spr_register_kvm_hv(env, SPR_DAWRX1, "DAWRX1",
+> > +                        SPR_NOACCESS, SPR_NOACCESS,
+> > +                        SPR_NOACCESS, SPR_NOACCESS,
+> > +                        &spr_read_generic, &spr_write_generic,
+> > +                        KVM_REG_PPC_DAWRX1, 0x00000000);
+> > +}
+> > +
+> >  static void gen_spr_970_dbg(CPUPPCState *env)
+> >  {
+> >      /* Breakpoints */
+> > @@ -9142,6 +9156,7 @@ static void init_proc_POWER10(CPUPPCState *env)
+> >      /* Common Registers */
+> >      init_proc_book3s_common(env);
+> >      gen_spr_book3s_207_dbg(env);
+> > +    gen_spr_book3s_310_dbg(env);
+> > =20
+> >      /* POWER8 Specific Registers */
+> >      gen_spr_book3s_ids(env);
+>=20
 
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--YPCAeyqDQqWGqoS2
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAmBubYMACgkQbDjKyiDZ
+s5LZ7Q/8DvaVPVDjVhaOX2WERm/MRcssbQGRi4jF+5xwmPC8XIHEgt4cvV1NXH60
+usor9rehTvT/MQ+Qw+AbwkUN2QdkdM95BoLIXp1XeXPcACxmXmwFxZFUAAIMbDfm
+zBckd4Nhpt+NkubEgSKr2Dt3NSaHo+Z0kMpv4Vn/hy1b6sZMhBLfpfFwS733Jwtv
+HVrMrqSjPfp5S1+g54nQcl7pny9dYRamJBfVBhrhDv0TgB2LgU3IAlV+X9Bb9SoY
+NTZN12mK/dg6n036jyMdswFsaC/XMqtQYvHFM7fboFDAULigWUXmhnyjb0A4MgDX
+cptXRzHSg7zbrE89nUzX1Szd8pIh3Bca4HkpKQT3LKdsZ8jZja/cFlxP51G4poLr
+qKUhQBoVvog+Uz8SmQP6tzZ2a2U+pXEjWJGdqGlH5waH9N1vatEnsizJ1NJh/7Ep
+3PLL3Wb8h2LwQ0UFq0ZpTigajbEy3PGos9qMQoubWxDcpm1U3bKr4lQ3Zru68L7H
+TMDEpdGrmUOz1VGFJ54LEYAEQ0Rt8eFh9sCjaMHPn2/W+PPGB2z6MYSybu8j8lYH
+vQiAip4o957ulZgmLEw7NzeVQj7YTa2+DCTbsLj3x50NPfUUQwKWUt8xuIdrCNo0
+aYGZrIjw5pMl5VXy8mKeX9Ex5Z7KNGzdpBygHfUFj0PDfyTKSXw=
+=xsOj
+-----END PGP SIGNATURE-----
+
+--YPCAeyqDQqWGqoS2--
