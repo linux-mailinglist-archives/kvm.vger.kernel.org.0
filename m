@@ -2,118 +2,111 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7C0B8358B97
-	for <lists+kvm@lfdr.de>; Thu,  8 Apr 2021 19:43:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 03E55358BA1
+	for <lists+kvm@lfdr.de>; Thu,  8 Apr 2021 19:45:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232377AbhDHRoA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 8 Apr 2021 13:44:00 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:42272 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S231566AbhDHRn7 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 8 Apr 2021 13:43:59 -0400
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 138HXY9U106869;
-        Thu, 8 Apr 2021 13:43:45 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : reply-to : to : cc : date : in-reply-to : references : content-type
- : mime-version : content-transfer-encoding; s=pp1;
- bh=kqLUOibyhUwhuOKheUsaVeuC3WX6qO/UlKgURP8z3mU=;
- b=EGs51LcpoKr9wZ4w/fdAPtf9PGdG3YGtHNsidPuY0nQ7jFCYD7IjVbqrCYKdUZCE7H8f
- wKMbagkILbwV8V5LgeFCYdWEIr1Ld1/sXQXVT2XJrRezb3lzz/T3yBRBDlTZQKQwEpc4
- gnD0IphqtUnOtwMw8g2miUdIUdCjfohJN+a76k/x5+BebjUpF700uT0k56b1ZJtHyDGO
- 5Jl6n2DJExGDVSOZ5EFW6D3EukdPan7PpcgCZpqd4H4nmgKiXHnTOUTaKu/ZEYqhTmpL
- jxQW7g3u8r+1y3bo70MjQ8y/CnjcEURaXlq7VGqdPAYOcTFn4x40OTh1KhI6HTMLHkKf Sw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 37rwf1qcrx-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 08 Apr 2021 13:43:45 -0400
-Received: from m0098416.ppops.net (m0098416.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 138HXbjb107039;
-        Thu, 8 Apr 2021 13:43:45 -0400
-Received: from ppma04dal.us.ibm.com (7a.29.35a9.ip4.static.sl-reverse.com [169.53.41.122])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 37rwf1qcrk-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 08 Apr 2021 13:43:45 -0400
-Received: from pps.filterd (ppma04dal.us.ibm.com [127.0.0.1])
-        by ppma04dal.us.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 138Hhipd006738;
-        Thu, 8 Apr 2021 17:43:44 GMT
-Received: from b03cxnp07027.gho.boulder.ibm.com (b03cxnp07027.gho.boulder.ibm.com [9.17.130.14])
-        by ppma04dal.us.ibm.com with ESMTP id 37rvc4aaxh-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 08 Apr 2021 17:43:44 +0000
-Received: from b03ledav004.gho.boulder.ibm.com (b03ledav004.gho.boulder.ibm.com [9.17.130.235])
-        by b03cxnp07027.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 138Hhgli23658798
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 8 Apr 2021 17:43:42 GMT
-Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id A087E7805E;
-        Thu,  8 Apr 2021 17:43:42 +0000 (GMT)
-Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 3EDC17805C;
-        Thu,  8 Apr 2021 17:43:39 +0000 (GMT)
-Received: from jarvis.int.hansenpartnership.com (unknown [9.85.189.52])
-        by b03ledav004.gho.boulder.ibm.com (Postfix) with ESMTP;
-        Thu,  8 Apr 2021 17:43:39 +0000 (GMT)
-Message-ID: <936fa1e7755687981bdbc3bad9ecf2354c748381.camel@linux.ibm.com>
-Subject: Re: [RFC v2] KVM: x86: Support KVM VMs sharing SEV context
-From:   James Bottomley <jejb@linux.ibm.com>
-Reply-To: jejb@linux.ibm.com
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Ashish Kalra <ashish.kalra@amd.com>,
-        Nathan Tempelman <natet@google.com>
-Cc:     thomas.lendacky@amd.com, x86@kernel.org, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, srutherford@google.com,
-        seanjc@google.com, rientjes@google.com, brijesh.singh@amd.com,
-        dovmurik@linux.vnet.ibm.com, lersek@redhat.com, frankeh@us.ibm.com
-Date:   Thu, 08 Apr 2021 10:43:37 -0700
-In-Reply-To: <87bdd3a6-f5eb-91e4-9442-97dfef231640@redhat.com>
-References: <20210316014027.3116119-1-natet@google.com>
-         <20210402115813.GB17630@ashkalra_ubuntu_server>
-         <87bdd3a6-f5eb-91e4-9442-97dfef231640@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.34.4 
+        id S232700AbhDHRp6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 8 Apr 2021 13:45:58 -0400
+Received: from smtp-fw-4101.amazon.com ([72.21.198.25]:13320 "EHLO
+        smtp-fw-4101.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232476AbhDHRp6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 8 Apr 2021 13:45:58 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.de; i=@amazon.de; q=dns/txt; s=amazon201209;
+  t=1617903947; x=1649439947;
+  h=date:from:to:cc:message-id:references:mime-version:
+   in-reply-to:subject;
+  bh=cRK7cHLlPvIvXeQBZsTih5yQp0YoZivUbAIHh/I9DCY=;
+  b=edMobyrzZVYrsPeN3ebdRNr5IkzMCQ2nV8sFTAauVC7nzkVAt3tEjhe5
+   tm4ETr5GJlIilM15298CXr4bLZRfi6xz2MRNZLjPxq+qr1sejlS99tf0h
+   AhRk8FHOc2s9mp+aMLtSznKVivHH5L9xt87IGap2t9fazA8ZAwnfEfQvh
+   s=;
+X-IronPort-AV: E=Sophos;i="5.82,207,1613433600"; 
+   d="scan'208";a="100501308"
+Subject: Re: [PATCH 0/4] Add support for XMM fast hypercalls
+Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO email-inbound-relay-1e-27fb8269.us-east-1.amazon.com) ([10.43.8.2])
+  by smtp-border-fw-out-4101.iad4.amazon.com with ESMTP; 08 Apr 2021 17:45:39 +0000
+Received: from EX13D28EUC003.ant.amazon.com (iad12-ws-svc-p26-lb9-vlan3.iad.amazon.com [10.40.163.38])
+        by email-inbound-relay-1e-27fb8269.us-east-1.amazon.com (Postfix) with ESMTPS id E3A73A17D1;
+        Thu,  8 Apr 2021 17:45:33 +0000 (UTC)
+Received: from u366d62d47e3651.ant.amazon.com (10.43.160.224) by
+ EX13D28EUC003.ant.amazon.com (10.43.164.43) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.2; Thu, 8 Apr 2021 17:45:26 +0000
+Date:   Thu, 8 Apr 2021 19:45:22 +0200
+From:   Siddharth Chandrasekaran <sidcha@amazon.de>
+To:     Wei Liu <wei.liu@kernel.org>
+CC:     Paolo Bonzini <pbonzini@redhat.com>, <kys@microsoft.com>,
+        <haiyangz@microsoft.com>, <sthemmin@microsoft.com>,
+        <tglx@linutronix.de>, <mingo@redhat.com>, <bp@alien8.de>,
+        <x86@kernel.org>, <hpa@zytor.com>, <seanjc@google.com>,
+        <vkuznets@redhat.com>, <wanpengli@tencent.com>,
+        <jmattson@google.com>, <joro@8bytes.org>, <graf@amazon.com>,
+        <eyakovl@amazon.de>, <linux-hyperv@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>
+Message-ID: <20210408174521.GF32315@u366d62d47e3651.ant.amazon.com>
+References: <20210407212926.3016-1-sidcha@amazon.de>
+ <20210408152817.k4d4hjdqu7hsjllo@liuwe-devbox-debian-v2>
+ <033e7d77-d640-2c12-4918-da6b5b7f4e21@redhat.com>
+ <20210408154006.GA32315@u366d62d47e3651.ant.amazon.com>
+ <53200f24-bd57-1509-aee2-0723aa8a3f6f@redhat.com>
+ <20210408155442.GC32315@u366d62d47e3651.ant.amazon.com>
+ <20210408163018.mlr23jd2r4st54jc@liuwe-devbox-debian-v2>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 9p72LhukfUR3FxXlfP-qIRKLLGEn7zHs
-X-Proofpoint-ORIG-GUID: Ozv8vcGwL_F7LkToS5aTi5Rbk6Gft_mR
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.761
- definitions=2021-04-08_04:2021-04-08,2021-04-08 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1011 bulkscore=0
- malwarescore=0 impostorscore=0 phishscore=0 suspectscore=0
- lowpriorityscore=0 priorityscore=1501 mlxlogscore=999 mlxscore=0
- spamscore=0 adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2104060000 definitions=main-2104080117
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20210408163018.mlr23jd2r4st54jc@liuwe-devbox-debian-v2>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-Originating-IP: [10.43.160.224]
+X-ClientProxiedBy: EX13D49UWB001.ant.amazon.com (10.43.163.72) To
+ EX13D28EUC003.ant.amazon.com (10.43.164.43)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 2021-04-02 at 16:20 +0200, Paolo Bonzini wrote:
-> On 02/04/21 13:58, Ashish Kalra wrote:
-> > Hi Nathan,
-> > 
-> > Will you be posting a corresponding Qemu patch for this ?
+On Thu, Apr 08, 2021 at 04:30:18PM +0000, Wei Liu wrote:
+> On Thu, Apr 08, 2021 at 05:54:43PM +0200, Siddharth Chandrasekaran wrote:
+> > On Thu, Apr 08, 2021 at 05:48:19PM +0200, Paolo Bonzini wrote:
+> > > On 08/04/21 17:40, Siddharth Chandrasekaran wrote:
+> > > > > > > Although the Hyper-v TLFS mentions that a guest cannot use this feature
+> > > > > > > unless the hypervisor advertises support for it, some hypercalls which
+> > > > > > > we plan on upstreaming in future uses them anyway.
+> > > > > > No, please don't do this. Check the feature bit(s) before you issue
+> > > > > > hypercalls which rely on the extended interface.
+> > > > > Perhaps Siddharth should clarify this, but I read it as Hyper-V being
+> > > > > buggy and using XMM arguments unconditionally.
+> > > > The guest is at fault here as it expects Hyper-V to consume arguments
+> > > > from XMM registers for certain hypercalls (that we are working) even if
+> > > > we didn't expose the feature via CPUID bits.
+> > >
+> > > What guest is that?
+> >
+> > It is a Windows Server 2016.
 > 
-> Hi Ashish,
-> 
-> as far as I know IBM is working on QEMU patches for guest-based 
-> migration helpers.
+> Can you be more specific? Are you implementing some hypercalls from
+> TLFS? If so, which ones?
 
-Yes, that's right, we'll take on this part.
+Yes all of them are from TLFS. We are implementing VSM and there are a
+bunch of hypercalls that we have implemented to manage VTL switches,
+memory protection and virtual interrupts.
 
-> However, it would be nice to collaborate on the low-level (SEC/PEI) 
-> firmware patches to detect whether a CPU is part of the primary VM
-> or the mirror.  If Google has any OVMF patches already done for that,
-> it would be great to combine it with IBM's SEV migration code and
-> merge it into upstream OVMF.
+The following 3 hypercalls that use the XMM fast hypercalls are relevant
+to this patch set:
 
-We've reached the stage with our prototyping where not having the OVMF
-support is blocking us from working on QEMU.  If we're going to have to
-reinvent the wheel in OVMF because Google is unwilling to publish the
-patches, can you at least give some hints about how you did it?
+HvCallModifyVtlProtectionMask
+HvGetVpRegisters 
+HvSetVpRegisters 
 
-Thanks,
+~ Sid.
 
-James
+
+
+Amazon Development Center Germany GmbH
+Krausenstr. 38
+10117 Berlin
+Geschaeftsfuehrung: Christian Schlaeger, Jonathan Weiss
+Eingetragen am Amtsgericht Charlottenburg unter HRB 149173 B
+Sitz: Berlin
+Ust-ID: DE 289 237 879
+
 
 
