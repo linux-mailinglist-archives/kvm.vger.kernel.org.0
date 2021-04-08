@@ -2,140 +2,126 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EEF25358035
-	for <lists+kvm@lfdr.de>; Thu,  8 Apr 2021 12:05:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6E1BA358150
+	for <lists+kvm@lfdr.de>; Thu,  8 Apr 2021 13:07:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231205AbhDHKF3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 8 Apr 2021 06:05:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50302 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230412AbhDHKF2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 8 Apr 2021 06:05:28 -0400
-Received: from mail-wr1-x42c.google.com (mail-wr1-x42c.google.com [IPv6:2a00:1450:4864:20::42c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 998E0C061762
-        for <kvm@vger.kernel.org>; Thu,  8 Apr 2021 03:05:17 -0700 (PDT)
-Received: by mail-wr1-x42c.google.com with SMTP id 12so1474604wrz.7
-        for <kvm@vger.kernel.org>; Thu, 08 Apr 2021 03:05:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ffwll.ch; s=google;
-        h=date:from:to:cc:subject:message-id:mail-followup-to:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=36bvTqcToGLAmD+a9gwi7UztJJlmmlryLAr2BU8KQ8s=;
-        b=lIdZTKCpObM4Wmr4t/JuIwVigP9bm6yi8C5UN+QUf40InjOtA1Jdt5+tp80w3zNnQo
-         VlSZtKdBmzi+ZwGrhGIMLGEyI3q+id+HoCUH4Q4tHYGMh2RoGkmAJXhHhZHaecvlKMmC
-         QlFz7G/ND8mE2P823Sob9sGXYc3DtI/97X/D0=
+        id S231150AbhDHLHL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 8 Apr 2021 07:07:11 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:39634 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230395AbhDHLHJ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 8 Apr 2021 07:07:09 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1617880018;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=uqFnFnU+W5hoDYL4hIDIXsxj0nax+65fpHN1hSzXtQU=;
+        b=i5RFaEYOoBBVxgion5/FMLabt+iHjFmzycvPHnes5VOYfGVW67/TwK3wqaFaf/bHdfqLvh
+        EHfUTdt1lZJAwO1pjJb+KIZiCUycVdwulaXah9JDiPcZSkXGfs4hLp7j/tSLRGKhr7rMrO
+        4HxXGDwWIvjgPJPVvACL+2fi7AYE+uw=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-402-Q0MI-nqKNSu-nA4qC0cjfA-1; Thu, 08 Apr 2021 07:06:56 -0400
+X-MC-Unique: Q0MI-nqKNSu-nA4qC0cjfA-1
+Received: by mail-wr1-f71.google.com with SMTP id o11so836234wrc.4
+        for <kvm@vger.kernel.org>; Thu, 08 Apr 2021 04:06:56 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id
-         :mail-followup-to:references:mime-version:content-disposition
-         :in-reply-to;
-        bh=36bvTqcToGLAmD+a9gwi7UztJJlmmlryLAr2BU8KQ8s=;
-        b=egZwFjfrYsg+DiHUvan7HLf14qUlzgPNuOv4fic3J/GCb+Mn7MYvJCYS73s4vLwIAt
-         vxYhc+OERZxGGSTkRYBBDa+75LurhYbFpKxM6UxPN37QWinaTW0TU4qjHhF28vSQI35h
-         qi4YMP1fkpo0lw8pkDepN98mvGFmhYvjg24Xi5C/Eb54Yl145JBOvMyO97ohQsA78l7Z
-         aS7sKn/WP2ssp2Sk4PNOHa4soB/4iz376kalbuxP+ttKHKJcEuxfJuj88AZ9j1uO9VrE
-         8h0Mb/jc/cqDs/CWKXYq1OG7IbrFaSqoRkq/dLDSNRcn0Y34Myee061uWNoEpoC5oFIH
-         lWAw==
-X-Gm-Message-State: AOAM530rSZla1tOYC8ltqkrrforSx/mWYDCIajvBA2XUZXgx8efTBzdV
-        ohX7QITG/6ezilr63lsUZG1IOA==
-X-Google-Smtp-Source: ABdhPJzpwqYXCVUB+8r0nQC2/W7H7J7o+XDWVlyU4mTtGNJrkB+UEdkDLgvXZNrPAgIv0wJQsQSfww==
-X-Received: by 2002:adf:f692:: with SMTP id v18mr713305wrp.206.1617876316263;
-        Thu, 08 Apr 2021 03:05:16 -0700 (PDT)
-Received: from phenom.ffwll.local ([2a02:168:57f4:0:efd0:b9e5:5ae6:c2fa])
-        by smtp.gmail.com with ESMTPSA id l4sm12802446wmh.8.2021.04.08.03.05.15
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=uqFnFnU+W5hoDYL4hIDIXsxj0nax+65fpHN1hSzXtQU=;
+        b=didSH89+0UkML8PibUMPpwJTlsIGMt5/YG99q7h1R+LTFfHtuE2fn6aw2JPgpmAx6h
+         69oM2z8+le6dupl7/0a47q63zADA1NP2Dv000s5ebElhNmE0iw1ADOeFpqumH8wMhlzF
+         um/80aYj+gyA3QKaQVImGUHfXB9tKX4U7a5Uh3sPL5xWwuJ1gjuLGVhPHdR8Z/lmph6N
+         B5BbYUWvRml50QOuxOFctJ2rNHTS6ffoktcxQeMSTrdSTv/bzJWF6ciYmz19udBlay/H
+         b2D/RhpZDQrcdmGvNOywZ6YydKGCDYXQzaIpg+0LJirdMAmDo49lvhMcL1B3w2xMEVsX
+         qFog==
+X-Gm-Message-State: AOAM5328jApsnzlBVokm+GXISnnmbTac1+fxqc05Ctphxwd8zMC2Ds7z
+        9nO5ZYBVMBIABHfbXellZ+2z3kzMdDP2UYGR2BPCG7/CW43MlTQHhZQHrenjZ4zaiB9Hda7BXGt
+        F+sh6owSAcLkw
+X-Received: by 2002:a1c:9dd5:: with SMTP id g204mr7810233wme.87.1617880015660;
+        Thu, 08 Apr 2021 04:06:55 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxhTjY0W2FDvXVXeD2w+sxa4IvR8DiEXHT/hvQBvRN5BWI+R63DZx6H7rXpPawxMiiXKC0BMw==
+X-Received: by 2002:a1c:9dd5:: with SMTP id g204mr7810214wme.87.1617880015445;
+        Thu, 08 Apr 2021 04:06:55 -0700 (PDT)
+Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id z15sm15469155wrw.38.2021.04.08.04.06.54
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 08 Apr 2021 03:05:15 -0700 (PDT)
-Date:   Thu, 8 Apr 2021 12:05:13 +0200
-From:   Daniel Vetter <daniel@ffwll.ch>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     Daniel Vetter <daniel.vetter@ffwll.ch>,
-        DRI Development <dri-devel@lists.freedesktop.org>,
-        LKML <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org,
-        linux-mm@kvack.org, linux-arm-kernel@lists.infradead.org,
-        linux-samsung-soc@vger.kernel.org, linux-media@vger.kernel.org,
-        3pvd@google.com, Jann Horn <jannh@google.com>,
+        Thu, 08 Apr 2021 04:06:55 -0700 (PDT)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Vineeth Pillai <viremana@linux.microsoft.com>
+Cc:     "H. Peter Anvin" <hpa@zytor.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "K. Y. Srinivasan" <kys@microsoft.com>, x86@kernel.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-hyperv@vger.kernel.org,
+        Lan Tianyu <Tianyu.Lan@microsoft.com>,
+        Michael Kelley <mikelley@microsoft.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Peter Xu <peterx@redhat.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Daniel Vetter <daniel.vetter@intel.com>
-Subject: Re: [PATCH 3/3] mm: unexport follow_pfn
-Message-ID: <YG7VWWkvnv2IPEXt@phenom.ffwll.local>
-Mail-Followup-To: Jason Gunthorpe <jgg@nvidia.com>,
-        DRI Development <dri-devel@lists.freedesktop.org>,
-        LKML <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org,
-        linux-mm@kvack.org, linux-arm-kernel@lists.infradead.org,
-        linux-samsung-soc@vger.kernel.org, linux-media@vger.kernel.org,
-        3pvd@google.com, Jann Horn <jannh@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>, Peter Xu <peterx@redhat.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Daniel Vetter <daniel.vetter@intel.com>
-References: <20210316153303.3216674-1-daniel.vetter@ffwll.ch>
- <20210316153303.3216674-4-daniel.vetter@ffwll.ch>
- <20210329133101.GA1168973@nvidia.com>
+        Sean Christopherson <seanjc@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, Wei Liu <wei.liu@kernel.org>,
+        Stephen Hemminger <sthemmin@microsoft.com>,
+        Haiyang Zhang <haiyangz@microsoft.com>
+Subject: Re: [PATCH 1/7] hyperv: Detect Nested virtualization support for SVM
+In-Reply-To: <e14dac75ff1088b2c4bea361954b37e414edd03c.1617804573.git.viremana@linux.microsoft.com>
+References: <cover.1617804573.git.viremana@linux.microsoft.com>
+ <e14dac75ff1088b2c4bea361954b37e414edd03c.1617804573.git.viremana@linux.microsoft.com>
+Date:   Thu, 08 Apr 2021 13:06:53 +0200
+Message-ID: <87lf9tavci.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210329133101.GA1168973@nvidia.com>
-X-Operating-System: Linux phenom 5.7.0-1-amd64 
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Mar 29, 2021 at 10:31:01AM -0300, Jason Gunthorpe wrote:
-> On Tue, Mar 16, 2021 at 04:33:03PM +0100, Daniel Vetter wrote:
-> > Both kvm (in bd2fae8da794 ("KVM: do not assume PTE is writable after
-> > follow_pfn")) and vfio (in 07956b6269d3 ("vfio/type1: Use
-> > follow_pte()")) have lost their callsites of follow_pfn(). All the
-> > other ones have been switched over to unsafe_follow_pfn because they
-> > cannot be fixed without breaking userspace api.
-> > 
-> > Argueably the vfio code is still racy, but that's kinda a bigger
-> 
-> vfio and kvm
+Vineeth Pillai <viremana@linux.microsoft.com> writes:
 
-Hm I thought kvm is non-racy due to the mmu notifier catch races?
+> Detect nested features exposed by Hyper-V if SVM is enabled.
+>
+> Signed-off-by: Vineeth Pillai <viremana@linux.microsoft.com>
+> ---
+>  arch/x86/kernel/cpu/mshyperv.c | 10 +++++++++-
+>  1 file changed, 9 insertions(+), 1 deletion(-)
+>
+> diff --git a/arch/x86/kernel/cpu/mshyperv.c b/arch/x86/kernel/cpu/mshyperv.c
+> index 3546d3e21787..4d364acfe95d 100644
+> --- a/arch/x86/kernel/cpu/mshyperv.c
+> +++ b/arch/x86/kernel/cpu/mshyperv.c
+> @@ -325,9 +325,17 @@ static void __init ms_hyperv_init_platform(void)
+>  			ms_hyperv.isolation_config_a, ms_hyperv.isolation_config_b);
+>  	}
+>  
+> -	if (ms_hyperv.hints & HV_X64_ENLIGHTENED_VMCS_RECOMMENDED) {
+> +	/*
+> +	 * AMD does not need enlightened VMCS as VMCB is already a
+> +	 * datastructure in memory. 
 
-> 
-> > picture. But since it does leak the pte beyond where it drops the pt
-> > lock, without anything else like an mmu notifier guaranteeing
-> > coherence, the problem is at least clearly visible in the vfio code.
-> > So good enough with me.
-> > 
-> > I've decided to keep the explanation that after dropping the pt lock
-> > you must have an mmu notifier if you keep using the pte somehow by
-> > adjusting it and moving it into the kerneldoc for the new follow_pte()
-> > function.
-> > 
-> > Cc: 3pvd@google.com
-> > Cc: Jann Horn <jannh@google.com>
-> > Cc: Paolo Bonzini <pbonzini@redhat.com>
-> > Cc: Jason Gunthorpe <jgg@nvidia.com>
-> > Cc: Cornelia Huck <cohuck@redhat.com>
-> > Cc: Peter Xu <peterx@redhat.com>
-> > Cc: Alex Williamson <alex.williamson@redhat.com>
-> > Cc: linux-mm@kvack.org
-> > Cc: linux-arm-kernel@lists.infradead.org
-> > Cc: linux-samsung-soc@vger.kernel.org
-> > Cc: linux-media@vger.kernel.org
-> > Cc: kvm@vger.kernel.org
-> > Signed-off-by: Daniel Vetter <daniel.vetter@intel.com>
-> > --- 
-> >  include/linux/mm.h |  2 --
-> >  mm/memory.c        | 26 +++++---------------------
-> >  mm/nommu.c         | 13 +------------
-> >  3 files changed, 6 insertions(+), 35 deletions(-)
-> 
-> Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
+Well, VMCS is also a structure in memory, isn't it? It's just that we
+don't have a 'clean field' concept for it and we can't use normal memory
+accesses.
 
-Thanks for your r-b tags, I'll add them.
--Daniel
+> 	We need to get the nested
+> +	 * features if SVM is enabled.
+> +	 */
+> +	if (boot_cpu_has(X86_FEATURE_SVM) ||
+> +	    ms_hyperv.hints & HV_X64_ENLIGHTENED_VMCS_RECOMMENDED) {
 
-> 
-> Jason
+Do I understand correctly that we can just look at CPUID.0x40000000.EAX
+and in case it is >= 0x4000000A we can read HYPERV_CPUID_NESTED_FEATURES
+leaf? I'd suggest we do that intead then.
+
+>  		ms_hyperv.nested_features =
+>  			cpuid_eax(HYPERV_CPUID_NESTED_FEATURES);
+> +		pr_info("Hyper-V nested_features: 0x%x\n",
+> +			ms_hyperv.nested_features);
+>  	}
+>  
+>  	/*
 
 -- 
-Daniel Vetter
-Software Engineer, Intel Corporation
-http://blog.ffwll.ch
+Vitaly
+
