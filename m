@@ -2,106 +2,230 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 50653358338
-	for <lists+kvm@lfdr.de>; Thu,  8 Apr 2021 14:25:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6DF6935834A
+	for <lists+kvm@lfdr.de>; Thu,  8 Apr 2021 14:30:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231344AbhDHMZ6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 8 Apr 2021 08:25:58 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:25520 "EHLO
+        id S230467AbhDHMaw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 8 Apr 2021 08:30:52 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:30694 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230412AbhDHMZ5 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 8 Apr 2021 08:25:57 -0400
+        by vger.kernel.org with ESMTP id S229964AbhDHMav (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 8 Apr 2021 08:30:51 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1617884745;
+        s=mimecast20190719; t=1617885039;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=N8WC71YVcH2PzB7/MRu3TT5EAfVDS68BDlRAwibePTY=;
-        b=BFOymnrUexHM4qGR2E/L1kdleoZo3oPz7gym6MmGdt0XOo5BHj13XzNePVRDjH6Mp6qJDb
-        gZu5CmvVBrJo9fTfcYD6GG85I33d5DC+uhujSq9AjdL8QNj/vIb7s/RbKg5ADFDj9NPNpy
-        ROm1UFeDrdFeruPCvmK1baDqexnL/vw=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-261-NRFgAPW1MiCBbkaerBSaeg-1; Thu, 08 Apr 2021 08:25:44 -0400
-X-MC-Unique: NRFgAPW1MiCBbkaerBSaeg-1
-Received: by mail-ed1-f71.google.com with SMTP id q12so946849edv.9
-        for <kvm@vger.kernel.org>; Thu, 08 Apr 2021 05:25:43 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:cc:references:from:subject:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=N8WC71YVcH2PzB7/MRu3TT5EAfVDS68BDlRAwibePTY=;
-        b=FV8CHEEG6IvxVqzHaPq/9U67ghAgVu+77rD9xH6MtnxL03Y2PDOxLmRDkUweVn7L7+
-         ND8mJUFjpdinISGN4NV1VjH9fznNZZwWBpo/tXYH9jEh+BbHiV7wc8RrqMM7gUdjATD6
-         u3yOMkkHIvD/2GbEKkygcE/JsW4PJrD5GtxkWoThhA13Sbco37CiZSrpTHAj01vcdxfI
-         UdKs+eiEadZBSlh4+AddJiugqM5HNz+h6G2UVsU6qFeeeufTsbofxusKYECtgPZSdQJ3
-         xc/ZC/eJZQ14xbL1jUI0f5f3mwhd0+EeoxwioZeUWDczOzvjyBFiCWuBmwWHXwo84Y16
-         1Ymw==
-X-Gm-Message-State: AOAM53273Pd7rKwb5nxbQ5jSvnh1HAPIkAQ/Bbjhs7PRsi7tmFNTtD4P
-        8N1qEVNkYXKVDB9k2NJ1cJ3qrjLP+4kZ9zUwu6VcHa7AbzrFiJ5dD5qNzmz2rt0Q9qt2Xk8uJfv
-        UNqk2rS9H2MV8
-X-Received: by 2002:a17:907:1614:: with SMTP id hb20mr9988510ejc.77.1617884742924;
-        Thu, 08 Apr 2021 05:25:42 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyOrCIDnw2gn0DIxYl9xIccpQ4md4ymI/6JnKD1M3OovnJwb9XKE+/tFGcSy6GkB9tvyHovaQ==
-X-Received: by 2002:a17:907:1614:: with SMTP id hb20mr9988481ejc.77.1617884742753;
-        Thu, 08 Apr 2021 05:25:42 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id x24sm12332509edr.36.2021.04.08.05.25.41
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 08 Apr 2021 05:25:42 -0700 (PDT)
-To:     Marcelo Tosatti <mtosatti@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        vkuznets@redhat.com, dwmw@amazon.co.uk
-References: <20210330165958.3094759-1-pbonzini@redhat.com>
- <20210330165958.3094759-2-pbonzini@redhat.com>
- <20210407174021.GA30046@fuller.cnet>
- <51cae826-8973-5113-7e12-8163eab36cb7@redhat.com>
- <20210408120021.GA65315@fuller.cnet>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH 1/2] KVM: x86: reduce pvclock_gtod_sync_lock critical
- sections
-Message-ID: <2abe4b19-e41e-34f9-0a3c-30812c7b719e@redhat.com>
-Date:   Thu, 8 Apr 2021 14:25:41 +0200
+        bh=s64/vAfSrBNQsCpuAMqXq7sIP9uWm8iiIR6se2Ly0S4=;
+        b=LUitROKq9NbM2Defx5IrcSeHVF8kOXom9XPArw8kIzT6iCzTvXR6Gxef6hIz81DIqMlrjf
+        qql8FZa58JHoCVjaijlDi/yWe0GKhiuS/TToCVr2Xxh2U1sx2vMbex+kDAxEay+DmvPLLp
+        MQMRMCm5nAciXApLnmp6kRYehSAF670=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-363-TqiEpuyWMnmjarYH6YNu5g-1; Thu, 08 Apr 2021 08:30:35 -0400
+X-MC-Unique: TqiEpuyWMnmjarYH6YNu5g-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D8D10107ACC7;
+        Thu,  8 Apr 2021 12:30:31 +0000 (UTC)
+Received: from [10.36.115.214] (ovpn-115-214.ams2.redhat.com [10.36.115.214])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 5BEDB196E3;
+        Thu,  8 Apr 2021 12:30:16 +0000 (UTC)
+Subject: Re: [PATCH v14 06/13] iommu/smmuv3: Allow stage 1 invalidation with
+ unmanaged ASIDs
+To:     Kunkun Jiang <jiangkunkun@huawei.com>, eric.auger.pro@gmail.com,
+        iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, will@kernel.org,
+        maz@kernel.org, robin.murphy@arm.com, joro@8bytes.org,
+        alex.williamson@redhat.com, tn@semihalf.com, zhukeqian1@huawei.com
+Cc:     jacob.jun.pan@linux.intel.com, yi.l.liu@intel.com,
+        wangxingang5@huawei.com, jean-philippe@linaro.org,
+        zhangfei.gao@linaro.org, zhangfei.gao@gmail.com,
+        vivek.gautam@arm.com, shameerali.kolothum.thodi@huawei.com,
+        yuzenghui@huawei.com, nicoleotsuka@gmail.com,
+        lushenming@huawei.com, vsethi@nvidia.com,
+        wanghaibin.wang@huawei.com
+References: <20210223205634.604221-1-eric.auger@redhat.com>
+ <20210223205634.604221-7-eric.auger@redhat.com>
+ <901720e6-6ca5-eb9a-1f24-0ca479bcfecc@huawei.com>
+From:   Auger Eric <eric.auger@redhat.com>
+Message-ID: <0246aec2-162d-0584-3ca4-b9c304ef3c8a@redhat.com>
+Date:   Thu, 8 Apr 2021 14:30:13 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.7.0
+ Thunderbird/78.8.0
 MIME-Version: 1.0
-In-Reply-To: <20210408120021.GA65315@fuller.cnet>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <901720e6-6ca5-eb9a-1f24-0ca479bcfecc@huawei.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 08/04/21 14:00, Marcelo Tosatti wrote:
+Hi Kunkun,
+
+On 4/1/21 2:37 PM, Kunkun Jiang wrote:
+> Hi Eric,
+> 
+> On 2021/2/24 4:56, Eric Auger wrote:
+>> With nested stage support, soon we will need to invalidate
+>> S1 contexts and ranges tagged with an unmanaged asid, this
+>> latter being managed by the guest. So let's introduce 2 helpers
+>> that allow to invalidate with externally managed ASIDs
 >>
->> KVM_REQ_MCLOCK_INPROGRESS is only needed to kick running vCPUs out of the
->> execution loop;
-> We do not want vcpus with different system_timestamp/tsc_timestamp
-> pair:
+>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>>
+>> ---
+>>
+>> v13 -> v14
+>> - Actually send the NH_ASID command (reported by Xingang Wang)
+>> ---
+>>   drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c | 38 ++++++++++++++++-----
+>>   1 file changed, 29 insertions(+), 9 deletions(-)
+>>
+>> diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
+>> b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
+>> index 5579ec4fccc8..4c19a1114de4 100644
+>> --- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
+>> +++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
+>> @@ -1843,9 +1843,9 @@ int arm_smmu_atc_inv_domain(struct
+>> arm_smmu_domain *smmu_domain, int ssid,
+>>   }
+>>     /* IO_PGTABLE API */
+>> -static void arm_smmu_tlb_inv_context(void *cookie)
+>> +static void __arm_smmu_tlb_inv_context(struct arm_smmu_domain
+>> *smmu_domain,
+>> +                       int ext_asid)
+>>   {
+>> -    struct arm_smmu_domain *smmu_domain = cookie;
+>>       struct arm_smmu_device *smmu = smmu_domain->smmu;
+>>       struct arm_smmu_cmdq_ent cmd;
+>>   @@ -1856,7 +1856,13 @@ static void arm_smmu_tlb_inv_context(void
+>> *cookie)
+>>        * insertion to guarantee those are observed before the TLBI. Do be
+>>        * careful, 007.
+>>        */
+>> -    if (smmu_domain->stage == ARM_SMMU_DOMAIN_S1) {
+>> +    if (ext_asid >= 0) { /* guest stage 1 invalidation */
+>> +        cmd.opcode    = CMDQ_OP_TLBI_NH_ASID;
+>> +        cmd.tlbi.asid    = ext_asid;
+>> +        cmd.tlbi.vmid    = smmu_domain->s2_cfg.vmid;
+>> +        arm_smmu_cmdq_issue_cmd(smmu, &cmd);
+>> +        arm_smmu_cmdq_issue_sync(smmu);
+>> +    } else if (smmu_domain->stage == ARM_SMMU_DOMAIN_S1) {
+>>           arm_smmu_tlb_inv_asid(smmu, smmu_domain->s1_cfg.cd.asid);
+>>       } else {
+>>           cmd.opcode    = CMDQ_OP_TLBI_S12_VMALL;
+>> @@ -1867,6 +1873,13 @@ static void arm_smmu_tlb_inv_context(void *cookie)
+>>       arm_smmu_atc_inv_domain(smmu_domain, 0, 0, 0);
+>>   }
+>>   +static void arm_smmu_tlb_inv_context(void *cookie)
+>> +{
+>> +    struct arm_smmu_domain *smmu_domain = cookie;
+>> +
+>> +    __arm_smmu_tlb_inv_context(smmu_domain, -1);
+>> +}
+>> +
+>>   static void __arm_smmu_tlb_inv_range(struct arm_smmu_cmdq_ent *cmd,
+>>                        unsigned long iova, size_t size,
+>>                        size_t granule,
+>> @@ -1926,9 +1939,10 @@ static void __arm_smmu_tlb_inv_range(struct
+>> arm_smmu_cmdq_ent *cmd,
+>>       arm_smmu_cmdq_batch_submit(smmu, &cmds);
+>>   }
+>>   
+> Here is the part of code in __arm_smmu_tlb_inv_range():
+>>         if (smmu->features & ARM_SMMU_FEAT_RANGE_INV) {
+>>                 /* Get the leaf page size */
+>>                 tg = __ffs(smmu_domain->domain.pgsize_bitmap);
+>>
+>>                 /* Convert page size of 12,14,16 (log2) to 1,2,3 */
+>>                 cmd->tlbi.tg = (tg - 10) / 2;
+>>
+>>                 /* Determine what level the granule is at */
+>>                 cmd->tlbi.ttl = 4 - ((ilog2(granule) - 3) / (tg - 3));
+>>
+>>                 num_pages = size >> tg;
+>>         }
+> When pSMMU supports RIL, we get the leaf page size by __ffs(smmu_domain->
+> domain.pgsize_bitmap). In nested mode, it is determined by host
+> PAGE_SIZE. If
+> the host kernel and guest kernel has different translation granule (e.g.
+> host 16K,
+> guest 4K), __arm_smmu_tlb_inv_range() will issue an incorrect tlbi command.
 > 
->   * To avoid that problem, do not allow visibility of distinct
->   * system_timestamp/tsc_timestamp values simultaneously: use a master
->   * copy of host monotonic time values. Update that master copy
->   * in lockstep.
+> Do you have any idea about this issue?
+
+I think this is the same issue as the one reported by Chenxiang
+
+https://lore.kernel.org/lkml/15938ed5-2095-e903-a290-333c299015a2@hisilicon.com/
+
+In case RIL is not supported by the host, next version will use the
+smallest pSMMU supported page size, as done in __arm_smmu_tlb_inv_range
+
+Thanks
+
+Eric
+
 > 
-> So KVM_REQ_MCLOCK_INPROGRESS also ensures that no vcpu enters
-> guest mode (via vcpu->requests check before VM-entry) with a
-> different system_timestamp/tsc_timestamp pair.
-
-Yes this is what KVM_REQ_MCLOCK_INPROGRESS does, but it does not have to 
-be done that way.  All you really need is the IPI with KVM_REQUEST_WAIT, 
-which ensures that updates happen after the vCPUs have exited guest 
-mode.  You don't need to loop on vcpu->requests for example, because 
-kvm_guest_time_update could just spin on pvclock_gtod_sync_lock until 
-pvclock_update_vm_gtod_copy is done.
-
-So this morning I tried protecting the kvm->arch fields for kvmclock 
-using a seqcount, which is nice also because get_kvmclock_ns() does not 
-have to bounce the cacheline of pvclock_gtod_sync_lock anymore.  I'll 
-post it tomorrow or next week.
-
-Paolo
+> Best Regards,
+> Kunkun Jiang
+>> -static void arm_smmu_tlb_inv_range_domain(unsigned long iova, size_t
+>> size,
+>> -                      size_t granule, bool leaf,
+>> -                      struct arm_smmu_domain *smmu_domain)
+>> +static void
+>> +arm_smmu_tlb_inv_range_domain(unsigned long iova, size_t size,
+>> +                  size_t granule, bool leaf, int ext_asid,
+>> +                  struct arm_smmu_domain *smmu_domain)
+>>   {
+>>       struct arm_smmu_cmdq_ent cmd = {
+>>           .tlbi = {
+>> @@ -1936,7 +1950,12 @@ static void
+>> arm_smmu_tlb_inv_range_domain(unsigned long iova, size_t size,
+>>           },
+>>       };
+>>   -    if (smmu_domain->stage == ARM_SMMU_DOMAIN_S1) {
+>> +    if (ext_asid >= 0) {  /* guest stage 1 invalidation */
+>> +        cmd.opcode    = smmu_domain->smmu->features &
+>> ARM_SMMU_FEAT_E2H ?
+>> +                  CMDQ_OP_TLBI_EL2_VA : CMDQ_OP_TLBI_NH_VA;
+>> +        cmd.tlbi.asid    = ext_asid;
+>> +        cmd.tlbi.vmid    = smmu_domain->s2_cfg.vmid;
+>> +    } else if (smmu_domain->stage == ARM_SMMU_DOMAIN_S1) {
+>>           cmd.opcode    = smmu_domain->smmu->features &
+>> ARM_SMMU_FEAT_E2H ?
+>>                     CMDQ_OP_TLBI_EL2_VA : CMDQ_OP_TLBI_NH_VA;
+>>           cmd.tlbi.asid    = smmu_domain->s1_cfg.cd.asid;
+>> @@ -1944,6 +1963,7 @@ static void
+>> arm_smmu_tlb_inv_range_domain(unsigned long iova, size_t size,
+>>           cmd.opcode    = CMDQ_OP_TLBI_S2_IPA;
+>>           cmd.tlbi.vmid    = smmu_domain->s2_cfg.vmid;
+>>       }
+>> +
+>>       __arm_smmu_tlb_inv_range(&cmd, iova, size, granule, smmu_domain);
+>>         /*
+>> @@ -1982,7 +2002,7 @@ static void arm_smmu_tlb_inv_page_nosync(struct
+>> iommu_iotlb_gather *gather,
+>>   static void arm_smmu_tlb_inv_walk(unsigned long iova, size_t size,
+>>                     size_t granule, void *cookie)
+>>   {
+>> -    arm_smmu_tlb_inv_range_domain(iova, size, granule, false, cookie);
+>> +    arm_smmu_tlb_inv_range_domain(iova, size, granule, false, -1,
+>> cookie);
+>>   }
+>>     static const struct iommu_flush_ops arm_smmu_flush_ops = {
+>> @@ -2523,7 +2543,7 @@ static void arm_smmu_iotlb_sync(struct
+>> iommu_domain *domain,
+>>         arm_smmu_tlb_inv_range_domain(gather->start,
+>>                         gather->end - gather->start + 1,
+>> -                      gather->pgsize, true, smmu_domain);
+>> +                      gather->pgsize, true, -1, smmu_domain);
+>>   }
+>>     static phys_addr_t
+> 
+> 
 
