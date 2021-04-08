@@ -2,127 +2,99 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 32B2435838D
-	for <lists+kvm@lfdr.de>; Thu,  8 Apr 2021 14:45:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 363883583D8
+	for <lists+kvm@lfdr.de>; Thu,  8 Apr 2021 14:52:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231420AbhDHMqG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 8 Apr 2021 08:46:06 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:55977 "EHLO
+        id S231865AbhDHMwq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 8 Apr 2021 08:52:46 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:45210 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229741AbhDHMqF (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 8 Apr 2021 08:46:05 -0400
+        by vger.kernel.org with ESMTP id S231801AbhDHMwc (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 8 Apr 2021 08:52:32 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1617885954;
+        s=mimecast20190719; t=1617886341;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=tUXfy+VSEEl5j5H1dI8KuFyJtEablKEBo7YiZjGApMQ=;
-        b=Qs+225uGs5gqAYYL3uIZ/nz2DmEgGMoGdhFmEWR1VRaMFAq1jGPDbTVXFa2HzzwaYcCBzK
-        dcrI+7fsUqtUhldWY+Q2OKDWN2NjeT43nPZPQjUnYyXYDdlqrEbk5ev/OS6+FYVwHICF+a
-        uABk/wBnjVWMmOV5w9gGnoYGrledOQg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-505-2XSbkMFuMOG4WjyQOgRVEg-1; Thu, 08 Apr 2021 08:45:50 -0400
-X-MC-Unique: 2XSbkMFuMOG4WjyQOgRVEg-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 10930195D562;
-        Thu,  8 Apr 2021 12:45:49 +0000 (UTC)
-Received: from wangxiaodeMacBook-Air.local (ovpn-12-93.pek2.redhat.com [10.72.12.93])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 79BFB60BF1;
-        Thu,  8 Apr 2021 12:45:43 +0000 (UTC)
-Subject: Re: [PATCH v2 2/3] virito_pci: add timeout to reset device operation
-To:     Max Gurtovoy <mgurtovoy@nvidia.com>, mst@redhat.com,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org
-Cc:     oren@nvidia.com, nitzanc@nvidia.com, cohuck@redhat.com
-References: <20210408081109.56537-1-mgurtovoy@nvidia.com>
- <20210408081109.56537-2-mgurtovoy@nvidia.com>
- <2bead2b3-fa23-dc1e-3200-ddfa24944b75@redhat.com>
- <a00abefe-790d-8239-ac42-9f70daa7a25c@nvidia.com>
-From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <93221213-8fc3-96ef-7e89-b7c03bea5322@redhat.com>
-Date:   Thu, 8 Apr 2021 20:45:41 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
- Gecko/20100101 Thunderbird/78.9.0
+        bh=4S1xhqNTpv3IJ0yxypseMcfA4gi2Db1hR2vDlBKzCkU=;
+        b=A2VOyqkG7ycRDwOOA+/UauXuwzsJljvB3POHODVnH4QL/wXyIQAWDDCPgpTyzEFfQAvZGS
+        QJMaK7i6wyYFkn4PtbxFTErKol3GEOMBAhVYGUAWT12piHyvGcu2BRHuZOe9+qlNknmgSF
+        3WkyoykbxFKlKV9fzG6NDV2Dsac7F7o=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-475-BYJlc5nRNtKnYxJrl0WAHA-1; Thu, 08 Apr 2021 08:52:19 -0400
+X-MC-Unique: BYJlc5nRNtKnYxJrl0WAHA-1
+Received: by mail-ed1-f71.google.com with SMTP id j18so979667edv.6
+        for <kvm@vger.kernel.org>; Thu, 08 Apr 2021 05:52:19 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=4S1xhqNTpv3IJ0yxypseMcfA4gi2Db1hR2vDlBKzCkU=;
+        b=YjS6JJzVnHuFuaKOVVgJwHtt3ejudZi+nco+3dANNbfTHiDNggTcLGvEJEmHWHBWrl
+         nxAPptBk8HdfgGdXUV3l7nYfV348RNTwPwi8tAUQ9WXJEx8TdMTiBy7yI6hb7oB3/Chu
+         Qp3islCR7qPDeezJIu4VMAkrMZhXjq8Elx1XI62wqAgduYUFjypFfz6tMQhmydmcaX/n
+         w0TkmX2j9zD92I9vD9Y+DoDV//JbcOqlAgttfJDaptkOl9LpErSn4uJDepj/nCeR7aiY
+         Upp+SMuyX1pl9G+wx9torPg2g/Bx6JGtWeoLKQZVrwQ04GnRAIUDuBa3hfJJA71l1K+F
+         iDLA==
+X-Gm-Message-State: AOAM530WFEnBQVlRdDzFEMAQ7Jb5Pswht6iROMlAAFVQQxQmZaxMRQ5/
+        WYM0lmlM2CGM4AXgV+N5eFEC2go4LQ6h3ax1+FYAWcyHTcisyYFzjOz+RZ4s9sUplQHAv4/6+vN
+        WNkGeXpqvvkFe
+X-Received: by 2002:a50:9fa1:: with SMTP id c30mr2365353edf.66.1617886338690;
+        Thu, 08 Apr 2021 05:52:18 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyxbF93yjemzoR4e6xZdoBnB/y33lLc3fLY1c5uNkCMBQilxA+808u9E8cSRoq+VR5heR8REg==
+X-Received: by 2002:a50:9fa1:: with SMTP id c30mr2365326edf.66.1617886338487;
+        Thu, 08 Apr 2021 05:52:18 -0700 (PDT)
+Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id a12sm10363569ejy.87.2021.04.08.05.52.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 08 Apr 2021 05:52:18 -0700 (PDT)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Siddharth Chandrasekaran <sidcha@amazon.de>
+Cc:     Alexander Graf <graf@amazon.com>,
+        Evgeny Iakovlev <eyakovl@amazon.de>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Sean Christopherson <seanjc@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>
+Subject: Re: [PATCH 3/4] KVM: x86: kvm_hv_flush_tlb use inputs from XMM
+ registers
+In-Reply-To: <01fc0ac9-f159-d3df-6c8c-8f8122fe31ea@redhat.com>
+References: <20210407211954.32755-1-sidcha@amazon.de>
+ <20210407211954.32755-4-sidcha@amazon.de>
+ <87eefl7zp4.fsf@vitty.brq.redhat.com>
+ <01fc0ac9-f159-d3df-6c8c-8f8122fe31ea@redhat.com>
+Date:   Thu, 08 Apr 2021 14:52:16 +0200
+Message-ID: <878s5t7xbz.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <a00abefe-790d-8239-ac42-9f70daa7a25c@nvidia.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Paolo Bonzini <pbonzini@redhat.com> writes:
 
-在 2021/4/8 下午5:44, Max Gurtovoy 写道:
+> On 08/04/21 14:01, Vitaly Kuznetsov wrote:
+>> 
+>> Also, we can probably defer kvm_hv_hypercall_read_xmm() until we know
+>> how many regs we actually need to not read them all (we will always
+>> need xmm[0] I guess so we can as well read it here).
 >
-> On 4/8/2021 12:01 PM, Jason Wang wrote:
->>
->> 在 2021/4/8 下午4:11, Max Gurtovoy 写道:
->>> According to the spec after writing 0 to device_status, the driver MUST
->>> wait for a read of device_status to return 0 before reinitializing the
->>> device. In case we have a device that won't return 0, the reset
->>> operation will loop forever and cause the host/vm to stuck. Set timeout
->>> for 3 minutes before giving up on the device.
->>>
->>> Signed-off-by: Max Gurtovoy <mgurtovoy@nvidia.com>
->>> ---
->>>   drivers/virtio/virtio_pci_modern.c | 10 +++++++++-
->>>   1 file changed, 9 insertions(+), 1 deletion(-)
->>>
->>> diff --git a/drivers/virtio/virtio_pci_modern.c 
->>> b/drivers/virtio/virtio_pci_modern.c
->>> index cc3412a96a17..dcee616e8d21 100644
->>> --- a/drivers/virtio/virtio_pci_modern.c
->>> +++ b/drivers/virtio/virtio_pci_modern.c
->>> @@ -162,6 +162,7 @@ static int vp_reset(struct virtio_device *vdev)
->>>   {
->>>       struct virtio_pci_device *vp_dev = to_vp_device(vdev);
->>>       struct virtio_pci_modern_device *mdev = &vp_dev->mdev;
->>> +    unsigned long timeout = jiffies + msecs_to_jiffies(180000);
->>>         /* 0 status means a reset. */
->>>       vp_modern_set_status(mdev, 0);
->>> @@ -169,9 +170,16 @@ static int vp_reset(struct virtio_device *vdev)
->>>        * device_status to return 0 before reinitializing the device.
->>>        * This will flush out the status write, and flush in device 
->>> writes,
->>>        * including MSI-X interrupts, if any.
->>> +     * Set a timeout before giving up on the device.
->>>        */
->>> -    while (vp_modern_get_status(mdev))
->>> +    while (vp_modern_get_status(mdev)) {
->>> +        if (time_after(jiffies, timeout)) {
->>
->>
->> What happens if the device finish the rest after the timeout?
+> The cost is get/put FPU, so I think there's not much to gain from that.
 >
->
-> The driver will set VIRTIO_CONFIG_S_FAILED and one can re-probe it 
-> later on (e.g by re-scanning the pci bus).
 
+Maybe, I just think that in most cases we will only need xmm0. To make
+the optimization work we can probably do kvm_get_fpu() once we figured
+out that we're dealing with XMM hypercall and do kvm_put_fpu() when
+we're done processing hypercall parameters. This way we don't need to do
+get/put twice. We can certainly leave this idea to the (possible) future
+optimizations.
 
-Ok, so do we need the flush through vp_synchronize_vectors() here?
-
-Thanks
-
-
->
->
->>
->> Thanks
->>
->>
->>> +            dev_err(&vdev->dev, "virtio: device not ready. "
->>> +                "Aborting. Try again later\n");
->>> +            return -EAGAIN;
->>> +        }
->>>           msleep(1);
->>> +    }
->>>       /* Flush pending VQ/configuration callbacks. */
->>>       vp_synchronize_vectors(vdev);
->>>       return 0;
->>
->
+-- 
+Vitaly
 
