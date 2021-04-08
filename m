@@ -2,196 +2,125 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4D4E3357BD3
-	for <lists+kvm@lfdr.de>; Thu,  8 Apr 2021 07:27:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 447CB357BE9
+	for <lists+kvm@lfdr.de>; Thu,  8 Apr 2021 07:39:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229579AbhDHF1x (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 8 Apr 2021 01:27:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46198 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229506AbhDHF1u (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 8 Apr 2021 01:27:50 -0400
-Received: from mail-ed1-x52e.google.com (mail-ed1-x52e.google.com [IPv6:2a00:1450:4864:20::52e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 46D79C061761
-        for <kvm@vger.kernel.org>; Wed,  7 Apr 2021 22:27:39 -0700 (PDT)
-Received: by mail-ed1-x52e.google.com with SMTP id f8so816094edd.11
-        for <kvm@vger.kernel.org>; Wed, 07 Apr 2021 22:27:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance-com.20150623.gappssmtp.com; s=20150623;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=XBsyg95HvfPCaEnZTpjOKu7MER6UdAU2kaoMscYQi8Y=;
-        b=jYfsBh72CrskhMRxL/8IYLk38hnv+O5xRQIsaEaOfaaGv6MA8Js14HzL5sJZWiXhNL
-         4vVpaQx4FKRolEe2JaiSI737LSOgjNz70Wvign3n/6dEKYvnmoPeu52M1I5KN3rVRfLG
-         u59LSRgb//zUFWs2xHSFXUj1fBed9EJiD23RGbQPzNO7GCwrI4OzqIv3lwF2Ya3yiC5K
-         9YkKazmFV9NsHEmi7KI74lApFXX+jGWDjYqn0qG2qumU3w1xUFkkVJ/sFXvkGbZInEuR
-         +dN7BY7FKVBwQWkVQzQwf41tAO9mQAY3/9eMYlEMJTt86hRFkrs3jS+jvTfJ8IeS/IZI
-         j7dw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=XBsyg95HvfPCaEnZTpjOKu7MER6UdAU2kaoMscYQi8Y=;
-        b=aKhmyRl+Sh4guMoZy2WfHPQQlTm+bYWE3j8m+vdevdT7UkzF6HA2/6MFMkcMOjwjFf
-         JjwnN4vDxGxW+dKjslAJVqP3N7pDqa9QC2gaL7Wayy4TgGeBHSHrTD1gwL1RDlU1+5ar
-         5Ms2bhyM+TNJxP7luMHNA7x7qtH7GpJ7Qm6IGs3Vx7Ft2YL1lgKlvtJSHTyrrHvzQiH1
-         O0VtwF4FuDyMIIDxnh7BAfoxFW7pfQA188A88EW/Qwco/IlKBAQ0TBur1LdoDp+hKnaO
-         zeYYGlImr+Z6xFbxwR/mLa1i/c6sG+xQ0unI2QFmQnCjwgweUDbUeLf3dYxUvQu1KMW/
-         IINw==
-X-Gm-Message-State: AOAM5319PiLyiZzAz67NzSJJfujeDSKnFinyv8es5dYHSmQHga8ZYiwt
-        bMV9w707DqyI0wNm5ob229F1aoWQneeACgp5unhG
-X-Google-Smtp-Source: ABdhPJw3cYEhtTY5BHRxiZkL1RHpeWMZaV4LAjqbpGDcn482YygWtNBA4BmOQyKwYeeY/hJkcq9H4uHf1KkDuCYwyek=
-X-Received: by 2002:a05:6402:6ca:: with SMTP id n10mr8976690edy.312.1617859657831;
- Wed, 07 Apr 2021 22:27:37 -0700 (PDT)
+        id S229745AbhDHFkI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 8 Apr 2021 01:40:08 -0400
+Received: from mga01.intel.com ([192.55.52.88]:35620 "EHLO mga01.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229512AbhDHFkH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 8 Apr 2021 01:40:07 -0400
+IronPort-SDR: 1NjWPzihncrvdfHrftvyxSL0CPpKrkdPfaq/lvoc3QOVi9hOp368Z6IUnJpA3dL6Lu7fsODx6d
+ 6qrBz6vgIbKw==
+X-IronPort-AV: E=McAfee;i="6000,8403,9947"; a="213865231"
+X-IronPort-AV: E=Sophos;i="5.82,205,1613462400"; 
+   d="scan'208";a="213865231"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Apr 2021 22:39:56 -0700
+IronPort-SDR: 1nFchG0VZE84cW6XjVn3o0HBS7z8MjplqzBG6Xp+pw4/ZQaO5x4nB9B+DBfeb0HsxmjRpFzKzP
+ rVqP6MDPNrXA==
+X-IronPort-AV: E=Sophos;i="5.82,205,1613462400"; 
+   d="scan'208";a="458674706"
+Received: from likexu-mobl1.ccr.corp.intel.com (HELO [10.238.4.93]) ([10.238.4.93])
+  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Apr 2021 22:39:51 -0700
+Subject: Re: [PATCH v4 08/16] KVM: x86/pmu: Add IA32_DS_AREA MSR emulation to
+ manage guest DS buffer
+To:     Peter Zijlstra <peterz@infradead.org>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, eranian@google.com,
+        andi@firstfloor.org, kan.liang@linux.intel.com,
+        wei.w.wang@intel.com, Wanpeng Li <wanpengli@tencent.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        x86@kernel.org, linux-kernel@vger.kernel.org,
+        Andi Kleen <ak@linux.intel.com>,
+        Like Xu <like.xu@linux.intel.com>
+References: <20210329054137.120994-1-like.xu@linux.intel.com>
+ <20210329054137.120994-9-like.xu@linux.intel.com>
+ <YG3SPsiFJPeXQXhq@hirez.programming.kicks-ass.net>
+From:   "Xu, Like" <like.xu@intel.com>
+Message-ID: <610bfd14-3250-0542-2d93-cbd15f2b4e16@intel.com>
+Date:   Thu, 8 Apr 2021 13:39:49 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.9.0
 MIME-Version: 1.0
-References: <20210331080519.172-1-xieyongji@bytedance.com> <20210331080519.172-9-xieyongji@bytedance.com>
- <30862242-293b-f42f-d8ce-2c31a52e3697@redhat.com>
-In-Reply-To: <30862242-293b-f42f-d8ce-2c31a52e3697@redhat.com>
-From:   Yongji Xie <xieyongji@bytedance.com>
-Date:   Thu, 8 Apr 2021 13:27:27 +0800
-Message-ID: <CACycT3t+nAWtHDzWxWRvVdcinQdmTx-PL8Rk7yfBt2RXiQCn6Q@mail.gmail.com>
-Subject: Re: Re: [PATCH v6 08/10] vduse: Implement an MMU-based IOMMU driver
-To:     Jason Wang <jasowang@redhat.com>
-Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        Parav Pandit <parav@nvidia.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Christian Brauner <christian.brauner@canonical.com>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Matthew Wilcox <willy@infradead.org>, viro@zeniv.linux.org.uk,
-        Jens Axboe <axboe@kernel.dk>, bcrl@kvack.org,
-        Jonathan Corbet <corbet@lwn.net>,
-        =?UTF-8?Q?Mika_Penttil=C3=A4?= <mika.penttila@nextfour.com>,
-        Dan Carpenter <dan.carpenter@oracle.com>,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        kvm@vger.kernel.org, linux-fsdevel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <YG3SPsiFJPeXQXhq@hirez.programming.kicks-ass.net>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Apr 8, 2021 at 11:26 AM Jason Wang <jasowang@redhat.com> wrote:
->
->
-> =E5=9C=A8 2021/3/31 =E4=B8=8B=E5=8D=884:05, Xie Yongji =E5=86=99=E9=81=93=
-:
-> > This implements an MMU-based IOMMU driver to support mapping
-> > kernel dma buffer into userspace. The basic idea behind it is
-> > treating MMU (VA->PA) as IOMMU (IOVA->PA). The driver will set
-> > up MMU mapping instead of IOMMU mapping for the DMA transfer so
-> > that the userspace process is able to use its virtual address to
-> > access the dma buffer in kernel.
-> >
-> > And to avoid security issue, a bounce-buffering mechanism is
-> > introduced to prevent userspace accessing the original buffer
-> > directly.
-> >
-> > Signed-off-by: Xie Yongji <xieyongji@bytedance.com>
->
->
-> Acked-by: Jason Wang <jasowang@redhat.com>
->
-> With some nits:
->
->
-> > ---
-> >   drivers/vdpa/vdpa_user/iova_domain.c | 521 ++++++++++++++++++++++++++=
-+++++++++
-> >   drivers/vdpa/vdpa_user/iova_domain.h |  70 +++++
-> >   2 files changed, 591 insertions(+)
-> >   create mode 100644 drivers/vdpa/vdpa_user/iova_domain.c
-> >   create mode 100644 drivers/vdpa/vdpa_user/iova_domain.h
->
->
-> [...]
->
->
-> > +static void vduse_domain_bounce(struct vduse_iova_domain *domain,
-> > +                             dma_addr_t iova, size_t size,
-> > +                             enum dma_data_direction dir)
-> > +{
-> > +     struct vduse_bounce_map *map;
-> > +     unsigned int offset;
-> > +     void *addr;
-> > +     size_t sz;
-> > +
-> > +     while (size) {
-> > +             map =3D &domain->bounce_maps[iova >> PAGE_SHIFT];
-> > +             offset =3D offset_in_page(iova);
-> > +             sz =3D min_t(size_t, PAGE_SIZE - offset, size);
-> > +
-> > +             if (WARN_ON(!map->bounce_page ||
-> > +                         map->orig_phys =3D=3D INVALID_PHYS_ADDR))
-> > +                     return;
-> > +
-> > +             addr =3D page_address(map->bounce_page) + offset;
-> > +             do_bounce(map->orig_phys + offset, addr, sz, dir);
-> > +             size -=3D sz;
-> > +             iova +=3D sz;
-> > +     }
-> > +}
-> > +
-> > +static struct page *
-> > +vduse_domain_get_mapping_page(struct vduse_iova_domain *domain, u64 io=
-va)
->
->
-> It's better to rename this as "vduse_domain_get_coherent_page?".
->
+Hi Peter,
 
-OK.
+Thanks for your detailed comments.
+
+If you have more comments for other patches, please let me know.
+
+On 2021/4/7 23:39, Peter Zijlstra wrote:
+> On Mon, Mar 29, 2021 at 01:41:29PM +0800, Like Xu wrote:
+>> @@ -3869,10 +3876,12 @@ static struct perf_guest_switch_msr *intel_guest_get_msrs(int *nr, void *data)
+>>   
+>>   		if (arr[1].guest)
+>>   			arr[0].guest |= arr[1].guest;
+>> -		else
+>> +		else {
+>>   			arr[1].guest = arr[1].host;
+>> +			arr[2].guest = arr[2].host;
+>> +		}
+> What's all this gibberish?
+>
+> The way I read that it says:
+>
+> 	if guest has PEBS_ENABLED
+> 		guest GLOBAL_CTRL |= PEBS_ENABLED
+> 	otherwise
+> 		guest PEBS_ENABLED = host PEBS_ENABLED
+> 		guest DS_AREA = host DS_AREA
+>
+> which is just completely random garbage afaict. Why would you leak host
+> msrs into the guest?
+
+In fact, this is not a leak at all.
+
+When we do "arr[i].guest = arr[i].host;" assignment in the 
+intel_guest_get_msrs(),
+the KVM will check "if (msrs[i].host == msrs[i].guest)" and if so, it 
+disables the atomic
+switch for this msr during vmx transaction in the caller 
+atomic_switch_perf_msrs().
+
+In that case, the msr value doesn't change and any guest write will be trapped.
+If the next check is "msrs[i].host != msrs[i].guest", the atomic switch 
+will be triggered again.
+
+Compared to before, this part of the logic has not changed, which helps to 
+reduce overhead.
+
+> Why would you change guest GLOBAL_CTRL implicitly;
+
+This is because in the early part of this function, we have operations:
+
+     if (x86_pmu.flags & PMU_FL_PEBS_ALL)
+         arr[0].guest &= ~cpuc->pebs_enabled;
+     else
+         arr[0].guest &= ~(cpuc->pebs_enabled & PEBS_COUNTER_MASK);
+
+and if guest has PEBS_ENABLED, we need these bits back for PEBS counters:
+
+     arr[0].guest |= arr[1].guest;
+
+> guest had better wrmsr that himself to control when stuff is enabled.
+
+When vm_entry, the msr value of GLOBAL_CTRL on the hardware may be
+different from trapped value "pmu->global_ctrl" written by the guest.
+
+If the perf scheduler cross maps guest counter X to the host counter Y,
+we have to enable the bit Y in GLOBAL_CTRL before vm_entry rather than X.
 
 >
-> > +{
-> > +     u64 start =3D iova & PAGE_MASK;
-> > +     u64 last =3D start + PAGE_SIZE - 1;
-> > +     struct vhost_iotlb_map *map;
-> > +     struct page *page =3D NULL;
-> > +
-> > +     spin_lock(&domain->iotlb_lock);
-> > +     map =3D vhost_iotlb_itree_first(domain->iotlb, start, last);
-> > +     if (!map)
-> > +             goto out;
-> > +
-> > +     page =3D pfn_to_page((map->addr + iova - map->start) >> PAGE_SHIF=
-T);
-> > +     get_page(page);
-> > +out:
-> > +     spin_unlock(&domain->iotlb_lock);
-> > +
-> > +     return page;
-> > +}
-> > +
->
->
-> [...]
->
->
-> > +
-> > +static dma_addr_t
-> > +vduse_domain_alloc_iova(struct iova_domain *iovad,
-> > +                     unsigned long size, unsigned long limit)
-> > +{
-> > +     unsigned long shift =3D iova_shift(iovad);
-> > +     unsigned long iova_len =3D iova_align(iovad, size) >> shift;
-> > +     unsigned long iova_pfn;
-> > +
-> > +     if (iova_len < (1 << (IOVA_RANGE_CACHE_MAX_SIZE - 1)))
-> > +             iova_len =3D roundup_pow_of_two(iova_len);
->
->
-> Let's add a comment as what has been done in dma-iommu.c?
->
+> This just cannot be right.
 
-Fine.
-
-> (In the future, it looks to me it's better to move them to
-> alloc_iova_fast()).
->
-
-Agree.
-
-Thanks,
-Yongji
