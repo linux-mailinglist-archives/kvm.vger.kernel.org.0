@@ -2,99 +2,181 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 363883583D8
-	for <lists+kvm@lfdr.de>; Thu,  8 Apr 2021 14:52:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5D1CC3583F1
+	for <lists+kvm@lfdr.de>; Thu,  8 Apr 2021 14:57:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231865AbhDHMwq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 8 Apr 2021 08:52:46 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:45210 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231801AbhDHMwc (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 8 Apr 2021 08:52:32 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1617886341;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=4S1xhqNTpv3IJ0yxypseMcfA4gi2Db1hR2vDlBKzCkU=;
-        b=A2VOyqkG7ycRDwOOA+/UauXuwzsJljvB3POHODVnH4QL/wXyIQAWDDCPgpTyzEFfQAvZGS
-        QJMaK7i6wyYFkn4PtbxFTErKol3GEOMBAhVYGUAWT12piHyvGcu2BRHuZOe9+qlNknmgSF
-        3WkyoykbxFKlKV9fzG6NDV2Dsac7F7o=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-475-BYJlc5nRNtKnYxJrl0WAHA-1; Thu, 08 Apr 2021 08:52:19 -0400
-X-MC-Unique: BYJlc5nRNtKnYxJrl0WAHA-1
-Received: by mail-ed1-f71.google.com with SMTP id j18so979667edv.6
-        for <kvm@vger.kernel.org>; Thu, 08 Apr 2021 05:52:19 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=4S1xhqNTpv3IJ0yxypseMcfA4gi2Db1hR2vDlBKzCkU=;
-        b=YjS6JJzVnHuFuaKOVVgJwHtt3ejudZi+nco+3dANNbfTHiDNggTcLGvEJEmHWHBWrl
-         nxAPptBk8HdfgGdXUV3l7nYfV348RNTwPwi8tAUQ9WXJEx8TdMTiBy7yI6hb7oB3/Chu
-         Qp3islCR7qPDeezJIu4VMAkrMZhXjq8Elx1XI62wqAgduYUFjypFfz6tMQhmydmcaX/n
-         w0TkmX2j9zD92I9vD9Y+DoDV//JbcOqlAgttfJDaptkOl9LpErSn4uJDepj/nCeR7aiY
-         Upp+SMuyX1pl9G+wx9torPg2g/Bx6JGtWeoLKQZVrwQ04GnRAIUDuBa3hfJJA71l1K+F
-         iDLA==
-X-Gm-Message-State: AOAM530WFEnBQVlRdDzFEMAQ7Jb5Pswht6iROMlAAFVQQxQmZaxMRQ5/
-        WYM0lmlM2CGM4AXgV+N5eFEC2go4LQ6h3ax1+FYAWcyHTcisyYFzjOz+RZ4s9sUplQHAv4/6+vN
-        WNkGeXpqvvkFe
-X-Received: by 2002:a50:9fa1:: with SMTP id c30mr2365353edf.66.1617886338690;
-        Thu, 08 Apr 2021 05:52:18 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyxbF93yjemzoR4e6xZdoBnB/y33lLc3fLY1c5uNkCMBQilxA+808u9E8cSRoq+VR5heR8REg==
-X-Received: by 2002:a50:9fa1:: with SMTP id c30mr2365326edf.66.1617886338487;
-        Thu, 08 Apr 2021 05:52:18 -0700 (PDT)
-Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id a12sm10363569ejy.87.2021.04.08.05.52.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 08 Apr 2021 05:52:18 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Siddharth Chandrasekaran <sidcha@amazon.de>
-Cc:     Alexander Graf <graf@amazon.com>,
-        Evgeny Iakovlev <eyakovl@amazon.de>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Sean Christopherson <seanjc@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>
-Subject: Re: [PATCH 3/4] KVM: x86: kvm_hv_flush_tlb use inputs from XMM
- registers
-In-Reply-To: <01fc0ac9-f159-d3df-6c8c-8f8122fe31ea@redhat.com>
-References: <20210407211954.32755-1-sidcha@amazon.de>
- <20210407211954.32755-4-sidcha@amazon.de>
- <87eefl7zp4.fsf@vitty.brq.redhat.com>
- <01fc0ac9-f159-d3df-6c8c-8f8122fe31ea@redhat.com>
-Date:   Thu, 08 Apr 2021 14:52:16 +0200
-Message-ID: <878s5t7xbz.fsf@vitty.brq.redhat.com>
+        id S231308AbhDHM6J (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 8 Apr 2021 08:58:09 -0400
+Received: from mail-bn8nam11on2045.outbound.protection.outlook.com ([40.107.236.45]:39606
+        "EHLO NAM11-BN8-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S229803AbhDHM6I (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 8 Apr 2021 08:58:08 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=YUG2xDU35g21u3jedkN/TO7/ahEIn+mIgK8++vrq6BS6jbvyLUsO6Ic8jYbvUjNGwN9WCIPy5mJwomw3isbS6xoFmtatIp1uA5Xh0wSBu1mdCkl1gn10suJcfoj0mX7vZEtGe63PwCi87ZoB6zwoovsXIwiFlN6CjaBWfkQsooMGni67QD2Je2Msb1AdZ3X6i53h/lV5yvyAUV7gVSjmcbISprYgP71RWnm0VgdDkHNYztN7zwEPHvhkrPZWw8jp6dXcB8NqsNI+iZiAYalB0PspRaTgz3fGbCeKwRiYAlvl2uv6AShO30Au46DtizXxYta/wqDeyPpIBtSXkHWvhQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=BOV2mMbph69FWw1d/prMNb7sGB6JcMqgNSXEAVNYhR4=;
+ b=ZqpI3d7+Uw9kWBXUIqowwv2aws6HGIDr6+SX384a3nq8Y5NdlbFi7Z1cGJ0/WMgaYSFo0mQO8UdfQJ+AofvEL8y2VbxbWlsUg92TZ5CP97L4u5BVqbUiejWStrIlM7UjQ9dLY3xUNcN+cnJgUlE3o1zI7gSQ6EShsCj374qXoUSpyIm9SwX2Vh53pzDvm2rQh5DOyOC8qziR35qKtKVa3EyGgKrMJ9vdSuCjeDwJ+Nqb3pYQntNJLVTCTeVtgQF/Xc3Bx98eE9JnCae/O/T18LWcYtzkXO6z0hCWwBzgitzoL4krmTYSNEuaO9DG3opBH6CycYGIwCX3/mJk1SWVKg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.112.34) smtp.rcpttodomain=redhat.com smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=none sp=none pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=BOV2mMbph69FWw1d/prMNb7sGB6JcMqgNSXEAVNYhR4=;
+ b=jbf509GypDkdnhcWoIu7PVCacBme7RWJn6pcIFWTx5BnvV8mFbnbokhVWFaBEjWGRcG88h876qNKIiUsvGuKDk1E66wO0SA5AzmaCrkZfGLs9pUWLIxdFgIl19BlTlWdv677t2d4nx1FrwAnLWdEZOf31QNhb2cz297mGl+4DGqtFZ6NnBytL2oCozbhwXrnsxY6DnkMH0yZmE2lYbp0zQf5Vjy89yK8zU/OqwePouw+MYFdRdBBRGbFIH5vRsZ9zEE0NYPv4lCkyvT9j1MYc2Jppn/IUFe7FNuqi5opNnDXheQWPfgBzUDst61dlWr850nq90Plv3kkE6Ngaky/Rg==
+Received: from BN6PR19CA0060.namprd19.prod.outlook.com (2603:10b6:404:e3::22)
+ by BN9PR12MB5321.namprd12.prod.outlook.com (2603:10b6:408:102::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4020.18; Thu, 8 Apr
+ 2021 12:57:56 +0000
+Received: from BN8NAM11FT034.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:404:e3:cafe::2f) by BN6PR19CA0060.outlook.office365.com
+ (2603:10b6:404:e3::22) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4020.16 via Frontend
+ Transport; Thu, 8 Apr 2021 12:57:56 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.112.34)
+ smtp.mailfrom=nvidia.com; redhat.com; dkim=none (message not signed)
+ header.d=none;redhat.com; dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.112.34 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.112.34; helo=mail.nvidia.com;
+Received: from mail.nvidia.com (216.228.112.34) by
+ BN8NAM11FT034.mail.protection.outlook.com (10.13.176.139) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ 15.20.4020.17 via Frontend Transport; Thu, 8 Apr 2021 12:57:56 +0000
+Received: from [172.27.15.189] (172.20.145.6) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Thu, 8 Apr
+ 2021 12:57:53 +0000
+Subject: Re: [PATCH v2 2/3] virito_pci: add timeout to reset device operation
+To:     Jason Wang <jasowang@redhat.com>, <mst@redhat.com>,
+        <kvm@vger.kernel.org>, <virtualization@lists.linux-foundation.org>
+CC:     <oren@nvidia.com>, <nitzanc@nvidia.com>, <cohuck@redhat.com>
+References: <20210408081109.56537-1-mgurtovoy@nvidia.com>
+ <20210408081109.56537-2-mgurtovoy@nvidia.com>
+ <2bead2b3-fa23-dc1e-3200-ddfa24944b75@redhat.com>
+ <a00abefe-790d-8239-ac42-9f70daa7a25c@nvidia.com>
+ <93221213-8fc3-96ef-7e89-b7c03bea5322@redhat.com>
+From:   Max Gurtovoy <mgurtovoy@nvidia.com>
+Message-ID: <7ed9cafa-498e-156d-c667-6da3fa432b18@nvidia.com>
+Date:   Thu, 8 Apr 2021 15:57:50 +0300
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.9.0
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <93221213-8fc3-96ef-7e89-b7c03bea5322@redhat.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-Originating-IP: [172.20.145.6]
+X-ClientProxiedBy: HQMAIL107.nvidia.com (172.20.187.13) To
+ HQMAIL107.nvidia.com (172.20.187.13)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 2e48e9b6-2c14-4140-b20c-08d8fa8dee38
+X-MS-TrafficTypeDiagnostic: BN9PR12MB5321:
+X-Microsoft-Antispam-PRVS: <BN9PR12MB53218C7634605D73A0E8FEAADE749@BN9PR12MB5321.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:8882;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: FMYnNUOK1NxLA95Yf+QWsEy9ghTGbrMpsBP28+fkMdgkcHiy2jC+zio7O169/8/qhoLSzO+AMJgAkPci4vC5Xx2HhK0mwyCeN7UK84Vvd7082SeJx9G8wsS3SzYLdJk6jL9uvoolP/a5n0HrSXE/wtGck2mvh8YmJ5o69rp+4CB/9JAaSsjKXTVe1/ZW/LtaJBGPSPipt34EJUW1V3fMpgXK3UFDkCbe5WTSJO4wjiUPwvblMZe+yb6pCQXoydsCpKnADM9CRTVpaYqM1oUqqI275H2yCWVOf2XzzfS+ae36wZnFQCTIvvaj08CxNQe5or7X+VQgbuhLnsuSfkamMfFSg4O01g9a0Eb6PkjrXmfDnJ4LHqQ0FjkXTRu7gE2wtI03SLpscRu7CUNMho5sI34uWb6jl70SD4UNrj/UhIBw3txhuLTMhNA/EMcFWTkxrVYJJ/kSLeQQO0oMWE7RO/VplmH2//BFfJZX7UTA8UxIakZ/kBPtVICQ7ezvfrflaroADJIdy1eLDpc7E09h9EeiaAlJTg+HmobMCO9h6DPZOaZWNk4O9OLtXvndmYYQM7576XAhl48X630FexuJa0Zv8ZPQmn2IhpjCa7nrhFg2GbvQ4Kjhdvuw9hZ+XO/arfU3Aghxe25wQ6ZJQSAqt0tMt4rv+GonJZ7VKPrYOWxe+xpMrErToAiVZyh91YA6
+X-Forefront-Antispam-Report: CIP:216.228.112.34;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:schybrid03.nvidia.com;CAT:NONE;SFS:(4636009)(376002)(346002)(39860400002)(136003)(396003)(36840700001)(46966006)(7636003)(336012)(36860700001)(36906005)(31686004)(82310400003)(16526019)(426003)(53546011)(316002)(5660300002)(2906002)(36756003)(2616005)(47076005)(4326008)(8676002)(31696002)(70586007)(83380400001)(356005)(70206006)(478600001)(86362001)(186003)(54906003)(16576012)(26005)(8936002)(82740400003)(110136005)(43740500002);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Apr 2021 12:57:56.5082
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2e48e9b6-2c14-4140-b20c-08d8fa8dee38
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.112.34];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource: BN8NAM11FT034.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN9PR12MB5321
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Paolo Bonzini <pbonzini@redhat.com> writes:
 
-> On 08/04/21 14:01, Vitaly Kuznetsov wrote:
->> 
->> Also, we can probably defer kvm_hv_hypercall_read_xmm() until we know
->> how many regs we actually need to not read them all (we will always
->> need xmm[0] I guess so we can as well read it here).
+On 4/8/2021 3:45 PM, Jason Wang wrote:
 >
-> The cost is get/put FPU, so I think there's not much to gain from that.
+> 在 2021/4/8 下午5:44, Max Gurtovoy 写道:
+>>
+>> On 4/8/2021 12:01 PM, Jason Wang wrote:
+>>>
+>>> 在 2021/4/8 下午4:11, Max Gurtovoy 写道:
+>>>> According to the spec after writing 0 to device_status, the driver 
+>>>> MUST
+>>>> wait for a read of device_status to return 0 before reinitializing the
+>>>> device. In case we have a device that won't return 0, the reset
+>>>> operation will loop forever and cause the host/vm to stuck. Set 
+>>>> timeout
+>>>> for 3 minutes before giving up on the device.
+>>>>
+>>>> Signed-off-by: Max Gurtovoy <mgurtovoy@nvidia.com>
+>>>> ---
+>>>>   drivers/virtio/virtio_pci_modern.c | 10 +++++++++-
+>>>>   1 file changed, 9 insertions(+), 1 deletion(-)
+>>>>
+>>>> diff --git a/drivers/virtio/virtio_pci_modern.c 
+>>>> b/drivers/virtio/virtio_pci_modern.c
+>>>> index cc3412a96a17..dcee616e8d21 100644
+>>>> --- a/drivers/virtio/virtio_pci_modern.c
+>>>> +++ b/drivers/virtio/virtio_pci_modern.c
+>>>> @@ -162,6 +162,7 @@ static int vp_reset(struct virtio_device *vdev)
+>>>>   {
+>>>>       struct virtio_pci_device *vp_dev = to_vp_device(vdev);
+>>>>       struct virtio_pci_modern_device *mdev = &vp_dev->mdev;
+>>>> +    unsigned long timeout = jiffies + msecs_to_jiffies(180000);
+>>>>         /* 0 status means a reset. */
+>>>>       vp_modern_set_status(mdev, 0);
+>>>> @@ -169,9 +170,16 @@ static int vp_reset(struct virtio_device *vdev)
+>>>>        * device_status to return 0 before reinitializing the device.
+>>>>        * This will flush out the status write, and flush in device 
+>>>> writes,
+>>>>        * including MSI-X interrupts, if any.
+>>>> +     * Set a timeout before giving up on the device.
+>>>>        */
+>>>> -    while (vp_modern_get_status(mdev))
+>>>> +    while (vp_modern_get_status(mdev)) {
+>>>> +        if (time_after(jiffies, timeout)) {
+>>>
+>>>
+>>> What happens if the device finish the rest after the timeout?
+>>
+>>
+>> The driver will set VIRTIO_CONFIG_S_FAILED and one can re-probe it 
+>> later on (e.g by re-scanning the pci bus).
 >
+>
+> Ok, so do we need the flush through vp_synchronize_vectors() here?
 
-Maybe, I just think that in most cases we will only need xmm0. To make
-the optimization work we can probably do kvm_get_fpu() once we figured
-out that we're dealing with XMM hypercall and do kvm_put_fpu() when
-we're done processing hypercall parameters. This way we don't need to do
-get/put twice. We can certainly leave this idea to the (possible) future
-optimizations.
+If the device didn't write 0 to status I guess we don't need that.
 
--- 
-Vitaly
+The device shouldn't raise any interrupt before negotiation finish 
+successfully.
 
+MST, is that correct ?
+
+>
+> Thanks
+>
+>
+>>
+>>
+>>>
+>>> Thanks
+>>>
+>>>
+>>>> + dev_err(&vdev->dev, "virtio: device not ready. "
+>>>> +                "Aborting. Try again later\n");
+>>>> +            return -EAGAIN;
+>>>> +        }
+>>>>           msleep(1);
+>>>> +    }
+>>>>       /* Flush pending VQ/configuration callbacks. */
+>>>>       vp_synchronize_vectors(vdev);
+>>>>       return 0;
+>>>
+>>
+>
