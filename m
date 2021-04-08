@@ -2,105 +2,335 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6723A357EA1
-	for <lists+kvm@lfdr.de>; Thu,  8 Apr 2021 11:01:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BFFD8357F0C
+	for <lists+kvm@lfdr.de>; Thu,  8 Apr 2021 11:23:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229714AbhDHJCA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 8 Apr 2021 05:02:00 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:60815 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229588AbhDHJB7 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 8 Apr 2021 05:01:59 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1617872507;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Bd0XkAkp0u7oQzy6N4znighkJ1TVo4lYhUV0ZZUVvFQ=;
-        b=VbYK43mImQgewJCSXKUU+1GOhJzvK4QH2DV9d2dz+tPkSeE3orATc+rOpaAHmux68eu0fC
-        bjdVx4KQFk3dHbzgZWGopYaDcrDUElGhcVnqa53lNILiw5TcqaYtoRF4tzCa5S7IAZt6Eq
-        xK0ARj65mdXpDNQ78NavvdgeNKc1AL8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-544-h-I7I4jcP2S4GNT2yL1UHg-1; Thu, 08 Apr 2021 05:01:45 -0400
-X-MC-Unique: h-I7I4jcP2S4GNT2yL1UHg-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2F14418766D2;
-        Thu,  8 Apr 2021 09:01:44 +0000 (UTC)
-Received: from wangxiaodeMacBook-Air.local (ovpn-13-53.pek2.redhat.com [10.72.13.53])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id AAED65C1C4;
-        Thu,  8 Apr 2021 09:01:34 +0000 (UTC)
-Subject: Re: [PATCH v2 2/3] virito_pci: add timeout to reset device operation
-To:     Max Gurtovoy <mgurtovoy@nvidia.com>, mst@redhat.com,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org
-Cc:     oren@nvidia.com, nitzanc@nvidia.com, cohuck@redhat.com
-References: <20210408081109.56537-1-mgurtovoy@nvidia.com>
- <20210408081109.56537-2-mgurtovoy@nvidia.com>
-From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <2bead2b3-fa23-dc1e-3200-ddfa24944b75@redhat.com>
-Date:   Thu, 8 Apr 2021 17:01:32 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
- Gecko/20100101 Thunderbird/78.9.0
+        id S231136AbhDHJX2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 8 Apr 2021 05:23:28 -0400
+Received: from szxga02-in.huawei.com ([45.249.212.188]:3521 "EHLO
+        szxga02-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230506AbhDHJX1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 8 Apr 2021 05:23:27 -0400
+Received: from DGGEML401-HUB.china.huawei.com (unknown [172.30.72.54])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4FGG3C6B8xzRYkc;
+        Thu,  8 Apr 2021 17:21:11 +0800 (CST)
+Received: from dggpemm500023.china.huawei.com (7.185.36.83) by
+ DGGEML401-HUB.china.huawei.com (10.3.17.32) with Microsoft SMTP Server (TLS)
+ id 14.3.498.0; Thu, 8 Apr 2021 17:23:12 +0800
+Received: from [10.174.187.128] (10.174.187.128) by
+ dggpemm500023.china.huawei.com (7.185.36.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id
+ 15.1.2106.2; Thu, 8 Apr 2021 17:23:12 +0800
+Subject: Re: [RFC PATCH v3 1/2] KVM: arm64: Move CMOs from user_mem_abort to
+ the fault handlers
+To:     Alexandru Elisei <alexandru.elisei@arm.com>,
+        Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        <kvmarm@lists.cs.columbia.edu>,
+        <linux-arm-kernel@lists.infradead.org>, <kvm@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>
+CC:     James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Gavin Shan <gshan@redhat.com>,
+        Quentin Perret <qperret@google.com>,
+        <wanghaibin.wang@huawei.com>, <zhukeqian1@huawei.com>,
+        <yuzenghui@huawei.com>
+References: <20210326031654.3716-1-wangyanan55@huawei.com>
+ <20210326031654.3716-2-wangyanan55@huawei.com>
+ <cd6c8a86-b7b2-3d3e-121a-c9d1cb23c4b3@arm.com>
+From:   "wangyanan (Y)" <wangyanan55@huawei.com>
+Message-ID: <b688cf37-16e6-d068-d97f-146c64afca08@huawei.com>
+Date:   Thu, 8 Apr 2021 17:23:11 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.4.0
 MIME-Version: 1.0
-In-Reply-To: <20210408081109.56537-2-mgurtovoy@nvidia.com>
-Content-Type: text/plain; charset=gbk; format=flowed
+In-Reply-To: <cd6c8a86-b7b2-3d3e-121a-c9d1cb23c4b3@arm.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Content-Language: en-US
+X-Originating-IP: [10.174.187.128]
+X-ClientProxiedBy: dggeme712-chm.china.huawei.com (10.1.199.108) To
+ dggpemm500023.china.huawei.com (7.185.36.83)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Hi Alex,
 
-ÔÚ 2021/4/8 ÏÂÎç4:11, Max Gurtovoy Ð´µÀ:
-> According to the spec after writing 0 to device_status, the driver MUST
-> wait for a read of device_status to return 0 before reinitializing the
-> device. In case we have a device that won't return 0, the reset
-> operation will loop forever and cause the host/vm to stuck. Set timeout
-> for 3 minutes before giving up on the device.
+On 2021/4/7 23:31, Alexandru Elisei wrote:
+> Hi Yanan,
 >
-> Signed-off-by: Max Gurtovoy <mgurtovoy@nvidia.com>
-> ---
->   drivers/virtio/virtio_pci_modern.c | 10 +++++++++-
->   1 file changed, 9 insertions(+), 1 deletion(-)
+> On 3/26/21 3:16 AM, Yanan Wang wrote:
+>> We currently uniformly permorm CMOs of D-cache and I-cache in function
+>> user_mem_abort before calling the fault handlers. If we get concurrent
+>> guest faults(e.g. translation faults, permission faults) or some really
+>> unnecessary guest faults caused by BBM, CMOs for the first vcpu are
+> I can't figure out what BBM means.
+Just as Will has explained, it's Break-Before-Make rule. When we need to
+replace an old table entry with a new one, we should firstly invalidate
+the old table entry(Break), before installation of the new entry(Make).
+
+And I think this patch mainly introduces benefits in two specific scenarios:
+1) In a VM startup, it will improve efficiency of handling page faults 
+incurred
+by vCPUs, when initially populating stage2 page tables.
+2) After live migration, the heavy workload will be resumed on the 
+destination
+VMs, however all the stage2 page tables need to be rebuilt.
+>> necessary while the others later are not.
+>>
+>> By moving CMOs to the fault handlers, we can easily identify conditions
+>> where they are really needed and avoid the unnecessary ones. As it's a
+>> time consuming process to perform CMOs especially when flushing a block
+>> range, so this solution reduces much load of kvm and improve efficiency
+>> of the page table code.
+>>
+>> So let's move both clean of D-cache and invalidation of I-cache to the
+>> map path and move only invalidation of I-cache to the permission path.
+>> Since the original APIs for CMOs in mmu.c are only called in function
+>> user_mem_abort, we now also move them to pgtable.c.
+>>
+>> Signed-off-by: Yanan Wang <wangyanan55@huawei.com>
+>> ---
+>>   arch/arm64/include/asm/kvm_mmu.h | 31 ---------------
+>>   arch/arm64/kvm/hyp/pgtable.c     | 68 +++++++++++++++++++++++++-------
+>>   arch/arm64/kvm/mmu.c             | 23 ++---------
+>>   3 files changed, 57 insertions(+), 65 deletions(-)
+>>
+>> diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
+>> index 90873851f677..c31f88306d4e 100644
+>> --- a/arch/arm64/include/asm/kvm_mmu.h
+>> +++ b/arch/arm64/include/asm/kvm_mmu.h
+>> @@ -177,37 +177,6 @@ static inline bool vcpu_has_cache_enabled(struct kvm_vcpu *vcpu)
+>>   	return (vcpu_read_sys_reg(vcpu, SCTLR_EL1) & 0b101) == 0b101;
+>>   }
+>>   
+>> -static inline void __clean_dcache_guest_page(kvm_pfn_t pfn, unsigned long size)
+>> -{
+>> -	void *va = page_address(pfn_to_page(pfn));
+>> -
+>> -	/*
+>> -	 * With FWB, we ensure that the guest always accesses memory using
+>> -	 * cacheable attributes, and we don't have to clean to PoC when
+>> -	 * faulting in pages. Furthermore, FWB implies IDC, so cleaning to
+>> -	 * PoU is not required either in this case.
+>> -	 */
+>> -	if (cpus_have_const_cap(ARM64_HAS_STAGE2_FWB))
+>> -		return;
+>> -
+>> -	kvm_flush_dcache_to_poc(va, size);
+>> -}
+>> -
+>> -static inline void __invalidate_icache_guest_page(kvm_pfn_t pfn,
+>> -						  unsigned long size)
+>> -{
+>> -	if (icache_is_aliasing()) {
+>> -		/* any kind of VIPT cache */
+>> -		__flush_icache_all();
+>> -	} else if (is_kernel_in_hyp_mode() || !icache_is_vpipt()) {
+>> -		/* PIPT or VPIPT at EL2 (see comment in __kvm_tlb_flush_vmid_ipa) */
+>> -		void *va = page_address(pfn_to_page(pfn));
+>> -
+>> -		invalidate_icache_range((unsigned long)va,
+>> -					(unsigned long)va + size);
+>> -	}
+>> -}
+>> -
+>>   void kvm_set_way_flush(struct kvm_vcpu *vcpu);
+>>   void kvm_toggle_cache(struct kvm_vcpu *vcpu, bool was_enabled);
+>>   
+>> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+>> index 4d177ce1d536..829a34eea526 100644
+>> --- a/arch/arm64/kvm/hyp/pgtable.c
+>> +++ b/arch/arm64/kvm/hyp/pgtable.c
+>> @@ -464,6 +464,43 @@ static int stage2_map_set_prot_attr(enum kvm_pgtable_prot prot,
+>>   	return 0;
+>>   }
+>>   
+>> +static bool stage2_pte_cacheable(kvm_pte_t pte)
+>> +{
+>> +	u64 memattr = pte & KVM_PTE_LEAF_ATTR_LO_S2_MEMATTR;
+>> +	return memattr == PAGE_S2_MEMATTR(NORMAL);
+>> +}
+>> +
+>> +static bool stage2_pte_executable(kvm_pte_t pte)
+>> +{
+>> +	return !(pte & KVM_PTE_LEAF_ATTR_HI_S2_XN);
+>> +}
+>> +
+>> +static void stage2_flush_dcache(void *addr, u64 size)
+>> +{
+>> +	/*
+>> +	 * With FWB, we ensure that the guest always accesses memory using
+>> +	 * cacheable attributes, and we don't have to clean to PoC when
+>> +	 * faulting in pages. Furthermore, FWB implies IDC, so cleaning to
+>> +	 * PoU is not required either in this case.
+>> +	 */
+>> +	if (cpus_have_const_cap(ARM64_HAS_STAGE2_FWB))
+>> +		return;
+>> +
+>> +	__flush_dcache_area(addr, size);
+>> +}
+>> +
+>> +static void stage2_invalidate_icache(void *addr, u64 size)
+>> +{
+>> +	if (icache_is_aliasing()) {
+>> +		/* Flush any kind of VIPT icache */
+>> +		__flush_icache_all();
+>> +	} else if (is_kernel_in_hyp_mode() || !icache_is_vpipt()) {
+>> +		/* PIPT or VPIPT at EL2 */
+>> +		invalidate_icache_range((unsigned long)addr,
+>> +					(unsigned long)addr + size);
+>> +	}
+>> +}
+>> +
+>>   static int stage2_map_walker_try_leaf(u64 addr, u64 end, u32 level,
+>>   				      kvm_pte_t *ptep,
+>>   				      struct stage2_map_data *data)
+>> @@ -495,6 +532,13 @@ static int stage2_map_walker_try_leaf(u64 addr, u64 end, u32 level,
+>>   		put_page(page);
+>>   	}
+>>   
+>> +	/* Perform CMOs before installation of the new PTE */
+>> +	if (!kvm_pte_valid(old) || stage2_pte_cacheable(old))
+> I'm not sure why the stage2_pte_cacheable(old) condition is needed.
 >
-> diff --git a/drivers/virtio/virtio_pci_modern.c b/drivers/virtio/virtio_pci_modern.c
-> index cc3412a96a17..dcee616e8d21 100644
-> --- a/drivers/virtio/virtio_pci_modern.c
-> +++ b/drivers/virtio/virtio_pci_modern.c
-> @@ -162,6 +162,7 @@ static int vp_reset(struct virtio_device *vdev)
->   {
->   	struct virtio_pci_device *vp_dev = to_vp_device(vdev);
->   	struct virtio_pci_modern_device *mdev = &vp_dev->mdev;
-> +	unsigned long timeout = jiffies + msecs_to_jiffies(180000);
->   
->   	/* 0 status means a reset. */
->   	vp_modern_set_status(mdev, 0);
-> @@ -169,9 +170,16 @@ static int vp_reset(struct virtio_device *vdev)
->   	 * device_status to return 0 before reinitializing the device.
->   	 * This will flush out the status write, and flush in device writes,
->   	 * including MSI-X interrupts, if any.
-> +	 * Set a timeout before giving up on the device.
->   	 */
-> -	while (vp_modern_get_status(mdev))
-> +	while (vp_modern_get_status(mdev)) {
-> +		if (time_after(jiffies, timeout)) {
+> kvm_handle_guest_abort() handles three types of stage 2 data or instruction
+> aborts: translation faults (fault_status == FSC_FAULT), access faults
+> (fault_status == FSC_ACCESS) and permission faults (fault_status == FSC_PERM).
+>
+> Access faults are handled in handle_access_fault(), which means user_mem_abort()
+> handles translation and permission faults.
+Yes, and we are certain that it's a translation fault here in 
+stage2_map_walker_try_leaf.
+> The original code did the dcache clean
+> + inval when not a permission fault, which means the CMO was done only on a
+> translation fault. Translation faults mean that the IPA was not mapped, so the old
+> entry will always be invalid. Even if we're coalescing multiple last level leaf
+> entries int oaÂ  block mapping, the table entry which is replaced is invalid
+> because it's marked as such in stage2_map_walk_table_pre().
+>
+> Is there something I'm missing?
+I originally thought that we could possibly have a translation fault on 
+a valid stage2 table
+descriptor due to some special cases, and that's the reason 
+stage2_pte_cacheable(old)
+condition exits, but I can't image any scenario like this.
 
+I think your above explanation is right, maybe I should just drop that 
+condition.
+>
+>> +		stage2_flush_dcache(__va(phys), granule);
+>> +
+>> +	if (stage2_pte_executable(new))
+>> +		stage2_invalidate_icache(__va(phys), granule);
+> This, together with the stage2_attr_walker() changes below, look identical to the
+> current code in user_mem_abort(). The executable permission is set on an exec
+> fault (instruction abort not on a stage 2 translation table walk), and as a result
+> of the fault we either need to map a new page here, or relax permissions in
+> kvm_pgtable_stage2_relax_perms() -> stage2_attr_walker() below.
+I agree.
+Do you mean this part of change is right?
 
-What happens if the device finish the rest after the timeout?
-
-Thanks
-
-
-> +			dev_err(&vdev->dev, "virtio: device not ready. "
-> +				"Aborting. Try again later\n");
-> +			return -EAGAIN;
-> +		}
->   		msleep(1);
-> +	}
->   	/* Flush pending VQ/configuration callbacks. */
->   	vp_synchronize_vectors(vdev);
->   	return 0;
-
+Thanks,
+Yanan
+> Thanks,
+>
+> Alex
+>
+>> +
+>>   	smp_store_release(ptep, new);
+>>   	get_page(page);
+>>   	data->phys += granule;
+>> @@ -651,20 +695,6 @@ int kvm_pgtable_stage2_map(struct kvm_pgtable *pgt, u64 addr, u64 size,
+>>   	return ret;
+>>   }
+>>   
+>> -static void stage2_flush_dcache(void *addr, u64 size)
+>> -{
+>> -	if (cpus_have_const_cap(ARM64_HAS_STAGE2_FWB))
+>> -		return;
+>> -
+>> -	__flush_dcache_area(addr, size);
+>> -}
+>> -
+>> -static bool stage2_pte_cacheable(kvm_pte_t pte)
+>> -{
+>> -	u64 memattr = pte & KVM_PTE_LEAF_ATTR_LO_S2_MEMATTR;
+>> -	return memattr == PAGE_S2_MEMATTR(NORMAL);
+>> -}
+>> -
+>>   static int stage2_unmap_walker(u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
+>>   			       enum kvm_pgtable_walk_flags flag,
+>>   			       void * const arg)
+>> @@ -743,8 +773,16 @@ static int stage2_attr_walker(u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
+>>   	 * but worst-case the access flag update gets lost and will be
+>>   	 * set on the next access instead.
+>>   	 */
+>> -	if (data->pte != pte)
+>> +	if (data->pte != pte) {
+>> +		/*
+>> +		 * Invalidate the instruction cache before updating
+>> +		 * if we are going to add the executable permission.
+>> +		 */
+>> +		if (!stage2_pte_executable(*ptep) && stage2_pte_executable(pte))
+>> +			stage2_invalidate_icache(kvm_pte_follow(pte),
+>> +						 kvm_granule_size(level));
+>>   		WRITE_ONCE(*ptep, pte);
+>> +	}
+>>   
+>>   	return 0;
+>>   }
+>> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+>> index 77cb2d28f2a4..1eec9f63bc6f 100644
+>> --- a/arch/arm64/kvm/mmu.c
+>> +++ b/arch/arm64/kvm/mmu.c
+>> @@ -609,16 +609,6 @@ void kvm_arch_mmu_enable_log_dirty_pt_masked(struct kvm *kvm,
+>>   	kvm_mmu_write_protect_pt_masked(kvm, slot, gfn_offset, mask);
+>>   }
+>>   
+>> -static void clean_dcache_guest_page(kvm_pfn_t pfn, unsigned long size)
+>> -{
+>> -	__clean_dcache_guest_page(pfn, size);
+>> -}
+>> -
+>> -static void invalidate_icache_guest_page(kvm_pfn_t pfn, unsigned long size)
+>> -{
+>> -	__invalidate_icache_guest_page(pfn, size);
+>> -}
+>> -
+>>   static void kvm_send_hwpoison_signal(unsigned long address, short lsb)
+>>   {
+>>   	send_sig_mceerr(BUS_MCEERR_AR, (void __user *)address, lsb, current);
+>> @@ -882,13 +872,8 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>>   	if (writable)
+>>   		prot |= KVM_PGTABLE_PROT_W;
+>>   
+>> -	if (fault_status != FSC_PERM && !device)
+>> -		clean_dcache_guest_page(pfn, vma_pagesize);
+>> -
+>> -	if (exec_fault) {
+>> +	if (exec_fault)
+>>   		prot |= KVM_PGTABLE_PROT_X;
+>> -		invalidate_icache_guest_page(pfn, vma_pagesize);
+>> -	}
+>>   
+>>   	if (device)
+>>   		prot |= KVM_PGTABLE_PROT_DEVICE;
+>> @@ -1144,10 +1129,10 @@ int kvm_set_spte_hva(struct kvm *kvm, unsigned long hva, pte_t pte)
+>>   	trace_kvm_set_spte_hva(hva);
+>>   
+>>   	/*
+>> -	 * We've moved a page around, probably through CoW, so let's treat it
+>> -	 * just like a translation fault and clean the cache to the PoC.
+>> +	 * We've moved a page around, probably through CoW, so let's treat
+>> +	 * it just like a translation fault and the map handler will clean
+>> +	 * the cache to the PoC.
+>>   	 */
+>> -	clean_dcache_guest_page(pfn, PAGE_SIZE);
+>>   	handle_hva_to_gpa(kvm, hva, end, &kvm_set_spte_handler, &pfn);
+>>   	return 0;
+>>   }
+> .
