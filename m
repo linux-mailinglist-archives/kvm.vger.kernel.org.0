@@ -2,140 +2,392 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2FE33358900
-	for <lists+kvm@lfdr.de>; Thu,  8 Apr 2021 17:57:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 76B413588FF
+	for <lists+kvm@lfdr.de>; Thu,  8 Apr 2021 17:56:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232017AbhDHP5K (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 8 Apr 2021 11:57:10 -0400
-Received: from smtp-fw-9102.amazon.com ([207.171.184.29]:45251 "EHLO
-        smtp-fw-9102.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231893AbhDHP5I (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 8 Apr 2021 11:57:08 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.de; i=@amazon.de; q=dns/txt; s=amazon201209;
-  t=1617897418; x=1649433418;
-  h=date:from:to:cc:message-id:references:mime-version:
-   in-reply-to:subject;
-  bh=7PBS5e2WyJ69c6rfp53RALIlaSpOGlnG+OF+BW1TqaQ=;
-  b=f2D5zbUqCCavbex5zny1t7OjGYnnpu9i681VvzGrMezI1eusc/HoJDKg
-   VDXG5/nbaWFvLvEDmKJuThsUKdbFbP5aKUFWddT8XYZSr2ytmuxgTidks
-   WRctx7hMhjPGnseH4UzWTUZd7IIOz9Q4KwKT5A078YZBu1oh8y1BEBP0y
-   4=;
-X-IronPort-AV: E=Sophos;i="5.82,206,1613433600"; 
-   d="scan'208";a="126144841"
-Subject: Re: [PATCH 4/4] KVM: hyper-v: Advertise support for fast XMM hypercalls
-Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO email-inbound-relay-1e-a70de69e.us-east-1.amazon.com) ([10.43.8.2])
-  by smtp-border-fw-out-9102.sea19.amazon.com with ESMTP; 08 Apr 2021 15:56:50 +0000
-Received: from EX13D28EUC003.ant.amazon.com (iad12-ws-svc-p26-lb9-vlan2.iad.amazon.com [10.40.163.34])
-        by email-inbound-relay-1e-a70de69e.us-east-1.amazon.com (Postfix) with ESMTPS id 81305A196F;
-        Thu,  8 Apr 2021 15:56:43 +0000 (UTC)
-Received: from u366d62d47e3651.ant.amazon.com (10.43.161.102) by
- EX13D28EUC003.ant.amazon.com (10.43.164.43) with Microsoft SMTP Server (TLS)
- id 15.0.1497.2; Thu, 8 Apr 2021 15:56:35 +0000
-Date:   Thu, 8 Apr 2021 17:56:31 +0200
-From:   Siddharth Chandrasekaran <sidcha@amazon.de>
-To:     Wei Liu <wei.liu@kernel.org>
-CC:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Alexander Graf <graf@amazon.com>,
-        Evgeny Iakovlev <eyakovl@amazon.de>,
-        <linux-hyperv@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <kvm@vger.kernel.org>, "K. Y. Srinivasan" <kys@microsoft.com>,
-        Haiyang Zhang <haiyangz@microsoft.com>,
-        "Stephen Hemminger" <sthemmin@microsoft.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        <x86@kernel.org>, "H. Peter Anvin" <hpa@zytor.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>
-Message-ID: <20210408155630.GD32315@u366d62d47e3651.ant.amazon.com>
-References: <20210407211954.32755-1-sidcha@amazon.de>
- <20210407211954.32755-5-sidcha@amazon.de>
- <87blap7zha.fsf@vitty.brq.redhat.com>
- <20210408142053.GA10636@u366d62d47e3651.ant.amazon.com>
- <20210408154446.mtatlrheoq7hpoaq@liuwe-devbox-debian-v2>
+        id S231919AbhDHP5J (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 8 Apr 2021 11:57:09 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:38173 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231772AbhDHP5I (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 8 Apr 2021 11:57:08 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1617897416;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=7gWqzZ7HSG5rO5rh2OHr3zzEwfoBButfWUmVF2jq9Go=;
+        b=A/9NzszxZCEnN9Sf0aIYxyocXlA3xkK5FgU5F0NGqyWSNzNUQJd8oaK++LigthVg0x8Bwd
+        ifByx6wlFmqT64udATCVoh01D5OF5UjsqEe1KdrfE9lKX8DSNTzVggKba1/gQ8d0KeRnC1
+        qph3t2xsKmDdy641bcOnJgNZbNJyEBU=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-427-l4ZYYvMnNYCEWIQh5zKuwA-1; Thu, 08 Apr 2021 11:56:55 -0400
+X-MC-Unique: l4ZYYvMnNYCEWIQh5zKuwA-1
+Received: by mail-wm1-f71.google.com with SMTP id r18so587348wmq.5
+        for <kvm@vger.kernel.org>; Thu, 08 Apr 2021 08:56:54 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=7gWqzZ7HSG5rO5rh2OHr3zzEwfoBButfWUmVF2jq9Go=;
+        b=I6fX0WDPt8KRqLtQO5d+h+4QXAtt44e/bzFwkegPIDbQxMsoOXKKbFcfZ+oAfEzPHu
+         omq1nzEqnjYP0ODoy/B1cRIkzS80+hgr6OOZoXS4bbze2C5DUWNl4IaG5pztXA+eU8XA
+         R5RI2+/Cg/u8son4IU1JK41C/lQpMIl5HB9+yD7nGfviL303MZoQV/tYbFAshsydjpm2
+         GlvKxTJ3Q/IMpuqXew6W9g5KMYGzaXzCcaCGh2gG85CuX7pZVj5mP+QSB+cGm8RiRbtz
+         jrp9t1/VJj8palMI/mFJV6XeQrD3fs4oZzTUGyBh87vDonewHzYmQmc7mUSpFnoamsto
+         eCGA==
+X-Gm-Message-State: AOAM532Uohmn5CopNJap490MA4zBd7YSOOUGy9vIqIQHqhH3NcZ4/Mj3
+        vLjSza8dS5YC/28KgHT7x+F8oGSorgOV4luzUqAo1YQfywkhF6EuG5aBzd0+xo/dD5zvzZUAaYf
+        w3EyaxbjpQwt7
+X-Received: by 2002:adf:dd4c:: with SMTP id u12mr12245386wrm.424.1617897413499;
+        Thu, 08 Apr 2021 08:56:53 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxCXqumOuMoKAuVInQCf9FLyIed+SH8jyxCub+CW+6ugtvcKLkS5XDd7ATjTybLOiRUcg43Pg==
+X-Received: by 2002:adf:dd4c:: with SMTP id u12mr12245363wrm.424.1617897413268;
+        Thu, 08 Apr 2021 08:56:53 -0700 (PDT)
+Received: from redhat.com ([2a10:800e:f0d3:0:b69b:9fb8:3947:5636])
+        by smtp.gmail.com with ESMTPSA id x12sm37584448wrr.7.2021.04.08.08.56.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 08 Apr 2021 08:56:52 -0700 (PDT)
+Date:   Thu, 8 Apr 2021 11:56:49 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Max Gurtovoy <mgurtovoy@nvidia.com>
+Cc:     Jason Wang <jasowang@redhat.com>, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, oren@nvidia.com,
+        nitzanc@nvidia.com, cohuck@redhat.com
+Subject: Re: [PATCH v2 1/3] virtio: update reset callback to return status
+Message-ID: <20210408115524-mutt-send-email-mst@kernel.org>
+References: <20210408081109.56537-1-mgurtovoy@nvidia.com>
+ <16fa0e31-a305-3b41-b0d3-ad76aa00177b@redhat.com>
+ <1f134102-4ccb-57e3-858d-3922d851ce8a@nvidia.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20210408154446.mtatlrheoq7hpoaq@liuwe-devbox-debian-v2>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-Originating-IP: [10.43.161.102]
-X-ClientProxiedBy: EX13D29UWC001.ant.amazon.com (10.43.162.143) To
- EX13D28EUC003.ant.amazon.com (10.43.164.43)
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <1f134102-4ccb-57e3-858d-3922d851ce8a@nvidia.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Apr 08, 2021 at 03:44:46PM +0000, Wei Liu wrote:
-> CAUTION: This email originated from outside of the organization. Do not click links or open attachments unless you can confirm the sender and know the content is safe.
->
->
->
-> On Thu, Apr 08, 2021 at 04:20:54PM +0200, Siddharth Chandrasekaran wrote:
-> > On Thu, Apr 08, 2021 at 02:05:53PM +0200, Vitaly Kuznetsov wrote:
-> > > Siddharth Chandrasekaran <sidcha@amazon.de> writes:
-> > >
-> > > > Now that all extant hypercalls that can use XMM registers (based on
-> > > > spec) for input/outputs are patched to support them, we can start
-> > > > advertising this feature to guests.
-> > > >
-> > > > Cc: Alexander Graf <graf@amazon.com>
-> > > > Cc: Evgeny Iakovlev <eyakovl@amazon.de>
-> > > > Signed-off-by: Siddharth Chandrasekaran <sidcha@amazon.de>
-> > > > ---
-> > > >  arch/x86/include/asm/hyperv-tlfs.h | 4 ++--
-> > > >  arch/x86/kvm/hyperv.c              | 1 +
-> > > >  2 files changed, 3 insertions(+), 2 deletions(-)
-> > > >
-> > > > diff --git a/arch/x86/include/asm/hyperv-tlfs.h b/arch/x86/include/asm/hyperv-tlfs.h
-> > > > index e6cd3fee562b..1f160ef60509 100644
-> > > > --- a/arch/x86/include/asm/hyperv-tlfs.h
-> > > > +++ b/arch/x86/include/asm/hyperv-tlfs.h
-> > > > @@ -49,10 +49,10 @@
-> > > >  /* Support for physical CPU dynamic partitioning events is available*/
-> > > >  #define HV_X64_CPU_DYNAMIC_PARTITIONING_AVAILABLE    BIT(3)
-> > > >  /*
-> > > > - * Support for passing hypercall input parameter block via XMM
-> > > > + * Support for passing hypercall input and output parameter block via XMM
-> > > >   * registers is available
-> > > >   */
-> > > > -#define HV_X64_HYPERCALL_PARAMS_XMM_AVAILABLE                BIT(4)
-> > > > +#define HV_X64_HYPERCALL_PARAMS_XMM_AVAILABLE                BIT(4) | BIT(15)
-> > >
-> > > TLFS 6.0b states that there are two distinct bits for input and output:
-> > >
-> > > CPUID Leaf 0x40000003.EDX:
-> > > Bit 4: support for passing hypercall input via XMM registers is available.
-> > > Bit 15: support for returning hypercall output via XMM registers is available.
-> > >
-> > > and HV_X64_HYPERCALL_PARAMS_XMM_AVAILABLE is not currently used
-> > > anywhere, I'd suggest we just rename
-> > >
-> > > HV_X64_HYPERCALL_PARAMS_XMM_AVAILABLE to HV_X64_HYPERCALL_XMM_INPUT_AVAILABLE
-> > > and add HV_X64_HYPERCALL_XMM_OUTPUT_AVAILABLE (bit 15).
-> >
-> > That is how I had it initially; but then noticed that we would never
-> > need to use either of them separately. So it seemed like a reasonable
-> > abstraction to put them together.
-> >
->
-> They are two separate things in TLFS. Please use two macros here.
+On Thu, Apr 08, 2021 at 12:56:52PM +0300, Max Gurtovoy wrote:
+> 
+> On 4/8/2021 11:58 AM, Jason Wang wrote:
+> > 
+> > 在 2021/4/8 下午4:11, Max Gurtovoy 写道:
+> > > The reset device operation, usually is an operation that might fail from
+> > > various reasons. For example, the controller might be in a bad state and
+> > > can't answer to any request. Usually, the paravirt SW based virtio
+> > > devices always succeed in reset operation but this is not the case for
+> > > HW based virtio devices.
+> > 
+> > 
+> > I would like to know under what condition that the reset operation may
+> > fail (except for the case of a bugg guest).
+> 
+> The controller might not be ready or stuck. This is a real use case for many
+> PCI devices.
+> 
+> For real devices the FW might be in a bad state and it can happen also for
+> paravirt device if you have a bug in the controller code or if you entered
+> some error flow (Out of memory).
+> 
+> You don't want to be stuck because of one bad device.
 
-Ack, will split them.
-
-~ Sid.
+OK so maybe we can do more to detect the bad device.
+Won't we get all 1's on a read in this case?
 
 
-
-Amazon Development Center Germany GmbH
-Krausenstr. 38
-10117 Berlin
-Geschaeftsfuehrung: Christian Schlaeger, Jonathan Weiss
-Eingetragen am Amtsgericht Charlottenburg unter HRB 149173 B
-Sitz: Berlin
-Ust-ID: DE 289 237 879
-
-
+> 
+> > 
+> > 
+> > > 
+> > > This commit is also a preparation for adding a timeout mechanism for
+> > > resetting virtio devices.
+> > > 
+> > > Signed-off-by: Max Gurtovoy <mgurtovoy@nvidia.com>
+> > > ---
+> > > 
+> > > changes from v1:
+> > >   - update virtio_ccw.c (Cornelia)
+> > >   - update virtio_uml.c
+> > >   - update mlxbf-tmfifo.c
+> > 
+> > 
+> > Note that virtio driver may call reset, so you probably need to convert
+> > them.
+> 
+> I'm sure I understand.
+> 
+> Convert to what ?
+> 
+> Thanks.
+> 
+> > 
+> > Thanks
+> > 
+> > 
+> > > 
+> > > ---
+> > >   arch/um/drivers/virtio_uml.c             |  4 +++-
+> > >   drivers/platform/mellanox/mlxbf-tmfifo.c |  4 +++-
+> > >   drivers/remoteproc/remoteproc_virtio.c   |  4 +++-
+> > >   drivers/s390/virtio/virtio_ccw.c         |  9 ++++++---
+> > >   drivers/virtio/virtio.c                  | 22 +++++++++++++++-------
+> > >   drivers/virtio/virtio_mmio.c             |  3 ++-
+> > >   drivers/virtio/virtio_pci_legacy.c       |  4 +++-
+> > >   drivers/virtio/virtio_pci_modern.c       |  3 ++-
+> > >   drivers/virtio/virtio_vdpa.c             |  4 +++-
+> > >   include/linux/virtio_config.h            |  5 +++--
+> > >   10 files changed, 43 insertions(+), 19 deletions(-)
+> > > 
+> > > diff --git a/arch/um/drivers/virtio_uml.c b/arch/um/drivers/virtio_uml.c
+> > > index 91ddf74ca888..b6e66265ed32 100644
+> > > --- a/arch/um/drivers/virtio_uml.c
+> > > +++ b/arch/um/drivers/virtio_uml.c
+> > > @@ -827,11 +827,13 @@ static void vu_set_status(struct virtio_device
+> > > *vdev, u8 status)
+> > >       vu_dev->status = status;
+> > >   }
+> > >   -static void vu_reset(struct virtio_device *vdev)
+> > > +static int vu_reset(struct virtio_device *vdev)
+> > >   {
+> > >       struct virtio_uml_device *vu_dev = to_virtio_uml_device(vdev);
+> > >         vu_dev->status = 0;
+> > > +
+> > > +    return 0;
+> > >   }
+> > >     static void vu_del_vq(struct virtqueue *vq)
+> > > diff --git a/drivers/platform/mellanox/mlxbf-tmfifo.c
+> > > b/drivers/platform/mellanox/mlxbf-tmfifo.c
+> > > index bbc4e71a16ff..c192b8ac5d9e 100644
+> > > --- a/drivers/platform/mellanox/mlxbf-tmfifo.c
+> > > +++ b/drivers/platform/mellanox/mlxbf-tmfifo.c
+> > > @@ -980,11 +980,13 @@ static void
+> > > mlxbf_tmfifo_virtio_set_status(struct virtio_device *vdev,
+> > >   }
+> > >     /* Reset the device. Not much here for now. */
+> > > -static void mlxbf_tmfifo_virtio_reset(struct virtio_device *vdev)
+> > > +static int mlxbf_tmfifo_virtio_reset(struct virtio_device *vdev)
+> > >   {
+> > >       struct mlxbf_tmfifo_vdev *tm_vdev = mlxbf_vdev_to_tmfifo(vdev);
+> > >         tm_vdev->status = 0;
+> > > +
+> > > +    return 0;
+> > >   }
+> > >     /* Read the value of a configuration field. */
+> > > diff --git a/drivers/remoteproc/remoteproc_virtio.c
+> > > b/drivers/remoteproc/remoteproc_virtio.c
+> > > index 0cc617f76068..ca9573c62c3d 100644
+> > > --- a/drivers/remoteproc/remoteproc_virtio.c
+> > > +++ b/drivers/remoteproc/remoteproc_virtio.c
+> > > @@ -191,7 +191,7 @@ static void rproc_virtio_set_status(struct
+> > > virtio_device *vdev, u8 status)
+> > >       dev_dbg(&vdev->dev, "status: %d\n", status);
+> > >   }
+> > >   -static void rproc_virtio_reset(struct virtio_device *vdev)
+> > > +static int rproc_virtio_reset(struct virtio_device *vdev)
+> > >   {
+> > >       struct rproc_vdev *rvdev = vdev_to_rvdev(vdev);
+> > >       struct fw_rsc_vdev *rsc;
+> > > @@ -200,6 +200,8 @@ static void rproc_virtio_reset(struct
+> > > virtio_device *vdev)
+> > >         rsc->status = 0;
+> > >       dev_dbg(&vdev->dev, "reset !\n");
+> > > +
+> > > +    return 0;
+> > >   }
+> > >     /* provide the vdev features as retrieved from the firmware */
+> > > diff --git a/drivers/s390/virtio/virtio_ccw.c
+> > > b/drivers/s390/virtio/virtio_ccw.c
+> > > index 54e686dca6de..52b32555e746 100644
+> > > --- a/drivers/s390/virtio/virtio_ccw.c
+> > > +++ b/drivers/s390/virtio/virtio_ccw.c
+> > > @@ -732,14 +732,15 @@ static int virtio_ccw_find_vqs(struct
+> > > virtio_device *vdev, unsigned nvqs,
+> > >       return ret;
+> > >   }
+> > >   -static void virtio_ccw_reset(struct virtio_device *vdev)
+> > > +static int virtio_ccw_reset(struct virtio_device *vdev)
+> > >   {
+> > >       struct virtio_ccw_device *vcdev = to_vc_device(vdev);
+> > >       struct ccw1 *ccw;
+> > > +    int ret;
+> > >         ccw = ccw_device_dma_zalloc(vcdev->cdev, sizeof(*ccw));
+> > >       if (!ccw)
+> > > -        return;
+> > > +        return -ENOMEM;
+> > >         /* Zero status bits. */
+> > >       vcdev->dma_area->status = 0;
+> > > @@ -749,8 +750,10 @@ static void virtio_ccw_reset(struct
+> > > virtio_device *vdev)
+> > >       ccw->flags = 0;
+> > >       ccw->count = 0;
+> > >       ccw->cda = 0;
+> > > -    ccw_io_helper(vcdev, ccw, VIRTIO_CCW_DOING_RESET);
+> > > +    ret = ccw_io_helper(vcdev, ccw, VIRTIO_CCW_DOING_RESET);
+> > >       ccw_device_dma_free(vcdev->cdev, ccw, sizeof(*ccw));
+> > > +
+> > > +    return ret;
+> > >   }
+> > >     static u64 virtio_ccw_get_features(struct virtio_device *vdev)
+> > > diff --git a/drivers/virtio/virtio.c b/drivers/virtio/virtio.c
+> > > index 4b15c00c0a0a..ddbfd5b5f3bd 100644
+> > > --- a/drivers/virtio/virtio.c
+> > > +++ b/drivers/virtio/virtio.c
+> > > @@ -338,7 +338,7 @@ int register_virtio_device(struct virtio_device
+> > > *dev)
+> > >       /* Assign a unique device index and hence name. */
+> > >       err = ida_simple_get(&virtio_index_ida, 0, 0, GFP_KERNEL);
+> > >       if (err < 0)
+> > > -        goto out;
+> > > +        goto out_err;
+> > >         dev->index = err;
+> > >       dev_set_name(&dev->dev, "virtio%u", dev->index);
+> > > @@ -349,7 +349,9 @@ int register_virtio_device(struct virtio_device
+> > > *dev)
+> > >         /* We always start by resetting the device, in case a previous
+> > >        * driver messed it up.  This also tests that code path a
+> > > little. */
+> > > -    dev->config->reset(dev);
+> > > +    err = dev->config->reset(dev);
+> > > +    if (err)
+> > > +        goto out_ida;
+> > >         /* Acknowledge that we've seen the device. */
+> > >       virtio_add_status(dev, VIRTIO_CONFIG_S_ACKNOWLEDGE);
+> > > @@ -362,10 +364,14 @@ int register_virtio_device(struct
+> > > virtio_device *dev)
+> > >        */
+> > >       err = device_add(&dev->dev);
+> > >       if (err)
+> > > -        ida_simple_remove(&virtio_index_ida, dev->index);
+> > > -out:
+> > > -    if (err)
+> > > -        virtio_add_status(dev, VIRTIO_CONFIG_S_FAILED);
+> > > +        goto out_ida;
+> > > +
+> > > +    return 0;
+> > > +
+> > > +out_ida:
+> > > +    ida_simple_remove(&virtio_index_ida, dev->index);
+> > > +out_err:
+> > > +    virtio_add_status(dev, VIRTIO_CONFIG_S_FAILED);
+> > >       return err;
+> > >   }
+> > >   EXPORT_SYMBOL_GPL(register_virtio_device);
+> > > @@ -408,7 +414,9 @@ int virtio_device_restore(struct virtio_device *dev)
+> > >         /* We always start by resetting the device, in case a previous
+> > >        * driver messed it up. */
+> > > -    dev->config->reset(dev);
+> > > +    ret = dev->config->reset(dev);
+> > > +    if (ret)
+> > > +        goto err;
+> > >         /* Acknowledge that we've seen the device. */
+> > >       virtio_add_status(dev, VIRTIO_CONFIG_S_ACKNOWLEDGE);
+> > > diff --git a/drivers/virtio/virtio_mmio.c b/drivers/virtio/virtio_mmio.c
+> > > index 56128b9c46eb..12b8f048c48d 100644
+> > > --- a/drivers/virtio/virtio_mmio.c
+> > > +++ b/drivers/virtio/virtio_mmio.c
+> > > @@ -256,12 +256,13 @@ static void vm_set_status(struct virtio_device
+> > > *vdev, u8 status)
+> > >       writel(status, vm_dev->base + VIRTIO_MMIO_STATUS);
+> > >   }
+> > >   -static void vm_reset(struct virtio_device *vdev)
+> > > +static int vm_reset(struct virtio_device *vdev)
+> > >   {
+> > >       struct virtio_mmio_device *vm_dev = to_virtio_mmio_device(vdev);
+> > >         /* 0 status means a reset. */
+> > >       writel(0, vm_dev->base + VIRTIO_MMIO_STATUS);
+> > > +    return 0;
+> > >   }
+> > >     diff --git a/drivers/virtio/virtio_pci_legacy.c
+> > > b/drivers/virtio/virtio_pci_legacy.c
+> > > index d62e9835aeec..0b5d95e3efa1 100644
+> > > --- a/drivers/virtio/virtio_pci_legacy.c
+> > > +++ b/drivers/virtio/virtio_pci_legacy.c
+> > > @@ -89,7 +89,7 @@ static void vp_set_status(struct virtio_device
+> > > *vdev, u8 status)
+> > >       iowrite8(status, vp_dev->ioaddr + VIRTIO_PCI_STATUS);
+> > >   }
+> > >   -static void vp_reset(struct virtio_device *vdev)
+> > > +static int vp_reset(struct virtio_device *vdev)
+> > >   {
+> > >       struct virtio_pci_device *vp_dev = to_vp_device(vdev);
+> > >       /* 0 status means a reset. */
+> > > @@ -99,6 +99,8 @@ static void vp_reset(struct virtio_device *vdev)
+> > >       ioread8(vp_dev->ioaddr + VIRTIO_PCI_STATUS);
+> > >       /* Flush pending VQ/configuration callbacks. */
+> > >       vp_synchronize_vectors(vdev);
+> > > +
+> > > +    return 0;
+> > >   }
+> > >     static u16 vp_config_vector(struct virtio_pci_device *vp_dev,
+> > > u16 vector)
+> > > diff --git a/drivers/virtio/virtio_pci_modern.c
+> > > b/drivers/virtio/virtio_pci_modern.c
+> > > index fbd4ebc00eb6..cc3412a96a17 100644
+> > > --- a/drivers/virtio/virtio_pci_modern.c
+> > > +++ b/drivers/virtio/virtio_pci_modern.c
+> > > @@ -158,7 +158,7 @@ static void vp_set_status(struct virtio_device
+> > > *vdev, u8 status)
+> > >       vp_modern_set_status(&vp_dev->mdev, status);
+> > >   }
+> > >   -static void vp_reset(struct virtio_device *vdev)
+> > > +static int vp_reset(struct virtio_device *vdev)
+> > >   {
+> > >       struct virtio_pci_device *vp_dev = to_vp_device(vdev);
+> > >       struct virtio_pci_modern_device *mdev = &vp_dev->mdev;
+> > > @@ -174,6 +174,7 @@ static void vp_reset(struct virtio_device *vdev)
+> > >           msleep(1);
+> > >       /* Flush pending VQ/configuration callbacks. */
+> > >       vp_synchronize_vectors(vdev);
+> > > +    return 0;
+> > >   }
+> > >     static u16 vp_config_vector(struct virtio_pci_device *vp_dev,
+> > > u16 vector)
+> > > diff --git a/drivers/virtio/virtio_vdpa.c b/drivers/virtio/virtio_vdpa.c
+> > > index e28acf482e0c..5fd4e627a9b0 100644
+> > > --- a/drivers/virtio/virtio_vdpa.c
+> > > +++ b/drivers/virtio/virtio_vdpa.c
+> > > @@ -97,11 +97,13 @@ static void virtio_vdpa_set_status(struct
+> > > virtio_device *vdev, u8 status)
+> > >       return ops->set_status(vdpa, status);
+> > >   }
+> > >   -static void virtio_vdpa_reset(struct virtio_device *vdev)
+> > > +static int virtio_vdpa_reset(struct virtio_device *vdev)
+> > >   {
+> > >       struct vdpa_device *vdpa = vd_get_vdpa(vdev);
+> > >         vdpa_reset(vdpa);
+> > > +
+> > > +    return 0;
+> > >   }
+> > >     static bool virtio_vdpa_notify(struct virtqueue *vq)
+> > > diff --git a/include/linux/virtio_config.h
+> > > b/include/linux/virtio_config.h
+> > > index 8519b3ae5d52..d2b0f1699a75 100644
+> > > --- a/include/linux/virtio_config.h
+> > > +++ b/include/linux/virtio_config.h
+> > > @@ -44,9 +44,10 @@ struct virtio_shm_region {
+> > >    *    status: the new status byte
+> > >    * @reset: reset the device
+> > >    *    vdev: the virtio device
+> > > - *    After this, status and feature negotiation must be done again
+> > > + *    Upon success, status and feature negotiation must be done again
+> > >    *    Device must not be reset from its vq/config callbacks, or in
+> > >    *    parallel with being added/removed.
+> > > + *    Returns 0 on success or error status.
+> > >    * @find_vqs: find virtqueues and instantiate them.
+> > >    *    vdev: the virtio_device
+> > >    *    nvqs: the number of virtqueues to find
+> > > @@ -82,7 +83,7 @@ struct virtio_config_ops {
+> > >       u32 (*generation)(struct virtio_device *vdev);
+> > >       u8 (*get_status)(struct virtio_device *vdev);
+> > >       void (*set_status)(struct virtio_device *vdev, u8 status);
+> > > -    void (*reset)(struct virtio_device *vdev);
+> > > +    int (*reset)(struct virtio_device *vdev);
+> > >       int (*find_vqs)(struct virtio_device *, unsigned nvqs,
+> > >               struct virtqueue *vqs[], vq_callback_t *callbacks[],
+> > >               const char * const names[], const bool *ctx,
+> > 
 
