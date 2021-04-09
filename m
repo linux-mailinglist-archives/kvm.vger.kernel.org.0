@@ -2,219 +2,121 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id ECE7D35A4E1
-	for <lists+kvm@lfdr.de>; Fri,  9 Apr 2021 19:46:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3822A35A51F
+	for <lists+kvm@lfdr.de>; Fri,  9 Apr 2021 19:59:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234174AbhDIRqy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 9 Apr 2021 13:46:54 -0400
-Received: from foss.arm.com ([217.140.110.172]:56286 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S233332AbhDIRqy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 9 Apr 2021 13:46:54 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id CD1011FB;
-        Fri,  9 Apr 2021 10:46:40 -0700 (PDT)
-Received: from C02W217MHV2R.local (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 09FC03F792;
-        Fri,  9 Apr 2021 10:46:39 -0700 (PDT)
-Subject: Re: [PATCH kvm-unit-tests 8/8] arm/arm64: psci: don't assume method
- is hvc
-To:     Andrew Jones <drjones@redhat.com>, kvm@vger.kernel.org
-Cc:     alexandru.elisei@arm.com, andre.przywara@arm.com,
-        eric.auger@redhat.com
-References: <20210407185918.371983-1-drjones@redhat.com>
- <20210407185918.371983-9-drjones@redhat.com>
-From:   Nikos Nikoleris <nikos.nikoleris@arm.com>
-Message-ID: <660cfeb4-c411-8335-0351-716a98faf0ae@arm.com>
-Date:   Fri, 9 Apr 2021 18:46:33 +0100
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
- Gecko/20100101 Thunderbird/78.9.0
+        id S234349AbhDIR73 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 9 Apr 2021 13:59:29 -0400
+Received: from mail-il1-f197.google.com ([209.85.166.197]:47792 "EHLO
+        mail-il1-f197.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234049AbhDIR72 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 9 Apr 2021 13:59:28 -0400
+Received: by mail-il1-f197.google.com with SMTP id h21so3973591ila.14
+        for <kvm@vger.kernel.org>; Fri, 09 Apr 2021 10:59:15 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
+        bh=0+Ew6rNNg3ztpKhQhG/z/BAPWHH+xWvZmjOvCb1fdu8=;
+        b=TUwjWCilEs+eo5MhdsaGsL8G99HcjZtiFcdXldNddEEDPzaMivmqGfZT5szIgj6bdr
+         x4jZG3nNCZZ67LK6mKwyXuxxU2MDvNhjkiy25zVeFL8vH0/5Kaq+1RCTshpO3EeQ6bJd
+         jxojWt3i26SE7ydzAVKeGku34zLP6RSlW0Kxo2q4GjzO2DEPSZsHiFTRltQjfXIgcIi/
+         LjOrQOVHOgiSuuXGCu7aAoKKClSyTpIwdEG25TjlF31Uni6nIM+FBk4oJcflvHRVnu9V
+         BVy70Q4AQqv2bCUtFIwKyZQyUDvz6/QW9MGT0YZyHN5GBsLoTuPakgCRHMYfilPSRJo6
+         AiGQ==
+X-Gm-Message-State: AOAM533PK4xTvq6GrQ5dz1O/OGrGJK00pLmTpy/lnPhGmdhL5PpM51jY
+        oKT3hlQ9wA2HlzYXNn0SY+YguK4+7jnh57DWsacXDvI6sshl
+X-Google-Smtp-Source: ABdhPJzkQ8GpqnpBVrEegTqvzPxggMdUSz72bWw5uFKXrGcQBqAvYcvPw96M9nSuvyJIMq+fJ1pLRoxWv7LEAw2mn8I7p7x6vJjO
 MIME-Version: 1.0
-In-Reply-To: <20210407185918.371983-9-drjones@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+X-Received: by 2002:a02:c908:: with SMTP id t8mr15943562jao.78.1617991155447;
+ Fri, 09 Apr 2021 10:59:15 -0700 (PDT)
+Date:   Fri, 09 Apr 2021 10:59:15 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <00000000000012002d05bf8dec8d@google.com>
+Subject: [syzbot] BUG: spinlock bad magic in erofs_pcpubuf_growsize
+From:   syzbot <syzbot+d6a0e4b80bd39f54c2f6@syzkaller.appspotmail.com>
+To:     akpm@linux-foundation.org, bp@alien8.de, chao@kernel.org,
+        hpa@zytor.com, jmattson@google.com, joro@8bytes.org,
+        kvm@vger.kernel.org, linux-erofs@lists.ozlabs.org,
+        linux-kernel@vger.kernel.org, mark.rutland@arm.com,
+        masahiroy@kernel.org, mingo@redhat.com, pbonzini@redhat.com,
+        peterz@infradead.org, rafael.j.wysocki@intel.com,
+        rostedt@goodmis.org, seanjc@google.com,
+        syzkaller-bugs@googlegroups.com, tglx@linutronix.de,
+        vkuznets@redhat.com, wanpengli@tencent.com, will@kernel.org,
+        x86@kernel.org, xiang@kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 07/04/2021 19:59, Andrew Jones wrote:
-> The method can also be smc and it will be when running on bare metal.
-> 
-> Signed-off-by: Andrew Jones <drjones@redhat.com>
-> ---
->   arm/selftest.c     | 34 +++++++---------------------------
->   lib/arm/asm/psci.h |  9 +++++++--
->   lib/arm/psci.c     | 17 +++++++++++++++--
->   lib/arm/setup.c    | 22 ++++++++++++++++++++++
->   4 files changed, 51 insertions(+), 31 deletions(-)
-> 
-> diff --git a/arm/selftest.c b/arm/selftest.c
-> index 4495b161cdd5..9f459ed3d571 100644
-> --- a/arm/selftest.c
-> +++ b/arm/selftest.c
-> @@ -400,33 +400,13 @@ static void check_vectors(void *arg __unused)
->   	exit(report_summary());
->   }
->   
-> -static bool psci_check(void)
-> +static void psci_print(void)
->   {
-> -	const struct fdt_property *method;
-> -	int node, len, ver;
-> -
-> -	node = fdt_node_offset_by_compatible(dt_fdt(), -1, "arm,psci-0.2");
-> -	if (node < 0) {
-> -		printf("PSCI v0.2 compatibility required\n");
-> -		return false;
-> -	}
-> -
-> -	method = fdt_get_property(dt_fdt(), node, "method", &len);
-> -	if (method == NULL) {
-> -		printf("bad psci device tree node\n");
-> -		return false;
-> -	}
-> -
-> -	if (len < 4 || strcmp(method->data, "hvc") != 0) {
-> -		printf("psci method must be hvc\n");
-> -		return false;
-> -	}
-> -
-> -	ver = psci_invoke(PSCI_0_2_FN_PSCI_VERSION, 0, 0, 0);
-> -	printf("PSCI version %d.%d\n", PSCI_VERSION_MAJOR(ver),
-> -				       PSCI_VERSION_MINOR(ver));
-> -
-> -	return true;
-> +	int ver = psci_invoke(PSCI_0_2_FN_PSCI_VERSION, 0, 0, 0);
-> +	report_info("PSCI version: %d.%d", PSCI_VERSION_MAJOR(ver),
-> +					  PSCI_VERSION_MINOR(ver));
-> +	report_info("PSCI method: %s", psci_invoke == psci_invoke_hvc ?
-> +				       "hvc" : "smc");
->   }
->   
->   static void cpu_report(void *data __unused)
-> @@ -465,7 +445,7 @@ int main(int argc, char **argv)
->   
->   	} else if (strcmp(argv[1], "smp") == 0) {
->   
-> -		report(psci_check(), "PSCI version");
-> +		psci_print();
->   		on_cpus(cpu_report, NULL);
->   		while (!cpumask_full(&ready))
->   			cpu_relax();
-> diff --git a/lib/arm/asm/psci.h b/lib/arm/asm/psci.h
-> index 7b956bf5987d..e385ce27f5d1 100644
-> --- a/lib/arm/asm/psci.h
-> +++ b/lib/arm/asm/psci.h
-> @@ -3,8 +3,13 @@
->   #include <libcflat.h>
->   #include <linux/psci.h>
->   
-> -extern int psci_invoke(unsigned long function_id, unsigned long arg0,
-> -		       unsigned long arg1, unsigned long arg2);
-> +typedef int (*psci_invoke_fn)(unsigned long function_id, unsigned long arg0,
-> +			      unsigned long arg1, unsigned long arg2);
-> +extern psci_invoke_fn psci_invoke;
-> +extern int psci_invoke_hvc(unsigned long function_id, unsigned long arg0,
-> +			   unsigned long arg1, unsigned long arg2);
-> +extern int psci_invoke_smc(unsigned long function_id, unsigned long arg0,
-> +			   unsigned long arg1, unsigned long arg2);
->   extern int psci_cpu_on(unsigned long cpuid, unsigned long entry_point);
->   extern void psci_system_reset(void);
->   extern int cpu_psci_cpu_boot(unsigned int cpu);
-> diff --git a/lib/arm/psci.c b/lib/arm/psci.c
-> index 936c83948b6a..46300f30822c 100644
-> --- a/lib/arm/psci.c
-> +++ b/lib/arm/psci.c
-> @@ -11,9 +11,11 @@
->   #include <asm/page.h>
->   #include <asm/smp.h>
->   
-> +psci_invoke_fn psci_invoke;
-> +
->   __attribute__((noinline))
-> -int psci_invoke(unsigned long function_id, unsigned long arg0,
-> -		unsigned long arg1, unsigned long arg2)
-> +int psci_invoke_hvc(unsigned long function_id, unsigned long arg0,
-> +		    unsigned long arg1, unsigned long arg2)
->   {
->   	asm volatile(
->   		"hvc #0"
-> @@ -22,6 +24,17 @@ int psci_invoke(unsigned long function_id, unsigned long arg0,
->   	return function_id;
->   }
->   
-> +__attribute__((noinline))
+Hello,
 
-Is noinline necessary? We shouldn't be calling psci_invoke_smc and 
-psci_invoke_hmc directly, it's unlikely that the compiler will have a 
-chance to inline them. But I might be missing something here because I 
-don't see why it was there in psci_invoke either.
+syzbot found the following issue on:
 
-Otherwise Reviewed-by: Nikos Nikoleris <nikos.nikoleris@arm.com>
+HEAD commit:    9c54130c Add linux-next specific files for 20210406
+git tree:       linux-next
+console output: https://syzkaller.appspot.com/x/log.txt?x=1654617ed00000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=d125958c3995ddcd
+dashboard link: https://syzkaller.appspot.com/bug?extid=d6a0e4b80bd39f54c2f6
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=101a5786d00000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1147dd0ed00000
 
-Thanks,
+The issue was bisected to:
 
-Nikos
+commit 997acaf6b4b59c6a9c259740312a69ea549cc684
+Author: Mark Rutland <mark.rutland@arm.com>
+Date:   Mon Jan 11 15:37:07 2021 +0000
 
-> +int psci_invoke_smc(unsigned long function_id, unsigned long arg0,
-> +		    unsigned long arg1, unsigned long arg2)
-> +{
-> +	asm volatile(
-> +		"smc #0"
-> +	: "+r" (function_id)
-> +	: "r" (arg0), "r" (arg1), "r" (arg2));
-> +	return function_id;
-> +}
-> +
->   int psci_cpu_on(unsigned long cpuid, unsigned long entry_point)
->   {
->   #ifdef __arm__
-> diff --git a/lib/arm/setup.c b/lib/arm/setup.c
-> index 5cda2d919d2b..e595a9e5a167 100644
-> --- a/lib/arm/setup.c
-> +++ b/lib/arm/setup.c
-> @@ -25,6 +25,7 @@
->   #include <asm/processor.h>
->   #include <asm/smp.h>
->   #include <asm/timer.h>
-> +#include <asm/psci.h>
->   
->   #include "io.h"
->   
-> @@ -55,6 +56,26 @@ int mpidr_to_cpu(uint64_t mpidr)
->   	return -1;
->   }
->   
-> +static void psci_set_conduit(void)
-> +{
-> +	const void *fdt = dt_fdt();
-> +	const struct fdt_property *method;
-> +	int node, len;
-> +
-> +	node = fdt_node_offset_by_compatible(fdt, -1, "arm,psci-0.2");
-> +	assert_msg(node >= 0, "PSCI v0.2 compatibility required");
-> +
-> +	method = fdt_get_property(fdt, node, "method", &len);
-> +	assert(method != NULL && len == 4);
-> +
-> +	if (strcmp(method->data, "hvc") == 0)
-> +		psci_invoke = psci_invoke_hvc;
-> +	else if (strcmp(method->data, "smc") == 0)
-> +		psci_invoke = psci_invoke_smc;
-> +	else
-> +		assert_msg(false, "Unknown PSCI conduit: %s", method->data);
-> +}
-> +
->   static void cpu_set(int fdtnode __unused, u64 regval, void *info __unused)
->   {
->   	int cpu = nr_cpus++;
-> @@ -259,6 +280,7 @@ void setup(const void *fdt, phys_addr_t freemem_start)
->   	mem_regions_add_assumed();
->   	mem_init(PAGE_ALIGN((unsigned long)freemem));
->   
-> +	psci_set_conduit();
->   	cpu_init();
->   
->   	/* cpu_init must be called before thread_info_init */
-> 
+    lockdep: report broken irq restoration
+
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=11d8d7aad00000
+final oops:     https://syzkaller.appspot.com/x/report.txt?x=13d8d7aad00000
+console output: https://syzkaller.appspot.com/x/log.txt?x=15d8d7aad00000
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+d6a0e4b80bd39f54c2f6@syzkaller.appspotmail.com
+Fixes: 997acaf6b4b5 ("lockdep: report broken irq restoration")
+
+loop0: detected capacity change from 0 to 31
+BUG: spinlock bad magic on CPU#1, syz-executor062/8434
+ lock: 0xffff8880b9c31d60, .magic: 00000000, .owner: <none>/-1, .owner_cpu: 0
+CPU: 1 PID: 8434 Comm: syz-executor062 Not tainted 5.12.0-rc6-next-20210406-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
+Call Trace:
+ __dump_stack lib/dump_stack.c:79 [inline]
+ dump_stack+0x141/0x1d7 lib/dump_stack.c:120
+ debug_spin_lock_before kernel/locking/spinlock_debug.c:83 [inline]
+ do_raw_spin_lock+0x216/0x2b0 kernel/locking/spinlock_debug.c:112
+ erofs_pcpubuf_growsize+0x36f/0x620 fs/erofs/pcpubuf.c:83
+ z_erofs_load_lz4_config+0x1ef/0x3e0 fs/erofs/decompressor.c:64
+ erofs_read_superblock fs/erofs/super.c:331 [inline]
+ erofs_fc_fill_super+0xe84/0x1d10 fs/erofs/super.c:499
+ get_tree_bdev+0x440/0x760 fs/super.c:1293
+ vfs_get_tree+0x89/0x2f0 fs/super.c:1498
+ do_new_mount fs/namespace.c:2905 [inline]
+ path_mount+0x132a/0x1fa0 fs/namespace.c:3235
+ do_mount fs/namespace.c:3248 [inline]
+ __do_sys_mount fs/namespace.c:3456 [inline]
+ __se_sys_mount fs/namespace.c:3433 [inline]
+ __x64_sys_mount+0x27f/0x300 fs/namespace.c:3433
+ do_syscall_64+0x2d/0x70 arch/x86/entry/common.c:46
+ entry_SYSCALL_64_after_hwframe+0x44/0xae
+RIP: 0033:0x444f7a
+Code: 83 c4 08 5b 5d c3 66 2e 0f 1f 84 00 00 00 00 00 c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 49 89 ca b8 a5 00 00 00 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 c0 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007ffe1fa3c2a8 EFLAGS: 00000286 ORIG_RAX: 00000000000000a5
+RAX: ffffffffffffffda RBX: 00007ffe1fa3c300 RCX: 0000000000444f7a
+RDX: 0000000020000000 RSI: 0000000020000100 RDI: 00007ffe1fa3c2c0
+RBP: 00007ffe1fa3c2c0 R08: 00007ffe1fa3c300 R09: 
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+syzbot can test patches for this issue, for details see:
+https://goo.gl/tpsmEJ#testing-patches
