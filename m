@@ -2,21 +2,21 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 28D6F359354
-	for <lists+kvm@lfdr.de>; Fri,  9 Apr 2021 05:45:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9DBAE35934D
+	for <lists+kvm@lfdr.de>; Fri,  9 Apr 2021 05:45:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233308AbhDIDpJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 8 Apr 2021 23:45:09 -0400
-Received: from szxga04-in.huawei.com ([45.249.212.190]:15641 "EHLO
+        id S233310AbhDIDpF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 8 Apr 2021 23:45:05 -0400
+Received: from szxga04-in.huawei.com ([45.249.212.190]:15640 "EHLO
         szxga04-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232662AbhDIDo7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S233273AbhDIDo7 (ORCPT <rfc822;kvm@vger.kernel.org>);
         Thu, 8 Apr 2021 23:44:59 -0400
 Received: from DGGEMS414-HUB.china.huawei.com (unknown [172.30.72.60])
-        by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4FGkTL29g4znYts;
+        by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4FGkTL39vRznYwQ;
         Fri,  9 Apr 2021 11:41:58 +0800 (CST)
 Received: from DESKTOP-7FEPK9S.china.huawei.com (10.174.184.135) by
  DGGEMS414-HUB.china.huawei.com (10.3.19.214) with Microsoft SMTP Server id
- 14.3.498.0; Fri, 9 Apr 2021 11:44:36 +0800
+ 14.3.498.0; Fri, 9 Apr 2021 11:44:38 +0800
 From:   Shenming Lu <lushenming@huawei.com>
 To:     Alex Williamson <alex.williamson@redhat.com>,
         Cornelia Huck <cohuck@redhat.com>,
@@ -35,9 +35,9 @@ CC:     Kevin Tian <kevin.tian@intel.com>,
         Barry Song <song.bao.hua@hisilicon.com>,
         <wanghaibin.wang@huawei.com>, <yuzenghui@huawei.com>,
         <lushenming@huawei.com>
-Subject: [RFC PATCH v3 3/8] vfio/type1: Add an MMU notifier to avoid pinning
-Date:   Fri, 9 Apr 2021 11:44:15 +0800
-Message-ID: <20210409034420.1799-4-lushenming@huawei.com>
+Subject: [RFC PATCH v3 4/8] vfio/type1: Pre-map more pages than requested in the IOPF handling
+Date:   Fri, 9 Apr 2021 11:44:16 +0800
+Message-ID: <20210409034420.1799-5-lushenming@huawei.com>
 X-Mailer: git-send-email 2.27.0.windows.1
 In-Reply-To: <20210409034420.1799-1-lushenming@huawei.com>
 References: <20210409034420.1799-1-lushenming@huawei.com>
@@ -50,174 +50,181 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-To avoid pinning pages when they are mapped in IOMMU page tables, we
-add an MMU notifier to tell the addresses which are no longer valid
-and try to unmap them.
+To optimize for fewer page fault handlings, we can pre-map more pages
+than requested at once.
+
+Note that IOPF_PREMAP_LEN is just an arbitrary value for now, which we
+could try further tuning.
 
 Signed-off-by: Shenming Lu <lushenming@huawei.com>
 ---
- drivers/vfio/vfio_iommu_type1.c | 112 +++++++++++++++++++++++++++++++-
- 1 file changed, 109 insertions(+), 3 deletions(-)
+ drivers/vfio/vfio_iommu_type1.c | 131 ++++++++++++++++++++++++++++++--
+ 1 file changed, 123 insertions(+), 8 deletions(-)
 
 diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-index ab0ff60ee207..1cb9d1f2717b 100644
+index 1cb9d1f2717b..01e296c6dc9e 100644
 --- a/drivers/vfio/vfio_iommu_type1.c
 +++ b/drivers/vfio/vfio_iommu_type1.c
-@@ -40,6 +40,7 @@
- #include <linux/notifier.h>
- #include <linux/dma-iommu.h>
- #include <linux/irqdomain.h>
-+#include <linux/mmu_notifier.h>
- 
- #define DRIVER_VERSION  "0.2"
- #define DRIVER_AUTHOR   "Alex Williamson <alex.williamson@redhat.com>"
-@@ -69,6 +70,7 @@ struct vfio_iommu {
- 	struct mutex		lock;
- 	struct rb_root		dma_list;
- 	struct blocking_notifier_head notifier;
-+	struct mmu_notifier	mn;
- 	unsigned int		dma_avail;
- 	unsigned int		vaddr_invalid_count;
- 	uint64_t		pgsize_bitmap;
-@@ -1204,6 +1206,72 @@ static long vfio_unmap_unpin(struct vfio_iommu *iommu, struct vfio_dma *dma,
- 	return unlocked;
+@@ -3217,6 +3217,91 @@ static int vfio_iommu_type1_dirty_pages(struct vfio_iommu *iommu,
+ 	return -EINVAL;
  }
  
-+/* Unmap the IOPF mapped pages in the specified range. */
-+static void vfio_unmap_partial_iopf(struct vfio_iommu *iommu,
-+				    struct vfio_dma *dma,
-+				    dma_addr_t start, dma_addr_t end)
++/*
++ * To optimize for fewer page fault handlings, try to
++ * pre-map more pages than requested.
++ */
++#define IOPF_PREMAP_LEN		512
++
++/*
++ * Return 0 on success or a negative error code, the
++ * number of pages contiguously pinned is in @pinned.
++ */
++static int pin_pages_iopf(struct vfio_dma *dma, unsigned long vaddr,
++			  unsigned long npages, unsigned long *pfn_base,
++			  unsigned long *pinned, struct vfio_batch *batch)
 +{
-+	struct iommu_iotlb_gather *gathers;
-+	struct vfio_domain *d;
-+	int i, num_domains = 0;
++	struct mm_struct *mm;
++	unsigned long pfn;
++	int ret = 0;
++	*pinned = 0;
 +
-+	list_for_each_entry(d, &iommu->domain_list, next)
-+		num_domains++;
++	mm = get_task_mm(dma->task);
++	if (!mm)
++		return -ENODEV;
 +
-+	gathers = kzalloc(sizeof(*gathers) * num_domains, GFP_KERNEL);
-+	if (gathers) {
-+		for (i = 0; i < num_domains; i++)
-+			iommu_iotlb_gather_init(&gathers[i]);
++	if (batch->size) {
++		*pfn_base = page_to_pfn(batch->pages[batch->offset]);
++		pfn = *pfn_base;
++	} else {
++		*pfn_base = 0;
 +	}
 +
-+	while (start < end) {
-+		unsigned long bit_offset;
-+		size_t len;
++	while (npages) {
++		if (!batch->size) {
++			unsigned long req_pages = min_t(unsigned long, npages,
++							batch->capacity);
 +
-+		bit_offset = (start - dma->iova) >> PAGE_SHIFT;
++			ret = vaddr_get_pfns(mm, vaddr, req_pages, dma->prot,
++					     &pfn, batch->pages);
++			if (ret < 0)
++				goto out;
 +
-+		for (len = 0; start + len < end; len += PAGE_SIZE) {
-+			if (!IOPF_MAPPED_BITMAP_GET(dma,
-+					bit_offset + (len >> PAGE_SHIFT)))
++			batch->size = ret;
++			batch->offset = 0;
++			ret = 0;
++
++			if (!*pfn_base)
++				*pfn_base = pfn;
++		}
++
++		while (true) {
++			if (pfn != *pfn_base + *pinned)
++				goto out;
++
++			(*pinned)++;
++			npages--;
++			vaddr += PAGE_SIZE;
++			batch->offset++;
++			batch->size--;
++
++			if (!batch->size)
 +				break;
++
++			pfn = page_to_pfn(batch->pages[batch->offset]);
 +		}
 +
-+		if (len) {
-+			i = 0;
-+			list_for_each_entry(d, &iommu->domain_list, next) {
-+				size_t unmapped;
-+
-+				if (gathers)
-+					unmapped = iommu_unmap_fast(d->domain,
-+								    start, len,
-+								    &gathers[i++]);
-+				else
-+					unmapped = iommu_unmap(d->domain,
-+							       start, len);
-+
-+				if (WARN_ON(unmapped != len))
-+					goto out;
-+			}
-+
-+			bitmap_clear(dma->iopf_mapped_bitmap,
-+				     bit_offset, len >> PAGE_SHIFT);
-+
-+			cond_resched();
-+		}
-+
-+		start += (len + PAGE_SIZE);
++		if (unlikely(disable_hugepages))
++			break;
 +	}
 +
 +out:
-+	if (gathers) {
-+		i = 0;
-+		list_for_each_entry(d, &iommu->domain_list, next)
-+			iommu_iotlb_sync(d->domain, &gathers[i++]);
-+
-+		kfree(gathers);
++	if (batch->size == 1 && !batch->offset) {
++		put_pfn(pfn, dma->prot);
++		batch->size = 0;
 +	}
++
++	mmput(mm);
++	return ret;
 +}
 +
- static void vfio_remove_dma(struct vfio_iommu *iommu, struct vfio_dma *dma)
++static void unpin_pages_iopf(struct vfio_dma *dma,
++			     unsigned long pfn, unsigned long npages)
++{
++	while (npages--)
++		put_pfn(pfn++, dma->prot);
++}
++
+ /* VFIO I/O Page Fault handler */
+ static int vfio_iommu_type1_dma_map_iopf(struct iommu_fault *fault, void *data)
  {
- 	WARN_ON(!RB_EMPTY_ROOT(&dma->pfn_list));
-@@ -3197,17 +3265,18 @@ static int vfio_iommu_type1_dma_map_iopf(struct iommu_fault *fault, void *data)
+@@ -3225,9 +3310,11 @@ static int vfio_iommu_type1_dma_map_iopf(struct iommu_fault *fault, void *data)
+ 	struct vfio_iopf_group *iopf_group;
+ 	struct vfio_iommu *iommu;
+ 	struct vfio_dma *dma;
++	struct vfio_batch batch;
+ 	dma_addr_t iova = ALIGN_DOWN(fault->prm.addr, PAGE_SIZE);
+ 	int access_flags = 0;
+-	unsigned long bit_offset, vaddr, pfn;
++	size_t premap_len, map_len, mapped_len = 0;
++	unsigned long bit_offset, vaddr, pfn, i, npages;
+ 	int ret;
+ 	enum iommu_page_response_code status = IOMMU_PAGE_RESP_INVALID;
+ 	struct iommu_page_response resp = {0};
+@@ -3263,19 +3350,47 @@ static int vfio_iommu_type1_dma_map_iopf(struct iommu_fault *fault, void *data)
+ 	if (IOPF_MAPPED_BITMAP_GET(dma, bit_offset))
+ 		goto out_success;
  
++	premap_len = IOPF_PREMAP_LEN << PAGE_SHIFT;
++	npages = dma->size >> PAGE_SHIFT;
++	map_len = PAGE_SIZE;
++	for (i = bit_offset + 1; i < npages; i++) {
++		if (map_len >= premap_len || IOPF_MAPPED_BITMAP_GET(dma, i))
++			break;
++		map_len += PAGE_SIZE;
++	}
  	vaddr = iova - dma->iova + dma->vaddr;
++	vfio_batch_init(&batch);
  
--	if (vfio_pin_page_external(dma, vaddr, &pfn, true))
-+	if (vfio_pin_page_external(dma, vaddr, &pfn, false))
- 		goto out_invalid;
+-	if (vfio_pin_page_external(dma, vaddr, &pfn, false))
+-		goto out_invalid;
++	while (map_len) {
++		ret = pin_pages_iopf(dma, vaddr + mapped_len,
++				     map_len >> PAGE_SHIFT, &pfn,
++				     &npages, &batch);
++		if (!npages)
++			break;
  
- 	if (vfio_iommu_map(iommu, iova, pfn, 1, dma->prot)) {
--		if (put_pfn(pfn, dma->prot))
--			vfio_lock_acct(dma, -1, true);
-+		put_pfn(pfn, dma->prot);
- 		goto out_invalid;
+-	if (vfio_iommu_map(iommu, iova, pfn, 1, dma->prot)) {
+-		put_pfn(pfn, dma->prot);
+-		goto out_invalid;
++		if (vfio_iommu_map(iommu, iova + mapped_len, pfn,
++				   npages, dma->prot)) {
++			unpin_pages_iopf(dma, pfn, npages);
++			vfio_batch_unpin(&batch, dma);
++			break;
++		}
++
++		bitmap_set(dma->iopf_mapped_bitmap,
++			   bit_offset + (mapped_len >> PAGE_SHIFT), npages);
++
++		unpin_pages_iopf(dma, pfn, npages);
++
++		map_len -= npages << PAGE_SHIFT;
++		mapped_len += npages << PAGE_SHIFT;
++
++		if (ret)
++			break;
  	}
  
- 	bitmap_set(dma->iopf_mapped_bitmap, bit_offset, 1);
+-	bitmap_set(dma->iopf_mapped_bitmap, bit_offset, 1);
++	vfio_batch_fini(&batch);
  
-+	put_pfn(pfn, dma->prot);
-+
+-	put_pfn(pfn, dma->prot);
++	if (!mapped_len)
++		goto out_invalid;
+ 
  out_success:
  	status = IOMMU_PAGE_RESP_SUCCESS;
- 
-@@ -3220,6 +3289,43 @@ static int vfio_iommu_type1_dma_map_iopf(struct iommu_fault *fault, void *data)
- 	return 0;
- }
- 
-+static void mn_invalidate_range(struct mmu_notifier *mn, struct mm_struct *mm,
-+				unsigned long start, unsigned long end)
-+{
-+	struct vfio_iommu *iommu = container_of(mn, struct vfio_iommu, mn);
-+	struct rb_node *n;
-+	int ret;
-+
-+	mutex_lock(&iommu->lock);
-+
-+	ret = vfio_wait_all_valid(iommu);
-+	if (WARN_ON(ret < 0))
-+		return;
-+
-+	for (n = rb_first(&iommu->dma_list); n; n = rb_next(n)) {
-+		struct vfio_dma *dma = rb_entry(n, struct vfio_dma, node);
-+		unsigned long start_n, end_n;
-+
-+		if (end <= dma->vaddr || start >= dma->vaddr + dma->size)
-+			continue;
-+
-+		start_n = ALIGN_DOWN(max_t(unsigned long, start, dma->vaddr),
-+				     PAGE_SIZE);
-+		end_n = ALIGN(min_t(unsigned long, end, dma->vaddr + dma->size),
-+			      PAGE_SIZE);
-+
-+		vfio_unmap_partial_iopf(iommu, dma,
-+					start_n - dma->vaddr + dma->iova,
-+					end_n - dma->vaddr + dma->iova);
-+	}
-+
-+	mutex_unlock(&iommu->lock);
-+}
-+
-+static const struct mmu_notifier_ops vfio_iommu_type1_mn_ops = {
-+	.invalidate_range	= mn_invalidate_range,
-+};
-+
- static long vfio_iommu_type1_ioctl(void *iommu_data,
- 				   unsigned int cmd, unsigned long arg)
- {
 -- 
 2.19.1
 
