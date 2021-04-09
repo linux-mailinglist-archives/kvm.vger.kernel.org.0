@@ -2,231 +2,179 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BB775359620
-	for <lists+kvm@lfdr.de>; Fri,  9 Apr 2021 09:14:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2B4EE359683
+	for <lists+kvm@lfdr.de>; Fri,  9 Apr 2021 09:38:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233346AbhDIHOf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 9 Apr 2021 03:14:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45278 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231630AbhDIHOe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 9 Apr 2021 03:14:34 -0400
-Received: from mail-io1-xd32.google.com (mail-io1-xd32.google.com [IPv6:2607:f8b0:4864:20::d32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D2B31C061760;
-        Fri,  9 Apr 2021 00:14:21 -0700 (PDT)
-Received: by mail-io1-xd32.google.com with SMTP id k25so4927654iob.6;
-        Fri, 09 Apr 2021 00:14:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=VTmdTMBzyKToChcb7ZNRkSEhVlJj9wYY6YTSsfntQ4M=;
-        b=r7N+hcQdTvq0JWsBEaJzKqcA99+gvM2DgXx2mft9eZhCtEyNxJRbaVpA3wmE2Kx/yo
-         vwCIuAYH7r2IZfmMQMiVMFZ2rsMOhdoAvn2eMPbXhXPBUKCy3E0QBdWUBCpLMY1UmpRH
-         fTQzNH53D+EJdKiXU2HXmvWHlpT0B1t9j2lBlyh7Ws06GazyKK0ohKzxvbqqJSllsC1z
-         S+XwT6flttyBxhMLEE0tGQK8aC705bM63m8r2IvCHqgdT331mDkBgL2eqcrvRBDLGi9T
-         BHm3jfz2qNWSTwKmgrtCP1yAR7hd/zLW6rYL5iLsR8Ct4TjQNl1M49S9UfIzt8/6WXkg
-         azGw==
+        id S229545AbhDIHiV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 9 Apr 2021 03:38:21 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:50367 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229621AbhDIHiU (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 9 Apr 2021 03:38:20 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1617953887;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=fkrozLMJPACVkdmHi98evbnJXUcRYylIKOGu+prd3Vg=;
+        b=AVV5gxNk0ddxwfb/hc6IA7CKtMu465VgViEyqjZ4ZZFvbM3CZoyw5SA/IHNk9yycKIY8F2
+        cvkdlWoAb0PsLQ32V8TD/bYTMYEBlK+5QT0GfpLe1IcdzZKmfhsAOp8R5OKE0R1/B2jFhP
+        Ns7NTa2nrSQt6o1NZNt+1/AdKX2nGFs=
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
+ [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-469-KOTh75VGP0eT9VYto1GaSw-1; Fri, 09 Apr 2021 03:38:06 -0400
+X-MC-Unique: KOTh75VGP0eT9VYto1GaSw-1
+Received: by mail-ed1-f72.google.com with SMTP id w8so2256015edx.0
+        for <kvm@vger.kernel.org>; Fri, 09 Apr 2021 00:38:05 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=VTmdTMBzyKToChcb7ZNRkSEhVlJj9wYY6YTSsfntQ4M=;
-        b=MhxqsAdRgopZgM1/3VH14VGTWPD2+yIQuDT3FnrUiyTK25yRifgKN8dQW2jXVr4UmM
-         uPxsbQy4e8I+h6K11FZlJrAqelcs1btPIeT6BIikhtnQdhyuuTgfZtHQqceke69vD3aS
-         aBBuAreuzBpFCtr0s88Ju/mbFvpFResdjvijR40vlDPIFTlAgEcNgqIy4Mm/JN1WsNGn
-         EpHGRHyD/yU9RJuwqiIQj53SfkzPZIJy8I8ZdJLsI47rdYkzxRk+0sOp8sp4IvURa55I
-         CARoeBu1KffZbXLUUP+ALxw5q4f2npyVaoF4xBCWHAtGkQKFPHuW1Z+B9I1FMvoq/4xW
-         rxNA==
-X-Gm-Message-State: AOAM531aM/6ExrJk6CEyk8tOtGHHN9AWHEfZ5McXJrD5jzYDxLszCuZ4
-        47becHGGPBu4QRBF6Vcgl87AzRm+AVbzu/Jvmvw=
-X-Google-Smtp-Source: ABdhPJyegJp7g4Zxdu3DE79gjWENGNF4EzjQ+x6DRHH5+i6AQhWscsxus5BtJCDiwwPjzgXn8tt/jOGBQHdYJiJNo50=
-X-Received: by 2002:a02:ba1a:: with SMTP id z26mr9802353jan.43.1617952461183;
- Fri, 09 Apr 2021 00:14:21 -0700 (PDT)
-MIME-Version: 1.0
-References: <20201127112114.3219360-1-pbonzini@redhat.com> <20201127112114.3219360-3-pbonzini@redhat.com>
-In-Reply-To: <20201127112114.3219360-3-pbonzini@redhat.com>
-From:   Lai Jiangshan <jiangshanlai+lkml@gmail.com>
-Date:   Fri, 9 Apr 2021 15:14:10 +0800
-Message-ID: <CAJhGHyCdqgtvK98_KieG-8MUfg1Jghd+H99q+FkgL0ZuqnvuAw@mail.gmail.com>
-Subject: Re: [PATCH 2/2] KVM: x86: Fix split-irqchip vs interrupt injection
- window request
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     LKML <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org,
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=fkrozLMJPACVkdmHi98evbnJXUcRYylIKOGu+prd3Vg=;
+        b=W8LIOczbjnaciJkQISjXxJvTPAcd2fCh7U6Z74BixALyLaUNKaefg7H8rSzukM6reN
+         cF/vgmo6m+ffgTGtZWiXETlUacDRxW1xOAYVlH3zKtRDbeATspy61ION8WgcSRQi5sRz
+         nE6firzCprpHHjT6Y/bubsK9HrfcFAC5QUjOcLumXyv78RK0UyFNqbst8X/E92ygkNmU
+         /vIgGRv6DDslRXhatRq5Nmc7TWpFxOx8uCx++BwEWMssahQXd2IuAeANcQ0rMEArZ/zt
+         0ZXdHdjtNLrmvoWhhDwurv5YgNU3fflLSOdVF3lEp8nVCRyQixE7OfaMtZI2S+cioUCw
+         iI7w==
+X-Gm-Message-State: AOAM532MgEVr+fHS6hEqFV1oS1hV9S9ZU5rrE8A/oEFyi6O9CHS1jqEE
+        c+i8/aYhX/E078WtCFPtMM6Dbvzr+aNZ5Nu+G0C1aAOaFnCQN+7Z3JtgiFDJ2TmaWCsv1eJJqOY
+        WcqK/k2tAAT1X
+X-Received: by 2002:a17:906:170d:: with SMTP id c13mr14557524eje.491.1617953884853;
+        Fri, 09 Apr 2021 00:38:04 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJw0b2ZoUfqjNAa81uHiiZD1Mdm+c8bRsxSc++bCivJSOo+DhWfXVhlCJ950VqISuyzIOO5GyQ==
+X-Received: by 2002:a17:906:170d:: with SMTP id c13mr14557510eje.491.1617953884680;
+        Fri, 09 Apr 2021 00:38:04 -0700 (PDT)
+Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id q18sm920852edr.26.2021.04.09.00.38.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 09 Apr 2021 00:38:04 -0700 (PDT)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Siddharth Chandrasekaran <sidcha@amazon.de>
+Cc:     Alexander Graf <graf@amazon.com>,
+        Evgeny Iakovlev <eyakovl@amazon.de>,
+        linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, "K. Y. Srinivasan" <kys@microsoft.com>,
+        Haiyang Zhang <haiyangz@microsoft.com>,
+        Stephen Hemminger <sthemmin@microsoft.com>,
+        Wei Liu <wei.liu@kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <seanjc@google.com>,
-        Filippo Sironi <sironi@amazon.de>,
-        David Woodhouse <dwmw@amazon.co.uk>,
-        "v4.7+" <stable@vger.kernel.org>,
-        Wanpeng Li <wanpengli@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>
+Subject: Re: [PATCH 4/4] KVM: hyper-v: Advertise support for fast XMM
+ hypercalls
+In-Reply-To: <20210408155220.GB32315@u366d62d47e3651.ant.amazon.com>
+References: <20210407211954.32755-1-sidcha@amazon.de>
+ <20210407211954.32755-5-sidcha@amazon.de>
+ <87blap7zha.fsf@vitty.brq.redhat.com>
+ <20210408142053.GA10636@u366d62d47e3651.ant.amazon.com>
+ <8735w096pk.fsf@vitty.brq.redhat.com>
+ <20210408155220.GB32315@u366d62d47e3651.ant.amazon.com>
+Date:   Fri, 09 Apr 2021 09:38:03 +0200
+Message-ID: <87zgy77vs4.fsf@vitty.brq.redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Nov 27, 2020 at 7:26 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> kvm_cpu_accept_dm_intr and kvm_vcpu_ready_for_interrupt_injection are
-> a hodge-podge of conditions, hacked together to get something that
-> more or less works.  But what is actually needed is much simpler;
-> in both cases the fundamental question is, do we have a place to stash
-> an interrupt if userspace does KVM_INTERRUPT?
->
-> In userspace irqchip mode, that is !vcpu->arch.interrupt.injected.
-> Currently kvm_event_needs_reinjection(vcpu) covers it, but it is
-> unnecessarily restrictive.
->
-> In split irqchip mode it's a bit more complicated, we need to check
-> kvm_apic_accept_pic_intr(vcpu) (the IRQ window exit is basically an INTACK
-> cycle and thus requires ExtINTs not to be masked) as well as
-> !pending_userspace_extint(vcpu).  However, there is no need to
-> check kvm_event_needs_reinjection(vcpu), since split irqchip keeps
-> pending ExtINT state separate from event injection state, and checking
-> kvm_cpu_has_interrupt(vcpu) is wrong too since ExtINT has higher
-> priority than APIC interrupts.  In fact the latter fixes a bug:
-> when userspace requests an IRQ window vmexit, an interrupt in the
-> local APIC can cause kvm_cpu_has_interrupt() to be true and thus
-> kvm_vcpu_ready_for_interrupt_injection() to return false.  When this
-> happens, vcpu_run does not exit to userspace but the interrupt window
-> vmexits keep occurring.  The VM loops without any hope of making progress.
->
-> Once we try to fix these with something like
->
->      return kvm_arch_interrupt_allowed(vcpu) &&
-> -        !kvm_cpu_has_interrupt(vcpu) &&
-> -        !kvm_event_needs_reinjection(vcpu) &&
-> -        kvm_cpu_accept_dm_intr(vcpu);
-> +        (!lapic_in_kernel(vcpu)
-> +         ? !vcpu->arch.interrupt.injected
-> +         : (kvm_apic_accept_pic_intr(vcpu)
-> +            && !pending_userspace_extint(v)));
->
-> we realize two things.  First, thanks to the previous patch the complex
-> conditional can reuse !kvm_cpu_has_extint(vcpu).  Second, the interrupt
-> window request in vcpu_enter_guest()
->
->         bool req_int_win =
->                 dm_request_for_irq_injection(vcpu) &&
->                 kvm_cpu_accept_dm_intr(vcpu);
->
-> should be kept in sync with kvm_vcpu_ready_for_interrupt_injection():
-> it is unnecessary to ask the processor for an interrupt window
-> if we would not be able to return to userspace.  Therefore, the
-> complex conditional is really the correct implementation of
-> kvm_cpu_accept_dm_intr(vcpu).  It all makes sense:
->
-> - we can accept an interrupt from userspace if there is a place
->   to stash it (and, for irqchip split, ExtINTs are not masked).
->   Interrupts from userspace _can_ be accepted even if right now
->   EFLAGS.IF=0.
+Siddharth Chandrasekaran <sidcha@amazon.de> writes:
 
-Hello, Paolo
+> On Thu, Apr 08, 2021 at 04:44:23PM +0200, Vitaly Kuznetsov wrote:
+>> CAUTION: This email originated from outside of the organization. Do not click links or open attachments unless you can confirm the sender and know the content is safe.
+>>
+>>
+>>
+>> Siddharth Chandrasekaran <sidcha@amazon.de> writes:
+>>
+>> > On Thu, Apr 08, 2021 at 02:05:53PM +0200, Vitaly Kuznetsov wrote:
+>> >> Siddharth Chandrasekaran <sidcha@amazon.de> writes:
+>> >>
+>> >> > Now that all extant hypercalls that can use XMM registers (based on
+>> >> > spec) for input/outputs are patched to support them, we can start
+>> >> > advertising this feature to guests.
+>> >> >
+>> >> > Cc: Alexander Graf <graf@amazon.com>
+>> >> > Cc: Evgeny Iakovlev <eyakovl@amazon.de>
+>> >> > Signed-off-by: Siddharth Chandrasekaran <sidcha@amazon.de>
+>> >> > ---
+>> >> >  arch/x86/include/asm/hyperv-tlfs.h | 4 ++--
+>> >> >  arch/x86/kvm/hyperv.c              | 1 +
+>> >> >  2 files changed, 3 insertions(+), 2 deletions(-)
+>> >> >
+>> >> > diff --git a/arch/x86/include/asm/hyperv-tlfs.h b/arch/x86/include/asm/hyperv-tlfs.h
+>> >> > index e6cd3fee562b..1f160ef60509 100644
+>> >> > --- a/arch/x86/include/asm/hyperv-tlfs.h
+>> >> > +++ b/arch/x86/include/asm/hyperv-tlfs.h
+>> >> > @@ -49,10 +49,10 @@
+>> >> >  /* Support for physical CPU dynamic partitioning events is available*/
+>> >> >  #define HV_X64_CPU_DYNAMIC_PARTITIONING_AVAILABLE    BIT(3)
+>> >> >  /*
+>> >> > - * Support for passing hypercall input parameter block via XMM
+>> >> > + * Support for passing hypercall input and output parameter block via XMM
+>> >> >   * registers is available
+>> >> >   */
+>> >> > -#define HV_X64_HYPERCALL_PARAMS_XMM_AVAILABLE                BIT(4)
+>> >> > +#define HV_X64_HYPERCALL_PARAMS_XMM_AVAILABLE                BIT(4) | BIT(15)
+>> >>
+>> >> TLFS 6.0b states that there are two distinct bits for input and output:
+>> >>
+>> >> CPUID Leaf 0x40000003.EDX:
+>> >> Bit 4: support for passing hypercall input via XMM registers is available.
+>> >> Bit 15: support for returning hypercall output via XMM registers is available.
+>> >>
+>> >> and HV_X64_HYPERCALL_PARAMS_XMM_AVAILABLE is not currently used
+>> >> anywhere, I'd suggest we just rename
+>> >>
+>> >> HV_X64_HYPERCALL_PARAMS_XMM_AVAILABLE to HV_X64_HYPERCALL_XMM_INPUT_AVAILABLE
+>> >> and add HV_X64_HYPERCALL_XMM_OUTPUT_AVAILABLE (bit 15).
+>> >
+>> > That is how I had it initially; but then noticed that we would never
+>> > need to use either of them separately. So it seemed like a reasonable
+>> > abstraction to put them together.
+>> >
+>>
+>> Actually, we may. In theory, KVM userspace may decide to expose just
+>> one of these two to the guest as it is not obliged to copy everything
+>> from KVM_GET_SUPPORTED_HV_CPUID so we will need separate
+>> guest_cpuid_has() checks.
+>
+> Makes sense. I'll split them and add the checks.
+>
+>> (This reminds me of something I didn't see in your series:
+>> we need to check that XMM hypercall parameters support was actually
+>> exposed to the guest as it is illegal for a guest to use it otherwise --
+>> and we will likely need two checks, for input and output).
+>
+> We observed that Windows expects Hyper-V to support XMM params even if
+> we don't advertise this feature but if userspace wants to hide this
+> feature and the guest does it anyway, then it makes sense to treat it as
+> an illegal OP.
+>
 
-If userspace does KVM_INTERRUPT, vcpu->arch.interrupt.injected is
-set immediately, and in inject_pending_event(), we have
+Out of pure curiosity, which Windows version behaves like that? And how
+does this work with KVM without your patches?
 
-        else if (!vcpu->arch.exception.pending) {
-                if (vcpu->arch.nmi_injected) {
-                        kvm_x86_ops.set_nmi(vcpu);
-                        can_inject = false;
-                } else if (vcpu->arch.interrupt.injected) {
-                        kvm_x86_ops.set_irq(vcpu);
-                        can_inject = false;
-                }
-        }
+Sane KVM userspaces will certainly expose both XMM input and output
+capabilities together but having an ability to hide one or both of them
+may come handy while debugging.
 
-I'm curious about that can the kvm_x86_ops.set_irq() here be possible
-to queue the irq with EFLAGS.IF=0? If not, which code prevents it?
+Also, we weren't enforcing the rule that enlightenments not exposed to
+the guest don't work, even the whole Hyper-V emulation interface was
+available to all guests who were smart enough to know how to enable it!
+I don't like this for two reasons: security (large attack surface) and
+the fact that someone 'smart' may decide to use Hyper-V emulation
+features on KVM as 'general purpose' features saying 'they're always
+available anyway', this risks becoming an ABI.
 
-I'm asking about this because I just noticed that interrupt can
-be queued when exception pending, and this patch relaxed it even
-more.
+Let's at least properly check if the feature was exposed to the guest
+for all new enlightenments.
 
-Note: interrupt can NOT be queued when exception pending
-until 664f8e26b00c7 ("KVM: X86: Fix loss of exception which
-has not yet been injected") which I think is dangerous.
+-- 
+Vitaly
 
-Thanks
-Lai
-
->
-> - in order to tell userspace we will inject its interrupt ("IRQ
->   window open" i.e. kvm_vcpu_ready_for_interrupt_injection), both
->   KVM and the vCPU need to be ready to accept the interrupt.
->
-> ... and this is what the patch implements.
->
-> Reported-by: David Woodhouse <dwmw@amazon.co.uk>
-> Analyzed-by: David Woodhouse <dwmw@amazon.co.uk>
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  arch/x86/include/asm/kvm_host.h |  1 +
->  arch/x86/kvm/irq.c              |  2 +-
->  arch/x86/kvm/x86.c              | 17 +++++++----------
->  3 files changed, 9 insertions(+), 11 deletions(-)
->
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index d44858b69353..ddaf3e01a854 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -1655,6 +1655,7 @@ int kvm_test_age_hva(struct kvm *kvm, unsigned long hva);
->  int kvm_set_spte_hva(struct kvm *kvm, unsigned long hva, pte_t pte);
->  int kvm_cpu_has_injectable_intr(struct kvm_vcpu *v);
->  int kvm_cpu_has_interrupt(struct kvm_vcpu *vcpu);
-> +int kvm_cpu_has_extint(struct kvm_vcpu *v);
->  int kvm_arch_interrupt_allowed(struct kvm_vcpu *vcpu);
->  int kvm_cpu_get_interrupt(struct kvm_vcpu *v);
->  void kvm_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event);
-> diff --git a/arch/x86/kvm/irq.c b/arch/x86/kvm/irq.c
-> index e2d49a506e7f..fa01f07e449e 100644
-> --- a/arch/x86/kvm/irq.c
-> +++ b/arch/x86/kvm/irq.c
-> @@ -40,7 +40,7 @@ static int pending_userspace_extint(struct kvm_vcpu *v)
->   * check if there is pending interrupt from
->   * non-APIC source without intack.
->   */
-> -static int kvm_cpu_has_extint(struct kvm_vcpu *v)
-> +int kvm_cpu_has_extint(struct kvm_vcpu *v)
->  {
->         /*
->          * FIXME: interrupt.injected represents an interrupt that it's
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 447edc0d1d5a..54124b6211df 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -4051,21 +4051,22 @@ static int kvm_vcpu_ioctl_set_lapic(struct kvm_vcpu *vcpu,
->
->  static int kvm_cpu_accept_dm_intr(struct kvm_vcpu *vcpu)
->  {
-> -       return (!lapic_in_kernel(vcpu) ||
-> -               kvm_apic_accept_pic_intr(vcpu));
-> +       /*
-> +        * We can accept userspace's request for interrupt injection
-> +        * as long as we have a place to store the interrupt number.
-> +        * The actual injection will happen when the CPU is able to
-> +        * deliver the interrupt.
-> +        */
-> +       if (kvm_cpu_has_extint(vcpu))
-> +               return false;
-> +
-> +       /* Acknowledging ExtINT does not happen if LINT0 is masked.  */
-> +       return !(lapic_in_kernel(vcpu) && !kvm_apic_accept_pic_intr(vcpu));
->  }
->
-> -/*
-> - * if userspace requested an interrupt window, check that the
-> - * interrupt window is open.
-> - *
-> - * No need to exit to userspace if we already have an interrupt queued.
-> - */
->  static int kvm_vcpu_ready_for_interrupt_injection(struct kvm_vcpu *vcpu)
->  {
->         return kvm_arch_interrupt_allowed(vcpu) &&
-> -               !kvm_cpu_has_interrupt(vcpu) &&
-> -               !kvm_event_needs_reinjection(vcpu) &&
->                 kvm_cpu_accept_dm_intr(vcpu);
->  }
->
-> --
-> 2.28.0
->
