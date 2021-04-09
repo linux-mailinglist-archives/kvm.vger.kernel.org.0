@@ -2,97 +2,250 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 99F673593B7
-	for <lists+kvm@lfdr.de>; Fri,  9 Apr 2021 06:18:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 04E3F359428
+	for <lists+kvm@lfdr.de>; Fri,  9 Apr 2021 06:50:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231496AbhDIETB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 9 Apr 2021 00:19:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35560 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231452AbhDIES7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 9 Apr 2021 00:18:59 -0400
-Received: from mail-pg1-x534.google.com (mail-pg1-x534.google.com [IPv6:2607:f8b0:4864:20::534])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 69170C061761;
-        Thu,  8 Apr 2021 21:18:47 -0700 (PDT)
-Received: by mail-pg1-x534.google.com with SMTP id l76so2926491pga.6;
-        Thu, 08 Apr 2021 21:18:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=MsqyvVn7YBppCO1Fy05Gz6niO5R1x3MO0z1PGcRbBxY=;
-        b=EP/Sgod+jeOnf4VL9JfZDQ9Pr5uhtieaqoD05W2JaPAwKkIeH2TSS2/ICzmk11ixoJ
-         Mp7kUIvVnHkdFGY2s1YFBw9X2KXTXtXgD156TFWRYtw3vxwGmxv+wNuNV2fMVqyFE7dL
-         UgeE3duktk5Pv3DY5JZMIK/QTIX07PDZm4y1yFfYpQys12QZeCwJy2W08DYWxJnoR4wc
-         +Hz/OSt+BTrwoz3T3MhvGKXiXBmkcwbfcbsixw8vROZ1hnvNzq+gJBmIxqMtf15Cr/Mp
-         RXHo/zZ94Sw6SdFtkXiss3N8+rJajCGzwmTh9LtPav5y2nkAM9M5degZ9AS9Xy3Ws9SZ
-         O6qQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references;
-        bh=MsqyvVn7YBppCO1Fy05Gz6niO5R1x3MO0z1PGcRbBxY=;
-        b=bu7TNJ+G2YCK5jjOiM9mFo6FCyO56Q/K7O8r/UpWEyH1B33WIO4YbXQLtagqohKRDp
-         j2yuFnu4F4WG+1uFBbn4E6os+IMxTkynF5zQIX+0AZjaoPIkhd5e/M4XGs3F33s0ZoUo
-         MK9fDv14F01P/JkHMrDYdIUm3WhX3qd9b7dKyqcTzKrKyn6Yqf4GP/nWqRgZ5gK/34K5
-         0+Z6zk/YDRQKZxzMzYbC9+JcKGKfgf1cYV0lzDAY8nUKoNPCI7MeYEwHeMzcjxmlw/w9
-         g1sI194nt0JmU5E3tAPMmxxiwe4zMFVs7riBQYVHvNRDq85DaFwToOUcMXd9So5CDJ41
-         8scw==
-X-Gm-Message-State: AOAM5323cgIfXPwd5+CEMEVXaCDaA43e7l8XfXYpI3ZZ6r9eW31ZFFpA
-        JWPZcz+u853CGGgMPsmbEmT5A7DvuwY=
-X-Google-Smtp-Source: ABdhPJw9hAF280dZWKgB4cI3JFgI/AtnKjbHPUMqQZF6H88Bfz7UmghVe0rFUZ/XIYFv5eyzIpnFVw==
-X-Received: by 2002:a63:1a11:: with SMTP id a17mr10968569pga.371.1617941926840;
-        Thu, 08 Apr 2021 21:18:46 -0700 (PDT)
-Received: from localhost.localdomain ([103.7.29.6])
-        by smtp.googlemail.com with ESMTPSA id gw24sm765553pjb.42.2021.04.08.21.18.44
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 08 Apr 2021 21:18:46 -0700 (PDT)
-From:   Wanpeng Li <kernellwp@gmail.com>
-X-Google-Original-From: Wanpeng Li <wanpengli@tencent.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>
-Subject: [PATCH v2 3/3] KVM: X86: Do not yield to self
-Date:   Fri,  9 Apr 2021 12:18:31 +0800
-Message-Id: <1617941911-5338-3-git-send-email-wanpengli@tencent.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1617941911-5338-1-git-send-email-wanpengli@tencent.com>
-References: <1617941911-5338-1-git-send-email-wanpengli@tencent.com>
+        id S231415AbhDIEsx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 9 Apr 2021 00:48:53 -0400
+Received: from szxga03-in.huawei.com ([45.249.212.189]:3395 "EHLO
+        szxga03-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229715AbhDIEsw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 9 Apr 2021 00:48:52 -0400
+Received: from DGGEML401-HUB.china.huawei.com (unknown [172.30.72.54])
+        by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4FGlv16vY3z5mLB;
+        Fri,  9 Apr 2021 12:45:49 +0800 (CST)
+Received: from dggema765-chm.china.huawei.com (10.1.198.207) by
+ DGGEML401-HUB.china.huawei.com (10.3.17.32) with Microsoft SMTP Server (TLS)
+ id 14.3.498.0; Fri, 9 Apr 2021 12:48:37 +0800
+Received: from [10.174.185.210] (10.174.185.210) by
+ dggema765-chm.china.huawei.com (10.1.198.207) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.2106.2; Fri, 9 Apr 2021 12:48:36 +0800
+Subject: Re: [PATCH v14 06/13] iommu/smmuv3: Allow stage 1 invalidation with
+ unmanaged ASIDs
+To:     Auger Eric <eric.auger@redhat.com>, <eric.auger.pro@gmail.com>,
+        <iommu@lists.linux-foundation.org>, <linux-kernel@vger.kernel.org>,
+        <kvm@vger.kernel.org>, <kvmarm@lists.cs.columbia.edu>,
+        <will@kernel.org>, <maz@kernel.org>, <robin.murphy@arm.com>,
+        <joro@8bytes.org>, <alex.williamson@redhat.com>, <tn@semihalf.com>,
+        <zhukeqian1@huawei.com>
+CC:     <jacob.jun.pan@linux.intel.com>, <yi.l.liu@intel.com>,
+        <wangxingang5@huawei.com>, <jean-philippe@linaro.org>,
+        <zhangfei.gao@linaro.org>, <zhangfei.gao@gmail.com>,
+        <vivek.gautam@arm.com>, <shameerali.kolothum.thodi@huawei.com>,
+        <yuzenghui@huawei.com>, <nicoleotsuka@gmail.com>,
+        <lushenming@huawei.com>, <vsethi@nvidia.com>,
+        <wanghaibin.wang@huawei.com>
+References: <20210223205634.604221-1-eric.auger@redhat.com>
+ <20210223205634.604221-7-eric.auger@redhat.com>
+ <901720e6-6ca5-eb9a-1f24-0ca479bcfecc@huawei.com>
+ <0246aec2-162d-0584-3ca4-b9c304ef3c8a@redhat.com>
+From:   Kunkun Jiang <jiangkunkun@huawei.com>
+Message-ID: <46f3760a-9ab5-1710-598e-38fbc1f5fb5c@huawei.com>
+Date:   Fri, 9 Apr 2021 12:48:35 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.8.1
+MIME-Version: 1.0
+In-Reply-To: <0246aec2-162d-0584-3ca4-b9c304ef3c8a@redhat.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-Originating-IP: [10.174.185.210]
+X-ClientProxiedBy: dggeme702-chm.china.huawei.com (10.1.199.98) To
+ dggema765-chm.china.huawei.com (10.1.198.207)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Wanpeng Li <wanpengli@tencent.com>
+Hi Eric,
 
-If the target is self we do not need to yield, we can avoid malicious
-guest to play this.
+On 2021/4/8 20:30, Auger Eric wrote:
+> Hi Kunkun,
+>
+> On 4/1/21 2:37 PM, Kunkun Jiang wrote:
+>> Hi Eric,
+>>
+>> On 2021/2/24 4:56, Eric Auger wrote:
+>>> With nested stage support, soon we will need to invalidate
+>>> S1 contexts and ranges tagged with an unmanaged asid, this
+>>> latter being managed by the guest. So let's introduce 2 helpers
+>>> that allow to invalidate with externally managed ASIDs
+>>>
+>>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>>>
+>>> ---
+>>>
+>>> v13 -> v14
+>>> - Actually send the NH_ASID command (reported by Xingang Wang)
+>>> ---
+>>>    drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c | 38 ++++++++++++++++-----
+>>>    1 file changed, 29 insertions(+), 9 deletions(-)
+>>>
+>>> diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
+>>> b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
+>>> index 5579ec4fccc8..4c19a1114de4 100644
+>>> --- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
+>>> +++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
+>>> @@ -1843,9 +1843,9 @@ int arm_smmu_atc_inv_domain(struct
+>>> arm_smmu_domain *smmu_domain, int ssid,
+>>>    }
+>>>      /* IO_PGTABLE API */
+>>> -static void arm_smmu_tlb_inv_context(void *cookie)
+>>> +static void __arm_smmu_tlb_inv_context(struct arm_smmu_domain
+>>> *smmu_domain,
+>>> +                       int ext_asid)
+>>>    {
+>>> -    struct arm_smmu_domain *smmu_domain = cookie;
+>>>        struct arm_smmu_device *smmu = smmu_domain->smmu;
+>>>        struct arm_smmu_cmdq_ent cmd;
+>>>    @@ -1856,7 +1856,13 @@ static void arm_smmu_tlb_inv_context(void
+>>> *cookie)
+>>>         * insertion to guarantee those are observed before the TLBI. Do be
+>>>         * careful, 007.
+>>>         */
+>>> -    if (smmu_domain->stage == ARM_SMMU_DOMAIN_S1) {
+>>> +    if (ext_asid >= 0) { /* guest stage 1 invalidation */
+>>> +        cmd.opcode    = CMDQ_OP_TLBI_NH_ASID;
+>>> +        cmd.tlbi.asid    = ext_asid;
+>>> +        cmd.tlbi.vmid    = smmu_domain->s2_cfg.vmid;
+>>> +        arm_smmu_cmdq_issue_cmd(smmu, &cmd);
+>>> +        arm_smmu_cmdq_issue_sync(smmu);
+>>> +    } else if (smmu_domain->stage == ARM_SMMU_DOMAIN_S1) {
+>>>            arm_smmu_tlb_inv_asid(smmu, smmu_domain->s1_cfg.cd.asid);
+>>>        } else {
+>>>            cmd.opcode    = CMDQ_OP_TLBI_S12_VMALL;
+>>> @@ -1867,6 +1873,13 @@ static void arm_smmu_tlb_inv_context(void *cookie)
+>>>        arm_smmu_atc_inv_domain(smmu_domain, 0, 0, 0);
+>>>    }
+>>>    +static void arm_smmu_tlb_inv_context(void *cookie)
+>>> +{
+>>> +    struct arm_smmu_domain *smmu_domain = cookie;
+>>> +
+>>> +    __arm_smmu_tlb_inv_context(smmu_domain, -1);
+>>> +}
+>>> +
+>>>    static void __arm_smmu_tlb_inv_range(struct arm_smmu_cmdq_ent *cmd,
+>>>                         unsigned long iova, size_t size,
+>>>                         size_t granule,
+>>> @@ -1926,9 +1939,10 @@ static void __arm_smmu_tlb_inv_range(struct
+>>> arm_smmu_cmdq_ent *cmd,
+>>>        arm_smmu_cmdq_batch_submit(smmu, &cmds);
+>>>    }
+>>>    
+>> Here is the part of code in __arm_smmu_tlb_inv_range():
+>>>          if (smmu->features & ARM_SMMU_FEAT_RANGE_INV) {
+>>>                  /* Get the leaf page size */
+>>>                  tg = __ffs(smmu_domain->domain.pgsize_bitmap);
+>>>
+>>>                  /* Convert page size of 12,14,16 (log2) to 1,2,3 */
+>>>                  cmd->tlbi.tg = (tg - 10) / 2;
+>>>
+>>>                  /* Determine what level the granule is at */
+>>>                  cmd->tlbi.ttl = 4 - ((ilog2(granule) - 3) / (tg - 3));
+>>>
+>>>                  num_pages = size >> tg;
+>>>          }
+>> When pSMMU supports RIL, we get the leaf page size by __ffs(smmu_domain->
+>> domain.pgsize_bitmap). In nested mode, it is determined by host
+>> PAGE_SIZE. If
+>> the host kernel and guest kernel has different translation granule (e.g.
+>> host 16K,
+>> guest 4K), __arm_smmu_tlb_inv_range() will issue an incorrect tlbi command.
+>>
+>> Do you have any idea about this issue?
+> I think this is the same issue as the one reported by Chenxiang
+>
+> https://lore.kernel.org/lkml/15938ed5-2095-e903-a290-333c299015a2@hisilicon.com/
+>
+> In case RIL is not supported by the host, next version will use the
+> smallest pSMMU supported page size, as done in __arm_smmu_tlb_inv_range
+>
+> Thanks
+>
+> Eric
+I think they are different. In normal cases, when we want to invalidate the
+cache of stage 1, we should use the granule size supported by vSMMU to
+implement and issue an tlbi command if pSMMU supports RIL.
 
-Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
----
-v1 -> v2:
- * update comments
+But in the current __arm_smmu_tlb_inv_range(), it always uses the granule
+size supported by host.
+(tg = __ffs(smmu_domain->domain.pgsize_bitmap);)
 
- arch/x86/kvm/x86.c | 4 ++++
- 1 file changed, 4 insertions(+)
+Let me explain more clearly.
+Preconditions of this issue:
+1. pSMMU supports RIL
+2. host and guest use different translation granule (e.g. host 16K, 
+guest 4K)
 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index f08e9b4..ce9a1d2 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -8231,6 +8231,10 @@ static void kvm_sched_yield(struct kvm_vcpu *vcpu, unsigned long dest_id)
- 	if (!target || !READ_ONCE(target->ready))
- 		goto no_yield;
- 
-+	/* Ignore requests to yield to self */
-+	if (vcpu == target)
-+		goto no_yield;
-+
- 	if (kvm_vcpu_yield_to(target) <= 0)
- 		goto no_yield;
- 
--- 
-2.7.4
+Guest wants to invalidate 4K, so info->granule_size = 4K.
+In __arm_smmu_tlb_inv_range(),   if pSMMU supports RIL and host 16K,
+tg = 14, tlbi.tg = 2, tlbi.ttl = 4, tlbi.scale = 0, tlbi.num = -1. It is 
+an incorrect
+tlbi command.
+
+So it would be better to pass the leaf page size supported by vSMMU to
+host.  Perhaps this issue and the one reported by Chenxiang can be solved
+together.
+
+Thanks,
+Kunkun Jiang
+>> Best Regards,
+>> Kunkun Jiang
+>>> -static void arm_smmu_tlb_inv_range_domain(unsigned long iova, size_t
+>>> size,
+>>> -                      size_t granule, bool leaf,
+>>> -                      struct arm_smmu_domain *smmu_domain)
+>>> +static void
+>>> +arm_smmu_tlb_inv_range_domain(unsigned long iova, size_t size,
+>>> +                  size_t granule, bool leaf, int ext_asid,
+>>> +                  struct arm_smmu_domain *smmu_domain)
+>>>    {
+>>>        struct arm_smmu_cmdq_ent cmd = {
+>>>            .tlbi = {
+>>> @@ -1936,7 +1950,12 @@ static void
+>>> arm_smmu_tlb_inv_range_domain(unsigned long iova, size_t size,
+>>>            },
+>>>        };
+>>>    -    if (smmu_domain->stage == ARM_SMMU_DOMAIN_S1) {
+>>> +    if (ext_asid >= 0) {  /* guest stage 1 invalidation */
+>>> +        cmd.opcode    = smmu_domain->smmu->features &
+>>> ARM_SMMU_FEAT_E2H ?
+>>> +                  CMDQ_OP_TLBI_EL2_VA : CMDQ_OP_TLBI_NH_VA;
+>>> +        cmd.tlbi.asid    = ext_asid;
+>>> +        cmd.tlbi.vmid    = smmu_domain->s2_cfg.vmid;
+>>> +    } else if (smmu_domain->stage == ARM_SMMU_DOMAIN_S1) {
+>>>            cmd.opcode    = smmu_domain->smmu->features &
+>>> ARM_SMMU_FEAT_E2H ?
+>>>                      CMDQ_OP_TLBI_EL2_VA : CMDQ_OP_TLBI_NH_VA;
+>>>            cmd.tlbi.asid    = smmu_domain->s1_cfg.cd.asid;
+>>> @@ -1944,6 +1963,7 @@ static void
+>>> arm_smmu_tlb_inv_range_domain(unsigned long iova, size_t size,
+>>>            cmd.opcode    = CMDQ_OP_TLBI_S2_IPA;
+>>>            cmd.tlbi.vmid    = smmu_domain->s2_cfg.vmid;
+>>>        }
+>>> +
+>>>        __arm_smmu_tlb_inv_range(&cmd, iova, size, granule, smmu_domain);
+>>>          /*
+>>> @@ -1982,7 +2002,7 @@ static void arm_smmu_tlb_inv_page_nosync(struct
+>>> iommu_iotlb_gather *gather,
+>>>    static void arm_smmu_tlb_inv_walk(unsigned long iova, size_t size,
+>>>                      size_t granule, void *cookie)
+>>>    {
+>>> -    arm_smmu_tlb_inv_range_domain(iova, size, granule, false, cookie);
+>>> +    arm_smmu_tlb_inv_range_domain(iova, size, granule, false, -1,
+>>> cookie);
+>>>    }
+>>>      static const struct iommu_flush_ops arm_smmu_flush_ops = {
+>>> @@ -2523,7 +2543,7 @@ static void arm_smmu_iotlb_sync(struct
+>>> iommu_domain *domain,
+>>>          arm_smmu_tlb_inv_range_domain(gather->start,
+>>>                          gather->end - gather->start + 1,
+>>> -                      gather->pgsize, true, smmu_domain);
+>>> +                      gather->pgsize, true, -1, smmu_domain);
+>>>    }
+>>>      static phys_addr_t
+>>
+> .
+
 
