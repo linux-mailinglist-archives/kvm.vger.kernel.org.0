@@ -2,166 +2,138 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7976735A191
-	for <lists+kvm@lfdr.de>; Fri,  9 Apr 2021 16:56:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E595935A223
+	for <lists+kvm@lfdr.de>; Fri,  9 Apr 2021 17:39:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233957AbhDIO4q (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 9 Apr 2021 10:56:46 -0400
-Received: from mail-mw2nam10on2057.outbound.protection.outlook.com ([40.107.94.57]:10592
-        "EHLO NAM10-MW2-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S233541AbhDIO4o (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 9 Apr 2021 10:56:44 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=CBzAE6d6MbEmhp5peRdGEeRoo1D8vt/yiwpEOyXag7oL+P+CQyH1EtoN1oXUIbripY+jLtTik2mD5L0p/+0JT+voLJB4SzgzKykDMYFmBu+8eBIKiuWQXHAQUz88Dr5go1/IFCaP8B+k+7eZz+lBiD+y+6X4J6GTVqMQvLmynZ+TzHuH1/r1IXWhqcqihgy/dytbg841rKujQkQoVC2CjE6HwQ75zAJBZUvdE6qtY/sRGWb4rx1L16gHDJOl7qI4fyhKFBsllL1iTOB/FLFQGrd9Y6xuzmGXGAsgsYmlR+b8Vd+7EcmZvXWqW39K7Z+G4qFQ6pyoXj0pAp51DdZEsw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=3/pY+/tCBvLiWQ71K4Teq6i0ic6oIASwz/rXopwEvvM=;
- b=A4o+HLZu/H9kqpRkZpl9XIJvqYJLhrCAPdAZVl0RjkG6EAzJw30LOHHXbYGeqeut794aqtb8z4ZpDjGbF4LAE1ZitvQd77trzRdJsCfTzwfehUWUgBFAMOwq0VWs60KNkC8Le2Nt0M44r6/NBIE8pqF2KdyoifX0GnKnK3h6FWaOottV7wr5nfhWRu0+vu8tA7Hsl0N2419KUL7jfYcB9QNsl3ic/+N+tkCBU1tuJ5R2KuWXfs2YWi/a+tHn9MhlajYJAI1VYtXZVXqMp1MepgI40B9KNF+At4utWAGXVFadmDp3ftJ0kLg1EetS7QHQA9y5G8XFK7td73+oBkb+oQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=3/pY+/tCBvLiWQ71K4Teq6i0ic6oIASwz/rXopwEvvM=;
- b=hUeCCFqeqizmntqq04HJPvv+x0W4iRAhfOiLi+PoGqDi5EblVHOk4wlrqVAR9sBtwGPgPyzhWyzbqS31NfvXGWlsPiXcLi4nEG+DYEr8FT+DsPuL+xJdvm2eb0YZQf8YyQ84LuO0Q0HxLOtnMklvm4nUnxBYwWXdJkwHilQip0g=
-Authentication-Results: amd.com; dkim=none (message not signed)
- header.d=none;amd.com; dmarc=none action=none header.from=amd.com;
-Received: from DM5PR12MB1355.namprd12.prod.outlook.com (2603:10b6:3:6e::7) by
- DM6PR12MB4941.namprd12.prod.outlook.com (2603:10b6:5:1b8::17) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.4020.21; Fri, 9 Apr 2021 14:56:29 +0000
-Received: from DM5PR12MB1355.namprd12.prod.outlook.com
- ([fe80::b914:4704:ad6f:aba9]) by DM5PR12MB1355.namprd12.prod.outlook.com
- ([fe80::b914:4704:ad6f:aba9%12]) with mapi id 15.20.4020.021; Fri, 9 Apr 2021
- 14:56:29 +0000
-Subject: Re: [PATCH v2] KVM: SVM: Make sure GHCB is mapped before updating
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Borislav Petkov <bp@alien8.de>, Ingo Molnar <mingo@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Brijesh Singh <brijesh.singh@amd.com>
-References: <1ed85188bee4a602ffad9632cdf5b5b5c0f40957.1617900892.git.thomas.lendacky@amd.com>
- <YG85HxqEAVd9eEu/@google.com> <923548be-db20-7eea-33aa-571347a95526@amd.com>
- <YG8/WHFOPX6H1eJf@google.com> <3c28c9bf-d14e-3f9b-0973-ba4a438aaa33@amd.com>
- <YG9d8aOuZKasgw2j@google.com>
-From:   Tom Lendacky <thomas.lendacky@amd.com>
-Message-ID: <87363a29-fa57-a2b2-4b42-6f2cd5e54dfd@amd.com>
-Date:   Fri, 9 Apr 2021 09:56:27 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.7.1
-In-Reply-To: <YG9d8aOuZKasgw2j@google.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [67.79.209.213]
-X-ClientProxiedBy: SA0PR11CA0066.namprd11.prod.outlook.com
- (2603:10b6:806:d2::11) To DM5PR12MB1355.namprd12.prod.outlook.com
- (2603:10b6:3:6e::7)
+        id S233700AbhDIPjb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 9 Apr 2021 11:39:31 -0400
+Received: from mail-il1-f197.google.com ([209.85.166.197]:53807 "EHLO
+        mail-il1-f197.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231402AbhDIPja (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 9 Apr 2021 11:39:30 -0400
+Received: by mail-il1-f197.google.com with SMTP id k12so3693012ilo.20
+        for <kvm@vger.kernel.org>; Fri, 09 Apr 2021 08:39:17 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
+        bh=jZbg77mtmUAx73slrlTxgnb1mnony9A1Ml58bH1UALw=;
+        b=lvJEl2ZpkiBMn9rte9qcy909+YLFwyDTIKKXnQBH/lrimsusjugG/NgQjoFV8V6SGf
+         XSI5EUGT+hSQESstUVceansf7vi0Q7MbqywrE27Z9T0D4PnlikF9Qm35sKr/8j+lio8Z
+         QiIc8O7UfZGj206ZW4ThdTNAVg4F5c8EPPIcN70T1j2h+1pzWQ1y3PWogB56ZNu3rdn3
+         cNuFvgUwmu4v2stChtnaIt1whYklqF2i5T5qD40/+BLU4ygm4vrGritiy0vzmIwfeN9x
+         YCZFV+1aXZ5w5PPlBHil+YbXFrmCxzCIYwlFeA8H+GilhgBvK5uzrrNbPF9HVWK7jrt1
+         Y5Mg==
+X-Gm-Message-State: AOAM533bZydtI1AJo8IshF1sJjrYJBZ77p+1HiXHMAzeOiJ/EYpa7ZOa
+        XSN4P60iTdsQuS97Jz/8zNr9j7247vC61eTPC7E7yc8JB9zL
+X-Google-Smtp-Source: ABdhPJywqm5sQ8uWfvrUvAFPSwnslEiHr4h+DPIlj9Ki8nKrSEPlMx/yenRdvwaJicFT4iECq25yIRgOCwGTyTSCdIqY1+4lZ3RN
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from office-linux.texastahm.com (67.79.209.213) by SA0PR11CA0066.namprd11.prod.outlook.com (2603:10b6:806:d2::11) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4020.16 via Frontend Transport; Fri, 9 Apr 2021 14:56:28 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 7520f009-d294-4821-401b-08d8fb67a841
-X-MS-TrafficTypeDiagnostic: DM6PR12MB4941:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <DM6PR12MB4941DEB5A5598E760B9E2539EC739@DM6PR12MB4941.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: t34PLXjvt1hc2ZsuCIDvCRn+dcX6mfj1KaJncsZx/U0hM3Pc1P3sHeNsl3tq7x0xjMx2yMjAKRFMTUnwAiZabpuOyc+Mnh/sy6GxOwRUpVgEWzDS5xLlqMMsKHI1I9y6MQel1xXjbULK8P78l1/7pio70u6BeA1lWpAEtBVywf0QgzHHNZjC8c6/e+GeJtaU/PtK4XuqeUo4pyDjO1LekXlrCHb6JvsfZOwO6KdRHTantt9kx5nP7OO8tn914ZJVP1Aswp8fAh+VXFrIpl/lk1jmTD1wA3xYl652iy5XAHRp0k80sgxkL1uSsChQL0crs9jkm+piAzu8zRIT7elFTn7Ey3QAAWwGP0Fbf9cqWmTmhwR/yYb97T9fdcof7+c1eBALAuoX5BajE/8g/qrihAI8v+8XWudr0vYy5K1268tefOx95A85iihMw2SNJCIWHyy2lt9MxDIfZJJE4rKLGjsGpypS6dSHOQxU91gYkuW7Dn5kc+GOagyiYmlOT+5m52Iizq8ykp6Tu/cOb+cEdPMzFObo+y/DdI9/F2HC9n5kGspyO2g176gTo+03hPdTRR6sMDpF9LfP4ixKeWfwjXl8D9OijlFjNHIo3c6P9TW46BvQ48Z/cvtzy4G4zK5JmNuQA+FBr48B3LOeWsWwZlQ8Iltaga1lj7aJMqGfk9v7UGqEi/3/15APHvF0OOsSPBfbKhwfBZRZDDs5TqejpO8fw+Swh7iQthM+wQv2TCU=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM5PR12MB1355.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(346002)(136003)(366004)(39850400004)(376002)(396003)(316002)(8936002)(8676002)(66946007)(6916009)(478600001)(54906003)(31686004)(66476007)(66556008)(5660300002)(4326008)(86362001)(83380400001)(31696002)(186003)(956004)(26005)(38100700001)(2906002)(16526019)(6506007)(7416002)(6486002)(36756003)(2616005)(6512007)(53546011)(45980500001)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: =?utf-8?B?ckR3UHVPZWx1dzNRb1FQa2VsUEQ0V1pkUWphQTh1a0tCcng0NVdoVVZnNTVD?=
- =?utf-8?B?TThENFd3c0hnTkNrVGV0engvOHVUWU4yRVNOQk5meHQyYnR6NURhUnRoMGpp?=
- =?utf-8?B?TWVxRnczb3dxbjROWDczeExObkEyem1GNytXVXIzTG1meUZ6YWxZT3RWc2tt?=
- =?utf-8?B?SnQ5NkF5V1I3dHRqUVM0ak1lRmY2RTU4SHIzL0xaNDRNdVAvRFU5OWtITUFW?=
- =?utf-8?B?M2lVY2NXU3ZMVi95UG9yM21FMnJsOTgxancxa1ZWSytWTmFhcS92WnlLSW5S?=
- =?utf-8?B?dFlQSWxFS0RKaU9XZ1VrZkZiUVVHTmVISHl0WTVtWlFxRVZ6aUFZRDB5aVJp?=
- =?utf-8?B?OU01N085eVp6NURQdlJRbDhCY09CdWQ0WktlTFFWTE9WZktPVkVKS1Zva01Y?=
- =?utf-8?B?NmV3R2xWaDRBbktQV0c2QXhoYVhtRVB4K2QxZ2ZvNlQxSWhCbXdHOVZXenY2?=
- =?utf-8?B?M0NMK0xUeG0yeGV1MzFoRklRMmljUk8vWFowMTdSVFhqU092S05pRkRpK2JG?=
- =?utf-8?B?Mm1TcUpsc1hjZ0pxVERPOVA1ZVVTbXlxNHcvVTBsdmV3blV5VTZmZEJlUE11?=
- =?utf-8?B?TnZaZTYvZW5FYlZISUxrRG9TUkhJVzd5OGN0UysxMlpzWFVLNzFGT2tqNnZq?=
- =?utf-8?B?OFBFVkxCcHdjWGVnNldKL0J3Yk85ZXZlR2dNVmlkVG5pbmZMSWpYUTZVNHNE?=
- =?utf-8?B?LzZEcURlaFhuTUtsN2NhUE9KZCtBQkR3Y0JSU0hjaHhBRVJzQUIzQjNaa25K?=
- =?utf-8?B?Qi8wY3FzdTBlNy9kME8xV25uc2xnM0o0Nk5iK3NvN0NaMzJQLyt6RXlUVXFP?=
- =?utf-8?B?Vjh2TnB4bEhyeFR1R004NzdQdkY0VU5ZK0tYSFNXTCs2SGpGZXBxYUtMVU5W?=
- =?utf-8?B?WG9BNnRBaFUyczlXWXdvd1VoOUVVVnBKanhrVFd1Y0huQUFHMlJWa1RxbGgy?=
- =?utf-8?B?aUU4NGFvS0lPVUZjSlZ2L2RHaGpzVzZOVldlNDV6S2dQL2toVEpaVDM1R1ps?=
- =?utf-8?B?bHYycm8vU1lTKzdxbzZML1NqcTB2SlBTcUo3Rms2TUo3R1ZsM00rNHU0ZXVx?=
- =?utf-8?B?ampGL0pTbXJqVEZJSzBRNlhWZXZRckx1cmlacDRmKzdKVHkyTy9nQXFHTDZK?=
- =?utf-8?B?N1pJdk1WN1JZaGNQMHFCaUJDWE9rdHRRZE5SUGZwVkphblVEWnQwMitwQkpJ?=
- =?utf-8?B?KzZ5SjNVS2ZGVmJPakMrVDBJV21qM0JaWEtHWmxsUkpxUVQ1UWNsektYelJW?=
- =?utf-8?B?SWJJSGlsOTI3ZEdUeUtYaTZObHdvem9kTUhKUFN1dlg0U2lJZk5jZEYwc1k2?=
- =?utf-8?B?K1ZXRWs1d3MxV1IrY2pycUxUNWxDYThSRnRLVExEYjFFdXpWajA1UXRwbE9M?=
- =?utf-8?B?NXJ5TFQvQUVtbmVjam1VRS9PMEpCOXYrdy9jRnA5ekI4ZWVaSFpLUTdadXJy?=
- =?utf-8?B?NGpIN1FhSjZYSWxFNFlpSHdzQ0tKekg5cGtjZW1WTm9DK3VkMisvbmdnRjc1?=
- =?utf-8?B?UFEyUGRoS0E1NGxJUC9xRmx0TXp5S3QrQkNoMERkK2RHQ0VscmFLOXBia20x?=
- =?utf-8?B?OEhUeXlxMzBLS1FRR295MVRaM2pNQ0h6ZkNXdFFNL0VXSGpES1ozUm9WaFJH?=
- =?utf-8?B?U1NWL05ZenYxNXg0bkRST3YwcVM5aGpNYXRoUkJrTXI2bDd2QXBzcmU4LzYz?=
- =?utf-8?B?NmZDdldxWTIwcjdSMUFScm1JeVFYYlgyVFl2YTNlL09WNnVuSEpFM01xUThI?=
- =?utf-8?Q?Fe9UrgsuUrZ6TdV8uDgOwJM8vtARSN8QyvfBIMB?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7520f009-d294-4821-401b-08d8fb67a841
-X-MS-Exchange-CrossTenant-AuthSource: DM5PR12MB1355.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Apr 2021 14:56:29.7726
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: RFogmrHnRFjMIJcQPi8VKmLOxj3zqi4l0U/ufz4+xtzfubFolVx/5fxr1gBEluKrtmlrraSse+pY7rXZQeMd/Q==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4941
+X-Received: by 2002:a02:b615:: with SMTP id h21mr15254285jam.93.1617982756977;
+ Fri, 09 Apr 2021 08:39:16 -0700 (PDT)
+Date:   Fri, 09 Apr 2021 08:39:16 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000007b81f905bf8bf7ac@google.com>
+Subject: [syzbot] WARNING: refcount bug in sk_psock_get
+From:   syzbot <syzbot+b54a1ce86ba4a623b7f0@syzkaller.appspotmail.com>
+To:     akpm@linux-foundation.org, andrii@kernel.org, ast@kernel.org,
+        borisp@nvidia.com, bp@alien8.de, bpf@vger.kernel.org,
+        daniel@iogearbox.net, davem@davemloft.net, hpa@zytor.com,
+        jmattson@google.com, john.fastabend@gmail.com, joro@8bytes.org,
+        kafai@fb.com, kpsingh@kernel.org, kuba@kernel.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        mark.rutland@arm.com, masahiroy@kernel.org, mingo@redhat.com,
+        netdev@vger.kernel.org, pbonzini@redhat.com, peterz@infradead.org,
+        rafael.j.wysocki@intel.com, rostedt@goodmis.org, seanjc@google.com,
+        songliubraving@fb.com, syzkaller-bugs@googlegroups.com,
+        tglx@linutronix.de, vkuznets@redhat.com, wanpengli@tencent.com,
+        will@kernel.org, x86@kernel.org, yhs@fb.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 4/8/21 2:48 PM, Sean Christopherson wrote:
-> On Thu, Apr 08, 2021, Tom Lendacky wrote:
->>
->>
->> On 4/8/21 12:37 PM, Sean Christopherson wrote:
->>> On Thu, Apr 08, 2021, Tom Lendacky wrote:
->>>> On 4/8/21 12:10 PM, Sean Christopherson wrote:
->>>>> On Thu, Apr 08, 2021, Tom Lendacky wrote:
->>>>>> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
->>>>>> index 83e00e524513..7ac67615c070 100644
->>>>>> --- a/arch/x86/kvm/svm/sev.c
->>>>>> +++ b/arch/x86/kvm/svm/sev.c
->>>>>> @@ -2105,5 +2105,8 @@ void sev_vcpu_deliver_sipi_vector(struct kvm_vcpu *vcpu, u8 vector)
->>>>>>  	 * the guest will set the CS and RIP. Set SW_EXIT_INFO_2 to a
->>>>>>  	 * non-zero value.
->>>>>>  	 */
->>>>>> +	if (WARN_ON_ONCE(!svm->ghcb))
->>>>>
->>>>> Isn't this guest triggerable?  I.e. send a SIPI without doing the reset hold?
->>>>> If so, this should not WARN.
->>>>
->>>> Yes, it is a guest triggerable event. But a guest shouldn't be doing that,
->>>> so I thought adding the WARN_ON_ONCE() just to detect it wasn't bad.
->>>> Definitely wouldn't want a WARN_ON().
->>>
->>> WARNs are intended only for host issues, e.g. a malicious guest shouldn't be
->>> able to crash the host when running with panic_on_warn.
->>>
->>
->> Ah, yeah, forgot about panic_on_warn. I can go back to the original patch
->> or do a pr_warn_once(), any pref?
-> 
-> No strong preference.  If you think the print would be helpful for ongoing
-> development, then it's probably worth adding.
+Hello,
 
-For development, I'd want to see it all the time. But since it is guest
-triggerable, the _once() method is really needed in production. So in the
-latest version I just dropped the message/notification.
+syzbot found the following issue on:
 
-Thanks,
-Tom
+HEAD commit:    9c54130c Add linux-next specific files for 20210406
+git tree:       linux-next
+console output: https://syzkaller.appspot.com/x/log.txt?x=17d8d7aad00000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=d125958c3995ddcd
+dashboard link: https://syzkaller.appspot.com/bug?extid=b54a1ce86ba4a623b7f0
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1729797ed00000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1190f46ad00000
 
-> 
+The issue was bisected to:
+
+commit 997acaf6b4b59c6a9c259740312a69ea549cc684
+Author: Mark Rutland <mark.rutland@arm.com>
+Date:   Mon Jan 11 15:37:07 2021 +0000
+
+    lockdep: report broken irq restoration
+
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=11a6cc96d00000
+final oops:     https://syzkaller.appspot.com/x/report.txt?x=13a6cc96d00000
+console output: https://syzkaller.appspot.com/x/log.txt?x=15a6cc96d00000
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+b54a1ce86ba4a623b7f0@syzkaller.appspotmail.com
+Fixes: 997acaf6b4b5 ("lockdep: report broken irq restoration")
+
+------------[ cut here ]------------
+refcount_t: saturated; leaking memory.
+WARNING: CPU: 1 PID: 8414 at lib/refcount.c:19 refcount_warn_saturate+0xf4/0x1e0 lib/refcount.c:19
+Modules linked in:
+CPU: 1 PID: 8414 Comm: syz-executor793 Not tainted 5.12.0-rc6-next-20210406-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
+RIP: 0010:refcount_warn_saturate+0xf4/0x1e0 lib/refcount.c:19
+Code: 1d 69 0c e6 09 31 ff 89 de e8 c8 b4 a6 fd 84 db 75 ab e8 0f ae a6 fd 48 c7 c7 e0 52 c2 89 c6 05 49 0c e6 09 01 e8 91 0f 00 05 <0f> 0b eb 8f e8 f3 ad a6 fd 0f b6 1d 33 0c e6 09 31 ff 89 de e8 93
+RSP: 0018:ffffc90000eef388 EFLAGS: 00010282
+RAX: 0000000000000000 RBX: 0000000000000000 RCX: 0000000000000000
+RDX: ffff88801bbdd580 RSI: ffffffff815c2e05 RDI: fffff520001dde63
+RBP: 0000000000000000 R08: 0000000000000000 R09: 0000000000000000
+R10: ffffffff815bcc6e R11: 0000000000000000 R12: 1ffff920001dde74
+R13: 0000000090200301 R14: ffff888026e00000 R15: ffffc90000eef3c0
+FS:  0000000001422300(0000) GS:ffff8880b9d00000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000000020000000 CR3: 0000000012b3b000 CR4: 00000000001506e0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ __refcount_add_not_zero include/linux/refcount.h:163 [inline]
+ __refcount_inc_not_zero include/linux/refcount.h:227 [inline]
+ refcount_inc_not_zero include/linux/refcount.h:245 [inline]
+ sk_psock_get+0x3b0/0x400 include/linux/skmsg.h:435
+ bpf_exec_tx_verdict+0x11e/0x11a0 net/tls/tls_sw.c:799
+ tls_sw_sendmsg+0xa41/0x1800 net/tls/tls_sw.c:1013
+ inet_sendmsg+0x99/0xe0 net/ipv4/af_inet.c:821
+ sock_sendmsg_nosec net/socket.c:654 [inline]
+ sock_sendmsg+0xcf/0x120 net/socket.c:674
+ sock_write_iter+0x289/0x3c0 net/socket.c:1001
+ call_write_iter include/linux/fs.h:2106 [inline]
+ do_iter_readv_writev+0x46f/0x740 fs/read_write.c:740
+ do_iter_write+0x188/0x670 fs/read_write.c:866
+ vfs_writev+0x1aa/0x630 fs/read_write.c:939
+ do_writev+0x27f/0x300 fs/read_write.c:982
+ do_syscall_64+0x2d/0x70 arch/x86/entry/common.c:46
+ entry_SYSCALL_64_after_hwframe+0x44/0xae
+RIP: 0033:0x43efa9
+Code: 28 c3 e8 2a 14 00 00 66 2e 0f 1f 84 00 00 00 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 c0 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007ffe9279f418 EFLAGS: 00000246 ORIG_RAX: 0000000000000014
+RAX: ffffffffffffffda RBX: 0000000000400488 RCX: 000000000043efa9
+RDX: 0000000000000001 RSI: 0000000020000100 RDI: 0000000000000003
+RBP: 0000000000402f90 R08: 0000000000400488 R09: 0000000000400488
+R10: 0000000000000038 R11: 0000000000000246 R12: 0000000000403020
+R13: 0000000000000000 R14: 00000000004ac018 R15: 0000000000400488
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+syzbot can test patches for this issue, for details see:
+https://goo.gl/tpsmEJ#testing-patches
