@@ -2,214 +2,285 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 242D73597DB
-	for <lists+kvm@lfdr.de>; Fri,  9 Apr 2021 10:30:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1D0293597E5
+	for <lists+kvm@lfdr.de>; Fri,  9 Apr 2021 10:31:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231402AbhDIIav (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 9 Apr 2021 04:30:51 -0400
-Received: from mga04.intel.com ([192.55.52.120]:33479 "EHLO mga04.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229696AbhDIIaq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 9 Apr 2021 04:30:46 -0400
-IronPort-SDR: vCmdpw6qkvdchWVgDxL27j1UYzpZJeFaOF2KG/b7nrqEdMw/DjvYOY5j6xBSlk1spC+lqz9pTU
- aagJfMMKgdkg==
-X-IronPort-AV: E=McAfee;i="6000,8403,9948"; a="191567606"
-X-IronPort-AV: E=Sophos;i="5.82,208,1613462400"; 
-   d="scan'208";a="191567606"
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Apr 2021 01:30:20 -0700
-IronPort-SDR: 4CBP2n1UCbEC7IphgTOX8DUauUMyRWtHmry8kTdOXTVsmp+gl8H8HheMpe6u6ma3gJ906fAXkm
- 5opdCzW0kPrg==
-X-IronPort-AV: E=Sophos;i="5.82,208,1613462400"; 
-   d="scan'208";a="416174376"
-Received: from likexu-mobl1.ccr.corp.intel.com (HELO [10.238.4.93]) ([10.238.4.93])
-  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Apr 2021 01:30:16 -0700
-Subject: Re: [PATCH v4 08/16] KVM: x86/pmu: Add IA32_DS_AREA MSR emulation to
- manage guest DS buffer
-To:     Peter Zijlstra <peterz@infradead.org>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, eranian@google.com,
-        andi@firstfloor.org, kan.liang@linux.intel.com,
-        wei.w.wang@intel.com, Wanpeng Li <wanpengli@tencent.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        x86@kernel.org, linux-kernel@vger.kernel.org,
-        Andi Kleen <ak@linux.intel.com>,
-        Like Xu <like.xu@linux.intel.com>
-References: <20210329054137.120994-1-like.xu@linux.intel.com>
- <20210329054137.120994-9-like.xu@linux.intel.com>
- <YG3SPsiFJPeXQXhq@hirez.programming.kicks-ass.net>
- <610bfd14-3250-0542-2d93-cbd15f2b4e16@intel.com>
- <YG62VBBix2WVy3XA@hirez.programming.kicks-ass.net>
- <8695f271-9da9-f16d-15f2-e2757186db65@intel.com>
- <YHAJXh2AtSMcC5xf@hirez.programming.kicks-ass.net>
-From:   "Xu, Like" <like.xu@intel.com>
-Message-ID: <9ec0e0ba-bef6-710e-1e9c-36beaedae16e@intel.com>
-Date:   Fri, 9 Apr 2021 16:30:14 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.9.0
+        id S231925AbhDIIbu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 9 Apr 2021 04:31:50 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:42961 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231668AbhDIIbq (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 9 Apr 2021 04:31:46 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1617957093;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=ckiaDadLI3Q36uJmnyF8zVs1VJKNRCw3jjdFa+zQU9E=;
+        b=TctAKeQ/t0+lsb8rkozNL6dUeCzb9O7mtohz6Bs4NpEvi6F18vBNEYnLmRNmU/2BSHdzhp
+        FRMSbNItKVMTHGZjqDUirgIqy0+cwGew96bmcYB0evf/UMMwLaO/h5NuCBN+9ojgcBhB0y
+        W+P0pmkpMnVaLI3cWu2fclf9fqLjx7c=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-130-ygGqiEGgNb-IGtXqc6wpjA-1; Fri, 09 Apr 2021 04:31:26 -0400
+X-MC-Unique: ygGqiEGgNb-IGtXqc6wpjA-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8A3DB8189EE;
+        Fri,  9 Apr 2021 08:31:23 +0000 (UTC)
+Received: from [10.36.114.73] (ovpn-114-73.ams2.redhat.com [10.36.114.73])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 0C8C019C71;
+        Fri,  9 Apr 2021 08:31:11 +0000 (UTC)
+Subject: Re: [PATCH v14 06/13] iommu/smmuv3: Allow stage 1 invalidation with
+ unmanaged ASIDs
+To:     Kunkun Jiang <jiangkunkun@huawei.com>, eric.auger.pro@gmail.com,
+        iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, will@kernel.org,
+        maz@kernel.org, robin.murphy@arm.com, joro@8bytes.org,
+        alex.williamson@redhat.com, tn@semihalf.com, zhukeqian1@huawei.com
+Cc:     jacob.jun.pan@linux.intel.com, yi.l.liu@intel.com,
+        wangxingang5@huawei.com, jean-philippe@linaro.org,
+        zhangfei.gao@linaro.org, zhangfei.gao@gmail.com,
+        vivek.gautam@arm.com, shameerali.kolothum.thodi@huawei.com,
+        yuzenghui@huawei.com, nicoleotsuka@gmail.com,
+        lushenming@huawei.com, vsethi@nvidia.com,
+        wanghaibin.wang@huawei.com
+References: <20210223205634.604221-1-eric.auger@redhat.com>
+ <20210223205634.604221-7-eric.auger@redhat.com>
+ <901720e6-6ca5-eb9a-1f24-0ca479bcfecc@huawei.com>
+ <0246aec2-162d-0584-3ca4-b9c304ef3c8a@redhat.com>
+ <46f3760a-9ab5-1710-598e-38fbc1f5fb5c@huawei.com>
+From:   Auger Eric <eric.auger@redhat.com>
+Message-ID: <2baf96db-d7fe-e341-1b40-fab2b4c9fd92@redhat.com>
+Date:   Fri, 9 Apr 2021 10:31:09 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.8.0
 MIME-Version: 1.0
-In-Reply-To: <YHAJXh2AtSMcC5xf@hirez.programming.kicks-ass.net>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <46f3760a-9ab5-1710-598e-38fbc1f5fb5c@huawei.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2021/4/9 15:59, Peter Zijlstra wrote:
-> On Fri, Apr 09, 2021 at 03:07:38PM +0800, Xu, Like wrote:
->> Hi Peter,
+Hi Kunkun,
+
+On 4/9/21 6:48 AM, Kunkun Jiang wrote:
+> Hi Eric,
+> 
+> On 2021/4/8 20:30, Auger Eric wrote:
+>> Hi Kunkun,
 >>
->> On 2021/4/8 15:52, Peter Zijlstra wrote:
->>>> This is because in the early part of this function, we have operations:
+>> On 4/1/21 2:37 PM, Kunkun Jiang wrote:
+>>> Hi Eric,
+>>>
+>>> On 2021/2/24 4:56, Eric Auger wrote:
+>>>> With nested stage support, soon we will need to invalidate
+>>>> S1 contexts and ranges tagged with an unmanaged asid, this
+>>>> latter being managed by the guest. So let's introduce 2 helpers
+>>>> that allow to invalidate with externally managed ASIDs
 >>>>
->>>>       if (x86_pmu.flags & PMU_FL_PEBS_ALL)
->>>>           arr[0].guest &= ~cpuc->pebs_enabled;
->>>>       else
->>>>           arr[0].guest &= ~(cpuc->pebs_enabled & PEBS_COUNTER_MASK);
+>>>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
 >>>>
->>>> and if guest has PEBS_ENABLED, we need these bits back for PEBS counters:
+>>>> ---
 >>>>
->>>>       arr[0].guest |= arr[1].guest;
->>> I don't think that's right, who's to say they were set in the first
->>> place? The guest's GLOBAL_CTRL could have had the bits cleared at VMEXIT
->>> time. You can't unconditionally add PEBS_ENABLED into GLOBAL_CTRL,
->>> that's wrong.
->> I can't keep up with you on this comment and would you explain more ?
-> Well, it could be I'm terminally confused on how virt works (I usually
-> am, it just doesn't make any sense ever).
-
-I may help you a little on this.
-
->
-> On top of that this code doesn't have any comments to help.
-
-More comments will be added.
-
->
-> So perf_guest_switch_msr has two msr values: guest and host.
->
-> In my naive understanding guest is the msr value the guest sees and host
-> is the value the host has. If it is not that, then the naming is just
-> misleading at best.
->
-> But thinking more about it, if these are fully emulated MSRs (which I
-> think they are), then there might actually be 3 different values, not 2.
-
-You are right about 3 different values.
-
->
-> We have the value the guest sees when it uses {RD,WR}MSR.
-> We have the value the hardware has when it runs a guest.
-> We have the value the hardware has when it doesn't run a guest.
->
-> And somehow this code does something, but I can't for the life of me
-> figure out what and how.
-
-Just focus on the last two values and the enabling bits (on the GLOBAL_CTRL
-and PEBS_ENABLE) of "the value the hardware has when it runs a guest"
-are exclusive with "the value the hardware has when it doesn't run a guest."
-
->> To address your previous comments, does the code below look good to you?
+>>>> v13 -> v14
+>>>> - Actually send the NH_ASID command (reported by Xingang Wang)
+>>>> ---
+>>>>    drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c | 38
+>>>> ++++++++++++++++-----
+>>>>    1 file changed, 29 insertions(+), 9 deletions(-)
+>>>>
+>>>> diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
+>>>> b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
+>>>> index 5579ec4fccc8..4c19a1114de4 100644
+>>>> --- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
+>>>> +++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
+>>>> @@ -1843,9 +1843,9 @@ int arm_smmu_atc_inv_domain(struct
+>>>> arm_smmu_domain *smmu_domain, int ssid,
+>>>>    }
+>>>>      /* IO_PGTABLE API */
+>>>> -static void arm_smmu_tlb_inv_context(void *cookie)
+>>>> +static void __arm_smmu_tlb_inv_context(struct arm_smmu_domain
+>>>> *smmu_domain,
+>>>> +                       int ext_asid)
+>>>>    {
+>>>> -    struct arm_smmu_domain *smmu_domain = cookie;
+>>>>        struct arm_smmu_device *smmu = smmu_domain->smmu;
+>>>>        struct arm_smmu_cmdq_ent cmd;
+>>>>    @@ -1856,7 +1856,13 @@ static void arm_smmu_tlb_inv_context(void
+>>>> *cookie)
+>>>>         * insertion to guarantee those are observed before the TLBI.
+>>>> Do be
+>>>>         * careful, 007.
+>>>>         */
+>>>> -    if (smmu_domain->stage == ARM_SMMU_DOMAIN_S1) {
+>>>> +    if (ext_asid >= 0) { /* guest stage 1 invalidation */
+>>>> +        cmd.opcode    = CMDQ_OP_TLBI_NH_ASID;
+>>>> +        cmd.tlbi.asid    = ext_asid;
+>>>> +        cmd.tlbi.vmid    = smmu_domain->s2_cfg.vmid;
+>>>> +        arm_smmu_cmdq_issue_cmd(smmu, &cmd);
+>>>> +        arm_smmu_cmdq_issue_sync(smmu);
+>>>> +    } else if (smmu_domain->stage == ARM_SMMU_DOMAIN_S1) {
+>>>>            arm_smmu_tlb_inv_asid(smmu, smmu_domain->s1_cfg.cd.asid);
+>>>>        } else {
+>>>>            cmd.opcode    = CMDQ_OP_TLBI_S12_VMALL;
+>>>> @@ -1867,6 +1873,13 @@ static void arm_smmu_tlb_inv_context(void
+>>>> *cookie)
+>>>>        arm_smmu_atc_inv_domain(smmu_domain, 0, 0, 0);
+>>>>    }
+>>>>    +static void arm_smmu_tlb_inv_context(void *cookie)
+>>>> +{
+>>>> +    struct arm_smmu_domain *smmu_domain = cookie;
+>>>> +
+>>>> +    __arm_smmu_tlb_inv_context(smmu_domain, -1);
+>>>> +}
+>>>> +
+>>>>    static void __arm_smmu_tlb_inv_range(struct arm_smmu_cmdq_ent *cmd,
+>>>>                         unsigned long iova, size_t size,
+>>>>                         size_t granule,
+>>>> @@ -1926,9 +1939,10 @@ static void __arm_smmu_tlb_inv_range(struct
+>>>> arm_smmu_cmdq_ent *cmd,
+>>>>        arm_smmu_cmdq_batch_submit(smmu, &cmds);
+>>>>    }
+>>>>    
+>>> Here is the part of code in __arm_smmu_tlb_inv_range():
+>>>>          if (smmu->features & ARM_SMMU_FEAT_RANGE_INV) {
+>>>>                  /* Get the leaf page size */
+>>>>                  tg = __ffs(smmu_domain->domain.pgsize_bitmap);
+>>>>
+>>>>                  /* Convert page size of 12,14,16 (log2) to 1,2,3 */
+>>>>                  cmd->tlbi.tg = (tg - 10) / 2;
+>>>>
+>>>>                  /* Determine what level the granule is at */
+>>>>                  cmd->tlbi.ttl = 4 - ((ilog2(granule) - 3) / (tg - 3));
+>>>>
+>>>>                  num_pages = size >> tg;
+>>>>          }
+>>> When pSMMU supports RIL, we get the leaf page size by
+>>> __ffs(smmu_domain->
+>>> domain.pgsize_bitmap). In nested mode, it is determined by host
+>>> PAGE_SIZE. If
+>>> the host kernel and guest kernel has different translation granule (e.g.
+>>> host 16K,
+>>> guest 4K), __arm_smmu_tlb_inv_range() will issue an incorrect tlbi
+>>> command.
+>>>
+>>> Do you have any idea about this issue?
+>> I think this is the same issue as the one reported by Chenxiang
 >>
->> static struct perf_guest_switch_msr *intel_guest_get_msrs(int *nr, void *data)
->> {
->>      struct cpu_hw_events *cpuc = this_cpu_ptr(&cpu_hw_events);
->>      struct perf_guest_switch_msr *arr = cpuc->guest_switch_msrs;
->>      struct debug_store *ds = __this_cpu_read(cpu_hw_events.ds);
->>      struct kvm_pmu *pmu = (struct kvm_pmu *)data;
->>      u64 pebs_mask = (x86_pmu.flags & PMU_FL_PEBS_ALL) ?
->>              cpuc->pebs_enabled : (cpuc->pebs_enabled & PEBS_COUNTER_MASK);
->>      int i = 0;
+>> https://lore.kernel.org/lkml/15938ed5-2095-e903-a290-333c299015a2@hisilicon.com/
 >>
->>      arr[i].msr = MSR_CORE_PERF_GLOBAL_CTRL;
->>      arr[i].host = x86_pmu.intel_ctrl & ~cpuc->intel_ctrl_guest_mask;
->>      arr[i].guest = x86_pmu.intel_ctrl & ~cpuc->intel_ctrl_host_mask;
->>      arr[i].guest &= ~pebs_mask;
 >>
->>      if (!x86_pmu.pebs)
->>          goto out;
+>> In case RIL is not supported by the host, next version will use the
+>> smallest pSMMU supported page size, as done in __arm_smmu_tlb_inv_range
 >>
->>      /*
->>       * If PMU counter has PEBS enabled it is not enough to
->>       * disable counter on a guest entry since PEBS memory
->>       * write can overshoot guest entry and corrupt guest
->>       * memory. Disabling PEBS solves the problem.
->>       *
->>       * Don't do this if the CPU already enforces it.
->>       */
->>      if (x86_pmu.pebs_no_isolation) {
->>          i++;
->>          arr[i].msr = MSR_IA32_PEBS_ENABLE;
->>          arr[i].host = cpuc->pebs_enabled;
->>          arr[i].guest = 0;
->>          goto out;
->>      }
+>> Thanks
 >>
->>      if (!pmu || !x86_pmu.pebs_vmx)
->>          goto out;
->>
->>      i++;
->>      arr[i].msr = MSR_IA32_DS_AREA;
->>      arr[i].host = (unsigned long)ds;
->>      arr[i].guest = pmu->ds_area;
->>
->>      if (x86_pmu.intel_cap.pebs_baseline) {
->>          i++;
->>          arr[i].msr = MSR_PEBS_DATA_CFG;
->>          arr[i].host = cpuc->pebs_data_cfg;
->>          arr[i].guest = pmu->pebs_data_cfg;
->>      }
->>
->>      i++;
->>      arr[i].msr = MSR_IA32_PEBS_ENABLE;
->>      arr[i].host = cpuc->pebs_enabled & ~cpuc->intel_ctrl_guest_mask;
->>      arr[i].guest = pebs_mask & ~cpuc->intel_ctrl_host_mask;
->>
->>      if (arr[i].host) {
->>          /* Disable guest PEBS if host PEBS is enabled. */
->>          arr[i].guest = 0;
->>      } else {
->>          /* Disable guest PEBS for cross-mapped PEBS counters. */
->>          arr[i].guest &= ~pmu->host_cross_mapped_mask;
->>          arr[0].guest |= arr[i].guest;
->>      }
->>
->> out:
->>      *nr = ++i;
->>      return arr;
->> }
-> The ++ is in a weird location, if you place it after filling out an
-> entry it makes more sense I think. Something like:
->
-> 	arr[i].msr = MSR_CORE_PERF_GLOBAL_CTRL;
-> 	arr[i].host = x86_pmu.intel_ctrl & ~cpuc->intel_ctrl_guest_mask;
-> 	arr[i].guest = x86_pmu.intel_ctrl & ~cpuc->intel_ctrl_host_mask;
-> 	arr[i].guest &= ~pebs_mask;
-> 	i++;
->
-> or, perhaps even like:
->
-> 	arr[i++] = (struct perf_guest_switch_msr){
-> 		.msr = MSR_CORE_PERF_GLOBAL_CTRL,
-> 		.host = x86_pmu.intel_ctrl & ~cpuc->intel_ctrl_guest_mask,
-> 		.guest = x86_pmu.intel_ctrl & (~cpuc->intel_ctrl_host_mask | ~pebs_mask),
-> 	};
+>> Eric
+> I think they are different. In normal cases, when we want to invalidate the
+> cache of stage 1, we should use the granule size supported by vSMMU to
+> implement and issue an tlbi command if pSMMU supports RIL.
+> 
+> But in the current __arm_smmu_tlb_inv_range(), it always uses the granule
+> size supported by host.
+> (tg = __ffs(smmu_domain->domain.pgsize_bitmap);)
+> 
+> Let me explain more clearly.
+> Preconditions of this issue:
+> 1. pSMMU supports RIL
+> 2. host and guest use different translation granule (e.g. host 16K,
+> guest 4K)
+this is not clear to me. See below.
+> 
+> Guest wants to invalidate 4K, so info->granule_size = 4K.
+> In __arm_smmu_tlb_inv_range(),   if pSMMU supports RIL and host 16K,
+> tg = 14, tlbi.tg = 2, tlbi.ttl = 4, tlbi.scale = 0, tlbi.num = -1. It is
+> an incorrect
+> tlbi command.
 
-The later one looks good to me and I'll apply it.
+If the guest uses 4K granule, this means the pSMMU also supports 4K
+granule. Otherwise the corresponding CD is invalid (TG0/TG1 field desc).
+So in that case isn't it valid to send a RIL invalidation with tg = 12,
+right?
 
-> But it doesn't address the fundamental confusion I seem to be having,
-> what actual msr value is what.
+Making sure the guest uses a valid pSMMU supported granule is the QEMU
+job I think, this should be done at the init phase before hitting CD
+invalid errors for sure.
 
-VMX hardware has the capability to switch MSR values atomically：
-- for vm-entry instruction, it loads the value of arr[i].guest to arr[i].msr;
-- for vm-exit instruction, it loads the value of arr[i].host to arr[i].msr;
+Thanks
 
-The intel_guest_get_msrs() will populate arr[i].guest and arr[i].host values
-before each vm-entry and its caller does the optimization to skip the switch
-if arr[i].guest == arr[i].host.
+Eric
 
-Just let me know if you have more questions,
-otherwise I assume we have reached an agreement on this part of code.
+> 
+> So it would be better to pass the leaf page size supported by vSMMU to
+> host.  Perhaps this issue and the one reported by Chenxiang can be solved
+> together.
+> 
+> Thanks,
+> Kunkun Jiang
+>>> Best Regards,
+>>> Kunkun Jiang
+>>>> -static void arm_smmu_tlb_inv_range_domain(unsigned long iova, size_t
+>>>> size,
+>>>> -                      size_t granule, bool leaf,
+>>>> -                      struct arm_smmu_domain *smmu_domain)
+>>>> +static void
+>>>> +arm_smmu_tlb_inv_range_domain(unsigned long iova, size_t size,
+>>>> +                  size_t granule, bool leaf, int ext_asid,
+>>>> +                  struct arm_smmu_domain *smmu_domain)
+>>>>    {
+>>>>        struct arm_smmu_cmdq_ent cmd = {
+>>>>            .tlbi = {
+>>>> @@ -1936,7 +1950,12 @@ static void
+>>>> arm_smmu_tlb_inv_range_domain(unsigned long iova, size_t size,
+>>>>            },
+>>>>        };
+>>>>    -    if (smmu_domain->stage == ARM_SMMU_DOMAIN_S1) {
+>>>> +    if (ext_asid >= 0) {  /* guest stage 1 invalidation */
+>>>> +        cmd.opcode    = smmu_domain->smmu->features &
+>>>> ARM_SMMU_FEAT_E2H ?
+>>>> +                  CMDQ_OP_TLBI_EL2_VA : CMDQ_OP_TLBI_NH_VA;
+>>>> +        cmd.tlbi.asid    = ext_asid;
+>>>> +        cmd.tlbi.vmid    = smmu_domain->s2_cfg.vmid;
+>>>> +    } else if (smmu_domain->stage == ARM_SMMU_DOMAIN_S1) {
+>>>>            cmd.opcode    = smmu_domain->smmu->features &
+>>>> ARM_SMMU_FEAT_E2H ?
+>>>>                      CMDQ_OP_TLBI_EL2_VA : CMDQ_OP_TLBI_NH_VA;
+>>>>            cmd.tlbi.asid    = smmu_domain->s1_cfg.cd.asid;
+>>>> @@ -1944,6 +1963,7 @@ static void
+>>>> arm_smmu_tlb_inv_range_domain(unsigned long iova, size_t size,
+>>>>            cmd.opcode    = CMDQ_OP_TLBI_S2_IPA;
+>>>>            cmd.tlbi.vmid    = smmu_domain->s2_cfg.vmid;
+>>>>        }
+>>>> +
+>>>>        __arm_smmu_tlb_inv_range(&cmd, iova, size, granule,
+>>>> smmu_domain);
+>>>>          /*
+>>>> @@ -1982,7 +2002,7 @@ static void arm_smmu_tlb_inv_page_nosync(struct
+>>>> iommu_iotlb_gather *gather,
+>>>>    static void arm_smmu_tlb_inv_walk(unsigned long iova, size_t size,
+>>>>                      size_t granule, void *cookie)
+>>>>    {
+>>>> -    arm_smmu_tlb_inv_range_domain(iova, size, granule, false, cookie);
+>>>> +    arm_smmu_tlb_inv_range_domain(iova, size, granule, false, -1,
+>>>> cookie);
+>>>>    }
+>>>>      static const struct iommu_flush_ops arm_smmu_flush_ops = {
+>>>> @@ -2523,7 +2543,7 @@ static void arm_smmu_iotlb_sync(struct
+>>>> iommu_domain *domain,
+>>>>          arm_smmu_tlb_inv_range_domain(gather->start,
+>>>>                          gather->end - gather->start + 1,
+>>>> -                      gather->pgsize, true, smmu_domain);
+>>>> +                      gather->pgsize, true, -1, smmu_domain);
+>>>>    }
+>>>>      static phys_addr_t
+>>>
+>> .
+> 
+> 
+
