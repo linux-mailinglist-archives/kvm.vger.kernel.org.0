@@ -2,121 +2,70 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 26D2535969A
-	for <lists+kvm@lfdr.de>; Fri,  9 Apr 2021 09:42:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7923D35969C
+	for <lists+kvm@lfdr.de>; Fri,  9 Apr 2021 09:43:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231968AbhDIHm7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 9 Apr 2021 03:42:59 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:33707 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231895AbhDIHm7 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 9 Apr 2021 03:42:59 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1617954166;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=YNRAYvZEYzpqoys7GviK7KCuwJyenrXNkiKbNxZPfpU=;
-        b=CqLLGpxrvPXKVQIoSPkhXXt3ZPN2tup3m1CkbHHzk9BvotQSpOd9G5M1dE65Rs3xB8xipT
-        04WSd+DvGQiucJZByRNhJJgA9VmYMmgydINIOVl+AEVLr1/3E4qcNEGm1rk/vDDNZC7gqH
-        3J5DVZrx5+D7V7cKYKV5ujmeFBbedU0=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-327-4o4w7KXQM3elLtQ9dbkulA-1; Fri, 09 Apr 2021 03:42:44 -0400
-X-MC-Unique: 4o4w7KXQM3elLtQ9dbkulA-1
-Received: by mail-ed1-f71.google.com with SMTP id l22so2274695edt.8
-        for <kvm@vger.kernel.org>; Fri, 09 Apr 2021 00:42:44 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=YNRAYvZEYzpqoys7GviK7KCuwJyenrXNkiKbNxZPfpU=;
-        b=TZ726yxtkEKjQdU6Foacz3Nzm4GHNj3mK2eEmw/Y0PoMkAq1bZtxSa2tUtPh/iSB3b
-         JMEga/QId4foTLgnJAUNnoe5vfejDtqQUYl8XkGZFuq+RUNfMrdgHgVd0hy26ZLXKRHP
-         n+DLmuoa8ynKzONZ+5Gpb7NWe2/laJ29eo/3Yol557LpcBAUPqdzXqAHVEcg0p7mFnHM
-         62nInayMqgU7nn74/Zm7vIMZUwfMwkTgwRfIQKDV/gN15EkGSzybBpg5luhES9Oon6hK
-         ZPTwxhHcJ7GGpXYaAV7jHLTn1edbRR6kQbzA/K2jAlS2oNUuSDv5M1YVfzJjhqO6//V5
-         DlCA==
-X-Gm-Message-State: AOAM532u9TzTosDpAoagqYh7i9SWKImqWKkHpuh+G1bBIurCuHYm1YUQ
-        5I6LUzgVXFkpG6EYdxxVQsk81Aw71axa3ncETrVOpkhn8XsXsXXhwUw8hMB1uddv0VAzZTd1Tq1
-        xKnOeXc7hh8cT
-X-Received: by 2002:a50:f29a:: with SMTP id f26mr16170636edm.13.1617954163350;
-        Fri, 09 Apr 2021 00:42:43 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJw9X6LUCm/VlbxytiCCUWpZztthGe5jHm4meEp8gBOoBrkZhZ7mUGCrZnvizxVfncZD29wCmQ==
-X-Received: by 2002:a50:f29a:: with SMTP id f26mr16170612edm.13.1617954163221;
-        Fri, 09 Apr 2021 00:42:43 -0700 (PDT)
-Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id ju23sm819785ejc.17.2021.04.09.00.42.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 09 Apr 2021 00:42:42 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Siddharth Chandrasekaran <sidcha@amazon.de>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kys@microsoft.com,
-        haiyangz@microsoft.com, sthemmin@microsoft.com, tglx@linutronix.de,
-        mingo@redhat.com, bp@alien8.de, x86@kernel.org, hpa@zytor.com,
-        seanjc@google.com, wanpengli@tencent.com, jmattson@google.com,
-        joro@8bytes.org, graf@amazon.com, eyakovl@amazon.de,
-        linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, Wei Liu <wei.liu@kernel.org>
-Subject: Re: [PATCH 0/4] Add support for XMM fast hypercalls
-In-Reply-To: <20210408174521.GF32315@u366d62d47e3651.ant.amazon.com>
-References: <20210407212926.3016-1-sidcha@amazon.de>
- <20210408152817.k4d4hjdqu7hsjllo@liuwe-devbox-debian-v2>
- <033e7d77-d640-2c12-4918-da6b5b7f4e21@redhat.com>
- <20210408154006.GA32315@u366d62d47e3651.ant.amazon.com>
- <53200f24-bd57-1509-aee2-0723aa8a3f6f@redhat.com>
- <20210408155442.GC32315@u366d62d47e3651.ant.amazon.com>
- <20210408163018.mlr23jd2r4st54jc@liuwe-devbox-debian-v2>
- <20210408174521.GF32315@u366d62d47e3651.ant.amazon.com>
-Date:   Fri, 09 Apr 2021 09:42:41 +0200
-Message-ID: <87wntb7vke.fsf@vitty.brq.redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+        id S231950AbhDIHnR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 9 Apr 2021 03:43:17 -0400
+Received: from mga04.intel.com ([192.55.52.120]:30006 "EHLO mga04.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229751AbhDIHnR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 9 Apr 2021 03:43:17 -0400
+IronPort-SDR: RcEna5pu8xMIp21wMNJ/mHFn77sWn44h0N8q2S/Z0IErMaVyORr5uU4BEJ7QyAHYhjOj0T1x0A
+ hRsQDxIrkPig==
+X-IronPort-AV: E=McAfee;i="6000,8403,9948"; a="191560039"
+X-IronPort-AV: E=Sophos;i="5.82,208,1613462400"; 
+   d="scan'208";a="191560039"
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Apr 2021 00:43:05 -0700
+IronPort-SDR: jAS780YL7WolSpmM2cAADVzf3M3ZmGn94XGB6Smo+hTMF8fFnTiBCOdOWC0l6u6OCQYHfazZJD
+ 0nbuHAJv3Z5g==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.82,208,1613462400"; 
+   d="scan'208";a="450104302"
+Received: from local-michael-cet-test.sh.intel.com ([10.239.159.166])
+  by fmsmga002.fm.intel.com with ESMTP; 09 Apr 2021 00:43:03 -0700
+From:   Yang Weijiang <weijiang.yang@intel.com>
+To:     pbonzini@redhat.com, kvm@vger.kernel.org
+Cc:     Yang Weijiang <weijiang.yang@intel.com>
+Subject: [PATCH] [kvm-unit-tests PATCH] x86/access: Fix intermittent test failure
+Date:   Fri,  9 Apr 2021 15:55:18 +0800
+Message-Id: <20210409075518.32065-1-weijiang.yang@intel.com>
+X-Mailer: git-send-email 2.17.2
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Siddharth Chandrasekaran <sidcha@amazon.de> writes:
+During kvm-unit-test, below failure pattern is observed, this is due to testing thread
+migration + cache "lazy" flush during test, so forcely flush the cache to avoid the issue.
+Pin the test app to certain physical CPU can fix the issue as well. The error report is
+misleading, pke is the victim of the issue.
 
-> On Thu, Apr 08, 2021 at 04:30:18PM +0000, Wei Liu wrote:
->> On Thu, Apr 08, 2021 at 05:54:43PM +0200, Siddharth Chandrasekaran wrote:
->> > On Thu, Apr 08, 2021 at 05:48:19PM +0200, Paolo Bonzini wrote:
->> > > On 08/04/21 17:40, Siddharth Chandrasekaran wrote:
->> > > > > > > Although the Hyper-v TLFS mentions that a guest cannot use this feature
->> > > > > > > unless the hypervisor advertises support for it, some hypercalls which
->> > > > > > > we plan on upstreaming in future uses them anyway.
->> > > > > > No, please don't do this. Check the feature bit(s) before you issue
->> > > > > > hypercalls which rely on the extended interface.
->> > > > > Perhaps Siddharth should clarify this, but I read it as Hyper-V being
->> > > > > buggy and using XMM arguments unconditionally.
->> > > > The guest is at fault here as it expects Hyper-V to consume arguments
->> > > > from XMM registers for certain hypercalls (that we are working) even if
->> > > > we didn't expose the feature via CPUID bits.
->> > >
->> > > What guest is that?
->> >
->> > It is a Windows Server 2016.
->> 
->> Can you be more specific? Are you implementing some hypercalls from
->> TLFS? If so, which ones?
->
-> Yes all of them are from TLFS. We are implementing VSM and there are a
-> bunch of hypercalls that we have implemented to manage VTL switches,
-> memory protection and virtual interrupts.
+test user cr4.pke: FAIL: error code 5 expected 4
+Dump mapping: address: 0x123400000000
+------L4: 21ea007
+------L3: 21eb007
+------L2: 21ec000
+------L1: 2000000
 
-Wow, sounds awesome! Do you plan to upstream this work?
+Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
+---
+ x86/access.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-> The following 3 hypercalls that use the XMM fast hypercalls are relevant
-> to this patch set:
->
-> HvCallModifyVtlProtectionMask
-> HvGetVpRegisters 
-> HvSetVpRegisters 
-
-It seems AccessVSM and AccessVpRegisters privilges have implicit
-dependency on XMM input/output. This will need to be enforced in KVM
-userspace.
-
+diff --git a/x86/access.c b/x86/access.c
+index 7dc9eb6..379d533 100644
+--- a/x86/access.c
++++ b/x86/access.c
+@@ -211,6 +211,8 @@ static unsigned set_cr4_smep(int smep)
+         ptl2[2] |= PT_USER_MASK;
+     if (!r)
+         shadow_cr4 = cr4;
++
++    invlpg((void *)(ptl2[2] & ~PAGE_SIZE));
+     return r;
+ }
+ 
 -- 
-Vitaly
+2.26.2
 
