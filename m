@@ -2,88 +2,91 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 95C54359869
-	for <lists+kvm@lfdr.de>; Fri,  9 Apr 2021 10:59:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 71A21359873
+	for <lists+kvm@lfdr.de>; Fri,  9 Apr 2021 11:00:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231638AbhDII7Z (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 9 Apr 2021 04:59:25 -0400
-Received: from szxga01-in.huawei.com ([45.249.212.187]:3081 "EHLO
-        szxga01-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230181AbhDII7X (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 9 Apr 2021 04:59:23 -0400
-Received: from DGGEML402-HUB.china.huawei.com (unknown [172.30.72.53])
-        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4FGsRF3G8zzWV6R;
-        Fri,  9 Apr 2021 16:55:37 +0800 (CST)
-Received: from dggpemm500023.china.huawei.com (7.185.36.83) by
- DGGEML402-HUB.china.huawei.com (10.3.17.38) with Microsoft SMTP Server (TLS)
- id 14.3.498.0; Fri, 9 Apr 2021 16:59:09 +0800
-Received: from [10.174.187.128] (10.174.187.128) by
- dggpemm500023.china.huawei.com (7.185.36.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id
- 15.1.2106.2; Fri, 9 Apr 2021 16:59:08 +0800
-Subject: Re: [PATCH v4 1/2] KVM: arm64: Move CMOs from user_mem_abort to the
- fault handlers
+        id S232197AbhDIJAu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 9 Apr 2021 05:00:50 -0400
+Received: from mail.kernel.org ([198.145.29.99]:59640 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S230181AbhDIJAt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 9 Apr 2021 05:00:49 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 974C8611AB;
+        Fri,  9 Apr 2021 09:00:36 +0000 (UTC)
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94)
+        (envelope-from <maz@kernel.org>)
+        id 1lUn0E-006UdP-Jz; Fri, 09 Apr 2021 10:00:34 +0100
+Date:   Fri, 09 Apr 2021 10:00:33 +0100
+Message-ID: <87lf9romry.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
 To:     Quentin Perret <qperret@google.com>
-CC:     Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
-        "Alexandru Elisei" <alexandru.elisei@arm.com>,
+Cc:     Yanan Wang <wangyanan55@huawei.com>, Will Deacon <will@kernel.org>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
         Catalin Marinas <catalin.marinas@arm.com>,
-        <kvmarm@lists.cs.columbia.edu>,
-        <linux-arm-kernel@lists.infradead.org>, <kvm@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, James Morse <james.morse@arm.com>,
+        kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        James Morse <james.morse@arm.com>,
         Julien Thierry <julien.thierry.kdev@gmail.com>,
-        "Suzuki K Poulose" <suzuki.poulose@arm.com>,
-        Gavin Shan <gshan@redhat.com>, <wanghaibin.wang@huawei.com>,
-        <zhukeqian1@huawei.com>, <yuzenghui@huawei.com>
-References: <20210409033652.28316-1-wangyanan55@huawei.com>
- <20210409033652.28316-2-wangyanan55@huawei.com> <YHALa38PPQBceqF9@google.com>
-From:   "wangyanan (Y)" <wangyanan55@huawei.com>
-Message-ID: <67c497cc-5a74-e431-a9bc-d05582998bbe@huawei.com>
-Date:   Fri, 9 Apr 2021 16:59:08 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.4.0
-MIME-Version: 1.0
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Gavin Shan <gshan@redhat.com>, wanghaibin.wang@huawei.com,
+        zhukeqian1@huawei.com, yuzenghui@huawei.com
+Subject: Re: [PATCH v4 1/2] KVM: arm64: Move CMOs from user_mem_abort to the fault handlers
 In-Reply-To: <YHALa38PPQBceqF9@google.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-Originating-IP: [10.174.187.128]
-X-ClientProxiedBy: dggeme708-chm.china.huawei.com (10.1.199.104) To
- dggpemm500023.china.huawei.com (7.185.36.83)
-X-CFilter-Loop: Reflected
+References: <20210409033652.28316-1-wangyanan55@huawei.com>
+        <20210409033652.28316-2-wangyanan55@huawei.com>
+        <YHALa38PPQBceqF9@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: qperret@google.com, wangyanan55@huawei.com, will@kernel.org, alexandru.elisei@arm.com, catalin.marinas@arm.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, gshan@redhat.com, wanghaibin.wang@huawei.com, zhukeqian1@huawei.com, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Quentin,
-
-On 2021/4/9 16:08, Quentin Perret wrote:
+On Fri, 09 Apr 2021 09:08:11 +0100,
+Quentin Perret <qperret@google.com> wrote:
+> 
 > Hi Yanan,
->
+> 
 > On Friday 09 Apr 2021 at 11:36:51 (+0800), Yanan Wang wrote:
->> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
->> +static void stage2_invalidate_icache(void *addr, u64 size)
->> +{
->> +	if (icache_is_aliasing()) {
->> +		/* Flush any kind of VIPT icache */
->> +		__flush_icache_all();
->> +	} else if (is_kernel_in_hyp_mode() || !icache_is_vpipt()) {
->> +		/* PIPT or VPIPT at EL2 */
->> +		invalidate_icache_range((unsigned long)addr,
->> +					(unsigned long)addr + size);
->> +	}
->> +}
->> +
+> > diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+> > +static void stage2_invalidate_icache(void *addr, u64 size)
+> > +{
+> > +	if (icache_is_aliasing()) {
+> > +		/* Flush any kind of VIPT icache */
+> > +		__flush_icache_all();
+> > +	} else if (is_kernel_in_hyp_mode() || !icache_is_vpipt()) {
+> > +		/* PIPT or VPIPT at EL2 */
+> > +		invalidate_icache_range((unsigned long)addr,
+> > +					(unsigned long)addr + size);
+> > +	}
+> > +}
+> > +
+> 
 > I would recommend to try and rebase this patch on kvmarm/next because
 > we've made a few changes in pgtable.c recently. It is now linked into
 > the EL2 NVHE code which means there are constraints on what can be used
 > from there -- you'll need a bit of extra work to make some of these
 > functions available to EL2.
-I see, thanks for reminding me this.
-I will work on kvmarm/next and send a new version later.
 
-Thanks,
-Yanan
->
-> Thanks,
-> Quentin
-> .
+That's an interesting point.
+
+I wonder whether we are missing something on the i-side for VPITP +
+host stage-2 due to switching HCR_EL2.VM. We haven't changed the VMID
+(still 0), but I can't bring myself to be sure it doesn't affect the
+icache in this case...
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
