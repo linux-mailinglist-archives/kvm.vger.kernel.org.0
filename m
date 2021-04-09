@@ -2,55 +2,53 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CF0EA359E86
-	for <lists+kvm@lfdr.de>; Fri,  9 Apr 2021 14:23:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7E3A5359E90
+	for <lists+kvm@lfdr.de>; Fri,  9 Apr 2021 14:24:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232804AbhDIMXi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 9 Apr 2021 08:23:38 -0400
-Received: from linux.microsoft.com ([13.77.154.182]:42432 "EHLO
+        id S233525AbhDIMZB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 9 Apr 2021 08:25:01 -0400
+Received: from linux.microsoft.com ([13.77.154.182]:42622 "EHLO
         linux.microsoft.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232763AbhDIMXf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 9 Apr 2021 08:23:35 -0400
+        with ESMTP id S233019AbhDIMY4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 9 Apr 2021 08:24:56 -0400
 Received: from [192.168.86.30] (c-73-38-52-84.hsd1.vt.comcast.net [73.38.52.84])
-        by linux.microsoft.com (Postfix) with ESMTPSA id E677C20B5680;
-        Fri,  9 Apr 2021 05:23:20 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com E677C20B5680
+        by linux.microsoft.com (Postfix) with ESMTPSA id 6CFEC20B5680;
+        Fri,  9 Apr 2021 05:24:40 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 6CFEC20B5680
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-        s=default; t=1617971002;
-        bh=g1IkxfC02BI2BaL8HcBt5TCTlI/DmrIpd9NIeiz+BX8=;
+        s=default; t=1617971083;
+        bh=cvjSlEqzE0r8jbTTyah78wK4atQEFVQUPgjPXKTu3zo=;
         h=Subject:To:Cc:References:From:Date:In-Reply-To:From;
-        b=fDj98FQ0o8C9gtrF5zNWuas2cJ8KOF0kYOBZ9RmYT9qJ8Jo4iRsYJXO8L3kX5B6iK
-         3LB/y/+2He4rNKz2eYoVDAsWb2ovypwCeabvrYsiDOyGf1Cs0x9sCbyU3qqjLLNOcj
-         qRHsOdSZjrj+OAonLaLjzVJvyKqvYo12nV0IyJF0=
-Subject: Re: [PATCH 1/7] hyperv: Detect Nested virtualization support for SVM
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "K. Y. Srinivasan" <kys@microsoft.com>, x86@kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-hyperv@vger.kernel.org,
+        b=boTUERpFwM/5ek3yZAirRhWiEIv4atHr3NyIxPiLghR3L906gPgsOPZMTnnRzLI6Q
+         eBPVWrM6W3FUgzbon1UIyIPMdKgHXQCQxcMVQhXxr2nXopMv5oF9QX7Z2+o69HXQD0
+         h3qpKMYq6kkGejCBKExVadsJB12fEt2vmuGT2z6k=
+Subject: Re: [PATCH 4/7] KVM: SVM: hyper-v: Nested enlightenments in VMCB
+To:     Paolo Bonzini <pbonzini@redhat.com>,
         Lan Tianyu <Tianyu.Lan@microsoft.com>,
         Michael Kelley <mikelley@microsoft.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>, Wei Liu <wei.liu@kernel.org>,
         Stephen Hemminger <sthemmin@microsoft.com>,
         Haiyang Zhang <haiyangz@microsoft.com>
+Cc:     "H. Peter Anvin" <hpa@zytor.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "K. Y. Srinivasan" <kys@microsoft.com>, x86@kernel.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-hyperv@vger.kernel.org, viremana@linux.microsoft.com
 References: <cover.1617804573.git.viremana@linux.microsoft.com>
- <e14dac75ff1088b2c4bea361954b37e414edd03c.1617804573.git.viremana@linux.microsoft.com>
- <87lf9tavci.fsf@vitty.brq.redhat.com>
- <af87c25e-78c6-5859-e1c1-2aa07d087a25@linux.microsoft.com>
- <YG8gPI6NZHGBc3Zl@google.com>
+ <e9de12a81ab31613fb55d5c1308ca0ca050ced4c.1617804573.git.viremana@linux.microsoft.com>
+ <5927967d-c5a2-6df9-9aff-4b92c207df09@redhat.com>
 From:   Vineeth Pillai <viremana@linux.microsoft.com>
-Message-ID: <cce1a04e-7b72-ea7f-d6eb-099a7e777cf3@linux.microsoft.com>
-Date:   Fri, 9 Apr 2021 08:23:19 -0400
+Message-ID: <1ae328de-718c-dfa3-f5af-e765d953d841@linux.microsoft.com>
+Date:   Fri, 9 Apr 2021 08:24:39 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.8.1
 MIME-Version: 1.0
-In-Reply-To: <YG8gPI6NZHGBc3Zl@google.com>
+In-Reply-To: <5927967d-c5a2-6df9-9aff-4b92c207df09@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Content-Language: en-US
@@ -59,19 +57,20 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
-On 4/8/21 11:24 AM, Sean Christopherson wrote:
+On 4/8/21 11:44 AM, Paolo Bonzini wrote:
+> On 07/04/21 16:41, Vineeth Pillai wrote:
+>> +#define VMCB_ALL_CLEAN_MASK (__CLEAN_MASK | (1U << 
+>> VMCB_HV_NESTED_ENLIGHTENMENTS))
+>> +#else
+>> +#define VMCB_ALL_CLEAN_MASK __CLEAN_MASK
+>> +#endif
 >
-> Technically, you can use normal memory accesses, so long as software guarantees
-> the VMCS isn't resident in the VMCS cache and knows the field offsets for the
-> underlying CPU.  The lack of an architecturally defined layout is the biggest
-> issue, e.g. tacking on dirty bits through a PV ABI would be trivial.
+> I think this should depend on whether KVM is running on top of 
+> Hyper-V; not on whether KVM is *compiled* with Hyper-V support.
 >
->> Yes, you are right. I was referring to the fact that we cant use normal
->> memory accesses, but is a bit mis-worded.
-> If you slot in "architectural" it will read nicely, i.e. "VMCB is already an
-> architectural datastructure in memory".
-Yes, this makes sense. Thanks for the suggestion, will reword as you
-suggested.
+> So you should turn VMCB_ALL_CLEAN_MASK into a __read_mostly variable.
+Will do.
 
 Thanks,
 Vineeth
+
