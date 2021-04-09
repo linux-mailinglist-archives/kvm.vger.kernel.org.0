@@ -2,106 +2,137 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8781135931E
-	for <lists+kvm@lfdr.de>; Fri,  9 Apr 2021 05:38:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3D5CF35933C
+	for <lists+kvm@lfdr.de>; Fri,  9 Apr 2021 05:44:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233228AbhDIDiM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 8 Apr 2021 23:38:12 -0400
-Received: from szxga04-in.huawei.com ([45.249.212.190]:15635 "EHLO
+        id S233253AbhDIDo5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 8 Apr 2021 23:44:57 -0400
+Received: from szxga04-in.huawei.com ([45.249.212.190]:15637 "EHLO
         szxga04-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232990AbhDIDiL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 8 Apr 2021 23:38:11 -0400
-Received: from DGGEMS407-HUB.china.huawei.com (unknown [172.30.72.58])
-        by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4FGkJW4QMSznZ6Z;
-        Fri,  9 Apr 2021 11:34:19 +0800 (CST)
-Received: from DESKTOP-TMVL5KK.china.huawei.com (10.174.187.128) by
- DGGEMS407-HUB.china.huawei.com (10.3.19.207) with Microsoft SMTP Server id
- 14.3.498.0; Fri, 9 Apr 2021 11:36:57 +0800
-From:   Yanan Wang <wangyanan55@huawei.com>
-To:     Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
-        "Alexandru Elisei" <alexandru.elisei@arm.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        <kvmarm@lists.cs.columbia.edu>,
-        <linux-arm-kernel@lists.infradead.org>, <kvm@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>
-CC:     James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Gavin Shan <gshan@redhat.com>,
-        Quentin Perret <qperret@google.com>,
-        <wanghaibin.wang@huawei.com>, <zhukeqian1@huawei.com>,
-        <yuzenghui@huawei.com>, Yanan Wang <wangyanan55@huawei.com>
-Subject: [PATCH v4 2/2] KVM: arm64: Distinguish cases of memcache allocations completely
-Date:   Fri, 9 Apr 2021 11:36:52 +0800
-Message-ID: <20210409033652.28316-3-wangyanan55@huawei.com>
-X-Mailer: git-send-email 2.8.4.windows.1
-In-Reply-To: <20210409033652.28316-1-wangyanan55@huawei.com>
-References: <20210409033652.28316-1-wangyanan55@huawei.com>
+        with ESMTP id S232662AbhDIDoz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 8 Apr 2021 23:44:55 -0400
+Received: from DGGEMS414-HUB.china.huawei.com (unknown [172.30.72.59])
+        by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4FGkTF20x7znZ7c;
+        Fri,  9 Apr 2021 11:41:53 +0800 (CST)
+Received: from DESKTOP-7FEPK9S.china.huawei.com (10.174.184.135) by
+ DGGEMS414-HUB.china.huawei.com (10.3.19.214) with Microsoft SMTP Server id
+ 14.3.498.0; Fri, 9 Apr 2021 11:44:30 +0800
+From:   Shenming Lu <lushenming@huawei.com>
+To:     Alex Williamson <alex.williamson@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Will Deacon <will@kernel.org>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        Eric Auger <eric.auger@redhat.com>, <kvm@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>,
+        <iommu@lists.linux-foundation.org>, <linux-api@vger.kernel.org>
+CC:     Kevin Tian <kevin.tian@intel.com>,
+        Lu Baolu <baolu.lu@linux.intel.com>, <yi.l.liu@intel.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+        Barry Song <song.bao.hua@hisilicon.com>,
+        <wanghaibin.wang@huawei.com>, <yuzenghui@huawei.com>,
+        <lushenming@huawei.com>
+Subject: [RFC PATCH v3 0/8] Add IOPF support for VFIO passthrough
+Date:   Fri, 9 Apr 2021 11:44:12 +0800
+Message-ID: <20210409034420.1799-1-lushenming@huawei.com>
+X-Mailer: git-send-email 2.27.0.windows.1
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.174.187.128]
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [10.174.184.135]
 X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-With a guest translation fault, the memcache pages are not needed if KVM
-is only about to install a new leaf entry into the existing page table.
-And with a guest permission fault, the memcache pages are also not needed
-for a write_fault in dirty-logging time if KVM is only about to update
-the existing leaf entry instead of collapsing a block entry into a table.
+Hi,
 
-By comparing fault_granule and vma_pagesize, cases that require allocations
-from memcache and cases that don't can be distinguished completely.
+Requesting for your comments and suggestions. :-)
 
-Signed-off-by: Yanan Wang <wangyanan55@huawei.com>
----
- arch/arm64/kvm/mmu.c | 25 ++++++++++++-------------
- 1 file changed, 12 insertions(+), 13 deletions(-)
+The static pinning and mapping problem in VFIO and possible solutions
+have been discussed a lot [1, 2]. One of the solutions is to add I/O
+Page Fault support for VFIO devices. Different from those relatively
+complicated software approaches such as presenting a vIOMMU that provides
+the DMA buffer information (might include para-virtualized optimizations),
+IOPF mainly depends on the hardware faulting capability, such as the PCIe
+PRI extension or Arm SMMU stall model. What's more, the IOPF support in
+the IOMMU driver has already been implemented in SVA [3]. So we add IOPF
+support for VFIO passthrough based on the IOPF part of SVA in this series.
 
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 1eec9f63bc6f..05af40dc60c1 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -810,19 +810,6 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 	gfn = fault_ipa >> PAGE_SHIFT;
- 	mmap_read_unlock(current->mm);
- 
--	/*
--	 * Permission faults just need to update the existing leaf entry,
--	 * and so normally don't require allocations from the memcache. The
--	 * only exception to this is when dirty logging is enabled at runtime
--	 * and a write fault needs to collapse a block entry into a table.
--	 */
--	if (fault_status != FSC_PERM || (logging_active && write_fault)) {
--		ret = kvm_mmu_topup_memory_cache(memcache,
--						 kvm_mmu_cache_min_pages(kvm));
--		if (ret)
--			return ret;
--	}
--
- 	mmu_seq = vcpu->kvm->mmu_notifier_seq;
- 	/*
- 	 * Ensure the read of mmu_notifier_seq happens before we call
-@@ -880,6 +867,18 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 	else if (cpus_have_const_cap(ARM64_HAS_CACHE_DIC))
- 		prot |= KVM_PGTABLE_PROT_X;
- 
-+	/*
-+	 * Allocations from the memcache are required only when granule of the
-+	 * lookup level where the guest fault happened exceeds vma_pagesize,
-+	 * which means new page tables will be created in the fault handlers.
-+	 */
-+	if (fault_granule > vma_pagesize) {
-+		ret = kvm_mmu_topup_memory_cache(memcache,
-+						 kvm_mmu_cache_min_pages(kvm));
-+		if (ret)
-+			return ret;
-+	}
-+
- 	/*
- 	 * Under the premise of getting a FSC_PERM fault, we just need to relax
- 	 * permissions only if vma_pagesize equals fault_granule. Otherwise,
+We have measured its performance with UADK [4] (passthrough an accelerator
+to a VM(1U16G)) on Hisilicon Kunpeng920 board (and compared with host SVA):
+
+Run hisi_sec_test...
+ - with varying sending times and message lengths
+ - with/without IOPF enabled (speed slowdown)
+
+when msg_len = 1MB (and PREMAP_LEN (in Patch 4) = 1):
+            slowdown (num of faults)
+ times      VFIO IOPF      host SVA
+ 1          63.4% (518)    82.8% (512)
+ 100        22.9% (1058)   47.9% (1024)
+ 1000       2.6% (1071)    8.5% (1024)
+
+when msg_len = 10MB (and PREMAP_LEN = 512):
+            slowdown (num of faults)
+ times      VFIO IOPF
+ 1          32.6% (13)
+ 100        3.5% (26)
+ 1000       1.6% (26)
+
+History:
+
+v2 -> v3
+ - Nit fixes.
+ - No reason to disable reporting the unrecoverable faults. (baolu)
+ - Maintain a global IOPF enabled group list.
+ - Split the pre-mapping optimization to be a separate patch.
+ - Add selective faulting support (use vfio_pin_pages to indicate the
+   non-faultable scope and add a new struct vfio_range to record it,
+   untested). (Kevin)
+
+v1 -> v2
+ - Numerous improvements following the suggestions. Thanks a lot to all
+   of you.
+
+Note that PRI is not supported at the moment since there is no hardware.
+
+Links:
+[1] Lesokhin I, et al. Page Fault Support for Network Controllers. In ASPLOS,
+    2016.
+[2] Tian K, et al. coIOMMU: A Virtual IOMMU with Cooperative DMA Buffer Tracking
+    for Efficient Memory Management in Direct I/O. In USENIX ATC, 2020.
+[3] https://patchwork.kernel.org/project/linux-arm-kernel/cover/20210401154718.307519-1-jean-philippe@linaro.org/
+[4] https://github.com/Linaro/uadk
+
+Thanks,
+Shenming
+
+
+Shenming Lu (8):
+  iommu: Evolve the device fault reporting framework
+  vfio/type1: Add a page fault handler
+  vfio/type1: Add an MMU notifier to avoid pinning
+  vfio/type1: Pre-map more pages than requested in the IOPF handling
+  vfio/type1: VFIO_IOMMU_ENABLE_IOPF
+  vfio/type1: No need to statically pin and map if IOPF enabled
+  vfio/type1: Add selective DMA faulting support
+  vfio: Add nested IOPF support
+
+ .../iommu/arm/arm-smmu-v3/arm-smmu-v3-sva.c   |    3 +-
+ drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c   |   18 +-
+ drivers/iommu/iommu.c                         |   56 +-
+ drivers/vfio/vfio.c                           |   85 +-
+ drivers/vfio/vfio_iommu_type1.c               | 1000 ++++++++++++++++-
+ include/linux/iommu.h                         |   19 +-
+ include/linux/vfio.h                          |   13 +
+ include/uapi/linux/iommu.h                    |    4 +
+ include/uapi/linux/vfio.h                     |    6 +
+ 9 files changed, 1181 insertions(+), 23 deletions(-)
+
 -- 
 2.19.1
 
