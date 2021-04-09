@@ -2,286 +2,260 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 992CE359355
-	for <lists+kvm@lfdr.de>; Fri,  9 Apr 2021 05:45:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F2FA83593B3
+	for <lists+kvm@lfdr.de>; Fri,  9 Apr 2021 06:18:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233153AbhDIDpb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 8 Apr 2021 23:45:31 -0400
-Received: from szxga06-in.huawei.com ([45.249.212.32]:16422 "EHLO
-        szxga06-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233299AbhDIDpF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 8 Apr 2021 23:45:05 -0400
-Received: from DGGEMS414-HUB.china.huawei.com (unknown [172.30.72.60])
-        by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4FGkVZ5q3qzlWq4;
-        Fri,  9 Apr 2021 11:43:02 +0800 (CST)
-Received: from DESKTOP-7FEPK9S.china.huawei.com (10.174.184.135) by
- DGGEMS414-HUB.china.huawei.com (10.3.19.214) with Microsoft SMTP Server id
- 14.3.498.0; Fri, 9 Apr 2021 11:44:45 +0800
-From:   Shenming Lu <lushenming@huawei.com>
-To:     Alex Williamson <alex.williamson@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Will Deacon <will@kernel.org>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Jean-Philippe Brucker <jean-philippe@linaro.org>,
-        Eric Auger <eric.auger@redhat.com>, <kvm@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>,
-        <iommu@lists.linux-foundation.org>, <linux-api@vger.kernel.org>
-CC:     Kevin Tian <kevin.tian@intel.com>,
-        Lu Baolu <baolu.lu@linux.intel.com>, <yi.l.liu@intel.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Jonathan Cameron <Jonathan.Cameron@huawei.com>,
-        Barry Song <song.bao.hua@hisilicon.com>,
-        <wanghaibin.wang@huawei.com>, <yuzenghui@huawei.com>,
-        <lushenming@huawei.com>
-Subject: [RFC PATCH v3 8/8] vfio: Add nested IOPF support
-Date:   Fri, 9 Apr 2021 11:44:20 +0800
-Message-ID: <20210409034420.1799-9-lushenming@huawei.com>
-X-Mailer: git-send-email 2.27.0.windows.1
-In-Reply-To: <20210409034420.1799-1-lushenming@huawei.com>
-References: <20210409034420.1799-1-lushenming@huawei.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.174.184.135]
-X-CFilter-Loop: Reflected
+        id S230118AbhDIESy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 9 Apr 2021 00:18:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35534 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229526AbhDIESy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 9 Apr 2021 00:18:54 -0400
+Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 783E3C061760;
+        Thu,  8 Apr 2021 21:18:42 -0700 (PDT)
+Received: by mail-pj1-x1033.google.com with SMTP id i4so2259215pjk.1;
+        Thu, 08 Apr 2021 21:18:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id;
+        bh=Gd+gXcz6Jd6OEHUz9h21bPRreafNfkInMEF4YPsbOpk=;
+        b=tefdWYpWO2XnAMMkeY/iwlwssVIS8QxEFUzgz5cgjuzgTa71RZuaRnkw6Ut8ArDbyt
+         vDNQsQgqr3DIjUSZO6EfCN7beVAnJVrK9U+hlpT6YjmgOcs84zwx0bdl64ZbUg/9Dc7o
+         Z733MXUGKLVBoLTrLPzWC5ZcJaPAw3fjuEdR7MrVOMS6t3oDGNH5vu9kcntpfYSZAFph
+         RA/3iUXqQse83yjjcQ684JF+a0fhcRKpF7zMTgtUIqVQSobgttedo1xpusc1zPgXbfNA
+         VBD4ecS7hAqyFryS25kHF0+mN8gbWKf9m4KtgMEZRXkrV+xr8ndqzxA/NYMfEuNbrLyh
+         cWnA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=Gd+gXcz6Jd6OEHUz9h21bPRreafNfkInMEF4YPsbOpk=;
+        b=Mb2s8ABvf6IUYFbVa5uq/3+rjIcsA2+1Jl79Go+6MrH6641uBdbjK/IwAXLd+xA83v
+         nG1HLhEudgQEuXdrlWb0UUgYY+TTwUzfZcOdmx+o/y0FOvKQqfWf5GxYv1yRWh7t7gIu
+         RjPwT3GBBUSbgcXFabDb3K5K2HWo2FeJGmY5JwJdbwNnJOlLwxa1VrYtzDp/SZLqNVYw
+         Q5asMZejogj9RDJLVYQ48Zo3E3uDEI97uzQ9Zw+qG/qYumyfCoqIcTflF7pN/Gj04CNK
+         kZoPxNLM0gB3fjPbBy91St3eVdTRKCW6x36Lgo9o4Imsp1o/grlq6zzJ9NKEMFoYbHed
+         uzAg==
+X-Gm-Message-State: AOAM531NDu+g+X63yWv3eq38AmOYyQYoSVXm9oP7TDD6Ia5InH8NbVf/
+        xUcVEA18tanPK3CSG8QooYWA97qXjuo=
+X-Google-Smtp-Source: ABdhPJyYC5We5GOGs227qlbjCUawiRAdPZfMPTKKs2CTtjRaW/csMkfeTbEps/Ol1v0ogr1/E98Fpg==
+X-Received: by 2002:a17:90a:5889:: with SMTP id j9mr12376248pji.69.1617941921712;
+        Thu, 08 Apr 2021 21:18:41 -0700 (PDT)
+Received: from localhost.localdomain ([103.7.29.6])
+        by smtp.googlemail.com with ESMTPSA id gw24sm765553pjb.42.2021.04.08.21.18.39
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 08 Apr 2021 21:18:41 -0700 (PDT)
+From:   Wanpeng Li <kernellwp@gmail.com>
+X-Google-Original-From: Wanpeng Li <wanpengli@tencent.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>
+Subject: [PATCH v2 1/3] x86/kvm: Don't bother __pv_cpu_mask when !CONFIG_SMP
+Date:   Fri,  9 Apr 2021 12:18:29 +0800
+Message-Id: <1617941911-5338-1-git-send-email-wanpengli@tencent.com>
+X-Mailer: git-send-email 2.7.4
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-To set up nested mode, drivers such as vfio_pci need to register a
-handler to receive stage/level 1 faults from the IOMMU, but since
-currently each device can only have one iommu dev fault handler,
-and if stage 2 IOPF is already enabled (VFIO_IOMMU_ENABLE_IOPF),
-we choose to update the registered handler (a consolidated one) via
-flags (set FAULT_REPORT_NESTED_L1), and further deliver the received
-stage 1 faults in the handler to the guest through a newly added
-vfio_device_ops callback.
+From: Wanpeng Li <wanpengli@tencent.com>
 
-Signed-off-by: Shenming Lu <lushenming@huawei.com>
+Enable PV TLB shootdown when !CONFIG_SMP doesn't make sense. Let's 
+move it inside CONFIG_SMP. In addition, we can avoid define and 
+alloc __pv_cpu_mask when !CONFIG_SMP and get rid of 'alloc' variable 
+in kvm_alloc_cpumask.
+
+Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
 ---
- drivers/vfio/vfio.c             | 81 +++++++++++++++++++++++++++++++++
- drivers/vfio/vfio_iommu_type1.c | 49 +++++++++++++++++++-
- include/linux/vfio.h            | 12 +++++
- 3 files changed, 141 insertions(+), 1 deletion(-)
+v1 -> v2:
+ * shuffle things around a bit more
 
-diff --git a/drivers/vfio/vfio.c b/drivers/vfio/vfio.c
-index 44c8dfabf7de..4245f15914bf 100644
---- a/drivers/vfio/vfio.c
-+++ b/drivers/vfio/vfio.c
-@@ -2356,6 +2356,87 @@ struct iommu_domain *vfio_group_iommu_domain(struct vfio_group *group)
+ arch/x86/kernel/kvm.c | 118 +++++++++++++++++++++++---------------------------
+ 1 file changed, 55 insertions(+), 63 deletions(-)
+
+diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
+index 5e78e01..224a7a1 100644
+--- a/arch/x86/kernel/kvm.c
++++ b/arch/x86/kernel/kvm.c
+@@ -451,6 +451,10 @@ static void __init sev_map_percpu_data(void)
+ 	}
  }
- EXPORT_SYMBOL_GPL(vfio_group_iommu_domain);
  
-+/*
-+ * Register/Update the VFIO IOPF handler to receive
-+ * nested stage/level 1 faults.
-+ */
-+int vfio_iommu_dev_fault_handler_register_nested(struct device *dev)
-+{
-+	struct vfio_container *container;
-+	struct vfio_group *group;
-+	struct vfio_iommu_driver *driver;
-+	int ret;
++#ifdef CONFIG_SMP
 +
-+	if (!dev)
-+		return -EINVAL;
++static DEFINE_PER_CPU(cpumask_var_t, __pv_cpu_mask);
 +
-+	group = vfio_group_get_from_dev(dev);
-+	if (!group)
-+		return -ENODEV;
-+
-+	ret = vfio_group_add_container_user(group);
-+	if (ret)
-+		goto out;
-+
-+	container = group->container;
-+	driver = container->iommu_driver;
-+	if (likely(driver && driver->ops->register_handler))
-+		ret = driver->ops->register_handler(container->iommu_data, dev);
-+	else
-+		ret = -ENOTTY;
-+
-+	vfio_group_try_dissolve_container(group);
-+
-+out:
-+	vfio_group_put(group);
-+	return ret;
-+}
-+EXPORT_SYMBOL_GPL(vfio_iommu_dev_fault_handler_register_nested);
-+
-+int vfio_iommu_dev_fault_handler_unregister_nested(struct device *dev)
-+{
-+	struct vfio_container *container;
-+	struct vfio_group *group;
-+	struct vfio_iommu_driver *driver;
-+	int ret;
-+
-+	if (!dev)
-+		return -EINVAL;
-+
-+	group = vfio_group_get_from_dev(dev);
-+	if (!group)
-+		return -ENODEV;
-+
-+	ret = vfio_group_add_container_user(group);
-+	if (ret)
-+		goto out;
-+
-+	container = group->container;
-+	driver = container->iommu_driver;
-+	if (likely(driver && driver->ops->unregister_handler))
-+		ret = driver->ops->unregister_handler(container->iommu_data, dev);
-+	else
-+		ret = -ENOTTY;
-+
-+	vfio_group_try_dissolve_container(group);
-+
-+out:
-+	vfio_group_put(group);
-+	return ret;
-+}
-+EXPORT_SYMBOL_GPL(vfio_iommu_dev_fault_handler_unregister_nested);
-+
-+int vfio_transfer_iommu_fault(struct device *dev, struct iommu_fault *fault)
-+{
-+	struct vfio_device *device = dev_get_drvdata(dev);
-+
-+	if (unlikely(!device->ops->transfer))
-+		return -EOPNOTSUPP;
-+
-+	return device->ops->transfer(device->device_data, fault);
-+}
-+EXPORT_SYMBOL_GPL(vfio_transfer_iommu_fault);
-+
- /**
-  * Module/class support
-  */
-diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-index ba2b5a1cf6e9..9d1adeddb303 100644
---- a/drivers/vfio/vfio_iommu_type1.c
-+++ b/drivers/vfio/vfio_iommu_type1.c
-@@ -3821,13 +3821,32 @@ static int vfio_iommu_type1_dma_map_iopf(struct iommu_fault *fault, void *data)
- 	struct vfio_batch batch;
- 	struct vfio_range *range;
- 	dma_addr_t iova = ALIGN_DOWN(fault->prm.addr, PAGE_SIZE);
--	int access_flags = 0;
-+	int access_flags = 0, nested;
- 	size_t premap_len, map_len, mapped_len = 0;
- 	unsigned long bit_offset, vaddr, pfn, i, npages;
- 	int ret;
- 	enum iommu_page_response_code status = IOMMU_PAGE_RESP_INVALID;
- 	struct iommu_page_response resp = {0};
+ static bool pv_tlb_flush_supported(void)
+ {
+ 	return (kvm_para_has_feature(KVM_FEATURE_PV_TLB_FLUSH) &&
+@@ -458,10 +462,6 @@ static bool pv_tlb_flush_supported(void)
+ 		kvm_para_has_feature(KVM_FEATURE_STEAL_TIME));
+ }
  
-+	if (vfio_dev_domian_nested(dev, &nested))
-+		return -ENODEV;
+-static DEFINE_PER_CPU(cpumask_var_t, __pv_cpu_mask);
+-
+-#ifdef CONFIG_SMP
+-
+ static bool pv_ipi_supported(void)
+ {
+ 	return kvm_para_has_feature(KVM_FEATURE_PV_SEND_IPI);
+@@ -574,6 +574,49 @@ static void kvm_smp_send_call_func_ipi(const struct cpumask *mask)
+ 	}
+ }
+ 
++static void kvm_flush_tlb_others(const struct cpumask *cpumask,
++			const struct flush_tlb_info *info)
++{
++	u8 state;
++	int cpu;
++	struct kvm_steal_time *src;
++	struct cpumask *flushmask = this_cpu_cpumask_var_ptr(__pv_cpu_mask);
 +
++	cpumask_copy(flushmask, cpumask);
 +	/*
-+	 * When configured in nested mode, further deliver the
-+	 * stage/level 1 faults to the guest.
++	 * We have to call flush only on online vCPUs. And
++	 * queue flush_on_enter for pre-empted vCPUs
 +	 */
-+	if (nested) {
-+		bool l2;
-+
-+		if (fault->type == IOMMU_FAULT_PAGE_REQ)
-+			l2 = fault->prm.flags & IOMMU_FAULT_PAGE_REQUEST_L2;
-+		if (fault->type == IOMMU_FAULT_DMA_UNRECOV)
-+			l2 = fault->event.flags & IOMMU_FAULT_UNRECOV_L2;
-+
-+		if (!l2)
-+			return vfio_transfer_iommu_fault(dev, fault);
++	for_each_cpu(cpu, flushmask) {
++		src = &per_cpu(steal_time, cpu);
++		state = READ_ONCE(src->preempted);
++		if ((state & KVM_VCPU_PREEMPTED)) {
++			if (try_cmpxchg(&src->preempted, &state,
++					state | KVM_VCPU_FLUSH_TLB))
++				__cpumask_clear_cpu(cpu, flushmask);
++		}
 +	}
 +
- 	if (fault->type != IOMMU_FAULT_PAGE_REQ)
- 		return -EOPNOTSUPP;
- 
-@@ -4201,6 +4220,32 @@ static void vfio_iommu_type1_notify(void *iommu_data,
- 	wake_up_all(&iommu->vaddr_wait);
++	native_flush_tlb_others(flushmask, info);
++}
++
++static __init int kvm_alloc_cpumask(void)
++{
++	int cpu;
++
++	if (!kvm_para_available() || nopv)
++		return 0;
++
++	if (pv_tlb_flush_supported() || pv_ipi_supported())
++		for_each_possible_cpu(cpu) {
++			zalloc_cpumask_var_node(per_cpu_ptr(&__pv_cpu_mask, cpu),
++				GFP_KERNEL, cpu_to_node(cpu));
++		}
++
++	return 0;
++}
++arch_initcall(kvm_alloc_cpumask);
++
+ static void __init kvm_smp_prepare_boot_cpu(void)
+ {
+ 	/*
+@@ -611,33 +654,8 @@ static int kvm_cpu_down_prepare(unsigned int cpu)
+ 	local_irq_enable();
+ 	return 0;
  }
+-#endif
+-
+-static void kvm_flush_tlb_others(const struct cpumask *cpumask,
+-			const struct flush_tlb_info *info)
+-{
+-	u8 state;
+-	int cpu;
+-	struct kvm_steal_time *src;
+-	struct cpumask *flushmask = this_cpu_cpumask_var_ptr(__pv_cpu_mask);
+-
+-	cpumask_copy(flushmask, cpumask);
+-	/*
+-	 * We have to call flush only on online vCPUs. And
+-	 * queue flush_on_enter for pre-empted vCPUs
+-	 */
+-	for_each_cpu(cpu, flushmask) {
+-		src = &per_cpu(steal_time, cpu);
+-		state = READ_ONCE(src->preempted);
+-		if ((state & KVM_VCPU_PREEMPTED)) {
+-			if (try_cmpxchg(&src->preempted, &state,
+-					state | KVM_VCPU_FLUSH_TLB))
+-				__cpumask_clear_cpu(cpu, flushmask);
+-		}
+-	}
  
-+static int vfio_iommu_type1_register_handler(void *iommu_data,
-+					     struct device *dev)
-+{
-+	struct vfio_iommu *iommu = iommu_data;
-+
-+	if (iommu->iopf_enabled)
-+		return iommu_update_device_fault_handler(dev, ~0,
-+						FAULT_REPORT_NESTED_L1);
-+	else
-+		return iommu_register_device_fault_handler(dev,
-+						vfio_iommu_type1_dma_map_iopf,
-+						FAULT_REPORT_NESTED_L1, dev);
-+}
-+
-+static int vfio_iommu_type1_unregister_handler(void *iommu_data,
-+					       struct device *dev)
-+{
-+	struct vfio_iommu *iommu = iommu_data;
-+
-+	if (iommu->iopf_enabled)
-+		return iommu_update_device_fault_handler(dev,
-+						~FAULT_REPORT_NESTED_L1, 0);
-+	else
-+		return iommu_unregister_device_fault_handler(dev);
-+}
-+
- static const struct vfio_iommu_driver_ops vfio_iommu_driver_ops_type1 = {
- 	.name			= "vfio-iommu-type1",
- 	.owner			= THIS_MODULE,
-@@ -4216,6 +4261,8 @@ static const struct vfio_iommu_driver_ops vfio_iommu_driver_ops_type1 = {
- 	.dma_rw			= vfio_iommu_type1_dma_rw,
- 	.group_iommu_domain	= vfio_iommu_type1_group_iommu_domain,
- 	.notify			= vfio_iommu_type1_notify,
-+	.register_handler	= vfio_iommu_type1_register_handler,
-+	.unregister_handler	= vfio_iommu_type1_unregister_handler,
- };
+-	native_flush_tlb_others(flushmask, info);
+-}
++#endif
  
- static int __init vfio_iommu_type1_init(void)
-diff --git a/include/linux/vfio.h b/include/linux/vfio.h
-index a7b426d579df..4621d8f0395d 100644
---- a/include/linux/vfio.h
-+++ b/include/linux/vfio.h
-@@ -29,6 +29,8 @@
-  * @match: Optional device name match callback (return: 0 for no-match, >0 for
-  *         match, -errno for abort (ex. match with insufficient or incorrect
-  *         additional args)
-+ * @transfer: Optional. Transfer the received stage/level 1 faults to the guest
-+ *            for nested mode.
-  */
- struct vfio_device_ops {
- 	char	*name;
-@@ -43,6 +45,7 @@ struct vfio_device_ops {
- 	int	(*mmap)(void *device_data, struct vm_area_struct *vma);
- 	void	(*request)(void *device_data, unsigned int count);
- 	int	(*match)(void *device_data, char *buf);
-+	int	(*transfer)(void *device_data, struct iommu_fault *fault);
- };
+ static void __init kvm_guest_init(void)
+ {
+@@ -653,12 +671,6 @@ static void __init kvm_guest_init(void)
+ 		pv_ops.time.steal_clock = kvm_steal_clock;
+ 	}
  
- extern struct iommu_group *vfio_iommu_group_get(struct device *dev);
-@@ -100,6 +103,10 @@ struct vfio_iommu_driver_ops {
- 						   struct iommu_group *group);
- 	void		(*notify)(void *iommu_data,
- 				  enum vfio_iommu_notify_type event);
-+	int		(*register_handler)(void *iommu_data,
-+					    struct device *dev);
-+	int		(*unregister_handler)(void *iommu_data,
-+					      struct device *dev);
- };
+-	if (pv_tlb_flush_supported()) {
+-		pv_ops.mmu.flush_tlb_others = kvm_flush_tlb_others;
+-		pv_ops.mmu.tlb_remove_table = tlb_remove_table;
+-		pr_info("KVM setup pv remote TLB flush\n");
+-	}
+-
+ 	if (kvm_para_has_feature(KVM_FEATURE_PV_EOI))
+ 		apic_set_eoi_write(kvm_guest_apic_eoi_write);
  
- extern int vfio_register_iommu_driver(const struct vfio_iommu_driver_ops *ops);
-@@ -161,6 +168,11 @@ extern int vfio_unregister_notifier(struct device *dev,
- struct kvm;
- extern void vfio_group_set_kvm(struct vfio_group *group, struct kvm *kvm);
+@@ -668,6 +680,12 @@ static void __init kvm_guest_init(void)
+ 	}
  
-+extern int vfio_iommu_dev_fault_handler_register_nested(struct device *dev);
-+extern int vfio_iommu_dev_fault_handler_unregister_nested(struct device *dev);
-+extern int vfio_transfer_iommu_fault(struct device *dev,
-+				     struct iommu_fault *fault);
+ #ifdef CONFIG_SMP
++	if (pv_tlb_flush_supported()) {
++		pv_ops.mmu.flush_tlb_others = kvm_flush_tlb_others;
++		pv_ops.mmu.tlb_remove_table = tlb_remove_table;
++		pr_info("KVM setup pv remote TLB flush\n");
++	}
 +
- /*
-  * Sub-module helpers
-  */
+ 	smp_ops.smp_prepare_boot_cpu = kvm_smp_prepare_boot_cpu;
+ 	if (pv_sched_yield_supported()) {
+ 		smp_ops.send_call_func_ipi = kvm_smp_send_call_func_ipi;
+@@ -734,7 +752,7 @@ static uint32_t __init kvm_detect(void)
+ 
+ static void __init kvm_apic_init(void)
+ {
+-#if defined(CONFIG_SMP)
++#ifdef CONFIG_SMP
+ 	if (pv_ipi_supported())
+ 		kvm_setup_pv_ipi();
+ #endif
+@@ -794,32 +812,6 @@ static __init int activate_jump_labels(void)
+ }
+ arch_initcall(activate_jump_labels);
+ 
+-static __init int kvm_alloc_cpumask(void)
+-{
+-	int cpu;
+-	bool alloc = false;
+-
+-	if (!kvm_para_available() || nopv)
+-		return 0;
+-
+-	if (pv_tlb_flush_supported())
+-		alloc = true;
+-
+-#if defined(CONFIG_SMP)
+-	if (pv_ipi_supported())
+-		alloc = true;
+-#endif
+-
+-	if (alloc)
+-		for_each_possible_cpu(cpu) {
+-			zalloc_cpumask_var_node(per_cpu_ptr(&__pv_cpu_mask, cpu),
+-				GFP_KERNEL, cpu_to_node(cpu));
+-		}
+-
+-	return 0;
+-}
+-arch_initcall(kvm_alloc_cpumask);
+-
+ #ifdef CONFIG_PARAVIRT_SPINLOCKS
+ 
+ /* Kick a cpu by its apicid. Used to wake up a halted vcpu */
 -- 
-2.19.1
+2.7.4
 
