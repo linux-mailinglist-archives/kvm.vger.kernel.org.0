@@ -2,220 +2,284 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BCFB2359900
-	for <lists+kvm@lfdr.de>; Fri,  9 Apr 2021 11:19:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BA95635998C
+	for <lists+kvm@lfdr.de>; Fri,  9 Apr 2021 11:43:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231772AbhDIJUF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 9 Apr 2021 05:20:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44962 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230181AbhDIJUE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 9 Apr 2021 05:20:04 -0400
-Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C8389C061760
-        for <kvm@vger.kernel.org>; Fri,  9 Apr 2021 02:19:51 -0700 (PDT)
-From:   Thomas Gleixner <tglx@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1617959989;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=WfcZ5q0KU6r5Mjht3FAZ0XMh57ML+b4s2AEOei31CUo=;
-        b=xoLcrIkIawpTNZ3LQUzhi7x9ccpgy/pSVEIY99tRm9kbitE1qpEYynpQyqLnW+mcC1xsny
-        BsMWYb2yzo8TjMf3wUujvOyymz1j05yCerDfVUlPL+68yR2rU+7WW9YJczi4xrJ3O6t+50
-        7hi5BED+G5xmJhEmND4iMxxYHh8AuyfV/WOuBi01nMq+26PwvKBXHfwut0P2DHoEBmT/cx
-        sis/L07yykDEn1HMhR33Lx7uAJrEw/hdJLyAnOzi5C0N+qCpo5KvqnkFcUx/pGdhmLLZAi
-        hd1zTxmrI5xsZQ5SjafTJSOW65Z4Yi2vevgKuL/50zBApDQx3R4QA8mLc40W/Q==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1617959989;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=WfcZ5q0KU6r5Mjht3FAZ0XMh57ML+b4s2AEOei31CUo=;
-        b=4zhzvsRiUgV1AIipj4zLtc/L6rPMz45SrnYUvDDr41jUbJFn/8OULNdT5zp2qUp4BhUOIj
-        y7SeMxfv60zFcxBQ==
-To:     Wanpeng Li <kernellwp@gmail.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Michael Tokarev <mjt@tls.msk.ru>, kvm <kvm@vger.kernel.org>,
-        "qemu-devel\@nongnu.org Developers" <qemu-devel@nongnu.org>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: Commit "x86/kvm: Move context tracking where it belongs" broke guest time accounting
-In-Reply-To: <CANRm+CwgvAPOvCxmuEDb+L5kvjBcpWE03Ps70qpqKntHuPxpaA@mail.gmail.com>
-References: <YGzW/Pa/p7svg5Rr@google.com> <874kgg29uo.ffs@nanos.tec.linutronix.de> <CANRm+CwgvAPOvCxmuEDb+L5kvjBcpWE03Ps70qpqKntHuPxpaA@mail.gmail.com>
-Date:   Fri, 09 Apr 2021 11:19:48 +0200
-Message-ID: <871rbj6ci3.ffs@nanos.tec.linutronix.de>
+        id S232870AbhDIJng (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 9 Apr 2021 05:43:36 -0400
+Received: from szxga03-in.huawei.com ([45.249.212.189]:3396 "EHLO
+        szxga03-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231370AbhDIJnf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 9 Apr 2021 05:43:35 -0400
+Received: from DGGEML404-HUB.china.huawei.com (unknown [172.30.72.57])
+        by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4FGtR36F6Kz5nKD;
+        Fri,  9 Apr 2021 17:40:31 +0800 (CST)
+Received: from dggema765-chm.china.huawei.com (10.1.198.207) by
+ DGGEML404-HUB.china.huawei.com (10.3.17.39) with Microsoft SMTP Server (TLS)
+ id 14.3.498.0; Fri, 9 Apr 2021 17:43:17 +0800
+Received: from [10.174.185.210] (10.174.185.210) by
+ dggema765-chm.china.huawei.com (10.1.198.207) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.2106.2; Fri, 9 Apr 2021 17:43:16 +0800
+Subject: Re: [PATCH v14 06/13] iommu/smmuv3: Allow stage 1 invalidation with
+ unmanaged ASIDs
+To:     Auger Eric <eric.auger@redhat.com>, <eric.auger.pro@gmail.com>,
+        <iommu@lists.linux-foundation.org>, <linux-kernel@vger.kernel.org>,
+        <kvm@vger.kernel.org>, <kvmarm@lists.cs.columbia.edu>,
+        <will@kernel.org>, <maz@kernel.org>, <robin.murphy@arm.com>,
+        <joro@8bytes.org>, <alex.williamson@redhat.com>, <tn@semihalf.com>,
+        <zhukeqian1@huawei.com>
+CC:     <jacob.jun.pan@linux.intel.com>, <yi.l.liu@intel.com>,
+        <wangxingang5@huawei.com>, <jean-philippe@linaro.org>,
+        <zhangfei.gao@linaro.org>, <zhangfei.gao@gmail.com>,
+        <vivek.gautam@arm.com>, <shameerali.kolothum.thodi@huawei.com>,
+        <yuzenghui@huawei.com>, <nicoleotsuka@gmail.com>,
+        <lushenming@huawei.com>, <vsethi@nvidia.com>,
+        <wanghaibin.wang@huawei.com>
+References: <20210223205634.604221-1-eric.auger@redhat.com>
+ <20210223205634.604221-7-eric.auger@redhat.com>
+ <901720e6-6ca5-eb9a-1f24-0ca479bcfecc@huawei.com>
+ <0246aec2-162d-0584-3ca4-b9c304ef3c8a@redhat.com>
+ <46f3760a-9ab5-1710-598e-38fbc1f5fb5c@huawei.com>
+ <2baf96db-d7fe-e341-1b40-fab2b4c9fd92@redhat.com>
+From:   Kunkun Jiang <jiangkunkun@huawei.com>
+Message-ID: <13debb39-dddf-7138-fc72-1e22d9a74889@huawei.com>
+Date:   Fri, 9 Apr 2021 17:43:05 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.8.1
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <2baf96db-d7fe-e341-1b40-fab2b4c9fd92@redhat.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-Originating-IP: [10.174.185.210]
+X-ClientProxiedBy: dggeme716-chm.china.huawei.com (10.1.199.112) To
+ dggema765-chm.china.huawei.com (10.1.198.207)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Apr 09 2021 at 16:13, Wanpeng Li wrote:
-> On Thu, 8 Apr 2021 at 21:19, Thomas Gleixner <tglx@linutronix.de> wrote:
+On 2021/4/9 16:31, Auger Eric wrote:
+> Hi Kunkun,
 >
-> +    account_guest_enter();
+> On 4/9/21 6:48 AM, Kunkun Jiang wrote:
+>> Hi Eric,
+>>
+>> On 2021/4/8 20:30, Auger Eric wrote:
+>>> Hi Kunkun,
+>>>
+>>> On 4/1/21 2:37 PM, Kunkun Jiang wrote:
+>>>> Hi Eric,
+>>>>
+>>>> On 2021/2/24 4:56, Eric Auger wrote:
+>>>>> With nested stage support, soon we will need to invalidate
+>>>>> S1 contexts and ranges tagged with an unmanaged asid, this
+>>>>> latter being managed by the guest. So let's introduce 2 helpers
+>>>>> that allow to invalidate with externally managed ASIDs
+>>>>>
+>>>>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>>>>>
+>>>>> ---
+>>>>>
+>>>>> v13 -> v14
+>>>>> - Actually send the NH_ASID command (reported by Xingang Wang)
+>>>>> ---
+>>>>>     drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c | 38
+>>>>> ++++++++++++++++-----
+>>>>>     1 file changed, 29 insertions(+), 9 deletions(-)
+>>>>>
+>>>>> diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
+>>>>> b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
+>>>>> index 5579ec4fccc8..4c19a1114de4 100644
+>>>>> --- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
+>>>>> +++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
+>>>>> @@ -1843,9 +1843,9 @@ int arm_smmu_atc_inv_domain(struct
+>>>>> arm_smmu_domain *smmu_domain, int ssid,
+>>>>>     }
+>>>>>       /* IO_PGTABLE API */
+>>>>> -static void arm_smmu_tlb_inv_context(void *cookie)
+>>>>> +static void __arm_smmu_tlb_inv_context(struct arm_smmu_domain
+>>>>> *smmu_domain,
+>>>>> +                       int ext_asid)
+>>>>>     {
+>>>>> -    struct arm_smmu_domain *smmu_domain = cookie;
+>>>>>         struct arm_smmu_device *smmu = smmu_domain->smmu;
+>>>>>         struct arm_smmu_cmdq_ent cmd;
+>>>>>     @@ -1856,7 +1856,13 @@ static void arm_smmu_tlb_inv_context(void
+>>>>> *cookie)
+>>>>>          * insertion to guarantee those are observed before the TLBI.
+>>>>> Do be
+>>>>>          * careful, 007.
+>>>>>          */
+>>>>> -    if (smmu_domain->stage == ARM_SMMU_DOMAIN_S1) {
+>>>>> +    if (ext_asid >= 0) { /* guest stage 1 invalidation */
+>>>>> +        cmd.opcode    = CMDQ_OP_TLBI_NH_ASID;
+>>>>> +        cmd.tlbi.asid    = ext_asid;
+>>>>> +        cmd.tlbi.vmid    = smmu_domain->s2_cfg.vmid;
+>>>>> +        arm_smmu_cmdq_issue_cmd(smmu, &cmd);
+>>>>> +        arm_smmu_cmdq_issue_sync(smmu);
+>>>>> +    } else if (smmu_domain->stage == ARM_SMMU_DOMAIN_S1) {
+>>>>>             arm_smmu_tlb_inv_asid(smmu, smmu_domain->s1_cfg.cd.asid);
+>>>>>         } else {
+>>>>>             cmd.opcode    = CMDQ_OP_TLBI_S12_VMALL;
+>>>>> @@ -1867,6 +1873,13 @@ static void arm_smmu_tlb_inv_context(void
+>>>>> *cookie)
+>>>>>         arm_smmu_atc_inv_domain(smmu_domain, 0, 0, 0);
+>>>>>     }
+>>>>>     +static void arm_smmu_tlb_inv_context(void *cookie)
+>>>>> +{
+>>>>> +    struct arm_smmu_domain *smmu_domain = cookie;
+>>>>> +
+>>>>> +    __arm_smmu_tlb_inv_context(smmu_domain, -1);
+>>>>> +}
+>>>>> +
+>>>>>     static void __arm_smmu_tlb_inv_range(struct arm_smmu_cmdq_ent *cmd,
+>>>>>                          unsigned long iova, size_t size,
+>>>>>                          size_t granule,
+>>>>> @@ -1926,9 +1939,10 @@ static void __arm_smmu_tlb_inv_range(struct
+>>>>> arm_smmu_cmdq_ent *cmd,
+>>>>>         arm_smmu_cmdq_batch_submit(smmu, &cmds);
+>>>>>     }
+>>>>>     
+>>>> Here is the part of code in __arm_smmu_tlb_inv_range():
+>>>>>           if (smmu->features & ARM_SMMU_FEAT_RANGE_INV) {
+>>>>>                   /* Get the leaf page size */
+>>>>>                   tg = __ffs(smmu_domain->domain.pgsize_bitmap);
+>>>>>
+>>>>>                   /* Convert page size of 12,14,16 (log2) to 1,2,3 */
+>>>>>                   cmd->tlbi.tg = (tg - 10) / 2;
+>>>>>
+>>>>>                   /* Determine what level the granule is at */
+>>>>>                   cmd->tlbi.ttl = 4 - ((ilog2(granule) - 3) / (tg - 3));
+>>>>>
+>>>>>                   num_pages = size >> tg;
+>>>>>           }
+>>>> When pSMMU supports RIL, we get the leaf page size by
+>>>> __ffs(smmu_domain->
+>>>> domain.pgsize_bitmap). In nested mode, it is determined by host
+>>>> PAGE_SIZE. If
+>>>> the host kernel and guest kernel has different translation granule (e.g.
+>>>> host 16K,
+>>>> guest 4K), __arm_smmu_tlb_inv_range() will issue an incorrect tlbi
+>>>> command.
+>>>>
+>>>> Do you have any idea about this issue?
+>>> I think this is the same issue as the one reported by Chenxiang
+>>>
+>>> https://lore.kernel.org/lkml/15938ed5-2095-e903-a290-333c299015a2@hisilicon.com/
+>>>
+>>>
+>>> In case RIL is not supported by the host, next version will use the
+>>> smallest pSMMU supported page size, as done in __arm_smmu_tlb_inv_range
+>>>
+>>> Thanks
+>>>
+>>> Eric
+>> I think they are different. In normal cases, when we want to invalidate the
+>> cache of stage 1, we should use the granule size supported by vSMMU to
+>> implement and issue an tlbi command if pSMMU supports RIL.
+>>
+>> But in the current __arm_smmu_tlb_inv_range(), it always uses the granule
+>> size supported by host.
+>> (tg = __ffs(smmu_domain->domain.pgsize_bitmap);)
+>>
+>> Let me explain more clearly.
+>> Preconditions of this issue:
+>> 1. pSMMU supports RIL
+>> 2. host and guest use different translation granule (e.g. host 16K,
+>> guest 4K)
+> this is not clear to me. See below.
+>> Guest wants to invalidate 4K, so info->granule_size = 4K.
+>> In __arm_smmu_tlb_inv_range(),   if pSMMU supports RIL and host 16K,
+>> tg = 14, tlbi.tg = 2, tlbi.ttl = 4, tlbi.scale = 0, tlbi.num = -1. It is
+>> an incorrect
+>> tlbi command.
+> If the guest uses 4K granule, this means the pSMMU also supports 4K
+> granule. Otherwise the corresponding CD is invalid (TG0/TG1 field desc).
+> So in that case isn't it valid to send a RIL invalidation with tg = 12,
+> right?
+Dose "tg = 12" come from the smallest pSMMU supported page size?
+Sorry, I overlooked the point you mentioned earlier.
 
-This wants to move into the instrumentation_begin/end() section above.
-
->      guest_enter_irqoff();
->      lockdep_hardirqs_on(CALLER_ADDR0);
->
-> @@ -3759,6 +3760,8 @@ static noinstr void svm_vcpu_enter_exit(struct
-> kvm_vcpu *vcpu)
->       */
->      lockdep_hardirqs_off(CALLER_ADDR0);
->      guest_exit_irqoff();
-> +    if (vtime_accounting_enabled_this_cpu())
-> +        account_guest_exit();
-
-This time below. Aside of that I'd suggest to have two inlines instead
-of having the conditional here.
-
->
->  #ifdef CONFIG_VIRT_CPU_ACCOUNTING_GEN
-> -/* must be called with irqs disabled */
-> -static __always_inline void guest_enter_irqoff(void)
-> +static __always_inline void account_guest_enter(void)
->  {
->      instrumentation_begin();
->      if (vtime_accounting_enabled_this_cpu())
-> @@ -113,7 +112,11 @@ static __always_inline void guest_enter_irqoff(void)
->      else
->          current->flags |= PF_VCPU;
->      instrumentation_end();
-
-If you move the invocation into the instrumentable section then this
-instrumentation_begin/end() can be removed.
-
-Something like the below +/- the obligatory bikeshed painting
-vs. function names.
+My previous idea was to use granule_size to record the stage 1 page size
+and nb_granules to record the number of pages.(Without deep consideration)
+Now, it seems also okay to use the smallest pSMMU supported page size.
 
 Thanks,
+Kunkun Jiang
+> Making sure the guest uses a valid pSMMU supported granule is the QEMU
+> job I think, this should be done at the init phase before hitting CD
+> invalid errors for sure.
+>
+> Thanks
+>
+> Eric
+>
+>> So it would be better to pass the leaf page size supported by vSMMU to
+>> host.  Perhaps this issue and the one reported by Chenxiang can be solved
+>> together.
+>>
+>> Thanks,
+>> Kunkun Jiang
+>>>> Best Regards,
+>>>> Kunkun Jiang
+>>>>> -static void arm_smmu_tlb_inv_range_domain(unsigned long iova, size_t
+>>>>> size,
+>>>>> -                      size_t granule, bool leaf,
+>>>>> -                      struct arm_smmu_domain *smmu_domain)
+>>>>> +static void
+>>>>> +arm_smmu_tlb_inv_range_domain(unsigned long iova, size_t size,
+>>>>> +                  size_t granule, bool leaf, int ext_asid,
+>>>>> +                  struct arm_smmu_domain *smmu_domain)
+>>>>>     {
+>>>>>         struct arm_smmu_cmdq_ent cmd = {
+>>>>>             .tlbi = {
+>>>>> @@ -1936,7 +1950,12 @@ static void
+>>>>> arm_smmu_tlb_inv_range_domain(unsigned long iova, size_t size,
+>>>>>             },
+>>>>>         };
+>>>>>     -    if (smmu_domain->stage == ARM_SMMU_DOMAIN_S1) {
+>>>>> +    if (ext_asid >= 0) {  /* guest stage 1 invalidation */
+>>>>> +        cmd.opcode    = smmu_domain->smmu->features &
+>>>>> ARM_SMMU_FEAT_E2H ?
+>>>>> +                  CMDQ_OP_TLBI_EL2_VA : CMDQ_OP_TLBI_NH_VA;
+>>>>> +        cmd.tlbi.asid    = ext_asid;
+>>>>> +        cmd.tlbi.vmid    = smmu_domain->s2_cfg.vmid;
+>>>>> +    } else if (smmu_domain->stage == ARM_SMMU_DOMAIN_S1) {
+>>>>>             cmd.opcode    = smmu_domain->smmu->features &
+>>>>> ARM_SMMU_FEAT_E2H ?
+>>>>>                       CMDQ_OP_TLBI_EL2_VA : CMDQ_OP_TLBI_NH_VA;
+>>>>>             cmd.tlbi.asid    = smmu_domain->s1_cfg.cd.asid;
+>>>>> @@ -1944,6 +1963,7 @@ static void
+>>>>> arm_smmu_tlb_inv_range_domain(unsigned long iova, size_t size,
+>>>>>             cmd.opcode    = CMDQ_OP_TLBI_S2_IPA;
+>>>>>             cmd.tlbi.vmid    = smmu_domain->s2_cfg.vmid;
+>>>>>         }
+>>>>> +
+>>>>>         __arm_smmu_tlb_inv_range(&cmd, iova, size, granule,
+>>>>> smmu_domain);
+>>>>>           /*
+>>>>> @@ -1982,7 +2002,7 @@ static void arm_smmu_tlb_inv_page_nosync(struct
+>>>>> iommu_iotlb_gather *gather,
+>>>>>     static void arm_smmu_tlb_inv_walk(unsigned long iova, size_t size,
+>>>>>                       size_t granule, void *cookie)
+>>>>>     {
+>>>>> -    arm_smmu_tlb_inv_range_domain(iova, size, granule, false, cookie);
+>>>>> +    arm_smmu_tlb_inv_range_domain(iova, size, granule, false, -1,
+>>>>> cookie);
+>>>>>     }
+>>>>>       static const struct iommu_flush_ops arm_smmu_flush_ops = {
+>>>>> @@ -2523,7 +2543,7 @@ static void arm_smmu_iotlb_sync(struct
+>>>>> iommu_domain *domain,
+>>>>>           arm_smmu_tlb_inv_range_domain(gather->start,
+>>>>>                           gather->end - gather->start + 1,
+>>>>> -                      gather->pgsize, true, smmu_domain);
+>>>>> +                      gather->pgsize, true, -1, smmu_domain);
+>>>>>     }
+>>>>>       static phys_addr_t
+>>> .
+>>
+> .
 
-        tglx
----
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -3782,6 +3782,7 @@ static noinstr void svm_vcpu_enter_exit(
- 	 * accordingly.
- 	 */
- 	instrumentation_begin();
-+	vtime_account_guest_enter();
- 	trace_hardirqs_on_prepare();
- 	lockdep_hardirqs_on_prepare(CALLER_ADDR0);
- 	instrumentation_end();
-@@ -3816,6 +3817,7 @@ static noinstr void svm_vcpu_enter_exit(
- 
- 	instrumentation_begin();
- 	trace_hardirqs_off_finish();
-+	vtime_account_guest_exit();
- 	instrumentation_end();
- }
- 
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -6655,6 +6655,7 @@ static noinstr void vmx_vcpu_enter_exit(
- 	 * accordingly.
- 	 */
- 	instrumentation_begin();
-+	vtime_account_guest_enter();
- 	trace_hardirqs_on_prepare();
- 	lockdep_hardirqs_on_prepare(CALLER_ADDR0);
- 	instrumentation_end();
-@@ -6693,6 +6694,7 @@ static noinstr void vmx_vcpu_enter_exit(
- 
- 	instrumentation_begin();
- 	trace_hardirqs_off_finish();
-+	vtime_account_guest_exit();
- 	instrumentation_end();
- }
- 
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -9200,6 +9200,7 @@ static int vcpu_enter_guest(struct kvm_v
- 	++vcpu->stat.exits;
- 	local_irq_disable();
- 	kvm_after_interrupt(vcpu);
-+	vcpu_account_guest_exit();
- 
- 	if (lapic_in_kernel(vcpu)) {
- 		s64 delta = vcpu->arch.apic->lapic_timer.advance_expire_delta;
---- a/include/linux/context_tracking.h
-+++ b/include/linux/context_tracking.h
-@@ -107,13 +107,6 @@ static inline void context_tracking_init
- /* must be called with irqs disabled */
- static __always_inline void guest_enter_irqoff(void)
- {
--	instrumentation_begin();
--	if (vtime_accounting_enabled_this_cpu())
--		vtime_guest_enter(current);
--	else
--		current->flags |= PF_VCPU;
--	instrumentation_end();
--
- 	if (context_tracking_enabled())
- 		__context_tracking_enter(CONTEXT_GUEST);
- 
-@@ -135,37 +128,18 @@ static __always_inline void guest_exit_i
- {
- 	if (context_tracking_enabled())
- 		__context_tracking_exit(CONTEXT_GUEST);
--
--	instrumentation_begin();
--	if (vtime_accounting_enabled_this_cpu())
--		vtime_guest_exit(current);
--	else
--		current->flags &= ~PF_VCPU;
--	instrumentation_end();
- }
- 
- #else
- static __always_inline void guest_enter_irqoff(void)
- {
--	/*
--	 * This is running in ioctl context so its safe
--	 * to assume that it's the stime pending cputime
--	 * to flush.
--	 */
- 	instrumentation_begin();
--	vtime_account_kernel(current);
--	current->flags |= PF_VCPU;
- 	rcu_virt_note_context_switch(smp_processor_id());
- 	instrumentation_end();
- }
- 
- static __always_inline void guest_exit_irqoff(void)
- {
--	instrumentation_begin();
--	/* Flush the guest cputime we spent on the guest */
--	vtime_account_kernel(current);
--	current->flags &= ~PF_VCPU;
--	instrumentation_end();
- }
- #endif /* CONFIG_VIRT_CPU_ACCOUNTING_GEN */
- 
-@@ -178,4 +152,24 @@ static inline void guest_exit(void)
- 	local_irq_restore(flags);
- }
- 
-+static __always_inline void vtime_account_guest_enter(void)
-+{
-+	if (vtime_accounting_enabled_this_cpu())
-+		vtime_guest_enter(current);
-+	else
-+		current->flags |= PF_VCPU;
-+}
-+
-+static __always_inline void vtime_account_guest_exit(void)
-+{
-+	if (vtime_accounting_enabled_this_cpu())
-+		vtime_guest_exit(current);
-+}
-+
-+static __always_inline void vcpu_account_guest_exit(void)
-+{
-+	if (!vtime_accounting_enabled_this_cpu())
-+		current->flags &= ~PF_VCPU;
-+}
-+
- #endif
+
