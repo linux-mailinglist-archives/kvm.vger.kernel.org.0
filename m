@@ -2,255 +2,211 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8B317359FC4
-	for <lists+kvm@lfdr.de>; Fri,  9 Apr 2021 15:27:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AC326359FE0
+	for <lists+kvm@lfdr.de>; Fri,  9 Apr 2021 15:33:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232855AbhDIN1W (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 9 Apr 2021 09:27:22 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:39354 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231127AbhDIN1S (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 9 Apr 2021 09:27:18 -0400
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 139D2qk0146781;
-        Fri, 9 Apr 2021 09:27:04 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=XzuS5as5IWaueUcn3ofnkt2I+738FWP6ZUWEz2NtDkQ=;
- b=tmJdmyHrn/LMuNYmiyOZaEQVe+rik34dC1Dda1/atF/GEcgfiXzc/V61NBF661hecK20
- hVG3jq2zc2oZejmfYU/+HCuLTHUM9hN2pPvU0h1MkEVSFTsYkg/4jX8XlCBCnrHgbQuu
- aRnce4N9SFxdgRw/EVsLc9lTJKxgUV8WxmZCQV5rD9p0tXNzr43qUft01sLndj/LsLbB
- mTWDSrCV1XocX5vqtOhfm870WWcbHaWhS9FDkPcTpSeEH/uqMi+6ElSJF7qwpW9JXywV
- v1cZEcUenDEH8BeECHDKr2lWMCFLrITVd2MgvryNb4E+gJmf5qFh+Crap2fPdPjHFU89 5Q== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 37tpvwhu4n-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 09 Apr 2021 09:27:04 -0400
-Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 139D3KJN001972;
-        Fri, 9 Apr 2021 09:27:04 -0400
-Received: from ppma04dal.us.ibm.com (7a.29.35a9.ip4.static.sl-reverse.com [169.53.41.122])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 37tpvwhu47-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 09 Apr 2021 09:27:03 -0400
-Received: from pps.filterd (ppma04dal.us.ibm.com [127.0.0.1])
-        by ppma04dal.us.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 139DLnJR030812;
-        Fri, 9 Apr 2021 13:27:03 GMT
-Received: from b03cxnp08025.gho.boulder.ibm.com (b03cxnp08025.gho.boulder.ibm.com [9.17.130.17])
-        by ppma04dal.us.ibm.com with ESMTP id 37rvc4hq0x-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 09 Apr 2021 13:27:03 +0000
-Received: from b03ledav006.gho.boulder.ibm.com (b03ledav006.gho.boulder.ibm.com [9.17.130.237])
-        by b03cxnp08025.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 139DQxhK29032940
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 9 Apr 2021 13:26:59 GMT
-Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 76E6BC6061;
-        Fri,  9 Apr 2021 13:26:59 +0000 (GMT)
-Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 54801C6057;
-        Fri,  9 Apr 2021 13:26:57 +0000 (GMT)
-Received: from cpe-172-100-162-199.stny.res.rr.com (unknown [9.85.201.195])
-        by b03ledav006.gho.boulder.ibm.com (Postfix) with ESMTP;
-        Fri,  9 Apr 2021 13:26:57 +0000 (GMT)
-Subject: Re: [PATCH v15 00/13] s390/vfio-ap: dynamic configuration support
-To:     Halil Pasic <pasic@linux.ibm.com>
-Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, jjherne@linux.ibm.com, freude@linux.ibm.com,
-        borntraeger@de.ibm.com, cohuck@redhat.com, mjrosato@linux.ibm.com,
-        alex.williamson@redhat.com, kwankhede@nvidia.com,
-        fiuczy@linux.ibm.com, frankja@linux.ibm.com, david@redhat.com,
-        hca@linux.ibm.com, gor@linux.ibm.com,
-        "Jason J . Herne" <jjherne@linux.ibm.com>
-References: <20210406153122.22874-1-akrowiak@linux.ibm.com>
- <20210408223804.0ca5ba36.pasic@linux.ibm.com>
-From:   Tony Krowiak <akrowiak@linux.ibm.com>
-Message-ID: <4c083431-bdba-15f8-bcbc-f80192cb02c8@linux.ibm.com>
-Date:   Fri, 9 Apr 2021 09:26:56 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.8.1
+        id S233604AbhDINeG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 9 Apr 2021 09:34:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44408 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233552AbhDINeF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 9 Apr 2021 09:34:05 -0400
+Received: from mail-lf1-x136.google.com (mail-lf1-x136.google.com [IPv6:2a00:1450:4864:20::136])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F4C0C061760
+        for <kvm@vger.kernel.org>; Fri,  9 Apr 2021 06:33:51 -0700 (PDT)
+Received: by mail-lf1-x136.google.com with SMTP id w28so9738378lfn.2
+        for <kvm@vger.kernel.org>; Fri, 09 Apr 2021 06:33:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=shutemov-name.20150623.gappssmtp.com; s=20150623;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=+pHQi2OzKPyPC0KIDsVeHvTEz5QYwkp15iNvMnsgf9c=;
+        b=qmgSCtmourr9L2RlDFZgGr4egPrINyGU02cvXp0bbLU/zh8hYLJR8gXLKqNI4rVRfJ
+         Y216MNdtd9ViTgOGuvoA2McTPPYzN0win0s9md94sOKiqH2TEjZY3SVXFR816pgHmWIj
+         RJpmJtHdZG+harWrFFsinPRs7DedCERbBb/Phy3ALRYSDN+7W4FegvBBC1Q9iE2jUsbU
+         J9RsxSre6uR+dDfvM0SbyPOCbKo8C8dLPayB43e/MzuBtfwuvoGEHn+kEZQKJvqQBCz8
+         RJbvO2AHT87yb4G5GXW6K6QwzW/fRa02DLSME+nD2WtO0RwDg5nzWQPhXPzcqRCURtWK
+         NuWg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=+pHQi2OzKPyPC0KIDsVeHvTEz5QYwkp15iNvMnsgf9c=;
+        b=Fu6L1pDP7nMfUeQwaWCFD4no4RWwjPHqWyjcUJpfKUTEGQNpjKJytpUGzPpoxs8P42
+         kDa3/DujLxwbETGiquv9kXpZ9njtLeBcf4WNDvQpUrKeAdjXLvjiMPXvhS1SjlODX52U
+         OCNL2gHKOif/l/aPm56tnWcoWa/rmEg42GPsEKIrvFSJnvDVGDCKQS513qzcgHoroPeo
+         BSunvMqrV6rpzWNKAgK8c4vCfQYghwF58TTa9jjbJJWNjLwrBKsj7sp7Ld6xwNqym1H/
+         GtMDPfEUbehhMuZd2c9P1REi4P/XdVZ/hBbFxYFBAJ5GYLN3lQOtvtFYzVDEu3w9zmfq
+         yDzQ==
+X-Gm-Message-State: AOAM530UZvl1wuD2kGfG9DHQNLOGLNVIYKZGXn2JRMNOLj/myDH2CYIn
+        fqCKL7+iyVscNmgy51GnELm7XA==
+X-Google-Smtp-Source: ABdhPJynjRSJthCRwTX5vDn44O6h7SJMm8/0v0Lujd09ADcCsNIQoU7fugG96bOELQBpOXbWEJf18g==
+X-Received: by 2002:a05:6512:3091:: with SMTP id z17mr10257535lfd.84.1617975229701;
+        Fri, 09 Apr 2021 06:33:49 -0700 (PDT)
+Received: from box.localdomain ([86.57.175.117])
+        by smtp.gmail.com with ESMTPSA id z9sm282834lfa.80.2021.04.09.06.33.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 09 Apr 2021 06:33:48 -0700 (PDT)
+Received: by box.localdomain (Postfix, from userid 1000)
+        id F213F102498; Fri,  9 Apr 2021 16:33:47 +0300 (+03)
+Date:   Fri, 9 Apr 2021 16:33:47 +0300
+From:   "Kirill A. Shutemov" <kirill@shutemov.name>
+To:     David Hildenbrand <david@redhat.com>
+Cc:     Dave Hansen <dave.hansen@linux.intel.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Sean Christopherson <seanjc@google.com>,
+        Jim Mattson <jmattson@google.com>,
+        David Rientjes <rientjes@google.com>,
+        "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>,
+        "Kleen, Andi" <andi.kleen@intel.com>,
+        "Yamahata, Isaku" <isaku.yamahata@intel.com>, x86@kernel.org,
+        kvm@vger.kernel.org, linux-mm@kvack.org,
+        linux-kernel@vger.kernel.org,
+        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
+        Oscar Salvador <osalvador@suse.de>,
+        Naoya Horiguchi <n-horiguchi@ah.jp.nec.com>
+Subject: Re: [RFCv1 7/7] KVM: unmap guest memory using poisoned pages
+Message-ID: <20210409133347.r2uf3u5g55pp27xn@box>
+References: <20210402152645.26680-1-kirill.shutemov@linux.intel.com>
+ <20210402152645.26680-8-kirill.shutemov@linux.intel.com>
+ <5e934d94-414c-90de-c58e-34456e4ab1cf@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20210408223804.0ca5ba36.pasic@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: aL5dvifMWPhZQPeYaM8gu8t1dYwPY1as
-X-Proofpoint-ORIG-GUID: WGZW_BFRV22fYKWcat4rtAc1OpeCB_CP
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.761
- definitions=2021-04-09_05:2021-04-09,2021-04-09 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 spamscore=0
- suspectscore=0 impostorscore=0 mlxscore=0 adultscore=0 lowpriorityscore=0
- priorityscore=1501 phishscore=0 clxscore=1015 mlxlogscore=999
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2104060000 definitions=main-2104090096
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <5e934d94-414c-90de-c58e-34456e4ab1cf@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Wed, Apr 07, 2021 at 04:55:54PM +0200, David Hildenbrand wrote:
+> On 02.04.21 17:26, Kirill A. Shutemov wrote:
+> > TDX architecture aims to provide resiliency against confidentiality and
+> > integrity attacks. Towards this goal, the TDX architecture helps enforce
+> > the enabling of memory integrity for all TD-private memory.
+> > 
+> > The CPU memory controller computes the integrity check value (MAC) for
+> > the data (cache line) during writes, and it stores the MAC with the
+> > memory as meta-data. A 28-bit MAC is stored in the ECC bits.
+> > 
+> > Checking of memory integrity is performed during memory reads. If
+> > integrity check fails, CPU poisones cache line.
+> > 
+> > On a subsequent consumption (read) of the poisoned data by software,
+> > there are two possible scenarios:
+> > 
+> >   - Core determines that the execution can continue and it treats
+> >     poison with exception semantics signaled as a #MCE
+> > 
+> >   - Core determines execution cannot continue,and it does an unbreakable
+> >     shutdown
+> > 
+> > For more details, see Chapter 14 of Intel TDX Module EAS[1]
+> > 
+> > As some of integrity check failures may lead to system shutdown host
+> > kernel must not allow any writes to TD-private memory. This requirment
+> > clashes with KVM design: KVM expects the guest memory to be mapped into
+> > host userspace (e.g. QEMU).
+> > 
+> > This patch aims to start discussion on how we can approach the issue.
+> > 
+> > For now I intentionally keep TDX out of picture here and try to find a
+> > generic way to unmap KVM guest memory from host userspace. Hopefully, it
+> > makes the patch more approachable. And anyone can try it out.
+> > 
+> > To the proposal:
+> > 
+> > Looking into existing codepaths I've discovered that we already have
+> > semantics we want. That's PG_hwpoison'ed pages and SWP_HWPOISON swap
+> > entries in page tables:
+> > 
+> >    - If an application touches a page mapped with the SWP_HWPOISON, it will
+> >      get SIGBUS.
+> > 
+> >    - GUP will fail with -EFAULT;
+> > 
+> > Access the poisoned memory via page cache doesn't match required
+> > semantics right now, but it shouldn't be too hard to make it work:
+> > access to poisoned dirty pages should give -EIO or -EHWPOISON.
+> > 
+> > My idea is that we can mark page as poisoned when we make it TD-private
+> > and replace all PTEs that map the page with SWP_HWPOISON.
+> 
+> It looks quite hacky (well, what did I expect from an RFC :) ) you can no
+> longer distinguish actually poisoned pages from "temporarily poisoned"
+> pages. FOLL_ALLOW_POISONED sounds especially nasty and dangerous -  "I want
+> to read/write a poisoned page, trust me, I know what I am doing".
+> 
+> Storing the state for each individual page initially sounded like the right
+> thing to do, but I wonder if we couldn't handle this on a per-VMA level. You
+> can just remember the handful of shared ranges internally like you do right
+> now AFAIU.
 
+per-VMA would not fly for file-backed (e.g. tmpfs) memory. We may need to
+combine PG_hwpoison with VMA flag. Maybe per-inode tracking would also be
+required. Or per-memslot. I donno. Need more experiments.
 
-On 4/8/21 4:38 PM, Halil Pasic wrote:
-> On Tue,  6 Apr 2021 11:31:09 -0400
-> Tony Krowiak <akrowiak@linux.ibm.com> wrote:
->
->> Tony Krowiak (13):
->>    s390/vfio-ap: fix circular lockdep when setting/clearing crypto masks
-> The subsequent patches, re introduce this circular locking dependency
-> problem. See my kernel messages for the details. The link we severe
-> in the above patch is re-introduced at several places. One of them is
-> assign_adapter_store().
+Note, I use PG_hwpoison now, but if we find a show-stopper issue where we
+would see confusion with a real poison, we can switch to new flags and
+a new swap_type(). I have not seen a reason yet.
 
-Like in the patch referenced above, the lockdep splat occurs when
-the APCB masks are set which requires acquisition of the kvm lock.
-Patch 08/13, allow hot plug/unplug of AP resources using mdev,
-introduces code that updates the APCB masks whenever an
-adapter, domain or control domain is assigned or unassigned
-as well as when a queue device is probed or removed.
-I think the solution from the patch above can be implemented
-here to resolve this problem.
+> From what I get, you want a way to
+> 
+> 1. Unmap pages from the user space page tables.
 
->
-> Regards,
-> Halil
->
-> [  +0.000236] vfio_ap matrix: MDEV: Registered
-> [  +0.037919] vfio_mdev 4f77ad87-1e62-4959-8b7a-c677c98d2194: Adding to iommu group 1
-> [  +0.000092] vfio_mdev 4f77ad87-1e62-4959-8b7a-c677c98d2194: MDEV: group_id = 1
->
-> [Apr 8 22:31] ======================================================
-> [  +0.000002] WARNING: possible circular locking dependency detected
-> [  +0.000002] 5.12.0-rc6-00016-g5bea90816c56 #57 Not tainted
-> [  +0.000002] ------------------------------------------------------
-> [  +0.000002] CPU 1/KVM/6651 is trying to acquire lock:
-> [  +0.000002] 00000000cef9d508 (&matrix_dev->lock){+.+.}-{3:3}, at: handle_pqap+0x56/0x1c8 [vfio_ap]
-> [  +0.000011]
->                but task is already holding lock:
-> [  +0.000001] 00000000d41f4308 (&vcpu->mutex){+.+.}-{3:3}, at: kvm_vcpu_ioctl+0x90/0x898 [kvm]
-> [  +0.000038]
->                which lock already depends on the new lock.
->
-> [  +0.000002]
->                the existing dependency chain (in reverse order) is:
-> [  +0.000001]
->                -> #2 (&vcpu->mutex){+.+.}-{3:3}:
-> [  +0.000004]        validate_chain+0x796/0xa20
-> [  +0.000006]        __lock_acquire+0x420/0x7c8
-> [  +0.000003]        lock_acquire.part.0+0xec/0x1e8
-> [  +0.000002]        lock_acquire+0xb8/0x208
-> [  +0.000002]        __mutex_lock+0xa2/0x928
-> [  +0.000005]        mutex_lock_nested+0x32/0x40
-> [  +0.000002]        kvm_s390_cpus_to_pv+0x4e/0xf8 [kvm]
-> [  +0.000019]        kvm_s390_handle_pv+0x1ce/0x6b0 [kvm]
-> [  +0.000018]        kvm_arch_vm_ioctl+0x3ec/0x550 [kvm]
-> [  +0.000019]        kvm_vm_ioctl+0x40e/0x4a8 [kvm]
-> [  +0.000018]        __s390x_sys_ioctl+0xc0/0x100
-> [  +0.000004]        do_syscall+0x7e/0xd0
-> [  +0.000043]        __do_syscall+0xc0/0xd8
-> [  +0.000004]        system_call+0x72/0x98
-> [  +0.000004]
->                -> #1 (&kvm->lock){+.+.}-{3:3}:
-> [  +0.000004]        validate_chain+0x796/0xa20
-> [  +0.000002]        __lock_acquire+0x420/0x7c8
-> [  +0.000002]        lock_acquire.part.0+0xec/0x1e8
-> [  +0.000002]        lock_acquire+0xb8/0x208
-> [  +0.000003]        __mutex_lock+0xa2/0x928
-> [  +0.000002]        mutex_lock_nested+0x32/0x40
-> [  +0.000002]        kvm_arch_crypto_set_masks+0x4a/0x2b8 [kvm]
-> [  +0.000018]        vfio_ap_mdev_refresh_apcb+0xd0/0xe0 [vfio_ap]
-> [  +0.000003]        assign_adapter_store+0x1f2/0x240 [vfio_ap]
-> [  +0.000003]        kernfs_fop_write_iter+0x13e/0x1e0
-> [  +0.000003]        new_sync_write+0x10a/0x198
-> [  +0.000003]        vfs_write.part.0+0x196/0x290
-> [  +0.000002]        ksys_write+0x6c/0xf8
-> [  +0.000003]        do_syscall+0x7e/0xd0
-> [  +0.000002]        __do_syscall+0xc0/0xd8
-> [  +0.000003]        system_call+0x72/0x98
-> [  +0.000002]
->                -> #0 (&matrix_dev->lock){+.+.}-{3:3}:
-> [  +0.000004]        check_noncircular+0x16e/0x190
-> [  +0.000002]        check_prev_add+0xec/0xf38
-> [  +0.000002]        validate_chain+0x796/0xa20
-> [  +0.000002]        __lock_acquire+0x420/0x7c8
-> [  +0.000002]        lock_acquire.part.0+0xec/0x1e8
-> [  +0.000002]        lock_acquire+0xb8/0x208
-> [  +0.000002]        __mutex_lock+0xa2/0x928
-> [  +0.000002]        mutex_lock_nested+0x32/0x40
-> [  +0.000003]        handle_pqap+0x56/0x1c8 [vfio_ap]
-> [  +0.000002]        handle_pqap+0xe2/0x1d8 [kvm]
-> [  +0.000019]        kvm_handle_sie_intercept+0x134/0x248 [kvm]
-> [  +0.000019]        vcpu_post_run+0x2b6/0x580 [kvm]
-> [  +0.000018]        __vcpu_run+0x27e/0x388 [kvm]
-> [  +0.000019]        kvm_arch_vcpu_ioctl_run+0x10a/0x278 [kvm]
-> [  +0.000018]        kvm_vcpu_ioctl+0x2cc/0x898 [kvm]
-> [  +0.000018]        __s390x_sys_ioctl+0xc0/0x100
-> [  +0.000003]        do_syscall+0x7e/0xd0
-> [  +0.000002]        __do_syscall+0xc0/0xd8
-> [  +0.000002]        system_call+0x72/0x98
-> [  +0.000003]
->                other info that might help us debug this:
->
-> [  +0.000001] Chain exists of:
->                  &matrix_dev->lock --> &kvm->lock --> &vcpu->mutex
->
-> [  +0.000005]  Possible unsafe locking scenario:
->
-> [  +0.000001]        CPU0                    CPU1
-> [  +0.000001]        ----                    ----
-> [  +0.000002]   lock(&vcpu->mutex);
-> [  +0.000002]                                lock(&kvm->lock);
-> [  +0.000002]                                lock(&vcpu->mutex);
-> [  +0.000002]   lock(&matrix_dev->lock);
-> [  +0.000002]
->                 *** DEADLOCK ***
->
-> [  +0.000002] 2 locks held by CPU 1/KVM/6651:
-> [  +0.000002]  #0: 00000000d41f4308 (&vcpu->mutex){+.+.}-{3:3}, at: kvm_vcpu_ioctl+0x90/0x898 [kvm]
-> [  +0.000023]  #1: 00000000da2fc508 (&kvm->srcu){....}-{0:0}, at: __vcpu_run+0x1ec/0x388 [kvm]
-> [  +0.000021]
->                stack backtrace:
-> [  +0.000002] CPU: 6 PID: 6651 Comm: CPU 1/KVM Not tainted 5.12.0-rc6-00016-g5bea90816c56 #57
-> [  +0.000004] Hardware name: IBM 8561 T01 701 (LPAR)
-> [  +0.000001] Call Trace:
-> [  +0.000002]  [<00000002010e7ef0>] show_stack+0x90/0xf8
-> [  +0.000007]  [<00000002010fb5b2>] dump_stack+0xba/0x108
-> [  +0.000002]  [<000000020053feb6>] check_noncircular+0x16e/0x190
-> [  +0.000003]  [<0000000200541424>] check_prev_add+0xec/0xf38
-> [  +0.000002]  [<0000000200542a06>] validate_chain+0x796/0xa20
-> [  +0.000003]  [<0000000200545430>] __lock_acquire+0x420/0x7c8
-> [  +0.000002]  [<00000002005441a4>] lock_acquire.part.0+0xec/0x1e8
-> [  +0.000002]  [<0000000200544358>] lock_acquire+0xb8/0x208
-> [  +0.000003]  [<000000020110aeea>] __mutex_lock+0xa2/0x928
-> [  +0.000002]  [<000000020110b7a2>] mutex_lock_nested+0x32/0x40
-> [  +0.000003]  [<000003ff8060fb5e>] handle_pqap+0x56/0x1c8 [vfio_ap]
-> [  +0.000003]  [<000003ff80597412>] handle_pqap+0xe2/0x1d8 [kvm]
-> [  +0.000018]  [<000003ff8058c924>] kvm_handle_sie_intercept+0x134/0x248 [kvm]
-> [  +0.000020]  [<000003ff80588e96>] vcpu_post_run+0x2b6/0x580 [kvm]
-> [  +0.000019]  [<000003ff805893de>] __vcpu_run+0x27e/0x388 [kvm]
-> [  +0.000018]  [<000003ff80589d0a>] kvm_arch_vcpu_ioctl_run+0x10a/0x278 [kvm]
-> [  +0.000019]  [<000003ff805704d4>] kvm_vcpu_ioctl+0x2cc/0x898 [kvm]
-> [  +0.000019]  [<0000000200801ee8>] __s390x_sys_ioctl+0xc0/0x100
-> [  +0.000003]  [<000000020046e7ae>] do_syscall+0x7e/0xd0
-> [  +0.000003]  [<00000002010ffc20>] __do_syscall+0xc0/0xd8
-> [  +0.000002]  [<0000000201110c42>] system_call+0x72/0x98
-> [  +0.000003] INFO: lockdep is turned off.
-> [  +6.846296] vfio_mdev 4f77ad87-1e62-4959-8b7a-c677c98d2194: Removing from iommu group 1
-> [  +0.000028] vfio_mdev 4f77ad87-1e62-4959-8b7a-c677c98d2194: MDEV: detaching iommu
-> [  +0.007677] vfio_ap matrix: MDEV: Unregistering
->
->
->>    s390/vfio-ap: use new AP bus interface to search for queue devices
->>    s390/vfio-ap: move probe and remove callbacks to vfio_ap_ops.c
->>    s390/vfio-ap: manage link between queue struct and matrix mdev
->>    s390/vfio-ap: introduce shadow APCB
->>    s390/vfio-ap: refresh guest's APCB by filtering APQNs assigned to mdev
->>    s390/vfio-ap: allow assignment of unavailable AP queues to mdev device
->>    s390/vfio-ap: allow hot plug/unplug of AP resources using mdev device
->>    s390/zcrypt: driver callback to indicate resource in use
->>    s390/vfio-ap: implement in-use callback for vfio_ap driver
->>    s390/vfio-ap: sysfs attribute to display the guest's matrix
->>    s390/zcrypt: notify drivers on config changed and scan complete
->>      callbacks
->>    s390/vfio-ap: update docs to include dynamic config support
+Plain unmap would not work for some use-cases. Some CSPs want to
+preallocate memory in a specific way. It's a way to provide a fine-grained
+NUMA policy.
 
+The existing mapping has to be converted.
+
+> 2. Disallow re-faulting of the protected pages into the page tables. On user
+> space access, you want to deliver some signal (e.g., SIGBUS).
+
+Note that userspace mapping is the only source of pfn's for VM's shadow
+mapping. The fault should be allow, but lead to non-present PTE that still
+encodes pfn.
+
+> 3. Allow selected users to still grab the pages (esp. KVM to fault them into
+> the page tables).
+
+As long as fault leads to non-present PTEs we are fine. Usespace still may
+want to mlock() some of guest memory. There's no reason to prevent this.
+
+> 4. Allow access to currently shared specific pages from user space.
+> 
+> Right now, you achieve
+> 
+> 1. Via try_to_unmap()
+> 2. TestSetPageHWPoison
+> 3. TBD (e.g., FOLL_ALLOW_POISONED)
+> 4. ClearPageHWPoison()
+> 
+> 
+> If we could bounce all writes to shared pages through the kernel, things
+> could end up a little easier. Some very rough idea:
+> 
+> We could let user space setup VM memory as
+> mprotect(PROT_READ) (+ PROT_KERNEL_WRITE?), and after activating protected
+> memory (I assume via a KVM ioctl), make sure the VMAs cannot be set to
+> PROT_WRITE anymore. This would already properly unmap and deliver a SIGSEGV
+> when trying to write from user space.
+> 
+> You could then still access the pages, e.g., via FOLL_FORCE or a new fancy
+> flag that allows to write with VM_MAYWRITE|VM_DENYUSERWRITE. This would
+> allow an ioctl to write page content and to map the pages into NPTs.
+> 
+> As an extension, we could think about (re?)mapping some shared pages
+> read|write. The question is how to synchronize with user space.
+> 
+> I have no idea how expensive would be bouncing writes (and reads?) through
+> the kernel. Did you ever experiment with that/evaluate that?
+
+It's going to be double bounce buffer: on the guest we force swiotlb to
+make it go through shared region. I don't think it's a good idea.
+
+There are a number of way to share a memory. It's going to be decided by
+the way we get these pages unmapped in the first place.
+
+-- 
+ Kirill A. Shutemov
