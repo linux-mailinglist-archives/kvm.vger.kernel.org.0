@@ -2,285 +2,110 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1D0293597E5
-	for <lists+kvm@lfdr.de>; Fri,  9 Apr 2021 10:31:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 100453597F4
+	for <lists+kvm@lfdr.de>; Fri,  9 Apr 2021 10:33:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231925AbhDIIbu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 9 Apr 2021 04:31:50 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:42961 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231668AbhDIIbq (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 9 Apr 2021 04:31:46 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1617957093;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=ckiaDadLI3Q36uJmnyF8zVs1VJKNRCw3jjdFa+zQU9E=;
-        b=TctAKeQ/t0+lsb8rkozNL6dUeCzb9O7mtohz6Bs4NpEvi6F18vBNEYnLmRNmU/2BSHdzhp
-        FRMSbNItKVMTHGZjqDUirgIqy0+cwGew96bmcYB0evf/UMMwLaO/h5NuCBN+9ojgcBhB0y
-        W+P0pmkpMnVaLI3cWu2fclf9fqLjx7c=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-130-ygGqiEGgNb-IGtXqc6wpjA-1; Fri, 09 Apr 2021 04:31:26 -0400
-X-MC-Unique: ygGqiEGgNb-IGtXqc6wpjA-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8A3DB8189EE;
-        Fri,  9 Apr 2021 08:31:23 +0000 (UTC)
-Received: from [10.36.114.73] (ovpn-114-73.ams2.redhat.com [10.36.114.73])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 0C8C019C71;
-        Fri,  9 Apr 2021 08:31:11 +0000 (UTC)
-Subject: Re: [PATCH v14 06/13] iommu/smmuv3: Allow stage 1 invalidation with
- unmanaged ASIDs
-To:     Kunkun Jiang <jiangkunkun@huawei.com>, eric.auger.pro@gmail.com,
-        iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, will@kernel.org,
-        maz@kernel.org, robin.murphy@arm.com, joro@8bytes.org,
-        alex.williamson@redhat.com, tn@semihalf.com, zhukeqian1@huawei.com
-Cc:     jacob.jun.pan@linux.intel.com, yi.l.liu@intel.com,
-        wangxingang5@huawei.com, jean-philippe@linaro.org,
-        zhangfei.gao@linaro.org, zhangfei.gao@gmail.com,
-        vivek.gautam@arm.com, shameerali.kolothum.thodi@huawei.com,
-        yuzenghui@huawei.com, nicoleotsuka@gmail.com,
-        lushenming@huawei.com, vsethi@nvidia.com,
-        wanghaibin.wang@huawei.com
-References: <20210223205634.604221-1-eric.auger@redhat.com>
- <20210223205634.604221-7-eric.auger@redhat.com>
- <901720e6-6ca5-eb9a-1f24-0ca479bcfecc@huawei.com>
- <0246aec2-162d-0584-3ca4-b9c304ef3c8a@redhat.com>
- <46f3760a-9ab5-1710-598e-38fbc1f5fb5c@huawei.com>
-From:   Auger Eric <eric.auger@redhat.com>
-Message-ID: <2baf96db-d7fe-e341-1b40-fab2b4c9fd92@redhat.com>
-Date:   Fri, 9 Apr 2021 10:31:09 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.8.0
+        id S232448AbhDIIeJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 9 Apr 2021 04:34:09 -0400
+Received: from szxga01-in.huawei.com ([45.249.212.187]:5125 "EHLO
+        szxga01-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232328AbhDIIeI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 9 Apr 2021 04:34:08 -0400
+Received: from DGGEML401-HUB.china.huawei.com (unknown [172.30.72.53])
+        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4FGrvq2VFYzYV47;
+        Fri,  9 Apr 2021 16:31:51 +0800 (CST)
+Received: from dggpeml500013.china.huawei.com (7.185.36.41) by
+ DGGEML401-HUB.china.huawei.com (10.3.17.32) with Microsoft SMTP Server (TLS)
+ id 14.3.498.0; Fri, 9 Apr 2021 16:33:53 +0800
+Received: from [10.174.187.161] (10.174.187.161) by
+ dggpeml500013.china.huawei.com (7.185.36.41) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id
+ 15.1.2106.2; Fri, 9 Apr 2021 16:33:52 +0800
+Subject: Re: [PATCH v4 01/16] perf/x86/intel: Add x86_pmu.pebs_vmx for Ice
+ Lake Servers
+To:     "Xu, Like" <like.xu@intel.com>
+References: <20210329054137.120994-2-like.xu@linux.intel.com>
+ <606BD46F.7050903@huawei.com>
+ <18597e2b-3719-8d0d-9043-e9dbe39496a2@intel.com>
+CC:     <andi@firstfloor.org>, "Fangyi (Eric)" <eric.fangyi@huawei.com>,
+        Xiexiangyou <xiexiangyou@huawei.com>,
+        <kan.liang@linux.intel.com>, <kvm@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <wei.w.wang@intel.com>,
+        <x86@kernel.org>
+From:   "Liuxiangdong (Aven, Cloud Infrastructure Service Product Dept.)" 
+        <liuxiangdong5@huawei.com>
+Message-ID: <60701165.3060000@huawei.com>
+Date:   Fri, 9 Apr 2021 16:33:41 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:38.0) Gecko/20100101
+ Thunderbird/38.1.0
 MIME-Version: 1.0
-In-Reply-To: <46f3760a-9ab5-1710-598e-38fbc1f5fb5c@huawei.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+In-Reply-To: <18597e2b-3719-8d0d-9043-e9dbe39496a2@intel.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Originating-IP: [10.174.187.161]
+X-ClientProxiedBy: dggeme716-chm.china.huawei.com (10.1.199.112) To
+ dggpeml500013.china.huawei.com (7.185.36.41)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Kunkun,
+Do you have any comments or ideas about it ?
 
-On 4/9/21 6:48 AM, Kunkun Jiang wrote:
-> Hi Eric,
-> 
-> On 2021/4/8 20:30, Auger Eric wrote:
->> Hi Kunkun,
->>
->> On 4/1/21 2:37 PM, Kunkun Jiang wrote:
->>> Hi Eric,
->>>
->>> On 2021/2/24 4:56, Eric Auger wrote:
->>>> With nested stage support, soon we will need to invalidate
->>>> S1 contexts and ranges tagged with an unmanaged asid, this
->>>> latter being managed by the guest. So let's introduce 2 helpers
->>>> that allow to invalidate with externally managed ASIDs
->>>>
->>>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->>>>
->>>> ---
->>>>
->>>> v13 -> v14
->>>> - Actually send the NH_ASID command (reported by Xingang Wang)
->>>> ---
->>>>    drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c | 38
->>>> ++++++++++++++++-----
->>>>    1 file changed, 29 insertions(+), 9 deletions(-)
->>>>
->>>> diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
->>>> b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
->>>> index 5579ec4fccc8..4c19a1114de4 100644
->>>> --- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
->>>> +++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
->>>> @@ -1843,9 +1843,9 @@ int arm_smmu_atc_inv_domain(struct
->>>> arm_smmu_domain *smmu_domain, int ssid,
->>>>    }
->>>>      /* IO_PGTABLE API */
->>>> -static void arm_smmu_tlb_inv_context(void *cookie)
->>>> +static void __arm_smmu_tlb_inv_context(struct arm_smmu_domain
->>>> *smmu_domain,
->>>> +                       int ext_asid)
->>>>    {
->>>> -    struct arm_smmu_domain *smmu_domain = cookie;
->>>>        struct arm_smmu_device *smmu = smmu_domain->smmu;
->>>>        struct arm_smmu_cmdq_ent cmd;
->>>>    @@ -1856,7 +1856,13 @@ static void arm_smmu_tlb_inv_context(void
->>>> *cookie)
->>>>         * insertion to guarantee those are observed before the TLBI.
->>>> Do be
->>>>         * careful, 007.
->>>>         */
->>>> -    if (smmu_domain->stage == ARM_SMMU_DOMAIN_S1) {
->>>> +    if (ext_asid >= 0) { /* guest stage 1 invalidation */
->>>> +        cmd.opcode    = CMDQ_OP_TLBI_NH_ASID;
->>>> +        cmd.tlbi.asid    = ext_asid;
->>>> +        cmd.tlbi.vmid    = smmu_domain->s2_cfg.vmid;
->>>> +        arm_smmu_cmdq_issue_cmd(smmu, &cmd);
->>>> +        arm_smmu_cmdq_issue_sync(smmu);
->>>> +    } else if (smmu_domain->stage == ARM_SMMU_DOMAIN_S1) {
->>>>            arm_smmu_tlb_inv_asid(smmu, smmu_domain->s1_cfg.cd.asid);
->>>>        } else {
->>>>            cmd.opcode    = CMDQ_OP_TLBI_S12_VMALL;
->>>> @@ -1867,6 +1873,13 @@ static void arm_smmu_tlb_inv_context(void
->>>> *cookie)
->>>>        arm_smmu_atc_inv_domain(smmu_domain, 0, 0, 0);
->>>>    }
->>>>    +static void arm_smmu_tlb_inv_context(void *cookie)
->>>> +{
->>>> +    struct arm_smmu_domain *smmu_domain = cookie;
->>>> +
->>>> +    __arm_smmu_tlb_inv_context(smmu_domain, -1);
->>>> +}
->>>> +
->>>>    static void __arm_smmu_tlb_inv_range(struct arm_smmu_cmdq_ent *cmd,
->>>>                         unsigned long iova, size_t size,
->>>>                         size_t granule,
->>>> @@ -1926,9 +1939,10 @@ static void __arm_smmu_tlb_inv_range(struct
->>>> arm_smmu_cmdq_ent *cmd,
->>>>        arm_smmu_cmdq_batch_submit(smmu, &cmds);
->>>>    }
->>>>    
->>> Here is the part of code in __arm_smmu_tlb_inv_range():
->>>>          if (smmu->features & ARM_SMMU_FEAT_RANGE_INV) {
->>>>                  /* Get the leaf page size */
->>>>                  tg = __ffs(smmu_domain->domain.pgsize_bitmap);
->>>>
->>>>                  /* Convert page size of 12,14,16 (log2) to 1,2,3 */
->>>>                  cmd->tlbi.tg = (tg - 10) / 2;
->>>>
->>>>                  /* Determine what level the granule is at */
->>>>                  cmd->tlbi.ttl = 4 - ((ilog2(granule) - 3) / (tg - 3));
->>>>
->>>>                  num_pages = size >> tg;
->>>>          }
->>> When pSMMU supports RIL, we get the leaf page size by
->>> __ffs(smmu_domain->
->>> domain.pgsize_bitmap). In nested mode, it is determined by host
->>> PAGE_SIZE. If
->>> the host kernel and guest kernel has different translation granule (e.g.
->>> host 16K,
->>> guest 4K), __arm_smmu_tlb_inv_range() will issue an incorrect tlbi
->>> command.
->>>
->>> Do you have any idea about this issue?
->> I think this is the same issue as the one reported by Chenxiang
->>
->> https://lore.kernel.org/lkml/15938ed5-2095-e903-a290-333c299015a2@hisilicon.com/
+https://lore.kernel.org/kvm/606E5EF6.2060402@huawei.com/
+
+
+On 2021/4/6 13:14, Xu, Like wrote:
+> Hi Xiangdong,
+>
+> On 2021/4/6 11:24, Liuxiangdong (Aven, Cloud Infrastructure Service 
+> Product Dept.) wrote:
+>> Hi，like.
+>> Some questions about this new pebs patches set：
+>> https://lore.kernel.org/kvm/20210329054137.120994-2-like.xu@linux.intel.com/ 
 >>
 >>
->> In case RIL is not supported by the host, next version will use the
->> smallest pSMMU supported page size, as done in __arm_smmu_tlb_inv_range
+>> The new hardware facility supporting guest PEBS is only available
+>> on Intel Ice Lake Server platforms for now.
+>
+> Yes, we have documented this "EPT-friendly PEBS" capability in the SDM
+> 18.3.10.1 Processor Event Based Sampling (PEBS) Facility
+>
+> And again, this patch set doesn't officially support guest PEBS on the 
+> Skylake.
+>
 >>
->> Thanks
 >>
->> Eric
-> I think they are different. In normal cases, when we want to invalidate the
-> cache of stage 1, we should use the granule size supported by vSMMU to
-> implement and issue an tlbi command if pSMMU supports RIL.
-> 
-> But in the current __arm_smmu_tlb_inv_range(), it always uses the granule
-> size supported by host.
-> (tg = __ffs(smmu_domain->domain.pgsize_bitmap);)
-> 
-> Let me explain more clearly.
-> Preconditions of this issue:
-> 1. pSMMU supports RIL
-> 2. host and guest use different translation granule (e.g. host 16K,
-> guest 4K)
-this is not clear to me. See below.
-> 
-> Guest wants to invalidate 4K, so info->granule_size = 4K.
-> In __arm_smmu_tlb_inv_range(),   if pSMMU supports RIL and host 16K,
-> tg = 14, tlbi.tg = 2, tlbi.ttl = 4, tlbi.scale = 0, tlbi.num = -1. It is
-> an incorrect
-> tlbi command.
-
-If the guest uses 4K granule, this means the pSMMU also supports 4K
-granule. Otherwise the corresponding CD is invalid (TG0/TG1 field desc).
-So in that case isn't it valid to send a RIL invalidation with tg = 12,
-right?
-
-Making sure the guest uses a valid pSMMU supported granule is the QEMU
-job I think, this should be done at the init phase before hitting CD
-invalid errors for sure.
-
-Thanks
-
-Eric
-
-> 
-> So it would be better to pass the leaf page size supported by vSMMU to
-> host.  Perhaps this issue and the one reported by Chenxiang can be solved
-> together.
-> 
-> Thanks,
-> Kunkun Jiang
->>> Best Regards,
->>> Kunkun Jiang
->>>> -static void arm_smmu_tlb_inv_range_domain(unsigned long iova, size_t
->>>> size,
->>>> -                      size_t granule, bool leaf,
->>>> -                      struct arm_smmu_domain *smmu_domain)
->>>> +static void
->>>> +arm_smmu_tlb_inv_range_domain(unsigned long iova, size_t size,
->>>> +                  size_t granule, bool leaf, int ext_asid,
->>>> +                  struct arm_smmu_domain *smmu_domain)
->>>>    {
->>>>        struct arm_smmu_cmdq_ent cmd = {
->>>>            .tlbi = {
->>>> @@ -1936,7 +1950,12 @@ static void
->>>> arm_smmu_tlb_inv_range_domain(unsigned long iova, size_t size,
->>>>            },
->>>>        };
->>>>    -    if (smmu_domain->stage == ARM_SMMU_DOMAIN_S1) {
->>>> +    if (ext_asid >= 0) {  /* guest stage 1 invalidation */
->>>> +        cmd.opcode    = smmu_domain->smmu->features &
->>>> ARM_SMMU_FEAT_E2H ?
->>>> +                  CMDQ_OP_TLBI_EL2_VA : CMDQ_OP_TLBI_NH_VA;
->>>> +        cmd.tlbi.asid    = ext_asid;
->>>> +        cmd.tlbi.vmid    = smmu_domain->s2_cfg.vmid;
->>>> +    } else if (smmu_domain->stage == ARM_SMMU_DOMAIN_S1) {
->>>>            cmd.opcode    = smmu_domain->smmu->features &
->>>> ARM_SMMU_FEAT_E2H ?
->>>>                      CMDQ_OP_TLBI_EL2_VA : CMDQ_OP_TLBI_NH_VA;
->>>>            cmd.tlbi.asid    = smmu_domain->s1_cfg.cd.asid;
->>>> @@ -1944,6 +1963,7 @@ static void
->>>> arm_smmu_tlb_inv_range_domain(unsigned long iova, size_t size,
->>>>            cmd.opcode    = CMDQ_OP_TLBI_S2_IPA;
->>>>            cmd.tlbi.vmid    = smmu_domain->s2_cfg.vmid;
->>>>        }
->>>> +
->>>>        __arm_smmu_tlb_inv_range(&cmd, iova, size, granule,
->>>> smmu_domain);
->>>>          /*
->>>> @@ -1982,7 +2002,7 @@ static void arm_smmu_tlb_inv_page_nosync(struct
->>>> iommu_iotlb_gather *gather,
->>>>    static void arm_smmu_tlb_inv_walk(unsigned long iova, size_t size,
->>>>                      size_t granule, void *cookie)
->>>>    {
->>>> -    arm_smmu_tlb_inv_range_domain(iova, size, granule, false, cookie);
->>>> +    arm_smmu_tlb_inv_range_domain(iova, size, granule, false, -1,
->>>> cookie);
->>>>    }
->>>>      static const struct iommu_flush_ops arm_smmu_flush_ops = {
->>>> @@ -2523,7 +2543,7 @@ static void arm_smmu_iotlb_sync(struct
->>>> iommu_domain *domain,
->>>>          arm_smmu_tlb_inv_range_domain(gather->start,
->>>>                          gather->end - gather->start + 1,
->>>> -                      gather->pgsize, true, smmu_domain);
->>>> +                      gather->pgsize, true, -1, smmu_domain);
->>>>    }
->>>>      static phys_addr_t
->>>
->> .
-> 
-> 
+>> AFAIK， Icelake supports adaptive PEBS and extended PEBS which 
+>> Skylake doesn't.
+>> But we can still use IA32_PEBS_ENABLE MSR to indicate general-purpose 
+>> counter in Skylake.
+>
+> For Skylake, only the PMC0-PMC3 are valid for PEBS and you may
+> mask the other unsupported bits in the pmu->pebs_enable_mask.
+>
+>> Is there anything else that only Icelake supports in this patches set?
+>
+> The PDIR counter on the Ice Lake is the fixed counter 0
+> while the PDIR counter on the Sky Lake is the gp counter 1.
+>
+> You may also expose x86_pmu.pebs_vmx for Skylake in the 1st patch.
+>
+>>
+>>
+>> Besides, we have tried this patches set in Icelake.  We can use 
+>> pebs(eg: "perf record -e cycles:pp")
+>> when guest is kernel-5.11, but can't when kernel-4.18.  Is there a 
+>> minimum guest kernel version requirement?
+>
+> The Ice Lake CPU model has been added since v5.4.
+>
+> You may double check whether the stable tree(s) code has
+> INTEL_FAM6_ICELAKE in the arch/x86/include/asm/intel-family.h.
+>
+>>
+>>
+>> Thanks,
+>> Xiangdong Liu
+>
 
