@@ -2,85 +2,200 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F079135A40A
-	for <lists+kvm@lfdr.de>; Fri,  9 Apr 2021 18:53:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 34B2F35A480
+	for <lists+kvm@lfdr.de>; Fri,  9 Apr 2021 19:18:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234071AbhDIQxW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 9 Apr 2021 12:53:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60058 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233332AbhDIQxT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 9 Apr 2021 12:53:19 -0400
-Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 36E5AC061760;
-        Fri,  9 Apr 2021 09:53:05 -0700 (PDT)
-Received: from zn.tnic (p200300ec2f0be10039b183a609a7c35d.dip0.t-ipconnect.de [IPv6:2003:ec:2f0b:e100:39b1:83a6:9a7:c35d])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id A72A01EC04DA;
-        Fri,  9 Apr 2021 18:53:02 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1617987182;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=qdhoxtp2hGKBHLadXtcjDz2Xk4ANRTM4V96sSJKs0Co=;
-        b=iOEa9+FKd6sLuv6pyKuvUjDiJ8WGjQcvG8KP/XP7G0xhZEynfEcEyidCPCCpxkOFqhQig0
-        Td+afS0yDyoCjXjTfNHdHCW+34HrRLiYLWbEVR71iDwkkSSTZB2PoYq0TwgkCKEgXxKP4F
-        nKES18Shk5z2cMnSUlza4lXbW/htbuM=
-Date:   Fri, 9 Apr 2021 18:53:02 +0200
-From:   Borislav Petkov <bp@alien8.de>
-To:     Brijesh Singh <brijesh.singh@amd.com>
-Cc:     linux-kernel@vger.kernel.org, x86@kernel.org, kvm@vger.kernel.org,
-        ak@linux.intel.com, Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        "H. Peter Anvin" <hpa@zytor.com>, Tony Luck <tony.luck@intel.com>,
-        Dave Hansen <dave.hansen@intel.com>,
-        "Peter Zijlstra (Intel)" <peterz@infradead.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        David Rientjes <rientjes@google.com>,
-        Sean Christopherson <seanjc@google.com>
-Subject: Re: [RFC Part1 PATCH 11/13] x86/kernel: validate rom memory before
- accessing when SEV-SNP is active
-Message-ID: <20210409165302.GF15567@zn.tnic>
-References: <20210324164424.28124-1-brijesh.singh@amd.com>
- <20210324164424.28124-12-brijesh.singh@amd.com>
+        id S233827AbhDIRS0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 9 Apr 2021 13:18:26 -0400
+Received: from foss.arm.com ([217.140.110.172]:55682 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S232395AbhDIRSW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 9 Apr 2021 13:18:22 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8E7C71FB;
+        Fri,  9 Apr 2021 10:18:08 -0700 (PDT)
+Received: from C02W217MHV2R.local (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 970FB3F792;
+        Fri,  9 Apr 2021 10:18:07 -0700 (PDT)
+Subject: Re: [PATCH kvm-unit-tests 1/8] arm/arm64: Reorganize cstart assembler
+To:     Andrew Jones <drjones@redhat.com>, kvm@vger.kernel.org
+Cc:     alexandru.elisei@arm.com, andre.przywara@arm.com,
+        eric.auger@redhat.com
+References: <20210407185918.371983-1-drjones@redhat.com>
+ <20210407185918.371983-2-drjones@redhat.com>
+From:   Nikos Nikoleris <nikos.nikoleris@arm.com>
+Message-ID: <cd8f7e2a-9d53-6793-a0dd-bf58ab491ad1@arm.com>
+Date:   Fri, 9 Apr 2021 18:18:05 +0100
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
+ Gecko/20100101 Thunderbird/78.9.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20210324164424.28124-12-brijesh.singh@amd.com>
+In-Reply-To: <20210407185918.371983-2-drjones@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Mar 24, 2021 at 11:44:22AM -0500, Brijesh Singh wrote:
-> +	/*
-> +	 * The ROM memory is not part of the E820 system RAM and is not prevalidated by the BIOS.
-> +	 * The kernel page table maps the ROM region as encrypted memory, the SEV-SNP requires
-> +	 * the all the encrypted memory must be validated before the access.
-> +	 */
-> +	if (sev_snp_active()) {
-> +		unsigned long n, paddr;
+On 07/04/2021 19:59, Andrew Jones wrote:
+> Move secondary_entry helper functions out of .init and into .text,
+> since secondary_entry isn't run at "init" time.
+> 
+> Signed-off-by: Andrew Jones <drjones@redhat.com>
+> ---
+>   arm/cstart.S   | 62 +++++++++++++++++++++++++++-----------------------
+>   arm/cstart64.S | 22 +++++++++++-------
+>   2 files changed, 48 insertions(+), 36 deletions(-)
+> 
+> diff --git a/arm/cstart.S b/arm/cstart.S
+> index d88a98362940..653ab1e8a141 100644
+> --- a/arm/cstart.S
+> +++ b/arm/cstart.S
+> @@ -96,32 +96,7 @@ start:
+>   	bl	exit
+>   	b	halt
+>   
+> -
+> -.macro set_mode_stack mode, stack
+> -	add	\stack, #S_FRAME_SIZE
+> -	msr	cpsr_c, #(\mode | PSR_I_BIT | PSR_F_BIT)
+> -	isb
+> -	mov	sp, \stack
+> -.endm
+> -
+> -exceptions_init:
+> -	mrc	p15, 0, r2, c1, c0, 0	@ read SCTLR
+> -	bic	r2, #CR_V		@ SCTLR.V := 0
+> -	mcr	p15, 0, r2, c1, c0, 0	@ write SCTLR
+> -	ldr	r2, =vector_table
+> -	mcr	p15, 0, r2, c12, c0, 0	@ write VBAR
+> -
+> -	mrs	r2, cpsr
+> -
+> -	/* first frame reserved for svc mode */
+> -	set_mode_stack	UND_MODE, r0
+> -	set_mode_stack	ABT_MODE, r0
+> -	set_mode_stack	IRQ_MODE, r0
+> -	set_mode_stack	FIQ_MODE, r0
+> -
+> -	msr	cpsr_cxsf, r2		@ back to svc mode
+> -	isb
+> -	mov	pc, lr
+> +.text
+>   
+>   enable_vfp:
+>   	/* Enable full access to CP10 and CP11: */
+> @@ -133,8 +108,6 @@ enable_vfp:
+>   	vmsr	fpexc, r0
+>   	mov	pc, lr
+>   
+> -.text
+> -
+>   .global get_mmu_off
+>   get_mmu_off:
+>   	ldr	r0, =auxinfo
+> @@ -235,6 +208,39 @@ asm_mmu_disable:
+>   
+>   	mov     pc, lr
+>   
+> +/*
+> + * Vectors
+> + */
 > +
-> +		n = ((system_rom_resource.end + 1) - video_rom_resource.start) >> PAGE_SHIFT;
-> +		paddr = video_rom_resource.start;
-> +		early_snp_set_memory_private((unsigned long)__va(paddr), paddr, n);
-> +	}
+> +.macro set_mode_stack mode, stack
+> +	add	\stack, #S_FRAME_SIZE
+> +	msr	cpsr_c, #(\mode | PSR_I_BIT | PSR_F_BIT)
+> +	isb
+> +	mov	sp, \stack
+> +.endm
+> +
+> +exceptions_init:
+> +	mrc	p15, 0, r2, c1, c0, 0	@ read SCTLR
+> +	bic	r2, #CR_V		@ SCTLR.V := 0
+> +	mcr	p15, 0, r2, c1, c0, 0	@ write SCTLR
+> +	ldr	r2, =vector_table
+> +	mcr	p15, 0, r2, c12, c0, 0	@ write VBAR
+> +
+> +	mrs	r2, cpsr
+> +
+> +	/*
+> +	 * Input r0 is the stack top, which is the exception stacks base
 
-I don't like this sprinkling of SNP-special stuff that needs to be done,
-around the tree. Instead, pls define a function called
+Minor, feel free to ignore - wouldn't it be better to put this comment 
+at the start of this routine to inform the caller?
 
-	snp_prep_memory(unsigned long pa, unsigned int num_pages, enum operation);
+I am not sure about the practical implications of having an .init 
+section but in any case, moving secondary_entry helper functions to 
+.text seems sensible.
 
-or so which does all the manipulation needed and the callsites only
-simply unconditionally call that function so that all detail is
-extracted and optimized away when not config-enabled.
+Reviewed-by Nikos Nikoleris <nikos.nikoleris@arm.com>
 
-Thx.
+Thanks,
 
--- 
-Regards/Gruss,
-    Boris.
+Nikos
 
-https://people.kernel.org/tglx/notes-about-netiquette
+> +	 * The first frame is reserved for svc mode
+> +	 */
+> +	set_mode_stack	UND_MODE, r0
+> +	set_mode_stack	ABT_MODE, r0
+> +	set_mode_stack	IRQ_MODE, r0
+> +	set_mode_stack	FIQ_MODE, r0
+> +
+> +	msr	cpsr_cxsf, r2		@ back to svc mode
+> +	isb
+> +	mov	pc, lr
+> +
+>   /*
+>    * Vector stubs
+>    * Simplified version of the Linux kernel implementation
+> diff --git a/arm/cstart64.S b/arm/cstart64.S
+> index 0a85338bcdae..d39cf4dfb99c 100644
+> --- a/arm/cstart64.S
+> +++ b/arm/cstart64.S
+> @@ -89,10 +89,12 @@ start:
+>   	msr	cpacr_el1, x4
+>   
+>   	/* set up exception handling */
+> +	mov	x4, x0				// x0 is the addr of the dtb
+>   	bl	exceptions_init
+>   
+>   	/* complete setup */
+> -	bl	setup				// x0 is the addr of the dtb
+> +	mov	x0, x4				// restore the addr of the dtb
+> +	bl	setup
+>   	bl	get_mmu_off
+>   	cbnz	x0, 1f
+>   	bl	setup_vm
+> @@ -109,13 +111,6 @@ start:
+>   	bl	exit
+>   	b	halt
+>   
+> -exceptions_init:
+> -	adrp	x4, vector_table
+> -	add	x4, x4, :lo12:vector_table
+> -	msr	vbar_el1, x4
+> -	isb
+> -	ret
+> -
+>   .text
+>   
+>   .globl get_mmu_off
+> @@ -251,6 +246,17 @@ asm_mmu_disable:
+>   
+>   /*
+>    * Vectors
+> + */
+> +
+> +exceptions_init:
+> +	adrp	x0, vector_table
+> +	add	x0, x0, :lo12:vector_table
+> +	msr	vbar_el1, x0
+> +	isb
+> +	ret
+> +
+> +/*
+> + * Vector stubs
+>    * Adapted from arch/arm64/kernel/entry.S
+>    */
+>   .macro vector_stub, name, vec
+> 
