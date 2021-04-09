@@ -2,250 +2,126 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 04E3F359428
-	for <lists+kvm@lfdr.de>; Fri,  9 Apr 2021 06:50:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6AAD3359436
+	for <lists+kvm@lfdr.de>; Fri,  9 Apr 2021 06:55:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231415AbhDIEsx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 9 Apr 2021 00:48:53 -0400
-Received: from szxga03-in.huawei.com ([45.249.212.189]:3395 "EHLO
-        szxga03-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229715AbhDIEsw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 9 Apr 2021 00:48:52 -0400
-Received: from DGGEML401-HUB.china.huawei.com (unknown [172.30.72.54])
-        by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4FGlv16vY3z5mLB;
-        Fri,  9 Apr 2021 12:45:49 +0800 (CST)
-Received: from dggema765-chm.china.huawei.com (10.1.198.207) by
- DGGEML401-HUB.china.huawei.com (10.3.17.32) with Microsoft SMTP Server (TLS)
- id 14.3.498.0; Fri, 9 Apr 2021 12:48:37 +0800
-Received: from [10.174.185.210] (10.174.185.210) by
- dggema765-chm.china.huawei.com (10.1.198.207) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
- 15.1.2106.2; Fri, 9 Apr 2021 12:48:36 +0800
-Subject: Re: [PATCH v14 06/13] iommu/smmuv3: Allow stage 1 invalidation with
- unmanaged ASIDs
-To:     Auger Eric <eric.auger@redhat.com>, <eric.auger.pro@gmail.com>,
-        <iommu@lists.linux-foundation.org>, <linux-kernel@vger.kernel.org>,
-        <kvm@vger.kernel.org>, <kvmarm@lists.cs.columbia.edu>,
-        <will@kernel.org>, <maz@kernel.org>, <robin.murphy@arm.com>,
-        <joro@8bytes.org>, <alex.williamson@redhat.com>, <tn@semihalf.com>,
-        <zhukeqian1@huawei.com>
-CC:     <jacob.jun.pan@linux.intel.com>, <yi.l.liu@intel.com>,
-        <wangxingang5@huawei.com>, <jean-philippe@linaro.org>,
-        <zhangfei.gao@linaro.org>, <zhangfei.gao@gmail.com>,
-        <vivek.gautam@arm.com>, <shameerali.kolothum.thodi@huawei.com>,
-        <yuzenghui@huawei.com>, <nicoleotsuka@gmail.com>,
-        <lushenming@huawei.com>, <vsethi@nvidia.com>,
-        <wanghaibin.wang@huawei.com>
-References: <20210223205634.604221-1-eric.auger@redhat.com>
- <20210223205634.604221-7-eric.auger@redhat.com>
- <901720e6-6ca5-eb9a-1f24-0ca479bcfecc@huawei.com>
- <0246aec2-162d-0584-3ca4-b9c304ef3c8a@redhat.com>
-From:   Kunkun Jiang <jiangkunkun@huawei.com>
-Message-ID: <46f3760a-9ab5-1710-598e-38fbc1f5fb5c@huawei.com>
-Date:   Fri, 9 Apr 2021 12:48:35 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.8.1
+        id S233121AbhDIEyk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 9 Apr 2021 00:54:40 -0400
+Received: from szxga02-in.huawei.com ([45.249.212.188]:3522 "EHLO
+        szxga02-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230219AbhDIEyi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 9 Apr 2021 00:54:38 -0400
+Received: from dggeml406-hub.china.huawei.com (unknown [172.30.72.53])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4FGm2Z0NyGzRWCj;
+        Fri,  9 Apr 2021 12:52:22 +0800 (CST)
+Received: from dggpemm000002.china.huawei.com (7.185.36.174) by
+ dggeml406-hub.china.huawei.com (10.3.17.50) with Microsoft SMTP Server (TLS)
+ id 14.3.498.0; Fri, 9 Apr 2021 12:54:23 +0800
+Received: from dggpemm000003.china.huawei.com (7.185.36.128) by
+ dggpemm000002.china.huawei.com (7.185.36.174) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2106.2; Fri, 9 Apr 2021 12:54:23 +0800
+Received: from dggpemm000003.china.huawei.com ([7.185.36.128]) by
+ dggpemm000003.china.huawei.com ([7.185.36.128]) with mapi id 15.01.2106.013;
+ Fri, 9 Apr 2021 12:54:23 +0800
+From:   "Zengtao (B)" <prime.zeng@hisilicon.com>
+To:     Alex Williamson <alex.williamson@redhat.com>
+CC:     "cohuck@redhat.com" <cohuck@redhat.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "jgg@nvidia.com" <jgg@nvidia.com>,
+        "peterx@redhat.com" <peterx@redhat.com>
+Subject: =?utf-8?B?562U5aSNOiBbUEFUQ0ggdjEgMDEvMTRdIHZmaW86IENyZWF0ZSB2ZmlvX2Zz?=
+ =?utf-8?Q?=5Ftype_with_inode_per_device?=
+Thread-Topic: [PATCH v1 01/14] vfio: Create vfio_fs_type with inode per device
+Thread-Index: AQHXFGTEBL9vagM8VUiybsk55NZ2y6qrwTfw
+Date:   Fri, 9 Apr 2021 04:54:23 +0000
+Message-ID: <d9fdf4e8435244be826782daada0fd7b@hisilicon.com>
+References: <161523878883.3480.12103845207889888280.stgit@gimli.home>
+ <161524004828.3480.1817334832614722574.stgit@gimli.home>
+In-Reply-To: <161524004828.3480.1817334832614722574.stgit@gimli.home>
+Accept-Language: zh-CN, en-US
+Content-Language: zh-CN
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.69.38.183]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-In-Reply-To: <0246aec2-162d-0584-3ca4-b9c304ef3c8a@redhat.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-Originating-IP: [10.174.185.210]
-X-ClientProxiedBy: dggeme702-chm.china.huawei.com (10.1.199.98) To
- dggema765-chm.china.huawei.com (10.1.198.207)
 X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Eric,
-
-On 2021/4/8 20:30, Auger Eric wrote:
-> Hi Kunkun,
->
-> On 4/1/21 2:37 PM, Kunkun Jiang wrote:
->> Hi Eric,
->>
->> On 2021/2/24 4:56, Eric Auger wrote:
->>> With nested stage support, soon we will need to invalidate
->>> S1 contexts and ranges tagged with an unmanaged asid, this
->>> latter being managed by the guest. So let's introduce 2 helpers
->>> that allow to invalidate with externally managed ASIDs
->>>
->>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->>>
->>> ---
->>>
->>> v13 -> v14
->>> - Actually send the NH_ASID command (reported by Xingang Wang)
->>> ---
->>>    drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c | 38 ++++++++++++++++-----
->>>    1 file changed, 29 insertions(+), 9 deletions(-)
->>>
->>> diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
->>> b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
->>> index 5579ec4fccc8..4c19a1114de4 100644
->>> --- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
->>> +++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
->>> @@ -1843,9 +1843,9 @@ int arm_smmu_atc_inv_domain(struct
->>> arm_smmu_domain *smmu_domain, int ssid,
->>>    }
->>>      /* IO_PGTABLE API */
->>> -static void arm_smmu_tlb_inv_context(void *cookie)
->>> +static void __arm_smmu_tlb_inv_context(struct arm_smmu_domain
->>> *smmu_domain,
->>> +                       int ext_asid)
->>>    {
->>> -    struct arm_smmu_domain *smmu_domain = cookie;
->>>        struct arm_smmu_device *smmu = smmu_domain->smmu;
->>>        struct arm_smmu_cmdq_ent cmd;
->>>    @@ -1856,7 +1856,13 @@ static void arm_smmu_tlb_inv_context(void
->>> *cookie)
->>>         * insertion to guarantee those are observed before the TLBI. Do be
->>>         * careful, 007.
->>>         */
->>> -    if (smmu_domain->stage == ARM_SMMU_DOMAIN_S1) {
->>> +    if (ext_asid >= 0) { /* guest stage 1 invalidation */
->>> +        cmd.opcode    = CMDQ_OP_TLBI_NH_ASID;
->>> +        cmd.tlbi.asid    = ext_asid;
->>> +        cmd.tlbi.vmid    = smmu_domain->s2_cfg.vmid;
->>> +        arm_smmu_cmdq_issue_cmd(smmu, &cmd);
->>> +        arm_smmu_cmdq_issue_sync(smmu);
->>> +    } else if (smmu_domain->stage == ARM_SMMU_DOMAIN_S1) {
->>>            arm_smmu_tlb_inv_asid(smmu, smmu_domain->s1_cfg.cd.asid);
->>>        } else {
->>>            cmd.opcode    = CMDQ_OP_TLBI_S12_VMALL;
->>> @@ -1867,6 +1873,13 @@ static void arm_smmu_tlb_inv_context(void *cookie)
->>>        arm_smmu_atc_inv_domain(smmu_domain, 0, 0, 0);
->>>    }
->>>    +static void arm_smmu_tlb_inv_context(void *cookie)
->>> +{
->>> +    struct arm_smmu_domain *smmu_domain = cookie;
->>> +
->>> +    __arm_smmu_tlb_inv_context(smmu_domain, -1);
->>> +}
->>> +
->>>    static void __arm_smmu_tlb_inv_range(struct arm_smmu_cmdq_ent *cmd,
->>>                         unsigned long iova, size_t size,
->>>                         size_t granule,
->>> @@ -1926,9 +1939,10 @@ static void __arm_smmu_tlb_inv_range(struct
->>> arm_smmu_cmdq_ent *cmd,
->>>        arm_smmu_cmdq_batch_submit(smmu, &cmds);
->>>    }
->>>    
->> Here is the part of code in __arm_smmu_tlb_inv_range():
->>>          if (smmu->features & ARM_SMMU_FEAT_RANGE_INV) {
->>>                  /* Get the leaf page size */
->>>                  tg = __ffs(smmu_domain->domain.pgsize_bitmap);
->>>
->>>                  /* Convert page size of 12,14,16 (log2) to 1,2,3 */
->>>                  cmd->tlbi.tg = (tg - 10) / 2;
->>>
->>>                  /* Determine what level the granule is at */
->>>                  cmd->tlbi.ttl = 4 - ((ilog2(granule) - 3) / (tg - 3));
->>>
->>>                  num_pages = size >> tg;
->>>          }
->> When pSMMU supports RIL, we get the leaf page size by __ffs(smmu_domain->
->> domain.pgsize_bitmap). In nested mode, it is determined by host
->> PAGE_SIZE. If
->> the host kernel and guest kernel has different translation granule (e.g.
->> host 16K,
->> guest 4K), __arm_smmu_tlb_inv_range() will issue an incorrect tlbi command.
->>
->> Do you have any idea about this issue?
-> I think this is the same issue as the one reported by Chenxiang
->
-> https://lore.kernel.org/lkml/15938ed5-2095-e903-a290-333c299015a2@hisilicon.com/
->
-> In case RIL is not supported by the host, next version will use the
-> smallest pSMMU supported page size, as done in __arm_smmu_tlb_inv_range
->
-> Thanks
->
-> Eric
-I think they are different. In normal cases, when we want to invalidate the
-cache of stage 1, we should use the granule size supported by vSMMU to
-implement and issue an tlbi command if pSMMU supports RIL.
-
-But in the current __arm_smmu_tlb_inv_range(), it always uses the granule
-size supported by host.
-(tg = __ffs(smmu_domain->domain.pgsize_bitmap);)
-
-Let me explain more clearly.
-Preconditions of this issue:
-1. pSMMU supports RIL
-2. host and guest use different translation granule (e.g. host 16K, 
-guest 4K)
-
-Guest wants to invalidate 4K, so info->granule_size = 4K.
-In __arm_smmu_tlb_inv_range(),   if pSMMU supports RIL and host 16K,
-tg = 14, tlbi.tg = 2, tlbi.ttl = 4, tlbi.scale = 0, tlbi.num = -1. It is 
-an incorrect
-tlbi command.
-
-So it would be better to pass the leaf page size supported by vSMMU to
-host.  Perhaps this issue and the one reported by Chenxiang can be solved
-together.
-
-Thanks,
-Kunkun Jiang
->> Best Regards,
->> Kunkun Jiang
->>> -static void arm_smmu_tlb_inv_range_domain(unsigned long iova, size_t
->>> size,
->>> -                      size_t granule, bool leaf,
->>> -                      struct arm_smmu_domain *smmu_domain)
->>> +static void
->>> +arm_smmu_tlb_inv_range_domain(unsigned long iova, size_t size,
->>> +                  size_t granule, bool leaf, int ext_asid,
->>> +                  struct arm_smmu_domain *smmu_domain)
->>>    {
->>>        struct arm_smmu_cmdq_ent cmd = {
->>>            .tlbi = {
->>> @@ -1936,7 +1950,12 @@ static void
->>> arm_smmu_tlb_inv_range_domain(unsigned long iova, size_t size,
->>>            },
->>>        };
->>>    -    if (smmu_domain->stage == ARM_SMMU_DOMAIN_S1) {
->>> +    if (ext_asid >= 0) {  /* guest stage 1 invalidation */
->>> +        cmd.opcode    = smmu_domain->smmu->features &
->>> ARM_SMMU_FEAT_E2H ?
->>> +                  CMDQ_OP_TLBI_EL2_VA : CMDQ_OP_TLBI_NH_VA;
->>> +        cmd.tlbi.asid    = ext_asid;
->>> +        cmd.tlbi.vmid    = smmu_domain->s2_cfg.vmid;
->>> +    } else if (smmu_domain->stage == ARM_SMMU_DOMAIN_S1) {
->>>            cmd.opcode    = smmu_domain->smmu->features &
->>> ARM_SMMU_FEAT_E2H ?
->>>                      CMDQ_OP_TLBI_EL2_VA : CMDQ_OP_TLBI_NH_VA;
->>>            cmd.tlbi.asid    = smmu_domain->s1_cfg.cd.asid;
->>> @@ -1944,6 +1963,7 @@ static void
->>> arm_smmu_tlb_inv_range_domain(unsigned long iova, size_t size,
->>>            cmd.opcode    = CMDQ_OP_TLBI_S2_IPA;
->>>            cmd.tlbi.vmid    = smmu_domain->s2_cfg.vmid;
->>>        }
->>> +
->>>        __arm_smmu_tlb_inv_range(&cmd, iova, size, granule, smmu_domain);
->>>          /*
->>> @@ -1982,7 +2002,7 @@ static void arm_smmu_tlb_inv_page_nosync(struct
->>> iommu_iotlb_gather *gather,
->>>    static void arm_smmu_tlb_inv_walk(unsigned long iova, size_t size,
->>>                      size_t granule, void *cookie)
->>>    {
->>> -    arm_smmu_tlb_inv_range_domain(iova, size, granule, false, cookie);
->>> +    arm_smmu_tlb_inv_range_domain(iova, size, granule, false, -1,
->>> cookie);
->>>    }
->>>      static const struct iommu_flush_ops arm_smmu_flush_ops = {
->>> @@ -2523,7 +2543,7 @@ static void arm_smmu_iotlb_sync(struct
->>> iommu_domain *domain,
->>>          arm_smmu_tlb_inv_range_domain(gather->start,
->>>                          gather->end - gather->start + 1,
->>> -                      gather->pgsize, true, smmu_domain);
->>> +                      gather->pgsize, true, -1, smmu_domain);
->>>    }
->>>      static phys_addr_t
->>
-> .
-
-
+PiAtLS0tLemCruS7tuWOn+S7ti0tLS0tDQo+IOWPkeS7tuS6ujogQWxleCBXaWxsaWFtc29uIFtt
+YWlsdG86YWxleC53aWxsaWFtc29uQHJlZGhhdC5jb21dDQo+IOWPkemAgeaXtumXtDogMjAyMeW5
+tDPmnIg55pelIDU6NDcNCj4g5pS25Lu25Lq6OiBhbGV4LndpbGxpYW1zb25AcmVkaGF0LmNvbQ0K
+PiDmioTpgIE6IGNvaHVja0ByZWRoYXQuY29tOyBrdm1Admdlci5rZXJuZWwub3JnOw0KPiBsaW51
+eC1rZXJuZWxAdmdlci5rZXJuZWwub3JnOyBqZ2dAbnZpZGlhLmNvbTsgcGV0ZXJ4QHJlZGhhdC5j
+b20NCj4g5Li76aKYOiBbUEFUQ0ggdjEgMDEvMTRdIHZmaW86IENyZWF0ZSB2ZmlvX2ZzX3R5cGUg
+d2l0aCBpbm9kZSBwZXIgZGV2aWNlDQo+IA0KPiBCeSBsaW5raW5nIGFsbCB0aGUgZGV2aWNlIGZk
+cyB3ZSBwcm92aWRlIHRvIHVzZXJzcGFjZSB0byBhbiBhZGRyZXNzIHNwYWNlDQo+IHRocm91Z2gg
+YSBuZXcgcHNldWRvIGZzLCB3ZSBjYW4gdXNlIHRvb2xzIGxpa2UNCj4gdW5tYXBfbWFwcGluZ19y
+YW5nZSgpIHRvIHphcCBhbGwgdm1hcyBhc3NvY2lhdGVkIHdpdGggYSBkZXZpY2UuDQo+IA0KPiBT
+dWdnZXN0ZWQtYnk6IEphc29uIEd1bnRob3JwZSA8amdnQG52aWRpYS5jb20+DQo+IFNpZ25lZC1v
+ZmYtYnk6IEFsZXggV2lsbGlhbXNvbiA8YWxleC53aWxsaWFtc29uQHJlZGhhdC5jb20+DQo+IC0t
+LQ0KPiAgZHJpdmVycy92ZmlvL3ZmaW8uYyB8ICAgNTQNCj4gKysrKysrKysrKysrKysrKysrKysr
+KysrKysrKysrKysrKysrKysrKysrKysrKysrKysrDQo+ICAxIGZpbGUgY2hhbmdlZCwgNTQgaW5z
+ZXJ0aW9ucygrKQ0KPiANCj4gZGlmZiAtLWdpdCBhL2RyaXZlcnMvdmZpby92ZmlvLmMgYi9kcml2
+ZXJzL3ZmaW8vdmZpby5jIGluZGV4DQo+IDM4Nzc5ZTZmZDgwYy4uYWJkZjhkNTJhOTExIDEwMDY0
+NA0KPiAtLS0gYS9kcml2ZXJzL3ZmaW8vdmZpby5jDQo+ICsrKyBiL2RyaXZlcnMvdmZpby92Zmlv
+LmMNCj4gQEAgLTMyLDExICszMiwxOCBAQA0KPiAgI2luY2x1ZGUgPGxpbnV4L3ZmaW8uaD4NCj4g
+ICNpbmNsdWRlIDxsaW51eC93YWl0Lmg+DQo+ICAjaW5jbHVkZSA8bGludXgvc2NoZWQvc2lnbmFs
+Lmg+DQo+ICsjaW5jbHVkZSA8bGludXgvcHNldWRvX2ZzLmg+DQo+ICsjaW5jbHVkZSA8bGludXgv
+bW91bnQuaD4NCk1pbm9yOiBrZWVwIHRoZSBoZWFkZXJzIGluIGFscGhhYmV0aWNhbCBvcmRlci4N
+Cg0KPiANCj4gICNkZWZpbmUgRFJJVkVSX1ZFUlNJT04JIjAuMyINCj4gICNkZWZpbmUgRFJJVkVS
+X0FVVEhPUgkiQWxleCBXaWxsaWFtc29uIDxhbGV4LndpbGxpYW1zb25AcmVkaGF0LmNvbT4iDQo+
+ICAjZGVmaW5lIERSSVZFUl9ERVNDCSJWRklPIC0gVXNlciBMZXZlbCBtZXRhLWRyaXZlciINCj4g
+DQo+ICsjZGVmaW5lIFZGSU9fTUFHSUMgMHg1NjQ2NDk0ZiAvKiAiVkZJTyIgKi8NCk1vdmUgdG8g
+aW5jbHVkZS91YXBpL2xpbnV4L21hZ2ljLmggPyANCg0KPiArDQo+ICtzdGF0aWMgaW50IHZmaW9f
+ZnNfY250Ow0KPiArc3RhdGljIHN0cnVjdCB2ZnNtb3VudCAqdmZpb19mc19tbnQ7DQo+ICsNCj4g
+IHN0YXRpYyBzdHJ1Y3QgdmZpbyB7DQo+ICAJc3RydWN0IGNsYXNzCQkJKmNsYXNzOw0KPiAgCXN0
+cnVjdCBsaXN0X2hlYWQJCWlvbW11X2RyaXZlcnNfbGlzdDsNCj4gQEAgLTk3LDYgKzEwNCw3IEBA
+IHN0cnVjdCB2ZmlvX2RldmljZSB7DQo+ICAJc3RydWN0IHZmaW9fZ3JvdXAJCSpncm91cDsNCj4g
+IAlzdHJ1Y3QgbGlzdF9oZWFkCQlncm91cF9uZXh0Ow0KPiAgCXZvaWQJCQkJKmRldmljZV9kYXRh
+Ow0KPiArCXN0cnVjdCBpbm9kZQkJCSppbm9kZTsNCj4gIH07DQo+IA0KPiAgI2lmZGVmIENPTkZJ
+R19WRklPX05PSU9NTVUNCj4gQEAgLTUyOSw2ICs1MzcsMzQgQEAgc3RhdGljIHN0cnVjdCB2Zmlv
+X2dyb3VwDQo+ICp2ZmlvX2dyb3VwX2dldF9mcm9tX2RldihzdHJ1Y3QgZGV2aWNlICpkZXYpDQo+
+ICAJcmV0dXJuIGdyb3VwOw0KPiAgfQ0KPiANCj4gK3N0YXRpYyBpbnQgdmZpb19mc19pbml0X2Zz
+X2NvbnRleHQoc3RydWN0IGZzX2NvbnRleHQgKmZjKSB7DQo+ICsJcmV0dXJuIGluaXRfcHNldWRv
+KGZjLCBWRklPX01BR0lDKSA/IDAgOiAtRU5PTUVNOyB9DQo+ICsNCj4gK3N0YXRpYyBzdHJ1Y3Qg
+ZmlsZV9zeXN0ZW1fdHlwZSB2ZmlvX2ZzX3R5cGUgPSB7DQo+ICsJLm5hbWUgPSAidmZpbyIsDQo+
+ICsJLm93bmVyID0gVEhJU19NT0RVTEUsDQo+ICsJLmluaXRfZnNfY29udGV4dCA9IHZmaW9fZnNf
+aW5pdF9mc19jb250ZXh0LA0KPiArCS5raWxsX3NiID0ga2lsbF9hbm9uX3N1cGVyLA0KPiArfTsN
+Cj4gKw0KPiArc3RhdGljIHN0cnVjdCBpbm9kZSAqdmZpb19mc19pbm9kZV9uZXcodm9pZCkgew0K
+PiArCXN0cnVjdCBpbm9kZSAqaW5vZGU7DQo+ICsJaW50IHJldDsNCj4gKw0KPiArCXJldCA9IHNp
+bXBsZV9waW5fZnMoJnZmaW9fZnNfdHlwZSwgJnZmaW9fZnNfbW50LCAmdmZpb19mc19jbnQpOw0K
+PiArCWlmIChyZXQpDQo+ICsJCXJldHVybiBFUlJfUFRSKHJldCk7DQo+ICsNCj4gKwlpbm9kZSA9
+IGFsbG9jX2Fub25faW5vZGUodmZpb19mc19tbnQtPm1udF9zYik7DQo+ICsJaWYgKElTX0VSUihp
+bm9kZSkpDQo+ICsJCXNpbXBsZV9yZWxlYXNlX2ZzKCZ2ZmlvX2ZzX21udCwgJnZmaW9fZnNfY250
+KTsNCj4gKw0KPiArCXJldHVybiBpbm9kZTsNCj4gK30NCj4gKw0KPiAgLyoqDQo+ICAgKiBEZXZp
+Y2Ugb2JqZWN0cyAtIGNyZWF0ZSwgcmVsZWFzZSwgZ2V0LCBwdXQsIHNlYXJjaA0KPiAgICovDQo+
+IEBAIC01MzksMTEgKzU3NSwxOSBAQCBzdHJ1Y3QgdmZpb19kZXZpY2UNCj4gKnZmaW9fZ3JvdXBf
+Y3JlYXRlX2RldmljZShzdHJ1Y3QgdmZpb19ncm91cCAqZ3JvdXAsDQo+ICAJCQkJCSAgICAgdm9p
+ZCAqZGV2aWNlX2RhdGEpDQo+ICB7DQo+ICAJc3RydWN0IHZmaW9fZGV2aWNlICpkZXZpY2U7DQo+
+ICsJc3RydWN0IGlub2RlICppbm9kZTsNCj4gDQo+ICAJZGV2aWNlID0ga3phbGxvYyhzaXplb2Yo
+KmRldmljZSksIEdGUF9LRVJORUwpOw0KPiAgCWlmICghZGV2aWNlKQ0KPiAgCQlyZXR1cm4gRVJS
+X1BUUigtRU5PTUVNKTsNCj4gDQo+ICsJaW5vZGUgPSB2ZmlvX2ZzX2lub2RlX25ldygpOw0KPiAr
+CWlmIChJU19FUlIoaW5vZGUpKSB7DQo+ICsJCWtmcmVlKGRldmljZSk7DQo+ICsJCXJldHVybiBF
+UlJfQ0FTVChpbm9kZSk7DQo+ICsJfQ0KPiArCWRldmljZS0+aW5vZGUgPSBpbm9kZTsNCj4gKw0K
+PiAgCWtyZWZfaW5pdCgmZGV2aWNlLT5rcmVmKTsNCj4gIAlkZXZpY2UtPmRldiA9IGRldjsNCj4g
+IAlkZXZpY2UtPmdyb3VwID0gZ3JvdXA7DQo+IEBAIC01NzQsNiArNjE4LDkgQEAgc3RhdGljIHZv
+aWQgdmZpb19kZXZpY2VfcmVsZWFzZShzdHJ1Y3Qga3JlZiAqa3JlZikNCj4gDQo+ICAJZGV2X3Nl
+dF9kcnZkYXRhKGRldmljZS0+ZGV2LCBOVUxMKTsNCj4gDQo+ICsJaXB1dChkZXZpY2UtPmlub2Rl
+KTsNCj4gKwlzaW1wbGVfcmVsZWFzZV9mcygmdmZpb19mc19tbnQsICZ2ZmlvX2ZzX2NudCk7DQo+
+ICsNCj4gIAlrZnJlZShkZXZpY2UpOw0KPiANCj4gIAkvKiB2ZmlvX2RlbF9ncm91cF9kZXYgbWF5
+IGJlIHdhaXRpbmcgZm9yIHRoaXMgZGV2aWNlICovIEBAIC0xNDg4LDYNCj4gKzE1MzUsMTMgQEAg
+c3RhdGljIGludCB2ZmlvX2dyb3VwX2dldF9kZXZpY2VfZmQoc3RydWN0IHZmaW9fZ3JvdXAgKmdy
+b3VwLA0KPiBjaGFyICpidWYpDQo+ICAJICovDQo+ICAJZmlsZXAtPmZfbW9kZSB8PSAoRk1PREVf
+TFNFRUsgfCBGTU9ERV9QUkVBRCB8IEZNT0RFX1BXUklURSk7DQo+IA0KPiArCS8qDQo+ICsJICog
+VXNlIHRoZSBwc2V1ZG8gZnMgaW5vZGUgb24gdGhlIGRldmljZSB0byBsaW5rIGFsbCBtbWFwcw0K
+PiArCSAqIHRvIHRoZSBzYW1lIGFkZHJlc3Mgc3BhY2UsIGFsbG93aW5nIHVzIHRvIHVubWFwIGFs
+bCB2bWFzDQo+ICsJICogYXNzb2NpYXRlZCB0byB0aGlzIGRldmljZSB1c2luZyB1bm1hcF9tYXBw
+aW5nX3JhbmdlKCkuDQo+ICsJICovDQo+ICsJZmlsZXAtPmZfbWFwcGluZyA9IGRldmljZS0+aW5v
+ZGUtPmlfbWFwcGluZzsNCj4gKw0KPiAgCWF0b21pY19pbmMoJmdyb3VwLT5jb250YWluZXJfdXNl
+cnMpOw0KPiANCj4gIAlmZF9pbnN0YWxsKHJldCwgZmlsZXApOw0KDQo=
