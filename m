@@ -2,128 +2,78 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 274DB35AE77
-	for <lists+kvm@lfdr.de>; Sat, 10 Apr 2021 16:42:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1945D35AEAF
+	for <lists+kvm@lfdr.de>; Sat, 10 Apr 2021 17:12:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234757AbhDJOmz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 10 Apr 2021 10:42:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59420 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234722AbhDJOmx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 10 Apr 2021 10:42:53 -0400
-Received: from mail-ed1-x532.google.com (mail-ed1-x532.google.com [IPv6:2a00:1450:4864:20::532])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2EA92C06138B
-        for <kvm@vger.kernel.org>; Sat, 10 Apr 2021 07:42:38 -0700 (PDT)
-Received: by mail-ed1-x532.google.com with SMTP id r22so9799826edq.9
-        for <kvm@vger.kernel.org>; Sat, 10 Apr 2021 07:42:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=kTawFiL6YC0ek5PHB26XWuvo8LaNhKMkeOr4Du3g3zA=;
-        b=JCcCeg0rQfZpHF7PhaQNGA3miaa7tggjS+utX6p12DI0sTb0ihsmqMgvvGsbxtDHCr
-         KgoxghxA7da6cqteVtbnfdO5V/Pc97pVB/ZvZVnWPHB9wxtQxiJw8CRBdl+mbjT7FQEX
-         1jxnAnJoT8pgL6emKLIsCAiabuxq45xMybI397PO1WX6fCN20mDAnGeLbOuRj+tslGID
-         k7fLuauKxt18AHgRiTMJx3N8l/0z2pwcZE+4CWsQsuLtFzIlqjgCUuUwbYZ9wsAgg0Bi
-         pfD0Ze0K6Y8gsSkfdsODcr1rRuva1eS7YeXt+og1VSY4EygWHqVoZ/J05B/xXUjB8aRB
-         eatw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
-         :mime-version:content-transfer-encoding;
-        bh=kTawFiL6YC0ek5PHB26XWuvo8LaNhKMkeOr4Du3g3zA=;
-        b=ODW/6dgrNSirnjUoQvNVPf04C17s+8NiXgzp/YP9RYxkA77gmTn8TbRDUX2mc/kaai
-         QjRcHaDrWH8/UGmt844repkdds5d3BNrco6fqsV/z5KpjHrYhbIRKpTErmFz1XEeT9E/
-         53yYzMZCSHTJK1mqzFuX+B2dYKuH1AlT3ycdyZjxUIx2lmueSbEKUyqFPx1rG0YJYL5e
-         eRJQjVFb9naKcb2m7O0NmjABw3esj92bMyfSZFG3ATASXGpCOU19ieRjD/3j89KIbqkx
-         P9q7Pim+RdC9mDTpUpwS9bh3zdiXbQGQqGtuJMPO0qvMod9Unb9M5sy6tGNklgcexK7y
-         q1Yw==
-X-Gm-Message-State: AOAM530wFd2LsRzW8ljt7IMZrK5LG44WIbzRcwlgBTDo2UvXpC3DaPu6
-        ewGJWuzAs+8CuFnpqwsRVD6sOAqy1DM=
-X-Google-Smtp-Source: ABdhPJw76ssbtXK8h1CD4DJy4g5SmIyJB4j8fKnOjZbRV/ewnbsLEO1fsF1/x1o4JGKvUz5HJrCEUA==
-X-Received: by 2002:a05:6402:34d5:: with SMTP id w21mr21863459edc.14.1618065756922;
-        Sat, 10 Apr 2021 07:42:36 -0700 (PDT)
-Received: from avogadro.redhat.com ([2001:b07:add:ec09:c399:bc87:7b6c:fb2a])
-        by smtp.gmail.com with ESMTPSA id q18sm3171357edr.26.2021.04.10.07.42.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 10 Apr 2021 07:42:36 -0700 (PDT)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+        id S234392AbhDJPMt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 10 Apr 2021 11:12:49 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:34403 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S234519AbhDJPMs (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Sat, 10 Apr 2021 11:12:48 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1618067553;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=aLP+qJ58JyOHR0t3LnIIqaqKNGbep4094fX8j1+aZ48=;
+        b=C7EKgXA++aGHqq9E6E1W+446DEogLj8ifBah767KnyLokNNPwtOZnZoLnDuu7VDlclPR1u
+        117jrULC1l5YhBhBieIiaikvwqruqEHu98f0LW7Dzu6SvecZPKI1TGu3ND4y4eQE58W5zJ
+        yMxozEDdgCv8E0rayj3vE41Nuv8rz9w=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-208-EvZmBmH4PA-4nn-rj2UP8w-1; Sat, 10 Apr 2021 11:12:31 -0400
+X-MC-Unique: EvZmBmH4PA-4nn-rj2UP8w-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5E94F801814;
+        Sat, 10 Apr 2021 15:12:30 +0000 (UTC)
+Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 0CA735D9D3;
+        Sat, 10 Apr 2021 15:12:29 +0000 (UTC)
 From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     kvm@vger.kernel.org
-Cc:     seanjc@google.com, Yang Weijiang <weijiang.yang@intel.com>
-Subject: [PATCH kvm-unit-tests] access: change CR0/CR4/EFER before TLB flushes
-Date:   Sat, 10 Apr 2021 16:42:34 +0200
-Message-Id: <20210410144234.32124-2-pbonzini@redhat.com>
-X-Mailer: git-send-email 2.30.1
+To:     stable@vger.kernel.org
+Cc:     kvm@vger.kernel.org, sasha@kernel.org
+Subject: [PATCH 5.10/5.11 0/9] Fix missing TLB flushes in TDP MMU
+Date:   Sat, 10 Apr 2021 11:12:20 -0400
+Message-Id: <20210410151229.4062930-1-pbonzini@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-After CR0/CR4/EFER changes a stale TLB entry can be observed, because MOV
-to CR4 only invalidates TLB entries if CR4.SMEP is changed from 0 to 1.
+The new MMU for two-dimensional paging had some missing TLB flushes
+in 5.10 and 5.11.  This series backports some generic improvements
+to simplify the backport in the last four patches.
 
-The TLB is already flushed in ac_set_expected_status,
-but if kvm-unit-tests is migrated to another CPU and CR4 is
-changed after the flush, a stale entry can be used.
+Ben Gardon (5):
+  KVM: x86/mmu: change TDP MMU yield function returns to match
+    cond_resched
+  KVM: x86/mmu: Merge flush and non-flush tdp_mmu_iter_cond_resched
+  KVM: x86/mmu: Rename goal_gfn to next_last_level_gfn
+  KVM: x86/mmu: Ensure forward progress when yielding in TDP MMU iter
+  KVM: x86/mmu: Yield in TDU MMU iter even if no SPTES changed
 
-Reported-by: Yang Weijiang <weijiang.yang@intel.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- x86/access.c | 25 ++++++++++++-------------
- 1 file changed, 12 insertions(+), 13 deletions(-)
+Paolo Bonzini (1):
+  KVM: x86/mmu: preserve pending TLB flush across calls to
+    kvm_tdp_mmu_zap_sp
 
-diff --git a/x86/access.c b/x86/access.c
-index 66bd466..e5d5c00 100644
---- a/x86/access.c
-+++ b/x86/access.c
-@@ -448,8 +448,6 @@ fault:
- 
- static void ac_set_expected_status(ac_test_t *at)
- {
--    invlpg(at->virt);
--
-     if (at->ptep)
- 	at->expected_pte = *at->ptep;
-     at->expected_pde = *at->pdep;
-@@ -561,6 +559,18 @@ static void __ac_setup_specific_pages(ac_test_t *at, ac_pool_t *pool,
- 	root = vroot[index];
-     }
-     ac_set_expected_status(at);
-+
-+    set_cr0_wp(F(AC_CPU_CR0_WP));
-+    set_efer_nx(F(AC_CPU_EFER_NX));
-+    set_cr4_pke(F(AC_CPU_CR4_PKE));
-+    if (F(AC_CPU_CR4_PKE)) {
-+        /* WD2=AD2=1, WD1=F(AC_PKU_WD), AD1=F(AC_PKU_AD) */
-+        write_pkru(0x30 | (F(AC_PKU_WD) ? 8 : 0) |
-+                   (F(AC_PKU_AD) ? 4 : 0));
-+    }
-+
-+    set_cr4_smep(F(AC_CPU_CR4_SMEP));
-+    invlpg(at->virt);
- }
- 
- static void ac_test_setup_pte(ac_test_t *at, ac_pool_t *pool)
-@@ -644,17 +654,6 @@ static int ac_test_do_access(ac_test_t *at)
-     *((unsigned char *)at->phys) = 0xc3; /* ret */
- 
-     unsigned r = unique;
--    set_cr0_wp(F(AC_CPU_CR0_WP));
--    set_efer_nx(F(AC_CPU_EFER_NX));
--    set_cr4_pke(F(AC_CPU_CR4_PKE));
--    if (F(AC_CPU_CR4_PKE)) {
--        /* WD2=AD2=1, WD1=F(AC_PKU_WD), AD1=F(AC_PKU_AD) */
--        write_pkru(0x30 | (F(AC_PKU_WD) ? 8 : 0) |
--                   (F(AC_PKU_AD) ? 4 : 0));
--    }
--
--    set_cr4_smep(F(AC_CPU_CR4_SMEP));
--
-     if (F(AC_ACCESS_TWICE)) {
- 	asm volatile (
- 	    "mov $fixed2, %%rsi \n\t"
+Sean Christopherson (3):
+  KVM: x86/mmu: Ensure TLBs are flushed when yielding during GFN range
+    zap
+  KVM: x86/mmu: Ensure TLBs are flushed for TDP MMU during NX zapping
+  KVM: x86/mmu: Don't allow TDP MMU to yield when recovering NX pages
+
+ arch/x86/kvm/mmu/mmu.c      | 13 ++---
+ arch/x86/kvm/mmu/tdp_iter.c | 30 +++--------
+ arch/x86/kvm/mmu/tdp_iter.h | 11 +++--
+ arch/x86/kvm/mmu/tdp_mmu.c  | 99 ++++++++++++++++++++++++-------------
+ arch/x86/kvm/mmu/tdp_mmu.h  | 18 ++++++-
+ 5 files changed, 103 insertions(+), 68 deletions(-)
+
 -- 
-2.30.1
+2.26.2
 
