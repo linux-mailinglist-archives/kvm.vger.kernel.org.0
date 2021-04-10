@@ -2,144 +2,404 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id ACDDE35AB38
-	for <lists+kvm@lfdr.de>; Sat, 10 Apr 2021 07:53:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A62D435ADAD
+	for <lists+kvm@lfdr.de>; Sat, 10 Apr 2021 15:34:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234379AbhDJFxY convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Sat, 10 Apr 2021 01:53:24 -0400
-Received: from [105.162.1.217] ([105.162.1.217]:60802 "EHLO
-        guard.vivawebhost.com" rhost-flags-FAIL-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S233606AbhDJFxX (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Sat, 10 Apr 2021 01:53:23 -0400
-Message-ID: <058004a8549a8985aa6fd98a7eb8929ebf520665@aport.ru>
-Reply-To: "Kenya Business Plans" <lfzbw@aport.ru>
-From:   "Kenya Business Plans" <utodef@aport.ru>
-To:     <kvm@vger.kernel.org>
-Subject: Kenya Cutomized Business Plans for only Kes 499/=
-Date:   Sat, 10 Apr 2021 08:53:03 +0300
-Organization: Kenya Business Plans
+        id S234797AbhDJNfC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 10 Apr 2021 09:35:02 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:41460 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S234792AbhDJNfC (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Sat, 10 Apr 2021 09:35:02 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1618061687;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=61RLxG396MmBWeaHTHxuMc9FrYSo5K3YhBg2TokzVa4=;
+        b=To7OKFEgjqIHpi1ru81Y7N3Jb+nej0ODv/xZ8ozTUK7uXNIzS3iIdy2oXGxxmBdbBQwG3y
+        lC1F297fZmGd+TsUNuyIL71eXccI/eMBWtrBo+uqbtqlfSgrVrPzqV3SAggSnbGnWdRsXK
+        MrGfs/vXXOKd2qkalKpZ0DUQK+c23K8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-584-2kmKWyqFMOa8e53Ex4i1Vg-1; Sat, 10 Apr 2021 09:34:43 -0400
+X-MC-Unique: 2kmKWyqFMOa8e53Ex4i1Vg-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4FF8C801814;
+        Sat, 10 Apr 2021 13:34:40 +0000 (UTC)
+Received: from [10.36.112.36] (ovpn-112-36.ams2.redhat.com [10.36.112.36])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id B6B145D9E3;
+        Sat, 10 Apr 2021 13:34:28 +0000 (UTC)
+From:   Auger Eric <eric.auger@redhat.com>
+Subject: Re: [PATCH v14 08/13] dma-iommu: Implement NESTED_MSI cookie
+To:     Zenghui Yu <yuzenghui@huawei.com>
+Cc:     eric.auger.pro@gmail.com, iommu@lists.linux-foundation.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        kvmarm@lists.cs.columbia.edu, will@kernel.org, maz@kernel.org,
+        robin.murphy@arm.com, joro@8bytes.org, alex.williamson@redhat.com,
+        tn@semihalf.com, zhukeqian1@huawei.com,
+        jacob.jun.pan@linux.intel.com, yi.l.liu@intel.com,
+        wangxingang5@huawei.com, jiangkunkun@huawei.com,
+        jean-philippe@linaro.org, zhangfei.gao@linaro.org,
+        zhangfei.gao@gmail.com, vivek.gautam@arm.com,
+        shameerali.kolothum.thodi@huawei.com, nicoleotsuka@gmail.com,
+        lushenming@huawei.com, vsethi@nvidia.com,
+        wanghaibin.wang@huawei.com
+References: <20210223205634.604221-1-eric.auger@redhat.com>
+ <20210223205634.604221-9-eric.auger@redhat.com>
+ <791bb74a-cd74-7b96-1f0d-cf7a602eb159@huawei.com>
+Message-ID: <ec719b21-8729-7cdc-cd4a-b67f4d1064f0@redhat.com>
+Date:   Sat, 10 Apr 2021 15:34:25 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8";
-Content-Transfer-Encoding: 8BIT
+In-Reply-To: <791bb74a-cd74-7b96-1f0d-cf7a602eb159@huawei.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-  
-Customized Kenya Business Plans
-Invest wisely by getting street smart market surveys, guides and info packs with the sweet or harsh reality of the market.
-Actual Facts & Figures on Revenue, Mark Up, Wholesale, Retail prices, Competition, Survival rate, Differentiation, Capital, Process, Equipment, Suppliers, Opportunities, Licenses, Consumer Behaviour, Manpower Tips, Tricks & so so much more.
+Hi Zenghui,
 
-We have comprehensive business plans in these categories:
+On 4/7/21 9:39 AM, Zenghui Yu wrote:
+> Hi Eric,
+> 
+> On 2021/2/24 4:56, Eric Auger wrote:
+>> Up to now, when the type was UNMANAGED, we used to
+>> allocate IOVA pages within a reserved IOVA MSI range.
+>>
+>> If both the host and the guest are exposed with SMMUs, each
+>> would allocate an IOVA. The guest allocates an IOVA (gIOVA)
+>> to map onto the guest MSI doorbell (gDB). The Host allocates
+>> another IOVA (hIOVA) to map onto the physical doorbell (hDB).
+>>
+>> So we end up with 2 unrelated mappings, at S1 and S2:
+>>           S1             S2
+>> gIOVA    ->     gDB
+>>                 hIOVA    ->    hDB
+>>
+>> The PCI device would be programmed with hIOVA.
+>> No stage 1 mapping would existing, causing the MSIs to fault.
+>>
+>> iommu_dma_bind_guest_msi() allows to pass gIOVA/gDB
+>> to the host so that gIOVA can be used by the host instead of
+>> re-allocating a new hIOVA.
+>>
+>>           S1           S2
+>> gIOVA    ->    gDB    ->    hDB
+>>
+>> this time, the PCI device can be programmed with the gIOVA MSI
+>> doorbell which is correctly mapped through both stages.
+>>
+>> Nested mode is not compatible with HW MSI regions as in that
+>> case gDB and hDB should have a 1-1 mapping. This check will
+>> be done when attaching each device to the IOMMU domain.
+>>
+>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> 
+> [...]
+> 
+>> diff --git a/drivers/iommu/dma-iommu.c b/drivers/iommu/dma-iommu.c
+>> index f659395e7959..d25eb7cecaa7 100644
+>> --- a/drivers/iommu/dma-iommu.c
+>> +++ b/drivers/iommu/dma-iommu.c
+>> @@ -19,6 +19,7 @@
+>>   #include <linux/irq.h>
+>>   #include <linux/mm.h>
+>>   #include <linux/mutex.h>
+>> +#include <linux/mutex.h>
+> 
+> Duplicated include.
+sure
+> 
+>>   #include <linux/pci.h>
+>>   #include <linux/swiotlb.h>
+>>   #include <linux/scatterlist.h>
+>> @@ -29,12 +30,15 @@
+>>   struct iommu_dma_msi_page {
+>>       struct list_head    list;
+>>       dma_addr_t        iova;
+>> +    dma_addr_t        gpa;
+>>       phys_addr_t        phys;
+>> +    size_t            s1_granule;
+>>   };
+>>     enum iommu_dma_cookie_type {
+>>       IOMMU_DMA_IOVA_COOKIE,
+>>       IOMMU_DMA_MSI_COOKIE,
+>> +    IOMMU_DMA_NESTED_MSI_COOKIE,
+>>   };
+>>     struct iommu_dma_cookie {
+>> @@ -46,6 +50,7 @@ struct iommu_dma_cookie {
+>>           dma_addr_t        msi_iova;
+> 
+> msi_iova is unused in the nested mode, but we still set it to the start
+> address of the RESV_SW_MSI region (in iommu_get_msi_cookie()), which
+> looks a bit strange to me.
+I agree with you
+> 
+>>       };
+>>       struct list_head        msi_page_list;
+>> +    spinlock_t            msi_lock;
+> 
+> Should msi_lock be grabbed everywhere msi_page_list is populated?
+> Especially in iommu_dma_get_msi_page(), which can be invoked from the
+> irqchip driver.
+Yes I agree
+> 
+>>         /* Domain for flush queue callback; NULL if flush queue not in
+>> use */
+>>       struct iommu_domain        *fq_domain;
+>> @@ -87,6 +92,7 @@ static struct iommu_dma_cookie *cookie_alloc(enum
+>> iommu_dma_cookie_type type)
+>>         cookie = kzalloc(sizeof(*cookie), GFP_KERNEL);
+>>       if (cookie) {
+>> +        spin_lock_init(&cookie->msi_lock);
+>>           INIT_LIST_HEAD(&cookie->msi_page_list);
+>>           cookie->type = type;
+>>       }
+>> @@ -120,14 +126,17 @@ EXPORT_SYMBOL(iommu_get_dma_cookie);
+>>    *
+>>    * Users who manage their own IOVA allocation and do not want DMA
+>> API support,
+>>    * but would still like to take advantage of automatic MSI
+>> remapping, can use
+>> - * this to initialise their own domain appropriately. Users should
+>> reserve a
+>> + * this to initialise their own domain appropriately. Users may
+>> reserve a
+>>    * contiguous IOVA region, starting at @base, large enough to
+>> accommodate the
+>>    * number of PAGE_SIZE mappings necessary to cover every MSI
+>> doorbell address
+>> - * used by the devices attached to @domain.
+>> + * used by the devices attached to @domain. The other way round is to
+>> provide
+>> + * usable iova pages through the iommu_dma_bind_doorbell API (nested
+>> stages
+> 
+> s/iommu_dma_bind_doorbell/iommu_dma_bind_guest_msi/ ?
+correct
+> 
+>> + * use case)
+>>    */
+>>   int iommu_get_msi_cookie(struct iommu_domain *domain, dma_addr_t base)
+>>   {
+>>       struct iommu_dma_cookie *cookie;
+>> +    int nesting, ret;
+>>         if (domain->type != IOMMU_DOMAIN_UNMANAGED)
+>>           return -EINVAL;
+>> @@ -135,7 +144,12 @@ int iommu_get_msi_cookie(struct iommu_domain
+>> *domain, dma_addr_t base)
+>>       if (domain->iova_cookie)
+>>           return -EEXIST;
+>>   -    cookie = cookie_alloc(IOMMU_DMA_MSI_COOKIE);
+>> +    ret =  iommu_domain_get_attr(domain, DOMAIN_ATTR_NESTING, &nesting);
+> 
+> Redundant space.
+yep
+> 
+>> +    if (!ret && nesting)
+>> +        cookie = cookie_alloc(IOMMU_DMA_NESTED_MSI_COOKIE);
+>> +    else
+>> +        cookie = cookie_alloc(IOMMU_DMA_MSI_COOKIE);
+>> +
+>>       if (!cookie)
+>>           return -ENOMEM;
+>>   @@ -156,6 +170,7 @@ void iommu_put_dma_cookie(struct iommu_domain
+>> *domain)
+>>   {
+>>       struct iommu_dma_cookie *cookie = domain->iova_cookie;
+>>       struct iommu_dma_msi_page *msi, *tmp;
+>> +    bool s2_unmap = false;
+>>         if (!cookie)
+>>           return;
+>> @@ -163,7 +178,15 @@ void iommu_put_dma_cookie(struct iommu_domain
+>> *domain)
+>>       if (cookie->type == IOMMU_DMA_IOVA_COOKIE && cookie->iovad.granule)
+>>           put_iova_domain(&cookie->iovad);
+>>   +    if (cookie->type == IOMMU_DMA_NESTED_MSI_COOKIE)
+>> +        s2_unmap = true;
+>> +
+>>       list_for_each_entry_safe(msi, tmp, &cookie->msi_page_list, list) {
+>> +        if (s2_unmap && msi->phys) {
+> 
+> I don't think @s2_unmap is necessary. Checking 'cookie->type==NESTED'
+> directly shouldn't be that expensive.
+agreed
+> 
+>> +            size_t size = cookie_msi_granule(cookie);
+>> +
+>> +            WARN_ON(iommu_unmap(domain, msi->gpa, size) != size);
+>> +        }
+>>           list_del(&msi->list);
+>>           kfree(msi);
+>>       }
+>> @@ -172,6 +195,92 @@ void iommu_put_dma_cookie(struct iommu_domain
+>> *domain)
+>>   }
+>>   EXPORT_SYMBOL(iommu_put_dma_cookie);
+>>   +/**
+>> + * iommu_dma_bind_guest_msi - Allows to pass the stage 1
+>> + * binding of a virtual MSI doorbell used by @dev.
+>> + *
+>> + * @domain: domain handle
+>> + * @iova: guest iova
+> 
+> Can we change it to 'giova' (to match the unbind side)?
+sure
+> 
+>> + * @gpa: gpa of the virtual doorbell
+>> + * @size: size of the granule used for the stage1 mapping
+>> + *
+>> + * In nested stage use case, the user can provide IOVA/IPA bindings
+>> + * corresponding to a guest MSI stage 1 mapping. When the host needs
+>> + * to map its own MSI doorbells, it can use @gpa as stage 2 input
+>> + * and map it onto the physical MSI doorbell.
+>> + */
+>> +int iommu_dma_bind_guest_msi(struct iommu_domain *domain,
+>> +                 dma_addr_t iova, phys_addr_t gpa, size_t size)
+>> +{
+>> +    struct iommu_dma_cookie *cookie = domain->iova_cookie;
+>> +    struct iommu_dma_msi_page *msi;
+>> +    int ret = 0;
+>> +
+>> +    if (!cookie)
+>> +        return -EINVAL;
+>> +
+>> +    if (cookie->type != IOMMU_DMA_NESTED_MSI_COOKIE)
+>> +        return -EINVAL;
+>> +
+>> +    iova = iova & ~(dma_addr_t)(size - 1);
+>> +    gpa = gpa & ~(phys_addr_t)(size - 1);
+>> +
+>> +    spin_lock(&cookie->msi_lock);
+>> +
+>> +    list_for_each_entry(msi, &cookie->msi_page_list, list) {
+>> +        if (msi->iova == iova)
+>> +            goto unlock; /* this page is already registered */
+>> +    }
+>> +
+>> +    msi = kzalloc(sizeof(*msi), GFP_ATOMIC);
+>> +    if (!msi) {
+>> +        ret = -ENOMEM;
+>> +        goto unlock;
+>> +    }
+>> +
+>> +    msi->iova = iova;
+>> +    msi->gpa = gpa;
+>> +    msi->s1_granule = size;
+>> +    list_add(&msi->list, &cookie->msi_page_list);
+>> +unlock:
+>> +    spin_unlock(&cookie->msi_lock);
+>> +    return ret;
+>> +}
+>> +EXPORT_SYMBOL(iommu_dma_bind_guest_msi);
+>> +
+>> +void iommu_dma_unbind_guest_msi(struct iommu_domain *domain,
+>> dma_addr_t giova)
+>> +{
+>> +    struct iommu_dma_cookie *cookie = domain->iova_cookie;
+>> +    struct iommu_dma_msi_page *msi;
+>> +
+>> +    if (!cookie)
+>> +        return;
+>> +
+>> +    if (cookie->type != IOMMU_DMA_NESTED_MSI_COOKIE)
+>> +        return;
+>> +
+>> +    spin_lock(&cookie->msi_lock);
+>> +
+>> +    list_for_each_entry(msi, &cookie->msi_page_list, list) {
+>> +        dma_addr_t aligned_giova =
+>> +            giova & ~(dma_addr_t)(msi->s1_granule - 1);
+>> +
+>> +        if (msi->iova == aligned_giova) {
+>> +            if (msi->phys) {
+>> +                /* unmap the stage 2 */
+>> +                size_t size = cookie_msi_granule(cookie);
+>> +
+>> +                WARN_ON(iommu_unmap(domain, msi->gpa, size) != size);
+>> +            }
+>> +            list_del(&msi->list);
+>> +            kfree(msi);
+>> +            break;
+>> +        }
+>> +    }
+>> +    spin_unlock(&cookie->msi_lock);
+>> +}
+>> +EXPORT_SYMBOL(iommu_dma_unbind_guest_msi);
+>> +
+>>   /**
+>>    * iommu_dma_get_resv_regions - Reserved region driver helper
+>>    * @dev: Device from iommu_get_resv_regions()
+>> @@ -1343,6 +1452,33 @@ static struct iommu_dma_msi_page
+>> *iommu_dma_get_msi_page(struct device *dev,
+>>           if (msi_page->phys == msi_addr)
+>>               return msi_page;
+>>   +    /*
+>> +     * In nested stage mode, we do not allocate an MSI page in
+>> +     * a range provided by the user. Instead, IOVA/IPA bindings are
+>> +     * individually provided. We reuse thise IOVAs to build the
+> 
+> s/thise/these/
+yep
+> 
+>> +     * GIOVA -> GPA -> MSI HPA nested stage mapping.
+>> +     */
+>> +    if (cookie->type == IOMMU_DMA_NESTED_MSI_COOKIE) {
+>> +        list_for_each_entry(msi_page, &cookie->msi_page_list, list)
+>> +            if (!msi_page->phys) {
+>> +                int ret;
+>> +
+>> +                /* do the stage 2 mapping */
+>> +                ret = iommu_map(domain,
+>> +                        msi_page->gpa, msi_addr, size,
+> 
+> Shouldn't we make sure that the size of S2 mapping is not less than
+> s1_granule? Although what we need is actually a 32-bit TRANSLATER
+> register, we don't know where it is mapped in S1.
+The GITS_TRANSLATER is at offset 0x40 of the page. That's what I had in
+mind. But indeed the doorbell may belong to another MSI controller with
+different layout. So yes that's wort checking.
 
-Agrovet
-Auto Glass Retail -17 Pages
-Bank Agency Fact-sheet
-Beef Butchery - 31 pages
-Boda Boda
-Bottled Water - 53 Pages
-Building Materials Yard - Dynamics & Case Study
-Car Wash Quick Guide
-Chapati Wholesale (Case Study)
-Chemist -Retail - 31 Pages
-Chicken Butchery
-Chips & Chicken Cafe - 31 Pages
-Concreting ( Koroga) Equipment Leasing - 29 Pages
-Corn Chips Snacks Making - 37 Pages
-Cosmetics Retail - 30 Pages
-Cosmetics Retail -30 Pages
-Courier - 35 Pages
-Cyber Cafe
-Day-care
-Electrical Parts Retail - 27 Pages
-Executive Barber Shop - 42 Pages
-Fish Supply - Nairobi Hotels Quick Overview
-Fish Supply - Nairobi Hotels Quick Survey
-Flowers - Nairobi (Retail/ Wholesale )
-Free Advertiser Magazine ( Quick Guide & Case Study )
-Fruit / Juice Parlour
-Gas (LPG) Retail
-Gift Service
-Gym - 38 pages
-Hair Salon
-Ice Lollies Making
-Ice Lollies Making ( Quick Guide )
-Imaging Clinic (Ultrasound and X-ray) - 46 Pages
-Inner-wear Retail - 27 Pages
-Laundry - 31 pages
-Leather: Skins Trade -26 Pages
-'Local' Bar - 48 Pages
-Maize Milling (Unga wa Ugali)
-Milk Distributorship
-Mitumba Clothes
-Money Lending - Informal Overview
-Motorcycle Spare Parts Retail -33 Pages
-Movie Shop
-M-pesa Sub Agent
-Nails (Misumari) Making - 60 Pages
-Non-Woven Bags Making -39 Pages
-Petrol Station (Independent) - 47 Pages
-Plumbing Hardware Retail - 35 Pages *New
-Primary School Business - 38 Pages
-Printing Business - 55 Pages
-Real Estate Agency - 42 Pages
-Second Hand Novels (R)
-Selling Cake Boxes
-Selling Cookies
-Senator Keg Bar
-Slot Machines Quick Guide
-Small Scale FMCG Distribution - New
-Smokies & Egg Vending
-Supermarket - 75 Pages
-Supermarket Shelf Space Guide
-Tents & Chairs Leasing
-Tiles Retail Business Fact-sheet
-Timber Yard - 32 Pages
-Tomato ( Greenhouse ) - Quick Market & Production Guide
-Tyres Retail Business - 29 Pages
+I will add this check in iommu_dma_bind_guest_msi()
 
-Invest wisely in 2020 by getting street smart market surveys with:
-- Market Analysis
-- Step by step establishing Process
-- Licenses - Issuing authority, cost, requirements
-- Equipment - Suppliers, Considerations, Cost
-- Other requirements
-- Suppliers & Prices
-- Raw Materials
-- Buying Selling Prices
-- Production Costs
-- Operational Costs
-- Day to day Operations
-- Revenue & Margins
-- Sample wholesale retail prices
-- Case Studies
-- Manpower
-- Capital breakdown
-- Opportunities
-- Competition
-- Surviving & Thriving
-- Analysis, figures, observations, dos & don'ts
-- Trends ,Tips, Tricks and so much more.
+> 
+>> +                        IOMMU_MMIO | IOMMU_WRITE);
+> 
+> Is it intentional to drop the IOMMU_NOEXEC flag (from @prot)?
+no restoring it.
+> 
+>> +                if (ret) {
+>> +                    pr_warn("MSI S2 mapping failed (%d)\n",
+>> +                        ret);
+>> +                    return NULL;
+>> +                }
+>> +                msi_page->phys = msi_addr;
+>> +                return msi_page;
+>> +            }
+>> +        pr_warn("%s no MSI binding found\n", __func__);
+>> +        return NULL;
+>> +    }
+>> +
+>>       msi_page = kzalloc(sizeof(*msi_page), GFP_KERNEL);
+>>       if (!msi_page)
+>>           return NULL;
+> 
+> 
+> Thanks,
+> Zenghui
+> 
 
-To Download a Sample Business Plan Copy and paste the link below to your browser
+Thank you for your careful review!
 
-https://drive.google.com/open?id=1gO2UiWble5J9oEvd8qH3oJ0XsrwvVdtQ
+Best Regards
 
-The whole package of 65 Business Plans above is available Offer Price @ Kshs. 499. We are only selling the guides as a package.
+Eric
 
-To Order Kindly use Lipa Na M-Pesa Buy Goods and Services Till No. 234931.
-
-On payment kindly forward the Mpesa payment confirmation text and your email address to +254 721 351 269.
-
-We deliver via email within 15 minutes of payment.
-
-TRIED, TESTED AND TRUSTED. Helping You Start a Business in Kenya With Less Risk!
-
-Kind Regards;
-
-
-Hashna A. Noor
-Manager - Sales & Marketing
-Kenya Business Plans Limited
-+254721351269 | +254707559080
-78 Brookside Drive | Nairobi | Kenya
