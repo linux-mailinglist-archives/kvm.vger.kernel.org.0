@@ -2,67 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A5ACC35B634
-	for <lists+kvm@lfdr.de>; Sun, 11 Apr 2021 18:49:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A8D0835B6BD
+	for <lists+kvm@lfdr.de>; Sun, 11 Apr 2021 21:23:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235992AbhDKQuA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 11 Apr 2021 12:50:00 -0400
-Received: from mail.kernel.org ([198.145.29.99]:55038 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S235338AbhDKQuA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 11 Apr 2021 12:50:00 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id A5BF5610A2;
-        Sun, 11 Apr 2021 16:49:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1618159783;
-        bh=psLyqltR+EN0VKLdamJX1RHbFakkVlqPcfUTO2YRles=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=qd4s9NErPLa1t4TGvkqpx39sBVbAOGTl1+Qde+SdTAR3bzYvIkMU+v0+oEL7NHzY8
-         9irj3xDIze5B3F7FTUzcVw0K2sKQ8OjetsxzVxSzTA/ml63R7SlFOVQVgqgilj42Pc
-         DeYauv0AFmgOJcqAXTd21ksCj4hEv+wK0P8JJfTNonG8tqfSrmQSgjXD++fRcxekOp
-         VT2mTI2cyB0jqdl4IAHlKDbKma61D/MdSPypUbMNrFNpKNQH9ldP2CEMug0yyM5nK7
-         UR7h09Xquj99XLJm9HmmiUUhlltdH6cZkFRaipKy8pAlXdyw7ubhLA2P2ChRsGtvrk
-         S7z7Bb8xhvUew==
-Date:   Sun, 11 Apr 2021 12:49:42 -0400
-From:   Sasha Levin <sashal@kernel.org>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     stable@vger.kernel.org, kvm@vger.kernel.org, sashal@kernel.org
-Subject: Re: [PATCH 5.10/5.11 0/9] Fix missing TLB flushes in TDP MMU
-Message-ID: <YHMoeygaDoams9TZ@sashalap>
-References: <20210410151229.4062930-1-pbonzini@redhat.com>
+        id S235882AbhDKTXw convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Sun, 11 Apr 2021 15:23:52 -0400
+Received: from [105.162.25.85] ([105.162.25.85]:6646 "EHLO
+        host31.registrar-servers.com" rhost-flags-FAIL-FAIL-OK-FAIL)
+        by vger.kernel.org with ESMTP id S235323AbhDKTXw (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Sun, 11 Apr 2021 15:23:52 -0400
+X-Greylist: delayed 423 seconds by postgrey-1.27 at vger.kernel.org; Sun, 11 Apr 2021 15:23:51 EDT
+Message-ID: <889ed7739d705a507c79cf6385517b7ad03f60@aport.ru>
+Reply-To: "Kenya Bulk email Marketing" <info@detahost.com>
+From:   "Kenya Bulk email Marketing" <isheco@aport.ru>
+To:     <kvm@vger.kernel.org>
+Subject: Kenya bulk email marketing - Target over 1.8 Million Kenyans via email
+Date:   Sun, 11 Apr 2021 22:16:28 +0300
+Organization: Kenya Bulk Email
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20210410151229.4062930-1-pbonzini@redhat.com>
+Content-Type: text/plain; charset="utf-8";
+Content-Transfer-Encoding: 8BIT
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, Apr 10, 2021 at 11:12:20AM -0400, Paolo Bonzini wrote:
->The new MMU for two-dimensional paging had some missing TLB flushes
->in 5.10 and 5.11.  This series backports some generic improvements
->to simplify the backport in the last four patches.
->
->Ben Gardon (5):
->  KVM: x86/mmu: change TDP MMU yield function returns to match
->    cond_resched
->  KVM: x86/mmu: Merge flush and non-flush tdp_mmu_iter_cond_resched
->  KVM: x86/mmu: Rename goal_gfn to next_last_level_gfn
->  KVM: x86/mmu: Ensure forward progress when yielding in TDP MMU iter
->  KVM: x86/mmu: Yield in TDU MMU iter even if no SPTES changed
->
->Paolo Bonzini (1):
->  KVM: x86/mmu: preserve pending TLB flush across calls to
->    kvm_tdp_mmu_zap_sp
->
->Sean Christopherson (3):
->  KVM: x86/mmu: Ensure TLBs are flushed when yielding during GFN range
->    zap
->  KVM: x86/mmu: Ensure TLBs are flushed for TDP MMU during NX zapping
->  KVM: x86/mmu: Don't allow TDP MMU to yield when recovering NX pages
+Gain more clients on top of your existing clients on a daily basis 24/7/365 via Bulk email marketing - GUARANTEED
+Get A Personal Mail Server For Your Company / Organization Fully Setup & Configured & 1.8Million Kenyan Emails Loaded
+  - Why A Personal Mail Server For Bulk Mail Marketing
+  - Send mass email on a daily basis 24/7/365 days
+  - The mass mail server comes with its own logins to view the mass emailing progress
+  - The mass mail server comes with 1.8Million clean Kenyan emails already loaded.
+  - You only add the subject and the content of the email
+  - The mass mail server can send up to 100,000 emails per day all delivered straight to inbox
+  - We Monitor your mail mail server 24/7  to ensure full deliverability
+  - Be able to add you own email list in the mail server
+  - Gain New Clients Today on Top Of Your Existing Clients.
+As they say, Mass Marketing is the True fuel for business growth.
+Reach 100,000+ People in a Day & Notice the Difference.
+Bulk Email Marketing - Most cost effective alternative to TV & Radio Ads
+Reach approximately 100,000 people on a daily basis. 24/7/365 With your own personal mail server at a cost of Kshs 10,000 per month. (Offer Valid for 7days ONLY)
+We also have a mobile phone numbers database segmented per county, and we provide Bulk SMS  at  60cents/sms, sender ID Kshs.8300
 
-Queued up, thanks!
-
--- 
-Thanks,
-Sasha
+Contact Us Today
+Regards
+George K. Mariene
+Wyzer Technologies Limited
+Tel: +254 707 559 080 | +254 721 351 269
+www.textsms.co.ke | www.datahost.co.ke  
+18, Msanduku Road | Off Mbaazi Avenue | Lavington | Nairobi
