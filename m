@@ -2,23 +2,23 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A8D0835B6BD
-	for <lists+kvm@lfdr.de>; Sun, 11 Apr 2021 21:23:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9B60935B6E2
+	for <lists+kvm@lfdr.de>; Sun, 11 Apr 2021 22:43:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235882AbhDKTXw convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Sun, 11 Apr 2021 15:23:52 -0400
-Received: from [105.162.25.85] ([105.162.25.85]:6646 "EHLO
-        host31.registrar-servers.com" rhost-flags-FAIL-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S235323AbhDKTXw (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Sun, 11 Apr 2021 15:23:52 -0400
-X-Greylist: delayed 423 seconds by postgrey-1.27 at vger.kernel.org; Sun, 11 Apr 2021 15:23:51 EDT
-Message-ID: <889ed7739d705a507c79cf6385517b7ad03f60@aport.ru>
-Reply-To: "Kenya Bulk email Marketing" <info@detahost.com>
-From:   "Kenya Bulk email Marketing" <isheco@aport.ru>
+        id S236553AbhDKUnk convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Sun, 11 Apr 2021 16:43:40 -0400
+Received: from [105.162.25.85] ([105.162.25.85]:51693 "EHLO
+        guard.vivawebhost.com" rhost-flags-FAIL-FAIL-OK-FAIL)
+        by vger.kernel.org with ESMTP id S233822AbhDKUnk (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Sun, 11 Apr 2021 16:43:40 -0400
+X-Greylist: delayed 423 seconds by postgrey-1.27 at vger.kernel.org; Sun, 11 Apr 2021 16:43:39 EDT
+Message-ID: <8ad99034da371d1d0104b21ef82c06080b656d@aport.ru>
+Reply-To: "Kenya Business Plans" <mz@aport.ru>
+From:   "Kenya Business Plans" <hlcy@aport.ru>
 To:     <kvm@vger.kernel.org>
-Subject: Kenya bulk email marketing - Target over 1.8 Million Kenyans via email
-Date:   Sun, 11 Apr 2021 22:16:28 +0300
-Organization: Kenya Bulk Email
+Subject: Kenya Cutomized Business Plans for only Kes 499/=
+Date:   Sun, 11 Apr 2021 23:36:14 +0300
+Organization: Kenya Business Plans
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8";
 Content-Transfer-Encoding: 8BIT
@@ -26,27 +26,121 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Gain more clients on top of your existing clients on a daily basis 24/7/365 via Bulk email marketing - GUARANTEED
-Get A Personal Mail Server For Your Company / Organization Fully Setup & Configured & 1.8Million Kenyan Emails Loaded
-  - Why A Personal Mail Server For Bulk Mail Marketing
-  - Send mass email on a daily basis 24/7/365 days
-  - The mass mail server comes with its own logins to view the mass emailing progress
-  - The mass mail server comes with 1.8Million clean Kenyan emails already loaded.
-  - You only add the subject and the content of the email
-  - The mass mail server can send up to 100,000 emails per day all delivered straight to inbox
-  - We Monitor your mail mail server 24/7  to ensure full deliverability
-  - Be able to add you own email list in the mail server
-  - Gain New Clients Today on Top Of Your Existing Clients.
-As they say, Mass Marketing is the True fuel for business growth.
-Reach 100,000+ People in a Day & Notice the Difference.
-Bulk Email Marketing - Most cost effective alternative to TV & Radio Ads
-Reach approximately 100,000 people on a daily basis. 24/7/365 With your own personal mail server at a cost of Kshs 10,000 per month. (Offer Valid for 7days ONLY)
-We also have a mobile phone numbers database segmented per county, and we provide Bulk SMS  at  60cents/sms, sender ID Kshs.8300
+  
+Customized Kenya Business Plans
+Invest wisely by getting street smart market surveys, guides and info packs with the sweet or harsh reality of the market.
+Actual Facts & Figures on Revenue, Mark Up, Wholesale, Retail prices, Competition, Survival rate, Differentiation, Capital, Process, Equipment, Suppliers, Opportunities, Licenses, Consumer Behaviour, Manpower Tips, Tricks & so so much more.
 
-Contact Us Today
-Regards
-George K. Mariene
-Wyzer Technologies Limited
-Tel: +254 707 559 080 | +254 721 351 269
-www.textsms.co.ke | www.datahost.co.ke  
-18, Msanduku Road | Off Mbaazi Avenue | Lavington | Nairobi
+We have comprehensive business plans in these categories:
+
+Agrovet
+Auto Glass Retail -17 Pages
+Bank Agency Fact-sheet
+Beef Butchery - 31 pages
+Boda Boda
+Bottled Water - 53 Pages
+Building Materials Yard - Dynamics & Case Study
+Car Wash Quick Guide
+Chapati Wholesale (Case Study)
+Chemist -Retail - 31 Pages
+Chicken Butchery
+Chips & Chicken Cafe - 31 Pages
+Concreting ( Koroga) Equipment Leasing - 29 Pages
+Corn Chips Snacks Making - 37 Pages
+Cosmetics Retail - 30 Pages
+Cosmetics Retail -30 Pages
+Courier - 35 Pages
+Cyber Cafe
+Day-care
+Electrical Parts Retail - 27 Pages
+Executive Barber Shop - 42 Pages
+Fish Supply - Nairobi Hotels Quick Overview
+Fish Supply - Nairobi Hotels Quick Survey
+Flowers - Nairobi (Retail/ Wholesale )
+Free Advertiser Magazine ( Quick Guide & Case Study )
+Fruit / Juice Parlour
+Gas (LPG) Retail
+Gift Service
+Gym - 38 pages
+Hair Salon
+Ice Lollies Making
+Ice Lollies Making ( Quick Guide )
+Imaging Clinic (Ultrasound and X-ray) - 46 Pages
+Inner-wear Retail - 27 Pages
+Laundry - 31 pages
+Leather: Skins Trade -26 Pages
+'Local' Bar - 48 Pages
+Maize Milling (Unga wa Ugali)
+Milk Distributorship
+Mitumba Clothes
+Money Lending - Informal Overview
+Motorcycle Spare Parts Retail -33 Pages
+Movie Shop
+M-pesa Sub Agent
+Nails (Misumari) Making - 60 Pages
+Non-Woven Bags Making -39 Pages
+Petrol Station (Independent) - 47 Pages
+Plumbing Hardware Retail - 35 Pages *New
+Primary School Business - 38 Pages
+Printing Business - 55 Pages
+Real Estate Agency - 42 Pages
+Second Hand Novels (R)
+Selling Cake Boxes
+Selling Cookies
+Senator Keg Bar
+Slot Machines Quick Guide
+Small Scale FMCG Distribution - New
+Smokies & Egg Vending
+Supermarket - 75 Pages
+Supermarket Shelf Space Guide
+Tents & Chairs Leasing
+Tiles Retail Business Fact-sheet
+Timber Yard - 32 Pages
+Tomato ( Greenhouse ) - Quick Market & Production Guide
+Tyres Retail Business - 29 Pages
+
+Invest wisely in 2020 by getting street smart market surveys with:
+- Market Analysis
+- Step by step establishing Process
+- Licenses - Issuing authority, cost, requirements
+- Equipment - Suppliers, Considerations, Cost
+- Other requirements
+- Suppliers & Prices
+- Raw Materials
+- Buying Selling Prices
+- Production Costs
+- Operational Costs
+- Day to day Operations
+- Revenue & Margins
+- Sample wholesale retail prices
+- Case Studies
+- Manpower
+- Capital breakdown
+- Opportunities
+- Competition
+- Surviving & Thriving
+- Analysis, figures, observations, dos & don'ts
+- Trends ,Tips, Tricks and so much more.
+
+To Download a Sample Business Plan Copy and paste the link below to your browser
+
+https://drive.google.com/open?id=1gO2UiWble5J9oEvd8qH3oJ0XsrwvVdtQ
+
+The whole package of 65 Business Plans above is available Offer Price @ Kshs. 499. We are only selling the guides as a package.
+
+To Order Kindly use Lipa Na M-Pesa Buy Goods and Services Till No. 234931.
+
+On payment kindly forward the Mpesa payment confirmation text and your email address to +254 721 351 269.
+
+We deliver via email within 15 minutes of payment.
+
+TRIED, TESTED AND TRUSTED. Helping You Start a Business in Kenya With Less Risk!
+
+Kind Regards;
+
+
+Hashna A. Noor
+Manager - Sales & Marketing
+Kenya Business Plans Limited
++254721351269 | +254707559080
+78 Brookside Drive | Nairobi | Kenya
