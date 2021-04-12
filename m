@@ -2,181 +2,148 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E7E7535B946
-	for <lists+kvm@lfdr.de>; Mon, 12 Apr 2021 06:23:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4612735BA5B
+	for <lists+kvm@lfdr.de>; Mon, 12 Apr 2021 08:53:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230255AbhDLEXE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 12 Apr 2021 00:23:04 -0400
-Received: from mga02.intel.com ([134.134.136.20]:31690 "EHLO mga02.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230208AbhDLEWw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 12 Apr 2021 00:22:52 -0400
-IronPort-SDR: ywNlP/uf51VsM2+bq2s/L8Ic4lOU3pq6zGSrNXvKSRVm7DfsCX22FT12dd8mOGgpCOmzNznyeb
- LV9Kz2B/sTMg==
-X-IronPort-AV: E=McAfee;i="6000,8403,9951"; a="181234715"
-X-IronPort-AV: E=Sophos;i="5.82,214,1613462400"; 
-   d="scan'208";a="181234715"
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Apr 2021 21:22:26 -0700
-IronPort-SDR: lAFA4YzoE7WQbr1CJAA3s1OnShHfKrmMoD61HCzxd5+gb6Xcya3hQMSLRzwwDQH68QCBWTMB/j
- rd3wEXrwULgg==
-X-IronPort-AV: E=Sophos;i="5.82,214,1613462400"; 
-   d="scan'208";a="521030468"
-Received: from rutujajo-mobl.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.212.194.203])
-  by fmsmga001-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Apr 2021 21:22:23 -0700
-From:   Kai Huang <kai.huang@intel.com>
-To:     kvm@vger.kernel.org, linux-sgx@vger.kernel.org
-Cc:     seanjc@google.com, pbonzini@redhat.com, bp@alien8.de,
-        jarkko@kernel.org, dave.hansen@intel.com, luto@kernel.org,
-        rick.p.edgecombe@intel.com, haitao.huang@intel.com,
-        Andy Lutomirski <luto@amacapital.net>,
-        Kai Huang <kai.huang@intel.com>
-Subject: [PATCH v5 11/11] KVM: x86: Add capability to grant VM access to privileged SGX attribute
-Date:   Mon, 12 Apr 2021 16:21:43 +1200
-Message-Id: <0b099d65e933e068e3ea934b0523bab070cb8cea.1618196135.git.kai.huang@intel.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <cover.1618196135.git.kai.huang@intel.com>
-References: <cover.1618196135.git.kai.huang@intel.com>
+        id S236624AbhDLGxq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 12 Apr 2021 02:53:46 -0400
+Received: from szxga07-in.huawei.com ([45.249.212.35]:17309 "EHLO
+        szxga07-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231175AbhDLGxq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 12 Apr 2021 02:53:46 -0400
+Received: from DGGEMS412-HUB.china.huawei.com (unknown [172.30.72.59])
+        by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4FJfXG3S84z9yZR;
+        Mon, 12 Apr 2021 14:51:10 +0800 (CST)
+Received: from huawei.com (10.174.186.236) by DGGEMS412-HUB.china.huawei.com
+ (10.3.19.212) with Microsoft SMTP Server id 14.3.498.0; Mon, 12 Apr 2021
+ 14:53:17 +0800
+From:   Yifei Jiang <jiangyifei@huawei.com>
+To:     <qemu-devel@nongnu.org>, <qemu-riscv@nongnu.org>
+CC:     <kvm-riscv@lists.infradead.org>, <kvm@vger.kernel.org>,
+        <libvir-list@redhat.com>, <anup.patel@wdc.com>,
+        <palmer@dabbelt.com>, <Alistair.Francis@wdc.com>,
+        <sagark@eecs.berkeley.edu>, <kbastian@mail.uni-paderborn.de>,
+        <bin.meng@windriver.com>, <fanliang@huawei.com>,
+        <wu.wubin@huawei.com>, <zhang.zhanghailiang@huawei.com>,
+        <yinyipeng1@huawei.com>, Yifei Jiang <jiangyifei@huawei.com>
+Subject: [PATCH RFC v5 00/12] Add riscv kvm accel support
+Date:   Mon, 12 Apr 2021 14:52:34 +0800
+Message-ID: <20210412065246.1853-1-jiangyifei@huawei.com>
+X-Mailer: git-send-email 2.26.2.windows.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
+X-Originating-IP: [10.174.186.236]
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Sean Christopherson <sean.j.christopherson@intel.com>
+This series adds both riscv32 and riscv64 kvm support, and implements
+migration based on riscv. It is based on temporarily unaccepted kvm:
+https://github.com/kvm-riscv/linux (lastest version v17).
 
-Add a capability, KVM_CAP_SGX_ATTRIBUTE, that can be used by userspace
-to grant a VM access to a priveleged attribute, with args[0] holding a
-file handle to a valid SGX attribute file.
+This series depends on above pending changes which haven't yet been
+accepted, so this QEMU patch series is treated as RFC patches until
+that dependency has been dealt with.
 
-The SGX subsystem restricts access to a subset of enclave attributes to
-provide additional security for an uncompromised kernel, e.g. to prevent
-malware from using the PROVISIONKEY to ensure its nodes are running
-inside a geniune SGX enclave and/or to obtain a stable fingerprint.
+Several steps to use this:
+1. Build emulation
+$ ./configure --target-list=riscv64-softmmu
+$ make -j$(nproc)
 
-To prevent userspace from circumventing such restrictions by running an
-enclave in a VM, KVM restricts guest access to privileged attributes by
-default.
+2. Build kernel
+https://github.com/kvm-riscv/linux
 
-Cc: Andy Lutomirski <luto@amacapital.net>
-Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-Signed-off-by: Kai Huang <kai.huang@intel.com>
----
-v4->v5:
- - rebase to latest kvm/queue.
+3. Build QEMU VM
+Cross built in riscv toolchain.
+$ PKG_CONFIG_LIBDIR=<toolchain pkgconfig path>
+$ export PKG_CONFIG_SYSROOT_DIR=<toolchain sysroot path>
+$ ./configure --target-list=riscv64-softmmu --enable-kvm \
+--cross-prefix=riscv64-linux-gnu- --disable-libiscsi --disable-glusterfs \
+--disable-libusb --disable-usb-redir --audio-drv-list= --disable-opengl \
+--disable-libxml2
+$ make -j$(nproc)
 
----
- Documentation/virt/kvm/api.rst | 23 +++++++++++++++++++++++
- arch/x86/kvm/cpuid.c           |  2 +-
- arch/x86/kvm/x86.c             | 21 +++++++++++++++++++++
- include/uapi/linux/kvm.h       |  1 +
- 4 files changed, 46 insertions(+), 1 deletion(-)
+4. Start emulation
+$ ./qemu-system-riscv64 -M virt -m 4096M -cpu rv64,x-h=true -nographic \
+        -name guest=riscv-hyp,debug-threads=on \
+        -smp 4 \
+        -bios ./fw_jump.bin \
+        -kernel ./Image \
+        -drive file=./hyp.img,format=raw,id=hd0 \
+        -device virtio-blk-device,drive=hd0 \
+        -append "root=/dev/vda rw console=ttyS0 earlycon=sbi"
 
-diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-index 2c4253718881..1c073588cf0b 100644
---- a/Documentation/virt/kvm/api.rst
-+++ b/Documentation/virt/kvm/api.rst
-@@ -6246,6 +6246,29 @@ the two vms from accidentally clobbering each other through interrupts and
- MSRs.
- 
- 
-+7.25 KVM_CAP_SGX_ATTRIBUTE
-+----------------------
-+
-+:Architectures: x86
-+:Target: VM
-+:Parameters: args[0] is a file handle of a SGX attribute file in securityfs
-+:Returns: 0 on success, -EINVAL if the file handle is invalid or if a requested
-+          attribute is not supported by KVM.
-+
-+KVM_CAP_SGX_ATTRIBUTE enables a userspace VMM to grant a VM access to one or
-+more priveleged enclave attributes.  args[0] must hold a file handle to a valid
-+SGX attribute file corresponding to an attribute that is supported/restricted
-+by KVM (currently only PROVISIONKEY).
-+
-+The SGX subsystem restricts access to a subset of enclave attributes to provide
-+additional security for an uncompromised kernel, e.g. use of the PROVISIONKEY
-+is restricted to deter malware from using the PROVISIONKEY to obtain a stable
-+system fingerprint.  To prevent userspace from circumventing such restrictions
-+by running an enclave in a VM, KVM prevents access to privileged attributes by
-+default.
-+
-+See Documentation/x86/sgx/2.Kernel-internals.rst for more details.
-+
- 8. Other capabilities.
- ======================
- 
-diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-index a0d45607b702..6dc12d949f86 100644
---- a/arch/x86/kvm/cpuid.c
-+++ b/arch/x86/kvm/cpuid.c
-@@ -849,7 +849,7 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
- 		 * expected to derive it from supported XCR0.
- 		 */
- 		entry->eax &= SGX_ATTR_DEBUG | SGX_ATTR_MODE64BIT |
--			      /* PROVISIONKEY | */ SGX_ATTR_EINITTOKENKEY |
-+			      SGX_ATTR_PROVISIONKEY | SGX_ATTR_EINITTOKENKEY |
- 			      SGX_ATTR_KSS;
- 		entry->ebx &= 0;
- 		break;
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index b9600540508e..aab07334e1d4 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -75,6 +75,7 @@
- #include <asm/tlbflush.h>
- #include <asm/intel_pt.h>
- #include <asm/emulate_prefix.h>
-+#include <asm/sgx.h>
- #include <clocksource/hyperv_timer.h>
- 
- #define CREATE_TRACE_POINTS
-@@ -3803,6 +3804,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 	case KVM_CAP_X86_MSR_FILTER:
- 	case KVM_CAP_ENFORCE_PV_FEATURE_CPUID:
- 	case KVM_CAP_VM_COPY_ENC_CONTEXT_FROM:
-+#ifdef CONFIG_X86_SGX_KVM
-+	case KVM_CAP_SGX_ATTRIBUTE:
-+#endif
- 		r = 1;
- 		break;
- #ifdef CONFIG_KVM_XEN
-@@ -5393,6 +5397,23 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
- 		if (kvm_x86_ops.vm_copy_enc_context_from)
- 			r = kvm_x86_ops.vm_copy_enc_context_from(kvm, cap->args[0]);
- 		return r;
-+#ifdef CONFIG_X86_SGX_KVM
-+	case KVM_CAP_SGX_ATTRIBUTE: {
-+		unsigned long allowed_attributes = 0;
-+
-+		r = sgx_set_attribute(&allowed_attributes, cap->args[0]);
-+		if (r)
-+			break;
-+
-+		/* KVM only supports the PROVISIONKEY privileged attribute. */
-+		if ((allowed_attributes & SGX_ATTR_PROVISIONKEY) &&
-+		    !(allowed_attributes & ~SGX_ATTR_PROVISIONKEY))
-+			kvm->arch.sgx_provisioning_allowed = true;
-+		else
-+			r = -EINVAL;
-+		break;
-+	}
-+#endif
- 	default:
- 		r = -EINVAL;
- 		break;
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index 424b12658923..130f756c696d 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -1079,6 +1079,7 @@ struct kvm_ppc_resize_hpt {
- #define KVM_CAP_X86_BUS_LOCK_EXIT 193
- #define KVM_CAP_PPC_DAWR1 194
- #define KVM_CAP_VM_COPY_ENC_CONTEXT_FROM 195
-+#define KVM_CAP_SGX_ATTRIBUTE 196
- 
- #ifdef KVM_CAP_IRQ_ROUTING
- 
+5. Start kvm-acceled QEMU VM in emulation
+$ ./qemu-system-riscv64 -M virt,accel=kvm -m 1024M -cpu host -nographic \
+        -name guest=riscv-guset \
+        -smp 2 \
+        -bios none \
+        -kernel ./Image \
+        -drive file=./guest.img,format=raw,id=hd0 \
+        -device virtio-blk-device,drive=hd0 \
+        -append "root=/dev/vda rw console=ttyS0 earlycon=sbi"
+
+Changes since RFC v4
+- Rebase on QEMU v6.0.0-rc2 and kvm-riscv linux v17.
+- Remove time scaling support as software solution is incomplete.
+  Because it will cause unacceptable performance degradation. and
+  We will post a better solution.
+- Revise according to Alistair's review comments.
+  - Remove compile time XLEN checks in kvm_riscv_reg_id
+  - Surround TYPE_RISCV_CPU_HOST definition by CONFIG_KVM and share
+    it between RV32 and RV64.
+  - Add kvm-stub.c for reduce unnecessary compilation checks.
+  - Add riscv_setup_direct_kernel() to direct boot kernel for KVM.
+
+Changes since RFC v3
+- Rebase on QEMU v5.2.0-rc2 and kvm-riscv linux v15.
+- Add time scaling support(New patches 13, 14 and 15).
+- Fix the bug that guest vm can't reboot.
+
+Changes since RFC v2
+- Fix checkpatch error at target/riscv/sbi_ecall_interface.h.
+- Add riscv migration support.
+
+Changes since RFC v1
+- Add separate SBI ecall interface header.
+- Add riscv32 kvm accel support.
+
+Yifei Jiang (12):
+  linux-header: Update linux/kvm.h
+  target/riscv: Add target/riscv/kvm.c to place the public kvm interface
+  target/riscv: Implement function kvm_arch_init_vcpu
+  target/riscv: Implement kvm_arch_get_registers
+  target/riscv: Implement kvm_arch_put_registers
+  target/riscv: Support start kernel directly by KVM
+  hw/riscv: PLIC update external interrupt by KVM when kvm enabled
+  target/riscv: Handle KVM_EXIT_RISCV_SBI exit
+  target/riscv: Add host cpu type
+  target/riscv: Add kvm_riscv_get/put_regs_timer
+  target/riscv: Implement virtual time adjusting with vm state changing
+  target/riscv: Support virtual time context synchronization
+
+ hw/intc/sifive_plic.c              |  29 +-
+ hw/riscv/boot.c                    |  11 +
+ hw/riscv/virt.c                    |   7 +
+ include/hw/riscv/boot.h            |   1 +
+ linux-headers/linux/kvm.h          |  97 +++++
+ meson.build                        |   2 +
+ target/riscv/cpu.c                 |  17 +
+ target/riscv/cpu.h                 |  10 +
+ target/riscv/kvm-stub.c            |  30 ++
+ target/riscv/kvm.c                 | 605 +++++++++++++++++++++++++++++
+ target/riscv/kvm_riscv.h           |  25 ++
+ target/riscv/machine.c             |  14 +
+ target/riscv/meson.build           |   1 +
+ target/riscv/sbi_ecall_interface.h |  72 ++++
+ 14 files changed, 912 insertions(+), 9 deletions(-)
+ create mode 100644 target/riscv/kvm-stub.c
+ create mode 100644 target/riscv/kvm.c
+ create mode 100644 target/riscv/kvm_riscv.h
+ create mode 100644 target/riscv/sbi_ecall_interface.h
+
 -- 
-2.30.2
+2.19.1
 
