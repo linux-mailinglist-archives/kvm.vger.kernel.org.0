@@ -2,40 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id ADEB135BAB0
-	for <lists+kvm@lfdr.de>; Mon, 12 Apr 2021 09:16:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8F69935BB97
+	for <lists+kvm@lfdr.de>; Mon, 12 Apr 2021 10:02:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236840AbhDLHQq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 12 Apr 2021 03:16:46 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:38020 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S236679AbhDLHQq (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 12 Apr 2021 03:16:46 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1618211786;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=+6nhImlR+qM3GuM+TRySf0myMMv0WJfLOSpNifcSyi0=;
-        b=U80xVAmBy8GdBZ+Gi7kaK3tZMrBqw4JdhMzmmLr0SDzQDgDkrjpaMk29s3PiPSDj+DXAGq
-        OepkL/ioc3oMreNmicqVUgiU1sh808wEy+eAsVdVDd7AFqco1d75I56gKGZtMhyJbj7T9F
-        +GEPZS9nDnSrH5kjqdI+DcSpePRykTU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-602-NEo5XLLuME-EhrKf6vyxYQ-1; Mon, 12 Apr 2021 03:16:23 -0400
-X-MC-Unique: NEo5XLLuME-EhrKf6vyxYQ-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4C679802B4F;
-        Mon, 12 Apr 2021 07:16:21 +0000 (UTC)
-Received: from wangxiaodeMacBook-Air.local (ovpn-13-232.pek2.redhat.com [10.72.13.232])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 66F2E13488;
-        Mon, 12 Apr 2021 07:16:15 +0000 (UTC)
-Subject: Re: [PATCH v6 09/10] vduse: Introduce VDUSE - vDPA Device in
- Userspace
-To:     Yongji Xie <xieyongji@bytedance.com>
+        id S237129AbhDLIDP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 12 Apr 2021 04:03:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54154 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S236808AbhDLIDO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 12 Apr 2021 04:03:14 -0400
+Received: from mail-ej1-x62e.google.com (mail-ej1-x62e.google.com [IPv6:2a00:1450:4864:20::62e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2E4ABC06138C
+        for <kvm@vger.kernel.org>; Mon, 12 Apr 2021 01:02:56 -0700 (PDT)
+Received: by mail-ej1-x62e.google.com with SMTP id w23so2917854ejb.9
+        for <kvm@vger.kernel.org>; Mon, 12 Apr 2021 01:02:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance-com.20150623.gappssmtp.com; s=20150623;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=p6jHxvinR4oy1/faml5c1RePikeItP2Kvd2rZJWrTiQ=;
+        b=lBqfXWeW37pd7NVUT+Uk9TzwfyGZg7ekKVZcL+rLzd38GksZBKR7JgS6SVbsrGW39X
+         6ZQm8GNiZW6mio9p5jZdsLmscZVYaQofpMHy25hgF5Fb/qN9hrLt4VCW+2+Uo21CZy+8
+         g3M3iRgDWKppnOeVow7mBfNQjxGDyDBNVRnuZFyDbRSLT5wqkwDbmN+y540tFVwD9SQ5
+         hF8wbyI2J28YY73Rx3X4feBz2fKnwz5xghVxWzDMDLzbiyG2SK+nlXToWtL0Pd4QksMZ
+         mVm/zIkwrIYMFJh8mZhUSIbnUq+vU+5wfLBADVijL1Z0Q4jHChPqjIGIK7Ro2tgQP9gs
+         K8lw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=p6jHxvinR4oy1/faml5c1RePikeItP2Kvd2rZJWrTiQ=;
+        b=MkJaj1il7PcDfX144FaD0rsyWrhtPCnYCSIOod5eGXAfcR26YY3WZhVhcMUGophpYU
+         DNz7D1fBEGyUarPoA9Hbue/izUK7wYtiS/87G48noAFEQOY9DYYamG3rfLsqVy6JDu6A
+         cwdgimlQXihA+OEVGaAu+h0G2esmqhJy3yNGIkM5U2wexsLx9AX1XWbNeK/awsLWiaeQ
+         /HLCK9w6AFJpA7FnEDMAy4MtRJcVXDUksWLGE7xNum8pfHOBvvN1eHuZYHEd/54gRqYg
+         A5xC0YpktXqhxKnaJSt8E33I2cTscCElXGtI4wOssV/87ZyShV0M+R/+7oVh7NhTE4uF
+         mLkQ==
+X-Gm-Message-State: AOAM533gKunva50NmUd32APuYt6CBF7Zjb1JS8lXDkJLVXjmqlgy3tEB
+        UuMRVPfqKx4Jk5IomA+Q8h3fnsxL2hmICEcVrCCd
+X-Google-Smtp-Source: ABdhPJzxBC6arRGRGNDZDQU74O/wINTe0uOldAk5rkZ3ldemXaFDnYdXEXoqOxA7hneHBKXEwp5mvfq2QIMmiuXk118=
+X-Received: by 2002:a17:906:36ce:: with SMTP id b14mr22328852ejc.395.1618214574855;
+ Mon, 12 Apr 2021 01:02:54 -0700 (PDT)
+MIME-Version: 1.0
+References: <20210331080519.172-1-xieyongji@bytedance.com> <20210331080519.172-10-xieyongji@bytedance.com>
+ <c817178a-2ac8-bf93-1ed3-528579c657a3@redhat.com> <CACycT3v_KFQXoxRbEj8c0Ve6iKn9RbibtBDgBFs=rf0ZOmTBBQ@mail.gmail.com>
+ <091dde74-449b-385c-0ec9-11e4847c6c4c@redhat.com> <CACycT3vwATp4+Ao0fjuyeeLQN+xHH=dXF+JUyuitkn4k8hELnA@mail.gmail.com>
+ <dc9a90dd-4f86-988c-c1b5-ac606ce5e14b@redhat.com>
+In-Reply-To: <dc9a90dd-4f86-988c-c1b5-ac606ce5e14b@redhat.com>
+From:   Yongji Xie <xieyongji@bytedance.com>
+Date:   Mon, 12 Apr 2021 16:02:44 +0800
+Message-ID: <CACycT3vxO21Yt6+px2c2Q8DONNUNehdo2Vez_RKQCKe76CM2TA@mail.gmail.com>
+Subject: Re: Re: [PATCH v6 09/10] vduse: Introduce VDUSE - vDPA Device in Userspace
+To:     Jason Wang <jasowang@redhat.com>
 Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
         Stefan Hajnoczi <stefanha@redhat.com>,
         Stefano Garzarella <sgarzare@redhat.com>,
@@ -46,61 +64,50 @@ Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
         Matthew Wilcox <willy@infradead.org>, viro@zeniv.linux.org.uk,
         Jens Axboe <axboe@kernel.dk>, bcrl@kvack.org,
         Jonathan Corbet <corbet@lwn.net>,
-        =?UTF-8?Q?Mika_Penttil=c3=a4?= <mika.penttila@nextfour.com>,
+        =?UTF-8?Q?Mika_Penttil=C3=A4?= <mika.penttila@nextfour.com>,
         Dan Carpenter <dan.carpenter@oracle.com>,
         virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
         kvm@vger.kernel.org, linux-fsdevel@vger.kernel.org
-References: <20210331080519.172-1-xieyongji@bytedance.com>
- <20210331080519.172-10-xieyongji@bytedance.com>
- <c817178a-2ac8-bf93-1ed3-528579c657a3@redhat.com>
- <CACycT3v_KFQXoxRbEj8c0Ve6iKn9RbibtBDgBFs=rf0ZOmTBBQ@mail.gmail.com>
- <091dde74-449b-385c-0ec9-11e4847c6c4c@redhat.com>
- <CACycT3vwATp4+Ao0fjuyeeLQN+xHH=dXF+JUyuitkn4k8hELnA@mail.gmail.com>
-From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <dc9a90dd-4f86-988c-c1b5-ac606ce5e14b@redhat.com>
-Date:   Mon, 12 Apr 2021 15:16:13 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
- Gecko/20100101 Thunderbird/78.9.1
-MIME-Version: 1.0
-In-Reply-To: <CACycT3vwATp4+Ao0fjuyeeLQN+xHH=dXF+JUyuitkn4k8hELnA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-在 2021/4/9 下午4:02, Yongji Xie 写道:
->>>>> +};
->>>>> +
->>>>> +struct vduse_dev_config_data {
->>>>> +     __u32 offset; /* offset from the beginning of config space */
->>>>> +     __u32 len; /* the length to read/write */
->>>>> +     __u8 data[VDUSE_CONFIG_DATA_LEN]; /* data buffer used to read/write */
->>>> Note that since VDUSE_CONFIG_DATA_LEN is part of uAPI it means we can
->>>> not change it in the future.
->>>>
->>>> So this might suffcient for future features or all type of virtio devices.
->>>>
->>> Do you mean 256 is no enough here？
->> Yes.
->>
-> But this request will be submitted multiple times if config lengh is
-> larger than 256. So do you think whether we need to extent the size to
-> 512 or larger?
-
-
-So I think you'd better either:
-
-1) document the limitation (256) in somewhere, (better both uapi and doc)
-
-or
-
-2) make it variable
-
-Thanks
-
-
+On Mon, Apr 12, 2021 at 3:16 PM Jason Wang <jasowang@redhat.com> wrote:
+>
+>
+> =E5=9C=A8 2021/4/9 =E4=B8=8B=E5=8D=884:02, Yongji Xie =E5=86=99=E9=81=93:
+> >>>>> +};
+> >>>>> +
+> >>>>> +struct vduse_dev_config_data {
+> >>>>> +     __u32 offset; /* offset from the beginning of config space */
+> >>>>> +     __u32 len; /* the length to read/write */
+> >>>>> +     __u8 data[VDUSE_CONFIG_DATA_LEN]; /* data buffer used to read=
+/write */
+> >>>> Note that since VDUSE_CONFIG_DATA_LEN is part of uAPI it means we ca=
+n
+> >>>> not change it in the future.
+> >>>>
+> >>>> So this might suffcient for future features or all type of virtio de=
+vices.
+> >>>>
+> >>> Do you mean 256 is no enough here=EF=BC=9F
+> >> Yes.
+> >>
+> > But this request will be submitted multiple times if config lengh is
+> > larger than 256. So do you think whether we need to extent the size to
+> > 512 or larger?
+>
+>
+> So I think you'd better either:
+>
+> 1) document the limitation (256) in somewhere, (better both uapi and doc)
 >
 
+But the VDUSE_CONFIG_DATA_LEN doesn't mean the limitation of
+configuration space. It only means the maximum size of one data
+transfer for configuration space. Do you mean document this?
+
+Thanks,
+Yongji
