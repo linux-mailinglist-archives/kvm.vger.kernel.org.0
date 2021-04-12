@@ -2,69 +2,110 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 16B5735CEEB
-	for <lists+kvm@lfdr.de>; Mon, 12 Apr 2021 18:57:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D90CC35CEFA
+	for <lists+kvm@lfdr.de>; Mon, 12 Apr 2021 18:57:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244988AbhDLQwP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 12 Apr 2021 12:52:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56952 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345698AbhDLQrr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 12 Apr 2021 12:47:47 -0400
-Received: from mail-pf1-x42a.google.com (mail-pf1-x42a.google.com [IPv6:2607:f8b0:4864:20::42a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 412E7C06174A
-        for <kvm@vger.kernel.org>; Mon, 12 Apr 2021 09:44:30 -0700 (PDT)
-Received: by mail-pf1-x42a.google.com with SMTP id l123so9541188pfl.8
-        for <kvm@vger.kernel.org>; Mon, 12 Apr 2021 09:44:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=UNKlEmkrm49jut0y7GXEHhj3JtBxtOY6CZ0/T47VW+A=;
-        b=PKmo4cDbkWbiYVfjzK2Ksy54pySWRIezSHMyLJCHrThM1gOCO7wtrzhAQLFjKmIlEt
-         I05Z9NlSVfNkbcfiF6xWFE1AnjM5CcJXsUms3Aqpr4GjBFwIzcg6MLltvn6FnVIIaeGm
-         0t8bAqH+GVy0bnAenbS0jyGAdmb/kTXraT5bfUehxullUlpa+Nax2BLTlNPGDq8U8Qv0
-         7Z2cNi5BpMuRQvIsYyqkeK+pri5eJnoY0wtfqrTMkKs/sior52Kxx1+DcamnU2T0R/7h
-         AGkkUctqryGjTrf96qaaHJCUsjv2i9s576PfULsufD3srABNN2i3GPh7nok3vz7OTGCg
-         uTpA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=UNKlEmkrm49jut0y7GXEHhj3JtBxtOY6CZ0/T47VW+A=;
-        b=AB10tgYcXNwJhDOqgTGJA7oe7RtvNK2R42nFlYXZRjTQ1ce1FyeY5DeD0xRkUQtkUh
-         MbzzOS4H2dmFlqfbC3tLjW1yGURg0cR+cYqjv5B4KI1aQIaMy3PfjUo/JL1BIkQOpUK1
-         aIXJQJ3rlWFHUxShgz2U6TG9qQ/3CoT0S3NR7LBcAMqgMI8l9yvzteX+6W8JZcLsSds8
-         DSAdg/Ib8FxaTlIzPIfEvtiVZD2WJPbRh213fFB+H5LSK9sRdOrq/45U79qP36uzYn6h
-         tK+Pd6OYsJAmjpjlyN41DmB2SrkEixEjAdxu8mDwYYI6P0RQ2fdWlFrK3qnCwE/6mpXS
-         t1Pg==
-X-Gm-Message-State: AOAM532DcMLsDU6OaqW9mMAQcWrb+SSYQWd+tYQXRnTSkaBcexuPqdIr
-        SdJqiGsR3ld4sbAT5RPFCR4VDg==
-X-Google-Smtp-Source: ABdhPJzlg9ARJA0G+N4vWrWO0YlJkkfzs+HFSg93Ry3NvnX3nB2wWAJBm+xJwNb3b5F71nLS9OI+ZA==
-X-Received: by 2002:a63:5f88:: with SMTP id t130mr28388924pgb.403.1618245869753;
-        Mon, 12 Apr 2021 09:44:29 -0700 (PDT)
-Received: from google.com (240.111.247.35.bc.googleusercontent.com. [35.247.111.240])
-        by smtp.gmail.com with ESMTPSA id c9sm9518158pfl.169.2021.04.12.09.44.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 12 Apr 2021 09:44:29 -0700 (PDT)
-Date:   Mon, 12 Apr 2021 16:44:25 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     stable@vger.kernel.org, kvm@vger.kernel.org, sasha@kernel.org
-Subject: Re: [PATCH 5.10/5.11 0/9] Fix missing TLB flushes in TDP MMU
-Message-ID: <YHR46QCe/ivBNZKR@google.com>
-References: <20210410151229.4062930-1-pbonzini@redhat.com>
+        id S244110AbhDLQyK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 12 Apr 2021 12:54:10 -0400
+Received: from foss.arm.com ([217.140.110.172]:55888 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S245663AbhDLQv7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 12 Apr 2021 12:51:59 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id AF20512FC;
+        Mon, 12 Apr 2021 09:51:40 -0700 (PDT)
+Received: from [192.168.0.110] (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 4CB453F73B;
+        Mon, 12 Apr 2021 09:51:38 -0700 (PDT)
+Subject: Re: [PATCH v2] KVM: arm64: Fully zero the vcpu state on reset
+To:     Marc Zyngier <maz@kernel.org>,
+        linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
+        kvmarm@lists.cs.columbia.edu
+Cc:     James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Will Deacon <will@kernel.org>, kernel-team@android.com,
+        stable@vger.kernel.org
+References: <20210409173257.3031729-1-maz@kernel.org>
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+Message-ID: <977338ef-9b06-1fec-9075-5e9cbdb89bc2@arm.com>
+Date:   Mon, 12 Apr 2021 17:51:53 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.9.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210410151229.4062930-1-pbonzini@redhat.com>
+In-Reply-To: <20210409173257.3031729-1-maz@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, Apr 10, 2021, Paolo Bonzini wrote:
-> The new MMU for two-dimensional paging had some missing TLB flushes
-> in 5.10 and 5.11.  This series backports some generic improvements
-> to simplify the backport in the last four patches.
+Hi Marc,
 
-Did a quick read through, didn't see anything obviously broken.  Thanks Paolo!
+On 4/9/21 6:32 PM, Marc Zyngier wrote:
+> On vcpu reset, we expect all the registers to be brought back
+> to their initial state, which happens to be a bunch of zeroes.
+>
+> However, some recent commit broke this, and is now leaving a bunch
+> of registers (such as the FP state) with whatever was left by the
+> guest. My bad.
+>
+> Zero the reset of the state (32bit SPSRs and FPSIMD state).
+>
+> Cc: stable@vger.kernel.org
+> Fixes: e47c2055c68e ("KVM: arm64: Make struct kvm_regs userspace-only")
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>
+> Notes:
+>     v2: Only reset the FPSIMD state and the AArch32 SPSRs to avoid
+>     corrupting CNTVOFF in creative ways.
+
+I missed that last time, sorry.
+
+>
+>  arch/arm64/kvm/reset.c | 5 +++++
+>  1 file changed, 5 insertions(+)
+>
+> diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
+> index bd354cd45d28..4b5acd84b8c8 100644
+> --- a/arch/arm64/kvm/reset.c
+> +++ b/arch/arm64/kvm/reset.c
+> @@ -242,6 +242,11 @@ int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
+>  
+>  	/* Reset core registers */
+>  	memset(vcpu_gp_regs(vcpu), 0, sizeof(*vcpu_gp_regs(vcpu)));
+> +	memset(&vcpu->arch.ctxt.fp_regs, 0, sizeof(vcpu->arch.ctxt.fp_regs));
+> +	vcpu->arch.ctxt.spsr_abt = 0;
+> +	vcpu->arch.ctxt.spsr_und = 0;
+> +	vcpu->arch.ctxt.spsr_irq = 0;
+> +	vcpu->arch.ctxt.spsr_fiq = 0;
+
+Checked, and the only fields not touched by the change from struct kvm_cpu_context
+are sys_regs and __hyp_running_cpu. __hyp_running_cpu is assumed to be NULL for a
+guest and it doesn't change during the lifetime of a VCPU; it is set to NULL when
+struct kvm_vcpu is allocated.
+
+CNTVOFF_EL2 is not accessible to userspace (it's not in the sys_reg_descs and in
+the invariant_sys_regs arrays), so it's not necessary to reset it in case
+userspace changed it. Same for the other registers that are part of the VCPU
+context, but are not in sys_reg_descs.
+
+I think it's a good choice to skip zeroing the system registers. I compared
+vcpu->arch.ctxt.sys_regs with sys_regs_descs, there were quite a few registers
+that were part of the vcpu context (pointer authentication registers, virtual
+timer registers, and others) and not part of sys_regs_descs. If someone adds a
+register to the VCPU context, but not to sys_regs_descs, I think it would have
+been easy to miss the fact that KVM_ARM_VCPU_INIT zeroes it.
+
+Hopefully I haven't missed anything:
+
+Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
+
+Thanks,
+
+Alex
+
+>  	vcpu_gp_regs(vcpu)->pstate = pstate;
+>  
+>  	/* Reset system registers */
