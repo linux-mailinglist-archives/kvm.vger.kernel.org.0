@@ -2,112 +2,145 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2E51C35D035
-	for <lists+kvm@lfdr.de>; Mon, 12 Apr 2021 20:22:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7D87135D065
+	for <lists+kvm@lfdr.de>; Mon, 12 Apr 2021 20:31:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244825AbhDLSW2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 12 Apr 2021 14:22:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49548 "EHLO
+        id S237110AbhDLSbW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 12 Apr 2021 14:31:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51550 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236635AbhDLSW2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 12 Apr 2021 14:22:28 -0400
-Received: from mail-il1-x132.google.com (mail-il1-x132.google.com [IPv6:2607:f8b0:4864:20::132])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 288B1C06174A
-        for <kvm@vger.kernel.org>; Mon, 12 Apr 2021 11:22:09 -0700 (PDT)
-Received: by mail-il1-x132.google.com with SMTP id n4so11848983ili.8
-        for <kvm@vger.kernel.org>; Mon, 12 Apr 2021 11:22:09 -0700 (PDT)
+        with ESMTP id S236924AbhDLSbW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 12 Apr 2021 14:31:22 -0400
+Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A7FC2C061574
+        for <kvm@vger.kernel.org>; Mon, 12 Apr 2021 11:31:03 -0700 (PDT)
+Received: by mail-pl1-x636.google.com with SMTP id 20so2887666pll.7
+        for <kvm@vger.kernel.org>; Mon, 12 Apr 2021 11:31:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=pnS66VMnQJOfrQyl2K7TCo3s3dpgaNmmTPqQ0SzKz4s=;
-        b=TqcrGz6KegN4pgqHPFivO3yGcoeZ9JJB6yZiEM5mAH0qxvLsR4SaGHWo0U+elcVTyI
-         TSSKliuOOFqi3UJxhDqG7QSKqqO/9Vvx1mue/2PCnaDTlLpGSemF80v0dI143RexXv1j
-         ady1yIvG8Zizv9go+vd2t3SqJ92h6aaa1kxViJfcAfqiAEyMtWO35CgIFHGfUqypuSgM
-         LLYaLHfLyGEFQu/xArIC8HCiX4eCJnWv2LWr6FQcgDHl0ExNXTwCLJk9L+/GcXuLEeWu
-         JJX+qm7lowNyE1UF6Sf229fqH1kvV8QIxPiwJy9vRjN//S/A0Do6mlTzid3FhRpUUW/d
-         6YgQ==
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=KTXek3wu3TIvZC4D8KnpQ7WkjbGnlEOD8KPlvMfjSbE=;
+        b=N2Xgo4sXOhN1wSIic0+ss421yNCI1zz0CCMMqkzu7u22Hr0fCnxY6TyNTiXhm59iKP
+         pqHdoJ5vW4uCH9wX5ccxu12inS1B1w0b81tJLY0MyaLM2HlLa2sSVGuA8WPHH2q9t8WX
+         bs/xh+OrQMaNpCCI6jW1mE+/ZmN3W0DAf8YOd8jwu1ooyERnye3Ms4eoGaysFaSzfRDb
+         ShS5S7tt2Y8VOQGBIpKgfAiSh8FpChv2s0/VbEh0KPyeiUZj/VXsJZrsrDxAw2pqbH2Z
+         4NjdYtCfey3enTI9lHEDNAZpieQAuCiDMsCHgEkZvkit3coNddwmBK7IkXhaGbIuJ6s5
+         XhDA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=pnS66VMnQJOfrQyl2K7TCo3s3dpgaNmmTPqQ0SzKz4s=;
-        b=irNQs65wh3enm5gC6UzX0+nXWeWeNkoNRP5wbaqKDUeIe0TtOtSGNDsqWkyWQhWVMB
-         GIs12LqKNfq7Xz7kyX2kHcexGyF1tlF6AJ7QdxyVzx/VOJtyZ4xE/2V21TOz2jL5Q2oA
-         Az2zx5EMS78QVA3lFQmigImPQytBgJNTepd7iZLZoiCAGNZLCYwa24I3jUk5wb9FKKCZ
-         KX/sDduA4CoFWhYMGzhzRFHabHes8ikF3BAvcfFgmM+0qOHqSW9Sa2Hyod9cnNe3U5pr
-         vrMTKUC15l3RW04IVK42rU/3Xu97oXZ2zTZXGOLLOYtnM8QBOyTPvUrU3UryKQypOo1j
-         ZI4Q==
-X-Gm-Message-State: AOAM531KlOEUzY+fBVTy2bJtZBLNOXbqLIw309WViIRAdBBBki0IuTDa
-        hhsQlC03O/Opw/ty6p/r1M9dsb+u+qcL+vousd2sow==
-X-Google-Smtp-Source: ABdhPJwm+p1wkbZpFs/xEL+3HaD8HlLDy1XD8ohjBf6jJHtLg6V4pd8T8YN5xkFghqM9wK3gH/5Tb+0+prv0uWNCQzw=
-X-Received: by 2002:a05:6e02:1a49:: with SMTP id u9mr2895809ilv.306.1618251728283;
- Mon, 12 Apr 2021 11:22:08 -0700 (PDT)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=KTXek3wu3TIvZC4D8KnpQ7WkjbGnlEOD8KPlvMfjSbE=;
+        b=N6pypNF4CtUYgoAeZJwRoOkLRkMDhfoSq5v3UDpOzT4GXmdUyD19o71GngSIqAbhdJ
+         ZvH86NGSoBXwKvvCpf3f4jFwy5REUhS70tGJ+qOBLGeKRmsbke3zRqOiSRkYyhVypnX1
+         pbacUHFXJmqQzqKbWxpBf91vL9vXt5sZEaIO+Fw+FyqK03u466HdglJNZeuJGN3X2xOk
+         Gn5cI6MQK6xCH3tnH9dWDzuC6qAHwAb+NvIDBmSsZCil3I3nROwhUeTx3V5rh4h9EK1a
+         SfKKfUvXSOqsA/PSi2rZSAYlyYzHshT2KlIEMLeXkRU8gpM/Rq3dRKTc/lGApKGN7TTV
+         D1Yg==
+X-Gm-Message-State: AOAM530Wlrybsn/fUf8KVlZ4gVluoNa3pe5gn88NuroxPMrDejFGsV2m
+        AS70wRskm4tP93uFFbrcuoCybQ==
+X-Google-Smtp-Source: ABdhPJxsah44wtBEgzYJCNZjjim9+OQyJ9J6BZFgAJ2ZRVjXwE9uqMbYUCm97EhSC65ptJNIa3m5RA==
+X-Received: by 2002:a17:90a:29a5:: with SMTP id h34mr555735pjd.158.1618252263021;
+        Mon, 12 Apr 2021 11:31:03 -0700 (PDT)
+Received: from google.com (240.111.247.35.bc.googleusercontent.com. [35.247.111.240])
+        by smtp.gmail.com with ESMTPSA id j1sm129086pjn.26.2021.04.12.11.31.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 12 Apr 2021 11:31:02 -0700 (PDT)
+Date:   Mon, 12 Apr 2021 18:30:58 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Yang Weijiang <weijiang.yang@intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
+Subject: Re: [PATCH] [kvm-unit-tests PATCH] x86/access: Fix intermittent test
+ failure
+Message-ID: <YHSR4lWFupf6m9sv@google.com>
+References: <20210409075518.32065-1-weijiang.yang@intel.com>
+ <1c641daa-c11d-69b6-e63b-ff7d0576c093@redhat.com>
+ <YHCkIRvXAFmS/hUn@google.com>
+ <20210412132551.GA20077@local-michael-cet-test.sh.intel.com>
 MIME-Version: 1.0
-References: <20210401233736.638171-1-bgardon@google.com> <20210401233736.638171-10-bgardon@google.com>
- <4fc5960f-0b64-1cf5-d2c1-080d82d226a0@redhat.com>
-In-Reply-To: <4fc5960f-0b64-1cf5-d2c1-080d82d226a0@redhat.com>
-From:   Ben Gardon <bgardon@google.com>
-Date:   Mon, 12 Apr 2021 11:21:57 -0700
-Message-ID: <CANgfPd-kYQgwdtm5uamYrPhq_V6DkocZXTq9iKzbfJaWcLy3Lw@mail.gmail.com>
-Subject: Re: [PATCH v2 09/13] KVM: x86/mmu: Allow zap gfn range to operate
- under the mmu read lock
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
-        Peter Xu <peterx@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Peter Shier <pshier@google.com>,
-        Peter Feiner <pfeiner@google.com>,
-        Junaid Shahid <junaids@google.com>,
-        Jim Mattson <jmattson@google.com>,
-        Yulei Zhang <yulei.kernel@gmail.com>,
-        Wanpeng Li <kernellwp@gmail.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Xiao Guangrong <xiaoguangrong.eric@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210412132551.GA20077@local-michael-cet-test.sh.intel.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Apr 2, 2021 at 12:53 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> On 02/04/21 01:37, Ben Gardon wrote:
-> > +void kvm_tdp_mmu_put_root(struct kvm *kvm, struct kvm_mmu_page *root,
-> > +                       bool shared)
-> >   {
-> >       gfn_t max_gfn = 1ULL << (shadow_phys_bits - PAGE_SHIFT);
+On Mon, Apr 12, 2021, Yang Weijiang wrote:
+> On Fri, Apr 09, 2021 at 06:59:45PM +0000, Sean Christopherson wrote:
+> > On Fri, Apr 09, 2021, Paolo Bonzini wrote:
+> > > On 09/04/21 09:55, Yang Weijiang wrote:
+> > > > During kvm-unit-test, below failure pattern is observed, this is due to testing thread
+> > > > migration + cache "lazy" flush during test, so forcely flush the cache to avoid the issue.
+> > > > Pin the test app to certain physical CPU can fix the issue as well. The error report is
+> > > > misleading, pke is the victim of the issue.
+> > > > 
+> > > > test user cr4.pke: FAIL: error code 5 expected 4
+> > > > Dump mapping: address: 0x123400000000
+> > > > ------L4: 21ea007
+> > > > ------L3: 21eb007
+> > > > ------L2: 21ec000
+> > > > ------L1: 2000000
+> > > > 
+> > > > Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
+> > > > ---
+> > > >   x86/access.c | 2 ++
+> > > >   1 file changed, 2 insertions(+)
+> > > > 
+> > > > diff --git a/x86/access.c b/x86/access.c
+> > > > index 7dc9eb6..379d533 100644
+> > > > --- a/x86/access.c
+> > > > +++ b/x86/access.c
+> > > > @@ -211,6 +211,8 @@ static unsigned set_cr4_smep(int smep)
+> > > >           ptl2[2] |= PT_USER_MASK;
+> > > >       if (!r)
+> > > >           shadow_cr4 = cr4;
+> > > > +
+> > > > +    invlpg((void *)(ptl2[2] & ~PAGE_SIZE));
+> > > >       return r;
+> > > >   }
+> > > > 
+> > > 
+> > > Applied, thanks.
+> > 
+> > Egad, I can't keep up with this new Paolo :-D
+> > 
+> > 
+> > Would it also work to move the existing invlpg() into ac_test_do_access()?
 > >
-> > -     lockdep_assert_held_write(&kvm->mmu_lock);
-> > +     kvm_lockdep_assert_mmu_lock_held(kvm, shared);
-> >
-> >       if (!refcount_dec_and_test(&root->tdp_mmu_root_count))
-> >               return;
-> > @@ -81,7 +92,7 @@ void kvm_tdp_mmu_put_root(struct kvm *kvm, struct kvm_mmu_page *root)
-> >       list_del_rcu(&root->link);
-> >       spin_unlock(&kvm->arch.tdp_mmu_pages_lock);
-> >
-> > -     zap_gfn_range(kvm, root, 0, max_gfn, false, false);
-> > +     zap_gfn_range(kvm, root, 0, max_gfn, false, false, shared);
-> >
-> >       call_rcu(&root->rcu_head, tdp_mmu_free_sp_rcu_callback);
->
-> Instead of patch 13, would it make sense to delay the zap_gfn_range and
-> call_rcu to a work item (either unconditionally, or only if
-> shared==false)?  Then the zap_gfn_range would be able to yield and take
-> the mmu_lock for read, similar to kvm_tdp_mmu_zap_invalidated_roots.
->
-> If done unconditionally, this would also allow removing the "shared"
-> argument to kvm_tdp_mmu_put_root, tdp_mmu_next_root and
-> for_each_tdp_mmu_root_yield_safe, so I would place that change before
-> this patch.
->
-> Paolo
->
+> Hi, Sean,
+> You patch works for the app on my side, but one thing makes my confused, my patch
+> invalidates the mapping for test code(ac_test_do_access), but your patch invlidates
+> at->virt, they're not mapped to the same page. Why it works?
 
-I tried that and it created problems. I believe the issue was that on
-VM teardown memslots would be freed and the memory reallocated before
-the root was torn down, resulting in a use-after free from
-mark_pfn_dirty. Perhaps this could be resolved by forcing memslot
-changes to wait until that work item was processed before returning. I
-can look into it but I suspect there will be a lot of "gotchas"
-involved.
+I don't know why your patch works.  Best guess is that INVLPG on the PMD is
+causing the CPU to flush the entire TLB, i.e. the problematic entry is collateral
+damage.
+
+> I simplified the test by only executing two patterns as below:
+> 
+> printf("\n############# start test ############\n\n");
+> at.flags = 0x8000000;
+> ac_test_exec(&at, &pool);
+> at.flags = 0x200000; /* or 0x10200000 */
+> ac_test_exec(&at, &pool);
+> printf("############# end test ############\n\n");
+> 
+> with your patch I still got error code 5 while getting  error code 4 with my patch.
+> What makes it different?
+
+Now I'm really confused.  This:
+
+  at.flags = 0x8000000;                                                         
+  ac_test_exec(&at, &pool);
+
+runs the test with a not-present PTE.  I don't understand how you are getting
+error code '5' (USER + PRESENT) when running the user test; there shouldn't be
+anything for at->virt in the TLB.
+
+Are there tests being run before this point?  Even then, explicitly flushing
+at->virt should work.  The fact that set_cr4_smep() modifies a PMD and not the
+leaf PTE should be irrelevant.  Per the SDM:
+
+  INVLPG also invalidates all entries in all paging-structure caches associated
+  with the current PCID, regardless of the linear addresses to which they correspond.
