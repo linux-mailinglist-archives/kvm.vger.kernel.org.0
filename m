@@ -2,153 +2,91 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7999C35D152
-	for <lists+kvm@lfdr.de>; Mon, 12 Apr 2021 21:48:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1E81835D154
+	for <lists+kvm@lfdr.de>; Mon, 12 Apr 2021 21:48:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245473AbhDLToa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 12 Apr 2021 15:44:30 -0400
-Received: from mail-mw2nam12on2042.outbound.protection.outlook.com ([40.107.244.42]:43809
-        "EHLO NAM12-MW2-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S245417AbhDLToZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 12 Apr 2021 15:44:25 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=FroxcO3CLuikkZfZbrgxT5Q/tdQYboGkshpI24ngiwKwdCDc4Dh175S6oBens8vAJlxSc5ZHMNweMel1JP5Hxejwhy/8pjDuai2vobUdcrSGan60xVPwQqty5cTD8cQlq7H4mN/Cf/jTxF8ophva3J1aio3nOvNlAhF81iegl2gWIOes+LnRyDt55PF3il+xqkZ7S01bvcJ6vY65IOotl3+K/StMGeqqhMmT0SxwOSe87EkUqZnrLFfdp6ac6FeLFcxvX+UUDSZ11X2iaehqc8LMxw6/8LhTre/k6ebLPnMIOrppqjUxOw8b7GkyIA39PW/sgI7/p20PRINYBZSmWQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=MYVNY8BsTybE58fvtY+jcGFOHWn1tynkMK/KKN9NcjU=;
- b=ZM+SNrTLNrwcqyXkM4clTWdNelqcRpCbpmOrA3uUrLL+jtJQmIsggxBz0cDavCKYRNcWSYG9M6dwjUGTJf+5t5XSwXpbE6adPXudWeJmjG8bp+fM6DUqVMbTJGMu8cxKV0dIeu0mN8mGyXuyypjbOLBXwUFwt77x+DVqc/ltG377M800m8pFeIehQECYiPEFzXEMzrAXvk8JBn5uc1Re4q2Le8V/xyIAqTimYM3d96maKTDyDggb6hj14aeBi0YspPcYto+fGemjqtE1bT8vaLG4Pza00Fu25H23Pe9OaxHgs6z7hMyHQKwqDC83P+fbCtTdPyeYOWmLh+DxWH4ScQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=MYVNY8BsTybE58fvtY+jcGFOHWn1tynkMK/KKN9NcjU=;
- b=LmPcPB/Uelk1ylcU4hBaDFFBHHxcXa+SwDMeM4td8jr7IHjYq15imcQIyhPnwMhjl/lVmlpvGkl41676rS33BoJ0AmbivXBQok8YVwfuGsKgkT8KX6cbNhnG9wZgJdbSJTJRbx0r/vVm/5r3VPQ/or9CcJCwASDf29EXt56nG2U=
-Authentication-Results: redhat.com; dkim=none (message not signed)
- header.d=none;redhat.com; dmarc=none action=none header.from=amd.com;
-Received: from SN6PR12MB2767.namprd12.prod.outlook.com (2603:10b6:805:75::23)
- by SN6PR12MB2717.namprd12.prod.outlook.com (2603:10b6:805:68::29) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4020.22; Mon, 12 Apr
- 2021 19:44:05 +0000
-Received: from SN6PR12MB2767.namprd12.prod.outlook.com
- ([fe80::1fb:7d59:2c24:615e]) by SN6PR12MB2767.namprd12.prod.outlook.com
- ([fe80::1fb:7d59:2c24:615e%6]) with mapi id 15.20.4020.022; Mon, 12 Apr 2021
- 19:44:05 +0000
-From:   Ashish Kalra <Ashish.Kalra@amd.com>
-To:     pbonzini@redhat.com
-Cc:     tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com,
-        joro@8bytes.org, bp@suse.de, thomas.lendacky@amd.com,
-        x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        srutherford@google.com, seanjc@google.com,
-        venu.busireddy@oracle.com, brijesh.singh@amd.com
-Subject: [PATCH v12 03/13] KVM: SVM: Add KVM_SEV_SEND_FINISH command
-Date:   Mon, 12 Apr 2021 19:43:55 +0000
-Message-Id: <5082bd6a8539d24bc55a1dd63a1b341245bb168f.1618254007.git.ashish.kalra@amd.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <cover.1618254007.git.ashish.kalra@amd.com>
-References: <cover.1618254007.git.ashish.kalra@amd.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [165.204.77.1]
-X-ClientProxiedBy: SA9PR13CA0080.namprd13.prod.outlook.com
- (2603:10b6:806:23::25) To SN6PR12MB2767.namprd12.prod.outlook.com
- (2603:10b6:805:75::23)
-MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from ashkalra_ubuntu_server.amd.com (165.204.77.1) by SA9PR13CA0080.namprd13.prod.outlook.com (2603:10b6:806:23::25) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4042.6 via Frontend Transport; Mon, 12 Apr 2021 19:44:04 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 6c59e801-781f-455b-81c4-08d8fdeb546f
-X-MS-TrafficTypeDiagnostic: SN6PR12MB2717:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <SN6PR12MB2717B6441E5ED327B6683FE58E709@SN6PR12MB2717.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:3826;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 02EH1EnKDvi7jzfHysP+86yyZMn2dWBBjVH4rfxi0NbSiKvNGtR8pqoV6RRMEkvLLv4GqtInJdc1PP6eFMSK66RlXo5s5dQvhLuWOZ92v1AShmm51XBtj4ecdHdbH9tWRvKow4jHqvvN+eNhtI8zKuHC4CzZZDGsU3LVCCQ6LTcUmNpUB2qOoHERkRJ5bkU6DEvx9AgkNMCWUdxyJ3SzrnA5deNn56gbqVa4ApKfTSGkP311O2TduXu5eKq88gY2Au1MBUaGhYwuHdxY2o0sxxj5ofYQVscScH0HmhKeIpUTwahA3lhzaEhGpmHBSRMvv37VknOAmInSLno5Mm2E86+Ami18BmRUAxBmMMZTXbyy4OnMfLTAZlP6o+JFPoqXsyQPy/UO/AlAdafsbtw4KDYbY6MK44MnWk6G1zdswXyYTyqjfsh65mjJ8CbRksRICDULZCIe2KhFK6de5zeaeThOQSbNuBD2ZnGoNLDZne0chIFjyPHarJ43DDARrKZWjk/sjjvV7WM7iEuYUmkcf5eUkDqR3HFnbDMNckA8X/AENP4xxl33LGQ277MLNhCmHMtHG6KhtrUE3TB8e9TTtZbsaGXuvyu6yxXPj2EQzLXM6mWSdqxCZdpoa5xOy2JamXpYpTXGOla098U3Z7e+QA==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2767.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(136003)(346002)(366004)(376002)(396003)(39860400002)(36756003)(8676002)(6916009)(4326008)(316002)(86362001)(2906002)(52116002)(66556008)(2616005)(8936002)(6666004)(83380400001)(38350700002)(956004)(186003)(478600001)(26005)(38100700002)(5660300002)(66476007)(7416002)(66946007)(6486002)(16526019)(7696005);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: =?utf-8?B?MVJYU29ycGVLSy9OK0RsZkppdU5WQ0R2bkVYRTE3TldiZEZvS0IrQWRqMnF4?=
- =?utf-8?B?UVNFeFBzbHFya0NuQWdJUzZZUGZyRGpSZU1Ram9GaFM3V1VZQWR5TkgzZjRR?=
- =?utf-8?B?NC9JZzB6MkNlaHBVZ0RnaXJYT3YzK2pWU3hpdTFjTjFPQWlYc2hTR2V3Z3E3?=
- =?utf-8?B?Q0lobGlscmtXc2Q4eGNKTVFxN0w1Z2Yra1RkVVFwYWxiWUtmZFBYeXZSRnJn?=
- =?utf-8?B?Zy8wd0FRdnVvcG5mdUtmbHRSY2VZZ1krRUdEeU9lelB4RDJIaEZlTC92WU9n?=
- =?utf-8?B?SHN2MEx5anNXUkNtWWVDWW1DSHc5bUV2VXo4aGNNaGFibVVza09Ub05zdnN6?=
- =?utf-8?B?OTllVUE2MU9MOEtEVFJmWldzWkkyN2JIQlNMRGVhbXZGaGFna2FQbzFhUWMr?=
- =?utf-8?B?dU96ZjRpV0Z0VHMwWEY2U3lKeDFrZVhsVGVGTTVDNGc4RzlGRnVaWnNrQVYy?=
- =?utf-8?B?Y2JXMHliSTZFdGZUdmpsL2lRbUZYVjZVZ0U1c1o4T3hLaEtWL21SaDl6dUNO?=
- =?utf-8?B?SStsOGRsM2lLMjFWaUhqdG9MajVsaFV1blBickpYOXVYa05rWDQydlhqZjRn?=
- =?utf-8?B?TEVkMFhKR3pyRVRTSEJiNGU3ZFd1cVMvUVpSSlFMTnN0RFhzWjlNQllxQ3Fw?=
- =?utf-8?B?SVZSdEhuS3pYMUJjZ0hwOFFoMEt3UHNZd2hQem0yNjUwZ2R5R1VCOUlvbU1r?=
- =?utf-8?B?Z2lQVTVPMmQ0V1ZxclF0Smg2cG1JZmlRUnBoYnMzRnYrT0NQV0JmNmlubEVu?=
- =?utf-8?B?djdHT250alVGTGUwRW9wZTNDNVVLTndVNlZnaWRoQ051eUhLdWdzbEpDZ0pU?=
- =?utf-8?B?c0lVdWYwMTlpT1VVS3crUFUvTndDK1ZVZTd6L2dKUXlESjFkVXpyODE5MWNQ?=
- =?utf-8?B?bHB2eTV0a3VtNU1sWGliSXRTUE5WS1lYOGphVmQrY0J0UkFUUFdKT3JYZHls?=
- =?utf-8?B?ckNjSmFlSmt5KzNVR0ZjanZadFkwaG5HVHdWQ2ZGVjhrUUpuTFFJRlNaYVZm?=
- =?utf-8?B?RklhK2xsUnluTTFPaEJobVpma05VQlNhdUErYXdqUnJsNllJOGJNTzFOMWhn?=
- =?utf-8?B?YTMzYzJWRW9RUVBLMmQxMm84SzNsWkdBcDlJbCtaMEJnYjdlaGFEVTAwKzNI?=
- =?utf-8?B?RlhVYmYxbFdSc0ZhN0svVzd5MDJrWDF0QzFCeVVQOUx6bHVhZTRONEZZWmx3?=
- =?utf-8?B?ZWlKcWt2bGJ6bXRGVStpSUVIdmRBR2JCZTRVeEVaUW5Wbkh6UDkrVFN6YlV2?=
- =?utf-8?B?V2dMRDVQRzY4WS9qekZ6RndKZXNJb3duNXcyd3piaFZkUUJqNFVnbFNndGt4?=
- =?utf-8?B?UzVwWHFUY013MVhwTDRPYXJzd3RRTUE3VnM4QmJBNkFSM1N0ZGF6MWgrKy80?=
- =?utf-8?B?SldwcU8yeExjZTF5SjZEaFFYdDlzY1Z2eUpCSWVJT0lpQkJleW9HOXZGSjc2?=
- =?utf-8?B?R0xOQmUwbXFOejdEbjVUb3ZLb3NlSXJsRmtiZkJyVjMrdVNtYjN5UXRlMEhi?=
- =?utf-8?B?dk1ORi9yVlR4UDVFajZ0Z0pkNkhDVjB0Yk8vK0JMYjkySytzTnBPQk1WUTlt?=
- =?utf-8?B?eFR3QmM2K1YzSnJNNnd6TGY0ckk2ZE1zT2ltNFRBa3BQTlVQbmtmU2o1blNY?=
- =?utf-8?B?aXVyNVJ6VnZUMTBlMlpnVE50QWlUNGZWRSs5M2JocHAvVVRHa09QZVpKNEwr?=
- =?utf-8?B?amN0aWplQm44KzZWZ1FGTThLYWFXSitIcDFyTDhsSXNxMUJUUklPVFFMMzNB?=
- =?utf-8?Q?ocYukJ+fdex8hKyVlabw949YUOVz8AnEaznVc4X?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6c59e801-781f-455b-81c4-08d8fdeb546f
-X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2767.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Apr 2021 19:44:05.0779
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: wS8UnpC7aPZ1tpKFHskHKWuVAr0Yw1DoVOs7f5STIbrsFXxJINDjU5q9mfwGHGP3qmt7+6kwR8kryyg6b/iAIA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN6PR12MB2717
+        id S245463AbhDLTov (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 12 Apr 2021 15:44:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39508 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S237467AbhDLTot (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 12 Apr 2021 15:44:49 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC88BC06174A
+        for <kvm@vger.kernel.org>; Mon, 12 Apr 2021 12:44:29 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id p75so7630863ybc.8
+        for <kvm@vger.kernel.org>; Mon, 12 Apr 2021 12:44:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=/8EkO2XpIPXcNEfhUs0PL9HjG4CvnSZ9tVEjZh4FrjQ=;
+        b=S0iQUxgzZCycSQe3SNyXbIJuej2vlR0NuxrshrOGKhJLLvXPGhDyVZG8IQxuuItysR
+         JvVFuwHey6/CIIEmRA3z0yoeyxsl51Y8A78QwLPge3ayY1LxPxecZTzGMQQ7f33wNKwn
+         DcFM+V98n1ZzgZVsyXKKRQzZCHl03R25m3DcIGPNfOXxYJspv3HDKjRYd90bxOX5SzNq
+         lwN7J3XdrE9Tmas/aIBtkkaWOB5U7o1c1IAdCAEjxMNYdxLP7o0bqrnxvPJYZVSpYu+9
+         HzxBg6elw1AxIrzydhstSW4SvvFZQuxWVbQm3gpGCDNtGGzH0y3xJxSlfnROCbHaWmBX
+         Ebcw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=/8EkO2XpIPXcNEfhUs0PL9HjG4CvnSZ9tVEjZh4FrjQ=;
+        b=epbxuom5eLy+BHUMu0OkosNkSmXsPoBH0tKbJQRX19vKS4iVB5Wm/pPibe2OG4sivg
+         n5jZktbOiYPn/jbfYbcwRSVrGRSIW5k6o+r/fm8x38WuonZUl1uuYT9g8eqlV+NF2av9
+         uzPCbB/Wk5QxKTH7prTp19uTNpONy+qGRzxkm0QgWDQuti1Gp24jxnHxXl8FnvxkxViS
+         wPP8ifDTjHlaLqtwbGpt69uueeOV7/ZFGQ0IYPq+2XohRskl2Egvb5kL4dzKDr5LqNGB
+         zgcuuJroibJTMgqPu9dYSNJ/gFsk4Z+HULMYZNYaYRTfqG2VIVMTLzXZ7KxPuP/G7yta
+         qGog==
+X-Gm-Message-State: AOAM532C8M1V7z00vM3yYXvEl7UKJfs2ROH4gV7FZzuEgWBQ9KmX5xTV
+        SM98Pfvy90GN2HyRXeaVRcL0H9BXjnkhrUxI7frgzsYP908eFSq/dmqnz6LuEqce8iowHA6tVCD
+        bzv9GqgyxDDmdyrHjxw+MvMe1pPPWyYkTBJFABlzdDWjy78W3kDoQu7rzBhuh4bsv2XTebao=
+X-Google-Smtp-Source: ABdhPJwNI+9lyvZ0DJiIr2W5uyQ2D6wQHUegyqjJ6pJ+Q7kPEyT/XSIKzfs1B3pw2DkRPG7h7d0DT5MKnQ9V/YVSKQ==
+X-Received: from riemann.sea.corp.google.com ([2620:15c:158:202:d03b:94af:33cb:27b9])
+ (user=srutherford job=sendgmr) by 2002:a25:af0a:: with SMTP id
+ a10mr39867011ybh.390.1618256668824; Mon, 12 Apr 2021 12:44:28 -0700 (PDT)
+Date:   Mon, 12 Apr 2021 12:44:08 -0700
+Message-Id: <20210412194408.2458827-1-srutherford@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.31.1.295.g9ea45b61b8-goog
+Subject: [PATCH v3] KVM: SVM: Add support for KVM_SEV_SEND_CANCEL command
+From:   Steve Rutherford <srutherford@google.com>
+To:     kvm@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org, natet@google.com,
+        Ashish.Kalra@amd.com, brijesh.singh@amd.com, pbonzini@redhat.com,
+        Steve Rutherford <srutherford@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Brijesh Singh <brijesh.singh@amd.com>
+After completion of SEND_START, but before SEND_FINISH, the source VMM can
+issue the SEND_CANCEL command to stop a migration. This is necessary so
+that a cancelled migration can restart with a new target later.
 
-The command is used to finailize the encryption context created with
-KVM_SEV_SEND_START command.
-
-Cc: Thomas Gleixner <tglx@linutronix.de>
-Cc: Ingo Molnar <mingo@redhat.com>
-Cc: "H. Peter Anvin" <hpa@zytor.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Joerg Roedel <joro@8bytes.org>
-Cc: Borislav Petkov <bp@suse.de>
-Cc: Tom Lendacky <thomas.lendacky@amd.com>
-Cc: x86@kernel.org
-Cc: kvm@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
-Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
-Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
+Reviewed-by: Nathan Tempelman <natet@google.com>
+Reviewed-by: Brijesh Singh <brijesh.singh@amd.com>
+Signed-off-by: Steve Rutherford <srutherford@google.com>
 ---
- .../virt/kvm/amd-memory-encryption.rst        |  8 +++++++
+ .../virt/kvm/amd-memory-encryption.rst        |  9 ++++++++
  arch/x86/kvm/svm/sev.c                        | 23 +++++++++++++++++++
- 2 files changed, 31 insertions(+)
+ drivers/crypto/ccp/sev-dev.c                  |  1 +
+ include/linux/psp-sev.h                       | 10 ++++++++
+ include/uapi/linux/kvm.h                      |  2 ++
+ 5 files changed, 45 insertions(+)
 
 diff --git a/Documentation/virt/kvm/amd-memory-encryption.rst b/Documentation/virt/kvm/amd-memory-encryption.rst
-index 3c5456e0268a..26c4e6c83f62 100644
+index 469a6308765b1..9e018a3eec03b 100644
 --- a/Documentation/virt/kvm/amd-memory-encryption.rst
 +++ b/Documentation/virt/kvm/amd-memory-encryption.rst
-@@ -335,6 +335,14 @@ Returns: 0 on success, -negative on error
-                 __u32 trans_len;
+@@ -284,6 +284,15 @@ Returns: 0 on success, -negative on error
+                 __u32 len;
          };
  
-+12. KVM_SEV_SEND_FINISH
++16. KVM_SEV_SEND_CANCEL
 +------------------------
 +
-+After completion of the migration flow, the KVM_SEV_SEND_FINISH command can be
-+issued by the hypervisor to delete the encryption context.
++After completion of SEND_START, but before SEND_FINISH, the source VMM can issue the
++SEND_CANCEL command to stop a migration. This is necessary so that a cancelled
++migration can restart with a new target later.
 +
 +Returns: 0 on success, -negative on error
 +
@@ -156,17 +94,17 @@ index 3c5456e0268a..26c4e6c83f62 100644
  ==========
  
 diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index 30527285a39a..92325d9527ce 100644
+index 83e00e5245136..16d75b39e5e78 100644
 --- a/arch/x86/kvm/svm/sev.c
 +++ b/arch/x86/kvm/svm/sev.c
-@@ -1350,6 +1350,26 @@ static int sev_send_update_data(struct kvm *kvm, struct kvm_sev_cmd *argp)
+@@ -1110,6 +1110,26 @@ static int sev_get_attestation_report(struct kvm *kvm, struct kvm_sev_cmd *argp)
  	return ret;
  }
  
-+static int sev_send_finish(struct kvm *kvm, struct kvm_sev_cmd *argp)
++static int sev_send_cancel(struct kvm *kvm, struct kvm_sev_cmd *argp)
 +{
 +	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
-+	struct sev_data_send_finish *data;
++	struct sev_data_send_cancel *data;
 +	int ret;
 +
 +	if (!sev_guest(kvm))
@@ -177,7 +115,7 @@ index 30527285a39a..92325d9527ce 100644
 +		return -ENOMEM;
 +
 +	data->handle = sev->handle;
-+	ret = sev_issue_cmd(kvm, SEV_CMD_SEND_FINISH, data, &argp->error);
++	ret = sev_issue_cmd(kvm, SEV_CMD_SEND_CANCEL, data, &argp->error);
 +
 +	kfree(data);
 +	return ret;
@@ -186,16 +124,69 @@ index 30527285a39a..92325d9527ce 100644
  int svm_mem_enc_op(struct kvm *kvm, void __user *argp)
  {
  	struct kvm_sev_cmd sev_cmd;
-@@ -1409,6 +1429,9 @@ int svm_mem_enc_op(struct kvm *kvm, void __user *argp)
- 	case KVM_SEV_SEND_UPDATE_DATA:
- 		r = sev_send_update_data(kvm, &sev_cmd);
+@@ -1163,6 +1183,9 @@ int svm_mem_enc_op(struct kvm *kvm, void __user *argp)
+ 	case KVM_SEV_GET_ATTESTATION_REPORT:
+ 		r = sev_get_attestation_report(kvm, &sev_cmd);
  		break;
-+	case KVM_SEV_SEND_FINISH:
-+		r = sev_send_finish(kvm, &sev_cmd);
++	case KVM_SEV_SEND_CANCEL:
++		r = sev_send_cancel(kvm, &sev_cmd);
 +		break;
  	default:
  		r = -EINVAL;
  		goto out;
+diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
+index cb9b4c4e371ed..4172a1afa0db9 100644
+--- a/drivers/crypto/ccp/sev-dev.c
++++ b/drivers/crypto/ccp/sev-dev.c
+@@ -129,6 +129,7 @@ static int sev_cmd_buffer_len(int cmd)
+ 	case SEV_CMD_DOWNLOAD_FIRMWARE:		return sizeof(struct sev_data_download_firmware);
+ 	case SEV_CMD_GET_ID:			return sizeof(struct sev_data_get_id);
+ 	case SEV_CMD_ATTESTATION_REPORT:	return sizeof(struct sev_data_attestation_report);
++	case SEV_CMD_SEND_CANCEL:			return sizeof(struct sev_data_send_cancel);
+ 	default:				return 0;
+ 	}
+ 
+diff --git a/include/linux/psp-sev.h b/include/linux/psp-sev.h
+index b801ead1e2bb5..74f2babffc574 100644
+--- a/include/linux/psp-sev.h
++++ b/include/linux/psp-sev.h
+@@ -73,6 +73,7 @@ enum sev_cmd {
+ 	SEV_CMD_SEND_UPDATE_DATA	= 0x041,
+ 	SEV_CMD_SEND_UPDATE_VMSA	= 0x042,
+ 	SEV_CMD_SEND_FINISH		= 0x043,
++	SEV_CMD_SEND_CANCEL		= 0x044,
+ 
+ 	/* Guest migration commands (incoming) */
+ 	SEV_CMD_RECEIVE_START		= 0x050,
+@@ -392,6 +393,15 @@ struct sev_data_send_finish {
+ 	u32 handle;				/* In */
+ } __packed;
+ 
++/**
++ * struct sev_data_send_cancel - SEND_CANCEL command parameters
++ *
++ * @handle: handle of the VM to process
++ */
++struct sev_data_send_cancel {
++	u32 handle;				/* In */
++} __packed;
++
+ /**
+  * struct sev_data_receive_start - RECEIVE_START command parameters
+  *
+diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+index f6afee209620d..707469b6b7072 100644
+--- a/include/uapi/linux/kvm.h
++++ b/include/uapi/linux/kvm.h
+@@ -1671,6 +1671,8 @@ enum sev_cmd_id {
+ 	KVM_SEV_CERT_EXPORT,
+ 	/* Attestation report */
+ 	KVM_SEV_GET_ATTESTATION_REPORT,
++	/* Guest Migration Extension */
++	KVM_SEV_SEND_CANCEL,
+ 
+ 	KVM_SEV_NR_MAX,
+ };
 -- 
-2.17.1
+2.31.1.295.g9ea45b61b8-goog
 
