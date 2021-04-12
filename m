@@ -2,105 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3929A35B935
-	for <lists+kvm@lfdr.de>; Mon, 12 Apr 2021 06:09:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 25E9035B93A
+	for <lists+kvm@lfdr.de>; Mon, 12 Apr 2021 06:22:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229669AbhDLEKH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 12 Apr 2021 00:10:07 -0400
-Received: from szxga01-in.huawei.com ([45.249.212.187]:5127 "EHLO
-        szxga01-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229448AbhDLEKG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 12 Apr 2021 00:10:06 -0400
-Received: from DGGEML403-HUB.china.huawei.com (unknown [172.30.72.53])
-        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4FJZvf4HGpzYWLD;
-        Mon, 12 Apr 2021 12:07:42 +0800 (CST)
-Received: from dggpemm000001.china.huawei.com (7.185.36.245) by
- DGGEML403-HUB.china.huawei.com (10.3.17.33) with Microsoft SMTP Server (TLS)
- id 14.3.498.0; Mon, 12 Apr 2021 12:09:46 +0800
-Received: from dggpemm000003.china.huawei.com (7.185.36.128) by
- dggpemm000001.china.huawei.com (7.185.36.245) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2106.2; Mon, 12 Apr 2021 12:09:46 +0800
-Received: from dggpemm000003.china.huawei.com ([7.185.36.128]) by
- dggpemm000003.china.huawei.com ([7.185.36.128]) with mapi id 15.01.2106.013;
- Mon, 12 Apr 2021 12:09:46 +0800
-From:   "Zengtao (B)" <prime.zeng@hisilicon.com>
-To:     Alex Williamson <alex.williamson@redhat.com>
-CC:     "cohuck@redhat.com" <cohuck@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "jgg@nvidia.com" <jgg@nvidia.com>,
-        "peterx@redhat.com" <peterx@redhat.com>
-Subject: =?utf-8?B?562U5aSNOiBbUEFUQ0ggdjEgMDEvMTRdIHZmaW86IENyZWF0ZSB2ZmlvX2Zz?=
- =?utf-8?Q?=5Ftype_with_inode_per_device?=
-Thread-Topic: [PATCH v1 01/14] vfio: Create vfio_fs_type with inode per device
-Thread-Index: AQHXFGTEBL9vagM8VUiybsk55NZ2y6qrwTfwgAAn2gCABI/PsA==
-Date:   Mon, 12 Apr 2021 04:09:46 +0000
-Message-ID: <6a551b830c6d4850b970ab5d6d4e9f16@hisilicon.com>
-References: <161523878883.3480.12103845207889888280.stgit@gimli.home>
-        <161524004828.3480.1817334832614722574.stgit@gimli.home>
-        <d9fdf4e8435244be826782daada0fd7b@hisilicon.com>
- <20210409082400.1004fcef@x1.home.shazbot.org>
-In-Reply-To: <20210409082400.1004fcef@x1.home.shazbot.org>
-Accept-Language: zh-CN, en-US
-Content-Language: zh-CN
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.69.38.183]
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+        id S229854AbhDLEWK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 12 Apr 2021 00:22:10 -0400
+Received: from mga07.intel.com ([134.134.136.100]:53368 "EHLO mga07.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229448AbhDLEWJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 12 Apr 2021 00:22:09 -0400
+IronPort-SDR: FoYqkzv/LFzzJ+QB1ew3CltJuopGb2eqWcnF/1yzIQDeZ+JeGaK4o0o7Z2+11bi8ic/5lfItNh
+ iqRycluaGVzQ==
+X-IronPort-AV: E=McAfee;i="6000,8403,9951"; a="258083736"
+X-IronPort-AV: E=Sophos;i="5.82,214,1613462400"; 
+   d="scan'208";a="258083736"
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Apr 2021 21:21:51 -0700
+IronPort-SDR: T3JTS6xv/VQ4UVbj73NncAbScptLx2jk2XAtoh50u0vb/bK0hBltG4Ks9TM/xIQDTNjE9k447z
+ sqIGwDVpVPrw==
+X-IronPort-AV: E=Sophos;i="5.82,214,1613462400"; 
+   d="scan'208";a="521030335"
+Received: from rutujajo-mobl.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.212.194.203])
+  by fmsmga001-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Apr 2021 21:21:48 -0700
+From:   Kai Huang <kai.huang@intel.com>
+To:     kvm@vger.kernel.org, linux-sgx@vger.kernel.org
+Cc:     seanjc@google.com, pbonzini@redhat.com, bp@alien8.de,
+        jarkko@kernel.org, dave.hansen@intel.com, luto@kernel.org,
+        rick.p.edgecombe@intel.com, haitao.huang@intel.com
+Subject: [PATCH v5 00/11] KVM SGX virtualization support (KVM part)
+Date:   Mon, 12 Apr 2021 16:21:32 +1200
+Message-Id: <cover.1618196135.git.kai.huang@intel.com>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
-X-CFilter-Loop: Reflected
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-PiAtLS0tLemCruS7tuWOn+S7ti0tLS0tDQo+IOWPkeS7tuS6ujogQWxleCBXaWxsaWFtc29uIFtt
-YWlsdG86YWxleC53aWxsaWFtc29uQHJlZGhhdC5jb21dDQo+IOWPkemAgeaXtumXtDogMjAyMeW5
-tDTmnIg55pelIDIyOjI0DQo+IOaUtuS7tuS6ujogWmVuZ3RhbyAoQikgPHByaW1lLnplbmdAaGlz
-aWxpY29uLmNvbT4NCj4g5oqE6YCBOiBjb2h1Y2tAcmVkaGF0LmNvbTsga3ZtQHZnZXIua2VybmVs
-Lm9yZzsNCj4gbGludXgta2VybmVsQHZnZXIua2VybmVsLm9yZzsgamdnQG52aWRpYS5jb207IHBl
-dGVyeEByZWRoYXQuY29tDQo+IOS4u+mimDogUmU6IFtQQVRDSCB2MSAwMS8xNF0gdmZpbzogQ3Jl
-YXRlIHZmaW9fZnNfdHlwZSB3aXRoIGlub2RlIHBlciBkZXZpY2UNCj4gDQo+IE9uIEZyaSwgOSBB
-cHIgMjAyMSAwNDo1NDoyMyArMDAwMA0KPiAiWmVuZ3RhbyAoQikiIDxwcmltZS56ZW5nQGhpc2ls
-aWNvbi5jb20+IHdyb3RlOg0KPiANCj4gPiA+IC0tLS0t6YKu5Lu25Y6f5Lu2LS0tLS0NCj4gPiA+
-IOWPkeS7tuS6ujogQWxleCBXaWxsaWFtc29uIFttYWlsdG86YWxleC53aWxsaWFtc29uQHJlZGhh
-dC5jb21dDQo+ID4gPiDlj5HpgIHml7bpl7Q6IDIwMjHlubQz5pyIOeaXpSA1OjQ3DQo+ID4gPiDm
-lLbku7bkuro6IGFsZXgud2lsbGlhbXNvbkByZWRoYXQuY29tDQo+ID4gPiDmioTpgIE6IGNvaHVj
-a0ByZWRoYXQuY29tOyBrdm1Admdlci5rZXJuZWwub3JnOw0KPiA+ID4gbGludXgta2VybmVsQHZn
-ZXIua2VybmVsLm9yZzsgamdnQG52aWRpYS5jb207IHBldGVyeEByZWRoYXQuY29tDQo+ID4gPiDk
-uLvpopg6IFtQQVRDSCB2MSAwMS8xNF0gdmZpbzogQ3JlYXRlIHZmaW9fZnNfdHlwZSB3aXRoIGlu
-b2RlIHBlciBkZXZpY2UNCj4gPiA+DQo+ID4gPiBCeSBsaW5raW5nIGFsbCB0aGUgZGV2aWNlIGZk
-cyB3ZSBwcm92aWRlIHRvIHVzZXJzcGFjZSB0byBhbiBhZGRyZXNzDQo+ID4gPiBzcGFjZSB0aHJv
-dWdoIGEgbmV3IHBzZXVkbyBmcywgd2UgY2FuIHVzZSB0b29scyBsaWtlDQo+ID4gPiB1bm1hcF9t
-YXBwaW5nX3JhbmdlKCkgdG8gemFwIGFsbCB2bWFzIGFzc29jaWF0ZWQgd2l0aCBhIGRldmljZS4N
-Cj4gPiA+DQo+ID4gPiBTdWdnZXN0ZWQtYnk6IEphc29uIEd1bnRob3JwZSA8amdnQG52aWRpYS5j
-b20+DQo+ID4gPiBTaWduZWQtb2ZmLWJ5OiBBbGV4IFdpbGxpYW1zb24gPGFsZXgud2lsbGlhbXNv
-bkByZWRoYXQuY29tPg0KPiA+ID4gLS0tDQo+ID4gPiAgZHJpdmVycy92ZmlvL3ZmaW8uYyB8ICAg
-NTQNCj4gPiA+ICsrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysr
-KysrKw0KPiA+ID4gIDEgZmlsZSBjaGFuZ2VkLCA1NCBpbnNlcnRpb25zKCspDQo+ID4gPg0KPiA+
-ID4gZGlmZiAtLWdpdCBhL2RyaXZlcnMvdmZpby92ZmlvLmMgYi9kcml2ZXJzL3ZmaW8vdmZpby5j
-IGluZGV4DQo+ID4gPiAzODc3OWU2ZmQ4MGMuLmFiZGY4ZDUyYTkxMSAxMDA2NDQNCj4gPiA+IC0t
-LSBhL2RyaXZlcnMvdmZpby92ZmlvLmMNCj4gPiA+ICsrKyBiL2RyaXZlcnMvdmZpby92ZmlvLmMN
-Cj4gPiA+IEBAIC0zMiwxMSArMzIsMTggQEANCj4gPiA+ICAjaW5jbHVkZSA8bGludXgvdmZpby5o
-Pg0KPiA+ID4gICNpbmNsdWRlIDxsaW51eC93YWl0Lmg+DQo+ID4gPiAgI2luY2x1ZGUgPGxpbnV4
-L3NjaGVkL3NpZ25hbC5oPg0KPiA+ID4gKyNpbmNsdWRlIDxsaW51eC9wc2V1ZG9fZnMuaD4NCj4g
-PiA+ICsjaW5jbHVkZSA8bGludXgvbW91bnQuaD4NCj4gPiBNaW5vcjoga2VlcCB0aGUgaGVhZGVy
-cyBpbiBhbHBoYWJldGljYWwgb3JkZXIuDQo+IA0KPiBUaGV5IHN0YXJ0ZWQgb3V0IHRoYXQgd2F5
-LCBidXQgdmFyaW91cyB0cmVlLXdpZGUgY2hhbmdlcyBpZ25vcmluZyB0aGF0LCBhbmQNCj4gbGlr
-ZWx5IG92ZXJzaWdodHMgb24gbXkgcGFydCBhcyB3ZWxsLCBoYXMgbGVmdCB1cyB3aXRoIG51bWVy
-b3VzIGJyZWFrcyBpbiB0aGF0DQo+IHJ1bGUgYWxyZWFkeS4NCj4gDQo+ID4gPg0KPiA+ID4gICNk
-ZWZpbmUgRFJJVkVSX1ZFUlNJT04JIjAuMyINCj4gPiA+ICAjZGVmaW5lIERSSVZFUl9BVVRIT1IJ
-IkFsZXggV2lsbGlhbXNvbg0KPiA8YWxleC53aWxsaWFtc29uQHJlZGhhdC5jb20+Ig0KPiA+ID4g
-ICNkZWZpbmUgRFJJVkVSX0RFU0MJIlZGSU8gLSBVc2VyIExldmVsIG1ldGEtZHJpdmVyIg0KPiA+
-ID4NCj4gPiA+ICsjZGVmaW5lIFZGSU9fTUFHSUMgMHg1NjQ2NDk0ZiAvKiAiVkZJTyIgKi8NCj4g
-PiBNb3ZlIHRvIGluY2x1ZGUvdWFwaS9saW51eC9tYWdpYy5oID8NCj4gDQo+IEhtbSwgeWVhaCwg
-SSBzdXBwb3NlIGl0IHByb2JhYmx5IHNob3VsZCBnbyB0aGVyZS4gIFRoYW5rcy4NCj4gDQo+IEZX
-SVcsIEknbSBzdGlsbCB3b3JraW5nIG9uIGEgbmV4dCB2ZXJzaW9uIG9mIHRoaXMgc2VyaWVzLCBj
-dXJyZW50bHkgc3RydWdnbGluZw0KPiBob3cgdG8gaGFuZGxlIGFuIGFyYml0cmFyeSBudW1iZXIg
-b2Ygdm1hcyBwZXIgdXNlciBETUEgbWFwcGluZy4gIFRoYW5rcywNCj4gDQoNCldpbGwgZG8gc29t
-ZSB0ZXN0aW5nIG9uIG91ciBwbGF0Zm9ybSwgYW5kIHdhbnQgdG8gbWFrZSBzdXJlIHRoZSBpc3N1
-ZQ0KIEkgcmVwb3J0ZWQgaXMgaW5jbHVkZWQgOiANCiBodHRwczovL3BhdGNod29yay5rZXJuZWwu
-b3JnL3Byb2plY3Qva3ZtL3BhdGNoLzE2MTUyMDE4OTAtODg3LTEtZ2l0LXNlbmQtZW1haWwtcHJp
-bWUuemVuZ0BoaXNpbGljb24uY29tLw0KIA0KIFRoYW5rcw0KIHplbmd0YW8NCg0KDQo+IEFsZXgN
-Cg0K
+Hi Paolo, Sean,
+
+Boris has merged x86 part patches to the tip/x86/sgx. This series is KVM part
+patches. Due to some code change in x86 part patches, two KVM patches need
+update so this is the new version. Please help to review. Thanks!
+
+Specifically, x86 patch (x86/sgx: Add helpers to expose ECREATE and EINIT to
+KVM) was changed to return -EINVAL directly w/o setting trapnr when 
+access_ok()s fail on any user pointers, so KVM patches:
+
+KVM: VMX: Add SGX ENCLS[ECREATE] handler to enforce CPUID restrictions
+KVM: VMX: Add ENCLS[EINIT] handler to support SGX Launch Control (LC)
+
+were updated to handle this case.
+
+This seris was firstly based on tip/x86/sgx, and then rebased to latest
+kvm/queue, so it can be applied to kvm/queue directly now.
+
+Changelog:
+
+(Please see individual patch for changelog for specific patch)
+
+v4->v5:
+ - Addressed Sean's comments (patch 06, 07, 09 were slightly updated).
+ - Rebased to latest kvm/queue (patch 08, 11 were updated to resolve conflict).
+
+Sean Christopherson (11):
+  KVM: x86: Export kvm_mmu_gva_to_gpa_{read,write}() for SGX (VMX)
+  KVM: x86: Define new #PF SGX error code bit
+  KVM: x86: Add support for reverse CPUID lookup of scattered features
+  KVM: x86: Add reverse-CPUID lookup support for scattered SGX features
+  KVM: VMX: Add basic handling of VM-Exit from SGX enclave
+  KVM: VMX: Frame in ENCLS handler for SGX virtualization
+  KVM: VMX: Add SGX ENCLS[ECREATE] handler to enforce CPUID restrictions
+  KVM: VMX: Add emulation of SGX Launch Control LE hash MSRs
+  KVM: VMX: Add ENCLS[EINIT] handler to support SGX Launch Control (LC)
+  KVM: VMX: Enable SGX virtualization for SGX1, SGX2 and LC
+  KVM: x86: Add capability to grant VM access to privileged SGX
+    attribute
+
+ Documentation/virt/kvm/api.rst  |  23 ++
+ arch/x86/include/asm/kvm_host.h |   5 +
+ arch/x86/include/asm/vmx.h      |   1 +
+ arch/x86/include/uapi/asm/vmx.h |   1 +
+ arch/x86/kvm/Makefile           |   2 +
+ arch/x86/kvm/cpuid.c            |  89 +++++-
+ arch/x86/kvm/cpuid.h            |  50 +++-
+ arch/x86/kvm/vmx/nested.c       |  28 +-
+ arch/x86/kvm/vmx/nested.h       |   5 +
+ arch/x86/kvm/vmx/sgx.c          | 502 ++++++++++++++++++++++++++++++++
+ arch/x86/kvm/vmx/sgx.h          |  34 +++
+ arch/x86/kvm/vmx/vmcs12.c       |   1 +
+ arch/x86/kvm/vmx/vmcs12.h       |   4 +-
+ arch/x86/kvm/vmx/vmx.c          | 109 ++++++-
+ arch/x86/kvm/vmx/vmx.h          |   3 +
+ arch/x86/kvm/x86.c              |  23 ++
+ include/uapi/linux/kvm.h        |   1 +
+ 17 files changed, 858 insertions(+), 23 deletions(-)
+ create mode 100644 arch/x86/kvm/vmx/sgx.c
+ create mode 100644 arch/x86/kvm/vmx/sgx.h
+
+-- 
+2.30.2
+
