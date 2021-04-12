@@ -2,110 +2,115 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D90CC35CEFA
-	for <lists+kvm@lfdr.de>; Mon, 12 Apr 2021 18:57:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E6F6935CF1A
+	for <lists+kvm@lfdr.de>; Mon, 12 Apr 2021 19:02:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244110AbhDLQyK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 12 Apr 2021 12:54:10 -0400
-Received: from foss.arm.com ([217.140.110.172]:55888 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S245663AbhDLQv7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 12 Apr 2021 12:51:59 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id AF20512FC;
-        Mon, 12 Apr 2021 09:51:40 -0700 (PDT)
-Received: from [192.168.0.110] (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 4CB453F73B;
-        Mon, 12 Apr 2021 09:51:38 -0700 (PDT)
-Subject: Re: [PATCH v2] KVM: arm64: Fully zero the vcpu state on reset
-To:     Marc Zyngier <maz@kernel.org>,
-        linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
-        kvmarm@lists.cs.columbia.edu
-Cc:     James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Will Deacon <will@kernel.org>, kernel-team@android.com,
-        stable@vger.kernel.org
-References: <20210409173257.3031729-1-maz@kernel.org>
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <977338ef-9b06-1fec-9075-5e9cbdb89bc2@arm.com>
-Date:   Mon, 12 Apr 2021 17:51:53 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.9.0
+        id S244410AbhDLRCs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 12 Apr 2021 13:02:48 -0400
+Received: from smtp-fw-9102.amazon.com ([207.171.184.29]:16009 "EHLO
+        smtp-fw-9102.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S243659AbhDLRBo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 12 Apr 2021 13:01:44 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.de; i=@amazon.de; q=dns/txt; s=amazon201209;
+  t=1618246887; x=1649782887;
+  h=from:to:cc:subject:date:message-id:mime-version;
+  bh=rqIXEoKr8J06sdj1H8DHbETKlNN7iSR0KNAHaBFZ++A=;
+  b=SclBWRXYus0mkGCeRdXZ3YXtUZKaVogr37JxIqMhkU7N5Q3U5crEECus
+   nXf5iWOcFJ5lLp4StAidEcagIlSPpXAX6Y2VbKDCFSA4cLk/CPD2zhUeZ
+   c1u2t/ZcO8wERxbilT720jcyOH30NtYWNFI8GrP5ldWYPY8TUDmwDOA2L
+   8=;
+X-IronPort-AV: E=Sophos;i="5.82,216,1613433600"; 
+   d="scan'208";a="126988018"
+Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO email-inbound-relay-1e-42f764a0.us-east-1.amazon.com) ([10.25.36.214])
+  by smtp-border-fw-out-9102.sea19.amazon.com with ESMTP; 12 Apr 2021 17:00:59 +0000
+Received: from EX13D28EUC003.ant.amazon.com (iad12-ws-svc-p26-lb9-vlan2.iad.amazon.com [10.40.163.34])
+        by email-inbound-relay-1e-42f764a0.us-east-1.amazon.com (Postfix) with ESMTPS id D3C0DC03BD;
+        Mon, 12 Apr 2021 17:00:52 +0000 (UTC)
+Received: from uc8bbc9586ea454.ant.amazon.com (10.43.161.253) by
+ EX13D28EUC003.ant.amazon.com (10.43.164.43) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.2; Mon, 12 Apr 2021 17:00:44 +0000
+From:   Siddharth Chandrasekaran <sidcha@amazon.de>
+To:     "K. Y. Srinivasan" <kys@microsoft.com>,
+        Haiyang Zhang <haiyangz@microsoft.com>,
+        Stephen Hemminger <sthemmin@microsoft.com>,
+        Wei Liu <wei.liu@kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        <x86@kernel.org>, "H. Peter Anvin" <hpa@zytor.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        "Sean Christopherson" <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        "Joerg Roedel" <joro@8bytes.org>
+CC:     Siddharth Chandrasekaran <sidcha@amazon.de>,
+        Alexander Graf <graf@amazon.com>,
+        Evgeny Iakovlev <eyakovl@amazon.de>,
+        Liran Alon <liran@amazon.com>,
+        Ioannis Aslanidis <iaslan@amazon.de>,
+        <linux-hyperv@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <kvm@vger.kernel.org>
+Subject: [PATCH v2 0/4]  Add support for XMM fast hypercalls
+Date:   Mon, 12 Apr 2021 19:00:13 +0200
+Message-ID: <cover.1618244920.git.sidcha@amazon.de>
+X-Mailer: git-send-email 2.17.1
 MIME-Version: 1.0
-In-Reply-To: <20210409173257.3031729-1-maz@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
+Content-Type: text/plain
+X-Originating-IP: [10.43.161.253]
+X-ClientProxiedBy: EX13D16UWB001.ant.amazon.com (10.43.161.17) To
+ EX13D28EUC003.ant.amazon.com (10.43.164.43)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Marc,
+Hyper-V supports the use of XMM registers to perform fast hypercalls.
+This allows guests to take advantage of the improved performance of the
+fast hypercall interface even though a hypercall may require more than
+(the current maximum of) two general purpose registers.
 
-On 4/9/21 6:32 PM, Marc Zyngier wrote:
-> On vcpu reset, we expect all the registers to be brought back
-> to their initial state, which happens to be a bunch of zeroes.
->
-> However, some recent commit broke this, and is now leaving a bunch
-> of registers (such as the FP state) with whatever was left by the
-> guest. My bad.
->
-> Zero the reset of the state (32bit SPSRs and FPSIMD state).
->
-> Cc: stable@vger.kernel.org
-> Fixes: e47c2055c68e ("KVM: arm64: Make struct kvm_regs userspace-only")
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->
-> Notes:
->     v2: Only reset the FPSIMD state and the AArch32 SPSRs to avoid
->     corrupting CNTVOFF in creative ways.
+The XMM fast hypercall interface uses an additional six XMM registers
+(XMM0 to XMM5) to allow the caller to pass an input parameter block of
+up to 112 bytes. Hyper-V can also return data back to the guest in the
+remaining XMM registers that are not used by the current hypercall.
 
-I missed that last time, sorry.
+Although the Hyper-v TLFS mentions that a guest cannot use this feature
+unless the hypervisor advertises support for it, some hypercalls which
+we plan on upstreaming in future uses them anyway. This patchset adds
+necessary infrastructure for handling input/output via XMM registers and
+patches kvm_hv_flush_tlb() to use xmm input arguments.
 
->
->  arch/arm64/kvm/reset.c | 5 +++++
->  1 file changed, 5 insertions(+)
->
-> diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
-> index bd354cd45d28..4b5acd84b8c8 100644
-> --- a/arch/arm64/kvm/reset.c
-> +++ b/arch/arm64/kvm/reset.c
-> @@ -242,6 +242,11 @@ int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
->  
->  	/* Reset core registers */
->  	memset(vcpu_gp_regs(vcpu), 0, sizeof(*vcpu_gp_regs(vcpu)));
-> +	memset(&vcpu->arch.ctxt.fp_regs, 0, sizeof(vcpu->arch.ctxt.fp_regs));
-> +	vcpu->arch.ctxt.spsr_abt = 0;
-> +	vcpu->arch.ctxt.spsr_und = 0;
-> +	vcpu->arch.ctxt.spsr_irq = 0;
-> +	vcpu->arch.ctxt.spsr_fiq = 0;
+~ Sid.
 
-Checked, and the only fields not touched by the change from struct kvm_cpu_context
-are sys_regs and __hyp_running_cpu. __hyp_running_cpu is assumed to be NULL for a
-guest and it doesn't change during the lifetime of a VCPU; it is set to NULL when
-struct kvm_vcpu is allocated.
+v2:
+- Add hc.fast to is_xmm_fast_hypercall() check
+- Split CPUID feature bits for input and output
 
-CNTVOFF_EL2 is not accessible to userspace (it's not in the sys_reg_descs and in
-the invariant_sys_regs arrays), so it's not necessary to reset it in case
-userspace changed it. Same for the other registers that are part of the VCPU
-context, but are not in sys_reg_descs.
+Siddharth Chandrasekaran (4):
+  KVM: x86: Move FPU register accessors into fpu.h
+  KVM: hyper-v: Collect hypercall params into struct
+  KVM: x86: kvm_hv_flush_tlb use inputs from XMM registers
+  KVM: hyper-v: Advertise support for fast XMM hypercalls
 
-I think it's a good choice to skip zeroing the system registers. I compared
-vcpu->arch.ctxt.sys_regs with sys_regs_descs, there were quite a few registers
-that were part of the vcpu context (pointer authentication registers, virtual
-timer registers, and others) and not part of sys_regs_descs. If someone adds a
-register to the VCPU context, but not to sys_regs_descs, I think it would have
-been easy to miss the fact that KVM_ARM_VCPU_INIT zeroes it.
+ arch/x86/include/asm/hyperv-tlfs.h |   7 +-
+ arch/x86/kvm/emulate.c             | 138 +++-------------
+ arch/x86/kvm/fpu.h                 | 140 +++++++++++++++++
+ arch/x86/kvm/hyperv.c              | 242 +++++++++++++++++++----------
+ 4 files changed, 327 insertions(+), 200 deletions(-)
+ create mode 100644 arch/x86/kvm/fpu.h
 
-Hopefully I haven't missed anything:
+-- 
+2.17.1
 
-Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
 
-Thanks,
 
-Alex
+Amazon Development Center Germany GmbH
+Krausenstr. 38
+10117 Berlin
+Geschaeftsfuehrung: Christian Schlaeger, Jonathan Weiss
+Eingetragen am Amtsgericht Charlottenburg unter HRB 149173 B
+Sitz: Berlin
+Ust-ID: DE 289 237 879
 
->  	vcpu_gp_regs(vcpu)->pstate = pstate;
->  
->  	/* Reset system registers */
+
+
