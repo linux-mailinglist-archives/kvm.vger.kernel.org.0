@@ -2,177 +2,157 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3FF4D35C522
-	for <lists+kvm@lfdr.de>; Mon, 12 Apr 2021 13:29:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DBEAC35C584
+	for <lists+kvm@lfdr.de>; Mon, 12 Apr 2021 13:45:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240248AbhDLLaM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 12 Apr 2021 07:30:12 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:52611 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S240228AbhDLLaM (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 12 Apr 2021 07:30:12 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1618226993;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=nyeLo4FrE5zHreHQz7MasSEetE9tN3Jw9beLpfv7C+Q=;
-        b=aSAnDnidOX9HkwAZD7KpooRvdvnwB+XcFX+ocKpv2xR6mTDQ8Q8zH4kM0beZyR7ToX8fSI
-        k9ET2y+YaokWpERXU4+vm2m3ed0K7fKdNKUqDDafBX2CSAfZn0S8C3cubJUqvO6l1ntSH1
-        FeBLP4MrpQ2py+4d+LZAbmjPabOeKq4=
-Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
- [209.85.218.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-345-oRMH4OBtNGCY07f_XSvSbA-1; Mon, 12 Apr 2021 07:29:52 -0400
-X-MC-Unique: oRMH4OBtNGCY07f_XSvSbA-1
-Received: by mail-ej1-f72.google.com with SMTP id d25so3296034ejb.14
-        for <kvm@vger.kernel.org>; Mon, 12 Apr 2021 04:29:52 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=nyeLo4FrE5zHreHQz7MasSEetE9tN3Jw9beLpfv7C+Q=;
-        b=sSsDrlWq151NIH3+jRlfB8oT61hrYOYhcrpdKbdzLI/sXfmS8F+m3bbZc0niWq6Ta5
-         wbmG2G15/dHaJaRzZ3HdFaLbpeGZkmE7WamR2jyzPmr9LKZ520gm5Z7zL4oVjkXn3Sa5
-         KJWydxw54EcT6K5bdZ3FiT6b1qFUZJEiglQ5h1HFK5U7RweiC3YVsha9m2dQzAE7pAbj
-         gsaL5Unmy8u49VCDTdaHBB9hthq8lzg9OFZHrb/25DI7rkpOb04MbRevvOLBnvgocsM8
-         TH0Uowd1wIWtPQCXy1yjM0VRutUBHqROO84zQjOiwoPxIJCxhKmLjen9KTaBJ6d5hvpe
-         qKQQ==
-X-Gm-Message-State: AOAM5324opzziRoD7d6AbP+WI7pnThM9eLefqGMDuaL+oVNsVHi36Bii
-        TALAGE1JxI6rKBtTcWJOvkDl09sCOnNIiDf5qWgN7OWVm+4Gwt8KUJpKGJkikXaTCnLW1YjHmxf
-        GNjp1pw9jz/Xr
-X-Received: by 2002:a05:6402:104c:: with SMTP id e12mr28076532edu.108.1618226991138;
-        Mon, 12 Apr 2021 04:29:51 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyU49Hw6nOmYzmAj9jQhtd21t/eNOeTdT3HGIbQ8noTgP0Y7DfBr7L/L9OO7Hpodode77anZw==
-X-Received: by 2002:a05:6402:104c:: with SMTP id e12mr28076506edu.108.1618226990993;
-        Mon, 12 Apr 2021 04:29:50 -0700 (PDT)
-Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id e16sm6427109edu.94.2021.04.12.04.29.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 12 Apr 2021 04:29:50 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Siddharth Chandrasekaran <sidcha@amazon.de>
-Cc:     Alexander Graf <graf@amazon.com>,
-        Evgeny Iakovlev <eyakovl@amazon.de>,
-        linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, "K. Y. Srinivasan" <kys@microsoft.com>,
-        Haiyang Zhang <haiyangz@microsoft.com>,
-        Stephen Hemminger <sthemmin@microsoft.com>,
-        Wei Liu <wei.liu@kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>
-Subject: Re: [PATCH 4/4] KVM: hyper-v: Advertise support for fast XMM
- hypercalls
-In-Reply-To: <20210412081110.GA16796@uc8bbc9586ea454.ant.amazon.com>
-References: <20210407211954.32755-1-sidcha@amazon.de>
- <20210407211954.32755-5-sidcha@amazon.de>
- <87blap7zha.fsf@vitty.brq.redhat.com>
- <20210408142053.GA10636@u366d62d47e3651.ant.amazon.com>
- <8735w096pk.fsf@vitty.brq.redhat.com>
- <20210412081110.GA16796@uc8bbc9586ea454.ant.amazon.com>
-Date:   Mon, 12 Apr 2021 13:29:49 +0200
-Message-ID: <87czuz7nbm.fsf@vitty.brq.redhat.com>
+        id S239874AbhDLLph (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 12 Apr 2021 07:45:37 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:54102 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S237792AbhDLLpg (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 12 Apr 2021 07:45:36 -0400
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 13CBZD1E099481;
+        Mon, 12 Apr 2021 07:44:43 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : content-transfer-encoding : mime-version; s=pp1;
+ bh=zROa97CJSkAXDOF05z4b0Av2x+Xi+AT9U3HHYG8ufmY=;
+ b=S/YN7IiKGelyXqKY0i22tmArFpC34sB1LlAfdzOUEOXI0SL7f7E29TnDyvIwTkiDNOx8
+ QhV/yZjyH3iY4U0S1b+DNm3b1dIjNZ5pwdlCovk1PPuYtEWgMImTZ/iMClSl+shvw9oh
+ 3IUw7+WNqNWOrsOn2H5dy2sCcly2c6f3X06enL21DMJ+djrm492y/5hew3ikdJYXjyOd
+ Zr8AyuP2QdaHLohmnINJxkDb9b0oIgJBjwQxbpXqt/Wc9kU/hrL3+9afBPoZSjA0gwqW
+ NkF8svOo+tfKVv7EjU7s72Yt38KpMt66RXwiT7EuWGBgsDmKknR2fua0VdZyXNE6CW/6 XQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 37vkphcdpd-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 12 Apr 2021 07:44:43 -0400
+Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 13CBZcWe100457;
+        Mon, 12 Apr 2021 07:44:43 -0400
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 37vkphcdmv-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 12 Apr 2021 07:44:43 -0400
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 13CBiNr1006407;
+        Mon, 12 Apr 2021 11:44:40 GMT
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
+        by ppma04ams.nl.ibm.com with ESMTP id 37u3n8srn3-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 12 Apr 2021 11:44:40 +0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 13CBicZq41484710
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 12 Apr 2021 11:44:38 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 7811FAE045;
+        Mon, 12 Apr 2021 11:44:38 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id AAE58AE053;
+        Mon, 12 Apr 2021 11:44:34 +0000 (GMT)
+Received: from bangoria.ibmuc.com (unknown [9.199.37.145])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Mon, 12 Apr 2021 11:44:34 +0000 (GMT)
+From:   Ravi Bangoria <ravi.bangoria@linux.ibm.com>
+To:     paulus@samba.org, david@gibson.dropbear.id.au
+Cc:     ravi.bangoria@linux.ibm.com, mpe@ellerman.id.au, mikey@neuling.org,
+        pbonzini@redhat.com, mst@redhat.com, clg@kaod.org,
+        qemu-ppc@nongnu.org, qemu-devel@nongnu.org, kvm@vger.kernel.org,
+        cohuck@redhat.com, groug@kaod.org
+Subject: [PATCH v5 0/3] ppc: Enable 2nd DAWR support on Power10
+Date:   Mon, 12 Apr 2021 17:14:30 +0530
+Message-Id: <20210412114433.129702-1-ravi.bangoria@linux.ibm.com>
+X-Mailer: git-send-email 2.30.2
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: 9VwWoDvnhcUD0pSTkFrnUVwF-rNHsrwX
+X-Proofpoint-ORIG-GUID: 2iGnkR8121EAucctxYslK97SjSRNfqM7
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 MIME-Version: 1.0
-Content-Type: text/plain
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.761
+ definitions=2021-04-12_09:2021-04-12,2021-04-12 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 spamscore=0
+ impostorscore=0 malwarescore=0 mlxlogscore=999 mlxscore=0
+ lowpriorityscore=0 clxscore=1015 adultscore=0 phishscore=0
+ priorityscore=1501 bulkscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2104060000 definitions=main-2104120079
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Siddharth Chandrasekaran <sidcha@amazon.de> writes:
+This series enables 2nd DAWR support on p10 qemu guest. 2nd
+DAWR is new watchpoint added in Power10 processor. Kernel/kvm
+patches are already in[1]. Watchpoint on powerpc TCG guest is
+not supported and thus 2nd DAWR is not enabled for TCG mode.
 
-> On Thu, Apr 08, 2021 at 04:44:23PM +0200, Vitaly Kuznetsov wrote:
->> Siddharth Chandrasekaran <sidcha@amazon.de> writes:
->> > On Thu, Apr 08, 2021 at 02:05:53PM +0200, Vitaly Kuznetsov wrote:
->> >> Siddharth Chandrasekaran <sidcha@amazon.de> writes:
->> >> > Now that all extant hypercalls that can use XMM registers (based on
->> >> > spec) for input/outputs are patched to support them, we can start
->> >> > advertising this feature to guests.
->> >> >
->> >> > Cc: Alexander Graf <graf@amazon.com>
->> >> > Cc: Evgeny Iakovlev <eyakovl@amazon.de>
->> >> > Signed-off-by: Siddharth Chandrasekaran <sidcha@amazon.de>
->> >> > ---
->> >> >  arch/x86/include/asm/hyperv-tlfs.h | 4 ++--
->> >> >  arch/x86/kvm/hyperv.c              | 1 +
->> >> >  2 files changed, 3 insertions(+), 2 deletions(-)
->> >> >
->> >> > diff --git a/arch/x86/include/asm/hyperv-tlfs.h b/arch/x86/include/asm/hyperv-tlfs.h
->> >> > index e6cd3fee562b..1f160ef60509 100644
->> >> > --- a/arch/x86/include/asm/hyperv-tlfs.h
->> >> > +++ b/arch/x86/include/asm/hyperv-tlfs.h
->> >> > @@ -49,10 +49,10 @@
->> >> >  /* Support for physical CPU dynamic partitioning events is available*/
->> >> >  #define HV_X64_CPU_DYNAMIC_PARTITIONING_AVAILABLE    BIT(3)
->> >> >  /*
->> >> > - * Support for passing hypercall input parameter block via XMM
->> >> > + * Support for passing hypercall input and output parameter block via XMM
->> >> >   * registers is available
->> >> >   */
->> >> > -#define HV_X64_HYPERCALL_PARAMS_XMM_AVAILABLE                BIT(4)
->> >> > +#define HV_X64_HYPERCALL_PARAMS_XMM_AVAILABLE                BIT(4) | BIT(15)
->> >>
->> >> TLFS 6.0b states that there are two distinct bits for input and output:
->> >>
->> >> CPUID Leaf 0x40000003.EDX:
->> >> Bit 4: support for passing hypercall input via XMM registers is available.
->> >> Bit 15: support for returning hypercall output via XMM registers is available.
->> >>
->> >> and HV_X64_HYPERCALL_PARAMS_XMM_AVAILABLE is not currently used
->> >> anywhere, I'd suggest we just rename
->> >>
->> >> HV_X64_HYPERCALL_PARAMS_XMM_AVAILABLE to HV_X64_HYPERCALL_XMM_INPUT_AVAILABLE
->> >> and add HV_X64_HYPERCALL_XMM_OUTPUT_AVAILABLE (bit 15).
->> >
->> > That is how I had it initially; but then noticed that we would never
->> > need to use either of them separately. So it seemed like a reasonable
->> > abstraction to put them together.
->> >
->> 
->> Actually, we may. In theory, KVM userspace may decide to expose just
->> one of these two to the guest as it is not obliged to copy everything
->> from KVM_GET_SUPPORTED_HV_CPUID so we will need separate
->> guest_cpuid_has() checks.
->
-> Looks like guest_cpuid_has() check is for x86 CPU features only (if I'm
-> not mistaken) and I don't see a suitable alternative that looks into
-> vcpu->arch.cpuid_entries[]. So I plan to add a new method
-> hv_guest_cpuid_has() in hyperv.c to have this check; does that sound
-> right to you?
-> If you can give a quick go-ahead, I'll make the changes requested so
-> far and send v2 this series.
+Patches apply fine on qemu/master branch (f2afdc2ad94b).
 
-Sorry my mistake, guest_cpuid_has() was the wrong function to name. In the
-meantime I started working on fine-grained access to the existing
-Hyper-V enlightenments as well and I think the best approach would be to
-cache CPUID 0x40000003 (EAX, EBX, EDX) in kvm_hv_set_cpuid()  to avoid
-looping through all guest CPUID entries on every hypercall. Your check
-will then look like
+v4: https://lore.kernel.org/r/20210406053833.282907-1-ravi.bangoria@linux.ibm.com
+v3->v4:
+  - Make error message more proper.
 
- if (hv_vcpu->cpuid_cache.features_edx & HV_X64_HYPERCALL_XMM_INPUT_AVAILABLE)
- ...
+v3: https://lore.kernel.org/r/20210330095350.36309-1-ravi.bangoria@linux.ibm.com
+v3->v4:
+  - spapr_dt_pa_features(): POWER10 processor is compatible with 3.0
+    (PCR_COMPAT_3_00). No need to ppc_check_compat(3_10) for now as
+    ppc_check_compati(3_00) will also be true. ppc_check_compat(3_10)
+    can be added while introducing pa_features_310 in future.
+  - Use error_append_hint() for hints. Also add ERRP_GUARD().
+  - Add kvmppc_set_cap_dawr1() stub function for CONFIG_KVM=n.
 
+v2: https://lore.kernel.org/r/20210329041906.213991-1-ravi.bangoria@linux.ibm.com
+v2->v3:
+  - Don't introduce pa_features_310[], instead, reuse pa_features_300[]
+    for 3.1 guests, as there is no difference between initial values of
+    them atm.
+  - Call gen_spr_book3s_310_dbg() from init_proc_POWER10() instead of
+    init_proc_POWER8(). Also, Don't call gen_spr_book3s_207_dbg() from
+    gen_spr_book3s_310_dbg() as init_proc_POWER10() already calls it.
 
- if (hv_vcpu->cpuid_cache.features_edx & HV_X64_HYPERCALL_XMM_OUTPUT_AVAILABLE)
- ...
+v1: https://lore.kernel.org/r/20200723104220.314671-1-ravi.bangoria@linux.ibm.com
+[Apologies for long gap]
+v1->v2:
+  - Introduce machine capability cap-dawr1 to enable/disable
+    the feature. By default, 2nd DAWR is OFF for guests even
+    when host kvm supports it. User has to manually enable it
+    with -machine cap-dawr1=on if he wishes to use it.
+  - Split the header file changes into separate patch. (Sync
+    headers from v5.12-rc3)
 
-We can wrap this into a hv_guest_cpuid_has() helper indeed, it'll look like:
+[1] https://git.kernel.org/torvalds/c/bd1de1a0e6eff
 
- if (hv_guest_cpuid_has(vcpu, HYPERV_CPUID_FEATURES, CPUID_EDX, HV_X64_HYPERCALL_XMM_INPUT_AVAILABLE))
- ...
+Ravi Bangoria (3):
+  Linux headers: update from 5.12-rc3
+  ppc: Rename current DAWR macros and variables
+  ppc: Enable 2nd DAWR support on p10
 
-but I'm not sure it's worth it, maybe raw check is shorter and better.
-
-I plan to send something out in a day or two, I'll Cc: you. Feel free to
-do v2 without this, if your series gets merged first I can just add the
-'fine-grained access' to mine.
-
-Thanks!
+ hw/ppc/spapr.c                                |  7 +-
+ hw/ppc/spapr_caps.c                           | 32 +++++++
+ include/hw/ppc/spapr.h                        |  8 +-
+ include/standard-headers/drm/drm_fourcc.h     | 23 ++++-
+ include/standard-headers/linux/input.h        |  2 +-
+ .../standard-headers/rdma/vmw_pvrdma-abi.h    |  7 ++
+ linux-headers/asm-generic/unistd.h            |  4 +-
+ linux-headers/asm-mips/unistd_n32.h           |  1 +
+ linux-headers/asm-mips/unistd_n64.h           |  1 +
+ linux-headers/asm-mips/unistd_o32.h           |  1 +
+ linux-headers/asm-powerpc/kvm.h               |  2 +
+ linux-headers/asm-powerpc/unistd_32.h         |  1 +
+ linux-headers/asm-powerpc/unistd_64.h         |  1 +
+ linux-headers/asm-s390/unistd_32.h            |  1 +
+ linux-headers/asm-s390/unistd_64.h            |  1 +
+ linux-headers/asm-x86/kvm.h                   |  1 +
+ linux-headers/asm-x86/unistd_32.h             |  1 +
+ linux-headers/asm-x86/unistd_64.h             |  1 +
+ linux-headers/asm-x86/unistd_x32.h            |  1 +
+ linux-headers/linux/kvm.h                     | 89 +++++++++++++++++++
+ linux-headers/linux/vfio.h                    | 27 ++++++
+ target/ppc/cpu.h                              |  6 +-
+ target/ppc/kvm.c                              | 12 +++
+ target/ppc/kvm_ppc.h                          | 12 +++
+ target/ppc/translate_init.c.inc               | 19 +++-
+ 25 files changed, 250 insertions(+), 11 deletions(-)
 
 -- 
-Vitaly
+2.17.1
 
