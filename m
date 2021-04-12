@@ -2,118 +2,134 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D922135CAB1
-	for <lists+kvm@lfdr.de>; Mon, 12 Apr 2021 18:04:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C120135CABA
+	for <lists+kvm@lfdr.de>; Mon, 12 Apr 2021 18:05:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243042AbhDLQE1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 12 Apr 2021 12:04:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47486 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242868AbhDLQEZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 12 Apr 2021 12:04:25 -0400
-Received: from mail-pg1-x534.google.com (mail-pg1-x534.google.com [IPv6:2607:f8b0:4864:20::534])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4AECFC061574
-        for <kvm@vger.kernel.org>; Mon, 12 Apr 2021 09:04:07 -0700 (PDT)
-Received: by mail-pg1-x534.google.com with SMTP id z16so9751509pga.1
-        for <kvm@vger.kernel.org>; Mon, 12 Apr 2021 09:04:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=JBvLAe+XdwyC1TahhE2etbWctmaxYBIUWvV5rmz141I=;
-        b=iP2BummN96o3Ez8aj7V9/rOfsPo8UnTnLCwQVbYCglNGVspy6LsiU1mUu4Y41zmXKu
-         taawvpF5xCOgJFc5Qmz1GCLztVn8ao0dJMHcYBmTf3JzFmQg6DoyPQr3BU1mv9GLAKkr
-         VcMBBq2+t4OjMccea/TY0zBqiIfOzdUcrxVVyTnlGcIpy7Q+HBHbw5oBvvmO6gwcm9Uu
-         jwJKM1dM8a88MjHK4t2lik4OT7cq83tXjotwfEfB0ThjwoPLZo5+VuKx0lH5O5rtDSEU
-         RU1GIMh+SOVczf5cJU/YGCl4nqVGlOYXHOG6JJB+4nZzrSDoCeNA6tOfOLsDKHObcggc
-         DmzA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=JBvLAe+XdwyC1TahhE2etbWctmaxYBIUWvV5rmz141I=;
-        b=eivTSvvQHGgxbLcPWaAWFyJwnzNNdP+g/YJhARBFI3D3bzYa5q3MEIeb2ufkA317tE
-         8a4bsxtDFTxtg3/dwvmD43wLAWDJ1rzS16slPvxfEMyi3QWiCiDuUrv8EENbfsxT8Zhd
-         e6kPf34A0lmUreDhXdpBnbdm8qoFtKKT9qcK03QGwXoQy7Mlg2zVPs3pOvXkL895kLVk
-         2WCvuR0yRWw9xxLoT3WiRzWmJevW+lZtWl3u4aKkA+b73fGsusuwKGMp9PIoWdO7fc8M
-         6lNdKIHL82JUkmuRQPNj+sWOK4fDAC2CwGhQNSKFoEtxP0lcdFVy5vyoqPmxTJQk10iC
-         /9OA==
-X-Gm-Message-State: AOAM531YakVHlN3FPJ2EU1tQbCWMTUYBzH4YBLZQ150UOQ2AiFKDXalE
-        8mE0yhdwAcxmEdgRC2DSuUfnqg==
-X-Google-Smtp-Source: ABdhPJxhOXb9IE7zbrpJuSGroimic3OsWCTWvzSPzW/IeB9YaZiZiXzrb8oqA2lnlZXfDq9mXWEk7A==
-X-Received: by 2002:a63:6cc:: with SMTP id 195mr28628134pgg.153.1618243446756;
-        Mon, 12 Apr 2021 09:04:06 -0700 (PDT)
-Received: from google.com (240.111.247.35.bc.googleusercontent.com. [35.247.111.240])
-        by smtp.gmail.com with ESMTPSA id ev24sm8085263pjb.9.2021.04.12.09.04.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 12 Apr 2021 09:04:05 -0700 (PDT)
-Date:   Mon, 12 Apr 2021 16:04:02 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     David Edmondson <david.edmondson@oracle.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Joerg Roedel <joro@8bytes.org>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Jim Mattson <jmattson@google.com>,
-        Ingo Molnar <mingo@redhat.com>,
-        Joao Martins <joao.m.martins@oracle.com>,
-        Aaron Lewis <aaronlewis@google.com>
-Subject: Re: [PATCH 5/6] KVM: SVM: pass a proper reason in
- kvm_emulate_instruction()
-Message-ID: <YHRvchkUSIeU8tRR@google.com>
-References: <20210412130938.68178-1-david.edmondson@oracle.com>
- <20210412130938.68178-6-david.edmondson@oracle.com>
+        id S243217AbhDLQGN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 12 Apr 2021 12:06:13 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:20686 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S240732AbhDLQGK (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 12 Apr 2021 12:06:10 -0400
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 13CG4SUt096045;
+        Mon, 12 Apr 2021 12:05:52 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : content-transfer-encoding : mime-version; s=pp1;
+ bh=GV4FlGfQXJpJ7BggiAQ7ShtsLJvuaLMzOPcWEaPWkVc=;
+ b=tp4rbRMddBJiMMFqpm9oV8l+ZJwrE74nrULhr5tzJ36VxCkL3n2EvIyiC6ZoHqlIFmor
+ 8NandfbQz4ByVW8v6LztEvRz1NbCXDHfnDvGt2EVx/NyRKSi7vwKrfNsXw2DKwUNuxjp
+ ERAqUhHbj3rdDDXC5gsVEeybkRldMql0TkgQa9VMd3fQqKqWxSqY6Ty6pwdcERLAh/cu
+ MSi+GtrI3Lzjwd3d80R6jZCRvIG59JBpjb/MbT5L9sYQyySGeD3ywhZF3NShQrrVd4UI
+ X+ivWwPYziIfG7R/L+QgMTXTQyh9k3zI1eu/nqi1gz6ITLC3+uTlFxQHvPjdG2e6BsHY iQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 37vkde6tn9-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 12 Apr 2021 12:05:52 -0400
+Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 13CG5NcT103142;
+        Mon, 12 Apr 2021 12:05:51 -0400
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 37vkde6tk8-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 12 Apr 2021 12:05:51 -0400
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 13CFqCdI029750;
+        Mon, 12 Apr 2021 16:05:49 GMT
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
+        by ppma03ams.nl.ibm.com with ESMTP id 37u3n89y1s-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 12 Apr 2021 16:05:49 +0000
+Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 13CG5kZc30867920
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 12 Apr 2021 16:05:46 GMT
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 276F511C050;
+        Mon, 12 Apr 2021 16:05:46 +0000 (GMT)
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 15AB911C054;
+        Mon, 12 Apr 2021 16:05:46 +0000 (GMT)
+Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
+        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
+        Mon, 12 Apr 2021 16:05:46 +0000 (GMT)
+Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 25651)
+        id C9AC1E02A6; Mon, 12 Apr 2021 18:05:45 +0200 (CEST)
+From:   Christian Borntraeger <borntraeger@de.ibm.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     KVM <kvm@vger.kernel.org>, Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        linux-s390 <linux-s390@vger.kernel.org>,
+        Christian Borntraeger <borntraeger@de.ibm.com>
+Subject: [GIT PULL 0/7] KVM: s390: Updates for 5.13
+Date:   Mon, 12 Apr 2021 18:05:38 +0200
+Message-Id: <20210412160545.231194-1-borntraeger@de.ibm.com>
+X-Mailer: git-send-email 2.30.2
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: KV8HIJTj25eAiOhQqv-vqhYhU6rXRScC
+X-Proofpoint-ORIG-GUID: dSMjm8eYpxk2xS6lPYu4Iud-hIwW5V5h
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210412130938.68178-6-david.edmondson@oracle.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.761
+ definitions=2021-04-12_11:2021-04-12,2021-04-12 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 lowpriorityscore=0
+ suspectscore=0 adultscore=0 impostorscore=0 priorityscore=1501
+ malwarescore=0 spamscore=0 clxscore=1015 bulkscore=0 mlxlogscore=999
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2104060000 definitions=main-2104120102
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-+Aaron
+Paolo,
 
-On Mon, Apr 12, 2021, David Edmondson wrote:
-> From: Joao Martins <joao.m.martins@oracle.com>
-> 
-> Declare various causes of emulation and use them as appropriate.
-> 
-> Signed-off-by: Joao Martins <joao.m.martins@oracle.com>
-> Signed-off-by: David Edmondson <david.edmondson@oracle.com>
-> ---
->  arch/x86/include/asm/kvm_host.h |  6 ++++++
->  arch/x86/kvm/svm/avic.c         |  3 ++-
->  arch/x86/kvm/svm/svm.c          | 26 +++++++++++++++-----------
->  3 files changed, 23 insertions(+), 12 deletions(-)
-> 
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index 79e9ca756742..e1284680cbdc 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -1535,6 +1535,12 @@ enum {
->  	EMULREASON_IO_COMPLETE,
->  	EMULREASON_UD,
->  	EMULREASON_PF,
-> +	EMULREASON_SVM_NOASSIST,
-> +	EMULREASON_SVM_RSM,
-> +	EMULREASON_SVM_RDPMC,
-> +	EMULREASON_SVM_CR,
-> +	EMULREASON_SVM_DR,
-> +	EMULREASON_SVM_AVIC_UNACCEL,
+only small things for 5.13, one is a fix (with cc stable) consisting of
+multiple patches. I had it running in next for a while since this is
+a pretty complicated area of the architecture but its now good to go.
 
-Passing these to userspace arguably makes them ABI, i.e. they need to go into
-uapi/kvm.h somewhere.  That said, I don't like passing arbitrary values for what
-is effectively the VM-Exit reason.  Why not simply pass the exit reason, assuming
-we do indeed want to dump this info to userspace?
+The following changes since commit a38fd8748464831584a19438cbb3082b5a2dab15:
 
-What is the intended end usage of this information?  Actual emulation?  Debug?
-Logging?
+  Linux 5.12-rc2 (2021-03-05 17:33:41 -0800)
 
-Depending on what you're trying to do with the info, maybe there's a better
-option.  E.g. Aaron is working on a series that includes passing pass the code
-stream (instruction bytes) to userspace on emulation failure, though I'm not
-sure if he's planning on providing the VM-Exit reason.
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/kvms390/linux.git  tags/kvm-s390-next-5.13-1
+
+for you to fetch changes up to c3171e94cc1cdcc3229565244112e869f052b8d9:
+
+  KVM: s390: VSIE: fix MVPG handling for prefixing and MSO (2021-03-24 10:31:55 +0100)
+
+----------------------------------------------------------------
+KVM: s390: Updates for 5.13
+
+- properly handle MVPG in nesting KVM (vsie)
+- allow to forward the yield_to hypercall (diagnose 9c)
+- fixes
+
+----------------------------------------------------------------
+Bhaskar Chowdhury (1):
+      KVM: s390: Fix comment spelling in kvm_s390_vcpu_start()
+
+Claudio Imbrenda (5):
+      KVM: s390: split kvm_s390_logical_to_effective
+      KVM: s390: extend kvm_s390_shadow_fault to return entry pointer
+      KVM: s390: VSIE: correctly handle MVPG when in VSIE
+      KVM: s390: split kvm_s390_real_to_abs
+      KVM: s390: VSIE: fix MVPG handling for prefixing and MSO
+
+Pierre Morel (1):
+      KVM: s390: diag9c (directed yield) forwarding
+
+ Documentation/virt/kvm/s390-diag.rst |  33 +++++++++++
+ arch/s390/include/asm/kvm_host.h     |   1 +
+ arch/s390/include/asm/smp.h          |   1 +
+ arch/s390/kernel/smp.c               |   1 +
+ arch/s390/kvm/diag.c                 |  31 +++++++++-
+ arch/s390/kvm/gaccess.c              |  30 ++++++++--
+ arch/s390/kvm/gaccess.h              |  60 ++++++++++++++-----
+ arch/s390/kvm/kvm-s390.c             |   8 ++-
+ arch/s390/kvm/kvm-s390.h             |   8 +++
+ arch/s390/kvm/vsie.c                 | 109 ++++++++++++++++++++++++++++++++---
+ 10 files changed, 250 insertions(+), 32 deletions(-)
