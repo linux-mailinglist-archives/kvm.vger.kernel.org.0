@@ -2,127 +2,130 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 928B435C74E
-	for <lists+kvm@lfdr.de>; Mon, 12 Apr 2021 15:14:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 175C935C7F0
+	for <lists+kvm@lfdr.de>; Mon, 12 Apr 2021 15:49:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241722AbhDLNOU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 12 Apr 2021 09:14:20 -0400
-Received: from mga05.intel.com ([192.55.52.43]:29917 "EHLO mga05.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S241101AbhDLNOT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 12 Apr 2021 09:14:19 -0400
-IronPort-SDR: UxlR4zUjgf+rSliUWqRMIq0zrX22fyqclb53IGh2P4cjsu+Wg0lbzSIII7SOOE8Jz6vlxo0KEv
- VFIRBEpgz8oQ==
-X-IronPort-AV: E=McAfee;i="6000,8403,9952"; a="279486727"
-X-IronPort-AV: E=Sophos;i="5.82,216,1613462400"; 
-   d="scan'208";a="279486727"
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Apr 2021 06:13:33 -0700
-IronPort-SDR: kFhsr/qPtNDuI/5nmHJbXbftuixI/WLpD7HAG0u7ChzYnzqTZX4dKTpmVJXGA50ywlFn2MTwhJ
- 6wbHgT9MGEnQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.82,216,1613462400"; 
-   d="scan'208";a="521178063"
-Received: from local-michael-cet-test.sh.intel.com (HELO localhost) ([10.239.159.166])
-  by fmsmga001.fm.intel.com with ESMTP; 12 Apr 2021 06:13:31 -0700
-Date:   Mon, 12 Apr 2021 21:25:51 +0800
-From:   Yang Weijiang <weijiang.yang@intel.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Yang Weijiang <weijiang.yang@intel.com>, kvm@vger.kernel.org
-Subject: Re: [PATCH] [kvm-unit-tests PATCH] x86/access: Fix intermittent test
- failure
-Message-ID: <20210412132551.GA20077@local-michael-cet-test.sh.intel.com>
-References: <20210409075518.32065-1-weijiang.yang@intel.com>
- <1c641daa-c11d-69b6-e63b-ff7d0576c093@redhat.com>
- <YHCkIRvXAFmS/hUn@google.com>
+        id S242027AbhDLNtg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 12 Apr 2021 09:49:36 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:52668 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S237043AbhDLNte (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 12 Apr 2021 09:49:34 -0400
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 13CDZCtO049495;
+        Mon, 12 Apr 2021 09:49:17 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=to : cc : references :
+ from : subject : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=2oOcGSPSGoDy5NhJdmam44Bu6upQ3ur1+giSabjybZs=;
+ b=Qd7DLYmridpDnHJcyH8QWtByL5h8ub+wpD4IDi8xXkFqfxGNn6vlp42t7kHn79dnvXkO
+ vEyxEt4fc38rkSWIj6gH2DmboVdI4AmTXmPiHPExrKAnvP1nxKfwR7ATPz6cbwnWUIYJ
+ PYcFaMwytqF1Un16UZkaPUZg7WlxnrlPhaud5Vq2weFoEBj9/wpVz++Wr2VOK/Tzl0f1
+ qUKhzdDh3pe7vOvQQGFPW2E4+BBwkgkBw5y6pkGKQw5pj4ZTgkyPViuL1nFT0/C8QfS2
+ 3u+4VKgxXk1MZRo10YgZDkWyXP2LUbr15CfKHXGpNB3ICB5BgRSD8wLzTh9BuEBsBQff ag== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 37us2v5t7m-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 12 Apr 2021 09:49:16 -0400
+Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 13CDZQb7050634;
+        Mon, 12 Apr 2021 09:49:16 -0400
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 37us2v5t6m-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 12 Apr 2021 09:49:16 -0400
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+        by ppma06ams.nl.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 13CDm2TU006298;
+        Mon, 12 Apr 2021 13:49:14 GMT
+Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
+        by ppma06ams.nl.ibm.com with ESMTP id 37u39hhv75-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 12 Apr 2021 13:49:13 +0000
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 13CDmmK037945700
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 12 Apr 2021 13:48:49 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id A9B26A4053;
+        Mon, 12 Apr 2021 13:49:10 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 42842A404D;
+        Mon, 12 Apr 2021 13:49:10 +0000 (GMT)
+Received: from [9.145.90.160] (unknown [9.145.90.160])
+        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Mon, 12 Apr 2021 13:49:10 +0000 (GMT)
+To:     Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     linux-s390@vger.kernel.org, david@redhat.com, thuth@redhat.com,
+        cohuck@redhat.com, pmorel@linux.ibm.com
+References: <20210407124209.828540-1-imbrenda@linux.ibm.com>
+ <20210407124209.828540-6-imbrenda@linux.ibm.com>
+From:   Janosch Frank <frankja@linux.ibm.com>
+Subject: Re: [kvm-unit-tests PATCH v3 5/7] s390x: lib: add PGM_TEID_* macros
+Message-ID: <641fc1a7-08bb-6052-8686-9ba15f270204@linux.ibm.com>
+Date:   Mon, 12 Apr 2021 15:49:09 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.8.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YHCkIRvXAFmS/hUn@google.com>
-User-Agent: Mutt/1.11.3 (2019-02-01)
+In-Reply-To: <20210407124209.828540-6-imbrenda@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: Kk_JV_zowvI85jHK17ZHKjxuL7-NfVOM
+X-Proofpoint-GUID: LBjuJPLekTvYYdQbiC4yBiWLeDiMfhM9
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.761
+ definitions=2021-04-12_10:2021-04-12,2021-04-12 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 mlxscore=0
+ lowpriorityscore=0 clxscore=1015 impostorscore=0 malwarescore=0
+ mlxlogscore=999 suspectscore=0 priorityscore=1501 adultscore=0
+ phishscore=0 spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2104060000 definitions=main-2104120091
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Apr 09, 2021 at 06:59:45PM +0000, Sean Christopherson wrote:
-> On Fri, Apr 09, 2021, Paolo Bonzini wrote:
-> > On 09/04/21 09:55, Yang Weijiang wrote:
-> > > During kvm-unit-test, below failure pattern is observed, this is due to testing thread
-> > > migration + cache "lazy" flush during test, so forcely flush the cache to avoid the issue.
-> > > Pin the test app to certain physical CPU can fix the issue as well. The error report is
-> > > misleading, pke is the victim of the issue.
-> > > 
-> > > test user cr4.pke: FAIL: error code 5 expected 4
-> > > Dump mapping: address: 0x123400000000
-> > > ------L4: 21ea007
-> > > ------L3: 21eb007
-> > > ------L2: 21ec000
-> > > ------L1: 2000000
-> > > 
-> > > Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
-> > > ---
-> > >   x86/access.c | 2 ++
-> > >   1 file changed, 2 insertions(+)
-> > > 
-> > > diff --git a/x86/access.c b/x86/access.c
-> > > index 7dc9eb6..379d533 100644
-> > > --- a/x86/access.c
-> > > +++ b/x86/access.c
-> > > @@ -211,6 +211,8 @@ static unsigned set_cr4_smep(int smep)
-> > >           ptl2[2] |= PT_USER_MASK;
-> > >       if (!r)
-> > >           shadow_cr4 = cr4;
-> > > +
-> > > +    invlpg((void *)(ptl2[2] & ~PAGE_SIZE));
-> > >       return r;
-> > >   }
-> > > 
-> > 
-> > Applied, thanks.
+On 4/7/21 2:42 PM, Claudio Imbrenda wrote:
+> Add PGM_TEID_* macros, to select TEID fields from various types of
+> translation and protection exceptions.
 > 
-> Egad, I can't keep up with this new Paolo :-D
+> Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+> ---
+>  lib/s390x/asm/interrupt.h | 6 ++++++
+>  1 file changed, 6 insertions(+)
 > 
-> 
-> Would it also work to move the existing invlpg() into ac_test_do_access()?
->
-Hi, Sean,
-You patch works for the app on my side, but one thing makes my confused, my patch
-invalidates the mapping for test code(ac_test_do_access), but your patch invlidates
-at->virt, they're not mapped to the same page. Why it works?
+> diff --git a/lib/s390x/asm/interrupt.h b/lib/s390x/asm/interrupt.h
+> index bf0eb40d..d32aacb2 100644
+> --- a/lib/s390x/asm/interrupt.h
+> +++ b/lib/s390x/asm/interrupt.h
+> @@ -13,6 +13,12 @@
+>  #define EXT_IRQ_EXTERNAL_CALL	0x1202
+>  #define EXT_IRQ_SERVICE_SIG	0x2401
+>  
+> +#define PGM_TEID_ADDR		PAGE_MASK
+> +#define PGM_TEID_AI		0x003
 
-I simplified the test by only executing two patterns as below:
+ASCEID
 
-printf("\n############# start test ############\n\n");
-at.flags = 0x8000000;
-ac_test_exec(&at, &pool);
-at.flags = 0x200000; /* or 0x10200000 */
-ac_test_exec(&at, &pool);
-printf("############# end test ############\n\n");
+> +#define PGM_TEID_M		0x004
 
-with your patch I still got error code 5 while getting  error code 4 with my patch.
-What makes it different?
+MVPGI? or MVPGIND
 
-> diff --git a/x86/access.c b/x86/access.c
-> index 7dc9eb6..5f335dd 100644
-> --- a/x86/access.c
-> +++ b/x86/access.c
-> @@ -451,8 +451,6 @@ fault:
-> 
->  static void ac_set_expected_status(ac_test_t *at)
->  {
-> -    invlpg(at->virt);
-> -
->      if (at->ptep)
->         at->expected_pte = *at->ptep;
->      at->expected_pde = *at->pdep;
-> @@ -658,6 +656,9 @@ static int ac_test_do_access(ac_test_t *at)
-> 
->      set_cr4_smep(F(AC_CPU_CR4_SMEP));
-> 
-> +    /* Flush after _all_ setup is done, toggling SMEP may also modify PMDs. */
-> +    invlpg(at->virt);
+> +#define PGM_TEID_A		0x008
+
+ACCESL?
+
+> +#define PGM_TEID_FS		0xc00
+
+You don't use that one, right?
+And even if you did you'd need one for store and fetch each for it to be
+useful.
+
+
+TLDR: Those abbreviations are too short
+
 > +
->      if (F(AC_ACCESS_TWICE)) {
->         asm volatile (
->             "mov $fixed2, %%rsi \n\t
+>  void register_pgm_cleanup_func(void (*f)(void));
+>  void handle_pgm_int(struct stack_frame_int *stack);
+>  void handle_ext_int(struct stack_frame_int *stack);
+> 
+
