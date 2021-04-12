@@ -2,127 +2,76 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id AC37135C34B
-	for <lists+kvm@lfdr.de>; Mon, 12 Apr 2021 12:06:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2BB1335C37E
+	for <lists+kvm@lfdr.de>; Mon, 12 Apr 2021 12:15:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239168AbhDLKDk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 12 Apr 2021 06:03:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51864 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244405AbhDLKA2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 12 Apr 2021 06:00:28 -0400
-Received: from mail-ed1-x532.google.com (mail-ed1-x532.google.com [IPv6:2a00:1450:4864:20::532])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5D1CFC06138E
-        for <kvm@vger.kernel.org>; Mon, 12 Apr 2021 03:00:08 -0700 (PDT)
-Received: by mail-ed1-x532.google.com with SMTP id 18so14335545edx.3
-        for <kvm@vger.kernel.org>; Mon, 12 Apr 2021 03:00:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance-com.20150623.gappssmtp.com; s=20150623;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=QxwWcvoZimdUpeMmS0ttHFmxJVwAZhHYr74miAUwCbM=;
-        b=oFeWl3I0YH45zNyIE2HImZ3isTqDrhfIysj0EQcj9tqRjX1s/IEPFDmkjhYEPJtL4k
-         PQiRwPRyWCTGG7FagoelZWJYC2L0CXSqDzZjrPMQibHuOiYlW81mKKgqvrwVMHS74R1u
-         Z52Tq560QpgxqmgTCLDAD8q4OyGtnDMGnb2iiak1O/PiF++Xn0u4qT8SY9rHMPzhxnpk
-         wpVvtDD7jDg95I+J38e19L6rdWmOqS3yuukdOHX6JFmOG7GwR9VdLTpUGeMt1DKvrmt/
-         TLGpIJYKHX1Pia3fnE/wrY39FGK0xHHCh4CmqYedt8oLqL7qUSOAll036rmo6PPJcp7a
-         75pw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=QxwWcvoZimdUpeMmS0ttHFmxJVwAZhHYr74miAUwCbM=;
-        b=h6MOS9HhEkAbJypBNkg5Q/mJ7AKKMG+wcpGBRbvIarGBFD1MsMBkRmEu0RrOyu4ZDP
-         4pqmRoZcDX+q3mdvTZGA5KntM/AgNPGmXTnzINRJZ0bWNSyCGNrBu9Ixz2KyBBL2+5t/
-         etpR/BILvWqnq8p0Dkse5M3wT24V5yTFIfwJkn4/hd/WuKO0yX98m2j/dUsRWWtoPoAV
-         9oA9RRhwAzEKnQJL3StebPtrwuB0lc8j5BVO5AS9sSIiJ7B7/OGUsJB963wQXXhj+dmv
-         XpuqMVRqh/zgSLBPWX/KOeuzYj7x/5nKM5YDhhZDLsyx9onCc709awPF43ffjTdhmU45
-         YHwQ==
-X-Gm-Message-State: AOAM530WGwErD4ZraIgjC//FokE8eTLvWnDGhfw23Qcw10aZyDbcp3Le
-        Lp8bgLmpB6vDRDyfITijEmluit3XGYVnvO/dg816
-X-Google-Smtp-Source: ABdhPJx8wwJ5G14XsvtrAXwDus9VVYn+9LjO6cXjylyaRfLAcGOtTRp6MSESNYsMsqA/2p8s2fGrTXmL0awPsgd/kag=
-X-Received: by 2002:a05:6402:4d1:: with SMTP id n17mr27978100edw.118.1618221607011;
- Mon, 12 Apr 2021 03:00:07 -0700 (PDT)
-MIME-Version: 1.0
-References: <20210331080519.172-1-xieyongji@bytedance.com> <20210331080519.172-10-xieyongji@bytedance.com>
- <c817178a-2ac8-bf93-1ed3-528579c657a3@redhat.com> <CACycT3v_KFQXoxRbEj8c0Ve6iKn9RbibtBDgBFs=rf0ZOmTBBQ@mail.gmail.com>
- <091dde74-449b-385c-0ec9-11e4847c6c4c@redhat.com> <CACycT3vwATp4+Ao0fjuyeeLQN+xHH=dXF+JUyuitkn4k8hELnA@mail.gmail.com>
- <dc9a90dd-4f86-988c-c1b5-ac606ce5e14b@redhat.com> <CACycT3vxO21Yt6+px2c2Q8DONNUNehdo2Vez_RKQCKe76CM2TA@mail.gmail.com>
- <0f386dfe-45c9-5609-55f7-b8ab2a4abf5e@redhat.com>
-In-Reply-To: <0f386dfe-45c9-5609-55f7-b8ab2a4abf5e@redhat.com>
-From:   Yongji Xie <xieyongji@bytedance.com>
-Date:   Mon, 12 Apr 2021 17:59:56 +0800
-Message-ID: <CACycT3vbDhUKM0OX-zo02go09gh2+EEdyZ_YQuz8PXzo3EngXw@mail.gmail.com>
-Subject: Re: Re: [PATCH v6 09/10] vduse: Introduce VDUSE - vDPA Device in Userspace
-To:     Jason Wang <jasowang@redhat.com>
-Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        Parav Pandit <parav@nvidia.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Christian Brauner <christian.brauner@canonical.com>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Matthew Wilcox <willy@infradead.org>, viro@zeniv.linux.org.uk,
-        Jens Axboe <axboe@kernel.dk>, bcrl@kvack.org,
-        Jonathan Corbet <corbet@lwn.net>,
-        =?UTF-8?Q?Mika_Penttil=C3=A4?= <mika.penttila@nextfour.com>,
-        Dan Carpenter <dan.carpenter@oracle.com>,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        kvm@vger.kernel.org, linux-fsdevel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+        id S238748AbhDLKPb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 12 Apr 2021 06:15:31 -0400
+Received: from mail.kernel.org ([198.145.29.99]:42556 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S237524AbhDLKNN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 12 Apr 2021 06:13:13 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 1878761278;
+        Mon, 12 Apr 2021 10:12:55 +0000 (UTC)
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94)
+        (envelope-from <maz@kernel.org>)
+        id 1lVtYq-006yXm-Kb; Mon, 12 Apr 2021 11:12:52 +0100
+Date:   Mon, 12 Apr 2021 11:12:51 +0100
+Message-ID: <87eeffolp8.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        linux-mips@vger.kernel.org, kvm@vger.kernel.org,
+        kvm-ppc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Ben Gardon <bgardon@google.com>
+Subject: Re: [PATCH v2 03/10] KVM: arm64: Convert to the gfn-based MMU notifier callbacks
+In-Reply-To: <20210402005658.3024832-4-seanjc@google.com>
+References: <20210402005658.3024832-1-seanjc@google.com>
+        <20210402005658.3024832-4-seanjc@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: seanjc@google.com, chenhuacai@kernel.org, aleksandar.qemu.devel@gmail.com, paulus@ozlabs.org, pbonzini@redhat.com, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, linux-mips@vger.kernel.org, kvm@vger.kernel.org, kvm-ppc@vger.kernel.org, linux-kernel@vger.kernel.org, bgardon@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Apr 12, 2021 at 5:37 PM Jason Wang <jasowang@redhat.com> wrote:
->
->
-> =E5=9C=A8 2021/4/12 =E4=B8=8B=E5=8D=884:02, Yongji Xie =E5=86=99=E9=81=93=
-:
-> > On Mon, Apr 12, 2021 at 3:16 PM Jason Wang <jasowang@redhat.com> wrote:
-> >>
-> >> =E5=9C=A8 2021/4/9 =E4=B8=8B=E5=8D=884:02, Yongji Xie =E5=86=99=E9=81=
-=93:
-> >>>>>>> +};
-> >>>>>>> +
-> >>>>>>> +struct vduse_dev_config_data {
-> >>>>>>> +     __u32 offset; /* offset from the beginning of config space =
-*/
-> >>>>>>> +     __u32 len; /* the length to read/write */
-> >>>>>>> +     __u8 data[VDUSE_CONFIG_DATA_LEN]; /* data buffer used to re=
-ad/write */
-> >>>>>> Note that since VDUSE_CONFIG_DATA_LEN is part of uAPI it means we =
-can
-> >>>>>> not change it in the future.
-> >>>>>>
-> >>>>>> So this might suffcient for future features or all type of virtio =
-devices.
-> >>>>>>
-> >>>>> Do you mean 256 is no enough here=EF=BC=9F
-> >>>> Yes.
-> >>>>
-> >>> But this request will be submitted multiple times if config lengh is
-> >>> larger than 256. So do you think whether we need to extent the size t=
-o
-> >>> 512 or larger?
-> >>
-> >> So I think you'd better either:
-> >>
-> >> 1) document the limitation (256) in somewhere, (better both uapi and d=
-oc)
-> >>
-> > But the VDUSE_CONFIG_DATA_LEN doesn't mean the limitation of
-> > configuration space. It only means the maximum size of one data
-> > transfer for configuration space. Do you mean document this?
->
->
-> Yes, and another thing is that since you're using
-> data[VDUSE_CONFIG_DATA_LEN] in the uapi, it implies the length is always
-> 256 which seems not good and not what the code is wrote.
->
+On Fri, 02 Apr 2021 01:56:51 +0100,
+Sean Christopherson <seanjc@google.com> wrote:
+> 
+> Move arm64 to the gfn-base MMU notifier APIs, which do the hva->gfn
+> lookup in common code.
+> 
+> No meaningful functional change intended, though the exact order of
+> operations is slightly different since the memslot lookups occur before
+> calling into arch code.
+> 
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
 
-How about renaming VDUSE_CONFIG_DATA_LEN to VDUSE_MAX_TRANSFER_LEN?
+Reviewed-by: Marc Zyngier <maz@kernel.org>
 
-Thanks,
-Yongji
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
