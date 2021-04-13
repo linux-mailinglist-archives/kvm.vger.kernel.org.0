@@ -2,174 +2,125 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C9F3835E4E5
-	for <lists+kvm@lfdr.de>; Tue, 13 Apr 2021 19:21:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3915635E4FD
+	for <lists+kvm@lfdr.de>; Tue, 13 Apr 2021 19:26:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347137AbhDMRVu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 13 Apr 2021 13:21:50 -0400
-Received: from mail-qk1-f174.google.com ([209.85.222.174]:42905 "EHLO
-        mail-qk1-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345750AbhDMRVo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 13 Apr 2021 13:21:44 -0400
-Received: by mail-qk1-f174.google.com with SMTP id d15so5652739qkc.9
-        for <kvm@vger.kernel.org>; Tue, 13 Apr 2021 10:21:24 -0700 (PDT)
+        id S1347146AbhDMR0H (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 13 Apr 2021 13:26:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41386 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232738AbhDMR0G (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 13 Apr 2021 13:26:06 -0400
+Received: from mail-pf1-x42a.google.com (mail-pf1-x42a.google.com [IPv6:2607:f8b0:4864:20::42a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C5E9C061756
+        for <kvm@vger.kernel.org>; Tue, 13 Apr 2021 10:25:46 -0700 (PDT)
+Received: by mail-pf1-x42a.google.com with SMTP id a85so11429312pfa.0
+        for <kvm@vger.kernel.org>; Tue, 13 Apr 2021 10:25:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=OxU0Eujrm9GQyvXdIjhuiVVTC0s99PIjeEwmRYVaK0M=;
-        b=TvQ0AiMsfQyBkVrkMDo18tZSvp8ItDKLX9tIp24gJJi9NrydOSekkMLSPHzrYhWjkV
-         kXfwlD8SA8kKV/fBmZHnkDl7WgoA2uz4kz0fJ7rWdXXQ69IkfLAnlDT/vm7Ptw/lexEa
-         iDybKWcdRXGnOCWSfkGPqZ4dkCHaoRuNzrxQ3wkNmL7avVA1jv66QGIuJhTalp9yccWi
-         NABnGz+dNplEJ3EybgzfEkASRU8pZxjuDuM6zwCBX4Yf/H0dXOQrFGg1UjfcT/g2x+fp
-         Gr8+YicXBTWxLVD1DR4OjHi8EUuWZpJeAkBPbQKhcUAPTTHmILuIgSiCpcB9SfHGysPL
-         ZPAw==
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=5vr3PwJeGNJ+ARdvZPnoqmm3/dVq98uqA1dFm+w77rA=;
+        b=B7qaXV9ZpUN50AEatDo+ijkDYDeSfHKMdIVqdGTVHitzoOJT0zvMuxU0B0u4QWCCAP
+         CLuhYic90AuWUMGifY2q4J/m7AQK/VOUK0iZCrLvVxXh8/46dOYWPDzBMMSbBxTmT7K0
+         FK2MbSTKqRvsXRCvu4Bgwmn5TqPkPFTYeXDk0D5Nleqk9FP+XL4BHB43oCPN6xWdgrPK
+         vl7s2pml4EQajThYGfZyiWPUnlLAdYrcKoJfrQrKaSIzKf7L1JkqXk3zCP1S2L3bzjJN
+         g2RV2sXQNFhhjWlsvct+CwERTwCLjBWpimrjQQFn4zAgOlncRNGg2oKBIO9O/4u40b0a
+         NxvQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=OxU0Eujrm9GQyvXdIjhuiVVTC0s99PIjeEwmRYVaK0M=;
-        b=DrbWOrfvjailT2CcCZh2+259ifZse25OthFEaToQyN6areKMEPP+ZsL9pLMVxXSWR9
-         yF1vKhq88GF2EerhwnAyMElkJtg1Ef4xFpecH1mw9P6AalEy+n5Cp3XZnR7OR4kuXacp
-         dQsTPi4MrtdsXhNV4L/I7s8G82NdQzKFp6YtQt+23xqmY/jnc0UVbFLQtnAPkra8WcwH
-         NJfmdPBcAxaTmYOnpb/7llbHnDkTPoQ6ia9LYEvPAAEXXR2zz9SYv1xMQijmywz1LVru
-         7oe1fyXiVbugvE/s8SEjExRKakJ952ZCyVOP70uRprdjX/RI5z4TqvsPNeuAV+WspH2z
-         uPZw==
-X-Gm-Message-State: AOAM533bvSFKa9QbgdaHPUW75svxwXLWdA5Jsv7y/I503KLseiegOEfC
-        smMbEPToW7+erZlG4+99SIQ1Bx08nCK5eP/3i/Zhhw==
-X-Google-Smtp-Source: ABdhPJzZbF9SOsSr1JV8btp47Zzg36R3JvHSGAwCv47evxt2VeGK3yqlQo147eL5mHjg5iEX+jdnHlDqSzZOV8YjVsc=
-X-Received: by 2002:a05:620a:243:: with SMTP id q3mr14170127qkn.501.1618334423663;
- Tue, 13 Apr 2021 10:20:23 -0700 (PDT)
-MIME-Version: 1.0
-References: <000000000000ca9a6005bec29ebe@google.com> <2db3c803-6a94-9345-261a-a2bb74370c02@redhat.com>
- <20210331042922.GE2065@kadam> <20210401121933.GA2710221@ziepe.ca>
-In-Reply-To: <20210401121933.GA2710221@ziepe.ca>
-From:   Dmitry Vyukov <dvyukov@google.com>
-Date:   Tue, 13 Apr 2021 19:20:12 +0200
-Message-ID: <CACT4Y+ZG9Dhv1UTvotsTimVrzaojPN91Lu1CsPqm4kd1j5yNkQ@mail.gmail.com>
-Subject: Re: [syzbot] WARNING in unsafe_follow_pfn
-To:     Jason Gunthorpe <jgg@ziepe.ca>
-Cc:     Dan Carpenter <dan.carpenter@oracle.com>,
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=5vr3PwJeGNJ+ARdvZPnoqmm3/dVq98uqA1dFm+w77rA=;
+        b=oL+Ehm3142R8EO+gl7zgkShsTajVjNE/EB8d7kuLms4BGCm4kOqBqpefORPqi2AoIe
+         0lil5IvOFKZ6g7HZqIrVR5NL4Apk5q2i3X8RDZnACSL+YQZosJKsDxF/75vPvfEiWp9F
+         P+oL6ahoR3ugB1isXAWozNi7bFDI16ZfyI30+RUkwskl3sb2wUgZg2Y2E4FWlkZTEtz1
+         5CH2MfccXb+iKhiCELEZEfQKF53zcuY+HNAN8cM8x9pj6kllspbJSHsSjYHiPpUZwM/E
+         HceqMJg34lHoOsNRUG6diuLk6pQiwZgRJk5tq3xVZGtomtvAOVky/jwtxpNg2uMoJ+wJ
+         y92Q==
+X-Gm-Message-State: AOAM5330ZEJPJw6ZPUFdL7lSNIsusFPy711baKFaxXlqIix8jA7ODV+d
+        x+vnuex6+1mdSnbmqtvYGxKugA==
+X-Google-Smtp-Source: ABdhPJzOEwhO/ZQZjBRucPtwUXd+BgP4ag+EUzaOeZrRo+QYusDeHN+kT7aq911ZWked1Moq/CiKuw==
+X-Received: by 2002:a62:4e96:0:b029:248:effc:9a4d with SMTP id c144-20020a624e960000b0290248effc9a4dmr1498365pfb.71.1618334744252;
+        Tue, 13 Apr 2021 10:25:44 -0700 (PDT)
+Received: from google.com (240.111.247.35.bc.googleusercontent.com. [35.247.111.240])
+        by smtp.gmail.com with ESMTPSA id b7sm15201183pgs.62.2021.04.13.10.25.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 13 Apr 2021 10:25:43 -0700 (PDT)
+Date:   Tue, 13 Apr 2021 17:25:40 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Wanpeng Li <kernellwp@gmail.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         Paolo Bonzini <pbonzini@redhat.com>,
-        syzbot <syzbot+015dd7cdbbbc2c180c65@syzkaller.appspotmail.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Borislav Petkov <bp@alien8.de>,
-        Daniel Vetter <daniel.vetter@ffwll.ch>,
-        daniel.vetter@intel.com, "H. Peter Anvin" <hpa@zytor.com>,
-        Jim Mattson <jmattson@google.com>,
-        James Morris <jmorris@namei.org>,
-        Joerg Roedel <joro@8bytes.org>, KVM list <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Linux Media Mailing List <linux-media@vger.kernel.org>,
-        Linux-MM <linux-mm@kvack.org>,
-        linux-security-module <linux-security-module@vger.kernel.org>,
-        m.szyprowski@samsung.com,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Ingo Molnar <mingo@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        "Serge E. Hallyn" <serge@hallyn.com>,
-        syzkaller-bugs <syzkaller-bugs@googlegroups.com>,
-        Tomasz Figa <tfiga@chromium.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
-        "the arch/x86 maintainers" <x86@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Michael Tokarev <mjt@tls.msk.ru>
+Subject: Re: [PATCH v2 0/3] KVM: Properly account for guest CPU time
+Message-ID: <YHXUFJuLXY8VZw3B@google.com>
+References: <1618298169-3831-1-git-send-email-wanpengli@tencent.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1618298169-3831-1-git-send-email-wanpengli@tencent.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Apr 1, 2021 at 2:19 PM Jason Gunthorpe <jgg@ziepe.ca> wrote:
->
-> On Wed, Mar 31, 2021 at 07:29:22AM +0300, Dan Carpenter wrote:
-> > On Tue, Mar 30, 2021 at 07:04:30PM +0200, Paolo Bonzini wrote:
-> > > On 30/03/21 17:26, syzbot wrote:
-> > > > Hello,
-> > > >
-> > > > syzbot found the following issue on:
-> > > >
-> > > > HEAD commit:    93129492 Add linux-next specific files for 20210326
-> > > > git tree:       linux-next
-> > > > console output: https://syzkaller.appspot.com/x/log.txt?x=169ab21ad00000
-> > > > kernel config:  https://syzkaller.appspot.com/x/.config?x=6f2f73285ea94c45
-> > > > dashboard link: https://syzkaller.appspot.com/bug?extid=015dd7cdbbbc2c180c65
-> > > > syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=119b8d06d00000
-> > > > C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=112e978ad00000
-> > > >
-> > > > The issue was bisected to:
-> > > >
-> > > > commit d40b9fdee6dc819d8fc35f70c345cbe0394cde4c
-> > > > Author: Daniel Vetter <daniel.vetter@ffwll.ch>
-> > > > Date:   Tue Mar 16 15:33:01 2021 +0000
-> > > >
-> > > >      mm: Add unsafe_follow_pfn
-> > > >
-> > > > bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=122d2016d00000
-> > > > final oops:     https://syzkaller.appspot.com/x/report.txt?x=112d2016d00000
-> > > > console output: https://syzkaller.appspot.com/x/log.txt?x=162d2016d00000
-> > > >
-> > > > IMPORTANT: if you fix the issue, please add the following tag to the commit:
-> > > > Reported-by: syzbot+015dd7cdbbbc2c180c65@syzkaller.appspotmail.com
-> > > > Fixes: d40b9fdee6dc ("mm: Add unsafe_follow_pfn")
-> > >
-> > > This is basically intentional because get_vaddr_frames is broken, isn't it?
-> > > I think it needs to be ignored in syzkaller.
-> >
-> > What?
-> >
-> > The bisect is wrong (because it's blaming the commit which added the
-> > warning instead of the commit which added the buggy caller) but the
-> > warning is correct.
-> >
-> > Plus users are going to be seeing this as well.  According to the commit
-> > message for 69bacee7f9ad ("mm: Add unsafe_follow_pfn") "Unfortunately
-> > there's some users where this is not fixable (like v4l userptr of iomem
-> > mappings)".  It sort of seems crazy to dump this giant splat and then
-> > tell users to ignore it forever because it can't be fixed...  0_0
->
-> I think the discussion conclusion was that this interface should not
-> be used by userspace anymore, it is obsolete by some new interface?
->
-> It should be protected by some kconfig and the kconfig should be
-> turned off for syzkaller runs.
+On Tue, Apr 13, 2021, Wanpeng Li wrote:
+> The bugzilla https://bugzilla.kernel.org/show_bug.cgi?id=209831
+> reported that the guest time remains 0 when running a while true
+> loop in the guest.
+> 
+> The commit 87fa7f3e98a131 ("x86/kvm: Move context tracking where it
+> belongs") moves guest_exit_irqoff() close to vmexit breaks the
+> tick-based time accouting when the ticks that happen after IRQs are
+> disabled are incorrectly accounted to the host/system time. This is
+> because we exit the guest state too early.
+> 
+> This patchset splits both context tracking logic and the time accounting 
+> logic from guest_enter/exit_irqoff(), keep context tracking around the 
+> actual vmentry/exit code, have the virt time specific helpers which 
+> can be placed at the proper spots in kvm. In addition, it will not 
+> break the world outside of x86.
 
-If this is not a kernel bug, then it must not use WARN_ON[_ONCE]. It
-makes the kernel untestable for both automated systems and humans:
+IMO, this is going in the wrong direction.  Rather than separate context tracking,
+vtime accounting, and KVM logic, this further intertwines the three.  E.g. the
+context tracking code has even more vtime accounting NATIVE vs. GEN vs. TICK
+logic baked into it.
 
-https://lwn.net/Articles/769365/
+Rather than smush everything into context_tracking.h, I think we can cleanly
+split the context tracking and vtime accounting code into separate pieces, which
+will in turn allow moving the wrapping logic to linux/kvm_host.h.  Once that is
+done, splitting the context tracking and time accounting logic for KVM x86
+becomes a KVM detail as opposed to requiring dedicated logic in the context
+tracking code.
 
-<quote>
-Greg Kroah-Hartman raised the problem of core kernel API code that
-will use WARN_ON_ONCE() to complain about bad usage; that will not
-generate the desired result if WARN_ON_ONCE() is configured to crash
-the machine. He was told that the code should just call pr_warn()
-instead, and that the called function should return an error in such
-situations. It was generally agreed that any WARN_ON() or
-WARN_ON_ONCE() calls that can be triggered from user space need to be
-fixed.
-</quote>
+I have untested code that compiles on x86, I'll send an RFC shortly.
 
-
-https://lore.kernel.org/netdev/20210413085522.2caee809@gandalf.local.home/
-From: Steven Rostedt
-<quote>
-
-I agree. WARN_ON(_ONCE) should be reserved for anomalies that should not
-happen ever. Anything that the user could trigger, should not trigger a
-WARN_ON.
-
-A WARN_ON is perfectly fine for detecting an accounting error inside the
-kernel. I have them scattered all over my code, but they should never be
-hit, even if something in user space tries to hit it. (with an exception of
-an interface I want to deprecate, where I want to know if it's still being
-used ;-) Of course, that wouldn't help bots testing the code. And I haven't
-done that in years)
-
-Any anomaly that can be triggered by user space doing something it should
-not be doing really needs a pr_warn().
-</quote>
-
-And if it's a kernel bug reachable from user-space, then I think this
-code should be removed entirely, not just on all testing systems. Or
-otherwise if we are not removing it for some reason, then it needs to
-be fixed.
+> v1 -> v2:
+>  * split context_tracking from guest_enter/exit_irqoff
+>  * provide separate vtime accounting functions for consistent
+>  * place the virt time specific helpers at the proper splot 
+> 
+> Suggested-by: Thomas Gleixner <tglx@linutronix.de>
+> Cc: Thomas Gleixner <tglx@linutronix.de>
+> Cc: Sean Christopherson <seanjc@google.com>
+> Cc: Michael Tokarev <mjt@tls.msk.ru>
+> 
+> Wanpeng Li (3):
+>   context_tracking: Split guest_enter/exit_irqoff
+>   context_tracking: Provide separate vtime accounting functions
+>   x86/kvm: Fix vtime accounting
+> 
+>  arch/x86/kvm/svm/svm.c           |  6 ++-
+>  arch/x86/kvm/vmx/vmx.c           |  6 ++-
+>  arch/x86/kvm/x86.c               |  1 +
+>  include/linux/context_tracking.h | 84 +++++++++++++++++++++++++++++++---------
+>  4 files changed, 74 insertions(+), 23 deletions(-)
+> 
+> -- 
+> 2.7.4
+> 
