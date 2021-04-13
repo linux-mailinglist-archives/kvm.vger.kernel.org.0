@@ -2,154 +2,142 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 69A4635E194
-	for <lists+kvm@lfdr.de>; Tue, 13 Apr 2021 16:33:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D402535E1DE
+	for <lists+kvm@lfdr.de>; Tue, 13 Apr 2021 16:51:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1343579AbhDMOdc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 13 Apr 2021 10:33:32 -0400
-Received: from vps-vb.mhejs.net ([37.28.154.113]:49706 "EHLO vps-vb.mhejs.net"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S237060AbhDMOdJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 13 Apr 2021 10:33:09 -0400
-Received: from MUA
-        by vps-vb.mhejs.net with esmtps (TLS1.2:ECDHE-RSA-AES256-GCM-SHA384:256)
-        (Exim 4.93.0.4)
-        (envelope-from <mail@maciej.szmigiero.name>)
-        id 1lWJkn-00040N-6x; Tue, 13 Apr 2021 16:10:57 +0200
-From:   "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Igor Mammedov <imammedo@redhat.com>,
-        Marc Zyngier <maz@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Paul Mackerras <paulus@ozlabs.org>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH v2 7/8] KVM: Optimize gfn lookup in kvm_zap_gfn_range()
-Date:   Tue, 13 Apr 2021 16:10:13 +0200
-Message-Id: <2e599cf1c3318207c13cad0a73c1b28b8419dcbe.1618322004.git.maciej.szmigiero@oracle.com>
-X-Mailer: git-send-email 2.31.1
-In-Reply-To: <cover.1618322001.git.maciej.szmigiero@oracle.com>
-References: <cover.1618322001.git.maciej.szmigiero@oracle.com>
+        id S231225AbhDMOwP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 13 Apr 2021 10:52:15 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:53878 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231165AbhDMOwP (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 13 Apr 2021 10:52:15 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1618325515;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=Uiuspi3kAcJpSAV4ULt0j0WV8oWELu9JdJSm5DjVPIw=;
+        b=ixs//s62Ij0Apc0RBO2L/C2yO9a5ikCic4PM1Ruo7pV/T++t2H89Y5q66WcBoeozUYsoVe
+        k3cDOki9QcSOkRcpP0fnnXkVlRXNrqSDhe9lBRdJiSswhXeRubeJpsZyxK1ohRV/TQyvWc
+        hOoT92B52XTMdIZhpl9cmnIi9+HaVtA=
+Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
+ [209.85.218.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-480-ZMMPi29wPoCbSOkjXvt9ow-1; Tue, 13 Apr 2021 10:51:53 -0400
+X-MC-Unique: ZMMPi29wPoCbSOkjXvt9ow-1
+Received: by mail-ej1-f69.google.com with SMTP id zj19so2247569ejb.22
+        for <kvm@vger.kernel.org>; Tue, 13 Apr 2021 07:51:53 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=Uiuspi3kAcJpSAV4ULt0j0WV8oWELu9JdJSm5DjVPIw=;
+        b=rBnxe4L0Y/M1Qwv0ElXdnE1DnJ8zn08Mlz91ywr0mgKo4FLHj5IRq/K5UfRKM4xW5X
+         7WkFl6968zvM4VWNHSR8hzCVRYycs6hps9xs29giBDQ59yPCtk6WwGi9J7ra0AcveIL+
+         QSPfiOSuI2PDUzBMuD5JFCFT+v4va8eg2BXDK2AUcOFnOfUwM8iEyCY0AESwRfUMRSjA
+         Py6+wQJnBbOu1cXVT+bQwsKfhPVr4uoFNZfDjA1CG7t36pR/Bky2UhboQoo01UfqV2+b
+         6XucmiMYGNWOON3zGRinG5VXqKI3jv6W3RiBKoA8FQTBR7WuGxJcNYoPwjdt8Pb5SjI3
+         Cr1w==
+X-Gm-Message-State: AOAM5317HQsQ1sCpT5DgHJhtGi8zKLzj6xLGd+BIdYGLAQt60eRFIcGW
+        RI7fIEK1NzSFKkuc9LUoO51MBPWP/ZFHKWhQ8YMvQ37r+fO1GBQQs2AWDlSD94TvUum9wTS7qQR
+        2kpE0U3CZFK/+
+X-Received: by 2002:aa7:c952:: with SMTP id h18mr35907668edt.269.1618325512515;
+        Tue, 13 Apr 2021 07:51:52 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzRAwGGF6rKAliD+NJrnoocig9lgh+NcU4AX5RI2IW0+VGKaBsyF+IPo/gcPpyvEJKNK5UN0Q==
+X-Received: by 2002:aa7:c952:: with SMTP id h18mr35907643edt.269.1618325512305;
+        Tue, 13 Apr 2021 07:51:52 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id t14sm7995787ejc.121.2021.04.13.07.51.51
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 13 Apr 2021 07:51:51 -0700 (PDT)
+Subject: Re: [PATCH v5 00/11] KVM SGX virtualization support (KVM part)
+To:     Kai Huang <kai.huang@intel.com>, kvm@vger.kernel.org,
+        linux-sgx@vger.kernel.org
+Cc:     seanjc@google.com, bp@alien8.de, jarkko@kernel.org,
+        dave.hansen@intel.com, luto@kernel.org, rick.p.edgecombe@intel.com,
+        haitao.huang@intel.com
+References: <cover.1618196135.git.kai.huang@intel.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <af16a973-29cd-3df0-55c6-260be5db8b12@redhat.com>
+Date:   Tue, 13 Apr 2021 16:51:50 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.7.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <cover.1618196135.git.kai.huang@intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>
+On 12/04/21 06:21, Kai Huang wrote:
+> Hi Paolo, Sean,
+> 
+> Boris has merged x86 part patches to the tip/x86/sgx. This series is KVM part
+> patches. Due to some code change in x86 part patches, two KVM patches need
+> update so this is the new version. Please help to review. Thanks!
+> 
+> Specifically, x86 patch (x86/sgx: Add helpers to expose ECREATE and EINIT to
+> KVM) was changed to return -EINVAL directly w/o setting trapnr when
+> access_ok()s fail on any user pointers, so KVM patches:
+> 
+> KVM: VMX: Add SGX ENCLS[ECREATE] handler to enforce CPUID restrictions
+> KVM: VMX: Add ENCLS[EINIT] handler to support SGX Launch Control (LC)
+> 
+> were updated to handle this case.
+> 
+> This seris was firstly based on tip/x86/sgx, and then rebased to latest
+> kvm/queue, so it can be applied to kvm/queue directly now.
 
-Introduce a memslots gfn upper bound operation and use it to optimize
-kvm_zap_gfn_range().
-This way this handler can do a quick lookup for intersecting gfns and won't
-have to do a linear scan of the whole memslot set.
+Boris, can you confirm that tip/x86/sgx has stable commit hashes?
 
-Signed-off-by: Maciej S. Szmigiero <maciej.szmigiero@oracle.com>
----
- arch/x86/kvm/mmu/mmu.c   | 41 ++++++++++++++++++++++++++++++++++++++--
- include/linux/kvm_host.h | 22 +++++++++++++++++++++
- 2 files changed, 61 insertions(+), 2 deletions(-)
+Thanks,
 
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 74781c00a420..7e610d3bc819 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -5498,14 +5498,51 @@ void kvm_zap_gfn_range(struct kvm *kvm, gfn_t gfn_start, gfn_t gfn_end)
- 	int i;
- 	bool flush = false;
- 
-+	if (gfn_end == gfn_start || WARN_ON(gfn_end < gfn_start))
-+		return;
-+
- 	write_lock(&kvm->mmu_lock);
- 	for (i = 0; i < KVM_ADDRESS_SPACE_NUM; i++) {
--		int ctr;
-+		int idxactive;
-+		struct rb_node *node;
- 
- 		slots = __kvm_memslots(kvm, i);
--		kvm_for_each_memslot(memslot, ctr, slots) {
-+		idxactive = kvm_memslots_idx(slots);
-+
-+		/*
-+		 * Find the slot with the lowest gfn that can possibly intersect with
-+		 * the range, so we'll ideally have slot start <= range start
-+		 */
-+		node = kvm_memslots_gfn_upper_bound(slots, gfn_start);
-+		if (node) {
-+			struct rb_node *pnode;
-+
-+			/*
-+			 * A NULL previous node means that the very first slot
-+			 * already has a higher start gfn.
-+			 * In this case slot start > range start.
-+			 */
-+			pnode = rb_prev(node);
-+			if (pnode)
-+				node = pnode;
-+		} else {
-+			/* a NULL node below means no slots */
-+			node = rb_last(&slots->gfn_tree);
-+		}
-+
-+		for ( ; node; node = rb_next(node)) {
- 			gfn_t start, end;
- 
-+			memslot = container_of(node, struct kvm_memory_slot,
-+					       gfn_node[idxactive]);
-+
-+			/*
-+			 * If this slot starts beyond or at the end of the range so does
-+			 * every next one
-+			 */
-+			if (memslot->base_gfn >= gfn_start + gfn_end)
-+				break;
-+
- 			start = max(gfn_start, memslot->base_gfn);
- 			end = min(gfn_end, memslot->base_gfn + memslot->npages);
- 			if (start >= end)
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index bb50776a5ebd..884cac86042a 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -703,6 +703,28 @@ struct kvm_memory_slot *id_to_memslot(struct kvm_memslots *slots, int id)
- 	return NULL;
- }
- 
-+static inline
-+struct rb_node *kvm_memslots_gfn_upper_bound(struct kvm_memslots *slots,
-+					     gfn_t gfn)
-+{
-+	int idxactive = kvm_memslots_idx(slots);
-+	struct rb_node *node, *result = NULL;
-+
-+	for (node = slots->gfn_tree.rb_node; node; ) {
-+		struct kvm_memory_slot *slot;
-+
-+		slot = container_of(node, struct kvm_memory_slot,
-+				    gfn_node[idxactive]);
-+		if (gfn < slot->base_gfn) {
-+			result = node;
-+			node = node->rb_left;
-+		} else
-+			node = node->rb_right;
-+	}
-+
-+	return result;
-+}
-+
- /*
-  * KVM_SET_USER_MEMORY_REGION ioctl allows the following operations:
-  * - create a new memory slot
+Paolo
+
+> Changelog:
+> 
+> (Please see individual patch for changelog for specific patch)
+> 
+> v4->v5:
+>   - Addressed Sean's comments (patch 06, 07, 09 were slightly updated).
+>   - Rebased to latest kvm/queue (patch 08, 11 were updated to resolve conflict).
+> 
+> Sean Christopherson (11):
+>    KVM: x86: Export kvm_mmu_gva_to_gpa_{read,write}() for SGX (VMX)
+>    KVM: x86: Define new #PF SGX error code bit
+>    KVM: x86: Add support for reverse CPUID lookup of scattered features
+>    KVM: x86: Add reverse-CPUID lookup support for scattered SGX features
+>    KVM: VMX: Add basic handling of VM-Exit from SGX enclave
+>    KVM: VMX: Frame in ENCLS handler for SGX virtualization
+>    KVM: VMX: Add SGX ENCLS[ECREATE] handler to enforce CPUID restrictions
+>    KVM: VMX: Add emulation of SGX Launch Control LE hash MSRs
+>    KVM: VMX: Add ENCLS[EINIT] handler to support SGX Launch Control (LC)
+>    KVM: VMX: Enable SGX virtualization for SGX1, SGX2 and LC
+>    KVM: x86: Add capability to grant VM access to privileged SGX
+>      attribute
+> 
+>   Documentation/virt/kvm/api.rst  |  23 ++
+>   arch/x86/include/asm/kvm_host.h |   5 +
+>   arch/x86/include/asm/vmx.h      |   1 +
+>   arch/x86/include/uapi/asm/vmx.h |   1 +
+>   arch/x86/kvm/Makefile           |   2 +
+>   arch/x86/kvm/cpuid.c            |  89 +++++-
+>   arch/x86/kvm/cpuid.h            |  50 +++-
+>   arch/x86/kvm/vmx/nested.c       |  28 +-
+>   arch/x86/kvm/vmx/nested.h       |   5 +
+>   arch/x86/kvm/vmx/sgx.c          | 502 ++++++++++++++++++++++++++++++++
+>   arch/x86/kvm/vmx/sgx.h          |  34 +++
+>   arch/x86/kvm/vmx/vmcs12.c       |   1 +
+>   arch/x86/kvm/vmx/vmcs12.h       |   4 +-
+>   arch/x86/kvm/vmx/vmx.c          | 109 ++++++-
+>   arch/x86/kvm/vmx/vmx.h          |   3 +
+>   arch/x86/kvm/x86.c              |  23 ++
+>   include/uapi/linux/kvm.h        |   1 +
+>   17 files changed, 858 insertions(+), 23 deletions(-)
+>   create mode 100644 arch/x86/kvm/vmx/sgx.c
+>   create mode 100644 arch/x86/kvm/vmx/sgx.h
+> 
+
