@@ -2,72 +2,105 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D5DE535D83B
-	for <lists+kvm@lfdr.de>; Tue, 13 Apr 2021 08:49:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8B80235D899
+	for <lists+kvm@lfdr.de>; Tue, 13 Apr 2021 09:16:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345072AbhDMGtP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 13 Apr 2021 02:49:15 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:49607 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S244532AbhDMGtI (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 13 Apr 2021 02:49:08 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1618296528;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=GJP8fy7iKl8dKDV7E0klDhAvK0oVKdzafF/dYILoImU=;
-        b=LJI7/2S4imkvlvRrVQ0QleTE9OcAjzjNrDZF3FRxbM/AFLaKjc2b5H2GOqFaIJ7tB9oQx3
-        fuZNVIz6ucxp1AAywhCSGSpiEnhQ70XFXBrRtIhQvNDqUTOrvtIiwXXN8DzSdxYHhN0JmA
-        YZRKA5JvsHarYk7nDzVoDfNxbhcGchM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-48-uCC3GaStOo-ZktgeWFkllg-1; Tue, 13 Apr 2021 02:48:44 -0400
-X-MC-Unique: uCC3GaStOo-ZktgeWFkllg-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B3C7A18766D4;
-        Tue, 13 Apr 2021 06:48:42 +0000 (UTC)
-Received: from gondolin (ovpn-113-97.ams2.redhat.com [10.36.113.97])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 094F96062F;
-        Tue, 13 Apr 2021 06:48:36 +0000 (UTC)
-Date:   Tue, 13 Apr 2021 08:48:34 +0200
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     "Christian A. Ehrhardt" <lk@c--e.de>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Alexey Kardashevskiy <aik@ozlabs.ru>,
-        David Gibson <david@gibson.dropbear.id.au>,
-        Michael Ellerman <mpe@ellerman.id.au>
-Subject: Re: [PATCH] vfio/pci: Add missing range check in vfio_pci_mmap
-Message-ID: <20210413084834.1d5cd6cb.cohuck@redhat.com>
-In-Reply-To: <20210412214124.GA241759@lisa.in-ulm.de>
-References: <20210410230013.GC416417@lisa.in-ulm.de>
-        <20210412140238.184e141f@omen>
-        <20210412214124.GA241759@lisa.in-ulm.de>
-Organization: Red Hat GmbH
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+        id S237646AbhDMHQl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 13 Apr 2021 03:16:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48432 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S237515AbhDMHQj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 13 Apr 2021 03:16:39 -0400
+Received: from mail-pf1-x436.google.com (mail-pf1-x436.google.com [IPv6:2607:f8b0:4864:20::436])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D816BC061574;
+        Tue, 13 Apr 2021 00:16:20 -0700 (PDT)
+Received: by mail-pf1-x436.google.com with SMTP id d124so10816539pfa.13;
+        Tue, 13 Apr 2021 00:16:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id;
+        bh=4jaLokaB9YgYGQd1dte3mGoZJD+miSFwfBYhbyWtFbs=;
+        b=jjh64cmhug+f7SLA7mg20jYLt0Z/v2rJIYUWy5rAgV0dkPAb/0h6Mnc2vuWxoX6akK
+         99L2qqnphiDmeOHfQtbTxbc/ghnbtvZ89QPfve1Sy+tt8uCcStSSJ3sREiMNyuKgFr0U
+         mYGIecSUAqIcqF/0KbgAP8cW0PrdlebHvpFsWlOPD0cBOeLmF7SLV3rumTir5ZE3Pfba
+         y+5fMB+Oqd/tFtYbr6yW9uRdd3g7JcTD7Db5WgClMDFGoeO4PVkd3xu5zEB+oQ82xz7c
+         CNYiBQEtMIrguncbmpm6UlX/zei6ulwdXJuOCrFuxX9p0SqYCWyJ5OmlQvFgVYZMYlK4
+         VNXw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=4jaLokaB9YgYGQd1dte3mGoZJD+miSFwfBYhbyWtFbs=;
+        b=PSHwcXDu5sn5u949FCOxjzJUhBRg7p3AmjOCK6K1kLng56O7njWZqBQgTMncX3AR+C
+         nmpcEeQwj7OmXL9VOwNyOn0D9ycWDaunhC/ByfV7f/IMrAhkXdKKj1KpIOfTl3e1lk4H
+         O1jaUfe6EOuY7DfWuD2RuFnkXKeYog+9XzvVubDEOEuNTgyHZhd7q6Cj1OHozXmR/nH+
+         GYr8KvajumloD3xo9H4sy3wukrqizzE2ysVbBZutMC2PuJzfaCEizZ+5A4TwNOZMchXF
+         spNGNC/g3jZ7IeQX+rLsrKcOguTYA1vQ8EO3hKJqAjPNdgbPIP0HYfbacOdWGEqOYauV
+         66yA==
+X-Gm-Message-State: AOAM532rM7syq0udoA5OmpLjTd3xK/Ex6tDcNA4N4CfCtwdJgB/jfBWz
+        PV/ywBdA6rdk0x4KkjyJk7+Kj9yVD48=
+X-Google-Smtp-Source: ABdhPJxHMv+p+T4Gek6gYXJ37Y4b4Fh/Wylwlnld+vQvNYSEcBNARDog28+6qhAwEYLaLpqhY5RcUw==
+X-Received: by 2002:a65:6483:: with SMTP id e3mr31253666pgv.208.1618298180233;
+        Tue, 13 Apr 2021 00:16:20 -0700 (PDT)
+Received: from localhost.localdomain ([103.7.29.6])
+        by smtp.googlemail.com with ESMTPSA id i10sm2031088pjm.1.2021.04.13.00.16.17
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 13 Apr 2021 00:16:19 -0700 (PDT)
+From:   Wanpeng Li <kernellwp@gmail.com>
+X-Google-Original-From: Wanpeng Li <wanpengli@tencent.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Michael Tokarev <mjt@tls.msk.ru>
+Subject: [PATCH v2 0/3] KVM: Properly account for guest CPU time
+Date:   Tue, 13 Apr 2021 15:16:06 +0800
+Message-Id: <1618298169-3831-1-git-send-email-wanpengli@tencent.com>
+X-Mailer: git-send-email 2.7.4
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 12 Apr 2021 23:41:24 +0200
-"Christian A. Ehrhardt" <lk@c--e.de> wrote:
+The bugzilla https://bugzilla.kernel.org/show_bug.cgi?id=209831
+reported that the guest time remains 0 when running a while true
+loop in the guest.
 
-> When mmaping an extra device region verify that the region index
-> derived from the mmap offset is valid.
-> 
-> Fixes: a15b1883fee1 ("vfio_pci: Allow mapping extra regions")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Christian A. Ehrhardt <lk@c--e.de>
-> ---
->  drivers/vfio/pci/vfio_pci.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
+The commit 87fa7f3e98a131 ("x86/kvm: Move context tracking where it
+belongs") moves guest_exit_irqoff() close to vmexit breaks the
+tick-based time accouting when the ticks that happen after IRQs are
+disabled are incorrectly accounted to the host/system time. This is
+because we exit the guest state too early.
 
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+This patchset splits both context tracking logic and the time accounting 
+logic from guest_enter/exit_irqoff(), keep context tracking around the 
+actual vmentry/exit code, have the virt time specific helpers which 
+can be placed at the proper spots in kvm. In addition, it will not 
+break the world outside of x86.
+
+v1 -> v2:
+ * split context_tracking from guest_enter/exit_irqoff
+ * provide separate vtime accounting functions for consistent
+ * place the virt time specific helpers at the proper splot 
+
+Suggested-by: Thomas Gleixner <tglx@linutronix.de>
+Cc: Thomas Gleixner <tglx@linutronix.de>
+Cc: Sean Christopherson <seanjc@google.com>
+Cc: Michael Tokarev <mjt@tls.msk.ru>
+
+Wanpeng Li (3):
+  context_tracking: Split guest_enter/exit_irqoff
+  context_tracking: Provide separate vtime accounting functions
+  x86/kvm: Fix vtime accounting
+
+ arch/x86/kvm/svm/svm.c           |  6 ++-
+ arch/x86/kvm/vmx/vmx.c           |  6 ++-
+ arch/x86/kvm/x86.c               |  1 +
+ include/linux/context_tracking.h | 84 +++++++++++++++++++++++++++++++---------
+ 4 files changed, 74 insertions(+), 23 deletions(-)
+
+-- 
+2.7.4
 
