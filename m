@@ -2,101 +2,156 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 98E1935E63F
-	for <lists+kvm@lfdr.de>; Tue, 13 Apr 2021 20:24:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D8A4735E64B
+	for <lists+kvm@lfdr.de>; Tue, 13 Apr 2021 20:25:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232828AbhDMSYe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 13 Apr 2021 14:24:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54080 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232621AbhDMSYe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 13 Apr 2021 14:24:34 -0400
-Received: from mail-qv1-xf2c.google.com (mail-qv1-xf2c.google.com [IPv6:2607:f8b0:4864:20::f2c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 03ACFC061756
-        for <kvm@vger.kernel.org>; Tue, 13 Apr 2021 11:24:13 -0700 (PDT)
-Received: by mail-qv1-xf2c.google.com with SMTP id ef17so2898041qvb.0
-        for <kvm@vger.kernel.org>; Tue, 13 Apr 2021 11:24:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=kOiJzunVd05mqamt/5TGLR6Y6fd83AHptXCwJ4Xqk20=;
-        b=XFVCecc5SaXMXkEtMSOm6hS5wZ10POOPoNVf6wtWlKfFJsuYEYKWxhzSt0+b/fVFg5
-         j70FPau57jAGTGNQ3+9tA9h9ZoO7yhMw9fFhKY3ccf2fbxJjT4KC68lzeAS+4cn3HMGB
-         wp5PzotUQA4HOmRLYGnF6lGyWvjkDUaH9c4W68ZoCoNauDoc4V9TStZcf3ER3GSgi2B8
-         TAKRg/N1syJIMdjgHR6v6YGmBieKFHBRue3kOx9W/YALVuUYFVfV04eS3w2NY9xdW8aO
-         3ft/9Hvx7suI6YOOuwBV33K9HKwN2ojD3DmQGMoZB4GKqS/qhxJBAMFiF7xo1WSXfU70
-         peYQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=kOiJzunVd05mqamt/5TGLR6Y6fd83AHptXCwJ4Xqk20=;
-        b=ryj2xfqmZSax+Iy7sxICDw+RFMM+lwLdKMp4g6ogAEsdyxtbFki05x4lQ12Lx8fEKL
-         3Du3LO+7uy4OR0yELr9lVTgDYrQBG7NJTr+ZrvS8oc/ALULeHBHFWJILjNoEz4T6x6y/
-         Q2eIiaT2HlQ9N69ab5tfPi3pQgrCMDTQDx/F2dOxqgeJ3syTqyQfnnPCFAkKJwRbS2Bd
-         Y/EYlwJ02HFgykC0x2aimCJ0tp9b4gkIdKKaFG8aUIu0rw+0J1a2JhNEILO+ETotCg/K
-         AKsV4SsNOeH2jbFZnLrMv0PWMP17nYyu6wLmBD1lTJxb+iNmft2OKX6TtvKtMTWJboMq
-         nc8Q==
-X-Gm-Message-State: AOAM5330yZtJnqIf1rSPE24rasMQXClgOsbikjdKkg1CrwSUHDNxsJmL
-        p85y8pcV9AChEp6Kk8TRUJ5w+BCWeVQbbCCwTQORyA==
-X-Google-Smtp-Source: ABdhPJw6yF83WYbBJZbmO8yDMBaKSylZ7lchp4a3dBmw4v5MoYL6NrNQOEUYGEgo1fjifejUv/nkR/RD81DbNlucA38=
-X-Received: by 2002:a0c:8421:: with SMTP id l30mr21579057qva.23.1618338252752;
- Tue, 13 Apr 2021 11:24:12 -0700 (PDT)
+        id S1347659AbhDMSYl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 13 Apr 2021 14:24:41 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:53216 "EHLO
+        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1347644AbhDMSYj (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 13 Apr 2021 14:24:39 -0400
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 13DI3LJD174939;
+        Tue, 13 Apr 2021 14:24:18 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : content-transfer-encoding : mime-version; s=pp1;
+ bh=Mcj9KNyb1VQD9tj3wCqDsBlIU/svScL3oqGgdcN5QYs=;
+ b=FV0T1FHiogE4wPvFv6aB9jN/7LfHl280jSWtYGm8rJ4bOo4i1yBkRFNWM3UqcIyqoUZZ
+ XDDnUjCtSAR8lNpldUeD77fBXOLzAbv+J0pJyF/FbeFQ2SVmFRpoYU4C3aDlnRG+7lfQ
+ BRDb6LUQs6/ClHBBrJdRg9uiLWmHSRIOdRdbywyc/WwZCLzPgKTxcNHWYSDcI+1REYXk
+ YeUc4FQUXtghADv0cfawrPNn5jpuDjM6rimGLOPfADQXsWqNxBznKZTe52h8o85j+0nW
+ sgmrYszWrEEBF3NrMo/0AGmF1TQlPz3EjSYP5p465Oa+xVEmSQMLibG6LiCeKvhCAre1 vA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 37webguqq9-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 13 Apr 2021 14:24:18 -0400
+Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 13DI3NZB175114;
+        Tue, 13 Apr 2021 14:24:18 -0400
+Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 37webguqpm-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 13 Apr 2021 14:24:17 -0400
+Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
+        by ppma01fra.de.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 13DIOGTg005743;
+        Tue, 13 Apr 2021 18:24:16 GMT
+Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
+        by ppma01fra.de.ibm.com with ESMTP id 37u3n89gq3-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 13 Apr 2021 18:24:16 +0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 13DIODPN28180832
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 13 Apr 2021 18:24:13 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id DCDCE52052;
+        Tue, 13 Apr 2021 18:24:12 +0000 (GMT)
+Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTPS id C922452054;
+        Tue, 13 Apr 2021 18:24:12 +0000 (GMT)
+Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 4958)
+        id 7A553E045F; Tue, 13 Apr 2021 20:24:12 +0200 (CEST)
+From:   Eric Farman <farman@linux.ibm.com>
+To:     Cornelia Huck <cohuck@redhat.com>,
+        Halil Pasic <pasic@linux.ibm.com>
+Cc:     Matthew Rosato <mjrosato@linux.ibm.com>,
+        Jared Rossi <jrossi@linux.ibm.com>, linux-s390@vger.kernel.org,
+        kvm@vger.kernel.org, Eric Farman <farman@linux.ibm.com>
+Subject: [RFC PATCH v4 0/4] vfio-ccw: Fix interrupt handling for HALT/CLEAR
+Date:   Tue, 13 Apr 2021 20:24:06 +0200
+Message-Id: <20210413182410.1396170-1-farman@linux.ibm.com>
+X-Mailer: git-send-email 2.25.1
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: aXEvu7h_WgfUNsKDSpLfdw-30kt-u1g-
+X-Proofpoint-ORIG-GUID: fTwHtlTHMYvLtGaSkZ7V6KtnAsjAzqI2
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 MIME-Version: 1.0
-References: <000000000000ae236f05bfde0678@google.com> <20210413134147.54556d9d@gandalf.local.home>
- <20210413134314.16068eeb@gandalf.local.home>
-In-Reply-To: <20210413134314.16068eeb@gandalf.local.home>
-From:   Dmitry Vyukov <dvyukov@google.com>
-Date:   Tue, 13 Apr 2021 20:24:00 +0200
-Message-ID: <CACT4Y+ZrkE=ZKKncTOJRJgOTNfU8PGz=k+8V+0602ftTCHkc6Q@mail.gmail.com>
-Subject: Re: [syzbot] possible deadlock in del_gendisk
-To:     Steven Rostedt <rostedt@goodmis.org>,
-        syzkaller <syzkaller@googlegroups.com>
-Cc:     syzbot <syzbot+61e04e51b7ac86930589@syzkaller.appspotmail.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Jens Axboe <axboe@kernel.dk>, Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, KVM list <kvm@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>, masahiroy@kernel.org,
-        Ingo Molnar <mingo@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        rafael.j.wysocki@intel.com,
-        Sean Christopherson <seanjc@google.com>,
-        syzkaller-bugs <syzkaller-bugs@googlegroups.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Will Deacon <will@kernel.org>,
-        "the arch/x86 maintainers" <x86@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.761
+ definitions=2021-04-13_12:2021-04-13,2021-04-13 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ malwarescore=0 bulkscore=0 phishscore=0 adultscore=0 mlxlogscore=999
+ spamscore=0 priorityscore=1501 mlxscore=0 suspectscore=0 impostorscore=0
+ clxscore=1011 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2104060000 definitions=main-2104130122
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Apr 13, 2021 at 7:43 PM Steven Rostedt <rostedt@goodmis.org> wrote:
->
-> On Tue, 13 Apr 2021 13:41:47 -0400
-> Steven Rostedt <rostedt@goodmis.org> wrote:
->
-> > As the below splats look like it has nothing to do with this patch, and
-> > this patch will add a WARN() if there's broken logic somewhere, I bet the
-> > bisect got confused (if it is automated and does a panic_on_warning),
-> > because it will panic for broken code that his patch detects.
-> >
-> > That is, the bisect was confused because it was triggering on two different
-> > issues. One that triggered the reported splat below, and another that this
-> > commit detects and warns on.
->
-> Is it possible to update the the bisect to make sure that if it is failing
-> on warnings, to make sure the warnings are somewhat related, before decided
-> that its the same bug?
+Hi Conny, Halil,
 
-It does not seem to be feasible, bugs manifest differently in both
-space and time. Also even if we somehow conclude the crash we see is
-different, it says nothing about the original bug. For more data see:
-https://groups.google.com/g/syzkaller/c/sR8aAXaWEF4/m/tTWYRgvmAwAJ
+Let's restart our discussion about the collision between interrupts for
+START SUBCHANNEL and HALT/CLEAR SUBCHANNEL. It's been a quarter million
+minutes (give or take), so here is the problematic scenario again:
+
+	CPU 1			CPU 2
+ 1	CLEAR SUBCHANNEL
+ 2	fsm_irq()
+ 3				START SUBCHANNEL
+ 4	vfio_ccw_sch_io_todo()
+ 5				fsm_irq()
+ 6				vfio_ccw_sch_io_todo()
+
+From the channel subsystem's point of view the CLEAR SUBCHANNEL (step 1)
+is complete once step 2 is called, as the Interrupt Response Block (IRB)
+has been presented and the TEST SUBCHANNEL was driven by the cio layer.
+Thus, the START SUBCHANNEL (step 3) is submitted [1] and gets a cc=0 to
+indicate the I/O was accepted. However, step 2 stacks the bulk of the
+actual work onto a workqueue for when the subchannel lock is NOT held,
+and is unqueued at step 4. That code misidentifies the data in the IRB
+as being associated with the newly active I/O, and may release memory
+that is actively in use by the channel subsystem and/or device. Eww.
+
+In this version...
+
+Patch 1 and 2 are defensive checks. Patch 2 was part of v3 [2], but I
+would love a better option here to guard between steps 2 and 4.
+
+Patch 3 is a subset of the removal of the CP_PENDING FSM state in v3.
+I've obviously gone away from this idea, but I thought this piece is
+still valuable.
+
+Patch 4 collapses the code on the interrupt path so that changes to
+the FSM state and the channel_program struct are handled at the same
+point, rather than separated by a mutex boundary. Because of the
+possibility of a START and HALT/CLEAR running concurrently, it does
+not make sense to split them here.
+
+With the above patches, maybe it then makes sense to hold the io_mutex
+across the entirety of vfio_ccw_sch_io_todo(). But I'm not completely
+sure that would be acceptable.
+
+So... Thoughts?
+
+Thanks,
+Eric
+
+Previous versions:
+v3: https://lore.kernel.org/kvm/20200616195053.99253-1-farman@linux.ibm.com/
+v2: https://lore.kernel.org/kvm/20200513142934.28788-1-farman@linux.ibm.com/
+v1: https://lore.kernel.org/kvm/20200124145455.51181-1-farman@linux.ibm.com/
+
+Footnotes:
+[1] Halil correctly asserts that today's QEMU should prohibit this, but I
+    still have not looked into why. The above is the sequence that is
+    occurring in the kernel, and we shouldn't rely on a well-behaved
+    userspace to enforce things for us. It is still on my list for further
+    investigation, but it's lower in priority.
+[2] https://lore.kernel.org/kvm/20200619134005.512fc54f.cohuck@redhat.com/
+
+Eric Farman (4):
+  vfio-ccw: Check initialized flag in cp_init()
+  vfio-ccw: Check workqueue before doing START
+  vfio-ccw: Reset FSM state to IDLE inside FSM
+  vfio-ccw: Reset FSM state to IDLE before io_mutex
+
+ drivers/s390/cio/vfio_ccw_cp.c  | 4 ++++
+ drivers/s390/cio/vfio_ccw_drv.c | 7 +++----
+ drivers/s390/cio/vfio_ccw_fsm.c | 6 ++++++
+ drivers/s390/cio/vfio_ccw_ops.c | 2 --
+ 4 files changed, 13 insertions(+), 6 deletions(-)
+
+-- 
+2.25.1
+
