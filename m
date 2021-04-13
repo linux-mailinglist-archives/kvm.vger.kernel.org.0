@@ -2,231 +2,342 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A287F35E6FB
-	for <lists+kvm@lfdr.de>; Tue, 13 Apr 2021 21:20:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 63CAC35E809
+	for <lists+kvm@lfdr.de>; Tue, 13 Apr 2021 23:08:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244991AbhDMTUi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 13 Apr 2021 15:20:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38198 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238727AbhDMTUe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 13 Apr 2021 15:20:34 -0400
-Received: from mail-io1-xd31.google.com (mail-io1-xd31.google.com [IPv6:2607:f8b0:4864:20::d31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 96C9EC061756
-        for <kvm@vger.kernel.org>; Tue, 13 Apr 2021 12:20:14 -0700 (PDT)
-Received: by mail-io1-xd31.google.com with SMTP id j26so18191543iog.13
-        for <kvm@vger.kernel.org>; Tue, 13 Apr 2021 12:20:14 -0700 (PDT)
+        id S1346618AbhDMVIr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 13 Apr 2021 17:08:47 -0400
+Received: from smtp-fw-33001.amazon.com ([207.171.190.10]:56992 "EHLO
+        smtp-fw-33001.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1344575AbhDMVIq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 13 Apr 2021 17:08:46 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=qUYPcj8zrA5dCXV+Qd7SV6lPwqpZcDSVkNd2rz1KGP4=;
-        b=Gzs3YBuQdikVGHOQ0Jpqli7GUxYflzrfBuLoFvlAAy3NqLjZ2PRBtB8+1VwIE6isCY
-         kIZAfWUdKN6XC8NSnk1z6P3jdfds4l2PBFqOb2ggsMHN1YV0iDxAKcwWfxh5PWfXJo8F
-         0UwJe6JNkq1vB5bMA+8S15rDSFnHzbSWvArJTsdlqGKNkiUkcgifJjjdc5+msvxn1KIs
-         RQvX4ifvcr1Etk9Ogernfx6NjX1pQZLdYRT4sc9HxLtJs5OgBf2lu9Urc21zEe4/cPgY
-         2+eTltF7ldJ79SwjjCjExpTTN29ZmNlkyNVl36xG0zRcS0M+/otq98h6Cp0o0FnwXwEf
-         kW3A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=qUYPcj8zrA5dCXV+Qd7SV6lPwqpZcDSVkNd2rz1KGP4=;
-        b=M4r7Pn9jWhiLFXbQBxKZrC0/NxbTXnZjrdNd25Bsp+4X6K7oWu3gTQU6wY/pvRg7t0
-         bTf0UWYDcjnsFA0Z9Ylxdgr2L/jaRjMBZGs8ROhlINQOV9J0lAMaUtuFCFD414z/7vBo
-         DSmmY6u6p9n4ptLCWZfCmqyrmY0+LZ3RIrC+lC3UZcLt1GrBmHnjiD2Ou89tHQVv3mnf
-         qjPBpLEDLMEvyzyRrtsK+4pEAJqr9eJz8h4CK9hAvGaWckQkH2TVdwGqPQMrm2jaJWAO
-         M76dpEgprLOCuKUGwfoGzwKB6I25S5jPPxdAe1+PHOARYaWaLe3x/4ZuMSmrdC+WvxlI
-         PA0A==
-X-Gm-Message-State: AOAM531ywe821Lg36xKkBySWaC3l+dbknMI8nfi1W/1U2LMTj/vv23LC
-        YEmktRn410NKJYwnEaxumFxxTywyWO959Hape+eQ0A==
-X-Google-Smtp-Source: ABdhPJwSwBukOLXixI0WMfs2vnVZ5rnPEXzOUNbTKi4Duil4sVjTdcPyLwsKfy79OAMMKO+qB+v38GYYF6GQf0GUMig=
-X-Received: by 2002:a5d:83cf:: with SMTP id u15mr27662714ior.34.1618341613707;
- Tue, 13 Apr 2021 12:20:13 -0700 (PDT)
-MIME-Version: 1.0
-References: <cover.1618254007.git.ashish.kalra@amd.com> <c349516d85d9e3fc7404d564ff81d7ebecc1162c.1618254007.git.ashish.kalra@amd.com>
- <CABayD+cNLdoPHYvw0ZAXZS2wRg4cCFGTMvON0Ja2cWJ4juHNbA@mail.gmail.com>
- <CABayD+c2P9miY2pKG=k1Ey3cj6RZG98WgssLCnBJgoW9Fng7gg@mail.gmail.com>
- <20210413014821.GA3276@ashkalra_ubuntu_server> <CABayD+dqg+CYm4hAc6gRY6ygpbgpm-a7jo6ZGotbcA3arq9yQg@mail.gmail.com>
- <20210413114712.GA3996@ashkalra_ubuntu_server>
-In-Reply-To: <20210413114712.GA3996@ashkalra_ubuntu_server>
-From:   Steve Rutherford <srutherford@google.com>
-Date:   Tue, 13 Apr 2021 12:19:37 -0700
-Message-ID: <CABayD+fx5++vD0LHEysvQ4Wj9VDa_spUo2dUouCds5EiYFyHMg@mail.gmail.com>
-Subject: Re: [PATCH v12 13/13] x86/kvm: Add kexec support for SEV Live Migration.
-To:     Ashish Kalra <ashish.kalra@amd.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+  d=amazon.de; i=@amazon.de; q=dns/txt; s=amazon201209;
+  t=1618348106; x=1649884106;
+  h=date:from:to:cc:message-id:references:mime-version:
+   in-reply-to:subject;
+  bh=oXscWfXptDs7/ZJws9fZMwjKGAhwqVVLijAjsYycvy4=;
+  b=Ret1hHFI49xuJ0yhp3a+0xPZfaP2M9CETQmC9dNPqItgPCVXVe8APaLw
+   IroTGE7tphWiNFpeId9dAhImxcIK+aq3DLEDydAiCkO62Lf1qVnNF91+E
+   8S/O22z6d4FSP8w7p1MlnNZ3Io8HoGLKG/uOZ4VwHprPP7anZPxRtKXHS
+   g=;
+X-IronPort-AV: E=Sophos;i="5.82,220,1613433600"; 
+   d="scan'208";a="118195962"
+Subject: Re: [PATCH v2 3/4] KVM: x86: kvm_hv_flush_tlb use inputs from XMM registers
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO email-inbound-relay-1e-c7f73527.us-east-1.amazon.com) ([10.25.36.210])
+  by smtp-border-fw-out-33001.sea14.amazon.com with ESMTP; 13 Apr 2021 21:08:18 +0000
+Received: from EX13D28EUC003.ant.amazon.com (iad12-ws-svc-p26-lb9-vlan3.iad.amazon.com [10.40.163.38])
+        by email-inbound-relay-1e-c7f73527.us-east-1.amazon.com (Postfix) with ESMTPS id 45C3FBD5C2;
+        Tue, 13 Apr 2021 21:08:11 +0000 (UTC)
+Received: from uc8bbc9586ea454.ant.amazon.com (10.43.161.39) by
+ EX13D28EUC003.ant.amazon.com (10.43.164.43) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.2; Tue, 13 Apr 2021 21:08:03 +0000
+Date:   Tue, 13 Apr 2021 23:07:59 +0200
+From:   Siddharth Chandrasekaran <sidcha@amazon.de>
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+CC:     Alexander Graf <graf@amazon.com>,
+        Evgeny Iakovlev <eyakovl@amazon.de>,
+        Liran Alon <liran@amazon.com>,
+        Ioannis Aslanidis <iaslan@amazon.de>,
+        <linux-hyperv@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <kvm@vger.kernel.org>, "K. Y. Srinivasan" <kys@microsoft.com>,
+        Haiyang Zhang <haiyangz@microsoft.com>,
+        Stephen Hemminger <sthemmin@microsoft.com>,
+        Wei Liu <wei.liu@kernel.org>,
         Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Joerg Roedel <joro@8bytes.org>,
-        Borislav Petkov <bp@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        X86 ML <x86@kernel.org>, KVM list <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Sean Christopherson <seanjc@google.com>,
-        Venu Busireddy <venu.busireddy@oracle.com>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        kexec@lists.infradead.org
-Content-Type: text/plain; charset="UTF-8"
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        <x86@kernel.org>, "H. Peter Anvin" <hpa@zytor.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        "Sean Christopherson" <seanjc@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        "Jim Mattson" <jmattson@google.com>, Joerg Roedel <joro@8bytes.org>
+Message-ID: <20210413210758.GA10240@uc8bbc9586ea454.ant.amazon.com>
+References: <cover.1618244920.git.sidcha@amazon.de>
+ <da036c786700032b32e68ebece06fd1a6b6bf344.1618244920.git.sidcha@amazon.de>
+ <87sg3u5l8z.fsf@vitty.brq.redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <87sg3u5l8z.fsf@vitty.brq.redhat.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-Originating-IP: [10.43.161.39]
+X-ClientProxiedBy: EX13D20UWA003.ant.amazon.com (10.43.160.97) To
+ EX13D28EUC003.ant.amazon.com (10.43.164.43)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Apr 13, 2021 at 4:47 AM Ashish Kalra <ashish.kalra@amd.com> wrote:
->
-> On Mon, Apr 12, 2021 at 07:25:03PM -0700, Steve Rutherford wrote:
-> > On Mon, Apr 12, 2021 at 6:48 PM Ashish Kalra <ashish.kalra@amd.com> wrote:
-> > >
-> > > On Mon, Apr 12, 2021 at 06:23:32PM -0700, Steve Rutherford wrote:
-> > > > On Mon, Apr 12, 2021 at 5:22 PM Steve Rutherford <srutherford@google.com> wrote:
-> > > > >
-> > > > > On Mon, Apr 12, 2021 at 12:48 PM Ashish Kalra <Ashish.Kalra@amd.com> wrote:
-> > > > > >
-> > > > > > From: Ashish Kalra <ashish.kalra@amd.com>
-> > > > > >
-> > > > > > Reset the host's shared pages list related to kernel
-> > > > > > specific page encryption status settings before we load a
-> > > > > > new kernel by kexec. We cannot reset the complete
-> > > > > > shared pages list here as we need to retain the
-> > > > > > UEFI/OVMF firmware specific settings.
-> > > > > >
-> > > > > > The host's shared pages list is maintained for the
-> > > > > > guest to keep track of all unencrypted guest memory regions,
-> > > > > > therefore we need to explicitly mark all shared pages as
-> > > > > > encrypted again before rebooting into the new guest kernel.
-> > > > > >
-> > > > > > Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
-> > > > > > ---
-> > > > > >  arch/x86/kernel/kvm.c | 24 ++++++++++++++++++++++++
-> > > > > >  1 file changed, 24 insertions(+)
-> > > > > >
-> > > > > > diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
-> > > > > > index bcc82e0c9779..4ad3ed547ff1 100644
-> > > > > > --- a/arch/x86/kernel/kvm.c
-> > > > > > +++ b/arch/x86/kernel/kvm.c
-> > > > > > @@ -39,6 +39,7 @@
-> > > > > >  #include <asm/cpuidle_haltpoll.h>
-> > > > > >  #include <asm/ptrace.h>
-> > > > > >  #include <asm/svm.h>
-> > > > > > +#include <asm/e820/api.h>
-> > > > > >
-> > > > > >  DEFINE_STATIC_KEY_FALSE(kvm_async_pf_enabled);
-> > > > > >
-> > > > > > @@ -384,6 +385,29 @@ static void kvm_pv_guest_cpu_reboot(void *unused)
-> > > > > >          */
-> > > > > >         if (kvm_para_has_feature(KVM_FEATURE_PV_EOI))
-> > > > > >                 wrmsrl(MSR_KVM_PV_EOI_EN, 0);
-> > > > > > +       /*
-> > > > > > +        * Reset the host's shared pages list related to kernel
-> > > > > > +        * specific page encryption status settings before we load a
-> > > > > > +        * new kernel by kexec. NOTE: We cannot reset the complete
-> > > > > > +        * shared pages list here as we need to retain the
-> > > > > > +        * UEFI/OVMF firmware specific settings.
-> > > > > > +        */
-> > > > > > +       if (sev_live_migration_enabled & (smp_processor_id() == 0)) {
-> > > > > What happens if the reboot of CPU0 races with another CPU servicing a
-> > > > > device request (while the reboot is pending for that CPU)?
-> > > > > Seems like you could run into a scenario where you have hypercalls racing.
-> > > > >
-> > > > > Calling this on every core isn't free, but it is an easy way to avoid this race.
-> > > > > You could also count cores, and have only last core do the job, but
-> > > > > that seems more complicated.
-> > > > On second thought, I think this may be insufficient as a fix, since my
-> > > > read of kernel/reboot.c seems to imply that devices aren't shutdown
-> > > > until after these notifiers occur. As such, a single thread might be
-> > > > able to race with itself. I could be wrong here though.
-> > > >
-> > > > The heavy hammer would be to disable migration through the MSR (which
-> > > > the subsequent boot will re-enable).
-> > > >
-> > > > I'm curious if there is a less "blocking" way of handling kexecs (that
-> > > > strategy would block LM while the guest booted).
-> > > >
-> > > > One option that comes to mind would be for the guest to "mute" the
-> > > > encryption status hypercall after the call to reset the encryption
-> > > > status. The problem would be that the encryption status for pages
-> > > > would be very temporarily inaccurate in the window between that call
-> > > > and the start of the next boot. That isn't ideal, but, on the other
-> > > > hand, the VM was about to reboot anyway, so a corrupted shared page
-> > > > for device communication probably isn't super important. Still, I'm
-> > > > not really a fan of that. This would avoid corrupting the next boot,
-> > > > which is clearly an improvement.
-> > > >
-> > > > Each time the kernel boots it could also choose something like a
-> > > > generation ID, and pass that down each time it calls the hypercall.
-> > > > This would then let userspace identify which requests were coming from
-> > > > the subsequent boot.
-> > > >
-> > > > Everything here (except, perhaps, disabling migration through the MSR)
-> > > > seems kind of complicated. I somewhat hope my interpretation of
-> > > > kernel/reboot.c is wrong and this race just is not possible in the
-> > > > first place.
-> > > >
-> > >
-> > > Disabling migration through the MSR after resetting the page encryption
-> > > status is a reasonable approach. There is a similar window existing for
-> > > normal VM boot during which LM is disabled, from the point where OVMF
-> > > checks and adds support for SEV LM and the kernel boot checks for the
-> > > same and enables LM using the MSR.
+On Tue, Apr 13, 2021 at 04:09:48PM +0200, Vitaly Kuznetsov wrote:
+> Siddharth Chandrasekaran <sidcha@amazon.de> writes:
+> > Hyper-V supports the use of XMM registers to perform fast hypercalls.
+> > This allows guests to take advantage of the improved performance of the
+> > fast hypercall interface even though a hypercall may require more than
+> > (the current maximum of) two input registers.
 > >
-> > I'm not totally confident that disabling LM through the MSR is
-> > sufficient. I also think the newly booted kernel needs to reset the
-> > state itself, since nothing stops the hypercalls after the disable
-> > goes through. The host won't know the difference between early boot
-> > (pre-enablement) hypercalls and racy just-before-restart hypercalls.
-> > You might disable migration through the hypercall, get a late status
-> > change hypercall, reboot, then re-enable migration, but still have
-> > stale state.
+> > The XMM fast hypercall interface uses six additional XMM registers (XMM0
+> > to XMM5) to allow the guest to pass an input parameter block of up to
+> > 112 bytes. Hyper-V can also return data back to the guest in the
+> > remaining XMM registers that are not used by the current hypercall.
 > >
-> > I _believe_ that the kernel doesn't mark it's RAM as private on boot
-> > as an optimization (might be wrong about this), since it would have
-> > been expensive to mark all of ram as encrypted previously. I believe
-> > that is no longer a limitation given the KVM_EXIT, so we can reset
-> > this during early boot instead of just before the kexec.
+> > Add framework to read/write to XMM registers in kvm_hv_hypercall() and
+> > use the additional hypercall inputs from XMM registers in
+> > kvm_hv_flush_tlb() when possible.
 > >
->
-> I was wondering if disabling both migration (via the MSR) and "muting"
-> the hypercall using the "sev_live_migration_enabled" variable after the
-> page encryption status has been reset, will reset the page encryption
-> status of the guest to the (last known/good) configuration available to
-> the guest at boot time (i.e, all RAM pages marked as private and UEFI
-> setup shared MMIO/device regions, etc).
->
-> But disabling migration and muting hypercalls after page encryption
-> status reset is still "racy" with hypercalls on other vCPUS, and that
-> can potentially mess-up the page encryption status available to guest
-> after kexec.
->
-> So probably, as you mentioned above, resetting the page encryption
-> status during early boot (immediately after detecting host support for
-> migration and enabling the hypercalls) instead of just before the kexec
-> is a good fix.
-That strategy sounds good to me.
+> > Cc: Alexander Graf <graf@amazon.com>
+> > Co-developed-by: Evgeny Iakovlev <eyakovl@amazon.de>
+> > Signed-off-by: Evgeny Iakovlev <eyakovl@amazon.de>
+> > Signed-off-by: Siddharth Chandrasekaran <sidcha@amazon.de>
+> > ---
+> >  arch/x86/kvm/hyperv.c | 109 ++++++++++++++++++++++++++++++++++--------
+> >  1 file changed, 90 insertions(+), 19 deletions(-)
+> >
+> > diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
+> > index 8f6babd1ea0d..1f9959aba70d 100644
+> > --- a/arch/x86/kvm/hyperv.c
+> > +++ b/arch/x86/kvm/hyperv.c
+> > @@ -36,6 +36,7 @@
+> >
+> >  #include "trace.h"
+> >  #include "irq.h"
+> > +#include "fpu.h"
+> >
+> >  /* "Hv#1" signature */
+> >  #define HYPERV_CPUID_SIGNATURE_EAX 0x31237648
+> > @@ -1623,6 +1624,8 @@ static __always_inline unsigned long *sparse_set_to_vcpu_mask(
+> >       return vcpu_bitmap;
+> >  }
+> >
+> > +#define KVM_HV_HYPERCALL_MAX_XMM_REGISTERS  6
+> 
+> Nitpick: this is not KVM-specific so could probably go to arch/x86/include/asm/hyperv-tlfs.h
 
-Thanks,
-Steve
->
-> Thanks,
-> Ashish
->
-> > > > > > +               int i;
-> > > > > > +               unsigned long nr_pages;
-> > > > > > +
-> > > > > > +               for (i = 0; i < e820_table->nr_entries; i++) {
-> > > > > > +                       struct e820_entry *entry = &e820_table->entries[i];
-> > > > > > +
-> > > > > > +                       if (entry->type != E820_TYPE_RAM)
-> > > > > > +                               continue;
-> > > > > > +
-> > > > > > +                       nr_pages = DIV_ROUND_UP(entry->size, PAGE_SIZE);
-> > > > > > +
-> > > > > > +                       kvm_sev_hypercall3(KVM_HC_PAGE_ENC_STATUS,
-> > > > > > +                                          entry->addr, nr_pages, 1);
-> > > > > > +               }
-> > > > > > +       }
-> > > > > >         kvm_pv_disable_apf();
-> > > > > >         kvm_disable_steal_time();
-> > > > > >  }
-> > > > > > --
-> > > > > > 2.17.1
-> > > > > >
+Ack.
+
+> > +
+> >  struct kvm_hv_hcall {
+> >       u64 param;
+> >       u64 ingpa;
+> > @@ -1632,10 +1635,14 @@ struct kvm_hv_hcall {
+> >       u16 rep_idx;
+> >       bool fast;
+> >       bool rep;
+> > +     sse128_t xmm[KVM_HV_HYPERCALL_MAX_XMM_REGISTERS];
+> > +     bool xmm_dirty;
+> >  };
+> >
+> >  static u64 kvm_hv_flush_tlb(struct kvm_vcpu *vcpu, struct kvm_hv_hcall *hc, bool ex)
+> >  {
+> > +     int i, j;
+> > +     gpa_t gpa;
+> >       struct kvm *kvm = vcpu->kvm;
+> >       struct kvm_vcpu_hv *hv_vcpu = to_hv_vcpu(vcpu);
+> >       struct hv_tlb_flush_ex flush_ex;
+> > @@ -1649,8 +1656,15 @@ static u64 kvm_hv_flush_tlb(struct kvm_vcpu *vcpu, struct kvm_hv_hcall *hc, bool
+> >       bool all_cpus;
+> >
+> >       if (!ex) {
+> > -             if (unlikely(kvm_read_guest(kvm, hc->ingpa, &flush, sizeof(flush))))
+> > -                     return HV_STATUS_INVALID_HYPERCALL_INPUT;
+> > +             if (hc->fast) {
+> > +                     flush.address_space = hc->ingpa;
+> > +                     flush.flags = hc->outgpa;
+> > +                     flush.processor_mask = sse128_lo(hc->xmm[0]);
+> > +             } else {
+> > +                     if (unlikely(kvm_read_guest(kvm, hc->ingpa,
+> > +                                                 &flush, sizeof(flush))))
+> > +                             return HV_STATUS_INVALID_HYPERCALL_INPUT;
+> > +             }
+> >
+> >               trace_kvm_hv_flush_tlb(flush.processor_mask,
+> >                                      flush.address_space, flush.flags);
+> > @@ -1668,9 +1682,16 @@ static u64 kvm_hv_flush_tlb(struct kvm_vcpu *vcpu, struct kvm_hv_hcall *hc, bool
+> >               all_cpus = (flush.flags & HV_FLUSH_ALL_PROCESSORS) ||
+> >                       flush.processor_mask == 0;
+> >       } else {
+> > -             if (unlikely(kvm_read_guest(kvm, hc->ingpa, &flush_ex,
+> > -                                         sizeof(flush_ex))))
+> > -                     return HV_STATUS_INVALID_HYPERCALL_INPUT;
+> > +             if (hc->fast) {
+> > +                     flush_ex.address_space = hc->ingpa;
+> > +                     flush_ex.flags = hc->outgpa;
+> > +                     memcpy(&flush_ex.hv_vp_set,
+> > +                            &hc->xmm[0], sizeof(hc->xmm[0]));
+> > +             } else {
+> > +                     if (unlikely(kvm_read_guest(kvm, hc->ingpa, &flush_ex,
+> > +                                                 sizeof(flush_ex))))
+> > +                             return HV_STATUS_INVALID_HYPERCALL_INPUT;
+> > +             }
+> >
+> >               trace_kvm_hv_flush_tlb_ex(flush_ex.hv_vp_set.valid_bank_mask,
+> >                                         flush_ex.hv_vp_set.format,
+> > @@ -1681,20 +1702,29 @@ static u64 kvm_hv_flush_tlb(struct kvm_vcpu *vcpu, struct kvm_hv_hcall *hc, bool
+> >               all_cpus = flush_ex.hv_vp_set.format !=
+> >                       HV_GENERIC_SET_SPARSE_4K;
+> >
+> > -             sparse_banks_len =
+> > -                     bitmap_weight((unsigned long *)&valid_bank_mask, 64) *
+> > -                     sizeof(sparse_banks[0]);
+> > +             sparse_banks_len = bitmap_weight((unsigned long *)&valid_bank_mask, 64);
+> >
+> >               if (!sparse_banks_len && !all_cpus)
+> >                       goto ret_success;
+> >
+> > -             if (!all_cpus &&
+> > -                 kvm_read_guest(kvm,
+> > -                                hc->ingpa + offsetof(struct hv_tlb_flush_ex,
+> > -                                                     hv_vp_set.bank_contents),
+> > -                                sparse_banks,
+> > -                                sparse_banks_len))
+> > -                     return HV_STATUS_INVALID_HYPERCALL_INPUT;
+> > +             if (!all_cpus) {
+> > +                     if (hc->fast) {
+> > +                             if (sparse_banks_len > KVM_HV_HYPERCALL_MAX_XMM_REGISTERS - 1)
+> > +                                     return HV_STATUS_INVALID_HYPERCALL_INPUT;
+> > +                             for (i = 0, j = 1; i < sparse_banks_len; i += 2, j++) {
+> 
+> Nitpick: you don't really need 'j' here as 'j == i/2 + 1', right?
+
+Yes, you are right. Changed.
+
+> > +                                     sparse_banks[i + 0] = sse128_lo(hc->xmm[j]);
+> 
+> Using ' + 0' for identation is ... unusual :-) I'm not opposed to it
+> here though.
+
+Old habit :-).
+
+> > +                                     sparse_banks[i + 1] = sse128_hi(hc->xmm[j]);
+> > +                             }
+> > +                     } else {
+> > +                             gpa = hc->ingpa;
+> > +                             gpa += offsetof(struct hv_tlb_flush_ex,
+> > +                                             hv_vp_set.bank_contents);
+> 
+> Nitpick: if splitting these into two lines is only done to fit into 80
+> chars then I'd the requirement is no more so we can be a bit wider.
+> 
+>  gpa = hc->ingpa + offsetof(...)
+
+Ack.
+
+> > +                             if (unlikely(kvm_read_guest(kvm, gpa, sparse_banks,
+> > +                                                         sparse_banks_len *
+> > +                                                         sizeof(sparse_banks[0]))))
+> > +                                     return HV_STATUS_INVALID_HYPERCALL_INPUT;
+> > +                     }
+> > +             }
+> >       }
+> >
+> >       cpumask_clear(&hv_vcpu->tlb_flush);
+> > @@ -1890,6 +1920,41 @@ static u16 kvm_hvcall_signal_event(struct kvm_vcpu *vcpu, struct kvm_hv_hcall *h
+> >       return HV_STATUS_SUCCESS;
+> >  }
+> >
+> > +static bool is_xmm_fast_hypercall(struct kvm_hv_hcall *hc)
+> > +{
+> > +     switch (hc->code) {
+> > +     case HVCALL_FLUSH_VIRTUAL_ADDRESS_LIST:
+> > +     case HVCALL_FLUSH_VIRTUAL_ADDRESS_SPACE:
+> > +     case HVCALL_FLUSH_VIRTUAL_ADDRESS_LIST_EX:
+> > +     case HVCALL_FLUSH_VIRTUAL_ADDRESS_SPACE_EX:
+> > +             return true;
+> > +     }
+> > +
+> > +     return false;
+> > +}
+> > +
+> > +static inline void kvm_hv_hypercall_read_xmm(struct kvm_hv_hcall *hc)
+> > +{
+> > +     int reg;
+> > +
+> > +     kvm_fpu_get();
+> > +     for (reg = 0; reg < KVM_HV_HYPERCALL_MAX_XMM_REGISTERS; reg++)
+> > +             _kvm_read_sse_reg(reg, &hc->xmm[reg]);
+> > +     kvm_fpu_put();
+> > +     hc->xmm_dirty = false;
+> > +}
+> > +
+> > +static inline void kvm_hv_hypercall_write_xmm(struct kvm_hv_hcall *hc)
+> > +{
+> > +     int reg;
+> > +
+> > +     kvm_fpu_get();
+> > +     for (reg = 0; reg < KVM_HV_HYPERCALL_MAX_XMM_REGISTERS; reg++)
+> > +             _kvm_write_sse_reg(reg, &hc->xmm[reg]);
+> > +     kvm_fpu_put();
+> > +     hc->xmm_dirty = false;
+> > +}
+> > +
+> >  int kvm_hv_hypercall(struct kvm_vcpu *vcpu)
+> >  {
+> >       struct kvm_hv_hcall hc;
+> > @@ -1926,6 +1991,9 @@ int kvm_hv_hypercall(struct kvm_vcpu *vcpu)
+> >       hc.rep_idx = (hc.param >> HV_HYPERCALL_REP_START_OFFSET) & 0xfff;
+> >       hc.rep = !!(hc.rep_cnt || hc.rep_idx);
+> >
+> > +     if (hc.fast && is_xmm_fast_hypercall(&hc))
+> > +             kvm_hv_hypercall_read_xmm(&hc);
+> > +
+> >       trace_kvm_hv_hypercall(hc.code, hc.fast, hc.rep_cnt, hc.rep_idx,
+> >                              hc.ingpa, hc.outgpa);
+> >
+> > @@ -1961,28 +2029,28 @@ int kvm_hv_hypercall(struct kvm_vcpu *vcpu)
+> >                               kvm_hv_hypercall_complete_userspace;
+> >               return 0;
+> >       case HVCALL_FLUSH_VIRTUAL_ADDRESS_LIST:
+> > -             if (unlikely(hc.fast || !hc.rep_cnt || hc.rep_idx)) {
+> > +             if (unlikely(!hc.rep_cnt || hc.rep_idx)) {
+> >                       ret = HV_STATUS_INVALID_HYPERCALL_INPUT;
+> >                       break;
+> >               }
+> >               ret = kvm_hv_flush_tlb(vcpu, &hc, false);
+> >               break;
+> >       case HVCALL_FLUSH_VIRTUAL_ADDRESS_SPACE:
+> > -             if (unlikely(hc.fast || hc.rep)) {
+> > +             if (unlikely(hc.rep)) {
+> >                       ret = HV_STATUS_INVALID_HYPERCALL_INPUT;
+> >                       break;
+> >               }
+> >               ret = kvm_hv_flush_tlb(vcpu, &hc, false);
+> >               break;
+> >       case HVCALL_FLUSH_VIRTUAL_ADDRESS_LIST_EX:
+> > -             if (unlikely(hc.fast || !hc.rep_cnt || hc.rep_idx)) {
+> > +             if (unlikely(!hc.rep_cnt || hc.rep_idx)) {
+> >                       ret = HV_STATUS_INVALID_HYPERCALL_INPUT;
+> >                       break;
+> >               }
+> >               ret = kvm_hv_flush_tlb(vcpu, &hc, true);
+> >               break;
+> >       case HVCALL_FLUSH_VIRTUAL_ADDRESS_SPACE_EX:
+> > -             if (unlikely(hc.fast || hc.rep)) {
+> > +             if (unlikely(hc.rep)) {
+> >                       ret = HV_STATUS_INVALID_HYPERCALL_INPUT;
+> >                       break;
+> >               }
+> > @@ -2035,6 +2103,9 @@ int kvm_hv_hypercall(struct kvm_vcpu *vcpu)
+> >               break;
+> >       }
+> >
+> > +     if (hc.xmm_dirty)
+> > +             kvm_hv_hypercall_write_xmm(&hc);
+> > +
+> 
+> Wei already mention that but as 'xmm_dirty' is not being used in this
+> patch I'd suggest we move it out too.
+
+Okay, I should remove HV_X64_HYPERCALL_XMM_OUTPUT_AVAILABLE for now then.
+
+~ Sid.
+
+
+
+Amazon Development Center Germany GmbH
+Krausenstr. 38
+10117 Berlin
+Geschaeftsfuehrung: Christian Schlaeger, Jonathan Weiss
+Eingetragen am Amtsgericht Charlottenburg unter HRB 149173 B
+Sitz: Berlin
+Ust-ID: DE 289 237 879
+
+
+
