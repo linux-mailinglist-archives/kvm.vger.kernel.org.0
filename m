@@ -2,74 +2,96 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E012A35E69F
-	for <lists+kvm@lfdr.de>; Tue, 13 Apr 2021 20:43:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 795C135E6A4
+	for <lists+kvm@lfdr.de>; Tue, 13 Apr 2021 20:46:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233027AbhDMSoA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 13 Apr 2021 14:44:00 -0400
-Received: from mail.kernel.org ([198.145.29.99]:56570 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231980AbhDMSn7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 13 Apr 2021 14:43:59 -0400
-Received: from gandalf.local.home (cpe-66-24-58-225.stny.res.rr.com [66.24.58.225])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id B3BD26113E;
-        Tue, 13 Apr 2021 18:43:36 +0000 (UTC)
-Date:   Tue, 13 Apr 2021 14:43:35 -0400
-From:   Steven Rostedt <rostedt@goodmis.org>
-To:     Dmitry Vyukov <dvyukov@google.com>
-Cc:     syzkaller <syzkaller@googlegroups.com>,
-        syzbot <syzbot+61e04e51b7ac86930589@syzkaller.appspotmail.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Jens Axboe <axboe@kernel.dk>, Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, KVM list <kvm@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>, masahiroy@kernel.org,
-        Ingo Molnar <mingo@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        rafael.j.wysocki@intel.com,
-        Sean Christopherson <seanjc@google.com>,
-        syzkaller-bugs <syzkaller-bugs@googlegroups.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Will Deacon <will@kernel.org>,
-        "the arch/x86 maintainers" <x86@kernel.org>
-Subject: Re: [syzbot] possible deadlock in del_gendisk
-Message-ID: <20210413144335.4ff14cf2@gandalf.local.home>
-In-Reply-To: <20210413144009.6ed2feb8@gandalf.local.home>
-References: <000000000000ae236f05bfde0678@google.com>
-        <20210413134147.54556d9d@gandalf.local.home>
-        <20210413134314.16068eeb@gandalf.local.home>
-        <CACT4Y+ZrkE=ZKKncTOJRJgOTNfU8PGz=k+8V+0602ftTCHkc6Q@mail.gmail.com>
-        <20210413144009.6ed2feb8@gandalf.local.home>
-X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+        id S1347697AbhDMSq3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 13 Apr 2021 14:46:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59036 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1346394AbhDMSq0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 13 Apr 2021 14:46:26 -0400
+Received: from mail-ej1-x632.google.com (mail-ej1-x632.google.com [IPv6:2a00:1450:4864:20::632])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2BB2EC061574
+        for <kvm@vger.kernel.org>; Tue, 13 Apr 2021 11:46:05 -0700 (PDT)
+Received: by mail-ej1-x632.google.com with SMTP id n2so27546658ejy.7
+        for <kvm@vger.kernel.org>; Tue, 13 Apr 2021 11:46:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=BMGgkIUNC5wWSbI0C1p7AMY+wrQiOl3v5uY4HYbC/nA=;
+        b=mRHHof94dBTjnv2kql1qxtKewllGuJC7CJTPW+gffF3hjEG/vYqShSSh9lDYIGDTZW
+         +2f5H5GYi9BMd979sRs2hichgCR1CFTVXFx13NO7FvDVI1Kp44mYBorL/ls0WUNneyyB
+         /JTqivyXzzjZJpZ4llQutwzxtvBSsTvz4bB3cPR+5JNtBakN5/VYtzIvJdaEBUethCfG
+         0bGzPtJhwx5x3rsBUsU7MaC+/gPylvCadXuMIBW3DaK/KN5FffKAyDdlMyUcpNVBXuQ7
+         DjYoNZT+Jj4RHjC8Bt37cCXI9UPgPC0qZ9/z4htSGHq1+v/huhtfkdApmWjZxdcIOxk1
+         DnQw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=BMGgkIUNC5wWSbI0C1p7AMY+wrQiOl3v5uY4HYbC/nA=;
+        b=gMOX+6TCDIwob9pIypAaaQruxyEFACX3SKukKoDIGAbsBRen1mN/ExdbJFNz9IxJhs
+         /tY8nWctjGuRMssklA68wHqmwO0q8lT6wXRS5LG7/f/T+E7yDp2LIqnFC2C/0O6pUy3B
+         /y5pbxnjVY3EaL11F3NqMtm1qPW7MrISprHqPUfpWwaYSJyO1yOsMGNRN4CtsbJoIkEq
+         LClg6UsPWqAEO+NYhuUyGZGW40Qlg+q/lQRDmMGfa/hyEkoP0AqosliVA81ErZFTC01D
+         MppuFgvwnPzPKgEG2EmuKV//LY3K+ahiCF1ItjwyRDZ2fQQApExYgqHeoXIF2mybWMvf
+         UNCg==
+X-Gm-Message-State: AOAM533gQy+4BljRwvM0Wsfhuias9SRELLM6t/CUl3xRKcP0VE6xRhCG
+        njrj//+h1MPA1E+aGZcBCYtyJSQe7Am+l2s6x63/z/Jo+u8=
+X-Google-Smtp-Source: ABdhPJwOAKdwimwdXmyd9YZC1Lo2ZFNJZlqxhMHcPG2WDWSOeFiYrvVfHRaqwggt18Drl/Opi1c9PgTsxhMlYzmPg5Q=
+X-Received: by 2002:a17:906:48c4:: with SMTP id d4mr14395692ejt.548.1618339563693;
+ Tue, 13 Apr 2021 11:46:03 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <20210412130938.68178-1-david.edmondson@oracle.com>
+ <20210412130938.68178-6-david.edmondson@oracle.com> <YHRvchkUSIeU8tRR@google.com>
+ <cuno8eisbf9.fsf@oracle.com>
+In-Reply-To: <cuno8eisbf9.fsf@oracle.com>
+From:   Aaron Lewis <aaronlewis@google.com>
+Date:   Tue, 13 Apr 2021 11:45:52 -0700
+Message-ID: <CAAAPnDGy2MZF2QVTTdNQgQC3Sh9mOjJx-cetn2nZ4cu6-h1Zvg@mail.gmail.com>
+Subject: Re: [PATCH 5/6] KVM: SVM: pass a proper reason in kvm_emulate_instruction()
+To:     David Edmondson <david.edmondson@oracle.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        linux-kernel@vger.kernel.org, kvm list <kvm@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Joerg Roedel <joro@8bytes.org>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Jim Mattson <jmattson@google.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        Joao Martins <joao.m.martins@oracle.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 13 Apr 2021 14:40:09 -0400
-Steven Rostedt <rostedt@goodmis.org> wrote:
+>
+> > Depending on what you're trying to do with the info, maybe there's a better
+> > option.  E.g. Aaron is working on a series that includes passing pass the code
+> > stream (instruction bytes) to userspace on emulation failure, though I'm not
+> > sure if he's planning on providing the VM-Exit reason.
+>
+> Having the instruction stream will be good.
+>
+> Aaron: do you have anything to share now? In what time frame do you
+> think you might submit patches?
 
-> ------------[ cut here ]------------
-> raw_local_irq_restore() called with IRQs enabled
-> WARNING: CPU: 0 PID: 8777 at kernel/locking/irqflag-debug.c:9 warn_bogus_irq_restore kernel/locking/irqflag-debug.c:9 [inline]
-> WARNING: CPU: 0 PID: 8777 at kernel/locking/irqflag-debug.c:9 warn_bogus_irq_restore+0x1d/0x20 kernel/locking/irqflag-debug.c:7
+I should be able to have something out later this week.  There is no
+exit reason as Sean indicated, so if that's important it will have to
+be reworked afterwards.  For struct internal in kvm_run I use data[0]
+for flags to indicate what's contained in the rest of it, I use
+data[1] as the instruction size, and I use data[2,3] to store the
+instruction bytes.  Hope that helps.
 
-In fact, when you have the above, which is a WARN() with text:
-
- "raw_local_irq_restore() called with IRQs enabled"
-
-It is pretty much guaranteed that all triggers of this bug will have the
-above warning with the same text.
-
--- Steve
-
+>
+> I'm happy to re-work this to make the exit reason available, if that's
+> the appropriate direction.
+>
+> dme.
+> --
+> And you're standing here beside me, I love the passing of time.
