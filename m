@@ -2,100 +2,103 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9F8B535DE6F
-	for <lists+kvm@lfdr.de>; Tue, 13 Apr 2021 14:15:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4681A35DEA8
+	for <lists+kvm@lfdr.de>; Tue, 13 Apr 2021 14:27:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239118AbhDMMPi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 13 Apr 2021 08:15:38 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:29644 "EHLO
+        id S1345506AbhDMM1B (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 13 Apr 2021 08:27:01 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:49572 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S236758AbhDMMPh (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 13 Apr 2021 08:15:37 -0400
+        by vger.kernel.org with ESMTP id S1345497AbhDMM07 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 13 Apr 2021 08:26:59 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1618316117;
+        s=mimecast20190719; t=1618316799;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=aqf0RiZSoAYfI4s0e2+ZgKSiJco7N8Kba8wSDbcvYCc=;
-        b=TMWLLvIIl04hagtpe6OblGypZQSvWNHooOkG3g/GA6Af1MWHl1a5j+0kzosu/DQFbwuJ1p
-        GYrh8FYbdjdZpXsN+l+NKpN1gq3keBaiyM/UfHXcYmADLJZDkC1h5iqPxQ2KtqgrIlS2Yi
-        9kCUuK73WUyKFOLqz2WLinu9g5OGGGE=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-415-Y3xg7aWOPnGI98klKizf2Q-1; Tue, 13 Apr 2021 08:15:15 -0400
-X-MC-Unique: Y3xg7aWOPnGI98klKizf2Q-1
-Received: by mail-ed1-f69.google.com with SMTP id r4-20020a0564022344b0290382ce72b7f9so1154823eda.19
-        for <kvm@vger.kernel.org>; Tue, 13 Apr 2021 05:15:15 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=aqf0RiZSoAYfI4s0e2+ZgKSiJco7N8Kba8wSDbcvYCc=;
-        b=rztOwhZii6ZcVlIRijZrrnIwNvnOiIYWohzZ+msmZVjN1MB7I3tdHakvc0Y9mNTfUi
-         Xx9gslAxpDr840Pg8o60NR12ZFHCRymwjFx2Bbvo7taDwy7yw0k7+NDsEMrsfo0pD2ge
-         6s+Uj9IW0wwn3fbtWYWHeeE/224QG2WEDg2yS8/JWuGJpGvMzeDP1cyQrzJKE5aVgCYm
-         8xiK+IFKp7+g44QFBfHIYptf5+5azkJTPqy4w62LX650XA9dRLliC96Ej9QL3eOEtYzJ
-         dmeJeyp0yueYn4s1W+L0lSZxLBVxxPfNitlbZx5PEArnBJTFFf2RtEqkQlt1kArwJmG3
-         CqBQ==
-X-Gm-Message-State: AOAM531R83JpxGHhDFAbKlqcN8HydAybftdzBzDXrDSHmb2idMyldVI0
-        m8Lsss4ksgi+7GTGu9VZ6ebjUBVCP/IXabG5bPQ+7248ORpB4V9j3drXYvL8VKgx83ChfvFftcE
-        QuQlqU2Sr+ift
-X-Received: by 2002:a17:906:3549:: with SMTP id s9mr9309563eja.327.1618316114728;
-        Tue, 13 Apr 2021 05:15:14 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJye3ZXpM2j4/xA1ZsYOu2bEOUbV5nlWPoAJCBVywHcjFdlmDPmkeyBoZhrkjlFGbk70xZ8uSA==
-X-Received: by 2002:a17:906:3549:: with SMTP id s9mr9309548eja.327.1618316114534;
-        Tue, 13 Apr 2021 05:15:14 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id j6sm9057849edw.73.2021.04.13.05.15.13
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 13 Apr 2021 05:15:13 -0700 (PDT)
-Subject: Re: [PATCH 2/2] KVM: x86: Fix split-irqchip vs interrupt injection
- window request
-To:     Lai Jiangshan <jiangshanlai+lkml@gmail.com>,
-        Sean Christopherson <seanjc@google.com>
-Cc:     LKML <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org,
-        Filippo Sironi <sironi@amazon.de>,
-        David Woodhouse <dwmw@amazon.co.uk>,
-        "v4.7+" <stable@vger.kernel.org>,
-        Wanpeng Li <wanpengli@tencent.com>
-References: <20201127112114.3219360-1-pbonzini@redhat.com>
- <20201127112114.3219360-3-pbonzini@redhat.com>
- <CAJhGHyCdqgtvK98_KieG-8MUfg1Jghd+H99q+FkgL0ZuqnvuAw@mail.gmail.com>
- <YHS/BxMiO6I1VOEY@google.com>
- <CAJhGHyAcnwkCfTcnxXcgAHnF=wPbH2EDp7H+e74ce+oNOWJ=_Q@mail.gmail.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <80b013dc-0078-76f4-1299-3cff261ef7d8@redhat.com>
-Date:   Tue, 13 Apr 2021 14:15:12 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.7.0
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=gHXO771pHe9zTon0JL2N9C6BipX6JwrG/i20Z7QO1yU=;
+        b=CQeuts+YaiwvwmlueAPwBiq3NOwn3k2pN+u+Siui9VxpY28SHpf0FczYsUPYD+sM96Ch7e
+        7MTMW4WB6lzDsgFq/ENku9Jb2J7U1grwo2lheBVQnGdm7uw6IO+YW/xNBFLu/XzpFnhnAI
+        5hedAtIPq/3+TEcacO5Ysl1E5QBGN6c=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-325-XnBuu0xjN3SGTxk9jSZ6cQ-1; Tue, 13 Apr 2021 08:26:36 -0400
+X-MC-Unique: XnBuu0xjN3SGTxk9jSZ6cQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 44E488030D0;
+        Tue, 13 Apr 2021 12:26:34 +0000 (UTC)
+Received: from vitty.brq.redhat.com (unknown [10.40.195.75])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id C3AB660C04;
+        Tue, 13 Apr 2021 12:26:31 +0000 (UTC)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Siddharth Chandrasekaran <sidcha@amazon.de>,
+        linux-kernel@vger.kernel.org, linux-hyperv@vger.kernel.org
+Subject: [PATCH RFC 00/22] KVM: x86: hyper-v: Fine-grained access check to Hyper-V hypercalls and MSRs
+Date:   Tue, 13 Apr 2021 14:26:08 +0200
+Message-Id: <20210413122630.975617-1-vkuznets@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CAJhGHyAcnwkCfTcnxXcgAHnF=wPbH2EDp7H+e74ce+oNOWJ=_Q@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 13/04/21 13:03, Lai Jiangshan wrote:
-> This patch claims that it has a place to
-> stash the IRQ when EFLAGS.IF=0, but inject_pending_event() seams to ignore
-> EFLAGS.IF and queues the IRQ to the guest directly in the first branch
-> of using "kvm_x86_ops.set_irq(vcpu)".
+Currently, all implemented Hyper-V features (MSRs and hypercalls) are
+available unconditionally to all Hyper-V enabled guests. This is not
+ideal as KVM userspace may decide to provide only a subset of the
+currently implemented features to emulate an older Hyper-V version,
+to reduce attack surface,... Implement checks against guest visible
+CPUIDs for all currently implemented MSRs and hypercalls.
 
-This is only true for pure-userspace irqchip.  For split-irqchip, in 
-which case the "place to stash" the interrupt is 
-vcpu->arch.pending_external_vector.
+RFC part:
+- KVM has KVM_CAP_ENFORCE_PV_FEATURE_CPUID for KVM PV features. Should
+ we use it for Hyper-V as well or should we rather add a Hyper-V specific
+ CAP (or neither)?
 
-For pure-userspace irqchip, KVM_INTERRUPT only cares about being able to 
-stash the interrupt in vcpu->arch.interrupt.injected.  It is indeed 
-wrong for userspace to call KVM_INTERRUPT if the vCPU is not ready for 
-interrupt injection, but KVM_INTERRUPT does not return an error.
+TODO:
+- Write a selftest
+- Check with various Windows/Hyper-V versions that CPUID feature bits
+ are actually respected.
 
-Ignoring the fact that this would be incorrect use of the API, are you 
-saying that the incorrect injection was not possible before this patch?
+Vitaly Kuznetsov (22):
+  asm-generic/hyperv: add HV_STATUS_ACCESS_DENIED definition
+  KVM: x86: hyper-v: Cache guest CPUID leaves determining features
+    availability
+  KVM: x86: hyper-v: Honor HV_MSR_VP_RUNTIME_AVAILABLE privilege bit
+  KVM: x86: hyper-v: Honor HV_MSR_TIME_REF_COUNT_AVAILABLE privilege bit
+  KVM: x86: hyper-v: Honor HV_MSR_HYPERCALL_AVAILABLE privilege bit
+  KVM: x86: hyper-v: Honor HV_MSR_VP_INDEX_AVAILABLE privilege bit
+  KVM: x86: hyper-v: Honor HV_MSR_RESET_AVAILABLE privilege bit
+  KVM: x86: hyper-v: Honor HV_MSR_REFERENCE_TSC_AVAILABLE privilege bit
+  KVM: x86: hyper-v: Honor HV_MSR_SYNIC_AVAILABLE privilege bit
+  KVM: x86: hyper-v: Honor HV_MSR_SYNTIMER_AVAILABLE privilege bit
+  KVM: x86: hyper-v: Honor HV_MSR_APIC_ACCESS_AVAILABLE privilege bit
+  KVM: x86: hyper-v: Honor HV_ACCESS_FREQUENCY_MSRS privilege bit
+  KVM: x86: hyper-v: Honor HV_ACCESS_REENLIGHTENMENT privilege bit
+  KVM: x86: hyper-v: Honor HV_FEATURE_GUEST_CRASH_MSR_AVAILABLE
+    privilege bit
+  KVM: x86: hyper-v: Honor HV_FEATURE_GUEST_CRASH_MSR_AVAILABLE
+    privilege bit
+  KVM: x86: hyper-v: Honor HV_STIMER_DIRECT_MODE_AVAILABLE privilege bit
+  KVM: x86: hyper-v: Honor HV_POST_MESSAGES privilege bit
+  KVM: x86: hyper-v: Honor HV_SIGNAL_EVENTS privilege bit
+  KVM: x86: hyper-v: Honor HV_DEBUGGING privilege bit
+  KVM: x86: hyper-v: Honor HV_X64_REMOTE_TLB_FLUSH_RECOMMENDED bit
+  KVM: x86: hyper-v: Honor HV_X64_CLUSTER_IPI_RECOMMENDED bit
+  KVM: x86: hyper-v: Check access to HVCALL_NOTIFY_LONG_SPIN_WAIT
+    hypercall
 
-Paolo
+ arch/x86/include/asm/kvm_host.h   |   8 +
+ arch/x86/kvm/hyperv.c             | 305 +++++++++++++++++++++++++++---
+ include/asm-generic/hyperv-tlfs.h |   1 +
+ 3 files changed, 291 insertions(+), 23 deletions(-)
+
+-- 
+2.30.2
 
