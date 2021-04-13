@@ -2,36 +2,37 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4681A35DEA8
-	for <lists+kvm@lfdr.de>; Tue, 13 Apr 2021 14:27:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9259B35DEAB
+	for <lists+kvm@lfdr.de>; Tue, 13 Apr 2021 14:27:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345506AbhDMM1B (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 13 Apr 2021 08:27:01 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:49572 "EHLO
+        id S1345512AbhDMM1I (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 13 Apr 2021 08:27:08 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:59174 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1345497AbhDMM07 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 13 Apr 2021 08:26:59 -0400
+        by vger.kernel.org with ESMTP id S1345505AbhDMM1B (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 13 Apr 2021 08:27:01 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1618316799;
+        s=mimecast20190719; t=1618316801;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=gHXO771pHe9zTon0JL2N9C6BipX6JwrG/i20Z7QO1yU=;
-        b=CQeuts+YaiwvwmlueAPwBiq3NOwn3k2pN+u+Siui9VxpY28SHpf0FczYsUPYD+sM96Ch7e
-        7MTMW4WB6lzDsgFq/ENku9Jb2J7U1grwo2lheBVQnGdm7uw6IO+YW/xNBFLu/XzpFnhnAI
-        5hedAtIPq/3+TEcacO5Ysl1E5QBGN6c=
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=PPZjB79IEIwq/PRCsOh+j7hnsKwi62omE4Ya7aReZls=;
+        b=LlrlQ4q1S5ZBgKDn1KF38Frzc4HTW8XiBQg1bbyaCoVSFAxmj3qbmieZFukN7GglYQxRvL
+        WW7ttJwzP+UElc1bvNi1QNNLmMOX7/S2z7YlZfifPY7uasBiOQfobINMQsB4+AMnNa5bIZ
+        EQQKt8Pf3WC7JsgE5M5O7CjJRg88wPw=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-325-XnBuu0xjN3SGTxk9jSZ6cQ-1; Tue, 13 Apr 2021 08:26:36 -0400
-X-MC-Unique: XnBuu0xjN3SGTxk9jSZ6cQ-1
+ us-mta-301-WXqNNjheOdWLlC4Ft6wxxQ-1; Tue, 13 Apr 2021 08:26:38 -0400
+X-MC-Unique: WXqNNjheOdWLlC4Ft6wxxQ-1
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 44E488030D0;
-        Tue, 13 Apr 2021 12:26:34 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AC61D1008062;
+        Tue, 13 Apr 2021 12:26:36 +0000 (UTC)
 Received: from vitty.brq.redhat.com (unknown [10.40.195.75])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id C3AB660C04;
-        Tue, 13 Apr 2021 12:26:31 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 926D760C04;
+        Tue, 13 Apr 2021 12:26:34 +0000 (UTC)
 From:   Vitaly Kuznetsov <vkuznets@redhat.com>
 To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Sean Christopherson <seanjc@google.com>,
@@ -39,9 +40,11 @@ Cc:     Sean Christopherson <seanjc@google.com>,
         Jim Mattson <jmattson@google.com>,
         Siddharth Chandrasekaran <sidcha@amazon.de>,
         linux-kernel@vger.kernel.org, linux-hyperv@vger.kernel.org
-Subject: [PATCH RFC 00/22] KVM: x86: hyper-v: Fine-grained access check to Hyper-V hypercalls and MSRs
-Date:   Tue, 13 Apr 2021 14:26:08 +0200
-Message-Id: <20210413122630.975617-1-vkuznets@redhat.com>
+Subject: [PATCH RFC 01/22] asm-generic/hyperv: add HV_STATUS_ACCESS_DENIED definition
+Date:   Tue, 13 Apr 2021 14:26:09 +0200
+Message-Id: <20210413122630.975617-2-vkuznets@redhat.com>
+In-Reply-To: <20210413122630.975617-1-vkuznets@redhat.com>
+References: <20210413122630.975617-1-vkuznets@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
@@ -49,56 +52,26 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Currently, all implemented Hyper-V features (MSRs and hypercalls) are
-available unconditionally to all Hyper-V enabled guests. This is not
-ideal as KVM userspace may decide to provide only a subset of the
-currently implemented features to emulate an older Hyper-V version,
-to reduce attack surface,... Implement checks against guest visible
-CPUIDs for all currently implemented MSRs and hypercalls.
+From TLFSv6.0b, this status means: "The caller did not possess sufficient
+access rights to perform the requested operation."
 
-RFC part:
-- KVM has KVM_CAP_ENFORCE_PV_FEATURE_CPUID for KVM PV features. Should
- we use it for Hyper-V as well or should we rather add a Hyper-V specific
- CAP (or neither)?
+Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+---
+ include/asm-generic/hyperv-tlfs.h | 1 +
+ 1 file changed, 1 insertion(+)
 
-TODO:
-- Write a selftest
-- Check with various Windows/Hyper-V versions that CPUID feature bits
- are actually respected.
-
-Vitaly Kuznetsov (22):
-  asm-generic/hyperv: add HV_STATUS_ACCESS_DENIED definition
-  KVM: x86: hyper-v: Cache guest CPUID leaves determining features
-    availability
-  KVM: x86: hyper-v: Honor HV_MSR_VP_RUNTIME_AVAILABLE privilege bit
-  KVM: x86: hyper-v: Honor HV_MSR_TIME_REF_COUNT_AVAILABLE privilege bit
-  KVM: x86: hyper-v: Honor HV_MSR_HYPERCALL_AVAILABLE privilege bit
-  KVM: x86: hyper-v: Honor HV_MSR_VP_INDEX_AVAILABLE privilege bit
-  KVM: x86: hyper-v: Honor HV_MSR_RESET_AVAILABLE privilege bit
-  KVM: x86: hyper-v: Honor HV_MSR_REFERENCE_TSC_AVAILABLE privilege bit
-  KVM: x86: hyper-v: Honor HV_MSR_SYNIC_AVAILABLE privilege bit
-  KVM: x86: hyper-v: Honor HV_MSR_SYNTIMER_AVAILABLE privilege bit
-  KVM: x86: hyper-v: Honor HV_MSR_APIC_ACCESS_AVAILABLE privilege bit
-  KVM: x86: hyper-v: Honor HV_ACCESS_FREQUENCY_MSRS privilege bit
-  KVM: x86: hyper-v: Honor HV_ACCESS_REENLIGHTENMENT privilege bit
-  KVM: x86: hyper-v: Honor HV_FEATURE_GUEST_CRASH_MSR_AVAILABLE
-    privilege bit
-  KVM: x86: hyper-v: Honor HV_FEATURE_GUEST_CRASH_MSR_AVAILABLE
-    privilege bit
-  KVM: x86: hyper-v: Honor HV_STIMER_DIRECT_MODE_AVAILABLE privilege bit
-  KVM: x86: hyper-v: Honor HV_POST_MESSAGES privilege bit
-  KVM: x86: hyper-v: Honor HV_SIGNAL_EVENTS privilege bit
-  KVM: x86: hyper-v: Honor HV_DEBUGGING privilege bit
-  KVM: x86: hyper-v: Honor HV_X64_REMOTE_TLB_FLUSH_RECOMMENDED bit
-  KVM: x86: hyper-v: Honor HV_X64_CLUSTER_IPI_RECOMMENDED bit
-  KVM: x86: hyper-v: Check access to HVCALL_NOTIFY_LONG_SPIN_WAIT
-    hypercall
-
- arch/x86/include/asm/kvm_host.h   |   8 +
- arch/x86/kvm/hyperv.c             | 305 +++++++++++++++++++++++++++---
- include/asm-generic/hyperv-tlfs.h |   1 +
- 3 files changed, 291 insertions(+), 23 deletions(-)
-
+diff --git a/include/asm-generic/hyperv-tlfs.h b/include/asm-generic/hyperv-tlfs.h
+index 83448e837ded..e01a3bade13a 100644
+--- a/include/asm-generic/hyperv-tlfs.h
++++ b/include/asm-generic/hyperv-tlfs.h
+@@ -187,6 +187,7 @@ enum HV_GENERIC_SET_FORMAT {
+ #define HV_STATUS_INVALID_HYPERCALL_INPUT	3
+ #define HV_STATUS_INVALID_ALIGNMENT		4
+ #define HV_STATUS_INVALID_PARAMETER		5
++#define HV_STATUS_ACCESS_DENIED			6
+ #define HV_STATUS_OPERATION_DENIED		8
+ #define HV_STATUS_INSUFFICIENT_MEMORY		11
+ #define HV_STATUS_INVALID_PORT_ID		17
 -- 
 2.30.2
 
