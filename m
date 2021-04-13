@@ -2,96 +2,141 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9179635DCC9
-	for <lists+kvm@lfdr.de>; Tue, 13 Apr 2021 12:49:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2B22335DCE4
+	for <lists+kvm@lfdr.de>; Tue, 13 Apr 2021 12:54:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1343964AbhDMKto (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 13 Apr 2021 06:49:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38518 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1343968AbhDMKsw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 13 Apr 2021 06:48:52 -0400
-Received: from mail-oo1-xc35.google.com (mail-oo1-xc35.google.com [IPv6:2607:f8b0:4864:20::c35])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2A610C061756
-        for <kvm@vger.kernel.org>; Tue, 13 Apr 2021 03:48:29 -0700 (PDT)
-Received: by mail-oo1-xc35.google.com with SMTP id c6-20020a4aacc60000b02901e6260b12e2so1215464oon.3
-        for <kvm@vger.kernel.org>; Tue, 13 Apr 2021 03:48:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=yxLJ4jx8zwDk/l6JxSedZpECocVz8godYHUHDpr6FEA=;
-        b=RENUxgHAdiSY76wYt4rOshQmzTHere3sPQ5GTz5/bulLKvJbyQmdA3CRegxOjjVv9/
-         54U0GoEyUibq3V1RI5RxChEL5w/Qnm37BdG3DIaWcxL4d7jzRkORs9V2ZMNZA1Toa4jw
-         h2XSHxiih4HD7oDxISlhVBhLrMXX6Tji6XdjKQ/eDkCQ1ictH1WPSOCBa37hp2yXAq1L
-         Nvj4pPVYZo8l6wWP54fwWlYx04Onn7nRS6YwVlu4Tb1wKbkYlaf5D0DEXwizY11nqOoj
-         SUlfMPshSNyMt5jFr5oPQmey0A0joR76RSGBY3jAYGZlMqSkjzRoqlsnCajyezCvm8ue
-         2VPA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=yxLJ4jx8zwDk/l6JxSedZpECocVz8godYHUHDpr6FEA=;
-        b=L8SQsRjf/yu3fRiSSw0iVTz6dIU7lGB9rdvW5K/1eL2yV5DiLWY/x55oEkR67eEf+I
-         YdQVc36MnlZzv8gfTZBLrBXPHD8LGW79RYaTyJVY07cuAPx6y2JPOtFnDlw7rEohHfia
-         RrSGLizzp3zbog8t6+hw0bapmmxoLTCOLI2obiBFGdsUXmfbj6LhlOm4b2FdjBNQxK6M
-         v9x7jR7u4uWlif2iIh9FcdpctaOy6t4oKbsbU72lu6T3BFMsWbLaW0do5HLXFYbL3b4M
-         BBhqiVfdOyF7vWl2cHP+6su/omLDXK9hEP+/ioaOI4LVxEgIw7YF7xnOGYqpmUWzyxCy
-         CMgQ==
-X-Gm-Message-State: AOAM531b1w5TDrCxKlmkxOKReuFQlsA3h0+ldgKOeDyXh76rYfw6VbPO
-        fwrQ3ZBMWKmjpSXlWxG3ykeN3CXM7m/BwbRI0s4=
-X-Google-Smtp-Source: ABdhPJwvMJbyzQjQhXqYPrCYTGKf70zatUrhdhepuSnzn+uhQzUd3m0nXe/dXVKuIIvIPGKMVSpttbAOkiPQEbFq4sk=
-X-Received: by 2002:a4a:e615:: with SMTP id f21mr4324558oot.41.1618310907968;
- Tue, 13 Apr 2021 03:48:27 -0700 (PDT)
-MIME-Version: 1.0
-References: <36088364-0b3d-d492-0aa4-59ea8f1d1632@msgid.tls.msk.ru>
-In-Reply-To: <36088364-0b3d-d492-0aa4-59ea8f1d1632@msgid.tls.msk.ru>
-From:   Wanpeng Li <kernellwp@gmail.com>
-Date:   Tue, 13 Apr 2021 18:48:15 +0800
-Message-ID: <CANRm+CyMpNS2OAC8CKGb9HUQe3v180e6gHOZYmVZ8gw=XQKYKw@mail.gmail.com>
-Subject: Re: Commit "x86/kvm: Move context tracking where it belongs" broke
- guest time accounting
-To:     Michael Tokarev <mjt@tls.msk.ru>
-Cc:     kvm <kvm@vger.kernel.org>,
-        "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+        id S1344060AbhDMKzA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 13 Apr 2021 06:55:00 -0400
+Received: from forward4-smtp.messagingengine.com ([66.111.4.238]:55327 "EHLO
+        forward4-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1344006AbhDMKx5 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 13 Apr 2021 06:53:57 -0400
+Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
+        by mailforward.nyi.internal (Postfix) with ESMTP id BFD401940918;
+        Tue, 13 Apr 2021 06:53:35 -0400 (EDT)
+Received: from mailfrontend1 ([10.202.2.162])
+  by compute5.internal (MEProxy); Tue, 13 Apr 2021 06:53:35 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        messagingengine.com; h=cc:content-type:date:from:in-reply-to
+        :message-id:mime-version:references:subject:to:x-me-proxy
+        :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; bh=LU2r2V
+        aAOHQrDcDegAXkrCbLQ5rLC3ELxpAY5KMD34k=; b=Urrm1paw1rJuxWjNLyJb8B
+        8ysGi72VT4VwnBe+cqoWS6UK7J00L53pmGPeN2XXCtFDb52Cc0rONk8VuVbxWaLN
+        PkjaavzYRLWkNZPC9evUu9KVszgP7/YPaoOtP4EWbEMTs4+oVsE0v91OD9eo5mkm
+        xRSP1kOcaWvNRXkTYBEQsODv3hpSaDhz3h19MqqnpIVhiIt1rdE3pONkczF7YRsT
+        amIhg32PhgY8yzngsgihsTYxuPXzh6TEa2bmw2cvyNg5ysPrPwADoM7ykH2OvwaA
+        ZufsEKz/Nj+FTY7yD3ZSDkIp5/fYuBERqdoDkJ6oAZ7q5srdqZH4rZJ5Vwcte1pQ
+        ==
+X-ME-Sender: <xms:LXh1YKav4TO8_USeLg1vL3DkKR1ko3310XjPD319Sl0sW1JDWgX4QA>
+    <xme:LXh1YNYJ5QNYRVE7u526JvWRUL4W01w2J2oAUvJUmnK6PljzJ2KpBVZrd0QdOwsGS
+    uL_z0ziHxCUd3w8ZOc>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeduledrudekledgfeegucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
+    cujfgurhepvffujghfhfffkfggtgesthdtredttddttdenucfhrhhomhepffgrvhhiugcu
+    gfgumhhonhgushhonhcuoegurghvihgurdgvughmohhnughsohhnsehorhgrtghlvgdrtg
+    homheqnecuggftrfgrthhtvghrnhepheelfeefudeiudegudelgfetgeetkeelveeuieet
+    udelheejkeeileekveeukedtnecukfhppeekuddrudekjedrvdeirddvfeeknecuvehluh
+    hsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepuggrvhhiugdrvggu
+    mhhonhgushhonhesohhrrggtlhgvrdgtohhm
+X-ME-Proxy: <xmx:LXh1YE_MAwxcY7uEKWMQcv0XPS-UdGgGm9OPoo5DYMo7DW2PmRyqAw>
+    <xmx:LXh1YMpj5KZrfnqsgJhBJ1FIl1n6_1feVRERAGBxqnM8pDDu6MB-jg>
+    <xmx:LXh1YFq9YaeU5nifU2ihFbdsKTM6JKMWbK9DPD3uHhJqCR6Y-Os5YQ>
+    <xmx:L3h1YEe10TRBeAFAfCSlt6Bvs7XvKoxXi3AtDBflLj09wvTdmYKvZ2I4CFs>
+Received: from disaster-area.hh.sledj.net (disaster-area.hh.sledj.net [81.187.26.238])
+        by mail.messagingengine.com (Postfix) with ESMTPA id EFF4C24005C;
+        Tue, 13 Apr 2021 06:53:31 -0400 (EDT)
+Received: from localhost (disaster-area.hh.sledj.net [local])
+        by disaster-area.hh.sledj.net (OpenSMTPD) with ESMTPA id a8eaf34e;
+        Tue, 13 Apr 2021 10:53:30 +0000 (UTC)
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org,
         Thomas Gleixner <tglx@linutronix.de>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+        Joerg Roedel <joro@8bytes.org>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Jim Mattson <jmattson@google.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        Joao Martins <joao.m.martins@oracle.com>,
+        Aaron Lewis <aaronlewis@google.com>
+Subject: Re: [PATCH 5/6] KVM: SVM: pass a proper reason in
+ kvm_emulate_instruction()
+In-Reply-To: <YHRvchkUSIeU8tRR@google.com>
+References: <20210412130938.68178-1-david.edmondson@oracle.com>
+ <20210412130938.68178-6-david.edmondson@oracle.com>
+ <YHRvchkUSIeU8tRR@google.com>
+X-HGTTG: zarquon
+From:   David Edmondson <david.edmondson@oracle.com>
+X-Now-Playing: Dido - Life for Rent: Stoned
+Date:   Tue, 13 Apr 2021 11:53:30 +0100
+Message-ID: <cuno8eisbf9.fsf@oracle.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 7 Apr 2021 at 18:55, Michael Tokarev <mjt@tls.msk.ru> wrote:
->
-> Hi!
->
-> It looks like this commit:
->
-> commit 87fa7f3e98a1310ef1ac1900e7ee7f9610a038bc
-> Author: Thomas Gleixner <tglx@linutronix.de>
-> Date:   Wed Jul 8 21:51:54 2020 +0200
->
->      x86/kvm: Move context tracking where it belongs
->
->      Context tracking for KVM happens way too early in the vcpu_run()
->      code. Anything after guest_enter_irqoff() and before guest_exit_irqoff()
->      cannot use RCU and should also be not instrumented.
->
->      The current way of doing this covers way too much code. Move it closer to
->      the actual vmenter/exit code.
->
-> broke kvm guest cpu time accounting - after this commit, when running
-> qemu-system-x86_64 -enable-kvm, the guest time (in /proc/stat and
-> elsewhere) is always 0.
->
-> I dunno why it happened, but it happened, and all kernels after 5.9
-> are affected by this.
->
-> This commit is found in a (painful) git bisect between kernel 5.8 and 5.10.
+On Monday, 2021-04-12 at 16:04:02 GMT, Sean Christopherson wrote:
 
-Hi Michael,
+> +Aaron
+>
+> On Mon, Apr 12, 2021, David Edmondson wrote:
+>> From: Joao Martins <joao.m.martins@oracle.com>
+>> 
+>> Declare various causes of emulation and use them as appropriate.
+>> 
+>> Signed-off-by: Joao Martins <joao.m.martins@oracle.com>
+>> Signed-off-by: David Edmondson <david.edmondson@oracle.com>
+>> ---
+>>  arch/x86/include/asm/kvm_host.h |  6 ++++++
+>>  arch/x86/kvm/svm/avic.c         |  3 ++-
+>>  arch/x86/kvm/svm/svm.c          | 26 +++++++++++++++-----------
+>>  3 files changed, 23 insertions(+), 12 deletions(-)
+>> 
+>> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+>> index 79e9ca756742..e1284680cbdc 100644
+>> --- a/arch/x86/include/asm/kvm_host.h
+>> +++ b/arch/x86/include/asm/kvm_host.h
+>> @@ -1535,6 +1535,12 @@ enum {
+>>  	EMULREASON_IO_COMPLETE,
+>>  	EMULREASON_UD,
+>>  	EMULREASON_PF,
+>> +	EMULREASON_SVM_NOASSIST,
+>> +	EMULREASON_SVM_RSM,
+>> +	EMULREASON_SVM_RDPMC,
+>> +	EMULREASON_SVM_CR,
+>> +	EMULREASON_SVM_DR,
+>> +	EMULREASON_SVM_AVIC_UNACCEL,
+>
+> Passing these to userspace arguably makes them ABI, i.e. they need to go into
+> uapi/kvm.h somewhere.  That said, I don't like passing arbitrary values for what
+> is effectively the VM-Exit reason.  Why not simply pass the exit reason, assuming
+> we do indeed want to dump this info to userspace?
 
-Please have a try.
-https://lore.kernel.org/kvm/1618298169-3831-1-git-send-email-wanpengli@tencent.com/
+That would suffice, yes.
 
-    Wanpeng
+> What is the intended end usage of this information?  Actual emulation?  Debug?
+> Logging?
+
+Debug (which implies logging, given that I want this to happen on
+systems that are in service).
+
+> Depending on what you're trying to do with the info, maybe there's a better
+> option.  E.g. Aaron is working on a series that includes passing pass the code
+> stream (instruction bytes) to userspace on emulation failure, though I'm not
+> sure if he's planning on providing the VM-Exit reason.
+
+Having the instruction stream will be good.
+
+Aaron: do you have anything to share now? In what time frame do you
+think you might submit patches?
+
+I'm happy to re-work this to make the exit reason available, if that's
+the appropriate direction.
+
+dme.
+-- 
+And you're standing here beside me, I love the passing of time.
