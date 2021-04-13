@@ -2,206 +2,273 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0CD9A35DD52
-	for <lists+kvm@lfdr.de>; Tue, 13 Apr 2021 13:06:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AB00C35DE02
+	for <lists+kvm@lfdr.de>; Tue, 13 Apr 2021 13:47:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345226AbhDMLD6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 13 Apr 2021 07:03:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41912 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345186AbhDMLDs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 13 Apr 2021 07:03:48 -0400
-Received: from mail-il1-x12d.google.com (mail-il1-x12d.google.com [IPv6:2607:f8b0:4864:20::12d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4B553C06175F;
-        Tue, 13 Apr 2021 04:03:29 -0700 (PDT)
-Received: by mail-il1-x12d.google.com with SMTP id 7so12042322ilz.0;
-        Tue, 13 Apr 2021 04:03:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=SaQgaohvFRse8y7sF4qogtAi4k/YBL2bzDFsmdJBavY=;
-        b=DGpGEmKGP9Wcnn+JS5iPztOqsliXtOJ6fLtlbkr3oUuvarZefDCbhdQMV9rWTlrds6
-         wVHOwrYEI+99+2IGpmIWMLE1wpDIn2CXsqVN03ai7Hr0HO/V+oV8Q9L1lafgVFx2N1Nq
-         Yjp6zRrZh67xGBCgJlAuBnb4BUQzEPlP/ztzsxfRhFa04D9JaACtsymqEWnej2UBjzn0
-         SKzrmYaI1W+LGaLJvxWC2qOpEjrjJXQDccufw9sl37yZexj4AeNZ0gATKYofrkypsGKK
-         N6xL1b4cyfjUWNGopXT6QwjwOkFswUYd1+8eU1ds8KBVb5U2RII2lYVxAvgYYGPh5wXA
-         KuUw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=SaQgaohvFRse8y7sF4qogtAi4k/YBL2bzDFsmdJBavY=;
-        b=CEMLWsyACSBXDcgdZZsHFI7XkakS9MqfbjgtEKcdTOCh4C+b9za5/Pzx276XdOnSvW
-         oaP+0a0wNsXs8x6GFnmPrMyXcaHlI+Gg0cU170qAyEbKMnpIajoEdiB9aZylVQnk/O/4
-         6shl4mH891G5lSRKjSjbC12wtWGW99Kb3eG7aNUOdImwt916vqOd4I8eCVgCxwfUP2Uh
-         c2apmar3Qx1uTks5+VLZgEIIza27vfdbvVaTmZb9kcZgqbCmUQE/6INEsOJMsHTaaqkI
-         1Foe2VoE/Nu+aldYGdLS8JnxlpXU9dNZpZnmYrwlZLSvelCQmB7yeeu8NdCZ6cmsVXGZ
-         Sk1Q==
-X-Gm-Message-State: AOAM531vF79Cl93KrC/ZGiDzzMirL0GzB58o7yGzVG+Ogx5qqTsJsgf2
-        7rg/l8PpZNeYnHkcxtPBXwlhu/R+JPMJQdrhbuI=
-X-Google-Smtp-Source: ABdhPJx1z9NLxTOUwTs565vCjlORC+kL0RY4GMGpIY2nljUMLDWzexizGFY+fWG/FlfOwOVgOUTLKxemLbute+nsrDk=
-X-Received: by 2002:a92:ac0f:: with SMTP id r15mr27223305ilh.52.1618311808723;
- Tue, 13 Apr 2021 04:03:28 -0700 (PDT)
-MIME-Version: 1.0
-References: <20201127112114.3219360-1-pbonzini@redhat.com> <20201127112114.3219360-3-pbonzini@redhat.com>
- <CAJhGHyCdqgtvK98_KieG-8MUfg1Jghd+H99q+FkgL0ZuqnvuAw@mail.gmail.com> <YHS/BxMiO6I1VOEY@google.com>
-In-Reply-To: <YHS/BxMiO6I1VOEY@google.com>
-From:   Lai Jiangshan <jiangshanlai+lkml@gmail.com>
-Date:   Tue, 13 Apr 2021 19:03:17 +0800
-Message-ID: <CAJhGHyAcnwkCfTcnxXcgAHnF=wPbH2EDp7H+e74ce+oNOWJ=_Q@mail.gmail.com>
-Subject: Re: [PATCH 2/2] KVM: x86: Fix split-irqchip vs interrupt injection
- window request
-To:     Sean Christopherson <seanjc@google.com>
+        id S245725AbhDMLrl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 13 Apr 2021 07:47:41 -0400
+Received: from mail-mw2nam10on2085.outbound.protection.outlook.com ([40.107.94.85]:37088
+        "EHLO NAM10-MW2-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S238852AbhDMLrk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 13 Apr 2021 07:47:40 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Mxt96c2ZM0UMn8+8uxxkqYuZmgWcthWSyOphRGjw4TKdWYMzvZCVT3r70GtD/F3ljvqGclN+tnNfTCrfpQ9cNQncEJb1s9by4ysXvNKXM/cf+0rnYvTrMYCCcR9bKjPUVfqzELlyOBAmkBFah6Mx6OXNePPkdwYrcMDVXTxupUQvg/8uHUFzsqJXAllxs260TjRiPDDlUdiOAGycB2jAzUUhjcpg3hdWGnaru0UrMRgTmxxWUtIbgs+/4X1JrbqeZkTXHvaa/neBnxpNCYD6w5V6AP5/6ej7IGonbLmEFZuTGHpYCjulnWzvE0mx+50PvlhWBexTzURuoeul8/YcDw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Ap6mpQ/sKwZ40/xBDq5rcvQ87e6uJFL15wvUGayrlQ4=;
+ b=RYQBhwOYOC4DTB8iVGCRWpxAZGOvtILAuSo1VDW8DKCtGJ3J+MhmiFI59pbFKv8MaY3cKedKYl2oXs/mVG71680lg+6ON2ZDkPKSggOTcf5hgdowz7lKdWacNxJ3bvLOM9b6tBLyj+u2ovr8HyT6hC3NIXg2pERYp29GlFeiW9pEBS7omjf0epNlzt5Yvl+Fz0HyOnInFOcim4ekDcicFZbXggg7JBbZeebVWybbrLUweOGOnOeHO1VIzwEvccCNkollmd53xlrtFpIQkTsTZilyFfruIDEOUhlIgkAGi5C6FKpFLrxtVQMU8RVOSRIu6Ma8u8a79Y4cCGY11GNOCQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Ap6mpQ/sKwZ40/xBDq5rcvQ87e6uJFL15wvUGayrlQ4=;
+ b=ePIFZOoVRH1BT/OoqhwxSAyWr/pQXyTHeCskxIb5zeJWFASaDIvA7yV+HGdVriDoNfhzWGUo8mdAx0a3vBedXKc2KeDmts2bCUJV+aaXa/gCdgVfj8AFwwCE5p+cGjcgPAqc08IfcITAJheL3ouiT4aq9LMiH5zFa5xseh1hHrc=
+Authentication-Results: google.com; dkim=none (message not signed)
+ header.d=none;google.com; dmarc=none action=none header.from=amd.com;
+Received: from SN6PR12MB2767.namprd12.prod.outlook.com (2603:10b6:805:75::23)
+ by SN1PR12MB2368.namprd12.prod.outlook.com (2603:10b6:802:32::23) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4020.22; Tue, 13 Apr
+ 2021 11:47:18 +0000
+Received: from SN6PR12MB2767.namprd12.prod.outlook.com
+ ([fe80::1fb:7d59:2c24:615e]) by SN6PR12MB2767.namprd12.prod.outlook.com
+ ([fe80::1fb:7d59:2c24:615e%6]) with mapi id 15.20.4020.022; Tue, 13 Apr 2021
+ 11:47:18 +0000
+Date:   Tue, 13 Apr 2021 11:47:12 +0000
+From:   Ashish Kalra <ashish.kalra@amd.com>
+To:     Steve Rutherford <srutherford@google.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        LKML <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org,
-        Filippo Sironi <sironi@amazon.de>,
-        David Woodhouse <dwmw@amazon.co.uk>,
-        "v4.7+" <stable@vger.kernel.org>,
-        Wanpeng Li <wanpengli@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Joerg Roedel <joro@8bytes.org>,
+        Borislav Petkov <bp@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        X86 ML <x86@kernel.org>, KVM list <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Sean Christopherson <seanjc@google.com>,
+        Venu Busireddy <venu.busireddy@oracle.com>,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        kexec@lists.infradead.org
+Subject: Re: [PATCH v12 13/13] x86/kvm: Add kexec support for SEV Live
+ Migration.
+Message-ID: <20210413114712.GA3996@ashkalra_ubuntu_server>
+References: <cover.1618254007.git.ashish.kalra@amd.com>
+ <c349516d85d9e3fc7404d564ff81d7ebecc1162c.1618254007.git.ashish.kalra@amd.com>
+ <CABayD+cNLdoPHYvw0ZAXZS2wRg4cCFGTMvON0Ja2cWJ4juHNbA@mail.gmail.com>
+ <CABayD+c2P9miY2pKG=k1Ey3cj6RZG98WgssLCnBJgoW9Fng7gg@mail.gmail.com>
+ <20210413014821.GA3276@ashkalra_ubuntu_server>
+ <CABayD+dqg+CYm4hAc6gRY6ygpbgpm-a7jo6ZGotbcA3arq9yQg@mail.gmail.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CABayD+dqg+CYm4hAc6gRY6ygpbgpm-a7jo6ZGotbcA3arq9yQg@mail.gmail.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-Originating-IP: [165.204.77.1]
+X-ClientProxiedBy: SN7PR04CA0021.namprd04.prod.outlook.com
+ (2603:10b6:806:f2::26) To SN6PR12MB2767.namprd12.prod.outlook.com
+ (2603:10b6:805:75::23)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from ashkalra_ubuntu_server (165.204.77.1) by SN7PR04CA0021.namprd04.prod.outlook.com (2603:10b6:806:f2::26) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4020.17 via Frontend Transport; Tue, 13 Apr 2021 11:47:17 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 844e2800-c4dc-49bf-1333-08d8fe71e3ca
+X-MS-TrafficTypeDiagnostic: SN1PR12MB2368:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <SN1PR12MB2368F57BEAFFDBE05C053E368E4F9@SN1PR12MB2368.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: /yJkJTruXT/ZkocNpGrH9viZm3qAxgiCLt8Jd1HY1pA+gK8M5OK8+NqtI2txTcntbBXPTz/ZzkaxL8s5ZJLy25UE1OHuF3m58imtkBJ4Yq/6b2Os4kfkMZkUZP/nkp9k0crPZp6A/0hYS/znzuscx1co6tFHBw0fYcprgrQqSSutiks8d/8iTcB9eVrRQsNQAP2sWEf8/ppALYiOa/fi2CP7SKA5SUnGRetj19qXswrFt41bcODOuzTqyvyViVnLZ4FMyvsaR+qPZHP6ABIgRX1cSX0GXdC+RhmYBcLKo0ybNRVDMNmXuG8owb/MiCbvsqvsmTgcdxY097htmKm7J9GIGLnNz8uf9n6rjAPizBj0jscJU2031QKT3pXYvuk4OqrxYIf69lFM3Tk1Licbqn2WkZOHCtEwVOVLSD+gj/1Iw896j/LMBVCv745jtERuuSLpSrZkdK2o60BQLQ7MLbUeuRnEAN/8/Tt0nDqieDgegtmRah5MNjAku/pYIIWxijwl9SB6WqdhRbhNqyeG+iW6dQ82yUOwJ5cVrbj1GnT0dEokYaRFvk8xNK3fdnLCdjeX5wJuo2uGzWH+qLb7pyWYoLatokVFjWkmlXGeCxRIBL9SzlJxbDHwu0O6lOji7kN/xNmEUssTHcyGOOx/x7lC8sIhnwVSzJdkKODh1bo=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2767.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(376002)(136003)(396003)(366004)(346002)(39860400002)(8936002)(6666004)(33656002)(478600001)(86362001)(66476007)(38100700002)(9686003)(55016002)(8676002)(186003)(66556008)(4326008)(44832011)(38350700002)(316002)(2906002)(1076003)(33716001)(66946007)(7416002)(5660300002)(6916009)(83380400001)(956004)(6496006)(16526019)(54906003)(52116002)(26005)(53546011);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData: =?us-ascii?Q?8UXtn0OJYkppJ/Vs7tfOxzCphTCt/bMXWLElmcqSjpwjWz6TRVEa53ATdclT?=
+ =?us-ascii?Q?9wTuN/CzxgR3blQZGhqD0N3K2FxIX/f6krHq09eLF4bwNG4SOOQpY3waB42U?=
+ =?us-ascii?Q?X8/k1UfoR9a/H88G5dDt5ITdcAmsrb3QIh9iNhs0BAh95zvgoPONQl2tXTXD?=
+ =?us-ascii?Q?HopJenDj7pvDM+lq/sBCbC/4MiMJAmoMt9+WCoHISE6KZnTTA/3cPf+IM+nO?=
+ =?us-ascii?Q?o2nFDBbqs2ZkjaVtPseEIxNnBLb5RKpHxiN/BI0RzwvJTDeAwXtQa345QSum?=
+ =?us-ascii?Q?dgdJ6b1Xg+QT+L+mlUPonGsxMoCz50jqKiOK9v68CEKC9h4MbsvT9DLSNuUR?=
+ =?us-ascii?Q?Lg96nshYejyuut8bqma7h+c12VAUj1wJdW/I0fiN7VjWh3J53aZYFYnd6ENn?=
+ =?us-ascii?Q?wfD/NZgeU+bZoWGT5+dRqxPwq3RZOp0D6KDah/1fQW+89VM2mpCndelDN2n6?=
+ =?us-ascii?Q?vzQdOU+nCwX2mtEqMA7tK1E51a7xG4mFrnIxsTAKG+SdO1lclAUZYdEB6dJP?=
+ =?us-ascii?Q?64/LucEQr17NlM5Ts7CiQ7xC9lQyTrpjUPdf6dm9AgOYnfX+iDqHSvYmfBqZ?=
+ =?us-ascii?Q?OLxjrH3Kpcohlwii3Ky2JG8JD9dyifujJhfuzyoePJTbiG4VyfymgylUMmtd?=
+ =?us-ascii?Q?PHVFfWdlOrjQ/MTP/8FrojYr3hEF6oaTpbLCpQOiKKQzoy65oSZi6lZeoQAb?=
+ =?us-ascii?Q?fJOrd1tNY1YXa7veEUcZphYuBJlj/PWXOybOHk5dEoKFYiY7g7QugjjzFZay?=
+ =?us-ascii?Q?gEU8W8ztBFysfZjeJWfMf2eHvaaIurr8QTFzl+v3RYfklqcg7y1vN5l6/XNJ?=
+ =?us-ascii?Q?UHtSwzf/OrHEWCcqDr9FF/O8HNJ3u7ZYIepVSKyZswxQ5imHpHtkYBdH1dFP?=
+ =?us-ascii?Q?6+iuUJnPzXTkRKFuNoM9da2HGyijQD8+VDmVOBXgGkrxUcyT3OghOlrF9Xsm?=
+ =?us-ascii?Q?vfuo9pBlD4Q+1SiV3rqv6WnPN48EU8hwFCgtqy6gMLjfErTinctevqZj8Rf1?=
+ =?us-ascii?Q?4+y2zT9erDE+9x8y/8v7iPUNNiYY+UBi9k3fokU7p4/iFKi2/Jq0+tchH/g4?=
+ =?us-ascii?Q?ibzFdkY2Jg9Yg0R9zYiICVe2kgmonSDVU0BUyOh+wEAdR6fcLd587l7JbUFZ?=
+ =?us-ascii?Q?Xf8atwGLOPdpgz95WW+P/X0dzDtX4ZwDaL76c4GWyvupUKumackZmt3HBk9W?=
+ =?us-ascii?Q?2azrFy9fSsntHfzQbml5G4XuqpqX8/VDnEuoZJqRVXx/IJSQcbYUPKux4fU2?=
+ =?us-ascii?Q?tNw7HglOk8BGi7V8ETLmBtIZkBOqyG/y+IOdmSXrtW4FD1qRpjbShRtur10y?=
+ =?us-ascii?Q?iD3QFp4u5JRUCRKDtWzQsUDp?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 844e2800-c4dc-49bf-1333-08d8fe71e3ca
+X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2767.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Apr 2021 11:47:18.3033
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: HgLdrk4XTGKH02jV0Lmgprc49SAehiOYx2Sx2cO4bWX0D9k6CpVHplE/00B/EPW0Q8CSQzmMQT2BGzrpehFjkg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN1PR12MB2368
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Apr 13, 2021 at 5:43 AM Sean Christopherson <seanjc@google.com> wrote:
->
-> On Fri, Apr 09, 2021, Lai Jiangshan wrote:
-> > On Fri, Nov 27, 2020 at 7:26 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
-> > >
-> > > kvm_cpu_accept_dm_intr and kvm_vcpu_ready_for_interrupt_injection are
-> > > a hodge-podge of conditions, hacked together to get something that
-> > > more or less works.  But what is actually needed is much simpler;
-> > > in both cases the fundamental question is, do we have a place to stash
-> > > an interrupt if userspace does KVM_INTERRUPT?
-> > >
-> > > In userspace irqchip mode, that is !vcpu->arch.interrupt.injected.
-> > > Currently kvm_event_needs_reinjection(vcpu) covers it, but it is
-> > > unnecessarily restrictive.
-> > >
-> > > In split irqchip mode it's a bit more complicated, we need to check
-> > > kvm_apic_accept_pic_intr(vcpu) (the IRQ window exit is basically an INTACK
-> > > cycle and thus requires ExtINTs not to be masked) as well as
-> > > !pending_userspace_extint(vcpu).  However, there is no need to
-> > > check kvm_event_needs_reinjection(vcpu), since split irqchip keeps
-> > > pending ExtINT state separate from event injection state, and checking
-> > > kvm_cpu_has_interrupt(vcpu) is wrong too since ExtINT has higher
-> > > priority than APIC interrupts.  In fact the latter fixes a bug:
-> > > when userspace requests an IRQ window vmexit, an interrupt in the
-> > > local APIC can cause kvm_cpu_has_interrupt() to be true and thus
-> > > kvm_vcpu_ready_for_interrupt_injection() to return false.  When this
-> > > happens, vcpu_run does not exit to userspace but the interrupt window
-> > > vmexits keep occurring.  The VM loops without any hope of making progress.
-> > >
-> > > Once we try to fix these with something like
-> > >
-> > >      return kvm_arch_interrupt_allowed(vcpu) &&
-> > > -        !kvm_cpu_has_interrupt(vcpu) &&
-> > > -        !kvm_event_needs_reinjection(vcpu) &&
-> > > -        kvm_cpu_accept_dm_intr(vcpu);
-> > > +        (!lapic_in_kernel(vcpu)
-> > > +         ? !vcpu->arch.interrupt.injected
-> > > +         : (kvm_apic_accept_pic_intr(vcpu)
-> > > +            && !pending_userspace_extint(v)));
-> > >
-> > > we realize two things.  First, thanks to the previous patch the complex
-> > > conditional can reuse !kvm_cpu_has_extint(vcpu).  Second, the interrupt
-> > > window request in vcpu_enter_guest()
-> > >
-> > >         bool req_int_win =
-> > >                 dm_request_for_irq_injection(vcpu) &&
-> > >                 kvm_cpu_accept_dm_intr(vcpu);
-> > >
-> > > should be kept in sync with kvm_vcpu_ready_for_interrupt_injection():
-> > > it is unnecessary to ask the processor for an interrupt window
-> > > if we would not be able to return to userspace.  Therefore, the
-> > > complex conditional is really the correct implementation of
-> > > kvm_cpu_accept_dm_intr(vcpu).  It all makes sense:
-> > >
-> > > - we can accept an interrupt from userspace if there is a place
-> > >   to stash it (and, for irqchip split, ExtINTs are not masked).
-> > >   Interrupts from userspace _can_ be accepted even if right now
-> > >   EFLAGS.IF=0.
+On Mon, Apr 12, 2021 at 07:25:03PM -0700, Steve Rutherford wrote:
+> On Mon, Apr 12, 2021 at 6:48 PM Ashish Kalra <ashish.kalra@amd.com> wrote:
 > >
-> > Hello, Paolo
+> > On Mon, Apr 12, 2021 at 06:23:32PM -0700, Steve Rutherford wrote:
+> > > On Mon, Apr 12, 2021 at 5:22 PM Steve Rutherford <srutherford@google.com> wrote:
+> > > >
+> > > > On Mon, Apr 12, 2021 at 12:48 PM Ashish Kalra <Ashish.Kalra@amd.com> wrote:
+> > > > >
+> > > > > From: Ashish Kalra <ashish.kalra@amd.com>
+> > > > >
+> > > > > Reset the host's shared pages list related to kernel
+> > > > > specific page encryption status settings before we load a
+> > > > > new kernel by kexec. We cannot reset the complete
+> > > > > shared pages list here as we need to retain the
+> > > > > UEFI/OVMF firmware specific settings.
+> > > > >
+> > > > > The host's shared pages list is maintained for the
+> > > > > guest to keep track of all unencrypted guest memory regions,
+> > > > > therefore we need to explicitly mark all shared pages as
+> > > > > encrypted again before rebooting into the new guest kernel.
+> > > > >
+> > > > > Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
+> > > > > ---
+> > > > >  arch/x86/kernel/kvm.c | 24 ++++++++++++++++++++++++
+> > > > >  1 file changed, 24 insertions(+)
+> > > > >
+> > > > > diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
+> > > > > index bcc82e0c9779..4ad3ed547ff1 100644
+> > > > > --- a/arch/x86/kernel/kvm.c
+> > > > > +++ b/arch/x86/kernel/kvm.c
+> > > > > @@ -39,6 +39,7 @@
+> > > > >  #include <asm/cpuidle_haltpoll.h>
+> > > > >  #include <asm/ptrace.h>
+> > > > >  #include <asm/svm.h>
+> > > > > +#include <asm/e820/api.h>
+> > > > >
+> > > > >  DEFINE_STATIC_KEY_FALSE(kvm_async_pf_enabled);
+> > > > >
+> > > > > @@ -384,6 +385,29 @@ static void kvm_pv_guest_cpu_reboot(void *unused)
+> > > > >          */
+> > > > >         if (kvm_para_has_feature(KVM_FEATURE_PV_EOI))
+> > > > >                 wrmsrl(MSR_KVM_PV_EOI_EN, 0);
+> > > > > +       /*
+> > > > > +        * Reset the host's shared pages list related to kernel
+> > > > > +        * specific page encryption status settings before we load a
+> > > > > +        * new kernel by kexec. NOTE: We cannot reset the complete
+> > > > > +        * shared pages list here as we need to retain the
+> > > > > +        * UEFI/OVMF firmware specific settings.
+> > > > > +        */
+> > > > > +       if (sev_live_migration_enabled & (smp_processor_id() == 0)) {
+> > > > What happens if the reboot of CPU0 races with another CPU servicing a
+> > > > device request (while the reboot is pending for that CPU)?
+> > > > Seems like you could run into a scenario where you have hypercalls racing.
+> > > >
+> > > > Calling this on every core isn't free, but it is an easy way to avoid this race.
+> > > > You could also count cores, and have only last core do the job, but
+> > > > that seems more complicated.
+> > > On second thought, I think this may be insufficient as a fix, since my
+> > > read of kernel/reboot.c seems to imply that devices aren't shutdown
+> > > until after these notifiers occur. As such, a single thread might be
+> > > able to race with itself. I could be wrong here though.
+> > >
+> > > The heavy hammer would be to disable migration through the MSR (which
+> > > the subsequent boot will re-enable).
+> > >
+> > > I'm curious if there is a less "blocking" way of handling kexecs (that
+> > > strategy would block LM while the guest booted).
+> > >
+> > > One option that comes to mind would be for the guest to "mute" the
+> > > encryption status hypercall after the call to reset the encryption
+> > > status. The problem would be that the encryption status for pages
+> > > would be very temporarily inaccurate in the window between that call
+> > > and the start of the next boot. That isn't ideal, but, on the other
+> > > hand, the VM was about to reboot anyway, so a corrupted shared page
+> > > for device communication probably isn't super important. Still, I'm
+> > > not really a fan of that. This would avoid corrupting the next boot,
+> > > which is clearly an improvement.
+> > >
+> > > Each time the kernel boots it could also choose something like a
+> > > generation ID, and pass that down each time it calls the hypercall.
+> > > This would then let userspace identify which requests were coming from
+> > > the subsequent boot.
+> > >
+> > > Everything here (except, perhaps, disabling migration through the MSR)
+> > > seems kind of complicated. I somewhat hope my interpretation of
+> > > kernel/reboot.c is wrong and this race just is not possible in the
+> > > first place.
+> > >
 > >
-> > If userspace does KVM_INTERRUPT, vcpu->arch.interrupt.injected is
-> > set immediately, and in inject_pending_event(), we have
-> >
-> >         else if (!vcpu->arch.exception.pending) {
-> >                 if (vcpu->arch.nmi_injected) {
-> >                         kvm_x86_ops.set_nmi(vcpu);
-> >                         can_inject = false;
-> >                 } else if (vcpu->arch.interrupt.injected) {
-> >                         kvm_x86_ops.set_irq(vcpu);
-> >                         can_inject = false;
-> >                 }
-> >         }
-> >
-> > I'm curious about that can the kvm_x86_ops.set_irq() here be possible
-> > to queue the irq with EFLAGS.IF=0? If not, which code prevents it?
->
-> The interrupt is only directly injected if the local APIC is _not_ in-kernel.
-> If userspace is managing the local APIC, my understanding is that userspace is
-> also responsible for honoring EFLAGS.IF, though KVM aids userspace by updating
-> vcpu->run->ready_for_interrupt_injection when exiting to userspace.  When
-> userspace is modeling the local APIC, that resolves to
-> kvm_vcpu_ready_for_interrupt_injection():
->
->         return kvm_arch_interrupt_allowed(vcpu) &&
->                 kvm_cpu_accept_dm_intr(vcpu);
->
-> where kvm_arch_interrupt_allowed() checks EFLAGS.IF (and an edge case related to
-> nested virtualization).  KVM also captures EFLAGS.IF in vcpu->run->if_flag.
-> For whatever reason, QEMU checks both vcpu->run flags before injecting an IRQ,
-> maybe to handle a case where QEMU itself clears EFLAGS.IF?
+> > Disabling migration through the MSR after resetting the page encryption
+> > status is a reasonable approach. There is a similar window existing for
+> > normal VM boot during which LM is disabled, from the point where OVMF
+> > checks and adds support for SEV LM and the kernel boot checks for the
+> > same and enables LM using the MSR.
+> 
+> I'm not totally confident that disabling LM through the MSR is
+> sufficient. I also think the newly booted kernel needs to reset the
+> state itself, since nothing stops the hypercalls after the disable
+> goes through. The host won't know the difference between early boot
+> (pre-enablement) hypercalls and racy just-before-restart hypercalls.
+> You might disable migration through the hypercall, get a late status
+> change hypercall, reboot, then re-enable migration, but still have
+> stale state.
+> 
+> I _believe_ that the kernel doesn't mark it's RAM as private on boot
+> as an optimization (might be wrong about this), since it would have
+> been expensive to mark all of ram as encrypted previously. I believe
+> that is no longer a limitation given the KVM_EXIT, so we can reset
+> this during early boot instead of just before the kexec.
+> 
 
-If userspace is managing the local APIC, the user VMM would insert IRQ
-when kvm_run->ready_for_interrupt_injection=1 since this flags
-implied EFLAGS.IF before this patch (for example gVisor checks this only
-instead of kvm_run->if_flag).  This patch claims that it has a place to
-stash the IRQ when EFLAGS.IF=0, but inject_pending_event() seams to ignore
-EFLAGS.IF and queues the IRQ to the guest directly in the first branch
-of using "kvm_x86_ops.set_irq(vcpu)".
+I was wondering if disabling both migration (via the MSR) and "muting"
+the hypercall using the "sev_live_migration_enabled" variable after the
+page encryption status has been reset, will reset the page encryption
+status of the guest to the (last known/good) configuration available to
+the guest at boot time (i.e, all RAM pages marked as private and UEFI
+setup shared MMIO/device regions, etc). 
 
-I have encountered a problem but failed to exactly dissect it with
-some internal code involved.
+But disabling migration and muting hypercalls after page encryption
+status reset is still "racy" with hypercalls on other vCPUS, and that
+can potentially mess-up the page encryption status available to guest
+after kexec.
 
-It is somewhat possible that it has resulted from Li Wanpeng's patch
-(I replied to this patch because this patch relaxes the condition even
-more without reasons for how it suppresses/stashes IRQ to the guest).
+So probably, as you mentioned above, resetting the page encryption
+status during early boot (immediately after detecting host support for
+migration and enabling the hypercalls) instead of just before the kexec
+is a good fix.
 
-When a guest APP userspace hits an exception and vmexit and returns to
-the user VMM (gVisor) in conditions combined, and the user VMM wants to
-queue an IRQ to it: It is now EFLAGS.IF=1 and ready_for_interrupt_injection=1
-and user VMM happily queues the IRQ. In inject_pending_event(), the IRQ is
-lower priority and the earlier exception is queued to the guest first.  But
-the IRQ can't be continuously suppressed and it is queued at the beginning
-of the exception handler where EFLAGS.IF=0.
-(Before Li Wanpeng's patch, ready_for_interrupt_injection=0, since
-there is an exception pending)
+Thanks,
+Ashish
 
-All above is just my guess.  But I want to know more clues.
-And this patch says:
-
- : we can accept an interrupt from userspace if there is a place
- : to stash it (and, for irqchip split, ExtINTs are not masked).
- : Interrupts from userspace _can_ be accepted even if right now
- : EFLAGS.IF=0.
-
-So it might help me for analyzing if I knew how this
-behavior is achieved since inject_pending_event() doesn't
-check EFLAGS.IF=0 for the first using "kvm_x86_ops.set_irq(vcpu)".
-
-Thanks
-
-Lai.
-
->
-> > I'm asking about this because I just noticed that interrupt can
-> > be queued when exception pending, and this patch relaxed it even
-> > more.
-> >
-> > Note: interrupt can NOT be queued when exception pending
-> > until 664f8e26b00c7 ("KVM: X86: Fix loss of exception which
-> > has not yet been injected") which I think is dangerous.
+> > > > > +               int i;
+> > > > > +               unsigned long nr_pages;
+> > > > > +
+> > > > > +               for (i = 0; i < e820_table->nr_entries; i++) {
+> > > > > +                       struct e820_entry *entry = &e820_table->entries[i];
+> > > > > +
+> > > > > +                       if (entry->type != E820_TYPE_RAM)
+> > > > > +                               continue;
+> > > > > +
+> > > > > +                       nr_pages = DIV_ROUND_UP(entry->size, PAGE_SIZE);
+> > > > > +
+> > > > > +                       kvm_sev_hypercall3(KVM_HC_PAGE_ENC_STATUS,
+> > > > > +                                          entry->addr, nr_pages, 1);
+> > > > > +               }
+> > > > > +       }
+> > > > >         kvm_pv_disable_apf();
+> > > > >         kvm_disable_steal_time();
+> > > > >  }
+> > > > > --
+> > > > > 2.17.1
+> > > > >
