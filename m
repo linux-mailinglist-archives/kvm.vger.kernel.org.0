@@ -2,62 +2,62 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 50E0F35D99D
-	for <lists+kvm@lfdr.de>; Tue, 13 Apr 2021 10:08:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8240135DA27
+	for <lists+kvm@lfdr.de>; Tue, 13 Apr 2021 10:34:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240470AbhDMII0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 13 Apr 2021 04:08:26 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:14604 "EHLO
-        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S238229AbhDMII0 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 13 Apr 2021 04:08:26 -0400
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 13D834iN024563;
-        Tue, 13 Apr 2021 04:07:20 -0400
+        id S239004AbhDMIej (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 13 Apr 2021 04:34:39 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:53070 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229656AbhDMIei (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 13 Apr 2021 04:34:38 -0400
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 13D8XDB4071495;
+        Tue, 13 Apr 2021 04:33:15 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=Ql7r4twH3uyhCQI3WyBa/+Qd1zCPeMx1W+pnxHpMXU4=;
- b=pdLfpNvjq37NJ9D7fhlZy5Sj4vGHxYnqDGkxvRFHkj967UNeZg1U+2mSkrRMvR638S0G
- grkhTD+Zz1MWJ6JFp11j6ahLEtu5fb/TEzDT139pSrPDOGm3gi4E4SssqSv0/2IUcJnk
- +TICj7Ud4tIbCywrgm+FEkfYlABgzWTRj/Q1l/4CjuAlL2AjO9ZDh4gfrInSV61/qHN/
- LYGLVhmNRRZ14BU/XM3E2qPqIZJ9BE8L2WS9IRnvUuoba3CKj3nIbMBLIY/QEKhec3Fa
- m4UxQLvXMZSAkDr5HfzEi67tNpuIeQJn1ONrpRRFRj65iMuJpkZl038kdNMBNmDY9yDq Yw== 
+ references : from : message-id : date : in-reply-to : content-type :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=H1Y2/bGYlV5wOp/OT6q1ivbSoZaewBAhlcce0EfVJDw=;
+ b=hF6Tcce0q1E8/JsKwPEi11yovP5JnZmCCT6MhTHguCXtZ7HFAcCci66mCzkEHBJ98TPS
+ 1bL0ovKXyId2H4sT8as6eqBZ4gFngfZDlgFRALMyIpkeE5LM1fNNGOo+PydFIEukU7Kb
+ iUkzkLzHvkhviArbfORPEBAfqWk49tYahF3Ss2zq/ECsY3f4b9SodN+f961TpwOouEK5
+ gk4L/PFOGaP8Omu3GOacpHPg9zwvleL+qm9LZKeZKVpAPX/h3K3+H/PgOfp5+E9Xh9wf
+ cDKMOcx/+TKYTkTzNIau20xuPdnVVCnvcRMxjJmgAGVpjDTCt8bk8xGGpsk5UILue+JO pQ== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 37w6uvhbcq-1
+        by mx0a-001b2d01.pphosted.com with ESMTP id 37w76qsawv-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 13 Apr 2021 04:07:20 -0400
-Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 13D83HNG026422;
-        Tue, 13 Apr 2021 04:07:19 -0400
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 37w6uvhbbu-1
+        Tue, 13 Apr 2021 04:33:15 -0400
+Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 13D8XEpW071703;
+        Tue, 13 Apr 2021 04:33:14 -0400
+Received: from ppma06fra.de.ibm.com (48.49.7a9f.ip4.static.sl-reverse.com [159.122.73.72])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 37w76qsat3-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 13 Apr 2021 04:07:19 -0400
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 13D7wmPb002367;
-        Tue, 13 Apr 2021 08:07:17 GMT
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
-        by ppma03ams.nl.ibm.com with ESMTP id 37u3n8agce-1
+        Tue, 13 Apr 2021 04:33:14 -0400
+Received: from pps.filterd (ppma06fra.de.ibm.com [127.0.0.1])
+        by ppma06fra.de.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 13D8X28V004312;
+        Tue, 13 Apr 2021 08:33:03 GMT
+Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
+        by ppma06fra.de.ibm.com with ESMTP id 37u39h9b0g-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 13 Apr 2021 08:07:17 +0000
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 13D87FjY41812328
+        Tue, 13 Apr 2021 08:33:02 +0000
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
+        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 13D8WcuQ34865494
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 13 Apr 2021 08:07:15 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 8EDBC4C044;
-        Tue, 13 Apr 2021 08:07:15 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 00B2A4C052;
-        Tue, 13 Apr 2021 08:07:15 +0000 (GMT)
+        Tue, 13 Apr 2021 08:32:38 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 822D0A4053;
+        Tue, 13 Apr 2021 08:33:00 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 9A7E1A404D;
+        Tue, 13 Apr 2021 08:32:59 +0000 (GMT)
 Received: from oc7455500831.ibm.com (unknown [9.171.28.118])
-        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue, 13 Apr 2021 08:07:14 +0000 (GMT)
-Subject: Re: [PATCH v2 1/3] context_tracking: Split guest_enter/exit_irqoff
-To:     Wanpeng Li <kernellwp@gmail.com>
-Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
+        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Tue, 13 Apr 2021 08:32:59 +0000 (GMT)
+Subject: Re: [PATCH v2 0/3] KVM: Properly account for guest CPU time
+To:     Wanpeng Li <kernellwp@gmail.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <seanjc@google.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
@@ -66,42 +66,70 @@ Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
         Thomas Gleixner <tglx@linutronix.de>,
         Michael Tokarev <mjt@tls.msk.ru>
 References: <1618298169-3831-1-git-send-email-wanpengli@tencent.com>
- <1618298169-3831-2-git-send-email-wanpengli@tencent.com>
- <81112cec-72fa-dd8c-21c8-b24f51021f43@de.ibm.com>
- <CANRm+CwNxcKPKdV4Bxr-5sWJtg_SKZEN5atGJKRyLcVnWVSKSg@mail.gmail.com>
- <4551632e-5584-29f6-68dd-d85fa968858b@de.ibm.com>
- <CANRm+Cw=7kKztPFHaXrK926ve7pY3NN4O22t_QaevHnCXqX5tg@mail.gmail.com>
 From:   Christian Borntraeger <borntraeger@de.ibm.com>
-Message-ID: <1d6a5fa9-3639-0908-206f-c9e941270f11@de.ibm.com>
-Date:   Tue, 13 Apr 2021 10:07:14 +0200
+Message-ID: <76aa7dcc-ba57-f12d-bf19-880fa71f429f@de.ibm.com>
+Date:   Tue, 13 Apr 2021 10:32:59 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.9.0
-MIME-Version: 1.0
-In-Reply-To: <CANRm+Cw=7kKztPFHaXrK926ve7pY3NN4O22t_QaevHnCXqX5tg@mail.gmail.com>
+In-Reply-To: <1618298169-3831-1-git-send-email-wanpengli@tencent.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: sib58JeUfnxZZPGmfodP0ElEmi9mFVRE
-X-Proofpoint-GUID: EQAoTGuOQtv-r8sP28ywUXslUTNSPbjo
+X-Proofpoint-GUID: 5hr-l3q1hOV6VZnSkK6fZ5ICd8UFpN4g
+X-Proofpoint-ORIG-GUID: gr05uOpjtFFEiy3n2Ir3Us5sLnazPonJ
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+MIME-Version: 1.0
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.761
  definitions=2021-04-13_03:2021-04-13,2021-04-13 signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 mlxscore=0
- spamscore=0 clxscore=1015 impostorscore=0 suspectscore=0 bulkscore=0
- mlxlogscore=999 priorityscore=1501 adultscore=0 malwarescore=0
+ malwarescore=0 adultscore=0 bulkscore=0 mlxlogscore=999 impostorscore=0
+ clxscore=1015 priorityscore=1501 spamscore=0 suspectscore=0
  lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2104060000 definitions=main-2104130055
+ engine=8.12.0-2104060000 definitions=main-2104130058
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
 
-On 13.04.21 09:52, Wanpeng Li wrote:
->> Or did I miss anything.
+On 13.04.21 09:16, Wanpeng Li wrote:
+> The bugzilla https://bugzilla.kernel.org/show_bug.cgi?id=209831
+> reported that the guest time remains 0 when running a while true
+> loop in the guest.
 > 
-> I mean the if (!context_tracking_enabled_this_cpu()) part in the
-> function context_guest_enter_irqoff() ifdef
-> CONFIG_VIRT_CPU_ACCOUNTING_GEN. :)
+> The commit 87fa7f3e98a131 ("x86/kvm: Move context tracking where it
+> belongs") moves guest_exit_irqoff() close to vmexit breaks the
+> tick-based time accouting when the ticks that happen after IRQs are
+> disabled are incorrectly accounted to the host/system time. This is
+> because we exit the guest state too early.
+> 
+> This patchset splits both context tracking logic and the time accounting
+> logic from guest_enter/exit_irqoff(), keep context tracking around the
+> actual vmentry/exit code, have the virt time specific helpers which
+> can be placed at the proper spots in kvm. In addition, it will not
+> break the world outside of x86.
+> 
+> v1 -> v2:
+>   * split context_tracking from guest_enter/exit_irqoff
+>   * provide separate vtime accounting functions for consistent
+>   * place the virt time specific helpers at the proper splot
+> 
+> Suggested-by: Thomas Gleixner <tglx@linutronix.de>
+> Cc: Thomas Gleixner <tglx@linutronix.de>
+> Cc: Sean Christopherson <seanjc@google.com>
+> Cc: Michael Tokarev <mjt@tls.msk.ru>
+> 
+> Wanpeng Li (3):
+>    context_tracking: Split guest_enter/exit_irqoff
+>    context_tracking: Provide separate vtime accounting functions
+>    x86/kvm: Fix vtime accounting
+> 
+>   arch/x86/kvm/svm/svm.c           |  6 ++-
+>   arch/x86/kvm/vmx/vmx.c           |  6 ++-
+>   arch/x86/kvm/x86.c               |  1 +
+>   include/linux/context_tracking.h | 84 +++++++++++++++++++++++++++++++---------
+>   4 files changed, 74 insertions(+), 23 deletions(-)
+> 
 
-Ah I missed that. Thanks.
+The non CONFIG_VIRT_CPU_ACCOUNTING_GEN look good.
