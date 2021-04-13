@@ -2,53 +2,61 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9818535D8AC
-	for <lists+kvm@lfdr.de>; Tue, 13 Apr 2021 09:17:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2804035D901
+	for <lists+kvm@lfdr.de>; Tue, 13 Apr 2021 09:36:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238522AbhDMHRZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 13 Apr 2021 03:17:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48612 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238477AbhDMHRX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 13 Apr 2021 03:17:23 -0400
-Received: from mail-pl1-x62b.google.com (mail-pl1-x62b.google.com [IPv6:2607:f8b0:4864:20::62b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 48A62C061574;
-        Tue, 13 Apr 2021 00:17:03 -0700 (PDT)
-Received: by mail-pl1-x62b.google.com with SMTP id d8so7707747plh.11;
-        Tue, 13 Apr 2021 00:17:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=qBn3NeoemY9J5Bkb/rnTcONzq25KY3gcneMyVMKWJh4=;
-        b=N6UMgf8jU+Ph1yHrv45fN2UQmjBSexJWoxDczpBiSXMn3vW8WiXgpxdbhONQdgvDuc
-         5AD4k+AIC3ZXKMGEdVogNSBv3J+NvTT1e0eiuJ7Vch0MytAFVjhRKrJKKIA8eaJWhA3Z
-         OiN63URh3CJ541DhIXcwfA6eBoTEYqWFTP3haYCZX+VIMLODulSv5ZMMn0SnQK427UU/
-         yvLbMTDweMgUY8Adt4oW6BwLT7kbRDbOgG/a2Q0Rx9/ILBIq9IWU1N2BCuPs7Wbn93Ox
-         SDIfHxtIeVbzsSArXBfEuhV9zPJ24Lzy+AhhN6wd7ek0Vy5Jm57s1Uv2gD5DYeUKTy/E
-         MyWg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references;
-        bh=qBn3NeoemY9J5Bkb/rnTcONzq25KY3gcneMyVMKWJh4=;
-        b=V+qCHvOlSCG/MvOCUvtq0jlfT+8jVaSr/q73CUrarQMD5NxIlVeUNUbW/SZlKnAFEV
-         oxbf/rzGYR1o1Jqj2bFs2lVKTm05ulLrNOUTKZcwkWPbUI1Mgi1rmThKs3kaCZYet/Jc
-         arshLOd7LCFqk5s0VVQeqAVhOsbFYhMzLaUI+JFFzCahgMAu5NxJqnJR04pKUzFAhndS
-         yINKYeMV+P/dPAfAHTcTeu8/AFPvm46kgovewIEg9L/2r4KY5Cy+hjF/Go3RTh94vnPL
-         VtbDIRf747iBqjoOORggDuhNe88Iw7AxdlB4U+B5ILVMLv3xipfonj7YY+wAh1TasQkE
-         DszA==
-X-Gm-Message-State: AOAM533ymMG0dfsV7EYW9DlXiu5ZP9gMjGtB7zbK4xBJE2acfvTl76DA
-        eKuzcDX71PuteKL/n+yu4rXVCErINx8=
-X-Google-Smtp-Source: ABdhPJxhm0Sy6QK/KoC4cBVp3b45mZd0Y4H+Bx3swufVvcFqxy55E8mXgubHsHQU5bxVVc9qoXY2JA==
-X-Received: by 2002:a17:902:ab86:b029:e9:47c1:93de with SMTP id f6-20020a170902ab86b02900e947c193demr30787184plr.69.1618298222449;
-        Tue, 13 Apr 2021 00:17:02 -0700 (PDT)
-Received: from localhost.localdomain ([103.7.29.6])
-        by smtp.googlemail.com with ESMTPSA id i10sm2031088pjm.1.2021.04.13.00.16.59
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 13 Apr 2021 00:17:01 -0700 (PDT)
-From:   Wanpeng Li <kernellwp@gmail.com>
-X-Google-Original-From: Wanpeng Li <wanpengli@tencent.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+        id S240551AbhDMHhD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 13 Apr 2021 03:37:03 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:6422 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S237250AbhDMHg7 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 13 Apr 2021 03:36:59 -0400
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 13D7XTRS145130;
+        Tue, 13 Apr 2021 03:35:32 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=3jYkpuMDYV3WFilrrqiQJ+dv4nTYyKdryQ7ymrXvczs=;
+ b=XBk1nv3i7CIXiKq+u5/ld0QhpfG40bnT9f5v1U6T6+aVMvrS9rucp2sWRysmWm6J1Dfo
+ G2aYmFhls2cK8Ep320CgBbgNtpsE18sMoUFEEURkaJjD8xU2JiKrR9maMgamo0usUQTI
+ bvcrbzg9nfO/06iGVCXMM+cN+u8OR3YzwHA2A6Sq+rEcXhds0pK8dGpSkfHqTD4BHq3+
+ S6i9oBmwZHANWi2O45ODLmTkIkXr2+KFHqI5NVkE77qu1zXeAA6Ke8sD/zleAfi8WMvJ
+ Mns7inkXUugboHvPV4lqqhgHQRWuwMBQwYwynnPWhTrzGRSbyvChOiaOJcvbvLkQRDLk 9A== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 37vtvy6n5d-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 13 Apr 2021 03:35:31 -0400
+Received: from m0098414.ppops.net (m0098414.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 13D7YCQh147715;
+        Tue, 13 Apr 2021 03:35:31 -0400
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 37vtvy6n4q-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 13 Apr 2021 03:35:31 -0400
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 13D7Vx9R013096;
+        Tue, 13 Apr 2021 07:35:29 GMT
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
+        by ppma04ams.nl.ibm.com with ESMTP id 37u3n8tfmn-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 13 Apr 2021 07:35:29 +0000
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 13D7ZRvY34865448
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 13 Apr 2021 07:35:27 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 494524C040;
+        Tue, 13 Apr 2021 07:35:27 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 04C944C04A;
+        Tue, 13 Apr 2021 07:35:26 +0000 (GMT)
+Received: from oc7455500831.ibm.com (unknown [9.171.28.118])
+        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Tue, 13 Apr 2021 07:35:25 +0000 (GMT)
+Subject: Re: [PATCH v2 1/3] context_tracking: Split guest_enter/exit_irqoff
+To:     Wanpeng Li <kernellwp@gmail.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <seanjc@google.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
@@ -56,123 +64,60 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>,
         Thomas Gleixner <tglx@linutronix.de>,
-        Michael Tokarev <mjt@tls.msk.ru>, stable@vger.kernel.org
-Subject: [PATCH v2 3/3] x86/kvm: Fix vtime accounting
-Date:   Tue, 13 Apr 2021 15:16:09 +0800
-Message-Id: <1618298169-3831-4-git-send-email-wanpengli@tencent.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1618298169-3831-1-git-send-email-wanpengli@tencent.com>
+        Michael Tokarev <mjt@tls.msk.ru>
 References: <1618298169-3831-1-git-send-email-wanpengli@tencent.com>
+ <1618298169-3831-2-git-send-email-wanpengli@tencent.com>
+From:   Christian Borntraeger <borntraeger@de.ibm.com>
+Message-ID: <81112cec-72fa-dd8c-21c8-b24f51021f43@de.ibm.com>
+Date:   Tue, 13 Apr 2021 09:35:24 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.9.0
+MIME-Version: 1.0
+In-Reply-To: <1618298169-3831-2-git-send-email-wanpengli@tencent.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: yGaFh8iIuiyKlrUDgycLJ3QNmEh4ncT0
+X-Proofpoint-GUID: sWi3MjxlgqBGXEBL6ZVOYzNtHJCJFF0e
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.761
+ definitions=2021-04-13_03:2021-04-13,2021-04-13 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 spamscore=0
+ impostorscore=0 bulkscore=0 phishscore=0 mlxlogscore=996
+ lowpriorityscore=0 priorityscore=1501 clxscore=1011 adultscore=0
+ suspectscore=0 malwarescore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2104060000 definitions=main-2104130052
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Wanpeng Li <wanpengli@tencent.com>
 
-The bugzilla https://bugzilla.kernel.org/show_bug.cgi?id=209831
-reported that the guest time remains 0 when running a while true
-loop in the guest.
 
-The commit 87fa7f3e98a131 ("x86/kvm: Move context tracking where it
-belongs") moves guest_exit_irqoff() close to vmexit breaks the
-tick-based time accouting when the ticks that happen after IRQs are
-disabled are incorrectly accounted to the host/system time. This is
-because we exit the guest state too early.
+On 13.04.21 09:16, Wanpeng Li wrote:
+[...]
 
-Keep context tracking around the actual vmentry/exit code, the time 
-accounting logic is separated out by preposed patch from 
-guest_enter/exit_irqoff(). Keep vtime-based time accounting around 
-the actual vmentry/exit code when vtime_accounting_enabled_this_cpu() 
-is true, leave PF_VCPU clearing after handle_exit_irqoff() and explicit 
-IRQ window for tick-based time accouting.
+> @@ -145,6 +155,13 @@ static __always_inline void guest_exit_irqoff(void)
+>   }
+> 
+>   #else
+> +static __always_inline void context_guest_enter_irqoff(void)
+> +{
+> +	instrumentation_begin();
+> +	rcu_virt_note_context_switch(smp_processor_id());
+> +	instrumentation_end();
+> +}
+> +
+>   static __always_inline void guest_enter_irqoff(void)
+>   {
+>   	/*
+> @@ -155,10 +172,13 @@ static __always_inline void guest_enter_irqoff(void)
+>   	instrumentation_begin();
+>   	vtime_account_kernel(current);
+>   	current->flags |= PF_VCPU;
+> -	rcu_virt_note_context_switch(smp_processor_id());
+>   	instrumentation_end();
+> +
+> +	context_guest_enter_irqoff();
 
-Fixes: 87fa7f3e98a131 ("x86/kvm: Move context tracking where it belongs")
-Cc: Thomas Gleixner <tglx@linutronix.de>
-Cc: Sean Christopherson <seanjc@google.com>
-Cc: Michael Tokarev <mjt@tls.msk.ru>
-Cc: stable@vger.kernel.org#v5.9-rc1+
-Suggested-by: Thomas Gleixner <tglx@linutronix.de>
-Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
----
- arch/x86/kvm/svm/svm.c | 6 ++++--
- arch/x86/kvm/vmx/vmx.c | 6 ++++--
- arch/x86/kvm/x86.c     | 1 +
- 3 files changed, 9 insertions(+), 4 deletions(-)
-
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index 48b396f3..2a4e284 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -3726,11 +3726,12 @@ static noinstr void svm_vcpu_enter_exit(struct kvm_vcpu *vcpu)
- 	 * accordingly.
- 	 */
- 	instrumentation_begin();
-+	vtime_account_guest_enter();
- 	trace_hardirqs_on_prepare();
- 	lockdep_hardirqs_on_prepare(CALLER_ADDR0);
- 	instrumentation_end();
- 
--	guest_enter_irqoff();
-+	context_guest_enter_irqoff();
- 	lockdep_hardirqs_on(CALLER_ADDR0);
- 
- 	if (sev_es_guest(vcpu->kvm)) {
-@@ -3758,10 +3759,11 @@ static noinstr void svm_vcpu_enter_exit(struct kvm_vcpu *vcpu)
- 	 * into world and some more.
- 	 */
- 	lockdep_hardirqs_off(CALLER_ADDR0);
--	guest_exit_irqoff();
-+	context_guest_exit_irqoff();
- 
- 	instrumentation_begin();
- 	trace_hardirqs_off_finish();
-+	__vtime_account_guest_exit();
- 	instrumentation_end();
- }
- 
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index c05e6e2..23be956 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -6613,11 +6613,12 @@ static noinstr void vmx_vcpu_enter_exit(struct kvm_vcpu *vcpu,
- 	 * accordingly.
- 	 */
- 	instrumentation_begin();
-+	vtime_account_guest_enter();
- 	trace_hardirqs_on_prepare();
- 	lockdep_hardirqs_on_prepare(CALLER_ADDR0);
- 	instrumentation_end();
- 
--	guest_enter_irqoff();
-+	context_guest_enter_irqoff();
- 	lockdep_hardirqs_on(CALLER_ADDR0);
- 
- 	/* L1D Flush includes CPU buffer clear to mitigate MDS */
-@@ -6647,10 +6648,11 @@ static noinstr void vmx_vcpu_enter_exit(struct kvm_vcpu *vcpu,
- 	 * into world and some more.
- 	 */
- 	lockdep_hardirqs_off(CALLER_ADDR0);
--	guest_exit_irqoff();
-+	context_guest_exit_irqoff();
- 
- 	instrumentation_begin();
- 	trace_hardirqs_off_finish();
-+	__vtime_account_guest_exit();
- 	instrumentation_end();
- }
- 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index ce9a1d2..0d2dd3f 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -9245,6 +9245,7 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
- 	++vcpu->stat.exits;
- 	local_irq_disable();
- 	kvm_after_interrupt(vcpu);
-+	vcpu_account_guest_exit();
- 
- 	if (lapic_in_kernel(vcpu)) {
- 		s64 delta = vcpu->arch.apic->lapic_timer.advance_expire_delta;
--- 
-2.7.4
+So we now do instrumentation_begin 2 times?
 
