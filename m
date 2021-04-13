@@ -2,141 +2,192 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5B2E435E15C
-	for <lists+kvm@lfdr.de>; Tue, 13 Apr 2021 16:27:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9905A35E15F
+	for <lists+kvm@lfdr.de>; Tue, 13 Apr 2021 16:27:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231972AbhDMO1R (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 13 Apr 2021 10:27:17 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:44463 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231856AbhDMO1Q (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 13 Apr 2021 10:27:16 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1618324016;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=wBRPv3G5uNqKDsSO2MfNKj8YoTGefde97SCfUlwiDUw=;
-        b=cc3cwT2WJPhaevOi9k10cDUc91ktri8/za5CS4ofPgteOe87ABupMeA4+uO8Jlydqh3PMh
-        UYHgAVBdVtrLKo8ZEOSW482fusddBLKQ44nwOAUCcMvZeGvxoNJWHCXcOSjbqtIgzaWbKB
-        DGQJu/E89FtZr230DH3+DTDNYQgDIjE=
-Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
- [209.85.218.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-173-BHoqLJfqMiyc3HQ0HQx5Nw-1; Tue, 13 Apr 2021 10:26:55 -0400
-X-MC-Unique: BHoqLJfqMiyc3HQ0HQx5Nw-1
-Received: by mail-ej1-f72.google.com with SMTP id di5so5121034ejc.1
-        for <kvm@vger.kernel.org>; Tue, 13 Apr 2021 07:26:54 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=wBRPv3G5uNqKDsSO2MfNKj8YoTGefde97SCfUlwiDUw=;
-        b=f+4QbIwiEZkI9QYUiV23lINRbeiV/OzaQiZ6gD3y8W83A5xbNtTBVn+hJe358GtqfB
-         jbn4OLSHFIZZbFMUk8fX/Qyg0v9aZxsz6L6G5tyKHjIFwRX/tjwtDJpqjkMEg0m6XqEC
-         zxPf4+N0PCPFTr6eVi3Gy3FA3bvrN0Z+uyWCry95vCalxe6JrDlOkg0Vajc39iG4UGRc
-         B6FsyjJ7eYOk1Vg/L+OKCU5rd2XttI4KMCd1x9fbSLla1eTRPfrmtARI/PtouSeNYPq0
-         S+oJhI3j5e9V/+MANiUB6XPLcj/2BomdIGrd04aGzq3yCcMUSKtG5Eu6eiCOU1ZSIz5K
-         DsLQ==
-X-Gm-Message-State: AOAM532HrjVR4nWVjd7eC407zP6a14CLOONaB3/soTtvuT7Fydu2+Jsg
-        AVqVOtBwWVrKvPFBetLxw7AurCYvYUEghgBwiJjicRqC5a3e2fey9qt/SKpMl4vYD5DmAiM7yl5
-        X0mWdIQlz8I7c
-X-Received: by 2002:a05:6402:344e:: with SMTP id l14mr35655737edc.184.1618324013943;
-        Tue, 13 Apr 2021 07:26:53 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyl2wCg7G5ZLN6NTfXLLG6LDFnftmIdSKu81ij0nvsNsooVaOdHUB697PVzQlupmIvKSlGHzA==
-X-Received: by 2002:a05:6402:344e:: with SMTP id l14mr35655703edc.184.1618324013808;
-        Tue, 13 Apr 2021 07:26:53 -0700 (PDT)
-Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id nb29sm7767985ejc.118.2021.04.13.07.26.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 13 Apr 2021 07:26:53 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Siddharth Chandrasekaran <sidcha@amazon.de>
-Cc:     Alexander Graf <graf@amazon.com>,
-        Evgeny Iakovlev <eyakovl@amazon.de>,
-        Liran Alon <liran@amazon.com>,
-        Ioannis Aslanidis <iaslan@amazon.de>,
-        linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, "K. Y. Srinivasan" <kys@microsoft.com>,
-        Haiyang Zhang <haiyangz@microsoft.com>,
-        Stephen Hemminger <sthemmin@microsoft.com>,
-        Wei Liu <wei.liu@kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>
-Subject: Re: [PATCH v2 4/4] KVM: hyper-v: Advertise support for fast XMM
- hypercalls
-In-Reply-To: <5ec20918b06cad17cb43f04be212c5e21c18caea.1618244920.git.sidcha@amazon.de>
-References: <cover.1618244920.git.sidcha@amazon.de>
- <5ec20918b06cad17cb43f04be212c5e21c18caea.1618244920.git.sidcha@amazon.de>
-Date:   Tue, 13 Apr 2021 16:26:52 +0200
-Message-ID: <87pmyy5kgj.fsf@vitty.brq.redhat.com>
+        id S232003AbhDMO1x (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 13 Apr 2021 10:27:53 -0400
+Received: from foss.arm.com ([217.140.110.172]:43164 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S231913AbhDMO1v (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 13 Apr 2021 10:27:51 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 2EF00106F;
+        Tue, 13 Apr 2021 07:27:30 -0700 (PDT)
+Received: from C02W217MHV2R.local (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 47A9F3F694;
+        Tue, 13 Apr 2021 07:27:29 -0700 (PDT)
+Subject: Re: [PATCH kvm-unit-tests 5/8] arm/arm64: mmu: Remove memory layout
+ assumptions
+To:     Andrew Jones <drjones@redhat.com>, kvm@vger.kernel.org
+Cc:     alexandru.elisei@arm.com, andre.przywara@arm.com,
+        eric.auger@redhat.com
+References: <20210407185918.371983-1-drjones@redhat.com>
+ <20210407185918.371983-6-drjones@redhat.com>
+From:   Nikos Nikoleris <nikos.nikoleris@arm.com>
+Message-ID: <ebdc8e4a-4983-a807-0913-cc91a2ae0b5f@arm.com>
+Date:   Tue, 13 Apr 2021 15:27:27 +0100
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
+ Gecko/20100101 Thunderbird/78.9.1
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <20210407185918.371983-6-drjones@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Siddharth Chandrasekaran <sidcha@amazon.de> writes:
+On 07/04/2021 19:59, Andrew Jones wrote:
+> Rather than making too many assumptions about the memory layout
+> in mmu code, just set up the page tables per the memory regions
+> (which means putting all the memory layout assumptions in setup).
+> To ensure we get the right default flags set we need to split the
+> primary region into two regions for code and data.
+> 
+> We still only expect the primary regions to be present, but the
+> next patch will remove that assumption too.
+> 
+> Signed-off-by: Andrew Jones <drjones@redhat.com>
 
-> Now that all extant hypercalls that can use XMM registers (based on
-> spec) for input/outputs are patched to support them, we can start
-> advertising this feature to guests.
->
-> Cc: Alexander Graf <graf@amazon.com>
-> Cc: Evgeny Iakovlev <eyakovl@amazon.de>
-> Signed-off-by: Siddharth Chandrasekaran <sidcha@amazon.de>
+Looks good to me.
+
+Reviewed-by: Nikos Nikoleris <nikos.nikoleris@arm.com>
+
 > ---
->  arch/x86/include/asm/hyperv-tlfs.h | 7 ++++++-
->  arch/x86/kvm/hyperv.c              | 2 ++
->  2 files changed, 8 insertions(+), 1 deletion(-)
->
-> diff --git a/arch/x86/include/asm/hyperv-tlfs.h b/arch/x86/include/asm/hyperv-tlfs.h
-> index e6cd3fee562b..716f12be411e 100644
-> --- a/arch/x86/include/asm/hyperv-tlfs.h
-> +++ b/arch/x86/include/asm/hyperv-tlfs.h
-> @@ -52,7 +52,7 @@
->   * Support for passing hypercall input parameter block via XMM
->   * registers is available
->   */
-> -#define HV_X64_HYPERCALL_PARAMS_XMM_AVAILABLE		BIT(4)
-> +#define HV_X64_HYPERCALL_XMM_INPUT_AVAILABLE		BIT(4)
->  /* Support for a virtual guest idle state is available */
->  #define HV_X64_GUEST_IDLE_STATE_AVAILABLE		BIT(5)
->  /* Frequency MSRs available */
-> @@ -61,6 +61,11 @@
->  #define HV_FEATURE_GUEST_CRASH_MSR_AVAILABLE		BIT(10)
->  /* Support for debug MSRs available */
->  #define HV_FEATURE_DEBUG_MSRS_AVAILABLE			BIT(11)
-> +/*
-> + * Support for returning hypercall ouput block via XMM
-> + * registers is available
-> + */
-> +#define HV_X64_HYPERCALL_XMM_OUTPUT_AVAILABLE		BIT(15)
->  /* stimer Direct Mode is available */
->  #define HV_STIMER_DIRECT_MODE_AVAILABLE			BIT(19)
->  
-> diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
-> index 1f9959aba70d..55838c266bcd 100644
-> --- a/arch/x86/kvm/hyperv.c
-> +++ b/arch/x86/kvm/hyperv.c
-> @@ -2254,6 +2254,8 @@ int kvm_get_hv_cpuid(struct kvm_vcpu *vcpu, struct kvm_cpuid2 *cpuid,
->  			ent->ebx |= HV_POST_MESSAGES;
->  			ent->ebx |= HV_SIGNAL_EVENTS;
->  
-> +			ent->edx |= HV_X64_HYPERCALL_XMM_INPUT_AVAILABLE;
-> +			ent->edx |= HV_X64_HYPERCALL_XMM_OUTPUT_AVAILABLE;
->  			ent->edx |= HV_FEATURE_FREQUENCY_MSRS_AVAILABLE;
->  			ent->edx |= HV_FEATURE_GUEST_CRASH_MSR_AVAILABLE;
-
-With 'ouput' typo fixed,
-
-Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-
--- 
-Vitaly
-
+>   lib/arm/asm/setup.h |  1 +
+>   lib/arm/mmu.c       | 26 +++++++++++++++-----------
+>   lib/arm/setup.c     | 22 ++++++++++++++--------
+>   3 files changed, 30 insertions(+), 19 deletions(-)
+> 
+> diff --git a/lib/arm/asm/setup.h b/lib/arm/asm/setup.h
+> index c8afb2493f8d..210c14f818fb 100644
+> --- a/lib/arm/asm/setup.h
+> +++ b/lib/arm/asm/setup.h
+> @@ -15,6 +15,7 @@ extern int nr_cpus;
+>   
+>   #define MR_F_PRIMARY		(1U << 0)
+>   #define MR_F_IO			(1U << 1)
+> +#define MR_F_CODE		(1U << 2)
+>   #define MR_F_UNKNOWN		(1U << 31)
+>   
+>   struct mem_region {
+> diff --git a/lib/arm/mmu.c b/lib/arm/mmu.c
+> index a7b7ae51afe3..edd2b9da809b 100644
+> --- a/lib/arm/mmu.c
+> +++ b/lib/arm/mmu.c
+> @@ -20,8 +20,6 @@
+>   
+>   #include <linux/compiler.h>
+>   
+> -extern unsigned long etext;
+> -
+>   #define MMU_MAX_PERSISTENT_MAPS 64
+>   
+>   struct mmu_persistent_map {
+> @@ -208,7 +206,7 @@ void mmu_set_range_sect(pgd_t *pgtable, uintptr_t virt_offset,
+>   
+>   void *setup_mmu(phys_addr_t phys_end)
+>   {
+> -	uintptr_t code_end = (uintptr_t)&etext;
+> +	struct mem_region *r;
+>   
+>   	/* 0G-1G = I/O, 1G-3G = identity, 3G-4G = vmalloc */
+>   	if (phys_end > (3ul << 30))
+> @@ -223,14 +221,20 @@ void *setup_mmu(phys_addr_t phys_end)
+>   
+>   	mmu_idmap = alloc_page();
+>   
+> -	/* armv8 requires code shared between EL1 and EL0 to be read-only */
+> -	mmu_set_range_ptes(mmu_idmap, PHYS_OFFSET,
+> -		PHYS_OFFSET, code_end,
+> -		__pgprot(PTE_WBWA | PTE_RDONLY | PTE_USER));
+> -
+> -	mmu_set_range_ptes(mmu_idmap, code_end,
+> -		code_end, phys_end,
+> -		__pgprot(PTE_WBWA | PTE_USER));
+> +	for (r = mem_regions; r->end; ++r) {
+> +		if (r->flags & MR_F_IO) {
+> +			continue;
+> +		} else if (r->flags & MR_F_CODE) {
+> +			assert_msg(r->flags & MR_F_PRIMARY, "Unexpected code region");
+> +			/* armv8 requires code shared between EL1 and EL0 to be read-only */
+> +			mmu_set_range_ptes(mmu_idmap, r->start, r->start, r->end,
+> +					   __pgprot(PTE_WBWA | PTE_USER | PTE_RDONLY));
+> +		} else {
+> +			assert_msg(r->flags & MR_F_PRIMARY, "Unexpected data region");
+> +			mmu_set_range_ptes(mmu_idmap, r->start, r->start, r->end,
+> +					   __pgprot(PTE_WBWA | PTE_USER));
+> +		}
+> +	}
+>   
+>   	mmu_set_persistent_maps(mmu_idmap);
+>   
+> diff --git a/lib/arm/setup.c b/lib/arm/setup.c
+> index 9c16f6004e9f..9da5d24b0be9 100644
+> --- a/lib/arm/setup.c
+> +++ b/lib/arm/setup.c
+> @@ -31,6 +31,7 @@
+>   #define NR_INITIAL_MEM_REGIONS 16
+>   
+>   extern unsigned long stacktop;
+> +extern unsigned long etext;
+>   
+>   struct timer_state __timer_state;
+>   
+> @@ -88,10 +89,12 @@ unsigned int mem_region_get_flags(phys_addr_t paddr)
+>   
+>   static void mem_init(phys_addr_t freemem_start)
+>   {
+> +	phys_addr_t code_end = (phys_addr_t)(unsigned long)&etext;
+>   	struct dt_pbus_reg regs[NR_INITIAL_MEM_REGIONS];
+> -	struct mem_region primary, mem = {
+> +	struct mem_region mem = {
+>   		.start = (phys_addr_t)-1,
+>   	};
+> +	struct mem_region *primary = NULL;
+>   	phys_addr_t base, top;
+>   	int nr_regs, nr_io = 0, i;
+>   
+> @@ -110,8 +113,6 @@ static void mem_init(phys_addr_t freemem_start)
+>   	nr_regs = dt_get_memory_params(regs, NR_INITIAL_MEM_REGIONS - nr_io);
+>   	assert(nr_regs > 0);
+>   
+> -	primary = (struct mem_region){ 0 };
+> -
+>   	for (i = 0; i < nr_regs; ++i) {
+>   		struct mem_region *r = &mem_regions[nr_io + i];
+>   
+> @@ -123,7 +124,7 @@ static void mem_init(phys_addr_t freemem_start)
+>   		 */
+>   		if (freemem_start >= r->start && freemem_start < r->end) {
+>   			r->flags |= MR_F_PRIMARY;
+> -			primary = *r;
+> +			primary = r;
+>   		}
+>   
+>   		/*
+> @@ -135,13 +136,18 @@ static void mem_init(phys_addr_t freemem_start)
+>   		if (r->end > mem.end)
+>   			mem.end = r->end;
+>   	}
+> -	assert(primary.end != 0);
+> +	assert(primary);
+>   	assert(!(mem.start & ~PHYS_MASK) && !((mem.end - 1) & ~PHYS_MASK));
+>   
+> -	__phys_offset = primary.start;	/* PHYS_OFFSET */
+> -	__phys_end = primary.end;	/* PHYS_END */
+> +	__phys_offset = primary->start;	/* PHYS_OFFSET */
+> +	__phys_end = primary->end;	/* PHYS_END */
+> +
+> +	/* Split the primary region into two regions; code and data */
+> +	mem.start = code_end, mem.end = primary->end, mem.flags = MR_F_PRIMARY;
+> +	mem_regions[nr_io + i] = mem;
+> +	primary->end = code_end, primary->flags |= MR_F_CODE;
+>   
+> -	phys_alloc_init(freemem_start, primary.end - freemem_start);
+> +	phys_alloc_init(freemem_start, __phys_end - freemem_start);
+>   	phys_alloc_set_minimum_alignment(SMP_CACHE_BYTES);
+>   
+>   	phys_alloc_get_unused(&base, &top);
+> 
