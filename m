@@ -2,135 +2,155 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 448CF35E66C
-	for <lists+kvm@lfdr.de>; Tue, 13 Apr 2021 20:31:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4430735E696
+	for <lists+kvm@lfdr.de>; Tue, 13 Apr 2021 20:40:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347815AbhDMSaZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 13 Apr 2021 14:30:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55418 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1347817AbhDMSaR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 13 Apr 2021 14:30:17 -0400
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B6629C061574
-        for <kvm@vger.kernel.org>; Tue, 13 Apr 2021 11:29:56 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id h69so12519984ybg.10
-        for <kvm@vger.kernel.org>; Tue, 13 Apr 2021 11:29:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=reply-to:date:in-reply-to:message-id:mime-version:references
-         :subject:from:to:cc;
-        bh=ZLBo4g8Ay3j59zTWAeAVK1AEJcKiEUGCOtGCkug1Xm8=;
-        b=AaD3yleh8mz8kgSJJgqPAiZzvg6sryX2ta9uwSnAsRDcOcNyBAbY6KGhgzO1rlhZBk
-         11s8XkfFEJZlnp8hq6zog+bkCHpC1mn1LqL072WlJoBjJps9nBO25CktotduMpIWW42P
-         +26fZ5B1q4UHwQZ03a8ZOZHEXU/wZ7TS+4UiaRSR4AaacU0iDirwJlg2swGqzp1U5QO4
-         5i0+2mdrYyoIVyZJgfVttKgwtzIOH8soEck0FTGklOL7GtKvwrVKHnXlGXeh46xptfAQ
-         2rZgtnvJI3SifCu2tSfdEDQjj0Aqup16XyOP85/CBIB32dYa9W6QT4FyVkW9E/HDUFGG
-         4kaw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:reply-to:date:in-reply-to:message-id
-         :mime-version:references:subject:from:to:cc;
-        bh=ZLBo4g8Ay3j59zTWAeAVK1AEJcKiEUGCOtGCkug1Xm8=;
-        b=FI4ltMZ+HnXigBMFM9yr0w06h/Uk89rhr9xAfbobFImZX/MvJt0WUpHoiDBxq1iN0W
-         NbRPGGtA6mEDyCYXVmesyPCqeS99UvXLaVnXdm+4kki9dyAVIb/0Kisfwr2BxKoHHBhE
-         eEuGAhNumoYWIl35nfIObHipalT5u+wsjqmWVscy2SfjXiWx/pWGOC7Xxn76hC1mk4VG
-         D7iDvRis7pXTD+MeO3hMPfT94Wk4Zy0g23htDAxql1T95E0hh3Q9aZ28mqCIPXeVuCHw
-         BbYIbrnxcBPFLoNQ9kZFfHrEWW41ye5hEPNAYjJSz8eTwn682KvVDOGbSxZP47VPVCMa
-         OHYA==
-X-Gm-Message-State: AOAM532S0sHyUKsbIoudeQFvdP8qucKVSzSmAL5YrRdoJB33SNxS7JZ3
-        VxOs9urES3JSa8VD0SEU/YG6ZL5aG4w=
-X-Google-Smtp-Source: ABdhPJzgDbopp2o77po8l7A/S0LFZa5mDiEt8CIMZnU2TNFpHgkoh9deOcwEfKMMMuWk2+TVZO+w/WwC2bU=
-X-Received: from seanjc798194.pdx.corp.google.com ([2620:15c:f:10:f031:9c1c:56c7:c3bf])
- (user=seanjc job=sendgmr) by 2002:a25:ba87:: with SMTP id s7mr45194375ybg.222.1618338596029;
- Tue, 13 Apr 2021 11:29:56 -0700 (PDT)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Tue, 13 Apr 2021 11:29:33 -0700
-In-Reply-To: <20210413182933.1046389-1-seanjc@google.com>
-Message-Id: <20210413182933.1046389-8-seanjc@google.com>
-Mime-Version: 1.0
-References: <20210413182933.1046389-1-seanjc@google.com>
-X-Mailer: git-send-email 2.31.1.295.g9ea45b61b8-goog
-Subject: [RFC PATCH 7/7] KVM: x86: Defer tick-based accounting 'til after IRQ handling
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
+        id S1348104AbhDMSkf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 13 Apr 2021 14:40:35 -0400
+Received: from mail.kernel.org ([198.145.29.99]:55214 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229877AbhDMSkd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 13 Apr 2021 14:40:33 -0400
+Received: from gandalf.local.home (cpe-66-24-58-225.stny.res.rr.com [66.24.58.225])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 31C2C613C5;
+        Tue, 13 Apr 2021 18:40:11 +0000 (UTC)
+Date:   Tue, 13 Apr 2021 14:40:09 -0400
+From:   Steven Rostedt <rostedt@goodmis.org>
+To:     Dmitry Vyukov <dvyukov@google.com>
+Cc:     syzkaller <syzkaller@googlegroups.com>,
+        syzbot <syzbot+61e04e51b7ac86930589@syzkaller.appspotmail.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Jens Axboe <axboe@kernel.dk>, Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, KVM list <kvm@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>, masahiroy@kernel.org,
+        Ingo Molnar <mingo@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        rafael.j.wysocki@intel.com,
+        Sean Christopherson <seanjc@google.com>,
+        syzkaller-bugs <syzkaller-bugs@googlegroups.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Michael Tokarev <mjt@tls.msk.ru>
-Content-Type: text/plain; charset="UTF-8"
+        Will Deacon <will@kernel.org>,
+        "the arch/x86 maintainers" <x86@kernel.org>
+Subject: Re: [syzbot] possible deadlock in del_gendisk
+Message-ID: <20210413144009.6ed2feb8@gandalf.local.home>
+In-Reply-To: <CACT4Y+ZrkE=ZKKncTOJRJgOTNfU8PGz=k+8V+0602ftTCHkc6Q@mail.gmail.com>
+References: <000000000000ae236f05bfde0678@google.com>
+        <20210413134147.54556d9d@gandalf.local.home>
+        <20210413134314.16068eeb@gandalf.local.home>
+        <CACT4Y+ZrkE=ZKKncTOJRJgOTNfU8PGz=k+8V+0602ftTCHkc6Q@mail.gmail.com>
+X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When using tick-based accounting, defer the call to account guest time
-until after servicing any IRQ(s) that happened in the guest (or
-immediately after VM-Exit).  When using tick-based accounting, time is
-accounted to the guest when PF_VCPU is set when the tick IRQ handler
-runs.  The current approach of unconditionally accounting time in
-kvm_guest_exit_irqoff() prevents IRQs that occur in the guest from ever
-being processed with PF_VCPU set, since PF_VCPU ends up being set only
-during the relatively short VM-Enter sequence, which runs entirely with
-IRQs disabled.
+On Tue, 13 Apr 2021 20:24:00 +0200
+Dmitry Vyukov <dvyukov@google.com> wrote:
 
-Fixes: 87fa7f3e98a131 ("x86/kvm: Move context tracking where it belongs")
-Cc: Thomas Gleixner <tglx@linutronix.de>
-Cc: Michael Tokarev <mjt@tls.msk.ru>
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- arch/x86/kvm/x86.c | 8 ++++++++
- arch/x86/kvm/x86.h | 9 ++++++---
- 2 files changed, 14 insertions(+), 3 deletions(-)
+> On Tue, Apr 13, 2021 at 7:43 PM Steven Rostedt <rostedt@goodmis.org> wrote:
+> >
+> > On Tue, 13 Apr 2021 13:41:47 -0400
+> > Steven Rostedt <rostedt@goodmis.org> wrote:
+> >  
+> > > As the below splats look like it has nothing to do with this patch, and
+> > > this patch will add a WARN() if there's broken logic somewhere, I bet the
+> > > bisect got confused (if it is automated and does a panic_on_warning),
+> > > because it will panic for broken code that his patch detects.
+> > >
+> > > That is, the bisect was confused because it was triggering on two different
+> > > issues. One that triggered the reported splat below, and another that this
+> > > commit detects and warns on.  
+> >
+> > Is it possible to update the the bisect to make sure that if it is failing
+> > on warnings, to make sure the warnings are somewhat related, before decided
+> > that its the same bug?  
+> 
+> It does not seem to be feasible, bugs manifest differently in both
+> space and time. Also even if we somehow conclude the crash we see is
+> different, it says nothing about the original bug. For more data see:
+> https://groups.google.com/g/syzkaller/c/sR8aAXaWEF4/m/tTWYRgvmAwAJ
 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 16fb39503296..096bbf50b7a9 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -9230,6 +9230,14 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
- 	local_irq_disable();
- 	kvm_after_interrupt(vcpu);
- 
-+	/*
-+	 * When using tick-based account, wait until after servicing IRQs to
-+	 * account guest time so that any ticks that occurred while running the
-+	 * guest are properly accounted to the guest.
-+	 */
-+	if (!IS_ENABLED(CONFIG_VIRT_CPU_ACCOUNTING_GEN))
-+		kvm_vtime_account_guest_exit();
-+
- 	if (lapic_in_kernel(vcpu)) {
- 		s64 delta = vcpu->arch.apic->lapic_timer.advance_expire_delta;
- 		if (delta != S64_MIN) {
-diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
-index 74ef92f47db8..039a7d585925 100644
---- a/arch/x86/kvm/x86.h
-+++ b/arch/x86/kvm/x86.h
-@@ -38,15 +38,18 @@ static __always_inline void kvm_guest_exit_irqoff(void)
- 	 * have them in state 'on' as recorded before entering guest mode.
- 	 * Same as enter_from_user_mode().
- 	 *
--	 * guest_exit_irqoff() restores host context and reinstates RCU if
--	 * enabled and required.
-+	 * context_tracking_guest_exit_irqoff() restores host context and
-+	 * reinstates RCU if enabled and required.
- 	 *
- 	 * This needs to be done before the below as native_read_msr()
- 	 * contains a tracepoint and x86_spec_ctrl_restore_host() calls
- 	 * into world and some more.
- 	 */
- 	lockdep_hardirqs_off(CALLER_ADDR0);
--	guest_exit_irqoff();
-+	context_tracking_guest_exit_irqoff();
-+
-+	if (IS_ENABLED(CONFIG_VIRT_CPU_ACCOUNTING_GEN))
-+		kvm_vtime_account_guest_exit();
- 
- 	instrumentation_begin();
- 	trace_hardirqs_off_finish();
--- 
-2.31.1.295.g9ea45b61b8-goog
+Sure, but if you trigger a lockdep bug, lockdep bugs are usually very
+similar in all instances. It usually will include the same locks, or at
+least be the same type of lockdep bug (where some types are related).
 
+If the bisect saw an issue before and at this commit, I would think it
+didn't trigger a lockdep bug at all, and simply triggered a warning.
+
+In fact, according to:
+
+  https://syzkaller.appspot.com/x/report.txt?x=15a7e77ed00000
+
+That's exactly what it did.
+
+That is, if the original bug is a lockdep warning, you should only be
+interested in lockdep warnings (at a minimum). The final bug here had:
+
+------------[ cut here ]------------
+raw_local_irq_restore() called with IRQs enabled
+WARNING: CPU: 0 PID: 8777 at kernel/locking/irqflag-debug.c:9 warn_bogus_irq_restore kernel/locking/irqflag-debug.c:9 [inline]
+WARNING: CPU: 0 PID: 8777 at kernel/locking/irqflag-debug.c:9 warn_bogus_irq_restore+0x1d/0x20 kernel/locking/irqflag-debug.c:7
+Modules linked in:
+CPU: 0 PID: 8777 Comm: syz-executor.1 Not tainted 5.11.0-rc2-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
+RIP: 0010:warn_bogus_irq_restore kernel/locking/irqflag-debug.c:9 [inline]
+RIP: 0010:warn_bogus_irq_restore+0x1d/0x20 kernel/locking/irqflag-debug.c:7
+Code: 51 00 e9 3f fe ff ff cc cc cc cc cc cc 80 3d e0 b4 ce 0a 00 74 01 c3 48 c7 c7 60 f5 8a 88 c6 05 cf b4 ce 0a 01 e8 17 01 a4 06 <0f> 0b c3 48 c7 c0 a0 46 4d 8e 53 48 89 fb 48 ba 00 00 00 00 00 fc
+RSP: 0018:ffffc900017bf9f8 EFLAGS: 00010286
+RAX: 0000000000000000 RBX: ffff8881477b2040 RCX: 0000000000000000
+RDX: 0000000000000002 RSI: 0000000000000004 RDI: fffff520002f7f31
+RBP: 0000000000000246 R08: 0000000000000001 R09: ffff8880b9e2015b
+R10: ffffed10173c402b R11: 0000000000000001 R12: 0000000000000003
+R13: ffffed1028ef6408 R14: 0000000000000001 R15: ffff8880b9e359c0
+FS:  00000000017b8400(0000) GS:ffff8880b9e00000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00000000017c1848 CR3: 0000000010920000 CR4: 00000000001506f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ kvm_wait arch/x86/kernel/kvm.c:860 [inline]
+ kvm_wait+0xc3/0xe0 arch/x86/kernel/kvm.c:837
+ pv_wait arch/x86/include/asm/paravirt.h:564 [inline]
+ pv_wait_head_or_lock kernel/locking/qspinlock_paravirt.h:470 [inline]
+ __pv_queued_spin_lock_slowpath+0x8b8/0xb40 kernel/locking/qspinlock.c:508
+ pv_queued_spin_lock_slowpath arch/x86/include/asm/paravirt.h:554 [inline]
+ queued_spin_lock_slowpath arch/x86/include/asm/qspinlock.h:51 [inline]
+ queued_spin_lock include/asm-generic/qspinlock.h:85 [inline]
+ do_raw_spin_lock+0x200/0x2b0 kernel/locking/spinlock_debug.c:113
+ spin_lock include/linux/spinlock.h:354 [inline]
+ ext4_lock_group fs/ext4/ext4.h:3379 [inline]
+ __ext4_new_inode+0x2da2/0x44d0 fs/ext4/ialloc.c:1187
+ ext4_mkdir+0x298/0x910 fs/ext4/namei.c:2793
+ vfs_mkdir+0x413/0x660 fs/namei.c:3652
+ do_mkdirat+0x1eb/0x250 fs/namei.c:3675
+ do_syscall_64+0x2d/0x70 arch/x86/entry/common.c:46
+ entry_SYSCALL_64_after_hwframe+0x44/0xa9
+RIP: 0033:0x465567
+Code: 73 01 c3 48 c7 c1 bc ff ff ff f7 d8 64 89 01 48 83 c8 ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 b8 53 00 00 00 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 bc ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007ffe00ad69f8 EFLAGS: 00000202 ORIG_RAX: 0000000000000053
+RAX: ffffffffffffffda RBX: 00007ffe00ad6a90 RCX: 0000000000465567
+RDX: 0000000000000000 RSI: 00000000000001ff RDI: 00007ffe00ad6a90
+RBP: 00007ffe00ad6a6c R08: 0000000000000000 R09: 0000000000000006
+R10: 00007ffe00ad6794 R11: 0000000000000202 R12: 0000000000000032
+R13: 000000000006549a R14: 0000000000000002 R15: 00007ffe00ad6ad0
+
+
+
+Which shows a WARN was triggered, and totally unrelated to what you were
+bisecting.
+
+Just matching types of warnings (lockdep to lockdep, or WARN_ON to WARN_ON)
+would help reduce the number of bogus bisects you are having.
+
+-- Steve
