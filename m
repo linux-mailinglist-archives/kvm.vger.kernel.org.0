@@ -2,133 +2,238 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BE4AD35EBFA
-	for <lists+kvm@lfdr.de>; Wed, 14 Apr 2021 06:40:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6192535EC1F
+	for <lists+kvm@lfdr.de>; Wed, 14 Apr 2021 07:21:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231239AbhDNEkn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 14 Apr 2021 00:40:43 -0400
-Received: from aserp2130.oracle.com ([141.146.126.79]:36764 "EHLO
-        aserp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229515AbhDNEkm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 14 Apr 2021 00:40:42 -0400
-Received: from pps.filterd (aserp2130.oracle.com [127.0.0.1])
-        by aserp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 13E4U1FE039741;
-        Wed, 14 Apr 2021 04:38:32 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
- : subject : message-id : references : mime-version : content-type :
- in-reply-to; s=corp-2020-01-29;
- bh=Bd4/hg1yN1is4IRJn7hT6CyZTbFjK4SqbaFRqE8RBN8=;
- b=GDhlovi8GebAxK8lBABqyOkduyXZ8ROVjsZYsvvAarJBH9EElr42BK9NSjnbWDUkue9x
- ke0VO8SRzVPbjAXmqylIvdhhCAfJQvQXCscPoq9R7P+bSbDThL19ya2fTEWxudgzX5YN
- 2MpT5FhVoZvxYjhTo2e6X7QDgu4rohNhW5a7IMQiTTCaARtprCiTSno9B1iojLaWN2tB
- QMt5cMNb8YnLLVanQxMTvu/fmkgR7bEbvZ/LvLqL4qDYlkcZq0OZ0gytoU07NsuWqJvv
- iJkyhSk34fw9oRHWn6u1FpVhLMI2RLWQk8uzFIrs7UPv12RQWut4ljw91gOFzb1WQhGy AQ== 
-Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
-        by aserp2130.oracle.com with ESMTP id 37u1hbh5ep-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 14 Apr 2021 04:38:32 +0000
-Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
-        by userp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 13E4ZVxl007477;
-        Wed, 14 Apr 2021 04:38:31 GMT
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
-        by userp3020.oracle.com with ESMTP id 37unstc5ny-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 14 Apr 2021 04:38:30 +0000
-Received: from abhmp0001.oracle.com (abhmp0001.oracle.com [141.146.116.7])
-        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 13E4cH43023157;
-        Wed, 14 Apr 2021 04:38:21 GMT
-Received: from kadam (/102.36.221.92)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Wed, 14 Apr 2021 04:38:17 +0000
-Date:   Wed, 14 Apr 2021 07:37:59 +0300
-From:   Dan Carpenter <dan.carpenter@oracle.com>
-To:     Jason Gunthorpe <jgg@ziepe.ca>
-Cc:     Dmitry Vyukov <dvyukov@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        syzbot <syzbot+015dd7cdbbbc2c180c65@syzkaller.appspotmail.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Borislav Petkov <bp@alien8.de>,
-        Daniel Vetter <daniel.vetter@ffwll.ch>,
-        daniel.vetter@intel.com, "H. Peter Anvin" <hpa@zytor.com>,
-        Jim Mattson <jmattson@google.com>,
-        James Morris <jmorris@namei.org>,
-        Joerg Roedel <joro@8bytes.org>, KVM list <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Linux Media Mailing List <linux-media@vger.kernel.org>,
-        Linux-MM <linux-mm@kvack.org>,
-        linux-security-module <linux-security-module@vger.kernel.org>,
-        m.szyprowski@samsung.com,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Ingo Molnar <mingo@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        "Serge E. Hallyn" <serge@hallyn.com>,
-        syzkaller-bugs <syzkaller-bugs@googlegroups.com>,
-        Tomasz Figa <tfiga@chromium.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        the arch/x86 maintainers <x86@kernel.org>
-Subject: Re: [syzbot] WARNING in unsafe_follow_pfn
-Message-ID: <20210414043759.GM6021@kadam>
-References: <000000000000ca9a6005bec29ebe@google.com>
- <2db3c803-6a94-9345-261a-a2bb74370c02@redhat.com>
- <20210331042922.GE2065@kadam>
- <20210401121933.GA2710221@ziepe.ca>
- <CACT4Y+ZG9Dhv1UTvotsTimVrzaojPN91Lu1CsPqm4kd1j5yNkQ@mail.gmail.com>
- <20210413181145.GK227011@ziepe.ca>
+        id S1347175AbhDNFVc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 14 Apr 2021 01:21:32 -0400
+Received: from mx12.kaspersky-labs.com ([91.103.66.155]:29683 "EHLO
+        mx12.kaspersky-labs.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1347145AbhDNFVa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 14 Apr 2021 01:21:30 -0400
+Received: from relay12.kaspersky-labs.com (unknown [127.0.0.10])
+        by relay12.kaspersky-labs.com (Postfix) with ESMTP id 8421C763B1;
+        Wed, 14 Apr 2021 08:21:06 +0300 (MSK)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kaspersky.com;
+        s=mail202102; t=1618377666;
+        bh=oSPA1UM+2S78rshsSEmWZB4yTKUB4yLonrDG96WldRg=;
+        h=Subject:To:From:Message-ID:Date:MIME-Version:Content-Type;
+        b=g+rY1yaen0YKSyRqOOcBFX/N607AzUoFKfBXImSWUw6jUjTb6IMd1vK515hdcnl09
+         SELQy8hUNUcSIzAfNnaSACnvuxPulKm6mR0GJfrp9k/LbIi5NzVeTUVBYB/828UA8C
+         Nh7h4VKUkhkr3IArux/jbyZrHsQcEbOs484lqyYEGuGfEB5wLGV4qV2Ccb9w1NW1/K
+         FnMGxy0cerWgg1mTAvfsVUSdkb1NP3MEpNY5qSeA4pL++uPz3CPB9eFro5uEpglSis
+         +KH3mN7K54oh6YjdrgeIHYWGHGhP9/2O+TZtBjyPXaEJTgCqBYu18FfQT6pYJ6JdGy
+         G+POcBBdxgS3g==
+Received: from mail-hq2.kaspersky.com (unknown [91.103.66.206])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
+        (Client CN "mail-hq2.kaspersky.com", Issuer "Kaspersky MailRelays CA G3" (verified OK))
+        by mailhub12.kaspersky-labs.com (Postfix) with ESMTPS id 6BBD3763A4;
+        Wed, 14 Apr 2021 08:21:05 +0300 (MSK)
+Received: from [10.16.171.77] (10.64.64.121) by hqmailmbx3.avp.ru
+ (10.64.67.243) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2176.2; Wed, 14
+ Apr 2021 08:21:05 +0300
+Subject: Re: [RFC PATCH v8 11/19] virtio/vsock: dequeue callback for
+ SOCK_SEQPACKET
+To:     Stefan Hajnoczi <stefanha@redhat.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Jorgen Hansen <jhansen@vmware.com>,
+        Andra Paraschiv <andraprs@amazon.com>,
+        Colin Ian King <colin.king@canonical.com>,
+        Norbert Slusarek <nslusarek@gmx.net>,
+        Jeff Vander Stoep <jeffv@google.com>,
+        Alexander Popov <alex.popov@linux.com>
+CC:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "virtualization@lists.linux-foundation.org" 
+        <virtualization@lists.linux-foundation.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "stsp2@yandex.ru" <stsp2@yandex.ru>,
+        "oxffffaa@gmail.com" <oxffffaa@gmail.com>
+References: <20210413123954.3396314-1-arseny.krasnov@kaspersky.com>
+ <20210413124443.3403382-1-arseny.krasnov@kaspersky.com>
+From:   Arseny Krasnov <arseny.krasnov@kaspersky.com>
+Message-ID: <97ebdfc1-1b73-1c49-f2fa-6daa2726c0a6@kaspersky.com>
+Date:   Wed, 14 Apr 2021 08:21:04 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210413181145.GK227011@ziepe.ca>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-Proofpoint-IMR: 1
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=9953 signatures=668683
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 adultscore=0
- malwarescore=0 suspectscore=0 bulkscore=0 mlxscore=0 spamscore=0
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2104060000 definitions=main-2104140030
-X-Proofpoint-GUID: 5W5g74JUOBhBXqiypFmTmoVnXKL81tdF
-X-Proofpoint-ORIG-GUID: 5W5g74JUOBhBXqiypFmTmoVnXKL81tdF
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=9953 signatures=668683
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0 priorityscore=1501
- clxscore=1015 adultscore=0 mlxlogscore=999 impostorscore=0 malwarescore=0
- lowpriorityscore=0 spamscore=0 phishscore=0 bulkscore=0 suspectscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2104060000
- definitions=main-2104140029
+In-Reply-To: <20210413124443.3403382-1-arseny.krasnov@kaspersky.com>
+Content-Type: text/plain; charset="koi8-r"
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-Originating-IP: [10.64.64.121]
+X-ClientProxiedBy: hqmailmbx1.avp.ru (10.64.67.241) To hqmailmbx3.avp.ru
+ (10.64.67.243)
+X-KSE-ServerInfo: hqmailmbx3.avp.ru, 9
+X-KSE-AntiSpam-Interceptor-Info: scan successful
+X-KSE-AntiSpam-Version: 5.9.20, Database issued on: 04/14/2021 05:03:43
+X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
+X-KSE-AntiSpam-Method: none
+X-KSE-AntiSpam-Rate: 0
+X-KSE-AntiSpam-Info: Lua profiles 163086 [Apr 14 2021]
+X-KSE-AntiSpam-Info: Version: 5.9.20.0
+X-KSE-AntiSpam-Info: Envelope from: arseny.krasnov@kaspersky.com
+X-KSE-AntiSpam-Info: LuaCore: 442 442 b985cb57763b61d2a20abb585d5d4cc10c315b09
+X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
+X-KSE-AntiSpam-Info: d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2;kaspersky.com:7.1.1
+X-KSE-AntiSpam-Info: Rate: 0
+X-KSE-AntiSpam-Info: Status: not_detected
+X-KSE-AntiSpam-Info: Method: none
+X-KSE-Antiphishing-Info: Clean
+X-KSE-Antiphishing-ScanningType: Deterministic
+X-KSE-Antiphishing-Method: None
+X-KSE-Antiphishing-Bases: 04/14/2021 05:06:00
+X-KSE-AttachmentFiltering-Interceptor-Info: no applicable attachment filtering
+ rules found
+X-KSE-Antivirus-Interceptor-Info: scan successful
+X-KSE-Antivirus-Info: Clean, bases: 14.04.2021 0:55:00
+X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
+X-KSE-AttachmentFiltering-Interceptor-Info: no applicable attachment filtering
+ rules found
+X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
+X-KLMS-Rule-ID: 52
+X-KLMS-Message-Action: clean
+X-KLMS-AntiSpam-Status: not scanned, disabled by settings
+X-KLMS-AntiSpam-Interceptor-Info: not scanned
+X-KLMS-AntiPhishing: Clean, bases: 2021/04/14 03:55:00
+X-KLMS-AntiVirus: Kaspersky Security for Linux Mail Server, version 8.0.3.30, bases: 2021/04/13 22:18:00 #16592176
+X-KLMS-AntiVirus-Status: Clean, skipped
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Apr 13, 2021 at 03:11:45PM -0300, Jason Gunthorpe wrote:
-> On Tue, Apr 13, 2021 at 07:20:12PM +0200, Dmitry Vyukov wrote:
-> > > > Plus users are going to be seeing this as well.  According to the commit
-> > > > message for 69bacee7f9ad ("mm: Add unsafe_follow_pfn") "Unfortunately
-> > > > there's some users where this is not fixable (like v4l userptr of iomem
-> > > > mappings)".  It sort of seems crazy to dump this giant splat and then
-> > > > tell users to ignore it forever because it can't be fixed...  0_0
-> > >
-> > > I think the discussion conclusion was that this interface should not
-> > > be used by userspace anymore, it is obsolete by some new interface?
-> > >
-> > > It should be protected by some kconfig and the kconfig should be
-> > > turned off for syzkaller runs.
-> > 
-> > If this is not a kernel bug, then it must not use WARN_ON[_ONCE]. It
-> > makes the kernel untestable for both automated systems and humans:
-> 
-> It is a kernel security bug triggerable by userspace.
-> 
-> > And if it's a kernel bug reachable from user-space, then I think this
-> > code should be removed entirely, not just on all testing systems. Or
-> > otherwise if we are not removing it for some reason, then it needs to
-> > be fixed.
-> 
-> Legacy embedded systems apparently require it.
+I'll fix some issues of this patch found by kernel test robot
 
-Are legacy embedded systems ever going to update their kernel?  It might
-be better to just remove it.  (I don't really have any details outside
-of your email so I don't know).
-
-regards,
-dan carpenter
-
+On 13.04.2021 15:44, Arseny Krasnov wrote:
+> This adds transport callback and it's logic for SEQPACKET dequeue.
+> Callback fetches RW packets from rx queue of socket until whole record
+> is copied(if user's buffer is full, user is not woken up). This is done
+> to not stall sender, because if we wake up user and it leaves syscall,
+> nobody will send credit update for rest of record, and sender will wait
+> for next enter of read syscall at receiver's side. So if user buffer is
+> full, we just send credit update and drop data.
+>
+> Signed-off-by: Arseny Krasnov <arseny.krasnov@kaspersky.com>
+> ---
+> v7 -> v8:
+>  - Things like SEQ_BEGIN, SEQ_END, 'msg_len' and 'msg_id' now removed.
+>    This callback fetches and copies RW packets to user's buffer, until
+>    last packet of message found(this packet is marked in 'flags' field
+>    of header).
+>
+>  include/linux/virtio_vsock.h            |  5 ++
+>  net/vmw_vsock/virtio_transport_common.c | 73 +++++++++++++++++++++++++
+>  2 files changed, 78 insertions(+)
+>
+> diff --git a/include/linux/virtio_vsock.h b/include/linux/virtio_vsock.h
+> index dc636b727179..02acf6e9ae04 100644
+> --- a/include/linux/virtio_vsock.h
+> +++ b/include/linux/virtio_vsock.h
+> @@ -80,6 +80,11 @@ virtio_transport_dgram_dequeue(struct vsock_sock *vsk,
+>  			       struct msghdr *msg,
+>  			       size_t len, int flags);
+>  
+> +ssize_t
+> +virtio_transport_seqpacket_dequeue(struct vsock_sock *vsk,
+> +				   struct msghdr *msg,
+> +				   int flags,
+> +				   bool *msg_ready);
+>  s64 virtio_transport_stream_has_data(struct vsock_sock *vsk);
+>  s64 virtio_transport_stream_has_space(struct vsock_sock *vsk);
+>  
+> diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
+> index 833104b71a1c..8492b8bd5df5 100644
+> --- a/net/vmw_vsock/virtio_transport_common.c
+> +++ b/net/vmw_vsock/virtio_transport_common.c
+> @@ -393,6 +393,67 @@ virtio_transport_stream_do_dequeue(struct vsock_sock *vsk,
+>  	return err;
+>  }
+>  
+> +static int virtio_transport_seqpacket_do_dequeue(struct vsock_sock *vsk,
+> +						 struct msghdr *msg,
+> +						 int flags,
+> +						 bool *msg_ready)
+> +{
+> +	struct virtio_vsock_sock *vvs = vsk->trans;
+> +	struct virtio_vsock_pkt *pkt;
+> +	int err = 0;
+> +	size_t user_buf_len = msg->msg_iter.count;
+> +
+> +	*msg_ready = false;
+> +	spin_lock_bh(&vvs->rx_lock);
+> +
+> +	while (!*msg_ready && !list_empty(&vvs->rx_queue) && err >= 0) {
+> +		pkt = list_first_entry(&vvs->rx_queue, struct virtio_vsock_pkt, list);
+> +
+> +		if (le16_to_cpu(pkt->hdr.op) == VIRTIO_VSOCK_OP_RW) {
+> +			size_t bytes_to_copy;
+> +			size_t pkt_len;
+> +
+> +			pkt_len = (size_t)le32_to_cpu(pkt->hdr.len);
+> +			bytes_to_copy = min(user_buf_len, pkt_len);
+> +
+> +			/* sk_lock is held by caller so no one else can dequeue.
+> +			 * Unlock rx_lock since memcpy_to_msg() may sleep.
+> +			 */
+> +			spin_unlock_bh(&vvs->rx_lock);
+> +
+> +			if (memcpy_to_msg(msg, pkt->buf, bytes_to_copy)) {
+> +				err = -EINVAL;
+> +				break;
+> +			}
+> +
+> +			spin_lock_bh(&vvs->rx_lock);
+> +
+> +			/* If user sets 'MSG_TRUNC' we return real length
+> +			 * of message.
+> +			 */
+> +			if (flags & MSG_TRUNC)
+> +				err += pkt_len;
+> +			else
+> +				err += bytes_to_copy;
+> +
+> +			user_buf_len -= bytes_to_copy;
+> +
+> +			if (pkt->hdr.flags & VIRTIO_VSOCK_SEQ_EOR)
+> +				*msg_ready = true;
+> +		}
+> +
+> +		virtio_transport_dec_rx_pkt(vvs, pkt);
+> +		list_del(&pkt->list);
+> +		virtio_transport_free_pkt(pkt);
+> +	}
+> +
+> +	spin_unlock_bh(&vvs->rx_lock);
+> +
+> +	virtio_transport_send_credit_update(vsk);
+> +
+> +	return err;
+> +}
+> +
+>  ssize_t
+>  virtio_transport_stream_dequeue(struct vsock_sock *vsk,
+>  				struct msghdr *msg,
+> @@ -405,6 +466,18 @@ virtio_transport_stream_dequeue(struct vsock_sock *vsk,
+>  }
+>  EXPORT_SYMBOL_GPL(virtio_transport_stream_dequeue);
+>  
+> +ssize_t
+> +virtio_transport_seqpacket_dequeue(struct vsock_sock *vsk,
+> +				   struct msghdr *msg,
+> +				   int flags, bool *msg_ready)
+> +{
+> +	if (flags & MSG_PEEK)
+> +		return -EOPNOTSUPP;
+> +
+> +	return virtio_transport_seqpacket_do_dequeue(vsk, msg, flags, msg_ready);
+> +}
+> +EXPORT_SYMBOL_GPL(virtio_transport_seqpacket_dequeue);
+> +
+>  int
+>  virtio_transport_dgram_dequeue(struct vsock_sock *vsk,
+>  			       struct msghdr *msg,
