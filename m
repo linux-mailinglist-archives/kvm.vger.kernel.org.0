@@ -2,124 +2,87 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4496235F3EA
-	for <lists+kvm@lfdr.de>; Wed, 14 Apr 2021 14:37:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 61DF735F545
+	for <lists+kvm@lfdr.de>; Wed, 14 Apr 2021 15:47:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1351000AbhDNMgf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 14 Apr 2021 08:36:35 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:36930 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1350977AbhDNMg1 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 14 Apr 2021 08:36:27 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1618403766;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=BPj9B9SI4Ii5RY6ovJjvLP89Qdf3fZd8sHO2I12+bSw=;
-        b=bA8WshyFGNwQD2B9VuItej3w/LBiT0bLMX2C/aP99Y3UpelxH8HS1JCjNVt/i+YeS4Rbpb
-        e66lkBaSX9tYMyf1f42Z5okGtZRZJ1h2eWCMQ7t0mSwjINPjQKIct6cwGQp1M7MNoNKYWX
-        hwVvm/dAbLHUqOWplyyRN/hyI/VP2OM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-340-aA_1HIK1Pxi8LIgBXzxJxA-1; Wed, 14 Apr 2021 08:36:04 -0400
-X-MC-Unique: aA_1HIK1Pxi8LIgBXzxJxA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        id S1351594AbhDNNop (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 14 Apr 2021 09:44:45 -0400
+Received: from mail.kernel.org ([198.145.29.99]:52252 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1351586AbhDNNoo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 14 Apr 2021 09:44:44 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3C26383DD20;
-        Wed, 14 Apr 2021 12:36:03 +0000 (UTC)
-Received: from vitty.brq.redhat.com (unknown [10.40.196.11])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id BAFF45D9CC;
-        Wed, 14 Apr 2021 12:36:00 +0000 (UTC)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>, x86@kernel.org,
-        Lenny Szubowicz <lszubowi@redhat.com>,
-        Mohamed Aboubakr <mabouba@amazon.com>,
-        Xiaoyi Chen <cxiaoyi@amazon.com>, linux-kernel@vger.kernel.org
-Subject: [PATCH 5/5] x86/kvm: Unify kvm_pv_guest_cpu_reboot() with kvm_guest_cpu_offline()
-Date:   Wed, 14 Apr 2021 14:35:44 +0200
-Message-Id: <20210414123544.1060604-6-vkuznets@redhat.com>
-In-Reply-To: <20210414123544.1060604-1-vkuznets@redhat.com>
-References: <20210414123544.1060604-1-vkuznets@redhat.com>
+        by mail.kernel.org (Postfix) with ESMTPSA id B363A611AD;
+        Wed, 14 Apr 2021 13:44:23 +0000 (UTC)
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.lan)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94)
+        (envelope-from <maz@kernel.org>)
+        id 1lWfob-007RSZ-Jm; Wed, 14 Apr 2021 14:44:21 +0100
+From:   Marc Zyngier <maz@kernel.org>
+To:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+        linux-s390@vger.kernel.org, linux-sh@vger.kernel.org
+Cc:     Mark Rutland <mark.rutland@arm.com>, Will Deacon <will@kernel.org>,
+        Rich Felker <dalias@libc.org>,
+        Yoshinori Sato <ysato@users.sourceforge.jp>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Arnaldo Carvalho de Melo <acme@kernel.org>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>, nathan@kernel.org,
+        Viresh Kumar <viresh.kumar@linaro.org>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        kernel-team@android.com
+Subject: [PATCH 0/5] perf: oprofile spring cleanup
+Date:   Wed, 14 Apr 2021 14:44:04 +0100
+Message-Id: <20210414134409.1266357-1-maz@kernel.org>
+X-Mailer: git-send-email 2.29.2
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org, linux-sh@vger.kernel.org, mark.rutland@arm.com, will@kernel.org, dalias@libc.org, ysato@users.sourceforge.jp, peterz@infradead.org, acme@kernel.org, borntraeger@de.ibm.com, hca@linux.ibm.com, nathan@kernel.org, viresh.kumar@linaro.org, james.morse@arm.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com, kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Simplify the code by making PV features shutdown happen in one place.
+This small series builds on top of the work that was started with [1].
 
-Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
----
- arch/x86/kernel/kvm.c | 42 +++++++++++++++++-------------------------
- 1 file changed, 17 insertions(+), 25 deletions(-)
+It recently became apparent that KVM/arm64 is the last bit of the
+kernel that still uses perf_num_counters().
 
-diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
-index 1754b7c3f754..7da7bea96745 100644
---- a/arch/x86/kernel/kvm.c
-+++ b/arch/x86/kernel/kvm.c
-@@ -384,31 +384,6 @@ static void kvm_disable_steal_time(void)
- 	wrmsr(MSR_KVM_STEAL_TIME, 0, 0);
- }
- 
--static void kvm_pv_guest_cpu_reboot(void *unused)
--{
--	/*
--	 * We disable PV EOI before we load a new kernel by kexec,
--	 * since MSR_KVM_PV_EOI_EN stores a pointer into old kernel's memory.
--	 * New kernel can re-enable when it boots.
--	 */
--	if (kvm_para_has_feature(KVM_FEATURE_PV_EOI))
--		wrmsrl(MSR_KVM_PV_EOI_EN, 0);
--	kvm_pv_disable_apf();
--	kvm_disable_steal_time();
--}
--
--static int kvm_pv_reboot_notify(struct notifier_block *nb,
--				unsigned long code, void *unused)
--{
--	if (code == SYS_RESTART)
--		on_each_cpu(kvm_pv_guest_cpu_reboot, NULL, 1);
--	return NOTIFY_DONE;
--}
--
--static struct notifier_block kvm_pv_reboot_nb = {
--	.notifier_call = kvm_pv_reboot_notify,
--};
--
- static u64 kvm_steal_clock(int cpu)
- {
- 	u64 steal;
-@@ -664,6 +639,23 @@ static struct syscore_ops kvm_syscore_ops = {
- 	.resume		= kvm_resume,
- };
- 
-+static void kvm_pv_guest_cpu_reboot(void *unused)
-+{
-+	kvm_guest_cpu_offline(true);
-+}
-+
-+static int kvm_pv_reboot_notify(struct notifier_block *nb,
-+				unsigned long code, void *unused)
-+{
-+	if (code == SYS_RESTART)
-+		on_each_cpu(kvm_pv_guest_cpu_reboot, NULL, 1);
-+	return NOTIFY_DONE;
-+}
-+
-+static struct notifier_block kvm_pv_reboot_nb = {
-+	.notifier_call = kvm_pv_reboot_notify,
-+};
-+
- /*
-  * After a PV feature is registered, the host will keep writing to the
-  * registered memory location. If the guest happens to shutdown, this memory
+As I went ahead to address this, it became obvious that all traces of
+oprofile had been eradicated from all architectures but arm64, s390
+and sh (plus a bit of cruft in the core perf code). With KVM fixed,
+perf_num_counters() and perf_pmu_name() are finally gone.
+
+Thanks,
+
+	M.
+
+[1] https://lore.kernel.org/lkml/20210215050618.hgftdmfmslbdrg3j@vireshk-i7
+
+Marc Zyngier (5):
+  KVM: arm64: Divorce the perf code from oprofile helpers
+  arm64: Get rid of oprofile leftovers
+  s390: Get rid of oprofile leftovers
+  sh: Get rid of oprofile leftovers
+  perf: Get rid of oprofile leftovers
+
+ arch/arm64/kvm/perf.c         |  7 +------
+ arch/arm64/kvm/pmu-emul.c     |  2 +-
+ arch/s390/kernel/perf_event.c | 21 ---------------------
+ arch/sh/kernel/perf_event.c   | 18 ------------------
+ drivers/perf/arm_pmu.c        | 30 ------------------------------
+ include/kvm/arm_pmu.h         |  4 ++++
+ include/linux/perf_event.h    |  2 --
+ kernel/events/core.c          |  5 -----
+ 8 files changed, 6 insertions(+), 83 deletions(-)
+
 -- 
-2.30.2
-
+2.29.2
