@@ -2,233 +2,243 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BF38735EE55
-	for <lists+kvm@lfdr.de>; Wed, 14 Apr 2021 09:28:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D4A8A35EE7B
+	for <lists+kvm@lfdr.de>; Wed, 14 Apr 2021 09:42:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233475AbhDNH2T (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 14 Apr 2021 03:28:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54118 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232086AbhDNH2S (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 14 Apr 2021 03:28:18 -0400
-Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 284E5C061574;
-        Wed, 14 Apr 2021 00:27:57 -0700 (PDT)
-Received: from zn.tnic (p200300ec2f0e8f000e4e88675fafc1c1.dip0.t-ipconnect.de [IPv6:2003:ec:2f0e:8f00:e4e:8867:5faf:c1c1])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 92DF41EC03A0;
-        Wed, 14 Apr 2021 09:27:55 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1618385275;
+        id S1348699AbhDNHes (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 14 Apr 2021 03:34:48 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:46808 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1347875AbhDNHer (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 14 Apr 2021 03:34:47 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1618385665;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=IpAXtilQ8p4ZDwtbgeb9KY0InAhzSGPotnUZhB4cNj8=;
-        b=PRoaDLAcfw3/VXz/8um/bqMiuphYBfVtO/QHxkisG7n+E6ohJaHWrOTl/XmVS+u7Oi1jMg
-        1BtlNLPFnD14kHk92JIc8F+sVTd2kdCI08nwudSJVSv79/ZrcNG6frZ924I0Vgn66j+RMZ
-        V3yrWXEYnsl1JuB/lTK5p5U0kiXBDw4=
-Date:   Wed, 14 Apr 2021 09:27:47 +0200
-From:   Borislav Petkov <bp@alien8.de>
-To:     Brijesh Singh <brijesh.singh@amd.com>
-Cc:     linux-kernel@vger.kernel.org, x86@kernel.org, kvm@vger.kernel.org,
-        linux-crypto@vger.kernel.org, ak@linux.intel.com,
-        herbert@gondor.apana.org.au, Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        "H. Peter Anvin" <hpa@zytor.com>, Tony Luck <tony.luck@intel.com>,
-        Dave Hansen <dave.hansen@intel.com>,
-        "Peter Zijlstra (Intel)" <peterz@infradead.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        David Rientjes <rientjes@google.com>,
-        Sean Christopherson <seanjc@google.com>
-Subject: Re: [RFC Part2 PATCH 01/30] x86: Add the host SEV-SNP initialization
- support
-Message-ID: <20210414072747.GA15722@zn.tnic>
-References: <20210324170436.31843-1-brijesh.singh@amd.com>
- <20210324170436.31843-2-brijesh.singh@amd.com>
+         in-reply-to:in-reply-to:references:references;
+        bh=/EKL5XvCVEpC/xAzaCkVa2iKoqKzecx9m08YdXt8r2U=;
+        b=NSsiWrYWJIVeOdaky4RnOd/TskgjbZN4fFlVlwhntWV38E8uTWgzM8sQmOTfJ3jBB72oCU
+        DWHKf2jw6sz3BFu04DzX86tLDbG8/pSIi1UhRm7sBiXIaHzVsvqovsL16USnGL2Asgqu8B
+        hiuVeITM8aYXrwIQpJjFBjuZyYydr7I=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-536-Fg361Z2QNLSZ3FXCTGsgUQ-1; Wed, 14 Apr 2021 03:34:22 -0400
+X-MC-Unique: Fg361Z2QNLSZ3FXCTGsgUQ-1
+Received: by mail-wr1-f69.google.com with SMTP id y13-20020adfdf0d0000b02901029a3bf796so667913wrl.15
+        for <kvm@vger.kernel.org>; Wed, 14 Apr 2021 00:34:21 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=/EKL5XvCVEpC/xAzaCkVa2iKoqKzecx9m08YdXt8r2U=;
+        b=Ei+mSUY7doqQUCnjeO0/RHjMBBl25EI7/NPdMZouMLVrDUUkLeYC2cJwyE2Otksyuw
+         N4fGt6krxauuCNKmYQ2obhbGBPslrxyOhPovomkyTOfWO4lAHO1mfLfBWOXQYLAwpWWy
+         t6Mc50I4sT5RiSPQn8ABnbZFXyEKVVReuuBTHLEyBL8shVcETiPb2zkQj7vXDDH7XikP
+         4D5CkVo/luh7/4qBfjFLuZ2aNkqH6P/jtMA8J2mqYsnHtdFbbFqNAoSS0jKh2rlOR99e
+         4JueTmntJo4iE7GPDp7Ite3CISkx+Z11MO3PN/LdqXyVTuGIMhELs1F7ZecGk3d2E0w3
+         1awA==
+X-Gm-Message-State: AOAM531K1P7G7LNm3pKnDAgedC6ZG4etv/W9FeYSutNBI6gsBXUelEMX
+        0aGhdCEe6P51ZoDxl2QgYtIi1UugCg87DzfCh+Ig0w38hwACBGafw7gsnrWw9GfufrTjYYouuhI
+        ye6V26qmv4+7I
+X-Received: by 2002:adf:f506:: with SMTP id q6mr15884900wro.65.1618385660823;
+        Wed, 14 Apr 2021 00:34:20 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxfhdUyW/rYKPQEdLrMjzLeK4RYqnv+jhM0pMJO57jzpHnUMxj42Lj91ZhkDYfqygrXVL2Ebw==
+X-Received: by 2002:adf:f506:: with SMTP id q6mr15884871wro.65.1618385660595;
+        Wed, 14 Apr 2021 00:34:20 -0700 (PDT)
+Received: from redhat.com ([2a10:8006:2281:0:1994:c627:9eac:1825])
+        by smtp.gmail.com with ESMTPSA id l5sm4529131wmh.0.2021.04.14.00.34.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 14 Apr 2021 00:34:19 -0700 (PDT)
+Date:   Wed, 14 Apr 2021 03:34:16 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Xie Yongji <xieyongji@bytedance.com>
+Cc:     jasowang@redhat.com, stefanha@redhat.com, sgarzare@redhat.com,
+        parav@nvidia.com, hch@infradead.org,
+        christian.brauner@canonical.com, rdunlap@infradead.org,
+        willy@infradead.org, viro@zeniv.linux.org.uk, axboe@kernel.dk,
+        bcrl@kvack.org, corbet@lwn.net, mika.penttila@nextfour.com,
+        dan.carpenter@oracle.com,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        kvm@vger.kernel.org, linux-fsdevel@vger.kernel.org
+Subject: Re: [PATCH v6 00/10] Introduce VDUSE - vDPA Device in Userspace
+Message-ID: <20210414032909-mutt-send-email-mst@kernel.org>
+References: <20210331080519.172-1-xieyongji@bytedance.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210324170436.31843-2-brijesh.singh@amd.com>
+In-Reply-To: <20210331080519.172-1-xieyongji@bytedance.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Mar 24, 2021 at 12:04:07PM -0500, Brijesh Singh wrote:
-> @@ -538,6 +540,10 @@
->  #define MSR_K8_SYSCFG			0xc0010010
->  #define MSR_K8_SYSCFG_MEM_ENCRYPT_BIT	23
->  #define MSR_K8_SYSCFG_MEM_ENCRYPT	BIT_ULL(MSR_K8_SYSCFG_MEM_ENCRYPT_BIT)
-> +#define MSR_K8_SYSCFG_SNP_EN_BIT	24
-> +#define MSR_K8_SYSCFG_SNP_EN		BIT_ULL(MSR_K8_SYSCFG_SNP_EN_BIT)
-> +#define MSR_K8_SYSCFG_SNP_VMPL_EN_BIT	25
-> +#define MSR_K8_SYSCFG_SNP_VMPL_EN	BIT_ULL(MSR_K8_SYSCFG_SNP_VMPL_EN_BIT)
->  #define MSR_K8_INT_PENDING_MSG		0xc0010055
->  /* C1E active bits in int pending message */
->  #define K8_INTP_C1E_ACTIVE_MASK		0x18000000
+On Wed, Mar 31, 2021 at 04:05:09PM +0800, Xie Yongji wrote:
+> This series introduces a framework, which can be used to implement
+> vDPA Devices in a userspace program. The work consist of two parts:
+> control path forwarding and data path offloading.
+> 
+> In the control path, the VDUSE driver will make use of message
+> mechnism to forward the config operation from vdpa bus driver
+> to userspace. Userspace can use read()/write() to receive/reply
+> those control messages.
+> 
+> In the data path, the core is mapping dma buffer into VDUSE
+> daemon's address space, which can be implemented in different ways
+> depending on the vdpa bus to which the vDPA device is attached.
+> 
+> In virtio-vdpa case, we implements a MMU-based on-chip IOMMU driver with
+> bounce-buffering mechanism to achieve that. And in vhost-vdpa case, the dma
+> buffer is reside in a userspace memory region which can be shared to the
+> VDUSE userspace processs via transferring the shmfd.
+> 
+> The details and our user case is shown below:
+> 
+> ------------------------    -------------------------   ----------------------------------------------
+> |            Container |    |              QEMU(VM) |   |                               VDUSE daemon |
+> |       ---------      |    |  -------------------  |   | ------------------------- ---------------- |
+> |       |dev/vdx|      |    |  |/dev/vhost-vdpa-x|  |   | | vDPA device emulation | | block driver | |
+> ------------+-----------     -----------+------------   -------------+----------------------+---------
+>             |                           |                            |                      |
+>             |                           |                            |                      |
+> ------------+---------------------------+----------------------------+----------------------+---------
+> |    | block device |           |  vhost device |            | vduse driver |          | TCP/IP |    |
+> |    -------+--------           --------+--------            -------+--------          -----+----    |
+> |           |                           |                           |                       |        |
+> | ----------+----------       ----------+-----------         -------+-------                |        |
+> | | virtio-blk driver |       |  vhost-vdpa driver |         | vdpa device |                |        |
+> | ----------+----------       ----------+-----------         -------+-------                |        |
+> |           |      virtio bus           |                           |                       |        |
+> |   --------+----+-----------           |                           |                       |        |
+> |                |                      |                           |                       |        |
+> |      ----------+----------            |                           |                       |        |
+> |      | virtio-blk device |            |                           |                       |        |
+> |      ----------+----------            |                           |                       |        |
+> |                |                      |                           |                       |        |
+> |     -----------+-----------           |                           |                       |        |
+> |     |  virtio-vdpa driver |           |                           |                       |        |
+> |     -----------+-----------           |                           |                       |        |
+> |                |                      |                           |    vdpa bus           |        |
+> |     -----------+----------------------+---------------------------+------------           |        |
+> |                                                                                        ---+---     |
+> -----------------------------------------------------------------------------------------| NIC |------
+>                                                                                          ---+---
+>                                                                                             |
+>                                                                                    ---------+---------
+>                                                                                    | Remote Storages |
+>                                                                                    -------------------
 
-Ok, I believe it is finally time to make this MSR architectural and drop
-this silliness with "K8" in the name. If you wanna send me a prepatch which
-converts all like this:
+This all looks quite similar to vhost-user-block except that one
+does not need any kernel support at all.
 
-MSR_K8_SYSCFG -> MSR_AMD64_SYSCFG
+So I am still scratching my head about its advantages over
+vhost-user-block.
 
-I'll gladly take it. If you prefer me to do it, I'll gladly do it.
 
-> @@ -44,12 +45,16 @@ u64 sev_check_data __section(".data") = 0;
->  EXPORT_SYMBOL(sme_me_mask);
->  DEFINE_STATIC_KEY_FALSE(sev_enable_key);
->  EXPORT_SYMBOL_GPL(sev_enable_key);
-> +DEFINE_STATIC_KEY_FALSE(snp_enable_key);
-> +EXPORT_SYMBOL_GPL(snp_enable_key);
->  
->  bool sev_enabled __section(".data");
->  
->  /* Buffer used for early in-place encryption by BSP, no locking needed */
->  static char sme_early_buffer[PAGE_SIZE] __initdata __aligned(PAGE_SIZE);
->  
-> +static unsigned long rmptable_start, rmptable_end;
+> We make use of it to implement a block device connecting to
+> our distributed storage, which can be used both in containers and
+> VMs. Thus, we can have an unified technology stack in this two cases.
 
-__ro_after_init I guess.
+Maybe the container part is the answer. How does that stack look?
 
-> +
->  /*
->   * When SNP is active, this routine changes the page state from private to shared before
->   * copying the data from the source to destination and restore after the copy. This is required
-> @@ -528,3 +533,82 @@ void __init mem_encrypt_init(void)
->  	print_mem_encrypt_feature_info();
->  }
->  
-> +static __init void snp_enable(void *arg)
-> +{
-> +	u64 val;
-> +
-> +	rdmsrl_safe(MSR_K8_SYSCFG, &val);
+> To test it with null-blk:
+> 
+>   $ qemu-storage-daemon \
+>       --chardev socket,id=charmonitor,path=/tmp/qmp.sock,server,nowait \
+>       --monitor chardev=charmonitor \
+>       --blockdev driver=host_device,cache.direct=on,aio=native,filename=/dev/nullb0,node-name=disk0 \
+>       --export type=vduse-blk,id=test,node-name=disk0,writable=on,name=vduse-null,num-queues=16,queue-size=128
+> 
+> The qemu-storage-daemon can be found at https://github.com/bytedance/qemu/tree/vduse
+> 
+> Future work:
+>   - Improve performance
+>   - Userspace library (find a way to reuse device emulation code in qemu/rust-vmm)
+> 
+> V5 to V6:
+> - Export receive_fd() instead of __receive_fd()
+> - Factor out the unmapping logic of pa and va separatedly
+> - Remove the logic of bounce page allocation in page fault handler
+> - Use PAGE_SIZE as IOVA allocation granule
+> - Add EPOLLOUT support
+> - Enable setting API version in userspace
+> - Fix some bugs
+> 
+> V4 to V5:
+> - Remove the patch for irq binding
+> - Use a single IOTLB for all types of mapping
+> - Factor out vhost_vdpa_pa_map()
+> - Add some sample codes in document
+> - Use receice_fd_user() to pass file descriptor
+> - Fix some bugs
+> 
+> V3 to V4:
+> - Rebase to vhost.git
+> - Split some patches
+> - Add some documents
+> - Use ioctl to inject interrupt rather than eventfd
+> - Enable config interrupt support
+> - Support binding irq to the specified cpu
+> - Add two module parameter to limit bounce/iova size
+> - Create char device rather than anon inode per vduse
+> - Reuse vhost IOTLB for iova domain
+> - Rework the message mechnism in control path
+> 
+> V2 to V3:
+> - Rework the MMU-based IOMMU driver
+> - Use the iova domain as iova allocator instead of genpool
+> - Support transferring vma->vm_file in vhost-vdpa
+> - Add SVA support in vhost-vdpa
+> - Remove the patches on bounce pages reclaim
+> 
+> V1 to V2:
+> - Add vhost-vdpa support
+> - Add some documents
+> - Based on the vdpa management tool
+> - Introduce a workqueue for irq injection
+> - Replace interval tree with array map to store the iova_map
+> 
+> Xie Yongji (10):
+>   file: Export receive_fd() to modules
+>   eventfd: Increase the recursion depth of eventfd_signal()
+>   vhost-vdpa: protect concurrent access to vhost device iotlb
+>   vhost-iotlb: Add an opaque pointer for vhost IOTLB
+>   vdpa: Add an opaque pointer for vdpa_config_ops.dma_map()
+>   vdpa: factor out vhost_vdpa_pa_map() and vhost_vdpa_pa_unmap()
+>   vdpa: Support transferring virtual addressing during DMA mapping
+>   vduse: Implement an MMU-based IOMMU driver
+>   vduse: Introduce VDUSE - vDPA Device in Userspace
+>   Documentation: Add documentation for VDUSE
+> 
+>  Documentation/userspace-api/index.rst              |    1 +
+>  Documentation/userspace-api/ioctl/ioctl-number.rst |    1 +
+>  Documentation/userspace-api/vduse.rst              |  212 +++
+>  drivers/vdpa/Kconfig                               |   10 +
+>  drivers/vdpa/Makefile                              |    1 +
+>  drivers/vdpa/ifcvf/ifcvf_main.c                    |    2 +-
+>  drivers/vdpa/mlx5/net/mlx5_vnet.c                  |    2 +-
+>  drivers/vdpa/vdpa.c                                |    9 +-
+>  drivers/vdpa/vdpa_sim/vdpa_sim.c                   |    8 +-
+>  drivers/vdpa/vdpa_user/Makefile                    |    5 +
+>  drivers/vdpa/vdpa_user/iova_domain.c               |  521 ++++++++
+>  drivers/vdpa/vdpa_user/iova_domain.h               |   70 +
+>  drivers/vdpa/vdpa_user/vduse_dev.c                 | 1362 ++++++++++++++++++++
+>  drivers/vdpa/virtio_pci/vp_vdpa.c                  |    2 +-
+>  drivers/vhost/iotlb.c                              |   20 +-
+>  drivers/vhost/vdpa.c                               |  154 ++-
+>  fs/eventfd.c                                       |    2 +-
+>  fs/file.c                                          |    6 +
+>  include/linux/eventfd.h                            |    5 +-
+>  include/linux/file.h                               |    7 +-
+>  include/linux/vdpa.h                               |   21 +-
+>  include/linux/vhost_iotlb.h                        |    3 +
+>  include/uapi/linux/vduse.h                         |  175 +++
+>  23 files changed, 2548 insertions(+), 51 deletions(-)
+>  create mode 100644 Documentation/userspace-api/vduse.rst
+>  create mode 100644 drivers/vdpa/vdpa_user/Makefile
+>  create mode 100644 drivers/vdpa/vdpa_user/iova_domain.c
+>  create mode 100644 drivers/vdpa/vdpa_user/iova_domain.h
+>  create mode 100644 drivers/vdpa/vdpa_user/vduse_dev.c
+>  create mode 100644 include/uapi/linux/vduse.h
+> 
+> -- 
+> 2.11.0
 
-Why is this one _safe but the wrmsr isn't? Also, _safe returns a value -
-check it pls and return early.
-
-> +
-> +	val |= MSR_K8_SYSCFG_SNP_EN;
-> +	val |= MSR_K8_SYSCFG_SNP_VMPL_EN;
-> +
-> +	wrmsrl(MSR_K8_SYSCFG, val);
-> +}
-> +
-> +static __init int rmptable_init(void)
-> +{
-> +	u64 rmp_base, rmp_end;
-> +	unsigned long sz;
-> +	void *start;
-> +	u64 val;
-> +
-> +	rdmsrl_safe(MSR_AMD64_RMP_BASE, &rmp_base);
-> +	rdmsrl_safe(MSR_AMD64_RMP_END, &rmp_end);
-
-Ditto, why _safe if you're checking CPUID?
-
-> +
-> +	if (!rmp_base || !rmp_end) {
-> +		pr_info("SEV-SNP: Memory for the RMP table has not been reserved by BIOS\n");
-> +		return 1;
-> +	}
-> +
-> +	sz = rmp_end - rmp_base + 1;
-> +
-> +	start = memremap(rmp_base, sz, MEMREMAP_WB);
-> +	if (!start) {
-> +		pr_err("SEV-SNP: Failed to map RMP table 0x%llx-0x%llx\n", rmp_base, rmp_end);
-			^^^^^^^
-
-That prefix is done by doing
-
-#undef pr_fmt
-#define pr_fmt(fmt)     "SEV-SNP: " fmt
-
-before the SNP-specific functions.
-
-> +		return 1;
-> +	}
-> +
-> +	/*
-> +	 * Check if SEV-SNP is already enabled, this can happen if we are coming from kexec boot.
-> +	 * Do not initialize the RMP table when SEV-SNP is already.
-> +	 */
-
-comment can be 80 cols wide.
-
-> +	rdmsrl_safe(MSR_K8_SYSCFG, &val);
-
-As above.
-
-> +	if (val & MSR_K8_SYSCFG_SNP_EN)
-> +		goto skip_enable;
-> +
-> +	/* Initialize the RMP table to zero */
-> +	memset(start, 0, sz);
-> +
-> +	/* Flush the caches to ensure that data is written before we enable the SNP */
-> +	wbinvd_on_all_cpus();
-> +
-> +	/* Enable the SNP feature */
-> +	on_each_cpu(snp_enable, NULL, 1);
-
-What happens if you boot only a subset of the CPUs and then others get
-hotplugged later? IOW, you need a CPU hotplug notifier which enables the
-feature bit on newly arrived CPUs.
-
-Which makes me wonder whether it makes sense to have this in an initcall
-and not put it instead in init_amd(): the BSP will do the init work
-and the APs coming in will see that it has been enabled and only call
-snp_enable().
-
-Which solves the hotplug thing automagically.
-
-> +
-> +skip_enable:
-> +	rmptable_start = (unsigned long)start;
-> +	rmptable_end = rmptable_start + sz;
-> +
-> +	pr_info("SEV-SNP: RMP table physical address 0x%016llx - 0x%016llx\n", rmp_base, rmp_end);
-
-			  "RMP table at ..."
-
-also, why is this issued in skip_enable? You want to issue it only once,
-on enable.
-
-also, rmp_base and rmp_end look redundant - you can simply use
-rmptable_start and rmptable_end.
-
-Which reminds me - that function needs to check as the very first thing
-on entry whether SNP is enabled and exit if so - there's no need to read
-MSR_AMD64_RMP_BASE and MSR_AMD64_RMP_END unnecessarily.
-
-> +
-> +	return 0;
-> +}
-> +
-> +static int __init mem_encrypt_snp_init(void)
-> +{
-> +	if (!boot_cpu_has(X86_FEATURE_SEV_SNP))
-> +		return 1;
-> +
-> +	if (rmptable_init()) {
-> +		setup_clear_cpu_cap(X86_FEATURE_SEV_SNP);
-> +		return 1;
-> +	}
-> +
-> +	static_branch_enable(&snp_enable_key);
-> +
-> +	return 0;
-> +}
-> +/*
-> + * SEV-SNP must be enabled across all CPUs, so make the initialization as a late initcall.
-
-Is there any particular reason for this to be a late initcall?
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
