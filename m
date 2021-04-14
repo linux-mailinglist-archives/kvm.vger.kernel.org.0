@@ -2,70 +2,72 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9B93F35E91E
-	for <lists+kvm@lfdr.de>; Wed, 14 Apr 2021 00:40:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8EC9A35EA27
+	for <lists+kvm@lfdr.de>; Wed, 14 Apr 2021 03:01:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347514AbhDMWk0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 13 Apr 2021 18:40:26 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:50337 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1347463AbhDMWkZ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 13 Apr 2021 18:40:25 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1618353605;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=Se+bjf3UY2AKAwu4d1rz6KBu7BtAyVo+o4WxT9t65S8=;
-        b=cIM7Dv2sMSNk9NqTrwIF0rQn47CDn8QWKQ3F4Kbf4fHlY74INEVSwK/W2V9AbvEgwamVC/
-        K1xVVkBrzyFR/0c04xQ47M2XhNOpkD/bJpU8JFUsolQbkBhW+V0YmNS/w2wCuRH+68u1/8
-        vPFmrJMyQh8xxetdg6F6RI/l25qibIA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-215-F1oR74fOP22g-Rh33WhCQg-1; Tue, 13 Apr 2021 18:40:00 -0400
-X-MC-Unique: F1oR74fOP22g-Rh33WhCQg-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C6740107ACC7;
-        Tue, 13 Apr 2021 22:39:59 +0000 (UTC)
-Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 77538614FA;
-        Tue, 13 Apr 2021 22:39:59 +0000 (UTC)
-From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     torvalds@linux-foundation.org
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: [GIT PULL] KVM changes for 5.12-rc8 or final
-Date:   Tue, 13 Apr 2021 18:39:58 -0400
-Message-Id: <20210413223958.156145-1-pbonzini@redhat.com>
+        id S1348932AbhDNBBJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 13 Apr 2021 21:01:09 -0400
+Received: from mga07.intel.com ([134.134.136.100]:62191 "EHLO mga07.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1348903AbhDNBBI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 13 Apr 2021 21:01:08 -0400
+IronPort-SDR: IpWNaBaSEN/7rktX6bN7MpePhy+hBF6M+9MK482BupARKwwKJ15azGgMIKxxmKPC+D7c00hBsu
+ 6VCdYI8LPOVA==
+X-IronPort-AV: E=McAfee;i="6200,9189,9953"; a="258507154"
+X-IronPort-AV: E=Sophos;i="5.82,220,1613462400"; 
+   d="scan'208";a="258507154"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Apr 2021 18:00:46 -0700
+IronPort-SDR: mz+93uhYNOwn+a8RZ4tapNMO4Bmp3Cm+sWkle2xWEchoXztCane5vdKFxLURny1vcWna5SOINY
+ lO15n5U3ehMA==
+X-IronPort-AV: E=Sophos;i="5.82,220,1613462400"; 
+   d="scan'208";a="418086521"
+Received: from likexu-mobl1.ccr.corp.intel.com (HELO [10.238.4.93]) ([10.238.4.93])
+  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Apr 2021 18:00:42 -0700
+Subject: Re: [PATCH v2 4/4] KVM: x86: Expose Architectural LBR CPUID and its
+ XSAVES bit
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Like Xu <like.xu@linux.intel.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Wei Wang <wei.w.wang@intel.com>
+References: <20210203135714.318356-1-like.xu@linux.intel.com>
+ <20210203135714.318356-5-like.xu@linux.intel.com>
+ <8321d54b-173b-722b-ddce-df2f9bd7abc4@redhat.com>
+ <219d869b-0eeb-9e52-ea99-3444c6ab16a3@intel.com>
+ <b73a2945-11b9-38bf-845a-c64e7caa9d2e@intel.com>
+ <7698fd6c-94da-e352-193f-e09e002a8961@redhat.com>
+ <6f733543-200e-9ddd-240b-1f956a003ed6@intel.com>
+ <c3b916c2-5b4e-31d1-b27b-bf71b621bd7b@redhat.com>
+From:   "Xu, Like" <like.xu@intel.com>
+Message-ID: <b498b7b2-935a-a904-c513-df0b826bd0ae@intel.com>
+Date:   Wed, 14 Apr 2021 09:00:40 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.9.1
 MIME-Version: 1.0
+In-Reply-To: <c3b916c2-5b4e-31d1-b27b-bf71b621bd7b@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Content-Language: en-US
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Linus,
+Hi Paolo,
 
-The following changes since commit 315f02c60d9425b38eb8ad7f21b8a35e40db23f9:
+Do we have a chance to make Arch LBR into the mainline in the upcoming 
+merger window?
+https://lore.kernel.org/kvm/20210314155225.206661-1-like.xu@linux.intel.com/
 
-  KVM: x86/mmu: preserve pending TLB flush across calls to kvm_tdp_mmu_zap_sp (2021-04-08 07:48:18 -0400)
+Thanks,
+Like Xu
 
-are available in the Git repository at:
-
-  https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
-
-for you to fetch changes up to 04c4f2ee3f68c9a4bf1653d15f1a9a435ae33f7a:
-
-  KVM: VMX: Don't use vcpu->run->internal.ndata as an array index (2021-04-13 18:23:41 -0400)
-
-----------------------------------------------------------------
-Fix for a possible out-of-bounds access.
-
-----------------------------------------------------------------
-Reiji Watanabe (1):
-      KVM: VMX: Don't use vcpu->run->internal.ndata as an array index
-
- arch/x86/kvm/vmx/vmx.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+On 2021/2/8 18:31, Paolo Bonzini wrote:
+> Ok, this makes sense.  I'll review the patches more carefully, looking at 
+> 5.13 for the target.
+>
+> Paolo 
 
