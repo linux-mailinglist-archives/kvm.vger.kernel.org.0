@@ -2,60 +2,93 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6993F35F8D1
-	for <lists+kvm@lfdr.de>; Wed, 14 Apr 2021 18:24:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 35A6635F8FB
+	for <lists+kvm@lfdr.de>; Wed, 14 Apr 2021 18:33:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1351635AbhDNQPa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 14 Apr 2021 12:15:30 -0400
-Received: from mail.kernel.org ([198.145.29.99]:36930 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1351582AbhDNQPZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 14 Apr 2021 12:15:25 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPS id 3F3A961168;
-        Wed, 14 Apr 2021 16:15:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1618416904;
-        bh=5l4UNr1/zdHkE2Xm4JPmV7N7rukf9kN/f+0pBe/IyhA=;
-        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-        b=WLWmTmEE4KIoJlC3pNBKot4O4lpMNuEWP055PECttTDTGDUI8qM1/0+Wm+ZT8rzxZ
-         spzrCBCIJKwjiXiWR0GCpyLfeTSzaXbgVsQigfVX7crMeHOyMgA6zwRmS8zPeNKxqm
-         DWvQDuWAetfda5SBCuVj+e8fE5RsVixurk4fs1zV1/b32Phjs9vSPez6Z4AitiBm5s
-         rRiUMIgxdiGbVdfSH3Ai8WSQoWTCD9i+GFJUhX2z0HkJK4ZmPCTZdv70Encx7CrRI9
-         igcDExwHTGhNngOJv48QuUPKFHZ+kpZbihPuulMYgpkw+smAC7WuTF8sIiAuY8HMf1
-         ub1B1d+RXc9kg==
-Received: from pdx-korg-docbuild-2.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by pdx-korg-docbuild-2.ci.codeaurora.org (Postfix) with ESMTP id 35E6260CCF;
-        Wed, 14 Apr 2021 16:15:04 +0000 (UTC)
-Subject: Re: [GIT PULL] VFIO fix for v5.12-rc8/final
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <20210414090325.3580db75@omen>
-References: <20210414090325.3580db75@omen>
-X-PR-Tracked-List-Id: <kvm.vger.kernel.org>
-X-PR-Tracked-Message-Id: <20210414090325.3580db75@omen>
-X-PR-Tracked-Remote: git://github.com/awilliam/linux-vfio.git tags/vfio-v5.12-rc8
-X-PR-Tracked-Commit-Id: 909290786ea335366e21d7f1ed5812b90f2f0a92
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: e70b911acc1687100c31e550251715dbdac96a12
-Message-Id: <161841690421.3200.16413509673206057841.pr-tracker-bot@kernel.org>
-Date:   Wed, 14 Apr 2021 16:15:04 +0000
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        linux-kernel@vger.kernel.org,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>, lk@c--e.de
+        id S1351635AbhDNQa7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 14 Apr 2021 12:30:59 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:40863 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1349221AbhDNQa6 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 14 Apr 2021 12:30:58 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1618417836;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=TDqw7SuxPwDscOI0Q0fTDI3jnZfp7IWUGcUSEKD/yTc=;
+        b=hOvgyRBwHKlB6A2CQ50PNtHB59clf+aMy5KiSmGknqZsX1Ke3xbiGHX4/s0XvxpQtf069o
+        U4923A+AJ1WIcJ5LsYKKgRo4ibO7HMCX7yAeR5AvXqmJ1Ehw5pUJLGhOyr45i1dAW0Ldn6
+        60/RQtttSBVfXkUbWWOHF/JqRZq1JCs=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-528-A7xWChHmOqmZb-HYnca-XQ-1; Wed, 14 Apr 2021 12:30:34 -0400
+X-MC-Unique: A7xWChHmOqmZb-HYnca-XQ-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CED8A8030CF;
+        Wed, 14 Apr 2021 16:30:32 +0000 (UTC)
+Received: from gondolin (ovpn-113-114.ams2.redhat.com [10.36.113.114])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 7F08C5C1B4;
+        Wed, 14 Apr 2021 16:30:31 +0000 (UTC)
+Date:   Wed, 14 Apr 2021 18:30:28 +0200
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Eric Farman <farman@linux.ibm.com>
+Cc:     Halil Pasic <pasic@linux.ibm.com>,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        Jared Rossi <jrossi@linux.ibm.com>, linux-s390@vger.kernel.org,
+        kvm@vger.kernel.org
+Subject: Re: [RFC PATCH v4 1/4] vfio-ccw: Check initialized flag in
+ cp_init()
+Message-ID: <20210414183028.1285311e.cohuck@redhat.com>
+In-Reply-To: <20210413182410.1396170-2-farman@linux.ibm.com>
+References: <20210413182410.1396170-1-farman@linux.ibm.com>
+        <20210413182410.1396170-2-farman@linux.ibm.com>
+Organization: Red Hat GmbH
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The pull request you sent on Wed, 14 Apr 2021 09:03:25 -0600:
+On Tue, 13 Apr 2021 20:24:07 +0200
+Eric Farman <farman@linux.ibm.com> wrote:
 
-> git://github.com/awilliam/linux-vfio.git tags/vfio-v5.12-rc8
+> We have a really nice flag in the channel_program struct that
+> indicates if it had been initialized by cp_init(), and use it
+> as a guard in the other cp accessor routines, but not for a
+> duplicate call into cp_init(). The possibility of this occurring
+> is low, because that flow is protected by the private->io_mutex
+> and FSM CP_PROCESSING state. But then why bother checking it
+> in (for example) cp_prefetch() then?
+> 
+> Let's just be consistent and check for that in cp_init() too.
+> 
+> Fixes: 71189f263f8a3 ("vfio-ccw: make it safe to access channel programs")
+> Signed-off-by: Eric Farman <farman@linux.ibm.com>
+> ---
+>  drivers/s390/cio/vfio_ccw_cp.c | 4 ++++
+>  1 file changed, 4 insertions(+)
+> 
+> diff --git a/drivers/s390/cio/vfio_ccw_cp.c b/drivers/s390/cio/vfio_ccw_cp.c
+> index b9febc581b1f..8d1b2771c1aa 100644
+> --- a/drivers/s390/cio/vfio_ccw_cp.c
+> +++ b/drivers/s390/cio/vfio_ccw_cp.c
+> @@ -638,6 +638,10 @@ int cp_init(struct channel_program *cp, struct device *mdev, union orb *orb)
+>  	static DEFINE_RATELIMIT_STATE(ratelimit_state, 5 * HZ, 1);
+>  	int ret;
+>  
+> +	/* this is an error in the caller */
+> +	if (cp->initialized)
+> +		return -EBUSY;
+> +
+>  	/*
+>  	 * We only support prefetching the channel program. We assume all channel
+>  	 * programs executed by supported guests likewise support prefetching.
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/e70b911acc1687100c31e550251715dbdac96a12
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
 
-Thank you!
-
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
