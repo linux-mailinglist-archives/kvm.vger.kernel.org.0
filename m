@@ -2,93 +2,153 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 35A6635F8FB
-	for <lists+kvm@lfdr.de>; Wed, 14 Apr 2021 18:33:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 81A8035F95A
+	for <lists+kvm@lfdr.de>; Wed, 14 Apr 2021 19:04:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1351635AbhDNQa7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 14 Apr 2021 12:30:59 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:40863 "EHLO
+        id S1352056AbhDNQ7T (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 14 Apr 2021 12:59:19 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:45562 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1349221AbhDNQa6 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 14 Apr 2021 12:30:58 -0400
+        by vger.kernel.org with ESMTP id S1349790AbhDNQ7S (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 14 Apr 2021 12:59:18 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1618417836;
+        s=mimecast20190719; t=1618419537;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=TDqw7SuxPwDscOI0Q0fTDI3jnZfp7IWUGcUSEKD/yTc=;
-        b=hOvgyRBwHKlB6A2CQ50PNtHB59clf+aMy5KiSmGknqZsX1Ke3xbiGHX4/s0XvxpQtf069o
-        U4923A+AJ1WIcJ5LsYKKgRo4ibO7HMCX7yAeR5AvXqmJ1Ehw5pUJLGhOyr45i1dAW0Ldn6
-        60/RQtttSBVfXkUbWWOHF/JqRZq1JCs=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-528-A7xWChHmOqmZb-HYnca-XQ-1; Wed, 14 Apr 2021 12:30:34 -0400
-X-MC-Unique: A7xWChHmOqmZb-HYnca-XQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CED8A8030CF;
-        Wed, 14 Apr 2021 16:30:32 +0000 (UTC)
-Received: from gondolin (ovpn-113-114.ams2.redhat.com [10.36.113.114])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 7F08C5C1B4;
-        Wed, 14 Apr 2021 16:30:31 +0000 (UTC)
-Date:   Wed, 14 Apr 2021 18:30:28 +0200
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Eric Farman <farman@linux.ibm.com>
-Cc:     Halil Pasic <pasic@linux.ibm.com>,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        Jared Rossi <jrossi@linux.ibm.com>, linux-s390@vger.kernel.org,
-        kvm@vger.kernel.org
-Subject: Re: [RFC PATCH v4 1/4] vfio-ccw: Check initialized flag in
- cp_init()
-Message-ID: <20210414183028.1285311e.cohuck@redhat.com>
-In-Reply-To: <20210413182410.1396170-2-farman@linux.ibm.com>
-References: <20210413182410.1396170-1-farman@linux.ibm.com>
-        <20210413182410.1396170-2-farman@linux.ibm.com>
-Organization: Red Hat GmbH
+        bh=ooXI1eqVI95Q8agxrgrGK6HyUbaEXdlmhBwbh9iOSPc=;
+        b=JGC028N94ajlKOi2oMyf7s38w914MoY32FKzRwYv9VwHAunVhdaFy6qOtjrf/ddLJL+t60
+        sk4wWxzVWraH3dsvPRcTV1z0ivXBHVWACupXAQhnDIxAfV6IYKwPCzjMf4BZC++jyGLzeV
+        o307O6CJvVFD+JblhRGEP9C+7Do+eCg=
+Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
+ [209.85.218.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-162-FRyBzPQMNPaRC27y49gsCQ-1; Wed, 14 Apr 2021 12:58:54 -0400
+X-MC-Unique: FRyBzPQMNPaRC27y49gsCQ-1
+Received: by mail-ej1-f71.google.com with SMTP id ji8-20020a1709079808b029037c921a9ea0so5382ejc.9
+        for <kvm@vger.kernel.org>; Wed, 14 Apr 2021 09:58:54 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=ooXI1eqVI95Q8agxrgrGK6HyUbaEXdlmhBwbh9iOSPc=;
+        b=W3pogfKrPkVspEedFzPO750LfGIm2lmtRRltaSaaSIfQNoujjI1AochslLsdupIdFn
+         wDPsEZG1IRij5cQZJ4OWmVt1bLjWNHiSR7zRpK6n9s1iir6MWiHU+P4T0A7x3fLsfsXe
+         aCim35L7Zc4QXo+hN+JF6+jA8RZhUGNWa3eMqe5ANgwD3opXbK3YrRR7ypcaozWYbkvQ
+         M7ERi7oX8ehlJOH1Q1ao4b7OZxzAxsivVgfyO3EIpuCt13hYSrUBxCPwbr4Kjm+n+2J4
+         MXlGl15SgVs0fzkZgS3VgAZUFDcDefcOxCVxofNLaFEXV38Rb1D5Km8pYmPCHu+TYavM
+         pFmQ==
+X-Gm-Message-State: AOAM532cxvXWfYjuLYGoj7JXS4f4Mlhwb8s/ctZSyJBCyFgfzc4VI1HE
+        1qycNOM0o2IdXwtewzXv9nyrF0G5fCYjq6kHA2tBb9kKQ5CRd+AneN3wVjhf/M91ilvrDN3zHSx
+        GaArvoCe2tlef
+X-Received: by 2002:a17:906:dfcc:: with SMTP id jt12mr38750470ejc.31.1618419533536;
+        Wed, 14 Apr 2021 09:58:53 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzglppX4vTDWi8afiyN//7wxayw8/3KRKxeYiLKD51km0RS+4CNwUBbDvmhvHue1DXL1Xpjcw==
+X-Received: by 2002:a17:906:dfcc:: with SMTP id jt12mr38750460ejc.31.1618419533368;
+        Wed, 14 Apr 2021 09:58:53 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e? ([2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e])
+        by smtp.gmail.com with ESMTPSA id a22sm140361edu.14.2021.04.14.09.58.51
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 14 Apr 2021 09:58:52 -0700 (PDT)
+Subject: Re: [PATCH 2/2] KVM: x86: Fix split-irqchip vs interrupt injection
+ window request
+To:     Lai Jiangshan <jiangshanlai+lkml@gmail.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        LKML <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org,
+        Filippo Sironi <sironi@amazon.de>,
+        David Woodhouse <dwmw@amazon.co.uk>,
+        "v4.7+" <stable@vger.kernel.org>,
+        Wanpeng Li <wanpengli@tencent.com>
+References: <20201127112114.3219360-1-pbonzini@redhat.com>
+ <20201127112114.3219360-3-pbonzini@redhat.com>
+ <CAJhGHyCdqgtvK98_KieG-8MUfg1Jghd+H99q+FkgL0ZuqnvuAw@mail.gmail.com>
+ <YHS/BxMiO6I1VOEY@google.com>
+ <CAJhGHyAcnwkCfTcnxXcgAHnF=wPbH2EDp7H+e74ce+oNOWJ=_Q@mail.gmail.com>
+ <80b013dc-0078-76f4-1299-3cff261ef7d8@redhat.com>
+ <CAJhGHyChfXdcAMzzD7P3aC8tnhFW5GvOt88vOY=D3pyb7hgNAA@mail.gmail.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <6d9dafb1-b8ff-82ef-93dc-da869fe7ba0f@redhat.com>
+Date:   Wed, 14 Apr 2021 18:58:49 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <CAJhGHyChfXdcAMzzD7P3aC8tnhFW5GvOt88vOY=D3pyb7hgNAA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 13 Apr 2021 20:24:07 +0200
-Eric Farman <farman@linux.ibm.com> wrote:
+On 14/04/21 04:28, Lai Jiangshan wrote:
+> On Tue, Apr 13, 2021 at 8:15 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
+>>
+>> On 13/04/21 13:03, Lai Jiangshan wrote:
+>>> This patch claims that it has a place to
+>>> stash the IRQ when EFLAGS.IF=0, but inject_pending_event() seams to ignore
+>>> EFLAGS.IF and queues the IRQ to the guest directly in the first branch
+>>> of using "kvm_x86_ops.set_irq(vcpu)".
+>>
+>> This is only true for pure-userspace irqchip.  For split-irqchip, in
+>> which case the "place to stash" the interrupt is
+>> vcpu->arch.pending_external_vector.
+>>
+>> For pure-userspace irqchip, KVM_INTERRUPT only cares about being able to
+>> stash the interrupt in vcpu->arch.interrupt.injected.  It is indeed
+>> wrong for userspace to call KVM_INTERRUPT if the vCPU is not ready for
+>> interrupt injection, but KVM_INTERRUPT does not return an error.
+> 
+> Thanks for the reply.
+> 
+> May I ask what is the correct/practical way of using KVM_INTERRUPT ABI
+> for pure-userspace irqchip.
+> 
+> gVisor is indeed a pure-userspace irqchip, it will call KVM_INTERRUPT
+> when kvm_run->ready_for_interrupt_injection=1 (along with other conditions
+> unrelated to our discussion).
+> 
+> https://github.com/google/gvisor/blob/a9441aea2780da8c93da1c73da860219f98438de/pkg/sentry/platform/kvm/bluepill_amd64_unsafe.go#L105
+> 
+> if kvm_run->ready_for_interrupt_injection=1 when expection pending or
+> EFLAGS.IF=0, it would be unexpected for gVisor.
 
-> We have a really nice flag in the channel_program struct that
-> indicates if it had been initialized by cp_init(), and use it
-> as a guard in the other cp accessor routines, but not for a
-> duplicate call into cp_init(). The possibility of this occurring
-> is low, because that flow is protected by the private->io_mutex
-> and FSM CP_PROCESSING state. But then why bother checking it
-> in (for example) cp_prefetch() then?
-> 
-> Let's just be consistent and check for that in cp_init() too.
-> 
-> Fixes: 71189f263f8a3 ("vfio-ccw: make it safe to access channel programs")
-> Signed-off-by: Eric Farman <farman@linux.ibm.com>
-> ---
->  drivers/s390/cio/vfio_ccw_cp.c | 4 ++++
->  1 file changed, 4 insertions(+)
-> 
-> diff --git a/drivers/s390/cio/vfio_ccw_cp.c b/drivers/s390/cio/vfio_ccw_cp.c
-> index b9febc581b1f..8d1b2771c1aa 100644
-> --- a/drivers/s390/cio/vfio_ccw_cp.c
-> +++ b/drivers/s390/cio/vfio_ccw_cp.c
-> @@ -638,6 +638,10 @@ int cp_init(struct channel_program *cp, struct device *mdev, union orb *orb)
->  	static DEFINE_RATELIMIT_STATE(ratelimit_state, 5 * HZ, 1);
->  	int ret;
->  
-> +	/* this is an error in the caller */
-> +	if (cp->initialized)
-> +		return -EBUSY;
-> +
->  	/*
->  	 * We only support prefetching the channel program. We assume all channel
->  	 * programs executed by supported guests likewise support prefetching.
+Not with EFLAGS.IF=0.  For pending exception, there is code to handle it 
+in inject_pending_event:
 
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+         ... if (!vcpu->arch.exception.pending) {
+                 if (vcpu->arch.nmi_injected) {
+                         static_call(kvm_x86_set_nmi)(vcpu);
+                         can_inject = false;
+                 } else if (vcpu->arch.interrupt.injected) {
+                         static_call(kvm_x86_set_irq)(vcpu);
+                         can_inject = false;
+                 }
+         }
+	...
+         if (vcpu->arch.exception.pending) {
+		...
+                 can_inject = false;
+         }
+	// this is vcpu->arch.interrupt.injected for userspace LAPIC
+         if (kvm_cpu_has_injectable_intr(vcpu)) {
+                 r = can_inject ? 
+static_call(kvm_x86_interrupt_allowed)(vcpu, true) : -EBUSY;
+		if (r < 0)
+			goto busy;
+		...
+	}
+
+so what happens is:
+
+- the interrupt will not be injected before the exception
+
+- KVM will schedule an immediate vmexit to inject the interrupt as well
+
+- if (as is likely) the exception has turned off interrupts, the next 
+call to inject_pending_event will reach 
+static_call(kvm_x86_enable_irq_window) and the interrupt will only be 
+injected when IF becomes 1 again.
+
+Paolo
 
