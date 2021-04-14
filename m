@@ -2,25 +2,25 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 61DF735F545
-	for <lists+kvm@lfdr.de>; Wed, 14 Apr 2021 15:47:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D06C835F548
+	for <lists+kvm@lfdr.de>; Wed, 14 Apr 2021 15:47:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1351594AbhDNNop (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 14 Apr 2021 09:44:45 -0400
-Received: from mail.kernel.org ([198.145.29.99]:52252 "EHLO mail.kernel.org"
+        id S1351605AbhDNNoq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 14 Apr 2021 09:44:46 -0400
+Received: from mail.kernel.org ([198.145.29.99]:52294 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1351586AbhDNNoo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 14 Apr 2021 09:44:44 -0400
+        id S1351587AbhDNNop (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 14 Apr 2021 09:44:45 -0400
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id B363A611AD;
-        Wed, 14 Apr 2021 13:44:23 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 18C22611F0;
+        Wed, 14 Apr 2021 13:44:24 +0000 (UTC)
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.lan)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.94)
         (envelope-from <maz@kernel.org>)
-        id 1lWfob-007RSZ-Jm; Wed, 14 Apr 2021 14:44:21 +0100
+        id 1lWfoc-007RSZ-Cq; Wed, 14 Apr 2021 14:44:22 +0100
 From:   Marc Zyngier <maz@kernel.org>
 To:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
         linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
@@ -37,10 +37,12 @@ Cc:     Mark Rutland <mark.rutland@arm.com>, Will Deacon <will@kernel.org>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
         Alexandru Elisei <alexandru.elisei@arm.com>,
         kernel-team@android.com
-Subject: [PATCH 0/5] perf: oprofile spring cleanup
-Date:   Wed, 14 Apr 2021 14:44:04 +0100
-Message-Id: <20210414134409.1266357-1-maz@kernel.org>
+Subject: [PATCH 1/5] KVM: arm64: Divorce the perf code from oprofile helpers
+Date:   Wed, 14 Apr 2021 14:44:05 +0100
+Message-Id: <20210414134409.1266357-2-maz@kernel.org>
 X-Mailer: git-send-email 2.29.2
+In-Reply-To: <20210414134409.1266357-1-maz@kernel.org>
+References: <20210414134409.1266357-1-maz@kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 62.31.163.78
@@ -51,38 +53,70 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This small series builds on top of the work that was started with [1].
+KVM/arm64 is the sole user of perf_num_counters(), and really
+could do without it. Stop using the obsolete API by relying on
+the existing probing code.
 
-It recently became apparent that KVM/arm64 is the last bit of the
-kernel that still uses perf_num_counters().
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+---
+ arch/arm64/kvm/perf.c     | 7 +------
+ arch/arm64/kvm/pmu-emul.c | 2 +-
+ include/kvm/arm_pmu.h     | 4 ++++
+ 3 files changed, 6 insertions(+), 7 deletions(-)
 
-As I went ahead to address this, it became obvious that all traces of
-oprofile had been eradicated from all architectures but arm64, s390
-and sh (plus a bit of cruft in the core perf code). With KVM fixed,
-perf_num_counters() and perf_pmu_name() are finally gone.
-
-Thanks,
-
-	M.
-
-[1] https://lore.kernel.org/lkml/20210215050618.hgftdmfmslbdrg3j@vireshk-i7
-
-Marc Zyngier (5):
-  KVM: arm64: Divorce the perf code from oprofile helpers
-  arm64: Get rid of oprofile leftovers
-  s390: Get rid of oprofile leftovers
-  sh: Get rid of oprofile leftovers
-  perf: Get rid of oprofile leftovers
-
- arch/arm64/kvm/perf.c         |  7 +------
- arch/arm64/kvm/pmu-emul.c     |  2 +-
- arch/s390/kernel/perf_event.c | 21 ---------------------
- arch/sh/kernel/perf_event.c   | 18 ------------------
- drivers/perf/arm_pmu.c        | 30 ------------------------------
- include/kvm/arm_pmu.h         |  4 ++++
- include/linux/perf_event.h    |  2 --
- kernel/events/core.c          |  5 -----
- 8 files changed, 6 insertions(+), 83 deletions(-)
-
+diff --git a/arch/arm64/kvm/perf.c b/arch/arm64/kvm/perf.c
+index 739164324afe..b8b398670ef2 100644
+--- a/arch/arm64/kvm/perf.c
++++ b/arch/arm64/kvm/perf.c
+@@ -50,12 +50,7 @@ static struct perf_guest_info_callbacks kvm_guest_cbs = {
+ 
+ int kvm_perf_init(void)
+ {
+-	/*
+-	 * Check if HW_PERF_EVENTS are supported by checking the number of
+-	 * hardware performance counters. This could ensure the presence of
+-	 * a physical PMU and CONFIG_PERF_EVENT is selected.
+-	 */
+-	if (IS_ENABLED(CONFIG_ARM_PMU) && perf_num_counters() > 0)
++	if (kvm_pmu_probe_pmuver() != 0xf)
+ 		static_branch_enable(&kvm_arm_pmu_available);
+ 
+ 	return perf_register_guest_info_callbacks(&kvm_guest_cbs);
+diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
+index e32c6e139a09..fd167d4f4215 100644
+--- a/arch/arm64/kvm/pmu-emul.c
++++ b/arch/arm64/kvm/pmu-emul.c
+@@ -739,7 +739,7 @@ void kvm_pmu_set_counter_event_type(struct kvm_vcpu *vcpu, u64 data,
+ 	kvm_pmu_create_perf_event(vcpu, select_idx);
+ }
+ 
+-static int kvm_pmu_probe_pmuver(void)
++int kvm_pmu_probe_pmuver(void)
+ {
+ 	struct perf_event_attr attr = { };
+ 	struct perf_event *event;
+diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
+index 6fd3cda608e4..864b9997efb2 100644
+--- a/include/kvm/arm_pmu.h
++++ b/include/kvm/arm_pmu.h
+@@ -61,6 +61,7 @@ int kvm_arm_pmu_v3_get_attr(struct kvm_vcpu *vcpu,
+ int kvm_arm_pmu_v3_has_attr(struct kvm_vcpu *vcpu,
+ 			    struct kvm_device_attr *attr);
+ int kvm_arm_pmu_v3_enable(struct kvm_vcpu *vcpu);
++int kvm_pmu_probe_pmuver(void);
+ #else
+ struct kvm_pmu {
+ };
+@@ -116,6 +117,9 @@ static inline u64 kvm_pmu_get_pmceid(struct kvm_vcpu *vcpu, bool pmceid1)
+ {
+ 	return 0;
+ }
++
++static inline int kvm_pmu_probe_pmuver(void) { return 0xf; }
++
+ #endif
+ 
+ #endif
 -- 
 2.29.2
+
