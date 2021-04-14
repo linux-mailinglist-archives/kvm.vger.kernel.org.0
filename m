@@ -2,152 +2,154 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5799635EF68
-	for <lists+kvm@lfdr.de>; Wed, 14 Apr 2021 10:25:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0C9B135EFC5
+	for <lists+kvm@lfdr.de>; Wed, 14 Apr 2021 10:46:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1349790AbhDNIS4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 14 Apr 2021 04:18:56 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:35736 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1349808AbhDNISy (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 14 Apr 2021 04:18:54 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1618388311;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=drGuROoG7lj2vDETDU9JDvj19d1vG70cVaZLfEDasfQ=;
-        b=eng9jP2F8WIvEVqjIHcrtypbkDa0bReMJI2sovQ9ju6aGAoJhVd2xavUMFgQRObkGPK1TA
-        zG20mQeSxpQ28JcLiYKL6XcsdA+M80AdNX7W0Bh+0qyOiWtruxL13xmouwavbQFAg67nAn
-        4/y1crStaHgijUC1goWLNQJGuTg4NEI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-442-BEpTz7kFPZK4thdSD3eoIQ-1; Wed, 14 Apr 2021 04:18:28 -0400
-X-MC-Unique: BEpTz7kFPZK4thdSD3eoIQ-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 74FE91883527;
-        Wed, 14 Apr 2021 08:18:26 +0000 (UTC)
-Received: from wangxiaodeMacBook-Air.local (ovpn-13-33.pek2.redhat.com [10.72.13.33])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id B882B16ED7;
-        Wed, 14 Apr 2021 08:18:13 +0000 (UTC)
-Subject: Re: [PATCH v6 09/10] vduse: Introduce VDUSE - vDPA Device in
- Userspace
-To:     Yongji Xie <xieyongji@bytedance.com>
-Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        Parav Pandit <parav@nvidia.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Christian Brauner <christian.brauner@canonical.com>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Matthew Wilcox <willy@infradead.org>, viro@zeniv.linux.org.uk,
-        Jens Axboe <axboe@kernel.dk>, bcrl@kvack.org,
-        Jonathan Corbet <corbet@lwn.net>,
-        =?UTF-8?Q?Mika_Penttil=c3=a4?= <mika.penttila@nextfour.com>,
-        Dan Carpenter <dan.carpenter@oracle.com>,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        kvm@vger.kernel.org, linux-fsdevel@vger.kernel.org
-References: <20210331080519.172-1-xieyongji@bytedance.com>
- <20210331080519.172-10-xieyongji@bytedance.com>
- <c817178a-2ac8-bf93-1ed3-528579c657a3@redhat.com>
- <CACycT3v_KFQXoxRbEj8c0Ve6iKn9RbibtBDgBFs=rf0ZOmTBBQ@mail.gmail.com>
- <091dde74-449b-385c-0ec9-11e4847c6c4c@redhat.com>
- <CACycT3vwATp4+Ao0fjuyeeLQN+xHH=dXF+JUyuitkn4k8hELnA@mail.gmail.com>
- <dc9a90dd-4f86-988c-c1b5-ac606ce5e14b@redhat.com>
- <CACycT3vxO21Yt6+px2c2Q8DONNUNehdo2Vez_RKQCKe76CM2TA@mail.gmail.com>
- <0f386dfe-45c9-5609-55f7-b8ab2a4abf5e@redhat.com>
- <CACycT3vbDhUKM0OX-zo02go09gh2+EEdyZ_YQuz8PXzo3EngXw@mail.gmail.com>
- <a85c0a66-ad7f-a344-f8ed-363355f5e283@redhat.com>
- <CACycT3tHxtfgQhQgv0VyF_U523qASEv1Ydc4XuX43MFRzGVbfw@mail.gmail.com>
-From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <51cd2e3a-5b76-a6f5-da59-b118a7e13923@redhat.com>
-Date:   Wed, 14 Apr 2021 16:18:11 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
- Gecko/20100101 Thunderbird/78.9.1
+        id S1350124AbhDNIfh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 14 Apr 2021 04:35:37 -0400
+Received: from szxga06-in.huawei.com ([45.249.212.32]:16911 "EHLO
+        szxga06-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1350116AbhDNIfc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 14 Apr 2021 04:35:32 -0400
+Received: from DGGEMS404-HUB.china.huawei.com (unknown [172.30.72.58])
+        by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4FKwj851vkzkk2r;
+        Wed, 14 Apr 2021 16:33:16 +0800 (CST)
+Received: from [10.174.187.224] (10.174.187.224) by
+ DGGEMS404-HUB.china.huawei.com (10.3.19.204) with Microsoft SMTP Server id
+ 14.3.498.0; Wed, 14 Apr 2021 16:35:00 +0800
+Subject: Re: [RFC PATCH] KVM: x86: Support write protect huge pages lazily
+To:     Ben Gardon <bgardon@google.com>
+References: <20200828081157.15748-1-zhukeqian1@huawei.com>
+ <107696eb-755f-7807-a484-da63aad01ce4@huawei.com>
+ <YGzxzsRlqouaJv6a@google.com>
+ <CANgfPd8g3o2mJZi8rtR6jBNeYJTNWR0LTEcD2PeNLJk9JTz4CQ@mail.gmail.com>
+ <ff6a2cbb-7b18-9528-4e13-8728966e8c84@huawei.com>
+ <CANgfPd_h509o3kQGEQjuy2tzqnQ+toR4snJVAug=N2TULce3ag@mail.gmail.com>
+CC:     Sean Christopherson <seanjc@google.com>, kvm <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        <wanghaibin.wang@huawei.com>
+From:   Keqian Zhu <zhukeqian1@huawei.com>
+Message-ID: <f09aabf2-a94c-9176-098f-fee810b99d0c@huawei.com>
+Date:   Wed, 14 Apr 2021 16:35:00 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
+ Thunderbird/45.7.1
 MIME-Version: 1.0
-In-Reply-To: <CACycT3tHxtfgQhQgv0VyF_U523qASEv1Ydc4XuX43MFRzGVbfw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+In-Reply-To: <CANgfPd_h509o3kQGEQjuy2tzqnQ+toR4snJVAug=N2TULce3ag@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.174.187.224]
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Hi Ben,
 
-在 2021/4/13 下午12:28, Yongji Xie 写道:
-> On Tue, Apr 13, 2021 at 11:35 AM Jason Wang <jasowang@redhat.com> wrote:
+On 2021/4/14 0:43, Ben Gardon wrote:
+> On Tue, Apr 13, 2021 at 2:39 AM Keqian Zhu <zhukeqian1@huawei.com> wrote:
 >>
->> 在 2021/4/12 下午5:59, Yongji Xie 写道:
->>> On Mon, Apr 12, 2021 at 5:37 PM Jason Wang <jasowang@redhat.com> wrote:
->>>> 在 2021/4/12 下午4:02, Yongji Xie 写道:
->>>>> On Mon, Apr 12, 2021 at 3:16 PM Jason Wang <jasowang@redhat.com> wrote:
->>>>>> 在 2021/4/9 下午4:02, Yongji Xie 写道:
->>>>>>>>>>> +};
->>>>>>>>>>> +
->>>>>>>>>>> +struct vduse_dev_config_data {
->>>>>>>>>>> +     __u32 offset; /* offset from the beginning of config space */
->>>>>>>>>>> +     __u32 len; /* the length to read/write */
->>>>>>>>>>> +     __u8 data[VDUSE_CONFIG_DATA_LEN]; /* data buffer used to read/write */
->>>>>>>>>> Note that since VDUSE_CONFIG_DATA_LEN is part of uAPI it means we can
->>>>>>>>>> not change it in the future.
->>>>>>>>>>
->>>>>>>>>> So this might suffcient for future features or all type of virtio devices.
->>>>>>>>>>
->>>>>>>>> Do you mean 256 is no enough here？
->>>>>>>> Yes.
->>>>>>>>
->>>>>>> But this request will be submitted multiple times if config lengh is
->>>>>>> larger than 256. So do you think whether we need to extent the size to
->>>>>>> 512 or larger?
->>>>>> So I think you'd better either:
->>>>>>
->>>>>> 1) document the limitation (256) in somewhere, (better both uapi and doc)
->>>>>>
->>>>> But the VDUSE_CONFIG_DATA_LEN doesn't mean the limitation of
->>>>> configuration space. It only means the maximum size of one data
->>>>> transfer for configuration space. Do you mean document this?
->>>> Yes, and another thing is that since you're using
->>>> data[VDUSE_CONFIG_DATA_LEN] in the uapi, it implies the length is always
->>>> 256 which seems not good and not what the code is wrote.
+>>
+>>
+>> On 2021/4/13 1:19, Ben Gardon wrote:
+>>> On Tue, Apr 6, 2021 at 4:42 PM Sean Christopherson <seanjc@google.com> wrote:
 >>>>
->>> How about renaming VDUSE_CONFIG_DATA_LEN to VDUSE_MAX_TRANSFER_LEN?
+>>>> +Ben
+>>>>
+>>>> On Tue, Apr 06, 2021, Keqian Zhu wrote:
+>>>>> Hi Paolo,
+>>>>>
+>>>>> I plan to rework this patch and do full test. What do you think about this idea
+>>>>> (enable dirty logging for huge pages lazily)?
+>>>>
+>>>> Ben, don't you also have something similar (or maybe the exact opposite?) in the
+>>>> hopper?  This sounds very familiar, but I can't quite connect the dots that are
+>>>> floating around my head...
 >>>
->>> Thanks,
->>> Yongji
+>>> Sorry for the late response, I was out of office last week.
+>> Never mind, Sean has told to me. :)
 >>
->> So a question is the reason to have a limitation of this in the uAPI?
->> Note that in vhost-vdpa we don't have such:
+>>>
+>>> Yes, we have two relevant features I'd like to reconcile somehow:
+>>> 1.) Large page shattering - Instead of clearing a large TDP mapping,
+>>> flushing the TLBs, then replacing it with an empty TDP page table, go
+>>> straight from the large mapping to a fully pre-populated table. This
+>>> is slightly slower because the table needs to be pre-populated, but it
+>>> saves many vCPU page faults.
+>>> 2.) Eager page splitting - split all large mappings down to 4k when
+>>> enabling dirty logging, using large page shattering. This makes
+>>> enabling dirty logging much slower, but speeds up the first round (and
+>>> later rounds) of gathering / clearing the dirty log and reduces the
+>>> number of vCPU page faults. We've prefered to do this when enabling
+>>> dirty logging because it's a little less perf-sensitive than the later
+>>> passes where latency and convergence are critical.
+>> OK, I see. I think the lock stuff is an important part, so one question is that
+>> the shattering process is designed to be locked (i.e., protect mapping) or lock-less?
 >>
->> struct vhost_vdpa_config {
->>           __u32 off;
->>           __u32 len;
->>           __u8 buf[0];
->> };
+>> If it's locked, vCPU thread may be blocked for a long time (For arm, there is a
+>> mmu_lock per VM). If it's lock-less, how can we ensure the synchronization of
+>> mapping?
+> 
+> The TDP MMU for x86 could do it under the MMU read lock, but the
+> legacy / shadow x86 MMU and other architectures would need the whole
+> MMU lock.
+> While we do increase the time required to address a large SPTE, we can
+> completely avoid the vCPU needing the MMU lock on an access to that
+> SPTE as the translation goes straight from a large, writable SPTE, to
+> a 4k spte with either the d bit cleared or write protected. If it's
+> write protected, the fault can (at least on x86) be resolved without
+> the MMU lock.
+That's sounds good! In terms of lock, x86 is better than arm64. For arm64,
+we must hold whole MMU lock both for split large page or change permission
+for 4K page.
+
+> 
+> When I'm able to put together a large page shattering series, I'll do
+> some performance analysis and see how it changes things, but that part
+OK.
+
+> is sort of orthogonal to this change. The more I think about it, the
+> better the init-all-set approach for large pages sounds, compared to
+> eager splitting. I'm definitely in support of this patch and am happy
+> to help review when you send out the v2 with TDP MMU support and such.
+Thanks a lot. :)
+
+> 
 >>
-> If so, we need to call read()/write() multiple times each time
-> receiving/sending one request or response in userspace and kernel. For
-> example,
->
-> 1. read and check request/response type
-> 2. read and check config length if type is VDUSE_SET_CONFIG or VDUSE_GET_CONFIG
-> 3. read the payload
->
-> Not sure if it's worth it.
->
-> Thanks,
-> Yongji
+>>>
+>>> Large page shattering can happen in the NPT page fault handler or the
+>>> thread enabling dirty logging / clearing the dirty log, so it's
+>>> more-or-less orthogonal to this patch.
+>>>
+>>> Eager page splitting on the other hand takes the opposite approach to
+>>> this patch, frontloading as much of the work to enable dirty logging
+>>> as possible. Which approach is better is going to depend a lot on the
+>>> guest workload, your live migration constraints, and how the
+>>> user-space hypervisor makes use of KVM's growing number of dirty
+>>> logging options. In our case, the time to migrate a VM is usually less
+>>> of a concern than the performance degradation the guest experiences,
+>>> so we want to do everything we can to minimize vCPU exits and exit
+>>> latency.
+>> Yes, make sense to me.
+>>
+>>>
+>>> I think this is a reasonable change in principle if we're not write
+>>> protecting 4k pages already, but it's hard to really validate all the
+>>> performance implications. With this change we'd move pretty much all
+>>> the work to the first pass of clearing the dirty log, which is
+>>> probably an improvement since it's much more granular. The downside is
+>> Yes, at least split large page lazily is better than current logic.
+>>
+>>> that we do more work when we'd really like to be converging the dirty
+>>> set as opposed to earlier when we know all pages are dirty anyway.
+>> I think the dirty collecting procedure is not affected, do I miss something?
+> 
+> Oh yeah, good point. Since the splitting of large SPTEs is happening
+> in the vCPU threads it wouldn't slow dirty log collection at all. We
+> would have to do slightly more work to write protect the large SPTEs
+> that weren't written to, but that's a relatively small amount of work.
+Indeed.
 
 
-Right, I see.
-
-So I'm fine with current approach.
-
-Thanks
-
-
-
->
-
+BRs,
+Keqian
