@@ -2,154 +2,108 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0C9B135EFC5
-	for <lists+kvm@lfdr.de>; Wed, 14 Apr 2021 10:46:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DF0C035F003
+	for <lists+kvm@lfdr.de>; Wed, 14 Apr 2021 10:47:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1350124AbhDNIfh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 14 Apr 2021 04:35:37 -0400
-Received: from szxga06-in.huawei.com ([45.249.212.32]:16911 "EHLO
-        szxga06-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1350116AbhDNIfc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 14 Apr 2021 04:35:32 -0400
-Received: from DGGEMS404-HUB.china.huawei.com (unknown [172.30.72.58])
-        by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4FKwj851vkzkk2r;
-        Wed, 14 Apr 2021 16:33:16 +0800 (CST)
-Received: from [10.174.187.224] (10.174.187.224) by
- DGGEMS404-HUB.china.huawei.com (10.3.19.204) with Microsoft SMTP Server id
- 14.3.498.0; Wed, 14 Apr 2021 16:35:00 +0800
-Subject: Re: [RFC PATCH] KVM: x86: Support write protect huge pages lazily
-To:     Ben Gardon <bgardon@google.com>
-References: <20200828081157.15748-1-zhukeqian1@huawei.com>
- <107696eb-755f-7807-a484-da63aad01ce4@huawei.com>
- <YGzxzsRlqouaJv6a@google.com>
- <CANgfPd8g3o2mJZi8rtR6jBNeYJTNWR0LTEcD2PeNLJk9JTz4CQ@mail.gmail.com>
- <ff6a2cbb-7b18-9528-4e13-8728966e8c84@huawei.com>
- <CANgfPd_h509o3kQGEQjuy2tzqnQ+toR4snJVAug=N2TULce3ag@mail.gmail.com>
-CC:     Sean Christopherson <seanjc@google.com>, kvm <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        <wanghaibin.wang@huawei.com>
-From:   Keqian Zhu <zhukeqian1@huawei.com>
-Message-ID: <f09aabf2-a94c-9176-098f-fee810b99d0c@huawei.com>
-Date:   Wed, 14 Apr 2021 16:35:00 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
- Thunderbird/45.7.1
+        id S1350205AbhDNImr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 14 Apr 2021 04:42:47 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:44750 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232248AbhDNImq (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 14 Apr 2021 04:42:46 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1618389745;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=QLAUVPyRG/bi0Rkny0RSuOIvl4SdAX8nBzWjhMALWA4=;
+        b=CN+mz7eHaINp8vZ8TkQ7hAYssx5YvrhZb4uJTOMis322Nqa1HRVSHq5v36C8v1iXxfmdjx
+        v1Z3fQt7dscA63fjWKnDISxGLKrQxilZ2S16B2ENnJubHedhYQqO8z5y53/PVoto+rqg2W
+        qkg/JpbuIlgNbji1x30o9QUNJajLtyk=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-140-EpWJ0d6nPUWrPBFcNhomZw-1; Wed, 14 Apr 2021 04:42:22 -0400
+X-MC-Unique: EpWJ0d6nPUWrPBFcNhomZw-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2E8EB1020C25;
+        Wed, 14 Apr 2021 08:42:21 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.40.192.57])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 363D416ED7;
+        Wed, 14 Apr 2021 08:42:18 +0000 (UTC)
+Date:   Wed, 14 Apr 2021 10:42:16 +0200
+From:   Andrew Jones <drjones@redhat.com>
+To:     Nikos Nikoleris <nikos.nikoleris@arm.com>
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, alexandru.elisei@arm.com,
+        Jade Alglave <Jade.Alglave@arm.com>,
+        maranget <luc.maranget@inria.fr>
+Subject: Re: [kvm-unit-tests PATCH 0/3] Add support for external tests and
+ litmus7 documentation
+Message-ID: <20210414084216.khko7c7tk2tnu6bw@kamzik.brq.redhat.com>
+References: <20210324171402.371744-1-nikos.nikoleris@arm.com>
+ <aaabf2d9-ecea-8665-f43b-d3382963ff5a@arm.com>
 MIME-Version: 1.0
-In-Reply-To: <CANgfPd_h509o3kQGEQjuy2tzqnQ+toR4snJVAug=N2TULce3ag@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.174.187.224]
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aaabf2d9-ecea-8665-f43b-d3382963ff5a@arm.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Ben,
-
-On 2021/4/14 0:43, Ben Gardon wrote:
-> On Tue, Apr 13, 2021 at 2:39 AM Keqian Zhu <zhukeqian1@huawei.com> wrote:
->>
->>
->>
->> On 2021/4/13 1:19, Ben Gardon wrote:
->>> On Tue, Apr 6, 2021 at 4:42 PM Sean Christopherson <seanjc@google.com> wrote:
->>>>
->>>> +Ben
->>>>
->>>> On Tue, Apr 06, 2021, Keqian Zhu wrote:
->>>>> Hi Paolo,
->>>>>
->>>>> I plan to rework this patch and do full test. What do you think about this idea
->>>>> (enable dirty logging for huge pages lazily)?
->>>>
->>>> Ben, don't you also have something similar (or maybe the exact opposite?) in the
->>>> hopper?  This sounds very familiar, but I can't quite connect the dots that are
->>>> floating around my head...
->>>
->>> Sorry for the late response, I was out of office last week.
->> Never mind, Sean has told to me. :)
->>
->>>
->>> Yes, we have two relevant features I'd like to reconcile somehow:
->>> 1.) Large page shattering - Instead of clearing a large TDP mapping,
->>> flushing the TLBs, then replacing it with an empty TDP page table, go
->>> straight from the large mapping to a fully pre-populated table. This
->>> is slightly slower because the table needs to be pre-populated, but it
->>> saves many vCPU page faults.
->>> 2.) Eager page splitting - split all large mappings down to 4k when
->>> enabling dirty logging, using large page shattering. This makes
->>> enabling dirty logging much slower, but speeds up the first round (and
->>> later rounds) of gathering / clearing the dirty log and reduces the
->>> number of vCPU page faults. We've prefered to do this when enabling
->>> dirty logging because it's a little less perf-sensitive than the later
->>> passes where latency and convergence are critical.
->> OK, I see. I think the lock stuff is an important part, so one question is that
->> the shattering process is designed to be locked (i.e., protect mapping) or lock-less?
->>
->> If it's locked, vCPU thread may be blocked for a long time (For arm, there is a
->> mmu_lock per VM). If it's lock-less, how can we ensure the synchronization of
->> mapping?
+On Tue, Apr 13, 2021 at 05:52:37PM +0100, Nikos Nikoleris wrote:
+> On 24/03/2021 17:13, Nikos Nikoleris wrote:
+> > This set of patches makes small changes to the build system to allow
+> > easy integration of tests not included in the repository. To this end,
+> > it adds a parameter to the configuration script `--ext-dir=DIR` which
+> > will instruct the build system to include the Makefile in
+> > DIR/Makefile. The external Makefile can then add extra tests,
+> > link object files and modify/extend flags.
+> > 
+> > In addition, to demonstrate how we can use this functionality, a
+> > README file explains how to use litmus7 to generate the C code for
+> > litmus tests and link with kvm-unit-tests to produce flat files.
+> > 
+> > Note that currently, litmus7 produces its own independent Makefile as
+> > an intermediate step. Once this set of changes is committed, litmus7
+> > will be modifed to make use hook to specify external tests and
+> > leverage the build system to build the external tests
+> > (https://github.com/relokin/herdtools7/commit/8f23eb39d25931c2c34f4effa096df58547a3bb4).
+> > 
 > 
-> The TDP MMU for x86 could do it under the MMU read lock, but the
-> legacy / shadow x86 MMU and other architectures would need the whole
-> MMU lock.
-> While we do increase the time required to address a large SPTE, we can
-> completely avoid the vCPU needing the MMU lock on an access to that
-> SPTE as the translation goes straight from a large, writable SPTE, to
-> a 4k spte with either the d bit cleared or write protected. If it's
-> write protected, the fault can (at least on x86) be resolved without
-> the MMU lock.
-That's sounds good! In terms of lock, x86 is better than arm64. For arm64,
-we must hold whole MMU lock both for split large page or change permission
-for 4K page.
+> Just wanted to add that if anyone's interested in trying out this series
+> with litmus7 I am very happy to help. Any feedback on this series or the way
+> we use kvm-unit-tests would be very welcome!
+
+Hi Nikos,
+
+It's on my TODO to play with this. I just haven't had a chance yet. I'm
+particularly slow right now because I'm in the process of handling a
+switch of my email server from one type to another, requiring rewrites
+of filters, new mail synchronization methods, and, in general, lots of
+pain... Hopefully by the end of this week all will be done. Then, I can
+start ignoring emails on purpose again, instead of due to the fact that
+I can't find them :-)
+
+Thanks,
+drew
 
 > 
-> When I'm able to put together a large page shattering series, I'll do
-> some performance analysis and see how it changes things, but that part
-OK.
-
-> is sort of orthogonal to this change. The more I think about it, the
-> better the init-all-set approach for large pages sounds, compared to
-> eager splitting. I'm definitely in support of this patch and am happy
-> to help review when you send out the v2 with TDP MMU support and such.
-Thanks a lot. :)
-
+> Thanks,
 > 
->>
->>>
->>> Large page shattering can happen in the NPT page fault handler or the
->>> thread enabling dirty logging / clearing the dirty log, so it's
->>> more-or-less orthogonal to this patch.
->>>
->>> Eager page splitting on the other hand takes the opposite approach to
->>> this patch, frontloading as much of the work to enable dirty logging
->>> as possible. Which approach is better is going to depend a lot on the
->>> guest workload, your live migration constraints, and how the
->>> user-space hypervisor makes use of KVM's growing number of dirty
->>> logging options. In our case, the time to migrate a VM is usually less
->>> of a concern than the performance degradation the guest experiences,
->>> so we want to do everything we can to minimize vCPU exits and exit
->>> latency.
->> Yes, make sense to me.
->>
->>>
->>> I think this is a reasonable change in principle if we're not write
->>> protecting 4k pages already, but it's hard to really validate all the
->>> performance implications. With this change we'd move pretty much all
->>> the work to the first pass of clearing the dirty log, which is
->>> probably an improvement since it's much more granular. The downside is
->> Yes, at least split large page lazily is better than current logic.
->>
->>> that we do more work when we'd really like to be converging the dirty
->>> set as opposed to earlier when we know all pages are dirty anyway.
->> I think the dirty collecting procedure is not affected, do I miss something?
+> Nikos
 > 
-> Oh yeah, good point. Since the splitting of large SPTEs is happening
-> in the vCPU threads it wouldn't slow dirty log collection at all. We
-> would have to do slightly more work to write protect the large SPTEs
-> that weren't written to, but that's a relatively small amount of work.
-Indeed.
+> > Nikos Nikoleris (3):
+> >    arm/arm64: Avoid wildcard in the arm_clean recipe of the Makefile
+> >    arm/arm64: Add a way to specify an external directory with tests
+> >    README: Add a guide of how to run tests with litmus7
+> > 
+> >   configure           |   7 +++
+> >   arm/Makefile.common |  11 +++-
+> >   README.litmus7.md   | 125 ++++++++++++++++++++++++++++++++++++++++++++
+> >   3 files changed, 141 insertions(+), 2 deletions(-)
+> >   create mode 100644 README.litmus7.md
+> > 
+> 
 
-
-BRs,
-Keqian
