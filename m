@@ -2,90 +2,160 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4706F35FA22
-	for <lists+kvm@lfdr.de>; Wed, 14 Apr 2021 19:58:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BEE8935FAAC
+	for <lists+kvm@lfdr.de>; Wed, 14 Apr 2021 20:22:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1351370AbhDNR5z (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 14 Apr 2021 13:57:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51742 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1351282AbhDNR5z (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 14 Apr 2021 13:57:55 -0400
-Received: from mail-pf1-x42f.google.com (mail-pf1-x42f.google.com [IPv6:2607:f8b0:4864:20::42f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A34EAC061756
-        for <kvm@vger.kernel.org>; Wed, 14 Apr 2021 10:57:33 -0700 (PDT)
-Received: by mail-pf1-x42f.google.com with SMTP id o123so14264306pfb.4
-        for <kvm@vger.kernel.org>; Wed, 14 Apr 2021 10:57:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=bAj/sTVeT3EOEooCD0PWAEK0DFdv0I+bmfSZB33mtXg=;
-        b=YKlFCQU3jURALAoms83ymQ5gvp6uDIeOmXii2ecYlnaY3CnAEQDKyFe11bMpij/ofF
-         bvcE6c0NQt8C52+fZhUpCcVnJ56ADwd3GERCw21jztW8ge7H6iLIBzEFVgznlUdxw7pO
-         GnB2RNc+cUijVVBbHPc7yLqNlFJ0AMoPT8e7fYGjW9FbSCPVJ1tcmkf670aGeGhzLbfn
-         G7uKAmN10uawEXHZM3WXgk4wuHT9TNL3FcnnsWId9Lb1R0zD2t6EvnECYZh87Y/ILFFp
-         hF4BFmzeV/oh2/ylAWDVPXzudMJtVFR4Jeu2zXoaWZZYomQ6zGjEFAKEctcmfEEhgTAR
-         Li3Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=bAj/sTVeT3EOEooCD0PWAEK0DFdv0I+bmfSZB33mtXg=;
-        b=Xz2rHrt9a7biFUHo1wJSRcnLuk6xyo94jwrz/shxY6+BorETzyBxvdVg5lzqeCPk3a
-         77zhjuOXs5JYXRN0NhmItxglz9tFSE7r5IjcY7Rz9xqeT+U5tBjThgwPw6W5PPW+Db27
-         yUwrBaxMU9cCbbpKAfLRDlqEoyu8qQJrsIyCewSg8uRv9t2jbF8WyMDjzmtz/Dtftye4
-         /k/XUy9xsGG9pSvzn579n4rzfZ2aWuGFKe8RyYQpX7QRSA9DKtQm1tNoNHnASv3vIxkV
-         a1OKF0Via2upSnYDR3PXTadysu4ilbo9y2lre469sEwgux9mzqI5rPPJ+GD8OiPoxbUA
-         rkLg==
-X-Gm-Message-State: AOAM533BWe3VenbiFCZyDEcUVB9XjTIzjuWFyF1eSCF6bEnGuagU0NoJ
-        DUzYBpzGBnelFi9yh2yLkAQXdg==
-X-Google-Smtp-Source: ABdhPJw2RarwNWS5+8HnwKiSHGAsEixnrKltiKCAYoveloZrH9siPOcI5DSj1R2t10EAC+2caMUGjQ==
-X-Received: by 2002:a63:c60a:: with SMTP id w10mr37908204pgg.421.1618423052870;
-        Wed, 14 Apr 2021 10:57:32 -0700 (PDT)
-Received: from google.com (240.111.247.35.bc.googleusercontent.com. [35.247.111.240])
-        by smtp.gmail.com with ESMTPSA id r26sm110056pfq.17.2021.04.14.10.57.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 14 Apr 2021 10:57:32 -0700 (PDT)
-Date:   Wed, 14 Apr 2021 17:57:28 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Thomas Gleixner <tglx@linutronix.de>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
+        id S231288AbhDNSSD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 14 Apr 2021 14:18:03 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:22378 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232197AbhDNSSB (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 14 Apr 2021 14:18:01 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1618424259;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=/OYqddHlJXne+BFhqnkmv4/g/hMbPLBDi1f2Aw0G4WA=;
+        b=E/doeZDjJDNER7RXS4N53vtOQjDpMbG4vJhpPHqm3offPRmsBFkGAaUP48j5Wwtj477sQ2
+        DpUKTArHwrupndEfyNxrvOsr+EmFCbFGFiCq7KIML+ZZsBpiTkqedNuzUbrj04DoVngjtQ
+        2XQfZns2EmuD6nZO09hdZLEbOdtnWbU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-239-eHNIH7HTPv-2GGaEQKhsNQ-1; Wed, 14 Apr 2021 14:17:35 -0400
+X-MC-Unique: eHNIH7HTPv-2GGaEQKhsNQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 801148030A0;
+        Wed, 14 Apr 2021 18:17:30 +0000 (UTC)
+Received: from omen (ovpn-117-254.rdu2.redhat.com [10.10.117.254])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id DBA3A5D6D7;
+        Wed, 14 Apr 2021 18:17:20 +0000 (UTC)
+Date:   Wed, 14 Apr 2021 12:17:19 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     David Airlie <airlied@linux.ie>,
+        Tony Krowiak <akrowiak@linux.ibm.com>,
         Christian Borntraeger <borntraeger@de.ibm.com>,
-        Michael Tokarev <mjt@tls.msk.ru>
-Subject: Re: [RFC PATCH 0/7] KVM: Fix tick-based vtime accounting on x86
-Message-ID: <YHctCJDfeTq4zCVn@google.com>
-References: <20210413182933.1046389-1-seanjc@google.com>
- <87wnt4vkij.ffs@nanos.tec.linutronix.de>
+        Jonathan Corbet <corbet@lwn.net>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        dri-devel@lists.freedesktop.org,
+        Eric Farman <farman@linux.ibm.com>,
+        Harald Freudenberger <freude@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        intel-gfx@lists.freedesktop.org,
+        intel-gvt-dev@lists.freedesktop.org,
+        Jani Nikula <jani.nikula@linux.intel.com>,
+        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+        kvm@vger.kernel.org, Kirti Wankhede <kwankhede@nvidia.com>,
+        linux-doc@vger.kernel.org, linux-s390@vger.kernel.org,
+        Peter Oberparleiter <oberpar@linux.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Pierre Morel <pmorel@linux.ibm.com>,
+        Rodrigo Vivi <rodrigo.vivi@intel.com>,
+        Vineeth Vijayan <vneethv@linux.ibm.com>,
+        Zhenyu Wang <zhenyuw@linux.intel.com>,
+        Zhi Wang <zhi.a.wang@intel.com>,
+        "Raj, Ashok" <ashok.raj@intel.com>,
+        Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>,
+        Neo Jia <cjia@nvidia.com>, Cornelia Huck <cohuck@redhat.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Jike Song <jike.song@intel.com>,
+        Kevin Tian <kevin.tian@intel.com>,
+        Gerd Hoffmann <kraxel@redhat.com>,
+        Leon Romanovsky <leonro@nvidia.com>,
+        Max Gurtovoy <mgurtovoy@nvidia.com>,
+        Tarun Gupta <targupta@nvidia.com>
+Subject: Re: [PATCH v2 00/18] Make vfio_mdev type safe
+Message-ID: <20210414121719.7bdb6867@omen>
+In-Reply-To: <0-v2-d36939638fc6+d54-vfio2_jgg@nvidia.com>
+References: <0-v2-d36939638fc6+d54-vfio2_jgg@nvidia.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87wnt4vkij.ffs@nanos.tec.linutronix.de>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Apr 14, 2021, Thomas Gleixner wrote:
-> On Tue, Apr 13 2021 at 11:29, Sean Christopherson wrote:
-> > This is an alternative to Wanpeng's series[*] to fix tick-based accounting
-> > on x86.  The approach for fixing the bug is identical: defer accounting
-> > until after tick IRQs are handled.  The difference is purely in how the
-> > context tracking and vtime code is refactored in order to give KVM the
-> > hooks it needs to fix the x86 bug.
-> >
-> > x86 compile tested only, hence the RFC.  If folks like the direction and
-> > there are no unsolvable issues, I'll cross-compile, properly test on x86,
-> > and post an "official" series.
-> 
-> I like the final outcome of this, but we really want a small set of
-> patches first which actually fix the bug and is easy to backport and
-> then the larger consolidation on top.
-> 
-> Can you sort that out with Wanpeng please?
+On Tue,  6 Apr 2021 16:40:23 -0300
+Jason Gunthorpe <jgg@nvidia.com> wrote:
 
-Will do.
+> vfio_mdev has a number of different objects: mdev_parent, mdev_type and
+> mdev_device.
+> 
+> Unfortunately the types of these have been erased in various places
+> throughout the API, and this makes it very hard to understand this code or
+> maintain it by the time it reaches all of the drivers.
+> 
+> This series puts in all the types and aligns some of the design with the
+> driver core standard for a driver core bus driver:
+> 
+>  - Replace 'struct device *' with 'struct mdev_device *
+>  - Replace 'struct device *' with 'struct mdev_type *' and
+>    mtype_get_parent_dev()
+>  - Replace 'struct kobject *' with 'struct mdev_type *'
+> 
+> Now that types are clear it is easy to spot a few places that have
+> duplicated information.
+> 
+> More significantly we can now understand how to directly fix the
+> obfuscated 'kobj->name' matching by realizing the the kobj is a mdev_type,
+> which is linked to the supported_types_list provided by the driver, and
+> thus the core code can directly return the array indexes all the drivers
+> actually want.
+> 
+> v2:
+>  - Use a mdev_type local in mdev_create_sysfs_files
+>  - Rename the goto unwind labels in mdev_device_free()
+>  - Reorder patches, annotate reviewed-by's thanks all
+> v1: https://lore.kernel.org/r/0-v1-7dedf20b2b75+4f785-vfio2_jgg@nvidia.com
+> 
+> Jason Gunthorpe (18):
+>   vfio/mdev: Fix missing static's on MDEV_TYPE_ATTR's
+>   vfio/mdev: Do not allow a mdev_type to have a NULL parent pointer
+>   vfio/mdev: Add missing typesafety around mdev_device
+>   vfio/mdev: Simplify driver registration
+>   vfio/mdev: Use struct mdev_type in struct mdev_device
+>   vfio/mdev: Expose mdev_get/put_parent to mdev_private.h
+>   vfio/mdev: Add missing reference counting to mdev_type
+>   vfio/mdev: Reorganize mdev_device_create()
+>   vfio/mdev: Add missing error handling to dev_set_name()
+>   vfio/mdev: Remove duplicate storage of parent in mdev_device
+>   vfio/mdev: Add mdev/mtype_get_type_group_id()
+>   vfio/mtty: Use mdev_get_type_group_id()
+>   vfio/mdpy: Use mdev_get_type_group_id()
+>   vfio/mbochs: Use mdev_get_type_group_id()
+>   vfio/gvt: Make DRM_I915_GVT depend on VFIO_MDEV
+>   vfio/gvt: Use mdev_get_type_group_id()
+>   vfio/mdev: Remove kobj from mdev_parent_ops->create()
+>   vfio/mdev: Correct the function signatures for the
+>     mdev_type_attributes
+> 
+>  .../driver-api/vfio-mediated-device.rst       |   9 +-
+>  drivers/gpu/drm/i915/Kconfig                  |   1 +
+>  drivers/gpu/drm/i915/gvt/gvt.c                |  41 ++---
+>  drivers/gpu/drm/i915/gvt/gvt.h                |   4 +-
+>  drivers/gpu/drm/i915/gvt/kvmgt.c              |   7 +-
+>  drivers/s390/cio/vfio_ccw_ops.c               |  17 +-
+>  drivers/s390/crypto/vfio_ap_ops.c             |  14 +-
+>  drivers/vfio/mdev/mdev_core.c                 | 174 +++++++-----------
+>  drivers/vfio/mdev/mdev_driver.c               |  19 +-
+>  drivers/vfio/mdev/mdev_private.h              |  40 ++--
+>  drivers/vfio/mdev/mdev_sysfs.c                |  59 +++---
+>  drivers/vfio/mdev/vfio_mdev.c                 |  29 +--
+>  drivers/vfio/vfio_iommu_type1.c               |  25 +--
+>  include/linux/mdev.h                          |  80 +++++---
+>  samples/vfio-mdev/mbochs.c                    |  55 +++---
+>  samples/vfio-mdev/mdpy.c                      |  56 +++---
+>  samples/vfio-mdev/mtty.c                      |  66 ++-----
+>  17 files changed, 313 insertions(+), 383 deletions(-)
+
+Applied to vfio next branch for v5.13.  Thanks!
+
+Alex
+
