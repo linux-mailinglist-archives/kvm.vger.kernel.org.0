@@ -2,54 +2,54 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 53EFF35FDE2
-	for <lists+kvm@lfdr.de>; Thu, 15 Apr 2021 00:34:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AA39C35FDF7
+	for <lists+kvm@lfdr.de>; Thu, 15 Apr 2021 00:40:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234664AbhDNWes (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 14 Apr 2021 18:34:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55722 "EHLO
+        id S235098AbhDNWki (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 14 Apr 2021 18:40:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57046 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234740AbhDNWek (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 14 Apr 2021 18:34:40 -0400
-Received: from mail-il1-x12b.google.com (mail-il1-x12b.google.com [IPv6:2607:f8b0:4864:20::12b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 51BCDC061574
-        for <kvm@vger.kernel.org>; Wed, 14 Apr 2021 15:34:17 -0700 (PDT)
-Received: by mail-il1-x12b.google.com with SMTP id d2so18487359ilm.10
-        for <kvm@vger.kernel.org>; Wed, 14 Apr 2021 15:34:17 -0700 (PDT)
+        with ESMTP id S231645AbhDNWkh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 14 Apr 2021 18:40:37 -0400
+Received: from mail-il1-x12f.google.com (mail-il1-x12f.google.com [IPv6:2607:f8b0:4864:20::12f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 008CDC061574
+        for <kvm@vger.kernel.org>; Wed, 14 Apr 2021 15:40:15 -0700 (PDT)
+Received: by mail-il1-x12f.google.com with SMTP id c18so18508698iln.7
+        for <kvm@vger.kernel.org>; Wed, 14 Apr 2021 15:40:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=CI8Z/F5S582NuvrtPVvFNRH8BngEDJ7CgRUXykPNP6Y=;
-        b=OAjusVNtJp44MuoIj11Gd4CxZDVcf4G6GZFOeCVgdmRydnublD7l3xV1rbIctwhxtq
-         4+49mPnwcpSsCdoOBZ4fm2hUPFRXa4VwXhIxwEJTvf9p3+0R4pqoLxclwsghM/AwdlU/
-         bYsoz0oe9Vg9YPqkytJMPavURoVTSlT1oECcfu4r5DtjpyHs/7U2zuK48fsQBHjUUD+n
-         8tqnTFmxIiWJc/BB7tMgZNwM9ZNJkO1doNryxyIYvzyu89IUm03d7rBr6+d0pbFaeAWo
-         UmcxusTzPet+8kDY/x6t+/uynw2as2V3+2LUicukVjENXxJECC/OdiSnNXiFJlgEN6pR
-         h5Jg==
+        bh=n7d5Pcc0VNYj7xJiDh9xXCDiQUNA26uEPx/UGxLUN40=;
+        b=ua6Sag9BHfyRiKrYpjN1/P7tMimT7WvVKQ1INLqttw5yMrRxxFJIIX6wCCYdvzk33b
+         jKrglZ0aHu52HZSuSH3xtYVaSjmmEmvjXSFSX5r0vcY2Lrhy8r2o6J9oK+tvAoPe0eks
+         H3W0LenlTtoCoUYa9QpnS6tOda+y30lRJevL1BAwXxFKqhC8R4azUnSJKpFy06dskhhV
+         5WELmDUCJp5NV+ocMRQlkha0UvLSsrGJJAhvqI8v/3EzuCg5VQiMu0VAudIy0FEEJ8Fg
+         q1OmikIADtLWQDDMzDf7jF1JAs52pKgcFx9+zVs8cFfoaHZ4i6OX2o0kkGO+bXOvE6qE
+         WaXw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=CI8Z/F5S582NuvrtPVvFNRH8BngEDJ7CgRUXykPNP6Y=;
-        b=U6QjqrauKtWvh5bOPBPS9CCd3mfovjCmfljZp31PEY2mFH9AvgXgiOXgOvuQdS6WGk
-         DJkkENLaB5/wAvCcN/JI3HemJLxEaOJoL1BxH3klARg4LH6gl0P8SBS/F6oN4h4HcvDe
-         ULSH/vGCBAvbEuX+JbXlWsI/679ph6XKpvBAtgSmS26qneXgJRqXz1amM/kHUDfUoA6O
-         5U00Mjy1V3iRGTOrVd/fONIvb/5XT3ICuj/wBD/tAk5l3yyR3frGTDrxQ4W44iGPVGpl
-         gvJ+KSb+h+zmQ2uArrHMIKysNaCrla4eyBDwdBQ1vOx1qIfUm+DN5sbHpWwc6b4ThFOC
-         wXKw==
-X-Gm-Message-State: AOAM530j6U0ogldkp7RN+agjqn1rEskq3GP3Vv6/qRvsFIBAumC1ExXx
-        SDV2Y4NRudu1v1nXRc+svYhO1qx1iPS9noZggRU=
-X-Google-Smtp-Source: ABdhPJw7nVEWEpyQ3LlY/WJBHngQI5dgV+H5R7KpDVhY5wrYQ7aDnJU/AFTQru82dlQNnN0oQJZdZKvDxJQ8F6AtlvU=
-X-Received: by 2002:a05:6e02:5a2:: with SMTP id k2mr409747ils.177.1618439656765;
- Wed, 14 Apr 2021 15:34:16 -0700 (PDT)
+        bh=n7d5Pcc0VNYj7xJiDh9xXCDiQUNA26uEPx/UGxLUN40=;
+        b=legcRezb6VkJmeOuByvY1pdQj8deIpmOsHyMYBMyFDxLcFrWw1qsWZph8f7R2F9aHz
+         Wu+kK92TtI2n40tI0Me0/13j7ea0KPcBWlyeNznEGb/cJy1wvkA3h4KzGg7qRa2s8qEm
+         U2mmFFD3CHy6XMatOY5cK+JfzWImTIzStR3aH+FMs9XU7TpAl2u6nvp9djElZhYraxIl
+         CV+dhYmFGAKWC/x/i+sa6wjVYCs0+bBuMkpM5dUSXSl5cRt8vofVOArW21ZdLXo2DUGg
+         pb3W4zx0dkPPfDeRSQ5oW2AdHNFk2D+bTaPnB5rBrJJZtx9cKHROKJUdXgqIM6zIXXGC
+         C5aw==
+X-Gm-Message-State: AOAM533odlccZhAG0jb0hr+tICHaxIzIb/7WFOSW/YRa8K7qQlx3H1IF
+        lOjPjzQpNWgfnSVCu3QFCE7JpFoUuHbx/h9P+SE=
+X-Google-Smtp-Source: ABdhPJz0bHcyFH6loQKbB7SM4wJ2UxXqwZ4IQTDo24LsulLKqareNjVZld6J05qf/+twje9vI0eg82HjMRHuvoPSVkU=
+X-Received: by 2002:a92:d90f:: with SMTP id s15mr408088iln.227.1618440015373;
+ Wed, 14 Apr 2021 15:40:15 -0700 (PDT)
 MIME-Version: 1.0
-References: <20210412065246.1853-1-jiangyifei@huawei.com> <20210412065246.1853-10-jiangyifei@huawei.com>
-In-Reply-To: <20210412065246.1853-10-jiangyifei@huawei.com>
+References: <20210412065246.1853-1-jiangyifei@huawei.com> <20210412065246.1853-5-jiangyifei@huawei.com>
+In-Reply-To: <20210412065246.1853-5-jiangyifei@huawei.com>
 From:   Alistair Francis <alistair23@gmail.com>
-Date:   Thu, 15 Apr 2021 08:33:50 +1000
-Message-ID: <CAKmqyKPgfpEJYN0xTKRiD4Wk62-nu5pB=Ad1Z_NZasTrbXXrZg@mail.gmail.com>
-Subject: Re: [PATCH RFC v5 09/12] target/riscv: Add host cpu type
+Date:   Thu, 15 Apr 2021 08:39:49 +1000
+Message-ID: <CAKmqyKPnrhC9c2ek5ZetoHaDHir52ihEKzRCXHioOqMNvnVknQ@mail.gmail.com>
+Subject: Re: [PATCH RFC v5 04/12] target/riscv: Implement kvm_arch_get_registers
 To:     Yifei Jiang <jiangyifei@huawei.com>
 Cc:     "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
         "open list:RISC-V" <qemu-riscv@nongnu.org>,
@@ -68,10 +68,9 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Apr 12, 2021 at 4:54 PM Yifei Jiang <jiangyifei@huawei.com> wrote:
+On Mon, Apr 12, 2021 at 4:58 PM Yifei Jiang <jiangyifei@huawei.com> wrote:
 >
-> 'host' type cpu is set isa to RVXLEN simply, more isa info
-> will obtain from KVM in kvm_arch_init_vcpu()
+> Get GPR CSR and FP registers from kvm by KVM_GET_ONE_REG ioctl.
 >
 > Signed-off-by: Yifei Jiang <jiangyifei@huawei.com>
 > Signed-off-by: Yipeng Yin <yinyipeng1@huawei.com>
@@ -81,49 +80,176 @@ Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 Alistair
 
 > ---
->  target/riscv/cpu.c | 9 +++++++++
->  target/riscv/cpu.h | 1 +
->  2 files changed, 10 insertions(+)
+>  target/riscv/kvm.c | 150 ++++++++++++++++++++++++++++++++++++++++++++-
+>  1 file changed, 149 insertions(+), 1 deletion(-)
 >
-> diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
-> index dd34ab4978..8132d35a92 100644
-> --- a/target/riscv/cpu.c
-> +++ b/target/riscv/cpu.c
-> @@ -216,6 +216,12 @@ static void rv32_imafcu_nommu_cpu_init(Object *obj)
+> diff --git a/target/riscv/kvm.c b/target/riscv/kvm.c
+> index 0d924be33f..63485d7b65 100644
+> --- a/target/riscv/kvm.c
+> +++ b/target/riscv/kvm.c
+> @@ -50,13 +50,161 @@ static __u64 kvm_riscv_reg_id(CPURISCVState *env, __u64 type, __u64 idx)
+>      return id;
 >  }
->  #endif
 >
-> +static void riscv_host_cpu_init(Object *obj)
+> +#define RISCV_CORE_REG(env, name)  kvm_riscv_reg_id(env, KVM_REG_RISCV_CORE, \
+> +                 KVM_REG_RISCV_CORE_REG(name))
+> +
+> +#define RISCV_CSR_REG(env, name)  kvm_riscv_reg_id(env, KVM_REG_RISCV_CSR, \
+> +                 KVM_REG_RISCV_CSR_REG(name))
+> +
+> +#define RISCV_FP_F_REG(env, idx)  kvm_riscv_reg_id(env, KVM_REG_RISCV_FP_F, idx)
+> +
+> +#define RISCV_FP_D_REG(env, idx)  kvm_riscv_reg_id(env, KVM_REG_RISCV_FP_D, idx)
+> +
+> +static int kvm_riscv_get_regs_core(CPUState *cs)
 > +{
-> +    CPURISCVState *env = &RISCV_CPU(obj)->env;
-> +    set_misa(env, RVXLEN);
+> +    int ret = 0;
+> +    int i;
+> +    target_ulong reg;
+> +    CPURISCVState *env = &RISCV_CPU(cs)->env;
+> +
+> +    ret = kvm_get_one_reg(cs, RISCV_CORE_REG(env, regs.pc), &reg);
+> +    if (ret) {
+> +        return ret;
+> +    }
+> +    env->pc = reg;
+> +
+> +    for (i = 1; i < 32; i++) {
+> +        __u64 id = kvm_riscv_reg_id(env, KVM_REG_RISCV_CORE, i);
+> +        ret = kvm_get_one_reg(cs, id, &reg);
+> +        if (ret) {
+> +            return ret;
+> +        }
+> +        env->gpr[i] = reg;
+> +    }
+> +
+> +    return ret;
 > +}
 > +
->  static ObjectClass *riscv_cpu_class_by_name(const char *cpu_model)
->  {
->      ObjectClass *oc;
-> @@ -706,6 +712,9 @@ static const TypeInfo riscv_cpu_type_infos[] = {
->          .class_init = riscv_cpu_class_init,
->      },
->      DEFINE_CPU(TYPE_RISCV_CPU_ANY,              riscv_any_cpu_init),
-> +#if defined(CONFIG_KVM)
-> +    DEFINE_CPU(TYPE_RISCV_CPU_HOST,             riscv_host_cpu_init),
-> +#endif
->  #if defined(TARGET_RISCV32)
->      DEFINE_CPU(TYPE_RISCV_CPU_BASE32,           rv32_base_cpu_init),
->      DEFINE_CPU(TYPE_RISCV_CPU_IBEX,             rv32_ibex_cpu_init),
-> diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
-> index a489d94187..3ca3dad341 100644
-> --- a/target/riscv/cpu.h
-> +++ b/target/riscv/cpu.h
-> @@ -43,6 +43,7 @@
->  #define TYPE_RISCV_CPU_SIFIVE_E51       RISCV_CPU_TYPE_NAME("sifive-e51")
->  #define TYPE_RISCV_CPU_SIFIVE_U34       RISCV_CPU_TYPE_NAME("sifive-u34")
->  #define TYPE_RISCV_CPU_SIFIVE_U54       RISCV_CPU_TYPE_NAME("sifive-u54")
-> +#define TYPE_RISCV_CPU_HOST             RISCV_CPU_TYPE_NAME("host")
+> +static int kvm_riscv_get_regs_csr(CPUState *cs)
+> +{
+> +    int ret = 0;
+> +    target_ulong reg;
+> +    CPURISCVState *env = &RISCV_CPU(cs)->env;
+> +
+> +    ret = kvm_get_one_reg(cs, RISCV_CSR_REG(env, sstatus), &reg);
+> +    if (ret) {
+> +        return ret;
+> +    }
+> +    env->mstatus = reg;
+> +
+> +    ret = kvm_get_one_reg(cs, RISCV_CSR_REG(env, sie), &reg);
+> +    if (ret) {
+> +        return ret;
+> +    }
+> +    env->mie = reg;
+> +
+> +    ret = kvm_get_one_reg(cs, RISCV_CSR_REG(env, stvec), &reg);
+> +    if (ret) {
+> +        return ret;
+> +    }
+> +    env->stvec = reg;
+> +
+> +    ret = kvm_get_one_reg(cs, RISCV_CSR_REG(env, sscratch), &reg);
+> +    if (ret) {
+> +        return ret;
+> +    }
+> +    env->sscratch = reg;
+> +
+> +    ret = kvm_get_one_reg(cs, RISCV_CSR_REG(env, sepc), &reg);
+> +    if (ret) {
+> +        return ret;
+> +    }
+> +    env->sepc = reg;
+> +
+> +    ret = kvm_get_one_reg(cs, RISCV_CSR_REG(env, scause), &reg);
+> +    if (ret) {
+> +        return ret;
+> +    }
+> +    env->scause = reg;
+> +
+> +    ret = kvm_get_one_reg(cs, RISCV_CSR_REG(env, stval), &reg);
+> +    if (ret) {
+> +        return ret;
+> +    }
+> +    env->sbadaddr = reg;
+> +
+> +    ret = kvm_get_one_reg(cs, RISCV_CSR_REG(env, sip), &reg);
+> +    if (ret) {
+> +        return ret;
+> +    }
+> +    env->mip = reg;
+> +
+> +    ret = kvm_get_one_reg(cs, RISCV_CSR_REG(env, satp), &reg);
+> +    if (ret) {
+> +        return ret;
+> +    }
+> +    env->satp = reg;
+> +
+> +    return ret;
+> +}
+> +
+> +static int kvm_riscv_get_regs_fp(CPUState *cs)
+> +{
+> +    int ret = 0;
+> +    int i;
+> +    CPURISCVState *env = &RISCV_CPU(cs)->env;
+> +
+> +    if (riscv_has_ext(env, RVD)) {
+> +        uint64_t reg;
+> +        for (i = 0; i < 32; i++) {
+> +            ret = kvm_get_one_reg(cs, RISCV_FP_D_REG(env, i), &reg);
+> +            if (ret) {
+> +                return ret;
+> +            }
+> +            env->fpr[i] = reg;
+> +        }
+> +        return ret;
+> +    }
+> +
+> +    if (riscv_has_ext(env, RVF)) {
+> +        uint32_t reg;
+> +        for (i = 0; i < 32; i++) {
+> +            ret = kvm_get_one_reg(cs, RISCV_FP_F_REG(env, i), &reg);
+> +            if (ret) {
+> +                return ret;
+> +            }
+> +            env->fpr[i] = reg;
+> +        }
+> +        return ret;
+> +    }
+> +
+> +    return ret;
+> +}
+> +
+>  const KVMCapabilityInfo kvm_arch_required_capabilities[] = {
+>      KVM_CAP_LAST_INFO
+>  };
 >
->  #if defined(TARGET_RISCV32)
->  # define TYPE_RISCV_CPU_BASE            TYPE_RISCV_CPU_BASE32
+>  int kvm_arch_get_registers(CPUState *cs)
+>  {
+> -    return 0;
+> +    int ret = 0;
+> +
+> +    ret = kvm_riscv_get_regs_core(cs);
+> +    if (ret) {
+> +        return ret;
+> +    }
+> +
+> +    ret = kvm_riscv_get_regs_csr(cs);
+> +    if (ret) {
+> +        return ret;
+> +    }
+> +
+> +    ret = kvm_riscv_get_regs_fp(cs);
+> +    if (ret) {
+> +        return ret;
+> +    }
+> +
+> +    return ret;
+>  }
+>
+>  int kvm_arch_put_registers(CPUState *cs, int level)
 > --
 > 2.19.1
 >
