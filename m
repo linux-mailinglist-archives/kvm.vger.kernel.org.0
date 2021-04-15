@@ -2,235 +2,125 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4235C360391
-	for <lists+kvm@lfdr.de>; Thu, 15 Apr 2021 09:40:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 648993603CE
+	for <lists+kvm@lfdr.de>; Thu, 15 Apr 2021 10:01:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231515AbhDOHky (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 15 Apr 2021 03:40:54 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:57935 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231482AbhDOHkv (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 15 Apr 2021 03:40:51 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1618472427;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=FABcKglbZyz1XUUkdOXQm+i1lKqkxdPYz82VDd7EHCc=;
-        b=E3G/7HUOPVaw66wibjCv1WbFy3oUvSIpPjdbGVrER+fIgFMdIxriPAasDdqOJb3Du7jE5/
-        8icemMvkBVKtvzcUgWfSf5p0AYDR8EnlAcwKTSR9fkI0otf1KZhfu/GmUwNat6SdsaObDG
-        QEEPJBI/t4Qt+enrR9V/8M5X7ycLMYk=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-197-ZlEDVuOQOaeF8atOdSQdQA-1; Thu, 15 Apr 2021 03:40:25 -0400
-X-MC-Unique: ZlEDVuOQOaeF8atOdSQdQA-1
-Received: by mail-ed1-f71.google.com with SMTP id w14-20020aa7da4e0000b02903834aeed684so2947949eds.13
-        for <kvm@vger.kernel.org>; Thu, 15 Apr 2021 00:40:25 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=FABcKglbZyz1XUUkdOXQm+i1lKqkxdPYz82VDd7EHCc=;
-        b=oPVOCQAY8cvGt9YVyrxAicWkdl6x+oUqF03lLKLdPg73iKeJs6sO//qChCur9FfTuE
-         Ns2j7enE0uhco0va/i2lQroSSCoHPlrifHsjUrJ3LCbqeDY3SvG7DAIvwoCzTecpv6XB
-         uodTRNbjkR5SbghsgVmP3nQEak+EjFmAEpQXzltgMK41Aaap3ygQGzCyx760JxnNQ5TK
-         tD0jzriP4/ehvwje5U5vd2PgBFFzrF+dExbs2osHvv4RCnxFC9xKECW6M5pmmS74j4FT
-         Eh4srsuzW8qTZ4FE+bw4+/hM2QavpMpO1PFVTb/DJb6TO63idm+1YKTBITe9WyVTSOci
-         g8cw==
-X-Gm-Message-State: AOAM532reNedc8drsCskaDRf1BxBWtEH0pxW+mnYdFj77oZY4skDlcGJ
-        VL279Fsb71IXRCsbXYTwx9Bb1rId7Ul9CYphFmA/FgxgEqAf5qtQuN2VePfilftcA52zHa62Xa5
-        hXhFhZrskUhe9
-X-Received: by 2002:a17:906:80d6:: with SMTP id a22mr2018530ejx.277.1618472424067;
-        Thu, 15 Apr 2021 00:40:24 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJx0fuohm6puHv0F4pqjM8Oe2og4+AYVZWqbQ2+dlsXsdUigyAKX+u4GzMQpiq69iOvQF1X+Kw==
-X-Received: by 2002:a17:906:80d6:: with SMTP id a22mr2018508ejx.277.1618472423854;
-        Thu, 15 Apr 2021 00:40:23 -0700 (PDT)
-Received: from [192.168.10.118] ([93.56.169.140])
-        by smtp.gmail.com with ESMTPSA id d18sm1701897edv.1.2021.04.15.00.40.22
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 15 Apr 2021 00:40:23 -0700 (PDT)
-Subject: Re: [PATCH 2/2] tools: do not include scripts/Kbuild.include
-To:     Masahiro Yamada <masahiroy@kernel.org>,
-        linux-kbuild@vger.kernel.org
-Cc:     Janosch Frank <frankja@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Alexei Starovoitov <ast@kernel.org>,
-        Andrii Nakryiko <andrii@kernel.org>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Daniel Borkmann <daniel@iogearbox.net>,
-        Harish <harish@linux.ibm.com>,
-        John Fastabend <john.fastabend@gmail.com>,
-        KP Singh <kpsingh@kernel.org>, Martin KaFai Lau <kafai@fb.com>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Nathan Chancellor <nathan@kernel.org>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        Paul Mackerras <paulus@samba.org>,
-        Shuah Khan <shuah@kernel.org>,
-        Song Liu <songliubraving@fb.com>, Yonghong Song <yhs@fb.com>,
-        bpf@vger.kernel.org, clang-built-linux@googlegroups.com,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-kselftest@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        netdev@vger.kernel.org
-References: <20210415072700.147125-1-masahiroy@kernel.org>
- <20210415072700.147125-2-masahiroy@kernel.org>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <9d33ee98-9de3-2215-0c0b-cc856cec1b69@redhat.com>
-Date:   Thu, 15 Apr 2021 09:40:20 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.7.0
+        id S231266AbhDOIB5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 15 Apr 2021 04:01:57 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:13852 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230190AbhDOIB4 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 15 Apr 2021 04:01:56 -0400
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 13F7XvQ5152102;
+        Thu, 15 Apr 2021 04:01:34 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=Iy+4HEBSF+6Bj1MzBbaPvov+Xtf3UDKQhBpPJ8i7LDw=;
+ b=re0aowbxXwZsu8Y6GwmjiH+iLQxFENxjcoYfAuplBPNLiaWDQDxy2EzikGqbeYtOqMsw
+ zdshtgZPPiyXjHygi+VG2tRBAQEHWvxDcKcV8ZDs7hufE0EmciNA5TnUBmk17YmN7i45
+ yb7hLkwOAcCgIvVafsRwfURLXEDBsZFbNyw1a4Jm6hZy+A31XEFWK8v9RJ2ct+WycGrx
+ AlOqZRMkBWUkw8PMH1ar6d9eBtcxaTNKsoXxLsOqrQ4Pv82GlCCYSWpsEuL7M0v8aUl4
+ qdH7b8440+wqy1x/Q7R2chaO7brmYyKmwAstLDjx3XI5sfVYa11762mFBxF7RcdkS8v5 EQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 37x13v8w1g-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 15 Apr 2021 04:01:33 -0400
+Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 13F7YPS0153929;
+        Thu, 15 Apr 2021 04:01:33 -0400
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 37x13v8w0j-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 15 Apr 2021 04:01:33 -0400
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 13F7qMaL030873;
+        Thu, 15 Apr 2021 08:01:30 GMT
+Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
+        by ppma04ams.nl.ibm.com with ESMTP id 37u3n8uqum-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 15 Apr 2021 08:01:30 +0000
+Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 13F815wT22479228
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 15 Apr 2021 08:01:05 GMT
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 60FD111C06E;
+        Thu, 15 Apr 2021 08:01:27 +0000 (GMT)
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 2C91011C064;
+        Thu, 15 Apr 2021 08:01:27 +0000 (GMT)
+Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
+        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Thu, 15 Apr 2021 08:01:27 +0000 (GMT)
+From:   Heiko Carstens <hca@linux.ibm.com>
+To:     Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.vnet.ibm.com>
+Cc:     David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org
+Subject: [PATCH] KVM: s390: fix guarded storage control register handling
+Date:   Thu, 15 Apr 2021 10:01:27 +0200
+Message-Id: <20210415080127.1061275-1-hca@linux.ibm.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-In-Reply-To: <20210415072700.147125-2-masahiroy@kernel.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: oW4X9HK-9CKK23m1Mb8WhFHrZfpUPmTT
+X-Proofpoint-ORIG-GUID: hLD123nSDLfmqXYS4Ky0LkkimoaxWHCY
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.761
+ definitions=2021-04-15_03:2021-04-15,2021-04-15 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 impostorscore=0
+ suspectscore=0 phishscore=0 malwarescore=0 lowpriorityscore=0 adultscore=0
+ mlxscore=0 spamscore=0 priorityscore=1501 clxscore=1015 mlxlogscore=624
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2104060000
+ definitions=main-2104150049
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 15/04/21 09:27, Masahiro Yamada wrote:
-> Since commit d9f4ff50d2aa ("kbuild: spilt cc-option and friends to
-> scripts/Makefile.compiler"), some kselftests fail to build.
-> 
-> The tools/ directory opted out Kbuild, and went in a different
-> direction. They copy any kind of files to the tools/ directory
-> in order to do whatever they want to do in their world.
-> 
-> tools/build/Build.include mimics scripts/Kbuild.include, but some
-> tool Makefiles included the Kbuild one to import a feature that is
-> missing in tools/build/Build.include:
-> 
->   - Commit ec04aa3ae87b ("tools/thermal: tmon: use "-fstack-protector"
->     only if supported") included scripts/Kbuild.include from
->     tools/thermal/tmon/Makefile to import the cc-option macro.
-> 
->   - Commit c2390f16fc5b ("selftests: kvm: fix for compilers that do
->     not support -no-pie") included scripts/Kbuild.include from
->     tools/testing/selftests/kvm/Makefile to import the try-run macro.
-> 
->   - Commit 9cae4ace80ef ("selftests/bpf: do not ignore clang
->     failures") included scripts/Kbuild.include from
->     tools/testing/selftests/bpf/Makefile to import the .DELETE_ON_ERROR
->     target.
-> 
->   - Commit 0695f8bca93e ("selftests/powerpc: Handle Makefile for
->     unrecognized option") included scripts/Kbuild.include from
->     tools/testing/selftests/powerpc/pmu/ebb/Makefile to import the
->     try-run macro.
-> 
-> Copy what they want there, and stop including scripts/Kbuild.include
-> from the tool Makefiles.
+store_regs_fmt2() has an ordering problem: first the guarded storage
+facility is enabled on the local cpu, then preemption disabled, and
+then the STGSC (store guarded storage controls) instruction is
+executed.
 
-I think it would make sense to add try-run, cc-option and 
-.DELETE_ON_ERROR to tools/build/Build.include?
+If the process gets scheduled away between enabling the guarded
+storage facility and before preemption is disabled, this might lead to
+a special operation exception and therefore kernel crash as soon as
+the process is scheduled back and the STGSC instruction is executed.
 
-Paolo
+Fixes: 4e0b1ab72b8a ("KVM: s390: gs support for kvm guests")
+Cc: <stable@vger.kernel.org> # 4.12
+Reviewed-by: Christian Borntraeger <borntraeger@de.ibm.com>
+Signed-off-by: Heiko Carstens <hca@linux.ibm.com>
+---
+ arch/s390/kvm/kvm-s390.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-> Link: https://lore.kernel.org/lkml/86dadf33-70f7-a5ac-cb8c-64966d2f45a1@linux.ibm.com/
-> Fixes: d9f4ff50d2aa ("kbuild: spilt cc-option and friends to scripts/Makefile.compiler")
-> Reported-by: Janosch Frank <frankja@linux.ibm.com>
-> Reported-by: Christian Borntraeger <borntraeger@de.ibm.com>
-> Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
-> ---
-> 
->   tools/testing/selftests/bpf/Makefile          |  3 ++-
->   tools/testing/selftests/kvm/Makefile          | 12 +++++++++++-
->   .../selftests/powerpc/pmu/ebb/Makefile        | 11 ++++++++++-
->   tools/thermal/tmon/Makefile                   | 19 +++++++++++++++++--
->   4 files changed, 40 insertions(+), 5 deletions(-)
-> 
-> diff --git a/tools/testing/selftests/bpf/Makefile b/tools/testing/selftests/bpf/Makefile
-> index 044bfdcf5b74..d872b9f41543 100644
-> --- a/tools/testing/selftests/bpf/Makefile
-> +++ b/tools/testing/selftests/bpf/Makefile
-> @@ -1,5 +1,4 @@
->   # SPDX-License-Identifier: GPL-2.0
-> -include ../../../../scripts/Kbuild.include
->   include ../../../scripts/Makefile.arch
->   include ../../../scripts/Makefile.include
->   
-> @@ -476,3 +475,5 @@ EXTRA_CLEAN := $(TEST_CUSTOM_PROGS) $(SCRATCH_DIR) $(HOST_SCRATCH_DIR)	\
->   	prog_tests/tests.h map_tests/tests.h verifier/tests.h		\
->   	feature								\
->   	$(addprefix $(OUTPUT)/,*.o *.skel.h no_alu32 bpf_gcc bpf_testmod.ko)
-> +
-> +.DELETE_ON_ERROR:
-> diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-> index a6d61f451f88..8b45bc417d83 100644
-> --- a/tools/testing/selftests/kvm/Makefile
-> +++ b/tools/testing/selftests/kvm/Makefile
-> @@ -1,5 +1,15 @@
->   # SPDX-License-Identifier: GPL-2.0-only
-> -include ../../../../scripts/Kbuild.include
-> +
-> +TMPOUT = .tmp_$$$$
-> +
-> +try-run = $(shell set -e;		\
-> +	TMP=$(TMPOUT)/tmp;		\
-> +	mkdir -p $(TMPOUT);		\
-> +	trap "rm -rf $(TMPOUT)" EXIT;	\
-> +	if ($(1)) >/dev/null 2>&1;	\
-> +	then echo "$(2)";		\
-> +	else echo "$(3)";		\
-> +	fi)
->   
->   all:
->   
-> diff --git a/tools/testing/selftests/powerpc/pmu/ebb/Makefile b/tools/testing/selftests/powerpc/pmu/ebb/Makefile
-> index af3df79d8163..d5d3e869df93 100644
-> --- a/tools/testing/selftests/powerpc/pmu/ebb/Makefile
-> +++ b/tools/testing/selftests/powerpc/pmu/ebb/Makefile
-> @@ -1,5 +1,4 @@
->   # SPDX-License-Identifier: GPL-2.0
-> -include ../../../../../../scripts/Kbuild.include
->   
->   noarg:
->   	$(MAKE) -C ../../
-> @@ -8,6 +7,16 @@ noarg:
->   CFLAGS += -m64
->   
->   TMPOUT = $(OUTPUT)/TMPDIR/
-> +
-> +try-run = $(shell set -e;		\
-> +	TMP=$(TMPOUT)/tmp;		\
-> +	mkdir -p $(TMPOUT);		\
-> +	trap "rm -rf $(TMPOUT)" EXIT;	\
-> +	if ($(1)) >/dev/null 2>&1;	\
-> +	then echo "$(2)";		\
-> +	else echo "$(3)";		\
-> +	fi)
-> +
->   # Toolchains may build PIE by default which breaks the assembly
->   no-pie-option := $(call try-run, echo 'int main() { return 0; }' | \
->           $(CC) -Werror $(KBUILD_CPPFLAGS) $(CC_OPTION_CFLAGS) -no-pie -x c - -o "$$TMP", -no-pie)
-> diff --git a/tools/thermal/tmon/Makefile b/tools/thermal/tmon/Makefile
-> index 59e417ec3e13..92a683e4866c 100644
-> --- a/tools/thermal/tmon/Makefile
-> +++ b/tools/thermal/tmon/Makefile
-> @@ -1,6 +1,21 @@
->   # SPDX-License-Identifier: GPL-2.0
-> -# We need this for the "cc-option" macro.
-> -include ../../../scripts/Kbuild.include
-> +
-> +TMPOUT = .tmp_$$$$
-> +
-> +try-run = $(shell set -e;		\
-> +	TMP=$(TMPOUT)/tmp;		\
-> +	mkdir -p $(TMPOUT);		\
-> +	trap "rm -rf $(TMPOUT)" EXIT;	\
-> +	if ($(1)) >/dev/null 2>&1;	\
-> +	then echo "$(2)";		\
-> +	else echo "$(3)";		\
-> +	fi)
-> +
-> +__cc-option = $(call try-run,\
-> +	$(1) -Werror $(2) $(3) -c -x c /dev/null -o "$$TMP",$(3),$(4))
-> +
-> +cc-option = $(call __cc-option, $(CC),\
-> +	$(KBUILD_CPPFLAGS) $(KBUILD_CFLAGS),$(1),$(2))
->   
->   VERSION = 1.0
->   
-> 
+diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+index 2f09e9d7dc95..24ad447e648c 100644
+--- a/arch/s390/kvm/kvm-s390.c
++++ b/arch/s390/kvm/kvm-s390.c
+@@ -4307,16 +4307,16 @@ static void store_regs_fmt2(struct kvm_vcpu *vcpu)
+ 	kvm_run->s.regs.bpbc = (vcpu->arch.sie_block->fpf & FPF_BPBC) == FPF_BPBC;
+ 	kvm_run->s.regs.diag318 = vcpu->arch.diag318_info.val;
+ 	if (MACHINE_HAS_GS) {
++		preempt_disable();
+ 		__ctl_set_bit(2, 4);
+ 		if (vcpu->arch.gs_enabled)
+ 			save_gs_cb(current->thread.gs_cb);
+-		preempt_disable();
+ 		current->thread.gs_cb = vcpu->arch.host_gscb;
+ 		restore_gs_cb(vcpu->arch.host_gscb);
+-		preempt_enable();
+ 		if (!vcpu->arch.host_gscb)
+ 			__ctl_clear_bit(2, 4);
+ 		vcpu->arch.host_gscb = NULL;
++		preempt_enable();
+ 	}
+ 	/* SIE will save etoken directly into SDNX and therefore kvm_run */
+ }
+-- 
+2.25.1
 
