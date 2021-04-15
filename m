@@ -2,88 +2,86 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DEA7E360A2D
-	for <lists+kvm@lfdr.de>; Thu, 15 Apr 2021 15:09:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 93D2D360A57
+	for <lists+kvm@lfdr.de>; Thu, 15 Apr 2021 15:17:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233039AbhDONJ4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 15 Apr 2021 09:09:56 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:21927 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232844AbhDONJz (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 15 Apr 2021 09:09:55 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1618492172;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=9mFjqIW0FLUWlSw3xnD81019MFjYU02iqIypqRJLxc0=;
-        b=bCzI+CGgy8fTfMtUR1FB4tKycMMRymkb/Bdz/7nxbgGi/ZT3/MtEF7OGRa+RCDRGXAsc85
-        Z0/b6X6n+pw8UzwcflE8dHwNBitwS+MfhL1UDCNbgG0fM/VKOsfgUseKkEyab8hzVh7TKC
-        oZsUdCTlLBKi2/E9XV4xW2w5xaRUBcc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-188-QuVWWnFgOVi8jkICILP4SA-1; Thu, 15 Apr 2021 09:09:30 -0400
-X-MC-Unique: QuVWWnFgOVi8jkICILP4SA-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7FA14BBEE2;
-        Thu, 15 Apr 2021 13:09:29 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.40.192.57])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id A1AD610023B0;
-        Thu, 15 Apr 2021 13:09:23 +0000 (UTC)
-Date:   Thu, 15 Apr 2021 15:09:20 +0200
-From:   Andrew Jones <drjones@redhat.com>
-To:     Alexandru Elisei <alexandru.elisei@arm.com>
-Cc:     kvm@vger.kernel.org, nikos.nikoleris@arm.com,
-        andre.przywara@arm.com, eric.auger@redhat.com
-Subject: Re: [PATCH kvm-unit-tests 4/8] arm/arm64: mmu: Stop mapping an
- assumed IO region
-Message-ID: <20210415130920.cmxgcbyyrnbj7uie@kamzik.brq.redhat.com>
-References: <20210407185918.371983-1-drjones@redhat.com>
- <20210407185918.371983-5-drjones@redhat.com>
- <4f593d38-a462-aa00-2903-8a1f0c38a8e6@arm.com>
+        id S233088AbhDONRV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 15 Apr 2021 09:17:21 -0400
+Received: from foss.arm.com ([217.140.110.172]:45992 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S230202AbhDONRV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 15 Apr 2021 09:17:21 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id EE92311B3;
+        Thu, 15 Apr 2021 06:16:57 -0700 (PDT)
+Received: from monolith.localdoman (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 3B0E33F694;
+        Thu, 15 Apr 2021 06:16:57 -0700 (PDT)
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+To:     will@kernel.org, julien.thierry.kdev@gmail.com,
+        kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+Subject: [PATCH kvmtool] arm: Fail early if KVM_CAP_ARM_PMU_V3 is not supported
+Date:   Thu, 15 Apr 2021 14:17:25 +0100
+Message-Id: <20210415131725.105675-1-alexandru.elisei@arm.com>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <4f593d38-a462-aa00-2903-8a1f0c38a8e6@arm.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Apr 14, 2021 at 04:42:17PM +0100, Alexandru Elisei wrote:
-> On 4/7/21 7:59 PM, Andrew Jones wrote:
-> > +void mmu_set_persistent_maps(pgd_t *pgtable)
-> > +{
-> > +	struct mmu_persistent_map *map;
-> > +
-> > +	for (map = &mmu_persistent_maps[0]; map->phys_end; ++map) {
-> > +		if (map->sect)
-> > +			mmu_set_range_sect(pgtable, map->virt_offset,
-> > +					   map->phys_start, map->phys_end,
-> > +					   map->prot);
-> > +		else
-> > +			mmu_set_range_ptes(pgtable, map->virt_offset,
-> > +					   map->phys_start, map->phys_end,
-> > +					   map->prot);
-> > +	}
-> > +}
-> 
-> I assume the purpose of all of this machinery is to add mappings to idmap that
-> were created before setup_mmu(). Or are you planning to use it for something else?
-> 
-> Why not allocate the idmap in __ioremap (if it's NULL) and add entries to it in
-> that function? Then setup_mmu() can allocate the idmap only if it's NULL, and the
-> mappings added by __ioremap would still be there.
->
+pmu__generate_fdt_nodes() checks if the host has support for PMU in a guest
+and prints a warning if that's not the case. However, this check is too
+late because the function is called after the VCPU has been created, and
+VCPU creation fails if KVM_CAP_ARM_PMU_V3 is not available with a rather
+unhelpful error:
 
-Hi Alex,
+$ ./vm run -c1 -m64 -f selftest.flat --pmu
+  # lkvm run --firmware selftest.flat -m 64 -c 1 --name guest-1039
+  Info: Placing fdt at 0x80200000 - 0x80210000
+  Fatal: Unable to initialise vcpu
 
-I like your suggestion and will implement it that way for v2. If we ever
-do need these mappings for anything else, then we can revisit this,
-possibly stashing the mappings at the same time we add them to the idmap.
+Move the check for KVM_CAP_ARM_PMU_V3 to kvm_cpu__arch_init() before the
+VCPU is created so the user can get a more useful error message. This
+also matches the behaviour of KVM_CAP_ARM_EL1_32BIT.
 
-Thanks,
-drew
+Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+---
+ arm/kvm-cpu.c | 4 ++++
+ arm/pmu.c     | 5 -----
+ 2 files changed, 4 insertions(+), 5 deletions(-)
+
+diff --git a/arm/kvm-cpu.c b/arm/kvm-cpu.c
+index 2acecaecb696..6a2408c632df 100644
+--- a/arm/kvm-cpu.c
++++ b/arm/kvm-cpu.c
+@@ -50,6 +50,10 @@ struct kvm_cpu *kvm_cpu__arch_init(struct kvm *kvm, unsigned long cpu_id)
+ 	    !kvm__supports_extension(kvm, KVM_CAP_ARM_EL1_32BIT))
+ 		die("32bit guests are not supported\n");
+ 
++	if (kvm->cfg.arch.has_pmuv3 &&
++	    !kvm__supports_extension(kvm, KVM_CAP_ARM_PMU_V3))
++		die("PMUv3 is not supported");
++
+ 	vcpu = calloc(1, sizeof(struct kvm_cpu));
+ 	if (!vcpu)
+ 		return NULL;
+diff --git a/arm/pmu.c b/arm/pmu.c
+index ffd152e27447..5b058eabb49d 100644
+--- a/arm/pmu.c
++++ b/arm/pmu.c
+@@ -43,11 +43,6 @@ void pmu__generate_fdt_nodes(void *fdt, struct kvm *kvm)
+ 	if (!kvm->cfg.arch.has_pmuv3)
+ 		return;
+ 
+-	if (!kvm__supports_extension(kvm, KVM_CAP_ARM_PMU_V3)) {
+-		pr_info("PMU unsupported\n");
+-		return;
+-	}
+-
+ 	for (i = 0; i < kvm->nrcpus; i++) {
+ 		struct kvm_device_attr pmu_attr;
+ 
+-- 
+2.31.1
 
