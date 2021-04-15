@@ -2,194 +2,111 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F07B035FE0B
-	for <lists+kvm@lfdr.de>; Thu, 15 Apr 2021 00:50:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9B0A235FF12
+	for <lists+kvm@lfdr.de>; Thu, 15 Apr 2021 02:49:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233043AbhDNWvN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 14 Apr 2021 18:51:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59352 "EHLO
+        id S230087AbhDOAuM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 14 Apr 2021 20:50:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56738 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232789AbhDNWvN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 14 Apr 2021 18:51:13 -0400
-Received: from mail-io1-xd30.google.com (mail-io1-xd30.google.com [IPv6:2607:f8b0:4864:20::d30])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 31A35C061574
-        for <kvm@vger.kernel.org>; Wed, 14 Apr 2021 15:50:51 -0700 (PDT)
-Received: by mail-io1-xd30.google.com with SMTP id h141so13913136iof.2
-        for <kvm@vger.kernel.org>; Wed, 14 Apr 2021 15:50:51 -0700 (PDT)
+        with ESMTP id S229612AbhDOAuJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 14 Apr 2021 20:50:09 -0400
+Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D4B20C061574
+        for <kvm@vger.kernel.org>; Wed, 14 Apr 2021 17:49:46 -0700 (PDT)
+Received: by mail-pj1-x102c.google.com with SMTP id kb13-20020a17090ae7cdb02901503d67f0beso527223pjb.0
+        for <kvm@vger.kernel.org>; Wed, 14 Apr 2021 17:49:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=YMl0q4Qg+LLVVghVpz3Z75rPVp0f8dXQ4rlEwW2PnGY=;
-        b=MSWSM466xn2JwPKk40F9f0J0QSVWykebgtuupTAWaKe7xc8NFvydhhv6fEGlB5Emvr
-         phLpPjr4MxjPnc4/4xEZVaCAkH4/sqQRy9VUfOn3XRRVSV0EdVRFj7LM3yzEnVmoEzco
-         VB+RRIaYV445qO8LzejzorIh1Fu0YPD9vY+j/3K6ERPoRTL1oeKQMyjVxtrHSa+4jSTB
-         vtObrsewgGLlbFm+wpVp7XKo1zVtN/nt8tjom/92KZy6IUJLEvMUft9vfrJVwtyI7wWA
-         dlGDI93zZvW0SIdD2WNYcd/GMoGLc49tFP0WOyQe5irB5Oc75L074gPIUl0e4BQjVk24
-         HUww==
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=fOJI4hThVgEOLJyImgusGGiOxy9mpTSNJ/Mrm5n5Wk0=;
+        b=lEI57So+mLNKqR8MOcAK5p3MZw4vqrkk9etbelECfBcXuY5eDWQoby3QMZLzSfY8Ld
+         RvK2vdibjbtjGeqLJkWkmBpcWbieDeicodh6t61TVGzdFOeCO2Tfi3KhnWWSjua3I+7/
+         zjdNxm+qgvPvgZ9WsJ9ZUeZ5YYiuAJh6XbZ6tEsTahjj4Zht3bVEskNbzX1vDUHFjevH
+         xvzIDu3EKHqfEu4p4n1g3O6vhoUbUZUSS7b6TvAcCczNn3L241mIvi8mFqtGd8FZSgLw
+         Yy8ROdcJrDJ/TYNZnks+IkY99l1c7xmHX3Jt5yK9PVXmr+doXnNzkHsWhkATfYP4LBZn
+         OCgg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=YMl0q4Qg+LLVVghVpz3Z75rPVp0f8dXQ4rlEwW2PnGY=;
-        b=XGbGRV5UrmjgsPDGN3RWpaKkk5NVYTs1S1Hjah8v4zntMt6bEXpKpjALv9e9pi4g1F
-         D4NTgNzkWNGag5QallromUcsoICysBMycPQ4BZmFQUwxWDG3d7OKSOOO/AuMYdTnDxj6
-         giZdjcGPW9pWLfFEr9q1d1wtLDiltySHR4FCTDZ+55nWHZ88MWZbBN5pdzLtMdW376eR
-         cG+FuJ/wuOB3pFZgFMrQ6V0istdYVuM0bDQ20odfLpXjuI3UfZo/V9WWZGMa0sEZyBnx
-         tBdjILIMkyATQU1Otcw3eKb5pQqPFcCW3nLTYJGKSXgQVibDIxuiuhsw5yV1gcnTzl+r
-         uFsA==
-X-Gm-Message-State: AOAM533/g6Iol0hBhLHdtxn+Gviy2qgucSIJ4NYgQULGC96IdFT7bGv0
-        jlgHn/q7zFWvYtUURwfHUuRB6u0z6BM0L4BhjtyeR8Sm21kPZg==
-X-Google-Smtp-Source: ABdhPJxgaQGhRs1C/cFTlO12Ada6lPwWqpJPa3I/q2ak8K0Eq4Xr5SAYvJLaCBDcpyS9uy5RW9XvJXGaB5Cvzsq6VTE=
-X-Received: by 2002:a05:6638:3048:: with SMTP id u8mr203045jak.91.1618440650050;
- Wed, 14 Apr 2021 15:50:50 -0700 (PDT)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=fOJI4hThVgEOLJyImgusGGiOxy9mpTSNJ/Mrm5n5Wk0=;
+        b=cbGKkPJyhN1GRf6+QxjlNeTchJz1jf5hmuQE6Kq5ulLOeCJeO70QwxeANvMnVqsxTg
+         LBIAladwtUGckg4mcdFgKoU0Zr+c/PYf454qLj++AM+z41OuXT6EFi7zGHOQ0WFWDN4P
+         0JXCk5mQKODf2eYfUlGbbU/s1MiXZTD7pimlPXUzndzuelApbbpRviDq5I589fDahrb9
+         A2f36iaSeZS8DXeCnKzjQZL6FGaqgzPkA2KK9xhUDBN3nTMv8Yt2JxKUTiaZyeInKOK0
+         8LzaUYbKl/IxxKOekTATHL8ZPX+Go9HCm378HhU9JOHzt+U5xMfDMLXpaNwJtkXnuo4S
+         hfLw==
+X-Gm-Message-State: AOAM532utsjn02pMerQslWQYwz8vojMS18GlvWh5Mxyj4PIDH8jtCWxX
+        cb8wAvmnpcFINqHiAYFoBOp11s59kIVP/w==
+X-Google-Smtp-Source: ABdhPJxRBMrjNapa9s3nteduAiJXZXONsLdWBJOaAaq7bl/eTin1t4vjjR9fsQXFfqGsZoPswRvjvQ==
+X-Received: by 2002:a17:90a:fa0c:: with SMTP id cm12mr915481pjb.54.1618447785825;
+        Wed, 14 Apr 2021 17:49:45 -0700 (PDT)
+Received: from google.com (240.111.247.35.bc.googleusercontent.com. [35.247.111.240])
+        by smtp.gmail.com with ESMTPSA id z29sm589556pga.52.2021.04.14.17.49.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 14 Apr 2021 17:49:45 -0700 (PDT)
+Date:   Thu, 15 Apr 2021 00:49:41 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Wanpeng Li <kernellwp@gmail.com>
+Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Michael Tokarev <mjt@tls.msk.ru>
+Subject: Re: [PATCH v2 0/3] KVM: Properly account for guest CPU time
+Message-ID: <YHeNpUd1ZO1JVaAf@google.com>
+References: <1618298169-3831-1-git-send-email-wanpengli@tencent.com>
+ <YHXUFJuLXY8VZw3B@google.com>
+ <CANRm+CzDW_5SPM0131OvRn3UPBp1nahxCykCP61XWeUpYeHU5Q@mail.gmail.com>
 MIME-Version: 1.0
-References: <20210412065246.1853-1-jiangyifei@huawei.com> <20210412065246.1853-8-jiangyifei@huawei.com>
-In-Reply-To: <20210412065246.1853-8-jiangyifei@huawei.com>
-From:   Alistair Francis <alistair23@gmail.com>
-Date:   Thu, 15 Apr 2021 08:50:23 +1000
-Message-ID: <CAKmqyKNzyftUr0yTJ1TOENo_p3S_nO9peQRpdu=1Zbm70zncdQ@mail.gmail.com>
-Subject: Re: [PATCH RFC v5 07/12] hw/riscv: PLIC update external interrupt by
- KVM when kvm enabled
-To:     Yifei Jiang <jiangyifei@huawei.com>
-Cc:     "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
-        "open list:RISC-V" <qemu-riscv@nongnu.org>,
-        Bin Meng <bin.meng@windriver.com>,
-        Sagar Karandikar <sagark@eecs.berkeley.edu>,
-        "open list:Overall" <kvm@vger.kernel.org>, libvir-list@redhat.com,
-        Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
-        Anup Patel <anup.patel@wdc.com>,
-        yinyipeng <yinyipeng1@huawei.com>,
-        Alistair Francis <Alistair.Francis@wdc.com>,
-        kvm-riscv@lists.infradead.org, Palmer Dabbelt <palmer@dabbelt.com>,
-        fanliang@huawei.com, "Wubin (H)" <wu.wubin@huawei.com>,
-        Zhanghailiang <zhang.zhanghailiang@huawei.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CANRm+CzDW_5SPM0131OvRn3UPBp1nahxCykCP61XWeUpYeHU5Q@mail.gmail.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Apr 12, 2021 at 4:57 PM Yifei Jiang <jiangyifei@huawei.com> wrote:
->
-> Only support supervisor external interrupt currently.
->
-> Signed-off-by: Yifei Jiang <jiangyifei@huawei.com>
-> Signed-off-by: Yipeng Yin <yinyipeng1@huawei.com>
+On Wed, Apr 14, 2021, Wanpeng Li wrote:
+> On Wed, 14 Apr 2021 at 01:25, Sean Christopherson <seanjc@google.com> wrote:
+> >
+> > On Tue, Apr 13, 2021, Wanpeng Li wrote:
+> > > The bugzilla https://bugzilla.kernel.org/show_bug.cgi?id=209831
+> > > reported that the guest time remains 0 when running a while true
+> > > loop in the guest.
+> > >
+> > > The commit 87fa7f3e98a131 ("x86/kvm: Move context tracking where it
+> > > belongs") moves guest_exit_irqoff() close to vmexit breaks the
+> > > tick-based time accouting when the ticks that happen after IRQs are
+> > > disabled are incorrectly accounted to the host/system time. This is
+> > > because we exit the guest state too early.
+> > >
+> > > This patchset splits both context tracking logic and the time accounting
+> > > logic from guest_enter/exit_irqoff(), keep context tracking around the
+> > > actual vmentry/exit code, have the virt time specific helpers which
+> > > can be placed at the proper spots in kvm. In addition, it will not
+> > > break the world outside of x86.
+> >
+> > IMO, this is going in the wrong direction.  Rather than separate context tracking,
+> > vtime accounting, and KVM logic, this further intertwines the three.  E.g. the
+> > context tracking code has even more vtime accounting NATIVE vs. GEN vs. TICK
+> > logic baked into it.
+> >
+> > Rather than smush everything into context_tracking.h, I think we can cleanly
+> > split the context tracking and vtime accounting code into separate pieces, which
+> > will in turn allow moving the wrapping logic to linux/kvm_host.h.  Once that is
+> > done, splitting the context tracking and time accounting logic for KVM x86
+> > becomes a KVM detail as opposed to requiring dedicated logic in the context
+> > tracking code.
+> >
+> > I have untested code that compiles on x86, I'll send an RFC shortly.
+> 
+> We need an easy to backport fix and then we might have some further
+> cleanups on top.
 
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-
-Alistair
-
-> ---
->  hw/intc/sifive_plic.c    | 29 ++++++++++++++++++++---------
->  target/riscv/kvm-stub.c  |  5 +++++
->  target/riscv/kvm.c       | 20 ++++++++++++++++++++
->  target/riscv/kvm_riscv.h |  1 +
->  4 files changed, 46 insertions(+), 9 deletions(-)
->
-> diff --git a/hw/intc/sifive_plic.c b/hw/intc/sifive_plic.c
-> index 97a1a27a9a..2746eb7a05 100644
-> --- a/hw/intc/sifive_plic.c
-> +++ b/hw/intc/sifive_plic.c
-> @@ -31,6 +31,8 @@
->  #include "target/riscv/cpu.h"
->  #include "sysemu/sysemu.h"
->  #include "migration/vmstate.h"
-> +#include "sysemu/kvm.h"
-> +#include "kvm_riscv.h"
->
->  #define RISCV_DEBUG_PLIC 0
->
-> @@ -147,15 +149,24 @@ static void sifive_plic_update(SiFivePLICState *plic)
->              continue;
->          }
->          int level = sifive_plic_irqs_pending(plic, addrid);
-> -        switch (mode) {
-> -        case PLICMode_M:
-> -            riscv_cpu_update_mip(RISCV_CPU(cpu), MIP_MEIP, BOOL_TO_MASK(level));
-> -            break;
-> -        case PLICMode_S:
-> -            riscv_cpu_update_mip(RISCV_CPU(cpu), MIP_SEIP, BOOL_TO_MASK(level));
-> -            break;
-> -        default:
-> -            break;
-> +        if (kvm_enabled()) {
-> +            if (mode == PLICMode_M) {
-> +                continue;
-> +            }
-> +            kvm_riscv_set_irq(RISCV_CPU(cpu), IRQ_S_EXT, level);
-> +        } else {
-> +            switch (mode) {
-> +            case PLICMode_M:
-> +                riscv_cpu_update_mip(RISCV_CPU(cpu),
-> +                                     MIP_MEIP, BOOL_TO_MASK(level));
-> +                break;
-> +            case PLICMode_S:
-> +                riscv_cpu_update_mip(RISCV_CPU(cpu),
-> +                                     MIP_SEIP, BOOL_TO_MASK(level));
-> +                break;
-> +            default:
-> +                break;
-> +            }
->          }
->      }
->
-> diff --git a/target/riscv/kvm-stub.c b/target/riscv/kvm-stub.c
-> index 39b96fe3f4..4e8fc31a21 100644
-> --- a/target/riscv/kvm-stub.c
-> +++ b/target/riscv/kvm-stub.c
-> @@ -23,3 +23,8 @@ void kvm_riscv_reset_vcpu(RISCVCPU *cpu)
->  {
->      abort();
->  }
-> +
-> +void kvm_riscv_set_irq(RISCVCPU *cpu, int irq, int level)
-> +{
-> +    abort();
-> +}
-> diff --git a/target/riscv/kvm.c b/target/riscv/kvm.c
-> index 79c931acb4..da63535812 100644
-> --- a/target/riscv/kvm.c
-> +++ b/target/riscv/kvm.c
-> @@ -453,6 +453,26 @@ void kvm_riscv_reset_vcpu(RISCVCPU *cpu)
->      env->gpr[11] = cpu->env.fdt_addr;          /* a1 */
->  }
->
-> +void kvm_riscv_set_irq(RISCVCPU *cpu, int irq, int level)
-> +{
-> +    int ret;
-> +    unsigned virq = level ? KVM_INTERRUPT_SET : KVM_INTERRUPT_UNSET;
-> +
-> +    if (irq != IRQ_S_EXT) {
-> +        return;
-> +    }
-> +
-> +    if (!kvm_enabled()) {
-> +        return;
-> +    }
-> +
-> +    ret = kvm_vcpu_ioctl(CPU(cpu), KVM_INTERRUPT, &virq);
-> +    if (ret < 0) {
-> +        perror("Set irq failed");
-> +        abort();
-> +    }
-> +}
-> +
->  bool kvm_arch_cpu_check_are_resettable(void)
->  {
->      return true;
-> diff --git a/target/riscv/kvm_riscv.h b/target/riscv/kvm_riscv.h
-> index f38c82bf59..ed281bdce0 100644
-> --- a/target/riscv/kvm_riscv.h
-> +++ b/target/riscv/kvm_riscv.h
-> @@ -20,5 +20,6 @@
->  #define QEMU_KVM_RISCV_H
->
->  void kvm_riscv_reset_vcpu(RISCVCPU *cpu);
-> +void kvm_riscv_set_irq(RISCVCPU *cpu, int irq, int level);
->
->  #endif
-> --
-> 2.19.1
->
->
+I fiddled with this a bit today, I think I have something workable that will be
+a relatively clean and short backport.  With luck, I'll get it posted tomorrow.
