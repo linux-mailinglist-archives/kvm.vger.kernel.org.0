@@ -2,79 +2,116 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A7F91360523
-	for <lists+kvm@lfdr.de>; Thu, 15 Apr 2021 11:01:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A630F360538
+	for <lists+kvm@lfdr.de>; Thu, 15 Apr 2021 11:05:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231771AbhDOJCK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 15 Apr 2021 05:02:10 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:35142 "EHLO
+        id S232040AbhDOJFm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 15 Apr 2021 05:05:42 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:35004 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231534AbhDOJCJ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 15 Apr 2021 05:02:09 -0400
+        by vger.kernel.org with ESMTP id S231919AbhDOJFm (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 15 Apr 2021 05:05:42 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1618477306;
+        s=mimecast20190719; t=1618477519;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=OmprK/s2yXLK9tg/KIh5Kw+EZoIvomLpdnmrP8qdZsg=;
-        b=BHO6i8QVL6IXA/A0F1J4orj8+tWqwx4Bhg9P1tOIr9u93+/xg22ysANnLRLyMs4qLOLGpw
-        dVYjSe8yVahac3BPxsdmccWjQhMhAAY4YbZFDrQn5MymievqeJ97FPJULG9kTGH5vrD3J1
-        tvjyLTgNUf7/zARIwG4EppGPxltGm10=
+        bh=OzvjiFIzYZkBsqCDMlTdrOnRQkd+YTOFRqgYIvls9tY=;
+        b=KJLelLHCsM/7Cp96yw2TetMpvkA2qwR23oq8xIKdIyH89GwiU9d8HXnvbElosOaEwBP31m
+        4I2+Rw66awhW7eSmzA4NmikBY8D+pfpUqIRCKLGXL5OMI7OrWVZA6MtDvIjSNQpTCDPpdg
+        NBClF1Wj9YjajG0fpPaO8klTn2ULhSg=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-23-yV-e3MiMNAyRdES6OBB4Zg-1; Thu, 15 Apr 2021 05:01:44 -0400
-X-MC-Unique: yV-e3MiMNAyRdES6OBB4Zg-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+ us-mta-234-3fh0e0aYPsqfmelJdH-0Dw-1; Thu, 15 Apr 2021 05:05:16 -0400
+X-MC-Unique: 3fh0e0aYPsqfmelJdH-0Dw-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 49A5A1898284;
-        Thu, 15 Apr 2021 09:01:43 +0000 (UTC)
-Received: from gondolin (ovpn-113-158.ams2.redhat.com [10.36.113.158])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 7A4107086C;
-        Thu, 15 Apr 2021 09:01:37 +0000 (UTC)
-Date:   Thu, 15 Apr 2021 11:01:34 +0200
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Heiko Carstens <hca@linux.ibm.com>
-Cc:     Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.vnet.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org
-Subject: Re: [PATCH] KVM: s390: fix guarded storage control register
- handling
-Message-ID: <20210415110134.46136db2.cohuck@redhat.com>
-In-Reply-To: <20210415080127.1061275-1-hca@linux.ibm.com>
-References: <20210415080127.1061275-1-hca@linux.ibm.com>
-Organization: Red Hat GmbH
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C3B056D59B;
+        Thu, 15 Apr 2021 09:05:13 +0000 (UTC)
+Received: from wangxiaodeMacBook-Air.local (ovpn-12-61.pek2.redhat.com [10.72.12.61])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id DEDAE610FE;
+        Thu, 15 Apr 2021 09:04:59 +0000 (UTC)
+Subject: Re: [PATCH v6 10/10] Documentation: Add documentation for VDUSE
+From:   Jason Wang <jasowang@redhat.com>
+To:     Stefan Hajnoczi <stefanha@redhat.com>,
+        Yongji Xie <xieyongji@bytedance.com>
+Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        Parav Pandit <parav@nvidia.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Christian Brauner <christian.brauner@canonical.com>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Matthew Wilcox <willy@infradead.org>, viro@zeniv.linux.org.uk,
+        Jens Axboe <axboe@kernel.dk>, bcrl@kvack.org,
+        Jonathan Corbet <corbet@lwn.net>,
+        =?UTF-8?Q?Mika_Penttil=c3=a4?= <mika.penttila@nextfour.com>,
+        Dan Carpenter <dan.carpenter@oracle.com>,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        kvm@vger.kernel.org, linux-fsdevel@vger.kernel.org
+References: <20210331080519.172-1-xieyongji@bytedance.com>
+ <20210331080519.172-11-xieyongji@bytedance.com>
+ <YHb44R4HyLEUVSTF@stefanha-x1.localdomain>
+ <CACycT3uNR+nZY5gY0UhPkeOyi7Za6XkX4b=hasuDcgqdc7fqfg@mail.gmail.com>
+ <YHfo8pc7dIO9lNc3@stefanha-x1.localdomain>
+ <80b31814-9e41-3153-7efb-c0c2fab44feb@redhat.com>
+Message-ID: <02c19c22-13ea-ea97-d99b-71edfee0b703@redhat.com>
+Date:   Thu, 15 Apr 2021 17:04:58 +0800
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
+ Gecko/20100101 Thunderbird/78.9.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+In-Reply-To: <80b31814-9e41-3153-7efb-c0c2fab44feb@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 15 Apr 2021 10:01:27 +0200
-Heiko Carstens <hca@linux.ibm.com> wrote:
 
-> store_regs_fmt2() has an ordering problem: first the guarded storage
-> facility is enabled on the local cpu, then preemption disabled, and
-> then the STGSC (store guarded storage controls) instruction is
-> executed.
-> 
-> If the process gets scheduled away between enabling the guarded
-> storage facility and before preemption is disabled, this might lead to
-> a special operation exception and therefore kernel crash as soon as
-> the process is scheduled back and the STGSC instruction is executed.
-> 
-> Fixes: 4e0b1ab72b8a ("KVM: s390: gs support for kvm guests")
-> Cc: <stable@vger.kernel.org> # 4.12
-> Reviewed-by: Christian Borntraeger <borntraeger@de.ibm.com>
-> Signed-off-by: Heiko Carstens <hca@linux.ibm.com>
-> ---
->  arch/s390/kvm/kvm-s390.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+在 2021/4/15 下午4:36, Jason Wang 写道:
+>>>
+>> Please state this explicitly at the start of the document. Existing
+>> interfaces like FUSE are designed to avoid trusting userspace.
+>
+>
+> There're some subtle difference here. VDUSE present a device to kernel 
+> which means IOMMU is probably the only thing to prevent a malicous 
+> device.
+>
+>
+>> Therefore
+>> people might think the same is the case here. It's critical that people
+>> are aware of this before deploying VDUSE with virtio-vdpa.
+>>
+>> We should probably pause here and think about whether it's possible to
+>> avoid trusting userspace. Even if it takes some effort and costs some
+>> performance it would probably be worthwhile.
+>
+>
+> Since the bounce buffer is used the only attack surface is the 
+> coherent area, if we want to enforce stronger isolation we need to use 
+> shadow virtqueue (which is proposed in earlier version by me) in this 
+> case. But I'm not sure it's worth to do that.
 
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+
+
+So this reminds me the discussion in the end of last year. We need to 
+make sure we don't suffer from the same issues for VDUSE at least
+
+https://yhbt.net/lore/all/c3629a27-3590-1d9f-211b-c0b7be152b32@redhat.com/T/#mc6b6e2343cbeffca68ca7a97e0f473aaa871c95b
+
+Or we can solve it at virtio level, e.g remember the dma address instead 
+of depending on the addr in the descriptor ring
+
+Thanks
+
+
+>
+>
+>>
+>> Is the security situation different with vhost-vdpa? In that case it
+>> seems more likely that the host kernel doesn't need to trust the
+>> userspace VDUSE device.
 
