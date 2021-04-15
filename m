@@ -2,123 +2,345 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 539AC360815
-	for <lists+kvm@lfdr.de>; Thu, 15 Apr 2021 13:17:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B2690360838
+	for <lists+kvm@lfdr.de>; Thu, 15 Apr 2021 13:26:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232641AbhDOLRo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 15 Apr 2021 07:17:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52598 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230202AbhDOLRn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 15 Apr 2021 07:17:43 -0400
-Received: from mail-ej1-x62d.google.com (mail-ej1-x62d.google.com [IPv6:2a00:1450:4864:20::62d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D5023C06175F
-        for <kvm@vger.kernel.org>; Thu, 15 Apr 2021 04:17:20 -0700 (PDT)
-Received: by mail-ej1-x62d.google.com with SMTP id r9so36273698ejj.3
-        for <kvm@vger.kernel.org>; Thu, 15 Apr 2021 04:17:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance-com.20150623.gappssmtp.com; s=20150623;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=F2DnwbhM0K3eDbNV4OV/TxWIHc5j6rhfh7F0juu/TCM=;
-        b=AcT1wLlEsw/hLOv9QVCK3pqYeHDLF0S+eaz51VVr8uYsXgRZeLZ8SX14FP/ssoFxXE
-         R6WOrfa9wrzY/RDAiVI0Y7MTMehK81Ip1mxpyCwCO8ainJ4eo5vhUKUFAJGr/r//8Ucv
-         uXcxtATK1evfslAqNE6cVpB533Rjx8jCplNXy5Fjlr/izCvWUUg9Nn0zB8bLmqdxWsOI
-         yrUrsn1f9MY9c+lSCyv4m7uC3QRbsMlFqIu6BkNreQCZ7g/b7oHkU+qKKAPQlCAvz+5Q
-         5J0MKHcBO86FfvBHtIqdT+lQSrFMUVPWqMO1WIMajZNbE3+mXiPRg5X8/oP0wfek+1uB
-         WlSA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=F2DnwbhM0K3eDbNV4OV/TxWIHc5j6rhfh7F0juu/TCM=;
-        b=C+9/yfP7N21CAyVpHOgTBTStZC/jNnqEB5Wo+V6eMvKQqe1ecQtV1UbiHG/hTCcViH
-         Hu55iFE2C3//pJ8QkvC/wSSGlZnNti1LySIqUEsd50iaARvMvtCdlgyRlTAwJ/1z+HC1
-         /Hdb+Nsdmq80jntlPAZQGB0SjHY6v3sf58b5QmKY+XAfhiCt7ZoJ8KBWDjJcjy8ZcYZu
-         c4OQS4ogTMyH1LhFCzFuRw7dPZos9BN1xzxVmdU5dpYTy6kUWk0R/WB452jdMJC+Yolk
-         O8Ko8uLLoAxA8/d9rplPbRs9rPv5ck6e936ryd4q3T9qvivSShfcgRcpIOhmMFiH4cC3
-         GPvQ==
-X-Gm-Message-State: AOAM533UD7ezPKCTEfmadt5NeYbkfhVygalz7axt0s1jt3yIdf45Gy3S
-        WBgA0QXXR4kZXYaPU03j0aQEe4YnaXPhb4CF40E/
-X-Google-Smtp-Source: ABdhPJxIpQXfXBo/LLGFCyadIaJENXp32QQMzwuSrfXBhX4qR+8lwIcRxRI0FBc6gO1lL3MVnpwlBAcZljWAliGUbS8=
-X-Received: by 2002:a17:906:2a16:: with SMTP id j22mr2886917eje.247.1618485439307;
- Thu, 15 Apr 2021 04:17:19 -0700 (PDT)
+        id S232439AbhDOL06 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 15 Apr 2021 07:26:58 -0400
+Received: from szxga04-in.huawei.com ([45.249.212.190]:15686 "EHLO
+        szxga04-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230056AbhDOL06 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 15 Apr 2021 07:26:58 -0400
+Received: from DGGEMS413-HUB.china.huawei.com (unknown [172.30.72.58])
+        by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4FLcRG2bBjzpYQT;
+        Thu, 15 Apr 2021 19:23:38 +0800 (CST)
+Received: from [10.174.187.224] (10.174.187.224) by
+ DGGEMS413-HUB.china.huawei.com (10.3.19.213) with Microsoft SMTP Server id
+ 14.3.498.0; Thu, 15 Apr 2021 19:26:26 +0800
+Subject: Re: [PATCH v3 2/2] kvm/arm64: Try stage2 block mapping for host
+ device MMIO
+To:     Marc Zyngier <maz@kernel.org>
+References: <20210414065109.8616-1-zhukeqian1@huawei.com>
+ <20210414065109.8616-3-zhukeqian1@huawei.com> <87pmyxme2m.wl-maz@kernel.org>
+ <b434317f-ef6d-1d91-0189-8343c404c88c@huawei.com>
+ <87im4nn8wf.wl-maz@kernel.org>
+CC:     <linux-kernel@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>, <kvm@vger.kernel.org>,
+        <kvmarm@lists.cs.columbia.edu>, <wanghaibin.wang@huawei.com>,
+        Santosh Shukla <sashukla@nvidia.com>
+From:   Keqian Zhu <zhukeqian1@huawei.com>
+Message-ID: <7b5789fb-920d-e797-ba7a-49780bd3d587@huawei.com>
+Date:   Thu, 15 Apr 2021 19:26:26 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
+ Thunderbird/45.7.1
 MIME-Version: 1.0
-References: <20210331080519.172-1-xieyongji@bytedance.com> <20210331080519.172-11-xieyongji@bytedance.com>
- <YHb44R4HyLEUVSTF@stefanha-x1.localdomain> <CACycT3uNR+nZY5gY0UhPkeOyi7Za6XkX4b=hasuDcgqdc7fqfg@mail.gmail.com>
- <YHfo8pc7dIO9lNc3@stefanha-x1.localdomain> <80b31814-9e41-3153-7efb-c0c2fab44feb@redhat.com>
- <02c19c22-13ea-ea97-d99b-71edfee0b703@redhat.com>
-In-Reply-To: <02c19c22-13ea-ea97-d99b-71edfee0b703@redhat.com>
-From:   Yongji Xie <xieyongji@bytedance.com>
-Date:   Thu, 15 Apr 2021 19:17:08 +0800
-Message-ID: <CACycT3tL7URz3n-KhMAwYH+Sn1e1TSyfU+RKcc8jpPDJ7WcZ2w@mail.gmail.com>
-Subject: Re: Re: [PATCH v6 10/10] Documentation: Add documentation for VDUSE
-To:     Jason Wang <jasowang@redhat.com>
-Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        Parav Pandit <parav@nvidia.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Christian Brauner <christian.brauner@canonical.com>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Matthew Wilcox <willy@infradead.org>, viro@zeniv.linux.org.uk,
-        Jens Axboe <axboe@kernel.dk>, bcrl@kvack.org,
-        Jonathan Corbet <corbet@lwn.net>,
-        =?UTF-8?Q?Mika_Penttil=C3=A4?= <mika.penttila@nextfour.com>,
-        Dan Carpenter <dan.carpenter@oracle.com>,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        kvm@vger.kernel.org, linux-fsdevel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <87im4nn8wf.wl-maz@kernel.org>
+Content-Type: text/plain; charset="windows-1252"
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.174.187.224]
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Apr 15, 2021 at 5:05 PM Jason Wang <jasowang@redhat.com> wrote:
->
->
-> =E5=9C=A8 2021/4/15 =E4=B8=8B=E5=8D=884:36, Jason Wang =E5=86=99=E9=81=93=
-:
-> >>>
-> >> Please state this explicitly at the start of the document. Existing
-> >> interfaces like FUSE are designed to avoid trusting userspace.
-> >
-> >
-> > There're some subtle difference here. VDUSE present a device to kernel
-> > which means IOMMU is probably the only thing to prevent a malicous
-> > device.
-> >
-> >
-> >> Therefore
-> >> people might think the same is the case here. It's critical that peopl=
-e
-> >> are aware of this before deploying VDUSE with virtio-vdpa.
-> >>
-> >> We should probably pause here and think about whether it's possible to
-> >> avoid trusting userspace. Even if it takes some effort and costs some
-> >> performance it would probably be worthwhile.
-> >
-> >
-> > Since the bounce buffer is used the only attack surface is the
-> > coherent area, if we want to enforce stronger isolation we need to use
-> > shadow virtqueue (which is proposed in earlier version by me) in this
-> > case. But I'm not sure it's worth to do that.
->
->
->
-> So this reminds me the discussion in the end of last year. We need to
-> make sure we don't suffer from the same issues for VDUSE at least
->
-> https://yhbt.net/lore/all/c3629a27-3590-1d9f-211b-c0b7be152b32@redhat.com=
-/T/#mc6b6e2343cbeffca68ca7a97e0f473aaa871c95b
->
-> Or we can solve it at virtio level, e.g remember the dma address instead
-> of depending on the addr in the descriptor ring
->
+Hi Marc,
 
-I might miss something. But VDUSE has recorded the dma address during
-dma mapping, so we would not do bouncing if the addr/length is invalid
-during dma unmapping. Is it enough?
+On 2021/4/15 18:23, Marc Zyngier wrote:
+> On Thu, 15 Apr 2021 03:20:52 +0100,
+> Keqian Zhu <zhukeqian1@huawei.com> wrote:
+>>
+>> Hi Marc,
+>>
+>> On 2021/4/14 17:05, Marc Zyngier wrote:
+>>> + Santosh, who found some interesting bugs in that area before.
+>>>
+>>> On Wed, 14 Apr 2021 07:51:09 +0100,
+>>> Keqian Zhu <zhukeqian1@huawei.com> wrote:
+>>>>
+>>>> The MMIO region of a device maybe huge (GB level), try to use
+>>>> block mapping in stage2 to speedup both map and unmap.
+>>>>
+>>>> Compared to normal memory mapping, we should consider two more
+>>>> points when try block mapping for MMIO region:
+>>>>
+>>>> 1. For normal memory mapping, the PA(host physical address) and
+>>>> HVA have same alignment within PUD_SIZE or PMD_SIZE when we use
+>>>> the HVA to request hugepage, so we don't need to consider PA
+>>>> alignment when verifing block mapping. But for device memory
+>>>> mapping, the PA and HVA may have different alignment.
+>>>>
+>>>> 2. For normal memory mapping, we are sure hugepage size properly
+>>>> fit into vma, so we don't check whether the mapping size exceeds
+>>>> the boundary of vma. But for device memory mapping, we should pay
+>>>> attention to this.
+>>>>
+>>>> This adds device_rough_page_shift() to check these two points when
+>>>> selecting block mapping size.
+>>>>
+>>>> Signed-off-by: Keqian Zhu <zhukeqian1@huawei.com>
+>>>> ---
+>>>>  arch/arm64/kvm/mmu.c | 37 +++++++++++++++++++++++++++++++++----
+>>>>  1 file changed, 33 insertions(+), 4 deletions(-)
+>>>>
+>>>> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+>>>> index c59af5ca01b0..1a6d96169d60 100644
+>>>> --- a/arch/arm64/kvm/mmu.c
+>>>> +++ b/arch/arm64/kvm/mmu.c
+>>>> @@ -624,6 +624,31 @@ static void kvm_send_hwpoison_signal(unsigned long address, short lsb)
+>>>>  	send_sig_mceerr(BUS_MCEERR_AR, (void __user *)address, lsb, current);
+>>>>  }
+>>>>  
+>>>> +/*
+>>>> + * Find a max mapping size that properly insides the vma. And hva and pa must
+>>>> + * have the same alignment to this mapping size. It's rough as there are still
+>>>> + * other restrictions, will be checked by fault_supports_stage2_huge_mapping().
+>>>> + */
+>>>> +static short device_rough_page_shift(struct vm_area_struct *vma,
+>>>> +				     unsigned long hva)
+>>>
+>>> My earlier question still stands. Under which circumstances would this
+>>> function return something that is *not* the final mapping size? I
+>>> really don't see a reason why this would not return the final mapping
+>>> size.
+>>
+>> IIUC, all the restrictions are about alignment and area boundary.
+>>
+>> That's to say, HVA, IPA and PA must have same alignment within the
+>> mapping size.  And the areas are memslot and vma, which means the
+>> mapping size must properly fit into the memslot and vma.
+>>
+>> In this function, we just checked the alignment of HVA and PA, and
+>> the boundary of vma.  So we still need to check the alignment of HVA
+>> and IPA, and the boundary of memslot.  These will be checked by
+>> fault_supports_stage2_huge_mapping().
+> 
+> But that's no different from what we do with normal memory, is it? So
+> it really feels like we should have *one* function that deals with
+> establishing the basic mapping size from the VMA (see below for what I
+> have in mind).
+Right. And it looks better.
+
+> 
+>>
+>>>
+>>>> +{
+>>>> +	phys_addr_t pa = (vma->vm_pgoff << PAGE_SHIFT) + (hva - vma->vm_start);
+>>>> +
+>>>> +#ifndef __PAGETABLE_PMD_FOLDED
+>>>> +	if ((hva & (PUD_SIZE - 1)) == (pa & (PUD_SIZE - 1)) &&
+>>>> +	    ALIGN_DOWN(hva, PUD_SIZE) >= vma->vm_start &&
+>>>> +	    ALIGN(hva, PUD_SIZE) <= vma->vm_end)
+>>>> +		return PUD_SHIFT;
+>>>> +#endif
+>>>> +
+>>>> +	if ((hva & (PMD_SIZE - 1)) == (pa & (PMD_SIZE - 1)) &&
+>>>> +	    ALIGN_DOWN(hva, PMD_SIZE) >= vma->vm_start &&
+>>>> +	    ALIGN(hva, PMD_SIZE) <= vma->vm_end)
+>>>> +		return PMD_SHIFT;
+>>>> +
+>>>> +	return PAGE_SHIFT;
+>>>> +}
+>>>> +
+>>>>  static bool fault_supports_stage2_huge_mapping(struct kvm_memory_slot *memslot,
+>>>>  					       unsigned long hva,
+>>>>  					       unsigned long map_size)
+>>>> @@ -769,7 +794,10 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>>>>  		return -EFAULT;
+>>>>  	}
+>>>>  
+>>>> -	/* Let's check if we will get back a huge page backed by hugetlbfs */
+>>>> +	/*
+>>>> +	 * Let's check if we will get back a huge page backed by hugetlbfs, or
+>>>> +	 * get block mapping for device MMIO region.
+>>>> +	 */
+>>>>  	mmap_read_lock(current->mm);
+>>>>  	vma = find_vma_intersection(current->mm, hva, hva + 1);
+>>>>  	if (unlikely(!vma)) {
+>>>> @@ -780,11 +808,12 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>>>>  
+>>>>  	if (is_vm_hugetlb_page(vma))
+>>>>  		vma_shift = huge_page_shift(hstate_vma(vma));
+>>>> +	else if (vma->vm_flags & VM_PFNMAP)
+>>>> +		vma_shift = device_rough_page_shift(vma, hva);
+>>>
+>>> What prevents a VMA from having both VM_HUGETLB and VM_PFNMAP? This is
+>>> pretty unlikely, but I'd like to see this case catered for.
+>>>
+>> I'm not sure whether VM_HUGETLB and VM_PFNMAP are compatible, and I
+>> failed to find a case.
+>>
+>> VM_PFNMAP is used for page-ranges managed without "struct page",
+>> just pure PFN.  IIUC, VM_HUGETLB is used for hugetlbfs, which always
+>> has "struct page".  So I think they should not be compatible,
+>> otherwise it's a bug of driver.
+> 
+> For now, maybe. But huge mappings of PFN could land at some point, and
+> it'd be hard to catch. I think this case deserves a VM_BUG_ON().
+OK.
+
+> 
+>>
+>>>>  	else
+>>>>  		vma_shift = PAGE_SHIFT;
+>>>>  
+>>>> -	if (logging_active ||
+>>>> -	    (vma->vm_flags & VM_PFNMAP)) {
+>>>> +	if (logging_active) {
+> 
+> BTW, don't you introduce a bug here? Logging shouldn't affect device
+> mappings.
+I think it's not a bug, because for memlsot with VM_PFNMAP, the logging_active is always false.
+
+In kvm_arch_prepare_memory_region(), we make sure KVM_MEM_LOG_DIRTY_PAGES can't be set for a VM_PFNMAP memslot.
+Then in __kvm_set_memory_region(), we're sure dirty_bitmap is not allocated for this memslot.
+Then memslot_is_logging() will return false for this memslot.
+
+> 
+> 
+>>>>  		force_pte = true;
+>>>>  		vma_shift = PAGE_SHIFT;
+>>>>  	}
+>>>> @@ -855,7 +884,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>>>>  
+>>>>  	if (kvm_is_device_pfn(pfn)) {
+>>>>  		device = true;
+>>>> -		force_pte = true;
+>>>> +		force_pte = (vma_pagesize == PAGE_SIZE);
+>>>
+>>> Why do we need to set force_pte if we are already dealing with
+>>> PAGE_SIZE? I guess you are doing this for the sake of avoiding the
+>>> call to transparent_hugepage_adjust(), right?
+>> Yes.
+>>
+>>>
+>>> I'd rather you simply don't try to upgrade a device mapping by
+>>> explicitly checking for this and keep force_pte for *memory*
+>>> exclusively.
+>> Agree, that's better.
+>>
+>>>
+>>> Santosh, can you please take a look at this series and try to see if
+>>> the problem you fixed in [1] (which ended up as commit 91a2c34b7d6f)
+>>> is still OK with this series?
+>> I searched the initial version[*], VM_PFNMAP is set when we call
+>> gfn_to_pfn_prot()->vma_mmio_fault()->remap_pfn_range().  Then the
+>> check of VM_PFNMAP in user_mem_abort() failed, so we will try to
+>> call transparent_hugepage_adjust() for device pfn.
+>>
+>> In that case, our logic of trying block mapping for MMIO is not
+>> used. And we still set force_pte for device pfn, so this bugfix is
+>> not affected. Santosh, do you agree that?
+> 
+> But isn't what we just agreed to get rid of just above?
+Yes, I agree to get rid of force_pte for device. I'm sure your code
+doesn't break the bugfix.
+
+> 
+>>
+>> I still found that the reason vfio_pci does not have this
+>> bug. vfio_pci set VM_PFNMAP for vma when userspace calls mmap().  I
+>> will apply this logic for vfio_mdev too, let's see what vfio
+>> maintainer think about it.
+> 
+> I think that'd be good to see what Alex thinks about it...
+> 
+> Here's the changes I propose. It is completely untested, of course.
+> 
+> Thanks,
+> 
+> 	M.
+> 
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index 8711894db8c2..f32d956cc199 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+> @@ -738,6 +738,35 @@ transparent_hugepage_adjust(struct kvm_memory_slot *memslot,
+>  	return PAGE_SIZE;
+>  }
+>  
+> +static int get_vma_page_shift(struct vm_area_struct *vma, unsigned long hva)
+> +{
+> +	unsigned long pa;
+> +
+> +	if (is_vm_hugetlb_page(vma) && !(vma->vm_flags & VM_PFNMAP))
+> +		return huge_page_shift(hstate_vma(vma));
+> +
+> +	if (!(vma->vm_flags & VM_PFNMAP))
+> +		return PAGE_SHIFT;
+> +
+> +	VM_BUG_ON(is_vm_hugetlb_page(vma));
+> +
+> +	pa = (vma->vm_pgoff << PAGE_SHIFT) + (hva - vma->vm_start);
+> +
+> +#ifndef __PAGETABLE_PMD_FOLDED
+> +	if ((hva & (PUD_SIZE - 1)) == (pa & (PUD_SIZE - 1)) &&
+> +	    ALIGN_DOWN(hva, PUD_SIZE) >= vma->vm_start &&
+> +	    ALIGN(hva, PUD_SIZE) <= vma->vm_end)
+> +		return PUD_SHIFT;
+> +#endif
+> +
+> +	if ((hva & (PMD_SIZE - 1)) == (pa & (PMD_SIZE - 1)) &&
+> +	    ALIGN_DOWN(hva, PMD_SIZE) >= vma->vm_start &&
+> +	    ALIGN(hva, PMD_SIZE) <= vma->vm_end)
+> +		return PMD_SHIFT;
+> +
+> +	return PAGE_SHIFT;
+> +}
+> +
+>  static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>  			  struct kvm_memory_slot *memslot, unsigned long hva,
+>  			  unsigned long fault_status)
+> @@ -778,13 +807,9 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>  		return -EFAULT;
+>  	}
+>  
+> -	if (is_vm_hugetlb_page(vma))
+> -		vma_shift = huge_page_shift(hstate_vma(vma));
+> -	else
+> -		vma_shift = PAGE_SHIFT;
+> +	vma_shift = get_vma_page_shift(vma, hva);
+>  
+> -	if (logging_active ||
+> -	    (vma->vm_flags & VM_PFNMAP)) {
+> +	if (logging_active && !(vma->vm_flags & VM_PFNMAP)) {
+Maybe we don't need this. I can add some comments to explain it.
+
+>  		force_pte = true;
+>  		vma_shift = PAGE_SHIFT;
+>  	}
+> @@ -854,8 +879,17 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>  		return -EFAULT;
+>  
+>  	if (kvm_is_device_pfn(pfn)) {
+> +		/*
+> +		 * If the page was identified as device early by looking at
+> +		 * the VMA flags, vma_pagesize is already representing the
+> +		 * largest quantity we can map.  If instead it was mapped
+> +		 * via gfn_to_pfn_prot(), vma_pagesize is set to PAGE_SIZE
+> +		 * and must not be upgraded.
+> +		 *
+> +		 * In both cases, we don't let transparent_hugepage_adjust()
+> +		 * change things at the last minute.
+> +		 */
+>  		device = true;
+> -		force_pte = true;
+>  	} else if (logging_active && !write_fault) {
+>  		/*
+>  		 * Only actually map the page as writable if this was a write
+> @@ -876,7 +910,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>  	 * If we are not forced to use page mapping, check if we are
+>  	 * backed by a THP and thus use block mapping if possible.
+>  	 */
+> -	if (vma_pagesize == PAGE_SIZE && !force_pte)
+> +	if (vma_pagesize == PAGE_SIZE && !(force_pte || device))
+>  		vma_pagesize = transparent_hugepage_adjust(memslot, hva,
+>  							   &pfn, &fault_ipa);
+>  	if (writable)
+> 
+Looks good to me. :)
+
+I will test it. And when I send v4, should I add your Suggested-by or SoB?
+
 
 Thanks,
-Yongji
+Keqian
