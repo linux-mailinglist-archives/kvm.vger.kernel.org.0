@@ -2,129 +2,67 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 03B79360B00
-	for <lists+kvm@lfdr.de>; Thu, 15 Apr 2021 15:48:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0445E360B55
+	for <lists+kvm@lfdr.de>; Thu, 15 Apr 2021 16:04:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233152AbhDONtQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 15 Apr 2021 09:49:16 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:40642 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233259AbhDONtK (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 15 Apr 2021 09:49:10 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1618494527;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=QwQaOKgb78JkHs6ad6W1DSo80pvudYA+6ShjnGRvp3I=;
-        b=OkRt+lxkM96JEZ5ouAg+vzHA3FfH7auC5jVd2x7ojuWLIdUVvdzjd5/Nf+3qHD9u/AvCD2
-        Nh5dggbUH1VKmOLHu3LSQZF4AnvxHUE93gr3pI7i+QN7uBvNohZiCLeOFWalwGIAPs1eWx
-        GvgCLT1vRm7teyLL2QHzpu8N4WKqwjo=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-494-M-W6nlvhMImWEQ1nt_PWYg-1; Thu, 15 Apr 2021 09:48:43 -0400
-X-MC-Unique: M-W6nlvhMImWEQ1nt_PWYg-1
-Received: by mail-ed1-f71.google.com with SMTP id l22-20020a0564021256b0290384ebfba68cso1388722edw.2
-        for <kvm@vger.kernel.org>; Thu, 15 Apr 2021 06:48:43 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=QwQaOKgb78JkHs6ad6W1DSo80pvudYA+6ShjnGRvp3I=;
-        b=TlMZnD2StUv/hQ0nbuGOya89XNwQ9solRzm81vuNGCj274Xbmopu3Qg8yW+LYjg0Sy
-         kA5Ds3jILL5n9069UU8XHuOlufCj56FPscU7aOd5B6fHn8N7bAMu08OAmO7+95E3yAh0
-         20etdjX6VCbu7an0uV7QrGwsMX5NpQC3BN1M0y/dOnPK8UnqljclLgb25QIKbUeIfpC9
-         +lxRwpttuzOfZQhheWp+RH5M6PnX6emkMbxnz1/T5/Pv3j1ajuEQHLbXNhodQkcqMx39
-         /kgRzy7eR04QDMToZ8zqrJSlHHTcIQyMk3w9Dm4iScWekj+0YhhvhKlNj0OMWAfqu7yB
-         NiOQ==
-X-Gm-Message-State: AOAM532MUTAqTjqDxzWAZskGRnnUG26EKFZwYSmHwMWrMKN9Rfc6mKsf
-        F5xpGD01Go3Wk/klQDJqiz5sV0zah7svuwqKCDWmlxFL1r2K4qBUzBcuBYkux8hLSE3qAHDwmi1
-        +pKhGJjMAt+EQ
-X-Received: by 2002:a05:6402:270e:: with SMTP id y14mr4333835edd.283.1618494522352;
-        Thu, 15 Apr 2021 06:48:42 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxOtgD4WdYc2KT9f0JKG73xwBG/uagcBhRoEFoQdUeQykyoHKeWJx+aqlCXoC29Ap77HRT5+Q==
-X-Received: by 2002:a05:6402:270e:: with SMTP id y14mr4333823edd.283.1618494522219;
-        Thu, 15 Apr 2021 06:48:42 -0700 (PDT)
-Received: from steredhat (host-79-34-249-199.business.telecomitalia.it. [79.34.249.199])
-        by smtp.gmail.com with ESMTPSA id df8sm2608432edb.4.2021.04.15.06.48.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 15 Apr 2021 06:48:41 -0700 (PDT)
-Date:   Thu, 15 Apr 2021 15:48:38 +0200
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     Zhu Lingshan <lingshan.zhu@intel.com>
-Cc:     jasowang@redhat.com, mst@redhat.com, lulu@redhat.com,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH V2 3/3] vDPA/ifcvf: get_config_size should return dev
- specific config size
-Message-ID: <20210415134838.3hn33estolycag4p@steredhat>
-References: <20210415095336.4792-1-lingshan.zhu@intel.com>
- <20210415095336.4792-4-lingshan.zhu@intel.com>
+        id S233332AbhDOOEJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 15 Apr 2021 10:04:09 -0400
+Received: from szxga06-in.huawei.com ([45.249.212.32]:16924 "EHLO
+        szxga06-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233238AbhDOOEI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 15 Apr 2021 10:04:08 -0400
+Received: from DGGEMS402-HUB.china.huawei.com (unknown [172.30.72.60])
+        by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4FLgxp6xd9zkjjr;
+        Thu, 15 Apr 2021 22:01:50 +0800 (CST)
+Received: from DESKTOP-5IS4806.china.huawei.com (10.174.187.224) by
+ DGGEMS402-HUB.china.huawei.com (10.3.19.202) with Microsoft SMTP Server id
+ 14.3.498.0; Thu, 15 Apr 2021 22:03:33 +0800
+From:   Keqian Zhu <zhukeqian1@huawei.com>
+To:     <linux-kernel@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>, <kvm@vger.kernel.org>,
+        <kvmarm@lists.cs.columbia.edu>, Marc Zyngier <maz@kernel.org>
+CC:     <wanghaibin.wang@huawei.com>
+Subject: [PATCH v4 0/2] kvm/arm64: Try stage2 block mapping for host device MMIO
+Date:   Thu, 15 Apr 2021 22:03:26 +0800
+Message-ID: <20210415140328.24200-1-zhukeqian1@huawei.com>
+X-Mailer: git-send-email 2.8.4.windows.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20210415095336.4792-4-lingshan.zhu@intel.com>
+Content-Type: text/plain
+X-Originating-IP: [10.174.187.224]
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Apr 15, 2021 at 05:53:36PM +0800, Zhu Lingshan wrote:
->get_config_size() should return the size based on the decected
->device type.
->
->Signed-off-by: Zhu Lingshan <lingshan.zhu@intel.com>
->---
-> drivers/vdpa/ifcvf/ifcvf_main.c | 18 +++++++++++++++++-
-> 1 file changed, 17 insertions(+), 1 deletion(-)
->
->diff --git a/drivers/vdpa/ifcvf/ifcvf_main.c b/drivers/vdpa/ifcvf/ifcvf_main.c
->index cea1313b1a3f..6844c49fe1de 100644
->--- a/drivers/vdpa/ifcvf/ifcvf_main.c
->+++ b/drivers/vdpa/ifcvf/ifcvf_main.c
->@@ -347,7 +347,23 @@ static u32 ifcvf_vdpa_get_vq_align(struct vdpa_device *vdpa_dev)
->
-> static size_t ifcvf_vdpa_get_config_size(struct vdpa_device *vdpa_dev)
-> {
->-	return sizeof(struct virtio_net_config);
->+	struct ifcvf_adapter *adapter = vdpa_to_adapter(vdpa_dev);
->+	struct ifcvf_hw *vf = vdpa_to_vf(vdpa_dev);
->+	struct pci_dev *pdev = adapter->pdev;
->+	size_t size;
->+
->+	if (vf->dev_type == VIRTIO_ID_NET)
->+		size = sizeof(struct virtio_net_config);
->+
->+	else if (vf->dev_type == VIRTIO_ID_BLOCK)
->+		size = sizeof(struct virtio_blk_config);
->+
->+	else {
->+		size = 0;
->+		IFCVF_ERR(pdev, "VIRTIO ID %u not supported\n", vf->dev_type);
->+	}
+Hi,
 
-I slightly prefer the switch, but I don't have a strong opinion.
+We have two pathes to build stage2 mapping for MMIO regions.
 
-However, if we want to use if/else, we should follow 
-`Documentation/process/coding-style.rst` line 166:
-     Note that the closing brace is empty on a line of its own, **except** in
-     the cases where it is followed by a continuation of the same statement,
-     ie a ``while`` in a do-statement or an ``else`` in an if-statement, like
+Create time's path and stage2 fault path.
 
-also `scripts/checkpatch.pl --strict` complains:
+Patch#1 removes the creation time's mapping of MMIO regions
+Patch#2 tries stage2 block mapping for host device MMIO at fault path
 
-     CHECK: braces {} should be used on all arms of this statement
-     #209: FILE: drivers/vdpa/ifcvf/ifcvf_main.c:355:
-     +	if (vf->dev_type == VIRTIO_ID_NET)
-     [...]
-     +	else if (vf->dev_type == VIRTIO_ID_BLOCK)
-     [...]
-     +	else {
-     [...]
+Changelog:
 
-     CHECK: Unbalanced braces around else statement
-     #215: FILE: drivers/vdpa/ifcvf/ifcvf_main.c:361:
-     +	else {
+v4:
+ - use get_vma_page_shift() handle all cases. (Marc)
+ - get rid of force_pte for device mapping. (Marc)
+
+v3:
+ - Do not need to check memslot boundary in device_rough_page_shift(). (Marc)
 
 Thanks,
-Stefano
+Keqian
+
+
+Keqian Zhu (2):
+  kvm/arm64: Remove the creation time's mapping of MMIO regions
+  kvm/arm64: Try stage2 block mapping for host device MMIO
+
+ arch/arm64/kvm/mmu.c | 99 ++++++++++++++++++++++++--------------------
+ 1 file changed, 54 insertions(+), 45 deletions(-)
+
+-- 
+2.19.1
 
