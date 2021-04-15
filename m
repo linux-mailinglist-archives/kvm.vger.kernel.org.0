@@ -2,150 +2,111 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 45B3C36020E
-	for <lists+kvm@lfdr.de>; Thu, 15 Apr 2021 07:57:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4D483360226
+	for <lists+kvm@lfdr.de>; Thu, 15 Apr 2021 08:07:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230359AbhDOF4X (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 15 Apr 2021 01:56:23 -0400
-Received: from mga05.intel.com ([192.55.52.43]:55733 "EHLO mga05.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230170AbhDOF4V (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 15 Apr 2021 01:56:21 -0400
-IronPort-SDR: 1Ld0uAvT/uo8k8g6cXYVW38XkQ2G+qb7MTOuGND7NpQ54farzr8aoDyca7CT9uAPLcHf4Dec+n
- ew0Er1rcG5yg==
-X-IronPort-AV: E=McAfee;i="6200,9189,9954"; a="280106632"
-X-IronPort-AV: E=Sophos;i="5.82,223,1613462400"; 
-   d="scan'208";a="280106632"
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Apr 2021 22:55:59 -0700
-IronPort-SDR: cupJIMBQBcEDdz4unJTmXundCH3xLbBbjyxeTiXtI0cMSCP0hiMQChYi/IeWnTMzi8uKBrO4wB
- 18ECuXEGsY4A==
-X-IronPort-AV: E=Sophos;i="5.82,223,1613462400"; 
-   d="scan'208";a="418622476"
-Received: from lingshan-mobl5.ccr.corp.intel.com (HELO [10.254.209.173]) ([10.254.209.173])
-  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Apr 2021 22:55:56 -0700
-Subject: Re: [PATCH 2/3] vDPA/ifcvf: enable Intel C5000X-PL virtio-block for
- vDPA
-To:     Jason Wang <jasowang@redhat.com>,
-        Zhu Lingshan <lingshan.zhu@intel.com>, mst@redhat.com,
-        lulu@redhat.com, leonro@nvidia.com
-Cc:     virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20210414091832.5132-1-lingshan.zhu@intel.com>
- <20210414091832.5132-3-lingshan.zhu@intel.com>
- <54839b05-78d2-8edf-317c-372f0ecda024@redhat.com>
-From:   Zhu Lingshan <lingshan.zhu@linux.intel.com>
-Message-ID: <1a1f9f50-dc92-ced3-759d-e600abca3138@linux.intel.com>
-Date:   Thu, 15 Apr 2021 13:55:54 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.9.0
+        id S230424AbhDOGHh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 15 Apr 2021 02:07:37 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:46714 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230187AbhDOGHe (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 15 Apr 2021 02:07:34 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1618466831;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=+zQpfJqpx9ouYTivVYHq0zZnLNXpxnHkEi/8kwyW1R0=;
+        b=a0v1mNj/cgE58K7k80u+PLWYSEpOGbbSEr2S8zSxzQ77fG9rSL6nH3ZSvomZTSaq/gzHis
+        rkNCE+4q2E90VDqb2TFKjZgwNIeLzaLTaQqhK9LA2HeKhOhTi3QhzrBvqn1/vUfeAG44zn
+        WSn61MF6IiBcAQHx1B2fFcnUelcJR3E=
+Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
+ [209.85.218.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-412-t0AE0_5QPwKdkcEispEuBw-1; Thu, 15 Apr 2021 02:07:09 -0400
+X-MC-Unique: t0AE0_5QPwKdkcEispEuBw-1
+Received: by mail-ej1-f70.google.com with SMTP id r17-20020a1709069591b029037cf6a4a56dso543203ejx.12
+        for <kvm@vger.kernel.org>; Wed, 14 Apr 2021 23:07:09 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:to:cc:references:from:subject:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=+zQpfJqpx9ouYTivVYHq0zZnLNXpxnHkEi/8kwyW1R0=;
+        b=oM/pQx8vb99mBf6nhwbbu1JoxpO37uY8n3C9WPwTVq5wDuvSriVQPY7L77cEyK1kzB
+         FFTlOKtkXBuRkC7UAmFjiFNy0abquRAR3Ytfyx0r2PUxEKlc+aXUL64/W66HThH/9NV7
+         o5OJXGblnimZq3QIpW8dUsAi2Ah/XdQlcXHeGIVozUQeoebK7eXj96y/z5915O8jYUUi
+         D2GfxyuJwOIs9m+XQz6TiiNH7P7d1qiWfhlkKPTFKJlGQjqduGB4KspmOveDKa6wKjNU
+         pBJ/UV82s5m8uVIorpEfufqBf6JgjBsH0ULdlaGZRUV6KU2NaOMZHGukAofVcTgxIa1Q
+         Wzng==
+X-Gm-Message-State: AOAM533bp8txBhhfXaFPqXFL4h/axg3BLpCrPb0Xbs54Xn8/SSv9EP/f
+        yBOuuVgJYGFeDAmss2bYUo9m2mPNg9LwVbb2QjVlDtXzMjESLzLjVb629T9NNP+vMOTsFC1SWGH
+        xf6GxF47v7Q/F
+X-Received: by 2002:a17:906:5052:: with SMTP id e18mr1711346ejk.112.1618466828690;
+        Wed, 14 Apr 2021 23:07:08 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzRvvfi/7R2Qj/6IiukMYJNx/KuJdr6BgooLpTLPmk3qQeui/HM+RKSnJeBX/QpfGrRkoxWTw==
+X-Received: by 2002:a17:906:5052:: with SMTP id e18mr1711322ejk.112.1618466828430;
+        Wed, 14 Apr 2021 23:07:08 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e? ([2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e])
+        by smtp.gmail.com with ESMTPSA id f11sm1113767ejc.62.2021.04.14.23.07.07
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 14 Apr 2021 23:07:07 -0700 (PDT)
+To:     Lai Jiangshan <jiangshanlai+lkml@gmail.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        LKML <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org,
+        Filippo Sironi <sironi@amazon.de>,
+        David Woodhouse <dwmw@amazon.co.uk>,
+        "v4.7+" <stable@vger.kernel.org>,
+        Wanpeng Li <wanpengli@tencent.com>
+References: <20201127112114.3219360-1-pbonzini@redhat.com>
+ <20201127112114.3219360-3-pbonzini@redhat.com>
+ <CAJhGHyCdqgtvK98_KieG-8MUfg1Jghd+H99q+FkgL0ZuqnvuAw@mail.gmail.com>
+ <YHS/BxMiO6I1VOEY@google.com>
+ <CAJhGHyAcnwkCfTcnxXcgAHnF=wPbH2EDp7H+e74ce+oNOWJ=_Q@mail.gmail.com>
+ <80b013dc-0078-76f4-1299-3cff261ef7d8@redhat.com>
+ <CAJhGHyChfXdcAMzzD7P3aC8tnhFW5GvOt88vOY=D3pyb7hgNAA@mail.gmail.com>
+ <6d9dafb1-b8ff-82ef-93dc-da869fe7ba0f@redhat.com>
+ <CAJhGHyA=v_va2QTvo7Ve8JyZO4j5LjiCdB9CLnvRXGwGwa3e+A@mail.gmail.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH 2/2] KVM: x86: Fix split-irqchip vs interrupt injection
+ window request
+Message-ID: <5b422691-ffc5-d73a-1bda-f1ee61116756@redhat.com>
+Date:   Thu, 15 Apr 2021 08:07:06 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.7.0
 MIME-Version: 1.0
-In-Reply-To: <54839b05-78d2-8edf-317c-372f0ecda024@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAJhGHyA=v_va2QTvo7Ve8JyZO4j5LjiCdB9CLnvRXGwGwa3e+A@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On 15/04/21 02:59, Lai Jiangshan wrote:
+> The next call to inject_pending_event() will reach here AT FIRST with
+> vcpu->arch.exception.injected==false and vcpu->arch.exception.pending==false
+> 
+>>           ... if (!vcpu->arch.exception.pending) {
+>>                   if (vcpu->arch.nmi_injected) {
+>>                           static_call(kvm_x86_set_nmi)(vcpu);
+>>                           can_inject = false;
+>>                   } else if (vcpu->arch.interrupt.injected) {
+>>                           static_call(kvm_x86_set_irq)(vcpu);
+>>                           can_inject = false;
+>
+> And comes here and vcpu->arch.interrupt.injected is true for there is
+> an interrupt queued by KVM_INTERRUPT for pure user irqchip. It then does
+> the injection of the interrupt without checking the EFLAGS.IF.
 
-
-On 4/15/2021 11:34 AM, Jason Wang wrote:
->
-> 在 2021/4/14 下午5:18, Zhu Lingshan 写道:
->> This commit enabled Intel FPGA SmartNIC C5000X-PL virtio-block
->> for vDPA.
->>
->> Signed-off-by: Zhu Lingshan <lingshan.zhu@intel.com>
->> ---
->>   drivers/vdpa/ifcvf/ifcvf_base.h | 17 ++++++++++++++++-
->>   drivers/vdpa/ifcvf/ifcvf_main.c | 10 +++++++++-
->>   2 files changed, 25 insertions(+), 2 deletions(-)
->>
->> diff --git a/drivers/vdpa/ifcvf/ifcvf_base.h 
->> b/drivers/vdpa/ifcvf/ifcvf_base.h
->> index 1c04cd256fa7..8b403522bf06 100644
->> --- a/drivers/vdpa/ifcvf/ifcvf_base.h
->> +++ b/drivers/vdpa/ifcvf/ifcvf_base.h
->> @@ -15,6 +15,7 @@
->>   #include <linux/pci_regs.h>
->>   #include <linux/vdpa.h>
->>   #include <uapi/linux/virtio_net.h>
->> +#include <uapi/linux/virtio_blk.h>
->>   #include <uapi/linux/virtio_config.h>
->>   #include <uapi/linux/virtio_pci.h>
->>   @@ -28,7 +29,12 @@
->>   #define C5000X_PL_SUBSYS_VENDOR_ID    0x8086
->>   #define C5000X_PL_SUBSYS_DEVICE_ID    0x0001
->>   -#define IFCVF_SUPPORTED_FEATURES \
->> +#define C5000X_PL_BLK_VENDOR_ID        0x1AF4
->> +#define C5000X_PL_BLK_DEVICE_ID        0x1001
->> +#define C5000X_PL_BLK_SUBSYS_VENDOR_ID    0x8086
->> +#define C5000X_PL_BLK_SUBSYS_DEVICE_ID    0x0002
->> +
->> +#define IFCVF_NET_SUPPORTED_FEATURES \
->>           ((1ULL << VIRTIO_NET_F_MAC)            | \
->>            (1ULL << VIRTIO_F_ANY_LAYOUT)            | \
->>            (1ULL << VIRTIO_F_VERSION_1)            | \
->> @@ -37,6 +43,15 @@
->>            (1ULL << VIRTIO_F_ACCESS_PLATFORM)        | \
->>            (1ULL << VIRTIO_NET_F_MRG_RXBUF))
->>   +#define IFCVF_BLK_SUPPORTED_FEATURES \
->> +        ((1ULL << VIRTIO_BLK_F_SIZE_MAX)        | \
->> +         (1ULL << VIRTIO_BLK_F_SEG_MAX)            | \
->> +         (1ULL << VIRTIO_BLK_F_BLK_SIZE)        | \
->> +         (1ULL << VIRTIO_BLK_F_TOPOLOGY)        | \
->> +         (1ULL << VIRTIO_BLK_F_MQ)            | \
->> +         (1ULL << VIRTIO_F_VERSION_1)            | \
->> +         (1ULL << VIRTIO_F_ACCESS_PLATFORM))
->
->
-> I think we've discussed this sometime in the past but what's the 
-> reason for such whitelist consider there's already a get_features() 
-> implemention?
->
-> E.g Any reason to block VIRTIO_BLK_F_WRITE_ZEROS or VIRTIO_F_RING_PACKED?
->
-> Thanks
-The reason is some feature bits are supported in the device but not 
-supported by the driver, e.g, for virtio-net, mq & cq implementation is 
-not ready in the driver.
+Ok, understood now.  Yeah, that could be a problem for userspace irqchip 
+so we should switch it to use pending_external_vector instead.  Are you 
+going to write the patch or should I?
 
 Thanks!
 
->
->
->> +
->>   /* Only one queue pair for now. */
->>   #define IFCVF_MAX_QUEUE_PAIRS    1
->>   diff --git a/drivers/vdpa/ifcvf/ifcvf_main.c 
->> b/drivers/vdpa/ifcvf/ifcvf_main.c
->> index 99b0a6b4c227..9b6a38b798fa 100644
->> --- a/drivers/vdpa/ifcvf/ifcvf_main.c
->> +++ b/drivers/vdpa/ifcvf/ifcvf_main.c
->> @@ -171,7 +171,11 @@ static u64 ifcvf_vdpa_get_features(struct 
->> vdpa_device *vdpa_dev)
->>       struct ifcvf_hw *vf = vdpa_to_vf(vdpa_dev);
->>       u64 features;
->>   -    features = ifcvf_get_features(vf) & IFCVF_SUPPORTED_FEATURES;
->> +    if (vf->dev_type == VIRTIO_ID_NET)
->> +        features = ifcvf_get_features(vf) & 
->> IFCVF_NET_SUPPORTED_FEATURES;
->> +
->> +    if (vf->dev_type == VIRTIO_ID_BLOCK)
->> +        features = ifcvf_get_features(vf) & 
->> IFCVF_BLK_SUPPORTED_FEATURES;
->>         return features;
->>   }
->> @@ -509,6 +513,10 @@ static struct pci_device_id ifcvf_pci_ids[] = {
->>                C5000X_PL_DEVICE_ID,
->>                C5000X_PL_SUBSYS_VENDOR_ID,
->>                C5000X_PL_SUBSYS_DEVICE_ID) },
->> +    { PCI_DEVICE_SUB(C5000X_PL_BLK_VENDOR_ID,
->> +             C5000X_PL_BLK_DEVICE_ID,
->> +             C5000X_PL_BLK_SUBSYS_VENDOR_ID,
->> +             C5000X_PL_BLK_SUBSYS_DEVICE_ID) },
->>         { 0 },
->>   };
->
+Paolo
+
+> My question is that what stops the next call to inject_pending_event()
+> to reach here when KVM_INTERRUPT is called with exepction pending.
 
