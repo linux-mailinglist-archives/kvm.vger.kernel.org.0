@@ -2,111 +2,161 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4D483360226
-	for <lists+kvm@lfdr.de>; Thu, 15 Apr 2021 08:07:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9DDE4360267
+	for <lists+kvm@lfdr.de>; Thu, 15 Apr 2021 08:30:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230424AbhDOGHh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 15 Apr 2021 02:07:37 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:46714 "EHLO
+        id S230271AbhDOGbS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 15 Apr 2021 02:31:18 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:40865 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230187AbhDOGHe (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 15 Apr 2021 02:07:34 -0400
+        by vger.kernel.org with ESMTP id S230094AbhDOGbS (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 15 Apr 2021 02:31:18 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1618466831;
+        s=mimecast20190719; t=1618468255;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=+zQpfJqpx9ouYTivVYHq0zZnLNXpxnHkEi/8kwyW1R0=;
-        b=a0v1mNj/cgE58K7k80u+PLWYSEpOGbbSEr2S8zSxzQ77fG9rSL6nH3ZSvomZTSaq/gzHis
-        rkNCE+4q2E90VDqb2TFKjZgwNIeLzaLTaQqhK9LA2HeKhOhTi3QhzrBvqn1/vUfeAG44zn
-        WSn61MF6IiBcAQHx1B2fFcnUelcJR3E=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-412-t0AE0_5QPwKdkcEispEuBw-1; Thu, 15 Apr 2021 02:07:09 -0400
-X-MC-Unique: t0AE0_5QPwKdkcEispEuBw-1
-Received: by mail-ej1-f70.google.com with SMTP id r17-20020a1709069591b029037cf6a4a56dso543203ejx.12
-        for <kvm@vger.kernel.org>; Wed, 14 Apr 2021 23:07:09 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:cc:references:from:subject:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=+zQpfJqpx9ouYTivVYHq0zZnLNXpxnHkEi/8kwyW1R0=;
-        b=oM/pQx8vb99mBf6nhwbbu1JoxpO37uY8n3C9WPwTVq5wDuvSriVQPY7L77cEyK1kzB
-         FFTlOKtkXBuRkC7UAmFjiFNy0abquRAR3Ytfyx0r2PUxEKlc+aXUL64/W66HThH/9NV7
-         o5OJXGblnimZq3QIpW8dUsAi2Ah/XdQlcXHeGIVozUQeoebK7eXj96y/z5915O8jYUUi
-         D2GfxyuJwOIs9m+XQz6TiiNH7P7d1qiWfhlkKPTFKJlGQjqduGB4KspmOveDKa6wKjNU
-         pBJ/UV82s5m8uVIorpEfufqBf6JgjBsH0ULdlaGZRUV6KU2NaOMZHGukAofVcTgxIa1Q
-         Wzng==
-X-Gm-Message-State: AOAM533bp8txBhhfXaFPqXFL4h/axg3BLpCrPb0Xbs54Xn8/SSv9EP/f
-        yBOuuVgJYGFeDAmss2bYUo9m2mPNg9LwVbb2QjVlDtXzMjESLzLjVb629T9NNP+vMOTsFC1SWGH
-        xf6GxF47v7Q/F
-X-Received: by 2002:a17:906:5052:: with SMTP id e18mr1711346ejk.112.1618466828690;
-        Wed, 14 Apr 2021 23:07:08 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzRvvfi/7R2Qj/6IiukMYJNx/KuJdr6BgooLpTLPmk3qQeui/HM+RKSnJeBX/QpfGrRkoxWTw==
-X-Received: by 2002:a17:906:5052:: with SMTP id e18mr1711322ejk.112.1618466828430;
-        Wed, 14 Apr 2021 23:07:08 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e? ([2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e])
-        by smtp.gmail.com with ESMTPSA id f11sm1113767ejc.62.2021.04.14.23.07.07
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 14 Apr 2021 23:07:07 -0700 (PDT)
-To:     Lai Jiangshan <jiangshanlai+lkml@gmail.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        LKML <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org,
-        Filippo Sironi <sironi@amazon.de>,
-        David Woodhouse <dwmw@amazon.co.uk>,
-        "v4.7+" <stable@vger.kernel.org>,
-        Wanpeng Li <wanpengli@tencent.com>
-References: <20201127112114.3219360-1-pbonzini@redhat.com>
- <20201127112114.3219360-3-pbonzini@redhat.com>
- <CAJhGHyCdqgtvK98_KieG-8MUfg1Jghd+H99q+FkgL0ZuqnvuAw@mail.gmail.com>
- <YHS/BxMiO6I1VOEY@google.com>
- <CAJhGHyAcnwkCfTcnxXcgAHnF=wPbH2EDp7H+e74ce+oNOWJ=_Q@mail.gmail.com>
- <80b013dc-0078-76f4-1299-3cff261ef7d8@redhat.com>
- <CAJhGHyChfXdcAMzzD7P3aC8tnhFW5GvOt88vOY=D3pyb7hgNAA@mail.gmail.com>
- <6d9dafb1-b8ff-82ef-93dc-da869fe7ba0f@redhat.com>
- <CAJhGHyA=v_va2QTvo7Ve8JyZO4j5LjiCdB9CLnvRXGwGwa3e+A@mail.gmail.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH 2/2] KVM: x86: Fix split-irqchip vs interrupt injection
- window request
-Message-ID: <5b422691-ffc5-d73a-1bda-f1ee61116756@redhat.com>
-Date:   Thu, 15 Apr 2021 08:07:06 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.7.0
+        bh=5s82uP8bq8dgb0cLJfpozOWx/f1TAjgt4f2klLLOJS4=;
+        b=Ee9rcG9xCXn6pl9aYw9+wSO+Osma4G+uvweZYWVV8ndATgTL41c9kkJp8/TIfr3zVaX2o4
+        uXr1FA+SKHNJwh1s1QbskbYPNSZw5+WgCPNRvYVQfERavkMC46xCnC2uW9Uv4LE+oHZf2J
+        47SyQf34wokYf7tHd55ybhomMpawO/M=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-581-LjC3GfYoPIyzhDQTFgw6Tg-1; Thu, 15 Apr 2021 02:30:53 -0400
+X-MC-Unique: LjC3GfYoPIyzhDQTFgw6Tg-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4C8835212;
+        Thu, 15 Apr 2021 06:30:52 +0000 (UTC)
+Received: from wangxiaodeMacBook-Air.local (ovpn-12-61.pek2.redhat.com [10.72.12.61])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id A4CCE2B3C5;
+        Thu, 15 Apr 2021 06:30:43 +0000 (UTC)
+Subject: Re: [PATCH 1/3] vDPA/ifcvf: deduce VIRTIO device ID when probe
+To:     Zhu Lingshan <lingshan.zhu@linux.intel.com>,
+        Zhu Lingshan <lingshan.zhu@intel.com>, mst@redhat.com,
+        lulu@redhat.com, leonro@nvidia.com
+Cc:     virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20210414091832.5132-1-lingshan.zhu@intel.com>
+ <20210414091832.5132-2-lingshan.zhu@intel.com>
+ <85483ff1-cf98-ad05-0c53-74caa2464459@redhat.com>
+ <ccf7001b-27f0-27ea-40d2-52ca3cc2386b@linux.intel.com>
+From:   Jason Wang <jasowang@redhat.com>
+Message-ID: <ffd2861d-2395-de51-a227-f1ef33f74322@redhat.com>
+Date:   Thu, 15 Apr 2021 14:30:42 +0800
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
+ Gecko/20100101 Thunderbird/78.9.1
 MIME-Version: 1.0
-In-Reply-To: <CAJhGHyA=v_va2QTvo7Ve8JyZO4j5LjiCdB9CLnvRXGwGwa3e+A@mail.gmail.com>
+In-Reply-To: <ccf7001b-27f0-27ea-40d2-52ca3cc2386b@linux.intel.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
 Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 15/04/21 02:59, Lai Jiangshan wrote:
-> The next call to inject_pending_event() will reach here AT FIRST with
-> vcpu->arch.exception.injected==false and vcpu->arch.exception.pending==false
-> 
->>           ... if (!vcpu->arch.exception.pending) {
->>                   if (vcpu->arch.nmi_injected) {
->>                           static_call(kvm_x86_set_nmi)(vcpu);
->>                           can_inject = false;
->>                   } else if (vcpu->arch.interrupt.injected) {
->>                           static_call(kvm_x86_set_irq)(vcpu);
->>                           can_inject = false;
+
+在 2021/4/15 下午1:52, Zhu Lingshan 写道:
 >
-> And comes here and vcpu->arch.interrupt.injected is true for there is
-> an interrupt queued by KVM_INTERRUPT for pure user irqchip. It then does
-> the injection of the interrupt without checking the EFLAGS.IF.
+>
+> On 4/15/2021 11:30 AM, Jason Wang wrote:
+>>
+>> 在 2021/4/14 下午5:18, Zhu Lingshan 写道:
+>>> This commit deduces VIRTIO device ID as device type when probe,
+>>> then ifcvf_vdpa_get_device_id() can simply return the ID.
+>>> ifcvf_vdpa_get_features() and ifcvf_vdpa_get_config_size()
+>>> can work properly based on the device ID.
+>>>
+>>> Signed-off-by: Zhu Lingshan <lingshan.zhu@intel.com>
+>>> ---
+>>>   drivers/vdpa/ifcvf/ifcvf_base.h |  1 +
+>>>   drivers/vdpa/ifcvf/ifcvf_main.c | 22 ++++++++++------------
+>>>   2 files changed, 11 insertions(+), 12 deletions(-)
+>>>
+>>> diff --git a/drivers/vdpa/ifcvf/ifcvf_base.h 
+>>> b/drivers/vdpa/ifcvf/ifcvf_base.h
+>>> index b2eeb16b9c2c..1c04cd256fa7 100644
+>>> --- a/drivers/vdpa/ifcvf/ifcvf_base.h
+>>> +++ b/drivers/vdpa/ifcvf/ifcvf_base.h
+>>> @@ -84,6 +84,7 @@ struct ifcvf_hw {
+>>>       u32 notify_off_multiplier;
+>>>       u64 req_features;
+>>>       u64 hw_features;
+>>> +    u32 dev_type;
+>>>       struct virtio_pci_common_cfg __iomem *common_cfg;
+>>>       void __iomem *net_cfg;
+>>>       struct vring_info vring[IFCVF_MAX_QUEUE_PAIRS * 2];
+>>> diff --git a/drivers/vdpa/ifcvf/ifcvf_main.c 
+>>> b/drivers/vdpa/ifcvf/ifcvf_main.c
+>>> index 44d7586019da..99b0a6b4c227 100644
+>>> --- a/drivers/vdpa/ifcvf/ifcvf_main.c
+>>> +++ b/drivers/vdpa/ifcvf/ifcvf_main.c
+>>> @@ -323,19 +323,9 @@ static u32 ifcvf_vdpa_get_generation(struct 
+>>> vdpa_device *vdpa_dev)
+>>>     static u32 ifcvf_vdpa_get_device_id(struct vdpa_device *vdpa_dev)
+>>>   {
+>>> -    struct ifcvf_adapter *adapter = vdpa_to_adapter(vdpa_dev);
+>>> -    struct pci_dev *pdev = adapter->pdev;
+>>> -    u32 ret = -ENODEV;
+>>> -
+>>> -    if (pdev->device < 0x1000 || pdev->device > 0x107f)
+>>> -        return ret;
+>>> -
+>>> -    if (pdev->device < 0x1040)
+>>> -        ret =  pdev->subsystem_device;
+>>> -    else
+>>> -        ret =  pdev->device -0x1040;
+>>> +    struct ifcvf_hw *vf = vdpa_to_vf(vdpa_dev);
+>>>   -    return ret;
+>>> +    return vf->dev_type;
+>>>   }
+>>>     static u32 ifcvf_vdpa_get_vendor_id(struct vdpa_device *vdpa_dev)
+>>> @@ -466,6 +456,14 @@ static int ifcvf_probe(struct pci_dev *pdev, 
+>>> const struct pci_device_id *id)
+>>>       pci_set_drvdata(pdev, adapter);
+>>>         vf = &adapter->vf;
+>>> +    if (pdev->device < 0x1000 || pdev->device > 0x107f)
+>>> +        return -EOPNOTSUPP;
+>>> +
+>>> +    if (pdev->device < 0x1040)
+>>> +        vf->dev_type =  pdev->subsystem_device;
+>>> +    else
+>>> +        vf->dev_type =  pdev->device - 0x1040;
+>>
+>>
+>> So a question here, is the device a transtional device or modern one?
+>>
+>> If it's a transitonal one, can it swtich endianess automatically or not?
+>>
+>> Thanks
+> Hi Jason,
+>
+> This driver should drive both modern and transitional devices as we 
+> discussed before.
+> If it's a transitional one, it will act as a modern device by default, 
+> legacy mode is a fail-over path.
 
-Ok, understood now.  Yeah, that could be a problem for userspace irqchip 
-so we should switch it to use pending_external_vector instead.  Are you 
-going to write the patch or should I?
 
-Thanks!
+Note that legacy driver use native endian, support legacy driver 
+requires the device to know native endian which I'm not sure your device 
+can do that.
 
-Paolo
+Thanks
 
-> My question is that what stops the next call to inject_pending_event()
-> to reach here when KVM_INTERRUPT is called with exepction pending.
+
+> For vDPA, it has to support VIRTIO_1 and ACCESS_PLATFORM, so it must 
+> in modern mode.
+> I think we don't need to worry about endianess for legacy mode.
+>
+> Thanks
+> Zhu Lingshan
+>>
+>>
+>>> +
+>>>       vf->base = pcim_iomap_table(pdev);
+>>>         adapter->pdev = pdev;
+>>
+>
 
