@@ -2,191 +2,166 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 954E636001D
-	for <lists+kvm@lfdr.de>; Thu, 15 Apr 2021 04:49:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 12D2A360038
+	for <lists+kvm@lfdr.de>; Thu, 15 Apr 2021 05:20:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229660AbhDOCt4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 14 Apr 2021 22:49:56 -0400
-Received: from szxga01-in.huawei.com ([45.249.212.187]:3085 "EHLO
-        szxga01-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229467AbhDOCtz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 14 Apr 2021 22:49:55 -0400
-Received: from dggeml405-hub.china.huawei.com (unknown [172.30.72.56])
-        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4FLNxq2WfRzWX7d;
-        Thu, 15 Apr 2021 10:45:51 +0800 (CST)
-Received: from dggpeml500013.china.huawei.com (7.185.36.41) by
- dggeml405-hub.china.huawei.com (10.3.17.49) with Microsoft SMTP Server (TLS)
- id 14.3.498.0; Thu, 15 Apr 2021 10:49:30 +0800
-Received: from [10.174.187.161] (10.174.187.161) by
- dggpeml500013.china.huawei.com (7.185.36.41) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id
- 15.1.2106.2; Thu, 15 Apr 2021 10:49:30 +0800
-Subject: Re: [PATCH v4 01/16] perf/x86/intel: Add x86_pmu.pebs_vmx for Ice
- Lake Servers
-To:     "Xu, Like" <like.xu@intel.com>
-References: <20210329054137.120994-2-like.xu@linux.intel.com>
- <606BD46F.7050903@huawei.com>
- <18597e2b-3719-8d0d-9043-e9dbe39496a2@intel.com>
- <60701165.3060000@huawei.com>
- <1ba15937-ee3d-157a-e891-981fed8b414d@linux.intel.com>
- <607700F2.9080409@huawei.com>
- <76467c36-3399-a123-d582-92affadc4d73@intel.com>
-CC:     <andi@firstfloor.org>, "Fangyi (Eric)" <eric.fangyi@huawei.com>,
-        Xiexiangyou <xiexiangyou@huawei.com>,
-        <kan.liang@linux.intel.com>, <kvm@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <wei.w.wang@intel.com>,
-        <x86@kernel.org>, Like Xu <like.xu@linux.intel.com>
-From:   Liuxiangdong <liuxiangdong5@huawei.com>
-Message-ID: <6077A9AE.2090705@huawei.com>
-Date:   Thu, 15 Apr 2021 10:49:18 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:38.0) Gecko/20100101
- Thunderbird/38.1.0
+        id S229743AbhDODUp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 14 Apr 2021 23:20:45 -0400
+Received: from mga11.intel.com ([192.55.52.93]:1119 "EHLO mga11.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229729AbhDODUo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 14 Apr 2021 23:20:44 -0400
+IronPort-SDR: MvtThNtlQbDIBqgp0OMkHAsK5PywN3eZ3bRp6GVDkbolpFm9AMcRf+DVXQU8otXgTojmwwrvuZ
+ f9LTA9h4BaRg==
+X-IronPort-AV: E=McAfee;i="6200,9189,9954"; a="191592800"
+X-IronPort-AV: E=Sophos;i="5.82,223,1613462400"; 
+   d="scan'208";a="191592800"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Apr 2021 20:20:22 -0700
+IronPort-SDR: rUVRvKC/Gm3Y4LS+iYj8dSpAzd5yzaHoxZL634jMBaF2PjGggWq3JduNDB7CQvIhw15ZY6uyU1
+ Kmv8mFkj9MFA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.82,223,1613462400"; 
+   d="scan'208";a="425013845"
+Received: from clx-ap-likexu.sh.intel.com ([10.239.48.108])
+  by orsmga008.jf.intel.com with ESMTP; 14 Apr 2021 20:20:18 -0700
+From:   Like Xu <like.xu@linux.intel.com>
+To:     peterz@infradead.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>
+Cc:     andi@firstfloor.org, kan.liang@linux.intel.com,
+        wei.w.wang@intel.com, eranian@google.com, liuxiangdong5@huawei.com,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        x86@kernel.org, linux-kernel@vger.kernel.org,
+        Like Xu <like.xu@linux.intel.com>
+Subject: [PATCH v5 00/16] KVM: x86/pmu: Add basic support to enable guest PEBS via DS
+Date:   Thu, 15 Apr 2021 11:20:00 +0800
+Message-Id: <20210415032016.166201-1-like.xu@linux.intel.com>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
-In-Reply-To: <76467c36-3399-a123-d582-92affadc4d73@intel.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.174.187.161]
-X-ClientProxiedBy: dggeme710-chm.china.huawei.com (10.1.199.106) To
- dggpeml500013.china.huawei.com (7.185.36.41)
-X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+The guest Precise Event Based Sampling (PEBS) feature can provide
+an architectural state of the instruction executed after the guest
+instruction that exactly caused the event. It needs new hardware
+facility only available on Intel Ice Lake Server platforms. This
+patch set enables the basic PEBS feature for KVM guests on ICX.
 
+We can use PEBS feature on the Linux guest like native:
 
-On 2021/4/15 9:38, Xu, Like wrote:
-> On 2021/4/14 22:49, Liuxiangdong wrote:
->> Hi Like,
->>
->> On 2021/4/9 16:46, Like Xu wrote:
->>> Hi Liuxiangdong,
->>>
->>> On 2021/4/9 16:33, Liuxiangdong (Aven, Cloud Infrastructure Service 
->>> Product Dept.) wrote:
->>>> Do you have any comments or ideas about it ?
->>>>
->>>> https://lore.kernel.org/kvm/606E5EF6.2060402@huawei.com/
->>>
->>> My expectation is that there may be many fewer PEBS samples
->>> on Skylake without any soft lockup.
->>>
->>> You may need to confirm the statement
->>>
->>> "All that matters is that the EPT pages don't get
->>> unmapped ever while PEBS is active"
->>>
->>> is true in the kernel level.
->>>
->>> Try "-overcommit mem-lock=on" for your qemu.
->>>
->>
->> Sorry, in fact, I don't quite understand
->> "My expectation is that there may be many fewer PEBS samples on 
->> Skylake without any soft lockup. "
->
-> For testcase: perf record -e instructions:pp ./workload
->
-> We can get 2242 samples on the ICX guest, but
-> only 17 samples or less on the Skylake guest.
->
-> In my testcase on Skylake, neither the host nor the guest triggered 
-> the soft lock.
->
+  # perf record -e instructions:ppp ./br_instr a
+  # perf record -c 100000 -e instructions:pp ./br_instr a
 
-Thanks for your explanation！
-Could you please show your complete qemu command and qemu version used 
-on Skylake?
-I hope I can test it again according to your qemu cmd and version.
+To emulate guest PEBS facility for the above perf usages,
+we need to implement 2 code paths:
 
+1) Fast path
 
->>
->> And, I have used "-overcommit mem-lock=on"  when soft lockup happens.
->
-> I misunderstood the use of "mem-lock=on". It is not the same as the
-> guest mem pin and I believe more kernel patches are needed.
->
->>
->>
->> Now, I have tried to configure 1G-hugepages for 2G-mem vm. Each of 
->> guest numa nodes has 1G mem.
->> When I use pebs(perf record -e cycles:pp) in guest, there are 
->> successful pebs samples just for a while and
->> then I cannot get pebs samples. Host doesn't soft lockup in this 
->> process.
->
-> In the worst case, no samples are expected.
->
->>
->> Are there something wrong on skylake for we can only get a few 
->> samples? IRQ?  Or using hugepage is not effecitve?
->
-> The few samples comes from hardware limitation.
-> The Skylake doesn't have this "EPT-Friendly PEBS" capabilityand
-> some PEBS records will be lost when used by guests.
->
->>
->> Thanks!
->>
->>>>
->>>>
->>>> On 2021/4/6 13:14, Xu, Like wrote:
->>>>> Hi Xiangdong,
->>>>>
->>>>> On 2021/4/6 11:24, Liuxiangdong (Aven, Cloud Infrastructure 
->>>>> Service Product Dept.) wrote:
->>>>>> Hi，like.
->>>>>> Some questions about this new pebs patches set：
->>>>>> https://lore.kernel.org/kvm/20210329054137.120994-2-like.xu@linux.intel.com/ 
->>>>>>
->>>>>>
->>>>>> The new hardware facility supporting guest PEBS is only available
->>>>>> on Intel Ice Lake Server platforms for now.
->>>>>
->>>>> Yes, we have documented this "EPT-friendly PEBS" capability in the 
->>>>> SDM
->>>>> 18.3.10.1 Processor Event Based Sampling (PEBS) Facility
->>>>>
->>>>> And again, this patch set doesn't officially support guest PEBS on 
->>>>> the Skylake.
->>>>>
->>>>>>
->>>>>>
->>>>>> AFAIK， Icelake supports adaptive PEBS and extended PEBS which 
->>>>>> Skylake doesn't.
->>>>>> But we can still use IA32_PEBS_ENABLE MSR to indicate 
->>>>>> general-purpose counter in Skylake.
->>>>>
->>>>> For Skylake, only the PMC0-PMC3 are valid for PEBS and you may
->>>>> mask the other unsupported bits in the pmu->pebs_enable_mask.
->>>>>
->>>>>> Is there anything else that only Icelake supports in this patches 
->>>>>> set?
->>>>>
->>>>> The PDIR counter on the Ice Lake is the fixed counter 0
->>>>> while the PDIR counter on the Sky Lake is the gp counter 1.
->>>>>
->>>>> You may also expose x86_pmu.pebs_vmx for Skylake in the 1st patch.
->>>>>
->>>>>>
->>>>>>
->>>>>> Besides, we have tried this patches set in Icelake.  We can use 
->>>>>> pebs(eg: "perf record -e cycles:pp")
->>>>>> when guest is kernel-5.11, but can't when kernel-4.18. Is there a 
->>>>>> minimum guest kernel version requirement?
->>>>>
->>>>> The Ice Lake CPU model has been added since v5.4.
->>>>>
->>>>> You may double check whether the stable tree(s) code has
->>>>> INTEL_FAM6_ICELAKE in the arch/x86/include/asm/intel-family.h.
->>>>>
->>>>>>
->>>>>>
->>>>>> Thanks,
->>>>>> Xiangdong Liu
->>>>>
->>>>
->>>
->>
->
+This is when the host assigned physical PMC has an identical index as
+the virtual PMC (e.g. using physical PMC0 to emulate virtual PMC0).
+This path is used in most common use cases.
+
+2) Slow path
+
+This is when the host assigned physical PMC has a different index
+from the virtual PMC (e.g. using physical PMC1 to emulate virtual PMC0)
+In this case, KVM needs to rewrite the PEBS records to change the
+applicable counter indexes to the virtual PMC indexes, which would
+otherwise contain the physical counter index written by PEBS facility,
+and switch the counter reset values to the offset corresponding to
+the physical counter indexes in the DS data structure.
+
+The previous version [0] enables both fast path and slow path, which
+seems a bit more complex as the first step. In this patchset, we want
+to start with the fast path to get the basic guest PEBS enabled while
+keeping the slow path disabled. More focused discussion on the slow
+path [1] is planned to be put to another patchset in the next step.
+
+Compared to later versions in subsequent steps, the functionality
+to support host-guest PEBS both enabled and the functionality to
+emulate guest PEBS when the counter is cross-mapped are missing
+in this patch set (neither of these are typical scenarios).
+
+With the basic support, the guest can retrieve the correct PEBS
+information from its own PEBS records on the Ice Lake servers.
+And we expect it should work when migrating to another Ice Lake
+and no regression about host perf is expected.
+
+Here are the results of pebs test from guest/host for same workload:
+
+perf report on guest:
+# Samples: 2K of event 'instructions:ppp', # Event count (approx.): 1473377250
+# Overhead  Command   Shared Object      Symbol
+  57.74%  br_instr  br_instr           [.] lfsr_cond
+  41.40%  br_instr  br_instr           [.] cmp_end
+   0.21%  br_instr  [kernel.kallsyms]  [k] __lock_acquire
+
+perf report on host:
+# Samples: 2K of event 'instructions:ppp', # Event count (approx.): 1462721386
+# Overhead  Command   Shared Object     Symbol
+  57.90%  br_instr  br_instr          [.] lfsr_cond
+  41.95%  br_instr  br_instr          [.] cmp_end
+   0.05%  br_instr  [kernel.vmlinux]  [k] lock_acquire
+   Conclusion: the profiling results on the guest are similar tothat on the host.
+
+A minimum guest kernel version may be v5.4 or a backport version
+support Icelake server PEBS.
+
+Please check more details in each commit and feel free to comment.
+
+Previous:
+https://lore.kernel.org/kvm/20210329054137.120994-1-like.xu@linux.intel.com/
+
+[0] https://lore.kernel.org/kvm/20210104131542.495413-1-like.xu@linux.intel.com/
+[1] https://lore.kernel.org/kvm/20210115191113.nktlnmivc3edstiv@two.firstfloor.org/
+
+v4->v5 Changelog:
+- Rewrite intel_guest_get_msrs() to address Peter's comments;
+- Fix coding style including indentation and {};
+- Use __test_and_set_bit in the kvm_perf_overflow_intr();
+- Return void for x86_pmu_handle_guest_pebs();
+- Always drain pebs buffer on the host side;
+
+Like Xu (16):
+  perf/x86/intel: Add EPT-Friendly PEBS for Ice Lake Server
+  perf/x86/intel: Handle guest PEBS overflow PMI for KVM guest
+  perf/x86/core: Pass "struct kvm_pmu *" to determine the guest values
+  KVM: x86/pmu: Set MSR_IA32_MISC_ENABLE_EMON bit when vPMU is enabled
+  KVM: x86/pmu: Introduce the ctrl_mask value for fixed counter
+  KVM: x86/pmu: Reprogram PEBS event to emulate guest PEBS counter
+  KVM: x86/pmu: Add IA32_PEBS_ENABLE MSR emulation for extended PEBS
+  KVM: x86/pmu: Add IA32_DS_AREA MSR emulation to support guest DS
+  KVM: x86/pmu: Add PEBS_DATA_CFG MSR emulation to support adaptive PEBS
+  KVM: x86: Set PEBS_UNAVAIL in IA32_MISC_ENABLE when PEBS is enabled
+  KVM: x86/pmu: Adjust precise_ip to emulate Ice Lake guest PDIR counter
+  KVM: x86/pmu: Move pmc_speculative_in_use() to arch/x86/kvm/pmu.h
+  KVM: x86/pmu: Disable guest PEBS temporarily in two rare situations
+  KVM: x86/pmu: Add kvm_pmu_cap to optimize perf_get_x86_pmu_capability
+  KVM: x86/cpuid: Refactor host/guest CPU model consistency check
+  KVM: x86/pmu: Expose CPUIDs feature bits PDCM, DS, DTES64
+
+ arch/x86/events/core.c            |   5 +-
+ arch/x86/events/intel/core.c      | 130 ++++++++++++++++++++++++------
+ arch/x86/events/perf_event.h      |   5 +-
+ arch/x86/include/asm/kvm_host.h   |  16 ++++
+ arch/x86/include/asm/msr-index.h  |   6 ++
+ arch/x86/include/asm/perf_event.h |   5 +-
+ arch/x86/kvm/cpuid.c              |  24 ++----
+ arch/x86/kvm/cpuid.h              |   5 ++
+ arch/x86/kvm/pmu.c                |  50 +++++++++---
+ arch/x86/kvm/pmu.h                |  38 +++++++++
+ arch/x86/kvm/vmx/capabilities.h   |  26 ++++--
+ arch/x86/kvm/vmx/pmu_intel.c      | 115 +++++++++++++++++++++-----
+ arch/x86/kvm/vmx/vmx.c            |  24 +++++-
+ arch/x86/kvm/vmx/vmx.h            |   2 +-
+ arch/x86/kvm/x86.c                |  14 ++--
+ 15 files changed, 369 insertions(+), 96 deletions(-)
+
+-- 
+2.30.2
 
