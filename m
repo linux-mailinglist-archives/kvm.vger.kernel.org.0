@@ -2,125 +2,121 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 648993603CE
-	for <lists+kvm@lfdr.de>; Thu, 15 Apr 2021 10:01:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 17B2C3603D7
+	for <lists+kvm@lfdr.de>; Thu, 15 Apr 2021 10:05:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231266AbhDOIB5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 15 Apr 2021 04:01:57 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:13852 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230190AbhDOIB4 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 15 Apr 2021 04:01:56 -0400
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 13F7XvQ5152102;
-        Thu, 15 Apr 2021 04:01:34 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : mime-version : content-transfer-encoding; s=pp1;
- bh=Iy+4HEBSF+6Bj1MzBbaPvov+Xtf3UDKQhBpPJ8i7LDw=;
- b=re0aowbxXwZsu8Y6GwmjiH+iLQxFENxjcoYfAuplBPNLiaWDQDxy2EzikGqbeYtOqMsw
- zdshtgZPPiyXjHygi+VG2tRBAQEHWvxDcKcV8ZDs7hufE0EmciNA5TnUBmk17YmN7i45
- yb7hLkwOAcCgIvVafsRwfURLXEDBsZFbNyw1a4Jm6hZy+A31XEFWK8v9RJ2ct+WycGrx
- AlOqZRMkBWUkw8PMH1ar6d9eBtcxaTNKsoXxLsOqrQ4Pv82GlCCYSWpsEuL7M0v8aUl4
- qdH7b8440+wqy1x/Q7R2chaO7brmYyKmwAstLDjx3XI5sfVYa11762mFBxF7RcdkS8v5 EQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 37x13v8w1g-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 15 Apr 2021 04:01:33 -0400
-Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 13F7YPS0153929;
-        Thu, 15 Apr 2021 04:01:33 -0400
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 37x13v8w0j-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 15 Apr 2021 04:01:33 -0400
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 13F7qMaL030873;
-        Thu, 15 Apr 2021 08:01:30 GMT
-Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
-        by ppma04ams.nl.ibm.com with ESMTP id 37u3n8uqum-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 15 Apr 2021 08:01:30 +0000
-Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 13F815wT22479228
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 15 Apr 2021 08:01:05 GMT
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 60FD111C06E;
-        Thu, 15 Apr 2021 08:01:27 +0000 (GMT)
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 2C91011C064;
-        Thu, 15 Apr 2021 08:01:27 +0000 (GMT)
-Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
-        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu, 15 Apr 2021 08:01:27 +0000 (GMT)
-From:   Heiko Carstens <hca@linux.ibm.com>
-To:     Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.vnet.ibm.com>
-Cc:     David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org
-Subject: [PATCH] KVM: s390: fix guarded storage control register handling
-Date:   Thu, 15 Apr 2021 10:01:27 +0200
-Message-Id: <20210415080127.1061275-1-hca@linux.ibm.com>
-X-Mailer: git-send-email 2.25.1
+        id S231326AbhDOIFx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 15 Apr 2021 04:05:53 -0400
+Received: from conssluserg-01.nifty.com ([210.131.2.80]:56681 "EHLO
+        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230090AbhDOIFw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 15 Apr 2021 04:05:52 -0400
+X-Greylist: delayed 2136 seconds by postgrey-1.27 at vger.kernel.org; Thu, 15 Apr 2021 04:05:51 EDT
+Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169]) (authenticated)
+        by conssluserg-01.nifty.com with ESMTP id 13F856Vb022773;
+        Thu, 15 Apr 2021 17:05:06 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conssluserg-01.nifty.com 13F856Vb022773
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
+        s=dec2015msa; t=1618473906;
+        bh=LC1wwORrxX4s+QOHO85pxZXBS/KtIoUE4bsRAFozad4=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=da54tceNg+886hk0L1yXNqwic53kMAl/yYDA9rfAYHj0ARbrEgFju4bNK2u7DwSzr
+         0Nzz3nN74NFBD6BY3vVYIsLJyVstisa/a9wZNFo5HTfFMQNiNdQt34xs/EogI5R2pe
+         cGfTLcVB02siJoTnsZGY694SycVShDrvLKCT+fJH4c6gdApVr4yI8sDuiQRVb46uzf
+         5zxp+cpLvrquwzMBoqWdhFppX0LrOMfnMp2ux+33w21NjgtbXApne1xnDYHSASKVVS
+         d+1LtEJ5CKw8N5jVYem55TDcIAFV5Dpgqe/WelWt36GppnQoPbMUoN2vTaIcYxpiyl
+         UETUaHqyqS3pw==
+X-Nifty-SrcIP: [209.85.210.169]
+Received: by mail-pf1-f169.google.com with SMTP id p67so10591283pfp.10;
+        Thu, 15 Apr 2021 01:05:06 -0700 (PDT)
+X-Gm-Message-State: AOAM531srx0f25gk07BlcHD6re3R/c0h0vtMMO8k4EDCH91XPITvrY15
+        0r22kx+4zgJ8DL4Pd3zbcikywpxA58RKjrTsciQ=
+X-Google-Smtp-Source: ABdhPJySz/Ot0PzvuAqwezBmRSJBPOAtDPcVcBLTIDgzgzX8BI0wuMQUhTWcJdx8cpQqmQVarwqfYRNaT9Sfb7D43/8=
+X-Received: by 2002:aa7:946b:0:b029:24c:57ea:99bf with SMTP id
+ t11-20020aa7946b0000b029024c57ea99bfmr2063757pfq.63.1618473905663; Thu, 15
+ Apr 2021 01:05:05 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: oW4X9HK-9CKK23m1Mb8WhFHrZfpUPmTT
-X-Proofpoint-ORIG-GUID: hLD123nSDLfmqXYS4Ky0LkkimoaxWHCY
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.761
- definitions=2021-04-15_03:2021-04-15,2021-04-15 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 impostorscore=0
- suspectscore=0 phishscore=0 malwarescore=0 lowpriorityscore=0 adultscore=0
- mlxscore=0 spamscore=0 priorityscore=1501 clxscore=1015 mlxlogscore=624
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2104060000
- definitions=main-2104150049
+References: <20210415072700.147125-1-masahiroy@kernel.org> <20210415072700.147125-2-masahiroy@kernel.org>
+ <9d33ee98-9de3-2215-0c0b-cc856cec1b69@redhat.com>
+In-Reply-To: <9d33ee98-9de3-2215-0c0b-cc856cec1b69@redhat.com>
+From:   Masahiro Yamada <masahiroy@kernel.org>
+Date:   Thu, 15 Apr 2021 17:04:28 +0900
+X-Gmail-Original-Message-ID: <CAK7LNAQupbmeEVR0njSciv0X9FD+MofeB2Xm=wprEdNaO4TQKQ@mail.gmail.com>
+Message-ID: <CAK7LNAQupbmeEVR0njSciv0X9FD+MofeB2Xm=wprEdNaO4TQKQ@mail.gmail.com>
+Subject: Re: [PATCH 2/2] tools: do not include scripts/Kbuild.include
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Alexei Starovoitov <ast@kernel.org>,
+        Andrii Nakryiko <andrii@kernel.org>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Daniel Borkmann <daniel@iogearbox.net>,
+        Harish <harish@linux.ibm.com>,
+        John Fastabend <john.fastabend@gmail.com>,
+        KP Singh <kpsingh@kernel.org>, Martin KaFai Lau <kafai@fb.com>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Nathan Chancellor <nathan@kernel.org>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Paul Mackerras <paulus@samba.org>,
+        Shuah Khan <shuah@kernel.org>,
+        Song Liu <songliubraving@fb.com>, Yonghong Song <yhs@fb.com>,
+        bpf <bpf@vger.kernel.org>,
+        clang-built-linux <clang-built-linux@googlegroups.com>,
+        kvm@vger.kernel.org,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        "open list:KERNEL SELFTEST FRAMEWORK" 
+        <linux-kselftest@vger.kernel.org>,
+        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
+        Networking <netdev@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-store_regs_fmt2() has an ordering problem: first the guarded storage
-facility is enabled on the local cpu, then preemption disabled, and
-then the STGSC (store guarded storage controls) instruction is
-executed.
+On Thu, Apr 15, 2021 at 4:40 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+> On 15/04/21 09:27, Masahiro Yamada wrote:
+> > Since commit d9f4ff50d2aa ("kbuild: spilt cc-option and friends to
+> > scripts/Makefile.compiler"), some kselftests fail to build.
+> >
+> > The tools/ directory opted out Kbuild, and went in a different
+> > direction. They copy any kind of files to the tools/ directory
+> > in order to do whatever they want to do in their world.
+> >
+> > tools/build/Build.include mimics scripts/Kbuild.include, but some
+> > tool Makefiles included the Kbuild one to import a feature that is
+> > missing in tools/build/Build.include:
+> >
+> >   - Commit ec04aa3ae87b ("tools/thermal: tmon: use "-fstack-protector"
+> >     only if supported") included scripts/Kbuild.include from
+> >     tools/thermal/tmon/Makefile to import the cc-option macro.
+> >
+> >   - Commit c2390f16fc5b ("selftests: kvm: fix for compilers that do
+> >     not support -no-pie") included scripts/Kbuild.include from
+> >     tools/testing/selftests/kvm/Makefile to import the try-run macro.
+> >
+> >   - Commit 9cae4ace80ef ("selftests/bpf: do not ignore clang
+> >     failures") included scripts/Kbuild.include from
+> >     tools/testing/selftests/bpf/Makefile to import the .DELETE_ON_ERROR
+> >     target.
+> >
+> >   - Commit 0695f8bca93e ("selftests/powerpc: Handle Makefile for
+> >     unrecognized option") included scripts/Kbuild.include from
+> >     tools/testing/selftests/powerpc/pmu/ebb/Makefile to import the
+> >     try-run macro.
+> >
+> > Copy what they want there, and stop including scripts/Kbuild.include
+> > from the tool Makefiles.
+>
+> I think it would make sense to add try-run, cc-option and
+> .DELETE_ON_ERROR to tools/build/Build.include?
 
-If the process gets scheduled away between enabling the guarded
-storage facility and before preemption is disabled, this might lead to
-a special operation exception and therefore kernel crash as soon as
-the process is scheduled back and the STGSC instruction is executed.
 
-Fixes: 4e0b1ab72b8a ("KVM: s390: gs support for kvm guests")
-Cc: <stable@vger.kernel.org> # 4.12
-Reviewed-by: Christian Borntraeger <borntraeger@de.ibm.com>
-Signed-off-by: Heiko Carstens <hca@linux.ibm.com>
----
- arch/s390/kvm/kvm-s390.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+To be safe, I just copy-pasted what the makefiles need.
+If someone wants to refactor the tool build system, that is fine,
+but, to me, I do not see consistent rules or policy under tools/.
 
-diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-index 2f09e9d7dc95..24ad447e648c 100644
---- a/arch/s390/kvm/kvm-s390.c
-+++ b/arch/s390/kvm/kvm-s390.c
-@@ -4307,16 +4307,16 @@ static void store_regs_fmt2(struct kvm_vcpu *vcpu)
- 	kvm_run->s.regs.bpbc = (vcpu->arch.sie_block->fpf & FPF_BPBC) == FPF_BPBC;
- 	kvm_run->s.regs.diag318 = vcpu->arch.diag318_info.val;
- 	if (MACHINE_HAS_GS) {
-+		preempt_disable();
- 		__ctl_set_bit(2, 4);
- 		if (vcpu->arch.gs_enabled)
- 			save_gs_cb(current->thread.gs_cb);
--		preempt_disable();
- 		current->thread.gs_cb = vcpu->arch.host_gscb;
- 		restore_gs_cb(vcpu->arch.host_gscb);
--		preempt_enable();
- 		if (!vcpu->arch.host_gscb)
- 			__ctl_clear_bit(2, 4);
- 		vcpu->arch.host_gscb = NULL;
-+		preempt_enable();
- 	}
- 	/* SIE will save etoken directly into SDNX and therefore kvm_run */
- }
 -- 
-2.25.1
-
+Best Regards
+Masahiro Yamada
