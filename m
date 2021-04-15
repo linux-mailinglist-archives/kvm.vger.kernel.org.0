@@ -2,57 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 88AC736155A
-	for <lists+kvm@lfdr.de>; Fri, 16 Apr 2021 00:21:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 808C436155D
+	for <lists+kvm@lfdr.de>; Fri, 16 Apr 2021 00:22:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237334AbhDOWVw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 15 Apr 2021 18:21:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57174 "EHLO
+        id S237429AbhDOWWA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 15 Apr 2021 18:22:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57204 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237001AbhDOWVq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 15 Apr 2021 18:21:46 -0400
-Received: from mail-qt1-x849.google.com (mail-qt1-x849.google.com [IPv6:2607:f8b0:4864:20::849])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 51FD2C061574
-        for <kvm@vger.kernel.org>; Thu, 15 Apr 2021 15:21:23 -0700 (PDT)
-Received: by mail-qt1-x849.google.com with SMTP id i9-20020ac85e490000b02901b186fa5716so4931801qtx.22
-        for <kvm@vger.kernel.org>; Thu, 15 Apr 2021 15:21:23 -0700 (PDT)
+        with ESMTP id S237344AbhDOWVx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 15 Apr 2021 18:21:53 -0400
+Received: from mail-qk1-x74a.google.com (mail-qk1-x74a.google.com [IPv6:2607:f8b0:4864:20::74a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A80FFC06138C
+        for <kvm@vger.kernel.org>; Thu, 15 Apr 2021 15:21:25 -0700 (PDT)
+Received: by mail-qk1-x74a.google.com with SMTP id c129so2502201qkd.6
+        for <kvm@vger.kernel.org>; Thu, 15 Apr 2021 15:21:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=reply-to:date:in-reply-to:message-id:mime-version:references
          :subject:from:to:cc;
-        bh=ejNz6/mRycQ/8a4gZzvJd7025j920aJ4l8YEJ/7oL7w=;
-        b=ex93+VhLDEnZyrU3fa14LC/l+d4QG+7TX3kkWOj6bc2ImObzfFwIA0H3Ej6OsaJ25/
-         bXuSwIJLlLOWYitYmKqt6QfIfi4S55+UeHd6P/lXrdZqzvAFESJQrDcATMLmaeFyu/bJ
-         V0IszkhtV/E8vmxCdhqRdF6h9PDRJHpPfOe+QryANb8Fwh5Gi8f8IZF+VpBy7KqNY7qV
-         3h/Om4MO5KMZyf5Il785WcYyhTzZo/B/Uqxzh3/fzQJYfDdAUpzb50KLrFkzjYHgFWsA
-         rhzCNKhQfbSItqxPNuB+B4tUE0G0MBCvwwAUYHlxRPE8XatqhsPf7AjfuNmKVeH5BjxK
-         Xyeg==
+        bh=NoxzXKy25RgDTK+Npf4Da6Ion6Bw41f/CgEilQohoV8=;
+        b=ll1uAXpdlaV5cnuGtI1njjjBfpvjpK1FIrl1mcXZ1H8XGuPHtg54vXM+qgJMX8P1Aj
+         jwUrwlz8ahLHRGKNCVY7XjKoSsRrIw6QGWlawj3LwAxzApEwedpflNktBtFSkE1JSQH3
+         AzrtTK51T6VDg6d3DHQY8PvFUt83f+AgHKkgau8a4oceLdqJrVyCo5CyLaRhPVcr0l/2
+         ebF/GiwocYNSo2EIVlzcTogFFS1Dh52D2z6JE80JdHvBvO0T+ysc/jypfzdCePJ1Jc9s
+         MWsXLmJ0oXSrZazyF2M4XEDdjxSqMlDXVjUvZ6U602pCgB5jygCa8BoI1q4FcDKYU/Bp
+         +RoA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:reply-to:date:in-reply-to:message-id
          :mime-version:references:subject:from:to:cc;
-        bh=ejNz6/mRycQ/8a4gZzvJd7025j920aJ4l8YEJ/7oL7w=;
-        b=PnJq/z+wt++K5qSEFuPhBJk4OLLcLgkmYoPCWH7kAboQgc2PJazWv94mhFaTtskDby
-         69FGGO0h33/9IUPc4PBbUhX1yYpjeBzdKBRDJIdcuLxssGBJbT+eIuN7OZEJMfPYCvQQ
-         BLa8jWbKCQ6+hbsqMbPOzoF9dvMExUrkKKukQesiJaX6U9xqEKTE/kKuZDKXRdzu+PAJ
-         d6SfWrlYUtdHXigw2VYJn2mpEcIuOiRotwdeai5HPiKJZ7rdD2C9txLSAIXfhO92ZCp0
-         y4h1oAIPes4e60vQzsTSRoeYPD2mtSjrCKLQ7lin/nBvh9hs/m6IQ9FaVbGvZ4nRi+Us
-         bscg==
-X-Gm-Message-State: AOAM530nxsNLE/9sw0dbJDlufgyH+Z6BcYrMX9ZIPtvWKiLyBFgX7eG0
-        HnVHNllUNNOHo6ag0hefQPRv/9jumH4=
-X-Google-Smtp-Source: ABdhPJzf+ldPvj6Fg4gh6aAz/cRIuHFFV6MjRkz9wisPDwSyKPmpjYPOqJcN0ic3Jp8qnjnXL7/Vcfx6ldE=
+        bh=NoxzXKy25RgDTK+Npf4Da6Ion6Bw41f/CgEilQohoV8=;
+        b=d9yiZrqlH3UyndPkS5lRnr6ExS3eMeFnIF5pK2XSYvRl2UeWX3A3ZrmKeKqa3cQtuZ
+         jreTfgVFLotWQDZJ2+P75FyAxpgo1lkCYkR37sNwdcFCbBZVXexCJrprZy5CItulv9Yp
+         Ct8uGxcsa8E1hpBDAmHe6hgI6gfPyzGk0ecVUY54ytPMxulDjSkrRzLzCyIqUeIOngtL
+         oo9D5YlNIwNCxDxCyqK6I6a5Ls/BWV5QCPQys7bwKC4N8sUVARySRJRzlK08NbY7E28h
+         5MnrnXAMe5X7G2stNfLIc8xpIYtRw/tmEVgFjKhZv66Yg7wWWwEBcxQWvsSFkz0PbPSQ
+         8VwQ==
+X-Gm-Message-State: AOAM533P7Zie2DMAV5GYd0bJMvGdfdu0+CKi1myfctSyUF+/aVFSZ2nK
+        EKD2EDeRfM0L/G9FvAbkokJetcgKMKY=
+X-Google-Smtp-Source: ABdhPJyvJhqvaVHDZY4RvEdltK5JFGbOu/AGcbMBQJyXWeAzdbLMT9fvmebhPqJ2/ofqK6F2n8nBxpCaMN0=
 X-Received: from seanjc798194.pdx.corp.google.com ([2620:15c:f:10:6c93:ada0:6bbf:e7db])
- (user=seanjc job=sendgmr) by 2002:ad4:4f84:: with SMTP id em4mr5435608qvb.26.1618525282494;
- Thu, 15 Apr 2021 15:21:22 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a05:6214:176a:: with SMTP id
+ et10mr5598011qvb.23.1618525284837; Thu, 15 Apr 2021 15:21:24 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Thu, 15 Apr 2021 15:21:01 -0700
+Date:   Thu, 15 Apr 2021 15:21:02 -0700
 In-Reply-To: <20210415222106.1643837-1-seanjc@google.com>
-Message-Id: <20210415222106.1643837-5-seanjc@google.com>
+Message-Id: <20210415222106.1643837-6-seanjc@google.com>
 Mime-Version: 1.0
 References: <20210415222106.1643837-1-seanjc@google.com>
 X-Mailer: git-send-email 2.31.1.368.gbe11c130af-goog
-Subject: [PATCH v3 4/9] sched/vtime: Move vtime accounting external
- declarations above inlines
+Subject: [PATCH v3 5/9] sched/vtime: Move guest enter/exit vtime accounting to vtime.h
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Sean Christopherson <seanjc@google.com>,
@@ -68,130 +67,150 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Move the blob of external declarations (and their stubs) above the set of
-inline definitions (and their stubs) for vtime accounting.  This will
-allow a future patch to bring in more inline definitions without also
-having to shuffle large chunks of code.
+Provide separate helpers for guest enter vtime accounting (in addition to
+the existing guest exit helpers), and move all vtime accounting helpers
+to vtime.h where the existing #ifdef infrastructure can be leveraged to
+better delineate the different types of accounting.  This will also allow
+future cleanups via deduplication of context tracking code.
+
+Opportunstically delete the vtime_account_kernel() stub now that all
+callers are wrapped with CONFIG_VIRT_CPU_ACCOUNTING_NATIVE=y.
 
 No functional change intended.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- include/linux/vtime.h | 94 +++++++++++++++++++++----------------------
- 1 file changed, 47 insertions(+), 47 deletions(-)
+ include/linux/context_tracking.h | 17 +-----------
+ include/linux/vtime.h            | 46 +++++++++++++++++++++++++++-----
+ 2 files changed, 41 insertions(+), 22 deletions(-)
 
-diff --git a/include/linux/vtime.h b/include/linux/vtime.h
-index 041d6524d144..6a4317560539 100644
---- a/include/linux/vtime.h
-+++ b/include/linux/vtime.h
-@@ -10,53 +10,6 @@
+diff --git a/include/linux/context_tracking.h b/include/linux/context_tracking.h
+index 7cf03a8e5708..1c05035396ad 100644
+--- a/include/linux/context_tracking.h
++++ b/include/linux/context_tracking.h
+@@ -137,14 +137,6 @@ static __always_inline void context_tracking_guest_exit_irqoff(void)
+ 		__context_tracking_exit(CONTEXT_GUEST);
+ }
  
- struct task_struct;
- 
--/*
-- * vtime_accounting_enabled_this_cpu() definitions/declarations
-- */
--#if defined(CONFIG_VIRT_CPU_ACCOUNTING_NATIVE)
--
--static inline bool vtime_accounting_enabled_this_cpu(void) { return true; }
--extern void vtime_task_switch(struct task_struct *prev);
--
--#elif defined(CONFIG_VIRT_CPU_ACCOUNTING_GEN)
--
--/*
-- * Checks if vtime is enabled on some CPU. Cputime readers want to be careful
-- * in that case and compute the tickless cputime.
-- * For now vtime state is tied to context tracking. We might want to decouple
-- * those later if necessary.
-- */
--static inline bool vtime_accounting_enabled(void)
--{
--	return context_tracking_enabled();
--}
--
--static inline bool vtime_accounting_enabled_cpu(int cpu)
--{
--	return context_tracking_enabled_cpu(cpu);
--}
--
--static inline bool vtime_accounting_enabled_this_cpu(void)
--{
--	return context_tracking_enabled_this_cpu();
--}
--
--extern void vtime_task_switch_generic(struct task_struct *prev);
--
--static inline void vtime_task_switch(struct task_struct *prev)
+-static __always_inline void vtime_account_guest_exit(void)
 -{
 -	if (vtime_accounting_enabled_this_cpu())
--		vtime_task_switch_generic(prev);
+-		vtime_guest_exit(current);
+-	else
+-		current->flags &= ~PF_VCPU;
 -}
 -
--#else /* !CONFIG_VIRT_CPU_ACCOUNTING */
+ static __always_inline void guest_exit_irqoff(void)
+ {
+ 	context_tracking_guest_exit_irqoff();
+@@ -163,20 +155,13 @@ static __always_inline void guest_enter_irqoff(void)
+ 	 * to flush.
+ 	 */
+ 	instrumentation_begin();
+-	vtime_account_kernel(current);
+-	current->flags |= PF_VCPU;
++	vtime_account_guest_enter();
+ 	rcu_virt_note_context_switch(smp_processor_id());
+ 	instrumentation_end();
+ }
+ 
+ static __always_inline void context_tracking_guest_exit_irqoff(void) { }
+ 
+-static __always_inline void vtime_account_guest_exit(void)
+-{
+-	vtime_account_kernel(current);
+-	current->flags &= ~PF_VCPU;
+-}
 -
--static inline bool vtime_accounting_enabled_cpu(int cpu) {return false; }
--static inline bool vtime_accounting_enabled_this_cpu(void) { return false; }
--static inline void vtime_task_switch(struct task_struct *prev) { }
+ static __always_inline void guest_exit_irqoff(void)
+ {
+ 	instrumentation_begin();
+diff --git a/include/linux/vtime.h b/include/linux/vtime.h
+index 6a4317560539..3684487d01e1 100644
+--- a/include/linux/vtime.h
++++ b/include/linux/vtime.h
+@@ -3,21 +3,18 @@
+ #define _LINUX_KERNEL_VTIME_H
+ 
+ #include <linux/context_tracking_state.h>
++#include <linux/sched.h>
++
+ #ifdef CONFIG_VIRT_CPU_ACCOUNTING_NATIVE
+ #include <asm/vtime.h>
+ #endif
+ 
 -
--#endif
+-struct task_struct;
 -
  /*
   * Common vtime APIs
   */
-@@ -94,6 +47,53 @@ static inline void vtime_account_hardirq(struct task_struct *tsk) { }
- static inline void vtime_flush(struct task_struct *tsk) { }
- #endif
+ #ifdef CONFIG_VIRT_CPU_ACCOUNTING
+ extern void vtime_account_kernel(struct task_struct *tsk);
+ extern void vtime_account_idle(struct task_struct *tsk);
+-#else /* !CONFIG_VIRT_CPU_ACCOUNTING */
+-static inline void vtime_account_kernel(struct task_struct *tsk) { }
+ #endif /* !CONFIG_VIRT_CPU_ACCOUNTING */
  
-+/*
-+ * vtime_accounting_enabled_this_cpu() definitions/declarations
-+ */
-+#if defined(CONFIG_VIRT_CPU_ACCOUNTING_NATIVE)
-+
-+static inline bool vtime_accounting_enabled_this_cpu(void) { return true; }
-+extern void vtime_task_switch(struct task_struct *prev);
-+
-+#elif defined(CONFIG_VIRT_CPU_ACCOUNTING_GEN)
-+
-+/*
-+ * Checks if vtime is enabled on some CPU. Cputime readers want to be careful
-+ * in that case and compute the tickless cputime.
-+ * For now vtime state is tied to context tracking. We might want to decouple
-+ * those later if necessary.
-+ */
-+static inline bool vtime_accounting_enabled(void)
+ #ifdef CONFIG_VIRT_CPU_ACCOUNTING_GEN
+@@ -55,6 +52,18 @@ static inline void vtime_flush(struct task_struct *tsk) { }
+ static inline bool vtime_accounting_enabled_this_cpu(void) { return true; }
+ extern void vtime_task_switch(struct task_struct *prev);
+ 
++static __always_inline void vtime_account_guest_enter(void)
 +{
-+	return context_tracking_enabled();
++	vtime_account_kernel(current);
++	current->flags |= PF_VCPU;
 +}
 +
-+static inline bool vtime_accounting_enabled_cpu(int cpu)
++static __always_inline void vtime_account_guest_exit(void)
 +{
-+	return context_tracking_enabled_cpu(cpu);
++	vtime_account_kernel(current);
++	current->flags &= ~PF_VCPU;
 +}
 +
-+static inline bool vtime_accounting_enabled_this_cpu(void)
-+{
-+	return context_tracking_enabled_this_cpu();
-+}
-+
-+extern void vtime_task_switch_generic(struct task_struct *prev);
-+
-+static inline void vtime_task_switch(struct task_struct *prev)
+ #elif defined(CONFIG_VIRT_CPU_ACCOUNTING_GEN)
+ 
+ /*
+@@ -86,12 +95,37 @@ static inline void vtime_task_switch(struct task_struct *prev)
+ 		vtime_task_switch_generic(prev);
+ }
+ 
++static __always_inline void vtime_account_guest_enter(void)
 +{
 +	if (vtime_accounting_enabled_this_cpu())
-+		vtime_task_switch_generic(prev);
++		vtime_guest_enter(current);
++	else
++		current->flags |= PF_VCPU;
 +}
 +
-+#else /* !CONFIG_VIRT_CPU_ACCOUNTING */
++static __always_inline void vtime_account_guest_exit(void)
++{
++	if (vtime_accounting_enabled_this_cpu())
++		vtime_guest_exit(current);
++	else
++		current->flags &= ~PF_VCPU;
++}
 +
-+static inline bool vtime_accounting_enabled_cpu(int cpu) {return false; }
-+static inline bool vtime_accounting_enabled_this_cpu(void) { return false; }
-+static inline void vtime_task_switch(struct task_struct *prev) { }
-+
-+#endif
-+
+ #else /* !CONFIG_VIRT_CPU_ACCOUNTING */
  
- #ifdef CONFIG_IRQ_TIME_ACCOUNTING
- extern void irqtime_account_irq(struct task_struct *tsk, unsigned int offset);
+-static inline bool vtime_accounting_enabled_cpu(int cpu) {return false; }
+ static inline bool vtime_accounting_enabled_this_cpu(void) { return false; }
+ static inline void vtime_task_switch(struct task_struct *prev) { }
+ 
++static __always_inline void vtime_account_guest_enter(void)
++{
++	current->flags |= PF_VCPU;
++}
++
++static __always_inline void vtime_account_guest_exit(void)
++{
++	current->flags &= ~PF_VCPU;
++}
++
+ #endif
+ 
+ 
 -- 
 2.31.1.368.gbe11c130af-goog
 
