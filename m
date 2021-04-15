@@ -2,41 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 43707360F7E
-	for <lists+kvm@lfdr.de>; Thu, 15 Apr 2021 17:54:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 19E17360F85
+	for <lists+kvm@lfdr.de>; Thu, 15 Apr 2021 17:55:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233987AbhDOPy6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 15 Apr 2021 11:54:58 -0400
-Received: from mail-bn7nam10on2080.outbound.protection.outlook.com ([40.107.92.80]:58256
-        "EHLO NAM10-BN7-obe.outbound.protection.outlook.com"
+        id S234037AbhDOPz1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 15 Apr 2021 11:55:27 -0400
+Received: from mail-dm6nam10on2075.outbound.protection.outlook.com ([40.107.93.75]:28384
+        "EHLO NAM10-DM6-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S233369AbhDOPy5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 15 Apr 2021 11:54:57 -0400
+        id S232913AbhDOPz0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 15 Apr 2021 11:55:26 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=X3dtEnpxtFDyR8H65pFSH6g+3faofYuljlOT/VREeKuTZHy0kPM+H2KvuiUvp/QXVNnIIVQY4hh+RSGU8k2yUMMTvLtmrrSJV5mw7s5GKyRNMAnSDi4F6mQFCIwBmdBV8hvpixvsKQvF1wunhXIYUa2mLgsL8RIm2ecxOpZGyMj1XpZ/wh/k+lFbeUlv6Lbv9zweSfUgG2h92JM2oWN3lKFot7BHtfO1lKIj5wOVV429ItV2KKUni63N2r2VJSI4hKhWcMik3qDeo/LHektTMN7EVA/K2Ks0ekDD3iJhDiWGHZK7WyypLm6hJIMwt3iLhjFLiHaH8kgurf75RO+9mQ==
+ b=GnLdlQOKjFTGxVhIZfoU2A5jTaD4FFwQRGACnJCQyWUcFCGiWruvp3WHBhgo5HWKHRhtZZrK6PmdfJ/GhYTB/pD6u4yXAaCliFJa4Fnmp6v8V3V8cHUy9Cc3EojlAHYgSajHX8KJgxaKmO+7hhuZUIJBw1PIMlWkOQgJKs4Fd4b/L30652R6lJitYk91T7RxR3Z7NhZpHvF6CKdibdhORCzibzqe3gBL7tDoxHRrDBIo7C7tIwG1HB5Hixk7rXdjC016R5ByAmpymzWxbBYTZq+8/qHO5EWkQM6z5VOFOjsqG6/xFzAWKplaRPpgSOOgjEHyJG0eoBeWS+qxiQBksA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=OoXsYPtt9BXmkmjz+xmowRRzJrV5xMeUKi1J8IY9VRA=;
- b=dgWbClRt0z8MVQuzLDc5ROb3KxRz43ukVqbG+GoMmTMXM+pJbNuaCft/FrIR0NqULaCf2JLQD0J3Ho2NpATg+98yYeibvX67FwVdfWDsMg9wgFfAplENoRwmT/sNoD3ycW9f9lwJWKJ6g6lqv10/y2wTBbXS7LVcK/9eEH5+9h/r0ZFNaoI1asRvJE1Gcaz01SP/eLwIEEjyJO/e8RbdDX5FrmNne/hVDeLwGTF14gulUeH7TzMXlqbiH0Swkdqky33RBX/Au/rXrfLXd61qNm68sCSKltZD1RqxRUC63jcfSkEuYAMgmCFkjHiSF2bpmZHly5A/42r1reiNO0EslA==
+ bh=UL+lHwQVytiB/W+Txx8qhIcS4kg9BpXMgb/clYt+Co4=;
+ b=KvUJ0FLejOqP31PaPWvktplZRf30sdy52OQHfnkjsJKj2bjz2nF95uDbbmKAerj3zV93Tf16M4y0+jmh1CusnXGz1EsG+yAiXARtn3iRflRWJUbejNLBXmF0ioHhzxgOk84wuLGq3bvtAwHJdVRh3oeJxdmQ6CftBIhdoS5EQusIkEvWUQCsoF8A3ry43MWkxk8MfNcDHtLkucpXwzFLtoNfHwqd3aIIw1YgPDTmm9IjPUVBViPB8nN41LWKqGvZwgYtMRmWv/DTPFCkB0j4AKyyJnX/mWytmfcCnN3ungwISj1Uw8tNKA3dQ+hRgVVVj3ClKysUpH4OrOzc4W+NIA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
  header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=OoXsYPtt9BXmkmjz+xmowRRzJrV5xMeUKi1J8IY9VRA=;
- b=Z9f/fSIu0iSFB+tR52r1p0hHZNvIOHKNfdSqe8wYTyKXln8Y/vjqT5DYcmyhofQKafKy/uX6MYxcuPbJ3OGdvoEBKPTYj5MZFAJciPKuI7OItRGGtRbe4QuosWNZf+BjT8avTqaBn3iQQPwhAw4U1gaKyFwhH/1/hhND/294EXM=
+ bh=UL+lHwQVytiB/W+Txx8qhIcS4kg9BpXMgb/clYt+Co4=;
+ b=KlRW151RXOER1v6Tw/JDrs+1MEcSNJemYzLTfFF4Wh8/hRsktQU5ZGCDOQcaVK/frUhuvthQDBPvECePz/tjRh3y10J8Drzg/R4ny5rP1LrkTFHZ3gRWAvzLtS3FxzursEX2l7bFna6cOy9iRlkfPTkZNkHnikaTmI6t5gXd5R8=
 Authentication-Results: redhat.com; dkim=none (message not signed)
  header.d=none;redhat.com; dmarc=none action=none header.from=amd.com;
 Received: from SN6PR12MB2767.namprd12.prod.outlook.com (2603:10b6:805:75::23)
- by SA0PR12MB4384.namprd12.prod.outlook.com (2603:10b6:806:9f::22) with
+ by SA0PR12MB4592.namprd12.prod.outlook.com (2603:10b6:806:9b::16) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4042.16; Thu, 15 Apr
- 2021 15:54:32 +0000
+ 2021 15:55:01 +0000
 Received: from SN6PR12MB2767.namprd12.prod.outlook.com
  ([fe80::1fb:7d59:2c24:615e]) by SN6PR12MB2767.namprd12.prod.outlook.com
  ([fe80::1fb:7d59:2c24:615e%6]) with mapi id 15.20.4042.018; Thu, 15 Apr 2021
- 15:54:32 +0000
+ 15:55:01 +0000
 From:   Ashish Kalra <Ashish.Kalra@amd.com>
 To:     pbonzini@redhat.com
 Cc:     tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com,
@@ -44,80 +44,81 @@ Cc:     tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com,
         x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
         srutherford@google.com, seanjc@google.com,
         venu.busireddy@oracle.com, brijesh.singh@amd.com
-Subject: [PATCH v13 03/12] KVM: SVM: Add KVM_SEV_SEND_FINISH command
-Date:   Thu, 15 Apr 2021 15:54:15 +0000
-Message-Id: <5082bd6a8539d24bc55a1dd63a1b341245bb168f.1618498113.git.ashish.kalra@amd.com>
+Subject: [PATCH v13 04/12] KVM: SVM: Add support for KVM_SEV_RECEIVE_START command
+Date:   Thu, 15 Apr 2021 15:54:50 +0000
+Message-Id: <c7400111ed7458eee01007c4d8d57cdf2cbb0fc2.1618498113.git.ashish.kalra@amd.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <cover.1618498113.git.ashish.kalra@amd.com>
 References: <cover.1618498113.git.ashish.kalra@amd.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-Originating-IP: [165.204.77.1]
-X-ClientProxiedBy: SN7PR04CA0223.namprd04.prod.outlook.com
- (2603:10b6:806:127::18) To SN6PR12MB2767.namprd12.prod.outlook.com
+X-ClientProxiedBy: SA9PR13CA0008.namprd13.prod.outlook.com
+ (2603:10b6:806:21::13) To SN6PR12MB2767.namprd12.prod.outlook.com
  (2603:10b6:805:75::23)
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from ashkalra_ubuntu_server.amd.com (165.204.77.1) by SN7PR04CA0223.namprd04.prod.outlook.com (2603:10b6:806:127::18) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4042.16 via Frontend Transport; Thu, 15 Apr 2021 15:54:32 +0000
+Received: from ashkalra_ubuntu_server.amd.com (165.204.77.1) by SA9PR13CA0008.namprd13.prod.outlook.com (2603:10b6:806:21::13) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4065.6 via Frontend Transport; Thu, 15 Apr 2021 15:55:00 +0000
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: b0448f58-7341-4970-a3af-08d90026c2cc
-X-MS-TrafficTypeDiagnostic: SA0PR12MB4384:
+X-MS-Office365-Filtering-Correlation-Id: 7c499711-96cc-4b3a-80a9-08d90026d3c6
+X-MS-TrafficTypeDiagnostic: SA0PR12MB4592:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <SA0PR12MB4384C4BC56707D9C881D8F808E4D9@SA0PR12MB4384.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:3826;
+X-Microsoft-Antispam-PRVS: <SA0PR12MB45929455686B0EE7FB4DEF208E4D9@SA0PR12MB4592.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:2331;
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: E/oTqNgi3h5Xbomc4m90faWkBPrvyHM8zATlvHMT5rQDf9W30v5qSW8zcBn62Ns3KLA8yLaELW5uHqT0WWV9vFId9ZPcJOKrluEAy6DiTH7GXfp5ebz7s/ZcRP3GaNhx3kfuCqZWQnT8DLbdvm7SSGDY3uqSNK7h1IADfSN9a+R7SJKhGxj8eCHk9+l5PXZYgL/OpesSkkHYz/f1PsmaGiM2t1+pTTfiOX7sFPoB+XghMepayWBTaOeB63xuTDYn/eRqEOtHhq7OxRJELSg1sZxpVgVjPc5UZ9toum7LMDMMJJG00h5r7j8hR1zrpZgzxxyMMgZStcUoHFQK2zsnkIShkzk4OqRmJTFGV/Z7oKqJLWVQqbkAYNYcCUuSn00rsPp/6ApTbmZkEA32VL48/cmMD8EQdBc9Vjdi817RJPL/pg74dRkXhoaQqlnuaRgIx4dOGKjfgvvVk5Z662hMAcLHVvCyVFKBREW8qnNGbmfhzwxhfZvzP7jLXVRhH566+F1LhNXoy7bwfsvEyoClofiejMicJVXxPjt1IBMN8KXtEUwwI3B2wZEN2wCedc+ShWeUbSNVzEa3iCM/vvTf0eZttWqGTbggJpvc1mERcTD+s/4TmBr6g9xACEs26u/lZIbPPlyjzTe0Xg/ZDk9AUw==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2767.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(396003)(346002)(136003)(376002)(39860400002)(366004)(2906002)(4326008)(83380400001)(6666004)(316002)(38350700002)(2616005)(38100700002)(36756003)(8676002)(956004)(8936002)(26005)(16526019)(7696005)(66946007)(186003)(66476007)(66556008)(478600001)(5660300002)(7416002)(52116002)(6486002)(86362001)(6916009);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: =?utf-8?B?aWptbGJYQjNJRHcvaStWOVBIVWR5K09mN2RUQVFLSXRZQnBKSTB2Wi8vd0s1?=
- =?utf-8?B?VjFOZ1VsM0t1SHpxU3YyeC9wM1R1V0p4dU9FK3Q5YW5PcktGNEpjNjJqdjVl?=
- =?utf-8?B?M05yL3hVUmdxR05mdTNLQVRhdVdJQ0ExTm1wVDNySU1WY05XVWkyZ05Pazlp?=
- =?utf-8?B?ZFA3UENMVWFtVklnY1J1ME5sdkE2NjBaYjRJdzE1aXNPcWloQjdNZDJ3dHJv?=
- =?utf-8?B?cUdXbjlHNzhMaStzYmJwVmUwNVRIQ3lYZFNqZGZYaEoweUJBdWwyeUZWNThG?=
- =?utf-8?B?L2xGYnp2S1lhQ01vcXpzeVhrdm4vRloxMUJmZ3EvTzM1dVQ2cmJoSU91VDlw?=
- =?utf-8?B?STg2ZXBTd1g5eXRhY1hjNkg2TnVtUi9vVVpvVnNzM1lmUDRmOEpJbHllUVF0?=
- =?utf-8?B?Nmw2SmdLaGZxS2l6bWZNSmhFSmdjMzNyUFlFY3pVNzdUbWJzV3U0Y0FYWWlE?=
- =?utf-8?B?b2pnN0s1cVAyb1lLTytRSzU1Z1Y1eUxUdUtsTVplWmRNMlNDQkhWRWFFejQ1?=
- =?utf-8?B?enlhRy9Dc2R1RjdzamlKYWxYQUVEYlNtNkFucVFNVHlTUDBTMVJkc21BeWM0?=
- =?utf-8?B?RGNDRXdhQlVRUEdldzhlZnpFWkc3WGtCK0l2RXQ5UHlOQjRZb0dBSTJ6dkhx?=
- =?utf-8?B?WlBXNlZOK29HdU5HcXNDcUdqSlNkbmQzd0RueURMeTZZcTJlaTQ4Wm1ST1BY?=
- =?utf-8?B?RGZua013RGkrenJKbkFUbHRjOUt1alg2cDlvZnBMRkp6UjJ0VFYzejFpV1F0?=
- =?utf-8?B?bFZ2OVhUelFVSmxWZ3lCTlcyNndNU1p6ekt3Q0xveFNRNUF5dG1oVGZ2UXFP?=
- =?utf-8?B?VXdzU2tkL1N3RlFSYVpJV0ROczMxQmVWSVkwNkNPOXZRam1PTm0rRjN0SHVa?=
- =?utf-8?B?UGFFTFgxWjFpUlZoOHNIMm1jeE4xUFB2MXJzdHBsdWU0T2xGbytWaEhUOHJ0?=
- =?utf-8?B?NFVzUDhyZ2x2TmdrYXp0THRTT0lDV2paYXB4WDhBUUpVejR0NVg0Y21WS3VN?=
- =?utf-8?B?N2k4TkljM3ljbXQ3WG4zUWZoYlFDN0RtU1FLQk1ucG9wS3JsLzJPVUZWOTJN?=
- =?utf-8?B?RnZtY0xHUVB1QkZ0RTZoYjZkaVRjZThSV2xXQWtoTGZYTENRenc0alVQQUlV?=
- =?utf-8?B?OGNGWmxyU3hoQnNKM2lQanU2Q0gyZ3FWNUxTa29LWkZPdC9HTGJSN0dwVUpI?=
- =?utf-8?B?cm5HMFoxUTgyeUFJd1JTUEhYK3FsSjhXT25yTFk5SnpYNkpqRG9ENVNwYzZK?=
- =?utf-8?B?WlN0UGZsZ0s0MjVkdUpsanFkYVJLdEtTRGNMNlpCUkRvaWlhNzJ2Vzc0UDJG?=
- =?utf-8?B?MFVLUUM5UUMveHlPQ0Z3bVBzaWVrQmtsMTl0OThoaElYMllrVW9PVU9JODls?=
- =?utf-8?B?MlZzQVByZWdEdzlWOGx1TTk4Z1dXWXFrLzRmSmVtZHBFWFdZYnAwNHNvd1Nn?=
- =?utf-8?B?NUh6a3dPdGQrc1lQN2xjdEY3RXA0aG5qY1psc3B4aFB4aTFmbkdSNnFlcE9R?=
- =?utf-8?B?QmxwTEtFL08xZHdtYWppRWNLYktuNzBZTEZ1dWMwWU84K2x3c1NoaVAvbnlG?=
- =?utf-8?B?NGRFdWllRm5zSjFWWkQ1REc4NFN2WGNKdmZyMDJ6MWdMaUd6bkw5YjVLQ1FZ?=
- =?utf-8?B?YWw2VEtFVjFZb21xZytVMVpMaDBLMTdkUlJBd25rTkI0TTA5Qm1GT1lBNWxw?=
- =?utf-8?B?ZjVubjNLaGVLbG0wY0ZjZlgvbXNPbDJLOFh5Rit4UFpYSU1mVFRscDJuSmJO?=
- =?utf-8?Q?dj6n7DABN93KZD7Mx85uf8oFdDkosVMHFkuDwMH?=
+X-Microsoft-Antispam-Message-Info: yeBGT9I+dG6v6CwetAVF8URw2ionJyHbHwvaql/7mEkh/vnlFgkhEmi5IyoxjwhfxgWXmww1LfjA+HHvyHyVHt0elOyOMr2d2ok9uly0zbRUSCWHhF0cMxBxyZ1y5EoCVf+pATtpTr2CTkPy7rAk4gjfw6U4kPflwpVRLKtu/T2GBDdam86IOqfsCv/mdoJbInRqCL3A1fij/mS+od/hSVwvjlzhB8/4AM/j5avg9vtTGHfZe5FDhda+RohJ0Hus/+j9M/2FXdJR/uedkICbM2XUcnZ+iU4T47ogVsncxlLxT2W48FBddT1Ouhok9ostH4qcMi7e46GU0LQcK9uxFXcJ52mIHkE2jB87+xh22fzHa7TYEr1VLU83bZnULzVlA65toX2ggpxsoKCLqlmWlkrYkswZDP1wDwSbwDKQ9XnPQHc008BHjBnst3h7E4zuNXG4wirNS5upX+z8iw3PPvIAP008q5txs5Hr2EZH79+5Si8yX8nC6+DbZbs9LcR5r8IttgtvlBgSzVoxA+CE8q16BCyKO8E5g7nfFCsdNBwF7VbwDpmCJhKKXbLleIQbn5lNx3x2nhV9tbhQ3D5w6y1PaQcW6H5JHX0Hf9crhpBlfw6paKotDUtu4NHLBh9KC0qsw+nalRi5+hB/546cYg==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2767.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(376002)(396003)(366004)(136003)(346002)(39860400002)(5660300002)(186003)(26005)(956004)(66556008)(16526019)(4326008)(83380400001)(478600001)(6666004)(2616005)(6916009)(38350700002)(52116002)(86362001)(36756003)(7416002)(7696005)(8936002)(66476007)(8676002)(2906002)(66946007)(316002)(6486002)(38100700002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData: =?utf-8?B?dUZOdDJPL05lRjJxdlJzK2JsK20wZm1seUprcGVkaVlVRG9qUmppWmlmdDRk?=
+ =?utf-8?B?clJOaVNoZnIyZEp3Vllhb0Uwa1pqakFiVVVuUnBEZGc4VHg4RGJQc2hXTk85?=
+ =?utf-8?B?L1J0OXNnbVI5T1BGeW1OMDU0U08rcDk4WmIwTWtnU1hEYWNMS2liak0xTUFo?=
+ =?utf-8?B?Z2liM3ZPcVVBdkJOc0lXdWFzYlk2UHBza1JBUTlmQy9TK3FmOEFSWFBTNGt0?=
+ =?utf-8?B?elQwT092SEF6QStzbHFINXJPdnNjK2VJWGNlbmNmSElUcUhFZ0V1R2VjdGNJ?=
+ =?utf-8?B?ckpBMjZvMHQvMVVBd2NBcURvWDQwM1ViQ3hLUWN2N2VPN1BNc0RSbitOQ2Jz?=
+ =?utf-8?B?Z0NxZDhqKzdoaWdXR3IvT1Z0aVFlOE5LTVhnWVhvTGNqajNuaWh0Ry9sRFR4?=
+ =?utf-8?B?T0htVC9QUUhxM2xUOGhsYjdiSnhMdkYzS2xNYnBvZmdkSkRaN0Y4S3l1YURk?=
+ =?utf-8?B?a2xrQWZRc3YveDV6bW1DREtReWJ1UHFOQkZaSTZnSFlIU1Z4anc1UW91ZUVp?=
+ =?utf-8?B?VlVRcDNOQlJXZkhBNk5kbzROLzNRc202S2FxdXVneEt5UjVuNlRKVDdpSm11?=
+ =?utf-8?B?S2trbG9Ja2pldXZEYWQ5eFBXQURwL0ZqR1E3ai9zRXo3NGZWWWh2c1BzUFR6?=
+ =?utf-8?B?d216OVJHQ2xJWThLY0FHK3V1T2VndmxGajlrUmNrTFFjdW5Yb1lGeXFWcy9V?=
+ =?utf-8?B?SUxrOVFsTG94VGVsUXNRUHg3MXdCZ1hCSWVmVGJkTUo2MDdYZFNsMFVlbnov?=
+ =?utf-8?B?WTM0STA0a0o1bzhpOGxTKzRSYlFDTzFYWVdxT3hGbzZmYVNKSGEvbFc2eDhr?=
+ =?utf-8?B?UXZ5QmNmWUdEdGpOb1BlbEE3MElDNDIvVXlSdG43MUN6U2FydzJYY2JkdTk3?=
+ =?utf-8?B?emJrNEY3THpXSnVsVmhsaEJKcm55bEV4aTFjRElIRTI0NTFNSXBsUEZhQkZj?=
+ =?utf-8?B?MjdSMGFldlVHZXZQelVqcGptUmdJOXV5VjlSKzg2WGIzNXI0bDByckZVTzh3?=
+ =?utf-8?B?dFdVcDZOcTFpeVEvZjBpZEdEK1dabElWZDhGOVZjTmk1K1Z3a091Qzc0Y2N2?=
+ =?utf-8?B?U3JDc3JLUzhXUk8wU1l2T1JnekdXdkdpdnh2bjVsbVMxQzhBK0phRXRrREl5?=
+ =?utf-8?B?WkVwalcxVmlSVFVPaXVqbGVaaVlubHdaS2VkWURpOGx2OXpjSGNTMno5OUJY?=
+ =?utf-8?B?cld4MEd3RW8vVnFkdFFHQnRWSGJreDNRZGZBdmZJekZ5bkVKVUUzOVZrZDF0?=
+ =?utf-8?B?SWtKWVZkUVZjNEdoL1Urb3dWTmxWRytmc2JJd3ZFUmlCRnpoN01NZ3RrQ0I1?=
+ =?utf-8?B?WG5EYldoZnFtNmY5ZHluNVVJTnh6Sit5dFZhVy90cVFiWjFYdmV3T01neEpi?=
+ =?utf-8?B?WkdhUGJ6b3BsRkZlWW9Oa1ZCN0FVZFUrUjhjWEhJRzBZaTN0aVh6d3dMcWV1?=
+ =?utf-8?B?cTFyVWFMUGRqZzRpNEw0THdPN1c3VHlEUzNERjRQYy9XWjQ0S3RmT1ZIZWpt?=
+ =?utf-8?B?Y0Vhcjk5N3VUV0FjbFQ3c09lVS91V3pQUjRmSUxqdlVPaTNldlVmVldmbVIv?=
+ =?utf-8?B?Znc5RG1RQ2oyOW56bWdnaVJKRW1lZFhrblV3YzVJbWY3SUIrN2NscExSbDcr?=
+ =?utf-8?B?Z3hDVmZob1NqMkVHYkdUcWdwS2o0U3RIWVJ2ZzhyY21BZjFhRC9zOW01aHNt?=
+ =?utf-8?B?Um9rTEs3bEw3QXRNakVtYkdJREY4UllSVEtBYmxVakZ1NWVLeWtPbTJkQjQy?=
+ =?utf-8?Q?CMstTCd6dgKw5aL+wVJZGfSKwAmIlRT/97W5sFv?=
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: b0448f58-7341-4970-a3af-08d90026c2cc
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7c499711-96cc-4b3a-80a9-08d90026d3c6
 X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2767.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Apr 2021 15:54:32.8213
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Apr 2021 15:55:01.2564
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: fN5VjtUkQyeVrOy57GfleTWx1G4mtiqmA5/l/lFY+/I8MscXz7UEsJIiG7ZuhoW9XbMqecGMK0aARHhsfpRv4w==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR12MB4384
+X-MS-Exchange-CrossTenant-UserPrincipalName: z2pY1Yfn9csqslUIAxvZE2PRIx7UOCpNdsxpTps8Nw2Irl7VrqYO7gCzPkH63Fm82rdpcoko0voUTY4mM1hy4w==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR12MB4592
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 From: Brijesh Singh <brijesh.singh@amd.com>
 
-The command is used to finailize the encryption context created with
-KVM_SEV_SEND_START command.
+The command is used to create the encryption context for an incoming
+SEV guest. The encryption context can be later used by the hypervisor
+to import the incoming data into the SEV guest memory space.
 
 Cc: Thomas Gleixner <tglx@linutronix.de>
 Cc: Ingo Molnar <mingo@redhat.com>
@@ -133,70 +134,170 @@ Reviewed-by: Steve Rutherford <srutherford@google.com>
 Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
 Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
 ---
- .../virt/kvm/amd-memory-encryption.rst        |  8 +++++++
- arch/x86/kvm/svm/sev.c                        | 23 +++++++++++++++++++
- 2 files changed, 31 insertions(+)
+ .../virt/kvm/amd-memory-encryption.rst        | 29 +++++++
+ arch/x86/kvm/svm/sev.c                        | 81 +++++++++++++++++++
+ include/uapi/linux/kvm.h                      |  9 +++
+ 3 files changed, 119 insertions(+)
 
 diff --git a/Documentation/virt/kvm/amd-memory-encryption.rst b/Documentation/virt/kvm/amd-memory-encryption.rst
-index 3c5456e0268a..26c4e6c83f62 100644
+index 26c4e6c83f62..c86c1ded8dd8 100644
 --- a/Documentation/virt/kvm/amd-memory-encryption.rst
 +++ b/Documentation/virt/kvm/amd-memory-encryption.rst
-@@ -335,6 +335,14 @@ Returns: 0 on success, -negative on error
-                 __u32 trans_len;
-         };
+@@ -343,6 +343,35 @@ issued by the hypervisor to delete the encryption context.
  
-+12. KVM_SEV_SEND_FINISH
+ Returns: 0 on success, -negative on error
+ 
++13. KVM_SEV_RECEIVE_START
 +------------------------
 +
-+After completion of the migration flow, the KVM_SEV_SEND_FINISH command can be
-+issued by the hypervisor to delete the encryption context.
++The KVM_SEV_RECEIVE_START command is used for creating the memory encryption
++context for an incoming SEV guest. To create the encryption context, the user must
++provide a guest policy, the platform public Diffie-Hellman (PDH) key and session
++information.
++
++Parameters: struct  kvm_sev_receive_start (in/out)
 +
 +Returns: 0 on success, -negative on error
++
++::
++
++        struct kvm_sev_receive_start {
++                __u32 handle;           /* if zero then firmware creates a new handle */
++                __u32 policy;           /* guest's policy */
++
++                __u64 pdh_uaddr;        /* userspace address pointing to the PDH key */
++                __u32 pdh_len;
++
++                __u64 session_uaddr;    /* userspace address which points to the guest session information */
++                __u32 session_len;
++        };
++
++On success, the 'handle' field contains a new handle and on error, a negative value.
++
++For more details, see SEV spec Section 6.12.
 +
  References
  ==========
  
 diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index 30527285a39a..92325d9527ce 100644
+index 92325d9527ce..e530c2b34b5e 100644
 --- a/arch/x86/kvm/svm/sev.c
 +++ b/arch/x86/kvm/svm/sev.c
-@@ -1350,6 +1350,26 @@ static int sev_send_update_data(struct kvm *kvm, struct kvm_sev_cmd *argp)
+@@ -1370,6 +1370,84 @@ static int sev_send_finish(struct kvm *kvm, struct kvm_sev_cmd *argp)
  	return ret;
  }
  
-+static int sev_send_finish(struct kvm *kvm, struct kvm_sev_cmd *argp)
++static int sev_receive_start(struct kvm *kvm, struct kvm_sev_cmd *argp)
 +{
 +	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
-+	struct sev_data_send_finish *data;
++	struct sev_data_receive_start *start;
++	struct kvm_sev_receive_start params;
++	int *error = &argp->error;
++	void *session_data;
++	void *pdh_data;
 +	int ret;
 +
 +	if (!sev_guest(kvm))
 +		return -ENOTTY;
 +
-+	data = kzalloc(sizeof(*data), GFP_KERNEL);
-+	if (!data)
-+		return -ENOMEM;
++	/* Get parameter from the userspace */
++	if (copy_from_user(&params, (void __user *)(uintptr_t)argp->data,
++			sizeof(struct kvm_sev_receive_start)))
++		return -EFAULT;
 +
-+	data->handle = sev->handle;
-+	ret = sev_issue_cmd(kvm, SEV_CMD_SEND_FINISH, data, &argp->error);
++	/* some sanity checks */
++	if (!params.pdh_uaddr || !params.pdh_len ||
++	    !params.session_uaddr || !params.session_len)
++		return -EINVAL;
 +
-+	kfree(data);
++	pdh_data = psp_copy_user_blob(params.pdh_uaddr, params.pdh_len);
++	if (IS_ERR(pdh_data))
++		return PTR_ERR(pdh_data);
++
++	session_data = psp_copy_user_blob(params.session_uaddr,
++			params.session_len);
++	if (IS_ERR(session_data)) {
++		ret = PTR_ERR(session_data);
++		goto e_free_pdh;
++	}
++
++	ret = -ENOMEM;
++	start = kzalloc(sizeof(*start), GFP_KERNEL);
++	if (!start)
++		goto e_free_session;
++
++	start->handle = params.handle;
++	start->policy = params.policy;
++	start->pdh_cert_address = __psp_pa(pdh_data);
++	start->pdh_cert_len = params.pdh_len;
++	start->session_address = __psp_pa(session_data);
++	start->session_len = params.session_len;
++
++	/* create memory encryption context */
++	ret = __sev_issue_cmd(argp->sev_fd, SEV_CMD_RECEIVE_START, start,
++				error);
++	if (ret)
++		goto e_free;
++
++	/* Bind ASID to this guest */
++	ret = sev_bind_asid(kvm, start->handle, error);
++	if (ret)
++		goto e_free;
++
++	params.handle = start->handle;
++	if (copy_to_user((void __user *)(uintptr_t)argp->data,
++			 &params, sizeof(struct kvm_sev_receive_start))) {
++		ret = -EFAULT;
++		sev_unbind_asid(kvm, start->handle);
++		goto e_free;
++	}
++
++	sev->handle = start->handle;
++	sev->fd = argp->sev_fd;
++
++e_free:
++	kfree(start);
++e_free_session:
++	kfree(session_data);
++e_free_pdh:
++	kfree(pdh_data);
++
 +	return ret;
 +}
 +
  int svm_mem_enc_op(struct kvm *kvm, void __user *argp)
  {
  	struct kvm_sev_cmd sev_cmd;
-@@ -1409,6 +1429,9 @@ int svm_mem_enc_op(struct kvm *kvm, void __user *argp)
- 	case KVM_SEV_SEND_UPDATE_DATA:
- 		r = sev_send_update_data(kvm, &sev_cmd);
+@@ -1432,6 +1510,9 @@ int svm_mem_enc_op(struct kvm *kvm, void __user *argp)
+ 	case KVM_SEV_SEND_FINISH:
+ 		r = sev_send_finish(kvm, &sev_cmd);
  		break;
-+	case KVM_SEV_SEND_FINISH:
-+		r = sev_send_finish(kvm, &sev_cmd);
++	case KVM_SEV_RECEIVE_START:
++		r = sev_receive_start(kvm, &sev_cmd);
 +		break;
  	default:
  		r = -EINVAL;
  		goto out;
+diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+index d45af34c31be..29c25e641a0c 100644
+--- a/include/uapi/linux/kvm.h
++++ b/include/uapi/linux/kvm.h
+@@ -1750,6 +1750,15 @@ struct kvm_sev_send_update_data {
+ 	__u32 trans_len;
+ };
+ 
++struct kvm_sev_receive_start {
++	__u32 handle;
++	__u32 policy;
++	__u64 pdh_uaddr;
++	__u32 pdh_len;
++	__u64 session_uaddr;
++	__u32 session_len;
++};
++
+ #define KVM_DEV_ASSIGN_ENABLE_IOMMU	(1 << 0)
+ #define KVM_DEV_ASSIGN_PCI_2_3		(1 << 1)
+ #define KVM_DEV_ASSIGN_MASK_INTX	(1 << 2)
 -- 
 2.17.1
 
