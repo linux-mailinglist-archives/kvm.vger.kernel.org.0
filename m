@@ -2,230 +2,131 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4045336005E
-	for <lists+kvm@lfdr.de>; Thu, 15 Apr 2021 05:24:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9DF56360082
+	for <lists+kvm@lfdr.de>; Thu, 15 Apr 2021 05:31:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229933AbhDODYI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 14 Apr 2021 23:24:08 -0400
-Received: from mga09.intel.com ([134.134.136.24]:48391 "EHLO mga09.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229853AbhDODYG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 14 Apr 2021 23:24:06 -0400
-IronPort-SDR: iDoUQyd2cXMvY3qodPNaVvUwslDQ8IoH9TaNlL2Bk2KZWObw+ZFN/oCYHS9Q0iGMO+J9EiIWBL
- St2vP/QvOXBA==
-X-IronPort-AV: E=McAfee;i="6200,9189,9954"; a="194889886"
-X-IronPort-AV: E=Sophos;i="5.82,223,1613462400"; 
-   d="scan'208";a="194889886"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Apr 2021 20:23:44 -0700
-IronPort-SDR: nlm/WecwwNqgbtHsmzB33KM9/VNaHcu+Py3c0xb8JQFANHdm+fY67fvqqZ4G4Da6UYyf4t55S8
- QjnQBbrKmAsg==
-X-IronPort-AV: E=Sophos;i="5.82,223,1613462400"; 
-   d="scan'208";a="425014595"
-Received: from likexu-mobl1.ccr.corp.intel.com (HELO [10.238.4.93]) ([10.238.4.93])
-  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Apr 2021 20:23:41 -0700
-Subject: Re: [PATCH v4 01/16] perf/x86/intel: Add x86_pmu.pebs_vmx for Ice
- Lake Servers
-To:     Liuxiangdong <liuxiangdong5@huawei.com>
-Cc:     andi@firstfloor.org, "Fangyi (Eric)" <eric.fangyi@huawei.com>,
-        Xiexiangyou <xiexiangyou@huawei.com>, kan.liang@linux.intel.com,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        wei.w.wang@intel.com, x86@kernel.org,
-        "Xu, Like" <like.xu@intel.com>
-References: <20210329054137.120994-2-like.xu@linux.intel.com>
- <606BD46F.7050903@huawei.com>
- <18597e2b-3719-8d0d-9043-e9dbe39496a2@intel.com>
- <60701165.3060000@huawei.com>
- <1ba15937-ee3d-157a-e891-981fed8b414d@linux.intel.com>
- <607700F2.9080409@huawei.com>
- <76467c36-3399-a123-d582-92affadc4d73@intel.com>
- <6077A9AE.2090705@huawei.com>
-From:   Like Xu <like.xu@linux.intel.com>
-Organization: Intel OTC
-Message-ID: <de8cde39-f6d8-e3b9-427b-86f7e916d8a1@linux.intel.com>
-Date:   Thu, 15 Apr 2021 11:23:39 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.9.1
+        id S230102AbhDODbR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 14 Apr 2021 23:31:17 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:37436 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230054AbhDODbP (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 14 Apr 2021 23:31:15 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1618457453;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=HlNNiI/3x3aTaVCgbYG1oVjUjq53goSd1bVD/8PXIMk=;
+        b=epzY7ot/SSQwhOWMVhN6UPGz0H5k0iADiOu18fhkn6jL2s3sB8ru2iZiqAbF3HE129XGGy
+        QMfVtPbFnzDk5a4j9/NA6Bs2CE3R7KyJLx6ZOvHrtnvZxFKLZOAiXkayK7ew37E9yWXKep
+        G0j1iYhMz+4GRtaMcWrgLzbVFZr6d18=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-157-wQ4K-NJSPnOVQhvEvIBkPQ-1; Wed, 14 Apr 2021 23:30:49 -0400
+X-MC-Unique: wQ4K-NJSPnOVQhvEvIBkPQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 08E81107ACE4;
+        Thu, 15 Apr 2021 03:30:48 +0000 (UTC)
+Received: from wangxiaodeMacBook-Air.local (ovpn-13-220.pek2.redhat.com [10.72.13.220])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 9D418610A8;
+        Thu, 15 Apr 2021 03:30:43 +0000 (UTC)
+Subject: Re: [PATCH 1/3] vDPA/ifcvf: deduce VIRTIO device ID when probe
+To:     Zhu Lingshan <lingshan.zhu@intel.com>, mst@redhat.com,
+        lulu@redhat.com, leonro@nvidia.com
+Cc:     virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20210414091832.5132-1-lingshan.zhu@intel.com>
+ <20210414091832.5132-2-lingshan.zhu@intel.com>
+From:   Jason Wang <jasowang@redhat.com>
+Message-ID: <85483ff1-cf98-ad05-0c53-74caa2464459@redhat.com>
+Date:   Thu, 15 Apr 2021 11:30:41 +0800
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
+ Gecko/20100101 Thunderbird/78.9.1
 MIME-Version: 1.0
-In-Reply-To: <6077A9AE.2090705@huawei.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+In-Reply-To: <20210414091832.5132-2-lingshan.zhu@intel.com>
+Content-Type: text/plain; charset=gbk; format=flowed
 Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2021/4/15 10:49, Liuxiangdong wrote:
-> 
-> 
-> On 2021/4/15 9:38, Xu, Like wrote:
->> On 2021/4/14 22:49, Liuxiangdong wrote:
->>> Hi Like,
->>>
->>> On 2021/4/9 16:46, Like Xu wrote:
->>>> Hi Liuxiangdong,
->>>>
->>>> On 2021/4/9 16:33, Liuxiangdong (Aven, Cloud Infrastructure Service 
->>>> Product Dept.) wrote:
->>>>> Do you have any comments or ideas about it ?
->>>>>
->>>>> https://lore.kernel.org/kvm/606E5EF6.2060402@huawei.com/
->>>>
->>>> My expectation is that there may be many fewer PEBS samples
->>>> on Skylake without any soft lockup.
->>>>
->>>> You may need to confirm the statement
->>>>
->>>> "All that matters is that the EPT pages don't get
->>>> unmapped ever while PEBS is active"
->>>>
->>>> is true in the kernel level.
->>>>
->>>> Try "-overcommit mem-lock=on" for your qemu.
->>>>
->>>
->>> Sorry, in fact, I don't quite understand
->>> "My expectation is that there may be many fewer PEBS samples on Skylake 
->>> without any soft lockup. "
->>
->> For testcase: perf record -e instructions:pp ./workload
->>
->> We can get 2242 samples on the ICX guest, but
->> only 17 samples or less on the Skylake guest.
->>
->> In my testcase on Skylake, neither the host nor the guest triggered the 
->> soft lock.
->>
-> 
-> Thanks for your explanationï¼
-> Could you please show your complete qemu command and qemu version used on 
-> Skylake?
-> I hope I can test it again according to your qemu cmd and version.
 
-A new version is released and you may have a try.
+ÔÚ 2021/4/14 ÏÂÎç5:18, Zhu Lingshan Ð´µÀ:
+> This commit deduces VIRTIO device ID as device type when probe,
+> then ifcvf_vdpa_get_device_id() can simply return the ID.
+> ifcvf_vdpa_get_features() and ifcvf_vdpa_get_config_size()
+> can work properly based on the device ID.
+>
+> Signed-off-by: Zhu Lingshan <lingshan.zhu@intel.com>
+> ---
+>   drivers/vdpa/ifcvf/ifcvf_base.h |  1 +
+>   drivers/vdpa/ifcvf/ifcvf_main.c | 22 ++++++++++------------
+>   2 files changed, 11 insertions(+), 12 deletions(-)
+>
+> diff --git a/drivers/vdpa/ifcvf/ifcvf_base.h b/drivers/vdpa/ifcvf/ifcvf_base.h
+> index b2eeb16b9c2c..1c04cd256fa7 100644
+> --- a/drivers/vdpa/ifcvf/ifcvf_base.h
+> +++ b/drivers/vdpa/ifcvf/ifcvf_base.h
+> @@ -84,6 +84,7 @@ struct ifcvf_hw {
+>   	u32 notify_off_multiplier;
+>   	u64 req_features;
+>   	u64 hw_features;
+> +	u32 dev_type;
+>   	struct virtio_pci_common_cfg __iomem *common_cfg;
+>   	void __iomem *net_cfg;
+>   	struct vring_info vring[IFCVF_MAX_QUEUE_PAIRS * 2];
+> diff --git a/drivers/vdpa/ifcvf/ifcvf_main.c b/drivers/vdpa/ifcvf/ifcvf_main.c
+> index 44d7586019da..99b0a6b4c227 100644
+> --- a/drivers/vdpa/ifcvf/ifcvf_main.c
+> +++ b/drivers/vdpa/ifcvf/ifcvf_main.c
+> @@ -323,19 +323,9 @@ static u32 ifcvf_vdpa_get_generation(struct vdpa_device *vdpa_dev)
+>   
+>   static u32 ifcvf_vdpa_get_device_id(struct vdpa_device *vdpa_dev)
+>   {
+> -	struct ifcvf_adapter *adapter = vdpa_to_adapter(vdpa_dev);
+> -	struct pci_dev *pdev = adapter->pdev;
+> -	u32 ret = -ENODEV;
+> -
+> -	if (pdev->device < 0x1000 || pdev->device > 0x107f)
+> -		return ret;
+> -
+> -	if (pdev->device < 0x1040)
+> -		ret =  pdev->subsystem_device;
+> -	else
+> -		ret =  pdev->device - 0x1040;
+> +	struct ifcvf_hw *vf = vdpa_to_vf(vdpa_dev);
+>   
+> -	return ret;
+> +	return vf->dev_type;
+>   }
+>   
+>   static u32 ifcvf_vdpa_get_vendor_id(struct vdpa_device *vdpa_dev)
+> @@ -466,6 +456,14 @@ static int ifcvf_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+>   	pci_set_drvdata(pdev, adapter);
+>   
+>   	vf = &adapter->vf;
+> +	if (pdev->device < 0x1000 || pdev->device > 0x107f)
+> +		return -EOPNOTSUPP;
+> +
+> +	if (pdev->device < 0x1040)
+> +		vf->dev_type =  pdev->subsystem_device;
+> +	else
+> +		vf->dev_type =  pdev->device - 0x1040;
 
-qemu command: "-enable-kvm -cpu host,migratable=no"
-qemu base commit: db55d2c9239d445cb7f1fa8ede8e42bd339058f4
-kvm base commit: f96be2deac9bca3ef5a2b0b66b71fcef8bad586d
 
-diff --git a/arch/x86/events/intel/core.c b/arch/x86/events/intel/core.c
-index 63c55f45ca92..727f55400eaf 100644
---- a/arch/x86/events/intel/core.c
-+++ b/arch/x86/events/intel/core.c
-@@ -5618,6 +5618,7 @@ __init int intel_pmu_init(void)
-  	case INTEL_FAM6_KABYLAKE:
-  	case INTEL_FAM6_COMETLAKE_L:
-  	case INTEL_FAM6_COMETLAKE:
-+		x86_pmu.pebs_vmx = 1;
-  		x86_add_quirk(intel_pebs_isolation_quirk);
-  		x86_pmu.late_ack = true;
-  		memcpy(hw_cache_event_ids, skl_hw_cache_event_ids, 
-sizeof(hw_cache_event_ids));
-diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
-index 100a749251b8..9e37e3dbe3ae 100644
---- a/arch/x86/kvm/pmu.c
-+++ b/arch/x86/kvm/pmu.c
-@@ -150,9 +150,8 @@ static void pmc_reprogram_counter(struct kvm_pmc *pmc, 
-u32 type,
-  		 * the accuracy of the PEBS profiling result, because the "event IP"
-  		 * in the PEBS record is calibrated on the guest side.
-  		 */
--		attr.precise_ip = 1;
--		if (x86_match_cpu(vmx_icl_pebs_cpu) && pmc->idx == 32)
--			attr.precise_ip = 3;
-+		attr.precise_ip = x86_match_cpu(vmx_icl_pebs_cpu) ?
-+			((pmc->idx == 32) ? 3 : 1) : ((pmc->idx == 1) ? 3 : 1);
-  	}
+So a question here, is the device a transtional device or modern one?
 
-  	event = perf_event_create_kernel_counter(&attr, -1, current,
+If it's a transitonal one, can it swtich endianess automatically or not?
 
-> 
-> 
->>>
->>> And, I have used "-overcommit mem-lock=on"Â  when soft lockup happens.
->>
->> I misunderstood the use of "mem-lock=on". It is not the same as the
->> guest mem pin and I believe more kernel patches are needed.
->>
->>>
->>>
->>> Now, I have tried to configure 1G-hugepages for 2G-mem vm. Each of guest 
->>> numa nodes has 1G mem.
->>> When I use pebs(perf record -e cycles:pp) in guest, there are successful 
->>> pebs samples just for a while and
->>> then I cannot get pebs samples. Host doesn't soft lockup in this process.
->>
->> In the worst case, no samples are expected.
->>
->>>
->>> Are there something wrong on skylake for we can only get a few samples? 
->>> IRQ?Â  Or using hugepage is not effecitve?
->>
->> The few samples comes from hardware limitation.
->> The Skylake doesn't have this "EPT-Friendly PEBS" capabilityand
->> some PEBS records will be lost when used by guests.
->>
->>>
->>> Thanks!
->>>
->>>>>
->>>>>
->>>>> On 2021/4/6 13:14, Xu, Like wrote:
->>>>>> Hi Xiangdong,
->>>>>>
->>>>>> On 2021/4/6 11:24, Liuxiangdong (Aven, Cloud Infrastructure Service 
->>>>>> Product Dept.) wrote:
->>>>>>> Hiï¼Œlike.
->>>>>>> Some questions about this new pebs patches setï¼š
->>>>>>> https://lore.kernel.org/kvm/20210329054137.120994-2-like.xu@linux.intel.com/ 
->>>>>>>
->>>>>>>
->>>>>>> The new hardware facility supporting guest PEBS is only available
->>>>>>> on Intel Ice Lake Server platforms for now.
->>>>>>
->>>>>> Yes, we have documented this "EPT-friendly PEBS" capability in the SDM
->>>>>> 18.3.10.1 Processor Event Based Sampling (PEBS) Facility
->>>>>>
->>>>>> And again, this patch set doesn't officially support guest PEBS on 
->>>>>> the Skylake.
->>>>>>
->>>>>>>
->>>>>>>
->>>>>>> AFAIKï¼Œ Icelake supports adaptive PEBS and extended PEBS which 
->>>>>>> Skylake doesn't.
->>>>>>> But we can still use IA32_PEBS_ENABLE MSR to indicate 
->>>>>>> general-purpose counter in Skylake.
->>>>>>
->>>>>> For Skylake, only the PMC0-PMC3 are valid for PEBS and you may
->>>>>> mask the other unsupported bits in the pmu->pebs_enable_mask.
->>>>>>
->>>>>>> Is there anything else that only Icelake supports in this patches set?
->>>>>>
->>>>>> The PDIR counter on the Ice Lake is the fixed counter 0
->>>>>> while the PDIR counter on the Sky Lake is the gp counter 1.
->>>>>>
->>>>>> You may also expose x86_pmu.pebs_vmx for Skylake in the 1st patch.
->>>>>>
->>>>>>>
->>>>>>>
->>>>>>> Besides, we have tried this patches set in Icelake.Â  We can use 
->>>>>>> pebs(eg: "perf record -e cycles:pp")
->>>>>>> when guest is kernel-5.11, but can't when kernel-4.18. Is there a 
->>>>>>> minimum guest kernel version requirement?
->>>>>>
->>>>>> The Ice Lake CPU model has been added since v5.4.
->>>>>>
->>>>>> You may double check whether the stable tree(s) code has
->>>>>> INTEL_FAM6_ICELAKE in the arch/x86/include/asm/intel-family.h.
->>>>>>
->>>>>>>
->>>>>>>
->>>>>>> Thanks,
->>>>>>> Xiangdong Liu
->>>>>>
->>>>>
->>>>
->>>
->>
-> 
+Thanks
+
+
+> +
+>   	vf->base = pcim_iomap_table(pdev);
+>   
+>   	adapter->pdev = pdev;
 
