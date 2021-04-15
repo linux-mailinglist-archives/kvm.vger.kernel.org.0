@@ -2,110 +2,315 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D3049361319
-	for <lists+kvm@lfdr.de>; Thu, 15 Apr 2021 21:50:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DC23E3613AA
+	for <lists+kvm@lfdr.de>; Thu, 15 Apr 2021 22:43:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235030AbhDOTuw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 15 Apr 2021 15:50:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52540 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234226AbhDOTuv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 15 Apr 2021 15:50:51 -0400
-Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 62B28C061574;
-        Thu, 15 Apr 2021 12:50:27 -0700 (PDT)
-Received: from zn.tnic (p200300ec2f0ace009d15a56636e5abd2.dip0.t-ipconnect.de [IPv6:2003:ec:2f0a:ce00:9d15:a566:36e5:abd2])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 063121EC03E4;
-        Thu, 15 Apr 2021 21:50:26 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1618516226;
+        id S235455AbhDOUoO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 15 Apr 2021 16:44:14 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:41253 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S235150AbhDOUoL (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 15 Apr 2021 16:44:11 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1618519427;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=m+1u7jWekMJzRnPaUKo/hlQMLbQ3pB3EnuCoWlBcJwE=;
-        b=gC/HenhFlKg6OxOBD5VmBJE7r2uQnnyrYhzs7L7smfXhCX62Dm4DyBu8DDw9HPr/dclVF7
-        tWQhGAdvoTQgF/bnrvyy/Fms2w0qHDXUavv/J2XYx1SjESSCNHXwO0y3Bl6kVdvijQKUWm
-        BZCr/BMY883/B+Eclm1Ezk8MUMmxUgY=
-Date:   Thu, 15 Apr 2021 21:50:20 +0200
-From:   Borislav Petkov <bp@alien8.de>
-To:     Brijesh Singh <brijesh.singh@amd.com>
-Cc:     linux-kernel@vger.kernel.org, x86@kernel.org, kvm@vger.kernel.org,
-        linux-crypto@vger.kernel.org, ak@linux.intel.com,
-        herbert@gondor.apana.org.au, Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        "H. Peter Anvin" <hpa@zytor.com>, Tony Luck <tony.luck@intel.com>,
-        Dave Hansen <dave.hansen@intel.com>,
-        "Peter Zijlstra (Intel)" <peterz@infradead.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        David Rientjes <rientjes@google.com>,
-        Sean Christopherson <seanjc@google.com>
-Subject: Re: [RFC Part2 PATCH 02/30] x86/sev-snp: add RMP entry lookup helpers
-Message-ID: <20210415195020.GG6318@zn.tnic>
-References: <20210324170436.31843-1-brijesh.singh@amd.com>
- <20210324170436.31843-3-brijesh.singh@amd.com>
- <20210415165711.GD6318@zn.tnic>
- <1813139d-f5f9-3791-dadb-4a684fe1cf46@amd.com>
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=GxEGQ6WbGdMLQ9XEOvu1wvt7ZSWG9pv/O+MOPHmN598=;
+        b=ZrW0Z83PfXEMxyMLmdXi2qR4ftiw/nhajZmRGWS7LJdHUQCg4I+o+sMxbPDnVJvX72FxTb
+        FbIhgmldoxaM1AtXCWih/nA4F0XRjj6gmJ6Fh/LQRGCaNjmUiDULdmNUOmUTs6TxnDHz4h
+        vDkqPAzVockEtOBJlPEHllW2cmYqdIc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-388-TwEVkYgJMGuYe5r7s1L7zQ-1; Thu, 15 Apr 2021 16:43:44 -0400
+X-MC-Unique: TwEVkYgJMGuYe5r7s1L7zQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0DA4F1008060;
+        Thu, 15 Apr 2021 20:43:42 +0000 (UTC)
+Received: from redhat.com (ovpn-117-254.rdu2.redhat.com [10.10.117.254])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 0B0A15D71F;
+        Thu, 15 Apr 2021 20:43:38 +0000 (UTC)
+Date:   Thu, 15 Apr 2021 14:43:38 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Keqian Zhu <zhukeqian1@huawei.com>
+Cc:     <linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>,
+        Kirti Wankhede <kwankhede@nvidia.com>,
+        "Cornelia Huck" <cohuck@redhat.com>,
+        Yi Sun <yi.y.sun@linux.intel.com>,
+        Tian Kevin <kevin.tian@intel.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Will Deacon <will@kernel.org>,
+        "Joerg Roedel" <joro@8bytes.org>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+        Lu Baolu <baolu.lu@linux.intel.com>,
+        <wanghaibin.wang@huawei.com>, <jiangkunkun@huawei.com>,
+        <yuzenghui@huawei.com>, <lushenming@huawei.com>
+Subject: Re: [PATCH 3/3] vfio/iommu_type1: Add support for manual dirty log
+ clear
+Message-ID: <20210415144338.54b90041@redhat.com>
+In-Reply-To: <20210413091445.7448-4-zhukeqian1@huawei.com>
+References: <20210413091445.7448-1-zhukeqian1@huawei.com>
+        <20210413091445.7448-4-zhukeqian1@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <1813139d-f5f9-3791-dadb-4a684fe1cf46@amd.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Apr 15, 2021 at 01:08:09PM -0500, Brijesh Singh wrote:
-> This is from Family 19h Model 01h Rev B01. The processor which
-> introduces the SNP feature. Yes, I have already upload the PPR on the BZ.
+On Tue, 13 Apr 2021 17:14:45 +0800
+Keqian Zhu <zhukeqian1@huawei.com> wrote:
+
+> From: Kunkun Jiang <jiangkunkun@huawei.com>
 > 
-> The PPR is also available at AMD: https://www.amd.com/en/support/tech-docs
+> In the past, we clear dirty log immediately after sync dirty
+> log to userspace. This may cause redundant dirty handling if
+> userspace handles dirty log iteratively:
+> 
+> After vfio clears dirty log, new dirty log starts to generate.
+> These new dirty log will be reported to userspace even if they
+> are generated before userspace handles the same dirty page.
+> 
+> That's to say, we should minimize the time gap of dirty log
+> clearing and dirty log handling. We can give userspace the
+> interface to clear dirty log.
 
-Please add the link in the bugzilla to the comments here - this is the
-reason why stuff is being uploaded in the first place, because those
-vendor sites tend to change and those links become stale with time.
+IIUC, a user would be expected to clear the bitmap before copying the
+dirty pages, therefore you're trying to reduce that time gap between
+clearing any copy, but it cannot be fully eliminated and importantly,
+if the user clears after copying, they've introduced a race.  Correct?
 
-> I guess I was trying to shorten the name. I am good with struct rmpentry;
+What results do you have to show that this is a worthwhile optimization?
 
-Yes please - typedefs are used only in very specific cases.
+I really don't like the semantics that testing for an IOMMU capability
+enables it.  It needs to be explicitly controllable feature, which
+suggests to me that it might be a flag used in combination with _GET or
+a separate _GET_NOCLEAR operations.  Thanks,
 
-> All those magic numbers are documented in the PPR.
+Alex
 
-We use defines - not magic numbers. For example
 
-#define RMPTABLE_ENTRIES_OFFSET 0x4000
+> Co-developed-by: Keqian Zhu <zhukeqian1@huawei.com>
+> Signed-off-by: Kunkun Jiang <jiangkunkun@huawei.com>
+> ---
+>  drivers/vfio/vfio_iommu_type1.c | 100 ++++++++++++++++++++++++++++++--
+>  include/uapi/linux/vfio.h       |  28 ++++++++-
+>  2 files changed, 123 insertions(+), 5 deletions(-)
+> 
+> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+> index 77950e47f56f..d9c4a27b3c4e 100644
+> --- a/drivers/vfio/vfio_iommu_type1.c
+> +++ b/drivers/vfio/vfio_iommu_type1.c
+> @@ -78,6 +78,7 @@ struct vfio_iommu {
+>  	bool			v2;
+>  	bool			nesting;
+>  	bool			dirty_page_tracking;
+> +	bool			dirty_log_manual_clear;
+>  	bool			pinned_page_dirty_scope;
+>  	bool			container_open;
+>  };
+> @@ -1242,6 +1243,78 @@ static int vfio_iommu_dirty_log_sync(struct vfio_iommu *iommu,
+>  	return ret;
+>  }
+>  
+> +static int vfio_iova_dirty_log_clear(u64 __user *bitmap,
+> +				     struct vfio_iommu *iommu,
+> +				     dma_addr_t iova, size_t size,
+> +				     size_t pgsize)
+> +{
+> +	struct vfio_dma *dma;
+> +	struct rb_node *n;
+> +	dma_addr_t start_iova, end_iova, riova;
+> +	unsigned long pgshift = __ffs(pgsize);
+> +	unsigned long bitmap_size;
+> +	unsigned long *bitmap_buffer = NULL;
+> +	bool clear_valid;
+> +	int rs, re, start, end, dma_offset;
+> +	int ret = 0;
+> +
+> +	bitmap_size = DIRTY_BITMAP_BYTES(size >> pgshift);
+> +	bitmap_buffer = kvmalloc(bitmap_size, GFP_KERNEL);
+> +	if (!bitmap_buffer) {
+> +		ret = -ENOMEM;
+> +		goto out;
+> +	}
+> +
+> +	if (copy_from_user(bitmap_buffer, bitmap, bitmap_size)) {
+> +		ret = -EFAULT;
+> +		goto out;
+> +	}
+> +
+> +	for (n = rb_first(&iommu->dma_list); n; n = rb_next(n)) {
+> +		dma = rb_entry(n, struct vfio_dma, node);
+> +		if (!dma->iommu_mapped)
+> +			continue;
+> +		if ((dma->iova + dma->size - 1) < iova)
+> +			continue;
+> +		if (dma->iova > iova + size - 1)
+> +			break;
+> +
+> +		start_iova = max(iova, dma->iova);
+> +		end_iova = min(iova + size, dma->iova + dma->size);
+> +
+> +		/* Similar logic as the tail of vfio_iova_dirty_bitmap */
+> +
+> +		clear_valid = false;
+> +		start = (start_iova - iova) >> pgshift;
+> +		end = (end_iova - iova) >> pgshift;
+> +		bitmap_for_each_set_region(bitmap_buffer, rs, re, start, end) {
+> +			clear_valid = true;
+> +			riova = iova + (rs << pgshift);
+> +			dma_offset = (riova - dma->iova) >> pgshift;
+> +			bitmap_clear(dma->bitmap, dma_offset, re - rs);
+> +		}
+> +
+> +		if (clear_valid)
+> +			vfio_dma_populate_bitmap(dma, pgsize);
+> +
+> +		if (clear_valid && !iommu->pinned_page_dirty_scope &&
+> +		    dma->iommu_mapped && !iommu->num_non_hwdbm_groups) {
+> +			ret = vfio_iommu_dirty_log_clear(iommu, start_iova,
+> +					end_iova - start_iova,	bitmap_buffer,
+> +					iova, pgshift);
+> +			if (ret) {
+> +				pr_warn("dma dirty log clear failed!\n");
+> +				goto out;
+> +			}
+> +		}
+> +
+> +	}
+> +
+> +out:
+> +	kfree(bitmap_buffer);
+> +	return ret;
+> +}
+> +
+>  static int update_user_bitmap(u64 __user *bitmap, struct vfio_iommu *iommu,
+>  			      struct vfio_dma *dma, dma_addr_t base_iova,
+>  			      size_t pgsize)
+> @@ -1329,6 +1402,10 @@ static int vfio_iova_dirty_bitmap(u64 __user *bitmap, struct vfio_iommu *iommu,
+>  		if (ret)
+>  			return ret;
+>  
+> +		/* Do not clear dirty automatically when manual_clear enabled */
+> +		if (iommu->dirty_log_manual_clear)
+> +			continue;
+> +
+>  		/* Clear iommu dirty log to re-enable dirty log tracking */
+>  		if (iommu->num_non_pinned_groups && dma->iommu_mapped &&
+>  		    !iommu->num_non_hwdbm_groups) {
+> @@ -2946,6 +3023,11 @@ static int vfio_iommu_type1_check_extension(struct vfio_iommu *iommu,
+>  		if (!iommu)
+>  			return 0;
+>  		return vfio_domains_have_iommu_cache(iommu);
+> +	case VFIO_DIRTY_LOG_MANUAL_CLEAR:
+> +		if (!iommu)
+> +			return 0;
+> +		iommu->dirty_log_manual_clear = true;
+> +		return 1;
+>  	default:
+>  		return 0;
+>  	}
+> @@ -3201,7 +3283,8 @@ static int vfio_iommu_type1_dirty_pages(struct vfio_iommu *iommu,
+>  	struct vfio_iommu_type1_dirty_bitmap dirty;
+>  	uint32_t mask = VFIO_IOMMU_DIRTY_PAGES_FLAG_START |
+>  			VFIO_IOMMU_DIRTY_PAGES_FLAG_STOP |
+> -			VFIO_IOMMU_DIRTY_PAGES_FLAG_GET_BITMAP;
+> +			VFIO_IOMMU_DIRTY_PAGES_FLAG_GET_BITMAP |
+> +			VFIO_IOMMU_DIRTY_PAGES_FLAG_CLEAR_BITMAP;
+>  	unsigned long minsz;
+>  	int ret = 0;
+>  
+> @@ -3243,7 +3326,8 @@ static int vfio_iommu_type1_dirty_pages(struct vfio_iommu *iommu,
+>  		}
+>  		mutex_unlock(&iommu->lock);
+>  		return 0;
+> -	} else if (dirty.flags & VFIO_IOMMU_DIRTY_PAGES_FLAG_GET_BITMAP) {
+> +	} else if (dirty.flags & (VFIO_IOMMU_DIRTY_PAGES_FLAG_GET_BITMAP |
+> +				VFIO_IOMMU_DIRTY_PAGES_FLAG_CLEAR_BITMAP)) {
+>  		struct vfio_iommu_type1_dirty_bitmap_get range;
+>  		unsigned long pgshift;
+>  		size_t data_size = dirty.argsz - minsz;
+> @@ -3286,13 +3370,21 @@ static int vfio_iommu_type1_dirty_pages(struct vfio_iommu *iommu,
+>  			goto out_unlock;
+>  		}
+>  
+> -		if (iommu->dirty_page_tracking)
+> +		if (!iommu->dirty_page_tracking) {
+> +			ret = -EINVAL;
+> +			goto out_unlock;
+> +		}
+> +
+> +		if (dirty.flags & VFIO_IOMMU_DIRTY_PAGES_FLAG_GET_BITMAP)
+>  			ret = vfio_iova_dirty_bitmap(range.bitmap.data,
+>  						     iommu, range.iova,
+>  						     range.size,
+>  						     range.bitmap.pgsize);
+>  		else
+> -			ret = -EINVAL;
+> +			ret = vfio_iova_dirty_log_clear(range.bitmap.data,
+> +							iommu, range.iova,
+> +							range.size,
+> +							range.bitmap.pgsize);
+>  out_unlock:
+>  		mutex_unlock(&iommu->lock);
+>  
+> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
+> index 8ce36c1d53ca..784dc3cf2a8f 100644
+> --- a/include/uapi/linux/vfio.h
+> +++ b/include/uapi/linux/vfio.h
+> @@ -52,6 +52,14 @@
+>  /* Supports the vaddr flag for DMA map and unmap */
+>  #define VFIO_UPDATE_VADDR		10
+>  
+> +/*
+> + * The vfio_iommu driver may support user clears dirty log manually, which means
+> + * dirty log is not cleared automatically after dirty log is copied to userspace,
+> + * it's user's duty to clear dirty log. Note: when user queries this extension
+> + * and vfio_iommu driver supports it, then it is enabled.
+> + */
+> +#define VFIO_DIRTY_LOG_MANUAL_CLEAR	11
+> +
+>  /*
+>   * The IOCTL interface is designed for extensibility by embedding the
+>   * structure length (argsz) and flags into structures passed between
+> @@ -1188,7 +1196,24 @@ struct vfio_iommu_type1_dma_unmap {
+>   * actual bitmap. If dirty pages logging is not enabled, an error will be
+>   * returned.
+>   *
+> - * Only one of the flags _START, _STOP and _GET may be specified at a time.
+> + * Calling the IOCTL with VFIO_IOMMU_DIRTY_PAGES_FLAG_CLEAR_BITMAP flag set,
+> + * instructs the IOMMU driver to clear the dirty status of pages in a bitmap
+> + * for IOMMU container for a given IOVA range. The user must specify the IOVA
+> + * range, the bitmap and the pgsize through the structure
+> + * vfio_iommu_type1_dirty_bitmap_get in the data[] portion. This interface
+> + * supports clearing a bitmap of the smallest supported pgsize only and can be
+> + * modified in future to clear a bitmap of any specified supported pgsize. The
+> + * user must provide a memory area for the bitmap memory and specify its size
+> + * in bitmap.size. One bit is used to represent one page consecutively starting
+> + * from iova offset. The user should provide page size in bitmap.pgsize field.
+> + * A bit set in the bitmap indicates that the page at that offset from iova is
+> + * cleared the dirty status, and dirty tracking is re-enabled for that page. The
+> + * caller must set argsz to a value including the size of structure
+> + * vfio_iommu_dirty_bitmap_get, but excluing the size of the actual bitmap. If
+> + * dirty pages logging is not enabled, an error will be returned.
+> + *
+> + * Only one of the flags _START, _STOP, _GET and _CLEAR may be specified at a
+> + * time.
+>   *
+>   */
+>  struct vfio_iommu_type1_dirty_bitmap {
+> @@ -1197,6 +1222,7 @@ struct vfio_iommu_type1_dirty_bitmap {
+>  #define VFIO_IOMMU_DIRTY_PAGES_FLAG_START	(1 << 0)
+>  #define VFIO_IOMMU_DIRTY_PAGES_FLAG_STOP	(1 << 1)
+>  #define VFIO_IOMMU_DIRTY_PAGES_FLAG_GET_BITMAP	(1 << 2)
+> +#define VFIO_IOMMU_DIRTY_PAGES_FLAG_CLEAR_BITMAP (1 << 3)
+>  	__u8         data[];
+>  };
+>  
 
-The 8 is probably
-
-PAGE_SHIFT - RMPENTRY_SHIFT
-
-because you have GPA bits [50:12] and an RMP entry is 16 bytes, i.e., 1 << 4.
-
-With defines it is actually clear what the computation is doing - with
-naked numbers not really.
-
-> APM does not provide the offset of the entry inside the RMP table.
-
-It does, kinda, but in the pseudocode of those new insns in APM v3. From
-PVALIDATE pseudo:
-
-	RMP_ENTRY_PA = RMP_BASE + 0x4000 + (SYSTEM_PA / 0x1000) * 16
-
-and that last
-
-	/ 0x1000 * 16
-
-is actually
-
-	>> 12 - 4
-
-i.e., the >> 8 shift.
-
-Thx.
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
