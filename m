@@ -2,111 +2,161 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9B0A235FF12
-	for <lists+kvm@lfdr.de>; Thu, 15 Apr 2021 02:49:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 20EDA35FF1B
+	for <lists+kvm@lfdr.de>; Thu, 15 Apr 2021 03:00:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230087AbhDOAuM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 14 Apr 2021 20:50:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56738 "EHLO
+        id S229612AbhDOA7n (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 14 Apr 2021 20:59:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58810 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229612AbhDOAuJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 14 Apr 2021 20:50:09 -0400
-Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D4B20C061574
-        for <kvm@vger.kernel.org>; Wed, 14 Apr 2021 17:49:46 -0700 (PDT)
-Received: by mail-pj1-x102c.google.com with SMTP id kb13-20020a17090ae7cdb02901503d67f0beso527223pjb.0
-        for <kvm@vger.kernel.org>; Wed, 14 Apr 2021 17:49:46 -0700 (PDT)
+        with ESMTP id S229570AbhDOA7n (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 14 Apr 2021 20:59:43 -0400
+Received: from mail-io1-xd35.google.com (mail-io1-xd35.google.com [IPv6:2607:f8b0:4864:20::d35])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4F7C8C061574;
+        Wed, 14 Apr 2021 17:59:21 -0700 (PDT)
+Received: by mail-io1-xd35.google.com with SMTP id p8so1164513iol.11;
+        Wed, 14 Apr 2021 17:59:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=fOJI4hThVgEOLJyImgusGGiOxy9mpTSNJ/Mrm5n5Wk0=;
-        b=lEI57So+mLNKqR8MOcAK5p3MZw4vqrkk9etbelECfBcXuY5eDWQoby3QMZLzSfY8Ld
-         RvK2vdibjbtjGeqLJkWkmBpcWbieDeicodh6t61TVGzdFOeCO2Tfi3KhnWWSjua3I+7/
-         zjdNxm+qgvPvgZ9WsJ9ZUeZ5YYiuAJh6XbZ6tEsTahjj4Zht3bVEskNbzX1vDUHFjevH
-         xvzIDu3EKHqfEu4p4n1g3O6vhoUbUZUSS7b6TvAcCczNn3L241mIvi8mFqtGd8FZSgLw
-         Yy8ROdcJrDJ/TYNZnks+IkY99l1c7xmHX3Jt5yK9PVXmr+doXnNzkHsWhkATfYP4LBZn
-         OCgg==
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=MlWKABH2GBAXTBEFNgkeH520s5m+9L7trkfahPYAnUs=;
+        b=D6dg/gq1roNisWaVaa20wOSDiOyxuGO7NQIp40zuPtkoC3Tf8n3DdsNQSSG/8tZ5w0
+         /ehX2Ou5WWUVl/2Qb6ptPXAjjMOgfy4mW3T1CHAwSUxt6TzR21NYxhlV9pFb6QMhWloO
+         2znnc9Sr1cvc8r1qSYA4M0hTLhWd/IquiyvNts//2AN8XyBfcSyMJo7p9Lin5uq+jDkq
+         sFQAnLOBsRC0F/iI/vwdcSQovT0vNK/puEdGLFclnZN1CPHQfO6ugB+v0leGs05/N4hw
+         daoaKaMc+Cew1EDZ/O6ce4AQ+lue/dsI43M+phi28NRy3jq9qntUwbMl56qlIhRZ5M/V
+         vHcQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=fOJI4hThVgEOLJyImgusGGiOxy9mpTSNJ/Mrm5n5Wk0=;
-        b=cbGKkPJyhN1GRf6+QxjlNeTchJz1jf5hmuQE6Kq5ulLOeCJeO70QwxeANvMnVqsxTg
-         LBIAladwtUGckg4mcdFgKoU0Zr+c/PYf454qLj++AM+z41OuXT6EFi7zGHOQ0WFWDN4P
-         0JXCk5mQKODf2eYfUlGbbU/s1MiXZTD7pimlPXUzndzuelApbbpRviDq5I589fDahrb9
-         A2f36iaSeZS8DXeCnKzjQZL6FGaqgzPkA2KK9xhUDBN3nTMv8Yt2JxKUTiaZyeInKOK0
-         8LzaUYbKl/IxxKOekTATHL8ZPX+Go9HCm378HhU9JOHzt+U5xMfDMLXpaNwJtkXnuo4S
-         hfLw==
-X-Gm-Message-State: AOAM532utsjn02pMerQslWQYwz8vojMS18GlvWh5Mxyj4PIDH8jtCWxX
-        cb8wAvmnpcFINqHiAYFoBOp11s59kIVP/w==
-X-Google-Smtp-Source: ABdhPJxRBMrjNapa9s3nteduAiJXZXONsLdWBJOaAaq7bl/eTin1t4vjjR9fsQXFfqGsZoPswRvjvQ==
-X-Received: by 2002:a17:90a:fa0c:: with SMTP id cm12mr915481pjb.54.1618447785825;
-        Wed, 14 Apr 2021 17:49:45 -0700 (PDT)
-Received: from google.com (240.111.247.35.bc.googleusercontent.com. [35.247.111.240])
-        by smtp.gmail.com with ESMTPSA id z29sm589556pga.52.2021.04.14.17.49.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 14 Apr 2021 17:49:45 -0700 (PDT)
-Date:   Thu, 15 Apr 2021 00:49:41 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Wanpeng Li <kernellwp@gmail.com>
-Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Michael Tokarev <mjt@tls.msk.ru>
-Subject: Re: [PATCH v2 0/3] KVM: Properly account for guest CPU time
-Message-ID: <YHeNpUd1ZO1JVaAf@google.com>
-References: <1618298169-3831-1-git-send-email-wanpengli@tencent.com>
- <YHXUFJuLXY8VZw3B@google.com>
- <CANRm+CzDW_5SPM0131OvRn3UPBp1nahxCykCP61XWeUpYeHU5Q@mail.gmail.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=MlWKABH2GBAXTBEFNgkeH520s5m+9L7trkfahPYAnUs=;
+        b=qMYXaLpMQXYSafgtnGDkEtirKK5gED2X6nGnL6lTFkb9QoUcKQ10aNvEnhjOhYPr7g
+         ihIRQ2SNeVML9O32ZTmt1QhjFgxx/deRnzu2mwpRvfy3NKbfaIGIahpnPbwCv3HyRTcc
+         0L0uRzyKd8Wm01NTM1LrrlgwVbH7b8tPMTXOtl8YNoWdlDz1rEgl3xCi/f9yYHVJEplf
+         2v5hMWwaQ4qJQpvFw5AX1gCIGnhIz+gceKTa5TVyw5gGlx4OCUe4HZf0Rl0DZZxqK9Cl
+         +JU6Sl/DEaMGDDkJYMLG9xbOzAOT9rQCY760/qX46eMrA34HgJYWIGAPsgciu4BNfTp6
+         WPbA==
+X-Gm-Message-State: AOAM531BMOwMmN7I9SR7fmGQlZ4oAUuWHOYyeO5p2W5Igwhft9/4fbmM
+        FQcQ3shAahuNQCIFphLBIYDWUkKRj28tqHVgs4U=
+X-Google-Smtp-Source: ABdhPJy+BIfqyS5SHXZKcVjMNR8+VE9YOjN1D3/GcWSVAHJ5FiQujpULGdqU7StrBWLELbkRG2ZY0AqWAfgarRzcXtI=
+X-Received: by 2002:a5e:cb06:: with SMTP id p6mr642270iom.154.1618448360790;
+ Wed, 14 Apr 2021 17:59:20 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CANRm+CzDW_5SPM0131OvRn3UPBp1nahxCykCP61XWeUpYeHU5Q@mail.gmail.com>
+References: <20201127112114.3219360-1-pbonzini@redhat.com> <20201127112114.3219360-3-pbonzini@redhat.com>
+ <CAJhGHyCdqgtvK98_KieG-8MUfg1Jghd+H99q+FkgL0ZuqnvuAw@mail.gmail.com>
+ <YHS/BxMiO6I1VOEY@google.com> <CAJhGHyAcnwkCfTcnxXcgAHnF=wPbH2EDp7H+e74ce+oNOWJ=_Q@mail.gmail.com>
+ <80b013dc-0078-76f4-1299-3cff261ef7d8@redhat.com> <CAJhGHyChfXdcAMzzD7P3aC8tnhFW5GvOt88vOY=D3pyb7hgNAA@mail.gmail.com>
+ <6d9dafb1-b8ff-82ef-93dc-da869fe7ba0f@redhat.com>
+In-Reply-To: <6d9dafb1-b8ff-82ef-93dc-da869fe7ba0f@redhat.com>
+From:   Lai Jiangshan <jiangshanlai+lkml@gmail.com>
+Date:   Thu, 15 Apr 2021 08:59:09 +0800
+Message-ID: <CAJhGHyA=v_va2QTvo7Ve8JyZO4j5LjiCdB9CLnvRXGwGwa3e+A@mail.gmail.com>
+Subject: Re: [PATCH 2/2] KVM: x86: Fix split-irqchip vs interrupt injection
+ window request
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        LKML <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org,
+        Filippo Sironi <sironi@amazon.de>,
+        David Woodhouse <dwmw@amazon.co.uk>,
+        "v4.7+" <stable@vger.kernel.org>,
+        Wanpeng Li <wanpengli@tencent.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Apr 14, 2021, Wanpeng Li wrote:
-> On Wed, 14 Apr 2021 at 01:25, Sean Christopherson <seanjc@google.com> wrote:
+On Thu, Apr 15, 2021 at 12:58 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+> On 14/04/21 04:28, Lai Jiangshan wrote:
+> > On Tue, Apr 13, 2021 at 8:15 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
+> >>
+> >> On 13/04/21 13:03, Lai Jiangshan wrote:
+> >>> This patch claims that it has a place to
+> >>> stash the IRQ when EFLAGS.IF=0, but inject_pending_event() seams to ignore
+> >>> EFLAGS.IF and queues the IRQ to the guest directly in the first branch
+> >>> of using "kvm_x86_ops.set_irq(vcpu)".
+> >>
+> >> This is only true for pure-userspace irqchip.  For split-irqchip, in
+> >> which case the "place to stash" the interrupt is
+> >> vcpu->arch.pending_external_vector.
+> >>
+> >> For pure-userspace irqchip, KVM_INTERRUPT only cares about being able to
+> >> stash the interrupt in vcpu->arch.interrupt.injected.  It is indeed
+> >> wrong for userspace to call KVM_INTERRUPT if the vCPU is not ready for
+> >> interrupt injection, but KVM_INTERRUPT does not return an error.
 > >
-> > On Tue, Apr 13, 2021, Wanpeng Li wrote:
-> > > The bugzilla https://bugzilla.kernel.org/show_bug.cgi?id=209831
-> > > reported that the guest time remains 0 when running a while true
-> > > loop in the guest.
-> > >
-> > > The commit 87fa7f3e98a131 ("x86/kvm: Move context tracking where it
-> > > belongs") moves guest_exit_irqoff() close to vmexit breaks the
-> > > tick-based time accouting when the ticks that happen after IRQs are
-> > > disabled are incorrectly accounted to the host/system time. This is
-> > > because we exit the guest state too early.
-> > >
-> > > This patchset splits both context tracking logic and the time accounting
-> > > logic from guest_enter/exit_irqoff(), keep context tracking around the
-> > > actual vmentry/exit code, have the virt time specific helpers which
-> > > can be placed at the proper spots in kvm. In addition, it will not
-> > > break the world outside of x86.
+> > Thanks for the reply.
 > >
-> > IMO, this is going in the wrong direction.  Rather than separate context tracking,
-> > vtime accounting, and KVM logic, this further intertwines the three.  E.g. the
-> > context tracking code has even more vtime accounting NATIVE vs. GEN vs. TICK
-> > logic baked into it.
+> > May I ask what is the correct/practical way of using KVM_INTERRUPT ABI
+> > for pure-userspace irqchip.
 > >
-> > Rather than smush everything into context_tracking.h, I think we can cleanly
-> > split the context tracking and vtime accounting code into separate pieces, which
-> > will in turn allow moving the wrapping logic to linux/kvm_host.h.  Once that is
-> > done, splitting the context tracking and time accounting logic for KVM x86
-> > becomes a KVM detail as opposed to requiring dedicated logic in the context
-> > tracking code.
+> > gVisor is indeed a pure-userspace irqchip, it will call KVM_INTERRUPT
+> > when kvm_run->ready_for_interrupt_injection=1 (along with other conditions
+> > unrelated to our discussion).
 > >
-> > I have untested code that compiles on x86, I'll send an RFC shortly.
-> 
-> We need an easy to backport fix and then we might have some further
-> cleanups on top.
+> > https://github.com/google/gvisor/blob/a9441aea2780da8c93da1c73da860219f98438de/pkg/sentry/platform/kvm/bluepill_amd64_unsafe.go#L105
+> >
+> > if kvm_run->ready_for_interrupt_injection=1 when expection pending or
+> > EFLAGS.IF=0, it would be unexpected for gVisor.
+>
+> Not with EFLAGS.IF=0.  For pending exception, there is code to handle it
+> in inject_pending_event:
+>
 
-I fiddled with this a bit today, I think I have something workable that will be
-a relatively clean and short backport.  With luck, I'll get it posted tomorrow.
+Thanks for the reply.
+(I rearranged your summarization here)
+
+> so what happens is:
+>
+> - the interrupt will not be injected before the exception
+>
+> - KVM will schedule an immediate vmexit to inject the interrupt as well
+>
+> - if (as is likely) the exception has turned off interrupts, the next
+> call to inject_pending_event will reach
+> static_call(kvm_x86_enable_irq_window) and the interrupt will only be
+> injected when IF becomes 1 again.
+
+The next call to inject_pending_event() will reach here AT FIRST with
+vcpu->arch.exception.injected==false and vcpu->arch.exception.pending==false
+
+>          ... if (!vcpu->arch.exception.pending) {
+>                  if (vcpu->arch.nmi_injected) {
+>                          static_call(kvm_x86_set_nmi)(vcpu);
+>                          can_inject = false;
+>                  } else if (vcpu->arch.interrupt.injected) {
+>                          static_call(kvm_x86_set_irq)(vcpu);
+>                          can_inject = false;
+
+And comes here and vcpu->arch.interrupt.injected is true for there is
+an interrupt queued by KVM_INTERRUPT for pure user irqchip. It then does
+the injection of the interrupt without checking the EFLAGS.IF.
+
+My question is that what stops the next call to inject_pending_event()
+to reach here when KVM_INTERRUPT is called with exepction pending.
+
+Or what makes kvm_run->ready_for_interrupt_injection be zero when
+exception pending to disallow userspace to call KVM_INTERRUPT.
+
+
+>                  }
+>          }
+>         ...
+>          if (vcpu->arch.exception.pending) {
+>                 ...
+>                  can_inject = false;
+>          }
+>         // this is vcpu->arch.interrupt.injected for userspace LAPIC
+>          if (kvm_cpu_has_injectable_intr(vcpu)) {
+>                  r = can_inject ?
+> static_call(kvm_x86_interrupt_allowed)(vcpu, true) : -EBUSY;
+>                 if (r < 0)
+>                         goto busy;
+>                 ...
+>         }
+>
+>
+> Paolo
+>
