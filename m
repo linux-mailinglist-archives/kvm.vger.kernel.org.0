@@ -2,109 +2,141 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 91DF2360853
-	for <lists+kvm@lfdr.de>; Thu, 15 Apr 2021 13:34:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2B78136088C
+	for <lists+kvm@lfdr.de>; Thu, 15 Apr 2021 13:50:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232512AbhDOLfP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 15 Apr 2021 07:35:15 -0400
-Received: from szxga05-in.huawei.com ([45.249.212.191]:17001 "EHLO
-        szxga05-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230056AbhDOLfL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 15 Apr 2021 07:35:11 -0400
-Received: from DGGEMS405-HUB.china.huawei.com (unknown [172.30.72.59])
-        by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4FLcck3HcWzPpxD;
-        Thu, 15 Apr 2021 19:31:50 +0800 (CST)
-Received: from [10.174.187.224] (10.174.187.224) by
- DGGEMS405-HUB.china.huawei.com (10.3.19.205) with Microsoft SMTP Server id
- 14.3.498.0; Thu, 15 Apr 2021 19:34:40 +0800
-Subject: Re: [PATCH 1/5] KVM: arm64: Divorce the perf code from oprofile
- helpers
-To:     Marc Zyngier <maz@kernel.org>
-References: <20210414134409.1266357-1-maz@kernel.org>
- <20210414134409.1266357-2-maz@kernel.org>
- <baa268cf-c92d-6b97-da4c-e7da2a9ccb7a@huawei.com>
- <87h7k7n81z.wl-maz@kernel.org>
-CC:     <kvm@vger.kernel.org>, <kvmarm@lists.cs.columbia.edu>,
-        <linux-arm-kernel@lists.infradead.org>,
-        <linux-kernel@vger.kernel.org>, <linux-s390@vger.kernel.org>,
-        <linux-sh@vger.kernel.org>, Rich Felker <dalias@libc.org>,
-        Yoshinori Sato <ysato@users.sourceforge.jp>,
-        "Peter Zijlstra" <peterz@infradead.org>,
-        Viresh Kumar <viresh.kumar@linaro.org>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Arnaldo Carvalho de Melo <acme@kernel.org>,
-        <nathan@kernel.org>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        <kernel-team@android.com>, Will Deacon <will@kernel.org>
-From:   Keqian Zhu <zhukeqian1@huawei.com>
-Message-ID: <da73e0c7-4dd7-ce69-3304-3da8f1521127@huawei.com>
-Date:   Thu, 15 Apr 2021 19:34:40 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
- Thunderbird/45.7.1
+        id S232705AbhDOLvK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 15 Apr 2021 07:51:10 -0400
+Received: from szxga04-in.huawei.com ([45.249.212.190]:16123 "EHLO
+        szxga04-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232641AbhDOLvH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 15 Apr 2021 07:51:07 -0400
+Received: from DGGEMS407-HUB.china.huawei.com (unknown [172.30.72.60])
+        by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4FLcz764x4zpYXY;
+        Thu, 15 Apr 2021 19:47:47 +0800 (CST)
+Received: from DESKTOP-TMVL5KK.china.huawei.com (10.174.187.128) by
+ DGGEMS407-HUB.china.huawei.com (10.3.19.207) with Microsoft SMTP Server id
+ 14.3.498.0; Thu, 15 Apr 2021 19:50:33 +0800
+From:   Yanan Wang <wangyanan55@huawei.com>
+To:     Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
+        "Quentin Perret" <qperret@google.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        <kvmarm@lists.cs.columbia.edu>,
+        <linux-arm-kernel@lists.infradead.org>, <kvm@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>
+CC:     Catalin Marinas <catalin.marinas@arm.com>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        "Suzuki K Poulose" <suzuki.poulose@arm.com>,
+        Gavin Shan <gshan@redhat.com>, <wanghaibin.wang@huawei.com>,
+        <zhukeqian1@huawei.com>, <yuzenghui@huawei.com>,
+        Yanan Wang <wangyanan55@huawei.com>
+Subject: [PATCH v5 0/6] KVM: arm64: Improve efficiency of stage2 page table
+Date:   Thu, 15 Apr 2021 19:50:26 +0800
+Message-ID: <20210415115032.35760-1-wangyanan55@huawei.com>
+X-Mailer: git-send-email 2.8.4.windows.1
 MIME-Version: 1.0
-In-Reply-To: <87h7k7n81z.wl-maz@kernel.org>
-Content-Type: text/plain; charset="windows-1252"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.174.187.224]
+Content-Type: text/plain
+X-Originating-IP: [10.174.187.128]
 X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Marc,
+Hi,
 
-On 2021/4/15 18:42, Marc Zyngier wrote:
-> On Thu, 15 Apr 2021 07:59:26 +0100,
-> Keqian Zhu <zhukeqian1@huawei.com> wrote:
->>
->> Hi Marc,
->>
->> On 2021/4/14 21:44, Marc Zyngier wrote:
->>> KVM/arm64 is the sole user of perf_num_counters(), and really
->>> could do without it. Stop using the obsolete API by relying on
->>> the existing probing code.
->>>
->>> Signed-off-by: Marc Zyngier <maz@kernel.org>
->>> ---
->>>  arch/arm64/kvm/perf.c     | 7 +------
->>>  arch/arm64/kvm/pmu-emul.c | 2 +-
->>>  include/kvm/arm_pmu.h     | 4 ++++
->>>  3 files changed, 6 insertions(+), 7 deletions(-)
->>>
->>> diff --git a/arch/arm64/kvm/perf.c b/arch/arm64/kvm/perf.c
->>> index 739164324afe..b8b398670ef2 100644
->>> --- a/arch/arm64/kvm/perf.c
->>> +++ b/arch/arm64/kvm/perf.c
->>> @@ -50,12 +50,7 @@ static struct perf_guest_info_callbacks kvm_guest_cbs = {
->>>  
->>>  int kvm_perf_init(void)
->>>  {
->>> -	/*
->>> -	 * Check if HW_PERF_EVENTS are supported by checking the number of
->>> -	 * hardware performance counters. This could ensure the presence of
->>> -	 * a physical PMU and CONFIG_PERF_EVENT is selected.
->>> -	 */
->>> -	if (IS_ENABLED(CONFIG_ARM_PMU) && perf_num_counters() > 0)
->>> +	if (kvm_pmu_probe_pmuver() != 0xf)
->> The probe() function may be called many times
->> (kvm_arm_pmu_v3_set_attr also calls it).  I don't know whether the
->> first calling is enough. If so, can we use a static variable in it,
->> so the following calling can return the result right away?
-> 
-> No, because that wouldn't help with crappy big-little implementations
-> that could have PMUs with different versions. We want to find the
-> version at the point where the virtual PMU is created, which is why we
-> call the probe function once per vcpu.
-I see.
+This series makes some efficiency improvement of guest stage-2 page
+table code, and there are some test results to quantify the benefit.
+The code has been re-arranged based on the latest kvmarm/next tree.
 
-But AFAICS the pmuver is placed in kvm->arch, and the probe function is called
-once per VM. Maybe I miss something.
+Descriptions:
+We currently uniformly permorm CMOs of D-cache and I-cache in function
+user_mem_abort before calling the fault handlers. If we get concurrent
+guest faults(e.g. translation faults, permission faults) or some really
+unnecessary guest faults caused by BBM, CMOs for the first vcpu are
+necessary while the others later are not.
 
-> 
-> This of course is broken in other ways (BL+KVM is a total disaster
-> when it comes to PMU), but making this static would just make it
-> worse.
-OK.
+By moving CMOs to the fault handlers, we can easily identify conditions
+where they are really needed and avoid the unnecessary ones. As it's a
+time consuming process to perform CMOs especially when flushing a block
+range, so this solution reduces much load of kvm and improve efficiency
+of the stage-2 page table code.
 
-Thanks,
-Keqian
+In this series, patch #1, #3, #4 make preparation for place movement
+of CMOs (adapt to the latest stage-2 page table framework). And patch
+#2, #5 move CMOs of D-cache and I-cache to the fault handlers. Patch
+#6 introduces a new way to distinguish cases of memcache allocations.
+
+The following are results in v3 to represent the benefit introduced
+by movement of CMOs, and they were tested by [1] (kvm/selftest) that
+I have posted recently.
+[1] https://lore.kernel.org/lkml/20210302125751.19080-1-wangyanan55@huawei.com/
+
+When there are muitiple vcpus concurrently accessing the same memory
+region, we can test the execution time of KVM creating new mappings,
+updating the permissions of old mappings from RO to RW, and the time
+of re-creating the blocks after they have been split.
+
+hardware platform: HiSilicon Kunpeng920 Server
+host kernel: Linux mainline v5.12-rc2
+
+cmdline: ./kvm_page_table_test -m 4 -s anonymous -b 1G -v 80
+           (80 vcpus, 1G memory, page mappings(normal 4K))
+KVM_CREATE_MAPPINGS: before 104.35s -> after  90.42s  +13.35%
+KVM_UPDATE_MAPPINGS: before  78.64s -> after  75.45s  + 4.06%
+
+cmdline: ./kvm_page_table_test -m 4 -s anonymous_thp -b 20G -v 40
+           (40 vcpus, 20G memory, block mappings(THP 2M))
+KVM_CREATE_MAPPINGS: before  15.66s -> after   6.92s  +55.80%
+KVM_UPDATE_MAPPINGS: before 178.80s -> after 123.35s  +31.00%
+KVM_REBUILD_BLOCKS:  before 187.34s -> after 131.76s  +30.65%
+
+cmdline: ./kvm_page_table_test -m 4 -s anonymous_hugetlb_1gb -b 20G -v 40
+           (40 vcpus, 20G memory, block mappings(HUGETLB 1G))
+KVM_CREATE_MAPPINGS: before 104.54s -> after   3.70s  +96.46%
+KVM_UPDATE_MAPPINGS: before 174.20s -> after 115.94s  +33.44%
+KVM_REBUILD_BLOCKS:  before 103.95s -> after   2.96s  +97.15%
+
+---
+
+Changelogs:
+v4->v5:
+- rebased on the latest kvmarm/tree to adapt to the new stage-2 page-table code
+- v4: https://lore.kernel.org/lkml/20210409033652.28316-1-wangyanan55@huawei.com/
+
+v3->v4:
+- perform D-cache flush if we are not mapping device memory
+- rebased on top of mainline v5.12-rc6
+- v3: https://lore.kernel.org/lkml/20210326031654.3716-1-wangyanan55@huawei.com/
+
+v2->v3:
+- drop patch #3 in v2
+- retest v3 based on v5.12-rc2
+- v2: https://lore.kernel.org/lkml/20210310094319.18760-1-wangyanan55@huawei.com/
+
+v1->v2:
+- rebased on top of mainline v5.12-rc2
+- also move CMOs of I-cache to the fault handlers
+- retest v2 based on v5.12-rc2
+- v1: https://lore.kernel.org/lkml/20210208112250.163568-1-wangyanan55@huawei.com/
+
+---
+
+Yanan Wang (6):
+  KVM: arm64: Introduce KVM_PGTABLE_S2_GUEST stage-2 flag
+  KVM: arm64: Move D-cache flush to the fault handlers
+  KVM: arm64: Add mm_ops member for structure stage2_attr_data
+  KVM: arm64: Provide invalidate_icache_range at non-VHE EL2
+  KVM: arm64: Move I-cache flush to the fault handlers
+  KVM: arm64: Distinguish cases of memcache allocations completely
+
+ arch/arm64/include/asm/kvm_mmu.h     | 31 -------------
+ arch/arm64/include/asm/kvm_pgtable.h | 38 ++++++++++------
+ arch/arm64/kvm/hyp/nvhe/cache.S      | 11 +++++
+ arch/arm64/kvm/hyp/pgtable.c         | 65 +++++++++++++++++++++++-----
+ arch/arm64/kvm/mmu.c                 | 51 ++++++++--------------
+ 5 files changed, 107 insertions(+), 89 deletions(-)
+
+-- 
+2.23.0
+
