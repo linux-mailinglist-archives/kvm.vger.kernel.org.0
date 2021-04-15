@@ -2,113 +2,161 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B23AE3603DC
-	for <lists+kvm@lfdr.de>; Thu, 15 Apr 2021 10:06:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 267473603E3
+	for <lists+kvm@lfdr.de>; Thu, 15 Apr 2021 10:07:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231511AbhDOIHB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 15 Apr 2021 04:07:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38420 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231241AbhDOIHA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 15 Apr 2021 04:07:00 -0400
-Received: from mail-il1-x12a.google.com (mail-il1-x12a.google.com [IPv6:2607:f8b0:4864:20::12a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 03741C061574;
-        Thu, 15 Apr 2021 01:06:38 -0700 (PDT)
-Received: by mail-il1-x12a.google.com with SMTP id 6so19441284ilt.9;
-        Thu, 15 Apr 2021 01:06:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=xQjML/19fS2KYb4gv13QovtbXXbNQiltUsF/J2T/nMk=;
-        b=VtbzxXkkAQY51C48ZXBSjT+nti+po3LqJUEy1wpMjLi58hxNwIaNtiCA9dv7Nzw9AE
-         WBJMJsjjn/7WmpuXgnXRY89V2hPw8ls7xUGrR3omEi5NpuTAhqcqSfvkFmRGJwELxAnZ
-         kdvS78Dr+GDGPhu45Lc6YPevgqIr0LQKWl2TaVKBLT4+onwEJeRN+nexea2Xn58yBRNj
-         Q9+UO8OTOBod5mgj8l4W2SHZET0jwREFbC92Hpm5Cm7cwhR0KG1lcweSHBs0hZynXjFa
-         RmrCR+UZaKXVHeOXgpI+V98lOOzRaa5OZHXPnOBvgi7RDjXvmts+Ukk93vzQvPs7/Ql3
-         ikBQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=xQjML/19fS2KYb4gv13QovtbXXbNQiltUsF/J2T/nMk=;
-        b=lAQBm9MFv+1V13jOFzFCq41dR+qMPi4QMeiBWTGlznkTEH7JWInOQpsAuLiVgWMFY5
-         iCCi6BC8vtX+531SzK1dHUJHFYNzz79PaKyDTYbd73PuTWkoagTINiumMHmWx+bh9h4G
-         JFLMzqDelkDKeqpGnNm2cMytaKwgYwgHm2qm6W8PNebSEpkAnNujFEftf4BKgyIECQEP
-         m2RSXBvk1LyVzqcRLZHlhRleLPVsW7vHqi9SglavhcbZntjSaQq9cANA1CJBNfHwdIYW
-         WDU18Oyt8XEWu50hEvxqLV/BsmBTX0puaQZWOPfNkwsYiek1X44iTxo6v6SBbuYmeB9L
-         ce2A==
-X-Gm-Message-State: AOAM531F0FyJpy/rmosIJJh6KNaqaLcTys60h5CiJERdydRySKnfKxnV
-        a9Wy5nsJWuQf1QZOtMHmiXMHoYoLhCX8VNckxNQ=
-X-Google-Smtp-Source: ABdhPJyg0LaNjQ9QuiIOCdf+zmUHw145GSPPkmdZIEUUSfLsySMUTdMHe7e43fw1bqPQ2tUDo71PTwZSHuMv+5HzU14=
-X-Received: by 2002:a05:6e02:1282:: with SMTP id y2mr1862926ilq.308.1618473997519;
- Thu, 15 Apr 2021 01:06:37 -0700 (PDT)
+        id S231558AbhDOIIP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 15 Apr 2021 04:08:15 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:34986 "EHLO
+        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230090AbhDOIIO (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 15 Apr 2021 04:08:14 -0400
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 13F84B5A132058;
+        Thu, 15 Apr 2021 04:06:53 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : in-reply-to : content-type :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=qlxWFtVavXCd/lHzWzSrLnEFhrdIu+gCNQ7cSdIefOE=;
+ b=bOZgsQih45h3B+5N6i127n5q0Bt37CffaF1qGurNTvPvvbtRdw6NurRtE3OBov4NbcWg
+ No9e2XWo0lZoaTXFPJLkYMS+iJw5+7FwmFQz2q8RarOroiGvm+bUcxOVDV/AnaA+MxhS
+ Isrt/JCoG3ub6c6U220wf85bvx7TZTnQVeuWW+FiUz8yqabHlxLadVz8066EFBSQlWbw
+ vhWgdkLMxV3wb2XlCl4kuaR3grtYSouRI4Xb9/6NhyjxS9q1MuCx2HKutg3FhtSa4R09
+ 0U3LYPk/nE0mP8BmWUvLE/a89G1+KCBjYsy1Xl7c+Lr4i5VpdZqVmy0F+06cpG2qGm8Y Gg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 37x46utmt3-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 15 Apr 2021 04:06:53 -0400
+Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 13F84VnS133994;
+        Thu, 15 Apr 2021 04:06:52 -0400
+Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 37x46utmru-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 15 Apr 2021 04:06:52 -0400
+Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
+        by ppma04fra.de.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 13F85EEK011874;
+        Thu, 15 Apr 2021 08:06:50 GMT
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
+        by ppma04fra.de.ibm.com with ESMTP id 37u3n8a0dx-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 15 Apr 2021 08:06:50 +0000
+Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 13F86lP066322744
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 15 Apr 2021 08:06:47 GMT
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 73F1011C050;
+        Thu, 15 Apr 2021 08:06:47 +0000 (GMT)
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id BA81411C064;
+        Thu, 15 Apr 2021 08:06:45 +0000 (GMT)
+Received: from oc7455500831.ibm.com (unknown [9.171.63.231])
+        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Thu, 15 Apr 2021 08:06:45 +0000 (GMT)
+Subject: Re: [PATCH 2/2] tools: do not include scripts/Kbuild.include
+To:     Masahiro Yamada <masahiroy@kernel.org>,
+        linux-kbuild@vger.kernel.org
+Cc:     Janosch Frank <frankja@linux.ibm.com>,
+        Alexei Starovoitov <ast@kernel.org>,
+        Andrii Nakryiko <andrii@kernel.org>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Daniel Borkmann <daniel@iogearbox.net>,
+        Harish <harish@linux.ibm.com>,
+        John Fastabend <john.fastabend@gmail.com>,
+        KP Singh <kpsingh@kernel.org>, Martin KaFai Lau <kafai@fb.com>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Nathan Chancellor <nathan@kernel.org>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Paul Mackerras <paulus@samba.org>,
+        Shuah Khan <shuah@kernel.org>,
+        Song Liu <songliubraving@fb.com>, Yonghong Song <yhs@fb.com>,
+        bpf@vger.kernel.org, clang-built-linux@googlegroups.com,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-kselftest@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        netdev@vger.kernel.org
+References: <20210415072700.147125-1-masahiroy@kernel.org>
+ <20210415072700.147125-2-masahiroy@kernel.org>
+From:   Christian Borntraeger <borntraeger@de.ibm.com>
+Message-ID: <eb623ea6-a2f4-9692-ff3d-cb9f9b9ea15f@de.ibm.com>
+Date:   Thu, 15 Apr 2021 10:06:45 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.9.0
+In-Reply-To: <20210415072700.147125-2-masahiroy@kernel.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: -YMTQ38-A9pZbmNZPcHayMt5HbaIwtug
+X-Proofpoint-ORIG-GUID: FIconhLodZz_0nArX8fkTBP6UY0y2BNs
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 MIME-Version: 1.0
-References: <20201127112114.3219360-1-pbonzini@redhat.com> <20201127112114.3219360-3-pbonzini@redhat.com>
- <CAJhGHyCdqgtvK98_KieG-8MUfg1Jghd+H99q+FkgL0ZuqnvuAw@mail.gmail.com>
- <YHS/BxMiO6I1VOEY@google.com> <CAJhGHyAcnwkCfTcnxXcgAHnF=wPbH2EDp7H+e74ce+oNOWJ=_Q@mail.gmail.com>
- <80b013dc-0078-76f4-1299-3cff261ef7d8@redhat.com> <CAJhGHyChfXdcAMzzD7P3aC8tnhFW5GvOt88vOY=D3pyb7hgNAA@mail.gmail.com>
- <6d9dafb1-b8ff-82ef-93dc-da869fe7ba0f@redhat.com> <CAJhGHyA=v_va2QTvo7Ve8JyZO4j5LjiCdB9CLnvRXGwGwa3e+A@mail.gmail.com>
- <5b422691-ffc5-d73a-1bda-f1ee61116756@redhat.com>
-In-Reply-To: <5b422691-ffc5-d73a-1bda-f1ee61116756@redhat.com>
-From:   Lai Jiangshan <jiangshanlai+lkml@gmail.com>
-Date:   Thu, 15 Apr 2021 16:06:26 +0800
-Message-ID: <CAJhGHyAM6e_XW7iTgYZ3CBv_ANUx4cAZh8+Hq7uXyM6OT1Sf8Q@mail.gmail.com>
-Subject: Re: [PATCH 2/2] KVM: x86: Fix split-irqchip vs interrupt injection
- window request
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        LKML <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org,
-        Filippo Sironi <sironi@amazon.de>,
-        David Woodhouse <dwmw@amazon.co.uk>,
-        "v4.7+" <stable@vger.kernel.org>,
-        Wanpeng Li <wanpengli@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.761
+ definitions=2021-04-15_03:2021-04-15,2021-04-15 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1011
+ priorityscore=1501 malwarescore=0 lowpriorityscore=0 bulkscore=0
+ adultscore=0 suspectscore=0 impostorscore=0 mlxscore=0 spamscore=0
+ phishscore=0 mlxlogscore=999 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2104060000 definitions=main-2104150053
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Apr 15, 2021 at 2:07 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> On 15/04/21 02:59, Lai Jiangshan wrote:
-> > The next call to inject_pending_event() will reach here AT FIRST with
-> > vcpu->arch.exception.injected==false and vcpu->arch.exception.pending==false
-> >
-> >>           ... if (!vcpu->arch.exception.pending) {
-> >>                   if (vcpu->arch.nmi_injected) {
-> >>                           static_call(kvm_x86_set_nmi)(vcpu);
-> >>                           can_inject = false;
-> >>                   } else if (vcpu->arch.interrupt.injected) {
-> >>                           static_call(kvm_x86_set_irq)(vcpu);
-> >>                           can_inject = false;
-> >
-> > And comes here and vcpu->arch.interrupt.injected is true for there is
-> > an interrupt queued by KVM_INTERRUPT for pure user irqchip. It then does
-> > the injection of the interrupt without checking the EFLAGS.IF.
->
-> Ok, understood now.  Yeah, that could be a problem for userspace irqchip
-> so we should switch it to use pending_external_vector instead.  Are you
-> going to write the patch or should I?
->
 
-I wish you do it.  I haven't figured out how to write a clean test for
-it and confirm it in upstream.  But I will backport your patch and test it.
+On 15.04.21 09:27, Masahiro Yamada wrote:
+> Since commit d9f4ff50d2aa ("kbuild: spilt cc-option and friends to
+> scripts/Makefile.compiler"), some kselftests fail to build.
+> 
+> The tools/ directory opted out Kbuild, and went in a different
+> direction. They copy any kind of files to the tools/ directory
+> in order to do whatever they want to do in their world.
+> 
+> tools/build/Build.include mimics scripts/Kbuild.include, but some
+> tool Makefiles included the Kbuild one to import a feature that is
+> missing in tools/build/Build.include:
+> 
+>   - Commit ec04aa3ae87b ("tools/thermal: tmon: use "-fstack-protector"
+>     only if supported") included scripts/Kbuild.include from
+>     tools/thermal/tmon/Makefile to import the cc-option macro.
+> 
+>   - Commit c2390f16fc5b ("selftests: kvm: fix for compilers that do
+>     not support -no-pie") included scripts/Kbuild.include from
+>     tools/testing/selftests/kvm/Makefile to import the try-run macro.
+> 
+>   - Commit 9cae4ace80ef ("selftests/bpf: do not ignore clang
+>     failures") included scripts/Kbuild.include from
+>     tools/testing/selftests/bpf/Makefile to import the .DELETE_ON_ERROR
+>     target.
+> 
+>   - Commit 0695f8bca93e ("selftests/powerpc: Handle Makefile for
+>     unrecognized option") included scripts/Kbuild.include from
+>     tools/testing/selftests/powerpc/pmu/ebb/Makefile to import the
+>     try-run macro.
+> 
+> Copy what they want there, and stop including scripts/Kbuild.include
+> from the tool Makefiles.
+> 
+> Link: https://lore.kernel.org/lkml/86dadf33-70f7-a5ac-cb8c-64966d2f45a1@linux.ibm.com/
+> Fixes: d9f4ff50d2aa ("kbuild: spilt cc-option and friends to scripts/Makefile.compiler")
+> Reported-by: Janosch Frank <frankja@linux.ibm.com>
+> Reported-by: Christian Borntraeger <borntraeger@de.ibm.com>
+> Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 
-My fix is changing the behavior back to before 664f8e26b00c7 where
-arch.exception.pending=true would prevent ready_for_interrupt_injection
-to be non-zero.  So that KVM_INTERRUPT maintains the original behavior
-that it can immediately inject IRQ into guests. (Userspace may regret
-an unearthly injected IRQ for it has no right to revise the IRQ or cancel
-it.)  But your fix will unify the behaviors of all kinds of irqchips.
+When applying this on top of d9f4ff50d2aa ("kbuild: spilt cc-option and friends to scripts/Makefile.compiler")
 
-Thanks
-Lai
+I still do get
 
+# ==== Test Assertion Failure ====
+#   lib/kvm_util.c:142: vm->fd >= 0
+#   pid=315635 tid=315635 - Invalid argument
+#      1	0x0000000001002f4b: vm_open at kvm_util.c:142
+#      2	 (inlined by) vm_create at kvm_util.c:258
+#      3	0x00000000010015ef: test_add_max_memory_regions at set_memory_region_test.c:351
+#      4	 (inlined by) main at set_memory_region_test.c:397
+#      5	0x000003ff971abb89: ?? ??:0
+#      6	0x00000000010017ad: .annobin_abi_note.c.hot at crt1.o:?
+#   KVM_CREATE_VM ioctl failed, rc: -1 errno: 22
+not ok 7 selftests: kvm: set_memory_region_test # exit=254
 
-> Thanks!
->
-> Paolo
->
-> > My question is that what stops the next call to inject_pending_event()
-> > to reach here when KVM_INTERRUPT is called with exepction pending.
->
+and the testcase compilation does not pickup the pgste option.
