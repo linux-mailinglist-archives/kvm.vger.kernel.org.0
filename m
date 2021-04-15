@@ -2,138 +2,395 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4DF78360FA2
-	for <lists+kvm@lfdr.de>; Thu, 15 Apr 2021 17:59:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 948C2360FA7
+	for <lists+kvm@lfdr.de>; Thu, 15 Apr 2021 18:01:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234018AbhDOP7l (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 15 Apr 2021 11:59:41 -0400
-Received: from mail-bn7nam10on2085.outbound.protection.outlook.com ([40.107.92.85]:8161
-        "EHLO NAM10-BN7-obe.outbound.protection.outlook.com"
+        id S234086AbhDOQBw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 15 Apr 2021 12:01:52 -0400
+Received: from mail-co1nam11on2062.outbound.protection.outlook.com ([40.107.220.62]:11987
+        "EHLO NAM11-CO1-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S232769AbhDOP7l (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 15 Apr 2021 11:59:41 -0400
+        id S231726AbhDOQBv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 15 Apr 2021 12:01:51 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=lSMhqhb+nw2tk7EyAm68yFMOgxq3WvwKvd9QKoFQyv6AsK6QOk9YT5+K6h9ZD0GAbXjg5vbR4yu3xUMOoTVClr9Snx8MH1Phk240YcgXamnjG9jiCW1LieZ5v0D1/+lkTgWtuEaLQKzMmMZ67P88dCE/lggrrIuqw937ng57XtE9H3iNlynXF6CNlZbTKx46NlSbQ6vmmXrHX7QroQQ62Rvly5kok+BFXzRLUExrRA5Ij7FWzjFdYKY54tGEiZqDzhWyngFJ+6C3CNME5kZ3oxREXY3+ic4QhU13ek3H9+jNvywQyXk8CLV2oh2G0EGlAS66xobLeL6I2YZfYv+MvA==
+ b=VZiXjUQSgXvuq2sq6olpi25CigZ0Lr8pLkynpVdD91lmBwIshfktncgu8FR42KMl6RHE3W2c5hT37gQahY8DpSPtESNbqFBx4ukA/z6lAg/SxZQlIiBJELtRwXtok0YACVewhpkxNbENh+eHDmPOTGRR/f2OPnv5JCRnQij42l+u81dFdBQsczZW4+1ygsMdmRO0uDHVAQ9EDdpcMbs6YblbhctxmjelFxpAdTEbFsU5YzRgMNnR49MOnhpyiM0dU0RyLfg1fEHGg1ogOgWLGooS+uyhLdwjzFQarhpFC5hWFZjaQCKAqEOslpXGDN6jak54P198zPdohJfkKHFn9g==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=fzHgR4/srdRrnpCFf//he/wMHnI5/X07xubuaqy1vPo=;
- b=NfgLHJ2T6MuMbSe23bwfXaZ/LdwuaC8RuUxzq6IkpQcZ7XjfEGct3C8VsTS0hqD6rEr1GUbQRP1KgM6NAZc89ERh1d+GBmynwK+qXvIbVdEXT6w/JDyE8/H2QiF84wsMJDAFGiksnHg79xSYE3WAtLOt/+xG4VpgsDB2ia/5n+1+YDZe4sGpXTkUIP2ZJ39vmw5t6N7aoH4wEzMsh9snxMHkGFmTbMsjErw9QT3jxl/INw8pXZLa+zAE+Voj8ebc6+jJrHNTaPVmjFQSi0KFKu1k8GX7YJsg9R3WJVrvSr/idHUU4TI8u7AXrST4rlixHhxQUNdJ2BdRWH/EbGBXHA==
+ bh=uLF70FUMovikKo8IBygF7beVKFc18vJMfTzLHEG+vVc=;
+ b=GPHfMgao9axBGUf0KJ+nVs6kFTdb4P42Ay4/f06zMvc9hGtUiUtSQ4ojC0mWo3wqcNpd7t0XQbPRyS4vHz6HzrMXAA/ne3wlNfFeDcgM2M8pQ6ueJTTcS3BtzNjfninRBGiKv8TK82AP+u/RdjK53ClE0dmESU8KqGjCF/vraZ5oabF+3vP8S+V/KRPsSEfxpDCGCqR/yurC5LXamEHpmgnYvy7zb/RuSdQlyHxN4GctYJJSV1zZvXOR3PGBYFTWldHUbpXUvWxbFGkc1DkeGk09SdQ6Nr+DGi2qxN6uJQzyTvkh8PrtuoCDbkwjvqAw+78gnHqnTAMdG5HYJ50Dvw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
  header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=fzHgR4/srdRrnpCFf//he/wMHnI5/X07xubuaqy1vPo=;
- b=C27UeugGWc8rOIbZnDg0GHGNf+Z83G0Lg892ZKRNHEtK1F7QYzaY34r3jPhPXwVB0vgKi9Zda2uvjuyrkcGw263QOR/SOKvbeaXfSr4bMVZO6776cTV3Wz+xzb5lQmkIHLELn5hucQC15sSxwVFnfUocLuBXd91wZfBQryNn984=
+ bh=uLF70FUMovikKo8IBygF7beVKFc18vJMfTzLHEG+vVc=;
+ b=1hphpmb0uBZVYPYYOMfnmFX2o/mwU82tbAcI3rrwu6ihP6OV3LH+LRQylxX57U3QRvGeYETfNkRHPp18YhyxAXgY1tjbUS4qbPq5/F98oue8Kq5sTpSNvm2YEtpH4yYGymkM43Y5JvuTriBF9/c5zNzNldV2SU0edN25/gK71K8=
 Authentication-Results: redhat.com; dkim=none (message not signed)
  header.d=none;redhat.com; dmarc=none action=none header.from=amd.com;
 Received: from SN6PR12MB2767.namprd12.prod.outlook.com (2603:10b6:805:75::23)
- by SN6PR12MB2719.namprd12.prod.outlook.com (2603:10b6:805:6c::12) with
+ by SA0PR12MB4415.namprd12.prod.outlook.com (2603:10b6:806:70::17) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4042.18; Thu, 15 Apr
- 2021 15:59:15 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4042.16; Thu, 15 Apr
+ 2021 16:01:26 +0000
 Received: from SN6PR12MB2767.namprd12.prod.outlook.com
  ([fe80::1fb:7d59:2c24:615e]) by SN6PR12MB2767.namprd12.prod.outlook.com
  ([fe80::1fb:7d59:2c24:615e%6]) with mapi id 15.20.4042.018; Thu, 15 Apr 2021
- 15:59:15 +0000
+ 16:01:26 +0000
 From:   Ashish Kalra <Ashish.Kalra@amd.com>
 To:     pbonzini@redhat.com
 Cc:     tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com,
         joro@8bytes.org, bp@suse.de, thomas.lendacky@amd.com,
         x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
         srutherford@google.com, seanjc@google.com,
-        venu.busireddy@oracle.com, brijesh.singh@amd.com
-Subject: [PATCH v13 11/12] EFI: Introduce the new AMD Memory Encryption GUID.
-Date:   Thu, 15 Apr 2021 15:58:42 +0000
-Message-Id: <ae8924d0dcac0b397295f53f7bd3ff06f6a9ff12.1618498113.git.ashish.kalra@amd.com>
+        venu.busireddy@oracle.com, brijesh.singh@amd.com,
+        kexec@lists.infradead.org
+Subject: [PATCH v13 12/12] x86/kvm: Add guest support for detecting and enabling SEV Live Migration feature.
+Date:   Thu, 15 Apr 2021 16:01:16 +0000
+Message-Id: <ffd67dbc1ae6d3505d844e65928a7248ebaebdcc.1618498113.git.ashish.kalra@amd.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <cover.1618498113.git.ashish.kalra@amd.com>
 References: <cover.1618498113.git.ashish.kalra@amd.com>
 Content-Type: text/plain
 X-Originating-IP: [165.204.77.1]
-X-ClientProxiedBy: SA0PR11CA0148.namprd11.prod.outlook.com
- (2603:10b6:806:131::33) To SN6PR12MB2767.namprd12.prod.outlook.com
+X-ClientProxiedBy: SA0PR11CA0187.namprd11.prod.outlook.com
+ (2603:10b6:806:1bc::12) To SN6PR12MB2767.namprd12.prod.outlook.com
  (2603:10b6:805:75::23)
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from ashkalra_ubuntu_server.amd.com (165.204.77.1) by SA0PR11CA0148.namprd11.prod.outlook.com (2603:10b6:806:131::33) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4042.17 via Frontend Transport; Thu, 15 Apr 2021 15:59:14 +0000
+Received: from ashkalra_ubuntu_server.amd.com (165.204.77.1) by SA0PR11CA0187.namprd11.prod.outlook.com (2603:10b6:806:1bc::12) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4042.16 via Frontend Transport; Thu, 15 Apr 2021 16:01:25 +0000
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: f50d6138-f304-4e83-f381-08d900276b29
-X-MS-TrafficTypeDiagnostic: SN6PR12MB2719:
+X-MS-Office365-Filtering-Correlation-Id: 90f20e35-6b85-4e9a-b1e3-08d90027b94d
+X-MS-TrafficTypeDiagnostic: SA0PR12MB4415:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <SN6PR12MB271955C3DE6D1B130492A83B8E4D9@SN6PR12MB2719.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:4941;
+X-Microsoft-Antispam-PRVS: <SA0PR12MB44159D3CF1DCCA4150A278528E4D9@SA0PR12MB4415.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:331;
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: kHkVVc+1LjHrlX9jRhSixpjha9JCtOPV+RpylX5ZduaLLKwpZ69veDWGNReaXXqBx5X+ZM1OoxiQOhpBRKujjMMtvHVkRlhfULIRkvlRhQ6g2DncB2tsLOQ9v/2SZZmfmSv0raMeCtAt/wPDRdWNLhvg4n4KHBWsQMMDoXpFkEL4Gyp72XlzadrgQS0mRI87V4Ln5XY85SibOse/sjx+4ET6nbBy7S8x8EzkW7PxRC7B1Evp4qW/9wsnAGnav8ffm7UB1Arc/3eOH+JIaE4YQ76h5hhr81Tic1QSsXxMlecTwoABez193uAhjCTaZR5k/iy62f+ejc2znQrXiV0xi/oc0uFacC8Uo8U4s6wG+Pef4y6713KgM9anHbfxlAdG/GbekEu5snprFQzKjZd8mscJPpcYwC8byhkHzfS6vTSpZ4u6U4xSdG8aFd5i8RZamkvnPpyqYZ5E5v9mXxXsYNBIKsO6zM+t2qJ/hUf48/ByiA9Zr1H4hun9OTFbk0uZlvoA/vIlAdmpPb8dsVUYk66LZ1bUMXRWSoxpYHP7yvB6PTLGz7TWPAqLSJvCcF6voBEmaxy0r3ryWNtpPLcaBv+/V0GwKSK0uS3TNWQnyP/DWclkIZWE6oL1p1nLMhU8lFLDJRUmcWrEOzxNGbiw2g==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2767.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(396003)(376002)(346002)(136003)(39860400002)(2616005)(6486002)(956004)(6916009)(16526019)(66476007)(66556008)(8676002)(2906002)(66946007)(83380400001)(478600001)(6666004)(316002)(36756003)(8936002)(5660300002)(52116002)(7416002)(86362001)(26005)(38350700002)(38100700002)(7696005)(4326008)(186003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: =?us-ascii?Q?OQPJgTgpGqwJpB8vUzAn9G6UMz0CT7iiPzsQhUfumu1r8oXmidxLmHTnLLis?=
- =?us-ascii?Q?qRM4uU2STbr/vR806Mepin+raJqhD+KYGMKWlI3tv6zYBkOBf00PWsl4T1Wr?=
- =?us-ascii?Q?WBmO3+fMM1hFk1Ammm+w6FJLrW+VtLCwgzym0r0yPg/IaAJ5ghEiCMmpVFrS?=
- =?us-ascii?Q?fi0Ce9uLs1nCPhRkH8qgYu6MTaKR13R81PnKkzx/ma4zgHM840dWFcZhBKOs?=
- =?us-ascii?Q?cOS9sMxHxID86mT16pBkEUXqlqqOT+M2YVZKM8SwYidpGPPuY85CtPyliMGD?=
- =?us-ascii?Q?Q/q9dx3VsLgyl1ax8T1ptD/j+wYvSKVNQ3v3sfUtkbi/2X9dnESIHCetqSfL?=
- =?us-ascii?Q?XtqjWSVMhqktHZp06KC8aXn5aqWkQjhX+frJA8fUOI/8zEVPRhYEKOF5lEWf?=
- =?us-ascii?Q?VKOi/PiJKdI8vIW6XGAvZHhwW5E4ElLkuj1NQ45RMfFx/Yv5vpXPj2f+/y6o?=
- =?us-ascii?Q?6eVfVFD1i1v+Yw4d1hfPXhvy1Xk8VvaqAh8Z8s478HmcbCi0475DAU1eyLxo?=
- =?us-ascii?Q?uwfg39SifTX7Bp32VhTbK+GnxCcmnPkldWFLQFOBz8WFmZiqRAn2dGPjEq4C?=
- =?us-ascii?Q?+YDNME23rOeq/T8ahbOT9sqs573eL8yjhGbM7Z9qwJYdoiLBJdq5CCKPI6v9?=
- =?us-ascii?Q?e7YuxVGy5qqRSbXPyGMZ3LbOHBIcMQR1trMeistHBTRI+XRtd33t5ML3Pm1B?=
- =?us-ascii?Q?180V1hJgzw/oWyF484bzs+BMLyDZBpCukkKIqvIEkDOMKc6/xKhF7Xfxl7CK?=
- =?us-ascii?Q?94oFtQEH4fxa8hwYtQzEcV3RxEId5Khzy9Ch199zy2RXP+tw1nbBTlBcvouW?=
- =?us-ascii?Q?bmQjYjR2cwtE3zLFsjy4Y3B48nE9gh31jolw+L+4tz4PEDpAQWIaPDrGL6aP?=
- =?us-ascii?Q?NQFovO+gD0lbDn2yYUUdYqefVQlJ/8EL1JD+TFlnCITHXrXSCcT752I6Soah?=
- =?us-ascii?Q?vXrqmflWacj/+kgODAVRl/wS/2TXYSKA49sJMm+WugoxBBRV+GbnUQhlO+a4?=
- =?us-ascii?Q?b8YuERzApuhGkO0pvpkfcHz/DF/ebcOjCUhjBkb1V6t21+2gLe0TmDsKX7xD?=
- =?us-ascii?Q?A5rqPsZjRhkeNCJ9shTCUCGKQDV7sQeherAu95hcZsYpi12pgYdhyF2zo9YT?=
- =?us-ascii?Q?Xg+9WdDX69GGibdfcXgf8PHMrlxxme7cB5un93/LJ5hjn6ZIzLmYvfkrwL4D?=
- =?us-ascii?Q?tApXJOyShMsNwtwOGzyz5PsGTX1dn03zGdTdHIqVhCK4Suv2O3WJ9TzZa2ID?=
- =?us-ascii?Q?OfwjWwCJqP2tnb7pRpsKR8qJgvLRGNeY4SaP5hqGoLPjUuc677EgRls7EV/r?=
- =?us-ascii?Q?P3wC1bMEumNYiFE/sWd1V5f6?=
+X-Microsoft-Antispam-Message-Info: c7OaLCqVQzfQJ8Yj/wuS7iimES+6mbFznkg9yDSR4Utip8Y5ULHORaFYAUXVqldDJuLs7bY6rYeHyQW15E1bR2z2cZwv5Tc8mTJj3juOTnZ8hvbYMtluXoiB+LTymRnpCRpS38KAmWwjwBh69bflpsWeD2+HFpcuGkf1YWASmeVc606q1sWtzikl99HxmFxIQN0T4ZgFvyrS/R8BGu41ARl0WCYC/eD9Ld3MeJfjxr8LvN1dXrGGkrcSosqjgnXpjkfaC22kgVUlom/UU13JA8P1WZSpIEOeBv70PZ7v8HJia5mHRykb9lC6L3JZkXfhFGdCKXYMrxCW97Q83r8GIaiWKzVvqcThTGKf4+j/YfQKE2sLslFCOSf73Y4PZjhqKGvNwRHsZFVx/5BJLSCtjcE/sk9gNKV5F8hUP/Ucsjj6W5j9X4MRz7+bpY12YwYIvT1L2wKMnQoIOhNQFTcFfnYk0Pss5vOuG7CFMwK/IVwVuIPOvXJkD+1qVa9b2D9LZ71se/M6xfnTz8VXRgg+6GJg6EV12czGTEM/TGLpPpE4LqBL0b90pJtZV5m4uAc230EE1KkWaEal8o7R1/1EnAywW1aKqyTF8JxZiKCiN/vQ7G9h2eYeykClhkP4Vciw62CARPFGfD6sCY86QrcZMg==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2767.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(346002)(39860400002)(396003)(376002)(366004)(136003)(7416002)(16526019)(8676002)(186003)(8936002)(5660300002)(83380400001)(66476007)(36756003)(38350700002)(66946007)(956004)(66556008)(4326008)(6666004)(2616005)(316002)(38100700002)(7696005)(6916009)(52116002)(2906002)(6486002)(26005)(86362001)(478600001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData: =?us-ascii?Q?qvxKANlCqAx/1M8UFJMUJZIAKTginIJfwPcVFav+j/q6Fk0/uCW8TgMxSciI?=
+ =?us-ascii?Q?N+Jv/xypb66NqQl5hqTQFqFGzs3fYRYhMa93KUjm6RSAeuQ1RWiav/woKiEY?=
+ =?us-ascii?Q?ZeKOc2U0GOFW+XtxQmR8ecDZX7PrlWcC6CvYM5zwCMJCU1ZbI1fG9UcJPHTD?=
+ =?us-ascii?Q?JlL0/7E4i5TcgEA+tAOIN+/oyMNdAZUrHlUy7IzGD2eDYH4gNnxwpNNNLCVf?=
+ =?us-ascii?Q?MA1Qjoz3LF0J4+SQTD08Z4I7bbAfZwNt6E+oPJ5d5BL5SQEERbolAWv6QvP+?=
+ =?us-ascii?Q?atVXFbMdWPbh1huMHBeaySO76kh/sJwDTL6p3cbPrKnmyykse3ewK3adGpiU?=
+ =?us-ascii?Q?u4/IWO/MJSz0eQRInHVJ1VhjwJNsC2Oawpj5y/j4cnEoRIGhknfyiN8kJhCl?=
+ =?us-ascii?Q?xGbBxQ0KD/bwI9lJ4wH6zWk0VijT7wHiGZBm4lqxFSJvNXgPt9J/GU7mFF1/?=
+ =?us-ascii?Q?kN0VS03OIlGnt1KyvMV1PZ+8O1Dbmi5eVDm52baRvj86U14EX9Fn0x1jXGbf?=
+ =?us-ascii?Q?2sgt4ahORhE/FsXt731nVpYEzTMW9JJxhspQrmq0Nb7uRtX4wPpwVaBHIQTv?=
+ =?us-ascii?Q?jV+28CwH4WFmfcBfrmj2JtZmCgqg9Lwq2OtLKvI7P2iuZiq/oWiBcwTfz8nr?=
+ =?us-ascii?Q?nOOPXHFG4bqNxBmbT6bpk/B5KAvugtGneR1E4wA6Rz1AEW5wU2QX5CLAC+0t?=
+ =?us-ascii?Q?NkGkrt5KONG8LJfBHYWaHQVYirpw73D+FmakHMWgUBiM42kyYW72kmbIJv3w?=
+ =?us-ascii?Q?F6sCXgFPfPWn0J+x9Ec6guIqh4FirnPxMTk6kigM2FWvBdMUc33BVUAWieAO?=
+ =?us-ascii?Q?oBpAxZG0ClL6BEJtOfNbew97FVoRCRp7+U1njiFn9N58mLMjFFywuNI6lVF9?=
+ =?us-ascii?Q?+j4AKElrBg1ZHcK5Us0iQbkp3RIW45WTq0wSqoGhl8q4mmFt5cWJRGtUMYkj?=
+ =?us-ascii?Q?qTkSIPE8ak5tiKfhrCODwYvJkra3yYPz/ve6c+Bey10CB/NE2jqVNz8tDv3x?=
+ =?us-ascii?Q?rI/miG2bjQuD6L53ri2NHqicIq576vpLvbhYWfa2msDmXwZ+L0CVZZafVNYc?=
+ =?us-ascii?Q?IbiIhjFilyV5cuA73q2NgQyG0GfKMB5PAiL/SrM54+M3JfXRsfYlq2j0EbGQ?=
+ =?us-ascii?Q?Q0O+Xn9LJ5/zWwIkYmcAMqSlXUEe0uBzPbD9blaEVWUPVnwM8qJz3Yb4+bqT?=
+ =?us-ascii?Q?FumVATU0ETm+vYKnrdAeKMaMxNWaYD8e/0U79DaM9KKNWu3EKUIiPhtFsolR?=
+ =?us-ascii?Q?yYmXi3q4EvG0wBBF7dqc5z19armCT+N8q2d1jzh2XySbqQZdpJIVvgDnz7ZM?=
+ =?us-ascii?Q?stp7j0jhIA29dWtCK7yufP8+?=
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: f50d6138-f304-4e83-f381-08d900276b29
+X-MS-Exchange-CrossTenant-Network-Message-Id: 90f20e35-6b85-4e9a-b1e3-08d90027b94d
 X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2767.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Apr 2021 15:59:15.2581
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Apr 2021 16:01:26.3816
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: AoSVWllmSoP5kMHmrnw8Lv/sTbH85KOoPc1wNzhcyDOhtslr+H3n1oUJ3FN5qkASrFZ0y2W56GcfnAWvsFPrHg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN6PR12MB2719
+X-MS-Exchange-CrossTenant-UserPrincipalName: mgQDBZtxm3h8gvxES9AJs4SFLHUgdYTSdCEzhakAwEhf7yplFWebNEkkUAMMBTN4AM+kNxyBCLzOGQaBllFCgw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR12MB4415
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 From: Ashish Kalra <ashish.kalra@amd.com>
 
-Introduce a new AMD Memory Encryption GUID which is currently
-used for defining a new UEFI environment variable which indicates
-UEFI/OVMF support for the SEV live migration feature. This variable
-is setup when UEFI/OVMF detects host/hypervisor support for SEV
-live migration and later this variable is read by the kernel using
-EFI runtime services to verify if OVMF supports the live migration
-feature.
+The guest support for detecting and enabling SEV Live migration
+feature uses the following logic :
+
+ - kvm_init_plaform() invokes check_kvm_sev_migration() which
+   checks if its booted under the EFI
+
+   - If not EFI,
+
+     i) check for the KVM_FEATURE_CPUID
+
+     ii) if CPUID reports that migration is supported, issue a wrmsrl()
+         to enable the SEV live migration support
+
+   - If EFI,
+
+     i) check for the KVM_FEATURE_CPUID
+
+     ii) If CPUID reports that migration is supported, read the UEFI variable which
+         indicates OVMF support for live migration
+
+     iii) the variable indicates live migration is supported, issue a wrmsrl() to
+          enable the SEV live migration support
+
+The EFI live migration check is done using a late_initcall() callback.
+
+Also, ensure that _bss_decrypted section is marked as decrypted in the
+shared pages list.
+
+Also adds kexec support for SEV Live Migration.
+
+Reset the host's shared pages list related to kernel
+specific page encryption status settings before we load a
+new kernel by kexec. We cannot reset the complete
+shared pages list here as we need to retain the
+UEFI/OVMF firmware specific settings.
+
+The host's shared pages list is maintained for the
+guest to keep track of all unencrypted guest memory regions,
+therefore we need to explicitly mark all shared pages as
+encrypted again before rebooting into the new guest kernel.
 
 Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
-Reviewed-by: Steve Rutherford <srutherford@google.com>
 ---
- include/linux/efi.h | 1 +
- 1 file changed, 1 insertion(+)
+ arch/x86/include/asm/mem_encrypt.h |  8 ++++
+ arch/x86/kernel/kvm.c              | 55 +++++++++++++++++++++++++
+ arch/x86/mm/mem_encrypt.c          | 64 ++++++++++++++++++++++++++++++
+ 3 files changed, 127 insertions(+)
 
-diff --git a/include/linux/efi.h b/include/linux/efi.h
-index 6b5d36babfcc..6f364ace82cb 100644
---- a/include/linux/efi.h
-+++ b/include/linux/efi.h
-@@ -362,6 +362,7 @@ void efi_native_runtime_setup(void);
+diff --git a/arch/x86/include/asm/mem_encrypt.h b/arch/x86/include/asm/mem_encrypt.h
+index 31c4df123aa0..19b77f3a62dc 100644
+--- a/arch/x86/include/asm/mem_encrypt.h
++++ b/arch/x86/include/asm/mem_encrypt.h
+@@ -21,6 +21,7 @@
+ extern u64 sme_me_mask;
+ extern u64 sev_status;
+ extern bool sev_enabled;
++extern bool sev_live_migration_enabled;
  
- /* OEM GUIDs */
- #define DELLEMC_EFI_RCI2_TABLE_GUID		EFI_GUID(0x2d9f28a2, 0xa886, 0x456a,  0x97, 0xa8, 0xf1, 0x1e, 0xf2, 0x4f, 0xf4, 0x55)
-+#define MEM_ENCRYPT_GUID			EFI_GUID(0x0cf29b71, 0x9e51, 0x433a,  0xa3, 0xb7, 0x81, 0xf3, 0xab, 0x16, 0xb8, 0x75)
+ void sme_encrypt_execute(unsigned long encrypted_kernel_vaddr,
+ 			 unsigned long decrypted_kernel_vaddr,
+@@ -44,8 +45,11 @@ void __init sme_enable(struct boot_params *bp);
  
- typedef struct {
- 	efi_guid_t guid;
+ int __init early_set_memory_decrypted(unsigned long vaddr, unsigned long size);
+ int __init early_set_memory_encrypted(unsigned long vaddr, unsigned long size);
++void __init early_set_mem_enc_dec_hypercall(unsigned long vaddr, int npages,
++					    bool enc);
+ 
+ void __init mem_encrypt_free_decrypted_mem(void);
++void __init check_kvm_sev_migration(void);
+ 
+ /* Architecture __weak replacement functions */
+ void __init mem_encrypt_init(void);
+@@ -60,6 +64,7 @@ bool sev_es_active(void);
+ #else	/* !CONFIG_AMD_MEM_ENCRYPT */
+ 
+ #define sme_me_mask	0ULL
++#define sev_live_migration_enabled	false
+ 
+ static inline void __init sme_early_encrypt(resource_size_t paddr,
+ 					    unsigned long size) { }
+@@ -84,8 +89,11 @@ static inline int __init
+ early_set_memory_decrypted(unsigned long vaddr, unsigned long size) { return 0; }
+ static inline int __init
+ early_set_memory_encrypted(unsigned long vaddr, unsigned long size) { return 0; }
++static inline void __init
++early_set_mem_enc_dec_hypercall(unsigned long vaddr, int npages, bool enc) {}
+ 
+ static inline void mem_encrypt_free_decrypted_mem(void) { }
++static inline void check_kvm_sev_migration(void) { }
+ 
+ #define __bss_decrypted
+ 
+diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
+index 78bb0fae3982..94ef16d263a7 100644
+--- a/arch/x86/kernel/kvm.c
++++ b/arch/x86/kernel/kvm.c
+@@ -26,6 +26,7 @@
+ #include <linux/kprobes.h>
+ #include <linux/nmi.h>
+ #include <linux/swait.h>
++#include <linux/efi.h>
+ #include <asm/timer.h>
+ #include <asm/cpu.h>
+ #include <asm/traps.h>
+@@ -429,6 +430,59 @@ static inline void __set_percpu_decrypted(void *ptr, unsigned long size)
+ 	early_set_memory_decrypted((unsigned long) ptr, size);
+ }
+ 
++static int __init setup_kvm_sev_migration(void)
++{
++	efi_char16_t efi_sev_live_migration_enabled[] = L"SevLiveMigrationEnabled";
++	efi_guid_t efi_variable_guid = MEM_ENCRYPT_GUID;
++	efi_status_t status;
++	unsigned long size;
++	bool enabled;
++
++	/*
++	 * check_kvm_sev_migration() invoked via kvm_init_platform() before
++	 * this callback would have setup the indicator that live migration
++	 * feature is supported/enabled.
++	 */
++	if (!sev_live_migration_enabled)
++		return 0;
++
++	if (!efi_enabled(EFI_BOOT))
++		return 0;
++
++	if (!efi_enabled(EFI_RUNTIME_SERVICES)) {
++		pr_info("%s : EFI runtime services are not enabled\n", __func__);
++		return 0;
++	}
++
++	size = sizeof(enabled);
++
++	/* Get variable contents into buffer */
++	status = efi.get_variable(efi_sev_live_migration_enabled,
++				  &efi_variable_guid, NULL, &size, &enabled);
++
++	if (status == EFI_NOT_FOUND) {
++		pr_info("%s : EFI live migration variable not found\n", __func__);
++		return 0;
++	}
++
++	if (status != EFI_SUCCESS) {
++		pr_info("%s : EFI variable retrieval failed\n", __func__);
++		return 0;
++	}
++
++	if (enabled == 0) {
++		pr_info("%s: live migration disabled in EFI\n", __func__);
++		return 0;
++	}
++
++	pr_info("%s : live migration enabled in EFI\n", __func__);
++	wrmsrl(MSR_KVM_SEV_LIVE_MIGRATION, KVM_SEV_LIVE_MIGRATION_ENABLED);
++
++	return true;
++}
++
++late_initcall(setup_kvm_sev_migration);
++
+ /*
+  * Iterate through all possible CPUs and map the memory region pointed
+  * by apf_reason, steal_time and kvm_apic_eoi as decrypted at once.
+@@ -747,6 +801,7 @@ static bool __init kvm_msi_ext_dest_id(void)
+ 
+ static void __init kvm_init_platform(void)
+ {
++	check_kvm_sev_migration();
+ 	kvmclock_init();
+ 	x86_platform.apic_post_init = kvm_apic_init;
+ }
+diff --git a/arch/x86/mm/mem_encrypt.c b/arch/x86/mm/mem_encrypt.c
+index fae9ccbd0da7..382d1d4f00f5 100644
+--- a/arch/x86/mm/mem_encrypt.c
++++ b/arch/x86/mm/mem_encrypt.c
+@@ -20,6 +20,7 @@
+ #include <linux/bitops.h>
+ #include <linux/dma-mapping.h>
+ #include <linux/kvm_para.h>
++#include <linux/efi.h>
+ 
+ #include <asm/tlbflush.h>
+ #include <asm/fixmap.h>
+@@ -31,6 +32,7 @@
+ #include <asm/msr.h>
+ #include <asm/cmdline.h>
+ #include <asm/kvm_para.h>
++#include <asm/e820/api.h>
+ 
+ #include "mm_internal.h"
+ 
+@@ -48,6 +50,8 @@ EXPORT_SYMBOL_GPL(sev_enable_key);
+ 
+ bool sev_enabled __section(".data");
+ 
++bool sev_live_migration_enabled __section(".data");
++
+ /* Buffer used for early in-place encryption by BSP, no locking needed */
+ static char sme_early_buffer[PAGE_SIZE] __initdata __aligned(PAGE_SIZE);
+ 
+@@ -237,6 +241,9 @@ static void set_memory_enc_dec_hypercall(unsigned long vaddr, int npages,
+ 	unsigned long sz = npages << PAGE_SHIFT;
+ 	unsigned long vaddr_end, vaddr_next;
+ 
++	if (!sev_live_migration_enabled)
++		return;
++
+ 	vaddr_end = vaddr + sz;
+ 
+ 	for (; vaddr < vaddr_end; vaddr = vaddr_next) {
+@@ -407,6 +414,12 @@ int __init early_set_memory_encrypted(unsigned long vaddr, unsigned long size)
+ 	return early_set_memory_enc_dec(vaddr, size, true);
+ }
+ 
++void __init early_set_mem_enc_dec_hypercall(unsigned long vaddr, int npages,
++					bool enc)
++{
++	set_memory_enc_dec_hypercall(vaddr, npages, enc);
++}
++
+ /*
+  * SME and SEV are very similar but they are not the same, so there are
+  * times that the kernel will need to distinguish between SME and SEV. The
+@@ -462,6 +475,57 @@ bool force_dma_unencrypted(struct device *dev)
+ 	return false;
+ }
+ 
++void __init check_kvm_sev_migration(void)
++{
++	if (sev_active() &&
++	    kvm_para_has_feature(KVM_FEATURE_SEV_LIVE_MIGRATION)) {
++		unsigned long nr_pages;
++		int i;
++
++		pr_info("KVM enable live migration\n");
++		WRITE_ONCE(sev_live_migration_enabled, true);
++
++		/*
++		 * Reset the host's shared pages list related to kernel
++		 * specific page encryption status settings before we load a
++		 * new kernel by kexec. Reset the page encryption status
++		 * during early boot intead of just before kexec to avoid SMP
++		 * races during kvm_pv_guest_cpu_reboot().
++		 * NOTE: We cannot reset the complete shared pages list
++		 * here as we need to retain the UEFI/OVMF firmware
++		 * specific settings.
++		 */
++
++		for (i = 0; i < e820_table->nr_entries; i++) {
++			struct e820_entry *entry = &e820_table->entries[i];
++
++			if (entry->type != E820_TYPE_RAM)
++				continue;
++
++			nr_pages = DIV_ROUND_UP(entry->size, PAGE_SIZE);
++
++			kvm_sev_hypercall3(KVM_HC_PAGE_ENC_STATUS, entry->addr,
++					   nr_pages, 1);
++		}
++
++		/*
++		 * Ensure that _bss_decrypted section is marked as decrypted in the
++		 * shared pages list.
++		 */
++		nr_pages = DIV_ROUND_UP(__end_bss_decrypted - __start_bss_decrypted,
++					PAGE_SIZE);
++		early_set_mem_enc_dec_hypercall((unsigned long)__start_bss_decrypted,
++						nr_pages, 0);
++
++		/*
++		 * If not booted using EFI, enable Live migration support.
++		 */
++		if (!efi_enabled(EFI_BOOT))
++			wrmsrl(MSR_KVM_SEV_LIVE_MIGRATION,
++			       KVM_SEV_LIVE_MIGRATION_ENABLED);
++	}
++}
++
+ void __init mem_encrypt_free_decrypted_mem(void)
+ {
+ 	unsigned long vaddr, vaddr_end, npages;
 -- 
 2.17.1
 
