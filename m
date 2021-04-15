@@ -2,29 +2,29 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E3D7236003C
-	for <lists+kvm@lfdr.de>; Thu, 15 Apr 2021 05:20:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6070436003D
+	for <lists+kvm@lfdr.de>; Thu, 15 Apr 2021 05:20:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229821AbhDODVA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 14 Apr 2021 23:21:00 -0400
+        id S229817AbhDODVB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 14 Apr 2021 23:21:01 -0400
 Received: from mga11.intel.com ([192.55.52.93]:1119 "EHLO mga11.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229784AbhDODUw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 14 Apr 2021 23:20:52 -0400
-IronPort-SDR: WluMKt3RKzBvf2Kf6iDasblMAw0czv4tqs5BKgFmSp75ikV/9NwAgyJMGWtNuyaKtKIsRSepnn
- W/H87oxCqsBg==
-X-IronPort-AV: E=McAfee;i="6200,9189,9954"; a="191592818"
+        id S229762AbhDODU4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 14 Apr 2021 23:20:56 -0400
+IronPort-SDR: rpX3W4XHABwzbfX9UgR2mKvd0bn+/9ZeijwWx+jG9P08jO+bPdYdkjz7c/C2CqRKM7XcXu9k6f
+ j1v7uD2KsGog==
+X-IronPort-AV: E=McAfee;i="6200,9189,9954"; a="191592825"
 X-IronPort-AV: E=Sophos;i="5.82,223,1613462400"; 
-   d="scan'208";a="191592818"
+   d="scan'208";a="191592825"
 Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Apr 2021 20:20:30 -0700
-IronPort-SDR: KyUl0mfZ8i4X1zlihPR6/hEbHgFTdebyzWrkvzHp4KuCB/HprucJZmtvHxkiDKNDdJR0qRQieB
- +0efxpG9V+sw==
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Apr 2021 20:20:34 -0700
+IronPort-SDR: rVFPZ7YgA4Y4zqgCCco6jebL1WDghaIUFLByyJuHwBdcevE4TxKoefXomnNLyKxQpY4qd7bh/C
+ Eh4528Qx/yfA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.82,223,1613462400"; 
-   d="scan'208";a="425013870"
+   d="scan'208";a="425013896"
 Received: from clx-ap-likexu.sh.intel.com ([10.239.48.108])
-  by orsmga008.jf.intel.com with ESMTP; 14 Apr 2021 20:20:26 -0700
+  by orsmga008.jf.intel.com with ESMTP; 14 Apr 2021 20:20:30 -0700
 From:   Like Xu <like.xu@linux.intel.com>
 To:     peterz@infradead.org, Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <seanjc@google.com>
@@ -35,11 +35,10 @@ Cc:     andi@firstfloor.org, kan.liang@linux.intel.com,
         Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
         x86@kernel.org, linux-kernel@vger.kernel.org,
-        Like Xu <like.xu@linux.intel.com>,
-        Andi Kleen <ak@linux.intel.com>
-Subject: [PATCH v5 02/16] perf/x86/intel: Handle guest PEBS overflow PMI for KVM guest
-Date:   Thu, 15 Apr 2021 11:20:02 +0800
-Message-Id: <20210415032016.166201-3-like.xu@linux.intel.com>
+        Like Xu <like.xu@linux.intel.com>
+Subject: [PATCH v5 03/16] perf/x86/core: Pass "struct kvm_pmu *" to determine the guest values
+Date:   Thu, 15 Apr 2021 11:20:03 +0800
+Message-Id: <20210415032016.166201-4-like.xu@linux.intel.com>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20210415032016.166201-1-like.xu@linux.intel.com>
 References: <20210415032016.166201-1-like.xu@linux.intel.com>
@@ -49,83 +48,109 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-With PEBS virtualization, the guest PEBS records get delivered to the
-guest DS, and the host pmi handler uses perf_guest_cbs->is_in_guest()
-to distinguish whether the PMI comes from the guest code like Intel PT.
+Splitting the logic for determining the guest values is unnecessarily
+confusing, and potentially fragile. Perf should have full knowledge and
+control of what values are loaded for the guest.
 
-No matter how many guest PEBS counters are overflowed, only triggering
-one fake event is enough. The fake event causes the KVM PMI callback to
-be called, thereby injecting the PEBS overflow PMI into the guest.
+If we change .guest_get_msrs() to take a struct kvm_pmu pointer, then it
+can generate the full set of guest values by grabbing guest ds_area and
+pebs_data_cfg. Alternatively, .guest_get_msrs() could take the desired
+guest MSR values directly (ds_area and pebs_data_cfg), but kvm_pmu is
+vendor agnostic, so we don't see any reason to not just pass the pointer.
 
-KVM may inject the PMI with BUFFER_OVF set, even if the guest DS is
-empty. That should really be harmless. Thus guest PEBS handler would
-retrieve the correct information from its own PEBS records buffer.
-
-Originally-by: Andi Kleen <ak@linux.intel.com>
-Co-developed-by: Kan Liang <kan.liang@linux.intel.com>
-Signed-off-by: Kan Liang <kan.liang@linux.intel.com>
+Suggested-by: Sean Christopherson <seanjc@google.com>
 Signed-off-by: Like Xu <like.xu@linux.intel.com>
 ---
- arch/x86/events/intel/core.c | 40 ++++++++++++++++++++++++++++++++++++
- 1 file changed, 40 insertions(+)
+ arch/x86/events/core.c            | 4 ++--
+ arch/x86/events/intel/core.c      | 4 ++--
+ arch/x86/events/perf_event.h      | 2 +-
+ arch/x86/include/asm/perf_event.h | 4 ++--
+ arch/x86/kvm/vmx/vmx.c            | 3 ++-
+ 5 files changed, 9 insertions(+), 8 deletions(-)
 
-diff --git a/arch/x86/events/intel/core.c b/arch/x86/events/intel/core.c
-index 591d60cc8436..021658df1feb 100644
---- a/arch/x86/events/intel/core.c
-+++ b/arch/x86/events/intel/core.c
-@@ -2747,6 +2747,43 @@ static void intel_pmu_reset(void)
- 	local_irq_restore(flags);
+diff --git a/arch/x86/events/core.c b/arch/x86/events/core.c
+index 06bef6ba8a9b..7e2264a8c3f7 100644
+--- a/arch/x86/events/core.c
++++ b/arch/x86/events/core.c
+@@ -673,9 +673,9 @@ void x86_pmu_disable_all(void)
+ 	}
  }
  
-+/*
-+ * We may be running with guest PEBS events created by KVM, and the
-+ * PEBS records are logged into the guest's DS and invisible to host.
-+ *
-+ * In the case of guest PEBS overflow, we only trigger a fake event
-+ * to emulate the PEBS overflow PMI for guest PBES counters in KVM.
-+ * The guest will then vm-entry and check the guest DS area to read
-+ * the guest PEBS records.
-+ *
-+ * The contents and other behavior of the guest event do not matter.
-+ */
-+static void x86_pmu_handle_guest_pebs(struct pt_regs *regs,
-+					struct perf_sample_data *data)
-+{
-+	struct cpu_hw_events *cpuc = this_cpu_ptr(&cpu_hw_events);
-+	u64 guest_pebs_idxs = cpuc->pebs_enabled & ~cpuc->intel_ctrl_host_mask;
-+	struct perf_event *event = NULL;
-+	int bit;
-+
-+	if (!x86_pmu.pebs_active || !guest_pebs_idxs)
-+		return;
-+
-+	for_each_set_bit(bit, (unsigned long *)&guest_pebs_idxs,
-+			 INTEL_PMC_IDX_FIXED + x86_pmu.num_counters_fixed) {
-+		event = cpuc->events[bit];
-+		if (!event->attr.precise_ip)
-+			continue;
-+
-+		perf_sample_data_init(data, 0, event->hw.last_period);
-+		if (perf_event_overflow(event, data, regs))
-+			x86_pmu_stop(event, 0);
-+
-+		/* Inject one fake event is enough. */
-+		break;
-+	}
-+}
-+
- static int handle_pmi_common(struct pt_regs *regs, u64 status)
+-struct perf_guest_switch_msr *perf_guest_get_msrs(int *nr)
++struct perf_guest_switch_msr *perf_guest_get_msrs(int *nr, void *data)
  {
- 	struct perf_sample_data data;
-@@ -2797,6 +2834,9 @@ static int handle_pmi_common(struct pt_regs *regs, u64 status)
- 		u64 pebs_enabled = cpuc->pebs_enabled;
+-	return static_call(x86_pmu_guest_get_msrs)(nr);
++	return static_call(x86_pmu_guest_get_msrs)(nr, data);
+ }
+ EXPORT_SYMBOL_GPL(perf_guest_get_msrs);
  
- 		handled++;
-+		if (x86_pmu.pebs_vmx && perf_guest_cbs &&
-+		    perf_guest_cbs->is_in_guest())
-+			x86_pmu_handle_guest_pebs(regs, &data);
- 		x86_pmu.drain_pebs(regs, &data);
- 		status &= x86_pmu.intel_ctrl | GLOBAL_STATUS_TRACE_TOPAPMI;
+diff --git a/arch/x86/events/intel/core.c b/arch/x86/events/intel/core.c
+index 021658df1feb..2f8ac53fe594 100644
+--- a/arch/x86/events/intel/core.c
++++ b/arch/x86/events/intel/core.c
+@@ -3834,7 +3834,7 @@ static int intel_pmu_hw_config(struct perf_event *event)
+ 	return 0;
+ }
+ 
+-static struct perf_guest_switch_msr *intel_guest_get_msrs(int *nr)
++static struct perf_guest_switch_msr *intel_guest_get_msrs(int *nr, void *data)
+ {
+ 	struct cpu_hw_events *cpuc = this_cpu_ptr(&cpu_hw_events);
+ 	struct perf_guest_switch_msr *arr = cpuc->guest_switch_msrs;
+@@ -3866,7 +3866,7 @@ static struct perf_guest_switch_msr *intel_guest_get_msrs(int *nr)
+ 	return arr;
+ }
+ 
+-static struct perf_guest_switch_msr *core_guest_get_msrs(int *nr)
++static struct perf_guest_switch_msr *core_guest_get_msrs(int *nr, void *data)
+ {
+ 	struct cpu_hw_events *cpuc = this_cpu_ptr(&cpu_hw_events);
+ 	struct perf_guest_switch_msr *arr = cpuc->guest_switch_msrs;
+diff --git a/arch/x86/events/perf_event.h b/arch/x86/events/perf_event.h
+index 85dc4e1d4514..e52b35333e1f 100644
+--- a/arch/x86/events/perf_event.h
++++ b/arch/x86/events/perf_event.h
+@@ -809,7 +809,7 @@ struct x86_pmu {
+ 	/*
+ 	 * Intel host/guest support (KVM)
+ 	 */
+-	struct perf_guest_switch_msr *(*guest_get_msrs)(int *nr);
++	struct perf_guest_switch_msr *(*guest_get_msrs)(int *nr, void *data);
+ 
+ 	/*
+ 	 * Check period value for PERF_EVENT_IOC_PERIOD ioctl.
+diff --git a/arch/x86/include/asm/perf_event.h b/arch/x86/include/asm/perf_event.h
+index 6a6e707905be..d5957b68906b 100644
+--- a/arch/x86/include/asm/perf_event.h
++++ b/arch/x86/include/asm/perf_event.h
+@@ -491,10 +491,10 @@ static inline void perf_check_microcode(void) { }
+ #endif
+ 
+ #if defined(CONFIG_PERF_EVENTS) && defined(CONFIG_CPU_SUP_INTEL)
+-extern struct perf_guest_switch_msr *perf_guest_get_msrs(int *nr);
++extern struct perf_guest_switch_msr *perf_guest_get_msrs(int *nr, void *data);
+ extern int x86_perf_get_lbr(struct x86_pmu_lbr *lbr);
+ #else
+-struct perf_guest_switch_msr *perf_guest_get_msrs(int *nr);
++struct perf_guest_switch_msr *perf_guest_get_msrs(int *nr, void *data);
+ static inline int x86_perf_get_lbr(struct x86_pmu_lbr *lbr)
+ {
+ 	return -1;
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index c05e6e2854b5..58673351c475 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -6537,9 +6537,10 @@ static void atomic_switch_perf_msrs(struct vcpu_vmx *vmx)
+ {
+ 	int i, nr_msrs;
+ 	struct perf_guest_switch_msr *msrs;
++	struct kvm_pmu *pmu = vcpu_to_pmu(&vmx->vcpu);
+ 
+ 	/* Note, nr_msrs may be garbage if perf_guest_get_msrs() returns NULL. */
+-	msrs = perf_guest_get_msrs(&nr_msrs);
++	msrs = perf_guest_get_msrs(&nr_msrs, (void *)pmu);
+ 	if (!msrs)
+ 		return;
  
 -- 
 2.30.2
