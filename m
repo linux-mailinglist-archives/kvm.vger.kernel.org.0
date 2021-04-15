@@ -2,127 +2,110 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1F9F436040F
-	for <lists+kvm@lfdr.de>; Thu, 15 Apr 2021 10:16:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9B6E4360437
+	for <lists+kvm@lfdr.de>; Thu, 15 Apr 2021 10:25:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231640AbhDOIQ6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 15 Apr 2021 04:16:58 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:46883 "EHLO
+        id S231487AbhDOIZl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 15 Apr 2021 04:25:41 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:48998 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231609AbhDOIQ5 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 15 Apr 2021 04:16:57 -0400
+        by vger.kernel.org with ESMTP id S231241AbhDOIZj (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 15 Apr 2021 04:25:39 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1618474594;
+        s=mimecast20190719; t=1618475116;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=g3qfacKPFWYJe6SJGGT9jnGqaiQMDFfgudP5Ye2GaUQ=;
-        b=c9+ONAshVSV3qg9yjtOrQrUrZcT/JYDOGo6U9OCJBH/eX0KeilVqztN59hEPV+jW9ydbCy
-        CbtDat4++YVf3iYO4jq6O2cBP8OjC4aweTEt9PLs6Kfli5ZZIC+83WkNEPM3oWGHK5OrmJ
-        wN3eMkaIx1XnZVEfF6xK3wyIpQLdRAk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-562-nf00DL1qOpq2a81pIwwyBQ-1; Thu, 15 Apr 2021 04:16:29 -0400
-X-MC-Unique: nf00DL1qOpq2a81pIwwyBQ-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9AA2310053E8;
-        Thu, 15 Apr 2021 08:16:28 +0000 (UTC)
-Received: from wangxiaodeMacBook-Air.local (ovpn-12-61.pek2.redhat.com [10.72.12.61])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 1581C1F057;
-        Thu, 15 Apr 2021 08:16:21 +0000 (UTC)
-Subject: Re: [PATCH 3/3] vDPA/ifcvf: get_config_size should return dev
- specific config size
-To:     Stefano Garzarella <sgarzare@redhat.com>,
-        Zhu Lingshan <lingshan.zhu@intel.com>
-Cc:     mst@redhat.com, lulu@redhat.com, leonro@nvidia.com,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20210414091832.5132-1-lingshan.zhu@intel.com>
- <20210414091832.5132-4-lingshan.zhu@intel.com>
- <20210415081236.anbssqtsyjnmiaby@steredhat>
-From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <178b6e14-dfb5-b5f9-477e-15801d849c2a@redhat.com>
-Date:   Thu, 15 Apr 2021 16:16:20 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
- Gecko/20100101 Thunderbird/78.9.1
+        bh=/bQmWZhJFBGurEcgsfC0EuOHiXGG/UZMr42BKHCg0CM=;
+        b=UJbcKBLM63tXFdhL6+sbafxYYoa0aUY/icViLfFSJ3OpAIqwZ3EUxYDHXeuiawYzlbpV1q
+        zkNBIpUjZlT9iEScEp5M68IQSwUKFdPl6Lks6dbTmfD8MpuLrNpc0N5IzAyhrGr+Mt0/WN
+        ep1A56TsRhtbds8aPFUdyGazSylvnuE=
+Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
+ [209.85.218.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-529-A-XCznNgPZOVi6BaMsSODQ-1; Thu, 15 Apr 2021 04:25:14 -0400
+X-MC-Unique: A-XCznNgPZOVi6BaMsSODQ-1
+Received: by mail-ej1-f69.google.com with SMTP id lf6-20020a1709071746b029037cee5e31c4so655989ejc.13
+        for <kvm@vger.kernel.org>; Thu, 15 Apr 2021 01:25:14 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=/bQmWZhJFBGurEcgsfC0EuOHiXGG/UZMr42BKHCg0CM=;
+        b=FmBTs5XK/IyrznYvJS3nTgfxEdM8gN5R5911gijxoiGFicOpupQRcjEYNgQZAs4vaP
+         AWbknWnbPvGDvw4rA+gs0j+knMI35+f6XofiUHsiXRJWO4O21WDcrN8ynJFCJMqg2P8f
+         r9oIXgVbN6yU7X47qaoqj17llsbJ+wpdf5LtlslNTTzt7dxatF8yzHEcngXpeBjBNz8A
+         GZKSmKVceAvQToHKOg8V0VZ4kU7HbmX3U1ca+AJ/viPjyibcxRhf+34JYf5Pa7/jHgg8
+         1mcKIUiIRKcTEBbqmTIWBnDQFHj3ew5QrSSUrG/bu+lPl6BtmrCVNVqGy7fZwDCP4Rvb
+         rBSw==
+X-Gm-Message-State: AOAM531M9L7QLIMWl1Zwhpk23Xm1CjevBQYoMdVIr6tsjayjHRt8Gyng
+        oSAnvGAfnAQTRr3BauKxbfKGP1OvhL8cc4TU4+eMn2ml8Rt6ZyjuaIOhyxtXX8MTR/B/9a2T1HE
+        S5VmaAGztLfkJ
+X-Received: by 2002:a17:906:fb90:: with SMTP id lr16mr2188972ejb.173.1618475113128;
+        Thu, 15 Apr 2021 01:25:13 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwV9d4Hf8P/msHacfoZkJ3KBX3z8yqEirLBflCXrob29FKDQvETDro/hTdN8fxJUXyuYv/GnQ==
+X-Received: by 2002:a17:906:fb90:: with SMTP id lr16mr2188956ejb.173.1618475112977;
+        Thu, 15 Apr 2021 01:25:12 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e? ([2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e])
+        by smtp.gmail.com with ESMTPSA id bm13sm1380535ejb.75.2021.04.15.01.25.11
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 15 Apr 2021 01:25:12 -0700 (PDT)
+Subject: Re: [PATCH 2/2] tools: do not include scripts/Kbuild.include
+To:     Masahiro Yamada <masahiroy@kernel.org>
+Cc:     Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Alexei Starovoitov <ast@kernel.org>,
+        Andrii Nakryiko <andrii@kernel.org>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Daniel Borkmann <daniel@iogearbox.net>,
+        Harish <harish@linux.ibm.com>,
+        John Fastabend <john.fastabend@gmail.com>,
+        KP Singh <kpsingh@kernel.org>, Martin KaFai Lau <kafai@fb.com>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Nathan Chancellor <nathan@kernel.org>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Paul Mackerras <paulus@samba.org>,
+        Shuah Khan <shuah@kernel.org>,
+        Song Liu <songliubraving@fb.com>, Yonghong Song <yhs@fb.com>,
+        bpf <bpf@vger.kernel.org>,
+        clang-built-linux <clang-built-linux@googlegroups.com>,
+        kvm@vger.kernel.org,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        "open list:KERNEL SELFTEST FRAMEWORK" 
+        <linux-kselftest@vger.kernel.org>,
+        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
+        Networking <netdev@vger.kernel.org>
+References: <20210415072700.147125-1-masahiroy@kernel.org>
+ <20210415072700.147125-2-masahiroy@kernel.org>
+ <9d33ee98-9de3-2215-0c0b-cc856cec1b69@redhat.com>
+ <CAK7LNAQupbmeEVR0njSciv0X9FD+MofeB2Xm=wprEdNaO4TQKQ@mail.gmail.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <2e46231f-1d30-6a6f-c768-f34295376d0a@redhat.com>
+Date:   Thu, 15 Apr 2021 10:25:10 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.7.0
 MIME-Version: 1.0
-In-Reply-To: <20210415081236.anbssqtsyjnmiaby@steredhat>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+In-Reply-To: <CAK7LNAQupbmeEVR0njSciv0X9FD+MofeB2Xm=wprEdNaO4TQKQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On 15/04/21 10:04, Masahiro Yamada wrote:
+> On Thu, Apr 15, 2021 at 4:40 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
+>> I think it would make sense to add try-run, cc-option and
+>> .DELETE_ON_ERROR to tools/build/Build.include?
+> 
+> To be safe, I just copy-pasted what the makefiles need.
+> If someone wants to refactor the tool build system, that is fine,
+> but, to me, I do not see consistent rules or policy under tools/.
 
-在 2021/4/15 下午4:12, Stefano Garzarella 写道:
-> On Wed, Apr 14, 2021 at 05:18:32PM +0800, Zhu Lingshan wrote:
->> get_config_size() should return the size based on the decected
->> device type.
->>
->> Signed-off-by: Zhu Lingshan <lingshan.zhu@intel.com>
->> ---
->> drivers/vdpa/ifcvf/ifcvf_main.c | 11 ++++++++++-
->> 1 file changed, 10 insertions(+), 1 deletion(-)
->>
->> diff --git a/drivers/vdpa/ifcvf/ifcvf_main.c 
->> b/drivers/vdpa/ifcvf/ifcvf_main.c
->> index 9b6a38b798fa..b48b9789b69e 100644
->> --- a/drivers/vdpa/ifcvf/ifcvf_main.c
->> +++ b/drivers/vdpa/ifcvf/ifcvf_main.c
->> @@ -347,7 +347,16 @@ static u32 ifcvf_vdpa_get_vq_align(struct 
->> vdpa_device *vdpa_dev)
->>
->> static size_t ifcvf_vdpa_get_config_size(struct vdpa_device *vdpa_dev)
->> {
->> -    return sizeof(struct virtio_net_config);
->> +    struct ifcvf_hw *vf = vdpa_to_vf(vdpa_dev);
->> +    size_t size;
->> +
->> +    if (vf->dev_type == VIRTIO_ID_NET)
->> +        size = sizeof(struct virtio_net_config);
->> +
->> +    if (vf->dev_type == VIRTIO_ID_BLOCK)
->> +        size = sizeof(struct virtio_blk_config);
->> +
->> +    return size;
->
-> I'm not familiar with the ifcvf details, but can it happen that the 
-> device is not block or net?
->
-> Should we set `size` to 0 by default to handle this case or are we 
-> sure it's one of the two?
->
-> Maybe we should add a comment or a warning message in this case, to 
-> prevent some analysis tool or compiler from worrying that `size` might 
-> be uninitialized.
->
-> I was thinking something like this:
->
->     switch(vf->dev_type) {
->     case VIRTIO_ID_NET:
->         size = sizeof(struct virtio_net_config);
->         break;
->     case VIRTIO_ID_BLOCK:
->         size = sizeof(struct virtio_blk_config);
->         break;
->     default:
->         /* or WARN(1, "") if dev_warn() not apply */
->         dev_warn(... , "virtio ID [0x%x] not supported\n")
->         size = 0;
->
->     }
->
+"Please put this in a common file instead of introducing duplication" is 
+not asking for wholesale refactoring.
 
-Yes, I agree.
-
-Thanks
-
-
-> Thanks,
-> Stefano
->
+Paolo
 
