@@ -2,84 +2,273 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 17E0E361A7C
-	for <lists+kvm@lfdr.de>; Fri, 16 Apr 2021 09:27:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B9270361AE0
+	for <lists+kvm@lfdr.de>; Fri, 16 Apr 2021 09:55:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239512AbhDPHW3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 16 Apr 2021 03:22:29 -0400
-Received: from mga14.intel.com ([192.55.52.115]:57485 "EHLO mga14.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S239271AbhDPHW1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 16 Apr 2021 03:22:27 -0400
-IronPort-SDR: nnHSKsVdR1aKfBTU8DYCPNDMeCMhO+U0YQ227D+R2pvenNL91sOJvl1yu6RMUY6ngJWtg4YYle
- AgxLeM9Lbqjg==
-X-IronPort-AV: E=McAfee;i="6200,9189,9955"; a="194561115"
-X-IronPort-AV: E=Sophos;i="5.82,226,1613462400"; 
-   d="scan'208";a="194561115"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Apr 2021 00:22:03 -0700
-IronPort-SDR: aEUdZ80edj3XHNnznvC+Sg6M6e6RqRDyhVnkOWA16iGpMx+g5D5441uXJLBCK+TtSIVq9zRqV5
- F0SAW4AN2t6g==
-X-IronPort-AV: E=Sophos;i="5.82,226,1613462400"; 
-   d="scan'208";a="425489818"
-Received: from unknown (HELO localhost.localdomain.bj.intel.com) ([10.240.193.73])
-  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Apr 2021 00:21:59 -0700
-From:   Zhu Lingshan <lingshan.zhu@intel.com>
-To:     jasowang@redhat.com, mst@redhat.com, lulu@redhat.com,
-        sgarzare@redhat.com
-Cc:     virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Zhu Lingshan <lingshan.zhu@intel.com>
-Subject: [PATCH V3 3/3] vDPA/ifcvf: get_config_size should return dev specific config size
-Date:   Fri, 16 Apr 2021 15:16:28 +0800
-Message-Id: <20210416071628.4984-4-lingshan.zhu@intel.com>
-X-Mailer: git-send-email 2.27.0
-In-Reply-To: <20210416071628.4984-1-lingshan.zhu@intel.com>
-References: <20210416071628.4984-1-lingshan.zhu@intel.com>
+        id S239751AbhDPHwY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 16 Apr 2021 03:52:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39470 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S239746AbhDPHwW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 16 Apr 2021 03:52:22 -0400
+Received: from mail-qk1-x72e.google.com (mail-qk1-x72e.google.com [IPv6:2607:f8b0:4864:20::72e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3205CC061756
+        for <kvm@vger.kernel.org>; Fri, 16 Apr 2021 00:51:58 -0700 (PDT)
+Received: by mail-qk1-x72e.google.com with SMTP id c123so23140891qke.1
+        for <kvm@vger.kernel.org>; Fri, 16 Apr 2021 00:51:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=BizjiGX7CK7NjPG3BovU7t24ZMIVaovvNxFJE+wsBXQ=;
+        b=vI+aMtELxlNIzIJMPLcC4V1frvgUhkH01PvdlxpYg06klmvQYA8kuSK04/cL8O+eRS
+         ZRHLP2IHb780+a8Ktl+bIwClqMU0OehGGsouVxVmaBMY3SffvyIS5lD/MrDasJerbJpM
+         cIVzQKb9xrP9SHk6UAVNbIYTMi3bPL36arW6GfWfni31nPD2lpgl8IakVKULxpFNCEM1
+         F7NM5A2IOXY9x34QknLbjPXRIGMEMCEEaQR68wSEg1Kjxzq4kL4DinCio3HkUmRaHDbr
+         /tluu2R2zZ14/piduklaqwLEgY59DmM+8uTMetfuSi4z1DhGre8OsH5nuKuPZxYOGpgo
+         AMsw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=BizjiGX7CK7NjPG3BovU7t24ZMIVaovvNxFJE+wsBXQ=;
+        b=F9JvQZCRlHny+IELmGt8Rpn464MwA4ekDXXWc1CNB9z7Pl2tTziaSQCMQFQXurboGJ
+         zbgOsoTktE8XdRaQ9F4/bmw1rTr7JehFdDXm6rYRyopm4wy0iZ6tNUHaG9BS3EsYe6dY
+         wAXbhVJwNQIqYAs0k85yh1q2bVZ3XDJehes2Wo18ggPzVfi0Ap+NJkMj0Uc1UEKP679G
+         00iZFUM2PBnZnDGhFaf7H3wb3aDTglr7eh9uHVX4DwqiSpj7ZogDlk9fvtChZF4tS4aa
+         dNT5JN2uriC5bmeYkV9N2EnOBZ4dVUQhlLPsw0UFziypDGOSLaizhXt42frLbTyrfRNH
+         S3rg==
+X-Gm-Message-State: AOAM530Kus/2m4SRtfIXWkXxuWP2aUudkkEPlXv7mNmY/BN713bT0Fxw
+        1MH45dTAmSNOaEPlCxG8Z7Y2xV6xGUH20oui8csXXg==
+X-Google-Smtp-Source: ABdhPJwEtiakJYwu3/9foJYpXSrj8LxrAzHvwF1aRhkw1e9k2vb8/qow2YEeRFwq+MdgQSvXF7YZSoZaigW7DwlgsdU=
+X-Received: by 2002:a37:4042:: with SMTP id n63mr3263745qka.501.1618559517123;
+ Fri, 16 Apr 2021 00:51:57 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <000000000000ae236f05bfde0678@google.com> <20210413134147.54556d9d@gandalf.local.home>
+ <20210413134314.16068eeb@gandalf.local.home> <CACT4Y+ZrkE=ZKKncTOJRJgOTNfU8PGz=k+8V+0602ftTCHkc6Q@mail.gmail.com>
+ <20210413144009.6ed2feb8@gandalf.local.home> <20210413144335.4ff14cf2@gandalf.local.home>
+In-Reply-To: <20210413144335.4ff14cf2@gandalf.local.home>
+From:   Dmitry Vyukov <dvyukov@google.com>
+Date:   Fri, 16 Apr 2021 09:51:45 +0200
+Message-ID: <CACT4Y+YipDUHQiqJ=gtEeBQGz2AjqT6e_fje5DHsm0a5e+-GRQ@mail.gmail.com>
+Subject: Bisections with different bug manifestations
+To:     Steven Rostedt <rostedt@goodmis.org>
+Cc:     syzkaller <syzkaller@googlegroups.com>,
+        syzbot <syzbot+61e04e51b7ac86930589@syzkaller.appspotmail.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Jens Axboe <axboe@kernel.dk>, Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, KVM list <kvm@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>, masahiroy@kernel.org,
+        Ingo Molnar <mingo@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        rafael.j.wysocki@intel.com,
+        Sean Christopherson <seanjc@google.com>,
+        syzkaller-bugs <syzkaller-bugs@googlegroups.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Will Deacon <will@kernel.org>,
+        "the arch/x86 maintainers" <x86@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-get_config_size() should return the size based on the decected
-device type.
+On Tue, Apr 13, 2021 at 8:43 PM Steven Rostedt <rostedt@goodmis.org> wrote:
+>
+> On Tue, 13 Apr 2021 14:40:09 -0400
+> Steven Rostedt <rostedt@goodmis.org> wrote:
+>
+> > ------------[ cut here ]------------
+> > raw_local_irq_restore() called with IRQs enabled
+> > WARNING: CPU: 0 PID: 8777 at kernel/locking/irqflag-debug.c:9 warn_bogus_irq_restore kernel/locking/irqflag-debug.c:9 [inline]
+> > WARNING: CPU: 0 PID: 8777 at kernel/locking/irqflag-debug.c:9 warn_bogus_irq_restore+0x1d/0x20 kernel/locking/irqflag-debug.c:7
+>
+> In fact, when you have the above, which is a WARN() with text:
+>
+>  "raw_local_irq_restore() called with IRQs enabled"
+>
+> It is pretty much guaranteed that all triggers of this bug will have the
+> above warning with the same text.
 
-Signed-off-by: Zhu Lingshan <lingshan.zhu@intel.com>
----
- drivers/vdpa/ifcvf/ifcvf_main.c | 19 ++++++++++++++++++-
- 1 file changed, 18 insertions(+), 1 deletion(-)
+This looks nice on paper and looking at only 1 bisection log. But
+unfortunately in practice theory and practice are different...
 
-diff --git a/drivers/vdpa/ifcvf/ifcvf_main.c b/drivers/vdpa/ifcvf/ifcvf_main.c
-index 376b2014916a..3b6f7862dbb8 100644
---- a/drivers/vdpa/ifcvf/ifcvf_main.c
-+++ b/drivers/vdpa/ifcvf/ifcvf_main.c
-@@ -356,7 +356,24 @@ static u32 ifcvf_vdpa_get_vq_align(struct vdpa_device *vdpa_dev)
- 
- static size_t ifcvf_vdpa_get_config_size(struct vdpa_device *vdpa_dev)
- {
--	return sizeof(struct virtio_net_config);
-+	struct ifcvf_adapter *adapter = vdpa_to_adapter(vdpa_dev);
-+	struct ifcvf_hw *vf = vdpa_to_vf(vdpa_dev);
-+	struct pci_dev *pdev = adapter->pdev;
-+	size_t size;
-+
-+	switch (vf->dev_type) {
-+	case VIRTIO_ID_NET:
-+		size = sizeof(struct virtio_net_config);
-+		break;
-+	case VIRTIO_ID_BLOCK:
-+		size = sizeof(struct virtio_blk_config);
-+		break;
-+	default:
-+		size = 0;
-+		IFCVF_ERR(pdev, "VIRTIO ID %u not supported\n", vf->dev_type);
-+	}
-+
-+	return size;
- }
- 
- static void ifcvf_vdpa_get_config(struct vdpa_device *vdpa_dev,
--- 
-2.27.0
+This was discussed at length multiple times:
+https://groups.google.com/g/syzkaller/search?q=bisection+different+manifestations
+https://groups.google.com/g/syzkaller-bugs/c/nFeC8-UG1gg/m/y6gUEsvAAgAJ
+https://groups.google.com/g/syzkaller/c/sR8aAXaWEF4/m/tTWYRgvmAwAJ
+https://groups.google.com/g/syzkaller/c/9NdprHsGBqo/m/Yj9uWRDgBQAJ
 
+If you look at substantial base of bisection logs, you will find lots
+of cases where bug types, functions don't match. Kernel crashes
+differently even on the same revision. And obviously things change if
+you change revisions. Also if you see presumably a different bug, what
+does it say regarding the original bug.
+
+I would very much like to improve automatic bisection quality, but it
+does not look trivial at all.
+
+Some random examples where, say, your hypothesis of WARN-to-WARN,
+BUG-to-BUG does not hold even on the same kernel revision (add to this
+different revisions and the fact that a different bug does not give
+info regarding the original bug):
+
+run #0: crashed: KASAN: use-after-free Read in fuse_dev_do_read
+run #1: crashed: WARNING in request_end
+run #2: crashed: KASAN: use-after-free Read in fuse_dev_do_read
+run #3: OK
+run #4: OK
+
+run #0: crashed: KASAN: slab-out-of-bounds Read in __ip_append_data
+run #1: crashed: inconsistent lock state in rhashtable_walk_enter
+run #2: crashed: inconsistent lock state in rhashtable_walk_enter
+run #3: crashed: inconsistent lock state in rhashtable_walk_enter
+run #4: crashed: inconsistent lock state in rhashtable_walk_enter
+run #5: crashed: inconsistent lock state in rhashtable_walk_enter
+run #6: crashed: inconsistent lock state in rhashtable_walk_enter
+run #7: crashed: kernel BUG at arch/x86/mm/physaddr.c:LINE!
+run #8: crashed: inconsistent lock state in rhashtable_walk_enter
+run #9: crashed: inconsistent lock state in rhashtable_walk_enter
+
+run #0: crashed: kernel BUG at arch/x86/mm/physaddr.c:LINE!
+run #1: crashed: inconsistent lock state in rhashtable_walk_enter
+run #2: crashed: inconsistent lock state in rhashtable_walk_enter
+run #3: crashed: inconsistent lock state in rhashtable_walk_enter
+run #4: crashed: inconsistent lock state in rhashtable_walk_enter
+run #5: crashed: kernel BUG at arch/x86/mm/physaddr.c:LINE!
+run #6: crashed: inconsistent lock state in rhashtable_walk_enter
+run #7: crashed: kernel BUG at arch/x86/mm/physaddr.c:LINE!
+run #8: crashed: inconsistent lock state in rhashtable_walk_enter
+run #9: crashed: inconsistent lock state in rhashtable_walk_enter
+
+run #0: crashed: KASAN: use-after-free Read in __vb2_perform_fileio
+run #1: crashed: KASAN: use-after-free Write in __vb2_cleanup_fileio
+run #2: crashed: KASAN: use-after-free Read in __vb2_perform_fileio
+run #3: crashed: KASAN: use-after-free Read in __vb2_perform_fileio
+run #4: crashed: INFO: task hung in vivid_stop_generating_vid_cap
+run #5: crashed: INFO: task hung in vivid_stop_generating_vid_cap
+run #6: crashed: INFO: task hung in vivid_stop_generating_vid_cap
+run #7: crashed: INFO: task hung in vivid_stop_generating_vid_cap
+run #8: crashed: INFO: task hung in vivid_stop_generating_vid_cap
+run #9: crashed: INFO: task hung in vivid_stop_generating_vid_cap
+
+run #0: crashed: general protection fault in sctp_assoc_rwnd_increase
+run #1: crashed: general protection fault in sctp_ulpevent_free
+run #2: crashed: general protection fault in sctp_assoc_rwnd_increase
+run #3: crashed: general protection fault in sctp_assoc_rwnd_increase
+run #4: crashed: general protection fault in sctp_assoc_rwnd_increase
+run #5: crashed: general protection fault in sctp_assoc_rwnd_increase
+run #6: crashed: general protection fault in sctp_assoc_rwnd_increase
+run #7: crashed: general protection fault in sctp_assoc_rwnd_increase
+
+run #0: crashed: general protection fault in sctp_assoc_rwnd_increase
+run #1: crashed: general protection fault in sctp_assoc_rwnd_increase
+run #2: crashed: general protection fault in sctp_assoc_rwnd_increase
+run #3: crashed: general protection fault in sctp_assoc_rwnd_increase
+run #4: crashed: general protection fault in corrupted
+run #5: crashed: general protection fault in sctp_assoc_rwnd_increase
+run #6: crashed: general protection fault in sctp_assoc_rwnd_increase
+run #7: crashed: general protection fault in corrupted
+
+run #0: crashed: INFO: rcu detected stall in corrupted
+run #1: crashed: INFO: rcu detected stall in ext4_file_write_iter
+run #2: crashed: INFO: rcu detected stall in sys_sendfile64
+run #3: crashed: INFO: rcu detected stall in corrupted
+run #4: crashed: INFO: rcu detected stall in ext4_file_write_iter
+run #5: crashed: INFO: rcu detected stall in corrupted
+run #6: crashed: INFO: rcu detected stall in corrupted
+run #7: crashed: INFO: rcu detected stall in ext4_file_write_iter
+run #8: crashed: INFO: rcu detected stall in sys_sendfile64
+run #9: crashed: INFO: rcu detected stall in ext4_file_write_iter
+
+run #0: crashed: INFO: rcu detected stall in sys_sendfile64
+run #1: crashed: INFO: rcu detected stall in corrupted
+run #2: crashed: INFO: rcu detected stall in corrupted
+run #3: crashed: INFO: rcu detected stall in sys_sendfile64
+run #4: crashed: INFO: rcu detected stall in corrupted
+run #5: crashed: INFO: rcu detected stall in corrupted
+run #6: crashed: INFO: rcu detected stall in corrupted
+run #7: crashed: INFO: rcu detected stall in corrupted
+run #8: crashed: INFO: rcu detected stall in sys_sendfile64
+run #9: crashed: INFO: rcu detected stall in corrupted
+
+run #0: crashed: INFO: rcu detected stall in rw_verify_area
+run #1: crashed: INFO: rcu detected stall in ext4_file_write_iter
+run #2: crashed: INFO: rcu detected stall in corrupted
+run #3: crashed: INFO: rcu detected stall in corrupted
+run #4: crashed: INFO: rcu detected stall in ext4_file_write_iter
+run #5: crashed: INFO: rcu detected stall in ext4_file_write_iter
+run #6: crashed: INFO: rcu detected stall in corrupted
+run #7: crashed: INFO: rcu detected stall in ext4_file_write_iter
+run #8: crashed: INFO: rcu detected stall in ext4_file_write_iter
+run #9: crashed: INFO: rcu detected stall in rw_verify_area
+
+run #0: crashed: INFO: rcu detected stall in ext4_file_write_iter
+run #1: crashed: INFO: rcu detected stall in corrupted
+run #2: crashed: INFO: rcu detected stall in sys_sendfile64
+run #3: crashed: INFO: rcu detected stall in sys_sendfile64
+run #4: crashed: INFO: rcu detected stall in corrupted
+run #5: crashed: INFO: rcu detected stall in sys_sendfile64
+run #6: crashed: INFO: rcu detected stall in sys_sendfile64
+run #7: crashed: INFO: rcu detected stall in corrupted
+run #8: crashed: INFO: rcu detected stall in corrupted
+run #9: crashed: INFO: rcu detected stall in sys_sendfile64
+
+run #0: crashed: KASAN: use-after-free Read in link_path_walk
+run #1: crashed: KASAN: use-after-free Read in link_path_walk
+run #2: crashed: KASAN: use-after-free Read in trailing_symlink
+run #3: crashed: KASAN: use-after-free Read in trailing_symlink
+run #4: crashed: KASAN: use-after-free Read in trailing_symlink
+run #5: crashed: KASAN: use-after-free Read in link_path_walk
+run #6: crashed: KASAN: use-after-free Read in link_path_walk
+run #7: crashed: KASAN: use-after-free Read in link_path_walk
+run #8: crashed: KASAN: use-after-free Read in trailing_symlink
+run #9: crashed: KASAN: use-after-free Read in trailing_symlink
+
+run #0: crashed: BUG: unable to handle kernel NULL pointer dereference
+in mrvl_setup
+run #1: crashed: BUG: unable to handle kernel NULL pointer dereference
+in mrvl_setup
+run #2: crashed: BUG: unable to handle kernel NULL pointer dereference
+in mrvl_setup
+run #3: crashed: BUG: unable to handle kernel NULL pointer dereference
+in mrvl_setup
+run #4: crashed: WARNING: ODEBUG bug in corrupted
+run #5: crashed: BUG: unable to handle kernel NULL pointer dereference
+in mrvl_setup
+run #6: crashed: BUG: unable to handle kernel NULL pointer dereference
+in mrvl_setup
+run #7: crashed: BUG: unable to handle kernel NULL pointer dereference
+in mrvl_setup
+run #8: crashed: BUG: unable to handle kernel NULL pointer dereference
+in mrvl_setup
+run #9: crashed: BUG: unable to handle kernel NULL pointer dereference
+in mrvl_setup
+
+run #0: crashed: KASAN: use-after-free Read in delayed_uprobe_remove
+run #1: crashed: KASAN: use-after-free Read in delayed_uprobe_remove
+run #2: crashed: general protection fault in delayed_uprobe_remove
+run #3: crashed: KASAN: use-after-free Read in delayed_uprobe_remove
+run #4: crashed: general protection fault in delayed_uprobe_remove
+run #5: crashed: KASAN: use-after-free Read in delayed_uprobe_remove
+run #6: OK
+run #7: OK
+run #8: OK
+run #9: OK
+
+run #0: crashed: general protection fault in delayed_uprobe_remove
+run #1: crashed: KASAN: use-after-free Read in delayed_uprobe_remove
+run #2: crashed: KASAN: use-after-free Read in delayed_uprobe_remove
+run #3: crashed: KASAN: use-after-free Read in delayed_uprobe_remove
+run #4: crashed: general protection fault in delayed_uprobe_remove
+run #5: crashed: KASAN: use-after-free Read in delayed_uprobe_remove
+run #6: OK
+run #7: OK
+run #8: OK
+run #9: OK
