@@ -2,80 +2,90 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 938AC36253B
-	for <lists+kvm@lfdr.de>; Fri, 16 Apr 2021 18:10:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 19E4636253D
+	for <lists+kvm@lfdr.de>; Fri, 16 Apr 2021 18:10:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239976AbhDPQLC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        id S240086AbhDPQLF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 16 Apr 2021 12:11:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38476 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S240003AbhDPQLC (ORCPT <rfc822;kvm@vger.kernel.org>);
         Fri, 16 Apr 2021 12:11:02 -0400
-Received: from linux.microsoft.com ([13.77.154.182]:46378 "EHLO
-        linux.microsoft.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236350AbhDPQK4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 16 Apr 2021 12:10:56 -0400
-Received: from [192.168.86.23] (c-73-38-52-84.hsd1.vt.comcast.net [73.38.52.84])
-        by linux.microsoft.com (Postfix) with ESMTPSA id 0378920B8001;
-        Fri, 16 Apr 2021 09:10:28 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 0378920B8001
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-        s=default; t=1618589431;
-        bh=9MXNGr+OsMs3ZgwnW73MWJRCTLeAvuN7B4xa579GwLs=;
-        h=Subject:To:Cc:References:From:Date:In-Reply-To:From;
-        b=qq63LORblOaS7ZOylg8BPaRJrxFsJH4ALhgZg4EXBBxDzyX/HiLnpZQncAH56chNV
-         gJbU+JREtUYqCHkoE/Nx2mAsemurEp4A0OlgpIrThG4eUwpscLCg7VbOX+pfh+QBzy
-         jZMk27UwZrUCqJtIvt1lbj5hRk1tiYEotgHgO+Dc=
-Subject: Re: [PATCH v2 1/7] hyperv: Detect Nested virtualization support for
- SVM
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     "H. Peter Anvin" <hpa@zytor.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "K. Y. Srinivasan" <kys@microsoft.com>, x86@kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-hyperv@vger.kernel.org,
-        Lan Tianyu <Tianyu.Lan@microsoft.com>,
-        Michael Kelley <mikelley@microsoft.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
+Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E366AC061574;
+        Fri, 16 Apr 2021 09:10:33 -0700 (PDT)
+Received: from zn.tnic (p200300ec2f0cc5009814827a174df863.dip0.t-ipconnect.de [IPv6:2003:ec:2f0c:c500:9814:827a:174d:f863])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 6A3B61EC0266;
+        Fri, 16 Apr 2021 18:10:31 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1618589431;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=+MJ/0/bCWRz30Mius/GPUqvFtWhZjXcEQ85tGdDxnEo=;
+        b=hsOStmq9d5jwAO8B6qzzf5VDCgjx5/XxwAJLSA2VQ2rYv5uslbCRphvdsyyJnpAOzpo+FH
+        9U3I0ffyWY/RegHhRlRgbX3Q+MOZkS8RBG1IcvOS8NhJhD06gfFI99DclF1yagr0GM+cC+
+        xX+x7G9BNyk3o0AaS9loMaucg32h2xo=
+Date:   Fri, 16 Apr 2021 18:10:30 +0200
+From:   Borislav Petkov <bp@alien8.de>
+To:     "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+Cc:     Dave Hansen <dave.hansen@linux.intel.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Peter Zijlstra <peterz@infradead.org>,
         Sean Christopherson <seanjc@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, Wei Liu <wei.liu@kernel.org>,
-        Stephen Hemminger <sthemmin@microsoft.com>,
-        Haiyang Zhang <haiyangz@microsoft.com>,
-        viremana@linux.microsoft.com
-References: <cover.1618492553.git.viremana@linux.microsoft.com>
- <9d12558549bc0c6f179b26f5b16c751bdfab3f74.1618492553.git.viremana@linux.microsoft.com>
- <871rba8wjj.fsf@vitty.brq.redhat.com>
-From:   Vineeth Pillai <viremana@linux.microsoft.com>
-Message-ID: <a50e0d90-d853-7195-56ce-42b85484a55e@linux.microsoft.com>
-Date:   Fri, 16 Apr 2021 12:10:26 -0400
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.9.1
+        David Rientjes <rientjes@google.com>,
+        "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>,
+        "Kleen, Andi" <andi.kleen@intel.com>,
+        "Yamahata, Isaku" <isaku.yamahata@intel.com>,
+        Erdem Aktas <erdemaktas@google.com>,
+        Steve Rutherford <srutherford@google.com>,
+        Peter Gonda <pgonda@google.com>,
+        David Hildenbrand <david@redhat.com>, x86@kernel.org,
+        kvm@vger.kernel.org, linux-mm@kvack.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [RFCv2 02/13] x86/kvm: Introduce KVM memory protection feature
+Message-ID: <20210416161030.GC22348@zn.tnic>
+References: <20210416154106.23721-1-kirill.shutemov@linux.intel.com>
+ <20210416154106.23721-3-kirill.shutemov@linux.intel.com>
 MIME-Version: 1.0
-In-Reply-To: <871rba8wjj.fsf@vitty.brq.redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20210416154106.23721-3-kirill.shutemov@linux.intel.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Fri, Apr 16, 2021 at 06:40:55PM +0300, Kirill A. Shutemov wrote:
+> Provide basic helpers, KVM_FEATURE, CPUID flag and a hypercall.
+> 
+> Host side doesn't provide the feature yet, so it is a dead code for now.
+> 
+> Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
+> ---
+>  arch/x86/include/asm/cpufeatures.h   |  1 +
+>  arch/x86/include/asm/kvm_para.h      |  5 +++++
+>  arch/x86/include/uapi/asm/kvm_para.h |  3 ++-
+>  arch/x86/kernel/kvm.c                | 17 +++++++++++++++++
+>  include/uapi/linux/kvm_para.h        |  3 ++-
+>  5 files changed, 27 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/x86/include/asm/cpufeatures.h b/arch/x86/include/asm/cpufeatures.h
+> index 84b887825f12..d8f3d2619913 100644
+> --- a/arch/x86/include/asm/cpufeatures.h
+> +++ b/arch/x86/include/asm/cpufeatures.h
+> @@ -238,6 +238,7 @@
+>  #define X86_FEATURE_VMW_VMMCALL		( 8*32+19) /* "" VMware prefers VMMCALL hypercall instruction */
+>  #define X86_FEATURE_SEV_ES		( 8*32+20) /* AMD Secure Encrypted Virtualization - Encrypted State */
+>  #define X86_FEATURE_VM_PAGE_FLUSH	( 8*32+21) /* "" VM Page Flush MSR is supported */
+> +#define X86_FEATURE_KVM_MEM_PROTECTED	( 8*32+22) /* "" KVM memory protection extension */
 
-> It may make sense to expand this a bit as it is probably unclear how the
-> change is related to SVM.
->
-> Something like:
->
-> HYPERV_CPUID_NESTED_FEATURES CPUID leaf can be present on both Intel and
-> AMD Hyper-V guests. Previously, the code was using
-> HV_X64_ENLIGHTENED_VMCS_RECOMMENDED feature bit to determine the
-> availability of nested features leaf and this complies to TLFS:
-> "Recommend a nested hypervisor using the enlightened VMCS interface.
-> Also indicates that additional nested enlightenments may be available
-> (see leaf 0x4000000A)". Enlightened VMCS, however, is an Intel only
-> feature so the detection method doesn't work for AMD. Use
-> HYPERV_CPUID_VENDOR_AND_MAX_FUNCTIONS.EAX CPUID information ("The
-> maximum input value for hypervisor CPUID information.") instead, this
-> works for both AMD and Intel.
-Thanks for the input. Will update the commit message in next revision.
+That feature bit is still unused.
 
-Thanks,
-Vineeth
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
