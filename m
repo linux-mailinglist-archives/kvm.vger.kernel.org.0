@@ -2,75 +2,127 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 252173625F4
-	for <lists+kvm@lfdr.de>; Fri, 16 Apr 2021 18:46:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C574B362651
+	for <lists+kvm@lfdr.de>; Fri, 16 Apr 2021 19:07:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236513AbhDPQqy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 16 Apr 2021 12:46:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46552 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235595AbhDPQqx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 16 Apr 2021 12:46:53 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 947DBC061574;
-        Fri, 16 Apr 2021 09:46:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=BxSXtPsAmxUFlWPdD98J/97elcMLJtVAfMQiYC0wrec=; b=nS9gVgOCNBVzeS3pqL5W4rnkMr
-        aJPl02WUaeZA81Upi/OJP409n6KoLw5d8mcWR1zbyR3sRlv3hWbP5IATF7arA4qjeE2dYjUz7jtk2
-        hkT9rqZA5KXsM3f1MBCDH6wckYcadrBJOeTcSh8a5k8zp1u40wZMEEl9OGDBA8wtTBBeKEz4IcJTO
-        IDPmCDeLvJRDctFn+NglDOY+rpPbvZODAksJGozKVR0R1K36mHGFor4GcQtHcTvdAmP0oR8h7+DxW
-        aNZcG/TM1aoyO6aSzAv0HEmqXT426M26Ii64sQNZv6AB8/hqbY68PvJKE2sTrzV7PK7iDrulkxgsg
-        WC+0UejQ==;
-Received: from willy by casper.infradead.org with local (Exim 4.94 #2 (Red Hat Linux))
-        id 1lXRbW-00ACjP-BC; Fri, 16 Apr 2021 16:46:04 +0000
-Date:   Fri, 16 Apr 2021 17:46:02 +0100
-From:   Matthew Wilcox <willy@infradead.org>
-To:     "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Cc:     Dave Hansen <dave.hansen@linux.intel.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>,
+        id S238600AbhDPRHf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 16 Apr 2021 13:07:35 -0400
+Received: from linux.microsoft.com ([13.77.154.182]:53654 "EHLO
+        linux.microsoft.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235535AbhDPRHa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 16 Apr 2021 13:07:30 -0400
+Received: from [192.168.86.23] (c-73-38-52-84.hsd1.vt.comcast.net [73.38.52.84])
+        by linux.microsoft.com (Postfix) with ESMTPSA id 56DC020B8001;
+        Fri, 16 Apr 2021 10:07:03 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 56DC020B8001
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+        s=default; t=1618592825;
+        bh=aQ2nMf6p7JAo/eTml5qCXpa9nirMhLaQNfU2xL/fxvM=;
+        h=Subject:To:Cc:References:From:Date:In-Reply-To:From;
+        b=erY+xcbw6X7T0sZPUTOa8e/DXH71J0xDzcbrUOQAz8CGwmHO3FcN5I0beC4rWIAph
+         P/5C9I2Nr1IYiYJetLO10aTjRKsArqPfJJo3POQIidJcjTT6NTXGHg4PKdlXrOp6k8
+         ZENzTJfu/JenJhLf6I1kLeDGpRpVnK9gVO5vTCz8=
+Subject: Re: [PATCH v2 4/7] KVM: SVM: hyper-v: Nested enlightenments in VMCB
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Lan Tianyu <Tianyu.Lan@microsoft.com>,
+        Michael Kelley <mikelley@microsoft.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <seanjc@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        David Rientjes <rientjes@google.com>,
-        "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>,
-        "Kleen, Andi" <andi.kleen@intel.com>,
-        "Yamahata, Isaku" <isaku.yamahata@intel.com>,
-        Erdem Aktas <erdemaktas@google.com>,
-        Steve Rutherford <srutherford@google.com>,
-        Peter Gonda <pgonda@google.com>,
-        David Hildenbrand <david@redhat.com>, x86@kernel.org,
-        kvm@vger.kernel.org, linux-mm@kvack.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [RFCv2 00/13] TDX and guest memory unmapping
-Message-ID: <20210416164602.GN2531743@casper.infradead.org>
-References: <20210416154106.23721-1-kirill.shutemov@linux.intel.com>
+        Joerg Roedel <joro@8bytes.org>, Wei Liu <wei.liu@kernel.org>,
+        Stephen Hemminger <sthemmin@microsoft.com>,
+        Haiyang Zhang <haiyangz@microsoft.com>
+Cc:     "H. Peter Anvin" <hpa@zytor.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "K. Y. Srinivasan" <kys@microsoft.com>, x86@kernel.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-hyperv@vger.kernel.org, viremana@linux.microsoft.com
+References: <cover.1618492553.git.viremana@linux.microsoft.com>
+ <ffe0e81164e5577a43f7499e40922b6abb663430.1618492553.git.viremana@linux.microsoft.com>
+ <87v98m7gi4.fsf@vitty.brq.redhat.com>
+From:   Vineeth Pillai <viremana@linux.microsoft.com>
+Message-ID: <4aaab6f9-7785-5c0a-4f9d-f972ec21888b@linux.microsoft.com>
+Date:   Fri, 16 Apr 2021 13:07:00 -0400
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.9.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210416154106.23721-1-kirill.shutemov@linux.intel.com>
+In-Reply-To: <87v98m7gi4.fsf@vitty.brq.redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Apr 16, 2021 at 06:40:53PM +0300, Kirill A. Shutemov wrote:
-> TDX integrity check failures may lead to system shutdown host kernel must
-> not allow any writes to TD-private memory. This requirment clashes with
-> KVM design: KVM expects the guest memory to be mapped into host userspace
-> (e.g. QEMU).
-> 
-> This patchset aims to start discussion on how we can approach the issue.
-> 
-> The core of the change is in the last patch. Please see more detailed
-> description of the issue and proposoal of the solution there.
 
-This seems to have some parallels with s390's arch_make_page_accessible().
-Is there any chance to combine the two, so we don't end up with duplicated
-hooks all over the MM for this kind of thing?
+On 4/16/2021 4:58 AM, Vitaly Kuznetsov wrote:
+>
+>> +
+>> +#if IS_ENABLED(CONFIG_HYPERV)
+>> +struct __packed hv_enlightenments {
+>> +	struct __packed hv_enlightenments_control {
+>> +		u32 nested_flush_hypercall:1;
+>> +		u32 msr_bitmap:1;
+>> +		u32 enlightened_npt_tlb: 1;
+>> +		u32 reserved:29;
+>> +	} hv_enlightenments_control;
+>> +	u32 hv_vp_id;
+>> +	u64 hv_vm_id;
+>> +	u64 partition_assist_page;
+>> +	u64 reserved;
+>> +};
+> Enlightened VMCS seems to have the same part:
+>
+>          struct {
+>                  u32 nested_flush_hypercall:1;
+>                  u32 msr_bitmap:1;
+>                  u32 reserved:30;
+>          }  __packed hv_enlightenments_control;
+>          u32 hv_vp_id;
+>          u64 hv_vm_id;
+>          u64 partition_assist_page;
+>
+> Would it maybe make sense to unify these two (in case they are the same
+> thing in Hyper-V, of course)?
+They are very similar but,  the individual bits are a bit different. SVM 
+struct has an
+additional bit 'enlightened_npt_tlb'. There might be future changes as 
+well if new
+enlightenments are designed for performance optimization. So I feel, we 
+can have
+it as separate structs.
 
-https://patchwork.kernel.org/project/kvm/cover/20200214222658.12946-1-borntraeger@de.ibm.com/
 
-and recent THP/Folio-related discussion:
-https://lore.kernel.org/linux-mm/20210409194059.GW2531743@casper.infradead.org/
+>>   
+>> +#define VMCB_ALL_CLEAN_MASK (					\
+>> +	(1U << VMCB_INTERCEPTS) | (1U << VMCB_PERM_MAP) |	\
+>> +	(1U << VMCB_ASID) | (1U << VMCB_INTR) |			\
+>> +	(1U << VMCB_NPT) | (1U << VMCB_CR) | (1U << VMCB_DR) |	\
+>> +	(1U << VMCB_DT) | (1U << VMCB_SEG) | (1U << VMCB_CR2) |	\
+>> +	(1U << VMCB_LBR) | (1U << VMCB_AVIC)			\
+>> +	)
+> What if we preserve VMCB_DIRTY_MAX and drop this newly introduced
+> VMCB_ALL_CLEAN_MASK (which basically lists all the members of the enum
+> above)? '1 << VMCB_DIRTY_MAX' can still work. (If the 'VMCB_DIRTY_MAX'
+> name becomes misleading we can e.g. rename it to VMCB_NATIVE_DIRTY_MAX
+> or something but I'm not sure it's worth it)
+
+I thought of keeping this code because, if we have non-contiguous bits 
+in future, we
+would need this kinda logic anyways. But I get your point. Will revert this.
+
+
+>
+>> +#if IS_ENABLED(CONFIG_HYPERV)
+>> +#define VMCB_HYPERV_CLEAN_MASK (1U << VMCB_HV_NESTED_ENLIGHTENMENTS)
+>> +#endif
+> VMCB_HYPERV_CLEAN_MASK is a single bit, why do we need it at all
+> (BIT(VMCB_HV_NESTED_ENLIGHTENMENTS) is not super long)
+
+Agreed. Will change it in next revision.
+
+Thanks,
+Vineeth
+
