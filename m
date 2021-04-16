@@ -2,321 +2,152 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 59FEE361C0E
-	for <lists+kvm@lfdr.de>; Fri, 16 Apr 2021 11:00:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 51C22361C18
+	for <lists+kvm@lfdr.de>; Fri, 16 Apr 2021 11:00:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240736AbhDPIqb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 16 Apr 2021 04:46:31 -0400
-Received: from szxga07-in.huawei.com ([45.249.212.35]:17347 "EHLO
-        szxga07-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240729AbhDPIqa (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 16 Apr 2021 04:46:30 -0400
-Received: from DGGEMS412-HUB.china.huawei.com (unknown [172.30.72.60])
-        by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4FM8rH2Xg5z7tV4;
-        Fri, 16 Apr 2021 16:43:43 +0800 (CST)
-Received: from [10.174.187.224] (10.174.187.224) by
- DGGEMS412-HUB.china.huawei.com (10.3.19.212) with Microsoft SMTP Server id
- 14.3.498.0; Fri, 16 Apr 2021 16:45:53 +0800
-Subject: Re: [PATCH 3/3] vfio/iommu_type1: Add support for manual dirty log
- clear
-To:     Alex Williamson <alex.williamson@redhat.com>
-References: <20210413091445.7448-1-zhukeqian1@huawei.com>
- <20210413091445.7448-4-zhukeqian1@huawei.com>
- <20210415144338.54b90041@redhat.com>
-CC:     <linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>,
-        Kirti Wankhede <kwankhede@nvidia.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Yi Sun <yi.y.sun@linux.intel.com>,
-        Tian Kevin <kevin.tian@intel.com>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Will Deacon <will@kernel.org>, Joerg Roedel <joro@8bytes.org>,
-        Jean-Philippe Brucker <jean-philippe@linaro.org>,
-        "Jonathan Cameron" <Jonathan.Cameron@huawei.com>,
-        Lu Baolu <baolu.lu@linux.intel.com>,
-        <wanghaibin.wang@huawei.com>, <jiangkunkun@huawei.com>,
-        <yuzenghui@huawei.com>, <lushenming@huawei.com>
-From:   Keqian Zhu <zhukeqian1@huawei.com>
-Message-ID: <342c51f2-02dd-df03-16d1-3a27f19cd06c@huawei.com>
-Date:   Fri, 16 Apr 2021 16:45:52 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
- Thunderbird/45.7.1
+        id S240873AbhDPIrl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 16 Apr 2021 04:47:41 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:22412 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S240844AbhDPIrj (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 16 Apr 2021 04:47:39 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1618562834;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=wRo3dX7HZBf9pYjFq5ETZzrsfm6Cv5K3vSoaAXFlhHU=;
+        b=RGFBwfBXHKejp9MKQemsIL/7+/3duF8+rG3tczerdGGiMiE/P8HHaVtiQAOPAAUKTi+/Hd
+        RH8odz+40r9XDG2aic9o/VY3oZIcymGdD4dzBb39sGShNFJeXgiqU8ClxYGutxXCbMze1V
+        36IP0unVy4eA2k0gNHm/ObfJx72SwNw=
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
+ [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-308-BVsuNyr6NkaaoHijXwWqSg-1; Fri, 16 Apr 2021 04:47:11 -0400
+X-MC-Unique: BVsuNyr6NkaaoHijXwWqSg-1
+Received: by mail-ed1-f72.google.com with SMTP id i25-20020a50fc190000b0290384fe0dab00so1063615edr.6
+        for <kvm@vger.kernel.org>; Fri, 16 Apr 2021 01:47:11 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=wRo3dX7HZBf9pYjFq5ETZzrsfm6Cv5K3vSoaAXFlhHU=;
+        b=YJXR2lHDgBIX0aa2u68Hb3afxIEpT/TR78eJaELmyShFHENCHU6+5yASpnwOjGsieI
+         rUre+CzjbhIghDaezg7HfLbVBv3aGmXu/Ebrju+/VgPE726aIB0AIw3fp44t/sTOfflG
+         ZHtL7z4E0ehGvrzkZJmk4cQ8WpaInl9150eua1te2Ze4pxRlJQAKjnSizwFb8/YeGgQo
+         7bmQmqKtm4Jhd/4Dbo9VKGv6ty1ABpgABR9jmq5s75YDwA2Ca9GJ4f+XnarZ/5+/UCZc
+         xGYwOSZNRsfGXnAlVoevjF4Z2U3AOHOJh6HabAsiGd7d6ugPFZH0Z8y4FAZo1gHFBJxO
+         3a2w==
+X-Gm-Message-State: AOAM531qMU/zyl/4FfYcv/NjCoSA1qJUuA1qf2Zqdj9tHlixZAjb+xt+
+        SubrKZimLClZdcWW/sAimG28VOKTCRgceggNPiNU0fjbJNK+rM5mvZCsN0a4xupsCGCvO0gzP1r
+        7ZFd9dccCEFdY
+X-Received: by 2002:a50:8fe6:: with SMTP id y93mr8637328edy.224.1618562830125;
+        Fri, 16 Apr 2021 01:47:10 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwh1Zl2ub3jfnrnRMGdIeGAkIGOzcVmqwkMtbMOyGQ3+DRwPr4tDakxV4LySH2DCPUs/c6RYw==
+X-Received: by 2002:a50:8fe6:: with SMTP id y93mr8637313edy.224.1618562829919;
+        Fri, 16 Apr 2021 01:47:09 -0700 (PDT)
+Received: from steredhat (host-79-34-249-199.business.telecomitalia.it. [79.34.249.199])
+        by smtp.gmail.com with ESMTPSA id k9sm3617309eje.102.2021.04.16.01.47.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 16 Apr 2021 01:47:09 -0700 (PDT)
+Date:   Fri, 16 Apr 2021 10:47:07 +0200
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     Zhu Lingshan <lingshan.zhu@intel.com>
+Cc:     jasowang@redhat.com, mst@redhat.com, lulu@redhat.com,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH V3 2/3] vDPA/ifcvf: enable Intel C5000X-PL virtio-block
+ for vDPA
+Message-ID: <20210416084707.ruqzvg4airzkkc2t@steredhat>
+References: <20210416071628.4984-1-lingshan.zhu@intel.com>
+ <20210416071628.4984-3-lingshan.zhu@intel.com>
 MIME-Version: 1.0
-In-Reply-To: <20210415144338.54b90041@redhat.com>
-Content-Type: text/plain; charset="windows-1252"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.174.187.224]
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20210416071628.4984-3-lingshan.zhu@intel.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Alex,
+On Fri, Apr 16, 2021 at 03:16:27PM +0800, Zhu Lingshan wrote:
+>This commit enabled Intel FPGA SmartNIC C5000X-PL virtio-block
+>for vDPA.
+>
+>Signed-off-by: Zhu Lingshan <lingshan.zhu@intel.com>
+>---
+> drivers/vdpa/ifcvf/ifcvf_base.h |  8 +++++++-
+> drivers/vdpa/ifcvf/ifcvf_main.c | 19 ++++++++++++++++++-
+> 2 files changed, 25 insertions(+), 2 deletions(-)
 
-On 2021/4/16 4:43, Alex Williamson wrote:
-> On Tue, 13 Apr 2021 17:14:45 +0800
-> Keqian Zhu <zhukeqian1@huawei.com> wrote:
-> 
->> From: Kunkun Jiang <jiangkunkun@huawei.com>
->>
->> In the past, we clear dirty log immediately after sync dirty
->> log to userspace. This may cause redundant dirty handling if
->> userspace handles dirty log iteratively:
->>
->> After vfio clears dirty log, new dirty log starts to generate.
->> These new dirty log will be reported to userspace even if they
->> are generated before userspace handles the same dirty page.
->>
->> That's to say, we should minimize the time gap of dirty log
->> clearing and dirty log handling. We can give userspace the
->> interface to clear dirty log.
-> 
-> IIUC, a user would be expected to clear the bitmap before copying the
-> dirty pages, therefore you're trying to reduce that time gap between
-> clearing any copy, but it cannot be fully eliminated and importantly,
-> if the user clears after copying, they've introduced a race.  Correct?
-Yep, it's totally correct. If user clears after copying, it may lose dirty info.
-I'll enhance the doc.
+Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
 
-> 
-> What results do you have to show that this is a worthwhile optimization?
-This optimization is inspired by KVM[1]. The results are differ by different workload of guest.
-In theory, the higher dirty rate the better result. But sorry that I tested it on our FPGA, the dirty
-rate is heavily limited, so the result is not obvious.
+>
+>diff --git a/drivers/vdpa/ifcvf/ifcvf_base.h b/drivers/vdpa/ifcvf/ifcvf_base.h
+>index 1c04cd256fa7..0111bfdeb342 100644
+>--- a/drivers/vdpa/ifcvf/ifcvf_base.h
+>+++ b/drivers/vdpa/ifcvf/ifcvf_base.h
+>@@ -15,6 +15,7 @@
+> #include <linux/pci_regs.h>
+> #include <linux/vdpa.h>
+> #include <uapi/linux/virtio_net.h>
+>+#include <uapi/linux/virtio_blk.h>
+> #include <uapi/linux/virtio_config.h>
+> #include <uapi/linux/virtio_pci.h>
+>
+>@@ -28,7 +29,12 @@
+> #define C5000X_PL_SUBSYS_VENDOR_ID	0x8086
+> #define C5000X_PL_SUBSYS_DEVICE_ID	0x0001
+>
+>-#define IFCVF_SUPPORTED_FEATURES \
+>+#define C5000X_PL_BLK_VENDOR_ID		0x1AF4
+>+#define C5000X_PL_BLK_DEVICE_ID		0x1001
+>+#define C5000X_PL_BLK_SUBSYS_VENDOR_ID	0x8086
+>+#define C5000X_PL_BLK_SUBSYS_DEVICE_ID	0x0002
+>+
+>+#define IFCVF_NET_SUPPORTED_FEATURES \
+> 		((1ULL << VIRTIO_NET_F_MAC)			| \
+> 		 (1ULL << VIRTIO_F_ANY_LAYOUT)			| \
+> 		 (1ULL << VIRTIO_F_VERSION_1)			| \
+>diff --git a/drivers/vdpa/ifcvf/ifcvf_main.c b/drivers/vdpa/ifcvf/ifcvf_main.c
+>index 469a9b5737b7..376b2014916a 100644
+>--- a/drivers/vdpa/ifcvf/ifcvf_main.c
+>+++ b/drivers/vdpa/ifcvf/ifcvf_main.c
+>@@ -168,10 +168,23 @@ static struct ifcvf_hw *vdpa_to_vf(struct vdpa_device *vdpa_dev)
+>
+> static u64 ifcvf_vdpa_get_features(struct vdpa_device *vdpa_dev)
+> {
+>+	struct ifcvf_adapter *adapter = vdpa_to_adapter(vdpa_dev);
+> 	struct ifcvf_hw *vf = vdpa_to_vf(vdpa_dev);
+>+	struct pci_dev *pdev = adapter->pdev;
+>+
+> 	u64 features;
+>
+>-	features = ifcvf_get_features(vf) & IFCVF_SUPPORTED_FEATURES;
+>+	switch (vf->dev_type) {
+>+	case VIRTIO_ID_NET:
+>+		features = ifcvf_get_features(vf) & IFCVF_NET_SUPPORTED_FEATURES;
+>+		break;
+>+	case VIRTIO_ID_BLOCK:
+>+		features = ifcvf_get_features(vf);
+>+		break;
+>+	default:
+>+		features = 0;
+>+		IFCVF_ERR(pdev, "VIRTIO ID %u not supported\n", vf->dev_type);
+>+	}
+>
+> 	return features;
+> }
+>@@ -517,6 +530,10 @@ static struct pci_device_id ifcvf_pci_ids[] = {
+> 			 C5000X_PL_DEVICE_ID,
+> 			 C5000X_PL_SUBSYS_VENDOR_ID,
+> 			 C5000X_PL_SUBSYS_DEVICE_ID) },
+>+	{ PCI_DEVICE_SUB(C5000X_PL_BLK_VENDOR_ID,
+>+			 C5000X_PL_BLK_DEVICE_ID,
+>+			 C5000X_PL_BLK_SUBSYS_VENDOR_ID,
+>+			 C5000X_PL_BLK_SUBSYS_DEVICE_ID) },
+>
+> 	{ 0 },
+> };
+>-- 
+>2.27.0
+>
 
-> 
-> I really don't like the semantics that testing for an IOMMU capability
-> enables it.  It needs to be explicitly controllable feature, which
-> suggests to me that it might be a flag used in combination with _GET or
-> a separate _GET_NOCLEAR operations.  Thanks,
-Yes, good suggestion. We should give userspace a choice.
-
-Thanks,
-Keqian
-
-[1] https://lore.kernel.org/kvm/1543251253-24762-1-git-send-email-pbonzini@redhat.com/
-
-> 
-> Alex
-> 
-> 
->> Co-developed-by: Keqian Zhu <zhukeqian1@huawei.com>
->> Signed-off-by: Kunkun Jiang <jiangkunkun@huawei.com>
->> ---
->>  drivers/vfio/vfio_iommu_type1.c | 100 ++++++++++++++++++++++++++++++--
->>  include/uapi/linux/vfio.h       |  28 ++++++++-
->>  2 files changed, 123 insertions(+), 5 deletions(-)
->>
->> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
->> index 77950e47f56f..d9c4a27b3c4e 100644
->> --- a/drivers/vfio/vfio_iommu_type1.c
->> +++ b/drivers/vfio/vfio_iommu_type1.c
->> @@ -78,6 +78,7 @@ struct vfio_iommu {
->>  	bool			v2;
->>  	bool			nesting;
->>  	bool			dirty_page_tracking;
->> +	bool			dirty_log_manual_clear;
->>  	bool			pinned_page_dirty_scope;
->>  	bool			container_open;
->>  };
->> @@ -1242,6 +1243,78 @@ static int vfio_iommu_dirty_log_sync(struct vfio_iommu *iommu,
->>  	return ret;
->>  }
->>  
->> +static int vfio_iova_dirty_log_clear(u64 __user *bitmap,
->> +				     struct vfio_iommu *iommu,
->> +				     dma_addr_t iova, size_t size,
->> +				     size_t pgsize)
->> +{
->> +	struct vfio_dma *dma;
->> +	struct rb_node *n;
->> +	dma_addr_t start_iova, end_iova, riova;
->> +	unsigned long pgshift = __ffs(pgsize);
->> +	unsigned long bitmap_size;
->> +	unsigned long *bitmap_buffer = NULL;
->> +	bool clear_valid;
->> +	int rs, re, start, end, dma_offset;
->> +	int ret = 0;
->> +
->> +	bitmap_size = DIRTY_BITMAP_BYTES(size >> pgshift);
->> +	bitmap_buffer = kvmalloc(bitmap_size, GFP_KERNEL);
->> +	if (!bitmap_buffer) {
->> +		ret = -ENOMEM;
->> +		goto out;
->> +	}
->> +
->> +	if (copy_from_user(bitmap_buffer, bitmap, bitmap_size)) {
->> +		ret = -EFAULT;
->> +		goto out;
->> +	}
->> +
->> +	for (n = rb_first(&iommu->dma_list); n; n = rb_next(n)) {
->> +		dma = rb_entry(n, struct vfio_dma, node);
->> +		if (!dma->iommu_mapped)
->> +			continue;
->> +		if ((dma->iova + dma->size - 1) < iova)
->> +			continue;
->> +		if (dma->iova > iova + size - 1)
->> +			break;
->> +
->> +		start_iova = max(iova, dma->iova);
->> +		end_iova = min(iova + size, dma->iova + dma->size);
->> +
->> +		/* Similar logic as the tail of vfio_iova_dirty_bitmap */
->> +
->> +		clear_valid = false;
->> +		start = (start_iova - iova) >> pgshift;
->> +		end = (end_iova - iova) >> pgshift;
->> +		bitmap_for_each_set_region(bitmap_buffer, rs, re, start, end) {
->> +			clear_valid = true;
->> +			riova = iova + (rs << pgshift);
->> +			dma_offset = (riova - dma->iova) >> pgshift;
->> +			bitmap_clear(dma->bitmap, dma_offset, re - rs);
->> +		}
->> +
->> +		if (clear_valid)
->> +			vfio_dma_populate_bitmap(dma, pgsize);
->> +
->> +		if (clear_valid && !iommu->pinned_page_dirty_scope &&
->> +		    dma->iommu_mapped && !iommu->num_non_hwdbm_groups) {
->> +			ret = vfio_iommu_dirty_log_clear(iommu, start_iova,
->> +					end_iova - start_iova,	bitmap_buffer,
->> +					iova, pgshift);
->> +			if (ret) {
->> +				pr_warn("dma dirty log clear failed!\n");
->> +				goto out;
->> +			}
->> +		}
->> +
->> +	}
->> +
->> +out:
->> +	kfree(bitmap_buffer);
->> +	return ret;
->> +}
->> +
->>  static int update_user_bitmap(u64 __user *bitmap, struct vfio_iommu *iommu,
->>  			      struct vfio_dma *dma, dma_addr_t base_iova,
->>  			      size_t pgsize)
->> @@ -1329,6 +1402,10 @@ static int vfio_iova_dirty_bitmap(u64 __user *bitmap, struct vfio_iommu *iommu,
->>  		if (ret)
->>  			return ret;
->>  
->> +		/* Do not clear dirty automatically when manual_clear enabled */
->> +		if (iommu->dirty_log_manual_clear)
->> +			continue;
->> +
->>  		/* Clear iommu dirty log to re-enable dirty log tracking */
->>  		if (iommu->num_non_pinned_groups && dma->iommu_mapped &&
->>  		    !iommu->num_non_hwdbm_groups) {
->> @@ -2946,6 +3023,11 @@ static int vfio_iommu_type1_check_extension(struct vfio_iommu *iommu,
->>  		if (!iommu)
->>  			return 0;
->>  		return vfio_domains_have_iommu_cache(iommu);
->> +	case VFIO_DIRTY_LOG_MANUAL_CLEAR:
->> +		if (!iommu)
->> +			return 0;
->> +		iommu->dirty_log_manual_clear = true;
->> +		return 1;
->>  	default:
->>  		return 0;
->>  	}
->> @@ -3201,7 +3283,8 @@ static int vfio_iommu_type1_dirty_pages(struct vfio_iommu *iommu,
->>  	struct vfio_iommu_type1_dirty_bitmap dirty;
->>  	uint32_t mask = VFIO_IOMMU_DIRTY_PAGES_FLAG_START |
->>  			VFIO_IOMMU_DIRTY_PAGES_FLAG_STOP |
->> -			VFIO_IOMMU_DIRTY_PAGES_FLAG_GET_BITMAP;
->> +			VFIO_IOMMU_DIRTY_PAGES_FLAG_GET_BITMAP |
->> +			VFIO_IOMMU_DIRTY_PAGES_FLAG_CLEAR_BITMAP;
->>  	unsigned long minsz;
->>  	int ret = 0;
->>  
->> @@ -3243,7 +3326,8 @@ static int vfio_iommu_type1_dirty_pages(struct vfio_iommu *iommu,
->>  		}
->>  		mutex_unlock(&iommu->lock);
->>  		return 0;
->> -	} else if (dirty.flags & VFIO_IOMMU_DIRTY_PAGES_FLAG_GET_BITMAP) {
->> +	} else if (dirty.flags & (VFIO_IOMMU_DIRTY_PAGES_FLAG_GET_BITMAP |
->> +				VFIO_IOMMU_DIRTY_PAGES_FLAG_CLEAR_BITMAP)) {
->>  		struct vfio_iommu_type1_dirty_bitmap_get range;
->>  		unsigned long pgshift;
->>  		size_t data_size = dirty.argsz - minsz;
->> @@ -3286,13 +3370,21 @@ static int vfio_iommu_type1_dirty_pages(struct vfio_iommu *iommu,
->>  			goto out_unlock;
->>  		}
->>  
->> -		if (iommu->dirty_page_tracking)
->> +		if (!iommu->dirty_page_tracking) {
->> +			ret = -EINVAL;
->> +			goto out_unlock;
->> +		}
->> +
->> +		if (dirty.flags & VFIO_IOMMU_DIRTY_PAGES_FLAG_GET_BITMAP)
->>  			ret = vfio_iova_dirty_bitmap(range.bitmap.data,
->>  						     iommu, range.iova,
->>  						     range.size,
->>  						     range.bitmap.pgsize);
->>  		else
->> -			ret = -EINVAL;
->> +			ret = vfio_iova_dirty_log_clear(range.bitmap.data,
->> +							iommu, range.iova,
->> +							range.size,
->> +							range.bitmap.pgsize);
->>  out_unlock:
->>  		mutex_unlock(&iommu->lock);
->>  
->> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
->> index 8ce36c1d53ca..784dc3cf2a8f 100644
->> --- a/include/uapi/linux/vfio.h
->> +++ b/include/uapi/linux/vfio.h
->> @@ -52,6 +52,14 @@
->>  /* Supports the vaddr flag for DMA map and unmap */
->>  #define VFIO_UPDATE_VADDR		10
->>  
->> +/*
->> + * The vfio_iommu driver may support user clears dirty log manually, which means
->> + * dirty log is not cleared automatically after dirty log is copied to userspace,
->> + * it's user's duty to clear dirty log. Note: when user queries this extension
->> + * and vfio_iommu driver supports it, then it is enabled.
->> + */
->> +#define VFIO_DIRTY_LOG_MANUAL_CLEAR	11
->> +
->>  /*
->>   * The IOCTL interface is designed for extensibility by embedding the
->>   * structure length (argsz) and flags into structures passed between
->> @@ -1188,7 +1196,24 @@ struct vfio_iommu_type1_dma_unmap {
->>   * actual bitmap. If dirty pages logging is not enabled, an error will be
->>   * returned.
->>   *
->> - * Only one of the flags _START, _STOP and _GET may be specified at a time.
->> + * Calling the IOCTL with VFIO_IOMMU_DIRTY_PAGES_FLAG_CLEAR_BITMAP flag set,
->> + * instructs the IOMMU driver to clear the dirty status of pages in a bitmap
->> + * for IOMMU container for a given IOVA range. The user must specify the IOVA
->> + * range, the bitmap and the pgsize through the structure
->> + * vfio_iommu_type1_dirty_bitmap_get in the data[] portion. This interface
->> + * supports clearing a bitmap of the smallest supported pgsize only and can be
->> + * modified in future to clear a bitmap of any specified supported pgsize. The
->> + * user must provide a memory area for the bitmap memory and specify its size
->> + * in bitmap.size. One bit is used to represent one page consecutively starting
->> + * from iova offset. The user should provide page size in bitmap.pgsize field.
->> + * A bit set in the bitmap indicates that the page at that offset from iova is
->> + * cleared the dirty status, and dirty tracking is re-enabled for that page. The
->> + * caller must set argsz to a value including the size of structure
->> + * vfio_iommu_dirty_bitmap_get, but excluing the size of the actual bitmap. If
->> + * dirty pages logging is not enabled, an error will be returned.
->> + *
->> + * Only one of the flags _START, _STOP, _GET and _CLEAR may be specified at a
->> + * time.
->>   *
->>   */
->>  struct vfio_iommu_type1_dirty_bitmap {
->> @@ -1197,6 +1222,7 @@ struct vfio_iommu_type1_dirty_bitmap {
->>  #define VFIO_IOMMU_DIRTY_PAGES_FLAG_START	(1 << 0)
->>  #define VFIO_IOMMU_DIRTY_PAGES_FLAG_STOP	(1 << 1)
->>  #define VFIO_IOMMU_DIRTY_PAGES_FLAG_GET_BITMAP	(1 << 2)
->> +#define VFIO_IOMMU_DIRTY_PAGES_FLAG_CLEAR_BITMAP (1 << 3)
->>  	__u8         data[];
->>  };
->>  
-> 
-> .
-> 
