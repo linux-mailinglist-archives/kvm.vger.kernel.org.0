@@ -2,31 +2,31 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0A51836243B
-	for <lists+kvm@lfdr.de>; Fri, 16 Apr 2021 17:42:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2CBE2362439
+	for <lists+kvm@lfdr.de>; Fri, 16 Apr 2021 17:42:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344048AbhDPPmQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 16 Apr 2021 11:42:16 -0400
-Received: from mga09.intel.com ([134.134.136.24]:4092 "EHLO mga09.intel.com"
+        id S1344033AbhDPPmO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 16 Apr 2021 11:42:14 -0400
+Received: from mga17.intel.com ([192.55.52.151]:10800 "EHLO mga17.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1343989AbhDPPmL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 16 Apr 2021 11:42:11 -0400
-IronPort-SDR: E9YfRotjPqIUZrKWWV/D64DLh8dwSCmaGzDza6oSmpdTNUauWpp8/Exd1T9XjguHtJEZIEQkFc
- tPMJ9eFMHzwQ==
-X-IronPort-AV: E=McAfee;i="6200,9189,9956"; a="195169145"
+        id S1343970AbhDPPmI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 16 Apr 2021 11:42:08 -0400
+IronPort-SDR: uWHD7F5t2HzlTcto9mPtvJcDEq9sES5hTS581oUnaruuGCDkBRGkG43VurwDmUL8y3VJxymj3J
+ 1XinxyK2Ceyw==
+X-IronPort-AV: E=McAfee;i="6200,9189,9956"; a="175163936"
 X-IronPort-AV: E=Sophos;i="5.82,226,1613462400"; 
-   d="scan'208";a="195169145"
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Apr 2021 08:41:42 -0700
-IronPort-SDR: X85JOUNwgOD0cizzR5uDukCMiBRDxeHXnklH8hj1bphP48a0OlK0J470EynoTDSDOOq7s8sGWp
- THnhFtf3GCoQ==
+   d="scan'208";a="175163936"
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Apr 2021 08:41:43 -0700
+IronPort-SDR: lGuaSt9Jbppuno2GL+IX51ChFHPEI5DU+6ronyLCHnvyol9GOMLKa/g0sci/4syDwSpPwbuOAE
+ o2DRvdX+WXuw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.82,226,1613462400"; 
-   d="scan'208";a="384352246"
+   d="scan'208";a="422038783"
 Received: from black.fi.intel.com ([10.237.72.28])
-  by orsmga006.jf.intel.com with ESMTP; 16 Apr 2021 08:41:37 -0700
+  by orsmga007.jf.intel.com with ESMTP; 16 Apr 2021 08:41:38 -0700
 Received: by black.fi.intel.com (Postfix, from userid 1000)
-        id 0A0DB279; Fri, 16 Apr 2021 18:41:50 +0300 (EEST)
+        id 144FD2BE; Fri, 16 Apr 2021 18:41:50 +0300 (EEST)
 From:   "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
 To:     Dave Hansen <dave.hansen@linux.intel.com>,
         Andy Lutomirski <luto@kernel.org>,
@@ -44,9 +44,9 @@ Cc:     David Rientjes <rientjes@google.com>,
         kvm@vger.kernel.org, linux-mm@kvack.org,
         linux-kernel@vger.kernel.org,
         "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: [RFCv2 06/13] x86/realmode: Share trampoline area if KVM memory protection enabled
-Date:   Fri, 16 Apr 2021 18:40:59 +0300
-Message-Id: <20210416154106.23721-7-kirill.shutemov@linux.intel.com>
+Subject: [RFCv2 07/13] mm: Add hwpoison_entry_to_pfn() and hwpoison_entry_to_page()
+Date:   Fri, 16 Apr 2021 18:41:00 +0300
+Message-Id: <20210416154106.23721-8-kirill.shutemov@linux.intel.com>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20210416154106.23721-1-kirill.shutemov@linux.intel.com>
 References: <20210416154106.23721-1-kirill.shutemov@linux.intel.com>
@@ -56,41 +56,51 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-If KVM memory protection is active, the trampoline area will need to be
-in shared memory.
+Add helpers to convert hwpoison swap entry to pfn and page.
 
 Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
 ---
- arch/x86/realmode/init.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
+ include/linux/swapops.h | 20 ++++++++++++++++++++
+ 1 file changed, 20 insertions(+)
 
-diff --git a/arch/x86/realmode/init.c b/arch/x86/realmode/init.c
-index 22fda7d99159..f3b54b5da693 100644
---- a/arch/x86/realmode/init.c
-+++ b/arch/x86/realmode/init.c
-@@ -10,6 +10,7 @@
- #include <asm/tlbflush.h>
- #include <asm/crash.h>
- #include <asm/sev-es.h>
-+#include <asm/kvm_para.h>
+diff --git a/include/linux/swapops.h b/include/linux/swapops.h
+index d9b7c9132c2f..520589b12fb3 100644
+--- a/include/linux/swapops.h
++++ b/include/linux/swapops.h
+@@ -323,6 +323,16 @@ static inline int is_hwpoison_entry(swp_entry_t entry)
+ 	return swp_type(entry) == SWP_HWPOISON;
+ }
  
- struct real_mode_header *real_mode_header;
- u32 *trampoline_cr4_features;
-@@ -75,11 +76,11 @@ static void __init setup_real_mode(void)
- 	base = (unsigned char *)real_mode_header;
++static inline unsigned long hwpoison_entry_to_pfn(swp_entry_t entry)
++{
++	return swp_offset(entry);
++}
++
++static inline struct page *hwpoison_entry_to_page(swp_entry_t entry)
++{
++	return pfn_to_page(hwpoison_entry_to_pfn(entry));
++}
++
+ static inline void num_poisoned_pages_inc(void)
+ {
+ 	atomic_long_inc(&num_poisoned_pages);
+@@ -345,6 +355,16 @@ static inline int is_hwpoison_entry(swp_entry_t swp)
+ 	return 0;
+ }
  
- 	/*
--	 * If SME is active, the trampoline area will need to be in
--	 * decrypted memory in order to bring up other processors
-+	 * If SME or KVM memory protection is active, the trampoline area will
-+	 * need to be in decrypted memory in order to bring up other processors
- 	 * successfully. This is not needed for SEV.
- 	 */
--	if (sme_active())
-+	if (sme_active() || kvm_mem_protected())
- 		set_memory_decrypted((unsigned long)base, size >> PAGE_SHIFT);
- 
- 	memcpy(base, real_mode_blob, size);
++static inline unsigned long hwpoison_entry_to_pfn(swp_entry_t entry)
++{
++	return 0;
++}
++
++static inline struct page *hwpoison_entry_to_page(swp_entry_t entry)
++{
++	return NULL;
++}
++
+ static inline void num_poisoned_pages_inc(void)
+ {
+ }
 -- 
 2.26.3
 
