@@ -2,150 +2,227 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6BB79361812
-	for <lists+kvm@lfdr.de>; Fri, 16 Apr 2021 05:08:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3F7A5361818
+	for <lists+kvm@lfdr.de>; Fri, 16 Apr 2021 05:13:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235001AbhDPDIz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 15 Apr 2021 23:08:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34394 "EHLO
+        id S237802AbhDPDOS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 15 Apr 2021 23:14:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35568 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234903AbhDPDIw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 15 Apr 2021 23:08:52 -0400
-Received: from mail-pf1-x42a.google.com (mail-pf1-x42a.google.com [IPv6:2607:f8b0:4864:20::42a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D3288C061574;
-        Thu, 15 Apr 2021 20:08:23 -0700 (PDT)
-Received: by mail-pf1-x42a.google.com with SMTP id n38so17430067pfv.2;
-        Thu, 15 Apr 2021 20:08:23 -0700 (PDT)
+        with ESMTP id S235054AbhDPDOR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 15 Apr 2021 23:14:17 -0400
+Received: from mail-ej1-x62d.google.com (mail-ej1-x62d.google.com [IPv6:2a00:1450:4864:20::62d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 275E6C061574
+        for <kvm@vger.kernel.org>; Thu, 15 Apr 2021 20:13:53 -0700 (PDT)
+Received: by mail-ej1-x62d.google.com with SMTP id u21so39965786ejo.13
+        for <kvm@vger.kernel.org>; Thu, 15 Apr 2021 20:13:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id;
-        bh=uFKS1WFTegraebrT+gI7cJRe7sDUnuGWyUREin+ouco=;
-        b=YkfygmwWDmCVEsZLunBUBrilsLiA7IDScQtDDzAj1O22eaBGUAhpgnVjJ0bPLP2DV8
-         ABXF+F3OcIAaOOSmIBZjD5lHAQfWI7rXaceSqRgKG5X1PDlzYeoBg/xafuj3LjCrlPbG
-         AAhmkmcgCP2q9NnjFZK++3AjbBI6/eKREP579HKQQvtgTA6ivrz2C0hSflYVX7q3g93W
-         JxHKKEO3j7OVCYMBwgNK8FeBGqowy0bELkQW6ZC5M+Ge1sIvKOZ9kOJt9rLkCbR8rPYx
-         k69yWUvo9XBnvaEtZRYMxs0OHY6L0TGhr6F8VTuOwdb4/CAQoohkMsNrprP0dG+EuDCs
-         VAIw==
+        d=bytedance-com.20150623.gappssmtp.com; s=20150623;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=oPn6nrbtIIi/otRhY/sdadda9UqY0FLEvAtSn1BGbPk=;
+        b=jLoGDYGY3a5INx2p3ZGtEjh5krsUmpMORqpU/X5oAFvhXFQbvFNcR4/xoxTy/3PUZd
+         TUMKdWcs92hQMy6cgZj9u2+DbJ4iWSb/dUaUKR/C+D2nsjjH6cV+nY43CXZQc4JahNPG
+         LdpK1lJO5C63OAMfWYHkyFWegVdayQhceCm+o1fGGF6Sp5dGw7LbHFIR3uFqWliqmdC9
+         +Fzq7Kni01pKs7Axa5cwY4xoQ6+QevG+P/gOPB5Y2ThaseQV+MG7WE7CBoJFAxlABn13
+         Hjls2V/6Bw+kDhDU4492BagFy/ptGpuuybUajRRbm0onh+i/PTVwHJD4x1FBZwNxpEZB
+         ttGg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id;
-        bh=uFKS1WFTegraebrT+gI7cJRe7sDUnuGWyUREin+ouco=;
-        b=eye7gZm7ZBS/u9+fCKv1lw6eXO9ST7gJ7y/hJGkb5l2HaZOtKH/odfUoqy6PKbIWq1
-         IJYvaiN05Im+SZmeDfygmyEjht5ZB/R72bjDqTM+eAHVkAYAOZEsFBcAONvi6JeQw7hZ
-         nSzTB7hsEMc5AC9qhd/tRFCbzr4EulsBviWAHLff0Nh5aGamSlcZmPvPAT+C4S9GSvyu
-         iM+y2sUPJsy7QFauOR2U/xJFQCXcZQfFtvl/lXwwtQQLg6aA5B1DLt3YIq0rTLw0b8hO
-         qCG6juPjKhSWsrUzy6ogT24VMUgcYWM87wQgxCAZRo4320f/K6bRnwuLIJENk+eZYm/D
-         yQXg==
-X-Gm-Message-State: AOAM530rkO/AKe8xz5/1c/n0dzumQbu5hRlztZng+fZN264fACVrbstb
-        JDUZw7gTSKVI4AoCONHhLzVNoFkpUuw=
-X-Google-Smtp-Source: ABdhPJxvnnkermnsBPvw4vDQQcMspMPBLn164mh+/HbqfeJn6OqJVYNt2NtPxYaMdKw34BrqNa7PsA==
-X-Received: by 2002:a63:c111:: with SMTP id w17mr6101708pgf.127.1618542503102;
-        Thu, 15 Apr 2021 20:08:23 -0700 (PDT)
-Received: from localhost.localdomain ([103.7.29.6])
-        by smtp.googlemail.com with ESMTPSA id r1sm3654698pfh.153.2021.04.15.20.08.20
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 15 Apr 2021 20:08:22 -0700 (PDT)
-From:   Wanpeng Li <kernellwp@gmail.com>
-X-Google-Original-From: Wanpeng Li <wanpengli@tencent.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>
-Subject: [PATCH] KVM: Boost vCPU candidiate in user mode which is delivering interrupt
-Date:   Fri, 16 Apr 2021 11:08:10 +0800
-Message-Id: <1618542490-14756-1-git-send-email-wanpengli@tencent.com>
-X-Mailer: git-send-email 2.7.4
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=oPn6nrbtIIi/otRhY/sdadda9UqY0FLEvAtSn1BGbPk=;
+        b=qGbv0RrkCE3AC5uQwAICRUZNl0t/1WGnCheAm7qb11dgjhMaTIr3V2I9azq8S2F4WJ
+         3x8/oSr6sJJfFvUUynoqSpva7fBjhPFiMs3fbKdmOUDsPuEAiR4oXFugmlMBxqbuin6T
+         ANXu7PjO7NprDonZsPR2QRnm+pgStn5bdbXh5+Fr6Iq5rBTuz89HqF+iYOp+uFWtAuxI
+         M2ucP/xrH9lFDhgK1Hvf12fE76NAVrKuZ8MkKo5fUCi/BdRhIpN1ZmqNO71GsbZSnzAd
+         C3gNRZOBngR1wpCaQr5L+tGUrjKHNjd9AFUshtKDnLQSXQDHB6X4pnd8puIP95c6B2oW
+         GGzw==
+X-Gm-Message-State: AOAM532pCTiHv+gDtfTq1Aym3uIum1yBKYf2P7457m7dw1WzqdprZglg
+        cIGLb/gofRo0A3PK/xClwzqkmKF7+pksWsEjCTpx
+X-Google-Smtp-Source: ABdhPJyUlL90ZzXalWJXx8x39M0xoyCR8uJMNvALHlYLKd5/jJj401j1kaYO/M9OEl4x96SAQPWJT3mAagbavWrSL+Y=
+X-Received: by 2002:a17:906:af5a:: with SMTP id ly26mr6250717ejb.372.1618542831901;
+ Thu, 15 Apr 2021 20:13:51 -0700 (PDT)
+MIME-Version: 1.0
+References: <20210331080519.172-1-xieyongji@bytedance.com> <20210331080519.172-11-xieyongji@bytedance.com>
+ <YHb44R4HyLEUVSTF@stefanha-x1.localdomain> <CACycT3uNR+nZY5gY0UhPkeOyi7Za6XkX4b=hasuDcgqdc7fqfg@mail.gmail.com>
+ <YHfo8pc7dIO9lNc3@stefanha-x1.localdomain> <80b31814-9e41-3153-7efb-c0c2fab44feb@redhat.com>
+ <YHhP4i+yXgA2KkVJ@stefanha-x1.localdomain>
+In-Reply-To: <YHhP4i+yXgA2KkVJ@stefanha-x1.localdomain>
+From:   Yongji Xie <xieyongji@bytedance.com>
+Date:   Fri, 16 Apr 2021 11:13:41 +0800
+Message-ID: <CACycT3uNNbDPdxDk+0ry4vRJ4PU0oKqbpwc9bqKPOJHBcyLnww@mail.gmail.com>
+Subject: Re: Re: [PATCH v6 10/10] Documentation: Add documentation for VDUSE
+To:     Stefan Hajnoczi <stefanha@redhat.com>
+Cc:     Jason Wang <jasowang@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        Parav Pandit <parav@nvidia.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Christian Brauner <christian.brauner@canonical.com>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Matthew Wilcox <willy@infradead.org>, viro@zeniv.linux.org.uk,
+        Jens Axboe <axboe@kernel.dk>, bcrl@kvack.org,
+        Jonathan Corbet <corbet@lwn.net>,
+        =?UTF-8?Q?Mika_Penttil=C3=A4?= <mika.penttila@nextfour.com>,
+        Dan Carpenter <dan.carpenter@oracle.com>,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        kvm@vger.kernel.org, linux-fsdevel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Wanpeng Li <wanpengli@tencent.com>
+On Thu, Apr 15, 2021 at 10:38 PM Stefan Hajnoczi <stefanha@redhat.com> wrot=
+e:
+>
+> On Thu, Apr 15, 2021 at 04:36:35PM +0800, Jason Wang wrote:
+> >
+> > =E5=9C=A8 2021/4/15 =E4=B8=8B=E5=8D=883:19, Stefan Hajnoczi =E5=86=99=
+=E9=81=93:
+> > > On Thu, Apr 15, 2021 at 01:38:37PM +0800, Yongji Xie wrote:
+> > > > On Wed, Apr 14, 2021 at 10:15 PM Stefan Hajnoczi <stefanha@redhat.c=
+om> wrote:
+> > > > > On Wed, Mar 31, 2021 at 04:05:19PM +0800, Xie Yongji wrote:
+> > > > > > VDUSE (vDPA Device in Userspace) is a framework to support
+> > > > > > implementing software-emulated vDPA devices in userspace. This
+> > > > > > document is intended to clarify the VDUSE design and usage.
+> > > > > >
+> > > > > > Signed-off-by: Xie Yongji <xieyongji@bytedance.com>
+> > > > > > ---
+> > > > > >   Documentation/userspace-api/index.rst |   1 +
+> > > > > >   Documentation/userspace-api/vduse.rst | 212 +++++++++++++++++=
++++++++++++++++++
+> > > > > >   2 files changed, 213 insertions(+)
+> > > > > >   create mode 100644 Documentation/userspace-api/vduse.rst
+> > > > > Just looking over the documentation briefly (I haven't studied th=
+e code
+> > > > > yet)...
+> > > > >
+> > > > Thank you!
+> > > >
+> > > > > > +How VDUSE works
+> > > > > > +------------
+> > > > > > +Each userspace vDPA device is created by the VDUSE_CREATE_DEV =
+ioctl on
+> > > > > > +the character device (/dev/vduse/control). Then a device file =
+with the
+> > > > > > +specified name (/dev/vduse/$NAME) will appear, which can be us=
+ed to
+> > > > > > +implement the userspace vDPA device's control path and data pa=
+th.
+> > > > > These steps are taken after sending the VDPA_CMD_DEV_NEW netlink
+> > > > > message? (Please consider reordering the documentation to make it=
+ clear
+> > > > > what the sequence of steps are.)
+> > > > >
+> > > > No, VDUSE devices should be created before sending the
+> > > > VDPA_CMD_DEV_NEW netlink messages which might produce I/Os to VDUSE=
+.
+> > > I see. Please include an overview of the steps before going into deta=
+il.
+> > > Something like:
+> > >
+> > >    VDUSE devices are started as follows:
+> > >
+> > >    1. Create a new VDUSE instance with ioctl(VDUSE_CREATE_DEV) on
+> > >       /dev/vduse/control.
+> > >
+> > >    2. Begin processing VDUSE messages from /dev/vduse/$NAME. The firs=
+t
+> > >       messages will arrive while attaching the VDUSE instance to vDPA=
+.
+> > >
+> > >    3. Send the VDPA_CMD_DEV_NEW netlink message to attach the VDUSE
+> > >       instance to vDPA.
+> > >
+> > >    VDUSE devices are stopped as follows:
+> > >
+> > >    ...
+> > >
+> > > > > > +     static int netlink_add_vduse(const char *name, int device=
+_id)
+> > > > > > +     {
+> > > > > > +             struct nl_sock *nlsock;
+> > > > > > +             struct nl_msg *msg;
+> > > > > > +             int famid;
+> > > > > > +
+> > > > > > +             nlsock =3D nl_socket_alloc();
+> > > > > > +             if (!nlsock)
+> > > > > > +                     return -ENOMEM;
+> > > > > > +
+> > > > > > +             if (genl_connect(nlsock))
+> > > > > > +                     goto free_sock;
+> > > > > > +
+> > > > > > +             famid =3D genl_ctrl_resolve(nlsock, VDPA_GENL_NAM=
+E);
+> > > > > > +             if (famid < 0)
+> > > > > > +                     goto close_sock;
+> > > > > > +
+> > > > > > +             msg =3D nlmsg_alloc();
+> > > > > > +             if (!msg)
+> > > > > > +                     goto close_sock;
+> > > > > > +
+> > > > > > +             if (!genlmsg_put(msg, NL_AUTO_PORT, NL_AUTO_SEQ, =
+famid, 0, 0,
+> > > > > > +                 VDPA_CMD_DEV_NEW, 0))
+> > > > > > +                     goto nla_put_failure;
+> > > > > > +
+> > > > > > +             NLA_PUT_STRING(msg, VDPA_ATTR_DEV_NAME, name);
+> > > > > > +             NLA_PUT_STRING(msg, VDPA_ATTR_MGMTDEV_DEV_NAME, "=
+vduse");
+> > > > > > +             NLA_PUT_U32(msg, VDPA_ATTR_DEV_ID, device_id);
+> > > > > What are the permission/capability requirements for VDUSE?
+> > > > >
+> > > > Now I think we need privileged permission (root user). Because
+> > > > userspace daemon is able to access avail vring, used vring, descrip=
+tor
+> > > > table in kernel driver directly.
+> > > Please state this explicitly at the start of the document. Existing
+> > > interfaces like FUSE are designed to avoid trusting userspace.
+> >
+> >
+> > There're some subtle difference here. VDUSE present a device to kernel =
+which
+> > means IOMMU is probably the only thing to prevent a malicous device.
+> >
+> >
+> > > Therefore
+> > > people might think the same is the case here. It's critical that peop=
+le
+> > > are aware of this before deploying VDUSE with virtio-vdpa.
+> > >
+> > > We should probably pause here and think about whether it's possible t=
+o
+> > > avoid trusting userspace. Even if it takes some effort and costs some
+> > > performance it would probably be worthwhile.
+> >
+> >
+> > Since the bounce buffer is used the only attack surface is the coherent
+> > area, if we want to enforce stronger isolation we need to use shadow
+> > virtqueue (which is proposed in earlier version by me) in this case. Bu=
+t I'm
+> > not sure it's worth to do that.
+>
+> The security situation needs to be clear before merging this feature.
+>
+> I think the IOMMU and vring can be made secure. What is more concerning
+> is the kernel code that runs on top: VIRTIO device drivers, network
+> stack, file systems, etc. They trust devices to an extent.
+>
 
-Both lock holder vCPU and IPI receiver that has halted are condidate for 
-boost. However, the PLE handler was originally designed to deal with the 
-lock holder preemption problem. The Intel PLE occurs when the spinlock 
-waiter is in kernel mode. This assumption doesn't hold for IPI receiver, 
-they can be in either kernel or user mode. the vCPU candidate in user mode 
-will not be boosted even if they should respond to IPIs. Some benchmarks 
-like pbzip2, swaptions etc do the TLB shootdown in kernel mode and most
-of the time they are running in user mode. It can lead to a large number 
-of continuous PLE events because the IPI sender causes PLE events 
-repeatedly until the receiver is scheduled while the receiver is not 
-candidate for a boost.
+I will dig into it to see if there is any security issue.
 
-This patch boosts the vCPU candidiate in user mode which is delivery 
-interrupt. We can observe the speed of pbzip2 improves 10% in 96 vCPUs 
-VM in over-subscribe scenario (The host machine is 2 socket, 48 cores, 
-96 HTs Intel CLX box). There is no performance regression for other 
-benchmarks like Unixbench spawn (most of the time contend read/write 
-lock in kernel mode), ebizzy (most of the time contend read/write sem 
-and TLB shoodtdown in kernel mode).
+> Since virtio-vdpa is a big reason for doing VDUSE in the first place I
+> don't think it makes sense to disable virtio-vdpa with VDUSE. A solution
+> is needed.
+>
+> I'm going to be offline for a week and don't want to be a bottleneck.
+> I'll catch up when I'm back.
+>
 
-Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
----
- arch/x86/kvm/x86.c       | 8 ++++++++
- include/linux/kvm_host.h | 1 +
- virt/kvm/kvm_main.c      | 6 ++++++
- 3 files changed, 15 insertions(+)
+Thanks for your comments!
 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 0d2dd3f..0f16fa5 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -11069,6 +11069,14 @@ bool kvm_arch_dy_runnable(struct kvm_vcpu *vcpu)
- 	return false;
- }
- 
-+bool kvm_arch_interrupt_delivery(struct kvm_vcpu *vcpu)
-+{
-+	if (vcpu->arch.apicv_active && static_call(kvm_x86_dy_apicv_has_pending_interrupt)(vcpu))
-+		return true;
-+
-+	return false;
-+}
-+
- bool kvm_arch_vcpu_in_kernel(struct kvm_vcpu *vcpu)
- {
- 	return vcpu->arch.preempted_in_kernel;
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index 3b06d12..5012fc4 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -954,6 +954,7 @@ int kvm_arch_vcpu_runnable(struct kvm_vcpu *vcpu);
- bool kvm_arch_vcpu_in_kernel(struct kvm_vcpu *vcpu);
- int kvm_arch_vcpu_should_kick(struct kvm_vcpu *vcpu);
- bool kvm_arch_dy_runnable(struct kvm_vcpu *vcpu);
-+bool kvm_arch_interrupt_delivery(struct kvm_vcpu *vcpu);
- int kvm_arch_post_init_vm(struct kvm *kvm);
- void kvm_arch_pre_destroy_vm(struct kvm *kvm);
- 
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 0a481e7..781d2db 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -3012,6 +3012,11 @@ static bool vcpu_dy_runnable(struct kvm_vcpu *vcpu)
- 	return false;
- }
- 
-+bool __weak kvm_arch_interrupt_delivery(struct kvm_vcpu *vcpu)
-+{
-+	return false;
-+}
-+
- void kvm_vcpu_on_spin(struct kvm_vcpu *me, bool yield_to_kernel_mode)
- {
- 	struct kvm *kvm = me->kvm;
-@@ -3045,6 +3050,7 @@ void kvm_vcpu_on_spin(struct kvm_vcpu *me, bool yield_to_kernel_mode)
- 			    !vcpu_dy_runnable(vcpu))
- 				continue;
- 			if (READ_ONCE(vcpu->preempted) && yield_to_kernel_mode &&
-+				!kvm_arch_interrupt_delivery(vcpu) &&
- 				!kvm_arch_vcpu_in_kernel(vcpu))
- 				continue;
- 			if (!kvm_vcpu_eligible_for_directed_yield(vcpu))
--- 
-2.7.4
-
+Thanks,
+Yongji
