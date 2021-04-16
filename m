@@ -2,107 +2,127 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0BB5836219C
-	for <lists+kvm@lfdr.de>; Fri, 16 Apr 2021 16:02:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 06973362305
+	for <lists+kvm@lfdr.de>; Fri, 16 Apr 2021 16:52:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235832AbhDPOCc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 16 Apr 2021 10:02:32 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:31682 "EHLO
+        id S244843AbhDPOmU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 16 Apr 2021 10:42:20 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:39735 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S235196AbhDPOCb (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 16 Apr 2021 10:02:31 -0400
+        by vger.kernel.org with ESMTP id S244855AbhDPOmM (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 16 Apr 2021 10:42:12 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1618581726;
+        s=mimecast20190719; t=1618584107;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=CsnX1uUtSEgpJZw9F0YXVXLSEsEMxeYY82QRT9JM2Rk=;
-        b=Po1KaRl+FyI6ydQu4NnEXheVMBDYtduQDknm7997b3eh7eaYt+cyn6tXMcMWUo1JDYl5W+
-        aQE1OP0sON/v6W3D8G8iFwOBuY25n6OtFcMmmSOUCVucUEEskDR2e57lOIjSsIFOSXtNL7
-        pWyiq0YYVrBGsPtH6ahD/mU3UuDYHP8=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-511-aq4zODGkO7C-snObLl_OOA-1; Fri, 16 Apr 2021 10:02:04 -0400
-X-MC-Unique: aq4zODGkO7C-snObLl_OOA-1
-Received: by mail-ed1-f69.google.com with SMTP id bm19-20020a0564020b13b02903789d6e74b5so7025090edb.21
-        for <kvm@vger.kernel.org>; Fri, 16 Apr 2021 07:02:04 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=CsnX1uUtSEgpJZw9F0YXVXLSEsEMxeYY82QRT9JM2Rk=;
-        b=IoR3tueO1Ix6Cx8pq5V4FGkY+PutH4xk9SMEOOiShTMFQyWID4JtF397Dt6ctrenQg
-         ofIfC6g67pk7UhloIOUBhMAw/hyMjvf8mu7rc9R8AxqF5zl+o+L8TmtRh2XZQzxJ1Cv+
-         ggrTkdHQDT9rGYYTLMA5pjxzEAwNSG5tefo09C697cMKE/8/+drRoMiOPCKu+jqEW7tl
-         ctZ6tgoOHp3SS3XWfWvENARPzielF0YKjyaQNOzaM9X2ha/9V8hnIQPwRmRchKnqAVlS
-         dn95I1XtDQzH8GSTqpxVcs5WpPeyvzCryV2GplO2MK6iZJ7WYL6DhsaiTiz23Bqprqss
-         n6Uw==
-X-Gm-Message-State: AOAM532wxzUyS7ltiLSRYksVa+2bge0+tOGEh15PRWdMQ+ILj4toaryY
-        uqTTVvrEjrvmd39B2MJnDW8/lIZYAnePWB0dXTSkTV2eD93bLnShT2uuHVjPXVMYu1mjqrkVD4t
-        Iyuqr1KkyoN8M
-X-Received: by 2002:a05:6402:2552:: with SMTP id l18mr9944470edb.71.1618581723041;
-        Fri, 16 Apr 2021 07:02:03 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxER520adn508n7gqk1PlMU2QCKke3crrQVS65fvfRhHVdi9QlT7AtgFN9IE4YPxeKcEvIP2g==
-X-Received: by 2002:a05:6402:2552:: with SMTP id l18mr9944450edb.71.1618581722818;
-        Fri, 16 Apr 2021 07:02:02 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id jl8sm375691ejc.122.2021.04.16.07.02.01
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 16 Apr 2021 07:02:02 -0700 (PDT)
-Subject: Re: linux-next: Fixes tag needs some work in the kvm tree
-To:     Christian Borntraeger <borntraeger@de.ibm.com>,
-        Stephen Rothwell <sfr@canb.auug.org.au>,
-        KVM <kvm@vger.kernel.org>
-Cc:     Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Next Mailing List <linux-next@vger.kernel.org>
-References: <20210416222731.3e82b3a0@canb.auug.org.au>
- <00222197-fb22-ab0a-97e2-11c9f85a67f1@de.ibm.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <2b825142-fdd9-be35-6d88-bb3b9c985122@redhat.com>
-Date:   Fri, 16 Apr 2021 16:02:01 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.7.0
+        bh=69SR1XrRy7ZrnGBaFQtD0Qy5QiGIoUIwjD4dmBMDvsE=;
+        b=DH4kWjWVYuiKLmt/9Z1EWkcpdrhrSAv5KvboOwKuOpcohmzhHAc1WURqSPX22U9LKNRdLs
+        TXCDnIicyzHDX1VS7q0I2C0CjjiDf8BUP6WCBilRZoLzbYdXoCT0cIgN8WnbXy4y2c8bUN
+        YkiPU6qRLcRNESn12fCkXPTOU7vwMmo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-143-trGUW47AN22_GRuSFIqgIw-1; Fri, 16 Apr 2021 10:41:43 -0400
+X-MC-Unique: trGUW47AN22_GRuSFIqgIw-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9D5F0801814;
+        Fri, 16 Apr 2021 14:41:41 +0000 (UTC)
+Received: from gondolin (ovpn-113-152.ams2.redhat.com [10.36.113.152])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 4EBEE19CBE;
+        Fri, 16 Apr 2021 14:41:40 +0000 (UTC)
+Date:   Fri, 16 Apr 2021 16:41:37 +0200
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Eric Farman <farman@linux.ibm.com>
+Cc:     Halil Pasic <pasic@linux.ibm.com>,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        Jared Rossi <jrossi@linux.ibm.com>, linux-s390@vger.kernel.org,
+        kvm@vger.kernel.org
+Subject: Re: [RFC PATCH v4 2/4] vfio-ccw: Check workqueue before doing START
+Message-ID: <20210416164137.23f4631b.cohuck@redhat.com>
+In-Reply-To: <577e873506ef60dd988653b8b28898e306e7493f.camel@linux.ibm.com>
+References: <20210413182410.1396170-1-farman@linux.ibm.com>
+        <20210413182410.1396170-3-farman@linux.ibm.com>
+        <20210415125131.33065221.cohuck@redhat.com>
+        <ac08eb1143b5d354b8bcaf9117178fbd91bc2af2.camel@linux.ibm.com>
+        <20210415181951.2f13fdcc.cohuck@redhat.com>
+        <577e873506ef60dd988653b8b28898e306e7493f.camel@linux.ibm.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-In-Reply-To: <00222197-fb22-ab0a-97e2-11c9f85a67f1@de.ibm.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 16/04/21 14:38, Christian Borntraeger wrote:
-> On 16.04.21 14:27, Stephen Rothwell wrote:
->> Hi all,
->>
->> In commit
->>
->>    c3171e94cc1c ("KVM: s390: VSIE: fix MVPG handling for prefixing and 
->> MSO")
->>
->> Fixes tag
->>
->>    Fixes: bdf7509bbefa ("s390/kvm: VSIE: correctly handle MVPG when in 
->> VSIE")
->>
->> has these problem(s):
->>
->>    - Subject does not match target commit subject
->>      Just use
->>     git log -1 --format='Fixes: %h ("%s")'
+On Thu, 15 Apr 2021 14:42:21 -0400
+Eric Farman <farman@linux.ibm.com> wrote:
+
+> On Thu, 2021-04-15 at 18:19 +0200, Cornelia Huck wrote:
+> > On Thu, 15 Apr 2021 09:48:37 -0400
+> > Eric Farman <farman@linux.ibm.com> wrote:
+> >   
+> > > On Thu, 2021-04-15 at 12:51 +0200, Cornelia Huck wrote:  
+> > > > I'm wondering what we should do for hsch. We probably want to
+> > > > return
+> > > > -EBUSY for a pending condition as well, if I read the PoP
+> > > > correctly...    
+> > > 
+> > > Ah, yes...  I agree that to maintain parity with ssch and pops, the
+> > > same cc1/-EBUSY would be applicable here. Will make that change in
+> > > next
+> > > version.  
+> > 
+> > Yes, just to handle things in the same fashion consistently.
+> >   
+> > > > the only problem is that QEMU seems to match everything to 0; but
+> > > > that
+> > > > is arguably not the kernel's problem.
+> > > > 
+> > > > For clear, we obviously don't have busy conditions. Should we
+> > > > clean
+> > > > up
+> > > > any pending conditions?    
+> > > 
+> > > By doing anything other than issuing the csch to the subchannel?  I
+> > > don't think so, that should be more than enough to get the css and
+> > > vfio-ccw in sync with each other.  
+> > 
+> > Hm, doesn't a successful csch clear any status pending?   
 > 
-> Hmm, this has been sitting in kvms390/next for some time now. Is this a 
-> new check?
+> Yep.
 > 
+> > That would mean
+> > that invoking our csch backend implies that we won't deliver the
+> > status
+> > pending that is already pending via the workqueue, which therefore
+> > needs to be flushed out in some way?   
+> 
+> Ah, so I misunderstood the direction you were going... I'm not aware of
+> a way to "purge" items from a workqueue, as the flush_workqueue()
+> routine is documented as picking them off and running them.
+> 
+> Perhaps an atomic flag in (private? cp?) that causes
+> vfio_ccw_sch_io_todo() to just exit rather than doing all its stuff?
 
-Maybe you just missed it when it was reported for kvms390?
+Yes, maybe something like that.
 
-https://www.spinics.net/lists/linux-next/msg59652.html
+Maybe we should do that on top once we have a good idea, if the current
+series already fixes the problems that are actually happening now and
+then.
 
-The SHA1 is stable now so it's too late.  It's not a big deal I guess.
+> 
+> > I remember we did some special
+> > csch handling, but I don't immediately see where; might have been
+> > only
+> > in QEMU.
+> >   
+> 
+> Maybe.  I don't see anything jumping out at me though. :(
 
-Paolo
+I might have misremembered; it only really applies to passthrough, as
+emulated subchannels are handled synchronously anyway.
 
