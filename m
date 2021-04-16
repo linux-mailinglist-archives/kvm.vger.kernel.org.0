@@ -2,166 +2,150 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0DD703617F1
-	for <lists+kvm@lfdr.de>; Fri, 16 Apr 2021 05:03:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6BB79361812
+	for <lists+kvm@lfdr.de>; Fri, 16 Apr 2021 05:08:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234894AbhDPDDp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 15 Apr 2021 23:03:45 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:47159 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234548AbhDPDDn (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 15 Apr 2021 23:03:43 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1618542198;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=ikyH2z8Vt7uMI/VG6XB6eSk4QGEm2QFd/gz535ClrYI=;
-        b=BASWjgEYLJMnmwstVjFjieUWjo7ikxv/iaUmpMEeRrRtOR3CzLRVwhNyGwcWQU4vI/KhC7
-        frwpso8QTcxru3pxOGSU9WJMO79Q2eVGwwUJKwyVBRJ65NYwHacLOml6LAte7kBdSSIyBD
-        cZVfTL9GbTFDlt3NFjfbxTJARy00R74=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-68-ByMz4XzrPpGli7s2BmtqTA-1; Thu, 15 Apr 2021 23:03:16 -0400
-X-MC-Unique: ByMz4XzrPpGli7s2BmtqTA-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8D9EB81744F;
-        Fri, 16 Apr 2021 03:03:14 +0000 (UTC)
-Received: from wangxiaodeMacBook-Air.local (ovpn-13-140.pek2.redhat.com [10.72.13.140])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id F395B60BE5;
-        Fri, 16 Apr 2021 03:02:58 +0000 (UTC)
-Subject: Re: [PATCH v6 10/10] Documentation: Add documentation for VDUSE
-To:     Yongji Xie <xieyongji@bytedance.com>
-Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        Parav Pandit <parav@nvidia.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Christian Brauner <christian.brauner@canonical.com>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Matthew Wilcox <willy@infradead.org>, viro@zeniv.linux.org.uk,
-        Jens Axboe <axboe@kernel.dk>, bcrl@kvack.org,
-        Jonathan Corbet <corbet@lwn.net>,
-        =?UTF-8?Q?Mika_Penttil=c3=a4?= <mika.penttila@nextfour.com>,
-        Dan Carpenter <dan.carpenter@oracle.com>,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        kvm@vger.kernel.org, linux-fsdevel@vger.kernel.org
-References: <20210331080519.172-1-xieyongji@bytedance.com>
- <20210331080519.172-11-xieyongji@bytedance.com>
- <YHb44R4HyLEUVSTF@stefanha-x1.localdomain>
- <CACycT3uNR+nZY5gY0UhPkeOyi7Za6XkX4b=hasuDcgqdc7fqfg@mail.gmail.com>
- <YHfo8pc7dIO9lNc3@stefanha-x1.localdomain>
- <80b31814-9e41-3153-7efb-c0c2fab44feb@redhat.com>
- <02c19c22-13ea-ea97-d99b-71edfee0b703@redhat.com>
- <CACycT3tL7URz3n-KhMAwYH+Sn1e1TSyfU+RKcc8jpPDJ7WcZ2w@mail.gmail.com>
- <5beabeaf-52a6-7ee5-b666-f3616ea82811@redhat.com>
- <CACycT3tyksBYxgbQLFJ-mFCKkaWotucM5_ho_K3q4wMpR0P=gw@mail.gmail.com>
-From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <17e3312e-686b-c5dd-852d-e9ffb7f4c707@redhat.com>
-Date:   Fri, 16 Apr 2021 11:02:57 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
- Gecko/20100101 Thunderbird/78.9.1
-MIME-Version: 1.0
-In-Reply-To: <CACycT3tyksBYxgbQLFJ-mFCKkaWotucM5_ho_K3q4wMpR0P=gw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+        id S235001AbhDPDIz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 15 Apr 2021 23:08:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34394 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234903AbhDPDIw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 15 Apr 2021 23:08:52 -0400
+Received: from mail-pf1-x42a.google.com (mail-pf1-x42a.google.com [IPv6:2607:f8b0:4864:20::42a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D3288C061574;
+        Thu, 15 Apr 2021 20:08:23 -0700 (PDT)
+Received: by mail-pf1-x42a.google.com with SMTP id n38so17430067pfv.2;
+        Thu, 15 Apr 2021 20:08:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id;
+        bh=uFKS1WFTegraebrT+gI7cJRe7sDUnuGWyUREin+ouco=;
+        b=YkfygmwWDmCVEsZLunBUBrilsLiA7IDScQtDDzAj1O22eaBGUAhpgnVjJ0bPLP2DV8
+         ABXF+F3OcIAaOOSmIBZjD5lHAQfWI7rXaceSqRgKG5X1PDlzYeoBg/xafuj3LjCrlPbG
+         AAhmkmcgCP2q9NnjFZK++3AjbBI6/eKREP579HKQQvtgTA6ivrz2C0hSflYVX7q3g93W
+         JxHKKEO3j7OVCYMBwgNK8FeBGqowy0bELkQW6ZC5M+Ge1sIvKOZ9kOJt9rLkCbR8rPYx
+         k69yWUvo9XBnvaEtZRYMxs0OHY6L0TGhr6F8VTuOwdb4/CAQoohkMsNrprP0dG+EuDCs
+         VAIw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=uFKS1WFTegraebrT+gI7cJRe7sDUnuGWyUREin+ouco=;
+        b=eye7gZm7ZBS/u9+fCKv1lw6eXO9ST7gJ7y/hJGkb5l2HaZOtKH/odfUoqy6PKbIWq1
+         IJYvaiN05Im+SZmeDfygmyEjht5ZB/R72bjDqTM+eAHVkAYAOZEsFBcAONvi6JeQw7hZ
+         nSzTB7hsEMc5AC9qhd/tRFCbzr4EulsBviWAHLff0Nh5aGamSlcZmPvPAT+C4S9GSvyu
+         iM+y2sUPJsy7QFauOR2U/xJFQCXcZQfFtvl/lXwwtQQLg6aA5B1DLt3YIq0rTLw0b8hO
+         qCG6juPjKhSWsrUzy6ogT24VMUgcYWM87wQgxCAZRo4320f/K6bRnwuLIJENk+eZYm/D
+         yQXg==
+X-Gm-Message-State: AOAM530rkO/AKe8xz5/1c/n0dzumQbu5hRlztZng+fZN264fACVrbstb
+        JDUZw7gTSKVI4AoCONHhLzVNoFkpUuw=
+X-Google-Smtp-Source: ABdhPJxvnnkermnsBPvw4vDQQcMspMPBLn164mh+/HbqfeJn6OqJVYNt2NtPxYaMdKw34BrqNa7PsA==
+X-Received: by 2002:a63:c111:: with SMTP id w17mr6101708pgf.127.1618542503102;
+        Thu, 15 Apr 2021 20:08:23 -0700 (PDT)
+Received: from localhost.localdomain ([103.7.29.6])
+        by smtp.googlemail.com with ESMTPSA id r1sm3654698pfh.153.2021.04.15.20.08.20
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 15 Apr 2021 20:08:22 -0700 (PDT)
+From:   Wanpeng Li <kernellwp@gmail.com>
+X-Google-Original-From: Wanpeng Li <wanpengli@tencent.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>
+Subject: [PATCH] KVM: Boost vCPU candidiate in user mode which is delivering interrupt
+Date:   Fri, 16 Apr 2021 11:08:10 +0800
+Message-Id: <1618542490-14756-1-git-send-email-wanpengli@tencent.com>
+X-Mailer: git-send-email 2.7.4
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+From: Wanpeng Li <wanpengli@tencent.com>
 
-在 2021/4/16 上午10:58, Yongji Xie 写道:
-> On Fri, Apr 16, 2021 at 10:20 AM Jason Wang <jasowang@redhat.com> wrote:
->>
->> 在 2021/4/15 下午7:17, Yongji Xie 写道:
->>> On Thu, Apr 15, 2021 at 5:05 PM Jason Wang <jasowang@redhat.com> wrote:
->>>> 在 2021/4/15 下午4:36, Jason Wang 写道:
->>>>>> Please state this explicitly at the start of the document. Existing
->>>>>> interfaces like FUSE are designed to avoid trusting userspace.
->>>>> There're some subtle difference here. VDUSE present a device to kernel
->>>>> which means IOMMU is probably the only thing to prevent a malicous
->>>>> device.
->>>>>
->>>>>
->>>>>> Therefore
->>>>>> people might think the same is the case here. It's critical that people
->>>>>> are aware of this before deploying VDUSE with virtio-vdpa.
->>>>>>
->>>>>> We should probably pause here and think about whether it's possible to
->>>>>> avoid trusting userspace. Even if it takes some effort and costs some
->>>>>> performance it would probably be worthwhile.
->>>>> Since the bounce buffer is used the only attack surface is the
->>>>> coherent area, if we want to enforce stronger isolation we need to use
->>>>> shadow virtqueue (which is proposed in earlier version by me) in this
->>>>> case. But I'm not sure it's worth to do that.
->>>>
->>>> So this reminds me the discussion in the end of last year. We need to
->>>> make sure we don't suffer from the same issues for VDUSE at least
->>>>
->>>> https://yhbt.net/lore/all/c3629a27-3590-1d9f-211b-c0b7be152b32@redhat.com/T/#mc6b6e2343cbeffca68ca7a97e0f473aaa871c95b
->>>>
->>>> Or we can solve it at virtio level, e.g remember the dma address instead
->>>> of depending on the addr in the descriptor ring
->>>>
->>> I might miss something. But VDUSE has recorded the dma address during
->>> dma mapping, so we would not do bouncing if the addr/length is invalid
->>> during dma unmapping. Is it enough?
->>
->> E.g malicous device write a buggy dma address in the descriptor ring, so
->> we had:
->>
->> vring_unmap_one_split(desc->addr, desc->len)
->>       dma_unmap_single()
->>           vduse_dev_unmap_page()
->>               vduse_domain_bounce()
->>
->> And in vduse_domain_bounce() we had:
->>
->>           while (size) {
->>                   map = &domain->bounce_maps[iova >> PAGE_SHIFT];
->>                   offset = offset_in_page(iova);
->>                   sz = min_t(size_t, PAGE_SIZE - offset, size);
->>
->> This means we trust the iova which is dangerous and exacly the issue
->> mentioned in the above link.
->>
->>   From VDUSE level need to make sure iova is legal.
->>
-> I think we already do that in vduse_domain_bounce():
->
->      while (size) {
->          map = &domain->bounce_maps[iova >> PAGE_SHIFT];
->
->          if (WARN_ON(!map->bounce_page ||
->              map->orig_phys == INVALID_PHYS_ADDR))
->              return;
+Both lock holder vCPU and IPI receiver that has halted are condidate for 
+boost. However, the PLE handler was originally designed to deal with the 
+lock holder preemption problem. The Intel PLE occurs when the spinlock 
+waiter is in kernel mode. This assumption doesn't hold for IPI receiver, 
+they can be in either kernel or user mode. the vCPU candidate in user mode 
+will not be boosted even if they should respond to IPIs. Some benchmarks 
+like pbzip2, swaptions etc do the TLB shootdown in kernel mode and most
+of the time they are running in user mode. It can lead to a large number 
+of continuous PLE events because the IPI sender causes PLE events 
+repeatedly until the receiver is scheduled while the receiver is not 
+candidate for a boost.
 
+This patch boosts the vCPU candidiate in user mode which is delivery 
+interrupt. We can observe the speed of pbzip2 improves 10% in 96 vCPUs 
+VM in over-subscribe scenario (The host machine is 2 socket, 48 cores, 
+96 HTs Intel CLX box). There is no performance regression for other 
+benchmarks like Unixbench spawn (most of the time contend read/write 
+lock in kernel mode), ebizzy (most of the time contend read/write sem 
+and TLB shoodtdown in kernel mode).
 
-So you don't check whether iova is legal before using it, so it's at 
-least a possible out of bound access of the bounce_maps[] isn't it? (e.g 
-what happens if iova is ULLONG_MAX).
+Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
+---
+ arch/x86/kvm/x86.c       | 8 ++++++++
+ include/linux/kvm_host.h | 1 +
+ virt/kvm/kvm_main.c      | 6 ++++++
+ 3 files changed, 15 insertions(+)
 
-
->
->
->>   From virtio level, we should not truse desc->addr.
->>
-> We would not touch desc->addr after vring_unmap_one_split(). So I'm
-> not sure what we need to do at the virtio level.
-
-
-I think the point is to record the dma addres/len somewhere instead of 
-reading them from descriptor ring.
-
-Thanks
-
-
->
-> Thanks,
-> Yongji
->
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 0d2dd3f..0f16fa5 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -11069,6 +11069,14 @@ bool kvm_arch_dy_runnable(struct kvm_vcpu *vcpu)
+ 	return false;
+ }
+ 
++bool kvm_arch_interrupt_delivery(struct kvm_vcpu *vcpu)
++{
++	if (vcpu->arch.apicv_active && static_call(kvm_x86_dy_apicv_has_pending_interrupt)(vcpu))
++		return true;
++
++	return false;
++}
++
+ bool kvm_arch_vcpu_in_kernel(struct kvm_vcpu *vcpu)
+ {
+ 	return vcpu->arch.preempted_in_kernel;
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index 3b06d12..5012fc4 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -954,6 +954,7 @@ int kvm_arch_vcpu_runnable(struct kvm_vcpu *vcpu);
+ bool kvm_arch_vcpu_in_kernel(struct kvm_vcpu *vcpu);
+ int kvm_arch_vcpu_should_kick(struct kvm_vcpu *vcpu);
+ bool kvm_arch_dy_runnable(struct kvm_vcpu *vcpu);
++bool kvm_arch_interrupt_delivery(struct kvm_vcpu *vcpu);
+ int kvm_arch_post_init_vm(struct kvm *kvm);
+ void kvm_arch_pre_destroy_vm(struct kvm *kvm);
+ 
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 0a481e7..781d2db 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -3012,6 +3012,11 @@ static bool vcpu_dy_runnable(struct kvm_vcpu *vcpu)
+ 	return false;
+ }
+ 
++bool __weak kvm_arch_interrupt_delivery(struct kvm_vcpu *vcpu)
++{
++	return false;
++}
++
+ void kvm_vcpu_on_spin(struct kvm_vcpu *me, bool yield_to_kernel_mode)
+ {
+ 	struct kvm *kvm = me->kvm;
+@@ -3045,6 +3050,7 @@ void kvm_vcpu_on_spin(struct kvm_vcpu *me, bool yield_to_kernel_mode)
+ 			    !vcpu_dy_runnable(vcpu))
+ 				continue;
+ 			if (READ_ONCE(vcpu->preempted) && yield_to_kernel_mode &&
++				!kvm_arch_interrupt_delivery(vcpu) &&
+ 				!kvm_arch_vcpu_in_kernel(vcpu))
+ 				continue;
+ 			if (!kvm_vcpu_eligible_for_directed_yield(vcpu))
+-- 
+2.7.4
 
