@@ -2,127 +2,164 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 06973362305
-	for <lists+kvm@lfdr.de>; Fri, 16 Apr 2021 16:52:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2497B362314
+	for <lists+kvm@lfdr.de>; Fri, 16 Apr 2021 16:52:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244843AbhDPOmU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 16 Apr 2021 10:42:20 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:39735 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S244855AbhDPOmM (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 16 Apr 2021 10:42:12 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1618584107;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=69SR1XrRy7ZrnGBaFQtD0Qy5QiGIoUIwjD4dmBMDvsE=;
-        b=DH4kWjWVYuiKLmt/9Z1EWkcpdrhrSAv5KvboOwKuOpcohmzhHAc1WURqSPX22U9LKNRdLs
-        TXCDnIicyzHDX1VS7q0I2C0CjjiDf8BUP6WCBilRZoLzbYdXoCT0cIgN8WnbXy4y2c8bUN
-        YkiPU6qRLcRNESn12fCkXPTOU7vwMmo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-143-trGUW47AN22_GRuSFIqgIw-1; Fri, 16 Apr 2021 10:41:43 -0400
-X-MC-Unique: trGUW47AN22_GRuSFIqgIw-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        id S245015AbhDPOo5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 16 Apr 2021 10:44:57 -0400
+Received: from mail.kernel.org ([198.145.29.99]:35750 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S244946AbhDPOoy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 16 Apr 2021 10:44:54 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9D5F0801814;
-        Fri, 16 Apr 2021 14:41:41 +0000 (UTC)
-Received: from gondolin (ovpn-113-152.ams2.redhat.com [10.36.113.152])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 4EBEE19CBE;
-        Fri, 16 Apr 2021 14:41:40 +0000 (UTC)
-Date:   Fri, 16 Apr 2021 16:41:37 +0200
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Eric Farman <farman@linux.ibm.com>
-Cc:     Halil Pasic <pasic@linux.ibm.com>,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        Jared Rossi <jrossi@linux.ibm.com>, linux-s390@vger.kernel.org,
-        kvm@vger.kernel.org
-Subject: Re: [RFC PATCH v4 2/4] vfio-ccw: Check workqueue before doing START
-Message-ID: <20210416164137.23f4631b.cohuck@redhat.com>
-In-Reply-To: <577e873506ef60dd988653b8b28898e306e7493f.camel@linux.ibm.com>
-References: <20210413182410.1396170-1-farman@linux.ibm.com>
-        <20210413182410.1396170-3-farman@linux.ibm.com>
-        <20210415125131.33065221.cohuck@redhat.com>
-        <ac08eb1143b5d354b8bcaf9117178fbd91bc2af2.camel@linux.ibm.com>
-        <20210415181951.2f13fdcc.cohuck@redhat.com>
-        <577e873506ef60dd988653b8b28898e306e7493f.camel@linux.ibm.com>
-Organization: Red Hat GmbH
-MIME-Version: 1.0
+        by mail.kernel.org (Postfix) with ESMTPSA id 9800161073;
+        Fri, 16 Apr 2021 14:44:29 +0000 (UTC)
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94)
+        (envelope-from <maz@kernel.org>)
+        id 1lXPhr-007sW3-CZ; Fri, 16 Apr 2021 15:44:27 +0100
+Date:   Fri, 16 Apr 2021 15:44:22 +0100
+Message-ID: <87a6py2ss9.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Keqian Zhu <zhukeqian1@huawei.com>
+Cc:     <linux-kernel@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>, <kvm@vger.kernel.org>,
+        <kvmarm@lists.cs.columbia.edu>, <wanghaibin.wang@huawei.com>
+Subject: Re: [PATCH v4 2/2] kvm/arm64: Try stage2 block mapping for host device MMIO
+In-Reply-To: <8f55b64f-b4dd-700e-c997-8de9c5ea282f@huawei.com>
+References: <20210415140328.24200-1-zhukeqian1@huawei.com>
+        <20210415140328.24200-3-zhukeqian1@huawei.com>
+        <8f55b64f-b4dd-700e-c997-8de9c5ea282f@huawei.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: zhukeqian1@huawei.com, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, wanghaibin.wang@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 15 Apr 2021 14:42:21 -0400
-Eric Farman <farman@linux.ibm.com> wrote:
-
-> On Thu, 2021-04-15 at 18:19 +0200, Cornelia Huck wrote:
-> > On Thu, 15 Apr 2021 09:48:37 -0400
-> > Eric Farman <farman@linux.ibm.com> wrote:
-> >   
-> > > On Thu, 2021-04-15 at 12:51 +0200, Cornelia Huck wrote:  
-> > > > I'm wondering what we should do for hsch. We probably want to
-> > > > return
-> > > > -EBUSY for a pending condition as well, if I read the PoP
-> > > > correctly...    
-> > > 
-> > > Ah, yes...  I agree that to maintain parity with ssch and pops, the
-> > > same cc1/-EBUSY would be applicable here. Will make that change in
-> > > next
-> > > version.  
+On Thu, 15 Apr 2021 15:08:09 +0100,
+Keqian Zhu <zhukeqian1@huawei.com> wrote:
+> 
+> Hi Marc,
+> 
+> On 2021/4/15 22:03, Keqian Zhu wrote:
+> > The MMIO region of a device maybe huge (GB level), try to use
+> > block mapping in stage2 to speedup both map and unmap.
 > > 
-> > Yes, just to handle things in the same fashion consistently.
-> >   
-> > > > the only problem is that QEMU seems to match everything to 0; but
-> > > > that
-> > > > is arguably not the kernel's problem.
-> > > > 
-> > > > For clear, we obviously don't have busy conditions. Should we
-> > > > clean
-> > > > up
-> > > > any pending conditions?    
-> > > 
-> > > By doing anything other than issuing the csch to the subchannel?  I
-> > > don't think so, that should be more than enough to get the css and
-> > > vfio-ccw in sync with each other.  
+> > Compared to normal memory mapping, we should consider two more
+> > points when try block mapping for MMIO region:
 > > 
-> > Hm, doesn't a successful csch clear any status pending?   
-> 
-> Yep.
-> 
-> > That would mean
-> > that invoking our csch backend implies that we won't deliver the
-> > status
-> > pending that is already pending via the workqueue, which therefore
-> > needs to be flushed out in some way?   
-> 
-> Ah, so I misunderstood the direction you were going... I'm not aware of
-> a way to "purge" items from a workqueue, as the flush_workqueue()
-> routine is documented as picking them off and running them.
-> 
-> Perhaps an atomic flag in (private? cp?) that causes
-> vfio_ccw_sch_io_todo() to just exit rather than doing all its stuff?
+> > 1. For normal memory mapping, the PA(host physical address) and
+> > HVA have same alignment within PUD_SIZE or PMD_SIZE when we use
+> > the HVA to request hugepage, so we don't need to consider PA
+> > alignment when verifing block mapping. But for device memory
+> > mapping, the PA and HVA may have different alignment.
+> > 
+> > 2. For normal memory mapping, we are sure hugepage size properly
+> > fit into vma, so we don't check whether the mapping size exceeds
+> > the boundary of vma. But for device memory mapping, we should pay
+> > attention to this.
+> > 
+> > This adds get_vma_page_shift() to get page shift for both normal
+> > memory and device MMIO region, and check these two points when
+> > selecting block mapping size for MMIO region.
+> > 
+> > Signed-off-by: Keqian Zhu <zhukeqian1@huawei.com>
+> > ---
+> >  arch/arm64/kvm/mmu.c | 61 ++++++++++++++++++++++++++++++++++++--------
+> >  1 file changed, 51 insertions(+), 10 deletions(-)
+> > 
+> > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> > index c59af5ca01b0..5a1cc7751e6d 100644
+> > --- a/arch/arm64/kvm/mmu.c
+> > +++ b/arch/arm64/kvm/mmu.c
+> > @@ -738,6 +738,35 @@ transparent_hugepage_adjust(struct kvm_memory_slot *memslot,
+> >  	return PAGE_SIZE;
+> >  }
+> >  
+> > +static int get_vma_page_shift(struct vm_area_struct *vma, unsigned long hva)
+> > +{
+> > +	unsigned long pa;
+> > +
+> > +	if (is_vm_hugetlb_page(vma) && !(vma->vm_flags & VM_PFNMAP))
+> > +		return huge_page_shift(hstate_vma(vma));
+> > +
+> > +	if (!(vma->vm_flags & VM_PFNMAP))
+> > +		return PAGE_SHIFT;
+> > +
+> > +	VM_BUG_ON(is_vm_hugetlb_page(vma));
+> > +
+> > +	pa = (vma->vm_pgoff << PAGE_SHIFT) + (hva - vma->vm_start);
+> > +
+> > +#ifndef __PAGETABLE_PMD_FOLDED
+> > +	if ((hva & (PUD_SIZE - 1)) == (pa & (PUD_SIZE - 1)) &&
+> > +	    ALIGN_DOWN(hva, PUD_SIZE) >= vma->vm_start &&
+> > +	    ALIGN(hva, PUD_SIZE) <= vma->vm_end)
+> > +		return PUD_SHIFT;
+> > +#endif
+> > +
+> > +	if ((hva & (PMD_SIZE - 1)) == (pa & (PMD_SIZE - 1)) &&
+> > +	    ALIGN_DOWN(hva, PMD_SIZE) >= vma->vm_start &&
+> > +	    ALIGN(hva, PMD_SIZE) <= vma->vm_end)
+> > +		return PMD_SHIFT;
+> > +
+> > +	return PAGE_SHIFT;
+> > +}
+> > +
+> >  static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+> >  			  struct kvm_memory_slot *memslot, unsigned long hva,
+> >  			  unsigned long fault_status)
+> > @@ -769,7 +798,10 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+> >  		return -EFAULT;
+> >  	}
+> >  
+> > -	/* Let's check if we will get back a huge page backed by hugetlbfs */
+> > +	/*
+> > +	 * Let's check if we will get back a huge page backed by hugetlbfs, or
+> > +	 * get block mapping for device MMIO region.
+> > +	 */
+> >  	mmap_read_lock(current->mm);
+> >  	vma = find_vma_intersection(current->mm, hva, hva + 1);
+> >  	if (unlikely(!vma)) {
+> > @@ -778,15 +810,15 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+> >  		return -EFAULT;
+> >  	}
+> >  
+> > -	if (is_vm_hugetlb_page(vma))
+> > -		vma_shift = huge_page_shift(hstate_vma(vma));
+> > -	else
+> > -		vma_shift = PAGE_SHIFT;
+> > -
+> > -	if (logging_active ||
+> > -	    (vma->vm_flags & VM_PFNMAP)) {
+> > +	/*
+> > +	 * logging_active is guaranteed to never be true for VM_PFNMAP
+> > +	 * memslots.
+> > +	 */
+> > +	if (logging_active) {
+> >  		force_pte = true;
+> >  		vma_shift = PAGE_SHIFT;
+> > +	} else {
+> > +		vma_shift = get_vma_page_shift(vma, hva);
+> >  	}
+> I use a if/else manner in v4, please check that. Thanks very much!
 
-Yes, maybe something like that.
+That's fine. However, it is getting a bit late for 5.13, and we don't
+have much time to left it simmer in -next. I'll probably wait until
+after the merge window to pick it up.
 
-Maybe we should do that on top once we have a good idea, if the current
-series already fixes the problems that are actually happening now and
-then.
+Thanks,
 
-> 
-> > I remember we did some special
-> > csch handling, but I don't immediately see where; might have been
-> > only
-> > in QEMU.
-> >   
-> 
-> Maybe.  I don't see anything jumping out at me though. :(
+	M.
 
-I might have misremembered; it only really applies to passthrough, as
-emulated subchannels are handled synchronously anyway.
-
+-- 
+Without deviation from the norm, progress is not possible.
