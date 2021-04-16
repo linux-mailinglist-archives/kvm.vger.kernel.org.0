@@ -2,83 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CB2B2361BDD
-	for <lists+kvm@lfdr.de>; Fri, 16 Apr 2021 11:00:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 37696361BE2
+	for <lists+kvm@lfdr.de>; Fri, 16 Apr 2021 11:00:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239831AbhDPIiI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 16 Apr 2021 04:38:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49708 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232442AbhDPIiI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 16 Apr 2021 04:38:08 -0400
-Received: from mail-ed1-x529.google.com (mail-ed1-x529.google.com [IPv6:2a00:1450:4864:20::529])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D712CC061574
-        for <kvm@vger.kernel.org>; Fri, 16 Apr 2021 01:37:43 -0700 (PDT)
-Received: by mail-ed1-x529.google.com with SMTP id e7so31202810edu.10
-        for <kvm@vger.kernel.org>; Fri, 16 Apr 2021 01:37:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:reply-to:from:date:message-id:subject:to;
-        bh=Gf5DdGQaLrtCkIF8R0njnqLSn7wVO3lU5G0spefPsVI=;
-        b=LmNXByOIhFlcs8qs6HanxiwgP5gQJMJ1KjpgyJX5AaPpRcyPIsHPhYg5Z/fpsehls+
-         uDFxzfI9DBpxZcsEPzwo9kW1Ph/8bg79CteJXTUL1LhUqgtIsXiUFLPIFdFn4qaV8Kex
-         WyT+I40d56fD0h7UBm6Gxc/nfrMcFhcZDc3G0/HBodkYFoBOXs3JdoR5EB+Bibpn3XHS
-         Tx7iwjlf9+K12067R1F4gKeowr9G9TTXCeV0TUa93y91cg4VAPwiIIIu+7uqprfv7W0G
-         eLNvNbnnvS1mSTCs90YfehqZ2L1IHPqnwpKrcp//gakzC/wSNrHjh29CJ82bAKkqJcVb
-         cFHA==
+        id S239038AbhDPIkl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 16 Apr 2021 04:40:41 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:56121 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S236538AbhDPIkj (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 16 Apr 2021 04:40:39 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1618562415;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=E/21KtrUJDrIPwXoawNEtFcajhDHUfFH4h+ED/BPh0I=;
+        b=VVK1Qu+j2n1Qavq9i6cWb2qbytZFCE1y64zdFyu9vZlEFRWcJuYEqY/1Rk0LypUwifiGX+
+        K6v18a2aXFx8MVChuXtuxwO8FaDwJpM6mpeSUD1QkvyiD9ECpmaqTlGbscjIzh/7Fe2bxv
+        7VkujnV7lNc8JzrSgHMKzWfU13z/97A=
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
+ [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-224-utcNFdFuPaSNkhK9H20LAw-1; Fri, 16 Apr 2021 04:40:11 -0400
+X-MC-Unique: utcNFdFuPaSNkhK9H20LAw-1
+Received: by mail-ed1-f72.google.com with SMTP id b9-20020a05640202c9b029038276b571ddso6618945edx.11
+        for <kvm@vger.kernel.org>; Fri, 16 Apr 2021 01:40:11 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:reply-to:from:date:message-id
-         :subject:to;
-        bh=Gf5DdGQaLrtCkIF8R0njnqLSn7wVO3lU5G0spefPsVI=;
-        b=gXLd0BvqLMI/Vvg1QSlIRZswHbNZbLbsyWnV6JYX6JHJpezV4blMJ5YR9g6RPAGiS3
-         Iuwzq9NpLOinthtRaB9AmF+cWGcSA6kX7lWWu8iGFo+0+aIKQdj/TGcnrRAW85BNYWJB
-         /ZcU+Ydl4Li4wlzBZKwu86Qs+4/LzDzLPB3UAm9EN8cfBVzKGciZOrPEh3IYO5Ev6we9
-         TYRIOtu1ClfawdipKa9IXJFG2A50+DFWq35sqnCPC3xwr68lxWMkUPpS4pDBAclk9Oc0
-         I1FIIOBYGCM65oRrhrFfwFlsaAAjaLBMZPoa8p5DxTRcTENTbb3aRvutoW/M3O11Yxvt
-         JTfg==
-X-Gm-Message-State: AOAM533EgBvefnNpusNPOgNCBa/lA7FlnBbYTqB/vlTWnexJ+nmOSaey
-        MdlATb65LUHYHXvLe0CbS9VUqzPmyOtxQDSBRS4=
-X-Google-Smtp-Source: ABdhPJw0ADn6E9mJ8VjSGap3UZKwJyW8I/7oxF/y0xS++FK98Lt5/GMWWscaS+pdNsqaE+BCdhjdT+vt9K+rAFrv46w=
-X-Received: by 2002:aa7:ca0f:: with SMTP id y15mr7512394eds.384.1618562262505;
- Fri, 16 Apr 2021 01:37:42 -0700 (PDT)
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=E/21KtrUJDrIPwXoawNEtFcajhDHUfFH4h+ED/BPh0I=;
+        b=pbfQgW722X5fnXoD05WKAynyjNXMGKKBT8HCJRGowOUVArk9rlonWKMNQTS/PSuUwm
+         WV7enEyH8GLLs0Ewhl0K5hHImAPWq6AAhGxxN9vGX+Wg9lepR5InXMq6JJxc/jxEHOp8
+         m0Jh64O+pDkhfhHvjD/xZYuOs3Mztb8wsLWC8jgyeFYbMbJc/+RwXpaLtjtyOSdo+Eyt
+         d6u4JIBS7wDtt4IcB/OQg2NZ6pzBMB2D3TCOhEGqMZIjtUKeKTBhKCSU2qGIPBve2FH1
+         EAbNKR92B0Ty7x3U4Xg1MleOfbyreIbSVyh6ExeUBSNwYGIc3zFMCLp6uV6xVVjLjCHH
+         zNAw==
+X-Gm-Message-State: AOAM531cM/JRiuX7ewOUkuRKh9B8pIeTGnluzdjZEoOXqNjVp7dvpCkx
+        /pD6iuXF+KUdueqxVOVxHlEMn+DUuXATuAVVN/Z3ROXYkuGAEgJOuRCwiyIPphd2IFjCV12PSqQ
+        oHZgyOuJS/9SH
+X-Received: by 2002:a17:906:2596:: with SMTP id m22mr7477027ejb.175.1618562410231;
+        Fri, 16 Apr 2021 01:40:10 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyzNJnhs14GfiKHmwxiwSXkMkIYSx3t9HmyGiPAFsuoDS423ZgZVJAbSWmQrlHtBpNbXS2xKA==
+X-Received: by 2002:a17:906:2596:: with SMTP id m22mr7477008ejb.175.1618562410070;
+        Fri, 16 Apr 2021 01:40:10 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e? ([2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e])
+        by smtp.gmail.com with ESMTPSA id b14sm4764203edx.39.2021.04.16.01.40.08
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 16 Apr 2021 01:40:09 -0700 (PDT)
+Subject: Re: [PATCH v2 3/7] KVM: x86: hyper-v: Move the remote TLB flush logic
+ out of vmx
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Vineeth Pillai <viremana@linux.microsoft.com>
+Cc:     "H. Peter Anvin" <hpa@zytor.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "K. Y. Srinivasan" <kys@microsoft.com>, x86@kernel.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-hyperv@vger.kernel.org,
+        Lan Tianyu <Tianyu.Lan@microsoft.com>,
+        Michael Kelley <mikelley@microsoft.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, Wei Liu <wei.liu@kernel.org>,
+        Stephen Hemminger <sthemmin@microsoft.com>,
+        Haiyang Zhang <haiyangz@microsoft.com>
+References: <cover.1618492553.git.viremana@linux.microsoft.com>
+ <92207433d0784e123347caaa955c04fbec51eaa7.1618492553.git.viremana@linux.microsoft.com>
+ <87y2di7hiz.fsf@vitty.brq.redhat.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <8a83b571-5c19-603e-193f-666b99a96461@redhat.com>
+Date:   Fri, 16 Apr 2021 10:40:07 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.7.0
 MIME-Version: 1.0
-Received: by 2002:a17:906:19d8:0:0:0:0 with HTTP; Fri, 16 Apr 2021 01:37:42
- -0700 (PDT)
-Reply-To: nnoelie64@gmail.com
-From:   Noelie Nikiema <jemillasmith57@gmail.com>
-Date:   Fri, 16 Apr 2021 01:37:42 -0700
-Message-ID: <CAL1ZfBsCp21QX=_-25dFBFjRkeCgPAjSUbC1L-XP-kMQAxRdGw@mail.gmail.com>
-Subject: Dear Beneficiary,
-To:     undisclosed-recipients:;
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <87y2di7hiz.fsf@vitty.brq.redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-2021 FUND RECOVERY / COMPENSATION PAYMENT DIRECTIVE OFFICE
+On 16/04/21 10:36, Vitaly Kuznetsov wrote:
+> - Create a dedicated set of files, e.g. 'kvmonhyperv.[ch]' (I also
+> thought about 'hyperv_host.[ch]' but then I realized it's equally
+> misleading as one can read this as 'KVM is acting as Hyper-V host').
+> 
+> Personally, I'd vote for the later. Besides eliminating confusion, the
+> benefit of having dedicated files is that we can avoid compiling them
+> completely when !IS_ENABLED(CONFIG_HYPERV) (#ifdefs in C are ugly).
 
- I am a foreign delegate from the United Nations fund recovery
-committee office/ compensation directive office , your name and
-address  are among the listed and approved people for this payments as
-one of the scammed victim, i wait your swift response for the
-immediate payments of your US$4,550.000.00 compensations funds.
+Indeed.  For the file, kvm-on-hv.[ch] can do.
 
-On this faith full recommendations, I want you to know that during the
-last UN meetings held at Africa ,it was alarmed so much by the rest of
-the world in the meetings on the lost of funds by various foreigners
-to the scams artists operating in syndicates all over the world today,
-in other to retain the good image of the country, the president UN is
-now paying 50 victims of this operators US$4,550.000.00 each, Due to
-the corrupt and inefficient banking systems in Africa, the payments
-are to be wired via direct transfer, online banking transfer or ATM
-visa card,
+Paolo
 
-According to the number of applicants at hand,12 beneficiaries has
-been paid ,half of the victims are from the United States and Asia, we
-still have more  left to be paid
-Waiting for your swift response in other to advice you on the next
-step how to process your payment.
-
-Thanks
-Dr. Noelie Nikiema
