@@ -2,31 +2,31 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2CBE2362439
-	for <lists+kvm@lfdr.de>; Fri, 16 Apr 2021 17:42:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E6E61362436
+	for <lists+kvm@lfdr.de>; Fri, 16 Apr 2021 17:41:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344033AbhDPPmO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 16 Apr 2021 11:42:14 -0400
-Received: from mga17.intel.com ([192.55.52.151]:10800 "EHLO mga17.intel.com"
+        id S1343964AbhDPPmL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 16 Apr 2021 11:42:11 -0400
+Received: from mga09.intel.com ([134.134.136.24]:4092 "EHLO mga09.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1343970AbhDPPmI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 16 Apr 2021 11:42:08 -0400
-IronPort-SDR: uWHD7F5t2HzlTcto9mPtvJcDEq9sES5hTS581oUnaruuGCDkBRGkG43VurwDmUL8y3VJxymj3J
- 1XinxyK2Ceyw==
-X-IronPort-AV: E=McAfee;i="6200,9189,9956"; a="175163936"
+        id S1343943AbhDPPmH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 16 Apr 2021 11:42:07 -0400
+IronPort-SDR: UnfIaZTA1WTwaplTy6pGqT4QKIXSSwzVUf6K5A1MPONKw6BU73gyEc5XP1G6rrGUCsC+nJqgMS
+ M69UNntXbv/A==
+X-IronPort-AV: E=McAfee;i="6200,9189,9956"; a="195169144"
 X-IronPort-AV: E=Sophos;i="5.82,226,1613462400"; 
-   d="scan'208";a="175163936"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Apr 2021 08:41:43 -0700
-IronPort-SDR: lGuaSt9Jbppuno2GL+IX51ChFHPEI5DU+6ronyLCHnvyol9GOMLKa/g0sci/4syDwSpPwbuOAE
- o2DRvdX+WXuw==
+   d="scan'208";a="195169144"
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Apr 2021 08:41:41 -0700
+IronPort-SDR: ar7dDxzt2Oi7GIhsG5qtuISAhRHVX9LRp+f1DQ8gtF04+3xB3T4x0fabS8zuRBBAEv60tGGXg6
+ I/rj8v9izkvQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.82,226,1613462400"; 
-   d="scan'208";a="422038783"
+   d="scan'208";a="383087500"
 Received: from black.fi.intel.com ([10.237.72.28])
-  by orsmga007.jf.intel.com with ESMTP; 16 Apr 2021 08:41:38 -0700
+  by orsmga003.jf.intel.com with ESMTP; 16 Apr 2021 08:41:37 -0700
 Received: by black.fi.intel.com (Postfix, from userid 1000)
-        id 144FD2BE; Fri, 16 Apr 2021 18:41:50 +0300 (EEST)
+        id 1DDE82CF; Fri, 16 Apr 2021 18:41:50 +0300 (EEST)
 From:   "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
 To:     Dave Hansen <dave.hansen@linux.intel.com>,
         Andy Lutomirski <luto@kernel.org>,
@@ -44,9 +44,9 @@ Cc:     David Rientjes <rientjes@google.com>,
         kvm@vger.kernel.org, linux-mm@kvack.org,
         linux-kernel@vger.kernel.org,
         "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: [RFCv2 07/13] mm: Add hwpoison_entry_to_pfn() and hwpoison_entry_to_page()
-Date:   Fri, 16 Apr 2021 18:41:00 +0300
-Message-Id: <20210416154106.23721-8-kirill.shutemov@linux.intel.com>
+Subject: [RFCv2 08/13] mm/gup: Add FOLL_ALLOW_POISONED
+Date:   Fri, 16 Apr 2021 18:41:01 +0300
+Message-Id: <20210416154106.23721-9-kirill.shutemov@linux.intel.com>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20210416154106.23721-1-kirill.shutemov@linux.intel.com>
 References: <20210416154106.23721-1-kirill.shutemov@linux.intel.com>
@@ -56,51 +56,72 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add helpers to convert hwpoison swap entry to pfn and page.
+The new flag allows to bypass check if the page is poisoned and get
+reference on it.
 
 Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
 ---
- include/linux/swapops.h | 20 ++++++++++++++++++++
- 1 file changed, 20 insertions(+)
+ include/linux/mm.h |  1 +
+ mm/gup.c           | 29 ++++++++++++++++++-----------
+ 2 files changed, 19 insertions(+), 11 deletions(-)
 
-diff --git a/include/linux/swapops.h b/include/linux/swapops.h
-index d9b7c9132c2f..520589b12fb3 100644
---- a/include/linux/swapops.h
-+++ b/include/linux/swapops.h
-@@ -323,6 +323,16 @@ static inline int is_hwpoison_entry(swp_entry_t entry)
- 	return swp_type(entry) == SWP_HWPOISON;
- }
+diff --git a/include/linux/mm.h b/include/linux/mm.h
+index ecdf8a8cd6ae..378a94481fd1 100644
+--- a/include/linux/mm.h
++++ b/include/linux/mm.h
+@@ -2802,6 +2802,7 @@ struct page *follow_page(struct vm_area_struct *vma, unsigned long address,
+ #define FOLL_SPLIT_PMD	0x20000	/* split huge pmd before returning */
+ #define FOLL_PIN	0x40000	/* pages must be released via unpin_user_page */
+ #define FOLL_FAST_ONLY	0x80000	/* gup_fast: prevent fall-back to slow gup */
++#define FOLL_ALLOW_POISONED 0x100000 /* bypass poison check */
  
-+static inline unsigned long hwpoison_entry_to_pfn(swp_entry_t entry)
-+{
-+	return swp_offset(entry);
-+}
+ /*
+  * FOLL_PIN and FOLL_LONGTERM may be used in various combinations with each
+diff --git a/mm/gup.c b/mm/gup.c
+index e4c224cd9661..dd3b79b03eb5 100644
+--- a/mm/gup.c
++++ b/mm/gup.c
+@@ -384,22 +384,29 @@ static struct page *follow_page_pte(struct vm_area_struct *vma,
+ 	ptep = pte_offset_map_lock(mm, pmd, address, &ptl);
+ 	pte = *ptep;
+ 	if (!pte_present(pte)) {
+-		swp_entry_t entry;
++		swp_entry_t entry = pte_to_swp_entry(pte);
 +
-+static inline struct page *hwpoison_entry_to_page(swp_entry_t entry)
-+{
-+	return pfn_to_page(hwpoison_entry_to_pfn(entry));
-+}
++		if (pte_none(pte))
++			goto no_page;
 +
- static inline void num_poisoned_pages_inc(void)
- {
- 	atomic_long_inc(&num_poisoned_pages);
-@@ -345,6 +355,16 @@ static inline int is_hwpoison_entry(swp_entry_t swp)
- 	return 0;
- }
- 
-+static inline unsigned long hwpoison_entry_to_pfn(swp_entry_t entry)
-+{
-+	return 0;
-+}
+ 		/*
+ 		 * KSM's break_ksm() relies upon recognizing a ksm page
+ 		 * even while it is being migrated, so for that case we
+ 		 * need migration_entry_wait().
+ 		 */
+-		if (likely(!(flags & FOLL_MIGRATION)))
+-			goto no_page;
+-		if (pte_none(pte))
+-			goto no_page;
+-		entry = pte_to_swp_entry(pte);
+-		if (!is_migration_entry(entry))
+-			goto no_page;
+-		pte_unmap_unlock(ptep, ptl);
+-		migration_entry_wait(mm, pmd, address);
+-		goto retry;
++		if (is_migration_entry(entry) && (flags & FOLL_MIGRATION)) {
++			pte_unmap_unlock(ptep, ptl);
++			migration_entry_wait(mm, pmd, address);
++			goto retry;
++		}
 +
-+static inline struct page *hwpoison_entry_to_page(swp_entry_t entry)
-+{
-+	return NULL;
-+}
++		if (is_hwpoison_entry(entry) && (flags & FOLL_ALLOW_POISONED)) {
++			page = hwpoison_entry_to_page(entry);
++			get_page(page);
++			goto out;
++		}
 +
- static inline void num_poisoned_pages_inc(void)
- {
- }
++		goto no_page;
+ 	}
+ 	if ((flags & FOLL_NUMA) && pte_protnone(pte))
+ 		goto no_page;
 -- 
 2.26.3
 
