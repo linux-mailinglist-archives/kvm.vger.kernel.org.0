@@ -2,104 +2,169 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 155CE361FFE
-	for <lists+kvm@lfdr.de>; Fri, 16 Apr 2021 14:38:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 653E3362054
+	for <lists+kvm@lfdr.de>; Fri, 16 Apr 2021 14:55:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241853AbhDPMim (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 16 Apr 2021 08:38:42 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:9636 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S235243AbhDPMil (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 16 Apr 2021 08:38:41 -0400
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 13GCZX3m037291;
-        Fri, 16 Apr 2021 08:38:10 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=8iOl2pgc+pfrz28oppTEemV2d1omLs4ADa4tFM33Xlc=;
- b=VDFkjS+4LeYpNPu6fC7SQWNuxOwac7Q7+B2TV/pTqlrUIOJg0rgQhbwSgvERD+mUssB4
- EXZarjciy0LxqzwVoXOePZVW2NnSTgZzCrrCOxuasIt2+BUAG1Sn+R/H+2KOFhxcTphx
- xcDBBhQfk5NaSoVElMRLsRevQBJm6iQkFbCtej7/NKfRy1IIhtED9YJtNVNWL2bYv4UB
- xVzLmXmKh+EUV6XaIZYxJABihIGBgbdkDsY33D6IhEkalHK8W6cm5vE4yBAUMA5jQ530
- I+Q/YLNzrxBspepXZrNLe/AwJxIMSoIpN41fYO7xuSo/p86k8WWMxV2UhtcjFI45rdP8 jA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 37xxnphcvr-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 16 Apr 2021 08:38:10 -0400
-Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 13GCZjMX038176;
-        Fri, 16 Apr 2021 08:38:09 -0400
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 37xxnphcuv-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 16 Apr 2021 08:38:09 -0400
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 13GCRj8W006769;
-        Fri, 16 Apr 2021 12:38:08 GMT
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
-        by ppma03ams.nl.ibm.com with ESMTP id 37u3n8cf0h-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 16 Apr 2021 12:38:08 +0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 13GCc5Ea42795498
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 16 Apr 2021 12:38:05 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id B6D0AAE055;
-        Fri, 16 Apr 2021 12:38:05 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 18E3DAE04D;
-        Fri, 16 Apr 2021 12:38:05 +0000 (GMT)
-Received: from oc7455500831.ibm.com (unknown [9.171.64.24])
-        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Fri, 16 Apr 2021 12:38:05 +0000 (GMT)
-Subject: Re: linux-next: Fixes tag needs some work in the kvm tree
-To:     Stephen Rothwell <sfr@canb.auug.org.au>,
-        Paolo Bonzini <pbonzini@redhat.com>, KVM <kvm@vger.kernel.org>
-Cc:     Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Next Mailing List <linux-next@vger.kernel.org>
-References: <20210416222731.3e82b3a0@canb.auug.org.au>
-From:   Christian Borntraeger <borntraeger@de.ibm.com>
-Message-ID: <00222197-fb22-ab0a-97e2-11c9f85a67f1@de.ibm.com>
-Date:   Fri, 16 Apr 2021 14:38:04 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.9.0
+        id S240839AbhDPMyl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 16 Apr 2021 08:54:41 -0400
+Received: from conssluserg-01.nifty.com ([210.131.2.80]:32415 "EHLO
+        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235495AbhDPMyk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 16 Apr 2021 08:54:40 -0400
+Received: from mail-pj1-f43.google.com (mail-pj1-f43.google.com [209.85.216.43]) (authenticated)
+        by conssluserg-01.nifty.com with ESMTP id 13GCruXn017060;
+        Fri, 16 Apr 2021 21:53:57 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conssluserg-01.nifty.com 13GCruXn017060
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
+        s=dec2015msa; t=1618577637;
+        bh=FpBTE/PmjepHTlzWsrX59REOgQgL2WrtsCCIoF/CYWE=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=pnl4cChP9BDT4wIiEZMCXce74IYPbyviH0geJnOMydzhvTMMKqvimUCJ8LuO/ydUi
+         B7GCRGzMyz8AbBjXaIdqdOj97w4Mvl4+xM1yl+DjOmMRHy8sXXrxwF2VPV6p3HkIDh
+         n6j6f7LmOePGYddtG4MeM1IJTF09NZL2HYvxNn0VmUbtcoGAQN0WIk8JwzmNwqxNuH
+         IfVvglF9RnOeg2qR9OQZYFuxmRVvfEgsWCD65f5cmxQGtubERM4wyCwE/Fx0XhOF6+
+         fHFg+T4J4DNZEIcoxa3aGVqRu3zGr7QifJpt93kYMOXSvEw6iuQScro++18+YzyjqF
+         Xuddd4D8zQwkQ==
+X-Nifty-SrcIP: [209.85.216.43]
+Received: by mail-pj1-f43.google.com with SMTP id em21-20020a17090b0155b029014e204a81e6so6371593pjb.1;
+        Fri, 16 Apr 2021 05:53:57 -0700 (PDT)
+X-Gm-Message-State: AOAM530bgqjsO3lWF/tHwnQMGcasjhkPXEs8XTPkhXTB07EP/ZLEsXmv
+        3mp4/TT+UMxTuIlUFayxCQxemxeq34bCCblaPSY=
+X-Google-Smtp-Source: ABdhPJxb/FC19twtF+zRiYRXoqGzOZCJTyiYCPanDW2DbASdA2RE0I7WCFpU5qPpBix6mu/jtdFnthAB/xgwIUGoUjg=
+X-Received: by 2002:a17:90a:1056:: with SMTP id y22mr9094969pjd.153.1618577636323;
+ Fri, 16 Apr 2021 05:53:56 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20210416222731.3e82b3a0@canb.auug.org.au>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: jhd4b3CO_inSOEuzwgnTPLcvLjuMOTHn
-X-Proofpoint-ORIG-GUID: RrMXz8aLz6p4OEC2DXqGZd9WGSa9MuRX
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.761
- definitions=2021-04-16_07:2021-04-15,2021-04-16 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 phishscore=0
- mlxscore=0 impostorscore=0 spamscore=0 malwarescore=0 clxscore=1015
- adultscore=0 lowpriorityscore=0 bulkscore=0 priorityscore=1501
- mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2104060000 definitions=main-2104160094
+References: <20210415072700.147125-1-masahiroy@kernel.org> <20210415072700.147125-2-masahiroy@kernel.org>
+ <eb623ea6-a2f4-9692-ff3d-cb9f9b9ea15f@de.ibm.com> <0eeed665-a105-917b-e7fb-8dafe2ae9d94@de.ibm.com>
+In-Reply-To: <0eeed665-a105-917b-e7fb-8dafe2ae9d94@de.ibm.com>
+From:   Masahiro Yamada <masahiroy@kernel.org>
+Date:   Fri, 16 Apr 2021 21:53:18 +0900
+X-Gmail-Original-Message-ID: <CAK7LNASfiiLJd9dOpaJ47pJ4FzgV8JL3vU8okOYz0=eaE4OYgQ@mail.gmail.com>
+Message-ID: <CAK7LNASfiiLJd9dOpaJ47pJ4FzgV8JL3vU8okOYz0=eaE4OYgQ@mail.gmail.com>
+Subject: Re: [PATCH 2/2] tools: do not include scripts/Kbuild.include
+To:     Christian Borntraeger <borntraeger@de.ibm.com>
+Cc:     Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Alexei Starovoitov <ast@kernel.org>,
+        Andrii Nakryiko <andrii@kernel.org>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Daniel Borkmann <daniel@iogearbox.net>,
+        Harish <harish@linux.ibm.com>,
+        John Fastabend <john.fastabend@gmail.com>,
+        KP Singh <kpsingh@kernel.org>, Martin KaFai Lau <kafai@fb.com>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Nathan Chancellor <nathan@kernel.org>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Paul Mackerras <paulus@samba.org>,
+        Shuah Khan <shuah@kernel.org>,
+        Song Liu <songliubraving@fb.com>, Yonghong Song <yhs@fb.com>,
+        bpf <bpf@vger.kernel.org>,
+        clang-built-linux <clang-built-linux@googlegroups.com>,
+        kvm@vger.kernel.org,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        "open list:KERNEL SELFTEST FRAMEWORK" 
+        <linux-kselftest@vger.kernel.org>,
+        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
+        Networking <netdev@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 16.04.21 14:27, Stephen Rothwell wrote:
-> Hi all,
-> 
-> In commit
-> 
->    c3171e94cc1c ("KVM: s390: VSIE: fix MVPG handling for prefixing and MSO")
-> 
-> Fixes tag
-> 
->    Fixes: bdf7509bbefa ("s390/kvm: VSIE: correctly handle MVPG when in VSIE")
-> 
-> has these problem(s):
-> 
->    - Subject does not match target commit subject
->      Just use
-> 	git log -1 --format='Fixes: %h ("%s")'
+On Fri, Apr 16, 2021 at 2:56 PM Christian Borntraeger
+<borntraeger@de.ibm.com> wrote:
+>
+>
+> On 15.04.21 10:06, Christian Borntraeger wrote:
+> >
+> > On 15.04.21 09:27, Masahiro Yamada wrote:
+> >> Since commit d9f4ff50d2aa ("kbuild: spilt cc-option and friends to
+> >> scripts/Makefile.compiler"), some kselftests fail to build.
+> >>
+> >> The tools/ directory opted out Kbuild, and went in a different
+> >> direction. They copy any kind of files to the tools/ directory
+> >> in order to do whatever they want to do in their world.
+> >>
+> >> tools/build/Build.include mimics scripts/Kbuild.include, but some
+> >> tool Makefiles included the Kbuild one to import a feature that is
+> >> missing in tools/build/Build.include:
+> >>
+> >>   - Commit ec04aa3ae87b ("tools/thermal: tmon: use "-fstack-protector"
+> >>     only if supported") included scripts/Kbuild.include from
+> >>     tools/thermal/tmon/Makefile to import the cc-option macro.
+> >>
+> >>   - Commit c2390f16fc5b ("selftests: kvm: fix for compilers that do
+> >>     not support -no-pie") included scripts/Kbuild.include from
+> >>     tools/testing/selftests/kvm/Makefile to import the try-run macro.
+> >>
+> >>   - Commit 9cae4ace80ef ("selftests/bpf: do not ignore clang
+> >>     failures") included scripts/Kbuild.include from
+> >>     tools/testing/selftests/bpf/Makefile to import the .DELETE_ON_ERROR
+> >>     target.
+> >>
+> >>   - Commit 0695f8bca93e ("selftests/powerpc: Handle Makefile for
+> >>     unrecognized option") included scripts/Kbuild.include from
+> >>     tools/testing/selftests/powerpc/pmu/ebb/Makefile to import the
+> >>     try-run macro.
+> >>
+> >> Copy what they want there, and stop including scripts/Kbuild.include
+> >> from the tool Makefiles.
+> >>
+> >> Link: https://lore.kernel.org/lkml/86dadf33-70f7-a5ac-cb8c-64966d2f45a1@linux.ibm.com/
+> >> Fixes: d9f4ff50d2aa ("kbuild: spilt cc-option and friends to scripts/Makefile.compiler")
+> >> Reported-by: Janosch Frank <frankja@linux.ibm.com>
+> >> Reported-by: Christian Borntraeger <borntraeger@de.ibm.com>
+> >> Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+> >
+> > When applying this on top of d9f4ff50d2aa ("kbuild: spilt cc-option and friends to scripts/Makefile.compiler")
+> >
+> > I still do get
+> >
+> > # ==== Test Assertion Failure ====
+> > #   lib/kvm_util.c:142: vm->fd >= 0
+> > #   pid=315635 tid=315635 - Invalid argument
+> > #      1    0x0000000001002f4b: vm_open at kvm_util.c:142
+> > #      2     (inlined by) vm_create at kvm_util.c:258
+> > #      3    0x00000000010015ef: test_add_max_memory_regions at set_memory_region_test.c:351
+> > #      4     (inlined by) main at set_memory_region_test.c:397
+> > #      5    0x000003ff971abb89: ?? ??:0
+> > #      6    0x00000000010017ad: .annobin_abi_note.c.hot at crt1.o:?
+> > #   KVM_CREATE_VM ioctl failed, rc: -1 errno: 22
+> > not ok 7 selftests: kvm: set_memory_region_test # exit=254
+> >
+> > and the testcase compilation does not pickup the pgste option.
+>
+> What does work is the following:
+> diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
+> index a6d61f451f88..d9c6d9c2069e 100644
+> --- a/tools/testing/selftests/kvm/Makefile
+> +++ b/tools/testing/selftests/kvm/Makefile
+> @@ -1,5 +1,6 @@
+>   # SPDX-License-Identifier: GPL-2.0-only
+>   include ../../../../scripts/Kbuild.include
+> +include ../../../../scripts/Makefile.compiler
+>
+>   all:
+>
+>
+> as it does pickup the linker option handling.
 
-Hmm, this has been sitting in kvms390/next for some time now. Is this a new check?
+
+Kbuild and the tools are divorced.
+
+They cannot be married unless the tools/
+build system is largely refactored.
+That will be a tons of works (and
+I am not sure if it is welcome).
+
+The Kbuild refactoring should not be bothered by
+the tools.
+For now, I want them separated from each other.
+
+
+
+--
+Best Regards
+
+Masahiro Yamada
