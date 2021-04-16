@@ -2,78 +2,85 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0973B361DFD
-	for <lists+kvm@lfdr.de>; Fri, 16 Apr 2021 12:32:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8AF59361FC3
+	for <lists+kvm@lfdr.de>; Fri, 16 Apr 2021 14:27:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239536AbhDPKc2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 16 Apr 2021 06:32:28 -0400
-Received: from mail-wm1-f53.google.com ([209.85.128.53]:39631 "EHLO
-        mail-wm1-f53.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238766AbhDPKc1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 16 Apr 2021 06:32:27 -0400
-Received: by mail-wm1-f53.google.com with SMTP id i21-20020a05600c3555b029012eae2af5d4so4286440wmq.4;
-        Fri, 16 Apr 2021 03:32:01 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=yqhNqfjZUG4eC0lkMn87qOHykQGaWRjakY07kc6mVKw=;
-        b=gVznrD3krorP8fo6hwOv4a2IeibvemExqseX8YiirgAqQuUF9WoKmHB1QGG6lEQmjP
-         ELx7kwqXjo6VT4Cg/b9NKmiPBjKmTipWKeTI2GO2eXsyo55iyRGfh3cPb2aTpC2HXCpu
-         VXAWPb07YDBgkxuB/cduWVOsTQs+OqMegHZvJQwYzwKQuUgVQBHgYZmPiaCQFbJIYQj9
-         UIBNw9EhBuPnwElShCF3nWZBNyijJ/FKB/Ei4wk7I2qM4zW362xJMsaVJeqZvZVzKyu8
-         r5PW8oCc/Dr7QofpAAPqYyf4t9Qm2b+R7/AyAgGIWxUFwUKdQAjLmySAB0103KzsWyW3
-         QFSQ==
-X-Gm-Message-State: AOAM53142kJvOubzcvso74w7/bMK0Cs/NKkTQkgz+rkfsyx0j3oIqwql
-        ctZ3tiGb8jFI5sc5zSbkjl0=
-X-Google-Smtp-Source: ABdhPJxerASWRcbPAJybWqXWONU6R+tPGuulB/fKNbyDGI3tyQ4wQNWfaWet2Kd1JYysI92oOshy9A==
-X-Received: by 2002:a05:600c:40c4:: with SMTP id m4mr7468836wmh.25.1618569120641;
-        Fri, 16 Apr 2021 03:32:00 -0700 (PDT)
-Received: from liuwe-devbox-debian-v2 ([51.145.34.42])
-        by smtp.gmail.com with ESMTPSA id u8sm9631940wrr.42.2021.04.16.03.31.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 16 Apr 2021 03:32:00 -0700 (PDT)
-Date:   Fri, 16 Apr 2021 10:31:58 +0000
-From:   Wei Liu <wei.liu@kernel.org>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     Wei Liu <wei.liu@kernel.org>, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Siddharth Chandrasekaran <sidcha@amazon.de>,
-        linux-kernel@vger.kernel.org, linux-hyperv@vger.kernel.org
-Subject: Re: [PATCH RFC 01/22] asm-generic/hyperv: add
- HV_STATUS_ACCESS_DENIED definition
-Message-ID: <20210416103158.34cxzspi5idzci5g@liuwe-devbox-debian-v2>
-References: <20210413122630.975617-1-vkuznets@redhat.com>
- <20210413122630.975617-2-vkuznets@redhat.com>
- <20210415141403.hftsza3ucrf262tq@liuwe-devbox-debian-v2>
- <877dl38sw2.fsf@vitty.brq.redhat.com>
+        id S235547AbhDPM2C (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 16 Apr 2021 08:28:02 -0400
+Received: from ozlabs.org ([203.11.71.1]:40005 "EHLO ozlabs.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S234914AbhDPM2B (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 16 Apr 2021 08:28:01 -0400
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        by mail.ozlabs.org (Postfix) with ESMTPSA id 4FMFpW6jWXz9sVb;
+        Fri, 16 Apr 2021 22:27:31 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=canb.auug.org.au;
+        s=201702; t=1618576052;
+        bh=JYdcLdPUbTo38tlUGmoVGoWuj6WMw32aNHJqgtTCmtY=;
+        h=Date:From:To:Cc:Subject:From;
+        b=qKkcct5wuDcOsZPYHyhGTQN3p9pM377ZvPDpG4ZNqnCrapu/6F9UCx4iSr8MTFBRb
+         ejhzGMofCfqPpZCKNN8Rt8Fk95xEUEPA+4s68rxggS/ddIPNzT+H8m6GmhayrPbDb5
+         faHRerQUMRT/U41nXfXhEyVYfnjB526cpflJMsqzYKsLx3tb2tbGcl+orX+qlVg3MB
+         wU3mnj2GgnCmuELAQmEdzIjWeW/oEjx0QfZmJCHg/USbl69NzkD2POIj5VypgsWVpq
+         4GDcHyX2VcBVCzFsErVnnJikU88nJ2rxpsOD0QErEGMHHLY6xFf2nbqm1CVgzH1tuz
+         53c/9vpRRNvDw==
+Date:   Fri, 16 Apr 2021 22:27:31 +1000
+From:   Stephen Rothwell <sfr@canb.auug.org.au>
+To:     Paolo Bonzini <pbonzini@redhat.com>, KVM <kvm@vger.kernel.org>
+Cc:     Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Next Mailing List <linux-next@vger.kernel.org>
+Subject: linux-next: Fixes tag needs some work in the kvm tree
+Message-ID: <20210416222731.3e82b3a0@canb.auug.org.au>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <877dl38sw2.fsf@vitty.brq.redhat.com>
+Content-Type: multipart/signed; boundary="Sig_/1tsCH=y7VINn6jpuc5OMoAl";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Apr 15, 2021 at 05:33:17PM +0200, Vitaly Kuznetsov wrote:
-> Wei Liu <wei.liu@kernel.org> writes:
-> 
-> > On Tue, Apr 13, 2021 at 02:26:09PM +0200, Vitaly Kuznetsov wrote:
-> >> From TLFSv6.0b, this status means: "The caller did not possess sufficient
-> >> access rights to perform the requested operation."
-> >> 
-> >> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-> >
-> > This can be applied to hyperv-next right away. Let me know what you
-> > think.
-> >
-> 
-> In case there's no immediate need for this constant outside of KVM, I'd
-> suggest you just give Paolo your 'Acked-by' so I can carry the patch in
-> the series for the time being. This will eliminate the need to track
-> dependencies between hyperv-next and kvm-next.
+--Sig_/1tsCH=y7VINn6jpuc5OMoAl
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-Acked-by: Wei Liu <wei.liu@kernel.org>
+Hi all,
+
+In commit
+
+  c3171e94cc1c ("KVM: s390: VSIE: fix MVPG handling for prefixing and MSO")
+
+Fixes tag
+
+  Fixes: bdf7509bbefa ("s390/kvm: VSIE: correctly handle MVPG when in VSIE")
+
+has these problem(s):
+
+  - Subject does not match target commit subject
+    Just use
+	git log -1 --format=3D'Fixes: %h ("%s")'
+
+--=20
+Cheers,
+Stephen Rothwell
+
+--Sig_/1tsCH=y7VINn6jpuc5OMoAl
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmB5grMACgkQAVBC80lX
+0GxTKgf8DPhUSMv9IFzE2TZZAUQun6lqp8YjsO2jTTU4tIeRuFmJmCg1tYFHRlzK
+ORAvCmKJjtNC2B0uNXh3UrhxWVCeawPjw4OBRb8DoTCnIIBo274kHbqGG2I7WNZp
+1BZZsTKa1wIf09f6fKn9MlYOPbLdFlOc3YvA/AGTfMOyRem0eF8Xozk6q/M+VvqL
+7ki2t6bht6+9qLC35MU2vlt4B/ZWQtxkcdQIIOdq/f96H/fy4P5gKytG7ztlqSxM
+51YWi0pCT5ElR/Mob1GxIRqHjTX5bDVqW0fiR1YFbhl9ZY+VLIwOLwKxNLEH7quq
+NSU4+JeZOnmy7i5igVgtAiweDxUT/A==
+=XIlH
+-----END PGP SIGNATURE-----
+
+--Sig_/1tsCH=y7VINn6jpuc5OMoAl--
