@@ -2,31 +2,31 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 65D4A36242C
-	for <lists+kvm@lfdr.de>; Fri, 16 Apr 2021 17:41:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9EF1D36242F
+	for <lists+kvm@lfdr.de>; Fri, 16 Apr 2021 17:41:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243493AbhDPPmC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 16 Apr 2021 11:42:02 -0400
-Received: from mga12.intel.com ([192.55.52.136]:63662 "EHLO mga12.intel.com"
+        id S1343905AbhDPPmD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 16 Apr 2021 11:42:03 -0400
+Received: from mga04.intel.com ([192.55.52.120]:11046 "EHLO mga04.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S235514AbhDPPmB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        id S235551AbhDPPmB (ORCPT <rfc822;kvm@vger.kernel.org>);
         Fri, 16 Apr 2021 11:42:01 -0400
-IronPort-SDR: qByucoM14H8DwyAFPGwMzh0MQkeoZi9DFopOlw9770N02taZSywMRoMGAmGr/eAfCv3+bicOfI
- Tnf4mo1kSRmw==
-X-IronPort-AV: E=McAfee;i="6200,9189,9956"; a="174550435"
+IronPort-SDR: 35tJIDHUOoUC+co8OdFG12X5kKl2dWd3dLemK635tu4gcajP2toI36zcqLX29FMz7sBz1LAjZ2
+ j+zmWxAgpumg==
+X-IronPort-AV: E=McAfee;i="6200,9189,9956"; a="192931129"
 X-IronPort-AV: E=Sophos;i="5.82,226,1613462400"; 
-   d="scan'208";a="174550435"
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Apr 2021 08:41:36 -0700
-IronPort-SDR: JHSnJpXle56RA6NOpktcidrINTGGvy+pVP+IY3njKrzX6L3ewV0BhUmmbMqeo9bSv6+cmm05xB
- WB9eJa8RjXkg==
+   d="scan'208";a="192931129"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Apr 2021 08:41:36 -0700
+IronPort-SDR: 6IctWwvMhRST79zs3UT7X2lmhiZ2l9BRZTh8PbQxjhQJynga4+YurvugLpc+mbLJQ/BneIdPz3
+ BgBVQ2QiXENA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.82,226,1613462400"; 
-   d="scan'208";a="453378435"
+   d="scan'208";a="461998771"
 Received: from black.fi.intel.com ([10.237.72.28])
-  by fmsmga002.fm.intel.com with ESMTP; 16 Apr 2021 08:41:32 -0700
+  by orsmga001.jf.intel.com with ESMTP; 16 Apr 2021 08:41:32 -0700
 Received: by black.fi.intel.com (Postfix, from userid 1000)
-        id C158A12A; Fri, 16 Apr 2021 18:41:49 +0300 (EEST)
+        id CAD0EBA; Fri, 16 Apr 2021 18:41:49 +0300 (EEST)
 From:   "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
 To:     Dave Hansen <dave.hansen@linux.intel.com>,
         Andy Lutomirski <luto@kernel.org>,
@@ -44,95 +44,184 @@ Cc:     David Rientjes <rientjes@google.com>,
         kvm@vger.kernel.org, linux-mm@kvack.org,
         linux-kernel@vger.kernel.org,
         "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: [RFCv2 00/13] TDX and guest memory unmapping
-Date:   Fri, 16 Apr 2021 18:40:53 +0300
-Message-Id: <20210416154106.23721-1-kirill.shutemov@linux.intel.com>
+Subject: [RFCv2 01/13] x86/mm: Move force_dma_unencrypted() to common code
+Date:   Fri, 16 Apr 2021 18:40:54 +0300
+Message-Id: <20210416154106.23721-2-kirill.shutemov@linux.intel.com>
 X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20210416154106.23721-1-kirill.shutemov@linux.intel.com>
+References: <20210416154106.23721-1-kirill.shutemov@linux.intel.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-TDX integrity check failures may lead to system shutdown host kernel must
-not allow any writes to TD-private memory. This requirment clashes with
-KVM design: KVM expects the guest memory to be mapped into host userspace
-(e.g. QEMU).
+force_dma_unencrypted() has to return true for KVM guest with the memory
+protected enabled. Move it out of AMD SME code.
 
-This patchset aims to start discussion on how we can approach the issue.
+Introduce new config option X86_MEM_ENCRYPT_COMMON that has to be
+selected by all x86 memory encryption features.
 
-The core of the change is in the last patch. Please see more detailed
-description of the issue and proposoal of the solution there.
+This is preparation for the following patches.
 
-TODO:
-  - THP support
-  - Clarify semantics wrt. page cache
-
-v2:
-  - Unpoison page on free
-  - Authorize access to the page: only the KVM that poisoned the page
-    allows to touch it
-  - FOLL_ALLOW_POISONED is implemented
-
-The patchset can also be found here:
-
-git://git.kernel.org/pub/scm/linux/kernel/git/kas/linux.git kvm-unmapped-poison
-
-Kirill A. Shutemov (13):
-  x86/mm: Move force_dma_unencrypted() to common code
-  x86/kvm: Introduce KVM memory protection feature
-  x86/kvm: Make DMA pages shared
-  x86/kvm: Use bounce buffers for KVM memory protection
-  x86/kvmclock: Share hvclock memory with the host
-  x86/realmode: Share trampoline area if KVM memory protection enabled
-  mm: Add hwpoison_entry_to_pfn() and hwpoison_entry_to_page()
-  mm/gup: Add FOLL_ALLOW_POISONED
-  shmem: Fail shmem_getpage_gfp() on poisoned pages
-  mm: Keep page reference for hwpoison entries
-  mm: Replace hwpoison entry with present PTE if page got unpoisoned
-  KVM: passdown struct kvm to hva_to_pfn_slow()
-  KVM: unmap guest memory using poisoned pages
-
- arch/powerpc/kvm/book3s_64_mmu_hv.c    |   2 +-
- arch/powerpc/kvm/book3s_64_mmu_radix.c |   2 +-
- arch/x86/Kconfig                       |   9 +-
- arch/x86/include/asm/cpufeatures.h     |   1 +
- arch/x86/include/asm/io.h              |   4 +-
- arch/x86/include/asm/kvm_para.h        |   5 +
- arch/x86/include/asm/mem_encrypt.h     |   7 +-
- arch/x86/include/uapi/asm/kvm_para.h   |   3 +-
- arch/x86/kernel/kvm.c                  |  19 +++
- arch/x86/kernel/kvmclock.c             |   2 +-
- arch/x86/kernel/pci-swiotlb.c          |   3 +-
- arch/x86/kvm/Kconfig                   |   1 +
- arch/x86/kvm/cpuid.c                   |   3 +-
- arch/x86/kvm/mmu/mmu.c                 |  20 ++-
- arch/x86/kvm/mmu/paging_tmpl.h         |  10 +-
- arch/x86/kvm/x86.c                     |   6 +
- arch/x86/mm/Makefile                   |   2 +
- arch/x86/mm/mem_encrypt.c              |  74 ---------
- arch/x86/mm/mem_encrypt_common.c       |  87 ++++++++++
- arch/x86/mm/pat/set_memory.c           |  10 ++
- arch/x86/realmode/init.c               |   7 +-
- include/linux/kvm_host.h               |  31 +++-
- include/linux/mm.h                     |   1 +
- include/linux/swapops.h                |  20 +++
- include/uapi/linux/kvm_para.h          |   5 +-
- mm/gup.c                               |  29 ++--
- mm/memory.c                            |  44 ++++-
- mm/page_alloc.c                        |   7 +
- mm/rmap.c                              |   2 +-
- mm/shmem.c                             |   7 +
- virt/Makefile                          |   2 +-
- virt/kvm/Kconfig                       |   4 +
- virt/kvm/Makefile                      |   1 +
- virt/kvm/kvm_main.c                    | 212 +++++++++++++++++++------
- virt/kvm/mem_protected.c               | 110 +++++++++++++
- 35 files changed, 593 insertions(+), 159 deletions(-)
+Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
+---
+ arch/x86/Kconfig                 |  7 +++++-
+ arch/x86/include/asm/io.h        |  4 +++-
+ arch/x86/mm/Makefile             |  2 ++
+ arch/x86/mm/mem_encrypt.c        | 30 -------------------------
+ arch/x86/mm/mem_encrypt_common.c | 38 ++++++++++++++++++++++++++++++++
+ 5 files changed, 49 insertions(+), 32 deletions(-)
  create mode 100644 arch/x86/mm/mem_encrypt_common.c
- create mode 100644 virt/kvm/Makefile
- create mode 100644 virt/kvm/mem_protected.c
 
+diff --git a/arch/x86/Kconfig b/arch/x86/Kconfig
+index 21f851179ff0..2b4ce1722dbd 100644
+--- a/arch/x86/Kconfig
++++ b/arch/x86/Kconfig
+@@ -1520,14 +1520,19 @@ config X86_CPA_STATISTICS
+ 	  helps to determine the effectiveness of preserving large and huge
+ 	  page mappings when mapping protections are changed.
+ 
++config X86_MEM_ENCRYPT_COMMON
++	select ARCH_HAS_FORCE_DMA_UNENCRYPTED
++	select DYNAMIC_PHYSICAL_MASK
++	def_bool n
++
+ config AMD_MEM_ENCRYPT
+ 	bool "AMD Secure Memory Encryption (SME) support"
+ 	depends on X86_64 && CPU_SUP_AMD
+ 	select DMA_COHERENT_POOL
+-	select DYNAMIC_PHYSICAL_MASK
+ 	select ARCH_USE_MEMREMAP_PROT
+ 	select ARCH_HAS_FORCE_DMA_UNENCRYPTED
+ 	select INSTRUCTION_DECODER
++	select X86_MEM_ENCRYPT_COMMON
+ 	help
+ 	  Say yes to enable support for the encryption of system memory.
+ 	  This requires an AMD processor that supports Secure Memory
+diff --git a/arch/x86/include/asm/io.h b/arch/x86/include/asm/io.h
+index d726459d08e5..6dc51b31cb0e 100644
+--- a/arch/x86/include/asm/io.h
++++ b/arch/x86/include/asm/io.h
+@@ -256,10 +256,12 @@ static inline void slow_down_io(void)
+ 
+ #endif
+ 
+-#ifdef CONFIG_AMD_MEM_ENCRYPT
+ #include <linux/jump_label.h>
+ 
+ extern struct static_key_false sev_enable_key;
++
++#ifdef CONFIG_AMD_MEM_ENCRYPT
++
+ static inline bool sev_key_active(void)
+ {
+ 	return static_branch_unlikely(&sev_enable_key);
+diff --git a/arch/x86/mm/Makefile b/arch/x86/mm/Makefile
+index 5864219221ca..b31cb52bf1bd 100644
+--- a/arch/x86/mm/Makefile
++++ b/arch/x86/mm/Makefile
+@@ -52,6 +52,8 @@ obj-$(CONFIG_X86_INTEL_MEMORY_PROTECTION_KEYS)	+= pkeys.o
+ obj-$(CONFIG_RANDOMIZE_MEMORY)			+= kaslr.o
+ obj-$(CONFIG_PAGE_TABLE_ISOLATION)		+= pti.o
+ 
++obj-$(CONFIG_X86_MEM_ENCRYPT_COMMON)	+= mem_encrypt_common.o
++
+ obj-$(CONFIG_AMD_MEM_ENCRYPT)	+= mem_encrypt.o
+ obj-$(CONFIG_AMD_MEM_ENCRYPT)	+= mem_encrypt_identity.o
+ obj-$(CONFIG_AMD_MEM_ENCRYPT)	+= mem_encrypt_boot.o
+diff --git a/arch/x86/mm/mem_encrypt.c b/arch/x86/mm/mem_encrypt.c
+index c3d5f0236f35..9ca477b9b8ba 100644
+--- a/arch/x86/mm/mem_encrypt.c
++++ b/arch/x86/mm/mem_encrypt.c
+@@ -15,10 +15,6 @@
+ #include <linux/dma-direct.h>
+ #include <linux/swiotlb.h>
+ #include <linux/mem_encrypt.h>
+-#include <linux/device.h>
+-#include <linux/kernel.h>
+-#include <linux/bitops.h>
+-#include <linux/dma-mapping.h>
+ 
+ #include <asm/tlbflush.h>
+ #include <asm/fixmap.h>
+@@ -390,32 +386,6 @@ bool noinstr sev_es_active(void)
+ 	return sev_status & MSR_AMD64_SEV_ES_ENABLED;
+ }
+ 
+-/* Override for DMA direct allocation check - ARCH_HAS_FORCE_DMA_UNENCRYPTED */
+-bool force_dma_unencrypted(struct device *dev)
+-{
+-	/*
+-	 * For SEV, all DMA must be to unencrypted addresses.
+-	 */
+-	if (sev_active())
+-		return true;
+-
+-	/*
+-	 * For SME, all DMA must be to unencrypted addresses if the
+-	 * device does not support DMA to addresses that include the
+-	 * encryption mask.
+-	 */
+-	if (sme_active()) {
+-		u64 dma_enc_mask = DMA_BIT_MASK(__ffs64(sme_me_mask));
+-		u64 dma_dev_mask = min_not_zero(dev->coherent_dma_mask,
+-						dev->bus_dma_limit);
+-
+-		if (dma_dev_mask <= dma_enc_mask)
+-			return true;
+-	}
+-
+-	return false;
+-}
+-
+ void __init mem_encrypt_free_decrypted_mem(void)
+ {
+ 	unsigned long vaddr, vaddr_end, npages;
+diff --git a/arch/x86/mm/mem_encrypt_common.c b/arch/x86/mm/mem_encrypt_common.c
+new file mode 100644
+index 000000000000..dd791352f73f
+--- /dev/null
++++ b/arch/x86/mm/mem_encrypt_common.c
+@@ -0,0 +1,38 @@
++// SPDX-License-Identifier: GPL-2.0-only
++/*
++ * AMD Memory Encryption Support
++ *
++ * Copyright (C) 2016 Advanced Micro Devices, Inc.
++ *
++ * Author: Tom Lendacky <thomas.lendacky@amd.com>
++ */
++
++#include <linux/mm.h>
++#include <linux/mem_encrypt.h>
++#include <linux/dma-direct.h>
++
++/* Override for DMA direct allocation check - ARCH_HAS_FORCE_DMA_UNENCRYPTED */
++bool force_dma_unencrypted(struct device *dev)
++{
++	/*
++	 * For SEV, all DMA must be to unencrypted/shared addresses.
++	 */
++	if (sev_active())
++		return true;
++
++	/*
++	 * For SME, all DMA must be to unencrypted addresses if the
++	 * device does not support DMA to addresses that include the
++	 * encryption mask.
++	 */
++	if (sme_active()) {
++		u64 dma_enc_mask = DMA_BIT_MASK(__ffs64(sme_me_mask));
++		u64 dma_dev_mask = min_not_zero(dev->coherent_dma_mask,
++						dev->bus_dma_limit);
++
++		if (dma_dev_mask <= dma_enc_mask)
++			return true;
++	}
++
++	return false;
++}
 -- 
 2.26.3
 
