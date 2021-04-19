@@ -2,108 +2,154 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 46FDB363CA0
-	for <lists+kvm@lfdr.de>; Mon, 19 Apr 2021 09:36:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 91BCB363D29
+	for <lists+kvm@lfdr.de>; Mon, 19 Apr 2021 10:11:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237790AbhDSHfj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 19 Apr 2021 03:35:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38890 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237670AbhDSHfd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 19 Apr 2021 03:35:33 -0400
-Received: from mail-ot1-x32c.google.com (mail-ot1-x32c.google.com [IPv6:2607:f8b0:4864:20::32c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 602E4C06174A;
-        Mon, 19 Apr 2021 00:35:03 -0700 (PDT)
-Received: by mail-ot1-x32c.google.com with SMTP id i16-20020a9d68d00000b0290286edfdfe9eso21113245oto.3;
-        Mon, 19 Apr 2021 00:35:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=n9kAD+An3yHMDHmSNL3zi3TsigAV5UlobdscCMtr7J4=;
-        b=LzJLKOgsGPV/ZfICAzX/t5HEIjdhvhY2mRLcII5OwXFNSpUkoJmrhiReAU/wYMN+S6
-         AzRRKcyNQje20Fig56y0AF60oCp1ebCHn+7I0lxHp0jZhXRdphiNtfUNJPB9FqTtL6cH
-         9QaRKe8IUtR0Lmu9ylezZlhcuIWtPAFYo5kYOfhMTHqGEiL+UTpJqbD6/N0uu8B8ViQh
-         vbYFb1gVMzAKY2kKHNh7Kh0t3KutK/EtQ35bf5ZIrcblK2xveaLlFxov7VUrI2eu+6qe
-         D7Hc4CbecJQJKCcwrDBOJh4j0ST147nILYtaFuxbLWNm4lacUL+kOTw974ElZvSA3QQC
-         8igg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=n9kAD+An3yHMDHmSNL3zi3TsigAV5UlobdscCMtr7J4=;
-        b=OPUU5OIxv/kEcRtfr54wp03iM5ossgEAntLDgZ2K2ky06QzB3tAqbZZ3V1PnivdXhQ
-         vMX4ECFhEo+6D9GAtuW+rckk0ConQZAC/wf9Nrk/wkOnloW/x/vbo116sLqbOHUAmZ0Z
-         evIIdg4MyqnT0+AdL6/krJ34IBKCKuTrZLWY+Eo7ERlE34e0iE586d3MI/fgfqZtcrgW
-         zRSurufisjXT5p4M5EHBGaEsWVHhJxra5MKsvSTIraCJi7+JZBWvDQF6OXzfYS7zCkfU
-         GH24GKA+0gQP4BXmggb1EIl5pS7UxMQb4YMv/s5P4t57/+k2u6Xl/BdrzGYMj3ijHy3t
-         u5kA==
-X-Gm-Message-State: AOAM533YY1yh/Cf/pYTbcoSlkOZsLxpq9zSJyrBdiQ3zqm1mkacLitJL
-        4vt8/chU0HA95DTd9deig5qsExIaDn+y+zvQ09sRTaEfa1k=
-X-Google-Smtp-Source: ABdhPJzCFZnyv/Dk96lgn4f8UJjt/XXEK3GkjiKQny5+JtiGq8AeDJZ2pWhd7jifMpSi0QH6DSXQXZ0I2P7s1xErAaU=
-X-Received: by 2002:a9d:6b13:: with SMTP id g19mr13803978otp.185.1618817702886;
- Mon, 19 Apr 2021 00:35:02 -0700 (PDT)
+        id S237513AbhDSILw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 19 Apr 2021 04:11:52 -0400
+Received: from szxga01-in.huawei.com ([45.249.212.187]:5137 "EHLO
+        szxga01-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229473AbhDSILv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 19 Apr 2021 04:11:51 -0400
+Received: from DGGEML404-HUB.china.huawei.com (unknown [172.30.72.53])
+        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4FNzx14r1WzYXv3;
+        Mon, 19 Apr 2021 16:09:09 +0800 (CST)
+Received: from dggpeml500013.china.huawei.com (7.185.36.41) by
+ DGGEML404-HUB.china.huawei.com (10.3.17.39) with Microsoft SMTP Server (TLS)
+ id 14.3.498.0; Mon, 19 Apr 2021 16:11:19 +0800
+Received: from [10.174.187.161] (10.174.187.161) by
+ dggpeml500013.china.huawei.com (7.185.36.41) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id
+ 15.1.2176.2; Mon, 19 Apr 2021 16:11:19 +0800
+Subject: Re: [PATCH v5 06/16] KVM: x86/pmu: Reprogram PEBS event to emulate
+ guest PEBS counter
+To:     Like Xu <like.xu@linux.intel.com>,
+        "Fangyi (Eric)" <eric.fangyi@huawei.com>,
+        Xiexiangyou <xiexiangyou@huawei.com>
+References: <20210415032016.166201-1-like.xu@linux.intel.com>
+ <20210415032016.166201-7-like.xu@linux.intel.com>
+CC:     <kvm@vger.kernel.org>, <x86@kernel.org>,
+        <linux-kernel@vger.kernel.org>, Andi Kleen <ak@linux.intel.com>
+From:   Liuxiangdong <liuxiangdong5@huawei.com>
+Message-ID: <607D3B26.5020904@huawei.com>
+Date:   Mon, 19 Apr 2021 16:11:18 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:38.0) Gecko/20100101
+ Thunderbird/38.1.0
 MIME-Version: 1.0
-References: <1618542490-14756-1-git-send-email-wanpengli@tencent.com> <9c49c6ff-d896-e6a5-c051-b6707f6ec58a@redhat.com>
-In-Reply-To: <9c49c6ff-d896-e6a5-c051-b6707f6ec58a@redhat.com>
-From:   Wanpeng Li <kernellwp@gmail.com>
-Date:   Mon, 19 Apr 2021 15:34:53 +0800
-Message-ID: <CANRm+Cy-xmDRQoUfOYm+GGvWiS+qC_sBjyZmcLykbKqTF2YDxQ@mail.gmail.com>
-Subject: Re: [PATCH] KVM: Boost vCPU candidiate in user mode which is
- delivering interrupt
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20210415032016.166201-7-like.xu@linux.intel.com>
+Content-Type: text/plain; charset="windows-1252"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.174.187.161]
+X-ClientProxiedBy: dggeme708-chm.china.huawei.com (10.1.199.104) To
+ dggpeml500013.china.huawei.com (7.185.36.41)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, 17 Apr 2021 at 21:09, Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> On 16/04/21 05:08, Wanpeng Li wrote:
-> > From: Wanpeng Li <wanpengli@tencent.com>
-> >
-> > Both lock holder vCPU and IPI receiver that has halted are condidate for
-> > boost. However, the PLE handler was originally designed to deal with the
-> > lock holder preemption problem. The Intel PLE occurs when the spinlock
-> > waiter is in kernel mode. This assumption doesn't hold for IPI receiver,
-> > they can be in either kernel or user mode. the vCPU candidate in user mode
-> > will not be boosted even if they should respond to IPIs. Some benchmarks
-> > like pbzip2, swaptions etc do the TLB shootdown in kernel mode and most
-> > of the time they are running in user mode. It can lead to a large number
-> > of continuous PLE events because the IPI sender causes PLE events
-> > repeatedly until the receiver is scheduled while the receiver is not
-> > candidate for a boost.
-> >
-> > This patch boosts the vCPU candidiate in user mode which is delivery
-> > interrupt. We can observe the speed of pbzip2 improves 10% in 96 vCPUs
-> > VM in over-subscribe scenario (The host machine is 2 socket, 48 cores,
-> > 96 HTs Intel CLX box). There is no performance regression for other
-> > benchmarks like Unixbench spawn (most of the time contend read/write
-> > lock in kernel mode), ebizzy (most of the time contend read/write sem
-> > and TLB shoodtdown in kernel mode).
-> >
-> > +bool kvm_arch_interrupt_delivery(struct kvm_vcpu *vcpu)
-> > +{
-> > +     if (vcpu->arch.apicv_active && static_call(kvm_x86_dy_apicv_has_pending_interrupt)(vcpu))
-> > +             return true;
-> > +
-> > +     return false;
-> > +}
->
-> Can you reuse vcpu_dy_runnable instead of this new function?
 
-I have some concerns. For x86 arch, vcpu_dy_runnable() will add extra
-vCPU candidates by KVM_REQ_EVENT and async pf(which has already
-opportunistically made the guest do other stuff). For other arches,
-kvm_arch_dy_runnale() is equal to kvm_arch_vcpu_runnable() except
-powerpc which has too many events and is not conservative. In general,
- vcpu_dy_runnable() will loose the conditions and add more vCPU
-candidates.
 
-    Wanpeng
+On 2021/4/15 11:20, Like Xu wrote:
+> When a guest counter is configured as a PEBS counter through
+> IA32_PEBS_ENABLE, a guest PEBS event will be reprogrammed by
+> configuring a non-zero precision level in the perf_event_attr.
+>
+> The guest PEBS overflow PMI bit would be set in the guest
+> GLOBAL_STATUS MSR when PEBS facility generates a PEBS
+> overflow PMI based on guest IA32_DS_AREA MSR.
+>
+> Even with the same counter index and the same event code and
+> mask, guest PEBS events will not be reused for non-PEBS events.
+>
+> Originally-by: Andi Kleen <ak@linux.intel.com>
+> Co-developed-by: Kan Liang <kan.liang@linux.intel.com>
+> Signed-off-by: Kan Liang <kan.liang@linux.intel.com>
+> Signed-off-by: Like Xu <like.xu@linux.intel.com>
+> ---
+>   arch/x86/kvm/pmu.c | 34 ++++++++++++++++++++++++++++++++--
+>   1 file changed, 32 insertions(+), 2 deletions(-)
+>
+> diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
+> index 827886c12c16..0f86c1142f17 100644
+> --- a/arch/x86/kvm/pmu.c
+> +++ b/arch/x86/kvm/pmu.c
+> @@ -74,11 +74,21 @@ static void kvm_perf_overflow_intr(struct perf_event *perf_event,
+>   {
+>   	struct kvm_pmc *pmc = perf_event->overflow_handler_context;
+>   	struct kvm_pmu *pmu = pmc_to_pmu(pmc);
+> +	bool skip_pmi = false;
+>   
+>   	if (!test_and_set_bit(pmc->idx, pmu->reprogram_pmi)) {
+> -		__set_bit(pmc->idx, (unsigned long *)&pmu->global_status);
+> +		if (perf_event->attr.precise_ip) {
+> +			/* Indicate PEBS overflow PMI to guest. */
+> +			skip_pmi = __test_and_set_bit(GLOBAL_STATUS_BUFFER_OVF_BIT,
+> +						      (unsigned long *)&pmu->global_status);
+> +		} else {
+> +			__set_bit(pmc->idx, (unsigned long *)&pmu->global_status);
+> +		}
+>   		kvm_make_request(KVM_REQ_PMU, pmc->vcpu);
+>   
+> +		if (skip_pmi)
+> +			return;
+> +
+>   		/*
+>   		 * Inject PMI. If vcpu was in a guest mode during NMI PMI
+>   		 * can be ejected on a guest mode re-entry. Otherwise we can't
+> @@ -99,6 +109,7 @@ static void pmc_reprogram_counter(struct kvm_pmc *pmc, u32 type,
+>   				  bool exclude_kernel, bool intr,
+>   				  bool in_tx, bool in_tx_cp)
+>   {
+> +	struct kvm_pmu *pmu = vcpu_to_pmu(pmc->vcpu);
+>   	struct perf_event *event;
+>   	struct perf_event_attr attr = {
+>   		.type = type,
+> @@ -110,6 +121,7 @@ static void pmc_reprogram_counter(struct kvm_pmc *pmc, u32 type,
+>   		.exclude_kernel = exclude_kernel,
+>   		.config = config,
+>   	};
+> +	bool pebs = test_bit(pmc->idx, (unsigned long *)&pmu->pebs_enable);
+>   
+
+pebs_enable is defined in patch 07, but used here(in patch 06).
+Maybe we can change the patches order in next patch version if necessary.
+
+>   	attr.sample_period = get_sample_period(pmc, pmc->counter);
+>   
+> @@ -124,9 +136,23 @@ static void pmc_reprogram_counter(struct kvm_pmc *pmc, u32 type,
+>   		attr.sample_period = 0;
+>   		attr.config |= HSW_IN_TX_CHECKPOINTED;
+>   	}
+> +	if (pebs) {
+> +		/*
+> +		 * The non-zero precision level of guest event makes the ordinary
+> +		 * guest event becomes a guest PEBS event and triggers the host
+> +		 * PEBS PMI handler to determine whether the PEBS overflow PMI
+> +		 * comes from the host counters or the guest.
+> +		 *
+> +		 * For most PEBS hardware events, the difference in the software
+> +		 * precision levels of guest and host PEBS events will not affect
+> +		 * the accuracy of the PEBS profiling result, because the "event IP"
+> +		 * in the PEBS record is calibrated on the guest side.
+> +		 */
+> +		attr.precise_ip = 1;
+> +	}
+>   
+>   	event = perf_event_create_kernel_counter(&attr, -1, current,
+> -						 intr ? kvm_perf_overflow_intr :
+> +						 (intr || pebs) ? kvm_perf_overflow_intr :
+>   						 kvm_perf_overflow, pmc);
+>   	if (IS_ERR(event)) {
+>   		pr_debug_ratelimited("kvm_pmu: event creation failed %ld for pmc->idx = %d\n",
+> @@ -161,6 +187,10 @@ static bool pmc_resume_counter(struct kvm_pmc *pmc)
+>   			      get_sample_period(pmc, pmc->counter)))
+>   		return false;
+>   
+> +	if (!test_bit(pmc->idx, (unsigned long *)&pmc_to_pmu(pmc)->pebs_enable) &&
+> +	    pmc->perf_event->attr.precise_ip)
+> +		return false;
+> +
+>   	/* reuse perf_event to serve as pmc_reprogram_counter() does*/
+>   	perf_event_enable(pmc->perf_event);
+>   
+
