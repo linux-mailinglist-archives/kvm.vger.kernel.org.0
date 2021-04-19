@@ -2,168 +2,118 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 54FC33647AD
-	for <lists+kvm@lfdr.de>; Mon, 19 Apr 2021 18:02:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E8653364827
+	for <lists+kvm@lfdr.de>; Mon, 19 Apr 2021 18:25:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242091AbhDSQC1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 19 Apr 2021 12:02:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38768 "EHLO
+        id S233841AbhDSQZe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 19 Apr 2021 12:25:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43958 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242024AbhDSQCW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 19 Apr 2021 12:02:22 -0400
-Received: from mail-pf1-x42b.google.com (mail-pf1-x42b.google.com [IPv6:2607:f8b0:4864:20::42b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4CE88C061763
-        for <kvm@vger.kernel.org>; Mon, 19 Apr 2021 09:01:51 -0700 (PDT)
-Received: by mail-pf1-x42b.google.com with SMTP id h11so5838923pfn.0
-        for <kvm@vger.kernel.org>; Mon, 19 Apr 2021 09:01:51 -0700 (PDT)
+        with ESMTP id S230063AbhDSQZd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 19 Apr 2021 12:25:33 -0400
+Received: from mail-wr1-x42d.google.com (mail-wr1-x42d.google.com [IPv6:2a00:1450:4864:20::42d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 727C1C06174A
+        for <kvm@vger.kernel.org>; Mon, 19 Apr 2021 09:25:03 -0700 (PDT)
+Received: by mail-wr1-x42d.google.com with SMTP id w4so30960240wrt.5
+        for <kvm@vger.kernel.org>; Mon, 19 Apr 2021 09:25:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=D+scCxaF/k3XnD2sscAAiRoJE5CZQjd/qu5mFzNH7gg=;
-        b=i6RwnX5xqtSrZgM5rvmPeRmsfWNxhgopBYEi7XmYe2x+pC/K41omM/bvXmWAVKQdQY
-         lzyWCwQbk11DZ3Geq6gmuYxwk0ELNs7jLPwq+wZYFINt7uY6uHeRzZeqXSB6GuVtClOA
-         T/QiaTut2wOhP/aP+L6oWxJPjRQX/NcOKzvG3dsWlR6j98FCd85cnQHmT+GLhSUQ+eLK
-         sTJRB51lTBIsffNdMn97QnCUyrA6Ego1GbUSI1/LFLZlqp9RfFKBr1WqljqJyIHL2DX1
-         oJfkMteb3JLrkZxNM6c8IJPJiXC4uWjDX/CntY5u9HWERN4m8Otuu8VxDKFGVIw3genw
-         SV6g==
+        d=linaro.org; s=google;
+        h=references:user-agent:from:to:cc:subject:date:in-reply-to
+         :message-id:mime-version:content-transfer-encoding;
+        bh=2IEVMMmjvSqcQfvawzed72ofqrNQJLYwE1FD7NLKTHQ=;
+        b=qmxDCFcLnrEeeHQw+kvCEQrxx9mvbfmTEbqNhT/xKgKbl4jfZMhz9BM0lIO3qfepyk
+         CXPa5+2ib2y9Dc8LrMc0hkwuptdqae7f+qIUMvFVeSYip5M+un/irGY4mj72qq399CoC
+         UcadyqibEayJA0JUhVHGouQ191Eboj6bjBgn3mktGkJDZVP9tIruo7C3XdX+kP51bwWW
+         8zJaazjsSAeQXCruwJwM5qNcjhPLoni3niGXs2BJWPLdk6Eo8HwglUSl/NY7NGHbZnQP
+         ciYbGH/YbKmXdEOWRjRFosh2W0QS19i2Bg+7M2Gx3zvFIizSWxHCakJsxzI0kcgesRkP
+         S2nQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=D+scCxaF/k3XnD2sscAAiRoJE5CZQjd/qu5mFzNH7gg=;
-        b=RBTCkXnEM+iJgugB+UPqbaP8bfyutIEXNpB9r3yIzV3CGzdscVng7yVJrZcbenDUmT
-         at6I+j76THA+Bt9lLA1uSv/lkasfrD1DasiE+shKvWSS/iHL3D9vTPMeyj9u6HCPtnT4
-         3dANl5bWvxeKza+Rb7oIfmkl4GofG2vWeYSvX16nkOH9zh3gUKAyd9YskVABrFovuLY2
-         0Af/H9oEU0cDCYQ25OShpfUC466nsKoMFSN4CHCoNYva+EnpIIO2akp3BD7lxfP9L5J7
-         8EUvltymYuveimYmcfy+8f8OwaOo0iDjhqJGp4LXOY5cBMqa+n4wEmtX7KYaDgO+/i6A
-         Imtw==
-X-Gm-Message-State: AOAM532on7yxFe047mYehRplSdV6lwz8Zwv53uNDQ5ckRW9q9k2IlesE
-        iRHptkW0U+MORN7u/e/BM/erBw==
-X-Google-Smtp-Source: ABdhPJwKrlTLKHLyKD4kCvVe40T/+hXPu2uy1xeYbvr2iGbcZ8V8usWVWgakEo//6lEuJdOUeoFa8g==
-X-Received: by 2002:a62:7d07:0:b029:21b:d1bc:f6c8 with SMTP id y7-20020a627d070000b029021bd1bcf6c8mr20258928pfc.45.1618848110621;
-        Mon, 19 Apr 2021 09:01:50 -0700 (PDT)
-Received: from google.com (240.111.247.35.bc.googleusercontent.com. [35.247.111.240])
-        by smtp.gmail.com with ESMTPSA id l17sm13229762pgi.66.2021.04.19.09.01.49
+        h=x-gm-message-state:references:user-agent:from:to:cc:subject:date
+         :in-reply-to:message-id:mime-version:content-transfer-encoding;
+        bh=2IEVMMmjvSqcQfvawzed72ofqrNQJLYwE1FD7NLKTHQ=;
+        b=hGyVMTUWANYV9l3ZmAiL0+04SlwO2/6JBKgtRlT2c2lg/JTUMIazpdSbSbcSRCVd6+
+         mJrQK/yH9jROomC91QqCzsBhAzd1NuDbTpKVuKZwEXHE69ClrVJ6W36FXcydrivg2c1q
+         9p4SSEZeZnfsMb23g7TtAKTUgd0k4KX9TROXKerT6ULjjlNzisQZk6kBZLIKOv+MBAHp
+         bxs4YeWq23JikVZymY7U4Z5r1M5LEzzv5Ne0SVS8qnKGLQ5mMBqm4XutNSE9Xd53jKbC
+         qFqbAvC66I1o9ISzSWSnOFAdjMkCxO8fiS5AXEug/rnxRPh68BRwbKbVZZWxMxt0dLfu
+         afKg==
+X-Gm-Message-State: AOAM531aD/X17Vu2Bverbk5K1IneC3atIvL5BEqehp8LA9/GiVihY/hp
+        /xistRI8H11BNamE/087hUchvmGmw30zvA==
+X-Google-Smtp-Source: ABdhPJz6tlBO/C4r8ErWIld/G5DyDMOUqJFQRkL1k37aUmHea8oZVnaXMZrR50X+O/FqbT/BEDYduw==
+X-Received: by 2002:a5d:4006:: with SMTP id n6mr15575576wrp.240.1618849501997;
+        Mon, 19 Apr 2021 09:25:01 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+        by smtp.gmail.com with ESMTPSA id o12sm14363892wmq.21.2021.04.19.09.25.00
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 19 Apr 2021 09:01:49 -0700 (PDT)
-Date:   Mon, 19 Apr 2021 16:01:46 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     "Kirill A. Shutemov" <kirill@shutemov.name>
-Cc:     "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Jim Mattson <jmattson@google.com>,
-        David Rientjes <rientjes@google.com>,
-        "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>,
-        "Kleen, Andi" <andi.kleen@intel.com>,
-        "Yamahata, Isaku" <isaku.yamahata@intel.com>,
-        Erdem Aktas <erdemaktas@google.com>,
-        Steve Rutherford <srutherford@google.com>,
-        Peter Gonda <pgonda@google.com>,
-        David Hildenbrand <david@redhat.com>, x86@kernel.org,
-        kvm@vger.kernel.org, linux-mm@kvack.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [RFCv2 13/13] KVM: unmap guest memory using poisoned pages
-Message-ID: <YH2pam5b837wFM3z@google.com>
-References: <20210416154106.23721-1-kirill.shutemov@linux.intel.com>
- <20210416154106.23721-14-kirill.shutemov@linux.intel.com>
- <YHnJtvXdrZE+AfM3@google.com>
- <20210419142602.khjbzktk5tk5l6lk@box.shutemov.name>
+        Mon, 19 Apr 2021 09:25:00 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+        by zen.linaroharston (Postfix) with ESMTP id 461AB1FF7E;
+        Mon, 19 Apr 2021 17:25:00 +0100 (BST)
+References: <20210401144152.1031282-1-mlevitsk@redhat.com>
+ <20210401144152.1031282-2-mlevitsk@redhat.com>
+User-agent: mu4e 1.5.11; emacs 28.0.50
+From:   Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To:     Maxim Levitsky <mlevitsk@redhat.com>
+Cc:     qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        Cornelia Huck <cohuck@redhat.com>,
+        Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Subject: Re: [PATCH 1/2] kvm: update kernel headers for
+ KVM_GUESTDBG_BLOCKEVENTS
+Date:   Mon, 19 Apr 2021 17:22:56 +0100
+In-reply-to: <20210401144152.1031282-2-mlevitsk@redhat.com>
+Message-ID: <874kg29r8j.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210419142602.khjbzktk5tk5l6lk@box.shutemov.name>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Apr 19, 2021, Kirill A. Shutemov wrote:
-> On Fri, Apr 16, 2021 at 05:30:30PM +0000, Sean Christopherson wrote:
-> > I like the idea of using "special" PTE value to denote guest private memory,
-> > e.g. in this RFC, HWPOISON.  But I strongly dislike having KVM involved in the
-> > manipulation of the special flag/value.
-> > 
-> > Today, userspace owns the gfn->hva translations and the kernel effectively owns
-> > the hva->pfn translations (with input from userspace).  KVM just connects the
-> > dots.
-> > 
-> > Having KVM own the shared/private transitions means KVM is now part owner of the
-> > entire gfn->hva->pfn translation, i.e. KVM is effectively now a secondary MMU
-> > and a co-owner of the primary MMU.  This creates locking madness, e.g. KVM taking
-> > mmap_sem for write, mmu_lock under page lock, etc..., and also takes control away
-> > from userspace.  E.g. userspace strategy could be to use a separate backing/pool
-> > for shared memory and change the gfn->hva translation (memslots) in reaction to
-> > a shared/private conversion.  Automatically swizzling things in KVM takes away
-> > that option.
-> > 
-> > IMO, KVM should be entirely "passive" in this process, e.g. the guest shares or
-> > protects memory, userspace calls into the kernel to change state, and the kernel
-> > manages the page tables to prevent bad actors.  KVM simply does the plumbing for
-> > the guest page tables.
-> 
-> That's a new perspective for me. Very interesting.
-> 
-> Let's see how it can look like:
-> 
->  - KVM only allows poisoned pages (or whatever flag we end up using for
->    protection) in the private mappings. SIGBUS otherwise.
-> 
->  - Poisoned pages must be tied to the KVM instance to be allowed in the
->    private mappings. Like kvm->id in the current prototype. SIGBUS
->    otherwise.
-> 
->  - Pages get poisoned on fault in if the VMA has a new vmflag set.
-> 
->  - Fault in of a poisoned page leads to hwpoison entry. Userspace cannot
->    access such pages.
-> 
->  - Poisoned pages produced this way get unpoisoned on free.
-> 
->  - The new VMA flag set by userspace. mprotect(2)?
 
-Ya, or mmap(), though I'm not entirely sure a VMA flag would suffice.  The
-notion of the page being private is tied to the PFN, which would suggest "struct
-page" needs to be involved.
+Maxim Levitsky <mlevitsk@redhat.com> writes:
 
-But fundamentally the private pages, are well, private.  They can't be shared
-across processes, so I think we could (should?) require the VMA to always be
-MAP_PRIVATE.  Does that buy us enough to rely on the VMA alone?  I.e. is that
-enough to prevent userspace and unaware kernel code from acquiring a reference
-to the underlying page?
+> Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
 
->  - Add a new GUP flag to retrive such pages from the userspace mapping.
->    Used only for private mapping population.
+Generally it's a good idea to reference where these are coming from, is
+it a current kernel patch in flight or from an release we haven't synced
+up to yet?
 
->  - Shared gfn ranges managed by userspace, based on hypercalls from the
->    guest.
-> 
->  - Shared mappings get populated via normal VMA. Any poisoned pages here
->    would lead to SIGBUS.
-> 
-> So far it looks pretty straight-forward.
-> 
-> The only thing that I don't understand is at way point the page gets tied
-> to the KVM instance. Currently we do it just before populating shadow
-> entries, but it would not work with the new scheme: as we poison pages
-> on fault it they may never get inserted into shadow entries. That's not
-> good as we rely on the info to unpoison page on free.
+Usually linux header updates are done with semi-regular runs on
+./scripts/update-linux-headers.sh but obviously it's OK to include
+standalone patches during the review process.
 
-Can you elaborate on what you mean by "unpoison"?  If the page is never actually
-mapped into the guest, then its poisoned status is nothing more than a software
-flag, i.e. nothing extra needs to be done on free.  If the page is mapped into
-the guest, then KVM can be made responsible for reinitializing the page with
-keyid=0 when the page is removed from the guest.
+> ---
+>  linux-headers/asm-x86/kvm.h | 2 ++
+>  linux-headers/linux/kvm.h   | 1 +
+>  2 files changed, 3 insertions(+)
+>
+> diff --git a/linux-headers/asm-x86/kvm.h b/linux-headers/asm-x86/kvm.h
+> index 8e76d3701d..33878cdc34 100644
+> --- a/linux-headers/asm-x86/kvm.h
+> +++ b/linux-headers/asm-x86/kvm.h
+> @@ -281,6 +281,8 @@ struct kvm_debug_exit_arch {
+>  #define KVM_GUESTDBG_USE_HW_BP		0x00020000
+>  #define KVM_GUESTDBG_INJECT_DB		0x00040000
+>  #define KVM_GUESTDBG_INJECT_BP		0x00080000
+> +#define KVM_GUESTDBG_BLOCKIRQ		0x00100000
+> +
+>=20=20
+>  /* for KVM_SET_GUEST_DEBUG */
+>  struct kvm_guest_debug_arch {
+> diff --git a/linux-headers/linux/kvm.h b/linux-headers/linux/kvm.h
+> index 020b62a619..2ded7a0630 100644
+> --- a/linux-headers/linux/kvm.h
+> +++ b/linux-headers/linux/kvm.h
+> @@ -1056,6 +1056,7 @@ struct kvm_ppc_resize_hpt {
+>  #define KVM_CAP_ENFORCE_PV_FEATURE_CPUID 190
+>  #define KVM_CAP_SYS_HYPERV_CPUID 191
+>  #define KVM_CAP_DIRTY_LOG_RING 192
+> +#define KVM_CAP_SET_GUEST_DEBUG2 195
+>=20=20
+>  #ifdef KVM_CAP_IRQ_ROUTING
 
-The TDX Module prevents mapping the same PFN into multiple guests, so the kernel
-doesn't actually have to care _which_ KVM instance(s) is associated with a page,
-it only needs to prevent installing valid PTEs in the host page tables.
 
-> Maybe we should tie VMA to the KVM instance on setting the vmflags?
-> I donno.
-> 
-> Any comments?
-> 
-> -- 
->  Kirill A. Shutemov
+--=20
+Alex Benn=C3=A9e
