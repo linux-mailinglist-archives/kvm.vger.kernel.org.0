@@ -2,161 +2,101 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 56269363D4B
-	for <lists+kvm@lfdr.de>; Mon, 19 Apr 2021 10:19:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8A2A8363D68
+	for <lists+kvm@lfdr.de>; Mon, 19 Apr 2021 10:22:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238177AbhDSISb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 19 Apr 2021 04:18:31 -0400
-Received: from mga07.intel.com ([134.134.136.100]:34272 "EHLO mga07.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S238169AbhDSISb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 19 Apr 2021 04:18:31 -0400
-IronPort-SDR: 0EOm6+UG79k5SAbgTEj/e+kg9JfhEzmAC1bY5VUVpGj5LDNMWFEmQE95ocHJt84L/x60n6p4fT
- pvNl1WO0b+gg==
-X-IronPort-AV: E=McAfee;i="6200,9189,9958"; a="259245845"
-X-IronPort-AV: E=Sophos;i="5.82,233,1613462400"; 
-   d="scan'208";a="259245845"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Apr 2021 01:17:59 -0700
-IronPort-SDR: oR6E+ZXMvs/PYgGpV4EEpUULAIie472Ka8gep1tdPIvDEr/cSiwNovLvRE0wx8loZ1vV26mS7H
- EPbUH9jV31uQ==
-X-IronPort-AV: E=Sophos;i="5.82,233,1613462400"; 
-   d="scan'208";a="426419123"
-Received: from likexu-mobl1.ccr.corp.intel.com (HELO [10.238.4.93]) ([10.238.4.93])
-  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Apr 2021 01:17:57 -0700
-Subject: Re: [PATCH v5 06/16] KVM: x86/pmu: Reprogram PEBS event to emulate
- guest PEBS counter
-To:     Liuxiangdong <liuxiangdong5@huawei.com>
-Cc:     kvm@vger.kernel.org, x86@kernel.org, linux-kernel@vger.kernel.org,
-        Andi Kleen <ak@linux.intel.com>,
-        Like Xu <like.xu@linux.intel.com>,
-        Xiexiangyou <xiexiangyou@huawei.com>,
-        "Fangyi (Eric)" <eric.fangyi@huawei.com>
-References: <20210415032016.166201-1-like.xu@linux.intel.com>
- <20210415032016.166201-7-like.xu@linux.intel.com>
- <607D3B26.5020904@huawei.com>
-From:   "Xu, Like" <like.xu@intel.com>
-Message-ID: <478c630b-1dc7-e042-2884-21086c417d99@intel.com>
-Date:   Mon, 19 Apr 2021 16:17:54 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.9.1
+        id S231387AbhDSIXC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 19 Apr 2021 04:23:02 -0400
+Received: from eu-smtp-delivery-151.mimecast.com ([185.58.86.151]:44010 "EHLO
+        eu-smtp-delivery-151.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229870AbhDSIXA (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 19 Apr 2021 04:23:00 -0400
+Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) (Using
+ TLS) by relay.mimecast.com with ESMTP id
+ uk-mta-173-Jw5v629MP6SNyxusFjbP0g-1; Mon, 19 Apr 2021 09:22:22 +0100
+X-MC-Unique: Jw5v629MP6SNyxusFjbP0g-1
+Received: from AcuMS.Aculab.com (fd9f:af1c:a25b:0:994c:f5c2:35d6:9b65) by
+ AcuMS.aculab.com (fd9f:af1c:a25b:0:994c:f5c2:35d6:9b65) with Microsoft SMTP
+ Server (TLS) id 15.0.1497.2; Mon, 19 Apr 2021 09:22:21 +0100
+Received: from AcuMS.Aculab.com ([fe80::994c:f5c2:35d6:9b65]) by
+ AcuMS.aculab.com ([fe80::994c:f5c2:35d6:9b65%12]) with mapi id
+ 15.00.1497.015; Mon, 19 Apr 2021 09:22:21 +0100
+From:   David Laight <David.Laight@ACULAB.COM>
+To:     "'wangyanan (Y)'" <wangyanan55@huawei.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+CC:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Andrew Jones <drjones@redhat.com>,
+        Ben Gardon <bgardon@google.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Peter Xu <peterx@redhat.com>,
+        "wanghaibin.wang@huawei.com" <wanghaibin.wang@huawei.com>,
+        "yuzenghui@huawei.com" <yuzenghui@huawei.com>,
+        kvm <kvm@vger.kernel.org>,
+        "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: RE: [PATCH v6 03/10] KVM: selftests: Use flag CLOCK_MONOTONIC_RAW for
+ timing
+Thread-Topic: [PATCH v6 03/10] KVM: selftests: Use flag CLOCK_MONOTONIC_RAW
+ for timing
+Thread-Index: AQHXNObaeVOoTXOm4UClXGWfioY7I6q7fhHA
+Date:   Mon, 19 Apr 2021 08:22:21 +0000
+Message-ID: <8f36c1973c8147858000dd2a28d046ce@AcuMS.aculab.com>
+References: <20210330080856.14940-1-wangyanan55@huawei.com>
+ <20210330080856.14940-4-wangyanan55@huawei.com>
+ <1f892f30-1a72-1bcb-462f-b3d6f2bababb@redhat.com>
+ <82def592-e36c-25c3-c8c5-84c9be83e926@huawei.com>
+In-Reply-To: <82def592-e36c-25c3-c8c5-84c9be83e926@huawei.com>
+Accept-Language: en-GB, en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
+x-originating-ip: [10.202.205.107]
 MIME-Version: 1.0
-In-Reply-To: <607D3B26.5020904@huawei.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Authentication-Results: relay.mimecast.com;
+        auth=pass smtp.auth=C51A453 smtp.mailfrom=david.laight@aculab.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: aculab.com
 Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: base64
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2021/4/19 16:11, Liuxiangdong wrote:
->
->
-> On 2021/4/15 11:20, Like Xu wrote:
->> When a guest counter is configured as a PEBS counter through
->> IA32_PEBS_ENABLE, a guest PEBS event will be reprogrammed by
->> configuring a non-zero precision level in the perf_event_attr.
->>
->> The guest PEBS overflow PMI bit would be set in the guest
->> GLOBAL_STATUS MSR when PEBS facility generates a PEBS
->> overflow PMI based on guest IA32_DS_AREA MSR.
->>
->> Even with the same counter index and the same event code and
->> mask, guest PEBS events will not be reused for non-PEBS events.
->>
->> Originally-by: Andi Kleen <ak@linux.intel.com>
->> Co-developed-by: Kan Liang <kan.liang@linux.intel.com>
->> Signed-off-by: Kan Liang <kan.liang@linux.intel.com>
->> Signed-off-by: Like Xu <like.xu@linux.intel.com>
->> ---
->>   arch/x86/kvm/pmu.c | 34 ++++++++++++++++++++++++++++++++--
->>   1 file changed, 32 insertions(+), 2 deletions(-)
->>
->> diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
->> index 827886c12c16..0f86c1142f17 100644
->> --- a/arch/x86/kvm/pmu.c
->> +++ b/arch/x86/kvm/pmu.c
->> @@ -74,11 +74,21 @@ static void kvm_perf_overflow_intr(struct perf_event 
->> *perf_event,
->>   {
->>       struct kvm_pmc *pmc = perf_event->overflow_handler_context;
->>       struct kvm_pmu *pmu = pmc_to_pmu(pmc);
->> +    bool skip_pmi = false;
->>         if (!test_and_set_bit(pmc->idx, pmu->reprogram_pmi)) {
->> -        __set_bit(pmc->idx, (unsigned long *)&pmu->global_status);
->> +        if (perf_event->attr.precise_ip) {
->> +            /* Indicate PEBS overflow PMI to guest. */
->> +            skip_pmi = __test_and_set_bit(GLOBAL_STATUS_BUFFER_OVF_BIT,
->> +                              (unsigned long *)&pmu->global_status);
->> +        } else {
->> +            __set_bit(pmc->idx, (unsigned long *)&pmu->global_status);
->> +        }
->>           kvm_make_request(KVM_REQ_PMU, pmc->vcpu);
->>   +        if (skip_pmi)
->> +            return;
->> +
->>           /*
->>            * Inject PMI. If vcpu was in a guest mode during NMI PMI
->>            * can be ejected on a guest mode re-entry. Otherwise we can't
->> @@ -99,6 +109,7 @@ static void pmc_reprogram_counter(struct kvm_pmc 
->> *pmc, u32 type,
->>                     bool exclude_kernel, bool intr,
->>                     bool in_tx, bool in_tx_cp)
->>   {
->> +    struct kvm_pmu *pmu = vcpu_to_pmu(pmc->vcpu);
->>       struct perf_event *event;
->>       struct perf_event_attr attr = {
->>           .type = type,
->> @@ -110,6 +121,7 @@ static void pmc_reprogram_counter(struct kvm_pmc 
->> *pmc, u32 type,
->>           .exclude_kernel = exclude_kernel,
->>           .config = config,
->>       };
->> +    bool pebs = test_bit(pmc->idx, (unsigned long *)&pmu->pebs_enable);
->
-> pebs_enable is defined in patch 07, but used here(in patch 06).
-> Maybe we can change the patches order in next patch version if necessary.
-
-Thanks! I'll fix it.
-
->
->>       attr.sample_period = get_sample_period(pmc, pmc->counter);
->>   @@ -124,9 +136,23 @@ static void pmc_reprogram_counter(struct kvm_pmc 
->> *pmc, u32 type,
->>           attr.sample_period = 0;
->>           attr.config |= HSW_IN_TX_CHECKPOINTED;
->>       }
->> +    if (pebs) {
->> +        /*
->> +         * The non-zero precision level of guest event makes the ordinary
->> +         * guest event becomes a guest PEBS event and triggers the host
->> +         * PEBS PMI handler to determine whether the PEBS overflow PMI
->> +         * comes from the host counters or the guest.
->> +         *
->> +         * For most PEBS hardware events, the difference in the software
->> +         * precision levels of guest and host PEBS events will not affect
->> +         * the accuracy of the PEBS profiling result, because the 
->> "event IP"
->> +         * in the PEBS record is calibrated on the guest side.
->> +         */
->> +        attr.precise_ip = 1;
->> +    }
->>         event = perf_event_create_kernel_counter(&attr, -1, current,
->> -                         intr ? kvm_perf_overflow_intr :
->> +                         (intr || pebs) ? kvm_perf_overflow_intr :
->>                            kvm_perf_overflow, pmc);
->>       if (IS_ERR(event)) {
->>           pr_debug_ratelimited("kvm_pmu: event creation failed %ld for 
->> pmc->idx = %d\n",
->> @@ -161,6 +187,10 @@ static bool pmc_resume_counter(struct kvm_pmc *pmc)
->>                     get_sample_period(pmc, pmc->counter)))
->>           return false;
->>   +    if (!test_bit(pmc->idx, (unsigned long 
->> *)&pmc_to_pmu(pmc)->pebs_enable) &&
->> +        pmc->perf_event->attr.precise_ip)
->> +        return false;
->> +
->>       /* reuse perf_event to serve as pmc_reprogram_counter() does*/
->>       perf_event_enable(pmc->perf_event);
->
+RnJvbTogd2FuZ3lhbmFuIChZKQ0KPiBTZW50OiAxOSBBcHJpbCAyMDIxIDA3OjQwDQo+IA0KPiBI
+aSBQYW9sbywNCj4gDQo+IE9uIDIwMjEvNC8xNyAyMToyMywgUGFvbG8gQm9uemluaSB3cm90ZToN
+Cj4gPiBPbiAzMC8wMy8yMSAxMDowOCwgWWFuYW4gV2FuZyB3cm90ZToNCj4gPj4gSW4gYWRkaXRp
+b24gdG8gZnVuY3Rpb24gb2YgQ0xPQ0tfTU9OT1RPTklDLCBmbGFnIENMT0NLX01PTk9UT05JQ19S
+QVcgY2FuDQo+ID4+IGFsc28gc2hpZWxkIHBvc3NpYWJsZSBpbXBhY3Qgb2YgTlRQLCB3aGljaCBj
+YW4gcHJvdmlkZSBtb3JlIHJvYnVzdG5lc3MuDQo+ID4+DQo+ID4+IFN1Z2dlc3RlZC1ieTogVml0
+YWx5IEt1em5ldHNvdjx2a3V6bmV0c0ByZWRoYXQuY29tPg0KPiA+PiBTaWduZWQtb2ZmLWJ5OiBZ
+YW5hbiBXYW5nPHdhbmd5YW5hbjU1QGh1YXdlaS5jb20+DQo+ID4+IFJldmlld2VkLWJ5OiBCZW4g
+R2FyZG9uPGJnYXJkb25AZ29vZ2xlLmNvbT4NCj4gPj4gUmV2aWV3ZWQtYnk6IEFuZHJldyBKb25l
+czxkcmpvbmVzQHJlZGhhdC5jb20+DQo+ID4NCj4gPiBJJ20gbm90IHN1cmUgYWJvdXQgdGhpcyBv
+bmUsIGlzIHRoZSBlZmZlY3QgdmlzaWJsZT8NCj4gPg0KPiBJbiBwcmFjdGljZSwgZGlmZmVyZW5j
+ZSBiZXR3ZWVuIHJlc3VsdHMgZ290IHdpdGggQ0xPQ0tfTU9OT1RPTklDIGFuZA0KPiBDTE9DS19N
+T05PVE9OSUNfUkFXDQo+IGFjdHVhbGx5IGlzIHRvbyBsaXR0bGUgdG8gYmUgdmlzaWJsZS4gQnV0
+IGlmIGp1c3QgaW4gdGhlb3J5LA0KPiBDTE9DS19NT05PVE9OSUNfUkFXIGNhbiBlbnN1cmUgdGlt
+ZSByZXN1bHRzDQo+IG9mIHRoZSBjb21wYXJlZCB0ZXN0cyBhcmUgYmFzZWQgb24gdGhlIHNhbWUg
+bG9jYWwgb3NjaWxsYXRvciBmcmVxdWVuY3ksDQo+IHdoaWNoIGlzIG5vdCBzdWJqZWN0IHRvIHBv
+c3NpYmxlDQo+IE5UUCBmcmVxdWVuY3kgYWRqdXN0bWVudC4gQ2hhbmdlIGluIHRoaXMgcGF0Y2gg
+c2VlbXMgbGlrZSBhIGJpdCBvZg0KPiBvcHRpbWl6YXRpb24uDQoNClRoZSByZWFsIGFubm95YW5j
+ZSBpcyB3aGVuIE5UUCBpcyByZWFsaWduaW5nIHRoZSBsb2NhbCBjbG9jay4NClRoaXMgdHlwaWNh
+bGx5IGhhcHBlbnMgYWZ0ZXIgYm9vdCAtIGJ1dCBjYW4gdGFrZSBxdWl0ZSBhIGZldw0KbWludXRl
+cyAoZG9uJ3QgdGhpbmsgaXQgY2FuIHF1aXRlIGdldCB0byBhbiBob3VyKS4NCihJIHRoaW5rIHNv
+bWV0aGluZyBzaW1pbGFyIGlzIGNhdXNlZCBieSBsZWFwIHNlY29uZHMuKQ0KDQpEdXJpbmcgdGhp
+cyBwZXJpb2QgQ0xPQ0tfTU9OT1RPTklDIGNhbiBydW4gYXQgYSBzaWduaWZpY2FudGx5DQpkaWZm
+ZXJlbnQgcmF0ZSBmcm9tICdyZWFsIHRpbWUnLg0KVGhpcyBtYXkgbm90IG1hdHRlciBmb3IgdGlt
+aW5nIHNlbGYgdGVzdHMsIGJ1dCBpcyBzaWduaWZpY2FudA0KZm9yIFJUUCBhdWRpby4NCg0KVGhl
+IHByb2JsZW0gdGhlcmUgaXMgdGhhdCB5b3Ugd2FudCB0aGUgTlRQIGNvcnJlY3RlZCB0aW1lDQpk
+dXJpbmcgJ25vcm1hbCBydW5uaW5nJyBiZWNhdXNlIHRoZSBzbWFsbCBjb3JyZWN0aW9uIChmb3IN
+CmNyeXN0YWwgZXJyb3IpIGlzIHVzZWZ1bC4NCg0KQnV0IHRoZSBrZXJuZWwgSFIgdGltZXJzIGFy
+ZSBvbmx5IGRlZmluZWQgZm9yIENMT0NLX01PTk9UT05JQw0KYW5kIHRoZSB1c2Vyc3BhY2UgcmVx
+dWVzdHMgZm9yIENMT0NLX01PTk9UT05JQ19SQVcgYXJlIGxpa2VseQ0KdG8gYmUgcmVhbCBzeXN0
+ZW0gY2FsbHMuDQoNCldoYXQgeW91IHJlYWxseSB3YW50IGlzIGEgY2xvY2sgd2hvc2UgZnJlcXVl
+bmN5IGlzIGFkanVzdGVkDQpieSBOVFAgYnV0IGRvZXNuJ3QgaGF2ZSB0aGUgTlRQIG9mZnNldCBh
+ZGp1Y3RtZW50cy4NCkluIHJlYWxpdHkgdGhpcyBvdWdodCB0byBiZSBDTE9DS19NT05PVE9OSUMu
+DQoNCglEYXZpZA0KDQotDQpSZWdpc3RlcmVkIEFkZHJlc3MgTGFrZXNpZGUsIEJyYW1sZXkgUm9h
+ZCwgTW91bnQgRmFybSwgTWlsdG9uIEtleW5lcywgTUsxIDFQVCwgVUsNClJlZ2lzdHJhdGlvbiBO
+bzogMTM5NzM4NiAoV2FsZXMpDQo=
 
