@@ -2,253 +2,245 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 18FA1364846
-	for <lists+kvm@lfdr.de>; Mon, 19 Apr 2021 18:33:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 80FCD364844
+	for <lists+kvm@lfdr.de>; Mon, 19 Apr 2021 18:33:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233899AbhDSQdy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 19 Apr 2021 12:33:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45786 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230127AbhDSQdx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 19 Apr 2021 12:33:53 -0400
-Received: from mail-il1-x130.google.com (mail-il1-x130.google.com [IPv6:2607:f8b0:4864:20::130])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 784E5C06174A
-        for <kvm@vger.kernel.org>; Mon, 19 Apr 2021 09:33:23 -0700 (PDT)
-Received: by mail-il1-x130.google.com with SMTP id v13so13602062ilj.8
-        for <kvm@vger.kernel.org>; Mon, 19 Apr 2021 09:33:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=TqLI60sjSsT5Okt3elXRCoAP14unLg0uiOTnUf56les=;
-        b=XbFAw5Wb1z9NWcItuaUVZiUE20XR+pHQErtcmU0HMM1588xPaP3ic45eLKIBrwKx+t
-         7yxeC5U++LQEgpM0nInY/4Dwz1FebEfDwEDObBn9Iv56ODCnWq4Ae/5rXocg2jnJ4hw8
-         m61N+XXgweqX62OyYaC10u7lZRRxLJfc3aIxhGlVTROt/xby2Ld7FeSrHik2h1YtHIhB
-         vO4C5GG6FgBRuZBikNWT05JJuf8SRBBEvSXNjy3I4ZO1fz5pwFDx1gdFbYI2UfBZu99p
-         1AMkHS/EjBmSp5f9d3J0qOxBWVQdl+9SzWFoLgeMv2KxH2Amb5fQnpVLPZyqpmIYYvq3
-         c1EA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=TqLI60sjSsT5Okt3elXRCoAP14unLg0uiOTnUf56les=;
-        b=Sy4EIvcPXzv6F3knf0+BN57uouSa9TM//WIt2+mJZUnG2OFdonmklrMErDqajoTKX5
-         yKkMq2clVtmRB2HQ8UKZNEGhXSoTlDsEUDWHqY4WM4QvA6B7cMWVvOmaoc25i0I3Yn0d
-         QbwxFKOFFB/tkE1MnReB3h07331idLFaXXYkFfuG/l5YNRQKB6uDsoUrxdKNKKNBwkNm
-         BikWo/oUm7LI0I6NoD9UHLDbjeZenKWasjSyHSxbhVmBHl6SAc8O54bQIMQnWbot8Bon
-         nLt0V3ZEdwD1ULks9lSPUFG3eeMZjRig1LugDZGrIy70WFP1VnHsAWHJOWFkWcAaQLbr
-         9/Iw==
-X-Gm-Message-State: AOAM530b2N5B1ag1N47E9YVFzQz6+l8ZPp5C/7+8LZt8laumhk7GG7vA
-        0s+jpLATqewAVD/KbXcSfAXJ6gLwmW5nOAb3i4J8lK9EgKE=
-X-Google-Smtp-Source: ABdhPJyqaZf7nqdPzo/Ysi8H6/297HxD5ZiDlvEiZvp2L7lblZbKdRkP8aCsU40eVXlZGL26w9MkjyvqJIz0CatRpbU=
-X-Received: by 2002:a92:3f08:: with SMTP id m8mr5672265ila.154.1618850002798;
- Mon, 19 Apr 2021 09:33:22 -0700 (PDT)
+        id S233360AbhDSQdg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 19 Apr 2021 12:33:36 -0400
+Received: from foss.arm.com ([217.140.110.172]:46110 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S230127AbhDSQdd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 19 Apr 2021 12:33:33 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 19F341478;
+        Mon, 19 Apr 2021 09:33:03 -0700 (PDT)
+Received: from [192.168.0.110] (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 5B94F3F7D7;
+        Mon, 19 Apr 2021 09:33:02 -0700 (PDT)
+Subject: Re: [PATCH kvm-unit-tests 8/8] arm/arm64: psci: don't assume method
+ is hvc
+To:     Andrew Jones <drjones@redhat.com>, kvm@vger.kernel.org
+Cc:     nikos.nikoleris@arm.com, andre.przywara@arm.com,
+        eric.auger@redhat.com
+References: <20210407185918.371983-1-drjones@redhat.com>
+ <20210407185918.371983-9-drjones@redhat.com>
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+Message-ID: <a7896505-8343-9b26-6174-e1b17a697a81@arm.com>
+Date:   Mon, 19 Apr 2021 17:33:37 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.9.1
 MIME-Version: 1.0
-References: <202104172326.ZkdtgfKs-lkp@intel.com>
-In-Reply-To: <202104172326.ZkdtgfKs-lkp@intel.com>
-From:   Ben Gardon <bgardon@google.com>
-Date:   Mon, 19 Apr 2021 09:33:11 -0700
-Message-ID: <CANgfPd9WOLmQsDqQgtA5k4UHC+r6jPF4xFN5_gizg_fFa+LXjQ@mail.gmail.com>
-Subject: Re: [kvm:queue 153/154] arch/x86/kvm/mmu/mmu.c:5443:39: error:
- 'struct kvm_arch' has no member named 'tdp_mmu_roots'
-To:     kernel test robot <lkp@intel.com>
-Cc:     kbuild-all@lists.01.org, kvm <kvm@vger.kernel.org>,
-        Robert Hu <robert.hu@intel.com>,
-        Farrah Chen <farrah.chen@intel.com>,
-        Danmei Wei <danmei.wei@intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20210407185918.371983-9-drjones@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-I must have failed to propagate some #define CONFIG_x86_64 tags
-around. I can send out some patches to fix this and the other bug the
-test robot found.
+Hi Drew,
 
-On Sat, Apr 17, 2021 at 8:40 AM kernel test robot <lkp@intel.com> wrote:
+On 4/7/21 7:59 PM, Andrew Jones wrote:
+> The method can also be smc and it will be when running on bare metal.
 >
-> tree:   https://git.kernel.org/pub/scm/virt/kvm/kvm.git queue
-> head:   3afb84581509b8d28979d15b5d727366efb3c8e5
-> commit: 1336c692abad5a737dd6d18b30fae2e2183f73f7 [153/154] KVM: x86/mmu: Fast invalidation for TDP MMU
-> config: i386-allyesconfig (attached as .config)
-> compiler: gcc-9 (Debian 9.3.0-22) 9.3.0
-> reproduce (this is a W=1 build):
->         # https://git.kernel.org/pub/scm/virt/kvm/kvm.git/commit/?id=1336c692abad5a737dd6d18b30fae2e2183f73f7
->         git remote add kvm https://git.kernel.org/pub/scm/virt/kvm/kvm.git
->         git fetch --no-tags kvm queue
->         git checkout 1336c692abad5a737dd6d18b30fae2e2183f73f7
->         # save the attached .config to linux build tree
->         make W=1 W=1 ARCH=i386
->
-> If you fix the issue, kindly add following tag as appropriate
-> Reported-by: kernel test robot <lkp@intel.com>
->
-> All errors (new ones prefixed by >>):
->
->    In file included from include/linux/cpumask.h:10,
->                     from include/linux/mm_types_task.h:14,
->                     from include/linux/mm_types.h:5,
->                     from arch/x86/kvm/irq.h:13,
->                     from arch/x86/kvm/mmu/mmu.c:18:
->    arch/x86/kvm/mmu/mmu.c: In function 'kvm_mmu_zap_all_fast':
-> >> arch/x86/kvm/mmu/mmu.c:5443:39: error: 'struct kvm_arch' has no member named 'tdp_mmu_roots'
->     5443 |   list_for_each_entry(root, &kvm->arch.tdp_mmu_roots, link)
->          |                                       ^
->    include/linux/kernel.h:708:26: note: in definition of macro 'container_of'
->      708 |  void *__mptr = (void *)(ptr);     \
->          |                          ^~~
->    include/linux/list.h:522:2: note: in expansion of macro 'list_entry'
->      522 |  list_entry((ptr)->next, type, member)
->          |  ^~~~~~~~~~
->    include/linux/list.h:628:13: note: in expansion of macro 'list_first_entry'
->      628 |  for (pos = list_first_entry(head, typeof(*pos), member); \
->          |             ^~~~~~~~~~~~~~~~
->    arch/x86/kvm/mmu/mmu.c:5443:3: note: in expansion of macro 'list_for_each_entry'
->     5443 |   list_for_each_entry(root, &kvm->arch.tdp_mmu_roots, link)
->          |   ^~~~~~~~~~~~~~~~~~~
->    In file included from <command-line>:
-> >> arch/x86/kvm/mmu/mmu.c:5443:39: error: 'struct kvm_arch' has no member named 'tdp_mmu_roots'
->     5443 |   list_for_each_entry(root, &kvm->arch.tdp_mmu_roots, link)
->          |                                       ^
->    include/linux/compiler_types.h:300:9: note: in definition of macro '__compiletime_assert'
->      300 |   if (!(condition))     \
->          |         ^~~~~~~~~
->    include/linux/compiler_types.h:320:2: note: in expansion of macro '_compiletime_assert'
->      320 |  _compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
->          |  ^~~~~~~~~~~~~~~~~~~
->    include/linux/build_bug.h:39:37: note: in expansion of macro 'compiletime_assert'
->       39 | #define BUILD_BUG_ON_MSG(cond, msg) compiletime_assert(!(cond), msg)
->          |                                     ^~~~~~~~~~~~~~~~~~
->    include/linux/kernel.h:709:2: note: in expansion of macro 'BUILD_BUG_ON_MSG'
->      709 |  BUILD_BUG_ON_MSG(!__same_type(*(ptr), ((type *)0)->member) && \
->          |  ^~~~~~~~~~~~~~~~
->    include/linux/kernel.h:709:20: note: in expansion of macro '__same_type'
->      709 |  BUILD_BUG_ON_MSG(!__same_type(*(ptr), ((type *)0)->member) && \
->          |                    ^~~~~~~~~~~
->    include/linux/list.h:511:2: note: in expansion of macro 'container_of'
->      511 |  container_of(ptr, type, member)
->          |  ^~~~~~~~~~~~
->    include/linux/list.h:522:2: note: in expansion of macro 'list_entry'
->      522 |  list_entry((ptr)->next, type, member)
->          |  ^~~~~~~~~~
->    include/linux/list.h:628:13: note: in expansion of macro 'list_first_entry'
->      628 |  for (pos = list_first_entry(head, typeof(*pos), member); \
->          |             ^~~~~~~~~~~~~~~~
->    arch/x86/kvm/mmu/mmu.c:5443:3: note: in expansion of macro 'list_for_each_entry'
->     5443 |   list_for_each_entry(root, &kvm->arch.tdp_mmu_roots, link)
->          |   ^~~~~~~~~~~~~~~~~~~
-> >> arch/x86/kvm/mmu/mmu.c:5443:39: error: 'struct kvm_arch' has no member named 'tdp_mmu_roots'
->     5443 |   list_for_each_entry(root, &kvm->arch.tdp_mmu_roots, link)
->          |                                       ^
->    include/linux/compiler_types.h:300:9: note: in definition of macro '__compiletime_assert'
->      300 |   if (!(condition))     \
->          |         ^~~~~~~~~
->    include/linux/compiler_types.h:320:2: note: in expansion of macro '_compiletime_assert'
->      320 |  _compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
->          |  ^~~~~~~~~~~~~~~~~~~
->    include/linux/build_bug.h:39:37: note: in expansion of macro 'compiletime_assert'
->       39 | #define BUILD_BUG_ON_MSG(cond, msg) compiletime_assert(!(cond), msg)
->          |                                     ^~~~~~~~~~~~~~~~~~
->    include/linux/kernel.h:709:2: note: in expansion of macro 'BUILD_BUG_ON_MSG'
->      709 |  BUILD_BUG_ON_MSG(!__same_type(*(ptr), ((type *)0)->member) && \
->          |  ^~~~~~~~~~~~~~~~
->    include/linux/kernel.h:710:6: note: in expansion of macro '__same_type'
->      710 |     !__same_type(*(ptr), void),   \
->          |      ^~~~~~~~~~~
->    include/linux/list.h:511:2: note: in expansion of macro 'container_of'
->      511 |  container_of(ptr, type, member)
->          |  ^~~~~~~~~~~~
->    include/linux/list.h:522:2: note: in expansion of macro 'list_entry'
->      522 |  list_entry((ptr)->next, type, member)
->          |  ^~~~~~~~~~
->    include/linux/list.h:628:13: note: in expansion of macro 'list_first_entry'
->      628 |  for (pos = list_first_entry(head, typeof(*pos), member); \
->          |             ^~~~~~~~~~~~~~~~
->    arch/x86/kvm/mmu/mmu.c:5443:3: note: in expansion of macro 'list_for_each_entry'
->     5443 |   list_for_each_entry(root, &kvm->arch.tdp_mmu_roots, link)
->          |   ^~~~~~~~~~~~~~~~~~~
->    In file included from include/linux/mm_types.h:8,
->                     from arch/x86/kvm/irq.h:13,
->                     from arch/x86/kvm/mmu/mmu.c:18:
-> >> arch/x86/kvm/mmu/mmu.c:5443:39: error: 'struct kvm_arch' has no member named 'tdp_mmu_roots'
->     5443 |   list_for_each_entry(root, &kvm->arch.tdp_mmu_roots, link)
->          |                                       ^
->    include/linux/list.h:619:20: note: in definition of macro 'list_entry_is_head'
->      619 |  (&pos->member == (head))
->          |                    ^~~~
->    arch/x86/kvm/mmu/mmu.c:5443:3: note: in expansion of macro 'list_for_each_entry'
->     5443 |   list_for_each_entry(root, &kvm->arch.tdp_mmu_roots, link)
->          |   ^~~~~~~~~~~~~~~~~~~
->
->
-> vim +5443 arch/x86/kvm/mmu/mmu.c
->
->   5398
->   5399  /*
->   5400   * Fast invalidate all shadow pages and use lock-break technique
->   5401   * to zap obsolete pages.
->   5402   *
->   5403   * It's required when memslot is being deleted or VM is being
->   5404   * destroyed, in these cases, we should ensure that KVM MMU does
->   5405   * not use any resource of the being-deleted slot or all slots
->   5406   * after calling the function.
->   5407   */
->   5408  static void kvm_mmu_zap_all_fast(struct kvm *kvm)
->   5409  {
->   5410          struct kvm_mmu_page *root;
->   5411
->   5412          lockdep_assert_held(&kvm->slots_lock);
->   5413
->   5414          write_lock(&kvm->mmu_lock);
->   5415          trace_kvm_mmu_zap_all_fast(kvm);
->   5416
->   5417          /*
->   5418           * Toggle mmu_valid_gen between '0' and '1'.  Because slots_lock is
->   5419           * held for the entire duration of zapping obsolete pages, it's
->   5420           * impossible for there to be multiple invalid generations associated
->   5421           * with *valid* shadow pages at any given time, i.e. there is exactly
->   5422           * one valid generation and (at most) one invalid generation.
->   5423           */
->   5424          kvm->arch.mmu_valid_gen = kvm->arch.mmu_valid_gen ? 0 : 1;
->   5425
->   5426
->   5427          if (is_tdp_mmu_enabled(kvm)) {
->   5428                  /*
->   5429                   * Mark each TDP MMU root as invalid so that other threads
->   5430                   * will drop their references and allow the root count to
->   5431                   * go to 0.
->   5432                   *
->   5433                   * This has essentially the same effect for the TDP MMU
->   5434                   * as updating mmu_valid_gen above does for the shadow
->   5435                   * MMU.
->   5436                   *
->   5437                   * In order to ensure all threads see this change when
->   5438                   * handling the MMU reload signal, this must happen in the
->   5439                   * same critical section as kvm_reload_remote_mmus, and
->   5440                   * before kvm_zap_obsolete_pages as kvm_zap_obsolete_pages
->   5441                   * could drop the MMU lock and yield.
->   5442                   */
-> > 5443                  list_for_each_entry(root, &kvm->arch.tdp_mmu_roots, link)
->   5444                          root->role.invalid = true;
->   5445          }
->   5446
->   5447          /*
->   5448           * Notify all vcpus to reload its shadow page table and flush TLB.
->   5449           * Then all vcpus will switch to new shadow page table with the new
->   5450           * mmu_valid_gen.
->   5451           *
->   5452           * Note: we need to do this under the protection of mmu_lock,
->   5453           * otherwise, vcpu would purge shadow page but miss tlb flush.
->   5454           */
->   5455          kvm_reload_remote_mmus(kvm);
->   5456
->   5457          kvm_zap_obsolete_pages(kvm);
->   5458
->   5459          write_unlock(&kvm->mmu_lock);
->   5460  }
->   5461
->
+> Signed-off-by: Andrew Jones <drjones@redhat.com>
 > ---
-> 0-DAY CI Kernel Test Service, Intel Corporation
-> https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
+>  arm/selftest.c     | 34 +++++++---------------------------
+>  lib/arm/asm/psci.h |  9 +++++++--
+>  lib/arm/psci.c     | 17 +++++++++++++++--
+>  lib/arm/setup.c    | 22 ++++++++++++++++++++++
+>  4 files changed, 51 insertions(+), 31 deletions(-)
+>
+> diff --git a/arm/selftest.c b/arm/selftest.c
+> index 4495b161cdd5..9f459ed3d571 100644
+> --- a/arm/selftest.c
+> +++ b/arm/selftest.c
+> @@ -400,33 +400,13 @@ static void check_vectors(void *arg __unused)
+>  	exit(report_summary());
+>  }
+>  
+> -static bool psci_check(void)
+> +static void psci_print(void)
+>  {
+> -	const struct fdt_property *method;
+> -	int node, len, ver;
+> -
+> -	node = fdt_node_offset_by_compatible(dt_fdt(), -1, "arm,psci-0.2");
+> -	if (node < 0) {
+> -		printf("PSCI v0.2 compatibility required\n");
+> -		return false;
+> -	}
+> -
+> -	method = fdt_get_property(dt_fdt(), node, "method", &len);
+> -	if (method == NULL) {
+> -		printf("bad psci device tree node\n");
+> -		return false;
+> -	}
+> -
+> -	if (len < 4 || strcmp(method->data, "hvc") != 0) {
+> -		printf("psci method must be hvc\n");
+> -		return false;
+> -	}
+> -
+> -	ver = psci_invoke(PSCI_0_2_FN_PSCI_VERSION, 0, 0, 0);
+> -	printf("PSCI version %d.%d\n", PSCI_VERSION_MAJOR(ver),
+> -				       PSCI_VERSION_MINOR(ver));
+> -
+> -	return true;
+> +	int ver = psci_invoke(PSCI_0_2_FN_PSCI_VERSION, 0, 0, 0);
+> +	report_info("PSCI version: %d.%d", PSCI_VERSION_MAJOR(ver),
+> +					  PSCI_VERSION_MINOR(ver));
+> +	report_info("PSCI method: %s", psci_invoke == psci_invoke_hvc ?
+> +				       "hvc" : "smc");
+>  }
+>  
+>  static void cpu_report(void *data __unused)
+> @@ -465,7 +445,7 @@ int main(int argc, char **argv)
+>  
+>  	} else if (strcmp(argv[1], "smp") == 0) {
+>  
+> -		report(psci_check(), "PSCI version");
+> +		psci_print();
+>  		on_cpus(cpu_report, NULL);
+>  		while (!cpumask_full(&ready))
+>  			cpu_relax();
+> diff --git a/lib/arm/asm/psci.h b/lib/arm/asm/psci.h
+> index 7b956bf5987d..e385ce27f5d1 100644
+> --- a/lib/arm/asm/psci.h
+> +++ b/lib/arm/asm/psci.h
+> @@ -3,8 +3,13 @@
+>  #include <libcflat.h>
+>  #include <linux/psci.h>
+>  
+> -extern int psci_invoke(unsigned long function_id, unsigned long arg0,
+> -		       unsigned long arg1, unsigned long arg2);
+> +typedef int (*psci_invoke_fn)(unsigned long function_id, unsigned long arg0,
+
+function_id is 32bits. sizeof(unsigned long) is 64 bits for arm64.
+
+> +			      unsigned long arg1, unsigned long arg2);
+> +extern psci_invoke_fn psci_invoke;
+> +extern int psci_invoke_hvc(unsigned long function_id, unsigned long arg0,
+> +			   unsigned long arg1, unsigned long arg2);
+> +extern int psci_invoke_smc(unsigned long function_id, unsigned long arg0,
+> +			   unsigned long arg1, unsigned long arg2);
+>  extern int psci_cpu_on(unsigned long cpuid, unsigned long entry_point);
+>  extern void psci_system_reset(void);
+>  extern int cpu_psci_cpu_boot(unsigned int cpu);
+> diff --git a/lib/arm/psci.c b/lib/arm/psci.c
+> index 936c83948b6a..46300f30822c 100644
+> --- a/lib/arm/psci.c
+> +++ b/lib/arm/psci.c
+> @@ -11,9 +11,11 @@
+>  #include <asm/page.h>
+>  #include <asm/smp.h>
+>  
+> +psci_invoke_fn psci_invoke;
+
+In setup(), we set the conduit after we call assert() several time. If the asert()
+fails, then psci_system_off() will end up calling a NULL function. Maybe there
+should be some sort of check for that?
+
+> +
+>  __attribute__((noinline))
+> -int psci_invoke(unsigned long function_id, unsigned long arg0,
+> -		unsigned long arg1, unsigned long arg2)
+> +int psci_invoke_hvc(unsigned long function_id, unsigned long arg0,
+> +		    unsigned long arg1, unsigned long arg2)
+>  {
+>  	asm volatile(
+>  		"hvc #0"
+> @@ -22,6 +24,17 @@ int psci_invoke(unsigned long function_id, unsigned long arg0,
+>  	return function_id;
+>  }
+>  
+> +__attribute__((noinline))
+> +int psci_invoke_smc(unsigned long function_id, unsigned long arg0,
+> +		    unsigned long arg1, unsigned long arg2)
+> +{
+> +	asm volatile(
+> +		"smc #0"
+> +	: "+r" (function_id)
+> +	: "r" (arg0), "r" (arg1), "r" (arg2));
+> +	return function_id;
+
+I haven't been able to figure out what prevents the compiler from shuffling the
+arguments around before executing the inline assembly, such that x0-x3 doesn't
+contain the arguments in the order we are expecting.
+
+Some excerpts from the extended asm help page [1] that make me believe that the
+compiler doesn't provide any guarantees:
+
+"If you must use a specific register, but your Machine Constraints do not provide
+sufficient control to select the specific register you want, local register
+variables may provide a solution"
+
+"Using the generic ‘r’ constraint instead of a constraint for a specific register
+allows the compiler to pick the register to use, which can result in more
+efficient code."
+
+Same with psci_invoke_hvc(). Doing both in assembly (like Linux) should be
+sufficient and fairly straightforward.
+
+[1] https://gcc.gnu.org/onlinedocs/gcc/Extended-Asm.html#Extended-Asm
+
+> +}
+> +
+>  int psci_cpu_on(unsigned long cpuid, unsigned long entry_point)
+>  {
+>  #ifdef __arm__
+> diff --git a/lib/arm/setup.c b/lib/arm/setup.c
+> index 5cda2d919d2b..e595a9e5a167 100644
+> --- a/lib/arm/setup.c
+> +++ b/lib/arm/setup.c
+> @@ -25,6 +25,7 @@
+>  #include <asm/processor.h>
+>  #include <asm/smp.h>
+>  #include <asm/timer.h>
+> +#include <asm/psci.h>
+>  
+>  #include "io.h"
+>  
+> @@ -55,6 +56,26 @@ int mpidr_to_cpu(uint64_t mpidr)
+>  	return -1;
+>  }
+>  
+> +static void psci_set_conduit(void)
+> +{
+> +	const void *fdt = dt_fdt();
+> +	const struct fdt_property *method;
+> +	int node, len;
+> +
+> +	node = fdt_node_offset_by_compatible(fdt, -1, "arm,psci-0.2");
+> +	assert_msg(node >= 0, "PSCI v0.2 compatibility required");
+> +
+> +	method = fdt_get_property(fdt, node, "method", &len);
+> +	assert(method != NULL && len == 4);
+> +
+> +	if (strcmp(method->data, "hvc") == 0)
+> +		psci_invoke = psci_invoke_hvc;
+> +	else if (strcmp(method->data, "smc") == 0)
+> +		psci_invoke = psci_invoke_smc;
+> +	else
+> +		assert_msg(false, "Unknown PSCI conduit: %s", method->data);
+> +}
+
+Any particular reason for doing this here instead of in psci.c? This looks like
+something that belongs to that file, but that might just be my personal preference.
+
+Thanks,
+
+Alex
+
+> +
+>  static void cpu_set(int fdtnode __unused, u64 regval, void *info __unused)
+>  {
+>  	int cpu = nr_cpus++;
+> @@ -259,6 +280,7 @@ void setup(const void *fdt, phys_addr_t freemem_start)
+>  	mem_regions_add_assumed();
+>  	mem_init(PAGE_ALIGN((unsigned long)freemem));
+>  
+> +	psci_set_conduit();
+>  	cpu_init();
+>  
+>  	/* cpu_init must be called before thread_info_init */
