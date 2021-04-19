@@ -2,311 +2,362 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9021B3641DC
-	for <lists+kvm@lfdr.de>; Mon, 19 Apr 2021 14:41:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0FB9B3643A1
+	for <lists+kvm@lfdr.de>; Mon, 19 Apr 2021 15:31:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239144AbhDSMmQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 19 Apr 2021 08:42:16 -0400
-Received: from forward3-smtp.messagingengine.com ([66.111.4.237]:53993 "EHLO
-        forward3-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233112AbhDSMmP (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 19 Apr 2021 08:42:15 -0400
-Received: from compute4.internal (compute4.nyi.internal [10.202.2.44])
-        by mailforward.nyi.internal (Postfix) with ESMTP id AD52A1940DEE;
-        Mon, 19 Apr 2021 08:41:45 -0400 (EDT)
-Received: from mailfrontend1 ([10.202.2.162])
-  by compute4.internal (MEProxy); Mon, 19 Apr 2021 08:41:45 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:content-type:date:from:in-reply-to
-        :message-id:mime-version:references:subject:to:x-me-proxy
-        :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; bh=0jAWxN
-        QBqoFLqOtPNvMpSzPTkphK++QymqeX+Nel/UI=; b=B8G/CwVz995F9jE5jfIHBN
-        b9MCQ/6cHAYJuQvXec2sgzY8YgIPL283vO3MYxE+BA6Wdv7AF5cNK8GjrDp8o1UN
-        S84x7gRWIKutPo0Im3xGbeJmmM6RwRpf2MmzbTpInwqvIoGqOuiG35Mz21qH/+kl
-        16d82WZPoDzgTtlzf/OEWLyuHprfBV5OauChkzg9mIvlQ2BNWjikV4lEFdbquMNk
-        E08YFNhv8Uff3vKeutBVgeSIZRvdM/OuzS3JgmPDW21r/k79hoGnM2qciQVXxTYS
-        W3ItIJL0an874tTBh+wmrgh2z09uxLmcMDy9foSa4Adv5+fmfySifBIb/qLHlNTw
-        ==
-X-ME-Sender: <xms:iXp9YOYpcF-dM8zMvmHJ1iK6MzZVd7lQVmaYZVWrFyHlwETMt_ZKzA>
-    <xme:iXp9YBaXZMSqk_sh0QptSZPRp0pJgsFQurydihpzfCUIXpsx-rsapmXeiOwtvWWMp
-    yFmDwtUbr34kdzRyQo>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeduledrvddtgedgheeiucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
-    cujfgurhepvffujghfhfffkfggtgesthdtredttddttdenucfhrhhomhepffgrvhhiugcu
-    gfgumhhonhgushhonhcuoegumhgvsegumhgvrdhorhhgqeenucggtffrrghtthgvrhhnpe
-    fhkeeguedtvdegffffteehjedvjeeitefgfefgffdugeffffegudehgeetgeelkeenucfk
-    phepkedurddukeejrddviedrvdefkeenucevlhhushhtvghrufhiiigvpedtnecurfgrrh
-    grmhepmhgrihhlfhhrohhmpegumhgvsegumhgvrdhorhhg
-X-ME-Proxy: <xmx:iXp9YI9wOlLochoQCssecnroMOw7VxXS6G5g-6hErcsIGcnbaXlR3w>
-    <xmx:iXp9YArTuY6tSao6v1l0yelK0p1TgyVOSFh3FUKJE2RuD9r3_kEPTQ>
-    <xmx:iXp9YJqbNS7i2QFUiLIA_lvWZ29l_zkyM-YYEfphIVGARdpRo-wIJQ>
-    <xmx:iXp9YAVXNyUCO9vSBGapSQsitpQpYCkA5dHaGu8uzCKRWAf8xy_VRQ>
-Received: from disaster-area.hh.sledj.net (disaster-area.hh.sledj.net [81.187.26.238])
-        by mail.messagingengine.com (Postfix) with ESMTPA id CC73624005C;
-        Mon, 19 Apr 2021 08:41:44 -0400 (EDT)
-Received: from localhost (disaster-area.hh.sledj.net [local])
-        by disaster-area.hh.sledj.net (OpenSMTPD) with ESMTPA id 76b3293b;
-        Mon, 19 Apr 2021 12:41:43 +0000 (UTC)
-To:     Aaron Lewis <aaronlewis@google.com>
-Cc:     jmattson@google.com, seanjc@google.com, kvm@vger.kernel.org,
-        Aaron Lewis <aaronlewis@google.com>
-Subject: Re: [PATCH 1/2] kvm: x86: Allow userspace to handle emulation errors
-In-Reply-To: <20210416131820.2566571-1-aaronlewis@google.com>
-References: <20210416131820.2566571-1-aaronlewis@google.com>
-X-HGTTG: zarquon
-From:   David Edmondson <dme@dme.org>
-X-Now-Playing: Floating Points - Elaenia: Elaenia
-Date:   Mon, 19 Apr 2021 13:41:43 +0100
-Message-ID: <cunblaaqwe0.fsf@dme.org>
+        id S240652AbhDSNVM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 19 Apr 2021 09:21:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58338 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S241398AbhDSNU3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 19 Apr 2021 09:20:29 -0400
+Received: from mail-lf1-x12e.google.com (mail-lf1-x12e.google.com [IPv6:2a00:1450:4864:20::12e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B5351C061373
+        for <kvm@vger.kernel.org>; Mon, 19 Apr 2021 06:18:54 -0700 (PDT)
+Received: by mail-lf1-x12e.google.com with SMTP id n138so56006198lfa.3
+        for <kvm@vger.kernel.org>; Mon, 19 Apr 2021 06:18:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=ICjc9fLtNV7Ru7mKiGaY8uOB3WqgEhqKpsTcAMCMfWA=;
+        b=Eevn823c7q6BC2k/R5sZssPrJ4uwmX4bc93DPEPTQDdJaY9WiAalUqWZiIVD9qgZIV
+         Wd62N/V74AQhCqEuRzTn6yBYKH+3elcvMagbbbyMmRKb9vdVS1Q3E8tvgu2vH/eeGdQz
+         y1BfACzUOPrYOBv6UtBgLoI3ZrYP9pW/ZPdIdcPIBXdPBEU/lkxBuFDIU+rlvkpGdm77
+         mtSzkkNLi4qGCVgtdU9lNoXChuVSeKt3ehqBgD51KhCAtTnEngD4Smb54ny97KWiX8r1
+         zqg4RE+a4mOyzn9CxdIpsVokvbZoz40eH8HNUTMyoBz3o7dck1qBZvuqfMYgHXx/e2+G
+         JfTA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=ICjc9fLtNV7Ru7mKiGaY8uOB3WqgEhqKpsTcAMCMfWA=;
+        b=pmzO5gJ5Z5vo4uy2M6NlDfxi/7sAMg7lSc3EcF7C5JXamSMO248OS+RkYK6j5WUoqu
+         ZDqE3zCWdgQcPj5VHIm4vMCL2Z9Mp9bQRHqXloEL5TwkRndfdJTwRjteCMj83R+A/r++
+         kLi+tmcDy3yWyx/O7MaS7q4jP2nVIfccRrkclZotcaE0GmSGHj73W9AZ14WVHNPzpkSK
+         W8RDjfH5NqCetB/KwWHb8aLfRoH1HmDRcFGlNmUfXZ5A/yAhIP5/IiMap9zYjHr02ZuH
+         A55plRCTu6wsO2qWadX2nwIORoXyZ8qCBCAuAJ6A58ZlhnSViKjZxRx03G95dXJSXrg1
+         qC6Q==
+X-Gm-Message-State: AOAM5326RSFTqK3NPjNOQzlfWDW6xlYybxc2nDVQ+dg2y0lpDKoKDZJ9
+        dLB+6ZKO+aR9l63oV87mSRuYMeDevQfupoZ7kbc/FQ==
+X-Google-Smtp-Source: ABdhPJyu1mtgIp2YR+7X8iN5Ds69+pZ/OZJfwc24L5jIIlOaw2bZwEG+DjSjUTzdthDCgSQvyhWmnYXfxsnz7zZRkMo=
+X-Received: by 2002:a19:700a:: with SMTP id h10mr4841975lfc.178.1618838331770;
+ Mon, 19 Apr 2021 06:18:51 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain
+References: <20210415151741.1607806-1-jingzhangos@google.com>
+ <20210415151741.1607806-4-jingzhangos@google.com> <3d985605-a2ad-b25e-328c-c37cb4ef1794@arm.com>
+In-Reply-To: <3d985605-a2ad-b25e-328c-c37cb4ef1794@arm.com>
+From:   Jing Zhang <jingzhangos@google.com>
+Date:   Mon, 19 Apr 2021 08:18:39 -0500
+Message-ID: <CAAdAUtiNJGRa=TKynxKVGQA4W-L63j1ZaL-QYS6jDoMgrSVrMQ@mail.gmail.com>
+Subject: Re: [PATCH v2 3/4] KVM: stats: Add documentation for statistics data
+ binary interface
+To:     Yoan Picchi <yoan.picchi@arm.com>
+Cc:     KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.cs.columbia.edu>,
+        LinuxMIPS <linux-mips@vger.kernel.org>,
+        KVMPPC <kvm-ppc@vger.kernel.org>,
+        LinuxS390 <linux-s390@vger.kernel.org>,
+        Linuxkselftest <linux-kselftest@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Marc Zyngier <maz@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Peter Shier <pshier@google.com>,
+        Oliver Upton <oupton@google.com>,
+        David Rientjes <rientjes@google.com>,
+        Emanuele Giuseppe Esposito <eesposit@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Thanks for sending the patches.
+Hi Yoan,
 
-On Friday, 2021-04-16 at 06:18:19 -07, Aaron Lewis wrote:
-
-> Add a fallback mechanism to the in-kernel instruction emulator that
-> allows userspace the opportunity to process an instruction the emulator
-> was unable to.  When the in-kernel instruction emulator fails to process
-> an instruction it will either inject a #UD into the guest or exit to
-> userspace with exit reason KVM_INTERNAL_ERROR.  This is because it does
-> not know how to proceed in an appropriate manner.  This feature lets
-> userspace get involved to see if it can figure out a better path
-> forward.
-
-Given that you are intending to try and handle the instruction in
-user-space, it seems a little odd to overload the
-KVM_EXIT_INTERNAL_ERROR/KVM_INTERNAL_ERROR_EMULATION exit reason/sub
-error.
-
-Why not add a new exit reason, particularly given that the caller has to
-enable the capability to get the relevant data? (It would also remove
-the need for the flag field and any mechanism for packing multiple bits
-of detail into the structure.)
-
+On Mon, Apr 19, 2021 at 5:46 AM Yoan Picchi <yoan.picchi@arm.com> wrote:
 >
-> Signed-off-by: Aaron Lewis <aaronlewis@google.com>
-> Change-Id: If9876bc73d26f6c3ff9a8bce177c2fc6f160e629
-> ---
->  Documentation/virt/kvm/api.rst  | 16 ++++++++++++++++
->  arch/x86/include/asm/kvm_host.h |  6 ++++++
->  arch/x86/kvm/x86.c              | 33 +++++++++++++++++++++++++++++----
->  include/uapi/linux/kvm.h        | 20 ++++++++++++++++++++
->  tools/include/uapi/linux/kvm.h  | 20 ++++++++++++++++++++
->  5 files changed, 91 insertions(+), 4 deletions(-)
+> Hello Jing, and thanks for the patches. Just two small nitpicks.
 >
-> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-> index 307f2fcf1b02..f8278e893fbe 100644
-> --- a/Documentation/virt/kvm/api.rst
-> +++ b/Documentation/virt/kvm/api.rst
-> @@ -6233,6 +6233,22 @@ KVM_RUN_BUS_LOCK flag is used to distinguish between them.
->  This capability can be used to check / enable 2nd DAWR feature provided
->  by POWER10 processor.
->  
-> +7.24 KVM_CAP_EXIT_ON_EMULATION_FAILURE
-> +--------------------------------------
-> +
-> +:Architectures: x86
-> +:Parameters: args[0] whether the feature should be enabled or not
-> +
-> +With this capability enabled, the in-kernel instruction emulator packs the exit
-> +struct of KVM_INTERNAL_ERROR with the instruction length and instruction bytes
-> +when an error occurs while emulating an instruction.  This allows userspace to
-> +then take a look at the instruction and see if it is able to handle it more
-> +gracefully than the in-kernel emulator.
-> +
-> +When this capability is enabled use the emulation_failure struct instead of the
-> +internal struct for the exit struct.  They have the same layout, but the
-> +emulation_failure struct matches the content better.
-> +
->  8. Other capabilities.
->  ======================
->  
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index 3768819693e5..07235d08e976 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -1049,6 +1049,12 @@ struct kvm_arch {
->  	bool exception_payload_enabled;
->  
->  	bool bus_lock_detection_enabled;
-> +	/*
-> +	 * If exit_on_emulation_error is set, and the in-kernel instruction
-> +	 * emulator fails to emulate an instruction, allow userspace
-> +	 * the opportunity to look at it.
-> +	 */
-> +	bool exit_on_emulation_error;
->  
->  	/* Deflect RDMSR and WRMSR to user space when they trigger a #GP */
->  	u32 user_space_msr_mask;
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index eca63625aee4..f9a207f815fb 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -3771,6 +3771,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
->  	case KVM_CAP_X86_USER_SPACE_MSR:
->  	case KVM_CAP_X86_MSR_FILTER:
->  	case KVM_CAP_ENFORCE_PV_FEATURE_CPUID:
-> +	case KVM_CAP_EXIT_ON_EMULATION_FAILURE:
->  		r = 1;
->  		break;
->  #ifdef CONFIG_KVM_XEN
-> @@ -5357,6 +5358,10 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
->  			kvm->arch.bus_lock_detection_enabled = true;
->  		r = 0;
->  		break;
-> +	case KVM_CAP_EXIT_ON_EMULATION_FAILURE:
-> +		kvm->arch.exit_on_emulation_error = cap->args[0];
-> +		r = 0;
-> +		break;
->  	default:
->  		r = -EINVAL;
->  		break;
-> @@ -7119,8 +7124,29 @@ void kvm_inject_realmode_interrupt(struct kvm_vcpu *vcpu, int irq, int inc_eip)
->  }
->  EXPORT_SYMBOL_GPL(kvm_inject_realmode_interrupt);
->  
-> +static void prepare_emulation_failure_exit(struct kvm_vcpu *vcpu)
-> +{
-> +	struct x86_emulate_ctxt *ctxt = vcpu->arch.emulate_ctxt;
-> +	u64 insn_size = ctxt->fetch.end - ctxt->fetch.data;
-> +	struct kvm *kvm = vcpu->kvm;
-> +
-> +	vcpu->run->exit_reason = KVM_EXIT_INTERNAL_ERROR;
-> +	vcpu->run->emulation_failure.suberror = KVM_INTERNAL_ERROR_EMULATION;
-> +	vcpu->run->emulation_failure.ndata = 0;
-> +	if (kvm->arch.exit_on_emulation_error && insn_size > 0) {
-> +		vcpu->run->emulation_failure.ndata = 3;
-> +		vcpu->run->emulation_failure.flags =
-> +			KVM_INTERNAL_ERROR_EMULATION_FLAG_INSTRUCTION_BYTES;
-> +		vcpu->run->emulation_failure.insn_size = insn_size;
-> +		memcpy(vcpu->run->emulation_failure.insn_bytes,
-> +		       ctxt->fetch.data, sizeof(ctxt->fetch.data));
-> +	}
-> +}
-> +
->  static int handle_emulation_failure(struct kvm_vcpu *vcpu, int emulation_type)
->  {
-> +	struct kvm *kvm = vcpu->kvm;
-> +
->  	++vcpu->stat.insn_emulation_fail;
->  	trace_kvm_emulate_insn_failed(vcpu);
->  
-> @@ -7129,10 +7155,9 @@ static int handle_emulation_failure(struct kvm_vcpu *vcpu, int emulation_type)
->  		return 1;
->  	}
->  
-> -	if (emulation_type & EMULTYPE_SKIP) {
-> -		vcpu->run->exit_reason = KVM_EXIT_INTERNAL_ERROR;
-> -		vcpu->run->internal.suberror = KVM_INTERNAL_ERROR_EMULATION;
-> -		vcpu->run->internal.ndata = 0;
-> +	if (kvm->arch.exit_on_emulation_error ||
-> +	    (emulation_type & EMULTYPE_SKIP)) {
-> +		prepare_emulation_failure_exit(vcpu);
->  		return 0;
->  	}
->  
-> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> index f6afee209620..7c77099235b2 100644
-> --- a/include/uapi/linux/kvm.h
-> +++ b/include/uapi/linux/kvm.h
-> @@ -279,6 +279,17 @@ struct kvm_xen_exit {
->  /* Encounter unexpected vm-exit reason */
->  #define KVM_INTERNAL_ERROR_UNEXPECTED_EXIT_REASON	4
->  
-> +/*
-> + * When using the suberror KVM_INTERNAL_ERROR_EMULATION, these flags are used
-> + * to describe what is contained in the exit struct.  The flags are used to
-> + * describe it's contents, and the contents should be in ascending numerical
-> + * order of the flag values.  For example, if the flag
-> + * KVM_INTERNAL_ERROR_EMULATION_FLAG_INSTRUCTION_BYTES is set, the instruction
-> + * length and instruction bytes would be expected to show up first because this
-> + * flag has the lowest numerical value (1) of all the other flags.
-> + */
-> +#define KVM_INTERNAL_ERROR_EMULATION_FLAG_INSTRUCTION_BYTES (1ULL << 0)
-> +
->  /* for KVM_RUN, returned by mmap(vcpu_fd, offset=0) */
->  struct kvm_run {
->  	/* in */
-> @@ -382,6 +393,14 @@ struct kvm_run {
->  			__u32 ndata;
->  			__u64 data[16];
->  		} internal;
-> +		/* KVM_EXIT_INTERNAL_ERROR, too (not 2) */
-> +		struct {
-> +			__u32 suberror;
-> +			__u32 ndata;
-> +			__u64 flags;
-> +			__u8  insn_size;
-> +			__u8  insn_bytes[15];
-> +		} emulation_failure;
->  		/* KVM_EXIT_OSI */
->  		struct {
->  			__u64 gprs[32];
-> @@ -1078,6 +1097,7 @@ struct kvm_ppc_resize_hpt {
->  #define KVM_CAP_DIRTY_LOG_RING 192
->  #define KVM_CAP_X86_BUS_LOCK_EXIT 193
->  #define KVM_CAP_PPC_DAWR1 194
-> +#define KVM_CAP_EXIT_ON_EMULATION_FAILURE 195
->  
->  #ifdef KVM_CAP_IRQ_ROUTING
->  
-> diff --git a/tools/include/uapi/linux/kvm.h b/tools/include/uapi/linux/kvm.h
-> index f6afee209620..7c77099235b2 100644
-> --- a/tools/include/uapi/linux/kvm.h
-> +++ b/tools/include/uapi/linux/kvm.h
-> @@ -279,6 +279,17 @@ struct kvm_xen_exit {
->  /* Encounter unexpected vm-exit reason */
->  #define KVM_INTERNAL_ERROR_UNEXPECTED_EXIT_REASON	4
->  
-> +/*
-> + * When using the suberror KVM_INTERNAL_ERROR_EMULATION, these flags are used
-> + * to describe what is contained in the exit struct.  The flags are used to
-> + * describe it's contents, and the contents should be in ascending numerical
-> + * order of the flag values.  For example, if the flag
-> + * KVM_INTERNAL_ERROR_EMULATION_FLAG_INSTRUCTION_BYTES is set, the instruction
-> + * length and instruction bytes would be expected to show up first because this
-> + * flag has the lowest numerical value (1) of all the other flags.
-
-When adding a new flag, do I steal bytes from insn_bytes[] for my
-associated payload? If so, how many do I have to leave?
-
-> + */
-> +#define KVM_INTERNAL_ERROR_EMULATION_FLAG_INSTRUCTION_BYTES (1ULL << 0)
-> +
->  /* for KVM_RUN, returned by mmap(vcpu_fd, offset=0) */
->  struct kvm_run {
->  	/* in */
-> @@ -382,6 +393,14 @@ struct kvm_run {
->  			__u32 ndata;
->  			__u64 data[16];
->  		} internal;
-> +		/* KVM_EXIT_INTERNAL_ERROR, too (not 2) */
-> +		struct {
-> +			__u32 suberror;
-> +			__u32 ndata;
-> +			__u64 flags;
-> +			__u8  insn_size;
-> +			__u8  insn_bytes[15];
-> +		} emulation_failure;
->  		/* KVM_EXIT_OSI */
->  		struct {
->  			__u64 gprs[32];
-> @@ -1078,6 +1097,7 @@ struct kvm_ppc_resize_hpt {
->  #define KVM_CAP_DIRTY_LOG_RING 192
->  #define KVM_CAP_X86_BUS_LOCK_EXIT 193
->  #define KVM_CAP_PPC_DAWR1 194
-> +#define KVM_CAP_EXIT_ON_EMULATION_FAILURE 195
->  
->  #ifdef KVM_CAP_IRQ_ROUTING
->  
-> -- 
-> 2.31.1.368.gbe11c130af-goog
-
-dme.
--- 
-Walking upside down in the sky, between the satellites passing by, I'm looking.
+> On 15/04/2021 16:17, Jing Zhang wrote:
+> > Signed-off-by: Jing Zhang <jingzhangos@google.com>
+> > ---
+> >   Documentation/virt/kvm/api.rst | 169 ++++++++++++++++++++++++++++++++=
++
+> >   1 file changed, 169 insertions(+)
+> >
+> > diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/ap=
+i.rst
+> > index 2c4253718881..6474c31a4436 100644
+> > --- a/Documentation/virt/kvm/api.rst
+> > +++ b/Documentation/virt/kvm/api.rst
+> > @@ -4941,6 +4941,167 @@ see KVM_XEN_VCPU_SET_ATTR above.
+> >   The KVM_XEN_VCPU_ATTR_TYPE_RUNSTATE_ADJUST type may not be used
+> >   with the KVM_XEN_VCPU_GET_ATTR ioctl.
+> >
+> > +4.131 KVM_STATS_GETFD
+> > +---------------------
+> > +
+> > +:Capability: KVM_CAP_STATS_BINARY_FD
+> > +:Architectures: all
+> > +:Type: vm ioctl, vcpu ioctl
+> > +:Parameters: none
+> > +:Returns: statistics file descriptor on success, < 0 on error
+> > +
+> > +Errors:
+> > +
+> > +  =3D=3D=3D=3D=3D=3D     =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> > +  ENOMEM     if the fd could not be created due to lack of memory
+> > +  EMFILE     if the number of opened files exceeds the limit
+> > +  =3D=3D=3D=3D=3D=3D     =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> > +
+> > +The file descriptor can be used to read VM/vCPU statistics data in bin=
+ary
+> > +format. The file data is organized into three blocks as below:
+> > ++-------------+
+> > +|   Header    |
+> > ++-------------+
+> > +| Descriptors |
+> > ++-------------+
+> > +| Stats Data  |
+> > ++-------------+
+> > +
+> > +The Header block is always at the start of the file. It is only needed=
+ to be
+> > +read one time after a system boot.
+> > +It is in the form of ``struct kvm_stats_header`` as below::
+> > +
+> > +     #define KVM_STATS_ID_MAXLEN                     64
+>
+>
+> Removing one tab would align the 64 with the defines below, though it
+> might be a tad close to the id field. I'm not sure which is best but
+> I'll still mention it.
+Sure, will align it with following defines.
+>
+>
+> > +     struct kvm_stats_header {
+> > +             char id[KVM_STATS_ID_MAXLEN];
+> > +             __u32 name_size;
+> > +             __u32 count;
+> > +             __u32 desc_offset;
+> > +             __u32 data_offset;
+> > +     };
+> > +
+> > +The ``id`` field is identification for the corresponding KVM statistic=
+s. For
+> > +KVM statistics, it is in the form of "kvm-{kvm pid}", like "kvm-12345"=
+. For
+> > +VCPU statistics, it is in the form of "kvm-{kvm pid}/vcpu-{vcpu id}", =
+like
+> > +"kvm-12345/vcpu-12".
+> > +
+> > +The ``name_size`` field is the size (byte) of the statistics name stri=
+ng
+> > +(including trailing '\0') appended to the end of every statistics desc=
+riptor.
+> > +
+> > +The ``count`` field is the number of statistics.
+> > +
+> > +The ``desc_offset`` field is the offset of the Descriptors block from =
+the start
+> > +of the file indicated by the file descriptor.
+> > +
+> > +The ``data_offset`` field is the offset of the Stats Data block from t=
+he start
+> > +of the file indicated by the file descriptor.
+> > +
+> > +The Descriptors block is only needed to be read once after a system bo=
+ot. It is
+> > +an array of ``struct kvm_stats_desc`` as below::
+> > +
+> > +     #define KVM_STATS_TYPE_SHIFT            0
+> > +     #define KVM_STATS_TYPE_MASK             (0xF << KVM_STATS_TYPE_SH=
+IFT)
+> > +     #define KVM_STATS_TYPE_CUMULATIVE       (0x0 << KVM_STATS_TYPE_SH=
+IFT)
+> > +     #define KVM_STATS_TYPE_INSTANT          (0x1 << KVM_STATS_TYPE_SH=
+IFT)
+> > +     #define KVM_STATS_TYPE_MAX              KVM_STATS_TYPE_INSTANT
+> > +
+> > +     #define KVM_STATS_UNIT_SHIFT            4
+> > +     #define KVM_STATS_UNIT_MASK             (0xF << KVM_STATS_UNIT_SH=
+IFT)
+> > +     #define KVM_STATS_UNIT_NONE             (0x0 << KVM_STATS_UNIT_SH=
+IFT)
+> > +     #define KVM_STATS_UNIT_BYTES            (0x1 << KVM_STATS_UNIT_SH=
+IFT)
+> > +     #define KVM_STATS_UNIT_SECONDS          (0x2 << KVM_STATS_UNIT_SH=
+IFT)
+> > +     #define KVM_STATS_UNIT_CYCLES           (0x3 << KVM_STATS_UNIT_SH=
+IFT)
+> > +     #define KVM_STATS_UNIT_MAX              KVM_STATS_UNIT_CYCLES
+> > +
+> > +     #define KVM_STATS_SCALE_SHIFT           8
+> > +     #define KVM_STATS_SCALE_MASK            (0xF << KVM_STATS_SCALE_S=
+HIFT)
+> > +     #define KVM_STATS_SCALE_POW10           (0x0 << KVM_STATS_SCALE_S=
+HIFT)
+> > +     #define KVM_STATS_SCALE_POW2            (0x1 << KVM_STATS_SCALE_S=
+HIFT)
+> > +     #define KVM_STATS_SCALE_MAX             KVM_STATS_SCALE_POW2
+> > +     struct kvm_stats_desc {
+> > +             __u32 flags;
+> > +             __s16 exponent;
+> > +             __u16 size;
+> > +             __u32 unused1;
+> > +             __u32 unused2;
+> > +             __u8 name[0];
+> > +     };
+>
+>
+> Maybe add a new line between the define and the struct ? And do that as
+> well in the code ?
+Thanks. Will add a blank line before both structs.
+>
+>
+> > +
+> > +The ``flags`` field contains the type and unit of the statistics data =
+described
+> > +by this descriptor. The following flags are supported:
+> > +  * ``KVM_STATS_TYPE_CUMULATIVE``
+> > +    The statistics data is cumulative. The value of data can only be i=
+ncreased.
+> > +    Most of the counters used in KVM are of this type.
+> > +    The corresponding ``count`` filed for this type is always 1.
+> > +  * ``KVM_STATS_TYPE_INSTANT``
+> > +    The statistics data is instantaneous. Its value can be increased o=
+r
+> > +    decreased. This type is usually used as a measurement of some reso=
+urces,
+> > +    like the number of dirty pages, the number of large pages, etc.
+> > +    The corresponding ``count`` field for this type is always 1.
+> > +  * ``KVM_STATS_UNIT_NONE``
+> > +    There is no unit for the value of statistics data. This usually me=
+ans that
+> > +    the value is a simple counter of an event.
+> > +  * ``KVM_STATS_UNIT_BYTES``
+> > +    It indicates that the statistics data is used to measure memory si=
+ze, in the
+> > +    unit of Byte, KiByte, MiByte, GiByte, etc. The unit of the data is
+> > +    determined by the ``exponent`` field in the descriptor. The
+> > +    ``KVM_STATS_SCALE_POW2`` flag is valid in this case. The unit of t=
+he data is
+> > +    determined by ``pow(2, exponent)``. For example, if value is 10,
+> > +    ``exponent`` is 20, which means the unit of statistics data is MiB=
+yte, we
+> > +    can get the statistics data in the unit of Byte by
+> > +    ``value * pow(2, exponent) =3D 10 * pow(2, 20) =3D 10 MiByte`` whi=
+ch is
+> > +    10 * 1024 * 1024 Bytes.
+> > +  * ``KVM_STATS_UNIT_SECONDS``
+> > +    It indicates that the statistics data is used to measure time/late=
+ncy, in
+> > +    the unit of nanosecond, microsecond, millisecond and second. The u=
+nit of the
+> > +    data is determined by the ``exponent`` field in the descriptor. Th=
+e
+> > +    ``KVM_STATS_SCALE_POW10`` flag is valid in this case. The unit of =
+the data
+> > +    is determined by ``pow(10, exponent)``. For example, if value is 2=
+000000,
+> > +    ``exponent`` is -6, which means the unit of statistics data is mic=
+rosecond,
+> > +    we can get the statistics data in the unit of second by
+> > +    ``value * pow(10, exponent) =3D 2000000 * pow(10, -6) =3D 2 second=
+s``.
+> > +  * ``KVM_STATS_UNIT_CYCLES``
+> > +    It indicates that the statistics data is used to measure CPU clock=
+ cycles.
+> > +    The ``KVM_STATS_SCALE_POW10`` flag is valid in this case. For exam=
+ple, if
+> > +    value is 200, ``exponent`` is 4, we can get the number of CPU cloc=
+k cycles
+> > +    by ``value * pow(10, exponent) =3D 200 * pow(10, 4) =3D 2000000``.
+> > +
+> > +The ``exponent`` field is the scale of corresponding statistics data. =
+It has two
+> > +values as follows:
+> > +  * ``KVM_STATS_SCALE_POW10``
+> > +    The scale is based on power of 10. It is used for measurement of t=
+ime and
+> > +    CPU clock cycles.
+> > +  * ``KVM_STATS_SCALE_POW2``
+> > +    The scale is based on power of 2. It is used for measurement of me=
+mory size.
+> > +
+> > +The ``size`` field is the number of values of this statistics data. It=
+ is in the
+> > +unit of ``unsigned long`` for VCPU or ``__u64`` for VM.
+> > +
+> > +The ``unused1`` and ``unused2`` fields are reserved for future
+> > +support for other types of statistics data, like log/linear histogram.
+> > +
+> > +The ``name`` field points to the name string of the statistics data. T=
+he name
+> > +string starts at the end of ``struct kvm_stats_desc``.
+> > +The maximum length (including trailing '\0') is indicated by ``name_si=
+ze``
+> > +in ``struct kvm_stats_header``.
+> > +
+> > +The Stats Data block contains an array of data values of type ``struct
+> > +kvm_vm_stats_data`` or ``struct kvm_vcpu_stats_data``. It would be rea=
+d by
+> > +user space periodically to pull statistics data.
+> > +The order of data value in Stats Data block is the same as the order o=
+f
+> > +descriptors in Descriptors block.
+> > +  * Statistics data for VM::
+> > +
+> > +     struct kvm_vm_stats_data {
+> > +             unsigned long value[0];
+> > +     };
+> > +
+> > +  * Statistics data for VCPU::
+> > +
+> > +     struct kvm_vcpu_stats_data {
+> > +             __u64 value[0];
+> > +     };
+> > +
+> >   5. The kvm_run structure
+> >   =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D
+> >
+> > @@ -6740,3 +6901,11 @@ vcpu_info is set.
+> >   The KVM_XEN_HVM_CONFIG_RUNSTATE flag indicates that the runstate-rela=
+ted
+> >   features KVM_XEN_VCPU_ATTR_TYPE_RUNSTATE_ADDR/_CURRENT/_DATA/_ADJUST =
+are
+> >   supported by the KVM_XEN_VCPU_SET_ATTR/KVM_XEN_VCPU_GET_ATTR ioctls.
+> > +
+> > +8.31 KVM_CAP_STATS_BINARY_FD
+> > +----------------------------
+> > +
+> > +:Architectures: all
+> > +
+> > +This capability indicates the feature that user space can create get a=
+ file
+> > +descriptor for every VM and VCPU to read statistics data in binary for=
+mat.
+> IMPORTANT NOTICE: The contents of this email and any attachments are conf=
+idential and may also be privileged. If you are not the intended recipient,=
+ please notify the sender immediately and do not disclose the contents to a=
+ny other person, use it for any purpose, or store or copy the information i=
+n any medium. Thank you.
