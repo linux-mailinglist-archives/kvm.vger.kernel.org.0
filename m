@@ -2,102 +2,148 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id AFF5D3639B6
-	for <lists+kvm@lfdr.de>; Mon, 19 Apr 2021 05:20:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7DC4E363AAD
+	for <lists+kvm@lfdr.de>; Mon, 19 Apr 2021 06:54:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237426AbhDSDSW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 18 Apr 2021 23:18:22 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:30856 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S237386AbhDSDSV (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Sun, 18 Apr 2021 23:18:21 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1618802272;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=kqu7b/R1y+iNn3LQCUv3CxvSNt0vkP4D2ZFqD/1uXRc=;
-        b=IxWSyDOMJVwQqOYMVmdEIaPDly0hX/iA3MWk6/udM0uML7QlZvnut2yJFHM1QUSCDTDh1X
-        UEqBqyY0L4qWAjJk+FzHDL6kPxbdn4Ikh6124UdmNAWjm1U8PD/CtzMdPzkdsc2Ap2p0pQ
-        A8r+uqENDA8qnePVRHFDHRo0yJpmzCs=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-327-yl9jzV4EMmCooe1ydXK_hg-1; Sun, 18 Apr 2021 23:17:50 -0400
-X-MC-Unique: yl9jzV4EMmCooe1ydXK_hg-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 741A5100A605;
-        Mon, 19 Apr 2021 03:17:49 +0000 (UTC)
-Received: from wangxiaodeMacBook-Air.local (ovpn-12-157.pek2.redhat.com [10.72.12.157])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 13C0519C66;
-        Mon, 19 Apr 2021 03:17:41 +0000 (UTC)
-Subject: Re: [PATCH V3 3/3] vDPA/ifcvf: get_config_size should return dev
- specific config size
-To:     Zhu Lingshan <lingshan.zhu@intel.com>, mst@redhat.com,
-        lulu@redhat.com, sgarzare@redhat.com
-Cc:     virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20210416071628.4984-1-lingshan.zhu@intel.com>
- <20210416071628.4984-4-lingshan.zhu@intel.com>
-From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <c1afa91f-b0a1-9ea8-8827-a0920a26f16e@redhat.com>
-Date:   Mon, 19 Apr 2021 11:17:40 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
- Gecko/20100101 Thunderbird/78.9.1
+        id S229952AbhDSEyd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 19 Apr 2021 00:54:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60362 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230114AbhDSEyc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 19 Apr 2021 00:54:32 -0400
+Received: from ozlabs.org (ozlabs.org [IPv6:2401:3900:2:1::2])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F2FC3C061760
+        for <kvm@vger.kernel.org>; Sun, 18 Apr 2021 21:54:02 -0700 (PDT)
+Received: by ozlabs.org (Postfix, from userid 1007)
+        id 4FNvbn620Gz9vGS; Mon, 19 Apr 2021 14:53:57 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+        d=gibson.dropbear.id.au; s=201602; t=1618808037;
+        bh=w8w/Una9oTYFSRCztOk/A2HhBtupl3pZZIKnl5xDCZE=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=Fh5wZyMuInOcnJE9nCOf3udTitwttN847nVSMu6pdkv7DkprlaIRn85UsSuf4jrKx
+         4NTIODyQy8Lfa3GTXs3Fs+dCFDMBxiZN22otpwjkKURqsoMV7dHaU8PKaUu/q6dHkJ
+         BIBKOf+L1qbxVn/YWTLtwwC9lHMgda8agPEGyMJQ=
+Date:   Mon, 19 Apr 2021 14:47:12 +1000
+From:   David Gibson <david@gibson.dropbear.id.au>
+To:     Ravi Bangoria <ravi.bangoria@linux.ibm.com>
+Cc:     paulus@samba.org, mpe@ellerman.id.au, mikey@neuling.org,
+        pbonzini@redhat.com, mst@redhat.com, clg@kaod.org,
+        qemu-ppc@nongnu.org, qemu-devel@nongnu.org, kvm@vger.kernel.org,
+        cohuck@redhat.com, groug@kaod.org
+Subject: Re: [PATCH v5 2/3] ppc: Rename current DAWR macros and variables
+Message-ID: <YH0LUDQKOu6WBA3Z@yekko.fritz.box>
+References: <20210412114433.129702-1-ravi.bangoria@linux.ibm.com>
+ <20210412114433.129702-3-ravi.bangoria@linux.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <20210416071628.4984-4-lingshan.zhu@intel.com>
-Content-Type: text/plain; charset=gbk; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="uKhbdfvihr3S9uQx"
+Content-Disposition: inline
+In-Reply-To: <20210412114433.129702-3-ravi.bangoria@linux.ibm.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
-ÔÚ 2021/4/16 ÏÂÎç3:16, Zhu Lingshan Ð´µÀ:
-> get_config_size() should return the size based on the decected
-> device type.
->
-> Signed-off-by: Zhu Lingshan <lingshan.zhu@intel.com>
+--uKhbdfvihr3S9uQx
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
+On Mon, Apr 12, 2021 at 05:14:32PM +0530, Ravi Bangoria wrote:
+> Power10 is introducing second DAWR. Use real register names (with
+> suffix 0) from ISA for current macros and variables used by Qemu.
+>=20
+> One exception to this is KVM_REG_PPC_DAWR[X]. This is from kernel
+> uapi header and thus not changed in kernel as well as Qemu.
+>=20
+> Signed-off-by: Ravi Bangoria <ravi.bangoria@linux.ibm.com>
+> Reviewed-by: Greg Kurz <groug@kaod.org>
+> Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
 
-Acked-by: Jason Wang <jasowang@redhat.com>
-
+This stands independently of the other patches, so I've applied it to ppc-f=
+or-6.1.
 
 > ---
->   drivers/vdpa/ifcvf/ifcvf_main.c | 19 ++++++++++++++++++-
->   1 file changed, 18 insertions(+), 1 deletion(-)
->
-> diff --git a/drivers/vdpa/ifcvf/ifcvf_main.c b/drivers/vdpa/ifcvf/ifcvf_main.c
-> index 376b2014916a..3b6f7862dbb8 100644
-> --- a/drivers/vdpa/ifcvf/ifcvf_main.c
-> +++ b/drivers/vdpa/ifcvf/ifcvf_main.c
-> @@ -356,7 +356,24 @@ static u32 ifcvf_vdpa_get_vq_align(struct vdpa_device *vdpa_dev)
->   
->   static size_t ifcvf_vdpa_get_config_size(struct vdpa_device *vdpa_dev)
->   {
-> -	return sizeof(struct virtio_net_config);
-> +	struct ifcvf_adapter *adapter = vdpa_to_adapter(vdpa_dev);
-> +	struct ifcvf_hw *vf = vdpa_to_vf(vdpa_dev);
-> +	struct pci_dev *pdev = adapter->pdev;
-> +	size_t size;
-> +
-> +	switch (vf->dev_type) {
-> +	case VIRTIO_ID_NET:
-> +		size = sizeof(struct virtio_net_config);
-> +		break;
-> +	case VIRTIO_ID_BLOCK:
-> +		size = sizeof(struct virtio_blk_config);
-> +		break;
-> +	default:
-> +		size = 0;
-> +		IFCVF_ERR(pdev, "VIRTIO ID %u not supported\n", vf->dev_type);
-> +	}
-> +
-> +	return size;
->   }
->   
->   static void ifcvf_vdpa_get_config(struct vdpa_device *vdpa_dev,
+>  include/hw/ppc/spapr.h          | 2 +-
+>  target/ppc/cpu.h                | 4 ++--
+>  target/ppc/translate_init.c.inc | 4 ++--
+>  3 files changed, 5 insertions(+), 5 deletions(-)
+>=20
+> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+> index bf7cab7a2c..5f90bb26d5 100644
+> --- a/include/hw/ppc/spapr.h
+> +++ b/include/hw/ppc/spapr.h
+> @@ -363,7 +363,7 @@ struct SpaprMachineState {
+> =20
+>  /* Values for 2nd argument to H_SET_MODE */
+>  #define H_SET_MODE_RESOURCE_SET_CIABR           1
+> -#define H_SET_MODE_RESOURCE_SET_DAWR            2
+> +#define H_SET_MODE_RESOURCE_SET_DAWR0           2
+>  #define H_SET_MODE_RESOURCE_ADDR_TRANS_MODE     3
+>  #define H_SET_MODE_RESOURCE_LE                  4
+> =20
+> diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
+> index e73416da68..cd02d65303 100644
+> --- a/target/ppc/cpu.h
+> +++ b/target/ppc/cpu.h
+> @@ -1459,10 +1459,10 @@ typedef PowerPCCPU ArchCPU;
+>  #define SPR_MPC_BAR           (0x09F)
+>  #define SPR_PSPB              (0x09F)
+>  #define SPR_DPDES             (0x0B0)
+> -#define SPR_DAWR              (0x0B4)
+> +#define SPR_DAWR0             (0x0B4)
+>  #define SPR_RPR               (0x0BA)
+>  #define SPR_CIABR             (0x0BB)
+> -#define SPR_DAWRX             (0x0BC)
+> +#define SPR_DAWRX0            (0x0BC)
+>  #define SPR_HFSCR             (0x0BE)
+>  #define SPR_VRSAVE            (0x100)
+>  #define SPR_USPRG0            (0x100)
+> diff --git a/target/ppc/translate_init.c.inc b/target/ppc/translate_init.=
+c.inc
+> index c03a7c4f52..879e6df217 100644
+> --- a/target/ppc/translate_init.c.inc
+> +++ b/target/ppc/translate_init.c.inc
+> @@ -7748,12 +7748,12 @@ static void gen_spr_book3s_dbg(CPUPPCState *env)
+> =20
+>  static void gen_spr_book3s_207_dbg(CPUPPCState *env)
+>  {
+> -    spr_register_kvm_hv(env, SPR_DAWR, "DAWR",
+> +    spr_register_kvm_hv(env, SPR_DAWR0, "DAWR0",
+>                          SPR_NOACCESS, SPR_NOACCESS,
+>                          SPR_NOACCESS, SPR_NOACCESS,
+>                          &spr_read_generic, &spr_write_generic,
+>                          KVM_REG_PPC_DAWR, 0x00000000);
+> -    spr_register_kvm_hv(env, SPR_DAWRX, "DAWRX",
+> +    spr_register_kvm_hv(env, SPR_DAWRX0, "DAWRX0",
+>                          SPR_NOACCESS, SPR_NOACCESS,
+>                          SPR_NOACCESS, SPR_NOACCESS,
+>                          &spr_read_generic, &spr_write_generic,
 
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--uKhbdfvihr3S9uQx
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAmB9C1AACgkQbDjKyiDZ
+s5Ib1BAAl3mnY3gtl1SjsG9umEhO9nqR1kJZAJGsP25qrQGs2WubfgWnqKKa5gOz
+PhbCiZLUIb7aLc9en2pQDH5ZztA/UjbeS63u3EngGPRgBIQ0UWqyoUg2SVmLcI00
+brmgd9/Hm4rGwaMtcijoRDWFTvIVpstm46VcfpXc36jEcTfBsNEqD41A8+sTTt1K
+tP0/COUrSKnuR1E6Bs45x0Mpa3i6nw6QNTYQnOFbm6WuSa83A57gxRnxKjKkWjWu
+mOUei/oUgN2Z+OMnK1HnqrfoNT1DLwkOG2AsAaso+Zv9Y10TOjkAHcX3hvCL71Sy
+6qAUs1pph1MIideMkmBsjhmKo77Y16Ba7K0T+3KcfEjxGBf8mo1Fc8KTVZdX/3bz
+QKael58ipjOqIJus1EymrQuO1gOPqrMNncHruv0qOTWYHZmINqfBHKs6zWMAl7O8
+pIaQr+RHncB7alv7dmOHqmSyp2x5ohp6+5fL0rM1QhkGlB3T1hC5I07se1uKIOJp
+vJ/GQJdLqojQ6zmckD3sJe7hNEk6i2FVSOg9zs9BisaZF2EoTXnah9bk6kjmqWN3
+Wvis+ooTyNCy+WORLKpxCMf57kVyFK1ref0svvsidYtOuEtQmBiH8cFG9aZcXzo6
+2NDGVNxsjmVbWQclsjtAx3pQJXc2h9bfQ885uoVZcKKfScAoPNM=
+=Fj6p
+-----END PGP SIGNATURE-----
+
+--uKhbdfvihr3S9uQx--
