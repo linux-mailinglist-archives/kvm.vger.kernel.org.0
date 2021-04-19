@@ -2,175 +2,151 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 159CE364651
-	for <lists+kvm@lfdr.de>; Mon, 19 Apr 2021 16:41:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F1F553646BE
+	for <lists+kvm@lfdr.de>; Mon, 19 Apr 2021 17:09:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240352AbhDSOlg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 19 Apr 2021 10:41:36 -0400
-Received: from mail-bn8nam11on2047.outbound.protection.outlook.com ([40.107.236.47]:25664
-        "EHLO NAM11-BN8-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S231814AbhDSOle (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 19 Apr 2021 10:41:34 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=hrbrUOnQFO1iyHLQly5KuEJqHC37TQEUiGgI7+BAsKeWDV9bDXOYjv+NR346991GvaLRek3LJj3X5LUAaS9q5rA9V+1nyns/0JDKJtOLTrAqAY8yUDztn2uDLTNFYyumJQkOLbqoENmoWVCGakbH5/Qq5vyr8QXHMlUxIFJfhIRHXKFGYbXRMyX5BaJ4JV+F9UmenesALM6pSsZh4KeWu6ECzxcvPABXidzhg0pGc1Tf10c9vqLpkR4Pd1MDqncvdf3r/gXmoCTzAI9reGYh/mabtEc4WSkZw/ezoL50jL9eWAg6w2l2tGaHMgf+lXz3BNU5RqXdjhBoFUUKpWT1qQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=kPZegIsCzt3Igtbathhh26i2XEeAT3Xt8xFiqzAcW2o=;
- b=JcqrNbngnehHSTfnHxY/x8AHJhnxt38OienLA1XHf4aIAw9RwIXaEBxL8fz+NN6OWRt7z0cPadYF+ERXKmKKJHN1pVACZNy+v5Tz80CuB8C2w6cDo8lQg/BFU+FvRXtO+4OmAYVMxecTeTOFik2b59+dmnWWUbD59zZD7FRRvHXU/yPi9r+q9aHmUS25BDILCzfIpDurc6cB3bUhG2NOgjlDH7VYkfa0TarO650F46hanipT/GRNoPY+XCUgHaY5LHzc6LvO1cz/MXry9cGhii63FUR3mfvQ+Pybk6YbR4oYtsmT4u5DmfdIUDXm+R8g/fP7VRb+EHCfNsaa7hEtjQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=kPZegIsCzt3Igtbathhh26i2XEeAT3Xt8xFiqzAcW2o=;
- b=ZfMLPxIW/t5dKDNlUuqtcE83u5GBDp70gvkrLBJuiY140ZSOlLNn3DOlcMdTTkIGV0/OQSNNpbmEHYcGpxN3/XB64WWe9JWM0HAroWunKh1dOn6U+/pgNuLVFIs8S1WO9OkXKPzyobXRNcUga5if3Nl8SWGlnX4zHoTojgw6PGk=
-Authentication-Results: google.com; dkim=none (message not signed)
- header.d=none;google.com; dmarc=none action=none header.from=amd.com;
-Received: from SN6PR12MB2767.namprd12.prod.outlook.com (2603:10b6:805:75::23)
- by SA0PR12MB4415.namprd12.prod.outlook.com (2603:10b6:806:70::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4042.16; Mon, 19 Apr
- 2021 14:41:02 +0000
-Received: from SN6PR12MB2767.namprd12.prod.outlook.com
- ([fe80::1fb:7d59:2c24:615e]) by SN6PR12MB2767.namprd12.prod.outlook.com
- ([fe80::1fb:7d59:2c24:615e%6]) with mapi id 15.20.4042.024; Mon, 19 Apr 2021
- 14:41:02 +0000
-Date:   Mon, 19 Apr 2021 14:40:57 +0000
-From:   Ashish Kalra <ashish.kalra@amd.com>
-To:     Steve Rutherford <srutherford@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Joerg Roedel <joro@8bytes.org>,
-        Borislav Petkov <bp@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        X86 ML <x86@kernel.org>, KVM list <kvm@vger.kernel.org>,
+        id S238119AbhDSPJh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 19 Apr 2021 11:09:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55228 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230160AbhDSPJg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 19 Apr 2021 11:09:36 -0400
+Received: from mail-pf1-x436.google.com (mail-pf1-x436.google.com [IPv6:2607:f8b0:4864:20::436])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 54720C061761
+        for <kvm@vger.kernel.org>; Mon, 19 Apr 2021 08:09:06 -0700 (PDT)
+Received: by mail-pf1-x436.google.com with SMTP id i190so23371254pfc.12
+        for <kvm@vger.kernel.org>; Mon, 19 Apr 2021 08:09:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=hANO9FC/Eqy7x+FqUY+Eg+GK+A5D7OA8qqUpVhz6pBc=;
+        b=kdJeLy959fNOuKxiroQcVOpawxEafqWiFZUUkpHihGfEQxevL2br8jYADTI99Hlkt0
+         pxi48YwShSMIGYOPYh19SRcKw0/qtKjHOQV5NZHG+GX3fdSH9rc/Ouut1LmJAMWfESyZ
+         nSsqU7qb1XMvGLjaeScqMEfymOKRe3oFN5h9wviXivc2hQBA5q2ZPRZBFb9g2WqmQVK1
+         G+Wz9+BBVFhBKwoL+EhblfYM+PcGh0+DJoIKjPWLd5d26fRiyKa1RFPaq72urIp3Mljh
+         Jdv5YUWT0YTiUMer7shX5JYUHOCJczBMI1/0L4KbuH5uuYKPtWl6XvJtdLw4ASYwNnxq
+         i1Pg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=hANO9FC/Eqy7x+FqUY+Eg+GK+A5D7OA8qqUpVhz6pBc=;
+        b=JFPDexq8wPMGL869OkV9KJahFvEBgQuYLNmRFEwQOUzzHrXmgEQPHEw1H0vyzUO37R
+         J9j51Axx+xR2b0dnU/jU0JCVtrAMHNyDQROtmVeqyXz5/d26jVylK6HeQRuBMzj7xE10
+         XNccLYSTu3ii3dVIxzrTWF8KuFLXZxFdK5Eq5lbRtndMcYt540sSLbFSyd1flWuuOHxR
+         tE2Lnn9H1ysWinVM+c2txKg+pF5U+Xbw+QFM6zTQdjQYbqfPEQ6kV4XSFqKbM1y//2xV
+         CsTBaOY6NMEB5f6JXOpy6X7deX+JHZaqxi/bwVZlBr+SFN5UssJkVZLPUdQ7CczY+fAM
+         ESPg==
+X-Gm-Message-State: AOAM533n6lBA2ciaBna63vFD82ZE6PV8nc69V/0fZJwIs2TpiEEwCB6f
+        3/WdK90LESFx+jyStuermSQc7g==
+X-Google-Smtp-Source: ABdhPJwnF3cebcgAyO34u1tO2FNSwVgIH4GUuQL1co2FTQ++bMbkjJe/dIdeNDuTNanEN/8E7oFanw==
+X-Received: by 2002:a05:6a00:1687:b029:253:f417:4dba with SMTP id k7-20020a056a001687b0290253f4174dbamr20329863pfc.5.1618844945636;
+        Mon, 19 Apr 2021 08:09:05 -0700 (PDT)
+Received: from google.com (240.111.247.35.bc.googleusercontent.com. [35.247.111.240])
+        by smtp.gmail.com with ESMTPSA id gt22sm14457236pjb.7.2021.04.19.08.09.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 19 Apr 2021 08:09:05 -0700 (PDT)
+Date:   Mon, 19 Apr 2021 15:09:01 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Wanpeng Li <kernellwp@gmail.com>, Marc Zyngier <maz@kernel.org>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm <kvm@vger.kernel.org>,
         LKML <linux-kernel@vger.kernel.org>,
-        Sean Christopherson <seanjc@google.com>,
-        Venu Busireddy <venu.busireddy@oracle.com>,
-        Brijesh Singh <brijesh.singh@amd.com>
-Subject: Re: [PATCH v13 00/12] Add AMD SEV guest live migration support
-Message-ID: <20210419144057.GA1569@ashkalra_ubuntu_server>
-References: <cover.1618498113.git.ashish.kalra@amd.com>
- <CABayD+dGWWha8opC7rFgNYs=bgWbohE+ngTRfKjw12fXrT+Q+g@mail.gmail.com>
+        Ben Gardon <bgardon@google.com>
+Subject: Re: [PATCH v2 09/10] KVM: Don't take mmu_lock for range invalidation
+ unless necessary
+Message-ID: <YH2dDRBXJcbUcbLi@google.com>
+References: <20210402005658.3024832-1-seanjc@google.com>
+ <20210402005658.3024832-10-seanjc@google.com>
+ <CANRm+Cwt9Xs=13r9E4YWOhcE6oEJXmVrkKrv_wQ5jMUkY8+Stw@mail.gmail.com>
+ <2a7670e4-94c0-9f35-74de-a7d5b1504ced@redhat.com>
+MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CABayD+dGWWha8opC7rFgNYs=bgWbohE+ngTRfKjw12fXrT+Q+g@mail.gmail.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-Originating-IP: [165.204.77.1]
-X-ClientProxiedBy: SN4PR0701CA0046.namprd07.prod.outlook.com
- (2603:10b6:803:2d::33) To SN6PR12MB2767.namprd12.prod.outlook.com
- (2603:10b6:805:75::23)
-MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from ashkalra_ubuntu_server (165.204.77.1) by SN4PR0701CA0046.namprd07.prod.outlook.com (2603:10b6:803:2d::33) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4042.16 via Frontend Transport; Mon, 19 Apr 2021 14:41:02 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: c36c3c5a-ad2c-49a1-6f1e-08d9034127ce
-X-MS-TrafficTypeDiagnostic: SA0PR12MB4415:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <SA0PR12MB441506C577409C29969FF1A78E499@SA0PR12MB4415.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: cZkuqFzbJ5U1Hg2mHqpVjM+18sGuvrIYF/U+UDBX+eZP2EYvE8TlGzEISEuWgHkGiQcH3w9hjrKi2Vi/jEmKeN73eN4lfHjKOUJqaIN67H3z2v330jWxCD2q2INh+MeBO7yvK6khTx1VP2cBgKB+LKMqUAjkHdJHrOuZ2mzqEImQ/6/UBNk8smnqLum61ykNaWg0PObS6qHc2qDxvG9pdfDu3JF75JqubVSYJMj8mnplblVJPiAgdCWgkSp2zLSRw8cGHP0RjsBw6eG2ayLiu+m17rJXLPfKVVDRvjMR2JSKrhi2x6gKT6oOSq0IvWPEZzF15ygMkfIoxIzAUC+iqnPOen9q6A8WkEqe18+OO+Q21O8VmnwupfcbmHM4V9tW88rQYun2QSKgLOuWyAj0csVgylf365yE20Bms8V8glV07PMgPE3GwBTwer/sl9YwL/6qa28+GdRjzf2D85nc+Y0z6/01DMRG7mI3QxoEtxGcbZsvZgPf2OuEg+/c2dGj+jj1aJuBs0XL8IRM3B3U2LowZccn3u0ktAyEn/f3zdqW6jLo7Ft6W7SI1pxFW6G/JivsKnYXmCY1fxn4DTF0YVc0lhsJ/JG09qKgKnZNHMP3RcuvpEiutJJ/JuJ1nICaGJdnnboPf1m8UMnRoRU/lCSiJ+uDrttlhSlxg5fq8BSlEBlMmbH3nxVzlazbk+e+EuvUsjB/TBCYOhj6gUXuwftcEt11y6vh+6NioDlMfzA=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2767.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(39860400002)(366004)(346002)(136003)(396003)(376002)(83380400001)(1076003)(6496006)(8936002)(52116002)(54906003)(55016002)(6666004)(38100700002)(86362001)(44832011)(9686003)(2906002)(7416002)(38350700002)(956004)(316002)(4326008)(26005)(478600001)(5660300002)(186003)(66476007)(66556008)(45080400002)(66946007)(33656002)(8676002)(33716001)(966005)(53546011)(16526019)(6916009);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: =?us-ascii?Q?by1PMoejJ2VHkQylCueA+m97fYEuczqrKIWc8YAbprpO86FC0NAcsQVJyNNa?=
- =?us-ascii?Q?rdW5DEdzH23wNurEw9YLmUAokOw0dAaMXnVBRjgann5aX2N2TM4CY48l0K1h?=
- =?us-ascii?Q?MJEA2ZmPAzBj5nf/KNF7TEjrSCqteojyavrcfFpyFzHiTLTGSj5Ci48OaXvS?=
- =?us-ascii?Q?AnD9grj65cM25DaVGdaxjdGc5fmGIXV2rZuKV6tslYtQh8Ha2NZpgh5dEXLY?=
- =?us-ascii?Q?U3BB820NOlnGPpGrS5bjO0KpFUBUMiDKCwxh8i3a1kCoDMiarf4/0EF4tB6y?=
- =?us-ascii?Q?5sSFUFZqLgvkW4ynJAA4H/h+hMCiifrwQN2bJ6/oUuzzzqlmxHw9yhWmZlcl?=
- =?us-ascii?Q?c6W6y8Wl8o+NBPPNE8NMJQlELfhXTtFuZzY/s8xboIJyx8yUs7Uv/7ggQcnu?=
- =?us-ascii?Q?Gcm1+cUUs+tP/xiTyyFpngLalX7g1V2Ps0RH1zm+si/TfF1vX5579/JYuocf?=
- =?us-ascii?Q?5Ck0cAHL7dlCJlOysQCOU1I1xBWc9mU8mNnuSHttdVVEE+LaNoSVYLsJbPY7?=
- =?us-ascii?Q?lX0kGN0A0TFmOnPiGuBKxV2DSMgmELi2ViKq8UiqtfPlCjJVLPavQpuNtMN3?=
- =?us-ascii?Q?Ihn22w4i8ioow26wJ15OboEsYxevQAmk4uFr6ki4o4FYFhUTRrljek5JY97P?=
- =?us-ascii?Q?XkC3GFgfAMYJEPEVZPfiN7ApW8x5SmlE8IfaSUlMSmnKkwO+M7Uh+SKDnST/?=
- =?us-ascii?Q?T6f4AmXk+C+5xZ705ZJiMmw3/I5fSvD1ew8Wvo3/9i9d2Ca8PMIvqPEU9XV7?=
- =?us-ascii?Q?3Lcf+SsgPb6WVpIZVcY1yBfLlOM4Rxb2qA7+DXtwRW8taySniAB91Ljj6Zqs?=
- =?us-ascii?Q?z71EkEwaxZsT+m6dQAWG9H1Wew1IGtLZ4HjVM6nl66/ppfzIN1d2B6thVbvr?=
- =?us-ascii?Q?mZUcVu5ztRg+DUSDCHdnYTJJAK354oB8eFRTmt/JoMKpuM0ECdbJQKVJ6UI9?=
- =?us-ascii?Q?V4IbSWXoYsTJjkUZBARlP+eW2pqmjsz1BxReySM8itiKjI79VWHIKsGb2Upz?=
- =?us-ascii?Q?0PGX+wV8cKtZ3QCzNFku1p59wy0F7EDznTysPerJVKAdY3bkYyJqANfUdALI?=
- =?us-ascii?Q?kRN7iPv050CekvrU1i5xKXgFe80wFCVRuqn48VaY1sWB6XyT27F+EfbATY36?=
- =?us-ascii?Q?QEu4f8famnZPdDQm1NSmUMS+RxQKoCW+jwlk9V7qHOP7vEC57x9WP0ddOTyD?=
- =?us-ascii?Q?vS05YfD+PlQBt49twr5r5tiJX1954eYhcm5/f629P922q+4TrjUPbCpMlJmH?=
- =?us-ascii?Q?Dcr1NNP0ufFlIFCeldCj2dl7lM5E3SN9WCHTSAhzrdeSGTQjvBDrzLJVbH8e?=
- =?us-ascii?Q?m/+Kp/OX1pgQITyyuf8Y4wAM?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c36c3c5a-ad2c-49a1-6f1e-08d9034127ce
-X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2767.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Apr 2021 14:41:02.7992
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Dq8Pl7G9lLb1Y7qO7bbORiXa08HQiqhzJThWJD4/dQyNkwpbTFNdyV5AjY8vx4XwLEaWp0kiFRb6sdEfCl0Gkg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR12MB4415
+In-Reply-To: <2a7670e4-94c0-9f35-74de-a7d5b1504ced@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Apr 16, 2021 at 02:43:48PM -0700, Steve Rutherford wrote:
-> On Thu, Apr 15, 2021 at 8:52 AM Ashish Kalra <Ashish.Kalra@amd.com> wrote:
-> >
-> > From: Ashish Kalra <ashish.kalra@amd.com>
-> >
-> > The series add support for AMD SEV guest live migration commands. To protect the
-> > confidentiality of an SEV protected guest memory while in transit we need to
-> > use the SEV commands defined in SEV API spec [1].
-> >
-> > SEV guest VMs have the concept of private and shared memory. Private memory
-> > is encrypted with the guest-specific key, while shared memory may be encrypted
-> > with hypervisor key. The commands provided by the SEV FW are meant to be used
-> > for the private memory only. The patch series introduces a new hypercall.
-> > The guest OS can use this hypercall to notify the page encryption status.
-> > If the page is encrypted with guest specific-key then we use SEV command during
-> > the migration. If page is not encrypted then fallback to default.
-> >
-> > The patch uses the KVM_EXIT_HYPERCALL exitcode and hypercall to
-> > userspace exit functionality as a common interface from the guest back to the
-> > VMM and passing on the guest shared/unencrypted page information to the
-> > userspace VMM/Qemu. Qemu can consult this information during migration to know
-> > whether the page is encrypted.
-> >
-> > This section descibes how the SEV live migration feature is negotiated
-> > between the host and guest, the host indicates this feature support via
-> > KVM_FEATURE_CPUID. The guest firmware (OVMF) detects this feature and
-> > sets a UEFI enviroment variable indicating OVMF support for live
-> > migration, the guest kernel also detects the host support for this
-> > feature via cpuid and in case of an EFI boot verifies if OVMF also
-> > supports this feature by getting the UEFI enviroment variable and if it
-> > set then enables live migration feature on host by writing to a custom
-> > MSR, if not booted under EFI, then it simply enables the feature by
-> > again writing to the custom MSR. The MSR is also handled by the
-> > userspace VMM/Qemu.
-> >
-> > A branch containing these patches is available here:
-> > https://nam11.safelinks.protection.outlook.com/?url=https%3A%2F%2Fgithub.com%2FAMDESE%2Flinux%2Ftree%2Fsev-migration-v13&amp;data=04%7C01%7CAshish.Kalra%40amd.com%7C7bee6d5c907b46d0998508d90120ce2d%7C3dd8961fe4884e608e11a82d994e183d%7C0%7C0%7C637542063133830260%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C1000&amp;sdata=FkKrciL41GDNyNDqrPMVblRa%2FaReogW4OzhbYaSYs04%3D&amp;reserved=0
-> >
-> > [1] https://nam11.safelinks.protection.outlook.com/?url=https%3A%2F%2Fdeveloper.amd.com%2Fwp-content%2Fresources%2F55766.PDF&amp;data=04%7C01%7CAshish.Kalra%40amd.com%7C7bee6d5c907b46d0998508d90120ce2d%7C3dd8961fe4884e608e11a82d994e183d%7C0%7C0%7C637542063133830260%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C1000&amp;sdata=%2FLFBR9ean0acMmR8WTLUHZsAynYPRAa7%2FeZEVVdpCo8%3D&amp;reserved=0
-> >
-> > Changes since v12:
-> > - Reset page encryption status during early boot instead of just
-> >   before the kexec to avoid SMP races during kvm_pv_guest_cpu_reboot().
+On Mon, Apr 19, 2021, Paolo Bonzini wrote:
+> On 19/04/21 10:49, Wanpeng Li wrote:
+> > I saw this splatting:
+> > 
+> >   ======================================================
+> >   WARNING: possible circular locking dependency detected
+> >   5.12.0-rc3+ #6 Tainted: G           OE
+> >   ------------------------------------------------------
+> >   qemu-system-x86/3069 is trying to acquire lock:
+> >   ffffffff9c775ca0 (mmu_notifier_invalidate_range_start){+.+.}-{0:0},
+> > at: __mmu_notifier_invalidate_range_end+0x5/0x190
+> > 
+> >   but task is already holding lock:
+> >   ffffaff7410a9160 (&kvm->mmu_notifier_slots_lock){.+.+}-{3:3}, at:
+> > kvm_mmu_notifier_invalidate_range_start+0x36d/0x4f0 [kvm]
 > 
-> Does this series need to disable the MSR during kvm_pv_guest_cpu_reboot()?
+> I guess it is possible to open-code the wait using a readers count and a
+> spinlock (see patch after signature).  This allows including the
+> rcu_assign_pointer in the same critical section that checks the number
+> of readers.  Also on the plus side, the init_rwsem() is replaced by
+> slightly nicer code.
+
+Ugh, the count approach is nearly identical to Ben's original code.  Using a
+rwsem seemed so clever :-/
+
+> IIUC this could be extended to non-sleeping invalidations too, but I
+> am not really sure about that.
+
+Yes, that should be fine.
+
+> There are some issues with the patch though:
 > 
+> - I am not sure if this should be a raw spin lock to avoid the same issue
+> on PREEMPT_RT kernel.  That said the critical section is so tiny that using
+> a raw spin lock may make sense anyway
 
-Yes, i think that will make sense, it will be similar to the first time
-VM boot where the MSR will be disabled till it is enabled at early
-kernel boot. I will add this to the current patch series.
+If using spinlock_t is problematic, wouldn't mmu_lock already be an issue?  Or
+am I misunderstanding your concern?
 
-Thanks,
-Ashish
+> - this loses the rwsem fairness.  On the other hand, mm/mmu_notifier.c's
+> own interval-tree-based filter is also using a similar mechanism that is
+> likewise not fair, so it should be okay.
 
-> I _think_ going into blackout during the window after restart, but
-> before the MSR is explicitly reenabled, would cause corruption. The
-> historical shared pages could be re-allocated as non-shared pages
-> during restart.
+The one concern I had with an unfair mechanism of this nature is that, in theory,
+the memslot update could be blocked indefinitely.
+
+> Any opinions?  For now I placed the change below in kvm/queue, but I'm
+> leaning towards delaying this optimization to the next merge window.
+
+I think delaying it makes sense.
+
+> @@ -1333,9 +1351,22 @@ static struct kvm_memslots *install_new_memslots(struct kvm *kvm,
+>  	WARN_ON(gen & KVM_MEMSLOT_GEN_UPDATE_IN_PROGRESS);
+>  	slots->generation = gen | KVM_MEMSLOT_GEN_UPDATE_IN_PROGRESS;
+> -	down_write(&kvm->mmu_notifier_slots_lock);
+> +	/*
+> +	 * This cannot be an rwsem because the MMU notifier must not run
+> +	 * inside the critical section.  A sleeping rwsem cannot exclude
+> +	 * that.
+
+How on earth did you decipher that from the splat?  I stared at it for a good
+five minutes and was completely befuddled.
+
+> +	 */
+> +	spin_lock(&kvm->mn_invalidate_lock);
+> +	prepare_to_rcuwait(&kvm->mn_memslots_update_rcuwait);
+> +	while (kvm->mn_active_invalidate_count) {
+> +		set_current_state(TASK_UNINTERRUPTIBLE);
+> +		spin_unlock(&kvm->mn_invalidate_lock);
+> +		schedule();
+> +		spin_lock(&kvm->mn_invalidate_lock);
+> +	}
+> +	finish_rcuwait(&kvm->mn_memslots_update_rcuwait);
+>  	rcu_assign_pointer(kvm->memslots[as_id], slots);
+> -	up_write(&kvm->mmu_notifier_slots_lock);
+> +	spin_unlock(&kvm->mn_invalidate_lock);
+>  	synchronize_srcu_expedited(&kvm->srcu);
 > 
-> Steve
