@@ -2,111 +2,287 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BBCCB3644A6
-	for <lists+kvm@lfdr.de>; Mon, 19 Apr 2021 15:34:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 14431364541
+	for <lists+kvm@lfdr.de>; Mon, 19 Apr 2021 15:50:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241125AbhDSNaw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 19 Apr 2021 09:30:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59772 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242020AbhDSN2F (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 19 Apr 2021 09:28:05 -0400
-Received: from mail-lf1-x131.google.com (mail-lf1-x131.google.com [IPv6:2a00:1450:4864:20::131])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 05BF1C061361
-        for <kvm@vger.kernel.org>; Mon, 19 Apr 2021 06:26:23 -0700 (PDT)
-Received: by mail-lf1-x131.google.com with SMTP id n138so56045055lfa.3
-        for <kvm@vger.kernel.org>; Mon, 19 Apr 2021 06:26:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=NqBtQukzUcKGvmZ1aJArxdkZjllZ69uT8+WTmwdJ6G4=;
-        b=em/J+S9hHzBCCI9MSW7xxROUGoj1ECCpWbKbkDd7uZveF8DcpPGfSfeXe7udqDYAGS
-         Jj37aD7VWJOTXi/3DhMCYdi9pJNW7jm5Sf4PAqzlM+s1im59ujQ9g0r3tX6QKiCnqI8I
-         oO5sYxp5JVgxN3n4uVwCg7nst4zKPgyNiqk71xh9fzEU1SJZSiHV0spwlLta2FppoNXt
-         4Sn69HhmbhTj4I1GZVCwzi8/H+Q2tBi5gcCNkX4caIusJ3tMJ1W1hCmiVohKi/6R3p1P
-         P4SE3XIUdcjPLBQZiKpeMRryN/1muaULpqJ4vS3LQj+EtgGFUJ9LyQpWIyR+n0cbkMPO
-         AGIw==
+        id S239999AbhDSNvJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 19 Apr 2021 09:51:09 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:52523 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S238497AbhDSNvD (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 19 Apr 2021 09:51:03 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1618840232;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=3mWWrs07VeyhsaVD9xqLJ/6yk16w935A3cPLp1luCFU=;
+        b=TQg8BjeU2vk6nJry0VFpLp+Am/XdkDw7LRTgmH1InELs+3wCj96PVA3WE6Xzkq8O1pq2GJ
+        8HvtLdsYKwIYqP5O8NMulRv3CQ9DyYF56oZfSiS82oIhpdxIRSpvAnnhkQJYXzE9dFEtfS
+        ZXysa0Vyg/Ywgf/NnuNjowUfDLMXBOE=
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
+ [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-557-zZOgVYzgP5yjVO7wnAuTng-1; Mon, 19 Apr 2021 09:50:28 -0400
+X-MC-Unique: zZOgVYzgP5yjVO7wnAuTng-1
+Received: by mail-ed1-f72.google.com with SMTP id h13-20020a05640250cdb02903790a9c55acso11207858edb.4
+        for <kvm@vger.kernel.org>; Mon, 19 Apr 2021 06:50:28 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=NqBtQukzUcKGvmZ1aJArxdkZjllZ69uT8+WTmwdJ6G4=;
-        b=GUnNIUi4Sk9C9M/gvYRaNbtQl1nkjvgb8ieu73KPK4Q40TBFT71LXoQYtnrJNvkZ4n
-         dsLQ6Fhuw/Ga7xaAZvoXD4t1PeAHiGKCsGLm72pEeBxqh0/TqNmz1AjTW0uQzPmqpKAi
-         ZN4bTbuB84CEmxoZQSerZjpteJMLxpdvVCDqiXaQxuj8jluMEYbYXKyatesquuLwwgL5
-         Mz2ywnLTC7g1x01j1kJlU1q0YLjfS/Lx0kxcscViALOaWFn5kM3AkniVRBM7xoCSRWbv
-         6SYBNb0uSg2AqoaUlu2JUQdRYuiUz5sXAcayuipvVdvxoM+AxULczhA3UWTTtoiEfniu
-         NQLA==
-X-Gm-Message-State: AOAM5317/St0d8Mt+nr8LQtwTaxgBtn6itVkLjRNP4sAOVpQWzFIunOf
-        h/C3sAbTBUCWtxOoHUwO02cjRbi/ieS8dju7Eymhkg==
-X-Google-Smtp-Source: ABdhPJzC7C637Xaczt8wN5cywlsLikI7xQQerJcl2++bY+AQeL59litpEy9MDacIxAURgyTiZJG8O4odjR7fc14+zi0=
-X-Received: by 2002:a19:3813:: with SMTP id f19mr5725327lfa.473.1618838781799;
- Mon, 19 Apr 2021 06:26:21 -0700 (PDT)
-MIME-Version: 1.0
-References: <20210415151741.1607806-1-jingzhangos@google.com>
- <20210415151741.1607806-5-jingzhangos@google.com> <9f2a8873-c2c2-ec84-58b4-7c90c59d1d25@redhat.com>
-In-Reply-To: <9f2a8873-c2c2-ec84-58b4-7c90c59d1d25@redhat.com>
-From:   Jing Zhang <jingzhangos@google.com>
-Date:   Mon, 19 Apr 2021 08:26:09 -0500
-Message-ID: <CAAdAUtinT2+kqV7ia+gVFpy=Mf5TiNJU2QNSbGGC0Ybj3PPuzw@mail.gmail.com>
-Subject: Re: [PATCH v2 4/4] KVM: selftests: Add selftest for KVM statistics
- data binary interface
-To:     Emanuele Giuseppe Esposito <eesposit@redhat.com>
-Cc:     KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.cs.columbia.edu>,
-        LinuxMIPS <linux-mips@vger.kernel.org>,
-        KVMPPC <kvm-ppc@vger.kernel.org>,
-        LinuxS390 <linux-s390@vger.kernel.org>,
-        Linuxkselftest <linux-kselftest@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Marc Zyngier <maz@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Will Deacon <will@kernel.org>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-        Paul Mackerras <paulus@ozlabs.org>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Sean Christopherson <seanjc@google.com>,
+        h=x-gm-message-state:to:cc:references:from:subject:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=3mWWrs07VeyhsaVD9xqLJ/6yk16w935A3cPLp1luCFU=;
+        b=CrjfoAL+hc/HzmjrxpOfrPnUmvJSeuLCYg1OWN5UJlwaavtEP9lN6nrmW4is93rBwD
+         vs7nvHrK5+gBVAYx35yDTdx75okDTkoU1GvlGdpaCWiY99+EzYfQ+MOcOf76fT7oaCvN
+         wShRA57Kiol2TIJhr3gTbY1vG7mp9A8+NA01Ww4bmPcKWDPl8i8y8EdpDc8tHEGA/XqR
+         2uc6WFZoUczL4qXkGsfTDHU22tS5p6syarARnz2cMq4/zOlhVD718XCVz5nwDu6cPuOJ
+         3sbnXUfiap5kekZg2tZancaWMMAcntbV+waByqvEv66sZj8/rqP7NgVDZ4IWxIMR1DJg
+         f27g==
+X-Gm-Message-State: AOAM531BFkHyBZZa5ND0p1RGkeu13ciTItHy5lV0csuHzB5wSLOBbGDF
+        Y0/Y6Rt+/KWd0F9s9O75xwDicELvlTIXW/Nt1lMVh6qpuTbmIJ3e+pDxf5A2HtTdCoCaVd9dpLU
+        Vu/76jrWfi3s9
+X-Received: by 2002:a05:6402:2794:: with SMTP id b20mr8093108ede.48.1618840227377;
+        Mon, 19 Apr 2021 06:50:27 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxQCaelkV2XL8Vc+Z3L0QFp3k/2BYZeNmoNVKV3upxEGfeYl9ST9RLvoIxzfo1AcRAtj73fWA==
+X-Received: by 2002:a05:6402:2794:: with SMTP id b20mr8093080ede.48.1618840227102;
+        Mon, 19 Apr 2021 06:50:27 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id 16sm10597529ejw.0.2021.04.19.06.50.25
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 19 Apr 2021 06:50:26 -0700 (PDT)
+To:     Wanpeng Li <kernellwp@gmail.com>,
+        Sean Christopherson <seanjc@google.com>
+Cc:     Marc Zyngier <maz@kernel.org>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Peter Shier <pshier@google.com>,
-        Oliver Upton <oupton@google.com>,
-        David Rientjes <rientjes@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        Joerg Roedel <joro@8bytes.org>, kvm <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Ben Gardon <bgardon@google.com>
+References: <20210402005658.3024832-1-seanjc@google.com>
+ <20210402005658.3024832-10-seanjc@google.com>
+ <CANRm+Cwt9Xs=13r9E4YWOhcE6oEJXmVrkKrv_wQ5jMUkY8+Stw@mail.gmail.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH v2 09/10] KVM: Don't take mmu_lock for range invalidation
+ unless necessary
+Message-ID: <2a7670e4-94c0-9f35-74de-a7d5b1504ced@redhat.com>
+Date:   Mon, 19 Apr 2021 15:50:25 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.7.0
+MIME-Version: 1.0
+In-Reply-To: <CANRm+Cwt9Xs=13r9E4YWOhcE6oEJXmVrkKrv_wQ5jMUkY8+Stw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Emanuele,
+On 19/04/21 10:49, Wanpeng Li wrote:
+> I saw this splatting:
+> 
+>   ======================================================
+>   WARNING: possible circular locking dependency detected
+>   5.12.0-rc3+ #6 Tainted: G           OE
+>   ------------------------------------------------------
+>   qemu-system-x86/3069 is trying to acquire lock:
+>   ffffffff9c775ca0 (mmu_notifier_invalidate_range_start){+.+.}-{0:0},
+> at: __mmu_notifier_invalidate_range_end+0x5/0x190
+> 
+>   but task is already holding lock:
+>   ffffaff7410a9160 (&kvm->mmu_notifier_slots_lock){.+.+}-{3:3}, at:
+> kvm_mmu_notifier_invalidate_range_start+0x36d/0x4f0 [kvm]
 
-On Mon, Apr 19, 2021 at 6:18 AM Emanuele Giuseppe Esposito
-<eesposit@redhat.com> wrote:
->
-> Hi Jing,
->
-> > +int vm_stats_test(struct kvm_vm *vm)
-> > +{
-> > +     ssize_t ret;
-> > +     int i, stats_fd, err = -1;
-> > +     size_t size_desc, size_data = 0;
-> > +     struct kvm_stats_header header;
-> > +     struct kvm_stats_desc *stats_desc, *pdesc;
-> > +     struct kvm_vm_stats_data *stats_data;
-> > +
-> > +     // Get fd for VM stats
->
-> Another small nitpick: comments should go in /* */ format
-Thanks. Will fix all comments.
->
-> Thank you,
-> Emanuele
->
+I guess it is possible to open-code the wait using a readers count and a
+spinlock (see patch after signature).  This allows including the
+rcu_assign_pointer in the same critical section that checks the number
+of readers.  Also on the plus side, the init_rwsem() is replaced by
+slightly nicer code.
 
-Jing
+IIUC this could be extended to non-sleeping invalidations too, but I
+am not really sure about that.
+
+There are some issues with the patch though:
+
+- I am not sure if this should be a raw spin lock to avoid the same issue
+on PREEMPT_RT kernel.  That said the critical section is so tiny that using
+a raw spin lock may make sense anyway
+
+- this loses the rwsem fairness.  On the other hand, mm/mmu_notifier.c's
+own interval-tree-based filter is also using a similar mechanism that is
+likewise not fair, so it should be okay.
+
+Any opinions?  For now I placed the change below in kvm/queue, but I'm
+leaning towards delaying this optimization to the next merge window.
+
+Paolo
+
+diff --git a/Documentation/virt/kvm/locking.rst b/Documentation/virt/kvm/locking.rst
+index 8f5d5bcf5689..e628f48dfdda 100644
+--- a/Documentation/virt/kvm/locking.rst
++++ b/Documentation/virt/kvm/locking.rst
+@@ -16,12 +16,11 @@ The acquisition orders for mutexes are as follows:
+  - kvm->slots_lock is taken outside kvm->irq_lock, though acquiring
+    them together is quite rare.
+  
+-- The kvm->mmu_notifier_slots_lock rwsem ensures that pairs of
++- kvm->mn_active_invalidate_count ensures that pairs of
+    invalidate_range_start() and invalidate_range_end() callbacks
+-  use the same memslots array.  kvm->slots_lock is taken outside the
+-  write-side critical section of kvm->mmu_notifier_slots_lock, so
+-  MMU notifiers must not take kvm->slots_lock.  No other write-side
+-  critical sections should be added.
++  use the same memslots array.  kvm->slots_lock is taken on the
++  waiting side in install_new_memslots, so MMU notifiers must not
++  take kvm->slots_lock.
+  
+  On x86:
+  
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index 76b340dd6981..44a4a0c5148a 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -472,11 +472,15 @@ struct kvm {
+  #endif /* KVM_HAVE_MMU_RWLOCK */
+  
+  	struct mutex slots_lock;
+-	struct rw_semaphore mmu_notifier_slots_lock;
+  	struct mm_struct *mm; /* userspace tied to this vm */
+  	struct kvm_memslots __rcu *memslots[KVM_ADDRESS_SPACE_NUM];
+  	struct kvm_vcpu *vcpus[KVM_MAX_VCPUS];
+  
++	/* Used to wait for completion of MMU notifiers.  */
++	spinlock_t mn_invalidate_lock;
++	unsigned long mn_active_invalidate_count;
++	struct rcuwait mn_memslots_update_rcuwait;
++
+  	/*
+  	 * created_vcpus is protected by kvm->lock, and is incremented
+  	 * at the beginning of KVM_CREATE_VCPU.  online_vcpus is only
+@@ -662,7 +666,7 @@ static inline struct kvm_memslots *__kvm_memslots(struct kvm *kvm, int as_id)
+  	as_id = array_index_nospec(as_id, KVM_ADDRESS_SPACE_NUM);
+  	return srcu_dereference_check(kvm->memslots[as_id], &kvm->srcu,
+  				      lockdep_is_held(&kvm->slots_lock) ||
+-				      lockdep_is_held(&kvm->mmu_notifier_slots_lock) ||
++				      READ_ONCE(kvm->mn_active_invalidate_count) ||
+  				      !refcount_read(&kvm->users_count));
+  }
+  
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index ff9e95eb6960..cdaa1841e725 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -624,7 +624,7 @@ static void kvm_mmu_notifier_change_pte(struct mmu_notifier *mn,
+  	 * otherwise, mmu_notifier_count is incremented unconditionally.
+  	 */
+  	if (!kvm->mmu_notifier_count) {
+-		lockdep_assert_held(&kvm->mmu_notifier_slots_lock);
++		WARN_ON(!READ_ONCE(kvm->mn_active_invalidate_count));
+  		return;
+  	}
+  
+@@ -689,10 +689,13 @@ static int kvm_mmu_notifier_invalidate_range_start(struct mmu_notifier *mn,
+  	 * The complexity required to handle conditional locking for this case
+  	 * is not worth the marginal benefits, the VM is likely doomed anyways.
+  	 *
+-	 * Pairs with the up_read in range_end().
++	 * Pairs with the decrement in range_end().
+  	 */
+-	if (blockable)
+-		down_read(&kvm->mmu_notifier_slots_lock);
++	if (blockable) {
++		spin_lock(&kvm->mn_invalidate_lock);
++		kvm->mn_active_invalidate_count++;
++		spin_unlock(&kvm->mn_invalidate_lock);
++	}
+  
+  	__kvm_handle_hva_range(kvm, &hva_range);
+  
+@@ -735,9 +738,20 @@ static void kvm_mmu_notifier_invalidate_range_end(struct mmu_notifier *mn,
+  
+  	__kvm_handle_hva_range(kvm, &hva_range);
+  
+-	/* Pairs with the down_read in range_start(). */
+-	if (blockable)
+-		up_read(&kvm->mmu_notifier_slots_lock);
++	/* Pairs with the increment in range_start(). */
++	if (blockable) {
++		bool wake;
++		spin_lock(&kvm->mn_invalidate_lock);
++		wake = (--kvm->mn_active_invalidate_count == 0);
++		spin_unlock(&kvm->mn_invalidate_lock);
++
++		/*
++		 * There can only be one waiter, since the wait happens under
++		 * slots_lock.
++		 */
++		if (wake)
++			rcuwait_wake_up(&kvm->mn_memslots_update_rcuwait);
++	}
+  
+  	BUG_ON(kvm->mmu_notifier_count < 0);
+  }
+@@ -951,7 +965,9 @@ static struct kvm *kvm_create_vm(unsigned long type)
+  	mutex_init(&kvm->lock);
+  	mutex_init(&kvm->irq_lock);
+  	mutex_init(&kvm->slots_lock);
+-	init_rwsem(&kvm->mmu_notifier_slots_lock);
++	spin_lock_init(&kvm->mn_invalidate_lock);
++	rcuwait_init(&kvm->mn_memslots_update_rcuwait);
++
+  	INIT_LIST_HEAD(&kvm->devices);
+  
+  	BUILD_BUG_ON(KVM_MEM_SLOTS_NUM > SHRT_MAX);
+@@ -1073,15 +1089,17 @@ static void kvm_destroy_vm(struct kvm *kvm)
+  #if defined(CONFIG_MMU_NOTIFIER) && defined(KVM_ARCH_WANT_MMU_NOTIFIER)
+  	mmu_notifier_unregister(&kvm->mmu_notifier, kvm->mm);
+  	/*
+-	 * Reset the lock used to prevent memslot updates between MMU notifier
+-	 * invalidate_range_start() and invalidate_range_end().  At this point,
+-	 * no more MMU notifiers will run and pending calls to ...start() have
+-	 * completed.  But, the lock could still be held if KVM's notifier was
+-	 * removed between ...start() and ...end().  No threads can be waiting
+-	 * on the lock as the last reference on KVM has been dropped.  If the
+-	 * lock is still held, freeing memslots will deadlock.
++	 * At this point, pending calls to invalidate_range_start()
++	 * have completed but no more MMU notifiers will run, so
++	 * mn_active_invalidate_count may remain unbalanced.
++	 * No threads can be waiting in install_new_memslots as the
++	 * last reference on KVM has been dropped, but freeing
++	 * memslots will deadlock without manual intervention.
+  	 */
+-	init_rwsem(&kvm->mmu_notifier_slots_lock);
++	spin_lock(&kvm->mn_invalidate_lock);
++	kvm->mn_active_invalidate_count = 0;
++	WARN_ON(rcuwait_active(&kvm->mn_memslots_update_rcuwait));
++	spin_unlock(&kvm->mn_invalidate_lock);
+  #else
+  	kvm_arch_flush_shadow_all(kvm);
+  #endif
+@@ -1333,9 +1351,22 @@ static struct kvm_memslots *install_new_memslots(struct kvm *kvm,
+  	WARN_ON(gen & KVM_MEMSLOT_GEN_UPDATE_IN_PROGRESS);
+  	slots->generation = gen | KVM_MEMSLOT_GEN_UPDATE_IN_PROGRESS;
+  
+-	down_write(&kvm->mmu_notifier_slots_lock);
++	/*
++	 * This cannot be an rwsem because the MMU notifier must not run
++	 * inside the critical section.  A sleeping rwsem cannot exclude
++	 * that.
++	 */
++	spin_lock(&kvm->mn_invalidate_lock);
++	prepare_to_rcuwait(&kvm->mn_memslots_update_rcuwait);
++	while (kvm->mn_active_invalidate_count) {
++		set_current_state(TASK_UNINTERRUPTIBLE);
++		spin_unlock(&kvm->mn_invalidate_lock);
++		schedule();
++		spin_lock(&kvm->mn_invalidate_lock);
++	}
++	finish_rcuwait(&kvm->mn_memslots_update_rcuwait);
+  	rcu_assign_pointer(kvm->memslots[as_id], slots);
+-	up_write(&kvm->mmu_notifier_slots_lock);
++	spin_unlock(&kvm->mn_invalidate_lock);
+  
+  	synchronize_srcu_expedited(&kvm->srcu);
+  
+
