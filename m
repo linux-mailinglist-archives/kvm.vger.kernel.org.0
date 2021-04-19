@@ -2,86 +2,86 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0CB70363BA0
-	for <lists+kvm@lfdr.de>; Mon, 19 Apr 2021 08:40:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 97DC8363BA5
+	for <lists+kvm@lfdr.de>; Mon, 19 Apr 2021 08:40:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237607AbhDSGji (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 19 Apr 2021 02:39:38 -0400
-Received: from mga12.intel.com ([192.55.52.136]:32762 "EHLO mga12.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S237214AbhDSGj3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 19 Apr 2021 02:39:29 -0400
-IronPort-SDR: OGLaISLx6Yn2hDfCj0Yry9aDPRUQsUHLTbXWy9R/TsDFf0kHtXc8Nn655O39yK9Wh+dVhI8XQQ
- Pw9CTkGMcd/w==
-X-IronPort-AV: E=McAfee;i="6200,9189,9958"; a="174766104"
-X-IronPort-AV: E=Sophos;i="5.82,233,1613462400"; 
-   d="scan'208";a="174766104"
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Apr 2021 23:39:00 -0700
-IronPort-SDR: wH9HZJ09KeG3XJL9rB96XhUZmwQUVyfP5DDpoOLbnjfZ4VZoGcBfhPofa/QOH2L+KAf+ZC0m3Z
- q4zpRNO/R7hA==
-X-IronPort-AV: E=Sophos;i="5.82,233,1613462400"; 
-   d="scan'208";a="523328560"
-Received: from unknown (HELO localhost.localdomain.bj.intel.com) ([10.240.193.73])
-  by fmsmga001-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Apr 2021 23:38:58 -0700
-From:   Zhu Lingshan <lingshan.zhu@intel.com>
-To:     jasowang@redhat.com, mst@redhat.com, lulu@redhat.com,
-        sgarzare@redhat.com
-Cc:     virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Zhu Lingshan <lingshan.zhu@intel.com>
-Subject: [PATCH V4 3/3] vDPA/ifcvf: get_config_size should return dev specific config size
-Date:   Mon, 19 Apr 2021 14:33:26 +0800
-Message-Id: <20210419063326.3748-4-lingshan.zhu@intel.com>
-X-Mailer: git-send-email 2.27.0
-In-Reply-To: <20210419063326.3748-1-lingshan.zhu@intel.com>
-References: <20210419063326.3748-1-lingshan.zhu@intel.com>
+        id S237214AbhDSGkj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 19 Apr 2021 02:40:39 -0400
+Received: from szxga01-in.huawei.com ([45.249.212.187]:5136 "EHLO
+        szxga01-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230038AbhDSGki (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 19 Apr 2021 02:40:38 -0400
+Received: from DGGEML402-HUB.china.huawei.com (unknown [172.30.72.56])
+        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4FNxvl0GktzYXdt;
+        Mon, 19 Apr 2021 14:37:55 +0800 (CST)
+Received: from dggpemm500023.china.huawei.com (7.185.36.83) by
+ DGGEML402-HUB.china.huawei.com (10.3.17.38) with Microsoft SMTP Server (TLS)
+ id 14.3.498.0; Mon, 19 Apr 2021 14:40:04 +0800
+Received: from [10.174.187.128] (10.174.187.128) by
+ dggpemm500023.china.huawei.com (7.185.36.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id
+ 15.1.2176.2; Mon, 19 Apr 2021 14:40:03 +0800
+Subject: Re: [PATCH v6 03/10] KVM: selftests: Use flag CLOCK_MONOTONIC_RAW for
+ timing
+To:     Paolo Bonzini <pbonzini@redhat.com>
+CC:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Andrew Jones <drjones@redhat.com>,
+        Ben Gardon <bgardon@google.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Peter Xu <peterx@redhat.com>, <wanghaibin.wang@huawei.com>,
+        <yuzenghui@huawei.com>, kvm <kvm@vger.kernel.org>,
+        <linux-kselftest@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+References: <20210330080856.14940-1-wangyanan55@huawei.com>
+ <20210330080856.14940-4-wangyanan55@huawei.com>
+ <1f892f30-1a72-1bcb-462f-b3d6f2bababb@redhat.com>
+From:   "wangyanan (Y)" <wangyanan55@huawei.com>
+Message-ID: <82def592-e36c-25c3-c8c5-84c9be83e926@huawei.com>
+Date:   Mon, 19 Apr 2021 14:40:03 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.4.0
 MIME-Version: 1.0
+In-Reply-To: <1f892f30-1a72-1bcb-462f-b3d6f2bababb@redhat.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
 Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-Originating-IP: [10.174.187.128]
+X-ClientProxiedBy: dggeme719-chm.china.huawei.com (10.1.199.115) To
+ dggpemm500023.china.huawei.com (7.185.36.83)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-get_config_size() should return the size based on the decected
-device type.
+Hi Paolo,
 
-Signed-off-by: Zhu Lingshan <lingshan.zhu@intel.com>
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
-Acked-by: Jason Wang <jasowang@redhat.com>
----
- drivers/vdpa/ifcvf/ifcvf_main.c | 19 ++++++++++++++++++-
- 1 file changed, 18 insertions(+), 1 deletion(-)
+On 2021/4/17 21:23, Paolo Bonzini wrote:
+> On 30/03/21 10:08, Yanan Wang wrote:
+>> In addition to function of CLOCK_MONOTONIC, flag CLOCK_MONOTONIC_RAW can
+>> also shield possiable impact of NTP, which can provide more robustness.
+>>
+>> Suggested-by: Vitaly Kuznetsov<vkuznets@redhat.com>
+>> Signed-off-by: Yanan Wang<wangyanan55@huawei.com>
+>> Reviewed-by: Ben Gardon<bgardon@google.com>
+>> Reviewed-by: Andrew Jones<drjones@redhat.com>
+>
+> I'm not sure about this one, is the effect visible?
+>
+In practice, difference between results got with CLOCK_MONOTONIC and 
+CLOCK_MONOTONIC_RAW
+actually is too little to be visible. But if just in theory, 
+CLOCK_MONOTONIC_RAW can ensure time results
+of the compared tests are based on the same local oscillator frequency, 
+which is not subject to possible
+NTP frequency adjustment. Change in this patch seems like a bit of 
+optimization.
 
-diff --git a/drivers/vdpa/ifcvf/ifcvf_main.c b/drivers/vdpa/ifcvf/ifcvf_main.c
-index 9a4a6df91f08..e48e6b74fe2e 100644
---- a/drivers/vdpa/ifcvf/ifcvf_main.c
-+++ b/drivers/vdpa/ifcvf/ifcvf_main.c
-@@ -356,7 +356,24 @@ static u32 ifcvf_vdpa_get_vq_align(struct vdpa_device *vdpa_dev)
- 
- static size_t ifcvf_vdpa_get_config_size(struct vdpa_device *vdpa_dev)
- {
--	return sizeof(struct virtio_net_config);
-+	struct ifcvf_adapter *adapter = vdpa_to_adapter(vdpa_dev);
-+	struct ifcvf_hw *vf = vdpa_to_vf(vdpa_dev);
-+	struct pci_dev *pdev = adapter->pdev;
-+	size_t size;
-+
-+	switch (vf->dev_type) {
-+	case VIRTIO_ID_NET:
-+		size = sizeof(struct virtio_net_config);
-+		break;
-+	case VIRTIO_ID_BLOCK:
-+		size = sizeof(struct virtio_blk_config);
-+		break;
-+	default:
-+		size = 0;
-+		IFCVF_ERR(pdev, "VIRTIO ID %u not supported\n", vf->dev_type);
-+	}
-+
-+	return size;
- }
- 
- static void ifcvf_vdpa_get_config(struct vdpa_device *vdpa_dev,
--- 
-2.27.0
+But either of these two flags is good to me. If this patch is not 
+convincing enough to be accepted, I will
+post a patch later in fix use of CLOCK_MONOTONIC_RAW in 
+kvm_page_table_test.c just to be consistent
+with other kvm tests, please queue. :）
+
+Thanks,
+Yanan
+
 
