@@ -2,133 +2,133 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8D7FC36487D
-	for <lists+kvm@lfdr.de>; Mon, 19 Apr 2021 18:47:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2A52F364881
+	for <lists+kvm@lfdr.de>; Mon, 19 Apr 2021 18:49:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238974AbhDSQsD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 19 Apr 2021 12:48:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48944 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231674AbhDSQsC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 19 Apr 2021 12:48:02 -0400
-Received: from mail-ed1-x533.google.com (mail-ed1-x533.google.com [IPv6:2a00:1450:4864:20::533])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C6D42C06174A
-        for <kvm@vger.kernel.org>; Mon, 19 Apr 2021 09:47:31 -0700 (PDT)
-Received: by mail-ed1-x533.google.com with SMTP id e7so41463540edu.10
-        for <kvm@vger.kernel.org>; Mon, 19 Apr 2021 09:47:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=ULkhNyBkJhOzd2MtmJFa/N3rtzrsuHnW3mv/d14HWLM=;
-        b=VhD8JcHZqBlTxK0XiSAT5abkUGtYvRrHraP88rp2g6d4qMhjN8AND+EUCqq3ybh02J
-         isTHDXjYPTnOPp7ahTnaAu3susndWiDiTaNMNnTT2LI8ZZ6lnWG4g+ogCbvuRFN6cCaX
-         rWgU4SOkaJsBpZV+Tzcb7B3gEPlCUcan+L/Ejttdbp90P+tUIfDsEwLxoYFKNVcYZ0kc
-         IcEcx2hApvd/93kBuK8KtD8Q8FZ3iNvHK/FoBU1i+LRiq8QEytRm46Ej7a0mD424D6eJ
-         Xrj+gYTQPPu+TqGYnhmfcJdtTrfvjeDcSDHkY/FbrsUQbTgDTLBwofYPV2vtiy5iOWup
-         xuOw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=ULkhNyBkJhOzd2MtmJFa/N3rtzrsuHnW3mv/d14HWLM=;
-        b=CFWectAaBfEWIyDx+iXnXD6Rxbxp2wEv0fgU6Pzil2Z2C0BVGGawJQ6I7/rqsMwFPk
-         lg7MRPfLWXsdcBPbOxBiyzH8eHuWqOz5TnZ+VprgbPGXbQv9KcorIAKtQuA+wm9DYWsp
-         pMAgCf8DUtVetZ/xcNppH25h4fugLvVaEiVNMyquKRDa1s5CSRXbE/tFA9qxGKYurERs
-         mNQzeJcjIq2Dp5Myc7Gle2NE82U7BcZjnGsD5MFpeKjJoN8rngyZYrtMaLUwZmUrFB4q
-         QFtWtrlyOegXUQ3OC6HXxMu37kzJuBmy9yO0mNa84oRKEVKfwbdpF3ZaMe/KHzPhJdbP
-         dVOQ==
-X-Gm-Message-State: AOAM530gWwdyqxmtIiaKa8x/touj86Hpy5wPfMXSr7GpvT1KrvGGlHSw
-        aQ5Mlgd1r17oKBV4sjiS6s8JtmfYbQl/ZqqYHpNtIQ==
-X-Google-Smtp-Source: ABdhPJxNiWi2JhW9wjSbgaz+5jZJ4+e/AuWvZuRuM1kzspnXfEdKUNV2b790X2dS9VFF4IUusotQcntY9d5emh7qRW8=
-X-Received: by 2002:aa7:c492:: with SMTP id m18mr3594976edq.30.1618850850281;
- Mon, 19 Apr 2021 09:47:30 -0700 (PDT)
-MIME-Version: 1.0
-References: <20210416131820.2566571-1-aaronlewis@google.com> <cunblaaqwe0.fsf@dme.org>
-In-Reply-To: <cunblaaqwe0.fsf@dme.org>
-From:   Aaron Lewis <aaronlewis@google.com>
-Date:   Mon, 19 Apr 2021 09:47:19 -0700
-Message-ID: <CAAAPnDEEwLRMLZffJSN5W93d5s6EQJuAP58vAVJCo+RZD6ahsA@mail.gmail.com>
-Subject: Re: [PATCH 1/2] kvm: x86: Allow userspace to handle emulation errors
-To:     David Edmondson <dme@dme.org>
-Cc:     Jim Mattson <jmattson@google.com>,
+        id S239129AbhDSQtt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 19 Apr 2021 12:49:49 -0400
+Received: from mga17.intel.com ([192.55.52.151]:53075 "EHLO mga17.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S231674AbhDSQtt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 19 Apr 2021 12:49:49 -0400
+IronPort-SDR: ME+pWubpdG4o9RkdAYlIXWfut98LVGOMLrS/u6AcCbNDUFFEEokg8DoDLj7e4kupjNcU14XwFK
+ Ed940wTTOcuw==
+X-IronPort-AV: E=McAfee;i="6200,9189,9959"; a="175470552"
+X-IronPort-AV: E=Sophos;i="5.82,234,1613462400"; 
+   d="scan'208";a="175470552"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Apr 2021 09:49:18 -0700
+IronPort-SDR: 7Cc6vAEbhW1z0LwoEyIdYtF/0C7nWzGoIMgKkbrnkFw1WH4wbxEh8vRZwnhgfW2mJajoYHyQ1L
+ 6BQICGoz6MUA==
+X-IronPort-AV: E=Sophos;i="5.82,234,1613462400"; 
+   d="scan'208";a="426576282"
+Received: from jcfarwe-mobl1.amr.corp.intel.com (HELO [10.212.244.217]) ([10.212.244.217])
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Apr 2021 09:49:17 -0700
+Subject: Re: [RFCv2 06/13] x86/realmode: Share trampoline area if KVM memory
+ protection enabled
+To:     "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Peter Zijlstra <peterz@infradead.org>,
         Sean Christopherson <seanjc@google.com>,
-        kvm list <kvm@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+        Jim Mattson <jmattson@google.com>
+Cc:     David Rientjes <rientjes@google.com>,
+        "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>,
+        "Kleen, Andi" <andi.kleen@intel.com>,
+        "Yamahata, Isaku" <isaku.yamahata@intel.com>,
+        Erdem Aktas <erdemaktas@google.com>,
+        Steve Rutherford <srutherford@google.com>,
+        Peter Gonda <pgonda@google.com>,
+        David Hildenbrand <david@redhat.com>, x86@kernel.org,
+        kvm@vger.kernel.org, linux-mm@kvack.org,
+        linux-kernel@vger.kernel.org
+References: <20210416154106.23721-1-kirill.shutemov@linux.intel.com>
+ <20210416154106.23721-7-kirill.shutemov@linux.intel.com>
+From:   Dave Hansen <dave.hansen@intel.com>
+Autocrypt: addr=dave.hansen@intel.com; keydata=
+ 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
+ z5cecg==
+Message-ID: <5e9acef8-4945-4341-2271-647f6244b939@intel.com>
+Date:   Mon, 19 Apr 2021 09:49:16 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
+MIME-Version: 1.0
+In-Reply-To: <20210416154106.23721-7-kirill.shutemov@linux.intel.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> > Add a fallback mechanism to the in-kernel instruction emulator that
-> > allows userspace the opportunity to process an instruction the emulator
-> > was unable to.  When the in-kernel instruction emulator fails to process
-> > an instruction it will either inject a #UD into the guest or exit to
-> > userspace with exit reason KVM_INTERNAL_ERROR.  This is because it does
-> > not know how to proceed in an appropriate manner.  This feature lets
-> > userspace get involved to see if it can figure out a better path
-> > forward.
->
-> Given that you are intending to try and handle the instruction in
-> user-space, it seems a little odd to overload the
-> KVM_EXIT_INTERNAL_ERROR/KVM_INTERNAL_ERROR_EMULATION exit reason/sub
-> error.
->
-> Why not add a new exit reason, particularly given that the caller has to
-> enable the capability to get the relevant data? (It would also remove
-> the need for the flag field and any mechanism for packing multiple bits
-> of detail into the structure.)
+On 4/16/21 8:40 AM, Kirill A. Shutemov wrote:
+>  	/*
+> -	 * If SME is active, the trampoline area will need to be in
+> -	 * decrypted memory in order to bring up other processors
+> +	 * If SME or KVM memory protection is active, the trampoline area will
+> +	 * need to be in decrypted memory in order to bring up other processors
+>  	 * successfully. This is not needed for SEV.
+>  	 */
+> -	if (sme_active())
+> +	if (sme_active() || kvm_mem_protected())
+>  		set_memory_decrypted((unsigned long)base, size >> PAGE_SHIFT);
 
-I considered that, but I opted for the extensibility of the exiting
-KVM_EXIT_INTERNAL_ERROR instead.  To me it was six of one or half a
-dozen of the other.  With either strategy I still wanted to provide
-for future extensibility, and had a flags field in place.  That way we
-can add to this in the future if we find something that is missing
-(ie: potentially wanting a way to mark dirty pages, possibly passing a
-fault address, etc...)
+Could you take a look at all the places you've added these:
 
-> > +/*
-> > + * When using the suberror KVM_INTERNAL_ERROR_EMULATION, these flags are used
-> > + * to describe what is contained in the exit struct.  The flags are used to
-> > + * describe it's contents, and the contents should be in ascending numerical
-> > + * order of the flag values.  For example, if the flag
-> > + * KVM_INTERNAL_ERROR_EMULATION_FLAG_INSTRUCTION_BYTES is set, the instruction
-> > + * length and instruction bytes would be expected to show up first because this
-> > + * flag has the lowest numerical value (1) of all the other flags.
-> > + */
-> > +#define KVM_INTERNAL_ERROR_EMULATION_FLAG_INSTRUCTION_BYTES (1ULL << 0)
-> > +
-> >  /* for KVM_RUN, returned by mmap(vcpu_fd, offset=0) */
-> >  struct kvm_run {
-> >       /* in */
-> > @@ -382,6 +393,14 @@ struct kvm_run {
-> >                       __u32 ndata;
-> >                       __u64 data[16];
-> >               } internal;
-> > +             /* KVM_EXIT_INTERNAL_ERROR, too (not 2) */
-> > +             struct {
-> > +                     __u32 suberror;
-> > +                     __u32 ndata;
-> > +                     __u64 flags;
-> > +                     __u8  insn_size;
-> > +                     __u8  insn_bytes[15];
-> > +             } emulation_failure;
-> > +/*
-> > + * When using the suberror KVM_INTERNAL_ERROR_EMULATION, these flags are used
-> > + * to describe what is contained in the exit struct.  The flags are used to
-> > + * describe it's contents, and the contents should be in ascending numerical
-> > + * order of the flag values.  For example, if the flag
-> > + * KVM_INTERNAL_ERROR_EMULATION_FLAG_INSTRUCTION_BYTES is set, the instruction
-> > + * length and instruction bytes would be expected to show up first because this
-> > + * flag has the lowest numerical value (1) of all the other flags.
->
-> When adding a new flag, do I steal bytes from insn_bytes[] for my
-> associated payload? If so, how many do I have to leave?
->
+	if (foo() || kvm_mem_protected())
+		bar();
 
-The emulation_failure struct mirrors the internal struct, so if you
-are just adding to what I have, you can safely add up to 16 __u64's.
-I'm currently using the size equivalent to 3 of them (flags,
-insn_size, insn_bytes), so there should be plenty of space left for
-you to add what you need to the end.  Just add the fields you need to
-the end of emulation_failure struct, increase 'ndata' to the new
-count, add a new flag to 'flags' so we know its contents.
+spots and see if some refactoring is in order?
+
+I suspect that some thought about what the high-level commonalities are,
+plus some thoughtful helper function names would go a long way to making
+this whole thing understandable.
+
+
+set_memory_decrypted() as a name needs to go.  It almost needs to be
+something like:
+
+	set_memory_sharing()
+
+or something.  The "sharing" would be between the kernel and devices
+(for SME), or the guest kernel and host kernel for protected memory.
