@@ -2,165 +2,217 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5604E364A24
-	for <lists+kvm@lfdr.de>; Mon, 19 Apr 2021 20:53:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B40B0364A72
+	for <lists+kvm@lfdr.de>; Mon, 19 Apr 2021 21:21:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238333AbhDSSy1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 19 Apr 2021 14:54:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48584 "EHLO
+        id S241576AbhDSTVg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 19 Apr 2021 15:21:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54608 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232929AbhDSSy1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 19 Apr 2021 14:54:27 -0400
-Received: from mail-lj1-x22c.google.com (mail-lj1-x22c.google.com [IPv6:2a00:1450:4864:20::22c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C0622C061761
-        for <kvm@vger.kernel.org>; Mon, 19 Apr 2021 11:53:56 -0700 (PDT)
-Received: by mail-lj1-x22c.google.com with SMTP id r22so29930210ljc.5
-        for <kvm@vger.kernel.org>; Mon, 19 Apr 2021 11:53:56 -0700 (PDT)
+        with ESMTP id S239503AbhDSTVf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 19 Apr 2021 15:21:35 -0400
+Received: from mail-io1-xd33.google.com (mail-io1-xd33.google.com [IPv6:2607:f8b0:4864:20::d33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 77F74C06174A
+        for <kvm@vger.kernel.org>; Mon, 19 Apr 2021 12:21:05 -0700 (PDT)
+Received: by mail-io1-xd33.google.com with SMTP id v123so29163192ioe.10
+        for <kvm@vger.kernel.org>; Mon, 19 Apr 2021 12:21:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=shutemov-name.20150623.gappssmtp.com; s=20150623;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=+X4D2n9RFMWw8zjzh3E9FVsIFGWzECSAEPhHZI5vCug=;
-        b=PKRW/7grIxILIqQsK8h20q83oHtONy15VxwtEa46HHMPKMLvgfSwOc/ocz5gMW5UF1
-         JXZ3sixgGt7FqkeYJNqj8cCgCtgKNz+s5k6ZSXhHuN1T29+4JyAD5zNHptCnSK5C+Vtb
-         OThPJPzlqvud0YZHViZXPUIRp4FU6bh+H5+aefuZTo3WY6LChygih0ftfFO1q12z1c3N
-         Sjv+D/H0MaDHSaZ5mYVlOuB6xZgQ6z3kwlBS0hLPB0HfMm4uXkLTyDuO9DkdumtI+cWF
-         J6DAtW1wzC+iYCpgmdedDOtCTSaugPuBJ3qUgRh9QKt8ytE6JiBmjAwFG2EHExWpsFEW
-         9ctQ==
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=jXjjoWt46Jw4aYJCJQMswNRgoJcTtm7mXok8hN8cVH4=;
+        b=LBc5ghnUtNA4sLNOF5O3uvKop9WrGL+xQVnrKdZ8+XbH7Xs2yahScji+toDvMDZY+F
+         V0+g2AEeEDt6HgyR6Gk0dtFT+7Z/C5CoKr/+rv0qAo5G2Lzd7AY2S3RdlgWXuAJontG4
+         Ndfupmi9oqSIgFlkJatmLRpZhX0PYrGzQP/IMIg0nOawSCojyPepe2tjJWbm84jneUqb
+         aCVKNB5dfTbUfqlILEhnNHIUyz3fiScJsiTeNHZLK60LBPWb6E10ro4yeaMar9DyyQWS
+         Sp5fLpappMul2poyk5T/G5xEyhMHAcoBv6/UiX6YHgVsPPXy7xwzWgM+90W9k8TfJSVh
+         rB9A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=+X4D2n9RFMWw8zjzh3E9FVsIFGWzECSAEPhHZI5vCug=;
-        b=S4EptmaqoZC8YsZk//U4agwfiQrdtX5rXJQFg11oCzUQdAse7OP6lDI07GFiiOT88T
-         U9xR2eqQM0xpCTVsA6+a/qlPC14uyb4BMa/wgPdVFQ99qEHY5ugHxKusgiXL0HVza1zi
-         ehfIUJ1Am9machsCikBacKQdNtp4zxsvhcNgaxNP69YZvagf8FGUU+E/XaEGtCw45LbA
-         Ijk2jPU+30VdRSWg7pB/LkQCQvZRA52Y59HERnX7HECjgib2iX0RA6l6/IsXf6Qjz1sw
-         KHEj2i0jHqXUvRye350rCNltpNK7HwYiP88IwpwPeq5cZp2kkklk0478DK3nVc23LKSz
-         LShg==
-X-Gm-Message-State: AOAM530ljsx9W/ztzjMzGwJzhjIxCywBPV3DlnPImkgmG3GSpewI2vJh
-        YttYcL5LySMGxLhWtdOa9s8ABQ==
-X-Google-Smtp-Source: ABdhPJxD9mbt35DuFIVbuQCWztN4w/y9QKN+wH06/RwHSBIJ/Q8BxsA9a5YbLE87w6jRvlmzB7eXkQ==
-X-Received: by 2002:a2e:964e:: with SMTP id z14mr12543091ljh.150.1618858435261;
-        Mon, 19 Apr 2021 11:53:55 -0700 (PDT)
-Received: from box.localdomain ([86.57.175.117])
-        by smtp.gmail.com with ESMTPSA id s21sm1914950lfs.261.2021.04.19.11.53.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 19 Apr 2021 11:53:54 -0700 (PDT)
-Received: by box.localdomain (Postfix, from userid 1000)
-        id 28FB8102567; Mon, 19 Apr 2021 21:53:54 +0300 (+03)
-Date:   Mon, 19 Apr 2021 21:53:54 +0300
-From:   "Kirill A. Shutemov" <kirill@shutemov.name>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Jim Mattson <jmattson@google.com>,
-        David Rientjes <rientjes@google.com>,
-        "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>,
-        "Kleen, Andi" <andi.kleen@intel.com>,
-        "Yamahata, Isaku" <isaku.yamahata@intel.com>,
-        Erdem Aktas <erdemaktas@google.com>,
-        Steve Rutherford <srutherford@google.com>,
-        Peter Gonda <pgonda@google.com>,
-        David Hildenbrand <david@redhat.com>, x86@kernel.org,
-        kvm@vger.kernel.org, linux-mm@kvack.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [RFCv2 13/13] KVM: unmap guest memory using poisoned pages
-Message-ID: <20210419185354.v3rgandtrel7bzjj@box>
-References: <20210416154106.23721-1-kirill.shutemov@linux.intel.com>
- <20210416154106.23721-14-kirill.shutemov@linux.intel.com>
- <YHnJtvXdrZE+AfM3@google.com>
- <20210419142602.khjbzktk5tk5l6lk@box.shutemov.name>
- <YH2pam5b837wFM3z@google.com>
- <20210419164027.dqiptkebhdt5cfmy@box.shutemov.name>
- <YH3HWeOXFiCTZN4y@google.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=jXjjoWt46Jw4aYJCJQMswNRgoJcTtm7mXok8hN8cVH4=;
+        b=Fg+DcPRhV309AQImbrxKuoVNFIlGmJH+p6K3uVWt6oxWUxdxpzSYF1VjMh7+I3psGM
+         J86b2033VbmULQvhr0fB3liLgbZ1LYVWJ7pI/3L84CWxksgOGvLIVVQSnFhT+lyVXcTt
+         RAHOB0qOqI+SB7AWeX+ewLfEzbO8pr6soZs5L9PRRvL7DOdcIdzB4voafh9/7TBat0zP
+         z77v8m2wokAHvgEgyeuwuGdh6zBqLvowbX5bRL7GrGo0/VJjfAXgXBpzltS+YamJGh6I
+         7pEV6NH3itGJqHUwNG2/aWiemejTRZ8nnMIeY2r+vUX9oB8D7fQb4nR/lNM2FO2/KwyW
+         qaWg==
+X-Gm-Message-State: AOAM530gSLJpf0gwlJpy/qAHiPg1KC/kD0Ltu6MpDgUVeEsRfL6oyTVL
+        G8o/q2pTWtxC57l2ziYny5hx6Gq0FiQHQ/f42qW07Q==
+X-Google-Smtp-Source: ABdhPJy+m5wNyx2xyn35TIHSejk2E2jy98q8+flIf1+I1QE2+JbjJoAcojKs79C0HMMRo4DcNuPu2rzYOKuLgA08bFs=
+X-Received: by 2002:a5d:81c8:: with SMTP id t8mr15837366iol.19.1618860064760;
+ Mon, 19 Apr 2021 12:21:04 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YH3HWeOXFiCTZN4y@google.com>
+References: <20210416082511.2856-1-zhukeqian1@huawei.com> <20210416082511.2856-3-zhukeqian1@huawei.com>
+In-Reply-To: <20210416082511.2856-3-zhukeqian1@huawei.com>
+From:   Ben Gardon <bgardon@google.com>
+Date:   Mon, 19 Apr 2021 12:20:53 -0700
+Message-ID: <CANgfPd_WzX6Fm7BiMoBoehuLL8tjh4WEqehUhF8biPyL8vS4XQ@mail.gmail.com>
+Subject: Re: [RFC PATCH v2 2/2] KVM: x86: Not wr-protect huge page with
+ init_all_set dirty log
+To:     Keqian Zhu <zhukeqian1@huawei.com>
+Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        wanghaibin.wang@huawei.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Apr 19, 2021 at 06:09:29PM +0000, Sean Christopherson wrote:
-> On Mon, Apr 19, 2021, Kirill A. Shutemov wrote:
-> > On Mon, Apr 19, 2021 at 04:01:46PM +0000, Sean Christopherson wrote:
-> > > But fundamentally the private pages, are well, private.  They can't be shared
-> > > across processes, so I think we could (should?) require the VMA to always be
-> > > MAP_PRIVATE.  Does that buy us enough to rely on the VMA alone?  I.e. is that
-> > > enough to prevent userspace and unaware kernel code from acquiring a reference
-> > > to the underlying page?
-> > 
-> > Shared pages should be fine too (you folks wanted tmpfs support).
-> 
-> Is that a conflict though?  If the private->shared conversion request is kicked
-> out to userspace, then userspace can re-mmap() the files as MAP_SHARED, no?
-> 
-> Allowing MAP_SHARED for guest private memory feels wrong.  The data can't be
-> shared, and dirty data can't be written back to the file.
+On Fri, Apr 16, 2021 at 1:25 AM Keqian Zhu <zhukeqian1@huawei.com> wrote:
+>
+> Currently during start dirty logging, if we're with init-all-set,
+> we write protect huge pages and leave normal pages untouched, for
+> that we can enable dirty logging for these pages lazily.
+>
+> Actually enable dirty logging lazily for huge pages is feasible
+> too, which not only reduces the time of start dirty logging, also
+> greatly reduces side-effect on guest when there is high dirty rate.
+>
+> Signed-off-by: Keqian Zhu <zhukeqian1@huawei.com>
+> ---
+>  arch/x86/kvm/mmu/mmu.c | 48 ++++++++++++++++++++++++++++++++++++++----
+>  arch/x86/kvm/x86.c     | 37 +++++++++-----------------------
+>  2 files changed, 54 insertions(+), 31 deletions(-)
+>
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index 2ce5bc2ea46d..98fa25172b9a 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -1188,8 +1188,7 @@ static bool __rmap_clear_dirty(struct kvm *kvm, struct kvm_rmap_head *rmap_head,
+>   * @gfn_offset: start of the BITS_PER_LONG pages we care about
+>   * @mask: indicates which pages we should protect
+>   *
+> - * Used when we do not need to care about huge page mappings: e.g. during dirty
+> - * logging we do not have any such mappings.
+> + * Used when we do not need to care about huge page mappings.
+>   */
+>  static void kvm_mmu_write_protect_pt_masked(struct kvm *kvm,
+>                                      struct kvm_memory_slot *slot,
+> @@ -1246,13 +1245,54 @@ static void kvm_mmu_clear_dirty_pt_masked(struct kvm *kvm,
+>   * It calls kvm_mmu_write_protect_pt_masked to write protect selected pages to
+>   * enable dirty logging for them.
+>   *
+> - * Used when we do not need to care about huge page mappings: e.g. during dirty
+> - * logging we do not have any such mappings.
+> + * We need to care about huge page mappings: e.g. during dirty logging we may
+> + * have any such mappings.
+>   */
+>  void kvm_arch_mmu_enable_log_dirty_pt_masked(struct kvm *kvm,
+>                                 struct kvm_memory_slot *slot,
+>                                 gfn_t gfn_offset, unsigned long mask)
+>  {
+> +       gfn_t start, end;
+> +
+> +       /*
+> +        * Huge pages are NOT write protected when we start dirty log with
+> +        * init-all-set, so we must write protect them at here.
+> +        *
+> +        * The gfn_offset is guaranteed to be aligned to 64, but the base_gfn
+> +        * of memslot has no such restriction, so the range can cross two large
+> +        * pages.
+> +        */
+> +       if (kvm_dirty_log_manual_protect_and_init_set(kvm)) {
+> +               start = slot->base_gfn + gfn_offset + __ffs(mask);
+> +               end = slot->base_gfn + gfn_offset + __fls(mask);
+> +               kvm_mmu_slot_gfn_write_protect(kvm, slot, start, PG_LEVEL_2M);
+> +
+> +               /* Cross two large pages? */
+> +               if (ALIGN(start << PAGE_SHIFT, PMD_SIZE) !=
+> +                   ALIGN(end << PAGE_SHIFT, PMD_SIZE))
+> +                       kvm_mmu_slot_gfn_write_protect(kvm, slot, end,
+> +                                                      PG_LEVEL_2M);
+> +       }
+> +
+> +       /*
+> +        * RFC:
+> +        *
+> +        * 1. I don't return early when kvm_mmu_slot_gfn_write_protect() returns
+> +        * true, because I am not very clear about the relationship between
+> +        * legacy mmu and tdp mmu. AFAICS, the code logic is NOT an if/else
+> +        * manner.
+> +        *
+> +        * The kvm_mmu_slot_gfn_write_protect() returns true when we hit a
+> +        * writable large page mapping in legacy mmu mapping or tdp mmu mapping.
+> +        * Do we still have normal mapping in that case? (e.g. We have large
+> +        * mapping in legacy mmu and normal mapping in tdp mmu).
 
-It can be remapped, but faulting in the page would produce hwpoison entry.
-I don't see other way to make Google's use-case with tmpfs-backed guest
-memory work.
+Right, we can't return early because the two MMUs could map the page
+in different ways, but each MMU could also map the page in multiple
+ways independently.
+For example, if the legacy MMU was being used and we were running a
+nested VM, a page could be mapped 2M in EPT01 and 4K in EPT02, so we'd
+still need kvm_mmu_slot_gfn_write_protect  calls for both levels.
+I don't think there's a case where we can return early here with the
+information that the first calls to kvm_mmu_slot_gfn_write_protect
+access.
 
-> > The poisoned pages must be useless outside of the process with the blessed
-> > struct kvm. See kvm_pfn_map in the patch.
-> 
-> The big requirement for kernel TDX support is that the pages are useless in the
-> host.  Regarding the guest, for TDX, the TDX Module guarantees that at most a
-> single KVM guest can have access to a page at any given time.  I believe the RMP
-> provides the same guarantees for SEV-SNP.
-> 
-> SEV/SEV-ES could still end up with corruption if multiple guests map the same
-> private page, but that's obviously not the end of the world since it's the status
-> quo today.  Living with that shortcoming might be a worthy tradeoff if punting
-> mutual exclusion between guests to firmware/hardware allows us to simplify the
-> kernel implementation.
+> +        *
+> +        * 2. kvm_mmu_slot_gfn_write_protect() doesn't tell us whether the large
+> +        * page mapping exist. If it exists but is clean, we can return early.
+> +        * However, we have to do invasive change.
 
-The critical question is whether we ever need to translate hva->pfn after
-the page is added to the guest private memory. I believe we do, but I
-never checked. And that's the reason we need to keep hwpoison entries
-around, which encode pfn.
+What do you mean by invasive change?
 
-If we don't, it would simplify the solution: kvm_pfn_map is not needed.
-Single bit-per page would be enough.
-
-> > > >  - Add a new GUP flag to retrive such pages from the userspace mapping.
-> > > >    Used only for private mapping population.
-> > > 
-> > > >  - Shared gfn ranges managed by userspace, based on hypercalls from the
-> > > >    guest.
-> > > > 
-> > > >  - Shared mappings get populated via normal VMA. Any poisoned pages here
-> > > >    would lead to SIGBUS.
-> > > > 
-> > > > So far it looks pretty straight-forward.
-> > > > 
-> > > > The only thing that I don't understand is at way point the page gets tied
-> > > > to the KVM instance. Currently we do it just before populating shadow
-> > > > entries, but it would not work with the new scheme: as we poison pages
-> > > > on fault it they may never get inserted into shadow entries. That's not
-> > > > good as we rely on the info to unpoison page on free.
-> > > 
-> > > Can you elaborate on what you mean by "unpoison"?  If the page is never actually
-> > > mapped into the guest, then its poisoned status is nothing more than a software
-> > > flag, i.e. nothing extra needs to be done on free.
-> > 
-> > Normally, poisoned flag preserved for freed pages as it usually indicate
-> > hardware issue. In this case we need return page to the normal circulation.
-> > So we need a way to differentiate two kinds of page poison. Current patch
-> > does this by adding page's pfn to kvm_pfn_map. But this will not work if
-> > we uncouple poisoning and adding to shadow PTE.
-> 
-> Why use PG_hwpoison then?
-
-Page flags are scarce. I don't want to take occupy a new one until I'm
-sure I must.
-
-And we can re-use existing infrastructure to SIGBUS on access to such
-pages.
-
--- 
- Kirill A. Shutemov
+> +        */
+> +
+> +       /* Then we can handle the PT level pages */
+>         if (kvm_x86_ops.cpu_dirty_log_size)
+>                 kvm_mmu_clear_dirty_pt_masked(kvm, slot, gfn_offset, mask);
+>         else
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index eca63625aee4..dfd676ffa7da 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -10888,36 +10888,19 @@ static void kvm_mmu_slot_apply_flags(struct kvm *kvm,
+>                  */
+>                 kvm_mmu_zap_collapsible_sptes(kvm, new);
+>         } else {
+> -               /* By default, write-protect everything to log writes. */
+> -               int level = PG_LEVEL_4K;
+> +               /*
+> +                * If we're with initial-all-set, we don't need to write protect
+> +                * any page because they're reported as dirty already.
+> +                */
+> +               if (kvm_dirty_log_manual_protect_and_init_set(kvm))
+> +                       return;
+>
+>                 if (kvm_x86_ops.cpu_dirty_log_size) {
+> -                       /*
+> -                        * Clear all dirty bits, unless pages are treated as
+> -                        * dirty from the get-go.
+> -                        */
+> -                       if (!kvm_dirty_log_manual_protect_and_init_set(kvm))
+> -                               kvm_mmu_slot_leaf_clear_dirty(kvm, new);
+> -
+> -                       /*
+> -                        * Write-protect large pages on write so that dirty
+> -                        * logging happens at 4k granularity.  No need to
+> -                        * write-protect small SPTEs since write accesses are
+> -                        * logged by the CPU via dirty bits.
+> -                        */
+> -                       level = PG_LEVEL_2M;
+> -               } else if (kvm_dirty_log_manual_protect_and_init_set(kvm)) {
+> -                       /*
+> -                        * If we're with initial-all-set, we don't need
+> -                        * to write protect any small page because
+> -                        * they're reported as dirty already.  However
+> -                        * we still need to write-protect huge pages
+> -                        * so that the page split can happen lazily on
+> -                        * the first write to the huge page.
+> -                        */
+> -                       level = PG_LEVEL_2M;
+> +                       kvm_mmu_slot_leaf_clear_dirty(kvm, new);
+> +                       kvm_mmu_slot_remove_write_access(kvm, new, PG_LEVEL_2M);
+> +               } else {
+> +                       kvm_mmu_slot_remove_write_access(kvm, new, PG_LEVEL_4K);
+>                 }
+> -               kvm_mmu_slot_remove_write_access(kvm, new, level);
+>         }
+>  }
+>
+> --
+> 2.23.0
+>
