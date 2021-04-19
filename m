@@ -2,119 +2,75 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A822C3649DB
-	for <lists+kvm@lfdr.de>; Mon, 19 Apr 2021 20:33:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 581E53649DD
+	for <lists+kvm@lfdr.de>; Mon, 19 Apr 2021 20:36:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241051AbhDSSdo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 19 Apr 2021 14:33:44 -0400
-Received: from mga12.intel.com ([192.55.52.136]:39816 "EHLO mga12.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S241010AbhDSSdm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 19 Apr 2021 14:33:42 -0400
-IronPort-SDR: 0Y3snSQte4jA2Kiyn7obodLAhJHEE8npiFUy1AqLUPPqo5rJry2L0J6uCQvjLflyqeKCeye2i3
- Lt+DXr3PFg3Q==
-X-IronPort-AV: E=McAfee;i="6200,9189,9959"; a="174864997"
-X-IronPort-AV: E=Sophos;i="5.82,234,1613462400"; 
-   d="scan'208";a="174864997"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Apr 2021 11:33:09 -0700
-IronPort-SDR: yISBfxCwKCdA5nEad8k7d8swsX6vHSfDGubSaDKU1ZmSuDUNrkgTI7FjgpqFwJhlV6+wss6+Wq
- 6LGf8k/YVuXg==
-X-IronPort-AV: E=Sophos;i="5.82,234,1613462400"; 
-   d="scan'208";a="426611092"
-Received: from jcfarwe-mobl1.amr.corp.intel.com (HELO [10.212.244.217]) ([10.212.244.217])
-  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Apr 2021 11:33:08 -0700
-Subject: Re: [RFC Part2 PATCH 04/30] x86/mm: split the physmap when adding the
- page in RMP table
-To:     Andy Lutomirski <luto@amacapital.net>
-Cc:     Brijesh Singh <brijesh.singh@amd.com>,
-        Borislav Petkov <bp@alien8.de>, linux-kernel@vger.kernel.org,
-        x86@kernel.org, kvm@vger.kernel.org, linux-crypto@vger.kernel.org,
-        ak@linux.intel.com, herbert@gondor.apana.org.au,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        "H. Peter Anvin" <hpa@zytor.com>, Tony Luck <tony.luck@intel.com>,
-        "Peter Zijlstra (Intel)" <peterz@infradead.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        David Rientjes <rientjes@google.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vlastimil Babka <vbabka@suse.cz>
-References: <61596c4c-3849-99d5-b0aa-6ad6b415dff9@intel.com>
- <B17112AE-8848-48B0-997D-E1A3D79BD395@amacapital.net>
-From:   Dave Hansen <dave.hansen@intel.com>
-Autocrypt: addr=dave.hansen@intel.com; keydata=
- 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
- z5cecg==
-Message-ID: <535400b4-0593-a7ca-1548-532ee1fefbd7@intel.com>
-Date:   Mon, 19 Apr 2021 11:33:08 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        id S240058AbhDSSgv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 19 Apr 2021 14:36:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44660 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S238725AbhDSSgu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 19 Apr 2021 14:36:50 -0400
+Received: from mail-oi1-x22b.google.com (mail-oi1-x22b.google.com [IPv6:2607:f8b0:4864:20::22b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 90D4BC06174A
+        for <kvm@vger.kernel.org>; Mon, 19 Apr 2021 11:36:20 -0700 (PDT)
+Received: by mail-oi1-x22b.google.com with SMTP id k25so36427993oic.4
+        for <kvm@vger.kernel.org>; Mon, 19 Apr 2021 11:36:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=+EaVodVxNSn+D/fwaJGQ+R1xLJuoh8guKpmNOWOYpgk=;
+        b=o6hFMHegkbxozBAYktu5Big4qdDiidO++tuq0jNMkwH/Or4wQw0+rxlJr4FNQHxh96
+         QRsv4nztG6DjRR1IKAUVvjBMZP1d9IVOZriFILzL2IgcT3GdSgBbGI1MX8ik/kjqxdtL
+         m+TzTz9DE+YYm0j8SWft53zDVKPO4+GzEKPkv1rHgbmxiqx1m4Ec3wS5HEVf3nxOrGgz
+         KkrArrXUIf/RUd1EvHz97aVBUcQIRbFNTV7QM2cdh53tLd+QFgaFDD99CkJPbot8kQ8o
+         B4qtTWghuoIy9LBaGqYqpoc4mrBiYitukZVkh/8iCB2+VieFUGXCZrc60mHa0nIsINgM
+         Ol7w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=+EaVodVxNSn+D/fwaJGQ+R1xLJuoh8guKpmNOWOYpgk=;
+        b=Eqz9ADQnkV7DZA6gV1Pd8GLSMf7gCZLjxYZNgKSAf2ORLERIB7UHmOw1oDuBjTxB79
+         eu/5p+bEJR+xOqhitkV5NaKHywJUF7jbDeGlKlqBPDeV9pngvZ3azK5fNXqq4BWym0iu
+         lUspNOerYM78GHKiZyfi5EhuvKopogq7evzjK27rwOTFYZ9a1VZlMB7B5OLD2udtWwMi
+         Igx43CN913K6LoiMqbRahHPwM8hKpn62UNMseBy4MGRR52ixKOibwu7L3prdqZNJuvhf
+         hhzVERW0YCKJv8+RqYncMlD3ukm1l0PRffteGBqwfVj8wdZy7gFtXNcUSONxUYKTJyXJ
+         502w==
+X-Gm-Message-State: AOAM531OJgbt/+AkbjZD/w6krXaVwE2AulexnfB+BzWA7bhTqLCdrTPh
+        YRVfqB8aLkGPwriyNlXWzisxd/atBVuhhfujRad5Kg==
+X-Google-Smtp-Source: ABdhPJxJwG/eXheK5gyTmyWuMYOmw1WV+rmHlw5Xsv4/FWBbo/X0N1oJqGLcag0w84v0AfVnu+kfrN2wwi1E3TOncts=
+X-Received: by 2002:aca:3cd6:: with SMTP id j205mr337103oia.28.1618857379779;
+ Mon, 19 Apr 2021 11:36:19 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <B17112AE-8848-48B0-997D-E1A3D79BD395@amacapital.net>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+References: <20210412215611.110095-1-krish.sadhukhan@oracle.com>
+ <20210412215611.110095-3-krish.sadhukhan@oracle.com> <fdf27d2b-d0b6-96fa-f661-bef368f04469@redhat.com>
+ <711a0aa9-c46e-7bd3-5161-49bd9dd56286@oracle.com> <7106e7c6-c920-86fb-003e-51a42dfaf700@redhat.com>
+In-Reply-To: <7106e7c6-c920-86fb-003e-51a42dfaf700@redhat.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Mon, 19 Apr 2021 18:36:08 +0000
+Message-ID: <CALMp9eSuUuBHT8k8jxsyi9sOzMMXZEf3cpkRKyCEBpGtExGung@mail.gmail.com>
+Subject: Re: [PATCH 2/7 v7] KVM: nSVM: Define an exit code to reflect
+ consistency check failure
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Krish Sadhukhan <krish.sadhukhan@oracle.com>,
+        kvm list <kvm@vger.kernel.org>,
+        Sean Christopherson <seanjc@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 4/19/21 11:10 AM, Andy Lutomirski wrote:
-> I’m confused by this scenario. This should only affect physical pages
-> that are in the 2M area that contains guest memory. But, if we have a
-> 2M direct map PMD entry that contains kernel data and guest private
-> memory, we’re already in a situation in which the kernel touching
-> that memory would machine check, right?
+On Mon, Apr 19, 2021 at 11:28 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+> On 19/04/21 19:57, Krish Sadhukhan wrote:
+> > The reason why I thought of this is that SVM implementation uses only
+> > the lower half, as all AMD-defined exit code are handled therein only.
+> > Is this still going to cause an issue ?
+>
+> I would have to check what happens on bare metal, but VMEXIT_INVALID is
+> defined as "-1", not "FFFFFFFFh", so I think it should use the high 32
+> bits (in which case KVM is wrong in not storing the high 32 bits).
 
-Not machine check, but page fault.  Do machine checks even play a
-special role in SEV-SNP?  I thought that was only TDX?
-
-My point was just that you can't _easily_ do the 2M->4k kernel mapping
-demotion in a page fault handler, like I think Borislav was suggesting.
-
-> ISTM we should fully unmap any guest private page from the kernel and
-> all host user pagetables before actually making it be a guest private
-> page.
-
-Yes, that sounds attractive.  Then, we'd actually know if the host
-kernel was doing stray reads somehow because we'd get a fault there too.
+And VMEXIT_BUSY is -2.
