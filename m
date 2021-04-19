@@ -2,75 +2,112 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 581E53649DD
-	for <lists+kvm@lfdr.de>; Mon, 19 Apr 2021 20:36:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A8F813649E4
+	for <lists+kvm@lfdr.de>; Mon, 19 Apr 2021 20:37:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240058AbhDSSgv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 19 Apr 2021 14:36:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44660 "EHLO
+        id S241101AbhDSShy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 19 Apr 2021 14:37:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44888 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238725AbhDSSgu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 19 Apr 2021 14:36:50 -0400
-Received: from mail-oi1-x22b.google.com (mail-oi1-x22b.google.com [IPv6:2607:f8b0:4864:20::22b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 90D4BC06174A
-        for <kvm@vger.kernel.org>; Mon, 19 Apr 2021 11:36:20 -0700 (PDT)
-Received: by mail-oi1-x22b.google.com with SMTP id k25so36427993oic.4
-        for <kvm@vger.kernel.org>; Mon, 19 Apr 2021 11:36:20 -0700 (PDT)
+        with ESMTP id S241081AbhDSShx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 19 Apr 2021 14:37:53 -0400
+Received: from mail-pf1-x436.google.com (mail-pf1-x436.google.com [IPv6:2607:f8b0:4864:20::436])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E8FCDC061761
+        for <kvm@vger.kernel.org>; Mon, 19 Apr 2021 11:37:22 -0700 (PDT)
+Received: by mail-pf1-x436.google.com with SMTP id c17so23794559pfn.6
+        for <kvm@vger.kernel.org>; Mon, 19 Apr 2021 11:37:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=+EaVodVxNSn+D/fwaJGQ+R1xLJuoh8guKpmNOWOYpgk=;
-        b=o6hFMHegkbxozBAYktu5Big4qdDiidO++tuq0jNMkwH/Or4wQw0+rxlJr4FNQHxh96
-         QRsv4nztG6DjRR1IKAUVvjBMZP1d9IVOZriFILzL2IgcT3GdSgBbGI1MX8ik/kjqxdtL
-         m+TzTz9DE+YYm0j8SWft53zDVKPO4+GzEKPkv1rHgbmxiqx1m4Ec3wS5HEVf3nxOrGgz
-         KkrArrXUIf/RUd1EvHz97aVBUcQIRbFNTV7QM2cdh53tLd+QFgaFDD99CkJPbot8kQ8o
-         B4qtTWghuoIy9LBaGqYqpoc4mrBiYitukZVkh/8iCB2+VieFUGXCZrc60mHa0nIsINgM
-         Ol7w==
+        d=amacapital-net.20150623.gappssmtp.com; s=20150623;
+        h=content-transfer-encoding:from:mime-version:subject:date:message-id
+         :references:cc:in-reply-to:to;
+        bh=ai8urSCkfd8KqBe/Z0CzEZXhThfZtSSfYmfTJiDDXZc=;
+        b=zOeIYMUtTrpCHXxfvolG7AjkjRi8mAuwUc/OALV7FkrQFMdbVfNyy7eSgA25MEz5+K
+         d5St6m/cMFc2EIBcjhdTHIer7dVcDmRH+c6N2ywoofHgJ0cWsX46EDxSKyXeBuNFgKnV
+         3yz4ZITALnLrH00D9Jw9m6L8HU4WRTKOJ8xrer1IR+TL9lJmzfMi45iwnzWtN9ppSycx
+         DbdpqCRq5/N0G3qowU25pZaotqBOOUHwG3Uj6lCXGM5C058jIgRMMhAM9KtzG4XwHesu
+         8Guaw2lW+H/8o8TO/qpmhr0JWgnvdNbLI3cluAsDQs++AoiBMiDJv067toLMNOIhba7j
+         LyPA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=+EaVodVxNSn+D/fwaJGQ+R1xLJuoh8guKpmNOWOYpgk=;
-        b=Eqz9ADQnkV7DZA6gV1Pd8GLSMf7gCZLjxYZNgKSAf2ORLERIB7UHmOw1oDuBjTxB79
-         eu/5p+bEJR+xOqhitkV5NaKHywJUF7jbDeGlKlqBPDeV9pngvZ3azK5fNXqq4BWym0iu
-         lUspNOerYM78GHKiZyfi5EhuvKopogq7evzjK27rwOTFYZ9a1VZlMB7B5OLD2udtWwMi
-         Igx43CN913K6LoiMqbRahHPwM8hKpn62UNMseBy4MGRR52ixKOibwu7L3prdqZNJuvhf
-         hhzVERW0YCKJv8+RqYncMlD3ukm1l0PRffteGBqwfVj8wdZy7gFtXNcUSONxUYKTJyXJ
-         502w==
-X-Gm-Message-State: AOAM531OJgbt/+AkbjZD/w6krXaVwE2AulexnfB+BzWA7bhTqLCdrTPh
-        YRVfqB8aLkGPwriyNlXWzisxd/atBVuhhfujRad5Kg==
-X-Google-Smtp-Source: ABdhPJxJwG/eXheK5gyTmyWuMYOmw1WV+rmHlw5Xsv4/FWBbo/X0N1oJqGLcag0w84v0AfVnu+kfrN2wwi1E3TOncts=
-X-Received: by 2002:aca:3cd6:: with SMTP id j205mr337103oia.28.1618857379779;
- Mon, 19 Apr 2021 11:36:19 -0700 (PDT)
-MIME-Version: 1.0
-References: <20210412215611.110095-1-krish.sadhukhan@oracle.com>
- <20210412215611.110095-3-krish.sadhukhan@oracle.com> <fdf27d2b-d0b6-96fa-f661-bef368f04469@redhat.com>
- <711a0aa9-c46e-7bd3-5161-49bd9dd56286@oracle.com> <7106e7c6-c920-86fb-003e-51a42dfaf700@redhat.com>
-In-Reply-To: <7106e7c6-c920-86fb-003e-51a42dfaf700@redhat.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Mon, 19 Apr 2021 18:36:08 +0000
-Message-ID: <CALMp9eSuUuBHT8k8jxsyi9sOzMMXZEf3cpkRKyCEBpGtExGung@mail.gmail.com>
-Subject: Re: [PATCH 2/7 v7] KVM: nSVM: Define an exit code to reflect
- consistency check failure
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Krish Sadhukhan <krish.sadhukhan@oracle.com>,
-        kvm list <kvm@vger.kernel.org>,
-        Sean Christopherson <seanjc@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        h=x-gm-message-state:content-transfer-encoding:from:mime-version
+         :subject:date:message-id:references:cc:in-reply-to:to;
+        bh=ai8urSCkfd8KqBe/Z0CzEZXhThfZtSSfYmfTJiDDXZc=;
+        b=pqDKWl8tCMYhNyhaP/NUb3eYPjxbu/9CGjwRmtgsJmr2FfHmgg9FVw3XkF0lRfRuxB
+         jd5QNELDcYDC6H78FvHpDa0cMBsh0HMyJURP85+3dgdOn2nUOJv7S+7xWSvEiotkMn9B
+         HyuHYLanAgFr2ZWC6RSplEZ+GahB2d1suY5+2IBqUbME3YWABokmlq/G06wGREzwYvPT
+         XKSyuWimWIZsVLyw+6lmeN0qx0RGpbEzDiRS4yhfBS0umCrpZXtRS8+ZnhQfVcSKmVJT
+         1tQYFuEJmq/fRl+9871nvY6yPOsHvC4ImY61SBJoEyqaadJzgtG7DWjHPx78AYXIe4VJ
+         dBuA==
+X-Gm-Message-State: AOAM530Jomtl+JdZSjEPLa89ylCouyXy8x30Qghj6BVKlsXWaWZO+OjH
+        FV34GBFKuPrvGybuhmCEW8B/tw==
+X-Google-Smtp-Source: ABdhPJyVPfwWQ7xSRvyhvtGFAW9QR1YAvPZxOUssTc/7vRuqSzrMjl5dow9HECjNRpqslNdP9Ci/0g==
+X-Received: by 2002:a63:28c2:: with SMTP id o185mr13092135pgo.40.1618857442475;
+        Mon, 19 Apr 2021 11:37:22 -0700 (PDT)
+Received: from ?IPv6:2600:1010:b018:f7a3:b93c:afa3:79ad:4736? ([2600:1010:b018:f7a3:b93c:afa3:79ad:4736])
+        by smtp.gmail.com with ESMTPSA id 144sm8053271pfc.101.2021.04.19.11.37.21
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 19 Apr 2021 11:37:21 -0700 (PDT)
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+From:   Andy Lutomirski <luto@amacapital.net>
+Mime-Version: 1.0 (1.0)
+Subject: Re: [RFC Part2 PATCH 04/30] x86/mm: split the physmap when adding the page in RMP table
+Date:   Mon, 19 Apr 2021 11:37:19 -0700
+Message-Id: <D67BDFB6-84AA-4CA3-A951-7EEE0E4B4B26@amacapital.net>
+References: <535400b4-0593-a7ca-1548-532ee1fefbd7@intel.com>
+Cc:     Brijesh Singh <brijesh.singh@amd.com>,
+        Borislav Petkov <bp@alien8.de>, linux-kernel@vger.kernel.org,
+        x86@kernel.org, kvm@vger.kernel.org, linux-crypto@vger.kernel.org,
+        ak@linux.intel.com, herbert@gondor.apana.org.au,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        "H. Peter Anvin" <hpa@zytor.com>, Tony Luck <tony.luck@intel.com>,
+        "Peter Zijlstra (Intel)" <peterz@infradead.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        David Rientjes <rientjes@google.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vlastimil Babka <vbabka@suse.cz>
+In-Reply-To: <535400b4-0593-a7ca-1548-532ee1fefbd7@intel.com>
+To:     Dave Hansen <dave.hansen@intel.com>
+X-Mailer: iPhone Mail (18D70)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Apr 19, 2021 at 11:28 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> On 19/04/21 19:57, Krish Sadhukhan wrote:
-> > The reason why I thought of this is that SVM implementation uses only
-> > the lower half, as all AMD-defined exit code are handled therein only.
-> > Is this still going to cause an issue ?
->
-> I would have to check what happens on bare metal, but VMEXIT_INVALID is
-> defined as "-1", not "FFFFFFFFh", so I think it should use the high 32
-> bits (in which case KVM is wrong in not storing the high 32 bits).
 
-And VMEXIT_BUSY is -2.
+
+> On Apr 19, 2021, at 11:33 AM, Dave Hansen <dave.hansen@intel.com> wrote:
+>=20
+> =EF=BB=BFOn 4/19/21 11:10 AM, Andy Lutomirski wrote:
+>> I=E2=80=99m confused by this scenario. This should only affect physical p=
+ages
+>> that are in the 2M area that contains guest memory. But, if we have a
+>> 2M direct map PMD entry that contains kernel data and guest private
+>> memory, we=E2=80=99re already in a situation in which the kernel touching=
+
+>> that memory would machine check, right?
+>=20
+> Not machine check, but page fault.  Do machine checks even play a
+> special role in SEV-SNP?  I thought that was only TDX?
+
+Brain fart.
+
+>=20
+> My point was just that you can't _easily_ do the 2M->4k kernel mapping
+> demotion in a page fault handler, like I think Borislav was suggesting.
+
+We are certainly toast if this hits the stack.  Or if it hits a page table o=
+r the GDT or IDT :). The latter delightful choices would be triple faults.
+
+I sure hope the code we use to split a mapping is properly NMI safe.
+
+>=20
+>> ISTM we should fully unmap any guest private page from the kernel and
+>> all host user pagetables before actually making it be a guest private
+>> page.
+>=20
+> Yes, that sounds attractive.  Then, we'd actually know if the host
+> kernel was doing stray reads somehow because we'd get a fault there too.
+
+
