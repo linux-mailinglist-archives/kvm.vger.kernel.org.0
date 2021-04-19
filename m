@@ -2,93 +2,89 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 49A963649E8
-	for <lists+kvm@lfdr.de>; Mon, 19 Apr 2021 20:38:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B453D3649F2
+	for <lists+kvm@lfdr.de>; Mon, 19 Apr 2021 20:39:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241151AbhDSSiV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 19 Apr 2021 14:38:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45004 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233383AbhDSSiV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 19 Apr 2021 14:38:21 -0400
-Received: from mail-qk1-x74a.google.com (mail-qk1-x74a.google.com [IPv6:2607:f8b0:4864:20::74a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 43024C061761
-        for <kvm@vger.kernel.org>; Mon, 19 Apr 2021 11:37:51 -0700 (PDT)
-Received: by mail-qk1-x74a.google.com with SMTP id h190-20020a3785c70000b02902e022511825so5349027qkd.7
-        for <kvm@vger.kernel.org>; Mon, 19 Apr 2021 11:37:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
-         :cc;
-        bh=HoqkQjsrXDA3MZHGIOhk4HW4WAmuJ8XwDMdNTYnM7sc=;
-        b=ELAX9XpUiMG+kfljNBbVqTKe0lc7Ke4AvaC00ZGz8P71ngNC2AJQbz56Q4GyyPTMdI
-         Ia9qpAxKMywq0uoRx1k/QJ3tiGLFaK/RIBN+yGpg2bdS2Ko/x4gBUpd6RdN+X/dJu01G
-         JOD/HjSUw+gro2MBCX9WzBul4TX2nZRY9PtUZCiBm+Fsz/Jf3FBhoyzxj6Po3PT/iG4Y
-         C/5nlFeMOTJyQq6bguLqVBgYHfBP79GQxZnEvcmdzvKZ3bFKFSHHpYsUx39TyUj18BdV
-         YX1Y6HLweAJOJEvjAfwtHgLoBAWtUIZcaD/bXplVo8pAiXK2NhRu2YE6KjJVcsavnMEw
-         rnXQ==
+        id S241074AbhDSSkW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 19 Apr 2021 14:40:22 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:50978 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S239080AbhDSSkV (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 19 Apr 2021 14:40:21 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1618857591;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=I5wZEixzzZ7BQyKgP2wJg1cDVNwqU3SACo/kL7cIrtY=;
+        b=dYB4dLPNP0u2X5qnzAyhAiEjYpcAM1dhzkdpqdBi974MpjlKiOWrFR+uRYDvJsmFhYj24Y
+        9orsiYKB6ye0QR2AwerPWigN9QONbnwr6F06DiL/PLYW/DS9XHJqHumlJ46o3TS0VzxGoh
+        q1vC2UN4NePn0EdQQYdPRHJ9DNDhH5U=
+Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
+ [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-249-zFH5ADFaOrirdjSvMnK0Vw-1; Mon, 19 Apr 2021 14:39:49 -0400
+X-MC-Unique: zFH5ADFaOrirdjSvMnK0Vw-1
+Received: by mail-ed1-f70.google.com with SMTP id y10-20020a50f1ca0000b0290382d654f75eso11669698edl.1
+        for <kvm@vger.kernel.org>; Mon, 19 Apr 2021 11:39:49 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=HoqkQjsrXDA3MZHGIOhk4HW4WAmuJ8XwDMdNTYnM7sc=;
-        b=Tw8pwYPk+FY68R78amLGELjT/84Bv4Jn5nZ3Q/8gHJsqEgF/ztendY/I0R04NZmniK
-         qqPxhSfkg4TuQm056aiTCqolbvgG8Ab7Qm9/6qaum/QtKMMDWGTlts6szuzfdA7odSXq
-         xWnREF7ZpUuPNBxCrmErTHV/1FWGdTXGOn5htlg4QBczwyy9aKf4Fu7Nuzg0ABdxHkjc
-         6Dpf0hJkNqaVBI0+PtcjYxSPJwdAyLY/4skcJeCQf88KWpoO9FD+Z9KSqizuw1R8OndG
-         CUyEDLVCxjT1puQOV0LwVQDrnvkS1BaPK5fkjGU+yWre9uS9w6RpXVDb6XcBJKwEiDo/
-         EQAA==
-X-Gm-Message-State: AOAM5311hFvieMN5MxauPlHXD5PwLroJ6QMiydfd2z5PI4PAwhQci/0m
-        3wC8eCX4BBCSoN7k6wuXOGF5XgcVEsQh
-X-Google-Smtp-Source: ABdhPJxDNUQifVrK5TglBw9VRQKofuvrxcmJwhMYLJLGSLq74F0mICiz92LmaYaprKTgoKs/JILk/og/CCcL
-X-Received: from bgardon.sea.corp.google.com ([2620:15c:100:202:8c52:76ef:67d7:24b1])
- (user=bgardon job=sendgmr) by 2002:a0c:fbc5:: with SMTP id
- n5mr23225135qvp.0.1618857470495; Mon, 19 Apr 2021 11:37:50 -0700 (PDT)
-Date:   Mon, 19 Apr 2021 11:37:42 -0700
-In-Reply-To: <20210419183742.901647-1-bgardon@google.com>
-Message-Id: <20210419183742.901647-2-bgardon@google.com>
-Mime-Version: 1.0
-References: <20210419183742.901647-1-bgardon@google.com>
-X-Mailer: git-send-email 2.31.1.368.gbe11c130af-goog
-Subject: [PATCH 2/2] KVM: x86/mmu: Fix typo in for_each_tdp_mmu_root
-From:   Ben Gardon <bgardon@google.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, Peter Xu <peterx@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=I5wZEixzzZ7BQyKgP2wJg1cDVNwqU3SACo/kL7cIrtY=;
+        b=D5EihNdGLselTl3Bm6ls4VNycHXpssD787K4oryhHJU68IoD9nxDAhy1+Su/xLDNin
+         TAOoK9x+NH1IS7FvXsNVh1LSJtZOrJI7ugyMxaLWNQjol+FUpFk71P2qXBuXARVPl8Np
+         dh1xpbdI4mJmbaRjzIOlDwg3u7/8TU5Wyfbi/wB2pgQfLTJDIR3AFtFkVd1IuS08CJG9
+         z4ztoWDCQwHxt+03vMxgMvC//7HNDA5U8FxcZ8iMwC3EF3ECrX2fLXkCKVa08ciT4lfL
+         KmNPbPDED6Dt/Zmd2E8q1VFgyWY871k/+Ltcs9LRairdBhfwyXJ+NhsvqkRMAKuvpRAd
+         BjCw==
+X-Gm-Message-State: AOAM530AY0bCCzg3Yv6h+KpUlFaLakLnFm66LQLWMFu/fp9HJQV3+OCQ
+        p9I21rquUlm9269sbUSlrlzVe59M3HcJZg3809sYe+BfX9p2jQr1kMaM+nUELHT6pj7nwAbUsZm
+        vRrYTZnNfB6kj
+X-Received: by 2002:a17:907:3fa2:: with SMTP id hr34mr23789812ejc.476.1618857588669;
+        Mon, 19 Apr 2021 11:39:48 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyP1uTP85gYcMagyk148BltvMxLYcrpEhkZC2VRcUPss+lOjxdCSM4GV2A21uzznULK2NtGSA==
+X-Received: by 2002:a17:907:3fa2:: with SMTP id hr34mr23789794ejc.476.1618857588451;
+        Mon, 19 Apr 2021 11:39:48 -0700 (PDT)
+Received: from [192.168.10.118] ([93.56.169.140])
+        by smtp.gmail.com with ESMTPSA id bu8sm9970145edb.77.2021.04.19.11.39.43
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 19 Apr 2021 11:39:47 -0700 (PDT)
+Subject: Re: [kvm:queue 153/154] arch/x86/kvm/mmu/mmu.c:5443:39: error:
+ 'struct kvm_arch' has no member named 'tdp_mmu_roots'
+To:     Ben Gardon <bgardon@google.com>, kernel test robot <lkp@intel.com>
+Cc:     kbuild-all@lists.01.org, kvm <kvm@vger.kernel.org>,
         Robert Hu <robert.hu@intel.com>,
         Farrah Chen <farrah.chen@intel.com>,
-        Danmei Wei <danmei.wei@intel.com>,
-        Ben Gardon <bgardon@google.com>,
-        kernel test robot <lkp@intel.com>
-Content-Type: text/plain; charset="UTF-8"
+        Danmei Wei <danmei.wei@intel.com>
+References: <202104172326.ZkdtgfKs-lkp@intel.com>
+ <CANgfPd9WOLmQsDqQgtA5k4UHC+r6jPF4xFN5_gizg_fFa+LXjQ@mail.gmail.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <6f43303f-902d-2cc6-39ea-e6f583ef07c8@redhat.com>
+Date:   Mon, 19 Apr 2021 20:39:39 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.7.0
+MIME-Version: 1.0
+In-Reply-To: <CANgfPd9WOLmQsDqQgtA5k4UHC+r6jPF4xFN5_gizg_fFa+LXjQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-There's a typo in for_each_tdp_mmu_root which breaks compilation with
-certain configurations. Fix it.
+On 19/04/21 18:33, Ben Gardon wrote:
+> I must have failed to propagate some #define CONFIG_x86_64 tags
+> around.
 
-Fixes: 078d47ee71d6 ("KVM: x86/mmu: Protect the tdp_mmu_roots list with RCU")
+It's nicer to extract the loop to a new function 
+kvm_tdp_mmu_invalidate_roots.
 
-Reported-by: kernel test robot <lkp@intel.com>
-Signed-off-by: Ben Gardon <bgardon@google.com>
----
- arch/x86/kvm/mmu/tdp_mmu.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+> I can send out some patches to fix this and the other bug the
+> test robot found.
 
-diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-index 8ce8d0916042..f0aef4969754 100644
---- a/arch/x86/kvm/mmu/tdp_mmu.c
-+++ b/arch/x86/kvm/mmu/tdp_mmu.c
-@@ -152,7 +152,7 @@ static struct kvm_mmu_page *tdp_mmu_next_root(struct kvm *kvm,
- #define for_each_tdp_mmu_root(_kvm, _root, _as_id)				\
- 	list_for_each_entry_rcu(_root, &_kvm->arch.tdp_mmu_roots, link,		\
- 				lockdep_is_held_type(&kvm->mmu_lock, 0) ||	\
--				lockdep_is_help(&kvm->arch.tdp_mmu_pages_lock))	\
-+				lockdep_is_held(&kvm->arch.tdp_mmu_pages_lock))	\
- 		if (kvm_mmu_page_as_id(_root) != _as_id) {		\
- 		} else
- 
--- 
-2.31.1.368.gbe11c130af-goog
+No problem, I'm already testing some small fixes.
+
+Paolo
 
