@@ -2,137 +2,132 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A72FF3648E2
-	for <lists+kvm@lfdr.de>; Mon, 19 Apr 2021 19:14:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8522136493B
+	for <lists+kvm@lfdr.de>; Mon, 19 Apr 2021 19:53:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234056AbhDSROx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 19 Apr 2021 13:14:53 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:24960 "EHLO
+        id S240284AbhDSRxz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 19 Apr 2021 13:53:55 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:51289 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233867AbhDSROw (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 19 Apr 2021 13:14:52 -0400
+        by vger.kernel.org with ESMTP id S234295AbhDSRxu (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 19 Apr 2021 13:53:50 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1618852462;
+        s=mimecast20190719; t=1618854799;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=eylKqSPDKz9S5T2Q/ChqqD4u0vbwKNM9iAmrwjM6+PU=;
-        b=SOhcYzv4cHGXbddA4ZppMYm0ObHi9FiBC4lkjQpBt63BiaaaVtU3HjJ3mXIhlzg1ba5Tgk
-        VfgSOTKqasDqGHQmAzwJ4kUdUenuCDioXeYM1ONnbGZNe0+EAu/hQL4LTE+uqk5cGkRn3Q
-        jqHc0wLRZHQkmxGtR6NfRQgM2Kozryk=
+        bh=62i2YV3V/yVGPdncThtFG8X/AbkDXM0A7Kv9Bazf/uo=;
+        b=Sdh5ttImlHIdQBjEkggsLW6nO40UYR0lUSEHnSap6foiWZFajMUFbex+MYyHsj1hK56fB/
+        L/ANdZhqqtQ/VHuCv2ziDKes4hLBAqlUT8OPOEP/AUnwbUCFZXNFm7rZVVmqhTf+HQYPyN
+        9y56gytYt/8DszeBHKpcysEG+jtgVK0=
 Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
  [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-426-BLI75tolMTW0MovBWvvy1w-1; Mon, 19 Apr 2021 13:14:17 -0400
-X-MC-Unique: BLI75tolMTW0MovBWvvy1w-1
-Received: by mail-ed1-f72.google.com with SMTP id f1-20020a0564021941b02903850806bb32so5618518edz.9
-        for <kvm@vger.kernel.org>; Mon, 19 Apr 2021 10:14:17 -0700 (PDT)
+ us-mta-603-ts_dq__AOv-BRorw-Pyssw-1; Mon, 19 Apr 2021 13:53:16 -0400
+X-MC-Unique: ts_dq__AOv-BRorw-Pyssw-1
+Received: by mail-ed1-f72.google.com with SMTP id bf25-20020a0564021a59b0290385169cebf8so4210374edb.8
+        for <kvm@vger.kernel.org>; Mon, 19 Apr 2021 10:53:16 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=eylKqSPDKz9S5T2Q/ChqqD4u0vbwKNM9iAmrwjM6+PU=;
-        b=g0lPHCoIrAjyBIP/c6/Qa97WLfgn4Tepid4UAGSUWl20zP1hDtkIcMtQKNRWIhOwAJ
-         4oahi4ajvKvbPUOWTcKPsnw2ZXgSD6gGedfSNS426J7Xx5I8LQKNOeVCtB+Gs9+vYZN0
-         +SRbkOGbNSeXneQvQXzKHBiY+Zza2pRjHRzTwZzzukIVY6GxcZQ4NUcHoaLtJcOUnSrh
-         BBWYsrFRA3716Mokqc/E+Nd0iHmZdUEFI4x+74GWxe+nzOhZrJPV5XtrWfscqNep8i1Z
-         cXpp7Zdr4QmdGXZx9nhFNw3ZXN/m2MPrLK26COj32v2m9vAiZtn/5eYid1bUKSBhUmVE
-         M4cg==
-X-Gm-Message-State: AOAM531QZ2797H95TtT1ex0Rp/Z6BemrePC94uvkPKnYIjQQSSCwJqU8
-        tTHi6WidrpEzwB54Fs3cV/90Q9JGmCabU7RcUDSjfvnRSFYufyYUCAFfS9GAJWdZWTPEcBB+2Ro
-        FSrpe7TO6tBsu
-X-Received: by 2002:a17:906:70c4:: with SMTP id g4mr10585011ejk.443.1618852456748;
-        Mon, 19 Apr 2021 10:14:16 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyz7HtCdHIFmzmfa3Pq5QOAbWngw9gcL3kk+4xm7U7h633rYwfO6lJbpER/0gieLXM52ttO2g==
-X-Received: by 2002:a17:906:70c4:: with SMTP id g4mr10584990ejk.443.1618852456585;
-        Mon, 19 Apr 2021 10:14:16 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id q2sm10801191eje.24.2021.04.19.10.14.14
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 19 Apr 2021 10:14:15 -0700 (PDT)
-Subject: Re: [PATCH v5 10/11] KVM: VMX: Enable SGX virtualization for SGX1,
- SGX2 and LC
-To:     Sean Christopherson <seanjc@google.com>,
-        Kai Huang <kai.huang@intel.com>
-Cc:     kvm@vger.kernel.org, linux-sgx@vger.kernel.org, bp@alien8.de,
-        jarkko@kernel.org, dave.hansen@intel.com, luto@kernel.org,
-        rick.p.edgecombe@intel.com, haitao.huang@intel.com
-References: <cover.1618196135.git.kai.huang@intel.com>
- <a99e9c23310c79f2f4175c1af4c4cbcef913c3e5.1618196135.git.kai.huang@intel.com>
- <9f568584-8b09-afe6-30a1-cbe280749f5d@redhat.com>
- <3d376fef419077376eecb017ab494ba7ffc393a7.camel@intel.com>
- <YH2e1lIckOBY2OGa@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <acff71e3-4a38-b858-551c-8b34cbf344af@redhat.com>
-Date:   Mon, 19 Apr 2021 19:14:14 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.7.0
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=62i2YV3V/yVGPdncThtFG8X/AbkDXM0A7Kv9Bazf/uo=;
+        b=iW1q9JPBVqdEjffZ8fQHKrbZQ7JE5cwxnY18YNubv/DmLybSmRmS529oM4ONQ6WCSg
+         I6XrCVt/pLLFRRCmhgg/MxfdCeT/e5CgEGSuX0qN6H20Yz9O1JYbVLCJTvJr/ZMq/4Gy
+         q/uo5nmhXmwhUSg8hTrVzDuxQZKKHFssEAzBe4KPMc4bfBu5qRGz1dTA5z+PBwtMuEjE
+         cw6XDkn5VEgBGxEhqmHW2sgbdmxsxyy8VbqfSV07WRr2LYoOa9R/72v97YnphmQLHP5f
+         oQfYqwJzMrpTlJA28jTK3xvS44LJivaABq0EjHty4bwaV3US13ZaybLso+q3d01lHAqu
+         ehKw==
+X-Gm-Message-State: AOAM5306HOZk74afa6KbPlQUcPC2ttrRerxs8fUAdQORI+llhJCajBL4
+        5+3hxVygA0XZt4Gg8wXLgoC03PYyd+MuKP0NdjpI8GJeosFNcxM/50xA7o2FNzTqhYAm9uXkzuT
+        t2V2SXQuPAerR
+X-Received: by 2002:a05:6402:35c8:: with SMTP id z8mr2439792edc.210.1618854795147;
+        Mon, 19 Apr 2021 10:53:15 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwmULpLHe1bTKW6mRIESzPd/w8nTH4zxg9T7Fxjbok5VIY92xFFkgR/udKEuyHQMOb3fWevDw==
+X-Received: by 2002:a05:6402:35c8:: with SMTP id z8mr2439784edc.210.1618854794998;
+        Mon, 19 Apr 2021 10:53:14 -0700 (PDT)
+Received: from gator.home (cst2-174-132.cust.vodafone.cz. [31.30.174.132])
+        by smtp.gmail.com with ESMTPSA id d18sm13833764edv.1.2021.04.19.10.53.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 19 Apr 2021 10:53:14 -0700 (PDT)
+Date:   Mon, 19 Apr 2021 19:53:11 +0200
+From:   Andrew Jones <drjones@redhat.com>
+To:     Alexandru Elisei <alexandru.elisei@arm.com>
+Cc:     kvm@vger.kernel.org, nikos.nikoleris@arm.com,
+        andre.przywara@arm.com, eric.auger@redhat.com
+Subject: Re: [PATCH kvm-unit-tests 6/8] arm/arm64: setup: Consolidate memory
+ layout assumptions
+Message-ID: <20210419175311.holo5jd3c2lje7q3@gator.home>
+References: <20210407185918.371983-1-drjones@redhat.com>
+ <20210407185918.371983-7-drjones@redhat.com>
+ <aab892dc-6ef9-cfb5-7057-88ef7c692bba@arm.com>
+ <20210415172526.msfseu2qwwb4jquc@kamzik.brq.redhat.com>
+ <49591da9-9d78-cdd8-3587-d535c148de31@arm.com>
 MIME-Version: 1.0
-In-Reply-To: <YH2e1lIckOBY2OGa@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <49591da9-9d78-cdd8-3587-d535c148de31@arm.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 19/04/21 17:16, Sean Christopherson wrote:
-> On Mon, Apr 19, 2021, Kai Huang wrote:
->> On Sat, 2021-04-17 at 16:11 +0200, Paolo Bonzini wrote:
->>> On 12/04/21 06:21, Kai Huang wrote:
->>>> @@ -4377,6 +4380,15 @@ static void vmx_compute_secondary_exec_control(struct vcpu_vmx *vmx)
->>>>    	if (!vcpu->kvm->arch.bus_lock_detection_enabled)
->>>>    		exec_control &= ~SECONDARY_EXEC_BUS_LOCK_DETECTION;
->>>>    
->>>>
->>>> +	if (cpu_has_vmx_encls_vmexit() && nested) {
->>>> +		if (guest_cpuid_has(vcpu, X86_FEATURE_SGX))
->>>> +			vmx->nested.msrs.secondary_ctls_high |=
->>>> +				SECONDARY_EXEC_ENCLS_EXITING;
->>>> +		else
->>>> +			vmx->nested.msrs.secondary_ctls_high &=
->>>> +				~SECONDARY_EXEC_ENCLS_EXITING;
->>>> +	}
->>>> +
->>>
->>> This is incorrect, I've removed it.  The MSRs can only be written by
->>> userspace.
+On Mon, Apr 19, 2021 at 04:56:33PM +0100, Alexandru Elisei wrote:
+> Hi Drew,
 > 
-> vmx_compute_secondary_exec_control() violates that left, right, and center, it's
-> just buried down in vmx_adjust_secondary_exec_control().  This is an open coded
-> version of that helper, sans the actual update to exec_control since ENCLS needs
-> to be conditionally intercepted even when it's exposed to the guest.
-
-Hmm, that's true.  I'll place back the version that you had.
-
-Paolo
-
->>> If SGX is disabled in the guest CPUID, nested_vmx_exit_handled_encls can
->>> just do:
->>>
->>> 	if (!guest_cpuid_has(vcpu, X86_FEATURE_SGX) ||
->>> 	    !nested_cpu_has2(vmcs12, SECONDARY_EXEC_ENCLS_EXITING))
->>> 		return false;
->>>
->>> and the useless ENCLS exiting bitmap in vmcs12 will be ignored.
->>>
->>> Paolo
->>>
->>
->> Thanks for queuing this series!
->>
->> Looks good to me. However if I read code correctly, in this way a side effect would be
->> vmx->nested.msrs.secondary_ctls_high will always have SECONDARY_EXEC_ENCLS_EXITING bit
->> set, even SGX is not exposed to guest, which means a guest can set this even SGX is not
->> present, but I think it is OK since ENCLS exiting bitmap in vmcs12 will be ignored anyway
->> in nested_vmx_exit_handled_encls() as you mentioned above.
->>
->> Anyway, I have tested this code and it works at my side (by creating L2 with SGX support
->> and running SGX workloads inside it).
->>
->> Sean, please also comment if you have any.
->>
->>
+> On 4/15/21 6:25 PM, Andrew Jones wrote:
+> > On Thu, Apr 15, 2021 at 05:59:19PM +0100, Alexandru Elisei wrote:
+> >> Hi Drew,
+> >>
+> >> On 4/7/21 7:59 PM, Andrew Jones wrote:
+> >>> Keep as much memory layout assumptions as possible in init::start
+> >>> and a single setup function. This prepares us for calling setup()
+> >>> from different start functions which have been linked with different
+> >>> linker scripts. To do this, stacktop is only referenced from
+> >>> init::start, making freemem_start a parameter to setup(). We also
+> >>> split mem_init() into three parts, one that populates the mem regions
+> >>> per the DT, one that populates the mem regions per assumptions,
+> >>> and one that does the mem init. The concept of a primary region
+> >>> is dropped, but we add a sanity check for the absence of memory
+> >>> holes, because we don't know how to deal with them yet.
+> >>>
+> >>> Signed-off-by: Andrew Jones <drjones@redhat.com>
+> >>> ---
+> >>>  arm/cstart.S        |   4 +-
+> >>>  arm/cstart64.S      |   2 +
+> >>>  arm/flat.lds        |  23 ++++++
+> >>>  lib/arm/asm/setup.h |   8 +--
+> >>>  lib/arm/mmu.c       |   2 -
+> >>>  lib/arm/setup.c     | 165 ++++++++++++++++++++++++--------------------
+> >>>  6 files changed, 123 insertions(+), 81 deletions(-)
+> >>>
+> >>> diff --git a/arm/cstart.S b/arm/cstart.S
+> >>> index 731f841695ce..14444124c43f 100644
+> >>> --- a/arm/cstart.S
+> >>> +++ b/arm/cstart.S
+> >>> @@ -80,7 +80,9 @@ start:
+> >>>  
+> >>>  	/* complete setup */
+> >>>  	pop	{r0-r1}
+> >>> -	bl	setup
+> >>> +	mov	r1, #0
+> >> Doesn't that mean that for arm, the second argument to setup() will be 0 instead
+> >> of stacktop?
+> > The second argument is 64-bit, but we assume the upper 32 are zero.
 > 
+> I didn't realize that phys_addr_t is 64bit.
+> 
+> According to ARM IHI 0042F, page 15:
+> 
+> "A double-word sized type is passed in two consecutive registers (e.g., r0 and r1,
+> or r2 and r3). The content of the registers is as if the value had been loaded
+> from memory representation with a single LDM instruction."
+> 
+> I think r3 should be zeroed, not r1. r2 and r3 represent the 64bit value. arm is
+> little endian, so the least significant 32bits will be in r2 and the most
+> significant bits will be in r3.
+
+Thanks for this. It looks like I managed to mess it up two ways. The
+registers must be r2,r3 and r3 has the high bits. I'll fix it for v2.
+
+Thanks,
+drew
 
