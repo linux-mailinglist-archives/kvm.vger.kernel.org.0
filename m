@@ -2,98 +2,163 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 12E263653D5
-	for <lists+kvm@lfdr.de>; Tue, 20 Apr 2021 10:16:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 02F25365424
+	for <lists+kvm@lfdr.de>; Tue, 20 Apr 2021 10:30:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229593AbhDTIRA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 20 Apr 2021 04:17:00 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:42716 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229521AbhDTIQ7 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 20 Apr 2021 04:16:59 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1618906588;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=XJFMVyj4cgN/sZsxR0u2d2bEIw2+LpoMcRwhutx6v+U=;
-        b=aX/jw5Y58mF9GBFaVOBnXWZ2FO+w6OrVJJnhweCtERgS+ZiaQKtxV4QYqkkh/XclZy0u4C
-        7AGL7uBtEliJXYiSwQNJOyNKQBnB2ZIX6G2z4GtPC5Xe+HkK8H1tWbx/dbAvBj2N2QpoLP
-        GzuNDhMcvuxLohcZAJQpcVTgi9Xp/d4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-267-ZGHcG1ceOoCtUrwHvtHcNw-1; Tue, 20 Apr 2021 04:16:20 -0400
-X-MC-Unique: ZGHcG1ceOoCtUrwHvtHcNw-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 772C484B9B0;
-        Tue, 20 Apr 2021 08:16:19 +0000 (UTC)
-Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id B55591F04F;
-        Tue, 20 Apr 2021 08:16:15 +0000 (UTC)
-From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     Peter Xu <peterx@redhat.com>, stable@vger.kernel.org
-Subject: [PATCH] KVM: selftests: Always run vCPU thread with blocked SIG_IPI
-Date:   Tue, 20 Apr 2021 04:16:14 -0400
-Message-Id: <20210420081614.684787-1-pbonzini@redhat.com>
+        id S230500AbhDTIaz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 20 Apr 2021 04:30:55 -0400
+Received: from szxga08-in.huawei.com ([45.249.212.255]:3342 "EHLO
+        szxga08-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230495AbhDTIaz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 20 Apr 2021 04:30:55 -0400
+Received: from DGGEML402-HUB.china.huawei.com (unknown [172.30.72.57])
+        by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4FPcGg3sCZz14JV1;
+        Tue, 20 Apr 2021 16:26:35 +0800 (CST)
+Received: from dggpeml500013.china.huawei.com (7.185.36.41) by
+ DGGEML402-HUB.china.huawei.com (10.3.17.38) with Microsoft SMTP Server (TLS)
+ id 14.3.498.0; Tue, 20 Apr 2021 16:30:21 +0800
+Received: from [10.174.187.161] (10.174.187.161) by
+ dggpeml500013.china.huawei.com (7.185.36.41) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id
+ 15.1.2176.2; Tue, 20 Apr 2021 16:30:20 +0800
+Subject: Re: [PATCH v5 10/16] KVM: x86: Set PEBS_UNAVAIL in IA32_MISC_ENABLE
+ when PEBS is enabled
+To:     Like Xu <like.xu@linux.intel.com>, <peterz@infradead.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>
+References: <20210415032016.166201-1-like.xu@linux.intel.com>
+ <20210415032016.166201-11-like.xu@linux.intel.com>
+CC:     <andi@firstfloor.org>, <kan.liang@linux.intel.com>,
+        <wei.w.wang@intel.com>, <eranian@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, <kvm@vger.kernel.org>,
+        <x86@kernel.org>, <linux-kernel@vger.kernel.org>,
+        "Fangyi (Eric)" <eric.fangyi@huawei.com>,
+        Xiexiangyou <xiexiangyou@huawei.com>
+From:   Liuxiangdong <liuxiangdong5@huawei.com>
+Message-ID: <607E911C.4090706@huawei.com>
+Date:   Tue, 20 Apr 2021 16:30:20 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:38.0) Gecko/20100101
+ Thunderbird/38.1.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+In-Reply-To: <20210415032016.166201-11-like.xu@linux.intel.com>
+Content-Type: text/plain; charset="windows-1252"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.174.187.161]
+X-ClientProxiedBy: dggeme712-chm.china.huawei.com (10.1.199.108) To
+ dggpeml500013.china.huawei.com (7.185.36.41)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The main thread could start to send SIG_IPI at any time, even before signal
-blocked on vcpu thread.  Therefore, start the vcpu thread with the signal
-blocked.
 
-Without this patch, on very busy cores the dirty_log_test could fail directly
-on receiving a SIGUSR1 without a handler (when vcpu runs far slower than main).
 
-Reported-by: Peter Xu <peterx@redhat.com>
-Cc: stable@vger.kernel.org
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- tools/testing/selftests/kvm/dirty_log_test.c | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
+On 2021/4/15 11:20, Like Xu wrote:
+> The bit 12 represents "Processor Event Based Sampling Unavailable (RO)" :
+> 	1 = PEBS is not supported.
+> 	0 = PEBS is supported.
+>
+> A write to this PEBS_UNAVL available bit will bring #GP(0) when guest PEBS
+> is enabled. Some PEBS drivers in guest may care about this bit.
+>
+> Signed-off-by: Like Xu <like.xu@linux.intel.com>
+> ---
+>   arch/x86/kvm/vmx/pmu_intel.c | 2 ++
+>   arch/x86/kvm/x86.c           | 4 ++++
+>   2 files changed, 6 insertions(+)
+>
+> diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
+> index 58f32a55cc2e..c846d3eef7a7 100644
+> --- a/arch/x86/kvm/vmx/pmu_intel.c
+> +++ b/arch/x86/kvm/vmx/pmu_intel.c
+> @@ -588,6 +588,7 @@ static void intel_pmu_refresh(struct kvm_vcpu *vcpu)
+>   		bitmap_set(pmu->all_valid_pmc_idx, INTEL_PMC_IDX_FIXED_VLBR, 1);
+>   
+>   	if (vcpu->arch.perf_capabilities & PERF_CAP_PEBS_FORMAT) {
+> +		vcpu->arch.ia32_misc_enable_msr &= ~MSR_IA32_MISC_ENABLE_PEBS_UNAVAIL;
+>   		if (vcpu->arch.perf_capabilities & PERF_CAP_PEBS_BASELINE) {
+>   			pmu->pebs_enable_mask = ~pmu->global_ctrl;
+>   			pmu->reserved_bits &= ~ICL_EVENTSEL_ADAPTIVE;
+> @@ -597,6 +598,7 @@ static void intel_pmu_refresh(struct kvm_vcpu *vcpu)
+>   			}
+>   			pmu->pebs_data_cfg_mask = ~0xff00000full;
+>   		} else {
+> +			vcpu->arch.ia32_misc_enable_msr |= MSR_IA32_MISC_ENABLE_PEBS_UNAVAIL;
+>   			pmu->pebs_enable_mask =
+>   				~((1ull << pmu->nr_arch_gp_counters) - 1);
+>   		}
 
-diff --git a/tools/testing/selftests/kvm/dirty_log_test.c b/tools/testing/selftests/kvm/dirty_log_test.c
-index ffa4e2791926..81edbd23d371 100644
---- a/tools/testing/selftests/kvm/dirty_log_test.c
-+++ b/tools/testing/selftests/kvm/dirty_log_test.c
-@@ -527,9 +527,8 @@ static void *vcpu_worker(void *data)
- 	 */
- 	sigmask->len = 8;
- 	pthread_sigmask(0, NULL, sigset);
-+	sigdelset(sigset, SIG_IPI);
- 	vcpu_ioctl(vm, VCPU_ID, KVM_SET_SIGNAL_MASK, sigmask);
--	sigaddset(sigset, SIG_IPI);
--	pthread_sigmask(SIG_BLOCK, sigset, NULL);
- 
- 	sigemptyset(sigset);
- 	sigaddset(sigset, SIG_IPI);
-@@ -858,6 +857,7 @@ int main(int argc, char *argv[])
- 		.interval = TEST_HOST_LOOP_INTERVAL,
- 	};
- 	int opt, i;
-+	sigset_t sigset;
- 
- 	sem_init(&sem_vcpu_stop, 0, 0);
- 	sem_init(&sem_vcpu_cont, 0, 0);
-@@ -916,6 +916,11 @@ int main(int argc, char *argv[])
- 
- 	srandom(time(0));
- 
-+	/* Ensure that vCPU threads start with SIG_IPI blocked.  */
-+	sigemptyset(&sigset);
-+	sigaddset(&sigset, SIG_IPI);
-+	pthread_sigmask(SIG_BLOCK, &sigset, NULL);
-+
- 	if (host_log_mode_option == LOG_MODE_ALL) {
- 		/* Run each log mode */
- 		for (i = 0; i < LOG_MODE_NUM; i++) {
--- 
-2.26.2
+I guess what we want is
+
+         if (vcpu->arch.perf_capabilities & PERF_CAP_PEBS_FORMAT) {
+                 vcpu->arch.ia32_misc_enable_msr &= 
+~MSR_IA32_MISC_ENABLE_PEBS_UNAVAIL;
+                 if (vcpu->arch.perf_capabilities & 
+PERF_CAP_PEBS_BASELINE) {
+                         pmu->pebs_enable_mask = ~pmu->global_ctrl;
+                         pmu->reserved_bits &= ~ICL_EVENTSEL_ADAPTIVE;
+                         for (i = 0; i < pmu->nr_arch_fixed_counters; i++) {
+                                 pmu->fixed_ctr_ctrl_mask &=
+                                         ~(1ULL << (INTEL_PMC_IDX_FIXED 
++ i * 4));
+                         }
+                         pmu->pebs_data_cfg_mask = ~0xff00000full;
+                 } else {
+                         pmu->pebs_enable_mask =
+                                 ~((1ull << pmu->nr_arch_gp_counters) - 1);
+                 }
+         } else {
+                 vcpu->arch.ia32_misc_enable_msr |= 
+MSR_IA32_MISC_ENABLE_PEBS_UNAVAIL;
+                 vcpu->arch.perf_capabilities &= ~PERF_CAP_PEBS_MASK;
+         }
+
+
+But here is
+
+         if (vcpu->arch.perf_capabilities & PERF_CAP_PEBS_FORMAT) {
+                 vcpu->arch.ia32_misc_enable_msr &= 
+~MSR_IA32_MISC_ENABLE_PEBS_UNAVAIL;
+                 if (vcpu->arch.perf_capabilities & 
+PERF_CAP_PEBS_BASELINE) {
+                         pmu->pebs_enable_mask = ~pmu->global_ctrl;
+                         pmu->reserved_bits &= ~ICL_EVENTSEL_ADAPTIVE;
+                         for (i = 0; i < pmu->nr_arch_fixed_counters; i++) {
+                                 pmu->fixed_ctr_ctrl_mask &=
+                                         ~(1ULL << (INTEL_PMC_IDX_FIXED 
++ i * 4));
+                         }
+                         pmu->pebs_data_cfg_mask = ~0xff00000full;
+                 } else {
+                         vcpu->arch.ia32_misc_enable_msr |= 
+MSR_IA32_MISC_ENABLE_PEBS_UNAVAIL;
+                         pmu->pebs_enable_mask =
+                                 ~((1ull << pmu->nr_arch_gp_counters) - 1);
+                 }
+         } else {
+                 vcpu->arch.perf_capabilities &= ~PERF_CAP_PEBS_MASK;
+         }
+
+
+Wrong else branch?
+
+
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 1a64e816e06d..ed38f1dada63 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -3126,6 +3126,10 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+>   		break;
+>   	case MSR_IA32_MISC_ENABLE:
+>   		data &= ~MSR_IA32_MISC_ENABLE_EMON;
+> +		if (!msr_info->host_initiated &&
+> +		    (vcpu->arch.perf_capabilities & PERF_CAP_PEBS_FORMAT) &&
+> +		    (data & MSR_IA32_MISC_ENABLE_PEBS_UNAVAIL))
+> +			return 1;
+>   		if (!kvm_check_has_quirk(vcpu->kvm, KVM_X86_QUIRK_MISC_ENABLE_NO_MWAIT) &&
+>   		    ((vcpu->arch.ia32_misc_enable_msr ^ data) & MSR_IA32_MISC_ENABLE_MWAIT)) {
+>   			if (!guest_cpuid_has(vcpu, X86_FEATURE_XMM3))
 
