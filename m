@@ -2,111 +2,159 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 32FA5365299
-	for <lists+kvm@lfdr.de>; Tue, 20 Apr 2021 08:52:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 316C1365321
+	for <lists+kvm@lfdr.de>; Tue, 20 Apr 2021 09:21:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230173AbhDTGwu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 20 Apr 2021 02:52:50 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:50646 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230139AbhDTGwt (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 20 Apr 2021 02:52:49 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1618901534;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=/RHLOcD8M249MwA8TbQiobmQMiRvQB/PzoDWZSaIlRs=;
-        b=Y936Gk9M26gzMLBLegxECrPfafsVyxe2PUwWjrexN//6IicNN/ENLqUTFSa0gZ6+ToDluz
-        fGCXReIJm+OVszKndTMAwVpX43KMu5Z7AkqN7W9dyOU7zKcimp+0wgf7iVgCfHYy0hmn5J
-        jbv+7Zhur8wyDkgQJFvslsyPWDRja5M=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-288-sFsymWPZOp-fmEFyccTCMA-1; Tue, 20 Apr 2021 02:52:03 -0400
-X-MC-Unique: sFsymWPZOp-fmEFyccTCMA-1
-Received: by mail-ej1-f70.google.com with SMTP id ne22-20020a1709077b96b02903803a047edeso3076127ejc.3
-        for <kvm@vger.kernel.org>; Mon, 19 Apr 2021 23:52:03 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=/RHLOcD8M249MwA8TbQiobmQMiRvQB/PzoDWZSaIlRs=;
-        b=tGFcTjoO5WiqJVcHOY9J04yW8cNwRPOKJyKP1MDd2zAvFLXlkNAIjuVUkCFglHPrlP
-         6qcD8fXQVbNNDSip7BHWakvw//qLa7+NZUhe0kv+EWCTSaPbAKSkhF9MUkBFdcEPydt0
-         1JxaMiB6nRpkW3nnrMWCaii50SHsjrsbpyb4f0ckgwxFp+MlTehA28nLeF7ILouOUZGc
-         4qhAhmyxx6J2793P5ou/Idkikjp0vKB1q+KB3U2dJ+kuY0s/kH3Ro9lUi7OUHr3RLD7k
-         wKfezjVYNWjavsxXsxU0U/Qhl3FatoYRtv2QpWDaTd+aBjQwHntUlZ6ORZACydApY9om
-         Fy8g==
-X-Gm-Message-State: AOAM533R0bIY0J9qGEpVZTEHjKCHr1ZrsSQREc0iBjOf/GpzOm19DrT7
-        aAKl3Fcxi6kVzQOqGgGdyYJWkCq3qeoH5Zm0sUsMfKDJY8+9GhksCNS2dOsoZjXTvBdvzcis2CJ
-        qGctmFAUVynNM
-X-Received: by 2002:aa7:d615:: with SMTP id c21mr17156904edr.176.1618901522479;
-        Mon, 19 Apr 2021 23:52:02 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxZe4nQ7sV/TKik7MnccxJgmY8EXJfdk5pySAzdJqMH4GFHWmvdy8kRgIWbmaKvxr7m3t3iOw==
-X-Received: by 2002:aa7:d615:: with SMTP id c21mr17156887edr.176.1618901522269;
-        Mon, 19 Apr 2021 23:52:02 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id z14sm311068edc.62.2021.04.19.23.52.00
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 19 Apr 2021 23:52:01 -0700 (PDT)
-Subject: Re: Doubt regarding memory allocation in KVM
-To:     Shivank Garg <shivankgarg98@gmail.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <CAOVCmzH4XEGMGgOpvnLU7_qW93cNit4yvb6kOV2BZNZH_8POJg@mail.gmail.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <e7c9b569-a1c4-7b8f-ce47-8e3526464c60@redhat.com>
-Date:   Tue, 20 Apr 2021 08:52:00 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.7.0
+        id S230411AbhDTHVf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 20 Apr 2021 03:21:35 -0400
+Received: from forward4-smtp.messagingengine.com ([66.111.4.238]:57171 "EHLO
+        forward4-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229763AbhDTHVe (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 20 Apr 2021 03:21:34 -0400
+Received: from compute4.internal (compute4.nyi.internal [10.202.2.44])
+        by mailforward.nyi.internal (Postfix) with ESMTP id 041E31940A99;
+        Tue, 20 Apr 2021 03:21:03 -0400 (EDT)
+Received: from mailfrontend2 ([10.202.2.163])
+  by compute4.internal (MEProxy); Tue, 20 Apr 2021 03:21:03 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        messagingengine.com; h=cc:content-type:date:from:in-reply-to
+        :message-id:mime-version:references:subject:to:x-me-proxy
+        :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; bh=1HXd7o
+        6qRyET34NshJ/o0HaQujmE6n8sajMkZ0L+2xI=; b=LPefViur9+fE/45nV1Q3yv
+        lIJP3gmAnRV0wlfqRv1KRyYAcmhsSQmb3a3Ty66VaIXcATTx6HXpJVy9GhYGaHYo
+        +JD2mGiqJcYnkwBPnhE7EfgLOndQlDT/lVVGEAmeQMLJJD/RnVwV8vBTkGjgUjSn
+        FcAX/uqaOtH0+x1sSP08H0XFZSazmaAXIwtkxtzi7g5dOZzw2Zp6AOFVrM9OBHRd
+        WG3Xw9y/5f1pskfXAr+mzMx5FehJtIAAGPGV4nBx0JSpxaaTgJ8HDgkUIFp3a9b8
+        gUT7vsGFoBxkWmwSLzjP/RBFZoN5+p7eWUeXd+w6bLkPVmVhoSKLNalr+YTsj97Q
+        ==
+X-ME-Sender: <xms:3oB-YF9hnkx_l8N7v0YTlUCQhxcv8AyjMopxUgxqdcrsZbLPVJJl3Q>
+    <xme:3oB-YJvrdFhxD454P38OtoTFjqcbtOmCVvYJgzk1cNbu659OJRtFGsQEogLVEVzdo
+    mT2vXukamybeQiJbr8>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeduledrvddthedguddvtdcutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfgh
+    necuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
+    enucfjughrpefvufgjfhfhfffkgggtsehttdfotddttddtnecuhfhrohhmpeffrghvihgu
+    ucfgughmohhnughsohhnuceoughmvgesughmvgdrohhrgheqnecuggftrfgrthhtvghrnh
+    epgfdvudfhgfeuheejffeigffgveevudfgteegkedvlefggfeklefgtdeugfdvueegnecu
+    kfhppeekuddrudekjedrvdeirddvfeeknecuvehluhhsthgvrhfuihiivgeptdenucfrrg
+    hrrghmpehmrghilhhfrhhomhepughmvgesughmvgdrohhrgh
+X-ME-Proxy: <xmx:3oB-YDDruUkvofAa2EmCWzCTNk7UIWfYFbaOqDTKmQaHBCuPZOPzDg>
+    <xmx:3oB-YJevmSKpqFKZ8hx96D75eRjPO74PEEpMW8iBy4d3dnLE9GvNaQ>
+    <xmx:3oB-YKMxqdzVVFG1dhSeU7TX205L49bk9CO-HDIxd2eimyLROAfCZw>
+    <xmx:34B-YHqUG1bBvYadLrjKRBVzEsjTqbZR1qIlEKZRMPJAMRTS_1IVSw>
+Received: from disaster-area.hh.sledj.net (disaster-area.hh.sledj.net [81.187.26.238])
+        by mail.messagingengine.com (Postfix) with ESMTPA id D19F3108005B;
+        Tue, 20 Apr 2021 03:21:01 -0400 (EDT)
+Received: from localhost (disaster-area.hh.sledj.net [local])
+        by disaster-area.hh.sledj.net (OpenSMTPD) with ESMTPA id 1c027af2;
+        Tue, 20 Apr 2021 07:21:00 +0000 (UTC)
+To:     Aaron Lewis <aaronlewis@google.com>
+Cc:     Jim Mattson <jmattson@google.com>,
+        Sean Christopherson <seanjc@google.com>,
+        kvm list <kvm@vger.kernel.org>
+Subject: Re: [PATCH 1/2] kvm: x86: Allow userspace to handle emulation errors
+In-Reply-To: <CAAAPnDEEwLRMLZffJSN5W93d5s6EQJuAP58vAVJCo+RZD6ahsA@mail.gmail.com>
+References: <20210416131820.2566571-1-aaronlewis@google.com>
+ <cunblaaqwe0.fsf@dme.org>
+ <CAAAPnDEEwLRMLZffJSN5W93d5s6EQJuAP58vAVJCo+RZD6ahsA@mail.gmail.com>
+X-HGTTG: zarquon
+From:   David Edmondson <dme@dme.org>
+Date:   Tue, 20 Apr 2021 08:21:00 +0100
+Message-ID: <cunzgxtctgj.fsf@dme.org>
 MIME-Version: 1.0
-In-Reply-To: <CAOVCmzH4XEGMGgOpvnLU7_qW93cNit4yvb6kOV2BZNZH_8POJg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 20/04/21 07:45, Shivank Garg wrote:
-> Hi,
-> I'm learning about qemu KVM, looking into code and experimenting on
-> it. I have the following doubts regarding it, I would be grateful if
-> you help me to get some idea on them.
-> 
-> 1. I observe that KVM allocates memory to guests when it needs it but
-> doesn't take it back (except for ballooning case).
-> Also, the Qemu/KVM process does not free the memory even when the
-> guest is rebooted. In this case,  Does the Guest VM get access to
-> memory already pre-filled with some garbage from the previous run??
+On Monday, 2021-04-19 at 09:47:19 -07, Aaron Lewis wrote:
 
-Yes.
+>> > Add a fallback mechanism to the in-kernel instruction emulator that
+>> > allows userspace the opportunity to process an instruction the emulator
+>> > was unable to.  When the in-kernel instruction emulator fails to process
+>> > an instruction it will either inject a #UD into the guest or exit to
+>> > userspace with exit reason KVM_INTERNAL_ERROR.  This is because it does
+>> > not know how to proceed in an appropriate manner.  This feature lets
+>> > userspace get involved to see if it can figure out a better path
+>> > forward.
+>>
+>> Given that you are intending to try and handle the instruction in
+>> user-space, it seems a little odd to overload the
+>> KVM_EXIT_INTERNAL_ERROR/KVM_INTERNAL_ERROR_EMULATION exit reason/sub
+>> error.
+>>
+>> Why not add a new exit reason, particularly given that the caller has to
+>> enable the capability to get the relevant data? (It would also remove
+>> the need for the flag field and any mechanism for packing multiple bits
+>> of detail into the structure.)
+>
+> I considered that, but I opted for the extensibility of the exiting
+> KVM_EXIT_INTERNAL_ERROR instead.  To me it was six of one or half a
+> dozen of the other.  With either strategy I still wanted to provide
+> for future extensibility, and had a flags field in place.  That way we
+> can add to this in the future if we find something that is missing
+> (ie: potentially wanting a way to mark dirty pages, possibly passing a
+> fault address, etc...)
 
-> (Since the host would allocate zeroed pages to guests the first time
-> it requests but after that it's up to guests). Can it be a security
-> issue?
+How many of the flag based optional fields do you anticipate needing for
+any one particular exit scenario?
 
-No, it's the same that happens on non-virtual machine.
+If it's one, then using the flags to disambiguate the emulation failure
+cases after choosing to stuff all of the cases into
+KVM_EXIT_INTERNAL_ERROR / KVM_INTERNAL_ERROR_EMULATION would be odd.
 
-> 2. How does the KVM know if GPFN (guest physical frame number) is
-> backed by an actual machine frame number in host? If not mapped, then
-> it faults in the host and allocates a physical frame for guests in the
-> host. (kvm_mmu_page_fault)
+(I'm presuming that it's not one, but don't understand the use case.)
 
-It's all handled by Linux.  KVM only does a call to get_user_pages.  See 
-functions whose name starts with hva_to_pfn in virt/kvm/kvm_main.c
+>> > +/*
+>> > + * When using the suberror KVM_INTERNAL_ERROR_EMULATION, these flags are used
+>> > + * to describe what is contained in the exit struct.  The flags are used to
+>> > + * describe it's contents, and the contents should be in ascending numerical
+>> > + * order of the flag values.  For example, if the flag
+>> > + * KVM_INTERNAL_ERROR_EMULATION_FLAG_INSTRUCTION_BYTES is set, the instruction
+>> > + * length and instruction bytes would be expected to show up first because this
+>> > + * flag has the lowest numerical value (1) of all the other flags.
+>> > + */
+>> > +#define KVM_INTERNAL_ERROR_EMULATION_FLAG_INSTRUCTION_BYTES (1ULL << 0)
+>> > +
+>> >  /* for KVM_RUN, returned by mmap(vcpu_fd, offset=0) */
+>> >  struct kvm_run {
+>> >       /* in */
+>> > @@ -382,6 +393,14 @@ struct kvm_run {
+>> >                       __u32 ndata;
+>> >                       __u64 data[16];
+>> >               } internal;
+>> > +             /* KVM_EXIT_INTERNAL_ERROR, too (not 2) */
+>> > +             struct {
+>> > +                     __u32 suberror;
+>> > +                     __u32 ndata;
+>> > +                     __u64 flags;
+>> > +                     __u8  insn_size;
+>> > +                     __u8  insn_bytes[15];
+>> > +             } emulation_failure;
+>> > +/*
+>> > + * When using the suberror KVM_INTERNAL_ERROR_EMULATION, these flags are used
+>> > + * to describe what is contained in the exit struct.  The flags are used to
+>> > + * describe it's contents, and the contents should be in ascending numerical
+>> > + * order of the flag values.  For example, if the flag
+>> > + * KVM_INTERNAL_ERROR_EMULATION_FLAG_INSTRUCTION_BYTES is set, the instruction
+>> > + * length and instruction bytes would be expected to show up first because this
+>> > + * flag has the lowest numerical value (1) of all the other flags.
+>>
+>> When adding a new flag, do I steal bytes from insn_bytes[] for my
+>> associated payload? If so, how many do I have to leave?
+>>
+>
+> The emulation_failure struct mirrors the internal struct, so if you
+> are just adding to what I have, you can safely add up to 16 __u64's.
+> I'm currently using the size equivalent to 3 of them (flags,
+> insn_size, insn_bytes), so there should be plenty of space left for
+> you to add what you need to the end.  Just add the fields you need to
+> the end of emulation_failure struct, increase 'ndata' to the new
+> count, add a new flag to 'flags' so we know its contents.
 
-Given a GPA, the GFN is simply the guest physical address minus bits 
-0:11, so shifted right by 12.
+My apologies, I mis-read the u8 as u64, so figured that you'd eaten all
+of the remaining space.
 
-Paolo
-
+dme.
+-- 
+I walk like a building, I never get wet.
