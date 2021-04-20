@@ -2,132 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4F05936509B
-	for <lists+kvm@lfdr.de>; Tue, 20 Apr 2021 04:56:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 125123651E3
+	for <lists+kvm@lfdr.de>; Tue, 20 Apr 2021 07:46:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229688AbhDTC5S (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 19 Apr 2021 22:57:18 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:60189 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229559AbhDTC5R (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 19 Apr 2021 22:57:17 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1618887406;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=EE7LME23WUWVeXeRfQveamynPNr8MvEiH4grzJIaWTk=;
-        b=hp3zpKUgJqSxlZ6V0wnXzvotrNpIDERh5VyLtb3Jxzr5w0TdGe/gR8kyiYGzs197tBDT0y
-        5HBRWaUAjs8L3+XnUl9lr5QvUVFM/kLOZ7ogf8cPPO8AGgnInLTqLXHjoqHuyTbaL3pQHC
-        bU4Q1ILkL7grVTsxQDKfCRle3QUswH8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-47-iQ2M1oXpPD2yq6tNf7YBHQ-1; Mon, 19 Apr 2021 22:56:44 -0400
-X-MC-Unique: iQ2M1oXpPD2yq6tNf7YBHQ-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6D44683DD21;
-        Tue, 20 Apr 2021 02:56:43 +0000 (UTC)
-Received: from wangxiaodeMacBook-Air.local (ovpn-13-125.pek2.redhat.com [10.72.13.125])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id BA494610F1;
-        Tue, 20 Apr 2021 02:56:38 +0000 (UTC)
-Subject: Re: [PATCH V4 1/3] vDPA/ifcvf: deduce VIRTIO device ID when probe
-To:     Zhu Lingshan <lingshan.zhu@intel.com>, mst@redhat.com,
-        lulu@redhat.com, sgarzare@redhat.com
-Cc:     virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20210419063326.3748-1-lingshan.zhu@intel.com>
- <20210419063326.3748-2-lingshan.zhu@intel.com>
-From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <295dc8a9-3159-78bc-f90f-9c8abeedf1cb@redhat.com>
-Date:   Tue, 20 Apr 2021 10:56:37 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
- Gecko/20100101 Thunderbird/78.9.1
+        id S229889AbhDTFqg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 20 Apr 2021 01:46:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48900 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229450AbhDTFqf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 20 Apr 2021 01:46:35 -0400
+Received: from mail-ej1-x634.google.com (mail-ej1-x634.google.com [IPv6:2a00:1450:4864:20::634])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 51D5EC06174A;
+        Mon, 19 Apr 2021 22:46:03 -0700 (PDT)
+Received: by mail-ej1-x634.google.com with SMTP id w23so40590498ejb.9;
+        Mon, 19 Apr 2021 22:46:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:from:date:message-id:subject:to;
+        bh=fXjwTDCI0JfAHocBzWWyLFaiapoMwBLjcCP3SLFYBAk=;
+        b=MnPb9ImWv0p0rgMN2zYifNQWHmjZOaByAYPAptzLn1ZqIziA9jpBwxd1EIPMlOzkAy
+         8K2i+D3JXK99sIX2yLjyFgQaVdBE8KoeHpQtMz1to32aIRbKohDS6bSsZcY/Ag+/Vd3W
+         xwbL5Hqp3L+zx4LOKKe3cx7Q+AWAWoIaMVubhDxB7f/OxRc2eNyqUnxXrhhlN6cCYJB2
+         4rrO8MuAIUsViCaMxiMGLPDiLma+jOb4o+mV6Bk+CGl09I2lZFbN9M+tjqM70gZmTRv8
+         +QERKuH+uMjI4A+rlZm9an1n76gBSC724dzenMRZ/a4y9o1pgM4jnhAVgd/vfhMABicw
+         0Dog==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+        bh=fXjwTDCI0JfAHocBzWWyLFaiapoMwBLjcCP3SLFYBAk=;
+        b=K4jlSL4V8Wfs4pUcEpPasulQNYh7v+aIS08ASz0QTWDEunS4stO13x7KDGEHvNXPLx
+         Lx8k7eYqZWOcMEKLpWRNOvdt87OcELFB6x4HUgLvQBioWz7Qf7C2s6X9Fw3iXhC9/kdr
+         4YsmNWINr4+5Qxz6yavjDo552e24vYq59rgvyW49vWvgINVPbVDz1kk3FYTENmPcBHbL
+         rtgcAQpTP+rCDO9e1EERtgF0OKdF6MvKz75R1FMFHkSYbSb3OMlG2zuK2J8CTcdkULP0
+         E2CsneMxuKY1k29NI3l5l5pyLFIAkuCDp4tC9lcb+g351jkUnX0KBmTKlKAelldg7/mk
+         ZNow==
+X-Gm-Message-State: AOAM5306Y30994fTkvwFE2PbtDnQyUU/RuPEDC4zJp6NZCGnb3P6x6ra
+        Sw4Y+zd6GsqM8/aGLiIQjsiiC76KS17iLD10Yew=
+X-Google-Smtp-Source: ABdhPJzZVVvcLcQBCrcXCpxFFRsa2x8dmRxGSnS3BFksjvKkD6gg8o/KoDb1pac+U+5DAAB7aFNOYVyrLzoz7al1YRo=
+X-Received: by 2002:a17:906:37c9:: with SMTP id o9mr25241115ejc.285.1618897561979;
+ Mon, 19 Apr 2021 22:46:01 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20210419063326.3748-2-lingshan.zhu@intel.com>
-Content-Type: text/plain; charset=gbk; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+From:   Shivank Garg <shivankgarg98@gmail.com>
+Date:   Tue, 20 Apr 2021 11:15:45 +0530
+Message-ID: <CAOVCmzH4XEGMGgOpvnLU7_qW93cNit4yvb6kOV2BZNZH_8POJg@mail.gmail.com>
+Subject: Doubt regarding memory allocation in KVM
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Hi,
+I'm learning about qemu KVM, looking into code and experimenting on
+it. I have the following doubts regarding it, I would be grateful if
+you help me to get some idea on them.
 
-ÔÚ 2021/4/19 ÏÂÎç2:33, Zhu Lingshan Ð´µÀ:
-> This commit deduces VIRTIO device ID as device type when probe,
-> then ifcvf_vdpa_get_device_id() can simply return the ID.
-> ifcvf_vdpa_get_features() and ifcvf_vdpa_get_config_size()
-> can work properly based on the device ID.
->
-> Signed-off-by: Zhu Lingshan <lingshan.zhu@intel.com>
+1. I observe that KVM allocates memory to guests when it needs it but
+doesn't take it back (except for ballooning case).
+Also, the Qemu/KVM process does not free the memory even when the
+guest is rebooted. In this case,  Does the Guest VM get access to
+memory already pre-filled with some garbage from the previous run??
+(Since the host would allocate zeroed pages to guests the first time
+it requests but after that it's up to guests). Can it be a security
+issue?
 
+2. How does the KVM know if GPFN (guest physical frame number) is
+backed by an actual machine frame number in host? If not mapped, then
+it faults in the host and allocates a physical frame for guests in the
+host. (kvm_mmu_page_fault)
 
-Acked-by: Jason Wang <jasowang@redhat.com>
+3. How/where can I access the GPFNs in the host? Is "gfn_t gfn = gpa
+>> PAGE_SHIFT" and "gpa_t cr2_or_gpa" in the KVM page fault handler,
+x86 is the same as GPFN. (that is can I use pfn_to_page in guest VM to
+access the struct page in Guest)
 
+Thank You.
 
-> ---
->   drivers/vdpa/ifcvf/ifcvf_base.h |  1 +
->   drivers/vdpa/ifcvf/ifcvf_main.c | 27 +++++++++++++++------------
->   2 files changed, 16 insertions(+), 12 deletions(-)
->
-> diff --git a/drivers/vdpa/ifcvf/ifcvf_base.h b/drivers/vdpa/ifcvf/ifcvf_base.h
-> index b2eeb16b9c2c..1c04cd256fa7 100644
-> --- a/drivers/vdpa/ifcvf/ifcvf_base.h
-> +++ b/drivers/vdpa/ifcvf/ifcvf_base.h
-> @@ -84,6 +84,7 @@ struct ifcvf_hw {
->   	u32 notify_off_multiplier;
->   	u64 req_features;
->   	u64 hw_features;
-> +	u32 dev_type;
->   	struct virtio_pci_common_cfg __iomem *common_cfg;
->   	void __iomem *net_cfg;
->   	struct vring_info vring[IFCVF_MAX_QUEUE_PAIRS * 2];
-> diff --git a/drivers/vdpa/ifcvf/ifcvf_main.c b/drivers/vdpa/ifcvf/ifcvf_main.c
-> index 44d7586019da..66927ec81fa5 100644
-> --- a/drivers/vdpa/ifcvf/ifcvf_main.c
-> +++ b/drivers/vdpa/ifcvf/ifcvf_main.c
-> @@ -323,19 +323,9 @@ static u32 ifcvf_vdpa_get_generation(struct vdpa_device *vdpa_dev)
->   
->   static u32 ifcvf_vdpa_get_device_id(struct vdpa_device *vdpa_dev)
->   {
-> -	struct ifcvf_adapter *adapter = vdpa_to_adapter(vdpa_dev);
-> -	struct pci_dev *pdev = adapter->pdev;
-> -	u32 ret = -ENODEV;
-> -
-> -	if (pdev->device < 0x1000 || pdev->device > 0x107f)
-> -		return ret;
-> -
-> -	if (pdev->device < 0x1040)
-> -		ret =  pdev->subsystem_device;
-> -	else
-> -		ret =  pdev->device - 0x1040;
-> +	struct ifcvf_hw *vf = vdpa_to_vf(vdpa_dev);
->   
-> -	return ret;
-> +	return vf->dev_type;
->   }
->   
->   static u32 ifcvf_vdpa_get_vendor_id(struct vdpa_device *vdpa_dev)
-> @@ -466,6 +456,19 @@ static int ifcvf_probe(struct pci_dev *pdev, const struct pci_device_id *id)
->   	pci_set_drvdata(pdev, adapter);
->   
->   	vf = &adapter->vf;
-> +
-> +	/* This drirver drives both modern virtio devices and transitional
-> +	 * devices in modern mode.
-> +	 * vDPA requires feature bit VIRTIO_F_ACCESS_PLATFORM,
-> +	 * so legacy devices and transitional devices in legacy
-> +	 * mode will not work for vDPA, this driver will not
-> +	 * drive devices with legacy interface.
-> +	 */
-> +	if (pdev->device < 0x1040)
-> +		vf->dev_type =  pdev->subsystem_device;
-> +	else
-> +		vf->dev_type =  pdev->device - 0x1040;
-> +
->   	vf->base = pcim_iomap_table(pdev);
->   
->   	adapter->pdev = pdev;
-
+Best Regards,
+Shivank Garg
+M.Tech Student,
+IIT Kanpur
