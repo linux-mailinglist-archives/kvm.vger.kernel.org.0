@@ -2,92 +2,216 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 125123651E3
-	for <lists+kvm@lfdr.de>; Tue, 20 Apr 2021 07:46:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AD6D1365204
+	for <lists+kvm@lfdr.de>; Tue, 20 Apr 2021 08:02:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229889AbhDTFqg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 20 Apr 2021 01:46:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48900 "EHLO
+        id S229960AbhDTGCv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 20 Apr 2021 02:02:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52412 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229450AbhDTFqf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 20 Apr 2021 01:46:35 -0400
-Received: from mail-ej1-x634.google.com (mail-ej1-x634.google.com [IPv6:2a00:1450:4864:20::634])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 51D5EC06174A;
-        Mon, 19 Apr 2021 22:46:03 -0700 (PDT)
-Received: by mail-ej1-x634.google.com with SMTP id w23so40590498ejb.9;
-        Mon, 19 Apr 2021 22:46:03 -0700 (PDT)
+        with ESMTP id S229577AbhDTGCu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 20 Apr 2021 02:02:50 -0400
+Received: from mail-ot1-x336.google.com (mail-ot1-x336.google.com [IPv6:2607:f8b0:4864:20::336])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D508C061763;
+        Mon, 19 Apr 2021 23:02:19 -0700 (PDT)
+Received: by mail-ot1-x336.google.com with SMTP id o13-20020a9d404d0000b029028e0a0ae6b4so15806744oti.10;
+        Mon, 19 Apr 2021 23:02:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:from:date:message-id:subject:to;
-        bh=fXjwTDCI0JfAHocBzWWyLFaiapoMwBLjcCP3SLFYBAk=;
-        b=MnPb9ImWv0p0rgMN2zYifNQWHmjZOaByAYPAptzLn1ZqIziA9jpBwxd1EIPMlOzkAy
-         8K2i+D3JXK99sIX2yLjyFgQaVdBE8KoeHpQtMz1to32aIRbKohDS6bSsZcY/Ag+/Vd3W
-         xwbL5Hqp3L+zx4LOKKe3cx7Q+AWAWoIaMVubhDxB7f/OxRc2eNyqUnxXrhhlN6cCYJB2
-         4rrO8MuAIUsViCaMxiMGLPDiLma+jOb4o+mV6Bk+CGl09I2lZFbN9M+tjqM70gZmTRv8
-         +QERKuH+uMjI4A+rlZm9an1n76gBSC724dzenMRZ/a4y9o1pgM4jnhAVgd/vfhMABicw
-         0Dog==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=qt0lRKLsgtImiEowN6MCoMr9lqUeJDBLHkuJ/55/e98=;
+        b=joOeOfH7NiOFE/0XKIgGIHJgPnQwYp23K21ed17iU7dg50T0fzNgQoIPWDNC3AlzQt
+         lpSfy7m0ySvWg6PgQ9+Ag+PgkQARd+NQzBqgEMJTlZ5/l14220zPT23lvjwP78MuNn3Z
+         zm4c4ZB2yhdIYDL8ErVMvrMlmLIZ9qj8dZcFgZeBR+Syzt32EM5yWU+RLdh3rkVXxFW8
+         cZvW5nQTzeWGQsKs4pkH6ky0jnYeXbM2CnPhT+8Urkvwfx3Skd2hijerYL01xSciB9mk
+         DP5BiOWb/Si6hbrZ0Z9Il9XvlkN3mmBnWYLbTexDSxZEBxnrxOHPP1P5cDhU1AD4MmaB
+         I+AA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
-        bh=fXjwTDCI0JfAHocBzWWyLFaiapoMwBLjcCP3SLFYBAk=;
-        b=K4jlSL4V8Wfs4pUcEpPasulQNYh7v+aIS08ASz0QTWDEunS4stO13x7KDGEHvNXPLx
-         Lx8k7eYqZWOcMEKLpWRNOvdt87OcELFB6x4HUgLvQBioWz7Qf7C2s6X9Fw3iXhC9/kdr
-         4YsmNWINr4+5Qxz6yavjDo552e24vYq59rgvyW49vWvgINVPbVDz1kk3FYTENmPcBHbL
-         rtgcAQpTP+rCDO9e1EERtgF0OKdF6MvKz75R1FMFHkSYbSb3OMlG2zuK2J8CTcdkULP0
-         E2CsneMxuKY1k29NI3l5l5pyLFIAkuCDp4tC9lcb+g351jkUnX0KBmTKlKAelldg7/mk
-         ZNow==
-X-Gm-Message-State: AOAM5306Y30994fTkvwFE2PbtDnQyUU/RuPEDC4zJp6NZCGnb3P6x6ra
-        Sw4Y+zd6GsqM8/aGLiIQjsiiC76KS17iLD10Yew=
-X-Google-Smtp-Source: ABdhPJzZVVvcLcQBCrcXCpxFFRsa2x8dmRxGSnS3BFksjvKkD6gg8o/KoDb1pac+U+5DAAB7aFNOYVyrLzoz7al1YRo=
-X-Received: by 2002:a17:906:37c9:: with SMTP id o9mr25241115ejc.285.1618897561979;
- Mon, 19 Apr 2021 22:46:01 -0700 (PDT)
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=qt0lRKLsgtImiEowN6MCoMr9lqUeJDBLHkuJ/55/e98=;
+        b=j49Eqner5saUvUcgm5tLEHIsxBqkaJgezxVlujBsAny7uM+iTsuYZTj1p/4a8Oy1/s
+         H5D+kZIbI+JDB6+1dlMS24muk5+aklhwlm9OJpW7dHsmfO+Uyai1euofhqCbVH8XccOW
+         nCj3O3tbqKkukYo6fNityTYunwJQmxD9VXByhJKPDpso8oOcHEDK/AlEwbpU59kzs1xe
+         b0H6NNSZYQLd6vXJTVHeXkSh2bv3/MDVD7x5Aiz8NP94taaGC3nDVfOa7OxxNkuHAaDy
+         FjJ9hKjI5fn694l9F9Aeorh7OJZ0N0WS19gsFTSLpf4HDozP4LBEQQpzXBKZbvbFDOrm
+         0BQQ==
+X-Gm-Message-State: AOAM530D6YSMujS/GSXMQ+Ntc9lcgEZ+yIw2TCgvY0g0H22m9z8E4zZZ
+        8omYfKzUGD25Kjndqn/cSD9ReSTLX2HniVhmyt4=
+X-Google-Smtp-Source: ABdhPJy01S4bz+i/MSJiFM5wCIrqx6K4wHikx4zZZdKnntZ3F+W92lJPzs7GAnZVvyFP/Gtnc5QJ/i1cxdGJUzHkw90=
+X-Received: by 2002:a9d:7cc7:: with SMTP id r7mr6838781otn.254.1618898538926;
+ Mon, 19 Apr 2021 23:02:18 -0700 (PDT)
 MIME-Version: 1.0
-From:   Shivank Garg <shivankgarg98@gmail.com>
-Date:   Tue, 20 Apr 2021 11:15:45 +0530
-Message-ID: <CAOVCmzH4XEGMGgOpvnLU7_qW93cNit4yvb6kOV2BZNZH_8POJg@mail.gmail.com>
-Subject: Doubt regarding memory allocation in KVM
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
+References: <1618542490-14756-1-git-send-email-wanpengli@tencent.com>
+ <9c49c6ff-d896-e6a5-c051-b6707f6ec58a@redhat.com> <CANRm+Cy-xmDRQoUfOYm+GGvWiS+qC_sBjyZmcLykbKqTF2YDxQ@mail.gmail.com>
+ <YH2wnl05UBqVhcHr@google.com> <c1909fa3-61f3-de6b-1aa1-8bc36285e1e4@redhat.com>
+In-Reply-To: <c1909fa3-61f3-de6b-1aa1-8bc36285e1e4@redhat.com>
+From:   Wanpeng Li <kernellwp@gmail.com>
+Date:   Tue, 20 Apr 2021 14:02:07 +0800
+Message-ID: <CANRm+CwQ266j6wTxqFZtGhp_HfQZ7Y_e843hzROqNUxf9BcaFA@mail.gmail.com>
+Subject: Re: [PATCH] KVM: Boost vCPU candidiate in user mode which is
+ delivering interrupt
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+        Joerg Roedel <joro@8bytes.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi,
-I'm learning about qemu KVM, looking into code and experimenting on
-it. I have the following doubts regarding it, I would be grateful if
-you help me to get some idea on them.
+On Tue, 20 Apr 2021 at 00:59, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+> On 19/04/21 18:32, Sean Christopherson wrote:
+> > If false positives are a big concern, what about adding another pass to the loop
+> > and only yielding to usermode vCPUs with interrupts in the second full pass?
+> > I.e. give vCPUs that are already in kernel mode priority, and only yield to
+> > handle an interrupt if there are no vCPUs in kernel mode.
+> >
+> > kvm_arch_dy_runnable() pulls in pv_unhalted, which seems like a good thing.
+>
+> pv_unhalted won't help if you're waiting for a kernel spinlock though,
+> would it?  Doing two passes (or looking for a "best" candidate that
+> prefers kernel mode vCPUs to user mode vCPUs waiting for an interrupt)
+> seems like the best choice overall.
 
-1. I observe that KVM allocates memory to guests when it needs it but
-doesn't take it back (except for ballooning case).
-Also, the Qemu/KVM process does not free the memory even when the
-guest is rebooted. In this case,  Does the Guest VM get access to
-memory already pre-filled with some garbage from the previous run??
-(Since the host would allocate zeroed pages to guests the first time
-it requests but after that it's up to guests). Can it be a security
-issue?
+How about something like this:
 
-2. How does the KVM know if GPFN (guest physical frame number) is
-backed by an actual machine frame number in host? If not mapped, then
-it faults in the host and allocates a physical frame for guests in the
-host. (kvm_mmu_page_fault)
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index 6b4dd95..8ba50be 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -325,10 +325,12 @@ struct kvm_vcpu {
+      * Cpu relax intercept or pause loop exit optimization
+      * in_spin_loop: set when a vcpu does a pause loop exit
+      *  or cpu relax intercepted.
++     * pending_interrupt: set when a vcpu waiting for an interrupt
+      * dy_eligible: indicates whether vcpu is eligible for directed yield.
+      */
+     struct {
+         bool in_spin_loop;
++        bool pending_interrupt;
+         bool dy_eligible;
+     } spin_loop;
+ #endif
+@@ -1427,6 +1429,12 @@ static inline void
+kvm_vcpu_set_in_spin_loop(struct kvm_vcpu *vcpu, bool val)
+ {
+     vcpu->spin_loop.in_spin_loop = val;
+ }
++
++static inline void kvm_vcpu_set_pending_interrupt(struct kvm_vcpu
+*vcpu, bool val)
++{
++    vcpu->spin_loop.pending__interrupt = val;
++}
++
+ static inline void kvm_vcpu_set_dy_eligible(struct kvm_vcpu *vcpu, bool val)
+ {
+     vcpu->spin_loop.dy_eligible = val;
+@@ -1438,6 +1446,10 @@ static inline void
+kvm_vcpu_set_in_spin_loop(struct kvm_vcpu *vcpu, bool val)
+ {
+ }
 
-3. How/where can I access the GPFNs in the host? Is "gfn_t gfn = gpa
->> PAGE_SHIFT" and "gpa_t cr2_or_gpa" in the KVM page fault handler,
-x86 is the same as GPFN. (that is can I use pfn_to_page in guest VM to
-access the struct page in Guest)
++static inline void kvm_vcpu_set_pending_interrupt(struct kvm_vcpu
+*vcpu, bool val)
++{
++}
++
+ static inline void kvm_vcpu_set_dy_eligible(struct kvm_vcpu *vcpu, bool val)
+ {
+ }
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 529cff1..42e0255 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -410,6 +410,7 @@ static void kvm_vcpu_init(struct kvm_vcpu *vcpu,
+struct kvm *kvm, unsigned id)
+     INIT_LIST_HEAD(&vcpu->blocked_vcpu_list);
 
-Thank You.
+     kvm_vcpu_set_in_spin_loop(vcpu, false);
++    kvm_vcpu_set_pending_interrupt(vcpu, false);
+     kvm_vcpu_set_dy_eligible(vcpu, false);
+     vcpu->preempted = false;
+     vcpu->ready = false;
+@@ -3079,14 +3080,17 @@ EXPORT_SYMBOL_GPL(kvm_vcpu_yield_to);
+  * Helper that checks whether a VCPU is eligible for directed yield.
+  * Most eligible candidate to yield is decided by following heuristics:
+  *
+- *  (a) VCPU which has not done pl-exit or cpu relax intercepted recently
+- *  (preempted lock holder), indicated by @in_spin_loop.
+- *  Set at the beginning and cleared at the end of interception/PLE handler.
++ *  (a) VCPU which has not done pl-exit or cpu relax intercepted and is not
++ *  waiting for an interrupt recently (preempted lock holder). The former
++ *  one is indicated by @in_spin_loop, set at the beginning and cleared at
++ *  the end of interception/PLE handler. The later one is indicated by
++ *  @pending_interrupt, set when interrupt is delivering and cleared at
++ *  the end of directed yield.
+  *
+- *  (b) VCPU which has done pl-exit/ cpu relax intercepted but did not get
+- *  chance last time (mostly it has become eligible now since we have probably
+- *  yielded to lockholder in last iteration. This is done by toggling
+- *  @dy_eligible each time a VCPU checked for eligibility.)
++ *  (b) VCPU which has done pl-exit/ cpu relax intercepted or is waiting for
++ *  interrupt but did not get chance last time (mostly it has become eligible
++ *  now since we have probably yielded to lockholder in last iteration. This
++ *  is done by toggling @dy_eligible each time a VCPU checked for eligibility.)
+  *
+  *  Yielding to a recently pl-exited/cpu relax intercepted VCPU before yielding
+  *  to preempted lock-holder could result in wrong VCPU selection and CPU
+@@ -3102,10 +3106,10 @@ static bool
+kvm_vcpu_eligible_for_directed_yield(struct kvm_vcpu *vcpu)
+ #ifdef CONFIG_HAVE_KVM_CPU_RELAX_INTERCEPT
+     bool eligible;
 
-Best Regards,
-Shivank Garg
-M.Tech Student,
-IIT Kanpur
+-    eligible = !vcpu->spin_loop.in_spin_loop ||
++    eligible = !(vcpu->spin_loop.in_spin_loop ||
+vcpu->spin_loop.has_interrupt) ||
+             vcpu->spin_loop.dy_eligible;
+
+-    if (vcpu->spin_loop.in_spin_loop)
++    if (vcpu->spin_loop.in_spin_loop || vcpu->spin_loop.has_interrupt)
+         kvm_vcpu_set_dy_eligible(vcpu, !vcpu->spin_loop.dy_eligible);
+
+     return eligible;
+@@ -3137,6 +3141,16 @@ static bool vcpu_dy_runnable(struct kvm_vcpu *vcpu)
+     return false;
+ }
+
++static bool kvm_has_interrupt_delivery(struct kvm_vcpu *vcpu)
++{
++    if (vcpu_dy_runnable(vcpu)) {
++        kvm_vcpu_set_pending_interrupt(vcpu, true);
++        return true;
++    }
++
++    return false;
++}
++
+ void kvm_vcpu_on_spin(struct kvm_vcpu *me, bool yield_to_kernel_mode)
+ {
+     struct kvm *kvm = me->kvm;
+@@ -3170,6 +3184,7 @@ void kvm_vcpu_on_spin(struct kvm_vcpu *me, bool
+yield_to_kernel_mode)
+                 !vcpu_dy_runnable(vcpu))
+                 continue;
+             if (READ_ONCE(vcpu->preempted) && yield_to_kernel_mode &&
++                !kvm_has_interrupt_delivery(vcpu) &&
+                 !kvm_arch_vcpu_in_kernel(vcpu))
+                 continue;
+             if (!kvm_vcpu_eligible_for_directed_yield(vcpu))
+@@ -3177,6 +3192,7 @@ void kvm_vcpu_on_spin(struct kvm_vcpu *me, bool
+yield_to_kernel_mode)
+
+             yielded = kvm_vcpu_yield_to(vcpu);
+             if (yielded > 0) {
++                kvm_vcpu_set_pending_interrupt(vcpu, false);
+                 kvm->last_boosted_vcpu = i;
+                 break;
+             } else if (yielded < 0) {
