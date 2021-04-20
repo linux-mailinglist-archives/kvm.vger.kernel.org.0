@@ -2,140 +2,129 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 736FF365E1A
-	for <lists+kvm@lfdr.de>; Tue, 20 Apr 2021 19:02:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E7977365E49
+	for <lists+kvm@lfdr.de>; Tue, 20 Apr 2021 19:14:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233346AbhDTRC5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 20 Apr 2021 13:02:57 -0400
-Received: from wforward3-smtp.messagingengine.com ([64.147.123.22]:51953 "EHLO
-        wforward3-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233305AbhDTRC4 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 20 Apr 2021 13:02:56 -0400
-X-Greylist: delayed 521 seconds by postgrey-1.27 at vger.kernel.org; Tue, 20 Apr 2021 13:02:56 EDT
-Received: from compute4.internal (compute4.nyi.internal [10.202.2.44])
-        by mailforward.west.internal (Postfix) with ESMTP id B0C833BD4;
-        Tue, 20 Apr 2021 12:53:42 -0400 (EDT)
-Received: from mailfrontend1 ([10.202.2.162])
-  by compute4.internal (MEProxy); Tue, 20 Apr 2021 12:53:43 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:content-type:date:from:in-reply-to
-        :message-id:mime-version:references:subject:to:x-me-proxy
-        :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; bh=cKp2Xd
-        ce/YCF6NXRThqermvCsoe8zQNNncSOXUjnO24=; b=fi8qzmh8mDtZveNTxx7EyO
-        yvDMYjXGTAuOXnsrMRKTvEhCBvBdlszsYtmgFqP/naLnrKrmiJVihMwLobeuA7iC
-        hESESxGmFVwOQGM1tsO22pHYeFs3alKXiSMWrsadbQyW9OmdfciNWgHHbYjkW7CP
-        Wx1YzwRodkXbCL0enq4wdXWPb6OfyF7bRSAcu9oQLAdOne1HTKdPHPJtMxLaa3/r
-        RpSTOXg+gTAtIfOLYFnwBLALI8xlcFm4IaH8STm8v0jNbV5O+ZTh1ZrbYgLk5RWO
-        ixNiW4rZLHsOybeWvq4gMwmIWbSxTpkJta7cLA+PVDXtm15OSA6NRVFEY8sOPXsg
-        ==
-X-ME-Sender: <xms:FQd_YGPc6rj4P_pGGiqVMhCEdIXq8_0e7l-LnLwwjwOyY-zx68phsw>
-    <xme:FQd_YE_kOgtcFYsHDnl3qtYUy23qS-auSa34yW3q-wmS8Tq1SO3jcNkyzyD1mZen6
-    U9ETnK4iPi8dDP09ow>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeduledrvddtiedguddtkecutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfgh
-    necuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
-    enucfjughrpefvufgjfhfhfffkgggtsehttdertddttddtnecuhfhrohhmpeffrghvihgu
-    ucfgughmohhnughsohhnuceoughmvgesughmvgdrohhrgheqnecuggftrfgrthhtvghrnh
-    ephfekgeeutddvgeffffetheejvdejieetgfefgfffudegffffgeduheegteegleeknecu
-    kfhppeekuddrudekjedrvdeirddvfeeknecuvehluhhsthgvrhfuihiivgeptdenucfrrg
-    hrrghmpehmrghilhhfrhhomhepughmvgesughmvgdrohhrgh
-X-ME-Proxy: <xmx:FQd_YNSHZqO8MkAEycowcPAXGH3o3fBkDcHT0pvYL6Am6oF4NHccCw>
-    <xmx:FQd_YGu5AwWtSObNmhr2H8KtpRyChCqdGaq565gq5ylWgVvhjXOBXA>
-    <xmx:FQd_YOfYE3DafP5kIhA_r7h0x9WSUGumpIeztI_IK9Z6YSQjYQBFhQ>
-    <xmx:Fgd_YO5uci9fvY7yo0DriK5huLCEVgFc9tp5_8j__ho0ank7dnMpxYlMYgI>
-Received: from disaster-area.hh.sledj.net (disaster-area.hh.sledj.net [81.187.26.238])
-        by mail.messagingengine.com (Postfix) with ESMTPA id 5653A24005B;
-        Tue, 20 Apr 2021 12:53:41 -0400 (EDT)
-Received: from localhost (disaster-area.hh.sledj.net [local])
-        by disaster-area.hh.sledj.net (OpenSMTPD) with ESMTPA id 31cc8f06;
-        Tue, 20 Apr 2021 16:53:40 +0000 (UTC)
-To:     Aaron Lewis <aaronlewis@google.com>
-Cc:     Jim Mattson <jmattson@google.com>,
-        Sean Christopherson <seanjc@google.com>,
-        kvm list <kvm@vger.kernel.org>
-Subject: Re: [PATCH 1/2] kvm: x86: Allow userspace to handle emulation errors
-In-Reply-To: <CAAAPnDGnY76C-=FppsiL=OFY-ei8kHeJhfK_tNV8of3JHBZ0FA@mail.gmail.com>
-References: <20210416131820.2566571-1-aaronlewis@google.com>
- <cunblaaqwe0.fsf@dme.org>
- <CAAAPnDEEwLRMLZffJSN5W93d5s6EQJuAP58vAVJCo+RZD6ahsA@mail.gmail.com>
- <cunzgxtctgj.fsf@dme.org>
- <CAAAPnDGnY76C-=FppsiL=OFY-ei8kHeJhfK_tNV8of3JHBZ0FA@mail.gmail.com>
-X-HGTTG: zarquon
-From:   David Edmondson <dme@dme.org>
-Date:   Tue, 20 Apr 2021 17:53:40 +0100
-Message-ID: <cunbla8c2y3.fsf@dme.org>
+        id S233086AbhDTROe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 20 Apr 2021 13:14:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60102 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232916AbhDTROc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 20 Apr 2021 13:14:32 -0400
+Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A498AC06174A
+        for <kvm@vger.kernel.org>; Tue, 20 Apr 2021 10:13:59 -0700 (PDT)
+Received: by mail-pj1-x1031.google.com with SMTP id nk8so7031853pjb.3
+        for <kvm@vger.kernel.org>; Tue, 20 Apr 2021 10:13:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=5Rx/7pSrdOTjrqYhkD0rnBzZE6qiwPWA0fsq/Ig+gAU=;
+        b=qElD0nGptQO4d5U4icvmkxRPze4zkw8T5nITuq2CJ3NAoim/A7H2VCs5KmyfYmgVjP
+         Qjlyxn+oTHT03jlEabF8sslzpFRPgJXF0q6cH08Ng0Zs75M4LQMwZEB7yQqEArBSQjn7
+         QcBPdULWeGd1CKL/pSbMqc8wY6FAbX529h9WVfl1EVkevAj09dxJnXWAdAiFQUwJwLS1
+         YVasQwzrAVDDd4tA9/FJkEfqnGnn39XrbMdFSJRAthEl+IX6pDtcp7sfvPeZ6fF/EwmB
+         RXRA0hYu3q0HHarA1T7KQmIaZ91C+cbPKmPvxggjX5ElNLx4bawB9VUzKF5TuKb5/Wtm
+         fhUA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=5Rx/7pSrdOTjrqYhkD0rnBzZE6qiwPWA0fsq/Ig+gAU=;
+        b=uoVG9UO39GH+ICk5YGZtsjb7stJ26TSUrErj5w6bIM9LfmrAody/NR23bufcNgtpGO
+         TQJnDLSCiAVF3dlyyK8lmA26TSH+YRO2DlEU12K2WLKyZTylp17Fo9vhbLHKcbQhgoWq
+         AwXzq94Ndqvl1Vnhp+s73w/16ARP7UEMORHwoqsobzlf5LxT4iZH9V9je131uc2HaFQ4
+         vRuQsb6zxWfYBk7IMcSg+B6ejT4fW1mETsosGowMrbDxzOc1lcKOj+ZUDDlE0duTdpYu
+         2aJVXv+GrcwRAICb1UHc0Avrr/tUrGjMH6328rQitASVv7QDMxNKllkn0DPj9Oyw1jgd
+         TbuA==
+X-Gm-Message-State: AOAM533awhK4cmoTTSPlpqAYQ2aMLszOyl3NKfbqnP7XmbypGzpxcS4I
+        tJtozpCC85zP34tykxR0jGpnYg==
+X-Google-Smtp-Source: ABdhPJxFoch6bgHpPlK19OfXQhArjeTBWax5ZS4JHCVF4ImqcGbfNd87Wsh3hWG62bOhbKqRAG72qw==
+X-Received: by 2002:a17:902:9a0a:b029:e6:bf00:8a36 with SMTP id v10-20020a1709029a0ab02900e6bf008a36mr30106258plp.51.1618938839090;
+        Tue, 20 Apr 2021 10:13:59 -0700 (PDT)
+Received: from google.com (240.111.247.35.bc.googleusercontent.com. [35.247.111.240])
+        by smtp.gmail.com with ESMTPSA id d18sm2871703pjx.46.2021.04.20.10.13.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 20 Apr 2021 10:13:58 -0700 (PDT)
+Date:   Tue, 20 Apr 2021 17:13:54 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     "Kirill A. Shutemov" <kirill@shutemov.name>
+Cc:     "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Jim Mattson <jmattson@google.com>,
+        David Rientjes <rientjes@google.com>,
+        "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>,
+        "Kleen, Andi" <andi.kleen@intel.com>,
+        "Yamahata, Isaku" <isaku.yamahata@intel.com>,
+        Erdem Aktas <erdemaktas@google.com>,
+        Steve Rutherford <srutherford@google.com>,
+        Peter Gonda <pgonda@google.com>,
+        David Hildenbrand <david@redhat.com>, x86@kernel.org,
+        kvm@vger.kernel.org, linux-mm@kvack.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [RFCv2 13/13] KVM: unmap guest memory using poisoned pages
+Message-ID: <YH8L0ihIzL6UB6qD@google.com>
+References: <20210416154106.23721-1-kirill.shutemov@linux.intel.com>
+ <20210416154106.23721-14-kirill.shutemov@linux.intel.com>
+ <YHnJtvXdrZE+AfM3@google.com>
+ <20210419142602.khjbzktk5tk5l6lk@box.shutemov.name>
+ <YH2pam5b837wFM3z@google.com>
+ <20210419164027.dqiptkebhdt5cfmy@box.shutemov.name>
+ <YH3HWeOXFiCTZN4y@google.com>
+ <20210419185354.v3rgandtrel7bzjj@box>
+ <YH3jaf5ThzLZdY4K@google.com>
+ <20210419225755.nsrtjfvfcqscyb6m@box.shutemov.name>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210419225755.nsrtjfvfcqscyb6m@box.shutemov.name>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tuesday, 2021-04-20 at 07:57:27 -07, Aaron Lewis wrote:
+On Tue, Apr 20, 2021, Kirill A. Shutemov wrote:
+> On Mon, Apr 19, 2021 at 08:09:13PM +0000, Sean Christopherson wrote:
+> > On Mon, Apr 19, 2021, Kirill A. Shutemov wrote:
+> > > The critical question is whether we ever need to translate hva->pfn after
+> > > the page is added to the guest private memory. I believe we do, but I
+> > > never checked. And that's the reason we need to keep hwpoison entries
+> > > around, which encode pfn.
+> > 
+> > As proposed in the TDX RFC, KVM would "need" the hva->pfn translation if the
+> > guest private EPT entry was zapped, e.g. by NUMA balancing (which will fail on
+> > the backend).  But in that case, KVM still has the original PFN, the "new"
+> > translation becomes a sanity check to make sure that the zapped translation
+> > wasn't moved unexpectedly.
+> > 
+> > Regardless, I don't see what that has to do with kvm_pfn_map.  At some point,
+> > gup() has to fault in the page or look at the host PTE value.  For the latter,
+> > at least on x86, we can throw info into the PTE itself to tag it as guest-only.
+> > No matter what implementation we settle on, I think we've failed if we end up in
+> > a situation where the primary MMU has pages it doesn't know are guest-only.
+> 
+> I try to understand if it's a problem if KVM sees a guest-only PTE, but
+> it's for other VM. Like two VM's try to use the same tmpfs file as guest
+> memory. We cannot insert the pfn into two TD/SEV guest at once, but can it
+> cause other problems? I'm not sure.
 
->> >> Why not add a new exit reason, particularly given that the caller has to
->> >> enable the capability to get the relevant data? (It would also remove
->> >> the need for the flag field and any mechanism for packing multiple bits
->> >> of detail into the structure.)
->> >
->> > I considered that, but I opted for the extensibility of the exiting
->> > KVM_EXIT_INTERNAL_ERROR instead.  To me it was six of one or half a
->> > dozen of the other.  With either strategy I still wanted to provide
->> > for future extensibility, and had a flags field in place.  That way we
->> > can add to this in the future if we find something that is missing
->> > (ie: potentially wanting a way to mark dirty pages, possibly passing a
->> > fault address, etc...)
->>
->> How many of the flag based optional fields do you anticipate needing for
->> any one particular exit scenario?
->>
->> If it's one, then using the flags to disambiguate the emulation failure
->> cases after choosing to stuff all of the cases into
->> KVM_EXIT_INTERNAL_ERROR / KVM_INTERNAL_ERROR_EMULATION would be odd.
->>
->> (I'm presuming that it's not one, but don't understand the use case.)
->>
->
-> The motivation was to allow for maximum flexibility in the future, and
-> not be tied down to something we potentially missed now.  I agree the
-> flags aren't needed if we are only adding to what's currently there,
-> but they are needed if we want to remove something or pack something
-> differently.  I didn't see how I could achieve that without adding a
-> flags field.  Seemed like low overhead to be more future proof.
+For TDX and SNP, "firmware" will prevent assigning the same PFN to multiple VMs.
 
-With what you have now, the ndata field seems unnecessary - I should be
-able to determine the contents of the rest of the structure based on the
-flags. That also suggests to me that using something other than
-KVM_INTERNAL_ERROR_EMULATION would make sense.
+For SEV and SEV-ES, the PSP (what I'm calling "firmware") will not prevent
+assigning the same page to multiple guests.  But the failure mode in that case,
+assuming the guests have different ASIDs, is limited to corruption of the guest.
 
-This comment:
+On the other hand, for SEV/SEV-ES it's not invalid to assign the same ASID to
+multiple guests (there's an in-flight patch to do exactly that[*]), and sharing
+PFNs between guests with the same ASID would also be valid.  In other words, if
+we want to enforce PFN association in the kernel, I think the association should
+be per-ASID, not per-KVM guest.
 
->> >> > + * When using the suberror KVM_INTERNAL_ERROR_EMULATION, these flags are used
->> >> > + * to describe what is contained in the exit struct.  The flags are used to
->> >> > + * describe it's contents, and the contents should be in ascending numerical
->> >> > + * order of the flag values.  For example, if the flag
->> >> > + * KVM_INTERNAL_ERROR_EMULATION_FLAG_INSTRUCTION_BYTES is set, the instruction
->> >> > + * length and instruction bytes would be expected to show up first because this
->> >> > + * flag has the lowest numerical value (1) of all the other flags.
+So, I don't think we _need_ to rely on the TDX/SNP behavior, but if leveraging
+firmware to handle those checks means avoiding additional complexity in the
+kernel, then I think it's worth leaning on firmware even if it means SEV/SEV-ES
+don't enjoy the same level of robustness.
 
-originally made me think that the flag-indicated elements were going to
-be packed into the remaining space of the structure at a position
-depending on which flags are set.
-
-For example, if I add a new flag
-KVM_INTERNAL_ERROR_EMULATION_FLAG_EXIT_CODE, value 2, and then want to
-pass back an exit code but *not* instruction bytes, the comment appears
-to suggest that the exit code will appear immediately after the flags.
-
-This is contradicted by your other reply:
-
->> > Just add the fields you need to
->> > the end of emulation_failure struct, increase 'ndata' to the new
->> > count, add a new flag to 'flags' so we know its contents.
-
-Given this, the ordering of flag values does not seem significant - the
-structure elements corresponding to a flag value will always be present,
-just not filled with relevant data.
-
-dme.
--- 
-When you were the brightest star, who were the shadows?
+[*] https://lkml.kernel.org/r/20210408223214.2582277-1-natet@google.com
