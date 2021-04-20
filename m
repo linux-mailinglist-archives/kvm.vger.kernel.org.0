@@ -2,187 +2,215 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5029C365334
-	for <lists+kvm@lfdr.de>; Tue, 20 Apr 2021 09:23:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1784A365387
+	for <lists+kvm@lfdr.de>; Tue, 20 Apr 2021 09:49:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229760AbhDTHXi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 20 Apr 2021 03:23:38 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:38427 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229471AbhDTHXi (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 20 Apr 2021 03:23:38 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1618903386;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=iOjPfwXb4OBqjnrtphdyCIjJaLUOZwAgc5HsS5Qcaz4=;
-        b=hG/lCxzyq5/BoP6KjfiNdHAoPHFVLzNrxg9fVR+nlpco45R1AbCETegn6JQ+aq0Rw2E8Sa
-        BwiWa92Pm2XwOR+OsBhXonKWSd/wTF4hwTzHNUJNr2aN0heG6CFZ7/sBV3KkcMhuihBnaB
-        TC0oGbUeR3DY0ArJBC8JZedecCCN4kI=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-422-0W2MwGJqOOOpcLO2rYBZxg-1; Tue, 20 Apr 2021 03:22:55 -0400
-X-MC-Unique: 0W2MwGJqOOOpcLO2rYBZxg-1
-Received: by mail-ej1-f69.google.com with SMTP id z6-20020a17090665c6b02903700252d1ccso4403710ejn.10
-        for <kvm@vger.kernel.org>; Tue, 20 Apr 2021 00:22:55 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=iOjPfwXb4OBqjnrtphdyCIjJaLUOZwAgc5HsS5Qcaz4=;
-        b=e+ozmCy2aZuHEgZekKwVG0lqW1gRXzWBW9BXAvZvhMQEBJlYCH92pb2L7glXvR8YvN
-         9CHqLKESdJOqSfwyO1TQ+oj3WidfgwRSoQTcyHgJoIpeWWVp7Cjgw9Ji4bU3/gQm4UGJ
-         t61Azqv5Rybgh8q9Law6D6+C5Y2WpGVKgLxWn1bqD6L95Ou6tL57YUkVIBdhadtX0ZzT
-         01M6WydnmyAPyeQzqlj1089tGM1wOsxdIWYdzMQKnHeNlgaK37flZ9GbcSKCQo+D9zsv
-         2s16BSdgc6k6JdcG90X4eIVYJ86Qj3NNowdVmDledCeVdinCj2vcGVpa2/tfyMnhvP5/
-         IAnQ==
-X-Gm-Message-State: AOAM533S2EJa5wfkDzkuEdJCxYPWoocq3tcBLHSxGj2EHVKppp42nWF5
-        BVZrZOXdAhdat/zeQMbA520VK8o2vqOTcoEDQr8yaAXIjdAiYQn7mXWLSULT36fM6v54GWev19O
-        StJJrrDFqZow4
-X-Received: by 2002:a17:906:c1c5:: with SMTP id bw5mr4745268ejb.510.1618903374225;
-        Tue, 20 Apr 2021 00:22:54 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJy2QJROIdRPM2hmECvsC+4FwFOAwe2nIQpMN/ME3nb0Np6MQ8btKb9/VyXKn+NHnIEEkgpirQ==
-X-Received: by 2002:a17:906:c1c5:: with SMTP id bw5mr4745246ejb.510.1618903373975;
-        Tue, 20 Apr 2021 00:22:53 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id p4sm14795453edr.43.2021.04.20.00.22.52
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 20 Apr 2021 00:22:53 -0700 (PDT)
-Subject: Re: [PATCH] KVM: Boost vCPU candidiate in user mode which is
- delivering interrupt
-To:     Wanpeng Li <kernellwp@gmail.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>
-References: <1618542490-14756-1-git-send-email-wanpengli@tencent.com>
- <9c49c6ff-d896-e6a5-c051-b6707f6ec58a@redhat.com>
- <CANRm+Cy-xmDRQoUfOYm+GGvWiS+qC_sBjyZmcLykbKqTF2YDxQ@mail.gmail.com>
- <YH2wnl05UBqVhcHr@google.com>
- <c1909fa3-61f3-de6b-1aa1-8bc36285e1e4@redhat.com>
- <CANRm+CwQ266j6wTxqFZtGhp_HfQZ7Y_e843hzROqNUxf9BcaFA@mail.gmail.com>
- <CANRm+CyHX-_vQLck1a9wpCv8a-YnnemEWm+zVv4eWYby5gdAeg@mail.gmail.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <b2fca9a5-9b2b-b8f2-0d1e-fc8b9d9b5659@redhat.com>
-Date:   Tue, 20 Apr 2021 09:22:51 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.7.0
+        id S229843AbhDTHuG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 20 Apr 2021 03:50:06 -0400
+Received: from szxga06-in.huawei.com ([45.249.212.32]:17378 "EHLO
+        szxga06-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229475AbhDTHuF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 20 Apr 2021 03:50:05 -0400
+Received: from DGGEMS403-HUB.china.huawei.com (unknown [172.30.72.60])
+        by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4FPbPh51SJzjZrS;
+        Tue, 20 Apr 2021 15:47:36 +0800 (CST)
+Received: from [10.174.187.224] (10.174.187.224) by
+ DGGEMS403-HUB.china.huawei.com (10.3.19.203) with Microsoft SMTP Server id
+ 14.3.498.0; Tue, 20 Apr 2021 15:49:26 +0800
+Subject: Re: [RFC PATCH v2 2/2] KVM: x86: Not wr-protect huge page with
+ init_all_set dirty log
+To:     Ben Gardon <bgardon@google.com>
+References: <20210416082511.2856-1-zhukeqian1@huawei.com>
+ <20210416082511.2856-3-zhukeqian1@huawei.com>
+ <CANgfPd_WzX6Fm7BiMoBoehuLL8tjh4WEqehUhF8biPyL8vS4XQ@mail.gmail.com>
+CC:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
+        "Paolo Bonzini" <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        <wanghaibin.wang@huawei.com>
+From:   Keqian Zhu <zhukeqian1@huawei.com>
+Message-ID: <49e6bf4f-0142-c9ea-a8c1-7cfe211c8d7b@huawei.com>
+Date:   Tue, 20 Apr 2021 15:49:26 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
+ Thunderbird/45.7.1
 MIME-Version: 1.0
-In-Reply-To: <CANRm+CyHX-_vQLck1a9wpCv8a-YnnemEWm+zVv4eWYby5gdAeg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+In-Reply-To: <CANgfPd_WzX6Fm7BiMoBoehuLL8tjh4WEqehUhF8biPyL8vS4XQ@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.174.187.224]
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 20/04/21 08:08, Wanpeng Li wrote:
-> On Tue, 20 Apr 2021 at 14:02, Wanpeng Li <kernellwp@gmail.com> wrote:
+Hi Ben,
+
+On 2021/4/20 3:20, Ben Gardon wrote:
+> On Fri, Apr 16, 2021 at 1:25 AM Keqian Zhu <zhukeqian1@huawei.com> wrote:
 >>
->> On Tue, 20 Apr 2021 at 00:59, Paolo Bonzini <pbonzini@redhat.com> wrote:
->>>
->>> On 19/04/21 18:32, Sean Christopherson wrote:
->>>> If false positives are a big concern, what about adding another pass to the loop
->>>> and only yielding to usermode vCPUs with interrupts in the second full pass?
->>>> I.e. give vCPUs that are already in kernel mode priority, and only yield to
->>>> handle an interrupt if there are no vCPUs in kernel mode.
->>>>
->>>> kvm_arch_dy_runnable() pulls in pv_unhalted, which seems like a good thing.
->>>
->>> pv_unhalted won't help if you're waiting for a kernel spinlock though,
->>> would it?  Doing two passes (or looking for a "best" candidate that
->>> prefers kernel mode vCPUs to user mode vCPUs waiting for an interrupt)
->>> seems like the best choice overall.
+>> Currently during start dirty logging, if we're with init-all-set,
+>> we write protect huge pages and leave normal pages untouched, for
+>> that we can enable dirty logging for these pages lazily.
 >>
->> How about something like this:
+>> Actually enable dirty logging lazily for huge pages is feasible
+>> too, which not only reduces the time of start dirty logging, also
+>> greatly reduces side-effect on guest when there is high dirty rate.
+>>
+>> Signed-off-by: Keqian Zhu <zhukeqian1@huawei.com>
+>> ---
+>>  arch/x86/kvm/mmu/mmu.c | 48 ++++++++++++++++++++++++++++++++++++++----
+>>  arch/x86/kvm/x86.c     | 37 +++++++++-----------------------
+>>  2 files changed, 54 insertions(+), 31 deletions(-)
+>>
+>> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+>> index 2ce5bc2ea46d..98fa25172b9a 100644
+>> --- a/arch/x86/kvm/mmu/mmu.c
+>> +++ b/arch/x86/kvm/mmu/mmu.c
+>> @@ -1188,8 +1188,7 @@ static bool __rmap_clear_dirty(struct kvm *kvm, struct kvm_rmap_head *rmap_head,
+>>   * @gfn_offset: start of the BITS_PER_LONG pages we care about
+>>   * @mask: indicates which pages we should protect
+>>   *
+>> - * Used when we do not need to care about huge page mappings: e.g. during dirty
+>> - * logging we do not have any such mappings.
+>> + * Used when we do not need to care about huge page mappings.
+>>   */
+>>  static void kvm_mmu_write_protect_pt_masked(struct kvm *kvm,
+>>                                      struct kvm_memory_slot *slot,
+>> @@ -1246,13 +1245,54 @@ static void kvm_mmu_clear_dirty_pt_masked(struct kvm *kvm,
+>>   * It calls kvm_mmu_write_protect_pt_masked to write protect selected pages to
+>>   * enable dirty logging for them.
+>>   *
+>> - * Used when we do not need to care about huge page mappings: e.g. during dirty
+>> - * logging we do not have any such mappings.
+>> + * We need to care about huge page mappings: e.g. during dirty logging we may
+>> + * have any such mappings.
+>>   */
+>>  void kvm_arch_mmu_enable_log_dirty_pt_masked(struct kvm *kvm,
+>>                                 struct kvm_memory_slot *slot,
+>>                                 gfn_t gfn_offset, unsigned long mask)
+>>  {
+>> +       gfn_t start, end;
+>> +
+>> +       /*
+>> +        * Huge pages are NOT write protected when we start dirty log with
+>> +        * init-all-set, so we must write protect them at here.
+>> +        *
+>> +        * The gfn_offset is guaranteed to be aligned to 64, but the base_gfn
+>> +        * of memslot has no such restriction, so the range can cross two large
+>> +        * pages.
+>> +        */
+>> +       if (kvm_dirty_log_manual_protect_and_init_set(kvm)) {
+>> +               start = slot->base_gfn + gfn_offset + __ffs(mask);
+>> +               end = slot->base_gfn + gfn_offset + __fls(mask);
+>> +               kvm_mmu_slot_gfn_write_protect(kvm, slot, start, PG_LEVEL_2M);
+>> +
+>> +               /* Cross two large pages? */
+>> +               if (ALIGN(start << PAGE_SHIFT, PMD_SIZE) !=
+>> +                   ALIGN(end << PAGE_SHIFT, PMD_SIZE))
+>> +                       kvm_mmu_slot_gfn_write_protect(kvm, slot, end,
+>> +                                                      PG_LEVEL_2M);
+>> +       }
+>> +
+>> +       /*
+>> +        * RFC:
+>> +        *
+>> +        * 1. I don't return early when kvm_mmu_slot_gfn_write_protect() returns
+>> +        * true, because I am not very clear about the relationship between
+>> +        * legacy mmu and tdp mmu. AFAICS, the code logic is NOT an if/else
+>> +        * manner.
+>> +        *
+>> +        * The kvm_mmu_slot_gfn_write_protect() returns true when we hit a
+>> +        * writable large page mapping in legacy mmu mapping or tdp mmu mapping.
+>> +        * Do we still have normal mapping in that case? (e.g. We have large
+>> +        * mapping in legacy mmu and normal mapping in tdp mmu).
+> 
+> Right, we can't return early because the two MMUs could map the page
+> in different ways, but each MMU could also map the page in multiple
+> ways independently.
+> For example, if the legacy MMU was being used and we were running a
+> nested VM, a page could be mapped 2M in EPT01 and 4K in EPT02, so we'd
+> still need kvm_mmu_slot_gfn_write_protect  calls for both levels.
+> I don't think there's a case where we can return early here with the
+> information that the first calls to kvm_mmu_slot_gfn_write_protect
+> access.
+Thanks for the detailed explanation.
 
-I was thinking of something simpler:
+> 
+>> +        *
+>> +        * 2. kvm_mmu_slot_gfn_write_protect() doesn't tell us whether the large
+>> +        * page mapping exist. If it exists but is clean, we can return early.
+>> +        * However, we have to do invasive change.
+> 
+> What do you mean by invasive change?
+We need the kvm_mmu_slot_gfn_write_protect to report whether all mapping are large
+and clean, so we can return early. However it's not a part of semantics of this function.
 
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 9b8e30dd5b9b..455c648f9adc 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -3198,10 +3198,9 @@ void kvm_vcpu_on_spin(struct kvm_vcpu *me, bool yield_to_kernel_mode)
-  {
-  	struct kvm *kvm = me->kvm;
-  	struct kvm_vcpu *vcpu;
--	int last_boosted_vcpu = me->kvm->last_boosted_vcpu;
-  	int yielded = 0;
-  	int try = 3;
--	int pass;
-+	int pass, num_passes = 1;
-  	int i;
-  
-  	kvm_vcpu_set_in_spin_loop(me, true);
-@@ -3212,13 +3211,14 @@ void kvm_vcpu_on_spin(struct kvm_vcpu *me, bool yield_to_kernel_mode)
-  	 * VCPU is holding the lock that we need and will release it.
-  	 * We approximate round-robin by starting at the last boosted VCPU.
-  	 */
--	for (pass = 0; pass < 2 && !yielded && try; pass++) {
--		kvm_for_each_vcpu(i, vcpu, kvm) {
--			if (!pass && i <= last_boosted_vcpu) {
--				i = last_boosted_vcpu;
--				continue;
--			} else if (pass && i > last_boosted_vcpu)
--				break;
-+	for (pass = 0; pass < num_passes; pass++) {
-+		int idx = me->kvm->last_boosted_vcpu;
-+		int n = atomic_read(&kvm->online_vcpus);
-+		for (i = 0; i < n; i++, idx++) {
-+			if (idx == n)
-+				idx = 0;
-+
-+			vcpu = kvm_get_vcpu(kvm, idx);
-  			if (!READ_ONCE(vcpu->ready))
-  				continue;
-  			if (vcpu == me)
-@@ -3226,23 +3226,36 @@ void kvm_vcpu_on_spin(struct kvm_vcpu *me, bool yield_to_kernel_mode)
-  			if (rcuwait_active(&vcpu->wait) &&
-  			    !vcpu_dy_runnable(vcpu))
-  				continue;
--			if (READ_ONCE(vcpu->preempted) && yield_to_kernel_mode &&
--				!kvm_arch_vcpu_in_kernel(vcpu))
--				continue;
-  			if (!kvm_vcpu_eligible_for_directed_yield(vcpu))
-  				continue;
-  
-+			if (READ_ONCE(vcpu->preempted) && yield_to_kernel_mode &&
-+			    !kvm_arch_vcpu_in_kernel(vcpu)) {
-+			    /*
-+			     * A vCPU running in userspace can get to kernel mode via
-+			     * an interrupt.  That's a worse choice than a CPU already
-+			     * in kernel mode so only do it on a second pass.
-+			     */
-+			    if (!vcpu_dy_runnable(vcpu))
-+				    continue;
-+			    if (pass == 0) {
-+				    num_passes = 2;
-+				    continue;
-+			    }
-+			}
-+
-  			yielded = kvm_vcpu_yield_to(vcpu);
-  			if (yielded > 0) {
-  				kvm->last_boosted_vcpu = i;
--				break;
-+				goto done;
-  			} else if (yielded < 0) {
-  				try--;
-  				if (!try)
--					break;
-+					goto done;
-  			}
-  		}
-  	}
-+done:
-  	kvm_vcpu_set_in_spin_loop(me, false);
-  
-  	/* Ensure vcpu is not eligible during next spinloop */
+If this is the final code, compared to old code, we have an extra gfn_write_protect(),
+I don't whether it's acceptable?
 
-Paolo
+Thanks,
+Keqian
 
+
+> 
+>> +        */
+>> +
+>> +       /* Then we can handle the PT level pages */
+>>         if (kvm_x86_ops.cpu_dirty_log_size)
+>>                 kvm_mmu_clear_dirty_pt_masked(kvm, slot, gfn_offset, mask);
+>>         else
+>> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+>> index eca63625aee4..dfd676ffa7da 100644
+>> --- a/arch/x86/kvm/x86.c
+>> +++ b/arch/x86/kvm/x86.c
+>> @@ -10888,36 +10888,19 @@ static void kvm_mmu_slot_apply_flags(struct kvm *kvm,
+>>                  */
+>>                 kvm_mmu_zap_collapsible_sptes(kvm, new);
+>>         } else {
+>> -               /* By default, write-protect everything to log writes. */
+>> -               int level = PG_LEVEL_4K;
+>> +               /*
+>> +                * If we're with initial-all-set, we don't need to write protect
+>> +                * any page because they're reported as dirty already.
+>> +                */
+>> +               if (kvm_dirty_log_manual_protect_and_init_set(kvm))
+>> +                       return;
+>>
+>>                 if (kvm_x86_ops.cpu_dirty_log_size) {
+>> -                       /*
+>> -                        * Clear all dirty bits, unless pages are treated as
+>> -                        * dirty from the get-go.
+>> -                        */
+>> -                       if (!kvm_dirty_log_manual_protect_and_init_set(kvm))
+>> -                               kvm_mmu_slot_leaf_clear_dirty(kvm, new);
+>> -
+>> -                       /*
+>> -                        * Write-protect large pages on write so that dirty
+>> -                        * logging happens at 4k granularity.  No need to
+>> -                        * write-protect small SPTEs since write accesses are
+>> -                        * logged by the CPU via dirty bits.
+>> -                        */
+>> -                       level = PG_LEVEL_2M;
+>> -               } else if (kvm_dirty_log_manual_protect_and_init_set(kvm)) {
+>> -                       /*
+>> -                        * If we're with initial-all-set, we don't need
+>> -                        * to write protect any small page because
+>> -                        * they're reported as dirty already.  However
+>> -                        * we still need to write-protect huge pages
+>> -                        * so that the page split can happen lazily on
+>> -                        * the first write to the huge page.
+>> -                        */
+>> -                       level = PG_LEVEL_2M;
+>> +                       kvm_mmu_slot_leaf_clear_dirty(kvm, new);
+>> +                       kvm_mmu_slot_remove_write_access(kvm, new, PG_LEVEL_2M);
+>> +               } else {
+>> +                       kvm_mmu_slot_remove_write_access(kvm, new, PG_LEVEL_4K);
+>>                 }
+>> -               kvm_mmu_slot_remove_write_access(kvm, new, level);
+>>         }
+>>  }
+>>
+>> --
+>> 2.23.0
+>>
+> .
+> 
