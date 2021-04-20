@@ -2,96 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D75FE365C41
-	for <lists+kvm@lfdr.de>; Tue, 20 Apr 2021 17:32:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 97195365C59
+	for <lists+kvm@lfdr.de>; Tue, 20 Apr 2021 17:39:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232764AbhDTPdB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 20 Apr 2021 11:33:01 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:47097 "EHLO
+        id S233019AbhDTPkP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 20 Apr 2021 11:40:15 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:53004 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232504AbhDTPc7 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 20 Apr 2021 11:32:59 -0400
+        by vger.kernel.org with ESMTP id S233022AbhDTPkN (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 20 Apr 2021 11:40:13 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1618932747;
+        s=mimecast20190719; t=1618933181;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=VzIaFG2wDVdYEizwLnnsRmeoa1MCm+iU4UbjuWNpwW0=;
-        b=anQNL0wjSuL+tM5fUdujq03WYaqY6ZeMd0MNBcTP2U6f2d3oO5DF3aTtX/rHPNZ2pMFXfx
-        kY4MnYw7F8BZHyFfJLVL1l7b0UNIZeDExyfh8mgp2y9PmuNwJEw4hRk6eEtLIpCa5zqqjU
-        deAmLd2xi06YJfFlIm7uOhg+4S8HQqY=
-Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com
- [209.85.160.198]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-479-CXMuNUbKNYKwuJsbh16QLA-1; Tue, 20 Apr 2021 11:32:26 -0400
-X-MC-Unique: CXMuNUbKNYKwuJsbh16QLA-1
-Received: by mail-qt1-f198.google.com with SMTP id y10-20020a05622a004ab029019d4ad3437cso11282087qtw.12
-        for <kvm@vger.kernel.org>; Tue, 20 Apr 2021 08:32:26 -0700 (PDT)
+         content-transfer-encoding:content-transfer-encoding;
+        bh=coXw7bSB92l2OSOi2Pskhossq8vZZCyQYfDdNtE51LI=;
+        b=dOEt/yAUasv/0PvUhQPYQRPHrt8eAJsHHfxMsqZjwqDAwnLaT9wo4QUU7Ob8ZKwxCrwexi
+        fcaI5VnjjghSSnk5ieVBYKwN7Z8XDky6OEz4spGE9peVlXlBsHSPBrSWTCsUaz2FYUHWCQ
+        c6uHCRHAcnBqzi0jncO+6YACboNFuHE=
+Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
+ [209.85.219.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-576-D5jmD-_QNS-TNVQZfn9jwA-1; Tue, 20 Apr 2021 11:39:32 -0400
+X-MC-Unique: D5jmD-_QNS-TNVQZfn9jwA-1
+Received: by mail-qv1-f70.google.com with SMTP id m19-20020a0cdb930000b029019a25080c40so11634892qvk.11
+        for <kvm@vger.kernel.org>; Tue, 20 Apr 2021 08:39:32 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=VzIaFG2wDVdYEizwLnnsRmeoa1MCm+iU4UbjuWNpwW0=;
-        b=ui0tBaKTyPeLyoBlrS4BJmIA7cAKn5Vgs6aAT56VS5N8xNmdpOJUyvlF2rLBu0iOVJ
-         5OPyCHUWAzvSfXwOIplMwGL2kAN9A6dIbhChj9NSI3p/v6BvZtKbScDpHoJbPcs3pdHl
-         gamK8SpaLSz4IAL8CznJ1y2Vo96yncgxKbEN840em7QIwiBwLGq2vSgJU5LWb/FGKyVa
-         WbzobWImmvNAV5vYRcrlZbcaxN5drI70H8JJoFgmUaip3tMQVNTc/i1Ej7Aga0E2QlMA
-         sIzwzctGq4aMpKIKiBMDpk9ZJbd7J4WjMJO12gn5OfYhSKx2iClbzIWNV/6FM6S0Aqo/
-         /XOw==
-X-Gm-Message-State: AOAM531MNcuksbz8/bHLzeFa6EEBmJDpj/uNTnzv+DhlO8C9onEw5wvb
-        HskaGivusI4qlpLEr+SqlXeS+VnLREJY6G9iOEuYeIslWbNsPMu91i/cXnOpJixGNFL1KL0yGRu
-        uteMXMxJ1x88b
-X-Received: by 2002:a37:e108:: with SMTP id c8mr18492837qkm.499.1618932745573;
-        Tue, 20 Apr 2021 08:32:25 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzTKbZtJzki1RdMo4jaIwSDT4vU8zynoJCipKGsXfaSJHphwrc9cgg+bXzWrjtb96DzF1vjiQ==
-X-Received: by 2002:a37:e108:: with SMTP id c8mr18492812qkm.499.1618932745353;
-        Tue, 20 Apr 2021 08:32:25 -0700 (PDT)
-Received: from xz-x1 (bras-base-toroon474qw-grc-88-174-93-75-154.dsl.bell.ca. [174.93.75.154])
-        by smtp.gmail.com with ESMTPSA id f8sm4135429qkh.83.2021.04.20.08.32.24
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=coXw7bSB92l2OSOi2Pskhossq8vZZCyQYfDdNtE51LI=;
+        b=mH1kkGrMB/LBSNUwbZ5BU444G4lf/UEePA9Z+aAZl7hfcEltZPHCGS++jiOw3m5YJ7
+         m2aydhSmsT6rCNpT+hL2x3rr/nEdE+ay3Qd8Oym0td+wxY4xl5xvf8NdB0/iiEKJC/m2
+         4bLpGN67s0Qy7Xw89XSr10KE4J2pla/t9oww1BveWQeTCoB6t8X62+DgXc67Ye/eJfIy
+         UhQdxUXOw28Wv9+UsCXehhA4YUgWJNFjREdtQLsU5e2Y6G19Jc+446q3H6zknXorVCfv
+         aHVEBWYYnJ3cTAqIIXkyERxiyRqr+tvYStu6rubfx5TdUIHXFrqYjkBjadkif1cQVFQ7
+         8EOA==
+X-Gm-Message-State: AOAM530WtdXRyUN5D1ZVf5X8yjicHXtG3jhoKznvABabwAH1XknBn9t9
+        mXA9PRFjG+rma+sDsyfJst6eb+ro2+ME76hFeqjnjXzTLpcYV7hYiUkii6KK81AxOugTpbdgHoD
+        JIkNbvsDXjOUyhWM2me7gLBlaqn+Vbgt54IUAigRhxZOp5QdV4q5aqWZjzrIMyg==
+X-Received: by 2002:ac8:4e16:: with SMTP id c22mr10856584qtw.354.1618933171911;
+        Tue, 20 Apr 2021 08:39:31 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyE/oMaWgtfj/To4K6pA6L6aSzn9oP92etGjIRHkk4pGYIgEbMrwLhaCy0IueXIi8VP6xiH0Q==
+X-Received: by 2002:ac8:4e16:: with SMTP id c22mr10856551qtw.354.1618933171631;
+        Tue, 20 Apr 2021 08:39:31 -0700 (PDT)
+Received: from xz-x1.redhat.com (bras-base-toroon474qw-grc-88-174-93-75-154.dsl.bell.ca. [174.93.75.154])
+        by smtp.gmail.com with ESMTPSA id f12sm11633325qtq.84.2021.04.20.08.39.30
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 20 Apr 2021 08:32:24 -0700 (PDT)
-Date:   Tue, 20 Apr 2021 11:32:23 -0400
+        Tue, 20 Apr 2021 08:39:31 -0700 (PDT)
 From:   Peter Xu <peterx@redhat.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        stable@vger.kernel.org
-Subject: Re: [PATCH] KVM: selftests: Always run vCPU thread with blocked
- SIG_IPI
-Message-ID: <20210420153223.GB4440@xz-x1>
-References: <20210420081614.684787-1-pbonzini@redhat.com>
- <20210420143739.GA4440@xz-x1>
+To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, peterx@redhat.com,
+        Sean Christopherson <seanjc@google.com>,
+        Andrew Jones <drjones@redhat.com>
+Subject: [PATCH v4 0/2] KVM: selftests: fix races in dirty log test
+Date:   Tue, 20 Apr 2021 11:39:27 -0400
+Message-Id: <20210420153929.482810-1-peterx@redhat.com>
+X-Mailer: git-send-email 2.26.2
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20210420143739.GA4440@xz-x1>
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Apr 20, 2021 at 10:37:39AM -0400, Peter Xu wrote:
-> On Tue, Apr 20, 2021 at 04:16:14AM -0400, Paolo Bonzini wrote:
-> > The main thread could start to send SIG_IPI at any time, even before signal
-> > blocked on vcpu thread.  Therefore, start the vcpu thread with the signal
-> > blocked.
-> > 
-> > Without this patch, on very busy cores the dirty_log_test could fail directly
-> > on receiving a SIGUSR1 without a handler (when vcpu runs far slower than main).
-> > 
-> > Reported-by: Peter Xu <peterx@redhat.com>
-> > Cc: stable@vger.kernel.org
-> > Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> 
-> Yes, indeed better! :)
-> 
-> Reviewed-by: Peter Xu <peterx@redhat.com>
-
-I just remembered one thing: this will avoid program quits, but still we'll get
-the signal missing.  From that pov I slightly prefer the old patch.  However
-not a big deal so far as only dirty ring uses SIG_IPI, so there's always ring
-full which will just delay the kick. It's just we need to remember this when we
-extend IPI to non-dirty-ring tests as the kick is prone to be lost then.
-
-Thanks,
-
--- 
-Peter Xu
+v4:=0D
+- add missing vcpu_handle_sync_stop() call in dirty ring test=0D
+=0D
+The other solution of patch 2 is here [1]=0D
+=0D
+I got another report that there seems to still be a race, but that one seem=
+s=0D
+extremely hard to trigger, even so far we don't know whether that could be=
+=0D
+ARM-only.  Since current fix should make sense already and fix real problem=
+s,=0D
+IMHO we don't need to wait for that.=0D
+=0D
+Paolo, I still kept the 2nd patch just for completeness, but feel free to=0D
+ignore the 2nd patch if you prefer the other version, and I'll follow your=
+=0D
+preference.=0D
+=0D
+Thanks!=0D
+=0D
+[1] https://lore.kernel.org/kvm/20210420081614.684787-1-pbonzini@redhat.com=
+/=0D
+=0D
+Peter Xu (2):=0D
+  KVM: selftests: Sync data verify of dirty logging with guest sync=0D
+  KVM: selftests: Wait for vcpu thread before signal setup=0D
+=0D
+ tools/testing/selftests/kvm/dirty_log_test.c | 70 +++++++++++++++++---=0D
+ 1 file changed, 59 insertions(+), 11 deletions(-)=0D
+=0D
+-- =0D
+2.26.2=0D
+=0D
 
