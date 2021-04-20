@@ -2,55 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id AD6D1365204
-	for <lists+kvm@lfdr.de>; Tue, 20 Apr 2021 08:02:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2A7A6365216
+	for <lists+kvm@lfdr.de>; Tue, 20 Apr 2021 08:09:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229960AbhDTGCv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 20 Apr 2021 02:02:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52412 "EHLO
+        id S229981AbhDTGJc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 20 Apr 2021 02:09:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53864 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229577AbhDTGCu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 20 Apr 2021 02:02:50 -0400
-Received: from mail-ot1-x336.google.com (mail-ot1-x336.google.com [IPv6:2607:f8b0:4864:20::336])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D508C061763;
-        Mon, 19 Apr 2021 23:02:19 -0700 (PDT)
-Received: by mail-ot1-x336.google.com with SMTP id o13-20020a9d404d0000b029028e0a0ae6b4so15806744oti.10;
-        Mon, 19 Apr 2021 23:02:19 -0700 (PDT)
+        with ESMTP id S229577AbhDTGJa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 20 Apr 2021 02:09:30 -0400
+Received: from mail-oi1-x22e.google.com (mail-oi1-x22e.google.com [IPv6:2607:f8b0:4864:20::22e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CEB58C061763;
+        Mon, 19 Apr 2021 23:08:59 -0700 (PDT)
+Received: by mail-oi1-x22e.google.com with SMTP id k18so32990289oik.1;
+        Mon, 19 Apr 2021 23:08:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=qt0lRKLsgtImiEowN6MCoMr9lqUeJDBLHkuJ/55/e98=;
-        b=joOeOfH7NiOFE/0XKIgGIHJgPnQwYp23K21ed17iU7dg50T0fzNgQoIPWDNC3AlzQt
-         lpSfy7m0ySvWg6PgQ9+Ag+PgkQARd+NQzBqgEMJTlZ5/l14220zPT23lvjwP78MuNn3Z
-         zm4c4ZB2yhdIYDL8ErVMvrMlmLIZ9qj8dZcFgZeBR+Syzt32EM5yWU+RLdh3rkVXxFW8
-         cZvW5nQTzeWGQsKs4pkH6ky0jnYeXbM2CnPhT+8Urkvwfx3Skd2hijerYL01xSciB9mk
-         DP5BiOWb/Si6hbrZ0Z9Il9XvlkN3mmBnWYLbTexDSxZEBxnrxOHPP1P5cDhU1AD4MmaB
-         I+AA==
+        bh=fjuizEiuZ1OYwihnIJO4mEbU4UOFwOFWRZt/pOleI5w=;
+        b=T1uXkT4Zg696s/bXD4aAJb4FCzs8hj7re4tttOM/ywPRlIDUYJ8pasbAklFBCw/Q1F
+         Mv3X7uUN2zeyWl7RRN/kGGL2DU7mWkLHSHwjXxZJ2KWQ5Cw2eBVs6cHrRdSYw+Qp1tFr
+         3GCsjhIV8wgO/H6M5fd91htKxl1dkB0OwCRXxLuZgEmM5+HHnUkzy5W10gQPniG/CRhc
+         dNtdCRyI8i4dtl90Q+isgaJBy9QqkR+5PZmsQGMv0l6+NDjT4YcCgLbcU9t2mojwyYwh
+         Xi+iLUPBdKgO9eA/sw2l66cmfx+Kw89t4lvHP+h5/kl3Cevl/uQNCehJBsRO1JxoKm5i
+         qZwg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=qt0lRKLsgtImiEowN6MCoMr9lqUeJDBLHkuJ/55/e98=;
-        b=j49Eqner5saUvUcgm5tLEHIsxBqkaJgezxVlujBsAny7uM+iTsuYZTj1p/4a8Oy1/s
-         H5D+kZIbI+JDB6+1dlMS24muk5+aklhwlm9OJpW7dHsmfO+Uyai1euofhqCbVH8XccOW
-         nCj3O3tbqKkukYo6fNityTYunwJQmxD9VXByhJKPDpso8oOcHEDK/AlEwbpU59kzs1xe
-         b0H6NNSZYQLd6vXJTVHeXkSh2bv3/MDVD7x5Aiz8NP94taaGC3nDVfOa7OxxNkuHAaDy
-         FjJ9hKjI5fn694l9F9Aeorh7OJZ0N0WS19gsFTSLpf4HDozP4LBEQQpzXBKZbvbFDOrm
-         0BQQ==
-X-Gm-Message-State: AOAM530D6YSMujS/GSXMQ+Ntc9lcgEZ+yIw2TCgvY0g0H22m9z8E4zZZ
-        8omYfKzUGD25Kjndqn/cSD9ReSTLX2HniVhmyt4=
-X-Google-Smtp-Source: ABdhPJy01S4bz+i/MSJiFM5wCIrqx6K4wHikx4zZZdKnntZ3F+W92lJPzs7GAnZVvyFP/Gtnc5QJ/i1cxdGJUzHkw90=
-X-Received: by 2002:a9d:7cc7:: with SMTP id r7mr6838781otn.254.1618898538926;
- Mon, 19 Apr 2021 23:02:18 -0700 (PDT)
+        bh=fjuizEiuZ1OYwihnIJO4mEbU4UOFwOFWRZt/pOleI5w=;
+        b=pdWdYExMj46EOa3svUf4PpmiDBRIVtGVA1EvllPVOzhxskHURfHzPTHZh3vzbzp0yR
+         sKQzqLSk1CNUtv6tttDInf8Y3Y5xXyhh9elthJQr9TVNYrQX+MBpyXhAnK2sOHLRIZUD
+         PD3el7tBhOh9x9ek36VVZEwiwh7TUCW+o9JHatpqgxRJO0L77ZAUwllat4TS0/t0m/dM
+         6xjRIlHyKN7TkC3IezLXBeJaSSbtonP3Vpg2vnVAKPSqPx+vKDobbyTe9TwC3mPkns1X
+         ooVsHcpAVVnoX6ho1vFkW24jQTrLbBQQhGVVKL2klYrq0/mz6LIL2sScZV/4/lTD9RyJ
+         5jgA==
+X-Gm-Message-State: AOAM530Mh/mwJnFlBOFNNpLKjPyjPuaNhU2JHVx9aZEfotVL0pCD6+gz
+        oWPh45Fx2r5tVChBB40UmaLa22HvpZT7RyfDHLA=
+X-Google-Smtp-Source: ABdhPJz3fgrI47OpA394gAWYwPn9ljExaSHjgpNO/qeXwRvA+qoFGnMN1h3VJh51dte1IwbeeIF1K7Bh2erwi49eFJg=
+X-Received: by 2002:aca:bb09:: with SMTP id l9mr1978200oif.33.1618898939329;
+ Mon, 19 Apr 2021 23:08:59 -0700 (PDT)
 MIME-Version: 1.0
 References: <1618542490-14756-1-git-send-email-wanpengli@tencent.com>
  <9c49c6ff-d896-e6a5-c051-b6707f6ec58a@redhat.com> <CANRm+Cy-xmDRQoUfOYm+GGvWiS+qC_sBjyZmcLykbKqTF2YDxQ@mail.gmail.com>
  <YH2wnl05UBqVhcHr@google.com> <c1909fa3-61f3-de6b-1aa1-8bc36285e1e4@redhat.com>
-In-Reply-To: <c1909fa3-61f3-de6b-1aa1-8bc36285e1e4@redhat.com>
+ <CANRm+CwQ266j6wTxqFZtGhp_HfQZ7Y_e843hzROqNUxf9BcaFA@mail.gmail.com>
+In-Reply-To: <CANRm+CwQ266j6wTxqFZtGhp_HfQZ7Y_e843hzROqNUxf9BcaFA@mail.gmail.com>
 From:   Wanpeng Li <kernellwp@gmail.com>
-Date:   Tue, 20 Apr 2021 14:02:07 +0800
-Message-ID: <CANRm+CwQ266j6wTxqFZtGhp_HfQZ7Y_e843hzROqNUxf9BcaFA@mail.gmail.com>
+Date:   Tue, 20 Apr 2021 14:08:48 +0800
+Message-ID: <CANRm+CyHX-_vQLck1a9wpCv8a-YnnemEWm+zVv4eWYby5gdAeg@mail.gmail.com>
 Subject: Re: [PATCH] KVM: Boost vCPU candidiate in user mode which is
  delivering interrupt
 To:     Paolo Bonzini <pbonzini@redhat.com>
@@ -65,25 +66,29 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 20 Apr 2021 at 00:59, Paolo Bonzini <pbonzini@redhat.com> wrote:
+On Tue, 20 Apr 2021 at 14:02, Wanpeng Li <kernellwp@gmail.com> wrote:
 >
-> On 19/04/21 18:32, Sean Christopherson wrote:
-> > If false positives are a big concern, what about adding another pass to the loop
-> > and only yielding to usermode vCPUs with interrupts in the second full pass?
-> > I.e. give vCPUs that are already in kernel mode priority, and only yield to
-> > handle an interrupt if there are no vCPUs in kernel mode.
+> On Tue, 20 Apr 2021 at 00:59, Paolo Bonzini <pbonzini@redhat.com> wrote:
 > >
-> > kvm_arch_dy_runnable() pulls in pv_unhalted, which seems like a good thing.
+> > On 19/04/21 18:32, Sean Christopherson wrote:
+> > > If false positives are a big concern, what about adding another pass to the loop
+> > > and only yielding to usermode vCPUs with interrupts in the second full pass?
+> > > I.e. give vCPUs that are already in kernel mode priority, and only yield to
+> > > handle an interrupt if there are no vCPUs in kernel mode.
+> > >
+> > > kvm_arch_dy_runnable() pulls in pv_unhalted, which seems like a good thing.
+> >
+> > pv_unhalted won't help if you're waiting for a kernel spinlock though,
+> > would it?  Doing two passes (or looking for a "best" candidate that
+> > prefers kernel mode vCPUs to user mode vCPUs waiting for an interrupt)
+> > seems like the best choice overall.
 >
-> pv_unhalted won't help if you're waiting for a kernel spinlock though,
-> would it?  Doing two passes (or looking for a "best" candidate that
-> prefers kernel mode vCPUs to user mode vCPUs waiting for an interrupt)
-> seems like the best choice overall.
+> How about something like this:
 
-How about something like this:
+Sorry, should be the codes below:
 
 diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index 6b4dd95..8ba50be 100644
+index 6b4dd95..9bc5f87 100644
 --- a/include/linux/kvm_host.h
 +++ b/include/linux/kvm_host.h
 @@ -325,10 +325,12 @@ struct kvm_vcpu {
@@ -108,7 +113,7 @@ kvm_vcpu_set_in_spin_loop(struct kvm_vcpu *vcpu, bool val)
 +static inline void kvm_vcpu_set_pending_interrupt(struct kvm_vcpu
 *vcpu, bool val)
 +{
-+    vcpu->spin_loop.pending__interrupt = val;
++    vcpu->spin_loop.pending_interrupt = val;
 +}
 +
  static inline void kvm_vcpu_set_dy_eligible(struct kvm_vcpu *vcpu, bool val)
@@ -128,7 +133,7 @@ kvm_vcpu_set_in_spin_loop(struct kvm_vcpu *vcpu, bool val)
  {
  }
 diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 529cff1..42e0255 100644
+index 529cff1..bf6f1ec 100644
 --- a/virt/kvm/kvm_main.c
 +++ b/virt/kvm/kvm_main.c
 @@ -410,6 +410,7 @@ static void kvm_vcpu_init(struct kvm_vcpu *vcpu,
@@ -172,11 +177,11 @@ kvm_vcpu_eligible_for_directed_yield(struct kvm_vcpu *vcpu)
 
 -    eligible = !vcpu->spin_loop.in_spin_loop ||
 +    eligible = !(vcpu->spin_loop.in_spin_loop ||
-vcpu->spin_loop.has_interrupt) ||
+vcpu->spin_loop.pending_interrupt) ||
              vcpu->spin_loop.dy_eligible;
 
 -    if (vcpu->spin_loop.in_spin_loop)
-+    if (vcpu->spin_loop.in_spin_loop || vcpu->spin_loop.has_interrupt)
++    if (vcpu->spin_loop.in_spin_loop || vcpu->spin_loop.pending_interrupt)
          kvm_vcpu_set_dy_eligible(vcpu, !vcpu->spin_loop.dy_eligible);
 
      return eligible;
