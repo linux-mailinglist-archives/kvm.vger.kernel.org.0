@@ -2,97 +2,145 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3F03A365F8F
-	for <lists+kvm@lfdr.de>; Tue, 20 Apr 2021 20:40:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 102EB365FBB
+	for <lists+kvm@lfdr.de>; Tue, 20 Apr 2021 20:48:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233513AbhDTSlR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 20 Apr 2021 14:41:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51004 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233092AbhDTSlR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 20 Apr 2021 14:41:17 -0400
-Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AA6D5C06138A
-        for <kvm@vger.kernel.org>; Tue, 20 Apr 2021 11:40:45 -0700 (PDT)
-Received: by mail-pj1-x1034.google.com with SMTP id f6-20020a17090a6546b029015088cf4a1eso5101640pjs.2
-        for <kvm@vger.kernel.org>; Tue, 20 Apr 2021 11:40:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=4nTYHF9QS/Q9WoCJw/u+L5pBMc3V8p+wlC3603sKOj4=;
-        b=hvLe2o7sT3oWl/fEbgbgGtEJPUgJGw/6XpUZm+ms8RNBS7S+seOYlOjE+B+8CQlJVG
-         RNiTK9Y5SUuX0tiLOxru3FSd9RyW1tIrC3HBtNWp5T+Ncr9OsWKQkPAVrNcsEVxT6+tt
-         9EP7ewrMu69ERqjGZwqF+zRQ6vB/4MhO9oLIxKmAYu8hQJS4q2JuOPh9fJ+nazj4bcep
-         5MYz51YtM/Lo/VycEDI1qK7H3w/pdRUhJo2XK0dkP02mYFu5bpj0S+8tzx7cIjbyps1I
-         TD8jkRy6CjYu/9VLfonRj+2xk7qpk1QMte5LxwmmWYrf34g2COCG26A7vQL7FyYq0FQh
-         RO6w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=4nTYHF9QS/Q9WoCJw/u+L5pBMc3V8p+wlC3603sKOj4=;
-        b=s+0dPvEnoBJ5wz9oB2qJk8upoU8E1PwsmP74Zg7q0dw6mn6YJzwUkuWZKj3yNiIYFK
-         voUcdC6Ylmj0+in/syDj98frt955pYevmiOfyDl7H8GlchVacmTijYI+U0d/MC94P+UE
-         +uxyLJBEZQUHQH08EbgUlqdBDNhlWDArw8XfcPCdOQL05eUmWgtL05EmMb5phJEV9WRF
-         sURihZfCJrkXF06FY6Z4zGEdWo9NZf5mUzkzAZHlwDlVcfjoUb2AJfu7DIGQPjezAQTR
-         nlsBEhoRQQUqdIkwMUDXfiJWxNprYivQ//x6qmnzTgaItfZMzCNBfYYDRFeLBl0zUUbQ
-         3pNg==
-X-Gm-Message-State: AOAM532eGO+707Q25HLgb6YCC7QuEIbQMTeJ2TDjsybZ993AeXN5I56K
-        xHN7UFMZh7uS3n21fe0gwq4m6Q==
-X-Google-Smtp-Source: ABdhPJwLtV3eYPCTSS2TmLWh58OjIvh4AFl/89SXbnGqa8kyVZbG+76tU+3+IAk0u8RLkP+3xKxB1w==
-X-Received: by 2002:a17:90a:b292:: with SMTP id c18mr6745373pjr.179.1618944045026;
-        Tue, 20 Apr 2021 11:40:45 -0700 (PDT)
-Received: from google.com (240.111.247.35.bc.googleusercontent.com. [35.247.111.240])
-        by smtp.gmail.com with ESMTPSA id cv12sm2478514pjb.35.2021.04.20.11.40.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 20 Apr 2021 11:40:44 -0700 (PDT)
-Date:   Tue, 20 Apr 2021 18:40:41 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Ashish Kalra <ashish.kalra@amd.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, srutherford@google.com, joro@8bytes.org,
-        brijesh.singh@amd.com, thomas.lendacky@amd.com,
-        venu.busireddy@oracle.com, Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Borislav Petkov <bp@suse.de>,
-        x86@kernel.org
-Subject: Re: [PATCH 0/3] KVM: x86: guest interface for SEV live migration
-Message-ID: <YH8gKcxE+dfulftQ@google.com>
-References: <20210420112006.741541-1-pbonzini@redhat.com>
- <YH8P26OibEfxvJAu@google.com>
- <20210420181124.GA12798@ashkalra_ubuntu_server>
+        id S233664AbhDTSt3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 20 Apr 2021 14:49:29 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:31962 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S233381AbhDTSt2 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 20 Apr 2021 14:49:28 -0400
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 13KIYQNa084070;
+        Tue, 20 Apr 2021 14:48:11 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=jB43vwtE+c8Q+af2HVrjbesBeEhh0d8P1nMdh1RQ8CA=;
+ b=Uy6ngRLSykwccSAJzxP7fnc/1OfvjsemPsoyjXlBz1UHYjkW0qb1Gyo6yFoUwxtRxldY
+ C6XEJfTNhTRtJZuVvBTrZsPsI8mhxeuP85oIyh+q8/6OXE6AQEoV9cPG3pnx/7lnobn4
+ kMuTOQSclsDtQsM1SvVDB8cqJpuO5v0XwFhtKoBljBZU8G/gT7CmBSEnm2TKKqXHcbsN
+ 1Jp+o5ZJ6kn0G0MmzKi7aw6HV7FeEKYv313hk1gOAJc/De7bFbWbh+GkYlr5vkNtzu0v
+ BX0Z5d1YbUPKpIFDXJm1xKHLZXs8YZFad2iI7QOT/Vvf7uklEcPh29cYD/HLjzi9T7xX 0A== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3823ena0cr-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 20 Apr 2021 14:48:11 -0400
+Received: from m0098414.ppops.net (m0098414.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 13KIYgqD085523;
+        Tue, 20 Apr 2021 14:48:11 -0400
+Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3823ena0c8-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 20 Apr 2021 14:48:11 -0400
+Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
+        by ppma01fra.de.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 13KIkXp7023928;
+        Tue, 20 Apr 2021 18:48:09 GMT
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
+        by ppma01fra.de.ibm.com with ESMTP id 37yqa891uv-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 20 Apr 2021 18:48:09 +0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 13KIm6HW33816840
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 20 Apr 2021 18:48:07 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id D45FBAE059;
+        Tue, 20 Apr 2021 18:48:06 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 5387EAE051;
+        Tue, 20 Apr 2021 18:48:06 +0000 (GMT)
+Received: from oc7455500831.ibm.com (unknown [9.171.21.211])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Tue, 20 Apr 2021 18:48:06 +0000 (GMT)
+Subject: Re: [PATCH v3 1/9] context_tracking: Move guest exit context tracking
+ to separate helpers
+To:     Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Michael Tokarev <mjt@tls.msk.ru>
+References: <20210415222106.1643837-1-seanjc@google.com>
+ <20210415222106.1643837-2-seanjc@google.com>
+From:   Christian Borntraeger <borntraeger@de.ibm.com>
+Message-ID: <b4e95ae2-abf7-0b06-1819-37fd8868d278@de.ibm.com>
+Date:   Tue, 20 Apr 2021 20:48:05 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.9.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210420181124.GA12798@ashkalra_ubuntu_server>
+In-Reply-To: <20210415222106.1643837-2-seanjc@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: NHQywQPkFYycgixdgPptEWZJ73P_hQmm
+X-Proofpoint-ORIG-GUID: P-9eNqp9njeoLKOJDDPvoZGRIBM6bC8T
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.761
+ definitions=2021-04-20_08:2021-04-20,2021-04-20 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0
+ priorityscore=1501 adultscore=0 impostorscore=0 lowpriorityscore=0
+ mlxlogscore=999 bulkscore=0 mlxscore=0 malwarescore=0 clxscore=1015
+ spamscore=0 phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2104060000 definitions=main-2104200127
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Apr 20, 2021, Ashish Kalra wrote:
-> On Tue, Apr 20, 2021 at 05:31:07PM +0000, Sean Christopherson wrote:
-> > On Tue, Apr 20, 2021, Paolo Bonzini wrote:
-> > > +	case KVM_HC_PAGE_ENC_STATUS: {
-> > > +		u64 gpa = a0, npages = a1, enc = a2;
-> > > +
-> > > +		ret = -KVM_ENOSYS;
-> > > +		if (!vcpu->kvm->arch.hypercall_exit_enabled)
-> > 
-> > I don't follow, why does the hypercall need to be gated by a capability?  What
-> > would break if this were changed to?
-> > 
-> > 		if (!guest_pv_has(vcpu, KVM_FEATURE_HC_PAGE_ENC_STATUS))
-> > 
-> 
-> But, the above indicates host support for page_enc_status_hc, so we want
-> to ensure that host supports and has enabled support for the hypercall
-> exit, i.e., hypercall has been enabled.
 
-I still don't see how parroting back KVM_GET_SUPPORTED_CPUID, i.e. "unintentionally"
-setting KVM_FEATURE_HC_PAGE_ENC_STATUS, would break anything.  Sure, the guest
-does unnecessary hypercalls, but they're eaten by KVM.  On the flip side, gating
-the hypercall on the capability, and especially only the capability, creates
-weird scenarios where the guest can observe KVM_FEATURE_HC_PAGE_ENC_STATUS=1
-but fail the hypercall.  Those would be fairly clearcut VMM bugs, but at the
-same time KVM is essentially going out of its way to manufacture the problem.
+
+On 16.04.21 00:20, Sean Christopherson wrote:
+> From: Wanpeng Li <wanpengli@tencent.com>
+> 
+> Provide separate context tracking helpers for guest exit, the standalone
+> helpers will be called separately by KVM x86 in later patches to fix
+> tick-based accounting.
+> 
+> Suggested-by: Thomas Gleixner <tglx@linutronix.de>
+> Cc: Thomas Gleixner <tglx@linutronix.de>
+> Cc: Sean Christopherson <seanjc@google.com>
+> Cc: Michael Tokarev <mjt@tls.msk.ru>
+> Cc: Christian Borntraeger <borntraeger@de.ibm.com>
+> Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
+> Co-developed-by: Sean Christopherson <seanjc@google.com>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+
+Reviewed-by: Christian Borntraeger <borntraeger@de.ibm.com>
+> ---
+>   include/linux/context_tracking.h | 9 ++++++++-
+>   1 file changed, 8 insertions(+), 1 deletion(-)
+> 
+> diff --git a/include/linux/context_tracking.h b/include/linux/context_tracking.h
+> index bceb06498521..200d30cb3a82 100644
+> --- a/include/linux/context_tracking.h
+> +++ b/include/linux/context_tracking.h
+> @@ -131,10 +131,15 @@ static __always_inline void guest_enter_irqoff(void)
+>   	}
+>   }
+>   
+> -static __always_inline void guest_exit_irqoff(void)
+> +static __always_inline void context_tracking_guest_exit_irqoff(void)
+>   {
+>   	if (context_tracking_enabled())
+>   		__context_tracking_exit(CONTEXT_GUEST);
+> +}
+> +
+> +static __always_inline void guest_exit_irqoff(void)
+> +{
+> +	context_tracking_guest_exit_irqoff();
+>   
+>   	instrumentation_begin();
+>   	if (vtime_accounting_enabled_this_cpu())
+> @@ -159,6 +164,8 @@ static __always_inline void guest_enter_irqoff(void)
+>   	instrumentation_end();
+>   }
+>   
+> +static __always_inline void context_tracking_guest_exit_irqoff(void) { }
+> +
+>   static __always_inline void guest_exit_irqoff(void)
+>   {
+>   	instrumentation_begin();
+> 
