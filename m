@@ -2,137 +2,108 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 514D7365CF0
-	for <lists+kvm@lfdr.de>; Tue, 20 Apr 2021 18:13:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D468D365D37
+	for <lists+kvm@lfdr.de>; Tue, 20 Apr 2021 18:24:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232951AbhDTQNn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 20 Apr 2021 12:13:43 -0400
-Received: from foss.arm.com ([217.140.110.172]:37754 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232901AbhDTQNm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 20 Apr 2021 12:13:42 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id EAC3214BF;
-        Tue, 20 Apr 2021 09:13:10 -0700 (PDT)
-Received: from monolith.localdoman (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 280633F73B;
-        Tue, 20 Apr 2021 09:13:10 -0700 (PDT)
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-To:     drjones@redhat.com, kvm@vger.kernel.org,
-        kvmarm@lists.cs.columbia.edu
-Cc:     pbonzini@redhat.com
-Subject: [kvm-unit-tests RFC PATCH 1/1] configure: arm: Replace --vmm with --target
-Date:   Tue, 20 Apr 2021 17:13:38 +0100
-Message-Id: <20210420161338.70914-2-alexandru.elisei@arm.com>
-X-Mailer: git-send-email 2.31.1
-In-Reply-To: <20210420161338.70914-1-alexandru.elisei@arm.com>
-References: <20210420161338.70914-1-alexandru.elisei@arm.com>
+        id S232879AbhDTQZ2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 20 Apr 2021 12:25:28 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:44286 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232473AbhDTQZ2 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 20 Apr 2021 12:25:28 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1618935896;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=iLcG5OyaNHku0PtrgN264QDcVOjTc4dbGZJwd4rN2TU=;
+        b=V7Az/9mGEyxzLCtjUX9AeQJHEuNJ+OO4G7MmSBk6HLQzO3zF+ZEDTC9XjPic07reytT/rb
+        GATXUD4/MqnMF+8O4lR5lxeZRW8QGhl/8nzpUWRUbMjaJvHa9R6dTffk0eeU/fsONe6uks
+        NIO90GFoWuqYMVdsNoKmVIcKAZjnObY=
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
+ [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-153-jmCYT37kNgm0qcWEBGGd3g-1; Tue, 20 Apr 2021 12:24:54 -0400
+X-MC-Unique: jmCYT37kNgm0qcWEBGGd3g-1
+Received: by mail-ed1-f72.google.com with SMTP id n18-20020a0564020612b02903853320059eso4387378edv.0
+        for <kvm@vger.kernel.org>; Tue, 20 Apr 2021 09:24:54 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=iLcG5OyaNHku0PtrgN264QDcVOjTc4dbGZJwd4rN2TU=;
+        b=q79x/Xv4U0n2NpxyIUiVsRIx58an84HCUbAWGX91d7om0sgAQwyX9FF1rfljoIBJCe
+         8d20NTpGdpCLzj/VTQsoGuD/lnfaGbZvLPPpuz76E3ry35cKSGYNmPhu0ytcRaA9y8jY
+         OcE9yW38cWvgVdY/prVhoonljPQ54MdD8FlRHWpS0cUjtyrswMXuTeAkS31wJoVLI4i5
+         TzIbj80CgUPs79Sxd0OPEZ9x0n5th4FGNX9EQLJqmap9zLafgg/ZneETU2fvWGIo2oP4
+         mwHJSomWs5VaOIGY+3rV4+l2DhYb53xozDoNTw3S60cMs8Lpq4mm9IguexnVwiLARygb
+         j7Yw==
+X-Gm-Message-State: AOAM532f9kElK78dwpC3n1Ypt2xOEzG8HbEQmej5WJqsd7Sl9tIVvOIv
+        dX804icfOFrw3Nse298jI9uqVD1MN+24ucDLm9aR9dTj3YldPYxRds+jGu8Cm0tpK7C3WGbxOug
+        RV9NvIEFrVlH8
+X-Received: by 2002:a17:906:34da:: with SMTP id h26mr27944391ejb.496.1618935893434;
+        Tue, 20 Apr 2021 09:24:53 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJws1XKsATYiny/fBfVmMA+efwU+NuFd8mA4iIaBE90k/UA9tkXxnm8FYavk2EfJmE9m/sgjwg==
+X-Received: by 2002:a17:906:34da:: with SMTP id h26mr27944372ejb.496.1618935893207;
+        Tue, 20 Apr 2021 09:24:53 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e? ([2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e])
+        by smtp.gmail.com with ESMTPSA id b22sm16228566edv.96.2021.04.20.09.24.51
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 20 Apr 2021 09:24:52 -0700 (PDT)
+Subject: Re: [PATCH] KVM: selftests: Always run vCPU thread with blocked
+ SIG_IPI
+To:     Peter Xu <peterx@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        stable@vger.kernel.org
+References: <20210420081614.684787-1-pbonzini@redhat.com>
+ <20210420143739.GA4440@xz-x1> <20210420153223.GB4440@xz-x1>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <84c52ebe-58a2-6188-270e-c86409e44fa3@redhat.com>
+Date:   Tue, 20 Apr 2021 18:24:50 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.7.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20210420153223.GB4440@xz-x1>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The --vmm configure option was added to distinguish between the two virtual
-machine managers that kvm-unit-tests supports, qemu or kvmtool. There are
-plans to make kvm-unit-tests work as an EFI app, which will require changes
-to the way tests are compiled. Instead of adding a new configure option
-specifically for EFI and have it coexist with --vmm, or overloading the
-semantics of the existing --vmm option, let's replace --vmm with the more
-generic name --target.
+On 20/04/21 17:32, Peter Xu wrote:
+> On Tue, Apr 20, 2021 at 10:37:39AM -0400, Peter Xu wrote:
+>> On Tue, Apr 20, 2021 at 04:16:14AM -0400, Paolo Bonzini wrote:
+>>> The main thread could start to send SIG_IPI at any time, even before signal
+>>> blocked on vcpu thread.  Therefore, start the vcpu thread with the signal
+>>> blocked.
+>>>
+>>> Without this patch, on very busy cores the dirty_log_test could fail directly
+>>> on receiving a SIGUSR1 without a handler (when vcpu runs far slower than main).
+>>>
+>>> Reported-by: Peter Xu <peterx@redhat.com>
+>>> Cc: stable@vger.kernel.org
+>>> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+>>
+>> Yes, indeed better! :)
+>>
+>> Reviewed-by: Peter Xu <peterx@redhat.com>
+> 
+> I just remembered one thing: this will avoid program quits, but still we'll get
+> the signal missing.
 
---vmm has been kept for now as to avoid breaking existing users, but it has
-been modified to shadow value of --target and a message will be displayed
-to notify users that it will be removed at some point in the future.
+In what sense the signal will be missing?  As long as the thread exists, 
+the signal will be accepted (but not delivered because it is blocked); 
+it will then be delivered on the first KVM_RUN.
 
-Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
----
- configure | 30 +++++++++++++++++++++++-------
- 1 file changed, 23 insertions(+), 7 deletions(-)
+Paolo
 
-diff --git a/configure b/configure
-index 01a0b262a9f2..71d6dc9490df 100755
---- a/configure
-+++ b/configure
-@@ -21,7 +21,8 @@ pretty_print_stacks=yes
- environ_default=yes
- u32_long=
- wa_divide=
--vmm="qemu"
-+vmm=
-+target="qemu"
- errata_force=0
- erratatxt="$srcdir/errata.txt"
- host_key_document=
-@@ -35,8 +36,11 @@ usage() {
- 	Options include:
- 	    --arch=ARCH            architecture to compile for ($arch)
- 	    --processor=PROCESSOR  processor to compile for ($arch)
--	    --vmm=VMM              virtual machine monitor to compile for (qemu
--	                           or kvmtool, default is qemu) (arm/arm64 only)
-+	    --target=TARGET        target platform that the tests will be running on (qemu or
-+	                           kvmtool, default is qemu) (arm/arm64 only)
-+	    --vmm=VMM              virtual machine monitor to compile for (qemu or kvmtool).
-+	                           If specified, it must have the same value as the --target
-+	                           option (arm/arm64 only) (deprecated)
- 	    --cross-prefix=PREFIX  cross compiler prefix
- 	    --cc=CC		   c compiler to use ($cc)
- 	    --ld=LD		   ld linker to use ($ld)
-@@ -58,7 +62,7 @@ usage() {
- 	    --earlycon=EARLYCON
- 	                           Specify the UART name, type and address (optional, arm and
- 	                           arm64 only). The specified address will overwrite the UART
--	                           address set by the --vmm option. EARLYCON can be one of
-+	                           address set by the --target option. EARLYCON can be one of
- 	                           (case sensitive):
- 	               uart[8250],mmio,ADDR
- 	                           Specify an 8250 compatible UART at address ADDR. Supported
-@@ -91,6 +95,9 @@ while [[ "$1" = -* ]]; do
- 	--vmm)
- 	    vmm="$arg"
- 	    ;;
-+	--target)
-+	    target="$arg"
-+	    ;;
- 	--cross-prefix)
- 	    cross_prefix="$arg"
- 	    ;;
-@@ -177,16 +184,24 @@ if [ "$arch" = "i386" ] || [ "$arch" = "x86_64" ]; then
-     testdir=x86
- elif [ "$arch" = "arm" ] || [ "$arch" = "arm64" ]; then
-     testdir=arm
--    if [ "$vmm" = "qemu" ]; then
-+    if [ "$target" = "qemu" ]; then
-         arm_uart_early_addr=0x09000000
--    elif [ "$vmm" = "kvmtool" ]; then
-+    elif [ "$target" = "kvmtool" ]; then
-         arm_uart_early_addr=0x3f8
-         errata_force=1
-     else
--        echo '--vmm must be one of "qemu" or "kvmtool"!'
-+        echo '--target must be one of "qemu" or "kvmtool"!'
-         usage
-     fi
- 
-+    if [ -n "$vmm" ]; then
-+        echo "INFO: --vmm is deprecated and will be removed in future versions"
-+        if [  "$vmm" != "$target" ]; then
-+            echo "--vmm must have the same value as --target ($target)"
-+            usage
-+        fi
-+    fi
-+
-     if [ "$earlycon" ]; then
-         IFS=, read -r name type_addr addr <<<"$earlycon"
-         if [ "$name" != "uart" ] && [ "$name" != "uart8250" ] &&
-@@ -317,6 +332,7 @@ U32_LONG_FMT=$u32_long
- WA_DIVIDE=$wa_divide
- GENPROTIMG=${GENPROTIMG-genprotimg}
- HOST_KEY_DOCUMENT=$host_key_document
-+TARGET=$target
- EOF
- 
- cat <<EOF > lib/config.h
--- 
-2.31.1
+   From that pov I slightly prefer the old patch.  However
+> not a big deal so far as only dirty ring uses SIG_IPI, so there's always ring
+> full which will just delay the kick. It's just we need to remember this when we
+> extend IPI to non-dirty-ring tests as the kick is prone to be lost then.
+> 
+> Thanks,
+> 
 
