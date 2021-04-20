@@ -2,86 +2,175 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9B723365458
-	for <lists+kvm@lfdr.de>; Tue, 20 Apr 2021 10:40:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 99F7536545D
+	for <lists+kvm@lfdr.de>; Tue, 20 Apr 2021 10:41:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231133AbhDTIlU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 20 Apr 2021 04:41:20 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:23297 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230395AbhDTIlT (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 20 Apr 2021 04:41:19 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1618908048;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=zB438UsN4r9986PE2xEGkDVIweUkvDdpBp47AfbjynM=;
-        b=bei4g08qL7FL1WCCniujyQSbFO+Ayow4K377cRJq2y5vWNMFj2UHlVA96gadEVHbRnwsTl
-        GytxwnHRJ3bvqfWvVtDEA64eLmBUDhjwcAy9ThSInI2mfb4y4gYisgyjYtq4OwhSSqxqNb
-        0JllmMKIApq7u6sQ1KcyEnipu9pEoBY=
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
- [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-555-r-FhUuRbP9eDMgqXjq9_lg-1; Tue, 20 Apr 2021 04:40:46 -0400
-X-MC-Unique: r-FhUuRbP9eDMgqXjq9_lg-1
-Received: by mail-ed1-f70.google.com with SMTP id w14-20020aa7da4e0000b02903834aeed684so10965346eds.13
-        for <kvm@vger.kernel.org>; Tue, 20 Apr 2021 01:40:46 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=zB438UsN4r9986PE2xEGkDVIweUkvDdpBp47AfbjynM=;
-        b=ZCMUjIMSawLGDjk84vKdMZJkwD9F9YC/Y+ULvPTlCmQGk6WCK6mo+5w+pNUHTDIO3M
-         TXxauaWbi5E45/b5GddgoEXKov/cwOyQohfxBFzvqcrQcqQbE7Pi86SCA6ADK6f/eLgQ
-         o+IpPaJOqTCF3dS+WIZgVKsVYW3GtfQATUiwiLiGNLbSWytqvGtgKxvL50Bo3nkWsi2h
-         awr+Tg1M8ohfgMu3zMtkFwQwGreDMEo2R25qpGFXEdSDsfNHmFvlAe4uxYyjgRrhO4dh
-         pLxkuYHnq/TluP0+uDlB8YuNGfKN7bqP71tq1mmdi9l9AuVX0EUy815eVlmKs7Nqe5sF
-         3cMA==
-X-Gm-Message-State: AOAM532xi7uTcRLhzGTC2VMP4l0Ylf+wdaR54/4tw7Kda29ilaDmaMeH
-        ZL3qSjOHjzDGZ622ORnAJkp5DzacFdGkQIMQa/uRYf1rMaJQpajBK/MPdzhG8bTEKvo/XofqYgN
-        jHw89RTRHpKI8
-X-Received: by 2002:a17:906:8a79:: with SMTP id hy25mr26634057ejc.461.1618908045440;
-        Tue, 20 Apr 2021 01:40:45 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJx/ILxTwqgMLmyPwiD0e4MVWECB2Ha6lNaMT8x9NpakkGaBMmEIL306sPzWycnszm1yervXzg==
-X-Received: by 2002:a17:906:8a79:: with SMTP id hy25mr26634034ejc.461.1618908045217;
-        Tue, 20 Apr 2021 01:40:45 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id n15sm5177405eje.118.2021.04.20.01.40.43
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 20 Apr 2021 01:40:44 -0700 (PDT)
-Subject: Re: [PATCH v13 05/12] KVM: SVM: Add KVM_SEV_RECEIVE_UPDATE_DATA
- command
-To:     Ashish Kalra <Ashish.Kalra@amd.com>
-Cc:     tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com,
-        joro@8bytes.org, bp@suse.de, thomas.lendacky@amd.com,
-        x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        srutherford@google.com, seanjc@google.com,
-        venu.busireddy@oracle.com, brijesh.singh@amd.com
-References: <cover.1618498113.git.ashish.kalra@amd.com>
- <c5d0e3e719db7bb37ea85d79ed4db52e9da06257.1618498113.git.ashish.kalra@amd.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <d4488123-daac-3687-6f8d-fb54d6bd4019@redhat.com>
-Date:   Tue, 20 Apr 2021 10:40:42 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.7.0
+        id S230447AbhDTImR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 20 Apr 2021 04:42:17 -0400
+Received: from mga18.intel.com ([134.134.136.126]:29413 "EHLO mga18.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229551AbhDTImQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 20 Apr 2021 04:42:16 -0400
+IronPort-SDR: w6agHdMSJsW5yBVwXuJAiZYK8tO4hgNJDpIAdbRetBpRGhhjwzQexwQMAk8Q4ZbXjQGwFqWhuk
+ reFEuyqU2pLA==
+X-IronPort-AV: E=McAfee;i="6200,9189,9959"; a="182963039"
+X-IronPort-AV: E=Sophos;i="5.82,236,1613462400"; 
+   d="scan'208";a="182963039"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Apr 2021 01:41:44 -0700
+IronPort-SDR: Ftgv8gtd92aS32b6rP3/1T24z1S5MMl9Guug2k5KTEM1MY85deOFJZ64nrrPcbuNzAaFZuq2+a
+ XObZsqW/ycZg==
+X-IronPort-AV: E=Sophos;i="5.82,236,1613462400"; 
+   d="scan'208";a="420323458"
+Received: from likexu-mobl1.ccr.corp.intel.com (HELO [10.255.29.132]) ([10.255.29.132])
+  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Apr 2021 01:41:38 -0700
+Subject: Re: [PATCH v5 10/16] KVM: x86: Set PEBS_UNAVAIL in IA32_MISC_ENABLE
+ when PEBS is enabled
+To:     Liuxiangdong <liuxiangdong5@huawei.com>
+Cc:     andi@firstfloor.org, kan.liang@linux.intel.com,
+        wei.w.wang@intel.com, eranian@google.com,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        x86@kernel.org, linux-kernel@vger.kernel.org,
+        "Fangyi (Eric)" <eric.fangyi@huawei.com>,
+        Xiexiangyou <xiexiangyou@huawei.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Like Xu <like.xu@linux.intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>
+References: <20210415032016.166201-1-like.xu@linux.intel.com>
+ <20210415032016.166201-11-like.xu@linux.intel.com>
+ <607E911C.4090706@huawei.com>
+From:   "Xu, Like" <like.xu@intel.com>
+Message-ID: <d3bd9986-4cd9-c178-f288-038fb02d286f@intel.com>
+Date:   Tue, 20 Apr 2021 16:41:36 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.9.1
 MIME-Version: 1.0
-In-Reply-To: <c5d0e3e719db7bb37ea85d79ed4db52e9da06257.1618498113.git.ashish.kalra@amd.com>
+In-Reply-To: <607E911C.4090706@huawei.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 15/04/21 17:55, Ashish Kalra wrote:
-> +	if (!guest_page)
-> +		goto e_free;
-> +
+On 2021/4/20 16:30, Liuxiangdong wrote:
+>
+>
+> On 2021/4/15 11:20, Like Xu wrote:
+>> The bit 12 represents "Processor Event Based Sampling Unavailable (RO)" :
+>>     1 = PEBS is not supported.
+>>     0 = PEBS is supported.
+>>
+>> A write to this PEBS_UNAVL available bit will bring #GP(0) when guest PEBS
+>> is enabled. Some PEBS drivers in guest may care about this bit.
+>>
+>> Signed-off-by: Like Xu <like.xu@linux.intel.com>
+>> ---
+>>   arch/x86/kvm/vmx/pmu_intel.c | 2 ++
+>>   arch/x86/kvm/x86.c           | 4 ++++
+>>   2 files changed, 6 insertions(+)
+>>
+>> diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
+>> index 58f32a55cc2e..c846d3eef7a7 100644
+>> --- a/arch/x86/kvm/vmx/pmu_intel.c
+>> +++ b/arch/x86/kvm/vmx/pmu_intel.c
+>> @@ -588,6 +588,7 @@ static void intel_pmu_refresh(struct kvm_vcpu *vcpu)
+>>           bitmap_set(pmu->all_valid_pmc_idx, INTEL_PMC_IDX_FIXED_VLBR, 1);
+>>         if (vcpu->arch.perf_capabilities & PERF_CAP_PEBS_FORMAT) {
+>> +        vcpu->arch.ia32_misc_enable_msr &= 
+>> ~MSR_IA32_MISC_ENABLE_PEBS_UNAVAIL;
+>>           if (vcpu->arch.perf_capabilities & PERF_CAP_PEBS_BASELINE) {
+>>               pmu->pebs_enable_mask = ~pmu->global_ctrl;
+>>               pmu->reserved_bits &= ~ICL_EVENTSEL_ADAPTIVE;
+>> @@ -597,6 +598,7 @@ static void intel_pmu_refresh(struct kvm_vcpu *vcpu)
+>>               }
+>>               pmu->pebs_data_cfg_mask = ~0xff00000full;
+>>           } else {
+>> +            vcpu->arch.ia32_misc_enable_msr |= 
+>> MSR_IA32_MISC_ENABLE_PEBS_UNAVAIL;
+>>               pmu->pebs_enable_mask =
+>>                   ~((1ull << pmu->nr_arch_gp_counters) - 1);
+>>           }
+>
+> I guess what we want is
+>
+>        if (vcpu->arch.perf_capabilities & PERF_CAP_PEBS_FORMAT) {
+>                vcpu->arch.ia32_misc_enable_msr &= 
+> ~MSR_IA32_MISC_ENABLE_PEBS_UNAVAIL;
+>                if (vcpu->arch.perf_capabilities & PERF_CAP_PEBS_BASELINE) {
+>                        pmu->pebs_enable_mask = ~pmu->global_ctrl;
+>                        pmu->reserved_bits &= ~ICL_EVENTSEL_ADAPTIVE;
+>                        for (i = 0; i < pmu->nr_arch_fixed_counters; i++) {
+>                                pmu->fixed_ctr_ctrl_mask &=
+>                                        ~(1ULL << (INTEL_PMC_IDX_FIXED + i 
+> * 4));
+>                        }
+>                        pmu->pebs_data_cfg_mask = ~0xff00000full;
+>                } else {
+>                        pmu->pebs_enable_mask =
+>                                ~((1ull << pmu->nr_arch_gp_counters) - 1);
+>                }
+>        } else {
+>                vcpu->arch.ia32_misc_enable_msr |= 
+> MSR_IA32_MISC_ENABLE_PEBS_UNAVAIL;
+>                vcpu->arch.perf_capabilities &= ~PERF_CAP_PEBS_MASK;
+>        }
+>
+>
+> But here is
+>
+>        if (vcpu->arch.perf_capabilities & PERF_CAP_PEBS_FORMAT) {
+>                vcpu->arch.ia32_misc_enable_msr &= 
+> ~MSR_IA32_MISC_ENABLE_PEBS_UNAVAIL;
+>                if (vcpu->arch.perf_capabilities & PERF_CAP_PEBS_BASELINE) {
+>                        pmu->pebs_enable_mask = ~pmu->global_ctrl;
+>                        pmu->reserved_bits &= ~ICL_EVENTSEL_ADAPTIVE;
+>                        for (i = 0; i < pmu->nr_arch_fixed_counters; i++) {
+>                                pmu->fixed_ctr_ctrl_mask &=
+>                                        ~(1ULL << (INTEL_PMC_IDX_FIXED + i 
+> * 4));
+>                        }
+>                        pmu->pebs_data_cfg_mask = ~0xff00000full;
+>                } else {
+>                        vcpu->arch.ia32_misc_enable_msr |= 
+> MSR_IA32_MISC_ENABLE_PEBS_UNAVAIL;
 
-Missing unpin on error (but it won't be needed with Sean's patches that 
-move the data block to the stack, so I can fix this too).
+You got me. The v5 is wrong here but v4 is right.
 
-Paolo
+Please let me know if you have more comments on this version.
+
+> pmu->pebs_enable_mask =
+>                                ~((1ull << pmu->nr_arch_gp_counters) - 1);
+>                }
+>        } else {
+>                vcpu->arch.perf_capabilities &= ~PERF_CAP_PEBS_MASK;
+>        }
+>
+>
+> Wrong else branch?
+>
+>
+>> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+>> index 1a64e816e06d..ed38f1dada63 100644
+>> --- a/arch/x86/kvm/x86.c
+>> +++ b/arch/x86/kvm/x86.c
+>> @@ -3126,6 +3126,10 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, 
+>> struct msr_data *msr_info)
+>>           break;
+>>       case MSR_IA32_MISC_ENABLE:
+>>           data &= ~MSR_IA32_MISC_ENABLE_EMON;
+>> +        if (!msr_info->host_initiated &&
+>> +            (vcpu->arch.perf_capabilities & PERF_CAP_PEBS_FORMAT) &&
+>> +            (data & MSR_IA32_MISC_ENABLE_PEBS_UNAVAIL))
+>> +            return 1;
+>>           if (!kvm_check_has_quirk(vcpu->kvm, 
+>> KVM_X86_QUIRK_MISC_ENABLE_NO_MWAIT) &&
+>>               ((vcpu->arch.ia32_misc_enable_msr ^ data) & 
+>> MSR_IA32_MISC_ENABLE_MWAIT)) {
+>>               if (!guest_cpuid_has(vcpu, X86_FEATURE_XMM3))
+>
 
