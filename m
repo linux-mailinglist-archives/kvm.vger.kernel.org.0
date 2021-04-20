@@ -2,101 +2,140 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 789AD365E01
-	for <lists+kvm@lfdr.de>; Tue, 20 Apr 2021 18:58:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 736FF365E1A
+	for <lists+kvm@lfdr.de>; Tue, 20 Apr 2021 19:02:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233266AbhDTQ7P (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 20 Apr 2021 12:59:15 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:27120 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233286AbhDTQ7N (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 20 Apr 2021 12:59:13 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1618937921;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=T7OnI4g7y/j0j8gjLvALAW+SBNaqStqVNvhZwF+q8fQ=;
-        b=BAvYmu5/eaUuwth9Xxgm50vFDXBgh6H/VcWY/7e1Ot5M2fztgvsYy63f1qJRq8F//UIKAi
-        oFmK3qtvWr2ANNOa5wlGxIJ08FMHr5JFBlSo59OK88TBkiVtQ7bWoP5lFwiehZV6oSDMx9
-        7rJ+sUSaI17NMb1dnT1YdFhwkC5pOmg=
-Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com
- [209.85.160.198]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-575-q1pkpFXhMtiEijki_diD5Q-1; Tue, 20 Apr 2021 12:58:37 -0400
-X-MC-Unique: q1pkpFXhMtiEijki_diD5Q-1
-Received: by mail-qt1-f198.google.com with SMTP id y17-20020ac870910000b02901a7f2d61003so11424937qto.20
-        for <kvm@vger.kernel.org>; Tue, 20 Apr 2021 09:58:37 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=T7OnI4g7y/j0j8gjLvALAW+SBNaqStqVNvhZwF+q8fQ=;
-        b=YfOMAQVcRGuthgTaJZpBYjyyt7mcalCM5UwYfHffNxo7AuevkQLCyCo9q5GMN9mdlS
-         PoturSFahwyCfelKjT4+QL+ry38G3WOSTumOdtui5BdYPa1JEKQYFN2Mf65MKGjfQkFe
-         Akb7eEyHM5h2xBZ8xHORT9/8kVs0GQjVQjIvxEeV/KTa2/9D7sb29FckobU+Hnj9uEqn
-         eYpJhrcaACnx53baIkg1cU/zXLfQTJo3Lcyt+xUQtPxGZaBSulvxU9bQJwXJ5V9WdI3e
-         eB0iaLOkmNjxHT0RjYTR3TY+MQShsiF/6ZA/8Khdhb78OkwGXS9P/KtBDAw4tY+EzSlZ
-         a50g==
-X-Gm-Message-State: AOAM533YJzhASJyg9cfwiV00Byftpl52TgITKoshUrCh8jNnL+k511+3
-        UUbl6RaDIgCS33wxMsLEwO9tqs/Oyj9iYA+JIatS/pRs7B+o+M6I6u/WHcyEGJ70j/UyAvFms6Z
-        urq5bpP4pLAYS
-X-Received: by 2002:a0c:f546:: with SMTP id p6mr2800296qvm.6.1618937917007;
-        Tue, 20 Apr 2021 09:58:37 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJz4vGLU180G23sXR7ipr4r0p+fP/T/k9RjNGzudGX4h5CRoFZSDKgPckbD3RgJpc83I6Xw8fQ==
-X-Received: by 2002:a0c:f546:: with SMTP id p6mr2800271qvm.6.1618937916731;
-        Tue, 20 Apr 2021 09:58:36 -0700 (PDT)
-Received: from xz-x1 (bras-base-toroon474qw-grc-88-174-93-75-154.dsl.bell.ca. [174.93.75.154])
-        by smtp.gmail.com with ESMTPSA id b4sm12604291qkf.64.2021.04.20.09.58.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 20 Apr 2021 09:58:36 -0700 (PDT)
-Date:   Tue, 20 Apr 2021 12:58:34 -0400
-From:   Peter Xu <peterx@redhat.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        stable@vger.kernel.org
-Subject: Re: [PATCH] KVM: selftests: Always run vCPU thread with blocked
- SIG_IPI
-Message-ID: <20210420165834.GC4440@xz-x1>
-References: <20210420081614.684787-1-pbonzini@redhat.com>
- <20210420143739.GA4440@xz-x1>
- <20210420153223.GB4440@xz-x1>
- <84c52ebe-58a2-6188-270e-c86409e44fa3@redhat.com>
+        id S233346AbhDTRC5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 20 Apr 2021 13:02:57 -0400
+Received: from wforward3-smtp.messagingengine.com ([64.147.123.22]:51953 "EHLO
+        wforward3-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S233305AbhDTRC4 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 20 Apr 2021 13:02:56 -0400
+X-Greylist: delayed 521 seconds by postgrey-1.27 at vger.kernel.org; Tue, 20 Apr 2021 13:02:56 EDT
+Received: from compute4.internal (compute4.nyi.internal [10.202.2.44])
+        by mailforward.west.internal (Postfix) with ESMTP id B0C833BD4;
+        Tue, 20 Apr 2021 12:53:42 -0400 (EDT)
+Received: from mailfrontend1 ([10.202.2.162])
+  by compute4.internal (MEProxy); Tue, 20 Apr 2021 12:53:43 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        messagingengine.com; h=cc:content-type:date:from:in-reply-to
+        :message-id:mime-version:references:subject:to:x-me-proxy
+        :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; bh=cKp2Xd
+        ce/YCF6NXRThqermvCsoe8zQNNncSOXUjnO24=; b=fi8qzmh8mDtZveNTxx7EyO
+        yvDMYjXGTAuOXnsrMRKTvEhCBvBdlszsYtmgFqP/naLnrKrmiJVihMwLobeuA7iC
+        hESESxGmFVwOQGM1tsO22pHYeFs3alKXiSMWrsadbQyW9OmdfciNWgHHbYjkW7CP
+        Wx1YzwRodkXbCL0enq4wdXWPb6OfyF7bRSAcu9oQLAdOne1HTKdPHPJtMxLaa3/r
+        RpSTOXg+gTAtIfOLYFnwBLALI8xlcFm4IaH8STm8v0jNbV5O+ZTh1ZrbYgLk5RWO
+        ixNiW4rZLHsOybeWvq4gMwmIWbSxTpkJta7cLA+PVDXtm15OSA6NRVFEY8sOPXsg
+        ==
+X-ME-Sender: <xms:FQd_YGPc6rj4P_pGGiqVMhCEdIXq8_0e7l-LnLwwjwOyY-zx68phsw>
+    <xme:FQd_YE_kOgtcFYsHDnl3qtYUy23qS-auSa34yW3q-wmS8Tq1SO3jcNkyzyD1mZen6
+    U9ETnK4iPi8dDP09ow>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeduledrvddtiedguddtkecutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfgh
+    necuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
+    enucfjughrpefvufgjfhfhfffkgggtsehttdertddttddtnecuhfhrohhmpeffrghvihgu
+    ucfgughmohhnughsohhnuceoughmvgesughmvgdrohhrgheqnecuggftrfgrthhtvghrnh
+    ephfekgeeutddvgeffffetheejvdejieetgfefgfffudegffffgeduheegteegleeknecu
+    kfhppeekuddrudekjedrvdeirddvfeeknecuvehluhhsthgvrhfuihiivgeptdenucfrrg
+    hrrghmpehmrghilhhfrhhomhepughmvgesughmvgdrohhrgh
+X-ME-Proxy: <xmx:FQd_YNSHZqO8MkAEycowcPAXGH3o3fBkDcHT0pvYL6Am6oF4NHccCw>
+    <xmx:FQd_YGu5AwWtSObNmhr2H8KtpRyChCqdGaq565gq5ylWgVvhjXOBXA>
+    <xmx:FQd_YOfYE3DafP5kIhA_r7h0x9WSUGumpIeztI_IK9Z6YSQjYQBFhQ>
+    <xmx:Fgd_YO5uci9fvY7yo0DriK5huLCEVgFc9tp5_8j__ho0ank7dnMpxYlMYgI>
+Received: from disaster-area.hh.sledj.net (disaster-area.hh.sledj.net [81.187.26.238])
+        by mail.messagingengine.com (Postfix) with ESMTPA id 5653A24005B;
+        Tue, 20 Apr 2021 12:53:41 -0400 (EDT)
+Received: from localhost (disaster-area.hh.sledj.net [local])
+        by disaster-area.hh.sledj.net (OpenSMTPD) with ESMTPA id 31cc8f06;
+        Tue, 20 Apr 2021 16:53:40 +0000 (UTC)
+To:     Aaron Lewis <aaronlewis@google.com>
+Cc:     Jim Mattson <jmattson@google.com>,
+        Sean Christopherson <seanjc@google.com>,
+        kvm list <kvm@vger.kernel.org>
+Subject: Re: [PATCH 1/2] kvm: x86: Allow userspace to handle emulation errors
+In-Reply-To: <CAAAPnDGnY76C-=FppsiL=OFY-ei8kHeJhfK_tNV8of3JHBZ0FA@mail.gmail.com>
+References: <20210416131820.2566571-1-aaronlewis@google.com>
+ <cunblaaqwe0.fsf@dme.org>
+ <CAAAPnDEEwLRMLZffJSN5W93d5s6EQJuAP58vAVJCo+RZD6ahsA@mail.gmail.com>
+ <cunzgxtctgj.fsf@dme.org>
+ <CAAAPnDGnY76C-=FppsiL=OFY-ei8kHeJhfK_tNV8of3JHBZ0FA@mail.gmail.com>
+X-HGTTG: zarquon
+From:   David Edmondson <dme@dme.org>
+Date:   Tue, 20 Apr 2021 17:53:40 +0100
+Message-ID: <cunbla8c2y3.fsf@dme.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <84c52ebe-58a2-6188-270e-c86409e44fa3@redhat.com>
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Apr 20, 2021 at 06:24:50PM +0200, Paolo Bonzini wrote:
-> On 20/04/21 17:32, Peter Xu wrote:
-> > On Tue, Apr 20, 2021 at 10:37:39AM -0400, Peter Xu wrote:
-> > > On Tue, Apr 20, 2021 at 04:16:14AM -0400, Paolo Bonzini wrote:
-> > > > The main thread could start to send SIG_IPI at any time, even before signal
-> > > > blocked on vcpu thread.  Therefore, start the vcpu thread with the signal
-> > > > blocked.
-> > > > 
-> > > > Without this patch, on very busy cores the dirty_log_test could fail directly
-> > > > on receiving a SIGUSR1 without a handler (when vcpu runs far slower than main).
-> > > > 
-> > > > Reported-by: Peter Xu <peterx@redhat.com>
-> > > > Cc: stable@vger.kernel.org
-> > > > Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> > > 
-> > > Yes, indeed better! :)
-> > > 
-> > > Reviewed-by: Peter Xu <peterx@redhat.com>
-> > 
-> > I just remembered one thing: this will avoid program quits, but still we'll get
-> > the signal missing.
-> 
-> In what sense the signal will be missing?  As long as the thread exists, the
-> signal will be accepted (but not delivered because it is blocked); it will
-> then be delivered on the first KVM_RUN.
+On Tuesday, 2021-04-20 at 07:57:27 -07, Aaron Lewis wrote:
 
-Ah right..  Thanks,
+>> >> Why not add a new exit reason, particularly given that the caller has to
+>> >> enable the capability to get the relevant data? (It would also remove
+>> >> the need for the flag field and any mechanism for packing multiple bits
+>> >> of detail into the structure.)
+>> >
+>> > I considered that, but I opted for the extensibility of the exiting
+>> > KVM_EXIT_INTERNAL_ERROR instead.  To me it was six of one or half a
+>> > dozen of the other.  With either strategy I still wanted to provide
+>> > for future extensibility, and had a flags field in place.  That way we
+>> > can add to this in the future if we find something that is missing
+>> > (ie: potentially wanting a way to mark dirty pages, possibly passing a
+>> > fault address, etc...)
+>>
+>> How many of the flag based optional fields do you anticipate needing for
+>> any one particular exit scenario?
+>>
+>> If it's one, then using the flags to disambiguate the emulation failure
+>> cases after choosing to stuff all of the cases into
+>> KVM_EXIT_INTERNAL_ERROR / KVM_INTERNAL_ERROR_EMULATION would be odd.
+>>
+>> (I'm presuming that it's not one, but don't understand the use case.)
+>>
+>
+> The motivation was to allow for maximum flexibility in the future, and
+> not be tied down to something we potentially missed now.  I agree the
+> flags aren't needed if we are only adding to what's currently there,
+> but they are needed if we want to remove something or pack something
+> differently.  I didn't see how I could achieve that without adding a
+> flags field.  Seemed like low overhead to be more future proof.
 
+With what you have now, the ndata field seems unnecessary - I should be
+able to determine the contents of the rest of the structure based on the
+flags. That also suggests to me that using something other than
+KVM_INTERNAL_ERROR_EMULATION would make sense.
+
+This comment:
+
+>> >> > + * When using the suberror KVM_INTERNAL_ERROR_EMULATION, these flags are used
+>> >> > + * to describe what is contained in the exit struct.  The flags are used to
+>> >> > + * describe it's contents, and the contents should be in ascending numerical
+>> >> > + * order of the flag values.  For example, if the flag
+>> >> > + * KVM_INTERNAL_ERROR_EMULATION_FLAG_INSTRUCTION_BYTES is set, the instruction
+>> >> > + * length and instruction bytes would be expected to show up first because this
+>> >> > + * flag has the lowest numerical value (1) of all the other flags.
+
+originally made me think that the flag-indicated elements were going to
+be packed into the remaining space of the structure at a position
+depending on which flags are set.
+
+For example, if I add a new flag
+KVM_INTERNAL_ERROR_EMULATION_FLAG_EXIT_CODE, value 2, and then want to
+pass back an exit code but *not* instruction bytes, the comment appears
+to suggest that the exit code will appear immediately after the flags.
+
+This is contradicted by your other reply:
+
+>> > Just add the fields you need to
+>> > the end of emulation_failure struct, increase 'ndata' to the new
+>> > count, add a new flag to 'flags' so we know its contents.
+
+Given this, the ordering of flag values does not seem significant - the
+structure elements corresponding to a flag value will always be present,
+just not filled with relevant data.
+
+dme.
 -- 
-Peter Xu
-
+When you were the brightest star, who were the shadows?
