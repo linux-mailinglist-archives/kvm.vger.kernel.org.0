@@ -2,100 +2,118 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5FE13366088
-	for <lists+kvm@lfdr.de>; Tue, 20 Apr 2021 22:00:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0E6923660BA
+	for <lists+kvm@lfdr.de>; Tue, 20 Apr 2021 22:16:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233724AbhDTUB2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 20 Apr 2021 16:01:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40526 "EHLO
+        id S233752AbhDTURU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 20 Apr 2021 16:17:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44054 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233548AbhDTUB2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 20 Apr 2021 16:01:28 -0400
-Received: from mail-pf1-x435.google.com (mail-pf1-x435.google.com [IPv6:2607:f8b0:4864:20::435])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 404C4C06174A
-        for <kvm@vger.kernel.org>; Tue, 20 Apr 2021 13:00:56 -0700 (PDT)
-Received: by mail-pf1-x435.google.com with SMTP id 10so17485817pfl.1
-        for <kvm@vger.kernel.org>; Tue, 20 Apr 2021 13:00:56 -0700 (PDT)
+        with ESMTP id S233619AbhDTURT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 20 Apr 2021 16:17:19 -0400
+Received: from mail-pf1-x429.google.com (mail-pf1-x429.google.com [IPv6:2607:f8b0:4864:20::429])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A00CDC06138A
+        for <kvm@vger.kernel.org>; Tue, 20 Apr 2021 13:16:47 -0700 (PDT)
+Received: by mail-pf1-x429.google.com with SMTP id p67so21467082pfp.10
+        for <kvm@vger.kernel.org>; Tue, 20 Apr 2021 13:16:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=WyznEFsiwCnWk8+gQwxMUVYV5iBN3FcTKE5h3hGhx7M=;
-        b=T1wPSn0GwIB1THER+9S3gX8/XCeK1TNT4h2jZHu9cXCQixAAne+NGKzh+QDdbHn2rj
-         DznEAGR1WLikloHeZvigg/U6QIgwvN/xoFbGcDQlV60770Cd3ftd27A1dYvlXuQLXh05
-         cW5qZf9MKUrL+ZWyKQ3bAr7k4G6AEeBJDqSbdTClmlTD9SgsrIwr3nl9T+hCxrNlgb6X
-         EGL/S8+SJ8adRhCdpN+0/TbGattuTQOKCKGmsoPY1wdogK6ZXrlvxHzHc4c23/HGaGsF
-         GV4e3I5lAMZe9JU3OeH+nZpSInQczm1GAtxUilnIj4LfpeGQDbOq3QAqDNtBz+LTD8UE
-         ruQw==
+        bh=baguO7314vCrN8/3Lvu6Ck0/6YUj93gK/SeIRlHPkHY=;
+        b=VDk6YLqqHBjXELr908Vy3WBsu/P3T1SUqT+ZE+rHFrt/R8+YWT9gMDUBRfkEmzdvrH
+         n2heHViq5NBoovkpWFoJ9szOnoaDxi0rQNrCxGxXw+go42e2mkquPT5Kn1c7hw/UZGAK
+         SHxReazCEAgCJd3ktuLdhBRBu5hNh4DOGBm+1lIe0NjGPMbcR3KZQ0w/f8nrgB+CX5Uz
+         wItuzAE2l0q92ZY28tv0EmYCx4IIh8LSjN8Xrz7J8Wg9OTlhyUTGoTonMJLfygkOTxxl
+         JiloQ2+INXgN+FVI5Bc65zkU3dsdO9rQc4jouA3KmoeAT339FhlBhZmIyKqljJqnbQDt
+         fDeQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=WyznEFsiwCnWk8+gQwxMUVYV5iBN3FcTKE5h3hGhx7M=;
-        b=Iv2UieE7UYiyntBEHj12U/2bm3QDXQgclDCVzvrm+EYijwSWWhnlCRA6xa+hIli3Q0
-         ObUkuUO87LtckclKXclmnSrVdHae+dOr6G3jUq2YYCih0AKtGHpjCIPWXqeDdycmASdk
-         q2yE6acTO+e24S7BOvA7Pr6n1EEa79v2kytKUZqZWoWDtxbRzn+ttJ+pu67Q8d8nsA/g
-         KiwK0BGH+BBoSsA1wydUKb8QeoEauD+Ka36rAKm8ukX2iS18E6AYJIb5CahuFolNZW7U
-         FHj0yHMd/0om1jm9r5dYT6YTcikJ8PUT0aM+Y+ibuAJqd2dXgyYysEY69Rsy7uEYFMQM
-         hNvA==
-X-Gm-Message-State: AOAM53122/TaS5n2VjCfaZUbhEtBqeaXHuKEY1HgIFNb3iPt/3SSI9iw
-        Vy++tvYoui9L4+CzK1oxYl/4tWyHWV5/3A==
-X-Google-Smtp-Source: ABdhPJwpnptOMvWD5Mu8LdjGxtvPyM/dIWuNedDUSzJVDgSjTNCpcNDIaRju4DW0yVOzh70NWN6Crw==
-X-Received: by 2002:a63:175c:: with SMTP id 28mr18062006pgx.376.1618948855638;
-        Tue, 20 Apr 2021 13:00:55 -0700 (PDT)
+        bh=baguO7314vCrN8/3Lvu6Ck0/6YUj93gK/SeIRlHPkHY=;
+        b=aFereVjxzCOJU+JOyb+wckp/BQZMErqqzD8X2BZYr8aap8dHeZgHIRJtg7eCLgB8cf
+         aQnD9WjXdjnPUCmmOkYpjZw4Gz5P7hHTH2PClHKyXZy7etwuVegrlGEETuaR2Ae6F1rt
+         U73eu29bQyhFJLkKqyZIZmEi5YH3x5y7ZCAhir6Ces1lhcIINhSiENW0wu1PtDbnX3TX
+         r5r4wHy9XT+e8Ka3L7wOTy9t+qd38eHvbtNjG/9mfsFBtiM7OkM2GazT0jFHRlWZcAjw
+         lHrepENcNwtCxtjxWrC9xhSpN9cPbrCPtcTnGTNVGfy+BiZJGA3aXnN4pAPTvavXzM+F
+         SKqg==
+X-Gm-Message-State: AOAM532g/dDrFlGcdWfum4StJ270FQmIDBBEfzxAI3zfbUDRQAJNLyf5
+        9k8ThQtSCyI1dYAwC5Dz7jO/TQ==
+X-Google-Smtp-Source: ABdhPJzHP5mB0IkvpDfWhhTGznEdghO0p6TOY9+Gmafh1xpRpiI1fIGjEWEv/6LcbyNjpPa6ucTahw==
+X-Received: by 2002:a17:90b:1955:: with SMTP id nk21mr7031347pjb.198.1618949806996;
+        Tue, 20 Apr 2021 13:16:46 -0700 (PDT)
 Received: from google.com (240.111.247.35.bc.googleusercontent.com. [35.247.111.240])
-        by smtp.gmail.com with ESMTPSA id x2sm15442140pfx.41.2021.04.20.13.00.54
+        by smtp.gmail.com with ESMTPSA id k15sm16500650pfi.0.2021.04.20.13.16.46
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 20 Apr 2021 13:00:54 -0700 (PDT)
-Date:   Tue, 20 Apr 2021 20:00:51 +0000
+        Tue, 20 Apr 2021 13:16:46 -0700 (PDT)
+Date:   Tue, 20 Apr 2021 20:16:42 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     Krish Sadhukhan <krish.sadhukhan@oracle.com>
-Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, jmattson@google.com
-Subject: Re: [PATCH 3/7 v7] KVM: nSVM: No need to set bits 11:0 in MSRPM and
- IOPM bitmaps
-Message-ID: <YH8y86iPBdTwMT18@google.com>
-References: <20210412215611.110095-1-krish.sadhukhan@oracle.com>
- <20210412215611.110095-4-krish.sadhukhan@oracle.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        srutherford@google.com, joro@8bytes.org, brijesh.singh@amd.com,
+        thomas.lendacky@amd.com, venu.busireddy@oracle.com,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Borislav Petkov <bp@suse.de>,
+        x86@kernel.org, Ashish Kalra <ashish.kalra@amd.com>
+Subject: Re: [PATCH 0/3] KVM: x86: guest interface for SEV live migration
+Message-ID: <YH82qgTLCKUoSyNa@google.com>
+References: <20210420112006.741541-1-pbonzini@redhat.com>
+ <YH8P26OibEfxvJAu@google.com>
+ <05129de6-c8d9-de94-89e7-6257197433ef@redhat.com>
+ <YH8lMTMzfD7KugRg@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210412215611.110095-4-krish.sadhukhan@oracle.com>
+In-Reply-To: <YH8lMTMzfD7KugRg@google.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Apr 12, 2021, Krish Sadhukhan wrote:
-> According to APM vol 2, hardware ignores the low 12 bits in MSRPM and IOPM
-> bitmaps. Therefore setting/unssetting these bits has no effect as far as
-> VMRUN is concerned. Also, setting/unsetting these bits prevents tests from
-> verifying hardware behavior.
+On Tue, Apr 20, 2021, Sean Christopherson wrote:
+> On Tue, Apr 20, 2021, Paolo Bonzini wrote:
+> > On 20/04/21 19:31, Sean Christopherson wrote:
+> > > > +	case KVM_HC_PAGE_ENC_STATUS: {
+> > > > +		u64 gpa = a0, npages = a1, enc = a2;
+> > > > +
+> > > > +		ret = -KVM_ENOSYS;
+> > > > +		if (!vcpu->kvm->arch.hypercall_exit_enabled)
+> > > 
+> > > I don't follow, why does the hypercall need to be gated by a capability?  What
+> > > would break if this were changed to?
+> > > 
+> > > 		if (!guest_pv_has(vcpu, KVM_FEATURE_HC_PAGE_ENC_STATUS))
+> > 
+> > The problem is that it's valid to take KVM_GET_SUPPORTED_CPUID and send it
+> > unmodified to KVM_SET_CPUID2.  For this reason, features that are
+> > conditional on other ioctls, or that require some kind of userspace support,
+> > must not be in KVM_GET_SUPPORTED_CPUID.  For example:
+> > 
+> > - TSC_DEADLINE because it is only implemented after KVM_CREATE_IRQCHIP (or
+> > after KVM_ENABLE_CAP of KVM_CAP_IRQCHIP_SPLIT)
+> > 
+> > - MONITOR only makes sense if userspace enables KVM_CAP_X86_DISABLE_EXITS
+> > 
+> > X2APIC is reported even though it shouldn't be.  Too late to fix that, I
+> > think.
+> > 
+> > In this particular case, if userspace sets the bit in CPUID2 but doesn't
+> > handle KVM_EXIT_HYPERCALL, the guest will probably trigger some kind of
+> > assertion failure as soon as it invokes the HC_PAGE_ENC_STATUS hypercall.
 > 
-> Signed-off-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
-> ---
->  arch/x86/kvm/svm/nested.c | 2 --
->  1 file changed, 2 deletions(-)
+> Gah, I was thinking of the MSR behavior and forgot that the hypercall exiting
+> behavior intentionally doesn't require extra filtering.
 > 
-> diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
-> index ae53ae46ebca..fd42c8b7f99a 100644
-> --- a/arch/x86/kvm/svm/nested.c
-> +++ b/arch/x86/kvm/svm/nested.c
-> @@ -287,8 +287,6 @@ static void nested_load_control_from_vmcb12(struct vcpu_svm *svm,
->  
->  	/* Copy it here because nested_svm_check_controls will check it.  */
->  	svm->nested.ctl.asid           = control->asid;
-> -	svm->nested.ctl.msrpm_base_pa &= ~0x0fffULL;
-> -	svm->nested.ctl.iopm_base_pa  &= ~0x0fffULL;
-
-This will break nested_svm_vmrun_msrpm() if L1 passes an unaligned address.
-The shortlog is also wrong, KVM isn't setting bits, it's clearing bits.
-
-I also don't think svm->nested.ctl.msrpm_base_pa makes its way to hardware; IIUC,
-it's a copy of vmcs12->control.msrpm_base_pa.  The bitmap that gets loaded into
-the "real" VMCB is vmcb02->control.msrpm_base_pa.
-
->  }
->  
->  /*
-> -- 
-> 2.27.0
+> It's also worth noting that guest_pv_has() is particularly useless since it
+> will unconditionally return true for older VMMs that dont' enable
+> KVM_CAP_ENFORCE_PV_FEATURE_CPUID.
 > 
+> Bummer.
+
+Oh!  Almost forgot my hail mary idea.  Instead of a new capability, can we
+reject the hypercall if userspace has _not_ set KVM_CAP_ENFORCE_PV_FEATURE_CPUID?
+
+			if (vcpu->arch.pv_cpuid.enforce &&
+			    !guest_pv_has(vcpu, KVM_FEATURE_HC_PAGE_ENC_STATUS)
+				break;
