@@ -2,54 +2,30 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7DA6F366278
-	for <lists+kvm@lfdr.de>; Wed, 21 Apr 2021 01:26:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8263A366282
+	for <lists+kvm@lfdr.de>; Wed, 21 Apr 2021 01:33:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233964AbhDTX1L (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 20 Apr 2021 19:27:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57356 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234290AbhDTX1L (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 20 Apr 2021 19:27:11 -0400
-Received: from mail-pl1-x633.google.com (mail-pl1-x633.google.com [IPv6:2607:f8b0:4864:20::633])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3AAEFC06174A
-        for <kvm@vger.kernel.org>; Tue, 20 Apr 2021 16:26:39 -0700 (PDT)
-Received: by mail-pl1-x633.google.com with SMTP id g16so3696068plq.3
-        for <kvm@vger.kernel.org>; Tue, 20 Apr 2021 16:26:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=0qlu9dhH/WkK2RT8ePKeim6dOFYFhQZ+dnqPgQR/Yhk=;
-        b=SiLphwB7uAPiunj9/PliCt/W2Hn46mXxDXNjCyVoFFOHOGxOfdQeNQUdpqsV7EKlhi
-         Ts42KxEYJAYi+XUDl3yTsubuMM5oerCqemxsX4hh2XnKowqrwpOkUp83Rkb9dH7NKD+6
-         anv/8V7l3+86kX6ADNPSnN4VskoiKyCyGtTlB3dipFLK5zo63k68lT9B/CRq40fHJdsH
-         GHKtM4ZmyBoNvra+VVhVMObAyMF3bUMpXiLCz3J5yrfxU2ldDRrispu0bi2t3MsGj4dU
-         zWWbT6X7CyQ7oERMwtvQcrmHCX/j3snVGCUSn+2gah7pGRhfhRsnBbuUtWUHFuINGcCU
-         Shww==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=0qlu9dhH/WkK2RT8ePKeim6dOFYFhQZ+dnqPgQR/Yhk=;
-        b=hqupUEBKdMhNvhaWQZteijqsSzfB9mHOA//yfRNqfdy+fKqS0e+kiC65kaRvwbGg/u
-         BU39/Hio/7TKxKpG0OC8R1iy/yqXsaS5NmKqdE0r6r84inHuZpkXIfYM0O2/M0gPqTwd
-         S3sHlY9n5ViO/t08FDhwPuQpsxo8MK5qel+Amfj36faCgwqRg3VgiKM6X1r49t/mFbkx
-         CDbE3lX9ZZ9h4LJwPq6pyQRFI2qn392YaqmLL/+QjLjZ+Mjvh4s6dBe8I7M+l4GVZgRD
-         +m8FGHW4GDxafm/TLbT6mdAqGhk527c4bJPQIZrEyi+M87NkwUfLb0iLe54XogIvavSu
-         OXMw==
-X-Gm-Message-State: AOAM531DsZaoJmJ9C/RtZCzloFXPLXQzzGyGXPpIpCGiuHeoIFwKitil
-        B6id1zTSCwOCBxu/mHeumo3+3Q==
-X-Google-Smtp-Source: ABdhPJz5sZLLgPRQUdnzKngA02RMKJA94LBFbrExxAIBAVhr4QcTLL7+6YS18cRFkdIGidUyZVR9+Q==
-X-Received: by 2002:a17:902:e8ca:b029:ec:bec2:ba6b with SMTP id v10-20020a170902e8cab02900ecbec2ba6bmr3661376plg.42.1618961198626;
-        Tue, 20 Apr 2021 16:26:38 -0700 (PDT)
-Received: from google.com (240.111.247.35.bc.googleusercontent.com. [35.247.111.240])
-        by smtp.gmail.com with ESMTPSA id l22sm176699pjc.13.2021.04.20.16.26.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 20 Apr 2021 16:26:37 -0700 (PDT)
-Date:   Tue, 20 Apr 2021 23:26:34 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Frederic Weisbecker <frederic@kernel.org>
+        id S234361AbhDTXeP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 20 Apr 2021 19:34:15 -0400
+Received: from mail.kernel.org ([198.145.29.99]:44882 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S234280AbhDTXeO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 20 Apr 2021 19:34:14 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 77BB661417;
+        Tue, 20 Apr 2021 23:33:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1618961622;
+        bh=8B7pNQVGVPqFq0OWNqhKIFYmTu1o9WldILSo9/Ljz44=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=ktKbcgcxv4i8AftnZ+aGfR+j9fb32bPnaS8+Fh0aC/sUcA499GxKE/ACuBXcx+VRF
+         Kuq+r6oCCf0lN3UOkHLSgQoUN4Y+qltj1eqKl2DDGzfdZ5bY3lYL2esbC+STr5MgpV
+         wS6Z9RDUV6PgeP/00Yo+WNbmPCIl7lIGwpmO5ZC5PHG9eQPMV22a3hLYUoquYSGnrl
+         coUtdC9rFeSVwLxrARypQm1oZ5dvEcGmSIYS3X9UQTU4R8PaPY5jt74AHKkUpI8fXM
+         uBjjqVpW3i/Vl+bkcH+1Awb6nifw58rEuuLvr9jqc/krPgEsjkRPm7gEadtZ5Tb1IP
+         vJ8wJGMrlxKbA==
+Date:   Wed, 21 Apr 2021 01:33:38 +0200
+From:   Frederic Weisbecker <frederic@kernel.org>
+To:     Sean Christopherson <seanjc@google.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
@@ -58,49 +34,82 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         linux-kernel@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
         Michael Tokarev <mjt@tls.msk.ru>,
         Christian Borntraeger <borntraeger@de.ibm.com>
-Subject: Re: [PATCH v3 3/9] KVM: x86: Defer tick-based accounting 'til after
- IRQ handling
-Message-ID: <YH9jKpeviZtMKxt8@google.com>
+Subject: Re: [PATCH v3 0/9] KVM: Fix tick-based accounting for x86 guests
+Message-ID: <20210420233338.GB8720@lothringen>
 References: <20210415222106.1643837-1-seanjc@google.com>
- <20210415222106.1643837-4-seanjc@google.com>
- <20210420231402.GA8720@lothringen>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210420231402.GA8720@lothringen>
+In-Reply-To: <20210415222106.1643837-1-seanjc@google.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Apr 21, 2021, Frederic Weisbecker wrote:
-> On Thu, Apr 15, 2021 at 03:21:00PM -0700, Sean Christopherson wrote:
-> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> > index 16fb39503296..e4d475df1d4a 100644
-> > --- a/arch/x86/kvm/x86.c
-> > +++ b/arch/x86/kvm/x86.c
-> > @@ -9230,6 +9230,14 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
-> >  	local_irq_disable();
-> >  	kvm_after_interrupt(vcpu);
-> >  
-> > +	/*
-> > +	 * When using tick-based accounting, wait until after servicing IRQs to
-> > +	 * account guest time so that any ticks that occurred while running the
-> > +	 * guest are properly accounted to the guest.
-> > +	 */
-> > +	if (!vtime_accounting_enabled_this_cpu())
-> > +		vtime_account_guest_exit();
+On Thu, Apr 15, 2021 at 03:20:57PM -0700, Sean Christopherson wrote:
+> This is a continuation of Wanpeng's series[1] to fix tick-based CPU time
+> accounting on x86, with my cleanups[2] bolted on top.  The core premise of
+> Wanpeng's patches are preserved, but they are heavily stripped down.
+> Specifically, only the "guest exit" paths are split, and no code is
+> consolidated.  The intent is to do as little as possible in the three
+> patches that need to be backported.  Keeping those changes as small as
+> possible also meant that my cleanups did not need to unwind much 
+> refactoring.
 > 
-> Can we rather have instead:
+> On x86, tested CONFIG_VIRT_CPU_ACCOUNTING_GEN =y and =n, and with
+> CONFIG_DEBUG_ENTRY=y && CONFIG_VALIDATE_STACKS=y.  Compile tested arm64,
+> MIPS, PPC, and s390, the latter with CONFIG_DEBUG_ENTRY=y for giggles.
 > 
-> static inline void tick_account_guest_exit(void)
-> {
+> One last note: I elected to use vtime_account_guest_exit() in the x86 code
+> instead of open coding these equivalents:
+> 
+> 	if (vtime_accounting_enabled_this_cpu())
+> 		vtime_guest_exit(current);
+> ...
 > 	if (!vtime_accounting_enabled_this_cpu())
 > 		current->flags &= ~PF_VCPU;
-> }
 > 
-> It duplicates a bit of code but I think this will read less confusing.
+> With CONFIG_VIRT_CPU_ACCOUNTING_GEN=n, this is a complete non-issue, but
+> for the =y case it means context_tracking_enabled_this_cpu() is being
+> checked back-to-back.  The redundant checks bug me, but open coding the
+> gory details in x86 or providing funky variants in vtime.h felt worse.
+> 
+> Delta from Wanpeng's v2:
+> 
+>   - s/context_guest/context_tracking_guest, purely to match the existing
+>     functions.  I have no strong opinion either way.
+>   - Split only the "exit" functions.
+>   - Partially open code vcpu_account_guest_exit() and
+>     __vtime_account_guest_exit() in x86 to avoid churn when segueing into
+>     my cleanups (see above).
+> 
+> [1] https://lkml.kernel.org/r/1618298169-3831-1-git-send-email-wanpengli@tencent.com
+> [2] https://lkml.kernel.org/r/20210413182933.1046389-1-seanjc@google.com
+> 
+> Sean Christopherson (6):
+>   sched/vtime: Move vtime accounting external declarations above inlines
+>   sched/vtime: Move guest enter/exit vtime accounting to vtime.h
+>   context_tracking: Consolidate guest enter/exit wrappers
+>   context_tracking: KVM: Move guest enter/exit wrappers to KVM's domain
+>   KVM: x86: Consolidate guest enter/exit logic to common helpers
+>   KVM: Move instrumentation-safe annotations for enter/exit to x86 code
+> 
+> Wanpeng Li (3):
+>   context_tracking: Move guest exit context tracking to separate helpers
+>   context_tracking: Move guest exit vtime accounting to separate helpers
+>   KVM: x86: Defer tick-based accounting 'til after IRQ handling
+> 
+>  arch/x86/kvm/svm/svm.c           |  39 +--------
+>  arch/x86/kvm/vmx/vmx.c           |  39 +--------
+>  arch/x86/kvm/x86.c               |   8 ++
+>  arch/x86/kvm/x86.h               |  52 ++++++++++++
+>  include/linux/context_tracking.h |  92 ++++-----------------
+>  include/linux/kvm_host.h         |  38 +++++++++
+>  include/linux/vtime.h            | 138 +++++++++++++++++++------------
+>  7 files changed, 204 insertions(+), 202 deletions(-)
 
-Either way works for me.  I used vtime_account_guest_exit() to try to keep as
-many details as possible inside vtime, e.g. in case the implemenation is tweaked
-in the future.  But I agree that pretending KVM isn't already deeply intertwined
-with the details is a lie.
+Please Cc me on any follow-up of this patchset. I have set up a lot of booby
+traps on purpose in this cave and I might be able to remember a few on the way.
+Should you meet one of the poisoned arrows, rest assured that you were not the
+aimed target though.
+
+Thanks.
