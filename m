@@ -2,142 +2,132 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4FD93365061
-	for <lists+kvm@lfdr.de>; Tue, 20 Apr 2021 04:33:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4F05936509B
+	for <lists+kvm@lfdr.de>; Tue, 20 Apr 2021 04:56:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233532AbhDTCeR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 19 Apr 2021 22:34:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35682 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229508AbhDTCeQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 19 Apr 2021 22:34:16 -0400
-Received: from mail-ot1-x32b.google.com (mail-ot1-x32b.google.com [IPv6:2607:f8b0:4864:20::32b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1963BC06174A
-        for <kvm@vger.kernel.org>; Mon, 19 Apr 2021 19:33:46 -0700 (PDT)
-Received: by mail-ot1-x32b.google.com with SMTP id k14-20020a9d7dce0000b02901b866632f29so34544959otn.1
-        for <kvm@vger.kernel.org>; Mon, 19 Apr 2021 19:33:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=stonybrook.edu; s=sbu-gmail;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=I2YASYiNW4GYlT1VJPkWeAiPvogJBv6t7fDZPBpBZqM=;
-        b=mw67iJCf2W+0IQyupLCXl1zQCOgzZbSmGXMTpSE1/jTXHkIfZfJU1G8YbKACbroVa3
-         H9AYu0LlFlHGdQhSTxq+x7URzTx3dX2vtCCU3id/QIv6M7XJs123yX4q0IS2SCmkIf1X
-         sZNOUAn72CKRUOYRRXe8ZjO3/PhqHuuRm7lIs=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=I2YASYiNW4GYlT1VJPkWeAiPvogJBv6t7fDZPBpBZqM=;
-        b=kAAg/nMJ3rr71e85gCaprbl84Lsi62DSVtOtISglvANyUKg3o+8Ij926OKARy92xPq
-         Dce9EBM61otevfkpeBbo5wqzvsffgu6EPP1/9ke7feJfijea2LgPrpz/SF5THidDUJw4
-         oSY5zmtIDHsCDEOVQFMcdHXGt4Gg2/vzlLuRweuSeXMuEZ9l0xcjgX54OHmJb4KHCJ2C
-         f6Ux17gG40+TP5lh5l/DWy/Rp4Y343TnoNJGz38pQ+nkb+lmPt70hAKARDHamqzRD9+Q
-         ZngVoJO4Tay+o8NX0sV4ixTHD0l8nuVi8Crd9HBRa2DAa7HLjmxHBHdt4JdxpLAe/Mk5
-         bMuw==
-X-Gm-Message-State: AOAM533xnmr2/YytyXyLnFIdcU0I+WDEEvk6srFofoS7GF2rXQIVfsv3
-        8dejQVk9dzv/eX3Z3Z9OOhTlkBiUZpwi10Q5tsmBSxzaDAg=
-X-Google-Smtp-Source: ABdhPJxtpnu+6vh5rViQnb8KFkVV6LI1xGWHg/oRkhaajYQE7XIeATRi7S9mikyRI7jXFhLiOvom+S2aWYjlpJi5SEA=
-X-Received: by 2002:a05:6830:2241:: with SMTP id t1mr17173521otd.126.1618886025495;
- Mon, 19 Apr 2021 19:33:45 -0700 (PDT)
+        id S229688AbhDTC5S (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 19 Apr 2021 22:57:18 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:60189 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229559AbhDTC5R (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 19 Apr 2021 22:57:17 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1618887406;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=EE7LME23WUWVeXeRfQveamynPNr8MvEiH4grzJIaWTk=;
+        b=hp3zpKUgJqSxlZ6V0wnXzvotrNpIDERh5VyLtb3Jxzr5w0TdGe/gR8kyiYGzs197tBDT0y
+        5HBRWaUAjs8L3+XnUl9lr5QvUVFM/kLOZ7ogf8cPPO8AGgnInLTqLXHjoqHuyTbaL3pQHC
+        bU4Q1ILkL7grVTsxQDKfCRle3QUswH8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-47-iQ2M1oXpPD2yq6tNf7YBHQ-1; Mon, 19 Apr 2021 22:56:44 -0400
+X-MC-Unique: iQ2M1oXpPD2yq6tNf7YBHQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6D44683DD21;
+        Tue, 20 Apr 2021 02:56:43 +0000 (UTC)
+Received: from wangxiaodeMacBook-Air.local (ovpn-13-125.pek2.redhat.com [10.72.13.125])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id BA494610F1;
+        Tue, 20 Apr 2021 02:56:38 +0000 (UTC)
+Subject: Re: [PATCH V4 1/3] vDPA/ifcvf: deduce VIRTIO device ID when probe
+To:     Zhu Lingshan <lingshan.zhu@intel.com>, mst@redhat.com,
+        lulu@redhat.com, sgarzare@redhat.com
+Cc:     virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20210419063326.3748-1-lingshan.zhu@intel.com>
+ <20210419063326.3748-2-lingshan.zhu@intel.com>
+From:   Jason Wang <jasowang@redhat.com>
+Message-ID: <295dc8a9-3159-78bc-f90f-9c8abeedf1cb@redhat.com>
+Date:   Tue, 20 Apr 2021 10:56:37 +0800
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
+ Gecko/20100101 Thunderbird/78.9.1
 MIME-Version: 1.0
-References: <CAJGDS+GKd_YR9QmTR-6KsiE16=4s8fuqh8pmQTYnxHXS=mYp9g@mail.gmail.com>
- <YH2z3uuQYwSyGJfL@google.com>
-In-Reply-To: <YH2z3uuQYwSyGJfL@google.com>
-From:   Arnabjyoti Kalita <akalita@cs.stonybrook.edu>
-Date:   Tue, 20 Apr 2021 08:03:34 +0530
-Message-ID: <CAJGDS+FGnDFssYXLfLrog+AJu62rrs6DzAQuESJSDaNNdsYdcw@mail.gmail.com>
-Subject: Re: Intercepting RDTSC instruction by causing a VMEXIT
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20210419063326.3748-2-lingshan.zhu@intel.com>
+Content-Type: text/plain; charset=gbk; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hello Sean,
 
-Thank you very much for your answer. I'm hoping the inlined changes
-should be enough to see RDTSC interception.
+ÔÚ 2021/4/19 ÏÂÎç2:33, Zhu Lingshan Ð´µÀ:
+> This commit deduces VIRTIO device ID as device type when probe,
+> then ifcvf_vdpa_get_device_id() can simply return the ID.
+> ifcvf_vdpa_get_features() and ifcvf_vdpa_get_config_size()
+> can work properly based on the device ID.
+>
+> Signed-off-by: Zhu Lingshan <lingshan.zhu@intel.com>
 
-No, I'm actually not running a nested guest, even though vmx is enabled.
 
-Best Regards,
-Arnabjyoti Kalita
+Acked-by: Jason Wang <jasowang@redhat.com>
 
-On Mon, Apr 19, 2021 at 10:16 PM Sean Christopherson <seanjc@google.com> wrote:
+
+> ---
+>   drivers/vdpa/ifcvf/ifcvf_base.h |  1 +
+>   drivers/vdpa/ifcvf/ifcvf_main.c | 27 +++++++++++++++------------
+>   2 files changed, 16 insertions(+), 12 deletions(-)
 >
-> On Sat, Apr 17, 2021, Arnabjyoti Kalita wrote:
-> > Hello all,
-> >
-> > I'm having a requirement to record values obtained by reading tsc clock.
-> >
-> > The command line I use to start QEMU in KVM mode is as below -
-> >
-> > sudo ./qemu-system-x86_64 -m 1024 --machine pc-i440fx-2.5 -cpu
-> > qemu64,-vme,-x2apic,-kvmclock,+lahf_lm,+3dnowprefetch,+vmx -enable-kvm
-> > -netdev tap,id=tap1,ifname=tap0,script=no,downscript=no -device
-> > virtio-net-pci,netdev=tap1,mac=00:00:00:00:00:00 -drive
-> > file=~/os_images_for_qemu/ubuntu-16.04.server.qcow2,format=qcow2,if=none,id=img-direct
-> > -device virtio-blk-pci,drive=img-direct
-> >
-> > I am using QEMU version 2.11.92 and the guest kernel is a
-> > 4.4.0-116-generic. I use the CPU model "qemu64" because I have a
-> > requirement to create a snapshot of this guest and load the snapshot
-> > in TCG mode. The generic CPU model helps, in this regard.
-> >
-> > Now when the guest is running, I want to intercept all rdtsc
-> > instructions and record the tsc clock values. I know that for this to
-> > happen, the CPU_BASED_RDTSC_EXITING flag needs to exist for the
-> > particular CPU model.
-> >
-> > How do I start adding support for causing VMEXIT upon rdtsc execution?
->
-> This requires a KVM change.  The below should do the trick.
->
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index c05e6e2854b5..f000728e4319 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -2453,7 +2453,8 @@ static __init int setup_vmcs_config(struct vmcs_config *vmcs_conf,
->               CPU_BASED_MWAIT_EXITING |
->               CPU_BASED_MONITOR_EXITING |
->               CPU_BASED_INVLPG_EXITING |
-> -             CPU_BASED_RDPMC_EXITING;
-> +             CPU_BASED_RDPMC_EXITING |
-> +             CPU_BASED_RDTSC_EXITING;
->
->         opt = CPU_BASED_TPR_SHADOW |
->               CPU_BASED_USE_MSR_BITMAPS |
-> @@ -5194,6 +5195,15 @@ static int handle_invlpg(struct kvm_vcpu *vcpu)
->         return kvm_skip_emulated_instruction(vcpu);
->  }
->
-> +static int handle_rdtsc(struct kvm_vcpu *vcpu)
-> +{
-> +       u64 tsc = kvm_read_l1_tsc(vcpu, rdtsc());
+> diff --git a/drivers/vdpa/ifcvf/ifcvf_base.h b/drivers/vdpa/ifcvf/ifcvf_base.h
+> index b2eeb16b9c2c..1c04cd256fa7 100644
+> --- a/drivers/vdpa/ifcvf/ifcvf_base.h
+> +++ b/drivers/vdpa/ifcvf/ifcvf_base.h
+> @@ -84,6 +84,7 @@ struct ifcvf_hw {
+>   	u32 notify_off_multiplier;
+>   	u64 req_features;
+>   	u64 hw_features;
+> +	u32 dev_type;
+>   	struct virtio_pci_common_cfg __iomem *common_cfg;
+>   	void __iomem *net_cfg;
+>   	struct vring_info vring[IFCVF_MAX_QUEUE_PAIRS * 2];
+> diff --git a/drivers/vdpa/ifcvf/ifcvf_main.c b/drivers/vdpa/ifcvf/ifcvf_main.c
+> index 44d7586019da..66927ec81fa5 100644
+> --- a/drivers/vdpa/ifcvf/ifcvf_main.c
+> +++ b/drivers/vdpa/ifcvf/ifcvf_main.c
+> @@ -323,19 +323,9 @@ static u32 ifcvf_vdpa_get_generation(struct vdpa_device *vdpa_dev)
+>   
+>   static u32 ifcvf_vdpa_get_device_id(struct vdpa_device *vdpa_dev)
+>   {
+> -	struct ifcvf_adapter *adapter = vdpa_to_adapter(vdpa_dev);
+> -	struct pci_dev *pdev = adapter->pdev;
+> -	u32 ret = -ENODEV;
+> -
+> -	if (pdev->device < 0x1000 || pdev->device > 0x107f)
+> -		return ret;
+> -
+> -	if (pdev->device < 0x1040)
+> -		ret =  pdev->subsystem_device;
+> -	else
+> -		ret =  pdev->device - 0x1040;
+> +	struct ifcvf_hw *vf = vdpa_to_vf(vdpa_dev);
+>   
+> -	return ret;
+> +	return vf->dev_type;
+>   }
+>   
+>   static u32 ifcvf_vdpa_get_vendor_id(struct vdpa_device *vdpa_dev)
+> @@ -466,6 +456,19 @@ static int ifcvf_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+>   	pci_set_drvdata(pdev, adapter);
+>   
+>   	vf = &adapter->vf;
 > +
-> +       kvm_rax_write(vcpu, tsc & -1u);
-> +       kvm_rdx_write(vcpu, (tsc >> 32) & -1u);
-> +       return kvm_skip_emulated_instruction(vcpu);
-> +}
+> +	/* This drirver drives both modern virtio devices and transitional
+> +	 * devices in modern mode.
+> +	 * vDPA requires feature bit VIRTIO_F_ACCESS_PLATFORM,
+> +	 * so legacy devices and transitional devices in legacy
+> +	 * mode will not work for vDPA, this driver will not
+> +	 * drive devices with legacy interface.
+> +	 */
+> +	if (pdev->device < 0x1040)
+> +		vf->dev_type =  pdev->subsystem_device;
+> +	else
+> +		vf->dev_type =  pdev->device - 0x1040;
 > +
->  static int handle_apic_access(struct kvm_vcpu *vcpu)
->  {
->         if (likely(fasteoi)) {
-> @@ -5605,6 +5615,7 @@ static int (*kvm_vmx_exit_handlers[])(struct kvm_vcpu *vcpu) = {
->         [EXIT_REASON_INVD]                    = kvm_emulate_invd,
->         [EXIT_REASON_INVLPG]                  = handle_invlpg,
->         [EXIT_REASON_RDPMC]                   = kvm_emulate_rdpmc,
-> +       [EXIT_REASON_RDTSC]                   = handle_rdtsc,
->         [EXIT_REASON_VMCALL]                  = kvm_emulate_hypercall,
->         [EXIT_REASON_VMCLEAR]                 = handle_vmx_instruction,
->         [EXIT_REASON_VMLAUNCH]                = handle_vmx_instruction,
->
-> > I see that a fairly recent commit in QEMU helps adding nested VMX
-> > controls to named CPU models, but not "qemu64". Can I extend this
-> > commit to add these controls to "qemu64" as well? Will making this
-> > change immediately add support for intercepting VMEXITS for "qemu64"
-> > CPU?
->
-> Are you actually running a nested guest?
+>   	vf->base = pcim_iomap_table(pdev);
+>   
+>   	adapter->pdev = pdev;
+
