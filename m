@@ -2,141 +2,86 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 299A2365AD2
-	for <lists+kvm@lfdr.de>; Tue, 20 Apr 2021 16:08:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 66F0B365B4B
+	for <lists+kvm@lfdr.de>; Tue, 20 Apr 2021 16:37:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232507AbhDTOIf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 20 Apr 2021 10:08:35 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:55304 "EHLO
+        id S232683AbhDTOiQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 20 Apr 2021 10:38:16 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:21600 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231422AbhDTOIe (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 20 Apr 2021 10:08:34 -0400
+        by vger.kernel.org with ESMTP id S232597AbhDTOiP (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 20 Apr 2021 10:38:15 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1618927682;
+        s=mimecast20190719; t=1618929463;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=jDVmsZT82WF5IHvcZJyjG++DF0zOp7ksAtsJgyQLwio=;
-        b=Okc/riM2RA9u1XOkfuI01o1IwhSiJWmZ9fvcjUXmHkmB/OHIeQjacxzQ6r44G89itxCtCT
-        6LNk6c+8g9LDLnCRRfBSuF8W/QuMnjkhfOgExUbeeusc2vOrE312Qkv04NSDKVLcluNiLJ
-        qAJxNzGVdMp8D0lF52E5w/FJJZKZ2Qc=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-244-9qXCqdz1PCqVKqSnZCWXVA-1; Tue, 20 Apr 2021 10:07:54 -0400
-X-MC-Unique: 9qXCqdz1PCqVKqSnZCWXVA-1
-Received: by mail-ed1-f72.google.com with SMTP id w15-20020a056402268fb02903828f878ec5so13182217edd.5
-        for <kvm@vger.kernel.org>; Tue, 20 Apr 2021 07:07:54 -0700 (PDT)
+        bh=33CVA8kWHawipps7EFzUJb1CXaHeSH20T2baV3pWy8g=;
+        b=eawdI7Re9axqPZW5ClbKilu6mwYpkoVMvInu8pJzFsE/0fNWBYpGDhz/rUUlWOdKpbE0lE
+        PHwsSqsnNQO0VamlFZeoQJ8egM/jX7TVEdsPP5ZMU35I3+tuADFJvLY5eN6D1rVSv5/MUI
+        a37C5rtAZff2X1i478P7UGHeujXjyhI=
+Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com
+ [209.85.160.199]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-533-t9J_ocBcP1SMzj4jTelMrA-1; Tue, 20 Apr 2021 10:37:41 -0400
+X-MC-Unique: t9J_ocBcP1SMzj4jTelMrA-1
+Received: by mail-qt1-f199.google.com with SMTP id g21-20020ac858150000b02901ba6163708bso1375527qtg.5
+        for <kvm@vger.kernel.org>; Tue, 20 Apr 2021 07:37:41 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=jDVmsZT82WF5IHvcZJyjG++DF0zOp7ksAtsJgyQLwio=;
-        b=rOhuh8lLs0b5b2BQSpxnl96fyDNYT1j+USG8bzVvkV/ksIUAIHOXS3h4spSNrZq9Yf
-         YlBbL09cPlGMp2132/eyskBKhhSi6fORkW1J8mTrusmBEw2xiu4AwyyiUqiIbp5lKDNR
-         wiiPrpxPHK0dJs/euJZvhKopmmCNfPC9k3gpYy8qmgrGCxk8x7u8K6hV9shJb4VQZioA
-         Usatts/nEg2qhwpUw2jArOptiNNIUENRTRoBYauZ6fLj4AePcOldO6cqycrz8jmQtOuL
-         pJpuvAxG/F7i6nE/BA3XrAF9OGkgCiB0vw3G8rK8gulqNBvaF9JttUtdDXD8fA8YHnPD
-         EQ+g==
-X-Gm-Message-State: AOAM533qfCA7XHEMqIzL0IXxsClu8oakJ/5cXnfNPw08kG/j7vIKbF4N
-        2kcvZ6o9FxvYOr60i1sNraWk6LwHfQgEPEg6z8MnhjLo1WFOpMhhWkzzWgrB9BC9x4G4dfruBGU
-        4A5fGzh3Dwepf
-X-Received: by 2002:a05:6402:278d:: with SMTP id b13mr32202746ede.34.1618927673701;
-        Tue, 20 Apr 2021 07:07:53 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzsIyaH/fgrNE9cx6DPFnsc2ZoUIN4T+efZ+L0gcuhnjAJpXVjXgEYOrwxoSGCxE6PwPWOSAw==
-X-Received: by 2002:a05:6402:278d:: with SMTP id b13mr32202719ede.34.1618927673473;
-        Tue, 20 Apr 2021 07:07:53 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e? ([2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e])
-        by smtp.gmail.com with ESMTPSA id d1sm15235952ede.31.2021.04.20.07.07.52
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 20 Apr 2021 07:07:52 -0700 (PDT)
-Subject: Re: [PATCH v3 1/2] KVM: selftests: Sync data verify of dirty logging
- with guest sync
-To:     Peter Xu <peterx@redhat.com>
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=33CVA8kWHawipps7EFzUJb1CXaHeSH20T2baV3pWy8g=;
+        b=DIm7ZVg3inCIz9ZvHxBgEKauu+7QxHNmWb8mk6Fy7gNIVgsXRt60eeqMBcrTpPRiYh
+         4tuUB9BFG9qKONqq8l4E4xXDXrwL1YI2T68CpgF85P0VB2qGAVeJAySkZXR6UeFDMXfq
+         /KZvMo5CqLO9oJyltlbKH4k8kMwbd8qTKA784j3Q0JG3JKumV4ktj/8+1+9UlGl3SCIv
+         jOuKc2rlanMK5Nnp1cKMy1CjFcZoK0HhJjIaUH40NjKSQmZdUQ3DSARA00V4prlMateH
+         cp0P08FWSboP47G7ypPZiShOKMyahQ2SPE6gfT9HrTAlguKJeQXxkwj2De3ZBkk+c8Zy
+         b3dA==
+X-Gm-Message-State: AOAM531qXgeudLKueZZgl8//47wNjRyaHjKdodTsZ+DBezamJCS1FANV
+        1p3PjPbjm2CymI1M3ns3qeGAGnb1R3fiWNCtOXEGnvAO0c7C/4tlB+p2YCfhjkMZze1xRBW828F
+        Jv2TNpw5+FnOR
+X-Received: by 2002:a0c:fb43:: with SMTP id b3mr12120016qvq.42.1618929461411;
+        Tue, 20 Apr 2021 07:37:41 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJx4ONXVSlwHL519fIegDGFnXVnOOob94nUlZsSOdtHzcOFxIJiOusGtNuV+XRpmmYe1+KUq/Q==
+X-Received: by 2002:a0c:fb43:: with SMTP id b3mr12119998qvq.42.1618929461181;
+        Tue, 20 Apr 2021 07:37:41 -0700 (PDT)
+Received: from xz-x1 (bras-base-toroon474qw-grc-88-174-93-75-154.dsl.bell.ca. [174.93.75.154])
+        by smtp.gmail.com with ESMTPSA id k127sm12216745qkc.88.2021.04.20.07.37.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 20 Apr 2021 07:37:40 -0700 (PDT)
+Date:   Tue, 20 Apr 2021 10:37:39 -0400
+From:   Peter Xu <peterx@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Andrew Jones <drjones@redhat.com>,
-        Sean Christopherson <seanjc@google.com>
-References: <20210417143602.215059-1-peterx@redhat.com>
- <20210417143602.215059-2-peterx@redhat.com> <20210418124351.GW4440@xz-x1>
- <60b0c96c-161d-676d-c30a-a7ffeccab417@redhat.com>
- <20210420131041.GZ4440@xz-x1>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <e110673a-8422-bdff-4336-bdb486842d39@redhat.com>
-Date:   Tue, 20 Apr 2021 16:07:51 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.7.0
+        stable@vger.kernel.org
+Subject: Re: [PATCH] KVM: selftests: Always run vCPU thread with blocked
+ SIG_IPI
+Message-ID: <20210420143739.GA4440@xz-x1>
+References: <20210420081614.684787-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20210420131041.GZ4440@xz-x1>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20210420081614.684787-1-pbonzini@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 20/04/21 15:10, Peter Xu wrote:
-> On Tue, Apr 20, 2021 at 10:07:16AM +0200, Paolo Bonzini wrote:
->> On 18/04/21 14:43, Peter Xu wrote:
->>> ----8<-----
->>> diff --git a/tools/testing/selftests/kvm/dirty_log_test.c b/tools/testing/selftests/kvm/dirty_log_test.c
->>> index 25230e799bc4..d3050d1c2cd0 100644
->>> --- a/tools/testing/selftests/kvm/dirty_log_test.c
->>> +++ b/tools/testing/selftests/kvm/dirty_log_test.c
->>> @@ -377,7 +377,7 @@ static void dirty_ring_after_vcpu_run(struct kvm_vm *vm, int ret, int err)
->>>           /* A ucall-sync or ring-full event is allowed */
->>>           if (get_ucall(vm, VCPU_ID, NULL) == UCALL_SYNC) {
->>>                   /* We should allow this to continue */
->>> -               ;
->>> +               vcpu_handle_sync_stop();
->>>           } else if (run->exit_reason == KVM_EXIT_DIRTY_RING_FULL ||
->>>                      (ret == -1 && err == EINTR)) {
->>>                   /* Update the flag first before pause */
->>> ----8<-----
->>>
->>> That's my intention when I introduce vcpu_handle_sync_stop(), but forgot to
->>> add...
->>
->> And possibly even this (untested though):
->>
->> diff --git a/tools/testing/selftests/kvm/dirty_log_test.c b/tools/testing/selftests/kvm/dirty_log_test.c
->> index ffa4e2791926..918954f01cef 100644
->> --- a/tools/testing/selftests/kvm/dirty_log_test.c
->> +++ b/tools/testing/selftests/kvm/dirty_log_test.c
->> @@ -383,6 +383,7 @@ static void dirty_ring_after_vcpu_run(struct kvm_vm *vm, int ret, int err)
->>   		/* Update the flag first before pause */
->>   		WRITE_ONCE(dirty_ring_vcpu_ring_full,
->>   			   run->exit_reason == KVM_EXIT_DIRTY_RING_FULL);
->> +		atomic_set(&vcpu_sync_stop_requested, false);
->>   		sem_post(&sem_vcpu_stop);
->>   		pr_info("vcpu stops because %s...\n",
->>   			dirty_ring_vcpu_ring_full ?
->> @@ -804,8 +805,7 @@ static void run_test(enum vm_guest_mode mode, void *arg)
->>   		 * the flush of the last page, and since we handle the last
->>   		 * page specially verification will succeed anyway.
->>   		 */
->> -		assert(host_log_mode == LOG_MODE_DIRTY_RING ||
->> -		       atomic_read(&vcpu_sync_stop_requested) == false);
->> +		assert(atomic_read(&vcpu_sync_stop_requested) == false);
->>   		vm_dirty_log_verify(mode, bmap);
->>   		sem_post(&sem_vcpu_cont);
->>
->> You can submit all these as a separate patch.
+On Tue, Apr 20, 2021 at 04:16:14AM -0400, Paolo Bonzini wrote:
+> The main thread could start to send SIG_IPI at any time, even before signal
+> blocked on vcpu thread.  Therefore, start the vcpu thread with the signal
+> blocked.
 > 
-> But it could race, then?
+> Without this patch, on very busy cores the dirty_log_test could fail directly
+> on receiving a SIGUSR1 without a handler (when vcpu runs far slower than main).
 > 
->          main thread                 vcpu thread
->          -----------                 -----------
->                                    ring full
->                                      vcpu_sync_stop_requested=0
->                                      sem_post(&sem_vcpu_stop)
->       vcpu_sync_stop_requested=1
->       sem_wait(&sem_vcpu_stop)
->       assert(vcpu_sync_stop_requested==0)   <----
+> Reported-by: Peter Xu <peterx@redhat.com>
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 
-Yes, it could indeed.
+Yes, indeed better! :)
 
-Thanks,
+Reviewed-by: Peter Xu <peterx@redhat.com>
 
-Paolo
+-- 
+Peter Xu
 
