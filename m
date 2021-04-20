@@ -2,185 +2,124 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DE220365F20
-	for <lists+kvm@lfdr.de>; Tue, 20 Apr 2021 20:21:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5766D365F30
+	for <lists+kvm@lfdr.de>; Tue, 20 Apr 2021 20:28:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233245AbhDTSWW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 20 Apr 2021 14:22:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46736 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232879AbhDTSWT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 20 Apr 2021 14:22:19 -0400
-Received: from mail-pl1-x62e.google.com (mail-pl1-x62e.google.com [IPv6:2607:f8b0:4864:20::62e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B6F9CC06174A
-        for <kvm@vger.kernel.org>; Tue, 20 Apr 2021 11:21:47 -0700 (PDT)
-Received: by mail-pl1-x62e.google.com with SMTP id o16so6521530plg.5
-        for <kvm@vger.kernel.org>; Tue, 20 Apr 2021 11:21:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=vrF8syNtvi8MTUMiAAXA/Clz1Cv2NTynYHq8T0jl3hc=;
-        b=UT1TVF9HvxVD6sWsgYP/1DEbZNOAb0TEnyKd/Bd5nbiuHAaTlFDCbb5skiZtsrl8MN
-         wXlYPCdppgSfZhf5sueiX4xUe5c9WTupRCI1sauFHBxBKFiNx/wywnuPHpYXa18whuAU
-         BDCW6VjizWmVuUUZi1kMK6rQhOmpcdmdIBSDY85iePFpOblVOC4T12Dk3scpslYWpb7e
-         1NZIHDi3TMWNSCMg6EOUZjavB1JPSt8dnjjMSCR6QFxaoq7Y+RqoKpXFfPwzS1TVXVVG
-         UsCXKGcYUUFLUJyIoREc4TDAacxmrZWyJpAm2XcWiC0WlNPeBnX1sVdA9HYldw7aqZmo
-         gk0A==
+        id S233544AbhDTS2b (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 20 Apr 2021 14:28:31 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:55495 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S233092AbhDTS2a (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 20 Apr 2021 14:28:30 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1618943278;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=rt/t+I/KtcZ1bXATJ8JrmYabWuJFiLedZQY+lkzmzzc=;
+        b=SOAUtf/TzKHqnFh4Ma5XPZbWj64GchnvAodN0oSpJhoLbKeQhqBwGUMujJKFg7Od6hUAMh
+        Bd0iqBNFw8+lv+OaP7w9cL0Hrjcu7Wgp7m2dyB+faQ6prQAgd7Q5C8y/A5kzRpNiDbZfG0
+        metNFv+gTinuILQcxiiayWV9KFjIxVU=
+Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
+ [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-367-V3uc2CwUOJ2brjXdQnGxkg-1; Tue, 20 Apr 2021 14:27:54 -0400
+X-MC-Unique: V3uc2CwUOJ2brjXdQnGxkg-1
+Received: by mail-ed1-f70.google.com with SMTP id c15-20020a056402100fb029038518e5afc5so6045010edu.18
+        for <kvm@vger.kernel.org>; Tue, 20 Apr 2021 11:27:54 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=vrF8syNtvi8MTUMiAAXA/Clz1Cv2NTynYHq8T0jl3hc=;
-        b=iDfBUI4v+bhI9wsI6n3Hh0r0oP89yDiB41Z7AeiitmGR0bqTMoICPtEfFs25wF5K4w
-         ueOcngjU0WjnntfhZflBN+0T5IXzQ5nJPOvPEfRTBaEvGmbIWrCp8S/y4vkqc1SPMfBp
-         niKlbUlNTQRBV0gd3PE4pcY5NVif/1aFzqWbZqnMJzGtf94EwHEqOoh7kWWYqhz8WCK/
-         S99yV4gggyXDg/wLnqeJq5WNyq4T8sG52jvQyzA951575ogw6W0dNYO53buKc+/c7fOD
-         w6xHJODnKAjyc4M+hAWgWRNFh1/pdSoZqzsaJAqJjDIrcC4pj6hpl02vLltpM7mKfnl/
-         Q/Rw==
-X-Gm-Message-State: AOAM530UuuydjmLlqiIKVJMMCtAKZC90n0kiAhfO5ESgHzB0GOPtj/RA
-        Ihf6SSHTd5k5tJCPx3W9RNgBsw==
-X-Google-Smtp-Source: ABdhPJzHelQ69nDT+yfI/8ngPfXICJYB0pz+bCtV3K3qRKiBXhMk49PydGHMGv1m22zRRFMOZTDmbQ==
-X-Received: by 2002:a17:902:20e:b029:ec:a39a:4194 with SMTP id 14-20020a170902020eb02900eca39a4194mr12566484plc.31.1618942906998;
-        Tue, 20 Apr 2021 11:21:46 -0700 (PDT)
-Received: from google.com (240.111.247.35.bc.googleusercontent.com. [35.247.111.240])
-        by smtp.gmail.com with ESMTPSA id t10sm3102532pjy.16.2021.04.20.11.21.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 20 Apr 2021 11:21:46 -0700 (PDT)
-Date:   Tue, 20 Apr 2021 18:21:42 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     David Edmondson <dme@dme.org>
-Cc:     Aaron Lewis <aaronlewis@google.com>,
-        Jim Mattson <jmattson@google.com>,
-        kvm list <kvm@vger.kernel.org>
-Subject: Re: [PATCH 1/2] kvm: x86: Allow userspace to handle emulation errors
-Message-ID: <YH8btp+ilY93fKN0@google.com>
-References: <20210416131820.2566571-1-aaronlewis@google.com>
- <cunblaaqwe0.fsf@dme.org>
- <CAAAPnDEEwLRMLZffJSN5W93d5s6EQJuAP58vAVJCo+RZD6ahsA@mail.gmail.com>
- <cunzgxtctgj.fsf@dme.org>
- <CAAAPnDGnY76C-=FppsiL=OFY-ei8kHeJhfK_tNV8of3JHBZ0FA@mail.gmail.com>
- <cunbla8c2y3.fsf@dme.org>
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=rt/t+I/KtcZ1bXATJ8JrmYabWuJFiLedZQY+lkzmzzc=;
+        b=rexDoSB0Wc0h6WxWRYIub+9kyDMqYqjab89Txw9zywaaprnE7qnlD3S8eD2amCx7MN
+         YwX2QikG/zmpEtyYo+qe+a/3Bu69O8LEv5HktJQugojtnDM42GB1vXT/1Mzi1JxsOVwQ
+         DbB7zSNRSCxlVpSaWJ26IjIqldhupupYoq2pLIpmOEWhy0pV4qGJt9IXrCb7Kux/uU2I
+         YHLVI+NOKS7L7a3NEuzaRFXDtuHsmLMcJGw66Ry03uaRFY+8Ldh4vWH+5eUEQ6n+pokq
+         rzqHz34XfwEGpNk429vhyd4LtBxNYiU8Gtt8NsdShwSMyV7dOJEb6W7mhncpc0ai4Wuz
+         vcYw==
+X-Gm-Message-State: AOAM533j3Km05eWKVgCtqQprTDSBaEcPaNF3lRJWYkyKoj5oas5ptYDr
+        EO8SCqsCoH2hgTSl7Z7xDrukNQc1/qqih8R3mnl3h+C37YER53IpCmgxWVjTowACroVnEErh22O
+        5C7PVNkYBs1T5
+X-Received: by 2002:a17:907:3ac1:: with SMTP id fi1mr28976531ejc.139.1618943272712;
+        Tue, 20 Apr 2021 11:27:52 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxEdOZkYCgIf/rLx/m6BBXcl0kUNchsFF0jNoefPiJKHN2UivzWKjaJQk29HdPJtEGSlDj93A==
+X-Received: by 2002:a17:907:3ac1:: with SMTP id fi1mr28976513ejc.139.1618943272489;
+        Tue, 20 Apr 2021 11:27:52 -0700 (PDT)
+Received: from [192.168.10.118] ([93.56.169.140])
+        by smtp.gmail.com with ESMTPSA id li16sm13295075ejb.101.2021.04.20.11.27.51
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 20 Apr 2021 11:27:51 -0700 (PDT)
+Subject: Re: [PATCH 0/3] KVM: x86: guest interface for SEV live migration
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        srutherford@google.com, joro@8bytes.org, brijesh.singh@amd.com,
+        thomas.lendacky@amd.com, venu.busireddy@oracle.com,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Borislav Petkov <bp@suse.de>,
+        x86@kernel.org, Ashish Kalra <ashish.kalra@amd.com>
+References: <20210420112006.741541-1-pbonzini@redhat.com>
+ <YH7wAh0t+eQ5n1M2@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <2b1f1764-bcb0-096a-8d44-aee94f2c85f3@redhat.com>
+Date:   Tue, 20 Apr 2021 20:27:50 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <cunbla8c2y3.fsf@dme.org>
+In-Reply-To: <YH7wAh0t+eQ5n1M2@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Apr 20, 2021, David Edmondson wrote:
-> On Tuesday, 2021-04-20 at 07:57:27 -07, Aaron Lewis wrote:
+On 20/04/21 17:15, Sean Christopherson wrote:
+> On Tue, Apr 20, 2021, Paolo Bonzini wrote:
+>> Do not return the SEV-ES bit from KVM_GET_SUPPORTED_CPUID unless
+>> the corresponding module parameter is 1, and clear the memory encryption
+>> leaf completely if SEV is disabled.
 > 
-> >> >> Why not add a new exit reason, particularly given that the caller has to
-> >> >> enable the capability to get the relevant data? (It would also remove
-> >> >> the need for the flag field and any mechanism for packing multiple bits
-> >> >> of detail into the structure.)
-> >> >
-> >> > I considered that, but I opted for the extensibility of the exiting
-> >> > KVM_EXIT_INTERNAL_ERROR instead.  To me it was six of one or half a
-> >> > dozen of the other.  With either strategy I still wanted to provide
-> >> > for future extensibility, and had a flags field in place.  That way we
-> >> > can add to this in the future if we find something that is missing
-> >> > (ie: potentially wanting a way to mark dirty pages, possibly passing a
-> >> > fault address, etc...)
-> >>
-> >> How many of the flag based optional fields do you anticipate needing for
-> >> any one particular exit scenario?
-> >>
-> >> If it's one, then using the flags to disambiguate the emulation failure
-> >> cases after choosing to stuff all of the cases into
-> >> KVM_EXIT_INTERNAL_ERROR / KVM_INTERNAL_ERROR_EMULATION would be odd.
-> >>
-> >> (I'm presuming that it's not one, but don't understand the use case.)
-> >
-> > The motivation was to allow for maximum flexibility in the future, and
-> > not be tied down to something we potentially missed now.  I agree the
-> > flags aren't needed if we are only adding to what's currently there,
-> > but they are needed if we want to remove something or pack something
-> > differently.  I didn't see how I could achieve that without adding a
-> > flags field.  Seemed like low overhead to be more future proof.
+> Impeccable timing, I was planning on refreshing my SEV cleanup series[*] today.
+> There's going to be an annoying conflict with the svm_set_cpu_caps() change
+> (see below), any objecting to folding your unintentional feedback into my series?
+
+That's fine of course.
+
+>> diff --git a/arch/x86/kvm/cpuid.h b/arch/x86/kvm/cpuid.h
+>> index 888e88b42e8d..e873a60a4830 100644
+>> --- a/arch/x86/kvm/cpuid.h
+>> +++ b/arch/x86/kvm/cpuid.h
+>> @@ -99,6 +99,7 @@ static const struct cpuid_reg reverse_cpuid[] = {
+>>   	[CPUID_7_EDX]         = {         7, 0, CPUID_EDX},
+>>   	[CPUID_7_1_EAX]       = {         7, 1, CPUID_EAX},
+>>   	[CPUID_12_EAX]        = {0x00000012, 0, CPUID_EAX},
+>> +	[CPUID_8000_001F_EAX] = {0x8000001F, 0, CPUID_EAX},
+>>   };
+>>   
+>>   /*
+>> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+>> index cd8c333ed2dc..acdb8457289e 100644
+>> --- a/arch/x86/kvm/svm/svm.c
+>> +++ b/arch/x86/kvm/svm/svm.c
+>> @@ -923,6 +923,13 @@ static __init void svm_set_cpu_caps(void)
+>>   	if (boot_cpu_has(X86_FEATURE_LS_CFG_SSBD) ||
+>>   	    boot_cpu_has(X86_FEATURE_AMD_SSBD))
+>>   		kvm_cpu_cap_set(X86_FEATURE_VIRT_SSBD);
+>> +
+>> +	/* CPUID 0x8000001F */
+>> +	if (sev) {
+>> +		kvm_cpu_cap_set(X86_FEATURE_SEV);
+>> +		if (sev_es)
+>> +			kvm_cpu_cap_set(X86_FEATURE_SEV_ES);
 > 
-> With what you have now, the ndata field seems unnecessary - I should be
-> able to determine the contents of the rest of the structure based on the
-> flags.
+> Gah, I completely spaced on the module params in my series, which is more
+> problematic than normal because it also moves "sev" and "sev_es" to sev.c.  The
+> easy solution is to add sev_set_cpu_caps().
 
-Keeping ndata is necessary if we piggyback KVM_INTERNAL_ERROR_EMULATION,
-otherwise we'll break for VMMs that are not aware of the new format.  E.g. if
-ndata gets stuffed with a large number, KVM could cause a buffer overrun in an
-old VMM.
+Sounds good.
 
-> That also suggests to me that using something other than
-> KVM_INTERNAL_ERROR_EMULATION would make sense.
-
-Like Aaron, I'm on the fence as to whether or not a new exit reason is in order.
-On one hand, it would be slightly cleaner.  On the other hand, the existing
-"KVM_INTERNAL_ERROR_EMULATION" really is the best name.  It implies nothing
-about the userspace VMM, only that KVM attempted to emulate an instruction and
-failed.
-
-The other motivation is that KVM can opportunistically start dumping extra info
-for old VMMs, though this patch does not do that; feedback imminent. :-)
-
-> This comment:
-> 
-> >> >> > + * When using the suberror KVM_INTERNAL_ERROR_EMULATION, these flags are used
-> >> >> > + * to describe what is contained in the exit struct.  The flags are used to
-> >> >> > + * describe it's contents, and the contents should be in ascending numerical
-> >> >> > + * order of the flag values.  For example, if the flag
-> >> >> > + * KVM_INTERNAL_ERROR_EMULATION_FLAG_INSTRUCTION_BYTES is set, the instruction
-> >> >> > + * length and instruction bytes would be expected to show up first because this
-> >> >> > + * flag has the lowest numerical value (1) of all the other flags.
-> 
-> originally made me think that the flag-indicated elements were going to
-> be packed into the remaining space of the structure at a position
-> depending on which flags are set.
-> 
-> For example, if I add a new flag
-> KVM_INTERNAL_ERROR_EMULATION_FLAG_EXIT_CODE, value 2, and then want to
-> pass back an exit code but *not* instruction bytes, the comment appears
-> to suggest that the exit code will appear immediately after the flags.
-> 
-> This is contradicted by your other reply:
-> 
-> >> > Just add the fields you need to
-> >> > the end of emulation_failure struct, increase 'ndata' to the new
-> >> > count, add a new flag to 'flags' so we know its contents.
-> 
-> Given this, the ordering of flag values does not seem significant - the
-> structure elements corresponding to a flag value will always be present,
-> just not filled with relevant data.
-
-I think what Aaron is trying to say is that the order in the aliased data[] is
-associated with the lowest _defined_ flag value, not the lowest _set_ flag.
-
-That said, I would just omit the "ascending numerical" stuff entirely, e.g. I
-think for the #defines, this will suffice:
-
-/* Flags that describe what fields in emulation_failure hold valid data  */
-
-
-As for not breaking userspace if/when additional fields are added, we can instead
-document the new struct (and drop my snarky comment :-D), e.g.:
-
-		/*
-		 * KVM_INTERNAL_ERROR_EMULATION
-		 *
-		 * "struct emulation_failure" is an overlay of "struct internal"
-		 * that is used for the KVM_INTERNAL_ERROR_EMULATION sub-type of
-		 * KVM_EXIT_INTERNAL_ERROR.  Note, unlike other internal error
-		 * sub-types, this struct is ABI!  It also needs to be backwards
-		 * compabile with "struct internal".  Take special care that
-		 * "ndata" is correct, that new fields are enumerated in "flags",
-		 * and that each flag enumerates fields that are 64-bit aligned
-		 * and sized (so that ndata+internal.data[] is valid/accurate).
-		 */
-		struct {
-			__u32 suberror;
-			__u32 ndata;
-			__u64 flags;
-			__u8  insn_size;
-			__u8  insn_bytes[15];
-		} emulation_failure;
-
+Paolo
 
