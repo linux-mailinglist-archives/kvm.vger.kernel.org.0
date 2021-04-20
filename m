@@ -2,189 +2,96 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 915BF365C99
-	for <lists+kvm@lfdr.de>; Tue, 20 Apr 2021 17:48:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D75FE365C41
+	for <lists+kvm@lfdr.de>; Tue, 20 Apr 2021 17:32:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232929AbhDTPsn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 20 Apr 2021 11:48:43 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:64732 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S232504AbhDTPsm (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 20 Apr 2021 11:48:42 -0400
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 13KFZFYs129806;
-        Tue, 20 Apr 2021 11:48:10 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=JPotTaZ5vCwkEmEovJx8O3SJ4HDPi2NAPz9sDay49qY=;
- b=l5kfAmA2c5KH5/khytFzkQ8wA5Pbprpn9pm7W6GeZOF8SiKmpzj929c6wESPrwDgXxNe
- R1C6sHGcVNJrpFujWqmQTSJVUDEzgP8xvMADSLdf16cvmqsgLJdFHmaqhuYQRuq60IJl
- uhpJMho2dELepxdfK/259h8MC0kQurjgixhfgtI7/NWGqeGwpUR1EFAcm7xEFwlv3k5b
- oyeb74nqlnfJsX81zg5eb7DwFOzQ6mgwjj4z5Tqhmz9b0z+4+ti7KIwX17j3kMKzJZRu
- muM130vRicn884RLgPLE0G3t0w6/KThWWx04CsUfcqiTf4OdkimOd5ED42IcH8L/4j5V YA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 381x5ufse3-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 20 Apr 2021 11:48:10 -0400
-Received: from m0098414.ppops.net (m0098414.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 13KFYrqr127617;
-        Tue, 20 Apr 2021 11:48:10 -0400
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 381x5ufsde-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 20 Apr 2021 11:48:10 -0400
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 13KFm8Av018239;
-        Tue, 20 Apr 2021 15:48:08 GMT
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
-        by ppma03ams.nl.ibm.com with ESMTP id 37yqa8ht9r-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 20 Apr 2021 15:48:08 +0000
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 13KFm6dI40567098
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 20 Apr 2021 15:48:06 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 1312E4C050;
-        Tue, 20 Apr 2021 15:48:06 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id BCD6A4C04E;
-        Tue, 20 Apr 2021 15:48:05 +0000 (GMT)
-Received: from ibm-vm (unknown [9.145.0.91])
-        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue, 20 Apr 2021 15:48:05 +0000 (GMT)
-Date:   Tue, 20 Apr 2021 16:26:49 +0200
-From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
-To:     Janosch Frank <frankja@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org, thuth@redhat.com,
-        david@redhat.com
-Subject: Re: [kvm-unit-tests PATCH 5/6] s390x: uv-guest: Test invalid
- commands
-Message-ID: <20210420162649.4f9b77a6@ibm-vm>
-In-Reply-To: <20210316091654.1646-6-frankja@linux.ibm.com>
-References: <20210316091654.1646-1-frankja@linux.ibm.com>
-        <20210316091654.1646-6-frankja@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+        id S232764AbhDTPdB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 20 Apr 2021 11:33:01 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:47097 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232504AbhDTPc7 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 20 Apr 2021 11:32:59 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1618932747;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=VzIaFG2wDVdYEizwLnnsRmeoa1MCm+iU4UbjuWNpwW0=;
+        b=anQNL0wjSuL+tM5fUdujq03WYaqY6ZeMd0MNBcTP2U6f2d3oO5DF3aTtX/rHPNZ2pMFXfx
+        kY4MnYw7F8BZHyFfJLVL1l7b0UNIZeDExyfh8mgp2y9PmuNwJEw4hRk6eEtLIpCa5zqqjU
+        deAmLd2xi06YJfFlIm7uOhg+4S8HQqY=
+Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com
+ [209.85.160.198]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-479-CXMuNUbKNYKwuJsbh16QLA-1; Tue, 20 Apr 2021 11:32:26 -0400
+X-MC-Unique: CXMuNUbKNYKwuJsbh16QLA-1
+Received: by mail-qt1-f198.google.com with SMTP id y10-20020a05622a004ab029019d4ad3437cso11282087qtw.12
+        for <kvm@vger.kernel.org>; Tue, 20 Apr 2021 08:32:26 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=VzIaFG2wDVdYEizwLnnsRmeoa1MCm+iU4UbjuWNpwW0=;
+        b=ui0tBaKTyPeLyoBlrS4BJmIA7cAKn5Vgs6aAT56VS5N8xNmdpOJUyvlF2rLBu0iOVJ
+         5OPyCHUWAzvSfXwOIplMwGL2kAN9A6dIbhChj9NSI3p/v6BvZtKbScDpHoJbPcs3pdHl
+         gamK8SpaLSz4IAL8CznJ1y2Vo96yncgxKbEN840em7QIwiBwLGq2vSgJU5LWb/FGKyVa
+         WbzobWImmvNAV5vYRcrlZbcaxN5drI70H8JJoFgmUaip3tMQVNTc/i1Ej7Aga0E2QlMA
+         sIzwzctGq4aMpKIKiBMDpk9ZJbd7J4WjMJO12gn5OfYhSKx2iClbzIWNV/6FM6S0Aqo/
+         /XOw==
+X-Gm-Message-State: AOAM531MNcuksbz8/bHLzeFa6EEBmJDpj/uNTnzv+DhlO8C9onEw5wvb
+        HskaGivusI4qlpLEr+SqlXeS+VnLREJY6G9iOEuYeIslWbNsPMu91i/cXnOpJixGNFL1KL0yGRu
+        uteMXMxJ1x88b
+X-Received: by 2002:a37:e108:: with SMTP id c8mr18492837qkm.499.1618932745573;
+        Tue, 20 Apr 2021 08:32:25 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzTKbZtJzki1RdMo4jaIwSDT4vU8zynoJCipKGsXfaSJHphwrc9cgg+bXzWrjtb96DzF1vjiQ==
+X-Received: by 2002:a37:e108:: with SMTP id c8mr18492812qkm.499.1618932745353;
+        Tue, 20 Apr 2021 08:32:25 -0700 (PDT)
+Received: from xz-x1 (bras-base-toroon474qw-grc-88-174-93-75-154.dsl.bell.ca. [174.93.75.154])
+        by smtp.gmail.com with ESMTPSA id f8sm4135429qkh.83.2021.04.20.08.32.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 20 Apr 2021 08:32:24 -0700 (PDT)
+Date:   Tue, 20 Apr 2021 11:32:23 -0400
+From:   Peter Xu <peterx@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        stable@vger.kernel.org
+Subject: Re: [PATCH] KVM: selftests: Always run vCPU thread with blocked
+ SIG_IPI
+Message-ID: <20210420153223.GB4440@xz-x1>
+References: <20210420081614.684787-1-pbonzini@redhat.com>
+ <20210420143739.GA4440@xz-x1>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: sQkvA78nqKmKkVpk_lTY1DofCBlidr57
-X-Proofpoint-GUID: jWfZNwXHG5p7EqJR6nwGiL6nijPFGdek
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.761
- definitions=2021-04-20_07:2021-04-20,2021-04-20 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 mlxscore=0
- adultscore=0 spamscore=0 lowpriorityscore=0 clxscore=1015 bulkscore=0
- suspectscore=0 impostorscore=0 mlxlogscore=999 priorityscore=1501
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2104060000 definitions=main-2104200114
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20210420143739.GA4440@xz-x1>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 16 Mar 2021 09:16:53 +0000
-Janosch Frank <frankja@linux.ibm.com> wrote:
-
-> Let's check if the commands that are not indicated as available
-> produce a invalid command error.
-
-you say this, but you don't actually check that the commands are
-actually reported as unavailable
-
+On Tue, Apr 20, 2021 at 10:37:39AM -0400, Peter Xu wrote:
+> On Tue, Apr 20, 2021 at 04:16:14AM -0400, Paolo Bonzini wrote:
+> > The main thread could start to send SIG_IPI at any time, even before signal
+> > blocked on vcpu thread.  Therefore, start the vcpu thread with the signal
+> > blocked.
+> > 
+> > Without this patch, on very busy cores the dirty_log_test could fail directly
+> > on receiving a SIGUSR1 without a handler (when vcpu runs far slower than main).
+> > 
+> > Reported-by: Peter Xu <peterx@redhat.com>
+> > Cc: stable@vger.kernel.org
+> > Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 > 
-> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-> ---
->  s390x/uv-guest.c | 44 +++++++++++++++++++++++++++++++++++++-------
->  1 file changed, 37 insertions(+), 7 deletions(-)
+> Yes, indeed better! :)
 > 
-> diff --git a/s390x/uv-guest.c b/s390x/uv-guest.c
-> index 8915b2f1..517e3c66 100644
-> --- a/s390x/uv-guest.c
-> +++ b/s390x/uv-guest.c
-> @@ -120,16 +120,46 @@ static void test_sharing(void)
->  	report_prefix_pop();
->  }
->  
-> +static struct {
-> +	const char *name;
-> +	uint16_t cmd;
-> +	uint16_t len;
-> +} invalid_cmds[] = {
-> +	{ "bogus", 0x4242, sizeof(struct uv_cb_header) },
-> +	{ "init", UVC_CMD_INIT_UV, sizeof(struct uv_cb_init) },
-> +	{ "create conf", UVC_CMD_CREATE_SEC_CONF, sizeof(struct
-> uv_cb_cgc) },
-> +	{ "destroy conf", UVC_CMD_DESTROY_SEC_CONF, sizeof(struct
-> uv_cb_nodata) },
-> +	{ "create cpu", UVC_CMD_CREATE_SEC_CPU, sizeof(struct
-> uv_cb_csc) },
-> +	{ "destroy cpu", UVC_CMD_DESTROY_SEC_CPU, sizeof(struct
-> uv_cb_nodata) },
-> +	{ "conv to", UVC_CMD_CONV_TO_SEC_STOR, sizeof(struct
-> uv_cb_cts) },
-> +	{ "conv from", UVC_CMD_CONV_FROM_SEC_STOR, sizeof(struct
-> uv_cb_cfs) },
-> +	{ "set sec conf", UVC_CMD_SET_SEC_CONF_PARAMS, sizeof(struct
-> uv_cb_ssc) },
-> +	{ "unpack", UVC_CMD_UNPACK_IMG, sizeof(struct uv_cb_unp) },
-> +	{ "verify", UVC_CMD_VERIFY_IMG, sizeof(struct uv_cb_nodata)
-> },
-> +	{ "cpu reset", UVC_CMD_CPU_RESET, sizeof(struct
-> uv_cb_nodata) },
-> +	{ "cpu initial reset", UVC_CMD_CPU_RESET_INITIAL,
-> sizeof(struct uv_cb_nodata) },
-> +	{ "conf clear reset", UVC_CMD_PERF_CONF_CLEAR_RESET,
-> sizeof(struct uv_cb_nodata) },
-> +	{ "cpu clear reset", UVC_CMD_CPU_RESET_CLEAR, sizeof(struct
-> uv_cb_nodata) },
-> +	{ "cpu set state", UVC_CMD_CPU_SET_STATE, sizeof(struct
-> uv_cb_cpu_set_state) },
-> +	{ "pin shared", UVC_CMD_PIN_PAGE_SHARED, sizeof(struct
-> uv_cb_cfs) },
-> +	{ "unpin shared", UVC_CMD_UNPIN_PAGE_SHARED, sizeof(struct
-> uv_cb_cts) },
-> +	{ NULL, 0, 0 },
-> +};
-> +
->  static void test_invalid(void)
->  {
-> -	struct uv_cb_header uvcb = {
-> -		.len = 16,
-> -		.cmd = 0x4242,
-> -	};
-> -	int cc;
-> +	struct uv_cb_header *hdr = (void *)page;
-> +	int cc, i;
->  
-> -	cc = uv_call(0, (u64)&uvcb);
-> -	report(cc == 1 && uvcb.rc == UVC_RC_INV_CMD, "invalid
-> command");
-> +	report_prefix_push("invalid");
+> Reviewed-by: Peter Xu <peterx@redhat.com>
 
-here you just blindly loop over all the commands, without checking
-their actual availability
+I just remembered one thing: this will avoid program quits, but still we'll get
+the signal missing.  From that pov I slightly prefer the old patch.  However
+not a big deal so far as only dirty ring uses SIG_IPI, so there's always ring
+full which will just delay the kick. It's just we need to remember this when we
+extend IPI to non-dirty-ring tests as the kick is prone to be lost then.
 
-> +	for (i = 0; invalid_cmds[i].name; i++) {
+Thanks,
 
-maybe you can add another field for the availability bit (or even put
-them in the right order so the bit is the index) and here add something
-like
-
-if (uv_query_test_feature(i))
-	continue;
-
-so you will be sure the command is not available
-
-> +		hdr->cmd = invalid_cmds[i].cmd;
-> +		hdr->len = invalid_cmds[i].len;
-> +		cc = uv_call(0, (u64)hdr);
-> +		report(cc == 1 && hdr->rc == UVC_RC_INV_CMD, "%s",
-> +		       invalid_cmds[i].name);
-> +	}
-> +	report_prefix_pop();
->  }
->  
->  int main(void)
+-- 
+Peter Xu
 
