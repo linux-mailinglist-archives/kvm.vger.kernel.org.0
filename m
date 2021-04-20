@@ -2,255 +2,142 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4326E364FC2
-	for <lists+kvm@lfdr.de>; Tue, 20 Apr 2021 03:17:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4FD93365061
+	for <lists+kvm@lfdr.de>; Tue, 20 Apr 2021 04:33:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232930AbhDTBRy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 19 Apr 2021 21:17:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47426 "EHLO
+        id S233532AbhDTCeR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 19 Apr 2021 22:34:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35682 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229999AbhDTBRx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 19 Apr 2021 21:17:53 -0400
-Received: from mail-pg1-x531.google.com (mail-pg1-x531.google.com [IPv6:2607:f8b0:4864:20::531])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 191B0C061763
-        for <kvm@vger.kernel.org>; Mon, 19 Apr 2021 18:17:22 -0700 (PDT)
-Received: by mail-pg1-x531.google.com with SMTP id d10so25477571pgf.12
-        for <kvm@vger.kernel.org>; Mon, 19 Apr 2021 18:17:22 -0700 (PDT)
+        with ESMTP id S229508AbhDTCeQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 19 Apr 2021 22:34:16 -0400
+Received: from mail-ot1-x32b.google.com (mail-ot1-x32b.google.com [IPv6:2607:f8b0:4864:20::32b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1963BC06174A
+        for <kvm@vger.kernel.org>; Mon, 19 Apr 2021 19:33:46 -0700 (PDT)
+Received: by mail-ot1-x32b.google.com with SMTP id k14-20020a9d7dce0000b02901b866632f29so34544959otn.1
+        for <kvm@vger.kernel.org>; Mon, 19 Apr 2021 19:33:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=SggzfZxjHcNUSsdMFr1Eduw2GR0AfAVorLsjUVQHMLQ=;
-        b=JVfyIcteQwVIc1C5qvn6rWBSOtArwIhzfn29v6P/P6+Z1Xb1JJ6a39MbzFduBZLJc3
-         1fgTNVlkMIU2POWkC9ev3WkVNVG37ZmveLO5aXrMB/8K/v+IORdMiv2lRKblY3EtAEaQ
-         2r11UPVBWlDCpDpaZzO/44GNWaUglO18qs8rKcqGCFlLPDWUCm7TN5LLaSqAD8xLu8kj
-         NLjUK/Vr3IIWw4mE204cVelc3EkKfqBVKrv8yteyg99jaasela8bpcPsKazph+nAyTCb
-         AMyw9m0gRL9ANm6hEbBo5t0479K7qtJJu4MKItAXHVKxQMz23JIW713xtMA1pvlIO2QL
-         Gi4w==
+        d=stonybrook.edu; s=sbu-gmail;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=I2YASYiNW4GYlT1VJPkWeAiPvogJBv6t7fDZPBpBZqM=;
+        b=mw67iJCf2W+0IQyupLCXl1zQCOgzZbSmGXMTpSE1/jTXHkIfZfJU1G8YbKACbroVa3
+         H9AYu0LlFlHGdQhSTxq+x7URzTx3dX2vtCCU3id/QIv6M7XJs123yX4q0IS2SCmkIf1X
+         sZNOUAn72CKRUOYRRXe8ZjO3/PhqHuuRm7lIs=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=SggzfZxjHcNUSsdMFr1Eduw2GR0AfAVorLsjUVQHMLQ=;
-        b=aThAfYXFtqT1/PFsh5NX4GPYdZdp9WcbuMRHax8M5/OUyM9u9mfhNtc1jrMed9mCso
-         86xuW/yAIeJNx8vsE2BfGWZ6MOzjGWg4uvdjYkkjr3JRchp2b6Ttnq4/RUTOQlDVEFzO
-         I9qctI0ExCux5+KsqTwGaE7KIKCqksKHwJ4pna7o9lgtZ7AD7QeHpbamSpb//VooOYL3
-         mpTw38TNNKrOrACwMFtFtvtm0jz5BJK6D6Zgf1q8s1Fb4AONNJ8MoZg8rXgi1XucJ5MA
-         0LqBb+xKONHjDCANpRRFR1vP0JR14AO/UJYNZbZ1P83KJyJmb70mceX2v1dp+/1aiKug
-         acbA==
-X-Gm-Message-State: AOAM533Az5Gq7wNxQmMB9aNeG3ca17J3QeAv+bGQOae9iNrwIu88fOpD
-        Pi4nSt2bMKYuF9Dtd4c96RchHA==
-X-Google-Smtp-Source: ABdhPJxzHAdY3UsE4krXE94EyP90jXg3NBfuyK29elRMTZ4LaGvrT5vHnagdENvSbFKj4BjOdcxApw==
-X-Received: by 2002:a62:1b97:0:b029:24e:44e9:a8c1 with SMTP id b145-20020a621b970000b029024e44e9a8c1mr22972281pfb.19.1618881439280;
-        Mon, 19 Apr 2021 18:17:19 -0700 (PDT)
-Received: from google.com (240.111.247.35.bc.googleusercontent.com. [35.247.111.240])
-        by smtp.gmail.com with ESMTPSA id e23sm2931094pgg.76.2021.04.19.18.17.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 19 Apr 2021 18:17:18 -0700 (PDT)
-Date:   Tue, 20 Apr 2021 01:17:15 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <bonzini@gnu.org>
-Cc:     Wanpeng Li <kernellwp@gmail.com>, Marc Zyngier <maz@kernel.org>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Ben Gardon <bgardon@google.com>
-Subject: Re: [PATCH v2 09/10] KVM: Don't take mmu_lock for range invalidation
- unless necessary
-Message-ID: <YH4rm4W57R85tMKE@google.com>
-References: <20210402005658.3024832-1-seanjc@google.com>
- <20210402005658.3024832-10-seanjc@google.com>
- <CANRm+Cwt9Xs=13r9E4YWOhcE6oEJXmVrkKrv_wQ5jMUkY8+Stw@mail.gmail.com>
- <2a7670e4-94c0-9f35-74de-a7d5b1504ced@redhat.com>
- <YH2dDRBXJcbUcbLi@google.com>
- <051f78aa-7bf8-0832-aee6-b4157a1853a0@gnu.org>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=I2YASYiNW4GYlT1VJPkWeAiPvogJBv6t7fDZPBpBZqM=;
+        b=kAAg/nMJ3rr71e85gCaprbl84Lsi62DSVtOtISglvANyUKg3o+8Ij926OKARy92xPq
+         Dce9EBM61otevfkpeBbo5wqzvsffgu6EPP1/9ke7feJfijea2LgPrpz/SF5THidDUJw4
+         oSY5zmtIDHsCDEOVQFMcdHXGt4Gg2/vzlLuRweuSeXMuEZ9l0xcjgX54OHmJb4KHCJ2C
+         f6Ux17gG40+TP5lh5l/DWy/Rp4Y343TnoNJGz38pQ+nkb+lmPt70hAKARDHamqzRD9+Q
+         ZngVoJO4Tay+o8NX0sV4ixTHD0l8nuVi8Crd9HBRa2DAa7HLjmxHBHdt4JdxpLAe/Mk5
+         bMuw==
+X-Gm-Message-State: AOAM533xnmr2/YytyXyLnFIdcU0I+WDEEvk6srFofoS7GF2rXQIVfsv3
+        8dejQVk9dzv/eX3Z3Z9OOhTlkBiUZpwi10Q5tsmBSxzaDAg=
+X-Google-Smtp-Source: ABdhPJxtpnu+6vh5rViQnb8KFkVV6LI1xGWHg/oRkhaajYQE7XIeATRi7S9mikyRI7jXFhLiOvom+S2aWYjlpJi5SEA=
+X-Received: by 2002:a05:6830:2241:: with SMTP id t1mr17173521otd.126.1618886025495;
+ Mon, 19 Apr 2021 19:33:45 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <051f78aa-7bf8-0832-aee6-b4157a1853a0@gnu.org>
+References: <CAJGDS+GKd_YR9QmTR-6KsiE16=4s8fuqh8pmQTYnxHXS=mYp9g@mail.gmail.com>
+ <YH2z3uuQYwSyGJfL@google.com>
+In-Reply-To: <YH2z3uuQYwSyGJfL@google.com>
+From:   Arnabjyoti Kalita <akalita@cs.stonybrook.edu>
+Date:   Tue, 20 Apr 2021 08:03:34 +0530
+Message-ID: <CAJGDS+FGnDFssYXLfLrog+AJu62rrs6DzAQuESJSDaNNdsYdcw@mail.gmail.com>
+Subject: Re: Intercepting RDTSC instruction by causing a VMEXIT
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Apr 20, 2021, Paolo Bonzini wrote:
-> On 19/04/21 17:09, Sean Christopherson wrote:
-> > > - this loses the rwsem fairness.  On the other hand, mm/mmu_notifier.c's
-> > > own interval-tree-based filter is also using a similar mechanism that is
-> > > likewise not fair, so it should be okay.
-> > 
-> > The one concern I had with an unfair mechanism of this nature is that, in theory,
-> > the memslot update could be blocked indefinitely.
-> 
-> Yep, that's why I mentioned it.
-> 
-> > > @@ -1333,9 +1351,22 @@ static struct kvm_memslots *install_new_memslots(struct kvm *kvm,
-> > >   	WARN_ON(gen & KVM_MEMSLOT_GEN_UPDATE_IN_PROGRESS);
-> > >   	slots->generation = gen | KVM_MEMSLOT_GEN_UPDATE_IN_PROGRESS;
-> > > -	down_write(&kvm->mmu_notifier_slots_lock);
-> > > +	/*
-> > > +	 * This cannot be an rwsem because the MMU notifier must not run
-> > > +	 * inside the critical section.  A sleeping rwsem cannot exclude
-> > > +	 * that.
-> > 
-> > How on earth did you decipher that from the splat?  I stared at it for a good
-> > five minutes and was completely befuddled.
-> 
-> Just scratch that, it makes no sense.  It's much simpler, but you have
-> to look at include/linux/mmu_notifier.h to figure it out:
+Hello Sean,
 
-LOL, glad you could figure it out, I wasn't getting anywhere, mmu_notifier.h or
-not.
+Thank you very much for your answer. I'm hoping the inlined changes
+should be enough to see RDTSC interception.
 
->     invalidate_range_start
->       take pseudo lock
->       down_read()           (*)
->       release pseudo lock
->     invalidate_range_end
->       take pseudo lock      (**)
->       up_read()
->       release pseudo lock
-> 
-> At point (*) we take the mmu_notifiers_slots_lock inside the pseudo lock;
-> at point (**) we take the pseudo lock inside the mmu_notifiers_slots_lock.
-> 
-> This could cause a deadlock (ignoring for a second that the pseudo lock
-> is not a lock):
-> 
-> - invalidate_range_start waits on down_read(), because the rwsem is
-> held by install_new_memslots
-> 
-> - install_new_memslots waits on down_write(), because the rwsem is
-> held till (another) invalidate_range_end finishes
-> 
-> - invalidate_range_end sits waits on the pseudo lock, held by
-> invalidate_range_start.
-> 
-> Removing the fairness of the rwsem breaks the cycle (in lockdep terms,
-> it would change the *shared* rwsem readers into *shared recursive*
-> readers).  This also means that there's no need for a raw spinlock.
+No, I'm actually not running a nested guest, even though vmx is enabled.
 
-Ahh, thanks, this finally made things click.
+Best Regards,
+Arnabjyoti Kalita
 
-> Given this simple explanation, I think it's okay to include this
-
-LOL, "simple".
-
-> patch in the merge window pull request, with the fix after my
-> signature squashed in.  The fix actually undoes a lot of the
-> changes to __kvm_handle_hva_range that this patch made, so the
-> result is relatively simple.  You can already find the result
-> in kvm/queue.
-
-...
-
->  static __always_inline int __kvm_handle_hva_range(struct kvm *kvm,
->  						  const struct kvm_hva_range *range)
->  {
-> @@ -515,10 +495,6 @@ static __always_inline int __kvm_handle_hva_range(struct kvm *kvm,
->  	idx = srcu_read_lock(&kvm->srcu);
-> -	if (range->must_lock &&
-> -	    kvm_mmu_lock_and_check_handler(kvm, range, &locked))
-> -		goto out_unlock;
-> -
->  	for (i = 0; i < KVM_ADDRESS_SPACE_NUM; i++) {
->  		slots = __kvm_memslots(kvm, i);
->  		kvm_for_each_memslot(slot, slots) {
-> @@ -547,8 +523,14 @@ static __always_inline int __kvm_handle_hva_range(struct kvm *kvm,
->  			gfn_range.end = hva_to_gfn_memslot(hva_end + PAGE_SIZE - 1, slot);
->  			gfn_range.slot = slot;
-> -			if (kvm_mmu_lock_and_check_handler(kvm, range, &locked))
-> -				goto out_unlock;
-> +			if (!locked) {
-> +				locked = true;
-> +				KVM_MMU_LOCK(kvm);
-> +				if (!IS_KVM_NULL_FN(range->on_lock))
-> +					range->on_lock(kvm, range->start, range->end);
-> +				if (IS_KVM_NULL_FN(range->handler))
-> +					break;
-
-This can/should be "goto out_unlock", "break" only takes us out of the memslots
-walk, we want to get out of the address space loop.  Not a functional problem,
-but we might walk all SMM memslots unnecessarily.
-
-> +			}
->  			ret |= range->handler(kvm, &gfn_range);
->  		}
-> @@ -557,7 +539,6 @@ static __always_inline int __kvm_handle_hva_range(struct kvm *kvm,
->  	if (range->flush_on_ret && (ret || kvm->tlbs_dirty))
->  		kvm_flush_remote_tlbs(kvm);
-> -out_unlock:
->  	if (locked)
->  		KVM_MMU_UNLOCK(kvm);
-> @@ -580,7 +561,6 @@ static __always_inline int kvm_handle_hva_range(struct mmu_notifier *mn,
->  		.pte		= pte,
->  		.handler	= handler,
->  		.on_lock	= (void *)kvm_null_fn,
-> -		.must_lock	= false,
->  		.flush_on_ret	= true,
->  		.may_block	= false,
->  	};
-> @@ -600,7 +580,6 @@ static __always_inline int kvm_handle_hva_range_no_flush(struct mmu_notifier *mn
->  		.pte		= __pte(0),
->  		.handler	= handler,
->  		.on_lock	= (void *)kvm_null_fn,
-> -		.must_lock	= false,
->  		.flush_on_ret	= false,
->  		.may_block	= false,
->  	};
-> @@ -620,13 +599,11 @@ static void kvm_mmu_notifier_change_pte(struct mmu_notifier *mn,
->  	 * .change_pte() must be surrounded by .invalidate_range_{start,end}(),
-
-While you're squashing, want to change the above comma to a period?
-
->  	 * If mmu_notifier_count is zero, then start() didn't find a relevant
->  	 * memslot and wasn't forced down the slow path; rechecking here is
-> -	 * unnecessary.  This can only occur if memslot updates are blocked;
-> -	 * otherwise, mmu_notifier_count is incremented unconditionally.
-> +	 * unnecessary.
->  	 */
-> -	if (!kvm->mmu_notifier_count) {
-> -		lockdep_assert_held(&kvm->mmu_notifier_slots_lock);
-> +	WARN_ON_ONCE(!READ_ONCE(kvm->mn_active_invalidate_count));
-> +	if (!kvm->mmu_notifier_count)
->  		return;
-> -	}
->  	kvm_handle_hva_range(mn, address, address + 1, pte, kvm_set_spte_gfn);
+On Mon, Apr 19, 2021 at 10:16 PM Sean Christopherson <seanjc@google.com> wrote:
+>
+> On Sat, Apr 17, 2021, Arnabjyoti Kalita wrote:
+> > Hello all,
+> >
+> > I'm having a requirement to record values obtained by reading tsc clock.
+> >
+> > The command line I use to start QEMU in KVM mode is as below -
+> >
+> > sudo ./qemu-system-x86_64 -m 1024 --machine pc-i440fx-2.5 -cpu
+> > qemu64,-vme,-x2apic,-kvmclock,+lahf_lm,+3dnowprefetch,+vmx -enable-kvm
+> > -netdev tap,id=tap1,ifname=tap0,script=no,downscript=no -device
+> > virtio-net-pci,netdev=tap1,mac=00:00:00:00:00:00 -drive
+> > file=~/os_images_for_qemu/ubuntu-16.04.server.qcow2,format=qcow2,if=none,id=img-direct
+> > -device virtio-blk-pci,drive=img-direct
+> >
+> > I am using QEMU version 2.11.92 and the guest kernel is a
+> > 4.4.0-116-generic. I use the CPU model "qemu64" because I have a
+> > requirement to create a snapshot of this guest and load the snapshot
+> > in TCG mode. The generic CPU model helps, in this regard.
+> >
+> > Now when the guest is running, I want to intercept all rdtsc
+> > instructions and record the tsc clock values. I know that for this to
+> > happen, the CPU_BASED_RDTSC_EXITING flag needs to exist for the
+> > particular CPU model.
+> >
+> > How do I start adding support for causing VMEXIT upon rdtsc execution?
+>
+> This requires a KVM change.  The below should do the trick.
+>
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index c05e6e2854b5..f000728e4319 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -2453,7 +2453,8 @@ static __init int setup_vmcs_config(struct vmcs_config *vmcs_conf,
+>               CPU_BASED_MWAIT_EXITING |
+>               CPU_BASED_MONITOR_EXITING |
+>               CPU_BASED_INVLPG_EXITING |
+> -             CPU_BASED_RDPMC_EXITING;
+> +             CPU_BASED_RDPMC_EXITING |
+> +             CPU_BASED_RDTSC_EXITING;
+>
+>         opt = CPU_BASED_TPR_SHADOW |
+>               CPU_BASED_USE_MSR_BITMAPS |
+> @@ -5194,6 +5195,15 @@ static int handle_invlpg(struct kvm_vcpu *vcpu)
+>         return kvm_skip_emulated_instruction(vcpu);
 >  }
-
-...
-
-> @@ -1333,9 +1315,22 @@ static struct kvm_memslots *install_new_memslots(struct kvm *kvm,
->  	WARN_ON(gen & KVM_MEMSLOT_GEN_UPDATE_IN_PROGRESS);
->  	slots->generation = gen | KVM_MEMSLOT_GEN_UPDATE_IN_PROGRESS;
-> -	down_write(&kvm->mmu_notifier_slots_lock);
-> +	/*
-> +	 * This cannot be an rwsem because the MMU notifier must not run
-> +	 * inside the critical section, which cannot be excluded with a
-> +	 * sleeping rwsem.
-
-Any objection to replcaing this comment with a rephrased version of your
-statement about "shared" vs. "shared recursive" and breaking the fairness cycle?
-IIUC, it's not "running inside the critical section" that's problematic, it's
-that sleeping in down_write() can cause deadlock due to blocking future readers.
-
-Thanks much!
-
-> +	 */
-> +	spin_lock(&kvm->mn_invalidate_lock);
-> +	prepare_to_rcuwait(&kvm->mn_memslots_update_rcuwait);
-> +	while (kvm->mn_active_invalidate_count) {
-> +		set_current_state(TASK_UNINTERRUPTIBLE);
-> +		spin_unlock(&kvm->mn_invalidate_lock);
-> +		schedule();
-> +		spin_lock(&kvm->mn_invalidate_lock);
-> +	}
-> +	finish_rcuwait(&kvm->mn_memslots_update_rcuwait);
->  	rcu_assign_pointer(kvm->memslots[as_id], slots);
-> -	up_write(&kvm->mmu_notifier_slots_lock);
-> +	spin_unlock(&kvm->mn_invalidate_lock);
->  	synchronize_srcu_expedited(&kvm->srcu);
-> -- 
-> 2.26.2
-> 
+>
+> +static int handle_rdtsc(struct kvm_vcpu *vcpu)
+> +{
+> +       u64 tsc = kvm_read_l1_tsc(vcpu, rdtsc());
+> +
+> +       kvm_rax_write(vcpu, tsc & -1u);
+> +       kvm_rdx_write(vcpu, (tsc >> 32) & -1u);
+> +       return kvm_skip_emulated_instruction(vcpu);
+> +}
+> +
+>  static int handle_apic_access(struct kvm_vcpu *vcpu)
+>  {
+>         if (likely(fasteoi)) {
+> @@ -5605,6 +5615,7 @@ static int (*kvm_vmx_exit_handlers[])(struct kvm_vcpu *vcpu) = {
+>         [EXIT_REASON_INVD]                    = kvm_emulate_invd,
+>         [EXIT_REASON_INVLPG]                  = handle_invlpg,
+>         [EXIT_REASON_RDPMC]                   = kvm_emulate_rdpmc,
+> +       [EXIT_REASON_RDTSC]                   = handle_rdtsc,
+>         [EXIT_REASON_VMCALL]                  = kvm_emulate_hypercall,
+>         [EXIT_REASON_VMCLEAR]                 = handle_vmx_instruction,
+>         [EXIT_REASON_VMLAUNCH]                = handle_vmx_instruction,
+>
+> > I see that a fairly recent commit in QEMU helps adding nested VMX
+> > controls to named CPU models, but not "qemu64". Can I extend this
+> > commit to add these controls to "qemu64" as well? Will making this
+> > change immediately add support for intercepting VMEXITS for "qemu64"
+> > CPU?
+>
+> Are you actually running a nested guest?
