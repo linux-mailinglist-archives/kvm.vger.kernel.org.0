@@ -2,88 +2,78 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CD5DA365525
-	for <lists+kvm@lfdr.de>; Tue, 20 Apr 2021 11:18:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 70EE936557A
+	for <lists+kvm@lfdr.de>; Tue, 20 Apr 2021 11:34:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231146AbhDTJTF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 20 Apr 2021 05:19:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39018 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230090AbhDTJTE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 20 Apr 2021 05:19:04 -0400
-Received: from mail-ej1-x62b.google.com (mail-ej1-x62b.google.com [IPv6:2a00:1450:4864:20::62b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF137C06174A;
-        Tue, 20 Apr 2021 02:18:31 -0700 (PDT)
-Received: by mail-ej1-x62b.google.com with SMTP id r12so57205265ejr.5;
-        Tue, 20 Apr 2021 02:18:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:from:to:cc:references:subject:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=EdCLib9feauaBtsAA4PP+2VZP75jl9er/fzSepd50Jk=;
-        b=skmC3HkDpyGNGfZDYi+M367VKi9jGotM1zjxpDg1ja1yf8Y8Ap9o7tqnsA3kTXERuW
-         wXlJkiTF7JVvuhp9bm7NYoqzNhrfVJXwBwCI+5utOi/U3Y7nCBdnhg3uJVsjOBeC6911
-         kjkRIn03rRCAf7QTfD9RCc9iBEdmfNstpQ2jGBjIA/mv9M2SzDiqxuT2nbTM7B1wPN0A
-         dq4ngAK8O97lUkPc5Fyi3Zvg+MISpkhc0G6WkAQPNIz5PUawyqaurqGjdmAv4TqCcz62
-         NEUkA9RG+orFfxbbOAmn+X1gbbCgo8zaNoLORwsVrLzSUQZtdZlFNFkHlDyj4UA3wVkf
-         bcHA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:from:to:cc:references:subject:message-id
-         :date:user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=EdCLib9feauaBtsAA4PP+2VZP75jl9er/fzSepd50Jk=;
-        b=IIhpmtoaMz4pE37vbJaJKyP+zozmPCakAkoLCeOq5kq5X+I1s5I785hy9RXYfD+O5b
-         l1uKI37vnAD/xZ0TGv4x4NlO6c9uA4IsDaAyVu2tW6fyxVUDZUMWLWR4ac3OSQ0f2tbQ
-         Ipkiyy+3T18b09Ek7a/JdJCC3vIh/m4TsOspH/wgCK0EJGiYjebLZ7SgrqaB579etVnp
-         ptDCM4JxuSeHM2U+ztIYxmxZYP8Nk25HAa7C4w96FnF3cA7C8+yuyyA8lyKhRe8LNZYp
-         Cj4iXN2yOHNIqNeDISvCXzgmqH+ue98ydcgZSUStJYgFYQhwdCCZg20QXdRCBxHV4P4E
-         E1ew==
-X-Gm-Message-State: AOAM533pOXHMeiD/CB6BbOlEodixvtzsSMbxf+gR/QUo4/ANCkVjaoYt
-        aLWATlw0rI1RKeYAk8d/T/LWXZxQ/8M=
-X-Google-Smtp-Source: ABdhPJwXDQbzF/vYu1BqYDPfcqXS94tnxjRvqPf99nheyHBI/eVCsp3atzCDFOhOXonjeKxMJl0SlQ==
-X-Received: by 2002:a17:906:11ce:: with SMTP id o14mr26147286eja.113.1618910310484;
-        Tue, 20 Apr 2021 02:18:30 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.googlemail.com with ESMTPSA id ca1sm15419691edb.76.2021.04.20.02.18.29
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 20 Apr 2021 02:18:30 -0700 (PDT)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+        id S231255AbhDTJet (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 20 Apr 2021 05:34:49 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:38837 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230491AbhDTJer (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 20 Apr 2021 05:34:47 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1618911255;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=HR9PGFeuseuv+4p0efVgdR4ZvWDR0WWeCLxvhuktGw8=;
+        b=RDx/XDB48pjHJzSqYv+bdY95dViPBnmwOM4bVD3C6NFbCJnZaeCbrq6TbUrjSney5DaPpw
+        uvfokhh/er6zIUkJmsykLmk1kyyQVtj3dCUe794YZcYrelIHOBgNQYdJFbZer3yfuIRElC
+        cUVmTXPR3iNqTJDN5hbgOBYH0VWqQ0w=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-319-SJp_Z5AbNziPaAD3TyvAdw-1; Tue, 20 Apr 2021 05:34:13 -0400
+X-MC-Unique: SJp_Z5AbNziPaAD3TyvAdw-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C5736107ACCA;
+        Tue, 20 Apr 2021 09:34:12 +0000 (UTC)
+Received: from virtlab511.virt.lab.eng.bos.redhat.com (virtlab511.virt.lab.eng.bos.redhat.com [10.19.152.198])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 6152710016FE;
+        Tue, 20 Apr 2021 09:34:12 +0000 (UTC)
 From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     Ashish Kalra <Ashish.Kalra@amd.com>
-Cc:     tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com,
-        joro@8bytes.org, bp@suse.de, thomas.lendacky@amd.com,
-        x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        srutherford@google.com, seanjc@google.com,
-        venu.busireddy@oracle.com, brijesh.singh@amd.com
-References: <cover.1618498113.git.ashish.kalra@amd.com>
- <c7400111ed7458eee01007c4d8d57cdf2cbb0fc2.1618498113.git.ashish.kalra@amd.com>
- <8cade407-0141-3757-abd8-4399912741eb@redhat.com>
-Subject: Re: [PATCH v13 04/12] KVM: SVM: Add support for KVM_SEV_RECEIVE_START
- command
-Message-ID: <f43f3608-8250-ab58-3db2-f2f698d3de22@redhat.com>
-Date:   Tue, 20 Apr 2021 11:18:27 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.7.0
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     Brijesh Singh <brijesh.singh@amd.com>
+Subject: [PATCH] KVM: x86: document behavior of measurement ioctls with len==0
+Date:   Tue, 20 Apr 2021 05:34:11 -0400
+Message-Id: <20210420093411.1498840-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <8cade407-0141-3757-abd8-4399912741eb@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
 Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 20/04/21 10:38, Paolo Bonzini wrote:
-> On 15/04/21 17:54, Ashish Kalra wrote:
->> +    }
->> +
->> +    sev->handle = start->handle;
->> +    sev->fd = argp->sev_fd;
-> 
-> These two lines are spurious, I'll delete them.
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ Documentation/virt/kvm/amd-memory-encryption.rst | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-And this is wrong as well.  My apologies.
-
-Paolo
+diff --git a/Documentation/virt/kvm/amd-memory-encryption.rst b/Documentation/virt/kvm/amd-memory-encryption.rst
+index 469a6308765b..34ce2d1fcb89 100644
+--- a/Documentation/virt/kvm/amd-memory-encryption.rst
++++ b/Documentation/virt/kvm/amd-memory-encryption.rst
+@@ -148,6 +148,9 @@ measurement. Since the guest owner knows the initial contents of the guest at
+ boot, the measurement can be verified by comparing it to what the guest owner
+ expects.
+ 
++If len is zero on entry, the measurement blob length is written to len and
++uaddr is unused.
++
+ Parameters (in): struct  kvm_sev_launch_measure
+ 
+ Returns: 0 on success, -negative on error
+@@ -271,6 +274,9 @@ report containing the SHA-256 digest of the guest memory and VMSA passed through
+ commands and signed with the PEK. The digest returned by the command should match the digest
+ used by the guest owner with the KVM_SEV_LAUNCH_MEASURE.
+ 
++If len is zero on entry, the measurement blob length is written to len and
++uaddr is unused.
++
+ Parameters (in): struct kvm_sev_attestation
+ 
+ Returns: 0 on success, -negative on error
+-- 
+2.26.2
 
