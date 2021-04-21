@@ -2,85 +2,78 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A6F3C367008
-	for <lists+kvm@lfdr.de>; Wed, 21 Apr 2021 18:24:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E53FA36700C
+	for <lists+kvm@lfdr.de>; Wed, 21 Apr 2021 18:26:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235145AbhDUQZB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 21 Apr 2021 12:25:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55150 "EHLO
+        id S237676AbhDUQ1V (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 21 Apr 2021 12:27:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55678 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234980AbhDUQY7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 21 Apr 2021 12:24:59 -0400
-Received: from mail-ed1-x531.google.com (mail-ed1-x531.google.com [IPv6:2a00:1450:4864:20::531])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D5332C06174A
-        for <kvm@vger.kernel.org>; Wed, 21 Apr 2021 09:24:25 -0700 (PDT)
-Received: by mail-ed1-x531.google.com with SMTP id j12so25051203edy.3
-        for <kvm@vger.kernel.org>; Wed, 21 Apr 2021 09:24:25 -0700 (PDT)
+        with ESMTP id S235040AbhDUQ1U (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 21 Apr 2021 12:27:20 -0400
+Received: from mail-oi1-x229.google.com (mail-oi1-x229.google.com [IPv6:2607:f8b0:4864:20::229])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 41890C06174A
+        for <kvm@vger.kernel.org>; Wed, 21 Apr 2021 09:26:46 -0700 (PDT)
+Received: by mail-oi1-x229.google.com with SMTP id m13so42936061oiw.13
+        for <kvm@vger.kernel.org>; Wed, 21 Apr 2021 09:26:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=zTswBWBfN86e7L19WzbhIKA4mB0pfAmoRVuTBTzKaOU=;
-        b=h8BTSrOnPBxQ5DO5N9ccBBoc0D5RootOdz8t2t5wPhyLHYFqmUU9hEzEfED1WDRB9v
-         udwnFeVe+XM9yWJ3Tm2gI1qb5WR5QHqtz+ehLyB2xY+QVK5crMZVX/NR0Mxu87uktPg+
-         XnFII1pAKU7KXeQ/BEEau/OReW8TK7/dp7aztN6C/lOskaade0O7WQHMCMVLnKrIhc+i
-         dKI1RzBM7RfFGx7jnshPJ0il3Ti0ZIZOWmYV7MpGPzJZdpKg+4eif0SIm+n07SfVECQB
-         22GyF8YflWD/sFd9eC8vG7wC7G+rSN4Aq66pK9QSPCFPiDMeo1CQ29+E7XM6zFwRpYnf
-         KZKQ==
+        bh=Mc4Wz/Ltt0NhR+/+CNrXA0voQfkr4j+wi0eXrEYYBoE=;
+        b=mVapQl9TEL29cGGqX9itdR7/UJK7ZSMs/FFd0T8DnM2fa+Y4G/VxkvysIJWLeyDVs2
+         HIMYv+tLAfdapIABJq6XOGrSSwTJUmFrHBCN6NRDg1A3bUGa+ZJUnHiaFHa5YHN/z+Pl
+         gNQbrwUC1H6LUnrkDsaX3jIXZ8SMlZx78RJly++luQvFjyqD5pbWp+IYyfr2lu9Dj/dn
+         yKtXUShIHzeTpUEvJxVvxmm4hsEUYmU8iVWJTP9jaXEd/w81Qt8wgjZ4kk5FCj0WrROz
+         9046l+03sFR8AqoaKbjRCQ3EWUp3rxLjGfvl+6ScmC2I3e5eLJguTtogSVzeqKp//Vuo
+         jhig==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=zTswBWBfN86e7L19WzbhIKA4mB0pfAmoRVuTBTzKaOU=;
-        b=DuUqAWFVIcHmX5wWPceDHhIKcysDtv+FUsPqPIB9SPKNn4LjwaIG9DWlm38XFxm/Df
-         te9XUtkN3C/4NYCOqQ2+2v+rie9VGaTACPmrjIJkn9HNsyol11xlIzplO6F3q1alC5aA
-         YjeiWkjWZIvVZX0QT8cfwbmCcjkyNpVsjkU5b0PdLD2lLRxmNVxUsnPvYzhNb2tGJdil
-         LxH4i5wR+FJPpfiz19n+QinMYgrN9xpqiLSfXV1BLny6/B9+pIN5In8vJNEnBRy13AZ6
-         2DmO4cXpE2ofpVvEyjGUPwMBxBtqAWEJ0Fmtrxm9BKsQelsASqeEpHbWPLt03w07HQ5E
-         Dkkw==
-X-Gm-Message-State: AOAM531blEqyq+U6y1DofbTkccM2rOXDbnS9W0SlOY8cR+8JP4CV9gCc
-        UZa/3+ie63ULg98MqaEAlb2m0vlVIrTQVErfkdSfaw==
-X-Google-Smtp-Source: ABdhPJxBJv4JIYISO7TrUwENdg3H+Nn09vHjG7y8FMb27J3YjoHLlg2jbBHO8nVcSejPjLhkVGhA3XOU5qdhXXKr54U=
-X-Received: by 2002:aa7:c492:: with SMTP id m18mr16875020edq.30.1619022264375;
- Wed, 21 Apr 2021 09:24:24 -0700 (PDT)
+        bh=Mc4Wz/Ltt0NhR+/+CNrXA0voQfkr4j+wi0eXrEYYBoE=;
+        b=Am0Cru4docoydgimoIAk3iF2j9ezfnEsH/SLxugWdgXCflYdcY0kEm0pyK+yVS/nXb
+         LNaHbJ9IO3havpCzozh9crqOWJtQ+4s7sXV1ysK3Lts51ISVCq0kcfqGrhO9Dw/iHokq
+         XB16BxDnQuoBJptNOvP9iYkQxoIqOu8eJdTJXsROf37SPSuIqUL5g+RCGwc6EvM0hDrY
+         b0c/ShdFTYFI/xRgFZh+lag4u1fXA7eb4+at11hJ+k0QWvSLO/sWFic1HvxRQbcygiby
+         UFZaoaDXrtKPFQHamd2k/+Fq1KQ8rPidV6crin5nIZyWGtYXo4MmCBkcQf94mhHrCafE
+         yiUQ==
+X-Gm-Message-State: AOAM5300/LbmB6sxUBh6b+7RYwj8imp3zmyamVJ8gaOSbu4w7RYmjXwH
+        bV63qZcpu2a1y0Q4JgPHDcUl5d/euZtunYiUXMiuCw==
+X-Google-Smtp-Source: ABdhPJyNyuRKvNR2QR6coFrtTNnTJL25Mg5vMTjeAdL6Yhceu9GrpPh48bTgBJQZjGawLDGba3GUbZuH7aghffpuY/I=
+X-Received: by 2002:a05:6808:b2f:: with SMTP id t15mr3515949oij.6.1619022405322;
+ Wed, 21 Apr 2021 09:26:45 -0700 (PDT)
 MIME-Version: 1.0
-References: <20210421122833.3881993-1-aaronlewis@google.com> <cunsg3jg2ga.fsf@dme.org>
-In-Reply-To: <cunsg3jg2ga.fsf@dme.org>
-From:   Aaron Lewis <aaronlewis@google.com>
-Date:   Wed, 21 Apr 2021 09:24:13 -0700
-Message-ID: <CAAAPnDH1LtRDLCjxdd8hdqABSu9JfLyxN1G0Nu1COoVbHn1MLw@mail.gmail.com>
-Subject: Re: [PATCH v2 1/2] kvm: x86: Allow userspace to handle emulation errors
+References: <20210416131820.2566571-1-aaronlewis@google.com>
+ <YH8eyGMC3A9+CKTo@google.com> <m2sg3kt4jc.fsf@dme.org>
+In-Reply-To: <m2sg3kt4jc.fsf@dme.org>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Wed, 21 Apr 2021 09:26:34 -0700
+Message-ID: <CALMp9eQZLe_8esohDqt_0eLffOrAeC0vS1RSVw152z2RhmPntw@mail.gmail.com>
+Subject: Re: [PATCH 1/2] kvm: x86: Allow userspace to handle emulation errors
 To:     David Edmondson <dme@dme.org>
 Cc:     Sean Christopherson <seanjc@google.com>,
-        Jim Mattson <jmattson@google.com>,
+        Aaron Lewis <aaronlewis@google.com>,
         kvm list <kvm@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> > +     if (insn_size) {
-> > +             run->emulation_failure.ndata = 3;
-> > +             run->emulation_failure.flags |=
-> > +                     KVM_INTERNAL_ERROR_EMULATION_FLAG_INSTRUCTION_BYTES;
-> > +             run->emulation_failure.insn_size = insn_size;
-> > +             memcpy(run->emulation_failure.insn_bytes,
-> > +                    ctxt->fetch.data, sizeof(ctxt->fetch.data));
+On Wed, Apr 21, 2021 at 1:39 AM David Edmondson <dme@dme.org> wrote:
 >
-> We're relying on the fact that insn_bytes is at least as large as
-> fetch.data, which is fine, but worth an assertion?
+> On Tuesday, 2021-04-20 at 18:34:48 UTC, Sean Christopherson wrote:
 >
-> "Leaking" irrelevant bytes here also seems bad, but I can't immediately
-> see a problem as a result.
->
+> > On Fri, Apr 16, 2021, Aaron Lewis wrote:
+> >> +                    KVM_INTERNAL_ERROR_EMULATION_FLAG_INSTRUCTION_BYTES;
+> >> +            vcpu->run->emulation_failure.insn_size = insn_size;
+> >> +            memcpy(vcpu->run->emulation_failure.insn_bytes,
+> >> +                   ctxt->fetch.data, sizeof(ctxt->fetch.data));
+> >
+> > Doesn't truly matter, but I think it's less confusing to copy over insn_size
+> > bytes.
 
-I don't think this is a problem because the instruction bytes stream
-has irrelevant bytes in it anyway.  In the test attached I verify that
-it receives an flds instruction in userspace that was emulated in the
-guest.  In the stream that comes through insn_size is set to 15 and
-the instruction is only 2 bytes long, so the stream has irrelevant
-bytes in it as far as this instruction is concerned.
+> And zero out the rest?
 
-> > +     }
-> > +}
-> > +
+Why zero? Since we're talking about an instruction stream, wouldn't
+0x90 make more sense than zero?
