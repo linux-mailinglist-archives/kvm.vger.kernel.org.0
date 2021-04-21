@@ -2,180 +2,161 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4745536643E
-	for <lists+kvm@lfdr.de>; Wed, 21 Apr 2021 06:08:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 420E0366451
+	for <lists+kvm@lfdr.de>; Wed, 21 Apr 2021 06:20:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232178AbhDUEIs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 21 Apr 2021 00:08:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33470 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230390AbhDUEIs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 21 Apr 2021 00:08:48 -0400
-Received: from mail-wr1-x42a.google.com (mail-wr1-x42a.google.com [IPv6:2a00:1450:4864:20::42a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 11E97C06174A
-        for <kvm@vger.kernel.org>; Tue, 20 Apr 2021 21:08:14 -0700 (PDT)
-Received: by mail-wr1-x42a.google.com with SMTP id p6so33133173wrn.9
-        for <kvm@vger.kernel.org>; Tue, 20 Apr 2021 21:08:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=brainfault-org.20150623.gappssmtp.com; s=20150623;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=WaZO4G68UBU3vGgoF4QvbcfZTEDhOHGYS1PfQvi2NPo=;
-        b=hH2Ior+J2Jj3gNXUDRQb2B5cZpo1VHS6g+VxjUN7R8OhdUl9fhcQUHHeg/UwbHPYkt
-         dvGPFGGvtpzm8il69fqV/k0anKDrs22fD/uFqXYj0ug4Y+1RH4uNXWw4BUEMLlpXILc2
-         Jx6VXSLIDhRyISk0eDiw/aZmSEU/hILFVJSJGngSlOVAe7pLyUlzfdScUA7dR9xmikir
-         52k0XdSlSqtToZK98+AX7uP+/v58m4aOzTRqPceiJ5HDk6BuqTrDTiuQiVVNQK1ZyS+j
-         ok3BfOLol+LEdd2mebvVJo/83uUq7QtERwHcfiTs0dQVkxVyz7NtJ9AEF8iR0m2daEqw
-         JRtg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=WaZO4G68UBU3vGgoF4QvbcfZTEDhOHGYS1PfQvi2NPo=;
-        b=I18cnyRVjotfKFu7Z6sbpzmr3NEaDssvaZju1ySWgnyR5j1HdyWPzCb+loPtjXqFqp
-         uANzYpCR/0lidjW9Lfb1resb9FFTyLj5PNzn6nQ7jVDMwWLZXVkVdPQiYaPtdVBH/nPr
-         czy/Nq+dI7ippaCv57EK6a+LjGBUyO/PozZpnqs7Ic07mljH9Km/ED+rzY25VlTN/SJL
-         TnkOvdYIPdXkB9Jb8PYKeeIUVmA98pblsUq66ncocouYrU2DWVH8euBOtWD+S33H2Mw6
-         w/uK9/egmrhCwjrg/UqY1ZSv3aZ5rHUbqz3LlbP1x6cZdn4s4et7dG5H+0rHtAzOdVeG
-         PT3w==
-X-Gm-Message-State: AOAM530/Ix/4BeKRJEJdpq9Y28DtMvIQgnMBnCzGcHzxOkdYvXDO2l5h
-        Tefqgd2duHomgiPuemAO5LCxk8X317CIU88N8LGlCi+c31s=
-X-Google-Smtp-Source: ABdhPJy1qAwhycXgUCLM7eQQ0TAd+o7Pc7JTlOn+Av52SdM9p6+E9B1lX0Eh9/lh6HEocIJMfofebUvw4PhdiBPt1NU=
-X-Received: by 2002:adf:ce12:: with SMTP id p18mr24500366wrn.144.1618978092690;
- Tue, 20 Apr 2021 21:08:12 -0700 (PDT)
+        id S235015AbhDUEUu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 21 Apr 2021 00:20:50 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:45851 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S235002AbhDUEUt (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 21 Apr 2021 00:20:49 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1618978816;
+        h=from:from:reply-to:reply-to:subject:subject:date:date:
+         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+         content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=cjSZHEWY3U288wOLcJF8bqxNww9jB3gUcMdbQn87aho=;
+        b=drR3nllBJIKnhQMnqz1XqxmtjHRRTf4Ux8MRcwN95bWRFKx1cPAx89iqptWWk5ScLHXdnR
+        VoEJvb8zs4BqWuB5IobIs3r817ECkmZTrtrAauvkJyIKAKYMLo4ytudUDDmkcYg/MESjrn
+        zTt8ChEkVLFCTnIyHnFxgM91zD+Cw8I=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-239-2MP_mfYzO3GgSUEupOd9pg-1; Wed, 21 Apr 2021 00:20:08 -0400
+X-MC-Unique: 2MP_mfYzO3GgSUEupOd9pg-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A42ED100806B;
+        Wed, 21 Apr 2021 04:20:06 +0000 (UTC)
+Received: from [10.64.54.47] (vpn2-54-47.bne.redhat.com [10.64.54.47])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 846416061F;
+        Wed, 21 Apr 2021 04:20:03 +0000 (UTC)
+Reply-To: Gavin Shan <gshan@redhat.com>
+Subject: Re: [PATCH] KVM: arm64: Correctly handle the mmio faulting
+To:     Keqian Zhu <zhukeqian1@huawei.com>,
+        Santosh Shukla <sashukla@nvidia.com>
+Cc:     maz@kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+        linux-kernel@vger.kernel.org, cjia@nvidia.com,
+        linux-arm-kernel@lists.infradead.org,
+        "Wanghaibin (D)" <wanghaibin.wang@huawei.com>
+References: <1603297010-18787-1-git-send-email-sashukla@nvidia.com>
+ <8b20dfc0-3b5e-c658-c47d-ebc50d20568d@huawei.com>
+From:   Gavin Shan <gshan@redhat.com>
+Message-ID: <2e23aaa7-0c8d-13ba-2eae-9e6ab2adc587@redhat.com>
+Date:   Wed, 21 Apr 2021 16:20:12 +1000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
 MIME-Version: 1.0
-References: <a49a7142-104e-fdaa-4a6a-619505695229@redhat.com> <mhng-d64da1be-bacd-4885-aaf2-fea3c763418c@palmerdabbelt-glaptop>
-In-Reply-To: <mhng-d64da1be-bacd-4885-aaf2-fea3c763418c@palmerdabbelt-glaptop>
-From:   Anup Patel <anup@brainfault.org>
-Date:   Wed, 21 Apr 2021 09:38:01 +0530
-Message-ID: <CAAhSdy1EYhgA52m48DcyevM5j5EsuXPbVq5Z0KHB+SaXorNTeg@mail.gmail.com>
-Subject: Re: [PATCH v16 00/17] KVM RISC-V Support
-To:     Palmer Dabbelt <palmer@dabbelt.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Anup Patel <Anup.Patel@wdc.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Alexander Graf <graf@amazon.com>,
-        Atish Patra <Atish.Patra@wdc.com>,
-        Alistair Francis <Alistair.Francis@wdc.com>,
-        Damien Le Moal <Damien.LeMoal@wdc.com>,
-        KVM General <kvm@vger.kernel.org>,
-        kvm-riscv@lists.infradead.org,
-        linux-riscv <linux-riscv@lists.infradead.org>,
-        "linux-kernel@vger.kernel.org List" <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <8b20dfc0-3b5e-c658-c47d-ebc50d20568d@huawei.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Palmer,
+Hi Keqian and Santosh,
 
-On Sat, Apr 10, 2021 at 12:28 AM Palmer Dabbelt <palmer@dabbelt.com> wrote:
->
-> On Wed, 31 Mar 2021 02:21:58 PDT (-0700), pbonzini@redhat.com wrote:
-> > On 30/03/21 07:48, Anup Patel wrote:
-> >>
-> >> It seems Andrew does not want to freeze H-extension until we have virtualization
-> >> aware interrupt controller (such as RISC-V AIA specification) and IOMMU. Lot
-> >> of us feel that these things can be done independently because RISC-V
-> >> H-extension already has provisions for external interrupt controller with
-> >> virtualization support.
->
-> Sorry to hear that.  It's really gotten to a point where I'm just
-> embarrassed with how the RISC-V foundation is being run -- not sure if
-> these other ones bled into Linux land, but this is the third ISA
-> extension that's blown up over the last few weeks.  We had a lot of
-> discussion about this on the binutils/GCC side of things and I've
-> managed to convince myself that coupling the software stack to the
-> specification process isn't viable -- we made that decision under the
-> assumption that specifications would actually progress through the
-> process, but in practice that's just not happening.
->
-> My goal with the RISC-V stuff has always been getting us to a place
-> where we have real shipping products running a software stack that is as
-> close as possible to the upstream codebases.  I see that as the only way
-> to get the software stack to a point where it can be sustainably
-> maintained.  The "only frozen extensions" policy was meant to help this
-> by steering vendors towards a common base we could support, but in
-> practice it's just not working out.  The specification process is just
-> so unreliable that in practice everything that gets built ends up
-> relying on some non-standard behavior: whether it's a draft extension,
-> some vendor-specific extension, or just some implementation quirks.
-> There's always going to be some degree of that going on, but over the
-> last year or so we've just stopped progressing.
->
-> My worry with accepting the draft extensions is that we have no
-> guarantee of compatibility between various drafts, which makes
-> supporting multiple versions much more difficult.  I've always really
-> only been worried about supporting what gets implemented in a chip I can
-> actually run code on, as I can at least guarantee that doesn't change.
-> In practice that really has nothing to do with the specification freeze:
-> even ratified specifications change in ways that break compatibility so
-> we need to support multiple versions anyway.  That's why we've got
-> things like the K210 support (which doesn't quite follow the ratified
-> specs) and are going to take the errata stuff.  I hadn't been all that
-> worried about the H support because there was a plan to get is to
-> hardware, but with the change I'm not really sure how that's going to
-> happen.
->
-> > Yes, frankly that's pretty ridiculous as it's perfectly possible to
-> > emulate the interrupt controller in software (and an IOMMU is not needed
-> > at all if you are okay with emulated or paravirtualized devices---which
-> > is almost always the case except for partitioning hypervisors).
->
-> There's certainly some risk to freezing the H extension before we have
-> all flavors of systems up and running.  I spent a lot of time arguing
-> that case years ago before we started telling people that the H
-> extension just needed implementation, but that's not the decision we
-> made.  I don't really do RISC-V foundation stuff any more so I don't
-> know why this changed, but it's just too late.  It would be wonderful to
-> have an implementation of everything we need to build out one of these
-> complex systems, but I just just don't see how the current plan gets
-> there: that's a huge amount of work and I don't see why anyone would
-> commit to that when they can't count on it being supported when it's
-> released.
->
-> There are clearly some systems that can be built with this as it stands.
-> They're not going to satisfy every use case, but at least we'll get
-> people to start seriously using the spec.  That's the only way I can see
-> to move forward with this.  It's pretty clear that sitting around and
-> waiting doesn't work, we've tried that.
->
-> > Palmer, are you okay with merging RISC-V KVM?  Or should we place it in
-> > drivers/staging/riscv/kvm?
->
-> I'm certainly ready to drop my objections to merging the code based on
-> it targeting a draft extension, but at a bare minimum I want to get a
-> new policy in place that everyone can agree to for merging code.  I've
-> tried to draft up a new policy a handful of times this week, but I'm not
-> really quite sure how to go about this: ultimately trying to build
-> stable interfaces around an unstable ISA is just a losing battle.  I've
-> got a bunch of stuff going on right now, but I'll try to find some time
-> to actually sit down and finish one.
+On 4/21/21 12:59 PM, Keqian Zhu wrote:
+> On 2020/10/22 0:16, Santosh Shukla wrote:
+>> The Commit:6d674e28 introduces a notion to detect and handle the
+>> device mapping. The commit checks for the VM_PFNMAP flag is set
+>> in vma->flags and if set then marks force_pte to true such that
+>> if force_pte is true then ignore the THP function check
+>> (/transparent_hugepage_adjust()).
+>>
+>> There could be an issue with the VM_PFNMAP flag setting and checking.
+>> For example consider a case where the mdev vendor driver register's
+>> the vma_fault handler named vma_mmio_fault(), which maps the
+>> host MMIO region in-turn calls remap_pfn_range() and maps
+>> the MMIO's vma space. Where, remap_pfn_range implicitly sets
+>> the VM_PFNMAP flag into vma->flags.
+> Could you give the name of the mdev vendor driver that triggers this issue?
+> I failed to find one according to your description. Thanks.
+> 
 
-Can you send the patch for the updated policy which we can review ??
+I think it would be fixed in driver side to set VM_PFNMAP in
+its mmap() callback (call_mmap()), like vfio PCI driver does.
+It means it won't be delayed until page fault is issued and
+remap_pfn_range() is called. It's determined from the beginning
+that the vma associated the mdev vendor driver is serving as
+PFN remapping purpose. So the vma should be populated completely,
+including the VM_PFNMAP flag before it becomes visible to user
+space.
 
-Will it be possible to get KVM RISC-V merged for Linux-5.13 ?
+The example can be found from vfio driver in drivers/vfio/pci/vfio_pci.c:
+     vfio_pci_mmap:       VM_PFNMAP is set for the vma
+     vfio_pci_mmap_fault: remap_pfn_range() is called
 
-Regards,
-Anup
+Thanks,
+Gavin
 
->
-> I know it might seem odd to complain about how slowly things are going
-> and then throw up another roadblock, but I really do think this is a
-> very important thing to get right.  I'm just not sure how we're going to
-> get anywhere with RISC-V without someone providing stability, so I want
-> to make sure that whatever we do here can be done reliably.  If we don't
-> I'm worried the vendors are just going to go off and do their own
-> software stacks, which will make getting everyone back on the same page
-> very difficult.
->
-> > Either way, the best way to do it would be like this:
-> >
-> > 1) you apply patch 1 in a topic branch
-> >
-> > 2) you merge the topic branch in the risc-v tree
-> >
-> > 3) Anup merges the topic branch too and sends me a pull request.
-> >
-> > Paolo
+>>
+>> Now lets assume a mmio fault handing flow where guest first access
+>> the MMIO region whose 2nd stage translation is not present.
+>> So that results to arm64-kvm hypervisor executing guest abort handler,
+>> like below:
+>>
+>> kvm_handle_guest_abort() -->
+>>   user_mem_abort()--> {
+>>
+>>      ...
+>>      0. checks the vma->flags for the VM_PFNMAP.
+>>      1. Since VM_PFNMAP flag is not yet set so force_pte _is_ false;
+>>      2. gfn_to_pfn_prot() -->
+>>          __gfn_to_pfn_memslot() -->
+>>              fixup_user_fault() -->
+>>                  handle_mm_fault()-->
+>>                      __do_fault() -->
+>>                         vma_mmio_fault() --> // vendor's mdev fault handler
+>>                          remap_pfn_range()--> // Here sets the VM_PFNMAP
+>> 						flag into vma->flags.
+>>      3. Now that force_pte is set to false in step-2),
+>>         will execute transparent_hugepage_adjust() func and
+>>         that lead to Oops [4].
+>>   }
+>>
+>> The proposition is to check is_iomap flag before executing the THP
+>> function transparent_hugepage_adjust().
+>>
+>> [4] THP Oops:
+>>> pc: kvm_is_transparent_hugepage+0x18/0xb0
+>>> ...
+>>> ...
+>>> user_mem_abort+0x340/0x9b8
+>>> kvm_handle_guest_abort+0x248/0x468
+>>> handle_exit+0x150/0x1b0
+>>> kvm_arch_vcpu_ioctl_run+0x4d4/0x778
+>>> kvm_vcpu_ioctl+0x3c0/0x858
+>>> ksys_ioctl+0x84/0xb8
+>>> __arm64_sys_ioctl+0x28/0x38
+>>
+>> Tested on Huawei Kunpeng Taishan-200 arm64 server, Using VFIO-mdev device.
+>> Linux tip: 583090b1
+>>
+>> Fixes: 6d674e28 ("KVM: arm/arm64: Properly handle faulting of device mappings")
+>> Signed-off-by: Santosh Shukla <sashukla@nvidia.com>
+>> ---
+>>   arch/arm64/kvm/mmu.c | 2 +-
+>>   1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+>> index 3d26b47..ff15357 100644
+>> --- a/arch/arm64/kvm/mmu.c
+>> +++ b/arch/arm64/kvm/mmu.c
+>> @@ -1947,7 +1947,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>>   	 * If we are not forced to use page mapping, check if we are
+>>   	 * backed by a THP and thus use block mapping if possible.
+>>   	 */
+>> -	if (vma_pagesize == PAGE_SIZE && !force_pte)
+>> +	if (vma_pagesize == PAGE_SIZE && !force_pte && !is_iomap(flags))
+>>   		vma_pagesize = transparent_hugepage_adjust(memslot, hva,
+>>   							   &pfn, &fault_ipa);
+>>   	if (writable)
+>>
+> 
+
