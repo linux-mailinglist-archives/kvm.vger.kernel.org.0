@@ -2,112 +2,89 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3F63B3669BB
-	for <lists+kvm@lfdr.de>; Wed, 21 Apr 2021 13:13:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BC2133669C1
+	for <lists+kvm@lfdr.de>; Wed, 21 Apr 2021 13:16:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235052AbhDULOW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 21 Apr 2021 07:14:22 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:40462 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S238732AbhDULOU (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 21 Apr 2021 07:14:20 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1619003627;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=n/V0WhEVHAM0C6m5PpVh+o2jrUdbsJsqNYYgAzqcM5I=;
-        b=ItDRFKKtebMAgqIYz3YTyKp9oYmffnQfvITvBUstHa0Fz/5Up4mEfmOXU3gkX6bLGj82Kw
-        i4NTD+l4ERrhss/LWpVQQ2YiNTEWmJhFsgmHU1iYcJewYV+r7sSH8oQfw8xQ9Y7JHcQP3T
-        FdOSKm4c+8TkRlwplrUlkvtGzephQf4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-486-JTxke6veN_SQyPArducv5Q-1; Wed, 21 Apr 2021 07:13:43 -0400
-X-MC-Unique: JTxke6veN_SQyPArducv5Q-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AB7E283DD20;
-        Wed, 21 Apr 2021 11:13:42 +0000 (UTC)
-Received: from gondolin.fritz.box (ovpn-112-160.ams2.redhat.com [10.36.112.160])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 774896268F;
-        Wed, 21 Apr 2021 11:13:37 +0000 (UTC)
-Date:   Wed, 21 Apr 2021 13:13:35 +0200
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Janosch Frank <frankja@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org, thuth@redhat.com,
-        david@redhat.com, imbrenda@linux.ibm.com
-Subject: Re: [kvm-unit-tests PATCH 2/6] s390x: Add more Ultravisor command
- structure definitions
-Message-ID: <20210421131335.31a2bf47.cohuck@redhat.com>
-In-Reply-To: <20210316091654.1646-3-frankja@linux.ibm.com>
-References: <20210316091654.1646-1-frankja@linux.ibm.com>
-        <20210316091654.1646-3-frankja@linux.ibm.com>
-Organization: Red Hat GmbH
+        id S238627AbhDULQc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 21 Apr 2021 07:16:32 -0400
+Received: from linux.microsoft.com ([13.77.154.182]:42908 "EHLO
+        linux.microsoft.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235951AbhDULQa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 21 Apr 2021 07:16:30 -0400
+Received: from [192.168.86.31] (c-73-38-52-84.hsd1.vt.comcast.net [73.38.52.84])
+        by linux.microsoft.com (Postfix) with ESMTPSA id DC78B20B8001;
+        Wed, 21 Apr 2021 04:15:55 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com DC78B20B8001
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+        s=default; t=1619003757;
+        bh=0lGPWgCWxMY7QAIfAJHFkFTAYipH0FMtf/PdmxPyrUw=;
+        h=Subject:To:Cc:References:From:Date:In-Reply-To:From;
+        b=gudX5C8+viqc/m58ZbDfBIGMK5DF+vGWywf/UQuUq+w1S+fUI8PZmcpVYd9Zhl71G
+         7V5SefAQZ34ieq6v2Vd8FjSDLntWCzHUMWa3sIdlqQpijXqElS6Ied6EMj3YoGLLjf
+         JG9H08F28TC64nZMQQiYrs63e9IN3gNQlH1Xp1o0=
+Subject: Re: [PATCH v2 2/7] hyperv: SVM enlightened TLB flush support flag
+To:     Wei Liu <wei.liu@kernel.org>
+Cc:     Lan Tianyu <Tianyu.Lan@microsoft.com>,
+        Michael Kelley <mikelley@microsoft.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Stephen Hemminger <sthemmin@microsoft.com>,
+        Haiyang Zhang <haiyangz@microsoft.com>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "K. Y. Srinivasan" <kys@microsoft.com>, x86@kernel.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-hyperv@vger.kernel.org, viremana@linux.microsoft.com
+References: <cover.1618492553.git.viremana@linux.microsoft.com>
+ <3fd0cdfb9a4164a3fb90351db4dc10f52a7c4819.1618492553.git.viremana@linux.microsoft.com>
+ <20210421100026.4hcgrxeri444if45@liuwe-devbox-debian-v2>
+From:   Vineeth Pillai <viremana@linux.microsoft.com>
+Message-ID: <4a57cd2b-43b5-2625-3663-449ffa715b51@linux.microsoft.com>
+Date:   Wed, 21 Apr 2021 07:15:54 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.7.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20210421100026.4hcgrxeri444if45@liuwe-devbox-debian-v2>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Content-Language: en-US
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 16 Mar 2021 09:16:50 +0000
-Janosch Frank <frankja@linux.ibm.com> wrote:
 
-> They are needed in the new UV tests.
-> 
-> As we now extend the size of the query struct, we need to set the
-> length in the UV guest query test to a constant instead of using
-> sizeof.
-> 
-> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-> ---
->  lib/s390x/asm/uv.h | 148 ++++++++++++++++++++++++++++++++++++++++++++-
->  s390x/uv-guest.c   |   2 +-
->  2 files changed, 148 insertions(+), 2 deletions(-)
-> 
 
-(...)
+On 4/21/21 6:00 AM, Wei Liu wrote:
+> On Thu, Apr 15, 2021 at 01:43:37PM +0000, Vineeth Pillai wrote:
+>>   
+>> +/*
+>> + * This is specific to AMD and specifies that enlightened TLB flush is
+>> + * supported. If guest opts in to this feature, ASID invalidations only
+>> + * flushes gva -> hpa mapping entries. To flush the TLB entries derived
+>> + * from NPT, hypercalls should be used (HvFlushGuestPhysicalAddressSpace
+>> + * or HvFlushGuestPhysicalAddressList).
+>> + */
+>> +#define HV_X64_NESTED_ENLIGHTENED_TLB			BIT(22)
+>> +
+> c
+> This is not yet documented in TLFS, right? I can't find this bit in the
+> latest edition (6.0b).
+This would be documented in the TLFS update which is soon to be
+released.
 
->  struct uv_cb_qui {
->  	struct uv_cb_header header;
->  	u64 reserved08;
->  	u64 inst_calls_list[4];
-> -	u64 reserved30[15];
-> +	u64 reserved30[2];
-> +	u64 uv_base_stor_len;
-> +	u64 reserved48;
-> +	u64 conf_base_phys_stor_len;
-> +	u64 conf_base_virt_stor_len;
-> +	u64 conf_virt_var_stor_len;
-> +	u64 cpu_stor_len;
-> +	u32 reserved70[3];
-> +	u32 max_num_sec_conf;
-> +	u64 max_guest_stor_addr;
-> +	u8  reserved88[158 - 136];
-> +	u16 max_guest_cpus;
-> +	u8  reserveda0[200 - 160];
-> +}  __attribute__((packed))  __attribute__((aligned(8)));
+>
+> My first thought is the comment says this is AMD specific but the name
+> is rather generic. That looks a bit odd to begin with.
+I thought of of keeping the name generic to avoid renaming Intel
+specific ones also. If I understand correctly, the TLFS would also
+be having generic name for this and just translated the generic
+name here in this header.
 
-(...)
-
-> diff --git a/s390x/uv-guest.c b/s390x/uv-guest.c
-> index a13669ab..95a968c5 100644
-> --- a/s390x/uv-guest.c
-> +++ b/s390x/uv-guest.c
-> @@ -59,7 +59,7 @@ static void test_query(void)
->  {
->  	struct uv_cb_qui uvcb = {
->  		.header.cmd = UVC_CMD_QUI,
-> -		.header.len = sizeof(uvcb) - 8,
-> +		.header.len = 0xa0,
-
-This is a magic constant coming out of nowhere. Could you please at
-least add a comment to make clear what you are testing?
-
->  	};
->  	int cc;
->  
+Thanks,
+Vineeth
 
