@@ -2,136 +2,140 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 34E3B3672AD
-	for <lists+kvm@lfdr.de>; Wed, 21 Apr 2021 20:37:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B03873672CA
+	for <lists+kvm@lfdr.de>; Wed, 21 Apr 2021 20:46:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245257AbhDUSiE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 21 Apr 2021 14:38:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56848 "EHLO
+        id S245269AbhDUSqq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 21 Apr 2021 14:46:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58744 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238217AbhDUSiD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 21 Apr 2021 14:38:03 -0400
-Received: from mail-pg1-x533.google.com (mail-pg1-x533.google.com [IPv6:2607:f8b0:4864:20::533])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B733C06174A;
-        Wed, 21 Apr 2021 11:37:29 -0700 (PDT)
-Received: by mail-pg1-x533.google.com with SMTP id b17so30739457pgh.7;
-        Wed, 21 Apr 2021 11:37:29 -0700 (PDT)
+        with ESMTP id S233038AbhDUSqq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 21 Apr 2021 14:46:46 -0400
+Received: from mail-pf1-x434.google.com (mail-pf1-x434.google.com [IPv6:2607:f8b0:4864:20::434])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BFFABC06174A;
+        Wed, 21 Apr 2021 11:46:12 -0700 (PDT)
+Received: by mail-pf1-x434.google.com with SMTP id 10so20834151pfl.1;
+        Wed, 21 Apr 2021 11:46:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=MLDIrCj7VcFwbIVWMo51IqYk0C1IXr6JWZJILf65wHI=;
-        b=R+8SE6DM5G2LQqi0iv5Kh5rhcyMnQJmfwZeU0TDOqOKK+7bTroWXF7uhlgp4sbno+J
-         fjFXEvDENYIk4pBX/DEMjZHmCSJmFSBfnK0/MtDaKYk/rVxZTX1Lh6rV432gL45gQT6p
-         4RREJS7Iwfh5pFLlpMB8kuZAUPm4AO7vaJVezyRoY72DRNeY2qZn8HiYs8rxiaEdMuaW
-         EC8XCM8EosDiS+zQcWQwVZoZAN7Swx5Jb3t/ZJ7L6naLuNjzUY+UuPQLas+P/S0Hfxje
-         k1K8TYmVWGDA6xmIIF3oKS+MYzMd6YV8U9xC97ht7NtMuuVg5H6v+z1XL8VaXkDzpozj
-         RB8g==
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:content-transfer-encoding:in-reply-to;
+        bh=WUIJpBKatwUmZf28HiE78wEq3gCHO70hNUHTcM+ZXj0=;
+        b=EAg97X4b+W9iZfzikmPN8z2/tQpKMEj0ylxmQz8EBjIvBR3Mc8N8iDuOZMxaMFhCpY
+         OhWPUas+sD+P0sbt0iuzrhsetEhG8ibkw/lwOFyIo9AA5nmow/tfU5eNrtgz6spk9rsf
+         c5fOKAeqpWVqnx4kOMkryjLvVA7YcoDPZXqE2bjr+Kf9OF4ao6bFGX3fDgqV3AVJELFH
+         D1ViDqGF66WUr+qV7VT17vSSBsyVdkNyQ0vkZtP1JCOpVpnQ9qnL2MsAvxxCpvl1JTvr
+         rCiIyRe5Z5p65rCM7g62JVm5RKhjY5rQ4svzNfoeOMXA8kGAWZagp5Sn/0srXdrTQ1wX
+         vGkg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=MLDIrCj7VcFwbIVWMo51IqYk0C1IXr6JWZJILf65wHI=;
-        b=qAG9vAavIp8r0zG5AXAwS5s/Jqz9LvPd7X7qM934kWRPk9/XIIje1QUJOSy3f9feAh
-         I5DlV7JAQUGWC8ssCuf1M5xGuWz5i4FcE0h1hUmAD7tFavR7Z2MYNsuQpU/hSRWSqu22
-         LlGmFrWNjW/twaPPYttjI1qCcg7WSdnpIXIy9Lj1nLfTtzwpzZ7rdD74GcfIdeqluDIQ
-         1Sbaba4hvZNwdzIUP9nYihBQLRMzISyqBAqHXXSSmDHzvjXbrFjfWrhiiYGVcucwHZRZ
-         pSNBR/xudAZdSx9NudYjF3EldO4IlY5RU1VWdQXE9KY5kJB2Cd66bNOVXDvuJMgb+MGh
-         aRQA==
-X-Gm-Message-State: AOAM530VlYRzw/2FrfVjNJW11ztxQziqGuZlq/8RMRsbMGzVwCNq4NPw
-        BA5S+dTDQD7B87kLuyDTM5ZiTVnBLxc=
-X-Google-Smtp-Source: ABdhPJzel96ytZea4aYbQ9qXrLxaZk/FNCgluBRgKdCBizEwZAVvk0qX/WJNExEW8+NcC8kwX1wEow==
-X-Received: by 2002:a63:5466:: with SMTP id e38mr23035417pgm.172.1619030248495;
-        Wed, 21 Apr 2021 11:37:28 -0700 (PDT)
-Received: from [10.230.29.202] ([192.19.223.252])
-        by smtp.gmail.com with ESMTPSA id f3sm117847pgg.70.2021.04.21.11.37.26
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 21 Apr 2021 11:37:27 -0700 (PDT)
-Subject: Re: net: bridge: propagate error code and extack from
- br_mc_disabled_update
-To:     Christian Borntraeger <borntraeger@de.ibm.com>, olteanv@gmail.com
-Cc:     andrew@lunn.ch, davem@davemloft.net, idosch@idosch.org,
-        jiri@resnulli.us, kuba@kernel.org, netdev@vger.kernel.org,
-        nikolay@nvidia.com, roopa@nvidia.com, vladimir.oltean@nxp.com,
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=WUIJpBKatwUmZf28HiE78wEq3gCHO70hNUHTcM+ZXj0=;
+        b=ORd0h6cujXTyEdOHQ72+HOgokAoLV+SOPppcTyHvXHhnNT0RuPu2U8upFaX0/KkqFT
+         oq8d4N4yztYdZyX1G1aHXnGcwpSNMKPeO/FMe5o1N01hiFawdsmsuNAMtgEkO/QzzSvj
+         YcMq54PkhzkKtpYHoV5UNs8DyFbfZP4aFZD0qq2/MK/lNXE8SKKD6W5y3Y2V/LkkjVvD
+         tTvkN3zgwRJ9xFdtSNSBXvtUxCrA6yWFeHaNJ7+HqsSH8x99NrZmkTp3pYhy9LXc2e4K
+         remjUaMTr3nzIjvUsyRQBw0PXeg/428jPTSEbow01o2WJby0fv7fO4m4OXYhwIkSLm4+
+         8xng==
+X-Gm-Message-State: AOAM533N8dYj8g+hIAGnSiWiUywpDCBgZOsNkN1s5VMmTzvuVYP9UAdd
+        idBpQVfMOwMWwXmrakiL9wg=
+X-Google-Smtp-Source: ABdhPJw9BfbIHIlw9KVhuaVCbxNvnrxuRUS2mnJqfblzKlXo4vyU2neRZKTuXiJplTdBxSwKJ6UXNQ==
+X-Received: by 2002:a17:90a:cd06:: with SMTP id d6mr13027988pju.91.1619030772339;
+        Wed, 21 Apr 2021 11:46:12 -0700 (PDT)
+Received: from skbuf (5-12-16-165.residential.rdsnet.ro. [5.12.16.165])
+        by smtp.gmail.com with ESMTPSA id l35sm130470pgm.10.2021.04.21.11.46.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 21 Apr 2021 11:46:11 -0700 (PDT)
+Date:   Wed, 21 Apr 2021 21:46:00 +0300
+From:   Vladimir Oltean <olteanv@gmail.com>
+To:     Florian Fainelli <f.fainelli@gmail.com>
+Cc:     Christian Borntraeger <borntraeger@de.ibm.com>, andrew@lunn.ch,
+        davem@davemloft.net, idosch@idosch.org, jiri@resnulli.us,
+        kuba@kernel.org, netdev@vger.kernel.org, nikolay@nvidia.com,
+        roopa@nvidia.com, vladimir.oltean@nxp.com,
         linux-next@vger.kernel.org, kvm list <kvm@vger.kernel.org>,
         linux-s390 <linux-s390@vger.kernel.org>
+Subject: Re: net: bridge: propagate error code and extack from
+ br_mc_disabled_update
+Message-ID: <20210421184600.qzsx6obwifcfsshq@skbuf>
 References: <20210414192257.1954575-1-olteanv@gmail.com>
  <20210421181808.5210-1-borntraeger@de.ibm.com>
  <cfc19833-01ec-08ea-881d-4101780d1d86@de.ibm.com>
-From:   Florian Fainelli <f.fainelli@gmail.com>
-Message-ID: <3993fbf8-b409-f88f-c573-bf5b8f418a88@gmail.com>
-Date:   Wed, 21 Apr 2021 11:37:25 -0700
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Firefox/78.0 Thunderbird/78.9.0
+ <3993fbf8-b409-f88f-c573-bf5b8f418a88@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <cfc19833-01ec-08ea-881d-4101780d1d86@de.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <3993fbf8-b409-f88f-c573-bf5b8f418a88@gmail.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Wed, Apr 21, 2021 at 11:37:25AM -0700, Florian Fainelli wrote:
+> On 4/21/2021 11:35 AM, Christian Borntraeger wrote:
+> > On 21.04.21 20:18, Christian Borntraeger wrote:
+> >> Whatever version landed in next, according to bisect this broke
+> >> libvirt/kvms use of bridges:
+> >>
+> >>
+> >> # virsh start s31128001
+> >> error: Failed to start domain 's31128001'
+> >> error: Unable to add bridge virbr1 port vnet0: Operation not supported
+> >>
+> >> # grep vnet0 /var/log/libvirt/libvirtd.log
+> >>
+> >> 2021-04-21 07:43:09.453+0000: 2460: info : virNetDevTapCreate:240 :
+> >> created device: 'vnet0'
+> >> 2021-04-21 07:43:09.453+0000: 2460: debug :
+> >> virNetDevSetMACInternal:287 : SIOCSIFHWADDR vnet0
+> >> MAC=fe:bb:83:28:01:02 - Success
+> >> 2021-04-21 07:43:09.453+0000: 2460: error : virNetDevBridgeAddPort:633
+> >> : Unable to add bridge virbr1 port vnet0: Operation not supported
+> >> 2021-04-21 07:43:09.466+0000: 2543: debug : udevHandleOneDevice:1695 :
+> >> udev action: 'add': /sys/devices/virtual/net/vnet0
+> >>
+> >> Christian
+> >>
+> > 
+> > For reference:
+> > 
+> > ae1ea84b33dab45c7b6c1754231ebda5959b504c is the first bad commit
+> > commit ae1ea84b33dab45c7b6c1754231ebda5959b504c
+> > Author: Florian Fainelli <f.fainelli@gmail.com>
+> > Date:   Wed Apr 14 22:22:57 2021 +0300
+> > 
+> >    net: bridge: propagate error code and extack from br_mc_disabled_update
+> >       Some Ethernet switches might only be able to support disabling
+> > multicast
+> >    snooping globally, which is an issue for example when several bridges
+> >    span the same physical device and request contradictory settings.
+> >       Propagate the return value of br_mc_disabled_update() such that this
+> >    limitation is transmitted correctly to user-space.
+> >       Signed-off-by: Florian Fainelli <f.fainelli@gmail.com>
+> >    Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+> >    Signed-off-by: David S. Miller <davem@davemloft.net>
+> > 
+> > net/bridge/br_multicast.c | 28 +++++++++++++++++++++-------
+> > net/bridge/br_netlink.c   |  4 +++-
+> > net/bridge/br_private.h   |  3 ++-
+> > net/bridge/br_sysfs_br.c  |  8 +-------
+> > 4 files changed, 27 insertions(+), 16 deletions(-)
+> > 
+> > not sure if it matters this is on s390.
+> > A simple reproducer is virt-install, e.g.
+> > virt-install --name test --disk size=12 --memory=2048 --vcpus=2
+> > --location
+> > http://ports.ubuntu.com/ubuntu-ports/dists/bionic/main/installer-s390x/
+> 
+> Thanks, I will kick off a reproducer and let you know.
+> -- 
+> Florian
 
+Hey, you guys are moving fast, faster than it took me to open my email client...
 
-On 4/21/2021 11:35 AM, Christian Borntraeger wrote:
-> 
-> 
-> On 21.04.21 20:18, Christian Borntraeger wrote:
->> Whatever version landed in next, according to bisect this broke
->> libvirt/kvms use of bridges:
->>
->>
->> # virsh start s31128001
->> error: Failed to start domain 's31128001'
->> error: Unable to add bridge virbr1 port vnet0: Operation not supported
->>
->> # grep vnet0 /var/log/libvirt/libvirtd.log
->>
->> 2021-04-21 07:43:09.453+0000: 2460: info : virNetDevTapCreate:240 :
->> created device: 'vnet0'
->> 2021-04-21 07:43:09.453+0000: 2460: debug :
->> virNetDevSetMACInternal:287 : SIOCSIFHWADDR vnet0
->> MAC=fe:bb:83:28:01:02 - Success
->> 2021-04-21 07:43:09.453+0000: 2460: error : virNetDevBridgeAddPort:633
->> : Unable to add bridge virbr1 port vnet0: Operation not supported
->> 2021-04-21 07:43:09.466+0000: 2543: debug : udevHandleOneDevice:1695 :
->> udev action: 'add': /sys/devices/virtual/net/vnet0
->>
->> Christian
->>
-> 
-> For reference:
-> 
-> ae1ea84b33dab45c7b6c1754231ebda5959b504c is the first bad commit
-> commit ae1ea84b33dab45c7b6c1754231ebda5959b504c
-> Author: Florian Fainelli <f.fainelli@gmail.com>
-> Date:Â Â  Wed Apr 14 22:22:57 2021 +0300
-> 
-> Â Â  net: bridge: propagate error code and extack from br_mc_disabled_update
-> Â Â  Â Â  Some Ethernet switches might only be able to support disabling
-> multicast
-> Â Â  snooping globally, which is an issue for example when several bridges
-> Â Â  span the same physical device and request contradictory settings.
-> Â Â  Â Â  Propagate the return value of br_mc_disabled_update() such that this
-> Â Â  limitation is transmitted correctly to user-space.
-> Â Â  Â Â  Signed-off-by: Florian Fainelli <f.fainelli@gmail.com>
-> Â Â  Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
-> Â Â  Signed-off-by: David S. Miller <davem@davemloft.net>
-> 
-> net/bridge/br_multicast.c | 28 +++++++++++++++++++++-------
-> net/bridge/br_netlink.cÂ Â  |Â  4 +++-
-> net/bridge/br_private.hÂ Â  |Â  3 ++-
-> net/bridge/br_sysfs_br.cÂ  |Â  8 +-------
-> 4 files changed, 27 insertions(+), 16 deletions(-)
-> 
-> not sure if it matters this is on s390.
-> A simple reproducer is virt-install, e.g.
-> virt-install --name test --disk size=12 --memory=2048 --vcpus=2
-> --location
-> http://ports.ubuntu.com/ubuntu-ports/dists/bionic/main/installer-s390x/
+Sorry for the breakage, Christian, I've just sent a patch with what I
+think is wrong, could you give it a try?
 
-Thanks, I will kick off a reproducer and let you know.
--- 
-Florian
+Thanks!
