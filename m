@@ -2,126 +2,98 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A52903663D8
-	for <lists+kvm@lfdr.de>; Wed, 21 Apr 2021 05:00:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5FF8F3663F1
+	for <lists+kvm@lfdr.de>; Wed, 21 Apr 2021 05:21:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234771AbhDUDAB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 20 Apr 2021 23:00:01 -0400
-Received: from szxga06-in.huawei.com ([45.249.212.32]:17384 "EHLO
-        szxga06-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233874AbhDUDAB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 20 Apr 2021 23:00:01 -0400
-Received: from DGGEMS411-HUB.china.huawei.com (unknown [172.30.72.59])
-        by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4FQ4wQ1pKYzlYtt;
-        Wed, 21 Apr 2021 10:57:26 +0800 (CST)
-Received: from [10.174.187.224] (10.174.187.224) by
- DGGEMS411-HUB.china.huawei.com (10.3.19.211) with Microsoft SMTP Server id
- 14.3.498.0; Wed, 21 Apr 2021 10:59:12 +0800
-Subject: Re: [PATCH] KVM: arm64: Correctly handle the mmio faulting
-To:     Santosh Shukla <sashukla@nvidia.com>
-References: <1603297010-18787-1-git-send-email-sashukla@nvidia.com>
-CC:     <maz@kernel.org>, <kvm@vger.kernel.org>,
-        <kvmarm@lists.cs.columbia.edu>, <linux-kernel@vger.kernel.org>,
-        <cjia@nvidia.com>, <linux-arm-kernel@lists.infradead.org>,
-        "Wanghaibin (D)" <wanghaibin.wang@huawei.com>
-From:   Keqian Zhu <zhukeqian1@huawei.com>
-Message-ID: <8b20dfc0-3b5e-c658-c47d-ebc50d20568d@huawei.com>
-Date:   Wed, 21 Apr 2021 10:59:12 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
- Thunderbird/45.7.1
+        id S234641AbhDUDWQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 20 Apr 2021 23:22:16 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:38575 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S233927AbhDUDWL (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 20 Apr 2021 23:22:11 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1618975296;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=GEfjyJT9pCdQ1S+UliWsNNDLnxg2PWz47J1URl6HOzU=;
+        b=eEypCuRSDzs0HwL76gE4p7yCtBCnHwUr2m1t7Wvn7UaH2LXMW9Jr3CNY4a5D92Q+2qQLJv
+        09ibMyGY/uabo2HmXmKIwVMH0caipuBLuTnhRcHOT7zDhQtHZaVM+ZlCzjcbIR8luqGY6K
+        od6OZZ93fmVu7d9IHk2Keba3vrSRoSw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-174-b2XJ9duBPvGdM2cnsCx9ww-1; Tue, 20 Apr 2021 23:21:33 -0400
+X-MC-Unique: b2XJ9duBPvGdM2cnsCx9ww-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 84BEA8189C6;
+        Wed, 21 Apr 2021 03:21:31 +0000 (UTC)
+Received: from localhost.localdomain (ovpn-13-189.pek2.redhat.com [10.72.13.189])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 9F6836064B;
+        Wed, 21 Apr 2021 03:21:19 +0000 (UTC)
+From:   Jason Wang <jasowang@redhat.com>
+To:     mst@redhat.com, jasowang@redhat.com
+Cc:     virtualization@lists.linux-foundation.org,
+        linux-kernel@vger.kernel.org, xieyongji@bytedance.com,
+        stefanha@redhat.com, file@sect.tu-berlin.de, ashish.kalra@amd.com,
+        martin.radev@aisec.fraunhofer.de, konrad.wilk@oracle.com,
+        kvm@vger.kernel.org
+Subject: [RFC PATCH 0/7] Untrusted device support for virtio
+Date:   Wed, 21 Apr 2021 11:21:10 +0800
+Message-Id: <20210421032117.5177-1-jasowang@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1603297010-18787-1-git-send-email-sashukla@nvidia.com>
-Content-Type: text/plain; charset="windows-1252"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.174.187.224]
-X-CFilter-Loop: Reflected
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Santosh,
+Hi All:
 
-On 2020/10/22 0:16, Santosh Shukla wrote:
-> The Commit:6d674e28 introduces a notion to detect and handle the
-> device mapping. The commit checks for the VM_PFNMAP flag is set
-> in vma->flags and if set then marks force_pte to true such that
-> if force_pte is true then ignore the THP function check
-> (/transparent_hugepage_adjust()).
-> 
-> There could be an issue with the VM_PFNMAP flag setting and checking.
-> For example consider a case where the mdev vendor driver register's
-> the vma_fault handler named vma_mmio_fault(), which maps the
-> host MMIO region in-turn calls remap_pfn_range() and maps
-> the MMIO's vma space. Where, remap_pfn_range implicitly sets
-> the VM_PFNMAP flag into vma->flags.
-Could you give the name of the mdev vendor driver that triggers this issue?
-I failed to find one according to your description. Thanks.
+Sometimes, the driver doesn't trust the device. This is usually
+happens for the encrtpyed VM or VDUSE[1]. In both cases, technology
+like swiotlb is used to prevent the poking/mangling of memory from the
+device. But this is not sufficient since current virtio driver may
+trust what is stored in the descriptor table (coherent mapping) for
+performing the DMA operations like unmap and bounce so the device may
+choose to utilize the behaviour of swiotlb to perform attacks[2].
 
+For double insurance, to protect from a malicous device, when DMA API
+is used for the device, this series store and use the descriptor
+metadata in an auxiliay structure which can not be accessed via
+swiotlb instead of the ones in the descriptor table. Actually, we've
+almost achieved that through packed virtqueue and we just need to fix
+a corner case of handling mapping errors. For split virtqueue we just
+follow what's done in the packed.
 
-BRs,
-Keqian
+Note that we don't duplicate descriptor medata for indirect
+descriptors since it uses stream mapping which is read only so it's
+safe if the metadata of non-indirect descriptors are correct.
 
+The behaivor for non DMA API is kept for minimizing the performance
+impact.
 
-> 
-> Now lets assume a mmio fault handing flow where guest first access
-> the MMIO region whose 2nd stage translation is not present.
-> So that results to arm64-kvm hypervisor executing guest abort handler,
-> like below:
-> 
-> kvm_handle_guest_abort() -->
->  user_mem_abort()--> {
-> 
->     ...
->     0. checks the vma->flags for the VM_PFNMAP.
->     1. Since VM_PFNMAP flag is not yet set so force_pte _is_ false;
->     2. gfn_to_pfn_prot() -->
->         __gfn_to_pfn_memslot() -->
->             fixup_user_fault() -->
->                 handle_mm_fault()-->
->                     __do_fault() -->
->                        vma_mmio_fault() --> // vendor's mdev fault handler
->                         remap_pfn_range()--> // Here sets the VM_PFNMAP
-> 						flag into vma->flags.
->     3. Now that force_pte is set to false in step-2),
->        will execute transparent_hugepage_adjust() func and
->        that lead to Oops [4].
->  }
-> 
-> The proposition is to check is_iomap flag before executing the THP
-> function transparent_hugepage_adjust().
-> 
-> [4] THP Oops:
->> pc: kvm_is_transparent_hugepage+0x18/0xb0
->> ...
->> ...
->> user_mem_abort+0x340/0x9b8
->> kvm_handle_guest_abort+0x248/0x468
->> handle_exit+0x150/0x1b0
->> kvm_arch_vcpu_ioctl_run+0x4d4/0x778
->> kvm_vcpu_ioctl+0x3c0/0x858
->> ksys_ioctl+0x84/0xb8
->> __arm64_sys_ioctl+0x28/0x38
-> 
-> Tested on Huawei Kunpeng Taishan-200 arm64 server, Using VFIO-mdev device.
-> Linux tip: 583090b1
-> 
-> Fixes: 6d674e28 ("KVM: arm/arm64: Properly handle faulting of device mappings")
-> Signed-off-by: Santosh Shukla <sashukla@nvidia.com>
-> ---
->  arch/arm64/kvm/mmu.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index 3d26b47..ff15357 100644
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
-> @@ -1947,7 +1947,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->  	 * If we are not forced to use page mapping, check if we are
->  	 * backed by a THP and thus use block mapping if possible.
->  	 */
-> -	if (vma_pagesize == PAGE_SIZE && !force_pte)
-> +	if (vma_pagesize == PAGE_SIZE && !force_pte && !is_iomap(flags))
->  		vma_pagesize = transparent_hugepage_adjust(memslot, hva,
->  							   &pfn, &fault_ipa);
->  	if (writable)
-> 
+Slightly tested with packed on/off, iommu on/of, swiotlb force/off in
+the guest.
+
+Please review.
+
+[1] https://lore.kernel.org/netdev/fab615ce-5e13-a3b3-3715-a4203b4ab010@redhat.com/T/
+[2] https://yhbt.net/lore/all/c3629a27-3590-1d9f-211b-c0b7be152b32@redhat.com/T/#mc6b6e2343cbeffca68ca7a97e0f473aaa871c95b
+
+Jason Wang (7):
+  virtio-ring: maintain next in extra state for packed virtqueue
+  virtio_ring: rename vring_desc_extra_packed
+  virtio-ring: factor out desc_extra allocation
+  virtio_ring: secure handling of mapping errors
+  virtio_ring: introduce virtqueue_desc_add_split()
+  virtio: use err label in __vring_new_virtqueue()
+  virtio-ring: store DMA metadata in desc_extra for split virtqueue
+
+ drivers/virtio/virtio_ring.c | 189 ++++++++++++++++++++++++++---------
+ 1 file changed, 141 insertions(+), 48 deletions(-)
+
+-- 
+2.25.1
+
