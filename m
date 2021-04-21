@@ -2,142 +2,156 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 48402366552
-	for <lists+kvm@lfdr.de>; Wed, 21 Apr 2021 08:22:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1C1EF366569
+	for <lists+kvm@lfdr.de>; Wed, 21 Apr 2021 08:28:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235219AbhDUGWg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 21 Apr 2021 02:22:36 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:24730 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234885AbhDUGWf (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 21 Apr 2021 02:22:35 -0400
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 13L63DH9156056;
-        Wed, 21 Apr 2021 02:20:51 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=k/ieIyBolTpgcqF80f+tfdYQROMaFCUvrc+rfvOenpk=;
- b=gyRTR6kI6iaRS3hLKpw9QsJJOvYcSRxTokbmbA9i2AayY8oTZWRp4Oymmx/GMAsXjS23
- c2AyUJTy2k3XGgcNPMZQNJ8XAWUotby8bohcHdYBzDx+DdkHhyLlsruJ/O6m6LxttpsH
- u/0BIy/teGYUAnWkr01VEydKrQHRvXvjk6s4bPoBUJxWMyW3ee9bRXXmwyv5XTrvYWcJ
- dtbteb1KVihYDK5zAwjHsiym1oyOB8rhQctz05Gd2woe0XLbxD5XqcFFLWfQuZFBHPjq
- saRKKndET+fUT4sSGmQNd/rdZNZ7ROA7mOWegWqVo0sy24DDiRg0u0acgcA0gQgq3hEu 2Q== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3829u3x3fd-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 21 Apr 2021 02:20:51 -0400
-Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 13L63R6L157826;
-        Wed, 21 Apr 2021 02:20:51 -0400
-Received: from ppma06fra.de.ibm.com (48.49.7a9f.ip4.static.sl-reverse.com [159.122.73.72])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3829u3x3ep-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 21 Apr 2021 02:20:51 -0400
-Received: from pps.filterd (ppma06fra.de.ibm.com [127.0.0.1])
-        by ppma06fra.de.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 13L6KmQb017957;
-        Wed, 21 Apr 2021 06:20:48 GMT
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
-        by ppma06fra.de.ibm.com with ESMTP id 37ypxh95cj-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 21 Apr 2021 06:20:48 +0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 13L6KkTY43319570
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 21 Apr 2021 06:20:46 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 35A90AE056;
-        Wed, 21 Apr 2021 06:20:46 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 4B256AE045;
-        Wed, 21 Apr 2021 06:20:42 +0000 (GMT)
-Received: from [9.199.37.21] (unknown [9.199.37.21])
-        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Wed, 21 Apr 2021 06:20:41 +0000 (GMT)
-Subject: Re: [PATCH v5 3/3] ppc: Enable 2nd DAWR support on p10
-To:     David Gibson <david@gibson.dropbear.id.au>
-Cc:     paulus@samba.org, mpe@ellerman.id.au, mikey@neuling.org,
-        pbonzini@redhat.com, mst@redhat.com, clg@kaod.org,
-        qemu-ppc@nongnu.org, qemu-devel@nongnu.org, kvm@vger.kernel.org,
-        cohuck@redhat.com, groug@kaod.org,
-        Ravi Bangoria <ravi.bangoria@linux.ibm.com>
-References: <20210412114433.129702-1-ravi.bangoria@linux.ibm.com>
- <20210412114433.129702-4-ravi.bangoria@linux.ibm.com>
- <YH0M1YdINJqbdqP+@yekko.fritz.box>
-From:   Ravi Bangoria <ravi.bangoria@linux.ibm.com>
-Message-ID: <ca21d852-4b54-01d3-baab-cc8d0d50e505@linux.ibm.com>
-Date:   Wed, 21 Apr 2021 11:50:40 +0530
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.8.1
+        id S235971AbhDUG2z (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 21 Apr 2021 02:28:55 -0400
+Received: from szxga07-in.huawei.com ([45.249.212.35]:17807 "EHLO
+        szxga07-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235988AbhDUG2v (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 21 Apr 2021 02:28:51 -0400
+Received: from DGGEMS409-HUB.china.huawei.com (unknown [172.30.72.58])
+        by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4FQ9Xt2LtZz7wjD;
+        Wed, 21 Apr 2021 14:25:50 +0800 (CST)
+Received: from [10.174.187.224] (10.174.187.224) by
+ DGGEMS409-HUB.china.huawei.com (10.3.19.209) with Microsoft SMTP Server id
+ 14.3.498.0; Wed, 21 Apr 2021 14:28:08 +0800
+Subject: Re: [PATCH v4 1/2] kvm/arm64: Remove the creation time's mapping of
+ MMIO regions
+To:     Gavin Shan <gshan@redhat.com>, <linux-kernel@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>, <kvm@vger.kernel.org>,
+        <kvmarm@lists.cs.columbia.edu>, Marc Zyngier <maz@kernel.org>
+References: <20210415140328.24200-1-zhukeqian1@huawei.com>
+ <20210415140328.24200-2-zhukeqian1@huawei.com>
+ <ad39c796-2778-df26-b0c6-231e7626a747@redhat.com>
+From:   Keqian Zhu <zhukeqian1@huawei.com>
+Message-ID: <bd4d2cfc-37b9-f20a-5a5c-ed352d1a46dc@huawei.com>
+Date:   Wed, 21 Apr 2021 14:28:07 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
+ Thunderbird/45.7.1
 MIME-Version: 1.0
-In-Reply-To: <YH0M1YdINJqbdqP+@yekko.fritz.box>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Language: en-US
+In-Reply-To: <ad39c796-2778-df26-b0c6-231e7626a747@redhat.com>
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: qm7oCdpDo5nWgx59nGfZgRVOX3HoyEP8
-X-Proofpoint-ORIG-GUID: 3ZEDxFrrnwHfa3dLMjaN4eAe-b0QXCSY
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.761
- definitions=2021-04-21_02:2021-04-20,2021-04-21 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- phishscore=0 bulkscore=0 lowpriorityscore=0 adultscore=0 clxscore=1015
- spamscore=0 suspectscore=0 mlxscore=0 mlxlogscore=999 malwarescore=0
- impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2104060000 definitions=main-2104210049
+X-Originating-IP: [10.174.187.224]
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi David,
+Hi Gavin,
 
-On 4/19/21 10:23 AM, David Gibson wrote:
-> On Mon, Apr 12, 2021 at 05:14:33PM +0530, Ravi Bangoria wrote:
->> As per the PAPR, bit 0 of byte 64 in pa-features property indicates
->> availability of 2nd DAWR registers. i.e. If this bit is set, 2nd
->> DAWR is present, otherwise not. Use KVM_CAP_PPC_DAWR1 capability to
->> find whether kvm supports 2nd DAWR or not. If it's supported, allow
->> user to set the pa-feature bit in guest DT using cap-dawr1 machine
->> capability. Though, watchpoint on powerpc TCG guest is not supported
->> and thus 2nd DAWR is not enabled for TCG mode.
->>
->> Signed-off-by: Ravi Bangoria <ravi.bangoria@linux.ibm.com>
->> Reviewed-by: Greg Kurz <groug@kaod.org>
+On 2021/4/21 14:38, Gavin Shan wrote:
+> Hi Keqian,
 > 
-> So, I'm actually not sure if using an spapr capability is what we want
-> to do here.  The problem is that presumably the idea is to at some
-> point make the DAWR1 capability default to on (on POWER10, at least).
-> But at that point you'll no longer to be able to start TCG guests
-> without explicitly disabling it.  That's technically correct, since we
-> don't implement DAWR1 in TCG, but then we also don't implement DAWR0
-> and we let that slide... which I think is probably going to cause less
-> irritation on balance.
+> On 4/16/21 12:03 AM, Keqian Zhu wrote:
+>> The MMIO regions may be unmapped for many reasons and can be remapped
+>> by stage2 fault path. Map MMIO regions at creation time becomes a
+>> minor optimization and makes these two mapping path hard to sync.
+>>
+>> Remove the mapping code while keep the useful sanity check.
+>>
+>> Signed-off-by: Keqian Zhu <zhukeqian1@huawei.com>
+>> ---
+>>   arch/arm64/kvm/mmu.c | 38 +++-----------------------------------
+>>   1 file changed, 3 insertions(+), 35 deletions(-)
+>>
+> 
+> After removing the logic to create stage2 mapping for VM_PFNMAP region,
+> I think the "do { } while" loop becomes unnecessary and can be dropped
+> completely. It means the only sanity check is to see if the memory slot
+> overflows IPA space or not. In that case, KVM_MR_FLAGS_ONLY can be
+> ignored because the memory slot's base address and length aren't changed
+> when we have KVM_MR_FLAGS_ONLY.
+Maybe not exactly. Here we do an important sanity check that we shouldn't
+log dirty for memslots with VM_PFNMAP.
 
-Ok. Probably something like this is what you want?
 
-Power10 behavior:
-   - KVM does not support DAWR1: Boot the guest without DAWR1
-     support (No warnings). Error out only if user tries with
-     cap-dawr1=on.
-   - KVM supports DAWR1: Boot the guest with DAWR1 support, unless
-     user specifies cap-dawr1=off.
-   - TCG guest: Ignore cap-dawr1 i.e. boot as if there is only
-     DAWR0 (Should be fixed in future while adding PowerPC watch-
-     point support in TCG mode)
-
-Power10 predecessor behavior:
-   - KVM guest: Boot the guest without DAWR1 support. Error out
-     if user tries with cap-dawr1=on.
-   - TCG guest: Ignore cap-dawr1 i.e. boot as if there is only
-     DAWR0 (Should be fixed in future while adding PowerPC watch-
-     point support in TCG mode)
-
-> I'm wondering if we're actually just better off setting the pa feature
-> just based on the guest CPU model.  TCG will be broken if you try to
-> use it, but then, it already is.  AFAIK there's no inherent reason we
-> couldn't implement DAWR support in TCG, it's just never been worth the
-> trouble.
-
-Correct. Probably there is no practical usecase for DAWR in TCG mode.
+> 
+> It seems the patch isn't based on "next" branch because find_vma() was
+> replaced by find_vma_intersection() by one of my patches :)
+Yep, I remember it. I will replace it at next merge window...
 
 Thanks,
-Ravi
+Keqian
+
+> 
+> Thanks,
+> Gavin
+> 
+>> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+>> index 8711894db8c2..c59af5ca01b0 100644
+>> --- a/arch/arm64/kvm/mmu.c
+>> +++ b/arch/arm64/kvm/mmu.c
+>> @@ -1301,7 +1301,6 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
+>>   {
+>>       hva_t hva = mem->userspace_addr;
+>>       hva_t reg_end = hva + mem->memory_size;
+>> -    bool writable = !(mem->flags & KVM_MEM_READONLY);
+>>       int ret = 0;
+>>         if (change != KVM_MR_CREATE && change != KVM_MR_MOVE &&
+>> @@ -1318,8 +1317,7 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
+>>       mmap_read_lock(current->mm);
+>>       /*
+>>        * A memory region could potentially cover multiple VMAs, and any holes
+>> -     * between them, so iterate over all of them to find out if we can map
+>> -     * any of them right now.
+>> +     * between them, so iterate over all of them.
+>>        *
+>>        *     +--------------------------------------------+
+>>        * +---------------+----------------+   +----------------+
+>> @@ -1330,50 +1328,20 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
+>>        */
+>>       do {
+>>           struct vm_area_struct *vma = find_vma(current->mm, hva);
+>> -        hva_t vm_start, vm_end;
+>>             if (!vma || vma->vm_start >= reg_end)
+>>               break;
+>>   -        /*
+>> -         * Take the intersection of this VMA with the memory region
+>> -         */
+>> -        vm_start = max(hva, vma->vm_start);
+>> -        vm_end = min(reg_end, vma->vm_end);
+>> -
+>>           if (vma->vm_flags & VM_PFNMAP) {
+>> -            gpa_t gpa = mem->guest_phys_addr +
+>> -                    (vm_start - mem->userspace_addr);
+>> -            phys_addr_t pa;
+>> -
+>> -            pa = (phys_addr_t)vma->vm_pgoff << PAGE_SHIFT;
+>> -            pa += vm_start - vma->vm_start;
+>> -
+>>               /* IO region dirty page logging not allowed */
+>>               if (memslot->flags & KVM_MEM_LOG_DIRTY_PAGES) {
+>>                   ret = -EINVAL;
+>> -                goto out;
+>> -            }
+>> -
+>> -            ret = kvm_phys_addr_ioremap(kvm, gpa, pa,
+>> -                            vm_end - vm_start,
+>> -                            writable);
+>> -            if (ret)
+>>                   break;
+>> +            }
+>>           }
+>> -        hva = vm_end;
+>> +        hva = min(reg_end, vma->vm_end);
+>>       } while (hva < reg_end);
+>>   -    if (change == KVM_MR_FLAGS_ONLY)
+>> -        goto out;
+>> -
+>> -    spin_lock(&kvm->mmu_lock);
+>> -    if (ret)
+>> -        unmap_stage2_range(&kvm->arch.mmu, mem->guest_phys_addr, mem->memory_size);
+>> -    else if (!cpus_have_final_cap(ARM64_HAS_STAGE2_FWB))
+>> -        stage2_flush_memslot(kvm, memslot);
+>> -    spin_unlock(&kvm->mmu_lock);
+>> -out:
+>>       mmap_read_unlock(current->mm);
+>>       return ret;
+>>   }
+>>
+> 
+> .
+> 
