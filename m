@@ -2,140 +2,119 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 22BF93670F4
-	for <lists+kvm@lfdr.de>; Wed, 21 Apr 2021 19:10:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 682DE3670FB
+	for <lists+kvm@lfdr.de>; Wed, 21 Apr 2021 19:10:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238671AbhDURKz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 21 Apr 2021 13:10:55 -0400
-Received: from mail.kernel.org ([198.145.29.99]:40420 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S238034AbhDURKx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 21 Apr 2021 13:10:53 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 5606A61360;
-        Wed, 21 Apr 2021 17:10:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1619025020;
-        bh=vQW/O+ZRlOWfybjW1VBTul75liFN4bSm4NGQMUpQUt0=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=bLe+rypc/AwdIGixQpLnD3YnfRANOWDeSjFkhTfu2bu9XAezbNXlXjq8ttbMvesTs
-         dS7Fs2XcrFBDivtz+XddlwOTQeb7OOnU583/I6hT2E6JMgShitGXLx+uy6QrsddQYz
-         RoUmSUUwG8o+h82IA4MkGK7dAuU09qPIVzbE/u1dIbSMFnuw7TZAnIWHhpRX9sCVkc
-         IYzaSDVRZyRFJ0FtRkmoZ5/AbJL3Ox4K7vDts12Fv80qKOPCBInSLxqFlvGJcrY9W4
-         +mNbg+JCcUIcz6vF3bM3iC51b4FbhFE94l01WZBgVQxDnCS0QqRvKWz4jk7HOpfYUk
-         II82pwHBSlvyQ==
-Date:   Wed, 21 Apr 2021 10:10:15 -0700
-From:   Nathan Chancellor <nathan@kernel.org>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
+        id S242773AbhDURL0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 21 Apr 2021 13:11:26 -0400
+Received: from forward4-smtp.messagingengine.com ([66.111.4.238]:38057 "EHLO
+        forward4-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S242747AbhDURLV (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 21 Apr 2021 13:11:21 -0400
+Received: from compute4.internal (compute4.nyi.internal [10.202.2.44])
+        by mailforward.nyi.internal (Postfix) with ESMTP id A709D1940FC1;
+        Wed, 21 Apr 2021 13:10:44 -0400 (EDT)
+Received: from mailfrontend1 ([10.202.2.162])
+  by compute4.internal (MEProxy); Wed, 21 Apr 2021 13:10:44 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        messagingengine.com; h=cc:content-type:date:from:in-reply-to
+        :message-id:mime-version:references:subject:to:x-me-proxy
+        :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; bh=tEL1KB
+        UOWLdIutLcYeoODFn8sW0g2GSP9e5rB5nWXfg=; b=VbKQeWihdnLPNdynDTVBbA
+        mQikQhN+azuilj1XHD6Sv1wQcQgYlvK675+Vaoi3r6JLfBeWWrcF8S4y2WBokw8+
+        dXUS0MjGdKtA5rAbd355EgHaJDHwzEKmKba2TjcxuGNw3eJO81W9VfwtesgXAqZ8
+        0vbzpq1DDVXtvE9bgo1lv10+ZHljMp4x+wDTZgz3F5oLSUwIgH8cNzf8p9MI063R
+        MZWTSL8r+4Y4UQiWAkAFpa54tyE0Z1PhObvDGZiSqQ9FHPebqo+s2O/j85qD/bi+
+        GQ22kIOS56X0CmTj8GcM7nxLTRJQeU/0SqbakeMREutCXMpozlUJ7+WO1I16ZGTQ
+        ==
+X-ME-Sender: <xms:lFyAYD8lYwvmhJYdxkFZXTB6BjMGEwlCVwpJa6DrDx4qaSzgqMQSCg>
+    <xme:lFyAYPuRtyxNf7iPDpca3XVXCg5JXq137IcLZWFwBfUhE0p2j_41I3LQVIXWBuJ85
+    -j8GFO2_cZZhBzFDRg>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeduledrvddtkedgudduudcutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfgh
+    necuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
+    enucfjughrpefvufgjfhfhfffkgggtsehttdfotddttddtnecuhfhrohhmpeffrghvihgu
+    ucfgughmohhnughsohhnuceoughmvgesughmvgdrohhrgheqnecuggftrfgrthhtvghrnh
+    epkeetteegteevlefggeehieekueeuheegteejffefgeelvdfggffgleevuefhkeeunecu
+    ffhomhgrihhnpehslhgvughjrdhnvghtnecukfhppeekuddrudekjedrvdeirddvfeekne
+    cuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepughmvges
+    ughmvgdrohhrgh
+X-ME-Proxy: <xmx:lFyAYBACFSz9SsDfu5glb7yhuSt1cewIXEPu_X6p_V4gjpex26cYdw>
+    <xmx:lFyAYPesb7BusupSMkBlbPah_Setbxs6eL0eVuYw4e6oK4utYb2TEw>
+    <xmx:lFyAYINT6lYtoTB3ZfF1X6KuZ3IBWegH9CcHRvrSG0iKv1Gr3cUmHA>
+    <xmx:lFyAYNpsC4N8PzHjQvq36vLtSIZkjViCZ94pCR8_Riss_uthwgBSHg>
+Received: from disaster-area.hh.sledj.net (disaster-area.hh.sledj.net [81.187.26.238])
+        by mail.messagingengine.com (Postfix) with ESMTPA id C10ED24005B;
+        Wed, 21 Apr 2021 13:10:43 -0400 (EDT)
+Received: from localhost (disaster-area.hh.sledj.net [local])
+        by disaster-area.hh.sledj.net (OpenSMTPD) with ESMTPA id 26527a9e;
+        Wed, 21 Apr 2021 17:10:42 +0000 (UTC)
+To:     Aaron Lewis <aaronlewis@google.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        clang-built-linux@googlegroups.com, linux-kernel@vger.kernel.org,
-        Kai Huang <kai.huang@intel.com>
-Subject: Re: [PATCH] KVM: x86: Fix implicit enum conversion goof in scattered
- reverse CPUID code
-Message-ID: <YIBcd+5NKJFnkTC1@archlinux-ax161>
-References: <20210421010850.3009718-1-seanjc@google.com>
+        kvm list <kvm@vger.kernel.org>
+Subject: Re: [PATCH v2 1/2] kvm: x86: Allow userspace to handle emulation
+ errors
+In-Reply-To: <CAAAPnDH1LtRDLCjxdd8hdqABSu9JfLyxN1G0Nu1COoVbHn1MLw@mail.gmail.com>
+References: <20210421122833.3881993-1-aaronlewis@google.com>
+ <cunsg3jg2ga.fsf@dme.org>
+ <CAAAPnDH1LtRDLCjxdd8hdqABSu9JfLyxN1G0Nu1COoVbHn1MLw@mail.gmail.com>
+X-HGTTG: zarquon
+From:   David Edmondson <dme@dme.org>
+Date:   Wed, 21 Apr 2021 18:10:42 +0100
+Message-ID: <cunmttrftrh.fsf@dme.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210421010850.3009718-1-seanjc@google.com>
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Apr 20, 2021 at 06:08:50PM -0700, Sean Christopherson wrote:
-> Take "enum kvm_only_cpuid_leafs" in scattered specific CPUID helpers
-> (which is obvious in hindsight), and use "unsigned int" for leafs that
-> can be the kernel's standard "enum cpuid_leaf" or the aforementioned
-> KVM-only variant.  Loss of the enum params is a bit disapponting, but
-> gcc obviously isn't providing any extra sanity checks, and the various
+On Wednesday, 2021-04-21 at 09:24:13 -07, Aaron Lewis wrote:
 
-Unfortunately, gcc's -Wenum-conversion is behind -Wextra rather than
--Wall like clang. If you explicitly enable it with
-KCFLAGS=-Wenum-conversion to your make invocation, it will warn in the
-exact same way as clang:
+>> > +     if (insn_size) {
+>> > +             run->emulation_failure.ndata = 3;
+>> > +             run->emulation_failure.flags |=
+>> > +                     KVM_INTERNAL_ERROR_EMULATION_FLAG_INSTRUCTION_BYTES;
+>> > +             run->emulation_failure.insn_size = insn_size;
+>> > +             memcpy(run->emulation_failure.insn_bytes,
+>> > +                    ctxt->fetch.data, sizeof(ctxt->fetch.data));
+>>
+>> We're relying on the fact that insn_bytes is at least as large as
+>> fetch.data, which is fine, but worth an assertion?
+>>
+>> "Leaking" irrelevant bytes here also seems bad, but I can't immediately
+>> see a problem as a result.
+>>
+>
+> I don't think this is a problem because the instruction bytes stream
+> has irrelevant bytes in it anyway.  In the test attached I verify that
+> it receives an flds instruction in userspace that was emulated in the
+> guest.  In the stream that comes through insn_size is set to 15 and
+> the instruction is only 2 bytes long, so the stream has irrelevant
+> bytes in it as far as this instruction is concerned.
 
-arch/x86/kvm/cpuid.c: In function 'kvm_set_cpu_caps':
-arch/x86/kvm/cpuid.c:499:29: warning: implicit conversion from 'enum kvm_only_cpuid_leafs' to 'enum cpuid_leafs' [-Wenum-conversion]
-  499 |  kvm_cpu_cap_init_scattered(CPUID_12_EAX,
-      |                             ^~~~~~~~~~~~
-arch/x86/kvm/cpuid.c: In function '__do_cpuid_func':
-arch/x86/kvm/cpuid.c:837:31: warning: implicit conversion from 'enum kvm_only_cpuid_leafs' to 'enum cpuid_leafs' [-Wenum-conversion]
-  837 |   cpuid_entry_override(entry, CPUID_12_EAX);
-      |                               ^~~~~~~~~~~~
+As an experiment I added[1] reporting of the exit reason using flag 2. On
+emulation failure (without the instruction bytes flag enabled), one run
+of QEMU reported:
 
-clang's warning for comparison/posterity:
+> KVM internal error. Suberror: 1
+> extra data[0]: 2
+> extra data[1]: 4
+> extra data[2]: 0
+> extra data[3]: 31
+> emulation failure
 
-arch/x86/kvm/cpuid.c:499:29: warning: implicit conversion from enumeration type 'enum kvm_only_cpuid_leafs' to different enumeration type 'enum cpuid_leafs' [-Wenum-conversion]
-        kvm_cpu_cap_init_scattered(CPUID_12_EAX,
-        ~~~~~~~~~~~~~~~~~~~~~~~~~~ ^~~~~~~~~~~~
-arch/x86/kvm/cpuid.c:837:31: warning: implicit conversion from enumeration type 'enum kvm_only_cpuid_leafs' to different enumeration type 'enum cpuid_leafs' [-Wenum-conversion]
-                cpuid_entry_override(entry, CPUID_12_EAX);
-                ~~~~~~~~~~~~~~~~~~~~        ^~~~~~~~~~~~
-2 warnings generated.
+data[1] and data[2] are not indicated as valid, but it seems unfortunate
+that I got (not really random) garbage there.
 
-> BUILD_BUG_ON() assertions ensure the input is in range.
-> 
-> This fixes implicit enum conversions that are detected by clang-11.
-> 
-> Fixes: 4e66c0cb79b7 ("KVM: x86: Add support for reverse CPUID lookup of scattered features")
-> Cc: Kai Huang <kai.huang@intel.com>
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
+Admittedly, with only your patches applied ndata will never skip past
+any bytes, as there is only one flag. As soon as I add another, is it my
+job to zero out those unused bytes? Maybe we should be clearing all of
+the payload at the top of prepare_emulation_failure_exit().
 
-This makes GCC and clang happy in my brief testing.
+Footnotes:
+[1]  https://disaster-area.hh.sledj.net/tmp/dme-581090/
 
-I assume this will get squashed but in case not, here are some tags:
-
-Reviewed-by: Nathan Chancellor <nathan@kernel.org>
-Tested-by: Nathan Chancellor <nathan@kernel.org>
-
-> ---
-> 
-> Hopefully it's not too late to squash this...
-> 
->  arch/x86/kvm/cpuid.c | 5 +++--
->  arch/x86/kvm/cpuid.h | 2 +-
->  2 files changed, 4 insertions(+), 3 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-> index 96e41e1a1bde..e9d644147bf5 100644
-> --- a/arch/x86/kvm/cpuid.c
-> +++ b/arch/x86/kvm/cpuid.c
-> @@ -365,7 +365,7 @@ int kvm_vcpu_ioctl_get_cpuid2(struct kvm_vcpu *vcpu,
->  }
->  
->  /* Mask kvm_cpu_caps for @leaf with the raw CPUID capabilities of this CPU. */
-> -static __always_inline void __kvm_cpu_cap_mask(enum cpuid_leafs leaf)
-> +static __always_inline void __kvm_cpu_cap_mask(unsigned int leaf)
->  {
->  	const struct cpuid_reg cpuid = x86_feature_cpuid(leaf * 32);
->  	struct kvm_cpuid_entry2 entry;
-> @@ -378,7 +378,8 @@ static __always_inline void __kvm_cpu_cap_mask(enum cpuid_leafs leaf)
->  	kvm_cpu_caps[leaf] &= *__cpuid_entry_get_reg(&entry, cpuid.reg);
->  }
->  
-> -static __always_inline void kvm_cpu_cap_init_scattered(enum cpuid_leafs leaf, u32 mask)
-> +static __always_inline
-> +void kvm_cpu_cap_init_scattered(enum kvm_only_cpuid_leafs leaf, u32 mask)
->  {
->  	/* Use kvm_cpu_cap_mask for non-scattered leafs. */
->  	BUILD_BUG_ON(leaf < NCAPINTS);
-> diff --git a/arch/x86/kvm/cpuid.h b/arch/x86/kvm/cpuid.h
-> index eeb4a3020e1b..7bb4504a2944 100644
-> --- a/arch/x86/kvm/cpuid.h
-> +++ b/arch/x86/kvm/cpuid.h
-> @@ -236,7 +236,7 @@ static __always_inline void cpuid_entry_change(struct kvm_cpuid_entry2 *entry,
->  }
->  
->  static __always_inline void cpuid_entry_override(struct kvm_cpuid_entry2 *entry,
-> -						 enum cpuid_leafs leaf)
-> +						 unsigned int leaf)
->  {
->  	u32 *reg = cpuid_entry_get_reg(entry, leaf * 32);
->  
-> -- 
-> 2.31.1.368.gbe11c130af-goog
-> 
+dme.
+-- 
+Music has magic, it's good clear syncopation.
