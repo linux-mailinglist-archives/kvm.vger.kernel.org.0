@@ -2,85 +2,126 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 74A98366D84
-	for <lists+kvm@lfdr.de>; Wed, 21 Apr 2021 16:03:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5F329366DAC
+	for <lists+kvm@lfdr.de>; Wed, 21 Apr 2021 16:07:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243195AbhDUODv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 21 Apr 2021 10:03:51 -0400
-Received: from linux.microsoft.com ([13.77.154.182]:36468 "EHLO
+        id S243371AbhDUOHp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 21 Apr 2021 10:07:45 -0400
+Received: from linux.microsoft.com ([13.77.154.182]:36978 "EHLO
         linux.microsoft.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243185AbhDUODp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 21 Apr 2021 10:03:45 -0400
-Received: from [192.168.86.30] (c-73-38-52-84.hsd1.vt.comcast.net [73.38.52.84])
-        by linux.microsoft.com (Postfix) with ESMTPSA id 5904820B8001;
-        Wed, 21 Apr 2021 07:03:09 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 5904820B8001
+        with ESMTP id S243323AbhDUOHi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 21 Apr 2021 10:07:38 -0400
+Received: from viremana-dev.fwjladdvyuiujdukmejncen4mf.xx.internal.cloudapp.net (unknown [13.66.132.26])
+        by linux.microsoft.com (Postfix) with ESMTPSA id A031020B8001;
+        Wed, 21 Apr 2021 07:07:04 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com A031020B8001
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-        s=default; t=1619013792;
-        bh=KD/DUiMPEiLQj+0ajVc+9N7DwqSG/RI78g2xsXCrEoU=;
-        h=Subject:To:Cc:References:From:Date:In-Reply-To:From;
-        b=P9THrmyXwBQGjg5NjlXt/p+rL5Xfnl3W0WI9fTmUeKvNOA+H2lMWhruR4hdRgjjn3
-         /iHidBD/t/54/PjtxiK75Bq3aF3V0RBIeDhoSUWq0oeuk/sQsbe8RKN94CQItbPbbX
-         vV9hZEXsichv5WootFQ555l6gIrTOZeWX7F7gq9M=
-Subject: Re: [PATCH v2 5/7] KVM: SVM: hyper-v: Remote TLB flush for SVM
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     "H. Peter Anvin" <hpa@zytor.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "K. Y. Srinivasan" <kys@microsoft.com>, x86@kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-hyperv@vger.kernel.org,
-        Lan Tianyu <Tianyu.Lan@microsoft.com>,
+        s=default; t=1619014024;
+        bh=Cg5t1YQVX4cxqUdMwABIBhBs50zuYp0RIByfae1cQIs=;
+        h=From:To:Cc:Subject:Date:From;
+        b=sNmmAB3BcY0o93b9qcSFnOEbwY3ph/E3Kh64eWsqihR8XQP0ycLXgMHqIdofeuiXp
+         fxwdd95sbKFEvYMd1dc9Pxf9XxNwOvnVYAHuhnMugcCoj8TmKxZWq9qHje2uznlzrU
+         Wwm7Kws0hrjCsyJvQmgpafYqzb/fD2ZDzXKFIH5o=
+From:   Vineeth Pillai <viremana@linux.microsoft.com>
+To:     Lan Tianyu <Tianyu.Lan@microsoft.com>,
         Michael Kelley <mikelley@microsoft.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>, Wei Liu <wei.liu@kernel.org>,
         Stephen Hemminger <sthemmin@microsoft.com>,
-        Haiyang Zhang <haiyangz@microsoft.com>,
-        viremana@linux.microsoft.com
-References: <cover.1618492553.git.viremana@linux.microsoft.com>
- <959f6cc899a17c709a2f5a71f6b2dc8c072ae600.1618492553.git.viremana@linux.microsoft.com>
- <87sg3q7g7b.fsf@vitty.brq.redhat.com>
- <f85b1db2-3a0b-0de3-78e9-2c04721f00bc@linux.microsoft.com>
-From:   Vineeth Pillai <viremana@linux.microsoft.com>
-Message-ID: <3f410c6a-ed30-216e-af54-33855a2963b1@linux.microsoft.com>
-Date:   Wed, 21 Apr 2021 10:03:12 -0400
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.9.1
+        Haiyang Zhang <haiyangz@microsoft.com>
+Cc:     Vineeth Pillai <viremana@linux.microsoft.com>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "K. Y. Srinivasan" <kys@microsoft.com>, x86@kernel.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-hyperv@vger.kernel.org
+Subject: [PATCH v3 0/7] Hyper-V nested virt enlightenments for SVM
+Date:   Wed, 21 Apr 2021 14:06:47 +0000
+Message-Id: <cover.1619013347.git.viremana@linux.microsoft.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-In-Reply-To: <f85b1db2-3a0b-0de3-78e9-2c04721f00bc@linux.microsoft.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Content-Language: en-US
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+This patch series enables the nested virtualization enlightenments for
+SVM. This is very similar to the enlightenments for VMX except for the
+fact that there is no enlightened VMCS. For SVM, VMCB is already an
+architectural in-memory data structure.
 
-On 4/16/2021 1:26 PM, Vineeth Pillai wrote:
->
->>
->>   +#if IS_ENABLED(CONFIG_HYPERV)
->> +static void hv_init_vmcb(struct vmcb *vmcb)
->> +{
->> +    struct hv_enlightenments *hve = &vmcb->hv_enlightenments;
->> +
->> +    if (npt_enabled &&
->> +        ms_hyperv.nested_features & HV_X64_NESTED_ENLIGHTENED_TLB)
->> Nitpick: we can probably have a 'static inline' for
->>
->>   "npt_enabled && ms_hyperv.nested_features & 
->> HV_X64_NESTED_ENLIGHTENED_TLB"
->>
->> e.g. 'hv_svm_enlightened_tlbflush()'
-> Makes sense, will do.
-On a second thought, this function itself is small and just does this 
-one check.
-So, might not make sense to add one more function. I shall rather change 
-this
-function to be an inline.
+The supported enlightenments are:
 
-Thanks,
-Vineeth
+Enlightened TLB Flush: If this is enabled, ASID invalidations invalidate
+only gva -> hpa entries. To flush entries derived from NPT, hyper-v
+provided hypercalls (HvFlushGuestPhysicalAddressSpace or
+HvFlushGuestPhysicalAddressList) should be used.
+
+Enlightened MSR bitmap(TLFS 16.5.3): "When enabled, L0 hypervisor does
+not monitor the MSR bitmaps for changes. Instead, the L1 hypervisor must
+invalidate the corresponding clean field after making changes to one of
+the MSR bitmaps."
+
+Direct Virtual Flush(TLFS 16.8): The hypervisor exposes hypercalls
+(HvFlushVirtualAddressSpace, HvFlushVirtualAddressSpaceEx,
+HvFlushVirtualAddressList, and HvFlushVirtualAddressListEx) that allow
+operating systems to more efficiently manage the virtual TLB. The L1
+hypervisor can choose to allow its guest to use those hypercalls and
+delegate the responsibility to handle them to the L0 hypervisor. This
+requires the use of a partition assist page."
+
+L2 Windows boot time was measured with and without the patch. Time was
+measured from power on to the login screen and was averaged over a
+consecutive 5 trials:
+  Without the patch: 42 seconds
+  With the patch: 29 seconds
+--
+
+Changes from v2:
+- Refactored the Remote TLB Flush logic into separate hyperv specific
+  source files (kvm_onhyperv.[ch]).
+- Reverted the VMCB Clean bits macro changes as it is no longer needed.
+
+Changes from v1:
+- Move the remote TLB flush related fields from kvm_vcpu_hv and kvm_hv
+  to kvm_vcpu_arch and kvm_arch.
+- Modify the VMCB clean mask runtime based on whether L1 hypervisor
+  is running on Hyper-V or not.
+- Detect Hyper-V nested enlightenments based on
+  HYPERV_CPUID_VENDOR_AND_MAX_FUNCTIONS.
+- Address other minor review comments.
+---
+
+Vineeth Pillai (7):
+  hyperv: Detect Nested virtualization support for SVM
+  hyperv: SVM enlightened TLB flush support flag
+  KVM: x86: hyper-v: Move the remote TLB flush logic out of vmx
+  KVM: SVM: hyper-v: Nested enlightenments in VMCB
+  KVM: SVM: hyper-v: Remote TLB flush for SVM
+  KVM: SVM: hyper-v: Enlightened MSR-Bitmap support
+  KVM: SVM: hyper-v: Direct Virtual Flush support
+
+ arch/x86/include/asm/hyperv-tlfs.h |   9 +++
+ arch/x86/include/asm/kvm_host.h    |  14 ++++
+ arch/x86/include/asm/svm.h         |  24 +++++-
+ arch/x86/kernel/cpu/mshyperv.c     |  10 ++-
+ arch/x86/kvm/Makefile              |   5 ++
+ arch/x86/kvm/kvm_onhyperv.c        |  94 ++++++++++++++++++++++
+ arch/x86/kvm/kvm_onhyperv.h        |  31 ++++++++
+ arch/x86/kvm/svm/svm.c             | 121 +++++++++++++++++++++++++++++
+ arch/x86/kvm/svm/svm.h             |  12 ++-
+ arch/x86/kvm/vmx/vmx.c             |  97 ++---------------------
+ arch/x86/kvm/vmx/vmx.h             |  10 ---
+ arch/x86/kvm/x86.c                 |   8 ++
+ 12 files changed, 330 insertions(+), 105 deletions(-)
+ create mode 100644 arch/x86/kvm/kvm_onhyperv.c
+ create mode 100644 arch/x86/kvm/kvm_onhyperv.h
+
+-- 
+2.25.1
+
