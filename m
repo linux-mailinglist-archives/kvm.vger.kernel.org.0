@@ -2,126 +2,138 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8C92836634C
-	for <lists+kvm@lfdr.de>; Wed, 21 Apr 2021 03:09:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 41A973663A0
+	for <lists+kvm@lfdr.de>; Wed, 21 Apr 2021 04:25:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233947AbhDUBJb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 20 Apr 2021 21:09:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51318 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233836AbhDUBJa (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 20 Apr 2021 21:09:30 -0400
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 136A7C061763
-        for <kvm@vger.kernel.org>; Tue, 20 Apr 2021 18:08:58 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id e65-20020a25e7440000b02904ecfeff1ed8so2538539ybh.19
-        for <kvm@vger.kernel.org>; Tue, 20 Apr 2021 18:08:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=reply-to:date:message-id:mime-version:subject:from:to:cc;
-        bh=yreWuj6mbfdz2hyYXXMbP0/DSYeQPnhKZL0KcCdj5RA=;
-        b=ZbDT9mkvb5FK7FzLr7cfj2U79ll5HDNS55F9gFZCf1XL+zG4bER5KOmpLo+luFBH1y
-         z6wx2wRtBQhLMzugVmjygM8c+UaZPwB+F/91Yu6mHwe7Jid7BCant0asWBzggzZcrXSI
-         CK6w7nugeazI5joXFIfVIVrMehCfvKOhjVt7bKrvdCtcAFOgnJobdETedO7AHEFuQke+
-         fXil1H0AWX07UX0+278pdG6jkXSCk39dn6YWMo2ypw052A1On/OYkGUVq7hmucyudBRO
-         uqII9Af0fXBBrUcs1ChZIo8b1KR/REgE6OtCTU2nZom6Qy/dcipBIPSKMOE+G0nx9Vax
-         6vIw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:reply-to:date:message-id:mime-version:subject
-         :from:to:cc;
-        bh=yreWuj6mbfdz2hyYXXMbP0/DSYeQPnhKZL0KcCdj5RA=;
-        b=BO9ONb/rKqBek0zijUgTQJP70AbsvuY8MkP468EMKxOgm+gg+ZTvincbM2N2lczOmJ
-         cIH11e4a4x0DABNrE7jGWtVj/ATK44a61CNn0r1YSGK0tGbU7skDrh8TT7uj1xgD2zVJ
-         ig4wg909f0/FpmyQuomzIik5yFBbFxzcM4t6vE61SrF3DclmA47H3N0djbEiJC/R087F
-         jPcH0AqTtLlcZBM08qADKGsrCNEH9FXZNZSPpCNG3G9vCCkmsCBufUveiyaoT6xip2bY
-         QiN6+aNrjcpA/aaEuOEG6wnERfqFCM1FX0oYuDDUnK1n2+O7KoD1DoHogrxY6rxl0rET
-         zm+g==
-X-Gm-Message-State: AOAM5319hvBg6ser/baU8Sw9f6/TQAWJKbdCUmwyvvb7SHZR6DVg36/6
-        z2OMp0sbDP4Gprakn7F8a7jx6DHRpko=
-X-Google-Smtp-Source: ABdhPJx0KB0ZGkUiqj3A1BLGcno/kXT67zz5NuprBq16lIqKPtuL+i3wvD5/JWILMhKvqSlKgkvs7O/Df/E=
-X-Received: from seanjc798194.pdx.corp.google.com ([2620:15c:f:10:a116:ecd1:5e88:1d40])
- (user=seanjc job=sendgmr) by 2002:a25:d051:: with SMTP id h78mr28826991ybg.497.1618967337262;
- Tue, 20 Apr 2021 18:08:57 -0700 (PDT)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Tue, 20 Apr 2021 18:08:50 -0700
-Message-Id: <20210421010850.3009718-1-seanjc@google.com>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.31.1.368.gbe11c130af-goog
-Subject: [PATCH] KVM: x86: Fix implicit enum conversion goof in scattered
- reverse CPUID code
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Nathan Chancellor <nathan@kernel.org>,
-        Nick Desaulniers <ndesaulniers@google.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        id S234669AbhDUC0H (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 20 Apr 2021 22:26:07 -0400
+Received: from mga04.intel.com ([192.55.52.120]:46403 "EHLO mga04.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S234663AbhDUC0G (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 20 Apr 2021 22:26:06 -0400
+IronPort-SDR: xFOO0wBrlj6jqloUgQgN8idSM0KPYa5s+jWRB1SqtLdXZFE391CQRU3ZhNEoUZu7QF+GFVs4HZ
+ PratWXY4kkEw==
+X-IronPort-AV: E=McAfee;i="6200,9189,9960"; a="193505773"
+X-IronPort-AV: E=Sophos;i="5.82,238,1613462400"; 
+   d="scan'208";a="193505773"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Apr 2021 19:25:29 -0700
+IronPort-SDR: akYsLkRsovn6cY991zWYMbOWLfwUTZm6po+y7GhVV7p7G3PT5uRY1QFkZjnMTNwFIcgoZ7nmbQ
+ ELFuUxR8XvAw==
+X-IronPort-AV: E=Sophos;i="5.82,238,1613462400"; 
+   d="scan'208";a="427334235"
+Received: from likexu-mobl1.ccr.corp.intel.com (HELO [10.238.4.93]) ([10.238.4.93])
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Apr 2021 19:25:26 -0700
+Subject: Re: [PATCH v4 00/11] KVM: x86/pmu: Guest Architectural LBR Enabling
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        clang-built-linux@googlegroups.com, linux-kernel@vger.kernel.org,
-        Kai Huang <kai.huang@intel.com>
-Content-Type: text/plain; charset="UTF-8"
+        x86@kernel.org, wei.w.wang@intel.com, linux-kernel@vger.kernel.org,
+        "Xu, Like" <like.xu@intel.com>,
+        Sean Christopherson <seanjc@google.com>
+References: <20210314155225.206661-1-like.xu@linux.intel.com>
+ <8ab9709f-a866-a73e-2d78-70a0c17763be@intel.com>
+From:   Like Xu <like.xu@linux.intel.com>
+Organization: Intel OTC
+Message-ID: <3d2a3422-1746-3f5f-b71a-2a12f55c2dff@linux.intel.com>
+Date:   Wed, 21 Apr 2021 10:25:23 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.9.1
+MIME-Version: 1.0
+In-Reply-To: <8ab9709f-a866-a73e-2d78-70a0c17763be@intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Take "enum kvm_only_cpuid_leafs" in scattered specific CPUID helpers
-(which is obvious in hindsight), and use "unsigned int" for leafs that
-can be the kernel's standard "enum cpuid_leaf" or the aforementioned
-KVM-only variant.  Loss of the enum params is a bit disapponting, but
-gcc obviously isn't providing any extra sanity checks, and the various
-BUILD_BUG_ON() assertions ensure the input is in range.
+Hi Paolo,
 
-This fixes implicit enum conversions that are detected by clang-11.
+Do you have any comments on the patches 06 - 11 ?
 
-Fixes: 4e66c0cb79b7 ("KVM: x86: Add support for reverse CPUID lookup of scattered features")
-Cc: Kai Huang <kai.huang@intel.com>
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
+Thanks,
+Like Xu
 
-Hopefully it's not too late to squash this...
-
- arch/x86/kvm/cpuid.c | 5 +++--
- arch/x86/kvm/cpuid.h | 2 +-
- 2 files changed, 4 insertions(+), 3 deletions(-)
-
-diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-index 96e41e1a1bde..e9d644147bf5 100644
---- a/arch/x86/kvm/cpuid.c
-+++ b/arch/x86/kvm/cpuid.c
-@@ -365,7 +365,7 @@ int kvm_vcpu_ioctl_get_cpuid2(struct kvm_vcpu *vcpu,
- }
- 
- /* Mask kvm_cpu_caps for @leaf with the raw CPUID capabilities of this CPU. */
--static __always_inline void __kvm_cpu_cap_mask(enum cpuid_leafs leaf)
-+static __always_inline void __kvm_cpu_cap_mask(unsigned int leaf)
- {
- 	const struct cpuid_reg cpuid = x86_feature_cpuid(leaf * 32);
- 	struct kvm_cpuid_entry2 entry;
-@@ -378,7 +378,8 @@ static __always_inline void __kvm_cpu_cap_mask(enum cpuid_leafs leaf)
- 	kvm_cpu_caps[leaf] &= *__cpuid_entry_get_reg(&entry, cpuid.reg);
- }
- 
--static __always_inline void kvm_cpu_cap_init_scattered(enum cpuid_leafs leaf, u32 mask)
-+static __always_inline
-+void kvm_cpu_cap_init_scattered(enum kvm_only_cpuid_leafs leaf, u32 mask)
- {
- 	/* Use kvm_cpu_cap_mask for non-scattered leafs. */
- 	BUILD_BUG_ON(leaf < NCAPINTS);
-diff --git a/arch/x86/kvm/cpuid.h b/arch/x86/kvm/cpuid.h
-index eeb4a3020e1b..7bb4504a2944 100644
---- a/arch/x86/kvm/cpuid.h
-+++ b/arch/x86/kvm/cpuid.h
-@@ -236,7 +236,7 @@ static __always_inline void cpuid_entry_change(struct kvm_cpuid_entry2 *entry,
- }
- 
- static __always_inline void cpuid_entry_override(struct kvm_cpuid_entry2 *entry,
--						 enum cpuid_leafs leaf)
-+						 unsigned int leaf)
- {
- 	u32 *reg = cpuid_entry_get_reg(entry, leaf * 32);
- 
--- 
-2.31.1.368.gbe11c130af-goog
+On 2021/4/6 11:19, Xu, Like wrote:
+> Hi all, do we have any comments on this patch set?
+> 
+> On 2021/3/14 23:52, Like Xu wrote:
+>> Hi geniuses,
+>>
+>> Please help review the new version of Arch LBR enabling patch set.
+>>
+>> The Architectural Last Branch Records (LBRs) is publiced
+>> in the 319433-040 release of Intel Architecture Instruction
+>> Set Extensions and Future Features Programming Reference[0].
+>>
+>> The main advantages for the Arch LBR users are [1]:
+>> - Faster context switching due to XSAVES support and faster reset of
+>>    LBR MSRs via the new DEPTH MSR
+>> - Faster LBR read for a non-PEBS event due to XSAVES support, which
+>>    lowers the overhead of the NMI handler.
+>> - Linux kernel can support the LBR features without knowing the model
+>>    number of the current CPU.
+>>
+>> It's based on the kvm/queue tree plus two commits from kvm/intel tree:
+>> - 'fea4ab260645 ("KVM: x86: Refresh CPUID on writes to MSR_IA32_XSS")'
+>> - '0ccd14126cb2 ("KVM: x86: Report XSS as an MSR to be saved if there are 
+>> supported features")'
+>>
+>> Please check more details in each commit and feel free to comment.
+>>
+>> [0] https://software.intel.com/content/www/us/en/develop/download/
+>> intel-architecture-instruction-set-extensions-and-future-features-programming-reference.html 
+>>
+>> [1] 
+>> https://lore.kernel.org/lkml/1593780569-62993-1-git-send-email-kan.liang@linux.intel.com/ 
+>>
+>>
+>> ---
+>> v3->v4 Changelog:
+>> - Add one more host patch to reuse ARCH_LBR_CTL_MASK;
+>> - Add reserve_lbr_buffers() instead of using GFP_ATOMIC;
+>> - Fia a bug in the arch_lbr_depth_is_valid();
+>> - Add LBR_CTL_EN to unify DEBUGCTLMSR_LBR and ARCH_LBR_CTL_LBREN;
+>> - Add vmx->host_lbrctlmsr to save/restore host values;
+>> - Add KVM_SUPPORTED_XSS to refactoring supported_xss;
+>> - Clear Arch_LBR ans its XSS bit if it's not supported;
+>> - Add negative testing to the related kvm-unit-tests;
+>> - Refine code and commit messages;
+>>
+>> Previous:
+>> https://lore.kernel.org/kvm/20210303135756.1546253-1-like.xu@linux.intel.com/ 
+>>
+>>
+>> Like Xu (11):
+>>    perf/x86/intel: Fix the comment about guest LBR support on KVM
+>>    perf/x86/lbr: Simplify the exposure check for the LBR_INFO registers
+>>    perf/x86/lbr: Skip checking for the existence of LBR_TOS for Arch LBR
+>>    perf/x86/lbr: Move cpuc->lbr_xsave allocation out of sleeping region
+>>    perf/x86: Move ARCH_LBR_CTL_MASK definition to include/asm/msr-index.h
+>>    KVM: vmx/pmu: Add MSR_ARCH_LBR_DEPTH emulation for Arch LBR
+>>    KVM: vmx/pmu: Add MSR_ARCH_LBR_CTL emulation for Arch LBR
+>>    KVM: vmx/pmu: Add Arch LBR emulation and its VMCS field
+>>    KVM: x86: Expose Architectural LBR CPUID leaf
+>>    KVM: x86: Refine the matching and clearing logic for supported_xss
+>>    KVM: x86: Add XSAVE Support for Architectural LBRs
+>>
+>>   arch/x86/events/core.c           |   8 ++-
+>>   arch/x86/events/intel/bts.c      |   2 +-
+>>   arch/x86/events/intel/core.c     |   6 +-
+>>   arch/x86/events/intel/lbr.c      |  28 +++++----
+>>   arch/x86/events/perf_event.h     |   8 ++-
+>>   arch/x86/include/asm/msr-index.h |   1 +
+>>   arch/x86/include/asm/vmx.h       |   4 ++
+>>   arch/x86/kvm/cpuid.c             |  25 +++++++-
+>>   arch/x86/kvm/vmx/capabilities.h  |  25 +++++---
+>>   arch/x86/kvm/vmx/pmu_intel.c     | 103 ++++++++++++++++++++++++++++---
+>>   arch/x86/kvm/vmx/vmx.c           |  50 +++++++++++++--
+>>   arch/x86/kvm/vmx/vmx.h           |   4 ++
+>>   arch/x86/kvm/x86.c               |   6 +-
+>>   13 files changed, 227 insertions(+), 43 deletions(-)
+>>
+> 
 
