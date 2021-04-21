@@ -2,274 +2,160 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 25CD03672D3
-	for <lists+kvm@lfdr.de>; Wed, 21 Apr 2021 20:48:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C33E73672EA
+	for <lists+kvm@lfdr.de>; Wed, 21 Apr 2021 20:54:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245286AbhDUStS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 21 Apr 2021 14:49:18 -0400
-Received: from mail-dm6nam10on2045.outbound.protection.outlook.com ([40.107.93.45]:22054
-        "EHLO NAM10-DM6-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S235269AbhDUStQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 21 Apr 2021 14:49:16 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=lZgn3KQn5dd+R4AYJ8wY8K4NC33BcYql66s6WXCULQrdg5vIFfvDP9opr18X8Larzf0Ktm2Y2hw91O7BVoJsau9E9gfz5DgHGMTZN4sjIAWKA4U3/umWgPm+dY0Z4ICOpqOI7V2jZjL0CXCebFTeAQ8FOwFe1SYh8CoHZ0mWA9SmsvY7+Dt95OCkTl917l0vOJkuf7uQ+oNddXKAPeWbXv3yyXF1slk6VzyFcCCWOv57plZBWbnslePnYjkoqhyT3pPZYYf45uFCtrDbiN5PTB+Hmz/wTDtonpAp6dEX6UADrHkkEhUWAEkWKU17MkqS7U3/yDVUq7cmIvD9vkoEYA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=PH2uO/RJt0mN4H25N/JyyfdI0Mj205+wcieWzNmCnCQ=;
- b=Wi39dPDJedlWltW475ffAcX6tElUP/RNEWUrnTPstUf8ZOfu5A81aOV22d9F58cUBcS426TwGIhD2TAB9oL2uDqSdDGPbrMFC63HBWZZ/Cojas0tFQ653Wc1awvUPWS0SIFYk24CJhJUrl0aYHw28oAReuruBQX+v4MzW1oeE93s9uv6OFF4AOqBlvddHsDAUd8CoFwp9y5cq/8mlPXlp8P3Ttp4dDiN0ILmo4VERhjbDbKjk9jVSkBnC/fEgMhiyF6jn9Zse34+4bH01Sywn79msZLlzRkjrTzumx4304lpmn6paIRVIEnuRyodJZ+Zn6nPeqzqr6osYgyux2B/mg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=PH2uO/RJt0mN4H25N/JyyfdI0Mj205+wcieWzNmCnCQ=;
- b=KxcM/braLyacf4HbkS1LuXdjnQN9/1bOFnkyIv3vz/7bAoLfCKyXBBEZv+wXk4HtlHuPtc/CdYW1HDdf8DNEaRwxop8B2MNZNgMK0bbtzBSLzVonZGUrxWVIX9Of3BmVt/hMjKTvKdvm/E97BByuM0VBK8NPb+efumfwv/Gbuqg=
-Authentication-Results: redhat.com; dkim=none (message not signed)
- header.d=none;redhat.com; dmarc=none action=none header.from=amd.com;
-Received: from BYAPR12MB2759.namprd12.prod.outlook.com (2603:10b6:a03:61::32)
- by BY5PR12MB4936.namprd12.prod.outlook.com (2603:10b6:a03:1d4::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4065.20; Wed, 21 Apr
- 2021 18:48:39 +0000
-Received: from BYAPR12MB2759.namprd12.prod.outlook.com
- ([fe80::b0a3:bc2c:80ec:e791]) by BYAPR12MB2759.namprd12.prod.outlook.com
- ([fe80::b0a3:bc2c:80ec:e791%3]) with mapi id 15.20.4042.024; Wed, 21 Apr 2021
- 18:48:39 +0000
-Date:   Wed, 21 Apr 2021 18:48:32 +0000
-From:   Ashish Kalra <ashish.kalra@amd.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Borislav Petkov <bp@alien8.de>, tglx@linutronix.de,
-        mingo@redhat.com, hpa@zytor.com, joro@8bytes.org, bp@suse.de,
-        thomas.lendacky@amd.com, x86@kernel.org, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, srutherford@google.com,
-        seanjc@google.com, venu.busireddy@oracle.com,
-        brijesh.singh@amd.com, kexec@lists.infradead.org
-Subject: Re: [PATCH v13 12/12] x86/kvm: Add guest support for detecting and
- enabling SEV Live Migration feature.
-Message-ID: <20210421184832.GA14208@ashkalra_ubuntu_server>
-References: <cover.1618498113.git.ashish.kalra@amd.com>
- <ffd67dbc1ae6d3505d844e65928a7248ebaebdcc.1618498113.git.ashish.kalra@amd.com>
- <20210421144402.GB5004@zn.tnic>
- <2d3170ae-470a-089d-bdec-a43f8190cce7@redhat.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <2d3170ae-470a-089d-bdec-a43f8190cce7@redhat.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-Originating-IP: [165.204.77.1]
-X-ClientProxiedBy: SN7PR04CA0018.namprd04.prod.outlook.com
- (2603:10b6:806:f2::23) To BYAPR12MB2759.namprd12.prod.outlook.com
- (2603:10b6:a03:61::32)
+        id S245086AbhDUSzV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 21 Apr 2021 14:55:21 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:23942 "EHLO
+        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S235329AbhDUSzU (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 21 Apr 2021 14:55:20 -0400
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 13LIYXGG166471;
+        Wed, 21 Apr 2021 14:54:36 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : in-reply-to : content-type :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=hoIIvLijVUEh0RcJjWarSwu+MSlAeJILzJQySf4NFpQ=;
+ b=l8N6g/BUJT2vNi3BI2Zyyk3NlS3c7MWPwXgQ1WktcaI/1ip+T9VHinP0oS3duZwNv1zL
+ 2sWyX4WHH7PCvE6EvTLONG9SPrTVUHVIdULA3/78hmNvgFTcYuveqwbZ1h/T2luX4h0v
+ M5Q2n7Y71EvabfIBoqYtZW1qB53BwzinkwrZReo/0uKmD/bBdixUC17Z4L1pJXtm56qx
+ xCiQZuGvhFgmTDrYyq4GKNMSFmAr5oD3mfrtQsZOp1+Wbjmq14A8LZVT7BO/97HOpjWO
+ CDA52Af0RCbfwGvlsp0K+bs0phacX6gGClAhx87B3tcG/M1yQKcdeNzXr0rkj+WZzYY+ mA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 382pmm6nsy-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 21 Apr 2021 14:54:35 -0400
+Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 13LIYcC8167078;
+        Wed, 21 Apr 2021 14:54:35 -0400
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 382pmm6nsk-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 21 Apr 2021 14:54:35 -0400
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 13LIhbqP010245;
+        Wed, 21 Apr 2021 18:54:33 GMT
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
+        by ppma04ams.nl.ibm.com with ESMTP id 37yqa8jfjy-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 21 Apr 2021 18:54:33 +0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 13LIsV6f37814718
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 21 Apr 2021 18:54:31 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id E15965204E;
+        Wed, 21 Apr 2021 18:54:30 +0000 (GMT)
+Received: from oc7455500831.ibm.com (unknown [9.171.22.74])
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 11AD852050;
+        Wed, 21 Apr 2021 18:54:30 +0000 (GMT)
+Subject: Re: net: bridge: propagate error code and extack from
+ br_mc_disabled_update
+To:     Vladimir Oltean <olteanv@gmail.com>,
+        Florian Fainelli <f.fainelli@gmail.com>
+Cc:     andrew@lunn.ch, davem@davemloft.net, idosch@idosch.org,
+        jiri@resnulli.us, kuba@kernel.org, netdev@vger.kernel.org,
+        nikolay@nvidia.com, roopa@nvidia.com, vladimir.oltean@nxp.com,
+        linux-next@vger.kernel.org, kvm list <kvm@vger.kernel.org>,
+        linux-s390 <linux-s390@vger.kernel.org>
+References: <20210414192257.1954575-1-olteanv@gmail.com>
+ <20210421181808.5210-1-borntraeger@de.ibm.com>
+ <cfc19833-01ec-08ea-881d-4101780d1d86@de.ibm.com>
+ <3993fbf8-b409-f88f-c573-bf5b8f418a88@gmail.com>
+ <20210421184600.qzsx6obwifcfsshq@skbuf>
+From:   Christian Borntraeger <borntraeger@de.ibm.com>
+Message-ID: <5a55f3f3-4861-6871-3b74-05361015297a@de.ibm.com>
+Date:   Wed, 21 Apr 2021 20:54:29 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.9.1
+In-Reply-To: <20210421184600.qzsx6obwifcfsshq@skbuf>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: meZk1lVbO41N9oedT5XFUsDV-F5fD8ki
+X-Proofpoint-ORIG-GUID: BMX2wi3EmDEm_8l5YKvhKSRRXsW-xwAP
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from ashkalra_ubuntu_server (165.204.77.1) by SN7PR04CA0018.namprd04.prod.outlook.com (2603:10b6:806:f2::23) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4065.22 via Frontend Transport; Wed, 21 Apr 2021 18:48:38 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 68899b8c-8d4f-432f-340a-08d904f613cc
-X-MS-TrafficTypeDiagnostic: BY5PR12MB4936:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <BY5PR12MB4936C1A43AA4267A13A34CEF8E479@BY5PR12MB4936.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: Q2bWpvfwrmpsgG5ssz1UgPFTJjdHCzhD2B16SVjq+VsExell7JRvkBpEDXkHINk5xmUyiRGaoC7a2c4F64QCjG+NE0clDwFzllfVkvu7H5YQQEkvGXPAmXamlrl+9i5hgaFzosBwT5qbStTMGA8y0HSRPq4WNHhlaMJR7q9bP2LBGC3SBgWjeYaeLuQnHt/YuV/toyPenHHgdrnO3hgnaNO0gQUcYk4s6alq5mpiyuiLiEyULIkZxJfRqmJS5Je5qWCr4aT/Dsr8LF54TD/38VSA+8coWmHAGN6NpvMEh+PTf3pLydhMjiUDod7X5dQO7gssWaIu5vqDr4KOkM+2PrEhrfZaPeCa+BliL4dR37kVMwwHK16ItM+vkatqRy+PxZ8NM61CRYstVGDQlqgwsKJYuWNH9y+mPmB0sb6wgg8Lp1cudlc8WqD4MHac2WTVkzeA3rHaiDApaT1sAYu5XuBi8cU/BD4b5ONf6m7NHPxUrxgiylEIHlxOIe3tyLcgTNckT64uZXGr8i4EuQB+nxzTTnX3NedWXgZlPnzfJSBGSE7Bq6WLnpToxPVvmy8T/mr62/VISj2VRuTtJuVT0ABG/ZuiFgqS2bzg5KE3Py4nP1DGVM6e4ixqqSdBnj5CvEIn+ZYksIqb1xPwRI2SnA==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR12MB2759.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(39850400004)(346002)(396003)(136003)(376002)(366004)(7416002)(86362001)(33716001)(33656002)(6916009)(8676002)(1076003)(6496006)(44832011)(83380400001)(186003)(16526019)(956004)(478600001)(2906002)(26005)(316002)(6666004)(38100700002)(38350700002)(66946007)(66556008)(66476007)(9686003)(4326008)(55016002)(52116002)(8936002)(53546011)(5660300002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: =?us-ascii?Q?R8lRUGgS2y/WzrMmHqvAJoyu9a4SWRaqXD8U4Nxb2EepDPldwngvpiLpZJJ2?=
- =?us-ascii?Q?nNc8gMD6ypM3aYvyUPlAxoeBlyxlUmo0vojcfyR6ng1/fCNFXuL+eMuAGVM9?=
- =?us-ascii?Q?Y6aQLg4W6OGk2Epdy3mIwn96uYysnCJb92oONRmF0ZNMtQIK5BDXBKhhZC3Q?=
- =?us-ascii?Q?vbK58q+M6tXbCWT6I7I2qLkkoPlKN8j/XnD0aa4mEOLcuwEla1t2C+i06sLd?=
- =?us-ascii?Q?JoP8SLA4tYdHqFJYyFMmRa5VLsDuxU6JFXSybTkOs5TUBqt+uNJyH+GMt2JD?=
- =?us-ascii?Q?htH7roa3dIazXswWJUyjUzMBi3YJINlMXyL1ljuceqBSZBQpvBh9NSohbG49?=
- =?us-ascii?Q?MJffknJ+GAfa7u17QzvdkvVHwz76tWeOhSbyDK20N+sbNUNyZvzSxPD6j4A0?=
- =?us-ascii?Q?9efdYaPECJVH0959zsBclGkJo2OBTbK17sSMJo6SF2DrxdTuoGs9Ic0+I/lP?=
- =?us-ascii?Q?CfCs9iwShMm1Nee7+6cdHeqwogFjbnChB6W8Fw/7tvBhGskfwbDL1EOnhU3q?=
- =?us-ascii?Q?E+De4FQlDbiFF8p7sfoEvKQCNhId0TQFdQHB5hndW/pGluldmGYVNej5jvoE?=
- =?us-ascii?Q?Ec0DJK3aqMVKLQv4ga+irda643F7OwrJycyWw4wgsCmXmAxeOSfo8x4ulMRG?=
- =?us-ascii?Q?Pe6f63Oexmptn4jhO0mJlKCBF+yROxBZP5RcYVkQ2Avu2Z1i1p26kB3/ETPG?=
- =?us-ascii?Q?dLQ47qsdt+5gdebYAZa3Dr0tVM3GPgGftmD1OOuUZkzJOLiU1vuvNQwiaPlC?=
- =?us-ascii?Q?XQRa+OQdTOyHc2bn/hLPTpGYpjw3qLegONwx/0uW9oxMvv8IGd05fFrPWtDb?=
- =?us-ascii?Q?Jg9+oJcZtEn6++hsLh5MQpKzA93Ev5Y8VEBcF0Jusqhk08BQs0GmjJjcmjcM?=
- =?us-ascii?Q?q7Ryz7qgdMwab1Tar0QCe4cyoLdJqdpSkodom1o+lkS0Uq11PiLXrDSkj6OB?=
- =?us-ascii?Q?KeieMZSTFfYdibOhSKc1MsH7XSE7VETLc9uQcbW76MXWv7rk5uDgxFD7thn9?=
- =?us-ascii?Q?IJ80XhMcRv1LxTzWRQROOeAmAHeHc4MwIr/fp132+0J3w0I7Ybx7YdDSfdvG?=
- =?us-ascii?Q?uQmBn5j627ll3FGyY4UE8IYk7va95PHWrvXEwK0rV0LOy7+bI4eWLNm8B11U?=
- =?us-ascii?Q?uAbdTGpSXZD0UaCqi5rdmt9Mi63RDLAufPvbah7DYq8Da6RqQ6TaY8y5oYSH?=
- =?us-ascii?Q?fCzxgphfkWRwNasQcfxKXm8K5Jm3/ASyHeM+5O1KHM8y2S7vlhNq1U8I8zg1?=
- =?us-ascii?Q?xlfyJMfMrQO5rz7FTDHoq9wGeJw1W98xbj9lL3cif6C6UNQ1HjpyMFJpuBdw?=
- =?us-ascii?Q?vW1dh/QeTK4rxe3JI+gXG05Q?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 68899b8c-8d4f-432f-340a-08d904f613cc
-X-MS-Exchange-CrossTenant-AuthSource: BYAPR12MB2759.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Apr 2021 18:48:39.2580
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 8tgXLphWMH4wCzlzQxGIBkAmPjXneCfdZkAlOdv2VHcqwEAR9t74DYOdsGdMRCFFt/smgYbi9lQlmHxgTRY4hg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR12MB4936
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.761
+ definitions=2021-04-21_05:2021-04-21,2021-04-21 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
+ lowpriorityscore=0 adultscore=0 clxscore=1015 priorityscore=1501
+ mlxlogscore=999 mlxscore=0 phishscore=0 impostorscore=0 spamscore=0
+ suspectscore=0 bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2104060000 definitions=main-2104210128
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hello Paolo,
 
-The earlier patch#10 of SEV live migration patches which is now part of
-the guest interface patches used to define
-KVM_FEATURE_SEV_LIVE_MIGRATION. 
 
-So now, will the guest patches need to define this feature ?
+On 21.04.21 20:46, Vladimir Oltean wrote:
+> On Wed, Apr 21, 2021 at 11:37:25AM -0700, Florian Fainelli wrote:
+>> On 4/21/2021 11:35 AM, Christian Borntraeger wrote:
+>>> On 21.04.21 20:18, Christian Borntraeger wrote:
+>>>> Whatever version landed in next, according to bisect this broke
+>>>> libvirt/kvms use of bridges:
+>>>>
+>>>>
+>>>> # virsh start s31128001
+>>>> error: Failed to start domain 's31128001'
+>>>> error: Unable to add bridge virbr1 port vnet0: Operation not supported
+>>>>
+>>>> # grep vnet0 /var/log/libvirt/libvirtd.log
+>>>>
+>>>> 2021-04-21 07:43:09.453+0000: 2460: info : virNetDevTapCreate:240 :
+>>>> created device: 'vnet0'
+>>>> 2021-04-21 07:43:09.453+0000: 2460: debug :
+>>>> virNetDevSetMACInternal:287 : SIOCSIFHWADDR vnet0
+>>>> MAC=fe:bb:83:28:01:02 - Success
+>>>> 2021-04-21 07:43:09.453+0000: 2460: error : virNetDevBridgeAddPort:633
+>>>> : Unable to add bridge virbr1 port vnet0: Operation not supported
+>>>> 2021-04-21 07:43:09.466+0000: 2543: debug : udevHandleOneDevice:1695 :
+>>>> udev action: 'add': /sys/devices/virtual/net/vnet0
+>>>>
+>>>> Christian
+>>>>
+>>>
+>>> For reference:
+>>>
+>>> ae1ea84b33dab45c7b6c1754231ebda5959b504c is the first bad commit
+>>> commit ae1ea84b33dab45c7b6c1754231ebda5959b504c
+>>> Author: Florian Fainelli <f.fainelli@gmail.com>
+>>> Date:   Wed Apr 14 22:22:57 2021 +0300
+>>>
+>>>     net: bridge: propagate error code and extack from br_mc_disabled_update
+>>>        Some Ethernet switches might only be able to support disabling
+>>> multicast
+>>>     snooping globally, which is an issue for example when several bridges
+>>>     span the same physical device and request contradictory settings.
+>>>        Propagate the return value of br_mc_disabled_update() such that this
+>>>     limitation is transmitted correctly to user-space.
+>>>        Signed-off-by: Florian Fainelli <f.fainelli@gmail.com>
+>>>     Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+>>>     Signed-off-by: David S. Miller <davem@davemloft.net>
+>>>
+>>> net/bridge/br_multicast.c | 28 +++++++++++++++++++++-------
+>>> net/bridge/br_netlink.c   |  4 +++-
+>>> net/bridge/br_private.h   |  3 ++-
+>>> net/bridge/br_sysfs_br.c  |  8 +-------
+>>> 4 files changed, 27 insertions(+), 16 deletions(-)
+>>>
+>>> not sure if it matters this is on s390.
+>>> A simple reproducer is virt-install, e.g.
+>>> virt-install --name test --disk size=12 --memory=2048 --vcpus=2
+>>> --location
+>>> http://ports.ubuntu.com/ubuntu-ports/dists/bionic/main/installer-s390x/
+>>
+>> Thanks, I will kick off a reproducer and let you know.
+>> -- 
+>> Florian
+> 
+> Hey, you guys are moving fast, faster than it took me to open my email client...
+> 
+> Sorry for the breakage, Christian, I've just sent a patch with what I
+> think is wrong, could you give it a try?
 
-Thanks,
-Ashish
-
-On Wed, Apr 21, 2021 at 05:38:45PM +0200, Paolo Bonzini wrote:
-> On 21/04/21 16:44, Borislav Petkov wrote:
-> > On Thu, Apr 15, 2021 at 04:01:16PM +0000, Ashish Kalra wrote:
-> > > From: Ashish Kalra <ashish.kalra@amd.com>
-> > > 
-> > > The guest support for detecting and enabling SEV Live migration
-> > > feature uses the following logic :
-> > > 
-> > >   - kvm_init_plaform() invokes check_kvm_sev_migration() which
-> > >     checks if its booted under the EFI
-> > > 
-> > >     - If not EFI,
-> > > 
-> > >       i) check for the KVM_FEATURE_CPUID
-> > 
-> > Where do you do that?
-> > 
-> > $ git grep KVM_FEATURE_CPUID
-> > $
-> > 
-> > Do you mean
-> > 
-> > 	kvm_para_has_feature(KVM_FEATURE_SEV_LIVE_MIGRATION)
-> > 
-> > per chance?
-> 
-> Yep.  Or KVM_CPUID_FEATURES perhaps.
-> 
-> > 
-> > > diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
-> > > index 78bb0fae3982..94ef16d263a7 100644
-> > > --- a/arch/x86/kernel/kvm.c
-> > > +++ b/arch/x86/kernel/kvm.c
-> > > @@ -26,6 +26,7 @@
-> > >   #include <linux/kprobes.h>
-> > >   #include <linux/nmi.h>
-> > >   #include <linux/swait.h>
-> > > +#include <linux/efi.h>
-> > >   #include <asm/timer.h>
-> > >   #include <asm/cpu.h>
-> > >   #include <asm/traps.h>
-> > > @@ -429,6 +430,59 @@ static inline void __set_percpu_decrypted(void *ptr, unsigned long size)
-> > >   	early_set_memory_decrypted((unsigned long) ptr, size);
-> > >   }
-> > > +static int __init setup_kvm_sev_migration(void)
-> > 
-> > kvm_init_sev_migration() or so.
-> > 
-> > ...
-> > 
-> > > @@ -48,6 +50,8 @@ EXPORT_SYMBOL_GPL(sev_enable_key);
-> > >   bool sev_enabled __section(".data");
-> > > +bool sev_live_migration_enabled __section(".data");
-> > 
-> > Pls add a function called something like:
-> > 
-> > bool sev_feature_enabled(enum sev_feature)
-> > 
-> > and gets SEV_FEATURE_LIVE_MIGRATION and then use it instead of adding
-> > yet another boolean which contains whether some aspect of SEV has been
-> > enabled or not.
-> > 
-> > Then add a
-> > 
-> > static enum sev_feature sev_features;
-> > 
-> > in mem_encrypt.c and that function above will query that sev_features
-> > enum for set flags.
-> 
-> Even better: let's stop callings things SEV/SEV_ES.  Long term we want
-> anyway to use things like mem_encrypt_enabled (SEV),
-> guest_instruction_trap_enabled (SEV/ES), etc.
-> 
-> For this one we don't need a bool at all, we can simply check whether the
-> pvop points to paravirt_nop.  Also keep everything but the BSS handling in
-> arch/x86/kernel/kvm.c.  Only the BSS handling should be in
-> arch/x86/mm/mem_encrypt.c.  This way all KVM paravirt hypercalls and MSRs
-> are in kvm.c.
-> 
-> That is:
-> 
-> void kvm_init_platform(void)
-> {
-> 	if (sev_active() &&
-> 	    kvm_para_has_feature(KVM_FEATURE_SEV_LIVE_MIGRATION)) {
-> 		pv_ops.mmu.notify_page_enc_status_changed =
-> 			kvm_sev_hc_page_enc_status;
-> 		/* this takes care of bss_decrypted */
-> 		early_set_page_enc_status();
-> 		if (!efi_enabled(EFI_BOOT))
-> 			wrmsrl(MSR_KVM_SEV_LIVE_MIGRATION,
-> 			       KVM_SEV_LIVE_MIGRATION_ENABLED);
-> 	}
-> 	/* existing kvm_init_platform code goes here */
-> }
-> 
-> // the pvop is changed to take the pfn, so that the vaddr loop
-> // is not KVM specific
-> static inline void notify_page_enc_status_changed(unsigned long pfn,
-> 				int npages, bool enc)
-> {
-> 	PVOP_VCALL3(mmu.page_encryption_changed, pfn, npages, enc);
-> }
-> 
-> static void notify_addr_enc_status_changed(unsigned long addr,
-> 					   int numpages, bool enc)
-> {
-> #ifdef CONFIG_PARAVIRT
-> 	if (pv_ops.mmu.notify_page_enc_status_changed == paravirt_nop)
-> 		return;
-> 
-> 	/* the body of set_memory_enc_dec_hypercall goes here */
-> 	for (; vaddr < vaddr_end; vaddr = vaddr_next) {
-> 		...
-> 		notify_page_enc_status_changed(pfn, psize >> PAGE_SHIFT,
-> 					       enc);
-> 		vaddr_next = (vaddr & pmask) + psize;
-> 	}
-> #endif
-> }
-> 
-> static int __set_memory_enc_dec(unsigned long addr,
-> 				int numpages, bool enc)
-> {
-> 	...
->  	cpa_flush(&cpa, 0);
-> 	notify_addr_enc_status_changed(addr, numpages, enc);
->  	return ret;
-> }
-> 
-> 
-> > +static int __init setup_kvm_sev_migration(void)
-> 
-> Please rename this to include efi in the function name.
-> 
-> > 
-> > +		 */
-> > +		if (!efi_enabled(EFI_BOOT))
-> > +			wrmsrl(MSR_KVM_SEV_LIVE_MIGRATION,
-> > +			       KVM_SEV_LIVE_MIGRATION_ENABLED);
-> > +		} else {
-> > +			pr_info("KVM enable live migration feature unsupported\n");
-> > +		}
-> > +}
-> 
-> I think this pr_info is incorrect, because it can still be enabled in the
-> late_initcall.  Just remove it as in the sketch above.
-> 
-> Paolo
-> 
+Yes, this fixes the issue. I answered on the patch.
