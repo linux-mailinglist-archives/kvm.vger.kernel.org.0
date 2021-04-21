@@ -2,174 +2,115 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DECA4366699
-	for <lists+kvm@lfdr.de>; Wed, 21 Apr 2021 10:00:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5F1A13666C3
+	for <lists+kvm@lfdr.de>; Wed, 21 Apr 2021 10:10:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237547AbhDUIBa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 21 Apr 2021 04:01:30 -0400
-Received: from forward1-smtp.messagingengine.com ([66.111.4.223]:39149 "EHLO
-        forward1-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S235510AbhDUIB3 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 21 Apr 2021 04:01:29 -0400
-Received: from compute4.internal (compute4.nyi.internal [10.202.2.44])
-        by mailforward.nyi.internal (Postfix) with ESMTP id 59C561941B18;
-        Wed, 21 Apr 2021 04:00:56 -0400 (EDT)
-Received: from mailfrontend2 ([10.202.2.163])
-  by compute4.internal (MEProxy); Wed, 21 Apr 2021 04:00:56 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:content-type:date:from:in-reply-to
-        :message-id:mime-version:references:subject:to:x-me-proxy
-        :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; bh=ApckIW
-        ymDvQzvvTezAcPTxf3ZjSXC77DU2kd+nWpIG8=; b=MYvjSjcNMF08ITyQ76mFqJ
-        nErMOtDKTJMgeqWb6zTemfXcbmkmRj9BFc77A6Q5C+eCMwPLEi76/TgxWZy3YR9h
-        NN9X2kBojRiLk13xwbkadlCIxzdCb0qKBww17t+kOX0PXxiqYtIMVMmxVeis9hEz
-        gBW1pyh01C47IbH/fVjD7dXAlbthUa9cGF0cOwV8Fm+yNj8Y64MPnwQWAqyyozMn
-        gx4mSDDjgyVVNdZBMuet5Iq1+zWylj8ea9ulzDdwYfj4QqGATchgoqkF0L2LvrL5
-        naaEAGrrSfslEKx3g/2z5gemZQ4rfrvMDEa26cBdjMo80m+HbyOson5UsIFumoBA
-        ==
-X-ME-Sender: <xms:t9t_YBuLeAATe16Xv1mwWKJAq211oD8cQ5SC3_v-14d6nXHGkaLJeQ>
-    <xme:t9t_YKeYJ28Jopyq1UZAaG0Ue_ROa9qcdOHMYg26Gk3Aeu-nqxULHEcEQJq0U9KG-
-    ZomUrfgOXiEKFiFA-E>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeduledrvddtjedguddvhecutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfgh
-    necuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
-    enucfjughrpefvufgjfhfhfffkgggtsehttdertddttddtnecuhfhrohhmpeffrghvihgu
-    ucfgughmohhnughsohhnuceoughmvgesughmvgdrohhrgheqnecuggftrfgrthhtvghrnh
-    ephfekgeeutddvgeffffetheejvdejieetgfefgfffudegffffgeduheegteegleeknecu
-    kfhppeekuddrudekjedrvdeirddvfeeknecuvehluhhsthgvrhfuihiivgeptdenucfrrg
-    hrrghmpehmrghilhhfrhhomhepughmvgesughmvgdrohhrgh
-X-ME-Proxy: <xmx:t9t_YExhVmpQwRTOnYuNOUiYYERJFhoqRDV-Y44DnH52VnKISakXxw>
-    <xmx:t9t_YIMhJcGnCQnZAPjsnoAoLCjLkfOuPHpAVOe6w_K8Df1nlq9NpA>
-    <xmx:t9t_YB-78lNNvpPrBgihY237GGIfV0viGbkjZvoaGdPP1mNg25qXjw>
-    <xmx:uNt_YMZziFV14UQEiY556jMaEQyEBkKC_Fc_w2Svd8U2BVEHuxsL-w>
-Received: from disaster-area.hh.sledj.net (disaster-area.hh.sledj.net [81.187.26.238])
-        by mail.messagingengine.com (Postfix) with ESMTPA id 4C1FC108005F;
-        Wed, 21 Apr 2021 04:00:55 -0400 (EDT)
-Received: from localhost (disaster-area.hh.sledj.net [local])
-        by disaster-area.hh.sledj.net (OpenSMTPD) with ESMTPA id 0aa263d4;
-        Wed, 21 Apr 2021 08:00:54 +0000 (UTC)
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Aaron Lewis <aaronlewis@google.com>,
+        id S234407AbhDUIKl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 21 Apr 2021 04:10:41 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:45938 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230516AbhDUIKk (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 21 Apr 2021 04:10:40 -0400
+Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 13L84nHU018022;
+        Wed, 21 Apr 2021 04:09:19 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=mwMz8kH8eb7LB6iRuFzo9APuB5In4r3taMfrok+THW4=;
+ b=Rknlww4miNeAZKdajbWbLyPpE+ftxaPA3pFA6A4vAZnZsIvI9wZ5maxLoixx5GgB9BLT
+ qMHUd9p6os8/Zuiht7jAmBLekRlotOG8qjaFFSG4Su9Hci09+DK8U3w2ZZ98Cinjl3CN
+ EEz/jcgD1dA8PLuzq7d/e9z51bB3vnuNqEvxjv170xkZQwEmF/Ry5wiLw13141aIh04L
+ UsXe1yVWj9h7KlikXqJInk8ACDkPuujp1ntyEREeKUjIduXKHR4+uUDThtD1Uo8sSr0a
+ GbZGxV0RhyvM55vCTHtsl2OwX7YUne7/9U1HwVe0SOwpg3nf+mw48H7IN7iK9MXekFIP FA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 382e86bfys-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 21 Apr 2021 04:09:19 -0400
+Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 13L876rJ032050;
+        Wed, 21 Apr 2021 04:09:19 -0400
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 382e86bfxs-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 21 Apr 2021 04:09:18 -0400
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 13L895b8006545;
+        Wed, 21 Apr 2021 08:09:16 GMT
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
+        by ppma03ams.nl.ibm.com with ESMTP id 37yqa8j59m-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 21 Apr 2021 08:09:16 +0000
+Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 13L89DC126739028
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 21 Apr 2021 08:09:13 GMT
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id C0ECA11C058;
+        Wed, 21 Apr 2021 08:09:13 +0000 (GMT)
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 3A17011C04C;
+        Wed, 21 Apr 2021 08:09:13 +0000 (GMT)
+Received: from oc7455500831.ibm.com (unknown [9.171.39.90])
+        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Wed, 21 Apr 2021 08:09:13 +0000 (GMT)
+Subject: Re: [PATCH v3 9/9] KVM: Move instrumentation-safe annotations for
+ enter/exit to x86 code
+To:     Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        kvm list <kvm@vger.kernel.org>
-Subject: Re: [PATCH 1/2] kvm: x86: Allow userspace to handle emulation errors
-In-Reply-To: <YH8btp+ilY93fKN0@google.com>
-References: <20210416131820.2566571-1-aaronlewis@google.com>
- <cunblaaqwe0.fsf@dme.org>
- <CAAAPnDEEwLRMLZffJSN5W93d5s6EQJuAP58vAVJCo+RZD6ahsA@mail.gmail.com>
- <cunzgxtctgj.fsf@dme.org>
- <CAAAPnDGnY76C-=FppsiL=OFY-ei8kHeJhfK_tNV8of3JHBZ0FA@mail.gmail.com>
- <cunbla8c2y3.fsf@dme.org> <YH8btp+ilY93fKN0@google.com>
-X-HGTTG: zarquon
-From:   David Edmondson <dme@dme.org>
-Date:   Wed, 21 Apr 2021 09:00:54 +0100
-Message-ID: <cuno8e82hjd.fsf@dme.org>
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Michael Tokarev <mjt@tls.msk.ru>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Heiko Carstens <heiko.carstens@de.ibm.com>
+References: <20210415222106.1643837-1-seanjc@google.com>
+ <20210415222106.1643837-10-seanjc@google.com>
+From:   Christian Borntraeger <borntraeger@de.ibm.com>
+Message-ID: <0c74158d-279a-5afa-0778-822c77ac8dc2@de.ibm.com>
+Date:   Wed, 21 Apr 2021 10:09:11 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.9.1
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <20210415222106.1643837-10-seanjc@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: O0Gbqj7PsH1bpmljgRZ33Sx1MRyz_OsV
+X-Proofpoint-GUID: QYIWjy8vpv4N55O6Q4tlpQ0Nqt1_mssd
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.761
+ definitions=2021-04-21_02:2021-04-21,2021-04-21 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 adultscore=0
+ lowpriorityscore=0 phishscore=0 impostorscore=0 priorityscore=1501
+ mlxscore=0 clxscore=1015 malwarescore=0 suspectscore=0 spamscore=0
+ mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2104060000 definitions=main-2104210063
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tuesday, 2021-04-20 at 18:21:42 GMT, Sean Christopherson wrote:
 
-> On Tue, Apr 20, 2021, David Edmondson wrote:
->> 
->> With what you have now, the ndata field seems unnecessary - I should be
->> able to determine the contents of the rest of the structure based on the
->> flags.
->
-> Keeping ndata is necessary if we piggyback KVM_INTERNAL_ERROR_EMULATION,
-> otherwise we'll break for VMMs that are not aware of the new format.  E.g. if
-> ndata gets stuffed with a large number, KVM could cause a buffer overrun in an
-> old VMM.
 
-Agreed.
+On 16.04.21 00:21, Sean Christopherson wrote:
+> Drop the instrumentation_{begin,end}() annonations from the common KVM
+> guest enter/exit helpers, and massage the x86 code as needed to preserve
+> the necessary annotations.  x86 is the only architecture whose transition
+> flow is tagged as noinstr, and more specifically, it is the only
+> architecture for which instrumentation_{begin,end}() can be non-empty.
+> 
+> No other architecture supports CONFIG_STACK_VALIDATION=y, and s390 is the
+> only other architecture that support CONFIG_DEBUG_ENTRY=y.  For
+> instrumentation annontations to be meaningful, both aformentioned configs
+> must be enabled.
+> 
+> Letting x86 deal with the annotations avoids unnecessary nops by
+> squashing back-to-back instrumention-safe sequences.
 
->> That also suggests to me that using something other than
->> KVM_INTERNAL_ERROR_EMULATION would make sense.
->
-> Like Aaron, I'm on the fence as to whether or not a new exit reason is in order.
-> On one hand, it would be slightly cleaner.  On the other hand, the existing
-> "KVM_INTERNAL_ERROR_EMULATION" really is the best name.  It implies nothing
-> about the userspace VMM, only that KVM attempted to emulate an instruction and
-> failed.
->
-> The other motivation is that KVM can opportunistically start dumping extra info
-> for old VMMs, though this patch does not do that; feedback imminent. :-)
+We have considered implementing objtool for s390. Not sure where we
+stand and if we will do this or not. Sven/Heiko?
 
-It's nothing more than that the interface ends up feeling a little
-strange. With several flags added and some of the earlier flags unused,
-ndata ends up indicating the largest extent of the flag-indicated data,
-but the earlier elements of the structure are unused. Hence the question
-about how many flags we anticipate using simultaneously.
-
-(I'm not really arguing that we should be packing the stuff in and
-having to decode it, as that is also unpleasant.)
-
->> This comment:
->> 
->> >> >> > + * When using the suberror KVM_INTERNAL_ERROR_EMULATION, these flags are used
->> >> >> > + * to describe what is contained in the exit struct.  The flags are used to
->> >> >> > + * describe it's contents, and the contents should be in ascending numerical
->> >> >> > + * order of the flag values.  For example, if the flag
->> >> >> > + * KVM_INTERNAL_ERROR_EMULATION_FLAG_INSTRUCTION_BYTES is set, the instruction
->> >> >> > + * length and instruction bytes would be expected to show up first because this
->> >> >> > + * flag has the lowest numerical value (1) of all the other flags.
->> 
->> originally made me think that the flag-indicated elements were going to
->> be packed into the remaining space of the structure at a position
->> depending on which flags are set.
->> 
->> For example, if I add a new flag
->> KVM_INTERNAL_ERROR_EMULATION_FLAG_EXIT_CODE, value 2, and then want to
->> pass back an exit code but *not* instruction bytes, the comment appears
->> to suggest that the exit code will appear immediately after the flags.
->> 
->> This is contradicted by your other reply:
->> 
->> >> > Just add the fields you need to
->> >> > the end of emulation_failure struct, increase 'ndata' to the new
->> >> > count, add a new flag to 'flags' so we know its contents.
->> 
->> Given this, the ordering of flag values does not seem significant - the
->> structure elements corresponding to a flag value will always be present,
->> just not filled with relevant data.
->
-> I think what Aaron is trying to say is that the order in the aliased data[] is
-> associated with the lowest _defined_ flag value, not the lowest _set_ flag.
->
-> That said, I would just omit the "ascending numerical" stuff entirely, e.g. I
-> think for the #defines, this will suffice:
->
-> /* Flags that describe what fields in emulation_failure hold valid data  */
-
-Agreed.
-
-> As for not breaking userspace if/when additional fields are added, we can instead
-> document the new struct (and drop my snarky comment :-D), e.g.:
->
-> 		/*
-> 		 * KVM_INTERNAL_ERROR_EMULATION
-> 		 *
-> 		 * "struct emulation_failure" is an overlay of "struct internal"
-> 		 * that is used for the KVM_INTERNAL_ERROR_EMULATION sub-type of
-> 		 * KVM_EXIT_INTERNAL_ERROR.  Note, unlike other internal error
-> 		 * sub-types, this struct is ABI!  It also needs to be backwards
-> 		 * compabile with "struct internal".  Take special care that
-> 		 * "ndata" is correct, that new fields are enumerated in "flags",
-> 		 * and that each flag enumerates fields that are 64-bit aligned
-> 		 * and sized (so that ndata+internal.data[] is valid/accurate).
-> 		 */
-> 		struct {
-> 			__u32 suberror;
-> 			__u32 ndata;
-> 			__u64 flags;
-> 			__u8  insn_size;
-> 			__u8  insn_bytes[15];
-> 		} emulation_failure;
-
-Looks good (even with the snark).
-
-dme.
--- 
-People in love get everything wrong.
+So maybe drop this patch until every other arch agrees that there are
+no plans to implement this.
