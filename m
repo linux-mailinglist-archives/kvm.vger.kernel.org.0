@@ -2,316 +2,223 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D8B0A36660B
-	for <lists+kvm@lfdr.de>; Wed, 21 Apr 2021 09:03:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 303BA36660C
+	for <lists+kvm@lfdr.de>; Wed, 21 Apr 2021 09:03:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236661AbhDUHDj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 21 Apr 2021 03:03:39 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:38816 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S236429AbhDUHDS (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 21 Apr 2021 03:03:18 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1618988563;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=joz1D12trxVPCmLkuOCJdSehg5ak4DFNN0V29OjrZhw=;
-        b=dNW5diAKtz3UpbC8c7B5t4or022loYl42gfFrt8NRoMOiKHptdTPu4M8pKrz73vPUc8GLs
-        wf3bg5bfo+j0ukVViDF4V5z3tLVG5g2ZGN9QT/Z1buE04FS8emBJolTDduqXyPzNvxZunl
-        uOSpQj5ReuBTdVlhgR/MoxjryJZdKDM=
-Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
- [209.85.218.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-100-HrNTgrwfMT-ZNFCNS3A4vQ-1; Wed, 21 Apr 2021 03:02:11 -0400
-X-MC-Unique: HrNTgrwfMT-ZNFCNS3A4vQ-1
-Received: by mail-ej1-f72.google.com with SMTP id j25-20020a1709060519b029037cb8ca241aso5542777eja.19
-        for <kvm@vger.kernel.org>; Wed, 21 Apr 2021 00:02:11 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=joz1D12trxVPCmLkuOCJdSehg5ak4DFNN0V29OjrZhw=;
-        b=So6tPohuKdIRHPvLFM6B4F1c0ydTEwKauKiwaSWfDsdtMOIS3eBNGfrUEcqZLh6iTk
-         /FjQUFUHfvJQgcO4BLcS8Wf4Nc5L5Slgrqxw0vlTnb97EWRlaDK6KuuqjWCJgX/O1G85
-         oFcaBh982OaUA35Xv4VmzPEUKBTceFXq0NMdZT32Gaa1TIOBLOk7sA0ZCZXjOgrVoJEf
-         gIsjLvIkCWZKhmET2+dfIx5GCvTdxDjlGp0BBAhNIyV9G2O/GPN6hj5G5QQejaczd0Zf
-         I0Wztw6nTVpVlZWRNSPqjQo3k+775fXfpM0lS2fJJHoSe5Esngcuj9gDukv5o3uSaPTm
-         qhYg==
-X-Gm-Message-State: AOAM530/Itd80zr9luN2ioSSh6ddeFcXyY5s64rRc0Z9xRgwNpOfupwJ
-        AeZvOlDPmZAC47CPWintdc9yKA7zhiXl5nUHAWPibONinS/2WPdH+canyb0KK9DL1LcvfMVqlpr
-        VcKKmi01i+A4bNGD3lIjMayxtvhe0o6zFlp5kzNb8VT2N11g9wO9KQc9vks+9oUg=
-X-Received: by 2002:a05:6402:1cc1:: with SMTP id ds1mr35472629edb.135.1618988530155;
-        Wed, 21 Apr 2021 00:02:10 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxBuY2lC5RxiExSLmog/1JDMoZ2NJHFq7GOS6dKP1VgumN8IJB9TnDry55LntDDteUC7E6oJw==
-X-Received: by 2002:a05:6402:1cc1:: with SMTP id ds1mr35472588edb.135.1618988529847;
-        Wed, 21 Apr 2021 00:02:09 -0700 (PDT)
-Received: from gator.home (cst2-174-132.cust.vodafone.cz. [31.30.174.132])
-        by smtp.gmail.com with ESMTPSA id n14sm1339740ejy.90.2021.04.21.00.02.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 21 Apr 2021 00:02:08 -0700 (PDT)
-Date:   Wed, 21 Apr 2021 09:02:06 +0200
-From:   Andrew Jones <drjones@redhat.com>
-To:     kvm@vger.kernel.org
-Cc:     alexandru.elisei@arm.com, nikos.nikoleris@arm.com,
-        andre.przywara@arm.com, eric.auger@redhat.com
-Subject: Re: [PATCH kvm-unit-tests v2 8/8] arm/arm64: psci: don't assume
- method is hvc
-Message-ID: <20210421070206.mbtarb4cge5ywyuv@gator.home>
-References: <20210420190002.383444-1-drjones@redhat.com>
- <20210420190002.383444-9-drjones@redhat.com>
+        id S237027AbhDUHET (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 21 Apr 2021 03:04:19 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:39890 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S236301AbhDUHEJ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 21 Apr 2021 03:04:09 -0400
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 13L6YOrQ044023;
+        Wed, 21 Apr 2021 03:02:48 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=tLg5DX76NZwj7FRceDWBV4qvPy/Jbr1sqJp2kOTA/JY=;
+ b=hUaKfxzZma5B5OVj1/ezISza2bhG2HpYt9kS6Fd1xSfbpDTTqMngielE5gKcm5zxGv9H
+ /lrSuLbeNIVCEIKI1+f/MkmUcnfIPfwplH3W/Kdww+68wujGr3XyoBIE+mIV8GEzGkkk
+ +FPGPF1MHRUORtVbKMqfqO/YeWlM6HLeLPOftXyNov1a2aZryFTiKxOS+ECVG+Hy12Z/
+ 3DsaY/zoFdTYNJxe5WTdrZDUkDVEBRqr2Ehedvduwfu4Bb0aMzjfU2Q4uToBmDxmQUy/
+ Ma7rB1UV+ycabGOVoXVNw+GmGRtXxlOyF6NiZsIa1OSYF8S55I6WfTtk8V9ze394yVIL xw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3829y3xv6d-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 21 Apr 2021 03:02:47 -0400
+Received: from m0098413.ppops.net (m0098413.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 13L6Yfia044934;
+        Wed, 21 Apr 2021 03:02:47 -0400
+Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3829y3xv5h-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 21 Apr 2021 03:02:47 -0400
+Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
+        by ppma01fra.de.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 13L6qrQQ026220;
+        Wed, 21 Apr 2021 07:02:45 GMT
+Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
+        by ppma01fra.de.ibm.com with ESMTP id 37yqa8960b-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 21 Apr 2021 07:02:45 +0000
+Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
+        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 13L72gKe34013578
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 21 Apr 2021 07:02:42 GMT
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 8D4BB11C04A;
+        Wed, 21 Apr 2021 07:02:42 +0000 (GMT)
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 081F411C050;
+        Wed, 21 Apr 2021 07:02:42 +0000 (GMT)
+Received: from oc7455500831.ibm.com (unknown [9.171.39.90])
+        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Wed, 21 Apr 2021 07:02:41 +0000 (GMT)
+Subject: Re: [PATCH v3 4/9] sched/vtime: Move vtime accounting external
+ declarations above inlines
+To:     Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Michael Tokarev <mjt@tls.msk.ru>
+References: <20210415222106.1643837-1-seanjc@google.com>
+ <20210415222106.1643837-5-seanjc@google.com>
+From:   Christian Borntraeger <borntraeger@de.ibm.com>
+Message-ID: <74cac066-e3e8-7bbf-fb9c-b3709fb7ee0b@de.ibm.com>
+Date:   Wed, 21 Apr 2021 09:02:41 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.9.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210420190002.383444-9-drjones@redhat.com>
+In-Reply-To: <20210415222106.1643837-5-seanjc@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: OwUQ2hJzq0lBhnvGEjeUot3B6WWb09Nt
+X-Proofpoint-ORIG-GUID: vko_u5Nh6RQFLonC9XaqHBjqxTdmkN8U
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.761
+ definitions=2021-04-21_02:2021-04-20,2021-04-21 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 mlxscore=0
+ priorityscore=1501 mlxlogscore=999 phishscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 adultscore=0 suspectscore=0 bulkscore=0 malwarescore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2104060000
+ definitions=main-2104210052
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Apr 20, 2021 at 09:00:02PM +0200, Andrew Jones wrote:
-> The method can also be smc and it will be when running on bare metal.
+
+
+On 16.04.21 00:21, Sean Christopherson wrote:
+> Move the blob of external declarations (and their stubs) above the set of
+> inline definitions (and their stubs) for vtime accounting.  This will
+> allow a future patch to bring in more inline definitions without also
+> having to shuffle large chunks of code.
 > 
-> Signed-off-by: Andrew Jones <drjones@redhat.com>
+> No functional change intended.
+> 
+> Signed-off-by: Sean Christopherson<seanjc@google.com>
+
+Reviewed-by: Christian Borntraeger <borntraeger@de.ibm.com>
+
 > ---
->  arm/cstart.S       | 22 ++++++++++++++++++++++
->  arm/cstart64.S     | 22 ++++++++++++++++++++++
->  arm/selftest.c     | 34 +++++++---------------------------
->  lib/arm/asm/psci.h | 10 ++++++++--
->  lib/arm/psci.c     | 37 +++++++++++++++++++++++++++++--------
->  lib/arm/setup.c    |  2 ++
->  6 files changed, 90 insertions(+), 37 deletions(-)
+>   include/linux/vtime.h | 94 +++++++++++++++++++++----------------------
+>   1 file changed, 47 insertions(+), 47 deletions(-)
 > 
-> diff --git a/arm/cstart.S b/arm/cstart.S
-> index 446966de350d..2401d92cdadc 100644
-> --- a/arm/cstart.S
-> +++ b/arm/cstart.S
-> @@ -95,6 +95,28 @@ start:
->  
->  .text
->  
+> diff --git a/include/linux/vtime.h b/include/linux/vtime.h
+> index 041d6524d144..6a4317560539 100644
+> --- a/include/linux/vtime.h
+> +++ b/include/linux/vtime.h
+> @@ -10,53 +10,6 @@
+>   
+>   struct task_struct;
+>   
+> -/*
+> - * vtime_accounting_enabled_this_cpu() definitions/declarations
+> - */
+> -#if defined(CONFIG_VIRT_CPU_ACCOUNTING_NATIVE)
+> -
+> -static inline bool vtime_accounting_enabled_this_cpu(void) { return true; }
+> -extern void vtime_task_switch(struct task_struct *prev);
+> -
+> -#elif defined(CONFIG_VIRT_CPU_ACCOUNTING_GEN)
+> -
+> -/*
+> - * Checks if vtime is enabled on some CPU. Cputime readers want to be careful
+> - * in that case and compute the tickless cputime.
+> - * For now vtime state is tied to context tracking. We might want to decouple
+> - * those later if necessary.
+> - */
+> -static inline bool vtime_accounting_enabled(void)
+> -{
+> -	return context_tracking_enabled();
+> -}
+> -
+> -static inline bool vtime_accounting_enabled_cpu(int cpu)
+> -{
+> -	return context_tracking_enabled_cpu(cpu);
+> -}
+> -
+> -static inline bool vtime_accounting_enabled_this_cpu(void)
+> -{
+> -	return context_tracking_enabled_this_cpu();
+> -}
+> -
+> -extern void vtime_task_switch_generic(struct task_struct *prev);
+> -
+> -static inline void vtime_task_switch(struct task_struct *prev)
+> -{
+> -	if (vtime_accounting_enabled_this_cpu())
+> -		vtime_task_switch_generic(prev);
+> -}
+> -
+> -#else /* !CONFIG_VIRT_CPU_ACCOUNTING */
+> -
+> -static inline bool vtime_accounting_enabled_cpu(int cpu) {return false; }
+> -static inline bool vtime_accounting_enabled_this_cpu(void) { return false; }
+> -static inline void vtime_task_switch(struct task_struct *prev) { }
+> -
+> -#endif
+> -
+>   /*
+>    * Common vtime APIs
+>    */
+> @@ -94,6 +47,53 @@ static inline void vtime_account_hardirq(struct task_struct *tsk) { }
+>   static inline void vtime_flush(struct task_struct *tsk) { }
+>   #endif
+>   
 > +/*
-> + * psci_invoke_hvc / psci_invoke_smc
-> + *
-> + * Inputs:
-> + *   r0 -- function_id
-> + *   r1 -- arg0
-> + *   r2 -- arg1
-> + *   r3 -- arg2
-> + *
-> + * Outputs:
-> + *   r0 -- return code
+> + * vtime_accounting_enabled_this_cpu() definitions/declarations
 > + */
-> +.globl psci_invoke_hvc
-> +psci_invoke_hvc:
-> +	hvc	#0
-> +	mov	pc, lr
+> +#if defined(CONFIG_VIRT_CPU_ACCOUNTING_NATIVE)
 > +
-> +.globl psci_invoke_smc
-> +psci_invoke_smc:
-> +	smc	#0
-> +	mov	pc, lr
+> +static inline bool vtime_accounting_enabled_this_cpu(void) { return true; }
+> +extern void vtime_task_switch(struct task_struct *prev);
 > +
->  enable_vfp:
->  	/* Enable full access to CP10 and CP11: */
->  	mov	r0, #(3 << 22 | 3 << 20)
-> diff --git a/arm/cstart64.S b/arm/cstart64.S
-> index 42ba3a3ca249..7610e28f06dd 100644
-> --- a/arm/cstart64.S
-> +++ b/arm/cstart64.S
-> @@ -109,6 +109,28 @@ start:
->  
->  .text
->  
+> +#elif defined(CONFIG_VIRT_CPU_ACCOUNTING_GEN)
+> +
 > +/*
-> + * psci_invoke_hvc / psci_invoke_smc
-> + *
-> + * Inputs:
-> + *   x0 -- function_id
-> + *   x1 -- arg0
-> + *   x2 -- arg1
-> + *   x3 -- arg2
-> + *
-> + * Outputs:
-> + *   x0 -- return code
+> + * Checks if vtime is enabled on some CPU. Cputime readers want to be careful
+> + * in that case and compute the tickless cputime.
+> + * For now vtime state is tied to context tracking. We might want to decouple
+> + * those later if necessary.
 > + */
-> +.globl psci_invoke_hvc
-> +psci_invoke_hvc:
-> +	hvc	#0
-> +	ret
-> +
-> +.globl psci_invoke_smc
-> +psci_invoke_smc:
-> +	smc	#0
-> +	ret
-> +
->  get_mmu_off:
->  	adrp	x0, auxinfo
->  	ldr	x0, [x0, :lo12:auxinfo + 8]
-> diff --git a/arm/selftest.c b/arm/selftest.c
-> index 4495b161cdd5..9f459ed3d571 100644
-> --- a/arm/selftest.c
-> +++ b/arm/selftest.c
-> @@ -400,33 +400,13 @@ static void check_vectors(void *arg __unused)
->  	exit(report_summary());
->  }
->  
-> -static bool psci_check(void)
-> +static void psci_print(void)
->  {
-> -	const struct fdt_property *method;
-> -	int node, len, ver;
-> -
-> -	node = fdt_node_offset_by_compatible(dt_fdt(), -1, "arm,psci-0.2");
-> -	if (node < 0) {
-> -		printf("PSCI v0.2 compatibility required\n");
-> -		return false;
-> -	}
-> -
-> -	method = fdt_get_property(dt_fdt(), node, "method", &len);
-> -	if (method == NULL) {
-> -		printf("bad psci device tree node\n");
-> -		return false;
-> -	}
-> -
-> -	if (len < 4 || strcmp(method->data, "hvc") != 0) {
-> -		printf("psci method must be hvc\n");
-> -		return false;
-> -	}
-> -
-> -	ver = psci_invoke(PSCI_0_2_FN_PSCI_VERSION, 0, 0, 0);
-> -	printf("PSCI version %d.%d\n", PSCI_VERSION_MAJOR(ver),
-> -				       PSCI_VERSION_MINOR(ver));
-> -
-> -	return true;
-> +	int ver = psci_invoke(PSCI_0_2_FN_PSCI_VERSION, 0, 0, 0);
-> +	report_info("PSCI version: %d.%d", PSCI_VERSION_MAJOR(ver),
-> +					  PSCI_VERSION_MINOR(ver));
-> +	report_info("PSCI method: %s", psci_invoke == psci_invoke_hvc ?
-> +				       "hvc" : "smc");
->  }
->  
->  static void cpu_report(void *data __unused)
-> @@ -465,7 +445,7 @@ int main(int argc, char **argv)
->  
->  	} else if (strcmp(argv[1], "smp") == 0) {
->  
-> -		report(psci_check(), "PSCI version");
-> +		psci_print();
->  		on_cpus(cpu_report, NULL);
->  		while (!cpumask_full(&ready))
->  			cpu_relax();
-> diff --git a/lib/arm/asm/psci.h b/lib/arm/asm/psci.h
-> index 7b956bf5987d..2820c0a3afc7 100644
-> --- a/lib/arm/asm/psci.h
-> +++ b/lib/arm/asm/psci.h
-> @@ -3,8 +3,14 @@
->  #include <libcflat.h>
->  #include <linux/psci.h>
->  
-> -extern int psci_invoke(unsigned long function_id, unsigned long arg0,
-> -		       unsigned long arg1, unsigned long arg2);
-> +typedef int (*psci_invoke_fn)(unsigned long function_id, unsigned long arg0,
-> +			      unsigned long arg1, unsigned long arg2);
-> +extern psci_invoke_fn psci_invoke;
-> +extern int psci_invoke_hvc(unsigned long function_id, unsigned long arg0,
-> +			   unsigned long arg1, unsigned long arg2);
-> +extern int psci_invoke_smc(unsigned long function_id, unsigned long arg0,
-> +			   unsigned long arg1, unsigned long arg2);
-
-Hmm, I forgot to change function_id to 'unsigned int'.
-
-> +extern void psci_set_conduit(void);
->  extern int psci_cpu_on(unsigned long cpuid, unsigned long entry_point);
->  extern void psci_system_reset(void);
->  extern int cpu_psci_cpu_boot(unsigned int cpu);
-> diff --git a/lib/arm/psci.c b/lib/arm/psci.c
-> index 936c83948b6a..168786dcf792 100644
-> --- a/lib/arm/psci.c
-> +++ b/lib/arm/psci.c
-> @@ -6,22 +6,23 @@
->   *
->   * This work is licensed under the terms of the GNU LGPL, version 2.
->   */
-> +#include <devicetree.h>
->  #include <asm/psci.h>
->  #include <asm/setup.h>
->  #include <asm/page.h>
->  #include <asm/smp.h>
->  
-> -__attribute__((noinline))
-> -int psci_invoke(unsigned long function_id, unsigned long arg0,
-> -		unsigned long arg1, unsigned long arg2)
-> +extern void halt(void);
-
-And, this is a left over from an earlier version of psci_invoke_none.
-
-Will fix these things for v3.
-
-> +
-> +static int psci_invoke_none(unsigned long function_id, unsigned long arg0,
-> +			    unsigned long arg1, unsigned long arg2)
->  {
-> -	asm volatile(
-> -		"hvc #0"
-> -	: "+r" (function_id)
-> -	: "r" (arg0), "r" (arg1), "r" (arg2));
-> -	return function_id;
-> +	printf("No PSCI method configured! Can't invoke...\n");
-> +	return PSCI_RET_NOT_PRESENT;
->  }
->  
-> +psci_invoke_fn psci_invoke = psci_invoke_none;
-> +
->  int psci_cpu_on(unsigned long cpuid, unsigned long entry_point)
->  {
->  #ifdef __arm__
-> @@ -56,3 +57,23 @@ void psci_system_off(void)
->  	int err = psci_invoke(PSCI_0_2_FN_SYSTEM_OFF, 0, 0, 0);
->  	printf("CPU%d unable to do system off (error = %d)\n", smp_processor_id(), err);
->  }
-> +
-> +void psci_set_conduit(void)
+> +static inline bool vtime_accounting_enabled(void)
 > +{
-> +	const void *fdt = dt_fdt();
-> +	const struct fdt_property *method;
-> +	int node, len;
-> +
-> +	node = fdt_node_offset_by_compatible(fdt, -1, "arm,psci-0.2");
-> +	assert_msg(node >= 0, "PSCI v0.2 compatibility required");
-> +
-> +	method = fdt_get_property(fdt, node, "method", &len);
-> +	assert(method != NULL && len == 4);
-> +
-> +	if (strcmp(method->data, "hvc") == 0)
-> +		psci_invoke = psci_invoke_hvc;
-> +	else if (strcmp(method->data, "smc") == 0)
-> +		psci_invoke = psci_invoke_smc;
-> +	else
-> +		assert_msg(false, "Unknown PSCI conduit: %s", method->data);
+> +	return context_tracking_enabled();
 > +}
-> diff --git a/lib/arm/setup.c b/lib/arm/setup.c
-> index a5ebec3c5a12..07d52d2e5fe6 100644
-> --- a/lib/arm/setup.c
-> +++ b/lib/arm/setup.c
-> @@ -25,6 +25,7 @@
->  #include <asm/processor.h>
->  #include <asm/smp.h>
->  #include <asm/timer.h>
-> +#include <asm/psci.h>
->  
->  #include "io.h"
->  
-> @@ -266,6 +267,7 @@ void setup(const void *fdt, phys_addr_t freemem_start)
->  	mem_regions_add_assumed();
->  	mem_init(PAGE_ALIGN((unsigned long)freemem));
->  
-> +	psci_set_conduit();
->  	cpu_init();
->  
->  	/* cpu_init must be called before thread_info_init */
-> -- 
-> 2.30.2
+> +
+> +static inline bool vtime_accounting_enabled_cpu(int cpu)
+> +{
+> +	return context_tracking_enabled_cpu(cpu);
+> +}
+> +
+> +static inline bool vtime_accounting_enabled_this_cpu(void)
+> +{
+> +	return context_tracking_enabled_this_cpu();
+> +}
+> +
+> +extern void vtime_task_switch_generic(struct task_struct *prev);
+> +
+> +static inline void vtime_task_switch(struct task_struct *prev)
+> +{
+> +	if (vtime_accounting_enabled_this_cpu())
+> +		vtime_task_switch_generic(prev);
+> +}
+> +
+> +#else /* !CONFIG_VIRT_CPU_ACCOUNTING */
+> +
+> +static inline bool vtime_accounting_enabled_cpu(int cpu) {return false; }
+> +static inline bool vtime_accounting_enabled_this_cpu(void) { return false; }
+> +static inline void vtime_task_switch(struct task_struct *prev) { }
+> +
+> +#endif
+> +
+>   
+>   #ifdef CONFIG_IRQ_TIME_ACCOUNTING
+>   extern void irqtime_account_irq(struct task_struct *tsk, unsigned int offset);
+> -- 2.31.1.368.gbe11c130af-goog
 > 
-
-Thanks,
-drew
-
