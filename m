@@ -2,101 +2,123 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C0CE5367556
-	for <lists+kvm@lfdr.de>; Thu, 22 Apr 2021 00:51:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4ED7E36759B
+	for <lists+kvm@lfdr.de>; Thu, 22 Apr 2021 01:13:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243839AbhDUWwU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 21 Apr 2021 18:52:20 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:52877 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S235481AbhDUWwU (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 21 Apr 2021 18:52:20 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1619045506;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=S2eln1RiXUGbh8l5mrppZibe/ezmLkuWu5Q7gl1yH1I=;
-        b=MRAI7oCWFkUQLqtzO0Dh53vdL5Dl5LOpboaZqZshDVPhud6tQZLe0vt1FoVGHyPR/KY5ux
-        TYpfLUmNzWHfjWSD29W57MLJuGb2YZYo0hV09ngBM9GZakovC7CbDvVjX/Nj96O0y+D7hd
-        DxPHRyaqEtGa5axXsiRRk9iLNAdhcko=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-161-kd-xcCRJM6KjHMqIGpOPVg-1; Wed, 21 Apr 2021 18:51:42 -0400
-X-MC-Unique: kd-xcCRJM6KjHMqIGpOPVg-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 699F4343A3;
-        Wed, 21 Apr 2021 22:51:41 +0000 (UTC)
-Received: from redhat.com (ovpn-114-21.phx2.redhat.com [10.3.114.21])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 0637F5D747;
-        Wed, 21 Apr 2021 22:51:40 +0000 (UTC)
-Date:   Wed, 21 Apr 2021 16:51:40 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Dan Carpenter <dan.carpenter@oracle.com>
-Cc:     Kirti Wankhede <kwankhede@nvidia.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>, kvm@vger.kernel.org,
-        kernel-janitors@vger.kernel.org
-Subject: Re: [PATCH] vfio/mdev: remove unnecessary NULL check in
- mbochs_create()
-Message-ID: <20210421165140.52e9083b@redhat.com>
-In-Reply-To: <YIAowNYCOCNu+xhm@mwanda>
-References: <YIAowNYCOCNu+xhm@mwanda>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+        id S1343678AbhDUXNr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 21 Apr 2021 19:13:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60552 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S244043AbhDUXNq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 21 Apr 2021 19:13:46 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 378D5C06174A
+        for <kvm@vger.kernel.org>; Wed, 21 Apr 2021 16:13:11 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id c1-20020a5b0bc10000b02904e7c6399b20so17717471ybr.12
+        for <kvm@vger.kernel.org>; Wed, 21 Apr 2021 16:13:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=c4DrM/LT5tBLj73VSLr9DqeLdFK8eZgbdj+R4jNuKjY=;
+        b=jgc2UocMpPlGp2kfA6ChPksCj+wwHmHp3iEYMnY8C2SnStnb5WCsrGpBydK2xKNSq7
+         HEEmM80db+j2jxK7cyKx7ERmMrGsVehI8kUy0+UYzYmfAq7l65AJVCqfWGMvS6plxkfj
+         w4QUl3ZKnxZ1GjlzF9ywldGXkT8f+Zmp95g0SUmOBaMGIzQUBpHQb1ijOkAvGHblQnzm
+         PkejpsGcF4oqu+KyV/5UnQfIlb7H/sle26gjcFWzMMWoBrf/cKn6OQcSnGUZD0n6uEbL
+         Kpg1Xeg+5Q+8aKLYBGZBY+APOI2z3QXTnLZDqFXfAAyDeMGCBXh00BsTYNcK6c4HJfC3
+         lrYA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=c4DrM/LT5tBLj73VSLr9DqeLdFK8eZgbdj+R4jNuKjY=;
+        b=te4jqXWlKG6L89bp4b8DfQTSBWueo9E6uk3safZ66MiK1qjGmdpDgaJVIgYJ9yjvUy
+         wpCyqEU6Ao3aTPSuJ34+DBzDAbbgLY3BwmZWKLIbS/FD7ZPKXAzRSx08wY1PHBb3zb/K
+         rZQDB6pjbSpeuQxzVkIWw9H9/Y29CIkdHu4Q512p8jj/lHLGoPuPk1HGOZvJnbxE3NP8
+         FCgJhByU7CEbjkTXIYXQNL63tYkVqJq4u5ZrnkZTmaPa2V5hnM8MXcR++3XIwbyIzAkZ
+         MRVgK8RSMb5o+oXqrkYuoDoKGedraGWGSj83zkFpHKPnp+MZjBvplLsq29ThqH7BcRLq
+         +Zvw==
+X-Gm-Message-State: AOAM530I9AiAS1lGqlDAfc2w6r7HT3nTpDxuWLxsm3MpikCNw0oybgjr
+        U/5uL1SgxnUOLpcdsRCSQeM4GSa9OPN/Hg==
+X-Google-Smtp-Source: ABdhPJyrLYl2A/eXtMDi+Rb8poyahq1CpFQZkXLGakYoV2bGpySxhRJrrSOzEhvdqWqfGtW1DMm6ef5OH/WVGQ==
+X-Received: from mhmmm.sea.corp.google.com ([2620:15c:100:202:c919:a1bb:1eab:984c])
+ (user=jacobhxu job=sendgmr) by 2002:a5b:448:: with SMTP id
+ s8mr523404ybp.363.1619046790504; Wed, 21 Apr 2021 16:13:10 -0700 (PDT)
+Date:   Wed, 21 Apr 2021 16:12:57 -0700
+Message-Id: <20210421231258.2583654-1-jacobhxu@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.31.1.368.gbe11c130af-goog
+Subject: [kvm-unit-tests PATCH 1/2] x86: add movups/movupd sse testcases to emulator.c
+From:   Jacob Xu <jacobhxu@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Jim Mattson <jmattson@google.com>
+Cc:     kvm@vger.kernel.org, Jacob Xu <jacobhxu@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 21 Apr 2021 16:29:36 +0300
-Dan Carpenter <dan.carpenter@oracle.com> wrote:
+Here we add movups/movupd tests corresponding to functionality
+introduced in commit 29916968c486 ("kvm: Add emulation for movups/movupd").
 
-> This NULL check is no longer required because "type" now points to
-> an element in a non-NULL array.
+Signed-off-by: Jacob Xu <jacobhxu@google.com>
+---
+ x86/emulator.c | 44 ++++++++++++++++++++------------------------
+ 1 file changed, 20 insertions(+), 24 deletions(-)
 
-I think the mdpy change is correct too, but it's hard to verify from
-this commit log that it was actually intended.  Can we note that change
-as well?  Thanks,
-
-Alex
-
-> 
-> Fixes: 3d3a360e570616 ("vfio/mbochs: Use mdev_get_type_group_id()")
-> Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
-> ---
->  samples/vfio-mdev/mbochs.c | 2 --
->  samples/vfio-mdev/mdpy.c | 3 +--
->  2 files changed, 1 insertion(+), 4 deletions(-)
-> 
-> diff --git a/samples/vfio-mdev/mbochs.c b/samples/vfio-mdev/mbochs.c
-> index 861c76914e76..881ef9a7296f 100644
-> --- a/samples/vfio-mdev/mbochs.c
-> +++ b/samples/vfio-mdev/mbochs.c
-> @@ -513,8 +513,6 @@ static int mbochs_create(struct mdev_device *mdev)
->  	struct device *dev = mdev_dev(mdev);
->  	struct mdev_state *mdev_state;
->  
-> -	if (!type)
-> -		type = &mbochs_types[0];
->  	if (type->mbytes + mbochs_used_mbytes > max_mbytes)
->  		return -ENOMEM;
->  
-> diff --git a/samples/vfio-mdev/mdpy.c b/samples/vfio-mdev/mdpy.c
-> index f0c0e7209719..e889c1cf8fd1 100644
-> --- a/samples/vfio-mdev/mdpy.c
-> +++ b/samples/vfio-mdev/mdpy.c
-> @@ -667,8 +667,7 @@ static ssize_t description_show(struct mdev_type *mtype,
->  		&mdpy_types[mtype_get_type_group_id(mtype)];
->  
->  	return sprintf(buf, "virtual display, %dx%d framebuffer\n",
-> -		       type ? type->width  : 0,
-> -		       type ? type->height : 0);
-> +		       type->width, type->height);
->  }
->  static MDEV_TYPE_ATTR_RO(description);
->  
+diff --git a/x86/emulator.c b/x86/emulator.c
+index 6100b6d..ff3c2bf 100644
+--- a/x86/emulator.c
++++ b/x86/emulator.c
+@@ -664,30 +664,26 @@ static bool sseeq(sse_union *v1, sse_union *v2)
+ 
+ static __attribute__((target("sse2"))) void test_sse(sse_union *mem)
+ {
+-    sse_union v;
+-
+-    write_cr0(read_cr0() & ~6); /* EM, TS */
+-    write_cr4(read_cr4() | 0x200); /* OSFXSR */
+-    v.u[0] = 1; v.u[1] = 2; v.u[2] = 3; v.u[3] = 4;
+-    asm("movdqu %1, %0" : "=m"(*mem) : "x"(v.sse));
+-    report(sseeq(&v, mem), "movdqu (read)");
+-    mem->u[0] = 5; mem->u[1] = 6; mem->u[2] = 7; mem->u[3] = 8;
+-    asm("movdqu %1, %0" : "=x"(v.sse) : "m"(*mem));
+-    report(sseeq(mem, &v), "movdqu (write)");
+-
+-    v.u[0] = 1; v.u[1] = 2; v.u[2] = 3; v.u[3] = 4;
+-    asm("movaps %1, %0" : "=m"(*mem) : "x"(v.sse));
+-    report(sseeq(mem, &v), "movaps (read)");
+-    mem->u[0] = 5; mem->u[1] = 6; mem->u[2] = 7; mem->u[3] = 8;
+-    asm("movaps %1, %0" : "=x"(v.sse) : "m"(*mem));
+-    report(sseeq(&v, mem), "movaps (write)");
+-
+-    v.u[0] = 1; v.u[1] = 2; v.u[2] = 3; v.u[3] = 4;
+-    asm("movapd %1, %0" : "=m"(*mem) : "x"(v.sse));
+-    report(sseeq(mem, &v), "movapd (read)");
+-    mem->u[0] = 5; mem->u[1] = 6; mem->u[2] = 7; mem->u[3] = 8;
+-    asm("movapd %1, %0" : "=x"(v.sse) : "m"(*mem));
+-    report(sseeq(&v, mem), "movapd (write)");
++	sse_union v;
++
++	write_cr0(read_cr0() & ~6); /* EM, TS */
++	write_cr4(read_cr4() | 0x200); /* OSFXSR */
++
++#define TEST_RW_SSE(insn) do { \
++		v.u[0] = 1; v.u[1] = 2; v.u[2] = 3; v.u[3] = 4; \
++		asm(insn " %1, %0" : "=m"(*mem) : "x"(v.sse)); \
++		report(sseeq(&v, mem), insn " (read)"); \
++		mem->u[0] = 5; mem->u[1] = 6; mem->u[2] = 7; mem->u[3] = 8; \
++		asm(insn " %1, %0" : "=x"(v.sse) : "m"(*mem)); \
++		report(sseeq(&v, mem), insn " (write)"); \
++} while (0)
++
++	TEST_RW_SSE("movdqu");
++	TEST_RW_SSE("movaps");
++	TEST_RW_SSE("movapd");
++	TEST_RW_SSE("movups");
++	TEST_RW_SSE("movupd");
++#undef TEST_RW_SSE
+ }
+ 
+ static void test_mmx(uint64_t *mem)
+-- 
+2.31.1.368.gbe11c130af-goog
 
