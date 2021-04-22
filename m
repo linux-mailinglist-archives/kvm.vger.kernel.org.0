@@ -2,155 +2,143 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C9F4D367DDE
-	for <lists+kvm@lfdr.de>; Thu, 22 Apr 2021 11:40:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7700A367DE8
+	for <lists+kvm@lfdr.de>; Thu, 22 Apr 2021 11:42:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235553AbhDVJk6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 22 Apr 2021 05:40:58 -0400
-Received: from mx13.kaspersky-labs.com ([91.103.66.164]:36141 "EHLO
-        mx13.kaspersky-labs.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230285AbhDVJk5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 22 Apr 2021 05:40:57 -0400
-Received: from relay13.kaspersky-labs.com (unknown [127.0.0.10])
-        by relay13.kaspersky-labs.com (Postfix) with ESMTP id 9DBD25219A0;
-        Thu, 22 Apr 2021 12:40:20 +0300 (MSK)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kaspersky.com;
-        s=mail202102; t=1619084420;
-        bh=grePwXi7crrlM6+Hn5lGfxZJrOzcrxE7eMkw/ki7RsE=;
-        h=Subject:To:From:Message-ID:Date:MIME-Version:Content-Type;
-        b=5ODqkmRav/7IYTP0TTODcImsToRzLp6RRTDUFEEoHiLwosKOf0DdIk5KdjQRvTSOe
-         YKuuvewKliaZ3zZghnx6qtC61cI+BXI5CYiDEbZLDat0FBqoelp5EJPGzDQU+bF/6v
-         o0c+hOcL8PSOgiydXOIvOUxujPXMq3CEdQx/vhrp1MA5ZxuP5pTfEqTQCQUujNFsYk
-         4Fxcx9AIVl+OeHP8ngofLjCAP6sARWKn/ppaWtzVcTxxQQBXs7sYOK01HXm3+AoynJ
-         ssjWVekCWRgWLPA92v95QDnda29aKdapPnS2kq4fr7uw/uFTXK1h0LkOldjlXzwWAu
-         Ty8k195fDjt4w==
-Received: from mail-hq2.kaspersky.com (unknown [91.103.66.206])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
-        (Client CN "mail-hq2.kaspersky.com", Issuer "Kaspersky MailRelays CA G3" (verified OK))
-        by mailhub13.kaspersky-labs.com (Postfix) with ESMTPS id 55CDB521998;
-        Thu, 22 Apr 2021 12:40:19 +0300 (MSK)
-Received: from [10.16.171.77] (10.64.68.128) by hqmailmbx3.avp.ru
- (10.64.67.243) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2176.2; Thu, 22
- Apr 2021 12:40:18 +0300
-Subject: Re: [RFC PATCH v8 00/19] virtio/vsock: introduce SOCK_SEQPACKET
- support
-To:     Stefano Garzarella <sgarzare@redhat.com>
-CC:     Stefan Hajnoczi <stefanha@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Jorgen Hansen <jhansen@vmware.com>,
-        Colin Ian King <colin.king@canonical.com>,
-        Andra Paraschiv <andraprs@amazon.com>,
-        Norbert Slusarek <nslusarek@gmx.net>,
-        Alexander Popov <alex.popov@linux.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "stsp2@yandex.ru" <stsp2@yandex.ru>,
-        "oxffffaa@gmail.com" <oxffffaa@gmail.com>
-References: <20210413123954.3396314-1-arseny.krasnov@kaspersky.com>
- <20210421095213.25hnfi2th7gzyzt2@steredhat>
- <2c3d0749-0f41-e064-0153-b6130268add2@kaspersky.com>
- <20210422084638.bvblk33b4oi6cec6@steredhat>
-From:   Arseny Krasnov <arseny.krasnov@kaspersky.com>
-Message-ID: <bfefdd94-a84f-8bed-331e-274654a7426f@kaspersky.com>
-Date:   Thu, 22 Apr 2021 12:40:17 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        id S235755AbhDVJmG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 22 Apr 2021 05:42:06 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:55895 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S235742AbhDVJmE (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 22 Apr 2021 05:42:04 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1619084489;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=MRXM9RIwGAzOvqMViksoCgJRxC5LWVQ/YL3QO9+2J5w=;
+        b=ESgM2D7uCUikgWajvU/cy2xM0Q9ov0/3GgjoS0wAsiABO+1KraqtK7vSVJXqu9zG3MZKmc
+        2TH7+CE9czEwPdc49OdAPKZWSB/zIPmcRCV7rURBGdev1pfzp48jFVytnKSyh6K1NjzuMI
+        eQ5veheoebXvG/5slKp5qV3UhwqLuRs=
+Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
+ [209.85.218.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-147-5fdNMsBFPZ2BgEMxNO-73w-1; Thu, 22 Apr 2021 05:40:52 -0400
+X-MC-Unique: 5fdNMsBFPZ2BgEMxNO-73w-1
+Received: by mail-ej1-f71.google.com with SMTP id ne22-20020a1709077b96b02903803a047edeso5667074ejc.3
+        for <kvm@vger.kernel.org>; Thu, 22 Apr 2021 02:40:51 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=MRXM9RIwGAzOvqMViksoCgJRxC5LWVQ/YL3QO9+2J5w=;
+        b=AN9V3ReceMtnBgbS1YX5ymL4fSpfThERsPQ+lL+woWTzyxzWnSdFYn4ZmBeAiQ2Krq
+         wgG+7KqZDXvNECH/1epB2Ud1pGnIdOjFb48RBEt1/xu0eJja91C8stEcHwbec6BcIyeI
+         PIaQB4gA0ZI1ctpC4wHOWyNX7gQmPgJcdAh6TfJa48URqw2LeqlMXwMi3LdaYZG/c3Sa
+         I5yKWNjJ+0XELTT6x/vauvwaAJOpJAnjIg+hTrsSJuPlHAzOi0iqQ0tv4LR39Qq4WChw
+         QUpvZpmNF8KxuWU8IYCUYqHIk/CmmZw02Az3eIxcoUaNZOwa2qZQ6mQ/r3vyk0XfXntD
+         kBrw==
+X-Gm-Message-State: AOAM533VmaQxHaDvgSn8gpu5uv9y3gosvYZC4LxcvBZTTiV/rlejyELc
+        bOImrsm8Dd6EapK0QGRQBwG8V85USKGhj4STsLGsIObjViHogpTJiX9P2lYyZAg+TqgmvD7lpbs
+        qUWZWUO0PwZVv
+X-Received: by 2002:a05:6402:7cf:: with SMTP id u15mr2612988edy.297.1619084450887;
+        Thu, 22 Apr 2021 02:40:50 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxnMzqy1125yms4Nol3cFwtHxqmArRXTyoltonwXQvq5a1i+kLde1d2VZXwKNGWHqM1hcuLOw==
+X-Received: by 2002:a05:6402:7cf:: with SMTP id u15mr2612972edy.297.1619084450679;
+        Thu, 22 Apr 2021 02:40:50 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id q10sm1649695eds.26.2021.04.22.02.40.49
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 22 Apr 2021 02:40:50 -0700 (PDT)
+Subject: Re: [PATCH] KVM: x86: Properly handle APF vs disabled LAPIC situation
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Sebastien Boeuf <sebastien.boeuf@intel.com>,
+        linux-kernel@vger.kernel.org
+References: <20210422092948.568327-1-vkuznets@redhat.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <9a4601c7-c6a3-1b38-96de-e9d470fcaa8d@redhat.com>
+Date:   Thu, 22 Apr 2021 11:40:49 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.7.0
 MIME-Version: 1.0
-In-Reply-To: <20210422084638.bvblk33b4oi6cec6@steredhat>
-Content-Type: text/plain; charset="windows-1252"
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <20210422092948.568327-1-vkuznets@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-X-Originating-IP: [10.64.68.128]
-X-ClientProxiedBy: hqmailmbx1.avp.ru (10.64.67.241) To hqmailmbx3.avp.ru
- (10.64.67.243)
-X-KSE-ServerInfo: hqmailmbx3.avp.ru, 9
-X-KSE-AntiSpam-Interceptor-Info: scan successful
-X-KSE-AntiSpam-Version: 5.9.20, Database issued on: 04/22/2021 09:22:21
-X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
-X-KSE-AntiSpam-Method: none
-X-KSE-AntiSpam-Rate: 0
-X-KSE-AntiSpam-Info: Lua profiles 163278 [Apr 22 2021]
-X-KSE-AntiSpam-Info: Version: 5.9.20.0
-X-KSE-AntiSpam-Info: Envelope from: arseny.krasnov@kaspersky.com
-X-KSE-AntiSpam-Info: LuaCore: 442 442 b985cb57763b61d2a20abb585d5d4cc10c315b09
-X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
-X-KSE-AntiSpam-Info: kaspersky.com:7.1.1;127.0.0.199:7.1.2;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1
-X-KSE-AntiSpam-Info: Rate: 0
-X-KSE-AntiSpam-Info: Status: not_detected
-X-KSE-AntiSpam-Info: Method: none
-X-KSE-Antiphishing-Info: Clean
-X-KSE-Antiphishing-ScanningType: Deterministic
-X-KSE-Antiphishing-Method: None
-X-KSE-Antiphishing-Bases: 04/22/2021 09:24:00
-X-KSE-AttachmentFiltering-Interceptor-Info: no applicable attachment filtering
- rules found
-X-KSE-Antivirus-Interceptor-Info: scan successful
-X-KSE-Antivirus-Info: Clean, bases: 22.04.2021 7:02:00
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
-X-KSE-AttachmentFiltering-Interceptor-Info: no applicable attachment filtering
- rules found
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
-X-KLMS-Rule-ID: 52
-X-KLMS-Message-Action: clean
-X-KLMS-AntiSpam-Status: not scanned, disabled by settings
-X-KLMS-AntiSpam-Interceptor-Info: not scanned
-X-KLMS-AntiPhishing: Clean, bases: 2021/04/22 05:13:00
-X-KLMS-AntiVirus: Kaspersky Security for Linux Mail Server, version 8.0.3.30, bases: 2021/04/22 07:02:00 #16598851
-X-KLMS-AntiVirus-Status: Clean, skipped
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On 22/04/21 11:29, Vitaly Kuznetsov wrote:
+> Async PF 'page ready' event may happen when LAPIC is (temporary) disabled.
+> In particular, Sebastien reports that when Linux kernel is directly booted
+> by Cloud Hypervisor, LAPIC is 'software disabled' when APF mechanism is
+> initialized. On initialization KVM tries to inject 'wakeup all' event and
+> puts the corresponding token to the slot. It is, however, failing to inject
+> an interrupt (kvm_apic_set_irq() -> __apic_accept_irq() -> !apic_enabled())
+> so the guest never gets notified and the whole APF mechanism gets stuck.
+> The same issue is likely to happen if the guest temporary disables LAPIC
+> and a previously unavailable page becomes available.
+> 
+> Do two things to resolve the issue:
+> - Avoid dequeuing 'page ready' events from APF queue when LAPIC is
+>    disabled.
+> - Trigger an attempt to deliver pending 'page ready' events when LAPIC
+>    becomes enabled (SPIV or MSR_IA32_APICBASE).
+> 
+> Reported-by: Sebastien Boeuf <sebastien.boeuf@intel.com>
+> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+> ---
+>   arch/x86/kvm/lapic.c | 6 ++++++
+>   arch/x86/kvm/x86.c   | 2 +-
+>   2 files changed, 7 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+> index cc369b9ad8f1..49a839d0567a 100644
+> --- a/arch/x86/kvm/lapic.c
+> +++ b/arch/x86/kvm/lapic.c
+> @@ -296,6 +296,10 @@ static inline void apic_set_spiv(struct kvm_lapic *apic, u32 val)
+>   
+>   		atomic_set_release(&apic->vcpu->kvm->arch.apic_map_dirty, DIRTY);
+>   	}
+> +
+> +	/* Check if there are APF page ready requests pending */
+> +	if (enabled)
+> +		kvm_make_request(KVM_REQ_APF_READY, apic->vcpu);
+>   }
+>   
+>   static inline void kvm_apic_set_xapic_id(struct kvm_lapic *apic, u8 id)
+> @@ -2261,6 +2265,8 @@ void kvm_lapic_set_base(struct kvm_vcpu *vcpu, u64 value)
+>   		if (value & MSR_IA32_APICBASE_ENABLE) {
+>   			kvm_apic_set_xapic_id(apic, vcpu->vcpu_id);
+>   			static_branch_slow_dec_deferred(&apic_hw_disabled);
+> +			/* Check if there are APF page ready requests pending */
+> +			kvm_make_request(KVM_REQ_APF_READY, vcpu);
+>   		} else {
+>   			static_branch_inc(&apic_hw_disabled.key);
+>   			atomic_set_release(&apic->vcpu->kvm->arch.apic_map_dirty, DIRTY);
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index a06a6f48386d..001c6a445eaf 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -11296,7 +11296,7 @@ bool kvm_arch_can_dequeue_async_page_present(struct kvm_vcpu *vcpu)
+>   	if (!kvm_pv_async_pf_enabled(vcpu))
+>   		return true;
+>   	else
+> -		return apf_pageready_slot_free(vcpu);
+> +		return kvm_lapic_enabled(vcpu) && apf_pageready_slot_free(vcpu);
+>   }
+>   
+>   void kvm_arch_start_assignment(struct kvm *kvm)
+> 
 
-On 22.04.2021 11:46, Stefano Garzarella wrote:
-> On Wed, Apr 21, 2021 at 06:06:28PM +0300, Arseny Krasnov wrote:
->> On 21.04.2021 12:52, Stefano Garzarella wrote:
->>> On Tue, Apr 13, 2021 at 03:39:51PM +0300, Arseny Krasnov wrote:
->>>> v7 -> v8:
->>>> General changelog:
->>>> - whole idea is simplified: channel now considered reliable,
->>>>   so SEQ_BEGIN, SEQ_END, 'msg_len' and 'msg_id' were removed.
->>>>   Only thing that is used to mark end of message is bit in
->>>>   'flags' field of packet header: VIRTIO_VSOCK_SEQ_EOR. Packet
->>>>   with such bit set to 1 means, that this is last packet of
->>>>   message.
->>>>
->>>> - POSIX MSG_EOR support is removed, as there is no exact
->>>>   description how it works.
->>> It would be nice to support it, I'll try to see if I can find anything.
->>>
->>> I just reviewed the series. I think the most important things to fix are
->>> the `seqpacket_allow` stored in the struct virtio_transport that is
->>> wrong IMHO, and use cpu_to_le32()/le32_to_cpu() to access the flags.
->> Thank You, i'll prepare next version. Main question is: does this
->> approach(no SEQ_BEGIN, SEQ_END, 'msg_len' and 'msg_id') considered
->> good? In this case it will be easier to prepare final version, because 
->> is smaller and more simple than previous logic. Also patch to spec
->> will be smaller.
-> Yes, it's definitely much better than before.
->
-> The only problem I see is that we add some overhead per fragment 
-> (header). We could solve that with the mergeable buffers that Jiang is 
-> considering for DGRAM.
+Queued, with
 
-If we are talking about receive, i think, i can reuse merge logic for
+Cc: stable@vger.kernel.org
 
-stream sockets, the only difference is that buffers are mergeable
+Paolo
 
-until previous EOR(e.g. previous message) bit is found in rx queue.
-
->
-> If we have that support, I think we could reuse it here as well, but it 
-> might be a next step.
->
-> Thanks,
-> Stefano
->
->
