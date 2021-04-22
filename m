@@ -2,129 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B357D367B3F
-	for <lists+kvm@lfdr.de>; Thu, 22 Apr 2021 09:40:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 97E57367B45
+	for <lists+kvm@lfdr.de>; Thu, 22 Apr 2021 09:41:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230325AbhDVHkZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 22 Apr 2021 03:40:25 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:30289 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230285AbhDVHkY (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 22 Apr 2021 03:40:24 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1619077189;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=am3oqcwbAZTewEAL1q1sVytef24ZvvJQGjQNV10DXgc=;
-        b=GrCMllvSBB5nQikp3L+H/BehBzbqusbciq17rGcTjUTcdS89wdMnhJczjRXlXi7nWSCT7L
-        zdXP6wP4BC8hLa6ueggQZYu1+kzp4jnaFZ4kzWKWDmShHb0b0XQ3560o2u7ZJgWXkS+9Q3
-        Cx69wj6mDf5Zom1IsXve80CHzidiFlg=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-503-mVm3a7ZGM1iMYJvzIo5ypQ-1; Thu, 22 Apr 2021 03:39:47 -0400
-X-MC-Unique: mVm3a7ZGM1iMYJvzIo5ypQ-1
-Received: by mail-ej1-f69.google.com with SMTP id ne22-20020a1709077b96b02903803a047edeso5557575ejc.3
-        for <kvm@vger.kernel.org>; Thu, 22 Apr 2021 00:39:47 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:cc:references:from:subject:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=am3oqcwbAZTewEAL1q1sVytef24ZvvJQGjQNV10DXgc=;
-        b=G5vszEdAsYlWGtBViBtNPcbWMY2gwsKcER7HhYvCrZodqRilVHgAzOFI+HRqaYee8K
-         SOUPKcMyqePr/O6DBkYs/RW7BI+qPMImpW/swzPDNqgcqcvNWu1x/KkoK5HpO2ruedkz
-         XCTAvlm8Lq52+I/jiQ4qkNPMQPLPr1MsMbkaA0Z++UCHH7nZqTD/Js+AgHZYJNqr1m9C
-         KpMcMJ9yO1beVQAjTs9C079PvsHdR7Qj+ofRhPgZQBzT4KIRc9Cnsscdlx8QIvuJAJXd
-         PZ4pik/oPgkOf36Apb92QywMJuJQggOhi8k6SFFDTepX8m19WzOLV3sbDFMU1IBseRds
-         edwg==
-X-Gm-Message-State: AOAM533AuyFJMZ5mHZU85QkkaXwcpjZF+NRrqb7odEJqFW2fPH220i6t
-        NGNdZ3TEvUw2cYKNi7vhfpQALxQBLMTTA4mMlagNB3NEa4YmsS1smuPNFy6feRAtWInzEeYfFDj
-        YNGfEAt1iikGtWboYfvhD7Oupu7dG4nXxemksqrqBfHn/3tQEorj4VRp1h0LWZrZ2
-X-Received: by 2002:a05:6402:2216:: with SMTP id cq22mr2110190edb.265.1619077186253;
-        Thu, 22 Apr 2021 00:39:46 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzXe6pUNVLy4SO311qYFQSldx6jeUN9EJ6GcueT0+4hhV+Bw8HtI6VFQxxnnAjdrxiij30c1g==
-X-Received: by 2002:a05:6402:2216:: with SMTP id cq22mr2110170edb.265.1619077186016;
-        Thu, 22 Apr 2021 00:39:46 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id a17sm1255511ejx.13.2021.04.22.00.39.45
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 22 Apr 2021 00:39:45 -0700 (PDT)
-To:     Thomas Huth <thuth@redhat.com>, Jacob Xu <jacobhxu@google.com>,
-        Andrew Jones <drjones@redhat.com>
-Cc:     kvm@vger.kernel.org
-References: <20210421191611.2557051-1-jacobhxu@google.com>
- <edc3df0e-0eb7-108d-3371-2e13f285d632@redhat.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [kvm-unit-tests PATCH] update git tree location in MAINTAINERS to
- point at gitlab
-Message-ID: <97adb2d3-47f4-385a-18b4-90572c9f486a@redhat.com>
-Date:   Thu, 22 Apr 2021 09:39:44 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.7.0
+        id S235075AbhDVHmT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 22 Apr 2021 03:42:19 -0400
+Received: from szxga06-in.huawei.com ([45.249.212.32]:17389 "EHLO
+        szxga06-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229629AbhDVHmS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 22 Apr 2021 03:42:18 -0400
+Received: from DGGEMS408-HUB.china.huawei.com (unknown [172.30.72.58])
+        by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4FQq7g5J1TzjbVK;
+        Thu, 22 Apr 2021 15:39:43 +0800 (CST)
+Received: from [10.174.187.224] (10.174.187.224) by
+ DGGEMS408-HUB.china.huawei.com (10.3.19.208) with Microsoft SMTP Server id
+ 14.3.498.0; Thu, 22 Apr 2021 15:41:34 +0800
+Subject: Re: [PATCH v4 1/2] kvm/arm64: Remove the creation time's mapping of
+ MMIO regions
+To:     Gavin Shan <gshan@redhat.com>
+References: <20210415140328.24200-1-zhukeqian1@huawei.com>
+ <20210415140328.24200-2-zhukeqian1@huawei.com>
+ <ad39c796-2778-df26-b0c6-231e7626a747@redhat.com>
+ <bd4d2cfc-37b9-f20a-5a5c-ed352d1a46dc@huawei.com>
+ <f13bfc39-bee6-4562-fefc-76051bbf9735@redhat.com>
+From:   Keqian Zhu <zhukeqian1@huawei.com>
+CC:     <linux-kernel@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>, <kvm@vger.kernel.org>,
+        <kvmarm@lists.cs.columbia.edu>, Marc Zyngier <maz@kernel.org>,
+        Santosh Shukla <sashukla@nvidia.com>
+Message-ID: <9eb47a6c-3c5c-cb4a-d1de-1a3ce1b60a87@huawei.com>
+Date:   Thu, 22 Apr 2021 15:41:34 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
+ Thunderbird/45.7.1
 MIME-Version: 1.0
-In-Reply-To: <edc3df0e-0eb7-108d-3371-2e13f285d632@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <f13bfc39-bee6-4562-fefc-76051bbf9735@redhat.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.174.187.224]
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 22/04/21 05:42, Thomas Huth wrote:
-> On 21/04/2021 21.16, Jacob Xu wrote:
->> The MAINTAINERS file appears to have been forgotten during the migration
->> to gitlab from the kernel.org. Let's update it now.
->>
->> Signed-off-by: Jacob Xu <jacobhxu@google.com>
->> ---
->>   MAINTAINERS | 2 +-
->>   1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/MAINTAINERS b/MAINTAINERS
->> index 54124f6..e0c8e99 100644
->> --- a/MAINTAINERS
->> +++ b/MAINTAINERS
->> @@ -55,7 +55,7 @@ Maintainers
->>   -----------
->>   M: Paolo Bonzini <pbonzini@redhat.com>
->>   L: kvm@vger.kernel.org
->> -T: git://git.kernel.org/pub/scm/virt/kvm/kvm-unit-tests.git
->> +T:    https://gitlab.com/kvm-unit-tests/kvm-unit-tests.git
+Hi Gavin,
+
+On 2021/4/22 10:12, Gavin Shan wrote:
+> Hi Keqian,
 > 
-> Reviewed-by: Thomas Huth <thuth@redhat.com>
+> On 4/21/21 4:28 PM, Keqian Zhu wrote:
+>> On 2021/4/21 14:38, Gavin Shan wrote:
+>>> On 4/16/21 12:03 AM, Keqian Zhu wrote:
+>>>> The MMIO regions may be unmapped for many reasons and can be remapped
+>>>> by stage2 fault path. Map MMIO regions at creation time becomes a
+>>>> minor optimization and makes these two mapping path hard to sync.
+>>>>
+>>>> Remove the mapping code while keep the useful sanity check.
+>>>>
+>>>> Signed-off-by: Keqian Zhu <zhukeqian1@huawei.com>
+>>>> ---
+>>>>    arch/arm64/kvm/mmu.c | 38 +++-----------------------------------
+>>>>    1 file changed, 3 insertions(+), 35 deletions(-)
+>>>>
+>>>
+>>> After removing the logic to create stage2 mapping for VM_PFNMAP region,
+>>> I think the "do { } while" loop becomes unnecessary and can be dropped
+>>> completely. It means the only sanity check is to see if the memory slot
+>>> overflows IPA space or not. In that case, KVM_MR_FLAGS_ONLY can be
+>>> ignored because the memory slot's base address and length aren't changed
+>>> when we have KVM_MR_FLAGS_ONLY.
+>> Maybe not exactly. Here we do an important sanity check that we shouldn't
+>> log dirty for memslots with VM_PFNMAP.
+>>
+> 
+> Yeah, Sorry that I missed that part. Something associated with Santosh's
+> patch. The flag can be not existing until the page fault happened on
+> the vma. In this case, the check could be not working properly.
+> 
+>   [PATCH] KVM: arm64: Correctly handle the mmio faulting
+Yeah, you are right.
 
-You're too humble, Thomas. :)  Since Drew and you have commit access 
-this could very well be:
+If that happens, we won't try to use block mapping for memslot with VM_PFNMAP.
+But it keeps a same logic with old code.
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index ef7e9af..0082e58 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -54,8 +54,9 @@ Descriptions of section entries:
-  Maintainers
-  -----------
-  M: Paolo Bonzini <pbonzini@redhat.com>
-+M: Thomas Huth <thuth@redhat.com>
-+M: Andrew Jones <drjones@redhat.com>
-  L: kvm@vger.kernel.org
--T: git://git.kernel.org/pub/scm/virt/kvm/kvm-unit-tests.git
-+T: https://gitlab.com/kvm-unit-tests/kvm-unit-tests.git
+1. When without dirty-logging, we won't try block mapping for it, and we'll
+finally know that it's device, so won't try to do adjust THP (Transparent Huge Page)
+for it.
+2. If userspace wrongly enables dirty logging for this memslot, we'll force_pte for it.
 
-  Architecture Specific Code:
-  ---------------------------
-
-And also, while at it:
-
-diff --git a/MAINTAINERS b/MAINTAINERS
-index ef7e9af..0082e58 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -92,3 +94,4 @@ M: Paolo Bonzini <pbonzini@redhat.com>
-  L: kvm@vger.kernel.org
-  F: x86/*
-  F: lib/x86/*
-+T: https://gitlab.com/bonzini/kvm-unit-tests.git
-
-
+Thanks,
+Keqian
