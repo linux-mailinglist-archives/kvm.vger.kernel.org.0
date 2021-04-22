@@ -2,136 +2,96 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 30B1F367789
-	for <lists+kvm@lfdr.de>; Thu, 22 Apr 2021 04:38:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8F74236779D
+	for <lists+kvm@lfdr.de>; Thu, 22 Apr 2021 04:54:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234567AbhDVCjM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 21 Apr 2021 22:39:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49096 "EHLO
+        id S233990AbhDVCz0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 21 Apr 2021 22:55:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52606 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234493AbhDVCjL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 21 Apr 2021 22:39:11 -0400
+        with ESMTP id S232618AbhDVCz0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 21 Apr 2021 22:55:26 -0400
 Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2E286C06174A
-        for <kvm@vger.kernel.org>; Wed, 21 Apr 2021 19:38:35 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id s34-20020a252d620000b02904e34d3a48abso18194379ybe.13
-        for <kvm@vger.kernel.org>; Wed, 21 Apr 2021 19:38:35 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 082D3C06174A
+        for <kvm@vger.kernel.org>; Wed, 21 Apr 2021 19:54:52 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id 137-20020a250d8f0000b02904e7bf943359so18330178ybn.23
+        for <kvm@vger.kernel.org>; Wed, 21 Apr 2021 19:54:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=reply-to:date:message-id:mime-version:subject:from:to:cc;
-        bh=xbd22aCtQRBPSIBux5x1ONfW3mzcaq+9oc3GdPhDL5A=;
-        b=CQNZmCRn6tjpHmZXXODOgrYWhlhpa5V8QSPvAOYAmgGvNfkkZr0U7ML3JW+RkPYPPY
-         +1rAfFq+0zB61kdoNZlgZM63U2qHKsUK9NzCEPuV0c4YwnmL4ih52ThlPHMCCxxHrwNr
-         FeDr2TYhk3INAUrrQHwLF6HjW6P/uutql80C6h6UOlBP2xcWNtfYCXQd6Xa27tNRDVcH
-         0tX/Y/0d79FaHQ654iTuI+fGRFAR6+QkXJIkoqTEMELekTkH8QWtjCgRL+him5ULG9Di
-         DFoeWvq+L4DD0d9Qbo3aF/lyG9vG36/HovZbCetSNI1sJd7xA01c5R7D/ycfMcHzWw1r
-         VKNQ==
+        bh=Jb1cdGutYwWw/givKmt3Bb+yg+wB2IwgsnaOdWfXOpU=;
+        b=R0hKlBwz3cwKsOW3FhtoV33AWD+Lvy6eSAr8VoSJy6Q1fhJ1Ey9lBIOZ6oHDX45ABk
+         8JzXU+ptDc1rkaJuxHoZAkxm6AP2Ivz7aLtMAyOnaUrwtR+gXRpYDdyjSe24htGbkR5Q
+         Nlxi1MBB2joyB7x8PNjNg/2Wyi5K6XnEDJhJiXpNR8W4KJQ/jaIgy6xm9x20CUTPzpVz
+         OpTgDH3nvblR6YDTv3+fk5oG+PsKRSSmdMzi5tAjLc2HmZlt6gt9unpNnHCQkdmDzg8M
+         QMeO0dWMpLkVFcxapYJ7QqJZ7SDcgUfUaLHZhzvDKfw5NxBzIKpkNbiCQl1TFT01P352
+         yEYw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:reply-to:date:message-id:mime-version:subject
          :from:to:cc;
-        bh=xbd22aCtQRBPSIBux5x1ONfW3mzcaq+9oc3GdPhDL5A=;
-        b=Jew+5qmNNfR7f3JK/RwiK4DYqG/uQzx2LHCfIpRU22EhifOiJPaCzKN2Q2kHFj09k4
-         re94NwEBbqMsryUuRGUxxHaQBoi2YwVZf5A7abrTpLJ3L69EMGb9G/QFMkcYvEBKtQRt
-         UhoE68hBzuM+ELHJQrVkGlUQg91NBLXqLJl6hbuLMnXtlhXI6ETLrTIdEUHz2WYIGkK2
-         uo0XT6C9zFC7sTF1co4g4/kS80tTuZ+JybS1rPIeup6CjqJCQnIeVmMRoV+AbwZ6OTtJ
-         jXgQuNYMPcmDogPOU0f9STWoTlgk6f2goZ6D2hvvxO+Kvt3FpMJYnD/KNaFybKy+WQaq
-         irKw==
-X-Gm-Message-State: AOAM532+Q+yJZQikamwC2njMMek+izYPG4FRgV/Elq4LkX11FTex4LtB
-        XpiAcQZtISbEi0aaTc+J6rEd8qDRobc=
-X-Google-Smtp-Source: ABdhPJzDJe6RG1R6CFv4PyI3kz6h2OZBhalOq3sWRQX107uJCy6Z9sEu6/7T5WqnCSiXcRX/RnlUnwRfW6o=
+        bh=Jb1cdGutYwWw/givKmt3Bb+yg+wB2IwgsnaOdWfXOpU=;
+        b=FalrZ6rVIEeMgxsQSFf5B8euVdYIjwbfv3SFqsLMG15iSuytpzhb9ApqJ0NtC9qou9
+         7KDMFci+4DNKxRTvv5oTaVXz2vuJHJZFa0CuAVdNFaBCsMF/8GjlS0wNd9fEYT6It+F+
+         Kop40oQF/1uZlVV1ID1562wJQiUwPPYHkJtyTLvk1MNriqPY8ePsJdvLzklKG8N6GE54
+         WHTrfCrWU5tDmRhntLTbVXBbkw5rmKL+HqO+Y/s/g3lQKDAA07hewRUciGufhYB2cBV9
+         o/g1ZOFsMXMyqflfabvWAQdL8cQXB8fSmbveTCAF35pOkU2D+qTQKwvg4Iz0dwy4W0dA
+         eupw==
+X-Gm-Message-State: AOAM530BW4SaNOfVzoCgQGmKdqZkAoyXhNIRITpRtHe9BCLDbR6AKUR6
+        KvFZIXTFmfY4q+UnuwbHHxczjC+h1iU=
+X-Google-Smtp-Source: ABdhPJyThF/SMzswqaoyFI93YazXMDM/f91OEVBFWE803D202/HmOLSY1sZiW5WAAffRRinqQFGx7nHCJwc=
 X-Received: from seanjc798194.pdx.corp.google.com ([2620:15c:f:10:e012:374c:592:6194])
- (user=seanjc job=sendgmr) by 2002:a25:2fc5:: with SMTP id v188mr1593060ybv.140.1619059114437;
- Wed, 21 Apr 2021 19:38:34 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a25:aba9:: with SMTP id v38mr1680904ybi.67.1619060091313;
+ Wed, 21 Apr 2021 19:54:51 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Wed, 21 Apr 2021 19:38:31 -0700
-Message-Id: <20210422023831.3473491-1-seanjc@google.com>
+Date:   Wed, 21 Apr 2021 19:54:48 -0700
+Message-Id: <20210422025448.3475200-1-seanjc@google.com>
 Mime-Version: 1.0
 X-Mailer: git-send-email 2.31.1.498.g6c1eba8ee3d-goog
-Subject: [PATCH] KVM: VMX: Intercept FS/GS_BASE MSR accesses for 32-bit KVM
+Subject: [kvm-unit-tests PATCH] x86: svm: Skip NPT-only part of guest CR3
+ tests when NPT is disabled
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
+Cc:     kvm@vger.kernel.org, Sean Christopherson <seanjc@google.com>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Disable pass-through of the FS and GS base MSRs for 32-bit KVM.  Intel's
-SDM unequivocally states that the MSRs exist if and only if the CPU
-supports x86-64.  FS_BASE and GS_BASE are mostly a non-issue; a clever
-guest could opportunistically use the MSRs without issue.  KERNEL_GS_BASE
-is a bigger problem, as a clever guest would subtly be broken if it were
-migrated, as KVM disallows software access to the MSRs, and unlike the
-direct variants, KERNEL_GS_BASE needs to be explicitly migrated as it's
-not captured in the VMCS.
+Skip the sub-tests for guest CR3 that rely on NPT, unsurprisingly they
+fail when running with NPT disabled.  Alternatively, the test could be
+modified to poke into the legacy page tables, but obviously no one
+actually cares that much about shadow paging.
 
-Fixes: 25c5f225beda ("KVM: VMX: Enable MSR Bitmap feature")
+Fixes: 6d0ecbf ("nSVM: Test non-MBZ reserved bits in CR3 in long mode and legacy PAE mode")
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
+ x86/svm_tests.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-Note, this breaks kvm-unit-tests on 32-bit KVM VMX due to the boot code
-using WRMSR(MSR_GS_BASE).  But, the tests are already broken on SVM, and
-have always been broken on SVM, which is honestly the main reason I
-didn't just turn a blind eye.  :-)  I post the fix shortly.
-
- arch/x86/kvm/vmx/nested.c | 2 ++
- arch/x86/kvm/vmx/vmx.c    | 4 ++++
- 2 files changed, 6 insertions(+)
-
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index 8b111682fe5c..0f8c118ebc35 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -614,6 +614,7 @@ static inline bool nested_vmx_prepare_msr_bitmap(struct kvm_vcpu *vcpu,
- 	}
+diff --git a/x86/svm_tests.c b/x86/svm_tests.c
+index 29a0b59..353ab6b 100644
+--- a/x86/svm_tests.c
++++ b/x86/svm_tests.c
+@@ -2237,6 +2237,9 @@ static void test_cr3(void)
  
- 	/* KVM unconditionally exposes the FS/GS base MSRs to L1. */
-+#ifdef CONFIG_X86_64
- 	nested_vmx_disable_intercept_for_msr(msr_bitmap_l1, msr_bitmap_l0,
- 					     MSR_FS_BASE, MSR_TYPE_RW);
+ 	vmcb->save.cr4 = cr4_saved & ~X86_CR4_PCIDE;
  
-@@ -622,6 +623,7 @@ static inline bool nested_vmx_prepare_msr_bitmap(struct kvm_vcpu *vcpu,
++	if (!npt_supported())
++		goto skip_npt_only;
++
+ 	/* Clear P (Present) bit in NPT in order to trigger #NPF */
+ 	pdpe[0] &= ~1ULL;
  
- 	nested_vmx_disable_intercept_for_msr(msr_bitmap_l1, msr_bitmap_l0,
- 					     MSR_KERNEL_GS_BASE, MSR_TYPE_RW);
-+#endif
+@@ -2255,6 +2258,8 @@ static void test_cr3(void)
+ 	    SVM_CR3_PAE_LEGACY_RESERVED_MASK, SVM_EXIT_NPF, "(PAE) ");
  
- 	/*
- 	 * Checking the L0->L1 bitmap is trying to verify two things:
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 6501d66167b8..b58dc2d454f1 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -157,9 +157,11 @@ static u32 vmx_possible_passthrough_msrs[MAX_POSSIBLE_PASSTHROUGH_MSRS] = {
- 	MSR_IA32_SPEC_CTRL,
- 	MSR_IA32_PRED_CMD,
- 	MSR_IA32_TSC,
-+#ifdef CONFIG_X86_64
- 	MSR_FS_BASE,
- 	MSR_GS_BASE,
- 	MSR_KERNEL_GS_BASE,
-+#endif
- 	MSR_IA32_SYSENTER_CS,
- 	MSR_IA32_SYSENTER_ESP,
- 	MSR_IA32_SYSENTER_EIP,
-@@ -6969,9 +6971,11 @@ static int vmx_create_vcpu(struct kvm_vcpu *vcpu)
- 	bitmap_fill(vmx->shadow_msr_intercept.write, MAX_POSSIBLE_PASSTHROUGH_MSRS);
- 
- 	vmx_disable_intercept_for_msr(vcpu, MSR_IA32_TSC, MSR_TYPE_R);
-+#ifdef CONFIG_X86_64
- 	vmx_disable_intercept_for_msr(vcpu, MSR_FS_BASE, MSR_TYPE_RW);
- 	vmx_disable_intercept_for_msr(vcpu, MSR_GS_BASE, MSR_TYPE_RW);
- 	vmx_disable_intercept_for_msr(vcpu, MSR_KERNEL_GS_BASE, MSR_TYPE_RW);
-+#endif
- 	vmx_disable_intercept_for_msr(vcpu, MSR_IA32_SYSENTER_CS, MSR_TYPE_RW);
- 	vmx_disable_intercept_for_msr(vcpu, MSR_IA32_SYSENTER_ESP, MSR_TYPE_RW);
- 	vmx_disable_intercept_for_msr(vcpu, MSR_IA32_SYSENTER_EIP, MSR_TYPE_RW);
+ 	pdpe[0] |= 1ULL;
++
++skip_npt_only:
+ 	vmcb->save.cr3 = cr3_saved;
+ 	vmcb->save.cr4 = cr4_saved;
+ }
 -- 
 2.31.1.498.g6c1eba8ee3d-goog
 
