@@ -2,154 +2,131 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5AC0F367A27
-	for <lists+kvm@lfdr.de>; Thu, 22 Apr 2021 08:48:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C360D367A2A
+	for <lists+kvm@lfdr.de>; Thu, 22 Apr 2021 08:50:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234916AbhDVGsQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 22 Apr 2021 02:48:16 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:41495 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234877AbhDVGsQ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 22 Apr 2021 02:48:16 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1619074061;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=H/ET1kgjZaDP9QqqrVOtr2KWqSYP34uoIbTEzMVDfWs=;
-        b=UG7oEd4TjLk3TqhHwO2HfDRS8KXxrMDstnPjufLYEDF/QWCzik6Mf7xF6Tb4JMYNROEZRv
-        v2cDJ9Uu0oPZ2A4pQ7/JBQ2o21/Fe48trgvL2FDrphGM6xZRlS+DKT8m88GbOCQ67Fu6UM
-        NoC12yfYo1M2fJsK0Fj7bGtMiuMSZZM=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-185-y8kWAVmZMUq58C-e_JzrQg-1; Thu, 22 Apr 2021 02:47:39 -0400
-X-MC-Unique: y8kWAVmZMUq58C-e_JzrQg-1
-Received: by mail-ej1-f70.google.com with SMTP id z6-20020a17090665c6b02903700252d1ccso6805615ejn.10
-        for <kvm@vger.kernel.org>; Wed, 21 Apr 2021 23:47:39 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=H/ET1kgjZaDP9QqqrVOtr2KWqSYP34uoIbTEzMVDfWs=;
-        b=O9A0yPRsGZ1mxupdgeCQvzdOhEN28zgJGtfkvaDG2ihJ9Pn53W2HWeFNIf0uKdD2/8
-         MTczlw7Zg2GK0ErxazB2L3ykNtHD+ZU8yNIX42MHPW8YZMHlJ1uF6BCOAcvIQxgfFT+d
-         467clV5VICAGC6xe4CZnT81S5PxaZyQMx295lGZsz2b+LD9sSVnQQkgjTLaiFJ7hrTJP
-         iSquRIJUzFHaoFe7D60KJkCZ76FBlm0seTo6fFMNYiGNS7jOe+fqx30dDNaB3qHOiV0z
-         gVOogB2WOgwzJBg2AK6PGxE8TWmWoBvNG/tybSiV+wmiPY6XFwa9FmkpYi0cr7IXWqPU
-         +qag==
-X-Gm-Message-State: AOAM532N+F44dTZ+q+xeoVgQtIlvW5cJMqX1GaBMblYiXkB+42usBijV
-        MBeROGjSkwMhNf4xdF91CvEto/FJPURlSpyDnYXy8acylD2CvjKi45qYdVGpB2fc7O4fxxPqEYL
-        12ayhicRqkmB0
-X-Received: by 2002:aa7:c78a:: with SMTP id n10mr1825568eds.239.1619074058399;
-        Wed, 21 Apr 2021 23:47:38 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyoJOqKtEBxatEzxvvjy30R07QI7/KsZ8ywRC/exj0FTv9gLrgGET0BkO/O7mmUYWwGuAiJTQ==
-X-Received: by 2002:aa7:c78a:: with SMTP id n10mr1825552eds.239.1619074058194;
-        Wed, 21 Apr 2021 23:47:38 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id k9sm1244989eje.102.2021.04.21.23.47.37
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 21 Apr 2021 23:47:37 -0700 (PDT)
-Subject: Re: [PATCH] KVM: VMX: Intercept FS/GS_BASE MSR accesses for 32-bit
- KVM
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20210422023831.3473491-1-seanjc@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <e38e22bd-933e-ff44-f398-63e0c3a6e25a@redhat.com>
-Date:   Thu, 22 Apr 2021 08:47:36 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.7.0
-MIME-Version: 1.0
-In-Reply-To: <20210422023831.3473491-1-seanjc@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+        id S230341AbhDVGuk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 22 Apr 2021 02:50:40 -0400
+Received: from mail.kernel.org ([198.145.29.99]:45152 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229962AbhDVGuk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 22 Apr 2021 02:50:40 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 54CC561448;
+        Thu, 22 Apr 2021 06:50:05 +0000 (UTC)
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94)
+        (envelope-from <maz@kernel.org>)
+        id 1lZTA3-008paW-5p; Thu, 22 Apr 2021 07:50:03 +0100
+Date:   Thu, 22 Apr 2021 07:50:02 +0100
+Message-ID: <87v98eq0dh.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Gavin Shan <gshan@redhat.com>
+Cc:     Keqian Zhu <zhukeqian1@huawei.com>, kvm@vger.kernel.org,
+        kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org,
+        cjia@nvidia.com, linux-arm-kernel@lists.infradead.org,
+        "Wanghaibin (D)" <wanghaibin.wang@huawei.com>
+Subject: Re: [PATCH] KVM: arm64: Correctly handle the mmio faulting
+In-Reply-To: <b97415a2-7970-a741-9690-3e4514b4aa7d@redhat.com>
+References: <1603297010-18787-1-git-send-email-sashukla@nvidia.com>
+        <8b20dfc0-3b5e-c658-c47d-ebc50d20568d@huawei.com>
+        <2e23aaa7-0c8d-13ba-2eae-9e6ab2adc587@redhat.com>
+        <ed8a8b90-8b96-4967-01f5-cd0f536c38d2@huawei.com>
+        <871rb3rgpl.wl-maz@kernel.org>
+        <b97415a2-7970-a741-9690-3e4514b4aa7d@redhat.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: gshan@redhat.com, zhukeqian1@huawei.com, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org, cjia@nvidia.com, linux-arm-kernel@lists.infradead.org, wanghaibin.wang@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 22/04/21 04:38, Sean Christopherson wrote:
-> Disable pass-through of the FS and GS base MSRs for 32-bit KVM.  Intel's
-> SDM unequivocally states that the MSRs exist if and only if the CPU
-> supports x86-64.  FS_BASE and GS_BASE are mostly a non-issue; a clever
-> guest could opportunistically use the MSRs without issue.  KERNEL_GS_BASE
-> is a bigger problem, as a clever guest would subtly be broken if it were
-> migrated, as KVM disallows software access to the MSRs, and unlike the
-> direct variants, KERNEL_GS_BASE needs to be explicitly migrated as it's
-> not captured in the VMCS.
+On Thu, 22 Apr 2021 03:02:00 +0100,
+Gavin Shan <gshan@redhat.com> wrote:
 > 
-> Fixes: 25c5f225beda ("KVM: VMX: Enable MSR Bitmap feature")
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-
-I added an explicit note that this is not for stable kernels.  The 
-clever guest breaking after migration is the clever guest's problem.
-
-> ---
+> Hi Marc,
 > 
-> Note, this breaks kvm-unit-tests on 32-bit KVM VMX due to the boot code
-> using WRMSR(MSR_GS_BASE).  But, the tests are already broken on SVM, and
-> have always been broken on SVM, which is honestly the main reason I
-> didn't just turn a blind eye.  :-)  I post the fix shortly.
-
-Fair enough.  Queued, thanks.
-
->   arch/x86/kvm/vmx/nested.c | 2 ++
->   arch/x86/kvm/vmx/vmx.c    | 4 ++++
->   2 files changed, 6 insertions(+)
+> On 4/21/21 9:59 PM, Marc Zyngier wrote:
+> > On Wed, 21 Apr 2021 07:17:44 +0100,
+> > Keqian Zhu <zhukeqian1@huawei.com> wrote:
+> >> On 2021/4/21 14:20, Gavin Shan wrote:
+> >>> On 4/21/21 12:59 PM, Keqian Zhu wrote:
+> >>>> On 2020/10/22 0:16, Santosh Shukla wrote:
+> >>>>> The Commit:6d674e28 introduces a notion to detect and handle the
+> >>>>> device mapping. The commit checks for the VM_PFNMAP flag is set
+> >>>>> in vma->flags and if set then marks force_pte to true such that
+> >>>>> if force_pte is true then ignore the THP function check
+> >>>>> (/transparent_hugepage_adjust()).
+> >>>>> 
+> >>>>> There could be an issue with the VM_PFNMAP flag setting and checking.
+> >>>>> For example consider a case where the mdev vendor driver register's
+> >>>>> the vma_fault handler named vma_mmio_fault(), which maps the
+> >>>>> host MMIO region in-turn calls remap_pfn_range() and maps
+> >>>>> the MMIO's vma space. Where, remap_pfn_range implicitly sets
+> >>>>> the VM_PFNMAP flag into vma->flags.
+> >>>> Could you give the name of the mdev vendor driver that triggers this issue?
+> >>>> I failed to find one according to your description. Thanks.
+> >>>> 
+> >>> 
+> >>> I think it would be fixed in driver side to set VM_PFNMAP in
+> >>> its mmap() callback (call_mmap()), like vfio PCI driver does.
+> >>> It means it won't be delayed until page fault is issued and
+> >>> remap_pfn_range() is called. It's determined from the beginning
+> >>> that the vma associated the mdev vendor driver is serving as
+> >>> PFN remapping purpose. So the vma should be populated completely,
+> >>> including the VM_PFNMAP flag before it becomes visible to user
+> >>> space.
+> > 
+> > Why should that be a requirement? Lazy populating of the VMA should be
+> > perfectly acceptable if the fault can only happen on the CPU side.
+> > 
 > 
-> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-> index 8b111682fe5c..0f8c118ebc35 100644
-> --- a/arch/x86/kvm/vmx/nested.c
-> +++ b/arch/x86/kvm/vmx/nested.c
-> @@ -614,6 +614,7 @@ static inline bool nested_vmx_prepare_msr_bitmap(struct kvm_vcpu *vcpu,
->   	}
->   
->   	/* KVM unconditionally exposes the FS/GS base MSRs to L1. */
-> +#ifdef CONFIG_X86_64
->   	nested_vmx_disable_intercept_for_msr(msr_bitmap_l1, msr_bitmap_l0,
->   					     MSR_FS_BASE, MSR_TYPE_RW);
->   
-> @@ -622,6 +623,7 @@ static inline bool nested_vmx_prepare_msr_bitmap(struct kvm_vcpu *vcpu,
->   
->   	nested_vmx_disable_intercept_for_msr(msr_bitmap_l1, msr_bitmap_l0,
->   					     MSR_KERNEL_GS_BASE, MSR_TYPE_RW);
-> +#endif
->   
->   	/*
->   	 * Checking the L0->L1 bitmap is trying to verify two things:
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index 6501d66167b8..b58dc2d454f1 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -157,9 +157,11 @@ static u32 vmx_possible_passthrough_msrs[MAX_POSSIBLE_PASSTHROUGH_MSRS] = {
->   	MSR_IA32_SPEC_CTRL,
->   	MSR_IA32_PRED_CMD,
->   	MSR_IA32_TSC,
-> +#ifdef CONFIG_X86_64
->   	MSR_FS_BASE,
->   	MSR_GS_BASE,
->   	MSR_KERNEL_GS_BASE,
-> +#endif
->   	MSR_IA32_SYSENTER_CS,
->   	MSR_IA32_SYSENTER_ESP,
->   	MSR_IA32_SYSENTER_EIP,
-> @@ -6969,9 +6971,11 @@ static int vmx_create_vcpu(struct kvm_vcpu *vcpu)
->   	bitmap_fill(vmx->shadow_msr_intercept.write, MAX_POSSIBLE_PASSTHROUGH_MSRS);
->   
->   	vmx_disable_intercept_for_msr(vcpu, MSR_IA32_TSC, MSR_TYPE_R);
-> +#ifdef CONFIG_X86_64
->   	vmx_disable_intercept_for_msr(vcpu, MSR_FS_BASE, MSR_TYPE_RW);
->   	vmx_disable_intercept_for_msr(vcpu, MSR_GS_BASE, MSR_TYPE_RW);
->   	vmx_disable_intercept_for_msr(vcpu, MSR_KERNEL_GS_BASE, MSR_TYPE_RW);
-> +#endif
->   	vmx_disable_intercept_for_msr(vcpu, MSR_IA32_SYSENTER_CS, MSR_TYPE_RW);
->   	vmx_disable_intercept_for_msr(vcpu, MSR_IA32_SYSENTER_ESP, MSR_TYPE_RW);
->   	vmx_disable_intercept_for_msr(vcpu, MSR_IA32_SYSENTER_EIP, MSR_TYPE_RW);
+> It isn't a requirement and the drivers needn't follow strictly. I checked
+> several drivers before looking into the patch and found almost all the
+> drivers have VM_PFNMAP set at mmap() time. In drivers/vfio/vfio-pci.c,
+> there is a comment as below, but it doesn't reveal too much about why
+> we can't set VM_PFNMAP at fault time.
 > 
+> static int vfio_pci_mmap(void *device_data, struct vm_area_struct *vma)
+> {
+>       :
+>         /*
+>          * See remap_pfn_range(), called from vfio_pci_fault() but we can't
+>          * change vm_flags within the fault handler.  Set them now.
+>          */
+>         vma->vm_flags |= VM_IO | VM_PFNMAP | VM_DONTEXPAND | VM_DONTDUMP;
+>         vma->vm_ops = &vfio_pci_mmap_ops;
+> 
+>         return 0;
+> }
+> 
+> To set these flags in advance does have advantages. For example,
+> VM_DONTEXPAND prevents the vma to be merged with another
+> one. VM_DONTDUMP make this vma isn't eligible for
+> coredump. Otherwise, the address space, which is associated with the
+> vma is accessed and unnecessary page faults are triggered on
+> coredump.  VM_IO and VM_PFNMAP avoids to walk the page frames
+> associated with the vma since we don't have valid PFN in the
+> mapping.
 
+But PCI clearly isn't the case we are dealing with here, and not
+everything is VFIO either. I can *today* create a driver that
+implements a mmap+fault handler, call mmap() on it, pass the result to
+a memslot, and get to the exact same result Santosh describes.
+
+No PCI, no VFIO, just a random driver. We are *required* to handle
+that.
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
