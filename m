@@ -2,176 +2,114 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6F361367684
-	for <lists+kvm@lfdr.de>; Thu, 22 Apr 2021 02:53:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B10B436768B
+	for <lists+kvm@lfdr.de>; Thu, 22 Apr 2021 02:55:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238587AbhDVAxm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 21 Apr 2021 20:53:42 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:37758 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S235168AbhDVAxl (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 21 Apr 2021 20:53:41 -0400
-Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 13M0Wm4T119475;
-        Wed, 21 Apr 2021 20:53:07 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=+gGUx1sNshe+I44p8sIGmfmHRCxtWareHWcSohlwfVA=;
- b=p/AVgeSkiQBGeUovP4pUrLt4id5LOAIW4GKWIVEYqkEsnGRM5ogZDcSNZasHmXzNuVrM
- s1V34Q626wDdmqc9mQxGsysfHm6MPdf57VftCpr729QtAhxVKSpDOslTiEm31Nfc89zw
- zJxuLI2ibokYsPpHGJ5hWTRRj0tRgdSpAAnPynopfKYMEjNCAQCxMb16iKMq+dFp4du4
- YjFvxcply2QvlstqSeSb+Xc8C0v+ZSVsReDOqTxWvWXYhDwlVuW9gb31eVjEQ9fJ/usx
- Kx+wkJX0YlMLbXU0HdLn95Cl5QkPd66PbRCTQn0M1BQV4l88JJeVrRarCua++M2RHtGv QA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 382xh08kv5-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 21 Apr 2021 20:53:07 -0400
-Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 13M0YOvH125903;
-        Wed, 21 Apr 2021 20:53:07 -0400
-Received: from ppma06fra.de.ibm.com (48.49.7a9f.ip4.static.sl-reverse.com [159.122.73.72])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 382xh08kuj-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 21 Apr 2021 20:53:06 -0400
-Received: from pps.filterd (ppma06fra.de.ibm.com [127.0.0.1])
-        by ppma06fra.de.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 13M0laQg015086;
-        Thu, 22 Apr 2021 00:53:04 GMT
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
-        by ppma06fra.de.ibm.com with ESMTP id 37ypxh9dr7-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 22 Apr 2021 00:53:04 +0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 13M0r0dJ31785304
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 22 Apr 2021 00:53:01 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id E11CAAE051;
-        Thu, 22 Apr 2021 00:53:00 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 6C2F9AE045;
-        Thu, 22 Apr 2021 00:53:00 +0000 (GMT)
-Received: from li-e979b1cc-23ba-11b2-a85c-dfd230f6cf82 (unknown [9.171.31.18])
-        by d06av26.portsmouth.uk.ibm.com (Postfix) with SMTP;
-        Thu, 22 Apr 2021 00:53:00 +0000 (GMT)
-Date:   Thu, 22 Apr 2021 02:52:58 +0200
-From:   Halil Pasic <pasic@linux.ibm.com>
-To:     Eric Farman <farman@linux.ibm.com>
-Cc:     Cornelia Huck <cohuck@redhat.com>,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        Jared Rossi <jrossi@linux.ibm.com>, linux-s390@vger.kernel.org,
-        kvm@vger.kernel.org
-Subject: Re: [RFC PATCH v4 0/4] vfio-ccw: Fix interrupt handling for
- HALT/CLEAR
-Message-ID: <20210422025258.6ed7619d.pasic@linux.ibm.com>
-In-Reply-To: <20210413182410.1396170-1-farman@linux.ibm.com>
-References: <20210413182410.1396170-1-farman@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+        id S240060AbhDVA4K (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 21 Apr 2021 20:56:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54634 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235168AbhDVA4F (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 21 Apr 2021 20:56:05 -0400
+Received: from mail-oi1-x230.google.com (mail-oi1-x230.google.com [IPv6:2607:f8b0:4864:20::230])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BC183C06174A;
+        Wed, 21 Apr 2021 17:55:30 -0700 (PDT)
+Received: by mail-oi1-x230.google.com with SMTP id e25so14274016oii.2;
+        Wed, 21 Apr 2021 17:55:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=JLBiD4Tk04qTKkjyIW7B4SXWL4eElYN21Iltqq+dkjI=;
+        b=nVSKhA9jbTCQXGKT9VEE2jEn9daDPmQnc92m0FSOt8YqSlv3yQb6ws/3JSWDjA2tF4
+         URaAqnxyWUbM8qaopN5nwaRlzd1eiNwSJJayX+TsXYUYLxUmbET+V/sVItEQAsRa/JOH
+         O0DdNZYQrIJAU6vtrXXlpUkUWNa81+4v2CRF9kAny2YZmV6u577kuFkg8JbEVp2BS+Wg
+         vziVMn/vIVXLdU7zeLMQRMCj9APbZwUgQZcV9BcVRXMib60qb1QoZWXWedM74ucClHfO
+         GkTiCPcJPj0s+8lYligf6uMmfwgWbJ2TdmbGhPkZM3zIa3wDkQt+gIz+X0jvWiIKHDCK
+         A+jg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=JLBiD4Tk04qTKkjyIW7B4SXWL4eElYN21Iltqq+dkjI=;
+        b=qCpmiBBW95ftMzM+qPmAxedHROqRXvbP2lrubbCdmxi8xPP5lpd4WmBMzbPJN18wCU
+         bXxH5FzLBzQMoiH6WygK5yIXP1xFFQk0axsyg8wxUa23vfal5wYzzI9WL1whchIaU8yn
+         ddr8NcgI5qpjtaKQD93qIVYnll4j6uYZMhmUosfNOpAtNjMnanUKKlS6CM4b/6Lb7o7w
+         efbRBDtdnErfCydeMursjMOz1vHOVM+K0rQL26KVJR5w2LRrkeUzrf+Iv5tG4OTEDpBv
+         mUEGVxKu29z0S9QiCEZmloOQBRAWjohDhvzCDPbfyg0tNuljM80IAcOa+L2Wy5Xqm2io
+         jf+w==
+X-Gm-Message-State: AOAM532BW309X5HVFXutW7kZNdwcaxuHADe1EqvqfM4MgWgr759oehh1
+        4CwzRsIlLV05K2NlLxmDUKMtdGKQ6ZtUyyd2IzI=
+X-Google-Smtp-Source: ABdhPJzSxmMzr0fgRvT7YYexSh2vvSZM5cj/lAd32qu5bVc6ek/0yb56L5ty29OxkkiSZ6r3NXeYsd49EzjGDqaf9gE=
+X-Received: by 2002:a05:6808:5c5:: with SMTP id d5mr8509578oij.141.1619052930189;
+ Wed, 21 Apr 2021 17:55:30 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: -tn7Dq0vjRQVrJu2iUUvQnQBCSMVUaFa
-X-Proofpoint-ORIG-GUID: qD3C3reA9tJhAPzsvP5tNF2bkiRCPTE7
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.761
- definitions=2021-04-21_08:2021-04-21,2021-04-21 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 mlxscore=0
- adultscore=0 lowpriorityscore=0 malwarescore=0 suspectscore=0 spamscore=0
- impostorscore=0 clxscore=1015 priorityscore=1501 mlxlogscore=999
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2104060000 definitions=main-2104220003
+References: <20210421150831.60133-1-kentaishiguro@sslab.ics.keio.ac.jp>
+In-Reply-To: <20210421150831.60133-1-kentaishiguro@sslab.ics.keio.ac.jp>
+From:   Wanpeng Li <kernellwp@gmail.com>
+Date:   Thu, 22 Apr 2021 08:55:18 +0800
+Message-ID: <CANRm+Cw1hNauuWGXOazpJ=s0tb6C-iQx=CZY92SPTDSEaT7jAw@mail.gmail.com>
+Subject: Re: [RFC PATCH 0/2] Mitigating Excessive Pause-Loop Exiting in
+ VM-Agnostic KVM
+To:     Kenta Ishiguro <kentaishiguro@sslab.ics.keio.ac.jp>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        David Hildenbrand <david@redhat.com>,
+        kvm <kvm@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>,
+        pl@sslab.ics.keio.ac.jp, kono@sslab.ics.keio.ac.jp
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 13 Apr 2021 20:24:06 +0200
-Eric Farman <farman@linux.ibm.com> wrote:
+On Thu, 22 Apr 2021 at 06:13, Kenta Ishiguro
+<kentaishiguro@sslab.ics.keio.ac.jp> wrote:
+>
+> Dear KVM developers and maintainers,
+>
+> In our research work presented last week at the VEE 2021 conference [1], we
+> found out that a lot of continuous Pause-Loop-Exiting (PLE) events occur
+> due to three problems we have identified: 1) Linux CFS ignores hints from
+> KVM; 2) IPI receiver vCPUs in user-mode are not boosted; 3) IPI-receiver
+> that has halted is always a candidate for boost.  We have intoduced two
+> mitigations against the problems.
+>
+> To solve problem (1), patch 1 increases the vruntime of yielded vCPU to
+> pass the check `if (cfs_rq->next && wakeup_preempt_entity(cfs_rq->next,
+> left) < 1)` in `struct sched_entity * pick_next_entity()` if the cfs_rq's
+> skip and next are both vCPUs in the same VM. To keep fairness it does not
+> prioritize the guest VM which causes PLE, however it improves the
+> performance by eliminating unnecessary PLE. Also we have confirmed
+> `yield_to_task_fair` is called only from KVM.
+>
+> To solve problems (2) and (3), patch 2 monitors IPI communication between
+> vCPUs and leverages the relationship between vCPUs to select boost
+> candidates.  The "[PATCH] KVM: Boost vCPU candidiate in user mode which is
+> delivering interrupt" patch
+> (https://lore.kernel.org/kvm/CANRm+Cy-78UnrkX8nh5WdHut2WW5NU=UL84FRJnUNjsAPK+Uww@mail.gmail.com/T/)
+> seems to be effective for (2) while it only uses the IPI receiver
+> information.
+>
+> Our approach reduces the total number of PLE events by up to 87.6 % in four
+> 8-vCPU VMs in over-subscribed scenario with the Linux kernel 5.6.0. Please
+> find the patch below.
 
-> Hi Conny, Halil,
-> 
-> Let's restart our discussion about the collision between interrupts for
-> START SUBCHANNEL and HALT/CLEAR SUBCHANNEL. It's been a quarter million
-> minutes (give or take), so here is the problematic scenario again:
-> 
-> 	CPU 1			CPU 2
->  1	CLEAR SUBCHANNEL
->  2	fsm_irq()
->  3				START SUBCHANNEL
->  4	vfio_ccw_sch_io_todo()
->  5				fsm_irq()
->  6				vfio_ccw_sch_io_todo()
-> 
-> From the channel subsystem's point of view the CLEAR SUBCHANNEL (step 1)
-> is complete once step 2 is called, as the Interrupt Response Block (IRB)
-> has been presented and the TEST SUBCHANNEL was driven by the cio layer.
-> Thus, the START SUBCHANNEL (step 3) is submitted [1] and gets a cc=0 to
-> indicate the I/O was accepted. However, step 2 stacks the bulk of the
-> actual work onto a workqueue for when the subchannel lock is NOT held,
-> and is unqueued at step 4. That code misidentifies the data in the IRB
-> as being associated with the newly active I/O, and may release memory
-> that is actively in use by the channel subsystem and/or device. Eww.
-> 
-> In this version...
-> 
-> Patch 1 and 2 are defensive checks. Patch 2 was part of v3 [2], but I
-> would love a better option here to guard between steps 2 and 4.
-> 
-> Patch 3 is a subset of the removal of the CP_PENDING FSM state in v3.
-> I've obviously gone away from this idea, but I thought this piece is
-> still valuable.
-> 
-> Patch 4 collapses the code on the interrupt path so that changes to
-> the FSM state and the channel_program struct are handled at the same
-> point, rather than separated by a mutex boundary. Because of the
-> possibility of a START and HALT/CLEAR running concurrently, it does
-> not make sense to split them here.
-> 
-> With the above patches, maybe it then makes sense to hold the io_mutex
-> across the entirety of vfio_ccw_sch_io_todo(). But I'm not completely
-> sure that would be acceptable.
-> 
-> So... Thoughts?
+You should mention that this improvement mainly comes from your
+problems (1) scheduler hacking, however, kvm task is just an ordinary
+task and scheduler maintainer always does not accept special
+treatment.  the worst case for problems (1) mentioned in your paper, I
+guess it is vCPU stacking issue, I try to mitigate it before
+(https://lore.kernel.org/kvm/1564479235-25074-1-git-send-email-wanpengli@tencent.com/).
+For your problems (3), we evaluate hackbench which is heavily
+contended rq locks and heavy async ipi(reschedule ipi), the async ipi
+influence is around 0.X%, I don't expect normal workloads can feel any
+affected. In addition, four 8-vCPU VMs are not suitable for
+scalability evaluation. I don't think the complex which is introduced
+by your patch 2 is worth it since it gets a similar effect as my
+version w/ current heuristic algorithm.
 
-I believe we should address the concurrency, encapsulation and layering
-issues in the subchannel/ccw pass-through code (vfio-ccw) by taking a
-holistic approach as soon as possible.
-
-I find the current state of art very hard to reason about, and that
-adversely  affects my ability to reason about attempts at partial
-improvements.
-
-I understand that such a holistic approach needs a lot of work, and we
-may have to stop some bleeding first. In the stop the bleeding phase we
-can take a pragmatic approach and accept changes that empirically seem to
-work towards stopping the bleeding. I.e. if your tests say it's better,
-I'm willing to accept that it is better.
-
-I have to admit, I don't understand how synchronization is done in the
-vfio-ccw kernel module (in the sense of avoiding data races).
-
-Regarding your patches, I have to admit, I have a hard time figuring out
-which one of these (or what combination of them) is supposed to solve
-the problem you described above. If I had to guess, I would guess it is
-either patch 4, because it has a similar scenario diagram in the
-commit message like the one in the problem statement. Is my guess right?
-
-If it is right I don't quite understand the mechanics of the fix,
-because what the patch seems to do is changing the content of step 4 in
-the above diagram. And I don't see how is change that code
-so that it does not "misidentifies the data in the IRB as being
-associated with the newly active I/O". Moreover patch 4 seems to rely on
-private->state which, AFAIR is still used in a racy fashion.
-
-But if strong empirical evidence shows that it performs better (stops
-the bleeding), I think we can go ahead with it.
-
-Regards,
-Halil
-
-
-
-
-
-
-
+    Wanpeng
