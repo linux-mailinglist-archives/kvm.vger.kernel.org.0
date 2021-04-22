@@ -2,50 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E34A53678C9
-	for <lists+kvm@lfdr.de>; Thu, 22 Apr 2021 06:40:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5D7C13678CD
+	for <lists+kvm@lfdr.de>; Thu, 22 Apr 2021 06:43:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229636AbhDVEkg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 22 Apr 2021 00:40:36 -0400
-Received: from ozlabs.org ([203.11.71.1]:53873 "EHLO ozlabs.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229441AbhDVEkf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 22 Apr 2021 00:40:35 -0400
+        id S229636AbhDVEnp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 22 Apr 2021 00:43:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47992 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229441AbhDVEnp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 22 Apr 2021 00:43:45 -0400
+Received: from ozlabs.org (ozlabs.org [IPv6:2401:3900:2:1::2])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C6932C06174A;
+        Wed, 21 Apr 2021 21:43:10 -0700 (PDT)
 Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
         (No client certificate requested)
-        by mail.ozlabs.org (Postfix) with ESMTPSA id 4FQl8G53X5z9sRf;
-        Thu, 22 Apr 2021 14:39:57 +1000 (AEST)
+        by mail.ozlabs.org (Postfix) with ESMTPSA id 4FQlCv3cjKz9sRf;
+        Thu, 22 Apr 2021 14:43:07 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=canb.auug.org.au;
-        s=201702; t=1619066399;
-        bh=gytcSQ0EK1A2/+Z/7YRsitFG89wvMlfVFxtZpQz7+Do=;
+        s=201702; t=1619066588;
+        bh=Syn3qr1PGDyaL7XmaVT1PyuJyg2wGJIrvrm3IwZB9/I=;
         h=Date:From:To:Cc:Subject:From;
-        b=oi7ot3VlB0LJnu8c+jxixbdFRQPWaz1M5SDl2JQdE6yWZTeU4ngUXMbY1G1GXbzZ0
-         SQtVxrOABbsDhhC0BsD0UoZG5jmkrx4zEevSHELyHHekwAuvrvF5h+KtTvvnHtufU/
-         fH3ayb9bbe0MVRzvOgQFKbKzqbRxy4YDu7mq+hgFtptml9z7fmIiMMNcw0zduLRKqT
-         RkDdUB3rwpSnspYdDR9+Bep4FzV8d6uU3ruK0crjkQRkJPwPx9Xzx1PkNsBL1azoTz
-         eVO0NGPL4NjJltfxgUxjkSYq+YytjeSTA2KDbTxlEL4KtsobQDWp++k6wEKyU4szMd
-         PRNBAQstqPvFg==
-Date:   Thu, 22 Apr 2021 14:39:56 +1000
+        b=sjr939eeh1tu6S1HQ8xL1IF2UkOCCXHcRufsWcYgvMEgeihcYVUu+EmAVscVkXzva
+         oPS4d2exLKuT1tf63ti42cBKqoWUUwuZuSj0NYjg28ARw+GmywYsOVGF0QbxH9aJsJ
+         Ta8wJcASNcTEBOjOKx0F4HCSXOd9C1bKttVO7yXOzR0W3xKGmVHQNtwrRvsNTlTK/z
+         qcWualdC+PUqz36zvQGaTxNbj3zx/qG1v4eOvisK+T2ZSVnEVn6nMIVr/1uXywf2ut
+         cEI9C8rPR7we+t0WXUiYO62mQm8yxC2aYXibSZGcSeHFExjOuN3qIWb1isZuyoICVG
+         yle9h+UC440iQ==
+Date:   Thu, 22 Apr 2021 14:43:06 +1000
 From:   Stephen Rothwell <sfr@canb.auug.org.au>
 To:     Christoffer Dall <cdall@cs.columbia.edu>,
         Marc Zyngier <maz@kernel.org>,
         Paolo Bonzini <pbonzini@redhat.com>, KVM <kvm@vger.kernel.org>
-Cc:     Emanuele Giuseppe Esposito <eesposit@redhat.com>,
-        Jianyong Wu <jianyong.wu@arm.com>,
+Cc:     Jianyong Wu <jianyong.wu@arm.com>, Kai Huang <kai.huang@intel.com>,
         Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Next Mailing List <linux-next@vger.kernel.org>
+        Linux Next Mailing List <linux-next@vger.kernel.org>,
+        Maxim Levitsky <mlevitsk@redhat.com>,
+        Nathan Tempelman <natet@google.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Sean Christopherson <seanjc@google.com>
 Subject: linux-next: manual merge of the kvm-arm tree with the kvm tree
-Message-ID: <20210422143956.5a43d00a@canb.auug.org.au>
+Message-ID: <20210422144306.3ec8cfdb@canb.auug.org.au>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/=oiWDzj.pqXgWaGtuj6Jipk";
+Content-Type: multipart/signed; boundary="Sig_/sb04XD1HIWOi_j8MCbcn=hh";
  protocol="application/pgp-signature"; micalg=pgp-sha256
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
---Sig_/=oiWDzj.pqXgWaGtuj6Jipk
+--Sig_/sb04XD1HIWOi_j8MCbcn=hh
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 
@@ -53,11 +59,14 @@ Hi all,
 
 Today's linux-next merge of the kvm-arm tree got a conflict in:
 
-  Documentation/virt/kvm/api.rst
+  include/uapi/linux/kvm.h
 
-between commit:
+between commits:
 
-  24e7475f931a ("doc/virt/kvm: move KVM_CAP_PPC_MULTITCE in section 8")
+  8b13c36493d8 ("KVM: introduce KVM_CAP_SET_GUEST_DEBUG2")
+  fe7e948837f3 ("KVM: x86: Add capability to grant VM access to privileged =
+SGX attribute")
+  54526d1fd593 ("KVM: x86: Support KVM VMs sharing SEV context")
 
 from the kvm tree and commit:
 
@@ -76,65 +85,37 @@ complex conflicts.
 Cheers,
 Stephen Rothwell
 
-diff --cc Documentation/virt/kvm/api.rst
-index ee3446bf2a01,3f210953c135..000000000000
---- a/Documentation/virt/kvm/api.rst
-+++ b/Documentation/virt/kvm/api.rst
-@@@ -6744,28 -6738,12 +6757,38 @@@ The KVM_XEN_HVM_CONFIG_RUNSTATE flag in
-  features KVM_XEN_VCPU_ATTR_TYPE_RUNSTATE_ADDR/_CURRENT/_DATA/_ADJUST are
-  supported by the KVM_XEN_VCPU_SET_ATTR/KVM_XEN_VCPU_GET_ATTR ioctls.
+diff --cc include/uapi/linux/kvm.h
+index d76533498543,0e0f70c0d0dc..000000000000
+--- a/include/uapi/linux/kvm.h
++++ b/include/uapi/linux/kvm.h
+@@@ -1078,9 -1078,7 +1078,10 @@@ struct kvm_ppc_resize_hpt=20
+  #define KVM_CAP_DIRTY_LOG_RING 192
+  #define KVM_CAP_X86_BUS_LOCK_EXIT 193
+  #define KVM_CAP_PPC_DAWR1 194
+ -#define KVM_CAP_PTP_KVM 195
+ +#define KVM_CAP_SET_GUEST_DEBUG2 195
+ +#define KVM_CAP_SGX_ATTRIBUTE 196
+ +#define KVM_CAP_VM_COPY_ENC_CONTEXT_FROM 197
+++#define KVM_CAP_PTP_KVM 198
  =20
- -8.31 KVM_CAP_PTP_KVM
- +8.31 KVM_CAP_PPC_MULTITCE
- +-------------------------
- +
- +:Capability: KVM_CAP_PPC_MULTITCE
- +:Architectures: ppc
- +:Type: vm
- +
- +This capability means the kernel is capable of handling hypercalls
- +H_PUT_TCE_INDIRECT and H_STUFF_TCE without passing those into the user
- +space. This significantly accelerates DMA operations for PPC KVM guests.
- +User space should expect that its handlers for these hypercalls
- +are not going to be called if user space previously registered LIOBN
- +in KVM (via KVM_CREATE_SPAPR_TCE or similar calls).
- +
- +In order to enable H_PUT_TCE_INDIRECT and H_STUFF_TCE use in the guest,
- +user space might have to advertise it for the guest. For example,
- +IBM pSeries (sPAPR) guest starts using them if "hcall-multi-tce" is
- +present in the "ibm,hypertas-functions" device-tree property.
- +
- +The hypercalls mentioned above may or may not be processed successfully
- +in the kernel based fast path. If they can not be handled by the kernel,
- +they will get passed on to user space. So user space still has to have
- +an implementation for these despite the in kernel acceleration.
- +
- +This capability is always enabled.
-++
-++8.32 KVM_CAP_PTP_KVM
-+ --------------------
-+=20
-+ :Architectures: arm64
-+=20
-+ This capability indicates that the KVM virtual PTP service is
-+ supported in the host. A VMM can check whether the service is
-+ available to the guest on migration.
-+=20
+  #ifdef KVM_CAP_IRQ_ROUTING
+ =20
 
---Sig_/=oiWDzj.pqXgWaGtuj6Jipk
+--Sig_/sb04XD1HIWOi_j8MCbcn=hh
 Content-Type: application/pgp-signature
 Content-Description: OpenPGP digital signature
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmCA/hwACgkQAVBC80lX
-0GyIjwf/YPnoOnaIgaC8Xd9bRX01z2AHcpCdT47MVpd8fOgbfYIvtjLlYtkESyWl
-Mq/NcUPyWj+mZgHSH9gcf1WU6sqWfHpkhdJsrOQ+6tHm+JPyk3izXmp679YrDVDp
-WGGItboYI7XGBoNhZIwlJNol0BmtW5EhEdyqnNTAeRgVnxWiOCWB82mal7mv73/V
-W+qsLXe/EE7auftJvCS6OxoYMTg/PBgSK0TuBJGZUsMoeADKeGxLuydxazs9mPhE
-sm5lEQ1+G44Q1x2I2YkV6ieYO9KNKlk/3F2qu7nenSGXaYOZmk2NEPhNKDHyqHqu
-geoBjrGN5R0XSvV4ph+mBzCUPe/gMQ==
-=9tep
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmCA/toACgkQAVBC80lX
+0GyQ5Af/cJPoH5o4xEZAM/aCQpJpa8WwLJWn6uRoukB9Srn499nhUOcvtvLhHM/H
+ssXkz+SjsQcYB7zUbRXUEVA0qHuRdhMdvs2lNP3HiltO2JIBv8iXKcNMUg4AssN+
+FjTjJmBKS7SQPAu8E8r4OhkZX7kWr2bN3C4xYCkTwEv5DaMwx9UFpyey1fUkR9BY
+RrViKUU3C0fs/KLQD08YGwEk9Zm4jakwkRkHWnqPEKRl6Clcex8HiOq2gK2DIPo4
+SFtw5u2DuIm35EG8d1DoecHEfi/uN7zy33YTOxhxV+mlu2dr52Y/ltNRFHoi3rcU
+5kdZ/+mOt0fDdWA6x+QWU4bb9700bQ==
+=kKxv
 -----END PGP SIGNATURE-----
 
---Sig_/=oiWDzj.pqXgWaGtuj6Jipk--
+--Sig_/sb04XD1HIWOi_j8MCbcn=hh--
