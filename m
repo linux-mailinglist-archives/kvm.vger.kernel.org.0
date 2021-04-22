@@ -2,150 +2,80 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A70C5367EA5
-	for <lists+kvm@lfdr.de>; Thu, 22 Apr 2021 12:31:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D5DD5367EAC
+	for <lists+kvm@lfdr.de>; Thu, 22 Apr 2021 12:32:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235755AbhDVKad (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 22 Apr 2021 06:30:33 -0400
-Received: from mx13.kaspersky-labs.com ([91.103.66.164]:62670 "EHLO
-        mx13.kaspersky-labs.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230270AbhDVKad (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 22 Apr 2021 06:30:33 -0400
-Received: from relay13.kaspersky-labs.com (unknown [127.0.0.10])
-        by relay13.kaspersky-labs.com (Postfix) with ESMTP id 89125520F5B;
-        Thu, 22 Apr 2021 13:29:56 +0300 (MSK)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kaspersky.com;
-        s=mail202102; t=1619087396;
-        bh=gJ/b/xwdSVpAeKgXpj2z9DnCJJYMjVhcutsivV4jIkI=;
-        h=Subject:To:From:Message-ID:Date:MIME-Version:Content-Type;
-        b=46n0d7GcTC/DtZ4ug9hLxZavNm3XtWUYB5Agtxf8YzYw9c0FrFGwHufOtD4XaaU7C
-         PduJnoEmWuUwD0PJK3C6cDK1EsFOaWR9yJ4twT0uMK89Jni5z2oSjamCLHDACbwm3N
-         1uuUEIS0JSR7W3R3pI4VmSLVUVca11fFOxGBtHWflaNQPrUbUqZwnV7tTR6iv1ZXy0
-         F1HKhMNf7lWDRlGvfNdP7nBcqC/iW6GfSFM4rWBrEYcg0w0mkZr9slmTBO17WtJt6v
-         vgxcYCHvUxSxIH6hL7hcV4MdHbdXYUQgP2JtK6ScPCqaDcr10Lqb/FW9VWh0SH1YiZ
-         M1uiBwoJAA7bQ==
-Received: from mail-hq2.kaspersky.com (unknown [91.103.66.206])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
-        (Client CN "mail-hq2.kaspersky.com", Issuer "Kaspersky MailRelays CA G3" (verified OK))
-        by mailhub13.kaspersky-labs.com (Postfix) with ESMTPS id DDAED520D77;
-        Thu, 22 Apr 2021 13:29:55 +0300 (MSK)
-Received: from [10.16.171.77] (10.64.64.121) by hqmailmbx3.avp.ru
- (10.64.67.243) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2176.2; Thu, 22
- Apr 2021 13:29:54 +0300
-Subject: Re: [RFC PATCH v8 00/19] virtio/vsock: introduce SOCK_SEQPACKET
- support
-To:     Stefano Garzarella <sgarzare@redhat.com>
-CC:     Stefan Hajnoczi <stefanha@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Jorgen Hansen <jhansen@vmware.com>,
-        Colin Ian King <colin.king@canonical.com>,
-        Andra Paraschiv <andraprs@amazon.com>,
-        Norbert Slusarek <nslusarek@gmx.net>,
-        Alexander Popov <alex.popov@linux.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "stsp2@yandex.ru" <stsp2@yandex.ru>,
-        "oxffffaa@gmail.com" <oxffffaa@gmail.com>
-References: <20210413123954.3396314-1-arseny.krasnov@kaspersky.com>
- <20210421095213.25hnfi2th7gzyzt2@steredhat>
- <2c3d0749-0f41-e064-0153-b6130268add2@kaspersky.com>
- <20210422084638.bvblk33b4oi6cec6@steredhat>
- <bfefdd94-a84f-8bed-331e-274654a7426f@kaspersky.com>
- <20210422100217.jmpgevtrukqyukfo@steredhat>
-From:   Arseny Krasnov <arseny.krasnov@kaspersky.com>
-Message-ID: <bc649d1b-80d8-835c-6f47-8a7d402dd0b7@kaspersky.com>
-Date:   Thu, 22 Apr 2021 13:29:54 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        id S235099AbhDVKdY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 22 Apr 2021 06:33:24 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:46881 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230270AbhDVKdU (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 22 Apr 2021 06:33:20 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1619087565;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=h2Btu50h2SmkA6z4GjSXki84Hb6VYRx9g1fp8/EHavQ=;
+        b=Jvn27a66OfZ5cRWTZfRZLbTZaGj3lDO2XDvkO5ZOoAiM6ANTGgvVeR31KkFHot2tTcg8Tj
+        w4FRg/OqXL4OjW+6UgqW1Pa1bzRy7wEsABvMlKr0HeD7OGAt1llB1a7RLV5LTaE/AE/631
+        iFom+6IKcy7e/YRw7ptlGv8habknLZU=
+Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
+ [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-423-2MZAXXIsNoSxsnGI410m2Q-1; Thu, 22 Apr 2021 06:32:32 -0400
+X-MC-Unique: 2MZAXXIsNoSxsnGI410m2Q-1
+Received: by mail-ed1-f70.google.com with SMTP id f1-20020a0564021941b02903850806bb32so10554335edz.9
+        for <kvm@vger.kernel.org>; Thu, 22 Apr 2021 03:32:32 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=h2Btu50h2SmkA6z4GjSXki84Hb6VYRx9g1fp8/EHavQ=;
+        b=FD5+V15LwDU77kxI0hnMQwJzuYuMDnbSpkDqiJ0H+gQWJ5dDTMsOwHnmHd0HKl/Qh8
+         vvkPStqn6dQqPMpeK0IzEyrcjQvwVrtpa3VIQQvAIBBo/rowGmksW6XoYdJd8LeA7zlC
+         oiZ3zVey4ttYmOji8Ukfrdv9Nkv8ev+pjzb70qgmsRpPq5eMmzmVhyX9fXTsS2VLAwBI
+         iHwOSp5YoPDaI/md/8wQTRNfwaRh9ZlpRzELFSfm/AKY/pzQDG+THv9WV6ZluQzAjq+9
+         th9tuSOGkDwRar7OmPc08ZXhv1KOfxhknfPWaxsIlnKPmKx/blvR2Pko8C8aTxeZ59KG
+         06uw==
+X-Gm-Message-State: AOAM530TDV5NfgAjbsaLvg1/9NxAKStf6T2squIzkLI7YLOULcqFdYKz
+        +rcxq3/uH5mnw2K6a0eRYEwgdJ93FyAV+pah9Od4aaJk5OUHnnkQmMSteiSBomyf8l5P+omk/dh
+        OO7OdHLdVVRcP5V30NN44xFMrzu/kI2tIEd1sCnpwUuRPrnS5/OAfHntUvqMXspR9
+X-Received: by 2002:a05:6402:4415:: with SMTP id y21mr2992843eda.115.1619087551431;
+        Thu, 22 Apr 2021 03:32:31 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzGpHYpjBFfvyP7Lg2zIFzafNgD93IfoeIRSYOOV+HRic/18Kk1ss7n0Z4liuKwtsK+ie2VXQ==
+X-Received: by 2002:a05:6402:4415:: with SMTP id y21mr2992826eda.115.1619087551271;
+        Thu, 22 Apr 2021 03:32:31 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id a22sm1738851edu.14.2021.04.22.03.32.29
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 22 Apr 2021 03:32:30 -0700 (PDT)
+Subject: Re: [kvm-unit-tests PATCH 12/14] x86: msr: Verify 64-bit only MSRs
+ fault on 32-bit hosts
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     kvm@vger.kernel.org
+References: <20210422030504.3488253-1-seanjc@google.com>
+ <20210422030504.3488253-13-seanjc@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <f08a4adc-79aa-e38e-208d-3103181cfec7@redhat.com>
+Date:   Thu, 22 Apr 2021 12:32:29 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.7.0
 MIME-Version: 1.0
-In-Reply-To: <20210422100217.jmpgevtrukqyukfo@steredhat>
-Content-Type: text/plain; charset="windows-1252"
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <20210422030504.3488253-13-seanjc@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-X-Originating-IP: [10.64.64.121]
-X-ClientProxiedBy: hqmailmbx2.avp.ru (10.64.67.242) To hqmailmbx3.avp.ru
- (10.64.67.243)
-X-KSE-ServerInfo: hqmailmbx3.avp.ru, 9
-X-KSE-AntiSpam-Interceptor-Info: scan successful
-X-KSE-AntiSpam-Version: 5.9.20, Database issued on: 04/22/2021 10:12:55
-X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
-X-KSE-AntiSpam-Method: none
-X-KSE-AntiSpam-Rate: 0
-X-KSE-AntiSpam-Info: Lua profiles 163280 [Apr 22 2021]
-X-KSE-AntiSpam-Info: Version: 5.9.20.0
-X-KSE-AntiSpam-Info: Envelope from: arseny.krasnov@kaspersky.com
-X-KSE-AntiSpam-Info: LuaCore: 442 442 b985cb57763b61d2a20abb585d5d4cc10c315b09
-X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
-X-KSE-AntiSpam-Info: kaspersky.com:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2
-X-KSE-AntiSpam-Info: Rate: 0
-X-KSE-AntiSpam-Info: Status: not_detected
-X-KSE-AntiSpam-Info: Method: none
-X-KSE-Antiphishing-Info: Clean
-X-KSE-Antiphishing-ScanningType: Deterministic
-X-KSE-Antiphishing-Method: None
-X-KSE-Antiphishing-Bases: 04/22/2021 10:15:00
-X-KSE-AttachmentFiltering-Interceptor-Info: no applicable attachment filtering
- rules found
-X-KSE-Antivirus-Interceptor-Info: scan successful
-X-KSE-Antivirus-Info: Clean, bases: 22.04.2021 7:02:00
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
-X-KSE-AttachmentFiltering-Interceptor-Info: no applicable attachment filtering
- rules found
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
-X-KLMS-Rule-ID: 52
-X-KLMS-Message-Action: clean
-X-KLMS-AntiSpam-Status: not scanned, disabled by settings
-X-KLMS-AntiSpam-Interceptor-Info: not scanned
-X-KLMS-AntiPhishing: Clean, bases: 2021/04/22 09:51:00
-X-KLMS-AntiVirus: Kaspersky Security for Linux Mail Server, version 8.0.3.30, bases: 2021/04/22 07:02:00 #16598851
-X-KLMS-AntiVirus-Status: Clean, skipped
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On 22/04/21 05:05, Sean Christopherson wrote:
+> Force "cpu -host" so that CPUID can be used to check for 64-bit support.
 
-On 22.04.2021 13:02, Stefano Garzarella wrote:
-> On Thu, Apr 22, 2021 at 12:40:17PM +0300, Arseny Krasnov wrote:
->> On 22.04.2021 11:46, Stefano Garzarella wrote:
->>> On Wed, Apr 21, 2021 at 06:06:28PM +0300, Arseny Krasnov wrote:
->>>> Thank You, i'll prepare next version. Main question is: does this
->>>> approach(no SEQ_BEGIN, SEQ_END, 'msg_len' and 'msg_id') considered
->>>> good? In this case it will be easier to prepare final version, because
->>>> is smaller and more simple than previous logic. Also patch to spec
->>>> will be smaller.
->>> Yes, it's definitely much better than before.
->>>
->>> The only problem I see is that we add some overhead per fragment
->>> (header). We could solve that with the mergeable buffers that Jiang is
->>> considering for DGRAM.
->> If we are talking about receive, i think, i can reuse merge logic for
-> Yep, for TX the guest can potentially enqueue a big buffer.
-> Maybe it's still worth keeping a maximum size and fragmenting as we do 
-> now.
->
->> stream sockets, the only difference is that buffers are mergeable
->> until previous EOR(e.g. previous message) bit is found in rx queue.
->>
-> I got a little lost.
-> Can you elaborate more?
+"-cpu max" is preferred because it also works with QEMU binary 
+translation, otherwise looks good.  Someone can fix KVM if they're bored.
 
-I'm talking about 'virtio_transport_recv_enqueue()': it tries to copy
+Paolo
 
-data of new packet to buffer of tail packet in rx queue. In case of
-
-SEQPACKET i can reuse it, just adding logic that check EOR bit of
-
-tail packet.
-
->
-> Thanks,
-> Stefano
->
->
