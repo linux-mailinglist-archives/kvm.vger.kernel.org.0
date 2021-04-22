@@ -2,44 +2,44 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 91EFC36863D
-	for <lists+kvm@lfdr.de>; Thu, 22 Apr 2021 19:52:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D4CF536863E
+	for <lists+kvm@lfdr.de>; Thu, 22 Apr 2021 19:56:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236903AbhDVRx1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 22 Apr 2021 13:53:27 -0400
-Received: from userp2120.oracle.com ([156.151.31.85]:54078 "EHLO
-        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236762AbhDVRx0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 22 Apr 2021 13:53:26 -0400
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
-        by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 13MHo2wS090224;
-        Thu, 22 Apr 2021 17:52:48 GMT
+        id S236660AbhDVR5W (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 22 Apr 2021 13:57:22 -0400
+Received: from aserp2120.oracle.com ([141.146.126.78]:46822 "EHLO
+        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S236058AbhDVR5V (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 22 Apr 2021 13:57:21 -0400
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+        by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 13MHt1Zh128869;
+        Thu, 22 Apr 2021 17:56:37 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : from : to :
  cc : references : message-id : date : mime-version : in-reply-to :
  content-type : content-transfer-encoding; s=corp-2020-01-29;
- bh=LhDwt90eaZvon5rUc+tJE/t3SSwW/QKL6JAHVKq1Znc=;
- b=kJCfSPk9sanDNC5bcVWDcxwLV7eDXWswOuYnz3E83RBWo1Ie1bDOl2LBHI+CIxcFppAS
- gzeCLnnM81I5rrwocGmC/OF4k7U0XDCjUATe7b/ypn0l8M+WJtKAJpUuMhwzigukDcTa
- Gfr0SuLm37ZTAJtGRyZAoZWfaZ3Bf9GpOQwSQkLJ1A2K7Gq1CNTyZyFtSTdWpLndRUnG
- wt7Bp6seVWdcBiccWhoQDgWltDlEMPIwQ6o3JRFYVlnXPedDd7JrTscShLnaXGsiAo/y
- hh61mcWwNIgy2tc3TPBd/tQiElgTHThVAZnS02m/t2RRemNeJZ+lJ1tj+Higz+1VZYno ig== 
-Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
-        by userp2120.oracle.com with ESMTP id 38022y5kvu-1
+ bh=+eYHU4INq3bzBGpE+DXyPkvQC1OQIgdVUrexPZD3DTQ=;
+ b=y4eEFzZbux04DC/jXOdKr9LeADSpp+gx7J32BMsVxlfZZQ6/zGh1bXlExe+hLtAdzPB0
+ Kgnav5F8ikSTMkG6nAnibrgVohjR4dw7JDhw/9D7H/w1oTju3EKm+bU6Hl+o+rD334RV
+ EzTVdqw8v0fEakWBqiMVgoQaVczcjO5OM4tyNRxHt7etNZEhXz1uPbL12lXfF5nBCFDI
+ ayTkKqc0YTKNRyNa6/XhK3/MFAomEolDxrd0TwRobrhh0igOrZuJwAxs5Mr8VdRVIPXS
+ WZyv+0lVIR3m3/eduT3sH7VgUByzqakpJlDylsFSqiw1dxPa6ruORgDn7NveB7CcRFVk eA== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+        by aserp2120.oracle.com with ESMTP id 37yqmnp8j6-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 22 Apr 2021 17:52:47 +0000
-Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
-        by userp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 13MHoAc9087561;
-        Thu, 22 Apr 2021 17:52:47 GMT
-Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
-        by userp3030.oracle.com with ESMTP id 383cdrvdnf-1
+        Thu, 22 Apr 2021 17:56:37 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+        by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 13MHtrV4144817;
+        Thu, 22 Apr 2021 17:56:37 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+        by aserp3030.oracle.com with ESMTP id 383ccemb8s-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 22 Apr 2021 17:52:47 +0000
-Received: from abhmp0002.oracle.com (abhmp0002.oracle.com [141.146.116.8])
-        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 13MHqkM7009095;
-        Thu, 22 Apr 2021 17:52:46 GMT
+        Thu, 22 Apr 2021 17:56:37 +0000
+Received: from abhmp0005.oracle.com (abhmp0005.oracle.com [141.146.116.11])
+        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 13MHuamr002664;
+        Thu, 22 Apr 2021 17:56:36 GMT
 Received: from localhost.localdomain (/10.159.130.222)
         by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Thu, 22 Apr 2021 17:52:46 +0000
+        with ESMTP ; Thu, 22 Apr 2021 10:56:36 -0700
 Subject: Re: [PATCH 3/7 v7] KVM: nSVM: No need to set bits 11:0 in MSRPM and
  IOPM bitmaps
 From:   Krish Sadhukhan <krish.sadhukhan@oracle.com>
@@ -49,8 +49,8 @@ References: <20210412215611.110095-1-krish.sadhukhan@oracle.com>
  <20210412215611.110095-4-krish.sadhukhan@oracle.com>
  <YH8y86iPBdTwMT18@google.com>
  <058d78b9-eddd-95d9-e519-528ad7f2e40a@oracle.com>
-Message-ID: <ea03a5b5-adc2-c574-3d69-18df72cce6e6@oracle.com>
-Date:   Thu, 22 Apr 2021 10:52:38 -0700
+Message-ID: <cb1bb583-b8ac-ab3a-2bc3-dd3b416ee0e7@oracle.com>
+Date:   Thu, 22 Apr 2021 10:56:29 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.6.0
 MIME-Version: 1.0
@@ -59,18 +59,18 @@ Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
 Content-Language: en-US
 X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=9962 signatures=668683
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 spamscore=0 bulkscore=0
- suspectscore=0 mlxscore=0 malwarescore=0 mlxlogscore=999 phishscore=0
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 spamscore=0 suspectscore=0
+ mlxscore=0 phishscore=0 malwarescore=0 adultscore=0 mlxlogscore=999
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2104060000
- definitions=main-2104220134
-X-Proofpoint-ORIG-GUID: h1mtssgvxUHxLe5pfHqF6JMFe02nbOIY
-X-Proofpoint-GUID: h1mtssgvxUHxLe5pfHqF6JMFe02nbOIY
+ definitions=main-2104220135
+X-Proofpoint-ORIG-GUID: TV4PulFLmH0Ku9xNSOMbcEF1HJ_5reTx
+X-Proofpoint-GUID: TV4PulFLmH0Ku9xNSOMbcEF1HJ_5reTx
 X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=9962 signatures=668683
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 lowpriorityscore=0
- spamscore=0 bulkscore=0 phishscore=0 clxscore=1015 impostorscore=0
- mlxlogscore=999 adultscore=0 malwarescore=0 mlxscore=0 suspectscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2104060000
- definitions=main-2104220134
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 mlxscore=0 adultscore=0
+ impostorscore=0 spamscore=0 malwarescore=0 clxscore=1015
+ lowpriorityscore=0 priorityscore=1501 suspectscore=0 mlxlogscore=999
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2104060000 definitions=main-2104220135
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
@@ -133,8 +133,9 @@ On 4/22/21 10:50 AM, Krish Sadhukhan wrote:
 >
 > Aren't we actually using msrpm_base_pa from vmcb01 instead of vmcb02 ?
 
-Sorry, I meant to say:  Aren't we actually using msrpm_base_pa from 
-vmcb01 instead of vmcb12 ?
+
+Sorry, I meant to say,  "from vmcb01 instead of vmcb12"
+
 >
 >>>   }
 >>>     /*
