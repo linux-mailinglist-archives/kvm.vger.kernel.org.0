@@ -2,57 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7E38836775B
-	for <lists+kvm@lfdr.de>; Thu, 22 Apr 2021 04:22:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1FD9736775D
+	for <lists+kvm@lfdr.de>; Thu, 22 Apr 2021 04:22:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234193AbhDVCWS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 21 Apr 2021 22:22:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45288 "EHLO
+        id S234495AbhDVCWV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 21 Apr 2021 22:22:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45300 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234442AbhDVCWQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 21 Apr 2021 22:22:16 -0400
+        with ESMTP id S234504AbhDVCWT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 21 Apr 2021 22:22:19 -0400
 Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CEDF0C06138C
-        for <kvm@vger.kernel.org>; Wed, 21 Apr 2021 19:21:42 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id d89-20020a25a3620000b02904dc8d0450c6so18079482ybi.2
-        for <kvm@vger.kernel.org>; Wed, 21 Apr 2021 19:21:42 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4513FC06138B
+        for <kvm@vger.kernel.org>; Wed, 21 Apr 2021 19:21:45 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id f7-20020a5b0c070000b02904e9a56ee7e7so18175905ybq.9
+        for <kvm@vger.kernel.org>; Wed, 21 Apr 2021 19:21:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=reply-to:date:in-reply-to:message-id:mime-version:references
          :subject:from:to:cc;
-        bh=S/gdc/KPJQxXmxISBs1in1L8dT4ZjfjiXiG2Z4o7inw=;
-        b=edfyNDAfRzkyrqiUAUJ07/phuYREeNXJb43J5+fNz3oqXwMMMrufgK5rmZprOH5Aji
-         g9JWJ284jHbbeUlp4j9//gscxXo5H3+kVl/4DHB83adoMshbKlGZIUYJEpMFzfKy/Qqh
-         CN9jOX0Aa9nJagqnJBz+i6DNzzSGnZvYUXmkaVPBnVYSzbhITj6YpuL8rowDGBIo8I3l
-         EWq9Sb8eNRVJ5S55G605S8cJRQ/+/qONV6jEBozZC/d4OHwr8NWEIX0nG8ficzR6FPcz
-         q6o1TDgHGjKOB6vgCYglvEr8ar7BLxGF/d/xnkE7MNLYkJwvC5VhWprH1dgwQr3BDEJT
-         0Fzg==
+        bh=Up7S2qodevYtR008I3N0rggUDJORgGSJOkF2xutYXJ0=;
+        b=iIdJsgJUtTjMzT+78kXuGep6+9QHGKme0vpzT1R8IH880SWMlq/UZlo0s4bPP04QVf
+         IzzhMTDswyo0OclKvrmGOVzZsr2ue1OXAZA13fMO4nhocaYSAuh1AiaonCfqt6OFHlZh
+         eUXunQu8+mQ8MIb41v5rD1DXlaNowrWtD4Fj9zi+eb494QEHW1aWRef1Nx/O1zD24vLR
+         CZhFIFPfwRhtt7iBtoKpQIG1UF4dVRvqWIoPEyFFcuX4qEC8SPCcbnGnteKhMDuz1mED
+         68aPhgT+WzNNpVNfSfGmaJSQQpuNAtPGzFSerpkS+Wh7P9i96HrlaMhQ/NZoh5w/w9mO
+         LFbA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:reply-to:date:in-reply-to:message-id
          :mime-version:references:subject:from:to:cc;
-        bh=S/gdc/KPJQxXmxISBs1in1L8dT4ZjfjiXiG2Z4o7inw=;
-        b=n+sAOjW74LSZkJuPA8U7oi8bhqqf/rzDs0sY3B6PUmV52edUCFqyo8XCud5TMmikuE
-         jh7KsVwPPoyBMbdGpMUGbXjRCv/gE4gXzO6asGOxGOAlVzOAMoZyVGAKaApB58+VtlDM
-         C5Kk53cF3/htgBpwCQWBVUkFvHPtZ7OFzkPgC3ZRLV6IPX1DF9kKcKWaDMaP3BswZkIa
-         JA/fFSithF2vY68jXLvJfnS6VFj8VBfSL+uPHusp34r/zVBkqYY6VUwHCUN8D+drvzpd
-         kNxlWvb0T3Q1AEMzQUFXTaQYUawD9yIMi+syCs4x2rWCV3IqDLkt7K9269S3ipvf1VID
-         +VTg==
-X-Gm-Message-State: AOAM531eyl07Nj5gOun1CJiPLcMva7MP+9JvcrAvNe7k1xlZjjiXuRdV
-        Kf83vwumD/DJQGZp5R/CTwLaN9qY+iU=
-X-Google-Smtp-Source: ABdhPJzhRsVtk2eJrm0tONdcH5S8p/3//CBgI9jMbFawrOKcua/SVngwCpua6QFNe41fYo+ga9uA8WH511Y=
+        bh=Up7S2qodevYtR008I3N0rggUDJORgGSJOkF2xutYXJ0=;
+        b=hzUv7FN9N+h7vgQWDXefiFUEMW00Do0xPRBIioaf7fURz1X8h8A+aJq/G5aorJvs9o
+         9YvZTKvLlWNIDDD26hCu+cR+VXaSd+7/0zy5jdyz3ijBMeWOpVSU12dDLLJfdNjqb1Xs
+         mZryqLiN7G5G/kTwfVQj+xcbH0Cz4csAnKzRyHID3QOnl1twIbvtpAN0mRdjtRlhBGYJ
+         vqjpkg417tJHjsgL4bZSj63YPxnG4ojhI6BWjAOA/ojgI1/dEWN1zgvbMXqK0tcA2k30
+         YSLslSlFrazuYreTmP3IdgVJp6Kv5XNB/GOg9t1Mq9A0PgAbGV4c2whRLhcKG2g4VXHx
+         oqhg==
+X-Gm-Message-State: AOAM532VHHVJNGSRxzcV9JwMTCM0by0VSmYaMIfUPl1UZmw/fJQvnm0A
+        h7aINoK2QhyqwlAH33SJCw9NVGz7Uvg=
+X-Google-Smtp-Source: ABdhPJxUX0Vki1uKyvSo07xv+hVDoZRWGFVlxauhxPzHSyF9jmkSBHAIz9CaOamfc2tIG6F9Sa7NdN8llGY=
 X-Received: from seanjc798194.pdx.corp.google.com ([2620:15c:f:10:e012:374c:592:6194])
- (user=seanjc job=sendgmr) by 2002:a25:d051:: with SMTP id h78mr1432744ybg.497.1619058102136;
- Wed, 21 Apr 2021 19:21:42 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a25:69ce:: with SMTP id e197mr1491219ybc.448.1619058104503;
+ Wed, 21 Apr 2021 19:21:44 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Wed, 21 Apr 2021 19:21:24 -0700
+Date:   Wed, 21 Apr 2021 19:21:25 -0700
 In-Reply-To: <20210422022128.3464144-1-seanjc@google.com>
-Message-Id: <20210422022128.3464144-6-seanjc@google.com>
+Message-Id: <20210422022128.3464144-7-seanjc@google.com>
 Mime-Version: 1.0
 References: <20210422022128.3464144-1-seanjc@google.com>
 X-Mailer: git-send-email 2.31.1.498.g6c1eba8ee3d-goog
-Subject: [PATCH v2 5/9] KVM: nVMX: Truncate bits 63:32 of VMCS field on nested
- check in !64-bit
+Subject: [PATCH v2 6/9] KVM: nVMX: Truncate base/index GPR value on address
+ calc in !64-bit
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Sean Christopherson <seanjc@google.com>,
@@ -68,34 +68,33 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Drop bits 63:32 of the VMCS field encoding when checking for a nested
-VM-Exit on VMREAD/VMWRITE in !64-bit mode.  VMREAD and VMWRITE always
-use 32-bit operands outside of 64-bit mode.
+Drop bits 63:32 of the base and/or index GPRs when calculating the
+effective address of a VMX instruction memory operand.  Outside of 64-bit
+mode, memory encodings are strictly limited to E*X and below.
 
-The actual emulation of VMREAD/VMWRITE does the right thing, this bug is
-purely limited to incorrectly causing a nested VM-Exit if a GPR happens
-to have bits 63:32 set outside of 64-bit mode.
-
-Fixes: a7cde481b6e8 ("KVM: nVMX: Do not forward VMREAD/VMWRITE VMExits to L1 if required so by vmcs12 vmread/vmwrite bitmaps")
+Fixes: 064aea774768 ("KVM: nVMX: Decoding memory operands of VMX instructions")
 Cc: stable@vger.kernel.org
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/vmx/nested.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ arch/x86/kvm/vmx/nested.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index 8b111682fe5c..0e580305a1ee 100644
+index 0e580305a1ee..4daf1ff45221 100644
 --- a/arch/x86/kvm/vmx/nested.c
 +++ b/arch/x86/kvm/vmx/nested.c
-@@ -5743,7 +5743,7 @@ static bool nested_vmx_exit_handled_vmcs_access(struct kvm_vcpu *vcpu,
+@@ -4617,9 +4617,9 @@ int get_vmx_mem_address(struct kvm_vcpu *vcpu, unsigned long exit_qualification,
+ 	else if (addr_size == 0)
+ 		off = (gva_t)sign_extend64(off, 15);
+ 	if (base_is_valid)
+-		off += kvm_register_read(vcpu, base_reg);
++		off += kvm_register_readl(vcpu, base_reg);
+ 	if (index_is_valid)
+-		off += kvm_register_read(vcpu, index_reg) << scaling;
++		off += kvm_register_readl(vcpu, index_reg) << scaling;
+ 	vmx_get_segment(vcpu, &s, seg_reg);
  
- 	/* Decode instruction info and find the field to access */
- 	vmx_instruction_info = vmcs_read32(VMX_INSTRUCTION_INFO);
--	field = kvm_register_read(vcpu, (((vmx_instruction_info) >> 28) & 0xf));
-+	field = kvm_register_readl(vcpu, (((vmx_instruction_info) >> 28) & 0xf));
- 
- 	/* Out-of-range fields always cause a VM exit from L2 to L1 */
- 	if (field >> 15)
+ 	/*
 -- 
 2.31.1.498.g6c1eba8ee3d-goog
 
