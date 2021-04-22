@@ -2,143 +2,196 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D4CF536863E
-	for <lists+kvm@lfdr.de>; Thu, 22 Apr 2021 19:56:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7CC8D368643
+	for <lists+kvm@lfdr.de>; Thu, 22 Apr 2021 19:57:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236660AbhDVR5W (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 22 Apr 2021 13:57:22 -0400
-Received: from aserp2120.oracle.com ([141.146.126.78]:46822 "EHLO
-        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236058AbhDVR5V (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 22 Apr 2021 13:57:21 -0400
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
-        by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 13MHt1Zh128869;
-        Thu, 22 Apr 2021 17:56:37 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : from : to :
- cc : references : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2020-01-29;
- bh=+eYHU4INq3bzBGpE+DXyPkvQC1OQIgdVUrexPZD3DTQ=;
- b=y4eEFzZbux04DC/jXOdKr9LeADSpp+gx7J32BMsVxlfZZQ6/zGh1bXlExe+hLtAdzPB0
- Kgnav5F8ikSTMkG6nAnibrgVohjR4dw7JDhw/9D7H/w1oTju3EKm+bU6Hl+o+rD334RV
- EzTVdqw8v0fEakWBqiMVgoQaVczcjO5OM4tyNRxHt7etNZEhXz1uPbL12lXfF5nBCFDI
- ayTkKqc0YTKNRyNa6/XhK3/MFAomEolDxrd0TwRobrhh0igOrZuJwAxs5Mr8VdRVIPXS
- WZyv+0lVIR3m3/eduT3sH7VgUByzqakpJlDylsFSqiw1dxPa6ruORgDn7NveB7CcRFVk eA== 
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
-        by aserp2120.oracle.com with ESMTP id 37yqmnp8j6-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 22 Apr 2021 17:56:37 +0000
-Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
-        by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 13MHtrV4144817;
-        Thu, 22 Apr 2021 17:56:37 GMT
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
-        by aserp3030.oracle.com with ESMTP id 383ccemb8s-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 22 Apr 2021 17:56:37 +0000
-Received: from abhmp0005.oracle.com (abhmp0005.oracle.com [141.146.116.11])
-        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 13MHuamr002664;
-        Thu, 22 Apr 2021 17:56:36 GMT
-Received: from localhost.localdomain (/10.159.130.222)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Thu, 22 Apr 2021 10:56:36 -0700
-Subject: Re: [PATCH 3/7 v7] KVM: nSVM: No need to set bits 11:0 in MSRPM and
- IOPM bitmaps
-From:   Krish Sadhukhan <krish.sadhukhan@oracle.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, jmattson@google.com
-References: <20210412215611.110095-1-krish.sadhukhan@oracle.com>
- <20210412215611.110095-4-krish.sadhukhan@oracle.com>
- <YH8y86iPBdTwMT18@google.com>
- <058d78b9-eddd-95d9-e519-528ad7f2e40a@oracle.com>
-Message-ID: <cb1bb583-b8ac-ab3a-2bc3-dd3b416ee0e7@oracle.com>
-Date:   Thu, 22 Apr 2021 10:56:29 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.0
+        id S236287AbhDVR55 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 22 Apr 2021 13:57:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54510 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S236762AbhDVR54 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 22 Apr 2021 13:57:56 -0400
+Received: from mail-pl1-x62a.google.com (mail-pl1-x62a.google.com [IPv6:2607:f8b0:4864:20::62a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F3D92C06174A
+        for <kvm@vger.kernel.org>; Thu, 22 Apr 2021 10:57:19 -0700 (PDT)
+Received: by mail-pl1-x62a.google.com with SMTP id n10so12775810plc.0
+        for <kvm@vger.kernel.org>; Thu, 22 Apr 2021 10:57:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=LPNuZ3CwmXmYC2FOdA5xPRoooqia6WEbrp0AxJN/oo4=;
+        b=OeEcI35L89PDF8PPgJo+bs3JIK1XHd3+xKZjxRBj+o8xlZ0RPonvDHoB2pV+5UnVM0
+         ewLSSp38E+cded4uNVa8IFLQsTH3MTwcEnkxZXc5dn/h13NJyAd1UMgcjt9zYc4lyJN7
+         JDZa9emOMI18adv2qr6e38Hr6AFZMx0sKD1bxAN/t/BwY1uRVOI/0TUf5SshivLtg7/V
+         hnT3O4cqvp/qB5wpcERGe51zIcqavx13AFkxnLi+nc+0ja67ayIl/SO9IRPMqVcq7JgX
+         v4rYV5WvMhfUYJoZ97HGB3Up46XpVNq+OJFNPS1bPaAGPa2Zm/Nvb9eU1EQn/Dm8t78N
+         sOfw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=LPNuZ3CwmXmYC2FOdA5xPRoooqia6WEbrp0AxJN/oo4=;
+        b=jz6LMS9Jl/0C2ynj+XtF0ZZpcyvbVCO0psIRz1E6SmIa5RKsxfCV/59OuOnGFJKBih
+         2bRDV02QxUmY6p/9PmTMeVWZ52Tc3FazAP8lCrgloU3LOoqiWULCGqK1pOex1XoDIih8
+         mLm8imjqxkd3Qij13ils93MdNIiQSImeHAiat+CDIxcCBAqfFtk0pNcm6YpIznL5ANmS
+         uYReCD1VbQJ06grz7QUrXDtkDNG1d2c2x53ZB/gZAGQDYM0lvBka4ctrqDmrFkqJ/jLo
+         By9MhDy6SfGbNSgDSkZJWgyh/DzwzMcYtPiPZ0y9JygPij0ZFDrY/IufgMH9CLo6Y3Va
+         iDqw==
+X-Gm-Message-State: AOAM532W01Vv3oPIzsn5mX5xKVXUma7w9PB2jVE9TLg+SjkWEymhNHwc
+        z27QYCbbJKXEzV8+eOck3gHg3Pum+yJKsA==
+X-Google-Smtp-Source: ABdhPJznX75Tv1RHoHmp8l3Wt8EmOFlOjAYTOggoVUhdXa2f1YlzYNNioOpfOa8f77C79SbSTd5QFA==
+X-Received: by 2002:a17:90a:6c88:: with SMTP id y8mr5450316pjj.38.1619114239227;
+        Thu, 22 Apr 2021 10:57:19 -0700 (PDT)
+Received: from google.com (240.111.247.35.bc.googleusercontent.com. [35.247.111.240])
+        by smtp.gmail.com with ESMTPSA id a6sm2775349pfh.135.2021.04.22.10.57.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 22 Apr 2021 10:57:18 -0700 (PDT)
+Date:   Thu, 22 Apr 2021 17:57:15 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org
+Subject: Re: [kvm-unit-tests PATCH 01/14] x86/cstart: Don't use MSR_GS_BASE
+ in 32-bit boot code
+Message-ID: <YIG4+0WW7K9zw/f+@google.com>
+References: <20210422030504.3488253-1-seanjc@google.com>
+ <20210422030504.3488253-2-seanjc@google.com>
+ <24a92fa2-6d31-f1c2-6661-8b6f3f41766c@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <058d78b9-eddd-95d9-e519-528ad7f2e40a@oracle.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=9962 signatures=668683
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 spamscore=0 suspectscore=0
- mlxscore=0 phishscore=0 malwarescore=0 adultscore=0 mlxlogscore=999
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2104060000
- definitions=main-2104220135
-X-Proofpoint-ORIG-GUID: TV4PulFLmH0Ku9xNSOMbcEF1HJ_5reTx
-X-Proofpoint-GUID: TV4PulFLmH0Ku9xNSOMbcEF1HJ_5reTx
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=9962 signatures=668683
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 mlxscore=0 adultscore=0
- impostorscore=0 spamscore=0 malwarescore=0 clxscore=1015
- lowpriorityscore=0 priorityscore=1501 suspectscore=0 mlxlogscore=999
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2104060000 definitions=main-2104220135
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <24a92fa2-6d31-f1c2-6661-8b6f3f41766c@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Thu, Apr 22, 2021, Paolo Bonzini wrote:
+> On 22/04/21 05:04, Sean Christopherson wrote:
+> > Load the per-cpu GS.base for 32-bit build by building a temporary GDT
+> > and loading a "real" segment.  Using MSR_GS_BASE is wrong and broken,
+> > it's a 64-bit only MSR and does not exist on 32-bit CPUs.  The current
+> > code works only because 32-bit KVM VMX incorrectly disables interception
+> > of MSR_GS_BASE, and no one runs KVM on an actual 32-bit physical CPU,
+> > i.e. the MSR exists in hardware and so everything "works".
+> > 
+> > 32-bit KVM SVM is not buggy and correctly injects #GP on the WRMSR, i.e.
+> > the tests have never worked on 32-bit SVM.
+> 
+> Hmm, this breaks task switch.  But setting up separate descriptors is
+> not hard:
 
-On 4/22/21 10:50 AM, Krish Sadhukhan wrote:
->
-> On 4/20/21 1:00 PM, Sean Christopherson wrote:
->> On Mon, Apr 12, 2021, Krish Sadhukhan wrote:
->>> According to APM vol 2, hardware ignores the low 12 bits in MSRPM 
->>> and IOPM
->>> bitmaps. Therefore setting/unssetting these bits has no effect as 
->>> far as
->>> VMRUN is concerned. Also, setting/unsetting these bits prevents 
->>> tests from
->>> verifying hardware behavior.
->>>
->>> Signed-off-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
->>> ---
->>>   arch/x86/kvm/svm/nested.c | 2 --
->>>   1 file changed, 2 deletions(-)
->>>
->>> diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
->>> index ae53ae46ebca..fd42c8b7f99a 100644
->>> --- a/arch/x86/kvm/svm/nested.c
->>> +++ b/arch/x86/kvm/svm/nested.c
->>> @@ -287,8 +287,6 @@ static void 
->>> nested_load_control_from_vmcb12(struct vcpu_svm *svm,
->>>         /* Copy it here because nested_svm_check_controls will check 
->>> it.  */
->>>       svm->nested.ctl.asid           = control->asid;
->>> -    svm->nested.ctl.msrpm_base_pa &= ~0x0fffULL;
->>> -    svm->nested.ctl.iopm_base_pa  &= ~0x0fffULL;
->> This will break nested_svm_vmrun_msrpm() if L1 passes an unaligned 
->> address.
->> The shortlog is also wrong, KVM isn't setting bits, it's clearing bits.
->>
->> I also don't think svm->nested.ctl.msrpm_base_pa makes its way to 
->> hardware; IIUC,
->> it's a copy of vmcs12->control.msrpm_base_pa.  The bitmap that gets 
->> loaded into
->> the "real" VMCB is vmcb02->control.msrpm_base_pa.
->
->
-> Not sure if there's a problem with my patch as such, but upon 
-> inspecting the code, I see something missing:
->
->     In nested_load_control_from_vmcb12(), we are not really loading 
-> msrpm_base_pa from vmcb12 even     though the name of the function 
-> suggests so.
->
->     Then nested_vmcb_check_controls() checks msrpm_base_pa from 
-> 'nested.ctl' which doesn't have         the copy from vmcb12.
->
->     Then nested_vmcb02_prepare_control() prepares the vmcb02 copy of 
-> msrpm_base_pa from vmcb01.ptr->control.msrpm_base_pa.
->
->     Then nested_svm_vmrun_msrpm() uses msrpm_base_pa from 'nested.ctl'.
->
->
-> Aren't we actually using msrpm_base_pa from vmcb01 instead of vmcb02 ?
+Much better.
 
+> diff --git a/x86/cstart.S b/x86/cstart.S
+> index 489c561..7d9ed96 100644
+> --- a/x86/cstart.S
+> +++ b/x86/cstart.S
+> @@ -58,6 +58,10 @@ tss_descr:
+>          .rept max_cpus
+>          .quad 0x000089000000ffff // 32-bit avail tss
+>          .endr
+> +percpu_descr:
+> +        .rept max_cpus
+> +        .quad 0x00cf93000000ffff // 32-bit data segment for perCPU area
+> +        .endr
+>  gdt32_end:
+> 
+>  i = 0
+> @@ -89,13 +93,23 @@ mb_flags = 0x0
+>  	.long mb_magic, mb_flags, 0 - (mb_magic + mb_flags)
+>  mb_cmdline = 16
+> 
+> -MSR_GS_BASE = 0xc0000101
+> -
+>  .macro setup_percpu_area
+>  	lea -4096(%esp), %eax
+> -	mov $0, %edx
+> -	mov $MSR_GS_BASE, %ecx
+> -	wrmsr
+> +
+> +	/* fill GS_BASE in the GDT */
+> +	mov $(APIC_DEFAULT_PHYS_BASE + APIC_ID), %ebx
 
-Sorry, I meant to say,  "from vmcb01 instead of vmcb12"
+Using %ebx crushes the mbi_bootinfo pointer.  The easiest fix is to use %edx or
+%ecx.
 
->
->>>   }
->>>     /*
->>> -- 
->>> 2.27.0
->>>
+> +	mov (%ebx), %ebx
+
+No need to load the address into a reg, just drop the "$" above and encode
+"mov [imm32], <reg>".
+
+Want to fold this into your patch?
+
+diff --git a/x86/cstart.S b/x86/cstart.S
+index 7d9ed96..fb6eda5 100644
+--- a/x86/cstart.S
++++ b/x86/cstart.S
+@@ -97,17 +97,16 @@ mb_cmdline = 16
+        lea -4096(%esp), %eax
+
+        /* fill GS_BASE in the GDT */
+-       mov $(APIC_DEFAULT_PHYS_BASE + APIC_ID), %ebx
+-       mov (%ebx), %ebx
+-       shr $24, %ebx
+-       or %ax, percpu_descr+2(,%ebx,8)
++       mov (APIC_DEFAULT_PHYS_BASE + APIC_ID), %edx
++       shr $24, %edx
++       or %ax, percpu_descr+2(,%edx,8)
+
+        shr $16, %eax
+-       or %al, percpu_descr+4(,%ebx,8)
+-       or %ah, percpu_descr+7(,%ebx,8)
++       or %al, percpu_descr+4(,%edx,8)
++       or %ah, percpu_descr+7(,%edx,8)
+
+        lgdtl gdt32_descr
+-       lea percpu_descr-gdt32(,%ebx,8), %eax
++       lea percpu_descr-gdt32(,%edx,8), %eax
+        mov %ax, %gs
+
+ .endm
+
+> +	shr $24, %ebx
+> +	or %ax, percpu_descr+2(,%ebx,8)
+> +
+> +	shr $16, %eax
+> +	or %al, percpu_descr+4(,%ebx,8)
+> +	or %ah, percpu_descr+7(,%ebx,8)
+> +
+> +	lgdtl gdt32_descr
+> +	lea percpu_descr-gdt32(,%ebx,8), %eax
+> +	mov %ax, %gs
+> +
+>  .endm
+> 
+>  .macro setup_segments
+> @@ -188,16 +202,14 @@ load_tss:
+>  	mov (%eax), %eax
+>  	shr $24, %eax
+>  	mov %eax, %ebx
+> -	shl $3, %ebx
+>  	mov $((tss_end - tss) / max_cpus), %edx
+>  	imul %edx
+>  	add $tss, %eax
+> -	mov %ax, tss_descr+2(%ebx)
+> +	mov %ax, tss_descr+2(,%ebx,8)
+>  	shr $16, %eax
+> -	mov %al, tss_descr+4(%ebx)
+> -	shr $8, %eax
+> -	mov %al, tss_descr+7(%ebx)
+> -	lea tss_descr-gdt32(%ebx), %eax
+> +	mov %al, tss_descr+4(,%ebx,8)
+> +	mov %ah, tss_descr+7(,%ebx,8)
+
+Is there a functional change here?  If not, can you throw this into a separate
+patch?
+
+Thanks!
+
+> +	lea tss_descr-gdt32(,%ebx,8), %eax
+>  	ltr %ax
+>  	ret
+> 
+> 
+> Paolo
+> 
