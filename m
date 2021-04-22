@@ -2,98 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B58CB3688F9
-	for <lists+kvm@lfdr.de>; Fri, 23 Apr 2021 00:20:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6E42F368917
+	for <lists+kvm@lfdr.de>; Fri, 23 Apr 2021 00:39:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239754AbhDVWVB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 22 Apr 2021 18:21:01 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:55291 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S236763AbhDVWU7 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 22 Apr 2021 18:20:59 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1619130022;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type;
-        bh=tgQyxuFNIWv2WFwGCh6y2wdSkYdHkTXHx4X2Bpzjy2I=;
-        b=HP+d12yBLmHIipwN9ACa6yrY4L8RxDcVHWE90COWvMT2redh/FX55Bi0zrc5JXHZ6VR1nr
-        WlOn5DhHGv+pU0Gn2Zhl8Z4oyConXdvnA+e/xYVMaT30mWABtfnvWMqDbpHc95xEYGQw2k
-        JSvFdhahPm+WK4CChyH8Itj3fA5Y+d4=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-432-cxD-MhIfOU6ITGBgG-OYWw-1; Thu, 22 Apr 2021 18:20:21 -0400
-X-MC-Unique: cxD-MhIfOU6ITGBgG-OYWw-1
-Received: by mail-ed1-f71.google.com with SMTP id z3-20020a05640240c3b029037fb0c2bd3bso17651222edb.23
-        for <kvm@vger.kernel.org>; Thu, 22 Apr 2021 15:20:20 -0700 (PDT)
+        id S239666AbhDVWkB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 22 Apr 2021 18:40:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60226 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S239400AbhDVWkA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 22 Apr 2021 18:40:00 -0400
+Received: from mail-pf1-x432.google.com (mail-pf1-x432.google.com [IPv6:2607:f8b0:4864:20::432])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D68A5C061756
+        for <kvm@vger.kernel.org>; Thu, 22 Apr 2021 15:39:23 -0700 (PDT)
+Received: by mail-pf1-x432.google.com with SMTP id a12so32770918pfc.7
+        for <kvm@vger.kernel.org>; Thu, 22 Apr 2021 15:39:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=DUlDwcgwPAcRYMvT6n0zmQZ02FrFSLFm4jKgBTz17LU=;
+        b=Cw8D18+LB+KggXJC3Hs7OS36Q58sjfTflgjQhQVcB9h78s6y35jRdKlqU4zsPFg4F6
+         pauiG4kgb/tk6UMTiawgychtg2BRhGZAQ1p7iSqS2dbuOqqpEykK7yoJYv6NINA6/GNO
+         pF1RFPp0jpJX0UJ8BzE9xlRkIfI23O6jSnpGPDBoSIBf32ExAiXZVm5UBA+eA/tYaMYI
+         Y0QH0appUDGgAU/iCvtSaHHcH49M53u9lJ2gwQ5sZwuMMeSPnFPgHzjIBqv3BeSfYRlJ
+         xvechPdEmgyOqG07nK6+N0VIL0Nl+KiqVFKLAixAcFi59f6mO2+kI8ivDP62z3e3QyGL
+         Ydng==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:mime-version
-         :content-disposition;
-        bh=tgQyxuFNIWv2WFwGCh6y2wdSkYdHkTXHx4X2Bpzjy2I=;
-        b=G8LZ38fdR/cqPXrQ1s+bDakX7zyYbRqG1avQRNFJVN7wvQ5nxszNHTKF8itwWP24NA
-         6y/vwY832u+tKMepOW5W3FpIqPGSZfIcP4TELSILxED5+4dgwPeQgUPCxl0J5y917faX
-         5fWcOaf64VuoQDleV6H6T2YQdrxqbXR9uzcNGZ2U2AALlG+4RJaraIIAAG+pK9GH41h5
-         EVEu6WX5UDWNeS+i2YCJYNEpgT39G+bMLbfNiEabAYy36gbSIKxonxyHpW+UQs7pPVH9
-         1QZJ3JWwcVwjrige4S+dNGloPr6u7ypBQbuy545TxoFDi+W8BX8Q9o3WFtwCqMF/shW7
-         FZAg==
-X-Gm-Message-State: AOAM5308JCFQ9dTJLKAmnsWk5D4YF7EOHHFHq9+dS6L4/8zOvvLtRtAZ
-        1vCLOaq7UaIJEEZVTvnEojMqHo85jAG4e01ZrPN8Ab+aAkoYzSUTrjo1QmPSp1Oqm0cTwN4faPX
-        +pa9b3bRJY1Q4
-X-Received: by 2002:a05:6402:1912:: with SMTP id e18mr807275edz.184.1619130019727;
-        Thu, 22 Apr 2021 15:20:19 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwJy1AtNvC1yqgjKWu6Iev/lJ2pAgqjtkiG2OyAAr4aeu8ke3P5mSsVUhBCU4b2QDNeMyBTxQ==
-X-Received: by 2002:a05:6402:1912:: with SMTP id e18mr807263edz.184.1619130019602;
-        Thu, 22 Apr 2021 15:20:19 -0700 (PDT)
-Received: from redhat.com (212.116.168.114.static.012.net.il. [212.116.168.114])
-        by smtp.gmail.com with ESMTPSA id u1sm3177747edv.90.2021.04.22.15.20.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 22 Apr 2021 15:20:18 -0700 (PDT)
-Date:   Thu, 22 Apr 2021 18:20:16 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        dan.carpenter@oracle.com, elic@nvidia.com, jasowang@redhat.com,
-        lkp@intel.com, mst@redhat.com, stable@vger.kernel.org,
-        xieyongji@bytedance.com
-Subject: [GIT PULL] virtio: last minute fixes
-Message-ID: <20210422182016-mutt-send-email-mst@kernel.org>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=DUlDwcgwPAcRYMvT6n0zmQZ02FrFSLFm4jKgBTz17LU=;
+        b=AVBh2HHVj8oWYT3rN29GtOroIaBSjgW79OeCYhhDn7JaBVguPaosblfO6tdE2YsAvI
+         t7TPV+EypAIF2KQ3mI62bKV+42DIc49MIYuArsorKIoa2NfUpAVCBxsAc/UXRLnTlp/z
+         cQHJrEJzu1rTuq4wU4i8HZxiduqSSo+xOmD50sQXn5NUFt2XUTPDshAIqsj8DXMrPIby
+         7t2jVnd41HMx7NGtZB67Q+Is460B7ITs56h59QSPL77p5SkUwU/Y9vmryuVFV5foxI0n
+         akejUJCUlKPMNUGNvtWeiYksOG5ncgUDub58d+fHnsNS0VNxXolKNXmSUsfRNZGvI5B8
+         4ZHw==
+X-Gm-Message-State: AOAM530z9mUjREeBb4+fDAT538t1cmcitAjkww6Auz00lAreqX3X9YsN
+        zwNHL3IV5MmX52jz7EWVebWq4OLWT3kUg/3Z1Gi1ew==
+X-Google-Smtp-Source: ABdhPJy3/ASgM45udMwId+U8e7zn4WwchaRq957LjL2HP2hRvBq6aRgoGXGIp2N7MYU2Ynup+2a99x/e4Y0612lWCik=
+X-Received: by 2002:a63:4f50:: with SMTP id p16mr913749pgl.40.1619131163259;
+ Thu, 22 Apr 2021 15:39:23 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-X-Mutt-Fcc: =sent
+References: <20210422001736.3255735-1-seanjc@google.com> <CAAeT=FxaRV+za7yk8_9p45k4ui3QJx90gN4b8k4egrxux=QWFA@mail.gmail.com>
+ <YIHYsa1+psfnszcv@google.com>
+In-Reply-To: <YIHYsa1+psfnszcv@google.com>
+From:   Reiji Watanabe <reijiw@google.com>
+Date:   Thu, 22 Apr 2021 15:39:07 -0700
+Message-ID: <CAAeT=FwXuaHM+_ZpoCwHgXyBtSn_gA3r8j+gZ9rfgUBxEwkpWA@mail.gmail.com>
+Subject: Re: [PATCH v2] KVM: SVM: Delay restoration of host MSR_TSC_AUX until
+ return to userspace
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Tom Lendacky <thomas.lendacky@amd.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The following changes since commit bc04d93ea30a0a8eb2a2648b848cef35d1f6f798:
+> All in all, I think we want this:
+>
+>         case MSR_TSC_AUX:
+>                 if (!boot_cpu_has(X86_FEATURE_RDTSCP))
+>                         return 1;
+>
+>                 if (!msr_info->host_initiated &&
+>                     !guest_cpuid_has(vcpu, X86_FEATURE_RDTSCP))
+>                         return 1;
+>
+>                 /*
+>                  * TSC_AUX is usually changed only during boot and never read
+>                  * directly.  Intercept TSC_AUX instead of exposing it to the
+>                  * guest via direct_access_msrs, and switch it via user return.
+>                  */
+>                 preempt_disable();
+>                 r = kvm_set_user_return_msr(TSC_AUX_URET_SLOT, data, -1ull);
+>                 preempt_enable();
+>                 if (r)
+>                         return 1;
+>
+>                 /*
+>                  * Bits 63:32 are dropped by AMD CPUs, but are reserved on
+>                  * Intel CPUs.  AMD's APM has incomplete and conflicting info
+>                  * on the architectural behavior; emulate current hardware as
+>                  * doing so ensures migrating from AMD to Intel won't explode.
+>                  */
+>                 svm->tsc_aux = (u32)data;
+>                 break;
 
-  vdpa/mlx5: Fix suspend/resume index restoration (2021-04-09 12:08:28 -0400)
 
-are available in the Git repository at:
+Thank you for the explanation.
+I understand and the code above looks good to me.
+(I would assume we want to check the msr_info->host_initiated and
+guest_cpuid_has in svm_get_msr as well)
 
-  https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
-
-for you to fetch changes up to be286f84e33da1a7f83142b64dbd86f600e73363:
-
-  vdpa/mlx5: Set err = -ENOMEM in case dma_map_sg_attrs fails (2021-04-22 18:15:31 -0400)
-
-----------------------------------------------------------------
-virtio: last minute fixes
-
-Very late in the cycle but both risky if left unfixed and more or less
-obvious..
-
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-
-----------------------------------------------------------------
-Eli Cohen (1):
-      vdpa/mlx5: Set err = -ENOMEM in case dma_map_sg_attrs fails
-
-Xie Yongji (1):
-      vhost-vdpa: protect concurrent access to vhost device iotlb
-
- drivers/vdpa/mlx5/core/mr.c | 4 +++-
- drivers/vhost/vdpa.c        | 6 +++++-
- 2 files changed, 8 insertions(+), 2 deletions(-)
-
+Thanks,
+Reiji
