@@ -2,91 +2,152 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 540FB3678D0
-	for <lists+kvm@lfdr.de>; Thu, 22 Apr 2021 06:45:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9F8CF3678D2
+	for <lists+kvm@lfdr.de>; Thu, 22 Apr 2021 06:45:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229568AbhDVEqI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 22 Apr 2021 00:46:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48508 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229441AbhDVEqH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 22 Apr 2021 00:46:07 -0400
-Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 507ECC06174A
-        for <kvm@vger.kernel.org>; Wed, 21 Apr 2021 21:45:32 -0700 (PDT)
-Received: by mail-pj1-x1032.google.com with SMTP id m6-20020a17090a8586b02901507e1acf0fso277952pjn.3
-        for <kvm@vger.kernel.org>; Wed, 21 Apr 2021 21:45:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=DXjCdAnHAhGCr+w3KoEts8f/6jwy2njywZx+6/hg9YE=;
-        b=t6ENp/xv8z4IDL6KI0OqHPbBHh1kOa3qGrSZCajGcUXCTFbZlgP2SLPNctiLmrSQ2t
-         G69Hu/zbSglnwGiCWmCxCd3W7wbr2cGv248NJkXbE9SqrKmVh1DjGHdJAD1hO3RtcMGU
-         pJElz9RZ9jO5HY8B7yBmy3sGIguOsCcJq2V7Z1S9kHnD0eFQFqKIFC0CedA6qTz5yXNF
-         X9nEnjvZhNEWTL+27nlyhg3Vo75BHLBdEy5VoY+he1dUlT4w98TFneA37OayYr4EpLkg
-         UuF23A0tbRXu9tLBKmJwVRRzM/HVlW1zGJ1/nbf+SWZU3kBHzNH/qcmRafvbPN/q3XOd
-         4K5Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=DXjCdAnHAhGCr+w3KoEts8f/6jwy2njywZx+6/hg9YE=;
-        b=PdIZy8wUUFulxKIOjSHylh5mVpGCWy82dhIhfWopfRuuSuS9Ga1h1/ifJfyA6zqnR3
-         9Xw9gw8tvepsqm2BuRIJ++wVxVQO/vVkagI82k8GPo0iUqpA0Rjz2K5oEycs71NfYKE6
-         kVcFVuMT/FEp+SO9oUNq/XP7h14GAN0YGJq6lH7NKaAc1a+SmIRDRpDHrJ0gPgMWgqNy
-         Lbgq6fVdnJVAlF3PvOwmoFnlAQJU3ibCNZlsXpU/zI2LRAZVt20O7sSrxaWZ2XTyA4Dw
-         jlpXnJZ6WFqP1DJZeVdCiD7PkT4eju7oZtqydiHHuz4PZVz8Sl2TJbnt6X2+kFoLSMQJ
-         +PjA==
-X-Gm-Message-State: AOAM530xekZp/fia1lYrCGG1qL+bBtQe1fefSUeprqLu9VZZZh9YaQxa
-        sSW+4YmpWQVxVmrWo5iSC2hximbiqfqPzA==
-X-Google-Smtp-Source: ABdhPJxqDifEjz2EiDSvzzDYU591AdzyddlKSGsVhoBDF+p1Gg4e6D3cog9LXZZA24AqVdb/AbPy8w==
-X-Received: by 2002:a17:90a:9511:: with SMTP id t17mr15499041pjo.235.1619066731812;
-        Wed, 21 Apr 2021 21:45:31 -0700 (PDT)
-Received: from [192.168.1.11] ([71.212.131.83])
-        by smtp.gmail.com with ESMTPSA id e7sm828010pjd.6.2021.04.21.21.45.30
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 21 Apr 2021 21:45:31 -0700 (PDT)
-Subject: Re: [PATCH v5 3/3] ppc: Enable 2nd DAWR support on p10
-To:     David Gibson <david@gibson.dropbear.id.au>,
-        Ravi Bangoria <ravi.bangoria@linux.ibm.com>
-Cc:     qemu-ppc@nongnu.org, mikey@neuling.org, kvm@vger.kernel.org,
-        mst@redhat.com, mpe@ellerman.id.au, cohuck@redhat.com,
-        qemu-devel@nongnu.org, groug@kaod.org, paulus@samba.org,
-        =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>,
-        pbonzini@redhat.com
-References: <20210412114433.129702-1-ravi.bangoria@linux.ibm.com>
- <20210412114433.129702-4-ravi.bangoria@linux.ibm.com>
- <YH0M1YdINJqbdqP+@yekko.fritz.box>
- <ca21d852-4b54-01d3-baab-cc8d0d50e505@linux.ibm.com>
- <8020c404-d8ce-2758-d936-fc5e851017f0@kaod.org>
- <0b6e1a4a-eed2-1a45-50bf-2ccab398f4ed@linux.ibm.com>
- <YIDX5nRJ2NWdGvlj@yekko.fritz.box>
-From:   Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <01a7ea82-1d51-6d8d-5b47-43ef9df6b81e@linaro.org>
-Date:   Wed, 21 Apr 2021 21:45:29 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.7.1
-MIME-Version: 1.0
-In-Reply-To: <YIDX5nRJ2NWdGvlj@yekko.fritz.box>
-Content-Type: text/plain; charset=utf-8; format=flowed
+        id S230306AbhDVEqQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 22 Apr 2021 00:46:16 -0400
+Received: from mail-mw2nam12on2055.outbound.protection.outlook.com ([40.107.244.55]:35296
+        "EHLO NAM12-MW2-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S229578AbhDVEqP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 22 Apr 2021 00:46:15 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=JWA7zephkmtoNKEggj2Jy3Pe2rr6Ju0wqKVuOPIfa+K/Ruodh1AYST/3BNibcG6YeWy69Cx2nKSRVMKkR6KyxAf26n2R16ln5O7uadLWv+4id4WNrPGaMO0Oy06EMUXL8p2ZGu6zm/47siEQURAqg+APNKwQeVBpYZlqEY0OrPSbPcRgZhlojQJoOchKy/nZ6fnGzM+BAhKuCKVkSFIW0HVZkWo0bL+EeELGfP0Tw1uhKqdUlIIUch/1Zbudi2tbVP4xWEXManpNMMSefGyZ1MqBHROTtC8c0f1q/spxzqtv5ODSV+L/zb0mZZ5SObHKFV+NRJna56Ux8IDs1ih/7A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=wXUHQnxPY3oLNyzeTfgFvrNx9J6Xc6EP8Z/F+NZ9NaU=;
+ b=c8kjAdl7gVzaTljI82hVn3BLHSLQUb9HVrhioZ6m35hsoSt0xhn/hVx40MJQR9rcbP4QJWju942n1cqJZPnWom32LjrZvcYambyNIJC0RpWwtAhDNRue6sDwu7Qgx/6yjNh2dCh9yoKayJNh5ly7u8c8OHYE8YUJEVu2Y/qDZSJCCNlPFpEUNG0Y1Z50h7YbwkJbWFsh3SR5nj7FbN4LrjRfiun5wdtguaPZ/88MdT3XGwneRb7jadIXK+TjqiWaaQ1ubk7yMq/i+tipAf4+7P3N0XOMUnrIHpqun2U9IboENRy7MS2E1+8EUOYB78n2vg4HKPmQsSrlJoO43Brj3A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=vmware.com; dmarc=pass action=none header.from=vmware.com;
+ dkim=pass header.d=vmware.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=vmware.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=wXUHQnxPY3oLNyzeTfgFvrNx9J6Xc6EP8Z/F+NZ9NaU=;
+ b=LkFe9T0QND9JzaXBQMdLJwMMBGIHvZtHOYLQodWkjkopjI8W93k7hpfEmo8AH2Qp0kOFRJ3iTd6R+6d6cJ8e+JKx7zD3ksjRkPubJdN0Ol4bimeGI/Iw1pzVA79vo01UqiuqpOSON3dFjijLFysgxlLALAIJh+N7OS8/N1YJ20c=
+Received: from BYAPR05MB4776.namprd05.prod.outlook.com (2603:10b6:a03:4a::18)
+ by BYAPR05MB5909.namprd05.prod.outlook.com (2603:10b6:a03:ca::32) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4065.9; Thu, 22 Apr
+ 2021 04:45:39 +0000
+Received: from BYAPR05MB4776.namprd05.prod.outlook.com
+ ([fe80::3160:ae0e:f94e:26b]) by BYAPR05MB4776.namprd05.prod.outlook.com
+ ([fe80::3160:ae0e:f94e:26b%7]) with mapi id 15.20.4065.021; Thu, 22 Apr 2021
+ 04:45:39 +0000
+From:   Nadav Amit <namit@vmware.com>
+To:     Stephen Rothwell <sfr@canb.auug.org.au>
+CC:     Paolo Bonzini <pbonzini@redhat.com>, KVM <kvm@vger.kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@elte.hu>, "H. Peter Anvin" <hpa@zytor.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Ingo Molnar <mingo@kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Next Mailing List <linux-next@vger.kernel.org>,
+        Wanpeng Li <wanpengli@tencent.com>
+Subject: Re: linux-next: manual merge of the kvm tree with the tip tree
+Thread-Topic: linux-next: manual merge of the kvm tree with the tip tree
+Thread-Index: AQHXNzBSUrhwGdGsYUiaVBc7YAkxAqq/9k0A
+Date:   Thu, 22 Apr 2021 04:45:38 +0000
+Message-ID: <142AD46E-6B41-49F3-90C1-624649A20764@vmware.com>
+References: <20210422143056.62a3fee4@canb.auug.org.au>
+In-Reply-To: <20210422143056.62a3fee4@canb.auug.org.au>
+Accept-Language: en-US
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-mailer: Apple Mail (2.3654.60.0.2.21)
+authentication-results: canb.auug.org.au; dkim=none (message not signed)
+ header.d=none;canb.auug.org.au; dmarc=none action=none
+ header.from=vmware.com;
+x-originating-ip: [24.6.216.183]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 184733a2-84c1-4265-6198-08d905497a2c
+x-ms-traffictypediagnostic: BYAPR05MB5909:
+x-microsoft-antispam-prvs: <BYAPR05MB59099B2271CE28E0A21F2643D0469@BYAPR05MB5909.namprd05.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:2399;
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: 13cvY0XA9yvT9p/twcTmVuYBBMaQi/EEUKxJ1lYrtd7goTxXVMcR+tfQFbj56tw9gfWrOL3HDO9dUbZaJsm1gUcax29OUpbj0SDxJ2ah9b7UUx26m2mKXfz4TRHg4jMqr4fdwESlvN28rZ5ovf36U5IRFoxK8lOmov73IN1viycK54YkaqdPLiTppPn5CyXO8jJ/2W123fGLplikEO97fZ/cTeHh4eCRxK3bbsi3Ie3qcXo6sBOvymzCr56hgFdkjfR0vN+hctlV0tZImo7NqQ0VR0wm/VM+xaOkKsyFAmni7hxUo2tr5GZzrLOc0z5lYEJQjcbaRCsbkrLK5xVwuaL/qezlVpkWOVNrpf29Ep52JOpWBK4ObgiKbsnkiPGMNh1JukOCO4kEujrWwiOW3F3AFnQ8EoELHXMWFojjtYRYnH4LXYhE2oEr3LL+kjX5xOP9lD6N4aVgpMO11XpcpHFPXTjYxaO93hhrwD+52H/EmNOmiqV/S7l0IbCYl4SUVuo/Eau1UsAevFEmj9Y88ag7b/yY8cBp5ePIL0Pd+acz5IgVMALSg3DwaUxMT0CcyGLd4IUNSm55VP1JDvNOrg6a1TDrYY6gfc6vkadi5FVKWr/7ck2wJznGDNr2oi69lDCBPmTccZPnyMURu2PcssT6CK5x0cDstrmdbSuKylo=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR05MB4776.namprd05.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(39860400002)(136003)(376002)(396003)(366004)(346002)(6506007)(53546011)(64756008)(66556008)(66446008)(6916009)(76116006)(7416002)(122000001)(36756003)(66476007)(71200400001)(38100700002)(66946007)(33656002)(186003)(2616005)(86362001)(54906003)(2906002)(26005)(5660300002)(6512007)(6486002)(478600001)(8936002)(4326008)(316002)(83380400001)(8676002)(4744005)(45980500001);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata: =?us-ascii?Q?Uo3rraxYdoZfTA7iOGS23s4jTlFuuOsi9Q6zAoXJLusve7L99vU4w70OmTXG?=
+ =?us-ascii?Q?uxvKVu6UN2ZoztzGhvaqDeFOGCJYRapCQngkj3PBGBPLtYImhG2Kj0IUrqSO?=
+ =?us-ascii?Q?ixspfwoyCiUaYGa9RuxoH7squAViCmso5cdKhrk+sxFAFGk8h4fIyO4UZrSt?=
+ =?us-ascii?Q?epxq1v6BcSVU2kibPYWIV9VManJ2mvAovP7JEbCYtQC4Ec0FsivzeK3poeiw?=
+ =?us-ascii?Q?tCUo24RQms+gxawE6jsaBsjrBv5YNGayHj+f3zPIPlUJZ2vAIDnJo7nUtX+l?=
+ =?us-ascii?Q?N37/gy/roMLtU8BxtKiTq3sqNkpkTxFm0q9OrHgYquF3paWzZwfYLczrOT3a?=
+ =?us-ascii?Q?ZWJ05yKW3OjakmBLToEPPIFG2/eBNN9gBThE9Hjb+gkCFJI46Xy/1qc+Bvpn?=
+ =?us-ascii?Q?msJlCDpex2rLwJvYhK4loAXgdTpj8k44VkUmbO02yIJV9Gm32ueGtximrGcZ?=
+ =?us-ascii?Q?f4fEtKSifC7xjXB0bB82p8e/kPPV/4xqLSOPCL+7MZc67BuG610sJekE5XqF?=
+ =?us-ascii?Q?NTwKcIr0VU6KA2DzQerF+nPBUILlV6IRhkcfZfurIpd1OuYEgeryy9vSojEq?=
+ =?us-ascii?Q?bpjXbyQdhM3+AHsNAG+vPj7/XBx0a9+kUo9HGXvC9uxbZ4uWT03ve543KTnu?=
+ =?us-ascii?Q?WdFTgsETY/cjvn0h5KJbouEpyb84o5xF9ZGWtRwK/ochiLrTm7+zg69q25NY?=
+ =?us-ascii?Q?2neZPx6vEtOtlkIfHABE+Ww5HuXUZO1hoRoVVqNs1iVDvrVF+zxBdmdSL34r?=
+ =?us-ascii?Q?rwgnK51ARntTPzFYkf9SSG5mkfxDpwU57K6dzMEvtuBuKUzpspO1H93MACZr?=
+ =?us-ascii?Q?Vk+0kWcu47Ry8bQIBNlOqqfmmDwbdW9x4a46ome8NAWQaR1oAktInP+RINFd?=
+ =?us-ascii?Q?uzBfCwcmcVGJk51CuUorAVQzzmrLZFM80WwtDjtYpJR8wSCLAThX6jcX8ZEC?=
+ =?us-ascii?Q?YOQdkktjdORJ6lE30M4h25LIWGAJ/r2OtNVCEtg6GMumyGJ0341zz0w374D/?=
+ =?us-ascii?Q?9ayCDo0NuM4Z1TcIpzqYwXre2Le/hlD+UAPVK1UjGTshcdUbxNhK5vWuryxf?=
+ =?us-ascii?Q?KUkJPg/+MKv4efgD2WvwSjbpKLIpJhgGSsL2RzAgG1zzUQ7/kHeC04tyCSRr?=
+ =?us-ascii?Q?p1WxzAhocF4kJLAKWtCPE9gm1BwiNMwUaQ48qltsMFjWxv2tofR49bf1yIt+?=
+ =?us-ascii?Q?bN+IWrDHDeIIWhy2Fo3v9eUlQdVLM1gT+FPAQVZjDxermbjhBkTohFU7elYl?=
+ =?us-ascii?Q?q1yuCtWrWLk2BquYusFFq7A8OWM/vxEKGH6/muly+8LL1Y8Qhe+4HClHRtYh?=
+ =?us-ascii?Q?cbRVa/2eOxkwJExJ7uQrHyY7?=
+x-ms-exchange-transport-forked: True
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <74F8121D26A55F45BFD63DB3A13188FB@namprd05.prod.outlook.com>
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-OriginatorOrg: vmware.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BYAPR05MB4776.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 184733a2-84c1-4265-6198-08d905497a2c
+X-MS-Exchange-CrossTenant-originalarrivaltime: 22 Apr 2021 04:45:38.9286
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b39138ca-3cee-4b4a-a4d6-cd83d9dd62f0
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: VCDk/+3mo0YkzO8SmpeZXHFqSTe7m7Lgc/LzDGkXqOeqk2kYLjIraOKAr5cuTeER4Yg6ci0EzQ0McVyeC6H6WQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR05MB5909
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 4/21/21 6:56 PM, David Gibson wrote:
-> I don't actually know if qemu has TCG watchpoint support on any
-> hardware.  Presumably it would mean instrumenting all the tcg loads
-> and stores.
 
-We tag the soft tlb for pages that contain watchpoints.
+> On Apr 21, 2021, at 9:30 PM, Stephen Rothwell <sfr@canb.auug.org.au> wrot=
+e:
+>=20
+> Hi all,
+>=20
+> Today's linux-next merge of the kvm tree got a conflict in:
+>=20
+>  arch/x86/kernel/kvm.c
+>=20
+> between commit:
+>=20
+>  4ce94eabac16 ("x86/mm/tlb: Flush remote and local TLBs concurrently")
+>=20
+> from the tip tree and commit:
+>=20
+>  2b519b5797d4 ("x86/kvm: Don't bother __pv_cpu_mask when !CONFIG_SMP")
+>=20
+> from the kvm tree.
 
-See include/hw/core/cpu.h:
-   cpu_watchpoint_insert
-   cpu_watchpoint_remove
+Thank you and sorry for that.
 
+>  static void __init kvm_smp_prepare_boot_cpu(void)
+>  {
+>  	/*
+> @@@ -655,15 -668,9 +673,9 @@@ static void __init kvm_guest_init(void
+>=20
+>  	if (kvm_para_has_feature(KVM_FEATURE_STEAL_TIME)) {
+>  		has_steal_clock =3D 1;
+> -		pv_ops.time.steal_clock =3D kvm_steal_clock;
+> +		static_call_update(pv_steal_clock, kvm_steal_clock);
 
-r~
+I do not understand how this line ended in the merge fix though.
+
+Not that it is correct or wrong, but it is not part of either of
+these 2 patches AFAIK.
+
