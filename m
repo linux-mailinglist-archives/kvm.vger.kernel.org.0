@@ -2,117 +2,154 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A6C5B367E47
-	for <lists+kvm@lfdr.de>; Thu, 22 Apr 2021 12:03:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A82B0367E45
+	for <lists+kvm@lfdr.de>; Thu, 22 Apr 2021 12:03:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235806AbhDVKDg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 22 Apr 2021 06:03:36 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:59464 "EHLO
+        id S235647AbhDVKDe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 22 Apr 2021 06:03:34 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:37627 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S235770AbhDVKDa (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 22 Apr 2021 06:03:30 -0400
+        by vger.kernel.org with ESMTP id S235583AbhDVKD1 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 22 Apr 2021 06:03:27 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1619085775;
+        s=mimecast20190719; t=1619085759;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=xNNORhYicU7gfoyOCuO0kweWS4Sw8ld/VVblR3G06wg=;
-        b=fDZBpoqFmTf2EAYDzza1VEPkA/zkresZninQr2hQSsGORzFSHfwsPnn342ibQLovBat1ih
-        sA+J5kAniyZEyFxcvBMZa3fWyYTfx6Dft3GOVlwT+JZ5L8rMb+L97PlL24l/3mGsmyR6lC
-        uBYavJrlPb2XEsSjU0CG6u0NXnMdExE=
+        bh=uUwM1AKdnWp11aQqU2FXPyxf/Su9yfpl5UG8AutMED0=;
+        b=D9pXabPyI1PlwP1V/vbEo43cls3IA+ZdqlyalRF2V46Dbm2QA31NE0qGQRUzpYeoX+45cH
+        ZeBx8dx97fkZK+Os3UUPqIO8aJSeaP2NvQWNlNgk4T3eOgd4v3vjOvb09C/Fut1Ulz9nSP
+        N0SE7tnAomh6s2rLbTl2w9l5z7gTEZc=
 Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
  [209.85.218.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-24-PyKSetFaOt6SHs9_6vNRTw-1; Thu, 22 Apr 2021 06:02:21 -0400
-X-MC-Unique: PyKSetFaOt6SHs9_6vNRTw-1
-Received: by mail-ej1-f72.google.com with SMTP id lf6-20020a1709071746b029037cee5e31c4so7000973ejc.13
-        for <kvm@vger.kernel.org>; Thu, 22 Apr 2021 03:02:21 -0700 (PDT)
+ us-mta-201-S7I5nJsjNUqXjswDF2-dEg-1; Thu, 22 Apr 2021 06:02:31 -0400
+X-MC-Unique: S7I5nJsjNUqXjswDF2-dEg-1
+Received: by mail-ej1-f72.google.com with SMTP id c18-20020a17090603d2b029037c77ad778eso6993998eja.1
+        for <kvm@vger.kernel.org>; Thu, 22 Apr 2021 03:02:31 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=xNNORhYicU7gfoyOCuO0kweWS4Sw8ld/VVblR3G06wg=;
-        b=e5VAESmLPtXtMFYfap2SEjWUxW9qBNkeujltVSjJV53+rmENo62W4zM3Rdp8u0Affi
-         7TU6YLWBUNqjQSNweN5me/XRCE1ybG8W3GMdmBcd/YwVcCe4pbfG+atvqfn2UJFa/h/y
-         vM0qUgek3YAZkwHAAqhFic9Ws0ffuUNgjcqoxKhMLO+k5eQXXA3sA93+/Kxh+6NPIdxs
-         OJKL+d4HTaGjGYfw15fpSo90sGdnoQFh/zXVk5BB/6pnd8txGvaVQkfahubFNPjJFY/x
-         vCwje2icNCQhswTiEqNRCmrYPo5cO0IZqXWvBHeb07+7gfAFFdQeKjsmR8T2lEEDQPg9
-         UfJA==
-X-Gm-Message-State: AOAM533I6h5YIeVzYQwjmICikTmZQdcNXqwXIMfhsYWlXklgelHJ1FEt
-        LxIXsBWEv5HgtagpSqHaL69dEprs+eUBZgauJUqsAGoVWtSJUH7n3pj9wsisT/jx4HWYQpwySjO
-        kVNCtk/WIOgIM
-X-Received: by 2002:a17:906:704a:: with SMTP id r10mr2573002ejj.312.1619085740317;
-        Thu, 22 Apr 2021 03:02:20 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwoHUf/42/0fX52T0AvMJggbGbBnbTG84Gu4+wvT51LpZ70eW/cmD2f8ZCtTt0nyd7+UiYVVg==
-X-Received: by 2002:a17:906:704a:: with SMTP id r10mr2572977ejj.312.1619085740170;
-        Thu, 22 Apr 2021 03:02:20 -0700 (PDT)
-Received: from steredhat (host-79-34-249-199.business.telecomitalia.it. [79.34.249.199])
-        by smtp.gmail.com with ESMTPSA id l15sm1662876edb.48.2021.04.22.03.02.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 22 Apr 2021 03:02:19 -0700 (PDT)
-Date:   Thu, 22 Apr 2021 12:02:17 +0200
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     Arseny Krasnov <arseny.krasnov@kaspersky.com>
-Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Jorgen Hansen <jhansen@vmware.com>,
-        Colin Ian King <colin.king@canonical.com>,
-        Andra Paraschiv <andraprs@amazon.com>,
-        Norbert Slusarek <nslusarek@gmx.net>,
-        Alexander Popov <alex.popov@linux.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "stsp2@yandex.ru" <stsp2@yandex.ru>,
-        "oxffffaa@gmail.com" <oxffffaa@gmail.com>
-Subject: Re: [RFC PATCH v8 00/19] virtio/vsock: introduce SOCK_SEQPACKET
- support
-Message-ID: <20210422100217.jmpgevtrukqyukfo@steredhat>
-References: <20210413123954.3396314-1-arseny.krasnov@kaspersky.com>
- <20210421095213.25hnfi2th7gzyzt2@steredhat>
- <2c3d0749-0f41-e064-0153-b6130268add2@kaspersky.com>
- <20210422084638.bvblk33b4oi6cec6@steredhat>
- <bfefdd94-a84f-8bed-331e-274654a7426f@kaspersky.com>
+        h=x-gm-message-state:to:cc:references:from:subject:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=uUwM1AKdnWp11aQqU2FXPyxf/Su9yfpl5UG8AutMED0=;
+        b=T1f2W5YvRmTt8zpmvnDrhj+f1mFWt9TtK3OWJNjcDFQ9yvtZ+pjarpzi+cmXoGSECD
+         3WppYp80cNY/FzOzkzdXNMOLmAHgAcVAAWB1WXKYROTErInDqanbtvAaaH1LRwqt/Y4m
+         627x9gxE718KqKHJWqLk7mAqqPxclW7QTi2qrwM55w7f7jSd24b5c/iuF7P+BOqrqJhD
+         OZLfZOnz91pM7GmnJc8awXw4cepU0h/VkkhjMz7I1toY6ZDBV5DeuezNtm561jPpCrxf
+         dlo4cX/m/kEuWUFuWaQGprJ7+PDgbgeAEP/XPC5XqbSvrgpTWAYc/2t4px71ZkR0vLbo
+         gF2g==
+X-Gm-Message-State: AOAM532leEgZNtJ4y42TKMESHNu5UbuSztHbwceksF0gGNRPjHQv7pZs
+        2xGCiOonb0kv2jnRP0Q9LaCpxcgyaon0Dz5aDpFkDseI5NA8+l9Xa0/JgYgdLEJOujCbqag8aLK
+        DlpJskjruqxUBOlBCIZe14zPcUTN3BBIT8OMnRdqIB5X3EdZhJEu2xKhz2GbKvbf6
+X-Received: by 2002:a17:906:dbd5:: with SMTP id yc21mr2570289ejb.29.1619085750134;
+        Thu, 22 Apr 2021 03:02:30 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyjU46meRVPECdxCAyHRog5CRK/M4VxxvZnxSU9RnQrjwiVP9UHeaorZwQ7CvRjbI3mbacPqA==
+X-Received: by 2002:a17:906:dbd5:: with SMTP id yc21mr2570257ejb.29.1619085749893;
+        Thu, 22 Apr 2021 03:02:29 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id nc39sm1466337ejc.41.2021.04.22.03.02.29
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 22 Apr 2021 03:02:29 -0700 (PDT)
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     kvm@vger.kernel.org
+References: <20210422030504.3488253-1-seanjc@google.com>
+ <20210422030504.3488253-2-seanjc@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [kvm-unit-tests PATCH 01/14] x86/cstart: Don't use MSR_GS_BASE in
+ 32-bit boot code
+Message-ID: <24a92fa2-6d31-f1c2-6661-8b6f3f41766c@redhat.com>
+Date:   Thu, 22 Apr 2021 12:02:28 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <bfefdd94-a84f-8bed-331e-274654a7426f@kaspersky.com>
+In-Reply-To: <20210422030504.3488253-2-seanjc@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Apr 22, 2021 at 12:40:17PM +0300, Arseny Krasnov wrote:
->On 22.04.2021 11:46, Stefano Garzarella wrote:
->> On Wed, Apr 21, 2021 at 06:06:28PM +0300, Arseny Krasnov wrote:
->>> Thank You, i'll prepare next version. Main question is: does this
->>> approach(no SEQ_BEGIN, SEQ_END, 'msg_len' and 'msg_id') considered
->>> good? In this case it will be easier to prepare final version, because
->>> is smaller and more simple than previous logic. Also patch to spec
->>> will be smaller.
->> Yes, it's definitely much better than before.
->>
->> The only problem I see is that we add some overhead per fragment
->> (header). We could solve that with the mergeable buffers that Jiang is
->> considering for DGRAM.
->
->If we are talking about receive, i think, i can reuse merge logic for
+On 22/04/21 05:04, Sean Christopherson wrote:
+> Load the per-cpu GS.base for 32-bit build by building a temporary GDT
+> and loading a "real" segment.  Using MSR_GS_BASE is wrong and broken,
+> it's a 64-bit only MSR and does not exist on 32-bit CPUs.  The current
+> code works only because 32-bit KVM VMX incorrectly disables interception
+> of MSR_GS_BASE, and no one runs KVM on an actual 32-bit physical CPU,
+> i.e. the MSR exists in hardware and so everything "works".
+> 
+> 32-bit KVM SVM is not buggy and correctly injects #GP on the WRMSR, i.e.
+> the tests have never worked on 32-bit SVM.
 
-Yep, for TX the guest can potentially enqueue a big buffer.
-Maybe it's still worth keeping a maximum size and fragmenting as we do 
-now.
+Hmm, this breaks task switch.  But setting up separate descriptors is
+not hard:
 
->
->stream sockets, the only difference is that buffers are mergeable
->until previous EOR(e.g. previous message) bit is found in rx queue.
->
+diff --git a/x86/cstart.S b/x86/cstart.S
+index 489c561..7d9ed96 100644
+--- a/x86/cstart.S
++++ b/x86/cstart.S
+@@ -58,6 +58,10 @@ tss_descr:
+          .rept max_cpus
+          .quad 0x000089000000ffff // 32-bit avail tss
+          .endr
++percpu_descr:
++        .rept max_cpus
++        .quad 0x00cf93000000ffff // 32-bit data segment for perCPU area
++        .endr
+  gdt32_end:
 
-I got a little lost.
-Can you elaborate more?
+  i = 0
+@@ -89,13 +93,23 @@ mb_flags = 0x0
+  	.long mb_magic, mb_flags, 0 - (mb_magic + mb_flags)
+  mb_cmdline = 16
 
-Thanks,
-Stefano
+-MSR_GS_BASE = 0xc0000101
+-
+  .macro setup_percpu_area
+  	lea -4096(%esp), %eax
+-	mov $0, %edx
+-	mov $MSR_GS_BASE, %ecx
+-	wrmsr
++
++	/* fill GS_BASE in the GDT */
++	mov $(APIC_DEFAULT_PHYS_BASE + APIC_ID), %ebx
++	mov (%ebx), %ebx
++	shr $24, %ebx
++	or %ax, percpu_descr+2(,%ebx,8)
++
++	shr $16, %eax
++	or %al, percpu_descr+4(,%ebx,8)
++	or %ah, percpu_descr+7(,%ebx,8)
++
++	lgdtl gdt32_descr
++	lea percpu_descr-gdt32(,%ebx,8), %eax
++	mov %ax, %gs
++
+  .endm
+
+  .macro setup_segments
+@@ -188,16 +202,14 @@ load_tss:
+  	mov (%eax), %eax
+  	shr $24, %eax
+  	mov %eax, %ebx
+-	shl $3, %ebx
+  	mov $((tss_end - tss) / max_cpus), %edx
+  	imul %edx
+  	add $tss, %eax
+-	mov %ax, tss_descr+2(%ebx)
++	mov %ax, tss_descr+2(,%ebx,8)
+  	shr $16, %eax
+-	mov %al, tss_descr+4(%ebx)
+-	shr $8, %eax
+-	mov %al, tss_descr+7(%ebx)
+-	lea tss_descr-gdt32(%ebx), %eax
++	mov %al, tss_descr+4(,%ebx,8)
++	mov %ah, tss_descr+7(,%ebx,8)
++	lea tss_descr-gdt32(,%ebx,8), %eax
+  	ltr %ax
+  	ret
+
+
+Paolo
 
