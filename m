@@ -2,57 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 013F83677AC
+	by mail.lfdr.de (Postfix) with ESMTP id B6E8F3677AD
 	for <lists+kvm@lfdr.de>; Thu, 22 Apr 2021 05:05:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234471AbhDVDFw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 21 Apr 2021 23:05:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54838 "EHLO
+        id S234475AbhDVDFx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 21 Apr 2021 23:05:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54854 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234340AbhDVDFt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 21 Apr 2021 23:05:49 -0400
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 83EEBC06174A
-        for <kvm@vger.kernel.org>; Wed, 21 Apr 2021 20:05:11 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id u73-20020a25ab4f0000b0290410f38a2f81so18204349ybi.22
-        for <kvm@vger.kernel.org>; Wed, 21 Apr 2021 20:05:11 -0700 (PDT)
+        with ESMTP id S234409AbhDVDFu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 21 Apr 2021 23:05:50 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BFA00C06138B
+        for <kvm@vger.kernel.org>; Wed, 21 Apr 2021 20:05:13 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id s34-20020a252d620000b02904e34d3a48abso18260114ybe.13
+        for <kvm@vger.kernel.org>; Wed, 21 Apr 2021 20:05:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=reply-to:date:in-reply-to:message-id:mime-version:references
          :subject:from:to:cc;
-        bh=nHcWdzb0XhQi4QlsO7LmwsFD16llxMgU/74d4ZRWlZw=;
-        b=D2JzKJqHjJteWl3sof+pGV0S2zgDoGRVlLX7cwJQ0ayI9xM0VfVLyz3wzh0aAmD9kg
-         ox79dwVivYa6R0m+9ZRqLi1clA7jeolvTu+gadAbyc2WtfuFq6xmicvG1FaZy6pDD/Kf
-         tURIMAfcACywQAyft0l/LLABT7EkjpxONx7o/HAHHpZwnOqfJKYZwNspdpHMK2VGSvGm
-         0n0barYVkTlHG81oeBrUmrBtrX5478buf7TLuhi8Pz5mKOcLmp8+wpvn6ht3yYjHBpec
-         g26A5Rh9oaGAhGAqsnnxNzwhMEPw3LW4LceDrS+HwVlDPKkk1e00/3UOnFkFEWAKJJGO
-         zuFw==
+        bh=VekeEJpZiPwgxPOr5FnQtqIOMax6FYTSqbn7yUKIbiU=;
+        b=Rj9vJ/mioslnaY4/4JPrizEckMCfI+1CWYcBIegamHb539S/6PUMaCMFcd6Xf6GLE5
+         hf0uam+1ItAayJzVIUJLgjjFV/Q5hKCfBKk44sGwWiiOPYtFMM5lsk8azcQ9AB6Z6JmB
+         QvZNH670znCh0LEqMBAJcCZQtQOUi4Qxk3F69tcf1KbWUY+pbz1AexizqhsXc49clkeS
+         vXRYAQNljckNLI+W0CpH9EMCljumGbNtP5mqwKkT0w9ydT1h6APgR7B8o/pP44dFnpsd
+         eaaWOQa07qghmmJDUiqDcHiwsuViwdFsH0iNNeyJst0xTcuojVXD6hrep0TvoyuVL2xc
+         Tw+A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:reply-to:date:in-reply-to:message-id
          :mime-version:references:subject:from:to:cc;
-        bh=nHcWdzb0XhQi4QlsO7LmwsFD16llxMgU/74d4ZRWlZw=;
-        b=ZssLiWoVqN9IG14mwVGo1azbiepkQpXAfqisEon0Sm/ID6e+ZZtE6TlNqjxt3/wWZo
-         PvUzIlnPQkEZVCX17fOMowTELo9PmpRjUEh6bWQs1BIgJ4SrfmzrGpKHJ9brCdnz9pV+
-         xHhdF+zWAZZX6HNjuKs0wJTKfATqjokyvyTlbsJarnc47ZtbGdkqRYJUoZfjUohtO3Yq
-         KU0vc14bYtNPDemkdLeun5Ivqqkh1mIRVlXPHIfJzOLUDEm+gtIBZiuYl/tp+k5cdNND
-         3an9Ss/iJRhcCMgjFeZnTWPSyMNJoPypmu8HnUPezY9/3X2D3oDvwG0HKIsvgS+R8417
-         Td8w==
-X-Gm-Message-State: AOAM532RDh7K/0d6Ap/O1RKSyHhNN5aL1blvfdbF91u8AzMur/QVG43u
-        q07Au1/9EzEHodh1plXjXxLlMmj9/Xk=
-X-Google-Smtp-Source: ABdhPJxLbApf4tEVBeM51RtYEfuL5zZAymNJnucyaoJ8wGyx1OXt4Xn6ufLXYe09rp1WF7zYyXDIXK7kJg0=
+        bh=VekeEJpZiPwgxPOr5FnQtqIOMax6FYTSqbn7yUKIbiU=;
+        b=uY1rF78w6swOyr2zeskevTELMOs9r+NdB91EqODDI8VgPOjXevC0RLs//3h1sSUHh9
+         VkQA5Tz20nYkQZQdo8mkUCJSRJM+IHQwAqFcCSxwhl8tM+8c/4I7efXYL5Xrs7/hEwmf
+         ZGTc9foi+LumZoFJh79qBA9kVvJrsIUte+gC2Ap7m1NgoVE+A5A4h7ZBnK/WGpPIU8vH
+         wbDeGA95TWStsE5q1s2lD16/fFRTYJHKudN/S/nJHa+iieCFWj8BfHV6v5e53pZBip+f
+         7jRY4/1gpdDIlLGhvqWKLaPgY1t6c0pWz2VjP3Vik8xvyVp82KHUQmSDIsyLslrrfrGM
+         yTfg==
+X-Gm-Message-State: AOAM532xy2+2iahKUDNirPr3/mvcU5+CNPVi0cZY04/K084Ecd0mMYQj
+        BAbBQI4Z1PkxWO4IJuAx3GOl+UBVBhc=
+X-Google-Smtp-Source: ABdhPJy57mAFQkl8U/EMjPJUT8aH/Vc9J0YUUo9k2QLbPYWa1OQfQKDlszVc4lWFm1l+vv7dwLDp1AWmaCM=
 X-Received: from seanjc798194.pdx.corp.google.com ([2620:15c:f:10:e012:374c:592:6194])
- (user=seanjc job=sendgmr) by 2002:a25:5d0:: with SMTP id 199mr1584859ybf.56.1619060710852;
- Wed, 21 Apr 2021 20:05:10 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a25:74c6:: with SMTP id p189mr1547430ybc.251.1619060713094;
+ Wed, 21 Apr 2021 20:05:13 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Wed, 21 Apr 2021 20:04:51 -0700
+Date:   Wed, 21 Apr 2021 20:04:52 -0700
 In-Reply-To: <20210422030504.3488253-1-seanjc@google.com>
-Message-Id: <20210422030504.3488253-2-seanjc@google.com>
+Message-Id: <20210422030504.3488253-3-seanjc@google.com>
 Mime-Version: 1.0
 References: <20210422030504.3488253-1-seanjc@google.com>
 X-Mailer: git-send-email 2.31.1.498.g6c1eba8ee3d-goog
-Subject: [kvm-unit-tests PATCH 01/14] x86/cstart: Don't use MSR_GS_BASE in
- 32-bit boot code
+Subject: [kvm-unit-tests PATCH 02/14] x86: msr: Exclude GS/FS_BASE MSRs from
+ 32-bit builds
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     kvm@vger.kernel.org, Sean Christopherson <seanjc@google.com>
@@ -61,63 +61,35 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Load the per-cpu GS.base for 32-bit build by building a temporary GDT
-and loading a "real" segment.  Using MSR_GS_BASE is wrong and broken,
-it's a 64-bit only MSR and does not exist on 32-bit CPUs.  The current
-code works only because 32-bit KVM VMX incorrectly disables interception
-of MSR_GS_BASE, and no one runs KVM on an actual 32-bit physical CPU,
-i.e. the MSR exists in hardware and so everything "works".
+Don't test GS/FS_BASE and KERNEL_GS_BASE on 32-bit builds, the MSRs are
+64-bit only and should #GP when accessed on 32-bit vCPUs.
 
-32-bit KVM SVM is not buggy and correctly injects #GP on the WRMSR, i.e.
-the tests have never worked on 32-bit SVM.
-
-Fixes: dfe6cb6 ("Add 32 bit smp initialization code")
+Fixes: 7d36db3 ("Initial commit from qemu-kvm.git kvm/test/")
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- x86/cstart.S | 28 +++++++++++++++++++++++-----
- 1 file changed, 23 insertions(+), 5 deletions(-)
+ x86/msr.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/x86/cstart.S b/x86/cstart.S
-index 489c561..91970a2 100644
---- a/x86/cstart.S
-+++ b/x86/cstart.S
-@@ -89,13 +89,31 @@ mb_flags = 0x0
- 	.long mb_magic, mb_flags, 0 - (mb_magic + mb_flags)
- mb_cmdline = 16
- 
--MSR_GS_BASE = 0xc0000101
--
- .macro setup_percpu_area
- 	lea -4096(%esp), %eax
--	mov $0, %edx
--	mov $MSR_GS_BASE, %ecx
--	wrmsr
-+
-+	mov %eax, %edx
-+	shl $16, %edx
-+	or  $0xffff, %edx
-+	mov %edx, 0x10(%eax)
-+
-+	mov %eax, %edx
-+	and $0xff000000, %edx
-+	mov %eax, %ecx
-+	shr $16, %ecx
-+	and $0xff, %ecx
-+	or  %ecx, %edx
-+	or  $0x00cf9300, %edx
-+	mov %edx, 0x14(%eax)
-+
-+	movw $0x17, 0(%eax)
-+	mov %eax, 2(%eax)
-+	lgdtl (%eax)
-+
-+	mov $0x10, %ax
-+	mov %ax, %gs
-+
-+	lgdtl gdt32_descr
- .endm
- 
- .macro setup_segments
+diff --git a/x86/msr.c b/x86/msr.c
+index ce5dabe..757156d 100644
+--- a/x86/msr.c
++++ b/x86/msr.c
+@@ -36,6 +36,7 @@ struct msr_info msr_info[] =
+     { .index = 0x00000277, .name = "MSR_IA32_CR_PAT",
+       .val_pairs = {{ .valid = 1, .value = 0x07070707, .expected = 0x07070707}}
+     },
++#ifdef __x86_64__
+     { .index = 0xc0000100, .name = "MSR_FS_BASE",
+       .val_pairs = {{ .valid = 1, .value = addr_64, .expected = addr_64}}
+     },
+@@ -45,7 +46,6 @@ struct msr_info msr_info[] =
+     { .index = 0xc0000102, .name = "MSR_KERNEL_GS_BASE",
+       .val_pairs = {{ .valid = 1, .value = addr_64, .expected = addr_64}}
+     },
+-#ifdef __x86_64__
+     { .index = 0xc0000080, .name = "MSR_EFER",
+       .val_pairs = {{ .valid = 1, .value = 0xD00, .expected = 0xD00}}
+     },
 -- 
 2.31.1.498.g6c1eba8ee3d-goog
 
