@@ -2,108 +2,120 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 57349367995
-	for <lists+kvm@lfdr.de>; Thu, 22 Apr 2021 07:57:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1CD673679EE
+	for <lists+kvm@lfdr.de>; Thu, 22 Apr 2021 08:30:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234777AbhDVF6H (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 22 Apr 2021 01:58:07 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:44511 "EHLO ozlabs.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229923AbhDVF6D (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 22 Apr 2021 01:58:03 -0400
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        by mail.ozlabs.org (Postfix) with ESMTPSA id 4FQmsh0Pskz9sTD;
-        Thu, 22 Apr 2021 15:57:28 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=canb.auug.org.au;
-        s=201702; t=1619071048;
-        bh=sg9p+Yym4WtkPibvGln+BlE8RicUroqClBfSKpfPyY4=;
-        h=Date:From:To:Cc:Subject:From;
-        b=GoNHdzV6ijIt79lu9nIC7atw6SkqgdrUYlZMQG+2IVvYcZ2YILdsnp8M7pBwDa0Eh
-         F8yOEsmioe9+Z2r4NidAS53Zasklj07lfrG3L6uxav2x4Htz6PkAzaj/xt2pCVF2R9
-         BRa5AKLF6ClDLBEOxYS3lNuod1i52YtAfzUNFntDiefwsEQCEDZVRTt7vl3xMw/a04
-         Ff+ug+rI0WoGfEURpOIulmEm65pPtnQVApfLY6Tl7gRWiWG0UBPx2l4XxNdvBQN6O8
-         yM4955hchw2rH8y+j8IiZu5sCDyEKrRbCvbo2+J8dJ4d4mGbnGRAL02eqI4DsEA+nu
-         3yd7Ls7aMlFDg==
-Date:   Thu, 22 Apr 2021 15:57:27 +1000
-From:   Stephen Rothwell <sfr@canb.auug.org.au>
-To:     Tejun Heo <tj@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
-        KVM <kvm@vger.kernel.org>
-Cc:     Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        id S234854AbhDVGac (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 22 Apr 2021 02:30:32 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:28755 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230084AbhDVGab (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 22 Apr 2021 02:30:31 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1619072996;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=B6EiPZu3q42UgnLk/MTSD3xsxXo/x21R/hyRmF6Gxlg=;
+        b=cEicqHG89HsOgcIt2xuSE/SQsyZphPBt5MgRZeaD/2s8VF677u/uBXvK8735NGzBG4SqeR
+        AG++83251tp5yM2GURMOZ2YHAzpWUB7eSlKm1n9egjmj+pHHia6mHymIB+wTP5wPGQ2YjO
+        0ayAwUhd0bG9dLsgcsxcv3dmuPz4ek0=
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-150-QqYv5CnWM92hvYMg8t_Xpg-1; Thu, 22 Apr 2021 02:29:53 -0400
+X-MC-Unique: QqYv5CnWM92hvYMg8t_Xpg-1
+Received: by mail-ed1-f69.google.com with SMTP id y10-20020a50f1ca0000b0290382d654f75eso16170411edl.1
+        for <kvm@vger.kernel.org>; Wed, 21 Apr 2021 23:29:52 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=B6EiPZu3q42UgnLk/MTSD3xsxXo/x21R/hyRmF6Gxlg=;
+        b=c2bApyl08UT+H6sLPFIi/T7R+ABHoextq6Po2aF2G2D61dy/mJxbm4w2RwMMz+sJQ9
+         uJ2eBk9MaoCfPVPgz6AmHoFlT6nxTqu4hBOGqdHck3W0OO4lwNruxwDcst339UpFc5Ri
+         L7eR1j5AdzicpaNXEZyUBSTamh/47F9ybqI3Ly5jJWKgRsFVblqWFEAiDmuvDcXrzqtm
+         25ZRaqaVzjFb/rGKmePh9X2gYAa8OsNtXjhFgJpjG5MXNb1hn0LzudR0dXZCGVsrLmxV
+         EYksDUuMz1mvywUctPOKcUhuOkKSn+bzNd2SDTDTVkDLBVQyhH2TdkO5pfHBMFtrLDfT
+         RWqQ==
+X-Gm-Message-State: AOAM530cqs8DNyUsCvN3v/KfD9yiDJkXrkhEsSrWgSl6fkS5TaCkIgcm
+        7ez0fQtVgaa1fLGgD4gOneMqI0xAfpWdRkNR6v7w9jRht0yjw+UH08Zdqxt0hklgcfFvF7saXlU
+        Wnvc4noNOW5YX
+X-Received: by 2002:a17:906:d8cd:: with SMTP id re13mr1734329ejb.141.1619072991941;
+        Wed, 21 Apr 2021 23:29:51 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJysC/AMNwvEFPxfj5p+ELMpnF7pi7Egg3tU8xa4jD4gt4Fb63vh/8/sWYrJjGjhAPk/n/OQcw==
+X-Received: by 2002:a17:906:d8cd:: with SMTP id re13mr1734316ejb.141.1619072991741;
+        Wed, 21 Apr 2021 23:29:51 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id ca1sm1162161edb.76.2021.04.21.23.29.50
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 21 Apr 2021 23:29:51 -0700 (PDT)
+Subject: Re: linux-next: manual merge of the kvm tree with the tip tree
+To:     Nadav Amit <namit@vmware.com>,
+        Stephen Rothwell <sfr@canb.auug.org.au>
+Cc:     KVM <kvm@vger.kernel.org>, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@elte.hu>, "H. Peter Anvin" <hpa@zytor.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Ingo Molnar <mingo@kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
         Linux Next Mailing List <linux-next@vger.kernel.org>,
-        Nathan Tempelman <natet@google.com>,
-        Vipin Sharma <vipinsh@google.com>
-Subject: linux-next: manual merge of the cgroup tree with the kvm tree
-Message-ID: <20210422155727.70ca2e49@canb.auug.org.au>
+        Wanpeng Li <wanpengli@tencent.com>
+References: <20210422143056.62a3fee4@canb.auug.org.au>
+ <142AD46E-6B41-49F3-90C1-624649A20764@vmware.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <e69ecd92-f87c-eb8b-c288-83efb13bb3eb@redhat.com>
+Date:   Thu, 22 Apr 2021 08:29:50 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.7.0
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/1EmnoDOHwrH+rqAlBqfORKI";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+In-Reply-To: <142AD46E-6B41-49F3-90C1-624649A20764@vmware.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
---Sig_/1EmnoDOHwrH+rqAlBqfORKI
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+On 22/04/21 06:45, Nadav Amit wrote:
+> 
+>> On Apr 21, 2021, at 9:30 PM, Stephen Rothwell <sfr@canb.auug.org.au> wrote:
+>>
+>> Hi all,
+>>
+>> Today's linux-next merge of the kvm tree got a conflict in:
+>>
+>>   arch/x86/kernel/kvm.c
+>>
+>> between commit:
+>>
+>>   4ce94eabac16 ("x86/mm/tlb: Flush remote and local TLBs concurrently")
+>>
+>> from the tip tree and commit:
+>>
+>>   2b519b5797d4 ("x86/kvm: Don't bother __pv_cpu_mask when !CONFIG_SMP")
+>>
+>> from the kvm tree.
+> 
+> Thank you and sorry for that.
 
-Hi all,
+No problem, this is a reasonable conflict to have.
 
-Today's linux-next merge of the cgroup tree got a conflict in:
+Paolo
 
-  arch/x86/kvm/svm/svm.h
+>>   static void __init kvm_smp_prepare_boot_cpu(void)
+>>   {
+>>   	/*
+>> @@@ -655,15 -668,9 +673,9 @@@ static void __init kvm_guest_init(void
+>>
+>>   	if (kvm_para_has_feature(KVM_FEATURE_STEAL_TIME)) {
+>>   		has_steal_clock = 1;
+>> -		pv_ops.time.steal_clock = kvm_steal_clock;
+>> +		static_call_update(pv_steal_clock, kvm_steal_clock);
+> 
+> I do not understand how this line ended in the merge fix though.
+> 
+> Not that it is correct or wrong, but it is not part of either of
+> these 2 patches AFAIK.
+> 
 
-between commit:
-
-  54526d1fd593 ("KVM: x86: Support KVM VMs sharing SEV context")
-
-from the kvm tree and commit:
-
-  7aef27f0b2a8 ("svm/sev: Register SEV and SEV-ES ASIDs to the misc control=
-ler")
-
-from the cgroup tree.
-
-I fixed it up (see below) and can carry the fix as necessary. This
-is now fixed as far as linux-next is concerned, but any non trivial
-conflicts should be mentioned to your upstream maintainer when your tree
-is submitted for merging.  You may also want to consider cooperating
-with the maintainer of the conflicting tree to minimise any particularly
-complex conflicts.
-
---=20
-Cheers,
-Stephen Rothwell
-
-diff --cc arch/x86/kvm/svm/svm.h
-index 454da1c1d9b7,9806aaebc37f..000000000000
---- a/arch/x86/kvm/svm/svm.h
-+++ b/arch/x86/kvm/svm/svm.h
-@@@ -68,7 -65,7 +68,8 @@@ struct kvm_sev_info=20
-  	unsigned long pages_locked; /* Number of pages locked */
-  	struct list_head regions_list;  /* List of registered regions */
-  	u64 ap_jump_table;	/* SEV-ES AP Jump Table address */
- +	struct kvm *enc_context_owner; /* Owner of copied encryption context */
-+ 	struct misc_cg *misc_cg; /* For misc cgroup accounting */
-  };
- =20
-  struct kvm_svm {
-
---Sig_/1EmnoDOHwrH+rqAlBqfORKI
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmCBEEcACgkQAVBC80lX
-0Gx3BQgAnXwVvX8Ls+1RuPeLhvaMyLudVx1yoD16tvrM32rMfif/wEZqCrmk1gHO
-J01gSUM07C/90ykbQUHCK5jiB2cHjDeeMp7jKf8gBSuV/R/Lx6SppgX5CwaGCz7g
-2ycCeRpfgPHUTYaDRXlrRrPxkrU+6pmVNrJpuq4zp6dw1ooe4ICBPWihSF4dBRdv
-QmS8WtPc7lupsaouWdkZXvv+rSKJY3VVQP8PfjdKrEZQrcV9iSFglOvtux3caESI
-AdoEeO2LJ8Vx5sP3AyKM9/FsmbLv1IWrNHxpmR0llzyURdnHQPQTDaOkSqtSyXGk
-HmCHkcPCnfVPuUusgzpTjYnsPln7Vg==
-=dNwJ
------END PGP SIGNATURE-----
-
---Sig_/1EmnoDOHwrH+rqAlBqfORKI--
