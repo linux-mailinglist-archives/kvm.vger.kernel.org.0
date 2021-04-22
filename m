@@ -2,171 +2,176 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 40C6C367636
-	for <lists+kvm@lfdr.de>; Thu, 22 Apr 2021 02:25:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6F361367684
+	for <lists+kvm@lfdr.de>; Thu, 22 Apr 2021 02:53:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235144AbhDVAZ4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 21 Apr 2021 20:25:56 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:25382 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S235063AbhDVAZz (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 21 Apr 2021 20:25:55 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1619051118;
-        h=from:from:reply-to:reply-to:subject:subject:date:date:
-         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-         content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=iJ1/DVIqYO6+cVlh7hmQ/FIT2MrvC33b9kkUd/QtjuU=;
-        b=dRdzmi+vFUrmNu/OUowvqPUTTedgrQjYZlfXpkRUBqdVI54fgri9yIKyd30Bg3IeGKDBQE
-        xUWY0rOwTQUn+yJ8k6LMxN49DlYWOmMW0qk/3IyzUmNgjbXp9y3oHQF+F86XmXk2pRc/Cf
-        xLBidaC730D+AWHITv8s3G1XX5KcaFU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-541-fWoU0mMeMs2ncBbX-eb-jg-1; Wed, 21 Apr 2021 20:25:16 -0400
-X-MC-Unique: fWoU0mMeMs2ncBbX-eb-jg-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9C05D801814;
-        Thu, 22 Apr 2021 00:25:14 +0000 (UTC)
-Received: from [10.64.54.94] (vpn2-54-94.bne.redhat.com [10.64.54.94])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 019EC5D769;
-        Thu, 22 Apr 2021 00:25:11 +0000 (UTC)
-Reply-To: Gavin Shan <gshan@redhat.com>
-Subject: Re: [PATCH v4 2/2] kvm/arm64: Try stage2 block mapping for host
- device MMIO
-To:     Keqian Zhu <zhukeqian1@huawei.com>, linux-kernel@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
-        kvmarm@lists.cs.columbia.edu
-Cc:     Marc Zyngier <maz@kernel.org>, wanghaibin.wang@huawei.com
-References: <20210415140328.24200-1-zhukeqian1@huawei.com>
- <20210415140328.24200-3-zhukeqian1@huawei.com>
- <960e097d-818b-00bc-b2ee-0da17857f862@redhat.com>
- <105a403a-e48b-15bc-44ff-0ff34f7d2194@huawei.com>
-From:   Gavin Shan <gshan@redhat.com>
-Message-ID: <46606f3e-ef41-6520-6647-88c0f76a83e0@redhat.com>
-Date:   Thu, 22 Apr 2021 12:25:23 +1000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.0
+        id S238587AbhDVAxm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 21 Apr 2021 20:53:42 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:37758 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S235168AbhDVAxl (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 21 Apr 2021 20:53:41 -0400
+Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 13M0Wm4T119475;
+        Wed, 21 Apr 2021 20:53:07 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=+gGUx1sNshe+I44p8sIGmfmHRCxtWareHWcSohlwfVA=;
+ b=p/AVgeSkiQBGeUovP4pUrLt4id5LOAIW4GKWIVEYqkEsnGRM5ogZDcSNZasHmXzNuVrM
+ s1V34Q626wDdmqc9mQxGsysfHm6MPdf57VftCpr729QtAhxVKSpDOslTiEm31Nfc89zw
+ zJxuLI2ibokYsPpHGJ5hWTRRj0tRgdSpAAnPynopfKYMEjNCAQCxMb16iKMq+dFp4du4
+ YjFvxcply2QvlstqSeSb+Xc8C0v+ZSVsReDOqTxWvWXYhDwlVuW9gb31eVjEQ9fJ/usx
+ Kx+wkJX0YlMLbXU0HdLn95Cl5QkPd66PbRCTQn0M1BQV4l88JJeVrRarCua++M2RHtGv QA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 382xh08kv5-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 21 Apr 2021 20:53:07 -0400
+Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 13M0YOvH125903;
+        Wed, 21 Apr 2021 20:53:07 -0400
+Received: from ppma06fra.de.ibm.com (48.49.7a9f.ip4.static.sl-reverse.com [159.122.73.72])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 382xh08kuj-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 21 Apr 2021 20:53:06 -0400
+Received: from pps.filterd (ppma06fra.de.ibm.com [127.0.0.1])
+        by ppma06fra.de.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 13M0laQg015086;
+        Thu, 22 Apr 2021 00:53:04 GMT
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
+        by ppma06fra.de.ibm.com with ESMTP id 37ypxh9dr7-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 22 Apr 2021 00:53:04 +0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 13M0r0dJ31785304
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 22 Apr 2021 00:53:01 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id E11CAAE051;
+        Thu, 22 Apr 2021 00:53:00 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 6C2F9AE045;
+        Thu, 22 Apr 2021 00:53:00 +0000 (GMT)
+Received: from li-e979b1cc-23ba-11b2-a85c-dfd230f6cf82 (unknown [9.171.31.18])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with SMTP;
+        Thu, 22 Apr 2021 00:53:00 +0000 (GMT)
+Date:   Thu, 22 Apr 2021 02:52:58 +0200
+From:   Halil Pasic <pasic@linux.ibm.com>
+To:     Eric Farman <farman@linux.ibm.com>
+Cc:     Cornelia Huck <cohuck@redhat.com>,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        Jared Rossi <jrossi@linux.ibm.com>, linux-s390@vger.kernel.org,
+        kvm@vger.kernel.org
+Subject: Re: [RFC PATCH v4 0/4] vfio-ccw: Fix interrupt handling for
+ HALT/CLEAR
+Message-ID: <20210422025258.6ed7619d.pasic@linux.ibm.com>
+In-Reply-To: <20210413182410.1396170-1-farman@linux.ibm.com>
+References: <20210413182410.1396170-1-farman@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-In-Reply-To: <105a403a-e48b-15bc-44ff-0ff34f7d2194@huawei.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: -tn7Dq0vjRQVrJu2iUUvQnQBCSMVUaFa
+X-Proofpoint-ORIG-GUID: qD3C3reA9tJhAPzsvP5tNF2bkiRCPTE7
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.761
+ definitions=2021-04-21_08:2021-04-21,2021-04-21 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 mlxscore=0
+ adultscore=0 lowpriorityscore=0 malwarescore=0 suspectscore=0 spamscore=0
+ impostorscore=0 clxscore=1015 priorityscore=1501 mlxlogscore=999
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2104060000 definitions=main-2104220003
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Keqian,
+On Tue, 13 Apr 2021 20:24:06 +0200
+Eric Farman <farman@linux.ibm.com> wrote:
 
-On 4/21/21 4:36 PM, Keqian Zhu wrote:
-> On 2021/4/21 15:52, Gavin Shan wrote:
->> On 4/16/21 12:03 AM, Keqian Zhu wrote:
->>> The MMIO region of a device maybe huge (GB level), try to use
->>> block mapping in stage2 to speedup both map and unmap.
->>>
->>> Compared to normal memory mapping, we should consider two more
->>> points when try block mapping for MMIO region:
->>>
->>> 1. For normal memory mapping, the PA(host physical address) and
->>> HVA have same alignment within PUD_SIZE or PMD_SIZE when we use
->>> the HVA to request hugepage, so we don't need to consider PA
->>> alignment when verifing block mapping. But for device memory
->>> mapping, the PA and HVA may have different alignment.
->>>
->>> 2. For normal memory mapping, we are sure hugepage size properly
->>> fit into vma, so we don't check whether the mapping size exceeds
->>> the boundary of vma. But for device memory mapping, we should pay
->>> attention to this.
->>>
->>> This adds get_vma_page_shift() to get page shift for both normal
->>> memory and device MMIO region, and check these two points when
->>> selecting block mapping size for MMIO region.
->>>
->>> Signed-off-by: Keqian Zhu <zhukeqian1@huawei.com>
->>> ---
->>>    arch/arm64/kvm/mmu.c | 61 ++++++++++++++++++++++++++++++++++++--------
->>>    1 file changed, 51 insertions(+), 10 deletions(-)
->>>
->>> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
->>> index c59af5ca01b0..5a1cc7751e6d 100644
->>> --- a/arch/arm64/kvm/mmu.c
->>> +++ b/arch/arm64/kvm/mmu.c
->>> @@ -738,6 +738,35 @@ transparent_hugepage_adjust(struct kvm_memory_slot *memslot,
->>>        return PAGE_SIZE;
->>>    }
->>>    +static int get_vma_page_shift(struct vm_area_struct *vma, unsigned long hva)
->>> +{
->>> +    unsigned long pa;
->>> +
->>> +    if (is_vm_hugetlb_page(vma) && !(vma->vm_flags & VM_PFNMAP))
->>> +        return huge_page_shift(hstate_vma(vma));
->>> +
->>> +    if (!(vma->vm_flags & VM_PFNMAP))
->>> +        return PAGE_SHIFT;
->>> +
->>> +    VM_BUG_ON(is_vm_hugetlb_page(vma));
->>> +
->>
->> I don't understand how VM_PFNMAP is set for hugetlbfs related vma.
->> I think they are exclusive, meaning the flag is never set for
->> hugetlbfs vma. If it's true, VM_PFNMAP needn't be checked on hugetlbfs
->> vma and the VM_BUG_ON() becomes unnecessary.
-> Yes, but we're not sure all drivers follow this rule. Add a BUG_ON() is
-> a way to catch issue.
+> Hi Conny, Halil,
 > 
-
-I think I didn't make things clear. What I meant is VM_PFNMAP can't
-be set for hugetlbfs VMAs. So the checks here can be simplified as
-below if you agree:
-
-     if (is_vm_hugetlb_page(vma))
-         return huge_page_shift(hstate_vma(vma));
-
-     if (!(vma->vm_flags & VM_PFNMAP))
-         return PAGE_SHIFT;
-
-     VM_BUG_ON(is_vm_hugetlb_page(vma));       /* Can be dropped */
-
->>
->>> +    pa = (vma->vm_pgoff << PAGE_SHIFT) + (hva - vma->vm_start);
->>> +
->>> +#ifndef __PAGETABLE_PMD_FOLDED
->>> +    if ((hva & (PUD_SIZE - 1)) == (pa & (PUD_SIZE - 1)) &&
->>> +        ALIGN_DOWN(hva, PUD_SIZE) >= vma->vm_start &&
->>> +        ALIGN(hva, PUD_SIZE) <= vma->vm_end)
->>> +        return PUD_SHIFT;
->>> +#endif
->>> +
->>> +    if ((hva & (PMD_SIZE - 1)) == (pa & (PMD_SIZE - 1)) &&
->>> +        ALIGN_DOWN(hva, PMD_SIZE) >= vma->vm_start &&
->>> +        ALIGN(hva, PMD_SIZE) <= vma->vm_end)
->>> +        return PMD_SHIFT;
->>> +
->>> +    return PAGE_SHIFT;
->>> +}
->>> +
->>
->> There is "switch(...)" fallback mechanism in user_mem_abort(). PUD_SIZE/PMD_SIZE
->> can be downgraded accordingly if the addresses fails in the alignment check
->> by fault_supports_stage2_huge_mapping(). I think it would make user_mem_abort()
->> simplified if the logic can be moved to get_vma_page_shift().
->>
->> Another question if we need the check from fault_supports_stage2_huge_mapping()
->> if VM_PFNMAP area is going to be covered by block mapping. If so, the "switch(...)"
->> fallback mechanism needs to be part of get_vma_page_shift().
-> Yes, Good suggestion. My idea is that we can keep this series simpler and do further
-> optimization in another patch series. Do you mind to send a patch?
+> Let's restart our discussion about the collision between interrupts for
+> START SUBCHANNEL and HALT/CLEAR SUBCHANNEL. It's been a quarter million
+> minutes (give or take), so here is the problematic scenario again:
 > 
+> 	CPU 1			CPU 2
+>  1	CLEAR SUBCHANNEL
+>  2	fsm_irq()
+>  3				START SUBCHANNEL
+>  4	vfio_ccw_sch_io_todo()
+>  5				fsm_irq()
+>  6				vfio_ccw_sch_io_todo()
+> 
+> From the channel subsystem's point of view the CLEAR SUBCHANNEL (step 1)
+> is complete once step 2 is called, as the Interrupt Response Block (IRB)
+> has been presented and the TEST SUBCHANNEL was driven by the cio layer.
+> Thus, the START SUBCHANNEL (step 3) is submitted [1] and gets a cc=0 to
+> indicate the I/O was accepted. However, step 2 stacks the bulk of the
+> actual work onto a workqueue for when the subchannel lock is NOT held,
+> and is unqueued at step 4. That code misidentifies the data in the IRB
+> as being associated with the newly active I/O, and may release memory
+> that is actively in use by the channel subsystem and/or device. Eww.
+> 
+> In this version...
+> 
+> Patch 1 and 2 are defensive checks. Patch 2 was part of v3 [2], but I
+> would love a better option here to guard between steps 2 and 4.
+> 
+> Patch 3 is a subset of the removal of the CP_PENDING FSM state in v3.
+> I've obviously gone away from this idea, but I thought this piece is
+> still valuable.
+> 
+> Patch 4 collapses the code on the interrupt path so that changes to
+> the FSM state and the channel_program struct are handled at the same
+> point, rather than separated by a mutex boundary. Because of the
+> possibility of a START and HALT/CLEAR running concurrently, it does
+> not make sense to split them here.
+> 
+> With the above patches, maybe it then makes sense to hold the io_mutex
+> across the entirety of vfio_ccw_sch_io_todo(). But I'm not completely
+> sure that would be acceptable.
+> 
+> So... Thoughts?
 
-Yeah, It's fine to keep this series as of being. There are 3 checks applied
-here for MMIO region: hva/hpa/ipa and they're distributed in two functions,
-making the code a bit hard to follow. I can post patch to simplify it after
-your series gets merged :)
+I believe we should address the concurrency, encapsulation and layering
+issues in the subchannel/ccw pass-through code (vfio-ccw) by taking a
+holistic approach as soon as possible.
 
-Thanks,
-Gavin
+I find the current state of art very hard to reason about, and that
+adversely  affects my ability to reason about attempts at partial
+improvements.
+
+I understand that such a holistic approach needs a lot of work, and we
+may have to stop some bleeding first. In the stop the bleeding phase we
+can take a pragmatic approach and accept changes that empirically seem to
+work towards stopping the bleeding. I.e. if your tests say it's better,
+I'm willing to accept that it is better.
+
+I have to admit, I don't understand how synchronization is done in the
+vfio-ccw kernel module (in the sense of avoiding data races).
+
+Regarding your patches, I have to admit, I have a hard time figuring out
+which one of these (or what combination of them) is supposed to solve
+the problem you described above. If I had to guess, I would guess it is
+either patch 4, because it has a similar scenario diagram in the
+commit message like the one in the problem statement. Is my guess right?
+
+If it is right I don't quite understand the mechanics of the fix,
+because what the patch seems to do is changing the content of step 4 in
+the above diagram. And I don't see how is change that code
+so that it does not "misidentifies the data in the IRB as being
+associated with the newly active I/O". Moreover patch 4 seems to rely on
+private->state which, AFAIR is still used in a racy fashion.
+
+But if strong empirical evidence shows that it performs better (stops
+the bleeding), I think we can go ahead with it.
+
+Regards,
+Halil
+
+
+
+
+
+
 
