@@ -2,149 +2,123 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EDC1C367BAD
-	for <lists+kvm@lfdr.de>; Thu, 22 Apr 2021 10:03:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D998F367BBC
+	for <lists+kvm@lfdr.de>; Thu, 22 Apr 2021 10:07:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235191AbhDVIDq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 22 Apr 2021 04:03:46 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:47822 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234773AbhDVIDp (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 22 Apr 2021 04:03:45 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1619078590;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=HuliVKSjNgJrwoXum5zRyi+xd5k9Y5JwzVBuTZhkAsE=;
-        b=hNyt2KY8yecVqqejFdp5deW3EWouWIeCeXwFhg2YsG/rQwO+GVSlc9cRyOTAd99ZfWej+H
-        zIXXrMqicMKO5G3+oH8w3kVO6H+IKNIdSpui4pBW7s1xT5mYUx7XYNaFlN/FLNJ403fD2N
-        CZpGudMd9pPA2/Ol8fjSItbz+NcoX/Y=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-481-A2ZxUM7tP9GVsql8TUtTbA-1; Thu, 22 Apr 2021 04:03:08 -0400
-X-MC-Unique: A2ZxUM7tP9GVsql8TUtTbA-1
-Received: by mail-ed1-f71.google.com with SMTP id d2-20020aa7d6820000b0290384ee872881so12206072edr.10
-        for <kvm@vger.kernel.org>; Thu, 22 Apr 2021 01:03:08 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=HuliVKSjNgJrwoXum5zRyi+xd5k9Y5JwzVBuTZhkAsE=;
-        b=gPfjGd8zNfKAmA0j1CRgPtLv1mNis+r4Bxgr6wieBVJqGmeyA4ikI44VeLH/uWE6HN
-         j6Blkr4X+KaHBdKuQ5MoRScaT2Y1zlofeJCjrwjNWR4TekmlesvQqgWcdl0TSYhbmvr0
-         xZnqBy6/hIVoVT/1cSQFECbRAnSM9fMFGKaPs7NgBgaunTOk2KgFPEGLSpUiLhLA310b
-         y6EfOgr2cXa8jwzpUbG+Cd/WxQk8c12WFyO+BekzwN/Vaq4/SM/s1V/oFFivE6PtanN1
-         c5m9f5wsIqpXctYz2PZ1cfyznMIzztP1uZwvSLc+UBIy1W+2caVP51+nEa+v4dmYsFWb
-         AX0A==
-X-Gm-Message-State: AOAM5311CS3hV7Tm8LzuVR8YymSzwtPIRa9ElCmuY8hupJ36SHdU2Yy1
-        kV2mii4qbj5yCi1OQg8OQG5pcJ9NE7/OlB2FZbet0Dw4fmXrvzyk4QxPFPBNnSbEsfTdy0V6Iky
-        9UUiuXkVM9VRB
-X-Received: by 2002:a17:906:88b:: with SMTP id n11mr1988584eje.26.1619078587429;
-        Thu, 22 Apr 2021 01:03:07 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwBCeIBHz0a6EpgAkl4aqEVM/01xzrbdA4bz1BfFlA+tlE+r0auJtDYmLc9V1fmQD3QoOVbng==
-X-Received: by 2002:a17:906:88b:: with SMTP id n11mr1988567eje.26.1619078587272;
-        Thu, 22 Apr 2021 01:03:07 -0700 (PDT)
-Received: from gator (cst2-174-132.cust.vodafone.cz. [31.30.174.132])
-        by smtp.gmail.com with ESMTPSA id cd14sm1306755ejb.53.2021.04.22.01.03.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 22 Apr 2021 01:03:06 -0700 (PDT)
-Date:   Thu, 22 Apr 2021 10:03:05 +0200
-From:   Andrew Jones <drjones@redhat.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Thomas Huth <thuth@redhat.com>, Jacob Xu <jacobhxu@google.com>,
-        kvm@vger.kernel.org
-Subject: Re: [kvm-unit-tests PATCH] update git tree location in MAINTAINERS
- to point at gitlab
-Message-ID: <20210422080305.pjmfwq45qhhwmzt2@gator>
-References: <20210421191611.2557051-1-jacobhxu@google.com>
- <edc3df0e-0eb7-108d-3371-2e13f285d632@redhat.com>
- <97adb2d3-47f4-385a-18b4-90572c9f486a@redhat.com>
+        id S235208AbhDVIIO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 22 Apr 2021 04:08:14 -0400
+Received: from forward4-smtp.messagingengine.com ([66.111.4.238]:35745 "EHLO
+        forward4-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S235189AbhDVIIN (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 22 Apr 2021 04:08:13 -0400
+Received: from compute4.internal (compute4.nyi.internal [10.202.2.44])
+        by mailforward.nyi.internal (Postfix) with ESMTP id 0AA431940904;
+        Thu, 22 Apr 2021 04:07:39 -0400 (EDT)
+Received: from mailfrontend2 ([10.202.2.163])
+  by compute4.internal (MEProxy); Thu, 22 Apr 2021 04:07:39 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        messagingengine.com; h=cc:content-type:date:from:in-reply-to
+        :message-id:mime-version:references:subject:to:x-me-proxy
+        :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; bh=/HUHh8
+        49Z/kHRCGfql9FhjDE8mgm/I1eaS7Hb7jJaHk=; b=ErX4iOpgy4dKWqQKApWn9g
+        7bs984ZVdiOGwS72mXCBPhiBTGR5mYora9DZttm6HR4WhmwnYHDyiAtdRaSUs09o
+        rLf/1LDSrN8MuZf30rBeE/N4MaN4qzeotKpCQq8MTzLIw8pZfWbyKXDWfo09V9YS
+        8b9sM567UJ5bpfmgh2ah8emo9TlPYiEFGkN4cjFpvs175/VPV8svYA0MjUUAvBFO
+        YLEfzH942H1NE6zeMuEbebwQa3GtqhJ3LMPfU2ksyYbh2okEwam1RHmLXpGFMtPC
+        2NMc1ZJQRD8M8ytazbgNH1f0YLPikZfT22vmbNK/tYMWcsuu1GGTD9yiSbk5ZIIQ
+        ==
+X-ME-Sender: <xms:yi6BYLRSyaIsMwrPAthHsv5HZUAY7Y4VpyYGgfZpBgbGJGITC6Kj6w>
+    <xme:yi6BYMwK7M17QWS4jhN_JVmbdBfFTvvDOopq3j7XfA08Pf7DzS7iwcnorYmp7pBoC
+    oZQt7cosNxbl_DIQMw>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeduledrvddutdcutefuodetggdotefrodftvfcurf
+    hrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecuuegr
+    ihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjug
+    hrpefvufgjfhfhfffkgggtsehttdertddttddtnecuhfhrohhmpeffrghvihguucfgughm
+    ohhnughsohhnuceoughmvgesughmvgdrohhrgheqnecuggftrfgrthhtvghrnhephefhje
+    fgheevvdetudfgheevudeghedtffejgedtgfetvdfhheekgeefkeetkefhnecuffhomhgr
+    ihhnpehslhgvughjrdhnvghtnecukfhppeekuddrudekjedrvdeirddvfeeknecuvehluh
+    hsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepughmvgesughmvgdr
+    ohhrgh
+X-ME-Proxy: <xmx:yi6BYA05pJIeOtALTU0k_i26hwmC0Aud4oF6FSRxZ99kaYKV5m4atw>
+    <xmx:yi6BYLBkDR6J3p4DbM4039xyv4A2BRSkZuPogZK1dhFcvmlFxJU-IA>
+    <xmx:yi6BYEjDrYJbQ4l9s84vrDNwpo3ialbTO9s-y3ymyJmkeOrc2p_lkA>
+    <xmx:yy6BYNtc-CUEXPYr_wzWAs_gA4bUqKszBiqXE1vNKyawHY0g4siUIA>
+Received: from disaster-area.hh.sledj.net (disaster-area.hh.sledj.net [81.187.26.238])
+        by mail.messagingengine.com (Postfix) with ESMTPA id 462221080064;
+        Thu, 22 Apr 2021 04:07:38 -0400 (EDT)
+Received: from localhost (disaster-area.hh.sledj.net [local])
+        by disaster-area.hh.sledj.net (OpenSMTPD) with ESMTPA id f950ba56;
+        Thu, 22 Apr 2021 08:07:36 +0000 (UTC)
+To:     Aaron Lewis <aaronlewis@google.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Jim Mattson <jmattson@google.com>,
+        kvm list <kvm@vger.kernel.org>
+Subject: Re: [PATCH v2 1/2] kvm: x86: Allow userspace to handle emulation
+ errors
+In-Reply-To: <CAAAPnDHsz5Yd0oa5z15z0S4vum6=mHHXDN_M5X0HeVaCrk4H0Q@mail.gmail.com>
+References: <20210421122833.3881993-1-aaronlewis@google.com>
+ <cunsg3jg2ga.fsf@dme.org>
+ <CAAAPnDH1LtRDLCjxdd8hdqABSu9JfLyxN1G0Nu1COoVbHn1MLw@mail.gmail.com>
+ <cunmttrftrh.fsf@dme.org>
+ <CAAAPnDHsz5Yd0oa5z15z0S4vum6=mHHXDN_M5X0HeVaCrk4H0Q@mail.gmail.com>
+X-HGTTG: zarquon
+From:   David Edmondson <dme@dme.org>
+Date:   Thu, 22 Apr 2021 09:07:36 +0100
+Message-ID: <cunk0oug2t3.fsf@dme.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <97adb2d3-47f4-385a-18b4-90572c9f486a@redhat.com>
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Apr 22, 2021 at 09:39:44AM +0200, Paolo Bonzini wrote:
-> On 22/04/21 05:42, Thomas Huth wrote:
-> > On 21/04/2021 21.16, Jacob Xu wrote:
-> > > The MAINTAINERS file appears to have been forgotten during the migration
-> > > to gitlab from the kernel.org. Let's update it now.
-> > > 
-> > > Signed-off-by: Jacob Xu <jacobhxu@google.com>
-> > > ---
-> > >   MAINTAINERS | 2 +-
-> > >   1 file changed, 1 insertion(+), 1 deletion(-)
-> > > 
-> > > diff --git a/MAINTAINERS b/MAINTAINERS
-> > > index 54124f6..e0c8e99 100644
-> > > --- a/MAINTAINERS
-> > > +++ b/MAINTAINERS
-> > > @@ -55,7 +55,7 @@ Maintainers
-> > >   -----------
-> > >   M: Paolo Bonzini <pbonzini@redhat.com>
-> > >   L: kvm@vger.kernel.org
-> > > -T: git://git.kernel.org/pub/scm/virt/kvm/kvm-unit-tests.git
-> > > +T:    https://gitlab.com/kvm-unit-tests/kvm-unit-tests.git
-> > 
-> > Reviewed-by: Thomas Huth <thuth@redhat.com>
-> 
-> You're too humble, Thomas. :)  Since Drew and you have commit access this
-> could very well be:
-> 
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index ef7e9af..0082e58 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -54,8 +54,9 @@ Descriptions of section entries:
->  Maintainers
->  -----------
->  M: Paolo Bonzini <pbonzini@redhat.com>
-> +M: Thomas Huth <thuth@redhat.com>
-> +M: Andrew Jones <drjones@redhat.com>
->  L: kvm@vger.kernel.org
-> -T: git://git.kernel.org/pub/scm/virt/kvm/kvm-unit-tests.git
-> +T: https://gitlab.com/kvm-unit-tests/kvm-unit-tests.git
-> 
->  Architecture Specific Code:
->  ---------------------------
-> 
-> And also, while at it:
-> 
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index ef7e9af..0082e58 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -92,3 +94,4 @@ M: Paolo Bonzini <pbonzini@redhat.com>
->  L: kvm@vger.kernel.org
->  F: x86/*
->  F: lib/x86/*
-> +T: https://gitlab.com/bonzini/kvm-unit-tests.git
-> 
+On Wednesday, 2021-04-21 at 12:01:21 -07, Aaron Lewis wrote:
+
+>> >
+>> > I don't think this is a problem because the instruction bytes stream
+>> > has irrelevant bytes in it anyway.  In the test attached I verify that
+>> > it receives an flds instruction in userspace that was emulated in the
+>> > guest.  In the stream that comes through insn_size is set to 15 and
+>> > the instruction is only 2 bytes long, so the stream has irrelevant
+>> > bytes in it as far as this instruction is concerned.
+>>
+>> As an experiment I added[1] reporting of the exit reason using flag 2. On
+>> emulation failure (without the instruction bytes flag enabled), one run
+>> of QEMU reported:
+>>
+>> > KVM internal error. Suberror: 1
+>> > extra data[0]: 2
+>> > extra data[1]: 4
+>> > extra data[2]: 0
+>> > extra data[3]: 31
+>> > emulation failure
+>>
+>> data[1] and data[2] are not indicated as valid, but it seems unfortunate
+>> that I got (not really random) garbage there.
+>>
+>> Admittedly, with only your patches applied ndata will never skip past
+>> any bytes, as there is only one flag. As soon as I add another, is it my
+>> job to zero out those unused bytes? Maybe we should be clearing all of
+>> the payload at the top of prepare_emulation_failure_exit().
+>>
 >
+> Clearing the bytes at the top of prepare_emulation_failure_exit()
+> sounds good to me.  That will keep the data more deterministic.
+> Though, I will say that I don't think that is required.  If the first
+> flag isn't set the data shouldn't be read, no?
 
-I also use my own gitlab for arm/queue. So we could also add
+Agreed. As Jim indicated in his other reply, there should be no new data
+leaked by not zeroing the bytes.
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 54124f6f1a5e..0a2f3a645bb3 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -67,6 +67,7 @@ L: kvmarm@lists.cs.columbia.edu
- F: arm/*
- F: lib/arm/*
- F: lib/arm64/*
-+T: https://gitlab.com/rhdrjones/kvm-unit-tests.git
- 
- POWERPC
- M: Laurent Vivier <lvivier@redhat.com>
+For now at least, this is not a performance critical path, so clearing
+the payload doesn't seem too onerous.
 
+>> Footnotes:
+>> [1]  https://disaster-area.hh.sledj.net/tmp/dme-581090/
+>>
+>> dme.
+>> --
+>> Music has magic, it's good clear syncopation.
 
-Thanks,
-drew
-
+dme.
+-- 
+Don't you know you're never going to get to France.
