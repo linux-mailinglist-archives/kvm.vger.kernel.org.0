@@ -2,75 +2,113 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 82929367D9D
-	for <lists+kvm@lfdr.de>; Thu, 22 Apr 2021 11:22:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 30790367DBA
+	for <lists+kvm@lfdr.de>; Thu, 22 Apr 2021 11:30:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235614AbhDVJWd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 22 Apr 2021 05:22:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53256 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230270AbhDVJWc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 22 Apr 2021 05:22:32 -0400
-Received: from mail-oo1-xc2e.google.com (mail-oo1-xc2e.google.com [IPv6:2607:f8b0:4864:20::c2e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 54C62C06174A;
-        Thu, 22 Apr 2021 02:21:58 -0700 (PDT)
-Received: by mail-oo1-xc2e.google.com with SMTP id i25-20020a4aa1190000b02901bbd9429832so9821702ool.0;
-        Thu, 22 Apr 2021 02:21:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=sTsRqg+iSGDJKgDYHRuF7eGJxXnfL0XzsJ5wibmVRLw=;
-        b=eJK31DzkK7e34q83D97+fPgEpUWA1RwTTqhBPgd8uMEL+TwIlhMAb7r7TgSzIEdFJr
-         OwPtQV/tG5pJGencC0Drth0wMtOXv9Vgmo8QiUJ02lp7l0t8xbM5v8MdWjOcPuywICpN
-         OukM+dIP1hip70Ts8nTRKfH0mQAf+LjtQXKYKkYVN6ME/uEj8H+wcyZbQIQUiBPmjHGd
-         00HjgPs0cbVWrSS0Qjt01aP0Im2sKm+Kvhb3e0os6XGv2cDDUWXgWO09oR4iXsK3eAUD
-         uyxIElpqbUX7EeKI1V0NIOAoSVgM25y6RvxCLUbk9TTHLmw6nrPWQ4TGqX1f+FRuPi6e
-         ojvg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=sTsRqg+iSGDJKgDYHRuF7eGJxXnfL0XzsJ5wibmVRLw=;
-        b=Zd+IvaiNqqQnKPdNCGqOAKjiMy0G9sVsCw2/m7Wr5wemyMyMMNmiwU/Spe8wkROhGD
-         31WszLyu5y6DzIOpHP3uI8AIo/NSlS15yb96ijw5Hsi4yLuy5nr3n2hFAJfV4rBB0zxY
-         IF/6lXVyVZcc70OkyVoi5M+nY4bi+ryYgNfG8r1oAkrU9rCHmi/T3Jc+zT7bvk6lJtRA
-         m75QkwLz8xAF+peBA6Z9baBNJjyR3xEfcdotiBj2bDbwS5wgiBgz1wRlbm2siR8DzJQI
-         d7aZJqSwpYf+QqzcG7vf3GmkKu7d2vnPpgJ8i913npWgN+X+DTrcHpWLH1WIVTM0gVV2
-         4khg==
-X-Gm-Message-State: AOAM532QMpUCduIx+dG4ebdIxzoYk7q6lHjwn4YLbAJj/r0vWahmlP+M
-        o/iJZLTSzNVfEl1ZacowMHTz3yK7GtdI6m15ao/3OKUN
-X-Google-Smtp-Source: ABdhPJwvz0CZoQiatZ+w4b2Klndf0vu3VS+LB2o4SVXRuHdA/uMeJNufnr08FcHWaBqXZc9VvWFf4BsS/sQRsbFD4g0=
-X-Received: by 2002:a4a:8e18:: with SMTP id q24mr1732544ook.66.1619083317800;
- Thu, 22 Apr 2021 02:21:57 -0700 (PDT)
-MIME-Version: 1.0
-References: <20210421032513.1921-1-lihaiwei.kernel@gmail.com>
-In-Reply-To: <20210421032513.1921-1-lihaiwei.kernel@gmail.com>
-From:   Wanpeng Li <kernellwp@gmail.com>
-Date:   Thu, 22 Apr 2021 17:21:46 +0800
-Message-ID: <CANRm+CyXAjvkR6VBh=Nu1KFS=T+_9NX5bCYEWsB4KfmxPn2kLw@mail.gmail.com>
-Subject: Re: [PATCH] KVM: x86: Take advantage of kvm_arch_dy_has_pending_interrupt()
-To:     Haiwei Li <lihaiwei.kernel@gmail.com>
-Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        id S235647AbhDVJab (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 22 Apr 2021 05:30:31 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:41623 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S235613AbhDVJa3 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 22 Apr 2021 05:30:29 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1619083794;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=3kZqpcpDryGiJYWT4WCPcehjl0P1U1v7NJiamcT4384=;
+        b=AW3Yt1zXUqfNlqz4Ixh6sTw7uY1IxilsfopA7n62oL55nTs0jOphQENPgjLIYFfRXZacKV
+        GrkrRoP2/AU5oIt1szd6M+VhUqgtmDaEdlc9xI87e474sLMs/KsV1qVIXN0WtbiA2xmc39
+        xOOOJY9/0UHIRLGcA6GfYLji/EZcf/c=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-474-nmeL2AHLNr2oNKkFuYW9ew-1; Thu, 22 Apr 2021 05:29:53 -0400
+X-MC-Unique: nmeL2AHLNr2oNKkFuYW9ew-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B6DD5839A42;
+        Thu, 22 Apr 2021 09:29:51 +0000 (UTC)
+Received: from vitty.brq.redhat.com (unknown [10.40.194.217])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 825CC10023AE;
+        Thu, 22 Apr 2021 09:29:49 +0000 (UTC)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Haiwei Li <lihaiwei@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
+        Sebastien Boeuf <sebastien.boeuf@intel.com>,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH] KVM: x86: Properly handle APF vs disabled LAPIC situation
+Date:   Thu, 22 Apr 2021 11:29:48 +0200
+Message-Id: <20210422092948.568327-1-vkuznets@redhat.com>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 21 Apr 2021 at 11:26, <lihaiwei.kernel@gmail.com> wrote:
->
-> From: Haiwei Li <lihaiwei@tencent.com>
->
-> `kvm_arch_dy_runnable` checks the pending_interrupt as the code in
-> `kvm_arch_dy_has_pending_interrupt`. So take advantage of it.
->
-> Signed-off-by: Haiwei Li <lihaiwei@tencent.com>
+Async PF 'page ready' event may happen when LAPIC is (temporary) disabled.
+In particular, Sebastien reports that when Linux kernel is directly booted
+by Cloud Hypervisor, LAPIC is 'software disabled' when APF mechanism is
+initialized. On initialization KVM tries to inject 'wakeup all' event and
+puts the corresponding token to the slot. It is, however, failing to inject
+an interrupt (kvm_apic_set_irq() -> __apic_accept_irq() -> !apic_enabled())
+so the guest never gets notified and the whole APF mechanism gets stuck.
+The same issue is likely to happen if the guest temporary disables LAPIC
+and a previously unavailable page becomes available.
 
-Reviewed-by: Wanpeng Li <wanpengli@tencent.com>
+Do two things to resolve the issue:
+- Avoid dequeuing 'page ready' events from APF queue when LAPIC is
+  disabled.
+- Trigger an attempt to deliver pending 'page ready' events when LAPIC
+  becomes enabled (SPIV or MSR_IA32_APICBASE).
+
+Reported-by: Sebastien Boeuf <sebastien.boeuf@intel.com>
+Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+---
+ arch/x86/kvm/lapic.c | 6 ++++++
+ arch/x86/kvm/x86.c   | 2 +-
+ 2 files changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+index cc369b9ad8f1..49a839d0567a 100644
+--- a/arch/x86/kvm/lapic.c
++++ b/arch/x86/kvm/lapic.c
+@@ -296,6 +296,10 @@ static inline void apic_set_spiv(struct kvm_lapic *apic, u32 val)
+ 
+ 		atomic_set_release(&apic->vcpu->kvm->arch.apic_map_dirty, DIRTY);
+ 	}
++
++	/* Check if there are APF page ready requests pending */
++	if (enabled)
++		kvm_make_request(KVM_REQ_APF_READY, apic->vcpu);
+ }
+ 
+ static inline void kvm_apic_set_xapic_id(struct kvm_lapic *apic, u8 id)
+@@ -2261,6 +2265,8 @@ void kvm_lapic_set_base(struct kvm_vcpu *vcpu, u64 value)
+ 		if (value & MSR_IA32_APICBASE_ENABLE) {
+ 			kvm_apic_set_xapic_id(apic, vcpu->vcpu_id);
+ 			static_branch_slow_dec_deferred(&apic_hw_disabled);
++			/* Check if there are APF page ready requests pending */
++			kvm_make_request(KVM_REQ_APF_READY, vcpu);
+ 		} else {
+ 			static_branch_inc(&apic_hw_disabled.key);
+ 			atomic_set_release(&apic->vcpu->kvm->arch.apic_map_dirty, DIRTY);
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index a06a6f48386d..001c6a445eaf 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -11296,7 +11296,7 @@ bool kvm_arch_can_dequeue_async_page_present(struct kvm_vcpu *vcpu)
+ 	if (!kvm_pv_async_pf_enabled(vcpu))
+ 		return true;
+ 	else
+-		return apf_pageready_slot_free(vcpu);
++		return kvm_lapic_enabled(vcpu) && apf_pageready_slot_free(vcpu);
+ }
+ 
+ void kvm_arch_start_assignment(struct kvm *kvm)
+-- 
+2.30.2
+
