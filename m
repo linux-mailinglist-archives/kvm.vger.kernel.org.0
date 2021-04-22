@@ -2,57 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 571603677AF
-	for <lists+kvm@lfdr.de>; Thu, 22 Apr 2021 05:05:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 703913677B2
+	for <lists+kvm@lfdr.de>; Thu, 22 Apr 2021 05:05:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234493AbhDVDFy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 21 Apr 2021 23:05:54 -0400
+        id S234453AbhDVDGA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 21 Apr 2021 23:06:00 -0400
 Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54872 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232618AbhDVDFw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 21 Apr 2021 23:05:52 -0400
+        with ESMTP id S234571AbhDVDF6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 21 Apr 2021 23:05:58 -0400
 Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 35DD9C06138E
-        for <kvm@vger.kernel.org>; Wed, 21 Apr 2021 20:05:18 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id v63-20020a252f420000b02904ecfc17c803so7053345ybv.18
-        for <kvm@vger.kernel.org>; Wed, 21 Apr 2021 20:05:18 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7FEDCC06138C
+        for <kvm@vger.kernel.org>; Wed, 21 Apr 2021 20:05:20 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id s34-20020a252d620000b02904e34d3a48abso18260483ybe.13
+        for <kvm@vger.kernel.org>; Wed, 21 Apr 2021 20:05:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=reply-to:date:in-reply-to:message-id:mime-version:references
          :subject:from:to:cc;
-        bh=mSSHnXopyMXmFcA+159IyWL+hytDhJaLCTp1FEixKI8=;
-        b=pSvzT9tQOaeyEWRk7E2rJi5lyN54wxyEhDI7Bk9oAynZB5db1xDE7r6K2o15Q56Ip3
-         /MYlQQkR8u/UbyOFPieLyv2tNFYjbXOoQ/iC4O9aql7BKbq+BumIMG9/mFpl8oQcfJUj
-         3Soe8zioHjD5KM8+SxR8W80Lr4hMS2xi7NZGx2FrskG4VNOYYLIEaDVU1yL/qnS+6bzE
-         TreuFoZQg3tPY6EKlneV1X9Jd+PD245yLe+rW6KRVBi7eWL82fvlSOzwB0rqTz3Jzgly
-         P4NPjB8A/N+AiRDbwUilNFCte5H5j0gCqPUagXnA64aPKIgwCn8rM114YkEWi2vjdbJo
-         zquw==
+        bh=k8kB/uxnv9kzLjc+aLY861fcn3exbD8jjXlTvKbdBc0=;
+        b=hdXZPLc+ALcZLr+R5t4x/u6ggnfVRlH/p85VOmhZ641OOSKlL23jx7dMmTNCCd7qen
+         HJtUFea2ZILlshoC65ebLuRnv+XXiPWfAQ8vNj0mVB6klzzDzS0vnWsw3mH5d86/uOq+
+         5vmuJpH6rOOs1V/aoUaPO8e6L57eWzvH3zLYsTccU/HRyshDlSLoJitNieR3gbiPaXYJ
+         KzAeKcN6rwnKIY5NBntxTHF23SJ4X16LhmY9xrjmOQqleRLlkTRqqPV2lkcEiLmG7j8L
+         Hn0z+Lsr2+wu25kbjp+4cizDkGpdDmfq6dvRz5C+ftLeWyYlgc37hlp6YsGosWB1Ks4a
+         jpZQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:reply-to:date:in-reply-to:message-id
          :mime-version:references:subject:from:to:cc;
-        bh=mSSHnXopyMXmFcA+159IyWL+hytDhJaLCTp1FEixKI8=;
-        b=Xo4m2xRjmXXJ8rAaqxb3Tk4nEERom9ji7JeaKXXc7QoxWl44BMpclXnQa8gqBclwlZ
-         CgBjich4qpCTG6yrd6T3nK0ZXeN1hhqad4GsunjWyA4ONsPA71wUrlE0nBHtpuHId8lS
-         PA8OiUd6R94d7rVIIZEURhOAqbOFGBARG5X1UPPznDPAl7KcKvnE88ESZcoYAcNwrrJq
-         oiuMqoAy3oYpnGnQspWdWNs953Yg9aSaRM0a86mHij9oeRrxoy5vSvSHEvRPayhbb3Fm
-         RkbQNJel1nzSXCRN8JR18CHzG65Jec8SAZhKAD1/7sRdyX9jU9++wREyKnw3nGr7TEjs
-         bAUg==
-X-Gm-Message-State: AOAM5328efmaSSS+c/UK/OyeCsD554gLTyC5PyCHNtQma+sX0pXAkunQ
-        abfqdU/twhX5EfZA+pW5LV//cak91Gw=
-X-Google-Smtp-Source: ABdhPJwnQwsTDVcoKI8g0vYlK6UNL4T6bk/AODRBbTuaEBljurdvtJOgNYFf0rJbzHyS4ugPbappluDELnU=
+        bh=k8kB/uxnv9kzLjc+aLY861fcn3exbD8jjXlTvKbdBc0=;
+        b=V8EANo5qm0e6xLjYnYI8eU0eNdcUpIRd1wEHEyhulVf8ky8jConS0At+0t2AELGVNq
+         AxL/OrNotfpMprNWB1xRfjEWW0MNlJkG1/qNy2LYIyQO+ETZWZ+oLtqllCTaJVqMOR2j
+         CUWIFm//nndtBtqLTugW153Fc6msc7UDHjIEz31tGcH4B2DGFQoNw4UGznpaZ4Qc9eNg
+         zSEjvyF9xItcxgIypzkLJ6wMmBxQ4F4zkT4zUeeMOiIlnmMaGGAvQ7jNCSZ1rcXL3wFv
+         cn7V2rV46dq3ARla6+scb5gka4Bx2bQ+7FJqAZdWkwC7eGV8d/mHKe/qwuPPDrbH3R/O
+         oDYw==
+X-Gm-Message-State: AOAM532le6nFi1tmrHOuXSRFSwC1uRXQkf6Ypxwx3Tp2LqbX4hBmhD/i
+        aVnrdtWjJlHBJSo5O08P4u6bCGkQvQA=
+X-Google-Smtp-Source: ABdhPJyE/C9cLKUhYN8wgjtkmrOqjU+E6l7Z11S+l4wbcqcBK8eEo8gjhALmnidtNSrcHIYqNXtOX13lPo8=
 X-Received: from seanjc798194.pdx.corp.google.com ([2620:15c:f:10:e012:374c:592:6194])
- (user=seanjc job=sendgmr) by 2002:a5b:788:: with SMTP id b8mr1605507ybq.66.1619060717518;
- Wed, 21 Apr 2021 20:05:17 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a25:4446:: with SMTP id r67mr1508754yba.54.1619060719812;
+ Wed, 21 Apr 2021 20:05:19 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Wed, 21 Apr 2021 20:04:54 -0700
+Date:   Wed, 21 Apr 2021 20:04:55 -0700
 In-Reply-To: <20210422030504.3488253-1-seanjc@google.com>
-Message-Id: <20210422030504.3488253-5-seanjc@google.com>
+Message-Id: <20210422030504.3488253-6-seanjc@google.com>
 Mime-Version: 1.0
 References: <20210422030504.3488253-1-seanjc@google.com>
 X-Mailer: git-send-email 2.31.1.498.g6c1eba8ee3d-goog
-Subject: [kvm-unit-tests PATCH 04/14] x86: msr: Restore original MSR value
- after writing arbitrary test value
+Subject: [kvm-unit-tests PATCH 05/14] x86: Force the compiler to retrieve
+ exception info from per-cpu area
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     kvm@vger.kernel.org, Sean Christopherson <seanjc@google.com>
@@ -61,39 +61,48 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Restore the original MSR value after the WRMSR/RDMSR test.  MSR_GS_BASE
-in particular needs to be restored as it points at per-cpu data.
+Tag the exception vector/error code/flags inline asm as volatile so that
+it's not elided by the compiler.  Without "volatile", the compiler may
+omit the instruction if it inlines the helper and observes that the
+memory isn't modified between the store in TRY_CATCH() and the load in
+the helper.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- x86/msr.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ lib/x86/desc.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/x86/msr.c b/x86/msr.c
-index 757156d..5a3f1c3 100644
---- a/x86/msr.c
-+++ b/x86/msr.c
-@@ -77,7 +77,7 @@ static int find_msr_info(int msr_index)
- 
- static void test_msr_rw(int msr_index, unsigned long long input, unsigned long long expected)
+diff --git a/lib/x86/desc.c b/lib/x86/desc.c
+index 983d4d8..9c1228c 100644
+--- a/lib/x86/desc.c
++++ b/lib/x86/desc.c
+@@ -249,7 +249,7 @@ unsigned exception_vector(void)
  {
--    unsigned long long r = 0;
-+    unsigned long long r, orig;
-     int index;
-     const char *sptr;
-     if ((index = find_msr_info(msr_index)) != -1) {
-@@ -86,8 +86,11 @@ static void test_msr_rw(int msr_index, unsigned long long input, unsigned long l
-         printf("couldn't find name for msr # %#x, skipping\n", msr_index);
-         return;
-     }
-+
-+    orig = rdmsr(msr_index);
-     wrmsr(msr_index, input);
-     r = rdmsr(msr_index);
-+    wrmsr(msr_index, orig);
-     if (expected != r) {
-         printf("testing %s: output = %#" PRIx32 ":%#" PRIx32
- 	       " expected = %#" PRIx32 ":%#" PRIx32 "\n", sptr,
+     unsigned char vector;
+ 
+-    asm("movb %%gs:4, %0" : "=q"(vector));
++    asm volatile("movb %%gs:4, %0" : "=q"(vector));
+     return vector;
+ }
+ 
+@@ -265,7 +265,7 @@ unsigned exception_error_code(void)
+ {
+     unsigned short error_code;
+ 
+-    asm("mov %%gs:6, %0" : "=r"(error_code));
++    asm volatile("mov %%gs:6, %0" : "=r"(error_code));
+     return error_code;
+ }
+ 
+@@ -273,7 +273,7 @@ bool exception_rflags_rf(void)
+ {
+     unsigned char rf_flag;
+ 
+-    asm("movb %%gs:5, %b0" : "=q"(rf_flag));
++    asm volatile("movb %%gs:5, %b0" : "=q"(rf_flag));
+     return rf_flag & 1;
+ }
+ 
 -- 
 2.31.1.498.g6c1eba8ee3d-goog
 
