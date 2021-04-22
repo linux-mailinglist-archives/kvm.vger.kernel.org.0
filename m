@@ -2,129 +2,191 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 44B2C36849A
-	for <lists+kvm@lfdr.de>; Thu, 22 Apr 2021 18:15:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BEE1F36849F
+	for <lists+kvm@lfdr.de>; Thu, 22 Apr 2021 18:16:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236603AbhDVQPs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 22 Apr 2021 12:15:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60002 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235232AbhDVQPr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 22 Apr 2021 12:15:47 -0400
-Received: from mail-pl1-x635.google.com (mail-pl1-x635.google.com [IPv6:2607:f8b0:4864:20::635])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 456CCC06174A
-        for <kvm@vger.kernel.org>; Thu, 22 Apr 2021 09:15:12 -0700 (PDT)
-Received: by mail-pl1-x635.google.com with SMTP id h20so23791172plr.4
-        for <kvm@vger.kernel.org>; Thu, 22 Apr 2021 09:15:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=hPrnw+6gYREfgVmbG9la+vlv6dGyfI3xfHXyLaBNaY0=;
-        b=gScS+XjDdPxVnNlif6QF4Ktr6IKwhe4aH5TJDc6JBaZWQ2DitrRN8UJvq/dfOzR3DW
-         ovBVyy6Gxt0d3lGIoRzMFZH8FYMUXylkFbEjmxwf34wbaWdzDaDBYeRPjN2YUYgQi6uC
-         Srkldqp9AkSmKS2B0oY6zw+WrWSPFlxwVmfNI3r8ogY5WLnqS83VfFVc3/c/P8/aa9tQ
-         yzFBJCmdtRrmq3QmKB/eeLiiLCFbAVwsKJ4cY6aW4mz5w4F+Zw4ElhKDREydU31wRTCz
-         Y9Sf/N88Va6bZme1WGuaPYig4QnkAR4VXy+8/W7y+/DPmQ1r1sCTmEMxQnvMJQOIx22R
-         vFFg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=hPrnw+6gYREfgVmbG9la+vlv6dGyfI3xfHXyLaBNaY0=;
-        b=dyaVweCR2Lay8Ue4HjfrzIKhrG3X65WX42gbGWXKF2js0jiqQpUuBTmFm6uoOMiSuL
-         9DcF8vj5K+ti/1lWTqpTf008fROglmVEwKNwUkboBJAu80Y7otujaOyFUSD205UM08U3
-         +Pth8KtvyR4kuGR5/fAlCYloB23gX3E3IkNX9lKERtKV82Qr60ctnOxMF+MLE9lCAO4M
-         qAN1pdd4NWuhGGJCFwk607NEBU6bOMGqVjv0zTbdQ3XshO/uiKeg+i67VUH6xCdMvd+/
-         dhXtw/c3qTnKaHw38D3s72FYijSn55mcsF2WqDhQjUXcnjjeqzfI+zPXJFoZQ1VQQuJS
-         l3DQ==
-X-Gm-Message-State: AOAM532Brd6kwL2X10WgfLp3u8S/yVD2sCeK8F3YXy4MjyMPwC8hW+Z0
-        o81/IE3qhS9s3/FQPKEULFssmw==
-X-Google-Smtp-Source: ABdhPJyOayWFoLYWFT+Owff0/VHBrm9ci9acPCP3tukyJz3F7vgvr3XujaCyYBh0KIO5KKe033tbBg==
-X-Received: by 2002:a17:902:b117:b029:e6:81ed:8044 with SMTP id q23-20020a170902b117b02900e681ed8044mr4092540plr.13.1619108111612;
-        Thu, 22 Apr 2021 09:15:11 -0700 (PDT)
-Received: from google.com (240.111.247.35.bc.googleusercontent.com. [35.247.111.240])
-        by smtp.gmail.com with ESMTPSA id h8sm2693759pjt.17.2021.04.22.09.15.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 22 Apr 2021 09:15:11 -0700 (PDT)
-Date:   Thu, 22 Apr 2021 16:15:07 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Dave Hansen <dave.hansen@linux.intel.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Wei Huang <wei.huang2@amd.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Borislav Petkov <bp@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Brijesh Singh <brijesh.singh@amd.com>
-Subject: Re: [PATCH v5 03/15] KVM: SVM: Disable SEV/SEV-ES if NPT is disabled
-Message-ID: <YIGhC/1vlIAZfwzm@google.com>
-References: <20210422021125.3417167-1-seanjc@google.com>
- <20210422021125.3417167-4-seanjc@google.com>
- <5e8a2d7d-67de-eef4-ab19-33294920f50c@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <5e8a2d7d-67de-eef4-ab19-33294920f50c@redhat.com>
+        id S236594AbhDVQQx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 22 Apr 2021 12:16:53 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:12252 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S235232AbhDVQQx (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 22 Apr 2021 12:16:53 -0400
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 13MG4CjX026679;
+        Thu, 22 Apr 2021 12:16:18 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : to : cc : date : in-reply-to : references : content-type :
+ mime-version : content-transfer-encoding; s=pp1;
+ bh=ZIWXQPX90i80Lmle5fxjUFTlZhmILJEHM3oVIzOLnQE=;
+ b=JtIN9KXy6dz4PzZULrRbjeHNQh9f2Tek5IWxUYph9GD45f4rtlFMP5sMPpZgU8K9yoSh
+ LFb32nhazac6MYk5Nf1u6m1AGj6cRBRLRtMupKHS+ONKAGoDmuopbfX7c/Q5SPQfJI6c
+ VkCyH843qJpdiDKdROH3WnNUqEbajVB33n6SM3njjszy3hd2ny7ClXH9hWUS8PS3tVpb
+ b/4YnM3cF1/E+ZhaTcos0gNU+BAZpSLXaFV/bVmdJtJ7Ug/GWpGRAt2yjMQ0jhrcU4Vi
+ BLtZLpWYDh1e/6GWB6huc5W3QkZboPECJ+TUla56zdGlbodZKYcb8agu06TO+B8+AA0p Vw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3835faxwfq-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 22 Apr 2021 12:16:17 -0400
+Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 13MG4Hjt027197;
+        Thu, 22 Apr 2021 12:16:17 -0400
+Received: from ppma04dal.us.ibm.com (7a.29.35a9.ip4.static.sl-reverse.com [169.53.41.122])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3835faxwf3-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 22 Apr 2021 12:16:17 -0400
+Received: from pps.filterd (ppma04dal.us.ibm.com [127.0.0.1])
+        by ppma04dal.us.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 13MGCl0P007886;
+        Thu, 22 Apr 2021 16:16:16 GMT
+Received: from b03cxnp07028.gho.boulder.ibm.com (b03cxnp07028.gho.boulder.ibm.com [9.17.130.15])
+        by ppma04dal.us.ibm.com with ESMTP id 37yqaadwfv-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 22 Apr 2021 16:16:16 +0000
+Received: from b03ledav003.gho.boulder.ibm.com (b03ledav003.gho.boulder.ibm.com [9.17.130.234])
+        by b03cxnp07028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 13MGGFeT26607960
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 22 Apr 2021 16:16:15 GMT
+Received: from b03ledav003.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 0744F6A047;
+        Thu, 22 Apr 2021 16:16:15 +0000 (GMT)
+Received: from b03ledav003.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 47A876A04D;
+        Thu, 22 Apr 2021 16:16:14 +0000 (GMT)
+Received: from farman-thinkpad-t470p (unknown [9.160.17.178])
+        by b03ledav003.gho.boulder.ibm.com (Postfix) with ESMTP;
+        Thu, 22 Apr 2021 16:16:14 +0000 (GMT)
+Message-ID: <2c1c1e73d488673ec39d7c085a343cbd6b50fb41.camel@linux.ibm.com>
+Subject: Re: [RFC PATCH v4 4/4] vfio-ccw: Reset FSM state to IDLE before
+ io_mutex
+From:   Eric Farman <farman@linux.ibm.com>
+To:     Cornelia Huck <cohuck@redhat.com>
+Cc:     Halil Pasic <pasic@linux.ibm.com>,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        Jared Rossi <jrossi@linux.ibm.com>, linux-s390@vger.kernel.org,
+        kvm@vger.kernel.org
+Date:   Thu, 22 Apr 2021 12:16:13 -0400
+In-Reply-To: <b1f3abf22a54430f5b332be46f7431a9deb061df.camel@linux.ibm.com>
+References: <20210413182410.1396170-1-farman@linux.ibm.com>
+         <20210413182410.1396170-5-farman@linux.ibm.com>
+         <20210421122529.6e373a39.cohuck@redhat.com>
+         <b1f3abf22a54430f5b332be46f7431a9deb061df.camel@linux.ibm.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Mailer: Evolution 3.28.5 (3.28.5-14.el8) 
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: zU91Dd6GbB3hzpadvrcLk2Z7DjRYVaFM
+X-Proofpoint-GUID: XcmwMB9kQ9_Ln4gtSirzaOha227VrZan
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.761
+ definitions=2021-04-22_11:2021-04-22,2021-04-22 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ spamscore=0 suspectscore=0 mlxlogscore=734 clxscore=1015 bulkscore=0
+ phishscore=0 adultscore=0 malwarescore=0 lowpriorityscore=0
+ impostorscore=0 mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2104060000 definitions=main-2104220122
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Apr 22, 2021, Paolo Bonzini wrote:
-> On 22/04/21 04:11, Sean Christopherson wrote:
-> > Disable SEV and SEV-ES if NPT is disabled.  While the APM doesn't clearly
-> > state that NPT is mandatory, it's alluded to by:
+On Wed, 2021-04-21 at 08:58 -0400, Eric Farman wrote:
+> On Wed, 2021-04-21 at 12:25 +0200, Cornelia Huck wrote:
+> > On Tue, 13 Apr 2021 20:24:10 +0200
+> > Eric Farman <farman@linux.ibm.com> wrote:
 > > 
-> >    The guest page tables, managed by the guest, may mark data memory pages
-> >    as either private or shared, thus allowing selected pages to be shared
-> >    outside the guest.
+> > > Today, the stacked call to vfio_ccw_sch_io_todo() does three
+> > > things:
+> > > 
+> > > 1) Update a solicited IRB with CP information, and release the CP
+> > > if the interrupt was the end of a START operation.
+> > > 2) Copy the IRB data into the io_region, under the protection of
+> > > the io_mutex
+> > > 3) Reset the vfio-ccw FSM state to IDLE to acknowledge that
+> > > vfio-ccw can accept more work.
+> > > 
+> > > The trouble is that step 3 is (A) invoked for both solicited and
+> > > unsolicited interrupts, and (B) sitting after the mutex for step
+> > > 2.
+> > > This second piece becomes a problem if it processes an interrupt
+> > > for a CLEAR SUBCHANNEL while another thread initiates a START,
+> > > thus allowing the CP and FSM states to get out of sync. That is:
+> > > 
+> > > 	CPU 1				CPU 2
+> > > 	fsm_do_clear()
+> > > 	fsm_irq()
+> > > 					fsm_io_request()
+> > > 					fsm_io_helper()
+> > > 	vfio_ccw_sch_io_todo()
+> > > 					fsm_irq()
+> > > 					vfio_ccw_sch_io_todo()
+> > > 
+> > > Let's move the reset of the FSM state to the point where the
+> > > channel_program struct is cleaned up, which is only done for
+> > > solicited interrupts anyway.
+> > > 
+> > > Signed-off-by: Eric Farman <farman@linux.ibm.com>
+> > > ---
+> > >  drivers/s390/cio/vfio_ccw_drv.c | 7 +++----
+> > >  1 file changed, 3 insertions(+), 4 deletions(-)
+> > > 
+> > > diff --git a/drivers/s390/cio/vfio_ccw_drv.c
+> > > b/drivers/s390/cio/vfio_ccw_drv.c
+> > > index 8c625b530035..e51318f23ca8 100644
+> > > --- a/drivers/s390/cio/vfio_ccw_drv.c
+> > > +++ b/drivers/s390/cio/vfio_ccw_drv.c
+> > > @@ -94,16 +94,15 @@ static void vfio_ccw_sch_io_todo(struct
+> > > work_struct *work)
+> > >  		     (SCSW_ACTL_DEVACT | SCSW_ACTL_SCHACT));
+> > >  	if (scsw_is_solicited(&irb->scsw)) {
+> > >  		cp_update_scsw(&private->cp, &irb->scsw);
+> > > -		if (is_final && private->state ==
+> > > VFIO_CCW_STATE_CP_PENDING)
+> > > +		if (is_final && private->state ==
+> > > VFIO_CCW_STATE_CP_PENDING) {
+> > >  			cp_free(&private->cp);
+> > > +			private->state = VFIO_CCW_STATE_IDLE;
+> > > +		}
+> > >  	}
+> > >  	mutex_lock(&private->io_mutex);
+> > >  	memcpy(private->io_region->irb_area, irb, sizeof(*irb));
+> > >  	mutex_unlock(&private->io_mutex);
+> > >  
+> > > -	if (private->mdev && is_final)
+> > > -		private->state = VFIO_CCW_STATE_IDLE;
 > > 
-> > And practically speaking, shadow paging can't work since KVM can't read
-> > the guest's page tables.
-> > 
-> > Fixes: e9df09428996 ("KVM: SVM: Add sev module_param")
-> > Cc: Brijesh Singh <brijesh.singh@amd.com
-> > Cc: Tom Lendacky <thomas.lendacky@amd.com>
-> > Signed-off-by: Sean Christopherson <seanjc@google.com>
-> > ---
-> >   arch/x86/kvm/svm/svm.c | 30 +++++++++++++++---------------
-> >   1 file changed, 15 insertions(+), 15 deletions(-)
-> > 
-> > diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> > index fed153314aef..0e8489908216 100644
-> > --- a/arch/x86/kvm/svm/svm.c
-> > +++ b/arch/x86/kvm/svm/svm.c
-> > @@ -970,7 +970,21 @@ static __init int svm_hardware_setup(void)
-> >   		kvm_enable_efer_bits(EFER_SVME | EFER_LMSLE);
-> >   	}
-> > -	if (IS_ENABLED(CONFIG_KVM_AMD_SEV) && sev) {
-> > +	/*
-> > +	 * KVM's MMU doesn't support using 2-level paging for itself, and thus
-> > +	 * NPT isn't supported if the host is using 2-level paging since host
-> > +	 * CR4 is unchanged on VMRUN.
-> > +	 */
-> > +	if (!IS_ENABLED(CONFIG_X86_64) && !IS_ENABLED(CONFIG_X86_PAE))
-> > +		npt_enabled = false;
+> > Isn't that re-allowing new I/O requests a bit too early?
 > 
-> Unrelated, but since you're moving this code: should we be pre-scient and
-> tackle host 5-level paging as well?
+> Hrm... I guess I don't see what work vfio-ccw has left to do that is
+> presenting it from carrying on. The copying of the IRB data back into
+> the io_region seems like a flimsy gate to me. But...
 > 
-> Support for 5-level page tables on NPT is not hard to fix and could be
-> tested by patching QEMU.  However, the !NPT case would also have to be fixed
-> by extending the PDP and PML4 stacking trick to a PML5.
+> It seems you're (rightly) concerned with userspace doing SSCH + SSCH,
+> whereas I'v been focused on the CSCH + SSCH sequence. So with this
+> change, we're inviting the possibility of a second SSCH being able to
+> be submitted/started before the IRB data for the first SSCH is copied
+> (and presumably before userspace is tapped to read that data back).
+> 
+> Sigh... I guess that's not the greatest behavior either. Gotta
+> ruminate
+> on this.
+> 
+> >  Maybe remember
+> > that we had a final I/O interrupt for an I/O request and only
+> > change
+> > the state in this case?
+> 
+> As a local flag within this routine? Hrm... I have entirely too many
+> "Let's try this" branches that didn't work, but I don't see that one
+> jumping out at me. Will give it a try.
 
-Isn't that backwards?  It's the nested NPT case that requires the stacking trick.
-When !NPT is disabled in L0 KVM, 32-bit guests are run with PAE paging.  Maybe
-I'm misunderstanding what you're suggesting.
- 
-> However, without real hardware to test on I'd be a bit wary to do it.
-> Looking at 5-level EPT there might be other issues (e.g. what's the guest
-> MAXPHYADDR) and I would prefer to see what AMD comes up with exactly in the
-> APM.  So I would just block loading KVM on hypothetical AMD hosts with
-> CR4.LA57=1.
+Still going strong, so that bodes really well (knock wood). I need to
+spend a little time with patch 2 before I send the next version, but
+that shouldn't be too long.
 
-Agreed, I think blocking KVM makes the most sense.
+Eric
+
+> 
+> > 
+> > > -
+> > >  	if (private->io_trigger)
+> > >  		eventfd_signal(private->io_trigger, 1);
+> > >  }
+
