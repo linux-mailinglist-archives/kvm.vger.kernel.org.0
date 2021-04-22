@@ -2,148 +2,135 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 16A8B36844C
-	for <lists+kvm@lfdr.de>; Thu, 22 Apr 2021 17:59:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AE8A1368457
+	for <lists+kvm@lfdr.de>; Thu, 22 Apr 2021 18:02:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236696AbhDVP7Z (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 22 Apr 2021 11:59:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56358 "EHLO
+        id S236341AbhDVQCy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 22 Apr 2021 12:02:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57134 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236693AbhDVP7V (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 22 Apr 2021 11:59:21 -0400
-Received: from mail-pf1-x42e.google.com (mail-pf1-x42e.google.com [IPv6:2607:f8b0:4864:20::42e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C536BC06138C
-        for <kvm@vger.kernel.org>; Thu, 22 Apr 2021 08:58:46 -0700 (PDT)
-Received: by mail-pf1-x42e.google.com with SMTP id c3so13216747pfo.3
-        for <kvm@vger.kernel.org>; Thu, 22 Apr 2021 08:58:46 -0700 (PDT)
+        with ESMTP id S230510AbhDVQCy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 22 Apr 2021 12:02:54 -0400
+Received: from mail-pg1-x532.google.com (mail-pg1-x532.google.com [IPv6:2607:f8b0:4864:20::532])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9567CC06174A
+        for <kvm@vger.kernel.org>; Thu, 22 Apr 2021 09:02:17 -0700 (PDT)
+Received: by mail-pg1-x532.google.com with SMTP id p12so33157062pgj.10
+        for <kvm@vger.kernel.org>; Thu, 22 Apr 2021 09:02:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=44uFSIKvqnC7V+9ZchehMmm34h8scMBiFWmZbyka+5I=;
-        b=cMiEjZ1B9JMl8QATUXKRwJxkhvh5LCCEJA1EPShkG5o7xzgME4hzquSiFFSCVuKw2B
-         JwqtwHPEYESxOMlFUI13tzjNMcegmUV0xlrg7yIb5Lufn8Xs7oHPzAVXKxjmZ5dCaIaE
-         WxOPyIfhTTJOjVnJBqbDuuJgKDln1FmrMMl47T1/auyzw7U/kpQP59IyvNwBc9yG9R7t
-         +pHBoVsBV4aBkuFKMOXvL0zjFOIiAWYMizug6eGhWegiGoawjtuixtlUfUmXdU3kyJV9
-         CWOPOpkD6ro5l8Ipa0biA6w1HVaySW3pP9NchcMgAXZnHRsiz9ZRoH3FA7TtCV514owb
-         /Dgw==
+         :content-disposition:content-transfer-encoding:in-reply-to;
+        bh=TfyJ6MVZHZT4qYZs+QTfqHo5PYcAw3/WGKzKHmsNF7Q=;
+        b=AC8rkw3fEGKaCuZyZ6x2cTZBIIiTsrNr+cOHoTXvzbovKivVSx+wAcBZ6QCSyXz3FH
+         /2vaEl+ACQxujSmOl1iOoojBXkqdrWfjQeMmaSst7e6knIWot/a2tISkGD8+yjA6blrw
+         u9mcnSr5jthgkA5MGFcFz+Vz/suvZwMX0bYHkIcC9NL8oEPLMlWbxgtcZDHk9XRkfAez
+         0Rw3x++aTP4P+gstc7zuX55DTQMCoIQFtVKfQ68xubefZoQcu5oBX0aMErfn2srMeNq1
+         JVze+kHDRRSl24IcVZ83yC3Wisfv2ojx3SDCh+VR5o7eavBAOqdC1QfNVoVNif0XUm3s
+         qfhw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=44uFSIKvqnC7V+9ZchehMmm34h8scMBiFWmZbyka+5I=;
-        b=uBGf36aE4nSXytFAYLqoOSxzpORHaPQ78JGLxeEB5QbvnxdANIUVgQyNic5rCa6zWM
-         girjo5g67pSakUqiLsobdBiJ8ZeXVMNGOZr0BBaBfnPYm5XqSNrK2uNuG3uJAQanQU03
-         ZiOvHx3NUZzml+ut4Pg8lmnvME11hpxDSl4UVo2LNkXUbElWd2CunCLN52A7vWBikFsd
-         HFvhMawPtv+HexTb1OhhVUeJhXNMimpe5h2NVKEmdQm420DuLsExmmnTmviPgUcV5Mqk
-         Owqy4TjwJi79Ijj8/tRECkgmF7fJqFoGRiezsVV49ExghwJCAa5T3KGs1GaqN5v+lkPT
-         zgyw==
-X-Gm-Message-State: AOAM5314UCXnY4x5UVtxxP1bTeMfZoNlTuV+hZ4ya6zgO06nDMraA5jr
-        Yi820V0NmZCZd/J4aL920FzyUw==
-X-Google-Smtp-Source: ABdhPJxhKU670JBxP1/tcRbCpUbeXzYl86y/mGbDNHJh9ApJICeW/4m3bDFRQbbY/jHbJnkmJZQJdw==
-X-Received: by 2002:a65:45cf:: with SMTP id m15mr4170458pgr.7.1619107126146;
-        Thu, 22 Apr 2021 08:58:46 -0700 (PDT)
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=TfyJ6MVZHZT4qYZs+QTfqHo5PYcAw3/WGKzKHmsNF7Q=;
+        b=JCaM7H8LuCIE0HI/rT6lq+xLRNLjjdbi4tCvojgsUXcAHmziF8pJ3H6epNA16tsDR3
+         8LwuWLQKTUaueOpqi8oFfrmXNNgdQ3tvFqcO7EIpNEqI08klfJTD7Qxd8BjX2pS5DxC9
+         cQtiEW1qrWhpQd84g+Ez+zIGr8SayykJwjVYNCJzdMifH9dyj/lUncpi2g2s4JwSOjxp
+         Kw+PNF4t0LJcj9fHA1ngP8kEt0iRKdNXQBCA7ammglSQTwRy5RlMLIVacklAVML3NOj6
+         0Jgeb09pJujw+KMwvQSlHVupMbc0BFUdDEd9tT5S4H5vRp8JDCfsolKZR5fPEgY3tn4H
+         beLQ==
+X-Gm-Message-State: AOAM5327fJy44/iw52ANbZLBaRdwl7SyjBTSkB8EggHeLukA5mtKE+a6
+        Gm1GLU3/j4ZoYjFF96xD4iAJdw==
+X-Google-Smtp-Source: ABdhPJwT1O+t/p4an/2vRkDCCDoUTyVwUm0awyHzCOC6sIXQaBs6y7uc90epxfOrDrLmNNplO5oroA==
+X-Received: by 2002:a63:1a5e:: with SMTP id a30mr4307155pgm.156.1619107336834;
+        Thu, 22 Apr 2021 09:02:16 -0700 (PDT)
 Received: from google.com (240.111.247.35.bc.googleusercontent.com. [35.247.111.240])
-        by smtp.gmail.com with ESMTPSA id n11sm2818575pff.96.2021.04.22.08.58.45
+        by smtp.gmail.com with ESMTPSA id p10sm2761023pgn.85.2021.04.22.09.02.15
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 22 Apr 2021 08:58:45 -0700 (PDT)
-Date:   Thu, 22 Apr 2021 15:58:41 +0000
+        Thu, 22 Apr 2021 09:02:16 -0700 (PDT)
+Date:   Thu, 22 Apr 2021 16:02:12 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     Wanpeng Li <kernellwp@gmail.com>
-Cc:     Kenta Ishiguro <kentaishiguro@sslab.ics.keio.ac.jp>,
-        Paolo Bonzini <pbonzini@redhat.com>,
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Dave Hansen <dave.hansen@linux.intel.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Peter Zijlstra <peterz@infradead.org>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        David Hildenbrand <david@redhat.com>,
-        kvm <kvm@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>,
-        Pierre-Louis Aublin <pl@sslab.ics.keio.ac.jp>,
-        =?utf-8?B?5rKz6YeO5YGl5LqM?= <kono@sslab.ics.keio.ac.jp>
-Subject: Re: [RFC PATCH 0/2] Mitigating Excessive Pause-Loop Exiting in
- VM-Agnostic KVM
-Message-ID: <YIGdMZIVHVp3y/J0@google.com>
-References: <20210421150831.60133-1-kentaishiguro@sslab.ics.keio.ac.jp>
- <YIBQmMih1sNb5/rg@google.com>
- <CANRm+CxMf=kwDRQE-BNbhgCARuV3fuKpDbEV2oWTeKuGhUYd+w@mail.gmail.com>
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Borislav Petkov <bp@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Brijesh Singh <brijesh.singh@amd.com>
+Subject: Re: [PATCH v5 00/15] KVM: SVM: Misc SEV cleanups
+Message-ID: <YIGeBHEZ27zIDByF@google.com>
+References: <20210422021125.3417167-1-seanjc@google.com>
+ <e32cb350-9fbe-5abd-930a-e820a4f4930b@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <CANRm+CxMf=kwDRQE-BNbhgCARuV3fuKpDbEV2oWTeKuGhUYd+w@mail.gmail.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <e32cb350-9fbe-5abd-930a-e820a4f4930b@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Apr 22, 2021, Wanpeng Li wrote:
-> On Thu, 22 Apr 2021 at 09:45, Sean Christopherson <seanjc@google.com> wrote:
-> >
-> > On Thu, Apr 22, 2021, Kenta Ishiguro wrote:
-> > > To solve problems (2) and (3), patch 2 monitors IPI communication between
-> > > vCPUs and leverages the relationship between vCPUs to select boost
-> > > candidates.  The "[PATCH] KVM: Boost vCPU candidiate in user mode which is
-> > > delivering interrupt" patch
-> > > (https://lore.kernel.org/kvm/CANRm+Cy-78UnrkX8nh5WdHut2WW5NU=UL84FRJnUNjsAPK+Uww@mail.gmail.com/T/)
-> > > seems to be effective for (2) while it only uses the IPI receiver
-> > > information.
-> >
-> > On the IPI side of thing, I like the idea of explicitly tracking the IPIs,
-> > especially if we can simplify the implementation, e.g. by losing the receiver
-> > info and making ipi_received a bool.  Maybe temporarily table Wanpeng's patch
-> > while this approach is analyzed?
+On Thu, Apr 22, 2021, Paolo Bonzini wrote:
+> > Paolo Bonzini (1):
+> >    KVM: SEV: Mask CPUID[0x8000001F].eax according to supported features
+> > 
+> > Sean Christopherson (14):
+> >    KVM: SVM: Zero out the VMCB array used to track SEV ASID association
+> >    KVM: SVM: Free sev_asid_bitmap during init if SEV setup fails
+> >    KVM: SVM: Disable SEV/SEV-ES if NPT is disabled
+> >    KVM: SVM: Move SEV module params/variables to sev.c
+> >    x86/sev: Drop redundant and potentially misleading 'sev_enabled'
+> >    KVM: SVM: Append "_enabled" to module-scoped SEV/SEV-ES control
+> >      variables
+> >    KVM: SVM: Condition sev_enabled and sev_es_enabled on
+> >      CONFIG_KVM_AMD_SEV=y
+> >    KVM: SVM: Enable SEV/SEV-ES functionality by default (when supported)
+> >    KVM: SVM: Unconditionally invoke sev_hardware_teardown()
+> >    KVM: SVM: Explicitly check max SEV ASID during sev_hardware_setup()
+> >    KVM: SVM: Move SEV VMCB tracking allocation to sev.c
+> >    KVM: SVM: Drop redundant svm_sev_enabled() helper
+> >    KVM: SVM: Remove an unnecessary prototype declaration of
+> >      sev_flush_asids()
+> >    KVM: SVM: Skip SEV cache flush if no ASIDs have been used
+> > 
+> >   arch/x86/include/asm/mem_encrypt.h |  1 -
+> >   arch/x86/kvm/cpuid.c               |  8 ++-
+> >   arch/x86/kvm/cpuid.h               |  1 +
+> >   arch/x86/kvm/svm/sev.c             | 80 ++++++++++++++++++++++--------
+> >   arch/x86/kvm/svm/svm.c             | 57 +++++++++------------
+> >   arch/x86/kvm/svm/svm.h             |  9 +---
+> >   arch/x86/mm/mem_encrypt.c          | 12 ++---
+> >   arch/x86/mm/mem_encrypt_identity.c |  1 -
+> >   8 files changed, 97 insertions(+), 72 deletions(-)
+> > 
 > 
-> Hi all,
-> 
-> I evaluate my patch
+> Queued except for patch 6, send that separately since it's purely x86 and
+> maintainers will likely not notice it inside this thread.  You probably want
+> to avoid conflicts by waiting for the migration patches, though.
 
-Thanks for doing the testing, much appreciated!
+It can't be sent separately, having both the kernel's sev_enabled and KVM's
+sev_enabled doesn't build with CONFIG_AMD_MEM_ENCRYPT=y:
 
-> (https://lore.kernel.org/kvm/1618542490-14756-1-git-send-email-wanpengli@tencent.com),
-> Kenta's patch 2 and Sean's suggestion. The testing environment is
-> pbzip2 in 96 vCPUs VM in over-subscribe scenario (The host machine is
-> 2 socket, 48 cores, 96 HTs Intel CLX box).
-
-Are the vCPUs affined in any way?  How many VMs are running?  Are there other
-workloads in the host?  Not criticising, just asking so that others can reproduce
-your setup.
-
-> Note: the Kenta's scheduler hacking is not applied. The score of my patch is
-> the most stable and the best performance.
-
-On the other hand, Kenta's approach has the advantage of working for both Intel
-and AMD.  But I'm also not very familiar with AMD's AVIC, so I don't know if it's
-feasible to implement a performant equivalent in svm_dy_apicv_has_pending_interrupt().
-
-Kenda's patch is also flawed as it doesn't scale to 96 vCPUs; vCPUs 64-95 will
-never get boosted.
-
-> Wanpeng's patch
-> 
-> The average: vanilla -> boost: 69.124 -> 61.975, 10.3%
-> 
-> * Wall Clock: 61.695359 seconds
-> * Wall Clock: 63.343579 seconds
-> * Wall Clock: 61.567513 seconds
-> * Wall Clock: 62.144722 seconds
-> * Wall Clock: 61.091442 seconds
-> * Wall Clock: 62.085912 seconds
-> * Wall Clock: 61.311954 seconds
-> 
-> Kenta' patch
-> 
-> The average: vanilla -> boost: 69.148 -> 64.567, 6.6%
-> 
-> * Wall Clock:  66.288113 seconds
-> * Wall Clock:  61.228642 seconds
-> * Wall Clock:  62.100524 seconds
-> * Wall Clock:  68.355473 seconds
-> * Wall Clock:  64.864608 seconds
-> 
-> Sean's suggestion:
-> 
-> The average: vanilla -> boost: 69.148 -> 66.505, 3.8%
-> 
-> * Wall Clock: 60.583562 seconds
-> * Wall Clock: 58.533960 seconds
-> * Wall Clock: 70.103489 seconds
-> * Wall Clock: 74.279028 seconds
-> * Wall Clock: 69.024194 seconds
+arch/x86/kvm/svm/sev.c:33:13: error: static declaration of ‘sev_enabled’ follows non-static declaration
+   33 | static bool sev_enabled = true;
+      |             ^~~~~~~~~~~
+In file included from include/linux/mem_encrypt.h:17,
+                 from arch/x86/include/asm/page_types.h:7,
+                 from arch/x86/include/asm/page.h:9,
+                 from arch/x86/include/asm/thread_info.h:12,
+                 from include/linux/thread_info.h:58,
+                 from arch/x86/include/asm/preempt.h:7,
+                 from include/linux/preempt.h:78,
+                 from include/linux/percpu.h:6,
+                 from include/linux/context_tracking_state.h:5,
+                 from include/linux/hardirq.h:5,
+                 from include/linux/kvm_host.h:7,
+                 from arch/x86/kvm/svm/sev.c:11:
+arch/x86/include/asm/mem_encrypt.h:23:13: note: previous declaration of ‘sev_enabled’ was here
+   23 | extern bool sev_enabled;
+      |             ^~~~~~~~~~~
+make[3]: *** [scripts/Makefile.build:271: arch/x86/kvm/svm/sev.o] Error 1
