@@ -2,41 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B11B9368849
-	for <lists+kvm@lfdr.de>; Thu, 22 Apr 2021 22:55:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BA83536884E
+	for <lists+kvm@lfdr.de>; Thu, 22 Apr 2021 22:57:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239528AbhDVU4O (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 22 Apr 2021 16:56:14 -0400
-Received: from mail-mw2nam10on2075.outbound.protection.outlook.com ([40.107.94.75]:4961
-        "EHLO NAM10-MW2-obe.outbound.protection.outlook.com"
+        id S239584AbhDVU50 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 22 Apr 2021 16:57:26 -0400
+Received: from mail-bn7nam10on2075.outbound.protection.outlook.com ([40.107.92.75]:36448
+        "EHLO NAM10-BN7-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S236851AbhDVU4N (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 22 Apr 2021 16:56:13 -0400
+        id S239575AbhDVU5Z (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 22 Apr 2021 16:57:25 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=TtdfrRDrtSPfTKraQuZXVk9Qztu40JemGRA/WY/sJwF104VtG7M4ilHnJ81Z+tgtZO8X35ULG3eDo9UGZYXTFuVKOd8vONd0nhuHGTRyiZR/kxy8BhawaJJuSJr/HXgAlX++OBMQiJfZiPtXRBRp+4LTFmlptslEivwQwAskn+wbgnPM/PZDrIx8tjUVFGxr33FHfi2ohf0Ai5Pp+KNl5mOvyMDoNQv0LY/N2a+DT6+SOfdiAYlNbCzIw1puJOI4llPZPJ8lhoAz7Wb6zmTGXQH3Z/zGhpZV0FSwvZw/68S+fRnQzDYZ6Lj3TFtmvOkgEeIVHteV7Bne3B2U42K+Qg==
+ b=DiQGfO+XMnMXlBCnoc4Zn057dR6WUY1gvB1LSbZamfcOnXETjiOTt1K68zqB+iy5IdixEEg4xBi8nEkAsPWQskVF3ndA16rQ8Er4eFZmo5AbkP0a1EZ4v3eCKWvXvplXgSf39j+FLZ68gU/76O14mkoxdH/cnyi5BPY0Gb9l6Ga5I6LWKUSOGEbV292+BCDCjdhHlQlgXD9LJI3DAZOD+QHd/MJw6l6Xw/+7yAhDh2JQyfFSKuLmMMhoVbRXlFys3MKN01Kh8+fy40Vk6O2MkgJG2b9MSVwBUXxKr+t0hRiJ25D8xYG/RLFg/vcY+DYaXBDMzfcvs2+vAaKq9u9yoQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=V519WsdDsLhQcSitVWrmZPwA4RVtfnxNsUoCkWKP0qw=;
- b=hhIIvlTcsrg8RdIfC2TBY0CLqULuPWc0vjd/skop7j0vXUNxuQL03iZPlyD1Qn8D5RQkg+DbcaDEIBtISODkscQx2rirbvhvFDVw+A6TaU5zRZAoh/PC1xWMMmkg4mG2zgpUiA3le5jZ/lyZoVdTf/EtohU1cZ7Ww15kX240GFNqLmgD7q0cAfDpLe4Lm9jZF2oVlSbEUP16BmIzCiphYDOyXe+cIvhEuuOOuZC2r4xmmpY/KAMxZuvVU5YcJZgBZClc5c6gU8ixYWKnJIQ3lztCm+3sI/9UsyTcToVCDrAOI8lFzwtlJex+x81RsD5KDLSgzZ+L3DqGFYrgfM4AXg==
+ bh=kP40PdU4Z8HHa6wnZVnRT/zhr1u8HNB3yWt0AcQt+JM=;
+ b=g2I66d1BYWz6S1+mhN7QoGgaP5iMisGjFTDxm/7h2XG9QWwuvZG+UYrXEla80sbmjVz7U0ccnjeKvC1KJcgMSRbcySA+cX8hQOKMY871SQUMawMZdip6EPf2vhHA3rap1j/sBwUpzcscBm7ekx2Q7WeIl1byJ0Qp1OmQZTR8TgCUX3IyntzhLGsOCS0dOeD18QVT3uWmZpsw9Br9PnHHr+3dvFKbdv6Qn1EFlmHqm+D0UW6ERyx6ISp5WKpZ8XDYqvBAaXACOklUN9dqJGkhz+y8hdL/VHeljQe4na6EUJ4sExMsjg+f48xqWL3MNzCXcL/4tEJPCt2aIsjnuvWnsw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
  header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=V519WsdDsLhQcSitVWrmZPwA4RVtfnxNsUoCkWKP0qw=;
- b=UvOBdf7c3dOI0wR2jqErBASO7Vd6oZ5nJg0gU9/BUIWxIb3xQPIgll5bXCpURRGNFpAkk8m8+GqltZBWJ5jJvLnRgDzksagwnUKEkQlgDv7BryOHEssUnjqcbQZch5cTn1Y2mjWP040+yWAVY4TJh/q7sHzeN9SE5SpNUyM/s0w=
+ bh=kP40PdU4Z8HHa6wnZVnRT/zhr1u8HNB3yWt0AcQt+JM=;
+ b=rvaIkUk7wx1SOk7scAiK71P9inIVF3QOiJoV6oBMq6z7iKOW5TGO8rea0FkQ6r46s4+GbL4c1QoinoR+Gpvh1RQaT+iW9K5QIem52ijd5a7OxAzpGIAeigtbC3NTqMTJjWn9ZtLEU0U1VMwpGkdy6frCjOlwZ86/6dKAnk2QNwM=
 Authentication-Results: redhat.com; dkim=none (message not signed)
  header.d=none;redhat.com; dmarc=none action=none header.from=amd.com;
 Received: from SN6PR12MB2767.namprd12.prod.outlook.com (2603:10b6:805:75::23)
- by SA0PR12MB4510.namprd12.prod.outlook.com (2603:10b6:806:94::8) with
+ by SA0PR12MB4509.namprd12.prod.outlook.com (2603:10b6:806:9e::16) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4042.16; Thu, 22 Apr
- 2021 20:55:35 +0000
+ 2021 20:56:48 +0000
 Received: from SN6PR12MB2767.namprd12.prod.outlook.com
  ([fe80::1fb:7d59:2c24:615e]) by SN6PR12MB2767.namprd12.prod.outlook.com
  ([fe80::1fb:7d59:2c24:615e%7]) with mapi id 15.20.4065.021; Thu, 22 Apr 2021
- 20:55:35 +0000
+ 20:56:48 +0000
 From:   Ashish Kalra <Ashish.Kalra@amd.com>
 To:     pbonzini@redhat.com
 Cc:     tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com,
@@ -44,281 +44,95 @@ Cc:     tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com,
         x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
         srutherford@google.com, seanjc@google.com,
         venu.busireddy@oracle.com, brijesh.singh@amd.com
-Subject: [PATCH 2/4] mm: x86: Invoke hypercall when page encryption status is changed
-Date:   Thu, 22 Apr 2021 20:55:25 +0000
-Message-Id: <cf5f311872f58b371dec43e082d82dae55533597.1619124613.git.ashish.kalra@amd.com>
+Subject: [PATCH 3/4] EFI: Introduce the new AMD Memory Encryption GUID.
+Date:   Thu, 22 Apr 2021 20:56:39 +0000
+Message-Id: <eadc5fbf90e02fa4955f66f0d62661ed781c3dbd.1619124613.git.ashish.kalra@amd.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <cover.1619124613.git.ashish.kalra@amd.com>
 References: <cover.1619124613.git.ashish.kalra@amd.com>
 Content-Type: text/plain
 X-Originating-IP: [165.204.77.1]
-X-ClientProxiedBy: SA0PR13CA0022.namprd13.prod.outlook.com
- (2603:10b6:806:130::27) To SN6PR12MB2767.namprd12.prod.outlook.com
+X-ClientProxiedBy: SN4PR0801CA0021.namprd08.prod.outlook.com
+ (2603:10b6:803:29::31) To SN6PR12MB2767.namprd12.prod.outlook.com
  (2603:10b6:805:75::23)
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from ashkalra_ubuntu_server.amd.com (165.204.77.1) by SA0PR13CA0022.namprd13.prod.outlook.com (2603:10b6:806:130::27) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4087.16 via Frontend Transport; Thu, 22 Apr 2021 20:55:34 +0000
+Received: from ashkalra_ubuntu_server.amd.com (165.204.77.1) by SN4PR0801CA0021.namprd08.prod.outlook.com (2603:10b6:803:29::31) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4065.22 via Frontend Transport; Thu, 22 Apr 2021 20:56:48 +0000
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: d21adc52-70f0-4b3c-5cc6-08d905d0f9fc
-X-MS-TrafficTypeDiagnostic: SA0PR12MB4510:
+X-MS-Office365-Filtering-Correlation-Id: 2caacb1a-ec9f-4eba-be95-08d905d125ac
+X-MS-TrafficTypeDiagnostic: SA0PR12MB4509:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <SA0PR12MB4510567454CDA57F4FAC4CD48E469@SA0PR12MB4510.namprd12.prod.outlook.com>
+X-Microsoft-Antispam-PRVS: <SA0PR12MB4509F0D0D96E0CF914F4493E8E469@SA0PR12MB4509.namprd12.prod.outlook.com>
 X-MS-Oob-TLC-OOBClassifiers: OLM:4941;
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: fWDFCkiBbF7ln5wE2hx0lups+YSq9KuRafYU5/6MmQp13/kQISAc5BAjEhbVWsffYsUWm9HecFSQpxLhtlU/IjDXNQPtBGsraDcOJliZYIDRG3ChxtcuSQZ3jNrhz1QIsNyGMwWGJuPO4Zb28n9xRVUZiuysMI1jNYVNzhBjT0sGaVwzLY7UV7qJcT+dx2C/UUpJmVer9i/1W2E1XeB2IIHsRPgGKJbg+VRwkv6DIRH1ueMrLTSAR2HHiLTqdf1gwPqU6TUAiO5AjS9rYSi+1Jl0frnJfAXigC1evvSRjaVVvkidEpzVFnJb62POiA6BjT4DckzAt2bM/15Q80V+OE2pKkaCcn4XuAWYOk7JBiF2i2WFyPxoZ7L3J3A8C7Mv0FWsFZGzdBzvyW3VsrKy6fHYpXey70cDlwsyw4B0w0C0HAZL9ty8b2lUDSfq1L+LdlcMSzT6Flg20wFsnGZsiGeDOD1A/TYd7Ewkl8jL9/GULVSUQth5IvSbsKCi/x3caThrnKJszaQAN6F0zJlC0ul0H+2URMlgzxuxGBxD8TevXQN327mCbkes9wXF7ZYMbXeDh+BGQgEeGVOcVUwWBHY1hn/isKC7u5zbGTC/Hl9mQRTEFDJSwmhJGF2gEDyxUnKfVW83nZdabdeEd8Bp4g==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2767.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(39860400002)(346002)(366004)(376002)(396003)(136003)(316002)(7696005)(6666004)(86362001)(2906002)(52116002)(66946007)(66556008)(956004)(8936002)(38350700002)(4326008)(6486002)(5660300002)(66476007)(36756003)(6916009)(38100700002)(186003)(7416002)(2616005)(26005)(16526019)(478600001)(83380400001)(8676002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: =?us-ascii?Q?4DU7N7YTOW4EPj5aeQwfwCWd0KCtrO70bkoJX8gbknWWPU0ogEpHHFNGjdrJ?=
- =?us-ascii?Q?CTxdPehDtLKeB3CbUnLspSIdjzHW2+V6iecqE1PZXgMXGENXPU1fWS5bj8jW?=
- =?us-ascii?Q?o3LDUCxJOB99xra+mt2ZyHf7c0dMiGv5kdXje4UfqMJXqk51x6mXYbZlhyFw?=
- =?us-ascii?Q?X/OCLYGv3dTBvqGT7wbdYk+FSS7YbCTXCjG3YdQfBnZY2oNSvCO8oeo0Jxfw?=
- =?us-ascii?Q?kmEe2d1XjOs0SOKVpGGUX81juey3EZ7ATf9qm2AuykpH07OK2hsKwSAAj3rn?=
- =?us-ascii?Q?9B5sF15paDUgnG30N2kG6cQLGtF2y8aMy0mYCsfk4+WVIGOnwZ8vHpZBTyI+?=
- =?us-ascii?Q?pnvU3vdZohSn2KCdWqZE5EaUlyGzXqPZkNwc8G7sZG8SQ1abzopW38Xn42Gb?=
- =?us-ascii?Q?8brLt/2n/reRO3GDMm0P2c9dvvLgq1VfRXRna5tO0jheW7Pw1YzQkWmgdp7X?=
- =?us-ascii?Q?pJV7Q/nSs0ge9xhVcNRxNEhNWxCD8NFOhPrZxuCerNiWGJ6+hFqCAalpOyWh?=
- =?us-ascii?Q?RT/etebOp8WRtyvtYfZO1QajWr0kt0+3lTnnp33hdwp2fid7/u362NvtlP0F?=
- =?us-ascii?Q?Bk+MMrykTLecgR24ZCU8Hi5DPX/ohvUENijwOtRCerUSCvLq6bp+mgIFjdj8?=
- =?us-ascii?Q?avFnzK/U8xe4MGq1JP+z5+feUbxfyTVD/516vf5ASw2QgQXH4GXfpOgNSLTn?=
- =?us-ascii?Q?Qn2LtIPQqwITnLVnnAAK6Di8D6dOMn3y1shIxyWiEUD6Hw7WC58yBJkx+SrD?=
- =?us-ascii?Q?TGw40IH9fmrYL89226jaTndbOZxmhP6UcxIIcUBD9+a0rRJJt3zQJisQmo41?=
- =?us-ascii?Q?IBvRpG3chAAA4tsieCONzRVEUA8zdiXr+uhLGyUZhhjt8DYGbSN8qh4EocI2?=
- =?us-ascii?Q?jDTqHELDMs3MyT5eqGD8oZKBU9xrOI7bUyVR590+Ihdjj2zC+WquTmWthlnr?=
- =?us-ascii?Q?EEuWymjBuoEpV2EIC2CE2xrDaZeaoN2Pfl09OkRc3JesUf7VjxN1kvIIEZKr?=
- =?us-ascii?Q?w+Ye8Ii3+sgvBfOBdd7sfdN4cnBIDhAK5/ibp1aQ4XGaxTU9ajVA2npQQ/T8?=
- =?us-ascii?Q?hNkD+aonm2UfM6yFn0EPCOTFyPPY3r/XG/mvN5iWhGRJ+gXINA0+75kQp0os?=
- =?us-ascii?Q?m7tpLPquqnhKzGMGI3BSdzLcbgxTX7eeOVG+zJ1vgzrq/FZ7e/8epbdryy5s?=
- =?us-ascii?Q?YnxPygGo2ev/NQS5xFHGMEH63CtBUMYDMvPtZEYlMSPa0MOAnJCW4d7HxDdL?=
- =?us-ascii?Q?Y5+zFIVw0pin7wxjc5HhSULj6KlRYLcTCADkHgZqpzCJ+u1uZu3kfsSxzbX3?=
- =?us-ascii?Q?24Ttugmr0O+lxTT/1uZvoXTr?=
+X-Microsoft-Antispam-Message-Info: MAhMdgjj9TLObeUyAkXTB2A4PARxou6oE89ClQ3OKKbqphVosleihY+lsKbX/6Tg62NqZ/bpAR/u8VHdA+UkQtIjlMYOtd33JPajByI/PuzPCRAA3DJFx0otNk8mnPkS2nbO3i0NO2vn+lfiJev6/wJaKkVqKOr53z82w/WwHng3LG5hHh3fMNGz05Egeb5DpvWheM7/cbmXEWcJmu6MySOFiKYdts5Wh//hU+KYL1qukADYT33YVLCSRAefmLkZWLtJvO0jKau7jX5ilJlIWFIs5WqeEgvL4E5dFFLV/3USeMuw8tVh58upzIOeSE4RhuddDWtdGQTecDQeHJKvATsedMz5MHyjpaceMwkZB6FOUUXrVGRKKQJCtRiCdx7f1Xamjq3lgMkblmaX9UsOSMOPE9llg8O07VUuCWRF/EX2SMF0phcKByMQi3+5UXvljWivQBsu6QDfKH9kcwn7WvRhqVSIpC3jdYLknxtM+ULLy1ha9IlyskcUPVqxWvol599T0dkFCO5OQ49ZtGbXzgSG5nArQnSSGjaDCmpQXaaPdDKbtRuf6wfd/Gk4Hd/qd+Xsl/TTCTLSFAOxb12n+1jvk39VlhgapF3J/JHfa+DBMq9pjEQSx19uoFYOX78zE4ym063FwU+87iMC1BcALg==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2767.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(136003)(346002)(376002)(39860400002)(396003)(8936002)(7696005)(26005)(8676002)(2906002)(186003)(66946007)(86362001)(38100700002)(83380400001)(6666004)(6486002)(7416002)(16526019)(66556008)(36756003)(6916009)(52116002)(4326008)(5660300002)(956004)(478600001)(66476007)(38350700002)(2616005)(316002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData: =?us-ascii?Q?frq3yls1anxbELJrSvA8UaF30UsrYd5uw1Yh/C3Dlhuw1TE/jmKfFWgRKq8q?=
+ =?us-ascii?Q?2PmfzrMEntSyDHPtefot4RwPO7Mvi7Nwi1pCRewuhqbLYIJk/ecFpNWUotDE?=
+ =?us-ascii?Q?zXp37q/qfLvYVLItfsgo14+qJksUrQH7I23fEOYMgyz/kmplWtihg9KMcyA+?=
+ =?us-ascii?Q?O/Qqf/ISXPiw7dB7nnbGxgFHPe+tUVjY/poDr9idPwJIG7pPbGmwSoAiQRJ1?=
+ =?us-ascii?Q?1YzTGnfZGS4wl9bnVkxru7uB8UzevW1jmGn2BauZ5jmeb9tYF5C84lXEMu6u?=
+ =?us-ascii?Q?dFVRgC0fyDtnglg7dfjOk8WzMrcSh2TlAkjlrBYz+9BE7z0u4n3s2Wm/vzAf?=
+ =?us-ascii?Q?sfAbDP8DdgCqtajN4EYMT9nLTCgd4ndIrmiUW6tIrpaIHuPfE6AONgrB2H0L?=
+ =?us-ascii?Q?cX7DW+KVtpdMQQu4bbald4rIrHjZJbYqNWHXsnT1EMB7eFMMTPlcRKxJVN2R?=
+ =?us-ascii?Q?hYjIhYhoqSd27uz4iBm7/ssPckJ+/DIgvmqmMl4RLuhwy3YaLiRFAKxVbpwN?=
+ =?us-ascii?Q?L4WtXXi1EZpR89MEYNnZRruzvNZ+z/EG4PcSEKSDKWIpZ8P5MiWKLs7wVx4g?=
+ =?us-ascii?Q?Ill8c78UthMXYXQjygrJJ49ChX+JgkzqnvgqMFF/+OMeiknEo8QurG4tBzIb?=
+ =?us-ascii?Q?v492uMu8QsbQFGdU3tiNjsg65jevuZp3p/2hbJtleYNFVdTGTSuuOrhJ0jEK?=
+ =?us-ascii?Q?R2iUX1VDQPHs2SNKS02IE+TVhFpqgWPoPh6qOIxQ7Me3UIpby1dK9TrTIWjE?=
+ =?us-ascii?Q?VznZ16SpSS/8BUn2yjGcg6ERKL/FVbrFDBijKf5k+1R36NczGWl/saf0tIOv?=
+ =?us-ascii?Q?vkKU9MwaidWNqBTyH3FHNsqZwi+5EHdTv5t7/OjjWvzqo0tlzS9buHqFxlQi?=
+ =?us-ascii?Q?UHrQHr2/1g7MT2dczR8Y1/MGDvidXCbFrOdDryiJZSwjaf5TC4z7wwSAxOyM?=
+ =?us-ascii?Q?Ah/xT9/ahq0ungQsaAGKXXLbxpFJmtxUBvQynhz18EG92U6c3bssfbqAZ10G?=
+ =?us-ascii?Q?XVgOOQiWrvoYkD+6TOVlP+U0at4DPiE5AiuN107E8FBp6FxrF70dT07WFGIQ?=
+ =?us-ascii?Q?Dv+yR6jhrBag2x27LN0h0xayvSt7RyANQ95faq1rL3p3y4F0mSXouVsWbWva?=
+ =?us-ascii?Q?40AGcVsarWotCaQkhkbHNhX7t2Otwj1x5OirJQZqU7TEPKzPAMLLpMT63j+6?=
+ =?us-ascii?Q?C9oyzN339NdJnQA9O/E+LxrCNzjCrmKt/aSwSMiShMrq/P/Zyc1jia4O63Yp?=
+ =?us-ascii?Q?JxpriLCm1eg/6uIiriExsc1Y6V7g83hJMndzUFACumXGH0xj/BvcyH/JRl39?=
+ =?us-ascii?Q?EQggdbX3hN8f9hrHLty9eiGo?=
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: d21adc52-70f0-4b3c-5cc6-08d905d0f9fc
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2caacb1a-ec9f-4eba-be95-08d905d125ac
 X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2767.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Apr 2021 20:55:35.6277
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Apr 2021 20:56:48.9106
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: oXdzX9JhXOBl9NxP8GRtzTDJf2MRx9xx8xRbDiI1/DRuf59yBG3fNp2CqBlBPstY1+SfS+ADgGTwQg9WwRCmKQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR12MB4510
+X-MS-Exchange-CrossTenant-UserPrincipalName: AwmQ1xedRhQj7755Z6eOomt7ub8NLVfQaWh5zFHqrINRqSa4QCs1+ZcYXyQ1SDjGyYvOywXr/y8hE0QFZZK2Iw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR12MB4509
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Brijesh Singh <brijesh.singh@amd.com>
+From: Ashish Kalra <ashish.kalra@amd.com>
 
-Invoke a hypercall when a memory region is changed from encrypted ->
-decrypted and vice versa. Hypervisor needs to know the page encryption
-status during the guest migration.
+Introduce a new AMD Memory Encryption GUID which is currently
+used for defining a new UEFI environment variable which indicates
+UEFI/OVMF support for the SEV live migration feature. This variable
+is setup when UEFI/OVMF detects host/hypervisor support for SEV
+live migration and later this variable is read by the kernel using
+EFI runtime services to verify if OVMF supports the live migration
+feature.
 
-Cc: Thomas Gleixner <tglx@linutronix.de>
-Cc: Ingo Molnar <mingo@redhat.com>
-Cc: "H. Peter Anvin" <hpa@zytor.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Joerg Roedel <joro@8bytes.org>
-Cc: Borislav Petkov <bp@suse.de>
-Cc: Tom Lendacky <thomas.lendacky@amd.com>
-Cc: x86@kernel.org
-Cc: kvm@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
-Reviewed-by: Steve Rutherford <srutherford@google.com>
-Reviewed-by: Venu Busireddy <venu.busireddy@oracle.com>
-Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
 Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
 ---
- arch/x86/include/asm/paravirt.h       |  6 +++
- arch/x86/include/asm/paravirt_types.h |  2 +
- arch/x86/include/asm/set_memory.h     |  2 +
- arch/x86/kernel/paravirt.c            |  1 +
- arch/x86/mm/mem_encrypt.c             | 66 +++++++++++++++++++++++----
- arch/x86/mm/pat/set_memory.c          |  7 +++
- 6 files changed, 75 insertions(+), 9 deletions(-)
+ include/linux/efi.h | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/arch/x86/include/asm/paravirt.h b/arch/x86/include/asm/paravirt.h
-index 4abf110e2243..c0ef13e97f5a 100644
---- a/arch/x86/include/asm/paravirt.h
-+++ b/arch/x86/include/asm/paravirt.h
-@@ -84,6 +84,12 @@ static inline void paravirt_arch_exit_mmap(struct mm_struct *mm)
- 	PVOP_VCALL1(mmu.exit_mmap, mm);
- }
+diff --git a/include/linux/efi.h b/include/linux/efi.h
+index 8710f5710c1d..e95c144d1d02 100644
+--- a/include/linux/efi.h
++++ b/include/linux/efi.h
+@@ -360,6 +360,7 @@ void efi_native_runtime_setup(void);
  
-+static inline void notify_page_enc_status_changed(unsigned long pfn,
-+						  int npages, bool enc)
-+{
-+	PVOP_VCALL3(mmu.notify_page_enc_status_changed, pfn, npages, enc);
-+}
-+
- #ifdef CONFIG_PARAVIRT_XXL
- static inline void load_sp0(unsigned long sp0)
- {
-diff --git a/arch/x86/include/asm/paravirt_types.h b/arch/x86/include/asm/paravirt_types.h
-index de87087d3bde..7245d08f5500 100644
---- a/arch/x86/include/asm/paravirt_types.h
-+++ b/arch/x86/include/asm/paravirt_types.h
-@@ -195,6 +195,8 @@ struct pv_mmu_ops {
+ /* OEM GUIDs */
+ #define DELLEMC_EFI_RCI2_TABLE_GUID		EFI_GUID(0x2d9f28a2, 0xa886, 0x456a,  0x97, 0xa8, 0xf1, 0x1e, 0xf2, 0x4f, 0xf4, 0x55)
++#define MEM_ENCRYPT_GUID			EFI_GUID(0x0cf29b71, 0x9e51, 0x433a,  0xa3, 0xb7, 0x81, 0xf3, 0xab, 0x16, 0xb8, 0x75)
  
- 	/* Hook for intercepting the destruction of an mm_struct. */
- 	void (*exit_mmap)(struct mm_struct *mm);
-+	void (*notify_page_enc_status_changed)(unsigned long pfn, int npages,
-+					       bool enc);
- 
- #ifdef CONFIG_PARAVIRT_XXL
- 	struct paravirt_callee_save read_cr2;
-diff --git a/arch/x86/include/asm/set_memory.h b/arch/x86/include/asm/set_memory.h
-index 4352f08bfbb5..ed9cfe062634 100644
---- a/arch/x86/include/asm/set_memory.h
-+++ b/arch/x86/include/asm/set_memory.h
-@@ -83,6 +83,8 @@ int set_pages_rw(struct page *page, int numpages);
- int set_direct_map_invalid_noflush(struct page *page);
- int set_direct_map_default_noflush(struct page *page);
- bool kernel_page_present(struct page *page);
-+void notify_addr_enc_status_changed(unsigned long vaddr, int npages,
-+				    bool enc);
- 
- extern int kernel_set_to_readonly;
- 
-diff --git a/arch/x86/kernel/paravirt.c b/arch/x86/kernel/paravirt.c
-index c60222ab8ab9..192230247ad7 100644
---- a/arch/x86/kernel/paravirt.c
-+++ b/arch/x86/kernel/paravirt.c
-@@ -335,6 +335,7 @@ struct paravirt_patch_template pv_ops = {
- 			(void (*)(struct mmu_gather *, void *))tlb_remove_page,
- 
- 	.mmu.exit_mmap		= paravirt_nop,
-+	.mmu.notify_page_enc_status_changed	= paravirt_nop,
- 
- #ifdef CONFIG_PARAVIRT_XXL
- 	.mmu.read_cr2		= __PV_IS_CALLEE_SAVE(native_read_cr2),
-diff --git a/arch/x86/mm/mem_encrypt.c b/arch/x86/mm/mem_encrypt.c
-index 4b01f7dbaf30..e4b94099645b 100644
---- a/arch/x86/mm/mem_encrypt.c
-+++ b/arch/x86/mm/mem_encrypt.c
-@@ -229,29 +229,74 @@ void __init sev_setup_arch(void)
- 	swiotlb_adjust_size(size);
- }
- 
--static void __init __set_clr_pte_enc(pte_t *kpte, int level, bool enc)
-+static unsigned long pg_level_to_pfn(int level, pte_t *kpte, pgprot_t *ret_prot)
- {
--	pgprot_t old_prot, new_prot;
--	unsigned long pfn, pa, size;
--	pte_t new_pte;
-+	unsigned long pfn = 0;
-+	pgprot_t prot;
- 
- 	switch (level) {
- 	case PG_LEVEL_4K:
- 		pfn = pte_pfn(*kpte);
--		old_prot = pte_pgprot(*kpte);
-+		prot = pte_pgprot(*kpte);
- 		break;
- 	case PG_LEVEL_2M:
- 		pfn = pmd_pfn(*(pmd_t *)kpte);
--		old_prot = pmd_pgprot(*(pmd_t *)kpte);
-+		prot = pmd_pgprot(*(pmd_t *)kpte);
- 		break;
- 	case PG_LEVEL_1G:
- 		pfn = pud_pfn(*(pud_t *)kpte);
--		old_prot = pud_pgprot(*(pud_t *)kpte);
-+		prot = pud_pgprot(*(pud_t *)kpte);
- 		break;
- 	default:
--		return;
-+		return 0;
- 	}
- 
-+	if (ret_prot)
-+		*ret_prot = prot;
-+
-+	return pfn;
-+}
-+
-+void notify_addr_enc_status_changed(unsigned long vaddr, int npages,
-+				    bool enc)
-+{
-+#ifdef CONFIG_PARAVIRT
-+	unsigned long sz = npages << PAGE_SHIFT;
-+	unsigned long vaddr_end = vaddr + sz;
-+
-+	while (vaddr < vaddr_end) {
-+		int psize, pmask, level;
-+		unsigned long pfn;
-+		pte_t *kpte;
-+
-+		kpte = lookup_address(vaddr, &level);
-+		if (!kpte || pte_none(*kpte))
-+			return;
-+
-+		pfn = pg_level_to_pfn(level, kpte, NULL);
-+		if (!pfn)
-+			continue;
-+
-+		psize = page_level_size(level);
-+		pmask = page_level_mask(level);
-+
-+		notify_page_enc_status_changed(pfn, psize >> PAGE_SHIFT, enc);
-+
-+		vaddr = (vaddr & pmask) + psize;
-+	}
-+#endif
-+}
-+
-+static void __init __set_clr_pte_enc(pte_t *kpte, int level, bool enc)
-+{
-+	pgprot_t old_prot, new_prot;
-+	unsigned long pfn, pa, size;
-+	pte_t new_pte;
-+
-+	pfn = pg_level_to_pfn(level, kpte, &old_prot);
-+	if (!pfn)
-+		return;
-+
- 	new_prot = old_prot;
- 	if (enc)
- 		pgprot_val(new_prot) |= _PAGE_ENC;
-@@ -286,12 +331,13 @@ static void __init __set_clr_pte_enc(pte_t *kpte, int level, bool enc)
- static int __init early_set_memory_enc_dec(unsigned long vaddr,
- 					   unsigned long size, bool enc)
- {
--	unsigned long vaddr_end, vaddr_next;
-+	unsigned long vaddr_end, vaddr_next, start;
- 	unsigned long psize, pmask;
- 	int split_page_size_mask;
- 	int level, ret;
- 	pte_t *kpte;
- 
-+	start = vaddr;
- 	vaddr_next = vaddr;
- 	vaddr_end = vaddr + size;
- 
-@@ -346,6 +392,8 @@ static int __init early_set_memory_enc_dec(unsigned long vaddr,
- 
- 	ret = 0;
- 
-+	notify_addr_enc_status_changed(start, PAGE_ALIGN(size) >> PAGE_SHIFT,
-+					enc);
- out:
- 	__flush_tlb_all();
- 	return ret;
-diff --git a/arch/x86/mm/pat/set_memory.c b/arch/x86/mm/pat/set_memory.c
-index 16f878c26667..45e65517405a 100644
---- a/arch/x86/mm/pat/set_memory.c
-+++ b/arch/x86/mm/pat/set_memory.c
-@@ -2012,6 +2012,13 @@ static int __set_memory_enc_dec(unsigned long addr, int numpages, bool enc)
- 	 */
- 	cpa_flush(&cpa, 0);
- 
-+	/*
-+	 * Notify hypervisor that a given memory range is mapped encrypted
-+	 * or decrypted. The hypervisor will use this information during the
-+	 * VM migration.
-+	 */
-+	notify_addr_enc_status_changed(addr, numpages, enc);
-+
- 	return ret;
- }
- 
+ typedef struct {
+ 	efi_guid_t guid;
 -- 
 2.17.1
 
