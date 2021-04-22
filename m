@@ -2,86 +2,109 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F40EE368283
-	for <lists+kvm@lfdr.de>; Thu, 22 Apr 2021 16:36:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A82CF368289
+	for <lists+kvm@lfdr.de>; Thu, 22 Apr 2021 16:39:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236058AbhDVOhP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 22 Apr 2021 10:37:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38176 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236465AbhDVOhO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 22 Apr 2021 10:37:14 -0400
-Received: from mail-vk1-xa2f.google.com (mail-vk1-xa2f.google.com [IPv6:2607:f8b0:4864:20::a2f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E5EFDC06138B
-        for <kvm@vger.kernel.org>; Thu, 22 Apr 2021 07:36:37 -0700 (PDT)
-Received: by mail-vk1-xa2f.google.com with SMTP id s190so5485152vkd.6
-        for <kvm@vger.kernel.org>; Thu, 22 Apr 2021 07:36:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:from:date:message-id:subject:to:cc;
-        bh=GR8P6grrgB3ruOkM69G+4yKFVdAdfJxp2iiL3+XxziA=;
-        b=SQf0wC9CJvMOB8pFyT3KrisZwvQ+yvrp0Xt/8dDvabcTCj2hf2KUmlVdk3VtEzHlz7
-         J4inyZ5isJE1XxSbpUP2+BSPpHS/5eV697c/RLrwzFCQzCn5EdQ99MWEEjRSHculFL5P
-         zwIWATBEuGR+iXRgqwZCy3KojPJ15BOQDD4FPWeLLI4vyc1L5cqljjiLkp4hHNn8+ohP
-         Qxaysor7W6+gzjS8ltHNu1Mgz3HuRTuBRp8D40nxarNd0s8q5tcG3+ZiupOShJKqGs/1
-         HjMrFih3kZhJh3aM65EiGg2HLzpuev5s5OcanU8ciUu4pNgRlhrL6l+Uo63cbO2VJ+X+
-         2r+g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
-        bh=GR8P6grrgB3ruOkM69G+4yKFVdAdfJxp2iiL3+XxziA=;
-        b=ZMip1Mxk6oiQbZCXDkIocL+AY0OpA0el1ji+Xf6rZDKvm5uryV2ntHoYRZL925KcNX
-         Bs5yr39HQG016E67jwsLMT0nwHXrqVWDwftluGmmYzdDNIB8XjTT9+Xrh1uC9FPCmcZg
-         vBEeSHt+Tni5447KD8zQLcDeoOptZfW0WbQxrSDq3fxUCfE0JBVIG4ai4fvWdgYM4uOq
-         4EvvKxR1EreTTWX8bINFPn9pMTPdJKLrJu0w5ON3+W5SoiRbta2il5T/YdINSGQK4Jzv
-         ifieRSbpKly3D6ZURwb93BMjKs1HNOrIPfCvXRqUBupHWDZTGK1IjcV19T4kyx3qIEoE
-         5Lqw==
-X-Gm-Message-State: AOAM530LM3CXR1nipbFyqpsNzRHRw/kyL0MEvNScpq8apjhRsLjIB0G9
-        lCZU8PZlP2WloN/HUE3x6rL1am8/entm/szvU8OWvA==
-X-Google-Smtp-Source: ABdhPJw2/4Q0etYHJIX8SUZrn0cxC9aDLUykjju5XsssaMG4RXKlwNRaWAk8OwmetWkgN7dTRMyHRiyfGopnQ57nIvs=
-X-Received: by 2002:a1f:53c7:: with SMTP id h190mr3106831vkb.19.1619102196901;
- Thu, 22 Apr 2021 07:36:36 -0700 (PDT)
+        id S236534AbhDVOkE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 22 Apr 2021 10:40:04 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:10200 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S236510AbhDVOkB (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 22 Apr 2021 10:40:01 -0400
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 13MEYqt7046890;
+        Thu, 22 Apr 2021 10:38:30 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : references : date : in-reply-to : message-id : mime-version :
+ content-type; s=pp1; bh=bWvD20q4YhRTe5N3/qrevWFZh7UJjKlLEbSTpGJIUuA=;
+ b=oz1DJdrpI9VGdl3dHhwBMAtDPNwPTYJug1TMeShuh0waSzuJ0B3e9WXPG0wkXzDQcyOv
+ vcfiPY/hfKZcK3BCl7KPZm7Noqrb52qjF9bqiCaISD288958IlnRuGOMHA0tSqOtfOcu
+ Rmlz/tM32MkJqsLuXJDFMGspLvVkgyUjAjbX0PIFOg7JATNUxerSyIa3KA7pDYvll15q
+ yordJfQnVBP50+t2/wGoCComPnMzw7QmJKgAKdP66oQBKMky52qnoLGpXehQDbcAWISJ
+ SCaXwX0p5/RgPFHlAlMzl1/fAzpA3WcnH0EHGePaaw6AAJZP2F0Zb8V7FUqWlyGh9lH+ Cg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 383aqvrtnk-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 22 Apr 2021 10:38:30 -0400
+Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 13MEZhWN051717;
+        Thu, 22 Apr 2021 10:38:30 -0400
+Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 383aqvrtmc-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 22 Apr 2021 10:38:30 -0400
+Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
+        by ppma02fra.de.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 13MEMmLL032429;
+        Thu, 22 Apr 2021 14:38:28 GMT
+Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
+        by ppma02fra.de.ibm.com with ESMTP id 37yqa89m08-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 22 Apr 2021 14:38:28 +0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 13MEcPFJ20709722
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 22 Apr 2021 14:38:25 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id E72EB52059;
+        Thu, 22 Apr 2021 14:38:24 +0000 (GMT)
+Received: from tuxmaker.linux.ibm.com (unknown [9.152.85.9])
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTPS id 807F552052;
+        Thu, 22 Apr 2021 14:38:24 +0000 (GMT)
+From:   Sven Schnelle <svens@linux.ibm.com>
+To:     Christian Borntraeger <borntraeger@de.ibm.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Michael Tokarev <mjt@tls.msk.ru>,
+        Heiko Carstens <heiko.carstens@de.ibm.com>, gor@linux.ibm.com
+Subject: Re: [PATCH v3 9/9] KVM: Move instrumentation-safe annotations for
+ enter/exit to x86 code
+References: <20210415222106.1643837-1-seanjc@google.com>
+        <20210415222106.1643837-10-seanjc@google.com>
+        <0c74158d-279a-5afa-0778-822c77ac8dc2@de.ibm.com>
+Date:   Thu, 22 Apr 2021 16:38:24 +0200
+In-Reply-To: <0c74158d-279a-5afa-0778-822c77ac8dc2@de.ibm.com> (Christian
+        Borntraeger's message of "Wed, 21 Apr 2021 10:09:11 +0200")
+Message-ID: <yt9d4kfypeov.fsf@linux.ibm.com>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.0.50 (gnu/linux)
 MIME-Version: 1.0
-From:   Jue Wang <juew@google.com>
-Date:   Thu, 22 Apr 2021 07:36:25 -0700
-Message-ID: <CAPcxDJ6tkcgruegNfgPCjA3pS+-Q1iEGAZQejPhzOdx4x9cDnA@mail.gmail.com>
-Subject: Re: [RFCv2 00/13] TDX and guest memory unmapping
-To:     kirill.shutemov@linux.intel.com
-Cc:     andi.kleen@intel.com, dave.hansen@linux.intel.com,
-        david@redhat.com, erdemaktas@google.com, isaku.yamahata@intel.com,
-        jmattson@google.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org, luto@kernel.org,
-        peterz@infradead.org, pgonda@google.com,
-        rick.p.edgecombe@intel.com, rientjes@google.com, seanjc@google.com,
-        srutherford@google.com, x86@kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: S77gfyvLqOXBp7fwBctyyEw_3Fzv7DwJ
+X-Proofpoint-ORIG-GUID: C7nzDPw_32BELsJPSSQ7R73hhq1Ii59_
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.761
+ definitions=2021-04-22_06:2021-04-22,2021-04-22 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 impostorscore=0 adultscore=0 phishscore=0 suspectscore=0
+ bulkscore=0 mlxscore=0 mlxlogscore=999 clxscore=1011 spamscore=0
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2104060000 definitions=main-2104220118
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 16 Apr 2021 18:40:53 +0300, Kirill A. Shutemov wrote:
+Christian Borntraeger <borntraeger@de.ibm.com> writes:
 
-> TDX integrity check failures may lead to system shutdown host kernel must
-> not allow any writes to TD-private memory. This requirment clashes with
-> KVM design: KVM expects the guest memory to be mapped into host userspace
-> (e.g. QEMU).
+> On 16.04.21 00:21, Sean Christopherson wrote:
+>> Drop the instrumentation_{begin,end}() annonations from the common KVM
+>> guest enter/exit helpers, and massage the x86 code as needed to preserve
+>> the necessary annotations.  x86 is the only architecture whose transition
+>> flow is tagged as noinstr, and more specifically, it is the only
+>> architecture for which instrumentation_{begin,end}() can be non-empty.
+>> No other architecture supports CONFIG_STACK_VALIDATION=y, and s390
+>> is the
+>> only other architecture that support CONFIG_DEBUG_ENTRY=y.  For
+>> instrumentation annontations to be meaningful, both aformentioned configs
+>> must be enabled.
+>> Letting x86 deal with the annotations avoids unnecessary nops by
+>> squashing back-to-back instrumention-safe sequences.
+>
+> We have considered implementing objtool for s390. Not sure where we
+> stand and if we will do this or not. Sven/Heiko?
 
-> This patchset aims to start discussion on how we can approach the issue.
-
-Hi Kirill,
-
-Some potential food for thought:
-
-Repurpose Linux page hwpoison semantics for TDX-private memory protection is
-smart, however, treating PG_hwpoison or hwpoison swap pte differently when
-kvm->mem_protected=true implicitly disabled the original capability of page
-hwpoison: protecting the whole system from known corrupted physical memory
-and giving user space applications an opportunity to recover from physical
-memory corruptions.
-
-Have you considered introducing a set of similar but independent
-page/pte semantics
-for TDX private memory protection purpose?
-
-Best regards,
--Jue
+We are planning to support objtool on s390. Vasily is working on it -
+maybe he has some thoughts about this.
