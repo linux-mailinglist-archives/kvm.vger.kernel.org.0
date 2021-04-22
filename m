@@ -2,137 +2,135 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A9223367F05
-	for <lists+kvm@lfdr.de>; Thu, 22 Apr 2021 12:50:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0196D367F08
+	for <lists+kvm@lfdr.de>; Thu, 22 Apr 2021 12:50:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235937AbhDVKtB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 22 Apr 2021 06:49:01 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:32884 "EHLO
+        id S235917AbhDVKuM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 22 Apr 2021 06:50:12 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:25799 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S235513AbhDVKsz (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 22 Apr 2021 06:48:55 -0400
+        by vger.kernel.org with ESMTP id S235455AbhDVKuJ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 22 Apr 2021 06:50:09 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1619088499;
+        s=mimecast20190719; t=1619088574;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=W56Co4nmu9futOlRgTdRc7GGowpj4sKz++PgS6J5tsk=;
-        b=dlqBfDXOPLAAthq3eU+GFg8nSm5PKmrKr5EzImFVCrKAovkON0hRU4n+bkR1F1FpRCSW2h
-        OkG9wFFfJxV7OWqPYYVvVLqaX2EP3QSnP93znGnOGPW5+CImK8+9i2vfi1Uufz0WlJQoI6
-        tGBv79/rl8rQfpV6rrWKRoZGgfs+xuI=
-Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
- [209.85.218.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-583-nQzW2o-RM9CK5PRPWQi-qg-1; Thu, 22 Apr 2021 06:48:17 -0400
-X-MC-Unique: nQzW2o-RM9CK5PRPWQi-qg-1
-Received: by mail-ej1-f71.google.com with SMTP id bx15-20020a170906a1cfb029037415131f28so7092968ejb.18
-        for <kvm@vger.kernel.org>; Thu, 22 Apr 2021 03:48:17 -0700 (PDT)
+        bh=cepH4DVmZgMHRHW+WV87UBOsh4wAs3M6NCnks6Bbd8Y=;
+        b=I98JjUVOdepGVuTw5k2kwn+qPVr3FMwUfKpN7sa/uylvEkb4Qguhh0AcrwEkB25qrKCtqy
+        3jhzFWYhqvfAtY7G2OTleD2xYq5R3uErlTMNMuCRzzWNUKDL+DGH3y/z3+SaJ2tUzIL8Kc
+        g1lMhrBf4XRZKDLwzhrbOcssTErDNQQ=
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
+ [209.85.218.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-493-2bJXaFlmMfWEVmlwf5-fnw-1; Thu, 22 Apr 2021 06:49:32 -0400
+X-MC-Unique: 2bJXaFlmMfWEVmlwf5-fnw-1
+Received: by mail-ej1-f72.google.com with SMTP id k5-20020a1709061c05b029037cb8a99e03so7010452ejg.16
+        for <kvm@vger.kernel.org>; Thu, 22 Apr 2021 03:49:32 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=W56Co4nmu9futOlRgTdRc7GGowpj4sKz++PgS6J5tsk=;
-        b=jzAZJ17b5SEg6aeNgWFNoGD4hMwNTVLrwHlMNemlwezpTZJRmfCGazSz90mvNFjH7s
-         /SxyPL+lADBOL8DKDSY5Z+2zXwRHCR1kO0Cnej+0WnYwxhafEvtUfKdZXpD68pI1nAEU
-         hzTAdkJClmXJCq3O3AYBvPReErSGBCSaxqIRpJD8Yv9pPYT9Dm3l9XKr2EuIhDNbJsme
-         Oodmxg35jOAQsScTBOiDlv7oXmH27eKf9yCJFbAlRxD0FY06K0I5cKZgBV2I9X72K638
-         55E13yLySjf5kp8ekctTDO5cGXolREh/Idi8dnTgbsv6K2aZmf+MMkN51FD4KjJm9L7x
-         v4CA==
-X-Gm-Message-State: AOAM531Uw9E2WLzMO/djPkguhkTYnTvmLI68CjdbWFPHipNl6jeVw5ub
-        ngm+yocnkmkYGdH2wnGyHGgRfMTRiFwMwvng8v4Me2NdZ8dy4UfuV74lFV9SHXOQNUZP+epCtyA
-        RvzSPYS9hiRzX
-X-Received: by 2002:a17:906:cec2:: with SMTP id si2mr2807091ejb.234.1619088496488;
-        Thu, 22 Apr 2021 03:48:16 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJz3/JpW1+yllDt8fPHdvJEi1YttSx3GfTb7YhzmFF4NC8d2xAOCwtXohAtzSrborDsblnu1zw==
-X-Received: by 2002:a17:906:cec2:: with SMTP id si2mr2807055ejb.234.1619088496251;
-        Thu, 22 Apr 2021 03:48:16 -0700 (PDT)
-Received: from steredhat (host-79-34-249-199.business.telecomitalia.it. [79.34.249.199])
-        by smtp.gmail.com with ESMTPSA id d10sm1577096ejw.125.2021.04.22.03.48.14
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=cepH4DVmZgMHRHW+WV87UBOsh4wAs3M6NCnks6Bbd8Y=;
+        b=R0CLLCpquj0bc9q1YH5V0UOgpvaJANTLrsg4mbV97WiVX20DejcrJsvkIveD0W500O
+         BDDhFVm+NlupFWnGZg4iFz4Hok6gRc2/i41VMmmyDhoJqZaQIimx72KAXd9t/oslPZg6
+         XqQP97zXKYdeU06LYcHTDsD08GD07+tNuLdjHY99DE9zS7OdN7qgwK2GHfi8r5ylJz3d
+         ATpeqHQ0xleHuhfzf59eNVbzABCGRlr8Kf/T1zEFB0SW9+JkxNiKYU4YiI6cgbGlbqq9
+         idegs43RDFn5Og2uyDfl530cvdgwv9v6WarqnUEedgA5Xv+3FNBXCnuU4XYSTqiHTK7i
+         RmBg==
+X-Gm-Message-State: AOAM5319RRyFhIxUBoGhqCe15Xjplff0jruOWk6fWy6cwgnQFymZ2hsH
+        tX8R1ZG57+8MmQOloRsk6CT/ljjdvLzbgg/v9IT6tBSSLx7CJF7NIM/rBgAF6T4Q6ndnJC9wODu
+        KRYXq1MXfGHr+
+X-Received: by 2002:aa7:d9ce:: with SMTP id v14mr3085679eds.110.1619088571579;
+        Thu, 22 Apr 2021 03:49:31 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzLGo5TNn7MXo/voi472GduRwPJLEiKPNQM3olHulqQpsFAmVYDu4AmUn1ZFcytO2+nkGT0YQ==
+X-Received: by 2002:aa7:d9ce:: with SMTP id v14mr3085671eds.110.1619088571445;
+        Thu, 22 Apr 2021 03:49:31 -0700 (PDT)
+Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id n13sm1598355ejx.27.2021.04.22.03.49.30
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 22 Apr 2021 03:48:15 -0700 (PDT)
-Date:   Thu, 22 Apr 2021 12:48:13 +0200
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     Arseny Krasnov <arseny.krasnov@kaspersky.com>
-Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Jorgen Hansen <jhansen@vmware.com>,
-        Colin Ian King <colin.king@canonical.com>,
-        Andra Paraschiv <andraprs@amazon.com>,
-        Norbert Slusarek <nslusarek@gmx.net>,
-        Alexander Popov <alex.popov@linux.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "stsp2@yandex.ru" <stsp2@yandex.ru>,
-        "oxffffaa@gmail.com" <oxffffaa@gmail.com>
-Subject: Re: [RFC PATCH v8 00/19] virtio/vsock: introduce SOCK_SEQPACKET
- support
-Message-ID: <20210422104813.e2p4wzuk2ahw7af7@steredhat>
-References: <20210413123954.3396314-1-arseny.krasnov@kaspersky.com>
- <20210421095213.25hnfi2th7gzyzt2@steredhat>
- <2c3d0749-0f41-e064-0153-b6130268add2@kaspersky.com>
- <20210422084638.bvblk33b4oi6cec6@steredhat>
- <bfefdd94-a84f-8bed-331e-274654a7426f@kaspersky.com>
- <20210422100217.jmpgevtrukqyukfo@steredhat>
- <bc649d1b-80d8-835c-6f47-8a7d402dd0b7@kaspersky.com>
+        Thu, 22 Apr 2021 03:49:31 -0700 (PDT)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>
+Cc:     Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Babu Moger <babu.moger@amd.com>,
+        Joao Martins <joao.m.martins@oracle.com>,
+        David Woodhouse <dwmw@amazon.co.uk>
+Subject: Re: [PATCH v2 7/9] KVM: x86/xen: Drop RAX[63:32] when processing
+ hypercall
+In-Reply-To: <2ddcc979-519c-a38c-065f-a9036cc2b58e@redhat.com>
+References: <20210422022128.3464144-1-seanjc@google.com>
+ <20210422022128.3464144-8-seanjc@google.com>
+ <877dkuhcl7.fsf@vitty.brq.redhat.com>
+ <2ddcc979-519c-a38c-065f-a9036cc2b58e@redhat.com>
+Date:   Thu, 22 Apr 2021 12:49:30 +0200
+Message-ID: <874kfyh9vp.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <bc649d1b-80d8-835c-6f47-8a7d402dd0b7@kaspersky.com>
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Apr 22, 2021 at 01:29:54PM +0300, Arseny Krasnov wrote:
->
->On 22.04.2021 13:02, Stefano Garzarella wrote:
->> On Thu, Apr 22, 2021 at 12:40:17PM +0300, Arseny Krasnov wrote:
->>> On 22.04.2021 11:46, Stefano Garzarella wrote:
->>>> On Wed, Apr 21, 2021 at 06:06:28PM +0300, Arseny Krasnov wrote:
->>>>> Thank You, i'll prepare next version. Main question is: does this
->>>>> approach(no SEQ_BEGIN, SEQ_END, 'msg_len' and 'msg_id') considered
->>>>> good? In this case it will be easier to prepare final version, because
->>>>> is smaller and more simple than previous logic. Also patch to spec
->>>>> will be smaller.
->>>> Yes, it's definitely much better than before.
->>>>
->>>> The only problem I see is that we add some overhead per fragment
->>>> (header). We could solve that with the mergeable buffers that Jiang is
->>>> considering for DGRAM.
->>> If we are talking about receive, i think, i can reuse merge logic for
->> Yep, for TX the guest can potentially enqueue a big buffer.
->> Maybe it's still worth keeping a maximum size and fragmenting as we do
->> now.
->>
->>> stream sockets, the only difference is that buffers are mergeable
->>> until previous EOR(e.g. previous message) bit is found in rx queue.
+Paolo Bonzini <pbonzini@redhat.com> writes:
+
+> On 22/04/21 11:51, Vitaly Kuznetsov wrote:
+>> Sean Christopherson <seanjc@google.com> writes:
+>> 
+>>> Truncate RAX to 32 bits, i.e. consume EAX, when retrieving the hypecall
+>>> index for a Xen hypercall.  Per Xen documentation[*], the index is EAX
+>>> when the vCPU is not in 64-bit mode.
 >>>
->> I got a little lost.
->> Can you elaborate more?
+>>> [*] http://xenbits.xenproject.org/docs/sphinx-unstable/guest-guide/x86/hypercall-abi.html
+>>>
+>>> Fixes: 23200b7a30de ("KVM: x86/xen: intercept xen hypercalls if enabled")
+>>> Cc: Joao Martins <joao.m.martins@oracle.com>
+>>> Cc: David Woodhouse <dwmw@amazon.co.uk>
+>>> Cc: stable@vger.kernel.org
+>>> Signed-off-by: Sean Christopherson <seanjc@google.com>
+>>> ---
+>>>   arch/x86/kvm/xen.c | 2 +-
+>>>   1 file changed, 1 insertion(+), 1 deletion(-)
+>>>
+>>> diff --git a/arch/x86/kvm/xen.c b/arch/x86/kvm/xen.c
+>>> index ae17250e1efe..7f27bb65a572 100644
+>>> --- a/arch/x86/kvm/xen.c
+>>> +++ b/arch/x86/kvm/xen.c
+>>> @@ -673,7 +673,7 @@ int kvm_xen_hypercall(struct kvm_vcpu *vcpu)
+>>>   	bool longmode;
+>>>   	u64 input, params[6];
+>>>   
+>>> -	input = (u64)kvm_register_read(vcpu, VCPU_REGS_RAX);
+>>> +	input = (u64)kvm_register_readl(vcpu, VCPU_REGS_RAX);
+>>>   
+>>>   	/* Hyper-V hypercalls get bit 31 set in EAX */
+>>>   	if ((input & 0x80000000) &&
+>> 
+>> Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+>> 
+>> Alternatively, as a minor optimization, you could've used '!longmode'
+>> check below, something like:
+>> 
+>> diff --git a/arch/x86/kvm/xen.c b/arch/x86/kvm/xen.c
+>> index ae17250e1efe..7df1498d3a41 100644
+>> --- a/arch/x86/kvm/xen.c
+>> +++ b/arch/x86/kvm/xen.c
+>> @@ -682,6 +682,7 @@ int kvm_xen_hypercall(struct kvm_vcpu *vcpu)
+>>   
+>>          longmode = is_64_bit_mode(vcpu);
+>>          if (!longmode) {
+>> +               input = (u32)input;
+>>                  params[0] = (u32)kvm_rbx_read(vcpu);
+>>                  params[1] = (u32)kvm_rcx_read(vcpu);
+>>                  params[2] = (u32)kvm_rdx_read(vcpu);
+>> 
 >
->I'm talking about 'virtio_transport_recv_enqueue()': it tries to copy
+> You haven't seen patch 9 yet. :)
 >
->data of new packet to buffer of tail packet in rx queue. In case of
->
->SEQPACKET i can reuse it, just adding logic that check EOR bit of
->
->tail packet.
 
-This might be a good idea.
-It doesn't save us the transmitted header though, but at least it saves 
-us from queuing it.
-Even if with SEQPACKET I don't expect small packets, since it's the 
-driver that divides them and I think it does everything to use the 
-maximum available.
+True; suggestion dismissed :-)
 
-Instead the mergeable buffers I was referring to are based on the 
-virito-net feature VIRTIO_NET_F_MRG_RXBUF.
-Jiang is investigating whether we can reuse them for DGRAM.
-
-Thanks,
-Stefano
+-- 
+Vitaly
 
