@@ -2,114 +2,124 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B10B436768B
-	for <lists+kvm@lfdr.de>; Thu, 22 Apr 2021 02:55:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 84F3436768E
+	for <lists+kvm@lfdr.de>; Thu, 22 Apr 2021 02:56:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240060AbhDVA4K (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 21 Apr 2021 20:56:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54634 "EHLO
+        id S241798AbhDVA5L (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 21 Apr 2021 20:57:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54874 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235168AbhDVA4F (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 21 Apr 2021 20:56:05 -0400
-Received: from mail-oi1-x230.google.com (mail-oi1-x230.google.com [IPv6:2607:f8b0:4864:20::230])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BC183C06174A;
-        Wed, 21 Apr 2021 17:55:30 -0700 (PDT)
-Received: by mail-oi1-x230.google.com with SMTP id e25so14274016oii.2;
-        Wed, 21 Apr 2021 17:55:30 -0700 (PDT)
+        with ESMTP id S240981AbhDVA5L (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 21 Apr 2021 20:57:11 -0400
+Received: from mail-qv1-xf49.google.com (mail-qv1-xf49.google.com [IPv6:2607:f8b0:4864:20::f49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 20F9DC06138A
+        for <kvm@vger.kernel.org>; Wed, 21 Apr 2021 17:56:37 -0700 (PDT)
+Received: by mail-qv1-xf49.google.com with SMTP id e20-20020ad442b40000b029019aa511c767so14796670qvr.18
+        for <kvm@vger.kernel.org>; Wed, 21 Apr 2021 17:56:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=JLBiD4Tk04qTKkjyIW7B4SXWL4eElYN21Iltqq+dkjI=;
-        b=nVSKhA9jbTCQXGKT9VEE2jEn9daDPmQnc92m0FSOt8YqSlv3yQb6ws/3JSWDjA2tF4
-         URaAqnxyWUbM8qaopN5nwaRlzd1eiNwSJJayX+TsXYUYLxUmbET+V/sVItEQAsRa/JOH
-         O0DdNZYQrIJAU6vtrXXlpUkUWNa81+4v2CRF9kAny2YZmV6u577kuFkg8JbEVp2BS+Wg
-         vziVMn/vIVXLdU7zeLMQRMCj9APbZwUgQZcV9BcVRXMib60qb1QoZWXWedM74ucClHfO
-         GkTiCPcJPj0s+8lYligf6uMmfwgWbJ2TdmbGhPkZM3zIa3wDkQt+gIz+X0jvWiIKHDCK
-         A+jg==
+        d=google.com; s=20161025;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=NzxbZ+GAahgmxduXaRkOwY3LO03b4qVXF2kZFZVIV+M=;
+        b=EY/Bkrwt7EOV0vOcFdHrNNLfJEudSb/z5dFRNAUDXJY6GzahV2RUbyBuxe43j5Ba/c
+         37spJaQTJBA0XFya0TgE4ej7IfVEGU101kUiAdOEvipDBhjCIMth9aD+rTPMJIdwPaPg
+         hcn7HCpOfL+gSOCUrgHTnzfsgYufCUfBlSF79muCJ7O3urR5Xr191bTTgniB/VglLH3B
+         7qRpKMq8OMdWCjkovJKPox5LSfC4Y5RaQeKkigl3WkCVqvCdBVXtbk9dquRZ4wkt7QI+
+         ZhKMowSwhzz2u/Ubd4zQWQK5WtVPcIQ9RxH4LaNWB/NCG6JRXIfsAmTifEaDku7qKosz
+         RVIg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=JLBiD4Tk04qTKkjyIW7B4SXWL4eElYN21Iltqq+dkjI=;
-        b=qCpmiBBW95ftMzM+qPmAxedHROqRXvbP2lrubbCdmxi8xPP5lpd4WmBMzbPJN18wCU
-         bXxH5FzLBzQMoiH6WygK5yIXP1xFFQk0axsyg8wxUa23vfal5wYzzI9WL1whchIaU8yn
-         ddr8NcgI5qpjtaKQD93qIVYnll4j6uYZMhmUosfNOpAtNjMnanUKKlS6CM4b/6Lb7o7w
-         efbRBDtdnErfCydeMursjMOz1vHOVM+K0rQL26KVJR5w2LRrkeUzrf+Iv5tG4OTEDpBv
-         mUEGVxKu29z0S9QiCEZmloOQBRAWjohDhvzCDPbfyg0tNuljM80IAcOa+L2Wy5Xqm2io
-         jf+w==
-X-Gm-Message-State: AOAM532BW309X5HVFXutW7kZNdwcaxuHADe1EqvqfM4MgWgr759oehh1
-        4CwzRsIlLV05K2NlLxmDUKMtdGKQ6ZtUyyd2IzI=
-X-Google-Smtp-Source: ABdhPJzSxmMzr0fgRvT7YYexSh2vvSZM5cj/lAd32qu5bVc6ek/0yb56L5ty29OxkkiSZ6r3NXeYsd49EzjGDqaf9gE=
-X-Received: by 2002:a05:6808:5c5:: with SMTP id d5mr8509578oij.141.1619052930189;
- Wed, 21 Apr 2021 17:55:30 -0700 (PDT)
-MIME-Version: 1.0
-References: <20210421150831.60133-1-kentaishiguro@sslab.ics.keio.ac.jp>
-In-Reply-To: <20210421150831.60133-1-kentaishiguro@sslab.ics.keio.ac.jp>
-From:   Wanpeng Li <kernellwp@gmail.com>
-Date:   Thu, 22 Apr 2021 08:55:18 +0800
-Message-ID: <CANRm+Cw1hNauuWGXOazpJ=s0tb6C-iQx=CZY92SPTDSEaT7jAw@mail.gmail.com>
-Subject: Re: [RFC PATCH 0/2] Mitigating Excessive Pause-Loop Exiting in
- VM-Agnostic KVM
-To:     Kenta Ishiguro <kentaishiguro@sslab.ics.keio.ac.jp>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=NzxbZ+GAahgmxduXaRkOwY3LO03b4qVXF2kZFZVIV+M=;
+        b=VpMR/OIdTVx4BraOhfnTF2zICQoluoJaOWd+ntrLKBShklqsYns+Y/oEXFyQitUbBF
+         ekv79GGzQ/9XXLNVBZacxoabfe1lK68xw0XHYWfgHoK/8yNbtshTmlqV7QAGYcC5o65E
+         0n3f2NHu81md/JGxnX+onO6aqisI07c3/fW6jZSaWQYJiTZPhVqHVKS2dSvcoj6OAyar
+         tOfu/A0XTCW3pXuV4EQdgYWekCHO0UqDBzlgb5l0jTEsWTonTMBV2cQBf4PC9VJRWBw1
+         niUopfjHQuhipXafTd7ncA6Bb5DuI9aPBPti5oDs9d3thnm4Kb6fvUJkfA2Qa1JaQJqd
+         4AMg==
+X-Gm-Message-State: AOAM533IFuyeYe2+QaXTt9qejbdYjulcZ8ctx1gUeIG0cSiRhM2F5Jr5
+        8TpH14Pypea81LwrVL4YwCN8WehtKDllzg==
+X-Google-Smtp-Source: ABdhPJxAui1HQQb7EtOlgCHADfQilI+gHPBuOzi2tKt6XDOLsse2UiM5wVgrbw2fJk3VLdwlUNTHNMLXKlLN7Q==
+X-Received: from ricarkol2.c.googlers.com ([fda3:e722:ac3:10:24:72f4:c0a8:62fe])
+ (user=ricarkol job=sendgmr) by 2002:a0c:9ad7:: with SMTP id
+ k23mr702884qvf.24.1619052996218; Wed, 21 Apr 2021 17:56:36 -0700 (PDT)
+Date:   Wed, 21 Apr 2021 17:56:21 -0700
+Message-Id: <20210422005626.564163-1-ricarkol@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.31.1.368.gbe11c130af-goog
+Subject: [PATCH 0/5] KVM: x86: Use kernel x86 cpuid utilities in KVM selftests
+From:   Ricardo Koller <ricarkol@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org, Peter Zijlstra <peterz@infradead.org>,
+        Ingo Molnar <mingo@redhat.com>,
+        Arnaldo Carvalho de Melo <acme@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Jiri Olsa <jolsa@redhat.com>,
+        Namhyung Kim <namhyung@kernel.org>,
+        "H. Peter Anvin" <hpa@zytor.com>,
         Sean Christopherson <seanjc@google.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>,
-        David Hildenbrand <david@redhat.com>,
-        kvm <kvm@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>,
-        pl@sslab.ics.keio.ac.jp, kono@sslab.ics.keio.ac.jp
+        Nathan Chancellor <nathan@kernel.org>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        linux-kernel@vger.kernel.org, clang-built-linux@googlegroups.com,
+        Ricardo Koller <ricarkol@google.com>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 22 Apr 2021 at 06:13, Kenta Ishiguro
-<kentaishiguro@sslab.ics.keio.ac.jp> wrote:
->
-> Dear KVM developers and maintainers,
->
-> In our research work presented last week at the VEE 2021 conference [1], we
-> found out that a lot of continuous Pause-Loop-Exiting (PLE) events occur
-> due to three problems we have identified: 1) Linux CFS ignores hints from
-> KVM; 2) IPI receiver vCPUs in user-mode are not boosted; 3) IPI-receiver
-> that has halted is always a candidate for boost.  We have intoduced two
-> mitigations against the problems.
->
-> To solve problem (1), patch 1 increases the vruntime of yielded vCPU to
-> pass the check `if (cfs_rq->next && wakeup_preempt_entity(cfs_rq->next,
-> left) < 1)` in `struct sched_entity * pick_next_entity()` if the cfs_rq's
-> skip and next are both vCPUs in the same VM. To keep fairness it does not
-> prioritize the guest VM which causes PLE, however it improves the
-> performance by eliminating unnecessary PLE. Also we have confirmed
-> `yield_to_task_fair` is called only from KVM.
->
-> To solve problems (2) and (3), patch 2 monitors IPI communication between
-> vCPUs and leverages the relationship between vCPUs to select boost
-> candidates.  The "[PATCH] KVM: Boost vCPU candidiate in user mode which is
-> delivering interrupt" patch
-> (https://lore.kernel.org/kvm/CANRm+Cy-78UnrkX8nh5WdHut2WW5NU=UL84FRJnUNjsAPK+Uww@mail.gmail.com/T/)
-> seems to be effective for (2) while it only uses the IPI receiver
-> information.
->
-> Our approach reduces the total number of PLE events by up to 87.6 % in four
-> 8-vCPU VMs in over-subscribed scenario with the Linux kernel 5.6.0. Please
-> find the patch below.
+The kernel has a set of utilities and definitions to deal with x86 cpu
+features.  The x86 KVM selftests don't use them, and instead have
+evolved to use differing and ad-hoc methods for checking features. The
+advantage of the kernel feature definitions is that they use a format
+that embeds the info needed to extract them from cpuid (function, index,
+and register to use).
 
-You should mention that this improvement mainly comes from your
-problems (1) scheduler hacking, however, kvm task is just an ordinary
-task and scheduler maintainer always does not accept special
-treatment.  the worst case for problems (1) mentioned in your paper, I
-guess it is vCPU stacking issue, I try to mitigate it before
-(https://lore.kernel.org/kvm/1564479235-25074-1-git-send-email-wanpengli@tencent.com/).
-For your problems (3), we evaluate hackbench which is heavily
-contended rq locks and heavy async ipi(reschedule ipi), the async ipi
-influence is around 0.X%, I don't expect normal workloads can feel any
-affected. In addition, four 8-vCPU VMs are not suitable for
-scalability evaluation. I don't think the complex which is introduced
-by your patch 2 is worth it since it gets a similar effect as my
-version w/ current heuristic algorithm.
+The first 3 patches massage the related cpuid header files in the kernel
+side, then copy them into tools/ so they can be included by selftests.
+The last 2 patches replace the tests checking for cpu features to use
+the definitions and utilities introduced from the kernel.
 
-    Wanpeng
+Thanks,
+Ricardo
+
+Ricardo Koller (5):
+  KVM: x86: Move reverse CPUID helpers to separate header file
+  x86/cpu: Expose CPUID regs, leaf and index definitions to tools
+  tools headers x86: Copy cpuid helpers from the kernel
+  KVM: selftests: Introduce utilities for checking x86 features
+  KVM: selftests: Use kernel x86 cpuid features format
+
+ arch/x86/events/intel/pt.c                    |   1 +
+ arch/x86/include/asm/cpufeature.h             |  23 +-
+ arch/x86/include/asm/processor.h              |  11 -
+ arch/x86/kernel/cpu/scattered.c               |   2 +-
+ arch/x86/kernel/cpuid.c                       |   2 +-
+ arch/x86/kvm/cpuid.h                          | 177 +-----------
+ arch/x86/kvm/reverse_cpuid.h                  | 185 +++++++++++++
+ tools/arch/x86/include/asm/cpufeature.h       | 257 ++++++++++++++++++
+ tools/arch/x86/include/asm/cpufeatures.h      |   3 +
+ .../selftests/kvm/include/x86_64/cpuid.h      |  61 +++++
+ .../selftests/kvm/include/x86_64/processor.h  |  16 --
+ .../kvm/include/x86_64/reverse_cpuid.h        | 185 +++++++++++++
+ .../selftests/kvm/include/x86_64/svm_util.h   |  11 +-
+ tools/testing/selftests/kvm/lib/x86_64/svm.c  |   6 +-
+ tools/testing/selftests/kvm/lib/x86_64/vmx.c  |   5 +-
+ tools/testing/selftests/kvm/steal_time.c      |   5 +-
+ .../kvm/x86_64/cr4_cpuid_sync_test.c          |  23 +-
+ .../selftests/kvm/x86_64/set_sregs_test.c     |  25 +-
+ .../selftests/kvm/x86_64/vmx_pmu_msrs_test.c  |   8 +-
+ .../kvm/x86_64/vmx_set_nested_state_test.c    |   5 +-
+ .../selftests/kvm/x86_64/xss_msr_test.c       |  10 +-
+ 21 files changed, 749 insertions(+), 272 deletions(-)
+ create mode 100644 arch/x86/kvm/reverse_cpuid.h
+ create mode 100644 tools/arch/x86/include/asm/cpufeature.h
+ create mode 100644 tools/testing/selftests/kvm/include/x86_64/cpuid.h
+ create mode 100644 tools/testing/selftests/kvm/include/x86_64/reverse_cpuid.h
+
+-- 
+2.31.1.368.gbe11c130af-goog
+
