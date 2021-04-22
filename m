@@ -2,213 +2,130 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 55C4C367A2F
-	for <lists+kvm@lfdr.de>; Thu, 22 Apr 2021 08:51:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0068C367A3A
+	for <lists+kvm@lfdr.de>; Thu, 22 Apr 2021 08:53:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234877AbhDVGvR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 22 Apr 2021 02:51:17 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:29088 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229962AbhDVGvQ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 22 Apr 2021 02:51:16 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1619074241;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Fi/3M6cSDo3xMuL8XkHtN1SthVfdp8w1yaD/R2EQaLA=;
-        b=N61ScnmGYIXhqCwZ4BkDIGqOAEyDPaAd+q0jLu+ujm2sPQQht+ZsTxkM9vUUBHEff8evND
-        gXOnfJoFOV1HCNKYHF/ULA81I5aQ0rHc8grApva3lx0IhLgg4lo5G2wljx7sIvNKwydlhe
-        kuAZbTxO2b5jXd2mC5MQeL+OKqUxhs0=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-61-Ssmxi-R_OVqF74ct7tr9vA-1; Thu, 22 Apr 2021 02:50:39 -0400
-X-MC-Unique: Ssmxi-R_OVqF74ct7tr9vA-1
-Received: by mail-ej1-f69.google.com with SMTP id t9-20020a1709069489b02903807ab24426so4291631ejx.2
-        for <kvm@vger.kernel.org>; Wed, 21 Apr 2021 23:50:39 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=Fi/3M6cSDo3xMuL8XkHtN1SthVfdp8w1yaD/R2EQaLA=;
-        b=Aabqs+eA70jE3O/CX/ql3kXCSz2kQFE4pb2s4hvreujxVfZwuKlOdhu5hC5OoRe95l
-         VCnnk0bLgCHuKrIcbXIVe9Ph7p9v340Kr7yRW//aqWuSr82APdM8pvsH01X2AILTK+J+
-         XsCMi51ZyVFvatG45aV04hm7O430mnEJsmeMeoWGN5vVH67ERgjmX7seahStZnNAyPa1
-         4LriIHqlQMNkTssATpXIBMnB9LjFsSRrZw+pyX09rNpUABHceYuUrVfG8gbqMaO7Mi9b
-         Rcdm7JkqFopH8mSiZR6ndE6eN4l6+bgKVr3X1J7/x0AHSYESWCpICuE4dxztl2eJjhKe
-         Glsg==
-X-Gm-Message-State: AOAM531K+CAU2qe/DAYfCV0tGud0mKq8Cy2HKbhXK48BOKHAUo/WzNN+
-        +9SQDN68jrC7DP0s+UOY9VbOTpTxUcdvEiLCzVj2QFhEF2pg36mEvk9evhVfXPYTSpixZm42BcS
-        +wle1w/WmHJg7
-X-Received: by 2002:a17:906:7206:: with SMTP id m6mr1759459ejk.281.1619074238436;
-        Wed, 21 Apr 2021 23:50:38 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzRXHJPgqoumjrliCze9/fksB6akIOdDB7ZLqjIqj+F5zrQeJO/WTt++PWDJMplDtgXIcssSQ==
-X-Received: by 2002:a17:906:7206:: with SMTP id m6mr1759449ejk.281.1619074238280;
-        Wed, 21 Apr 2021 23:50:38 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id ce14sm1197654ejc.19.2021.04.21.23.50.37
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 21 Apr 2021 23:50:37 -0700 (PDT)
-Subject: Re: [PATCH v2 1/9] KVM: x86: Remove emulator's broken checks on
- CR0/CR3/CR4 loads
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Babu Moger <babu.moger@amd.com>,
-        Joao Martins <joao.m.martins@oracle.com>,
-        David Woodhouse <dwmw@amazon.co.uk>
-References: <20210422022128.3464144-1-seanjc@google.com>
- <20210422022128.3464144-2-seanjc@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <856568f8-bf57-9806-a0f6-e5136a623be4@redhat.com>
-Date:   Thu, 22 Apr 2021 08:50:36 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.7.0
-MIME-Version: 1.0
-In-Reply-To: <20210422022128.3464144-2-seanjc@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+        id S234965AbhDVGwO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 22 Apr 2021 02:52:14 -0400
+Received: from mail.kernel.org ([198.145.29.99]:45556 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S230241AbhDVGwN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 22 Apr 2021 02:52:13 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 40C196144D;
+        Thu, 22 Apr 2021 06:51:39 +0000 (UTC)
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94)
+        (envelope-from <maz@kernel.org>)
+        id 1lZTBZ-008pcR-8I; Thu, 22 Apr 2021 07:51:37 +0100
+Date:   Thu, 22 Apr 2021 07:51:36 +0100
+Message-ID: <87tunyq0av.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Gavin Shan <gshan@redhat.com>
+Cc:     Keqian Zhu <zhukeqian1@huawei.com>, linux-kernel@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
+        kvmarm@lists.cs.columbia.edu, wanghaibin.wang@huawei.com
+Subject: Re: [PATCH v4 2/2] kvm/arm64: Try stage2 block mapping for host device MMIO
+In-Reply-To: <46606f3e-ef41-6520-6647-88c0f76a83e0@redhat.com>
+References: <20210415140328.24200-1-zhukeqian1@huawei.com>
+        <20210415140328.24200-3-zhukeqian1@huawei.com>
+        <960e097d-818b-00bc-b2ee-0da17857f862@redhat.com>
+        <105a403a-e48b-15bc-44ff-0ff34f7d2194@huawei.com>
+        <46606f3e-ef41-6520-6647-88c0f76a83e0@redhat.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: gshan@redhat.com, zhukeqian1@huawei.com, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, wanghaibin.wang@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 22/04/21 04:21, Sean Christopherson wrote:
-> Remove the emulator's checks for illegal CR0, CR3, and CR4 values, as
-> the checks are redundant, outdated, and in the case of SEV's C-bit,
-> broken.  The emulator manually calculates MAXPHYADDR from CPUID and
-> neglects to mask off the C-bit.  For all other checks, kvm_set_cr*() are
-> a superset of the emulator checks, e.g. see CR4.LA57.
+On Thu, 22 Apr 2021 03:25:23 +0100,
+Gavin Shan <gshan@redhat.com> wrote:
 > 
-> Fixes: a780a3ea6282 ("KVM: X86: Fix reserved bits check for MOV to CR3")
-> Cc: Babu Moger <babu.moger@amd.com>
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->   arch/x86/kvm/emulate.c | 68 +-----------------------------------------
->   1 file changed, 1 insertion(+), 67 deletions(-)
-
-This can be (opportunistically ;)) squashed on top:
-
-diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
-index f4273b8e31fa..abd9a4db11a8 100644
---- a/arch/x86/kvm/emulate.c
-+++ b/arch/x86/kvm/emulate.c
-@@ -4220,15 +4220,7 @@ static bool valid_cr(int nr)
-  	}
-  }
-  
--static int check_cr_read(struct x86_emulate_ctxt *ctxt)
--{
--	if (!valid_cr(ctxt->modrm_reg))
--		return emulate_ud(ctxt);
--
--	return X86EMUL_CONTINUE;
--}
--
--static int check_cr_write(struct x86_emulate_ctxt *ctxt)
-+static int check_cr_access(struct x86_emulate_ctxt *ctxt)
-  {
-  	if (!valid_cr(ctxt->modrm_reg))
-  		return emulate_ud(ctxt);
-@@ -4775,10 +4767,10 @@ static const struct opcode twobyte_table[256] = {
-  	D(ImplicitOps | ModRM | SrcMem | NoAccess), /* 8 * reserved NOP */
-  	D(ImplicitOps | ModRM | SrcMem | NoAccess), /* NOP + 7 * reserved NOP */
-  	/* 0x20 - 0x2F */
--	DIP(ModRM | DstMem | Priv | Op3264 | NoMod, cr_read, check_cr_read),
-+	DIP(ModRM | DstMem | Priv | Op3264 | NoMod, cr_read, check_cr_access),
-  	DIP(ModRM | DstMem | Priv | Op3264 | NoMod, dr_read, check_dr_read),
-  	IIP(ModRM | SrcMem | Priv | Op3264 | NoMod, em_cr_write, cr_write,
--						check_cr_write),
-+						check_cr_access),
-  	IIP(ModRM | SrcMem | Priv | Op3264 | NoMod, em_dr_write, dr_write,
-  						check_dr_write),
-  	N, N, N, N,
-
-
-> diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
-> index f7970ba6219f..f4273b8e31fa 100644
-> --- a/arch/x86/kvm/emulate.c
-> +++ b/arch/x86/kvm/emulate.c
-> @@ -4230,75 +4230,9 @@ static int check_cr_read(struct x86_emulate_ctxt *ctxt)
->   
->   static int check_cr_write(struct x86_emulate_ctxt *ctxt)
->   {
-> -	u64 new_val = ctxt->src.val64;
-> -	int cr = ctxt->modrm_reg;
-> -	u64 efer = 0;
-> -
-> -	static u64 cr_reserved_bits[] = {
-> -		0xffffffff00000000ULL,
-> -		0, 0, 0, /* CR3 checked later */
-> -		CR4_RESERVED_BITS,
-> -		0, 0, 0,
-> -		CR8_RESERVED_BITS,
-> -	};
-> -
-> -	if (!valid_cr(cr))
-> +	if (!valid_cr(ctxt->modrm_reg))
->   		return emulate_ud(ctxt);
->   
-> -	if (new_val & cr_reserved_bits[cr])
-> -		return emulate_gp(ctxt, 0);
-> -
-> -	switch (cr) {
-> -	case 0: {
-> -		u64 cr4;
-> -		if (((new_val & X86_CR0_PG) && !(new_val & X86_CR0_PE)) ||
-> -		    ((new_val & X86_CR0_NW) && !(new_val & X86_CR0_CD)))
-> -			return emulate_gp(ctxt, 0);
-> -
-> -		cr4 = ctxt->ops->get_cr(ctxt, 4);
-> -		ctxt->ops->get_msr(ctxt, MSR_EFER, &efer);
-> -
-> -		if ((new_val & X86_CR0_PG) && (efer & EFER_LME) &&
-> -		    !(cr4 & X86_CR4_PAE))
-> -			return emulate_gp(ctxt, 0);
-> -
-> -		break;
-> -		}
-> -	case 3: {
-> -		u64 rsvd = 0;
-> -
-> -		ctxt->ops->get_msr(ctxt, MSR_EFER, &efer);
-> -		if (efer & EFER_LMA) {
-> -			u64 maxphyaddr;
-> -			u32 eax, ebx, ecx, edx;
-> -
-> -			eax = 0x80000008;
-> -			ecx = 0;
-> -			if (ctxt->ops->get_cpuid(ctxt, &eax, &ebx, &ecx,
-> -						 &edx, true))
-> -				maxphyaddr = eax & 0xff;
-> -			else
-> -				maxphyaddr = 36;
-> -			rsvd = rsvd_bits(maxphyaddr, 63);
-> -			if (ctxt->ops->get_cr(ctxt, 4) & X86_CR4_PCIDE)
-> -				rsvd &= ~X86_CR3_PCID_NOFLUSH;
-> -		}
-> -
-> -		if (new_val & rsvd)
-> -			return emulate_gp(ctxt, 0);
-> -
-> -		break;
-> -		}
-> -	case 4: {
-> -		ctxt->ops->get_msr(ctxt, MSR_EFER, &efer);
-> -
-> -		if ((efer & EFER_LMA) && !(new_val & X86_CR4_PAE))
-> -			return emulate_gp(ctxt, 0);
-> -
-> -		break;
-> -		}
-> -	}
-> -
->   	return X86EMUL_CONTINUE;
->   }
->   
+> Hi Keqian,
 > 
+> On 4/21/21 4:36 PM, Keqian Zhu wrote:
+> > On 2021/4/21 15:52, Gavin Shan wrote:
+> >> On 4/16/21 12:03 AM, Keqian Zhu wrote:
+> >>> The MMIO region of a device maybe huge (GB level), try to use
+> >>> block mapping in stage2 to speedup both map and unmap.
+> >>> 
+> >>> Compared to normal memory mapping, we should consider two more
+> >>> points when try block mapping for MMIO region:
+> >>> 
+> >>> 1. For normal memory mapping, the PA(host physical address) and
+> >>> HVA have same alignment within PUD_SIZE or PMD_SIZE when we use
+> >>> the HVA to request hugepage, so we don't need to consider PA
+> >>> alignment when verifing block mapping. But for device memory
+> >>> mapping, the PA and HVA may have different alignment.
+> >>> 
+> >>> 2. For normal memory mapping, we are sure hugepage size properly
+> >>> fit into vma, so we don't check whether the mapping size exceeds
+> >>> the boundary of vma. But for device memory mapping, we should pay
+> >>> attention to this.
+> >>> 
+> >>> This adds get_vma_page_shift() to get page shift for both normal
+> >>> memory and device MMIO region, and check these two points when
+> >>> selecting block mapping size for MMIO region.
+> >>> 
+> >>> Signed-off-by: Keqian Zhu <zhukeqian1@huawei.com>
+> >>> ---
+> >>>    arch/arm64/kvm/mmu.c | 61 ++++++++++++++++++++++++++++++++++++--------
+> >>>    1 file changed, 51 insertions(+), 10 deletions(-)
+> >>> 
+> >>> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> >>> index c59af5ca01b0..5a1cc7751e6d 100644
+> >>> --- a/arch/arm64/kvm/mmu.c
+> >>> +++ b/arch/arm64/kvm/mmu.c
+> >>> @@ -738,6 +738,35 @@ transparent_hugepage_adjust(struct kvm_memory_slot *memslot,
+> >>>        return PAGE_SIZE;
+> >>>    }
+> >>>    +static int get_vma_page_shift(struct vm_area_struct *vma, unsigned long hva)
+> >>> +{
+> >>> +    unsigned long pa;
+> >>> +
+> >>> +    if (is_vm_hugetlb_page(vma) && !(vma->vm_flags & VM_PFNMAP))
+> >>> +        return huge_page_shift(hstate_vma(vma));
+> >>> +
+> >>> +    if (!(vma->vm_flags & VM_PFNMAP))
+> >>> +        return PAGE_SHIFT;
+> >>> +
+> >>> +    VM_BUG_ON(is_vm_hugetlb_page(vma));
+> >>> +
+> >> 
+> >> I don't understand how VM_PFNMAP is set for hugetlbfs related vma.
+> >> I think they are exclusive, meaning the flag is never set for
+> >> hugetlbfs vma. If it's true, VM_PFNMAP needn't be checked on hugetlbfs
+> >> vma and the VM_BUG_ON() becomes unnecessary.
+> > Yes, but we're not sure all drivers follow this rule. Add a BUG_ON() is
+> > a way to catch issue.
+> > 
+> 
+> I think I didn't make things clear. What I meant is VM_PFNMAP can't
+> be set for hugetlbfs VMAs. So the checks here can be simplified as
+> below if you agree:
+> 
+>     if (is_vm_hugetlb_page(vma))
+>         return huge_page_shift(hstate_vma(vma));
+> 
+>     if (!(vma->vm_flags & VM_PFNMAP))
+>         return PAGE_SHIFT;
+> 
+>     VM_BUG_ON(is_vm_hugetlb_page(vma));       /* Can be dropped */
 
+No. If this case happens, I want to see it. I have explicitly asked
+for it, and this check stays.
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
