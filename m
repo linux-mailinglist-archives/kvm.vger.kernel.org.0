@@ -2,172 +2,149 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0B91B367BA6
-	for <lists+kvm@lfdr.de>; Thu, 22 Apr 2021 10:01:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EDC1C367BAD
+	for <lists+kvm@lfdr.de>; Thu, 22 Apr 2021 10:03:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230341AbhDVIB4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 22 Apr 2021 04:01:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34932 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230270AbhDVIBv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 22 Apr 2021 04:01:51 -0400
-Received: from mail-io1-xd32.google.com (mail-io1-xd32.google.com [IPv6:2607:f8b0:4864:20::d32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DB6EDC06174A;
-        Thu, 22 Apr 2021 01:00:24 -0700 (PDT)
-Received: by mail-io1-xd32.google.com with SMTP id g125so16005479iof.3;
-        Thu, 22 Apr 2021 01:00:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=Wtfr7O2uONmx0ABungB4kEDY0XFNe5e+ojy+4iH8yEA=;
-        b=p8PdxTO6IbO9u7UohErshlbh8icvmz/JDG7y1GqEgk5mFunkPsBVbEJUPRf78Xi2xr
-         kSRUtcRVfjbmBxKG0qjsh1/HndZ29CxY5HD9LgYDZpvynQBepAi6pd6zM1ELQsCQQPg/
-         VWIbO9mbmcu338Af40wvjIcjKiGSYhoudTq00h3r+mwwNVgyw02UnLBE//yPuxQ6DeIU
-         PvhCQFTnqLXragBst0XhiNBKvZYTZ++nQcoicTZ8MMJ4XXJFr6eXNsKDfAoxAQIk+qE2
-         S2fv6klbnyzH/XsIGBNYdcUU0vEp8S5guaaWAZS1jDJ+RyeiVvXtD9XfP1bDVA54/3k7
-         ke6Q==
+        id S235191AbhDVIDq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 22 Apr 2021 04:03:46 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:47822 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S234773AbhDVIDp (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 22 Apr 2021 04:03:45 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1619078590;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=HuliVKSjNgJrwoXum5zRyi+xd5k9Y5JwzVBuTZhkAsE=;
+        b=hNyt2KY8yecVqqejFdp5deW3EWouWIeCeXwFhg2YsG/rQwO+GVSlc9cRyOTAd99ZfWej+H
+        zIXXrMqicMKO5G3+oH8w3kVO6H+IKNIdSpui4pBW7s1xT5mYUx7XYNaFlN/FLNJ403fD2N
+        CZpGudMd9pPA2/Ol8fjSItbz+NcoX/Y=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-481-A2ZxUM7tP9GVsql8TUtTbA-1; Thu, 22 Apr 2021 04:03:08 -0400
+X-MC-Unique: A2ZxUM7tP9GVsql8TUtTbA-1
+Received: by mail-ed1-f71.google.com with SMTP id d2-20020aa7d6820000b0290384ee872881so12206072edr.10
+        for <kvm@vger.kernel.org>; Thu, 22 Apr 2021 01:03:08 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=Wtfr7O2uONmx0ABungB4kEDY0XFNe5e+ojy+4iH8yEA=;
-        b=YpKVfdRBtqEbu49p4i+3Fwakk7ax2C47jjtkIRzPCWP9WjuutsDr9WjG4RI/rzWwtG
-         azCEhYCWYqlI9Pk0nS0f0A9iNh0weLzccqMeYEGruDUncEv2CP6zHWxdO84VEVVYZS6x
-         fK8awCW76tZwl393HWroUB/cu/2HIwKrmgUhXG55YFYFsvHfcGrdrPVnl17UGAXSsUzt
-         QNDzhGgyO+StJxCceEKiti6LpWZj55rbEC+3NEFttFf0acn1k8UydKcQGcjdz9m7x+5v
-         bEnNrxhw1/su7KVSW1BeckIO+QrI73UyAOkf7TbAjomr/4jqflZoc9iNBOMKEVOqBam8
-         SJXg==
-X-Gm-Message-State: AOAM531g+wdAPS3QyrE/jlHdMCT3b5R/bV4SZozEvLfjn8F85RnTo5A2
-        pdSYebka9Xuy8uh4B7Oye8PYZ4ruDVXMXVk/9dM=
-X-Google-Smtp-Source: ABdhPJy1fKaPawu0LnQ0auRQy3Yko2GFa8uyOPy+TR/mQlHmW9sFgOxSaeUrz/hqzwMFlqoFPhsCfX6YuVrosEuiaXY=
-X-Received: by 2002:a05:6638:218b:: with SMTP id s11mr2060932jaj.81.1619078424192;
- Thu, 22 Apr 2021 01:00:24 -0700 (PDT)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=HuliVKSjNgJrwoXum5zRyi+xd5k9Y5JwzVBuTZhkAsE=;
+        b=gPfjGd8zNfKAmA0j1CRgPtLv1mNis+r4Bxgr6wieBVJqGmeyA4ikI44VeLH/uWE6HN
+         j6Blkr4X+KaHBdKuQ5MoRScaT2Y1zlofeJCjrwjNWR4TekmlesvQqgWcdl0TSYhbmvr0
+         xZnqBy6/hIVoVT/1cSQFECbRAnSM9fMFGKaPs7NgBgaunTOk2KgFPEGLSpUiLhLA310b
+         y6EfOgr2cXa8jwzpUbG+Cd/WxQk8c12WFyO+BekzwN/Vaq4/SM/s1V/oFFivE6PtanN1
+         c5m9f5wsIqpXctYz2PZ1cfyznMIzztP1uZwvSLc+UBIy1W+2caVP51+nEa+v4dmYsFWb
+         AX0A==
+X-Gm-Message-State: AOAM5311CS3hV7Tm8LzuVR8YymSzwtPIRa9ElCmuY8hupJ36SHdU2Yy1
+        kV2mii4qbj5yCi1OQg8OQG5pcJ9NE7/OlB2FZbet0Dw4fmXrvzyk4QxPFPBNnSbEsfTdy0V6Iky
+        9UUiuXkVM9VRB
+X-Received: by 2002:a17:906:88b:: with SMTP id n11mr1988584eje.26.1619078587429;
+        Thu, 22 Apr 2021 01:03:07 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwBCeIBHz0a6EpgAkl4aqEVM/01xzrbdA4bz1BfFlA+tlE+r0auJtDYmLc9V1fmQD3QoOVbng==
+X-Received: by 2002:a17:906:88b:: with SMTP id n11mr1988567eje.26.1619078587272;
+        Thu, 22 Apr 2021 01:03:07 -0700 (PDT)
+Received: from gator (cst2-174-132.cust.vodafone.cz. [31.30.174.132])
+        by smtp.gmail.com with ESMTPSA id cd14sm1306755ejb.53.2021.04.22.01.03.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 22 Apr 2021 01:03:06 -0700 (PDT)
+Date:   Thu, 22 Apr 2021 10:03:05 +0200
+From:   Andrew Jones <drjones@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Thomas Huth <thuth@redhat.com>, Jacob Xu <jacobhxu@google.com>,
+        kvm@vger.kernel.org
+Subject: Re: [kvm-unit-tests PATCH] update git tree location in MAINTAINERS
+ to point at gitlab
+Message-ID: <20210422080305.pjmfwq45qhhwmzt2@gator>
+References: <20210421191611.2557051-1-jacobhxu@google.com>
+ <edc3df0e-0eb7-108d-3371-2e13f285d632@redhat.com>
+ <97adb2d3-47f4-385a-18b4-90572c9f486a@redhat.com>
 MIME-Version: 1.0
-References: <1603297010-18787-1-git-send-email-sashukla@nvidia.com>
- <8b20dfc0-3b5e-c658-c47d-ebc50d20568d@huawei.com> <2e23aaa7-0c8d-13ba-2eae-9e6ab2adc587@redhat.com>
- <ed8a8b90-8b96-4967-01f5-cd0f536c38d2@huawei.com> <871rb3rgpl.wl-maz@kernel.org>
- <b97415a2-7970-a741-9690-3e4514b4aa7d@redhat.com> <87v98eq0dh.wl-maz@kernel.org>
- <bf782ec1-71da-5a8e-f250-20ed88677b8c@nvidia.com>
-In-Reply-To: <bf782ec1-71da-5a8e-f250-20ed88677b8c@nvidia.com>
-From:   Santosh Shukla <santosh.shukla1982@gmail.com>
-Date:   Thu, 22 Apr 2021 13:30:13 +0530
-Message-ID: <CACpj22xhXHMgsZHrL_2AbEzy=zzz=jXz0s6pRb0=zpJUai1ufg@mail.gmail.com>
-Subject: Re: [PATCH] KVM: arm64: Correctly handle the mmio faulting
-To:     "Tarun Gupta (SW-GPU)" <targupta@nvidia.com>
-Cc:     Marc Zyngier <maz@kernel.org>, Gavin Shan <gshan@redhat.com>,
-        Keqian Zhu <zhukeqian1@huawei.com>, kvm@vger.kernel.org,
-        kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org,
-        cjia@nvidia.com, linux-arm-kernel@lists.infradead.org,
-        "Wanghaibin (D)" <wanghaibin.wang@huawei.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <97adb2d3-47f4-385a-18b4-90572c9f486a@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Apr 22, 2021 at 1:07 PM Tarun Gupta (SW-GPU)
-<targupta@nvidia.com> wrote:
+On Thu, Apr 22, 2021 at 09:39:44AM +0200, Paolo Bonzini wrote:
+> On 22/04/21 05:42, Thomas Huth wrote:
+> > On 21/04/2021 21.16, Jacob Xu wrote:
+> > > The MAINTAINERS file appears to have been forgotten during the migration
+> > > to gitlab from the kernel.org. Let's update it now.
+> > > 
+> > > Signed-off-by: Jacob Xu <jacobhxu@google.com>
+> > > ---
+> > >   MAINTAINERS | 2 +-
+> > >   1 file changed, 1 insertion(+), 1 deletion(-)
+> > > 
+> > > diff --git a/MAINTAINERS b/MAINTAINERS
+> > > index 54124f6..e0c8e99 100644
+> > > --- a/MAINTAINERS
+> > > +++ b/MAINTAINERS
+> > > @@ -55,7 +55,7 @@ Maintainers
+> > >   -----------
+> > >   M: Paolo Bonzini <pbonzini@redhat.com>
+> > >   L: kvm@vger.kernel.org
+> > > -T: git://git.kernel.org/pub/scm/virt/kvm/kvm-unit-tests.git
+> > > +T:    https://gitlab.com/kvm-unit-tests/kvm-unit-tests.git
+> > 
+> > Reviewed-by: Thomas Huth <thuth@redhat.com>
+> 
+> You're too humble, Thomas. :)  Since Drew and you have commit access this
+> could very well be:
+> 
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index ef7e9af..0082e58 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -54,8 +54,9 @@ Descriptions of section entries:
+>  Maintainers
+>  -----------
+>  M: Paolo Bonzini <pbonzini@redhat.com>
+> +M: Thomas Huth <thuth@redhat.com>
+> +M: Andrew Jones <drjones@redhat.com>
+>  L: kvm@vger.kernel.org
+> -T: git://git.kernel.org/pub/scm/virt/kvm/kvm-unit-tests.git
+> +T: https://gitlab.com/kvm-unit-tests/kvm-unit-tests.git
+> 
+>  Architecture Specific Code:
+>  ---------------------------
+> 
+> And also, while at it:
+> 
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index ef7e9af..0082e58 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -92,3 +94,4 @@ M: Paolo Bonzini <pbonzini@redhat.com>
+>  L: kvm@vger.kernel.org
+>  F: x86/*
+>  F: lib/x86/*
+> +T: https://gitlab.com/bonzini/kvm-unit-tests.git
+> 
 >
->
->
-> On 4/22/2021 12:20 PM, Marc Zyngier wrote:
-> > External email: Use caution opening links or attachments
-> >
-> >
-> > On Thu, 22 Apr 2021 03:02:00 +0100,
-> > Gavin Shan <gshan@redhat.com> wrote:
-> >>
-> >> Hi Marc,
-> >>
-> >> On 4/21/21 9:59 PM, Marc Zyngier wrote:
-> >>> On Wed, 21 Apr 2021 07:17:44 +0100,
-> >>> Keqian Zhu <zhukeqian1@huawei.com> wrote:
-> >>>> On 2021/4/21 14:20, Gavin Shan wrote:
-> >>>>> On 4/21/21 12:59 PM, Keqian Zhu wrote:
-> >>>>>> On 2020/10/22 0:16, Santosh Shukla wrote:
-> >>>>>>> The Commit:6d674e28 introduces a notion to detect and handle the
-> >>>>>>> device mapping. The commit checks for the VM_PFNMAP flag is set
-> >>>>>>> in vma->flags and if set then marks force_pte to true such that
-> >>>>>>> if force_pte is true then ignore the THP function check
-> >>>>>>> (/transparent_hugepage_adjust()).
-> >>>>>>>
-> >>>>>>> There could be an issue with the VM_PFNMAP flag setting and checking.
-> >>>>>>> For example consider a case where the mdev vendor driver register's
-> >>>>>>> the vma_fault handler named vma_mmio_fault(), which maps the
-> >>>>>>> host MMIO region in-turn calls remap_pfn_range() and maps
-> >>>>>>> the MMIO's vma space. Where, remap_pfn_range implicitly sets
-> >>>>>>> the VM_PFNMAP flag into vma->flags.
-> >>>>>> Could you give the name of the mdev vendor driver that triggers this issue?
-> >>>>>> I failed to find one according to your description. Thanks.
-> >>>>>>
-> >>>>>
-> >>>>> I think it would be fixed in driver side to set VM_PFNMAP in
-> >>>>> its mmap() callback (call_mmap()), like vfio PCI driver does.
-> >>>>> It means it won't be delayed until page fault is issued and
-> >>>>> remap_pfn_range() is called. It's determined from the beginning
-> >>>>> that the vma associated the mdev vendor driver is serving as
-> >>>>> PFN remapping purpose. So the vma should be populated completely,
-> >>>>> including the VM_PFNMAP flag before it becomes visible to user
-> >>>>> space.
-> >>>
-> >>> Why should that be a requirement? Lazy populating of the VMA should be
-> >>> perfectly acceptable if the fault can only happen on the CPU side.
-> >>>
 
-Right.
-Hi keqian,
-You can refer to case
-http://lkml.iu.edu/hypermail/linux/kernel/2010.3/00952.html
+I also use my own gitlab for arm/queue. So we could also add
 
-(Sorry Guys, I am not with nvidia, but My quick input.)
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 54124f6f1a5e..0a2f3a645bb3 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -67,6 +67,7 @@ L: kvmarm@lists.cs.columbia.edu
+ F: arm/*
+ F: lib/arm/*
+ F: lib/arm64/*
++T: https://gitlab.com/rhdrjones/kvm-unit-tests.git
+ 
+ POWERPC
+ M: Laurent Vivier <lvivier@redhat.com>
 
-> >>
-> >> It isn't a requirement and the drivers needn't follow strictly. I checked
-> >> several drivers before looking into the patch and found almost all the
-> >> drivers have VM_PFNMAP set at mmap() time. In drivers/vfio/vfio-pci.c,
-> >> there is a comment as below, but it doesn't reveal too much about why
-> >> we can't set VM_PFNMAP at fault time.
-> >>
-> >> static int vfio_pci_mmap(void *device_data, struct vm_area_struct *vma)
-> >> {
-> >>        :
-> >>          /*
-> >>           * See remap_pfn_range(), called from vfio_pci_fault() but we can't
-> >>           * change vm_flags within the fault handler.  Set them now.
-> >>           */
-> >>          vma->vm_flags |= VM_IO | VM_PFNMAP | VM_DONTEXPAND | VM_DONTDUMP;
-> >>          vma->vm_ops = &vfio_pci_mmap_ops;
-> >>
-> >>          return 0;
-> >> }
-> >>
-> >> To set these flags in advance does have advantages. For example,
-> >> VM_DONTEXPAND prevents the vma to be merged with another
-> >> one. VM_DONTDUMP make this vma isn't eligible for
-> >> coredump. Otherwise, the address space, which is associated with the
-> >> vma is accessed and unnecessary page faults are triggered on
-> >> coredump.  VM_IO and VM_PFNMAP avoids to walk the page frames
-> >> associated with the vma since we don't have valid PFN in the
-> >> mapping.
-> >
-> > But PCI clearly isn't the case we are dealing with here, and not
-> > everything is VFIO either. I can *today* create a driver that
-> > implements a mmap+fault handler, call mmap() on it, pass the result to
-> > a memslot, and get to the exact same result Santosh describes.
-> >
-> > No PCI, no VFIO, just a random driver. We are *required* to handle
-> > that.
->
-> Agree with Marc here, that kernel should be able to handle it without
-> VM_PFNMAP flag set in driver.
->
-> For driver reference, you could check the V2 version of this patch that
-> got accepted upstream and has details as-to how this can be reproduced
-> using vfio-pci: https://www.spinics.net/lists/arm-kernel/msg848491.html
->
-> >
-> >          M.
-> >
-> > --
-> > Without deviation from the norm, progress is not possible.
-> >
+
+Thanks,
+drew
+
