@@ -2,147 +2,177 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2D81F367602
-	for <lists+kvm@lfdr.de>; Thu, 22 Apr 2021 02:02:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0A624367615
+	for <lists+kvm@lfdr.de>; Thu, 22 Apr 2021 02:12:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1343820AbhDVACo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 21 Apr 2021 20:02:44 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:24909 "EHLO
+        id S235033AbhDVAMk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 21 Apr 2021 20:12:40 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:37970 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234886AbhDVACn (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 21 Apr 2021 20:02:43 -0400
+        by vger.kernel.org with ESMTP id S231363AbhDVAMj (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 21 Apr 2021 20:12:39 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1619049729;
+        s=mimecast20190719; t=1619050325;
         h=from:from:reply-to:reply-to:subject:subject:date:date:
-         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+         message-id:message-id:to:to:cc:mime-version:mime-version:
          content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=AWyEtL+6GA4nLFwMmyJC5Ypm9RaDP0KzLZdhIttrWhA=;
-        b=LWi9i9xJwaJB4xtMCaXbgpVrkEH3OFEgJuztTmqSM86vNPxxHW0hWTsg3cH6RPtUMHruCD
-        6qJGffrqZU00Bvvy5stQGG1cxgsyjBoI6z5plzXwxmAfF4Q+ST6edZXme5J1rJZL93v4/f
-        3zjTTjfHH1pymWIF0dTIbdDU3F0huRg=
+        bh=M/J8IWhEGs6k/tx/BlrhqUV6+bSTGhNVblRiZYUIZ5M=;
+        b=ECAxQPvpGumouHl3DFicDVbz6SFcx9gAntdRuXeG6ZGet+r9XqdR5IgrHqUq+vui9X2DvC
+        YRA6SrufF72ralx/hzk657We07RNsMggAi5hYIwBWqs8HjTb19yEjXkL4/grPpdHtnMGRl
+        lpypk8mQbAwZMgqHZTAjSDwY+Snje1g=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-100-rpSKvb4KORWQllaxvzqZGA-1; Wed, 21 Apr 2021 20:01:56 -0400
-X-MC-Unique: rpSKvb4KORWQllaxvzqZGA-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+ us-mta-104-MmiDiyKwMmig7-nSkxAmyA-1; Wed, 21 Apr 2021 20:12:03 -0400
+X-MC-Unique: MmiDiyKwMmig7-nSkxAmyA-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E885B1006C82;
-        Thu, 22 Apr 2021 00:01:54 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7542681746C;
+        Thu, 22 Apr 2021 00:12:02 +0000 (UTC)
 Received: from [10.64.54.94] (vpn2-54-94.bne.redhat.com [10.64.54.94])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 1F8596064B;
-        Thu, 22 Apr 2021 00:01:51 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 76F9060871;
+        Thu, 22 Apr 2021 00:11:59 +0000 (UTC)
 Reply-To: Gavin Shan <gshan@redhat.com>
-Subject: Re: [PATCH] KVM: arm64: Correctly handle the mmio faulting
-To:     Marc Zyngier <maz@kernel.org>, Keqian Zhu <zhukeqian1@huawei.com>
-Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
-        linux-kernel@vger.kernel.org, cjia@nvidia.com,
-        linux-arm-kernel@lists.infradead.org,
-        "Wanghaibin (D)" <wanghaibin.wang@huawei.com>
-References: <1603297010-18787-1-git-send-email-sashukla@nvidia.com>
- <8b20dfc0-3b5e-c658-c47d-ebc50d20568d@huawei.com>
- <2e23aaa7-0c8d-13ba-2eae-9e6ab2adc587@redhat.com>
- <ed8a8b90-8b96-4967-01f5-cd0f536c38d2@huawei.com>
- <871rb3rgpl.wl-maz@kernel.org>
+Subject: Re: [PATCH v4 1/2] kvm/arm64: Remove the creation time's mapping of
+ MMIO regions
+To:     Keqian Zhu <zhukeqian1@huawei.com>, linux-kernel@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
+        kvmarm@lists.cs.columbia.edu, Marc Zyngier <maz@kernel.org>,
+        Santosh Shukla <sashukla@nvidia.com>
+References: <20210415140328.24200-1-zhukeqian1@huawei.com>
+ <20210415140328.24200-2-zhukeqian1@huawei.com>
+ <ad39c796-2778-df26-b0c6-231e7626a747@redhat.com>
+ <bd4d2cfc-37b9-f20a-5a5c-ed352d1a46dc@huawei.com>
 From:   Gavin Shan <gshan@redhat.com>
-Message-ID: <b97415a2-7970-a741-9690-3e4514b4aa7d@redhat.com>
-Date:   Thu, 22 Apr 2021 12:02:00 +1000
+Message-ID: <f13bfc39-bee6-4562-fefc-76051bbf9735@redhat.com>
+Date:   Thu, 22 Apr 2021 12:12:10 +1000
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.2.0
 MIME-Version: 1.0
-In-Reply-To: <871rb3rgpl.wl-maz@kernel.org>
+In-Reply-To: <bd4d2cfc-37b9-f20a-5a5c-ed352d1a46dc@huawei.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Marc,
+Hi Keqian,
 
-On 4/21/21 9:59 PM, Marc Zyngier wrote:
-> On Wed, 21 Apr 2021 07:17:44 +0100,
-> Keqian Zhu <zhukeqian1@huawei.com> wrote:
->> On 2021/4/21 14:20, Gavin Shan wrote:
->>> On 4/21/21 12:59 PM, Keqian Zhu wrote:
->>>> On 2020/10/22 0:16, Santosh Shukla wrote:
->>>>> The Commit:6d674e28 introduces a notion to detect and handle the
->>>>> device mapping. The commit checks for the VM_PFNMAP flag is set
->>>>> in vma->flags and if set then marks force_pte to true such that
->>>>> if force_pte is true then ignore the THP function check
->>>>> (/transparent_hugepage_adjust()).
->>>>>
->>>>> There could be an issue with the VM_PFNMAP flag setting and checking.
->>>>> For example consider a case where the mdev vendor driver register's
->>>>> the vma_fault handler named vma_mmio_fault(), which maps the
->>>>> host MMIO region in-turn calls remap_pfn_range() and maps
->>>>> the MMIO's vma space. Where, remap_pfn_range implicitly sets
->>>>> the VM_PFNMAP flag into vma->flags.
->>>> Could you give the name of the mdev vendor driver that triggers this issue?
->>>> I failed to find one according to your description. Thanks.
->>>>
+On 4/21/21 4:28 PM, Keqian Zhu wrote:
+> On 2021/4/21 14:38, Gavin Shan wrote:
+>> On 4/16/21 12:03 AM, Keqian Zhu wrote:
+>>> The MMIO regions may be unmapped for many reasons and can be remapped
+>>> by stage2 fault path. Map MMIO regions at creation time becomes a
+>>> minor optimization and makes these two mapping path hard to sync.
 >>>
->>> I think it would be fixed in driver side to set VM_PFNMAP in
->>> its mmap() callback (call_mmap()), like vfio PCI driver does.
->>> It means it won't be delayed until page fault is issued and
->>> remap_pfn_range() is called. It's determined from the beginning
->>> that the vma associated the mdev vendor driver is serving as
->>> PFN remapping purpose. So the vma should be populated completely,
->>> including the VM_PFNMAP flag before it becomes visible to user
->>> space.
-> 
-> Why should that be a requirement? Lazy populating of the VMA should be
-> perfectly acceptable if the fault can only happen on the CPU side.
-> 
-
-It isn't a requirement and the drivers needn't follow strictly. I checked
-several drivers before looking into the patch and found almost all the
-drivers have VM_PFNMAP set at mmap() time. In drivers/vfio/vfio-pci.c,
-there is a comment as below, but it doesn't reveal too much about why
-we can't set VM_PFNMAP at fault time.
-
-static int vfio_pci_mmap(void *device_data, struct vm_area_struct *vma)
-{
-       :
-         /*
-          * See remap_pfn_range(), called from vfio_pci_fault() but we can't
-          * change vm_flags within the fault handler.  Set them now.
-          */
-         vma->vm_flags |= VM_IO | VM_PFNMAP | VM_DONTEXPAND | VM_DONTDUMP;
-         vma->vm_ops = &vfio_pci_mmap_ops;
-
-         return 0;
-}
-
-To set these flags in advance does have advantages. For example, VM_DONTEXPAND
-prevents the vma to be merged with another one. VM_DONTDUMP make this vma
-isn't eligible for coredump. Otherwise, the address space, which is associated
-with the vma is accessed and unnecessary page faults are triggered on coredump.
-VM_IO and VM_PFNMAP avoids to walk the page frames associated with the vma since
-we don't have valid PFN in the mapping.
-
+>>> Remove the mapping code while keep the useful sanity check.
 >>>
->>> The example can be found from vfio driver in drivers/vfio/pci/vfio_pci.c:
->>>      vfio_pci_mmap:       VM_PFNMAP is set for the vma
->>>      vfio_pci_mmap_fault: remap_pfn_range() is called
->> Right. I have discussed the above with Marc. I want to find the driver
->> to fix it. However, AFAICS, there is no driver matches the description...
-> 
-> I have the feeling this is an out-of-tree driver (and Santosh email
-> address is bouncing, so I guess we won't have much information from
-> him).
-> 
-> However, the simple fact that any odd driver can provide a fault
-> handler and populate it the VMA on demand makes me think that we need
-> to support this case.
+>>> Signed-off-by: Keqian Zhu <zhukeqian1@huawei.com>
+>>> ---
+>>>    arch/arm64/kvm/mmu.c | 38 +++-----------------------------------
+>>>    1 file changed, 3 insertions(+), 35 deletions(-)
+>>>
+>>
+>> After removing the logic to create stage2 mapping for VM_PFNMAP region,
+>> I think the "do { } while" loop becomes unnecessary and can be dropped
+>> completely. It means the only sanity check is to see if the memory slot
+>> overflows IPA space or not. In that case, KVM_MR_FLAGS_ONLY can be
+>> ignored because the memory slot's base address and length aren't changed
+>> when we have KVM_MR_FLAGS_ONLY.
+> Maybe not exactly. Here we do an important sanity check that we shouldn't
+> log dirty for memslots with VM_PFNMAP.
 > 
 
-Yeah, Santosh's email isn't reachable. I think the VM_PFNMAP need to be
-rechecked after gup if we're going to support this case.
+Yeah, Sorry that I missed that part. Something associated with Santosh's
+patch. The flag can be not existing until the page fault happened on
+the vma. In this case, the check could be not working properly.
+
+   [PATCH] KVM: arm64: Correctly handle the mmio faulting
+
+[...]
 
 Thanks,
 Gavin
+
+>>
+>>> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+>>> index 8711894db8c2..c59af5ca01b0 100644
+>>> --- a/arch/arm64/kvm/mmu.c
+>>> +++ b/arch/arm64/kvm/mmu.c
+>>> @@ -1301,7 +1301,6 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
+>>>    {
+>>>        hva_t hva = mem->userspace_addr;
+>>>        hva_t reg_end = hva + mem->memory_size;
+>>> -    bool writable = !(mem->flags & KVM_MEM_READONLY);
+>>>        int ret = 0;
+>>>          if (change != KVM_MR_CREATE && change != KVM_MR_MOVE &&
+>>> @@ -1318,8 +1317,7 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
+>>>        mmap_read_lock(current->mm);
+>>>        /*
+>>>         * A memory region could potentially cover multiple VMAs, and any holes
+>>> -     * between them, so iterate over all of them to find out if we can map
+>>> -     * any of them right now.
+>>> +     * between them, so iterate over all of them.
+>>>         *
+>>>         *     +--------------------------------------------+
+>>>         * +---------------+----------------+   +----------------+
+>>> @@ -1330,50 +1328,20 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
+>>>         */
+>>>        do {
+>>>            struct vm_area_struct *vma = find_vma(current->mm, hva);
+>>> -        hva_t vm_start, vm_end;
+>>>              if (!vma || vma->vm_start >= reg_end)
+>>>                break;
+>>>    -        /*
+>>> -         * Take the intersection of this VMA with the memory region
+>>> -         */
+>>> -        vm_start = max(hva, vma->vm_start);
+>>> -        vm_end = min(reg_end, vma->vm_end);
+>>> -
+>>>            if (vma->vm_flags & VM_PFNMAP) {
+>>> -            gpa_t gpa = mem->guest_phys_addr +
+>>> -                    (vm_start - mem->userspace_addr);
+>>> -            phys_addr_t pa;
+>>> -
+>>> -            pa = (phys_addr_t)vma->vm_pgoff << PAGE_SHIFT;
+>>> -            pa += vm_start - vma->vm_start;
+>>> -
+>>>                /* IO region dirty page logging not allowed */
+>>>                if (memslot->flags & KVM_MEM_LOG_DIRTY_PAGES) {
+>>>                    ret = -EINVAL;
+>>> -                goto out;
+>>> -            }
+>>> -
+>>> -            ret = kvm_phys_addr_ioremap(kvm, gpa, pa,
+>>> -                            vm_end - vm_start,
+>>> -                            writable);
+>>> -            if (ret)
+>>>                    break;
+>>> +            }
+>>>            }
+>>> -        hva = vm_end;
+>>> +        hva = min(reg_end, vma->vm_end);
+>>>        } while (hva < reg_end);
+>>>    -    if (change == KVM_MR_FLAGS_ONLY)
+>>> -        goto out;
+>>> -
+>>> -    spin_lock(&kvm->mmu_lock);
+>>> -    if (ret)
+>>> -        unmap_stage2_range(&kvm->arch.mmu, mem->guest_phys_addr, mem->memory_size);
+>>> -    else if (!cpus_have_final_cap(ARM64_HAS_STAGE2_FWB))
+>>> -        stage2_flush_memslot(kvm, memslot);
+>>> -    spin_unlock(&kvm->mmu_lock);
+>>> -out:
+>>>        mmap_read_unlock(current->mm);
+>>>        return ret;
+>>>    }
+>>>
+>>
+>> .
+>>
+> 
 
