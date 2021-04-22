@@ -2,120 +2,91 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5D7C13678CD
-	for <lists+kvm@lfdr.de>; Thu, 22 Apr 2021 06:43:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 540FB3678D0
+	for <lists+kvm@lfdr.de>; Thu, 22 Apr 2021 06:45:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229636AbhDVEnp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 22 Apr 2021 00:43:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47992 "EHLO
+        id S229568AbhDVEqI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 22 Apr 2021 00:46:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48508 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229441AbhDVEnp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 22 Apr 2021 00:43:45 -0400
-Received: from ozlabs.org (ozlabs.org [IPv6:2401:3900:2:1::2])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C6932C06174A;
-        Wed, 21 Apr 2021 21:43:10 -0700 (PDT)
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        by mail.ozlabs.org (Postfix) with ESMTPSA id 4FQlCv3cjKz9sRf;
-        Thu, 22 Apr 2021 14:43:07 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=canb.auug.org.au;
-        s=201702; t=1619066588;
-        bh=Syn3qr1PGDyaL7XmaVT1PyuJyg2wGJIrvrm3IwZB9/I=;
-        h=Date:From:To:Cc:Subject:From;
-        b=sjr939eeh1tu6S1HQ8xL1IF2UkOCCXHcRufsWcYgvMEgeihcYVUu+EmAVscVkXzva
-         oPS4d2exLKuT1tf63ti42cBKqoWUUwuZuSj0NYjg28ARw+GmywYsOVGF0QbxH9aJsJ
-         Ta8wJcASNcTEBOjOKx0F4HCSXOd9C1bKttVO7yXOzR0W3xKGmVHQNtwrRvsNTlTK/z
-         qcWualdC+PUqz36zvQGaTxNbj3zx/qG1v4eOvisK+T2ZSVnEVn6nMIVr/1uXywf2ut
-         cEI9C8rPR7we+t0WXUiYO62mQm8yxC2aYXibSZGcSeHFExjOuN3qIWb1isZuyoICVG
-         yle9h+UC440iQ==
-Date:   Thu, 22 Apr 2021 14:43:06 +1000
-From:   Stephen Rothwell <sfr@canb.auug.org.au>
-To:     Christoffer Dall <cdall@cs.columbia.edu>,
-        Marc Zyngier <maz@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>, KVM <kvm@vger.kernel.org>
-Cc:     Jianyong Wu <jianyong.wu@arm.com>, Kai Huang <kai.huang@intel.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Next Mailing List <linux-next@vger.kernel.org>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        Nathan Tempelman <natet@google.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Sean Christopherson <seanjc@google.com>
-Subject: linux-next: manual merge of the kvm-arm tree with the kvm tree
-Message-ID: <20210422144306.3ec8cfdb@canb.auug.org.au>
+        with ESMTP id S229441AbhDVEqH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 22 Apr 2021 00:46:07 -0400
+Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 507ECC06174A
+        for <kvm@vger.kernel.org>; Wed, 21 Apr 2021 21:45:32 -0700 (PDT)
+Received: by mail-pj1-x1032.google.com with SMTP id m6-20020a17090a8586b02901507e1acf0fso277952pjn.3
+        for <kvm@vger.kernel.org>; Wed, 21 Apr 2021 21:45:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=DXjCdAnHAhGCr+w3KoEts8f/6jwy2njywZx+6/hg9YE=;
+        b=t6ENp/xv8z4IDL6KI0OqHPbBHh1kOa3qGrSZCajGcUXCTFbZlgP2SLPNctiLmrSQ2t
+         G69Hu/zbSglnwGiCWmCxCd3W7wbr2cGv248NJkXbE9SqrKmVh1DjGHdJAD1hO3RtcMGU
+         pJElz9RZ9jO5HY8B7yBmy3sGIguOsCcJq2V7Z1S9kHnD0eFQFqKIFC0CedA6qTz5yXNF
+         X9nEnjvZhNEWTL+27nlyhg3Vo75BHLBdEy5VoY+he1dUlT4w98TFneA37OayYr4EpLkg
+         UuF23A0tbRXu9tLBKmJwVRRzM/HVlW1zGJ1/nbf+SWZU3kBHzNH/qcmRafvbPN/q3XOd
+         4K5Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=DXjCdAnHAhGCr+w3KoEts8f/6jwy2njywZx+6/hg9YE=;
+        b=PdIZy8wUUFulxKIOjSHylh5mVpGCWy82dhIhfWopfRuuSuS9Ga1h1/ifJfyA6zqnR3
+         9Xw9gw8tvepsqm2BuRIJ++wVxVQO/vVkagI82k8GPo0iUqpA0Rjz2K5oEycs71NfYKE6
+         kVcFVuMT/FEp+SO9oUNq/XP7h14GAN0YGJq6lH7NKaAc1a+SmIRDRpDHrJ0gPgMWgqNy
+         Lbgq6fVdnJVAlF3PvOwmoFnlAQJU3ibCNZlsXpU/zI2LRAZVt20O7sSrxaWZ2XTyA4Dw
+         jlpXnJZ6WFqP1DJZeVdCiD7PkT4eju7oZtqydiHHuz4PZVz8Sl2TJbnt6X2+kFoLSMQJ
+         +PjA==
+X-Gm-Message-State: AOAM530xekZp/fia1lYrCGG1qL+bBtQe1fefSUeprqLu9VZZZh9YaQxa
+        sSW+4YmpWQVxVmrWo5iSC2hximbiqfqPzA==
+X-Google-Smtp-Source: ABdhPJxqDifEjz2EiDSvzzDYU591AdzyddlKSGsVhoBDF+p1Gg4e6D3cog9LXZZA24AqVdb/AbPy8w==
+X-Received: by 2002:a17:90a:9511:: with SMTP id t17mr15499041pjo.235.1619066731812;
+        Wed, 21 Apr 2021 21:45:31 -0700 (PDT)
+Received: from [192.168.1.11] ([71.212.131.83])
+        by smtp.gmail.com with ESMTPSA id e7sm828010pjd.6.2021.04.21.21.45.30
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 21 Apr 2021 21:45:31 -0700 (PDT)
+Subject: Re: [PATCH v5 3/3] ppc: Enable 2nd DAWR support on p10
+To:     David Gibson <david@gibson.dropbear.id.au>,
+        Ravi Bangoria <ravi.bangoria@linux.ibm.com>
+Cc:     qemu-ppc@nongnu.org, mikey@neuling.org, kvm@vger.kernel.org,
+        mst@redhat.com, mpe@ellerman.id.au, cohuck@redhat.com,
+        qemu-devel@nongnu.org, groug@kaod.org, paulus@samba.org,
+        =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>,
+        pbonzini@redhat.com
+References: <20210412114433.129702-1-ravi.bangoria@linux.ibm.com>
+ <20210412114433.129702-4-ravi.bangoria@linux.ibm.com>
+ <YH0M1YdINJqbdqP+@yekko.fritz.box>
+ <ca21d852-4b54-01d3-baab-cc8d0d50e505@linux.ibm.com>
+ <8020c404-d8ce-2758-d936-fc5e851017f0@kaod.org>
+ <0b6e1a4a-eed2-1a45-50bf-2ccab398f4ed@linux.ibm.com>
+ <YIDX5nRJ2NWdGvlj@yekko.fritz.box>
+From:   Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <01a7ea82-1d51-6d8d-5b47-43ef9df6b81e@linaro.org>
+Date:   Wed, 21 Apr 2021 21:45:29 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.7.1
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/sb04XD1HIWOi_j8MCbcn=hh";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+In-Reply-To: <YIDX5nRJ2NWdGvlj@yekko.fritz.box>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
---Sig_/sb04XD1HIWOi_j8MCbcn=hh
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+On 4/21/21 6:56 PM, David Gibson wrote:
+> I don't actually know if qemu has TCG watchpoint support on any
+> hardware.  Presumably it would mean instrumenting all the tcg loads
+> and stores.
 
-Hi all,
+We tag the soft tlb for pages that contain watchpoints.
 
-Today's linux-next merge of the kvm-arm tree got a conflict in:
+See include/hw/core/cpu.h:
+   cpu_watchpoint_insert
+   cpu_watchpoint_remove
 
-  include/uapi/linux/kvm.h
 
-between commits:
-
-  8b13c36493d8 ("KVM: introduce KVM_CAP_SET_GUEST_DEBUG2")
-  fe7e948837f3 ("KVM: x86: Add capability to grant VM access to privileged =
-SGX attribute")
-  54526d1fd593 ("KVM: x86: Support KVM VMs sharing SEV context")
-
-from the kvm tree and commit:
-
-  3bf725699bf6 ("KVM: arm64: Add support for the KVM PTP service")
-
-from the kvm-arm tree.
-
-I fixed it up (see below) and can carry the fix as necessary. This
-is now fixed as far as linux-next is concerned, but any non trivial
-conflicts should be mentioned to your upstream maintainer when your tree
-is submitted for merging.  You may also want to consider cooperating
-with the maintainer of the conflicting tree to minimise any particularly
-complex conflicts.
-
---=20
-Cheers,
-Stephen Rothwell
-
-diff --cc include/uapi/linux/kvm.h
-index d76533498543,0e0f70c0d0dc..000000000000
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@@ -1078,9 -1078,7 +1078,10 @@@ struct kvm_ppc_resize_hpt=20
-  #define KVM_CAP_DIRTY_LOG_RING 192
-  #define KVM_CAP_X86_BUS_LOCK_EXIT 193
-  #define KVM_CAP_PPC_DAWR1 194
- -#define KVM_CAP_PTP_KVM 195
- +#define KVM_CAP_SET_GUEST_DEBUG2 195
- +#define KVM_CAP_SGX_ATTRIBUTE 196
- +#define KVM_CAP_VM_COPY_ENC_CONTEXT_FROM 197
-++#define KVM_CAP_PTP_KVM 198
- =20
-  #ifdef KVM_CAP_IRQ_ROUTING
- =20
-
---Sig_/sb04XD1HIWOi_j8MCbcn=hh
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmCA/toACgkQAVBC80lX
-0GyQ5Af/cJPoH5o4xEZAM/aCQpJpa8WwLJWn6uRoukB9Srn499nhUOcvtvLhHM/H
-ssXkz+SjsQcYB7zUbRXUEVA0qHuRdhMdvs2lNP3HiltO2JIBv8iXKcNMUg4AssN+
-FjTjJmBKS7SQPAu8E8r4OhkZX7kWr2bN3C4xYCkTwEv5DaMwx9UFpyey1fUkR9BY
-RrViKUU3C0fs/KLQD08YGwEk9Zm4jakwkRkHWnqPEKRl6Clcex8HiOq2gK2DIPo4
-SFtw5u2DuIm35EG8d1DoecHEfi/uN7zy33YTOxhxV+mlu2dr52Y/ltNRFHoi3rcU
-5kdZ/+mOt0fDdWA6x+QWU4bb9700bQ==
-=kKxv
------END PGP SIGNATURE-----
-
---Sig_/sb04XD1HIWOi_j8MCbcn=hh--
+r~
