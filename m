@@ -2,170 +2,148 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B6AC2368448
-	for <lists+kvm@lfdr.de>; Thu, 22 Apr 2021 17:58:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 16A8B36844C
+	for <lists+kvm@lfdr.de>; Thu, 22 Apr 2021 17:59:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236625AbhDVP6o (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 22 Apr 2021 11:58:44 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:49145 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S236058AbhDVP6n (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 22 Apr 2021 11:58:43 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1619107088;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=A+D2duNY6Jz6vEcKAT3xK6NwCd9dhD5XS9gTlIjixsw=;
-        b=aOqeRjzLVgv4ITup7bcZGcnWCMbz7KZ6V6YPFbkJovl0gejE9e4R4D11NQ43gjDh5wt0hN
-        wC5OAIZjKWfnqyJQcZ76H1QGQRdYzFtOYhoYX+D6ivR3N0+gZ0iJLcadFBQHbwLTDJ/SyT
-        QHXKfEsY6IJ3HnNW4euD9OxMVoq4Rec=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-445-grvWMv3XP2KlIfroAAS2jA-1; Thu, 22 Apr 2021 11:58:01 -0400
-X-MC-Unique: grvWMv3XP2KlIfroAAS2jA-1
-Received: by mail-wm1-f71.google.com with SMTP id o7-20020a1c41070000b02901336831e90fso1784020wma.4
-        for <kvm@vger.kernel.org>; Thu, 22 Apr 2021 08:58:01 -0700 (PDT)
+        id S236696AbhDVP7Z (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 22 Apr 2021 11:59:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56358 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S236693AbhDVP7V (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 22 Apr 2021 11:59:21 -0400
+Received: from mail-pf1-x42e.google.com (mail-pf1-x42e.google.com [IPv6:2607:f8b0:4864:20::42e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C536BC06138C
+        for <kvm@vger.kernel.org>; Thu, 22 Apr 2021 08:58:46 -0700 (PDT)
+Received: by mail-pf1-x42e.google.com with SMTP id c3so13216747pfo.3
+        for <kvm@vger.kernel.org>; Thu, 22 Apr 2021 08:58:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=44uFSIKvqnC7V+9ZchehMmm34h8scMBiFWmZbyka+5I=;
+        b=cMiEjZ1B9JMl8QATUXKRwJxkhvh5LCCEJA1EPShkG5o7xzgME4hzquSiFFSCVuKw2B
+         JwqtwHPEYESxOMlFUI13tzjNMcegmUV0xlrg7yIb5Lufn8Xs7oHPzAVXKxjmZ5dCaIaE
+         WxOPyIfhTTJOjVnJBqbDuuJgKDln1FmrMMl47T1/auyzw7U/kpQP59IyvNwBc9yG9R7t
+         +pHBoVsBV4aBkuFKMOXvL0zjFOIiAWYMizug6eGhWegiGoawjtuixtlUfUmXdU3kyJV9
+         CWOPOpkD6ro5l8Ipa0biA6w1HVaySW3pP9NchcMgAXZnHRsiz9ZRoH3FA7TtCV514owb
+         /Dgw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=A+D2duNY6Jz6vEcKAT3xK6NwCd9dhD5XS9gTlIjixsw=;
-        b=raoqInVXL0Zj2Ll1AZulbzo5L5lywH7myn+WyK0LzOzfl4hStk6vZejsQxD+k0Gx0i
-         QF5fRHRmgJT2nBmjYSSVr8LAw5MoFhjJQMgaymKe499fFxqp4oEwVt3TT05OkBmXgs6r
-         0FU9O42opqIzLfX/jyO8WjyEdMhojzHCaIT57PM+tANxzGMwkBuOfuyYmhwMmX5P9xel
-         uDFhd9xwEvaKy7IofvTAXeldkaANdziMsSLPNU0L+hYQLoXXT4peXfyHLM9hK68+w+Fd
-         GJUsSx76CyOXtI7NAlqe0SxvnOFf1S98oWriQ+UQptfU0Z7QORS+lYQfS+kBa6iplsRF
-         hnRQ==
-X-Gm-Message-State: AOAM5301S90AQaSQXjmbUCbtRDRUHiQpKNnCx7xDKepzLhGLXwZhDAbo
-        Kyme8tDQgaaYJHzhVZRvrzdqMBjH7Iqr06aD9oI/p037BEjQkI4YI2qahWPT+JoFcQYusIGiS1V
-        svjZUP0lZLkOA
-X-Received: by 2002:a1c:6709:: with SMTP id b9mr760597wmc.56.1619107080313;
-        Thu, 22 Apr 2021 08:58:00 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwJcWLTOHJxFOQB3JHKtX9wIpaWaYcPOqbAAKCb6qD6isl9e5hO+ELChr11nzNKNkT3fLLD3Q==
-X-Received: by 2002:a1c:6709:: with SMTP id b9mr760580wmc.56.1619107080126;
-        Thu, 22 Apr 2021 08:58:00 -0700 (PDT)
-Received: from gator (cst2-174-132.cust.vodafone.cz. [31.30.174.132])
-        by smtp.gmail.com with ESMTPSA id o4sm5132985wrn.81.2021.04.22.08.57.59
+        bh=44uFSIKvqnC7V+9ZchehMmm34h8scMBiFWmZbyka+5I=;
+        b=uBGf36aE4nSXytFAYLqoOSxzpORHaPQ78JGLxeEB5QbvnxdANIUVgQyNic5rCa6zWM
+         girjo5g67pSakUqiLsobdBiJ8ZeXVMNGOZr0BBaBfnPYm5XqSNrK2uNuG3uJAQanQU03
+         ZiOvHx3NUZzml+ut4Pg8lmnvME11hpxDSl4UVo2LNkXUbElWd2CunCLN52A7vWBikFsd
+         HFvhMawPtv+HexTb1OhhVUeJhXNMimpe5h2NVKEmdQm420DuLsExmmnTmviPgUcV5Mqk
+         Owqy4TjwJi79Ijj8/tRECkgmF7fJqFoGRiezsVV49ExghwJCAa5T3KGs1GaqN5v+lkPT
+         zgyw==
+X-Gm-Message-State: AOAM5314UCXnY4x5UVtxxP1bTeMfZoNlTuV+hZ4ya6zgO06nDMraA5jr
+        Yi820V0NmZCZd/J4aL920FzyUw==
+X-Google-Smtp-Source: ABdhPJxhKU670JBxP1/tcRbCpUbeXzYl86y/mGbDNHJh9ApJICeW/4m3bDFRQbbY/jHbJnkmJZQJdw==
+X-Received: by 2002:a65:45cf:: with SMTP id m15mr4170458pgr.7.1619107126146;
+        Thu, 22 Apr 2021 08:58:46 -0700 (PDT)
+Received: from google.com (240.111.247.35.bc.googleusercontent.com. [35.247.111.240])
+        by smtp.gmail.com with ESMTPSA id n11sm2818575pff.96.2021.04.22.08.58.45
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 22 Apr 2021 08:57:59 -0700 (PDT)
-Date:   Thu, 22 Apr 2021 17:57:57 +0200
-From:   Andrew Jones <drjones@redhat.com>
-To:     Alexandru Elisei <alexandru.elisei@arm.com>
-Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
-        pbonzini@redhat.com
-Subject: Re: [kvm-unit-tests RFC PATCH 0/1] configure: arm: Replace --vmm
- with --target
-Message-ID: <20210422155757.t4pvv6blkvoyi2oy@gator>
-References: <20210420161338.70914-1-alexandru.elisei@arm.com>
- <20210420165101.irbx2upgqbazkvlt@gator.home>
- <ed3ba802-fee7-4c58-9d73-d33dfbd44d7f@arm.com>
+        Thu, 22 Apr 2021 08:58:45 -0700 (PDT)
+Date:   Thu, 22 Apr 2021 15:58:41 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Wanpeng Li <kernellwp@gmail.com>
+Cc:     Kenta Ishiguro <kentaishiguro@sslab.ics.keio.ac.jp>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        David Hildenbrand <david@redhat.com>,
+        kvm <kvm@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>,
+        Pierre-Louis Aublin <pl@sslab.ics.keio.ac.jp>,
+        =?utf-8?B?5rKz6YeO5YGl5LqM?= <kono@sslab.ics.keio.ac.jp>
+Subject: Re: [RFC PATCH 0/2] Mitigating Excessive Pause-Loop Exiting in
+ VM-Agnostic KVM
+Message-ID: <YIGdMZIVHVp3y/J0@google.com>
+References: <20210421150831.60133-1-kentaishiguro@sslab.ics.keio.ac.jp>
+ <YIBQmMih1sNb5/rg@google.com>
+ <CANRm+CxMf=kwDRQE-BNbhgCARuV3fuKpDbEV2oWTeKuGhUYd+w@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ed3ba802-fee7-4c58-9d73-d33dfbd44d7f@arm.com>
+In-Reply-To: <CANRm+CxMf=kwDRQE-BNbhgCARuV3fuKpDbEV2oWTeKuGhUYd+w@mail.gmail.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Apr 22, 2021 at 04:17:27PM +0100, Alexandru Elisei wrote:
-> Hi Drew,
+On Thu, Apr 22, 2021, Wanpeng Li wrote:
+> On Thu, 22 Apr 2021 at 09:45, Sean Christopherson <seanjc@google.com> wrote:
+> >
+> > On Thu, Apr 22, 2021, Kenta Ishiguro wrote:
+> > > To solve problems (2) and (3), patch 2 monitors IPI communication between
+> > > vCPUs and leverages the relationship between vCPUs to select boost
+> > > candidates.  The "[PATCH] KVM: Boost vCPU candidiate in user mode which is
+> > > delivering interrupt" patch
+> > > (https://lore.kernel.org/kvm/CANRm+Cy-78UnrkX8nh5WdHut2WW5NU=UL84FRJnUNjsAPK+Uww@mail.gmail.com/T/)
+> > > seems to be effective for (2) while it only uses the IPI receiver
+> > > information.
+> >
+> > On the IPI side of thing, I like the idea of explicitly tracking the IPIs,
+> > especially if we can simplify the implementation, e.g. by losing the receiver
+> > info and making ipi_received a bool.  Maybe temporarily table Wanpeng's patch
+> > while this approach is analyzed?
 > 
-> On 4/20/21 5:51 PM, Andrew Jones wrote:
-> > Hi Alex,
-> >
-> > On Tue, Apr 20, 2021 at 05:13:37PM +0100, Alexandru Elisei wrote:
-> >> This is an RFC because it's not exactly clear to me that this is the best
-> >> approach. I'm also open to using a different name for the new option, maybe
-> >> something like --platform if it makes more sense.
-> > I like 'target'.
-> >
-> >> I see two use cases for the patch:
-> >>
-> >> 1. Using different files when compiling kvm-unit-tests to run as an EFI app
-> >> as opposed to a KVM guest (described in the commit message).
-> >>
-> >> 2. This is speculation on my part, but I can see extending
-> >> arm/unittests.cfg with a "target" test option which can be used to decide
-> >> which tests need to be run based on the configure --target value. For
-> >> example, migration tests don't make much sense on kvmtool, which doesn't
-> >> have migration support. Similarly, the micro-bench test doesn't make much
-> >> sense (to me, at least) as an EFI app. Of course, this is only useful if
-> >> there are automated scripts to run the tests under kvmtool or EFI, which
-> >> doesn't look likely at the moment, so I left it out of the commit message.
-> > Sounds like a good idea. unittests.cfg could get a new option 'targets'
-> > where a list of targets is given. If targets is not present, then the
-> > test assumes it's for all targets. Might be nice to also accept !<target>
-> > syntax. E.g.
-> >
-> > # builds/runs for all targets
-> > [mytest]
-> > file = mytest.flat
-> >
-> > # builds/runs for given targets
-> > [mytest2]
-> > file = mytest2.flat
-> > targets = qemu,kvmtool
-> >
-> > # builds/runs for all targets except disabled targets
-> > [mytest3]
-> > file = mytest3.flat
-> > targets = !kvmtool
+> Hi all,
 > 
-> That's sounds like a good idea, but to be honest, I would wait until someone
-> actually needs it before implementing it. That way we don't risk not taking a use
-> case into account and then having to rework it.
+> I evaluate my patch
 
-Don't we have a usecase? Above you said that kvmtool should at least skip
-the migration tests.
+Thanks for doing the testing, much appreciated!
 
-> 
-> >
-> > And it wouldn't bother me to have special logic for kvmtool's lack of
-> > migration put directly in scripts/runtime.bash
-> 
-> Good to keep in mind when support is added.
-> 
-> >
-> > diff --git a/scripts/runtime.bash b/scripts/runtime.bash
-> > index 132389c7dd59..0d5cb51df4f4 100644
-> > --- a/scripts/runtime.bash
-> > +++ b/scripts/runtime.bash
-> > @@ -132,7 +132,7 @@ function run()
-> >      }
-> >  
-> >      cmdline=$(get_cmdline $kernel)
-> > -    if grep -qw "migration" <<<$groups ; then
-> > +    if grep -qw "migration" <<<$groups && [ "$TARGET" != "kvmtool" ]; then
-> >          cmdline="MIGRATION=yes $cmdline"
-> >      fi
-> >      if [ "$verbose" = "yes" ]; then
-> >
-> >> Using --vmm will trigger a warning. I was thinking about removing it entirely in
-> >> a about a year's time, but that's not set in stone. Note that qemu users
-> >> (probably the vast majority of people) will not be affected by this change as
-> >> long as they weren't setting --vmm explicitely to its default value of "qemu".
-> >>
-> > While we'd risk automated configure+build tools, like git{hub,lab} CI,
-> > failing, I think the risk is pretty low right now that anybody is using
-> > the option. Also, we might as well make them change sooner than later by
-> > failing configure. IOW, I'd just do s/vmm/target/g to rename it now. If
-> > we are concerned about the disruption, then I'd just make vmm an alias
-> > for target and not bother deprecating it ever.
-> 
-> I also think it will not be too bad if we make the change now, but I'm not sure
-> what you mean by making vmm an alias of target. The patch ignores --vmm is it's
-> not specified, and if it is specified on the configure command line, then it must
-> match the value of --target, otherwise configure fails.
->
+> (https://lore.kernel.org/kvm/1618542490-14756-1-git-send-email-wanpengli@tencent.com),
+> Kenta's patch 2 and Sean's suggestion. The testing environment is
+> pbzip2 in 96 vCPUs VM in over-subscribe scenario (The host machine is
+> 2 socket, 48 cores, 96 HTs Intel CLX box).
 
-The current patch does both things; it says don't use --vmm and it says
-the new --vmm is --target. I'm saying do one or the other. Either
-completely rename vmm to target, which will then error out when vmm is
-specified as an unknown option or allow the user to use either --vmm or
---target with no error and where both mean to do the same thing, which is
-to set the TARGET variable.
+Are the vCPUs affined in any way?  How many VMs are running?  Are there other
+workloads in the host?  Not criticising, just asking so that others can reproduce
+your setup.
 
-Thanks,
-drew
+> Note: the Kenta's scheduler hacking is not applied. The score of my patch is
+> the most stable and the best performance.
 
+On the other hand, Kenta's approach has the advantage of working for both Intel
+and AMD.  But I'm also not very familiar with AMD's AVIC, so I don't know if it's
+feasible to implement a performant equivalent in svm_dy_apicv_has_pending_interrupt().
+
+Kenda's patch is also flawed as it doesn't scale to 96 vCPUs; vCPUs 64-95 will
+never get boosted.
+
+> Wanpeng's patch
+> 
+> The average: vanilla -> boost: 69.124 -> 61.975, 10.3%
+> 
+> * Wall Clock: 61.695359 seconds
+> * Wall Clock: 63.343579 seconds
+> * Wall Clock: 61.567513 seconds
+> * Wall Clock: 62.144722 seconds
+> * Wall Clock: 61.091442 seconds
+> * Wall Clock: 62.085912 seconds
+> * Wall Clock: 61.311954 seconds
+> 
+> Kenta' patch
+> 
+> The average: vanilla -> boost: 69.148 -> 64.567, 6.6%
+> 
+> * Wall Clock:  66.288113 seconds
+> * Wall Clock:  61.228642 seconds
+> * Wall Clock:  62.100524 seconds
+> * Wall Clock:  68.355473 seconds
+> * Wall Clock:  64.864608 seconds
+> 
+> Sean's suggestion:
+> 
+> The average: vanilla -> boost: 69.148 -> 66.505, 3.8%
+> 
+> * Wall Clock: 60.583562 seconds
+> * Wall Clock: 58.533960 seconds
+> * Wall Clock: 70.103489 seconds
+> * Wall Clock: 74.279028 seconds
+> * Wall Clock: 69.024194 seconds
