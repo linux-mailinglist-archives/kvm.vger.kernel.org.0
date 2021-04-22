@@ -2,56 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4A79F367758
-	for <lists+kvm@lfdr.de>; Thu, 22 Apr 2021 04:21:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0E65936775A
+	for <lists+kvm@lfdr.de>; Thu, 22 Apr 2021 04:22:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234205AbhDVCWQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 21 Apr 2021 22:22:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45258 "EHLO
+        id S234272AbhDVCWR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 21 Apr 2021 22:22:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45278 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234301AbhDVCWM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 21 Apr 2021 22:22:12 -0400
+        with ESMTP id S233606AbhDVCWP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 21 Apr 2021 22:22:15 -0400
 Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 56EBBC06138C
-        for <kvm@vger.kernel.org>; Wed, 21 Apr 2021 19:21:38 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id e13-20020a25d30d0000b02904ec4109da25so18092514ybf.7
-        for <kvm@vger.kernel.org>; Wed, 21 Apr 2021 19:21:38 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A3908C06174A
+        for <kvm@vger.kernel.org>; Wed, 21 Apr 2021 19:21:40 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id p9-20020a2574090000b02904e2cb6a90e7so18286877ybc.17
+        for <kvm@vger.kernel.org>; Wed, 21 Apr 2021 19:21:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=reply-to:date:in-reply-to:message-id:mime-version:references
          :subject:from:to:cc;
-        bh=dmzwSU4y73/4LEavmF/OYppkzQDl6f2ap4gCGRq/u7Q=;
-        b=B3uHZlKmU3bUpjY9s9zd6Sx6XXeDiQuHUft/ttYvoKDv4H0Cnwd7rFWo/uM9hjbt3V
-         MBjdIRB3khz9u7TdEcltObR7Lo5Uddix+Ii9jiFbzZp3k+RbQrh6ebnx835FjM97uRHG
-         1BrJzpSswjwDNvcGZD4NB3zGsvqDlsQpCkvTCP9hS0t1p/q0APq2YrkO5N0tHWC9Yj4a
-         dO2YhyKFS751IwMtb8ZaXa/sip0UyazMUZdAgpaZQIzS2bCGsUEjuqVNrM+HM50WUBqS
-         wshEYB7/Eqn2eas6GOseDUqTdF7C7dy6ltuyldoep44gUDAVSnvIuJvRkSbIhEvpUFlZ
-         HQCQ==
+        bh=I0Pc+WtQCqohFg3KL72AUf+SIVAkRNg4ejFXFBQIKY8=;
+        b=H0CqJwhhEVGt3OZ7zmk052Lw3nGLSiNFdL+CgD1B03FsuXEY0C0gFnwhet8PntI872
+         Q9MoodaRpvytWq9vVyfyRLtUcUKNWit8lYcu4I0fHHgG/XUfpqJ7ErJdwWl7CDJg2PNc
+         MNjB3PaBRxKotaVxXaNIr9eDwYKvlWmxqE/lFwB1GIq20KTtjvL+i/M1qP2Daj0xjxwQ
+         1+Q2XclcP9g+x42/NjOi177KVLwNstR/MUfmFshal9ChaGbk6lP6ekCiEYcK/ru9Ouiz
+         lqv7BzUOR2Prde6EZFhnAXGKnuP3kMF3p9zmyaNQlzdSKobjtgFHXt6zFfz/yWx/8JF7
+         Scgg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:reply-to:date:in-reply-to:message-id
          :mime-version:references:subject:from:to:cc;
-        bh=dmzwSU4y73/4LEavmF/OYppkzQDl6f2ap4gCGRq/u7Q=;
-        b=DNISs8lnB977D1nzSfCE1YwAy25u5PYWKfG9UHpcLL65WG0rsMrSzsJiPBsgI7TD7P
-         TFv+3HKnPjCUNEaYtmFU+vKsDo6CxyNecR61/ccTf1XN+qZnBLVnCovTkaOBHeI5OfLR
-         +fS/tMSdffH+olMthuz8yDAJi/K5dbA4vSXRKfpXYVCAL8EYbfMlV4ZOZ4AozZtnX9ag
-         9+QAy7P2OJO3A0kI72zCC3DLsX5sAh+RXzHj2KsFHRXbuhXbQEmNpPE8pkXNGMso7Dbn
-         pxP3nTXalLal81V+3x4Buqhbwu4dx2riTR/BEnttXNCs8nr5Lu/Gh9rEF+CCP0FmE586
-         W8cg==
-X-Gm-Message-State: AOAM530dLvMtmverDfg5XRTTxJQaI27nQXjugPeZms9DzCiFz9YKNvxm
-        yClaPVRfgGBpo8Ggbnprz6NtAcwSRLs=
-X-Google-Smtp-Source: ABdhPJxCE4gUrvDEB867GR4YRgftu5sFnMM6G98+N8tTlWicY3XWd/UzALl3kkxUTKkrcP0iHY34ArIC5lo=
+        bh=I0Pc+WtQCqohFg3KL72AUf+SIVAkRNg4ejFXFBQIKY8=;
+        b=V+qKuQLvbxIycXt9wIOnd5JJ2Aegu7y/iVCK42aVIm0L9GybfkOUgUNztO3eE0LlSx
+         wHvS2Y9oIAVzcVCmlTsQ/ryXmFNQaR37BHMZb6x/1lU6ObUCaxGWe3QyUYPvgW8+D6YR
+         I+1KNiDLvVd8bYvCmCySo4I9Av5iNC2O6KG1ZLNfi0Ujtj2hQwnlB0+W55gpmHH3Cxt4
+         87oDGgvR5BzB0eVvtJbUKPenITfsgs2Z+5reD/5fVNpH+QzRDofc+QzbVnKoAU7/k7s5
+         bH8wUsGOOHCxe1kSmDH5d5ojRs4CgLWlQncEYRwntT5yc8zCOJtq2x630dS7PBHKZIcm
+         s2Zw==
+X-Gm-Message-State: AOAM530gPeSUyR801Py6BMKeAugWh0u/9IESr7IwFLtCASWUEpJFLk8r
+        RG7UqwLSKcCgwRFf7rSUogqh7coGzgA=
+X-Google-Smtp-Source: ABdhPJz/m6k3D3uKftTpKJ5RTzO9n0WC+YUy1Du1c5pKALGSe+ONm/82GevhxcEbVE7jw34a1QP/FTkw4IQ=
 X-Received: from seanjc798194.pdx.corp.google.com ([2620:15c:f:10:e012:374c:592:6194])
- (user=seanjc job=sendgmr) by 2002:a25:11c5:: with SMTP id 188mr1415372ybr.322.1619058097612;
- Wed, 21 Apr 2021 19:21:37 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a05:6902:68a:: with SMTP id
+ i10mr1456012ybt.0.1619058099879; Wed, 21 Apr 2021 19:21:39 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Wed, 21 Apr 2021 19:21:22 -0700
+Date:   Wed, 21 Apr 2021 19:21:23 -0700
 In-Reply-To: <20210422022128.3464144-1-seanjc@google.com>
-Message-Id: <20210422022128.3464144-4-seanjc@google.com>
+Message-Id: <20210422022128.3464144-5-seanjc@google.com>
 Mime-Version: 1.0
 References: <20210422022128.3464144-1-seanjc@google.com>
 X-Mailer: git-send-email 2.31.1.498.g6c1eba8ee3d-goog
-Subject: [PATCH v2 3/9] KVM: SVM: Truncate GPR value for DR and CR accesses in
+Subject: [PATCH v2 4/9] KVM: VMX: Truncate GPR value for DR and CR reads in
  !64-bit mode
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
@@ -68,58 +68,50 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Drop bits 63:32 on loads/stores to/from DRs and CRs when the vCPU is not
-in 64-bit mode.  The APM states bits 63:32 are dropped for both DRs and
-CRs:
+Drop bits 63:32 when storing a DR/CR to a GPR when the vCPU is not in
+64-bit mode.  Per the SDM:
 
-  In 64-bit mode, the operand size is fixed at 64 bits without the need
-  for a REX prefix. In non-64-bit mode, the operand size is fixed at 32
-  bits and the upper 32 bits of the destination are forced to 0.
+  The operand size for these instructions is always 32 bits in non-64-bit
+  modes, regardless of the operand-size attribute.
 
-Fixes: 7ff76d58a9dc ("KVM: SVM: enhance MOV CR intercept handler")
-Fixes: cae3797a4639 ("KVM: SVM: enhance mov DR intercept handler")
+CR8 technically isn't affected as CR8 isn't accessible outside of 64-bit
+mode, but fix it up for consistency and to allow for future cleanup.
+
+Fixes: 6aa8b732ca01 ("[PATCH] kvm: userspace interface")
 Cc: stable@vger.kernel.org
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/svm/svm.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ arch/x86/kvm/vmx/vmx.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index cd8c333ed2dc..6df12d7967db 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -2462,7 +2462,7 @@ static int cr_interception(struct kvm_vcpu *vcpu)
- 	err = 0;
- 	if (cr >= 16) { /* mov to cr */
- 		cr -= 16;
--		val = kvm_register_read(vcpu, reg);
-+		val = kvm_register_readl(vcpu, reg);
- 		trace_kvm_cr_write(cr, val);
- 		switch (cr) {
- 		case 0:
-@@ -2508,7 +2508,7 @@ static int cr_interception(struct kvm_vcpu *vcpu)
- 			kvm_queue_exception(vcpu, UD_VECTOR);
- 			return 1;
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 6501d66167b8..7ef4c11d655b 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -5132,12 +5132,12 @@ static int handle_cr(struct kvm_vcpu *vcpu)
+ 		case 3:
+ 			WARN_ON_ONCE(enable_unrestricted_guest);
+ 			val = kvm_read_cr3(vcpu);
+-			kvm_register_write(vcpu, reg, val);
++			kvm_register_writel(vcpu, reg, val);
+ 			trace_kvm_cr_read(cr, val);
+ 			return kvm_skip_emulated_instruction(vcpu);
+ 		case 8:
+ 			val = kvm_get_cr8(vcpu);
+-			kvm_register_write(vcpu, reg, val);
++			kvm_register_writel(vcpu, reg, val);
+ 			trace_kvm_cr_read(cr, val);
+ 			return kvm_skip_emulated_instruction(vcpu);
  		}
--		kvm_register_write(vcpu, reg, val);
-+		kvm_register_writel(vcpu, reg, val);
- 		trace_kvm_cr_read(cr, val);
- 	}
- 	return kvm_complete_insn_gp(vcpu, err);
-@@ -2574,11 +2574,11 @@ static int dr_interception(struct kvm_vcpu *vcpu)
- 	dr = svm->vmcb->control.exit_code - SVM_EXIT_READ_DR0;
- 	if (dr >= 16) { /* mov to DRn  */
- 		dr -= 16;
--		val = kvm_register_read(vcpu, reg);
-+		val = kvm_register_readl(vcpu, reg);
- 		err = kvm_set_dr(vcpu, dr, val);
- 	} else {
+@@ -5210,7 +5210,7 @@ static int handle_dr(struct kvm_vcpu *vcpu)
+ 		unsigned long val;
+ 
  		kvm_get_dr(vcpu, dr, &val);
 -		kvm_register_write(vcpu, reg, val);
 +		kvm_register_writel(vcpu, reg, val);
- 	}
- 
- 	return kvm_complete_insn_gp(vcpu, err);
+ 		err = 0;
+ 	} else {
+ 		err = kvm_set_dr(vcpu, dr, kvm_register_readl(vcpu, reg));
 -- 
 2.31.1.498.g6c1eba8ee3d-goog
 
