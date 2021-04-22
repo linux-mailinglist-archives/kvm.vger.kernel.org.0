@@ -2,246 +2,147 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 89E143684A4
-	for <lists+kvm@lfdr.de>; Thu, 22 Apr 2021 18:17:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3282F368507
+	for <lists+kvm@lfdr.de>; Thu, 22 Apr 2021 18:39:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236367AbhDVQR6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 22 Apr 2021 12:17:58 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:56222 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S236333AbhDVQR4 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 22 Apr 2021 12:17:56 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1619108240;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=rUvviQIOi9Y9P/XzEfQpDeW3p/9xLDBgy3nAUN/GIMY=;
-        b=XdxYAgvG66rub1SGilkUsOmINhYpTHOIHoDTcnoqra3Y/fVCjUhl3eH/ik7rRUaTTMLksG
-        7dp1kmeZ0+LQtwqJNEd2NOVpjEYPm40vC/aqmWTnB6Jin99JFtneAWGOMGFJsFc9XOK2RX
-        dHBhyvD7d02FZoYguZwrj02/oWWXWDk=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-181-z61JU1qvOpawtUYDXiwbRQ-1; Thu, 22 Apr 2021 12:17:06 -0400
-X-MC-Unique: z61JU1qvOpawtUYDXiwbRQ-1
-Received: by mail-ej1-f69.google.com with SMTP id r17-20020a1709069591b029037cf6a4a56dso7456459ejx.12
-        for <kvm@vger.kernel.org>; Thu, 22 Apr 2021 09:17:05 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=rUvviQIOi9Y9P/XzEfQpDeW3p/9xLDBgy3nAUN/GIMY=;
-        b=gj9kyPgaaRVAjbwyxp2EsxfC1E8g/T03B1HH1v0EaBJfscaRhDOcI8Gjwg+JiQoxWZ
-         SEBV1z9gdNoVLadxpioRi1gUng/03W7mYBvwLRkjjmTpVsxmc2jdB9/VMTBpl2KQXDRT
-         PePeBKutR0NZZPYGzQgj/JlkkMc2hC20/G/avZ/Rs0pkBnO6SuxQML1mCPk6A5IDrafA
-         RiX02UJrZcWO4Lbnyox06fcmm4W1SOggIcd0CqphoMx6qRodBrCs/mx9E9N5jeJZScyd
-         nOVwwgHXTv77oA/rcKYkx7eky+scUQD290IL3mB1Tp1Q1CCWOPWsRODzd8Hyq3KoJIx5
-         h98w==
-X-Gm-Message-State: AOAM5309AEZ001HokCwwsNogeeNPMTOztLLDI3CnboWuOb4w0HPQYjRn
-        Minv5L6j25Eih0423b/SN+gC4vK+5oFvmiNK0FtZICiYHVuh4j31gXX3LbYOk6lUHELrR/rkIbU
-        VzSRpQtEwYuXfDr+iAL6vp40FiobVi4dYCk2PVB+T7k3jozcBUXjyfjHkqVgQWOk=
-X-Received: by 2002:a17:906:c1c9:: with SMTP id bw9mr4276800ejb.239.1619108224752;
-        Thu, 22 Apr 2021 09:17:04 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwyux+HQZTvPFKICQBre1izroY5OihvxfjbEztF6dDUqmh9lyDuwb4M+HaN+5bIBzufoPsLSA==
-X-Received: by 2002:a17:906:c1c9:: with SMTP id bw9mr4276766ejb.239.1619108224506;
-        Thu, 22 Apr 2021 09:17:04 -0700 (PDT)
-Received: from gator (cst2-174-132.cust.vodafone.cz. [31.30.174.132])
-        by smtp.gmail.com with ESMTPSA id u24sm2476723edt.85.2021.04.22.09.17.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 22 Apr 2021 09:17:04 -0700 (PDT)
-Date:   Thu, 22 Apr 2021 18:17:02 +0200
-From:   Andrew Jones <drjones@redhat.com>
-To:     kvm@vger.kernel.org
-Cc:     alexandru.elisei@arm.com, nikos.nikoleris@arm.com,
-        andre.przywara@arm.com, eric.auger@redhat.com
-Subject: Re: [PATCH kvm-unit-tests v2 8/8] arm/arm64: psci: don't assume
- method is hvc
-Message-ID: <20210422161702.76ucofe2pbj4oacc@gator>
-References: <20210420190002.383444-1-drjones@redhat.com>
- <20210420190002.383444-9-drjones@redhat.com>
- <20210421070206.mbtarb4cge5ywyuv@gator.home>
+        id S237929AbhDVQkX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 22 Apr 2021 12:40:23 -0400
+Received: from mail-co1nam11on2057.outbound.protection.outlook.com ([40.107.220.57]:61792
+        "EHLO NAM11-CO1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S236236AbhDVQkV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 22 Apr 2021 12:40:21 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=WjbQrbHM24+FQE2bpTd1GA2bIOxSnsI3YeN0c7zQsNnserBxl1sAyUCV6m5INgzxF4mfeG887WiXEcF6dt0PvrsIcYVnPWJ5nqezDgQ9UZ6q9x85lSRnHV/a7yX8XZkTkuTFNd4KpQ4cgha1PHTiA0nxQWHz5/hZTozP4bKfGS0YNLC0jPl2astlFlAyyre5wqw6eHTQGBjMO0ZSo2P7+O4pN04DMDGBXyY+9sm+mIaiB4DUHDASrXU8v6d1TUi58Dxj7PB95PvARL6QbNTvprSxOo2h7yU+HOgLNUC9nXHM8Q0UAJvls1x1kRgzxUT5sIf5gahe09hYZrr5v4Igwg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=f8wo+Q7FxKV3AavXBxa670YdcVRdUTUmTcDBBHS75Co=;
+ b=nbnb+L2dwEEcGTj4CFTzGD9jhPdwv7tdBSkZEOK+npZdMKij4eX+waZ/3c/TyA/iuMIXUUs4u8dNNg32jzex9LsR4szJIaht/baY0711CmE2vWLnR/9TL0uhTqM72ZOjFcFlGjZ5ubF9+fOMPEL18bEZZ9siHlNPOZ5NgJAXg8saIOgVNj88uLRn4TWPruzg/+4U0k2++nZt+9ddVCEYswZJfUMHXI3VWZGrkGi01c4ZB+OCUZ3CbdQbowLtNR7COsqFsSwY/FhecoWHpljYxML2b0nbtwOKM1iCIznR0SAOEvK0LlxsLgfXa56qPq60rrRm+14dL1uodKDPitpyZw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=f8wo+Q7FxKV3AavXBxa670YdcVRdUTUmTcDBBHS75Co=;
+ b=XgC97j05+9PNNoN7gOjfAN10OGTCk82sqfYKuk9BRQ7zBvNH4wSKeL3NORJeiUN/+KOnRc+NUiNJ7DnfZg3nACzDD9//OHN5z+b38jGDBUmLPFDxcIKd0EblhDYzSiqEoS3P5KMXThNLKcFF+S4pfrSsO5YP0yMSawMD84gRaBY=
+Authentication-Results: redhat.com; dkim=none (message not signed)
+ header.d=none;redhat.com; dmarc=none action=none header.from=amd.com;
+Received: from SN6PR12MB2718.namprd12.prod.outlook.com (2603:10b6:805:6f::22)
+ by SA0PR12MB4495.namprd12.prod.outlook.com (2603:10b6:806:70::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4042.19; Thu, 22 Apr
+ 2021 16:39:45 +0000
+Received: from SN6PR12MB2718.namprd12.prod.outlook.com
+ ([fe80::9898:5b48:a062:db94]) by SN6PR12MB2718.namprd12.prod.outlook.com
+ ([fe80::9898:5b48:a062:db94%6]) with mapi id 15.20.4065.023; Thu, 22 Apr 2021
+ 16:39:45 +0000
+From:   Brijesh Singh <brijesh.singh@amd.com>
+To:     pbonzini@redhat.com, kvm@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org, sfr@canb.auug.org.au,
+        Ashish.Kalra@amd.com, Brijesh Singh <brijesh.singh@amd.com>
+Subject: [PATCH 0/4] Fix htmldocs warning seen after SEV migration patch merge
+Date:   Thu, 22 Apr 2021 11:38:32 -0500
+Message-Id: <20210422163836.27117-1-brijesh.singh@amd.com>
+X-Mailer: git-send-email 2.17.1
+Content-Type: text/plain
+X-Originating-IP: [165.204.77.1]
+X-ClientProxiedBy: SN2PR01CA0059.prod.exchangelabs.com (2603:10b6:800::27) To
+ SN6PR12MB2718.namprd12.prod.outlook.com (2603:10b6:805:6f::22)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210421070206.mbtarb4cge5ywyuv@gator.home>
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from sbrijesh-desktop.amd.com (165.204.77.1) by SN2PR01CA0059.prod.exchangelabs.com (2603:10b6:800::27) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4065.20 via Frontend Transport; Thu, 22 Apr 2021 16:39:45 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: ee7ed65c-1100-41b0-9ed4-08d905ad3c83
+X-MS-TrafficTypeDiagnostic: SA0PR12MB4495:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <SA0PR12MB4495DC5A875D7D7AB7023626E5469@SA0PR12MB4495.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:131;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: jikdWISlHb7QLTcUDAqHcOT7x3aGngWE+MYmEHYNi/zhfWoaUgqm329QxcfS7tBeEHOU+/FwH5yY1Iuxenv/5AcoFkkXRSDHkiau6QtUX8zomQo3/woKvExkdbzmTMT2YNqJHgcZVCrymECNgnKkERWpAEIOwvCMELvHWTQol+RcopfuxxRP4bB6lN4eHv3r+QsyrVy6i/S+m6OHG8q4CTChAM3bLbyzy6IiWyKOmCt5I8w6vJvmfoKH5jNDz3SwVGivczQIlbQ3G0KfA542vAQGYLoO9qXMEarkeSrsRkSwP1OGikc/LCVPBU9TRa/niKsg6odQD5ATuAWLlkOe7x6rryVbBsI8thjWj4W/fhNKmhqA8AGriRBJ7U7icl5zcYuWy8C+SkUzx5QnNArfRHr8IjeahkufmQ6X28DhbFGiQSTTPoxZAT2tYjbhf6/NHegs6PMN5I3BznF9paHz2PCJNiBXofuUlLEgUE5lNzNBZmN+gNah9+BUtC3zcdryp2eHktlm/b5svNmXHDZ9gLoSEvhPjZxzPBwUtOTbhyFGgt3eIAcpTpc4Tmq73vS1I2u0BrQhoGZ8qO1HKrK2+3lWwmJ5sbSyzwSR6KbBVKl83XZlTyKp1VZB4Fo+FIeNdAzvUgesiLIog1kgOWfoGA==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2718.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(376002)(136003)(366004)(346002)(396003)(39850400004)(26005)(8676002)(66476007)(6486002)(956004)(1076003)(16526019)(2616005)(36756003)(478600001)(4326008)(5660300002)(186003)(83380400001)(316002)(44832011)(38100700002)(38350700002)(6666004)(7696005)(66556008)(2906002)(86362001)(66946007)(8936002)(52116002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData: =?us-ascii?Q?bVn4rv95Y2fQFmJ1GtnczoACTD0rsggbY/3fY5XdJ1nQ2JbKGnlM646CY+hu?=
+ =?us-ascii?Q?3hEPkJ65Y+xdImTtQSlEE4T/gHTaYmGHiwf0lehRI8NoD/Do7g6yls5kJaX8?=
+ =?us-ascii?Q?UdubCyPRsH+z1n6mxMxsY3dpJTqyUjtX8jnbATM69I1bwzd3/mMCqzd07a+L?=
+ =?us-ascii?Q?MZS1KoRbk7Jq+dgZcSP/T0GtkoZhV6Xy6/XjJ37ZnJB4T3NUDwQOqwUfXBI6?=
+ =?us-ascii?Q?hR95eCU+lXEnwl0IGgA1J/8tNQtIDV1sFxdHX3Xt04PhXPccHxMXzEES8Uxx?=
+ =?us-ascii?Q?kDKZuqJ5hb+eCvYD39Kxplm4aeVC+CIKVRLgyD1gHwx3MmHzCQTuOlTsoZfz?=
+ =?us-ascii?Q?xM/2nio5Zt+wDK7ntMp75qofP7+HxfvnAoS5Mdn9TYk7JwjWdStRjrF7q0fh?=
+ =?us-ascii?Q?AnDQsy1V8TNw7fIHwmBCysuXs9PTX5l/lyAG0mMfYdSwjrN+TS4ydL5SgjdP?=
+ =?us-ascii?Q?ewhFMjDlHv1IAJoNe/leScYAjMUKATetJ7IP4RzafIyv+PPop011T7i768P0?=
+ =?us-ascii?Q?J6Ts8LRD0eCNQ0WhGJAJbx+n8JzaAXLetbALN2ooeBeSEdczocpKow4VVqon?=
+ =?us-ascii?Q?1eIUF0TTI7b2IPSa1GlaGaWDWkyX1vYVF2lLEswPOpsiFBr3XqlQs5iQHtp0?=
+ =?us-ascii?Q?TaFXj1j0C+Zyv2QUK/NictWPAZDS4OvL6a1AjbHr2cwK7yIzDCttdEBy7/4o?=
+ =?us-ascii?Q?5jrfwKk7tq7bbaLqJ4WPPnqwXTAZ05BNZKiwmS/zhAbYFNbmwgGrhAJwg7vx?=
+ =?us-ascii?Q?ScgjMdjnDy5AcqTXyrBPTCOPFF5X0gxqSflRquoFTrr+q5DRrzfT/EZna7Hg?=
+ =?us-ascii?Q?7cZ2NZTdiQJdWrZkpCaK2gsQAhMRcrfwwxEpsfYFRKk/+eQnGRg3FQh2J0jK?=
+ =?us-ascii?Q?CfWO+pn0vvxog/C483eZJ7ZQYUVTKl/DXs7TpLbxKnvLj4eN3p+/XibX4eUQ?=
+ =?us-ascii?Q?2peScguQHYnaj/Rrk85XXLfxUdihpGr8pOaGiCYmWRRoff2easAuMxO+A1t+?=
+ =?us-ascii?Q?OAwnDHMV/iyHOuGjCc/62S2ufY4WCTt7bE/EU28GoZxvn7LQ+q0joN2Epdy0?=
+ =?us-ascii?Q?FOrjYSDGNiIAmWg0ILFx8lYQ16XAvlkjewE+X8Uope1y5i9QN5JLD+PxKn0A?=
+ =?us-ascii?Q?r9vj5v4FOpIfxasBYFs/+mGnpe70hKfG2iSmVrLGuqJABoy9W66wbNkwJ5Mi?=
+ =?us-ascii?Q?kWlmuxs8hnSYd+5NrwKgwUZYYSpSh4a/uuW8crw6j9Kwiq4Zf5oDt4th+HXF?=
+ =?us-ascii?Q?MV+ipzph0uy6kt+ctMu+THno4G2pNGi5lAazIrwIa15g7iPmGJgzhNVQBVzB?=
+ =?us-ascii?Q?9LyMfC11WkDhSX8Ytu2RyOzR?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: ee7ed65c-1100-41b0-9ed4-08d905ad3c83
+X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2718.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Apr 2021 16:39:45.3714
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: C8/37xCfNec6AVig44sofAaKOWzIG84pSilRIRK5sY5r4shY7jTMuz6fSMwpoVlMcY7eYdceRGA0S3wrOIu+bA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR12MB4495
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+The make htmldocs reports the following warnings on kvm/next.
 
-For v3, I've done the following changes (inline)
+Documentation/virt/kvm/amd-memory-encryption.rst:308: WARNING: Inline emphasis start-string without end-string.
+Documentation/virt/kvm/amd-memory-encryption.rst:310: WARNING: Inline emphasis start-string without end-string.
+Documentation/virt/kvm/amd-memory-encryption.rst:313: WARNING: Inline emphasis start-string without end-string.
+Documentation/virt/kvm/amd-memory-encryption.rst:316: WARNING: Inline emphasis start-string without end-string.
+Documentation/virt/kvm/amd-memory-encryption.rst:319: WARNING: Inline emphasis start-string without end-string.
+Documentation/virt/kvm/amd-memory-encryption.rst:321: WARNING: Definition list ends without a blank line; unexpected unindent.
+Documentation/virt/kvm/amd-memory-encryption.rst:369: WARNING: Title underline too short.
 
-On Wed, Apr 21, 2021 at 09:02:06AM +0200, Andrew Jones wrote:
-> On Tue, Apr 20, 2021 at 09:00:02PM +0200, Andrew Jones wrote:
-> > The method can also be smc and it will be when running on bare metal.
-> > 
-> > Signed-off-by: Andrew Jones <drjones@redhat.com>
-> > ---
-> >  arm/cstart.S       | 22 ++++++++++++++++++++++
-> >  arm/cstart64.S     | 22 ++++++++++++++++++++++
-> >  arm/selftest.c     | 34 +++++++---------------------------
-> >  lib/arm/asm/psci.h | 10 ++++++++--
-> >  lib/arm/psci.c     | 37 +++++++++++++++++++++++++++++--------
-> >  lib/arm/setup.c    |  2 ++
-> >  6 files changed, 90 insertions(+), 37 deletions(-)
-> > 
-> > diff --git a/arm/cstart.S b/arm/cstart.S
-> > index 446966de350d..2401d92cdadc 100644
-> > --- a/arm/cstart.S
-> > +++ b/arm/cstart.S
-> > @@ -95,6 +95,28 @@ start:
-> >  
-> >  .text
-> >  
-> > +/*
-> > + * psci_invoke_hvc / psci_invoke_smc
-> > + *
-> > + * Inputs:
-> > + *   r0 -- function_id
-> > + *   r1 -- arg0
-> > + *   r2 -- arg1
-> > + *   r3 -- arg2
-> > + *
-> > + * Outputs:
-> > + *   r0 -- return code
-> > + */
-> > +.globl psci_invoke_hvc
-> > +psci_invoke_hvc:
-> > +	hvc	#0
-> > +	mov	pc, lr
-> > +
-> > +.globl psci_invoke_smc
-> > +psci_invoke_smc:
-> > +	smc	#0
-> > +	mov	pc, lr
-> > +
-> >  enable_vfp:
-> >  	/* Enable full access to CP10 and CP11: */
-> >  	mov	r0, #(3 << 22 | 3 << 20)
-> > diff --git a/arm/cstart64.S b/arm/cstart64.S
-> > index 42ba3a3ca249..7610e28f06dd 100644
-> > --- a/arm/cstart64.S
-> > +++ b/arm/cstart64.S
-> > @@ -109,6 +109,28 @@ start:
-> >  
-> >  .text
-> >  
-> > +/*
-> > + * psci_invoke_hvc / psci_invoke_smc
-> > + *
-> > + * Inputs:
-> > + *   x0 -- function_id
+15. KVM_SEV_RECEIVE_START
+------------------------
+Documentation/virt/kvm/amd-memory-encryption.rst:369: WARNING: Title underline too short.
 
-changed this comment to be 'w0 -- function_id'
+15. KVM_SEV_RECEIVE_START
+------------------------
+Documentation/virt/kvm/amd-memory-encryption.rst:398: WARNING: Title underline too short.
 
-> > + *   x1 -- arg0
-> > + *   x2 -- arg1
-> > + *   x3 -- arg2
-> > + *
-> > + * Outputs:
-> > + *   x0 -- return code
-> > + */
-> > +.globl psci_invoke_hvc
-> > +psci_invoke_hvc:
-> > +	hvc	#0
-> > +	ret
-> > +
-> > +.globl psci_invoke_smc
-> > +psci_invoke_smc:
-> > +	smc	#0
-> > +	ret
-> > +
-> >  get_mmu_off:
-> >  	adrp	x0, auxinfo
-> >  	ldr	x0, [x0, :lo12:auxinfo + 8]
-> > diff --git a/arm/selftest.c b/arm/selftest.c
-> > index 4495b161cdd5..9f459ed3d571 100644
-> > --- a/arm/selftest.c
-> > +++ b/arm/selftest.c
-> > @@ -400,33 +400,13 @@ static void check_vectors(void *arg __unused)
-> >  	exit(report_summary());
-> >  }
-> >  
-> > -static bool psci_check(void)
-> > +static void psci_print(void)
-> >  {
-> > -	const struct fdt_property *method;
-> > -	int node, len, ver;
-> > -
-> > -	node = fdt_node_offset_by_compatible(dt_fdt(), -1, "arm,psci-0.2");
-> > -	if (node < 0) {
-> > -		printf("PSCI v0.2 compatibility required\n");
-> > -		return false;
-> > -	}
-> > -
-> > -	method = fdt_get_property(dt_fdt(), node, "method", &len);
-> > -	if (method == NULL) {
-> > -		printf("bad psci device tree node\n");
-> > -		return false;
-> > -	}
-> > -
-> > -	if (len < 4 || strcmp(method->data, "hvc") != 0) {
-> > -		printf("psci method must be hvc\n");
-> > -		return false;
-> > -	}
-> > -
-> > -	ver = psci_invoke(PSCI_0_2_FN_PSCI_VERSION, 0, 0, 0);
-> > -	printf("PSCI version %d.%d\n", PSCI_VERSION_MAJOR(ver),
-> > -				       PSCI_VERSION_MINOR(ver));
-> > -
-> > -	return true;
-> > +	int ver = psci_invoke(PSCI_0_2_FN_PSCI_VERSION, 0, 0, 0);
-> > +	report_info("PSCI version: %d.%d", PSCI_VERSION_MAJOR(ver),
-> > +					  PSCI_VERSION_MINOR(ver));
-> > +	report_info("PSCI method: %s", psci_invoke == psci_invoke_hvc ?
-> > +				       "hvc" : "smc");
-> >  }
-> >  
-> >  static void cpu_report(void *data __unused)
-> > @@ -465,7 +445,7 @@ int main(int argc, char **argv)
-> >  
-> >  	} else if (strcmp(argv[1], "smp") == 0) {
-> >  
-> > -		report(psci_check(), "PSCI version");
-> > +		psci_print();
-> >  		on_cpus(cpu_report, NULL);
-> >  		while (!cpumask_full(&ready))
-> >  			cpu_relax();
-> > diff --git a/lib/arm/asm/psci.h b/lib/arm/asm/psci.h
-> > index 7b956bf5987d..2820c0a3afc7 100644
-> > --- a/lib/arm/asm/psci.h
-> > +++ b/lib/arm/asm/psci.h
-> > @@ -3,8 +3,14 @@
-> >  #include <libcflat.h>
-> >  #include <linux/psci.h>
-> >  
-> > -extern int psci_invoke(unsigned long function_id, unsigned long arg0,
-> > -		       unsigned long arg1, unsigned long arg2);
-> > +typedef int (*psci_invoke_fn)(unsigned long function_id, unsigned long arg0,
-> > +			      unsigned long arg1, unsigned long arg2);
-> > +extern psci_invoke_fn psci_invoke;
-> > +extern int psci_invoke_hvc(unsigned long function_id, unsigned long arg0,
-> > +			   unsigned long arg1, unsigned long arg2);
-> > +extern int psci_invoke_smc(unsigned long function_id, unsigned long arg0,
-> > +			   unsigned long arg1, unsigned long arg2);
+16. KVM_SEV_RECEIVE_UPDATE_DATA
+----------------------------
+Documentation/virt/kvm/amd-memory-encryption.rst:398: WARNING: Title underline too short.
 
-The prototypes are now
+16. KVM_SEV_RECEIVE_UPDATE_DATA
+----------------------------
+Documentation/virt/kvm/amd-memory-encryption.rst:422: WARNING: Title underline too short.
 
-long invoke_fn(unsigned int function_id, unsigned long arg0,
-               unsigned long arg1, unsigned long arg2)
+17. KVM_SEV_RECEIVE_FINISH
+------------------------
+Documentation/virt/kvm/amd-memory-encryption.rst:422: WARNING: Title underline too short.
 
-Notice the return value changed to long and the function_id to
-unsigned int.
+17. KVM_SEV_RECEIVE_FINISH
+------------------------
 
+Brijesh Singh (4):
+  docs: kvm: fix underline too short warning for KVM_SEV_RECEIVE_START
+  docs: kvm: fix underline too sort warning for
+    KVM_SEV_RECEIVE_UPDATE_DATA
+  docs: kvm: fix underline too short warning for KVM_SEV_RECEIVE_FINISH
+  docs: kvm: fix inline emphasis string warning for KVM_SEV_SEND_START
 
-I also improved the commit message by adding the following:
+ Documentation/virt/kvm/amd-memory-encryption.rst | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
-   The method can be smc in addition to hvc, and it will be when running
-   on bare metal. Additionally, we move the invocations to assembly so
-   we don't have to rely on compiler assumptions. We also fix the
-   prototype of psci_invoke. It should return long, not int, and
-   function_id should be an unsigned int, not an unsigned long.
-
-Thanks,
-drew
+-- 
+2.17.1
 
