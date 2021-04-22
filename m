@@ -2,146 +2,165 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 025BF367A7B
-	for <lists+kvm@lfdr.de>; Thu, 22 Apr 2021 09:02:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 86A9D367ABD
+	for <lists+kvm@lfdr.de>; Thu, 22 Apr 2021 09:15:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234816AbhDVHDa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 22 Apr 2021 03:03:30 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:29110 "EHLO
+        id S234991AbhDVHPI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 22 Apr 2021 03:15:08 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:36598 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234777AbhDVHD2 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 22 Apr 2021 03:03:28 -0400
+        by vger.kernel.org with ESMTP id S230241AbhDVHPH (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 22 Apr 2021 03:15:07 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1619074974;
+        s=mimecast20190719; t=1619075673;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=U1sBIWc97pwUoI/Y/7htamKNpDUssIIcTnKBNjle2Og=;
-        b=bezU014srEopERg1BU56cqWRPWt2I1+kIkQFkF+NO9DomHp0rmtGvIMlNIq9V9/s6b44BW
-        SFcw3M47HMs42V3BOORAJaiyTF3Jq4O2htWfhXOjwZ1nFxwh+c/AW6MwTRjWwk7Z1Xj0OZ
-        4RzOgDppkfZibh75pFp7jnl/5Ixz+tc=
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
- [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-510-GZLWv_hnN-qdrNQGcz0MhQ-1; Thu, 22 Apr 2021 03:02:13 -0400
-X-MC-Unique: GZLWv_hnN-qdrNQGcz0MhQ-1
-Received: by mail-ed1-f70.google.com with SMTP id p16-20020a0564021550b029038522733b66so8159033edx.11
-        for <kvm@vger.kernel.org>; Thu, 22 Apr 2021 00:02:13 -0700 (PDT)
+        bh=IogrsY3cJq5WADFY6TutrJbboIoUZaCtFj92TrOe82w=;
+        b=J3jzp5wdoQHxRlndZwT2GDzwZ479QpimAQzyJyB1otEUKe0mgzKJzkbyNoNnb1pcw2pga+
+        EQ9lnrg8MW2ByQPLsILXa9Znh2/DdFe/tWljV8Z1crp66DXU+Ox0apNmBbcTy50AiiE8EM
+        C4xd3Dkxpgj3vKhPyXaT6RvxhyQSMzc=
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
+ [209.85.218.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-362-hBgKJWKkPtKycDfry6eFyg-1; Thu, 22 Apr 2021 03:14:31 -0400
+X-MC-Unique: hBgKJWKkPtKycDfry6eFyg-1
+Received: by mail-ej1-f72.google.com with SMTP id lf6-20020a1709071746b029037cee5e31c4so6852000ejc.13
+        for <kvm@vger.kernel.org>; Thu, 22 Apr 2021 00:14:30 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+        h=x-gm-message-state:to:cc:references:from:subject:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=U1sBIWc97pwUoI/Y/7htamKNpDUssIIcTnKBNjle2Og=;
-        b=E/dwCIcs2vi8C8Q/uqmi8f4Intfm9Mf8/YLQG6UMWAoEGxngSBkeFLhKfxQeleIwWR
-         mQUFuG7bK1ZcubAKfG0za7DGs/4OJXDp2dCHvttSInIIsgzv2Mr62X6HpGhwppnqyXj5
-         QBKe9MfFl6cd+n/BB79/Te/Zb7+dlszmBgfuMDe3eNZrYuBQptsNVIZGRBhQ6WlACRDh
-         nGr+HvWxLrcpGhK1JwUH59BML44uCI8wVwYbYeh1WDH5Lwkc36qHLfxQPgZe4E39Fabh
-         WLC5gOSWnXdgZ+jinEhQNGV5XnayvL69wYK4XQx/C2PHSynjbmZIcdfKIiCivGhjiMcx
-         mSsA==
-X-Gm-Message-State: AOAM533F988WkpzxJsEF/5QHrww/ectVk4+yoUPzYSvHJS/jppcigrLS
-        gDzkcgMfjil0MrYJDLk7uIb5q+1Wz9oi3ip3OxGX7CNxXXB746kuQXjy76mDPxEZtEzCK0YL26k
-        mkQ62ZOLHozxV
-X-Received: by 2002:a05:6402:54f:: with SMTP id i15mr1922201edx.365.1619074932203;
-        Thu, 22 Apr 2021 00:02:12 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwW6HSmx2bqE6mJ1T+jSutBTgTnXdsbeh+wMEVf31ITrNbtI2a0LDOgDf0Ru09R/HBq590CVw==
-X-Received: by 2002:a05:6402:54f:: with SMTP id i15mr1922156edx.365.1619074931964;
-        Thu, 22 Apr 2021 00:02:11 -0700 (PDT)
+        bh=IogrsY3cJq5WADFY6TutrJbboIoUZaCtFj92TrOe82w=;
+        b=eDzxFTtI5IyirmDWOU0PhABbPELDZHKFryfSJGW6CoftmR2oPtolYRIclv+Ua59rGb
+         c1qSnwT2L6Wkzr44qY+O7vY4+f4hKjs0k49sPn60/hizBG8HqWGGBT3c/evRKcr+X/4u
+         pfrRwUCcUpJUX/oUsBZSppdu4/3EK7mF5QKfHMfePcyKwAVkegAQ+UxNCTw10YQE7O52
+         +e27kpbi6QqEditkX2TyNMqKBH++XOy5sdiyWZ3ZqT+NaWeFN2GRqB9i59EQeIwxIGjU
+         7GuEajhxyqZXn5Fbuwq890tcLxXWLXepGmdYqxLJL3AX32k+FBgJWRG7hmkwIboyX5N6
+         6uAA==
+X-Gm-Message-State: AOAM530rba4tBT0KCkdOBn3QnHj3zz9xQ9xPjF2X27bsyP4dnG2mo3Cu
+        x6UCo3mAJZRBnQvyrguNy+TxOpaLSkj2BI7UGNR7ofDSowSeehQOZcI//nvuSNeglB17gHxRBra
+        jt0Yy1SK6xRhL
+X-Received: by 2002:a17:906:cc48:: with SMTP id mm8mr1958961ejb.58.1619075668623;
+        Thu, 22 Apr 2021 00:14:28 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwip4qdfn29LT5Urrukkg+Xlat6rXN10GBboYd0g+NCnt5pXUXcX3xQ7cHMVL1uQIIrAYE2ng==
+X-Received: by 2002:a17:906:cc48:: with SMTP id mm8mr1958936ejb.58.1619075668395;
+        Thu, 22 Apr 2021 00:14:28 -0700 (PDT)
 Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id n13sm1196993ejx.27.2021.04.22.00.02.10
+        by smtp.gmail.com with ESMTPSA id q12sm1236568ejy.91.2021.04.22.00.14.27
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 22 Apr 2021 00:02:11 -0700 (PDT)
-Subject: Re: [PATCH 0/5] KVM: x86: Use kernel x86 cpuid utilities in KVM
- selftests
-To:     Ricardo Koller <ricarkol@google.com>
-Cc:     kvm@vger.kernel.org, Peter Zijlstra <peterz@infradead.org>,
-        Ingo Molnar <mingo@redhat.com>,
-        Arnaldo Carvalho de Melo <acme@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-        Jiri Olsa <jolsa@redhat.com>,
-        Namhyung Kim <namhyung@kernel.org>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Thu, 22 Apr 2021 00:14:27 -0700 (PDT)
+To:     Sean Christopherson <seanjc@google.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Wei Huang <wei.huang2@amd.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Nathan Chancellor <nathan@kernel.org>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        linux-kernel@vger.kernel.org, clang-built-linux@googlegroups.com
-References: <20210422005626.564163-1-ricarkol@google.com>
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Borislav Petkov <bp@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Brijesh Singh <brijesh.singh@amd.com>
+References: <20210422021125.3417167-1-seanjc@google.com>
+ <20210422021125.3417167-4-seanjc@google.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <c4524e4a-55c7-66f9-25d6-d397f11d25a8@redhat.com>
-Date:   Thu, 22 Apr 2021 09:02:09 +0200
+Subject: Re: [PATCH v5 03/15] KVM: SVM: Disable SEV/SEV-ES if NPT is disabled
+Message-ID: <5e8a2d7d-67de-eef4-ab19-33294920f50c@redhat.com>
+Date:   Thu, 22 Apr 2021 09:14:26 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.7.0
 MIME-Version: 1.0
-In-Reply-To: <20210422005626.564163-1-ricarkol@google.com>
+In-Reply-To: <20210422021125.3417167-4-seanjc@google.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 22/04/21 02:56, Ricardo Koller wrote:
-> The kernel has a set of utilities and definitions to deal with x86 cpu
-> features.  The x86 KVM selftests don't use them, and instead have
-> evolved to use differing and ad-hoc methods for checking features. The
-> advantage of the kernel feature definitions is that they use a format
-> that embeds the info needed to extract them from cpuid (function, index,
-> and register to use).
+On 22/04/21 04:11, Sean Christopherson wrote:
+> Disable SEV and SEV-ES if NPT is disabled.  While the APM doesn't clearly
+> state that NPT is mandatory, it's alluded to by:
 > 
-> The first 3 patches massage the related cpuid header files in the kernel
-> side, then copy them into tools/ so they can be included by selftests.
-> The last 2 patches replace the tests checking for cpu features to use
-> the definitions and utilities introduced from the kernel.
+>    The guest page tables, managed by the guest, may mark data memory pages
+>    as either private or shared, thus allowing selected pages to be shared
+>    outside the guest.
+> 
+> And practically speaking, shadow paging can't work since KVM can't read
+> the guest's page tables.
+> 
+> Fixes: e9df09428996 ("KVM: SVM: Add sev module_param")
+> Cc: Brijesh Singh <brijesh.singh@amd.com
+> Cc: Tom Lendacky <thomas.lendacky@amd.com>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+>   arch/x86/kvm/svm/svm.c | 30 +++++++++++++++---------------
+>   1 file changed, 15 insertions(+), 15 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+> index fed153314aef..0e8489908216 100644
+> --- a/arch/x86/kvm/svm/svm.c
+> +++ b/arch/x86/kvm/svm/svm.c
+> @@ -970,7 +970,21 @@ static __init int svm_hardware_setup(void)
+>   		kvm_enable_efer_bits(EFER_SVME | EFER_LMSLE);
+>   	}
+>   
+> -	if (IS_ENABLED(CONFIG_KVM_AMD_SEV) && sev) {
+> +	/*
+> +	 * KVM's MMU doesn't support using 2-level paging for itself, and thus
+> +	 * NPT isn't supported if the host is using 2-level paging since host
+> +	 * CR4 is unchanged on VMRUN.
+> +	 */
+> +	if (!IS_ENABLED(CONFIG_X86_64) && !IS_ENABLED(CONFIG_X86_PAE))
+> +		npt_enabled = false;
 
-I queued the first, but I am not sure about the rest.
+Unrelated, but since you're moving this code: should we be pre-scient 
+and tackle host 5-level paging as well?
 
-An alternative is to copy over the code from kvm-unit-tests which 
-encodes the leaf/subleaf/register/bit values into the X86_FEATURE_* 
-value.  Sharing code with kvm-unit-tests is probably simpler than adding 
-#ifdef __KERNEL__ and keeping the headers in sync.
+Support for 5-level page tables on NPT is not hard to fix and could be 
+tested by patching QEMU.  However, the !NPT case would also have to be 
+fixed by extending the PDP and PML4 stacking trick to a PML5.
+
+However, without real hardware to test on I'd be a bit wary to do it. 
+Looking at 5-level EPT there might be other issues (e.g. what's the 
+guest MAXPHYADDR) and I would prefer to see what AMD comes up with 
+exactly in the APM.  So I would just block loading KVM on hypothetical 
+AMD hosts with CR4.LA57=1.
 
 Paolo
 
-> Thanks,
-> Ricardo
-> 
-> Ricardo Koller (5):
->    KVM: x86: Move reverse CPUID helpers to separate header file
->    x86/cpu: Expose CPUID regs, leaf and index definitions to tools
->    tools headers x86: Copy cpuid helpers from the kernel
->    KVM: selftests: Introduce utilities for checking x86 features
->    KVM: selftests: Use kernel x86 cpuid features format
-> 
->   arch/x86/events/intel/pt.c                    |   1 +
->   arch/x86/include/asm/cpufeature.h             |  23 +-
->   arch/x86/include/asm/processor.h              |  11 -
->   arch/x86/kernel/cpu/scattered.c               |   2 +-
->   arch/x86/kernel/cpuid.c                       |   2 +-
->   arch/x86/kvm/cpuid.h                          | 177 +-----------
->   arch/x86/kvm/reverse_cpuid.h                  | 185 +++++++++++++
->   tools/arch/x86/include/asm/cpufeature.h       | 257 ++++++++++++++++++
->   tools/arch/x86/include/asm/cpufeatures.h      |   3 +
->   .../selftests/kvm/include/x86_64/cpuid.h      |  61 +++++
->   .../selftests/kvm/include/x86_64/processor.h  |  16 --
->   .../kvm/include/x86_64/reverse_cpuid.h        | 185 +++++++++++++
->   .../selftests/kvm/include/x86_64/svm_util.h   |  11 +-
->   tools/testing/selftests/kvm/lib/x86_64/svm.c  |   6 +-
->   tools/testing/selftests/kvm/lib/x86_64/vmx.c  |   5 +-
->   tools/testing/selftests/kvm/steal_time.c      |   5 +-
->   .../kvm/x86_64/cr4_cpuid_sync_test.c          |  23 +-
->   .../selftests/kvm/x86_64/set_sregs_test.c     |  25 +-
->   .../selftests/kvm/x86_64/vmx_pmu_msrs_test.c  |   8 +-
->   .../kvm/x86_64/vmx_set_nested_state_test.c    |   5 +-
->   .../selftests/kvm/x86_64/xss_msr_test.c       |  10 +-
->   21 files changed, 749 insertions(+), 272 deletions(-)
->   create mode 100644 arch/x86/kvm/reverse_cpuid.h
->   create mode 100644 tools/arch/x86/include/asm/cpufeature.h
->   create mode 100644 tools/testing/selftests/kvm/include/x86_64/cpuid.h
->   create mode 100644 tools/testing/selftests/kvm/include/x86_64/reverse_cpuid.h
+> +	if (!boot_cpu_has(X86_FEATURE_NPT))
+> +		npt_enabled = false;
+> +
+> +	kvm_configure_mmu(npt_enabled, get_max_npt_level(), PG_LEVEL_1G);
+> +	pr_info("kvm: Nested Paging %sabled\n", npt_enabled ? "en" : "dis");
+> +
+> +	if (IS_ENABLED(CONFIG_KVM_AMD_SEV) && sev && npt_enabled) {
+>   		sev_hardware_setup();
+>   	} else {
+>   		sev = false;
+> @@ -985,20 +999,6 @@ static __init int svm_hardware_setup(void)
+>   			goto err;
+>   	}
+>   
+> -	/*
+> -	 * KVM's MMU doesn't support using 2-level paging for itself, and thus
+> -	 * NPT isn't supported if the host is using 2-level paging since host
+> -	 * CR4 is unchanged on VMRUN.
+> -	 */
+> -	if (!IS_ENABLED(CONFIG_X86_64) && !IS_ENABLED(CONFIG_X86_PAE))
+> -		npt_enabled = false;
+> -
+> -	if (!boot_cpu_has(X86_FEATURE_NPT))
+> -		npt_enabled = false;
+> -
+> -	kvm_configure_mmu(npt_enabled, get_max_npt_level(), PG_LEVEL_1G);
+> -	pr_info("kvm: Nested Paging %sabled\n", npt_enabled ? "en" : "dis");
+> -
+>   	if (nrips) {
+>   		if (!boot_cpu_has(X86_FEATURE_NRIPS))
+>   			nrips = false;
 > 
 
