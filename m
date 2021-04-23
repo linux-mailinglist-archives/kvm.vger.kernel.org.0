@@ -2,320 +2,155 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DD16A368E97
-	for <lists+kvm@lfdr.de>; Fri, 23 Apr 2021 10:11:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2B109368E9E
+	for <lists+kvm@lfdr.de>; Fri, 23 Apr 2021 10:13:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241580AbhDWILz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 23 Apr 2021 04:11:55 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:44949 "EHLO
+        id S241147AbhDWINs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 23 Apr 2021 04:13:48 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:37364 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S241393AbhDWILy (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 23 Apr 2021 04:11:54 -0400
+        by vger.kernel.org with ESMTP id S241356AbhDWINr (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 23 Apr 2021 04:13:47 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1619165477;
+        s=mimecast20190719; t=1619165590;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=PAsMdBaHH54UtnD5ZOdRbSiDTadfouyxNC4i/WeqrP4=;
-        b=eQTLJykuxRcslTsZ0lAeZh3fMbdwRHQubAU97LjllGB8ilQxB8FEAXtDzdIpYtvG513ZBA
-        tWoSWbbx9Xo+nV1wo6vmUK4pEPgF2aYsR7l/e1azsbRxGqHQxCn76WPTT4xPtp+huqTZil
-        5QTXPuZ0uInayRzKyx16z2KLydQVwHk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-455-6hXCVJciM6CtDwSDeTSOvA-1; Fri, 23 Apr 2021 04:11:13 -0400
-X-MC-Unique: 6hXCVJciM6CtDwSDeTSOvA-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 19BF184BA42;
-        Fri, 23 Apr 2021 08:11:12 +0000 (UTC)
-Received: from localhost.localdomain (ovpn-13-225.pek2.redhat.com [10.72.13.225])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 1BEB25C5B5;
-        Fri, 23 Apr 2021 08:11:04 +0000 (UTC)
-From:   Jason Wang <jasowang@redhat.com>
-To:     mst@redhat.com, jasowang@redhat.com
-Cc:     virtualization@lists.linux-foundation.org,
-        linux-kernel@vger.kernel.org, xieyongji@bytedance.com,
-        stefanha@redhat.com, file@sect.tu-berlin.de, ashish.kalra@amd.com,
-        konrad.wilk@oracle.com, kvm@vger.kernel.org, hch@infradead.org
-Subject: [RFC PATCH V2 7/7] virtio-ring: store DMA metadata in desc_extra for split virtqueue
-Date:   Fri, 23 Apr 2021 16:09:42 +0800
-Message-Id: <20210423080942.2997-8-jasowang@redhat.com>
-In-Reply-To: <20210423080942.2997-1-jasowang@redhat.com>
-References: <20210423080942.2997-1-jasowang@redhat.com>
+        bh=JV8lxB5jxKaMLebE0kj34sple4uhf5PyGZQen4ktIWM=;
+        b=LDz91TX5E08jq4PvBHjAAmeNhVuzOJpP2I+AlgYMgcXhJP5ychacd+buwwUkA1q9y/DIHn
+        elV3qE9Z+WqQwod+eNb56F32CtxMzlFEixaW0qY8vN/jCMG1Tc+l5EeSw7x+B5T6wPbBrV
+        m7GXp92o5N0zw74YkH+H1xesbOZ3snw=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-462-0ZMbPSX3NgGMeQViDzRdAg-1; Fri, 23 Apr 2021 04:13:08 -0400
+X-MC-Unique: 0ZMbPSX3NgGMeQViDzRdAg-1
+Received: by mail-ed1-f71.google.com with SMTP id p16-20020a0564021550b029038522733b66so10148876edx.11
+        for <kvm@vger.kernel.org>; Fri, 23 Apr 2021 01:13:08 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=JV8lxB5jxKaMLebE0kj34sple4uhf5PyGZQen4ktIWM=;
+        b=QRw+lX+6sA4fnhRBvFiTV6nzoJARCohy56cOR3+NvjQRnbUOAilNPLzHE+2+eFKI1x
+         YKOmpynK37ldYmOJB4GQTsnRIvNzZJQd7ImbgapdKPxO8K5VaNL8DNtAgny2yGwG8zdF
+         PRuJE1QjNpHokkytCuXYXukBr8O40NtW7Yo4FbeBiKV9aITDPiq+jTXqeFCG01d1F8w9
+         k6Hm0CM3W42K7gHjpraBFnc4BR8FJlRBfe6pdmT8GFeEM5MvIYcCT+DouhprCLar8HYn
+         fMwQUpWsju/7v4qshl641gAeFdI7wyyCQ664ZZwpOvZ11S84H3SBXh3qnK9g4sQt6grA
+         tHXQ==
+X-Gm-Message-State: AOAM530SpqO7Z/BFEqPfbnzTpjOu0S4LmNc4iphvFM2E4yCvqFwjmpto
+        npoN6/EARH4zRbq0NBc0Oe1qZ2Yigqi217oBE9UX4lF87qw10K6XybWCJaswxuXm5nNV8sTvrCw
+        wVzx4Xq+xfdam
+X-Received: by 2002:a17:906:80d1:: with SMTP id a17mr2940522ejx.55.1619165587543;
+        Fri, 23 Apr 2021 01:13:07 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwmHJI1X+H7hKlvBNxRQOwhvUiNXWScEBXZM+Kc2dHSs2YT40KOzysDXFu7gbrM6y/ENjHjaw==
+X-Received: by 2002:a17:906:80d1:: with SMTP id a17mr2940509ejx.55.1619165587397;
+        Fri, 23 Apr 2021 01:13:07 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id f19sm3521662ejc.54.2021.04.23.01.13.06
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 23 Apr 2021 01:13:06 -0700 (PDT)
+Subject: Re: [PATCH] KVM: x86/xen: Take srcu lock when accessing
+ kvm_memslots()
+To:     Wanpeng Li <kernellwp@gmail.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>
+References: <1619161883-5963-1-git-send-email-wanpengli@tencent.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <f025b59c-5a8a-abf7-20fc-323a5b450ba5@redhat.com>
+Date:   Fri, 23 Apr 2021 10:13:05 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.7.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+In-Reply-To: <1619161883-5963-1-git-send-email-wanpengli@tencent.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-For split virtqueue, we used to depend on the address, length and
-flags stored in the descriptor ring for DMA unmapping. This is unsafe
-for the case since the device can manipulate the behavior of virtio
-driver, IOMMU drivers and swiotlb.
+On 23/04/21 09:11, Wanpeng Li wrote:
+> From: Wanpeng Li <wanpengli@tencent.com>
+> 
+> kvm_memslots() will be called by kvm_write_guest_offset_cached() so
+> take the srcu lock.
+> 
+> Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
 
-For safety, maintain the DMA address, DMA length, descriptor flags and
-next filed of the non indirect descriptors in vring_desc_state_extra
-when DMA API is used for virtio as we did for packed virtqueue and use
-those metadata for performing DMA operations. Indirect descriptors
-should be safe since they are using streaming mappings.
+Good catch.  But I would pull it from kvm_steal_time_set_preempted to 
+kvm_arch_vcpu_put instead.
 
-With this the descriptor ring is write only form the view of the
-driver.
+Paolo
 
-This slight increase the footprint of the drive but it's not noticed
-through pktgen (64B) test and netperf test in the case of virtio-net.
-
-Signed-off-by: Jason Wang <jasowang@redhat.com>
----
- drivers/virtio/virtio_ring.c | 112 +++++++++++++++++++++++++++--------
- 1 file changed, 87 insertions(+), 25 deletions(-)
-
-diff --git a/drivers/virtio/virtio_ring.c b/drivers/virtio/virtio_ring.c
-index 9800f1c9ce4c..5f0076eeb39c 100644
---- a/drivers/virtio/virtio_ring.c
-+++ b/drivers/virtio/virtio_ring.c
-@@ -130,6 +130,7 @@ struct vring_virtqueue {
- 
- 			/* Per-descriptor state. */
- 			struct vring_desc_state_split *desc_state;
-+			struct vring_desc_extra *desc_extra;
- 
- 			/* DMA address and size information */
- 			dma_addr_t queue_dma_addr;
-@@ -364,8 +365,8 @@ static int vring_mapping_error(const struct vring_virtqueue *vq,
-  * Split ring specific functions - *_split().
-  */
- 
--static void vring_unmap_one_split(const struct vring_virtqueue *vq,
--				  struct vring_desc *desc)
-+static void vring_unmap_one_split_indirect(const struct vring_virtqueue *vq,
-+					   struct vring_desc *desc)
- {
- 	u16 flags;
- 
-@@ -389,6 +390,35 @@ static void vring_unmap_one_split(const struct vring_virtqueue *vq,
- 	}
- }
- 
-+static unsigned int vring_unmap_one_split(const struct vring_virtqueue *vq,
-+					  unsigned int i)
-+{
-+	struct vring_desc_extra *extra = vq->split.desc_extra;
-+	u16 flags;
-+
-+	if (!vq->use_dma_api)
-+		goto out;
-+
-+	flags = extra[i].flags;
-+
-+	if (flags & VRING_DESC_F_INDIRECT) {
-+		dma_unmap_single(vring_dma_dev(vq),
-+				 extra[i].addr,
-+				 extra[i].len,
-+				 (flags & VRING_DESC_F_WRITE) ?
-+				 DMA_FROM_DEVICE : DMA_TO_DEVICE);
-+	} else {
-+		dma_unmap_page(vring_dma_dev(vq),
-+			       extra[i].addr,
-+			       extra[i].len,
-+			       (flags & VRING_DESC_F_WRITE) ?
-+			       DMA_FROM_DEVICE : DMA_TO_DEVICE);
-+	}
-+
-+out:
-+	return extra[i].next;
-+}
-+
- static struct vring_desc *alloc_indirect_split(struct virtqueue *_vq,
- 					       unsigned int total_sg,
- 					       gfp_t gfp)
-@@ -417,13 +447,28 @@ static inline unsigned int virtqueue_add_desc_split(struct virtqueue *vq,
- 						    unsigned int i,
- 						    dma_addr_t addr,
- 						    unsigned int len,
--						    u16 flags)
-+						    u16 flags,
-+						    bool indirect)
- {
-+	struct vring_virtqueue *vring = to_vvq(vq);
-+	struct vring_desc_extra *extra = vring->split.desc_extra;
-+	u16 next;
-+
- 	desc[i].flags = cpu_to_virtio16(vq->vdev, flags);
- 	desc[i].addr = cpu_to_virtio64(vq->vdev, addr);
- 	desc[i].len = cpu_to_virtio32(vq->vdev, len);
- 
--	return virtio16_to_cpu(vq->vdev, desc[i].next);
-+	if (!indirect) {
-+		next = extra[i].next;
-+		desc[i].next = cpu_to_virtio16(vq->vdev, next);
-+
-+		extra[i].addr = addr;
-+		extra[i].len = len;
-+		extra[i].flags = flags;
-+	} else
-+		next = virtio16_to_cpu(vq->vdev, desc[i].next);
-+
-+	return next;
- }
- 
- static inline int virtqueue_add_split(struct virtqueue *_vq,
-@@ -499,8 +544,12 @@ static inline int virtqueue_add_split(struct virtqueue *_vq,
- 				goto unmap_release;
- 
- 			prev = i;
-+			/* Note that we trust indirect descriptor
-+			 * table since it use stream DMA mapping.
-+			 */
- 			i = virtqueue_add_desc_split(_vq, desc, i, addr, sg->length,
--						     VRING_DESC_F_NEXT);
-+						     VRING_DESC_F_NEXT,
-+						     indirect);
- 		}
- 	}
- 	for (; n < (out_sgs + in_sgs); n++) {
-@@ -510,14 +559,21 @@ static inline int virtqueue_add_split(struct virtqueue *_vq,
- 				goto unmap_release;
- 
- 			prev = i;
-+			/* Note that we trust indirect descriptor
-+			 * table since it use stream DMA mapping.
-+			 */
- 			i = virtqueue_add_desc_split(_vq, desc, i, addr,
- 						     sg->length,
- 						     VRING_DESC_F_NEXT |
--						     VRING_DESC_F_WRITE);
-+						     VRING_DESC_F_WRITE,
-+						     indirect);
- 		}
- 	}
- 	/* Last one doesn't continue. */
- 	desc[prev].flags &= cpu_to_virtio16(_vq->vdev, ~VRING_DESC_F_NEXT);
-+	if (!indirect && vq->use_dma_api)
-+		vq->split.desc_extra[prev & (vq->split.vring.num - 1)].flags =
-+			~VRING_DESC_F_NEXT;
- 
- 	if (indirect) {
- 		/* Now that the indirect table is filled in, map it. */
-@@ -530,7 +586,8 @@ static inline int virtqueue_add_split(struct virtqueue *_vq,
- 		virtqueue_add_desc_split(_vq, vq->split.vring.desc,
- 					 head, addr,
- 					 total_sg * sizeof(struct vring_desc),
--			                 VRING_DESC_F_INDIRECT);
-+					 VRING_DESC_F_INDIRECT,
-+					 false);
- 	}
- 
- 	/* We're using some buffers from the free list. */
-@@ -538,8 +595,7 @@ static inline int virtqueue_add_split(struct virtqueue *_vq,
- 
- 	/* Update free pointer */
- 	if (indirect)
--		vq->free_head = virtio16_to_cpu(_vq->vdev,
--					vq->split.vring.desc[head].next);
-+		vq->free_head = vq->split.desc_extra[head].next;
- 	else
- 		vq->free_head = i;
- 
-@@ -584,8 +640,11 @@ static inline int virtqueue_add_split(struct virtqueue *_vq,
- 	for (n = 0; n < total_sg; n++) {
- 		if (i == err_idx)
- 			break;
--		vring_unmap_one_split(vq, &desc[i]);
--		i = virtio16_to_cpu(_vq->vdev, desc[i].next);
-+		if (indirect) {
-+			vring_unmap_one_split_indirect(vq, &desc[i]);
-+			i = virtio16_to_cpu(_vq->vdev, desc[i].next);
-+		} else
-+			i = vring_unmap_one_split(vq, i);
- 	}
- 
- 	if (indirect)
-@@ -639,14 +698,13 @@ static void detach_buf_split(struct vring_virtqueue *vq, unsigned int head,
- 	i = head;
- 
- 	while (vq->split.vring.desc[i].flags & nextflag) {
--		vring_unmap_one_split(vq, &vq->split.vring.desc[i]);
--		i = virtio16_to_cpu(vq->vq.vdev, vq->split.vring.desc[i].next);
-+		vring_unmap_one_split(vq, i);
-+		i = vq->split.desc_extra[i].next;
- 		vq->vq.num_free++;
- 	}
- 
--	vring_unmap_one_split(vq, &vq->split.vring.desc[i]);
--	vq->split.vring.desc[i].next = cpu_to_virtio16(vq->vq.vdev,
--						vq->free_head);
-+	vring_unmap_one_split(vq, i);
-+	vq->split.desc_extra[i].next = vq->free_head;
- 	vq->free_head = head;
- 
- 	/* Plus final descriptor */
-@@ -661,15 +719,14 @@ static void detach_buf_split(struct vring_virtqueue *vq, unsigned int head,
- 		if (!indir_desc)
- 			return;
- 
--		len = virtio32_to_cpu(vq->vq.vdev,
--				vq->split.vring.desc[head].len);
-+		len = vq->split.desc_extra[head].len;
- 
--		BUG_ON(!(vq->split.vring.desc[head].flags &
--			 cpu_to_virtio16(vq->vq.vdev, VRING_DESC_F_INDIRECT)));
-+		BUG_ON(!(vq->split.desc_extra[head].flags &
-+				VRING_DESC_F_INDIRECT));
- 		BUG_ON(len == 0 || len % sizeof(struct vring_desc));
- 
- 		for (j = 0; j < len / sizeof(struct vring_desc); j++)
--			vring_unmap_one_split(vq, &indir_desc[j]);
-+			vring_unmap_one_split_indirect(vq, &indir_desc[j]);
- 
- 		kfree(indir_desc);
- 		vq->split.desc_state[head].indir_desc = NULL;
-@@ -2085,7 +2142,6 @@ struct virtqueue *__vring_new_virtqueue(unsigned int index,
- 					void (*callback)(struct virtqueue *),
- 					const char *name)
- {
--	unsigned int i;
- 	struct vring_virtqueue *vq;
- 
- 	if (virtio_has_feature(vdev, VIRTIO_F_RING_PACKED))
-@@ -2140,16 +2196,20 @@ struct virtqueue *__vring_new_virtqueue(unsigned int index,
- 	if (!vq->split.desc_state)
- 		goto err_state;
- 
-+	vq->split.desc_extra = vring_alloc_desc_extra(vq, vring.num);
-+	if (!vq->split.desc_extra)
-+		goto err_extra;
-+
- 	/* Put everything in free lists. */
- 	vq->free_head = 0;
--	for (i = 0; i < vring.num-1; i++)
--		vq->split.vring.desc[i].next = cpu_to_virtio16(vdev, i + 1);
- 	memset(vq->split.desc_state, 0, vring.num *
- 			sizeof(struct vring_desc_state_split));
- 
- 	list_add_tail(&vq->vq.list, &vdev->vqs);
- 	return &vq->vq;
- 
-+err_extra:
-+	kfree(vq->split.desc_state);
- err_state:
- 	kfree(vq);
- 	return NULL;
-@@ -2233,8 +2293,10 @@ void vring_del_virtqueue(struct virtqueue *_vq)
- 					 vq->split.queue_dma_addr);
- 		}
- 	}
--	if (!vq->packed_ring)
-+	if (!vq->packed_ring) {
- 		kfree(vq->split.desc_state);
-+		kfree(vq->split.desc_extra);
-+	}
- 	list_del(&_vq->list);
- 	kfree(vq);
- }
--- 
-2.25.1
+> ---
+>   arch/x86/kvm/xen.c | 18 ++++++++++++++----
+>   1 file changed, 14 insertions(+), 4 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/xen.c b/arch/x86/kvm/xen.c
+> index ae17250..d0df782 100644
+> --- a/arch/x86/kvm/xen.c
+> +++ b/arch/x86/kvm/xen.c
+> @@ -96,6 +96,7 @@ void kvm_xen_update_runstate_guest(struct kvm_vcpu *v, int state)
+>   	struct kvm_vcpu_xen *vx = &v->arch.xen;
+>   	uint64_t state_entry_time;
+>   	unsigned int offset;
+> +	int idx;
+>   
+>   	kvm_xen_update_runstate(v, state);
+>   
+> @@ -133,10 +134,16 @@ void kvm_xen_update_runstate_guest(struct kvm_vcpu *v, int state)
+>   	BUILD_BUG_ON(sizeof(((struct compat_vcpu_runstate_info *)0)->state_entry_time) !=
+>   		     sizeof(state_entry_time));
+>   
+> +	/*
+> +	 * Take the srcu lock as memslots will be accessed to check the gfn
+> +	 * cache generation against the memslots generation.
+> +	 */
+> +	idx = srcu_read_lock(&v->kvm->srcu);
+> +
+>   	if (kvm_write_guest_offset_cached(v->kvm, &v->arch.xen.runstate_cache,
+>   					  &state_entry_time, offset,
+>   					  sizeof(state_entry_time)))
+> -		return;
+> +		goto out;
+>   	smp_wmb();
+>   
+>   	/*
+> @@ -154,7 +161,7 @@ void kvm_xen_update_runstate_guest(struct kvm_vcpu *v, int state)
+>   					  &vx->current_runstate,
+>   					  offsetof(struct vcpu_runstate_info, state),
+>   					  sizeof(vx->current_runstate)))
+> -		return;
+> +		goto out;
+>   
+>   	/*
+>   	 * Write the actual runstate times immediately after the
+> @@ -173,7 +180,7 @@ void kvm_xen_update_runstate_guest(struct kvm_vcpu *v, int state)
+>   					  &vx->runstate_times[0],
+>   					  offset + sizeof(u64),
+>   					  sizeof(vx->runstate_times)))
+> -		return;
+> +		goto out;
+>   
+>   	smp_wmb();
+>   
+> @@ -186,7 +193,10 @@ void kvm_xen_update_runstate_guest(struct kvm_vcpu *v, int state)
+>   	if (kvm_write_guest_offset_cached(v->kvm, &v->arch.xen.runstate_cache,
+>   					  &state_entry_time, offset,
+>   					  sizeof(state_entry_time)))
+> -		return;
+> +		goto out;
+> +
+> +out:
+> +	srcu_read_unlock(&v->kvm->srcu, idx);
+>   }
+>   
+>   int __kvm_xen_has_interrupt(struct kvm_vcpu *v)
+> 
 
