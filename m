@@ -2,104 +2,151 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6E42F368917
-	for <lists+kvm@lfdr.de>; Fri, 23 Apr 2021 00:39:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8D54336890C
+	for <lists+kvm@lfdr.de>; Fri, 23 Apr 2021 00:36:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239666AbhDVWkB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 22 Apr 2021 18:40:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60226 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239400AbhDVWkA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 22 Apr 2021 18:40:00 -0400
-Received: from mail-pf1-x432.google.com (mail-pf1-x432.google.com [IPv6:2607:f8b0:4864:20::432])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D68A5C061756
-        for <kvm@vger.kernel.org>; Thu, 22 Apr 2021 15:39:23 -0700 (PDT)
-Received: by mail-pf1-x432.google.com with SMTP id a12so32770918pfc.7
-        for <kvm@vger.kernel.org>; Thu, 22 Apr 2021 15:39:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=DUlDwcgwPAcRYMvT6n0zmQZ02FrFSLFm4jKgBTz17LU=;
-        b=Cw8D18+LB+KggXJC3Hs7OS36Q58sjfTflgjQhQVcB9h78s6y35jRdKlqU4zsPFg4F6
-         pauiG4kgb/tk6UMTiawgychtg2BRhGZAQ1p7iSqS2dbuOqqpEykK7yoJYv6NINA6/GNO
-         pF1RFPp0jpJX0UJ8BzE9xlRkIfI23O6jSnpGPDBoSIBf32ExAiXZVm5UBA+eA/tYaMYI
-         Y0QH0appUDGgAU/iCvtSaHHcH49M53u9lJ2gwQ5sZwuMMeSPnFPgHzjIBqv3BeSfYRlJ
-         xvechPdEmgyOqG07nK6+N0VIL0Nl+KiqVFKLAixAcFi59f6mO2+kI8ivDP62z3e3QyGL
-         Ydng==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=DUlDwcgwPAcRYMvT6n0zmQZ02FrFSLFm4jKgBTz17LU=;
-        b=AVBh2HHVj8oWYT3rN29GtOroIaBSjgW79OeCYhhDn7JaBVguPaosblfO6tdE2YsAvI
-         t7TPV+EypAIF2KQ3mI62bKV+42DIc49MIYuArsorKIoa2NfUpAVCBxsAc/UXRLnTlp/z
-         cQHJrEJzu1rTuq4wU4i8HZxiduqSSo+xOmD50sQXn5NUFt2XUTPDshAIqsj8DXMrPIby
-         7t2jVnd41HMx7NGtZB67Q+Is460B7ITs56h59QSPL77p5SkUwU/Y9vmryuVFV5foxI0n
-         akejUJCUlKPMNUGNvtWeiYksOG5ncgUDub58d+fHnsNS0VNxXolKNXmSUsfRNZGvI5B8
-         4ZHw==
-X-Gm-Message-State: AOAM530z9mUjREeBb4+fDAT538t1cmcitAjkww6Auz00lAreqX3X9YsN
-        zwNHL3IV5MmX52jz7EWVebWq4OLWT3kUg/3Z1Gi1ew==
-X-Google-Smtp-Source: ABdhPJy3/ASgM45udMwId+U8e7zn4WwchaRq957LjL2HP2hRvBq6aRgoGXGIp2N7MYU2Ynup+2a99x/e4Y0612lWCik=
-X-Received: by 2002:a63:4f50:: with SMTP id p16mr913749pgl.40.1619131163259;
- Thu, 22 Apr 2021 15:39:23 -0700 (PDT)
+        id S237047AbhDVWgm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 22 Apr 2021 18:36:42 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:28524 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232844AbhDVWgk (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 22 Apr 2021 18:36:40 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1619130965;
+        h=from:from:reply-to:reply-to:subject:subject:date:date:
+         message-id:message-id:to:to:cc:mime-version:mime-version:
+         content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=oCrQMIGOiPSDFBMRTF4r7RFudjb0OnYoOwI0UV/Dgh4=;
+        b=esJGnRhkq52WpBbiWhqW1ziBTzzqQW4T21uKbyseuwt9EWpEmxknqD7Vl0vqj780PKNSV/
+        uxLYAUskUx37nJvfmUajgO7gBtPbjwVFmTnD4f/AoPJ4x7SBMrfeVrAYRe4NeGFhMHRyWJ
+        RokT8VMt6NxR7mg7e0iNDaOoX2TaTPk=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-517-9OfPzJ6POMqYjjuQxS-VAQ-1; Thu, 22 Apr 2021 18:36:02 -0400
+X-MC-Unique: 9OfPzJ6POMqYjjuQxS-VAQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2B92210054F6;
+        Thu, 22 Apr 2021 22:36:01 +0000 (UTC)
+Received: from [10.64.54.94] (vpn2-54-94.bne.redhat.com [10.64.54.94])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 677C460BE5;
+        Thu, 22 Apr 2021 22:35:58 +0000 (UTC)
+Reply-To: Gavin Shan <gshan@redhat.com>
+Subject: Re: [PATCH v4 1/2] kvm/arm64: Remove the creation time's mapping of
+ MMIO regions
+To:     Keqian Zhu <zhukeqian1@huawei.com>, linux-kernel@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
+        kvmarm@lists.cs.columbia.edu, Marc Zyngier <maz@kernel.org>
+References: <20210415140328.24200-1-zhukeqian1@huawei.com>
+ <20210415140328.24200-2-zhukeqian1@huawei.com>
+From:   Gavin Shan <gshan@redhat.com>
+Message-ID: <b3da0d70-30e4-e128-cb76-16d335829541@redhat.com>
+Date:   Fri, 23 Apr 2021 10:36:09 +1000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
 MIME-Version: 1.0
-References: <20210422001736.3255735-1-seanjc@google.com> <CAAeT=FxaRV+za7yk8_9p45k4ui3QJx90gN4b8k4egrxux=QWFA@mail.gmail.com>
- <YIHYsa1+psfnszcv@google.com>
-In-Reply-To: <YIHYsa1+psfnszcv@google.com>
-From:   Reiji Watanabe <reijiw@google.com>
-Date:   Thu, 22 Apr 2021 15:39:07 -0700
-Message-ID: <CAAeT=FwXuaHM+_ZpoCwHgXyBtSn_gA3r8j+gZ9rfgUBxEwkpWA@mail.gmail.com>
-Subject: Re: [PATCH v2] KVM: SVM: Delay restoration of host MSR_TSC_AUX until
- return to userspace
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Tom Lendacky <thomas.lendacky@amd.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20210415140328.24200-2-zhukeqian1@huawei.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> All in all, I think we want this:
+On 4/16/21 12:03 AM, Keqian Zhu wrote:
+> The MMIO regions may be unmapped for many reasons and can be remapped
+> by stage2 fault path. Map MMIO regions at creation time becomes a
+> minor optimization and makes these two mapping path hard to sync.
+> 
+> Remove the mapping code while keep the useful sanity check.
+> 
+> Signed-off-by: Keqian Zhu <zhukeqian1@huawei.com>
+> ---
+>   arch/arm64/kvm/mmu.c | 38 +++-----------------------------------
+>   1 file changed, 3 insertions(+), 35 deletions(-)
 >
->         case MSR_TSC_AUX:
->                 if (!boot_cpu_has(X86_FEATURE_RDTSCP))
->                         return 1;
->
->                 if (!msr_info->host_initiated &&
->                     !guest_cpuid_has(vcpu, X86_FEATURE_RDTSCP))
->                         return 1;
->
->                 /*
->                  * TSC_AUX is usually changed only during boot and never read
->                  * directly.  Intercept TSC_AUX instead of exposing it to the
->                  * guest via direct_access_msrs, and switch it via user return.
->                  */
->                 preempt_disable();
->                 r = kvm_set_user_return_msr(TSC_AUX_URET_SLOT, data, -1ull);
->                 preempt_enable();
->                 if (r)
->                         return 1;
->
->                 /*
->                  * Bits 63:32 are dropped by AMD CPUs, but are reserved on
->                  * Intel CPUs.  AMD's APM has incomplete and conflicting info
->                  * on the architectural behavior; emulate current hardware as
->                  * doing so ensures migrating from AMD to Intel won't explode.
->                  */
->                 svm->tsc_aux = (u32)data;
->                 break;
 
+Reviewed-by: Gavin Shan <gshan@redhat.com>
 
-Thank you for the explanation.
-I understand and the code above looks good to me.
-(I would assume we want to check the msr_info->host_initiated and
-guest_cpuid_has in svm_get_msr as well)
+  
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index 8711894db8c2..c59af5ca01b0 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+> @@ -1301,7 +1301,6 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
+>   {
+>   	hva_t hva = mem->userspace_addr;
+>   	hva_t reg_end = hva + mem->memory_size;
+> -	bool writable = !(mem->flags & KVM_MEM_READONLY);
+>   	int ret = 0;
+>   
+>   	if (change != KVM_MR_CREATE && change != KVM_MR_MOVE &&
+> @@ -1318,8 +1317,7 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
+>   	mmap_read_lock(current->mm);
+>   	/*
+>   	 * A memory region could potentially cover multiple VMAs, and any holes
+> -	 * between them, so iterate over all of them to find out if we can map
+> -	 * any of them right now.
+> +	 * between them, so iterate over all of them.
+>   	 *
+>   	 *     +--------------------------------------------+
+>   	 * +---------------+----------------+   +----------------+
+> @@ -1330,50 +1328,20 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
+>   	 */
+>   	do {
+>   		struct vm_area_struct *vma = find_vma(current->mm, hva);
+> -		hva_t vm_start, vm_end;
+>   
+>   		if (!vma || vma->vm_start >= reg_end)
+>   			break;
+>   
+> -		/*
+> -		 * Take the intersection of this VMA with the memory region
+> -		 */
+> -		vm_start = max(hva, vma->vm_start);
+> -		vm_end = min(reg_end, vma->vm_end);
+> -
+>   		if (vma->vm_flags & VM_PFNMAP) {
+> -			gpa_t gpa = mem->guest_phys_addr +
+> -				    (vm_start - mem->userspace_addr);
+> -			phys_addr_t pa;
+> -
+> -			pa = (phys_addr_t)vma->vm_pgoff << PAGE_SHIFT;
+> -			pa += vm_start - vma->vm_start;
+> -
+>   			/* IO region dirty page logging not allowed */
+>   			if (memslot->flags & KVM_MEM_LOG_DIRTY_PAGES) {
+>   				ret = -EINVAL;
+> -				goto out;
+> -			}
+> -
+> -			ret = kvm_phys_addr_ioremap(kvm, gpa, pa,
+> -						    vm_end - vm_start,
+> -						    writable);
+> -			if (ret)
+>   				break;
+> +			}
+>   		}
+> -		hva = vm_end;
+> +		hva = min(reg_end, vma->vm_end);
+>   	} while (hva < reg_end);
+>   
+> -	if (change == KVM_MR_FLAGS_ONLY)
+> -		goto out;
+> -
+> -	spin_lock(&kvm->mmu_lock);
+> -	if (ret)
+> -		unmap_stage2_range(&kvm->arch.mmu, mem->guest_phys_addr, mem->memory_size);
+> -	else if (!cpus_have_final_cap(ARM64_HAS_STAGE2_FWB))
+> -		stage2_flush_memslot(kvm, memslot);
+> -	spin_unlock(&kvm->mmu_lock);
+> -out:
+>   	mmap_read_unlock(current->mm);
+>   	return ret;
+>   }
+> 
 
-Thanks,
-Reiji
