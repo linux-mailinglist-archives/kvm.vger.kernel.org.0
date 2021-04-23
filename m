@@ -2,74 +2,75 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 89D67368D9D
-	for <lists+kvm@lfdr.de>; Fri, 23 Apr 2021 09:06:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3EF46368DA3
+	for <lists+kvm@lfdr.de>; Fri, 23 Apr 2021 09:08:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241059AbhDWHGz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 23 Apr 2021 03:06:55 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:57860 "EHLO
+        id S240648AbhDWHIx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 23 Apr 2021 03:08:53 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:53628 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S241031AbhDWHGy (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 23 Apr 2021 03:06:54 -0400
+        by vger.kernel.org with ESMTP id S229486AbhDWHIw (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 23 Apr 2021 03:08:52 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1619161578;
+        s=mimecast20190719; t=1619161696;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=c0Cl5FS9BM4Q35WpIm6J5r8zv2qpk0iAb6szpk8n7ZM=;
-        b=biGX/NGO0qrC2w7BLajIz4frbV7lOHEKSbvtFeaRXIV1/oIH5JtgxLhOEd5eiZvMQaiZjX
-        6S5NQI1hL6vHvgUyMJo5vj4oMK/7kvVK95XDqfWJVAgPgoR5dWOc7Zp1+CzLu6maE71lAB
-        d6jYZKdEUo6xnnU8twyR8Tdc1PcRVE8=
-Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
- [209.85.218.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-418-_Lihg7JcMASn9_kgQGlwag-1; Fri, 23 Apr 2021 03:06:07 -0400
-X-MC-Unique: _Lihg7JcMASn9_kgQGlwag-1
-Received: by mail-ej1-f71.google.com with SMTP id x21-20020a1709064bd5b029037c44cb861cso8029747ejv.4
-        for <kvm@vger.kernel.org>; Fri, 23 Apr 2021 00:06:07 -0700 (PDT)
+        bh=s6nTxmdqew/u6s+lOFo4xVX1inakg0kuwdWkPa9JRN4=;
+        b=F44oXdJXyCWHPauIilrmPj5ggybeu2/A/1p0+z3SMNqeBqhNLZvJkjMH8Pvlt7U85bY/hG
+        yIY0xG6c22Iej1hYEkx0N5yBnGTk/8K6jmFGYeOzciyPrUjcMieNxvzK+gCCQ+3uuf5Hf/
+        KilLIOnyNQFOEAvndqhEt9AyF7L+jr8=
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
+ [209.85.218.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-422-KoHEssDZNyqPxNr88m-0Cw-1; Fri, 23 Apr 2021 03:08:14 -0400
+X-MC-Unique: KoHEssDZNyqPxNr88m-0Cw-1
+Received: by mail-ej1-f72.google.com with SMTP id i10-20020a1709067a4ab029037c5dba8400so8104430ejo.8
+        for <kvm@vger.kernel.org>; Fri, 23 Apr 2021 00:08:14 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=c0Cl5FS9BM4Q35WpIm6J5r8zv2qpk0iAb6szpk8n7ZM=;
-        b=kkhYEcCmSKrTmf6oDzPiCd31dvUr99narT1/ccCn0WxvHloW5hZ21eduJw4q5ID457
-         9yN9SWl1q2z6Eqr7NPJLANui30P4+8gorlwW/G8hB8xOsyJpRtIM1isEus8+SZ425yMw
-         aXNRgBO/6ol303OEaAzd2yT2PoyxyUNP44Y7cDx8UE/Co8nfFrCJKkKLbwMmGKmcQImF
-         XQ86sTNiB5Tm9buUzNIwoDQ3LZC+/pRjJeflQeAO2/wQOlmo3mZDYsiD32xfHnFAjLe7
-         Lcr9+9uICJEzEzfcYAi52X1VdAQXnIJv1tKzc7vqdYfxpqdU9zMqc/CMUbocbaqrM7qB
-         Sumg==
-X-Gm-Message-State: AOAM530YjqceEkDUT7O0Dx5HPIjw12sNAoJOgGZLTv6xsjevXYWMR3nj
-        XTVq+sSOClz9fOPb3cxolR4esFU8QT8ZBvAVDlr9Ddu2g42UR98xWi0mrm5pZJbzmqddTZ1Hfsz
-        Ebl/6OB3v9O4c
-X-Received: by 2002:a50:cc4b:: with SMTP id n11mr2774598edi.186.1619161566790;
-        Fri, 23 Apr 2021 00:06:06 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzBaNe9SswxfFTcNaWeJfRB2NuJ7rXn8/9taV7As0j13rnKsmU38i2cf1iTBfRl6CSz7Kerww==
-X-Received: by 2002:a50:cc4b:: with SMTP id n11mr2774568edi.186.1619161566637;
-        Fri, 23 Apr 2021 00:06:06 -0700 (PDT)
+        bh=s6nTxmdqew/u6s+lOFo4xVX1inakg0kuwdWkPa9JRN4=;
+        b=ExQ0vuZRbDQFtMSHQ8xyPCh6eaRmbRXH8JyaKbpDynVRfQ++AJ8nmeqgrjEyFax8Nv
+         XiKCjU/0hhiBruYc7GGk2KYL4HTcAG4BFwXDAB8ehJYCDlYpw3nNSLYEKkZFSeAKvU/B
+         EtNOcJIi6+6g3dWdiWiKs3Q/MWZelQwcu6acHizD0y276t2lOqPwXd53vuUJCsUczTkx
+         /tkf1jcvclavqeffmbn+XwOjAsDwXOmOmMDi9a5aYi5BycwG1dJlWITVLkqlP2iEA0bs
+         UJi33sqd5RVcVKkMkkEa9UEcexrkzqUnLTNaNiLtivS1aifvx6g2dz/i+ZkIQ0GIaSWI
+         C/fA==
+X-Gm-Message-State: AOAM532/DheIJhffAGei5Gi7JKnFuMjJbwSqDubTO+rlnJDM+xPj5hUZ
+        yAg4YiA+xgzgO0XZPE3FhGkvcgtZg74k/GNcsZZo7GL7IcmnEeq2BF8on/zOOu6PlMXDK5HbBjT
+        k/bQc0Rv7+N9A
+X-Received: by 2002:a17:906:36da:: with SMTP id b26mr2772503ejc.8.1619161693241;
+        Fri, 23 Apr 2021 00:08:13 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzhjQ/5A0AMXJ/oTAsivkhjGXT0QdCZlC/+ol6RTxlqAGpcL15cTSSJBoKA0Bo+y4Xe9v9/GA==
+X-Received: by 2002:a17:906:36da:: with SMTP id b26mr2772488ejc.8.1619161693095;
+        Fri, 23 Apr 2021 00:08:13 -0700 (PDT)
 Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id e16sm3918899edu.94.2021.04.23.00.06.05
+        by smtp.gmail.com with ESMTPSA id lr27sm3270158ejb.8.2021.04.23.00.08.11
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 23 Apr 2021 00:06:06 -0700 (PDT)
+        Fri, 23 Apr 2021 00:08:12 -0700 (PDT)
 Subject: Re: [PATCH] KVM: x86: Fix implicit enum conversion goof in scattered
  reverse CPUID code
-To:     Sean Christopherson <seanjc@google.com>,
-        Nathan Chancellor <nathan@kernel.org>,
-        Nick Desaulniers <ndesaulniers@google.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+To:     Nathan Chancellor <nathan@kernel.org>,
+        Sean Christopherson <seanjc@google.com>
+Cc:     Nick Desaulniers <ndesaulniers@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
         clang-built-linux@googlegroups.com, linux-kernel@vger.kernel.org,
         Kai Huang <kai.huang@intel.com>
 References: <20210421010850.3009718-1-seanjc@google.com>
+ <YIBcd+5NKJFnkTC1@archlinux-ax161>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <7b1f385c-3a97-efe0-bb8d-53cdb9c19dbf@redhat.com>
-Date:   Fri, 23 Apr 2021 09:06:04 +0200
+Message-ID: <c469d222-a082-a984-eedd-f6111e03917c@redhat.com>
+Date:   Fri, 23 Apr 2021 09:08:11 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.7.0
 MIME-Version: 1.0
-In-Reply-To: <20210421010850.3009718-1-seanjc@google.com>
+In-Reply-To: <YIBcd+5NKJFnkTC1@archlinux-ax161>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -77,67 +78,16 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 21/04/21 03:08, Sean Christopherson wrote:
-> Take "enum kvm_only_cpuid_leafs" in scattered specific CPUID helpers
-> (which is obvious in hindsight), and use "unsigned int" for leafs that
-> can be the kernel's standard "enum cpuid_leaf" or the aforementioned
-> KVM-only variant.  Loss of the enum params is a bit disapponting, but
-> gcc obviously isn't providing any extra sanity checks, and the various
-> BUILD_BUG_ON() assertions ensure the input is in range.
-> 
-> This fixes implicit enum conversions that are detected by clang-11.
-> 
-> Fixes: 4e66c0cb79b7 ("KVM: x86: Add support for reverse CPUID lookup of scattered features")
-> Cc: Kai Huang <kai.huang@intel.com>
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
-> 
-> Hopefully it's not too late to squash this...
+On 21/04/21 19:10, Nathan Chancellor wrote:
+> arch/x86/kvm/cpuid.c:499:29: warning: implicit conversion from enumeration type 'enum kvm_only_cpuid_leafs' to different enumeration type 'enum cpuid_leafs' [-Wenum-conversion]
+>          kvm_cpu_cap_init_scattered(CPUID_12_EAX,
+>          ~~~~~~~~~~~~~~~~~~~~~~~~~~ ^~~~~~~~~~~~
+> arch/x86/kvm/cpuid.c:837:31: warning: implicit conversion from enumeration type 'enum kvm_only_cpuid_leafs' to different enumeration type 'enum cpuid_leafs' [-Wenum-conversion]
+>                  cpuid_entry_override(entry, CPUID_12_EAX);
+>                  ~~~~~~~~~~~~~~~~~~~~        ^~~~~~~~~~~~
+> 2 warnings generated.
 
-Too late, but I queued this anyway.
+Added this to the commit message, thanks!
 
 Paolo
-
-> 
->   arch/x86/kvm/cpuid.c | 5 +++--
->   arch/x86/kvm/cpuid.h | 2 +-
->   2 files changed, 4 insertions(+), 3 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-> index 96e41e1a1bde..e9d644147bf5 100644
-> --- a/arch/x86/kvm/cpuid.c
-> +++ b/arch/x86/kvm/cpuid.c
-> @@ -365,7 +365,7 @@ int kvm_vcpu_ioctl_get_cpuid2(struct kvm_vcpu *vcpu,
->   }
->   
->   /* Mask kvm_cpu_caps for @leaf with the raw CPUID capabilities of this CPU. */
-> -static __always_inline void __kvm_cpu_cap_mask(enum cpuid_leafs leaf)
-> +static __always_inline void __kvm_cpu_cap_mask(unsigned int leaf)
->   {
->   	const struct cpuid_reg cpuid = x86_feature_cpuid(leaf * 32);
->   	struct kvm_cpuid_entry2 entry;
-> @@ -378,7 +378,8 @@ static __always_inline void __kvm_cpu_cap_mask(enum cpuid_leafs leaf)
->   	kvm_cpu_caps[leaf] &= *__cpuid_entry_get_reg(&entry, cpuid.reg);
->   }
->   
-> -static __always_inline void kvm_cpu_cap_init_scattered(enum cpuid_leafs leaf, u32 mask)
-> +static __always_inline
-> +void kvm_cpu_cap_init_scattered(enum kvm_only_cpuid_leafs leaf, u32 mask)
->   {
->   	/* Use kvm_cpu_cap_mask for non-scattered leafs. */
->   	BUILD_BUG_ON(leaf < NCAPINTS);
-> diff --git a/arch/x86/kvm/cpuid.h b/arch/x86/kvm/cpuid.h
-> index eeb4a3020e1b..7bb4504a2944 100644
-> --- a/arch/x86/kvm/cpuid.h
-> +++ b/arch/x86/kvm/cpuid.h
-> @@ -236,7 +236,7 @@ static __always_inline void cpuid_entry_change(struct kvm_cpuid_entry2 *entry,
->   }
->   
->   static __always_inline void cpuid_entry_override(struct kvm_cpuid_entry2 *entry,
-> -						 enum cpuid_leafs leaf)
-> +						 unsigned int leaf)
->   {
->   	u32 *reg = cpuid_entry_get_reg(entry, leaf * 32);
->   
-> 
 
