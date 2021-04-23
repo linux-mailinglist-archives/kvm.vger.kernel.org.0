@@ -2,263 +2,117 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EA81D368A44
-	for <lists+kvm@lfdr.de>; Fri, 23 Apr 2021 03:16:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C445E368A70
+	for <lists+kvm@lfdr.de>; Fri, 23 Apr 2021 03:36:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235869AbhDWBN2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 22 Apr 2021 21:13:28 -0400
-Received: from aserp2120.oracle.com ([141.146.126.78]:55736 "EHLO
-        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231261AbhDWBN1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 22 Apr 2021 21:13:27 -0400
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
-        by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 13N18vb5157257;
-        Fri, 23 Apr 2021 01:12:48 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
- references : from : message-id : date : in-reply-to : content-type :
- content-transfer-encoding : mime-version; s=corp-2020-01-29;
- bh=O5U8ArhvyLh6wAXec+9qOeUCJKmQS+2hBuq9XtacwVg=;
- b=lsVuyleJFlQPbJ7bXQ4UkaHm5hdir0Aa4klBzqyCCvjT6Cvc4DlBHFjtKFeFjeN2V1ps
- kWb84unnx7nooaKV7tP3K0I9+OwvcIAHhLqQ0g5qAlyWfbQGKihEiHZBOR76+yD6WBCm
- sm23NfIwnpS6LSvJ3CYKmNhBRMj22Zuj67PiU0UXs6gbM7B5xzZIfQBfvcNrJWGTSyVp
- cP1YEfdsNgv1I7yDIGhMMFb0ADuP7Y34mmMT+5QJTEwzJm3CrHn/IStokBUe9yaQCWBM
- JgiPsIgPbkVGDqFLPC2LMhBa2BUyKXjARUV5YVKTCPtxeCSL4DsESKze+F9A1CRMSSs5 Fw== 
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
-        by aserp2120.oracle.com with ESMTP id 37yqmnq15g-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 23 Apr 2021 01:12:48 +0000
-Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
-        by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 13N0xsGq172113;
-        Fri, 23 Apr 2021 01:12:48 GMT
-Received: from nam12-mw2-obe.outbound.protection.outlook.com (mail-mw2nam12lp2042.outbound.protection.outlook.com [104.47.66.42])
-        by aserp3030.oracle.com with ESMTP id 383ccf1r67-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 23 Apr 2021 01:12:47 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=kSutsej2biPoxMKOT9Qwpdh6gZIICwzHK0A91Vdr2sPs0Lc8tTA+K2cmfv+M7dgZcwXPaEs9pu8xYqnaBrEg27zDg6EeFwhOvPL2XF3I7D1zjynm2K/MsWw7grBoYgvO6+CegpnOSSvb4iO4w6/+/WqqSmYwIj6pAJRw6aN2jefc6Pt59oAmT7KDwqMFvZNECEuHIfBqE3JjYGMhIFbqct/5lcrUQHHvMt8ZkUVRbORAru5APov0KQH3kUhhQ6gfY5RLIx+b4JJma96tnEssFoqPEUARsopxi4tmRO+U3htwqtPdVSoYri55rWKXr6wqtG4CtaI+HHFzEtebicQi1Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=O5U8ArhvyLh6wAXec+9qOeUCJKmQS+2hBuq9XtacwVg=;
- b=c8rYWBRVYGwB5D2Y18NEnmWs+xzlid5hKJy/SvRp2iB+8+P1hTl1bF9ZWAFSHJcyjCykWjF5G6IzqUzTiNJ19lus3r5pXEoBLE3zpplYJNSv41HHaWNHsgeUPWEqneZXREucOxlC7jmAhLKtF11IBUUnTRdkzg1TY0ZPWg0vRBHOXN91zesm4XNqhfNiowEsKB07TnAQd1ohpGdu511elbA9MTzb0BllCcLCyVxrwO7ERKg/uLGKbE4nAQ+3XuRU92dC5orA+NZXPJu1NMJ5aYnD8Rjy2XYvKrIUrpQT0UFXE2Hp8vu1fkDJe56J1593YpDLx/LjD3xg2/VjxFyVIA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=O5U8ArhvyLh6wAXec+9qOeUCJKmQS+2hBuq9XtacwVg=;
- b=EKNRcuubRs/JxtyBnm3z1yPvxNydV6nciDEg3Uv96HCKXKdpeqFokxUCMLW5QiAcU02Cc0pCfkJFyEBDizHk/36mdeoImcxH9IicE7N2PPeTCxYJdNRk53oAheSDQnU4nj82mcAByrSsREYqeFnGeVQDp1w54w3BAEIxCqjbyoQ=
-Authentication-Results: google.com; dkim=none (message not signed)
- header.d=none;google.com; dmarc=none action=none header.from=oracle.com;
-Received: from SN6PR10MB3021.namprd10.prod.outlook.com (2603:10b6:805:cc::19)
- by SN6PR10MB2560.namprd10.prod.outlook.com (2603:10b6:805:45::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4042.18; Fri, 23 Apr
- 2021 01:12:45 +0000
-Received: from SN6PR10MB3021.namprd10.prod.outlook.com
- ([fe80::5911:9489:e05c:2d44]) by SN6PR10MB3021.namprd10.prod.outlook.com
- ([fe80::5911:9489:e05c:2d44%5]) with mapi id 15.20.4042.024; Fri, 23 Apr 2021
- 01:12:44 +0000
-Subject: Re: [PATCH 3/7 v7] KVM: nSVM: No need to set bits 11:0 in MSRPM and
- IOPM bitmaps
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, jmattson@google.com
-References: <20210412215611.110095-1-krish.sadhukhan@oracle.com>
- <20210412215611.110095-4-krish.sadhukhan@oracle.com>
- <YH8y86iPBdTwMT18@google.com>
- <058d78b9-eddd-95d9-e519-528ad7f2e40a@oracle.com>
- <cb1bb583-b8ac-ab3a-2bc3-dd3b416ee0e7@oracle.com>
- <YIG6B+LBsRWcpftK@google.com>
-From:   Krish Sadhukhan <krish.sadhukhan@oracle.com>
-Message-ID: <a9f74546-6ab7-88fc-83d1-382b380f6264@oracle.com>
-Date:   Thu, 22 Apr 2021 18:12:41 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.0
-In-Reply-To: <YIG6B+LBsRWcpftK@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-Originating-IP: [2606:b400:8301:1010::16aa]
-X-ClientProxiedBy: SN7PR04CA0154.namprd04.prod.outlook.com
- (2603:10b6:806:125::9) To SN6PR10MB3021.namprd10.prod.outlook.com
- (2603:10b6:805:cc::19)
+        id S240012AbhDWBgr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 22 Apr 2021 21:36:47 -0400
+Received: from szxga06-in.huawei.com ([45.249.212.32]:17393 "EHLO
+        szxga06-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S239976AbhDWBgq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 22 Apr 2021 21:36:46 -0400
+Received: from DGGEMS402-HUB.china.huawei.com (unknown [172.30.72.59])
+        by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4FRGzR4CGGzlZ8N;
+        Fri, 23 Apr 2021 09:34:11 +0800 (CST)
+Received: from [10.174.187.224] (10.174.187.224) by
+ DGGEMS402-HUB.china.huawei.com (10.3.19.202) with Microsoft SMTP Server id
+ 14.3.498.0; Fri, 23 Apr 2021 09:36:05 +0800
+Subject: Re: [PATCH v4 1/2] kvm/arm64: Remove the creation time's mapping of
+ MMIO regions
+To:     Gavin Shan <gshan@redhat.com>
+References: <20210415140328.24200-1-zhukeqian1@huawei.com>
+ <20210415140328.24200-2-zhukeqian1@huawei.com>
+ <ad39c796-2778-df26-b0c6-231e7626a747@redhat.com>
+ <bd4d2cfc-37b9-f20a-5a5c-ed352d1a46dc@huawei.com>
+ <f13bfc39-bee6-4562-fefc-76051bbf9735@redhat.com>
+ <9eb47a6c-3c5c-cb4a-d1de-1a3ce1b60a87@huawei.com>
+ <d185bbe1-4bb3-6a38-7a94-b0c52126e583@redhat.com>
+CC:     <linux-kernel@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>, <kvm@vger.kernel.org>,
+        <kvmarm@lists.cs.columbia.edu>, Marc Zyngier <maz@kernel.org>,
+        Santosh Shukla <sashukla@nvidia.com>
+From:   Keqian Zhu <zhukeqian1@huawei.com>
+Message-ID: <f521c845-610f-3efc-1713-9a01fb26f22f@huawei.com>
+Date:   Fri, 23 Apr 2021 09:36:05 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
+ Thunderbird/45.7.1
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from localhost.localdomain (2606:b400:8301:1010::16aa) by SN7PR04CA0154.namprd04.prod.outlook.com (2603:10b6:806:125::9) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4065.21 via Frontend Transport; Fri, 23 Apr 2021 01:12:43 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 3c8b077b-5f51-40e4-fe17-08d905f4e5f0
-X-MS-TrafficTypeDiagnostic: SN6PR10MB2560:
-X-Microsoft-Antispam-PRVS: <SN6PR10MB25601520AD9B78DA8085457581459@SN6PR10MB2560.namprd10.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:7691;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: yyIebktkNQo+oLW3HSlDGLj0CEJk29vbkxRwqDvk4bBHaUEeXoKQvdORYarGvvXHMX1lys0Egu1/r9CfABefu00dRaT6f7ojSvgMS3aDvjFhveOPxRD7DizwdJn+PSonOb22oBVQ62vx5VTxwlBbxz+guI9zJiW8/YAwMtb+v1Zje7BDUvfSJzE+2foBO33jkNigLR0ryKjNDh0qGZqO8TdXswEiMygOvHt+6IqpZJLZpbrRAUNMsRmW4a2WP4vI18qx9z1qkYHHPZUuT+hT3tUopOFiLQ7vzkzQ2T+CBT2iyIegKCJqPu11UXczKKv0PfwF0hNFK1CN1mwXPVHThacNCI791b49ek60hgmOPcupUHY6kJNeJCbeX2ETiCbiGVlV0zVrrZpK5x38ZOkeBWW5mAJgcNBpZ9P5Lx90feNIR05f0C2B4SfPHhmsnQpsAEt04/TCQY8KG5JYYx1dL2zxrGojVFQy8wzfaY6yq2wL7zAwMYwga1u1BRfdT+hpmjlYuhOeJvL3qiIcCSW4azuO5wR73Tpl1FX03/o6yv/QqfBFn6S6/yzsLO0d7QuTumPe99ihEGUXlTurHrq89DurLq6guflNZzKR4RZ4h3i9m7j6vt0YTUm96iRBsMEjCs2lnhuEFo/SykqKVIDvWiWcwVq9f7xsLiDYT9oS6iEBdFpHgduJwtwKMAXeY2kP
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR10MB3021.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(136003)(376002)(366004)(396003)(346002)(39860400002)(2616005)(8676002)(316002)(5660300002)(2906002)(66556008)(66476007)(6506007)(86362001)(38100700002)(8936002)(6916009)(31686004)(478600001)(6512007)(6486002)(66946007)(4326008)(36756003)(16526019)(53546011)(186003)(44832011)(83380400001)(31696002)(43740500002)(45980500001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: =?utf-8?B?MkwvNHJkb3Bvc2U1bVVXejlRd2x0MXhmMS9VdVpzSVJNaHJ0bjdOTnhvQzJX?=
- =?utf-8?B?dFRzcEhRZEtmSDd4ejlibDNLRnFoTTgyWm9uSUw3bDlwNFRsdnlMT3hUM2M4?=
- =?utf-8?B?cTJNb0FDaXkyaHFZK2R6ZFc2cGJoeTBNWkhGY0YrTCtsODIxenBNR28zZHd0?=
- =?utf-8?B?QThDQm9GdXUxb2Mxb2F2KzIyZHcvcHVPUG5pT2kvbjRnTHhrbFN6cUlnd2xm?=
- =?utf-8?B?aFdHb3RuOHA5S3paVFJDMW9KSmFOL04zOVAreTVpeno3OHVBZDR6NUlOMDV5?=
- =?utf-8?B?VHZjcW5xUzdFaGlhTkQxRFNic0w5THVHcVpLZXI3WkM2K2VsOThYVlZpc2Vj?=
- =?utf-8?B?YWtiU25IelJkdEQyZzdiN3RmZnNIa0l5QXBHa1BuQVF1VVkrZ0ZPR29qcEhu?=
- =?utf-8?B?L3Z3emszMEdobDBCc2dmVXZEWjhEQjZ5b04xbE9pdVhTamFUMEFTNWx3UWlk?=
- =?utf-8?B?UHhCZzhaTTl3NUtpUlR2REFlMXhWWFNDZy84ZzJLZ09udHoxRDY1eHg1aXBC?=
- =?utf-8?B?Z1BMYSt3R05MMTB2RWtOOFdGWk1QZ1NDbW10Qy9PekdSOHlRRWRsZGtCcTdy?=
- =?utf-8?B?Vks5TmRsYWNJUHJyemd3WWx3S0xPUzl4cm05aGtLNEZKTjMzM0Y2QUNqZzY3?=
- =?utf-8?B?Z2w5YmtGT0RqNzhtTm41ZlpYZnNINmNicGFkMytLT3pacjRwN0ZKMzVZbmZ2?=
- =?utf-8?B?QWtnL2JNelR2Yitpem1UT0RRckJtdy9NcGZOTHRVZ2VZc3hCS3pmZ1h4N3Fw?=
- =?utf-8?B?Q2dJSFZtcCt1N0pINFAyVTFVbzhzL0RKOXhVUjR4eEwyeE9OSWkvelBZTUt4?=
- =?utf-8?B?VmFVdU9HVmZla0V1N05RYmtIU3YrY1dFTEF1a2VtUy9lK04xaUdzNVpxQjBL?=
- =?utf-8?B?cUNCRTNwVkJHdlF0SVRSZW41cHBFb280RVMzdUZQSG52dnpHbFVnaE5oZEtk?=
- =?utf-8?B?TG9wMEFMZVhVQnZ4bmN2SE05VTJGOGxUMUFSMnNkcmt5VFNTbU5SbHhhaDBM?=
- =?utf-8?B?UXNvbHJQQ0d0V3p4eExJZ2RqM2hoTko4YjlWODJMZXo2a0JoRThwdG01Y3pE?=
- =?utf-8?B?dzNqVnpFTkhJWFQwclk5Y05naU4yMWFHOFNPblJnS1ZOTi83R0lscTdqTUJO?=
- =?utf-8?B?QWRjUHlidVlMWlZ2Q01ZY1RreDZHVWZsNkw2T3J6SGVwREVxYzg0bS9QeS9B?=
- =?utf-8?B?dmhnblVqZFFtVlh3QkVMMzRsRUJNL0EreGlXN0lsUm1TNnp2VCttbXB5NEgv?=
- =?utf-8?B?YjZqVGQ5NVdJblBkUlg4VmlFY0x0a00zbTdBVkhUcFJXMlpyWktHZURqekNX?=
- =?utf-8?B?Z3FSMTYrTjUxMkVCR2tsTk9wTEhyQnV5di9aOE9ZUUE0dnZjWDlWOWpFNVNv?=
- =?utf-8?B?ZzNQNnYzNzdtU2pFRHBwQmNOK2MxOVJMckVDb2s0UkpUS2R1ZzhZQnNCQkVX?=
- =?utf-8?B?WmQ5QjhVeXdrcm1mZWhTcWR2Nm1HSklXaXVlK1B3UzBKajdpNjZQOWlHQ0wr?=
- =?utf-8?B?R0hScS9RTG9MOG1YVEhLbTRrazByMWVydlBOczN3REFudFRXeHcyeGdZaW1I?=
- =?utf-8?B?VitXSks1NXpRSldSY0EzeGFGRHBqTm5WaVBVZzBpZzdabm01RWdMZHpIOFo3?=
- =?utf-8?B?VTVaMFdnandrcFVZSDVmZnd0RHRtbzkxM0ZXSklCUUtiQ2NQQjlmc1Z6dzRQ?=
- =?utf-8?B?RnF6bEdOSzlJVTl0d2c2RS9VM0dVQ3d0OEh1NTJ5WXBydUxpZU42U3B0cTZ6?=
- =?utf-8?B?QzYvWENWUjVLekJRM0ZiQXpXTXh5dHp4b3VLZm10NXY5cjJQelpZSjBvTWtX?=
- =?utf-8?B?RGRvaHhJUkJFYWNGTjZIQT09?=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3c8b077b-5f51-40e4-fe17-08d905f4e5f0
-X-MS-Exchange-CrossTenant-AuthSource: SN6PR10MB3021.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Apr 2021 01:12:43.9649
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: TZzcePraoJkVp/5sNsOiSPTIK0NSoPVkfATrPgpBdh506967586zGHD8p12XZOmU//BVInwaRmUj+Glh8qzHfBpSicbMpJRB88F89rh1syU=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN6PR10MB2560
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=9962 signatures=668683
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 spamscore=0 suspectscore=0
- mlxscore=0 phishscore=0 malwarescore=0 adultscore=0 mlxlogscore=999
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2104060000
- definitions=main-2104230003
-X-Proofpoint-ORIG-GUID: jGBepJbZZiX8w-Kp2fK0DQTgHXLydY6K
-X-Proofpoint-GUID: jGBepJbZZiX8w-Kp2fK0DQTgHXLydY6K
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=9962 signatures=668683
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 mlxscore=0 adultscore=0
- impostorscore=0 spamscore=0 malwarescore=0 clxscore=1015
- lowpriorityscore=0 priorityscore=1501 suspectscore=0 mlxlogscore=999
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2104060000 definitions=main-2104230004
+In-Reply-To: <d185bbe1-4bb3-6a38-7a94-b0c52126e583@redhat.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.174.187.224]
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Hi Gavin,
 
-On 4/22/21 11:01 AM, Sean Christopherson wrote:
-> On Thu, Apr 22, 2021, Krish Sadhukhan wrote:
->> On 4/22/21 10:50 AM, Krish Sadhukhan wrote:
->>> On 4/20/21 1:00 PM, Sean Christopherson wrote:
->>>> On Mon, Apr 12, 2021, Krish Sadhukhan wrote:
->>>>> According to APM vol 2, hardware ignores the low 12 bits in
->>>>> MSRPM and IOPM
->>>>> bitmaps. Therefore setting/unssetting these bits has no effect
->>>>> as far as
->>>>> VMRUN is concerned. Also, setting/unsetting these bits prevents
->>>>> tests from
->>>>> verifying hardware behavior.
->>>>>
->>>>> Signed-off-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
->>>>> ---
->>>>>    arch/x86/kvm/svm/nested.c | 2 --
->>>>>    1 file changed, 2 deletions(-)
->>>>>
->>>>> diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
->>>>> index ae53ae46ebca..fd42c8b7f99a 100644
->>>>> --- a/arch/x86/kvm/svm/nested.c
->>>>> +++ b/arch/x86/kvm/svm/nested.c
->>>>> @@ -287,8 +287,6 @@ static void
->>>>> nested_load_control_from_vmcb12(struct vcpu_svm *svm,
->>>>>          /* Copy it here because nested_svm_check_controls will
->>>>> check it.  */
->>>>>        svm->nested.ctl.asid           = control->asid;
->>>>> -    svm->nested.ctl.msrpm_base_pa &= ~0x0fffULL;
->>>>> -    svm->nested.ctl.iopm_base_pa  &= ~0x0fffULL;
->>>> This will break nested_svm_vmrun_msrpm() if L1 passes an unaligned
->>>> address.
->>>> The shortlog is also wrong, KVM isn't setting bits, it's clearing bits.
->>>>
->>>> I also don't think svm->nested.ctl.msrpm_base_pa makes its way to
->>>> hardware; IIUC,
->>>> it's a copy of vmcs12->control.msrpm_base_pa.  The bitmap that gets
->>>> loaded into
->>>> the "real" VMCB is vmcb02->control.msrpm_base_pa.
+On 2021/4/23 9:35, Gavin Shan wrote:
+> Hi Keqian,
+> 
+> On 4/22/21 5:41 PM, Keqian Zhu wrote:
+>> On 2021/4/22 10:12, Gavin Shan wrote:
+>>> On 4/21/21 4:28 PM, Keqian Zhu wrote:
+>>>> On 2021/4/21 14:38, Gavin Shan wrote:
+>>>>> On 4/16/21 12:03 AM, Keqian Zhu wrote:
+> 
+> [...]
+> 
 >>>
->>> Not sure if there's a problem with my patch as such, but upon inspecting
->>> the code, I see something missing:
+>>> Yeah, Sorry that I missed that part. Something associated with Santosh's
+>>> patch. The flag can be not existing until the page fault happened on
+>>> the vma. In this case, the check could be not working properly.
 >>>
->>>      In nested_load_control_from_vmcb12(), we are not really loading
->>> msrpm_base_pa from vmcb12 even     though the name of the function
->>> suggests so.
->>>
->>>      Then nested_vmcb_check_controls() checks msrpm_base_pa from
->>> 'nested.ctl' which doesn't have         the copy from vmcb12.
->>>
->>>      Then nested_vmcb02_prepare_control() prepares the vmcb02 copy of
->>> msrpm_base_pa from vmcb01.ptr->control.msrpm_base_pa.
->>>
->>>      Then nested_svm_vmrun_msrpm() uses msrpm_base_pa from 'nested.ctl'.
->>>
->>>
->>> Aren't we actually using msrpm_base_pa from vmcb01 instead of vmcb02 ?
+>>>    [PATCH] KVM: arm64: Correctly handle the mmio faulting
+>> Yeah, you are right.
 >>
->> Sorry, I meant to say,  "from vmcb01 instead of vmcb12"
-> The bitmap that's shoved into hardware comes from vmcb02, the bitmap that KVM
-> reads to merge into _that_ bitmap comes from vmcb12.
->
-> static bool nested_svm_vmrun_msrpm(struct vcpu_svm *svm)
-> {
-> 	/*
-> 	 * This function merges the msr permission bitmaps of kvm and the
-> 	 * nested vmcb. It is optimized in that it only merges the parts where
-> 	 * the kvm msr permission bitmap may contain zero bits
-> 	 */
-> 	int i;
->
-> 	if (!(vmcb_is_intercept(&svm->nested.ctl, INTERCEPT_MSR_PROT)))
-> 		return true;
->
-> 	for (i = 0; i < MSRPM_OFFSETS; i++) {
-> 		u32 value, p;
-> 		u64 offset;
->
-> 		if (msrpm_offsets[i] == 0xffffffff)
-> 			break;
->
-> 		p      = msrpm_offsets[i];
-> 		offset = svm->nested.ctl.msrpm_base_pa + (p * 4);
->
-> 		if (kvm_vcpu_read_guest(&svm->vcpu, offset, &value, 4)) <- This reads vmcb12
-> 			return false;
->
-> 		svm->nested.msrpm[p] = svm->msrpm[p] | value; <- Merge vmcb12's bitmap to KVM's bitmap for L2
-> 	}
->
-> 	svm->vmcb->control.msrpm_base_pa = __sme_set(__pa(svm->nested.msrpm)); <- This is vmcb02
->
-> 	return true;
-> }
+>> If that happens, we won't try to use block mapping for memslot with VM_PFNMAP.
+>> But it keeps a same logic with old code.
+>>
+>> 1. When without dirty-logging, we won't try block mapping for it, and we'll
+>> finally know that it's device, so won't try to do adjust THP (Transparent Huge Page)
+>> for it.
+>> 2. If userspace wrongly enables dirty logging for this memslot, we'll force_pte for it.
+>>
+> 
+> It's not about the patch itself and just want more discussion to get more details.
+> The patch itself looks good to me. I got two questions as below:
+> 
+> (1) The memslot fails to be added if it's backed by MMIO region and dirty logging is
+> enabled in kvm_arch_prepare_memory_region(). As Santosh reported, the corresponding
+> vma could be associated with MMIO region and VM_PFNMAP is missed. In this case,
+> kvm_arch_prepare_memory_region() isn't returning error, meaning the memslot can be
+> added successfully and block mapping isn't used, as you mentioned. The question is
+> the memslot is added, but the expected result would be failure.
+Sure. I think we could try to populate the final flag of vma in kvm_arch_prepare_memory_region().
+Maybe through GUP or any better method? It's nice if you can try to solve this. :)
 
-Sorry, I somehow missed the call to copy_vmcb_control_area() in 
-nested_load_control_from_vmcb12() where we are actually getting the 
-msrpm_base_pa from vmcb12. Thanks for the explanation.
+> 
+> (2) If dirty logging is enabled on the MMIO memslot, everything should be fine. If
+> the dirty logging isn't enabled and VM_PFNMAP isn't set yet in user_mem_abort(),
+> block mapping won't be used and PAGE_SIZE is picked, but the failing IPA might
+> be good candidate for block mapping. It means we miss something for blocking
+> mapping?
+Right. This issue also can be solved by populating the final flag of vma in kvm_arch_prepare_memory_region().
 
-Getting back to your concern that this patch breaks 
-nested_svm_vmrun_msrpm().  If L1 passes a valid address in which some 
-bits in 11:0 are set, the hardware is anyway going to ignore those bits, 
-irrespective of whether we clear them (before my patch) or pass them as 
-is (my patch) and therefore what L1 thinks as a valid address will 
-effectively be an invalid address to the hardware. The only difference 
-my patch makes is it enables tests to verify hardware behavior. Am 
-missing something ?
 
+> 
+> By the way, do you have idea why dirty logging can't be enabled on MMIO memslot?
+IIUC, MMIO region is of device memory type, it's associated with device state and action.
+For normal memory type, we can write it out-of-order and repeatedly, but for device memory
+type, we can't do that. The write to MMIO will trigger device action based on current device
+state, also what we can read from MMIO based on current device state. Thus the policy of
+dirty logging for normal memory can't be applied to MMIO.
+
+
+
+> I guess Marc might know the history. For example, QEMU is taking "/dev/mem" or
+> "/dev/kmem" to back guest's memory, the vma is marked as MMIO, but dirty logging
+> and migration isn't supported?
+The MMIO region is a part of device state. We need extra kernel driver to support migration
+of pass-through device, as how to save and restore the device state is closely related to
+a specific type of device. You can refer VFIO migration for more detail.
+
+Thanks,
+Keqian
