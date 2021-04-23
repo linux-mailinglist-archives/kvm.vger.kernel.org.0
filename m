@@ -2,99 +2,136 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 76E19368DA5
-	for <lists+kvm@lfdr.de>; Fri, 23 Apr 2021 09:09:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E6960368DB7
+	for <lists+kvm@lfdr.de>; Fri, 23 Apr 2021 09:11:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240868AbhDWHJj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 23 Apr 2021 03:09:39 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:52769 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229456AbhDWHJg (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 23 Apr 2021 03:09:36 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1619161740;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Q8ibsUJr2Xw/0Bx+47uUdT7BpjL9CbRIh33qYka8yhk=;
-        b=G63DP9uNTp1EdHBbtthf0ZcBi3qp0brUoYzACYBg1UqxQVvmo4qAZv+GxzfLQJqrTvDRLZ
-        r0ecJlY7Pax0uZpNV/S6ryCxs078lJ5UNgktz1j5tJqZthgV1MC9GicA6aKzQDCrK67ydv
-        5MITLMRsBDxP7nZ8tG86s1OByUYDxmg=
-Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
- [209.85.218.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-84-Ajmon8ElO2eRHuH2cZVIyA-1; Fri, 23 Apr 2021 03:08:58 -0400
-X-MC-Unique: Ajmon8ElO2eRHuH2cZVIyA-1
-Received: by mail-ej1-f72.google.com with SMTP id x21-20020a1709064bd5b029037c44cb861cso8032755ejv.4
-        for <kvm@vger.kernel.org>; Fri, 23 Apr 2021 00:08:58 -0700 (PDT)
+        id S241033AbhDWHMO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 23 Apr 2021 03:12:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58688 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S240743AbhDWHMO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 23 Apr 2021 03:12:14 -0400
+Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC723C061574;
+        Fri, 23 Apr 2021 00:11:36 -0700 (PDT)
+Received: by mail-pj1-x102a.google.com with SMTP id lr7so6497008pjb.2;
+        Fri, 23 Apr 2021 00:11:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id;
+        bh=HqJMjNWqtxCZEtFIyBmota7lpGm+rHS29SEa78vm9uw=;
+        b=nKpRcIzrlcMWE/JIaAcQTt+sIk18JhHn3VNFy/+7A9crEFQKaRl/4ybysLR+RyzWLv
+         JADj1GVyf+KH+Urzx3u5AYD/LI3Am90W0VLjwrlqt1MjdYsxAFsNg6wRnBOldXFZU6op
+         pjdemQY94oHgbZbVAKj7ozhdOvRP1FBzfUuQekdQroOA4QtwScShv5ana/u+uckRBjjq
+         NuJMKjOA0AGJii22hwhKlFmiql0z2ZNaQjCiH2+qSTfElfbYBC6oFqSeNBptRfzyR1mf
+         HP6rCBZDhI6XTyQOMpc/OrXgtVfp0CEmEjd+zeLTrUNlmOpIysxCHKhEvkvOyO476Jwv
+         h0rA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=Q8ibsUJr2Xw/0Bx+47uUdT7BpjL9CbRIh33qYka8yhk=;
-        b=SqJBEQOZEEqFqOEpPiJdTZL+u/n8nYwf+5QfZBZGryjFkgSIiemVvb23wg+Y8TBh6v
-         46EdkUh7EZg/0V8Qj2s18JQqUvCbU86rxGFjCrqpgwHQnD682PMf1f1PWjsInSallKln
-         Y1V+t2t4SobYZi6pK0Ov+aUfvYNzho0U92auNOQlCh2wVwNRkaeJAPIlnJvLVP2avEuD
-         yadA+F0lzfPKr3DakkLTeBn428L+v8BHyFSOHcpVcMvx8S5PVX8P2fY2R/PmMNSLoJkA
-         WmTqelHYYi+hDFBWiaAWEBI2uMj9veKk38kJZyuCrHB/KCVDpmyAXwdsipvKV+oedQCI
-         /CxA==
-X-Gm-Message-State: AOAM532wQrUmjdlrYDDwSRB+HWKG9N92TIpZddd9U6LVKq1vpKU0sFjn
-        ntX3+1pFXy81PaVPcuPde86Xw4PCBM2wD/hJGy4g81thjs9u/BDZ8zG6L4HE6uri5lWlOofRfOl
-        1NzLaU/nn8BI+
-X-Received: by 2002:a17:906:8407:: with SMTP id n7mr2602602ejx.264.1619161737479;
-        Fri, 23 Apr 2021 00:08:57 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwKqvDTxTMHU32SuNhtPSengJjdOtcKbAFGUrVKJrR2v+QuY2jmt97ToVycVtIsglBSI71ryw==
-X-Received: by 2002:a17:906:8407:: with SMTP id n7mr2602582ejx.264.1619161737244;
-        Fri, 23 Apr 2021 00:08:57 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id p4sm3890045edr.43.2021.04.23.00.08.56
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 23 Apr 2021 00:08:56 -0700 (PDT)
-Subject: Re: [PATCH v5 03/15] KVM: SVM: Disable SEV/SEV-ES if NPT is disabled
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Dave Hansen <dave.hansen@linux.intel.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Wei Huang <wei.huang2@amd.com>,
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=HqJMjNWqtxCZEtFIyBmota7lpGm+rHS29SEa78vm9uw=;
+        b=qdDK7zNTxo6uR5OV0rzMfXfeBFsIMUnoFNygU4NRVJpkZ/2rU7xMcNDYZugKcDNYcH
+         6wDP49raSaGd8hPyJGRcxHZ/DNSN/P997XIuuy5g2uncfIJ4HOQuqHSzT/RGyhRTzwQ8
+         vx5CZDws/JlvohgZWs7bJPtbNjr+22bKAU9PBXQwQ2PdhEthtHuQl7DGyXzZ/0rxpI5+
+         CBwLh5oLuhHV7ikqWJCXMk0VFVqxoJnxU8OpESnXpywtEEpeJVi+yijW4x/g/uXdPpmm
+         BQQtnWQyEJgE9UtvizNuH6T6TxeYP+56p5vUzg8TFHMn3s8UJX9XhkK4hrP3+io/06qL
+         8Ttg==
+X-Gm-Message-State: AOAM530+Qv7OphOFLrhmPZwrq9fe2t36HcaxCIID36CgjN4Q2Pgc2scG
+        2287NhsCo9hxkFNWk0eqH1T4g1BW7pM=
+X-Google-Smtp-Source: ABdhPJwD5pvvAJW0GH6EobdDrhDTk3dYtqLbuFADme2Js6GZdjV8gfbMGPInO9bDebAZqhHaFrR4hQ==
+X-Received: by 2002:a17:90b:e0b:: with SMTP id ge11mr4219103pjb.127.1619161896302;
+        Fri, 23 Apr 2021 00:11:36 -0700 (PDT)
+Received: from localhost.localdomain ([103.7.29.6])
+        by smtp.googlemail.com with ESMTPSA id gj13sm6605427pjb.57.2021.04.23.00.11.33
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 23 Apr 2021 00:11:35 -0700 (PDT)
+From:   Wanpeng Li <kernellwp@gmail.com>
+X-Google-Original-From: Wanpeng Li <wanpengli@tencent.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Borislav Petkov <bp@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Brijesh Singh <brijesh.singh@amd.com>
-References: <20210422021125.3417167-1-seanjc@google.com>
- <20210422021125.3417167-4-seanjc@google.com>
- <5e8a2d7d-67de-eef4-ab19-33294920f50c@redhat.com>
- <YIGhC/1vlIAZfwzm@google.com>
- <882d8bb4-8d40-1b4d-0742-4a4f2c307e5b@redhat.com>
- <YIG8Ythi0UIbO+Up@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <0a00ee34-965a-0ee1-1e2c-7fda8e21ec9e@redhat.com>
-Date:   Fri, 23 Apr 2021 09:08:55 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.7.0
-MIME-Version: 1.0
-In-Reply-To: <YIG8Ythi0UIbO+Up@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+        Joerg Roedel <joro@8bytes.org>
+Subject: [PATCH] KVM: x86/xen: Take srcu lock when accessing kvm_memslots()
+Date:   Fri, 23 Apr 2021 15:11:23 +0800
+Message-Id: <1619161883-5963-1-git-send-email-wanpengli@tencent.com>
+X-Mailer: git-send-email 2.7.4
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 22/04/21 20:11, Sean Christopherson wrote:
->> Yes, you're right.  NPT is easy but we would have to guess what the spec
->> would say about MAXPHYADDR, while nNPT would require the stacking of a PML5.
->> Either way, blocking KVM is the easiest thing todo.
-> How about I fold that into the s/lm_root/pml4_root rename[*]?  I.e. make the
-> blocking of PML5 a functional change, and the rename an opportunistic change?
-> 
-> [*]https://lkml.kernel.org/r/20210318201131.3242619-1-seanjc@google.com
-> 
+From: Wanpeng Li <wanpengli@tencent.com>
 
-Yes, that's a good plan.  Thanks,
+kvm_memslots() will be called by kvm_write_guest_offset_cached() so 
+take the srcu lock.
 
-Paolo
+Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
+---
+ arch/x86/kvm/xen.c | 18 ++++++++++++++----
+ 1 file changed, 14 insertions(+), 4 deletions(-)
+
+diff --git a/arch/x86/kvm/xen.c b/arch/x86/kvm/xen.c
+index ae17250..d0df782 100644
+--- a/arch/x86/kvm/xen.c
++++ b/arch/x86/kvm/xen.c
+@@ -96,6 +96,7 @@ void kvm_xen_update_runstate_guest(struct kvm_vcpu *v, int state)
+ 	struct kvm_vcpu_xen *vx = &v->arch.xen;
+ 	uint64_t state_entry_time;
+ 	unsigned int offset;
++	int idx;
+ 
+ 	kvm_xen_update_runstate(v, state);
+ 
+@@ -133,10 +134,16 @@ void kvm_xen_update_runstate_guest(struct kvm_vcpu *v, int state)
+ 	BUILD_BUG_ON(sizeof(((struct compat_vcpu_runstate_info *)0)->state_entry_time) !=
+ 		     sizeof(state_entry_time));
+ 
++	/*
++	 * Take the srcu lock as memslots will be accessed to check the gfn
++	 * cache generation against the memslots generation.
++	 */
++	idx = srcu_read_lock(&v->kvm->srcu);
++
+ 	if (kvm_write_guest_offset_cached(v->kvm, &v->arch.xen.runstate_cache,
+ 					  &state_entry_time, offset,
+ 					  sizeof(state_entry_time)))
+-		return;
++		goto out;
+ 	smp_wmb();
+ 
+ 	/*
+@@ -154,7 +161,7 @@ void kvm_xen_update_runstate_guest(struct kvm_vcpu *v, int state)
+ 					  &vx->current_runstate,
+ 					  offsetof(struct vcpu_runstate_info, state),
+ 					  sizeof(vx->current_runstate)))
+-		return;
++		goto out;
+ 
+ 	/*
+ 	 * Write the actual runstate times immediately after the
+@@ -173,7 +180,7 @@ void kvm_xen_update_runstate_guest(struct kvm_vcpu *v, int state)
+ 					  &vx->runstate_times[0],
+ 					  offset + sizeof(u64),
+ 					  sizeof(vx->runstate_times)))
+-		return;
++		goto out;
+ 
+ 	smp_wmb();
+ 
+@@ -186,7 +193,10 @@ void kvm_xen_update_runstate_guest(struct kvm_vcpu *v, int state)
+ 	if (kvm_write_guest_offset_cached(v->kvm, &v->arch.xen.runstate_cache,
+ 					  &state_entry_time, offset,
+ 					  sizeof(state_entry_time)))
+-		return;
++		goto out;
++
++out:
++	srcu_read_unlock(&v->kvm->srcu, idx);
+ }
+ 
+ int __kvm_xen_has_interrupt(struct kvm_vcpu *v)
+-- 
+2.7.4
 
