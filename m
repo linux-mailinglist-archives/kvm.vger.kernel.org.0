@@ -2,111 +2,123 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4AE3B368F4A
-	for <lists+kvm@lfdr.de>; Fri, 23 Apr 2021 11:24:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6334C368F6C
+	for <lists+kvm@lfdr.de>; Fri, 23 Apr 2021 11:33:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230339AbhDWJY6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 23 Apr 2021 05:24:58 -0400
-Received: from smtp-fw-33001.amazon.com ([207.171.190.10]:38107 "EHLO
-        smtp-fw-33001.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229939AbhDWJY5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 23 Apr 2021 05:24:57 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1619169862; x=1650705862;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=MmetagU797mHfH+rqMJ7bdU2UjwXQjjYyjhXUU6aeSM=;
-  b=jvKDcDXfY5JGPHahebd/r4LACHuHVTBrWuSIV6UKvHi1PhoeNEzqu4pO
-   xgUwd7SydOjQCwY/4Pk4o9FHzBsdiLptdS+vHZg5E1tzioSsIRH9pQxvu
-   EJzrMhkKBDhumrzfz2lv+qwPKpywzdbWWZceOjFfOC0cDXBvvQTgl0RyO
-   Y=;
-X-IronPort-AV: E=Sophos;i="5.82,245,1613433600"; 
-   d="scan'208";a="121015296"
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO email-inbound-relay-1e-c7c08562.us-east-1.amazon.com) ([10.25.36.214])
-  by smtp-border-fw-33001.sea14.amazon.com with ESMTP; 23 Apr 2021 09:24:14 +0000
-Received: from EX13MTAUWC002.ant.amazon.com (iad12-ws-svc-p26-lb9-vlan2.iad.amazon.com [10.40.163.34])
-        by email-inbound-relay-1e-c7c08562.us-east-1.amazon.com (Postfix) with ESMTPS id 0478A240A64;
-        Fri, 23 Apr 2021 09:24:09 +0000 (UTC)
-Received: from EX13D20UWC001.ant.amazon.com (10.43.162.244) by
- EX13MTAUWC002.ant.amazon.com (10.43.162.240) with Microsoft SMTP Server (TLS)
- id 15.0.1497.2; Fri, 23 Apr 2021 09:24:09 +0000
-Received: from [10.95.82.45] (10.43.160.119) by EX13D20UWC001.ant.amazon.com
- (10.43.162.244) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Fri, 23 Apr
- 2021 09:24:05 +0000
-Message-ID: <224d266e-aea3-3b4b-ec25-7bb120c4d98a@amazon.com>
-Date:   Fri, 23 Apr 2021 11:24:04 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:88.0)
- Gecko/20100101 Thunderbird/88.0
-Subject: Re: [PATCH] KVM: hyper-v: Add new exit reason HYPERV_OVERLAY
-Content-Language: en-US
-To:     Siddharth Chandrasekaran <sidcha@amazon.de>,
-        Paolo Bonzini <pbonzini@redhat.com>,
+        id S241717AbhDWJdz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 23 Apr 2021 05:33:55 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:25986 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229939AbhDWJdz (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 23 Apr 2021 05:33:55 -0400
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 13N94AmB183133;
+        Fri, 23 Apr 2021 05:32:42 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : references : mime-version : content-type :
+ in-reply-to; s=pp1; bh=ls43Bhvmg/av+jbLzz7/aLd4mS/CPGhhM61MlkiE+wA=;
+ b=NwPWHwKLP7omCZ97un+qBGPwWw6tF327tQ//x1W/lnYNfozPWng70eCSWCbyU0lHSa5R
+ BfQnR5yk6xSkek0ArDe0qUhY31ucxzLzZBlwt8g4LDqJz2fpnAzuJbng40okzQP37PWQ
+ Jt+UUjvKHq+JW3LuT9cTM0mRZZzZ+1j5naj0TYmxaCz8k9kQU0pIn8t/CcZPEyZoYllY
+ heOfYIDbWzWOPQuUz3J6k6KtAiJ+U8MuUZsjy+Ya+IGeixecWtQXbOeDqETRiHE4FS+6
+ m3QfhKGiqH1ie6dFl57oLbwLgdz0pcfA3ZB+GmiyAE/kTTtUIQpafdjwThRSaHaqaXaI kA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 383tqxswam-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 23 Apr 2021 05:32:42 -0400
+Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 13N9NUgn084705;
+        Fri, 23 Apr 2021 05:32:41 -0400
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 383tqxsw98-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 23 Apr 2021 05:32:41 -0400
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+        by ppma06ams.nl.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 13N9WQEx003330;
+        Fri, 23 Apr 2021 09:32:39 GMT
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
+        by ppma06ams.nl.ibm.com with ESMTP id 37yt2ru8ca-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 23 Apr 2021 09:32:39 +0000
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 13N9WaSZ44499336
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 23 Apr 2021 09:32:36 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 53C764C04A;
+        Fri, 23 Apr 2021 09:32:36 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id AB1A64C050;
+        Fri, 23 Apr 2021 09:32:35 +0000 (GMT)
+Received: from localhost (unknown [9.171.28.167])
+        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
+        Fri, 23 Apr 2021 09:32:35 +0000 (GMT)
+Date:   Fri, 23 Apr 2021 11:32:34 +0200
+From:   Vasily Gorbik <gor@linux.ibm.com>
+To:     Sven Schnelle <svens@linux.ibm.com>
+Cc:     Christian Borntraeger <borntraeger@de.ibm.com>,
         Sean Christopherson <seanjc@google.com>,
-        "Vitaly Kuznetsov" <vkuznets@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
-        "Jim Mattson" <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        "Thomas Gleixner" <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>,
-        "Borislav Petkov" <bp@alien8.de>, <x86@kernel.org>,
-        "H. Peter Anvin" <hpa@zytor.com>
-CC:     Evgeny Iakovlev <eyakovl@amazon.de>, Liran Alon <liran@amazon.com>,
-        Ioannis Aslanidis <iaslan@amazon.de>, <kvm@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>
-References: <20210423090333.21910-1-sidcha@amazon.de>
-From:   Alexander Graf <graf@amazon.com>
-In-Reply-To: <20210423090333.21910-1-sidcha@amazon.de>
-X-Originating-IP: [10.43.160.119]
-X-ClientProxiedBy: EX13D17UWB001.ant.amazon.com (10.43.161.252) To
- EX13D20UWC001.ant.amazon.com (10.43.162.244)
-Content-Type: text/plain; charset="utf-8"; format="flowed"
-Content-Transfer-Encoding: base64
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Michael Tokarev <mjt@tls.msk.ru>,
+        Heiko Carstens <heiko.carstens@de.ibm.com>
+Subject: Re: [PATCH v3 9/9] KVM: Move instrumentation-safe annotations for
+ enter/exit to x86 code
+Message-ID: <your-ad-here.call-01619170354-ext-2090@work.hours>
+References: <20210415222106.1643837-1-seanjc@google.com>
+ <20210415222106.1643837-10-seanjc@google.com>
+ <0c74158d-279a-5afa-0778-822c77ac8dc2@de.ibm.com>
+ <yt9d4kfypeov.fsf@linux.ibm.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <yt9d4kfypeov.fsf@linux.ibm.com>
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: CVTcfdrAiltuMym0SPDmpYabxyQpO3oV
+X-Proofpoint-GUID: nlrBmLBZz6P_QB0L9eVTwnmkvBPwdEXC
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.761
+ definitions=2021-04-22_15:2021-04-22,2021-04-22 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 clxscore=1011
+ adultscore=0 spamscore=0 priorityscore=1501 phishscore=0 malwarescore=0
+ impostorscore=0 suspectscore=0 mlxscore=0 mlxlogscore=999
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2104060000 definitions=main-2104230058
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-CgpPbiAyMy4wNC4yMSAxMTowMywgU2lkZGhhcnRoIENoYW5kcmFzZWthcmFuIHdyb3RlOgo+IEh5
-cGVyY2FsbCBjb2RlIHBhZ2UgaXMgc3BlY2lmaWVkIGluIHRoZSBIeXBlci1WIFRMRlMgdG8gYmUg
-YW4gb3ZlcmxheQo+IHBhZ2UsIGllLiwgZ3Vlc3QgY2hvb3NlcyBhIEdQQSBhbmQgdGhlIGhvc3Qg
-X3BsYWNlc18gYSBwYWdlIGF0IHRoYXQKPiBsb2NhdGlvbiwgbWFraW5nIGl0IHZpc2libGUgdG8g
-dGhlIGd1ZXN0IGFuZCB0aGUgZXhpc3RpbmcgcGFnZSBiZWNvbWVzCj4gaW5hY2Nlc3NpYmxlLiBT
-aW1pbGFybHkgd2hlbiBkaXNhYmxlZCwgdGhlIGhvc3Qgc2hvdWxkIF9yZW1vdmVfIHRoZQo+IG92
-ZXJsYXkgYW5kIHRoZSBvbGQgcGFnZSBzaG91bGQgYmVjb21lIHZpc2libGUgdG8gdGhlIGd1ZXN0
-Lgo+IAo+IEN1cnJlbnRseSBLVk0gZGlyZWN0bHkgcGF0Y2hlcyB0aGUgaHlwZXJjYWxsIGNvZGUg
-aW50byB0aGUgZ3Vlc3QgY2hvc2VuCj4gR1BBLiBTaW5jZSB0aGUgZ3Vlc3Qgc2VsZG9tIG1vdmVz
-IHRoZSBoeXBlcmNhbGwgY29kZSBwYWdlIGFyb3VuZCwgaXQKPiBkb2Vzbid0IHNlZSBhbnkgcHJv
-YmxlbXMgZXZlbiB0aG91Z2ggd2UgYXJlIGNvcnJ1cHRpbmcgdGhlIGV4aXRpbmcgZGF0YQo+IGlu
-IHRoYXQgR1BBLgo+IAo+IFZTTSBBUEkgaW50cm9kdWNlcyBtb3JlIGNvbXBsZXggb3ZlcmxheSB3
-b3JrZmxvd3MgZHVyaW5nIFZUTCBzd2l0Y2hlcwo+IHdoZXJlIHRoZSBndWVzdCBzdGFydHMgdG8g
-ZXhwZWN0IHRoYXQgdGhlIGV4aXN0aW5nIHBhZ2UgaXMgaW50YWN0LiBUaGlzCj4gbWVhbnMgd2Ug
-bmVlZCBhIG1vcmUgZ2VuZXJpYyBhcHByb2FjaCB0byBoYW5kbGluZyBvdmVybGF5IHBhZ2VzOiBh
-ZGQgYQo+IG5ldyBleGl0IHJlYXNvbiBLVk1fRVhJVF9IWVBFUlZfT1ZFUkxBWSB0aGF0IGV4aXRz
-IHRvIHVzZXJzcGFjZSB3aXRoIHRoZQo+IGV4cGVjdGF0aW9uIHRoYXQgYSBwYWdlIGdldHMgb3Zl
-cmxhaWQgdGhlcmUuCgpJIGNhbiBzZWUgaG93IHRoYXQgbWF5IGdldCBpbnRlcmVzdGluZyBmb3Ig
-b3RoZXIgb3ZlcmxheSBwYWdlcyBsYXRlciwgCmJ1dCB0aGlzIG9uZSBpbiBwYXJ0aWN1bGFyIGlz
-IGp1c3QgYW4gTVNSIHdyaXRlLCBubz8gSXMgdGhlcmUgYW55IHJlYXNvbiAKd2UgY2FuJ3QganVz
-dCB1c2UgdGhlIHVzZXIgc3BhY2UgTVNSIGhhbmRsaW5nIGxvZ2ljIGluc3RlYWQ/CgpXaGF0J3Mg
-bWlzc2luZyB0aGVuIGlzIGEgd2F5IHRvIHB1bGwgdGhlIGhjYWxsIHBhZ2UgY29udGVudHMgZnJv
-bSBLVk0uIApCdXQgZXZlbiB0aGVyZSBJJ20gbm90IGNvbnZpbmNlZCB0aGF0IEtWTSBzaG91bGQg
-YmUgdGhlIHJlZmVyZW5jZSBwb2ludCAKZm9yIGl0cyBjb250ZW50cy4gSXNuJ3QgdXNlciBzcGFj
-ZSBpbiBhbiBhcyBnb29kIHBvc2l0aW9uIHRvIGFzc2VtYmxlIGl0PwoKPiAKPiBJbiB0aGUgaW50
-ZXJlc3Qgb2YgbWFpbnRhaW5nIHVzZXJzcGFjZSBleHBvc2VkIGJlaGF2aW91ciwgYWRkIGEgbmV3
-IEtWTQo+IGNhcGFiaWxpdHkgdG8gYWxsb3cgdGhlIFZNTXMgdG8gZW5hYmxlIHRoaXMgaWYgdGhl
-eSBjYW4gaGFuZGxlIHRoZQo+IGh5cGVyY2FsbCBwYWdlIGluIHVzZXJzcGFjZS4KPiAKPiBTaWdu
-ZWQtb2ZmLWJ5OiBTaWRkaGFydGggQ2hhbmRyYXNla2FyYW4gPHNpZGNoYUBhbWF6b24uZGU+Cj4g
-Cj4gQ1I6IGh0dHBzOi8vY29kZS5hbWF6b24uY29tL3Jldmlld3MvQ1ItNDkwMTEzNzkKClBsZWFz
-ZSByZW1vdmUgdGhpcyBsaW5lIGZyb20gdXBzdHJlYW0gc3VibWlzc2lvbnMgOikuCgo+IC0tLQo+
-ICAgYXJjaC94ODYvaW5jbHVkZS9hc20va3ZtX2hvc3QuaCB8ICA0ICsrKysKPiAgIGFyY2gveDg2
-L2t2bS9oeXBlcnYuYyAgICAgICAgICAgfCAyNSArKysrKysrKysrKysrKysrKysrKysrLS0tCj4g
-ICBhcmNoL3g4Ni9rdm0veDg2LmMgICAgICAgICAgICAgIHwgIDUgKysrKysKPiAgIGluY2x1ZGUv
-dWFwaS9saW51eC9rdm0uaCAgICAgICAgfCAxMCArKysrKysrKysrCgpZb3UncmUgbW9kaWZ5aW5n
-IC8gYWRkaW5nIGEgdXNlciBzcGFjZSBBUEkuIFBsZWFzZSBtYWtlIHN1cmUgdG8gdXBkYXRlIAp0
-aGUgZG9jdW1lbnRhdGlvbiBpbiBEb2N1bWVudGF0aW9uL3ZpcnQva3ZtL2FwaS5yc3Qgd2hlbiB5
-b3UgZG8gdGhhdC4KCgpBbGV4CgoKCkFtYXpvbiBEZXZlbG9wbWVudCBDZW50ZXIgR2VybWFueSBH
-bWJICktyYXVzZW5zdHIuIDM4CjEwMTE3IEJlcmxpbgpHZXNjaGFlZnRzZnVlaHJ1bmc6IENocmlz
-dGlhbiBTY2hsYWVnZXIsIEpvbmF0aGFuIFdlaXNzCkVpbmdldHJhZ2VuIGFtIEFtdHNnZXJpY2h0
-IENoYXJsb3R0ZW5idXJnIHVudGVyIEhSQiAxNDkxNzMgQgpTaXR6OiBCZXJsaW4KVXN0LUlEOiBE
-RSAyODkgMjM3IDg3OQoKCg==
+On Thu, Apr 22, 2021 at 04:38:24PM +0200, Sven Schnelle wrote:
+> Christian Borntraeger <borntraeger@de.ibm.com> writes:
+> 
+> > On 16.04.21 00:21, Sean Christopherson wrote:
+> >> Drop the instrumentation_{begin,end}() annonations from the common KVM
+> >> guest enter/exit helpers, and massage the x86 code as needed to preserve
+> >> the necessary annotations.  x86 is the only architecture whose transition
+> >> flow is tagged as noinstr, and more specifically, it is the only
+> >> architecture for which instrumentation_{begin,end}() can be non-empty.
+> >> No other architecture supports CONFIG_STACK_VALIDATION=y, and s390
+> >> is the
+> >> only other architecture that support CONFIG_DEBUG_ENTRY=y.  For
+> >> instrumentation annontations to be meaningful, both aformentioned configs
+> >> must be enabled.
+> >> Letting x86 deal with the annotations avoids unnecessary nops by
+> >> squashing back-to-back instrumention-safe sequences.
+> >
+> > We have considered implementing objtool for s390. Not sure where we
+> > stand and if we will do this or not. Sven/Heiko?
+> 
+> We are planning to support objtool on s390. Vasily is working on it -
+> maybe he has some thoughts about this.
 
+We got CONFIG_DEBUG_ENTRY=y since 5.12, objtool runs on vmlinux.o but I have
+not yet enabled --noinstr option in s390 objtool. So, it's hard to say in
+advance if this particular change would make things better or worse.
+In general, common code annotations are problematic, because arch
+specific code is still not identical and this leads sometimes to different
+needs for common code annotations.
+
+I'll try to experiment with --noinstr on s390 shortly.
