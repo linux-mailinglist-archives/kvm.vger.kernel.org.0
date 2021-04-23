@@ -2,165 +2,170 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id AD93B368D61
-	for <lists+kvm@lfdr.de>; Fri, 23 Apr 2021 08:53:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D410A368D64
+	for <lists+kvm@lfdr.de>; Fri, 23 Apr 2021 08:54:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240699AbhDWGyQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 23 Apr 2021 02:54:16 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:32008 "EHLO
+        id S240744AbhDWGyY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 23 Apr 2021 02:54:24 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:37828 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S236806AbhDWGyP (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 23 Apr 2021 02:54:15 -0400
+        by vger.kernel.org with ESMTP id S240743AbhDWGyX (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 23 Apr 2021 02:54:23 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1619160819;
+        s=mimecast20190719; t=1619160827;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding;
-        bh=/2UnVx5VtX3OfRIVJ/IURmI0gb2kX8kbuxn/wS3RET8=;
-        b=FlAjuRBv+DvHcpANQDxvvzL4yMS6oKWLM0DGZksz7OX/E6qgBwtT1WGsF3FnUr6Q+5K4DX
-        EJMX/+iaK82L6sYYvGc+aeWkOPoqGt81Pl+Iuxl27qpZzhwzZMiMTMwV3sgPUtB1VG7fTd
-        fG1GatrhLyr9evNmARLR0IHaU2BlYD0=
+        bh=YXcaDNtwz3ucxJL+QAv1pl2x/JuMrGE4EhM2LwyjCSc=;
+        b=SY9NwrA48EXHZNsC03qXWCEQsBeQKHQgCUphSVcK4tvbVR49I4Uj42QqtQi+poGO1BiHHg
+        gkNSKjae9qiSw0piu6GnSeDQZ4qoIsn++VXtbjg/8u8kN3CynBr2YEMsG17DIDTd2fgF/C
+        Gf9b8Oj5jAtfenfCvfkh+DMxP+9XlGg=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-591-eJUaEOAHNMagwUnNp9SOEw-1; Fri, 23 Apr 2021 02:53:36 -0400
-X-MC-Unique: eJUaEOAHNMagwUnNp9SOEw-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+ us-mta-21-D7xAQQpiPn2L_dZvxmilZw-1; Fri, 23 Apr 2021 02:53:44 -0400
+X-MC-Unique: D7xAQQpiPn2L_dZvxmilZw-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9967E107ACE8;
-        Fri, 23 Apr 2021 06:53:35 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 56E86343A2;
+        Fri, 23 Apr 2021 06:53:43 +0000 (UTC)
 Received: from virtlab511.virt.lab.eng.bos.redhat.com (virtlab511.virt.lab.eng.bos.redhat.com [10.19.152.198])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 55CF8369A;
-        Fri, 23 Apr 2021 06:53:35 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 0DEED10016FE;
+        Fri, 23 Apr 2021 06:53:42 +0000 (UTC)
 From:   Paolo Bonzini <pbonzini@redhat.com>
 To:     kvm@vger.kernel.org
-Cc:     Krish Sadhukhan <krish.sadhukhan@oracle.com>
-Subject: [PATCH kvm-unit-tests] nSVM: Test addresses of MSR and IO permissions maps
-Date:   Fri, 23 Apr 2021 02:53:34 -0400
-Message-Id: <20210423065334.1701680-1-pbonzini@redhat.com>
+Cc:     Sean Christopherson <seanjc@google.com>
+Subject: [PATCH kvm-unit-tests] x86/cstart: Don't use MSR_GS_BASE in 32-bit boot code
+Date:   Fri, 23 Apr 2021 02:53:42 -0400
+Message-Id: <20210423065342.1701726-1-pbonzini@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Krish Sadhukhan <krish.sadhukhan@oracle.com>
+Add per-cpu selectors to the GDT, and set GS_BASE by
+loading a "real" segment.  Using MSR_GS_BASE is wrong and broken,
+it's a 64-bit only MSR and does not exist on 32-bit CPUs.  The current
+code works only because 32-bit KVM VMX incorrectly disables interception
+of MSR_GS_BASE, and no one runs KVM on an actual 32-bit physical CPU,
+i.e. the MSR exists in hardware and so everything "works".
 
-According to section "Canonicalization and Consistency Checks" in APM vol 2,
-the following guest state is illegal:
+32-bit KVM SVM is not buggy and correctly injects #GP on the WRMSR, i.e.
+the tests have never worked on 32-bit SVM.
 
-    "The MSR or IOIO intercept tables extend to a physical address that
-     is greater than or equal to the maximum supported physical address.
-     The VMRUN instruction ignores the lower 12 bits of the address
-     specified in the VMCB."
+While at it, tweak the TSS setup to look like the percpu setup; both
+are setting up the address field of the descriptor.
 
-Signed-off-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
-Message-Id: <20210412215611.110095-8-krish.sadhukhan@oracle.com>
-[Fix the test so that it passes when VMRUN does ignore the lower 12
- bits of the address. - Paolo]
+Fixes: dfe6cb6 ("Add 32 bit smp initialization code")
+Reported-by: Sean Christopherson <seanjc@google.com>
+Message-Id: <20210422030504.3488253-2-seanjc@google.com>
+[Patch rewritten, keeping Sean's commit message. - Paolo]
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- x86/svm_tests.c | 79 ++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 78 insertions(+), 1 deletion(-)
+ lib/x86/desc.c |  3 ++-
+ lib/x86/desc.h |  5 +++--
+ x86/cstart.S   | 35 ++++++++++++++++++++++-------------
+ 3 files changed, 27 insertions(+), 16 deletions(-)
 
-diff --git a/x86/svm_tests.c b/x86/svm_tests.c
-index 1c7416f..d689e73 100644
---- a/x86/svm_tests.c
-+++ b/x86/svm_tests.c
-@@ -2422,15 +2422,92 @@ static void test_dr(void)
- 	vmcb->save.dr7 = dr_saved;
+diff --git a/lib/x86/desc.c b/lib/x86/desc.c
+index 983d4d8..2672e02 100644
+--- a/lib/x86/desc.c
++++ b/lib/x86/desc.c
+@@ -333,7 +333,8 @@ void setup_tss32(void)
+ 	tss_intr.esp = tss_intr.esp0 = tss_intr.esp1 = tss_intr.esp2 =
+ 		(u32)intr_alt_stack + 4096;
+ 	tss_intr.cs = 0x08;
+-	tss_intr.ds = tss_intr.es = tss_intr.fs = tss_intr.gs = tss_intr.ss = 0x10;
++	tss_intr.ds = tss_intr.es = tss_intr.fs = tss_intr.ss = 0x10;
++	tss_intr.gs = read_gs();
+ 	tss_intr.iomap_base = (u16)desc_size;
+ 	set_gdt_entry(TSS_INTR, (u32)&tss_intr, desc_size - 1, 0x89, 0x0f);
  }
+diff --git a/lib/x86/desc.h b/lib/x86/desc.h
+index 0fe5cbf..77b2c59 100644
+--- a/lib/x86/desc.h
++++ b/lib/x86/desc.h
+@@ -103,8 +103,9 @@ typedef struct  __attribute__((packed)) {
+  * 0x38 (0x3b)  ring-3 code segment (32-bit)  same
+  * 0x40 (0x43)  ring-3 data segment (32-bit)  ring-3 data segment (32/64-bit)
+  * 0x48 (0x4b)  **unused**                    ring-3 code segment (64-bit)
+- * 0x50--0x78   free to use for test cases    same
+- * 0x80         primary TSS (CPU 0)           same
++ * 0x50-0x78    free to use for test cases    same
++ * 0x80-0x870   primary TSS (CPU 0..254)      same
++ * 0x878-0x1068 percpu area (CPU 0..254)      not used
+  *
+  * Note that the same segment can be used for 32-bit and 64-bit data segments
+  * (the L bit is only defined for code segments)
+diff --git a/x86/cstart.S b/x86/cstart.S
+index 489c561..bcf7218 100644
+--- a/x86/cstart.S
++++ b/x86/cstart.S
+@@ -58,6 +58,10 @@ tss_descr:
+         .rept max_cpus
+         .quad 0x000089000000ffff // 32-bit avail tss
+         .endr
++percpu_descr:
++        .rept max_cpus
++        .quad 0x00cf93000000ffff // 32-bit data segment for perCPU area
++        .endr
+ gdt32_end:
  
-+/* TODO: verify if high 32-bits are sign- or zero-extended on bare metal */
-+#define	TEST_BITMAP_ADDR(save_intercept, type, addr, exit_code,		\
-+			 msg) {						\
-+	vmcb->control.intercept = saved_intercept | 1ULL << type;	\
-+	if (type == INTERCEPT_MSR_PROT)					\
-+		vmcb->control.msrpm_base_pa = addr;			\
-+	else								\
-+		vmcb->control.iopm_base_pa = addr;			\
-+	report(svm_vmrun() == exit_code,				\
-+	    "Test %s address: %lx", msg, addr);                         \
-+}
-+
-+/*
-+ * If the MSR or IOIO intercept table extends to a physical address that
-+ * is greater than or equal to the maximum supported physical address, the
-+ * guest state is illegal.
-+ *
-+ * The VMRUN instruction ignores the lower 12 bits of the address specified
-+ * in the VMCB.
-+ *
-+ * MSRPM spans 2 contiguous 4KB pages while IOPM spans 2 contiguous 4KB
-+ * pages + 1 byte.
-+ *
-+ * [APM vol 2]
-+ *
-+ * Note: Unallocated MSRPM addresses conforming to consistency checks, generate
-+ * #NPF.
-+ */
-+static void test_msrpm_iopm_bitmap_addrs(void)
-+{
-+	u64 saved_intercept = vmcb->control.intercept;
-+	u64 addr_beyond_limit = 1ull << cpuid_maxphyaddr();
-+	u64 addr = virt_to_phys(msr_bitmap) & (~((1ull << 12) - 1));
-+
-+	TEST_BITMAP_ADDR(saved_intercept, INTERCEPT_MSR_PROT,
-+			addr_beyond_limit - 3 * PAGE_SIZE, SVM_EXIT_ERR,
-+			"MSRPM");
-+	TEST_BITMAP_ADDR(saved_intercept, INTERCEPT_MSR_PROT,
-+			addr_beyond_limit - 2 * PAGE_SIZE, SVM_EXIT_ERR,
-+			"MSRPM");
-+	TEST_BITMAP_ADDR(saved_intercept, INTERCEPT_MSR_PROT,
-+			addr_beyond_limit - 2 * PAGE_SIZE + 1, SVM_EXIT_ERR,
-+			"MSRPM");
-+	TEST_BITMAP_ADDR(saved_intercept, INTERCEPT_MSR_PROT,
-+			addr_beyond_limit - PAGE_SIZE, SVM_EXIT_ERR,
-+			"MSRPM");
-+	TEST_BITMAP_ADDR(saved_intercept, INTERCEPT_MSR_PROT, addr,
-+			SVM_EXIT_VMMCALL, "MSRPM");
-+	addr |= (1ull << 12) - 1;
-+	TEST_BITMAP_ADDR(saved_intercept, INTERCEPT_MSR_PROT, addr,
-+			SVM_EXIT_VMMCALL, "MSRPM");
-+
-+	TEST_BITMAP_ADDR(saved_intercept, INTERCEPT_IOIO_PROT,
-+			addr_beyond_limit - 4 * PAGE_SIZE, SVM_EXIT_VMMCALL,
-+			"IOPM");
-+	TEST_BITMAP_ADDR(saved_intercept, INTERCEPT_IOIO_PROT,
-+			addr_beyond_limit - 3 * PAGE_SIZE, SVM_EXIT_VMMCALL,
-+			"IOPM");
-+	TEST_BITMAP_ADDR(saved_intercept, INTERCEPT_IOIO_PROT,
-+			addr_beyond_limit - 2 * PAGE_SIZE - 2, SVM_EXIT_VMMCALL,
-+			"IOPM");
-+	TEST_BITMAP_ADDR(saved_intercept, INTERCEPT_IOIO_PROT,
-+			addr_beyond_limit - 2 * PAGE_SIZE, SVM_EXIT_ERR,
-+			"IOPM");
-+	TEST_BITMAP_ADDR(saved_intercept, INTERCEPT_IOIO_PROT,
-+			addr_beyond_limit - PAGE_SIZE, SVM_EXIT_ERR,
-+			"IOPM");
-+	addr = virt_to_phys(io_bitmap) & (~((1ull << 11) - 1));
-+	TEST_BITMAP_ADDR(saved_intercept, INTERCEPT_IOIO_PROT, addr,
-+			SVM_EXIT_VMMCALL, "IOPM");
-+	addr |= (1ull << 12) - 1;
-+	TEST_BITMAP_ADDR(saved_intercept, INTERCEPT_IOIO_PROT, addr,
-+			SVM_EXIT_VMMCALL, "IOPM");
-+
-+	vmcb->control.intercept = saved_intercept;
-+}
-+
- static void svm_guest_state_test(void)
- {
- 	test_set_guest(basic_guest_main);
+ i = 0
+@@ -89,13 +93,21 @@ mb_flags = 0x0
+ 	.long mb_magic, mb_flags, 0 - (mb_magic + mb_flags)
+ mb_cmdline = 16
+ 
+-MSR_GS_BASE = 0xc0000101
 -
- 	test_efer();
- 	test_cr0();
- 	test_cr3();
- 	test_cr4();
- 	test_dr();
-+	test_msrpm_iopm_bitmap_addrs();
- }
+ .macro setup_percpu_area
+ 	lea -4096(%esp), %eax
+-	mov $0, %edx
+-	mov $MSR_GS_BASE, %ecx
+-	wrmsr
++
++	/* fill GS_BASE in the GDT, do not clobber %ebx (multiboot info) */
++	mov (APIC_DEFAULT_PHYS_BASE + APIC_ID), %ecx
++	shr $24, %ecx
++	mov %ax, percpu_descr+2(,%ecx,8)
++
++	shr $16, %eax
++	mov %al, percpu_descr+4(,%ecx,8)
++	mov %ah, percpu_descr+7(,%ecx,8)
++
++	lea percpu_descr-gdt32(,%ecx,8), %eax
++	mov %ax, %gs
++
+ .endm
  
+ .macro setup_segments
+@@ -184,20 +196,17 @@ load_tss:
+ 	lidt idt_descr
+ 	mov $16, %eax
+ 	mov %ax, %ss
+-	mov $(APIC_DEFAULT_PHYS_BASE + APIC_ID), %eax
+-	mov (%eax), %eax
++	mov (APIC_DEFAULT_PHYS_BASE + APIC_ID), %eax
+ 	shr $24, %eax
+ 	mov %eax, %ebx
+-	shl $3, %ebx
+ 	mov $((tss_end - tss) / max_cpus), %edx
+ 	imul %edx
+ 	add $tss, %eax
+-	mov %ax, tss_descr+2(%ebx)
++	mov %ax, tss_descr+2(,%ebx,8)
+ 	shr $16, %eax
+-	mov %al, tss_descr+4(%ebx)
+-	shr $8, %eax
+-	mov %al, tss_descr+7(%ebx)
+-	lea tss_descr-gdt32(%ebx), %eax
++	mov %al, tss_descr+4(,%ebx,8)
++	mov %ah, tss_descr+7(,%ebx,8)
++	lea tss_descr-gdt32(,%ebx,8), %eax
+ 	ltr %ax
+ 	ret
  
 -- 
 2.26.2
