@@ -2,136 +2,155 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 57E8F3698CB
-	for <lists+kvm@lfdr.de>; Fri, 23 Apr 2021 20:02:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8A4B136991D
+	for <lists+kvm@lfdr.de>; Fri, 23 Apr 2021 20:17:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243436AbhDWSCs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 23 Apr 2021 14:02:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33206 "EHLO
+        id S243644AbhDWSSM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 23 Apr 2021 14:18:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36608 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231400AbhDWSCr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 23 Apr 2021 14:02:47 -0400
-Received: from mail-ot1-x334.google.com (mail-ot1-x334.google.com [IPv6:2607:f8b0:4864:20::334])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 75364C061574
-        for <kvm@vger.kernel.org>; Fri, 23 Apr 2021 11:02:09 -0700 (PDT)
-Received: by mail-ot1-x334.google.com with SMTP id d3-20020a9d29030000b029027e8019067fso44119241otb.13
-        for <kvm@vger.kernel.org>; Fri, 23 Apr 2021 11:02:09 -0700 (PDT)
+        with ESMTP id S243653AbhDWSSJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 23 Apr 2021 14:18:09 -0400
+Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AB3FEC06138F
+        for <kvm@vger.kernel.org>; Fri, 23 Apr 2021 11:17:31 -0700 (PDT)
+Received: by mail-pf1-x449.google.com with SMTP id a16-20020aa786500000b0290257e9832af4so13486680pfo.5
+        for <kvm@vger.kernel.org>; Fri, 23 Apr 2021 11:17:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=9znl9Akv85D3Qa3syKCKwQJTs1YevENL5QJ6YQadVOk=;
-        b=cxKhUbzgM6ob3kxiT/vVdlXCsjLJz4BfJwJYp4Dp20WNvtvij203JFmdcS134pwqmq
-         WjoKz8ijZTEUWjO0bV8+KHsFn9CSrVsFAO5MijskQahl2DWYpFQEIdhwwi1UZ1UXF34q
-         Wu0SH/ZbDZRXyERZfhNMv+6DWPAyj8uKGGIKGvBu4ceDxX+4pWqlwQGRg9fp8rweE4nF
-         bwzrvO5OB3oR/FwUnNy/slU9csr/NhqVW1EEUJsmAyHpo01kXm0BSKSBpkedluUUWerS
-         OhlCITL6pgjHt7kkfDBcPjE6Yw7OKw9wGh540aDZnhEdyHKFRGExkhcXMDxFMduArn9s
-         NE/Q==
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=jZ9aELeTtebSkfbpomfAFciujOueU+/1u2IVpj9kO9Q=;
+        b=RyBxs7miM4jdCQ3yugSc8OvrTlv5u+dF3p+Ra7seVMrj1RVtjB+pFXakJoRIl1jsLS
+         4JBtMKLiNnj9NnUNB9BsPmg2GgDdmytyBuu/qlKens774np+kb3bnNCuXir7AcEhlc1/
+         MMqfYw4RQYaFjE94XkSwKSrhOxKcqkWzlvWkJUaoPIQajn3YTSQmT7PSjqoq+mzFElwD
+         Nmi2pZp5/s1xwbLuQYIu7SednNnDgqlgHAbjSb3Ng+chogeOuRdzvwODmr0TjSFEqRbh
+         /2xlGDh8qLD5AOsfQQHMcbZvPA7WcxPJHgBTYDJjHZfxvE6utLgsp5D6rJBK8yPps95G
+         xQ1A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=9znl9Akv85D3Qa3syKCKwQJTs1YevENL5QJ6YQadVOk=;
-        b=CeVBs+OAqUBiOl5f5svTgdy4LrUc5Baa2RJoZU6GJ5P4ScK7W5F7pBDafxCQiZtwLy
-         9vPIW48UylRoSXFsF5Bzx7FYKhoYxUP442R2obeZ7MOzNJR4f5M7K0pZ0FAS6X9jGPvb
-         jOjbpJIsrT9IVF6kwJfksg2MqNtvBCPe+R0BjsfiR/8rf+7CL2S2oj+dOKthZupkSzhx
-         bf3/KC0OxDAMQfelvM/qDMrBE9PTSagujKEFsX+hbNla3Z+1UpM7xGPjO0SfkCAgLNLE
-         kV/oBH1xNsWLseooc88ZUzcXWGmBbmSzcBBcXmhMVyi20fsI6KMpOj0omEHmjq3VWuBZ
-         KiMg==
-X-Gm-Message-State: AOAM5319ICpj7W6fIVCZh2NWlaVNl4l/CxhSQNO0OMcqsGlHuybulbe1
-        JVT+NS2QE+MTnja1j7s5VDbQhskrc/VDmC4XQXQq9w==
-X-Google-Smtp-Source: ABdhPJw5hCBdsjlniF/uTz+qPCn677XUgN1ABtEQkKgCDdS7l3Wosw1n1iw8SmTgMJPEa/KSsJMWxse5L8BGdYeW8A8=
-X-Received: by 2002:a05:6830:16c8:: with SMTP id l8mr4386425otr.56.1619200928654;
- Fri, 23 Apr 2021 11:02:08 -0700 (PDT)
-MIME-Version: 1.0
-References: <20210421122833.3881993-1-aaronlewis@google.com>
- <cunsg3jg2ga.fsf@dme.org> <CAAAPnDH1LtRDLCjxdd8hdqABSu9JfLyxN1G0Nu1COoVbHn1MLw@mail.gmail.com>
- <cunmttrftrh.fsf@dme.org> <CAAAPnDHsz5Yd0oa5z15z0S4vum6=mHHXDN_M5X0HeVaCrk4H0Q@mail.gmail.com>
- <cunk0oug2t3.fsf@dme.org> <YILo26WQNvZNmtX0@google.com> <cunbla4ncdd.fsf@dme.org>
- <YIMF8b2jD3b8IfPP@google.com> <cun8s58nax7.fsf@dme.org> <CALMp9eS5nT2vuOWVg=A7rm1utK-6Pcq-akX5+szc24PeY4NDyA@mail.gmail.com>
-In-Reply-To: <CALMp9eS5nT2vuOWVg=A7rm1utK-6Pcq-akX5+szc24PeY4NDyA@mail.gmail.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Fri, 23 Apr 2021 11:01:58 -0700
-Message-ID: <CALMp9eTfSSmzL1qqv7p9Zz7pHNuBy1TGc0Pp3O8oZqeXUWBdKQ@mail.gmail.com>
-Subject: Re: [PATCH v2 1/2] kvm: x86: Allow userspace to handle emulation errors
-To:     David Edmondson <dme@dme.org>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Aaron Lewis <aaronlewis@google.com>,
-        kvm list <kvm@vger.kernel.org>
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=jZ9aELeTtebSkfbpomfAFciujOueU+/1u2IVpj9kO9Q=;
+        b=ecmDyuYcr5f8j1Y9DPrhvVdjRwfnEwkwcAAmrCi1UZjlYlV0ZoBbGvEbiaQpKzLnE2
+         xGF4vTsx0Y7MDBys1VbMBgWvKMU7Z3DEnTk2qdKuucc6iKu5Ug57hCnO8PIHfiwr5bFd
+         Ti0v0KQu7OP6NNpSLM6JrXosJdiV4iCf5zIC+5+P6YZDXT7bSMUnomKjzYx/DHzmR4I6
+         e+fdISbBwfj4QooLeBTSNqWnn3lBJfbKvxvE3nUjovmEw/wacpkBU09RL+tc6TYu5q5L
+         eq3zzsRHMTluidQayJoXkZB/Y+uAsQzi1kuHL0JCV0rl7gBUzeUyHpUrwG6joZlTe1aR
+         Mjww==
+X-Gm-Message-State: AOAM531UtdgrNBzHR1xZEAn3tXFuGXh9gFEoibhy3S37/O5LWYSXUE+Y
+        nBCDLc/BUfk8z1y4XQXK76Nsl6fOdJulrouQFqToSiph6i6LPJd1MnK3UdL1LOvwUbJFRLec7bO
+        Seutnr+U5zYaOnn3qqzrBWPPUn+bcezvbFWPJBr1sqkVAHypG7i4ZzXSFXWHsZoHsXc1Id7k=
+X-Google-Smtp-Source: ABdhPJybLPMWN/SpAe3p+WeheeiGCmvt6zlmflTWrm4w6vD8liP2VaphrDYff46dFN5dJ0IrExvz0uL99CbVXXMV7Q==
+X-Received: from jgzg.c.googlers.com ([fda3:e722:ac3:10:7f:e700:c0a8:1acf])
+ (user=jingzhangos job=sendgmr) by 2002:a17:90b:e98:: with SMTP id
+ fv24mr1049588pjb.1.1619201850403; Fri, 23 Apr 2021 11:17:30 -0700 (PDT)
+Date:   Fri, 23 Apr 2021 18:17:23 +0000
+Message-Id: <20210423181727.596466-1-jingzhangos@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.31.1.498.g6c1eba8ee3d-goog
+Subject: [PATCH v3 0/4] KVM statistics data fd-based binary interface
+From:   Jing Zhang <jingzhangos@google.com>
+To:     KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.cs.columbia.edu>,
+        LinuxMIPS <linux-mips@vger.kernel.org>,
+        KVMPPC <kvm-ppc@vger.kernel.org>,
+        LinuxS390 <linux-s390@vger.kernel.org>,
+        Linuxkselftest <linux-kselftest@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Marc Zyngier <maz@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Peter Shier <pshier@google.com>,
+        Oliver Upton <oupton@google.com>,
+        David Rientjes <rientjes@google.com>,
+        Emanuele Giuseppe Esposito <eesposit@redhat.com>
+Cc:     Jing Zhang <jingzhangos@google.com>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Apr 23, 2021 at 10:57 AM Jim Mattson <jmattson@google.com> wrote:
->
-> On Fri, Apr 23, 2021 at 10:55 AM David Edmondson <dme@dme.org> wrote:
-> >
-> > On Friday, 2021-04-23 at 17:37:53 GMT, Sean Christopherson wrote:
-> >
-> > > On Fri, Apr 23, 2021, David Edmondson wrote:
-> > >> On Friday, 2021-04-23 at 15:33:47 GMT, Sean Christopherson wrote:
-> > >>
-> > >> > On Thu, Apr 22, 2021, David Edmondson wrote:
-> > >> >> Agreed. As Jim indicated in his other reply, there should be no new data
-> > >> >> leaked by not zeroing the bytes.
-> > >> >>
-> > >> >> For now at least, this is not a performance critical path, so clearing
-> > >> >> the payload doesn't seem too onerous.
-> > >> >
-> > >> > I feel quite strongly that KVM should _not_ touch the unused bytes.
-> > >>
-> > >> I'm fine with that, but...
-> > >>
-> > >> > As Jim pointed out, a stream of 0x0 0x0 0x0 ... is not benign, it will
-> > >> > decode to one or more ADD instructions.  Arguably 0x90, 0xcc, or an
-> > >> > undending stream of prefixes would be more appropriate so that it's
-> > >> > less likely for userspace to decode a bogus instruction.
-> > >>
-> > >> ...I don't understand this position. If the user-level instruction
-> > >> decoder starts interpreting bytes that the kernel did *not* indicate as
-> > >> valid (by setting insn_size to include them), it's broken.
-> > >
-> > > Yes, so what's the point of clearing the unused bytes?
-> >
-> > Given that it doesn't prevent any known leakage, it's purely aesthetic,
-> > which is why I'm happy not to bother.
-> >
-> > > Doing so won't magically fix a broken userspace.  That's why I argue
-> > > that 0x90 or 0xcc would be more appropriate; there's at least a
-> > > non-zero chance that it will help userspace avoid doing something
-> > > completely broken.
-> >
-> > Perhaps an invalid instruction would be more useful in this respect, but
-> > INT03 fills a similar purpose.
-> >
-> > > On the other hand, userspace can guard against a broken _KVM_ by initializing
-> > > vcpu->run with a known pattern and logging if KVM exits to userspace with
-> > > seemingly bogus data.  Crushing the unused bytes to zero defeats userspace's
-> > > sanity check, e.g. if the actual memcpy() of the instruction bytes copies the
-> > > wrong number of bytes, then userspace's magic pattern will be lost and debugging
-> > > the KVM bug will be that much harder.
-> > >
-> > > This is very much not a theoretical problem, I have debugged two separate KVM
-> > > bugs in the last few months where KVM completely failed to set
-> > > vcpu->run->exit_reason before exiting to userspace.  The exit_reason is a bit of
-> > > a special case because it's disturbingly easy for KVM to get confused over return
-> > > values and unintentionally exit to userspace, but it's not a big stretch to
-> > > imagine a bug where KVM provides incomplete data.
-> >
-> > Understood.
-> >
-> > So is the conclusion that KVM should copy only insn_size bytes rather
-> > than the full 15?
->
-> Insn_size should almost always be 15. It will only be less when the
-> emulator hits a page crossing before fetching 15 bytes and it can't
-> fetch from the second page.
+This patchset provides a file descriptor for every VM and VCPU to read
+KVM statistics data in binary format.
+It is meant to provide a lightweight, flexible, scalable and efficient
+lock-free solution for user space telemetry applications to pull the
+statistics data periodically for large scale systems. The pulling
+frequency could be as high as a few times per second.
+In this patchset, every statistics data are treated to have some
+attributes as below:
+  * architecture dependent or common
+  * VM statistics data or VCPU statistics data
+  * type: cumulative, instantaneous,
+  * unit: none for simple counter, nanosecond, microsecond,
+    millisecond, second, Byte, KiByte, MiByte, GiByte. Clock Cycles
+Since no lock/synchronization is used, the consistency between all
+the statistics data is not guaranteed. That means not all statistics
+data are read out at the exact same time, since the statistics date
+are still being updated by KVM subsystems while they are read out.
 
-Oh, or if the CS limit is reached. (cf. AMD's APM, volume 2, section
-15.8.4: Nested and intercepted #PF).
+---
+
+* v2 -> v3
+  - Rebase to kvm/queue, commit edf408f5257b ("KVM: avoid "deadlock" between
+    install_new_memslots and MMU notifier")
+  - Resolve some nitpicks about format
+
+* v1 -> v2
+  - Use ARRAY_SIZE to count the number of stats descriptors
+  - Fix missing `size` field initialization in macro STATS_DESC
+
+[1] https://lore.kernel.org/kvm/20210402224359.2297157-1-jingzhangos@google.com
+[2] https://lore.kernel.org/kvm/20210415151741.1607806-1-jingzhangos@google.com
+
+---
+
+Jing Zhang (4):
+  KVM: stats: Separate common stats from architecture specific ones
+  KVM: stats: Add fd-based API to read binary stats data
+  KVM: stats: Add documentation for statistics data binary interface
+  KVM: selftests: Add selftest for KVM statistics data binary interface
+
+ Documentation/virt/kvm/api.rst                | 171 ++++++++
+ arch/arm64/include/asm/kvm_host.h             |   9 +-
+ arch/arm64/kvm/guest.c                        |  42 +-
+ arch/mips/include/asm/kvm_host.h              |   9 +-
+ arch/mips/kvm/mips.c                          |  67 +++-
+ arch/powerpc/include/asm/kvm_host.h           |   9 +-
+ arch/powerpc/kvm/book3s.c                     |  68 +++-
+ arch/powerpc/kvm/book3s_hv.c                  |  12 +-
+ arch/powerpc/kvm/book3s_pr.c                  |   2 +-
+ arch/powerpc/kvm/book3s_pr_papr.c             |   2 +-
+ arch/powerpc/kvm/booke.c                      |  63 ++-
+ arch/s390/include/asm/kvm_host.h              |   9 +-
+ arch/s390/kvm/kvm-s390.c                      | 133 ++++++-
+ arch/x86/include/asm/kvm_host.h               |   9 +-
+ arch/x86/kvm/x86.c                            |  71 +++-
+ include/linux/kvm_host.h                      | 132 ++++++-
+ include/linux/kvm_types.h                     |  12 +
+ include/uapi/linux/kvm.h                      |  50 +++
+ tools/testing/selftests/kvm/.gitignore        |   1 +
+ tools/testing/selftests/kvm/Makefile          |   3 +
+ .../testing/selftests/kvm/include/kvm_util.h  |   3 +
+ .../selftests/kvm/kvm_bin_form_stats.c        | 370 ++++++++++++++++++
+ tools/testing/selftests/kvm/lib/kvm_util.c    |  11 +
+ virt/kvm/kvm_main.c                           | 237 ++++++++++-
+ 24 files changed, 1405 insertions(+), 90 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/kvm_bin_form_stats.c
 
 
-> > dme.
-> > --
-> > But they'll laugh at you in Jackson, and I'll be dancin' on a Pony Keg.
+base-commit: edf408f5257ba39e63781b820528e1ce1ec0f543
+-- 
+2.31.1.498.g6c1eba8ee3d-goog
+
