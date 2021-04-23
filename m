@@ -2,209 +2,320 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DA2FB369655
-	for <lists+kvm@lfdr.de>; Fri, 23 Apr 2021 17:42:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 47B11369668
+	for <lists+kvm@lfdr.de>; Fri, 23 Apr 2021 17:53:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231627AbhDWPnQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 23 Apr 2021 11:43:16 -0400
-Received: from foss.arm.com ([217.140.110.172]:36290 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230294AbhDWPnP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 23 Apr 2021 11:43:15 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 89BB91396;
-        Fri, 23 Apr 2021 08:42:38 -0700 (PDT)
-Received: from [192.168.0.110] (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E5E563F73B;
-        Fri, 23 Apr 2021 08:42:37 -0700 (PDT)
-Subject: Re: [kvm-unit-tests RFC PATCH 0/1] configure: arm: Replace --vmm with
- --target
-To:     Andrew Jones <drjones@redhat.com>
-Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
-        pbonzini@redhat.com
-References: <20210420161338.70914-1-alexandru.elisei@arm.com>
- <20210420165101.irbx2upgqbazkvlt@gator.home>
- <ed3ba802-fee7-4c58-9d73-d33dfbd44d7f@arm.com>
- <20210422155757.t4pvv6blkvoyi2oy@gator>
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <854c2d33-0b20-b7e3-c522-b01a53fcbbb3@arm.com>
-Date:   Fri, 23 Apr 2021 16:43:14 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.9.1
-MIME-Version: 1.0
-In-Reply-To: <20210422155757.t4pvv6blkvoyi2oy@gator>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
+        id S243018AbhDWPxq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 23 Apr 2021 11:53:46 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:60676 "EHLO
+        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229691AbhDWPxq (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 23 Apr 2021 11:53:46 -0400
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 13NFp0j4177857;
+        Fri, 23 Apr 2021 11:53:09 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : to : cc : date : in-reply-to : references : content-type :
+ mime-version : content-transfer-encoding; s=pp1;
+ bh=dSocCxnE/1eza4CfQ2181FKYT/pGEpmEtiThxIEpd3o=;
+ b=VoGdgQkitAu76l4iL9WpsOWq57DzHPAlMv5hDIlHVy9QQJ0azD2FeGpk1o3gGON5xTcg
+ Q1mHtSjmW2I4MmYEP5NN3SCzkPBxaUdUx7AGzTP3Xqj/ldaFLfsdRJQzfl32GHdeJ11V
+ 1Dg8O+l7q3TgYfxrGWt4zphwjoyFZCo8TS1blRHnzGibPKJDTf86puDE2I8/Jb9xUgVo
+ Jl0gpj+V8PFAWubttUwddifblE8GZBZGql8ssbEKZyHSpO8KWI+OQMB6VonWeon6dqrO
+ scxb7DJFUFgjeCPecDdgif1TaYCoTMWiqpKUtVr6maFRbKtrLO2xE30uYHPSVXk0JdCj Gw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 383y5g4t0e-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 23 Apr 2021 11:53:08 -0400
+Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 13NFYL09107074;
+        Fri, 23 Apr 2021 11:53:08 -0400
+Received: from ppma05wdc.us.ibm.com (1b.90.2fa9.ip4.static.sl-reverse.com [169.47.144.27])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 383y5g4t06-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 23 Apr 2021 11:53:08 -0400
+Received: from pps.filterd (ppma05wdc.us.ibm.com [127.0.0.1])
+        by ppma05wdc.us.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 13NFr0Tm022782;
+        Fri, 23 Apr 2021 15:53:07 GMT
+Received: from b01cxnp22036.gho.pok.ibm.com (b01cxnp22036.gho.pok.ibm.com [9.57.198.26])
+        by ppma05wdc.us.ibm.com with ESMTP id 37yqa9sv3c-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 23 Apr 2021 15:53:07 +0000
+Received: from b01ledav001.gho.pok.ibm.com (b01ledav001.gho.pok.ibm.com [9.57.199.106])
+        by b01cxnp22036.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 13NFr7Uh11928544
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 23 Apr 2021 15:53:07 GMT
+Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 7235328058;
+        Fri, 23 Apr 2021 15:53:07 +0000 (GMT)
+Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id E412D28064;
+        Fri, 23 Apr 2021 15:53:06 +0000 (GMT)
+Received: from farman-thinkpad-t470p (unknown [9.160.17.178])
+        by b01ledav001.gho.pok.ibm.com (Postfix) with ESMTP;
+        Fri, 23 Apr 2021 15:53:06 +0000 (GMT)
+Message-ID: <c23691d7e4d0456dffbbeb1cea80fe3395f92c86.camel@linux.ibm.com>
+Subject: Re: [RFC PATCH v4 0/4] vfio-ccw: Fix interrupt handling for
+ HALT/CLEAR
+From:   Eric Farman <farman@linux.ibm.com>
+To:     Halil Pasic <pasic@linux.ibm.com>
+Cc:     Cornelia Huck <cohuck@redhat.com>,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        Jared Rossi <jrossi@linux.ibm.com>, linux-s390@vger.kernel.org,
+        kvm@vger.kernel.org
+Date:   Fri, 23 Apr 2021 11:53:06 -0400
+In-Reply-To: <20210423135015.5283edde.pasic@linux.ibm.com>
+References: <20210413182410.1396170-1-farman@linux.ibm.com>
+         <20210422025258.6ed7619d.pasic@linux.ibm.com>
+         <1eb9cbdfe43a42a62f6afb0315bb1e3a103dac9a.camel@linux.ibm.com>
+         <20210423135015.5283edde.pasic@linux.ibm.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Mailer: Evolution 3.28.5 (3.28.5-14.el8) 
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: 5D6xHIWdyXk8aaOUJFCBHYxgzIAm9ken
+X-Proofpoint-GUID: 3dQ3EvdPrCWr-ythjp_a5cstdXNZYRV7
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.761
+ definitions=2021-04-23_07:2021-04-23,2021-04-23 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 clxscore=1015
+ mlxlogscore=999 priorityscore=1501 lowpriorityscore=0 suspectscore=0
+ bulkscore=0 spamscore=0 adultscore=0 impostorscore=0 phishscore=0
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2104060000 definitions=main-2104230100
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Drew,
+On Fri, 2021-04-23 at 13:50 +0200, Halil Pasic wrote:
+> On Thu, 22 Apr 2021 16:49:21 -0400
+> Eric Farman <farman@linux.ibm.com> wrote:
+> 
+> > On Thu, 2021-04-22 at 02:52 +0200, Halil Pasic wrote:
+> > > On Tue, 13 Apr 2021 20:24:06 +0200
+> > > Eric Farman <farman@linux.ibm.com> wrote:
+> > >   
+> > > > Hi Conny, Halil,
+> > > > 
+> > > > Let's restart our discussion about the collision between
+> > > > interrupts
+> > > > for
+> > > > START SUBCHANNEL and HALT/CLEAR SUBCHANNEL. It's been a quarter
+> > > > million
+> > > > minutes (give or take), so here is the problematic scenario
+> > > > again:
+> > > > 
+> > > > 	CPU 1			CPU 2
+> > > >  1	CLEAR SUBCHANNEL
+> > > >  2	fsm_irq()
+> > > >  3				START SUBCHANNEL
+> > > >  4	vfio_ccw_sch_io_todo()
+> > > >  5				fsm_irq()
+> > > >  6				vfio_ccw_sch_io_todo()
+> > > > 
+> > > > From the channel subsystem's point of view the CLEAR SUBCHANNEL
+> > > > (step 1)
+> > > > is complete once step 2 is called, as the Interrupt Response
+> > > > Block
+> > > > (IRB)
+> > > > has been presented and the TEST SUBCHANNEL was driven by the
+> > > > cio
+> > > > layer.
+> > > > Thus, the START SUBCHANNEL (step 3) is submitted [1] and gets a
+> > > > cc=0 to
+> > > > indicate the I/O was accepted. However, step 2 stacks the bulk
+> > > > of
+> > > > the
+> > > > actual work onto a workqueue for when the subchannel lock is
+> > > > NOT
+> > > > held,
+> > > > and is unqueued at step 4. That code misidentifies the data in
+> > > > the
+> > > > IRB
+> > > > as being associated with the newly active I/O, and may release
+> > > > memory
+> > > > that is actively in use by the channel subsystem and/or device.
+> > > > Eww.
+> > > > 
+> > > > In this version...
+> > > > 
+> > > > Patch 1 and 2 are defensive checks. Patch 2 was part of v3 [2],
+> > > > but
+> > > > I
+> > > > would love a better option here to guard between steps 2 and 4.
+> > > > 
+> > > > Patch 3 is a subset of the removal of the CP_PENDING FSM state
+> > > > in
+> > > > v3.
+> > > > I've obviously gone away from this idea, but I thought this
+> > > > piece
+> > > > is
+> > > > still valuable.
+> > > > 
+> > > > Patch 4 collapses the code on the interrupt path so that
+> > > > changes to
+> > > > the FSM state and the channel_program struct are handled at the
+> > > > same
+> > > > point, rather than separated by a mutex boundary. Because of
+> > > > the
+> > > > possibility of a START and HALT/CLEAR running concurrently, it
+> > > > does
+> > > > not make sense to split them here.
+> > > > 
+> > > > With the above patches, maybe it then makes sense to hold the
+> > > > io_mutex
+> > > > across the entirety of vfio_ccw_sch_io_todo(). But I'm not
+> > > > completely
+> > > > sure that would be acceptable.
+> > > > 
+> > > > So... Thoughts?  
+> > > 
+> > > I believe we should address  
+> > 
+> > Who is the "we" here?
+> > 
+> 
+> The people that are responsible for vfio-ccw. 
+> 
+> > >  the concurrency, encapsulation and layering
+> > > issues in the subchannel/ccw pass-through code (vfio-ccw) by
+> > > taking a
+> > > holistic approach as soon as possible.
+> > > 
+> > > I find the current state of art very hard to reason about, and
+> > > that
+> > > adversely  affects my ability to reason about attempts at partial
+> > > improvements.
+> > > 
+> > > I understand that such a holistic approach needs a lot of work,
+> > > and
+> > > we
+> > > may have to stop some bleeding first. In the stop the bleeding
+> > > phase
+> > > we
+> > > can take a pragmatic approach and accept changes that empirically
+> > > seem to
+> > > work towards stopping the bleeding. I.e. if your tests say it's
+> > > better,
+> > > I'm willing to accept that it is better.  
+> > 
+> > So much bleeding!
+> > 
+> > RE: my tests... I have only been seeing the described problem in
+> > pathological tests, and this series lets those tests run without
+> > issue.
+> > 
+> 
+> Good to know.
+> 
+> > > I have to admit, I don't understand how synchronization is done
+> > > in
+> > > the
+> > > vfio-ccw kernel module (in the sense of avoiding data races).
+> > > 
+> > > Regarding your patches, I have to admit, I have a hard time
+> > > figuring
+> > > out
+> > > which one of these (or what combination of them) is supposed to
+> > > solve
+> > > the problem you described above. If I had to guess, I would guess
+> > > it
+> > > is
+> > > either patch 4, because it has a similar scenario diagram in the
+> > > commit message like the one in the problem statement. Is my guess
+> > > right?  
+> > 
+> > Sort of. It is true that Patch 4 is the last piece of the puzzle,
+> > and
+> > the diagram is included in that commit message so it is kept with
+> > the
+> > change, instead of being lost with the cover letter.
+> > 
+> > As I said in the cover letter, "Patch 1 and 2 are defensive checks"
+> > which are simply included to provide a more robust solution. You
+> > could
+> > argue that Patch 3 should be held out separately, but as it came
+> > from
+> > the previous version of this series it made sense to include here.
+> > 
+> 
+> Does that mean we need patches 1, 2 and 4 to fix the issue or is just
+> 4 sufficient?
 
-On 4/22/21 4:57 PM, Andrew Jones wrote:
-> On Thu, Apr 22, 2021 at 04:17:27PM +0100, Alexandru Elisei wrote:
->> Hi Drew,
->>
->> On 4/20/21 5:51 PM, Andrew Jones wrote:
->>> Hi Alex,
->>>
->>> On Tue, Apr 20, 2021 at 05:13:37PM +0100, Alexandru Elisei wrote:
->>>> This is an RFC because it's not exactly clear to me that this is the best
->>>> approach. I'm also open to using a different name for the new option, maybe
->>>> something like --platform if it makes more sense.
->>> I like 'target'.
->>>
->>>> I see two use cases for the patch:
->>>>
->>>> 1. Using different files when compiling kvm-unit-tests to run as an EFI app
->>>> as opposed to a KVM guest (described in the commit message).
->>>>
->>>> 2. This is speculation on my part, but I can see extending
->>>> arm/unittests.cfg with a "target" test option which can be used to decide
->>>> which tests need to be run based on the configure --target value. For
->>>> example, migration tests don't make much sense on kvmtool, which doesn't
->>>> have migration support. Similarly, the micro-bench test doesn't make much
->>>> sense (to me, at least) as an EFI app. Of course, this is only useful if
->>>> there are automated scripts to run the tests under kvmtool or EFI, which
->>>> doesn't look likely at the moment, so I left it out of the commit message.
->>> Sounds like a good idea. unittests.cfg could get a new option 'targets'
->>> where a list of targets is given. If targets is not present, then the
->>> test assumes it's for all targets. Might be nice to also accept !<target>
->>> syntax. E.g.
->>>
->>> # builds/runs for all targets
->>> [mytest]
->>> file = mytest.flat
->>>
->>> # builds/runs for given targets
->>> [mytest2]
->>> file = mytest2.flat
->>> targets = qemu,kvmtool
->>>
->>> # builds/runs for all targets except disabled targets
->>> [mytest3]
->>> file = mytest3.flat
->>> targets = !kvmtool
->> That's sounds like a good idea, but to be honest, I would wait until someone
->> actually needs it before implementing it. That way we don't risk not taking a use
->> case into account and then having to rework it.
-> Don't we have a usecase? Above you said that kvmtool should at least skip
-> the migration tests.
+Based on everything I understand, I would not feel comfortable with
+only 4.
 
-Sorry for not making myself clear, when I was talking about adding a "targets"
-parameter to a test, I was thinking that it will only be used by the run scripts.
-All the tests can run under qemu, and run_tests.sh only knows about qemu, so, from
-that point of view, that's why I think the "targets" argument is not useful at the
-moment.
+If you look at the commit message for patch 1, I do explain why its
+absence is not exposing any serialization problems today. But as it is
+part of the "CCW translation API" (documented in
+Documentation/s390/vfio-ccw.rst) I feel it is important to include.
 
-As for the migration test specifically, the VM migration is implemented in the run
-scripts, not in the test itself; the test waits for the UART to signal that
-migration is complete. That test runs just fine under kvmtool, but no migration is
-taking place:
+Something needs to be done in the transition described by Patch 2, even
+though it still has problems in its current form.
 
-$ ./vm run --irqchip=gicv3-its -c6 -m128 -f arm/gic.flat --params its-migration
-  # lkvm run --firmware arm/gic.flat -m 128 -c 6 --name guest-1440
-  Info: Placing fdt at 0x80200000 - 0x80210000
-chr_testdev_init: chr-testdev: can't find a virtio-console
-ITS: MAPD devid=2 size = 0x8 itt=0x801e0000 valid=1
-ITS: MAPD devid=7 size = 0x8 itt=0x801f0000 valid=1
-MAPC col_id=3 target_addr = 0x30000 valid=1
-MAPC col_id=2 target_addr = 0x20000 valid=1
-INVALL col_id=2
-INVALL col_id=3
-MAPTI dev_id=2 event_id=20 -> phys_id=8195, col_id=3
-MAPTI dev_id=7 event_id=255 -> phys_id=8196, col_id=2
-Now migrate the VM, then press a key to continue...
-INFO: gicv3: its-migration: Migration complete
-INT dev_id=2 event_id=20
-PASS: gicv3: its-migration: dev2/eventid=20 triggers LPI 8195 on PE #3 after migration
-INT dev_id=7 event_id=255
-PASS: gicv3: its-migration: dev7/eventid=255 triggers LPI 8196 on PE #2 after
-migration
-SUMMARY: 2 tests
+> 
+> > > If it is right I don't quite understand the mechanics of the fix,
+> > > because what the patch seems to do is changing the content of
+> > > step 4
+> > > in
+> > > the above diagram. And I don't see how is change that code
+> > > so that it does not "misidentifies the data in the IRB as being
+> > > associated with the newly active I/O".   
+> > 
+> > Consider that the cp_update_scsw() and cp_free() routines that get
+> > called here are looking at the cp->initialized flag to determine
+> > whether to perform any work. For a system that is otherwise idle,
+> > the
+> > cp->initialized flag will be false when processing an IRB related
+> > to a
+> > CSCH, meaning the bulk of this routine will be a NOP.
+> > 
+> > In the failing scenario, as I describe in the commit message for
+> > patch
+> > 4, we could be processing an interrupt that is unaffiliated with
+> > the CP
+> > that was (or is being) built. It need not even be a solicited
+> > interrupt; it just happened that the CSCH interrupt is what got me
+> > looking at this path. The whole situation boils down to the FSM
+> > state
+> > and cp->initialized flag being out of sync from one another after
+> > coming through this function.
+> > 
+> 
+> Thanks for the explanation. Since you are about to send out a new
+> verison which I understand won't be just about cosmetic fixes, I
+> won't
+> invest any more in understanding this one. But I hope this will help
+> me
+> understand that one. 
+> 
+> > > Moreover patch 4 seems to rely on
+> > > private->state which, AFAIR is still used in a racy fashion.
+> > > 
+> > > But if strong empirical evidence shows that it performs better
+> > > (stops
+> > > the bleeding), I think we can go ahead with it.  
+> > 
+> > Again with the bleeding. Is there a Doctor in the house? :)
+> > 
+> 
+> Sorry if I expressed myself comically. Was not my intention. I'm
+> puzzled.
 
-Even the pci-test works under kvmtool, even though it targets qemu's pci-testdev:
+No need to be sorry, and I didn't mean to offend you. The repeated use
+of such a dramatic phrase struck me as humorous, because it conveyed a
+much more prevalant problem than the one being fixed.
 
-$ ./vm run --irqchip=gicv3-its -c6 -m128 -f arm/pci-test.flat
-  # lkvm run --firmware arm/pci-test.flat -m 128 -c 6 --name guest-1468
-  Info: Placing fdt at 0x80200000 - 0x80210000
-chr_testdev_init: chr-testdev: can't find a virtio-console
-No PCIe ECAM compatible controller found
-PCI bus probing failed, skipping tests...
-SUMMARY: 0 tests
+> 
+> Is in your opinion the vfio-ccw kernel module data race free with
+> this
+> series applied?
 
-The test is still useful for kvmtool, because it tests that the PCI node in the
-DTB is generated as expected. And after kvmtool gets support for PCIE (work in
-progress), it will test PCI device probing, which makes it even more useful than
-it is today.
+I have no further concerns.
 
-So I guess the question is, do what should "targets" represent, how should it be
-used and do we need it now?
+Eric
 
->
->>> And it wouldn't bother me to have special logic for kvmtool's lack of
->>> migration put directly in scripts/runtime.bash
->> Good to keep in mind when support is added.
->>
->>> diff --git a/scripts/runtime.bash b/scripts/runtime.bash
->>> index 132389c7dd59..0d5cb51df4f4 100644
->>> --- a/scripts/runtime.bash
->>> +++ b/scripts/runtime.bash
->>> @@ -132,7 +132,7 @@ function run()
->>>      }
->>>  
->>>      cmdline=$(get_cmdline $kernel)
->>> -    if grep -qw "migration" <<<$groups ; then
->>> +    if grep -qw "migration" <<<$groups && [ "$TARGET" != "kvmtool" ]; then
->>>          cmdline="MIGRATION=yes $cmdline"
->>>      fi
->>>      if [ "$verbose" = "yes" ]; then
->>>
->>>> Using --vmm will trigger a warning. I was thinking about removing it entirely in
->>>> a about a year's time, but that's not set in stone. Note that qemu users
->>>> (probably the vast majority of people) will not be affected by this change as
->>>> long as they weren't setting --vmm explicitely to its default value of "qemu".
->>>>
->>> While we'd risk automated configure+build tools, like git{hub,lab} CI,
->>> failing, I think the risk is pretty low right now that anybody is using
->>> the option. Also, we might as well make them change sooner than later by
->>> failing configure. IOW, I'd just do s/vmm/target/g to rename it now. If
->>> we are concerned about the disruption, then I'd just make vmm an alias
->>> for target and not bother deprecating it ever.
->> I also think it will not be too bad if we make the change now, but I'm not sure
->> what you mean by making vmm an alias of target. The patch ignores --vmm is it's
->> not specified, and if it is specified on the configure command line, then it must
->> match the value of --target, otherwise configure fails.
->>
-> The current patch does both things; it says don't use --vmm and it says
-> the new --vmm is --target. I'm saying do one or the other. Either
-> completely rename vmm to target, which will then error out when vmm is
-> specified as an unknown option or allow the user to use either --vmm or
-> --target with no error and where both mean to do the same thing, which is
-> to set the TARGET variable.
-
-I'm sorry, but it's still not clear to me what you are trying to say.
-
-The current behaviour:
-
-$ ./configure --arch=arm64 --cross-prefix=aarch64-linux-gnu- --vmm=qemu
-INFO: --vmm is deprecated and will be removed in future versions
-$ ./configure --arch=arm64 --cross-prefix=aarch64-linux-gnu- --vmm=qemu --target=qemu
-INFO: --vmm is deprecated and will be removed in future versions
-$ ./configure --arch=arm64 --cross-prefix=aarch64-linux-gnu- --vmm=kvmtool
---target=qemu
-INFO: --vmm is deprecated and will be removed in future versions
---vmm must have the same value as --target (qemu)
-Usage: ./configure [options]
-[..]
-$ ./configure --arch=arm64 --cross-prefix=aarch64-linux-gnu- --vmm=kvmtool
---target=kvmtool
-INFO: --vmm is deprecated and will be removed in future versions
-
-Can you point out what makes you think that the patch tries to do two things at once?
-
-Thanks,
-
-Alex
+> 
+> Regards,
+> Halil
 
