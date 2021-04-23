@@ -2,148 +2,124 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3C4513695EF
-	for <lists+kvm@lfdr.de>; Fri, 23 Apr 2021 17:18:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 257C536963D
+	for <lists+kvm@lfdr.de>; Fri, 23 Apr 2021 17:34:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243021AbhDWPTW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 23 Apr 2021 11:19:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53152 "EHLO
+        id S243055AbhDWPea (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 23 Apr 2021 11:34:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56830 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237114AbhDWPTF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 23 Apr 2021 11:19:05 -0400
-Received: from mail-pl1-x629.google.com (mail-pl1-x629.google.com [IPv6:2607:f8b0:4864:20::629])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1B2C0C06174A
-        for <kvm@vger.kernel.org>; Fri, 23 Apr 2021 08:18:27 -0700 (PDT)
-Received: by mail-pl1-x629.google.com with SMTP id v13so11780022ple.9
-        for <kvm@vger.kernel.org>; Fri, 23 Apr 2021 08:18:27 -0700 (PDT)
+        with ESMTP id S242984AbhDWPe3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 23 Apr 2021 11:34:29 -0400
+Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B2B04C061574
+        for <kvm@vger.kernel.org>; Fri, 23 Apr 2021 08:33:52 -0700 (PDT)
+Received: by mail-pj1-x102a.google.com with SMTP id kb13-20020a17090ae7cdb02901503d67f0beso4674344pjb.0
+        for <kvm@vger.kernel.org>; Fri, 23 Apr 2021 08:33:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=RRJebZVaxHqzkm5xYFuJxuwx6avqRXGA2Ewnq/B2t4g=;
-        b=DWUEquz6eZmsmpLbHLdXJSR8NxTMfM4hf/a6kRnz1V1VS5NAs6IbQTJ0LGApSzMmF9
-         psF4GURk+fqTYq0pKqmYDim4F6PvAq6ceNWe7EB4sIWr4QzvPHNj5FT0cYZ+nD4T0ced
-         BAZKi6G9AnB35oZI6wUxnik6QM8gDDmURXaCJ1fuX6Ba/YaJafIJX0bqqYQxRI+LwUgv
-         AXqhBy2w+i6kX6AYB3gDv4FDVBg386OOj/ZwXG9izJje7LtlWchHkzsSsLzsSuk5i6Gm
-         gl+sa4Sa69GCjOc+jEJ/3Nw4XVJ6gAiSIcwitvq95n/cOLYufBrL1von4eXmR7Fq+dmR
-         VywQ==
+        bh=VYRSamfmSN5NeV2/coRcqwrjLzMH1bGIzsGw1q0g8JE=;
+        b=tmy1BHDBvZFz17vMssnaQ0aCzf5m+bOpE01fTLkv60uKsXJdu+h0/i8o8tfj8RycfL
+         wBzkz8EPcdCQFBl9IeQSw0AvdIMv3bSYy7VDdaHlIQJKLwASfQkclLKU4j5jblwCyfir
+         mGb4c3SoSKyfiYEo9u7RSKE7GrE+BJqOFelSb/1Elpxszh7SLeWLiJL2sA/lUk2iYXhW
+         Ai/QZxQ4bJ7WyLRbHmoDgkpf9kRkq6sNka9aMOwQ3DdGYlfPdxedYemtqa96yasBBkRO
+         UFwNcbb3e5dZvZifhE1wc5XqSjLJ9W2mUn3D766qUFerYwQicYS4HtDVP/gCqXduEtLe
+         cE1A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=RRJebZVaxHqzkm5xYFuJxuwx6avqRXGA2Ewnq/B2t4g=;
-        b=h1JWkDvPWBBpAnebHvK7S8hbd2ONBCu6auQQgyH0ruhVyfiLsHZKvwWxYnXKKLrmgI
-         KNUvNLVVq3jv5CYvX5VrOcKr0EBS4HHjz5498uNEL39TyGAm06PUaIB8YwdTSAr7uV/f
-         Cwrmy+X6YJBTPnKWcHU0y/RsQaIXN7I2mqVrYrwmd0m+Tk8gcxM4TP97IJ99VxWhRDGb
-         6nLy8VXKO0stu/rBMLBSN88u2WmBK9SE+u5AhpZCcqGhfdLBuBisJVju/Y1WB2JLM+pu
-         EzUXU2ulNM+bgXjH2eQvSzFt8kp/VBAhjktfSog5MbFDrkj+LqHBtJklPmExpVVOt5BN
-         2B3Q==
-X-Gm-Message-State: AOAM532G+3Tw8lmnl3ozgt5dDLI3u058XMHs/3Html+fAVUVrJWieHe5
-        LzDzJbMZY1TyZw780+vpb6OE4g==
-X-Google-Smtp-Source: ABdhPJzXDK2ujEd9Pl9K0qJpTeO+/RfaDkdAudeD0IMOb+Lm9JjFA3m7tSIH00mNZdVoIof0Pe6GzA==
-X-Received: by 2002:a17:902:7fc9:b029:eb:4828:47e8 with SMTP id t9-20020a1709027fc9b02900eb482847e8mr4603408plb.56.1619191106491;
-        Fri, 23 Apr 2021 08:18:26 -0700 (PDT)
+        bh=VYRSamfmSN5NeV2/coRcqwrjLzMH1bGIzsGw1q0g8JE=;
+        b=TLA+YtaCnubR/rxo029hG0pJUD3Re4MBlaT4/vob2Su5fox9Y3wzsAr2MUthhwtN2F
+         K2aiLAFbPCzVZV5bfrcfTkINRD/Lxc+dm6K4m9KVelaMwwxoomKOixO1GLh6rT4Uf8hB
+         btWluxV1rzUyIa/tZguOJ+3ISMMwIkFWK3YFXm8TF22hJ3f2dWKqqP7mKDs5fLxZhBMw
+         KVOAuqfzl5u1u+AxQ/oRZSsUUzStQyi2bj9ooNe7yFIsq2DODNeJO2w96QzD5eDl9xv3
+         OszjHJbQCVF4TLCwoHL0QEPivLsXb2fzwRW9gZ8jg7uRzSUcFZnziJSOo/82YKdj7oVf
+         YxOA==
+X-Gm-Message-State: AOAM531+kjd9Pe9i682/iWarc5eNNoLqt3cOGnQB9feghQVqH0uUlAte
+        d9iVRcVeoKkIzeMayubtHE64+Q==
+X-Google-Smtp-Source: ABdhPJwgI3xmYlqdQPtoYfcjqvmehUxDut53Kh8ms2j14Rpb53uuDkSYzWvqU8G2e79lzzqWlg6vtw==
+X-Received: by 2002:a17:902:eccd:b029:ea:ed20:b646 with SMTP id a13-20020a170902eccdb02900eaed20b646mr4362458plh.4.1619192032144;
+        Fri, 23 Apr 2021 08:33:52 -0700 (PDT)
 Received: from google.com (240.111.247.35.bc.googleusercontent.com. [35.247.111.240])
-        by smtp.gmail.com with ESMTPSA id 137sm5080242pfx.172.2021.04.23.08.18.25
+        by smtp.gmail.com with ESMTPSA id l18sm7532008pjq.33.2021.04.23.08.33.51
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 23 Apr 2021 08:18:25 -0700 (PDT)
-Date:   Fri, 23 Apr 2021 15:18:22 +0000
+        Fri, 23 Apr 2021 08:33:51 -0700 (PDT)
+Date:   Fri, 23 Apr 2021 15:33:47 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     Wanpeng Li <kernellwp@gmail.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
+To:     David Edmondson <dme@dme.org>
+Cc:     Aaron Lewis <aaronlewis@google.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>
-Subject: Re: [PATCH v2] KVM: x86/xen: Take srcu lock when accessing
- kvm_memslots()
-Message-ID: <YILlPmN0fgLA8RkJ@google.com>
-References: <1619166200-9215-1-git-send-email-wanpengli@tencent.com>
+        kvm list <kvm@vger.kernel.org>
+Subject: Re: [PATCH v2 1/2] kvm: x86: Allow userspace to handle emulation
+ errors
+Message-ID: <YILo26WQNvZNmtX0@google.com>
+References: <20210421122833.3881993-1-aaronlewis@google.com>
+ <cunsg3jg2ga.fsf@dme.org>
+ <CAAAPnDH1LtRDLCjxdd8hdqABSu9JfLyxN1G0Nu1COoVbHn1MLw@mail.gmail.com>
+ <cunmttrftrh.fsf@dme.org>
+ <CAAAPnDHsz5Yd0oa5z15z0S4vum6=mHHXDN_M5X0HeVaCrk4H0Q@mail.gmail.com>
+ <cunk0oug2t3.fsf@dme.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1619166200-9215-1-git-send-email-wanpengli@tencent.com>
+In-Reply-To: <cunk0oug2t3.fsf@dme.org>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Apr 23, 2021, Wanpeng Li wrote:
-> From: Wanpeng Li <wanpengli@tencent.com>
+On Thu, Apr 22, 2021, David Edmondson wrote:
+> On Wednesday, 2021-04-21 at 12:01:21 -07, Aaron Lewis wrote:
 > 
-> kvm_memslots() will be called by kvm_write_guest_offset_cached() so we should 
-> take the srcu lock. Let's pull the srcu lock operation from kvm_steal_time_set_preempted() 
-> again to fix xen part.
+> >> >
+> >> > I don't think this is a problem because the instruction bytes stream
+> >> > has irrelevant bytes in it anyway.  In the test attached I verify that
+> >> > it receives an flds instruction in userspace that was emulated in the
+> >> > guest.  In the stream that comes through insn_size is set to 15 and
+> >> > the instruction is only 2 bytes long, so the stream has irrelevant
+> >> > bytes in it as far as this instruction is concerned.
+> >>
+> >> As an experiment I added[1] reporting of the exit reason using flag 2. On
+> >> emulation failure (without the instruction bytes flag enabled), one run
+> >> of QEMU reported:
+> >>
+> >> > KVM internal error. Suberror: 1
+> >> > extra data[0]: 2
+> >> > extra data[1]: 4
+> >> > extra data[2]: 0
+> >> > extra data[3]: 31
+> >> > emulation failure
+> >>
+> >> data[1] and data[2] are not indicated as valid, but it seems unfortunate
+> >> that I got (not really random) garbage there.
+> >>
+> >> Admittedly, with only your patches applied ndata will never skip past
+> >> any bytes, as there is only one flag. As soon as I add another, is it my
+> >> job to zero out those unused bytes? Maybe we should be clearing all of
+> >> the payload at the top of prepare_emulation_failure_exit().
+> >>
+> >
+> > Clearing the bytes at the top of prepare_emulation_failure_exit()
+> > sounds good to me.  That will keep the data more deterministic.
+> > Though, I will say that I don't think that is required.  If the first
+> > flag isn't set the data shouldn't be read, no?
 > 
-> Fixes: 30b5c851af7 (KVM: x86/xen: Add support for vCPU runstate information)
-> Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
-> ---
->  arch/x86/kvm/x86.c | 20 +++++++++-----------
->  1 file changed, 9 insertions(+), 11 deletions(-)
+> Agreed. As Jim indicated in his other reply, there should be no new data
+> leaked by not zeroing the bytes.
 > 
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 3bf52ba..c775d24 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -4097,7 +4097,6 @@ static void kvm_steal_time_set_preempted(struct kvm_vcpu *vcpu)
->  {
->  	struct kvm_host_map map;
->  	struct kvm_steal_time *st;
-> -	int idx;
->  
->  	if (!(vcpu->arch.st.msr_val & KVM_MSR_ENABLED))
->  		return;
-> @@ -4105,15 +4104,9 @@ static void kvm_steal_time_set_preempted(struct kvm_vcpu *vcpu)
->  	if (vcpu->arch.st.preempted)
->  		return;
->  
-> -	/*
-> -	 * Take the srcu lock as memslots will be accessed to check the gfn
-> -	 * cache generation against the memslots generation.
-> -	 */
-> -	idx = srcu_read_lock(&vcpu->kvm->srcu);
-> -
->  	if (kvm_map_gfn(vcpu, vcpu->arch.st.msr_val >> PAGE_SHIFT, &map,
->  			&vcpu->arch.st.cache, true))
-> -		goto out;
-> +		return;
->  
->  	st = map.hva +
->  		offset_in_page(vcpu->arch.st.msr_val & KVM_STEAL_VALID_BITS);
-> @@ -4121,20 +4114,25 @@ static void kvm_steal_time_set_preempted(struct kvm_vcpu *vcpu)
->  	st->preempted = vcpu->arch.st.preempted = KVM_VCPU_PREEMPTED;
->  
->  	kvm_unmap_gfn(vcpu, &map, &vcpu->arch.st.cache, true, true);
-> -
-> -out:
-> -	srcu_read_unlock(&vcpu->kvm->srcu, idx);
->  }
->  
->  void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
->  {
-> +	int idx;
-> +
->  	if (vcpu->preempted && !vcpu->arch.guest_state_protected)
->  		vcpu->arch.preempted_in_kernel = !static_call(kvm_x86_get_cpl)(vcpu);
->  
-> +	/*
-> +	 * Take the srcu lock as memslots will be accessed to check the gfn
-> +	 * cache generation against the memslots generation.
-> +	 */
-> +	idx = srcu_read_lock(&vcpu->kvm->srcu);
+> For now at least, this is not a performance critical path, so clearing
+> the payload doesn't seem too onerous.
 
-Might be worth grabbing "kvm" in a local variable?  Either way:
+I feel quite strongly that KVM should _not_ touch the unused bytes.  As Jim
+pointed out, a stream of 0x0 0x0 0x0 ... is not benign, it will decode to one or
+more ADD instructions.  Arguably 0x90, 0xcc, or an undending stream of prefixes
+would be more appropriate so that it's less likely for userspace to decode a
+bogus instruction.
 
-Reviewed-by: Sean Christopherson <seanjc@google.com>
+I don't see any reason why unused insn bytes should be treated any differently
+than unused mmio.data[], or unused internal.data[], etc... 
 
->  	if (kvm_xen_msr_enabled(vcpu->kvm))
->  		kvm_xen_runstate_set_preempted(vcpu);
->  	else
->  		kvm_steal_time_set_preempted(vcpu);
-> +	srcu_read_unlock(&vcpu->kvm->srcu, idx);
->  
->  	static_call(kvm_x86_vcpu_put)(vcpu);
->  	vcpu->arch.last_host_tsc = rdtsc();
-> -- 
-> 2.7.4
-> 
+IMO, the better option is to do nothing and let userspace initialize vcpu->run
+before KVM_RUN if they want to avoid consuming stale data.  
