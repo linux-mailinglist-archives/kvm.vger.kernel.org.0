@@ -2,91 +2,128 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id AF8C036974F
-	for <lists+kvm@lfdr.de>; Fri, 23 Apr 2021 18:43:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 473B13697FA
+	for <lists+kvm@lfdr.de>; Fri, 23 Apr 2021 19:09:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243237AbhDWQoF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 23 Apr 2021 12:44:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44016 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242687AbhDWQoD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 23 Apr 2021 12:44:03 -0400
-Received: from mail-oi1-x22b.google.com (mail-oi1-x22b.google.com [IPv6:2607:f8b0:4864:20::22b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B918AC061574
-        for <kvm@vger.kernel.org>; Fri, 23 Apr 2021 09:43:25 -0700 (PDT)
-Received: by mail-oi1-x22b.google.com with SMTP id n184so23734376oia.12
-        for <kvm@vger.kernel.org>; Fri, 23 Apr 2021 09:43:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=5sbEm56V+MlayEe0ssGqqMKi2qTZckGwhWF3sRB4kjs=;
-        b=hZcflOZhW1kTHKPh/MOTuBJpsU+lzxyBdHrBR6J69BDNsp7BxOsqxDbsfesz0YAz6x
-         EMlxdNPV33pbVYjiDRWBFIR5ST4sYmViw9N4Wa6JaHQfFQNNAahzqMiBHkFjEhyJl8ny
-         klVqro/0Ght3Ya3T7MUFi+h+oRMDrKn5rv4kqhsZEGKYtl6qHM0SU/Ajmbwqlo/pVckZ
-         bUpIdDqCmZvYkahmTTw8h3cKFyJSA1/JM7RYV903Wj4tp+TZvVJEecuNMg5MB4laxi97
-         6g2y3TE78nwoV7xnvx5QnAjhRkMXuYBnYg+CuG2RN2O6U3yPMOw6gJ3ZELzS4DTW8rys
-         uhmA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=5sbEm56V+MlayEe0ssGqqMKi2qTZckGwhWF3sRB4kjs=;
-        b=s8L4zdxoZThpyOXcGH1RnjUHFj8rrpWv0QkYPd2McjLhU/dcdQTk41+jIw0eOmAN2c
-         3baXi1H5FnhLff2CbKZLrx3ZqEc9qTehfyL2Gl0dDD6o0J0+eEHoDqPMnuPVJACqsN/4
-         JcAl7Z+jx+GmRJNYU+weXXiJyp4UgzHDOp/u9cIE2QY/MERSp8c1a9IHDcQ06YRxGtCl
-         rbFvjONrb9H3vKAeig6mOaF+OPEpAHMAzffccHXWFtN91nkI1wPR2bIL//5EJAo/QW9J
-         cr/3TnoYhWVrKuzwk/wG3lDM7M+OVtmr+5gQGREeJpeDPPxDuRnP7S0gxNYAnG3+dtH2
-         GVAA==
-X-Gm-Message-State: AOAM531yK8gSEJjY/N08NegB0IgsJKdNYttw9MYJ3QWk1C78iDDLTHHO
-        WBsU9rJ1i3ehOKC0lKAB/whABf1Z1oGzaAkxED/SB1AOlazfoQ==
-X-Google-Smtp-Source: ABdhPJysgQcn9yibhvGOjAcVRUlc/4a/H2l4TrLWx4JMZR87q5pqF6PqKzp9BWAfoCT4lIGZ7LlR1vqjpRz6pJMPRFo=
-X-Received: by 2002:aca:408b:: with SMTP id n133mr4666392oia.13.1619196204981;
- Fri, 23 Apr 2021 09:43:24 -0700 (PDT)
+        id S231684AbhDWRJj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 23 Apr 2021 13:09:39 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:57836 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229691AbhDWRJi (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 23 Apr 2021 13:09:38 -0400
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 13NH4EtP057432;
+        Fri, 23 Apr 2021 13:09:01 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=XT3MF+QXeyK101zF2vqFzprhuAOyIadpctZ0fT0Cajc=;
+ b=JCjaWC71m9rpvapqta86gzk40RU70Y+TJgiIJsmXec7VaCJJc2pDo90hggXlUlx/e+pk
+ fy98MH6+FIyupI6kk4/mZx4FSUksd0lqyaKZ5LK64sMNLJ2pcsHt9EpVaNzXCgpGWbeM
+ 18TAWGpNI1u4tWylasARmqynGV9RjF/Y5st9KqKOIcUEv6t+zGaMsnALXri50E6lRD/Z
+ PcqhoA1wl0CY2K6zxL+L23aiT2O+pWMpt1nuIBmrIkNKCYTQGO69XhaZsL7+8GrlzWMy
+ VXshc0iypIzt0aJhFuxLWQz8xd0OPQqRvy9gy9S34iKnWVSPfDQZCcX24QhmR0+cHGUT KA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3841but20y-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 23 Apr 2021 13:09:01 -0400
+Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 13NH54Ed060673;
+        Fri, 23 Apr 2021 13:09:01 -0400
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3841but1yb-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 23 Apr 2021 13:09:01 -0400
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+        by ppma06ams.nl.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 13NH85vZ014519;
+        Fri, 23 Apr 2021 17:08:58 GMT
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
+        by ppma06ams.nl.ibm.com with ESMTP id 37yt2rue3h-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 23 Apr 2021 17:08:58 +0000
+Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 13NH8tcX36307354
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 23 Apr 2021 17:08:55 GMT
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 4853511C04A;
+        Fri, 23 Apr 2021 17:08:55 +0000 (GMT)
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id CE8DE11C04C;
+        Fri, 23 Apr 2021 17:08:54 +0000 (GMT)
+Received: from li-e979b1cc-23ba-11b2-a85c-dfd230f6cf82 (unknown [9.171.88.237])
+        by d06av25.portsmouth.uk.ibm.com (Postfix) with SMTP;
+        Fri, 23 Apr 2021 17:08:54 +0000 (GMT)
+Date:   Fri, 23 Apr 2021 19:08:53 +0200
+From:   Halil Pasic <pasic@linux.ibm.com>
+To:     Eric Farman <farman@linux.ibm.com>
+Cc:     Cornelia Huck <cohuck@redhat.com>,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        Jared Rossi <jrossi@linux.ibm.com>, linux-s390@vger.kernel.org,
+        kvm@vger.kernel.org
+Subject: Re: [RFC PATCH v4 0/4] vfio-ccw: Fix interrupt handling for
+ HALT/CLEAR
+Message-ID: <20210423190853.6b159871.pasic@linux.ibm.com>
+In-Reply-To: <c23691d7e4d0456dffbbeb1cea80fe3395f92c86.camel@linux.ibm.com>
+References: <20210413182410.1396170-1-farman@linux.ibm.com>
+ <20210422025258.6ed7619d.pasic@linux.ibm.com>
+ <1eb9cbdfe43a42a62f6afb0315bb1e3a103dac9a.camel@linux.ibm.com>
+ <20210423135015.5283edde.pasic@linux.ibm.com>
+ <c23691d7e4d0456dffbbeb1cea80fe3395f92c86.camel@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-References: <20210421122833.3881993-1-aaronlewis@google.com>
- <CALMp9eSu9k57KvGCO6aDEFgkV-Vxrnr1j7CbiLYbtKYG1uwMZQ@mail.gmail.com> <CAAAPnDH_EL3S5WqgLNWQOLruKeStemYtq9vAKVSfV6po3LNGxA@mail.gmail.com>
-In-Reply-To: <CAAAPnDH_EL3S5WqgLNWQOLruKeStemYtq9vAKVSfV6po3LNGxA@mail.gmail.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Fri, 23 Apr 2021 09:43:14 -0700
-Message-ID: <CALMp9eRyFOUHhg406qMfEy7g=szaOPTAsVgkoNfmO0GBeJAAqA@mail.gmail.com>
-Subject: Re: [PATCH v2 1/2] kvm: x86: Allow userspace to handle emulation errors
-To:     Aaron Lewis <aaronlewis@google.com>
-Cc:     David Edmondson <david.edmondson@oracle.com>,
-        Sean Christopherson <seanjc@google.com>,
-        kvm list <kvm@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: fI_-r-MRO54pOgx6fNGf6pWV39jlraS0
+X-Proofpoint-ORIG-GUID: 9A8xrKHIfqQiD1lpAs9xulM2dG-jSEAS
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.761
+ definitions=2021-04-23_07:2021-04-23,2021-04-23 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 malwarescore=0
+ adultscore=0 bulkscore=0 suspectscore=0 mlxlogscore=862 impostorscore=0
+ mlxscore=0 lowpriorityscore=0 spamscore=0 priorityscore=1501 clxscore=1015
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2104060000
+ definitions=main-2104230109
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Apr 22, 2021 at 9:14 PM Aaron Lewis <aaronlewis@google.com> wrote:
->
-> On Thu, Apr 22, 2021 at 5:57 AM Jim Mattson <jmattson@google.com> wrote:
-> >
-> > On Wed, Apr 21, 2021 at 5:28 AM Aaron Lewis <aaronlewis@google.com> wrote:
-> > >
-> > > Add a fallback mechanism to the in-kernel instruction emulator that
-> > > allows userspace the opportunity to process an instruction the emulator
-> > > was unable to.  When the in-kernel instruction emulator fails to process
-> > > an instruction it will either inject a #UD into the guest or exit to
-> > > userspace with exit reason KVM_INTERNAL_ERROR.  This is because it does
-> > > not know how to proceed in an appropriate manner.  This feature lets
-> > > userspace get involved to see if it can figure out a better path
-> > > forward.
-> > >
-> > > Signed-off-by: Aaron Lewis <aaronlewis@google.com>
-> >
-> > The instruction bytes are a good start, but in many cases, they aren't
-> > sufficient context to decode the next instruction. Should we eagerly
-> > provide that information in this exit, or should we just let userspace
-> > gather it via subsequent ioctls if necessary?
->
-> Why is there a concern for the next instruction?  This patch is about
-> userspace helping with the current instruction being emulated.  I'm
-> not sure why we would be concerned about the next one.
+On Fri, 23 Apr 2021 11:53:06 -0400
+Eric Farman <farman@linux.ibm.com> wrote:
 
-Sorry; I should have said, "The instruction bytes are a good start,
-but in many cases, they aren't sufficient context to decode *the*
-instruction." For example, suppose the first byte is 0x48. Without
-more context, we don't know if this is a DEC or a REX prefix.
+> > 
+> > Is in your opinion the vfio-ccw kernel module data race free with
+> > this
+> > series applied?  
+> 
+> I have no further concerns.
+
+I take this for a "yes, in my opinion it is data race free".
+
+Please explain me, how do we synchronize access to
+a) private->state
+b) cp->initialized?
+
+Asuming we both use the definition from the C standard, the multiple
+threads potentially concurrently accessing private->state or
+cp->initialized are not hard to find.
+
+For the former you can take vfio_ccw_sch_io_todo() (has both a read
+and a write, and runs from the workqueue) and fsm_io_request() (has
+both read and write). I guess the accesses from fsm_io_request() are
+all with the io_mutex held, but the accesses form vfio_ccw_sch_io_todo()
+are not with the io_mutex held AFAICT.
+
+And the same is true for the latter with the difference that 
+vfio_ccw_sch_io_todo() manipulates cp->initialized via cp_update_scsw()
+and cp_free().
+
+These are either data races, or I'm missing something. Let me also
+note that C programs data races are bad news, because of undefined
+behavior.
+
+Regards,
+Halil
+
+
