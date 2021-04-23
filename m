@@ -2,138 +2,114 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 16C01369839
-	for <lists+kvm@lfdr.de>; Fri, 23 Apr 2021 19:23:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 49E1E369888
+	for <lists+kvm@lfdr.de>; Fri, 23 Apr 2021 19:38:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231728AbhDWRYZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 23 Apr 2021 13:24:25 -0400
-Received: from forward2-smtp.messagingengine.com ([66.111.4.226]:43783 "EHLO
-        forward2-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229691AbhDWRYY (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 23 Apr 2021 13:24:24 -0400
-Received: from compute4.internal (compute4.nyi.internal [10.202.2.44])
-        by mailforward.nyi.internal (Postfix) with ESMTP id 0F5FD19404C5;
-        Fri, 23 Apr 2021 13:23:45 -0400 (EDT)
-Received: from mailfrontend1 ([10.202.2.162])
-  by compute4.internal (MEProxy); Fri, 23 Apr 2021 13:23:45 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:content-type:date:from:in-reply-to
-        :message-id:mime-version:references:subject:to:x-me-proxy
-        :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; bh=kHVNLz
-        WVTKEmUDZ7J3mrS8zQY4Nzk/Jv3noigt/lu4k=; b=LyDRnDYy1leaK2aOjLd3ut
-        tOAa9kWRDZR2Hojb7D1aUI7+gFXNzyQId8gxgalaAocCakKVj9N1XdxchDqkUH1b
-        HzcZN5wDT4ZtyF6dyX6PQiTcpnRm64UmM+oLqo66+1CoVoGhmTS7Va+SGjlVLiTg
-        Ldb+AY+bio6F3bE9PLu9raAdl/Nl68mK2UNiVbwGVRjJp6XXsASTgaaxGnido78N
-        boiZYU7Ln1Sm5R6c4UwV9jCcCOinBmW/ryXvxVRh6wYmg14XMfBg+c6N8m2z6GNq
-        ZrZpiruR+U1QoOugHpexfcvv4Kqe90NSoMj4EGLzAI4OHGHPLO2iQmL1k99r2RAw
-        ==
-X-ME-Sender: <xms:oAKDYJpuT_3kiapydQRHAjAd4qwNl7F-AxQ6Xx6jLtTlF7AIVSpP4g>
-    <xme:oAKDYLqPHgIXbr9FWocgw-EEXrB8kDfMaLRYdiIJU00W5IWT1WsFE16DRQu74foR4
-    pX8t7yu4Urzx5w4OnM>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeduledrvdduvddgudduvdcutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfgh
-    necuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
-    enucfjughrpefvufgjfhfhfffkgggtsehttdertddttddtnecuhfhrohhmpeffrghvihgu
-    ucfgughmohhnughsohhnuceoughmvgesughmvgdrohhrgheqnecuggftrfgrthhtvghrnh
-    ephfekgeeutddvgeffffetheejvdejieetgfefgfffudegffffgeduheegteegleeknecu
-    kfhppeekuddrudekjedrvdeirddvfeeknecuvehluhhsthgvrhfuihiivgeptdenucfrrg
-    hrrghmpehmrghilhhfrhhomhepughmvgesughmvgdrohhrgh
-X-ME-Proxy: <xmx:oAKDYGOm_B7pnhQTrv-SE6yDcC1RmbDnUh6IQF51Go1FmftE3qw1bg>
-    <xmx:oAKDYE42N7FSgjpyAiN_RdBeLbt8pfdsXrokl7shkMM7y6RieYdrzw>
-    <xmx:oAKDYI73d__wkZkWono73YEo5RnVr4cBKfeQTVLbhJQY3csxrKFw7w>
-    <xmx:oQKDYGkutVNePzS1so805tdc1kJHne7wXZtdEssYrizY5jwX4XB47w>
-Received: from disaster-area.hh.sledj.net (disaster-area.hh.sledj.net [81.187.26.238])
-        by mail.messagingengine.com (Postfix) with ESMTPA id 26F6D240054;
-        Fri, 23 Apr 2021 13:23:44 -0400 (EDT)
-Received: from localhost (disaster-area.hh.sledj.net [local])
-        by disaster-area.hh.sledj.net (OpenSMTPD) with ESMTPA id a2303c6e;
-        Fri, 23 Apr 2021 17:23:42 +0000 (UTC)
-To:     Sean Christopherson <seanjc@google.com>
+        id S231728AbhDWRig (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 23 Apr 2021 13:38:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56130 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229549AbhDWRie (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 23 Apr 2021 13:38:34 -0400
+Received: from mail-pg1-x52f.google.com (mail-pg1-x52f.google.com [IPv6:2607:f8b0:4864:20::52f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 11C95C061574
+        for <kvm@vger.kernel.org>; Fri, 23 Apr 2021 10:37:58 -0700 (PDT)
+Received: by mail-pg1-x52f.google.com with SMTP id p12so35673105pgj.10
+        for <kvm@vger.kernel.org>; Fri, 23 Apr 2021 10:37:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=5bu/6L4heVpMPYLnt4LzXj+yzwX6cdLvXLfTwmZluPI=;
+        b=OV3x5/Wm9kQ7iQ/ya+iwqLKBig/M30v0HhKYs9eBxENOMT/qeZYy3a3Es25I4FCdZ7
+         sO4cNaiTfQaqjHoJ/HziS9wZetQXPMQ0RgkxpUZyMV9BdK6x+oMtrGSiK586KPmRcALP
+         mcVrszxgOaJr2BsAKpG9oKWQBOK/i2EHxyf2Cx35MPSKAQKpxzD4BCrfQAuwh1li/KYE
+         xXCGwK66B3Sj++ChM8QS7kkB3MHdGHgpD3MbL9J7jeYIaLfyL0rGPYg7K+TeOjOnNhK9
+         yKAWAIh52G58xqS7iKaGpF1ghmcpg1O+cBCfQlnRO1MExjnzh5CGt9wLa8Dzo2/vxqCr
+         PZcQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=5bu/6L4heVpMPYLnt4LzXj+yzwX6cdLvXLfTwmZluPI=;
+        b=HJiJrirSWTP9DyyPnDO7suKvOdG3jUY/CdJFS1jJW6EquZYVmL17C+mu+JIlBEOCdK
+         mO9lapU2f9cHY1TWWSLr1jZwudh8wywZZEHJNYrhsOswkd9LFqVovet5ckghwyk0k1p/
+         YMq0Y7/xly0xGrbjpI0F43OAJDEvaK23YLucuVYRR7zcULtTePj0+gEMnTlvPoABRzx9
+         kjDKuSJS8IuJ4FLHzAAIRh5pjVKEZECoFYb7gee18nkdi67ogPhHRm8N7e2VKJ/peBZM
+         rOTJc9RGNDFmQxXRgZNOsbGiJF1YKjJ4IJvEDnfqoLko/l1r217BEva9pJkNYHQYrymP
+         7unQ==
+X-Gm-Message-State: AOAM532tw5bJ8B1xVUpbc6Lbj8PIcNYCJyOHcKUpek+0En4Y6ZGbuLRu
+        bAIVZrIG0m7Fyr1pNMgVfxvTNA==
+X-Google-Smtp-Source: ABdhPJywxdRAWLVOTRkyjmPRGqtM8zqy6/svqUFe5cTTme4Yp9PPkm+xR11VV7EO2dQkTd4TJe4glQ==
+X-Received: by 2002:a63:dc49:: with SMTP id f9mr4757064pgj.361.1619199477353;
+        Fri, 23 Apr 2021 10:37:57 -0700 (PDT)
+Received: from google.com (240.111.247.35.bc.googleusercontent.com. [35.247.111.240])
+        by smtp.gmail.com with ESMTPSA id d132sm5061980pfd.136.2021.04.23.10.37.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 23 Apr 2021 10:37:56 -0700 (PDT)
+Date:   Fri, 23 Apr 2021 17:37:53 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     David Edmondson <dme@dme.org>
 Cc:     Aaron Lewis <aaronlewis@google.com>,
         Jim Mattson <jmattson@google.com>,
         kvm list <kvm@vger.kernel.org>
 Subject: Re: [PATCH v2 1/2] kvm: x86: Allow userspace to handle emulation
  errors
-In-Reply-To: <YILo26WQNvZNmtX0@google.com>
+Message-ID: <YIMF8b2jD3b8IfPP@google.com>
 References: <20210421122833.3881993-1-aaronlewis@google.com>
  <cunsg3jg2ga.fsf@dme.org>
  <CAAAPnDH1LtRDLCjxdd8hdqABSu9JfLyxN1G0Nu1COoVbHn1MLw@mail.gmail.com>
  <cunmttrftrh.fsf@dme.org>
  <CAAAPnDHsz5Yd0oa5z15z0S4vum6=mHHXDN_M5X0HeVaCrk4H0Q@mail.gmail.com>
- <cunk0oug2t3.fsf@dme.org> <YILo26WQNvZNmtX0@google.com>
-X-HGTTG: zarquon
-From:   David Edmondson <dme@dme.org>
-Date:   Fri, 23 Apr 2021 18:23:42 +0100
-Message-ID: <cunbla4ncdd.fsf@dme.org>
+ <cunk0oug2t3.fsf@dme.org>
+ <YILo26WQNvZNmtX0@google.com>
+ <cunbla4ncdd.fsf@dme.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <cunbla4ncdd.fsf@dme.org>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Friday, 2021-04-23 at 15:33:47 GMT, Sean Christopherson wrote:
+On Fri, Apr 23, 2021, David Edmondson wrote:
+> On Friday, 2021-04-23 at 15:33:47 GMT, Sean Christopherson wrote:
+> 
+> > On Thu, Apr 22, 2021, David Edmondson wrote:
+> >> Agreed. As Jim indicated in his other reply, there should be no new data
+> >> leaked by not zeroing the bytes.
+> >> 
+> >> For now at least, this is not a performance critical path, so clearing
+> >> the payload doesn't seem too onerous.
+> >
+> > I feel quite strongly that KVM should _not_ touch the unused bytes.
+> 
+> I'm fine with that, but...
+> 
+> > As Jim pointed out, a stream of 0x0 0x0 0x0 ... is not benign, it will
+> > decode to one or more ADD instructions.  Arguably 0x90, 0xcc, or an
+> > undending stream of prefixes would be more appropriate so that it's
+> > less likely for userspace to decode a bogus instruction.
+> 
+> ...I don't understand this position. If the user-level instruction
+> decoder starts interpreting bytes that the kernel did *not* indicate as
+> valid (by setting insn_size to include them), it's broken.
 
-> On Thu, Apr 22, 2021, David Edmondson wrote:
->> On Wednesday, 2021-04-21 at 12:01:21 -07, Aaron Lewis wrote:
->> 
->> >> >
->> >> > I don't think this is a problem because the instruction bytes stream
->> >> > has irrelevant bytes in it anyway.  In the test attached I verify that
->> >> > it receives an flds instruction in userspace that was emulated in the
->> >> > guest.  In the stream that comes through insn_size is set to 15 and
->> >> > the instruction is only 2 bytes long, so the stream has irrelevant
->> >> > bytes in it as far as this instruction is concerned.
->> >>
->> >> As an experiment I added[1] reporting of the exit reason using flag 2. On
->> >> emulation failure (without the instruction bytes flag enabled), one run
->> >> of QEMU reported:
->> >>
->> >> > KVM internal error. Suberror: 1
->> >> > extra data[0]: 2
->> >> > extra data[1]: 4
->> >> > extra data[2]: 0
->> >> > extra data[3]: 31
->> >> > emulation failure
->> >>
->> >> data[1] and data[2] are not indicated as valid, but it seems unfortunate
->> >> that I got (not really random) garbage there.
->> >>
->> >> Admittedly, with only your patches applied ndata will never skip past
->> >> any bytes, as there is only one flag. As soon as I add another, is it my
->> >> job to zero out those unused bytes? Maybe we should be clearing all of
->> >> the payload at the top of prepare_emulation_failure_exit().
->> >>
->> >
->> > Clearing the bytes at the top of prepare_emulation_failure_exit()
->> > sounds good to me.  That will keep the data more deterministic.
->> > Though, I will say that I don't think that is required.  If the first
->> > flag isn't set the data shouldn't be read, no?
->> 
->> Agreed. As Jim indicated in his other reply, there should be no new data
->> leaked by not zeroing the bytes.
->> 
->> For now at least, this is not a performance critical path, so clearing
->> the payload doesn't seem too onerous.
->
-> I feel quite strongly that KVM should _not_ touch the unused bytes.
+Yes, so what's the point of clearing the unused bytes?  Doing so won't magically
+fix a broken userspace.  That's why I argue that 0x90 or 0xcc would be more
+appropriate; there's at least a non-zero chance that it will help userspace avoid
+doing something completely broken.
 
-I'm fine with that, but...
+On the other hand, userspace can guard against a broken _KVM_ by initializing
+vcpu->run with a known pattern and logging if KVM exits to userspace with
+seemingly bogus data.  Crushing the unused bytes to zero defeats userspace's
+sanity check, e.g. if the actual memcpy() of the instruction bytes copies the
+wrong number of bytes, then userspace's magic pattern will be lost and debugging
+the KVM bug will be that much harder.
 
-> As Jim pointed out, a stream of 0x0 0x0 0x0 ... is not benign, it will
-> decode to one or more ADD instructions.  Arguably 0x90, 0xcc, or an
-> undending stream of prefixes would be more appropriate so that it's
-> less likely for userspace to decode a bogus instruction.
-
-...I don't understand this position. If the user-level instruction
-decoder starts interpreting bytes that the kernel did *not* indicate as
-valid (by setting insn_size to include them), it's broken.
-
-> I don't see any reason why unused insn bytes should be treated any differently
-> than unused mmio.data[], or unused internal.data[], etc... 
->
-> IMO, the better option is to do nothing and let userspace initialize vcpu->run
-> before KVM_RUN if they want to avoid consuming stale data.  
-
-dme.
--- 
-I've still got sand in my shoes.
+This is very much not a theoretical problem, I have debugged two separate KVM
+bugs in the last few months where KVM completely failed to set
+vcpu->run->exit_reason before exiting to userspace.  The exit_reason is a bit of
+a special case because it's disturbingly easy for KVM to get confused over return
+values and unintentionally exit to userspace, but it's not a big stretch to
+imagine a bug where KVM provides incomplete data.
