@@ -2,230 +2,147 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DCB2E369319
-	for <lists+kvm@lfdr.de>; Fri, 23 Apr 2021 15:29:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 73D7A369471
+	for <lists+kvm@lfdr.de>; Fri, 23 Apr 2021 16:12:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242687AbhDWN3H (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 23 Apr 2021 09:29:07 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:36478 "EHLO
-        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S242715AbhDWN3F (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 23 Apr 2021 09:29:05 -0400
-Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 13NDEam0010754;
-        Fri, 23 Apr 2021 09:28:27 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : in-reply-to : references : content-type :
- content-transfer-encoding : mime-version; s=pp1;
- bh=84DUoFdQmTR7LOH3UPUHE46ozu23KIpXHbzuIIqemDc=;
- b=sg2SaBi6HODwqik8Ph4+taHvwh30FMGT4qaNYryKLDpFUFq6ZEZtF1BsJ8NIJ/rRu2ZE
- tmW0y0I+PPF4e6O0NNo8meTBE1X0YpSsUtTmMOt6ZINTAYB/V9e7IIVWzSFaeNQ9tvHi
- CbRbahYG4xry8Y7g7VE6iePPsOQzWShRYIRwhpk14et6VDNtqYSa2tBXga0R2/3fin7I
- vA+wFLGM/Ad598J5aB0Qa2Fr25N1Tv6xQfz9mks5vLkhx+V+2CR0Y4esHMUCiOleZfSd
- Gn9PqKz9bOa7MfH69TWCZAqDUrAtgngUsyQBIn14Hgf0Gm+YOjsvRSpybziyp0MQOmRa NA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 383ahj7jv3-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 23 Apr 2021 09:28:27 -0400
-Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 13NDGI4e015040;
-        Fri, 23 Apr 2021 09:28:26 -0400
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 383ahj7juj-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 23 Apr 2021 09:28:26 -0400
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 13NDRhkg030715;
-        Fri, 23 Apr 2021 13:28:24 GMT
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
-        by ppma04ams.nl.ibm.com with ESMTP id 37yqa8kdbf-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 23 Apr 2021 13:28:24 +0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 13NDSLef38142402
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 23 Apr 2021 13:28:21 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id B7398A4062;
-        Fri, 23 Apr 2021 13:28:21 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 57BD5A405B;
-        Fri, 23 Apr 2021 13:28:21 +0000 (GMT)
-Received: from sig-9-145-66-246.uk.ibm.com (unknown [9.145.66.246])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Fri, 23 Apr 2021 13:28:21 +0000 (GMT)
-Message-ID: <6b671a9cc1e4b0206e9048f96b87182db188beec.camel@linux.ibm.com>
-Subject: Re: [RFC PATCH v4 0/4] vfio-ccw: Fix interrupt handling for
- HALT/CLEAR
-From:   Niklas Schnelle <schnelle@linux.ibm.com>
-To:     Halil Pasic <pasic@linux.ibm.com>,
-        Cornelia Huck <cohuck@redhat.com>
-Cc:     Eric Farman <farman@linux.ibm.com>,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        Jared Rossi <jrossi@linux.ibm.com>, linux-s390@vger.kernel.org,
-        kvm@vger.kernel.org
-Date:   Fri, 23 Apr 2021 15:28:21 +0200
-In-Reply-To: <20210423152311.20570945.pasic@linux.ibm.com>
-References: <20210413182410.1396170-1-farman@linux.ibm.com>
-         <20210422025258.6ed7619d.pasic@linux.ibm.com>
-         <1eb9cbdfe43a42a62f6afb0315bb1e3a103dac9a.camel@linux.ibm.com>
-         <20210423130616.6dcbf4e4.cohuck@redhat.com>
-         <20210423152311.20570945.pasic@linux.ibm.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Mailer: Evolution 3.28.5 (3.28.5-14.el8) 
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: OHqli6u4_GSK9mkHdMa-TaWrha6R7VGa
-X-Proofpoint-GUID: ZDm35lBjYF3RilHzQE3Ho67ugAfs9v7c
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+        id S231542AbhDWONO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 23 Apr 2021 10:13:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38348 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229794AbhDWONN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 23 Apr 2021 10:13:13 -0400
+Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7058EC061574
+        for <kvm@vger.kernel.org>; Fri, 23 Apr 2021 07:12:37 -0700 (PDT)
+Received: by mail-pj1-x1034.google.com with SMTP id gq23-20020a17090b1057b0290151869af68bso1248716pjb.4
+        for <kvm@vger.kernel.org>; Fri, 23 Apr 2021 07:12:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=ajVi+9Fz0ys2enjKok/N/kbmnzMuDauCUH0fs9IKEz0=;
+        b=HEHFl5VeYwDsoLVSOGgYnu99ThD/fhwYVwtuoASS0BgfOPwTFVEfcPyFxLZAMprg7s
+         M5nmBsOBVNbPmNoloPdhMFEPZrQIIvLjxmPlAS9V9XmAkF8oK/MdKpuvfbGsBcA/r57K
+         4rRS9zp3WsgfW2VBwYPlmIvwJsJERcK8vbnox6Un3ce1rJ+I1ipv5w/uSWfmoDJrCNkJ
+         jXn9Kk1+GLZUN2QmkH8bqIBSg57O5jiLdpvnJPN8amM2MkufeSVh2kWytCu6DGuvtRL7
+         HZB4pbZu6+OmZ+rUscONnm/Qb/7bm4KJvq54vdtPrHcTtLfRQsNgvcuoLUD9qcT7DoZ6
+         Hjpw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=ajVi+9Fz0ys2enjKok/N/kbmnzMuDauCUH0fs9IKEz0=;
+        b=lh4u7ZIyYzqavrWEJDDd0yrgp/HqqhyBtoeN4bgiwuUf9VcHMix9us1iFL3Pz03x6v
+         87Fgwo2i3B2RzRicVe4rF1pgXltamOhaLJzisR10BR9kOWem7D5WsfULRLSz9qHnsDta
+         glk2BAaxAZFyGIQxJPP/vU2WmumUDZ7vIwQIaMda/Hij9WolfdlpIV9ktrNhWWsI+2Ki
+         lezwTjBSgJVsk5f71UA5MWEOWfm48KPycntGP3H5RJJhVTChYqWneERIz5wTOIQh9pRZ
+         8Q8DYfyTZ7ik/8Y7FPrgxuXmWw4gJ7mo3SR/iS9zcxnz5DlY9s8rLb4sdlDZY9YhkiSS
+         h2GQ==
+X-Gm-Message-State: AOAM5313l6cymoqIPQswqA/5URdzRcRHJ8oYOeMsDHKCq8p7e+D4iJR/
+        Uu+13nCjXobUGCXMB+Xa0HLFQA==
+X-Google-Smtp-Source: ABdhPJxklyb/JLlpqm/k8LcKabgsrb+/ZUxF2SYRQSHaFi240wu2tEqEvL8CVFL2+P3FPeLLlGB31Q==
+X-Received: by 2002:a17:90a:5b15:: with SMTP id o21mr4714274pji.193.1619187156819;
+        Fri, 23 Apr 2021 07:12:36 -0700 (PDT)
+Received: from google.com (240.111.247.35.bc.googleusercontent.com. [35.247.111.240])
+        by smtp.gmail.com with ESMTPSA id h18sm5059108pgj.51.2021.04.23.07.12.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 23 Apr 2021 07:12:36 -0700 (PDT)
+Date:   Fri, 23 Apr 2021 14:12:32 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Reiji Watanabe <reijiw@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Tom Lendacky <thomas.lendacky@amd.com>
+Subject: Re: [PATCH v2] KVM: SVM: Delay restoration of host MSR_TSC_AUX until
+ return to userspace
+Message-ID: <YILV0KrBUaESfTiY@google.com>
+References: <20210422001736.3255735-1-seanjc@google.com>
+ <CAAeT=FxaRV+za7yk8_9p45k4ui3QJx90gN4b8k4egrxux=QWFA@mail.gmail.com>
+ <YIHYsa1+psfnszcv@google.com>
+ <8cc2bb9a-167e-598c-6a9e-c23e943b1248@redhat.com>
 MIME-Version: 1.0
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.761
- definitions=2021-04-23_04:2021-04-23,2021-04-23 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 lowpriorityscore=0
- bulkscore=0 malwarescore=0 clxscore=1011 spamscore=0 priorityscore=1501
- adultscore=0 impostorscore=0 suspectscore=0 mlxlogscore=999 phishscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2104060000
- definitions=main-2104230084
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <8cc2bb9a-167e-598c-6a9e-c23e943b1248@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 2021-04-23 at 15:23 +0200, Halil Pasic wrote:
-> On Fri, 23 Apr 2021 13:06:16 +0200
-> Cornelia Huck <cohuck@redhat.com> wrote:
-> 
-> > On Thu, 22 Apr 2021 16:49:21 -0400
-> > Eric Farman <farman@linux.ibm.com> wrote:
+On Fri, Apr 23, 2021, Paolo Bonzini wrote:
+> On 22/04/21 22:12, Sean Christopherson wrote:
+> > 	case MSR_TSC_AUX:
+> > 		if (!boot_cpu_has(X86_FEATURE_RDTSCP))
+> > 			return 1;
 > > 
-> > > On Thu, 2021-04-22 at 02:52 +0200, Halil Pasic wrote:  
-> > > > On Tue, 13 Apr 2021 20:24:06 +0200
-> > > > Eric Farman <farman@linux.ibm.com> wrote:
-> > > >     
-> > > > > Hi Conny, Halil,
-> > > > > 
-> > > > > Let's restart our discussion about the collision between interrupts
-> > > > > for
-> > > > > START SUBCHANNEL and HALT/CLEAR SUBCHANNEL. It's been a quarter
-> > > > > million
-> > > > > minutes (give or take), so here is the problematic scenario again:
-> > > > > 
-> > > > > 	CPU 1			CPU 2
-> > > > >  1	CLEAR SUBCHANNEL
-> > > > >  2	fsm_irq()
-> > > > >  3				START SUBCHANNEL
-> > > > >  4	vfio_ccw_sch_io_todo()
-> > > > >  5				fsm_irq()
-> > > > >  6				vfio_ccw_sch_io_todo()
-> > > > > 
-> > > > > From the channel subsystem's point of view the CLEAR SUBCHANNEL
-> > > > > (step 1)
-> > > > > is complete once step 2 is called, as the Interrupt Response Block
-> > > > > (IRB)
-> > > > > has been presented and the TEST SUBCHANNEL was driven by the cio
-> > > > > layer.
-> > > > > Thus, the START SUBCHANNEL (step 3) is submitted [1] and gets a
-> > > > > cc=0 to
-> > > > > indicate the I/O was accepted. However, step 2 stacks the bulk of
-> > > > > the
-> > > > > actual work onto a workqueue for when the subchannel lock is NOT
-> > > > > held,
-> > > > > and is unqueued at step 4. That code misidentifies the data in the
-> > > > > IRB
-> > > > > as being associated with the newly active I/O, and may release
-> > > > > memory
-> > > > > that is actively in use by the channel subsystem and/or device.
-> > > > > Eww.
-> > > > > 
-> > > > > In this version...
-> > > > > 
-> > > > > Patch 1 and 2 are defensive checks. Patch 2 was part of v3 [2], but
-> > > > > I
-> > > > > would love a better option here to guard between steps 2 and 4.
-> > > > > 
-> > > > > Patch 3 is a subset of the removal of the CP_PENDING FSM state in
-> > > > > v3.
-> > > > > I've obviously gone away from this idea, but I thought this piece
-> > > > > is
-> > > > > still valuable.
-> > > > > 
-> > > > > Patch 4 collapses the code on the interrupt path so that changes to
-> > > > > the FSM state and the channel_program struct are handled at the
-> > > > > same
-> > > > > point, rather than separated by a mutex boundary. Because of the
-> > > > > possibility of a START and HALT/CLEAR running concurrently, it does
-> > > > > not make sense to split them here.
-> > > > > 
-> > > > > With the above patches, maybe it then makes sense to hold the
-> > > > > io_mutex
-> > > > > across the entirety of vfio_ccw_sch_io_todo(). But I'm not
-> > > > > completely
-> > > > > sure that would be acceptable.
-> > > > > 
-> > > > > So... Thoughts?    
-> > > > 
-> > > > I believe we should address    
-> > > 
-> > > Who is the "we" here?
-> > >   
-> > > >  the concurrency, encapsulation and layering
-> > > > issues in the subchannel/ccw pass-through code (vfio-ccw) by taking a
-> > > > holistic approach as soon as possible.  
+> > 		if (!msr_info->host_initiated &&
+> > 		    !guest_cpuid_has(vcpu, X86_FEATURE_RDTSCP))
+> > 			return 1;
 > > 
-> > Let me also ask: what is "holistic"? If that's a complete rewrite, I
-> > definitely don't have the capacity for that; if others want to take
-> > over the code, feel free.
+> > 		/*
+> > 		 * TSC_AUX is usually changed only during boot and never read
+> > 		 * directly.  Intercept TSC_AUX instead of exposing it to the
+> > 		 * guest via direct_access_msrs, and switch it via user return.
+> > 		 */
+> > 		preempt_disable();
+> > 		r = kvm_set_user_return_msr(TSC_AUX_URET_SLOT, data, -1ull);
+> > 		preempt_enable();
+> > 		if (r)
+> > 			return 1;
+> > 
+> > 		/*
+> > 		 * Bits 63:32 are dropped by AMD CPUs, but are reserved on
+> > 		 * Intel CPUs.  AMD's APM has incomplete and conflicting info
+> > 		 * on the architectural behavior; emulate current hardware as
+> > 		 * doing so ensures migrating from AMD to Intel won't explode.
+> > 		 */
+> > 		svm->tsc_aux = (u32)data;
+> > 		break;
 > > 
 > 
-> In general: https://en.wikipedia.org/wiki/Holism
-> 
-> In this context I mean:
-> * Fix all data races in in the vfio-ccw module instead of making the
-> "race window" smaller. Reasoning about the behavior of racy programs
-> is very difficult.
-> * The passed-through subchannel of the VM, as seen by the guest OS is an
-> overlay of the host subchannel (which we have to assume is within the
-> specification), the vfio-ccw kernel module, and an userspace emulator.
-> The interface between the kernel module and the userspace emulator is
-> something the authors of the vfio-ccw kernel module design, and while
-> doing so we have to think about the interface the whole solution needs
-> to implemnet. For example we should ask ourselves: what is the right
-> response in kernel when we encounter the situation described by the
-> steps 1-3 of Eric's scenario. Our VMs subchannel needs to reward the
-> SSC with a cc=2 if the subchannel has the clear FC bit set. If we detect
-> the described condition, does it mean that the userspace emulator is
-> broken? Or is the userspace emulator allowed to rely on the vfio-ccw
-> kernel module to detect this condition and return an -EBUSY (which
-> corresponds to cc=2 because that is apart of the definition of the
-> interface between the kernel and the userspace)? When is the FC bit
-> of our VMs subchannel cleared? I read patch 2 like it is trying to catch
-> the condition and return an -EBUSY, but I don't see it catching all
-> the possible cases. I.e. what if another CPU is executing the first
-> instruction of vfio_ccw_sch_io_todo() when we check 
-> work_pending(&private->io_work) in fsm_io_helper()?
-> 
-> [..]
-> 
-> > >   
-> > > > Moreover patch 4 seems to rely on
-> > > > private->state which, AFAIR is still used in a racy fashion.
-> > > > 
-> > > > But if strong empirical evidence shows that it performs better (stops
-> > > > the bleeding), I think we can go ahead with it.    
-> > > 
-> > > Again with the bleeding. Is there a Doctor in the house? :)  
-> > 
-> > No idea, seen any blue boxes around? :)
-> > 
-> 
-> Let me also ask what: blue boxes do you mean? If you mean
-> https://en.wikipedia.org/wiki/Blue_box
-> then, I'm not sure I can follow your association. Are you looking for
-> phone to call a doctor?
+> Ok, squashed in the following:
 
-I think he's talking about this phone box: 
-https://en.wikipedia.org/wiki/TARDIS
+Too fast!  The below won't compile (s/msr_info/msr and 'r' needs to be defined),
+and the get_msr() path needs the guest_cpuid_has() check.  I'll spin a v3. 
 
+> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+> index 14ff7f0963e9..00e9680969a2 100644
+> --- a/arch/x86/kvm/svm/svm.c
+> +++ b/arch/x86/kvm/svm/svm.c
+> @@ -2875,16 +2875,28 @@ static int svm_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr)
+>  		if (!boot_cpu_has(X86_FEATURE_RDTSCP))
+>  			return 1;
+> +		if (!msr_info->host_initiated &&
+> +		    !guest_cpuid_has(vcpu, X86_FEATURE_RDTSCP))
+> +			return 1;
+> +
+>  		/*
+>  		 * TSC_AUX is usually changed only during boot and never read
+>  		 * directly.  Intercept TSC_AUX instead of exposing it to the
+>  		 * guest via direct_access_msrs, and switch it via user return.
+>  		 */
+> -		svm->tsc_aux = data;
+> -
+>  		preempt_disable();
+> -		kvm_set_user_return_msr(TSC_AUX_URET_SLOT, data, -1ull);
+> +		r = kvm_set_user_return_msr(TSC_AUX_URET_SLOT, data, -1ull);
+>  		preempt_enable();
+> +		if (r)
+> +			return 1;
+> +
+> +		/*
+> +		 * Bits 63:32 are dropped by AMD CPUs, but are reserved on
+> +		 * Intel CPUs.  AMD's APM has incomplete and conflicting info
+> +		 * on the architectural behavior; emulate current hardware as
+> +		 * doing so ensures migrating from AMD to Intel won't explode.
+> +		 */
+> +		svm->tsc_aux = (u32)data;
+>  		break;
+>  	case MSR_IA32_DEBUGCTLMSR:
+>  		if (!boot_cpu_has(X86_FEATURE_LBRV)) {
 > 
-> Regards,
-> Halil
-
+> Paolo
+> 
