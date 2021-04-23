@@ -2,429 +2,501 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 89D83369103
-	for <lists+kvm@lfdr.de>; Fri, 23 Apr 2021 13:22:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6D5E536912A
+	for <lists+kvm@lfdr.de>; Fri, 23 Apr 2021 13:36:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229928AbhDWLXG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 23 Apr 2021 07:23:06 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:59165 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229479AbhDWLXG (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 23 Apr 2021 07:23:06 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1619176949;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=5qKak5PAjD7nwuV1d6xM0s2XCPnXHbQUu3Rp7wokfhE=;
-        b=V5jidbKkHkadmGIMEh1GQv3ligdgAdFCyGi+auR+m90m89FnP3N+gcFa+gmeXojDNQPPrb
-        g8NYdbPQ4E6id+JYg5VqJ8J1yQgaP5NVb3ctaLuKdCUboCcxbvvwTobPsHpBGYZJUoh6Ii
-        zADrULLpzLmu/TQRX5/IpnYA1SnYoGI=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-7-hMmNtQEzPreTKQ65gz5lpw-1; Fri, 23 Apr 2021 07:22:27 -0400
-X-MC-Unique: hMmNtQEzPreTKQ65gz5lpw-1
-Received: by mail-wr1-f70.google.com with SMTP id 32-20020adf84230000b029010705438fbfso9881124wrf.21
-        for <kvm@vger.kernel.org>; Fri, 23 Apr 2021 04:22:27 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=5qKak5PAjD7nwuV1d6xM0s2XCPnXHbQUu3Rp7wokfhE=;
-        b=XuUEa3RnjreUJJxIvGVZdkYFbx93I7RVYX8A8VSeIYqK130X7UyQfulxUINgfgq/tz
-         t7FTs+EBT3xn+qhVZAQBAVyv/I9iRUcWuCK/kk0qZ3Clke2BwlhB0pUe9ILUd9PlFu8C
-         qzYeTWKdllCBHyFb9eSaybIqza9MNu6ks3fbCK5VdiTLdiar3Ck853LbWjxd5pzZVOBN
-         cdDwa92UFMmwLG2/+9KOVkqU4B+O4WjxVQtCrtbiEhakJ4st9q3fjPEK8cHDb4PJSBZp
-         wp/1gnVtYCXlmoFpJW0T6JxtaNX2qfw0boEvitZakj9bAbvMTI1UWykX5i5emKFU1X3C
-         PfjQ==
-X-Gm-Message-State: AOAM5304pIPmXCBcSZCE1A12Xr2T66xLP3QelVS2mLPzfI/jglndOiTZ
-        7yZLVI1zQouMcl8RRUvh9f4j6909OS73Xg72FdliVNBsxbl/WzU8pwwWO4/vrh37R+fpZYc9KuS
-        DnN/UUjb5vwWT
-X-Received: by 2002:a5d:5151:: with SMTP id u17mr4228794wrt.413.1619176946366;
-        Fri, 23 Apr 2021 04:22:26 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJw/sCh8tKwrqR5d5QfxgBLR2KIXpZhslJWMqDfX5PwpKPlYvr7iyhP8mDmv5U3xY2nQG/pJAQ==
-X-Received: by 2002:a5d:5151:: with SMTP id u17mr4228776wrt.413.1619176946175;
-        Fri, 23 Apr 2021 04:22:26 -0700 (PDT)
-Received: from gator (cst2-174-132.cust.vodafone.cz. [31.30.174.132])
-        by smtp.gmail.com with ESMTPSA id h63sm7597392wmh.13.2021.04.23.04.22.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 23 Apr 2021 04:22:25 -0700 (PDT)
-Date:   Fri, 23 Apr 2021 13:22:23 +0200
-From:   Andrew Jones <drjones@redhat.com>
-To:     Ricardo Koller <ricarkol@google.com>
-Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
-        pbonzini@redhat.com, maz@kernel.org, alexandru.elisei@arm.com,
-        eric.auger@redhat.com
-Subject: Re: [PATCH 2/3] KVM: selftests: Add aarch64/debug-exceptions test
-Message-ID: <20210423112223.f45wsjq2biunbmcb@gator>
-References: <20210423040351.1132218-1-ricarkol@google.com>
- <20210423040351.1132218-3-ricarkol@google.com>
+        id S242185AbhDWLgv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 23 Apr 2021 07:36:51 -0400
+Received: from mail.kernel.org ([198.145.29.99]:47746 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S236905AbhDWLgr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 23 Apr 2021 07:36:47 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 5D6E361409;
+        Fri, 23 Apr 2021 11:36:10 +0000 (UTC)
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.lan)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94)
+        (envelope-from <maz@kernel.org>)
+        id 1lZu6S-0093oH-0E; Fri, 23 Apr 2021 12:36:08 +0100
+From:   Marc Zyngier <maz@kernel.org>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Alexandru Elisei <alexandru.elisei@arm.com>,
+        Andre Przywara <andre.przywara@arm.com>,
+        Andrew Jones <drjones@redhat.com>,
+        Andrew Scull <ascull@google.com>,
+        Anshuman Khandual <anshuman.khandual@arm.com>,
+        Ard Biesheuvel <ardb@kernel.org>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Daniel Kiss <daniel.kiss@arm.com>,
+        David Brazdil <dbrazdil@google.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        Gavin Shan <gshan@redhat.com>,
+        James Morse <james.morse@arm.com>,
+        Jianyong Wu <jianyong.wu@arm.com>,
+        Jon Hunter <jonathanh@nvidia.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Keqian Zhu <zhukeqian1@huawei.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Mathieu Poirier <mathieu.poirier@linaro.org>,
+        Quentin Perret <qperret@google.com>,
+        Richard Cochran <richardcochran@gmail.com>,
+        Shenming Lu <lushenming@huawei.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Will Deacon <will@kernel.org>,
+        Xiaofei Tan <tanxiaofei@huawei.com>,
+        Xu Jia <xujia39@huawei.com>, Zenghui Yu <yuzenghui@huawei.com>,
+        linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+        kernel-team@android.com
+Subject: [GIT PULL] KVM/arm64 updates for 5.13
+Date:   Fri, 23 Apr 2021 12:35:44 +0100
+Message-Id: <20210423113544.1726204-1-maz@kernel.org>
+X-Mailer: git-send-email 2.29.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210423040351.1132218-3-ricarkol@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: pbonzini@redhat.com, alexandru.elisei@arm.com, andre.przywara@arm.com, drjones@redhat.com, ascull@google.com, anshuman.khandual@arm.com, ardb@kernel.org, catalin.marinas@arm.com, daniel.kiss@arm.com, dbrazdil@google.com, eric.auger@redhat.com, gshan@redhat.com, james.morse@arm.com, jianyong.wu@arm.com, jonathanh@nvidia.com, julien.thierry.kdev@gmail.com, zhukeqian1@huawei.com, mark.rutland@arm.com, mathieu.poirier@linaro.org, qperret@google.com, richardcochran@gmail.com, lushenming@huawei.com, suzuki.poulose@arm.com, tglx@linutronix.de, will@kernel.org, tanxiaofei@huawei.com, xujia39@huawei.com, yuzenghui@huawei.com, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Apr 22, 2021 at 09:03:50PM -0700, Ricardo Koller wrote:
-> Covers fundamental tests for debug exceptions. The guest installs and
-> handle its debug exceptions itself, without KVM_SET_GUEST_DEBUG.
-> 
-> Signed-off-by: Ricardo Koller <ricarkol@google.com>
-> ---
->  tools/testing/selftests/kvm/.gitignore        |   1 +
->  tools/testing/selftests/kvm/Makefile          |   1 +
->  .../selftests/kvm/aarch64/debug-exceptions.c  | 250 ++++++++++++++++++
->  .../selftests/kvm/include/aarch64/processor.h |  17 ++
->  4 files changed, 269 insertions(+)
->  create mode 100644 tools/testing/selftests/kvm/aarch64/debug-exceptions.c
-> 
-> diff --git a/tools/testing/selftests/kvm/.gitignore b/tools/testing/selftests/kvm/.gitignore
-> index e65d5572aefc..f09ed908422b 100644
-> --- a/tools/testing/selftests/kvm/.gitignore
-> +++ b/tools/testing/selftests/kvm/.gitignore
-> @@ -1,4 +1,5 @@
->  # SPDX-License-Identifier: GPL-2.0-only
-> +/aarch64/debug-exceptions
->  /aarch64/get-reg-list
->  /aarch64/get-reg-list-sve
->  /aarch64/vgic_init
-> diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-> index 618c5903f478..2f92442c0cc9 100644
-> --- a/tools/testing/selftests/kvm/Makefile
-> +++ b/tools/testing/selftests/kvm/Makefile
-> @@ -73,6 +73,7 @@ TEST_GEN_PROGS_x86_64 += memslot_modification_stress_test
->  TEST_GEN_PROGS_x86_64 += set_memory_region_test
->  TEST_GEN_PROGS_x86_64 += steal_time
->  
-> +TEST_GEN_PROGS_aarch64 += aarch64/debug-exceptions
->  TEST_GEN_PROGS_aarch64 += aarch64/get-reg-list
->  TEST_GEN_PROGS_aarch64 += aarch64/get-reg-list-sve
->  TEST_GEN_PROGS_aarch64 += aarch64/vgic_init
-> diff --git a/tools/testing/selftests/kvm/aarch64/debug-exceptions.c b/tools/testing/selftests/kvm/aarch64/debug-exceptions.c
-> new file mode 100644
-> index 000000000000..18e8de2711d3
-> --- /dev/null
-> +++ b/tools/testing/selftests/kvm/aarch64/debug-exceptions.c
-> @@ -0,0 +1,250 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +#define _GNU_SOURCE /* for program_invocation_short_name */
+Hi Paolo,
 
-There's no reference to program_invocation_short_name below.
+Here's the rather large pull request for 5.13. Changes are all over
+the map, but the big ticket items are the S2 host isolation when
+running in protected mode, the save/restore support for GICv4.1 and
+guest SVE support in nVHE mode. Plenty of fixes too.
 
-> +#include <fcntl.h>
-> +#include <pthread.h>
-> +#include <sched.h>
-> +#include <semaphore.h>
-> +#include <signal.h>
-> +#include <stdio.h>
-> +#include <stdlib.h>
-> +#include <string.h>
-> +#include <sys/ioctl.h>
-> +#include <sys/mman.h>
-> +#include <asm/barrier.h>
-> +
-> +#include <linux/compiler.h>
-> +
-> +#include <test_util.h>
-> +#include <kvm_util.h>
-> +#include <processor.h>
+Note that this pull request drags a number of branches from other
+trees in order to avoid conflicts and make people's life easier:
 
-This is a boatload of includes, but it looks to me like all we need are
-the bottom three. Also, our pattern is to use "" for these local to kvm
-selftests includes.
+- the Coresight ETE/TRBE branch, as it is intertwined with the KVM
+  tracing support
 
-> +
-> +#define VCPU_ID 0
-> +
-> +extern unsigned char sw_bp, hw_bp, bp_svc, bp_brk, hw_wp, ss_start;
-> +static volatile uint64_t sw_bp_addr, hw_bp_addr;
-> +static volatile uint64_t wp_addr, wp_data_addr;
-> +static volatile uint64_t svc_addr;
-> +static volatile uint64_t ss_addr[4], ss_idx;
-> +#define  CAST_TO_PC(v)  ((uint64_t)&(v))
+- the arm64 vhe-only branch that deals with broken CPUs such as the
+  Apple M1
 
-The 'CAST_TO_' prefix isn't necessary, please just use PC()
+- the arm64 neon-softirqs-disabled that improves the support for
+  FP processing
 
-> +
-> +static void reset_debug_state(void)
-> +{
-> +	asm volatile("msr daifset, #8");
-> +
-> +	write_sysreg(osdlr_el1, 0);
-> +	write_sysreg(oslar_el1, 0);
-> +	asm volatile("isb" : : : "memory");
-> +
-> +	write_sysreg(mdscr_el1, 0);
-> +	/* This test only uses the first bp and wp slot. */
-> +	write_sysreg(dbgbvr0_el1, 0);
-> +	write_sysreg(dbgbcr0_el1, 0);
-> +	write_sysreg(dbgwcr0_el1, 0);
-> +	write_sysreg(dbgwvr0_el1, 0);
-> +	asm volatile("isb" : : : "memory");
-> +}
-> +
-> +static void install_wp(uint64_t addr)
-> +{
-> +	uint32_t wcr;
-> +	uint32_t mdscr;
-> +
-> +	wcr = DBGWCR_LEN8 | DBGWCR_RD | DBGWCR_WR | DBGWCR_EL1 | DBGWCR_E;
-> +	write_sysreg(dbgwcr0_el1, wcr);
-> +	write_sysreg(dbgwvr0_el1, addr);
-> +	asm volatile("isb" : : : "memory");
-> +
-> +	asm volatile("msr daifclr, #8");
-> +
-> +	mdscr = read_sysreg(mdscr_el1) | MDSCR_KDE | MDSCR_MDE;
-> +	write_sysreg(mdscr_el1, mdscr);
-> +}
-> +
-> +static void install_hw_bp(uint64_t addr)
-> +{
-> +	uint32_t bcr;
-> +	uint32_t mdscr;
-> +
-> +	bcr = DBGBCR_LEN8 | DBGBCR_EXEC | DBGBCR_EL1 | DBGBCR_E;
-> +	write_sysreg(dbgbcr0_el1, bcr);
-> +	write_sysreg(dbgbvr0_el1, addr);
-> +	asm volatile("isb" : : : "memory");
-> +
-> +	asm volatile("msr daifclr, #8");
-> +
-> +	mdscr = read_sysreg(mdscr_el1) | MDSCR_KDE | MDSCR_MDE;
-> +	write_sysreg(mdscr_el1, mdscr);
-> +}
-> +
-> +static void install_ss(void)
-> +{
-> +	uint32_t mdscr;
-> +
-> +	asm volatile("msr daifclr, #8");
-> +
-> +	mdscr = read_sysreg(mdscr_el1) | MDSCR_KDE | MDSCR_SS;
-> +	write_sysreg(mdscr_el1, mdscr);
-> +}
-> +
-> +static volatile char write_data;
-> +
-> +#define GUEST_ASSERT_EQ(arg1, arg2) \
-> +	GUEST_ASSERT_2((arg1) == (arg2), (arg1), (arg2))
+You will still get a couple of conflicts with the KVM tree, but these
+are absolutely trivial to resolve.
 
-Please add this to kvm_util.h.
+Please pull,
 
-> +
-> +static void guest_code(void)
-> +{
-> +	GUEST_SYNC(0);
-> +
-> +	/* Software-breakpoint */
-> +	asm volatile("sw_bp: brk #0");
-> +	GUEST_ASSERT_EQ(sw_bp_addr, CAST_TO_PC(sw_bp));
-> +
-> +	GUEST_SYNC(1);
-> +
-> +	/* Hardware-breakpoint */
-> +	reset_debug_state();
-> +	install_hw_bp(CAST_TO_PC(hw_bp));
-> +	asm volatile("hw_bp: nop");
-> +	GUEST_ASSERT_EQ(hw_bp_addr, CAST_TO_PC(hw_bp));
-> +
-> +	GUEST_SYNC(2);
-> +
-> +	/* Hardware-breakpoint + svc */
-> +	reset_debug_state();
-> +	install_hw_bp(CAST_TO_PC(bp_svc));
-> +	asm volatile("bp_svc: svc #0");
-> +	GUEST_ASSERT_EQ(hw_bp_addr, CAST_TO_PC(bp_svc));
-> +	GUEST_ASSERT_EQ(svc_addr, CAST_TO_PC(bp_svc) + 4);
-> +
-> +	GUEST_SYNC(3);
-> +
-> +	/* Hardware-breakpoint + software-breakpoint */
-> +	reset_debug_state();
-> +	install_hw_bp(CAST_TO_PC(bp_brk));
-> +	asm volatile("bp_brk: brk #0");
-> +	GUEST_ASSERT_EQ(sw_bp_addr, CAST_TO_PC(bp_brk));
-> +	GUEST_ASSERT_EQ(hw_bp_addr, CAST_TO_PC(bp_brk));
-> +
-> +	GUEST_SYNC(4);
-> +
-> +	/* Watchpoint */
-> +	reset_debug_state();
-> +	install_wp(CAST_TO_PC(write_data));
-> +	write_data = 'x';
-> +	GUEST_ASSERT_EQ(write_data, 'x');
-> +	GUEST_ASSERT_EQ(wp_data_addr, CAST_TO_PC(write_data));
-> +
-> +	GUEST_SYNC(5);
-> +
-> +	/* Single-step */
-> +	reset_debug_state();
-> +	install_ss();
-> +	ss_idx = 0;
-> +	asm volatile("ss_start:\n"
-> +		     "mrs x0, esr_el1\n"
-> +		     "add x0, x0, #1\n"
-> +		     "msr daifset, #8\n"
-> +		     : : : "x0");
-> +	GUEST_ASSERT_EQ(ss_addr[0], CAST_TO_PC(ss_start));
-> +	GUEST_ASSERT_EQ(ss_addr[1], CAST_TO_PC(ss_start) + 4);
-> +	GUEST_ASSERT_EQ(ss_addr[2], CAST_TO_PC(ss_start) + 8);
-> +
-> +	GUEST_DONE();
-> +}
-> +
-> +static void guest_sw_bp_handler(struct ex_regs *regs)
-> +{
-> +	sw_bp_addr = regs->pc;
-> +	regs->pc += 4;
-> +}
-> +
-> +static void guest_hw_bp_handler(struct ex_regs *regs)
-> +{
-> +	hw_bp_addr = regs->pc;
-> +	regs->pstate |= SPSR_D;
-> +}
-> +
-> +static void guest_wp_handler(struct ex_regs *regs)
-> +{
-> +	wp_data_addr = read_sysreg(far_el1);
-> +	wp_addr = regs->pc;
-> +	regs->pstate |= SPSR_D;
-> +}
-> +
-> +static void guest_ss_handler(struct ex_regs *regs)
-> +{
-> +	GUEST_ASSERT_1(ss_idx < 4, ss_idx);
-> +	ss_addr[ss_idx++] = regs->pc;
-> +	regs->pstate |= SPSR_SS;
-> +}
-> +
-> +static void guest_svc_handler(struct ex_regs *regs)
-> +{
-> +	svc_addr = regs->pc;
-> +}
-> +
-> +static int debug_version(struct kvm_vm *vm)
-> +{
-> +	uint64_t id_aa64dfr0;
-> +
-> +	get_reg(vm, VCPU_ID, ARM64_SYS_REG(ID_AA64DFR0_EL1), &id_aa64dfr0);
-> +	return id_aa64dfr0 & 0xf;
-> +}
-> +
-> +int main(int argc, char *argv[])
-> +{
-> +	struct kvm_vm *vm;
-> +	struct ucall uc;
-> +	int stage;
-> +	int ret;
-> +
-> +	vm = vm_create_default(VCPU_ID, 0, guest_code);
-> +	ucall_init(vm, NULL);
-> +
-> +	vm_init_descriptor_tables(vm);
-> +	vcpu_init_descriptor_tables(vm, VCPU_ID);
-> +
-> +	if (debug_version(vm) < 6) {
-> +		print_skip("Armv8 debug architecture not supported.");
-> +		kvm_vm_free(vm);
-> +		exit(KSFT_SKIP);
-> +	}
-> +
-> +	vm_handle_exception(vm, VECTOR_SYNC_EL1,
-> +			ESR_EC_BRK_INS, guest_sw_bp_handler);
-> +	vm_handle_exception(vm, VECTOR_SYNC_EL1,
-> +			ESR_EC_HW_BP_EL1, guest_hw_bp_handler);
-> +	vm_handle_exception(vm, VECTOR_SYNC_EL1,
-> +			ESR_EC_WP_EL1, guest_wp_handler);
-> +	vm_handle_exception(vm, VECTOR_SYNC_EL1,
-> +			ESR_EC_SSTEP_EL1, guest_ss_handler);
-> +	vm_handle_exception(vm, VECTOR_SYNC_EL1,
-> +			ESR_EC_SVC64, guest_svc_handler);
-> +
-> +	for (stage = 0; stage < 7; stage++) {
-> +		ret = _vcpu_run(vm, VCPU_ID);
-> +
-> +		TEST_ASSERT(ret == 0, "vcpu_run failed: %d\n", ret);
+	M.
 
-Instead of using the _ variant of vcpu_run and this assert on the ret==0,
-you can just use the non _ variant (vcpu_run), which does the same thing.
+The following changes since commit 1e28eed17697bcf343c6743f0028cc3b5dd88bf0:
 
+  Linux 5.12-rc3 (2021-03-14 14:41:02 -0700)
 
-> +		switch (get_ucall(vm, VCPU_ID, &uc)) {
-> +		case UCALL_SYNC:
-> +			TEST_ASSERT(uc.args[1] == stage,
-> +				"Stage %d: Unexpected sync ucall, got %lx",
-> +				stage, (ulong)uc.args[1]);
-> +
+are available in the Git repository at:
 
-Unnecessary blank line
+  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-5.13
 
-> +			break;
-> +		case UCALL_ABORT:
-> +			TEST_FAIL("%s at %s:%ld\n\tvalues: %#lx, %#lx",
-> +				(const char *)uc.args[0],
-> +				__FILE__, uc.args[1], uc.args[2], uc.args[3]);
-> +			break;
-> +		case UCALL_DONE:
-> +			goto done;
-> +		default:
-> +			TEST_FAIL("Unknown ucall %lu", uc.cmd);
-> +		}
-> +	}
-> +
-> +done:
-> +	kvm_vm_free(vm);
-> +	return 0;
-> +}
-> diff --git a/tools/testing/selftests/kvm/include/aarch64/processor.h b/tools/testing/selftests/kvm/include/aarch64/processor.h
-> index 5c902ad95c35..eee69b92e01e 100644
-> --- a/tools/testing/selftests/kvm/include/aarch64/processor.h
-> +++ b/tools/testing/selftests/kvm/include/aarch64/processor.h
-> @@ -21,6 +21,8 @@
->  #define SCTLR_EL1	3, 0,  1, 0, 0
->  #define VBAR_EL1	3, 0, 12, 0, 0
->  
-> +#define ID_AA64DFR0_EL1	3, 0,  0, 5, 0
+for you to fetch changes up to 9a8aae605b80fc0a830cdce747eed48e11acc067:
 
-It'd be nice to add a couple more tabs to the register defines above to
-get them aligned with this new one.
+  Merge branch 'kvm-arm64/kill_oprofile_dependency' into kvmarm-master/next (2021-04-22 13:41:49 +0100)
 
-> +
->  /*
->   * Default MAIR
->   *                  index   attribute
-> @@ -125,4 +127,19 @@ void vm_handle_exception(struct kvm_vm *vm, int vector, int ec,
->  	val;								  \
->  })
->  
-> +#define MDSCR_KDE	(1 << 13)
-> +#define MDSCR_MDE	(1 << 15)
-> +#define MDSCR_SS	(1 << 0)
-> +
-> +#define DBGBCR_LEN8	(0xff << 5)
-> +#define DBGBCR_EXEC	(0x0 << 3)
-> +#define DBGBCR_EL1	(0x1 << 1)
-> +#define DBGBCR_E	(0x1 << 0)
-> +
-> +#define DBGWCR_LEN8	(0xff << 5)
-> +#define DBGWCR_RD	(0x1 << 3)
-> +#define DBGWCR_WR	(0x2 << 3)
-> +#define DBGWCR_EL1	(0x1 << 1)
-> +#define DBGWCR_E	(0x1 << 0)
+----------------------------------------------------------------
+KVM/arm64 updates for Linux 5.13
 
-I think these debug specific defines should be put directly in the debug
-test.
+New features:
 
-> +
->  #endif /* SELFTEST_KVM_PROCESSOR_H */
-> -- 
-> 2.31.1.498.g6c1eba8ee3d-goog
->
+- Stage-2 isolation for the host kernel when running in protected mode
+- Guest SVE support when running in nVHE mode
+- Force W^X hypervisor mappings in nVHE mode
+- ITS save/restore for guests using direct injection with GICv4.1
+- nVHE panics now produce readable backtraces
+- Guest support for PTP using the ptp_kvm driver
+- Performance improvements in the S2 fault handler
+- Alexandru is now a reviewer (not really a new feature...)
 
-Thanks,
-drew 
+Fixes:
+- Proper emulation of the GICR_TYPER register
+- Handle the complete set of relocation in the nVHE EL2 object
+- Get rid of the oprofile dependency in the PMU code (and of the
+  oprofile body parts at the same time)
+- Debug and SPE fixes
+- Fix vcpu reset
 
+----------------------------------------------------------------
+Alexandru Elisei (4):
+      Documentation: KVM: Document KVM_GUESTDBG_USE_HW control flag for arm64
+      KVM: arm64: Initialize VCPU mdcr_el2 before loading it
+      KVM: arm64: Don't print warning when trapping SPE registers
+      KVM: arm64: Don't advertise FEAT_SPE to guests
+
+Andrew Scull (5):
+      bug: Remove redundant condition check in report_bug
+      bug: Factor out a getter for a bug's file line
+      bug: Assign values once in bug_get_file_line()
+      KVM: arm64: Use BUG and BUG_ON in nVHE hyp
+      KVM: arm64: Log source when panicking from nVHE hyp
+
+Anshuman Khandual (5):
+      arm64: Add TRBE definitions
+      coresight: core: Add support for dedicated percpu sinks
+      coresight: sink: Add TRBE driver
+      Documentation: coresight: trbe: Sysfs ABI description
+      Documentation: trace: Add documentation for TRBE
+
+Ard Biesheuvel (3):
+      arm64: assembler: remove conditional NEON yield macros
+      arm64: assembler: introduce wxN aliases for wN registers
+      arm64: fpsimd: run kernel mode NEON with softirqs disabled
+
+Daniel Kiss (1):
+      KVM: arm64: Enable SVE support for nVHE
+
+David Brazdil (1):
+      KVM: arm64: Support PREL/PLT relocs in EL2 code
+
+Eric Auger (11):
+      KVM: arm64: vgic-v3: Fix some error codes when setting RDIST base
+      KVM: arm64: Fix KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION read
+      KVM: arm64: vgic-v3: Fix error handling in vgic_v3_set_redist_base()
+      KVM: arm/arm64: vgic: Reset base address on kvm_vgic_dist_destroy()
+      docs: kvm: devices/arm-vgic-v3: enhance KVM_DEV_ARM_VGIC_CTRL_INIT doc
+      KVM: arm64: Simplify argument passing to vgic_uaccess_[read|write]
+      kvm: arm64: vgic-v3: Introduce vgic_v3_free_redist_region()
+      KVM: arm64: vgic-v3: Expose GICR_TYPER.Last for userspace
+      KVM: selftests: aarch64/vgic-v3 init sequence tests
+      KVM: selftests: vgic_init kvm selftests fixup
+      KVM: arm/arm64: Fix KVM_VGIC_V3_ADDR_TYPE_REDIST read
+
+Gavin Shan (3):
+      KVM: arm64: Hide kvm_mmu_wp_memory_region()
+      KVM: arm64: Use find_vma_intersection()
+      KVM: arm64: Don't retrieve memory slot again in page fault handler
+
+Jianyong Wu (4):
+      ptp: Reorganize ptp_kvm.c to make it arch-independent
+      clocksource: Add clocksource id for arm arch counter
+      KVM: arm64: Add support for the KVM PTP service
+      ptp: arm/arm64: Enable ptp_kvm for arm/arm64
+
+Jon Hunter (1):
+      ptp: Don't print an error if ptp_kvm is not supported
+
+Marc Zyngier (50):
+      KVM: arm64: Provide KVM's own save/restore SVE primitives
+      KVM: arm64: Use {read,write}_sysreg_el1 to access ZCR_EL1
+      KVM: arm64: Let vcpu_sve_pffr() handle HYP VAs
+      KVM: arm64: Introduce vcpu_sve_vq() helper
+      arm64: sve: Provide a conditional update accessor for ZCR_ELx
+      KVM: arm64: Rework SVE host-save/guest-restore
+      KVM: arm64: Map SVE context at EL2 when available
+      KVM: arm64: Save guest's ZCR_EL1 before saving the FPSIMD state
+      KVM: arm64: Trap host SVE accesses when the FPSIMD state is dirty
+      KVM: arm64: Save/restore SVE state for nVHE
+      arm64: Use INIT_SCTLR_EL1_MMU_OFF to disable the MMU on CPU restart
+      KVM: arm64: Use INIT_SCTLR_EL2_MMU_OFF to disable the MMU on KVM teardown
+      KVM: arm64: Turn SCTLR_ELx_FLAGS into INIT_SCTLR_EL2_MMU_ON
+      KVM: arm64: Force SCTLR_EL2.WXN when running nVHE
+      KVM: arm64: Fix host's ZCR_EL2 restore on nVHE
+      Merge tag 'v5.12-rc3' into kvm-arm64/host-stage2
+      irqchip/gic-v3-its: Add a cache invalidation right after vPE unmapping
+      KVM: arm64: Generate final CTR_EL0 value when running in Protected mode
+      KVM: arm64: Drop the CPU_FTR_REG_HYP_COPY infrastructure
+      KVM: arm64: Elect Alexandru as a replacement for Julien as a reviewer
+      KVM: arm64: Mark the kvmarm ML as moderated for non-subscribers
+      KVM: arm64: Fix table format for PTP documentation
+      Merge remote-tracking branch 'coresight/next-ETE-TRBE' into kvmarm-master/next
+      arm64: cpufeature: Allow early filtering of feature override
+      arm64: Cope with CPUs stuck in VHE mode
+      arm64: Get rid of CONFIG_ARM64_VHE
+      KVM: arm64: Clarify vcpu reset behaviour
+      KVM: arm64: Fully zero the vcpu state on reset
+      Merge branch 'kvm-arm64/debug-5.13' into kvmarm-master/next
+      Merge branch 'kvm-arm64/host-stage2' into kvmarm-master/next
+      Merge branch 'kvm-arm64/memslot-fixes' into kvmarm-master/next
+      Merge branch 'kvm-arm64/misc-5.13' into kvmarm-master/next
+      Merge branch 'kvm-arm64/nvhe-panic-info' into kvmarm-master/next
+      Merge branch 'kvm-arm64/nvhe-sve' into kvmarm-master/next
+      Merge branch 'kvm-arm64/nvhe-wxn' into kvmarm-master/next
+      Merge branch 'kvm-arm64/ptp' into kvmarm-master/next
+      Merge branch 'kvm-arm64/vgic-5.13' into kvmarm-master/next
+      Merge branch 'kvm-arm64/vlpi-save-restore' into kvmarm-master/next
+      Merge remote-tracking branch 'arm64/for-next/vhe-only' into kvmarm-master/next
+      Merge remote-tracking branch 'arm64/for-next/neon-softirqs-disabled' into kvmarm-master/next
+      Merge remote-tracking branch 'coresight/next-ETE-TRBE' into kvmarm-master/next
+      bug: Provide dummy version of bug_get_file_line() when !GENERIC_BUG
+      Merge branch 'kvm-arm64/nvhe-panic-info' into kvmarm-master/next
+      Merge branch 'kvm-arm64/ptp' into kvmarm-master/next
+      KVM: arm64: Divorce the perf code from oprofile helpers
+      arm64: Get rid of oprofile leftovers
+      s390: Get rid of oprofile leftovers
+      sh: Get rid of oprofile leftovers
+      perf: Get rid of oprofile leftovers
+      Merge branch 'kvm-arm64/kill_oprofile_dependency' into kvmarm-master/next
+
+Quentin Perret (35):
+      KVM: arm64: Initialize kvm_nvhe_init_params early
+      KVM: arm64: Avoid free_page() in page-table allocator
+      KVM: arm64: Factor memory allocation out of pgtable.c
+      KVM: arm64: Introduce a BSS section for use at Hyp
+      KVM: arm64: Make kvm_call_hyp() a function call at Hyp
+      KVM: arm64: Allow using kvm_nvhe_sym() in hyp code
+      KVM: arm64: Introduce an early Hyp page allocator
+      KVM: arm64: Stub CONFIG_DEBUG_LIST at Hyp
+      KVM: arm64: Introduce a Hyp buddy page allocator
+      KVM: arm64: Enable access to sanitized CPU features at EL2
+      KVM: arm64: Provide __flush_dcache_area at EL2
+      KVM: arm64: Factor out vector address calculation
+      arm64: asm: Provide set_sctlr_el2 macro
+      KVM: arm64: Prepare the creation of s1 mappings at EL2
+      KVM: arm64: Elevate hypervisor mappings creation at EL2
+      KVM: arm64: Use kvm_arch for stage 2 pgtable
+      KVM: arm64: Use kvm_arch in kvm_s2_mmu
+      KVM: arm64: Set host stage 2 using kvm_nvhe_init_params
+      KVM: arm64: Refactor kvm_arm_setup_stage2()
+      KVM: arm64: Refactor __load_guest_stage2()
+      KVM: arm64: Refactor __populate_fault_info()
+      KVM: arm64: Make memcache anonymous in pgtable allocator
+      KVM: arm64: Reserve memory for host stage 2
+      KVM: arm64: Sort the hypervisor memblocks
+      KVM: arm64: Always zero invalid PTEs
+      KVM: arm64: Use page-table to track page ownership
+      KVM: arm64: Refactor the *_map_set_prot_attr() helpers
+      KVM: arm64: Add kvm_pgtable_stage2_find_range()
+      KVM: arm64: Introduce KVM_PGTABLE_S2_NOFWB stage 2 flag
+      KVM: arm64: Introduce KVM_PGTABLE_S2_IDMAP stage 2 flag
+      KVM: arm64: Provide sanitized mmfr* registers at EL2
+      KVM: arm64: Wrap the host with a stage 2
+      KVM: arm64: Page-align the .hyp sections
+      KVM: arm64: Disable PMU support in protected mode
+      KVM: arm64: Protect the .hyp sections from the host
+
+Shenming Lu (4):
+      irqchip/gic-v3-its: Drop the setting of PTZ altogether
+      KVM: arm64: GICv4.1: Add function to get VLPI state
+      KVM: arm64: GICv4.1: Try to save VLPI state in save_pending_tables
+      KVM: arm64: GICv4.1: Give a chance to save VLPI state
+
+Suzuki K Poulose (17):
+      KVM: arm64: Hide system instruction access to Trace registers
+      KVM: arm64: Disable guest access to trace filter controls
+      perf: aux: Add flags for the buffer format
+      perf: aux: Add CoreSight PMU buffer formats
+      arm64: Add support for trace synchronization barrier
+      KVM: arm64: Handle access to TRFCR_EL1
+      KVM: arm64: Move SPE availability check to VCPU load
+      arm64: KVM: Enable access to TRBE support for host
+      coresight: etm4x: Move ETM to prohibited region for disable
+      coresight: etm-perf: Allow an event to use different sinks
+      coresight: Do not scan for graph if none is present
+      coresight: etm4x: Add support for PE OS lock
+      coresight: ete: Add support for ETE sysreg access
+      coresight: ete: Add support for ETE tracing
+      dts: bindings: Document device tree bindings for ETE
+      coresight: etm-perf: Handle stale output handles
+      dts: bindings: Document device tree bindings for Arm TRBE
+
+Thomas Gleixner (1):
+      time: Add mechanism to recognize clocksource in time_get_snapshot
+
+Wang Wensheng (1):
+      KVM: arm64: Fix error return code in init_hyp_mode()
+
+Wei Yongjun (2):
+      coresight: core: Make symbol 'csdev_sink' static
+      coresight: trbe: Fix return value check in arm_trbe_register_coresight_cpu()
+
+Will Deacon (5):
+      arm64: lib: Annotate {clear, copy}_page() as position-independent
+      KVM: arm64: Link position-independent string routines into .hyp.text
+      arm64: kvm: Add standalone ticket spinlock implementation for use at hyp
+      arm/arm64: Probe for the presence of KVM hypervisor
+      KVM: arm64: Advertise KVM UID to guests via SMCCC
+
+Xiaofei Tan (1):
+      arm64: sve: Provide sve_cond_update_zcr_vq fallback when !ARM64_SVE
+
+Xu Jia (1):
+      KVM: arm64: Make symbol '_kvm_host_prot_finalize' static
+
+Zenghui Yu (2):
+      KVM: arm64: GICv4.1: Restore VLPI pending state to physical side
+      KVM: arm64: Fix Function ID typo for PTP_KVM service
+
+ .../ABI/testing/sysfs-bus-coresight-devices-trbe   |   14 +
+ Documentation/admin-guide/kernel-parameters.txt    |    3 +-
+ Documentation/devicetree/bindings/arm/ete.yaml     |   75 ++
+ Documentation/devicetree/bindings/arm/trbe.yaml    |   49 +
+ Documentation/trace/coresight/coresight-trbe.rst   |   38 +
+ Documentation/virt/kvm/api.rst                     |   25 +-
+ Documentation/virt/kvm/arm/index.rst               |    1 +
+ Documentation/virt/kvm/arm/ptp_kvm.rst             |   25 +
+ Documentation/virt/kvm/devices/arm-vgic-its.rst    |    2 +-
+ Documentation/virt/kvm/devices/arm-vgic-v3.rst     |    2 +-
+ MAINTAINERS                                        |    6 +-
+ arch/arm/include/asm/hypervisor.h                  |    3 +
+ arch/arm64/Kconfig                                 |   20 -
+ arch/arm64/crypto/aes-modes.S                      |    2 +-
+ arch/arm64/crypto/sha1-ce-core.S                   |    2 +-
+ arch/arm64/crypto/sha2-ce-core.S                   |    2 +-
+ arch/arm64/crypto/sha3-ce-core.S                   |    4 +-
+ arch/arm64/crypto/sha512-ce-core.S                 |    2 +-
+ arch/arm64/include/asm/assembler.h                 |  129 +--
+ arch/arm64/include/asm/barrier.h                   |    1 +
+ arch/arm64/include/asm/cpufeature.h                |   17 +
+ arch/arm64/include/asm/el2_setup.h                 |   13 +
+ arch/arm64/include/asm/fpsimd.h                    |   11 +
+ arch/arm64/include/asm/fpsimdmacros.h              |   10 +-
+ arch/arm64/include/asm/hyp_image.h                 |    7 +
+ arch/arm64/include/asm/hypervisor.h                |    3 +
+ arch/arm64/include/asm/kvm_arm.h                   |    3 +
+ arch/arm64/include/asm/kvm_asm.h                   |    9 +
+ arch/arm64/include/asm/kvm_host.h                  |   46 +-
+ arch/arm64/include/asm/kvm_hyp.h                   |   14 +-
+ arch/arm64/include/asm/kvm_mmu.h                   |   25 +-
+ arch/arm64/include/asm/kvm_pgtable.h               |  164 ++-
+ arch/arm64/include/asm/pgtable-prot.h              |    4 +-
+ arch/arm64/include/asm/sections.h                  |    1 +
+ arch/arm64/include/asm/sysreg.h                    |   59 +-
+ arch/arm64/kernel/asm-offsets.c                    |    5 +
+ arch/arm64/kernel/cpu-reset.S                      |    5 +-
+ arch/arm64/kernel/cpufeature.c                     |   11 +-
+ arch/arm64/kernel/fpsimd.c                         |    4 +-
+ arch/arm64/kernel/head.S                           |   39 +-
+ arch/arm64/kernel/hyp-stub.S                       |   13 +-
+ arch/arm64/kernel/idreg-override.c                 |   26 +-
+ arch/arm64/kernel/image-vars.h                     |   34 +-
+ arch/arm64/kernel/vmlinux.lds.S                    |   74 +-
+ arch/arm64/kvm/arm.c                               |  216 +++-
+ arch/arm64/kvm/debug.c                             |  116 +-
+ arch/arm64/kvm/fpsimd.c                            |   26 +-
+ arch/arm64/kvm/guest.c                             |    6 +-
+ arch/arm64/kvm/handle_exit.c                       |   45 +
+ arch/arm64/kvm/hyp/Makefile                        |    2 +-
+ arch/arm64/kvm/hyp/fpsimd.S                        |   10 +
+ arch/arm64/kvm/hyp/include/hyp/switch.h            |  107 +-
+ arch/arm64/kvm/hyp/include/nvhe/early_alloc.h      |   14 +
+ arch/arm64/kvm/hyp/include/nvhe/gfp.h              |   68 ++
+ arch/arm64/kvm/hyp/include/nvhe/mem_protect.h      |   36 +
+ arch/arm64/kvm/hyp/include/nvhe/memory.h           |   51 +
+ arch/arm64/kvm/hyp/include/nvhe/mm.h               |   96 ++
+ arch/arm64/kvm/hyp/include/nvhe/spinlock.h         |   92 ++
+ arch/arm64/kvm/hyp/nvhe/Makefile                   |    9 +-
+ arch/arm64/kvm/hyp/nvhe/cache.S                    |   13 +
+ arch/arm64/kvm/hyp/nvhe/debug-sr.c                 |   56 +-
+ arch/arm64/kvm/hyp/nvhe/early_alloc.c              |   54 +
+ arch/arm64/kvm/hyp/nvhe/gen-hyprel.c               |   18 +
+ arch/arm64/kvm/hyp/nvhe/host.S                     |   18 +-
+ arch/arm64/kvm/hyp/nvhe/hyp-init.S                 |   54 +-
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c                 |   75 +-
+ arch/arm64/kvm/hyp/nvhe/hyp-smp.c                  |    6 +-
+ arch/arm64/kvm/hyp/nvhe/hyp.lds.S                  |    1 +
+ arch/arm64/kvm/hyp/nvhe/mem_protect.c              |  279 +++++
+ arch/arm64/kvm/hyp/nvhe/mm.c                       |  173 +++
+ arch/arm64/kvm/hyp/nvhe/page_alloc.c               |  195 ++++
+ arch/arm64/kvm/hyp/nvhe/psci-relay.c               |    4 +-
+ arch/arm64/kvm/hyp/nvhe/setup.c                    |  214 ++++
+ arch/arm64/kvm/hyp/nvhe/stub.c                     |   22 +
+ arch/arm64/kvm/hyp/nvhe/switch.c                   |   26 +-
+ arch/arm64/kvm/hyp/nvhe/tlb.c                      |    4 +-
+ arch/arm64/kvm/hyp/pgtable.c                       |  410 +++++--
+ arch/arm64/kvm/hyp/reserved_mem.c                  |  113 ++
+ arch/arm64/kvm/hyp/vhe/switch.c                    |    4 +-
+ arch/arm64/kvm/hypercalls.c                        |   80 +-
+ arch/arm64/kvm/mmu.c                               |  136 ++-
+ arch/arm64/kvm/perf.c                              |    7 +-
+ arch/arm64/kvm/pmu-emul.c                          |    2 +-
+ arch/arm64/kvm/pmu.c                               |    8 +-
+ arch/arm64/kvm/reset.c                             |   51 +-
+ arch/arm64/kvm/sys_regs.c                          |   16 +
+ arch/arm64/kvm/va_layout.c                         |    7 +
+ arch/arm64/kvm/vgic/vgic-init.c                    |   12 +-
+ arch/arm64/kvm/vgic/vgic-its.c                     |    6 +-
+ arch/arm64/kvm/vgic/vgic-kvm-device.c              |    7 +-
+ arch/arm64/kvm/vgic/vgic-mmio-v3.c                 |   81 +-
+ arch/arm64/kvm/vgic/vgic-mmio.c                    |   10 +-
+ arch/arm64/kvm/vgic/vgic-v3.c                      |   66 +-
+ arch/arm64/kvm/vgic/vgic-v4.c                      |   38 +
+ arch/arm64/kvm/vgic/vgic.h                         |    2 +
+ arch/arm64/lib/clear_page.S                        |    4 +-
+ arch/arm64/lib/copy_page.S                         |    4 +-
+ arch/arm64/mm/init.c                               |    3 +
+ arch/s390/kernel/perf_event.c                      |   21 -
+ arch/sh/kernel/perf_event.c                        |   18 -
+ drivers/clocksource/arm_arch_timer.c               |   36 +
+ drivers/firmware/psci/psci.c                       |    2 +
+ drivers/firmware/smccc/Makefile                    |    2 +-
+ drivers/firmware/smccc/kvm_guest.c                 |   50 +
+ drivers/firmware/smccc/smccc.c                     |    1 +
+ drivers/hwtracing/coresight/Kconfig                |   24 +-
+ drivers/hwtracing/coresight/Makefile               |    1 +
+ drivers/hwtracing/coresight/coresight-core.c       |   29 +-
+ drivers/hwtracing/coresight/coresight-etm-perf.c   |  119 +-
+ drivers/hwtracing/coresight/coresight-etm4x-core.c |  161 ++-
+ .../hwtracing/coresight/coresight-etm4x-sysfs.c    |   19 +-
+ drivers/hwtracing/coresight/coresight-etm4x.h      |   83 +-
+ drivers/hwtracing/coresight/coresight-platform.c   |    6 +
+ drivers/hwtracing/coresight/coresight-priv.h       |    3 +
+ drivers/hwtracing/coresight/coresight-trbe.c       | 1157 ++++++++++++++++++++
+ drivers/hwtracing/coresight/coresight-trbe.h       |  152 +++
+ drivers/irqchip/irq-gic-v3-its.c                   |   18 +-
+ drivers/perf/arm_pmu.c                             |   30 -
+ drivers/ptp/Kconfig                                |    2 +-
+ drivers/ptp/Makefile                               |    2 +
+ drivers/ptp/ptp_kvm_arm.c                          |   28 +
+ drivers/ptp/{ptp_kvm.c => ptp_kvm_common.c}        |   85 +-
+ drivers/ptp/ptp_kvm_x86.c                          |   97 ++
+ include/kvm/arm_pmu.h                              |    4 +
+ include/kvm/arm_vgic.h                             |    1 +
+ include/linux/arm-smccc.h                          |   41 +
+ include/linux/bug.h                                |   10 +
+ include/linux/clocksource.h                        |    6 +
+ include/linux/clocksource_ids.h                    |   12 +
+ include/linux/coresight.h                          |   13 +
+ include/linux/perf_event.h                         |    2 -
+ include/linux/ptp_kvm.h                            |   19 +
+ include/linux/timekeeping.h                        |   12 +-
+ include/uapi/linux/kvm.h                           |    1 +
+ include/uapi/linux/perf_event.h                    |   13 +-
+ kernel/events/core.c                               |    5 -
+ kernel/time/clocksource.c                          |    2 +
+ kernel/time/timekeeping.c                          |    1 +
+ lib/bug.c                                          |   54 +-
+ tools/testing/selftests/kvm/.gitignore             |    1 +
+ tools/testing/selftests/kvm/Makefile               |    1 +
+ tools/testing/selftests/kvm/aarch64/vgic_init.c    |  551 ++++++++++
+ tools/testing/selftests/kvm/include/kvm_util.h     |    9 +
+ tools/testing/selftests/kvm/lib/kvm_util.c         |   75 ++
+ 144 files changed, 6298 insertions(+), 856 deletions(-)
+ create mode 100644 Documentation/ABI/testing/sysfs-bus-coresight-devices-trbe
+ create mode 100644 Documentation/devicetree/bindings/arm/ete.yaml
+ create mode 100644 Documentation/devicetree/bindings/arm/trbe.yaml
+ create mode 100644 Documentation/trace/coresight/coresight-trbe.rst
+ create mode 100644 Documentation/virt/kvm/arm/ptp_kvm.rst
+ create mode 100644 arch/arm64/kvm/hyp/include/nvhe/early_alloc.h
+ create mode 100644 arch/arm64/kvm/hyp/include/nvhe/gfp.h
+ create mode 100644 arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
+ create mode 100644 arch/arm64/kvm/hyp/include/nvhe/memory.h
+ create mode 100644 arch/arm64/kvm/hyp/include/nvhe/mm.h
+ create mode 100644 arch/arm64/kvm/hyp/include/nvhe/spinlock.h
+ create mode 100644 arch/arm64/kvm/hyp/nvhe/cache.S
+ create mode 100644 arch/arm64/kvm/hyp/nvhe/early_alloc.c
+ create mode 100644 arch/arm64/kvm/hyp/nvhe/mem_protect.c
+ create mode 100644 arch/arm64/kvm/hyp/nvhe/mm.c
+ create mode 100644 arch/arm64/kvm/hyp/nvhe/page_alloc.c
+ create mode 100644 arch/arm64/kvm/hyp/nvhe/setup.c
+ create mode 100644 arch/arm64/kvm/hyp/nvhe/stub.c
+ create mode 100644 arch/arm64/kvm/hyp/reserved_mem.c
+ create mode 100644 drivers/firmware/smccc/kvm_guest.c
+ create mode 100644 drivers/hwtracing/coresight/coresight-trbe.c
+ create mode 100644 drivers/hwtracing/coresight/coresight-trbe.h
+ create mode 100644 drivers/ptp/ptp_kvm_arm.c
+ rename drivers/ptp/{ptp_kvm.c => ptp_kvm_common.c} (60%)
+ create mode 100644 drivers/ptp/ptp_kvm_x86.c
+ create mode 100644 include/linux/clocksource_ids.h
+ create mode 100644 include/linux/ptp_kvm.h
+ create mode 100644 tools/testing/selftests/kvm/aarch64/vgic_init.c
