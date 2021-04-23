@@ -2,68 +2,74 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 17FF5368D92
-	for <lists+kvm@lfdr.de>; Fri, 23 Apr 2021 09:04:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 89D67368D9D
+	for <lists+kvm@lfdr.de>; Fri, 23 Apr 2021 09:06:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240393AbhDWHFd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 23 Apr 2021 03:05:33 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:49249 "EHLO
+        id S241059AbhDWHGz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 23 Apr 2021 03:06:55 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:57860 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S236430AbhDWHFd (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 23 Apr 2021 03:05:33 -0400
+        by vger.kernel.org with ESMTP id S241031AbhDWHGy (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 23 Apr 2021 03:06:54 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1619161496;
+        s=mimecast20190719; t=1619161578;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=26egp8w78ciutRscKuA1JMKEhbElgHLLx+FcXJkKOgQ=;
-        b=fSjy0ZNtUhiRq1v2qxaPPw5xoh28sSKYE3CcoPuIn7jZa+KmDvRssJUuIJ7i3ETgKDGSMV
-        IH8UrUdvZ98C30S7Wh1DqMRGTXUoFcsrJdWXxE5Irx0A3ryU1sj59BPSiGe7ymzvFb93Sw
-        W1iczG5R+zM1cBN3ndUpev1jJGUQJ2w=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-345-7wYYBFuJP3yn8XI-p5dnJQ-1; Fri, 23 Apr 2021 03:04:55 -0400
-X-MC-Unique: 7wYYBFuJP3yn8XI-p5dnJQ-1
-Received: by mail-ej1-f70.google.com with SMTP id bx15-20020a170906a1cfb029037415131f28so8102229ejb.18
-        for <kvm@vger.kernel.org>; Fri, 23 Apr 2021 00:04:55 -0700 (PDT)
+        bh=c0Cl5FS9BM4Q35WpIm6J5r8zv2qpk0iAb6szpk8n7ZM=;
+        b=biGX/NGO0qrC2w7BLajIz4frbV7lOHEKSbvtFeaRXIV1/oIH5JtgxLhOEd5eiZvMQaiZjX
+        6S5NQI1hL6vHvgUyMJo5vj4oMK/7kvVK95XDqfWJVAgPgoR5dWOc7Zp1+CzLu6maE71lAB
+        d6jYZKdEUo6xnnU8twyR8Tdc1PcRVE8=
+Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
+ [209.85.218.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-418-_Lihg7JcMASn9_kgQGlwag-1; Fri, 23 Apr 2021 03:06:07 -0400
+X-MC-Unique: _Lihg7JcMASn9_kgQGlwag-1
+Received: by mail-ej1-f71.google.com with SMTP id x21-20020a1709064bd5b029037c44cb861cso8029747ejv.4
+        for <kvm@vger.kernel.org>; Fri, 23 Apr 2021 00:06:07 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=26egp8w78ciutRscKuA1JMKEhbElgHLLx+FcXJkKOgQ=;
-        b=YBvECi64leIz6q1vgDOWsEJ76IRXFhGCftAtBLVCKpDLzzUBTprOHWBM55hkJqxNAu
-         2FEgZ8vtrh6Dmw8bTSYWZxZVD7vxMDm7SedL9Wu1ksrUY/1WuYK6dX05GQuKejSChPOb
-         K8Zxs/T9Srfrb/3JobsPHURE6FW54mpjMhx0s2cvG4FU4DLqFUtu46qtXtSS4sFCBEGN
-         JzW0KMKDA/ljJvVEz53g8oQf5orxWYnlv23IiVmgSKsjQheUmpl5BtEGosTZMNgEFOWL
-         laUk4KtEzB/vwVHHThHKmX0gq+xqecECtDyrEZwlTFNPWnqfpuUfnm30rCyWIS8lHI/a
-         9PXQ==
-X-Gm-Message-State: AOAM530WKwSRyn5T6K9BLRVFcHYRbr6YU/UK4f2LWSvEExIDFTzcT57n
-        TygnTSO1BKL5OvivyQpOm0VJCQBrOHj9JCDf3W9nG2FhH6nHa9JKPEgSmh3SEQMB51GE+eMxJLj
-        U4JH3ucDRm601
-X-Received: by 2002:a17:906:3a45:: with SMTP id a5mr2691601ejf.288.1619161493990;
-        Fri, 23 Apr 2021 00:04:53 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyUF0hDNObT2Jc9NMcZiLwERleMHFOFp4SJgw0WEy/cG+Cr+oKbVFdv5KVr3qdOULZjBs66nQ==
-X-Received: by 2002:a17:906:3a45:: with SMTP id a5mr2691584ejf.288.1619161493836;
-        Fri, 23 Apr 2021 00:04:53 -0700 (PDT)
+        bh=c0Cl5FS9BM4Q35WpIm6J5r8zv2qpk0iAb6szpk8n7ZM=;
+        b=kkhYEcCmSKrTmf6oDzPiCd31dvUr99narT1/ccCn0WxvHloW5hZ21eduJw4q5ID457
+         9yN9SWl1q2z6Eqr7NPJLANui30P4+8gorlwW/G8hB8xOsyJpRtIM1isEus8+SZ425yMw
+         aXNRgBO/6ol303OEaAzd2yT2PoyxyUNP44Y7cDx8UE/Co8nfFrCJKkKLbwMmGKmcQImF
+         XQ86sTNiB5Tm9buUzNIwoDQ3LZC+/pRjJeflQeAO2/wQOlmo3mZDYsiD32xfHnFAjLe7
+         Lcr9+9uICJEzEzfcYAi52X1VdAQXnIJv1tKzc7vqdYfxpqdU9zMqc/CMUbocbaqrM7qB
+         Sumg==
+X-Gm-Message-State: AOAM530YjqceEkDUT7O0Dx5HPIjw12sNAoJOgGZLTv6xsjevXYWMR3nj
+        XTVq+sSOClz9fOPb3cxolR4esFU8QT8ZBvAVDlr9Ddu2g42UR98xWi0mrm5pZJbzmqddTZ1Hfsz
+        Ebl/6OB3v9O4c
+X-Received: by 2002:a50:cc4b:: with SMTP id n11mr2774598edi.186.1619161566790;
+        Fri, 23 Apr 2021 00:06:06 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzBaNe9SswxfFTcNaWeJfRB2NuJ7rXn8/9taV7As0j13rnKsmU38i2cf1iTBfRl6CSz7Kerww==
+X-Received: by 2002:a50:cc4b:: with SMTP id n11mr2774568edi.186.1619161566637;
+        Fri, 23 Apr 2021 00:06:06 -0700 (PDT)
 Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id cz2sm3889235edb.13.2021.04.23.00.04.52
+        by smtp.gmail.com with ESMTPSA id e16sm3918899edu.94.2021.04.23.00.06.05
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 23 Apr 2021 00:04:53 -0700 (PDT)
-Subject: Re: [PATCH] KVM: VMX: use EPT_VIOLATION_GVA_TRANSLATED instead of
- 0x100
-To:     Isaku Yamahata <isaku.yamahata@intel.com>, kvm@vger.kernel.org,
-        Sean Christopherson <seanjc@google.com>
-Cc:     isaku.yamahata@gmail.com, Yao Yuan <yuan.yao@intel.com>
-References: <724e8271ea301aece3eb2afe286a9e2e92a70b18.1619136576.git.isaku.yamahata@intel.com>
+        Fri, 23 Apr 2021 00:06:06 -0700 (PDT)
+Subject: Re: [PATCH] KVM: x86: Fix implicit enum conversion goof in scattered
+ reverse CPUID code
+To:     Sean Christopherson <seanjc@google.com>,
+        Nathan Chancellor <nathan@kernel.org>,
+        Nick Desaulniers <ndesaulniers@google.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        clang-built-linux@googlegroups.com, linux-kernel@vger.kernel.org,
+        Kai Huang <kai.huang@intel.com>
+References: <20210421010850.3009718-1-seanjc@google.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <040c4154-99c6-a9e3-3500-9f66a63286b6@redhat.com>
-Date:   Fri, 23 Apr 2021 09:04:51 +0200
+Message-ID: <7b1f385c-3a97-efe0-bb8d-53cdb9c19dbf@redhat.com>
+Date:   Fri, 23 Apr 2021 09:06:04 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.7.0
 MIME-Version: 1.0
-In-Reply-To: <724e8271ea301aece3eb2afe286a9e2e92a70b18.1619136576.git.isaku.yamahata@intel.com>
+In-Reply-To: <20210421010850.3009718-1-seanjc@google.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -71,32 +77,67 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 23/04/21 02:22, Isaku Yamahata wrote:
-> Use symbolic value, EPT_VIOLATION_GVA_TRANSLATED, instead of 0x100
-> in handle_ept_violation().
+On 21/04/21 03:08, Sean Christopherson wrote:
+> Take "enum kvm_only_cpuid_leafs" in scattered specific CPUID helpers
+> (which is obvious in hindsight), and use "unsigned int" for leafs that
+> can be the kernel's standard "enum cpuid_leaf" or the aforementioned
+> KVM-only variant.  Loss of the enum params is a bit disapponting, but
+> gcc obviously isn't providing any extra sanity checks, and the various
+> BUILD_BUG_ON() assertions ensure the input is in range.
 > 
-> Signed-off-by: Yao Yuan <yuan.yao@intel.com>
-> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+> This fixes implicit enum conversions that are detected by clang-11.
+> 
+> Fixes: 4e66c0cb79b7 ("KVM: x86: Add support for reverse CPUID lookup of scattered features")
+> Cc: Kai Huang <kai.huang@intel.com>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
 > ---
->   arch/x86/kvm/vmx/vmx.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index 6501d66167b8..2791c2b4c917 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -5398,7 +5398,7 @@ static int handle_ept_violation(struct kvm_vcpu *vcpu)
->   			EPT_VIOLATION_EXECUTABLE))
->   		      ? PFERR_PRESENT_MASK : 0;
->   
-> -	error_code |= (exit_qualification & 0x100) != 0 ?
-> +	error_code |= (exit_qualification & EPT_VIOLATION_GVA_TRANSLATED) != 0 ?
->   	       PFERR_GUEST_FINAL_MASK : PFERR_GUEST_PAGE_MASK;
->   
->   	vcpu->arch.exit_qualification = exit_qualification;
-> 
+> Hopefully it's not too late to squash this...
 
-Queued, thanks.
+Too late, but I queued this anyway.
 
 Paolo
+
+> 
+>   arch/x86/kvm/cpuid.c | 5 +++--
+>   arch/x86/kvm/cpuid.h | 2 +-
+>   2 files changed, 4 insertions(+), 3 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+> index 96e41e1a1bde..e9d644147bf5 100644
+> --- a/arch/x86/kvm/cpuid.c
+> +++ b/arch/x86/kvm/cpuid.c
+> @@ -365,7 +365,7 @@ int kvm_vcpu_ioctl_get_cpuid2(struct kvm_vcpu *vcpu,
+>   }
+>   
+>   /* Mask kvm_cpu_caps for @leaf with the raw CPUID capabilities of this CPU. */
+> -static __always_inline void __kvm_cpu_cap_mask(enum cpuid_leafs leaf)
+> +static __always_inline void __kvm_cpu_cap_mask(unsigned int leaf)
+>   {
+>   	const struct cpuid_reg cpuid = x86_feature_cpuid(leaf * 32);
+>   	struct kvm_cpuid_entry2 entry;
+> @@ -378,7 +378,8 @@ static __always_inline void __kvm_cpu_cap_mask(enum cpuid_leafs leaf)
+>   	kvm_cpu_caps[leaf] &= *__cpuid_entry_get_reg(&entry, cpuid.reg);
+>   }
+>   
+> -static __always_inline void kvm_cpu_cap_init_scattered(enum cpuid_leafs leaf, u32 mask)
+> +static __always_inline
+> +void kvm_cpu_cap_init_scattered(enum kvm_only_cpuid_leafs leaf, u32 mask)
+>   {
+>   	/* Use kvm_cpu_cap_mask for non-scattered leafs. */
+>   	BUILD_BUG_ON(leaf < NCAPINTS);
+> diff --git a/arch/x86/kvm/cpuid.h b/arch/x86/kvm/cpuid.h
+> index eeb4a3020e1b..7bb4504a2944 100644
+> --- a/arch/x86/kvm/cpuid.h
+> +++ b/arch/x86/kvm/cpuid.h
+> @@ -236,7 +236,7 @@ static __always_inline void cpuid_entry_change(struct kvm_cpuid_entry2 *entry,
+>   }
+>   
+>   static __always_inline void cpuid_entry_override(struct kvm_cpuid_entry2 *entry,
+> -						 enum cpuid_leafs leaf)
+> +						 unsigned int leaf)
+>   {
+>   	u32 *reg = cpuid_entry_get_reg(entry, leaf * 32);
+>   
+> 
 
