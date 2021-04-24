@@ -2,122 +2,70 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 93801369FF0
-	for <lists+kvm@lfdr.de>; Sat, 24 Apr 2021 09:20:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3018236A027
+	for <lists+kvm@lfdr.de>; Sat, 24 Apr 2021 10:39:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231836AbhDXHUR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 24 Apr 2021 03:20:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36130 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229682AbhDXHUQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 24 Apr 2021 03:20:16 -0400
-Received: from mail-pg1-x531.google.com (mail-pg1-x531.google.com [IPv6:2607:f8b0:4864:20::531])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80CFFC061574
-        for <kvm@vger.kernel.org>; Sat, 24 Apr 2021 00:19:38 -0700 (PDT)
-Received: by mail-pg1-x531.google.com with SMTP id d10so36687061pgf.12
-        for <kvm@vger.kernel.org>; Sat, 24 Apr 2021 00:19:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=Hn51PY3pPm3kGtoDtPX4jjQp72j/PPh9WRN9t50CmqE=;
-        b=kSJvGQDYFGHgB0/HnxoNSOhSHoQguJz14XtPApVtLtOyyYDK0iZb9ylkgJK3ubHNde
-         A30YOMdL9iF/EfqRxzzEhQC1l1JaQzhPB/f/7dErvYGPAIu5NVWqU6UmGY1uGFJkpBlr
-         /1K++6qvqqt7r4UDg88MPbW/73BldH9u//UKplas1k14WgxE+Oue93gUyOmGBNIL0wvr
-         a3ldCCij0Zs/GvDka8qbSZ5Nlx8GXcwzOWaRSMCda/2gpeCaDeiSq2xALrL+RO9II7eX
-         1jkuzUY5hfzNtpFZdYmCHMxmJ193/p5OYCjxwlFiECL98mocQmYtT+NbTJxfBm2QxIdk
-         fK9A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=Hn51PY3pPm3kGtoDtPX4jjQp72j/PPh9WRN9t50CmqE=;
-        b=D86PEXFFeMptVtc4V5303ikWadoAuzPRlV7yqRO32p72XPFFEkRyshC56tnApUiAGH
-         vzHhz4GAwMa8o/zowubN1OXWgjLxJwjPdUT2pU5+dUrgKzoO9N+H5RgiOPuQZnMSjC7t
-         /hpxt4GtCoXxftKscoYPrfVxOK/3igFT+5XB+OCfETNbj8ZnQPjHKHi/TD2y6itUvWcJ
-         zfBu8AtoLKqe99+WrQ3WuzD/ykfOd3XNDsdQ8T8dxaZQqC/v5nhqVlxsDcoj/0yuvlzf
-         IPl1ZN03RHF/3kWJlZUrszQM3stI8lkdvIrJBhF1n+Uw2Jf9KV+1dTXyl+PxxjLPft9b
-         2uZA==
-X-Gm-Message-State: AOAM533eX+mYAgSW6uuj7wcQak2WxL7ZOfW2R0Bmhf6RW9BiNmd4IJOn
-        4uAscmJHrKewWR7hOTc5TSiAafuJjfpIL/1xPa/yvg==
-X-Google-Smtp-Source: ABdhPJwxgoUJMtmz8jI1rLJsBnHJOS6IoMNPMyg2Bsm6KR3jRbbWp6mUrsGinx0hcYto5eFPQ6cclf/7+19x9xGh2SY=
-X-Received: by 2002:a05:6a00:15cb:b029:25c:a742:d34d with SMTP id
- o11-20020a056a0015cbb029025ca742d34dmr7330299pfu.25.1619248777694; Sat, 24
- Apr 2021 00:19:37 -0700 (PDT)
+        id S233770AbhDXI0k (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 24 Apr 2021 04:26:40 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:48541 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S233104AbhDXIZN (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Sat, 24 Apr 2021 04:25:13 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1619252641;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=JG5lz1zucN+SOqKs9Q0DF5YgOmDD8WYIPbDEuaJ2ii4=;
+        b=bK9sRkrwrQw+ab3PI3IwOchfeVMuTox5T+OhPx/Ks4XHSMTy5UR/GVH2FUXvZc75G9XYsE
+        GPpBgUE+eLZS9zoeysdS0ybkTrVmEHB3zoVIaugesqCqleuNjNcow4S5qI+LVVZJdCT4jZ
+        JsoFF3wWIZk9xTKfL/K86uec6D2t7tk=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-192-7EKwWYWbO6GMl3EdSzzoag-1; Sat, 24 Apr 2021 04:21:12 -0400
+X-MC-Unique: 7EKwWYWbO6GMl3EdSzzoag-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4C061343A2;
+        Sat, 24 Apr 2021 08:21:11 +0000 (UTC)
+Received: from virtlab511.virt.lab.eng.bos.redhat.com (virtlab511.virt.lab.eng.bos.redhat.com [10.19.152.198])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id F0DC55D6DC;
+        Sat, 24 Apr 2021 08:21:10 +0000 (UTC)
+From:   Paolo Bonzini <pbonzini@redhat.com>
+To:     torvalds@linux-foundation.org
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: [GIT PULL] KVM fix for 5.12 final
+Date:   Sat, 24 Apr 2021 04:21:10 -0400
+Message-Id: <20210424082110.1773621-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-References: <20210423223404.3860547-1-seanjc@google.com> <20210423223404.3860547-4-seanjc@google.com>
-In-Reply-To: <20210423223404.3860547-4-seanjc@google.com>
-From:   Reiji Watanabe <reijiw@google.com>
-Date:   Sat, 24 Apr 2021 00:19:21 -0700
-Message-ID: <CAAeT=FxhkRhwysd4mQa=iqEaje7R5nHew8ougtoyDEhL2sYxGA@mail.gmail.com>
-Subject: Re: [PATCH v3 3/4] KVM: x86: Tie Intel and AMD behavior for
- MSR_TSC_AUX to guest CPU model
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -1610,6 +1610,29 @@ static int __kvm_set_msr(struct kvm_vcpu *vcpu, u32 index, u64 data,
->                  * invokes 64-bit SYSENTER.
->                  */
->                 data = get_canonical(data, vcpu_virt_addr_bits(vcpu));
-> +               break;
-> +       case MSR_TSC_AUX:
-> +               if (!kvm_cpu_cap_has(X86_FEATURE_RDTSCP))
-> +                       return 1;
-> +
-> +               if (!host_initiated &&
-> +                   !guest_cpuid_has(vcpu, X86_FEATURE_RDTSCP))
-> +                       return 1;
-> +
-> +               /*
-> +                * Per Intel's SDM, bits 63:32 are reserved, but AMD's APM has
-> +                * incomplete and conflicting architectural behavior.  Current
-> +                * AMD CPUs completely ignore bits 63:32, i.e. they aren't
-> +                * reserved and always read as zeros.  Enforce Intel's reserved
-> +                * bits check if and only if the guest CPU is Intel, and clear
-> +                * the bits in all other cases.  This ensures cross-vendor
-> +                * migration will provide consistent behavior for the guest.
-> +                */
-> +               if (guest_cpuid_is_intel(vcpu) && (data >> 32) != 0)
-> +                       return 1;
-> +
-> +               data = (u32)data;
-> +               break;
->         }
->
->         msr.data = data;
-> @@ -1646,6 +1669,17 @@ int __kvm_get_msr(struct kvm_vcpu *vcpu, u32 index, u64 *data,
->         if (!host_initiated && !kvm_msr_allowed(vcpu, index, KVM_MSR_FILTER_READ))
->                 return KVM_MSR_RET_FILTERED;
->
-> +       switch (index) {
-> +       case MSR_TSC_AUX:
-> +               if (!kvm_cpu_cap_has(X86_FEATURE_RDTSCP))
-> +                       return 1;
-> +
-> +               if (!host_initiated &&
-> +                   !guest_cpuid_has(vcpu, X86_FEATURE_RDTSCP))
-> +                       return 1;
+Linus,
 
+The following changes since commit bf05bf16c76bb44ab5156223e1e58e26dfe30a88:
 
-It looks Table 2-2 of the Intel SDM Vol4 (April 2021) says
-TSC_AUX is supported:
+  Linux 5.12-rc8 (2021-04-18 14:45:32 -0700)
 
-   If CPUID.80000001H:EDX[27] = 1 or CPUID.(EAX=7,ECX=0):ECX[22] = 1
+are available in the Git repository at:
 
-Should we also check X86_FEATURE_RDPID before returning 1
-due to no RDTSCP support ?
-There doesn't seem to be a similar description in the APM though.
+  https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
 
-Thanks,
-Reiji
+for you to fetch changes up to 9c1a07442c95f6e64dc8de099e9f35ea73db7852:
+
+  KVM: x86/xen: Take srcu lock when accessing kvm_memslots() (2021-04-23 17:00:50 -0400)
+
+----------------------------------------------------------------
+SRCU bug introduced in the merge window
+
+----------------------------------------------------------------
+Wanpeng Li (1):
+      KVM: x86/xen: Take srcu lock when accessing kvm_memslots()
+
+ arch/x86/kvm/x86.c | 20 +++++++++-----------
+ 1 file changed, 9 insertions(+), 11 deletions(-)
+
