@@ -2,56 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3D692369E25
-	for <lists+kvm@lfdr.de>; Sat, 24 Apr 2021 02:53:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BE62C369E24
+	for <lists+kvm@lfdr.de>; Sat, 24 Apr 2021 02:53:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244254AbhDXAyC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 23 Apr 2021 20:54:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36798 "EHLO
+        id S232742AbhDXAx7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 23 Apr 2021 20:53:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36800 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244236AbhDXAwg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 23 Apr 2021 20:52:36 -0400
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA3BFC06137B
-        for <kvm@vger.kernel.org>; Fri, 23 Apr 2021 17:48:02 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id s2-20020a5b07420000b02904eb842efc40so26198702ybq.3
-        for <kvm@vger.kernel.org>; Fri, 23 Apr 2021 17:48:02 -0700 (PDT)
+        with ESMTP id S244170AbhDXAwf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 23 Apr 2021 20:52:35 -0400
+Received: from mail-qv1-xf4a.google.com (mail-qv1-xf4a.google.com [IPv6:2607:f8b0:4864:20::f4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E2E6EC06137D
+        for <kvm@vger.kernel.org>; Fri, 23 Apr 2021 17:48:04 -0700 (PDT)
+Received: by mail-qv1-xf4a.google.com with SMTP id p2-20020ad452e20000b0290177fba4b9d5so19500078qvu.6
+        for <kvm@vger.kernel.org>; Fri, 23 Apr 2021 17:48:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=reply-to:date:in-reply-to:message-id:mime-version:references
          :subject:from:to:cc;
-        bh=OQ6Lvv5hUZLxy6LtPOKbAp59CLYR6ZOdLmQpGf/gsyE=;
-        b=VAMmZddflONjj4+4i9x1eMZDZlg0Fk3FfXR97b9eh9OiOqWVMVlFB8OtX0Ia7HSXal
-         cJkfdUeFpYIwSnMrVpVCJK+crTHF+kQ2qBUtaqCVXMTsnjwN+c6TmZUmBkWUMbpp05cY
-         HJ5yxF67I+gB4biY/jxoqjlReB5Wo4gjt1zS4mrf3RQA4PIFpgfTuLVYAWV/74A7v0vt
-         NHWWoDjT0YsykzXSQ4s7BNhMFN8dVFC+hJsXalhoM1r9NnDRxDw5jpPYBYHLCiuDcp+D
-         Ff+B/dinV9IGDKYxxpki5nhSlqfIbzamUKNTdrMzm3r/oyON3ARkh3O6ZulmtR/HX32m
-         2Xmg==
+        bh=8FPjB9kODcd44RP7aC0zZao6wso5dTHmRwxsyhm3GIU=;
+        b=ozB2Ag/eEMci6Fo+7ypR3EpsxZvT2N3jckC41JPYLCyLZwWueyWwAysuxItZ2uzeKk
+         dpjozZ5Nl/F2ZREDDjmNT8iq3zQb2GESNIkIBQG5Dwrf+mYRNAvaLnDCV/7DJiD44wBv
+         YC2PMSKYAIOVLxE48ilkyk3/LA3WyNk6B9Jng9Sgwn/WOMIVOrU8Dm7fBiLo0XQO61f3
+         EQxbHW1IJS+ehHCIvH06rMTYNo11dvUqMKFaf4eQ0c3CD7SAgujPQmMRdCm1ovOPxaOn
+         IGJaOgkSTQEq2VrAL0BtxRe3J1J3zMrNtWainJ6cQo+NbgUMoSqVmShRfLKLmFQMc0Mb
+         wL+w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:reply-to:date:in-reply-to:message-id
          :mime-version:references:subject:from:to:cc;
-        bh=OQ6Lvv5hUZLxy6LtPOKbAp59CLYR6ZOdLmQpGf/gsyE=;
-        b=giQp4s/4hm80Mqf5cROAXNjYfGUO7HbM6kVb+ONxQH+iCYxDL6yfQeEUPOMfyoLbA2
-         KYZQsEhVq/o0bNywo38Dpqhw9TNJsTe3qKi7QGPlNRanH8J6tkxhlw6vhp4nBWgV0ERT
-         4Kl6GHbeqroXU5iRUDwJxXlErYpKqKZmpRIHZkzB7QVFHtyG8ph0ATm6wtqvIW+HBhds
-         zfo0Vgc0rOI+oS42SuUOFfVAFXymeleD5Q8NZnw5/a2sQCaEklNv7BziISxSnj5D0emY
-         Eciq4Uc2G1mEbHkdGGcHjCh/Pr5LMBEik+kW2wnP7bD+k91v6CUEBRf7OHXlBxHwMcVV
-         iEKg==
-X-Gm-Message-State: AOAM531f9nQt8rs9Y4Lx2QzB6gdOu+VhV4B/0zR1xlQsmhx8ac+GR4K8
-        80YIExpVihHSShCfpsUJadHrGrb9yes=
-X-Google-Smtp-Source: ABdhPJz973IcJu9CuRU33WhIG6gKNEX6LxtNGUTLA8kxQ4jqGktu9x6SnWAkTtYu/q0TVa56P20RsnBL5d4=
+        bh=8FPjB9kODcd44RP7aC0zZao6wso5dTHmRwxsyhm3GIU=;
+        b=nSmrNrraezwdPH39Ww7sgUTfoN9YtwzXIOmRdyCFEYfzP/0NEs1KlpN9G6ORkHu5Ja
+         Tro3tBegoUaOeq5ySLL0n9wdB+bnd3dENxISy21G/mW1K6hMNyYMy9TNWWVy9miriiSY
+         L6QObF53p6LBd4i/bATvX6up+BBsnHefBqTR1lgrdoVH24knsbg2yPigwufTX0vv8bck
+         svqx3FJ4lF74CxBqLZsSY5nn9AY4PyN7aMWYJ7MllR0J9HZ40aR6ctw4z2G/Ik0MC135
+         z5/t+4+898ICKiaLOCfOBiEFUZCerS4wrWx2HEP1IolxNbcUlvSOL0OSw4eCZSR1sMd9
+         aoTQ==
+X-Gm-Message-State: AOAM531ON9kqA5cGNiURG49AdAlRGX37B/XKhTHthR3l/TxOASvjZQhJ
+        4b9xufhejtpTExBqIQzEKxNsx44Iwr0=
+X-Google-Smtp-Source: ABdhPJwIe4aMtREwCdKlN8Ejc4nv8qWnmoGL1M73/G1IxtPwJ/CZeAKF0LNUA6wkJbNTrlSMirS4uyZ9p+w=
 X-Received: from seanjc798194.pdx.corp.google.com ([2620:15c:f:10:ad52:3246:e190:f070])
- (user=seanjc job=sendgmr) by 2002:a05:6902:4d4:: with SMTP id
- v20mr9489642ybs.420.1619225282067; Fri, 23 Apr 2021 17:48:02 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:ad4:4e01:: with SMTP id dl1mr7170885qvb.9.1619225284120;
+ Fri, 23 Apr 2021 17:48:04 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Fri, 23 Apr 2021 17:46:30 -0700
+Date:   Fri, 23 Apr 2021 17:46:31 -0700
 In-Reply-To: <20210424004645.3950558-1-seanjc@google.com>
-Message-Id: <20210424004645.3950558-29-seanjc@google.com>
+Message-Id: <20210424004645.3950558-30-seanjc@google.com>
 Mime-Version: 1.0
 References: <20210424004645.3950558-1-seanjc@google.com>
 X-Mailer: git-send-email 2.31.1.498.g6c1eba8ee3d-goog
-Subject: [PATCH 28/43] KVM: nVMX: Don't evaluate "emulation required" on VM-Exit
+Subject: [PATCH 29/43] KVM: SVM: Tweak order of cr0/cr4/efer writes at RESET/INIT
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Sean Christopherson <seanjc@google.com>,
@@ -65,114 +65,39 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Use the "internal" variants of setting segment registers when stuffing
-state on nested VM-Exit in order to skip the "emulation required"
-updates.  VM-Exit must always go to protected mode, and all segments are
-mostly hardcoded (to valid values) on VM-Exit.  The bits of the segments
-that aren't hardcoded are explicitly checked during VM-Enter, e.g. the
-selector RPLs must all be zero.
+Hoist svm_set_cr0() up in the sequence of register initialization during
+vCPU RESET/INIT, purely to match VMX so that a future patch can move the
+sequences to common x86.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/vmx/nested.c | 16 ++++++++--------
- arch/x86/kvm/vmx/vmx.c    |  6 ++----
- arch/x86/kvm/vmx/vmx.h    |  2 +-
- 3 files changed, 11 insertions(+), 13 deletions(-)
+ arch/x86/kvm/svm/svm.c | 7 +------
+ 1 file changed, 1 insertion(+), 6 deletions(-)
 
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index 32126fa0c4d8..f811bb7f2dc3 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -4245,7 +4245,7 @@ static void load_vmcs12_host_state(struct kvm_vcpu *vcpu,
- 		seg.l = 1;
- 	else
- 		seg.db = 1;
--	vmx_set_segment(vcpu, &seg, VCPU_SREG_CS);
-+	__vmx_set_segment(vcpu, &seg, VCPU_SREG_CS);
- 	seg = (struct kvm_segment) {
- 		.base = 0,
- 		.limit = 0xFFFFFFFF,
-@@ -4256,17 +4256,17 @@ static void load_vmcs12_host_state(struct kvm_vcpu *vcpu,
- 		.g = 1
- 	};
- 	seg.selector = vmcs12->host_ds_selector;
--	vmx_set_segment(vcpu, &seg, VCPU_SREG_DS);
-+	__vmx_set_segment(vcpu, &seg, VCPU_SREG_DS);
- 	seg.selector = vmcs12->host_es_selector;
--	vmx_set_segment(vcpu, &seg, VCPU_SREG_ES);
-+	__vmx_set_segment(vcpu, &seg, VCPU_SREG_ES);
- 	seg.selector = vmcs12->host_ss_selector;
--	vmx_set_segment(vcpu, &seg, VCPU_SREG_SS);
-+	__vmx_set_segment(vcpu, &seg, VCPU_SREG_SS);
- 	seg.selector = vmcs12->host_fs_selector;
- 	seg.base = vmcs12->host_fs_base;
--	vmx_set_segment(vcpu, &seg, VCPU_SREG_FS);
-+	__vmx_set_segment(vcpu, &seg, VCPU_SREG_FS);
- 	seg.selector = vmcs12->host_gs_selector;
- 	seg.base = vmcs12->host_gs_base;
--	vmx_set_segment(vcpu, &seg, VCPU_SREG_GS);
-+	__vmx_set_segment(vcpu, &seg, VCPU_SREG_GS);
- 	seg = (struct kvm_segment) {
- 		.base = vmcs12->host_tr_base,
- 		.limit = 0x67,
-@@ -4274,11 +4274,11 @@ static void load_vmcs12_host_state(struct kvm_vcpu *vcpu,
- 		.type = 11,
- 		.present = 1
- 	};
--	vmx_set_segment(vcpu, &seg, VCPU_SREG_TR);
-+	__vmx_set_segment(vcpu, &seg, VCPU_SREG_TR);
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index 4ea100c08cb3..88d34fa93d8b 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -1204,18 +1204,13 @@ static void init_vmcb(struct kvm_vcpu *vcpu)
+ 	init_sys_seg(&save->ldtr, SEG_TYPE_LDT);
+ 	init_sys_seg(&save->tr, SEG_TYPE_BUSY_TSS16);
  
- 	memset(&seg, 0, sizeof(seg));
- 	seg.unusable = 1;
--	vmx_set_segment(vcpu, &seg, VCPU_SREG_LDTR);
-+	__vmx_set_segment(vcpu, &seg, VCPU_SREG_LDTR);
++	svm_set_cr0(vcpu, X86_CR0_NW | X86_CR0_CD | X86_CR0_ET);
+ 	svm_set_cr4(vcpu, 0);
+ 	svm_set_efer(vcpu, 0);
+ 	save->dr6 = 0xffff0ff0;
+ 	kvm_set_rflags(vcpu, X86_EFLAGS_FIXED);
+ 	vcpu->arch.regs[VCPU_REGS_RIP] = 0x0000fff0;
  
- 	kvm_set_dr(vcpu, 7, 0x400);
- 	vmcs_write64(GUEST_IA32_DEBUGCTL, 0);
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 37bfa20a04dd..594975dc3f94 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -2827,8 +2827,6 @@ static __init int alloc_kvm_area(void)
- 	return 0;
- }
- 
--static void __vmx_set_segment(struct kvm_vcpu *vcpu, struct kvm_segment *var, int seg);
+-	/*
+-	 * svm_set_cr0() sets PG and WP and clears NW and CD on save->cr0.
+-	 * It also updates the guest-visible cr0 value.
+-	 */
+-	svm_set_cr0(vcpu, X86_CR0_NW | X86_CR0_CD | X86_CR0_ET);
 -
- static void fix_pmode_seg(struct kvm_vcpu *vcpu, int seg,
- 		struct kvm_segment *save)
- {
-@@ -3401,7 +3399,7 @@ static u32 vmx_segment_access_rights(struct kvm_segment *var)
- 	return ar;
- }
+ 	save->cr4 = X86_CR4_PAE;
  
--static void __vmx_set_segment(struct kvm_vcpu *vcpu, struct kvm_segment *var, int seg)
-+void __vmx_set_segment(struct kvm_vcpu *vcpu, struct kvm_segment *var, int seg)
- {
- 	struct vcpu_vmx *vmx = to_vmx(vcpu);
- 	const struct kvm_vmx_segment_field *sf = &kvm_vmx_segment_fields[seg];
-@@ -3438,7 +3436,7 @@ static void __vmx_set_segment(struct kvm_vcpu *vcpu, struct kvm_segment *var, in
- 	vmcs_write32(sf->ar_bytes, vmx_segment_access_rights(var));
- }
- 
--void vmx_set_segment(struct kvm_vcpu *vcpu, struct kvm_segment *var, int seg)
-+static void vmx_set_segment(struct kvm_vcpu *vcpu, struct kvm_segment *var, int seg)
- {
- 	__vmx_set_segment(vcpu, var, seg);
- 
-diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
-index 19fe09fad2fe..1283ad0e592d 100644
---- a/arch/x86/kvm/vmx/vmx.h
-+++ b/arch/x86/kvm/vmx/vmx.h
-@@ -376,7 +376,7 @@ void vmx_set_cr4(struct kvm_vcpu *vcpu, unsigned long cr4);
- void set_cr4_guest_host_mask(struct vcpu_vmx *vmx);
- void ept_save_pdptrs(struct kvm_vcpu *vcpu);
- void vmx_get_segment(struct kvm_vcpu *vcpu, struct kvm_segment *var, int seg);
--void vmx_set_segment(struct kvm_vcpu *vcpu, struct kvm_segment *var, int seg);
-+void __vmx_set_segment(struct kvm_vcpu *vcpu, struct kvm_segment *var, int seg);
- u64 construct_eptp(struct kvm_vcpu *vcpu, hpa_t root_hpa, int root_level);
- 
- void vmx_update_exception_bitmap(struct kvm_vcpu *vcpu);
+ 	if (npt_enabled) {
 -- 
 2.31.1.498.g6c1eba8ee3d-goog
 
