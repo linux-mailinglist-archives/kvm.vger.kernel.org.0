@@ -2,56 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id AF09A369E01
-	for <lists+kvm@lfdr.de>; Sat, 24 Apr 2021 02:51:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 06606369E02
+	for <lists+kvm@lfdr.de>; Sat, 24 Apr 2021 02:51:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244209AbhDXAt5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 23 Apr 2021 20:49:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36928 "EHLO
+        id S244504AbhDXAuD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 23 Apr 2021 20:50:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36932 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244330AbhDXAs1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 23 Apr 2021 20:48:27 -0400
-Received: from mail-qt1-x84a.google.com (mail-qt1-x84a.google.com [IPv6:2607:f8b0:4864:20::84a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 73FE8C06134A
-        for <kvm@vger.kernel.org>; Fri, 23 Apr 2021 17:47:27 -0700 (PDT)
-Received: by mail-qt1-x84a.google.com with SMTP id x13-20020ac84d4d0000b02901a95d7c4bb5so18629458qtv.14
-        for <kvm@vger.kernel.org>; Fri, 23 Apr 2021 17:47:27 -0700 (PDT)
+        with ESMTP id S244336AbhDXAs2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 23 Apr 2021 20:48:28 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 91024C06134E
+        for <kvm@vger.kernel.org>; Fri, 23 Apr 2021 17:47:29 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id u3-20020a2509430000b02904e7f1a30cffso26292240ybm.8
+        for <kvm@vger.kernel.org>; Fri, 23 Apr 2021 17:47:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=reply-to:date:in-reply-to:message-id:mime-version:references
          :subject:from:to:cc;
-        bh=nJ0Vx6GbmijZ7PDR3hwIYLOvt4K+KdVv1iVkzVPrEHQ=;
-        b=CHIwF6Upat5nEcmPw+p2goGG9yaxiZOo90wW5j+8Ba6nIAr/qCVhZjxVzBatY501fR
-         eV5lT1JFrSyfjrhrfANk8BrRdSZ7U6BmPXGHRFpY2dF/AmqrRf+73RYscgZ5s2Hb2Ev0
-         y3hm3xcNsxFKAHYTkjDIceYwbdND7SkIwvU4s+RsLvNxG7NzeoYNc6KyMnObn96yaKPW
-         +6pBQA7hpeshb4tY5GN+CgmVw6UUni99Ou+1XR6kYBsGrjEA1x0EWTi48+Z+fd37bA6+
-         Xi9pdfp9oVXpyc1g0PUqzF7plNbRkQ7AoRRWB0Pxj59OvWTEabRdBw4AyHl/Mi76w56y
-         l3hw==
+        bh=Xh7m40xB+PCdgjTH1Qjusqokdv3A8hOeLP4wgBd8rCM=;
+        b=m7Kced1XGavUVsH0vrTEvI819K22pWwag3mNjA9ln17XpeVzi/Emhgb+nl9PEa8DTb
+         83XHT+FntZINsSy1uE1KYCaY6Dw0Pzz0gFBGM19UQmUZv5cRuhDgZiWlP/rrwxvcVmjD
+         0Y4MI+GKiP+47Hx5HzzCv5PEiEl/sfX8AZabUAal712dfWW1OxTTyM6zln0adk7XXxGH
+         N60rPwv2QYTfJW0jW1XkPo56SiSSPFUo8MhjAf2VqfmbL819kmPm5CQsIL+y18wBoaEi
+         Mnq49xnBHPrPjM5whD/7oXi/Jgz79t7XNzI6sovpIPo5IjA/KDjCkzz4QvWfmXMXtJRg
+         EeMg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:reply-to:date:in-reply-to:message-id
          :mime-version:references:subject:from:to:cc;
-        bh=nJ0Vx6GbmijZ7PDR3hwIYLOvt4K+KdVv1iVkzVPrEHQ=;
-        b=fSHzEiPZUG9NZvJtSijvkTzJRE+avf2SnSWbznvvRwb7aNc6B/Yc1oBGMdXukYAfBD
-         D7kHW952w6E0xD+huDrlBGDRGhOFWUMdv1vV82aoh4YLUbEYebVo+eWN19NJXpBGLQcs
-         pryfpJ5oW4qyP4Qs9R23bRvgI+1WmyFE2+r0CcEDygnzZahH7Nh5eLVy249PABowaJbO
-         yZXO4/hg3nHprl11IKq5fL88I8ueMhxf48SpKXwgNweVGrYHzP2dW1rMG2clu+RA2EmK
-         9mZZxj6lb06151HDuIE/yzYTD3CuPKvegDks8Wtl4b53zqkdTwHORpKtTKkCKmaabSym
-         x8Ug==
-X-Gm-Message-State: AOAM533ui7LroWGee7IJmSJq5VuQMYvSL1h4KvDigu2NiABoM9kLki1L
-        V6237mb8olSt0geSQqOMoOKgLzTnl1E=
-X-Google-Smtp-Source: ABdhPJzE1UuuDxgXT49WcOpqRxfDihcDQIPaRpjw5EuExsxUh27ZmE1uejEh1Sue2I20i856RBEu6FSYlJU=
+        bh=Xh7m40xB+PCdgjTH1Qjusqokdv3A8hOeLP4wgBd8rCM=;
+        b=j6uY/0lDv1AnljxjqwSydFQFW3orPFj4fJ2zCM77G/fJqzBd44lEKJTHEoAcQKhdK2
+         aQqk4dQkyMu7NIAQPftNgHcwf3zfdp+AQ7dtvyJf+//Y56iOLUQNryPoGArzbUN4ys5u
+         1aT2/53c5PN06egkxQkpyjoekzSvVCvf7sMP/fWkenWIfgXwMG1DniFyCKyYttFrfPMU
+         fZ4lr557QJckaPQ8bZR7q86ZG/24Qff+DFV28k3vFbdJrFxYsSFt6omSBPs+2Ajtt+OK
+         VVj87jFXuYM7UxImjd8MfthFpzInroRoQfKhQxUg4Wnr6+eMRVsxlldWCX6ABuR2YaTV
+         m2Tg==
+X-Gm-Message-State: AOAM531DXoa6goH1v0eo2bxCgqchLM3JWYsnICJTkZpGetRRzkNx6icG
+        cEdLmseXprcekhjidD3Si4rOM9zClkk=
+X-Google-Smtp-Source: ABdhPJzpXCPqBe2RUCyu8UuGN557NYQlwjPqrZBc2bfEb5qqDYWpd95PoAPObper5Uk5il8kW8NF4wH7iSg=
 X-Received: from seanjc798194.pdx.corp.google.com ([2620:15c:f:10:ad52:3246:e190:f070])
- (user=seanjc job=sendgmr) by 2002:a0c:db05:: with SMTP id d5mr7191402qvk.41.1619225246707;
- Fri, 23 Apr 2021 17:47:26 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a25:a067:: with SMTP id x94mr10121340ybh.42.1619225248896;
+ Fri, 23 Apr 2021 17:47:28 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Fri, 23 Apr 2021 17:46:14 -0700
+Date:   Fri, 23 Apr 2021 17:46:15 -0700
 In-Reply-To: <20210424004645.3950558-1-seanjc@google.com>
-Message-Id: <20210424004645.3950558-13-seanjc@google.com>
+Message-Id: <20210424004645.3950558-14-seanjc@google.com>
 Mime-Version: 1.0
 References: <20210424004645.3950558-1-seanjc@google.com>
 X-Mailer: git-send-email 2.31.1.498.g6c1eba8ee3d-goog
-Subject: [PATCH 12/43] KVM: x86: Remove defunct BSP "update" in local APIC reset
+Subject: [PATCH 13/43] KVM: x86: Migrate the PIT only if vcpu0 is migrated,
+ not any BSP
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Sean Christopherson <seanjc@google.com>,
@@ -65,42 +66,38 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Remove a BSP APIC update in kvm_lapic_reset() that is a glorified and
-confusing nop.  When the code was originally added, kvm_vcpu_is_bsp()
-queried kvm->arch.bsp_vcpu, i.e. the intent was to set the BSP bit in the
-BSP vCPU's APIC.  But, stuffing the BSP bit at INIT was wrong since the
-guest can change its BSP(s); this was fixed by commit 58d269d8cccc ("KVM:
-x86: BSP in MSR_IA32_APICBASE is writable").
+Make vcpu0 the arbitrary owner of the PIT, as was intended when PIT
+migration was added by commit 2f5997140f22 ("KVM: migrate PIT timer").
+The PIT was unintentionally turned into being owned by the BSP by commit
+c5af89b68abb ("KVM: Introduce kvm_vcpu_is_bsp() function."), and was then
+unintentionally converted to a shared ownership model when
+kvm_vcpu_is_bsp() was modified to check the APIC base MSR instead of
+hardcoding vcpu0 as the BSP.
 
-In other words, kvm_vcpu_is_bsp() is now purely a reflection of
-vcpu->arch.apic_base.MSR_IA32_APICBASE_BSP, thus the update will always
-set the current value and kvm_lapic_set_base() is effectively a nop if
-the new and old values match.  The RESET case, which does need to stuff
-the BSP for the reset vCPU, is handled by vendor code (though this will
-soon be moved to common code).
+Functionally, this just means the PIT's hrtimer is migrated less often.
+The real motivation is to remove the usage of kvm_vcpu_is_bsp(), so that
+more legacy/broken crud can be removed in a future patch.
 
-No functional change intended.
-
+Fixes: 58d269d8cccc ("KVM: x86: BSP in MSR_IA32_APICBASE is writable")
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/lapic.c | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
+ arch/x86/kvm/i8254.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-index 655eb1d07344..b99630c6d7fe 100644
---- a/arch/x86/kvm/lapic.c
-+++ b/arch/x86/kvm/lapic.c
-@@ -2351,9 +2351,7 @@ void kvm_lapic_reset(struct kvm_vcpu *vcpu, bool init_event)
- 	apic->highest_isr_cache = -1;
- 	update_divide_count(apic);
- 	atomic_set(&apic->lapic_timer.pending, 0);
--	if (kvm_vcpu_is_bsp(vcpu))
--		kvm_lapic_set_base(vcpu,
--				vcpu->arch.apic_base | MSR_IA32_APICBASE_BSP);
-+
- 	vcpu->arch.pv_eoi.msr_val = 0;
- 	apic_update_ppr(apic);
- 	if (vcpu->arch.apicv_active) {
+diff --git a/arch/x86/kvm/i8254.c b/arch/x86/kvm/i8254.c
+index a6e218c6140d..5a69cce4d72d 100644
+--- a/arch/x86/kvm/i8254.c
++++ b/arch/x86/kvm/i8254.c
+@@ -220,7 +220,8 @@ void __kvm_migrate_pit_timer(struct kvm_vcpu *vcpu)
+ 	struct kvm_pit *pit = vcpu->kvm->arch.vpit;
+ 	struct hrtimer *timer;
+ 
+-	if (!kvm_vcpu_is_bsp(vcpu) || !pit)
++	/* Somewhat arbitrarily make vcpu0 the owner of the PIT. */
++	if (vcpu->vcpu_id || !pit)
+ 		return;
+ 
+ 	timer = &pit->pit_state.timer;
 -- 
 2.31.1.498.g6c1eba8ee3d-goog
 
