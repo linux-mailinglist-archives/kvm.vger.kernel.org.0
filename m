@@ -2,57 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 43EA6369E1B
+	by mail.lfdr.de (Postfix) with ESMTP id DD42D369E1D
 	for <lists+kvm@lfdr.de>; Sat, 24 Apr 2021 02:52:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244445AbhDXAxK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 23 Apr 2021 20:53:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36962 "EHLO
+        id S244483AbhDXAxO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 23 Apr 2021 20:53:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36964 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244474AbhDXAvo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 23 Apr 2021 20:51:44 -0400
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D439C061377
-        for <kvm@vger.kernel.org>; Fri, 23 Apr 2021 17:47:56 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id e8-20020a2587480000b02904e5857564e2so26353682ybn.16
-        for <kvm@vger.kernel.org>; Fri, 23 Apr 2021 17:47:56 -0700 (PDT)
+        with ESMTP id S244597AbhDXAvs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 23 Apr 2021 20:51:48 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 60064C061346
+        for <kvm@vger.kernel.org>; Fri, 23 Apr 2021 17:47:58 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id e13-20020a25d30d0000b02904ec4109da25so26208000ybf.7
+        for <kvm@vger.kernel.org>; Fri, 23 Apr 2021 17:47:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=reply-to:date:in-reply-to:message-id:mime-version:references
          :subject:from:to:cc;
-        bh=BsJdegcuVAgkFqlKM15IX9VerfL7fgnioVjMhrNs33k=;
-        b=vLlkN+LUxUzZtGrOzpsmPmPjsmrhAnES/tWoBJJAyibAJP7P+KimwEM8v/xj1BDKMC
-         lXBRoAMO9dPZhq3w9t/iBTqjbi4qgn6+fD3Nrwqwu7RJu7eTeAX3GBs0sgulKAQHxGBC
-         TCnXsZeo8VIbirryF19u2K/pH+fusn98DIKywWHtCeTR5cFWqrm+su5xf8Ai77gXGOYY
-         Wf7h65B9fb4f6LJuWuPQRLIOmjkEOVHv0QluCrjL85hA9eDHjcp8h/bf35+Nzg40Kx/P
-         4FmVIlL1eHGsjH4XBMx+8O7l2U8NzcI7oOWzah/msl0AKrrwW62V8OnCHuUQnPuOEAhw
-         hgGQ==
+        bh=xQjgXxDowxam8JHFp2lMQSy0uU5l4G90MChbJDwG3P4=;
+        b=vrkGY+oTI2Wmke2vymXqHiinOuYnSi6pt0qxIsFDWY4rSh3zLHKkzCF+4c/pNPTL1+
+         56kMamCA5mbaPHuJ7yLSXgWMYUOOTWaFOBB6wLJJskT2qn0POVeJ3ueX7QT4vc5hwKle
+         Lkk7ORtMHJ+w5qAavedqunXHaoueL6+Nitu4GDM4WJBYeNlZts309QUfSIRiYTwL+1Ak
+         qQLtz0UDF3IzaxdMHoAacttefRIPqjwPck33g12HYKSoLLDsjh5dVm0VvaoXTM7dzPaj
+         rizbGFen1vqHJvflNG2YRnIg+14a3fSBOUghG7UE+k2VqhbQFOcdItXJhxBMnax/+TST
+         Rzfw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:reply-to:date:in-reply-to:message-id
          :mime-version:references:subject:from:to:cc;
-        bh=BsJdegcuVAgkFqlKM15IX9VerfL7fgnioVjMhrNs33k=;
-        b=DECXhpGiRdW/4sMVz6xtFY4SjCpv61YQWchSWdc3Wk0XiMa+IjIpDB7bdKa+CDdSVJ
-         sd6a0a2iElO2CntfXvYxoYaIJAFXBOZLOZPwvkgXwsHj1apofB7AvXlcxaEKuAQKrWAY
-         /lPPpHxj3HFaHKoKPOgw7uNnsobqaMYzePZFaVPvQFyVjjrTe8FjE6cGKRVe6hHxtV8J
-         5YlWDmUTdNfOzKqoVdkFfqU9jPSHHMU2NmFFfXwMH4zoxrrLLMQS6TPMrvnzX1EGzgyf
-         Mc63jhoqzkyZtS1tjyzpcdt8fVFA2AiXcBLGTdzhca5qgZthEc/C19UrA5h4rmFZb+5A
-         XdpQ==
-X-Gm-Message-State: AOAM533voybDatsC3hbBS8n+oOkZmyslQ+YDjDv12SzoQ+AbxrnNnZPm
-        +cH/H2dk7W84aF+IrnsQ5TGTZYxLZOk=
-X-Google-Smtp-Source: ABdhPJzyPJomgsq6ZqoDzIcmkO1nI1sk1jfKTrA9H1DUUKS9RODIf5HQq30YKdvPbZsH69RJwsrH5f8n32g=
+        bh=xQjgXxDowxam8JHFp2lMQSy0uU5l4G90MChbJDwG3P4=;
+        b=RNmA4YzqKQBfC5amblbf+jyTZoP7KGTRgZy7/AApCaOqYPoy7dS3SnKK9FdbgYEfMq
+         ZyTpioKPF1lgbVjOMVDVDWuw47U6AutL7n5kTULVXh3QHjlgkyiBW9NRmV0hj0yCYzy2
+         5/s336sE1yxTS1NE3fQlbEO1js6bBbXakwU/YU2cEF4TItnPrptwBuw0Wlj0o2ToFZZP
+         9/qqARPX8Vg8RtwKrNZ9jQe0MMNhHw0orsCbjItjSleXcdb4Y1Tm6XQ8zXTkjzNETbMr
+         /QgiOzRveMAGXPMxTr+9WmSuTwwM8nB522ZrrBwMZoSbQOVPbu6/wQ6g2/7zuYLDUfp6
+         gmCg==
+X-Gm-Message-State: AOAM532AeH4Zkt4o4IgvYWYlPSj+waqbydjfIL1Uxn/mzSASQEba4eam
+        E4GG6XMqjoOtv4LOoN+7to5vyuSERNg=
+X-Google-Smtp-Source: ABdhPJy1vGfcQ/3sgvWc/gFelDhCA3rHMXvsqASU1T0CrCYyFZQ4XET3B3QGekR/FDZ6LrX8PHfitVfMjHk=
 X-Received: from seanjc798194.pdx.corp.google.com ([2620:15c:f:10:ad52:3246:e190:f070])
- (user=seanjc job=sendgmr) by 2002:a25:5883:: with SMTP id m125mr8938555ybb.171.1619225275305;
- Fri, 23 Apr 2021 17:47:55 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a25:7315:: with SMTP id o21mr6501271ybc.319.1619225277610;
+ Fri, 23 Apr 2021 17:47:57 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Fri, 23 Apr 2021 17:46:27 -0700
+Date:   Fri, 23 Apr 2021 17:46:28 -0700
 In-Reply-To: <20210424004645.3950558-1-seanjc@google.com>
-Message-Id: <20210424004645.3950558-26-seanjc@google.com>
+Message-Id: <20210424004645.3950558-27-seanjc@google.com>
 Mime-Version: 1.0
 References: <20210424004645.3950558-1-seanjc@google.com>
 X-Mailer: git-send-email 2.31.1.498.g6c1eba8ee3d-goog
-Subject: [PATCH 25/43] KVM: VMX: Pull GUEST_CR3 from the VMCS iff CR3 load
- exiting is disabled
+Subject: [PATCH 26/43] KVM: VMX: Process CR0.PG side effects after setting CR0 assets
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Sean Christopherson <seanjc@google.com>,
@@ -66,43 +65,75 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Tweak the logic for grabbing vmcs.GUEST_CR3 in vmx_cache_reg() to look
-directly at the execution controls, as opposed to effectively inferring
-the controls from vCPUs state.  Inferring the controls isn't wrong, but it
-creates a very subtle dependency between the caching logic, the state of
-vcpu->arch.cr0 (via is_paging()), and the behavior of vmx_set_cr0().
-
-Using the execution controls doesn't completely eliminate the dependency
-in vmx_set_cr0(), e.g. neglecting to cache CR3 before enabling
-interception would still break the guest, but it does reduce the
-code dependency and mostly eliminate the logical dependency (that CR3
-loads are intercepted in certain scenarios).  Eliminating the sublte
-read of vcpu->arch.cr0 will also allow for additional cleanup in
-vmx_set_cr0().
+Move the long mode and EPT w/o unrestricted guest side effect processing
+down in vmx_set_cr0() so that the EPT && !URG case doesn't have to stuff
+vcpu->arch.cr0 early.  This also fixes an oddity where CR0 might not be
+marked available, i.e. the early vcpu->arch.cr0 write would appear to be
+in danger of being overwritten, though that can't actually happen in the
+current code since CR0.TS is the only guest-owned bit, and CR0.TS is not
+read by vmx_set_cr4().
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/vmx/vmx.c | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
+ arch/x86/kvm/vmx/vmx.c | 23 ++++++++++++-----------
+ 1 file changed, 12 insertions(+), 11 deletions(-)
 
 diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index e42ae77e4b82..596c8f9766ac 100644
+index 596c8f9766ac..5f30181fd240 100644
 --- a/arch/x86/kvm/vmx/vmx.c
 +++ b/arch/x86/kvm/vmx/vmx.c
-@@ -2370,8 +2370,11 @@ static void vmx_cache_reg(struct kvm_vcpu *vcpu, enum kvm_reg reg)
- 		vcpu->arch.cr0 |= vmcs_readl(GUEST_CR0) & guest_owned_bits;
- 		break;
- 	case VCPU_EXREG_CR3:
--		if (is_unrestricted_guest(vcpu) ||
--		    (enable_ept && is_paging(vcpu)))
-+		/*
-+		 * When intercepting CR3 loads, e.g. for shadowing paging, KVM's
-+		 * CR3 is loaded into hardware, not the guest's CR3.
-+		 */
-+		if (!(exec_controls_get(to_vmx(vcpu)) & CPU_BASED_CR3_LOAD_EXITING))
- 			vcpu->arch.cr3 = vmcs_readl(GUEST_CR3);
- 		break;
- 	case VCPU_EXREG_CR4:
+@@ -3111,9 +3111,11 @@ void ept_save_pdptrs(struct kvm_vcpu *vcpu)
+ void vmx_set_cr0(struct kvm_vcpu *vcpu, unsigned long cr0)
+ {
+ 	struct vcpu_vmx *vmx = to_vmx(vcpu);
+-	unsigned long hw_cr0;
++	unsigned long hw_cr0, old_cr0_pg;
+ 	u32 tmp;
+ 
++	old_cr0_pg = kvm_read_cr0_bits(vcpu, X86_CR0_PG);
++
+ 	hw_cr0 = (cr0 & ~KVM_VM_CR0_ALWAYS_OFF);
+ 	if (is_unrestricted_guest(vcpu))
+ 		hw_cr0 |= KVM_VM_CR0_ALWAYS_ON_UNRESTRICTED_GUEST;
+@@ -3129,11 +3131,16 @@ void vmx_set_cr0(struct kvm_vcpu *vcpu, unsigned long cr0)
+ 			enter_rmode(vcpu);
+ 	}
+ 
++	vmcs_writel(CR0_READ_SHADOW, cr0);
++	vmcs_writel(GUEST_CR0, hw_cr0);
++	vcpu->arch.cr0 = cr0;
++	kvm_register_mark_available(vcpu, VCPU_EXREG_CR0);
++
+ #ifdef CONFIG_X86_64
+ 	if (vcpu->arch.efer & EFER_LME) {
+-		if (!is_paging(vcpu) && (cr0 & X86_CR0_PG))
++		if (!old_cr0_pg && (cr0 & X86_CR0_PG))
+ 			enter_lmode(vcpu);
+-		if (is_paging(vcpu) && !(cr0 & X86_CR0_PG))
++		else if (old_cr0_pg && !(cr0 & X86_CR0_PG))
+ 			exit_lmode(vcpu);
+ 	}
+ #endif
+@@ -3174,17 +3181,11 @@ void vmx_set_cr0(struct kvm_vcpu *vcpu, unsigned long cr0)
+ 			exec_controls_set(vmx, tmp);
+ 		}
+ 
+-		if (!is_paging(vcpu) != !(cr0 & X86_CR0_PG)) {
+-			vcpu->arch.cr0 = cr0;
++		/* Note, vmx_set_cr4() consumes the new vcpu->arch.cr0. */
++		if ((old_cr0_pg ^ cr0) & X86_CR0_PG)
+ 			vmx_set_cr4(vcpu, kvm_read_cr4(vcpu));
+-		}
+ 	}
+ 
+-	vmcs_writel(CR0_READ_SHADOW, cr0);
+-	vmcs_writel(GUEST_CR0, hw_cr0);
+-	vcpu->arch.cr0 = cr0;
+-	kvm_register_mark_available(vcpu, VCPU_EXREG_CR0);
+-
+ 	/* depends on vcpu->arch.cr0 to be set to a new value */
+ 	vmx->emulation_required = emulation_required(vcpu);
+ }
 -- 
 2.31.1.498.g6c1eba8ee3d-goog
 
