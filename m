@@ -2,70 +2,126 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3018236A027
-	for <lists+kvm@lfdr.de>; Sat, 24 Apr 2021 10:39:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9316F36A075
+	for <lists+kvm@lfdr.de>; Sat, 24 Apr 2021 11:07:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233770AbhDXI0k (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 24 Apr 2021 04:26:40 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:48541 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233104AbhDXIZN (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Sat, 24 Apr 2021 04:25:13 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1619252641;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=JG5lz1zucN+SOqKs9Q0DF5YgOmDD8WYIPbDEuaJ2ii4=;
-        b=bK9sRkrwrQw+ab3PI3IwOchfeVMuTox5T+OhPx/Ks4XHSMTy5UR/GVH2FUXvZc75G9XYsE
-        GPpBgUE+eLZS9zoeysdS0ybkTrVmEHB3zoVIaugesqCqleuNjNcow4S5qI+LVVZJdCT4jZ
-        JsoFF3wWIZk9xTKfL/K86uec6D2t7tk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-192-7EKwWYWbO6GMl3EdSzzoag-1; Sat, 24 Apr 2021 04:21:12 -0400
-X-MC-Unique: 7EKwWYWbO6GMl3EdSzzoag-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        id S233650AbhDXJHj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 24 Apr 2021 05:07:39 -0400
+Received: from mail.kernel.org ([198.145.29.99]:48724 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S238055AbhDXJHU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 24 Apr 2021 05:07:20 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4C061343A2;
-        Sat, 24 Apr 2021 08:21:11 +0000 (UTC)
-Received: from virtlab511.virt.lab.eng.bos.redhat.com (virtlab511.virt.lab.eng.bos.redhat.com [10.19.152.198])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id F0DC55D6DC;
-        Sat, 24 Apr 2021 08:21:10 +0000 (UTC)
-From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     torvalds@linux-foundation.org
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: [GIT PULL] KVM fix for 5.12 final
-Date:   Sat, 24 Apr 2021 04:21:10 -0400
-Message-Id: <20210424082110.1773621-1-pbonzini@redhat.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+        by mail.kernel.org (Postfix) with ESMTPSA id 0349B61131;
+        Sat, 24 Apr 2021 09:06:43 +0000 (UTC)
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=wait-a-minute.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94)
+        (envelope-from <maz@kernel.org>)
+        id 1laEFM-009DDW-Pi; Sat, 24 Apr 2021 10:06:41 +0100
+Date:   Sat, 24 Apr 2021 10:06:39 +0100
+Message-ID: <87r1j0rqzk.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Krishna Reddy <vdumpa@nvidia.com>
+Cc:     Sumit Gupta <sumitg@nvidia.com>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+        "jiangkunkun@huawei.com" <jiangkunkun@huawei.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "lushenming@huawei.com" <lushenming@huawei.com>,
+        "robin.murphy@arm.com" <robin.murphy@arm.com>,
+        "tn@semihalf.com" <tn@semihalf.com>,
+        "vivek.gautam@arm.com" <vivek.gautam@arm.com>,
+        Vikram Sethi <vsethi@nvidia.com>,
+        "wangxingang5@huawei.com" <wangxingang5@huawei.com>,
+        "will@kernel.org" <will@kernel.org>,
+        "zhangfei.gao@linaro.org" <zhangfei.gao@linaro.org>,
+        "zhukeqian1@huawei.com" <zhukeqian1@huawei.com>,
+        Sachin Nikam <Snikam@nvidia.com>,
+        Bibek Basu <bbasu@nvidia.com>,
+        Shanker Donthineni <sdonthineni@nvidia.com>
+Subject: Re: [PATCH v14 00/13] SMMUv3 Nested Stage Setup (IOMMU part)
+In-Reply-To: <BY5PR12MB37642B9AC7E5D907F5A664F6B3459@BY5PR12MB3764.namprd12.prod.outlook.com>
+References: <f99d8af1-425b-f1d5-83db-20e32b856143@redhat.com>
+        <1619103878-6664-1-git-send-email-sumitg@nvidia.com>
+        <YILFAJ50aqvkQaT/@myrica>
+        <5a8825bc-286e-b316-515f-3bd3c9c70a80@nvidia.com>
+        <BY5PR12MB37642B9AC7E5D907F5A664F6B3459@BY5PR12MB3764.namprd12.prod.outlook.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: vdumpa@nvidia.com, sumitg@nvidia.com, jean-philippe@linaro.org, eric.auger@redhat.com, alex.williamson@redhat.com, eric.auger.pro@gmail.com, iommu@lists.linux-foundation.org, jiangkunkun@huawei.com, joro@8bytes.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org, lushenming@huawei.com, robin.murphy@arm.com, tn@semihalf.com, vivek.gautam@arm.com, vsethi@nvidia.com, wangxingang5@huawei.com, will@kernel.org, zhangfei.gao@linaro.org, zhukeqian1@huawei.com, Snikam@nvidia.com, bbasu@nvidia.com, sdonthineni@nvidia.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Linus,
+On Fri, 23 Apr 2021 18:58:23 +0100,
+Krishna Reddy <vdumpa@nvidia.com> wrote:
+> 
+> >> Did that patch cause any issue, or is it just not needed on your system?
+> >> It fixes an hypothetical problem with the way ATS is implemented. 
+> >> Maybe I actually observed it on an old software model, I don't 
+> >> remember. Either way it's unlikely to go upstream but I'd like to know 
+> >> if I should drop it from my tree.
+> 
+> > Had to revert same patch "mm: notify remote TLBs when dirtying a PTE" to
+> > avoid below crash[1]. I am not sure about the cause yet.
+> 
+> I have noticed this issue earlier with patch pointed here and root
+> caused the issue as below.  It happens after vfio_mmap request from
+> QEMU for the PCIe device and during the access of VA when PTE access
+> flags are updated.
+> 
+> kvm_mmu_notifier_change_pte() --> kvm_set_spte_hve() -->
+> kvm_set_spte_hva() --> clean_dcache_guest_page()
+> 
+> The validation model doesn't have FWB capability supported.
+> __clean_dcache_guest_page() attempts to perform dcache flush on pcie
+> bar address(not a valid_pfn()) through page_address(), which doesn't
+> have page table mapping and leads to exception.
+> 
+> I have worked around the issue by filtering out the request if the
+> pfn is not valid in __clean_dcache_guest_page().  As the patch
+> wasn't posted in the community, reverted it as well.
 
-The following changes since commit bf05bf16c76bb44ab5156223e1e58e26dfe30a88:
+That's papering over the real issue, and this mapping path needs
+fixing as it was only ever expected to be called for CoW.
 
-  Linux 5.12-rc8 (2021-04-18 14:45:32 -0700)
+Can you please try the following patch and let me know if that fixes
+the issue for good?
 
-are available in the Git repository at:
+Thanks,
 
-  https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
+	M.
 
-for you to fetch changes up to 9c1a07442c95f6e64dc8de099e9f35ea73db7852:
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index 77cb2d28f2a4..b62dd40a4083 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -1147,7 +1147,8 @@ int kvm_set_spte_hva(struct kvm *kvm, unsigned long hva, pte_t pte)
+ 	 * We've moved a page around, probably through CoW, so let's treat it
+ 	 * just like a translation fault and clean the cache to the PoC.
+ 	 */
+-	clean_dcache_guest_page(pfn, PAGE_SIZE);
++	if (!kvm_is_device_pfn(pfn))
++		clean_dcache_guest_page(pfn, PAGE_SIZE);
+ 	handle_hva_to_gpa(kvm, hva, end, &kvm_set_spte_handler, &pfn);
+ 	return 0;
+ }
 
-  KVM: x86/xen: Take srcu lock when accessing kvm_memslots() (2021-04-23 17:00:50 -0400)
 
-----------------------------------------------------------------
-SRCU bug introduced in the merge window
-
-----------------------------------------------------------------
-Wanpeng Li (1):
-      KVM: x86/xen: Take srcu lock when accessing kvm_memslots()
-
- arch/x86/kvm/x86.c | 20 +++++++++-----------
- 1 file changed, 9 insertions(+), 11 deletions(-)
-
+-- 
+Without deviation from the norm, progress is not possible.
