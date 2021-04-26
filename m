@@ -2,317 +2,114 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7CB0036B2A3
-	for <lists+kvm@lfdr.de>; Mon, 26 Apr 2021 13:59:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1C3B836B319
+	for <lists+kvm@lfdr.de>; Mon, 26 Apr 2021 14:32:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233225AbhDZL7v (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 26 Apr 2021 07:59:51 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:31952 "EHLO
+        id S233355AbhDZMdR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 26 Apr 2021 08:33:17 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:46794 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232987AbhDZL7u (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 26 Apr 2021 07:59:50 -0400
+        by vger.kernel.org with ESMTP id S233279AbhDZMdN (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 26 Apr 2021 08:33:13 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1619438349;
+        s=mimecast20190719; t=1619440351;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=TlZMOK34N8iPKlCme/mC0AoDzOKm03r6/1rUsiDOfQQ=;
-        b=BxI0VmFFKVfggY39sBRMZhjgQ3fxyjElEYsTXmyXENUBWaRk3ijS8VFHw2t4rUzoZ9RDNE
-        c6qpDAXBEpJ1oqFvLY7Trwz/6vFUlxz2f2qVV5zixvswu6/VkI/cZT5CQJPD7aZir59Z5J
-        aYIjXZyU+oAZu+FhvteRL0ySeXUhlYY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-127-FbPqShkvNtm5Meg1Gg5EMg-1; Mon, 26 Apr 2021 07:59:05 -0400
-X-MC-Unique: FbPqShkvNtm5Meg1Gg5EMg-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D5506107ACCD;
-        Mon, 26 Apr 2021 11:59:04 +0000 (UTC)
-Received: from localhost.localdomain (unknown [10.40.192.73])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 03E27687F8;
-        Mon, 26 Apr 2021 11:59:01 +0000 (UTC)
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     qemu-devel@nongnu.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Eduardo Habkost <ehabkost@redhat.com>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        Maxim Levitsky <mlevitsk@redhat.com>
-Subject: [PATCH v2 2/2] KVM: use KVM_{GET|SET}_SREGS2 when supported.
-Date:   Mon, 26 Apr 2021 14:58:50 +0300
-Message-Id: <20210426115850.1003501-3-mlevitsk@redhat.com>
-In-Reply-To: <20210426115850.1003501-1-mlevitsk@redhat.com>
-References: <20210426115850.1003501-1-mlevitsk@redhat.com>
+        bh=q7ft+FJuoyaWZFH96qTL2gT73WOnML/rzPUiP2aXrO8=;
+        b=RYihPoE9tcXVoApI2iCN3XnA3sfvwGILJufj7ZjrgVNwshf9r3vMPezcIqsR/sHHnAlube
+        akbZi+RhZOMtfA4+xkKlSOB48A5lk+t8YH1QOkTrGuGCdQhc6SRMKuvUhNwVLgi7EUp2QE
+        oDMBRcszbx7bky/L4Hx6owNQpbQstjI=
+Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
+ [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-557-STJ3JLJxNSiL9O0_zNEXGA-1; Mon, 26 Apr 2021 08:32:29 -0400
+X-MC-Unique: STJ3JLJxNSiL9O0_zNEXGA-1
+Received: by mail-ed1-f70.google.com with SMTP id d6-20020a0564020786b0290387927a37e2so2032252edy.10
+        for <kvm@vger.kernel.org>; Mon, 26 Apr 2021 05:32:29 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:to:cc:references:from:subject:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=q7ft+FJuoyaWZFH96qTL2gT73WOnML/rzPUiP2aXrO8=;
+        b=pogdN1OgYtDP9iOQsX9Ll7cj4Dktw3AjsqFzB6t20MA0Z64hvPBt6BgCW+EhXQuu81
+         mBYIU4vcJzrkEJUn8faWSDdaWhGKOiAzzpyM9gSxUL8kZludoX5uIAcskyiaxAjEKT+W
+         6WH5CDws4OqBzWBxh2ZH2USdpZzhJBkWxr53uDcxnXXzZO2gQTjr/+wx5r2TVOvfFa3Q
+         U9/zUsdultnC7XZYHdie/r61fEzEpz47VeWuzlgidB5LeGYfeS/SbEMFxCiXgTGSTgfV
+         i8m/0SrUtGoVyx6wOYRIU8NRFK3mz+fjz6kgN0845FhAG5Y/QmiVf2OlxIgif5xf/QGL
+         Itrg==
+X-Gm-Message-State: AOAM530/J/Kdild69PhuMV3gUo+MJJgNXJo147MIaKYRYW2VeQnkkCXR
+        FPsvyK/ILnmbS1TSu1h04n9Mzm4b7MfK65zD+XTg56+dBlOkFl6dOzf6KIZbBbBm+3P2sTL/Rlo
+        0lJxbmcXvzkbO
+X-Received: by 2002:a17:906:c09:: with SMTP id s9mr18213038ejf.145.1619440348592;
+        Mon, 26 Apr 2021 05:32:28 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJx98SpHqrIShgDQiQwvrRqUS98bHoMpJXRGL/rNx8PhCExMvUUt8bj4tfMYahD10Bk25Oebmw==
+X-Received: by 2002:a17:906:c09:: with SMTP id s9mr18213015ejf.145.1619440348445;
+        Mon, 26 Apr 2021 05:32:28 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id y2sm2401527ejg.123.2021.04.26.05.32.27
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 26 Apr 2021 05:32:27 -0700 (PDT)
+To:     Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org
+Cc:     "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Jonathan Corbet <corbet@lwn.net>,
+        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
+        "open list:X86 ARCHITECTURE (32-BIT AND 64-BIT)" 
+        <linux-kernel@vger.kernel.org>, "H. Peter Anvin" <hpa@zytor.com>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Joerg Roedel <joro@8bytes.org>
+References: <20210426111333.967729-1-mlevitsk@redhat.com>
+ <20210426111333.967729-5-mlevitsk@redhat.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH v2 4/6] KVM: x86: Introduce KVM_GET_SREGS2 /
+ KVM_SET_SREGS2
+Message-ID: <898a9b18-4578-cb9d-ece7-f45ba5b7bb89@redhat.com>
+Date:   Mon, 26 Apr 2021 14:32:26 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.7.0
 MIME-Version: 1.0
+In-Reply-To: <20210426111333.967729-5-mlevitsk@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This allows to make PDPTRs part of the migration
-stream and thus not reload them after migration which
-is against X86 spec.
+On 26/04/21 13:13, Maxim Levitsky wrote:
+> +	if (sregs2->flags & KVM_SREGS2_FLAGS_PDPTRS_VALID) {
+> +
+> +		if (!is_pae_paging(vcpu))
+> +			return -EINVAL;
+> +
+> +		for (i = 0 ; i < 4 ; i++)
+> +			kvm_pdptr_write(vcpu, i, sregs2->pdptrs[i]);
+> +
+> +		kvm_register_mark_dirty(vcpu, VCPU_EXREG_PDPTR);
+> +		mmu_reset_needed = 1;
+> +	}
 
-Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
----
- accel/kvm/kvm-all.c   |   5 ++
- include/sysemu/kvm.h  |   4 ++
- target/i386/cpu.h     |   3 ++
- target/i386/kvm/kvm.c | 107 +++++++++++++++++++++++++++++++++++++++++-
- target/i386/machine.c |  30 ++++++++++++
- 5 files changed, 147 insertions(+), 2 deletions(-)
+I think this should also have
 
-diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-index b6d9f92f15..0397b3cb2b 100644
---- a/accel/kvm/kvm-all.c
-+++ b/accel/kvm/kvm-all.c
-@@ -142,6 +142,7 @@ bool kvm_msi_via_irqfd_allowed;
- bool kvm_gsi_routing_allowed;
- bool kvm_gsi_direct_mapping;
- bool kvm_allowed;
-+bool kvm_sregs2;
- bool kvm_readonly_mem_allowed;
- bool kvm_vm_attributes_allowed;
- bool kvm_direct_msi_allowed;
-@@ -2186,6 +2187,10 @@ static int kvm_init(MachineState *ms)
-     kvm_ioeventfd_any_length_allowed =
-         (kvm_check_extension(s, KVM_CAP_IOEVENTFD_ANY_LENGTH) > 0);
- 
-+
-+    kvm_sregs2 =
-+        (kvm_check_extension(s, KVM_CAP_SREGS2) > 0);
-+
-     kvm_state = s;
- 
-     ret = kvm_arch_init(ms, s);
-diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
-index a1ab1ee12d..b3d4538c55 100644
---- a/include/sysemu/kvm.h
-+++ b/include/sysemu/kvm.h
-@@ -32,6 +32,7 @@
- #ifdef CONFIG_KVM_IS_POSSIBLE
- 
- extern bool kvm_allowed;
-+extern bool kvm_sregs2;
- extern bool kvm_kernel_irqchip;
- extern bool kvm_split_irqchip;
- extern bool kvm_async_interrupts_allowed;
-@@ -139,6 +140,9 @@ extern bool kvm_msi_use_devid;
-  */
- #define kvm_gsi_direct_mapping() (kvm_gsi_direct_mapping)
- 
-+
-+#define kvm_supports_sregs2() (kvm_sregs2)
-+
- /**
-  * kvm_readonly_mem_enabled:
-  *
-diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-index 570f916878..ac877097d4 100644
---- a/target/i386/cpu.h
-+++ b/target/i386/cpu.h
-@@ -1422,6 +1422,9 @@ typedef struct CPUX86State {
-     SegmentCache idt; /* only base and limit are used */
- 
-     target_ulong cr[5]; /* NOTE: cr1 is unused */
-+
-+    bool pdptrs_valid;
-+    uint64_t pdptrs[4];
-     int32_t a20_mask;
- 
-     BNDReg bnd_regs[4];
-diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
-index 7fe9f52710..93570706e1 100644
---- a/target/i386/kvm/kvm.c
-+++ b/target/i386/kvm/kvm.c
-@@ -2514,6 +2514,61 @@ static int kvm_put_sregs(X86CPU *cpu)
-     return kvm_vcpu_ioctl(CPU(cpu), KVM_SET_SREGS, &sregs);
- }
- 
-+static int kvm_put_sregs2(X86CPU *cpu)
-+{
-+    CPUX86State *env = &cpu->env;
-+    struct kvm_sregs2 sregs;
-+    int i;
-+
-+    sregs.flags = 0;
-+
-+    if ((env->eflags & VM_MASK)) {
-+        set_v8086_seg(&sregs.cs, &env->segs[R_CS]);
-+        set_v8086_seg(&sregs.ds, &env->segs[R_DS]);
-+        set_v8086_seg(&sregs.es, &env->segs[R_ES]);
-+        set_v8086_seg(&sregs.fs, &env->segs[R_FS]);
-+        set_v8086_seg(&sregs.gs, &env->segs[R_GS]);
-+        set_v8086_seg(&sregs.ss, &env->segs[R_SS]);
-+    } else {
-+        set_seg(&sregs.cs, &env->segs[R_CS]);
-+        set_seg(&sregs.ds, &env->segs[R_DS]);
-+        set_seg(&sregs.es, &env->segs[R_ES]);
-+        set_seg(&sregs.fs, &env->segs[R_FS]);
-+        set_seg(&sregs.gs, &env->segs[R_GS]);
-+        set_seg(&sregs.ss, &env->segs[R_SS]);
-+    }
-+
-+    set_seg(&sregs.tr, &env->tr);
-+    set_seg(&sregs.ldt, &env->ldt);
-+
-+    sregs.idt.limit = env->idt.limit;
-+    sregs.idt.base = env->idt.base;
-+    memset(sregs.idt.padding, 0, sizeof sregs.idt.padding);
-+    sregs.gdt.limit = env->gdt.limit;
-+    sregs.gdt.base = env->gdt.base;
-+    memset(sregs.gdt.padding, 0, sizeof sregs.gdt.padding);
-+
-+    sregs.cr0 = env->cr[0];
-+    sregs.cr2 = env->cr[2];
-+    sregs.cr3 = env->cr[3];
-+    sregs.cr4 = env->cr[4];
-+
-+    sregs.cr8 = cpu_get_apic_tpr(cpu->apic_state);
-+    sregs.apic_base = cpu_get_apic_base(cpu->apic_state);
-+
-+    sregs.efer = env->efer;
-+
-+    if (env->pdptrs_valid) {
-+        for (i = 0; i < 4; i++) {
-+            sregs.pdptrs[i] = env->pdptrs[i];
-+        }
-+        sregs.flags |= KVM_SREGS2_FLAGS_PDPTRS_VALID;
-+    }
-+
-+    return kvm_vcpu_ioctl(CPU(cpu), KVM_SET_SREGS2, &sregs);
-+}
-+
-+
- static void kvm_msr_buf_reset(X86CPU *cpu)
- {
-     memset(cpu->kvm_msr_buf, 0, MSR_BUF_SIZE);
-@@ -3175,6 +3230,53 @@ static int kvm_get_sregs(X86CPU *cpu)
-     return 0;
- }
- 
-+static int kvm_get_sregs2(X86CPU *cpu)
-+{
-+    CPUX86State *env = &cpu->env;
-+    struct kvm_sregs2 sregs;
-+    int i, ret;
-+
-+    ret = kvm_vcpu_ioctl(CPU(cpu), KVM_GET_SREGS2, &sregs);
-+    if (ret < 0) {
-+        return ret;
-+    }
-+
-+    get_seg(&env->segs[R_CS], &sregs.cs);
-+    get_seg(&env->segs[R_DS], &sregs.ds);
-+    get_seg(&env->segs[R_ES], &sregs.es);
-+    get_seg(&env->segs[R_FS], &sregs.fs);
-+    get_seg(&env->segs[R_GS], &sregs.gs);
-+    get_seg(&env->segs[R_SS], &sregs.ss);
-+
-+    get_seg(&env->tr, &sregs.tr);
-+    get_seg(&env->ldt, &sregs.ldt);
-+
-+    env->idt.limit = sregs.idt.limit;
-+    env->idt.base = sregs.idt.base;
-+    env->gdt.limit = sregs.gdt.limit;
-+    env->gdt.base = sregs.gdt.base;
-+
-+    env->cr[0] = sregs.cr0;
-+    env->cr[2] = sregs.cr2;
-+    env->cr[3] = sregs.cr3;
-+    env->cr[4] = sregs.cr4;
-+
-+    env->efer = sregs.efer;
-+
-+    env->pdptrs_valid = sregs.flags & KVM_SREGS2_FLAGS_PDPTRS_VALID;
-+
-+    if (env->pdptrs_valid) {
-+        for (i = 0; i < 4; i++) {
-+            env->pdptrs[i] = sregs.pdptrs[i];
-+        }
-+    }
-+
-+    /* changes to apic base and cr8/tpr are read back via kvm_arch_post_run */
-+    x86_update_hflags(env);
-+
-+    return 0;
-+}
-+
- static int kvm_get_msrs(X86CPU *cpu)
- {
-     CPUX86State *env = &cpu->env;
-@@ -4000,7 +4102,8 @@ int kvm_arch_put_registers(CPUState *cpu, int level)
-     assert(cpu_is_stopped(cpu) || qemu_cpu_is_self(cpu));
- 
-     /* must be before kvm_put_nested_state so that EFER.SVME is set */
--    ret = kvm_put_sregs(x86_cpu);
-+    ret = kvm_supports_sregs2() ? kvm_put_sregs2(x86_cpu) :
-+                                  kvm_put_sregs(x86_cpu);
-     if (ret < 0) {
-         return ret;
-     }
-@@ -4105,7 +4208,7 @@ int kvm_arch_get_registers(CPUState *cs)
-     if (ret < 0) {
-         goto out;
-     }
--    ret = kvm_get_sregs(cpu);
-+    ret = kvm_supports_sregs2() ? kvm_get_sregs2(cpu) : kvm_get_sregs(cpu);
-     if (ret < 0) {
-         goto out;
-     }
-diff --git a/target/i386/machine.c b/target/i386/machine.c
-index 137604ddb8..ae0144cf34 100644
---- a/target/i386/machine.c
-+++ b/target/i386/machine.c
-@@ -1396,6 +1396,35 @@ static const VMStateDescription vmstate_msr_tsx_ctrl = {
-     }
- };
- 
-+static bool pdptrs_needed(void *opaque)
-+{
-+    X86CPU *cpu = opaque;
-+    CPUX86State *env = &cpu->env;
-+    return env->pdptrs_valid;
-+}
-+
-+static int pdptrs_post_load(void *opaque, int version_id)
-+{
-+    X86CPU *cpu = opaque;
-+    CPUX86State *env = &cpu->env;
-+    env->pdptrs_valid = true;
-+    return 0;
-+}
-+
-+
-+static const VMStateDescription vmstate_pdptrs = {
-+    .name = "cpu/pdptrs",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .needed = pdptrs_needed,
-+    .post_load = pdptrs_post_load,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_UINT64_ARRAY(env.pdptrs, X86CPU, 4),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
-+
- VMStateDescription vmstate_x86_cpu = {
-     .name = "cpu",
-     .version_id = 12,
-@@ -1531,6 +1560,7 @@ VMStateDescription vmstate_x86_cpu = {
-         &vmstate_nested_state,
- #endif
-         &vmstate_msr_tsx_ctrl,
-+        &vmstate_pdptrs,
-         NULL
-     }
- };
--- 
-2.26.2
+	else {
+		if (is_pae_paging(vcpu))
+			return -EINVAL;
+	}
+
+but perhaps even better, check it at the beginning:
+
+	if ((sregs->cr4 & X86_CR4_PAE) &&
+             !!(sregs->efer & EFER_LMA) == !!(sregs2->flags & KVM_SREGS2_FLAGS_PDPTRS_VALID))
+		return -EINVAL;
+
+which technically means the flag is redundant, but there is some value in
+having the flag and not allowing the user to shoot itself in the foot.
+
+Paolo
 
