@@ -2,36 +2,37 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4671036B225
-	for <lists+kvm@lfdr.de>; Mon, 26 Apr 2021 13:14:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A5B8836B233
+	for <lists+kvm@lfdr.de>; Mon, 26 Apr 2021 13:14:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233034AbhDZLO7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 26 Apr 2021 07:14:59 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:41637 "EHLO
+        id S233348AbhDZLPQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 26 Apr 2021 07:15:16 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:40415 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232492AbhDZLO4 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 26 Apr 2021 07:14:56 -0400
+        by vger.kernel.org with ESMTP id S233205AbhDZLPE (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 26 Apr 2021 07:15:04 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1619435655;
+        s=mimecast20190719; t=1619435663;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=4EGSofxQx4brtBrsah9Z+zPRC9nWkVvSS5E/pnfMZn0=;
-        b=E0S6t5qc1zssvPJR2i03GN7FsBl/xfOKirD79+vlmyeJMSCiGLYE6eNjkqYydjfnVzq4Ov
-        JLrw0Dn3DpThH/RdoWS073q/3ZFrjlz3g74zeEJAPpLgyPrzoUk/wAfOrm0FupFIbsvcXo
-        LJ+YxwtkrqTzH7h8x/txfEct/a2A99k=
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=6XVGhAXBfo9MgQy1ty+oqe6SntrES8m23Sof78r/E/E=;
+        b=IZXpeb5TvGbeASyH4WcqkzNxmY0dHKVSgTvd1sp9nX6qBLJER3Z41Hqn8YKJKQL6oNAasD
+        /fvupI8n3pTbjMe9yJM3K5hYyrZrwArPdplJyH060xXPmEyoCgCO20dVimK75mM2Bvy5Si
+        sK+lgPGrUMT0+vahbxAoItuFQB9BkK4=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-442-78yYM6mCOhS2wonT2h580w-1; Mon, 26 Apr 2021 07:14:11 -0400
-X-MC-Unique: 78yYM6mCOhS2wonT2h580w-1
+ us-mta-141-T7jfQD7PPQiPaeAlmnN-3A-1; Mon, 26 Apr 2021 07:14:21 -0400
+X-MC-Unique: T7jfQD7PPQiPaeAlmnN-3A-1
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id ABF3F84B9A7;
-        Mon, 26 Apr 2021 11:13:40 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D124F108BC2F;
+        Mon, 26 Apr 2021 11:13:45 +0000 (UTC)
 Received: from localhost.localdomain (unknown [10.40.192.73])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id BAE505D9F0;
-        Mon, 26 Apr 2021 11:13:35 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 316595D9D0;
+        Mon, 26 Apr 2021 11:13:40 +0000 (UTC)
 From:   Maxim Levitsky <mlevitsk@redhat.com>
 To:     kvm@vger.kernel.org
 Cc:     linux-doc@vger.kernel.org (open list:DOCUMENTATION),
@@ -48,68 +49,106 @@ Cc:     linux-doc@vger.kernel.org (open list:DOCUMENTATION),
         Sean Christopherson <seanjc@google.com>,
         Joerg Roedel <joro@8bytes.org>,
         Maxim Levitsky <mlevitsk@redhat.com>
-Subject: [PATCH v2 0/6] Introduce KVM_{GET|SET}_SREGS2 and fix PDPTR migration
-Date:   Mon, 26 Apr 2021 14:13:27 +0300
-Message-Id: <20210426111333.967729-1-mlevitsk@redhat.com>
-Content-Type: text/plain; charset="utf-8"
+Subject: [PATCH v2 1/6] KVM: nSVM: refactor the CR3 reload on migration
+Date:   Mon, 26 Apr 2021 14:13:28 +0300
+Message-Id: <20210426111333.967729-2-mlevitsk@redhat.com>
+In-Reply-To: <20210426111333.967729-1-mlevitsk@redhat.com>
+References: <20210426111333.967729-1-mlevitsk@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This patch set aims to fix few flaws that were discovered=0D
-in KVM_{GET|SET}_SREGS on x86:=0D
-=0D
-* There is no support for reading/writing PDPTRs although=0D
-  these are considered to be part of the guest state.=0D
-=0D
-* There is useless interrupt bitmap which isn't needed=0D
-=0D
-* No support for future extensions (via flags and such)=0D
-=0D
-Also if the user doesn't use the new SREG2 api, the PDPTR=0D
-load after migration is now done on KVM_REQ_GET_NESTED_STATE_PAGES=0D
-to at least read them correctly in cases when guest memory=0D
-map is not up to date when nested state is loaded.=0D
-=0D
-This patch series was tested by doing nested migration test=0D
-of 32 bit PAE L1 + 32 bit PAE L2 on AMD and Intel and by=0D
-nested migration test of 64 bit L1 + 32 bit PAE L2 on AMD.=0D
-The later test currently fails on Intel (regardless of my patches).=0D
-=0D
-Changes from V1:=0D
-  - move only PDPTRS load to KVM_REQ_GET_NESTED_STATE_PAGES on VMX=0D
-  - rebase on top of kvm/queue=0D
-  - improve the KVM_GET_SREGS2 to have flag for PDPTRS=0D
-    and remove padding=0D
-=0D
-Patches to qemu will be send soon as well.=0D
-=0D
-Best regards,=0D
-        Maxim Levitskky=0D
-=0D
-Maxim Levitsky (6):=0D
-  KVM: nSVM: refactor the CR3 reload on migration=0D
-  KVM: nVMX: delay loading of PDPTRs to KVM_REQ_GET_NESTED_STATE_PAGES=0D
-  KVM: x86: introduce kvm_register_clear_available=0D
-  KVM: x86: Introduce KVM_GET_SREGS2 / KVM_SET_SREGS2=0D
-  KVM: nSVM: avoid loading PDPTRs after migration when possible=0D
-  KVM: nVMX: avoid loading PDPTRs after migration when possible=0D
-=0D
- Documentation/virt/kvm/api.rst  |  48 +++++++++++=0D
- arch/x86/include/asm/kvm_host.h |   7 ++=0D
- arch/x86/include/uapi/asm/kvm.h |  13 +++=0D
- arch/x86/kvm/kvm_cache_regs.h   |  12 +++=0D
- arch/x86/kvm/svm/nested.c       |  33 ++++++--=0D
- arch/x86/kvm/svm/svm.c          |   6 +-=0D
- arch/x86/kvm/vmx/nested.c       |  24 ++++--=0D
- arch/x86/kvm/x86.c              | 139 ++++++++++++++++++++++++++------=0D
- include/uapi/linux/kvm.h        |   4 +=0D
- 9 files changed, 246 insertions(+), 40 deletions(-)=0D
-=0D
--- =0D
-2.26.2=0D
-=0D
+Document the actual reason why we need to do it
+on migration and move the call to svm_set_nested_state
+to be closer to VMX code.
+
+To avoid loading the PDPTRs from possibly not up to date memory map,
+in nested_svm_load_cr3 after the move, move this code to
+.get_nested_state_pages.
+
+Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+---
+ arch/x86/kvm/svm/nested.c | 32 +++++++++++++++++++++++++-------
+ 1 file changed, 25 insertions(+), 7 deletions(-)
+
+diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
+index 540d43ba2cf4..ceb37ed1dc98 100644
+--- a/arch/x86/kvm/svm/nested.c
++++ b/arch/x86/kvm/svm/nested.c
+@@ -385,12 +385,12 @@ static inline bool nested_npt_enabled(struct vcpu_svm *svm)
+  * if we are emulating VM-Entry into a guest with NPT enabled.
+  */
+ static int nested_svm_load_cr3(struct kvm_vcpu *vcpu, unsigned long cr3,
+-			       bool nested_npt)
++			       bool nested_npt, bool reload_pdptrs)
+ {
+ 	if (CC(kvm_vcpu_is_illegal_gpa(vcpu, cr3)))
+ 		return -EINVAL;
+ 
+-	if (!nested_npt && is_pae_paging(vcpu) &&
++	if (reload_pdptrs && !nested_npt && is_pae_paging(vcpu) &&
+ 	    (cr3 != kvm_read_cr3(vcpu) || pdptrs_changed(vcpu))) {
+ 		if (CC(!load_pdptrs(vcpu, vcpu->arch.walk_mmu, cr3)))
+ 			return -EINVAL;
+@@ -576,7 +576,7 @@ int enter_svm_guest_mode(struct kvm_vcpu *vcpu, u64 vmcb12_gpa,
+ 	nested_vmcb02_prepare_save(svm, vmcb12);
+ 
+ 	ret = nested_svm_load_cr3(&svm->vcpu, vmcb12->save.cr3,
+-				  nested_npt_enabled(svm));
++				  nested_npt_enabled(svm), true);
+ 	if (ret)
+ 		return ret;
+ 
+@@ -806,7 +806,7 @@ int nested_svm_vmexit(struct vcpu_svm *svm)
+ 
+ 	nested_svm_uninit_mmu_context(vcpu);
+ 
+-	rc = nested_svm_load_cr3(vcpu, svm->vmcb->save.cr3, false);
++	rc = nested_svm_load_cr3(vcpu, svm->vmcb->save.cr3, false, true);
+ 	if (rc)
+ 		return 1;
+ 
+@@ -1291,6 +1291,19 @@ static int svm_set_nested_state(struct kvm_vcpu *vcpu,
+ 	    !nested_vmcb_valid_sregs(vcpu, save))
+ 		goto out_free;
+ 
++	/*
++	 * While the nested guest CR3 is already checked and set by
++	 * KVM_SET_SREGS, it was set when nested state was yet loaded,
++	 * thus MMU might not be initialized correctly.
++	 * Set it again to fix this.
++	 */
++
++	ret = nested_svm_load_cr3(&svm->vcpu, vcpu->arch.cr3,
++				  nested_npt_enabled(svm), false);
++	if (WARN_ON_ONCE(ret))
++		goto out_free;
++
++
+ 	/*
+ 	 * All checks done, we can enter guest mode. Userspace provides
+ 	 * vmcb12.control, which will be combined with L1 and stored into
+@@ -1343,9 +1356,14 @@ static bool svm_get_nested_state_pages(struct kvm_vcpu *vcpu)
+ 	if (WARN_ON(!is_guest_mode(vcpu)))
+ 		return true;
+ 
+-	if (nested_svm_load_cr3(&svm->vcpu, vcpu->arch.cr3,
+-				nested_npt_enabled(svm)))
+-		return false;
++	if (!nested_npt_enabled(svm) && is_pae_paging(vcpu))
++		/*
++		 * Reload the guest's PDPTRs since after a migration
++		 * the guest CR3 might be restored prior to setting the nested
++		 * state which can lead to a load of wrong PDPTRs.
++		 */
++		if (CC(!load_pdptrs(vcpu, vcpu->arch.walk_mmu, vcpu->arch.cr3)))
++			return false;
+ 
+ 	if (!nested_svm_vmrun_msrpm(svm)) {
+ 		vcpu->run->exit_reason = KVM_EXIT_INTERNAL_ERROR;
+-- 
+2.26.2
 
