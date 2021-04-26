@@ -2,203 +2,239 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1F74B36B48A
-	for <lists+kvm@lfdr.de>; Mon, 26 Apr 2021 16:11:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 47C8036B488
+	for <lists+kvm@lfdr.de>; Mon, 26 Apr 2021 16:11:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233691AbhDZOM0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 26 Apr 2021 10:12:26 -0400
-Received: from mail-mw2nam12on2049.outbound.protection.outlook.com ([40.107.244.49]:29313
-        "EHLO NAM12-MW2-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S230250AbhDZOM0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 26 Apr 2021 10:12:26 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=A13rXAJsUhRL5OE0w91H6GvgL2/qg0fbmCt8ehpDvS8mdv/YPkz0RkXrkd570S5Fpl1zBxotVy1kL7f+p3/XCggIPFhJyeEmTOm5BARQBmkJVA+djz4V+1ZTyq3dCoKa+w/tAkLx9o5tnKPmyPAQjAnbI945CGbaLd5+uFmXfSVj2pXcz+RZ2u6WHJ8qOOat0TBrpH6RZi3sgKhmHIclWQ/8UF1fLmq83tiH8r9cV3L9CEn1qbwvIZAq3FarF5GCydYSRUYZSJMja23sYQJL5BUZb8R1nrETK+NH3D97OQcgVd3qocG7B7Ksa3naDnU0OiXd6nUwz40ctJJItdtU3A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=gRiDd+VenLbwzdrhW3DmB6lEyitsHEXSGm7R+UDtirs=;
- b=m6U4C5NCcg5SNB9y5yR3dHlVOXyosNJ+7giW3GBbjeKhIoaybdV4c7lTx9t3GSyK1Z4qES/ujj7KbvppqnDVvg+gh0nkY2u9MspbBZwTTRejL6SYduqjNF2cGr3hEVuiJeTpYNaAi2w7r59rDE1eft3a/pbgO8cbCozW8PFtu4DRKw7xE6Due12H5YWjc5j7sEKghAHATCOCxeVFJzneHz3bp857quT8b3n/YFggITj1QIRfkYTMPNFUvvvOt483g2qBW3cgvGQE1mqSvpnUgPTmbwkN0gfn/P2TjT30XTCvuSmAn0Z6RHBS8biAHRDrHmXxRJguE/Ev2UOohL7ZrQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=gRiDd+VenLbwzdrhW3DmB6lEyitsHEXSGm7R+UDtirs=;
- b=fsOJdbJSQSj7Io+0VRuSGCG0gXJRYs2zwBfG5rn1sS/Xx1ReNVSbv1a3So7e48bTS1MLsryqP1H4khgcuNzXJZiilWpPLnCnlR5Lojk9p8JV8t5p1qD6MdNGpxHL8yfYfVAvtv7HkIrYcikbHXi8Qp/m6xlb4fSl43XBDzy7u2qcD5CcWbK14pdHuq6yZEJogL4diEQuyWOMa7m5KwWhFh+FuymtQq6LKQqjT4OZntaRdJTyG+MVnoU8BrnEc7nH9FH2DCRFLnMLyr+D0RX+CoaZX2cpuA1LFOz8lNhyirn0oOnEIqDyQX12bjpG8i9VQXkbn9elzIb84oQcGOuBAQ==
-Authentication-Results: lst.de; dkim=none (message not signed)
- header.d=none;lst.de; dmarc=none action=none header.from=nvidia.com;
-Received: from DM6PR12MB3834.namprd12.prod.outlook.com (2603:10b6:5:14a::12)
- by DM5PR12MB1882.namprd12.prod.outlook.com (2603:10b6:3:112::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4065.23; Mon, 26 Apr
- 2021 14:11:41 +0000
-Received: from DM6PR12MB3834.namprd12.prod.outlook.com
- ([fe80::1c62:7fa3:617b:ab87]) by DM6PR12MB3834.namprd12.prod.outlook.com
- ([fe80::1c62:7fa3:617b:ab87%6]) with mapi id 15.20.4065.026; Mon, 26 Apr 2021
- 14:11:41 +0000
-Date:   Mon, 26 Apr 2021 11:11:40 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Alex Williamson <alex.williamson@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org,
-        Kirti Wankhede <kwankhede@nvidia.com>,
-        "Raj, Ashok" <ashok.raj@intel.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Leon Romanovsky <leonro@nvidia.com>,
-        Max Gurtovoy <mgurtovoy@nvidia.com>,
-        Tarun Gupta <targupta@nvidia.com>
-Subject: Re: [PATCH 02/12] vfio/mdev: Allow the mdev_parent_ops to specify
- the device driver to bind
-Message-ID: <20210426141140.GU1370958@nvidia.com>
-References: <0-v1-d88406ed308e+418-vfio3_jgg@nvidia.com>
- <2-v1-d88406ed308e+418-vfio3_jgg@nvidia.com>
- <20210426140257.GA15209@lst.de>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210426140257.GA15209@lst.de>
-X-Originating-IP: [47.55.113.94]
-X-ClientProxiedBy: MN2PR05CA0048.namprd05.prod.outlook.com
- (2603:10b6:208:236::17) To DM6PR12MB3834.namprd12.prod.outlook.com
- (2603:10b6:5:14a::12)
+        id S233494AbhDZOME (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 26 Apr 2021 10:12:04 -0400
+Received: from foss.arm.com ([217.140.110.172]:35034 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S230250AbhDZOMD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 26 Apr 2021 10:12:03 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9DDE531B;
+        Mon, 26 Apr 2021 07:11:21 -0700 (PDT)
+Received: from [192.168.0.110] (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 0525A3F70D;
+        Mon, 26 Apr 2021 07:11:20 -0700 (PDT)
+Subject: Re: [kvm-unit-tests RFC PATCH 0/1] configure: arm: Replace --vmm with
+ --target
+To:     Andrew Jones <drjones@redhat.com>
+Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+        pbonzini@redhat.com
+References: <20210420161338.70914-1-alexandru.elisei@arm.com>
+ <20210420165101.irbx2upgqbazkvlt@gator.home>
+ <ed3ba802-fee7-4c58-9d73-d33dfbd44d7f@arm.com>
+ <20210422155757.t4pvv6blkvoyi2oy@gator>
+ <854c2d33-0b20-b7e3-c522-b01a53fcbbb3@arm.com>
+ <20210426085911.jkkuj53jsajbjmi5@gator>
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+Message-ID: <d2004fdc-9506-32f5-cb11-fa9c5a7fe0c3@arm.com>
+Date:   Mon, 26 Apr 2021 15:11:43 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.0
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from mlx.ziepe.ca (47.55.113.94) by MN2PR05CA0048.namprd05.prod.outlook.com (2603:10b6:208:236::17) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4087.15 via Frontend Transport; Mon, 26 Apr 2021 14:11:41 +0000
-Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1lb1xc-00D4Jv-4i; Mon, 26 Apr 2021 11:11:40 -0300
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 2f25ad74-23a2-4c00-389a-08d908bd36ef
-X-MS-TrafficTypeDiagnostic: DM5PR12MB1882:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <DM5PR12MB1882537E4990FDAC4F3903ADC2429@DM5PR12MB1882.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 79i3gSqO8PJPW0I8Udca3mabr5VXBg+d7lS2QRfqLDFFn4WejmGHGQr3Xf+sMyWBOmq0InTdEQGE69DGlfL5WGKYKvcvSAQO3y5fBymex6hMUP3+vBhOeVDBb8VoaR61bqz9Jl2Ra923Nc8qjA8gRztO4hZoWXsC/BsUOhFDaH1IRZqFhvIXPVsjRB50J4u5p876gKBUz4oUnmxWIHKiRoZWm1zfBg5ApqRK62h1P33u0QRfX7VadV5SlHVS3OW2AAnHOUNujTEuu1yPvqPiY5Ka+6/61aLtv0QDsuwxJ1lzUctU6psayUJt7qi1c2fBXgu9L87t0fvRTMpJo0+TKg4gifFvsjjtDfQvrKR3kUaadarztDQHGuk7CMTqmYyqjB1WAIQdrpdKF/rHUOXXGew6fQTRKaBcVbi9onz/F3OywQdwPPBKZkHxcnYdO2rUt4M2E5QnuewNuuS5uCnUNF0y0Sof99hShXnWsgG0w6cJrdPdID+hsljKeeTsTgZegmylqrskHvbmiv8H0MrPv1IxbIbzC6NSJRAqzlw4LyY2dfKbCLGRckHFQw48UcIXiNwuSIamvf/d9ITHJ4qsC1uo8pS1pzw+nIT7lG8obv4=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB3834.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(376002)(346002)(396003)(39860400002)(136003)(186003)(38100700002)(4326008)(2906002)(6916009)(54906003)(478600001)(107886003)(66556008)(66946007)(66476007)(33656002)(9746002)(9786002)(83380400001)(1076003)(8676002)(5660300002)(8936002)(86362001)(426003)(26005)(316002)(2616005)(36756003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: =?us-ascii?Q?N14OU7lb8Ukc+mweXwC0jX9W8bvRCZQ1kO09YFbYd+q4CbLuuuO1rG2B3Wpa?=
- =?us-ascii?Q?404lYPTFRp6MoNk3KPTzs1yieB+98bBuoO+eDArHo+PQc+lYHICpJ4lzaaF6?=
- =?us-ascii?Q?8J7EBDiozKPXUT2Of/PACuH3nQca01BteCfGHogwqBMX+/fOv1JdF+8JDf/t?=
- =?us-ascii?Q?p51NBlQQEy5NnJnkIkkb1LCLENSdiRLbtArzL8HHx7YzHRJWK7HCFwQxQ/Jo?=
- =?us-ascii?Q?fuznXLLU42J9tS7yigbw7CNqJUlVbEdaxy8MV9XiQAWeD9ODftgd58LURdNo?=
- =?us-ascii?Q?efDLk/i96WS4RGqQ6kBsC7etN19bLNGjODSybg9sKeABCLrSO/UZNIcDu815?=
- =?us-ascii?Q?knEPfVCK8RsZwDYYNiKMKxS1XoJElcDqHDVglZ+Fm+Fa4pwiUIluXItgc9SK?=
- =?us-ascii?Q?E3Ya8+bM2FsA3i+SfXwvz1BKl0ovZoqRsGYIWMAHcXxCFGLgStizHrUuYMUQ?=
- =?us-ascii?Q?I4xqFUt3c00AkYhdDll+Wb3L55Cg0Ypge4txXwNIbpbsWqfDI+at4SDJVrab?=
- =?us-ascii?Q?ki7gPlilahTHBrWZO0S020YOpT7WeVUWO3o9B0eAnvG+/yE0Qz/x9E1w+mj7?=
- =?us-ascii?Q?c9lJVyLtMWHRtg9qZRPH3ia/XuvvnjPen60KbZglpyoejvgtbxKKHS7V/8TL?=
- =?us-ascii?Q?0GW+iOYYDMTC/hWBDegXnsOwGxb55Fetz6EQnLWpYyqjcMt5rr7K68Sn/rrX?=
- =?us-ascii?Q?kREmFAn/m2xttGCr5SZFo2+C8dLvvIOpUFP7fVjwVGK4lQlWDgmIQ+HYrR3a?=
- =?us-ascii?Q?/sT/Z4hZyLgvMuQtK/TMaQkW73P98poY4ap7cJaWfxOLrBb87FAAxM6v6Dmu?=
- =?us-ascii?Q?Npee8o/Lc01VuI9r1wmldAI3TlUn+h7zLJQjXpS7JlriCMcdbaUpBqM5MZWm?=
- =?us-ascii?Q?RolRFSpOriTFfw4ee1R9ghMhQoq13j2v2m4PmCAIMExVhi94etYhaVxsmKvq?=
- =?us-ascii?Q?Ru4YOU0DXa5wtYQCNpMvsjMiKlJwnTF6M7/aLcMRXwwzjdl+6uitY2PYjCrc?=
- =?us-ascii?Q?UeAg794Q3FZ7EAtPs87htEmEUomqcoX/b1QpwVlwoikCeOIeCwSXx/BBHd/g?=
- =?us-ascii?Q?aGN4UH/QZzOX97uuaNTkPm8Oi4fPulaiIYzOASsHBZpp3wgH4A1c36T9RyAs?=
- =?us-ascii?Q?tK44/K40WLyI6n5E5nXhCF7WqLbH0WyE84u14vkpm+MPaVzVO1R/EYKRJkfo?=
- =?us-ascii?Q?BxttGTY8vjpH/S3fifOokPlhAxqmd+arpGKCEyFpCKkXiMcFwY0gfM2IPP7S?=
- =?us-ascii?Q?XgpOk2ujEFF25nXlgd/Vb1VDrzWbLjGUuI1EsPXS1frgRZdc+4vmziEbfvqm?=
- =?us-ascii?Q?mNk3ygsQWWV9aTGxEy4JZtu5?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2f25ad74-23a2-4c00-389a-08d908bd36ef
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB3834.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Apr 2021 14:11:41.4763
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: k6GEIP8g4SOBe2fd/Xew7gX6AtvKfl5c+PhbeK/AFWKr+dOoRPCoUa6WcxsQ8H4Z
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR12MB1882
+In-Reply-To: <20210426085911.jkkuj53jsajbjmi5@gator>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Apr 26, 2021 at 04:02:57PM +0200, Christoph Hellwig wrote:
-> On Fri, Apr 23, 2021 at 08:02:59PM -0300, Jason Gunthorpe wrote:
-> > +/*
-> > + * mdev drivers can refuse to bind during probe(), in this case we want to fail
-> > + * the creation of the mdev all the way back to sysfs. This is a weird model
-> > + * that doesn't fit in the driver core well, nor does it seem to appear any
-> > + * place else in the kernel, so use a simple hack.
-> > + */
-> > +static int mdev_bind_driver(struct mdev_device *mdev)
-> > +{
-> > +	struct mdev_driver *drv = mdev->type->parent->ops->device_driver;
-> > +	int ret;
-> > +
-> > +	if (!drv)
-> > +		drv = &vfio_mdev_driver;
-> > +
-> > +	while (1) {
-> > +		device_lock(&mdev->dev);
-> > +		if (mdev->dev.driver == &drv->driver) {
-> > +			ret = 0;
-> > +			goto out_unlock;
-> > +		}
-> > +		if (mdev->probe_err) {
-> > +			ret = mdev->probe_err;
-> > +			goto out_unlock;
-> > +		}
-> > +		device_unlock(&mdev->dev);
-> > +		ret = device_attach(&mdev->dev);
-> > +		if (ret)
-> > +			return ret;
-> > +		mdev->probe_err = -EINVAL;
-> > +	}
-> > +	return 0;
-> > +
-> > +out_unlock:
-> > +	device_unlock(&mdev->dev);
-> > +	return ret;
-> > +}
-> 
-> This looks strange to me, and I think by open coding
-> device_attach we could do much better here, something like:
+Hi Drew,
 
-I look at this for a long time, it is strange.
+On 4/26/21 9:59 AM, Andrew Jones wrote:
+> On Fri, Apr 23, 2021 at 04:43:14PM +0100, Alexandru Elisei wrote:
+>> Hi Drew,
+>>
+>> On 4/22/21 4:57 PM, Andrew Jones wrote:
+>>> On Thu, Apr 22, 2021 at 04:17:27PM +0100, Alexandru Elisei wrote:
+>>>> Hi Drew,
+>>>>
+>>>> On 4/20/21 5:51 PM, Andrew Jones wrote:
+>>>>> Hi Alex,
+>>>>>
+>>>>> On Tue, Apr 20, 2021 at 05:13:37PM +0100, Alexandru Elisei wrote:
+>>>>>> This is an RFC because it's not exactly clear to me that this is the best
+>>>>>> approach. I'm also open to using a different name for the new option, maybe
+>>>>>> something like --platform if it makes more sense.
+>>>>> I like 'target'.
+>>>>>
+>>>>>> I see two use cases for the patch:
+>>>>>>
+>>>>>> 1. Using different files when compiling kvm-unit-tests to run as an EFI app
+>>>>>> as opposed to a KVM guest (described in the commit message).
+>>>>>>
+>>>>>> 2. This is speculation on my part, but I can see extending
+>>>>>> arm/unittests.cfg with a "target" test option which can be used to decide
+>>>>>> which tests need to be run based on the configure --target value. For
+>>>>>> example, migration tests don't make much sense on kvmtool, which doesn't
+>>>>>> have migration support. Similarly, the micro-bench test doesn't make much
+>>>>>> sense (to me, at least) as an EFI app. Of course, this is only useful if
+>>>>>> there are automated scripts to run the tests under kvmtool or EFI, which
+>>>>>> doesn't look likely at the moment, so I left it out of the commit message.
+>>>>> Sounds like a good idea. unittests.cfg could get a new option 'targets'
+>>>>> where a list of targets is given. If targets is not present, then the
+>>>>> test assumes it's for all targets. Might be nice to also accept !<target>
+>>>>> syntax. E.g.
+>>>>>
+>>>>> # builds/runs for all targets
+>>>>> [mytest]
+>>>>> file = mytest.flat
+>>>>>
+>>>>> # builds/runs for given targets
+>>>>> [mytest2]
+>>>>> file = mytest2.flat
+>>>>> targets = qemu,kvmtool
+>>>>>
+>>>>> # builds/runs for all targets except disabled targets
+>>>>> [mytest3]
+>>>>> file = mytest3.flat
+>>>>> targets = !kvmtool
+>>>> That's sounds like a good idea, but to be honest, I would wait until someone
+>>>> actually needs it before implementing it. That way we don't risk not taking a use
+>>>> case into account and then having to rework it.
+>>> Don't we have a usecase? Above you said that kvmtool should at least skip
+>>> the migration tests.
+>> Sorry for not making myself clear, when I was talking about adding a "targets"
+>> parameter to a test, I was thinking that it will only be used by the run scripts.
+>> All the tests can run under qemu, and run_tests.sh only knows about qemu, so, from
+>> that point of view, that's why I think the "targets" argument is not useful at the
+>> moment.
+>>
+>> As for the migration test specifically, the VM migration is implemented in the run
+>> scripts, not in the test itself; the test waits for the UART to signal that
+>> migration is complete. That test runs just fine under kvmtool, but no migration is
+>> taking place:
+>>
+>> $ ./vm run --irqchip=gicv3-its -c6 -m128 -f arm/gic.flat --params its-migration
+>> ï¿½ # lkvm run --firmware arm/gic.flat -m 128 -c 6 --name guest-1440
+>> ï¿½ Info: Placing fdt at 0x80200000 - 0x80210000
+>> chr_testdev_init: chr-testdev: can't find a virtio-console
+>> ITS: MAPD devid=2 size = 0x8 itt=0x801e0000 valid=1
+>> ITS: MAPD devid=7 size = 0x8 itt=0x801f0000 valid=1
+>> MAPC col_id=3 target_addr = 0x30000 valid=1
+>> MAPC col_id=2 target_addr = 0x20000 valid=1
+>> INVALL col_id=2
+>> INVALL col_id=3
+>> MAPTI dev_id=2 event_id=20 -> phys_id=8195, col_id=3
+>> MAPTI dev_id=7 event_id=255 -> phys_id=8196, col_id=2
+>> Now migrate the VM, then press a key to continue...
+>> INFO: gicv3: its-migration: Migration complete
+>> INT dev_id=2 event_id=20
+>> PASS: gicv3: its-migration: dev2/eventid=20 triggers LPI 8195 on PE #3 after migration
+>> INT dev_id=7 event_id=255
+>> PASS: gicv3: its-migration: dev7/eventid=255 triggers LPI 8196 on PE #2 after
+>> migration
+>> SUMMARY: 2 tests
+>>
+>> Even the pci-test works under kvmtool, even though it targets qemu's pci-testdev:
+>>
+>> $ ./vm run --irqchip=gicv3-its -c6 -m128 -f arm/pci-test.flat
+>> ï¿½ # lkvm run --firmware arm/pci-test.flat -m 128 -c 6 --name guest-1468
+>> ï¿½ Info: Placing fdt at 0x80200000 - 0x80210000
+>> chr_testdev_init: chr-testdev: can't find a virtio-console
+>> No PCIe ECAM compatible controller found
+>> PCI bus probing failed, skipping tests...
+>> SUMMARY: 0 tests
+>>
+>> The test is still useful for kvmtool, because it tests that the PCI node in the
+>> DTB is generated as expected. And after kvmtool gets support for PCIE (work in
+>> progress), it will test PCI device probing, which makes it even more useful than
+>> it is today.
+>>
+>> So I guess the question is, do what should "targets" represent, how should it be
+>> used and do we need it now?
+> I'll leave that up to you, since you're the one driving support for
+> kvmtool and, hopefully soon, bare-metal AArch64. BTW, I think we're long
 
-> static int mdev_bind_driver(struct mdev_device *mdev)
-> {
-> 	struct mdev_driver *drv = mdev->type->parent->ops->device_driver;
-> 	int ret = -EINVAL;
-> 
-> 	if (!drv)
-> 		drv = &vfio_mdev_driver;
-> 
-> 	device_lock(&mdev->dev);
-> 	if (WARN_ON_ONCE(device_is_bound(dev)))
-> 		goto out_unlock;
-> 	if (mdev->dev.p->dead)
-> 	 	goto out_unlock;
+If it's up to me, then I would prefer this gets added to the test definitions
+along with kvmtool (or baremetal) runscript support, when we have a well defined
+usecase for it.
 
-'p' is private to the driver core so we can't touch it here
+> overdue for adding kvmtool runner functionality, either by adapting what
+> we have (possibly by applying a TARGET variable :-) or by simply adding
+> new runner scripts. I personally would like to easily run kvmtool when
+> I'm testing arm/queue, and I don't want to have my own personal kvmtool
+> runner script to do that.
 
-> 	mdev->dev.driver = &drv->driver;
-> 	ret = device_bind_driver(&mdev->dev);
+I agree, this is sorely needed. There was someone from Arm that was interested in
+adding it, but that hasn't materialized yet. Regardless, I'll added it to my
+(rather long) list of todo's.
 
-It is really counter intuitive but device_bind_driver() doesn't
-actually call probe, or do a lot of other essential stuff.
+>
+>>>>> And it wouldn't bother me to have special logic for kvmtool's lack of
+>>>>> migration put directly in scripts/runtime.bash
+>>>> Good to keep in mind when support is added.
+>>>>
+>>>>> diff --git a/scripts/runtime.bash b/scripts/runtime.bash
+>>>>> index 132389c7dd59..0d5cb51df4f4 100644
+>>>>> --- a/scripts/runtime.bash
+>>>>> +++ b/scripts/runtime.bash
+>>>>> @@ -132,7 +132,7 @@ function run()
+>>>>>      }
+>>>>>  
+>>>>>      cmdline=$(get_cmdline $kernel)
+>>>>> -    if grep -qw "migration" <<<$groups ; then
+>>>>> +    if grep -qw "migration" <<<$groups && [ "$TARGET" != "kvmtool" ]; then
+>>>>>          cmdline="MIGRATION=yes $cmdline"
+>>>>>      fi
+>>>>>      if [ "$verbose" = "yes" ]; then
+>>>>>
+>>>>>> Using --vmm will trigger a warning. I was thinking about removing it entirely in
+>>>>>> a about a year's time, but that's not set in stone. Note that qemu users
+>>>>>> (probably the vast majority of people) will not be affected by this change as
+>>>>>> long as they weren't setting --vmm explicitely to its default value of "qemu".
+>>>>>>
+>>>>> While we'd risk automated configure+build tools, like git{hub,lab} CI,
+>>>>> failing, I think the risk is pretty low right now that anybody is using
+>>>>> the option. Also, we might as well make them change sooner than later by
+>>>>> failing configure. IOW, I'd just do s/vmm/target/g to rename it now. If
+>>>>> we are concerned about the disruption, then I'd just make vmm an alias
+>>>>> for target and not bother deprecating it ever.
+>>>> I also think it will not be too bad if we make the change now, but I'm not sure
+>>>> what you mean by making vmm an alias of target. The patch ignores --vmm is it's
+>>>> not specified, and if it is specified on the configure command line, then it must
+>>>> match the value of --target, otherwise configure fails.
+>>>>
+>>> The current patch does both things; it says don't use --vmm and it says
+>>> the new --vmm is --target. I'm saying do one or the other. Either
+>>> completely rename vmm to target, which will then error out when vmm is
+>>> specified as an unknown option or allow the user to use either --vmm or
+>>> --target with no error and where both mean to do the same thing, which is
+>>> to set the TARGET variable.
+>> I'm sorry, but it's still not clear to me what you are trying to say.
+>>
+>> The current behaviour:
+>>
+>> $ ./configure --arch=arm64 --cross-prefix=aarch64-linux-gnu- --vmm=qemu
+>> INFO: --vmm is deprecated and will be removed in future versions
+>> $ ./configure --arch=arm64 --cross-prefix=aarch64-linux-gnu- --vmm=qemu --target=qemu
+>> INFO: --vmm is deprecated and will be removed in future versions
+>> $ ./configure --arch=arm64 --cross-prefix=aarch64-linux-gnu- --vmm=kvmtool
+>> --target=qemu
+>> INFO: --vmm is deprecated and will be removed in future versions
+>> --vmm must have the same value as --target (qemu)
+>> Usage: ./configure [options]
+>> [..]
+>> $ ./configure --arch=arm64 --cross-prefix=aarch64-linux-gnu- --vmm=kvmtool
+>> --target=kvmtool
+>> INFO: --vmm is deprecated and will be removed in future versions
+>>
+>> Can you point out what makes you think that the patch tries to do two things at once?
+> Deprecation requires you do two things at once; add a warning to the old
+> and add the new. I'm saying we don't need to deprecate --vmm. Either just
+> do the new (s/vmm/target/g) or always allow the old (s/vmm/target/g plus
+> make --vmm an alias for --target without any warning). I'd prefer the
+> first one, since I'm not too worried about a few users having to figure
+> out how to change their muscle memory and CI scripts when they start
+> getting unknown option errors at configure time.
 
-As far as I can see the driver core has three different ways to bind
-drivers:
- - The normal 'really_probe()' path with all the bells and whistles.
- - You can set dev.driver before calling device_add() and related
- - You can call device_bind_driver() 'somehow'.
-
-The later two completely skip all the really_probe() stuff, so things
-like devm and more become broken. They also don't call probe(), that
-is up to the caller. They seem only usable in very niche special
-cases, unfortunately.
-
-Some callers open code the probe() but then they have ordering
-problems with the sysfs and other little issues.
-
-In this case 99% of the time the driver will already be bound here and
-this routine does nothing - the only case I worried about about is
-some kind of defered probe by default which calling device_attach()
-will defeat.
+Ok, I see now, I prefer the first approach, I'll remove --vmm entirely and replace
+it with --target.
 
 Thanks,
-Jason
+
+Alex
+
