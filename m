@@ -2,150 +2,162 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 728CA36B8FB
-	for <lists+kvm@lfdr.de>; Mon, 26 Apr 2021 20:33:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9700F36B987
+	for <lists+kvm@lfdr.de>; Mon, 26 Apr 2021 20:58:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234809AbhDZSdz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 26 Apr 2021 14:33:55 -0400
-Received: from mail-dm6nam12on2053.outbound.protection.outlook.com ([40.107.243.53]:26241
-        "EHLO NAM12-DM6-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S234229AbhDZSdy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 26 Apr 2021 14:33:54 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=M9gjogxHI8/sE5cutrq41fjqgN/GvozWAj/HRyQWkz7Oun5jAG1C6rB67Ot+fZfnEdH9G3B2QQoYjJupGmBb5xoSW2ga/lUfWhXrhOY7tu8qwDAeRAHt/UbLwfnI5ZjE9AjaypF+bzCz8Gumhc3SWraN7ZvKmtuhptSzaxE4hA0Fk3wVwrq5wKYuFEecnBlRx90/fHi7sDz0yjTmEfpGR7CD+Mpi6RkY1nFZMB4WUxlUChP6BnNT6HjMDFhaulQkS2syvB2YG7gyXvlbeYkgcQz2eerW1mb513ZIC5lT/01aDPYDqfltU4K9cAJe3blJwwRnVfGBuI1ljYbb6Y4VFA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=XUdY7wsveP90wwdl3/Gv4B/OmIMBzc1i+O5/HfspH+U=;
- b=BZjvl1PDz25V7Y4oUu/4HqjHhSsu2tV0k99gxuIwxfX19cUE2BOrQC5FyGMqlSBTEb8B13STck1M41bdemXarZz7Al6IsKOrQ/lDi9LOZpns3Ggtpp9yAdAdL2pCLwm5nGhfJ15+U63qxJ51p7PyuQPl7oJO1ekBGRRgJTZvUU+tBm/7p1lVyFlRIDAglAIpnPtSb4NziiZjkD4c6Cn2RFgffSE9jCr2YJawBjIL/YUkawUkjYqZbu2vgG6r8/gaxOmKtxDOGSUtyUWmDJBuoQY8pK1A03hkRfKHLY4TehZF3qnL6jv7XKV7Ko6IZRKF3p8nMWo21T6srZOqWF38Dw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=XUdY7wsveP90wwdl3/Gv4B/OmIMBzc1i+O5/HfspH+U=;
- b=q3Njayb71U9PtjlR9Cjmml4DMgbZHzKYSIh0kPEfISja700SPSStk0XgGeyzqKvL1B6JqrFaaNu7v+83ePLbp+Wyc1EA/wfBWuuvXbbn0PKZebCG5o2vZheb9XmX8BOAH60d8Wh65/XGUecgvBCBaUJG8IwPJnUw8lSe4p3EgOttjdUUIgsgFdFsaOZxKPDSyYbUe/39baZnanePuAAogx7u+4+1MTfn9p+5X9keTthva9iCD8dGc4ZRzpTMaxj8O6LrtCfcCcdibYaSb1nYW3d4u6sgWi2nViGvFGtl+Lk9Z+H/vxzU6Cmr7ewGYA2Pq4VnZ8IS0m3D7SYr/f0Wng==
-Authentication-Results: lst.de; dkim=none (message not signed)
- header.d=none;lst.de; dmarc=none action=none header.from=nvidia.com;
-Received: from DM6PR12MB3834.namprd12.prod.outlook.com (2603:10b6:5:14a::12)
- by DM6PR12MB2938.namprd12.prod.outlook.com (2603:10b6:5:18a::31) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4065.21; Mon, 26 Apr
- 2021 18:33:12 +0000
-Received: from DM6PR12MB3834.namprd12.prod.outlook.com
- ([fe80::1c62:7fa3:617b:ab87]) by DM6PR12MB3834.namprd12.prod.outlook.com
- ([fe80::1c62:7fa3:617b:ab87%6]) with mapi id 15.20.4065.026; Mon, 26 Apr 2021
- 18:33:11 +0000
-Date:   Mon, 26 Apr 2021 15:33:09 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     David Airlie <airlied@linux.ie>,
-        Tony Krowiak <akrowiak@linux.ibm.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        dri-devel@lists.freedesktop.org,
-        Eric Farman <farman@linux.ibm.com>,
-        Harald Freudenberger <freude@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        intel-gfx@lists.freedesktop.org,
-        intel-gvt-dev@lists.freedesktop.org,
-        Jani Nikula <jani.nikula@linux.intel.com>,
-        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
-        kvm@vger.kernel.org, Kirti Wankhede <kwankhede@nvidia.com>,
-        linux-doc@vger.kernel.org, linux-s390@vger.kernel.org,
-        Peter Oberparleiter <oberpar@linux.ibm.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Pierre Morel <pmorel@linux.ibm.com>,
-        Rodrigo Vivi <rodrigo.vivi@intel.com>,
-        Vineeth Vijayan <vneethv@linux.ibm.com>,
-        Zhenyu Wang <zhenyuw@linux.intel.com>,
-        Zhi Wang <zhi.a.wang@intel.com>,
-        "Raj, Ashok" <ashok.raj@intel.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Leon Romanovsky <leonro@nvidia.com>,
-        Max Gurtovoy <mgurtovoy@nvidia.com>,
-        Tarun Gupta <targupta@nvidia.com>
-Subject: Re: [PATCH 10/12] vfio/mdev: Remove mdev_parent_ops
-Message-ID: <20210426183309.GZ1370958@nvidia.com>
-References: <0-v1-d88406ed308e+418-vfio3_jgg@nvidia.com>
- <10-v1-d88406ed308e+418-vfio3_jgg@nvidia.com>
- <20210426141911.GH15209@lst.de>
+        id S239449AbhDZS7B (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 26 Apr 2021 14:59:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51022 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S239820AbhDZS7A (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 26 Apr 2021 14:59:00 -0400
+Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8E599C061574
+        for <kvm@vger.kernel.org>; Mon, 26 Apr 2021 11:58:18 -0700 (PDT)
+Received: by mail-pj1-x1032.google.com with SMTP id h14-20020a17090aea8eb02901553e1cc649so3630247pjz.0
+        for <kvm@vger.kernel.org>; Mon, 26 Apr 2021 11:58:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=uC+i8U1DYABk51F37rCJ7P5O8poPwp+NFIjw6zwOZ2c=;
+        b=JuEq54M6xQSipjxCXHUzSdfRcWh9h82ZnxXPcs1RdmvsErPGrx/baNC5nRFhGtngOg
+         FvsgO6fKXabxy+m8YcV/rs3+nZSQ20A8nGpz1LbV6yV1kd5Gp5zMBe0gSbG9MGcKGllD
+         JfS9Iiq4qge9puIMFqQjPil0/tHPkO2Hmaa3ZiMIUbMtJVBQnVRkmzbgxt+CMQT7wJf4
+         pVV+AZJisKhOSQO/c7ww0eW58tSbBefK5ZbwNFV5HhQeRt/TcqKhIxmEgULqk5pu+MR1
+         t8mjCt5JTtETEAi+0P7/S6OkdnD68BiSLSqoE5TdK9JSvldCfEoyKakYOspAAL6MFXLc
+         XwLA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=uC+i8U1DYABk51F37rCJ7P5O8poPwp+NFIjw6zwOZ2c=;
+        b=ule9RhgFFPixNGGXObrhftP3GoMlTHMD9g5oprqldQ/smr2ZYCunWRrkSjeXR9JC+e
+         R4Wyz+e3b1KDSANB3XNklo5neKw0QBYFUqoj1+02vbkiBRvYLV8Y31XpiDh1uLyAsmw8
+         Nsvq6Uzq45l5nlwprSpcIRLRuMx9TJ60mF1x9qxgyTBYN26nUyL9jbWW+zQ1eCyqTGaI
+         yM9MP00lCb2Vj9fD31Ola/+PKSMOMzXw+gQDhIUo1h9dEjgE3tvxpXaFsI/WEeBKV+bT
+         OoqOOxeHpVuKl/kxMyZiegEVGxWyv2dBxEdStUZddVXAHkp8VMhTGKJPOQUnP1sthPcf
+         /stg==
+X-Gm-Message-State: AOAM531MqCQ7xaUBNzRB7cWzc7PaB2RLKFLuuPfhR026GlRKF/JYyWak
+        9H67dyheAxXfwvXxflF2IpAmaTkhF9NnNg==
+X-Google-Smtp-Source: ABdhPJzkTREXtqHoctqGihHBPcFzt++MKZsCQrvBXi+RVM7t3GxfmtsMvVVOlyhAizvomEe1Q1jWcg==
+X-Received: by 2002:a17:90a:df8d:: with SMTP id p13mr601788pjv.38.1619463497585;
+        Mon, 26 Apr 2021 11:58:17 -0700 (PDT)
+Received: from google.com (150.12.83.34.bc.googleusercontent.com. [34.83.12.150])
+        by smtp.gmail.com with ESMTPSA id b1sm13179440pgf.84.2021.04.26.11.58.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 26 Apr 2021 11:58:16 -0700 (PDT)
+Date:   Mon, 26 Apr 2021 11:58:13 -0700
+From:   Ricardo Koller <ricarkol@google.com>
+To:     Andrew Jones <drjones@redhat.com>
+Cc:     Marc Zyngier <maz@kernel.org>, kvm@vger.kernel.org,
+        kvmarm@lists.cs.columbia.edu, pbonzini@redhat.com,
+        alexandru.elisei@arm.com, eric.auger@redhat.com
+Subject: Re: [PATCH 1/3] KVM: selftests: Add exception handling support for
+ aarch64
+Message-ID: <YIcNRVEF7RXjqHuY@google.com>
+References: <20210423040351.1132218-1-ricarkol@google.com>
+ <20210423040351.1132218-2-ricarkol@google.com>
+ <87sg3hnzrj.wl-maz@kernel.org>
+ <20210423110529.vivemdwnznhblhyf@gator>
+MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210426141911.GH15209@lst.de>
-X-Originating-IP: [47.55.113.94]
-X-ClientProxiedBy: BL1PR13CA0184.namprd13.prod.outlook.com
- (2603:10b6:208:2be::9) To DM6PR12MB3834.namprd12.prod.outlook.com
- (2603:10b6:5:14a::12)
-MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from mlx.ziepe.ca (47.55.113.94) by BL1PR13CA0184.namprd13.prod.outlook.com (2603:10b6:208:2be::9) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4087.16 via Frontend Transport; Mon, 26 Apr 2021 18:33:11 +0000
-Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1lb62f-00DAKp-Tb; Mon, 26 Apr 2021 15:33:09 -0300
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 4c7224c7-21fb-4825-343e-08d908e1bf05
-X-MS-TrafficTypeDiagnostic: DM6PR12MB2938:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <DM6PR12MB2938F50D85659760862C8A86C2429@DM6PR12MB2938.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:7691;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: pI5tMz07zGKnaG3o6aj5if1tgGtp72+yqVS+UWTBcvEuOA0gGl5Jynm9MZvgl7mMIQLZyB6DscntMLTxJPq0zbpz0BLbspA4Fbupklw78gGFVgyTBzQY9tWmySPh4niMVjUFpgOeBas718ELPbFJFiXNpGVXgenXOxkIjmLu6Q4cmyB+a55DyQWoXyK78EUh+RePH2aMUy2hTU8ECLuCEuKe9UHYMJnqUWc8EEqAuNKcimXgDIv7G+PmG5SWZk7ULiNaRfHdw8OF6YllIpOM1JPMXQhVYwZIOtN/tThXs5kmU9hRqdGlx8G/MeH5pQeWUw3LkKgwpL6rkH5/BQVFAogXrd6y4GbQBXHqUjGF1Q6kbqIm4oP6tfficUVTcsdbA66L3dry6f0AefH5ntvvSlDf1shR1N+HOPuIjTxNCg+hvlC/le3e3SU9lWcbIZQNtG/a3+hNHAlaHkRHUGe5uEJzbPqc0EA5/AErDewEjcwzqN4Bl3/7jj0JkX+Z8aYTkF4EJ1Yv9p2lQ/jXfdfdK5Xyk3CDrUIMED1vt9m8gDM+8fIJZMdekROlFcIcdhSsYHro0gBjWYkOi2UHvwOgbuv8En7uJj4Pl3DCB7zYp8s=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB3834.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(376002)(366004)(39860400002)(346002)(136003)(396003)(9746002)(38100700002)(86362001)(36756003)(8936002)(4326008)(33656002)(66556008)(66946007)(66476007)(9786002)(478600001)(8676002)(6916009)(7416002)(316002)(107886003)(5660300002)(186003)(2616005)(26005)(1076003)(4744005)(426003)(2906002)(54906003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: =?us-ascii?Q?JFs7CquhCCbhsQZiiePOuj6lwEwPW4gHFm+q5FVFjM/FwCsfNvwJFfyFdAJW?=
- =?us-ascii?Q?JFHgOIJBG4E0wjV1wSxbQ9pDEaAAscVuQ2UN1DtqSXK8pwwRjOn4+fV6vwFa?=
- =?us-ascii?Q?d+vKpoMH+aInaSyU7y+hiqmn8YCIk4FzZTI9J1aiyAT8S+nRLyOVDvkNyv0E?=
- =?us-ascii?Q?q0Rn0fTo/Ctxfe6jToUKgJgG/Lk8Ern07qWkfZJqRgBVt30927zY4ktvA9mb?=
- =?us-ascii?Q?Mh9dMog51+E8K8zfI7Mj6RMODhOkpudDHBmiPuXIhlRKtG5F9G0oVkFOGk+8?=
- =?us-ascii?Q?T+wiWxbhJAF+Y0iXX8Fusz6Yyu/Vtb/ULTCln012rJwkSsela5CDTz6DaTAO?=
- =?us-ascii?Q?XfQgEHXlVEPiDbpsq0/5b1IGsQ4bkhQM1YQNgwZNyQBF5R6kK9IxeJ9N69mS?=
- =?us-ascii?Q?msp1DVenWtKt3jW89mWZNbAZRRQNorvcprRAmyfB03Z/RE/tyDIXNm7G6I8U?=
- =?us-ascii?Q?XxAWr0+yFYxQ8MWaB+MBJNGImikf3sY1DxeS4unDj6soGN/0siHTd7KeTPrx?=
- =?us-ascii?Q?/6rF9bL8IvQ3EVmeNY+ocb1um6N/IR7ZFHp4ZXaE+d141xUSBYRF7sfNtHhd?=
- =?us-ascii?Q?GtP8ga+ZVkC9ineIvXqEzcMeXAGa2cK94NBpAXPZLiqi2qDndFa+Ajp4PMll?=
- =?us-ascii?Q?cS0ECq14A3yx4XIKiBatf+KHGULE9jNDiJpL3Z2Mjsdb/JIu1WriCYuPFI5k?=
- =?us-ascii?Q?D6uUBNN0ixZrHfswkYNWAMn7IEioLB9q6iEPI+I8+ccR4sU5MCE9GcJM47Lc?=
- =?us-ascii?Q?cW0lVrwVumTCahux+V4cUPSgJ6E1l2oxSCfvUtXlRZhTM+SsW1hhXdPVmWer?=
- =?us-ascii?Q?T1HafQHD7lPZKhbqaW+7wJIo6M13GGX66lPJGOSRAqBCnizdHtsb5nDZxa0r?=
- =?us-ascii?Q?zmkz8DgOhG8Jwjc5fMyJtcSA4ZpEK6xCFk5eRnGNpt3h6pu+/SS0U0hCCXL2?=
- =?us-ascii?Q?KTA9vCtt3Tm/EGvH3JyAS9qJNu/s0Pe8lsoMilbBUZZqcGH5I65HDYgErpef?=
- =?us-ascii?Q?lp3mOGjo2QYYTDhTOEgq9e5tUeeWSKCvwI47antljTwmdeDoVr/O/QJZVpQc?=
- =?us-ascii?Q?fRTtBciBeHWVgd98/t+lb3/M+eU6RcozHFLrdTgwwwv0wp50Edc4lxgqswzR?=
- =?us-ascii?Q?IchyioItpNQwmnVaPbgd7qliX0pteS2+un1vnkS15bqRVvOprugGkt0ih8sr?=
- =?us-ascii?Q?/T0lRNpoXZx1qRKYy05jyRLIbK9btIHvKlWz5T+YR0S270O2Zt1U82KbqM5s?=
- =?us-ascii?Q?z3qTJD6cMk9BlaCnCN9VydZCw+qtp/aQrv2v0Q7c72ugaMZ92BNGqu2oqUuZ?=
- =?us-ascii?Q?mWkeJsXMKTO96ySqnWzUNkck?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4c7224c7-21fb-4825-343e-08d908e1bf05
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB3834.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Apr 2021 18:33:11.8417
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: CDO/5JRh9WEp+ZU+CQyCYt6zAOCtVhx88Xx8hFMR2Tf5rPPGYmhiBTJSQ1W9hx76
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB2938
+In-Reply-To: <20210423110529.vivemdwnznhblhyf@gator>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Apr 26, 2021 at 04:19:11PM +0200, Christoph Hellwig wrote:
-> > +The mediated bus driver's probe function should create a vfio_device on top of
-> > +the mdev_device and connect it to an appropriate implementation of vfio_device_ops.
+On Fri, Apr 23, 2021 at 01:05:29PM +0200, Andrew Jones wrote:
+> On Fri, Apr 23, 2021 at 09:58:24AM +0100, Marc Zyngier wrote:
+> > Hi Ricardo,
+> > 
+> > Thanks for starting this.
 > 
-> Overly long line.
+> Indeed! Thank you for contributing to AArch64 kvm selftests!
 > 
-> > +This will provide the 'mdev_supported_types/XX/create' files which can then be used
-> > +to trigger the creation of a mdev_device. The created mdev_device will be attached
+> > > +void vm_handle_exception(struct kvm_vm *vm, int vector, int ec,
+> > > +			void (*handler)(struct ex_regs *));
+> > > +
+> > > +#define SPSR_D          (1 << 9)
+> > > +#define SPSR_SS         (1 << 21)
+> > > +
+> > > +#define write_sysreg(reg, val)						  \
+> > > +({									  \
+> > > +	asm volatile("msr "__stringify(reg)", %0" : : "r"(val));	  \
+> > > +})
 > 
-> Two more.
+> Linux does fancy stuff with the Z constraint to allow xzr. We might as
+> well copy that.
+> 
+> > > diff --git a/tools/testing/selftests/kvm/lib/aarch64/handlers.S b/tools/testing/selftests/kvm/lib/aarch64/handlers.S
+> > > new file mode 100644
+> > > index 000000000000..c920679b87c0
+> > > --- /dev/null
+> > > +++ b/tools/testing/selftests/kvm/lib/aarch64/handlers.S
+> > > @@ -0,0 +1,104 @@
+> > > +/* SPDX-License-Identifier: GPL-2.0 */
+> > > +.macro save_registers, el
+> > > +	stp	x28, x29, [sp, #-16]!
+> > > +	stp	x26, x27, [sp, #-16]!
+> > > +	stp	x24, x25, [sp, #-16]!
+> > > +	stp	x22, x23, [sp, #-16]!
+> > > +	stp	x20, x21, [sp, #-16]!
+> > > +	stp	x18, x19, [sp, #-16]!
+> > > +	stp	x16, x17, [sp, #-16]!
+> > > +	stp	x14, x15, [sp, #-16]!
+> > > +	stp	x12, x13, [sp, #-16]!
+> > > +	stp	x10, x11, [sp, #-16]!
+> > > +	stp	x8, x9, [sp, #-16]!
+> > > +	stp	x6, x7, [sp, #-16]!
+> > > +	stp	x4, x5, [sp, #-16]!
+> > > +	stp	x2, x3, [sp, #-16]!
+> > > +	stp	x0, x1, [sp, #-16]!
+> > > +
+> > > +	.if \el == 0
+> > > +	mrs	x1, sp_el0
+> > > +	.else
+> > > +	mov	x1, sp
+> > > +	.endif
+> > 
+> > It there any point in saving SP_EL1, given that you already have
+> > altered it significantly and will not be restoring it? I don't care
+> > much, and maybe it is useful as debug information, but a comment would
+> > certainly make the intent clearer.
+> 
+> kvm-unit-tests takes some pains to save the original sp. We may be able to
+> take some inspiration from there for this save and restore.
+> 
+> > > +void kvm_exit_unexpected_vector(int vector, uint64_t ec)
+> > > +{
+> > > +	ucall(UCALL_UNHANDLED, 2, vector, ec);
+> > > +}
+> > > +
+> > > +#define HANDLERS_IDX(_vector, _ec)	((_vector * ESR_EC_NUM) + _ec)
+> > 
+> > This is definitely odd. Not all the ECs are valid for all vector entry
+> > points. Actually, ECs only make sense for synchronous exceptions, and
+> > asynchronous events (IRQ, FIQ, SError) cannot populate ESR_ELx.
+> 
+> For this, kvm-unit-tests provides a separate API for interrupt handler
+> installation, which ensures ec is not used. Also, kvm-unit-tests uses
+> a 2-D array [vector][ec] for the synchronous exceptions. I think we
+> should be able to use a 2-D array here too, instead of the IDX macro.
+> 
+> > > +void vm_handle_exception(struct kvm_vm *vm, int vector, int ec,
+> > > +			 void (*handler)(struct ex_regs *))
+> > 
+> > The name seems to be slightly ill defined. To me "handle exception" is
+> > the action of handling the exception. Here, you are merely installing
+> > an exception handler.
+> >
+> 
+> I agree. Please rename this for all of kvm selftests to something with
+> 'install' in the name with the first patch of this series.
+> 
+> Thanks,
+> drew
+> 
 
-Got it, thanks
-
-Jason
+Thank you Andrew and Marc for the reviews. Will send v2 with all the
+feedback.
