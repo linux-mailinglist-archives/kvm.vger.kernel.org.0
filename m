@@ -2,119 +2,187 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 448DC36B3A2
-	for <lists+kvm@lfdr.de>; Mon, 26 Apr 2021 14:56:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B656236B3B3
+	for <lists+kvm@lfdr.de>; Mon, 26 Apr 2021 15:01:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233529AbhDZM5O (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 26 Apr 2021 08:57:14 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:35953 "EHLO
+        id S233567AbhDZNCP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 26 Apr 2021 09:02:15 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:25865 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233043AbhDZM5N (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 26 Apr 2021 08:57:13 -0400
+        by vger.kernel.org with ESMTP id S233549AbhDZNCK (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 26 Apr 2021 09:02:10 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1619441791;
+        s=mimecast20190719; t=1619442089;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=K7WbGpQEfdHQcLE/c3T851i5jSAp/KQCYtdsdEt8dGk=;
-        b=OIA9k1orkyt2BhV/Ez0IeIX/a/vLIVOFGk7sJCMtsgwdWYGQjyYNPUifTJJ6qtrDMM7KR3
-        Q/2i0b4zbzgJBrLYGAqFViutCWNe6u7iBLfgdUdB0LffmzBEN66rE4bUXLezUzPiYjaUVL
-        rMbN99L8V4kVrJJ4zzR03hpanuThn3A=
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=+/MOXnX9h7hR/cxq9q03AL7bpej16e5GaIUuHzQUeWc=;
+        b=YBWBCoS6voYBYJ8E0/m7MlI+YdmY9XeMnAvphj7mwFUZGwCbML/rh4FdaPIV/5OWQ85VIR
+        olAISZzqTObtTS8Wf8eg+X14HKCpdDgx9MrF4itS7C7EvLkJDI2lBQEpudWqHTKE5+Wxmv
+        9eYYs40H6G0Y3bXF3HxWq39B5MtJYes=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-550-8QxEabdQO0m-iOpvEz5_gw-1; Mon, 26 Apr 2021 08:56:27 -0400
-X-MC-Unique: 8QxEabdQO0m-iOpvEz5_gw-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+ us-mta-339-_QcW6wdhPr6ldfNflr999w-1; Mon, 26 Apr 2021 09:01:25 -0400
+X-MC-Unique: _QcW6wdhPr6ldfNflr999w-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5F9A0107ACCD;
-        Mon, 26 Apr 2021 12:56:24 +0000 (UTC)
-Received: from starship (unknown [10.40.192.73])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id D08199F64;
-        Mon, 26 Apr 2021 12:56:16 +0000 (UTC)
-Message-ID: <eeaa6c0f6efef926eb606b354052aba8cfef2c21.camel@redhat.com>
-Subject: Re: [PATCH v2 4/6] KVM: x86: Introduce KVM_GET_SREGS2 /
- KVM_SET_SREGS2
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
-Cc:     "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Jonathan Corbet <corbet@lwn.net>,
-        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
-        "open list:X86 ARCHITECTURE (32-BIT AND 64-BIT)" 
-        <linux-kernel@vger.kernel.org>, "H. Peter Anvin" <hpa@zytor.com>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 473861922963;
+        Mon, 26 Apr 2021 13:01:24 +0000 (UTC)
+Received: from vitty.brq.redhat.com (unknown [10.40.195.54])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 4B41C5C1CF;
+        Mon, 26 Apr 2021 13:01:22 +0000 (UTC)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
         Wanpeng Li <wanpengli@tencent.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
         Jim Mattson <jmattson@google.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Joerg Roedel <joro@8bytes.org>
-Date:   Mon, 26 Apr 2021 15:56:15 +0300
-In-Reply-To: <898a9b18-4578-cb9d-ece7-f45ba5b7bb89@redhat.com>
-References: <20210426111333.967729-1-mlevitsk@redhat.com>
-         <20210426111333.967729-5-mlevitsk@redhat.com>
-         <898a9b18-4578-cb9d-ece7-f45ba5b7bb89@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+        kernel test robot <oliver.sang@intel.com>,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH] KVM: selftests: Speed up set_memory_region_test
+Date:   Mon, 26 Apr 2021 15:01:21 +0200
+Message-Id: <20210426130121.758229-1-vkuznets@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 2021-04-26 at 14:32 +0200, Paolo Bonzini wrote:
-> On 26/04/21 13:13, Maxim Levitsky wrote:
-> > +	if (sregs2->flags & KVM_SREGS2_FLAGS_PDPTRS_VALID) {
-> > +
-> > +		if (!is_pae_paging(vcpu))
-> > +			return -EINVAL;
-> > +
-> > +		for (i = 0 ; i < 4 ; i++)
-> > +			kvm_pdptr_write(vcpu, i, sregs2->pdptrs[i]);
-> > +
-> > +		kvm_register_mark_dirty(vcpu, VCPU_EXREG_PDPTR);
-> > +		mmu_reset_needed = 1;
-> > +	}
-> 
-> I think this should also have
-> 
-> 	else {
-> 		if (is_pae_paging(vcpu))
-> 			return -EINVAL;
-> 	}
+After commit 4fc096a99e01 ("KVM: Raise the maximum number of user memslots")
+set_memory_region_test may take too long, reports are that the default
+timeout value we have (120s) may not be enough even on a physical host.
 
+Speed things up a bit by throwing away vm_userspace_mem_region_add() usage
+from test_add_max_memory_regions(), we don't really need to do the majority
+of the stuff it does for the sake of this test.
 
-What about the case when we migrate from qemu that doesn't use
-this ioctl to qemu that does? 
+On my AMD EPYC 7401P, # time ./set_memory_region_test
+pre-patch:
+ Testing KVM_RUN with zero added memory regions
+ Allowed number of memory slots: 32764
+ Adding slots 0..32763, each memory region with 2048K size
+ Testing MOVE of in-use region, 10 loops
+ Testing DELETE of in-use region, 10 loops
 
-In this case assuming that the new qemu does use SREGS2 ioctls,
-the PDPTR data will not be present
-in the migration stream and thus qemu will call this ioctl without this flag
-set.
+ real	0m44.917s
+ user	0m7.416s
+ sys	0m34.601s
 
-I think I should in this case load the pdptrs from memory,
-Or I should make qemu not use this ioctl in this.
-What do you prefer?
+post-patch:
+ Testing KVM_RUN with zero added memory regions
+ Allowed number of memory slots: 32764
+ Adding slots 0..32763, each memory region with 2048K size
+ Testing MOVE of in-use region, 10 loops
+ Testing DELETE of in-use region, 10 loops
 
-Thanks for pointing this bug out though!
-I haven't thought about this case well enough.
+ real	0m20.714s
+ user	0m0.109s
+ sys	0m18.359s
 
-Best regards,
-	Maxim Levitsky
+Reported-by: kernel test robot <oliver.sang@intel.com>
+Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+---
+ .../selftests/kvm/set_memory_region_test.c    | 61 ++++++++++++++-----
+ 1 file changed, 45 insertions(+), 16 deletions(-)
 
-> 
-> but perhaps even better, check it at the beginning:
-> 
-> 	if ((sregs->cr4 & X86_CR4_PAE) &&
->              !!(sregs->efer & EFER_LMA) == !!(sregs2->flags & KVM_SREGS2_FLAGS_PDPTRS_VALID))
-> 		return -EINVAL;
-> 
-> which technically means the flag is redundant, but there is some value in
-> having the flag and not allowing the user to shoot itself in the foot.
-> 
-> Paolo
-> 
-
+diff --git a/tools/testing/selftests/kvm/set_memory_region_test.c b/tools/testing/selftests/kvm/set_memory_region_test.c
+index f127ed31dba7..978f5b5f4dc0 100644
+--- a/tools/testing/selftests/kvm/set_memory_region_test.c
++++ b/tools/testing/selftests/kvm/set_memory_region_test.c
+@@ -329,6 +329,22 @@ static void test_zero_memory_regions(void)
+ }
+ #endif /* __x86_64__ */
+ 
++static int test_memory_region_add(struct kvm_vm *vm, void *mem, uint32_t slot,
++				   uint32_t size, uint64_t guest_addr)
++{
++	struct kvm_userspace_memory_region region;
++	int ret;
++
++	region.slot = slot;
++	region.flags = 0;
++	region.guest_phys_addr = guest_addr;
++	region.memory_size = size;
++	region.userspace_addr = (uintptr_t) mem;
++	ret = ioctl(vm_get_fd(vm), KVM_SET_USER_MEMORY_REGION, &region);
++
++	return ret;
++}
++
+ /*
+  * Test it can be added memory slots up to KVM_CAP_NR_MEMSLOTS, then any
+  * tentative to add further slots should fail.
+@@ -339,9 +355,15 @@ static void test_add_max_memory_regions(void)
+ 	struct kvm_vm *vm;
+ 	uint32_t max_mem_slots;
+ 	uint32_t slot;
+-	uint64_t guest_addr = 0x0;
+-	uint64_t mem_reg_npages;
+-	void *mem;
++	void *mem, *mem_aligned, *mem_extra;
++	size_t alignment;
++
++#ifdef __s390x__
++	/* On s390x, the host address must be aligned to 1M (due to PGSTEs) */
++	alignment = 0x100000;
++#else
++	alignment = 1;
++#endif
+ 
+ 	max_mem_slots = kvm_check_cap(KVM_CAP_NR_MEMSLOTS);
+ 	TEST_ASSERT(max_mem_slots > 0,
+@@ -350,30 +372,37 @@ static void test_add_max_memory_regions(void)
+ 
+ 	vm = vm_create(VM_MODE_DEFAULT, 0, O_RDWR);
+ 
+-	mem_reg_npages = vm_calc_num_guest_pages(VM_MODE_DEFAULT, MEM_REGION_SIZE);
+-
+ 	/* Check it can be added memory slots up to the maximum allowed */
+ 	pr_info("Adding slots 0..%i, each memory region with %dK size\n",
+ 		(max_mem_slots - 1), MEM_REGION_SIZE >> 10);
++
++	mem = mmap(NULL, MEM_REGION_SIZE * max_mem_slots + alignment,
++		   PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
++	TEST_ASSERT(mem != MAP_FAILED, "Failed to mmap() host");
++	mem_aligned = (void *)(((size_t) mem + alignment - 1) & ~(alignment - 1));
++
+ 	for (slot = 0; slot < max_mem_slots; slot++) {
+-		vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS,
+-					    guest_addr, slot, mem_reg_npages,
+-					    0);
+-		guest_addr += MEM_REGION_SIZE;
++		ret = test_memory_region_add(vm, mem_aligned +
++					     ((uint64_t)slot * MEM_REGION_SIZE),
++					     slot, MEM_REGION_SIZE,
++					     (uint64_t)slot * MEM_REGION_SIZE);
++		TEST_ASSERT(ret == 0, "KVM_SET_USER_MEMORY_REGION IOCTL failed,\n"
++			    "  rc: %i errno: %i slot: %i\n",
++			    ret, errno, slot);
+ 	}
+ 
+ 	/* Check it cannot be added memory slots beyond the limit */
+-	mem = mmap(NULL, MEM_REGION_SIZE, PROT_READ | PROT_WRITE,
+-		   MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+-	TEST_ASSERT(mem != MAP_FAILED, "Failed to mmap() host");
++	mem_extra = mmap(NULL, MEM_REGION_SIZE, PROT_READ | PROT_WRITE,
++			 MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
++	TEST_ASSERT(mem_extra != MAP_FAILED, "Failed to mmap() host");
+ 
+-	ret = ioctl(vm_get_fd(vm), KVM_SET_USER_MEMORY_REGION,
+-		    &(struct kvm_userspace_memory_region) {slot, 0, guest_addr,
+-		    MEM_REGION_SIZE, (uint64_t) mem});
++	ret = test_memory_region_add(vm, mem_extra, max_mem_slots, MEM_REGION_SIZE,
++				     (uint64_t)max_mem_slots * MEM_REGION_SIZE);
+ 	TEST_ASSERT(ret == -1 && errno == EINVAL,
+ 		    "Adding one more memory slot should fail with EINVAL");
+ 
+-	munmap(mem, MEM_REGION_SIZE);
++	munmap(mem, MEM_REGION_SIZE * max_mem_slots + alignment);
++	munmap(mem_extra, MEM_REGION_SIZE);
+ 	kvm_vm_free(vm);
+ }
+ 
+-- 
+2.30.2
 
