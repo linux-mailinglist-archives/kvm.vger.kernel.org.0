@@ -2,75 +2,66 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 33E4C36AB15
-	for <lists+kvm@lfdr.de>; Mon, 26 Apr 2021 05:31:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0053F36AB5F
+	for <lists+kvm@lfdr.de>; Mon, 26 Apr 2021 06:11:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231609AbhDZDbr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 25 Apr 2021 23:31:47 -0400
-Received: from mga17.intel.com ([192.55.52.151]:8388 "EHLO mga17.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231346AbhDZDbq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 25 Apr 2021 23:31:46 -0400
-IronPort-SDR: 9z0bDgbut7olTsu01nU4/dd4w0zLLGLxEvV2SF/lhOXxUX39Ynb6kkI4ICQJ3pJh0sWGF2ihmP
- N+Z/+IB6W53Q==
-X-IronPort-AV: E=McAfee;i="6200,9189,9965"; a="176392665"
-X-IronPort-AV: E=Sophos;i="5.82,251,1613462400"; 
-   d="scan'208";a="176392665"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Apr 2021 20:31:05 -0700
-IronPort-SDR: bB9O3aSLWK9aR07i9WUD/2odNc3cEtdDAdTXNinlcUn9ETOOHDjJQJhpItHzXIavkkq7ShGmvg
- 0MGfWl0AwxVQ==
-X-IronPort-AV: E=Sophos;i="5.82,251,1613462400"; 
-   d="scan'208";a="429183762"
-Received: from duan-optiplex-7080.bj.intel.com ([10.238.156.114])
-  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Apr 2021 20:31:03 -0700
-From:   Zhenzhong Duan <zhenzhong.duan@intel.com>
-To:     linux-kernel@vger.kernel.org
-Cc:     linux-kselftest@vger.kernel.org, kvm@vger.kernel.org,
-        pbonzini@redhat.com, shuah@kernel.org,
-        Zhenzhong Duan <zhenzhong.duan@intel.com>
-Subject: [PATCH] selftests: kvm: Fix the check of return value
-Date:   Tue, 27 Apr 2021 03:31:38 +0800
-Message-Id: <20210426193138.118276-1-zhenzhong.duan@intel.com>
-X-Mailer: git-send-email 2.25.1
+        id S230344AbhDZELx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 26 Apr 2021 00:11:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51110 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229469AbhDZELw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 26 Apr 2021 00:11:52 -0400
+Received: from mail-pg1-x52e.google.com (mail-pg1-x52e.google.com [IPv6:2607:f8b0:4864:20::52e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D3E87C061574
+        for <kvm@vger.kernel.org>; Sun, 25 Apr 2021 21:11:09 -0700 (PDT)
+Received: by mail-pg1-x52e.google.com with SMTP id q10so39212638pgj.2
+        for <kvm@vger.kernel.org>; Sun, 25 Apr 2021 21:11:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=sslab.ics.keio.ac.jp; s=google;
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=CTb6aVZF5rYyZGAFpZJcdBVEH5JTp6V0QEKxiSNXmh4=;
+        b=iWuKDR88umBSdmZzb3myz6GDget2+JF1wwrXG1nQ3zRojc7buHG3wSvC83xAHsqrgM
+         dZyQhqs845Jgoq+Nm/B8THJ6jrBZL7ydW1umQdCmiOlv/fVxd++o/5TR1iGEgaYqy+96
+         jr2vJtqsxpxJ4L7mc0Ohh6UnGtu3nxBqUsOCg=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=CTb6aVZF5rYyZGAFpZJcdBVEH5JTp6V0QEKxiSNXmh4=;
+        b=aN9LfrAJe7t2MNf4gASS1oICfmT0jqSIikFrCvM4M7mtXOuyYEg7gTURFVLRkIgNKq
+         2gEfUqCtBQ+/N3A5+T1Lk+uH2OZ1BGLdX43yo6/6oGARVjnq9dOzSU7xx7Z8svLAvOpQ
+         G7mukaMxK0FVCaD1pd4VhRk29b63f2F62lAujx3vhlZg2trtjBv2FzrvCSYPIZL6bDwh
+         cDIxYql6UC7bcezOXQK0WskaLvNqxgE/GNqAfZ3znUgow1t0CEoWh4aAspMeSmyXQ6PK
+         wii9O2jRehraU0Ffkup3A1khxDiO498KnDD8CjTRAzhz3gAUks1SPxTSFdveNbewf224
+         Hg9w==
+X-Gm-Message-State: AOAM531WlnLTdVG7ftBiQwghozFjLYKLSAwHp+TG2Cs4txsfaavUq2DO
+        yplysZlqRMDxhDSVubpmRTRmbA==
+X-Google-Smtp-Source: ABdhPJw6wXi3/36bZ4WsuZyFsKo80Kc7II7tEP1lQ7YG7zJE5bloDPI0w/AMtTeQfMxhcEFx5av2GA==
+X-Received: by 2002:a62:b403:0:b029:20c:cbd5:5be1 with SMTP id h3-20020a62b4030000b029020ccbd55be1mr15975172pfn.53.1619410269345;
+        Sun, 25 Apr 2021 21:11:09 -0700 (PDT)
+Received: from haraichi.dnlocal (113x36x239x145.ap113.ftth.ucom.ne.jp. [113.36.239.145])
+        by smtp.googlemail.com with ESMTPSA id y3sm10523112pjr.40.2021.04.25.21.11.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 25 Apr 2021 21:11:09 -0700 (PDT)
+From:   Kenta Ishiguro <kentaishiguro@sslab.ics.keio.ac.jp>
+To:     kernellwp@gmail.com
+Cc:     david@redhat.com, jmattson@google.com, joro@8bytes.org,
+        kentaishiguro@sslab.ics.keio.ac.jp, kono@sslab.ics.keio.ac.jp,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        pbonzini@redhat.com, pl@sslab.ics.keio.ac.jp, seanjc@google.com,
+        vkuznets@redhat.com, wanpengli@tencent.com
+Subject: Re: [RFC PATCH 0/2] Mitigating Excessive Pause-Loop Exiting in VM-Agnostic KVM
+Date:   Mon, 26 Apr 2021 13:10:50 +0900
+Message-Id: <20210426041050.3310-1-kentaishiguro@sslab.ics.keio.ac.jp>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <CANRm+Cz9GgQFDbbW_3bRO35FwvMGJ-ZFa0rSvEimxFzrvwmpJw@mail.gmail.com>
+References: <CANRm+Cz9GgQFDbbW_3bRO35FwvMGJ-ZFa0rSvEimxFzrvwmpJw@mail.gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-In vm_vcpu_rm() and kvm_vm_release(), a stale return value is checked in
-TEST_ASSERT macro.
-
-Fix it by assigning variable ret with correct return value.
-
-Signed-off-by: Zhenzhong Duan <zhenzhong.duan@intel.com>
----
- tools/testing/selftests/kvm/lib/kvm_util.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-index b8849a1aca79..53d3a7eb0d47 100644
---- a/tools/testing/selftests/kvm/lib/kvm_util.c
-+++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-@@ -514,7 +514,7 @@ static void vm_vcpu_rm(struct kvm_vm *vm, struct vcpu *vcpu)
- 	ret = munmap(vcpu->state, vcpu_mmap_sz());
- 	TEST_ASSERT(ret == 0, "munmap of VCPU fd failed, rc: %i "
- 		"errno: %i", ret, errno);
--	close(vcpu->fd);
-+	ret = close(vcpu->fd);
- 	TEST_ASSERT(ret == 0, "Close of VCPU fd failed, rc: %i "
- 		"errno: %i", ret, errno);
- 
-@@ -534,7 +534,7 @@ void kvm_vm_release(struct kvm_vm *vmp)
- 	TEST_ASSERT(ret == 0, "Close of vm fd failed,\n"
- 		"  vmp->fd: %i rc: %i errno: %i", vmp->fd, ret, errno);
- 
--	close(vmp->kvm_fd);
-+	ret = close(vmp->kvm_fd);
- 	TEST_ASSERT(ret == 0, "Close of /dev/kvm fd failed,\n"
- 		"  vmp->kvm_fd: %i rc: %i errno: %i", vmp->kvm_fd, ret, errno);
- }
--- 
-2.25.1
+I see. Thank you!
 
