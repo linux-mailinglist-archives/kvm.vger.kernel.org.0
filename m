@@ -2,148 +2,135 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B144E36B4F5
-	for <lists+kvm@lfdr.de>; Mon, 26 Apr 2021 16:34:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 13D7536B512
+	for <lists+kvm@lfdr.de>; Mon, 26 Apr 2021 16:40:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233856AbhDZOeh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 26 Apr 2021 10:34:37 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:49016 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S231862AbhDZOeh (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 26 Apr 2021 10:34:37 -0400
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 13QEWfup155246;
-        Mon, 26 Apr 2021 10:33:55 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=XeYqaKeaXScgxu/SeXV/Suyol2R7Pny2Z2VXEkdISc0=;
- b=A7R3AiqPbiehpihZ+6aGyGis5C+ih2uzd7TRosHa2GDZ1bFWx45hZW9+7VAiaswGUxSx
- IRdwHdUp0f7apLNRQUclrBBSf4bR3CACmFIm7LUTz4PrvhNXINUc0cY7/DYSSO24Eujs
- MuI/vQ5sHuELsd9iT0TRr5l18Y8FFzGzdQv2EtttBEBgu9OFly+Cg/JsVNk3qofg4vk5
- qDZRkLfeiAxYYtr22mC9gHRT++3on6mWjm74B8Bpq2mSHHYVEIOuzCFg6a9DwlBcULsC
- 4meImVc7059jaKuYOj++RYP3j9W//2Y2Kdgahc1kdPdxGrWjQqR0fJcPrZgxTaLewkEW iQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 385xg128e5-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 26 Apr 2021 10:33:55 -0400
-Received: from m0098413.ppops.net (m0098413.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 13QEXLr3160103;
-        Mon, 26 Apr 2021 10:33:55 -0400
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 385xg128dc-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 26 Apr 2021 10:33:54 -0400
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 13QEX1tV022658;
-        Mon, 26 Apr 2021 14:33:53 GMT
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
-        by ppma03ams.nl.ibm.com with ESMTP id 384ay8gv3g-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 26 Apr 2021 14:33:53 +0000
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
-        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 13QEXo2Q45351354
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 26 Apr 2021 14:33:50 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 3183152054;
-        Mon, 26 Apr 2021 14:33:50 +0000 (GMT)
-Received: from localhost.localdomain (unknown [9.145.12.8])
-        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id C88DB5204F;
-        Mon, 26 Apr 2021 14:33:49 +0000 (GMT)
-Subject: Re: [kvm-unit-tests PATCH 2/6] s390x: Add more Ultravisor command
- structure definitions
-To:     Cornelia Huck <cohuck@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org, thuth@redhat.com,
-        david@redhat.com, imbrenda@linux.ibm.com
-References: <20210316091654.1646-1-frankja@linux.ibm.com>
- <20210316091654.1646-3-frankja@linux.ibm.com>
- <20210421131335.31a2bf47.cohuck@redhat.com>
-From:   Janosch Frank <frankja@linux.ibm.com>
-Message-ID: <d3f47425-213e-a3b2-f120-da6c2cb01dd1@linux.ibm.com>
-Date:   Mon, 26 Apr 2021 16:33:49 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.8.1
+        id S233938AbhDZOkg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 26 Apr 2021 10:40:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49132 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233923AbhDZOke (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 26 Apr 2021 10:40:34 -0400
+Received: from mail-ed1-x529.google.com (mail-ed1-x529.google.com [IPv6:2a00:1450:4864:20::529])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D79AC061574
+        for <kvm@vger.kernel.org>; Mon, 26 Apr 2021 07:39:52 -0700 (PDT)
+Received: by mail-ed1-x529.google.com with SMTP id s15so66048351edd.4
+        for <kvm@vger.kernel.org>; Mon, 26 Apr 2021 07:39:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=9TasOpdV2QbBVNkMlotlhlLPBOUS2Vop9szkPM49qAY=;
+        b=thW2vdceLhzUIgEw1H/1hv/gzDl6T/P2MOTikzUgqGq/6T29bk+8EDK/m0E9wKx3lZ
+         gf/PZdZdd9xcndI8fghbyf7wqpZ/3airdtVSX/f4OolLb3RLdEIGshqTtzDvTs/SMJPS
+         FA1n7mf85KyPCnLpAPiGlAew1biSvBJlOQiLGRyo7Hskoqz97bkPpx3lqN6c+mUqaXRH
+         VOxSrm85Wu2x/xJ+YNEvNks8cWXUmcZb+yCScxzYoiC37h+KjBeaYkwK+zasekDzwpvM
+         WCC+s3Cu7sNlYNg7W7MXEP7JTkCRnDG08wpG63P3iLvEtAXGCnL7sX5tS1uvIM7ddXp1
+         SWCQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=9TasOpdV2QbBVNkMlotlhlLPBOUS2Vop9szkPM49qAY=;
+        b=EKpK4KZe6YARbaU9Pze2g9rhTD+Z5R+mu7MXIYqkVg3IJHlRLWeLZeXLcoEqnLQnJc
+         EJpkzPRXAfGrRP4HXjLCE+2FH0cELSklG75iw09tyRnDd51aRG4iX0iUAnJK2sMNJlpB
+         R4XtJDiKlXB0TRfCSIjBQb/K5y2VsJK//rnCqpLNeTN7iTFL3kdZsyTJ0FZtOeBEffZd
+         BdrtvNcGyv5zx0TurNlp3fNTqd/sws6U29IOY6KNdXo5n5gLgp04gsixVnYRJMF+S41N
+         GOnKb5cMdSqyQnr28nnKldhZPdz9zm59yePt4AbF/0MWZjJwxxUnujYIV+idKvffgivz
+         xCnw==
+X-Gm-Message-State: AOAM532Ko+SowL4Ys1he6keC+Xt/jTC9yBAV5KsTDnvP2jvGowLHr4J1
+        WRQ2fkIseSPzDAOgyK8jUh9+p15l1mPHpba80si7SA==
+X-Google-Smtp-Source: ABdhPJwgz6I7IbKzxCmvdXw0+gfQSTn7Wl077lqeMK0y353RJgh8nGaXMnOlhRchuT5S+cSS99I4qgSQW5PKrZvpyLs=
+X-Received: by 2002:aa7:d1d9:: with SMTP id g25mr14231981edp.30.1619447991042;
+ Mon, 26 Apr 2021 07:39:51 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20210421131335.31a2bf47.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: qvmPcoDZKj8VEsme1ah2NjPDyTIUJcR4
-X-Proofpoint-ORIG-GUID: kgzXRoshGs0U4j01squGGKQyeAH3EEBH
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.761
- definitions=2021-04-26_07:2021-04-26,2021-04-26 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 bulkscore=0
- phishscore=0 clxscore=1015 priorityscore=1501 impostorscore=0
- malwarescore=0 mlxscore=0 suspectscore=0 lowpriorityscore=0 spamscore=0
- mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2104060000 definitions=main-2104260114
+References: <20210421162225.3924641-1-aaronlewis@google.com>
+ <20210421162225.3924641-2-aaronlewis@google.com> <CALMp9eRHpBd96j3ZFkoeabCbwUbTzkaP2+OnxNyN7TLOa=myig@mail.gmail.com>
+In-Reply-To: <CALMp9eRHpBd96j3ZFkoeabCbwUbTzkaP2+OnxNyN7TLOa=myig@mail.gmail.com>
+From:   Aaron Lewis <aaronlewis@google.com>
+Date:   Mon, 26 Apr 2021 07:39:40 -0700
+Message-ID: <CAAAPnDE2J=cnwtuYUkdSx=gx5k_e3GTzqqGBFM81+VgJCuZNMQ@mail.gmail.com>
+Subject: Re: [PATCH v3 2/2] selftests: kvm: Allows userspace to handle
+ emulation errors.
+To:     Jim Mattson <jmattson@google.com>
+Cc:     David Edmondson <david.edmondson@oracle.com>,
+        Sean Christopherson <seanjc@google.com>,
+        kvm list <kvm@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 4/21/21 1:13 PM, Cornelia Huck wrote:
-> On Tue, 16 Mar 2021 09:16:50 +0000
-> Janosch Frank <frankja@linux.ibm.com> wrote:
-> 
->> They are needed in the new UV tests.
->>
->> As we now extend the size of the query struct, we need to set the
->> length in the UV guest query test to a constant instead of using
->> sizeof.
->>
->> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
->> ---
->>  lib/s390x/asm/uv.h | 148 ++++++++++++++++++++++++++++++++++++++++++++-
->>  s390x/uv-guest.c   |   2 +-
->>  2 files changed, 148 insertions(+), 2 deletions(-)
->>
-> 
-> (...)
-> 
->>  struct uv_cb_qui {
->>  	struct uv_cb_header header;
->>  	u64 reserved08;
->>  	u64 inst_calls_list[4];
->> -	u64 reserved30[15];
->> +	u64 reserved30[2];
->> +	u64 uv_base_stor_len;
->> +	u64 reserved48;
->> +	u64 conf_base_phys_stor_len;
->> +	u64 conf_base_virt_stor_len;
->> +	u64 conf_virt_var_stor_len;
->> +	u64 cpu_stor_len;
->> +	u32 reserved70[3];
->> +	u32 max_num_sec_conf;
->> +	u64 max_guest_stor_addr;
->> +	u8  reserved88[158 - 136];
->> +	u16 max_guest_cpus;
->> +	u8  reserveda0[200 - 160];
->> +}  __attribute__((packed))  __attribute__((aligned(8)));
-> 
-> (...)
-> 
->> diff --git a/s390x/uv-guest.c b/s390x/uv-guest.c
->> index a13669ab..95a968c5 100644
->> --- a/s390x/uv-guest.c
->> +++ b/s390x/uv-guest.c
->> @@ -59,7 +59,7 @@ static void test_query(void)
->>  {
->>  	struct uv_cb_qui uvcb = {
->>  		.header.cmd = UVC_CMD_QUI,
->> -		.header.len = sizeof(uvcb) - 8,
->> +		.header.len = 0xa0,
-> 
-> This is a magic constant coming out of nowhere. Could you please at
-> least add a comment to make clear what you are testing?
+> > +static void process_exit_on_emulation_error(struct kvm_vm *vm)
+> > +{
+> > +       struct kvm_run *run = vcpu_state(vm, VCPU_ID);
+> > +       struct kvm_regs regs;
+> > +       uint8_t *insn_bytes;
+> > +       uint8_t insn_size;
+> > +       uint64_t flags;
+> > +
+> > +       TEST_ASSERT(run->exit_reason == KVM_EXIT_INTERNAL_ERROR,
+> > +                   "Unexpected exit reason: %u (%s)",
+> > +                   run->exit_reason,
+> > +                   exit_reason_str(run->exit_reason));
+> > +
+> > +       TEST_ASSERT(run->emulation_failure.suberror == KVM_INTERNAL_ERROR_EMULATION,
+> > +                   "Unexpected suberror: %u",
+> > +                   run->emulation_failure.suberror);
+> > +
+> > +       if (run->emulation_failure.ndata >= 1) {
+> > +               flags = run->emulation_failure.flags;
+> > +               if ((flags & KVM_INTERNAL_ERROR_EMULATION_FLAG_INSTRUCTION_BYTES) &&
+> > +                   run->emulation_failure.ndata >= 3) {
+> > +                       insn_size = run->emulation_failure.insn_size;
+> > +                       insn_bytes = run->emulation_failure.insn_bytes;
+> > +
+> > +                       TEST_ASSERT(insn_size <= 15 && insn_size > 0,
+> > +                                   "Unexpected instruction size: %u",
+> > +                                   insn_size);
+> > +
+> > +                       TEST_ASSERT(is_flds(insn_bytes, insn_size),
+> > +                                   "Unexpected instruction.  Expected 'flds' (0xd9 /0), encountered (0x%x /%u)",
+> > +                                   insn_bytes[0], (insn_size >= 2) ? GET_REG(insn_bytes[1]) : 0);
+>
+> If you don't get 'flds', you shouldn't assume that the second byte is
+> the modr/m byte. Even if it is, the reg field may not be part of the
+> opcode.
+>
+> > +                       vcpu_regs_get(vm, VCPU_ID, &regs);
+> > +                       regs.rip += (uintptr_t)(&fld_end) - (uintptr_t)(&fld_start);
+>
+> A general purpose hypervisor wouldn't normally have access to these
+> labels, so you should really determine the length of the instruction
+> by decoding, *and* ensure that kvm gave you sufficient instruction
+> bytes. For instance, if the addressing mode involves a SIB byte and a
+> 32-bit displacement, you would need kvm to give you at least 7 bytes.
+> Speaking of sufficient bytes, it would be nice to see your test
+> exercise the case where kvm's in-kernel emulator can't actually fetch
+> the full 15 bytes.
+>
+> Can you comment on what else would have to be done to actually emulate
+> this instruction in userspace?
+>
 
-Added:
-/* A dword below the minimum length */
+Along with doing a more thorough job decoding this instruction we
+should really have a way to convert the effective address to a linear
+address.  This can be tricky to do, so I'd suggest letting the kernel
+do it (because it already knows how).  I could create an ioctl that
+resolves the effective address and returns either the corresponding
+linear address or an exception in the event it fails to linearize the
+address.  In the case we have here in this test I'd expect an
+exception in the form of a #PF(RSVD).  I was thinking this could be
+done as a followup to this change.
 
-> 
->>  	};
->>  	int cc;
->>  
-> 
-
+> > +                       vcpu_regs_set(vm, VCPU_ID, &regs);
+> > +               }
+> > +       }
+> > +}
+> > +
+> > +static void do_guest_assert(struct kvm_vm *vm, struct ucall *uc)
+> > +{
+> > +       TEST_FAIL("%s at %s:%ld", (const char *)uc->args[0], __FILE__,
+> > +                 uc->args[1]);
+> > +}
+> > +
