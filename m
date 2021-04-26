@@ -2,231 +2,120 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B7CC636B54A
-	for <lists+kvm@lfdr.de>; Mon, 26 Apr 2021 16:57:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 19DE636B561
+	for <lists+kvm@lfdr.de>; Mon, 26 Apr 2021 17:04:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233674AbhDZO5n (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 26 Apr 2021 10:57:43 -0400
-Received: from foss.arm.com ([217.140.110.172]:35432 "EHLO foss.arm.com"
+        id S233919AbhDZPEo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 26 Apr 2021 11:04:44 -0400
+Received: from foss.arm.com ([217.140.110.172]:35472 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S233825AbhDZO5l (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 26 Apr 2021 10:57:41 -0400
+        id S233752AbhDZPEi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 26 Apr 2021 11:04:38 -0400
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8A0DD1FB;
-        Mon, 26 Apr 2021 07:56:58 -0700 (PDT)
-Received: from [192.168.0.110] (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id CD0883F73B;
-        Mon, 26 Apr 2021 07:56:57 -0700 (PDT)
-Subject: Re: [PATCH kvm-unit-tests v2 8/8] arm/arm64: psci: don't assume
- method is hvc
-To:     Andrew Jones <drjones@redhat.com>, kvm@vger.kernel.org
-Cc:     nikos.nikoleris@arm.com, andre.przywara@arm.com,
-        eric.auger@redhat.com
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 3CD8A1FB;
+        Mon, 26 Apr 2021 08:03:57 -0700 (PDT)
+Received: from slackpad.fritz.box (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 760543F73B;
+        Mon, 26 Apr 2021 08:03:56 -0700 (PDT)
+Date:   Mon, 26 Apr 2021 16:03:26 +0100
+From:   Andre Przywara <andre.przywara@arm.com>
+To:     Andrew Jones <drjones@redhat.com>
+Cc:     kvm@vger.kernel.org, alexandru.elisei@arm.com,
+        nikos.nikoleris@arm.com, eric.auger@redhat.com
+Subject: Re: [PATCH kvm-unit-tests v2 3/8] pci-testdev: ioremap regions
+Message-ID: <20210426160326.65daca85@slackpad.fritz.box>
+In-Reply-To: <20210420190002.383444-4-drjones@redhat.com>
 References: <20210420190002.383444-1-drjones@redhat.com>
- <20210420190002.383444-9-drjones@redhat.com>
- <20210421070206.mbtarb4cge5ywyuv@gator.home>
- <20210422161702.76ucofe2pbj4oacc@gator>
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <c36ad6f1-a48f-02f0-27c9-e18d9efe3023@arm.com>
-Date:   Mon, 26 Apr 2021 15:57:34 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.0
+        <20210420190002.383444-4-drjones@redhat.com>
+Organization: Arm Ltd.
+X-Mailer: Claws Mail 3.17.1 (GTK+ 2.24.31; x86_64-slackware-linux-gnu)
 MIME-Version: 1.0
-In-Reply-To: <20210422161702.76ucofe2pbj4oacc@gator>
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Content-Language: en-US
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Drew,
+On Tue, 20 Apr 2021 20:59:57 +0200
+Andrew Jones <drjones@redhat.com> wrote:
 
-On 4/22/21 5:17 PM, Andrew Jones wrote:
-> For v3, I've done the following changes (inline)
->
-> On Wed, Apr 21, 2021 at 09:02:06AM +0200, Andrew Jones wrote:
->> On Tue, Apr 20, 2021 at 09:00:02PM +0200, Andrew Jones wrote:
->>> The method can also be smc and it will be when running on bare metal.
->>>
->>> Signed-off-by: Andrew Jones <drjones@redhat.com>
->>> ---
->>>  arm/cstart.S       | 22 ++++++++++++++++++++++
->>>  arm/cstart64.S     | 22 ++++++++++++++++++++++
->>>  arm/selftest.c     | 34 +++++++---------------------------
->>>  lib/arm/asm/psci.h | 10 ++++++++--
->>>  lib/arm/psci.c     | 37 +++++++++++++++++++++++++++++--------
->>>  lib/arm/setup.c    |  2 ++
->>>  6 files changed, 90 insertions(+), 37 deletions(-)
->>>
->>> diff --git a/arm/cstart.S b/arm/cstart.S
->>> index 446966de350d..2401d92cdadc 100644
->>> --- a/arm/cstart.S
->>> +++ b/arm/cstart.S
->>> @@ -95,6 +95,28 @@ start:
->>>  
->>>  .text
->>>  
->>> +/*
->>> + * psci_invoke_hvc / psci_invoke_smc
->>> + *
->>> + * Inputs:
->>> + *   r0 -- function_id
->>> + *   r1 -- arg0
->>> + *   r2 -- arg1
->>> + *   r3 -- arg2
->>> + *
->>> + * Outputs:
->>> + *   r0 -- return code
->>> + */
->>> +.globl psci_invoke_hvc
->>> +psci_invoke_hvc:
->>> +	hvc	#0
->>> +	mov	pc, lr
->>> +
->>> +.globl psci_invoke_smc
->>> +psci_invoke_smc:
->>> +	smc	#0
->>> +	mov	pc, lr
->>> +
->>>  enable_vfp:
->>>  	/* Enable full access to CP10 and CP11: */
->>>  	mov	r0, #(3 << 22 | 3 << 20)
->>> diff --git a/arm/cstart64.S b/arm/cstart64.S
->>> index 42ba3a3ca249..7610e28f06dd 100644
->>> --- a/arm/cstart64.S
->>> +++ b/arm/cstart64.S
->>> @@ -109,6 +109,28 @@ start:
->>>  
->>>  .text
->>>  
->>> +/*
->>> + * psci_invoke_hvc / psci_invoke_smc
->>> + *
->>> + * Inputs:
->>> + *   x0 -- function_id
-> changed this comment to be 'w0 -- function_id'
->
->>> + *   x1 -- arg0
->>> + *   x2 -- arg1
->>> + *   x3 -- arg2
->>> + *
->>> + * Outputs:
->>> + *   x0 -- return code
->>> + */
->>> +.globl psci_invoke_hvc
->>> +psci_invoke_hvc:
->>> +	hvc	#0
->>> +	ret
->>> +
->>> +.globl psci_invoke_smc
->>> +psci_invoke_smc:
->>> +	smc	#0
->>> +	ret
->>> +
->>>  get_mmu_off:
->>>  	adrp	x0, auxinfo
->>>  	ldr	x0, [x0, :lo12:auxinfo + 8]
->>> diff --git a/arm/selftest.c b/arm/selftest.c
->>> index 4495b161cdd5..9f459ed3d571 100644
->>> --- a/arm/selftest.c
->>> +++ b/arm/selftest.c
->>> @@ -400,33 +400,13 @@ static void check_vectors(void *arg __unused)
->>>  	exit(report_summary());
->>>  }
->>>  
->>> -static bool psci_check(void)
->>> +static void psci_print(void)
->>>  {
->>> -	const struct fdt_property *method;
->>> -	int node, len, ver;
->>> -
->>> -	node = fdt_node_offset_by_compatible(dt_fdt(), -1, "arm,psci-0.2");
->>> -	if (node < 0) {
->>> -		printf("PSCI v0.2 compatibility required\n");
->>> -		return false;
->>> -	}
->>> -
->>> -	method = fdt_get_property(dt_fdt(), node, "method", &len);
->>> -	if (method == NULL) {
->>> -		printf("bad psci device tree node\n");
->>> -		return false;
->>> -	}
->>> -
->>> -	if (len < 4 || strcmp(method->data, "hvc") != 0) {
->>> -		printf("psci method must be hvc\n");
->>> -		return false;
->>> -	}
->>> -
->>> -	ver = psci_invoke(PSCI_0_2_FN_PSCI_VERSION, 0, 0, 0);
->>> -	printf("PSCI version %d.%d\n", PSCI_VERSION_MAJOR(ver),
->>> -				       PSCI_VERSION_MINOR(ver));
->>> -
->>> -	return true;
->>> +	int ver = psci_invoke(PSCI_0_2_FN_PSCI_VERSION, 0, 0, 0);
->>> +	report_info("PSCI version: %d.%d", PSCI_VERSION_MAJOR(ver),
->>> +					  PSCI_VERSION_MINOR(ver));
->>> +	report_info("PSCI method: %s", psci_invoke == psci_invoke_hvc ?
->>> +				       "hvc" : "smc");
->>>  }
->>>  
->>>  static void cpu_report(void *data __unused)
->>> @@ -465,7 +445,7 @@ int main(int argc, char **argv)
->>>  
->>>  	} else if (strcmp(argv[1], "smp") == 0) {
->>>  
->>> -		report(psci_check(), "PSCI version");
->>> +		psci_print();
->>>  		on_cpus(cpu_report, NULL);
->>>  		while (!cpumask_full(&ready))
->>>  			cpu_relax();
->>> diff --git a/lib/arm/asm/psci.h b/lib/arm/asm/psci.h
->>> index 7b956bf5987d..2820c0a3afc7 100644
->>> --- a/lib/arm/asm/psci.h
->>> +++ b/lib/arm/asm/psci.h
->>> @@ -3,8 +3,14 @@
->>>  #include <libcflat.h>
->>>  #include <linux/psci.h>
->>>  
->>> -extern int psci_invoke(unsigned long function_id, unsigned long arg0,
->>> -		       unsigned long arg1, unsigned long arg2);
->>> +typedef int (*psci_invoke_fn)(unsigned long function_id, unsigned long arg0,
->>> +			      unsigned long arg1, unsigned long arg2);
->>> +extern psci_invoke_fn psci_invoke;
->>> +extern int psci_invoke_hvc(unsigned long function_id, unsigned long arg0,
->>> +			   unsigned long arg1, unsigned long arg2);
->>> +extern int psci_invoke_smc(unsigned long function_id, unsigned long arg0,
->>> +			   unsigned long arg1, unsigned long arg2);
-> The prototypes are now
->
-> long invoke_fn(unsigned int function_id, unsigned long arg0,
->                unsigned long arg1, unsigned long arg2)
->
-> Notice the return value changed to long and the function_id to
-> unsigned int.
+Hi,
 
-Strictly speaking, arm always returns an unsigned long (32bits), but arm64 can
-return either an unsigned long (64bits) when using SMC64/HVC64, or an unsigned int
-(32bits) when using SMC32/HVC32. But, I did check C99 and it says that the
-original value is unchanged if it fits in the new type (section 6.3.1.3), so we
-can just cast the result to an unsigned if we ever want to use SMC32/HVC32 on arm64.
+> Don't assume the physical addresses used with PCI have already been
+> identity mapped.
+> 
+> Reviewed-by: Nikos Nikoleris <nikos.nikoleris@arm.com>
+> Signed-off-by: Andrew Jones <drjones@redhat.com>
+> ---
+>  lib/pci-host-generic.c | 5 ++---
+>  lib/pci-host-generic.h | 4 ++--
+>  lib/pci-testdev.c      | 4 ++++
+>  3 files changed, 8 insertions(+), 5 deletions(-)
+> 
+> diff --git a/lib/pci-host-generic.c b/lib/pci-host-generic.c
+> index 818150dc0a66..de93b8feac39 100644
+> --- a/lib/pci-host-generic.c
+> +++ b/lib/pci-host-generic.c
+> @@ -122,7 +122,7 @@ static struct pci_host_bridge *pci_dt_probe(void)
+>  		      sizeof(host->addr_space[0]) * nr_addr_spaces);
+>  	assert(host != NULL);
+>  
+> -	host->start		= base.addr;
+> +	host->start		= ioremap(base.addr, base.size);
+>  	host->size		= base.size;
+>  	host->bus		= bus;
+>  	host->bus_max		= bus_max;
+> @@ -279,8 +279,7 @@ phys_addr_t pci_host_bridge_get_paddr(u64 pci_addr)
+>  
+>  static void __iomem *pci_get_dev_conf(struct pci_host_bridge *host, int devfn)
+>  {
+> -	return (void __iomem *)(unsigned long)
+> -		host->start + (devfn << PCI_ECAM_DEVFN_SHIFT);
+> +	return (void __iomem *)host->start + (devfn << PCI_ECAM_DEVFN_SHIFT);
 
-The declaration for psci_invoke_none should also be changed, but otherwise looks good.
+But host->start's type is now exactly "void __iomem *", so why the cast?
+And are we OK with doing pointer arithmetic on a void pointer?
 
-Thanks,
+>  }
+>  
+>  u8 pci_config_readb(pcidevaddr_t dev, u8 off)
+> diff --git a/lib/pci-host-generic.h b/lib/pci-host-generic.h
+> index fd30e7c74ed8..0ffe6380ec8f 100644
+> --- a/lib/pci-host-generic.h
+> +++ b/lib/pci-host-generic.h
+> @@ -18,8 +18,8 @@ struct pci_addr_space {
+>  };
+>  
+>  struct pci_host_bridge {
+> -	phys_addr_t		start;
+> -	phys_addr_t		size;
+> +	void __iomem		*start;
+> +	size_t			size;
+>  	int			bus;
+>  	int			bus_max;
+>  	int			nr_addr_spaces;
+> diff --git a/lib/pci-testdev.c b/lib/pci-testdev.c
+> index 039bb44781c1..4f2e5663b2d6 100644
+> --- a/lib/pci-testdev.c
+> +++ b/lib/pci-testdev.c
+> @@ -185,7 +185,11 @@ int pci_testdev(void)
+>  	mem = ioremap(addr, PAGE_SIZE);
+>  
+>  	addr = pci_bar_get_addr(&pci_dev, 1);
+> +#if defined(__i386__) || defined(__x86_64__)
+>  	io = (void *)(unsigned long)addr;
+> +#else
+> +	io = ioremap(addr, PAGE_SIZE);
+> +#endif
 
-Alex
+I am bit puzzled: For anything but x86 ioremap() is implemented like the
+first statement, so why do we differentiate here? Shouldn't either one
+of the statements be fine, for all architectures?
 
->
->
-> I also improved the commit message by adding the following:
->
->    The method can be smc in addition to hvc, and it will be when running
->    on bare metal. Additionally, we move the invocations to assembly so
->    we don't have to rely on compiler assumptions. We also fix the
->    prototype of psci_invoke. It should return long, not int, and
->    function_id should be an unsigned int, not an unsigned long.
->
-> Thanks,
-> drew
->
+Cheers,
+Andre
+
+>  
+>  	nr_tests += pci_testdev_all(mem, &pci_testdev_mem_ops);
+>  	nr_tests += pci_testdev_all(io, &pci_testdev_io_ops);
+
