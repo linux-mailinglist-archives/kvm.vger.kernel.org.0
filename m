@@ -2,114 +2,170 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1C3B836B319
-	for <lists+kvm@lfdr.de>; Mon, 26 Apr 2021 14:32:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 929DD36B354
+	for <lists+kvm@lfdr.de>; Mon, 26 Apr 2021 14:44:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233355AbhDZMdR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 26 Apr 2021 08:33:17 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:46794 "EHLO
+        id S232107AbhDZMo6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 26 Apr 2021 08:44:58 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:59454 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233279AbhDZMdN (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 26 Apr 2021 08:33:13 -0400
+        by vger.kernel.org with ESMTP id S231876AbhDZMov (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 26 Apr 2021 08:44:51 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1619440351;
+        s=mimecast20190719; t=1619441048;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=q7ft+FJuoyaWZFH96qTL2gT73WOnML/rzPUiP2aXrO8=;
-        b=RYihPoE9tcXVoApI2iCN3XnA3sfvwGILJufj7ZjrgVNwshf9r3vMPezcIqsR/sHHnAlube
-        akbZi+RhZOMtfA4+xkKlSOB48A5lk+t8YH1QOkTrGuGCdQhc6SRMKuvUhNwVLgi7EUp2QE
-        oDMBRcszbx7bky/L4Hx6owNQpbQstjI=
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
- [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-557-STJ3JLJxNSiL9O0_zNEXGA-1; Mon, 26 Apr 2021 08:32:29 -0400
-X-MC-Unique: STJ3JLJxNSiL9O0_zNEXGA-1
-Received: by mail-ed1-f70.google.com with SMTP id d6-20020a0564020786b0290387927a37e2so2032252edy.10
-        for <kvm@vger.kernel.org>; Mon, 26 Apr 2021 05:32:29 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:cc:references:from:subject:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=q7ft+FJuoyaWZFH96qTL2gT73WOnML/rzPUiP2aXrO8=;
-        b=pogdN1OgYtDP9iOQsX9Ll7cj4Dktw3AjsqFzB6t20MA0Z64hvPBt6BgCW+EhXQuu81
-         mBYIU4vcJzrkEJUn8faWSDdaWhGKOiAzzpyM9gSxUL8kZludoX5uIAcskyiaxAjEKT+W
-         6WH5CDws4OqBzWBxh2ZH2USdpZzhJBkWxr53uDcxnXXzZO2gQTjr/+wx5r2TVOvfFa3Q
-         U9/zUsdultnC7XZYHdie/r61fEzEpz47VeWuzlgidB5LeGYfeS/SbEMFxCiXgTGSTgfV
-         i8m/0SrUtGoVyx6wOYRIU8NRFK3mz+fjz6kgN0845FhAG5Y/QmiVf2OlxIgif5xf/QGL
-         Itrg==
-X-Gm-Message-State: AOAM530/J/Kdild69PhuMV3gUo+MJJgNXJo147MIaKYRYW2VeQnkkCXR
-        FPsvyK/ILnmbS1TSu1h04n9Mzm4b7MfK65zD+XTg56+dBlOkFl6dOzf6KIZbBbBm+3P2sTL/Rlo
-        0lJxbmcXvzkbO
-X-Received: by 2002:a17:906:c09:: with SMTP id s9mr18213038ejf.145.1619440348592;
-        Mon, 26 Apr 2021 05:32:28 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJx98SpHqrIShgDQiQwvrRqUS98bHoMpJXRGL/rNx8PhCExMvUUt8bj4tfMYahD10Bk25Oebmw==
-X-Received: by 2002:a17:906:c09:: with SMTP id s9mr18213015ejf.145.1619440348445;
-        Mon, 26 Apr 2021 05:32:28 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id y2sm2401527ejg.123.2021.04.26.05.32.27
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 26 Apr 2021 05:32:27 -0700 (PDT)
-To:     Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org
-Cc:     "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
+        bh=TSlotn4fBSdFFf3NHGJvYzieEsXBeHjCWbwR+pEgCSM=;
+        b=IDvUY6jOfjwl7qFQXDiidWQC/ldN23dhpADcL3/YJT4KLxFWDvYZjoWceLZD++cDXfYWUO
+        lAlflOly5AXVWaY3QBC/A8ZcxmSNih9ZW88ol6NZiMNxcSzuO7C3WNM5tDSyjeNclqjesq
+        6/+YX6MHAm9PjppsoH50z6/d9eUMLsw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-41-W1_il_x5O0-KQwH5hQ0CVw-1; Mon, 26 Apr 2021 08:44:07 -0400
+X-MC-Unique: W1_il_x5O0-KQwH5hQ0CVw-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3BB3587A83F;
+        Mon, 26 Apr 2021 12:44:03 +0000 (UTC)
+Received: from starship (unknown [10.40.192.73])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 5F70F6268B;
+        Mon, 26 Apr 2021 12:43:49 +0000 (UTC)
+Message-ID: <6d7146021f3435330b42f2e1b917d4b5dea00edc.camel@redhat.com>
+Subject: Re: [PATCH v2 0/9] KVM: my debug patch queue
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
+Cc:     "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
+        Ingo Molnar <mingo@redhat.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
         Thomas Gleixner <tglx@linutronix.de>,
-        Jonathan Corbet <corbet@lwn.net>,
-        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
-        "open list:X86 ARCHITECTURE (32-BIT AND 64-BIT)" 
-        <linux-kernel@vger.kernel.org>, "H. Peter Anvin" <hpa@zytor.com>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
         Sean Christopherson <seanjc@google.com>,
-        Joerg Roedel <joro@8bytes.org>
-References: <20210426111333.967729-1-mlevitsk@redhat.com>
- <20210426111333.967729-5-mlevitsk@redhat.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH v2 4/6] KVM: x86: Introduce KVM_GET_SREGS2 /
- KVM_SET_SREGS2
-Message-ID: <898a9b18-4578-cb9d-ece7-f45ba5b7bb89@redhat.com>
-Date:   Mon, 26 Apr 2021 14:32:26 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.7.0
+        Marc Zyngier <maz@kernel.org>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        open list <linux-kernel@vger.kernel.org>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Jonathan Corbet <corbet@lwn.net>, Jessica Yu <jeyu@kernel.org>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Jan Kiszka <jan.kiszka@siemens.com>,
+        Will Deacon <will@kernel.org>,
+        "open list:KERNEL VIRTUAL MACHINE FOR ARM64 (KVM/arm64)" 
+        <kvmarm@lists.cs.columbia.edu>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Jim Mattson <jmattson@google.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        David Hildenbrand <david@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        "open list:S390" <linux-s390@vger.kernel.org>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Kieran Bingham <kbingham@kernel.org>,
+        "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
+        "moderated list:KERNEL VIRTUAL MACHINE FOR ARM64 (KVM/arm64)" 
+        <linux-arm-kernel@lists.infradead.org>,
+        James Morse <james.morse@arm.com>
+Date:   Mon, 26 Apr 2021 15:43:48 +0300
+In-Reply-To: <cb7f918c-932f-d558-76ec-801ed8ed1f62@redhat.com>
+References: <20210401135451.1004564-1-mlevitsk@redhat.com>
+         <cb7f918c-932f-d558-76ec-801ed8ed1f62@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
-In-Reply-To: <20210426111333.967729-5-mlevitsk@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 26/04/21 13:13, Maxim Levitsky wrote:
-> +	if (sregs2->flags & KVM_SREGS2_FLAGS_PDPTRS_VALID) {
-> +
-> +		if (!is_pae_paging(vcpu))
-> +			return -EINVAL;
-> +
-> +		for (i = 0 ; i < 4 ; i++)
-> +			kvm_pdptr_write(vcpu, i, sregs2->pdptrs[i]);
-> +
-> +		kvm_register_mark_dirty(vcpu, VCPU_EXREG_PDPTR);
-> +		mmu_reset_needed = 1;
-> +	}
+On Fri, 2021-04-02 at 10:38 -0700, Paolo Bonzini wrote:
+> On 01/04/21 15:54, Maxim Levitsky wrote:
+> > Hi!
+> > 
+> > I would like to publish two debug features which were needed for other stuff
+> > I work on.
+> > 
+> > One is the reworked lx-symbols script which now actually works on at least
+> > gdb 9.1 (gdb 9.2 was reported to fail to load the debug symbols from the kernel
+> > for some reason, not related to this patch) and upstream qemu.
+> 
+> Queued patches 2-5 for now.  6 is okay but it needs a selftest. (e.g. 
+> using KVM_VCPU_SET_EVENTS) and the correct name for the constant.
+Do you mean to add a kvm-unit-test or to add a test to kernel's kvm unit tests
+for this?
 
-I think this should also have
+Best regards,
+	Maxim Levitsky
 
-	else {
-		if (is_pae_paging(vcpu))
-			return -EINVAL;
-	}
+> 
+> Paolo
+> 
+> > The other feature is the ability to trap all guest exceptions (on SVM for now)
+> > and see them in kvmtrace prior to potential merge to double/triple fault.
+> > 
+> > This can be very useful and I already had to manually patch KVM a few
+> > times for this.
+> > I will, once time permits, implement this feature on Intel as well.
+> > 
+> > V2:
+> > 
+> >   * Some more refactoring and workarounds for lx-symbols script
+> > 
+> >   * added KVM_GUESTDBG_BLOCKEVENTS flag to enable 'block interrupts on
+> >     single step' together with KVM_CAP_SET_GUEST_DEBUG2 capability
+> >     to indicate which guest debug flags are supported.
+> > 
+> >     This is a replacement for unconditional block of interrupts on single
+> >     step that was done in previous version of this patch set.
+> >     Patches to qemu to use that feature will be sent soon.
+> > 
+> >   * Reworked the the 'intercept all exceptions for debug' feature according
+> >     to the review feedback:
+> > 
+> >     - renamed the parameter that enables the feature and
+> >       moved it to common kvm module.
+> >       (only SVM part is currently implemented though)
+> > 
+> >     - disable the feature for SEV guests as was suggested during the review
+> >     - made the vmexit table const again, as was suggested in the review as well.
+> > 
+> > Best regards,
+> > 	Maxim Levitsky
+> > 
+> > Maxim Levitsky (9):
+> >    scripts/gdb: rework lx-symbols gdb script
+> >    KVM: introduce KVM_CAP_SET_GUEST_DEBUG2
+> >    KVM: x86: implement KVM_CAP_SET_GUEST_DEBUG2
+> >    KVM: aarch64: implement KVM_CAP_SET_GUEST_DEBUG2
+> >    KVM: s390x: implement KVM_CAP_SET_GUEST_DEBUG2
+> >    KVM: x86: implement KVM_GUESTDBG_BLOCKEVENTS
+> >    KVM: SVM: split svm_handle_invalid_exit
+> >    KVM: x86: add force_intercept_exceptions_mask
+> >    KVM: SVM: implement force_intercept_exceptions_mask
+> > 
+> >   Documentation/virt/kvm/api.rst    |   4 +
+> >   arch/arm64/include/asm/kvm_host.h |   4 +
+> >   arch/arm64/kvm/arm.c              |   2 +
+> >   arch/arm64/kvm/guest.c            |   5 -
+> >   arch/s390/include/asm/kvm_host.h  |   4 +
+> >   arch/s390/kvm/kvm-s390.c          |   3 +
+> >   arch/x86/include/asm/kvm_host.h   |  12 ++
+> >   arch/x86/include/uapi/asm/kvm.h   |   1 +
+> >   arch/x86/kvm/svm/svm.c            |  87 +++++++++++--
+> >   arch/x86/kvm/svm/svm.h            |   6 +-
+> >   arch/x86/kvm/x86.c                |  14 ++-
+> >   arch/x86/kvm/x86.h                |   2 +
+> >   include/uapi/linux/kvm.h          |   1 +
+> >   kernel/module.c                   |   8 +-
+> >   scripts/gdb/linux/symbols.py      | 203 ++++++++++++++++++++----------
+> >   15 files changed, 272 insertions(+), 84 deletions(-)
+> > 
 
-but perhaps even better, check it at the beginning:
-
-	if ((sregs->cr4 & X86_CR4_PAE) &&
-             !!(sregs->efer & EFER_LMA) == !!(sregs2->flags & KVM_SREGS2_FLAGS_PDPTRS_VALID))
-		return -EINVAL;
-
-which technically means the flag is redundant, but there is some value in
-having the flag and not allowing the user to shoot itself in the foot.
-
-Paolo
 
