@@ -2,160 +2,268 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 78E1A36B6C3
-	for <lists+kvm@lfdr.de>; Mon, 26 Apr 2021 18:26:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 32F5336B6EB
+	for <lists+kvm@lfdr.de>; Mon, 26 Apr 2021 18:35:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234161AbhDZQ0q (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 26 Apr 2021 12:26:46 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:34617 "EHLO
+        id S234216AbhDZQgg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 26 Apr 2021 12:36:36 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:43667 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233736AbhDZQ0o (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 26 Apr 2021 12:26:44 -0400
+        by vger.kernel.org with ESMTP id S233934AbhDZQgf (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 26 Apr 2021 12:36:35 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1619454362;
+        s=mimecast20190719; t=1619454953;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=70ixX72CpuOv/S5XCIQiALpW30YWzP0sOJPlrd+z28g=;
-        b=gTyuVqjXVPljKVZJAa3pMEmvNL4IQsthFuXUgGMltLhZiXRx78d/NDEdhxMvU5/sxA4Ysh
-        fSsleRM2n6OUY1DNioU8RZAY8ZGJ0LOJdCPpUOf1mtvBwI2TZb1qQnIFzeHnD0S+vFAbMc
-        fi5YpN9nU43+84QDwAhhZrupjl/S7ek=
-Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
- [209.85.218.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-325-6CgpiC-XPLaKvEL9Wlk6jA-1; Mon, 26 Apr 2021 12:26:00 -0400
-X-MC-Unique: 6CgpiC-XPLaKvEL9Wlk6jA-1
-Received: by mail-ej1-f71.google.com with SMTP id w2-20020a1709062f82b0290378745f26d5so10362747eji.6
-        for <kvm@vger.kernel.org>; Mon, 26 Apr 2021 09:25:59 -0700 (PDT)
+        bh=MeCuE/FPlAgVvZjVieoLf7RsSfzfqrjVGkfOcQGCeWk=;
+        b=aEgqlM36nu69uptWqFbGdu8eBkHADoH2QTU1OZIh2aGDwrGizn3uYzXc7EcFFFfSJb+Rwi
+        6sZ8Bfi1O43Bu4eoIXzt33JSA5VGwI7EUHavrD2TYQk+Q8HRNhWO93vkLLY1GQfjddM7+4
+        TQbV6MLOkq4Vcf5pIy8mH7AW/BAPtZs=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-532-XtzPlfZNMsuyoTQ2-wKoFQ-1; Mon, 26 Apr 2021 12:35:51 -0400
+X-MC-Unique: XtzPlfZNMsuyoTQ2-wKoFQ-1
+Received: by mail-ed1-f71.google.com with SMTP id h13-20020a05640250cdb02903790a9c55acso23287144edb.4
+        for <kvm@vger.kernel.org>; Mon, 26 Apr 2021 09:35:51 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=70ixX72CpuOv/S5XCIQiALpW30YWzP0sOJPlrd+z28g=;
-        b=N2b5RDfohW+ziBHx5+3laXA8Lp+/v+/zEFPsDJQVvKzlRCTCb+SNJ5qT0idXX/VK6O
-         VYgZrJFA2HMXdl4DJnbeAnz4ZyTl/GRKjlSH8R82BW3RX+w9OeaxdQ6aOlzyTG8zY6yn
-         7egGMNiUc/vRO8QedbkLi+BQ6PGwJxK9zfGpEjGU2m2gA1ZC5HH35SGZnuMo4rb7mcas
-         KRyFuUqqgdTZZspPSNB6xDf76bS62lNdYjngueY0q913mOdMD8ooUyIwEzRJcZGVQ3DB
-         5QnL0jK5LmBLfVlD6IplhdN903V9kXaQFnaLRg/GDdA3JhT1hj0CjGHj0E2O97aM7fo3
-         3opQ==
-X-Gm-Message-State: AOAM5334gWOZ3pLiMkwYMNxmTRzeT9Gpr61ItfRD7amrpW6MbpBki8zG
-        4YsLKWZHSApGDGcALgyWrIVWJSd/TfxZh06T5WX2LbcHF/k+lAXCluHR1n0PFnqglzcKzhltrD7
-        JAvoi0f/Y86Ex
-X-Received: by 2002:a17:907:3f9f:: with SMTP id hr31mr19130352ejc.349.1619454358826;
-        Mon, 26 Apr 2021 09:25:58 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJykfCOdce13T0w3AGSbMqOMU+sBokC9lLdCIV+VvXxvAAEuh2C3hTjNa9JMUC4P4WAQER+J6w==
-X-Received: by 2002:a17:907:3f9f:: with SMTP id hr31mr19130345ejc.349.1619454358676;
-        Mon, 26 Apr 2021 09:25:58 -0700 (PDT)
+        bh=MeCuE/FPlAgVvZjVieoLf7RsSfzfqrjVGkfOcQGCeWk=;
+        b=et4GKTgf3XKlIcXZ1xD0muNLCziqznAZE/NH0t0EOUGdp0UQin5nK08ico+KFkrw8r
+         pvLgKoQJH8iNDhLm/FVru504iRx2k9tC+3F3Fe5X0LqfGCkLnYn53YARE1OszwKmKdkP
+         QtLZWqeYorm5KM47JNpVZ8JCBerzX0tQuguz5Fhk4mUYf6f7Eba4C8lF1CrK+9I0gGoQ
+         agF27zyKD1vAO25UCPGAkYmpzHeleCPIgaA37MeDHj0jvFA1jzD/XzWNPSJW9azcYLeT
+         JQtfN0Ci9x7k1xkkOUyjJQoTW7zJ9V8HLFtKpSjupj14y+6NEFM2a0C61Ox5tNnviwGK
+         YWpg==
+X-Gm-Message-State: AOAM530VFdxrId1ckcLgycG2jSRm4t7eRdppViLM9cQK3skwxQ44X3lt
+        tVX61h5oFSK7KwpxFF2qUj0mGkaB/YzdehOL4faQFEmvRJAwZeOnfzGpNWaZIkSeWY5n+WAdHKm
+        yVS5uphxT/5vj
+X-Received: by 2002:a17:906:ece4:: with SMTP id qt4mr19783523ejb.514.1619454950534;
+        Mon, 26 Apr 2021 09:35:50 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJy8S5lXe4sj2eQW+PXlx4o7/9vNCErYeYssXv7N/970cayp1KqcVKgUcG0Kk3Ud8be8p2kg+g==
+X-Received: by 2002:a17:906:ece4:: with SMTP id qt4mr19783506ejb.514.1619454950308;
+        Mon, 26 Apr 2021 09:35:50 -0700 (PDT)
 Received: from gator (cst2-174-132.cust.vodafone.cz. [31.30.174.132])
-        by smtp.gmail.com with ESMTPSA id i8sm233255edu.64.2021.04.26.09.25.58
+        by smtp.gmail.com with ESMTPSA id p18sm6395797ejb.19.2021.04.26.09.35.49
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 26 Apr 2021 09:25:58 -0700 (PDT)
-Date:   Mon, 26 Apr 2021 18:25:56 +0200
+        Mon, 26 Apr 2021 09:35:49 -0700 (PDT)
+Date:   Mon, 26 Apr 2021 18:35:43 +0200
 From:   Andrew Jones <drjones@redhat.com>
-To:     Andre Przywara <andre.przywara@arm.com>
-Cc:     kvm@vger.kernel.org, alexandru.elisei@arm.com,
-        nikos.nikoleris@arm.com, eric.auger@redhat.com
-Subject: Re: [PATCH kvm-unit-tests v2 3/8] pci-testdev: ioremap regions
-Message-ID: <20210426162556.krirq2gxzigrprqq@gator>
+To:     Alexandru Elisei <alexandru.elisei@arm.com>
+Cc:     kvm@vger.kernel.org, nikos.nikoleris@arm.com,
+        andre.przywara@arm.com, eric.auger@redhat.com
+Subject: Re: [PATCH kvm-unit-tests v2 8/8] arm/arm64: psci: don't assume
+ method is hvc
+Message-ID: <20210426163543.rus23uuwoalcqgas@gator>
 References: <20210420190002.383444-1-drjones@redhat.com>
- <20210420190002.383444-4-drjones@redhat.com>
- <20210426160326.65daca85@slackpad.fritz.box>
+ <20210420190002.383444-9-drjones@redhat.com>
+ <20210421070206.mbtarb4cge5ywyuv@gator.home>
+ <20210422161702.76ucofe2pbj4oacc@gator>
+ <c36ad6f1-a48f-02f0-27c9-e18d9efe3023@arm.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210426160326.65daca85@slackpad.fritz.box>
+In-Reply-To: <c36ad6f1-a48f-02f0-27c9-e18d9efe3023@arm.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Apr 26, 2021 at 04:03:26PM +0100, Andre Przywara wrote:
-> On Tue, 20 Apr 2021 20:59:57 +0200
-> Andrew Jones <drjones@redhat.com> wrote:
+On Mon, Apr 26, 2021 at 03:57:34PM +0100, Alexandru Elisei wrote:
+> Hi Drew,
 > 
-> Hi,
+> On 4/22/21 5:17 PM, Andrew Jones wrote:
+> > For v3, I've done the following changes (inline)
+> >
+> > On Wed, Apr 21, 2021 at 09:02:06AM +0200, Andrew Jones wrote:
+> >> On Tue, Apr 20, 2021 at 09:00:02PM +0200, Andrew Jones wrote:
+> >>> The method can also be smc and it will be when running on bare metal.
+> >>>
+> >>> Signed-off-by: Andrew Jones <drjones@redhat.com>
+> >>> ---
+> >>>  arm/cstart.S       | 22 ++++++++++++++++++++++
+> >>>  arm/cstart64.S     | 22 ++++++++++++++++++++++
+> >>>  arm/selftest.c     | 34 +++++++---------------------------
+> >>>  lib/arm/asm/psci.h | 10 ++++++++--
+> >>>  lib/arm/psci.c     | 37 +++++++++++++++++++++++++++++--------
+> >>>  lib/arm/setup.c    |  2 ++
+> >>>  6 files changed, 90 insertions(+), 37 deletions(-)
+> >>>
+> >>> diff --git a/arm/cstart.S b/arm/cstart.S
+> >>> index 446966de350d..2401d92cdadc 100644
+> >>> --- a/arm/cstart.S
+> >>> +++ b/arm/cstart.S
+> >>> @@ -95,6 +95,28 @@ start:
+> >>>  
+> >>>  .text
+> >>>  
+> >>> +/*
+> >>> + * psci_invoke_hvc / psci_invoke_smc
+> >>> + *
+> >>> + * Inputs:
+> >>> + *   r0 -- function_id
+> >>> + *   r1 -- arg0
+> >>> + *   r2 -- arg1
+> >>> + *   r3 -- arg2
+> >>> + *
+> >>> + * Outputs:
+> >>> + *   r0 -- return code
+> >>> + */
+> >>> +.globl psci_invoke_hvc
+> >>> +psci_invoke_hvc:
+> >>> +	hvc	#0
+> >>> +	mov	pc, lr
+> >>> +
+> >>> +.globl psci_invoke_smc
+> >>> +psci_invoke_smc:
+> >>> +	smc	#0
+> >>> +	mov	pc, lr
+> >>> +
+> >>>  enable_vfp:
+> >>>  	/* Enable full access to CP10 and CP11: */
+> >>>  	mov	r0, #(3 << 22 | 3 << 20)
+> >>> diff --git a/arm/cstart64.S b/arm/cstart64.S
+> >>> index 42ba3a3ca249..7610e28f06dd 100644
+> >>> --- a/arm/cstart64.S
+> >>> +++ b/arm/cstart64.S
+> >>> @@ -109,6 +109,28 @@ start:
+> >>>  
+> >>>  .text
+> >>>  
+> >>> +/*
+> >>> + * psci_invoke_hvc / psci_invoke_smc
+> >>> + *
+> >>> + * Inputs:
+> >>> + *   x0 -- function_id
+> > changed this comment to be 'w0 -- function_id'
+> >
+> >>> + *   x1 -- arg0
+> >>> + *   x2 -- arg1
+> >>> + *   x3 -- arg2
+> >>> + *
+> >>> + * Outputs:
+> >>> + *   x0 -- return code
+> >>> + */
+> >>> +.globl psci_invoke_hvc
+> >>> +psci_invoke_hvc:
+> >>> +	hvc	#0
+> >>> +	ret
+> >>> +
+> >>> +.globl psci_invoke_smc
+> >>> +psci_invoke_smc:
+> >>> +	smc	#0
+> >>> +	ret
+> >>> +
+> >>>  get_mmu_off:
+> >>>  	adrp	x0, auxinfo
+> >>>  	ldr	x0, [x0, :lo12:auxinfo + 8]
+> >>> diff --git a/arm/selftest.c b/arm/selftest.c
+> >>> index 4495b161cdd5..9f459ed3d571 100644
+> >>> --- a/arm/selftest.c
+> >>> +++ b/arm/selftest.c
+> >>> @@ -400,33 +400,13 @@ static void check_vectors(void *arg __unused)
+> >>>  	exit(report_summary());
+> >>>  }
+> >>>  
+> >>> -static bool psci_check(void)
+> >>> +static void psci_print(void)
+> >>>  {
+> >>> -	const struct fdt_property *method;
+> >>> -	int node, len, ver;
+> >>> -
+> >>> -	node = fdt_node_offset_by_compatible(dt_fdt(), -1, "arm,psci-0.2");
+> >>> -	if (node < 0) {
+> >>> -		printf("PSCI v0.2 compatibility required\n");
+> >>> -		return false;
+> >>> -	}
+> >>> -
+> >>> -	method = fdt_get_property(dt_fdt(), node, "method", &len);
+> >>> -	if (method == NULL) {
+> >>> -		printf("bad psci device tree node\n");
+> >>> -		return false;
+> >>> -	}
+> >>> -
+> >>> -	if (len < 4 || strcmp(method->data, "hvc") != 0) {
+> >>> -		printf("psci method must be hvc\n");
+> >>> -		return false;
+> >>> -	}
+> >>> -
+> >>> -	ver = psci_invoke(PSCI_0_2_FN_PSCI_VERSION, 0, 0, 0);
+> >>> -	printf("PSCI version %d.%d\n", PSCI_VERSION_MAJOR(ver),
+> >>> -				       PSCI_VERSION_MINOR(ver));
+> >>> -
+> >>> -	return true;
+> >>> +	int ver = psci_invoke(PSCI_0_2_FN_PSCI_VERSION, 0, 0, 0);
+> >>> +	report_info("PSCI version: %d.%d", PSCI_VERSION_MAJOR(ver),
+> >>> +					  PSCI_VERSION_MINOR(ver));
+> >>> +	report_info("PSCI method: %s", psci_invoke == psci_invoke_hvc ?
+> >>> +				       "hvc" : "smc");
+> >>>  }
+> >>>  
+> >>>  static void cpu_report(void *data __unused)
+> >>> @@ -465,7 +445,7 @@ int main(int argc, char **argv)
+> >>>  
+> >>>  	} else if (strcmp(argv[1], "smp") == 0) {
+> >>>  
+> >>> -		report(psci_check(), "PSCI version");
+> >>> +		psci_print();
+> >>>  		on_cpus(cpu_report, NULL);
+> >>>  		while (!cpumask_full(&ready))
+> >>>  			cpu_relax();
+> >>> diff --git a/lib/arm/asm/psci.h b/lib/arm/asm/psci.h
+> >>> index 7b956bf5987d..2820c0a3afc7 100644
+> >>> --- a/lib/arm/asm/psci.h
+> >>> +++ b/lib/arm/asm/psci.h
+> >>> @@ -3,8 +3,14 @@
+> >>>  #include <libcflat.h>
+> >>>  #include <linux/psci.h>
+> >>>  
+> >>> -extern int psci_invoke(unsigned long function_id, unsigned long arg0,
+> >>> -		       unsigned long arg1, unsigned long arg2);
+> >>> +typedef int (*psci_invoke_fn)(unsigned long function_id, unsigned long arg0,
+> >>> +			      unsigned long arg1, unsigned long arg2);
+> >>> +extern psci_invoke_fn psci_invoke;
+> >>> +extern int psci_invoke_hvc(unsigned long function_id, unsigned long arg0,
+> >>> +			   unsigned long arg1, unsigned long arg2);
+> >>> +extern int psci_invoke_smc(unsigned long function_id, unsigned long arg0,
+> >>> +			   unsigned long arg1, unsigned long arg2);
+> > The prototypes are now
+> >
+> > long invoke_fn(unsigned int function_id, unsigned long arg0,
+> >                unsigned long arg1, unsigned long arg2)
+> >
+> > Notice the return value changed to long and the function_id to
+> > unsigned int.
 > 
-> > Don't assume the physical addresses used with PCI have already been
-> > identity mapped.
-> > 
-> > Reviewed-by: Nikos Nikoleris <nikos.nikoleris@arm.com>
-> > Signed-off-by: Andrew Jones <drjones@redhat.com>
-> > ---
-> >  lib/pci-host-generic.c | 5 ++---
-> >  lib/pci-host-generic.h | 4 ++--
-> >  lib/pci-testdev.c      | 4 ++++
-> >  3 files changed, 8 insertions(+), 5 deletions(-)
-> > 
-> > diff --git a/lib/pci-host-generic.c b/lib/pci-host-generic.c
-> > index 818150dc0a66..de93b8feac39 100644
-> > --- a/lib/pci-host-generic.c
-> > +++ b/lib/pci-host-generic.c
-> > @@ -122,7 +122,7 @@ static struct pci_host_bridge *pci_dt_probe(void)
-> >  		      sizeof(host->addr_space[0]) * nr_addr_spaces);
-> >  	assert(host != NULL);
-> >  
-> > -	host->start		= base.addr;
-> > +	host->start		= ioremap(base.addr, base.size);
-> >  	host->size		= base.size;
-> >  	host->bus		= bus;
-> >  	host->bus_max		= bus_max;
-> > @@ -279,8 +279,7 @@ phys_addr_t pci_host_bridge_get_paddr(u64 pci_addr)
-> >  
-> >  static void __iomem *pci_get_dev_conf(struct pci_host_bridge *host, int devfn)
-> >  {
-> > -	return (void __iomem *)(unsigned long)
-> > -		host->start + (devfn << PCI_ECAM_DEVFN_SHIFT);
-> > +	return (void __iomem *)host->start + (devfn << PCI_ECAM_DEVFN_SHIFT);
-> 
-> But host->start's type is now exactly "void __iomem *", so why the cast?
+> Strictly speaking, arm always returns an unsigned long (32bits), but arm64 can
+> return either an unsigned long (64bits) when using SMC64/HVC64, or an unsigned int
+> (32bits) when using SMC32/HVC32.
 
-Only because I didn't think to remove it. Will do for v3.
+Hmm, where did you see that? Because section 5.1 of the SMC calling
+convention disagrees
 
-> And are we OK with doing pointer arithmetic on a void pointer?
+"""
+5.1 Error codes
+Errors codes that are returned in R0, W0 and X0 are signed integers of the
+appropriate size:
+* In AArch32:
+  o When using the SMC32/HVC32 calling convention, error codes, which are
+    returned in R0, are 32-bit signed integers.
+* In AArch64:
+  o When using the SMC64/HVC64 calling convention, error codes, which are
+    returned in X0, are 64-bit signed integers.
+  o When using the SMC32/HVC32 calling convention, error codes, which are
+    returned in W0, are 32-bit signed integers. X0[63:32] is UNDEFINED.
+"""
 
-I'm pretty sure we have other cases, but if you'd prefer I can create a
-local char* for the arithmetic and then return it as a void*. (Assuming
-that's what you're suggesting I do.)
+And 5.2.2 from the Power State Coordination Interface manual
 
-> 
-> >  }
-> >  
-> >  u8 pci_config_readb(pcidevaddr_t dev, u8 off)
-> > diff --git a/lib/pci-host-generic.h b/lib/pci-host-generic.h
-> > index fd30e7c74ed8..0ffe6380ec8f 100644
-> > --- a/lib/pci-host-generic.h
-> > +++ b/lib/pci-host-generic.h
-> > @@ -18,8 +18,8 @@ struct pci_addr_space {
-> >  };
-> >  
-> >  struct pci_host_bridge {
-> > -	phys_addr_t		start;
-> > -	phys_addr_t		size;
-> > +	void __iomem		*start;
-> > +	size_t			size;
-> >  	int			bus;
-> >  	int			bus_max;
-> >  	int			nr_addr_spaces;
-> > diff --git a/lib/pci-testdev.c b/lib/pci-testdev.c
-> > index 039bb44781c1..4f2e5663b2d6 100644
-> > --- a/lib/pci-testdev.c
-> > +++ b/lib/pci-testdev.c
-> > @@ -185,7 +185,11 @@ int pci_testdev(void)
-> >  	mem = ioremap(addr, PAGE_SIZE);
-> >  
-> >  	addr = pci_bar_get_addr(&pci_dev, 1);
-> > +#if defined(__i386__) || defined(__x86_64__)
-> >  	io = (void *)(unsigned long)addr;
-> > +#else
-> > +	io = ioremap(addr, PAGE_SIZE);
-> > +#endif
-> 
-> I am bit puzzled: For anything but x86 ioremap() is implemented like the
-> first statement, so why do we differentiate here? Shouldn't either one
-> of the statements be fine, for all architectures?
-
-The addresses in this context are pio. So x86 should use them verbatim,
-but other architectures that don't have pio will need to avoid them or
-remap them and use them with fake pio instructions (e.g. inb/outb wrappers
-for readb/writeb).
+"""
+5.2.2 Return error codes
+Table 6 defines the values for error codes used with PSCI functions. All
+errors are considered to be 32-bit signed integers.
+"""
 
 Thanks,
 drew
