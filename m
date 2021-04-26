@@ -2,111 +2,155 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8D48136B08A
-	for <lists+kvm@lfdr.de>; Mon, 26 Apr 2021 11:28:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9751436B0B1
+	for <lists+kvm@lfdr.de>; Mon, 26 Apr 2021 11:33:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232116AbhDZJ3W (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 26 Apr 2021 05:29:22 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:20565 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232080AbhDZJ3R (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 26 Apr 2021 05:29:17 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1619429315;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=OtWVNId0H4MlH7zGbJHW4vVmuaAH+xdS1wmcTWoY6w0=;
-        b=PCHp0zeaHGtwJHoMpby4GBbSE/F82iu9OkpRePEF4S4vKJTUvWDxDDqOD0t3EYBKHfIIPG
-        3aHo941jn3rBpP4b5GeCsef/XI8Q7POp8vVfk43ZldmOTkUI88tZjnzx1YclLAt5i4iVeX
-        j6pM+Q4L5IAwIafsJ1KSQO2EBYmt3sI=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-281-S_DT_NcuM2OzoTYIp54Iuw-1; Mon, 26 Apr 2021 05:28:33 -0400
-X-MC-Unique: S_DT_NcuM2OzoTYIp54Iuw-1
-Received: by mail-ed1-f69.google.com with SMTP id f1-20020a0564021941b02903850806bb32so16735899edz.9
-        for <kvm@vger.kernel.org>; Mon, 26 Apr 2021 02:28:32 -0700 (PDT)
+        id S232520AbhDZJeZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 26 Apr 2021 05:34:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37422 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232116AbhDZJeZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 26 Apr 2021 05:34:25 -0400
+Received: from mail-io1-xd2f.google.com (mail-io1-xd2f.google.com [IPv6:2607:f8b0:4864:20::d2f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9722AC061574;
+        Mon, 26 Apr 2021 02:33:42 -0700 (PDT)
+Received: by mail-io1-xd2f.google.com with SMTP id a11so2922935ioo.0;
+        Mon, 26 Apr 2021 02:33:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=dnDdhSfghxdgBT4hhRmyjFVZ+eM7uoJ7RMVHwKGzfIE=;
+        b=A0JZgblxaHFBYPpfTBYLv7RrLxerkuPHoZeI+AXHFYMalWqHubI6RPlEvlDAL2OhhV
+         IIcFc6uiH98t2EepKLdTZIubzd4lUW+N/oCJw/i+1rQR2ERhtgry5TfHuOxJXPHNVHPo
+         Dapk/ouovvl4SqgcGUN9pre4Wqom/Z5xFEGO6CqWE2vqWDPLyOUoJupzAyT0CijxPB2t
+         kqPA1mHmqb7AkwUonuCIA9ZFUaom7sEpvlW5kt69jjk43t9GeWnQHIKcbUs/NTYEOriW
+         CT+Tig5ptvv/NNA8mRSXPlPjP+oVlQ3/C3EM0g+1Am4Mi+0BegGm0NbjdUcQQR5u7xiM
+         zxmA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=OtWVNId0H4MlH7zGbJHW4vVmuaAH+xdS1wmcTWoY6w0=;
-        b=t57zsPmdZ85tfPNg9cyT83hZ6Y02ozNv0vlnYXZJNjhsvc03pD6Tno6lhVOBK+BJEo
-         mBAORO/TXmW5b+a1oKJh0oZMRGFANhy8NMMyF0goV8iR+B/OqgGdn2rLO4Tvz3cGgEm6
-         UKC7vfkcVJwFFZg9e3tdgZQZ1H5LmIWSXrnWA4lvevhRP0bcW61zD1nvAWLlWI4N5FUu
-         gyR+ltm8PGm1zDEEVZlPhVWRVu+ZzsrbevTq8in/tZNA15Qw1709HzZeQmEU6wSIIJZ4
-         2aQ+5FArYhxB1XVTQ/4l0YIZoYmnTwB9GPj9AkLrqLo7bS2T9qRRJsHFAGCS8GnB9l7H
-         fNaA==
-X-Gm-Message-State: AOAM533t9RVovBKawJsrh3qgMI1X3MGKAEC+Vo5FnvI18Xc49bzxX542
-        gshapTjTmOXQ7aNpucKBxrkZ1Y/eWYfzZomEPCefIkynGmAE0/kuEFtaukz2qg+kylPOQDOcJcc
-        iiHrsXVrXMj3e
-X-Received: by 2002:aa7:c4c1:: with SMTP id p1mr19783009edr.133.1619429311948;
-        Mon, 26 Apr 2021 02:28:31 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJytAfyLKl2YKK7lKos9PhDPbKzINP26aWILO7ar4wTBgQ7gjsJ4KrtD/Mf8e0g7fXX2pHMNmA==
-X-Received: by 2002:aa7:c4c1:: with SMTP id p1mr19783001edr.133.1619429311818;
-        Mon, 26 Apr 2021 02:28:31 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e? ([2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e])
-        by smtp.gmail.com with ESMTPSA id b8sm14195751edu.41.2021.04.26.02.28.30
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 26 Apr 2021 02:28:31 -0700 (PDT)
-Subject: Re: [PATCH] selftests: kvm: Fix the check of return value
-To:     Zhenzhong Duan <zhenzhong.duan@intel.com>,
-        linux-kernel@vger.kernel.org
-Cc:     linux-kselftest@vger.kernel.org, kvm@vger.kernel.org,
-        shuah@kernel.org
-References: <20210426193138.118276-1-zhenzhong.duan@intel.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <0d23822d-1510-d615-c3bf-200b6636b766@redhat.com>
-Date:   Mon, 26 Apr 2021 11:28:29 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.7.0
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=dnDdhSfghxdgBT4hhRmyjFVZ+eM7uoJ7RMVHwKGzfIE=;
+        b=IsGtzWIsc9JdEINBuBYavUespJ5ayFzU/ehJ4wUdx05Pd9URXMaauPsRCG+zNPhoJ3
+         No7b//IBb7JeHy2gic6T0+tckVKikIAPZoYxKzbOmieXqZRVbg3/ayiVF0+BshcXMqAs
+         e+B8VcXEy2r2YhNO3pmqnrjPZoY0eYrSd5JBcdBVPgARu2QM/acg16OSUqc7Rm2dcrTm
+         pAELF8JRenVnZBM4OpoI6aRakqIaBZeSz898zRBtygYomd9eZu1iQflJ++artwBgPf5K
+         KzXQj5yh5asaBxUdmW3vpthLb5sZSe5YaRLqIRbG4X5fYBqhMpVmmslRVM9y7yoQMRrF
+         8IHA==
+X-Gm-Message-State: AOAM531Oh3/747v0hVQ82Hny3GXVM/NeC2L9hLM+zUvlRuJRu/PuZ4sA
+        4X6Mm/cM/V35rqBav0JBj9bRIUne83r7HwW0RE0=
+X-Google-Smtp-Source: ABdhPJy/nZrXcfLUoI1ikGjhjLdyu8YTa0BkZH5/i9Nr2Koi3j1QPg1Ey3UY56DThePnVVDQ9InMtE12++e3VnhHTtI=
+X-Received: by 2002:a6b:b404:: with SMTP id d4mr13662921iof.56.1619429622159;
+ Mon, 26 Apr 2021 02:33:42 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20210426193138.118276-1-zhenzhong.duan@intel.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <20200915191505.10355-1-sean.j.christopherson@intel.com> <20200915191505.10355-3-sean.j.christopherson@intel.com>
+In-Reply-To: <20200915191505.10355-3-sean.j.christopherson@intel.com>
+From:   Lai Jiangshan <jiangshanlai+lkml@gmail.com>
+Date:   Mon, 26 Apr 2021 17:33:30 +0800
+Message-ID: <CAJhGHyBOLUeqnwx2X=WToE2oY8Zkqj_y4KZ0hoq-goe+UWcR9g@mail.gmail.com>
+Subject: Re: [PATCH v2 2/2] KVM: VMX: Invoke NMI handler via indirect call
+ instead of INTn
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        LKML <linux-kernel@vger.kernel.org>,
+        Josh Poimboeuf <jpoimboe@redhat.com>,
+        Uros Bizjak <ubizjak@gmail.com>,
+        Andi Kleen <ak@linux.intel.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Steven Rostedt <rostedt@goodmis.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 26/04/21 21:31, Zhenzhong Duan wrote:
-> In vm_vcpu_rm() and kvm_vm_release(), a stale return value is checked in
-> TEST_ASSERT macro.
-> 
-> Fix it by assigning variable ret with correct return value.
-> 
-> Signed-off-by: Zhenzhong Duan <zhenzhong.duan@intel.com>
+Add CC: Andy Lutomirski
+Add CC: Steven Rostedt
+
+I think this patch made it wrong for NMI.
+
+On Wed, Sep 16, 2020 at 3:27 AM Sean Christopherson
+<sean.j.christopherson@intel.com> wrote:
+>
+> Rework NMI VM-Exit handling to invoke the kernel handler by function
+> call instead of INTn.  INTn microcode is relatively expensive, and
+> aligning the IRQ and NMI handling will make it easier to update KVM
+> should some newfangled method for invoking the handlers come along.
+>
+> Suggested-by: Andi Kleen <ak@linux.intel.com>
+> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 > ---
->   tools/testing/selftests/kvm/lib/kvm_util.c | 4 ++--
->   1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-> index b8849a1aca79..53d3a7eb0d47 100644
-> --- a/tools/testing/selftests/kvm/lib/kvm_util.c
-> +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-> @@ -514,7 +514,7 @@ static void vm_vcpu_rm(struct kvm_vm *vm, struct vcpu *vcpu)
->   	ret = munmap(vcpu->state, vcpu_mmap_sz());
->   	TEST_ASSERT(ret == 0, "munmap of VCPU fd failed, rc: %i "
->   		"errno: %i", ret, errno);
-> -	close(vcpu->fd);
-> +	ret = close(vcpu->fd);
->   	TEST_ASSERT(ret == 0, "Close of VCPU fd failed, rc: %i "
->   		"errno: %i", ret, errno);
->   
-> @@ -534,7 +534,7 @@ void kvm_vm_release(struct kvm_vm *vmp)
->   	TEST_ASSERT(ret == 0, "Close of vm fd failed,\n"
->   		"  vmp->fd: %i rc: %i errno: %i", vmp->fd, ret, errno);
->   
-> -	close(vmp->kvm_fd);
-> +	ret = close(vmp->kvm_fd);
->   	TEST_ASSERT(ret == 0, "Close of /dev/kvm fd failed,\n"
->   		"  vmp->kvm_fd: %i rc: %i errno: %i", vmp->kvm_fd, ret, errno);
->   }
-> 
+>  arch/x86/kvm/vmx/vmx.c | 30 +++++++++++++++---------------
+>  1 file changed, 15 insertions(+), 15 deletions(-)
+>
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index 391f079d9136..b0eca151931d 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -6411,40 +6411,40 @@ static void vmx_apicv_post_state_restore(struct kvm_vcpu *vcpu)
+>
+>  void vmx_do_interrupt_nmi_irqoff(unsigned long entry);
+>
+> +static void handle_interrupt_nmi_irqoff(struct kvm_vcpu *vcpu, u32 intr_info)
+> +{
+> +       unsigned int vector = intr_info & INTR_INFO_VECTOR_MASK;
+> +       gate_desc *desc = (gate_desc *)host_idt_base + vector;
+> +
+> +       kvm_before_interrupt(vcpu);
+> +       vmx_do_interrupt_nmi_irqoff(gate_offset(desc));
+> +       kvm_after_interrupt(vcpu);
+> +}
+> +
+>  static void handle_exception_nmi_irqoff(struct vcpu_vmx *vmx)
+>  {
+>         u32 intr_info = vmx_get_intr_info(&vmx->vcpu);
+>
+>         /* if exit due to PF check for async PF */
+> -       if (is_page_fault(intr_info)) {
+> +       if (is_page_fault(intr_info))
+>                 vmx->vcpu.arch.apf.host_apf_flags = kvm_read_and_reset_apf_flags();
+>         /* Handle machine checks before interrupts are enabled */
+> -       } else if (is_machine_check(intr_info)) {
+> +       else if (is_machine_check(intr_info))
+>                 kvm_machine_check();
+>         /* We need to handle NMIs before interrupts are enabled */
+> -       } else if (is_nmi(intr_info)) {
+> -               kvm_before_interrupt(&vmx->vcpu);
+> -               asm("int $2");
+> -               kvm_after_interrupt(&vmx->vcpu);
+> -       }
+> +       else if (is_nmi(intr_info))
+> +               handle_interrupt_nmi_irqoff(&vmx->vcpu, intr_info);
+>  }
 
-Queued, thanks.
+When handle_interrupt_nmi_irqoff() is called, we may lose the
+CPU-hidden-NMI-masked state due to IRET of #DB, #BP or other traps
+between VMEXIT and handle_interrupt_nmi_irqoff().
 
-Paolo
+But the NMI handler in the Linux kernel *expects* the CPU-hidden-NMI-masked
+state is still set in the CPU for no nested NMI intruding into the beginning
+of the handler.
 
+The original code "int $2" can provide the needed CPU-hidden-NMI-masked
+when entering #NMI, but I doubt it about this change.
+
+I maybe missed something, especially I haven't read all of the earlier
+discussions about the change.  More importantly, I haven't found the original
+suggestion from Andi Kleen: (Quote from the cover letter):
+
+The NMI consolidation was loosely suggested by Andi Kleen.  Andi's actual
+suggestion was to export and directly call the NMI handler, but that's a
+more involved change (unless I'm misunderstanding the wants of the NMI
+handler), whereas piggybacking the IRQ code is simple and seems like a
+worthwhile intermediate step.
+(End of quote)
+
+I think we need to change it back or change it to call the NMI handler
+immediately after VMEXIT before leaving "nostr" section if needed.
+
+Thanks,
+Lai
