@@ -2,51 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3D03136C153
-	for <lists+kvm@lfdr.de>; Tue, 27 Apr 2021 10:55:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5F80C36C156
+	for <lists+kvm@lfdr.de>; Tue, 27 Apr 2021 10:55:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235153AbhD0Izl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 27 Apr 2021 04:55:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36950 "EHLO
+        id S235185AbhD0I4A (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 27 Apr 2021 04:56:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37036 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229487AbhD0Izl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 27 Apr 2021 04:55:41 -0400
-Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 98C7FC061574;
-        Tue, 27 Apr 2021 01:54:57 -0700 (PDT)
-Received: by mail-pj1-x1036.google.com with SMTP id y22-20020a17090a8b16b0290150ae1a6d2bso6867274pjn.0;
-        Tue, 27 Apr 2021 01:54:57 -0700 (PDT)
+        with ESMTP id S235062AbhD0Iz7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 27 Apr 2021 04:55:59 -0400
+Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C6B18C061574;
+        Tue, 27 Apr 2021 01:55:15 -0700 (PDT)
+Received: by mail-pj1-x102d.google.com with SMTP id md17so3116982pjb.0;
+        Tue, 27 Apr 2021 01:55:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=DvudTC2BwHZGDoQJqasDl9cPJYuqaFYI5WCZvH5B/Zw=;
-        b=oZTdWHWa9y4vR0NRkwGHue6dwcl2JqZgsg7a6+YjFGuPfYA01jgtr5CG2FVV6JxsZ9
-         mypKHQE3nwLiAe0xgegucJmA7TC2ZoXS596vwbQv8YCiSKBLOMOYJ8Im+ZlEXh+zSJ9g
-         CHv2PTnEtz7IYhTMf68AtMxtuO4rUylhz0qM2NHyetmNgDmoXfdZvPmgKbnLQf4ilqyT
-         H0MgsAj/qVMZiQ9HbXjDKU6nbYGbANvN+DVIMT23z4vlS7QnD53TDBNLTwkBxXpsNpZE
-         +KC9qHwy4uf+fbZxJj96Zrs7SPVrj/7U1zxWyVqqlCxxH8NWiTS4Q0V+XrcwxNqP1099
-         RhDw==
+        bh=/31Vy6dJtI8OfNAY7ghunL8gA/RZhNPFIkU577+CHEs=;
+        b=A0xpPWh3R4bR9/A4KkPyHhizxphwgiPuLe9DPURlFVWpg+IfnOyhA4gsHx1cyY8rRK
+         fb1szxBZolHo88h6FZblRM6nsdQjNiKBx5nVGfkBXzWNt2vpGAvxj1YuMzVQsFQp273z
+         r7dudOSylQp1/3hnUkH9ByIJPy8lu1wjYVTslTHHZrfEgsQgM/McQ+Y077uRyV6JEO5c
+         GnFDHskT0G+IWsta4CPbWvZkRYtXrW4S03kbOuIiahbMx+XaE2TNKnppudOfKDeW/SNw
+         pk5hVLcZfp9SEH0BhUk5Xueb41D3XLHoBrnCQ5mzFyC8NJMOiq6xqT2U9YxM8tubcMXg
+         srOA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=DvudTC2BwHZGDoQJqasDl9cPJYuqaFYI5WCZvH5B/Zw=;
-        b=l+AcO67iwz1+aDetsF0X1LWUlEzl7W/6z8cQ2+ucyYngw6Op/xqmQda+mMkXgJ8HSx
-         PJ5MO7xRlY+NOTY3Li9Fs9SpS1H0kMhGB2eCD3raD/t4xG7SJNlyVfb+EIAxSwx0X3Yg
-         iZKawFk/UCXv2G98pNbAvyYsidGACWEK6BuIvtylmyaG6Ofv4jJDG46eGqQeuNYsVwTA
-         B5qzsPX8rJI5sg1tJWqSF6fsxzOHSrY/E7C9z111YYEv4OUYAw2N2Vq0SXs7fTrr8V7Q
-         /XsxMTeDJZ2wGppmA4aYcYBK890sZINHr9iSkY07N2fRrq44bVrLXzpGKxsqnkquOx0f
-         pv+Q==
-X-Gm-Message-State: AOAM530Z1kHSkAWMbzzsoqNw2huTue0LTGlRFwyUEn1dt0uXitPp2PV9
-        909QyrgQfL5eGrVTZkPAhiQ8uINmmZM=
-X-Google-Smtp-Source: ABdhPJyED8YOs73pY8DPavmzXj80ySfIXNvSlWASjVV8n8Ia2PPeO5IlLOQb7WEVRwY9uJ/wGmcSPA==
-X-Received: by 2002:a17:90b:2393:: with SMTP id mr19mr3656655pjb.24.1619513697046;
-        Tue, 27 Apr 2021 01:54:57 -0700 (PDT)
+        bh=/31Vy6dJtI8OfNAY7ghunL8gA/RZhNPFIkU577+CHEs=;
+        b=LIa/K1koORSZD7nhPIrH93lSbFYH6SyKzeDAWmb8+9pDjLOjdwfN8R8rPVsdbuPC0E
+         b8v1BvZwPBIcOcrEtlkdaOj2Gi0buAIfil0CAtmRK+ePLxC0hlq2OKhawj0zKVEfBxOO
+         WfrPLgHUujewEGZiV6r4IevmTUA6C891vxlPLRxi8DoggFLhJAf1u8AoT34zCgfyLWLV
+         CVjjhqL+yh3X1keVLgofVs5CW++cYGmvEyM8pbWO4RVFXJgbzjXeF3W2xUr7gPpE5Zgq
+         8DwwdKHMXEqBE8zu+4kjbQeu/XZjXvU36Yqvk1BE7S+39BE8BpLibC0Srm7BuRDuVJxr
+         SSLA==
+X-Gm-Message-State: AOAM530TnX9IIR7GgXpW1PQnzIuRFrQY9LeTfkEoBg/8ximZzENk2ck7
+        0hXdd6hnPgcA4SHb5mxnMpk6Y7NnqIU=
+X-Google-Smtp-Source: ABdhPJx+AJHGi3Rguoobjs/iQl6/SlIGKuNRMwZXS99zCPGUB+WyGOmVpZp9CTpHmWfFywdrAG0Bww==
+X-Received: by 2002:a17:902:bf44:b029:ec:c083:7377 with SMTP id u4-20020a170902bf44b02900ecc0837377mr22822309pls.27.1619513715229;
+        Tue, 27 Apr 2021 01:55:15 -0700 (PDT)
 Received: from localhost ([47.251.4.198])
-        by smtp.gmail.com with ESMTPSA id a65sm1986221pfb.116.2021.04.27.01.54.55
+        by smtp.gmail.com with ESMTPSA id 18sm1853014pji.30.2021.04.27.01.55.14
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 27 Apr 2021 01:54:56 -0700 (PDT)
+        Tue, 27 Apr 2021 01:55:14 -0700 (PDT)
 From:   Lai Jiangshan <jiangshanlai@gmail.com>
 To:     linux-kernel@vger.kernel.org
 Cc:     Lai Jiangshan <laijs@linux.alibaba.com>,
@@ -65,16 +65,10 @@ Cc:     Lai Jiangshan <laijs@linux.alibaba.com>,
         Maxim Levitsky <mlevitsk@redhat.com>,
         Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
         x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        Juergen Gross <jgross@suse.com>,
-        Stefano Stabellini <sstabellini@kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Alexandre Chartre <alexandre.chartre@oracle.com>,
-        Joerg Roedel <jroedel@suse.de>, Jian Cai <caij2003@gmail.com>,
-        xen-devel@lists.xenproject.org
-Subject: [PATCH 1/4] x86/xen/entry: Rename xenpv_exc_nmi to noist_exc_nmi
-Date:   Tue, 27 Apr 2021 07:09:46 +0800
-Message-Id: <20210426230949.3561-2-jiangshanlai@gmail.com>
+        Peter Zijlstra <peterz@infradead.org>
+Subject: [PATCH 3/4] KVM/VMX: Invoke NMI non-IST entry instead of IST entry
+Date:   Tue, 27 Apr 2021 07:09:48 +0800
+Message-Id: <20210426230949.3561-4-jiangshanlai@gmail.com>
 X-Mailer: git-send-email 2.19.1.6.gb485710b
 In-Reply-To: <20210426230949.3561-1-jiangshanlai@gmail.com>
 References: <20210426230949.3561-1-jiangshanlai@gmail.com>
@@ -86,10 +80,30 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Lai Jiangshan <laijs@linux.alibaba.com>
 
-There is no any functionality change intended.  Just rename it and
-move it to arch/x86/kernel/nmi.c so that we can resue it later in
-next patch for early NMI and kvm.
+In VMX, the NMI handler needs to be invoked after NMI VM-Exit.
 
+Before the commit 1a5488ef0dcf6 ("KVM: VMX: Invoke NMI handler via
+indirect call instead of INTn"), the work is done by INTn ("int $2").
+
+But INTn microcode is relatively expensive, so the commit reworked
+NMI VM-Exit handling to invoke the kernel handler by function call.
+And INTn doesn't set the NMI blocked flag required by the linux kernel
+NMI entry.  So moving away from INTn are very reasonable.
+
+Yet some details were missed.  After the said commit applied, the NMI
+entry pointer is fetched from the IDT table and called from the kernel
+stack.  But the NMI entry pointer installed on the IDT table is
+asm_exc_nmi() which expects to be invoked on the IST stack by the ISA.
+And it relies on the "NMI executing" variable on the IST stack to work
+correctly.  When it is unexpectedly called from the kernel stack, the
+RSP-located "NMI executing" variable is also on the kernel stack and
+is "uninitialized" and can cause the NMI entry to run in the wrong way.
+
+So we should not used the NMI entry installed on the IDT table.  Rather,
+we should use the NMI entry allowed to be used on the kernel stack which
+is asm_noist_exc_nmi() which is also used for XENPV and early booting.
+
+Link: https://lore.kernel.org/lkml/20200915191505.10355-3-sean.j.christopherson@intel.com/
 Cc: Thomas Gleixner <tglx@linutronix.de>
 Cc: Paolo Bonzini <pbonzini@redhat.com>
 Cc: Sean Christopherson <seanjc@google.com>
@@ -106,84 +120,54 @@ Cc: Uros Bizjak <ubizjak@gmail.com>
 Cc: Maxim Levitsky <mlevitsk@redhat.com>
 Signed-off-by: Lai Jiangshan <laijs@linux.alibaba.com>
 ---
- arch/x86/include/asm/idtentry.h | 2 +-
- arch/x86/kernel/nmi.c           | 8 ++++++++
- arch/x86/xen/enlighten_pv.c     | 9 +++------
- arch/x86/xen/xen-asm.S          | 2 +-
- 4 files changed, 13 insertions(+), 8 deletions(-)
+ arch/x86/kernel/nmi.c  | 3 +++
+ arch/x86/kvm/vmx/vmx.c | 8 ++++++--
+ 2 files changed, 9 insertions(+), 2 deletions(-)
 
-diff --git a/arch/x86/include/asm/idtentry.h b/arch/x86/include/asm/idtentry.h
-index e35e342673c7..5b11d2ddbb5c 100644
---- a/arch/x86/include/asm/idtentry.h
-+++ b/arch/x86/include/asm/idtentry.h
-@@ -590,7 +590,7 @@ DECLARE_IDTENTRY_RAW(X86_TRAP_MC,	xenpv_exc_machine_check);
- /* NMI */
- DECLARE_IDTENTRY_NMI(X86_TRAP_NMI,	exc_nmi);
- #ifdef CONFIG_XEN_PV
--DECLARE_IDTENTRY_RAW(X86_TRAP_NMI,	xenpv_exc_nmi);
-+DECLARE_IDTENTRY_RAW(X86_TRAP_NMI,	noist_exc_nmi);
- #endif
- 
- /* #DB */
 diff --git a/arch/x86/kernel/nmi.c b/arch/x86/kernel/nmi.c
-index bf250a339655..2b907a76d0a1 100644
+index 2fb1fd59d714..919f0400d931 100644
 --- a/arch/x86/kernel/nmi.c
 +++ b/arch/x86/kernel/nmi.c
-@@ -524,6 +524,14 @@ DEFINE_IDTENTRY_RAW(exc_nmi)
- 		mds_user_clear_cpu_buffers();
+@@ -528,10 +528,13 @@ DEFINE_IDTENTRY_RAW(noist_exc_nmi)
+ {
+ 	/*
+ 	 * On Xen PV and early booting stage, NMI doesn't use IST.
++	 * And when it is manually called from VMX NMI VM-Exit handler,
++	 * it doesn't use IST either.
+ 	 * The C part is the same as native.
+ 	 */
+ 	exc_nmi(regs);
  }
++EXPORT_SYMBOL_GPL(asm_noist_exc_nmi);
  
-+#ifdef CONFIG_XEN_PV
-+DEFINE_IDTENTRY_RAW(noist_exc_nmi)
-+{
-+	/* On Xen PV, NMI doesn't use IST.  The C part is the same as native. */
-+	exc_nmi(regs);
-+}
-+#endif
-+
  void stop_nmi(void)
  {
- 	ignore_nmis++;
-diff --git a/arch/x86/xen/enlighten_pv.c b/arch/x86/xen/enlighten_pv.c
-index 4f18cd9eacd8..5efbdb0905b7 100644
---- a/arch/x86/xen/enlighten_pv.c
-+++ b/arch/x86/xen/enlighten_pv.c
-@@ -565,12 +565,6 @@ static void xen_write_ldt_entry(struct desc_struct *dt, int entrynum,
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index bcbf0d2139e9..96e59d912637 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -36,6 +36,7 @@
+ #include <asm/debugreg.h>
+ #include <asm/desc.h>
+ #include <asm/fpu/internal.h>
++#include <asm/idtentry.h>
+ #include <asm/io.h>
+ #include <asm/irq_remapping.h>
+ #include <asm/kexec.h>
+@@ -6416,8 +6417,11 @@ static void handle_exception_nmi_irqoff(struct vcpu_vmx *vmx)
+ 	else if (is_machine_check(intr_info))
+ 		kvm_machine_check();
+ 	/* We need to handle NMIs before interrupts are enabled */
+-	else if (is_nmi(intr_info))
+-		handle_interrupt_nmi_irqoff(&vmx->vcpu, intr_info);
++	else if (is_nmi(intr_info)) {
++		kvm_before_interrupt(&vmx->vcpu);
++		vmx_do_interrupt_nmi_irqoff((unsigned long)asm_noist_exc_nmi);
++		kvm_after_interrupt(&vmx->vcpu);
++	}
+ }
  
- void noist_exc_debug(struct pt_regs *regs);
- 
--DEFINE_IDTENTRY_RAW(xenpv_exc_nmi)
--{
--	/* On Xen PV, NMI doesn't use IST.  The C part is the same as native. */
--	exc_nmi(regs);
--}
--
- DEFINE_IDTENTRY_RAW_ERRORCODE(xenpv_exc_double_fault)
- {
- 	/* On Xen PV, DF doesn't use IST.  The C part is the same as native. */
-@@ -626,6 +620,9 @@ struct trap_array_entry {
- 	.xen		= xen_asm_xenpv_##func,		\
- 	.ist_okay	= ist_ok }
- 
-+/* Alias to make TRAP_ENTRY_REDIR() happy for nmi */
-+#define xen_asm_xenpv_exc_nmi	xen_asm_noist_exc_nmi
-+
- static struct trap_array_entry trap_array[] = {
- 	TRAP_ENTRY_REDIR(exc_debug,			true  ),
- 	TRAP_ENTRY_REDIR(exc_double_fault,		true  ),
-diff --git a/arch/x86/xen/xen-asm.S b/arch/x86/xen/xen-asm.S
-index 1e626444712b..12e7cbbb2a8d 100644
---- a/arch/x86/xen/xen-asm.S
-+++ b/arch/x86/xen/xen-asm.S
-@@ -130,7 +130,7 @@ _ASM_NOKPROBE(xen_\name)
- xen_pv_trap asm_exc_divide_error
- xen_pv_trap asm_xenpv_exc_debug
- xen_pv_trap asm_exc_int3
--xen_pv_trap asm_xenpv_exc_nmi
-+xen_pv_trap asm_noist_exc_nmi
- xen_pv_trap asm_exc_overflow
- xen_pv_trap asm_exc_bounds
- xen_pv_trap asm_exc_invalid_op
+ static void handle_external_interrupt_irqoff(struct kvm_vcpu *vcpu)
 -- 
 2.19.1.6.gb485710b
 
