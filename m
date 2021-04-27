@@ -2,122 +2,98 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 96CE636C558
-	for <lists+kvm@lfdr.de>; Tue, 27 Apr 2021 13:38:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8B18A36C5E8
+	for <lists+kvm@lfdr.de>; Tue, 27 Apr 2021 14:16:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236015AbhD0Lja (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 27 Apr 2021 07:39:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45076 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235705AbhD0Lja (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 27 Apr 2021 07:39:30 -0400
-Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 036D6C061574;
-        Tue, 27 Apr 2021 04:38:47 -0700 (PDT)
-Received: from zn.tnic (p200300ec2f0c5e008a7c4c8941e22261.dip0.t-ipconnect.de [IPv6:2003:ec:2f0c:5e00:8a7c:4c89:41e2:2261])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 5A0041EC047E;
-        Tue, 27 Apr 2021 13:38:45 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1619523525;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=IAUQH8ckRL8RHgSocw7BeJrBQn+eUtnbT2dDn+igxMs=;
-        b=JVTU+70sWvRTU+SopM0YlyyGOmgJ6g6s0pfWanKmCpWILaUWfjQC0nNpvbpkUqfQ2RRum2
-        FEuSSKX1W3ssLIne23n7/XG++M6Vrmnc4wwpffOGYr4mLk1KAEn2IFh+WRvL4uHH763Ts1
-        j21Ra3QsjV66hv690SzIZHGqkUij9BY=
-Date:   Tue, 27 Apr 2021 13:38:40 +0200
-From:   Borislav Petkov <bp@alien8.de>
-To:     Maxim Levitsky <mlevitsk@redhat.com>
-Cc:     kvm@vger.kernel.org,
-        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
-        Ingo Molnar <mingo@redhat.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Sean Christopherson <seanjc@google.com>,
-        Marc Zyngier <maz@kernel.org>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        open list <linux-kernel@vger.kernel.org>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Jonathan Corbet <corbet@lwn.net>, Jessica Yu <jeyu@kernel.org>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Jan Kiszka <jan.kiszka@siemens.com>,
-        Will Deacon <will@kernel.org>,
-        "open list:KERNEL VIRTUAL MACHINE FOR ARM64 (KVM/arm64)" 
-        <kvmarm@lists.cs.columbia.edu>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Jim Mattson <jmattson@google.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        David Hildenbrand <david@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        "open list:S390" <linux-s390@vger.kernel.org>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Kieran Bingham <kbingham@kernel.org>,
-        "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
-        "moderated list:KERNEL VIRTUAL MACHINE FOR ARM64 (KVM/arm64)" 
-        <linux-arm-kernel@lists.infradead.org>,
-        James Morse <james.morse@arm.com>
-Subject: Re: [PATCH v2 8/9] KVM: x86: add force_intercept_exceptions_mask
-Message-ID: <YIf3wM1+enU1U/gn@zn.tnic>
-References: <20210401135451.1004564-1-mlevitsk@redhat.com>
- <20210401135451.1004564-9-mlevitsk@redhat.com>
+        id S235547AbhD0MQ6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 27 Apr 2021 08:16:58 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:28092 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S235410AbhD0MQ5 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 27 Apr 2021 08:16:57 -0400
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 13RC2liB152839
+        for <kvm@vger.kernel.org>; Tue, 27 Apr 2021 08:16:14 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=yhD1YNM89K2upDWov/ofq8a0LRVkPrK1zUWQRmieaHU=;
+ b=B+nDHxD/BPOd9pg/iMebZ8xnM9QGbTEhdkoPXnRLegmpvRMMfy9V4Dugcfb2aVkwrRfB
+ rJ7vIdNTdT+n8l8Zy5U7aXsGv9G7cE16ZP+NmB8JMOHUbx8dT+CIi9fQGUaCezs83Fuz
+ OSUBjJSH/gYrWIbgOix3I4lqFc0CQZ7bgfdyeGSizVrftVYHPrlM6K7XAgo2n4X8V+h0
+ 9vEdg9K1wNPoVkEGv/KFbh+puCwp09cCdMxrKwWGWvoQ/W+qaLPb242IMHikfYfN16qw
+ TtMPVPPxtXo5vuD56emhxnU6hW5sY+oLPDTifiFGnNqj3WoT1c1gAwdIxpqFFjUUGirt RQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 386gvx2y6c-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Tue, 27 Apr 2021 08:16:14 -0400
+Received: from m0098413.ppops.net (m0098413.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 13RC38Q0154800
+        for <kvm@vger.kernel.org>; Tue, 27 Apr 2021 08:16:13 -0400
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 386gvx2y5e-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 27 Apr 2021 08:16:13 -0400
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 13RCDkTZ029038;
+        Tue, 27 Apr 2021 12:16:12 GMT
+Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
+        by ppma03ams.nl.ibm.com with ESMTP id 384ay8hawc-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 27 Apr 2021 12:16:12 +0000
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 13RCG9bQ32768496
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 27 Apr 2021 12:16:09 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 0EEEEA4062;
+        Tue, 27 Apr 2021 12:16:09 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 9E48EA4064;
+        Tue, 27 Apr 2021 12:16:08 +0000 (GMT)
+Received: from ibm-vm.ibmuc.com (unknown [9.145.13.42])
+        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Tue, 27 Apr 2021 12:16:08 +0000 (GMT)
+From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
+To:     kvm@vger.kernel.org
+Cc:     frankja@linux.ibm.com, thuth@redhat.com, cohuck@redhat.com,
+        david@redhat.com
+Subject: [kvm-unit-tests PATCH v1 1/1] MAINTAINERS: s390x: add myself as reviewer
+Date:   Tue, 27 Apr 2021 14:16:08 +0200
+Message-Id: <20210427121608.157783-1-imbrenda@linux.ibm.com>
+X-Mailer: git-send-email 2.26.3
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20210401135451.1004564-9-mlevitsk@redhat.com>
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: _5K0ZkG2p1D7oxj7ah_t0IA6fRnsYbi-
+X-Proofpoint-GUID: HjXb49lfKUPLpfZHNfK3WkigpMi91nhA
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.761
+ definitions=2021-04-27_06:2021-04-27,2021-04-27 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 spamscore=0
+ mlxscore=0 clxscore=1015 adultscore=0 bulkscore=0 phishscore=0
+ mlxlogscore=984 suspectscore=0 lowpriorityscore=0 malwarescore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2104060000 definitions=main-2104270091
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Apr 01, 2021 at 04:54:50PM +0300, Maxim Levitsky wrote:
-> This parameter will be used by VMX and SVM code to force
-> interception of a set of exceptions, given by a bitmask
-> for guest debug and/or kvm debug.
-> 
-> This option is not intended for production.
-> 
-> This is based on an idea first shown here:
-> https://patchwork.kernel.org/project/kvm/patch/20160301192822.GD22677@pd.tnic/
-> 
-> CC: Borislav Petkov <bp@suse.de>
-> Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
-> ---
->  arch/x86/kvm/x86.c | 3 +++
->  arch/x86/kvm/x86.h | 2 ++
->  2 files changed, 5 insertions(+)
-> 
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 3627ce8fe5bb..1a51031d64d8 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -176,6 +176,9 @@ module_param(force_emulation_prefix, bool, S_IRUGO);
->  int __read_mostly pi_inject_timer = -1;
->  module_param(pi_inject_timer, bint, S_IRUGO | S_IWUSR);
->  
-> +uint force_intercept_exceptions_mask;
-> +module_param(force_intercept_exceptions_mask, uint, S_IRUGO | S_IWUSR);
-> +EXPORT_SYMBOL_GPL(force_intercept_exceptions_mask);
+Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+---
+ MAINTAINERS | 1 +
+ 1 file changed, 1 insertion(+)
 
-That's nice.
-
-I could use some text explaning the usage though, i.e. that thing takes
-a bitfield of exception vectors, so that I don't have to look at the
-code each time. :-)
-
-Thx.
-
+diff --git a/MAINTAINERS b/MAINTAINERS
+index e2505985..aaa404cf 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -85,6 +85,7 @@ M: Thomas Huth <thuth@redhat.com>
+ M: David Hildenbrand <david@redhat.com>
+ M: Janosch Frank <frankja@linux.ibm.com>
+ R: Cornelia Huck <cohuck@redhat.com>
++R: Claudio Imbrenda <imbrenda@linux.ibm.com>
+ L: kvm@vger.kernel.org
+ L: linux-s390@vger.kernel.org
+ F: s390x/*
 -- 
-Regards/Gruss,
-    Boris.
+2.26.3
 
-https://people.kernel.org/tglx/notes-about-netiquette
