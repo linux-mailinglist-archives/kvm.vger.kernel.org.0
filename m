@@ -2,172 +2,222 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 79A5236CA1C
-	for <lists+kvm@lfdr.de>; Tue, 27 Apr 2021 19:10:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7788F36CA30
+	for <lists+kvm@lfdr.de>; Tue, 27 Apr 2021 19:16:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235411AbhD0RLD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 27 Apr 2021 13:11:03 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:22609 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S236392AbhD0RLB (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 27 Apr 2021 13:11:01 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1619543417;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=C2Sf4ABwZ69tuh9yBcDqXJGyy1ZZ54o5G9Q7ZZIQnos=;
-        b=DhkmgBXt3cerMLAQnITvjbEB/RAKAhH281O8fBYrEWFkn4qbVm3gfcCVcaGoBM4ULLQnIs
-        EpC6pLpu5koGILrbyOZ9MeA5bQSqsTweaVoEFvVfJGDzjSTg2skzd2rLmawuT+qFbq4Akk
-        SgRF20H67uyCOMHR+gzPOKzvtvQJSi8=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-519-KdB6NBnWMKSi-cfGXrcllw-1; Tue, 27 Apr 2021 13:10:15 -0400
-X-MC-Unique: KdB6NBnWMKSi-cfGXrcllw-1
-Received: by mail-ej1-f70.google.com with SMTP id ji8-20020a1709079808b029037c921a9ea0so11475941ejc.9
-        for <kvm@vger.kernel.org>; Tue, 27 Apr 2021 10:10:14 -0700 (PDT)
+        id S235762AbhD0RRb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 27 Apr 2021 13:17:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35854 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235512AbhD0RRb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 27 Apr 2021 13:17:31 -0400
+Received: from mail-oi1-x236.google.com (mail-oi1-x236.google.com [IPv6:2607:f8b0:4864:20::236])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DFEB7C061574
+        for <kvm@vger.kernel.org>; Tue, 27 Apr 2021 10:16:47 -0700 (PDT)
+Received: by mail-oi1-x236.google.com with SMTP id i81so60397009oif.6
+        for <kvm@vger.kernel.org>; Tue, 27 Apr 2021 10:16:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=cjLN3S0GeULsbPxdT9hsZGLgbdFkdVSdByKi9ZEU5XQ=;
+        b=Ul2bV2VZHH6Ai6ZqOr5blonHZPiadyI7u70WLXhRACTBIvpTGcM168KyQh5qF2NIcD
+         IYAwn5soV6P76rDDSneuhX4JJ+iQsYnTG8teS3Poz0M/t/RQ81FeLeNN9KkIdCfvTVdc
+         YRP4GDGrL8fs+iJPShYe2eozRY/j5ut6XufjaNv0AC2x6H0Z6YTqzfaktMGIbK9oLOpD
+         PQxCZwDAYXivbLP21O8job3Q1nP340jAeSDKvqXBAivyDqLLxrHQTDLbEBtJwHLvsuKH
+         VSgWO5A3BdYNLJiYj7qOQs7dKbsacHsdUPP3gqQUSxa/3CuXa2jJpqfupu1pIQGD9hmj
+         5+QA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=C2Sf4ABwZ69tuh9yBcDqXJGyy1ZZ54o5G9Q7ZZIQnos=;
-        b=aPuOJAmoN2QfbinlGzhEAE+yHunIgmTrZrcdXP+5TpQWMSoRGP5egNP3e2IDbqwt3y
-         9JjMT7/Ee6he2jrXAdHYkEf2XCPEl64C6E3b4nDjieA2D66SJhuAufQGQj+dTDOP0pVb
-         4aZ7+Oh5+GFzb4Fsctnwds9d3OEZK025B0/ByJLBsUKVvUtYJrUBPM3HuD6hzlQD7uhH
-         h53UpjRCRLhK/3kUiZtayPkEV2PV8CISXv4yCBsnmYMEe2x06XQHG5aSUVcp7/ePz6x1
-         rPrvbqW2oZ35B/JClFdxlf+cOdTnZzj+FTINsMHqjlxWpvPHN2BNbwt5Qm6ZMP+LhlNp
-         SVVw==
-X-Gm-Message-State: AOAM530d1fs9UPSRekBW1LubTBdswfTTB/e4Jz4TnUsJ1eKhTuNkGul5
-        9GheGHQvQ0BOiG7g9IFie/6WomtJu95Puzd+h4iFQMdYlGtjOwNHYb79qcHRzSYt2ZqsUNYp+tB
-        PJcaQOnCIf/8W
-X-Received: by 2002:a05:6402:3109:: with SMTP id dc9mr5677606edb.13.1619543413953;
-        Tue, 27 Apr 2021 10:10:13 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxB1bTSrBv7eL5ESsqyHUsok/cKDQZo8Jx2cXyrR0WSAdcEfUJ7kBZIiCmgxEChxnhyKT/ArA==
-X-Received: by 2002:a05:6402:3109:: with SMTP id dc9mr5677588edb.13.1619543413796;
-        Tue, 27 Apr 2021 10:10:13 -0700 (PDT)
-Received: from gator.home (cst2-174-132.cust.vodafone.cz. [31.30.174.132])
-        by smtp.gmail.com with ESMTPSA id hd30sm270127ejc.59.2021.04.27.10.10.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 27 Apr 2021 10:10:13 -0700 (PDT)
-Date:   Tue, 27 Apr 2021 19:10:11 +0200
-From:   Andrew Jones <drjones@redhat.com>
-To:     Alexandru Elisei <alexandru.elisei@arm.com>
-Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
-        pbonzini@redhat.com
-Subject: Re: [kvm-unit-tests PATCH v2] configure: arm: Replace --vmm with
- --target
-Message-ID: <20210427171011.ymu7j5sen76c4xb3@gator.home>
-References: <20210427163437.243839-1-alexandru.elisei@arm.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=cjLN3S0GeULsbPxdT9hsZGLgbdFkdVSdByKi9ZEU5XQ=;
+        b=nSs7ZLtnRyiY2Ard4ARPQOTBnfGwu98PhC7yrKWlIlR8fmFtkQfhNZlxO7irkHlJo8
+         Hw/i6yDLYk5XcARvcTjad0wBDJcyq8MR4jUs0Akf0Mq3hgSuKAarMWQUxILIL7Mh9pLf
+         czc26tKv9mDjrqs0Ad8a6fNTdYuRubq06LPPF6v485UHaHV+MVqPp+3HOfq716xCYV7e
+         zvSP1uxT0gixUQWeZxUnUhaPPhLJMGMib31rXRbEr2gZLRVBPjWeJnaw81reKi8fG/N6
+         hT275gN7Wi7PlGUNcyGv2VdaV+yat2ZfRiQvj6H2LedhqR2tAuyybDi+f5Czxi0JFWwY
+         Cmqg==
+X-Gm-Message-State: AOAM5314/16UpMB16AdbKi5F9YIrAGqZjMF1bS/UpkIXG6gJdWl26FLr
+        gVJPLOZ3Tpeo1GvZQVOWSGC16+iIJaK53KyD5rcFhg==
+X-Google-Smtp-Source: ABdhPJyC2GcXZmSkD+cIPWyDka0DgbCKhoOdedWjvH76R54ZiDq+3yLOSjizHfeHHHsqdOoV8+E56OQGxMCHYRaPSQg=
+X-Received: by 2002:aca:3cd6:: with SMTP id j205mr16864460oia.28.1619543806617;
+ Tue, 27 Apr 2021 10:16:46 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210427163437.243839-1-alexandru.elisei@arm.com>
+References: <20210427170332.706287-1-aaronlewis@google.com>
+In-Reply-To: <20210427170332.706287-1-aaronlewis@google.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Tue, 27 Apr 2021 10:16:33 -0700
+Message-ID: <CALMp9eRW2V7y8Z76dmkO3hoh3Ly9QBLOtT-Madxhi5T8z+eVmA@mail.gmail.com>
+Subject: Re: [PATCH v4 1/2] kvm: x86: Allow userspace to handle emulation errors
+To:     Aaron Lewis <aaronlewis@google.com>
+Cc:     David Edmondson <david.edmondson@oracle.com>,
+        Sean Christopherson <seanjc@google.com>,
+        kvm list <kvm@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Apr 27, 2021 at 05:34:37PM +0100, Alexandru Elisei wrote:
-> The --vmm configure option was added to distinguish between the two virtual
-> machine managers that kvm-unit-tests supports, qemu or kvmtool. There are
-> plans to make kvm-unit-tests work as an EFI app, which will require changes
-> to the way tests are compiled. Instead of adding a new configure option
-> specifically for EFI and have it coexist with --vmm, or overloading the
-> semantics of the existing --vmm option, let's replace --vmm with the more
-> generic name --target.
-> 
-> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
-> ---
-> Changes in v2:
-> 
-> * Removed the RFC tag and cover letter.
-> * Removed --vmm entirely.
-> 
->  configure | 19 ++++++++++---------
->  1 file changed, 10 insertions(+), 9 deletions(-)
-> 
-> diff --git a/configure b/configure
-> index 01a0b262a9f2..08c6afdf952c 100755
-> --- a/configure
-> +++ b/configure
-> @@ -21,7 +21,7 @@ pretty_print_stacks=yes
->  environ_default=yes
->  u32_long=
->  wa_divide=
-> -vmm="qemu"
-> +target="qemu"
->  errata_force=0
->  erratatxt="$srcdir/errata.txt"
->  host_key_document=
-> @@ -35,8 +35,8 @@ usage() {
->  	Options include:
->  	    --arch=ARCH            architecture to compile for ($arch)
->  	    --processor=PROCESSOR  processor to compile for ($arch)
-> -	    --vmm=VMM              virtual machine monitor to compile for (qemu
-> -	                           or kvmtool, default is qemu) (arm/arm64 only)
-> +	    --target=TARGET        target platform that the tests will be running on (qemu or
-> +	                           kvmtool, default is qemu) (arm/arm64 only)
->  	    --cross-prefix=PREFIX  cross compiler prefix
->  	    --cc=CC		   c compiler to use ($cc)
->  	    --ld=LD		   ld linker to use ($ld)
-> @@ -58,7 +58,7 @@ usage() {
->  	    --earlycon=EARLYCON
->  	                           Specify the UART name, type and address (optional, arm and
->  	                           arm64 only). The specified address will overwrite the UART
-> -	                           address set by the --vmm option. EARLYCON can be one of
-> +	                           address set by the --target option. EARLYCON can be one of
->  	                           (case sensitive):
->  	               uart[8250],mmio,ADDR
->  	                           Specify an 8250 compatible UART at address ADDR. Supported
-> @@ -88,8 +88,8 @@ while [[ "$1" = -* ]]; do
->          --processor)
->  	    processor="$arg"
->  	    ;;
-> -	--vmm)
-> -	    vmm="$arg"
-> +	--target)
-> +	    target="$arg"
->  	    ;;
->  	--cross-prefix)
->  	    cross_prefix="$arg"
-> @@ -177,13 +177,13 @@ if [ "$arch" = "i386" ] || [ "$arch" = "x86_64" ]; then
->      testdir=x86
->  elif [ "$arch" = "arm" ] || [ "$arch" = "arm64" ]; then
->      testdir=arm
-> -    if [ "$vmm" = "qemu" ]; then
-> +    if [ "$target" = "qemu" ]; then
->          arm_uart_early_addr=0x09000000
-> -    elif [ "$vmm" = "kvmtool" ]; then
-> +    elif [ "$target" = "kvmtool" ]; then
->          arm_uart_early_addr=0x3f8
->          errata_force=1
->      else
-> -        echo '--vmm must be one of "qemu" or "kvmtool"!'
-> +        echo '--target must be one of "qemu" or "kvmtool"!'
->          usage
->      fi
->  
-> @@ -317,6 +317,7 @@ U32_LONG_FMT=$u32_long
->  WA_DIVIDE=$wa_divide
->  GENPROTIMG=${GENPROTIMG-genprotimg}
->  HOST_KEY_DOCUMENT=$host_key_document
-> +TARGET=$target
+On Tue, Apr 27, 2021 at 10:03 AM Aaron Lewis <aaronlewis@google.com> wrote:
+>
+> Add a fallback mechanism to the in-kernel instruction emulator that
+> allows userspace the opportunity to process an instruction the emulator
+> was unable to.  When the in-kernel instruction emulator fails to process
+> an instruction it will either inject a #UD into the guest or exit to
+> userspace with exit reason KVM_INTERNAL_ERROR.  This is because it does
+> not know how to proceed in an appropriate manner.  This feature lets
+> userspace get involved to see if it can figure out a better path
+> forward.
+>
+> Signed-off-by: Aaron Lewis <aaronlewis@google.com>
+...
+> +static void prepare_emulation_failure_exit(struct kvm_vcpu *vcpu)
+> +{
+> +       struct x86_emulate_ctxt *ctxt = vcpu->arch.emulate_ctxt;
+> +       u64 insn_size = ctxt->fetch.end - ctxt->fetch.data;
+> +       struct kvm_run *run = vcpu->run;
+> +       const u64 max_insn_size = 15;
 
-We should only emit this TARGET=qemu to the config.mak when we're
-arm/arm64, since that's what the help text says. Also, because the help
-text says that the --target option is only for arm/arm64, then configure
-should error out if it's used with another architecture. The nice thing
-about this rename is that we can get that right this time. We didn't error
-out with --vmm, but we should have. Erroring out on an unsupported
-feature allows us to add support for it later without the users having
-to guess if it'll work or not.
+Nit: insn_size and max_insn_size could both be just unsigned int.
 
-Thanks,
-drew
+> +       run->exit_reason = KVM_EXIT_INTERNAL_ERROR;
+> +       run->emulation_failure.suberror = KVM_INTERNAL_ERROR_EMULATION;
+> +       run->emulation_failure.ndata = 0;
+> +       run->emulation_failure.flags = 0;
+> +
+> +       if (insn_size) {
+> +               run->emulation_failure.ndata = 3;
+> +               run->emulation_failure.flags |=
+> +                       KVM_INTERNAL_ERROR_EMULATION_FLAG_INSTRUCTION_BYTES;
+> +               run->emulation_failure.insn_size = insn_size;
+> +               memset(run->emulation_failure.insn_bytes, 0x90, max_insn_size);
+> +               memcpy(run->emulation_failure.insn_bytes,
+> +                      ctxt->fetch.data, insn_size);
 
->  EOF
->  
->  cat <<EOF > lib/config.h
-> -- 
-> 2.31.1
-> 
+It's tempting to check that insn_size doesn't exceed 15, but I'm sure
+we all trust the emulator.
 
+> +       }
+> +}
+> +
+>  static int handle_emulation_failure(struct kvm_vcpu *vcpu, int emulation_type)
+>  {
+> +       struct kvm *kvm = vcpu->kvm;
+> +
+>         ++vcpu->stat.insn_emulation_fail;
+>         trace_kvm_emulate_insn_failed(vcpu);
+>
+> @@ -7129,10 +7159,9 @@ static int handle_emulation_failure(struct kvm_vcpu *vcpu, int emulation_type)
+>                 return 1;
+>         }
+>
+> -       if (emulation_type & EMULTYPE_SKIP) {
+> -               vcpu->run->exit_reason = KVM_EXIT_INTERNAL_ERROR;
+> -               vcpu->run->internal.suberror = KVM_INTERNAL_ERROR_EMULATION;
+> -               vcpu->run->internal.ndata = 0;
+> +       if (kvm->arch.exit_on_emulation_error ||
+> +           (emulation_type & EMULTYPE_SKIP)) {
+> +               prepare_emulation_failure_exit(vcpu);
+>                 return 0;
+>         }
+>
+> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> index f6afee209620..87009222c20c 100644
+> --- a/include/uapi/linux/kvm.h
+> +++ b/include/uapi/linux/kvm.h
+> @@ -279,6 +279,9 @@ struct kvm_xen_exit {
+>  /* Encounter unexpected vm-exit reason */
+>  #define KVM_INTERNAL_ERROR_UNEXPECTED_EXIT_REASON      4
+>
+> +/* Flags that describe what fields in emulation_failure hold valid data. */
+> +#define KVM_INTERNAL_ERROR_EMULATION_FLAG_INSTRUCTION_BYTES (1ULL << 0)
+> +
+>  /* for KVM_RUN, returned by mmap(vcpu_fd, offset=0) */
+>  struct kvm_run {
+>         /* in */
+> @@ -382,6 +385,25 @@ struct kvm_run {
+>                         __u32 ndata;
+>                         __u64 data[16];
+>                 } internal;
+> +               /*
+> +                * KVM_INTERNAL_ERROR_EMULATION
+> +                *
+> +                * "struct emulation_failure" is an overlay of "struct internal"
+> +                * that is used for the KVM_INTERNAL_ERROR_EMULATION sub-type of
+> +                * KVM_EXIT_INTERNAL_ERROR.  Note, unlike other internal error
+> +                * sub-types, this struct is ABI!  It also needs to be backwards
+> +                * compabile with "struct internal".  Take special care that
+> +                * "ndata" is correct, that new fields are enumerated in "flags",
+> +                * and that each flag enumerates fields that are 64-bit aligned
+> +                * and sized (so that ndata+internal.data[] is valid/accurate).
+> +                */
+> +               struct {
+> +                       __u32 suberror;
+> +                       __u32 ndata;
+> +                       __u64 flags;
+> +                       __u8  insn_size;
+> +                       __u8  insn_bytes[15];
+> +               } emulation_failure;
+>                 /* KVM_EXIT_OSI */
+>                 struct {
+>                         __u64 gprs[32];
+> @@ -1078,6 +1100,7 @@ struct kvm_ppc_resize_hpt {
+>  #define KVM_CAP_DIRTY_LOG_RING 192
+>  #define KVM_CAP_X86_BUS_LOCK_EXIT 193
+>  #define KVM_CAP_PPC_DAWR1 194
+> +#define KVM_CAP_EXIT_ON_EMULATION_FAILURE 195
+>
+>  #ifdef KVM_CAP_IRQ_ROUTING
+>
+> diff --git a/tools/include/uapi/linux/kvm.h b/tools/include/uapi/linux/kvm.h
+> index f6afee209620..87009222c20c 100644
+> --- a/tools/include/uapi/linux/kvm.h
+> +++ b/tools/include/uapi/linux/kvm.h
+> @@ -279,6 +279,9 @@ struct kvm_xen_exit {
+>  /* Encounter unexpected vm-exit reason */
+>  #define KVM_INTERNAL_ERROR_UNEXPECTED_EXIT_REASON      4
+>
+> +/* Flags that describe what fields in emulation_failure hold valid data. */
+> +#define KVM_INTERNAL_ERROR_EMULATION_FLAG_INSTRUCTION_BYTES (1ULL << 0)
+> +
+>  /* for KVM_RUN, returned by mmap(vcpu_fd, offset=0) */
+>  struct kvm_run {
+>         /* in */
+> @@ -382,6 +385,25 @@ struct kvm_run {
+>                         __u32 ndata;
+>                         __u64 data[16];
+>                 } internal;
+> +               /*
+> +                * KVM_INTERNAL_ERROR_EMULATION
+> +                *
+> +                * "struct emulation_failure" is an overlay of "struct internal"
+> +                * that is used for the KVM_INTERNAL_ERROR_EMULATION sub-type of
+> +                * KVM_EXIT_INTERNAL_ERROR.  Note, unlike other internal error
+> +                * sub-types, this struct is ABI!  It also needs to be backwards
+> +                * compabile with "struct internal".  Take special care that
+> +                * "ndata" is correct, that new fields are enumerated in "flags",
+> +                * and that each flag enumerates fields that are 64-bit aligned
+> +                * and sized (so that ndata+internal.data[] is valid/accurate).
+> +                */
+> +               struct {
+> +                       __u32 suberror;
+> +                       __u32 ndata;
+> +                       __u64 flags;
+> +                       __u8  insn_size;
+> +                       __u8  insn_bytes[15];
+> +               } emulation_failure;
+>                 /* KVM_EXIT_OSI */
+>                 struct {
+>                         __u64 gprs[32];
+> @@ -1078,6 +1100,7 @@ struct kvm_ppc_resize_hpt {
+>  #define KVM_CAP_DIRTY_LOG_RING 192
+>  #define KVM_CAP_X86_BUS_LOCK_EXIT 193
+>  #define KVM_CAP_PPC_DAWR1 194
+> +#define KVM_CAP_EXIT_ON_EMULATION_FAILURE 195
+>
+>  #ifdef KVM_CAP_IRQ_ROUTING
+>
+> --
+> 2.31.1.498.g6c1eba8ee3d-goog
+>
