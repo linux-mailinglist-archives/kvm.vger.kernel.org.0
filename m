@@ -2,86 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 66ACE36CE2D
-	for <lists+kvm@lfdr.de>; Tue, 27 Apr 2021 23:58:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9FA2E36CE68
+	for <lists+kvm@lfdr.de>; Wed, 28 Apr 2021 00:04:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239377AbhD0V7Y (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 27 Apr 2021 17:59:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41856 "EHLO
+        id S239028AbhD0WFi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 27 Apr 2021 18:05:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43234 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239364AbhD0V7O (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 27 Apr 2021 17:59:14 -0400
-Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3525BC06175F
-        for <kvm@vger.kernel.org>; Tue, 27 Apr 2021 14:58:31 -0700 (PDT)
-Received: by mail-pl1-x636.google.com with SMTP id a11so762663plh.3
-        for <kvm@vger.kernel.org>; Tue, 27 Apr 2021 14:58:31 -0700 (PDT)
+        with ESMTP id S237136AbhD0WFh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 27 Apr 2021 18:05:37 -0400
+Received: from mail-pf1-x42c.google.com (mail-pf1-x42c.google.com [IPv6:2607:f8b0:4864:20::42c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E0E3C061574
+        for <kvm@vger.kernel.org>; Tue, 27 Apr 2021 15:04:52 -0700 (PDT)
+Received: by mail-pf1-x42c.google.com with SMTP id c19so6444911pfv.2
+        for <kvm@vger.kernel.org>; Tue, 27 Apr 2021 15:04:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=GM2oAi1eIassl2KE9QEB2DIOW4+0ysif8RFRhM2xzYI=;
-        b=WG/aZBu2xYsBYP0PTRaptVMtN/fcTuR7BD/9Op2YIBWgCClIBBhHij0fZI/Cb8p2M8
-         B/vSq/QWoue5+UrK/zKcotuDhJqw/g203QjwVTfNJtgi0pJ5HOGjzAXGmcHdKkMa2iS0
-         olq9RVpkYDR51A55tjTQXTaOEauSqSiZZJ5LeyZsc9xcOCqryq9ZBHtv9CUhApCy2Op5
-         sZyhYk4anVC5X0xu5CE43QB6ZHtNJlQHV9bHIDEC7dK463503lZQkHfBt+XQHTCG1vpa
-         /cUlv2iwHrTYDCXXfDtiqbZERz5udd9/Q8UumEhpHcThFv38Z4f3b4aog5RC98KCnLjU
-         3qmA==
+        bh=Tvy9sjWqnF7JDLiqaC+vIZWUwHqerNYoWSgKZH8wt6M=;
+        b=me1+oJICsXM/Honee56OF6na2Z0Qe5yGdxkxw7as4C5ZgfzMtjQlpHfnmNak4ps01w
+         DxFLH3IDfdqPaUuCb9yLX6dg3RNuritgPghiVHkqFJHFBJvS+CHD7DR+MB4LVcq6YZdD
+         iFC35b73L3K0ItwA2PUAQsTkcLCacyl0w2WtTs3iLRB4d4Jw75w0wSxcbsSOpDooGsQr
+         NOO1CCqzrxph4RjD11FMIiiOYGTm3xlf9u7EovjM6KmpPhK8t5O85LZN1OB7aQpX5hlW
+         hGPrprBRcItrz4FhcKYLiwtGPoo28sIbRahPRTA5i5vcRS4YmFC8VtHoW8uAv/KNZAaY
+         NrMA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=GM2oAi1eIassl2KE9QEB2DIOW4+0ysif8RFRhM2xzYI=;
-        b=bMHtJeYeRGuClj7yWmCbVOfIeNpseWK8NLpcarD2tMolgNgw3eIAiGcx5wtD2MfF8x
-         AVk9l1uyFoEJfB6LRHwZbjeZKgVyu30VrXlmssZb+nOkWzElXfERSFRrOpXL7F5SGjTU
-         7G/Q9j27SYbThts5DxBINZEDb7lfm/XVRSa2kJesJnyMtRZIBWGxZ3+wLDBoZD2cbXy+
-         czvm9wQEkI4n40b4XDfWMRyEgdIP0fdtXCMsbBXXKvt74dxS6k+B82/WEGdYQZdBNNwC
-         PN369mBs9zOTcFdwxWaIENazBfHc9kx+JNqhtU/WAPs2bYbgtBX+TK1E/kvgkuBz4fjd
-         PoVA==
-X-Gm-Message-State: AOAM531bP/f/KedDLGnPhBXVl0/dYrZa60P2Sw05RW1bAz/U+NvPHd1j
-        6Nh062ZUI0AL7YKd/Q/atIVlcw==
-X-Google-Smtp-Source: ABdhPJwoNIoYndE80IPG3x6wK5IIiV+e7UukRLYi6vTtjvv6ZEjgO5qlKYaLKDVs8gBqYQDd2r5/vQ==
-X-Received: by 2002:a17:90b:4c8b:: with SMTP id my11mr388997pjb.201.1619560710674;
-        Tue, 27 Apr 2021 14:58:30 -0700 (PDT)
+        bh=Tvy9sjWqnF7JDLiqaC+vIZWUwHqerNYoWSgKZH8wt6M=;
+        b=GtEqCVlgcxvYQ0+BEJD86EnBQLkhdadXVKsaB/kZT83cOg+XcmNe0uAJLs2J5fOd4P
+         ehInwI9cKRUMyir0LyIMLHlBbMqYOK6tMUA5aSpQd6yL/cQ5VN4ZCI4OgyfKeB/d3BlA
+         A5/IOzUHMxmwBBokerDdhjyV0+imfWn8/zr9Rs/LVzawbTaMSX7UpJJEXBukBkyqmgYe
+         rg9KVZqMhssvZwHg8M7LNSHyDOjSEK2ighIziFrjeXNPXTaZUTs3WSAdUH2oD003fnZk
+         rcF7qijYcKlqRGU/Y7pe3inG6CvKFt1Ttj8+Q939qFq/6l/V7wylnFDzKrFws/mcEMVs
+         X8Ow==
+X-Gm-Message-State: AOAM532vFdC9AvAwIh1hnex+4Q74DygBotFXGyB2vBuetlT46J8OKNfs
+        xO5ydDAkT4HwZ1p5P9rB6cm69Q==
+X-Google-Smtp-Source: ABdhPJzyI0QDlQb9VCOlfpWW47x4/lUh4o18JWTGrDq9omVNi86NR1NQOYD6sx1HCX1/v89M9XzJIA==
+X-Received: by 2002:a63:144e:: with SMTP id 14mr23922285pgu.53.1619561091467;
+        Tue, 27 Apr 2021 15:04:51 -0700 (PDT)
 Received: from google.com (240.111.247.35.bc.googleusercontent.com. [35.247.111.240])
-        by smtp.gmail.com with ESMTPSA id 14sm2682634pfv.33.2021.04.27.14.58.29
+        by smtp.gmail.com with ESMTPSA id in1sm2965300pjb.23.2021.04.27.15.04.50
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 27 Apr 2021 14:58:30 -0700 (PDT)
-Date:   Tue, 27 Apr 2021 21:58:26 +0000
+        Tue, 27 Apr 2021 15:04:50 -0700 (PDT)
+Date:   Tue, 27 Apr 2021 22:04:47 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     Reiji Watanabe <reijiw@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 3/4] KVM: x86: Tie Intel and AMD behavior for
- MSR_TSC_AUX to guest CPU model
-Message-ID: <YIiJAjZQevp+DT9h@google.com>
-References: <20210423223404.3860547-1-seanjc@google.com>
- <20210423223404.3860547-4-seanjc@google.com>
- <CAAeT=FxhkRhwysd4mQa=iqEaje7R5nHew8ougtoyDEhL2sYxGA@mail.gmail.com>
- <YIcWvcneHWA9OPxv@google.com>
- <CAAeT=FzVDFVCjYAZyc+QXwtLeOW5UR6AsYZwNT6kFbOwnn=xFQ@mail.gmail.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        srutherford@google.com, joro@8bytes.org, brijesh.singh@amd.com,
+        thomas.lendacky@amd.com, venu.busireddy@oracle.com,
+        Ashish Kalra <ashish.kalra@amd.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Borislav Petkov <bp@suse.de>,
+        x86@kernel.org
+Subject: Re: [PATCH v2 1/2] KVM: X86: Introduce KVM_HC_PAGE_ENC_STATUS
+ hypercall
+Message-ID: <YIiKf21hqOo4W17H@google.com>
+References: <20210421173716.1577745-1-pbonzini@redhat.com>
+ <20210421173716.1577745-2-pbonzini@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAAeT=FzVDFVCjYAZyc+QXwtLeOW5UR6AsYZwNT6kFbOwnn=xFQ@mail.gmail.com>
+In-Reply-To: <20210421173716.1577745-2-pbonzini@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Apr 26, 2021, Reiji Watanabe wrote:
- 
-> > There is also a kernel bug lurking; vgetcpu_cpu_init() doesn't check
-> > X86_FEATURE_RDPID and will fail to initialize MSR_TSC_AUX if RDPID is supported
-> > but RDTSCP is not, and __getcpu() uses RDPID.  I'll verify that's broken and
-> > send a patch for that one too.
-> 
-> I don't find vgetcpu_cpu_init() or __getcpu() in
-> https://github.com/torvalds/linux.
-> I would assume you meant setup_getcpu() and vdso_read_cpunode() instead (?).
+On Wed, Apr 21, 2021, Paolo Bonzini wrote:
+> @@ -8334,6 +8350,26 @@ int kvm_emulate_hypercall(struct kvm_vcpu *vcpu)
+>  		kvm_sched_yield(vcpu, a0);
+>  		ret = 0;
+>  		break;
+> +	case KVM_HC_PAGE_ENC_STATUS: {
+> +		u64 gpa = a0, npages = a1, enc = a2;
 
-Ya, I was looking at an old kernel when I typed that up.  Bug is still there
-though :-)
+newline
+
+> +		if (!guest_pv_has(vcpu, KVM_FEATURE_HC_PAGE_ENC_STATUS)
+> +		    || !(vcpu->kvm->arch.hypercall_exit_enabled & (1 << KVM_HC_PAGE_ENC_STATUS)))
+
+|| on previous line, pretty please :-)
+
+> +			break;
+> +
+> +		ret = -KVM_EINVAL;
+> +		if (!PAGE_ALIGNED(gpa) || !npages ||
+> +		    gpa_to_gfn(gpa) + npages <= gpa_to_gfn(gpa))
+> +			break;
+> +
+> +		vcpu->run->exit_reason        = KVM_EXIT_HYPERCALL;
+> +		vcpu->run->hypercall.nr       = KVM_HC_PAGE_ENC_STATUS;
+> +		vcpu->run->hypercall.args[0]  = gpa;
+> +		vcpu->run->hypercall.args[1]  = npages;
+> +		vcpu->run->hypercall.args[2]  = enc;
+> +		vcpu->run->hypercall.longmode = op_64_bit;
+> +		vcpu->arch.complete_userspace_io = complete_hypercall_exit;
+> +		return 0;
+> +	}
+>  	default:
+>  		ret = -KVM_ENOSYS;
+>  		break;
