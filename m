@@ -2,84 +2,142 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7BFBB36BCCB
-	for <lists+kvm@lfdr.de>; Tue, 27 Apr 2021 03:00:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0501C36BD30
+	for <lists+kvm@lfdr.de>; Tue, 27 Apr 2021 04:19:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235240AbhD0BBH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 26 Apr 2021 21:01:07 -0400
-Received: from mail.kernel.org ([198.145.29.99]:50050 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232022AbhD0BBF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 26 Apr 2021 21:01:05 -0400
-Received: from oasis.local.home (cpe-66-24-58-225.stny.res.rr.com [66.24.58.225])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 30CAF60BBB;
-        Tue, 27 Apr 2021 01:00:22 +0000 (UTC)
-Date:   Mon, 26 Apr 2021 21:00:20 -0400
-From:   Steven Rostedt <rostedt@goodmis.org>
-To:     Lai Jiangshan <jiangshanlai+lkml@gmail.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        LKML <linux-kernel@vger.kernel.org>,
-        Josh Poimboeuf <jpoimboe@redhat.com>,
-        Uros Bizjak <ubizjak@gmail.com>,
-        Andi Kleen <ak@linux.intel.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Sean Christopherson <seanjc@google.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>
-Subject: Re: [PATCH v2 2/2] KVM: VMX: Invoke NMI handler via indirect call
- instead of INTn
-Message-ID: <20210426210020.417e3cfc@oasis.local.home>
-In-Reply-To: <CAJhGHyDrAwKO1iht=d0j+OKD1U7e1fzLminudxo2sPHbF53TKQ@mail.gmail.com>
-References: <20200915191505.10355-1-sean.j.christopherson@intel.com>
-        <20200915191505.10355-3-sean.j.christopherson@intel.com>
-        <CAJhGHyBOLUeqnwx2X=WToE2oY8Zkqj_y4KZ0hoq-goe+UWcR9g@mail.gmail.com>
-        <bb2c2d93-8046-017a-5711-c61c8f1a4c09@redhat.com>
-        <CAJhGHyDrAwKO1iht=d0j+OKD1U7e1fzLminudxo2sPHbF53TKQ@mail.gmail.com>
-X-Mailer: Claws Mail 3.17.3 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+        id S231449AbhD0CUA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 26 Apr 2021 22:20:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34852 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230371AbhD0CT7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 26 Apr 2021 22:19:59 -0400
+Received: from mail-oi1-x22e.google.com (mail-oi1-x22e.google.com [IPv6:2607:f8b0:4864:20::22e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E1130C061574
+        for <kvm@vger.kernel.org>; Mon, 26 Apr 2021 19:19:16 -0700 (PDT)
+Received: by mail-oi1-x22e.google.com with SMTP id k25so58413068oic.4
+        for <kvm@vger.kernel.org>; Mon, 26 Apr 2021 19:19:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=stonybrook.edu; s=sbu-gmail;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=hrHKmIfBIcMjhw0JQdGpkfRgnab+2X4SAi9olXFMVAc=;
+        b=rtbGsdKaHzEtDJqdQqtFPJhTDvqH8p9JEHQQkQqnMOzQvDg2amMEKvBQLEHbuOIo18
+         hqhDlnenECQpctFqbGog74r3bam8hURUgG8ZKw8y4WXomn1vKGgho79AIzEPuBWe1UwI
+         d120luiSbObZSPhjbWr7uYKfjDQBWmcm1h4rM=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=hrHKmIfBIcMjhw0JQdGpkfRgnab+2X4SAi9olXFMVAc=;
+        b=sqRRJLehBVBtLDaJ/kNiMRmkPAUIEDL97FiZGAiKiccW5lUtrzFszp28j1VG6KVqZx
+         ip//6fCg1Ti8GLKmML+ejDh1+LT4SEdtRglIOp8FlB7dKs/dA5FmHOH7rutHCfKFfCOP
+         nq2IORslgRUurzCRfY0XgBEVUvSl8wQiVneQVFwY7RlbN9wGQNB4tQIEcmNDHBOpq95v
+         e7MxMqHtGyD/z7bf0gFUUnaT41/ojVl8LUuqRf6W2Qh+1Oas67wDk7RxZBGdNLsEm+Du
+         V+FFV8su+a/KIIcMBxhZqSJ+h/usvApERvwqdCbdQxtdPofsbf2p46pxIiRJbrVVs/1q
+         0zdw==
+X-Gm-Message-State: AOAM530tEHfuXex6lqK9SsU3mp9sYMyQWrF0H0tkGi2N3TMZaiheF7Q7
+        Axq51ZUeaeySNbWJ7R1ONbSeJekqiTM4rghVIwzXFA==
+X-Google-Smtp-Source: ABdhPJw7flIluNbImVhsOCUe4YIKldkeWijMrcSEHUm2b3DgG+lXdVJq2remNnjMSsqnSrYvtgimTLrJsaGUVZXKmfY=
+X-Received: by 2002:aca:ba09:: with SMTP id k9mr14340838oif.178.1619489956142;
+ Mon, 26 Apr 2021 19:19:16 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <CAJGDS+GKd_YR9QmTR-6KsiE16=4s8fuqh8pmQTYnxHXS=mYp9g@mail.gmail.com>
+ <YH2z3uuQYwSyGJfL@google.com> <CAJGDS+FGnDFssYXLfLrog+AJu62rrs6DzAQuESJSDaNNdsYdcw@mail.gmail.com>
+ <CAJGDS+GT1mKHz6K=qHQf54S_97ym=nRP12MfO6OSEOpLYGht=A@mail.gmail.com> <YIbkxXwHPTPhN20C@google.com>
+In-Reply-To: <YIbkxXwHPTPhN20C@google.com>
+From:   Arnabjyoti Kalita <akalita@cs.stonybrook.edu>
+Date:   Tue, 27 Apr 2021 07:49:04 +0530
+Message-ID: <CAJGDS+EjtHmV7fdQmtHfiRG3uywd5=XbFb_VWr-GhCpmuN+=zA@mail.gmail.com>
+Subject: Re: Intercepting RDTSC instruction by causing a VMEXIT
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 27 Apr 2021 08:54:37 +0800
-Lai Jiangshan <jiangshanlai+lkml@gmail.com> wrote:
+Hello Sean,
 
-> > However, I'm not sure which of the two situations is better: entering
-> > the NMI handler on the IST without setting the hidden NMI-blocked flag
-> > could be a recipe for bad things as well.  
-> 
-> The change makes the ASM NMI entry called on the kernel stack.  But the
-> ASM NMI entry expects it on the IST stack and it plays with "NMI executing"
-> variable on the IST stack.  In this change, the stranded ASM NMI entry
-> will use the wrong/garbage "NMI executing" variable on the kernel stack
-> and may do some very wrong thing.
+Thank you very much again. I didn't know about the tracepointing
+methodology. This is very helpful, indeed.
 
-I missed this detail.
+In addition to my requirement of recording tsc values, I am trying to
+track when the VMEXITs happen in userspace(QEMU). This allows me to
+correlate recorded TSC values with the VMEXIT sequence. So, causing a
+VMEXIT in userspace is absolutely essential to me and I would love to
+have some pointers on how to do it.
 
-> 
-> Sorry, in my reply, "the NMI handler" meant to be the ASM entry installed
-> on the IDT table which really expects to be NMI-masked at the beginning.
-> 
-> The C NMI handler can handle the case of nested NMIs, which is useful
-> here.  I think we should change it to call the C NMI handler directly
-> here as Andy Lutomirski suggested:
+I run a server within the guest and I'm okay with performance dropping
+down to within a factor of 2 compared to running the server on native
+hardware. I run this experiment for about 20-30 seconds.
 
-Yes, because that's the way x86_32 works.
+Best Regards,
+Arnabjyoti Kalita
 
-> 
-> On Mon, Apr 26, 2021 at 11:09 PM Andy Lutomirski <luto@amacapital.net> wrote:
-> > The C NMI code has its own reentrancy protection and has for years.
-> > It should work fine for this use case.  
-> 
-> I think this is the right way.
 
-Agreed.
-
--- Steve
+On Mon, Apr 26, 2021 at 9:35 PM Sean Christopherson <seanjc@google.com> wrote:
+>
+> On Mon, Apr 26, 2021, Arnabjyoti Kalita wrote:
+> > Hello Sean,
+> >
+> > Thank you very much for your answer again. I could actually see that the
+> > RDTSC handler gets called successfully. I added a "printk" statement to the
+> > handler and I can see the messages being printed out to the kernel syslog.
+> >
+> > However, I am not sure if a VMEXIT is happening in userspace. I use QEMU
+> > and I do not see any notification from QEMU that tells me that a VMEXIT
+> > happened due to RDTSC being executed. Is there a mechanism to confirm this?
+>
+> Without further modification, KVM will _not_ exit to userspace in this case.
+>
+> > My actual requirement to record tsc values read out as a result of RDTSC
+> > execution still stands.
+>
+> Your requirement didn't clarify that userspace needed to record the values ;-)
+>
+> Forcing an exit to userspace is very doable, but will tank guest performance and
+> possibly interfere with whatever you're trying to do.  I would try adding a
+> tracepoint and using that to capture the TSC values.  Adding guest RIP, etc...
+> as needed is trivial.
+>
+> diff --git a/arch/x86/kvm/trace.h b/arch/x86/kvm/trace.h
+> index a61c015870e3..e962e813ba04 100644
+> --- a/arch/x86/kvm/trace.h
+> +++ b/arch/x86/kvm/trace.h
+> @@ -821,6 +821,23 @@ TRACE_EVENT(
+>                   __entry->gpa_match ? "GPA" : "GVA")
+>  );
+>
+> +TRACE_EVENT(kvm_emulate_rdtsc,
+> +       TP_PROTO(unsigned int vcpu_id, __u64 tsc),
+> +       TP_ARGS(vcpu_id, tsc),
+> +
+> +       TP_STRUCT__entry(
+> +               __field( unsigned int,  vcpu_id         )
+> +               __field(        __u64,  tsc             )
+> +       ),
+> +
+> +       TP_fast_assign(
+> +               __entry->vcpu_id                = vcpu_id;
+> +               __entry->tsc                    = tsc;
+> +       ),
+> +
+> +       TP_printk("vcpu=%u tsc=%llu", __entry->vcpu_id, __entry->tsc)
+> +);
+> +
+>  TRACE_EVENT(kvm_write_tsc_offset,
+>         TP_PROTO(unsigned int vcpu_id, __u64 previous_tsc_offset,
+>                  __u64 next_tsc_offset),
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index 61bf0b86770b..1fbeef520349 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -5254,6 +5254,8 @@ static int handle_rdtsc(struct kvm_vcpu *vcpu)
+>  {
+>         u64 tsc = kvm_read_l1_tsc(vcpu, rdtsc());
+>
+> +       trace_kvm_emulate_rdtsc(vcpu->vcpu_id, tsc);
+> +
+>         kvm_rax_write(vcpu, tsc & -1u);
+>         kvm_rdx_write(vcpu, (tsc >> 32) & -1u);
+>         return kvm_skip_emulated_instruction(vcpu);
