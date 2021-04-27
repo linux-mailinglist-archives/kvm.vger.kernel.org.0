@@ -2,102 +2,143 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E7B8836BFBD
-	for <lists+kvm@lfdr.de>; Tue, 27 Apr 2021 09:06:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4C05136C01E
+	for <lists+kvm@lfdr.de>; Tue, 27 Apr 2021 09:34:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234948AbhD0HHM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 27 Apr 2021 03:07:12 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:27632 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234843AbhD0HGh (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 27 Apr 2021 03:06:37 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1619507155;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=hU0X065Jts3zXqonmt3u6RVQ5smooOA0uzd+qO/RgE8=;
-        b=P8QSjF0q6m50cIAybdy2A4o8mfyp1KsskxX3363cAZllMxsaytEr0PP5x9GuDdVdXXmy83
-        C1U0N3iwkYnIe7RAHi2UPvo/xVHCgmqf5l6wAkCjpKZxRKGkTfTgjkj35YuPeedKbAJTOV
-        hHMPTb0L9y13JCD8UVhWLvgVwAiiTcI=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-143-21UlObUENe-ICImkjL4j2Q-1; Tue, 27 Apr 2021 03:05:52 -0400
-X-MC-Unique: 21UlObUENe-ICImkjL4j2Q-1
-Received: by mail-ej1-f69.google.com with SMTP id gb17-20020a1709079611b029038c058a504cso1805256ejc.7
-        for <kvm@vger.kernel.org>; Tue, 27 Apr 2021 00:05:52 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=hU0X065Jts3zXqonmt3u6RVQ5smooOA0uzd+qO/RgE8=;
-        b=LaLjcZa9812HEpRGW9vwoVHgmNJmPRU3RPr/2YUdxLiKJni5dddHFGUEwt3+c3/mKA
-         OwZ7TG0xCdNvRPucbb1FpwkcNJP3fYorFWjBgR0SQRGBu0eV0cQllIfJlvTuJRFS17MQ
-         3pcQv6Hj9MqJhU2RMQStXSgHnYIqqK9sv2KnyDYf7XPXb21yQ+xngwBKc1a8uh0IyZGi
-         Oval24yd/HnMYNXgSvNRzVq9OgZynlQLfjQlAY934y3jfJKdEsnC+w2ykWuVKVNry4am
-         CPYMjy88FczOYOLjcDMp+wTa3rsdxrkZmoMUU5NVtwxGG+IMn/J2xW0hw4I6dQ0ABjXi
-         bgCQ==
-X-Gm-Message-State: AOAM533mRSwke7vPSWNqJuHMbUkmAFfhjs8+SvDdklEq6J/YayVqtCus
-        d8/wLDr5aubpXLACXUK7R/Yx4BllFPGSRtU9IG74oln+D/7dvbTtn18cwOTiasM6oSgBpcKyo2u
-        T0uZe4qVmewVO
-X-Received: by 2002:a17:907:628a:: with SMTP id nd10mr22253861ejc.326.1619507151321;
-        Tue, 27 Apr 2021 00:05:51 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwZ7hxv9V3N9QTnZlvdRwBjGOXQZdA7OUgnCOqig0VsESbZiuwiXd/zr94sDLdsUQMotZjtOA==
-X-Received: by 2002:a17:907:628a:: with SMTP id nd10mr22253845ejc.326.1619507151124;
-        Tue, 27 Apr 2021 00:05:51 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e? ([2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e])
-        by smtp.gmail.com with ESMTPSA id 16sm12846449ejw.0.2021.04.27.00.05.49
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 27 Apr 2021 00:05:50 -0700 (PDT)
-Subject: Re: [PATCH v2 2/2] KVM: VMX: Invoke NMI handler via indirect call
- instead of INTn
-To:     Lai Jiangshan <jiangshanlai+lkml@gmail.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        LKML <linux-kernel@vger.kernel.org>,
-        Josh Poimboeuf <jpoimboe@redhat.com>,
-        Uros Bizjak <ubizjak@gmail.com>,
-        Andi Kleen <ak@linux.intel.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Steven Rostedt <rostedt@goodmis.org>,
-        Sean Christopherson <seanjc@google.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>
-References: <20200915191505.10355-1-sean.j.christopherson@intel.com>
- <20200915191505.10355-3-sean.j.christopherson@intel.com>
- <CAJhGHyBOLUeqnwx2X=WToE2oY8Zkqj_y4KZ0hoq-goe+UWcR9g@mail.gmail.com>
- <bb2c2d93-8046-017a-5711-c61c8f1a4c09@redhat.com>
- <CAJhGHyDrAwKO1iht=d0j+OKD1U7e1fzLminudxo2sPHbF53TKQ@mail.gmail.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <2fd450a9-0f59-8d88-d4bc-431245f3b565@redhat.com>
-Date:   Tue, 27 Apr 2021 09:05:49 +0200
+        id S234870AbhD0He6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 27 Apr 2021 03:34:58 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:10068 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232824AbhD0He5 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 27 Apr 2021 03:34:57 -0400
+Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 13R7XHHA076633;
+        Tue, 27 Apr 2021 03:34:06 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : in-reply-to : content-type :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=dbwUouL94Tn6aMK5okMNidltYNKsURrD9rSSG24y+N8=;
+ b=JlBYcGRZinkJQ1yL6heRHD3pud7q+grVvAnrNoVMNLWaK2KZOTrg7ISOe0e2zyBTewO2
+ 1Yq5+jH8spWiL4RGCY0ebeZKRkhbBBTXz4nJSrs+4HDL2ehS3Alpkd7dHPaV452wSF18
+ 4U191PPSIXGQuzZVE+ZQxTjDszgR1OSTHt9VdxybVLkWGnA34Ah1KytfPWIoKiGwbB5n
+ gWjLyztpo8shuUBK+uxW2ZC2Qm5AhLBHuUpwHG47IoVT2LTt8DtersFVqNovqz0g00Kj
+ TmnvSAAw+bGvEpM9NlyCwZdiiwvruwrXZ+jdNQkYd8uWLFU4McOxdbjRtbCDD8/NeVMR Gg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 386cf2txe0-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 27 Apr 2021 03:34:05 -0400
+Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 13R7XlU4078010;
+        Tue, 27 Apr 2021 03:34:05 -0400
+Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 386cf2txc2-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 27 Apr 2021 03:34:05 -0400
+Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
+        by ppma02fra.de.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 13R7Rane009579;
+        Tue, 27 Apr 2021 07:34:02 GMT
+Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
+        by ppma02fra.de.ibm.com with ESMTP id 384ay88nbr-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 27 Apr 2021 07:34:02 +0000
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
+        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 13R7XYL128049826
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 27 Apr 2021 07:33:34 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id B0CDF4C046;
+        Tue, 27 Apr 2021 07:33:58 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id AA4A24C040;
+        Tue, 27 Apr 2021 07:33:56 +0000 (GMT)
+Received: from oc7455500831.ibm.com (unknown [9.171.69.120])
+        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Tue, 27 Apr 2021 07:33:56 +0000 (GMT)
+Subject: Re: [PATCH 00/12] Remove vfio_mdev.c, mdev_parent_ops and more
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     David Airlie <airlied@linux.ie>,
+        Tony Krowiak <akrowiak@linux.ibm.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        dri-devel@lists.freedesktop.org,
+        Eric Farman <farman@linux.ibm.com>,
+        Harald Freudenberger <freude@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        intel-gfx@lists.freedesktop.org,
+        intel-gvt-dev@lists.freedesktop.org,
+        Jani Nikula <jani.nikula@linux.intel.com>,
+        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+        kvm@vger.kernel.org, Kirti Wankhede <kwankhede@nvidia.com>,
+        linux-doc@vger.kernel.org, linux-s390@vger.kernel.org,
+        Peter Oberparleiter <oberpar@linux.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Pierre Morel <pmorel@linux.ibm.com>,
+        Rodrigo Vivi <rodrigo.vivi@intel.com>,
+        Vineeth Vijayan <vneethv@linux.ibm.com>,
+        Zhenyu Wang <zhenyuw@linux.intel.com>,
+        Zhi Wang <zhi.a.wang@intel.com>,
+        "Raj, Ashok" <ashok.raj@intel.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Leon Romanovsky <leonro@nvidia.com>,
+        Max Gurtovoy <mgurtovoy@nvidia.com>,
+        Tarun Gupta <targupta@nvidia.com>
+References: <0-v1-d88406ed308e+418-vfio3_jgg@nvidia.com>
+ <5def83bb-599c-27fa-9daa-efa27b5ac1d4@de.ibm.com>
+ <20210426174250.GW1370958@nvidia.com>
+From:   Christian Borntraeger <borntraeger@de.ibm.com>
+Message-ID: <2ca13efa-3876-9496-edbf-4b12b93d721c@de.ibm.com>
+Date:   Tue, 27 Apr 2021 09:33:56 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.7.0
-MIME-Version: 1.0
-In-Reply-To: <CAJhGHyDrAwKO1iht=d0j+OKD1U7e1fzLminudxo2sPHbF53TKQ@mail.gmail.com>
+ Thunderbird/78.9.1
+In-Reply-To: <20210426174250.GW1370958@nvidia.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: u76BFO76MsdtScWYP9TmTAIjYZRDCeQ_
+X-Proofpoint-ORIG-GUID: E3SdCeQ-8MC1eEvgYB2mhBcR57fsEB6B
 Content-Transfer-Encoding: 7bit
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+MIME-Version: 1.0
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.761
+ definitions=2021-04-27_02:2021-04-27,2021-04-27 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0
+ mlxlogscore=999 bulkscore=0 spamscore=0 mlxscore=0 adultscore=0
+ phishscore=0 lowpriorityscore=0 priorityscore=1501 clxscore=1015
+ malwarescore=0 impostorscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2104060000 definitions=main-2104270055
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 27/04/21 02:54, Lai Jiangshan wrote:
-> The C NMI handler can handle the case of nested NMIs, which is useful
-> here.  I think we should change it to call the C NMI handler directly
-> here as Andy Lutomirski suggested:
 
-Great, can you send a patch?
 
-Paolo
-
-> On Mon, Apr 26, 2021 at 11:09 PM Andy Lutomirski <luto@amacapital.net> wrote:
->> The C NMI code has its own reentrancy protection and has for years.
->> It should work fine for this use case.
+On 26.04.21 19:42, Jason Gunthorpe wrote:
+> On Mon, Apr 26, 2021 at 06:43:14PM +0200, Christian Borntraeger wrote:
+>> On 24.04.21 01:02, Jason Gunthorpe wrote:
+>>> Prologue
+>>> ========
+>>>
+>>> This is series #3 in part of a larger work that arose from the minor
+>>> remark that the mdev_parent_ops indirection shim is useless and
+>>> complicates things.
+>>>
+>>> It applies on top of Alex's current tree and requires the prior two
+>>> series.
+>>
+>> Do you have a tree somewhere?
 > 
-> I think this is the right way.
+> [..]
+>>> A preview of the future series's is here:
+>>>     https://github.com/jgunthorpe/linux/pull/3/commits
 > 
+> Has everything, you'll want to go to:
+>    cover-letter: Remove vfio_mdev.c, mdev_parent_ops and more
+> 
+> As there are additional WIPs in that tree.
 
+I gave this a quick spin on s390x vfio-ap and it seems to work ok.
+This is really just a quick test, but no obvious problem.
