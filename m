@@ -2,467 +2,556 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BF9B136CA62
-	for <lists+kvm@lfdr.de>; Tue, 27 Apr 2021 19:33:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 635EB36CC17
+	for <lists+kvm@lfdr.de>; Tue, 27 Apr 2021 22:06:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238220AbhD0ReE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 27 Apr 2021 13:34:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39490 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230219AbhD0ReC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 27 Apr 2021 13:34:02 -0400
-Received: from mail-oi1-x231.google.com (mail-oi1-x231.google.com [IPv6:2607:f8b0:4864:20::231])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B2510C061574
-        for <kvm@vger.kernel.org>; Tue, 27 Apr 2021 10:33:17 -0700 (PDT)
-Received: by mail-oi1-x231.google.com with SMTP id r186so32635800oif.8
-        for <kvm@vger.kernel.org>; Tue, 27 Apr 2021 10:33:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=xd1G2TQ32uzkSPacK1rSxSrhe2tNhY7AT2tNqAXrs5c=;
-        b=ZeDUBgtxdrhUJrRVqQchVyjwHREJhl6RNV3zRxSiVOk2ivbUi70P0+1xntFz8mnaVV
-         bEQ6cTJw0vL1RifMQchE/Wa8HwwGdWhPN6WWb8CdgDwUuCfKMxZDGjpAL6CsJZNOSilD
-         jzLdRbrM1aD5fmqrzHn33V6ZVaRRVmlOlL7Fo1wDS8O/2gKCD5BF5so74+NxmCw3qO/t
-         IBwpOfNoxwK5XWJ3FfsWo/BdJtcMg2cnItZRh3YcjS4PXu6u2V6Q/3Dp1oD0Uke6Xc9r
-         5SmEW1Ibr5HrAtk+VNW7LkTrFatcS7+go7q9cjR0snKfc4dsNr3IBkB/i00k9PwvxPJQ
-         x0Lw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=xd1G2TQ32uzkSPacK1rSxSrhe2tNhY7AT2tNqAXrs5c=;
-        b=K05sDvh+E/qe/8OvlvjDYwJBa30FOs1nDqc5w0ObCp+KNrvW3+Ece7TRQpYkr4dlCz
-         pL0RJcfBS7zABF3pP3YxueUg3Rho9iMFCRNuc9aR8jypWcVN9yNAPFLtgVDPHIuPodJo
-         XHG6FaTvKDWNLMqMkkbcdlIU4iSNWWbaCTd38lE03lAdLzBDincMbGPEda7Usbppjrqe
-         CId7QbBNSxMjZLnkVekH+kGmGsC1TsH2K/ui+Fge+AJGDH8+6YC6eAErIdIrCXh6HZcj
-         L9Y883IC7VADPomnrj9lCzHohOse2UPqnXRAHPLe7NQOwcKmFdTQMih4THImqFpTrPdm
-         sdBQ==
-X-Gm-Message-State: AOAM53362NKqrZuKalDJ2UeYi/0rcGcW54/NJGh/b8ShcxQzoATR6Snh
-        clzbyatAPp4+805MHajxG6dbzbk+x8rKl/A6RM0aM0xL+pg=
-X-Google-Smtp-Source: ABdhPJxCVU/oSj1MaC3XcZM4/BWfGyXAjaJzGSAcQiwx2ySdbuMsYIftPto99hAup2eFQT0xLQO7KFZHfce6uMYj6Xk=
-X-Received: by 2002:aca:408b:: with SMTP id n133mr4267663oia.13.1619544796672;
- Tue, 27 Apr 2021 10:33:16 -0700 (PDT)
-MIME-Version: 1.0
-References: <20210427165958.705212-1-aaronlewis@google.com> <20210427165958.705212-3-aaronlewis@google.com>
-In-Reply-To: <20210427165958.705212-3-aaronlewis@google.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Tue, 27 Apr 2021 10:33:03 -0700
-Message-ID: <CALMp9eSup620xjz+Y-qAuCP=VxXRboYJstJdaM9GN46-MDvbLw@mail.gmail.com>
-Subject: Re: [PATCH v4 2/2] selftests: kvm: Allows userspace to handle
- emulation errors.
-To:     Aaron Lewis <aaronlewis@google.com>
-Cc:     David Edmondson <david.edmondson@oracle.com>,
-        Sean Christopherson <seanjc@google.com>,
-        kvm list <kvm@vger.kernel.org>
+        id S236287AbhD0UHB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 27 Apr 2021 16:07:01 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:44828 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S235514AbhD0UHA (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 27 Apr 2021 16:07:00 -0400
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 13RK4RQ7182399;
+        Tue, 27 Apr 2021 16:06:10 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : to : cc : date : in-reply-to : references : content-type :
+ mime-version : content-transfer-encoding; s=pp1;
+ bh=PZf3s/DbWLkTNVvKLoYM029m1PrWGtb6BskLemWYVJA=;
+ b=iKcawfGEYG2C4UirW4PqZ29ZcJExlKWOU0dnS63A49UMF3EhaZpBnUUe2umDz+24i+bq
+ 0Aarbqfh39lMoojDwzcAJkTLuEItpFDQDZs3PInP44rRAoUnxHK4Cz/Fx+7tfxZvevll
+ MyNuUo7B9t5n5/9oGbERGCH5MDoHJxKheqw4sbXUd1e6Enk+isyc97jYS66q3GUK0JX7
+ GJ/uKqwmLPB0PL7UejMyiKxB/XXWuDmzaT3MUcmMd+n99j2EnOtbYgDJbXXM+SQW/TAX
+ OEWQuPYNIks3N6MTLqFxf/pANjkaFgnkPseSiwYoix6dqVLjBhHgImrQWVnenuegSm+S Dw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 386s1vggxb-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 27 Apr 2021 16:06:10 -0400
+Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 13RK4SZX182437;
+        Tue, 27 Apr 2021 16:06:10 -0400
+Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com [169.63.214.131])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 386s1vggx2-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 27 Apr 2021 16:06:10 -0400
+Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
+        by ppma01dal.us.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 13RJvHrc002497;
+        Tue, 27 Apr 2021 20:06:09 GMT
+Received: from b03cxnp08028.gho.boulder.ibm.com (b03cxnp08028.gho.boulder.ibm.com [9.17.130.20])
+        by ppma01dal.us.ibm.com with ESMTP id 384ay95ru3-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 27 Apr 2021 20:06:09 +0000
+Received: from b03ledav003.gho.boulder.ibm.com (b03ledav003.gho.boulder.ibm.com [9.17.130.234])
+        by b03cxnp08028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 13RK68a830015820
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 27 Apr 2021 20:06:08 GMT
+Received: from b03ledav003.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 2647A6A057;
+        Tue, 27 Apr 2021 20:06:08 +0000 (GMT)
+Received: from b03ledav003.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 0A9676A054;
+        Tue, 27 Apr 2021 20:06:04 +0000 (GMT)
+Received: from farman-thinkpad-t470p (unknown [9.160.111.105])
+        by b03ledav003.gho.boulder.ibm.com (Postfix) with ESMTP;
+        Tue, 27 Apr 2021 20:06:04 +0000 (GMT)
+Message-ID: <5325cd47bf170b66591bc1e64bf9fa3aa9c365b5.camel@linux.ibm.com>
+Subject: Re: [PATCH v2 07/13] vfio/ccw: Convert to use
+ vfio_register_group_dev()
+From:   Eric Farman <farman@linux.ibm.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org,
+        Peter Oberparleiter <oberpar@linux.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Vineeth Vijayan <vneethv@linux.ibm.com>
+Cc:     "Raj, Ashok" <ashok.raj@intel.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Christoph Hellwig <hch@lst.de>,
+        Leon Romanovsky <leonro@nvidia.com>,
+        Max Gurtovoy <mgurtovoy@nvidia.com>,
+        Tarun Gupta <targupta@nvidia.com>
+Date:   Tue, 27 Apr 2021 16:06:04 -0400
+In-Reply-To: <7-v2-7667f42c9bad+935-vfio3_jgg@nvidia.com>
+References: <7-v2-7667f42c9bad+935-vfio3_jgg@nvidia.com>
 Content-Type: text/plain; charset="UTF-8"
+X-Mailer: Evolution 3.28.5 (3.28.5-14.el8) 
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: Dcbi-HSp6CWG786t-C6SQXwFnmOBhSiU
+X-Proofpoint-GUID: uKNJ0wwAipm3PltDWQjWhomuu2b2dyim
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.761
+ definitions=2021-04-27_11:2021-04-27,2021-04-27 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999 bulkscore=0
+ malwarescore=0 priorityscore=1501 suspectscore=0 lowpriorityscore=0
+ adultscore=0 spamscore=0 impostorscore=0 clxscore=1011 mlxscore=0
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2104060000 definitions=main-2104270134
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Apr 27, 2021 at 10:01 AM Aaron Lewis <aaronlewis@google.com> wrote:
->
-> This test exercises the feature KVM_CAP_EXIT_ON_EMULATION_FAILURE.  When
-> enabled, errors in the in-kernel instruction emulator are forwarded to
-> userspace with the instruction bytes stored in the exit struct for
-> KVM_EXIT_INTERNAL_ERROR.  So, when the guest attempts to emulate an
-> 'flds' instruction, which isn't able to be emulated in KVM, instead
-> of failing, KVM sends the instruction to userspace to handle.
->
-> For this test to work properly the module parameter
-> 'allow_smaller_maxphyaddr' has to be set.
->
-> Signed-off-by: Aaron Lewis <aaronlewis@google.com>
+On Mon, 2021-04-26 at 17:00 -0300, Jason Gunthorpe wrote:
+> This is more complicated because vfio_ccw is sharing the vfio_device
+> between both the mdev_device and its vfio_device and the css_driver.
+> 
+> The mdev is a singleton, and the reason for this sharing appears to
+> be to
+> allow the extra css_driver function callbacks to be delivered to the
+> vfio_device.
+> 
+> This keeps things as they were, with the css_driver allocating the
+> singleton, not the mdev_driver, this is pretty confusing. I'm also
+> uncertain how the lifetime model for the mdev works in the css_driver
+> callbacks.
+> 
+> At this point embed the vfio_device in the vfio_ccw_private and
+> instantiate it as a vfio_device when the mdev probes. The drvdata of
+> both
+> the css_device and the mdev_device point at the private, and
+> container_of
+> is used to get it back from the vfio_device.
+> 
+> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
 > ---
->  tools/testing/selftests/kvm/.gitignore        |   1 +
->  tools/testing/selftests/kvm/Makefile          |   1 +
->  .../selftests/kvm/include/x86_64/processor.h  |   3 +
->  .../selftests/kvm/lib/x86_64/processor.c      |  79 ++++++
->  .../kvm/x86_64/emulator_error_test.c          | 224 ++++++++++++++++++
->  5 files changed, 308 insertions(+)
->  create mode 100644 tools/testing/selftests/kvm/x86_64/emulator_error_test.c
->
-> diff --git a/tools/testing/selftests/kvm/.gitignore b/tools/testing/selftests/kvm/.gitignore
-> index 7bd7e776c266..ec9e20a2f752 100644
-> --- a/tools/testing/selftests/kvm/.gitignore
-> +++ b/tools/testing/selftests/kvm/.gitignore
-> @@ -7,6 +7,7 @@
->  /x86_64/cr4_cpuid_sync_test
->  /x86_64/debug_regs
->  /x86_64/evmcs_test
-> +/x86_64/emulator_error_test
->  /x86_64/get_cpuid_test
->  /x86_64/get_msr_index_features
->  /x86_64/kvm_pv_test
-> diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-> index 67eebb53235f..5ff705d92d02 100644
-> --- a/tools/testing/selftests/kvm/Makefile
-> +++ b/tools/testing/selftests/kvm/Makefile
-> @@ -41,6 +41,7 @@ LIBKVM_s390x = lib/s390x/processor.c lib/s390x/ucall.c lib/s390x/diag318_test_ha
->  TEST_GEN_PROGS_x86_64 = x86_64/cr4_cpuid_sync_test
->  TEST_GEN_PROGS_x86_64 += x86_64/get_msr_index_features
->  TEST_GEN_PROGS_x86_64 += x86_64/evmcs_test
-> +TEST_GEN_PROGS_x86_64 += x86_64/emulator_error_test
->  TEST_GEN_PROGS_x86_64 += x86_64/get_cpuid_test
->  TEST_GEN_PROGS_x86_64 += x86_64/hyperv_clock
->  TEST_GEN_PROGS_x86_64 += x86_64/hyperv_cpuid
-> diff --git a/tools/testing/selftests/kvm/include/x86_64/processor.h b/tools/testing/selftests/kvm/include/x86_64/processor.h
-> index 0b30b4e15c38..40f70f91e6a2 100644
-> --- a/tools/testing/selftests/kvm/include/x86_64/processor.h
-> +++ b/tools/testing/selftests/kvm/include/x86_64/processor.h
-> @@ -394,6 +394,9 @@ void vcpu_init_descriptor_tables(struct kvm_vm *vm, uint32_t vcpuid);
->  void vm_handle_exception(struct kvm_vm *vm, int vector,
->                         void (*handler)(struct ex_regs *));
->
-> +uint64_t vm_get_page_table_entry(struct kvm_vm *vm, uint64_t vaddr);
-> +void vm_set_page_table_entry(struct kvm_vm *vm, uint64_t vaddr, uint64_t pte);
+>  drivers/s390/cio/vfio_ccw_drv.c     |  21 +++--
+>  drivers/s390/cio/vfio_ccw_ops.c     | 135 +++++++++++++++-----------
+> --
+>  drivers/s390/cio/vfio_ccw_private.h |   5 ++
+>  3 files changed, 94 insertions(+), 67 deletions(-)
+> 
+> 
+
+...snip...
+
+> diff --git a/drivers/s390/cio/vfio_ccw_ops.c
+> b/drivers/s390/cio/vfio_ccw_ops.c
+> index 491a64c61fff1a..0fcf46031d3821 100644
+> --- a/drivers/s390/cio/vfio_ccw_ops.c
+> +++ b/drivers/s390/cio/vfio_ccw_ops.c
+> @@ -17,13 +17,13 @@
+>  
+>  #include "vfio_ccw_private.h"
+>  
+> -static int vfio_ccw_mdev_reset(struct mdev_device *mdev)
+> +static const struct vfio_device_ops vfio_ccw_dev_ops;
+> +
+> +static int vfio_ccw_mdev_reset(struct vfio_ccw_private *private)
+>  {
+> -	struct vfio_ccw_private *private;
+>  	struct subchannel *sch;
+>  	int ret;
+>  
+> -	private = dev_get_drvdata(mdev_parent_dev(mdev));
+>  	sch = private->sch;
+>  	/*
+>  	 * TODO:
+> @@ -61,7 +61,7 @@ static int vfio_ccw_mdev_notifier(struct
+> notifier_block *nb,
+>  		if (!cp_iova_pinned(&private->cp, unmap->iova))
+>  			return NOTIFY_OK;
+>  
+> -		if (vfio_ccw_mdev_reset(private->mdev))
+> +		if (vfio_ccw_mdev_reset(private))
+>  			return NOTIFY_BAD;
+>  
+>  		cp_free(&private->cp);
+> @@ -113,10 +113,11 @@ static struct attribute_group
+> *mdev_type_groups[] = {
+>  	NULL,
+>  };
+>  
+> -static int vfio_ccw_mdev_create(struct mdev_device *mdev)
+> +static int vfio_ccw_mdev_probe(struct mdev_device *mdev)
+>  {
+>  	struct vfio_ccw_private *private =
+>  		dev_get_drvdata(mdev_parent_dev(mdev));
+> +	int ret;
+>  
+>  	if (private->state == VFIO_CCW_STATE_NOT_OPER)
+>  		return -ENODEV;
+> @@ -124,6 +125,10 @@ static int vfio_ccw_mdev_create(struct
+> mdev_device *mdev)
+>  	if (atomic_dec_if_positive(&private->avail) < 0)
+>  		return -EPERM;
+>  
+> +	memset(&private->vdev, 0, sizeof(private->vdev));
+> +	vfio_init_group_dev(&private->vdev, &mdev->dev,
+> +			    &vfio_ccw_dev_ops);
+> +
+>  	private->mdev = mdev;
+>  	private->state = VFIO_CCW_STATE_IDLE;
+>  
+> @@ -132,19 +137,28 @@ static int vfio_ccw_mdev_create(struct
+> mdev_device *mdev)
+>  			   private->sch->schid.ssid,
+>  			   private->sch->schid.sch_no);
+>  
+> +	ret = vfio_register_group_dev(&private->vdev);
+> +	if (ret)
+> +		goto err_atomic;
+> +	dev_set_drvdata(&mdev->dev, private);
+>  	return 0;
+> +
+> +err_atomic:
+> +	atomic_inc(&private->avail);
+
+Since we're unwinding, should also do
+
+private->mdev = NULL
+private->state = VFIO_CCW_STATE_STANDBY
+
+> +	return ret;
+>  }
+>  
+> -static int vfio_ccw_mdev_remove(struct mdev_device *mdev)
+> +static void vfio_ccw_mdev_remove(struct mdev_device *mdev)
+>  {
+> -	struct vfio_ccw_private *private =
+> -		dev_get_drvdata(mdev_parent_dev(mdev));
+> +	struct vfio_ccw_private *private = dev_get_drvdata(&mdev->dev);
+>  
+>  	VFIO_CCW_MSG_EVENT(2, "mdev %pUl, sch %x.%x.%04x: remove\n",
+>  			   mdev_uuid(mdev), private->sch->schid.cssid,
+>  			   private->sch->schid.ssid,
+>  			   private->sch->schid.sch_no);
+>  
+> +	vfio_unregister_group_dev(&private->vdev);
+> +
+>  	if ((private->state != VFIO_CCW_STATE_NOT_OPER) &&
+>  	    (private->state != VFIO_CCW_STATE_STANDBY)) {
+>  		if (!vfio_ccw_sch_quiesce(private->sch))
+> @@ -155,20 +169,18 @@ static int vfio_ccw_mdev_remove(struct
+> mdev_device *mdev)
+>  	cp_free(&private->cp);
+>  	private->mdev = NULL;
+>  	atomic_inc(&private->avail);
+> -
+> -	return 0;
+>  }
+>  
+> -static int vfio_ccw_mdev_open(struct mdev_device *mdev)
+> +static int vfio_ccw_mdev_open(struct vfio_device *vdev)
+>  {
+>  	struct vfio_ccw_private *private =
+> -		dev_get_drvdata(mdev_parent_dev(mdev));
+> +		container_of(vdev, struct vfio_ccw_private, vdev);
+>  	unsigned long events = VFIO_IOMMU_NOTIFY_DMA_UNMAP;
+>  	int ret;
+>  
+>  	private->nb.notifier_call = vfio_ccw_mdev_notifier;
+>  
+> -	ret = vfio_register_notifier(mdev_dev(mdev), VFIO_IOMMU_NOTIFY,
+> +	ret = vfio_register_notifier(vdev->dev, VFIO_IOMMU_NOTIFY,
+>  				     &events, &private->nb);
+>  	if (ret)
+>  		return ret;
+> @@ -189,27 +201,26 @@ static int vfio_ccw_mdev_open(struct
+> mdev_device *mdev)
+>  
+>  out_unregister:
+>  	vfio_ccw_unregister_dev_regions(private);
+> -	vfio_unregister_notifier(mdev_dev(mdev), VFIO_IOMMU_NOTIFY,
+> +	vfio_unregister_notifier(vdev->dev, VFIO_IOMMU_NOTIFY,
+>  				 &private->nb);
+>  	return ret;
+>  }
+>  
+> -static void vfio_ccw_mdev_release(struct mdev_device *mdev)
+> +static void vfio_ccw_mdev_release(struct vfio_device *vdev)
+>  {
+>  	struct vfio_ccw_private *private =
+> -		dev_get_drvdata(mdev_parent_dev(mdev));
+> +		container_of(vdev, struct vfio_ccw_private, vdev);
+>  
+>  	if ((private->state != VFIO_CCW_STATE_NOT_OPER) &&
+>  	    (private->state != VFIO_CCW_STATE_STANDBY)) {
+> -		if (!vfio_ccw_mdev_reset(mdev))
+> +		if (!vfio_ccw_mdev_reset(private))
+>  			private->state = VFIO_CCW_STATE_STANDBY;
+>  		/* The state will be NOT_OPER on error. */
+>  	}
+>  
+>  	cp_free(&private->cp);
+>  	vfio_ccw_unregister_dev_regions(private);
+> -	vfio_unregister_notifier(mdev_dev(mdev), VFIO_IOMMU_NOTIFY,
+> -				 &private->nb);
+> +	vfio_unregister_notifier(vdev->dev, VFIO_IOMMU_NOTIFY,
+> &private->nb);
+>  }
+>  
+>  static ssize_t vfio_ccw_mdev_read_io_region(struct vfio_ccw_private
+> *private,
+> @@ -233,15 +244,14 @@ static ssize_t
+> vfio_ccw_mdev_read_io_region(struct vfio_ccw_private *private,
+>  	return ret;
+>  }
+>  
+> -static ssize_t vfio_ccw_mdev_read(struct mdev_device *mdev,
+> +static ssize_t vfio_ccw_mdev_read(struct vfio_device *vdev,
+>  				  char __user *buf,
+>  				  size_t count,
+>  				  loff_t *ppos)
+>  {
+> +	struct vfio_ccw_private *private =
+> +		container_of(vdev, struct vfio_ccw_private, vdev);
+>  	unsigned int index = VFIO_CCW_OFFSET_TO_INDEX(*ppos);
+> -	struct vfio_ccw_private *private;
+> -
+> -	private = dev_get_drvdata(mdev_parent_dev(mdev));
+>  
+>  	if (index >= VFIO_CCW_NUM_REGIONS + private->num_regions)
+>  		return -EINVAL;
+> @@ -288,15 +298,14 @@ static ssize_t
+> vfio_ccw_mdev_write_io_region(struct vfio_ccw_private *private,
+>  	return ret;
+>  }
+>  
+> -static ssize_t vfio_ccw_mdev_write(struct mdev_device *mdev,
+> +static ssize_t vfio_ccw_mdev_write(struct vfio_device *vdev,
+>  				   const char __user *buf,
+>  				   size_t count,
+>  				   loff_t *ppos)
+>  {
+> +	struct vfio_ccw_private *private =
+> +		container_of(vdev, struct vfio_ccw_private, vdev);
+>  	unsigned int index = VFIO_CCW_OFFSET_TO_INDEX(*ppos);
+> -	struct vfio_ccw_private *private;
+> -
+> -	private = dev_get_drvdata(mdev_parent_dev(mdev));
+>  
+>  	if (index >= VFIO_CCW_NUM_REGIONS + private->num_regions)
+>  		return -EINVAL;
+> @@ -313,12 +322,9 @@ static ssize_t vfio_ccw_mdev_write(struct
+> mdev_device *mdev,
+>  	return -EINVAL;
+>  }
+>  
+> -static int vfio_ccw_mdev_get_device_info(struct vfio_device_info
+> *info,
+> -					 struct mdev_device *mdev)
+> +static int vfio_ccw_mdev_get_device_info(struct vfio_ccw_private
+> *private,
+> +					 struct vfio_device_info *info)
+>  {
+> -	struct vfio_ccw_private *private;
+> -
+> -	private = dev_get_drvdata(mdev_parent_dev(mdev));
+>  	info->flags = VFIO_DEVICE_FLAGS_CCW | VFIO_DEVICE_FLAGS_RESET;
+>  	info->num_regions = VFIO_CCW_NUM_REGIONS + private-
+> >num_regions;
+>  	info->num_irqs = VFIO_CCW_NUM_IRQS;
+> @@ -326,14 +332,12 @@ static int vfio_ccw_mdev_get_device_info(struct
+> vfio_device_info *info,
+>  	return 0;
+>  }
+>  
+> -static int vfio_ccw_mdev_get_region_info(struct vfio_region_info
+> *info,
+> -					 struct mdev_device *mdev,
+> +static int vfio_ccw_mdev_get_region_info(struct vfio_ccw_private
+> *private,
+> +					 struct vfio_region_info *info,
+>  					 unsigned long arg)
+>  {
+> -	struct vfio_ccw_private *private;
+>  	int i;
+>  
+> -	private = dev_get_drvdata(mdev_parent_dev(mdev));
+>  	switch (info->index) {
+>  	case VFIO_CCW_CONFIG_REGION_INDEX:
+>  		info->offset = 0;
+> @@ -408,19 +412,16 @@ static int vfio_ccw_mdev_get_irq_info(struct
+> vfio_irq_info *info)
+>  	return 0;
+>  }
+>  
+> -static int vfio_ccw_mdev_set_irqs(struct mdev_device *mdev,
+> +static int vfio_ccw_mdev_set_irqs(struct vfio_ccw_private *private,
+>  				  uint32_t flags,
+>  				  uint32_t index,
+>  				  void __user *data)
+>  {
+> -	struct vfio_ccw_private *private;
+>  	struct eventfd_ctx **ctx;
+>  
+>  	if (!(flags & VFIO_IRQ_SET_ACTION_TRIGGER))
+>  		return -EINVAL;
+>  
+> -	private = dev_get_drvdata(mdev_parent_dev(mdev));
+> -
+>  	switch (index) {
+>  	case VFIO_CCW_IO_IRQ_INDEX:
+>  		ctx = &private->io_trigger;
+> @@ -522,10 +523,12 @@ void vfio_ccw_unregister_dev_regions(struct
+> vfio_ccw_private *private)
+>  	private->region = NULL;
+>  }
+>  
+> -static ssize_t vfio_ccw_mdev_ioctl(struct mdev_device *mdev,
+> +static ssize_t vfio_ccw_mdev_ioctl(struct vfio_device *vdev,
+>  				   unsigned int cmd,
+>  				   unsigned long arg)
+>  {
+> +	struct vfio_ccw_private *private =
+> +		container_of(vdev, struct vfio_ccw_private, vdev);
+>  	int ret = 0;
+>  	unsigned long minsz;
+>  
+> @@ -542,7 +545,7 @@ static ssize_t vfio_ccw_mdev_ioctl(struct
+> mdev_device *mdev,
+>  		if (info.argsz < minsz)
+>  			return -EINVAL;
+>  
+> -		ret = vfio_ccw_mdev_get_device_info(&info, mdev);
+> +		ret = vfio_ccw_mdev_get_device_info(private, &info);
+>  		if (ret)
+>  			return ret;
+>  
+> @@ -560,7 +563,7 @@ static ssize_t vfio_ccw_mdev_ioctl(struct
+> mdev_device *mdev,
+>  		if (info.argsz < minsz)
+>  			return -EINVAL;
+>  
+> -		ret = vfio_ccw_mdev_get_region_info(&info, mdev, arg);
+> +		ret = vfio_ccw_mdev_get_region_info(private, &info,
+> arg);
+>  		if (ret)
+>  			return ret;
+>  
+> @@ -605,47 +608,59 @@ static ssize_t vfio_ccw_mdev_ioctl(struct
+> mdev_device *mdev,
+>  			return ret;
+>  
+>  		data = (void __user *)(arg + minsz);
+> -		return vfio_ccw_mdev_set_irqs(mdev, hdr.flags,
+> hdr.index, data);
+> +		return vfio_ccw_mdev_set_irqs(private, hdr.flags,
+> hdr.index,
+> +					      data);
+>  	}
+>  	case VFIO_DEVICE_RESET:
+> -		return vfio_ccw_mdev_reset(mdev);
+> +		return vfio_ccw_mdev_reset(private);
+>  	default:
+>  		return -ENOTTY;
+>  	}
+>  }
+>  
+>  /* Request removal of the device*/
+> -static void vfio_ccw_mdev_request(struct mdev_device *mdev, unsigned
+> int count)
+> +static void vfio_ccw_mdev_request(struct vfio_device *vdev, unsigned
+> int count)
+>  {
+> -	struct vfio_ccw_private *private =
+> dev_get_drvdata(mdev_parent_dev(mdev));
+> -
+> -	if (!private)
+> -		return;
+> +	struct vfio_ccw_private *private =
+> +		container_of(vdev, struct vfio_ccw_private, vdev);
+> +	struct device *dev = private->vdev.dev;
+
+This could be simply vdev->dev.
+The rest seems okay.
+
+Thanks,
+Eric
+
+>  
+>  	if (private->req_trigger) {
+>  		if (!(count % 10))
+> -			dev_notice_ratelimited(mdev_dev(private->mdev),
+> +			dev_notice_ratelimited(dev,
+>  					       "Relaying device request
+> to user (#%u)\n",
+>  					       count);
+>  
+>  		eventfd_signal(private->req_trigger, 1);
+>  	} else if (count == 0) {
+> -		dev_notice(mdev_dev(private->mdev),
+> +		dev_notice(dev,
+>  			   "No device request channel registered,
+> blocked until released by user\n");
+>  	}
+>  }
+>  
+> +static const struct vfio_device_ops vfio_ccw_dev_ops = {
+> +	.open = vfio_ccw_mdev_open,
+> +	.release = vfio_ccw_mdev_release,
+> +	.read = vfio_ccw_mdev_read,
+> +	.write = vfio_ccw_mdev_write,
+> +	.ioctl = vfio_ccw_mdev_ioctl,
+> +	.request = vfio_ccw_mdev_request,
+> +};
+> +
+> +struct mdev_driver vfio_ccw_mdev_driver = {
+> +	.driver = {
+> +		.name = "vfio_ccw_mdev",
+> +		.owner = THIS_MODULE,
+> +		.mod_name = KBUILD_MODNAME,
+> +	},
+> +	.probe = vfio_ccw_mdev_probe,
+> +	.remove = vfio_ccw_mdev_remove,
+> +};
+> +
+>  static const struct mdev_parent_ops vfio_ccw_mdev_ops = {
+>  	.owner			= THIS_MODULE,
+> +	.device_driver		= &vfio_ccw_mdev_driver,
+>  	.supported_type_groups  = mdev_type_groups,
+> -	.create			= vfio_ccw_mdev_create,
+> -	.remove			= vfio_ccw_mdev_remove,
+> -	.open			= vfio_ccw_mdev_open,
+> -	.release		= vfio_ccw_mdev_release,
+> -	.read			= vfio_ccw_mdev_read,
+> -	.write			= vfio_ccw_mdev_write,
+> -	.ioctl			= vfio_ccw_mdev_ioctl,
+> -	.request		= vfio_ccw_mdev_request,
+>  };
+>  
+>  int vfio_ccw_mdev_reg(struct subchannel *sch)
+> diff --git a/drivers/s390/cio/vfio_ccw_private.h
+> b/drivers/s390/cio/vfio_ccw_private.h
+> index b2c762eb42b9bb..7272eb78861244 100644
+> --- a/drivers/s390/cio/vfio_ccw_private.h
+> +++ b/drivers/s390/cio/vfio_ccw_private.h
+> @@ -17,6 +17,7 @@
+>  #include <linux/eventfd.h>
+>  #include <linux/workqueue.h>
+>  #include <linux/vfio_ccw.h>
+> +#include <linux/vfio.h>
+>  #include <asm/crw.h>
+>  #include <asm/debug.h>
+>  
+> @@ -67,6 +68,7 @@ struct vfio_ccw_crw {
+>  
+>  /**
+>   * struct vfio_ccw_private
+> + * @vdev: Embedded VFIO device
+>   * @sch: pointer to the subchannel
+>   * @state: internal state of the device
+>   * @completion: synchronization helper of the I/O completion
+> @@ -90,6 +92,7 @@ struct vfio_ccw_crw {
+>   * @crw_work: work for deferral process of CRW handling
+>   */
+>  struct vfio_ccw_private {
+> +	struct vfio_device vdev;
+>  	struct subchannel	*sch;
+>  	int			state;
+>  	struct completion	*completion;
+> @@ -121,6 +124,8 @@ extern void vfio_ccw_mdev_unreg(struct subchannel
+> *sch);
+>  
+>  extern int vfio_ccw_sch_quiesce(struct subchannel *sch);
+>  
+> +extern struct mdev_driver vfio_ccw_mdev_driver;
 > +
 >  /*
->   * set_cpuid() - overwrites a matching cpuid entry with the provided value.
->   *              matches based on ent->function && ent->index. returns true
-> diff --git a/tools/testing/selftests/kvm/lib/x86_64/processor.c b/tools/testing/selftests/kvm/lib/x86_64/processor.c
-> index a8906e60a108..195af5a9c9ec 100644
-> --- a/tools/testing/selftests/kvm/lib/x86_64/processor.c
-> +++ b/tools/testing/selftests/kvm/lib/x86_64/processor.c
-> @@ -292,6 +292,85 @@ void virt_pg_map(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr,
->         pte[index[0]].present = 1;
->  }
->
-> +static struct pageTableEntry *_vm_get_page_table_entry(struct kvm_vm *vm,
-> +                                                      uint64_t vaddr)
-> +{
-> +       uint16_t index[4];
-> +       struct pageMapL4Entry *pml4e;
-> +       struct pageDirectoryPointerEntry *pdpe;
-> +       struct pageDirectoryEntry *pde;
-> +       struct pageTableEntry *pte;
-> +       struct kvm_cpuid_entry2 *entry;
-> +       int max_phy_addr;
-> +       /* Set the bottom 52 bits. */
-> +       uint64_t rsvd_mask = 0x000fffffffffffff;
-> +
-> +       entry = kvm_get_supported_cpuid_index(0x80000008, 0);
-> +       max_phy_addr = entry->eax & 0x000000ff;
-> +       /* Clear the bottom bits of the reserved mask. */
-> +       rsvd_mask = (rsvd_mask >> max_phy_addr) << max_phy_addr;
-> +
-> +       TEST_ASSERT(vm->mode == VM_MODE_PXXV48_4K, "Attempt to use "
-> +               "unknown or unsupported guest mode, mode: 0x%x", vm->mode);
-> +       TEST_ASSERT(sparsebit_is_set(vm->vpages_valid,
-> +               (vaddr >> vm->page_shift)),
-> +               "Invalid virtual address, vaddr: 0x%lx",
-> +               vaddr);
-> +       /*
-> +        * Based on the mode check above there are 48 bits in the vaddr, so
-> +        * shift 16 to sign extend the last bit (bit-47),
-> +        */
-> +       TEST_ASSERT(vaddr == ((vaddr << 16) >> 16),
-> +               "Canonical check failed.  The virtual addres is invalid.");
+>   * States of the device statemachine.
+>   */
 
-This trick doesn't work with an unsigned vaddr. (Shifting an unsigned
-value right introduces zeroes on the left, rather than replicating the
-sign bit.
-Nit: address is misspelled.
-
-> +
-> +       index[0] = (vaddr >> 12) & 0x1ffu;
-> +       index[1] = (vaddr >> 21) & 0x1ffu;
-> +       index[2] = (vaddr >> 30) & 0x1ffu;
-> +       index[3] = (vaddr >> 39) & 0x1ffu;
-> +
-> +       pml4e = addr_gpa2hva(vm, vm->pgd);
-> +       TEST_ASSERT(pml4e[index[3]].present,
-> +               "Expected pml4e to be present for gva: 0x%08lx", vaddr);
-> +       TEST_ASSERT(((pml4e[index[3]].address * vm->page_size) & rsvd_mask) == 0,
-> +                   "Unexpected reserved bits set.");
-
-Bit 7 of a PML4E is reserved, but it's not in your rsvd_mask.
-Also, are we assuming that the guest EFER.NXE bit is set? If not, then
-bit 63 of every page table level is reserved.
-
-> +
-> +       pdpe = addr_gpa2hva(vm, pml4e[index[3]].address * vm->page_size);
-> +       TEST_ASSERT(pdpe[index[2]].present,
-> +               "Expected pdpe to be present for gva: 0x%08lx", vaddr);
-> +       TEST_ASSERT(pdpe[index[2]].page_size == 0,
-> +               "Expected pdpe to map a pde not a 1-GByte page.");
-> +       TEST_ASSERT(((pdpe[index[2]].address * vm->page_size) & rsvd_mask) == 0,
-> +                   "Unexpected reserved bits set.");
-> +
-> +       pde = addr_gpa2hva(vm, pdpe[index[2]].address * vm->page_size);
-> +       TEST_ASSERT(pde[index[1]].present,
-> +               "Expected pde to be present for gva: 0x%08lx", vaddr);
-> +       TEST_ASSERT(pde[index[1]].page_size == 0,
-> +               "Expected pde to map a pte not a 2-MByte page.");
-> +       TEST_ASSERT(((pde[index[1]].address * vm->page_size) & rsvd_mask) == 0,
-> +                   "Unexpected reserved bits set.");
-> +
-> +       pte = addr_gpa2hva(vm, pde[index[1]].address * vm->page_size);
-> +       TEST_ASSERT(pte[index[0]].present,
-> +               "Expected pte to be present for gva: 0x%08lx", vaddr);
-> +
-> +       return &pte[index[0]];
-> +}
-> +
-> +uint64_t vm_get_page_table_entry(struct kvm_vm *vm, uint64_t vaddr)
-> +{
-> +       struct pageTableEntry *pte = _vm_get_page_table_entry(vm, vaddr);
-> +
-> +       return *(uint64_t *)pte;
-> +}
-> +
-> +void vm_set_page_table_entry(struct kvm_vm *vm, uint64_t vaddr, uint64_t pte)
-> +{
-> +       struct pageTableEntry *_pte = _vm_get_page_table_entry(vm, vaddr);
-Perhaps the argument could be renamed to 'new_pte' or 'val' or
-something, so you don't have to resort to an underscore prefix here?
-> +
-> +       *(uint64_t *)_pte = pte;
-> +}
-> +
->  void virt_dump(FILE *stream, struct kvm_vm *vm, uint8_t indent)
->  {
->         struct pageMapL4Entry *pml4e, *pml4e_start;
-> diff --git a/tools/testing/selftests/kvm/x86_64/emulator_error_test.c b/tools/testing/selftests/kvm/x86_64/emulator_error_test.c
-> new file mode 100644
-> index 000000000000..8d824af5f17b
-> --- /dev/null
-> +++ b/tools/testing/selftests/kvm/x86_64/emulator_error_test.c
-> @@ -0,0 +1,224 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +/*
-> + * Copyright (C) 2020, Google LLC.
-> + *
-> + * Tests for KVM_CAP_EXIT_ON_EMULATION_FAILURE capability.
-> + */
-> +
-> +#define _GNU_SOURCE /* for program_invocation_short_name */
-> +
-> +#include "test_util.h"
-> +#include "kvm_util.h"
-> +#include "vmx.h"
-> +
-> +#define VCPU_ID           1
-> +#define PAGE_SIZE  4096
-> +#define MAXPHYADDR 36
-> +
-> +#define MEM_REGION_GVA 0x0000123456789000
-> +#define MEM_REGION_GPA 0x0000000700000000
-> +#define MEM_REGION_SLOT        10
-> +#define MEM_REGION_SIZE PAGE_SIZE
-> +
-> +extern char fld_start, fld_end;
-> +
-> +static void guest_code(void)
-> +{
-> +       __asm__ __volatile__("fld_start: flds (%[addr]); fld_end:"
-> +                            :: [addr]"r"(MEM_REGION_GVA));
-
-Do you need the labels any more?
-
-> +
-> +       GUEST_DONE();
-> +}
-> +
-> +static void run_guest(struct kvm_vm *vm)
-> +{
-> +       int rc;
-> +
-> +       rc = _vcpu_run(vm, VCPU_ID);
-> +       TEST_ASSERT(rc == 0, "vcpu_run failed: %d\n", rc);
-> +}
-> +
-> +/*
-> + * Accessors to get R/M, REG, and Mod bits described in the SDM vol 2,
-> + * figure 2-2 "Table Interpretation of ModR/M Byte (C8H)".
-> + */
-> +#define GET_RM(insn_byte) (insn_byte & 0x7)
-> +#define GET_REG(insn_byte) ((insn_byte & 0x38) >> 3)
-> +#define GET_MOD(insn_byte) ((insn_byte & 0xc) >> 6)
-> +
-> +/* Ensure we are dealing with a simple 2-byte flds instruction. */
-> +static bool is_flds(uint8_t *insn_bytes, uint8_t insn_size)
-> +{
-> +       return insn_size >= 2 &&
-> +              insn_bytes[0] == 0xd9 &&
-> +              GET_REG(insn_bytes[1]) == 0x0 &&
-> +              GET_MOD(insn_bytes[1]) == 0x0 &&
-> +              /* Ensure there is no SIB byte. */
-> +              GET_RM(insn_bytes[1]) != 0x4 &&
-> +              /* Ensure there is no displacement byte. */
-> +              GET_RM(insn_bytes[1]) != 0x5;
-> +}
-> +
-> +static void process_exit_on_emulation_error(struct kvm_vm *vm)
-> +{
-> +       struct kvm_run *run = vcpu_state(vm, VCPU_ID);
-> +       struct kvm_regs regs;
-> +       uint8_t *insn_bytes;
-> +       uint8_t insn_size;
-> +       uint64_t flags;
-> +
-> +       TEST_ASSERT(run->exit_reason == KVM_EXIT_INTERNAL_ERROR,
-> +                   "Unexpected exit reason: %u (%s)",
-> +                   run->exit_reason,
-> +                   exit_reason_str(run->exit_reason));
-> +
-> +       TEST_ASSERT(run->emulation_failure.suberror == KVM_INTERNAL_ERROR_EMULATION,
-> +                   "Unexpected suberror: %u",
-> +                   run->emulation_failure.suberror);
-> +
-> +       if (run->emulation_failure.ndata >= 1) {
-> +               flags = run->emulation_failure.flags;
-> +               if ((flags & KVM_INTERNAL_ERROR_EMULATION_FLAG_INSTRUCTION_BYTES) &&
-> +                   run->emulation_failure.ndata >= 3) {
-> +                       insn_size = run->emulation_failure.insn_size;
-> +                       insn_bytes = run->emulation_failure.insn_bytes;
-> +
-> +                       TEST_ASSERT(insn_size <= 15 && insn_size > 0,
-> +                                   "Unexpected instruction size: %u",
-> +                                   insn_size);
-> +
-> +                       TEST_ASSERT(is_flds(insn_bytes, insn_size),
-> +                                   "Unexpected instruction.  Expected 'flds' (0xd9 /0), encountered instruction with opcode: 0x%x",
-> +                                   insn_bytes[0]);
-
-Nit: insn_bytes[0] may not be an opcode (or even part of an opcode).
-It may be a prefix.
-
-> +
-> +                       /*
-> +                        * If is_flds() succeeded then the instruction bytes
-> +                        * contained an flds instruction that is 2-bytes in
-> +                        * length (ie: no SIB nor displacement).
-> +                        */
-> +                       vcpu_regs_get(vm, VCPU_ID, &regs);
-> +                       regs.rip += 2;
-> +                       vcpu_regs_set(vm, VCPU_ID, &regs);
-> +               }
-> +       }
-> +}
-> +
-> +static void do_guest_assert(struct kvm_vm *vm, struct ucall *uc)
-> +{
-> +       TEST_FAIL("%s at %s:%ld", (const char *)uc->args[0], __FILE__,
-> +                 uc->args[1]);
-> +}
-> +
-> +static void check_for_guest_assert(struct kvm_vm *vm)
-> +{
-> +       struct kvm_run *run = vcpu_state(vm, VCPU_ID);
-> +       struct ucall uc;
-> +
-> +       if (run->exit_reason == KVM_EXIT_IO &&
-> +           get_ucall(vm, VCPU_ID, &uc) == UCALL_ABORT) {
-> +               do_guest_assert(vm, &uc);
-> +       }
-> +}
-> +
-> +static void process_ucall_done(struct kvm_vm *vm)
-> +{
-> +       struct kvm_run *run = vcpu_state(vm, VCPU_ID);
-> +       struct ucall uc;
-> +
-> +       check_for_guest_assert(vm);
-> +
-> +       TEST_ASSERT(run->exit_reason == KVM_EXIT_IO,
-> +                   "Unexpected exit reason: %u (%s)",
-> +                   run->exit_reason,
-> +                   exit_reason_str(run->exit_reason));
-> +
-> +       TEST_ASSERT(get_ucall(vm, VCPU_ID, &uc) == UCALL_DONE,
-> +                   "Unexpected ucall command: %lu, expected UCALL_DONE (%d)",
-> +                   uc.cmd, UCALL_DONE);
-> +}
-> +
-> +static uint64_t process_ucall(struct kvm_vm *vm)
-> +{
-> +       struct kvm_run *run = vcpu_state(vm, VCPU_ID);
-> +       struct ucall uc;
-> +
-> +       TEST_ASSERT(run->exit_reason == KVM_EXIT_IO,
-> +                   "Unexpected exit reason: %u (%s)",
-> +                   run->exit_reason,
-> +                   exit_reason_str(run->exit_reason));
-> +
-> +       switch (get_ucall(vm, VCPU_ID, &uc)) {
-> +       case UCALL_SYNC:
-> +               break;
-> +       case UCALL_ABORT:
-> +               do_guest_assert(vm, &uc);
-> +               break;
-> +       case UCALL_DONE:
-> +               process_ucall_done(vm);
-> +               break;
-> +       default:
-> +               TEST_ASSERT(false, "Unexpected ucall");
-> +       }
-> +
-> +       return uc.cmd;
-> +}
-> +
-> +int main(int argc, char *argv[])
-> +{
-> +       struct kvm_enable_cap emul_failure_cap = {
-> +               .cap = KVM_CAP_EXIT_ON_EMULATION_FAILURE,
-> +               .args[0] = 1,
-> +       };
-> +       struct kvm_cpuid_entry2 *entry;
-> +       struct kvm_cpuid2 *cpuid;
-> +       struct kvm_vm *vm;
-> +       uint64_t gpa, pte;
-> +       uint64_t *hva;
-> +       int rc;
-> +
-> +       /* Tell stdout not to buffer its content */
-> +       setbuf(stdout, NULL);
-> +
-> +       vm = vm_create_default(VCPU_ID, 0, guest_code);
-> +
-> +       if (!kvm_check_cap(KVM_CAP_SMALLER_MAXPHYADDR)) {
-> +               printf("module parameter 'allow_smaller_maxphyaddr' is not set.  Skipping test.\n");
-> +               return 0;
-> +       }
-> +
-> +       cpuid = kvm_get_supported_cpuid();
-> +
-> +       entry = kvm_get_supported_cpuid_index(0x80000008, 0);
-> +       entry->eax = (entry->eax & 0xffffff00) | MAXPHYADDR;
-> +       set_cpuid(cpuid, entry);
-> +
-> +       vcpu_set_cpuid(vm, VCPU_ID, cpuid);
-> +
-> +       entry = kvm_get_supported_cpuid_index(0x80000008, 0);
-
-Is the above line detritus?
-
-> +
-> +       rc = kvm_check_cap(KVM_CAP_EXIT_ON_EMULATION_FAILURE);
-> +       TEST_ASSERT(rc, "KVM_CAP_EXIT_ON_EMULATION_FAILURE is unavailable");
-> +       vm_enable_cap(vm, &emul_failure_cap);
-> +
-> +       vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS,
-> +                                   MEM_REGION_GPA, MEM_REGION_SLOT,
-> +                                   MEM_REGION_SIZE / PAGE_SIZE, 0);
-> +       gpa = vm_phy_pages_alloc(vm, MEM_REGION_SIZE / PAGE_SIZE,
-> +                                MEM_REGION_GPA, MEM_REGION_SLOT);
-> +       TEST_ASSERT(gpa == MEM_REGION_GPA, "Failed vm_phy_pages_alloc\n");
-> +       virt_map(vm, MEM_REGION_GVA, MEM_REGION_GPA, 1, 0);
-> +       hva = addr_gpa2hva(vm, MEM_REGION_GPA);
-> +       memset(hva, 0, PAGE_SIZE);
-> +       pte = vm_get_page_table_entry(vm, MEM_REGION_GVA);
-> +       vm_set_page_table_entry(vm, MEM_REGION_GVA, pte | (1ull << 36));
-> +
-> +       run_guest(vm);
-> +       process_exit_on_emulation_error(vm);
-> +       run_guest(vm);
-> +
-> +       TEST_ASSERT(process_ucall(vm) == UCALL_DONE, "Expected UCALL_DONE");
-> +
-> +       kvm_vm_free(vm);
-> +
-> +       return 0;
-> +}
-> --
-> 2.31.1.498.g6c1eba8ee3d-goog
->
