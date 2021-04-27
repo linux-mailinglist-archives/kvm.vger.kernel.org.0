@@ -2,51 +2,53 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 74C5236C4E8
-	for <lists+kvm@lfdr.de>; Tue, 27 Apr 2021 13:17:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 91E4836C4ED
+	for <lists+kvm@lfdr.de>; Tue, 27 Apr 2021 13:17:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237883AbhD0LR4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 27 Apr 2021 07:17:56 -0400
+        id S235793AbhD0LSZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 27 Apr 2021 07:18:25 -0400
 Received: from mail-eopbgr750082.outbound.protection.outlook.com ([40.107.75.82]:21193
         "EHLO NAM02-BL2-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S238097AbhD0LRh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 27 Apr 2021 07:17:37 -0400
+        id S235860AbhD0LSL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 27 Apr 2021 07:18:11 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=jLs9sngoJVM4X9Etf7HwtekW8pvLG2jQPhyLrAP6zKbW7BYXGbCK1SX0Tj91TtdYZGlmtdcUV3Ju+pEco5y91ZDcGeud4yuHKp+IPAgpKaPHVc9h/A1BuhwdGNHlI1jvvVCwTcaHpQ+nnBGHvvTtRMQTm9hI0CELj+rc9IHsIRoAbrBHes3UIfs+dDbqtWQyQUuNt/aughPh4FNDzVjaE/6Tc3RhL2QtlmzuvLE7u6583tLavOW/99vym1Rd3CdqFtxlPwiXKtP2/MQccR3yy9Z5P81k9qlJDEU5787aRUE0c2v4OCj138cjhuPFY4vtQo8I3TaiWdYFI//wuU/Mng==
+ b=YlkbJoJoGq5WT/Twoh2hRZyOXn85qE0UpzENiov8USYixav0Wj9GhZneFIzRnwvF9L0Uf0X2LWDIHJnfkbAfIy5rxHM2bViXS3WT24O+9/XKzJndgoDKuJYkGKaixu8Ky/CLLSHWsNCCCEVENR5embdvMuWYMTHWZcrbsMagbG7WmRH0ZJWIE8FRlceVq0rVH0ljWU6SkiQnrhGiKVfDp5rzUjYoaew4EnyUbDNJRAZYRI0ealoLRh/1mw/xHMUshQVlOmS6jw6HZTjUaQBaDVvTw7nYl2Kq6oCaRV191FubXLkA+nH9sucZdY5N65OP32Df18aYJjKpPSHo94Q9CQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=JvPH0fI22wBUZMMSlZxQodwdd8QP7uYw63eep1jq+fs=;
- b=aD+5SDDIFJp1ziRZ6MKktcyM21ezEWN5auWCFOYewDri57mp6/0+OOR2UxMjGkuQOmqIpC1HcrRuBKSnbbUhhMuQ/wGI4XaCwiDXkcXmlC6rNGeA667OErVz03/8K4216fOjgSYmMHoNh1o3nnlrZtf2+KMOLos5Lnd3Gzg6APeOVme7wC5+mxnv1tvXZ12K6/A3t0Vze42+YsTKPeACqfwWrxM+KN2jYuz6Uk1ZW/di+TzGItyNWm3oMf9/UKFnGZ0STHSLCga5h9+de8TfXyS8xgVYJ0vDr6J1JDWnZyTQYRXSupmCCryva5/9aY7woYRSIItp2i3f6es5yd9MHA==
+ bh=2nOEZicBp1Y3rjtNv6M78nq8vWBASOcaGaeP5+7Aj0E=;
+ b=I/bn4V6hsn9TwafW8RGF+o1j7fYYDE9LSeEx1g/kI5n4WEbh5LHuMWN44YsjZBHIblNXoOusm965p0UcTMcFU1xCgfcFcsG8fWMrdWqwsgIapHMqozHmzrC+w9fa1vF6OX9+dfogqRgNXfcAazk9qd78HQ6qbNfexpuggsa821nfCyLT+AjKhKv3HfdGjMiyfiuDYQURkTxJmiXNJE+vYyWzTsC0L0d4Uk9RKvS5n2gHnNoS/Qw/tMlb8aPlM148jiQXXuIOgMX0e1nfkhCfw8JvXh0OjtxF2tvBMoRdDQZdSJCz57DraJ2vBqbj+q4naFfHCnvQ9lWbod5No0vrCA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
  header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=JvPH0fI22wBUZMMSlZxQodwdd8QP7uYw63eep1jq+fs=;
- b=TNptPs6wydXDH2TtXqYj+iYbRGm9P1AvCgdZnlXdX4YmZQG03w5OZFs+1DayX1ANDrAVzSKL1pE7PCb/nBmOZ1KbNEWz37ZSiuA5CU3yydmdGmKmghDty8MGg7qHNKd0oNeRIy/Gw08AYTWmR3bv2OaIxn49kU9oDLs3TbI728E=
+ bh=2nOEZicBp1Y3rjtNv6M78nq8vWBASOcaGaeP5+7Aj0E=;
+ b=0FQRl/XWpQzccfmsFdg43S5cNyFZGRCaCE9dxLdk4TwIN/gbXVIi9oWY4AIvKhop5OjCjfU/mZA8+FzTN3jNb3B2lHqcZuCkSJj2ZW4UyNNNhhtJ68nilBPk26qZFN+3lEePzuNyB4EfaY0r7qwzxdxle1dGFZeb2aRZSEdX57k=
 Authentication-Results: kernel.org; dkim=none (message not signed)
  header.d=none;kernel.org; dmarc=none action=none header.from=amd.com;
 Received: from SN6PR12MB2718.namprd12.prod.outlook.com (2603:10b6:805:6f::22)
  by SA0PR12MB4432.namprd12.prod.outlook.com (2603:10b6:806:98::16) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4065.26; Tue, 27 Apr
- 2021 11:16:49 +0000
+ 2021 11:16:50 +0000
 Received: from SN6PR12MB2718.namprd12.prod.outlook.com
  ([fe80::9898:5b48:a062:db94]) by SN6PR12MB2718.namprd12.prod.outlook.com
  ([fe80::9898:5b48:a062:db94%6]) with mapi id 15.20.4065.027; Tue, 27 Apr 2021
- 11:16:49 +0000
+ 11:16:50 +0000
 From:   Brijesh Singh <brijesh.singh@amd.com>
 To:     x86@kernel.org
 Cc:     tglx@linutronix.de, bp@alien8.de, jroedel@suse.de,
         thomas.lendacky@amd.com, linux-kernel@vger.kernel.org,
         kvm@vger.kernel.org, pbonzini@redhat.com,
         Brijesh Singh <brijesh.singh@amd.com>
-Subject: [PATCH 0/3] x86/sev-es: rename file and other cleanup
-Date:   Tue, 27 Apr 2021 06:16:33 -0500
-Message-Id: <20210427111636.1207-1-brijesh.singh@amd.com>
+Subject: [PATCH 1/3] x86/sev-es: Rename sev-es.{ch} to sev.{ch}
+Date:   Tue, 27 Apr 2021 06:16:34 -0500
+Message-Id: <20210427111636.1207-2-brijesh.singh@amd.com>
 X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20210427111636.1207-1-brijesh.singh@amd.com>
+References: <20210427111636.1207-1-brijesh.singh@amd.com>
 Content-Type: text/plain
 X-Originating-IP: [165.204.77.1]
 X-ClientProxiedBy: SN4PR0201CA0054.namprd02.prod.outlook.com
@@ -56,100 +58,257 @@ MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
 Received: from sbrijesh-desktop.amd.com (165.204.77.1) by SN4PR0201CA0054.namprd02.prod.outlook.com (2603:10b6:803:20::16) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4087.25 via Frontend Transport; Tue, 27 Apr 2021 11:16:49 +0000
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 885cc2cf-997a-4ded-8b04-08d9096df395
+X-MS-Office365-Filtering-Correlation-Id: c2059cdf-03e8-42b8-4883-08d9096df3e7
 X-MS-TrafficTypeDiagnostic: SA0PR12MB4432:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <SA0PR12MB4432FAF700438398D9A4EEC3E5419@SA0PR12MB4432.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:1247;
+X-Microsoft-Antispam-PRVS: <SA0PR12MB4432083BF27C8506BBA7760FE5419@SA0PR12MB4432.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:8882;
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: PYlWMFh8Zaftl/7ofBKmf9qtPHH7qYT4ui57bj+voZExjNJd1+MGrq/M7A968Ykg1VKlYSA4qOHFS3jw8uZKEfBIQkQldm3g+C5rc9jh2vByjEW3kF55nxeZu2NgNzVKbMKVRdtGj8RNfQ8EpBgD41C8etgOV/jbrWVLJwt7qFxR2M9GL+Q+YnZkxibcVC0I/VbWj1VKCundsaHEx+f6e+A7+oF7FT0V6cRLd7619ZJAtoMAWYFHMKguT9aCoa7xL7+DHk2qEZOuP0t/DNai1f6aFOY4n30+UQqHvkc7k0M5qyVWzTd0KiCUSKjKtk7XXXWz8ruyrRlFpsHeVacKONom66DPZ9Ygt6XNkzWToTqRZ7+lhLRbZYf0EVJIr3WupUYlQ7nWaHVtPV6NwIblW5KW33r2kOZ1kmHJQe4jW4UJaBdEn4Yzah6DdsPRgiP2KoaWG0ngNPiy6UOczvI1w0hRN9lCBzubaqYAl7QAh7IJ49/LDT3AY1Q385DAsDCLKbxKRX3pHoWJRRZ+ilghzb9oolj5IGNNyZ8lfcQ14ugkPw7DCJSgC+0RvvtUYsAC7IqyeI4u/YCo0sCl3Tg5zmsReuD/tZVnkkqW3635jq1PxMpJSXULV47sVXhURO1a0ApqmeqC1XVQFqophU9FFb6hqkBq4u+Vxx3Okb6Rg3I=
+X-Microsoft-Antispam-Message-Info: ArJzbGJWQY1a2sLb8ohcWfJ9FehhhMVuF2gcnDTAijGFiprJt5xfEgQzBaOi/xLTPbVakuK1Qaave7pT56Lmv4PUlzbYvJaTQe/7efVo5Vuq2M3hwnMpl0ouB7vUBB60f5bO8vn2zQEwVVJbu7K/EjImPYGf52Q2yvNnCI5OSpl3lFIm0TowT2mGJbLECegShFlt61KXsb6KZR9lThycDGzrFakqHPwmM63dnAyH7nLPG6QlrPx4qIU/2uzy6oVyR3HYT/goYfYZdDT1tLhAgzhQ7itjONQBKw5W6YLYJeRCWysFRvQhnlUBk/sc3LXBFCG9KbJCOVlmde+/u2B5y/DzeR3Spq6bBo8AqeeWPNTYXp7MvFGN8BI/ZabK+wPJLniQvi9vPeoqy8YHQaFGz5u5sIPxd+ohOhmoW+8yinhSn2/TixUEb2W9PfRYqODerZbA5iJejY3UAIvcdXN3aBs0SIrtzM+lj2L6HAAkFZPvq/VGz7y+hQnpiXYSvI2Ma4Nxm1BkDH/sue4+IwR9tLDYqdZrbSCHmw0/rywEf7UjXBmWC2wTaWRbn+WIYSK1a8mhLOwjuh9XINXfOO0siXxkGsrobFhE6obI/muO+FDTzbQON2jD8ce92xjQ0oMbZHsDg31lmrrOvT79IgqhFt7hFu1KUffSpV4Uyg3lucE=
 X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2718.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(346002)(396003)(136003)(366004)(376002)(39860400002)(66556008)(66476007)(5660300002)(2616005)(956004)(478600001)(316002)(6916009)(66946007)(6666004)(44832011)(52116002)(86362001)(7696005)(1076003)(36756003)(8676002)(26005)(8936002)(16526019)(4326008)(2906002)(6486002)(83380400001)(186003)(38100700002)(38350700002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: =?us-ascii?Q?5m4N7Nkf/cI0NCv7MYclmYRZUjJic7mPf3BuSn/4I27WDP06TehMlmXbgmSP?=
- =?us-ascii?Q?R8ZMbWgc29CX9RCQ6046QMEPnZEstZb+4JZlWQyjUt69vsxotYJrGJU+NjHe?=
- =?us-ascii?Q?2/OTJCc89g0NE+ZwlNa/O8+boHeABsBMaTe7oF+NBOO00/vnRTGz4eWMshCM?=
- =?us-ascii?Q?zn9ob6GHKZDI9kpBO8jf2kivoJrW1Pwddpj91TaIuJAGP7ZgBn3bPgPH8UuB?=
- =?us-ascii?Q?q42FKRbhWNsvlUz/Sd2ymoe5IJfOfRUMDA+YbiQcMLqe9HUxakFJjCwVfaXt?=
- =?us-ascii?Q?77MacXeHtOOIIYBUqcdGPaP77VOChyJJP7BaBkwG3/7vgA/aU5dzCAvWk7SK?=
- =?us-ascii?Q?J6VvcqoxwSAFidnCoDQytmvX7DOymDBxU1NT7d7F96z22RS3LjxZhpxWN5S/?=
- =?us-ascii?Q?SLclT9Ur46YAmDsJjSODFPWGlOLgLASIvE3z/gxIkFVY5cHiprzp9jwfJHd2?=
- =?us-ascii?Q?9uNcHJ+pxW3z0v1R3ELwd9jMxiBOXKG9pk9ZwFvrYZ6xTnj7DcEtvbH/+w6E?=
- =?us-ascii?Q?BACcTCDV8AQs63JzSpcVASE/qJy2ijFhK5hsmd6PveH9XoB1f7qu1BjhY5Ax?=
- =?us-ascii?Q?PbCg1nxtfrXo9SlPUyAIvAB3/eJxbIj2Hf1oqKkqW2Wv1goJByktJUUkcKKx?=
- =?us-ascii?Q?7BD6QjcRMBB37YUz4XIfHheKfHgqI26fR9k/WMP0NIGtiquIJ7PPlI+Bs2TX?=
- =?us-ascii?Q?1Ocl4DWU9KfHHnBI7aoOc+ebbxem0ln3Ijp0x3FcH+frmpB5thJZif/1zD4m?=
- =?us-ascii?Q?LdFkjNNV/BdnjKOmIo0CK9tDpcCoJa9zYWfTbU55XyWI0vzWErqL9NN9ChZB?=
- =?us-ascii?Q?Iw4PEE2aW0ibYJV1goCX+M8EwTR2nOGdWndmkTf85gFNVn+UfarWWFrAH/Lp?=
- =?us-ascii?Q?TY01PMDkKTzumlKJNC1YNk/Ba5iYLHU86CX3+bqwr24L7c+pCUemo2xDVcxv?=
- =?us-ascii?Q?8UdkwQLQsf8OuLPrCB9VlFQUSuC9LBVwVKInQT+j0An58dojSoCD1NlIW/wO?=
- =?us-ascii?Q?124JKJWvKkHp0mnN+Tb/gmWXejY2vKOIBycy4KqtD4t3zQRuewPesfV2vUza?=
- =?us-ascii?Q?1jj93kCHEs6rkqdsv3GUnqDV9UhQbM5KWu9/xeM32dStmWGftqKJrcp1TtsT?=
- =?us-ascii?Q?dl3bn5GIek9qkSm/H+NUMqshvrFXsI1OmRw4rpoAPRk9O/1EdXEHA6fgPu+6?=
- =?us-ascii?Q?128ZtvmxdoS+L07lJpcrW82uTcS+rHQeIRqHS3EzgZbgho/3Q/5aqhpa3fd4?=
- =?us-ascii?Q?Nd3dSchqGqgGwJxCppcob3paXFmwIMh0DqoaZe3zNLYqpkBkDG+pe4aMZV11?=
- =?us-ascii?Q?Re26NPKgaeYXdhnIvpUA4Hpg?=
+X-MS-Exchange-AntiSpam-MessageData: =?us-ascii?Q?TuDExmeKGFXWd7k+qEU1r78Nb5W0r0IJqsAp/CH7m/63vjJOGxd+HsPqSN8m?=
+ =?us-ascii?Q?dLtdTW5P1gzHSxUtvTiiKn4EjXCPHarYi1Q0Se8BjlIOHtSQwDntsDFFHRqd?=
+ =?us-ascii?Q?epcYYCFIiwojuiZquDlVsSNwyYlyUgkgHaK4ZYWchr3rW3mqst/HykKHAush?=
+ =?us-ascii?Q?mzEkvkfuHOCPgpljybhkfFjF1/levTukjIp0pFotJWlOIeY8gqdG/zDnnBzl?=
+ =?us-ascii?Q?hjfu23/fpp4pAPXMxz5DAn8quW52LT2BgFRUNfbNx90aAnp1YDiwgNRD2QYQ?=
+ =?us-ascii?Q?v8BXZmrKX9f4zD/231gFdhyfuzuKZY++154V8qD2I3CsGtPtWjAiJpqE/Hs7?=
+ =?us-ascii?Q?cGHiVquag5otqf+3SoMI5NKI2ok/v/XB4xSaNS9gD7clg5jmn0liEgcZjiAj?=
+ =?us-ascii?Q?Pl2vzUpkCSKQovhqZDxPQ2eBma5arQwDuZQvl94bCZ1u8463DG+hzyrQ93V2?=
+ =?us-ascii?Q?qmpClsZxh2TzZ47q5AtD8UWFpede93kzVJiYnEExCikpch1E4p0I6N5yKK1k?=
+ =?us-ascii?Q?BrOqsveKIha10beUjxMUpy/PRV5oxUMsp16wnNsWloa2NKIFgZc7EIX5A58W?=
+ =?us-ascii?Q?YygySvopb/TxB37xaS3H9fkkTGG/omHyOlnf5jQGaZ1mCV+SlEYxZJBn4jhV?=
+ =?us-ascii?Q?3kTzb+tWrY/xugN4IfIva7ASACpCwcVWpInL2rK90YInRhH/bEKKs94LabPI?=
+ =?us-ascii?Q?NC0pQoL4IaCvs5ssajAhIC1a5EBL3tSHyJETLEU3zbO0Pc/ncdbuzNV2K5S9?=
+ =?us-ascii?Q?WUsrtELN+XSt/WA0b8nQwEhSgokFbQD1cq32rIBaUx3fWhBrKqZczj0CXy6U?=
+ =?us-ascii?Q?3QGWR//OM/axmxwaFQ76zrl7ewzjf0Y+8U8u3v4rM+qq4AEq/YHT8QqI8MHi?=
+ =?us-ascii?Q?jF/i8Ute4oNAwIX0UT3wvcEJ6gkiRozmeWlez2x6ywqahVQPwxhqjDhd4m8l?=
+ =?us-ascii?Q?vWmqQFPOWAFExCe/mD/tKp5tPUnR1kfCiWwRX82ZAAur2KUX6qWV95fy0Pvs?=
+ =?us-ascii?Q?avrSvJknAzFSvDlnOwzbsKJXJM0YOrCyi1t3Ze2mILE67x96VU0zbG2F7e9R?=
+ =?us-ascii?Q?TX+FMjJJKattH0e9rCEl9eBQEiA/e/Z5H7+Y8ivlWAWkBUtSCOrn7S5uO7sA?=
+ =?us-ascii?Q?XEvJ5UBl+fJa7hyjkLMLNJ9M/AQ342E2P0mno9wvQD2tiuE5VoLpOY3RCuQM?=
+ =?us-ascii?Q?jDqkBRrRA5eSnLWsX9OmNOxA5qETnfuQO65tgLQthDtiJ08akFFsKAW8Nt4U?=
+ =?us-ascii?Q?SWKdHRliXvotdSnihyDv4im+ERnY0L1iNVrlxuXdJ+GnpNFFWNJYiQRHR9Ez?=
+ =?us-ascii?Q?y6rPCvN8oOR3OdEyGHXvAR5K?=
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 885cc2cf-997a-4ded-8b04-08d9096df395
+X-MS-Exchange-CrossTenant-Network-Message-Id: c2059cdf-03e8-42b8-4883-08d9096df3e7
 X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2718.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Apr 2021 11:16:49.4213
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Apr 2021 11:16:49.9920
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: WezU6hkagyeyI7xk3uxfS+/hbVxZ4s2gcFG0il9bVZwn+9eAvFc/SCe4zfZ9of/L8FyqFAIk34fGYBIapbAoDg==
+X-MS-Exchange-CrossTenant-UserPrincipalName: PK/e8WYIcGQnL2cMV44TO/Dm3QfyigKWe0CQdm8JDTHbWk+99mzQo/DqjxUTQvd9PjnmhLLq8f+AxpxNlXJFyA==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR12MB4432
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This series is developed based on the feedbacks on SEV-SNP RFCv1.
+The SEV-SNP builds upon the SEV-ES functionality while adding new hardware
+protection. Version 2 of the GHCB specification adds new NAE events that
+are SEV-SNP specific. Rename the sev-es.{ch} to sev.{ch} so that we can
+consolidate all the SEV-ES and SEV-SNP in a one place.
 
-The SEV-SNP depends on SEV-ES functionality, so rename the sev-es.c
-to sev.c so that we can consolidate all the SEV support in one file.
-
-The series applies on top of commit (tip/master)
-eb4fae8d3b9e (origin/master, origin/HEAD, master) Merge tag 'v5.12' 
-
-Brijesh Singh (3):
-  x86/sev-es: Rename sev-es.{ch} to sev.{ch}
-  x86/sev: Move GHCB MSR protocol and NAE definitions in a common header
-  x86/msr: Rename MSR_K8_SYSCFG to MSR_AMD64_SYSCFG
-
- .../virt/kvm/amd-memory-encryption.rst        |  2 +-
- Documentation/x86/amd-memory-encryption.rst   |  6 +-
- arch/x86/boot/compressed/Makefile             |  6 +-
- arch/x86/boot/compressed/{sev-es.c => sev.c}  |  4 +-
- arch/x86/include/asm/msr-index.h              |  6 +-
- arch/x86/include/asm/sev-common.h             | 62 +++++++++++++++++++
- arch/x86/include/asm/{sev-es.h => sev.h}      | 30 ++-------
- arch/x86/kernel/Makefile                      |  6 +-
- arch/x86/kernel/cpu/amd.c                     |  4 +-
- arch/x86/kernel/cpu/mtrr/cleanup.c            |  2 +-
- arch/x86/kernel/cpu/mtrr/generic.c            |  4 +-
- arch/x86/kernel/head64.c                      |  2 +-
- arch/x86/kernel/mmconf-fam10h_64.c            |  2 +-
- arch/x86/kernel/nmi.c                         |  2 +-
- .../kernel/{sev-es-shared.c => sev-shared.c}  | 20 +++---
- arch/x86/kernel/{sev-es.c => sev.c}           |  4 +-
- arch/x86/kvm/svm/svm.c                        |  4 +-
- arch/x86/kvm/svm/svm.h                        | 38 ++----------
- arch/x86/kvm/x86.c                            |  2 +-
- arch/x86/mm/extable.c                         |  2 +-
- arch/x86/mm/mem_encrypt_identity.c            |  6 +-
- arch/x86/pci/amd_bus.c                        |  2 +-
- arch/x86/platform/efi/efi_64.c                |  2 +-
- arch/x86/realmode/init.c                      |  2 +-
- arch/x86/realmode/rm/trampoline_64.S          |  4 +-
- drivers/edac/amd64_edac.c                     |  2 +-
- tools/arch/x86/include/asm/msr-index.h        |  6 +-
- 27 files changed, 121 insertions(+), 111 deletions(-)
+Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+---
+ arch/x86/boot/compressed/Makefile                 | 6 +++---
+ arch/x86/boot/compressed/{sev-es.c => sev.c}      | 4 ++--
+ arch/x86/include/asm/{sev-es.h => sev.h}          | 0
+ arch/x86/kernel/Makefile                          | 6 +++---
+ arch/x86/kernel/head64.c                          | 2 +-
+ arch/x86/kernel/nmi.c                             | 2 +-
+ arch/x86/kernel/{sev-es-shared.c => sev-shared.c} | 0
+ arch/x86/kernel/{sev-es.c => sev.c}               | 4 ++--
+ arch/x86/mm/extable.c                             | 2 +-
+ arch/x86/platform/efi/efi_64.c                    | 2 +-
+ arch/x86/realmode/init.c                          | 2 +-
+ 11 files changed, 15 insertions(+), 15 deletions(-)
  rename arch/x86/boot/compressed/{sev-es.c => sev.c} (98%)
- create mode 100644 arch/x86/include/asm/sev-common.h
- rename arch/x86/include/asm/{sev-es.h => sev.h} (70%)
- rename arch/x86/kernel/{sev-es-shared.c => sev-shared.c} (96%)
+ rename arch/x86/include/asm/{sev-es.h => sev.h} (100%)
+ rename arch/x86/kernel/{sev-es-shared.c => sev-shared.c} (100%)
  rename arch/x86/kernel/{sev-es.c => sev.c} (99%)
 
+diff --git a/arch/x86/boot/compressed/Makefile b/arch/x86/boot/compressed/Makefile
+index 6e5522aebbbd..2a2975236c9e 100644
+--- a/arch/x86/boot/compressed/Makefile
++++ b/arch/x86/boot/compressed/Makefile
+@@ -48,10 +48,10 @@ KBUILD_CFLAGS += $(call as-option,-Wa$(comma)-mrelax-relocations=no)
+ KBUILD_CFLAGS += -include $(srctree)/include/linux/hidden.h
+ KBUILD_CFLAGS += $(CLANG_FLAGS)
+ 
+-# sev-es.c indirectly inludes inat-table.h which is generated during
++# sev.c indirectly inludes inat-table.h which is generated during
+ # compilation and stored in $(objtree). Add the directory to the includes so
+ # that the compiler finds it even with out-of-tree builds (make O=/some/path).
+-CFLAGS_sev-es.o += -I$(objtree)/arch/x86/lib/
++CFLAGS_sev.o += -I$(objtree)/arch/x86/lib/
+ 
+ KBUILD_AFLAGS  := $(KBUILD_CFLAGS) -D__ASSEMBLY__
+ GCOV_PROFILE := n
+@@ -93,7 +93,7 @@ ifdef CONFIG_X86_64
+ 	vmlinux-objs-y += $(obj)/idt_64.o $(obj)/idt_handlers_64.o
+ 	vmlinux-objs-y += $(obj)/mem_encrypt.o
+ 	vmlinux-objs-y += $(obj)/pgtable_64.o
+-	vmlinux-objs-$(CONFIG_AMD_MEM_ENCRYPT) += $(obj)/sev-es.o
++	vmlinux-objs-$(CONFIG_AMD_MEM_ENCRYPT) += $(obj)/sev.o
+ endif
+ 
+ vmlinux-objs-$(CONFIG_ACPI) += $(obj)/acpi.o
+diff --git a/arch/x86/boot/compressed/sev-es.c b/arch/x86/boot/compressed/sev.c
+similarity index 98%
+rename from arch/x86/boot/compressed/sev-es.c
+rename to arch/x86/boot/compressed/sev.c
+index 82041bd380e5..670e998fe930 100644
+--- a/arch/x86/boot/compressed/sev-es.c
++++ b/arch/x86/boot/compressed/sev.c
+@@ -13,7 +13,7 @@
+ #include "misc.h"
+ 
+ #include <asm/pgtable_types.h>
+-#include <asm/sev-es.h>
++#include <asm/sev.h>
+ #include <asm/trapnr.h>
+ #include <asm/trap_pf.h>
+ #include <asm/msr-index.h>
+@@ -117,7 +117,7 @@ static enum es_result vc_read_mem(struct es_em_ctxt *ctxt,
+ #include "../../lib/insn.c"
+ 
+ /* Include code for early handlers */
+-#include "../../kernel/sev-es-shared.c"
++#include "../../kernel/sev-shared.c"
+ 
+ static bool early_setup_sev_es(void)
+ {
+diff --git a/arch/x86/include/asm/sev-es.h b/arch/x86/include/asm/sev.h
+similarity index 100%
+rename from arch/x86/include/asm/sev-es.h
+rename to arch/x86/include/asm/sev.h
+diff --git a/arch/x86/kernel/Makefile b/arch/x86/kernel/Makefile
+index 0704c2a94272..0f66682ac02a 100644
+--- a/arch/x86/kernel/Makefile
++++ b/arch/x86/kernel/Makefile
+@@ -20,7 +20,7 @@ CFLAGS_REMOVE_kvmclock.o = -pg
+ CFLAGS_REMOVE_ftrace.o = -pg
+ CFLAGS_REMOVE_early_printk.o = -pg
+ CFLAGS_REMOVE_head64.o = -pg
+-CFLAGS_REMOVE_sev-es.o = -pg
++CFLAGS_REMOVE_sev.o = -pg
+ endif
+ 
+ KASAN_SANITIZE_head$(BITS).o				:= n
+@@ -28,7 +28,7 @@ KASAN_SANITIZE_dumpstack.o				:= n
+ KASAN_SANITIZE_dumpstack_$(BITS).o			:= n
+ KASAN_SANITIZE_stacktrace.o				:= n
+ KASAN_SANITIZE_paravirt.o				:= n
+-KASAN_SANITIZE_sev-es.o					:= n
++KASAN_SANITIZE_sev.o					:= n
+ 
+ # With some compiler versions the generated code results in boot hangs, caused
+ # by several compilation units. To be safe, disable all instrumentation.
+@@ -148,7 +148,7 @@ obj-$(CONFIG_UNWINDER_ORC)		+= unwind_orc.o
+ obj-$(CONFIG_UNWINDER_FRAME_POINTER)	+= unwind_frame.o
+ obj-$(CONFIG_UNWINDER_GUESS)		+= unwind_guess.o
+ 
+-obj-$(CONFIG_AMD_MEM_ENCRYPT)		+= sev-es.o
++obj-$(CONFIG_AMD_MEM_ENCRYPT)		+= sev.o
+ ###
+ # 64 bit specific files
+ ifeq ($(CONFIG_X86_64),y)
+diff --git a/arch/x86/kernel/head64.c b/arch/x86/kernel/head64.c
+index 18be44163a50..de01903c3735 100644
+--- a/arch/x86/kernel/head64.c
++++ b/arch/x86/kernel/head64.c
+@@ -39,7 +39,7 @@
+ #include <asm/realmode.h>
+ #include <asm/extable.h>
+ #include <asm/trapnr.h>
+-#include <asm/sev-es.h>
++#include <asm/sev.h>
+ 
+ /*
+  * Manage page tables very early on.
+diff --git a/arch/x86/kernel/nmi.c b/arch/x86/kernel/nmi.c
+index bf250a339655..fea394cabfa9 100644
+--- a/arch/x86/kernel/nmi.c
++++ b/arch/x86/kernel/nmi.c
+@@ -33,7 +33,7 @@
+ #include <asm/reboot.h>
+ #include <asm/cache.h>
+ #include <asm/nospec-branch.h>
+-#include <asm/sev-es.h>
++#include <asm/sev.h>
+ 
+ #define CREATE_TRACE_POINTS
+ #include <trace/events/nmi.h>
+diff --git a/arch/x86/kernel/sev-es-shared.c b/arch/x86/kernel/sev-shared.c
+similarity index 100%
+rename from arch/x86/kernel/sev-es-shared.c
+rename to arch/x86/kernel/sev-shared.c
+diff --git a/arch/x86/kernel/sev-es.c b/arch/x86/kernel/sev.c
+similarity index 99%
+rename from arch/x86/kernel/sev-es.c
+rename to arch/x86/kernel/sev.c
+index 73873b007838..9578c82832aa 100644
+--- a/arch/x86/kernel/sev-es.c
++++ b/arch/x86/kernel/sev.c
+@@ -22,7 +22,7 @@
+ 
+ #include <asm/cpu_entry_area.h>
+ #include <asm/stacktrace.h>
+-#include <asm/sev-es.h>
++#include <asm/sev.h>
+ #include <asm/insn-eval.h>
+ #include <asm/fpu/internal.h>
+ #include <asm/processor.h>
+@@ -459,7 +459,7 @@ static enum es_result vc_slow_virt_to_phys(struct ghcb *ghcb, struct es_em_ctxt
+ }
+ 
+ /* Include code shared with pre-decompression boot stage */
+-#include "sev-es-shared.c"
++#include "sev-shared.c"
+ 
+ void noinstr __sev_es_nmi_complete(void)
+ {
+diff --git a/arch/x86/mm/extable.c b/arch/x86/mm/extable.c
+index b93d6cd08a7f..121921b2927c 100644
+--- a/arch/x86/mm/extable.c
++++ b/arch/x86/mm/extable.c
+@@ -5,7 +5,7 @@
+ #include <xen/xen.h>
+ 
+ #include <asm/fpu/internal.h>
+-#include <asm/sev-es.h>
++#include <asm/sev.h>
+ #include <asm/traps.h>
+ #include <asm/kdebug.h>
+ 
+diff --git a/arch/x86/platform/efi/efi_64.c b/arch/x86/platform/efi/efi_64.c
+index df7b5477fc4f..7515e78ef898 100644
+--- a/arch/x86/platform/efi/efi_64.c
++++ b/arch/x86/platform/efi/efi_64.c
+@@ -47,7 +47,7 @@
+ #include <asm/realmode.h>
+ #include <asm/time.h>
+ #include <asm/pgalloc.h>
+-#include <asm/sev-es.h>
++#include <asm/sev.h>
+ 
+ /*
+  * We allocate runtime services regions top-down, starting from -4G, i.e.
+diff --git a/arch/x86/realmode/init.c b/arch/x86/realmode/init.c
+index 1be71ef5e4c4..2e1c1bec0f9e 100644
+--- a/arch/x86/realmode/init.c
++++ b/arch/x86/realmode/init.c
+@@ -9,7 +9,7 @@
+ #include <asm/realmode.h>
+ #include <asm/tlbflush.h>
+ #include <asm/crash.h>
+-#include <asm/sev-es.h>
++#include <asm/sev.h>
+ 
+ struct real_mode_header *real_mode_header;
+ u32 *trampoline_cr4_features;
 -- 
 2.17.1
 
