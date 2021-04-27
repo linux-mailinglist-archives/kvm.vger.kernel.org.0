@@ -2,72 +2,61 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 512AC36C9DF
-	for <lists+kvm@lfdr.de>; Tue, 27 Apr 2021 18:58:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 80D5A36C9E3
+	for <lists+kvm@lfdr.de>; Tue, 27 Apr 2021 18:58:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238236AbhD0Q7K (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 27 Apr 2021 12:59:10 -0400
-Received: from mail.kernel.org ([198.145.29.99]:44434 "EHLO mail.kernel.org"
+        id S237720AbhD0Q7b (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 27 Apr 2021 12:59:31 -0400
+Received: from mail.skyhub.de ([5.9.137.197]:55026 "EHLO mail.skyhub.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S236693AbhD0Q6r (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 27 Apr 2021 12:58:47 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPS id 68486611BE
-        for <kvm@vger.kernel.org>; Tue, 27 Apr 2021 16:58:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1619542684;
-        bh=+WWoBXXqqCe17BITCPpKTBBkltaGzN8xgsmZt9hHJO4=;
-        h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=DXf4Sabr1iJjg5wiqVpKieM7oet9eW3nxLLZgiYHwsVH+S1EJ24Bwjwfrpz0/I2kU
-         1W2ayeg5cZ163Zz6UvrWJOR97qp0WbLIJZRc2SqekqVe+xtWXJpOigCJXiwODAWiCo
-         MaBG5NSbt+oEn1d5evR2RG1rsEFjzSUiO8y+GTtbJ54fHCw7+DEHSd5cLHWheDamOO
-         +2Ppz4DcHqFucSJouSMymKhTqsSYK5RuAvX2P9izIPzpDc/Zs6utHfE3tnEhThSWcz
-         QJQFzCQcW6t4THPs5Cesm6u+0w6SzTgD53Et3NDTFaUoN61Fs8Gp5W4K1eI8mXtXjX
-         510smai13sLsw==
-Received: by pdx-korg-bugzilla-2.web.codeaurora.org (Postfix, from userid 48)
-        id 6556361247; Tue, 27 Apr 2021 16:58:04 +0000 (UTC)
-From:   bugzilla-daemon@bugzilla.kernel.org
-To:     kvm@vger.kernel.org
-Subject: [Bug 212859] Nested virtualization does not work well
-Date:   Tue, 27 Apr 2021 16:58:04 +0000
-X-Bugzilla-Reason: None
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Product: Virtualization
-X-Bugzilla-Component: kvm
-X-Bugzilla-Version: unspecified
-X-Bugzilla-Keywords: opw
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: ne-vlezay80@yandex.ru
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: keywords cc rep_platform
-Message-ID: <bug-212859-28872-nnSi5B04yd@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-212859-28872@https.bugzilla.kernel.org/>
-References: <bug-212859-28872@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        id S238110AbhD0Q73 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 27 Apr 2021 12:59:29 -0400
+Received: from zn.tnic (p200300ec2f0c5e0085f018e791730569.dip0.t-ipconnect.de [IPv6:2003:ec:2f0c:5e00:85f0:18e7:9173:569])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id EF26C1EC046E;
+        Tue, 27 Apr 2021 18:58:44 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1619542725;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=lz3XSWEbf7jwA4LTaOYIQoyDisqfXg243NLJRhz6mzo=;
+        b=Ht+705dCSPNBGI6RRwsNQUtroQ4dTA1OvVv+n8qThewcXxJUFIiGaL7XrEVMZcQIIyeeQI
+        0EmgRWNg0G0EqrlE+RuAcDpkNnn8qirJiUZsELpCc9U/qNEqO7p50p4TfSuvmrF/l30v4t
+        /sUoaTdCmM9hgUmCYl7jOhkLtwJLfNI=
+Date:   Tue, 27 Apr 2021 18:58:42 +0200
+From:   Borislav Petkov <bp@alien8.de>
+To:     Brijesh Singh <brijesh.singh@amd.com>
+Cc:     x86@kernel.org, tglx@linutronix.de, jroedel@suse.de,
+        thomas.lendacky@amd.com, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, pbonzini@redhat.com
+Subject: Re: [PATCH 1/3] x86/sev-es: Rename sev-es.{ch} to sev.{ch}
+Message-ID: <YIhCwtMA6WnDNvxt@zn.tnic>
+References: <20210427111636.1207-1-brijesh.singh@amd.com>
+ <20210427111636.1207-2-brijesh.singh@amd.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20210427111636.1207-2-brijesh.singh@amd.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D212859
+On Tue, Apr 27, 2021 at 06:16:34AM -0500, Brijesh Singh wrote:
+> The SEV-SNP builds upon the SEV-ES functionality while adding new hardware
+> protection. Version 2 of the GHCB specification adds new NAE events that
+> are SEV-SNP specific. Rename the sev-es.{ch} to sev.{ch} so that we can
+> consolidate all the SEV-ES and SEV-SNP in a one place.
 
-Alexey Boldyrev (ne-vlezay80@yandex.ru) changed:
+No "we":
 
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-           Keywords|                            |opw
-                 CC|                            |ne-vlezay80@yandex.ru
-           Hardware|All                         |x86-64
+... so that all SEV* functionality can be consolidated in one place."
 
---=20
-You may reply to this email to add a comment.
+Rest looks good.
 
-You are receiving this mail because:
-You are watching the assignee of the bug.=
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
