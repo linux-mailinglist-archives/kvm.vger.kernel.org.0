@@ -2,127 +2,182 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CE20E36CDC0
-	for <lists+kvm@lfdr.de>; Tue, 27 Apr 2021 23:15:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C3AF736CDE1
+	for <lists+kvm@lfdr.de>; Tue, 27 Apr 2021 23:31:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237055AbhD0VQb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 27 Apr 2021 17:16:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60720 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236965AbhD0VQa (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 27 Apr 2021 17:16:30 -0400
-Received: from mail-ed1-x52c.google.com (mail-ed1-x52c.google.com [IPv6:2a00:1450:4864:20::52c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CBF8FC061574
-        for <kvm@vger.kernel.org>; Tue, 27 Apr 2021 14:15:46 -0700 (PDT)
-Received: by mail-ed1-x52c.google.com with SMTP id i3so45964162edt.1
-        for <kvm@vger.kernel.org>; Tue, 27 Apr 2021 14:15:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=KjKAsb4G8TL0ol4SRQit/BMD/Sr8mtKntpyCFUbKr94=;
-        b=HMZ+pxK0o6EdaBnD+V+E9N/Mawmh+v/mbYODS7DVQcPiNqU4SkxU35nImij+ex55F8
-         QcOsMUrumgUV581ugOiAptctCihm0S7ATq5R/Vila2Ytv5piXIcnp5m4Za+dwRXCrg/N
-         KJ9J7Zwqg+dUDikbK5dXV9iVSJME5OJJJIgtR35Kz6Uw+n+ZPjdAIZYdRBTR+E3joPjN
-         L9ejgMaoAEknf6+r51EZve93cKAb2SK38ox7KiAlpXg/ETJIBAqKw1Ym28BqCMRILngn
-         +6AVzzG5Q9fQIGQBW/4cv/NbT2ZhYGAw/i87BSuXogYQAWV5Pya56rbgA/y8/piiuupq
-         Q5/w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=KjKAsb4G8TL0ol4SRQit/BMD/Sr8mtKntpyCFUbKr94=;
-        b=hWP8sMOzVgaqhXCU/HnYvJR2PiPtwC3FvLFdGsFvvrklgsOEoLRW8AFzdhWCZqGe4u
-         LaIrNcZb/584kK45vEI0bdyh1L+28gl63Rb0YIqqSezT8yYsw+B/RpgfYJzSBlUV/dma
-         4jzCsiWfu3kAQH0h6uhXe6ScvDuKEed2lE6dljlah3XkdldDRAsfepuVpe6kWxWgeQuv
-         GNXXRPvseOA93JMTf5hnUohp3RmYGGzkIkFh/94XOvmsl7NaKsc8u/mU7OgTPbn3vg7a
-         YIPi9sQXUbjBxX1kuFEKR8BpEqmfnm7N0XQLkJESZGgQ7+lwC4k5VBhwTsOU3kP8DDki
-         HGiw==
-X-Gm-Message-State: AOAM533oDByGAiF2mq0xcOFDh2VImNYR5jThso3yvY899qLchmWvY/7N
-        gIUhMGV9UDbCoIlSEwJKS6VYOLHbwPsIsVm5Gc4b5I8IKbC1
-X-Google-Smtp-Source: ABdhPJwwQsrz//4XD2vnKLu5roFhRqir4u8BZB4HhDQJTUYzabBHV0Zmq7bHGPnYJhGST19HKLCcNOSrfBCVjHueL4E=
-X-Received: by 2002:aa7:c7da:: with SMTP id o26mr6804672eds.244.1619558145094;
- Tue, 27 Apr 2021 14:15:45 -0700 (PDT)
+        id S238970AbhD0Vbp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 27 Apr 2021 17:31:45 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:20812 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S236994AbhD0Vbm (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 27 Apr 2021 17:31:42 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1619559058;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=owSuX0IYYbKuOWpVt2C5gN4EPBjP7c56j/CsuTAmQZ4=;
+        b=aLpJUCPpQ1Py8FiKkFMj6DPugHAhmo/Z5PxJix82mI7+DSxNQYt0/F16FBEvBAUmVgNyAa
+        iklRh3fZEgcyVZwII+hHKNC38G3R2jP3plKrjfdVt4Iv8eeHiAZWlswoXDNTFQcFyixgE+
+        0dwPxbazYZOt9Z8Ejy7GcZg+9kXPj2Q=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-209-zx3zw6DRMkeCyWY8RxI5DA-1; Tue, 27 Apr 2021 17:30:49 -0400
+X-MC-Unique: zx3zw6DRMkeCyWY8RxI5DA-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6C41CC7400;
+        Tue, 27 Apr 2021 21:30:45 +0000 (UTC)
+Received: from redhat.com (ovpn-113-225.phx2.redhat.com [10.3.113.225])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 2E6761042A90;
+        Tue, 27 Apr 2021 21:30:43 +0000 (UTC)
+Date:   Tue, 27 Apr 2021 15:30:42 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     David Airlie <airlied@linux.ie>,
+        Tony Krowiak <akrowiak@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        dri-devel@lists.freedesktop.org,
+        Eric Farman <farman@linux.ibm.com>,
+        Harald Freudenberger <freude@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        intel-gfx@lists.freedesktop.org,
+        intel-gvt-dev@lists.freedesktop.org,
+        Jani Nikula <jani.nikula@linux.intel.com>,
+        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+        kvm@vger.kernel.org, Kirti Wankhede <kwankhede@nvidia.com>,
+        linux-doc@vger.kernel.org, linux-s390@vger.kernel.org,
+        Peter Oberparleiter <oberpar@linux.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Pierre Morel <pmorel@linux.ibm.com>,
+        Rodrigo Vivi <rodrigo.vivi@intel.com>,
+        Vineeth Vijayan <vneethv@linux.ibm.com>,
+        Zhenyu Wang <zhenyuw@linux.intel.com>,
+        Zhi Wang <zhi.a.wang@intel.com>,
+        "Raj, Ashok" <ashok.raj@intel.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Leon Romanovsky <leonro@nvidia.com>,
+        Max Gurtovoy <mgurtovoy@nvidia.com>,
+        Tarun Gupta <targupta@nvidia.com>
+Subject: Re: [PATCH v2 00/13] Remove vfio_mdev.c, mdev_parent_ops and more
+Message-ID: <20210427153042.103e12ab@redhat.com>
+In-Reply-To: <0-v2-7667f42c9bad+935-vfio3_jgg@nvidia.com>
+References: <0-v2-7667f42c9bad+935-vfio3_jgg@nvidia.com>
 MIME-Version: 1.0
-References: <20210309045250.3333311-1-morbo@google.com>
-In-Reply-To: <20210309045250.3333311-1-morbo@google.com>
-From:   Bill Wendling <morbo@google.com>
-Date:   Tue, 27 Apr 2021 14:15:34 -0700
-Message-ID: <CAGG=3QWRS6q3g=AqbgPWDh4uuK3fS_Vw2MK9OXo618P+Y6n-WA@mail.gmail.com>
-Subject: Re: [kvm-unit-tests PATCH] Makefile: do not use "libgcc" for clang
-To:     kvm list <kvm@vger.kernel.org>, Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Jim Mattson <jmattson@google.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Ping.
+On Mon, 26 Apr 2021 17:00:02 -0300
+Jason Gunthorpe <jgg@nvidia.com> wrote:
 
-On Mon, Mar 8, 2021 at 8:53 PM Bill Wendling <morbo@google.com> wrote:
->
-> The -nostdlib flag disables the driver from adding libclang_rt.*.a
-> during linking. Adding a specific library to the command line then
-> causes the linker to report unresolved symbols, because the libraries
-> that resolve those symbols aren't automatically added. Turns out clang
-> doesn't need to specify that library.
->
-> Signed-off-by: Bill Wendling <morbo@google.com>
-> ---
->  Makefile            | 6 ++++++
->  arm/Makefile.common | 2 ++
->  x86/Makefile.common | 2 ++
->  3 files changed, 10 insertions(+)
->
-> diff --git a/Makefile b/Makefile
-> index e0828fe..61a1276 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -22,10 +22,16 @@ DESTDIR := $(PREFIX)/share/kvm-unit-tests/
->  cc-option = $(shell if $(CC) -Werror $(1) -S -o /dev/null -xc /dev/null \
->                > /dev/null 2>&1; then echo "$(1)"; else echo "$(2)"; fi ;)
->
-> +# cc-name
-> +# Expands to either gcc or clang
-> +cc-name = $(shell $(CC) -v 2>&1 | grep -q "clang version" && echo clang || echo gcc)
-> +
->  #make sure env CFLAGS variable is not used
->  CFLAGS =
->
-> +ifneq ($(cc-name),clang)
->  libgcc := $(shell $(CC) --print-libgcc-file-name)
-> +endif
->
->  libcflat := lib/libcflat.a
->  cflatobjs := \
-> diff --git a/arm/Makefile.common b/arm/Makefile.common
-> index a123e85..94922aa 100644
-> --- a/arm/Makefile.common
-> +++ b/arm/Makefile.common
-> @@ -58,7 +58,9 @@ OBJDIRS += lib/arm
->  libeabi = lib/arm/libeabi.a
->  eabiobjs = lib/arm/eabi_compat.o
->
-> +ifneq ($(cc-name),clang)
->  libgcc := $(shell $(CC) $(machine) --print-libgcc-file-name)
-> +endif
->
->  FLATLIBS = $(libcflat) $(LIBFDT_archive) $(libgcc) $(libeabi)
->  %.elf: LDFLAGS = -nostdlib $(arch_LDFLAGS)
-> diff --git a/x86/Makefile.common b/x86/Makefile.common
-> index 55f7f28..a96b236 100644
-> --- a/x86/Makefile.common
-> +++ b/x86/Makefile.common
-> @@ -37,7 +37,9 @@ COMMON_CFLAGS += -O1
->  # stack.o relies on frame pointers.
->  KEEP_FRAME_POINTER := y
->
-> +ifneq ($(cc-name),clang)
->  libgcc := $(shell $(CC) -m$(bits) --print-libgcc-file-name)
-> +endif
->
->  # We want to keep intermediate file: %.elf and %.o
->  .PRECIOUS: %.elf %.o
-> --
-> 2.30.1.766.gb4fecdf3b7-goog
->
+> The mdev bus's core part for managing the lifecycle of devices is mostly
+> as one would expect for a driver core bus subsystem.
+> 
+> However instead of having a normal 'struct device_driver' and binding the
+> actual mdev drivers through the standard driver core mechanisms it open
+> codes this with the struct mdev_parent_ops and provides a single driver
+> that shims between the VFIO core and the actual device driver.
+> 
+> Make every one of the mdev drivers implement an actual struct mdev_driver
+> and directly call vfio_register_group_dev() in the probe() function for
+> the mdev.
+> 
+> Squash what is left of the mdev_parent_ops into the mdev_driver and remap
+> create(), remove() and mdev_attr_groups to their driver core
+> equivalents. Arrange to bind the created mdev_device to the mdev_driver
+> that is provided by the end driver.
+> 
+> The actual execution flow doesn't change much, eg what was
+> parent_ops->create is now device_driver->probe and it is called at almost
+> the exact same time - except under the normal control of the driver core.
+> 
+> This allows deleting the entire mdev_drvdata, and tidying some of the
+> sysfs. Many places in the drivers start using container_of()
+> 
+> This cleanly splits the mdev sysfs GUID lifecycle management stuff from
+> the vfio_device implementation part, the only VFIO special part of mdev
+> that remains is the mdev specific iommu intervention.
+> 
+> v2:
+>  - Keep && m in samples kconfig
+>  - Restore accidently squashed removeal of vfio_mdev.c
+>  - Remove indirections to call bus_register()/bus_unregister()
+>  - Reflow long doc lines
+> v1: https://lore.kernel.org/r/0-v1-d88406ed308e+418-vfio3_jgg@nvidia.com
+> 
+> Jason
+> 
+> Cc: Leon Romanovsky <leonro@nvidia.com>
+> Cc: "Raj, Ashok" <ashok.raj@intel.com>
+> Cc: Dan Williams <dan.j.williams@intel.com>
+> Cc: Max Gurtovoy <mgurtovoy@nvidia.com>
+> Cc: Christoph Hellwig <hch@lst.de>
+> Cc: Tarun Gupta <targupta@nvidia.com>
+> Cc: Daniel Vetter <daniel@ffwll.ch>
+> 
+> 
+> Jason Gunthorpe (13):
+>   vfio/mdev: Remove CONFIG_VFIO_MDEV_DEVICE
+>   vfio/mdev: Allow the mdev_parent_ops to specify the device driver to
+>     bind
+>   vfio/mtty: Convert to use vfio_register_group_dev()
+>   vfio/mdpy: Convert to use vfio_register_group_dev()
+>   vfio/mbochs: Convert to use vfio_register_group_dev()
+>   vfio/ap_ops: Convert to use vfio_register_group_dev()
+>   vfio/ccw: Convert to use vfio_register_group_dev()
+>   vfio/gvt: Convert to use vfio_register_group_dev()
+>   vfio/mdev: Remove vfio_mdev.c
+>   vfio/mdev: Remove mdev_parent_ops dev_attr_groups
+>   vfio/mdev: Remove mdev_parent_ops
+>   vfio/mdev: Use the driver core to create the 'remove' file
+>   vfio/mdev: Remove mdev drvdata
+
+It'd be really helpful if you could consistently copy at least one
+list, preferably one monitored by patchwork, for an entire series.  The
+kvm list is missing patches 06 and 08.  I can find the latter hopping
+over to the intel-gfx or dri-devel projects as I did for the last
+series, but 06 only copied linux-s390, where I need to use lore and
+can't find a patchwork.  Thanks,
+
+Alex
+
+> 
+>  .../driver-api/vfio-mediated-device.rst       |  56 ++---
+>  Documentation/s390/vfio-ap.rst                |   1 -
+>  arch/s390/Kconfig                             |   2 +-
+>  drivers/gpu/drm/i915/Kconfig                  |   2 +-
+>  drivers/gpu/drm/i915/gvt/kvmgt.c              | 210 +++++++++--------
+>  drivers/s390/cio/vfio_ccw_drv.c               |  21 +-
+>  drivers/s390/cio/vfio_ccw_ops.c               | 136 ++++++-----
+>  drivers/s390/cio/vfio_ccw_private.h           |   5 +
+>  drivers/s390/crypto/vfio_ap_ops.c             | 138 ++++++-----
+>  drivers/s390/crypto/vfio_ap_private.h         |   2 +
+>  drivers/vfio/mdev/Kconfig                     |   7 -
+>  drivers/vfio/mdev/Makefile                    |   1 -
+>  drivers/vfio/mdev/mdev_core.c                 |  67 ++++--
+>  drivers/vfio/mdev/mdev_driver.c               |  20 +-
+>  drivers/vfio/mdev/mdev_private.h              |   4 +-
+>  drivers/vfio/mdev/mdev_sysfs.c                |  37 ++-
+>  drivers/vfio/mdev/vfio_mdev.c                 | 180 ---------------
+>  drivers/vfio/vfio.c                           |   6 +-
+>  include/linux/mdev.h                          |  86 +------
+>  include/linux/vfio.h                          |   4 +
+>  samples/Kconfig                               |   6 +-
+>  samples/vfio-mdev/mbochs.c                    | 166 +++++++------
+>  samples/vfio-mdev/mdpy.c                      | 162 +++++++------
+>  samples/vfio-mdev/mtty.c                      | 218 +++++++-----------
+>  24 files changed, 651 insertions(+), 886 deletions(-)
+>  delete mode 100644 drivers/vfio/mdev/vfio_mdev.c
+> 
+
