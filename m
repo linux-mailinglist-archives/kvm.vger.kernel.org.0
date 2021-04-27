@@ -2,122 +2,98 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5EC3736C981
-	for <lists+kvm@lfdr.de>; Tue, 27 Apr 2021 18:34:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BB0B736C9D9
+	for <lists+kvm@lfdr.de>; Tue, 27 Apr 2021 18:57:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236616AbhD0QfG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 27 Apr 2021 12:35:06 -0400
-Received: from foss.arm.com ([217.140.110.172]:54822 "EHLO foss.arm.com"
+        id S237984AbhD0Q6I (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 27 Apr 2021 12:58:08 -0400
+Received: from mail.kernel.org ([198.145.29.99]:43850 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S238335AbhD0Qet (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 27 Apr 2021 12:34:49 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 65150D6E;
-        Tue, 27 Apr 2021 09:34:05 -0700 (PDT)
-Received: from monolith.localdoman (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 4CDE13F73B;
-        Tue, 27 Apr 2021 09:34:04 -0700 (PDT)
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-To:     drjones@redhat.com, kvm@vger.kernel.org,
-        kvmarm@lists.cs.columbia.edu
-Cc:     pbonzini@redhat.com
-Subject: [kvm-unit-tests PATCH v2] configure: arm: Replace --vmm with --target
-Date:   Tue, 27 Apr 2021 17:34:37 +0100
-Message-Id: <20210427163437.243839-1-alexandru.elisei@arm.com>
-X-Mailer: git-send-email 2.31.1
+        id S237993AbhD0Q6D (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 27 Apr 2021 12:58:03 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPS id 48FA36105A
+        for <kvm@vger.kernel.org>; Tue, 27 Apr 2021 16:57:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1619542639;
+        bh=yKa+ob5V75yry2sndfvZzrSoade7VNgZQo+US3sqfgY=;
+        h=From:To:Subject:Date:From;
+        b=KQPb+b8fUCNMR4UpgKYbtLIurAAWWglJwlazWPQt5EeFKI2N978aWfJhjJ4XPFRP+
+         2SUWtghBtNMzlGzwO+UebJBct/uer7tykVotSSpdw8JnVKvhUHBu32/rdNdJSh6dWC
+         rMd+om7jV6vsW5aMBm2zxpSjznRM2+5YHESvzZV3/4sFssR2BhP4unKiWl5BMox4D9
+         r/OAWVKH3fRfxCd1Cz9Rz5YnQP6FmzqvabHNp35I3x1V4XOrc6ek88GAS+HXVZBbr9
+         udFDOyjfnKiglOdERqm2ISqOESb1bUTtYxZPeP4qNBp5clBVEWMoTAwwI79gsuZR4Z
+         JeHWKVUC6OvHQ==
+Received: by pdx-korg-bugzilla-2.web.codeaurora.org (Postfix, from userid 48)
+        id 41BB661247; Tue, 27 Apr 2021 16:57:19 +0000 (UTC)
+From:   bugzilla-daemon@bugzilla.kernel.org
+To:     kvm@vger.kernel.org
+Subject: [Bug 212859] New: Nested virtualization does not work well
+Date:   Tue, 27 Apr 2021 16:57:18 +0000
+X-Bugzilla-Reason: None
+X-Bugzilla-Type: new
+X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Product: Virtualization
+X-Bugzilla-Component: kvm
+X-Bugzilla-Version: unspecified
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: ne-vlezay80@yandex.ru
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: bug_id short_desc product version
+ cf_kernel_version rep_platform op_sys cf_tree bug_status bug_severity
+ priority component assigned_to reporter cf_regression
+Message-ID: <bug-212859-28872@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The --vmm configure option was added to distinguish between the two virtual
-machine managers that kvm-unit-tests supports, qemu or kvmtool. There are
-plans to make kvm-unit-tests work as an EFI app, which will require changes
-to the way tests are compiled. Instead of adding a new configure option
-specifically for EFI and have it coexist with --vmm, or overloading the
-semantics of the existing --vmm option, let's replace --vmm with the more
-generic name --target.
+https://bugzilla.kernel.org/show_bug.cgi?id=3D212859
 
-Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
----
-Changes in v2:
+            Bug ID: 212859
+           Summary: Nested virtualization does not work well
+           Product: Virtualization
+           Version: unspecified
+    Kernel Version: 4.19.188-amd64-cust1
+          Hardware: All
+                OS: Linux
+              Tree: Mainline
+            Status: NEW
+          Severity: normal
+          Priority: P1
+         Component: kvm
+          Assignee: virtualization_kvm@kernel-bugs.osdl.org
+          Reporter: ne-vlezay80@yandex.ru
+        Regression: No
 
-* Removed the RFC tag and cover letter.
-* Removed --vmm entirely.
+Qemu version: 2.8.1
 
- configure | 19 ++++++++++---------
- 1 file changed, 10 insertions(+), 9 deletions(-)
+System: Devuan Ascii
 
-diff --git a/configure b/configure
-index 01a0b262a9f2..08c6afdf952c 100755
---- a/configure
-+++ b/configure
-@@ -21,7 +21,7 @@ pretty_print_stacks=yes
- environ_default=yes
- u32_long=
- wa_divide=
--vmm="qemu"
-+target="qemu"
- errata_force=0
- erratatxt="$srcdir/errata.txt"
- host_key_document=
-@@ -35,8 +35,8 @@ usage() {
- 	Options include:
- 	    --arch=ARCH            architecture to compile for ($arch)
- 	    --processor=PROCESSOR  processor to compile for ($arch)
--	    --vmm=VMM              virtual machine monitor to compile for (qemu
--	                           or kvmtool, default is qemu) (arm/arm64 only)
-+	    --target=TARGET        target platform that the tests will be running on (qemu or
-+	                           kvmtool, default is qemu) (arm/arm64 only)
- 	    --cross-prefix=PREFIX  cross compiler prefix
- 	    --cc=CC		   c compiler to use ($cc)
- 	    --ld=LD		   ld linker to use ($ld)
-@@ -58,7 +58,7 @@ usage() {
- 	    --earlycon=EARLYCON
- 	                           Specify the UART name, type and address (optional, arm and
- 	                           arm64 only). The specified address will overwrite the UART
--	                           address set by the --vmm option. EARLYCON can be one of
-+	                           address set by the --target option. EARLYCON can be one of
- 	                           (case sensitive):
- 	               uart[8250],mmio,ADDR
- 	                           Specify an 8250 compatible UART at address ADDR. Supported
-@@ -88,8 +88,8 @@ while [[ "$1" = -* ]]; do
-         --processor)
- 	    processor="$arg"
- 	    ;;
--	--vmm)
--	    vmm="$arg"
-+	--target)
-+	    target="$arg"
- 	    ;;
- 	--cross-prefix)
- 	    cross_prefix="$arg"
-@@ -177,13 +177,13 @@ if [ "$arch" = "i386" ] || [ "$arch" = "x86_64" ]; then
-     testdir=x86
- elif [ "$arch" = "arm" ] || [ "$arch" = "arm64" ]; then
-     testdir=arm
--    if [ "$vmm" = "qemu" ]; then
-+    if [ "$target" = "qemu" ]; then
-         arm_uart_early_addr=0x09000000
--    elif [ "$vmm" = "kvmtool" ]; then
-+    elif [ "$target" = "kvmtool" ]; then
-         arm_uart_early_addr=0x3f8
-         errata_force=1
-     else
--        echo '--vmm must be one of "qemu" or "kvmtool"!'
-+        echo '--target must be one of "qemu" or "kvmtool"!'
-         usage
-     fi
- 
-@@ -317,6 +317,7 @@ U32_LONG_FMT=$u32_long
- WA_DIVIDE=$wa_divide
- GENPROTIMG=${GENPROTIMG-genprotimg}
- HOST_KEY_DOCUMENT=$host_key_document
-+TARGET=$target
- EOF
- 
- cat <<EOF > lib/config.h
--- 
-2.31.1
+Problem:
 
+If you try to use nested virtualization and run linux or openbsd on it, then
+the system inside the nested virtual machine periodically freezes. If you w=
+atch
+strace, there are a lot of timeouts during the hangup. But, if you use a ke=
+rnel
+from 5.10+ and qemu 5.20 on the host, then everything is fine. Nested
+virtualization works fine. Also run kernel 4.19.* on qemu, problem is not
+appers.
+
+Demonstration:
+https://youtu.be/mrMPukeTntQ
+
+--=20
+You may reply to this email to add a comment.
+
+You are receiving this mail because:
+You are watching the assignee of the bug.=
