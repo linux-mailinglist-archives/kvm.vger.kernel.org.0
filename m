@@ -2,26 +2,26 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6497E36CD48
-	for <lists+kvm@lfdr.de>; Tue, 27 Apr 2021 22:55:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DFF0636CD4C
+	for <lists+kvm@lfdr.de>; Tue, 27 Apr 2021 22:55:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239104AbhD0Uzw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 27 Apr 2021 16:55:52 -0400
-Received: from linux.microsoft.com ([13.77.154.182]:35570 "EHLO
+        id S239144AbhD0Uzz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 27 Apr 2021 16:55:55 -0400
+Received: from linux.microsoft.com ([13.77.154.182]:35580 "EHLO
         linux.microsoft.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239013AbhD0Uzt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S239043AbhD0Uzt (ORCPT <rfc822;kvm@vger.kernel.org>);
         Tue, 27 Apr 2021 16:55:49 -0400
 Received: from viremana-dev.fwjladdvyuiujdukmejncen4mf.xx.internal.cloudapp.net (unknown [13.66.132.26])
-        by linux.microsoft.com (Postfix) with ESMTPSA id D8A1B20B8001;
+        by linux.microsoft.com (Postfix) with ESMTPSA id F1B3320B8002;
         Tue, 27 Apr 2021 13:55:05 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com D8A1B20B8001
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com F1B3320B8002
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-        s=default; t=1619556905;
-        bh=Ej89Qm9LLMSPxt8OXtylVuc32Z7Yd+HfBt+EQT9qOcM=;
+        s=default; t=1619556906;
+        bh=N+TtNg651kLEqW/yUqiR219gdHV+Nj5LUEDricdH7Go=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=PDSa9QUPVYflfgMJWAgTbEJG+7+06T7vKyciYF1fXrbSVUcbE/FBojkyuHIrc6Cbt
-         ldrKzzEEb56CaYP9qDhkS+uBdx/7fJilIdaSw7DpW3jAky2Lhcrrn20Ax8Uy5lB6jT
-         RudJ8XQk73khY8QEpCt60IEDwyFrUOH09bjYb2z8=
+        b=Mw/leQAAUaqye9+XGI0trTjkKXYdvQNWm6Sf1LkemCV3G7F10D2ThQwIF3pBCDa7b
+         389Rnz6EMU8+Z1af7ecGsAXEqEND6j+CBNvyhouYdoW59ATCVWS+93XiMsIRPxVZQv
+         ESQAjVmn0b5JwQoLmJR3u5DV1EWMwmerFetdZAFY=
 From:   Vineeth Pillai <viremana@linux.microsoft.com>
 To:     Lan Tianyu <Tianyu.Lan@microsoft.com>,
         Michael Kelley <mikelley@microsoft.com>,
@@ -41,9 +41,9 @@ Cc:     Vineeth Pillai <viremana@linux.microsoft.com>,
         "K. Y. Srinivasan" <kys@microsoft.com>, x86@kernel.org,
         kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
         linux-hyperv@vger.kernel.org
-Subject: [PATCH v4 1/7] hyperv: Detect Nested virtualization support for SVM
-Date:   Tue, 27 Apr 2021 20:54:50 +0000
-Message-Id: <8ffa88e6ceb55d283c76b4c5fd9ad0fb1a2cf667.1619556430.git.viremana@linux.microsoft.com>
+Subject: [PATCH v4 2/7] hyperv: SVM enlightened TLB flush support flag
+Date:   Tue, 27 Apr 2021 20:54:51 +0000
+Message-Id: <cce3e52fde732ccdc7a34d2eb1e2d59917e4e5e0.1619556430.git.viremana@linux.microsoft.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <cover.1619556430.git.viremana@linux.microsoft.com>
 References: <cover.1619556430.git.viremana@linux.microsoft.com>
@@ -53,68 +53,37 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Previously, to detect nested virtualization enlightenment support,
-we were using HV_X64_ENLIGHTENED_VMCS_RECOMMENDED feature bit of
-HYPERV_CPUID_ENLIGHTMENT_INFO.EAX CPUID as docuemented in TLFS:
- "Bit 14: Recommend a nested hypervisor using the enlightened VMCS
-  interface. Also indicates that additional nested enlightenments
-  may be available (see leaf 0x4000000A)".
-
-Enlightened VMCS, however, is an Intel only feature so the above
-detection method doesn't work for AMD. So, use the
-HYPERV_CPUID_VENDOR_AND_MAX_FUNCTIONS.EAX CPUID information ("The
-maximum input value for hypervisor CPUID information.") and this
-works for both AMD and Intel.
+Bit 22 of HYPERV_CPUID_FEATURES.EDX is specific to SVM and specifies
+support for enlightened TLB flush. With this enlightenment enabled,
+ASID invalidations flushes only gva->hpa entries. To flush TLB entries
+derived from NPT, hypercalls should be used
+(HvFlushGuestPhysicalAddressSpace or HvFlushGuestPhysicalAddressList)
 
 Signed-off-by: Vineeth Pillai <viremana@linux.microsoft.com>
 ---
- arch/x86/kernel/cpu/mshyperv.c | 10 +++++++---
- 1 file changed, 7 insertions(+), 3 deletions(-)
+ arch/x86/include/asm/hyperv-tlfs.h | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-diff --git a/arch/x86/kernel/cpu/mshyperv.c b/arch/x86/kernel/cpu/mshyperv.c
-index 3546d3e21787..c6f812851e37 100644
---- a/arch/x86/kernel/cpu/mshyperv.c
-+++ b/arch/x86/kernel/cpu/mshyperv.c
-@@ -252,6 +252,7 @@ static void __init hv_smp_prepare_cpus(unsigned int max_cpus)
+diff --git a/arch/x86/include/asm/hyperv-tlfs.h b/arch/x86/include/asm/hyperv-tlfs.h
+index 606f5cc579b2..005bf14d0449 100644
+--- a/arch/x86/include/asm/hyperv-tlfs.h
++++ b/arch/x86/include/asm/hyperv-tlfs.h
+@@ -133,6 +133,15 @@
+ #define HV_X64_NESTED_GUEST_MAPPING_FLUSH		BIT(18)
+ #define HV_X64_NESTED_MSR_BITMAP			BIT(19)
  
- static void __init ms_hyperv_init_platform(void)
- {
-+	int hv_max_functions_eax;
- 	int hv_host_info_eax;
- 	int hv_host_info_ebx;
- 	int hv_host_info_ecx;
-@@ -269,6 +270,8 @@ static void __init ms_hyperv_init_platform(void)
- 	ms_hyperv.misc_features = cpuid_edx(HYPERV_CPUID_FEATURES);
- 	ms_hyperv.hints    = cpuid_eax(HYPERV_CPUID_ENLIGHTMENT_INFO);
- 
-+	hv_max_functions_eax = cpuid_eax(HYPERV_CPUID_VENDOR_AND_MAX_FUNCTIONS);
++/*
++ * This is specific to AMD and specifies that enlightened TLB flush is
++ * supported. If guest opts in to this feature, ASID invalidations only
++ * flushes gva -> hpa mapping entries. To flush the TLB entries derived
++ * from NPT, hypercalls should be used (HvFlushGuestPhysicalAddressSpace
++ * or HvFlushGuestPhysicalAddressList).
++ */
++#define HV_X64_NESTED_ENLIGHTENED_TLB			BIT(22)
 +
- 	pr_info("Hyper-V: privilege flags low 0x%x, high 0x%x, hints 0x%x, misc 0x%x\n",
- 		ms_hyperv.features, ms_hyperv.priv_high, ms_hyperv.hints,
- 		ms_hyperv.misc_features);
-@@ -298,8 +301,7 @@ static void __init ms_hyperv_init_platform(void)
- 	/*
- 	 * Extract host information.
- 	 */
--	if (cpuid_eax(HYPERV_CPUID_VENDOR_AND_MAX_FUNCTIONS) >=
--	    HYPERV_CPUID_VERSION) {
-+	if (hv_max_functions_eax >= HYPERV_CPUID_VERSION) {
- 		hv_host_info_eax = cpuid_eax(HYPERV_CPUID_VERSION);
- 		hv_host_info_ebx = cpuid_ebx(HYPERV_CPUID_VERSION);
- 		hv_host_info_ecx = cpuid_ecx(HYPERV_CPUID_VERSION);
-@@ -325,9 +327,11 @@ static void __init ms_hyperv_init_platform(void)
- 			ms_hyperv.isolation_config_a, ms_hyperv.isolation_config_b);
- 	}
+ /* HYPERV_CPUID_ISOLATION_CONFIG.EAX bits. */
+ #define HV_PARAVISOR_PRESENT				BIT(0)
  
--	if (ms_hyperv.hints & HV_X64_ENLIGHTENED_VMCS_RECOMMENDED) {
-+	if (hv_max_functions_eax >= HYPERV_CPUID_NESTED_FEATURES) {
- 		ms_hyperv.nested_features =
- 			cpuid_eax(HYPERV_CPUID_NESTED_FEATURES);
-+		pr_info("Hyper-V: Nested features: 0x%x\n",
-+			ms_hyperv.nested_features);
- 	}
- 
- 	/*
 -- 
 2.25.1
 
