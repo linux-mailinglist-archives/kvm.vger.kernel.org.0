@@ -2,128 +2,311 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9DB2F36C883
-	for <lists+kvm@lfdr.de>; Tue, 27 Apr 2021 17:18:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0233536C891
+	for <lists+kvm@lfdr.de>; Tue, 27 Apr 2021 17:20:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236710AbhD0PTJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 27 Apr 2021 11:19:09 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:63730 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S235659AbhD0PTJ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 27 Apr 2021 11:19:09 -0400
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 13RF5WOq078713;
-        Tue, 27 Apr 2021 11:17:47 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=15y1mYdOqZDhvaUTkeGjtPkIrb+NclH60/6bu+vDob0=;
- b=UIJU+hjmbZ7Li3H4LXdNdjcvcj+5xhhKov3LrsnJXihEReOBy2IpLj4hv344ulagKADs
- eXL8tCxmxVFGJ2A/d0OPFlOApHmKC5TqEPoWyJxOjlXNskCFdRNB5tF0iazgPzgMUnFc
- IgloiHl4P3UsUYJQnLWz4odgDhbB+ui2ciQ89gBqTIVtqcU/nCcEhb8tJIS1mqPn97Zw
- BZ22GWLFeZ34/dBfYKDRlppJxmenXlMKyX3yqFHhsXxllitW/TzPUm8mTWabZkBo7OEH
- XRGdR6hg+iqKL6QUd4LISZx+MScOtdyxMICDP5HwxmBb8fA61SP7QIQu/BpD1jQdwjEx Nw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 386ksjk5m0-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 27 Apr 2021 11:17:47 -0400
-Received: from m0098394.ppops.net (m0098394.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 13RF6g51086258;
-        Tue, 27 Apr 2021 11:17:46 -0400
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 386ksjk5k3-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 27 Apr 2021 11:17:46 -0400
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 13RFHifK016747;
-        Tue, 27 Apr 2021 15:17:44 GMT
-Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
-        by ppma06ams.nl.ibm.com with ESMTP id 384akh9dwd-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 27 Apr 2021 15:17:44 +0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 13RFGjx629491698
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 27 Apr 2021 15:16:46 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 280DCAE04D;
-        Tue, 27 Apr 2021 15:17:10 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 5584BAE045;
-        Tue, 27 Apr 2021 15:17:09 +0000 (GMT)
-Received: from oc7455500831.ibm.com (unknown [9.171.69.120])
-        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue, 27 Apr 2021 15:17:09 +0000 (GMT)
-Subject: Re: sched: Move SCHED_DEBUG sysctl to debugfs
-To:     Steven Rostedt <rostedt@goodmis.org>
-Cc:     peterz@infradead.org, bristot@redhat.com, bsegall@google.com,
-        dietmar.eggemann@arm.com, greg@kroah.com,
-        gregkh@linuxfoundation.org, joshdon@google.com,
-        juri.lelli@redhat.com, linux-kernel@vger.kernel.org,
-        linux@rasmusvillemoes.dk, mgorman@suse.de, mingo@kernel.org,
-        valentin.schneider@arm.com, vincent.guittot@linaro.org,
-        linux-s390@vger.kernel.org, kvm@vger.kernel.org
-References: <20210412102001.287610138@infradead.org>
- <20210427145925.5246-1-borntraeger@de.ibm.com>
- <20210427110926.24f41fbb@gandalf.local.home>
-From:   Christian Borntraeger <borntraeger@de.ibm.com>
-Message-ID: <ae04549f-b009-9d90-d312-5c544f5a5e14@de.ibm.com>
-Date:   Tue, 27 Apr 2021 17:17:09 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.9.1
+        id S238695AbhD0PVS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 27 Apr 2021 11:21:18 -0400
+Received: from forward2-smtp.messagingengine.com ([66.111.4.226]:37147 "EHLO
+        forward2-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S236663AbhD0PVR (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 27 Apr 2021 11:21:17 -0400
+Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
+        by mailforward.nyi.internal (Postfix) with ESMTP id 3134D1940C66;
+        Tue, 27 Apr 2021 11:20:30 -0400 (EDT)
+Received: from mailfrontend2 ([10.202.2.163])
+  by compute5.internal (MEProxy); Tue, 27 Apr 2021 11:20:30 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        messagingengine.com; h=cc:content-type:date:from:in-reply-to
+        :message-id:mime-version:references:subject:to:x-me-proxy
+        :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; bh=9fqkKP
+        5kWsCDgbN9IMwpdovybRSA4Y/1R8FSIObNGxQ=; b=AXNRJM11zSdtWbBKB++cBw
+        /ZsMG9Gs+6g+YDw74z/WCkvO8qbDXCkwnnlgRbkMVsgU1XJQ4W9jCjWOl45x+ccE
+        9rXE17QkJHFrexc/TBHB5V/Yn4uF7mb220VDWYu1s0FYE0PwVdDfQVfhxBn95Rqr
+        bn+flZ1I5KHn8xB67+IbGGBJy0hSmjJ86rZrzYKpmFfr4dnuc5OXtDu+YCX37Fxt
+        S8xBDWAknyb4fKGEwUo9AiQ8BaU7Ksu4eJazm2aXce6KRQEL0Ax/j4Gdo2fKflpW
+        xXp6Ej8XXZSlqb8j3jezWSlNfD2oO1afQ2FS4L1f50aFDkh1jPIbd227R1HnW6FA
+        ==
+X-ME-Sender: <xms:uyuIYNJLT9os2GfF3OQqzQoF32J47I9tfeAmPiolf8XC0sAn0s11Dw>
+    <xme:uyuIYJIQcHsiU7LbcuCuUkmmOSNZqOZlKqr-8KT4pvD15OaGUr5HNbZLCW_zuXNo6
+    czI2HOQAOBZj_5uD08>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeduledrvddvtddgkeelucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
+    cujfgurhepvffujghfhfffkfggtgesthdtredttddttdenucfhrhhomhepffgrvhhiugcu
+    gfgumhhonhgushhonhcuoegumhgvsegumhgvrdhorhhgqeenucggtffrrghtthgvrhhnpe
+    fhkeeguedtvdegffffteehjedvjeeitefgfefgffdugeffffegudehgeetgeelkeenucfk
+    phepkedurddukeejrddviedrvdefkeenucevlhhushhtvghrufhiiigvpedtnecurfgrrh
+    grmhepmhgrihhlfhhrohhmpegumhgvsegumhgvrdhorhhg
+X-ME-Proxy: <xmx:uyuIYFuSkheRBOafUe4Fqu71IVURfSBxWaeU55lJ7hRih7YunmCh3w>
+    <xmx:uyuIYOZ-rdP1X1ztult9HESvGU5PBZku9Kt3nxoI2scrR9Ko5rbb4Q>
+    <xmx:uyuIYEZwLa3fyaSAdKxoWGk8_s8MQRD2807CurRmZFwFuDtz2rX9ag>
+    <xmx:viuIYOuccJPO8ZNy_Bgg6y3LmcV2m9nvf8DQsnvEZPjcgSQBXUk-s7Ywkl0>
+Received: from disaster-area.hh.sledj.net (disaster-area.hh.sledj.net [81.187.26.238])
+        by mail.messagingengine.com (Postfix) with ESMTPA;
+        Tue, 27 Apr 2021 11:20:25 -0400 (EDT)
+Received: from localhost (disaster-area.hh.sledj.net [local])
+        by disaster-area.hh.sledj.net (OpenSMTPD) with ESMTPA id 045776a2;
+        Tue, 27 Apr 2021 15:20:25 +0000 (UTC)
+To:     Hikaru Nishida <hikalium@chromium.org>, kvm@vger.kernel.org
+Cc:     suleiman@google.com, Hikaru Nishida <hikalium@chromium.org>,
+        Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        John Stultz <john.stultz@linaro.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Stephen Boyd <sboyd@kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        linux-kernel@vger.kernel.org, x86@kernel.org
+Subject: Re: [RFC PATCH 4/6] x86/kvm: Add a host side support for virtual
+ suspend time injection
+In-Reply-To: <20210426090644.2218834-5-hikalium@chromium.org>
+References: <20210426090644.2218834-1-hikalium@chromium.org>
+ <20210426090644.2218834-5-hikalium@chromium.org>
+X-HGTTG: zarquon
+From:   David Edmondson <dme@dme.org>
+Date:   Tue, 27 Apr 2021 16:20:24 +0100
+Message-ID: <cuneeevkb47.fsf@dme.org>
 MIME-Version: 1.0
-In-Reply-To: <20210427110926.24f41fbb@gandalf.local.home>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: 8LnwMr35GvdP4-iKrSuyQ1vsFGyXLnDn
-X-Proofpoint-GUID: 8p0vcg5TR-O8GTMPBnw3xzhxG9KNmE4H
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.761
- definitions=2021-04-27_08:2021-04-27,2021-04-27 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- clxscore=1015 mlxscore=0 impostorscore=0 suspectscore=0 phishscore=0
- lowpriorityscore=0 spamscore=0 mlxlogscore=999 bulkscore=0 adultscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2104060000 definitions=main-2104270107
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Monday, 2021-04-26 at 18:06:43 +09, Hikaru Nishida wrote:
 
+> This patch implements virtual suspend time injection support for kvm
+> hosts.
+> If this functionality is enabled and the guest requests it, the host
+> will stop all the clocks observed by the guest during the host's
+> suspension and report the duration of suspend to the guest through
+> struct kvm_host_suspend_time to give a chance to adjust CLOCK_BOOTTIME
+> to the guest. This mechanism can be used to align the guest's clock
+> behavior to the hosts' ones.
+>
+> Signed-off-by: Hikaru Nishida <hikalium@chromium.org>
+> ---
+>
+>  arch/x86/include/asm/kvm_host.h |  5 ++
+>  arch/x86/kvm/cpuid.c            |  4 ++
+>  arch/x86/kvm/x86.c              | 89 ++++++++++++++++++++++++++++++++-
+>  include/linux/kvm_host.h        |  7 +++
+>  kernel/time/timekeeping.c       |  3 ++
+>  5 files changed, 107 insertions(+), 1 deletion(-)
+>
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index 3768819693e5..6584adaab3bf 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -994,6 +994,11 @@ struct kvm_arch {
+>  
+>  	gpa_t wall_clock;
+>  
+> +#ifdef CONFIG_KVM_VIRT_SUSPEND_TIMING
+> +	struct gfn_to_hva_cache suspend_time;
+> +	bool suspend_time_injection_enabled;
+> +#endif /* KVM_VIRT_SUSPEND_TIMING */
+> +
+>  	bool mwait_in_guest;
+>  	bool hlt_in_guest;
+>  	bool pause_in_guest;
+> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+> index 6bd2f8b830e4..62224b7bd7f9 100644
+> --- a/arch/x86/kvm/cpuid.c
+> +++ b/arch/x86/kvm/cpuid.c
+> @@ -814,6 +814,10 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
+>  			     (1 << KVM_FEATURE_PV_SCHED_YIELD) |
+>  			     (1 << KVM_FEATURE_ASYNC_PF_INT);
+>  
+> +#ifdef CONFIG_KVM_VIRT_SUSPEND_TIMING
+> +		entry->eax |= (1 << KVM_FEATURE_HOST_SUSPEND_TIME);
+> +#endif
+> +
+>  		if (sched_info_on())
+>  			entry->eax |= (1 << KVM_FEATURE_STEAL_TIME);
+>  
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index eca63625aee4..d919f771ce31 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -1285,6 +1285,9 @@ static const u32 emulated_msrs_all[] = {
+>  
+>  	MSR_KVM_ASYNC_PF_EN, MSR_KVM_STEAL_TIME,
+>  	MSR_KVM_PV_EOI_EN, MSR_KVM_ASYNC_PF_INT, MSR_KVM_ASYNC_PF_ACK,
+> +#ifdef CONFIG_KVM_VIRT_SUSPEND_TIMING
+> +	MSR_KVM_HOST_SUSPEND_TIME,
+> +#endif
+>  
+>  	MSR_IA32_TSC_ADJUST,
+>  	MSR_IA32_TSCDEADLINE,
+> @@ -2020,6 +2023,20 @@ static void kvm_write_system_time(struct kvm_vcpu *vcpu, gpa_t system_time,
+>  	return;
+>  }
+>  
+> +#ifdef CONFIG_KVM_VIRT_SUSPEND_TIMING
+> +static void kvm_write_suspend_time(struct kvm *kvm, bool updated)
 
-On 27.04.21 17:09, Steven Rostedt wrote:
-> On Tue, 27 Apr 2021 16:59:25 +0200
-> Christian Borntraeger <borntraeger@de.ibm.com> wrote:
-> 
->> Peter,
->>
->> I just realized that we moved away sysctl tunabled to debugfs in next.
->> We have seen several cases where it was benefitial to set
->> sched_migration_cost_ns to a lower value. For example with KVM I can
->> easily get 50% more transactions with 50000 instead of 500000.
->> Until now it was possible to use tuned or /etc/sysctl.conf to set
->> these things permanently.
->>
->> Given that some people do not want to have debugfs mounted all the time
->> I would consider this a regression. The sysctl tunable was always
->> available.
->>
->> I am ok with the "informational" things being in debugfs, but not
->> the tunables. So how do we proceed here?
-> 
-> Should there be a schedfs created?
-> 
-> This is the reason I created the tracefs file system, was to get the
-> tracing code out of debugfs, as debugfs is a catch all for everything and
-> can lead to poor and insecure interfaces that people do not want to add on
-> systems that they still want tracing on.
-> 
-> Or perhaps we should add a "tunefs" for tunables that are stable interfaces
-> that should not be in /proc but also not in debugfs.
+The "updated" argument is not used.
 
-Yes, a tunefs or schedfs could be considered a replacement for sysctl.
-It will still break existing setups with kernel.sched* things in /etc/sysctl.conf
-but at least there is a stable transition path.
+> +{
+> +	struct kvm_arch *ka = &kvm->arch;
+> +	struct kvm_host_suspend_time st;
+> +
+> +	if (!ka->suspend_time_injection_enabled)
+> +		return;
+> +
+> +	st.suspend_time_ns = kvm->suspend_time_ns;
+> +	kvm_write_guest_cached(kvm, &ka->suspend_time, &st, sizeof(st));
+> +}
+> +#endif
+> +
+>  static uint32_t div_frac(uint32_t dividend, uint32_t divisor)
+>  {
+>  	do_shl32_div32(dividend, divisor);
+> @@ -2653,6 +2670,9 @@ static void kvm_setup_pvclock_page(struct kvm_vcpu *v,
+>  
+>  	if (vcpu->pvclock_set_guest_stopped_request) {
+>  		vcpu->hv_clock.flags |= PVCLOCK_GUEST_STOPPED;
+> +#ifdef CONFIG_KVM_VIRT_SUSPEND_TIMING
+> +		kvm_write_suspend_time(v->kvm, true);
+> +#endif
+>  		vcpu->pvclock_set_guest_stopped_request = false;
+>  	}
+>  
+> @@ -3229,7 +3249,23 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+>  
+>  		vcpu->arch.msr_kvm_poll_control = data;
+>  		break;
+> -
+> +#ifdef CONFIG_KVM_VIRT_SUSPEND_TIMING
+> +	case MSR_KVM_HOST_SUSPEND_TIME:
+> +		if (!guest_pv_has(vcpu, KVM_FEATURE_HOST_SUSPEND_TIME))
+> +			return 1;
+> +		if (!(data & KVM_MSR_ENABLED)) {
+> +			vcpu->kvm->arch.suspend_time_injection_enabled = false;
+> +			break;
+> +		}
+> +		if (kvm_gfn_to_hva_cache_init(vcpu->kvm,
+> +		     &vcpu->kvm->arch.suspend_time, data & ~KVM_MSR_ENABLED,
+> +		     sizeof(struct kvm_host_suspend_time))) {
+> +			return 1;
+> +		}
+> +		vcpu->kvm->arch.suspend_time_injection_enabled = true;
+> +		kvm_write_suspend_time(vcpu->kvm, false);
+> +		break;
+> +#endif
+>  	case MSR_IA32_MCG_CTL:
+>  	case MSR_IA32_MCG_STATUS:
+>  	case MSR_IA32_MC0_CTL ... MSR_IA32_MCx_CTL(KVM_MAX_MCE_BANKS) - 1:
+> @@ -3535,6 +3571,15 @@ int kvm_get_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+>  
+>  		msr_info->data = vcpu->arch.msr_kvm_poll_control;
+>  		break;
+> +#ifdef CONFIG_KVM_VIRT_SUSPEND_TIMING
+> +	case MSR_KVM_HOST_SUSPEND_TIME:
+> +		if (!guest_pv_has(vcpu, KVM_FEATURE_HOST_SUSPEND_TIME))
+> +			return 1;
+> +		msr_info->data = vcpu->kvm->arch.suspend_time.gpa;
+> +		if (vcpu->kvm->arch.suspend_time_injection_enabled)
+> +			msr_info->data |= KVM_MSR_ENABLED;
+> +		break;
+> +#endif
+>  	case MSR_IA32_P5_MC_ADDR:
+>  	case MSR_IA32_P5_MC_TYPE:
+>  	case MSR_IA32_MCG_CAP:
+> @@ -11723,6 +11768,48 @@ int kvm_sev_es_string_io(struct kvm_vcpu *vcpu, unsigned int size,
+>  }
+>  EXPORT_SYMBOL_GPL(kvm_sev_es_string_io);
+>  
+> +#ifdef CONFIG_KVM_VIRT_SUSPEND_TIMING
+> +void kvm_arch_timekeeping_inject_sleeptime(const struct timespec64 *delta)
+> +{
+> +	struct kvm_vcpu *vcpu;
+> +	u64 suspend_time_ns;
+> +	struct kvm *kvm;
+> +	s64 adj;
+> +	int i;
+> +
+> +	suspend_time_ns = timespec64_to_ns(delta);
+> +	adj = tsc_khz * (suspend_time_ns / 1000000);
+> +	/*
+> +	 * Adjust TSCs on all vcpus as if they are stopped during a suspend.
+> +	 * doing a similar thing in kvm_arch_hardware_enable().
+> +	 */
+> +	mutex_lock(&kvm_lock);
+> +	list_for_each_entry(kvm, &vm_list, vm_list) {
+> +		if (!kvm->arch.suspend_time_injection_enabled)
+> +			continue;
+> +
+> +		kvm_for_each_vcpu(i, vcpu, kvm) {
+> +			/*
+> +			 * Adjustment here is always smaller than the gap
+> +			 * observed by the guest, so subtracting the value
+> +			 * here never rewinds the observed TSC in guests.
+> +			 * This adjustment will be applied on the next
+> +			 * kvm_arch_vcpu_load().
+> +			 */
+> +			vcpu->arch.tsc_offset_adjustment -= adj;
+> +		}
+> +		/*
+> +		 * Move the offset of kvm_clock here as if it is stopped
+> +		 * during the suspension.
+> +		 */
+> +		kvm->arch.kvmclock_offset -= suspend_time_ns;
+> +		/* suspend_time is accumulated per VM. */
+> +		kvm->suspend_time_ns += suspend_time_ns;
+> +	}
+> +	mutex_unlock(&kvm_lock);
+> +}
+> +#endif
+> +
+>  EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_entry);
+>  EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_exit);
+>  EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_fast_mmio);
+> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> index 1b65e7204344..e077b9a960fc 100644
+> --- a/include/linux/kvm_host.h
+> +++ b/include/linux/kvm_host.h
+> @@ -520,6 +520,9 @@ struct kvm {
+>  	pid_t userspace_pid;
+>  	unsigned int max_halt_poll_ns;
+>  	u32 dirty_ring_size;
+> +#ifdef CONFIG_KVM_VIRT_SUSPEND_TIMING
+> +	u64 suspend_time_ns;
+> +#endif
+>  };
+>  
+>  #define kvm_err(fmt, ...) \
+> @@ -1522,4 +1525,8 @@ static inline void kvm_handle_signal_exit(struct kvm_vcpu *vcpu)
+>  /* Max number of entries allowed for each kvm dirty ring */
+>  #define  KVM_DIRTY_RING_MAX_ENTRIES  65536
+>  
+> +#ifdef CONFIG_KVM_VIRT_SUSPEND_TIMING
+> +void kvm_arch_timekeeping_inject_sleeptime(const struct timespec64 *delta);
+> +#endif /* CONFIG_KVM_VIRT_SUSPEND_TIMING */
+> +
+>  #endif
+> diff --git a/kernel/time/timekeeping.c b/kernel/time/timekeeping.c
+> index ff0304de7de9..342a032ad552 100644
+> --- a/kernel/time/timekeeping.c
+> +++ b/kernel/time/timekeeping.c
+> @@ -1786,6 +1786,9 @@ void timekeeping_resume(void)
+>  	if (inject_sleeptime) {
+>  		suspend_timing_needed = false;
+>  		__timekeeping_inject_sleeptime(tk, &ts_delta);
+> +#ifdef CONFIG_KVM_VIRT_SUSPEND_TIMING
+> +		kvm_arch_timekeeping_inject_sleeptime(&ts_delta);
+> +#endif
+>  	}
+>  
+>  	/* Re-base the last cycle value */
+> -- 
+> 2.31.1.498.g6c1eba8ee3d-goog
 
-
+dme.
+-- 
+Stranded starfish have no place to hide.
