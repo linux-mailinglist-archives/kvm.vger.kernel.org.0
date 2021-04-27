@@ -2,166 +2,139 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BDAD136CC2E
-	for <lists+kvm@lfdr.de>; Tue, 27 Apr 2021 22:10:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1E26A36CD43
+	for <lists+kvm@lfdr.de>; Tue, 27 Apr 2021 22:55:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236459AbhD0ULe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 27 Apr 2021 16:11:34 -0400
-Received: from mail.savoirfairelinux.com ([208.88.110.44]:48822 "EHLO
-        mail.savoirfairelinux.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235412AbhD0ULe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 27 Apr 2021 16:11:34 -0400
-Received: from localhost (localhost [127.0.0.1])
-        by mail.savoirfairelinux.com (Postfix) with ESMTP id EF7369C02D0;
-        Tue, 27 Apr 2021 16:10:49 -0400 (EDT)
-Received: from mail.savoirfairelinux.com ([127.0.0.1])
-        by localhost (mail.savoirfairelinux.com [127.0.0.1]) (amavisd-new, port 10032)
-        with ESMTP id PINCznNH0R6Y; Tue, 27 Apr 2021 16:10:49 -0400 (EDT)
-Received: from localhost (localhost [127.0.0.1])
-        by mail.savoirfairelinux.com (Postfix) with ESMTP id 670A29C0D2A;
-        Tue, 27 Apr 2021 16:10:49 -0400 (EDT)
-X-Virus-Scanned: amavisd-new at mail.savoirfairelinux.com
-Received: from mail.savoirfairelinux.com ([127.0.0.1])
-        by localhost (mail.savoirfairelinux.com [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id 6pLUmLbSCXfx; Tue, 27 Apr 2021 16:10:49 -0400 (EDT)
-Received: from barbarian.mtl.sfl (unknown [192.168.51.254])
-        by mail.savoirfairelinux.com (Postfix) with ESMTPSA id 3DA1E9C02D0;
-        Tue, 27 Apr 2021 16:10:49 -0400 (EDT)
-From:   Firas Ashkar <firas.ashkar@savoirfairelinux.com>
-To:     gregkh@linuxfoundation.org, mst@redhat.com
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Firas Ashkar <firas.ashkar@savoirfairelinux.com>
-Subject: [PATCH v2] uio: uio_pci_generic: add memory resource mappings
-Date:   Tue, 27 Apr 2021 16:10:46 -0400
-Message-Id: <20210427201046.4005820-1-firas.ashkar@savoirfairelinux.com>
+        id S239083AbhD0Uzv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 27 Apr 2021 16:55:51 -0400
+Received: from linux.microsoft.com ([13.77.154.182]:35558 "EHLO
+        linux.microsoft.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S239040AbhD0Uzt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 27 Apr 2021 16:55:49 -0400
+Received: from viremana-dev.fwjladdvyuiujdukmejncen4mf.xx.internal.cloudapp.net (unknown [13.66.132.26])
+        by linux.microsoft.com (Postfix) with ESMTPSA id BE8B220B8000;
+        Tue, 27 Apr 2021 13:55:05 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com BE8B220B8000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+        s=default; t=1619556905;
+        bh=xqElmAcSUSaDejhXkc1b8y5LQbBrxkMdgKVlO7kAJ9k=;
+        h=From:To:Cc:Subject:Date:From;
+        b=iIPEsY/RWWfQ3JvBDrepFpdoykwTO1WUSIHuIn29dZd24W4pUZGXbwhbP1w43LYpX
+         Jt6l5k0kIVrenJk0orisZZPNsoZt8GqSWuOoCriOF1O0B1KtbwXHxYRvHo58bmrXbc
+         dv2z0RlXPp2V7ukVL5KKG3trWkSVIs8EZfQmE3VA=
+From:   Vineeth Pillai <viremana@linux.microsoft.com>
+To:     Lan Tianyu <Tianyu.Lan@microsoft.com>,
+        Michael Kelley <mikelley@microsoft.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, Wei Liu <wei.liu@kernel.org>,
+        Stephen Hemminger <sthemmin@microsoft.com>,
+        Haiyang Zhang <haiyangz@microsoft.com>
+Cc:     Vineeth Pillai <viremana@linux.microsoft.com>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "K. Y. Srinivasan" <kys@microsoft.com>, x86@kernel.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-hyperv@vger.kernel.org
+Subject: [PATCH v4 0/7] Hyper-V nested virt enlightenments for SVM
+Date:   Tue, 27 Apr 2021 20:54:49 +0000
+Message-Id: <cover.1619556430.git.viremana@linux.microsoft.com>
 X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-import memory resources from underlying pci device, thus allowing
-userspace applications to memory map those resources.
+This patch series enables the nested virtualization enlightenments for
+SVM. This is very similar to the enlightenments for VMX except for the
+fact that there is no enlightened VMCS. For SVM, VMCB is already an
+architectural in-memory data structure.
 
-without this change, current implementation, does not populate the
-memory maps and are not shown under the corresponding sysfs uio entry:
+The supported enlightenments are:
 
-root@apalis-imx8:~# echo "ad00 0122" > \
-			/sys/bus/pci/drivers/uio_pci_generic/new_id
-[   55.736433] uio_pci_generic 0000:01:00.0: enabling device (0000 -> 000=
-2)
-root@apalis-imx8:~# ls -lsrt /sys/class/uio/uio0/
-     0 -rw-r--r--    1 root     root          4096 Apr 27 18:52 uevent
-     0 -r--r--r--    1 root     root          4096 Apr 27 18:52 version
-     0 -r--r--r--    1 root     root          4096 Apr 27 18:52 suppliers
-     0 lrwxrwxrwx    1 root     root             0 Apr 27 18:52 subsystem
--> ../../../../../../../../../class/uio
-     0 drwxr-xr-x    2 root     root             0 Apr 27 18:52 power
-     0 -r--r--r--    1 root     root          4096 Apr 27 18:52 name
-     0 -r--r--r--    1 root     root          4096 Apr 27 18:52 event
-     0 lrwxrwxrwx    1 root     root             0 Apr 27 18:52 device
--> ../../../0000:01:00.0
-     0 -r--r--r--    1 root     root          4096 Apr 27 18:52 dev
-     0 -r--r--r--    1 root     root          4096 Apr 27 18:52 consumers
-root@apalis-imx8:~#
+Enlightened TLB Flush: If this is enabled, ASID invalidations invalidate
+only gva -> hpa entries. To flush entries derived from NPT, hyper-v
+provided hypercalls (HvFlushGuestPhysicalAddressSpace or
+HvFlushGuestPhysicalAddressList) should be used.
 
-with the proposed changed, have following instead:
-root@apalis-imx8:~# ls -lsrt /sys/class/uio/uio0/
-     0 -rw-r--r--    1 root     root          4096 Apr 27 19:06 uevent
-     0 -r--r--r--    1 root     root          4096 Apr 27 19:06 version
-     0 -r--r--r--    1 root     root          4096 Apr 27 19:06 suppliers
-     0 lrwxrwxrwx    1 root     root             0 Apr 27 19:06 subsystem
--> ../../../../../../../../../class/uio
-     0 drwxr-xr-x    2 root     root             0 Apr 27 19:06 power
-     0 -r--r--r--    1 root     root          4096 Apr 27 19:06 name
-     0 drwxr-xr-x    4 root     root             0 Apr 27 19:06 maps
-     0 -r--r--r--    1 root     root          4096 Apr 27 19:06 event
-     0 lrwxrwxrwx    1 root     root             0 Apr 27 19:06 device
--> ../../../0000:01:00.0
-     0 -r--r--r--    1 root     root          4096 Apr 27 19:06 dev
-     0 -r--r--r--    1 root     root          4096 Apr 27 19:06 consumers
-root@apalis-imx8:~#
+Enlightened MSR bitmap(TLFS 16.5.3): "When enabled, L0 hypervisor does
+not monitor the MSR bitmaps for changes. Instead, the L1 hypervisor must
+invalidate the corresponding clean field after making changes to one of
+the MSR bitmaps."
 
-root@apalis-imx8:~# ls -lsrt /sys/class/uio/uio0/maps/
-     0 drwxr-xr-x    2 root     root             0 Apr 27 19:07 map1
-     0 drwxr-xr-x    2 root     root             0 Apr 27 19:07 map0
-root@apalis-imx8:~#
+Direct Virtual Flush(TLFS 16.8): The hypervisor exposes hypercalls
+(HvFlushVirtualAddressSpace, HvFlushVirtualAddressSpaceEx,
+HvFlushVirtualAddressList, and HvFlushVirtualAddressListEx) that allow
+operating systems to more efficiently manage the virtual TLB. The L1
+hypervisor can choose to allow its guest to use those hypercalls and
+delegate the responsibility to handle them to the L0 hypervisor. This
+requires the use of a partition assist page."
 
-root@apalis-imx8:~# cat /sys/class/uio/uio0/maps/map1/addr
-0x0000000062000000
-root@apalis-imx8:~#
+L2 Windows boot time was measured with and without the patch. Time was
+measured from power on to the login screen and was averaged over a
+consecutive 5 trials:
+  Without the patch: 42 seconds
+  With the patch: 29 seconds
+--
 
-root@apalis-imx8:~# cat /sys/class/uio/uio0/maps/map1/size
-0x0000000000200000
-root@apalis-imx8:~#
+Changes from v3
+- Included definitions for software/hypervisor reserved fields in SVM
+  architectural data structures.
+- Consolidated Hyper-V specific code into svm_onhyperv.[ch] to reduce
+  the "ifdefs". This change applies only to SVM, VMX is not touched and
+  is not in the scope of this patch series.
 
-tested on AltaData ARINC 429 MiniPCIE module on imx8qm-apalis-ixora-v1.2
+Changes from v2:
+- Refactored the Remote TLB Flush logic into separate hyperv specific
+  source files (kvm_onhyperv.[ch]).
+- Reverted the VMCB Clean bits macro changes as it is no longer needed.
 
-Signed-off-by: Firas Ashkar <firas.ashkar@savoirfairelinux.com>
+Changes from v1:
+- Move the remote TLB flush related fields from kvm_vcpu_hv and kvm_hv
+  to kvm_vcpu_arch and kvm_arch.
+- Modify the VMCB clean mask runtime based on whether L1 hypervisor
+  is running on Hyper-V or not.
+- Detect Hyper-V nested enlightenments based on
+  HYPERV_CPUID_VENDOR_AND_MAX_FUNCTIONS.
+- Address other minor review comments.
 ---
 
-Notes:
-    Changes in V2
-    * add detailed description why this change is needed
-    * add test hardware name and version
+Vineeth Pillai (7):
+  hyperv: Detect Nested virtualization support for SVM
+  hyperv: SVM enlightened TLB flush support flag
+  KVM: x86: hyper-v: Move the remote TLB flush logic out of vmx
+  KVM: SVM: Software reserved fields
+  KVM: SVM: hyper-v: Remote TLB flush for SVM
+  KVM: SVM: hyper-v: Enlightened MSR-Bitmap support
+  KVM: SVM: hyper-v: Direct Virtual Flush support
 
-:100644 100644 c7d681fef198 efc43869131d M	drivers/uio/uio_pci_generic.c
- drivers/uio/uio_pci_generic.c | 32 ++++++++++++++++++++++++++++++++
- 1 file changed, 32 insertions(+)
+ arch/x86/include/asm/hyperv-tlfs.h |   9 ++
+ arch/x86/include/asm/kvm_host.h    |  14 +++
+ arch/x86/include/asm/svm.h         |   9 +-
+ arch/x86/include/uapi/asm/svm.h    |   3 +
+ arch/x86/kernel/cpu/mshyperv.c     |  10 +-
+ arch/x86/kvm/Makefile              |   9 ++
+ arch/x86/kvm/kvm_onhyperv.c        |  94 +++++++++++++++++++
+ arch/x86/kvm/kvm_onhyperv.h        |  33 +++++++
+ arch/x86/kvm/svm/svm.c             |  13 +++
+ arch/x86/kvm/svm/svm.h             |  22 ++++-
+ arch/x86/kvm/svm/svm_onhyperv.c    |  41 +++++++++
+ arch/x86/kvm/svm/svm_onhyperv.h    | 141 +++++++++++++++++++++++++++++
+ arch/x86/kvm/vmx/vmx.c             |  97 ++------------------
+ arch/x86/kvm/vmx/vmx.h             |  10 --
+ arch/x86/kvm/x86.c                 |   8 ++
+ 15 files changed, 406 insertions(+), 107 deletions(-)
+ create mode 100644 arch/x86/kvm/kvm_onhyperv.c
+ create mode 100644 arch/x86/kvm/kvm_onhyperv.h
+ create mode 100644 arch/x86/kvm/svm/svm_onhyperv.c
+ create mode 100644 arch/x86/kvm/svm/svm_onhyperv.h
 
-diff --git a/drivers/uio/uio_pci_generic.c b/drivers/uio/uio_pci_generic.=
-c
-index c7d681fef198..efc43869131d 100644
---- a/drivers/uio/uio_pci_generic.c
-+++ b/drivers/uio/uio_pci_generic.c
-@@ -72,7 +72,9 @@ static int probe(struct pci_dev *pdev,
- 			   const struct pci_device_id *id)
- {
- 	struct uio_pci_generic_dev *gdev;
-+	struct uio_mem *uiomem;
- 	int err;
-+	int i;
-=20
- 	err =3D pcim_enable_device(pdev);
- 	if (err) {
-@@ -101,6 +103,36 @@ static int probe(struct pci_dev *pdev,
- 			 "no support for interrupts?\n");
- 	}
-=20
-+	uiomem =3D &gdev->info.mem[0];
-+	for (i =3D 0; i < MAX_UIO_MAPS; ++i) {
-+		struct resource *r =3D &pdev->resource[i];
-+
-+		if (r->flags !=3D (IORESOURCE_SIZEALIGN | IORESOURCE_MEM))
-+			continue;
-+
-+		if (uiomem >=3D &gdev->info.mem[MAX_UIO_MAPS]) {
-+			dev_warn(
-+				&pdev->dev,
-+				"device has more than " __stringify(
-+					MAX_UIO_MAPS) " I/O memory resources.\n");
-+			break;
-+		}
-+
-+		uiomem->memtype =3D UIO_MEM_PHYS;
-+		uiomem->addr =3D r->start & PAGE_MASK;
-+		uiomem->offs =3D r->start & ~PAGE_MASK;
-+		uiomem->size =3D
-+			(uiomem->offs + resource_size(r) + PAGE_SIZE - 1) &
-+			PAGE_MASK;
-+		uiomem->name =3D r->name;
-+		++uiomem;
-+	}
-+
-+	while (uiomem < &gdev->info.mem[MAX_UIO_MAPS]) {
-+		uiomem->size =3D 0;
-+		++uiomem;
-+	}
-+
- 	return devm_uio_register_device(&pdev->dev, &gdev->info);
- }
-=20
---=20
+-- 
 2.25.1
 
