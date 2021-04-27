@@ -2,34 +2,34 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A5B8C36C86F
-	for <lists+kvm@lfdr.de>; Tue, 27 Apr 2021 17:12:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A0BAD36C87A
+	for <lists+kvm@lfdr.de>; Tue, 27 Apr 2021 17:14:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237748AbhD0PNi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 27 Apr 2021 11:13:38 -0400
-Received: from forward2-smtp.messagingengine.com ([66.111.4.226]:40397 "EHLO
+        id S237566AbhD0PPg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 27 Apr 2021 11:15:36 -0400
+Received: from forward2-smtp.messagingengine.com ([66.111.4.226]:33735 "EHLO
         forward2-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S235466AbhD0PNh (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 27 Apr 2021 11:13:37 -0400
-Received: from compute1.internal (compute1.nyi.internal [10.202.2.41])
-        by mailforward.nyi.internal (Postfix) with ESMTP id A68BA19409C9;
-        Tue, 27 Apr 2021 11:12:53 -0400 (EDT)
-Received: from mailfrontend2 ([10.202.2.163])
-  by compute1.internal (MEProxy); Tue, 27 Apr 2021 11:12:53 -0400
+        by vger.kernel.org with ESMTP id S236578AbhD0PPf (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 27 Apr 2021 11:15:35 -0400
+Received: from compute2.internal (compute2.nyi.internal [10.202.2.42])
+        by mailforward.nyi.internal (Postfix) with ESMTP id E9D381940ACD;
+        Tue, 27 Apr 2021 11:14:51 -0400 (EDT)
+Received: from mailfrontend1 ([10.202.2.162])
+  by compute2.internal (MEProxy); Tue, 27 Apr 2021 11:14:51 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
         messagingengine.com; h=cc:content-type:date:from:in-reply-to
         :message-id:mime-version:references:subject:to:x-me-proxy
-        :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; bh=P1Hqi4
-        PHicAFs4lHLdN9ZUQdjcf++Px2mQGjk8ekmiA=; b=tVGOkxtuv0wyL7RxhgaPKC
-        TRIxEl+J1wtc1S490MIOHDvQkwEN4ac9jgfGWxXyZz0Cu9CmMNkPsDDeDdp+sqL2
-        Df5meflPbbNTffzTiaX4jBd5sb9GE2Pvy3aBnMsuse4r/J3/SOJPwp81ISIkG7G5
-        CKbGW3tjVEBAzRKsjSDD3WhFPCNRalBrq3+BIC2R3CDwMvrLFBH2sjQSg+Vme2Ty
-        n5MrR8OLOIaz7tdeu2YaUg7/JBl0X2hxa+ZGALgWH3FiHeItfLQqQ8s28G8cFa1v
-        xorCvnTXALYkCcIhBk8nfXYxc7el8wzE+aJBIjoyaERvWS9qOfiYSLjh6AQXnwvw
+        :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; bh=tj0LVf
+        hJSNdorV650wiLh2qFHVZClezs2YTF435ywCY=; b=KJLR6Fkr9QyWaHzs5KXppX
+        kCWHm34QzLhX2IFC/hSyo5qZ9FbXZi5Jm4Wn3uXTpkaqAMp246jKhoIfi1Cojubh
+        abm93/Xr30JlAMND2jzL/GXI/UsB41EORexnZ9WbtWDdA0XATmlCyAUGEIM5J4i6
+        epFEnYh+DFt5UyzXEZ8BGZKTRuqnrha6h4eIIn1I4zpr/2EdP3KFwG/7MX0eCvRL
+        +dvDeAtAOsdm08Zc8omiSzNlJCnCwsfyr3P7FEW6hEiWmagW1LqQUTAOgv/A9sco
+        V74zluMF9SOqnaDYvUI4TOLWUwoUn/imiu01C2paUITBen5+PcQwLVUOGk1+GAHg
         ==
-X-ME-Sender: <xms:9CmIYBj27scQOjc1Es_1y5lFhxoPe22iJZ8tjJa5acihAKwyuurIlA>
-    <xme:9CmIYGB07sdOhT-VUKxhIw5N19Tswx-Vo-vbe_b_CsP1YEFQIddZGJfOHKWuSd7K4
-    8DhxVlir1uWVgKOjtg>
+X-ME-Sender: <xms:aSqIYE6_isfn4uOjT1gHJjwUzj6AcpoWinnkhSMgK1ephKwZ8zOPEQ>
+    <xme:aSqIYF6k0eXtWwdSf9L7LL3n7wJhulVgLgRpSjiO-80M6O1EUzpF9XLXwh4-8e5cE
+    eIVDRd0Zpy2zR5kgFs>
 X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeduledrvddvtddgkeejucetufdoteggodetrfdotf
     fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
     uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
@@ -38,107 +38,115 @@ X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeduledrvddvtddgkeejucetufdoteggod
     fhkeeguedtvdegffffteehjedvjeeitefgfefgffdugeffffegudehgeetgeelkeenucfk
     phepkedurddukeejrddviedrvdefkeenucevlhhushhtvghrufhiiigvpedtnecurfgrrh
     grmhepmhgrihhlfhhrohhmpegumhgvsegumhgvrdhorhhg
-X-ME-Proxy: <xmx:9CmIYBEl9twTwITE7c0sxQJxTYZTN50czE_0gvrMl-yXhPvVuw6YnA>
-    <xmx:9CmIYGR6qmiaEedFWDfiaKMtfAHJuy5DZmlA7VQzxhRcftS-NBsvLA>
-    <xmx:9CmIYOy4_4IOg114m78WKP1JrkSlwmBVcpsunZbYuOtWiZbec9F8_Q>
-    <xmx:9SmIYJzWXU4pJWRRnxqnt5p0602gW2iPaxPdGlcR_N3Y7KGcRN6xlQ>
+X-ME-Proxy: <xmx:aSqIYDfI9zXT4s0nd7K-U3N6wtfhMH61lMo0E-wyFYWnhxW5day-iQ>
+    <xmx:aSqIYJIV-SHkBCyueEmfqBoO1xtTBuwUi_mT6eAiFTP2m9dCeDQ1BA>
+    <xmx:aSqIYIIfS_tu1xf5BJbyCge_hO-W5HIGZk3vFaPS1jSW6pDbCmR7iA>
+    <xmx:ayqIYBdA4HZ8AvAJPOeHCoR2WE-58xKkmvU6afp2Kd-_u-BC6F6vG8l0Z2Q>
 Received: from disaster-area.hh.sledj.net (disaster-area.hh.sledj.net [81.187.26.238])
         by mail.messagingengine.com (Postfix) with ESMTPA;
-        Tue, 27 Apr 2021 11:12:51 -0400 (EDT)
+        Tue, 27 Apr 2021 11:14:47 -0400 (EDT)
 Received: from localhost (disaster-area.hh.sledj.net [local])
-        by disaster-area.hh.sledj.net (OpenSMTPD) with ESMTPA id 98a0580e;
-        Tue, 27 Apr 2021 15:12:50 +0000 (UTC)
+        by disaster-area.hh.sledj.net (OpenSMTPD) with ESMTPA id 686a8429;
+        Tue, 27 Apr 2021 15:14:46 +0000 (UTC)
 To:     Hikaru Nishida <hikalium@chromium.org>, kvm@vger.kernel.org
 Cc:     suleiman@google.com, Hikaru Nishida <hikalium@chromium.org>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Paolo Bonzini <pbonzini@redhat.com>, linux-doc@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [RFC PATCH 1/6] x86/kvm: Reserve KVM_FEATURE_HOST_SUSPEND_TIME
- and MSR_KVM_HOST_SUSPEND_TIME
-In-Reply-To: <20210426090644.2218834-2-hikalium@chromium.org>
+        Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        John Stultz <john.stultz@linaro.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Stephen Boyd <sboyd@kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        linux-kernel@vger.kernel.org, x86@kernel.org
+Subject: Re: [RFC PATCH 2/6] x86/kvm: Add a struct and constants for virtual
+ suspend time injection
+In-Reply-To: <20210426090644.2218834-3-hikalium@chromium.org>
 References: <20210426090644.2218834-1-hikalium@chromium.org>
- <20210426090644.2218834-2-hikalium@chromium.org>
+ <20210426090644.2218834-3-hikalium@chromium.org>
 X-HGTTG: zarquon
 From:   David Edmondson <dme@dme.org>
-Date:   Tue, 27 Apr 2021 16:12:50 +0100
-Message-ID: <cunk0onkbgt.fsf@dme.org>
+Date:   Tue, 27 Apr 2021 16:14:46 +0100
+Message-ID: <cunh7jrkbdl.fsf@dme.org>
 MIME-Version: 1.0
 Content-Type: text/plain
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Monday, 2021-04-26 at 18:06:40 +09, Hikaru Nishida wrote:
+On Monday, 2021-04-26 at 18:06:41 +09, Hikaru Nishida wrote:
 
-> No functional change; just add documentation for
-> KVM_FEATURE_HOST_SUSPEND_TIME and its corresponding
-> MSR_KVM_HOST_SUSPEND_TIME to support virtual suspend timing injection in
-> later patches.
+> This patch adds definitions that are needed by both host and guest
+
+s/This patch adds/Add/
+
+> to implement virtual suspend time injection.
+> This patch also adds #include <linux/kvm_host.h> in
+
+s/This patch also adds/Also add/
+
+> kernel/time/timekeeping.c to make necesarily functions which will be
+
+s/necesarily/necessary/
+
+> introduced in later patches available.
 >
 > Signed-off-by: Hikaru Nishida <hikalium@chromium.org>
 > ---
 >
->  Documentation/virt/kvm/cpuid.rst |  3 +++
->  Documentation/virt/kvm/msr.rst   | 29 +++++++++++++++++++++++++++++
->  2 files changed, 32 insertions(+)
+>  arch/x86/include/uapi/asm/kvm_para.h | 6 ++++++
+>  kernel/time/timekeeping.c            | 1 +
+>  2 files changed, 7 insertions(+)
 >
-> diff --git a/Documentation/virt/kvm/cpuid.rst b/Documentation/virt/kvm/cpuid.rst
-> index cf62162d4be2..c7cb581b9a9b 100644
-> --- a/Documentation/virt/kvm/cpuid.rst
-> +++ b/Documentation/virt/kvm/cpuid.rst
-> @@ -96,6 +96,9 @@ KVM_FEATURE_MSI_EXT_DEST_ID        15          guest checks this feature bit
->                                                 before using extended destination
->                                                 ID bits in MSI address bits 11-5.
+> diff --git a/arch/x86/include/uapi/asm/kvm_para.h b/arch/x86/include/uapi/asm/kvm_para.h
+> index 950afebfba88..13788b01094f 100644
+> --- a/arch/x86/include/uapi/asm/kvm_para.h
+> +++ b/arch/x86/include/uapi/asm/kvm_para.h
+> @@ -33,6 +33,7 @@
+>  #define KVM_FEATURE_PV_SCHED_YIELD	13
+>  #define KVM_FEATURE_ASYNC_PF_INT	14
+>  #define KVM_FEATURE_MSI_EXT_DEST_ID	15
+> +#define KVM_FEATURE_HOST_SUSPEND_TIME	16
 >  
-> +KVM_FEATURE_HOST_SUSPEND_TIME      16          host suspend time information
-> +                                               is available at msr 0x4b564d08.
+>  #define KVM_HINTS_REALTIME      0
+>  
+> @@ -54,6 +55,7 @@
+>  #define MSR_KVM_POLL_CONTROL	0x4b564d05
+>  #define MSR_KVM_ASYNC_PF_INT	0x4b564d06
+>  #define MSR_KVM_ASYNC_PF_ACK	0x4b564d07
+> +#define MSR_KVM_HOST_SUSPEND_TIME      0x4b564d08
+>  
+>  struct kvm_steal_time {
+>  	__u64 steal;
+> @@ -64,6 +66,10 @@ struct kvm_steal_time {
+>  	__u32 pad[11];
+>  };
+>  
+> +struct kvm_host_suspend_time {
+> +	__u64   suspend_time_ns;
+> +};
 > +
->  KVM_FEATURE_CLOCKSOURCE_STABLE_BIT 24          host will warn if no guest-side
->                                                 per-cpu warps are expected in
->                                                 kvmclock
-> diff --git a/Documentation/virt/kvm/msr.rst b/Documentation/virt/kvm/msr.rst
-> index e37a14c323d2..de96743245c9 100644
-> --- a/Documentation/virt/kvm/msr.rst
-> +++ b/Documentation/virt/kvm/msr.rst
-> @@ -376,3 +376,32 @@ data:
->  	write '1' to bit 0 of the MSR, this causes the host to re-scan its queue
->  	and check if there are more notifications pending. The MSR is available
->  	if KVM_FEATURE_ASYNC_PF_INT is present in CPUID.
-> +
-> +MSR_KVM_HOST_SUSPEND_TIME:
-> +	0x4b564d08
-> +
-> +data:
-> +	8-byte alignment physical address of a memory area which must be
-> +	in guest RAM, plus an enable bit in bit 0. This memory is expected to
-> +	hold a copy of the following structure::
-> +
-> +	 struct kvm_host_suspend_time {
-> +		__u64   suspend_time_ns;
-> +	 };
-> +
-> +	whose data will be filled in by the hypervisor.
-> +	If the guest register this structure through the MSR write, the host
-> +	will stop all the clocks including TSCs observed by the guest during
-> +	the host's suspension and report the duration of suspend through this
-> +	structure. Fields have the following meanings:
-> +
-> +	host_suspend_time_ns:
-
-s/host_suspend_time_ns/suspend_time_ns/
-
-> +		Total number of nanoseconds passed during the host's suspend
-> +		while the VM is running. This value will be increasing
-> +		monotonically.
-> +
-> +	Note that although MSRs are per-CPU entities, the effect of this
-> +	particular MSR is global.
-> +
-> +	Availability of this MSR must be checked via bit 16 in 0x4000001 cpuid
-> +	leaf prior to usage.
+>  #define KVM_VCPU_PREEMPTED          (1 << 0)
+>  #define KVM_VCPU_FLUSH_TLB          (1 << 1)
+>  
+> diff --git a/kernel/time/timekeeping.c b/kernel/time/timekeeping.c
+> index 6aee5768c86f..ff0304de7de9 100644
+> --- a/kernel/time/timekeeping.c
+> +++ b/kernel/time/timekeeping.c
+> @@ -22,6 +22,7 @@
+>  #include <linux/pvclock_gtod.h>
+>  #include <linux/compiler.h>
+>  #include <linux/audit.h>
+> +#include <linux/kvm_host.h>
+>  
+>  #include "tick-internal.h"
+>  #include "ntp_internal.h"
 > -- 
 > 2.31.1.498.g6c1eba8ee3d-goog
 
 dme.
 -- 
-I do believe it's Madame Joy.
+Too much information, running through my brain.
