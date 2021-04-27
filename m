@@ -2,108 +2,122 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4A7A536C514
-	for <lists+kvm@lfdr.de>; Tue, 27 Apr 2021 13:29:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 96CE636C558
+	for <lists+kvm@lfdr.de>; Tue, 27 Apr 2021 13:38:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235514AbhD0L3r (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 27 Apr 2021 07:29:47 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:35538 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230270AbhD0L3r (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 27 Apr 2021 07:29:47 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1619522944;
+        id S236015AbhD0Lja (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 27 Apr 2021 07:39:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45076 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235705AbhD0Lja (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 27 Apr 2021 07:39:30 -0400
+Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 036D6C061574;
+        Tue, 27 Apr 2021 04:38:47 -0700 (PDT)
+Received: from zn.tnic (p200300ec2f0c5e008a7c4c8941e22261.dip0.t-ipconnect.de [IPv6:2003:ec:2f0c:5e00:8a7c:4c89:41e2:2261])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 5A0041EC047E;
+        Tue, 27 Apr 2021 13:38:45 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1619523525;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=pkqyz+WNpdwlPbhZk3ghmnYGxACPaw6+OWJgfQs3wpk=;
-        b=h/fYHdIL+7I4kR+3Zoy240nac8GEUR9XBorJZNYNDi2PsQrunxWtTRMKOaElGBvzJIznWp
-        istd6yqFet4DItu8nsY0xmpdPu+qxknWfnW5U+xwx/lUAdEm3ww2MCHXpNB04+moG/h4G/
-        zyGbKnciwO783KjXbCr6T1VCiSBx3pg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-291-h92NcQHINEqH7c3QQp4m9g-1; Tue, 27 Apr 2021 07:29:00 -0400
-X-MC-Unique: h92NcQHINEqH7c3QQp4m9g-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 477C51936B96;
-        Tue, 27 Apr 2021 11:28:56 +0000 (UTC)
-Received: from work-vm (ovpn-114-253.ams2.redhat.com [10.36.114.253])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 5AE7361093;
-        Tue, 27 Apr 2021 11:28:16 +0000 (UTC)
-Date:   Tue, 27 Apr 2021 12:28:13 +0100
-From:   "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To:     Greg Kurz <groug@kaod.org>
-Cc:     qemu-devel@nongnu.org, Cornelia Huck <cohuck@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>, kvm@vger.kernel.org,
-        virtio-fs@redhat.com, Miklos Szeredi <miklos@szeredi.hu>,
-        Vivek Goyal <vgoyal@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [for-6.1 v2 0/2] virtiofsd: Add support for FUSE_SYNCFS request
-Message-ID: <YIf1TY4MbAQnCYG0@work-vm>
-References: <20210426152135.842037-1-groug@kaod.org>
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=IAUQH8ckRL8RHgSocw7BeJrBQn+eUtnbT2dDn+igxMs=;
+        b=JVTU+70sWvRTU+SopM0YlyyGOmgJ6g6s0pfWanKmCpWILaUWfjQC0nNpvbpkUqfQ2RRum2
+        FEuSSKX1W3ssLIne23n7/XG++M6Vrmnc4wwpffOGYr4mLk1KAEn2IFh+WRvL4uHH763Ts1
+        j21Ra3QsjV66hv690SzIZHGqkUij9BY=
+Date:   Tue, 27 Apr 2021 13:38:40 +0200
+From:   Borislav Petkov <bp@alien8.de>
+To:     Maxim Levitsky <mlevitsk@redhat.com>
+Cc:     kvm@vger.kernel.org,
+        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
+        Ingo Molnar <mingo@redhat.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Sean Christopherson <seanjc@google.com>,
+        Marc Zyngier <maz@kernel.org>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        open list <linux-kernel@vger.kernel.org>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Jonathan Corbet <corbet@lwn.net>, Jessica Yu <jeyu@kernel.org>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Jan Kiszka <jan.kiszka@siemens.com>,
+        Will Deacon <will@kernel.org>,
+        "open list:KERNEL VIRTUAL MACHINE FOR ARM64 (KVM/arm64)" 
+        <kvmarm@lists.cs.columbia.edu>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Jim Mattson <jmattson@google.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        David Hildenbrand <david@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        "open list:S390" <linux-s390@vger.kernel.org>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Kieran Bingham <kbingham@kernel.org>,
+        "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
+        "moderated list:KERNEL VIRTUAL MACHINE FOR ARM64 (KVM/arm64)" 
+        <linux-arm-kernel@lists.infradead.org>,
+        James Morse <james.morse@arm.com>
+Subject: Re: [PATCH v2 8/9] KVM: x86: add force_intercept_exceptions_mask
+Message-ID: <YIf3wM1+enU1U/gn@zn.tnic>
+References: <20210401135451.1004564-1-mlevitsk@redhat.com>
+ <20210401135451.1004564-9-mlevitsk@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20210426152135.842037-1-groug@kaod.org>
-User-Agent: Mutt/2.0.6 (2021-03-06)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+In-Reply-To: <20210401135451.1004564-9-mlevitsk@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-* Greg Kurz (groug@kaod.org) wrote:
-> FUSE_SYNCFS allows the client to flush the host page cache.
-> This isn't available in upstream linux yet, but the following
-> tree can be used to test:
+On Thu, Apr 01, 2021 at 04:54:50PM +0300, Maxim Levitsky wrote:
+> This parameter will be used by VMX and SVM code to force
+> interception of a set of exceptions, given by a bitmask
+> for guest debug and/or kvm debug.
+> 
+> This option is not intended for production.
+> 
+> This is based on an idea first shown here:
+> https://patchwork.kernel.org/project/kvm/patch/20160301192822.GD22677@pd.tnic/
+> 
+> CC: Borislav Petkov <bp@suse.de>
+> Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+> ---
+>  arch/x86/kvm/x86.c | 3 +++
+>  arch/x86/kvm/x86.h | 2 ++
+>  2 files changed, 5 insertions(+)
+> 
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 3627ce8fe5bb..1a51031d64d8 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -176,6 +176,9 @@ module_param(force_emulation_prefix, bool, S_IRUGO);
+>  int __read_mostly pi_inject_timer = -1;
+>  module_param(pi_inject_timer, bint, S_IRUGO | S_IWUSR);
+>  
+> +uint force_intercept_exceptions_mask;
+> +module_param(force_intercept_exceptions_mask, uint, S_IRUGO | S_IWUSR);
+> +EXPORT_SYMBOL_GPL(force_intercept_exceptions_mask);
 
-That looks OK to me; but we'll need to wait until syncfs lands in the
-upstream kernel; we've got bitten before by stuff changing before it
-actaully lands in the kernel.
+That's nice.
 
-Dave
+I could use some text explaning the usage though, i.e. that thing takes
+a bitfield of exception vectors, so that I don't have to look at the
+code each time. :-)
 
-> https://gitlab.com/gkurz/linux/-/tree/virtio-fs-sync
-> 
-> v2: - based on new version of FUSE_SYNCFS
->       https://listman.redhat.com/archives/virtio-fs/2021-April/msg00166.html
->     - propagate syncfs() errors to client (Vivek)
-> 
-> Greg Kurz (2):
->   Update linux headers to 5.12-rc8 + FUSE_SYNCFS
->   virtiofsd: Add support for FUSE_SYNCFS request
-> 
->  include/standard-headers/drm/drm_fourcc.h     | 23 ++++-
->  include/standard-headers/linux/ethtool.h      | 54 ++++++-----
->  include/standard-headers/linux/fuse.h         | 13 ++-
->  include/standard-headers/linux/input.h        |  2 +-
->  .../standard-headers/rdma/vmw_pvrdma-abi.h    |  7 ++
->  linux-headers/asm-generic/unistd.h            |  4 +-
->  linux-headers/asm-mips/unistd_n32.h           |  1 +
->  linux-headers/asm-mips/unistd_n64.h           |  1 +
->  linux-headers/asm-mips/unistd_o32.h           |  1 +
->  linux-headers/asm-powerpc/kvm.h               |  2 +
->  linux-headers/asm-powerpc/unistd_32.h         |  1 +
->  linux-headers/asm-powerpc/unistd_64.h         |  1 +
->  linux-headers/asm-s390/unistd_32.h            |  1 +
->  linux-headers/asm-s390/unistd_64.h            |  1 +
->  linux-headers/asm-x86/kvm.h                   |  1 +
->  linux-headers/asm-x86/unistd_32.h             |  1 +
->  linux-headers/asm-x86/unistd_64.h             |  1 +
->  linux-headers/asm-x86/unistd_x32.h            |  1 +
->  linux-headers/linux/kvm.h                     | 89 +++++++++++++++++++
->  linux-headers/linux/vfio.h                    | 27 ++++++
->  tools/virtiofsd/fuse_lowlevel.c               | 19 ++++
->  tools/virtiofsd/fuse_lowlevel.h               | 13 +++
->  tools/virtiofsd/passthrough_ll.c              | 29 ++++++
->  tools/virtiofsd/passthrough_seccomp.c         |  1 +
->  24 files changed, 267 insertions(+), 27 deletions(-)
-> 
-> -- 
-> 2.26.3
-> 
+Thx.
+
 -- 
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Regards/Gruss,
+    Boris.
 
+https://people.kernel.org/tglx/notes-about-netiquette
