@@ -2,98 +2,134 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8B18A36C5E8
-	for <lists+kvm@lfdr.de>; Tue, 27 Apr 2021 14:16:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BE1C536C615
+	for <lists+kvm@lfdr.de>; Tue, 27 Apr 2021 14:32:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235547AbhD0MQ6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 27 Apr 2021 08:16:58 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:28092 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S235410AbhD0MQ5 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 27 Apr 2021 08:16:57 -0400
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 13RC2liB152839
-        for <kvm@vger.kernel.org>; Tue, 27 Apr 2021 08:16:14 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : mime-version : content-transfer-encoding; s=pp1;
- bh=yhD1YNM89K2upDWov/ofq8a0LRVkPrK1zUWQRmieaHU=;
- b=B+nDHxD/BPOd9pg/iMebZ8xnM9QGbTEhdkoPXnRLegmpvRMMfy9V4Dugcfb2aVkwrRfB
- rJ7vIdNTdT+n8l8Zy5U7aXsGv9G7cE16ZP+NmB8JMOHUbx8dT+CIi9fQGUaCezs83Fuz
- OSUBjJSH/gYrWIbgOix3I4lqFc0CQZ7bgfdyeGSizVrftVYHPrlM6K7XAgo2n4X8V+h0
- 9vEdg9K1wNPoVkEGv/KFbh+puCwp09cCdMxrKwWGWvoQ/W+qaLPb242IMHikfYfN16qw
- TtMPVPPxtXo5vuD56emhxnU6hW5sY+oLPDTifiFGnNqj3WoT1c1gAwdIxpqFFjUUGirt RQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 386gvx2y6c-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Tue, 27 Apr 2021 08:16:14 -0400
-Received: from m0098413.ppops.net (m0098413.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 13RC38Q0154800
-        for <kvm@vger.kernel.org>; Tue, 27 Apr 2021 08:16:13 -0400
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 386gvx2y5e-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 27 Apr 2021 08:16:13 -0400
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 13RCDkTZ029038;
-        Tue, 27 Apr 2021 12:16:12 GMT
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
-        by ppma03ams.nl.ibm.com with ESMTP id 384ay8hawc-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 27 Apr 2021 12:16:12 +0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 13RCG9bQ32768496
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 27 Apr 2021 12:16:09 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 0EEEEA4062;
-        Tue, 27 Apr 2021 12:16:09 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 9E48EA4064;
-        Tue, 27 Apr 2021 12:16:08 +0000 (GMT)
-Received: from ibm-vm.ibmuc.com (unknown [9.145.13.42])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue, 27 Apr 2021 12:16:08 +0000 (GMT)
-From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
-To:     kvm@vger.kernel.org
-Cc:     frankja@linux.ibm.com, thuth@redhat.com, cohuck@redhat.com,
-        david@redhat.com
-Subject: [kvm-unit-tests PATCH v1 1/1] MAINTAINERS: s390x: add myself as reviewer
-Date:   Tue, 27 Apr 2021 14:16:08 +0200
-Message-Id: <20210427121608.157783-1-imbrenda@linux.ibm.com>
-X-Mailer: git-send-email 2.26.3
+        id S235435AbhD0MdY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 27 Apr 2021 08:33:24 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:58825 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S235410AbhD0MdY (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 27 Apr 2021 08:33:24 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1619526760;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=uD+dfFLq7YLHiJhFYup2fr0QjlX385E8xYG7uQWWaho=;
+        b=LzFv7pb2aHbCgX9BjijAHN/NuJx8hxqeN2hxgwzPLxWWfW4v3d7CYXT/OcIUGaQnka4g5A
+        C18M2TA9m3YbTzl3X4KPvO8a7opzYVDZuXq4/4ubkqy4sdydqPXIBjDt4vPCQQuOb4Jhbq
+        x2cb2HkkrdBOcnCXSlc6HjJjlVmK1NU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-149-vbJGX1YkP3aS1A8kdXkUEA-1; Tue, 27 Apr 2021 08:32:38 -0400
+X-MC-Unique: vbJGX1YkP3aS1A8kdXkUEA-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4204650202;
+        Tue, 27 Apr 2021 12:32:36 +0000 (UTC)
+Received: from gondolin.fritz.box (ovpn-113-176.ams2.redhat.com [10.36.113.176])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 2699E6ACED;
+        Tue, 27 Apr 2021 12:32:29 +0000 (UTC)
+Date:   Tue, 27 Apr 2021 14:32:27 +0200
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     Alex Williamson <alex.williamson@redhat.com>, kvm@vger.kernel.org,
+        Kirti Wankhede <kwankhede@nvidia.com>,
+        "Raj, Ashok" <ashok.raj@intel.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Christoph Hellwig <hch@lst.de>,
+        Leon Romanovsky <leonro@nvidia.com>,
+        Max Gurtovoy <mgurtovoy@nvidia.com>,
+        Tarun Gupta <targupta@nvidia.com>
+Subject: Re: [PATCH v2 02/13] vfio/mdev: Allow the mdev_parent_ops to
+ specify the device driver to bind
+Message-ID: <20210427143227.62f304fd.cohuck@redhat.com>
+In-Reply-To: <2-v2-7667f42c9bad+935-vfio3_jgg@nvidia.com>
+References: <0-v2-7667f42c9bad+935-vfio3_jgg@nvidia.com>
+        <2-v2-7667f42c9bad+935-vfio3_jgg@nvidia.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: _5K0ZkG2p1D7oxj7ah_t0IA6fRnsYbi-
-X-Proofpoint-GUID: HjXb49lfKUPLpfZHNfK3WkigpMi91nhA
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.761
- definitions=2021-04-27_06:2021-04-27,2021-04-27 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 spamscore=0
- mlxscore=0 clxscore=1015 adultscore=0 bulkscore=0 phishscore=0
- mlxlogscore=984 suspectscore=0 lowpriorityscore=0 malwarescore=0
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2104060000 definitions=main-2104270091
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
----
- MAINTAINERS | 1 +
- 1 file changed, 1 insertion(+)
+On Mon, 26 Apr 2021 17:00:04 -0300
+Jason Gunthorpe <jgg@nvidia.com> wrote:
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index e2505985..aaa404cf 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -85,6 +85,7 @@ M: Thomas Huth <thuth@redhat.com>
- M: David Hildenbrand <david@redhat.com>
- M: Janosch Frank <frankja@linux.ibm.com>
- R: Cornelia Huck <cohuck@redhat.com>
-+R: Claudio Imbrenda <imbrenda@linux.ibm.com>
- L: kvm@vger.kernel.org
- L: linux-s390@vger.kernel.org
- F: s390x/*
--- 
-2.26.3
+> This allows a mdev driver to opt out of using vfio_mdev.c, instead the
+> driver will provide a 'struct mdev_driver' and register directly with the
+> driver core.
+> 
+> Much of mdev_parent_ops becomes unused in this mode:
+> - create()/remove() are done via the mdev_driver probe()/remove()
+> - mdev_attr_groups becomes mdev_driver driver.dev_groups
+> - Wrapper function callbacks are replaced with the same ones from
+>   struct vfio_device_ops
+> 
+> Following patches convert all the drivers.
+> 
+> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
+> ---
+>  drivers/vfio/mdev/mdev_core.c   | 64 ++++++++++++++++++++++++++++-----
+>  drivers/vfio/mdev/mdev_driver.c | 17 ++++++++-
+>  include/linux/mdev.h            |  3 ++
+>  3 files changed, 75 insertions(+), 9 deletions(-)
+> 
+
+(...)
+
+> +/*
+> + * mdev drivers can refuse to bind during probe(), in this case we want to fail
+> + * the creation of the mdev all the way back to sysfs. This is a weird model
+> + * that doesn't fit in the driver core well, nor does it seem to appear any
+> + * place else in the kernel, so use a simple hack.
+> + */
+> +static int mdev_bind_driver(struct mdev_device *mdev)
+> +{
+> +	struct mdev_driver *drv = mdev->type->parent->ops->device_driver;
+> +	int ret;
+> +
+> +	if (!drv)
+> +		drv = &vfio_mdev_driver;
+> +
+> +	while (1) {
+> +		device_lock(&mdev->dev);
+> +		if (mdev->dev.driver == &drv->driver) {
+> +			ret = 0;
+> +			goto out_unlock;
+> +		}
+> +		if (mdev->probe_err) {
+> +			ret = mdev->probe_err;
+> +			goto out_unlock;
+> +		}
+> +		device_unlock(&mdev->dev);
+> +		ret = device_attach(&mdev->dev);
+> +		if (ret)
+> +			return ret;
+
+device_attach() can return 0 (no driver), 1 (bound), or -ENODEV (device
+not registered). I would expect mdev_bind_driver() to return 0 in case
+of success and !0 otherwise, and I think the calling code does so as
+well?
+
+> +		mdev->probe_err = -EINVAL;
+> +	}
+> +	return 0;
+> +
+> +out_unlock:
+> +	device_unlock(&mdev->dev);
+> +	return ret;
+> +}
+> +
+
+(...)
+
+Rest of the patch looks good to me.
 
