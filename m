@@ -2,360 +2,134 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 016EB36DCE4
-	for <lists+kvm@lfdr.de>; Wed, 28 Apr 2021 18:22:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8F6C136DCEC
+	for <lists+kvm@lfdr.de>; Wed, 28 Apr 2021 18:24:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240792AbhD1QXT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 28 Apr 2021 12:23:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59180 "EHLO
+        id S240955AbhD1QY4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 28 Apr 2021 12:24:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59570 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240623AbhD1QXM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 28 Apr 2021 12:23:12 -0400
-Received: from mail-oi1-x234.google.com (mail-oi1-x234.google.com [IPv6:2607:f8b0:4864:20::234])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 17D35C061573
-        for <kvm@vger.kernel.org>; Wed, 28 Apr 2021 09:22:24 -0700 (PDT)
-Received: by mail-oi1-x234.google.com with SMTP id i26so8261917oii.3
-        for <kvm@vger.kernel.org>; Wed, 28 Apr 2021 09:22:24 -0700 (PDT)
+        with ESMTP id S240934AbhD1QYz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 28 Apr 2021 12:24:55 -0400
+Received: from mail-ot1-x32e.google.com (mail-ot1-x32e.google.com [IPv6:2607:f8b0:4864:20::32e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AA635C061574
+        for <kvm@vger.kernel.org>; Wed, 28 Apr 2021 09:24:08 -0700 (PDT)
+Received: by mail-ot1-x32e.google.com with SMTP id c8-20020a9d78480000b0290289e9d1b7bcso44803241otm.4
+        for <kvm@vger.kernel.org>; Wed, 28 Apr 2021 09:24:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=CcFkFCZphcrbQ6FjF32eWapcASxmYPR97+gW/jo5thE=;
-        b=LHvheWQkgk7f2mqqA37lihjWniU2EUDKFAibSLpVNlJb87q/AwGxWsTqsiRKYTNNu/
-         SBIqbvhC2UL5jns72q7sFKmTj/Gy5hIFA7YBGFUnUl+0pl2a9FBDID75ffMwDKl24AAH
-         H/SA76ea8WVvT6qUuZWIq698niHXr5tIlSdV8Yy9mca5ISeLo/TrTrAobFPHNCdVZsn2
-         ImqH/KlI3roiYI0oZdjwUXT3FA/gu5dzqwpAnhm3U0Pp9poOdAQURNoCgqSrdkH29dmk
-         msGL7qd3L1oR5IhOHdfv3K6BaG8t2pXiyBaBJcYuzt2M52BR46/V6JByTYWVyLMj8wCB
-         2kSg==
+        bh=vFFeVW33ruUEu/k84GYwSnkp1LcEq7XYbpo7nxvVcFI=;
+        b=hn+R2pvJfLdJc/4FJGrLTsET9/BSFZHQ3oyvmGarpqqestJfKms3Tpj/IujFgKAK+I
+         STWb4Qige1UGtc7wy0KuENrTa2Pu7sEZx/BXCYVQJon9TnFgC+6xapjpJeI5XS97UqAD
+         PskI9dX0Haq3e0/eOmrBhs2wAU1K8uE8bjQ+PnDAHPcoMhfs+0Mw4COjmFSyNb6GfUZ1
+         RK8Yo+sHZ9mW/OSVZjISnjiwOxC7J4/DScD6bpR+wPrmH1F8+uAyDiyZKQ87bFtPxypQ
+         il5d7LCT4zkXOqK7HNc0ERUv6Xx9PXmyWzUrEl4z4nHacZRpZDTTC5x+58shKX+l84bn
+         bAtg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=CcFkFCZphcrbQ6FjF32eWapcASxmYPR97+gW/jo5thE=;
-        b=MNWCdQuSTnDvLzwJ+Y+ZF4QT76DPDly2b0lQTIMqPVDzOHfsdx+JKNXnpGqMynFAa+
-         aUTZ5bFcIev12PVWycfic7d+3C+UojW22thr4Yn8K9E2aGPssJkVvtW4RLF1TDsDWp8g
-         w8fpw8iFkQ+AxqnrRnnKpuxMFAkF3i1Ycpel8KduqyiO16uinzSNkad+ZwlTQh8zU/of
-         QSz99RG+dAlGkNOwxVLAWFMNTuv582ZAqBi4Qez7ydUoARd5OwOrM+fqtyKXA2POo5HA
-         pizIk/IHYHjewjLTJQRI0a8ttN2V9i4EBTscfEv8JCFKYtzElHIh/pxAHLO3emtwhPiH
-         tiFA==
-X-Gm-Message-State: AOAM530tcCTvdpdMXzUQQvy+k3+Uay3PY5bzdQcNc1DmmTWrZHE78aoe
-        8qGfhRxVo35kUNogkXE5DsM3FtzXrT8PDuqgE+l+4A==
-X-Google-Smtp-Source: ABdhPJyJ/2IPlRxjsk7MTshyLak3eQmudtx/8RRI04IkRTDfp2tWr0DF3YXiOnIc9aeVPmsgp2cEgAyI3dFYEvr1UYw=
-X-Received: by 2002:aca:5789:: with SMTP id l131mr3604019oib.164.1619626943161;
- Wed, 28 Apr 2021 09:22:23 -0700 (PDT)
+        bh=vFFeVW33ruUEu/k84GYwSnkp1LcEq7XYbpo7nxvVcFI=;
+        b=Cc03/49qBhOna/eiZ2/1f+m1ydkBmn9gqdYN7EqiG3SVyx7P2DVvghE9nVovAfqNsF
+         C9SFo6dhXhg0lgiNRNpXeWjbSOrJQrPkEN3ze2/QNh9G14/mr/O8xAQMCD766uqXlYQ4
+         twGKn14Is7WAa+MDKzp+3a1fKDLoz11t1ewLqSHGmbi+rZvmF/o1PDX/CG9TtiDJO2Gv
+         b1oEs/cyW9AEhl7qutVGkF11QkNVP6jfig1jED/GjpwfLuHtvjGHhjfRrBX2QPLr4Rg/
+         GFmhCNHc7ChW7cX4XsRvoXIuIuBXFSldqMntM9+p8jVybMVNXeHAj0l/DpauFtBOF9fo
+         gPJw==
+X-Gm-Message-State: AOAM530LBGs9ktHN6gmZRBvpGNtauHXpv6V4oWFg8q4xWcVaOatwL40k
+        RNtzQ/Y72LBdYBtpUrCBvtXScVQW/tGbb0fyk2jH+A==
+X-Google-Smtp-Source: ABdhPJwWHRNFe5yz7wBYtOPEdrHwUqI1dTfIVjAv50VzHm+M+vApvLtLT8m3GLJkwbhFeJKPFsHpIeINVS9qEG1hLoA=
+X-Received: by 2002:a05:6830:1deb:: with SMTP id b11mr25593909otj.72.1619627047878;
+ Wed, 28 Apr 2021 09:24:07 -0700 (PDT)
 MIME-Version: 1.0
-References: <20210416082511.2856-1-zhukeqian1@huawei.com> <20210416082511.2856-3-zhukeqian1@huawei.com>
- <CANgfPd_WzX6Fm7BiMoBoehuLL8tjh4WEqehUhF8biPyL8vS4XQ@mail.gmail.com>
- <49e6bf4f-0142-c9ea-a8c1-7cfe211c8d7b@huawei.com> <CANgfPd840MmH5zKRHb4p1Rk0QEDu8iJoMJZGxWF6fhqxANrptg@mail.gmail.com>
- <f0651fce-3b39-3ca7-6681-9fbc6edf8480@huawei.com> <CANgfPd_xJbL388zmirbQW-pSw+o0csmNe=uLA1yV_Zk-QMvDfA@mail.gmail.com>
- <4f71baed-544b-81b2-dfa6-f04016966a5a@huawei.com> <60894846.1c69fb81.6e765.161bSMTPIN_ADDED_BROKEN@mx.google.com>
-In-Reply-To: <60894846.1c69fb81.6e765.161bSMTPIN_ADDED_BROKEN@mx.google.com>
+References: <20210427223635.2711774-1-bgardon@google.com> <20210427223635.2711774-4-bgardon@google.com>
+ <2e5ecc0b-0ef4-a663-3b1d-81d020626b39@redhat.com>
+In-Reply-To: <2e5ecc0b-0ef4-a663-3b1d-81d020626b39@redhat.com>
 From:   Ben Gardon <bgardon@google.com>
-Date:   Wed, 28 Apr 2021 09:22:12 -0700
-Message-ID: <CANgfPd_FceqBOf3j-o91rZ_Ziq4vNj_0SVMrzfDVsr6PrweL4A@mail.gmail.com>
-Subject: Re: [RFC PATCH v2 2/2] KVM: x86: Not wr-protect huge page with
- init_all_set dirty log
-To:     zhukeqian <zhukeqian1@huawei.com>
+Date:   Wed, 28 Apr 2021 09:23:56 -0700
+Message-ID: <CANgfPd9OrCFoH1=2G_GD5MB5R54q5w=SDKP7vLnHPvDZox5WiQ@mail.gmail.com>
+Subject: Re: [PATCH 3/6] KVM: x86/mmu: Deduplicate rmap freeing in allocate_memslot_rmap
+To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
+        Peter Xu <peterx@redhat.com>,
         Sean Christopherson <seanjc@google.com>,
-        "Wanghaibin (D)" <wanghaibin.wang@huawei.com>
+        Peter Shier <pshier@google.com>,
+        Junaid Shahid <junaids@google.com>,
+        Jim Mattson <jmattson@google.com>,
+        Yulei Zhang <yulei.kernel@gmail.com>,
+        Wanpeng Li <kernellwp@gmail.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Xiao Guangrong <xiaoguangrong.eric@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Apr 28, 2021 at 4:34 AM zhukeqian <zhukeqian1@huawei.com> wrote:
+On Wed, Apr 28, 2021 at 3:00 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
 >
-> Oh, I have to correct myself.
->
-> without this opt:
-> first round dirtying: write fault and split large mapping
-> second round: write fault
->
-> with this opt:
-> first round dirtying: no write fault
-> second round: write fault and split large mapping
->
-> the total test time is expected to be reduced.
+> Typo in the commit subject, I guess?
 
-Oh yeah, good point. So we should really see the savings in the first
-round dirty memory time. Good catch.
+Oh woops, yeah It should just be "Deduplicate rmap freeing" or
+something to that effect.
 
 >
-> On 2021/4/28 0:33, Ben Gardon wrote:
-> > On Mon, Apr 26, 2021 at 10:04 PM Keqian Zhu < zhukeqian1@huawei.com> wrote:
-> >>
-> >> Hi Ben,
-> >>
-> >> Sorry for the delay reply!
-> >>
-> >> On 2021/4/21 0:30, Ben Gardon wrote:
-> >>> On Tue, Apr 20, 2021 at 12:49 AM Keqian Zhu < zhukeqian1@huawei.com> wrote:
-> >>>>
-> >>>> Hi Ben,
-> >>>>
-> >>>> On 2021/4/20 3:20, Ben Gardon wrote:
-> >>>>> On Fri, Apr 16, 2021 at 1:25 AM Keqian Zhu < zhukeqian1@huawei.com> wrote:
-> >>>>>>
-> >>>>>> Currently during start dirty logging, if we're with init-all-set,
-> >>>>>> we write protect huge pages and leave normal pages untouched, for
-> >>>>>> that we can enable dirty logging for these pages lazily.
-> >>>>>>
-> >>>>>> Actually enable dirty logging lazily for huge pages is feasible
-> >>>>>> too, which not only reduces the time of start dirty logging, also
-> >>>>>> greatly reduces side-effect on guest when there is high dirty rate.
-> >>>>>>
-> >>>>>> Signed-off-by: Keqian Zhu < zhukeqian1@huawei.com>
-> >>>>>> ---
-> >>>>>> arch/x86/kvm/mmu/mmu.c | 48 ++++++++++++++++++++++++++++++++++++++----
-> >>>>>> arch/x86/kvm/x86.c     | 37 +++++++++-----------------------
-> >>>>>> 2 files changed, 54 insertions(+), 31 deletions(-)
-> >>>>>>
-> >>>>>> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> >>>>>> index 2ce5bc2ea46d..98fa25172b9a 100644
-> >>>>>> --- a/arch/x86/kvm/mmu/mmu.c
-> >>>>>> +++ b/arch/x86/kvm/mmu/mmu.c
-> >>>>>> @@ -1188,8 +1188,7 @@ static bool __rmap_clear_dirty(struct kvm *kvm, struct kvm_rmap_head *rmap_head,
-> >>>>>>   * @gfn_offset: start of the BITS_PER_LONG pages we care about
-> >>>>>>   * @mask: indicates which pages we should protect
-> >>>>>>   *
-> >>>>>> - * Used when we do not need to care about huge page mappings: e.g. during dirty
-> >>>>>> - * logging we do not have any such mappings.
-> >>>>>> + * Used when we do not need to care about huge page mappings.
-> >>>>>>   */
-> >>>>>> static void kvm_mmu_write_protect_pt_masked(struct kvm *kvm,
-> >>>>>>                                      struct kvm_memory_slot *slot,
-> >>>>>> @@ -1246,13 +1245,54 @@ static void kvm_mmu_clear_dirty_pt_masked(struct kvm *kvm,
-> >>>>>>   * It calls kvm_mmu_write_protect_pt_masked to write protect selected pages to
-> >>>>>>   * enable dirty logging for them.
-> >>>>>>   *
-> >>>>>> - * Used when we do not need to care about huge page mappings: e.g. during dirty
-> >>>>>> - * logging we do not have any such mappings.
-> >>>>>> + * We need to care about huge page mappings: e.g. during dirty logging we may
-> >>>>>> + * have any such mappings.
-> >>>>>>   */
-> >>>>>> void kvm_arch_mmu_enable_log_dirty_pt_masked(struct kvm *kvm,
-> >>>>>>                                 struct kvm_memory_slot *slot,
-> >>>>>>                                 gfn_t gfn_offset, unsigned long mask)
-> >>>>>> {
-> >>>>>> +       gfn_t start, end;
-> >>>>>> +
-> >>>>>> +       /*
-> >>>>>> +        * Huge pages are NOT write protected when we start dirty log with
-> >>>>>> +        * init-all-set, so we must write protect them at here.
-> >>>>>> +        *
-> >>>>>> +        * The gfn_offset is guaranteed to be aligned to 64, but the base_gfn
-> >>>>>> +        * of memslot has no such restriction, so the range can cross two large
-> >>>>>> +        * pages.
-> >>>>>> +        */
-> >>>>>> +       if (kvm_dirty_log_manual_protect_and_init_set(kvm)) {
-> >>>>>> +               start = slot->base_gfn + gfn_offset + __ffs(mask);
-> >>>>>> +               end = slot->base_gfn + gfn_offset + __fls(mask);
-> >>>>>> +               kvm_mmu_slot_gfn_write_protect(kvm, slot, start, PG_LEVEL_2M);
-> >>>>>> +
-> >>>>>> +               /* Cross two large pages? */
-> >>>>>> +               if (ALIGN(start << PAGE_SHIFT, PMD_SIZE) !=
-> >>>>>> +                   ALIGN(end << PAGE_SHIFT, PMD_SIZE))
-> >>>>>> +                       kvm_mmu_slot_gfn_write_protect(kvm, slot, end,
-> >>>>>> +                                                      PG_LEVEL_2M);
-> >>>>>> +       }
-> >>>>>> +
-> >>>>>> +       /*
-> >>>>>> +        * RFC:
-> >>>>>> +        *
-> >>>>>> +        * 1. I don't return early when kvm_mmu_slot_gfn_write_protect() returns
-> >>>>>> +        * true, because I am not very clear about the relationship between
-> >>>>>> +        * legacy mmu and tdp mmu. AFAICS, the code logic is NOT an if/else
-> >>>>>> +        * manner.
-> >>>>>> +        *
-> >>>>>> +        * The kvm_mmu_slot_gfn_write_protect() returns true when we hit a
-> >>>>>> +        * writable large page mapping in legacy mmu mapping or tdp mmu mapping.
-> >>>>>> +        * Do we still have normal mapping in that case? (e.g. We have large
-> >>>>>> +        * mapping in legacy mmu and normal mapping in tdp mmu).
-> >>>>>
-> >>>>> Right, we can't return early because the two MMUs could map the page
-> >>>>> in different ways, but each MMU could also map the page in multiple
-> >>>>> ways independently.
-> >>>>> For example, if the legacy MMU was being used and we were running a
-> >>>>> nested VM, a page could be mapped 2M in EPT01 and 4K in EPT02, so we'd
-> >>>>> still need kvm_mmu_slot_gfn_write_protect calls for both levels.
-> >>>>> I don't think there's a case where we can return early here with the
-> >>>>> information that the first calls to kvm_mmu_slot_gfn_write_protect
-> >>>>> access.
-> >>>> Thanks for the detailed explanation.
-> >>>>
-> >>>>>
-> >>>>>> +        *
-> >>>>>> +        * 2. kvm_mmu_slot_gfn_write_protect() doesn't tell us whether the large
-> >>>>>> +        * page mapping exist. If it exists but is clean, we can return early.
-> >>>>>> +        * However, we have to do invasive change.
-> >>>>>
-> >>>>> What do you mean by invasive change?
-> >>>> We need the kvm_mmu_slot_gfn_write_protect to report whether all mapping are large
-> >>>> and clean, so we can return early. However it's not a part of semantics of this function.
-> >>>>
-> >>>> If this is the final code, compared to old code, we have an extra gfn_write_protect(),
-> >>>> I don't whether it's acceptable?
-> >>>
-> >>> Ah, I see. Please correct me if I'm wrong, but I think that in order
-> >>> to check that the only mappings on the GFN range are large, we'd still
-> >>> have to go over the rmap for the 4k mappings, at least for the legacy
-> >>> MMU. In that case, we're doing about as much work as the extra
-> >>> gfn_write_protect and I don't think that we'd get any efficiency gain
-> >>> for the change in semantics.
-> >>>
-> >>> Likewise for the TDP MMU, if the GFN range is mapped both large and
-> >>> 4k, it would have to be in different TDP structures, so the efficiency
-> >>> gains would again not be very big.
-> >> I am not familiar with the MMU virtualization of x86 arch, but I think
-> >> you are right.
-> >>
-> >>>
-> >>> I'm really just guessing about those performance characteristics
-> >>> though. It would definitely help to have some performance data to back
-> >>> all this up. Even just a few runs of the dirty_log_perf_test (in
-> >>> selftests) could provide some interesting results, and I'd be happy to
-> >>> help review any improvements you might make to that test.
-> >>>
-> >>> Regardless, I'd be inclined to keep this change as simple as possible
-> >>> for now and the early return optimization could happen in a follow-up
-> >>> patch. I think the extra gfn_write_protect is acceptable, especially
-> >>> if you can show that it doesn't cause a big hit in performance when
-> >>> running the dirty_log_perf_test with 4k and 2m backing memory.
-> >> I tested it using dirty_log_perf_test, the result shows that performance
-> >> of clear_dirty_log different within 2%.
+> Paolo
+>
+> On 28/04/21 00:36, Ben Gardon wrote:
+> > Small code deduplication. No functional change expected.
 > >
-> > I think there are a couple obstacles which make the stock
-> > dirty_log_perf_test less useful for measuring this optimization.
+> > Signed-off-by: Ben Gardon <bgardon@google.com>
+> > ---
+> >   arch/x86/kvm/x86.c | 19 +++++++++++--------
+> >   1 file changed, 11 insertions(+), 8 deletions(-)
 > >
-> > 1. Variance between runs
-> > With only 16 vCPUs and whatever the associated default guest memory
-> > size is, random system events and daemons introduce a lot of variance,
-> > at least in my testing. I usually try to run the biggest VM I can to
-> > smooth that out, but even with a 96 vCPU VM, a 2% difference is often
-> > not statistically significant. CPU pinning for the vCPU threads would
-> > help a lot to reduce variance. I don't remember if anyone has
-> > implemented this yet.
-> Yes, this makes sense.
->
+> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> > index cf3b67679cf0..5bcf07465c47 100644
+> > --- a/arch/x86/kvm/x86.c
+> > +++ b/arch/x86/kvm/x86.c
+> > @@ -10818,17 +10818,23 @@ void kvm_arch_destroy_vm(struct kvm *kvm)
+> >       kvm_hv_destroy_vm(kvm);
+> >   }
 > >
-> > 2. The guest dirty pattern
-> > By default, each guest vCPU will dirty it's entire partition of guest
-> > memory on each iteration. This means that instead of amortizing out
-> > the cost of write-protecting and splitting large pages, we simply move
-> > the burden later in the process. I see you didn't include the time for
-> > each iteration below, but I would expect this patch to move some of
-> > the time from "Enabling dirty logging time" and "Dirtying memory time"
-> > for pass 1 to "Clear dirty log time" and "Dirtying memory time" for
-> > pass 2. I wouldn't expect the total time over 5 iterations to change
-> > for this test.
-> If we have large page mapping and are with this optimization, the "Enabling dirty logging time"
-> and the first round "Dirtying memory time" will be greatly reduced.
->
-> However, I don't think other times (dirty_memory except first round, get_log, clear_log) are
-> expected to change compared to w/o optimization. Because after the first round "Dirtying memory",
-> all mappings have been split to normal mappings, so the situation is same as w/o this optimization.
->
-> Maybe I miss something?
->
+> > -void kvm_arch_free_memslot(struct kvm *kvm, struct kvm_memory_slot *slot)
+> > +static void free_memslot_rmap(struct kvm_memory_slot *slot)
+> >   {
+> >       int i;
 > >
-> > It would probably also serve us well to have some kind of "hot" subset
-> > of memory for each vCPU, since some of the benefit of lazy large page
-> > splitting depend on that access pattern.
+> >       for (i = 0; i < KVM_NR_PAGE_SIZES; ++i) {
+> >               kvfree(slot->arch.rmap[i]);
+> >               slot->arch.rmap[i] = NULL;
+> > +     }
+> > +}
 > >
-> > 3. Lockstep dirtying and dirty log collection
-> > While this test is currently great for timing dirty logging
-> > operations, it's not great for trickier analysis, especially
-> > reductions to guest degradation. In order to measure that we'd need to
-> > change the test to collect the dirty log as quickly as possible,
-> > independent of what the guest is doing and then also record how much
-> > "progress" the guest is able to make while all that is happening.
-> Yes, make sense.
->
-> Does the "dirty log collection" contains "dirty log clear"? As I understand, the dirty log
-> collection is very fast, just some memory copy. But for "dirty log clear", we should modify mappings
-> and perform TLBI, the time is much longer.
-
-Yeah, sorry. By dirty log collection I meant get + clear since the
-test does both before it waits for the guest to dirty all memory
-again.
-
->
+> > -             if (i == 0)
+> > -                     continue;
+> > +void kvm_arch_free_memslot(struct kvm *kvm, struct kvm_memory_slot *slot)
+> > +{
+> > +     int i;
+> > +
+> > +     free_memslot_rmap(slot);
 > >
-> > I'd be happy to help review any improvements to the test which you
-> > feel like making.
-> Thanks, Ben. emm... I feel very sorry that perhaps I don't have enough time to do this, many works are queued...
-> On the other hand, I think the "Dirtying memory time" of first round can show us the optimization.
-
-No worries, I think this is a good patch either way. No need to block
-on test improvements, from my perspective.
-
->
+> > +     for (i = 1; i < KVM_NR_PAGE_SIZES; ++i) {
+> >               kvfree(slot->arch.lpage_info[i - 1]);
+> >               slot->arch.lpage_info[i - 1] = NULL;
+> >       }
+> > @@ -10894,12 +10900,9 @@ static int kvm_alloc_memslot_metadata(struct kvm_memory_slot *slot,
+> >       return 0;
 > >
-> >>
-> >> *Without this patch*
-> >>
-> >> ./dirty_log_perf_test -i 5 -v 16 -s anonymous
-> >>
-> >> Testing guest mode: PA-bits:ANY, VA-bits:48, 4K pages
-> >> guest physical test memory offset: 0xffbfffff000
-> >> Populate memory time: 3.105203579s
-> >> Enabling dirty logging time: 0.000323444s
-> >> [...]
-> >> Get dirty log over 5 iterations took 0.000595033s. (Avg 0.000119006s/iteration)
-> >> Clear dirty log over 5 iterations took 0.713212922s. (Avg 0.142642584s/iteration)
-> >>
-> >> ./dirty_log_perf_test -i 5 -v 16 -s anonymous_hugetlb
-> >>
-> >> Testing guest mode: PA-bits:ANY, VA-bits:48, 4K pages
-> >> guest physical test memory offset: 0xffbfffff000
-> >> Populate memory time: 3.922764235s
-> >> Enabling dirty logging time: 0.000316473s
-> >> [...]
-> >> Get dirty log over 5 iterations took 0.000485459s. (Avg 0.000097091s/iteration)
-> >> Clear dirty log over 5 iterations took 0.603749670s. (Avg 0.120749934s/iteration)
-> >>
-> >>
-> >> *With this patch*
-> >>
-> >> ./dirty_log_perf_test -i 5 -v 16 -s anonymous
-> >>
-> >> Testing guest mode: PA-bits:ANY, VA-bits:48, 4K pages
-> >> guest physical test memory offset: 0xffbfffff000
-> >> Populate memory time: 3.244515198s
-> >> Enabling dirty logging time: 0.000280207s
-> >> [...]
-> >> Get dirty log over 5 iterations took 0.000484953s. (Avg 0.000096990s/iteration)
-> >> Clear dirty log over 5 iterations took 0.727620114s. (Avg 0.145524022s/iteration)
-> >>
-> >> ./dirty_log_perf_test -i 5 -v 16 -s anonymous_hugetlb
-> >>
-> >> Testing guest mode: PA-bits:ANY, VA-bits:48, 4K pages
-> >> guest physical test memory offset: 0xffbfffff000
-> >> Populate memory time: 3.244294061s
-> >> Enabling dirty logging time: 0.000273590s
-> >> [...]
-> >> Get dirty log over 5 iterations took 0.000474244s. (Avg 0.000094848s/iteration)
-> >> Clear dirty log over 5 iterations took 0.600593672s. (Avg 0.120118734s/iteration)
-> >>
-> >>
-> >> I faced a problem that there is no huge page mapping when test with
-> >> "-s anonymous_hugetlb", both for TDP enabled or disabled.
+> >   out_free:
+> > -     for (i = 0; i < KVM_NR_PAGE_SIZES; ++i) {
+> > -             kvfree(slot->arch.rmap[i]);
+> > -             slot->arch.rmap[i] = NULL;
+> > -             if (i == 0)
+> > -                     continue;
+> > +     free_memslot_rmap(slot);
 > >
-> > Do you mean that even before dirty logging was enabled, KVM didn't
-> > create any large mappings? That's odd. I would assume the backing
-> > memory allocation would just fail if there aren't enough hugepages
-> > available.
-> It's odd indeed. I can see there are large mapping when I do normal migration, but I
-> don't see large mapping when run this test.
->
-> I have proofed the time of "clear dirty log" is not effected, what about send a
-> formal patch?
-
-That sounds good to me.
-
->
-> Thanks,
-> Keqian
+> > +     for (i = 1; i < KVM_NR_PAGE_SIZES; ++i) {
+> >               kvfree(slot->arch.lpage_info[i - 1]);
+> >               slot->arch.lpage_info[i - 1] = NULL;
+> >       }
+> >
 >
