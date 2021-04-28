@@ -2,155 +2,188 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E683636D9D5
-	for <lists+kvm@lfdr.de>; Wed, 28 Apr 2021 16:50:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9EF0736DACA
+	for <lists+kvm@lfdr.de>; Wed, 28 Apr 2021 17:06:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239291AbhD1OvU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 28 Apr 2021 10:51:20 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:10122 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S236514AbhD1OvT (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 28 Apr 2021 10:51:19 -0400
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 13SEWhNI083557;
-        Wed, 28 Apr 2021 10:49:54 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=+MDph5yR3gYbc4z7haBiYjH/hMic3Sw60Vgj+9HGaec=;
- b=mb9YVMMZj01Xa68naoO6IhPCxdEPXk79yUFu2lZMm4k8Y+wsbB5JiWMSPS+gmFRYlb8D
- GC16uszM+zQbk3T1+fhwJ1luwTPmNLeFgetiuGUWo7Hvz78X0Uu42IcWs6n2cPGpnSTN
- jziiJLCj1m8u5SKWAM+ChFln9rHuDAw0xV0+aT1iGCN4o+TAO0M9zzaOydJ8hNPhtaB7
- OP6hXTrevFHJhqRyUxGAZAdrBzoTjJlm2QaniKs454MCQT8SOadjZF3anUpJSGxY66Ut
- tCqWEO+SLaZW79IxW2RSfbkmBA0izhxEWeM16NQrExtXci4JTX5Fm3OhLHoLYJvGPTuj Ug== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3879c612yf-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 28 Apr 2021 10:49:53 -0400
-Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 13SEY7qp095552;
-        Wed, 28 Apr 2021 10:49:53 -0400
-Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3879c612xs-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 28 Apr 2021 10:49:53 -0400
-Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
-        by ppma05fra.de.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 13SEhm14029529;
-        Wed, 28 Apr 2021 14:49:50 GMT
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
-        by ppma05fra.de.ibm.com with ESMTP id 384gjxs21t-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 28 Apr 2021 14:49:50 +0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 13SEnlLV38601106
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 28 Apr 2021 14:49:47 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 55D68A405B;
-        Wed, 28 Apr 2021 14:49:47 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 6D754A405F;
-        Wed, 28 Apr 2021 14:49:45 +0000 (GMT)
-Received: from oc7455500831.ibm.com (unknown [9.171.77.184])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Wed, 28 Apr 2021 14:49:45 +0000 (GMT)
-Subject: Re: sched: Move SCHED_DEBUG sysctl to debugfs
-To:     Peter Zijlstra <peterz@infradead.org>
-Cc:     bristot@redhat.com, bsegall@google.com, dietmar.eggemann@arm.com,
-        greg@kroah.com, gregkh@linuxfoundation.org, joshdon@google.com,
-        juri.lelli@redhat.com, linux-kernel@vger.kernel.org,
-        linux@rasmusvillemoes.dk, mgorman@suse.de, mingo@kernel.org,
-        rostedt@goodmis.org, valentin.schneider@arm.com,
-        vincent.guittot@linaro.org, linux-s390@vger.kernel.org,
-        kvm@vger.kernel.org
-References: <20210412102001.287610138@infradead.org>
- <20210427145925.5246-1-borntraeger@de.ibm.com>
- <YIkgzUWEPaXQTCOv@hirez.programming.kicks-ass.net>
- <da373590-f0d7-e3a2-cef9-4527fc9f3056@de.ibm.com>
- <YIlXQ43b6+7sUl+f@hirez.programming.kicks-ass.net>
-From:   Christian Borntraeger <borntraeger@de.ibm.com>
-Message-ID: <89ccb344-7a03-65e6-826d-4807e1ab2815@de.ibm.com>
-Date:   Wed, 28 Apr 2021 16:49:44 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.9.1
+        id S236090AbhD1PDV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 28 Apr 2021 11:03:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40766 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S239827AbhD1PCy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 28 Apr 2021 11:02:54 -0400
+Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1522BC0613ED
+        for <kvm@vger.kernel.org>; Wed, 28 Apr 2021 07:59:05 -0700 (PDT)
+Received: by mail-pj1-x102d.google.com with SMTP id lp8so2890444pjb.1
+        for <kvm@vger.kernel.org>; Wed, 28 Apr 2021 07:59:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=Jz7qPymMOFiVOAXZnP4Er6B1ezJAfu0fq5a7KpaKKQU=;
+        b=tJmUpYMlpVzCzA6fjWQAPQT8pJlmuQQJyP65wBc4SobpHYKgSjjw7PSOs+hrWxJfWb
+         S9/I6rpyxY795lojvfRjKS8iIGjOqOPQnaDnZyI4sEPHgMus7cVRTId5sUXOxvDhxRY7
+         iD1+csPryZ0Fl35FqzelVEtp4n0cGxmW4B8jH/E5CQvHsNNMEJrap/+TLT18S2DLjp4Y
+         bdSoURtwbRKMeuPqDU42hhNoOZ4vj6bhzAQ6Q4VUEQqs318Ap4H3mb/WLGn/prWKCQFS
+         NM+9JEldMbdZ6jDZql84b0qH51bF0B8CuYB0Qtd5GOfy2CtygMzKAMEC0wBSgzj8iGL2
+         UahQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=Jz7qPymMOFiVOAXZnP4Er6B1ezJAfu0fq5a7KpaKKQU=;
+        b=eVGE3lUMFTOYv6RVsmf4ukqwipqVlqhzfsauAS3kdgJZA88hfBI7InQbOEjxzQi/5N
+         5gBX3AenJ781yEZ8Wn9dRgaseSToM6EYbU9SIHeAAftfylw4TuBzmRSVu/fypJEX03zh
+         t4hiB9COMTiK15sEPxflBynLe4yXq8o0PU9esxdKci2xLL+oqm0y93x6P/pwMIcwyf6J
+         zwDkTJKJNSIpXtscRYi6CAo2+xvFJ0rgmNkTjo+8OFQMEixao4gh141e7Cd9cvqMk1Ut
+         tArHU+XT5aasRQn0kF1VD/QFW7sPrrjExC3J4ZEecsW1onHK4fu0ZsgNDS7+12JIAXbW
+         Ln0g==
+X-Gm-Message-State: AOAM530o5MItJBrj+N7dkfm9K8bzywKXFyeEmQiUc92eLZk3Ahcp9UOD
+        z4kx0gpvGz9NY7/NpxKRW604QA==
+X-Google-Smtp-Source: ABdhPJyqXFkfR+iBHk8ipYJO7e2td0DCaeMFxvdNTPxJZHuA4UqEQCca9eBPOjtc0ufvhqon6y+8hw==
+X-Received: by 2002:a17:902:10b:b029:ed:2b3e:beb4 with SMTP id 11-20020a170902010bb02900ed2b3ebeb4mr17868694plb.64.1619621944318;
+        Wed, 28 Apr 2021 07:59:04 -0700 (PDT)
+Received: from google.com (240.111.247.35.bc.googleusercontent.com. [35.247.111.240])
+        by smtp.gmail.com with ESMTPSA id mn22sm4501399pjb.24.2021.04.28.07.59.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 28 Apr 2021 07:59:03 -0700 (PDT)
+Date:   Wed, 28 Apr 2021 14:58:59 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Valeriy Vdovin <valeriy.vdovin@virtuozzo.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        linux-kernel@vger.kernel.org, Denis Lunev <den@openvz.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
+        Shuah Khan <shuah@kernel.org>,
+        Aaron Lewis <aaronlewis@google.com>,
+        Alexander Graf <graf@amazon.com>,
+        Like Xu <like.xu@linux.intel.com>,
+        Oliver Upton <oupton@google.com>,
+        Andrew Jones <drjones@redhat.com>, kvm@vger.kernel.org,
+        linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH] KVM: x86: Fix KVM_GET_CPUID2 ioctl to return cpuid
+ entries count
+Message-ID: <YIl4M/GgaYvwNuXv@google.com>
+References: <20210428113655.26282-1-valeriy.vdovin@virtuozzo.com>
+ <871raueg7y.fsf@vitty.brq.redhat.com>
+ <20210428134657.GA515794@dhcp-172-16-24-191.sw.ru>
 MIME-Version: 1.0
-In-Reply-To: <YIlXQ43b6+7sUl+f@hirez.programming.kicks-ass.net>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: GKX48hxqsFAcv5mlCEJdq8v7NzUQSymF
-X-Proofpoint-GUID: CPDMzAY1Lun_Kjk7BCoCWWMTM9fKYc_1
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.761
- definitions=2021-04-28_09:2021-04-28,2021-04-28 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0
- priorityscore=1501 clxscore=1015 phishscore=0 mlxlogscore=999 adultscore=0
- lowpriorityscore=0 suspectscore=0 spamscore=0 mlxscore=0 malwarescore=0
- impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2104060000 definitions=main-2104280098
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210428134657.GA515794@dhcp-172-16-24-191.sw.ru>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 28.04.21 14:38, Peter Zijlstra wrote:
-> On Wed, Apr 28, 2021 at 11:42:57AM +0200, Christian Borntraeger wrote:
->> On 28.04.21 10:46, Peter Zijlstra wrote:
->> [..]
->>> The right thing to do here is to analyze the situation and determine why
->>> migration_cost needs changing; is that an architectural thing, does s390
->>> benefit from less sticky tasks due to its cache setup (the book caches
->>> could be absorbing some of the penalties here for example). Or is it
->>> something that's workload related, does KVM intrinsically not care about
->>> migrating so much, or is it something else.
->>
->> So lets focus on the performance issue.
->>
->> One workload where we have seen this is transactional workload that is
->> triggered by external network requests. So every external request
->> triggered a wakup of a guest and a wakeup of a process in the guest.
->> The end result was that KVM was 40% slower than z/VM (in terms of
->> transactions per second) while we had more idle time.
->> With smaller sched_migration_cost_ns (e.g. 100000) KVM was as fast
->> as z/VM.
->>
->> So to me it looks like that the wakeup and reschedule to a free CPU
->> was just not fast enough. It might also depend where I/O interrupts
->> land. Not sure yet.
+On Wed, Apr 28, 2021, Valeriy Vdovin wrote:
+> On Wed, Apr 28, 2021 at 02:38:57PM +0200, Vitaly Kuznetsov wrote:
+> > Valeriy Vdovin <valeriy.vdovin@virtuozzo.com> writes:
+> > 
+> > > KVM_GET_CPUID2 kvm ioctl is not very well documented, but the way it is
+> > > implemented in function kvm_vcpu_ioctl_get_cpuid2 suggests that even at
+> > > error path it will try to return number of entries to the caller. But
+> > > The dispatcher kvm vcpu ioctl dispatcher code in kvm_arch_vcpu_ioctl
+> > > ignores any output from this function if it sees the error return code.
+> > >
+> > > It's very explicit by the code that it was designed to receive some
+> > > small number of entries to return E2BIG along with the corrected number.
+> > >
+> > > This lost logic in the dispatcher code has been restored by removing the
+> > > lines that check for function return code and skip if error is found.
+> > > Without it, the ioctl caller will see both the number of entries and the
+> > > correct error.
+> > >
+> > > In selftests relevant function vcpu_get_cpuid has also been modified to
+> > > utilize the number of cpuid entries returned along with errno E2BIG.
+> > >
+> > > Signed-off-by: Valeriy Vdovin <valeriy.vdovin@virtuozzo.com>
+> > > ---
+> > >  arch/x86/kvm/x86.c                            | 10 +++++-----
+> > >  .../selftests/kvm/lib/x86_64/processor.c      | 20 +++++++++++--------
+> > >  2 files changed, 17 insertions(+), 13 deletions(-)
+> > >
+> > > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> > > index efc7a82ab140..df8a3e44e722 100644
+> > > --- a/arch/x86/kvm/x86.c
+> > > +++ b/arch/x86/kvm/x86.c
+> > > @@ -4773,14 +4773,14 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
+> > >  		r = -EFAULT;
+> > >  		if (copy_from_user(&cpuid, cpuid_arg, sizeof(cpuid)))
+> > >  			goto out;
+> > > +
+> > >  		r = kvm_vcpu_ioctl_get_cpuid2(vcpu, &cpuid,
+> > >  					      cpuid_arg->entries);
+> > > -		if (r)
+> > > -			goto out;
+> > > -		r = -EFAULT;
+> > > -		if (copy_to_user(cpuid_arg, &cpuid, sizeof(cpuid)))
+> > 
+> > It may make sense to check that 'r == -E2BIG' before trying to write
+> > anything back. I don't think it is correct/expected to modify nent in
+> > other cases (e.g. when kvm_vcpu_ioctl_get_cpuid2() returns -EFAULT)
+> > 
+> That's a good point. The caller could expect and rely on the fact that nent
+> is unmodified in any error case except E2BIG. I will add this in the next
+> version.
+> > > +
+> > > +		if (copy_to_user(cpuid_arg, &cpuid, sizeof(cpuid))) {
+> > > +			r = -EFAULT;
+> > >  			goto out;
+> > > -		r = 0;
+> > > +		}
+> > >  		break;
+> > 
+> > How is KVM userspace supposed to know if it can trust the 'nent' value
+> > (KVM is fixed case) or not (KVM is not fixed case)? This can probably be
+> > resolved with adding a new capability (but then I'm not sure the change
+> > is worth it to be honest).
 > 
-> So there's unfortunately three places where migration_cost is used; one
-> is in {nohz_,}newidle_balance(), see below. Someone tried removing it
-> before and that ran into so weird regressions somewhere. But it is worth
-> checking if this is the thing that matters for your workload.
-> 
-> The other (main) use is in task_hot(), where we try and prevent
-> migrating tasks that have recently run on a CPU. We already have an
-> exception for SMT there, because SMT siblings share all cache levels per
-> defintion, so moving it to the sibling should have no ill effect.
-> 
-> It could be that the current measure is fundamentally too high for your
-> machine -- it is basically a random number that was determined many
-> years ago on some random x86 machine, so it not reflecting reality today
-> on an entirely different platform is no surprise.
-> 
-> Back in the day, we had some magic code that measured cache latency per
-> sched_domain and we used that, but that suffered from boot-to-boot
-> variance and made things rather non-deterministic, but the idea of
-> having per-domain cost certainly makes sense.
-> 
-> Over the years people have tried bringing parts of that back, but it
-> never really had convincing numbers justifying the complexity. So that's
-> another thing you could be looking at I suppose.
-> 
-> And then finally we have an almost random use in rebalance_domains(),
-> and I can't remember the story behind that one :/
-> 
-> 
-> Anyway, TL;DR, try and figure out which of these three is responsible
-> for your performance woes. If it's the first, the below patch might be a
-> good candidate. If it's task_hot(), we might need to re-eval per domain
-> costs. If its that other thing, I'll have to dig to figure out wth that
-> was supposed to accomplish ;-)
+> As I see it KVM userspace should set nent to 0, and then expect any non-zero
+> value in return along with E2BIG. This is the same approach I've used in the
+> modified test code in the same patch.
 
-Thanks for the insight. I will try to find out which of these areas make
-a difference here.
-[..]
+IMO, the current code is correct (well, least awful), albeit misleading.
+Copying back the number of entries but not the entries themselves would be a bug.
+That can obviously be remedied, but it adds even more complexity for no known
+benefit, and training userspace to go spelunking on -E2BIG would likely yield
+more bugs in the future.
+
+I also think we should keep the -E2BIG behavior of KVM_GET_CPUID2 and
+KVM_GET_{SUPPORTED,EMULATED,SUPPORTED_HV}_CPUID consistent.  Returning partial
+information would make KVM_GET_CPUID2 an anomaly.
+
+
+diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+index c96f79c9fff2..c4dbc7c47b17 100644
+--- a/arch/x86/kvm/cpuid.c
++++ b/arch/x86/kvm/cpuid.c
+@@ -348,20 +348,15 @@ int kvm_vcpu_ioctl_get_cpuid2(struct kvm_vcpu *vcpu,
+                              struct kvm_cpuid2 *cpuid,
+                              struct kvm_cpuid_entry2 __user *entries)
+ {
+-       int r;
+-
+-       r = -E2BIG;
+        if (cpuid->nent < vcpu->arch.cpuid_nent)
+-               goto out;
+-       r = -EFAULT;
++               return -E2BIG;
++
+        if (copy_to_user(entries, vcpu->arch.cpuid_entries,
+                         vcpu->arch.cpuid_nent * sizeof(struct kvm_cpuid_entry2)))
+-               goto out;
+-       return 0;
++               return -EFAULT;
+
+-out:
+        cpuid->nent = vcpu->arch.cpuid_nent;
+-       return r;
++       return 0;
+ }
+
+ /* Mask kvm_cpu_caps for @leaf with the raw CPUID capabilities of this CPU. */
