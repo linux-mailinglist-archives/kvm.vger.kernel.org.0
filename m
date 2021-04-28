@@ -2,78 +2,88 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8CF4036D461
-	for <lists+kvm@lfdr.de>; Wed, 28 Apr 2021 11:01:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CAEBD36D489
+	for <lists+kvm@lfdr.de>; Wed, 28 Apr 2021 11:08:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238040AbhD1JBK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 28 Apr 2021 05:01:10 -0400
-Received: from Galois.linutronix.de ([193.142.43.55]:46642 "EHLO
-        galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237187AbhD1JBI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 28 Apr 2021 05:01:08 -0400
-From:   Thomas Gleixner <tglx@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1619600418;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=ykPQW3hz29qXZdhBdbD6l3BEA7hSURF7RbxOqHRUZOM=;
-        b=dycaytdaqUqsMJz0lcSKdr3b2AyLaGfUCYu6Qwwp7bfJOQu/bG1E0/8ovpbHK0c0v8Ibm3
-        oJoLzyeiWRBZO/gkqafs2X8ZLc75Kdm03jT5KXpSezRldiDSkFmSV8VvZ3fq/YmVgOcdCx
-        J27ya+VNaQRjAJS6Ial7KGDeulyIpHYu+wO3IV4/IcQvYNaOiwZDQGz8oFQwRBdguSCByg
-        +L2oR7DOSpf8exM6NXi/wCLFy2rCdE/gV+z3ZK59sPlYJWzC4FB/qNcmyyJ5ui8kodB4i7
-        +mCukb3l6re/dDxIAnBI3RdlacnjDwV2MWma/Xah4e+P7vwH6JB+/S6VTLJCfw==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1619600418;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=ykPQW3hz29qXZdhBdbD6l3BEA7hSURF7RbxOqHRUZOM=;
-        b=p1JZAU+ZEOqSR8Pbn1xQ9AQacG0Z2fQdjh8wcJLHxRjmzdtyQMyLc7jr+6ndEd1TYtsOeS
-        HbHXJ318Zlbb35BA==
-To:     Zelin Deng <zelin.deng@linux.alibaba.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org, x86@kernel.org
-Subject: Re: [PATCH] Guest system time jumps when new vCPUs is hot-added
-In-Reply-To: <1619576521-81399-1-git-send-email-zelin.deng@linux.alibaba.com>
-References: <1619576521-81399-1-git-send-email-zelin.deng@linux.alibaba.com>
-Date:   Wed, 28 Apr 2021 11:00:18 +0200
-Message-ID: <87lf92n5r1.ffs@nanos.tec.linutronix.de>
+        id S237919AbhD1JJe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 28 Apr 2021 05:09:34 -0400
+Received: from smtp12.smtpout.orange.fr ([80.12.242.134]:53378 "EHLO
+        smtp.smtpout.orange.fr" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232153AbhD1JJe (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 28 Apr 2021 05:09:34 -0400
+Received: from localhost.localdomain ([86.243.172.93])
+        by mwinf5d23 with ME
+        id y98k2400a21Fzsu0398lpr; Wed, 28 Apr 2021 11:08:48 +0200
+X-ME-Helo: localhost.localdomain
+X-ME-Auth: Y2hyaXN0b3BoZS5qYWlsbGV0QHdhbmFkb28uZnI=
+X-ME-Date: Wed, 28 Apr 2021 11:08:48 +0200
+X-ME-IP: 86.243.172.93
+From:   Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+To:     pbonzini@redhat.com, seanjc@google.com, vkuznets@redhat.com,
+        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
+        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, x86@kernel.org,
+        hpa@zytor.com
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kernel-janitors@vger.kernel.org,
+        Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+Subject: [PATCH] x86/kvm: Use 'hlist_for_each_entry' to simplify code
+Date:   Wed, 28 Apr 2021 11:08:43 +0200
+Message-Id: <29796ca9a5d4255c2a0260c2f5c829539a6e7d88.1619600757.git.christophe.jaillet@wanadoo.fr>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Apr 28 2021 at 10:22, Zelin Deng wrote:
+Use 'hlist_for_each_entry' instead of hand writing it.
+This saves a few lines of code.
 
-> Hello,
-> I have below VM configuration:
-> ...
->     <vcpu placement='static' current='1'>2</vcpu>
->     <cpu mode='host-passthrough'>
->     </cpu>
->     <clock offset='utc'>
->         <timer name='tsc' frequency='3000000000'/>
->     </clock>
-> ...
-> After VM has been up for a few minutes, I use "virsh setvcpus" to hot-add
-> second vCPU into VM, below dmesg is observed:
-> [   53.273484] CPU1 has been hot-added
-> [   85.067135] SMP alternatives: switching to SMP code
-> [   85.078409] x86: Booting SMP configuration:
-> [   85.079027] smpboot: Booting Node 0 Processor 1 APIC 0x1
-> [   85.080240] kvm-clock: cpu 1, msr 77601041, secondary cpu clock
-> [   85.080450] smpboot: CPU 1 Converting physical 0 to logical die 1
-> [   85.101228] TSC ADJUST compensate: CPU1 observed 169175101528 warp. Adjust: 169175101528
-> [  141.513496] TSC ADJUST compensate: CPU1 observed 166 warp. Adjust: 169175101694
+Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+---
+Compile tested only
+---
+ arch/x86/kernel/kvm.c | 13 ++++---------
+ 1 file changed, 4 insertions(+), 9 deletions(-)
 
-Why is TSC_ADJUST on CPU1 different from CPU0 in the first place?
+diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
+index d307c22e5c18..35f5a0898b92 100644
+--- a/arch/x86/kernel/kvm.c
++++ b/arch/x86/kernel/kvm.c
+@@ -89,14 +89,11 @@ static struct kvm_task_sleep_head {
+ static struct kvm_task_sleep_node *_find_apf_task(struct kvm_task_sleep_head *b,
+ 						  u32 token)
+ {
+-	struct hlist_node *p;
++	struct kvm_task_sleep_node *n;
+ 
+-	hlist_for_each(p, &b->list) {
+-		struct kvm_task_sleep_node *n =
+-			hlist_entry(p, typeof(*n), link);
++	hlist_for_each_entry(n, &b->list, link)
+ 		if (n->token == token)
+ 			return n;
+-	}
+ 
+ 	return NULL;
+ }
+@@ -169,14 +166,12 @@ static void apf_task_wake_all(void)
+ 	for (i = 0; i < KVM_TASK_SLEEP_HASHSIZE; i++) {
+ 		struct kvm_task_sleep_head *b = &async_pf_sleepers[i];
+ 		struct kvm_task_sleep_node *n;
+-		struct hlist_node *p, *next;
++		struct hlist_node *next;
+ 
+ 		raw_spin_lock(&b->lock);
+-		hlist_for_each_safe(p, next, &b->list) {
+-			n = hlist_entry(p, typeof(*n), link);
++		hlist_for_each_entry_safe(n, next, &b->list, link)
+ 			if (n->cpu == smp_processor_id())
+ 				apf_task_wake_one(n);
+-		}
+ 		raw_spin_unlock(&b->lock);
+ 	}
+ }
+-- 
+2.30.2
 
-That's broken.
-
-Thanks,
-
-        tglx
