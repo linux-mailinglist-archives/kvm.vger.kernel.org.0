@@ -2,116 +2,157 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B9A7336D4EB
-	for <lists+kvm@lfdr.de>; Wed, 28 Apr 2021 11:43:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9AC3B36D528
+	for <lists+kvm@lfdr.de>; Wed, 28 Apr 2021 11:56:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237915AbhD1Jo1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 28 Apr 2021 05:44:27 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:23824 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S230032AbhD1Jo1 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 28 Apr 2021 05:44:27 -0400
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 13S9ZDwr051198;
-        Wed, 28 Apr 2021 05:43:06 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=hJ4fm10qSmUbQx0QNf2CKKbZbbiE7SHjxfgTeXNiJT4=;
- b=ksWdTqgqiTypWulUiVMoV0hUhOed6od2mJs0gFH4H6B7bIBzrscLpCSkJ66jWq2RbMOI
- FVRVN6uE/dul0RVTc8fkOUWNacjY+tHbAo6cEw1QLMQhGcnkLmiss5tz2BrrRFEzYDcn
- i495ZH1hgi+fMdso8aOILMOOaJ445gu8FY53xXhKF5erfLIDAB1K3XVvi83xJpDP5vnk
- Wen+v3fAZ1CPhoC0/d6QSZP428jLin0GyA63MTytf/0kJwnznPBgPgXUSD39eOV5qPVr
- dKds4aQqI55wumSEnvicKt0asFwz7OGkr4yryLy/q/K1B/kDrA77I1spTWLUz2V1VUHx Dw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3874rbh6jx-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 28 Apr 2021 05:43:05 -0400
-Received: from m0098414.ppops.net (m0098414.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 13S9ZWNE052305;
-        Wed, 28 Apr 2021 05:43:05 -0400
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3874rbh6gy-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 28 Apr 2021 05:43:04 -0400
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 13S9Rsan014762;
-        Wed, 28 Apr 2021 09:43:01 GMT
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
-        by ppma06ams.nl.ibm.com with ESMTP id 384akh9t0p-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 28 Apr 2021 09:43:01 +0000
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 13S9gwOp27328874
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 28 Apr 2021 09:42:58 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 8B7D34C058;
-        Wed, 28 Apr 2021 09:42:58 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id B75EA4C046;
-        Wed, 28 Apr 2021 09:42:57 +0000 (GMT)
-Received: from oc7455500831.ibm.com (unknown [9.171.77.184])
-        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Wed, 28 Apr 2021 09:42:57 +0000 (GMT)
-Subject: Re: sched: Move SCHED_DEBUG sysctl to debugfs
-To:     Peter Zijlstra <peterz@infradead.org>
-Cc:     bristot@redhat.com, bsegall@google.com, dietmar.eggemann@arm.com,
-        greg@kroah.com, gregkh@linuxfoundation.org, joshdon@google.com,
-        juri.lelli@redhat.com, linux-kernel@vger.kernel.org,
-        linux@rasmusvillemoes.dk, mgorman@suse.de, mingo@kernel.org,
-        rostedt@goodmis.org, valentin.schneider@arm.com,
-        vincent.guittot@linaro.org, linux-s390@vger.kernel.org,
-        kvm@vger.kernel.org
-References: <20210412102001.287610138@infradead.org>
- <20210427145925.5246-1-borntraeger@de.ibm.com>
- <YIkgzUWEPaXQTCOv@hirez.programming.kicks-ass.net>
-From:   Christian Borntraeger <borntraeger@de.ibm.com>
-Message-ID: <da373590-f0d7-e3a2-cef9-4527fc9f3056@de.ibm.com>
-Date:   Wed, 28 Apr 2021 11:42:57 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.9.1
+        id S238778AbhD1J4w (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 28 Apr 2021 05:56:52 -0400
+Received: from mga14.intel.com ([192.55.52.115]:55726 "EHLO mga14.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S230032AbhD1J4v (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 28 Apr 2021 05:56:51 -0400
+IronPort-SDR: lkpQhPGSx0IMmKw/ZN1ed+cFC4CR+3ZZ8AtRfWaBXYjalaIgIWaKG/wiOj4bRp/OahK2hApr6t
+ WBgNLex10XEw==
+X-IronPort-AV: E=McAfee;i="6200,9189,9967"; a="196258062"
+X-IronPort-AV: E=Sophos;i="5.82,257,1613462400"; 
+   d="scan'208";a="196258062"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Apr 2021 02:56:06 -0700
+IronPort-SDR: /jvroPBN/VZ3UMZDpzwauVfbEJ4mVOZswAFhEHEX1XPOpFgJu1IRQRcQk2hz5CEP7DN3NMMPi1
+ MUtnimI6c2Vg==
+X-IronPort-AV: E=Sophos;i="5.82,257,1613462400"; 
+   d="scan'208";a="423452748"
+Received: from lingshan-mobl5.ccr.corp.intel.com (HELO [10.254.209.93]) ([10.254.209.93])
+  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Apr 2021 02:56:04 -0700
+Subject: Re: [PATCH 2/2] vDPA/ifcvf: implement doorbell mapping for ifcvf
+To:     Jason Wang <jasowang@redhat.com>, mst@redhat.com
+Cc:     virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20210428082133.6766-1-lingshan.zhu@intel.com>
+ <20210428082133.6766-3-lingshan.zhu@intel.com>
+ <f6d9a424-9025-3eb5-1cb4-0ff22f7bec63@redhat.com>
+ <5052fced-cd9a-e453-5cb2-39cdde60a208@intel.com>
+ <1984491f-cd5e-d4bc-b328-41e2f2e935fd@redhat.com>
+From:   "Zhu, Lingshan" <lingshan.zhu@intel.com>
+Message-ID: <ef510c97-1f1c-a121-99db-b659a5f9518c@intel.com>
+Date:   Wed, 28 Apr 2021 17:56:02 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.9.0
 MIME-Version: 1.0
-In-Reply-To: <YIkgzUWEPaXQTCOv@hirez.programming.kicks-ass.net>
+In-Reply-To: <1984491f-cd5e-d4bc-b328-41e2f2e935fd@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: PyXbuBWVM482jVdeQbSsfmd6tzxziNh_
-X-Proofpoint-GUID: djE4eMa3yGFYgmAh-pNPbb-NDwd3AfuR
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.761
- definitions=2021-04-28_03:2021-04-27,2021-04-28 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 malwarescore=0
- suspectscore=0 bulkscore=0 adultscore=0 spamscore=0 impostorscore=0
- priorityscore=1501 mlxlogscore=999 lowpriorityscore=0 mlxscore=0
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2104060000 definitions=main-2104280064
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
 
-On 28.04.21 10:46, Peter Zijlstra wrote:
-[..]
-> The right thing to do here is to analyze the situation and determine why
-> migration_cost needs changing; is that an architectural thing, does s390
-> benefit from less sticky tasks due to its cache setup (the book caches
-> could be absorbing some of the penalties here for example). Or is it
-> something that's workload related, does KVM intrinsically not care about
-> migrating so much, or is it something else.
+On 4/28/2021 5:21 PM, Jason Wang wrote:
+>
+> 在 2021/4/28 下午4:59, Zhu, Lingshan 写道:
+>>
+>>
+>> On 4/28/2021 4:42 PM, Jason Wang wrote:
+>>>
+>>> 在 2021/4/28 下午4:21, Zhu Lingshan 写道:
+>>>> This commit implements doorbell mapping feature for ifcvf.
+>>>> This feature maps the notify page to userspace, to eliminate
+>>>> vmexit when kick a vq.
+>>>>
+>>>> Signed-off-by: Zhu Lingshan <lingshan.zhu@intel.com>
+>>>> ---
+>>>>   drivers/vdpa/ifcvf/ifcvf_main.c | 18 ++++++++++++++++++
+>>>>   1 file changed, 18 insertions(+)
+>>>>
+>>>> diff --git a/drivers/vdpa/ifcvf/ifcvf_main.c 
+>>>> b/drivers/vdpa/ifcvf/ifcvf_main.c
+>>>> index e48e6b74fe2e..afcb71bc0f51 100644
+>>>> --- a/drivers/vdpa/ifcvf/ifcvf_main.c
+>>>> +++ b/drivers/vdpa/ifcvf/ifcvf_main.c
+>>>> @@ -413,6 +413,23 @@ static int ifcvf_vdpa_get_vq_irq(struct 
+>>>> vdpa_device *vdpa_dev,
+>>>>       return vf->vring[qid].irq;
+>>>>   }
+>>>>   +static struct vdpa_notification_area 
+>>>> ifcvf_get_vq_notification(struct vdpa_device *vdpa_dev,
+>>>> +                                   u16 idx)
+>>>> +{
+>>>> +    struct ifcvf_hw *vf = vdpa_to_vf(vdpa_dev);
+>>>> +    struct vdpa_notification_area area;
+>>>> +
+>>>> +    if (vf->notify_pa % PAGE_SIZE) {
+>>>> +        area.addr = 0;
+>>>> +        area.size = 0;
+>>>
+>>>
+>>> We don't need this since:
+>>>
+>>> 1) there's a check in the vhost vDPA
+>> I think you mean this code block in vdpa.c
+>>         notify = ops->get_vq_notification(vdpa, index);
+>>         if (notify.addr & (PAGE_SIZE - 1))
+>>                 return -EINVAL;
+>>
+>> This should work, however, I think the parent driver should ensure it 
+>> passes a PAGE_SIZE aligned address to userspace, to be robust, to be 
+>> reliable.
+>
+>
+> The point is parent is unaware of whether or not there's a userspace.
+when calling this, I think it targets a usersapce program, why kernel 
+space need it, so IMHO no harm if we check this to keep the parent 
+driver robust.
+>
+>
+>>> 2) device is unaware of the bound driver, non page aligned doorbell 
+>>> doesn't necessarily meant it can be used
+>> Yes, non page aligned doorbell can not be used, so there is a check.
+>
+>
+> Typo, what I meant is "it can't be used". That is to say, we should 
+> let the vDPA bus driver to decide whether or not it can be used.
+If it is not page aligned, there would be extra complexities for 
+vhost/qemu, I see it as a hardware defect, why adapt to this kind of 
+defects?
 
-So lets focus on the performance issue.
-
-One workload where we have seen this is transactional workload that is
-triggered by external network requests. So every external request
-triggered a wakup of a guest and a wakeup of a process in the guest.
-The end result was that KVM was 40% slower than z/VM (in terms of
-transactions per second) while we had more idle time.
-With smaller sched_migration_cost_ns (e.g. 100000) KVM was as fast
-as z/VM.
-
-So to me it looks like that the wakeup and reschedule to a free CPU
-was just not fast enough. It might also depend where I/O interrupts
-land. Not sure yet.
+Thanks
+Zhu Lingshan
+>
+> Thanks
+>
+>
+>>
+>> Thanks
+>> Zhu Lingshan
+>>>
+>>> Let's leave those polices to the driver.
+>>>
+>>> Thanks
+>>>
+>>>
+>>>> +    } else {
+>>>> +        area.addr = vf->notify_pa;
+>>>> +        area.size = PAGE_SIZE;
+>>>> +    }
+>>>> +
+>>>> +    return area;
+>>>> +}
+>>>> +
+>>>>   /*
+>>>>    * IFCVF currently does't have on-chip IOMMU, so not
+>>>>    * implemented set_map()/dma_map()/dma_unmap()
+>>>> @@ -440,6 +457,7 @@ static const struct vdpa_config_ops 
+>>>> ifc_vdpa_ops ={
+>>>>       .get_config    = ifcvf_vdpa_get_config,
+>>>>       .set_config    = ifcvf_vdpa_set_config,
+>>>>       .set_config_cb  = ifcvf_vdpa_set_config_cb,
+>>>> +    .get_vq_notification = ifcvf_get_vq_notification,
+>>>>   };
+>>>>     static int ifcvf_probe(struct pci_dev *pdev, const struct 
+>>>> pci_device_id *id)
+>>>
+>>
+>
 
