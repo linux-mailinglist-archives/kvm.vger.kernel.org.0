@@ -2,116 +2,93 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A964136D422
-	for <lists+kvm@lfdr.de>; Wed, 28 Apr 2021 10:43:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 810FE36D43A
+	for <lists+kvm@lfdr.de>; Wed, 28 Apr 2021 10:48:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237757AbhD1Inv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 28 Apr 2021 04:43:51 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:52745 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S237110AbhD1Inu (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 28 Apr 2021 04:43:50 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1619599386;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=1W52g62U8eu7kNC+tsNnm2qSHOwqXQwpPJN3IreWZiE=;
-        b=iiQlzkCaf6dNYwl511OZR9Y1a9RX+pK4VcXIzyj1JgT4s2ygaKFAkj/RtMBcLnARQ05hJB
-        2MYRbcZPUYwBqnW1GUDbTyrEblILhr0bFWNIwSZ2jkrE79aVTj7VpQWM2dOP3MkQ624juc
-        BlrvbjG3MPRL7pJs9kMu1mKjbLlVlYk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-408-hAMRtaRlN_isfdaq7ctq8w-1; Wed, 28 Apr 2021 04:43:02 -0400
-X-MC-Unique: hAMRtaRlN_isfdaq7ctq8w-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 09BF710054F6;
-        Wed, 28 Apr 2021 08:43:01 +0000 (UTC)
-Received: from wangxiaodeMacBook-Air.local (ovpn-13-52.pek2.redhat.com [10.72.13.52])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 87E205F9C5;
-        Wed, 28 Apr 2021 08:42:55 +0000 (UTC)
-Subject: Re: [PATCH 2/2] vDPA/ifcvf: implement doorbell mapping for ifcvf
-To:     Zhu Lingshan <lingshan.zhu@intel.com>, mst@redhat.com
-Cc:     virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20210428082133.6766-1-lingshan.zhu@intel.com>
- <20210428082133.6766-3-lingshan.zhu@intel.com>
-From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <f6d9a424-9025-3eb5-1cb4-0ff22f7bec63@redhat.com>
-Date:   Wed, 28 Apr 2021 16:42:53 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
- Gecko/20100101 Thunderbird/78.10.0
+        id S237049AbhD1Isn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 28 Apr 2021 04:48:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42320 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S237552AbhD1Isl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 28 Apr 2021 04:48:41 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A68E9C061574;
+        Wed, 28 Apr 2021 01:47:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=kfPSQurt6Bc5u58DqRYZKABmqX9iTn1lw4a/TJR3JbA=; b=SSirg/LuehTe26W+39fkeZ5BFj
+        sV2rVItwkO092ybCX0GnQhdT39OdTIyzQGeKnfgFpdlAcwQ/oJsJ1Jhcfd89qJMkl7k0Oxjq07XnG
+        MOgMBnxBIolWP+T49UWyn76C32aaCeB1BB3FkWeiwewInYJywjEM7+R26QAPTzv5eAgYp9ifnifQz
+        0d1+1a1QogoINM8sJfmWcearn7cwHkdx/wGfUOi2FIXoOAEIPQXNaHt+LeVoJNh1bbWmVizOpwd7d
+        JHHfuVSVXOyjSTotGN2i05dAq6dmBJJVhkUXttuT2v1bTAia//7uRctaOphcgVQ+xFIu1fd7QJeU5
+        DFddzqMg==;
+Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
+        by casper.infradead.org with esmtpsa (Exim 4.94 #2 (Red Hat Linux))
+        id 1lbfpf-0083bX-1Q; Wed, 28 Apr 2021 08:46:16 +0000
+Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
+        (Client did not present a certificate)
+        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 8448830003A;
+        Wed, 28 Apr 2021 10:46:05 +0200 (CEST)
+Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
+        id 5B2102BF7B844; Wed, 28 Apr 2021 10:46:05 +0200 (CEST)
+Date:   Wed, 28 Apr 2021 10:46:05 +0200
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     Christian Borntraeger <borntraeger@de.ibm.com>
+Cc:     bristot@redhat.com, bsegall@google.com, dietmar.eggemann@arm.com,
+        greg@kroah.com, gregkh@linuxfoundation.org, joshdon@google.com,
+        juri.lelli@redhat.com, linux-kernel@vger.kernel.org,
+        linux@rasmusvillemoes.dk, mgorman@suse.de, mingo@kernel.org,
+        rostedt@goodmis.org, valentin.schneider@arm.com,
+        vincent.guittot@linaro.org, linux-s390@vger.kernel.org,
+        kvm@vger.kernel.org
+Subject: Re: sched: Move SCHED_DEBUG sysctl to debugfs
+Message-ID: <YIkgzUWEPaXQTCOv@hirez.programming.kicks-ass.net>
+References: <20210412102001.287610138@infradead.org>
+ <20210427145925.5246-1-borntraeger@de.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <20210428082133.6766-3-lingshan.zhu@intel.com>
-Content-Type: text/plain; charset=gbk; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210427145925.5246-1-borntraeger@de.ibm.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Tue, Apr 27, 2021 at 04:59:25PM +0200, Christian Borntraeger wrote:
+> Peter,
+> 
+> I just realized that we moved away sysctl tunabled to debugfs in next.
+> We have seen several cases where it was benefitial to set
+> sched_migration_cost_ns to a lower value. For example with KVM I can
+> easily get 50% more transactions with 50000 instead of 500000. 
+> Until now it was possible to use tuned or /etc/sysctl.conf to set
+> these things permanently. 
+> 
+> Given that some people do not want to have debugfs mounted all the time
+> I would consider this a regression. The sysctl tunable was always 
+> available.
+> 
+> I am ok with the "informational" things being in debugfs, but not
+> the tunables. So how do we proceed here?
 
-ÔÚ 2021/4/28 ÏÂÎç4:21, Zhu Lingshan Ð´µÀ:
-> This commit implements doorbell mapping feature for ifcvf.
-> This feature maps the notify page to userspace, to eliminate
-> vmexit when kick a vq.
->
-> Signed-off-by: Zhu Lingshan <lingshan.zhu@intel.com>
-> ---
->   drivers/vdpa/ifcvf/ifcvf_main.c | 18 ++++++++++++++++++
->   1 file changed, 18 insertions(+)
->
-> diff --git a/drivers/vdpa/ifcvf/ifcvf_main.c b/drivers/vdpa/ifcvf/ifcvf_main.c
-> index e48e6b74fe2e..afcb71bc0f51 100644
-> --- a/drivers/vdpa/ifcvf/ifcvf_main.c
-> +++ b/drivers/vdpa/ifcvf/ifcvf_main.c
-> @@ -413,6 +413,23 @@ static int ifcvf_vdpa_get_vq_irq(struct vdpa_device *vdpa_dev,
->   	return vf->vring[qid].irq;
->   }
->   
-> +static struct vdpa_notification_area ifcvf_get_vq_notification(struct vdpa_device *vdpa_dev,
-> +							       u16 idx)
-> +{
-> +	struct ifcvf_hw *vf = vdpa_to_vf(vdpa_dev);
-> +	struct vdpa_notification_area area;
-> +
-> +	if (vf->notify_pa % PAGE_SIZE) {
-> +		area.addr = 0;
-> +		area.size = 0;
+It's all SCHED_DEBUG; IOW you're relying on DEBUG infrastructure for
+production performance, and that's your fail.
 
+I very explicitly do not care to support people that poke random values
+into those 'tunables'. If people wants to do that, they get to keep any
+and all pieces.
 
-We don't need this since:
+The right thing to do here is to analyze the situation and determine why
+migration_cost needs changing; is that an architectural thing, does s390
+benefit from less sticky tasks due to its cache setup (the book caches
+could be absorbing some of the penalties here for example). Or is it
+something that's workload related, does KVM intrinsically not care about
+migrating so much, or is it something else.
 
-1) there's a check in the vhost vDPA
-2) device is unaware of the bound driver, non page aligned doorbell 
-doesn't necessarily meant it can be used
-
-Let's leave those polices to the driver.
-
-Thanks
-
-
-> +	} else {
-> +		area.addr = vf->notify_pa;
-> +		area.size = PAGE_SIZE;
-> +	}
-> +
-> +	return area;
-> +}
-> +
->   /*
->    * IFCVF currently does't have on-chip IOMMU, so not
->    * implemented set_map()/dma_map()/dma_unmap()
-> @@ -440,6 +457,7 @@ static const struct vdpa_config_ops ifc_vdpa_ops = {
->   	.get_config	= ifcvf_vdpa_get_config,
->   	.set_config	= ifcvf_vdpa_set_config,
->   	.set_config_cb  = ifcvf_vdpa_set_config_cb,
-> +	.get_vq_notification = ifcvf_get_vq_notification,
->   };
->   
->   static int ifcvf_probe(struct pci_dev *pdev, const struct pci_device_id *id)
-
+Basically, you get to figure out what the actual performance issue is,
+and then we can look at what to do about it so that everyone benefits,
+and not grow some random tweaks on the interweb that might or might not
+actually work for someone else.
