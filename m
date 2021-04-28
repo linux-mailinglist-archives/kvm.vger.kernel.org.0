@@ -2,104 +2,138 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 62C8F36D560
-	for <lists+kvm@lfdr.de>; Wed, 28 Apr 2021 12:04:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5F74D36D572
+	for <lists+kvm@lfdr.de>; Wed, 28 Apr 2021 12:09:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239070AbhD1KEq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 28 Apr 2021 06:04:46 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:53655 "EHLO
+        id S239073AbhD1KKI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 28 Apr 2021 06:10:08 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:40588 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S239012AbhD1KEm (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 28 Apr 2021 06:04:42 -0400
+        by vger.kernel.org with ESMTP id S238803AbhD1KKH (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 28 Apr 2021 06:10:07 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1619604237;
+        s=mimecast20190719; t=1619604562;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=i38qAydUV9D1OXWVf8wjL2KUV1llC+suuvz1DX0fuV4=;
-        b=A0Q5tbMowMpvoK5X/U9jlm6ldlzeQYKACNDqm1cCglcEpxSXLdnCtzd/XnXBy+cYJR3UyN
-        pdCpredFaS3Kfi+7M2NkP9x2TKjY/DTxHKLcVLm/nk2K0tm2fv7r5o4xLzYl9csegdhBra
-        IpdYpS5sZQnIadusdchkZZSOi94cbSs=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-579-8TkP04apOVOpmOkwW_Pleg-1; Wed, 28 Apr 2021 06:03:56 -0400
-X-MC-Unique: 8TkP04apOVOpmOkwW_Pleg-1
-Received: by mail-ed1-f72.google.com with SMTP id c15-20020a056402100fb029038518e5afc5so19097319edu.18
-        for <kvm@vger.kernel.org>; Wed, 28 Apr 2021 03:03:55 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=i38qAydUV9D1OXWVf8wjL2KUV1llC+suuvz1DX0fuV4=;
-        b=guVcp6UjYE4fqwPiWY8hKLy6Uw9tRZmUDiFglg6hnGk8ZurfS3Ifh8Ow86XWXdQgVy
-         w/XPSUXzlEFL221KYEn9JvEtpRDN9pm1nWC2H5qOTqbJ6fY8a7X1szepbIlSnUDCb3Vy
-         nJbZRU8h8twdVDoE1G+dPZyUfNRKna53RG9Ut76oUOIvlllQBhBSleE+ST84EOJ27KkV
-         wqN+vHkO/foMzbjLvVPz8h9MNl8dqz7sMjd2p/9fP1VZ3fP+T5VTum/lHu/nVJkQE6XF
-         Nttl1VClai0ENF5osCmO6OWj6/7YbOAT7QNvFQCvnrfBUL3/tpQ5uzYJnSaPSbQycM7Z
-         xaUA==
-X-Gm-Message-State: AOAM533KswQNIZTnnxn/0Sgx4TNmWs7LWCJ3jxfmy1XACPDfF5IXq4sd
-        thimmpqRAqCzI59WWMtO0XOgfOWHt4yHVKm+t1K25yFRHcIUoPA09V+9rUow4mXPAfmHBgcK82D
-        8QZ79y6qoP3oq
-X-Received: by 2002:a17:906:52d7:: with SMTP id w23mr1364770ejn.451.1619604234830;
-        Wed, 28 Apr 2021 03:03:54 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJy3+JiV66h277msomicqDtfqP9yRtiRRZvSSPmGaeRT5LaIAQspF8Ms21rTk7kH4E0CXyD43Q==
-X-Received: by 2002:a17:906:52d7:: with SMTP id w23mr1364748ejn.451.1619604234686;
-        Wed, 28 Apr 2021 03:03:54 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e? ([2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e])
-        by smtp.gmail.com with ESMTPSA id cm21sm4438901edb.29.2021.04.28.03.03.53
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 28 Apr 2021 03:03:54 -0700 (PDT)
-Subject: Re: [PATCH 6/6] KVM: x86/mmu: Lazily allocate memslot rmaps
-To:     Ben Gardon <bgardon@google.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Cc:     Peter Xu <peterx@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Peter Shier <pshier@google.com>,
-        Junaid Shahid <junaids@google.com>,
-        Jim Mattson <jmattson@google.com>,
-        Yulei Zhang <yulei.kernel@gmail.com>,
-        Wanpeng Li <kernellwp@gmail.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Xiao Guangrong <xiaoguangrong.eric@gmail.com>
-References: <20210427223635.2711774-1-bgardon@google.com>
- <20210427223635.2711774-7-bgardon@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <1b598516-4478-4de2-4241-d4b517ec03fa@redhat.com>
-Date:   Wed, 28 Apr 2021 12:03:52 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.7.0
+        bh=tCmCVcCGcXEgbhMIg1rIIz1DwzlDEOvC3LtivSI+s+8=;
+        b=HtEjH5NRcUoEcZLYNwH7VK13eSI/Rqp3qLR+u/7HASB6PLoJrCNg3trAz/OGjLhoG1LwLG
+        LGkly5mXwtEpBjnO3qlGtdXaUjDCliUkebnSqE9TOLr/sNm/RWezGRtoliEICTCWikA5XZ
+        w4OQjYJAQwdrIq02If43nksw9Hki3mo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-384-mXh6x8uYMpOqAsImOovtJw-1; Wed, 28 Apr 2021 06:09:19 -0400
+X-MC-Unique: mXh6x8uYMpOqAsImOovtJw-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F34CF801106;
+        Wed, 28 Apr 2021 10:09:17 +0000 (UTC)
+Received: from wangxiaodeMacBook-Air.local (ovpn-12-25.pek2.redhat.com [10.72.12.25])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id C5A021001B2C;
+        Wed, 28 Apr 2021 10:09:12 +0000 (UTC)
+Subject: Re: [PATCH 1/2] vDPA/ifcvf: record virtio notify base
+To:     "Zhu, Lingshan" <lingshan.zhu@intel.com>, mst@redhat.com
+Cc:     virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20210428082133.6766-1-lingshan.zhu@intel.com>
+ <20210428082133.6766-2-lingshan.zhu@intel.com>
+ <55217869-b456-f3bc-0b5a-6beaf34c19f8@redhat.com>
+ <3243eeef-2891-5b79-29cb-bc969802c5dc@intel.com>
+From:   Jason Wang <jasowang@redhat.com>
+Message-ID: <4cee04f1-a3fc-eaf0-747a-004ca09b06c0@redhat.com>
+Date:   Wed, 28 Apr 2021 18:09:11 +0800
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
+ Gecko/20100101 Thunderbird/78.10.0
 MIME-Version: 1.0
-In-Reply-To: <20210427223635.2711774-7-bgardon@google.com>
+In-Reply-To: <3243eeef-2891-5b79-29cb-bc969802c5dc@intel.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 28/04/21 00:36, Ben Gardon wrote:
-> -static int kvm_alloc_memslot_metadata(struct kvm_memory_slot *slot,
-> +static int kvm_alloc_memslot_metadata(struct kvm *kvm,
-> +				      struct kvm_memory_slot *slot,
->   				      unsigned long npages)
->   {
->   	int i;
-> @@ -10892,7 +10950,7 @@ static int kvm_alloc_memslot_metadata(struct kvm_memory_slot *slot,
->   	 */
->   	memset(&slot->arch, 0, sizeof(slot->arch));
->   
-> -	r = alloc_memslot_rmap(slot, npages);
-> +	r = alloc_memslot_rmap(kvm, slot, npages);
->   	if (r)
->   		return r;
->   
 
-I wonder why you need alloc_memslot_rmap at all here in 
-kvm_alloc_memslot_metadata, or alternatively why you need to do it in 
-kvm_arch_assign_memslots.  It seems like only one of those would be 
-necessary.
+在 2021/4/28 下午6:00, Zhu, Lingshan 写道:
+>
+>
+> On 4/28/2021 4:39 PM, Jason Wang wrote:
+>>
+>> 在 2021/4/28 下午4:21, Zhu Lingshan 写道:
+>>> This commit records virtio notify base addr to implemente
+>>> doorbell mapping feature
+>>>
+>>> Signed-off-by: Zhu Lingshan <lingshan.zhu@intel.com>
+>>> ---
+>>>   drivers/vdpa/ifcvf/ifcvf_base.c | 1 +
+>>>   drivers/vdpa/ifcvf/ifcvf_base.h | 1 +
+>>>   2 files changed, 2 insertions(+)
+>>>
+>>> diff --git a/drivers/vdpa/ifcvf/ifcvf_base.c 
+>>> b/drivers/vdpa/ifcvf/ifcvf_base.c
+>>> index 1a661ab45af5..cc61a5bfc5b1 100644
+>>> --- a/drivers/vdpa/ifcvf/ifcvf_base.c
+>>> +++ b/drivers/vdpa/ifcvf/ifcvf_base.c
+>>> @@ -133,6 +133,7 @@ int ifcvf_init_hw(struct ifcvf_hw *hw, struct 
+>>> pci_dev *pdev)
+>>> &hw->notify_off_multiplier);
+>>>               hw->notify_bar = cap.bar;
+>>>               hw->notify_base = get_cap_addr(hw, &cap);
+>>> +            hw->notify_pa = pci_resource_start(pdev, cap.bar) + 
+>>> cap.offset;
+>>
+>>
+>> To be more generic and avoid future changes, let's use the math 
+>> defined in the virtio spec.
+>>
+>> You may refer how it is implemented in virtio_pci vdpa driver[1].
+> Are you suggesting every vq keep its own notify_pa? In this case, we 
+> still need to record notify_pa in hw when init_hw, then initialize 
+> vq->notify_pa accrediting to hw->notify_pa.
 
-Paolo
+
+I meant you need to follow how virtio spec did to calculate the doorbell 
+address per vq:
+
+         cap.offset + queue_notify_off * notify_off_multiplier
+
+Obviously, you ignore queue_notify_off and notify_off_multiplier here. 
+This may bring troubles for the existing device IFCVF and future devices.
+
+If I understand correctly, this device can be probed by virtio-pci 
+driver which use the above math. There's no reason for using ad-hoc hack.
+
+Thanks
+
+
+>
+> Thanks
+> Zhu Lingshan
+>>
+>> Thanks
+>>
+>> [1] 
+>> https://lore.kernel.org/virtualization/20210415073147.19331-5-jasowang@redhat.com/T/
+>>
+>>
+>>> IFCVF_DBG(pdev, "hw->notify_base = %p\n",
+>>>                     hw->notify_base);
+>>>               break;
+>>> diff --git a/drivers/vdpa/ifcvf/ifcvf_base.h 
+>>> b/drivers/vdpa/ifcvf/ifcvf_base.h
+>>> index 0111bfdeb342..bcca7c1669dd 100644
+>>> --- a/drivers/vdpa/ifcvf/ifcvf_base.h
+>>> +++ b/drivers/vdpa/ifcvf/ifcvf_base.h
+>>> @@ -98,6 +98,7 @@ struct ifcvf_hw {
+>>>       char config_msix_name[256];
+>>>       struct vdpa_callback config_cb;
+>>>       unsigned int config_irq;
+>>> +    phys_addr_t  notify_pa;
+>>>   };
+>>>     struct ifcvf_adapter {
+>>
+>
 
