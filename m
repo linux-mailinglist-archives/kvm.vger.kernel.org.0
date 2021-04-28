@@ -2,141 +2,185 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BE8FD36D546
-	for <lists+kvm@lfdr.de>; Wed, 28 Apr 2021 12:00:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9F7B336D55D
+	for <lists+kvm@lfdr.de>; Wed, 28 Apr 2021 12:03:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238785AbhD1KBg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 28 Apr 2021 06:01:36 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:43909 "EHLO
+        id S239032AbhD1KEc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 28 Apr 2021 06:04:32 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:49830 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S238554AbhD1KBd (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 28 Apr 2021 06:01:33 -0400
+        by vger.kernel.org with ESMTP id S239027AbhD1KE3 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 28 Apr 2021 06:04:29 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1619604048;
+        s=mimecast20190719; t=1619604224;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=FhFNqwiAFSjk5pc8IGLBBUa1bd6wwdqJ26xugM42AOU=;
-        b=bUHp+K/PLPuY7Y2kC9ThTes/GauyUYORH6PYmclXfq8i1XFFohoI3A5OK2J5r21LOKim4Q
-        3os9g55VJDJ6YhFLk/wrNO272A6tvTRa4A3R++lboK8owZTmmKw97pcHDKdnjSO5+tMASv
-        Fnjd/Q/mJoSoYEkIu1rMXsMehJguTJY=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-103-hG1kYZBHOGmkl9itqx6h-w-1; Wed, 28 Apr 2021 06:00:46 -0400
-X-MC-Unique: hG1kYZBHOGmkl9itqx6h-w-1
-Received: by mail-ed1-f71.google.com with SMTP id u30-20020a50a41e0000b0290385504d6e4eso4711548edb.7
-        for <kvm@vger.kernel.org>; Wed, 28 Apr 2021 03:00:46 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=FhFNqwiAFSjk5pc8IGLBBUa1bd6wwdqJ26xugM42AOU=;
-        b=YCHu/umWP/DI4hOAW8jQH5eOMq8iaemZS9HcjVSdcqL4IjJIj54vvbKJUMp0PwTig+
-         GkC2uuud4ag5F+oA19uTHw8sS0r0DGQEPTi5rKrqr8aITbfY8jb5z7lzKp9Vgyb/EaPi
-         R1pra48/WuwL4spQiDLecn7VVJplBE7D8mxINuxM679a4ouXR5sFj6MESIvlFYYa19HM
-         gOYJLIc11K6i8lp27BXbVElrGzTyffHw8p1ykpsjmptYF/Wx9jsRbT1RVtIaqMBrKNDj
-         mFTf4PlXLpUYyh73+hvpLhGpvdyuF/emdzcjrAFUAzPDmJxAeP9uvdVbKUAim/6lNqwn
-         bGRA==
-X-Gm-Message-State: AOAM531gGlzC6hN5tHBp0HNit4DcOrLWOxZxBMOEbdeXkqTfaxPAUQFZ
-        4Bbcy6xJBJKtuuSZ5liCXc0kigWUepq2fekGc2u+RTBE5AgI//WvfRVCsOVcDRbkbEZP/p/gd2U
-        6MJvhuudM4EDt
-X-Received: by 2002:a17:906:a0d4:: with SMTP id bh20mr28035351ejb.348.1619604045185;
-        Wed, 28 Apr 2021 03:00:45 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxTMhrX4bqXfljul31u2glQku96LkpSI89jMTVvHtGdEXLDq8ZAQFkOvHuZRusQHJD5Oogk+A==
-X-Received: by 2002:a17:906:a0d4:: with SMTP id bh20mr28035332ejb.348.1619604045012;
-        Wed, 28 Apr 2021 03:00:45 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e? ([2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e])
-        by smtp.gmail.com with ESMTPSA id u13sm1620873ejj.16.2021.04.28.03.00.43
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 28 Apr 2021 03:00:44 -0700 (PDT)
-Subject: Re: [PATCH 3/6] KVM: x86/mmu: Deduplicate rmap freeing in
- allocate_memslot_rmap
-To:     Ben Gardon <bgardon@google.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Cc:     Peter Xu <peterx@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Peter Shier <pshier@google.com>,
-        Junaid Shahid <junaids@google.com>,
-        Jim Mattson <jmattson@google.com>,
-        Yulei Zhang <yulei.kernel@gmail.com>,
-        Wanpeng Li <kernellwp@gmail.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Xiao Guangrong <xiaoguangrong.eric@gmail.com>
-References: <20210427223635.2711774-1-bgardon@google.com>
- <20210427223635.2711774-4-bgardon@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <2e5ecc0b-0ef4-a663-3b1d-81d020626b39@redhat.com>
-Date:   Wed, 28 Apr 2021 12:00:43 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.7.0
+        bh=Kch3xLnz70cDbvDpj0Fifq23aWnY4BjlTmpmNAogQ4A=;
+        b=UKNuR9E9ldtKX4glXhYfYJA9+3UBgqjEbFzGz30h1N4YatbzorV+2DO5tV+D5HyoDut78e
+        2CuuKiFt1aUC6NBLhaSyEq3+/8IiLau8h1c7EO3heA0jQHovEwIH+2nzBfYJaLUEAFperb
+        YKhRppyW7mPI6vOI8SCE2aHVCfeDJOk=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-412-JMqoHd-RMbaSkEr70xrx7w-1; Wed, 28 Apr 2021 06:03:42 -0400
+X-MC-Unique: JMqoHd-RMbaSkEr70xrx7w-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 75C078186E5;
+        Wed, 28 Apr 2021 10:03:41 +0000 (UTC)
+Received: from wangxiaodeMacBook-Air.local (ovpn-12-25.pek2.redhat.com [10.72.12.25])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id C481B5D9C6;
+        Wed, 28 Apr 2021 10:03:35 +0000 (UTC)
+Subject: Re: [PATCH 2/2] vDPA/ifcvf: implement doorbell mapping for ifcvf
+To:     "Zhu, Lingshan" <lingshan.zhu@intel.com>, mst@redhat.com
+Cc:     virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20210428082133.6766-1-lingshan.zhu@intel.com>
+ <20210428082133.6766-3-lingshan.zhu@intel.com>
+ <f6d9a424-9025-3eb5-1cb4-0ff22f7bec63@redhat.com>
+ <5052fced-cd9a-e453-5cb2-39cdde60a208@intel.com>
+ <1984491f-cd5e-d4bc-b328-41e2f2e935fd@redhat.com>
+ <ef510c97-1f1c-a121-99db-b659a5f9518c@intel.com>
+From:   Jason Wang <jasowang@redhat.com>
+Message-ID: <4e0eda74-04ac-a889-471b-03fe65c65606@redhat.com>
+Date:   Wed, 28 Apr 2021 18:03:34 +0800
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
+ Gecko/20100101 Thunderbird/78.10.0
 MIME-Version: 1.0
-In-Reply-To: <20210427223635.2711774-4-bgardon@google.com>
+In-Reply-To: <ef510c97-1f1c-a121-99db-b659a5f9518c@intel.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Typo in the commit subject, I guess?
 
-Paolo
+在 2021/4/28 下午5:56, Zhu, Lingshan 写道:
+>
+>
+> On 4/28/2021 5:21 PM, Jason Wang wrote:
+>>
+>> 在 2021/4/28 下午4:59, Zhu, Lingshan 写道:
+>>>
+>>>
+>>> On 4/28/2021 4:42 PM, Jason Wang wrote:
+>>>>
+>>>> 在 2021/4/28 下午4:21, Zhu Lingshan 写道:
+>>>>> This commit implements doorbell mapping feature for ifcvf.
+>>>>> This feature maps the notify page to userspace, to eliminate
+>>>>> vmexit when kick a vq.
+>>>>>
+>>>>> Signed-off-by: Zhu Lingshan <lingshan.zhu@intel.com>
+>>>>> ---
+>>>>>   drivers/vdpa/ifcvf/ifcvf_main.c | 18 ++++++++++++++++++
+>>>>>   1 file changed, 18 insertions(+)
+>>>>>
+>>>>> diff --git a/drivers/vdpa/ifcvf/ifcvf_main.c 
+>>>>> b/drivers/vdpa/ifcvf/ifcvf_main.c
+>>>>> index e48e6b74fe2e..afcb71bc0f51 100644
+>>>>> --- a/drivers/vdpa/ifcvf/ifcvf_main.c
+>>>>> +++ b/drivers/vdpa/ifcvf/ifcvf_main.c
+>>>>> @@ -413,6 +413,23 @@ static int ifcvf_vdpa_get_vq_irq(struct 
+>>>>> vdpa_device *vdpa_dev,
+>>>>>       return vf->vring[qid].irq;
+>>>>>   }
+>>>>>   +static struct vdpa_notification_area 
+>>>>> ifcvf_get_vq_notification(struct vdpa_device *vdpa_dev,
+>>>>> +                                   u16 idx)
+>>>>> +{
+>>>>> +    struct ifcvf_hw *vf = vdpa_to_vf(vdpa_dev);
+>>>>> +    struct vdpa_notification_area area;
+>>>>> +
+>>>>> +    if (vf->notify_pa % PAGE_SIZE) {
+>>>>> +        area.addr = 0;
+>>>>> +        area.size = 0;
+>>>>
+>>>>
+>>>> We don't need this since:
+>>>>
+>>>> 1) there's a check in the vhost vDPA
+>>> I think you mean this code block in vdpa.c
+>>>         notify = ops->get_vq_notification(vdpa, index);
+>>>         if (notify.addr & (PAGE_SIZE - 1))
+>>>                 return -EINVAL;
+>>>
+>>> This should work, however, I think the parent driver should ensure 
+>>> it passes a PAGE_SIZE aligned address to userspace, to be robust, to 
+>>> be reliable.
+>>
+>>
+>> The point is parent is unaware of whether or not there's a userspace.
+> when calling this, I think it targets a usersapce program, why kernel 
+> space need it, so IMHO no harm if we check this to keep the parent 
+> driver robust.
 
-On 28/04/21 00:36, Ben Gardon wrote:
-> Small code deduplication. No functional change expected.
-> 
-> Signed-off-by: Ben Gardon <bgardon@google.com>
-> ---
->   arch/x86/kvm/x86.c | 19 +++++++++++--------
->   1 file changed, 11 insertions(+), 8 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index cf3b67679cf0..5bcf07465c47 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -10818,17 +10818,23 @@ void kvm_arch_destroy_vm(struct kvm *kvm)
->   	kvm_hv_destroy_vm(kvm);
->   }
->   
-> -void kvm_arch_free_memslot(struct kvm *kvm, struct kvm_memory_slot *slot)
-> +static void free_memslot_rmap(struct kvm_memory_slot *slot)
->   {
->   	int i;
->   
->   	for (i = 0; i < KVM_NR_PAGE_SIZES; ++i) {
->   		kvfree(slot->arch.rmap[i]);
->   		slot->arch.rmap[i] = NULL;
-> +	}
-> +}
->   
-> -		if (i == 0)
-> -			continue;
-> +void kvm_arch_free_memslot(struct kvm *kvm, struct kvm_memory_slot *slot)
-> +{
-> +	int i;
-> +
-> +	free_memslot_rmap(slot);
->   
-> +	for (i = 1; i < KVM_NR_PAGE_SIZES; ++i) {
->   		kvfree(slot->arch.lpage_info[i - 1]);
->   		slot->arch.lpage_info[i - 1] = NULL;
->   	}
-> @@ -10894,12 +10900,9 @@ static int kvm_alloc_memslot_metadata(struct kvm_memory_slot *slot,
->   	return 0;
->   
->   out_free:
-> -	for (i = 0; i < KVM_NR_PAGE_SIZES; ++i) {
-> -		kvfree(slot->arch.rmap[i]);
-> -		slot->arch.rmap[i] = NULL;
-> -		if (i == 0)
-> -			continue;
-> +	free_memslot_rmap(slot);
->   
-> +	for (i = 1; i < KVM_NR_PAGE_SIZES; ++i) {
->   		kvfree(slot->arch.lpage_info[i - 1]);
->   		slot->arch.lpage_info[i - 1] = NULL;
->   	}
-> 
+
+Again, vDPA device is unaware of what driver that is bound. It could be 
+virtio-vpda, vhost-vdpa or other in the future. It's only the vDPA bus 
+driver know how it is actually used.
+
+
+>>
+>>
+>>>> 2) device is unaware of the bound driver, non page aligned doorbell 
+>>>> doesn't necessarily meant it can be used
+>>> Yes, non page aligned doorbell can not be used, so there is a check.
+>>
+>>
+>> Typo, what I meant is "it can't be used". That is to say, we should 
+>> let the vDPA bus driver to decide whether or not it can be used.
+> If it is not page aligned, there would be extra complexities for 
+> vhost/qemu, I see it as a hardware defect, 
+
+
+It is allowed by the virtio spec, isn't it?
+
+Thanks
+
+
+> why adapt to this kind of defects?
+>
+> Thanks
+> Zhu Lingshan
+>>
+>> Thanks
+>>
+>>
+>>>
+>>> Thanks
+>>> Zhu Lingshan
+>>>>
+>>>> Let's leave those polices to the driver.
+>>>>
+>>>> Thanks
+>>>>
+>>>>
+>>>>> +    } else {
+>>>>> +        area.addr = vf->notify_pa;
+>>>>> +        area.size = PAGE_SIZE;
+>>>>> +    }
+>>>>> +
+>>>>> +    return area;
+>>>>> +}
+>>>>> +
+>>>>>   /*
+>>>>>    * IFCVF currently does't have on-chip IOMMU, so not
+>>>>>    * implemented set_map()/dma_map()/dma_unmap()
+>>>>> @@ -440,6 +457,7 @@ static const struct vdpa_config_ops 
+>>>>> ifc_vdpa_ops ={
+>>>>>       .get_config    = ifcvf_vdpa_get_config,
+>>>>>       .set_config    = ifcvf_vdpa_set_config,
+>>>>>       .set_config_cb  = ifcvf_vdpa_set_config_cb,
+>>>>> +    .get_vq_notification = ifcvf_get_vq_notification,
+>>>>>   };
+>>>>>     static int ifcvf_probe(struct pci_dev *pdev, const struct 
+>>>>> pci_device_id *id)
+>>>>
+>>>
+>>
+>
 
