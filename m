@@ -2,138 +2,97 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 18CCB36D596
-	for <lists+kvm@lfdr.de>; Wed, 28 Apr 2021 12:18:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9B9D936D5A0
+	for <lists+kvm@lfdr.de>; Wed, 28 Apr 2021 12:19:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238384AbhD1KTY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 28 Apr 2021 06:19:24 -0400
-Received: from mga04.intel.com ([192.55.52.120]:9704 "EHLO mga04.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S236343AbhD1KTY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 28 Apr 2021 06:19:24 -0400
-IronPort-SDR: eEHR3xipS7jmHV3goQtnhO60sQSjKCOUqPMGiXuM17dyXusl715syWSE+yzgyWO738KoHviCfe
- HTQR7xe+7BvA==
-X-IronPort-AV: E=McAfee;i="6200,9189,9967"; a="194591499"
-X-IronPort-AV: E=Sophos;i="5.82,257,1613462400"; 
-   d="scan'208";a="194591499"
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Apr 2021 03:18:39 -0700
-IronPort-SDR: 35eRNRH85RVTLRH73OYtRFxH45vSLn0DOdo8/CCZsSD6++eUPlh3sleW61lx47OALi0ulx8Rt1
- jUYe0CbePGAA==
-X-IronPort-AV: E=Sophos;i="5.82,257,1613462400"; 
-   d="scan'208";a="423462467"
-Received: from lingshan-mobl5.ccr.corp.intel.com (HELO [10.254.209.93]) ([10.254.209.93])
-  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Apr 2021 03:18:37 -0700
-Subject: Re: [PATCH 1/2] vDPA/ifcvf: record virtio notify base
-To:     Jason Wang <jasowang@redhat.com>, mst@redhat.com
-Cc:     virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20210428082133.6766-1-lingshan.zhu@intel.com>
- <20210428082133.6766-2-lingshan.zhu@intel.com>
- <55217869-b456-f3bc-0b5a-6beaf34c19f8@redhat.com>
- <3243eeef-2891-5b79-29cb-bc969802c5dc@intel.com>
- <4cee04f1-a3fc-eaf0-747a-004ca09b06c0@redhat.com>
-From:   "Zhu, Lingshan" <lingshan.zhu@intel.com>
-Message-ID: <b9d6d777-0396-4c97-f463-3f85aa4e975e@intel.com>
-Date:   Wed, 28 Apr 2021 18:18:35 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.9.0
+        id S239198AbhD1KTd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 28 Apr 2021 06:19:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34508 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S239179AbhD1KTc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 28 Apr 2021 06:19:32 -0400
+Received: from mail-wm1-x333.google.com (mail-wm1-x333.google.com [IPv6:2a00:1450:4864:20::333])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 50E19C061574
+        for <kvm@vger.kernel.org>; Wed, 28 Apr 2021 03:18:47 -0700 (PDT)
+Received: by mail-wm1-x333.google.com with SMTP id a22-20020a05600c2256b029014294520f18so4144123wmm.1
+        for <kvm@vger.kernel.org>; Wed, 28 Apr 2021 03:18:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=PKGDTgiVcM/lQ6iRrmAsUOi9EArz4u3h1iRq434eRSA=;
+        b=KR9NTcMYjJQLFeqrQ2TR6ifAqSo99rz39UJx//d3x6y1Dy1pWofUW08E+LT0G8mVAu
+         1IM32Pw4NlYnD+xTg/GD6c9VGP7xlLlG9Y2F8puVHsRfS6nDxFa18AxQoLHqOEEiDhFD
+         CYUxDhIHvSkLOYmsljUOkO0Pc96WjOXotVbjEexdG/4GSmx91wy1wz3Yo5tqu5m7YE+z
+         0ZaBAmhS4XQ54zJmw/RMOXvBqZhFFJ8zXcLcP4QHA4ByKgyzYDoGTPRNb/OtE5I0ZTTr
+         nSsnifL9HuaMPbTmyJO09WDgQ3PpZisNvjT6fIKEq7wyFN0EhJEa3+WDeIHyObwh4Rvu
+         UZxQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=PKGDTgiVcM/lQ6iRrmAsUOi9EArz4u3h1iRq434eRSA=;
+        b=lyfRZq+cyOCGBrKO8h4MCQbIY4QdiEXBkZirr+Ysec3xhIAb8jINPkV6egKmQtO4Li
+         wQP7ZfUSkuABex09B+5PiPMiwGSB9pJ0sF7066dyouRTgSEcQ1lChpvIVf++83JGC3Q2
+         aPUdrkc0FwAAUnfPsI/b+B7tYC2u7lE+YElWPWJItl5Mz+j4Usi3Zyo/59q1ANqIUtH5
+         I9p0hap3k66OXnQV1TcNEWKxPyV4sVv9ayWW0Bv70nFtjs6lsUSPZt/2q+dflqGObFZz
+         NvUYi9C1HiDSBUgJqwks5zOpoC7fVepCa2WLCSJoVb3tRGXAqFJYS3Tht077ke4ZWH+/
+         CTdg==
+X-Gm-Message-State: AOAM531MX94S1QrpeLlzUAaRE45sUWrGsZBOglHibKKuoDU8fmDjR8ye
+        SkfKE+V8GqYkoKS7PVyQ7Oa0IA==
+X-Google-Smtp-Source: ABdhPJzL3juJCDl3XA6F0deoJp88yUP3zghVWwtGs9VLwPOsZipRSr61EUnv0vcux7XC7IERZPmCgQ==
+X-Received: by 2002:a05:600c:228a:: with SMTP id 10mr30822102wmf.115.1619605126000;
+        Wed, 28 Apr 2021 03:18:46 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+        by smtp.gmail.com with ESMTPSA id l14sm7760562wrv.94.2021.04.28.03.18.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 28 Apr 2021 03:18:44 -0700 (PDT)
+Received: from zen.lan (localhost [127.0.0.1])
+        by zen.linaroharston (Postfix) with ESMTP id 1B26B1FF7E;
+        Wed, 28 Apr 2021 11:18:44 +0100 (BST)
+From:   =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To:     kvm@vger.kernel.org
+Cc:     shashi.mallela@linaro.org, alexandru.elisei@arm.com,
+        eric.auger@redhat.com, qemu-arm@nongnu.org,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        christoffer.dall@arm.com, maz@kernel.org,
+        =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Subject: [kvm-unit-tests PATCH v1 0/4] enable LPI and ITS for TCG
+Date:   Wed, 28 Apr 2021 11:18:40 +0100
+Message-Id: <20210428101844.22656-1-alex.bennee@linaro.org>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-In-Reply-To: <4cee04f1-a3fc-eaf0-747a-004ca09b06c0@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Content-Language: en-US
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+This is a companion to Shashi's series enabling LPI and ITS features
+for QEMU's TCG emulation. This is part of our push for a sbsa-ref
+platform which needs a more modern set of features.
 
+  From: Shashi Mallela <shashi.mallela@linaro.org>
+  Subject: [PATCH v2 0/8] GICv3 LPI and ITS feature implementation
+  Date: Wed, 31 Mar 2021 22:41:44 -0400
+  Message-Id: <20210401024152.203896-1-shashi.mallela@linaro.org>
 
-On 4/28/2021 6:09 PM, Jason Wang wrote:
->
-> 在 2021/4/28 下午6:00, Zhu, Lingshan 写道:
->>
->>
->> On 4/28/2021 4:39 PM, Jason Wang wrote:
->>>
->>> 在 2021/4/28 下午4:21, Zhu Lingshan 写道:
->>>> This commit records virtio notify base addr to implemente
->>>> doorbell mapping feature
->>>>
->>>> Signed-off-by: Zhu Lingshan <lingshan.zhu@intel.com>
->>>> ---
->>>>   drivers/vdpa/ifcvf/ifcvf_base.c | 1 +
->>>>   drivers/vdpa/ifcvf/ifcvf_base.h | 1 +
->>>>   2 files changed, 2 insertions(+)
->>>>
->>>> diff --git a/drivers/vdpa/ifcvf/ifcvf_base.c 
->>>> b/drivers/vdpa/ifcvf/ifcvf_base.c
->>>> index 1a661ab45af5..cc61a5bfc5b1 100644
->>>> --- a/drivers/vdpa/ifcvf/ifcvf_base.c
->>>> +++ b/drivers/vdpa/ifcvf/ifcvf_base.c
->>>> @@ -133,6 +133,7 @@ int ifcvf_init_hw(struct ifcvf_hw *hw, struct 
->>>> pci_dev *pdev)
->>>> &hw->notify_off_multiplier);
->>>>               hw->notify_bar = cap.bar;
->>>>               hw->notify_base = get_cap_addr(hw, &cap);
->>>> +            hw->notify_pa = pci_resource_start(pdev, cap.bar) + 
->>>> cap.offset;
->>>
->>>
->>> To be more generic and avoid future changes, let's use the math 
->>> defined in the virtio spec.
->>>
->>> You may refer how it is implemented in virtio_pci vdpa driver[1].
->> Are you suggesting every vq keep its own notify_pa? In this case, we 
->> still need to record notify_pa in hw when init_hw, then initialize 
->> vq->notify_pa accrediting to hw->notify_pa.
->
->
-> I meant you need to follow how virtio spec did to calculate the 
-> doorbell address per vq:
->
->         cap.offset + queue_notify_off * notify_off_multiplier
->
-> Obviously, you ignore queue_notify_off and notify_off_multiplier here. 
-> This may bring troubles for the existing device IFCVF and future devices.
->
-> If I understand correctly, this device can be probed by virtio-pci 
-> driver which use the above math. There's no reason for using ad-hoc hack.
-sure, when talking about initialize vq->notify_pa, I mean calculate with 
-with notify_base and multiplier, V2 will include this.
+Most of the changes are minor except the its-trigger test which skips
+invall handling checks which I think is relying on IMPDEF behaviour
+which we can't probe for. There is also a hilarious work around to
+some limitations in the run_migration() script in the last patch.
 
-Thanks,
-Zhu Lingshan
->
-> Thanks
->
->
->>
->> Thanks
->> Zhu Lingshan
->>>
->>> Thanks
->>>
->>> [1] 
->>> https://lore.kernel.org/virtualization/20210415073147.19331-5-jasowang@redhat.com/T/
->>>
->>>
->>>> IFCVF_DBG(pdev, "hw->notify_base = %p\n",
->>>>                     hw->notify_base);
->>>>               break;
->>>> diff --git a/drivers/vdpa/ifcvf/ifcvf_base.h 
->>>> b/drivers/vdpa/ifcvf/ifcvf_base.h
->>>> index 0111bfdeb342..bcca7c1669dd 100644
->>>> --- a/drivers/vdpa/ifcvf/ifcvf_base.h
->>>> +++ b/drivers/vdpa/ifcvf/ifcvf_base.h
->>>> @@ -98,6 +98,7 @@ struct ifcvf_hw {
->>>>       char config_msix_name[256];
->>>>       struct vdpa_callback config_cb;
->>>>       unsigned int config_irq;
->>>> +    phys_addr_t  notify_pa;
->>>>   };
->>>>     struct ifcvf_adapter {
->>>
->>
->
+Alex Bennée (4):
+  arm64: split its-trigger test into KVM and TCG variants
+  scripts/arch-run: don't use deprecated server/nowait options
+  arm64: enable its-migration tests for TCG
+  arm64: split its-migrate-unmapped-collection into KVM and TCG variants
+
+ scripts/arch-run.bash |  4 +--
+ arm/gic.c             | 67 ++++++++++++++++++++++++++-----------------
+ arm/unittests.cfg     | 23 ++++++++++++---
+ 3 files changed, 62 insertions(+), 32 deletions(-)
+
+-- 
+2.20.1
 
