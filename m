@@ -2,51 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7F12E36DFB1
-	for <lists+kvm@lfdr.de>; Wed, 28 Apr 2021 21:39:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9DD7436DFB5
+	for <lists+kvm@lfdr.de>; Wed, 28 Apr 2021 21:39:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241876AbhD1TjB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 28 Apr 2021 15:39:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46058 "EHLO
+        id S240086AbhD1TjJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 28 Apr 2021 15:39:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46068 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241840AbhD1Ti6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 28 Apr 2021 15:38:58 -0400
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7F982C061573
-        for <kvm@vger.kernel.org>; Wed, 28 Apr 2021 12:38:02 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id l17-20020a25ad510000b02904ee2dd236d5so6963127ybe.18
-        for <kvm@vger.kernel.org>; Wed, 28 Apr 2021 12:38:02 -0700 (PDT)
+        with ESMTP id S241726AbhD1Ti4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 28 Apr 2021 15:38:56 -0400
+Received: from mail-pf1-x44a.google.com (mail-pf1-x44a.google.com [IPv6:2607:f8b0:4864:20::44a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D08F8C0613ED
+        for <kvm@vger.kernel.org>; Wed, 28 Apr 2021 12:38:04 -0700 (PDT)
+Received: by mail-pf1-x44a.google.com with SMTP id k11-20020a62840b0000b029024135614a60so23914087pfd.18
+        for <kvm@vger.kernel.org>; Wed, 28 Apr 2021 12:38:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=date:message-id:mime-version:subject:from:to:cc;
-        bh=6lY0wVxKSFoGmS9bVqfbfPkbINkSpYIK0/Bfq4EeuDU=;
-        b=UHp/r+M7gHphcpiU1e7jr9u5gX7d0CIPQhlJzPJs034WaUGDGPnQ5PWWpQjxogK9jR
-         gRV2eCkUHTvUiuwFj08bK1QVFGzZKdIm/cxyZeoimqYttKlPB2BbBvam4admXBTXw7Cb
-         N8/u+1A+HNsv8z7rqATlxasT/vEyQqwmg0wKHPT0GOaXCpjifjz7BPfscAqXv0tPFgkY
-         DdXDtrSOsQgTbIzh9Nb9bn53/ZG8gorrB0YoK08kKJBz/uGhw/BOD1AhCuRHyDa4R8jt
-         kiNi7SB6DEdr6n/oVZ7YoxoMni0C7Zl9c5/nmXuzpoWJ7mlUeetO7QM5xKNMYbgB8f+D
-         rZkA==
+        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
+         :cc;
+        bh=3EmL6xt5jVjqc/fFRGG9Bp/HY5j+2f9o1zD7J8DnnPw=;
+        b=qojwyUnMOEKFrRAcoKNQv8n9HI0z+aYcwAplArllOvARz6euC5nXNvMP3+XTjqrcuq
+         27iyRNgjq7qlyk8BgfqzP+q/bPr4jr7bPbIFOboYm2DK2DViCz9IgZO02YQcBAjmgel7
+         LfkZytiSEZgfQZE2lG/0d3YqOKenqkidls0+i+KeEhqqrAkiHzY1FGQib/wb6bMGhpLC
+         ggG0+bb0D3uy/d/sAGEhmuM6kW/F/n5phGtR6VG9kFmXv+RTV8Z/lXrev6QZXNEaeuuF
+         FSyn+4mmB/ug/UJXVXOt2t+AUXRjC8OQmqDiBEC30XkjkcsO+gdvbaD1+CHgH+8vqOGS
+         vn2g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
-        bh=6lY0wVxKSFoGmS9bVqfbfPkbINkSpYIK0/Bfq4EeuDU=;
-        b=kGQBQmoBt8s0aH4BpkHTDATnIL47R/ZJZxEq/KYAOT6t/QzF7FqUSoEYGO2qRuuM1u
-         kicHoE6zQcu0YJrYKD5cCZhZHWnWlaph5eDBVGuluxfgdDnHSxCPWju/JGB5PlZjblXX
-         9Z+190NIbf1O0h+nKoF1l8/OBtz2Aegcl4jkkmEzLSXGxKAXgjPOhZ3Q/AAE8KWsTxtQ
-         jeQdP1dxBvSyBvPbUB1TNowB7360bFJZuK5Mi0ZtSg9BDPqTNu0poVPCvfJS2VDBAsjS
-         ATPlTMP5yTDUF/chhKT2hCtDo/eS/cFMiVYigeLnrOzg5I2BHHOgqFgkjylp7rv8PP86
-         M1zQ==
-X-Gm-Message-State: AOAM531egIlIYxpmxCpPYlA+ngB0fu5w9se/vekIg9b081m2sPCM/s8t
-        r0yW/R5bFubZ6mrSMrTUOgkLYxfXcalkoQ==
-X-Google-Smtp-Source: ABdhPJwBsfmNpvwW8rlmlnImBF6/Yn0bEE8RY/muQwjlhKwnzdbXRK8OsoZ5gVqEj7Y4ZZ66XeKQEI7IUq38XA==
+        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
+         :references:subject:from:to:cc;
+        bh=3EmL6xt5jVjqc/fFRGG9Bp/HY5j+2f9o1zD7J8DnnPw=;
+        b=UnEB2WoJIRGSVaGlKFk37j1R3ZlJ6BP3GrlCOPtd0xjtG+I1GrqZRZhiiNwkEX2vVP
+         pa9S0yXueMbj4h4hq8Kuf60ywjJNIErzXoU9bbLS9bIBHGOn1y4F9qwPWV4MGw0wNkn3
+         oIzyAuR5IfKt0FK9ACYbaTXk7kj3BtUj4Rt7NkqNjmPIEnscCpauKAQWerdfI3zetB5Z
+         HiR5nhvnn57IIzYWVELzUFaSV1pIVEy3dTQC6mhKHtnJNEL0QJtcEwRY0+R8lM68n/JF
+         zWk/WSNlOy37maeIfHXN0NVuikFaKv1oo/WomEgVoWpyX55lTNSAtHv2li7OZUrYBcNw
+         yMXQ==
+X-Gm-Message-State: AOAM533/YYCYMZqy56Ee4BNd8am/jCNXJSdPbxyYEqxFWRjpe2HcPCY1
+        7zXT7J/osSYnp7iowMZYcUpapd/idVZpaw==
+X-Google-Smtp-Source: ABdhPJwxcktVdD/XvgMx0K4EkvWN9+2vn0sfN6x1/yc8vpWGv23+caxbU3DuBq9wNvwPZ95Khs2Y0ysoEKh68w==
 X-Received: from ricarkol2.c.googlers.com ([fda3:e722:ac3:10:24:72f4:c0a8:62fe])
- (user=ricarkol job=sendgmr) by 2002:a25:99c1:: with SMTP id
- q1mr40283071ybo.517.1619638681487; Wed, 28 Apr 2021 12:38:01 -0700 (PDT)
-Date:   Wed, 28 Apr 2021 12:37:50 -0700
-Message-Id: <20210428193756.2110517-1-ricarkol@google.com>
+ (user=ricarkol job=sendgmr) by 2002:a17:902:8d8b:b029:ed:64bb:db81 with SMTP
+ id v11-20020a1709028d8bb02900ed64bbdb81mr8252681plo.53.1619638684396; Wed, 28
+ Apr 2021 12:38:04 -0700 (PDT)
+Date:   Wed, 28 Apr 2021 12:37:51 -0700
+In-Reply-To: <20210428193756.2110517-1-ricarkol@google.com>
+Message-Id: <20210428193756.2110517-2-ricarkol@google.com>
 Mime-Version: 1.0
+References: <20210428193756.2110517-1-ricarkol@google.com>
 X-Mailer: git-send-email 2.31.1.498.g6c1eba8ee3d-goog
-Subject: [PATCH v2 0/6] KVM: x86: Use kernel x86 cpuid utilities in KVM selftests
+Subject: [PATCH v2 1/6] KVM: selftests: Add kernel headers sync check
 From:   Ricardo Koller <ricarkol@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     kvm@vger.kernel.org, Peter Zijlstra <peterz@infradead.org>,
@@ -71,75 +76,121 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The kernel has a set of utilities and definitions to deal with x86 cpu
-features.  The x86 KVM selftests don't use them, and instead have
-evolved to use differing and ad-hoc methods for checking features. The
-advantage of the kernel feature definitions is that they use a format
-that embeds the info needed to extract them from cpuid (function, index,
-and register to use).
+Add a script that checks if header files under /tools match their
+original version in the kernel. Perform the check at the end of the
+make, so warnings are shown after all tests are built.  Note that
+the build is _not_ aborted if any diff check fails.
 
-Patches 1 and 2 add a script for checking that kernel headers don't
-drift from their original copies. Patches 3 and 4 massage the related
-cpuid header files in the kernel side, then copy them into tools/ so
-they can be included by selftests.  The last 2 patches replace the tests
-checking for cpu features to use the definitions and utilities
-introduced from the kernel.
+The list of header files to check was obtained from the union of the
+output of these (at tools/testing/selftests/kvm):
 
-Tested the arch/x86 patches by building these combinations:
-  ARCH=i386 allmodconfig
-  ARCH=i386 allyesconfig
-  ARCH=x86_64 allyesconfig
-  ARCH=x86_64 allmodconfig
-  ARCH=um alldefconfig
-  ARCH=i386 alldefconfig
-and the selftest changes on both x86 and arm64.
+  CFLAGS="-H" make ARCH=x86_64 2>&1 | grep '.h$' | grep 'tools'
+  CFLAGS="-H" make ARCH=arm64 CC=aarch64-linux-gnu-gcc-10 2>&1 | grep '.h$' | grep 'tools'
 
-Thanks,
-Ricardo
+and then by manually removing the header files that were updated on the
+tools/ side but not on the kernel side. There is no point in checking
+for these as their changes will not be synced back to the kernel. Here
+are the removed headers and the first commit that made them drift apart
+from their original copies:
 
-v2:
-- Add script to check for kernel headers drift in tools
-- Sync header that is currently failing the check
-- Move header copies under tools/testing/selftests/kvm/include/x86
-  instead of tools/arch/x86/include
-v1: https://lore.kernel.org/kvm/20210422005626.564163-1-ricarkol@google.com
+  tools/include/linux/kernel.h
+  d0761e37fe3 perf tools: Uninline scnprintf() and vscnprint()
 
-Ricardo Koller (6):
-  KVM: selftests: Add kernel headers sync check
-  tools headers x86: Update bitsperlong.h in tools
-  x86/cpu: Expose CPUID regs, leaf and index definitions to tools
-  tools headers x86: Copy cpuid helpers from the kernel
-  KVM: selftests: Introduce utilities for checking x86 features
-  KVM: selftests: Use kernel x86 cpuid features format
+  tools/include/linux/list.h
+  5602ea09c19 tools include: Add compiler.h to list.h
 
- arch/x86/events/intel/pt.c                    |   1 +
- arch/x86/include/asm/cpufeature.h             |  23 +-
- arch/x86/include/asm/processor.h              |  11 -
- arch/x86/kernel/cpu/scattered.c               |   2 +-
- arch/x86/kernel/cpuid.c                       |   2 +-
- tools/arch/x86/include/asm/cpufeatures.h      |   3 +
- tools/include/uapi/asm-generic/bitsperlong.h  |   1 +
- tools/testing/selftests/kvm/Makefile          |   2 +
- tools/testing/selftests/kvm/check-headers.sh  |  64 +++++
- .../kvm/include/x86_64/asm/cpufeature.h       | 257 ++++++++++++++++++
- .../selftests/kvm/include/x86_64/cpuid.h      |  61 +++++
- .../selftests/kvm/include/x86_64/processor.h  |  16 --
- .../kvm/include/x86_64/reverse_cpuid.h        | 185 +++++++++++++
- .../selftests/kvm/include/x86_64/svm_util.h   |  11 +-
- tools/testing/selftests/kvm/lib/x86_64/svm.c  |   6 +-
- tools/testing/selftests/kvm/lib/x86_64/vmx.c  |   5 +-
- tools/testing/selftests/kvm/steal_time.c      |   5 +-
- .../kvm/x86_64/cr4_cpuid_sync_test.c          |  23 +-
- .../selftests/kvm/x86_64/set_sregs_test.c     |  25 +-
- .../selftests/kvm/x86_64/vmx_pmu_msrs_test.c  |   8 +-
- .../kvm/x86_64/vmx_set_nested_state_test.c    |   5 +-
- .../selftests/kvm/x86_64/xss_msr_test.c       |  10 +-
- 22 files changed, 630 insertions(+), 96 deletions(-)
+  tools/include/linux/poison.h
+  6ae8eefc6c8 tools include: Do not use poison with C++
+
+  tools/include/linux/types.h
+  70ba6b8f975 tools include: add __aligned_u64 to types.h
+
+  tools/include/asm-generic/bitsperlong.h
+  2a00f026a15 tools: Fix up BITS_PER_LONG setting
+
+Based on tools/perf/check-headers.sh.
+
+Signed-off-by: Ricardo Koller <ricarkol@google.com>
+---
+ tools/testing/selftests/kvm/Makefile         |  2 +
+ tools/testing/selftests/kvm/check-headers.sh | 55 ++++++++++++++++++++
+ 2 files changed, 57 insertions(+)
  create mode 100755 tools/testing/selftests/kvm/check-headers.sh
- create mode 100644 tools/testing/selftests/kvm/include/x86_64/asm/cpufeature.h
- create mode 100644 tools/testing/selftests/kvm/include/x86_64/cpuid.h
- create mode 100644 tools/testing/selftests/kvm/include/x86_64/reverse_cpuid.h
 
+diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
+index ea5c42841307..69dc4f5e9ee3 100644
+--- a/tools/testing/selftests/kvm/Makefile
++++ b/tools/testing/selftests/kvm/Makefile
+@@ -147,6 +147,8 @@ $(OUTPUT)/libkvm.a: $(LIBKVM_OBJS)
+ 
+ x := $(shell mkdir -p $(sort $(dir $(TEST_GEN_PROGS))))
+ all: $(STATIC_LIBS)
++	@./check-headers.sh
++
+ $(TEST_GEN_PROGS): $(STATIC_LIBS)
+ 
+ cscope: include_paths = $(LINUX_TOOL_INCLUDE) $(LINUX_HDR_PATH) include lib ..
+diff --git a/tools/testing/selftests/kvm/check-headers.sh b/tools/testing/selftests/kvm/check-headers.sh
+new file mode 100755
+index 000000000000..c21a69b52bcd
+--- /dev/null
++++ b/tools/testing/selftests/kvm/check-headers.sh
+@@ -0,0 +1,55 @@
++#!/bin/sh
++# SPDX-License-Identifier: GPL-2.0
++#
++# Adapted from tools/perf/check-headers.sh
++
++FILES='
++arch/x86/include/asm/msr-index.h
++include/linux/bits.h
++include/linux/const.h
++include/uapi/asm-generic/bitsperlong.h
++include/uapi/linux/const.h
++include/vdso/bits.h
++include/vdso/const.h
++'
++
++check_2 () {
++  file1=$1
++  file2=$2
++
++  shift
++  shift
++
++  cmd="diff $* $file1 $file2 > /dev/null"
++
++  test -f $file2 && {
++    eval $cmd || {
++      echo "Warning: Kernel header at '$file1' differs from latest version at '$file2'" >&2
++      echo diff -u $file1 $file2
++    }
++  }
++}
++
++check () {
++  file=$1
++
++  shift
++
++  check_2 tools/$file $file $*
++}
++
++# Check if we are at the right place (we have the kernel headers)
++# (tools/testing/selftests/kvm/../../../../include)
++test -d ../../../../include || exit 0
++
++cd ../../../..
++
++# simple diff check
++for i in $FILES; do
++  check $i -B
++done
++
++# diff with extra ignore lines
++check include/linux/build_bug.h       '-I "^#\(ifndef\|endif\)\( \/\/\)* static_assert$"'
++
++cd tools/testing/selftests/kvm
 -- 
 2.31.1.498.g6c1eba8ee3d-goog
 
