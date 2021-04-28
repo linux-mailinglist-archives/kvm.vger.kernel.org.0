@@ -2,120 +2,89 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 485D436D983
-	for <lists+kvm@lfdr.de>; Wed, 28 Apr 2021 16:24:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F1BB236D98B
+	for <lists+kvm@lfdr.de>; Wed, 28 Apr 2021 16:27:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231281AbhD1OZS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 28 Apr 2021 10:25:18 -0400
-Received: from mail.kernel.org ([198.145.29.99]:52296 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229520AbhD1OZR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 28 Apr 2021 10:25:17 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id D11756142A;
+        id S231585AbhD1OZW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 28 Apr 2021 10:25:22 -0400
+Received: from wforward1-smtp.messagingengine.com ([64.147.123.30]:32831 "EHLO
+        wforward1-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229520AbhD1OZV (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 28 Apr 2021 10:25:21 -0400
+Received: from compute2.internal (compute2.nyi.internal [10.202.2.42])
+        by mailforward.west.internal (Postfix) with ESMTP id C9809B64;
+        Wed, 28 Apr 2021 10:24:35 -0400 (EDT)
+Received: from mailfrontend1 ([10.202.2.162])
+  by compute2.internal (MEProxy); Wed, 28 Apr 2021 10:24:36 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        messagingengine.com; h=cc:content-transfer-encoding:date:from
+        :message-id:mime-version:subject:to:x-me-proxy:x-me-proxy
+        :x-me-sender:x-me-sender:x-sasl-enc; s=fm2; bh=HQQ7SpOqqpIwy1otx
+        y1mWGf90mk55isIJKpzIEWUu1w=; b=O+5/nHzHlRhTl3zn3jPZx5Ni81cln3oao
+        vlOjqg6LWgvXJrqOv8obs4fRaPxz2cPnvQXpHhSsJht3lZcjlUf1MSaK0iclkiUF
+        PrAhdUPFdQczW7hfLE2ifucktETeVqwE23oVIkfz7W6teKVNkMwWExUxj9oFiizs
+        d3+tuqhNAptxyeK+MXLL+5XAJsPSYGcoBYGaK4TmsT1P2Png2jja/qV+W2X3dNdM
+        ENpqomCe0HBJrOeyYZ5IwPlTzKlKKFfPCqaU16ZBlu59t1ScQZK0rFUEv/vVrDCx
+        lXMhsv6CEQjEk6n2ku+J/28OujVljr2mMVXFEQi3QXe5rtl4Wrv8g==
+X-ME-Sender: <xms:InCJYDrxundC7WYciFjOmv2ygrpJ74plT-1tgE3QNiT86yqRcU3wgw>
+    <xme:InCJYNrtwORwdx_yk2wjh8CKyGszyCTLjkQ12WUX8kL-biEnYSlvX9qngaQbTxwA2
+    yOC0iKheOpqdbgNaME>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeduledrvddvvddgheduucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
+    cujfgurhephffvufffkffoggfgsedtkeertdertddtnecuhfhrohhmpeffrghvihguucfg
+    ughmohhnughsohhnuceouggrvhhiugdrvggumhhonhgushhonhesohhrrggtlhgvrdgtoh
+    hmqeenucggtffrrghtthgvrhhnpeduhfetvdfhgfeltddtgeelheetveeufeegteevtddu
+    iedvgeejhfdukeegteehheenucfkphepkedurddukeejrddviedrvdefkeenucevlhhush
+    htvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegurghvihgurdgvughm
+    ohhnughsohhnsehorhgrtghlvgdrtghomh
+X-ME-Proxy: <xmx:InCJYAN6LwT4F_kI-ZrSJDsYSOal9EHWCwOLABuSbw5efip584eLXA>
+    <xmx:InCJYG4Rfck2DvMzNI4VuZbwFJTvMLIMgIkQOv9owGXXOV6tFyRLNw>
+    <xmx:InCJYC4EldmNbbTlIWMexAUYRyxGTgAazj-35dUTwHF2DNTm86TwQQ>
+    <xmx:I3CJYPz9HB7OH-lak-hCi56L6NnX36Ww0D5UBexpmEW3ItPFvTAyRZq_yO0>
+Received: from disaster-area.hh.sledj.net (disaster-area.hh.sledj.net [81.187.26.238])
+        by mail.messagingengine.com (Postfix) with ESMTPA;
+        Wed, 28 Apr 2021 10:24:33 -0400 (EDT)
+Received: from localhost (disaster-area.hh.sledj.net [local])
+        by disaster-area.hh.sledj.net (OpenSMTPD) with ESMTPA id b1bbd0bf;
         Wed, 28 Apr 2021 14:24:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1619619872;
-        bh=UKUazvAqaSA3P62RMXBJczStPulFFoevUe1M29vJTt0=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=hrdLGfHuRw86dBtsH1q8UWfYFyLBUyEK6xIGSta5RqkpYqas78w0CpDEegYfsfANV
-         GCGTq0Idb51CX7g5+H/yAapHo0uS6xDlJqInjlrMMuckcqjGwEcJ/Gep+ewwToVfSA
-         cTTSDZd8WdlRvmH2aDVkZ/SCegIIoqGKG82JjLnOsyLZsXe5N7GKR+6uBbS3Wa+Lcz
-         P0oUXL3EM9tiLZgg+9lK9mN+ZPkG8WHP3BOJ9v6CEN3bMDnmWWNSfUCqvDlIZ+wLnv
-         ybVEDafoFcxmU1BcROUtAf/sNxUeMGytIVD+cQlQIGxPk6Rd0bA7kG47GLnjQvH7IS
-         j4lmqSzzUFUYQ==
-Date:   Wed, 28 Apr 2021 17:24:27 +0300
-From:   Leon Romanovsky <leon@kernel.org>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     Alex Williamson <alex.williamson@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org,
-        Kirti Wankhede <kwankhede@nvidia.com>,
-        "Raj, Ashok" <ashok.raj@intel.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Christoph Hellwig <hch@lst.de>,
-        Max Gurtovoy <mgurtovoy@nvidia.com>,
-        Tarun Gupta <targupta@nvidia.com>
-Subject: Re: [PATCH v2 02/13] vfio/mdev: Allow the mdev_parent_ops to specify
- the device driver to bind
-Message-ID: <YIlwGwfWi4d4pe1i@unreal>
-References: <0-v2-7667f42c9bad+935-vfio3_jgg@nvidia.com>
- <2-v2-7667f42c9bad+935-vfio3_jgg@nvidia.com>
- <YIkENzc+9XAFPcer@unreal>
- <20210428141446.GT1370958@nvidia.com>
+From:   David Edmondson <david.edmondson@oracle.com>
+To:     qemu-devel@nongnu.org
+Cc:     qemu-trivial@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
+        kvm@vger.kernel.org, David Edmondson <david.edmondson@oracle.com>
+Subject: [PATCH] accel: kvm: clarify that extra exit data is hexadecimal
+Date:   Wed, 28 Apr 2021 15:24:31 +0100
+Message-Id: <20210428142431.266879-1-david.edmondson@oracle.com>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210428141446.GT1370958@nvidia.com>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Apr 28, 2021 at 11:14:46AM -0300, Jason Gunthorpe wrote:
-> On Wed, Apr 28, 2021 at 09:44:07AM +0300, Leon Romanovsky wrote:
-> > On Mon, Apr 26, 2021 at 05:00:04PM -0300, Jason Gunthorpe wrote:
-> > > This allows a mdev driver to opt out of using vfio_mdev.c, instead the
-> > > driver will provide a 'struct mdev_driver' and register directly with the
-> > > driver core.
-> > > 
-> > > Much of mdev_parent_ops becomes unused in this mode:
-> > > - create()/remove() are done via the mdev_driver probe()/remove()
-> > > - mdev_attr_groups becomes mdev_driver driver.dev_groups
-> > > - Wrapper function callbacks are replaced with the same ones from
-> > >   struct vfio_device_ops
-> > > 
-> > > Following patches convert all the drivers.
-> > > 
-> > > Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
-> > >  drivers/vfio/mdev/mdev_core.c   | 64 ++++++++++++++++++++++++++++-----
-> > >  drivers/vfio/mdev/mdev_driver.c | 17 ++++++++-
-> > >  include/linux/mdev.h            |  3 ++
-> > >  3 files changed, 75 insertions(+), 9 deletions(-)
-> > 
-> > <...>
-> > 
-> > > +/*
-> > > + * mdev drivers can refuse to bind during probe(), in this case we want to fail
-> > > + * the creation of the mdev all the way back to sysfs. This is a weird model
-> > > + * that doesn't fit in the driver core well, nor does it seem to appear any
-> > > + * place else in the kernel, so use a simple hack.
-> > > + */
-> > > +static int mdev_bind_driver(struct mdev_device *mdev)
-> > > +{
-> > > +	struct mdev_driver *drv = mdev->type->parent->ops->device_driver;
-> > > +	int ret;
-> > > +
-> > > +	if (!drv)
-> > > +		drv = &vfio_mdev_driver;
-> > > +
-> > > +	while (1) {
-> > > +		device_lock(&mdev->dev);
-> > > +		if (mdev->dev.driver == &drv->driver) {
-> > > +			ret = 0;
-> > > +			goto out_unlock;
-> > > +		}
-> > > +		if (mdev->probe_err) {
-> > > +			ret = mdev->probe_err;
-> > > +			goto out_unlock;
-> > > +		}
-> > > +		device_unlock(&mdev->dev);
-> > > +		ret = device_attach(&mdev->dev);
-> > 
-> > The sequence above looks sketchy:
-> > 1. lock
-> > 2. check for driver
-> > 3. unlock
-> > 4. device_attach - it takes internally same lock as in step 1.
-> > 
-> > Why don't you rely on internal to device_attach() driver check?
-> 
-> This is locking both probe_err and the check that the right driver is
-> bound. device_attach() doesn't tell you the same information
+When dumping the extra exit data provided by KVM, make it clear that
+the data is hexadecimal.
 
-device_attach() returns you the information that driver is already
-bound, which is the same as you are doing here, because you don't
-unbind "the wrong driver".
+At the same time, zero-pad the output.
 
-Thanks
+Signed-off-by: David Edmondson <david.edmondson@oracle.com>
+---
+ accel/kvm/kvm-all.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-> 
-> Jason
+diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
+index b6d9f92f15..93d7cbfeaf 100644
+--- a/accel/kvm/kvm-all.c
++++ b/accel/kvm/kvm-all.c
+@@ -2269,7 +2269,7 @@ static int kvm_handle_internal_error(CPUState *cpu, struct kvm_run *run)
+         int i;
+ 
+         for (i = 0; i < run->internal.ndata; ++i) {
+-            fprintf(stderr, "extra data[%d]: %"PRIx64"\n",
++            fprintf(stderr, "extra data[%d]: 0x%016"PRIx64"\n",
+                     i, (uint64_t)run->internal.data[i]);
+         }
+     }
+-- 
+2.30.2
+
