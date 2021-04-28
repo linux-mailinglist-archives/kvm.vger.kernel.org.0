@@ -2,152 +2,199 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1659036D4AF
-	for <lists+kvm@lfdr.de>; Wed, 28 Apr 2021 11:22:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 37C0736D4C3
+	for <lists+kvm@lfdr.de>; Wed, 28 Apr 2021 11:28:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238111AbhD1JWr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 28 Apr 2021 05:22:47 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:37024 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230113AbhD1JWo (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 28 Apr 2021 05:22:44 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1619601719;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=axU4olOyFNuAi1siDolpKEA8kn46+KAy0fVSsUFenIk=;
-        b=EmvZZCyyhszEGER9SshYMOKvaWEwaGF8qLTei5tT+ERl13iMpORIdvb6/z/+MJ3iXFcScq
-        Q6AP6cHZXI5cEHhBLFslFAdQXC7ZUDeZ134UwJYrdQUtZcRgMcMUO59JxdRBcPIIGFGTO/
-        tBRqQcqYbaLkN1pnq5lvkezDVKgjPpI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-294-TqqIchBUMpmMqypacMgirw-1; Wed, 28 Apr 2021 05:21:54 -0400
-X-MC-Unique: TqqIchBUMpmMqypacMgirw-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9DA0B818CA3;
-        Wed, 28 Apr 2021 09:21:53 +0000 (UTC)
-Received: from wangxiaodeMacBook-Air.local (ovpn-12-25.pek2.redhat.com [10.72.12.25])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 83A6A5C224;
-        Wed, 28 Apr 2021 09:21:50 +0000 (UTC)
-Subject: Re: [PATCH 2/2] vDPA/ifcvf: implement doorbell mapping for ifcvf
-To:     "Zhu, Lingshan" <lingshan.zhu@intel.com>, mst@redhat.com
-Cc:     virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20210428082133.6766-1-lingshan.zhu@intel.com>
- <20210428082133.6766-3-lingshan.zhu@intel.com>
- <f6d9a424-9025-3eb5-1cb4-0ff22f7bec63@redhat.com>
- <5052fced-cd9a-e453-5cb2-39cdde60a208@intel.com>
-From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <1984491f-cd5e-d4bc-b328-41e2f2e935fd@redhat.com>
-Date:   Wed, 28 Apr 2021 17:21:48 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
- Gecko/20100101 Thunderbird/78.10.0
+        id S238130AbhD1J27 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 28 Apr 2021 05:28:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51316 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230113AbhD1J26 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 28 Apr 2021 05:28:58 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D174BC061574;
+        Wed, 28 Apr 2021 02:28:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=y7ONP7hJrRnuCKAnDvxJuxgrmiIMotVAdN8SIVwNIn8=; b=P6uUb98fva69hTbe+PGpKi1ePy
+        Gz316TWz9533QR18cIuzbrvuEVD4uv96CstbkjVW5vl1pt/lKfeSm9qV8xIvrl3yLJjHE/YWrp3O/
+        ZGUYH9FGx1oOPlQS1fJvxpk32Gk4Uv/RHOtRJyruqIxYFJ1GLKvqTNGVsXpH8MK04/PQRQs7Bf4uL
+        VCxJRDr8U/uq5CmipohO+TIUU93SnTDk+LNfLpvyVg+WU+rdT5AFbAAIJSPeYOV1pG4CkCqJbCr2M
+        +yyL85w1Fmw8ItfalaHTnzwtmA3I2vmwAZVnYG+M6XJZw9pK5al9O/shkThtU4cJ0IfrC8zKHr+P5
+        3zed6jKg==;
+Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
+        by casper.infradead.org with esmtpsa (Exim 4.94 #2 (Red Hat Linux))
+        id 1lbgRc-00861i-JC; Wed, 28 Apr 2021 09:26:03 +0000
+Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+        (Client did not present a certificate)
+        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 780CE300094;
+        Wed, 28 Apr 2021 11:25:19 +0200 (CEST)
+Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
+        id 56A212BF7B845; Wed, 28 Apr 2021 11:25:19 +0200 (CEST)
+Date:   Wed, 28 Apr 2021 11:25:19 +0200
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     Christian Borntraeger <borntraeger@de.ibm.com>
+Cc:     bristot@redhat.com, bsegall@google.com, dietmar.eggemann@arm.com,
+        greg@kroah.com, gregkh@linuxfoundation.org, joshdon@google.com,
+        juri.lelli@redhat.com, linux-kernel@vger.kernel.org,
+        linux@rasmusvillemoes.dk, mgorman@suse.de, mingo@kernel.org,
+        rostedt@goodmis.org, valentin.schneider@arm.com,
+        vincent.guittot@linaro.org, linux-s390@vger.kernel.org,
+        kvm@vger.kernel.org
+Subject: Re: sched: Move SCHED_DEBUG sysctl to debugfs
+Message-ID: <YIkp/6/NDL7KsvpY@hirez.programming.kicks-ass.net>
+References: <20210412102001.287610138@infradead.org>
+ <20210427145925.5246-1-borntraeger@de.ibm.com>
+ <YIkgzUWEPaXQTCOv@hirez.programming.kicks-ass.net>
+ <cf2a6c6c-21ea-df7b-94d1-940a344b8d26@de.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <5052fced-cd9a-e453-5cb2-39cdde60a208@intel.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <cf2a6c6c-21ea-df7b-94d1-940a344b8d26@de.ibm.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Wed, Apr 28, 2021 at 10:54:37AM +0200, Christian Borntraeger wrote:
+> 
+> 
+> On 28.04.21 10:46, Peter Zijlstra wrote:
+> > On Tue, Apr 27, 2021 at 04:59:25PM +0200, Christian Borntraeger wrote:
+> > > Peter,
+> > > 
+> > > I just realized that we moved away sysctl tunabled to debugfs in next.
+> > > We have seen several cases where it was benefitial to set
+> > > sched_migration_cost_ns to a lower value. For example with KVM I can
+> > > easily get 50% more transactions with 50000 instead of 500000.
+> > > Until now it was possible to use tuned or /etc/sysctl.conf to set
+> > > these things permanently.
+> > > 
+> > > Given that some people do not want to have debugfs mounted all the time
+> > > I would consider this a regression. The sysctl tunable was always
+> > > available.
+> > > 
+> > > I am ok with the "informational" things being in debugfs, but not
+> > > the tunables. So how do we proceed here?
+> > 
+> > It's all SCHED_DEBUG; IOW you're relying on DEBUG infrastructure for
+> > production performance, and that's your fail.
+> 
+> No its not. sched_migration_cost_ns was NEVER protected by CONFIG_SCHED_DEBUG.
+> It was available on all kernels with CONFIG_SMP.
 
-在 2021/4/28 下午4:59, Zhu, Lingshan 写道:
->
->
-> On 4/28/2021 4:42 PM, Jason Wang wrote:
->>
->> 在 2021/4/28 下午4:21, Zhu Lingshan 写道:
->>> This commit implements doorbell mapping feature for ifcvf.
->>> This feature maps the notify page to userspace, to eliminate
->>> vmexit when kick a vq.
->>>
->>> Signed-off-by: Zhu Lingshan <lingshan.zhu@intel.com>
->>> ---
->>>   drivers/vdpa/ifcvf/ifcvf_main.c | 18 ++++++++++++++++++
->>>   1 file changed, 18 insertions(+)
->>>
->>> diff --git a/drivers/vdpa/ifcvf/ifcvf_main.c 
->>> b/drivers/vdpa/ifcvf/ifcvf_main.c
->>> index e48e6b74fe2e..afcb71bc0f51 100644
->>> --- a/drivers/vdpa/ifcvf/ifcvf_main.c
->>> +++ b/drivers/vdpa/ifcvf/ifcvf_main.c
->>> @@ -413,6 +413,23 @@ static int ifcvf_vdpa_get_vq_irq(struct 
->>> vdpa_device *vdpa_dev,
->>>       return vf->vring[qid].irq;
->>>   }
->>>   +static struct vdpa_notification_area 
->>> ifcvf_get_vq_notification(struct vdpa_device *vdpa_dev,
->>> +                                   u16 idx)
->>> +{
->>> +    struct ifcvf_hw *vf = vdpa_to_vf(vdpa_dev);
->>> +    struct vdpa_notification_area area;
->>> +
->>> +    if (vf->notify_pa % PAGE_SIZE) {
->>> +        area.addr = 0;
->>> +        area.size = 0;
->>
->>
->> We don't need this since:
->>
->> 1) there's a check in the vhost vDPA
-> I think you mean this code block in vdpa.c
->         notify = ops->get_vq_notification(vdpa, index);
->         if (notify.addr & (PAGE_SIZE - 1))
->                 return -EINVAL;
->
-> This should work, however, I think the parent driver should ensure it 
-> passes a PAGE_SIZE aligned address to userspace, to be robust, to be 
-> reliable.
+The relevant section from origin/master:kernel/sysctl.c:
 
+#ifdef CONFIG_SCHED_DEBUG
+	{
+		.procname	= "sched_min_granularity_ns",
+		.data		= &sysctl_sched_min_granularity,
+		.maxlen		= sizeof(unsigned int),
+		.mode		= 0644,
+		.proc_handler	= sched_proc_update_handler,
+		.extra1		= &min_sched_granularity_ns,
+		.extra2		= &max_sched_granularity_ns,
+	},
+	{
+		.procname	= "sched_latency_ns",
+		.data		= &sysctl_sched_latency,
+		.maxlen		= sizeof(unsigned int),
+		.mode		= 0644,
+		.proc_handler	= sched_proc_update_handler,
+		.extra1		= &min_sched_granularity_ns,
+		.extra2		= &max_sched_granularity_ns,
+	},
+	{
+		.procname	= "sched_wakeup_granularity_ns",
+		.data		= &sysctl_sched_wakeup_granularity,
+		.maxlen		= sizeof(unsigned int),
+		.mode		= 0644,
+		.proc_handler	= sched_proc_update_handler,
+		.extra1		= &min_wakeup_granularity_ns,
+		.extra2		= &max_wakeup_granularity_ns,
+	},
+#ifdef CONFIG_SMP
+	{
+		.procname	= "sched_tunable_scaling",
+		.data		= &sysctl_sched_tunable_scaling,
+		.maxlen		= sizeof(enum sched_tunable_scaling),
+		.mode		= 0644,
+		.proc_handler	= sched_proc_update_handler,
+		.extra1		= &min_sched_tunable_scaling,
+		.extra2		= &max_sched_tunable_scaling,
+	},
+	{
+		.procname	= "sched_migration_cost_ns",
+		.data		= &sysctl_sched_migration_cost,
+		.maxlen		= sizeof(unsigned int),
+		.mode		= 0644,
+		.proc_handler	= proc_dointvec,
+	},
+	{
+		.procname	= "sched_nr_migrate",
+		.data		= &sysctl_sched_nr_migrate,
+		.maxlen		= sizeof(unsigned int),
+		.mode		= 0644,
+		.proc_handler	= proc_dointvec,
+	},
+#ifdef CONFIG_SCHEDSTATS
+	{
+		.procname	= "sched_schedstats",
+		.data		= NULL,
+		.maxlen		= sizeof(unsigned int),
+		.mode		= 0644,
+		.proc_handler	= sysctl_schedstats,
+		.extra1		= SYSCTL_ZERO,
+		.extra2		= SYSCTL_ONE,
+	},
+#endif /* CONFIG_SCHEDSTATS */
+#endif /* CONFIG_SMP */
+#ifdef CONFIG_NUMA_BALANCING
+	{
+		.procname	= "numa_balancing_scan_delay_ms",
+		.data		= &sysctl_numa_balancing_scan_delay,
+		.maxlen		= sizeof(unsigned int),
+		.mode		= 0644,
+		.proc_handler	= proc_dointvec,
+	},
+	{
+		.procname	= "numa_balancing_scan_period_min_ms",
+		.data		= &sysctl_numa_balancing_scan_period_min,
+		.maxlen		= sizeof(unsigned int),
+		.mode		= 0644,
+		.proc_handler	= proc_dointvec,
+	},
+	{
+		.procname	= "numa_balancing_scan_period_max_ms",
+		.data		= &sysctl_numa_balancing_scan_period_max,
+		.maxlen		= sizeof(unsigned int),
+		.mode		= 0644,
+		.proc_handler	= proc_dointvec,
+	},
+	{
+		.procname	= "numa_balancing_scan_size_mb",
+		.data		= &sysctl_numa_balancing_scan_size,
+		.maxlen		= sizeof(unsigned int),
+		.mode		= 0644,
+		.proc_handler	= proc_dointvec_minmax,
+		.extra1		= SYSCTL_ONE,
+	},
+	{
+		.procname	= "numa_balancing",
+		.data		= NULL, /* filled in by handler */
+		.maxlen		= sizeof(unsigned int),
+		.mode		= 0644,
+		.proc_handler	= sysctl_numa_balancing,
+		.extra1		= SYSCTL_ZERO,
+		.extra2		= SYSCTL_ONE,
+	},
+#endif /* CONFIG_NUMA_BALANCING */
+#endif /* CONFIG_SCHED_DEBUG */
 
-The point is parent is unaware of whether or not there's a userspace.
+How is migration_cost not under SCHED_DEBUG? The bigger problem is that
+world+dog has SCHED_DEBUG=y in their .config.
 
-
->> 2) device is unaware of the bound driver, non page aligned doorbell 
->> doesn't necessarily meant it can be used
-> Yes, non page aligned doorbell can not be used, so there is a check.
-
-
-Typo, what I meant is "it can't be used". That is to say, we should let 
-the vDPA bus driver to decide whether or not it can be used.
-
-Thanks
-
-
->
-> Thanks
-> Zhu Lingshan
->>
->> Let's leave those polices to the driver.
->>
->> Thanks
->>
->>
->>> +    } else {
->>> +        area.addr = vf->notify_pa;
->>> +        area.size = PAGE_SIZE;
->>> +    }
->>> +
->>> +    return area;
->>> +}
->>> +
->>>   /*
->>>    * IFCVF currently does't have on-chip IOMMU, so not
->>>    * implemented set_map()/dma_map()/dma_unmap()
->>> @@ -440,6 +457,7 @@ static const struct vdpa_config_ops ifc_vdpa_ops ={
->>>       .get_config    = ifcvf_vdpa_get_config,
->>>       .set_config    = ifcvf_vdpa_set_config,
->>>       .set_config_cb  = ifcvf_vdpa_set_config_cb,
->>> +    .get_vq_notification = ifcvf_get_vq_notification,
->>>   };
->>>     static int ifcvf_probe(struct pci_dev *pdev, const struct 
->>> pci_device_id *id)
->>
->
 
