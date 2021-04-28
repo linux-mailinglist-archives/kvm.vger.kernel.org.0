@@ -2,89 +2,79 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F1BB236D98B
-	for <lists+kvm@lfdr.de>; Wed, 28 Apr 2021 16:27:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4935436D9A7
+	for <lists+kvm@lfdr.de>; Wed, 28 Apr 2021 16:36:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231585AbhD1OZW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 28 Apr 2021 10:25:22 -0400
-Received: from wforward1-smtp.messagingengine.com ([64.147.123.30]:32831 "EHLO
-        wforward1-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229520AbhD1OZV (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 28 Apr 2021 10:25:21 -0400
-Received: from compute2.internal (compute2.nyi.internal [10.202.2.42])
-        by mailforward.west.internal (Postfix) with ESMTP id C9809B64;
-        Wed, 28 Apr 2021 10:24:35 -0400 (EDT)
-Received: from mailfrontend1 ([10.202.2.162])
-  by compute2.internal (MEProxy); Wed, 28 Apr 2021 10:24:36 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:content-transfer-encoding:date:from
-        :message-id:mime-version:subject:to:x-me-proxy:x-me-proxy
-        :x-me-sender:x-me-sender:x-sasl-enc; s=fm2; bh=HQQ7SpOqqpIwy1otx
-        y1mWGf90mk55isIJKpzIEWUu1w=; b=O+5/nHzHlRhTl3zn3jPZx5Ni81cln3oao
-        vlOjqg6LWgvXJrqOv8obs4fRaPxz2cPnvQXpHhSsJht3lZcjlUf1MSaK0iclkiUF
-        PrAhdUPFdQczW7hfLE2ifucktETeVqwE23oVIkfz7W6teKVNkMwWExUxj9oFiizs
-        d3+tuqhNAptxyeK+MXLL+5XAJsPSYGcoBYGaK4TmsT1P2Png2jja/qV+W2X3dNdM
-        ENpqomCe0HBJrOeyYZ5IwPlTzKlKKFfPCqaU16ZBlu59t1ScQZK0rFUEv/vVrDCx
-        lXMhsv6CEQjEk6n2ku+J/28OujVljr2mMVXFEQi3QXe5rtl4Wrv8g==
-X-ME-Sender: <xms:InCJYDrxundC7WYciFjOmv2ygrpJ74plT-1tgE3QNiT86yqRcU3wgw>
-    <xme:InCJYNrtwORwdx_yk2wjh8CKyGszyCTLjkQ12WUX8kL-biEnYSlvX9qngaQbTxwA2
-    yOC0iKheOpqdbgNaME>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeduledrvddvvddgheduucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
-    cujfgurhephffvufffkffoggfgsedtkeertdertddtnecuhfhrohhmpeffrghvihguucfg
-    ughmohhnughsohhnuceouggrvhhiugdrvggumhhonhgushhonhesohhrrggtlhgvrdgtoh
-    hmqeenucggtffrrghtthgvrhhnpeduhfetvdfhgfeltddtgeelheetveeufeegteevtddu
-    iedvgeejhfdukeegteehheenucfkphepkedurddukeejrddviedrvdefkeenucevlhhush
-    htvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegurghvihgurdgvughm
-    ohhnughsohhnsehorhgrtghlvgdrtghomh
-X-ME-Proxy: <xmx:InCJYAN6LwT4F_kI-ZrSJDsYSOal9EHWCwOLABuSbw5efip584eLXA>
-    <xmx:InCJYG4Rfck2DvMzNI4VuZbwFJTvMLIMgIkQOv9owGXXOV6tFyRLNw>
-    <xmx:InCJYC4EldmNbbTlIWMexAUYRyxGTgAazj-35dUTwHF2DNTm86TwQQ>
-    <xmx:I3CJYPz9HB7OH-lak-hCi56L6NnX36Ww0D5UBexpmEW3ItPFvTAyRZq_yO0>
-Received: from disaster-area.hh.sledj.net (disaster-area.hh.sledj.net [81.187.26.238])
-        by mail.messagingengine.com (Postfix) with ESMTPA;
-        Wed, 28 Apr 2021 10:24:33 -0400 (EDT)
-Received: from localhost (disaster-area.hh.sledj.net [local])
-        by disaster-area.hh.sledj.net (OpenSMTPD) with ESMTPA id b1bbd0bf;
-        Wed, 28 Apr 2021 14:24:31 +0000 (UTC)
-From:   David Edmondson <david.edmondson@oracle.com>
-To:     qemu-devel@nongnu.org
-Cc:     qemu-trivial@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
-        kvm@vger.kernel.org, David Edmondson <david.edmondson@oracle.com>
-Subject: [PATCH] accel: kvm: clarify that extra exit data is hexadecimal
-Date:   Wed, 28 Apr 2021 15:24:31 +0100
-Message-Id: <20210428142431.266879-1-david.edmondson@oracle.com>
-X-Mailer: git-send-email 2.30.2
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+        id S237045AbhD1Og5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 28 Apr 2021 10:36:57 -0400
+Received: from mail.kernel.org ([198.145.29.99]:53790 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S235864AbhD1Og4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 28 Apr 2021 10:36:56 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id A00E86143B;
+        Wed, 28 Apr 2021 14:36:11 +0000 (UTC)
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94)
+        (envelope-from <maz@kernel.org>)
+        id 1lblIP-009s5K-EV; Wed, 28 Apr 2021 15:36:09 +0100
+Date:   Wed, 28 Apr 2021 15:36:08 +0100
+Message-ID: <87k0omo4rr.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Alexandru Elisei <alexandru.elisei@arm.com>
+Cc:     Alex =?UTF-8?B?QmVubsOpZQ==?= <alex.bennee@linaro.org>,
+        kvm@vger.kernel.org, shashi.mallela@linaro.org,
+        eric.auger@redhat.com, qemu-arm@nongnu.org,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        christoffer.dall@arm.com
+Subject: Re: [kvm-unit-tests PATCH v1 1/4] arm64: split its-trigger test into KVM and TCG variants
+In-Reply-To: <996210ae-9c63-54ff-1a65-6dbd63da74d2@arm.com>
+References: <20210428101844.22656-1-alex.bennee@linaro.org>
+        <20210428101844.22656-2-alex.bennee@linaro.org>
+        <eaed3c63988513fe2849c2d6f22937af@kernel.org>
+        <87fszasjdg.fsf@linaro.org>
+        <996210ae-9c63-54ff-1a65-6dbd63da74d2@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com, alex.bennee@linaro.org, kvm@vger.kernel.org, shashi.mallela@linaro.org, eric.auger@redhat.com, qemu-arm@nongnu.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, christoffer.dall@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When dumping the extra exit data provided by KVM, make it clear that
-the data is hexadecimal.
+On Wed, 28 Apr 2021 15:00:15 +0100,
+Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+> 
+> I interpret that as that an INVALL guarantees that a change is
+> visible, but it the change can become visible even without the
+> INVALL.
 
-At the same time, zero-pad the output.
+Yes. Expecting the LPI to be delivered or not in the absence of an
+invalidate when its configuration has been altered is wrong. The
+architecture doesn't guarantee anything of the sort.
 
-Signed-off-by: David Edmondson <david.edmondson@oracle.com>
----
- accel/kvm/kvm-all.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+> The test relies on the fact that changes to the LPI tables are not
+> visible *under KVM* until the INVALL command, but that's not
+> necessarily the case on real hardware. To match the spec, I think
+> the test "dev2/eventid=20 still does not trigger any LPI" should be
+> removed and the stats reset should take place before the
+> configuration for LPI 8195 is set to the default.
 
-diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-index b6d9f92f15..93d7cbfeaf 100644
---- a/accel/kvm/kvm-all.c
-+++ b/accel/kvm/kvm-all.c
-@@ -2269,7 +2269,7 @@ static int kvm_handle_internal_error(CPUState *cpu, struct kvm_run *run)
-         int i;
- 
-         for (i = 0; i < run->internal.ndata; ++i) {
--            fprintf(stderr, "extra data[%d]: %"PRIx64"\n",
-+            fprintf(stderr, "extra data[%d]: 0x%016"PRIx64"\n",
-                     i, (uint64_t)run->internal.data[i]);
-         }
-     }
+If that's what the test expects (I haven't tried to investigate), it
+should be dropped completely, rather than trying to sidestep it for
+TCG.
+
+Thanks,
+
+	M.
+
 -- 
-2.30.2
-
+Without deviation from the norm, progress is not possible.
