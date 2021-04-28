@@ -2,136 +2,105 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BD2EF36E0EB
-	for <lists+kvm@lfdr.de>; Wed, 28 Apr 2021 23:29:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E337B36E114
+	for <lists+kvm@lfdr.de>; Wed, 28 Apr 2021 23:41:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230382AbhD1V3v (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 28 Apr 2021 17:29:51 -0400
-Received: from mail-dm6nam11on2068.outbound.protection.outlook.com ([40.107.223.68]:43680
-        "EHLO NAM11-DM6-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S229593AbhD1V3v (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 28 Apr 2021 17:29:51 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Gb8iVXHvQ713jtIvgf392fD90h/gzXglwkVi9zI07yWME8mb/E3045Ad62i/bE39i/sLl22aPoNhIB7ZHY6xwIhh7Pp6WMEw2br1d/HvqPu5oDMs88+SV2k+Ia/UOr9kfktNVH/T67nYvJoChk0ncKkEE8SKXFnHJ2U7edVwwsTX0dNKvR1J/SjHCy9q2d8Yjus1phdu7czu0XoCGcPMrRPZD5fc1WkzSmG/i+pTst6CEMHTGdS/P2R0C/h/X8eikD2XjffedLZo6BDzhEtmRYxy5JHagari77ZxBAd6/DFBZT4lJi9S9rg5nH/RjOlEMRm6OALIxnyrsK+tXhuzWA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=/7tq4EsWjuf1lch4ZBYoXtGOdABH7AuIiL6xazS/V8U=;
- b=fAIR/dPf0cQzbMIdk2qBO+NzLzIWM+6iR5ujLGbciNdhoGM1O8fHrbLFzwsMoO2FD/6G2cEh2UqoG0TlhbcUUPkZttrcNkA/ogCqY/UF9+G82kHWneQIHInYEEymQlMKcVBVUMdwDpTOt7IQ38Dd8qyhgGaX7GKpuCt5u+iKHbdBA7IQT3BW6FwAqP/TEIcWDdGJ0Jr91v2bGm5Wd7fMXrMkXdVe8I7rhY26+V/8i6EoIJ6K/vfyl29ItxKLz4pk8H7jIhJvN0Yg/P/oagDFDc8b5pazHeIDrpK0BVThckgZUk+ehAsvV+VyqN6i+iUoxeNPmZg3i25254IHCY1zsQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=/7tq4EsWjuf1lch4ZBYoXtGOdABH7AuIiL6xazS/V8U=;
- b=my8f6JJcgAgpV8LVF+nh5o8Q1Tv+0LkdXyTIF9a2UqHXnATL2dll2r9F6R5y7s1a+48/Y4LtR+daBsvODrHXN9WpLNBblAspF0WUUCET7wOqDEwSuSaX5WoZDacYcjuArzlZveic+M+lf3ABUC4CFGVf+j/FW6gvv8MqPDnMdSk=
-Authentication-Results: redhat.com; dkim=none (message not signed)
- header.d=none;redhat.com; dmarc=none action=none header.from=amd.com;
-Received: from SN6PR12MB2718.namprd12.prod.outlook.com (2603:10b6:805:6f::22)
- by SA0PR12MB4349.namprd12.prod.outlook.com (2603:10b6:806:98::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4065.23; Wed, 28 Apr
- 2021 21:29:04 +0000
-Received: from SN6PR12MB2718.namprd12.prod.outlook.com
- ([fe80::9898:5b48:a062:db94]) by SN6PR12MB2718.namprd12.prod.outlook.com
- ([fe80::9898:5b48:a062:db94%6]) with mapi id 15.20.4065.027; Wed, 28 Apr 2021
- 21:29:04 +0000
-Cc:     brijesh.singh@amd.com, x86@kernel.org, tglx@linutronix.de,
-        jroedel@suse.de, thomas.lendacky@amd.com,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        pbonzini@redhat.com
-Subject: Re: [PATCH 1/3] x86/sev-es: Rename sev-es.{ch} to sev.{ch}
-To:     Borislav Petkov <bp@alien8.de>
-References: <20210427111636.1207-1-brijesh.singh@amd.com>
- <20210427111636.1207-2-brijesh.singh@amd.com> <YIhCwtMA6WnDNvxt@zn.tnic>
-From:   Brijesh Singh <brijesh.singh@amd.com>
-Message-ID: <da102340-eaee-c76b-9773-bc63cf0e8f11@amd.com>
-Date:   Wed, 28 Apr 2021 16:29:01 -0500
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
- Gecko/20100101 Thunderbird/78.10.0
-In-Reply-To: <YIhCwtMA6WnDNvxt@zn.tnic>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-Originating-IP: [70.112.153.56]
-X-ClientProxiedBy: SA0PR12CA0005.namprd12.prod.outlook.com
- (2603:10b6:806:6f::10) To SN6PR12MB2718.namprd12.prod.outlook.com
- (2603:10b6:805:6f::22)
+        id S231157AbhD1Vmj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 28 Apr 2021 17:42:39 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:54225 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229890AbhD1Vmi (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 28 Apr 2021 17:42:38 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1619646112;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=/v4ZNp/t+nbs+oINjnStizm6FqJH+orku1bF/7PUqww=;
+        b=cMwvXnfUr57c68LBeuVokSii1kuu3N3j8L9JOpzAY9VkAhzxj4j5tdV/s59pO14lwcCex6
+        uiO6Tx+EoX7qETbXpxuNTiRvAVqehutwsIPH3TM2pbdSkzjYmSGgKJVYJkOim9G95v3t0K
+        0ta+j8eSEtsphFIZQysA4cSpX0ODyXc=
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
+ [209.85.218.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-464-5300reXqOhuEH-YAtLP-iw-1; Wed, 28 Apr 2021 17:41:50 -0400
+X-MC-Unique: 5300reXqOhuEH-YAtLP-iw-1
+Received: by mail-ej1-f72.google.com with SMTP id s23-20020a1709069617b02903907023c7c0so2541789ejx.0
+        for <kvm@vger.kernel.org>; Wed, 28 Apr 2021 14:41:50 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:to:cc:references:from:subject:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=/v4ZNp/t+nbs+oINjnStizm6FqJH+orku1bF/7PUqww=;
+        b=kRisU9DEAwR0AD+EwhBz1IQA8SDhrZu4hpEnGEZ/wlQIzubg91E9HDXDWZKHHyksLC
+         fv9lwdPxJ8ir0hpP3tacKqfqdxsrQzMcZSZ4oTHBDZCPuLCbh/Lwx+S9jfhXkDT0gGIS
+         x9EhDsS9i784rC49MNKkSk44lmBAAit5BgMRFbWa5BL2rdx7R2gVThEQiiLZ5QyoQ+s4
+         XkPsSwf4+nnRV+CHiodKhvrIbItBHbpz9upNZIxUwWWa2srLz+4lZ+wYAEXa2MNYqzN8
+         oxTuKED/o/Or22jqR92zMX0khqg/fMSxv9mn6VqqZi7711BfMavEglEiDQgQ1KBzshMH
+         sbjA==
+X-Gm-Message-State: AOAM533u2QDOxvODr183yOc9Uj62m23n/fauD2IiEjh/OMOyg0HBxUkz
+        0S3fO5F6FiXVKAWG3Ax1W0L9GLXywWLaP2FhLyLk8YbrnBlcy0pW3L85DLBooHH+NYIzcpngaYs
+        QnKMb3hs9pMOK
+X-Received: by 2002:a05:6402:154:: with SMTP id s20mr14652845edu.90.1619646109792;
+        Wed, 28 Apr 2021 14:41:49 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzJeT8jZKUCPuU3YCSZ5nBJlLlCjlR3d1gsNbygte6vsS9V5m8sz6NcZ0dd5mK7qLGGSbQ64w==
+X-Received: by 2002:a05:6402:154:: with SMTP id s20mr14652829edu.90.1619646109630;
+        Wed, 28 Apr 2021 14:41:49 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:63a7:c72e:ea0e:6045? ([2001:b07:6468:f312:63a7:c72e:ea0e:6045])
+        by smtp.gmail.com with ESMTPSA id z4sm734735edb.97.2021.04.28.14.41.47
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 28 Apr 2021 14:41:48 -0700 (PDT)
+To:     Ben Gardon <bgardon@google.com>
+Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
+        Peter Xu <peterx@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Peter Shier <pshier@google.com>,
+        Junaid Shahid <junaids@google.com>,
+        Jim Mattson <jmattson@google.com>,
+        Yulei Zhang <yulei.kernel@gmail.com>,
+        Wanpeng Li <kernellwp@gmail.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Xiao Guangrong <xiaoguangrong.eric@gmail.com>
+References: <20210427223635.2711774-1-bgardon@google.com>
+ <20210427223635.2711774-6-bgardon@google.com>
+ <997f9fe3-847b-8216-c629-1ad5fdd2ffae@redhat.com>
+ <CANgfPd8RZXQ-BamwQPS66Q5hLRZaDFhi0WaA=ZvCP4BbofiUhg@mail.gmail.com>
+ <d936b13b-bb00-fc93-de3b-adc59fa32a7b@redhat.com>
+ <CANgfPd9kVJOAR_uq+oh9kE2gr00EUAGSPiJ9jMR9BdG2CAC+BA@mail.gmail.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH 5/6] KVM: x86/mmu: Protect kvm->memslots with a mutex
+Message-ID: <5b4a0c30-118c-da1f-281c-130438a1c833@redhat.com>
+Date:   Wed, 28 Apr 2021 23:41:47 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.7.0
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from Brijeshs-MacBook-Pro.local (70.112.153.56) by SA0PR12CA0005.namprd12.prod.outlook.com (2603:10b6:806:6f::10) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4087.25 via Frontend Transport; Wed, 28 Apr 2021 21:29:03 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: fe054cbe-d563-40df-f9d0-08d90a8ca5ab
-X-MS-TrafficTypeDiagnostic: SA0PR12MB4349:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <SA0PR12MB4349ECD0000740F3EE3292E2E5409@SA0PR12MB4349.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:6790;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: goX9FusoRUaxcRqd3Uu/vxLi34UAtaIPSXDx23EIsqk+7XWCNVaS5SKxYIjpYZAu0bi2QViavIN3PH0uczrTacazTorsaWqkulXke09sJv97zC1VfIUFXZ9Bo221l74mMQqjgwrZ/sTjx4QjuDrRdiCa3sR+Qo606WCkxUlotttHtWsMT5uUHRqFRjUMQZE9wdZ14uNlXXxmIeil+3sUu0xtZky6c0cXn8uCr5mP/vmMaqn2q5zn7kRuQue1afTNKj9EZLaPWW+Xp/lzJOFFWKzvrvW2iSi5L7lckD2ydzRYHQBx27abM/wwzEtEDHG0NaEwzuAtMNB08cVU7UTBcddsFQE6KureBQeXHX+/lE5Gy2pdX54k9zvWksYBMM44jl41ZeMuiyRFPg1YAibvtKoO7xefl00SjkR8gggGZpiVmifsNMrCFvK+qrCsGnn+vsDBB7wFlAtg6l6T5FM15zoe0iE44gdwORqY4r4pECfRz8r/cQEKEVj8soo/rTDYmaUBQG07tE4zB+orKfZP1SqyWDmI3FqeAmzwaiuudb9mK0W2uWgDIucRiRIikwZqr4nDVJzMkRjPNhqx89acuf9REZNF/Xc/Ia/Rv77bk3gSjRGFnvzPmC8WZV4aNnuDC/TGRhfmamtIV7bbs/AsR/ATfGEGy6W9ge6ejqloGxOhu9pcnPYWfPAU7Zmyy8LF7j6VmfjeoGV6NLSS28NrH5AI7qFOxGvxoR3EebospUQ=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2718.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(376002)(136003)(346002)(396003)(39850400004)(366004)(44832011)(6512007)(6486002)(5660300002)(38350700002)(478600001)(83380400001)(6916009)(186003)(6506007)(66476007)(956004)(52116002)(8676002)(66556008)(36756003)(2906002)(66946007)(16526019)(31686004)(31696002)(38100700002)(2616005)(26005)(4326008)(86362001)(4744005)(316002)(53546011)(8936002)(43740500002)(45980500001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: =?utf-8?B?Y0pVWFdNVXBlTkcydzdOY0gvdUxPN2VKM1JEM1NUblFMS1lUaXJjdHNvRVl6?=
- =?utf-8?B?TWpob3M0S2cycWQwMEZINjk5aDRxS2xkOXdPL25HaFVDQm4vWU9mNmd1K2VR?=
- =?utf-8?B?MWFuRTRrZnduaE5ITFNqb2xiRXlIWjl6SFVXWktZYXY4ajkwc2tMSXZkQUgx?=
- =?utf-8?B?cmt1THhhV1JRbWtxaTdFcm1TN2ZGWEVlblpPN2hQcGtyVFJ3WCttQzV2RG9R?=
- =?utf-8?B?a0VhSnlUVy9tU20vakxJcTJBZVJYZ0JKby94MGN5NEZIOW1mWU4yWENsWm0z?=
- =?utf-8?B?cEdvTDI0M3ZRLzFPWDUvek9FMUJLRzFLbk5WNlVVSTVrRzlRNmYxWld6dThE?=
- =?utf-8?B?N1dpWlVZMVI2U1lnTVFZR2dzYmRUbE82K1dtaE11QVZsblR4clF4WjI4Vkdp?=
- =?utf-8?B?dWx0UUh2N1puTmlPUzNmbEZVbExzb21ObDZRQWlrdkVXcDVzU1k0dkM0T0l3?=
- =?utf-8?B?bVFvbzNHbm9nYjJwTEFDTHVLSjU0ZUdUTnlDc2FsS2xtTm5RL3N2WFFWQWh0?=
- =?utf-8?B?UUNmTGxjaWdjY2F6MlVtZDN1bnAyWEUxZjAwQjZESWtvUlF4aDZOd3ZNMDB4?=
- =?utf-8?B?OVROUVV5SjRjaUFjazJQTXNiN2o5RExFVmlaalZJVHFnUnhJQlgzeUpwU2FP?=
- =?utf-8?B?UE5xZ21vMEtNaTdUSCtMUDRBSDl2WWtHZHpuQUozeTUrV1o0SG41ZFFQSkRS?=
- =?utf-8?B?cmZGZE5jdHRibHljbWNMSy9LOVZrd3ZZbUh0R0lVV3pyaVBqbDAwOVVCWnRn?=
- =?utf-8?B?YTB3WmZrLzEzNkx3Y1JRZEpZLy9KcDJENlhUUStnWEprNVVKamtGVE4xSWJi?=
- =?utf-8?B?NFNHTGV6eDFESXR3WFkzYTB1Z0wvMFAyUVBUWU1ydzJNVFJkQ2FTN3M1cjFO?=
- =?utf-8?B?elo3V1dwbkU4L1BFSHVubU92YU51c2Y4a1ZnUkNKYkh4ZDdKMmdIWUcvMENN?=
- =?utf-8?B?Wk1YUTdmVnNSNmhHZU9pdFllS1ZoZWNGUHpOMEhpamV4cmhtWU1kckQ0WVdJ?=
- =?utf-8?B?aVpucjJoTzR1bmgxWmM5RWoweXlPOHpEZGo5aXhmZGFqWU53dlJXVUM0eisr?=
- =?utf-8?B?MU4yNW9KZk83R2FmUHNWSEg5cDV3dkM2TUVvYUdRYTczT0U5eVgwbjJXemlh?=
- =?utf-8?B?L1ZDTkw2UC9YdTVGWFhHTXhXRFFUNm82SlZxc1RISUovckJ0Tk4rVFdNNGtw?=
- =?utf-8?B?MTZXak10T3kzbU9ZYy9MTWlJaWlBaVVPWFc4Rnc2TjdnWXZtRzgySVFZSU9k?=
- =?utf-8?B?WGJXKzRoZEM0TUsvZTcwYkJaMGhBbzlHdFc3RVJJUm9vYUlqQXN1a1J0YnFZ?=
- =?utf-8?B?clI3QldyUEhWMWJMT29Ha21vSGpnbk42QTZrcEdjb3B6dmxtNjNIdVlDN1hi?=
- =?utf-8?B?UnhDRFNFUnVVaWIwRC9TQVBXem1GYWNYVmtQYkFBdEo0WXFGenhubWhpRHFB?=
- =?utf-8?B?QmJNUzd3by8zb3pCRjl3NldGMFpGM1VLamdyVHZ2c3ZpaHlnU0hCNEJsK1d6?=
- =?utf-8?B?amhWaDhaUlVwbHFJbC9DTnhvUk9USkVpdHc1V3E1dVpMMFl5THAzUGNLbkJS?=
- =?utf-8?B?RHE0cTVqZTREMnhtTUZoR0IvNlhJOHQvbllLa1N4ZE5yOHVBQ3RvVGNqNlVB?=
- =?utf-8?B?Wkk5TmZGdC8wbXdkV1VqYWRoUjRPRFFFcGJwSmlkMG1OSVV1S2hERkZDMFlY?=
- =?utf-8?B?ZU4wQ1pRcXU0cFhXcDMwbFI4NkdDazhiTkJ1d1JJSDhCMXRVcnJLalFIOVg1?=
- =?utf-8?Q?wCfjboF5a4gB01H7i3xgpY4oPgk1q4euDFp69xg?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: fe054cbe-d563-40df-f9d0-08d90a8ca5ab
-X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2718.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Apr 2021 21:29:04.2455
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 2zwjhEvXphD4998zifbG+KGWN0vPyQtjCXGwTuiSnw+dwkdYzbyvVIm/2vSvmqngv+SjM6WRuRRdwBzbk1kMWQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR12MB4349
+In-Reply-To: <CANgfPd9kVJOAR_uq+oh9kE2gr00EUAGSPiJ9jMR9BdG2CAC+BA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On 28/04/21 22:40, Ben Gardon wrote:
+> ... However with the locking you propose below, we might still run
+> into issues on a move or delete, which would mean we'd still need the
+> separate memory allocation for the rmaps array. Or we do some
+> shenanigans where we try to copy the rmap pointers from the other set
+> of memslots.
 
-On 4/27/21 11:58 AM, Borislav Petkov wrote:
-> On Tue, Apr 27, 2021 at 06:16:34AM -0500, Brijesh Singh wrote:
->> The SEV-SNP builds upon the SEV-ES functionality while adding new hardware
->> protection. Version 2 of the GHCB specification adds new NAE events that
->> are SEV-SNP specific. Rename the sev-es.{ch} to sev.{ch} so that we can
->> consolidate all the SEV-ES and SEV-SNP in a one place.
-> No "we":
->
-> ... so that all SEV* functionality can be consolidated in one place."
+If that's (almost) as easy as passing old to 
+kvm_arch_prepare_memory_region, that would be totally okay.
 
+> My only worry is the latency this could add to a nested VM launch, but
+> it seems pretty unlikely that that would be frequently coinciding with
+> a memslot change in practice.
 
-oops, I did it again :(.
+Right, memslot changes in practice occur only at boot and on hotplug. 
+If that was a problem we could always make the allocation state 
+off/in-progress/on, allowing to check the allocation state out of the 
+lock.  This would only potentially slow down the first nested VM launch.
 
-Let know if you want me to send the updated description ?
+Paolo
 
->
-> Rest looks good.
->
