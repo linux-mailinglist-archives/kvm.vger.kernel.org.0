@@ -2,76 +2,112 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E9D3736D890
-	for <lists+kvm@lfdr.de>; Wed, 28 Apr 2021 15:48:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E977C36D907
+	for <lists+kvm@lfdr.de>; Wed, 28 Apr 2021 15:59:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239900AbhD1NsS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 28 Apr 2021 09:48:18 -0400
-Received: from mail-wr1-f50.google.com ([209.85.221.50]:44743 "EHLO
-        mail-wr1-f50.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239888AbhD1NsQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 28 Apr 2021 09:48:16 -0400
-Received: by mail-wr1-f50.google.com with SMTP id h15so10888609wre.11;
-        Wed, 28 Apr 2021 06:47:30 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=iGL4C5pisQWePSYbT1yoPzAALGDCskG6Y8klDr3F6nM=;
-        b=PmRSIZxDKcE8Th/T03mo9M+jroj+CMvtCwp8KOQclXwdRAe3yZpel91m5Nqgdznp8k
-         n9JYbatuAeR0IOKTOKxkT+l2m+Qb7JhQbpQblQpKcLzYq0JfGuecMXOIxyJL251kDcFL
-         DqGz90WaKftdHliRnDnAlpc0U3kmhGGeJNWih/QU1P3MJIhauQnNyA7g8SSMqaxcRA/9
-         U44Ym30iibN9Pitdy8KVB9ioqgINpfXpwwzw+vHR1aPonDTsqFIKjT/APo6NgamaYLvO
-         HkMeFIhSuvAzm1eMKaVEJXNw+YhyVKOFSiDOV/esfH8zFm1VjD8RMdg0ZqEYm/kiGNAJ
-         UCRA==
-X-Gm-Message-State: AOAM532Z4z0zqDnoktt61k5h2cKp3bv7sOb0ezLocyJUwqm2ESCnvYXM
-        3WmUPfRgBWDD4L1WtmN3lls=
-X-Google-Smtp-Source: ABdhPJw4Dkn+Z9URbKoQsbJhddTdNOfjqh5vsI4fkVhJPc8IJJJpiLV1ZYkAWFDulJlSfBchlrrv8g==
-X-Received: by 2002:adf:de8b:: with SMTP id w11mr20658775wrl.315.1619617650238;
-        Wed, 28 Apr 2021 06:47:30 -0700 (PDT)
-Received: from liuwe-devbox-debian-v2 ([51.145.34.42])
-        by smtp.gmail.com with ESMTPSA id u9sm3674051wmc.38.2021.04.28.06.47.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 28 Apr 2021 06:47:29 -0700 (PDT)
-Date:   Wed, 28 Apr 2021 13:47:28 +0000
-From:   Wei Liu <wei.liu@kernel.org>
-To:     Vineeth Pillai <viremana@linux.microsoft.com>
-Cc:     Lan Tianyu <Tianyu.Lan@microsoft.com>,
-        Michael Kelley <mikelley@microsoft.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, Wei Liu <wei.liu@kernel.org>,
-        Stephen Hemminger <sthemmin@microsoft.com>,
-        Haiyang Zhang <haiyangz@microsoft.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "K. Y. Srinivasan" <kys@microsoft.com>, x86@kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-hyperv@vger.kernel.org
-Subject: Re: [PATCH v4 2/7] hyperv: SVM enlightened TLB flush support flag
-Message-ID: <20210428134728.jmu6bnjemhid3up7@liuwe-devbox-debian-v2>
-References: <cover.1619556430.git.viremana@linux.microsoft.com>
- <cce3e52fde732ccdc7a34d2eb1e2d59917e4e5e0.1619556430.git.viremana@linux.microsoft.com>
+        id S239050AbhD1OAZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 28 Apr 2021 10:00:25 -0400
+Received: from foss.arm.com ([217.140.110.172]:42894 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S230245AbhD1OAY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 28 Apr 2021 10:00:24 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 81EA4ED1;
+        Wed, 28 Apr 2021 06:59:39 -0700 (PDT)
+Received: from [192.168.0.110] (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 4BCF23F882;
+        Wed, 28 Apr 2021 06:59:38 -0700 (PDT)
+Subject: Re: [kvm-unit-tests PATCH v1 1/4] arm64: split its-trigger test into
+ KVM and TCG variants
+To:     =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+        Marc Zyngier <maz@kernel.org>
+Cc:     kvm@vger.kernel.org, shashi.mallela@linaro.org,
+        eric.auger@redhat.com, qemu-arm@nongnu.org,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        christoffer.dall@arm.com
+References: <20210428101844.22656-1-alex.bennee@linaro.org>
+ <20210428101844.22656-2-alex.bennee@linaro.org>
+ <eaed3c63988513fe2849c2d6f22937af@kernel.org> <87fszasjdg.fsf@linaro.org>
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+Message-ID: <996210ae-9c63-54ff-1a65-6dbd63da74d2@arm.com>
+Date:   Wed, 28 Apr 2021 15:00:15 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <cce3e52fde732ccdc7a34d2eb1e2d59917e4e5e0.1619556430.git.viremana@linux.microsoft.com>
+In-Reply-To: <87fszasjdg.fsf@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Apr 27, 2021 at 08:54:51PM +0000, Vineeth Pillai wrote:
-> Bit 22 of HYPERV_CPUID_FEATURES.EDX is specific to SVM and specifies
-> support for enlightened TLB flush. With this enlightenment enabled,
-> ASID invalidations flushes only gva->hpa entries. To flush TLB entries
-> derived from NPT, hypercalls should be used
-> (HvFlushGuestPhysicalAddressSpace or HvFlushGuestPhysicalAddressList)
-> 
-> Signed-off-by: Vineeth Pillai <viremana@linux.microsoft.com>
+Hi,
 
-Acked-by: Wei Liu <wei.liu@kernel.org>
+On 4/28/21 1:06 PM, Alex Bennée wrote:
+> Marc Zyngier <maz@kernel.org> writes:
+>
+>> On 2021-04-28 11:18, Alex Bennée wrote:
+>>> A few of the its-trigger tests rely on IMPDEF behaviour where caches
+>>> aren't flushed before invall events. However TCG emulation doesn't
+>>> model any invall behaviour and as we can't probe for it we need to be
+>>> told. Split the test into a KVM and TCG variant and skip the invall
+>>> tests when under TCG.
+>>> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+>>> Cc: Shashi Mallela <shashi.mallela@linaro.org>
+>>> ---
+>>>  arm/gic.c         | 60 +++++++++++++++++++++++++++--------------------
+>>>  arm/unittests.cfg | 11 ++++++++-
+>>>  2 files changed, 45 insertions(+), 26 deletions(-)
+>>> diff --git a/arm/gic.c b/arm/gic.c
+>>> index 98135ef..96a329d 100644
+>>> --- a/arm/gic.c
+>>> +++ b/arm/gic.c
+>>> @@ -36,6 +36,7 @@ static struct gic *gic;
+>>>  static int acked[NR_CPUS], spurious[NR_CPUS];
+>>>  static int irq_sender[NR_CPUS], irq_number[NR_CPUS];
+>>>  static cpumask_t ready;
+>>> +static bool under_tcg;
+>>>  static void nr_cpu_check(int nr)
+>>>  {
+>>> @@ -734,32 +735,38 @@ static void test_its_trigger(void)
+>>>  	/*
+>>>  	 * re-enable the LPI but willingly do not call invall
+>>>  	 * so the change in config is not taken into account.
+>>> -	 * The LPI should not hit
+>>> +	 * The LPI should not hit. This does however depend on
+>>> +	 * implementation defined behaviour - under QEMU TCG emulation
+>>> +	 * it can quite correctly process the event directly.
+>> It looks to me that you are using an IMPDEF behaviour of *TCG*
+>> here. The programming model mandates that there is an invalidation
+>> if you change the configuration of the LPI.
+> But does it mandate that the LPI cannot be sent until the invalidation?
+
+I think Marc is referring to this section of the GIC architecture (Arm IHI 0069F,
+page 5-82, I've highlighted the interesting bits):
+
+"A Redistributor can cache the information from the LPI Configuration tables
+pointed to by GICR_PROPBASER, when GICR_CTLR.EnableLPI == 1, subject to all of the
+following rules:
+* Whether or not one or more caches are present is IMPLEMENTATION DEFINED. Where
+at least one cache is present, the structure and size is IMPLEMENTATION DEFINED.
+* An LPI Configuration table entry might be allocated into the cache at any time.
+* A cached LPI Configuration table entry is not guaranteed to remain in the cache.
+* A cached LPI Configuration table entry *is not guaranteed to remain incoherent
+with memory*.
+* A change to the LPI configuration *is not guaranteed to be visible until an
+appropriate invalidation operation has completed*"
+
+I interpret that as that an INVALL guarantees that a change is visible, but it the
+change can become visible even without the INVALL.
+
+The test relies on the fact that changes to the LPI tables are not visible *under
+KVM* until the INVALL command, but that's not necessarily the case on real
+hardware. To match the spec, I think the test "dev2/eventid=20 still does not
+trigger any LPI" should be removed and the stats reset should take place before
+the configuration for LPI 8195 is set to the default.
+
+Thanks,
+
+Alex
+
