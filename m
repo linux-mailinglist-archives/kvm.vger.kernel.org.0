@@ -2,105 +2,132 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C390536DD53
-	for <lists+kvm@lfdr.de>; Wed, 28 Apr 2021 18:46:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E0E7A36DD66
+	for <lists+kvm@lfdr.de>; Wed, 28 Apr 2021 18:47:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241189AbhD1Qq4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 28 Apr 2021 12:46:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36424 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241162AbhD1Qqz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 28 Apr 2021 12:46:55 -0400
-Received: from mail-ot1-x333.google.com (mail-ot1-x333.google.com [IPv6:2607:f8b0:4864:20::333])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B469AC0613ED
-        for <kvm@vger.kernel.org>; Wed, 28 Apr 2021 09:46:08 -0700 (PDT)
-Received: by mail-ot1-x333.google.com with SMTP id u21-20020a0568301195b02902a2119f7613so12036765otq.10
-        for <kvm@vger.kernel.org>; Wed, 28 Apr 2021 09:46:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=DmiskXVVNt5ciuwEiKHO8o/4wceYpi0Zcrr9JiPcz+4=;
-        b=tKlQZLtx45gwtX02vXG4am95yPgB8gzjVWGEGzkBK5rHSLQtuz5IZ04D40M7aqZ8UA
-         SQrj2s883sseBmwH71ouOzMNI+nk8lJvYORtMOX1fHSPdSmTYM4FgiLNSmREZxAzSaR3
-         MqJ+Vk3vjL9lIS0E0F6NJ0j9VzeXhtVyH+fTVmgE83MhD/Gb3dVdfpD84wFeBMAb2PWR
-         AuJlum8cNObwRmHDfiuGAdA93msryBFu9PTQ1F8YBTwzkIBJh/Yf4Rh98+8ks4HQ7g6K
-         6FiQfzCzyaDxawWQPgKOnVJLKo/6MvQ+R9VGPKwgB7hs4v5qkwXjiJJgkP2K9kczPgWP
-         x2wA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=DmiskXVVNt5ciuwEiKHO8o/4wceYpi0Zcrr9JiPcz+4=;
-        b=bsfeCl6jYr6VDSEt7JBrtomRJiQwRZKzr0QOoKp3DVDrEulaaX7aN9ZRBJJ4OgSalI
-         FmVXi/G1OXxWJG0HSeatDAqwRUWQ6QNuaTKNAZIy5E2exyMGZQ2foTUONXBX+VpoZuvY
-         rj84fdGlmrfbcyIVFaAKkZ1y6e382Z6Ky+tXuKU1TXfDRaYglyCzDjddC+hIKPulmPwi
-         fqgcUY3hFkBeew1EusaEJb3EWWMzikp4ooXC/FEyB3Z2Oo6+5WMlHeNWtSSnsk/QEhDQ
-         3BchujJ+Y9t4bDhfPl/O9gx41ckD0Zo2tRnrPBNNmLCQ5cskgv8vxe/gh3RnL1myRnLl
-         caqA==
-X-Gm-Message-State: AOAM5314EH99f0vZ2My2tXYXddUaxuR8P9P1vvyye4YNeBdW2npiJw3O
-        DYy+g12LXflth/zzbLjTfVOBawhdd45Qvo6LeWVmlA==
-X-Google-Smtp-Source: ABdhPJxm9/4vsmoaNUh37g6GSvioejnyYo2lL7TUff8Bnx5tp58+g23lXhmGQX5QBlQ6T0GCLeWBILuDhGRYFHMfqSo=
-X-Received: by 2002:a9d:7857:: with SMTP id c23mr15021583otm.208.1619628367968;
- Wed, 28 Apr 2021 09:46:07 -0700 (PDT)
-MIME-Version: 1.0
-References: <20210427223635.2711774-1-bgardon@google.com> <20210427223635.2711774-7-bgardon@google.com>
- <1b598516-4478-4de2-4241-d4b517ec03fa@redhat.com>
-In-Reply-To: <1b598516-4478-4de2-4241-d4b517ec03fa@redhat.com>
-From:   Ben Gardon <bgardon@google.com>
-Date:   Wed, 28 Apr 2021 09:45:56 -0700
-Message-ID: <CANgfPd_o+UA4ry7Kpw3WbcPZYm32r+1o=hQmZdazsrZvO4aynA@mail.gmail.com>
-Subject: Re: [PATCH 6/6] KVM: x86/mmu: Lazily allocate memslot rmaps
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
-        Peter Xu <peterx@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Peter Shier <pshier@google.com>,
-        Junaid Shahid <junaids@google.com>,
-        Jim Mattson <jmattson@google.com>,
-        Yulei Zhang <yulei.kernel@gmail.com>,
-        Wanpeng Li <kernellwp@gmail.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Xiao Guangrong <xiaoguangrong.eric@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+        id S241196AbhD1Qrp convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Wed, 28 Apr 2021 12:47:45 -0400
+Received: from mail.kernel.org ([198.145.29.99]:49478 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S241138AbhD1Qro (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 28 Apr 2021 12:47:44 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id C79CA61412;
+        Wed, 28 Apr 2021 16:46:59 +0000 (UTC)
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94)
+        (envelope-from <maz@kernel.org>)
+        id 1lbnKz-009tmL-H6; Wed, 28 Apr 2021 17:46:57 +0100
+Date:   Wed, 28 Apr 2021 17:46:56 +0100
+Message-ID: <87fszanypr.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Alex =?UTF-8?B?QmVubsOpZQ==?= <alex.bennee@linaro.org>
+Cc:     Alexandru Elisei <alexandru.elisei@arm.com>, kvm@vger.kernel.org,
+        shashi.mallela@linaro.org, eric.auger@redhat.com,
+        qemu-arm@nongnu.org, linux-arm-kernel@lists.infradead.org,
+        kvmarm@lists.cs.columbia.edu, christoffer.dall@arm.com
+Subject: Re: [kvm-unit-tests PATCH v1 1/4] arm64: split its-trigger test into KVM and TCG variants
+In-Reply-To: <87czues90k.fsf@linaro.org>
+References: <20210428101844.22656-1-alex.bennee@linaro.org>
+        <20210428101844.22656-2-alex.bennee@linaro.org>
+        <eaed3c63988513fe2849c2d6f22937af@kernel.org>
+        <87fszasjdg.fsf@linaro.org>
+        <996210ae-9c63-54ff-1a65-6dbd63da74d2@arm.com>
+        <87k0omo4rr.wl-maz@kernel.org>
+        <87czues90k.fsf@linaro.org>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8BIT
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: alex.bennee@linaro.org, alexandru.elisei@arm.com, kvm@vger.kernel.org, shashi.mallela@linaro.org, eric.auger@redhat.com, qemu-arm@nongnu.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, christoffer.dall@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Apr 28, 2021 at 3:04 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> On 28/04/21 00:36, Ben Gardon wrote:
-> > -static int kvm_alloc_memslot_metadata(struct kvm_memory_slot *slot,
-> > +static int kvm_alloc_memslot_metadata(struct kvm *kvm,
-> > +                                   struct kvm_memory_slot *slot,
-> >                                     unsigned long npages)
-> >   {
-> >       int i;
-> > @@ -10892,7 +10950,7 @@ static int kvm_alloc_memslot_metadata(struct kvm_memory_slot *slot,
-> >        */
-> >       memset(&slot->arch, 0, sizeof(slot->arch));
+On Wed, 28 Apr 2021 16:37:45 +0100,
+Alex Bennée <alex.bennee@linaro.org> wrote:
+> 
+> 
+> Marc Zyngier <maz@kernel.org> writes:
+> 
+> > On Wed, 28 Apr 2021 15:00:15 +0100,
+> > Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+> >> 
+> >> I interpret that as that an INVALL guarantees that a change is
+> >> visible, but it the change can become visible even without the
+> >> INVALL.
 > >
-> > -     r = alloc_memslot_rmap(slot, npages);
-> > +     r = alloc_memslot_rmap(kvm, slot, npages);
-> >       if (r)
-> >               return r;
-> >
->
-> I wonder why you need alloc_memslot_rmap at all here in
-> kvm_alloc_memslot_metadata, or alternatively why you need to do it in
-> kvm_arch_assign_memslots.  It seems like only one of those would be
-> necessary.
+> > Yes. Expecting the LPI to be delivered or not in the absence of an
+> > invalidate when its configuration has been altered is wrong. The
+> > architecture doesn't guarantee anything of the sort.
+> 
+> Is the underlying hypervisor allowed to invalidate and reload the
+> configuration whenever it wants or should it only be driven by the
+> guests requests?
 
-Oh, that's a good point. We need it in kvm_arch_assign_memslots
-because of the race I identified in the thread for patch 5 of this
-series, but we could remove it from kvm_alloc_memslot_metadata with
-this patch.
+The HW can do it at any time. It all depends on whether the RD has
+cached this LPI configuration or not. KVM relies on the required
+invalidation as a hook to reload the cached state, as it has an
+infinite LPI configuration cache, while TCG doesn't have a cache at
+all. Both approaches are valid implementations.
 
-Of course, it would be much nicer if we could just keep it in
-kvm_alloc_memslot_metadata and find some other way to stop memslots
-without rmaps from being inappropriately installed, if anyone has a
-simpler way to accomplish that.
+> I did consider a more nuanced variant of the test that allowed for a
+> delivery pre-inval and a pass for post-inval as long as it had been
+> delivered one way or another:
+> 
+> --8<---------------cut here---------------start------------->8---
+> modified   arm/gic.c
+> @@ -36,6 +36,7 @@ static struct gic *gic;
+>  static int acked[NR_CPUS], spurious[NR_CPUS];
+>  static int irq_sender[NR_CPUS], irq_number[NR_CPUS];
+>  static cpumask_t ready;
+> +static bool under_tcg;
+>  
+>  static void nr_cpu_check(int nr)
+>  {
+> @@ -687,6 +688,7 @@ static void test_its_trigger(void)
+>  	struct its_collection *col3;
+>  	struct its_device *dev2, *dev7;
+>  	cpumask_t mask;
+> +	bool before, after;
+>  
+>  	if (its_setup1())
+>  		return;
+> @@ -734,15 +736,17 @@ static void test_its_trigger(void)
+>  	/*
+>  	 * re-enable the LPI but willingly do not call invall
+>  	 * so the change in config is not taken into account.
+> -	 * The LPI should not hit
+> +	 * The LPI should not hit. This does however depend on
 
->
-> Paolo
->
+This first point is *wrong*. From the architecture spec:
+
+<quote>
+* A change to the LPI configuration is not guaranteed to be visible
+  until an appropriate invalidation operation has completed:
+
+  - If one or more ITS is implemented, invalidation is performed using
+    the INV or INVALL command. A SYNC command completes the INV and
+    INVALL commands.
+</quote>
+
+*not guaranteed* means that it may fire, it may not.
+
+> +	 * implementation defined behaviour - under QEMU TCG emulation
+> +	 * it can quite correctly process the event directly.
+
+I really don't see the point in testing IMPDEF behaviours. We should
+test for architectural compliance, not for implementation choices.
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
