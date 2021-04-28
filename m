@@ -2,144 +2,186 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F09A436D5A6
-	for <lists+kvm@lfdr.de>; Wed, 28 Apr 2021 12:19:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8DBE536D5AC
+	for <lists+kvm@lfdr.de>; Wed, 28 Apr 2021 12:20:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239229AbhD1KTi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 28 Apr 2021 06:19:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34524 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236343AbhD1KTh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 28 Apr 2021 06:19:37 -0400
-Received: from mail-wr1-x429.google.com (mail-wr1-x429.google.com [IPv6:2a00:1450:4864:20::429])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 74205C06138A
-        for <kvm@vger.kernel.org>; Wed, 28 Apr 2021 03:18:52 -0700 (PDT)
-Received: by mail-wr1-x429.google.com with SMTP id d11so4582065wrw.8
-        for <kvm@vger.kernel.org>; Wed, 28 Apr 2021 03:18:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=oZnOV6h4qE9XN8eV45ogIXJuOiGbasz5bo3bp014tJU=;
-        b=ANukVHXncbLdbgHdhFWXicL6oAdfFtCcf2YirwriVA4no99pPgstEO2RBPIjibx6g8
-         nlffMe5pHxW6pOhzQoEmoo/n+D4hKxlvyGOY7k+NC3PlSWu5Jb4CY8BANgzKFMZqavfU
-         roWKWKJGmaCbeAun1KO/Luh2ACBlD7nxDsp0vFvUeCj+iDoPZir35+uMZzC1Cp2sr4Lu
-         VVN0vSbiol6mSi5ECjnJjcXI4+hSUIkgBUI6ay7IUnvinESDf1WTMc8u1938koOC85Gy
-         x99mUjPVIg6Xste2niTYJqDR5SNkeOpLFtOE6U8z8c8zJuW1KL7geU/8NzMdg+WB77n8
-         gLoQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=oZnOV6h4qE9XN8eV45ogIXJuOiGbasz5bo3bp014tJU=;
-        b=A0ueESOhXl/pfv8yTq620A18Mo3xMi1mX429WOBOxhxdqfAkflPGCqEp7upgsrS72v
-         XWZZ9dGFg88UnPBvNc1r/AC5x2wv49NieSHQvOzZ9Gv4579fHr0Wp62DKV9Qf+kAvrpV
-         VAJlqhlbkWQASY7IW7+zvKi9ZNjzAY4khAQfQqlXgN7ZikyVsAqxjwuHC04yUI6nel8x
-         e8bYsAxVqhkaRYYbZ6hzeWt6pu9t2ka4pE+XwwtWKVI/CtGZiOandYqFITMIRB1D6bG6
-         1R2QbsvtY3lWtPjmzzxefnl86U2wIcsfnLPlMlt+4P6A/0E4sP9ncsgg33V/MKMBr5lj
-         d1qA==
-X-Gm-Message-State: AOAM530BdGyKsLnsn3XjgoiG6OZe6yPImg8JFOpNhjGUddaNHCsozkRy
-        Zt+hZ8hBBBGRm5+Cyut2X40sSQ==
-X-Google-Smtp-Source: ABdhPJx4lXogaQ0G+Fi1V4EswMRVo+Z1RplrLBVXheFEI7EdeYbid5vv/TMhgbDmRt2wHswrTJ4YPg==
-X-Received: by 2002:adf:dd52:: with SMTP id u18mr2611724wrm.32.1619605131119;
-        Wed, 28 Apr 2021 03:18:51 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
-        by smtp.gmail.com with ESMTPSA id u2sm5734412wmc.22.2021.04.28.03.18.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 28 Apr 2021 03:18:44 -0700 (PDT)
-Received: from zen.lan (localhost [127.0.0.1])
-        by zen.linaroharston (Postfix) with ESMTP id 4D0661FF90;
-        Wed, 28 Apr 2021 11:18:44 +0100 (BST)
-From:   =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-To:     kvm@vger.kernel.org
-Cc:     shashi.mallela@linaro.org, alexandru.elisei@arm.com,
-        eric.auger@redhat.com, qemu-arm@nongnu.org,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        christoffer.dall@arm.com, maz@kernel.org,
-        =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Subject: [kvm-unit-tests PATCH v1 4/4] arm64: split its-migrate-unmapped-collection into KVM and TCG variants
-Date:   Wed, 28 Apr 2021 11:18:44 +0100
-Message-Id: <20210428101844.22656-5-alex.bennee@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20210428101844.22656-1-alex.bennee@linaro.org>
-References: <20210428101844.22656-1-alex.bennee@linaro.org>
+        id S239269AbhD1KVC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 28 Apr 2021 06:21:02 -0400
+Received: from mga05.intel.com ([192.55.52.43]:52251 "EHLO mga05.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S230248AbhD1KVB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 28 Apr 2021 06:21:01 -0400
+IronPort-SDR: kpadCj3J+AsXrGk2mCT/D00zqIf/qgoNS0WDNvteuL89SLv8N9QyDs/lSqvEepLXSnCTrImKZw
+ 8hQwxNI2QuzA==
+X-IronPort-AV: E=McAfee;i="6200,9189,9967"; a="282043530"
+X-IronPort-AV: E=Sophos;i="5.82,257,1613462400"; 
+   d="scan'208";a="282043530"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Apr 2021 03:20:15 -0700
+IronPort-SDR: dApj3T9INT2w9mW71TQIAdeviU5ltiqx14WUEmw+LwjnFS3O4jIxFpuC/Hd1E4va7S6f4Z9qIy
+ FcX79hJFbAMQ==
+X-IronPort-AV: E=Sophos;i="5.82,257,1613462400"; 
+   d="scan'208";a="423463379"
+Received: from lingshan-mobl5.ccr.corp.intel.com (HELO [10.254.209.93]) ([10.254.209.93])
+  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Apr 2021 03:20:12 -0700
+Subject: Re: [PATCH 2/2] vDPA/ifcvf: implement doorbell mapping for ifcvf
+To:     Jason Wang <jasowang@redhat.com>, mst@redhat.com
+Cc:     virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20210428082133.6766-1-lingshan.zhu@intel.com>
+ <20210428082133.6766-3-lingshan.zhu@intel.com>
+ <f6d9a424-9025-3eb5-1cb4-0ff22f7bec63@redhat.com>
+ <5052fced-cd9a-e453-5cb2-39cdde60a208@intel.com>
+ <1984491f-cd5e-d4bc-b328-41e2f2e935fd@redhat.com>
+ <ef510c97-1f1c-a121-99db-b659a5f9518c@intel.com>
+ <4e0eda74-04ac-a889-471b-03fe65c65606@redhat.com>
+From:   "Zhu, Lingshan" <lingshan.zhu@intel.com>
+Message-ID: <f4cb4619-5634-e42d-0629-5c40f6b0dcd1@intel.com>
+Date:   Wed, 28 Apr 2021 18:20:10 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.9.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <4e0eda74-04ac-a889-471b-03fe65c65606@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
+Content-Language: en-US
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When running the test in TCG we are basically running on bare metal so
-don't rely on having a particular kernel errata applied.
 
-You might wonder why we handle this with a totally new test name
-instead of adjusting the append as we have before? Well the
-run_migration shell script uses eval "$@" which unwraps the -append
-leading to any second parameter being split and leaving QEMU very
-confused and the test hanging. This seemed simpler than re-writing all
-the test running logic in something sane ;-)
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Cc: Shashi Mallela <shashi.mallela@linaro.org>
----
- arm/gic.c         |  7 ++++++-
- arm/unittests.cfg | 11 ++++++++++-
- 2 files changed, 16 insertions(+), 2 deletions(-)
+On 4/28/2021 6:03 PM, Jason Wang wrote:
+>
+> 在 2021/4/28 下午5:56, Zhu, Lingshan 写道:
+>>
+>>
+>> On 4/28/2021 5:21 PM, Jason Wang wrote:
+>>>
+>>> 在 2021/4/28 下午4:59, Zhu, Lingshan 写道:
+>>>>
+>>>>
+>>>> On 4/28/2021 4:42 PM, Jason Wang wrote:
+>>>>>
+>>>>> 在 2021/4/28 下午4:21, Zhu Lingshan 写道:
+>>>>>> This commit implements doorbell mapping feature for ifcvf.
+>>>>>> This feature maps the notify page to userspace, to eliminate
+>>>>>> vmexit when kick a vq.
+>>>>>>
+>>>>>> Signed-off-by: Zhu Lingshan <lingshan.zhu@intel.com>
+>>>>>> ---
+>>>>>>   drivers/vdpa/ifcvf/ifcvf_main.c | 18 ++++++++++++++++++
+>>>>>>   1 file changed, 18 insertions(+)
+>>>>>>
+>>>>>> diff --git a/drivers/vdpa/ifcvf/ifcvf_main.c 
+>>>>>> b/drivers/vdpa/ifcvf/ifcvf_main.c
+>>>>>> index e48e6b74fe2e..afcb71bc0f51 100644
+>>>>>> --- a/drivers/vdpa/ifcvf/ifcvf_main.c
+>>>>>> +++ b/drivers/vdpa/ifcvf/ifcvf_main.c
+>>>>>> @@ -413,6 +413,23 @@ static int ifcvf_vdpa_get_vq_irq(struct 
+>>>>>> vdpa_device *vdpa_dev,
+>>>>>>       return vf->vring[qid].irq;
+>>>>>>   }
+>>>>>>   +static struct vdpa_notification_area 
+>>>>>> ifcvf_get_vq_notification(struct vdpa_device *vdpa_dev,
+>>>>>> +                                   u16 idx)
+>>>>>> +{
+>>>>>> +    struct ifcvf_hw *vf = vdpa_to_vf(vdpa_dev);
+>>>>>> +    struct vdpa_notification_area area;
+>>>>>> +
+>>>>>> +    if (vf->notify_pa % PAGE_SIZE) {
+>>>>>> +        area.addr = 0;
+>>>>>> +        area.size = 0;
+>>>>>
+>>>>>
+>>>>> We don't need this since:
+>>>>>
+>>>>> 1) there's a check in the vhost vDPA
+>>>> I think you mean this code block in vdpa.c
+>>>>         notify = ops->get_vq_notification(vdpa, index);
+>>>>         if (notify.addr & (PAGE_SIZE - 1))
+>>>>                 return -EINVAL;
+>>>>
+>>>> This should work, however, I think the parent driver should ensure 
+>>>> it passes a PAGE_SIZE aligned address to userspace, to be robust, 
+>>>> to be reliable.
+>>>
+>>>
+>>> The point is parent is unaware of whether or not there's a userspace.
+>> when calling this, I think it targets a usersapce program, why kernel 
+>> space need it, so IMHO no harm if we check this to keep the parent 
+>> driver robust.
+>
+>
+> Again, vDPA device is unaware of what driver that is bound. It could 
+> be virtio-vpda, vhost-vdpa or other in the future. It's only the vDPA 
+> bus driver know how it is actually used.
+>
+>
+>>>
+>>>
+>>>>> 2) device is unaware of the bound driver, non page aligned 
+>>>>> doorbell doesn't necessarily meant it can be used
+>>>> Yes, non page aligned doorbell can not be used, so there is a check.
+>>>
+>>>
+>>> Typo, what I meant is "it can't be used". That is to say, we should 
+>>> let the vDPA bus driver to decide whether or not it can be used.
+>> If it is not page aligned, there would be extra complexities for 
+>> vhost/qemu, I see it as a hardware defect, 
+>
+>
+> It is allowed by the virtio spec, isn't it?
+The spec does not require the doorbell to be page size aligned, however 
+it still a hardware defect if non page size aligned notify base present, 
+I will leave a warning message here instead of the 0 value.
 
-diff --git a/arm/gic.c b/arm/gic.c
-index 96a329d..3bc7477 100644
---- a/arm/gic.c
-+++ b/arm/gic.c
-@@ -843,7 +843,7 @@ static void test_migrate_unmapped_collection(void)
- 		goto do_migrate;
- 	}
- 
--	if (!errata(ERRATA_UNMAPPED_COLLECTIONS)) {
-+	if (!errata(ERRATA_UNMAPPED_COLLECTIONS) && !under_tcg) {
- 		report_skip("Skipping test, as this test hangs without the fix. "
- 			    "Set %s=y to enable.", ERRATA_UNMAPPED_COLLECTIONS);
- 		test_skipped = true;
-@@ -1017,6 +1017,11 @@ int main(int argc, char **argv)
- 		report_prefix_push(argv[1]);
- 		test_migrate_unmapped_collection();
- 		report_prefix_pop();
-+	} else if (!strcmp(argv[1], "its-migrate-unmapped-collection-tcg")) {
-+		under_tcg = true;
-+		report_prefix_push(argv[1]);
-+		test_migrate_unmapped_collection();
-+		report_prefix_pop();
- 	} else if (strcmp(argv[1], "its-introspection") == 0) {
- 		report_prefix_push(argv[1]);
- 		test_its_introspection();
-diff --git a/arm/unittests.cfg b/arm/unittests.cfg
-index d4dbc8b..e8f2e74 100644
---- a/arm/unittests.cfg
-+++ b/arm/unittests.cfg
-@@ -214,13 +214,22 @@ extra_params = -machine gic-version=3 -append 'its-pending-migration'
- groups = its migration
- arch = arm64
- 
--[its-migrate-unmapped-collection]
-+[its-migrate-unmapped-collection-kvm]
- file = gic.flat
- smp = $MAX_SMP
-+accel = kvm
- extra_params = -machine gic-version=3 -append 'its-migrate-unmapped-collection'
- groups = its migration
- arch = arm64
- 
-+[its-migrate-unmapped-collection-tcg]
-+file = gic.flat
-+smp = $MAX_SMP
-+accel = tcg
-+extra_params = -machine gic-version=3 -append 'its-migrate-unmapped-collection-tcg'
-+groups = its migration
-+arch = arm64
-+
- # Test PSCI emulation
- [psci]
- file = psci.flat
--- 
-2.20.1
+Thanks
+Zhu Lingshan
+>
+> Thanks
+>
+>
+>> why adapt to this kind of defects?
+>>
+>> Thanks
+>> Zhu Lingshan
+>>>
+>>> Thanks
+>>>
+>>>
+>>>>
+>>>> Thanks
+>>>> Zhu Lingshan
+>>>>>
+>>>>> Let's leave those polices to the driver.
+>>>>>
+>>>>> Thanks
+>>>>>
+>>>>>
+>>>>>> +    } else {
+>>>>>> +        area.addr = vf->notify_pa;
+>>>>>> +        area.size = PAGE_SIZE;
+>>>>>> +    }
+>>>>>> +
+>>>>>> +    return area;
+>>>>>> +}
+>>>>>> +
+>>>>>>   /*
+>>>>>>    * IFCVF currently does't have on-chip IOMMU, so not
+>>>>>>    * implemented set_map()/dma_map()/dma_unmap()
+>>>>>> @@ -440,6 +457,7 @@ static const struct vdpa_config_ops 
+>>>>>> ifc_vdpa_ops ={
+>>>>>>       .get_config    = ifcvf_vdpa_get_config,
+>>>>>>       .set_config    = ifcvf_vdpa_set_config,
+>>>>>>       .set_config_cb  = ifcvf_vdpa_set_config_cb,
+>>>>>> +    .get_vq_notification = ifcvf_get_vq_notification,
+>>>>>>   };
+>>>>>>     static int ifcvf_probe(struct pci_dev *pdev, const struct 
+>>>>>> pci_device_id *id)
+>>>>>
+>>>>
+>>>
+>>
+>
 
