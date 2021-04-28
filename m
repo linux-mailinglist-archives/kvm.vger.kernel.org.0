@@ -2,146 +2,178 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 140EF36D788
-	for <lists+kvm@lfdr.de>; Wed, 28 Apr 2021 14:40:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0B60C36D785
+	for <lists+kvm@lfdr.de>; Wed, 28 Apr 2021 14:39:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239291AbhD1Mks (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 28 Apr 2021 08:40:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37584 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235630AbhD1Mkr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 28 Apr 2021 08:40:47 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9BD0FC061574;
-        Wed, 28 Apr 2021 05:40:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=m5f/iRhfUWRkjMhQisf/mthD9AMA77TGY3RTn6mcx6Q=; b=Lkqx31gsizhW9o7BpLZsPLAQ6X
-        InmIbkX46YfnQ/lGXXrBca7I7FvxudUMTFr+zICtQzQWdAR++bqAOtaPNtbaLtEcUxJxhXK96B7nG
-        wdCLH/PiJFmNuGWc3NjbHC0ezqo5YRu6o3/hkhUZmMrx+fVlA0b09ziwebO3mJ6ltfSp8/4DA/T1B
-        R76XZCqFJpc2DCxIs4QDwsuwZstPMQHGElGUwkgrJfEquzBC82cmh2n0TMopIsBsJMphtb6jQ7TsD
-        fAz0D6gSwCmInABLAIdKPl8owBaENkX4QSRAhwV4lUm/yjsT/A3EArSFC+A21eTDHweZio6odjPIz
-        xvjHNqbw==;
-Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
-        by casper.infradead.org with esmtpsa (Exim 4.94 #2 (Red Hat Linux))
-        id 1lbjSX-008Hl6-Kr; Wed, 28 Apr 2021 12:38:49 +0000
-Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-        (Client did not present a certificate)
-        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 1D408300091;
-        Wed, 28 Apr 2021 14:38:28 +0200 (CEST)
-Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
-        id F09762CE52E40; Wed, 28 Apr 2021 14:38:27 +0200 (CEST)
-Date:   Wed, 28 Apr 2021 14:38:27 +0200
-From:   Peter Zijlstra <peterz@infradead.org>
-To:     Christian Borntraeger <borntraeger@de.ibm.com>
-Cc:     bristot@redhat.com, bsegall@google.com, dietmar.eggemann@arm.com,
-        greg@kroah.com, gregkh@linuxfoundation.org, joshdon@google.com,
-        juri.lelli@redhat.com, linux-kernel@vger.kernel.org,
-        linux@rasmusvillemoes.dk, mgorman@suse.de, mingo@kernel.org,
-        rostedt@goodmis.org, valentin.schneider@arm.com,
-        vincent.guittot@linaro.org, linux-s390@vger.kernel.org,
-        kvm@vger.kernel.org
-Subject: Re: sched: Move SCHED_DEBUG sysctl to debugfs
-Message-ID: <YIlXQ43b6+7sUl+f@hirez.programming.kicks-ass.net>
-References: <20210412102001.287610138@infradead.org>
- <20210427145925.5246-1-borntraeger@de.ibm.com>
- <YIkgzUWEPaXQTCOv@hirez.programming.kicks-ass.net>
- <da373590-f0d7-e3a2-cef9-4527fc9f3056@de.ibm.com>
+        id S239314AbhD1Mjt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 28 Apr 2021 08:39:49 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:55682 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S239283AbhD1Mjs (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 28 Apr 2021 08:39:48 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1619613542;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=Adfym8klH+5tYEalET56TZJSSzxtb4r5UMa5Cv/WfQY=;
+        b=clx8ev1WVcudGfG2+qqURuqBsDiiIAunsleqr+vu+9QEGbZXzEQnPBlE2XQyD/W1swqQWg
+        JRGUbowm43Nh95qlGcVwIIOtrR8/CNSnh86/LYEJmBOos3ZeTu2Zt4L3A3eXW3afmY+F/X
+        UjhY1JTUW2tFOFhN3EP7YYNxurT4YBY=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-119-L3FN5WqkOhKko_NkdvRTrA-1; Wed, 28 Apr 2021 08:38:59 -0400
+X-MC-Unique: L3FN5WqkOhKko_NkdvRTrA-1
+Received: by mail-ed1-f71.google.com with SMTP id g19-20020a0564021813b029038811907178so857368edy.14
+        for <kvm@vger.kernel.org>; Wed, 28 Apr 2021 05:38:59 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=Adfym8klH+5tYEalET56TZJSSzxtb4r5UMa5Cv/WfQY=;
+        b=WhJqqS/ZUJn3bm+kmne8Icl05K1pxHaUP4rlKc9O5JLVyElmLy+EOwx2g16Vmumi2V
+         cUaVOxJtq9qNIdTsC4ujBPqqjiqqMMKcu3r92sdmVJw6czYE6cEhxzx+BLh24Kk6vouU
+         GIJKPE9onmbCwuTHnFECGwwI3zHKlQnp6UhrYgtiogJv3FPoTijdb/n9Jgqw0CwggbXE
+         8BKO6231zM67VZ7GWxliTDgYBGRJ24eFA+Wwa+843kNQ8tg9COG5kLcGkbH7yHABtkPH
+         d6S6zHMchj4dt1e4YLLvFY+Km4o5VDJOZI+P2fJnlN9tP0RM3RIWrT9gnbkJw+VXCIbL
+         KOGA==
+X-Gm-Message-State: AOAM533UeXgmz9aJyviPX3EFi71rx2ZpB8F23ocghJ0lxX+MTKz9sVOm
+        v+DIL7wNmsXaQnqbn9D7I+2MhvApWQNZ2TLkvi6dcYPv5dr01CpmvgyXHD1TjXTf2LrXCNr50sl
+        4ag9Brm1wP/Z0
+X-Received: by 2002:a17:906:6a41:: with SMTP id n1mr29126501ejs.401.1619613538769;
+        Wed, 28 Apr 2021 05:38:58 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzM7yUm1BKlNC1iK3OfUA70Fr0wQFbfb2WyKUUYOLARDyyEnrh62rWqtS9ykhJkwSv1JTJIIg==
+X-Received: by 2002:a17:906:6a41:: with SMTP id n1mr29126479ejs.401.1619613538594;
+        Wed, 28 Apr 2021 05:38:58 -0700 (PDT)
+Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id u1sm4785519edv.90.2021.04.28.05.38.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 28 Apr 2021 05:38:58 -0700 (PDT)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Valeriy Vdovin <valeriy.vdovin@virtuozzo.com>,
+        linux-kernel@vger.kernel.org
+Cc:     Denis Lunev <den@openvz.org>, Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
+        Shuah Khan <shuah@kernel.org>,
+        Aaron Lewis <aaronlewis@google.com>,
+        Alexander Graf <graf@amazon.com>,
+        Like Xu <like.xu@linux.intel.com>,
+        Oliver Upton <oupton@google.com>,
+        Andrew Jones <drjones@redhat.com>, kvm@vger.kernel.org,
+        linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH] KVM: x86: Fix KVM_GET_CPUID2 ioctl to return cpuid
+ entries count
+In-Reply-To: <20210428113655.26282-1-valeriy.vdovin@virtuozzo.com>
+References: <20210428113655.26282-1-valeriy.vdovin@virtuozzo.com>
+Date:   Wed, 28 Apr 2021 14:38:57 +0200
+Message-ID: <871raueg7y.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <da373590-f0d7-e3a2-cef9-4527fc9f3056@de.ibm.com>
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Apr 28, 2021 at 11:42:57AM +0200, Christian Borntraeger wrote:
-> On 28.04.21 10:46, Peter Zijlstra wrote:
-> [..]
-> > The right thing to do here is to analyze the situation and determine why
-> > migration_cost needs changing; is that an architectural thing, does s390
-> > benefit from less sticky tasks due to its cache setup (the book caches
-> > could be absorbing some of the penalties here for example). Or is it
-> > something that's workload related, does KVM intrinsically not care about
-> > migrating so much, or is it something else.
-> 
-> So lets focus on the performance issue.
-> 
-> One workload where we have seen this is transactional workload that is
-> triggered by external network requests. So every external request
-> triggered a wakup of a guest and a wakeup of a process in the guest.
-> The end result was that KVM was 40% slower than z/VM (in terms of
-> transactions per second) while we had more idle time.
-> With smaller sched_migration_cost_ns (e.g. 100000) KVM was as fast
-> as z/VM.
-> 
-> So to me it looks like that the wakeup and reschedule to a free CPU
-> was just not fast enough. It might also depend where I/O interrupts
-> land. Not sure yet.
+Valeriy Vdovin <valeriy.vdovin@virtuozzo.com> writes:
 
-So there's unfortunately three places where migration_cost is used; one
-is in {nohz_,}newidle_balance(), see below. Someone tried removing it
-before and that ran into so weird regressions somewhere. But it is worth
-checking if this is the thing that matters for your workload.
+> KVM_GET_CPUID2 kvm ioctl is not very well documented, but the way it is
+> implemented in function kvm_vcpu_ioctl_get_cpuid2 suggests that even at
+> error path it will try to return number of entries to the caller. But
+> The dispatcher kvm vcpu ioctl dispatcher code in kvm_arch_vcpu_ioctl
+> ignores any output from this function if it sees the error return code.
+>
+> It's very explicit by the code that it was designed to receive some
+> small number of entries to return E2BIG along with the corrected number.
+>
+> This lost logic in the dispatcher code has been restored by removing the
+> lines that check for function return code and skip if error is found.
+> Without it, the ioctl caller will see both the number of entries and the
+> correct error.
+>
+> In selftests relevant function vcpu_get_cpuid has also been modified to
+> utilize the number of cpuid entries returned along with errno E2BIG.
+>
+> Signed-off-by: Valeriy Vdovin <valeriy.vdovin@virtuozzo.com>
+> ---
+>  arch/x86/kvm/x86.c                            | 10 +++++-----
+>  .../selftests/kvm/lib/x86_64/processor.c      | 20 +++++++++++--------
+>  2 files changed, 17 insertions(+), 13 deletions(-)
+>
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index efc7a82ab140..df8a3e44e722 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -4773,14 +4773,14 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
+>  		r = -EFAULT;
+>  		if (copy_from_user(&cpuid, cpuid_arg, sizeof(cpuid)))
+>  			goto out;
+> +
+>  		r = kvm_vcpu_ioctl_get_cpuid2(vcpu, &cpuid,
+>  					      cpuid_arg->entries);
+> -		if (r)
+> -			goto out;
+> -		r = -EFAULT;
+> -		if (copy_to_user(cpuid_arg, &cpuid, sizeof(cpuid)))
 
-The other (main) use is in task_hot(), where we try and prevent
-migrating tasks that have recently run on a CPU. We already have an
-exception for SMT there, because SMT siblings share all cache levels per
-defintion, so moving it to the sibling should have no ill effect.
+It may make sense to check that 'r == -E2BIG' before trying to write
+anything back. I don't think it is correct/expected to modify nent in
+other cases (e.g. when kvm_vcpu_ioctl_get_cpuid2() returns -EFAULT)
 
-It could be that the current measure is fundamentally too high for your
-machine -- it is basically a random number that was determined many
-years ago on some random x86 machine, so it not reflecting reality today
-on an entirely different platform is no surprise.
+> +
+> +		if (copy_to_user(cpuid_arg, &cpuid, sizeof(cpuid))) {
+> +			r = -EFAULT;
+>  			goto out;
+> -		r = 0;
+> +		}
+>  		break;
 
-Back in the day, we had some magic code that measured cache latency per
-sched_domain and we used that, but that suffered from boot-to-boot
-variance and made things rather non-deterministic, but the idea of
-having per-domain cost certainly makes sense.
+How is KVM userspace supposed to know if it can trust the 'nent' value
+(KVM is fixed case) or not (KVM is not fixed case)? This can probably be
+resolved with adding a new capability (but then I'm not sure the change
+is worth it to be honest). Also, if making such a change, API
+documentation in virt/kvm/api.rst needs updating.
 
-Over the years people have tried bringing parts of that back, but it
-never really had convincing numbers justifying the complexity. So that's
-another thing you could be looking at I suppose.
+>  	}
+>  	case KVM_GET_MSRS: {
+> diff --git a/tools/testing/selftests/kvm/lib/x86_64/processor.c b/tools/testing/selftests/kvm/lib/x86_64/processor.c
+> index a8906e60a108..a412b39ad791 100644
+> --- a/tools/testing/selftests/kvm/lib/x86_64/processor.c
+> +++ b/tools/testing/selftests/kvm/lib/x86_64/processor.c
+> @@ -727,17 +727,21 @@ struct kvm_cpuid2 *vcpu_get_cpuid(struct kvm_vm *vm, uint32_t vcpuid)
+>  
+>  	cpuid = allocate_kvm_cpuid2();
+>  	max_ent = cpuid->nent;
+> +	cpuid->nent = 0;
+>  
+> -	for (cpuid->nent = 1; cpuid->nent <= max_ent; cpuid->nent++) {
+> -		rc = ioctl(vcpu->fd, KVM_GET_CPUID2, cpuid);
+> -		if (!rc)
+> -			break;
+> +	rc = ioctl(vcpu->fd, KVM_GET_CPUID2, cpuid);
+> +	TEST_ASSERT(rc == -1 && errno == E2BIG,
+> +		    "KVM_GET_CPUID2 should return E2BIG: %d %d",
+> +		    rc, errno);
+>  
+> -		TEST_ASSERT(rc == -1 && errno == E2BIG,
+> -			    "KVM_GET_CPUID2 should either succeed or give E2BIG: %d %d",
+> -			    rc, errno);
+> -	}
+> +	TEST_ASSERT(cpuid->nent,
+> +		    "KVM_GET_CPUID2 failed to set cpuid->nent with E2BIG");
+> +
+> +	TEST_ASSERT(cpuid->nent < max_ent,
+> +		"KVM_GET_CPUID2 has %d entries, expected maximum: %d",
+> +		cpuid->nent, max_ent);
+>  
+> +	rc = ioctl(vcpu->fd, KVM_GET_CPUID2, cpuid);
+>  	TEST_ASSERT(rc == 0, "KVM_GET_CPUID2 failed, rc: %i errno: %i",
+>  		    rc, errno);
 
-And then finally we have an almost random use in rebalance_domains(),
-and I can't remember the story behind that one :/
-
-
-Anyway, TL;DR, try and figure out which of these three is responsible
-for your performance woes. If it's the first, the below patch might be a
-good candidate. If it's task_hot(), we might need to re-eval per domain
-costs. If its that other thing, I'll have to dig to figure out wth that
-was supposed to accomplish ;-)
-
----
-
-diff --git a/kernel/sched/fair.c b/kernel/sched/fair.c
-index 3bdc41f22909..9189bd78ad8f 100644
---- a/kernel/sched/fair.c
-+++ b/kernel/sched/fair.c
-@@ -10557,10 +10557,6 @@ static void nohz_newidle_balance(struct rq *this_rq)
- 	if (!housekeeping_cpu(this_cpu, HK_FLAG_SCHED))
- 		return;
- 
--	/* Will wake up very soon. No time for doing anything else*/
--	if (this_rq->avg_idle < sysctl_sched_migration_cost)
--		return;
--
- 	/* Don't need to update blocked load of idle CPUs*/
- 	if (!READ_ONCE(nohz.has_blocked) ||
- 	    time_before(jiffies, READ_ONCE(nohz.next_blocked)))
-@@ -10622,8 +10618,7 @@ static int newidle_balance(struct rq *this_rq, struct rq_flags *rf)
- 	 */
- 	rq_unpin_lock(this_rq, rf);
- 
--	if (this_rq->avg_idle < sysctl_sched_migration_cost ||
--	    !READ_ONCE(this_rq->rd->overload)) {
-+	if (!READ_ONCE(this_rq->rd->overload)) {
- 
- 		rcu_read_lock();
- 		sd = rcu_dereference_check_sched_domain(this_rq->sd);
+-- 
+Vitaly
 
