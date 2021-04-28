@@ -2,73 +2,84 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1886336DC68
-	for <lists+kvm@lfdr.de>; Wed, 28 Apr 2021 17:50:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 972D836DCA2
+	for <lists+kvm@lfdr.de>; Wed, 28 Apr 2021 18:04:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231683AbhD1PvN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 28 Apr 2021 11:51:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52018 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236041AbhD1PvM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 28 Apr 2021 11:51:12 -0400
-Received: from mail-vs1-xe2e.google.com (mail-vs1-xe2e.google.com [IPv6:2607:f8b0:4864:20::e2e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 701B3C061573
-        for <kvm@vger.kernel.org>; Wed, 28 Apr 2021 08:50:27 -0700 (PDT)
-Received: by mail-vs1-xe2e.google.com with SMTP id u22so21087037vsu.6
-        for <kvm@vger.kernel.org>; Wed, 28 Apr 2021 08:50:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:from:date:message-id:subject:to
-         :content-transfer-encoding;
-        bh=lR/58DykDQ0QqK2HcxJA2o+sYpYNCKTf3/Hm+spZn4s=;
-        b=JSThn+RcYJtBGSptYIVgZUBDmeZS+J6/Dvf9pW3I9PeyKW2ECwtzIgs2+AtthkOHMX
-         RpT7TNBaM6mh6+YSjAoTm6JpyhM0BZ9K6su7SnZ+ab6E+p0gc156jbTAYMWjixm8zsWQ
-         MLjRoozvK+e0DqmqNW83HxH10jLLuAcfxiQS/scITYuFAkq/Ap6JkfxTcV/1EJ0qmlGy
-         6RNmQ03pUmBV+8cBHc00yBissvQOkiVXaauPqVDXnxKL5inD4jLpFyIgQexQDzW0J/MO
-         1WgtkceWOy3sAz3z+q8HwPtPg8lyr3SgCOdTi/5GkZlWlCFop+Nb4vZilia8w4+eeYk+
-         D4Cg==
+        id S231683AbhD1QEp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 28 Apr 2021 12:04:45 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:56307 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229891AbhD1QEo (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 28 Apr 2021 12:04:44 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1619625839;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=VWzv79dhOfCvbQC5r24ANwFDN3FblWj9S+W4LOJP8aI=;
+        b=AH0atEHN9RLYYW31H/+XOzi+f7mVc13bfyYmpTdFcqIRLCxaC8Kx2owtN7tSpAcDQzeF2t
+        B8fKBI3vkH7tcWTtPofsopk2hunOP4nmN2nQft8piHpti2zu2dEkeZ49pReLk/KNTVj7FM
+        8+wgHiBolxSG41nctPe2471PKy+VCaY=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-39-twlKZOmxPieAYBHyNY03Sg-1; Wed, 28 Apr 2021 12:03:57 -0400
+X-MC-Unique: twlKZOmxPieAYBHyNY03Sg-1
+Received: by mail-wr1-f69.google.com with SMTP id l2-20020adf9f020000b029010d6bb7f1cbso1766555wrf.7
+        for <kvm@vger.kernel.org>; Wed, 28 Apr 2021 09:03:57 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=lR/58DykDQ0QqK2HcxJA2o+sYpYNCKTf3/Hm+spZn4s=;
-        b=XWayMGBe1s9rSHzXVc2dyuAaropmGZMQjs2YGKEkVwZ2/SvsYEWKZ5D49X16BphMyb
-         JlOiz/gSQGvWPsw1GXp1GOLgSNZD4XJns9Mlmf/jCy1tWb2cJN6bxtNR+Tzp0mmRmPMc
-         /JpKYU6dkJ1AS7P8nKAtle1Wh1MEeWAq+66eYO33k0w5/+afgj3uOwk8SL0hrBQl0/V0
-         Fc2f7a8407pT2OnXduvARBBluiR63YeuYqaXMUzP+A+TMvPfMkSYSEna2op6LFbRLO9Q
-         gvPXkAj48x+de0HWhIrShF0suD1VZIxCawFv4Lc1fXu6Y30O7JX6R+22lGfLu58A+sVw
-         n0mA==
-X-Gm-Message-State: AOAM530bWIixzwHZtN2qdVBdpz2b50wbvGT08HXVEJRdvGg+GsfX77JF
-        o+YVInsRRxk3y+o3jA59rWVhQk9XiQ5nN3Bkk1TPBHY8i8o=
-X-Google-Smtp-Source: ABdhPJzcYKaAOPTDWtEFd76kBlbO+fAowLOWT+lBw7gCeyjBp16jFd+m+88KajcxqTqB+drSAX+Bcg8WLOCFeh/FptA=
-X-Received: by 2002:a67:d002:: with SMTP id r2mr24974132vsi.45.1619625026513;
- Wed, 28 Apr 2021 08:50:26 -0700 (PDT)
+        bh=VWzv79dhOfCvbQC5r24ANwFDN3FblWj9S+W4LOJP8aI=;
+        b=lmcEV8e8xJ/ofMIG0f6ZaD14IalMFPjcYHF8eorWqlvDovNpggRQNL0P0GXCDSLyMM
+         SEUb0XgisR7v3BW3b6Vaqg7Wh9ox8OtWjXCX09nt5BV46lf736D6rtMM5G+ph5wdDT8T
+         zQ57onzdd2QRuLD6nXjuRfA74FMMiHlokiG/IdIiU4gk8rl2QmEKPBZfam7UW3ahAH7i
+         sA/WT+PmTnhonu9lOM6SEnbGZa0T5Mn4pQjnYkxbeqhj8vjvAbKV3l6BKqm5aNgTnZJ+
+         oPbl14yfI4w5VCvX9H4X2d1c2m18avaWBIlN2KkRBtIGKXEnRuXY6zEv5tK061N0yOz4
+         voDQ==
+X-Gm-Message-State: AOAM533D34TLolCQdHS5x2rzAFDZQZ+2mlUGH1NQEI9Y1XWP6g24SloY
+        /Cbir6cwzG0dh7RSsWIVJe9IgWxHDIKi1IW6r6lQhVzAOEHe0CYDd/VnIu1Ia7XtDDZj/Oq6ZDk
+        LVrdTVXjzZ0dnAHLAyWYZPRgs8IoXW7fSxzmGImT3OVe69GNKpLfUUZo7PciOYA==
+X-Received: by 2002:adf:cd89:: with SMTP id q9mr10555920wrj.147.1619625836319;
+        Wed, 28 Apr 2021 09:03:56 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJw72dT/vsBEmhvsKrpp4jzv5dcu3oWBRWtHufZX4h+LqPGakBcS3KpBll1myBCN/rVv9xbJPA==
+X-Received: by 2002:adf:cd89:: with SMTP id q9mr10555887wrj.147.1619625836111;
+        Wed, 28 Apr 2021 09:03:56 -0700 (PDT)
+Received: from [192.168.1.36] (39.red-81-40-121.staticip.rima-tde.net. [81.40.121.39])
+        by smtp.gmail.com with ESMTPSA id x64sm107562wmg.46.2021.04.28.09.03.55
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 28 Apr 2021 09:03:55 -0700 (PDT)
+Subject: Re: [PATCH] accel: kvm: clarify that extra exit data is hexadecimal
+To:     David Edmondson <david.edmondson@oracle.com>, qemu-devel@nongnu.org
+Cc:     qemu-trivial@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
+        kvm@vger.kernel.org
+References: <20210428142431.266879-1-david.edmondson@oracle.com>
+From:   =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <5fbad3c6-0219-9dad-2a04-98198dacb01f@redhat.com>
+Date:   Wed, 28 Apr 2021 18:03:54 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.8.1
 MIME-Version: 1.0
-Received: by 2002:a9f:24a7:0:0:0:0:0 with HTTP; Wed, 28 Apr 2021 08:50:25
- -0700 (PDT)
-From:   ganesh salunkhe <ganeshsalunkhe73@gmail.com>
-Date:   Wed, 28 Apr 2021 15:50:25 +0000
-Message-ID: <CAD0h=5hn+F-k4Jrc-qD2KX+J7VyytsONHRE6iu497uGkBHzg=w@mail.gmail.com>
-Subject: Looking for a new opportunity
-To:     kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20210428142431.266879-1-david.edmondson@oracle.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hello,
+On 4/28/21 4:24 PM, David Edmondson wrote:
+> When dumping the extra exit data provided by KVM, make it clear that
+> the data is hexadecimal.
+> 
+> At the same time, zero-pad the output.
+> 
+> Signed-off-by: David Edmondson <david.edmondson@oracle.com>
+> ---
+>  accel/kvm/kvm-all.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
-I hope things have been awesome!
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-I=E2=80=99m jotting you a quick note to let you know that I=E2=80=99m curre=
-ntly
-searching for a new career opportunity in Computing Network.
-For a greater understanding of my professional qualifications, you can
-find my resume attached to this email.
-If you hear of anything within your own network that you think might
-fit the bill, I=E2=80=99d so appreciate if you could send a heads up my way=
-.
-Let me know if I can ever return the favor. I=E2=80=99m happy to do so!
-
-Thanks,
