@@ -2,188 +2,97 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9EF0736DACA
-	for <lists+kvm@lfdr.de>; Wed, 28 Apr 2021 17:06:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2BD0F36DB9F
+	for <lists+kvm@lfdr.de>; Wed, 28 Apr 2021 17:27:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236090AbhD1PDV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 28 Apr 2021 11:03:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40766 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239827AbhD1PCy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 28 Apr 2021 11:02:54 -0400
-Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1522BC0613ED
-        for <kvm@vger.kernel.org>; Wed, 28 Apr 2021 07:59:05 -0700 (PDT)
-Received: by mail-pj1-x102d.google.com with SMTP id lp8so2890444pjb.1
-        for <kvm@vger.kernel.org>; Wed, 28 Apr 2021 07:59:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=Jz7qPymMOFiVOAXZnP4Er6B1ezJAfu0fq5a7KpaKKQU=;
-        b=tJmUpYMlpVzCzA6fjWQAPQT8pJlmuQQJyP65wBc4SobpHYKgSjjw7PSOs+hrWxJfWb
-         S9/I6rpyxY795lojvfRjKS8iIGjOqOPQnaDnZyI4sEPHgMus7cVRTId5sUXOxvDhxRY7
-         iD1+csPryZ0Fl35FqzelVEtp4n0cGxmW4B8jH/E5CQvHsNNMEJrap/+TLT18S2DLjp4Y
-         bdSoURtwbRKMeuPqDU42hhNoOZ4vj6bhzAQ6Q4VUEQqs318Ap4H3mb/WLGn/prWKCQFS
-         NM+9JEldMbdZ6jDZql84b0qH51bF0B8CuYB0Qtd5GOfy2CtygMzKAMEC0wBSgzj8iGL2
-         UahQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=Jz7qPymMOFiVOAXZnP4Er6B1ezJAfu0fq5a7KpaKKQU=;
-        b=eVGE3lUMFTOYv6RVsmf4ukqwipqVlqhzfsauAS3kdgJZA88hfBI7InQbOEjxzQi/5N
-         5gBX3AenJ781yEZ8Wn9dRgaseSToM6EYbU9SIHeAAftfylw4TuBzmRSVu/fypJEX03zh
-         t4hiB9COMTiK15sEPxflBynLe4yXq8o0PU9esxdKci2xLL+oqm0y93x6P/pwMIcwyf6J
-         zwDkTJKJNSIpXtscRYi6CAo2+xvFJ0rgmNkTjo+8OFQMEixao4gh141e7Cd9cvqMk1Ut
-         tArHU+XT5aasRQn0kF1VD/QFW7sPrrjExC3J4ZEecsW1onHK4fu0ZsgNDS7+12JIAXbW
-         Ln0g==
-X-Gm-Message-State: AOAM530o5MItJBrj+N7dkfm9K8bzywKXFyeEmQiUc92eLZk3Ahcp9UOD
-        z4kx0gpvGz9NY7/NpxKRW604QA==
-X-Google-Smtp-Source: ABdhPJyqXFkfR+iBHk8ipYJO7e2td0DCaeMFxvdNTPxJZHuA4UqEQCca9eBPOjtc0ufvhqon6y+8hw==
-X-Received: by 2002:a17:902:10b:b029:ed:2b3e:beb4 with SMTP id 11-20020a170902010bb02900ed2b3ebeb4mr17868694plb.64.1619621944318;
-        Wed, 28 Apr 2021 07:59:04 -0700 (PDT)
-Received: from google.com (240.111.247.35.bc.googleusercontent.com. [35.247.111.240])
-        by smtp.gmail.com with ESMTPSA id mn22sm4501399pjb.24.2021.04.28.07.59.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 28 Apr 2021 07:59:03 -0700 (PDT)
-Date:   Wed, 28 Apr 2021 14:58:59 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Valeriy Vdovin <valeriy.vdovin@virtuozzo.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        linux-kernel@vger.kernel.org, Denis Lunev <den@openvz.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
-        Shuah Khan <shuah@kernel.org>,
-        Aaron Lewis <aaronlewis@google.com>,
-        Alexander Graf <graf@amazon.com>,
-        Like Xu <like.xu@linux.intel.com>,
-        Oliver Upton <oupton@google.com>,
-        Andrew Jones <drjones@redhat.com>, kvm@vger.kernel.org,
-        linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH] KVM: x86: Fix KVM_GET_CPUID2 ioctl to return cpuid
- entries count
-Message-ID: <YIl4M/GgaYvwNuXv@google.com>
-References: <20210428113655.26282-1-valeriy.vdovin@virtuozzo.com>
- <871raueg7y.fsf@vitty.brq.redhat.com>
- <20210428134657.GA515794@dhcp-172-16-24-191.sw.ru>
+        id S231600AbhD1P1W (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 28 Apr 2021 11:27:22 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:51169 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231347AbhD1P1V (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 28 Apr 2021 11:27:21 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1619623596;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=N9sLSkMd2PrkFOc/KnB2Eh0J9f5STmd+QbevjYr4WCA=;
+        b=JHBsTR+o0959iqy4+4PoTGEetS6yzX43fFszB4wbbXidP3gmTlbLZoesYtRayrkf9PRuB2
+        ZhOhRBi04nWe6vWUoXUw76+TcPFzI5qaHhNt+Dagg5760VTI71Ai7bbQNSG5eQ/AyykXOx
+        NDg6aB2X0UUbJspFS767OVX9faCSREg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-140-3DP7XKC2MKKxA7cDD_b_jQ-1; Wed, 28 Apr 2021 11:26:32 -0400
+X-MC-Unique: 3DP7XKC2MKKxA7cDD_b_jQ-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BD33880ED8D;
+        Wed, 28 Apr 2021 15:26:30 +0000 (UTC)
+Received: from [10.36.113.191] (ovpn-113-191.ams2.redhat.com [10.36.113.191])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id BC4E91007610;
+        Wed, 28 Apr 2021 15:26:28 +0000 (UTC)
+Subject: Re: [kvm-unit-tests PATCH v1 1/4] arm64: split its-trigger test into
+ KVM and TCG variants
+To:     Marc Zyngier <maz@kernel.org>,
+        Alexandru Elisei <alexandru.elisei@arm.com>
+Cc:     =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+        kvm@vger.kernel.org, shashi.mallela@linaro.org,
+        qemu-arm@nongnu.org, linux-arm-kernel@lists.infradead.org,
+        kvmarm@lists.cs.columbia.edu, christoffer.dall@arm.com
+References: <20210428101844.22656-1-alex.bennee@linaro.org>
+ <20210428101844.22656-2-alex.bennee@linaro.org>
+ <eaed3c63988513fe2849c2d6f22937af@kernel.org> <87fszasjdg.fsf@linaro.org>
+ <996210ae-9c63-54ff-1a65-6dbd63da74d2@arm.com> <87k0omo4rr.wl-maz@kernel.org>
+From:   Auger Eric <eric.auger@redhat.com>
+Message-ID: <5c446e6e-fb21-3a47-587b-6ad5e6baf096@redhat.com>
+Date:   Wed, 28 Apr 2021 17:26:26 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210428134657.GA515794@dhcp-172-16-24-191.sw.ru>
+In-Reply-To: <87k0omo4rr.wl-maz@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Apr 28, 2021, Valeriy Vdovin wrote:
-> On Wed, Apr 28, 2021 at 02:38:57PM +0200, Vitaly Kuznetsov wrote:
-> > Valeriy Vdovin <valeriy.vdovin@virtuozzo.com> writes:
-> > 
-> > > KVM_GET_CPUID2 kvm ioctl is not very well documented, but the way it is
-> > > implemented in function kvm_vcpu_ioctl_get_cpuid2 suggests that even at
-> > > error path it will try to return number of entries to the caller. But
-> > > The dispatcher kvm vcpu ioctl dispatcher code in kvm_arch_vcpu_ioctl
-> > > ignores any output from this function if it sees the error return code.
-> > >
-> > > It's very explicit by the code that it was designed to receive some
-> > > small number of entries to return E2BIG along with the corrected number.
-> > >
-> > > This lost logic in the dispatcher code has been restored by removing the
-> > > lines that check for function return code and skip if error is found.
-> > > Without it, the ioctl caller will see both the number of entries and the
-> > > correct error.
-> > >
-> > > In selftests relevant function vcpu_get_cpuid has also been modified to
-> > > utilize the number of cpuid entries returned along with errno E2BIG.
-> > >
-> > > Signed-off-by: Valeriy Vdovin <valeriy.vdovin@virtuozzo.com>
-> > > ---
-> > >  arch/x86/kvm/x86.c                            | 10 +++++-----
-> > >  .../selftests/kvm/lib/x86_64/processor.c      | 20 +++++++++++--------
-> > >  2 files changed, 17 insertions(+), 13 deletions(-)
-> > >
-> > > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> > > index efc7a82ab140..df8a3e44e722 100644
-> > > --- a/arch/x86/kvm/x86.c
-> > > +++ b/arch/x86/kvm/x86.c
-> > > @@ -4773,14 +4773,14 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
-> > >  		r = -EFAULT;
-> > >  		if (copy_from_user(&cpuid, cpuid_arg, sizeof(cpuid)))
-> > >  			goto out;
-> > > +
-> > >  		r = kvm_vcpu_ioctl_get_cpuid2(vcpu, &cpuid,
-> > >  					      cpuid_arg->entries);
-> > > -		if (r)
-> > > -			goto out;
-> > > -		r = -EFAULT;
-> > > -		if (copy_to_user(cpuid_arg, &cpuid, sizeof(cpuid)))
-> > 
-> > It may make sense to check that 'r == -E2BIG' before trying to write
-> > anything back. I don't think it is correct/expected to modify nent in
-> > other cases (e.g. when kvm_vcpu_ioctl_get_cpuid2() returns -EFAULT)
-> > 
-> That's a good point. The caller could expect and rely on the fact that nent
-> is unmodified in any error case except E2BIG. I will add this in the next
-> version.
-> > > +
-> > > +		if (copy_to_user(cpuid_arg, &cpuid, sizeof(cpuid))) {
-> > > +			r = -EFAULT;
-> > >  			goto out;
-> > > -		r = 0;
-> > > +		}
-> > >  		break;
-> > 
-> > How is KVM userspace supposed to know if it can trust the 'nent' value
-> > (KVM is fixed case) or not (KVM is not fixed case)? This can probably be
-> > resolved with adding a new capability (but then I'm not sure the change
-> > is worth it to be honest).
+Hi,
+
+On 4/28/21 4:36 PM, Marc Zyngier wrote:
+> On Wed, 28 Apr 2021 15:00:15 +0100,
+> Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+>>
+>> I interpret that as that an INVALL guarantees that a change is
+>> visible, but it the change can become visible even without the
+>> INVALL.
 > 
-> As I see it KVM userspace should set nent to 0, and then expect any non-zero
-> value in return along with E2BIG. This is the same approach I've used in the
-> modified test code in the same patch.
+> Yes. Expecting the LPI to be delivered or not in the absence of an
+> invalidate when its configuration has been altered is wrong. The
+> architecture doesn't guarantee anything of the sort.
+> 
+>> The test relies on the fact that changes to the LPI tables are not
+>> visible *under KVM* until the INVALL command, but that's not
+>> necessarily the case on real hardware. To match the spec, I think
+>> the test "dev2/eventid=20 still does not trigger any LPI" should be
+>> removed and the stats reset should take place before the
+>> configuration for LPI 8195 is set to the default.
 
-IMO, the current code is correct (well, least awful), albeit misleading.
-Copying back the number of entries but not the entries themselves would be a bug.
-That can obviously be remedied, but it adds even more complexity for no known
-benefit, and training userspace to go spelunking on -E2BIG would likely yield
-more bugs in the future.
+Yes I do agree with Alexandru and Marc after another reading of the
+spec. I initially thought the INVALL was the gate keeper for the new
+config but that sounds wrong. This test shall be removed then.
 
-I also think we should keep the -E2BIG behavior of KVM_GET_CPUID2 and
-KVM_GET_{SUPPORTED,EMULATED,SUPPORTED_HV}_CPUID consistent.  Returning partial
-information would make KVM_GET_CPUID2 an anomaly.
+Eric
+> 
+> If that's what the test expects (I haven't tried to investigate), it
+> should be dropped completely, rather than trying to sidestep it for
+> TCG.
+> 
+> Thanks,
+> 
+> 	M.
+> 
 
-
-diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-index c96f79c9fff2..c4dbc7c47b17 100644
---- a/arch/x86/kvm/cpuid.c
-+++ b/arch/x86/kvm/cpuid.c
-@@ -348,20 +348,15 @@ int kvm_vcpu_ioctl_get_cpuid2(struct kvm_vcpu *vcpu,
-                              struct kvm_cpuid2 *cpuid,
-                              struct kvm_cpuid_entry2 __user *entries)
- {
--       int r;
--
--       r = -E2BIG;
-        if (cpuid->nent < vcpu->arch.cpuid_nent)
--               goto out;
--       r = -EFAULT;
-+               return -E2BIG;
-+
-        if (copy_to_user(entries, vcpu->arch.cpuid_entries,
-                         vcpu->arch.cpuid_nent * sizeof(struct kvm_cpuid_entry2)))
--               goto out;
--       return 0;
-+               return -EFAULT;
-
--out:
-        cpuid->nent = vcpu->arch.cpuid_nent;
--       return r;
-+       return 0;
- }
-
- /* Mask kvm_cpu_caps for @leaf with the raw CPUID capabilities of this CPU. */
