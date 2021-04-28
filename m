@@ -2,134 +2,158 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8F6C136DCEC
-	for <lists+kvm@lfdr.de>; Wed, 28 Apr 2021 18:24:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AF28A36DD0A
+	for <lists+kvm@lfdr.de>; Wed, 28 Apr 2021 18:32:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240955AbhD1QY4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 28 Apr 2021 12:24:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59570 "EHLO
+        id S240504AbhD1Qdh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 28 Apr 2021 12:33:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33298 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240934AbhD1QYz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 28 Apr 2021 12:24:55 -0400
-Received: from mail-ot1-x32e.google.com (mail-ot1-x32e.google.com [IPv6:2607:f8b0:4864:20::32e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AA635C061574
-        for <kvm@vger.kernel.org>; Wed, 28 Apr 2021 09:24:08 -0700 (PDT)
-Received: by mail-ot1-x32e.google.com with SMTP id c8-20020a9d78480000b0290289e9d1b7bcso44803241otm.4
-        for <kvm@vger.kernel.org>; Wed, 28 Apr 2021 09:24:08 -0700 (PDT)
+        with ESMTP id S235502AbhD1Qdg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 28 Apr 2021 12:33:36 -0400
+Received: from mail-wr1-x434.google.com (mail-wr1-x434.google.com [IPv6:2a00:1450:4864:20::434])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CBD9CC061573
+        for <kvm@vger.kernel.org>; Wed, 28 Apr 2021 09:32:51 -0700 (PDT)
+Received: by mail-wr1-x434.google.com with SMTP id x7so63693220wrw.10
+        for <kvm@vger.kernel.org>; Wed, 28 Apr 2021 09:32:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=vFFeVW33ruUEu/k84GYwSnkp1LcEq7XYbpo7nxvVcFI=;
-        b=hn+R2pvJfLdJc/4FJGrLTsET9/BSFZHQ3oyvmGarpqqestJfKms3Tpj/IujFgKAK+I
-         STWb4Qige1UGtc7wy0KuENrTa2Pu7sEZx/BXCYVQJon9TnFgC+6xapjpJeI5XS97UqAD
-         PskI9dX0Haq3e0/eOmrBhs2wAU1K8uE8bjQ+PnDAHPcoMhfs+0Mw4COjmFSyNb6GfUZ1
-         RK8Yo+sHZ9mW/OSVZjISnjiwOxC7J4/DScD6bpR+wPrmH1F8+uAyDiyZKQ87bFtPxypQ
-         il5d7LCT4zkXOqK7HNc0ERUv6Xx9PXmyWzUrEl4z4nHacZRpZDTTC5x+58shKX+l84bn
-         bAtg==
+        d=linaro.org; s=google;
+        h=references:user-agent:from:to:cc:subject:date:in-reply-to
+         :message-id:mime-version:content-transfer-encoding;
+        bh=vMvP7yT7h0EJmqJtDWRQoTiz4uSh0TU3K6GL9MOqQzg=;
+        b=rNnMJW8MV/b+T1qXUq5CprIbKb3o5zKrUNQnUSN6zt+H57dBz+5m4Dka/+/gQZ8+oP
+         xU6Cp3yy8PUGARwnsQiTdLZLPXFXfVxFbHSdUKDzvKcBvraC31szfWCiNSb5yXOkXvxY
+         df6xjOOqXLRcIdEkSWgqRRMEZ8gPKW/L/yaj50kp7MJAywFAqjvK+xWWa74U98jAlwG3
+         mEEjQ/nhs3U7v1+tPzGFBDsO3seUZMBJyBDXZDfxZc9d7VxSESZ+ZblMkVallHGStxUH
+         FZD6iLH7tMs82vbr3DXtrwEhx3XRlzeLLYDJ72awnFyMCiypeptgla2+J+ejeBgVEgTQ
+         Ezmw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=vFFeVW33ruUEu/k84GYwSnkp1LcEq7XYbpo7nxvVcFI=;
-        b=Cc03/49qBhOna/eiZ2/1f+m1ydkBmn9gqdYN7EqiG3SVyx7P2DVvghE9nVovAfqNsF
-         C9SFo6dhXhg0lgiNRNpXeWjbSOrJQrPkEN3ze2/QNh9G14/mr/O8xAQMCD766uqXlYQ4
-         twGKn14Is7WAa+MDKzp+3a1fKDLoz11t1ewLqSHGmbi+rZvmF/o1PDX/CG9TtiDJO2Gv
-         b1oEs/cyW9AEhl7qutVGkF11QkNVP6jfig1jED/GjpwfLuHtvjGHhjfRrBX2QPLr4Rg/
-         GFmhCNHc7ChW7cX4XsRvoXIuIuBXFSldqMntM9+p8jVybMVNXeHAj0l/DpauFtBOF9fo
-         gPJw==
-X-Gm-Message-State: AOAM530LBGs9ktHN6gmZRBvpGNtauHXpv6V4oWFg8q4xWcVaOatwL40k
-        RNtzQ/Y72LBdYBtpUrCBvtXScVQW/tGbb0fyk2jH+A==
-X-Google-Smtp-Source: ABdhPJwWHRNFe5yz7wBYtOPEdrHwUqI1dTfIVjAv50VzHm+M+vApvLtLT8m3GLJkwbhFeJKPFsHpIeINVS9qEG1hLoA=
-X-Received: by 2002:a05:6830:1deb:: with SMTP id b11mr25593909otj.72.1619627047878;
- Wed, 28 Apr 2021 09:24:07 -0700 (PDT)
+        h=x-gm-message-state:references:user-agent:from:to:cc:subject:date
+         :in-reply-to:message-id:mime-version:content-transfer-encoding;
+        bh=vMvP7yT7h0EJmqJtDWRQoTiz4uSh0TU3K6GL9MOqQzg=;
+        b=KuikJD4vxtPYKgS//6GODLztL6i/G+movlNQefJ5bMRMhYj4m2x+an5UAwPch0bdPH
+         zki/AoAnA6yPOriBQPVj2lfGwv/xBZ3PzlCaPGn3PgTgflSxp0tqzRbGWjTsnuHUBBC4
+         A1Jf0MY1Ohr/cXr8ItCRxhtsrSy8xJBrI4FhD+uHD+kFUy3YNHlrAW9XTJMObJo3VqJ/
+         J6qDRJQrP8aUaPU5z7oGv78/JWtcE17rF5QzZMoBJWLSd49oVTn50i+xRI/kJMaGTSB1
+         Tl+H5qNY5NWTgWgGLiSa8GX3Zkup96K2fvcwGio8P6wbYqS6No/6OOh9pnLf6dSK21R6
+         ja4A==
+X-Gm-Message-State: AOAM532/ciBhmPa3uSzjgBf+5E4y6/HRDqIx6kONbpGKLJIBL+lWrXtb
+        5ih8ucEVNnbn1CUS5kc6Nqev+A==
+X-Google-Smtp-Source: ABdhPJzOUG0QIk3RFE1BxF3PoLYlTmc5Oy+854AX6CAz9G5nz1e/tyUANGyEiZRCxDXLPZZK94u1hQ==
+X-Received: by 2002:a5d:68c3:: with SMTP id p3mr38833351wrw.62.1619627570577;
+        Wed, 28 Apr 2021 09:32:50 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+        by smtp.gmail.com with ESMTPSA id u17sm6548332wmq.30.2021.04.28.09.32.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 28 Apr 2021 09:32:49 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+        by zen.linaroharston (Postfix) with ESMTP id E47051FF7E;
+        Wed, 28 Apr 2021 17:32:48 +0100 (BST)
+References: <20210428101844.22656-1-alex.bennee@linaro.org>
+ <20210428101844.22656-2-alex.bennee@linaro.org>
+ <eaed3c63988513fe2849c2d6f22937af@kernel.org> <87fszasjdg.fsf@linaro.org>
+ <996210ae-9c63-54ff-1a65-6dbd63da74d2@arm.com>
+ <87k0omo4rr.wl-maz@kernel.org> <87czues90k.fsf@linaro.org>
+User-agent: mu4e 1.5.12; emacs 28.0.50
+From:   Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     Alexandru Elisei <alexandru.elisei@arm.com>, kvm@vger.kernel.org,
+        shashi.mallela@linaro.org, eric.auger@redhat.com,
+        qemu-arm@nongnu.org, linux-arm-kernel@lists.infradead.org,
+        kvmarm@lists.cs.columbia.edu, christoffer.dall@arm.com
+Subject: Re: [kvm-unit-tests PATCH v1 1/4] arm64: split its-trigger test
+ into KVM and TCG variants
+Date:   Wed, 28 Apr 2021 17:31:27 +0100
+In-reply-to: <87czues90k.fsf@linaro.org>
+Message-ID: <877dkms72n.fsf@linaro.org>
 MIME-Version: 1.0
-References: <20210427223635.2711774-1-bgardon@google.com> <20210427223635.2711774-4-bgardon@google.com>
- <2e5ecc0b-0ef4-a663-3b1d-81d020626b39@redhat.com>
-In-Reply-To: <2e5ecc0b-0ef4-a663-3b1d-81d020626b39@redhat.com>
-From:   Ben Gardon <bgardon@google.com>
-Date:   Wed, 28 Apr 2021 09:23:56 -0700
-Message-ID: <CANgfPd9OrCFoH1=2G_GD5MB5R54q5w=SDKP7vLnHPvDZox5WiQ@mail.gmail.com>
-Subject: Re: [PATCH 3/6] KVM: x86/mmu: Deduplicate rmap freeing in allocate_memslot_rmap
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
-        Peter Xu <peterx@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Peter Shier <pshier@google.com>,
-        Junaid Shahid <junaids@google.com>,
-        Jim Mattson <jmattson@google.com>,
-        Yulei Zhang <yulei.kernel@gmail.com>,
-        Wanpeng Li <kernellwp@gmail.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Xiao Guangrong <xiaoguangrong.eric@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Apr 28, 2021 at 3:00 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> Typo in the commit subject, I guess?
 
-Oh woops, yeah It should just be "Deduplicate rmap freeing" or
-something to that effect.
+Alex Benn=C3=A9e <alex.bennee@linaro.org> writes:
 
+> Marc Zyngier <maz@kernel.org> writes:
 >
-> Paolo
+>> On Wed, 28 Apr 2021 15:00:15 +0100,
+>> Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+>>>=20
+>>> I interpret that as that an INVALL guarantees that a change is
+>>> visible, but it the change can become visible even without the
+>>> INVALL.
+>>
+>> Yes. Expecting the LPI to be delivered or not in the absence of an
+>> invalidate when its configuration has been altered is wrong. The
+>> architecture doesn't guarantee anything of the sort.
 >
-> On 28/04/21 00:36, Ben Gardon wrote:
-> > Small code deduplication. No functional change expected.
-> >
-> > Signed-off-by: Ben Gardon <bgardon@google.com>
-> > ---
-> >   arch/x86/kvm/x86.c | 19 +++++++++++--------
-> >   1 file changed, 11 insertions(+), 8 deletions(-)
-> >
-> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> > index cf3b67679cf0..5bcf07465c47 100644
-> > --- a/arch/x86/kvm/x86.c
-> > +++ b/arch/x86/kvm/x86.c
-> > @@ -10818,17 +10818,23 @@ void kvm_arch_destroy_vm(struct kvm *kvm)
-> >       kvm_hv_destroy_vm(kvm);
-> >   }
-> >
-> > -void kvm_arch_free_memslot(struct kvm *kvm, struct kvm_memory_slot *slot)
-> > +static void free_memslot_rmap(struct kvm_memory_slot *slot)
-> >   {
-> >       int i;
-> >
-> >       for (i = 0; i < KVM_NR_PAGE_SIZES; ++i) {
-> >               kvfree(slot->arch.rmap[i]);
-> >               slot->arch.rmap[i] = NULL;
-> > +     }
-> > +}
-> >
-> > -             if (i == 0)
-> > -                     continue;
-> > +void kvm_arch_free_memslot(struct kvm *kvm, struct kvm_memory_slot *slot)
-> > +{
-> > +     int i;
-> > +
-> > +     free_memslot_rmap(slot);
-> >
-> > +     for (i = 1; i < KVM_NR_PAGE_SIZES; ++i) {
-> >               kvfree(slot->arch.lpage_info[i - 1]);
-> >               slot->arch.lpage_info[i - 1] = NULL;
-> >       }
-> > @@ -10894,12 +10900,9 @@ static int kvm_alloc_memslot_metadata(struct kvm_memory_slot *slot,
-> >       return 0;
-> >
-> >   out_free:
-> > -     for (i = 0; i < KVM_NR_PAGE_SIZES; ++i) {
-> > -             kvfree(slot->arch.rmap[i]);
-> > -             slot->arch.rmap[i] = NULL;
-> > -             if (i == 0)
-> > -                     continue;
-> > +     free_memslot_rmap(slot);
-> >
-> > +     for (i = 1; i < KVM_NR_PAGE_SIZES; ++i) {
-> >               kvfree(slot->arch.lpage_info[i - 1]);
-> >               slot->arch.lpage_info[i - 1] = NULL;
-> >       }
-> >
+> Is the underlying hypervisor allowed to invalidate and reload the
+> configuration whenever it wants or should it only be driven by the
+> guests requests?
 >
+> I did consider a more nuanced variant of the test that allowed for a
+> delivery pre-inval and a pass for post-inval as long as it had been
+> delivered one way or another:
+>
+> --8<---------------cut here---------------start------------->8---
+> modified   arm/gic.c
+> @@ -36,6 +36,7 @@ static struct gic *gic;
+>  static int acked[NR_CPUS], spurious[NR_CPUS];
+>  static int irq_sender[NR_CPUS], irq_number[NR_CPUS];
+>  static cpumask_t ready;
+> +static bool under_tcg;
+>=20=20
+>  static void nr_cpu_check(int nr)
+>  {
+> @@ -687,6 +688,7 @@ static void test_its_trigger(void)
+>  	struct its_collection *col3;
+>  	struct its_device *dev2, *dev7;
+>  	cpumask_t mask;
+> +	bool before, after;
+>=20=20
+>  	if (its_setup1())
+>  		return;
+> @@ -734,15 +736,17 @@ static void test_its_trigger(void)
+>  	/*
+>  	 * re-enable the LPI but willingly do not call invall
+>  	 * so the change in config is not taken into account.
+> -	 * The LPI should not hit
+> +	 * The LPI should not hit. This does however depend on
+> +	 * implementation defined behaviour - under QEMU TCG emulation
+> +	 * it can quite correctly process the event directly.
+>  	 */
+>  	gicv3_lpi_set_config(8195, LPI_PROP_DEFAULT);
+>  	stats_reset();
+>  	cpumask_clear(&mask);
+>  	its_send_int(dev2, 20);
+>  	wait_for_interrupts(&mask);
+> -	report(check_acked(&mask, -1, -1),
+> -			"dev2/eventid=3D20 still does not trigger any LPI");
+> +	before =3D check_acked(&mask, -1, -1);
+> +	report_xfail(under_tcg, before, "dev2/eventid=3D20 still may not trigge=
+r any LPI");
+>=20=20
+>  	/* Now call the invall and check the LPI hits */
+>  	stats_reset();
+> @@ -750,8 +754,8 @@ static void test_its_trigger(void)
+>  	cpumask_set_cpu(3, &mask);
+>  	its_send_invall(col3);
+>  	wait_for_interrupts(&mask);
+> -	report(check_acked(&mask, 0, 8195),
+> -			"dev2/eventid=3D20 pending LPI is received");
+> +	after =3D check_acked(&mask, 0, 8195);
+> +	report(before !=3D after, "dev2/eventid=3D20 pending LPI is
+>  	received");
+
+Actually that should be:
+
+         report(after || !before, "dev2/eventid=3D20 pending LPI is receive=
+d");
+
+so either the IRQ arrives after the flush or it had previously.
+
+--=20
+Alex Benn=C3=A9e
