@@ -2,84 +2,152 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F201936D48E
-	for <lists+kvm@lfdr.de>; Wed, 28 Apr 2021 11:10:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1659036D4AF
+	for <lists+kvm@lfdr.de>; Wed, 28 Apr 2021 11:22:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237748AbhD1JKh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 28 Apr 2021 05:10:37 -0400
-Received: from Galois.linutronix.de ([193.142.43.55]:46684 "EHLO
-        galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229643AbhD1JKg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 28 Apr 2021 05:10:36 -0400
-From:   Thomas Gleixner <tglx@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1619600991;
+        id S238111AbhD1JWr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 28 Apr 2021 05:22:47 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:37024 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230113AbhD1JWo (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 28 Apr 2021 05:22:44 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1619601719;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=OL8ns1Jd0hYAa1/76ixHBO3gJQaqokoqzKMxkacoGTE=;
-        b=DwNcWU6lhZFEca3EY3gAqfjY2lRbJSUHSb1OsiRUKECkfftfyEBNZ1AfJRMGniV5oo6lZX
-        yRiuAUlN1dEWRSXLyBnIRk9r2ppIsfDhPFd1Zu1MnwtqNC+rDLrHJKAxelczyjDMVJexk0
-        +hq7TVo/kWozpIyMrK8EHEcNwLgsRknxxnSs9qlGURCLio/NfcDx5ZOJME17Et9MmyMv2/
-        zWdP25xz97wAHuAHfp28cirB3AkfQK5/1FKA8xwQ16zkNwK9ZeHf1rZLuWI6j/kFj//ZUE
-        YaIspFwEh6ag1M5ei+3HuTmdeVckSueB3Gdt7wamxlQOLOiMXaT2WOBpkciPug==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1619600991;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=OL8ns1Jd0hYAa1/76ixHBO3gJQaqokoqzKMxkacoGTE=;
-        b=xHWiM2KmX/UuADNH1lowDKhszNxBh1Jhm1rk1imi8/f9QvbB5AcHEVw/c14GoKsoBXnLOW
-        GDHoFE3m+CiuDxCw==
-To:     Zelin Deng <zelin.deng@linux.alibaba.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org, x86@kernel.org
-Subject: Re: [PATCH] Guest system time jumps when new vCPUs is hot-added
-In-Reply-To: <87lf92n5r1.ffs@nanos.tec.linutronix.de>
-References: <1619576521-81399-1-git-send-email-zelin.deng@linux.alibaba.com> <87lf92n5r1.ffs@nanos.tec.linutronix.de>
-Date:   Wed, 28 Apr 2021 11:09:50 +0200
-Message-ID: <87im46n5b5.ffs@nanos.tec.linutronix.de>
+        bh=axU4olOyFNuAi1siDolpKEA8kn46+KAy0fVSsUFenIk=;
+        b=EmvZZCyyhszEGER9SshYMOKvaWEwaGF8qLTei5tT+ERl13iMpORIdvb6/z/+MJ3iXFcScq
+        Q6AP6cHZXI5cEHhBLFslFAdQXC7ZUDeZ134UwJYrdQUtZcRgMcMUO59JxdRBcPIIGFGTO/
+        tBRqQcqYbaLkN1pnq5lvkezDVKgjPpI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-294-TqqIchBUMpmMqypacMgirw-1; Wed, 28 Apr 2021 05:21:54 -0400
+X-MC-Unique: TqqIchBUMpmMqypacMgirw-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9DA0B818CA3;
+        Wed, 28 Apr 2021 09:21:53 +0000 (UTC)
+Received: from wangxiaodeMacBook-Air.local (ovpn-12-25.pek2.redhat.com [10.72.12.25])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 83A6A5C224;
+        Wed, 28 Apr 2021 09:21:50 +0000 (UTC)
+Subject: Re: [PATCH 2/2] vDPA/ifcvf: implement doorbell mapping for ifcvf
+To:     "Zhu, Lingshan" <lingshan.zhu@intel.com>, mst@redhat.com
+Cc:     virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20210428082133.6766-1-lingshan.zhu@intel.com>
+ <20210428082133.6766-3-lingshan.zhu@intel.com>
+ <f6d9a424-9025-3eb5-1cb4-0ff22f7bec63@redhat.com>
+ <5052fced-cd9a-e453-5cb2-39cdde60a208@intel.com>
+From:   Jason Wang <jasowang@redhat.com>
+Message-ID: <1984491f-cd5e-d4bc-b328-41e2f2e935fd@redhat.com>
+Date:   Wed, 28 Apr 2021 17:21:48 +0800
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
+ Gecko/20100101 Thunderbird/78.10.0
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <5052fced-cd9a-e453-5cb2-39cdde60a208@intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Apr 28 2021 at 11:00, Thomas Gleixner wrote:
 
-> On Wed, Apr 28 2021 at 10:22, Zelin Deng wrote:
+在 2021/4/28 下午4:59, Zhu, Lingshan 写道:
 >
->> Hello,
->> I have below VM configuration:
->> ...
->>     <vcpu placement='static' current='1'>2</vcpu>
->>     <cpu mode='host-passthrough'>
->>     </cpu>
->>     <clock offset='utc'>
->>         <timer name='tsc' frequency='3000000000'/>
->>     </clock>
->> ...
->> After VM has been up for a few minutes, I use "virsh setvcpus" to hot-add
->> second vCPU into VM, below dmesg is observed:
->> [   53.273484] CPU1 has been hot-added
->> [   85.067135] SMP alternatives: switching to SMP code
->> [   85.078409] x86: Booting SMP configuration:
->> [   85.079027] smpboot: Booting Node 0 Processor 1 APIC 0x1
->> [   85.080240] kvm-clock: cpu 1, msr 77601041, secondary cpu clock
->> [   85.080450] smpboot: CPU 1 Converting physical 0 to logical die 1
->> [   85.101228] TSC ADJUST compensate: CPU1 observed 169175101528 warp. Adjust: 169175101528
->> [  141.513496] TSC ADJUST compensate: CPU1 observed 166 warp. Adjust: 169175101694
 >
-> Why is TSC_ADJUST on CPU1 different from CPU0 in the first place?
+> On 4/28/2021 4:42 PM, Jason Wang wrote:
+>>
+>> 在 2021/4/28 下午4:21, Zhu Lingshan 写道:
+>>> This commit implements doorbell mapping feature for ifcvf.
+>>> This feature maps the notify page to userspace, to eliminate
+>>> vmexit when kick a vq.
+>>>
+>>> Signed-off-by: Zhu Lingshan <lingshan.zhu@intel.com>
+>>> ---
+>>>   drivers/vdpa/ifcvf/ifcvf_main.c | 18 ++++++++++++++++++
+>>>   1 file changed, 18 insertions(+)
+>>>
+>>> diff --git a/drivers/vdpa/ifcvf/ifcvf_main.c 
+>>> b/drivers/vdpa/ifcvf/ifcvf_main.c
+>>> index e48e6b74fe2e..afcb71bc0f51 100644
+>>> --- a/drivers/vdpa/ifcvf/ifcvf_main.c
+>>> +++ b/drivers/vdpa/ifcvf/ifcvf_main.c
+>>> @@ -413,6 +413,23 @@ static int ifcvf_vdpa_get_vq_irq(struct 
+>>> vdpa_device *vdpa_dev,
+>>>       return vf->vring[qid].irq;
+>>>   }
+>>>   +static struct vdpa_notification_area 
+>>> ifcvf_get_vq_notification(struct vdpa_device *vdpa_dev,
+>>> +                                   u16 idx)
+>>> +{
+>>> +    struct ifcvf_hw *vf = vdpa_to_vf(vdpa_dev);
+>>> +    struct vdpa_notification_area area;
+>>> +
+>>> +    if (vf->notify_pa % PAGE_SIZE) {
+>>> +        area.addr = 0;
+>>> +        area.size = 0;
+>>
+>>
+>> We don't need this since:
+>>
+>> 1) there's a check in the vhost vDPA
+> I think you mean this code block in vdpa.c
+>         notify = ops->get_vq_notification(vdpa, index);
+>         if (notify.addr & (PAGE_SIZE - 1))
+>                 return -EINVAL;
 >
-> That's broken.
+> This should work, however, I think the parent driver should ensure it 
+> passes a PAGE_SIZE aligned address to userspace, to be robust, to be 
+> reliable.
 
-Aside of that the TSC synchronization check in guests cannot work
-reliably at all. Simply because there is no guarantee that vCPU0 and
-vCPU1 are running in parallel.
 
-Thanks,
+The point is parent is unaware of whether or not there's a userspace.
 
-        tglx
+
+>> 2) device is unaware of the bound driver, non page aligned doorbell 
+>> doesn't necessarily meant it can be used
+> Yes, non page aligned doorbell can not be used, so there is a check.
+
+
+Typo, what I meant is "it can't be used". That is to say, we should let 
+the vDPA bus driver to decide whether or not it can be used.
+
+Thanks
+
+
+>
+> Thanks
+> Zhu Lingshan
+>>
+>> Let's leave those polices to the driver.
+>>
+>> Thanks
+>>
+>>
+>>> +    } else {
+>>> +        area.addr = vf->notify_pa;
+>>> +        area.size = PAGE_SIZE;
+>>> +    }
+>>> +
+>>> +    return area;
+>>> +}
+>>> +
+>>>   /*
+>>>    * IFCVF currently does't have on-chip IOMMU, so not
+>>>    * implemented set_map()/dma_map()/dma_unmap()
+>>> @@ -440,6 +457,7 @@ static const struct vdpa_config_ops ifc_vdpa_ops ={
+>>>       .get_config    = ifcvf_vdpa_get_config,
+>>>       .set_config    = ifcvf_vdpa_set_config,
+>>>       .set_config_cb  = ifcvf_vdpa_set_config_cb,
+>>> +    .get_vq_notification = ifcvf_get_vq_notification,
+>>>   };
+>>>     static int ifcvf_probe(struct pci_dev *pdev, const struct 
+>>> pci_device_id *id)
+>>
+>
+
