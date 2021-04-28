@@ -2,186 +2,91 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8DBE536D5AC
-	for <lists+kvm@lfdr.de>; Wed, 28 Apr 2021 12:20:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E805B36D5CC
+	for <lists+kvm@lfdr.de>; Wed, 28 Apr 2021 12:29:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239269AbhD1KVC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 28 Apr 2021 06:21:02 -0400
-Received: from mga05.intel.com ([192.55.52.43]:52251 "EHLO mga05.intel.com"
+        id S239448AbhD1KaN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 28 Apr 2021 06:30:13 -0400
+Received: from mail.kernel.org ([198.145.29.99]:46332 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230248AbhD1KVB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 28 Apr 2021 06:21:01 -0400
-IronPort-SDR: kpadCj3J+AsXrGk2mCT/D00zqIf/qgoNS0WDNvteuL89SLv8N9QyDs/lSqvEepLXSnCTrImKZw
- 8hQwxNI2QuzA==
-X-IronPort-AV: E=McAfee;i="6200,9189,9967"; a="282043530"
-X-IronPort-AV: E=Sophos;i="5.82,257,1613462400"; 
-   d="scan'208";a="282043530"
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Apr 2021 03:20:15 -0700
-IronPort-SDR: dApj3T9INT2w9mW71TQIAdeviU5ltiqx14WUEmw+LwjnFS3O4jIxFpuC/Hd1E4va7S6f4Z9qIy
- FcX79hJFbAMQ==
-X-IronPort-AV: E=Sophos;i="5.82,257,1613462400"; 
-   d="scan'208";a="423463379"
-Received: from lingshan-mobl5.ccr.corp.intel.com (HELO [10.254.209.93]) ([10.254.209.93])
-  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Apr 2021 03:20:12 -0700
-Subject: Re: [PATCH 2/2] vDPA/ifcvf: implement doorbell mapping for ifcvf
-To:     Jason Wang <jasowang@redhat.com>, mst@redhat.com
-Cc:     virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20210428082133.6766-1-lingshan.zhu@intel.com>
- <20210428082133.6766-3-lingshan.zhu@intel.com>
- <f6d9a424-9025-3eb5-1cb4-0ff22f7bec63@redhat.com>
- <5052fced-cd9a-e453-5cb2-39cdde60a208@intel.com>
- <1984491f-cd5e-d4bc-b328-41e2f2e935fd@redhat.com>
- <ef510c97-1f1c-a121-99db-b659a5f9518c@intel.com>
- <4e0eda74-04ac-a889-471b-03fe65c65606@redhat.com>
-From:   "Zhu, Lingshan" <lingshan.zhu@intel.com>
-Message-ID: <f4cb4619-5634-e42d-0629-5c40f6b0dcd1@intel.com>
-Date:   Wed, 28 Apr 2021 18:20:10 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.9.0
+        id S238616AbhD1KaM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 28 Apr 2021 06:30:12 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 3FE02613F4;
+        Wed, 28 Apr 2021 10:29:28 +0000 (UTC)
+Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+        (Exim 4.94)
+        (envelope-from <maz@kernel.org>)
+        id 1lbhRd-009q8t-Vn; Wed, 28 Apr 2021 11:29:26 +0100
 MIME-Version: 1.0
-In-Reply-To: <4e0eda74-04ac-a889-471b-03fe65c65606@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=UTF-8;
+ format=flowed
 Content-Transfer-Encoding: 8bit
-Content-Language: en-US
+Date:   Wed, 28 Apr 2021 11:29:25 +0100
+From:   Marc Zyngier <maz@kernel.org>
+To:     =?UTF-8?Q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc:     kvm@vger.kernel.org, shashi.mallela@linaro.org,
+        alexandru.elisei@arm.com, eric.auger@redhat.com,
+        qemu-arm@nongnu.org, linux-arm-kernel@lists.infradead.org,
+        kvmarm@lists.cs.columbia.edu, christoffer.dall@arm.com
+Subject: Re: [kvm-unit-tests PATCH v1 1/4] arm64: split its-trigger test into
+ KVM and TCG variants
+In-Reply-To: <20210428101844.22656-2-alex.bennee@linaro.org>
+References: <20210428101844.22656-1-alex.bennee@linaro.org>
+ <20210428101844.22656-2-alex.bennee@linaro.org>
+User-Agent: Roundcube Webmail/1.4.11
+Message-ID: <eaed3c63988513fe2849c2d6f22937af@kernel.org>
+X-Sender: maz@kernel.org
+X-SA-Exim-Connect-IP: 51.254.78.96
+X-SA-Exim-Rcpt-To: alex.bennee@linaro.org, kvm@vger.kernel.org, shashi.mallela@linaro.org, alexandru.elisei@arm.com, eric.auger@redhat.com, qemu-arm@nongnu.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, christoffer.dall@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On 2021-04-28 11:18, Alex Bennée wrote:
+> A few of the its-trigger tests rely on IMPDEF behaviour where caches
+> aren't flushed before invall events. However TCG emulation doesn't
+> model any invall behaviour and as we can't probe for it we need to be
+> told. Split the test into a KVM and TCG variant and skip the invall
+> tests when under TCG.
+> 
+> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+> Cc: Shashi Mallela <shashi.mallela@linaro.org>
+> ---
+>  arm/gic.c         | 60 +++++++++++++++++++++++++++--------------------
+>  arm/unittests.cfg | 11 ++++++++-
+>  2 files changed, 45 insertions(+), 26 deletions(-)
+> 
+> diff --git a/arm/gic.c b/arm/gic.c
+> index 98135ef..96a329d 100644
+> --- a/arm/gic.c
+> +++ b/arm/gic.c
+> @@ -36,6 +36,7 @@ static struct gic *gic;
+>  static int acked[NR_CPUS], spurious[NR_CPUS];
+>  static int irq_sender[NR_CPUS], irq_number[NR_CPUS];
+>  static cpumask_t ready;
+> +static bool under_tcg;
+> 
+>  static void nr_cpu_check(int nr)
+>  {
+> @@ -734,32 +735,38 @@ static void test_its_trigger(void)
+>  	/*
+>  	 * re-enable the LPI but willingly do not call invall
+>  	 * so the change in config is not taken into account.
+> -	 * The LPI should not hit
+> +	 * The LPI should not hit. This does however depend on
+> +	 * implementation defined behaviour - under QEMU TCG emulation
+> +	 * it can quite correctly process the event directly.
 
+It looks to me that you are using an IMPDEF behaviour of *TCG*
+here. The programming model mandates that there is an invalidation
+if you change the configuration of the LPI.
 
-On 4/28/2021 6:03 PM, Jason Wang wrote:
->
-> 在 2021/4/28 下午5:56, Zhu, Lingshan 写道:
->>
->>
->> On 4/28/2021 5:21 PM, Jason Wang wrote:
->>>
->>> 在 2021/4/28 下午4:59, Zhu, Lingshan 写道:
->>>>
->>>>
->>>> On 4/28/2021 4:42 PM, Jason Wang wrote:
->>>>>
->>>>> 在 2021/4/28 下午4:21, Zhu Lingshan 写道:
->>>>>> This commit implements doorbell mapping feature for ifcvf.
->>>>>> This feature maps the notify page to userspace, to eliminate
->>>>>> vmexit when kick a vq.
->>>>>>
->>>>>> Signed-off-by: Zhu Lingshan <lingshan.zhu@intel.com>
->>>>>> ---
->>>>>>   drivers/vdpa/ifcvf/ifcvf_main.c | 18 ++++++++++++++++++
->>>>>>   1 file changed, 18 insertions(+)
->>>>>>
->>>>>> diff --git a/drivers/vdpa/ifcvf/ifcvf_main.c 
->>>>>> b/drivers/vdpa/ifcvf/ifcvf_main.c
->>>>>> index e48e6b74fe2e..afcb71bc0f51 100644
->>>>>> --- a/drivers/vdpa/ifcvf/ifcvf_main.c
->>>>>> +++ b/drivers/vdpa/ifcvf/ifcvf_main.c
->>>>>> @@ -413,6 +413,23 @@ static int ifcvf_vdpa_get_vq_irq(struct 
->>>>>> vdpa_device *vdpa_dev,
->>>>>>       return vf->vring[qid].irq;
->>>>>>   }
->>>>>>   +static struct vdpa_notification_area 
->>>>>> ifcvf_get_vq_notification(struct vdpa_device *vdpa_dev,
->>>>>> +                                   u16 idx)
->>>>>> +{
->>>>>> +    struct ifcvf_hw *vf = vdpa_to_vf(vdpa_dev);
->>>>>> +    struct vdpa_notification_area area;
->>>>>> +
->>>>>> +    if (vf->notify_pa % PAGE_SIZE) {
->>>>>> +        area.addr = 0;
->>>>>> +        area.size = 0;
->>>>>
->>>>>
->>>>> We don't need this since:
->>>>>
->>>>> 1) there's a check in the vhost vDPA
->>>> I think you mean this code block in vdpa.c
->>>>         notify = ops->get_vq_notification(vdpa, index);
->>>>         if (notify.addr & (PAGE_SIZE - 1))
->>>>                 return -EINVAL;
->>>>
->>>> This should work, however, I think the parent driver should ensure 
->>>> it passes a PAGE_SIZE aligned address to userspace, to be robust, 
->>>> to be reliable.
->>>
->>>
->>> The point is parent is unaware of whether or not there's a userspace.
->> when calling this, I think it targets a usersapce program, why kernel 
->> space need it, so IMHO no harm if we check this to keep the parent 
->> driver robust.
->
->
-> Again, vDPA device is unaware of what driver that is bound. It could 
-> be virtio-vpda, vhost-vdpa or other in the future. It's only the vDPA 
-> bus driver know how it is actually used.
->
->
->>>
->>>
->>>>> 2) device is unaware of the bound driver, non page aligned 
->>>>> doorbell doesn't necessarily meant it can be used
->>>> Yes, non page aligned doorbell can not be used, so there is a check.
->>>
->>>
->>> Typo, what I meant is "it can't be used". That is to say, we should 
->>> let the vDPA bus driver to decide whether or not it can be used.
->> If it is not page aligned, there would be extra complexities for 
->> vhost/qemu, I see it as a hardware defect, 
->
->
-> It is allowed by the virtio spec, isn't it?
-The spec does not require the doorbell to be page size aligned, however 
-it still a hardware defect if non page size aligned notify base present, 
-I will leave a warning message here instead of the 0 value.
-
-Thanks
-Zhu Lingshan
->
-> Thanks
->
->
->> why adapt to this kind of defects?
->>
->> Thanks
->> Zhu Lingshan
->>>
->>> Thanks
->>>
->>>
->>>>
->>>> Thanks
->>>> Zhu Lingshan
->>>>>
->>>>> Let's leave those polices to the driver.
->>>>>
->>>>> Thanks
->>>>>
->>>>>
->>>>>> +    } else {
->>>>>> +        area.addr = vf->notify_pa;
->>>>>> +        area.size = PAGE_SIZE;
->>>>>> +    }
->>>>>> +
->>>>>> +    return area;
->>>>>> +}
->>>>>> +
->>>>>>   /*
->>>>>>    * IFCVF currently does't have on-chip IOMMU, so not
->>>>>>    * implemented set_map()/dma_map()/dma_unmap()
->>>>>> @@ -440,6 +457,7 @@ static const struct vdpa_config_ops 
->>>>>> ifc_vdpa_ops ={
->>>>>>       .get_config    = ifcvf_vdpa_get_config,
->>>>>>       .set_config    = ifcvf_vdpa_set_config,
->>>>>>       .set_config_cb  = ifcvf_vdpa_set_config_cb,
->>>>>> +    .get_vq_notification = ifcvf_get_vq_notification,
->>>>>>   };
->>>>>>     static int ifcvf_probe(struct pci_dev *pdev, const struct 
->>>>>> pci_device_id *id)
->>>>>
->>>>
->>>
->>
->
-
+         M.
+-- 
+Jazz is not dead. It just smells funny...
