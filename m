@@ -2,97 +2,64 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C018C36D61C
-	for <lists+kvm@lfdr.de>; Wed, 28 Apr 2021 13:08:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CB21636D66C
+	for <lists+kvm@lfdr.de>; Wed, 28 Apr 2021 13:28:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238305AbhD1LI7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 28 Apr 2021 07:08:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45320 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239648AbhD1LIz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 28 Apr 2021 07:08:55 -0400
-Received: from mail-pf1-x42a.google.com (mail-pf1-x42a.google.com [IPv6:2607:f8b0:4864:20::42a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7ED36C061574;
-        Wed, 28 Apr 2021 04:08:10 -0700 (PDT)
-Received: by mail-pf1-x42a.google.com with SMTP id c3so24720259pfo.3;
-        Wed, 28 Apr 2021 04:08:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id;
-        bh=sLpoIH+yhyALQFTgQocCci8bsTG3D7jmg/76ZkWjRcY=;
-        b=dpwXpyq3mY3XQ/cbopkDD6jheZvyXHH6oeT2KuE8ukVbHVlj940j0PSiy+9xFf9xsh
-         +NNRap1mP+dfKzOY1wZpB+MXHl14qTGu29zkTdUjG/9YHWH28q50wsevtiSHsRjZorkp
-         TBidwdOjaxRWuGrrBR2WMAHr/hYZRMm4OVYcfrWZfYnhK6qdSLLniHMS7UoT6f1IU1WC
-         EzEFS8iidL21YpS0nUD+WLjHvuXCCQFbUuYtw0PctqOWcZndxuKU604QfncYs5H+ik17
-         F0z3l2U+DwwnQKsqNKCYHe1ZCgd2WqzmA04SkOUAYz7xZR5HkaDsfztOhENb2tbqAoGm
-         9b8g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id;
-        bh=sLpoIH+yhyALQFTgQocCci8bsTG3D7jmg/76ZkWjRcY=;
-        b=J9V1vGPHVbYRmUi+52GFCxgGznh7ZnI/kPaHDwgaL3ARZvrO+aDhDbXUaKMwkFFKN9
-         t5L+0gnrhVBwmk1hrWAfJlFuysKQ9tsnE+Pnx6c3rR75oDSTY82TN6251ZfQnBMfUXw6
-         0Qbuv64S/kkc8Bn75M5vwWqeRJifFZgrPat7UKjVI8+r0IaX3yMKMUouVwwitlvcBAIJ
-         /C95Id1DZ6CbQNF2lrln3xC1NyQgz68KJS8DiDWNcFM3X6L8t4PSy0s722quJT0tnphz
-         mY+jsNRc4Rgz8D2CznqU7zN0i1aBbGBv7WmShvt82V9jQ9JDJIfRG0gAg7fkenCN3dnJ
-         BweQ==
-X-Gm-Message-State: AOAM530TzsiLtGc0L+wXj80u5QErXaoQVj6H4CLel1rVVi0kFAY8mUFs
-        aMpLBLnQ0HJHYLjB+oUcQRVZCIuP300=
-X-Google-Smtp-Source: ABdhPJzgUYS5opVQrXuZN/v6IrlJrCS4wl7W8ENluYVVshJoupHTYPqxcKawOAAerM7DT8BRVj3gKg==
-X-Received: by 2002:a63:d942:: with SMTP id e2mr26479270pgj.117.1619608089738;
-        Wed, 28 Apr 2021 04:08:09 -0700 (PDT)
-Received: from localhost.localdomain ([103.7.29.6])
-        by smtp.googlemail.com with ESMTPSA id z17sm4738423pfe.181.2021.04.28.04.08.07
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 28 Apr 2021 04:08:09 -0700 (PDT)
-From:   Wanpeng Li <kernellwp@gmail.com>
-X-Google-Original-From: Wanpeng Li <wanpengli@tencent.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>
-Subject: [PATCH] KVM: LAPIC: Accurately guarantee busy wait for timer to expire when using hv_timer
-Date:   Wed, 28 Apr 2021 19:08:02 +0800
-Message-Id: <1619608082-4187-1-git-send-email-wanpengli@tencent.com>
-X-Mailer: git-send-email 2.7.4
+        id S238486AbhD1L2o (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 28 Apr 2021 07:28:44 -0400
+Received: from mail.skyhub.de ([5.9.137.197]:33800 "EHLO mail.skyhub.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S230420AbhD1L2o (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 28 Apr 2021 07:28:44 -0400
+Received: from zn.tnic (p200300ec2f0c1700f2e32bd17c928af7.dip0.t-ipconnect.de [IPv6:2003:ec:2f0c:1700:f2e3:2bd1:7c92:8af7])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 868B61EC01A8;
+        Wed, 28 Apr 2021 13:27:58 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1619609278;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=wX0F+YaUrQZGJ7PeYw9w/V7McHBNPDBXSLDgSyYC7J0=;
+        b=ZYf/SAZqE+aSmtpLJSFVWkaTmQ05yy0NKNXpwJgpmxxGUxOhpubhMst0d8XuV9RnNwkJ/p
+        RJI5buJf0DqMmBHzk0OYqgrpxVeXpA7k5emgBYoFTH3qFRmK+vSMnY+TGWuLGk7qoIEmlM
+        ZOjGoDexB+s7ejNsxmDbKwrfumLfDEc=
+Date:   Wed, 28 Apr 2021 13:27:57 +0200
+From:   Borislav Petkov <bp@alien8.de>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Brijesh Singh <brijesh.singh@amd.com>, x86@kernel.org,
+        tglx@linutronix.de, jroedel@suse.de, thomas.lendacky@amd.com,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: Re: [PATCH 3/3] x86/msr: Rename MSR_K8_SYSCFG to MSR_AMD64_SYSCFG
+Message-ID: <YIlGvdxZVa0kiJf4@zn.tnic>
+References: <20210427111636.1207-1-brijesh.singh@amd.com>
+ <20210427111636.1207-4-brijesh.singh@amd.com>
+ <YIk8c+/Vwf30Fh6G@zn.tnic>
+ <9e687194-5b68-9b4c-bf7f-0914e656d08f@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <9e687194-5b68-9b4c-bf7f-0914e656d08f@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Wanpeng Li <wanpengli@tencent.com>
+On Wed, Apr 28, 2021 at 12:55:26PM +0200, Paolo Bonzini wrote:
+> There shouldn't be any conflicts right now, but perhaps it's easiest to
+> merge the whole series for -rc2.
 
-Commit ee66e453db13d (KVM: lapic: Busy wait for timer to expire when 
-using hv_timer) tries to set ktime->expired_tscdeadline by checking 
-ktime->hv_timer_in_use since lapic timer oneshot/periodic modes which 
-are emulated by vmx preemption timer also get advanced, they leverage 
-the same vmx preemption timer logic with tsc-deadline mode. However, 
-ktime->hv_timer_in_use is cleared before apic_timer_expired() handling, 
-let's delay this clearing in preemption-disabled region.
+You mean, merge it upstream or into tip? I think you mean upstream
+because then it would be easy for everyone to base new stuff ontop.
 
-Fixes: ee66e453db13d (KVM: lapic: Busy wait for timer to expire when using hv_timer)
-Cc: Sean Christopherson <seanjc@google.com>
-Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
----
- arch/x86/kvm/lapic.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+> In any case,
+> 
+> Acked-by: Paolo Bonzini <pbonzini@redhat.com>
 
-diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-index 152591f..c0ebef5 100644
---- a/arch/x86/kvm/lapic.c
-+++ b/arch/x86/kvm/lapic.c
-@@ -1913,8 +1913,8 @@ void kvm_lapic_expired_hv_timer(struct kvm_vcpu *vcpu)
- 	if (!apic->lapic_timer.hv_timer_in_use)
- 		goto out;
- 	WARN_ON(rcuwait_active(&vcpu->wait));
--	cancel_hv_timer(apic);
- 	apic_timer_expired(apic, false);
-+	cancel_hv_timer(apic);
- 
- 	if (apic_lvtt_period(apic) && apic->lapic_timer.period) {
- 		advance_periodic_target_expiration(apic);
+Thx.
+
 -- 
-2.7.4
+Regards/Gruss,
+    Boris.
 
+https://people.kernel.org/tglx/notes-about-netiquette
