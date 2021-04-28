@@ -2,108 +2,141 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 500C736D540
-	for <lists+kvm@lfdr.de>; Wed, 28 Apr 2021 12:00:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BE8FD36D546
+	for <lists+kvm@lfdr.de>; Wed, 28 Apr 2021 12:00:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238501AbhD1KBE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 28 Apr 2021 06:01:04 -0400
-Received: from mga09.intel.com ([134.134.136.24]:63791 "EHLO mga09.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S233396AbhD1KBC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 28 Apr 2021 06:01:02 -0400
-IronPort-SDR: Y+z8L2G0UNYVsnll2m02PPaz2IjF69kLWteyo0wDfadxocdt4Y+Cq5w8dcnF766KGsWQ4izx31
- XUR7mrESEh6g==
-X-IronPort-AV: E=McAfee;i="6200,9189,9967"; a="196811684"
-X-IronPort-AV: E=Sophos;i="5.82,257,1613462400"; 
-   d="scan'208";a="196811684"
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Apr 2021 03:00:17 -0700
-IronPort-SDR: f7aF1oNaLFBuNCA2P0mGV7AtrmkAbXk1n/4Hj0QI2NR+Zt9QbZxP75HRIVkxVsUyF0d/FgYsqV
- YjtEYF8HWpjw==
-X-IronPort-AV: E=Sophos;i="5.82,257,1613462400"; 
-   d="scan'208";a="423454172"
-Received: from lingshan-mobl5.ccr.corp.intel.com (HELO [10.254.209.93]) ([10.254.209.93])
-  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Apr 2021 03:00:09 -0700
-Subject: Re: [PATCH 1/2] vDPA/ifcvf: record virtio notify base
-To:     Jason Wang <jasowang@redhat.com>, mst@redhat.com
-Cc:     virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20210428082133.6766-1-lingshan.zhu@intel.com>
- <20210428082133.6766-2-lingshan.zhu@intel.com>
- <55217869-b456-f3bc-0b5a-6beaf34c19f8@redhat.com>
-From:   "Zhu, Lingshan" <lingshan.zhu@intel.com>
-Message-ID: <3243eeef-2891-5b79-29cb-bc969802c5dc@intel.com>
-Date:   Wed, 28 Apr 2021 18:00:07 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.9.0
+        id S238785AbhD1KBg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 28 Apr 2021 06:01:36 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:43909 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S238554AbhD1KBd (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 28 Apr 2021 06:01:33 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1619604048;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=FhFNqwiAFSjk5pc8IGLBBUa1bd6wwdqJ26xugM42AOU=;
+        b=bUHp+K/PLPuY7Y2kC9ThTes/GauyUYORH6PYmclXfq8i1XFFohoI3A5OK2J5r21LOKim4Q
+        3os9g55VJDJ6YhFLk/wrNO272A6tvTRa4A3R++lboK8owZTmmKw97pcHDKdnjSO5+tMASv
+        Fnjd/Q/mJoSoYEkIu1rMXsMehJguTJY=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-103-hG1kYZBHOGmkl9itqx6h-w-1; Wed, 28 Apr 2021 06:00:46 -0400
+X-MC-Unique: hG1kYZBHOGmkl9itqx6h-w-1
+Received: by mail-ed1-f71.google.com with SMTP id u30-20020a50a41e0000b0290385504d6e4eso4711548edb.7
+        for <kvm@vger.kernel.org>; Wed, 28 Apr 2021 03:00:46 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=FhFNqwiAFSjk5pc8IGLBBUa1bd6wwdqJ26xugM42AOU=;
+        b=YCHu/umWP/DI4hOAW8jQH5eOMq8iaemZS9HcjVSdcqL4IjJIj54vvbKJUMp0PwTig+
+         GkC2uuud4ag5F+oA19uTHw8sS0r0DGQEPTi5rKrqr8aITbfY8jb5z7lzKp9Vgyb/EaPi
+         R1pra48/WuwL4spQiDLecn7VVJplBE7D8mxINuxM679a4ouXR5sFj6MESIvlFYYa19HM
+         gOYJLIc11K6i8lp27BXbVElrGzTyffHw8p1ykpsjmptYF/Wx9jsRbT1RVtIaqMBrKNDj
+         mFTf4PlXLpUYyh73+hvpLhGpvdyuF/emdzcjrAFUAzPDmJxAeP9uvdVbKUAim/6lNqwn
+         bGRA==
+X-Gm-Message-State: AOAM531gGlzC6hN5tHBp0HNit4DcOrLWOxZxBMOEbdeXkqTfaxPAUQFZ
+        4Bbcy6xJBJKtuuSZ5liCXc0kigWUepq2fekGc2u+RTBE5AgI//WvfRVCsOVcDRbkbEZP/p/gd2U
+        6MJvhuudM4EDt
+X-Received: by 2002:a17:906:a0d4:: with SMTP id bh20mr28035351ejb.348.1619604045185;
+        Wed, 28 Apr 2021 03:00:45 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxTMhrX4bqXfljul31u2glQku96LkpSI89jMTVvHtGdEXLDq8ZAQFkOvHuZRusQHJD5Oogk+A==
+X-Received: by 2002:a17:906:a0d4:: with SMTP id bh20mr28035332ejb.348.1619604045012;
+        Wed, 28 Apr 2021 03:00:45 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e? ([2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e])
+        by smtp.gmail.com with ESMTPSA id u13sm1620873ejj.16.2021.04.28.03.00.43
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 28 Apr 2021 03:00:44 -0700 (PDT)
+Subject: Re: [PATCH 3/6] KVM: x86/mmu: Deduplicate rmap freeing in
+ allocate_memslot_rmap
+To:     Ben Gardon <bgardon@google.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Cc:     Peter Xu <peterx@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Peter Shier <pshier@google.com>,
+        Junaid Shahid <junaids@google.com>,
+        Jim Mattson <jmattson@google.com>,
+        Yulei Zhang <yulei.kernel@gmail.com>,
+        Wanpeng Li <kernellwp@gmail.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Xiao Guangrong <xiaoguangrong.eric@gmail.com>
+References: <20210427223635.2711774-1-bgardon@google.com>
+ <20210427223635.2711774-4-bgardon@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <2e5ecc0b-0ef4-a663-3b1d-81d020626b39@redhat.com>
+Date:   Wed, 28 Apr 2021 12:00:43 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.7.0
 MIME-Version: 1.0
-In-Reply-To: <55217869-b456-f3bc-0b5a-6beaf34c19f8@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20210427223635.2711774-4-bgardon@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Typo in the commit subject, I guess?
 
+Paolo
 
-On 4/28/2021 4:39 PM, Jason Wang wrote:
->
-> 在 2021/4/28 下午4:21, Zhu Lingshan 写道:
->> This commit records virtio notify base addr to implemente
->> doorbell mapping feature
->>
->> Signed-off-by: Zhu Lingshan <lingshan.zhu@intel.com>
->> ---
->>   drivers/vdpa/ifcvf/ifcvf_base.c | 1 +
->>   drivers/vdpa/ifcvf/ifcvf_base.h | 1 +
->>   2 files changed, 2 insertions(+)
->>
->> diff --git a/drivers/vdpa/ifcvf/ifcvf_base.c 
->> b/drivers/vdpa/ifcvf/ifcvf_base.c
->> index 1a661ab45af5..cc61a5bfc5b1 100644
->> --- a/drivers/vdpa/ifcvf/ifcvf_base.c
->> +++ b/drivers/vdpa/ifcvf/ifcvf_base.c
->> @@ -133,6 +133,7 @@ int ifcvf_init_hw(struct ifcvf_hw *hw, struct 
->> pci_dev *pdev)
->> &hw->notify_off_multiplier);
->>               hw->notify_bar = cap.bar;
->>               hw->notify_base = get_cap_addr(hw, &cap);
->> +            hw->notify_pa = pci_resource_start(pdev, cap.bar) + 
->> cap.offset;
->
->
-> To be more generic and avoid future changes, let's use the math 
-> defined in the virtio spec.
->
-> You may refer how it is implemented in virtio_pci vdpa driver[1].
-Are you suggesting every vq keep its own notify_pa? In this case, we 
-still need to record notify_pa in hw when init_hw, then initialize 
-vq->notify_pa accrediting to hw->notify_pa.
-
-Thanks
-Zhu Lingshan
->
-> Thanks
->
-> [1] 
-> https://lore.kernel.org/virtualization/20210415073147.19331-5-jasowang@redhat.com/T/
->
->
->> IFCVF_DBG(pdev, "hw->notify_base = %p\n",
->>                     hw->notify_base);
->>               break;
->> diff --git a/drivers/vdpa/ifcvf/ifcvf_base.h 
->> b/drivers/vdpa/ifcvf/ifcvf_base.h
->> index 0111bfdeb342..bcca7c1669dd 100644
->> --- a/drivers/vdpa/ifcvf/ifcvf_base.h
->> +++ b/drivers/vdpa/ifcvf/ifcvf_base.h
->> @@ -98,6 +98,7 @@ struct ifcvf_hw {
->>       char config_msix_name[256];
->>       struct vdpa_callback config_cb;
->>       unsigned int config_irq;
->> +    phys_addr_t  notify_pa;
->>   };
->>     struct ifcvf_adapter {
->
+On 28/04/21 00:36, Ben Gardon wrote:
+> Small code deduplication. No functional change expected.
+> 
+> Signed-off-by: Ben Gardon <bgardon@google.com>
+> ---
+>   arch/x86/kvm/x86.c | 19 +++++++++++--------
+>   1 file changed, 11 insertions(+), 8 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index cf3b67679cf0..5bcf07465c47 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -10818,17 +10818,23 @@ void kvm_arch_destroy_vm(struct kvm *kvm)
+>   	kvm_hv_destroy_vm(kvm);
+>   }
+>   
+> -void kvm_arch_free_memslot(struct kvm *kvm, struct kvm_memory_slot *slot)
+> +static void free_memslot_rmap(struct kvm_memory_slot *slot)
+>   {
+>   	int i;
+>   
+>   	for (i = 0; i < KVM_NR_PAGE_SIZES; ++i) {
+>   		kvfree(slot->arch.rmap[i]);
+>   		slot->arch.rmap[i] = NULL;
+> +	}
+> +}
+>   
+> -		if (i == 0)
+> -			continue;
+> +void kvm_arch_free_memslot(struct kvm *kvm, struct kvm_memory_slot *slot)
+> +{
+> +	int i;
+> +
+> +	free_memslot_rmap(slot);
+>   
+> +	for (i = 1; i < KVM_NR_PAGE_SIZES; ++i) {
+>   		kvfree(slot->arch.lpage_info[i - 1]);
+>   		slot->arch.lpage_info[i - 1] = NULL;
+>   	}
+> @@ -10894,12 +10900,9 @@ static int kvm_alloc_memslot_metadata(struct kvm_memory_slot *slot,
+>   	return 0;
+>   
+>   out_free:
+> -	for (i = 0; i < KVM_NR_PAGE_SIZES; ++i) {
+> -		kvfree(slot->arch.rmap[i]);
+> -		slot->arch.rmap[i] = NULL;
+> -		if (i == 0)
+> -			continue;
+> +	free_memslot_rmap(slot);
+>   
+> +	for (i = 1; i < KVM_NR_PAGE_SIZES; ++i) {
+>   		kvfree(slot->arch.lpage_info[i - 1]);
+>   		slot->arch.lpage_info[i - 1] = NULL;
+>   	}
+> 
 
