@@ -2,162 +2,250 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 11EB136D832
-	for <lists+kvm@lfdr.de>; Wed, 28 Apr 2021 15:21:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 35E5936D88B
+	for <lists+kvm@lfdr.de>; Wed, 28 Apr 2021 15:48:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239785AbhD1NWY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 28 Apr 2021 09:22:24 -0400
-Received: from mail-bn8nam11on2089.outbound.protection.outlook.com ([40.107.236.89]:57569
-        "EHLO NAM11-BN8-obe.outbound.protection.outlook.com"
+        id S239696AbhD1NsH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 28 Apr 2021 09:48:07 -0400
+Received: from mail-he1eur01hn2218.outbound.protection.outlook.com ([52.100.5.218]:4098
+        "EHLO EUR01-HE1-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S239634AbhD1NWY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 28 Apr 2021 09:22:24 -0400
+        id S229891AbhD1NsG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 28 Apr 2021 09:48:06 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Py3KBZ6C7UKneg2/hIkZ/XUf8YTQvJF2WPnco1EtMVrJjnsM6t52I1+ncQ8MpN0mPGygg1SH1VfaCqGFaJNmYn/l901QOTZdfWbsXEuCr8dJAVf69GPsT/6g0KpdsMA9BdRgMz4uahrSYll6lBdNVpaP7+h6wQUJRDPo8h6YD7sxDYF2kIs2Klo7uU6+Fj83cqTkuD3VHlGmbhzu1oQQZxWsttwnDcEF8CcG8kK6ysqkL8gYyX1thjXYLXQUqu3R/BAoejRmo7MDoBdi8TuZzXUqTtx0wkl8N89zmk8A2KW0AnN5LvxBoqKoZx1w14zvxkVQ9q0RN4D2vOhcs3J5sg==
+ b=f8VYXF5kHxcdDE0LSBHww4ncuF4mG87a9KBXIFJeTLy8OKLDbcIPQbsmNVPKp22uGrWykNyhv3WXYghgBx9UDQ+glXr4112Aa3Tf5RfAZJinb9aeXDa4OPGa80IWsP+YlDuknf6SWf93GzAa787qXfXc3N33rPuuskf6yfzeFaR0/BffvWxvPGnkRiQ4yaClE8HVzeuRq1cbB7TjmIF0cWkogF5eR6mwsfMF9+j+Tj+rvY7dHPEvjcJ6mGQJd+NVq/TBKDZwbnV0yOn9XORcqfzFzwJ2Kd55UjmFwqrDnvHvDEX/pA+KF3Oo6hXoCeuNhfYgZwJZBkT0tL6YeHAwFA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=hyOBpghpK45LPineiz8iwenPHuyzITxCcxMuQknJVFo=;
- b=YKQvW1iPhUqfodwTrGbclrQxfmCiwwF5Ijz4naEza1aT9EIre/i3rC460jnn27qnFS3cxn1dLWACPmyl5XqQRvSwXkjPhn2JQzT+0TeuJ4BGTxCW3MiQ4BzEQRQkV2cl7BVJoW3ax3Dhpth7K6zxBqzRBrwkUhvlVKXHrPkCr3XNrvncxwpbA5TA0yXHTupmUkkoTGUrRjHPw0nZX9yDuRV03qEu5LVnn8dFYK75RANaZ5c12c+pf2mZH6g0Xp8lH2cVK5DMypXLo6JruRhMCtRggqvxm0WRug1Mci+rABTdvSPrZ5RcKRKd6C0QzJmrBhy+T/0AUpZhNdzRryDa4g==
+ bh=NegJJJsw8DC5qD87Y/UEZnZzhl/mxnLtwR4L7OUHxXs=;
+ b=XfzhLUWoWvf+JEGXpGP8Tff2ubZo0Z83yk0WHrpZH3t2gejsmIXVJOQq17WTjbwxtrulIamaJfin4KJPvAZWgqe7NkcBFjuS1plsyMAspZ8OWyywOly3dCfAZJ+vlHnlLseWrRiWxORgtvL9x7CvPnYnUy7L/Ur31/19IRkZ/8ZQTk7z8whioNuSxrJGHETsQinrsea8Z/az7VXsYPYwPu+E8sBzfgOnSTr3rve4FjOeAxPZ91x2enAxJlMteSqA5m4zVwL2uatoYqjPIfaVVkYX3lHFjxNEZ3rgP5CpJ3rDsTtRyZBineCot1xGik0tR1UrNQ11bvE8DuFz/JBDkA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=hyOBpghpK45LPineiz8iwenPHuyzITxCcxMuQknJVFo=;
- b=jeFyg/Dz85w3mN9hCwXa83/ODVOxA29QxpIkp1uk48fkCQaxtFepLiHDQBjiDH04/WMe0P/zLpqE6Q0b7+my0fbrxF/62XX5u04lHk0u6RJUmoDILgesmT93u756aWZEjMLbqiF/sUQwdYpsA5ccTP7mYPlvGFvJQyTDjSWy6yOvdWVTMetWi2vM8I4Nn5SY5PEhVrqgcTtKZ4+WtQpCTkP42BfQF2oc3rBvNQW52uhmox/Z6c7ehYzyMEG33m3eNqtnkYJeQ7m3qHmAqBIXSK3VMcjr/V/prPLmonUhnDe9t4YhVSLDe2AeumURUiZnUHaoAi1RFeeem+LIL9zztg==
-Authentication-Results: linux.ibm.com; dkim=none (message not signed)
- header.d=none;linux.ibm.com; dmarc=none action=none header.from=nvidia.com;
-Received: from DM6PR12MB3834.namprd12.prod.outlook.com (2603:10b6:5:14a::12)
- by DM5PR12MB1657.namprd12.prod.outlook.com (2603:10b6:4:d::21) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.4065.25; Wed, 28 Apr 2021 13:21:37 +0000
-Received: from DM6PR12MB3834.namprd12.prod.outlook.com
- ([fe80::1c62:7fa3:617b:ab87]) by DM6PR12MB3834.namprd12.prod.outlook.com
- ([fe80::1c62:7fa3:617b:ab87%6]) with mapi id 15.20.4065.027; Wed, 28 Apr 2021
- 13:21:37 +0000
-Date:   Wed, 28 Apr 2021 10:21:35 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Eric Farman <farman@linux.ibm.com>
-Cc:     Christian Borntraeger <borntraeger@de.ibm.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org,
-        Peter Oberparleiter <oberpar@linux.ibm.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Vineeth Vijayan <vneethv@linux.ibm.com>,
-        "Raj, Ashok" <ashok.raj@intel.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Christoph Hellwig <hch@lst.de>,
-        Leon Romanovsky <leonro@nvidia.com>,
-        Max Gurtovoy <mgurtovoy@nvidia.com>,
-        Tarun Gupta <targupta@nvidia.com>
-Subject: Re: [PATCH v2 07/13] vfio/ccw: Convert to use
- vfio_register_group_dev()
-Message-ID: <20210428132135.GR1370958@nvidia.com>
-References: <7-v2-7667f42c9bad+935-vfio3_jgg@nvidia.com>
- <5325cd47bf170b66591bc1e64bf9fa3aa9c365b5.camel@linux.ibm.com>
- <20210427221030.GK1370958@nvidia.com>
- <564ab34574dac135cd4e2f8f1816467d4d6dc25f.camel@linux.ibm.com>
+ bh=NegJJJsw8DC5qD87Y/UEZnZzhl/mxnLtwR4L7OUHxXs=;
+ b=hCPyDwY5ZQSrMqFLnkmWTsfMbsnF7hAZtDmuWMhFNVanq1cyo8pRvA8lTpbT50CmjJy/E0Ylw5gFTMi1kHXDgZf4H0uMilpU/x0M+vYoaH84yypY/9mLT6ts7PtiGW93dWTB0vZTdh21Djq/E+3N+jmX421ai/KvlUWN0UJGtso=
+Authentication-Results: redhat.com; dkim=none (message not signed)
+ header.d=none;redhat.com; dmarc=none action=none header.from=virtuozzo.com;
+Received: from AM9PR08MB5988.eurprd08.prod.outlook.com (2603:10a6:20b:283::19)
+ by AM9PR08MB5988.eurprd08.prod.outlook.com (2603:10a6:20b:283::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4065.23; Wed, 28 Apr
+ 2021 13:47:09 +0000
+Received: from AM9PR08MB5988.eurprd08.prod.outlook.com
+ ([fe80::7d3f:e291:9411:c50f]) by AM9PR08MB5988.eurprd08.prod.outlook.com
+ ([fe80::7d3f:e291:9411:c50f%7]) with mapi id 15.20.4065.028; Wed, 28 Apr 2021
+ 13:47:09 +0000
+Date:   Wed, 28 Apr 2021 16:46:57 +0300
+From:   Valeriy Vdovin <valeriy.vdovin@virtuozzo.com>
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, Denis Lunev <den@openvz.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
+        Shuah Khan <shuah@kernel.org>,
+        Aaron Lewis <aaronlewis@google.com>,
+        Alexander Graf <graf@amazon.com>,
+        Like Xu <like.xu@linux.intel.com>,
+        Oliver Upton <oupton@google.com>,
+        Andrew Jones <drjones@redhat.com>, kvm@vger.kernel.org,
+        linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH] KVM: x86: Fix KVM_GET_CPUID2 ioctl to return cpuid
+ entries count
+Message-ID: <20210428134657.GA515794@dhcp-172-16-24-191.sw.ru>
+References: <20210428113655.26282-1-valeriy.vdovin@virtuozzo.com>
+ <871raueg7y.fsf@vitty.brq.redhat.com>
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <564ab34574dac135cd4e2f8f1816467d4d6dc25f.camel@linux.ibm.com>
-X-Originating-IP: [206.223.160.26]
-X-ClientProxiedBy: CH2PR14CA0013.namprd14.prod.outlook.com
- (2603:10b6:610:60::23) To DM6PR12MB3834.namprd12.prod.outlook.com
- (2603:10b6:5:14a::12)
+In-Reply-To: <871raueg7y.fsf@vitty.brq.redhat.com>
+User-Agent: Mutt/1.5.21 (2010-09-15)
+X-Originating-IP: [185.231.240.5]
+X-ClientProxiedBy: FR0P281CA0012.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:15::17) To AM9PR08MB5988.eurprd08.prod.outlook.com
+ (2603:10a6:20b:283::19)
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from mlx.ziepe.ca (206.223.160.26) by CH2PR14CA0013.namprd14.prod.outlook.com (2603:10b6:610:60::23) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4087.25 via Frontend Transport; Wed, 28 Apr 2021 13:21:37 +0000
-Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1lbk8F-00E0tN-Pw; Wed, 28 Apr 2021 10:21:35 -0300
+Received: from dhcp-172-16-24-191.sw.ru (185.231.240.5) by FR0P281CA0012.DEUP281.PROD.OUTLOOK.COM (2603:10a6:d10:15::17) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4087.17 via Frontend Transport; Wed, 28 Apr 2021 13:47:08 +0000
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 06c08364-bea5-48df-cdd5-08d90a488d12
-X-MS-TrafficTypeDiagnostic: DM5PR12MB1657:
+X-MS-Office365-Filtering-Correlation-Id: cfb3773a-d905-4102-cb03-08d90a4c1e52
+X-MS-TrafficTypeDiagnostic: AM9PR08MB5988:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <DM5PR12MB16571E19D022DC67E1206254C2409@DM5PR12MB1657.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:7691;
+X-Microsoft-Antispam-PRVS: <AM9PR08MB59883601159F4176928F22E687409@AM9PR08MB5988.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:8882;
 X-MS-Exchange-SenderADCheck: 1
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:5;SRV:;IPV:NLI;SFV:SPM;H:AM9PR08MB5988.eurprd08.prod.outlook.com;PTR:;CAT:OSPM;SFS:(4636009)(366004)(5660300002)(83380400001)(6916009)(8676002)(38100700002)(44832011)(33656002)(66476007)(66556008)(6506007)(38350700002)(956004)(36756003)(86362001)(66946007)(7696005)(52116002)(7416002)(6666004)(186003)(2906002)(4326008)(16526019)(26005)(9686003)(54906003)(55016002)(498600001)(8936002)(1076003)(30126003);DIR:OUT;SFP:1501;
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: DLHjpi8NHyLAKlk+ygQ8xYW91RJFWVukn+ElK4BPCVjzA/gpk+F9KSNrjX3Dy9gpgCI9cW7yvscl1A10X69msrRT7STBod2MqDnyP1BtMPdpBOvwQb/gXkvgF9O+9Ro/amoKmFL4elrizCsp8baR2YoDRon4xAh9HHYGclJg3+PUomqQOL2Q2E4BVJvBqf86nWJ+du5vgu1YCdMOSt2eOiQTdnCGggaT4Q1LdhW4wMha/vKUBV+6ZAwdplezjxF550E5YFPUI0YMIC7GXSxJcPGcEpOaNF0eoL8/IHSgEqHwIAnWZeb63hmeblCOwMMLp6oxD3HX0CncA5HQlYHMF+uzDpEV0FypFI+KIDqKZuQFj+dCKRXXt+t8xRdKe9OPG0MjAFvS9zl+sn0369WQKR2+eXwThUnWZOCxx/59hU2lDow4yiIIBR2T5zDlj3nhLy+uyhHE25TNt/V5XChKDZL3y9d/pJHZIOVfgXITSGqRpLOc6FWhknFxWL/i2zeGBvaDDGx4lEtLcK693ntm582Ac2rid/9TupXvTPLdH/C0iw1ltOKK1NoP99bD+lraJwQO9R06oS/E/w/Qe0pANQ+lJlno7Z5mKN9KL1RN+SE=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB3834.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(346002)(39860400002)(376002)(396003)(136003)(366004)(83380400001)(66476007)(36756003)(7416002)(86362001)(33656002)(66946007)(66556008)(8676002)(4326008)(6916009)(426003)(8936002)(478600001)(5660300002)(9746002)(1076003)(9786002)(38100700002)(2616005)(26005)(186003)(2906002)(316002)(107886003)(54906003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: =?us-ascii?Q?YDTFOOkUGrFfbNJsqsnI/2aFgnuaZwPGmJ7nu0pQKz4lxE+VoPmQWRdCU3b4?=
- =?us-ascii?Q?/9Povk9lvANxaS03y27ivxH2287fPxagJo8hKM5hXQ/uSxnMRJEOEt9StWbZ?=
- =?us-ascii?Q?763dY11XDuW6dEuUq8pKVETkUo+zUPzkwReneTzdAAwe56KB1p0juRfH0nTz?=
- =?us-ascii?Q?KE9iripfcvg/8ft4cVt42AiQCGkWf1fl8EQEIl4FOB27wsl7IMOQLQs0olz5?=
- =?us-ascii?Q?Ogzo2+DOnAdezBBnMvrnlYXiWpHLVJBydehO/HtjKwbb73wnVQifWho7y8h8?=
- =?us-ascii?Q?gTzWA7d2kygQNhA3ARNZJkoWDb4MDrqWtyv3nRPx9qwI1X3EACKKajfImh3o?=
- =?us-ascii?Q?cP5AN6z8ml+QRXANvELXrQ1bo1SN/CbvFVAiK3Z0Toch2YYqEH6JOcA6sHqv?=
- =?us-ascii?Q?Cs/j3bw3TQZ+a/03d1eEMX34YQ5d8TjeAutyTsf88QLGaE0ZwgyHCDpzSIE5?=
- =?us-ascii?Q?gML5B9jhvmmnW/QZLOuALlNI54poH6s8Eb55hsic0RLmVw45TPwybhK5pPhu?=
- =?us-ascii?Q?IAxkDrmV8zSwASaNuI3iswq2ddNGVnOsCqF9cUZju7MWZr+hOHyKFa5lmC1t?=
- =?us-ascii?Q?fPEzr+B9oIWkLGLdHD5UJ76Svub8kp8VgphIJt+R606rhsFjODnQiSu/jNeW?=
- =?us-ascii?Q?DbrwsBSZuzdaTlVbYX+1QY8UGZ3jy6walbgyW3e8Gawz9oLie2CfxppmsolS?=
- =?us-ascii?Q?9fcKVgO15ZaEobUKuVugXQAwrimGoww6PUwwoZ0w5fdo770pFbqitV9+IjYh?=
- =?us-ascii?Q?sI7RRbs2xmnEDtp6j6lCXdmRov0RjfehPD8Sp8HZhW5KLguFKf2nwfI1kKxQ?=
- =?us-ascii?Q?RCqIFkbTIdgRl1nkLrBXu4Mrh2FHDr787usuF86fmNGBoEREnPVJOvy87W58?=
- =?us-ascii?Q?qFLc53ZMCQnn4ek3KYnrYnxU/IPS5lzFRGBC5yP5/K+hjglwOLw7hDBIQF3/?=
- =?us-ascii?Q?qdSnB34Bl3DmbJRF9h1sByWGQcKgIJlG+P2uUzBP/OTf/YbM9G9vFjvuFRAH?=
- =?us-ascii?Q?3OX80y1h0uHNy0m1AUPv1w8G7tr5KQRVm5TygOXCf0hcRSfLy9TrtXntANZL?=
- =?us-ascii?Q?XuTOfYgi3b8hxrNdkeUNB8r3Cl9DfHA4DQofTCYjqqOt0ujFJ7vdy0K7w4IO?=
- =?us-ascii?Q?rdVIhWhgkAYqUpnXoiveUEzJUubBkWxX6EXhZutT1mVRz2tHn5tQdrXCxIeh?=
- =?us-ascii?Q?IOV6PHyj+pqC+3uhdPX75aGxcDzP716jLQdLqZdhb8YSf5XQaS8t4yo2VA8o?=
- =?us-ascii?Q?9mxdl/4gib1MYybzRfE+odyWPfGB9OpK94VJW0i6dCfGeI3DGayrOmU/hhhT?=
- =?us-ascii?Q?oxZly7jT+t1Cla5a+GZeesYj?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 06c08364-bea5-48df-cdd5-08d90a488d12
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB3834.namprd12.prod.outlook.com
+X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?rnMkpzsuNqNLLGZnFUae8c1gNDtRlDPN143pVlMGz+9KOzFaF+npFFxtIFWo?=
+ =?us-ascii?Q?tt6iz7C8OS6sPohz43R0I6J14ECVV0oJOEeMk9Wi2qtFhNc6EIy+bF8V2nBA?=
+ =?us-ascii?Q?VN4LfOIQVtAzETC+HGkvyDOHyfoZ9mgacVoVRjGkbwLk02kv7Hrv6SYPOBOQ?=
+ =?us-ascii?Q?rR9dqKjrJoMIze1Dwv3Ym4/AoB8oY0fPvNPILxkGxGRI1rrg6erqiWqX+cgE?=
+ =?us-ascii?Q?YJDHFh961uMzp4rKzLs7QKrWNdsBN6lIJ7/AN4/pdpxHaTr7Vzw/FR2UygkQ?=
+ =?us-ascii?Q?YbaCYsxWtv6XtUWpjw8LNWX26kZKIQr/kp8v2MJuDPZ1SIHLaOLa3wbHePjy?=
+ =?us-ascii?Q?aB3+OPDx6rVDDqdVqHnuU+ZmI9fnhPMoaArpoWfc7vbfca3PzTYUJfEM0Fh7?=
+ =?us-ascii?Q?V+I/oMWNVN8B7g6cbwOwKMiIzFbVK4T4tx8/rzpYGlY6yrUKs+y7mbwG4DqH?=
+ =?us-ascii?Q?MD237B9UUahP3tUqFtrsg4/4FeUS5lCTC2Ot1FGC9fbSC36Pr+tHysFKZYJd?=
+ =?us-ascii?Q?o6y0n0q+xUoVW6cuHdxY/f1WuMIZQjmOPnMaMCMl5C4eWQ2PKVjxCMTPY+SJ?=
+ =?us-ascii?Q?Wtt8h/7W8jVx05Z+hYoc2dD7ciOp7yrYluPIYEocwdPRticFzPjPEWq18ezL?=
+ =?us-ascii?Q?eGYpvIAdrZAaw3mlK9XlACj2pvcwmYQxoMyAPdrfMN3AyLRZd8l5Lp1nLClx?=
+ =?us-ascii?Q?t1qVIjB812K21WSkF77DY55ohOrNZ0reDpb6FTfVUyHqXmIa5FD9oci0w8J0?=
+ =?us-ascii?Q?2ZAUkuOSOGScA5za9iRa8RqVwVKkdovID08t4SVyEuO7VgPKyUJhtszhv/2b?=
+ =?us-ascii?Q?bQvB3oxyhJnZ3OuDYei+iXNvMUOH35s/mAAPim2f0jVCis2FsIMJyGmRq+d2?=
+ =?us-ascii?Q?/fOwORqV6Mb8RaZ0MU6cHWyulnBnD/irkcckFoFNauWzflBeefJk9bs9mn5q?=
+ =?us-ascii?Q?V8MII/RssqJbcDSYMHoov1Mlxoq7lEWvGjvmCkGpgkc=3D?=
+X-MS-Exchange-AntiSpam-MessageData: =?us-ascii?Q?QnMt0Fu23s8ZfyDR2p4LFyPJlMRcEV3ztqbEXrWMJaUELFoaNRSnv4zqcH81?=
+ =?us-ascii?Q?gwUXagqx+CUvtYpZOvOyMsUlWl6uTfGd/3oEMzxculcR/jzMDyOYKmMmfyv0?=
+ =?us-ascii?Q?9Lu8PLA9eojJiwIo4lPSK1zqa5xT0WXqlujsdeGxWT1MElL9EQDHuouQmvhS?=
+ =?us-ascii?Q?/n7bMlOWcH0Jv34GtDOBftjQDOo2ekDwgCCwBrD0jn9XBKV2QUxIoZfrryGP?=
+ =?us-ascii?Q?s5D0ZFdJlTu92hgJWuNtMMEjVVIKXF4RW4rNkwGcAtCiWUlBId0Hj/jE20we?=
+ =?us-ascii?Q?nO5EXMvm2SGWo8Cjv8SFa6CTQr2aTcXbT3Xci1Wlh1nn8eOfZvhiodzHt0pP?=
+ =?us-ascii?Q?G+zRU12ynicP/jaKhebTrSpv2DKH99S6d0xhWQ7tW97YDakCDHEUTwDEE16f?=
+ =?us-ascii?Q?nFRCqTn2fSCRnOclStRqgO6fiIZq1dTlN3acr+M8Q95XV9omLtZ0spMMVL6U?=
+ =?us-ascii?Q?av46pKBPIFQmdC+pxQXEuLTUOgLRUMigfzyLXQAi/gPJo5rSqLPM8Mu51BO9?=
+ =?us-ascii?Q?dCXyi+/3FNwDgDN9uX8dfxjnw+5rwtDTAhrc/AoI6uwVe80APWnHPzLVBbz5?=
+ =?us-ascii?Q?vxtH+I0gahru/R/Fv7OvPKwxN+SziQuYjOnF/PmFxCwY+MLXm/uZf73Ba62n?=
+ =?us-ascii?Q?n8FnKiUXE1fN1DcTIqVoL0J25lWzutKPEfiC4hFpengAH+Wm+LTwxXbg5Uim?=
+ =?us-ascii?Q?3uhZZLzin+lHP//YIL0Tv88YU+1RHY39TkctAxLxKRABu9JBbP4Z/KaZ3xE/?=
+ =?us-ascii?Q?/KGRaInK8skBBfMkBLIfOeArDD997DaoDLsdVV4PUN+RabvS9iFMKG8IMKOG?=
+ =?us-ascii?Q?7vIklcTs5xIyFv+pV3gv/rudX+rsjisnlJF1m/bld4hg7nfWuu2dza8Nb34H?=
+ =?us-ascii?Q?5K3FA7N/kvGVIWVrM6OkzWUhVqsO3Brp9z3DXFtqL5EMP339yDaJLXH8ii18?=
+ =?us-ascii?Q?R7WWgv/O2bUQWBO6H68F6h/Fq6jtzIT2JXaJu4RAr8WZbahXC93YBxoJBmQz?=
+ =?us-ascii?Q?6BNfhOwdzN/oCVysXJJJKMFsNYGE3PIYOToY3TDpe9JYZQNZRvvtFV0aWEl0?=
+ =?us-ascii?Q?IYqueON3NF1MpKgQ6BV57oNNHlkvV8hB9fIddTcf5TCqwZOshs5GPmHeLOtp?=
+ =?us-ascii?Q?8GqDeWiJk0k9oLjMx/VY9IjenjfQDBWGKGS/KXXHd2Y/0VtVQgRMhn2LZxEm?=
+ =?us-ascii?Q?Hf4l/xcCInlZJbAoS7FGmjGvR4t3h5ShZMU4J49n+k3U78S5+qA+fz9Bn4FO?=
+ =?us-ascii?Q?98JicclSKddX2N6fsVH7ez6FBvwKxFYZoAzBnsaUaueBOqmupfk0wXdKxi4E?=
+ =?us-ascii?Q?gmkaiZUi2ABJ/ovlcBi4OnFV?=
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: cfb3773a-d905-4102-cb03-08d90a4c1e52
+X-MS-Exchange-CrossTenant-AuthSource: AM9PR08MB5988.eurprd08.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Apr 2021 13:21:37.2447
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Apr 2021 13:47:09.6332
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: r+kXP3fCELpgVmdacfVkJG+byBzAodRh6HJxlgPaOn1l8eI5jQzNQ1Titlt86qFM
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR12MB1657
+X-MS-Exchange-CrossTenant-UserPrincipalName: iqwocrwtPDSA9BJoxeG7mFH5OIzC4fYCEGkRLqbzD6DzorwnNDlab6mkUtDh0qumos17Fb0KrmRZITYfnu3EP5WYJiEqNQqaAmmW1J8CUHE=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM9PR08MB5988
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Apr 28, 2021 at 08:55:51AM -0400, Eric Farman wrote:
-> On Tue, 2021-04-27 at 19:10 -0300, Jason Gunthorpe wrote:
-> > On Tue, Apr 27, 2021 at 04:06:04PM -0400, Eric Farman wrote:
-> > > > @@ -132,19 +137,28 @@ static int vfio_ccw_mdev_create(struct
-> > > > mdev_device *mdev)
-> > > >  			   private->sch->schid.ssid,
-> > > >  			   private->sch->schid.sch_no);
-> > > >  
-> > > > +	ret = vfio_register_group_dev(&private->vdev);
-> > > > +	if (ret)
-> > > > +		goto err_atomic;
-> > > > +	dev_set_drvdata(&mdev->dev, private);
-> > > >  	return 0;
-> > > > +
-> > > > +err_atomic:
-> > > > +	atomic_inc(&private->avail);
-> > > 
-> > > Since we're unwinding, should also do
-> > > 
-> > > private->mdev = NULL
-> > > private->state = VFIO_CCW_STATE_STANDBY
-> > 
-> > I can change this, but it looks quite weird to do stuff like this
-> > with
-> > no locking.
+On Wed, Apr 28, 2021 at 02:38:57PM +0200, Vitaly Kuznetsov wrote:
+> Valeriy Vdovin <valeriy.vdovin@virtuozzo.com> writes:
 > 
-> I agree, but mdev_create didn't fail before, so backing out part of its
-> work seems weird too.
+> > KVM_GET_CPUID2 kvm ioctl is not very well documented, but the way it is
+> > implemented in function kvm_vcpu_ioctl_get_cpuid2 suggests that even at
+> > error path it will try to return number of entries to the caller. But
+> > The dispatcher kvm vcpu ioctl dispatcher code in kvm_arch_vcpu_ioctl
+> > ignores any output from this function if it sees the error return code.
+> >
+> > It's very explicit by the code that it was designed to receive some
+> > small number of entries to return E2BIG along with the corrected number.
+> >
+> > This lost logic in the dispatcher code has been restored by removing the
+> > lines that check for function return code and skip if error is found.
+> > Without it, the ioctl caller will see both the number of entries and the
+> > correct error.
+> >
+> > In selftests relevant function vcpu_get_cpuid has also been modified to
+> > utilize the number of cpuid entries returned along with errno E2BIG.
+> >
+> > Signed-off-by: Valeriy Vdovin <valeriy.vdovin@virtuozzo.com>
+> > ---
+> >  arch/x86/kvm/x86.c                            | 10 +++++-----
+> >  .../selftests/kvm/lib/x86_64/processor.c      | 20 +++++++++++--------
+> >  2 files changed, 17 insertions(+), 13 deletions(-)
+> >
+> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> > index efc7a82ab140..df8a3e44e722 100644
+> > --- a/arch/x86/kvm/x86.c
+> > +++ b/arch/x86/kvm/x86.c
+> > @@ -4773,14 +4773,14 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
+> >  		r = -EFAULT;
+> >  		if (copy_from_user(&cpuid, cpuid_arg, sizeof(cpuid)))
+> >  			goto out;
+> > +
+> >  		r = kvm_vcpu_ioctl_get_cpuid2(vcpu, &cpuid,
+> >  					      cpuid_arg->entries);
+> > -		if (r)
+> > -			goto out;
+> > -		r = -EFAULT;
+> > -		if (copy_to_user(cpuid_arg, &cpuid, sizeof(cpuid)))
+> 
+> It may make sense to check that 'r == -E2BIG' before trying to write
+> anything back. I don't think it is correct/expected to modify nent in
+> other cases (e.g. when kvm_vcpu_ioctl_get_cpuid2() returns -EFAULT)
+> 
+That's a good point. The caller could expect and rely on the fact that nent
+is unmodified in any error case except E2BIG. I will add this in the next
+version.
+> > +
+> > +		if (copy_to_user(cpuid_arg, &cpuid, sizeof(cpuid))) {
+> > +			r = -EFAULT;
+> >  			goto out;
+> > -		r = 0;
+> > +		}
+> >  		break;
+> 
+> How is KVM userspace supposed to know if it can trust the 'nent' value
+> (KVM is fixed case) or not (KVM is not fixed case)? This can probably be
+> resolved with adding a new capability (but then I'm not sure the change
+> is worth it to be honest).
 
-Before if vfio_register_group_dev() failed the device would be left
-half created but without a driver attached. It wasn't good.
+As I see it KVM userspace should set nent to 0, and then expect any non-zero
+value in return along with E2BIG. This is the same approach I've used in the
+modified test code in the same patch.
 
-The way it should work is up until vfio_register_group_dev() returns
-success there should be no concurrancy and no touches to 'private' -
-those WQs should all be shutdown.
+> Also, if making such a change, API
+> documentation in virt/kvm/api.rst needs updating.
 
-Ideally the private would be allocated here as well so these rules are
-clear and obvious
+Of course. I will add changes to the documentation and comments in case if this
+change in general will have a go.
 
-Jason
+> 
+> >  	}
+> >  	case KVM_GET_MSRS: {
+> > diff --git a/tools/testing/selftests/kvm/lib/x86_64/processor.c b/tools/testing/selftests/kvm/lib/x86_64/processor.c
+> > index a8906e60a108..a412b39ad791 100644
+> > --- a/tools/testing/selftests/kvm/lib/x86_64/processor.c
+> > +++ b/tools/testing/selftests/kvm/lib/x86_64/processor.c
+> > @@ -727,17 +727,21 @@ struct kvm_cpuid2 *vcpu_get_cpuid(struct kvm_vm *vm, uint32_t vcpuid)
+> >  
+> >  	cpuid = allocate_kvm_cpuid2();
+> >  	max_ent = cpuid->nent;
+> > +	cpuid->nent = 0;
+> >  
+> > -	for (cpuid->nent = 1; cpuid->nent <= max_ent; cpuid->nent++) {
+> > -		rc = ioctl(vcpu->fd, KVM_GET_CPUID2, cpuid);
+> > -		if (!rc)
+> > -			break;
+> > +	rc = ioctl(vcpu->fd, KVM_GET_CPUID2, cpuid);
+> > +	TEST_ASSERT(rc == -1 && errno == E2BIG,
+> > +		    "KVM_GET_CPUID2 should return E2BIG: %d %d",
+> > +		    rc, errno);
+> >  
+> > -		TEST_ASSERT(rc == -1 && errno == E2BIG,
+> > -			    "KVM_GET_CPUID2 should either succeed or give E2BIG: %d %d",
+> > -			    rc, errno);
+> > -	}
+> > +	TEST_ASSERT(cpuid->nent,
+> > +		    "KVM_GET_CPUID2 failed to set cpuid->nent with E2BIG");
+> > +
+> > +	TEST_ASSERT(cpuid->nent < max_ent,
+> > +		"KVM_GET_CPUID2 has %d entries, expected maximum: %d",
+> > +		cpuid->nent, max_ent);
+> >  
+> > +	rc = ioctl(vcpu->fd, KVM_GET_CPUID2, cpuid);
+> >  	TEST_ASSERT(rc == 0, "KVM_GET_CPUID2 failed, rc: %i errno: %i",
+> >  		    rc, errno);
+> 
+> -- 
+> Vitaly
+> 
