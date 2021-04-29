@@ -2,106 +2,109 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 60EDC36EDC7
-	for <lists+kvm@lfdr.de>; Thu, 29 Apr 2021 18:02:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 93C0136EE0C
+	for <lists+kvm@lfdr.de>; Thu, 29 Apr 2021 18:22:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234144AbhD2QDf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 29 Apr 2021 12:03:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33164 "EHLO
+        id S233480AbhD2QXM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 29 Apr 2021 12:23:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37440 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232004AbhD2QDf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 29 Apr 2021 12:03:35 -0400
-Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5651DC06138B;
-        Thu, 29 Apr 2021 09:02:48 -0700 (PDT)
-From:   Thomas Gleixner <tglx@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1619712165;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=8plJW1VXqdM/pu1ulaDOFaCnsDTuvu4fwYJsVAeb39E=;
-        b=tDCrPYi8epRqOfmXjzRVd+hbooSGl783ckl6sQX1A5heow2ufo0jVGFKEUwjXHcqxVH/u2
-        UEDVrPawKlRzU0u1CeXG3MZ5zw7lLsQBOasplVMnlEMkdIQ9luxXJqYbNP5lLTOPeObQPC
-        T8beFcOEQkHWSLIGJkuXPLvurVYfijBce/i4AElu/rvpMDGyRAy/63pdV/bmltVUUhBqeW
-        YsM5rPA1ksv03dHKMXgRe+SI4SfxX97eoIncb4TO/9UYcYzl28ZFpjVnUPIaYwk4Hlcrzi
-        Np7Jy14haEfQb1uDWblpVZHg7dkZwLkRdDKQT7syPiQ+ul4VMSPT18dzLoVPqA==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1619712165;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=8plJW1VXqdM/pu1ulaDOFaCnsDTuvu4fwYJsVAeb39E=;
-        b=PTZIOGrGSXFPL5ab1UCrpZmd2Ah5VfdyMmMYN0nmPDQUhJGuf7ilDznRsamgSV3WP2R7n0
-        UFI1Xp9muTi41NDw==
-To:     Zelin Deng <zelin.deng@linux.alibaba.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org, x86@kernel.org
-Subject: Re: [PATCH] Guest system time jumps when new vCPUs is hot-added
-In-Reply-To: <2df3de0e-670a-ba28-fdd2-0002cebde545@linux.alibaba.com>
-References: <1619576521-81399-1-git-send-email-zelin.deng@linux.alibaba.com> <87lf92n5r1.ffs@nanos.tec.linutronix.de> <e33920a0-24bc-fa40-0a23-c2eb5693f85d@linux.alibaba.com> <875z057a12.ffs@nanos.tec.linutronix.de> <2df3de0e-670a-ba28-fdd2-0002cebde545@linux.alibaba.com>
-Date:   Thu, 29 Apr 2021 18:02:44 +0200
-Message-ID: <87o8dxf597.ffs@nanos.tec.linutronix.de>
+        with ESMTP id S232004AbhD2QXL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 29 Apr 2021 12:23:11 -0400
+Received: from mail-ot1-x32e.google.com (mail-ot1-x32e.google.com [IPv6:2607:f8b0:4864:20::32e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2CAF6C06138B
+        for <kvm@vger.kernel.org>; Thu, 29 Apr 2021 09:22:25 -0700 (PDT)
+Received: by mail-ot1-x32e.google.com with SMTP id x54-20020a05683040b6b02902a527443e2fso10772354ott.1
+        for <kvm@vger.kernel.org>; Thu, 29 Apr 2021 09:22:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=CaZsd8nEwfI7SXN/G683mq5xJ239kKgBpHKTfQDNQ4w=;
+        b=pDzu2bwbGuUT2ab/ziLXDHDjtOF/DjKDlWP2e8DOsapP95yoXeG73VlfVeeXV9M7km
+         4i5/cbd4Uz2V74WfWHlHc7s1Z0K9BDGx9DqJ9JXM0My7sGN3WVF5uAHRpG9tlrgKYBba
+         1hX2R7avvnc4KEMX5h5av4LMKK+dxI5fy8mYOtyMv/+6tK1G+rFmcmyWbBhn65vmFo5N
+         v7NFxmm/6uIM1kLRI0auKuRz6BRzWUhPjbBfj2k8QjvEary3Iw2yyrU/4o2IyNPxyxCo
+         C6GMdbcwCetWt/NMRkOxEk2b9lJXTm4MoVDGKorvSrec14CAuXmzmwrs3+ViYwiEtGSs
+         mVtQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=CaZsd8nEwfI7SXN/G683mq5xJ239kKgBpHKTfQDNQ4w=;
+        b=imDnGeZ5wF0d4NdjmtkqoGTrnaVwbQspav0LaDRXjtxin0EakTXh12JAcV/GG+zO7Y
+         pAxuY43cRpEXTvTaTyV/i/T8kLnoC+dknafPOjnxyVWKe3vJZPsOsl3JZd7MczMQfmKG
+         TiiTsTz1qMBoE/b0PNd7r4FFyXjugp2kOxywm6el6Hx1gUJjWsbLtzeBcvKJcbeGF8Vd
+         GmRsaJRro5Pl/NeEyIs3pCeBoVV/7A2ivK1ia8ae+WLseMdPMq9gvdczBx3kpQu1+jo5
+         cuMNWd0FXojWZfM/ytQL4UnZY9o6CaEB8KHwwcwy5jEUwumzxZTVOTf4At09EX5Ky4+2
+         HZFQ==
+X-Gm-Message-State: AOAM533oHXKaUssFhBeWH4xVFlr0hNloIHLXyXgibe8L2zGXv+90Mlw5
+        FXKWyp2qLIYSZydMMHU697HCnZLWfNQL/emu26kbxw==
+X-Google-Smtp-Source: ABdhPJxBUEQhBUCweyfdFoslZYjcLeSMRMlkIyTuW2acmlXQy+c6Izb4A86xoa9xrO3e/6IeTlb3rQ6Hw+kqa1zfqFY=
+X-Received: by 2002:a9d:7857:: with SMTP id c23mr180583otm.208.1619713344327;
+ Thu, 29 Apr 2021 09:22:24 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+References: <20210429041226.50279-1-kai.huang@intel.com>
+In-Reply-To: <20210429041226.50279-1-kai.huang@intel.com>
+From:   Ben Gardon <bgardon@google.com>
+Date:   Thu, 29 Apr 2021 09:22:13 -0700
+Message-ID: <CANgfPd_PMO6cKtPoTaEV0R_qWfbm1TgwpT=7Sr_N_5JKMgysVQ@mail.gmail.com>
+Subject: Re: [PATCH] KVM: x86/mmu: Avoid unnecessary page table allocation in kvm_tdp_mmu_map()
+To:     Kai Huang <kai.huang@intel.com>
+Cc:     kvm <kvm@vger.kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Apr 29 2021 at 17:38, Zelin Deng wrote:
-> On 2021/4/29 =E4=B8=8B=E5=8D=884:46, Thomas Gleixner wrote:
->> And that validation expects that the CPUs involved run in a tight loop
->> concurrently so the TSC readouts which happen on both can be reliably
->> compared.
->>
->> But this cannot be guaranteed on vCPUs at all, because the host can
->> schedule out one or both at any point during that synchronization
->> check.
+On Wed, Apr 28, 2021 at 9:12 PM Kai Huang <kai.huang@intel.com> wrote:
 >
-> Is there any plan to fix this?
-
-The above cannot be fixed.
-
-As I said before the solution is:
-
->> A two socket guest setup needs to have information from the host that
->> TSC is usable and that the socket sync check can be skipped. Anything
->> else is just doomed to fail in hard to diagnose ways.
+> In kvm_tdp_mmu_map(), while iterating TDP MMU page table entries, it is
+> possible SPTE has already been frozen by another thread but the frozen
+> is not done yet, for instance, when another thread is still in middle of
+> zapping large page.  In this case, the !is_shadow_present_pte() check
+> for old SPTE in tdp_mmu_for_each_pte() may hit true, and in this case
+> allocating new page table is unnecessary since tdp_mmu_set_spte_atomic()
+> later will return false and page table will need to be freed.  Add
+> is_removed_spte() check before allocating new page table to avoid this.
 >
-> Yes, I had tried to add "tsc=3Dunstable" to skip tsc sync.=C2=A0 However =
-if a=20
+> Signed-off-by: Kai Huang <kai.huang@intel.com>
 
-tsc=3Dunstable? Oh well.
+Nice catch!
 
-> user process which is not pined to vCPU is using rdtsc, it can get tsc=20
-> warp, because it can be scheduled among vCPUs.=C2=A0 Does it mean user
+Reviewed-by: Ben Gardon <bgardon@google.com>
 
-Only if the hypervisor is not doing the right thing and makes sure that
-all vCPUs have the same tsc offset vs. the host TSC.
+> ---
+>  arch/x86/kvm/mmu/tdp_mmu.c | 8 ++++++++
+>  1 file changed, 8 insertions(+)
+>
+> diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+> index 83cbdbe5de5a..84ee1a76a79d 100644
+> --- a/arch/x86/kvm/mmu/tdp_mmu.c
+> +++ b/arch/x86/kvm/mmu/tdp_mmu.c
+> @@ -1009,6 +1009,14 @@ int kvm_tdp_mmu_map(struct kvm_vcpu *vcpu, gpa_t gpa, u32 error_code,
+>                 }
+>
+>                 if (!is_shadow_present_pte(iter.old_spte)) {
+> +                       /*
+> +                        * If SPTE has been forzen by another thread, just
 
-> applications have to guarantee itself to use rdtsc only when TSC is=20
-> reliable?
+frozen
 
-If the TSCs of CPUs are not in sync then the kernel does the right thing
-and uses some other clocksource for the various time interfaces, e.g.
-the kernel provides clock_getttime() which guarantees to be correct
-whether TSC is usable or not.
-
-Any application using RDTSC directly is own their own and it's not a
-kernel problem.
-
-The host kernel cannot make guarantees that the hardware is sane neither
-can a guest kernel make guarantees that the hypervisor is sane.
-
-Thanks,
-
-        tglx
-
-
-
-
+> +                        * give up and retry, avoiding unnecessary page table
+> +                        * allocation and free.
+> +                        */
+> +                       if (is_removed_spte(iter.old_spte))
+> +                               break;
+> +
+>                         sp = alloc_tdp_mmu_page(vcpu, iter.gfn, iter.level);
+>                         child_pt = sp->spt;
+>
+> --
+> 2.30.2
+>
