@@ -2,90 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 688FB36E8C7
-	for <lists+kvm@lfdr.de>; Thu, 29 Apr 2021 12:32:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2F52C36E903
+	for <lists+kvm@lfdr.de>; Thu, 29 Apr 2021 12:47:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233219AbhD2Kcq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 29 Apr 2021 06:32:46 -0400
-Received: from foss.arm.com ([217.140.110.172]:46416 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232629AbhD2Kcq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 29 Apr 2021 06:32:46 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id BA2911FB;
-        Thu, 29 Apr 2021 03:31:59 -0700 (PDT)
-Received: from [192.168.0.110] (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 67D8F3F70D;
-        Thu, 29 Apr 2021 03:31:58 -0700 (PDT)
-Subject: Re: [PATCH] KVM: arm64: Skip CMOs when updating a PTE pointing to
- non-memory
-To:     Jean-Philippe Brucker <jean-philippe@linaro.org>
-Cc:     Marc Zyngier <maz@kernel.org>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        kernel-team@android.com, Krishna Reddy <vdumpa@nvidia.com>,
-        Sumit Gupta <sumitg@nvidia.com>
-References: <20210426103605.616908-1-maz@kernel.org>
- <e6d955f1-f2a4-9505-19ab-5a770f821386@arm.com> <YIgsbp/hRxM9U+ZN@myrica>
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <35d5f174-3814-a019-a6e3-14cffad69763@arm.com>
-Date:   Thu, 29 Apr 2021 11:32:33 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.0
+        id S240494AbhD2KsC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 29 Apr 2021 06:48:02 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:41477 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232245AbhD2Kr7 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 29 Apr 2021 06:47:59 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1619693232;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=N9yW175n2/Fko+VjOrEdOCUWNBA9vqG7mA8IcKObQLw=;
+        b=hypsTPujQo9vhQoevNCS75yDH/CdF110XfJ6s2MpMPnPIP16LkrZ8MRAyrclCGw5dKHnAo
+        JtY35d5lcBpwyXXf8P9VO2YxLGqlm4pRVD5cN5jt4gS/BD9YlHeFAYHHi2RaoYYjUA7+O+
+        RmET/1S48elS03HAWTnHgDez9dU+9D4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-539-Y3VwTIlZNjG3KF0B0M7I0A-1; Thu, 29 Apr 2021 06:47:10 -0400
+X-MC-Unique: Y3VwTIlZNjG3KF0B0M7I0A-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DD55D8018A7;
+        Thu, 29 Apr 2021 10:47:08 +0000 (UTC)
+Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 317EE5DF26;
+        Thu, 29 Apr 2021 10:47:08 +0000 (UTC)
+From:   Paolo Bonzini <pbonzini@redhat.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     srutherford@google.com, seanjc@google.com, joro@8bytes.org,
+        brijesh.singh@amd.com, thomas.lendacky@amd.com,
+        ashish.kalra@amd.com
+Subject: [PATCH v3 0/2] KVM: x86: guest interface for SEV live migration
+Date:   Thu, 29 Apr 2021 06:47:05 -0400
+Message-Id: <20210429104707.203055-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <YIgsbp/hRxM9U+ZN@myrica>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Jean,
+This is a reviewed version of the guest interface (hypercall+MSR)
+for SEV live migration.  The differences lie mostly in the API
+for userspace.  In particular:
 
-On 4/27/21 4:23 PM, Jean-Philippe Brucker wrote:
-> On Tue, Apr 27, 2021 at 03:52:46PM +0100, Alexandru Elisei wrote:
->> The comment [1] suggested that the panic is triggered during page aging.
-> I think only with an out-of-tree patch applied
-> https://jpbrucker.net/git/linux/commit/?h=sva/2021-03-01&id=d32d8baaf293aaefef8a1c9b8a4508ab2ec46c61
-> which probably is not going upstream.
+- the CPUID feature is not exposed in KVM_GET_SUPPORTED_CPUID
 
-Thanks for that, that explains why I wasn't able to trigger the notification.
+- the hypercall must be enabled manually with KVM_ENABLE_CAP
 
-I did a grep for all the places where mmu_notifier_change_pte() and
-set_pte_at_notify() are used in the kernel, and from what I can tell they are only
-called for a new pte which has a struct page. From my investigation, the notifiers
-are called from ksm (which deals with physical memory), swap migration (so still
-pages in memory) and on copy-on-write.
+- the MSR has sensible behavior if not filtered
 
-On Linux v5.12, I tried to trigger the copy-on-write notification by forking
-kvmtool right after the BAR region is mapped and then reading from the userspace
-BAR address, but the new pte (for which the notifier is called) is valid.
+Compared to v2, the KVM-provided behavior of the MSR is different:
+it is set to 0 if the guest memory is encrypted, and 1 if it is not.
+The idea is that the MSR is read-only if KVM_FEATURE_HC_PAGE_ENC_STATUS
+is not exposed to the guest (it should only be exposed if the guest has
+encrypted memory), but it also has a sensible value for non-encrypted
+guests.  QEMU could however expose a "0" value for the special "-cpu
+host,migratable=no" mode if it wanted.
 
-I also looked at what x86 does, but I couldn't find where cache maintenance is
-performed (wouldn't surprise me if it's not necessary at all).
+Because of this new behavior, the CPUID bit are split.
 
-So I guess my question is what kind of pfns the MMU notifiers for the secondary
-MMUs are required to handle. If the requirement is that they should handle both
-device and struct page backed pfns, then the patch looks correct to me
-(user_mem_abort() also uses kvm_is_device_pfn() to decide if dcache maintenance is
-needed).
+Paolo
 
-Thanks,
+Ashish Kalra (1):
+  KVM: X86: Introduce KVM_HC_PAGE_ENC_STATUS hypercall
 
-Alex
+Paolo Bonzini (1):
+  KVM: x86: add MSR_KVM_MIGRATION_CONTROL
 
-> Thanks,
-> Jean
->
->> vfio_pci_mmap() sets the VM_PFNMAP for the VMA and I see in the Documentation that
->> pages with VM_PFNMAP are added to the unevictable LRU list, doesn't that mean it's
->> not subject the page aging? I feel like there's something I'm missing.
->>
->> [1]
->> https://lore.kernel.org/kvm/BY5PR12MB37642B9AC7E5D907F5A664F6B3459@BY5PR12MB3764.namprd12.prod.outlook.com/
->>
->> Thanks,
->>
->> Alex
+ Documentation/virt/kvm/api.rst        | 14 +++++++
+ Documentation/virt/kvm/cpuid.rst      |  9 +++++
+ Documentation/virt/kvm/hypercalls.rst | 21 ++++++++++
+ Documentation/virt/kvm/msr.rst        | 14 +++++++
+ arch/x86/include/asm/kvm-x86-ops.h    |  1 +
+ arch/x86/include/asm/kvm_host.h       |  3 ++
+ arch/x86/include/uapi/asm/kvm_para.h  |  5 +++
+ arch/x86/kvm/cpuid.c                  |  3 +-
+ arch/x86/kvm/svm/svm.c                |  1 +
+ arch/x86/kvm/vmx/vmx.c                |  7 ++++
+ arch/x86/kvm/x86.c                    | 56 +++++++++++++++++++++++++++
+ include/uapi/linux/kvm.h              |  1 +
+ include/uapi/linux/kvm_para.h         |  1 +
+ 13 files changed, 135 insertions(+), 1 deletion(-)
+
+-- 
+2.26.2
+
