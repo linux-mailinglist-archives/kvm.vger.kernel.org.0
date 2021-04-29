@@ -2,44 +2,44 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id ED30136EE50
-	for <lists+kvm@lfdr.de>; Thu, 29 Apr 2021 18:42:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 441EC36EE51
+	for <lists+kvm@lfdr.de>; Thu, 29 Apr 2021 18:42:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240858AbhD2Qmg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 29 Apr 2021 12:42:36 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:20617 "EHLO
+        id S240871AbhD2Qmi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 29 Apr 2021 12:42:38 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:48300 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S240836AbhD2Qmf (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 29 Apr 2021 12:42:35 -0400
+        by vger.kernel.org with ESMTP id S235685AbhD2Qmh (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 29 Apr 2021 12:42:37 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1619714508;
+        s=mimecast20190719; t=1619714510;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=r9z+cICtQ43gomqRuZQazwMWmwGDEnE1Yh3d+ya3MAA=;
-        b=EkmXTqFC+GFzcuVHwpg8/8ADd95xuPrsNFzhu4TWxwG02bGgHKtF2hYXYzHihkb7gvUpG8
-        81dutWpI6jEtbhAzIldFHfeoZWXbQX/ZI2LCVKHoK94LW8raTOKNZvDmoiHF5AWR5ngFhf
-        B3y4cq1TdGdByxYyJ/gH3gy6EmR7Vgk=
+        bh=apJfadLLb6assvbd5me3CFatovJPdZOxXAq/JUMlgBQ=;
+        b=fh3JlJkfATbf7ICY9WruYafq3luW5AqJGsSEpQ/EGso1IRcviSD/5Bb6tdspNyqq69uuQz
+        mUfAQSwTiANC8k225BdA8JWbNRDv2uei6fPK8CTQvT9DmVW2904THM7Cr5ogsLBR4+MAAM
+        ZhI2w7H0BJKI4OGLZnQcuxCc9PX+raI=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-38-56l9UMn-N66Fn2a_khwOKw-1; Thu, 29 Apr 2021 12:41:46 -0400
-X-MC-Unique: 56l9UMn-N66Fn2a_khwOKw-1
+ us-mta-172-VcptO9BcNzqRpB0xSr5J4Q-1; Thu, 29 Apr 2021 12:41:48 -0400
+X-MC-Unique: VcptO9BcNzqRpB0xSr5J4Q-1
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B38E8107DEEF;
-        Thu, 29 Apr 2021 16:41:45 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7F114A40C1;
+        Thu, 29 Apr 2021 16:41:47 +0000 (UTC)
 Received: from gator.redhat.com (unknown [10.40.192.243])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 4A3025D6DC;
-        Thu, 29 Apr 2021 16:41:44 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 12FC864187;
+        Thu, 29 Apr 2021 16:41:45 +0000 (UTC)
 From:   Andrew Jones <drjones@redhat.com>
 To:     kvm@vger.kernel.org
 Cc:     alexandru.elisei@arm.com, nikos.nikoleris@arm.com,
         andre.przywara@arm.com, eric.auger@redhat.com
-Subject: [PATCH kvm-unit-tests v3 4/8] arm/arm64: mmu: Stop mapping an assumed IO region
-Date:   Thu, 29 Apr 2021 18:41:26 +0200
-Message-Id: <20210429164130.405198-5-drjones@redhat.com>
+Subject: [PATCH kvm-unit-tests v3 5/8] arm/arm64: mmu: Remove memory layout assumptions
+Date:   Thu, 29 Apr 2021 18:41:27 +0200
+Message-Id: <20210429164130.405198-6-drjones@redhat.com>
 In-Reply-To: <20210429164130.405198-1-drjones@redhat.com>
 References: <20210429164130.405198-1-drjones@redhat.com>
 MIME-Version: 1.0
@@ -49,201 +49,166 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-By providing a proper ioremap function, we can just rely on devices
-calling it for each region they need (as they already do) instead of
-mapping a big assumed I/O range. We don't require the MMU to be
-enabled at the time of the ioremap. In that case, we add the mapping
-to the identity map anyway. This allows us to call setup_vm after
-io_init. Why don't we just call setup_vm before io_init, I hear you
-ask? Well, that's because tests like sieve want to start with the MMU
-off, later call setup_vm, and all the while have working I/O. Some
-unit tests are just really demanding...
+Rather than making too many assumptions about the memory layout
+in mmu code, just set up the page tables per the memory regions
+(which means putting all the memory layout assumptions in setup).
+To ensure we get the right default flags set we need to split the
+primary region into two regions for code and data.
 
-While at it, ensure we map the I/O regions with XN (execute never),
-as suggested by Alexandru Elisei.
+We still only expect the primary regions to be present, but the
+next patch will remove that assumption too.
 
+(Unfortunately we still have an assumption in setup_mmu. We assume
+ the range 3G-4G is available for the virtual memory allocator. We'll
+ need to remove that assumption as well with another patch in order
+ to support arbitrary memory maps.)
+
+Reviewed-by: Nikos Nikoleris <nikos.nikoleris@arm.com>
+Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
 Signed-off-by: Andrew Jones <drjones@redhat.com>
 ---
- lib/arm/asm/io.h            |  6 ++++++
- lib/arm/asm/mmu.h           |  3 +++
- lib/arm/asm/page.h          |  2 ++
- lib/arm/asm/pgtable-hwdef.h |  1 +
- lib/arm/mmu.c               | 37 +++++++++++++++++++++++++++----------
- lib/arm64/asm/io.h          |  6 ++++++
- lib/arm64/asm/mmu.h         |  1 +
- lib/arm64/asm/page.h        |  2 ++
- 8 files changed, 48 insertions(+), 10 deletions(-)
+ lib/arm/asm/setup.h |  1 +
+ lib/arm/mmu.c       | 26 +++++++++++++++-----------
+ lib/arm/setup.c     | 29 +++++++++++++++++++++--------
+ 3 files changed, 37 insertions(+), 19 deletions(-)
 
-diff --git a/lib/arm/asm/io.h b/lib/arm/asm/io.h
-index ba3b0b2412ad..e4caa6ff5d1e 100644
---- a/lib/arm/asm/io.h
-+++ b/lib/arm/asm/io.h
-@@ -77,6 +77,12 @@ static inline void __raw_writel(u32 val, volatile void __iomem *addr)
- 		     : "r" (val));
- }
+diff --git a/lib/arm/asm/setup.h b/lib/arm/asm/setup.h
+index c8afb2493f8d..210c14f818fb 100644
+--- a/lib/arm/asm/setup.h
++++ b/lib/arm/asm/setup.h
+@@ -15,6 +15,7 @@ extern int nr_cpus;
  
-+#define ioremap ioremap
-+static inline void __iomem *ioremap(phys_addr_t phys_addr, size_t size)
-+{
-+	return __ioremap(phys_addr, size);
-+}
-+
- #define virt_to_phys virt_to_phys
- static inline phys_addr_t virt_to_phys(const volatile void *x)
- {
-diff --git a/lib/arm/asm/mmu.h b/lib/arm/asm/mmu.h
-index 122874b8aebe..94e70f0a84bf 100644
---- a/lib/arm/asm/mmu.h
-+++ b/lib/arm/asm/mmu.h
-@@ -8,10 +8,13 @@
- #include <asm/barrier.h>
+ #define MR_F_PRIMARY		(1U << 0)
+ #define MR_F_IO			(1U << 1)
++#define MR_F_CODE		(1U << 2)
+ #define MR_F_UNKNOWN		(1U << 31)
  
- #define PTE_USER		L_PTE_USER
-+#define PTE_UXN			L_PTE_XN
-+#define PTE_PXN			L_PTE_PXN
- #define PTE_RDONLY		PTE_AP2
- #define PTE_SHARED		L_PTE_SHARED
- #define PTE_AF			PTE_EXT_AF
- #define PTE_WBWA		L_PTE_MT_WRITEALLOC
-+#define PTE_UNCACHED		L_PTE_MT_UNCACHED
- 
- /* See B3.18.7 TLB maintenance operations */
- 
-diff --git a/lib/arm/asm/page.h b/lib/arm/asm/page.h
-index 1fb5cd26ac66..8eb4a883808e 100644
---- a/lib/arm/asm/page.h
-+++ b/lib/arm/asm/page.h
-@@ -47,5 +47,7 @@ typedef struct { pteval_t pgprot; } pgprot_t;
- extern phys_addr_t __virt_to_phys(unsigned long addr);
- extern unsigned long __phys_to_virt(phys_addr_t addr);
- 
-+extern void *__ioremap(phys_addr_t phys_addr, size_t size);
-+
- #endif /* !__ASSEMBLY__ */
- #endif /* _ASMARM_PAGE_H_ */
-diff --git a/lib/arm/asm/pgtable-hwdef.h b/lib/arm/asm/pgtable-hwdef.h
-index fe1d8540ea3f..90fd306c7cc0 100644
---- a/lib/arm/asm/pgtable-hwdef.h
-+++ b/lib/arm/asm/pgtable-hwdef.h
-@@ -34,6 +34,7 @@
- #define L_PTE_USER		(_AT(pteval_t, 1) << 6)		/* AP[1] */
- #define L_PTE_SHARED		(_AT(pteval_t, 3) << 8)		/* SH[1:0], inner shareable */
- #define L_PTE_YOUNG		(_AT(pteval_t, 1) << 10)	/* AF */
-+#define L_PTE_PXN		(_AT(pteval_t, 1) << 53)	/* PXN */
- #define L_PTE_XN		(_AT(pteval_t, 1) << 54)	/* XN */
- 
- /*
+ struct mem_region {
 diff --git a/lib/arm/mmu.c b/lib/arm/mmu.c
-index 15eef007f256..791b1f88f946 100644
+index 791b1f88f946..7d658a3fe89c 100644
 --- a/lib/arm/mmu.c
 +++ b/lib/arm/mmu.c
-@@ -11,6 +11,7 @@
- #include <asm/mmu.h>
- #include <asm/setup.h>
- #include <asm/page.h>
-+#include <asm/io.h>
+@@ -20,8 +20,6 @@
  
- #include "alloc_page.h"
- #include "vmalloc.h"
-@@ -157,9 +158,8 @@ void mmu_set_range_sect(pgd_t *pgtable, uintptr_t virt_offset,
+ #include <linux/compiler.h>
+ 
+-extern unsigned long etext;
+-
+ pgd_t *mmu_idmap;
+ 
+ /* CPU 0 starts with disabled MMU */
+@@ -157,7 +155,7 @@ void mmu_set_range_sect(pgd_t *pgtable, uintptr_t virt_offset,
+ 
  void *setup_mmu(phys_addr_t phys_end)
  {
- 	uintptr_t code_end = (uintptr_t)&etext;
--	struct mem_region *r;
+-	uintptr_t code_end = (uintptr_t)&etext;
++	struct mem_region *r;
  
--	/* 0G-1G = I/O, 1G-3G = identity, 3G-4G = vmalloc */
-+	/* 3G-4G region is reserved for vmalloc, cap phys_end at 3G */
+ 	/* 3G-4G region is reserved for vmalloc, cap phys_end at 3G */
  	if (phys_end > (3ul << 30))
- 		phys_end = 3ul << 30;
+@@ -173,14 +171,20 @@ void *setup_mmu(phys_addr_t phys_end)
+ 	if (!mmu_idmap)
+ 		mmu_idmap = alloc_page();
  
-@@ -170,14 +170,8 @@ void *setup_mmu(phys_addr_t phys_end)
- 			"Unsupported translation granule %ld\n", PAGE_SIZE);
- #endif
- 
--	mmu_idmap = alloc_page();
+-	/* armv8 requires code shared between EL1 and EL0 to be read-only */
+-	mmu_set_range_ptes(mmu_idmap, PHYS_OFFSET,
+-		PHYS_OFFSET, code_end,
+-		__pgprot(PTE_WBWA | PTE_RDONLY | PTE_USER));
 -
--	for (r = mem_regions; r->end; ++r) {
--		if (!(r->flags & MR_F_IO))
--			continue;
--		mmu_set_range_sect(mmu_idmap, r->start, r->start, r->end,
--				   __pgprot(PMD_SECT_UNCACHED | PMD_SECT_USER));
--	}
-+	if (!mmu_idmap)
-+		mmu_idmap = alloc_page();
- 
- 	/* armv8 requires code shared between EL1 and EL0 to be read-only */
- 	mmu_set_range_ptes(mmu_idmap, PHYS_OFFSET,
-@@ -192,6 +186,29 @@ void *setup_mmu(phys_addr_t phys_end)
- 	return mmu_idmap;
- }
- 
-+void __iomem *__ioremap(phys_addr_t phys_addr, size_t size)
-+{
-+	phys_addr_t paddr_aligned = phys_addr & PAGE_MASK;
-+	phys_addr_t paddr_end = PAGE_ALIGN(phys_addr + size);
-+	pgprot_t prot = __pgprot(PTE_UNCACHED | PTE_USER | PTE_UXN | PTE_PXN);
-+	pgd_t *pgtable;
-+
-+	assert(sizeof(long) == 8 || !(phys_addr >> 32));
-+
-+	if (mmu_enabled()) {
-+		pgtable = current_thread_info()->pgtable;
-+	} else {
-+		if (!mmu_idmap)
-+			mmu_idmap = alloc_page();
-+		pgtable = mmu_idmap;
+-	mmu_set_range_ptes(mmu_idmap, code_end,
+-		code_end, phys_end,
+-		__pgprot(PTE_WBWA | PTE_USER));
++	for (r = mem_regions; r->end; ++r) {
++		if (r->flags & MR_F_IO) {
++			continue;
++		} else if (r->flags & MR_F_CODE) {
++			assert_msg(r->flags & MR_F_PRIMARY, "Unexpected code region");
++			/* armv8 requires code shared between EL1 and EL0 to be read-only */
++			mmu_set_range_ptes(mmu_idmap, r->start, r->start, r->end,
++					   __pgprot(PTE_WBWA | PTE_USER | PTE_RDONLY));
++		} else {
++			assert_msg(r->flags & MR_F_PRIMARY, "Unexpected data region");
++			mmu_set_range_ptes(mmu_idmap, r->start, r->start, r->end,
++					   __pgprot(PTE_WBWA | PTE_USER));
++		}
 +	}
-+
-+	mmu_set_range_ptes(pgtable, paddr_aligned, paddr_aligned,
-+			   paddr_end, prot);
-+
-+	return (void __iomem *)(unsigned long)phys_addr;
-+}
-+
- phys_addr_t __virt_to_phys(unsigned long addr)
+ 
+ 	mmu_enable(mmu_idmap);
+ 	return mmu_idmap;
+diff --git a/lib/arm/setup.c b/lib/arm/setup.c
+index 9c16f6004e9f..7db308b70744 100644
+--- a/lib/arm/setup.c
++++ b/lib/arm/setup.c
+@@ -31,6 +31,7 @@
+ #define NR_INITIAL_MEM_REGIONS 16
+ 
+ extern unsigned long stacktop;
++extern unsigned long etext;
+ 
+ struct timer_state __timer_state;
+ 
+@@ -88,10 +89,12 @@ unsigned int mem_region_get_flags(phys_addr_t paddr)
+ 
+ static void mem_init(phys_addr_t freemem_start)
  {
- 	if (mmu_enabled()) {
-diff --git a/lib/arm64/asm/io.h b/lib/arm64/asm/io.h
-index e0a03b250d5b..be19f471c0fa 100644
---- a/lib/arm64/asm/io.h
-+++ b/lib/arm64/asm/io.h
-@@ -71,6 +71,12 @@ static inline u64 __raw_readq(const volatile void __iomem *addr)
- 	return val;
- }
++	phys_addr_t code_end = (phys_addr_t)(unsigned long)&etext;
+ 	struct dt_pbus_reg regs[NR_INITIAL_MEM_REGIONS];
+-	struct mem_region primary, mem = {
++	struct mem_region mem = {
+ 		.start = (phys_addr_t)-1,
+ 	};
++	struct mem_region *primary = NULL;
+ 	phys_addr_t base, top;
+ 	int nr_regs, nr_io = 0, i;
  
-+#define ioremap ioremap
-+static inline void __iomem *ioremap(phys_addr_t phys_addr, size_t size)
-+{
-+	return __ioremap(phys_addr, size);
-+}
+@@ -110,8 +113,6 @@ static void mem_init(phys_addr_t freemem_start)
+ 	nr_regs = dt_get_memory_params(regs, NR_INITIAL_MEM_REGIONS - nr_io);
+ 	assert(nr_regs > 0);
+ 
+-	primary = (struct mem_region){ 0 };
+-
+ 	for (i = 0; i < nr_regs; ++i) {
+ 		struct mem_region *r = &mem_regions[nr_io + i];
+ 
+@@ -123,7 +124,7 @@ static void mem_init(phys_addr_t freemem_start)
+ 		 */
+ 		if (freemem_start >= r->start && freemem_start < r->end) {
+ 			r->flags |= MR_F_PRIMARY;
+-			primary = *r;
++			primary = r;
+ 		}
+ 
+ 		/*
+@@ -135,13 +136,25 @@ static void mem_init(phys_addr_t freemem_start)
+ 		if (r->end > mem.end)
+ 			mem.end = r->end;
+ 	}
+-	assert(primary.end != 0);
++	assert(primary);
+ 	assert(!(mem.start & ~PHYS_MASK) && !((mem.end - 1) & ~PHYS_MASK));
+ 
+-	__phys_offset = primary.start;	/* PHYS_OFFSET */
+-	__phys_end = primary.end;	/* PHYS_END */
++	__phys_offset = primary->start;	/* PHYS_OFFSET */
++	__phys_end = primary->end;	/* PHYS_END */
 +
- #define virt_to_phys virt_to_phys
- static inline phys_addr_t virt_to_phys(const volatile void *x)
- {
-diff --git a/lib/arm64/asm/mmu.h b/lib/arm64/asm/mmu.h
-index 72d75eafc882..72371b2d9fe3 100644
---- a/lib/arm64/asm/mmu.h
-+++ b/lib/arm64/asm/mmu.h
-@@ -8,6 +8,7 @@
- #include <asm/barrier.h>
++	/* Split the primary region into two regions; code and data */
++	mem_regions[nr_io + i] = (struct mem_region){
++		.start = code_end,
++		.end = primary->end,
++		.flags = MR_F_PRIMARY,
++	};
++	*primary = (struct mem_region){
++		.start = primary->start,
++		.end = code_end,
++		.flags = MR_F_PRIMARY | MR_F_CODE,
++	};
  
- #define PMD_SECT_UNCACHED	PMD_ATTRINDX(MT_DEVICE_nGnRE)
-+#define PTE_UNCACHED		PTE_ATTRINDX(MT_DEVICE_nGnRE)
- #define PTE_WBWA		PTE_ATTRINDX(MT_NORMAL)
+-	phys_alloc_init(freemem_start, primary.end - freemem_start);
++	phys_alloc_init(freemem_start, __phys_end - freemem_start);
+ 	phys_alloc_set_minimum_alignment(SMP_CACHE_BYTES);
  
- static inline void flush_tlb_all(void)
-diff --git a/lib/arm64/asm/page.h b/lib/arm64/asm/page.h
-index ae4484b22114..d0fac6ea563d 100644
---- a/lib/arm64/asm/page.h
-+++ b/lib/arm64/asm/page.h
-@@ -72,5 +72,7 @@ typedef struct { pteval_t pgprot; } pgprot_t;
- extern phys_addr_t __virt_to_phys(unsigned long addr);
- extern unsigned long __phys_to_virt(phys_addr_t addr);
- 
-+extern void *__ioremap(phys_addr_t phys_addr, size_t size);
-+
- #endif /* !__ASSEMBLY__ */
- #endif /* _ASMARM64_PAGE_H_ */
+ 	phys_alloc_get_unused(&base, &top);
 -- 
 2.30.2
 
