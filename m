@@ -2,170 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EC7E836F144
-	for <lists+kvm@lfdr.de>; Thu, 29 Apr 2021 22:48:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2F9CD36F1D8
+	for <lists+kvm@lfdr.de>; Thu, 29 Apr 2021 23:18:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233477AbhD2Ute (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 29 Apr 2021 16:49:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39728 "EHLO
+        id S237173AbhD2VTe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 29 Apr 2021 17:19:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46580 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231201AbhD2Ute (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 29 Apr 2021 16:49:34 -0400
-Received: from mail-pf1-x42e.google.com (mail-pf1-x42e.google.com [IPv6:2607:f8b0:4864:20::42e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7F2B3C06138B
-        for <kvm@vger.kernel.org>; Thu, 29 Apr 2021 13:48:47 -0700 (PDT)
-Received: by mail-pf1-x42e.google.com with SMTP id j6so7589741pfh.5
-        for <kvm@vger.kernel.org>; Thu, 29 Apr 2021 13:48:47 -0700 (PDT)
+        with ESMTP id S233293AbhD2VTe (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 29 Apr 2021 17:19:34 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4BDB8C06138B
+        for <kvm@vger.kernel.org>; Thu, 29 Apr 2021 14:18:47 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id i8-20020a0569020688b02904ef3bd00ce7so7065256ybt.7
+        for <kvm@vger.kernel.org>; Thu, 29 Apr 2021 14:18:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=vfHYRnlb0vVZXq2Q43nIevJ7E7GHoNnTAH4NF+Y+ato=;
-        b=bX9FlXZlTMXKWDjEW6C0Fo7hElOWeG/bNgdT2zGzTrxSmlR/fT0SIWaNA8fO3F6FzT
-         PiTywxQs7BJz2sypT9T/UgHUZUXd+NZ2y/x5nklOe7OC/Qk/1HmRyZWeb5X+JPnGfgQY
-         4C4My8Jy2Q0pIjifBEK0TgbnQMrZNplVVNyjngx1HTTxG3l91DZRum1giu20xqM6uU7R
-         vDOR6XRg1hAevH0sjKxU6vCWwXNMVmFgwOZ8BCNHag7qao99j+qWTx6YzlTai6EG/KDj
-         IKiu3zrUsLQkq96XZXp8xI4129oeZSDkU+mvwd7mmY5WW5wEBRH74xX4rPxjk06WykSk
-         zg1w==
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=5NDzCDKCGCk6XFMagA6CzP44uT46tOEAvw4LLjGAeOA=;
+        b=rsK1XDnr5jWG+rKZO/5mZTxX0XfQb3/H8ivcRXIm8gWzPRbayNlE2dbGbIR2G21tnP
+         CjdzicccsKnXkgCxrKknP2hlgTb2OvTbwkjMYfsSoG41gsJ6+v4Ot2toYnKn6Tu48ua8
+         YwBI7l6OYQKS4jyWdgj7zcEY1jk2KSRxCUfOAgQy4rmguySN0O28l7NAS8qKBcGukhpy
+         EtuKxQnFHjmTeMhFTjMMS2enzygdfISkubtywX1Kwnm+iL/fLlYd25Ylo69pqwXLbfi3
+         yHJLPy9wsIxUHVlV1GqJUe4sJA8EuEsU3wgJy4AlznwRc1IjXxZrPO2GuumB9IhoMUnr
+         XR6g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=vfHYRnlb0vVZXq2Q43nIevJ7E7GHoNnTAH4NF+Y+ato=;
-        b=dJGjYw+YebpOJu4ZdrUrl73y8YaCAlSl0jCLGU8ryAFAfucqmV9Ae2kpJr6pjLdSeN
-         1MaLIqhYU3K8mHlYo0XpPgZjyCXf8tT842sW29wajzgAzISptYZF6yBMuxTFgEI3B8gP
-         IcddnwQPadkr34j7IUvba8XKed4DaEjDZahcJ5XoFR9HEl8CsxDEv+OLbcNpQIvkEhfH
-         cvNExad5yz19lJ6i9Ueo0SCg7+XJFwz3LwEAVP6pGnJFwPM8WpqVCJo3XWORv/StjpI1
-         +vPVKEa+i8maLTo9e8hO42xhN0S2XSEvWziBvNl9zM/IvMTlnv67SvSwkFR1knpeU+Ka
-         35TA==
-X-Gm-Message-State: AOAM530eA0dqp1hKb/BbK5A8Te3W4UFdVQHNz1WN5ZDSB8sUOvuLrf36
-        AJvpjfHcGEkNnvFqdNN0rc9qEw==
-X-Google-Smtp-Source: ABdhPJzuQA1inRk4ReHCvh+AGTrZE0BErUvVuR+abPHgf+1IpAurGZHHxvanQ1tmL/Y8HSon3LHLiw==
-X-Received: by 2002:a63:df09:: with SMTP id u9mr1459024pgg.112.1619729326829;
-        Thu, 29 Apr 2021 13:48:46 -0700 (PDT)
-Received: from google.com (150.12.83.34.bc.googleusercontent.com. [34.83.12.150])
-        by smtp.gmail.com with ESMTPSA id p12sm8544742pjo.4.2021.04.29.13.48.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 29 Apr 2021 13:48:46 -0700 (PDT)
-Date:   Thu, 29 Apr 2021 13:48:42 -0700
-From:   Ricardo Koller <ricarkol@google.com>
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
-        pbonzini@redhat.com, drjones@redhat.com, alexandru.elisei@arm.com,
-        eric.auger@redhat.com
-Subject: Re: [PATCH 1/3] KVM: selftests: Add exception handling support for
- aarch64
-Message-ID: <YIsbqhQ/OOzluxtq@google.com>
-References: <20210423040351.1132218-1-ricarkol@google.com>
- <20210423040351.1132218-2-ricarkol@google.com>
- <87sg3hnzrj.wl-maz@kernel.org>
- <YIryP84dAc0XHJk2@google.com>
- <87fsz8vp4d.wl-maz@kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87fsz8vp4d.wl-maz@kernel.org>
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=5NDzCDKCGCk6XFMagA6CzP44uT46tOEAvw4LLjGAeOA=;
+        b=RJnE1f0dk+1kWswiVG651eSupLBNnKo04q+tRU1dfC4xth8rvePuee//wo2+r+Ihty
+         nJpT6Vv1Gci3Vx5rWOZVwrhkDlSNu5ehHSzdrvdqnQOV2eCN2rdqaMPx9GM4oUZwCfCA
+         rYVD5mNZrrwYS1NVqEH0ROiOqhuG2SiLDu696F1bdwvLYOmtyqqP3vKOwibC52wX3Opn
+         OJ+PS2k3Kyt8d4uwFGjLX7EJ496Vuc8mp8iFNFNWst7rtGdvua4WWSfLMzzhNAWv2RgO
+         Tu8O7BMRzkpEcX4NinbeNAK6AbltvZVcv5+Qq4XJlzm027wbTda0rxMgRr7N8Wr+fxIY
+         FtUg==
+X-Gm-Message-State: AOAM533MKWgjFkh1cfzNeFiuOmflLKDqTX9TSbuXVT0krayzBTRD8GvL
+        uPhD0azb5/4ug0ceJH4VnJ20FFO03olw
+X-Google-Smtp-Source: ABdhPJzMnmNUqhweoATHShUFOm2WiU0N4e30hQvigpqsUZJG3TEf8qs9lU0gYxxmgEWAVvG1Ltgqrz6ePbmj
+X-Received: from bgardon.sea.corp.google.com ([2620:15c:100:202:1a18:9719:a02:56fb])
+ (user=bgardon job=sendgmr) by 2002:a5b:611:: with SMTP id d17mr2257989ybq.421.1619731126562;
+ Thu, 29 Apr 2021 14:18:46 -0700 (PDT)
+Date:   Thu, 29 Apr 2021 14:18:26 -0700
+Message-Id: <20210429211833.3361994-1-bgardon@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.31.1.527.g47e6f16901-goog
+Subject: [PATCH v2 0/7] Lazily allocate memslot rmaps
+From:   Ben Gardon <bgardon@google.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, Peter Xu <peterx@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Peter Shier <pshier@google.com>,
+        Junaid Shahid <junaids@google.com>,
+        Jim Mattson <jmattson@google.com>,
+        Yulei Zhang <yulei.kernel@gmail.com>,
+        Wanpeng Li <kernellwp@gmail.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Xiao Guangrong <xiaoguangrong.eric@gmail.com>,
+        Ben Gardon <bgardon@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Apr 29, 2021 at 08:59:14PM +0100, Marc Zyngier wrote:
-> AOn Thu, 29 Apr 2021 18:51:59 +0100,
-> Ricardo Koller <ricarkol@google.com> wrote:
-> > 
-> > On Fri, Apr 23, 2021 at 09:58:24AM +0100, Marc Zyngier wrote:
-> > > Hi Ricardo,
-> > > 
-> > > Thanks for starting this.
-> > > 
-> > > On Fri, 23 Apr 2021 05:03:49 +0100,
-> > > Ricardo Koller <ricarkol@google.com> wrote:
-> > > > +.pushsection ".entry.text", "ax"
-> > > > +.balign 0x800
-> > > > +.global vectors
-> > > > +vectors:
-> > > > +.popsection
-> > > > +
-> > > > +/*
-> > > > + * Build an exception handler for vector and append a jump to it into
-> > > > + * vectors (while making sure that it's 0x80 aligned).
-> > > > + */
-> > > > +.macro HANDLER, el, label, vector
-> > > > +handler\()\vector:
-> > > > +	save_registers \el
-> > > > +	mov	x0, sp
-> > > > +	mov	x1, \vector
-> > > > +	bl	route_exception
-> > > > +	restore_registers \el
-> > > > +
-> > > > +.pushsection ".entry.text", "ax"
-> > > > +.balign 0x80
-> > > > +	b	handler\()\vector
-> > > > +.popsection
-> > > > +.endm
-> > > 
-> > > That's an interesting construct, wildly different from what we are
-> > > using elsewhere in the kernel, but hey, I like change ;-). It'd be
-> > > good to add a comment to spell out that anything that emits into
-> > > .entry.text between the declaration of 'vectors' and the end of this
-> > > file will break everything.
-> > > 
-> > > > +
-> > > > +.global ex_handler_code
-> > > > +ex_handler_code:
-> > > > +	HANDLER	1, sync, 0			// Synchronous EL1t
-> > > > +	HANDLER	1, irq, 1			// IRQ EL1t
-> > > > +	HANDLER	1, fiq, 2			// FIQ EL1t
-> > > > +	HANDLER	1, error, 3			// Error EL1t
-> > > 
-> > > Can any of these actually happen? As far as I can see, the whole
-> > > selftest environment seems to be designed around EL1h.
-> > >
-> > 
-> > They can happen. KVM defaults to use EL1h:
-> 
-> That's not a KVM decision. That's an architectural requirement. Reset
-> is an exception, exception use the handler mode.
-> 
+This series enables KVM to save memory when using the TDP MMU by waiting
+to allocate memslot rmaps until they are needed. To do this, KVM tracks
+whether or not a shadow root has been allocated. In order to get away
+with not allocating the rmaps, KVM must also be sure to skip operations
+which iterate over the rmaps. If the TDP MMU is in use and we have not
+allocated a shadow root, these operations would essentially be op-ops
+anyway. Skipping the rmap operations has a secondary benefit of avoiding
+acquiring the MMU lock in write mode in many cases, substantially
+reducing MMU lock contention.
 
-That makes sense, thanks for the clarification.
+This series was tested on an Intel Skylake machine. With the TDP MMU off
+and on, this introduced no new failures on kvm-unit-tests or KVM selftests.
 
-> > 
-> > 	#define VCPU_RESET_PSTATE_EL1   (PSR_MODE_EL1h | PSR_A_BIT | PSR_I_BIT | \
-> > 
-> > but then a guest can set the SPSel to 0:
-> > 
-> > 	asm volatile("msr spsel, #0");
-> > 
-> > and this happens:
-> > 
-> > 	  Unexpected exception guest (vector:0x0, ec:0x25)
-> > 
-> > I think it should still be a valid situation: some test might want to
-> > try it.
-> 
-> Sure, but that's not what this test (in patch #2) is doing, is it?
-> If, as I believe, this is an unexpected situation, why not handle it
-> separately? I'm not advocating one way or another, but it'd be good to
-> understand the actual scope of the exception handling in this
-> infrastructure.
-> 
-> If you plan to allow tests to run in the EL1t environment, where do
-> you decide to switch back to EL1t after taking the exception in EL1h?
-> Are the tests supposed to implement both stack layouts?
-> 
-> Overall, I'm worried that nobody is going to use this layout *unless*
-> it becomes mandated.
-> 
-> Thanks,
-> 
-> 	M.
-> 
-> -- 
-> Without deviation from the norm, progress is not possible.
+Changelog:
+v2:
+	Incorporated feedback from Paolo and Sean
+	Replaced the memslot_assignment_lock with slots_arch_lock, which
+	has a larger critical section.
 
-Got it, I see your point. Yes, I'm definitely not planning to use it.
-Will just treat those vectors as "invalid".
+Ben Gardon (7):
+  KVM: x86/mmu: Track if shadow MMU active
+  KVM: x86/mmu: Skip rmap operations if shadow MMU inactive
+  KVM: x86/mmu: Deduplicate rmap freeing
+  KVM: x86/mmu: Factor out allocating memslot rmap
+  KVM: mmu: Refactor memslot copy
+  KVM: mmu: Add slots_arch_lock for memslot arch fields
+  KVM: x86/mmu: Lazily allocate memslot rmaps
 
-Thanks again,
-Ricardo
+ arch/x86/include/asm/kvm_host.h |  13 +++
+ arch/x86/kvm/mmu/mmu.c          | 153 +++++++++++++++++++++-----------
+ arch/x86/kvm/mmu/mmu_internal.h |   2 +
+ arch/x86/kvm/mmu/tdp_mmu.c      |   6 +-
+ arch/x86/kvm/mmu/tdp_mmu.h      |   4 +-
+ arch/x86/kvm/x86.c              | 110 +++++++++++++++++++----
+ include/linux/kvm_host.h        |   9 ++
+ virt/kvm/kvm_main.c             |  54 ++++++++---
+ 8 files changed, 264 insertions(+), 87 deletions(-)
+
+-- 
+2.31.1.527.g47e6f16901-goog
+
