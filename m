@@ -2,75 +2,123 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E048C36EE46
-	for <lists+kvm@lfdr.de>; Thu, 29 Apr 2021 18:39:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6E51D36EE4C
+	for <lists+kvm@lfdr.de>; Thu, 29 Apr 2021 18:41:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233420AbhD2Qkf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 29 Apr 2021 12:40:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41314 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232724AbhD2Qke (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 29 Apr 2021 12:40:34 -0400
-Received: from mail-ot1-x329.google.com (mail-ot1-x329.google.com [IPv6:2607:f8b0:4864:20::329])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8D243C06138B
-        for <kvm@vger.kernel.org>; Thu, 29 Apr 2021 09:39:47 -0700 (PDT)
-Received: by mail-ot1-x329.google.com with SMTP id n32-20020a9d1ea30000b02902a53d6ad4bdso6908351otn.3
-        for <kvm@vger.kernel.org>; Thu, 29 Apr 2021 09:39:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=ixwoeHd50m6yi5/B4CIkxSJFBB/BaPT5DwpNhFLHMuQ=;
-        b=BDxNH2RuCXa/E45AdxHwAozvJYEphArYc+zMAXpSPoswyFmNzdPZsvb72VDJ8KmNaR
-         QhJ/w62JOUrQWq5hmMwENhHbr0nkM5IEMpPkrVjlmD9Ig3YvSKgGcQKudlrDhBjSTHFp
-         C0WGHXpizXI2C3LbvCUUNl5kXT1hqsoYcB2tUw+nVmd7hNi0y7xK26IQW0Mz8Vhqa7dN
-         7Vxh0tx606cU492BKbjbN60fS8Ocfyabj10tbCwHbJF559moIhPnaGohGrOURmN5BpBo
-         GLMqf6xtPtremSCjlhXV9kTs7kimBr8PaxWhcvSYEVIHHIZFUTS+myGpGxqcKqPZoIp4
-         hgUw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=ixwoeHd50m6yi5/B4CIkxSJFBB/BaPT5DwpNhFLHMuQ=;
-        b=TzJvsr52GzC9kYT5H6uDwXtTg6lq4kLMhXpiyXp9EaVRrpakKRds3WQ28li1rgf5bP
-         5zmxgOPlswitYOCiQwfEH1bbTYTnDV0FYR4JXINdHYQmXarBPwf32c7R7zeeWgGTpMpi
-         7o7ylE4ovcHqPI1btOnligbVXEw8Av341Tuml2LhQ4Wpav279WiNSuwy8yftaTk+YEto
-         BMT/4LGi5g/3a3eSuhA04TWjDFFJ0H2sN8RC1gf8lbHAOwQMOVPnhKykl7WKBZqgijDE
-         E6buBsdAjLdOYBjf1Q/MHc5c2puJiZW1PvJPs9POyTY3GkS5vEQYNtFuIPDf9ks0HKuA
-         ZLHw==
-X-Gm-Message-State: AOAM531RNrLaWxgSDQOuqkx05bdlf6b9CTe+IwpdqlCXFA+95gtMio1F
-        YJfRCQw4rfttH6SmmYPCf08PHU9V6S9XWlc2yGxnUPUeHLA=
-X-Google-Smtp-Source: ABdhPJxtndknXjuzfV43itjqUPlRlj7ljqUbZu/4UIaI8w2JkAq/zyJn9vLJv76Z2BJjo1RI1DWRmRdJZ+QV40j3jxo=
-X-Received: by 2002:a05:6830:4009:: with SMTP id h9mr2721861ots.295.1619714386733;
- Thu, 29 Apr 2021 09:39:46 -0700 (PDT)
+        id S240748AbhD2Qma (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 29 Apr 2021 12:42:30 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:43700 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S233099AbhD2Qm3 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 29 Apr 2021 12:42:29 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1619714502;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=KJvPIMRIaEUaTRVTXR0nZcXfhBmX/xq1gsZgnD2mQyg=;
+        b=DP6ld4Q0wi3klN3RBagLgIncNpgmjQ5AN9yI2Xj5vwd9IGypQXMzxcYwsgrLNpzlPzR7L4
+        vIBQL6BUwndeEShqk4SN8efdQhIc5atUI99+dq3thCqxQyf3Mwe0FllZP5o2zcZznRrMms
+        bCOTwqi57Ewmr8VdEtt6/NlPcTfCWqw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-495-5vcgWDx7O0Ge58de1s8vJw-1; Thu, 29 Apr 2021 12:41:39 -0400
+X-MC-Unique: 5vcgWDx7O0Ge58de1s8vJw-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 865F91B18BC8;
+        Thu, 29 Apr 2021 16:41:38 +0000 (UTC)
+Received: from gator.redhat.com (unknown [10.40.192.243])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id AF3DF64184;
+        Thu, 29 Apr 2021 16:41:31 +0000 (UTC)
+From:   Andrew Jones <drjones@redhat.com>
+To:     kvm@vger.kernel.org
+Cc:     alexandru.elisei@arm.com, nikos.nikoleris@arm.com,
+        andre.przywara@arm.com, eric.auger@redhat.com
+Subject: [PATCH kvm-unit-tests v3 0/8] arm/arm64: Prepare for target-efi
+Date:   Thu, 29 Apr 2021 18:41:22 +0200
+Message-Id: <20210429164130.405198-1-drjones@redhat.com>
 MIME-Version: 1.0
-References: <20210429162233.116849-1-venkateshs@chromium.org>
-In-Reply-To: <20210429162233.116849-1-venkateshs@chromium.org>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Thu, 29 Apr 2021 09:39:35 -0700
-Message-ID: <CALMp9eQXj7aN2=rE50Yyt5z-Pf5wfO1w5k9rf1Q+LBnpN3zx5A@mail.gmail.com>
-Subject: Re: [PATCH] kvm: exit halt polling on need_resched() as well
-To:     Venkatesh Srinivas <venkateshs@chromium.org>
-Cc:     kvm list <kvm@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        David Matlack <dmatlack@google.com>,
-        Benjamin Segall <bsegall@google.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Apr 29, 2021 at 9:22 AM Venkatesh Srinivas
-<venkateshs@chromium.org> wrote:
->
-> From: Benjamin Segall <bsegall@google.com>
->
-> single_task_running() is usually more general than need_resched()
-> but CFS_BANDWIDTH throttling will use resched_task() when there
-> is just one task to get the task to block. This was causing
-> long-need_resched warnings and was likely allowing VMs to
-> overrun their quota when halt polling.
->
-> Signed-off-by: Ben Segall <bsegall@google.com>
-> Signed-off-by: Venkatesh Srinivas <venkateshs@chromium.org>
-Reviewed-by: Jim Mattson <jmattson@google.com>
+v3:
+ - Picked up Alex's r-b on patch 1 and 5
+ - Removed useless cast in pci_host_bridge_get_paddr [Andre]
+ - Added XN bits when mapping I/O pages [Alex]
+ - Tweaks to patch 6 suggested by Alex and myself
+ - Improved patch 8 commit message and changed psci-invoke's input
+   and output parameter types
+
+v2:
+ - Addressed all comments from Nikos and Alex
+ - The biggest changes are
+   * dropping the weird persistent map stuff that I never liked by taking
+     Alex's suggestion to just create the idmap early
+   * adding mem_region_add() to clean up memory region adding code, also
+     improved the assignment of region fields
+ - Also, while we found that we still have a memory map assumption
+   (3G-4G reserved for virtual memory allocation), I only make that
+   assumption clear. I've left removing it for an additional patch
+   for another day.
+ - Added psci_invoke_none() to use prior to the PSCI method being set
+ - Added r-b's for each patch given, unless the commit changed too much
+ - Didn't take Alex's suggestion to use x5 for stacktop when calling
+   setup from start. I prefer explicitly loading it again.
+
+
+This series is a collection of patches derived from [1] that pave the
+way for new targets, e.g. target-efi[2]. These patches mostly address
+the elimination of memory map assumptions and they shouldn't have any
+functional changes. The last two patches are a couple of patches not
+related to the memory map, but they also prepare for bare metal targets.
+I tossed them in since I don't think they should be too controversial.
+This patch series is also available here [3].
+
+[1] https://github.com/rhdrjones/kvm-unit-tests/commits/target-efi
+[2] https://www.youtube.com/watch?v=kvaufVrL0J0
+[3] https://gitlab.com/rhdrjones/kvm-unit-tests/-/commits/efiprep
+
+Thanks,
+drew
+
+
+Andrew Jones (8):
+  arm/arm64: Reorganize cstart assembler
+  arm/arm64: Move setup_vm into setup
+  pci-testdev: ioremap regions
+  arm/arm64: mmu: Stop mapping an assumed IO region
+  arm/arm64: mmu: Remove memory layout assumptions
+  arm/arm64: setup: Consolidate memory layout assumptions
+  chr-testdev: Silently fail init
+  arm/arm64: psci: Don't assume method is hvc
+
+ arm/cstart.S                |  92 ++++++++++++-------
+ arm/cstart64.S              |  45 ++++++---
+ arm/flat.lds                |  23 +++++
+ arm/selftest.c              |  34 ++-----
+ lib/arm/asm/io.h            |   6 ++
+ lib/arm/asm/mmu.h           |   3 +
+ lib/arm/asm/page.h          |   2 +
+ lib/arm/asm/pgtable-hwdef.h |   1 +
+ lib/arm/asm/psci.h          |  10 +-
+ lib/arm/asm/setup.h         |   7 +-
+ lib/arm/mmu.c               |  53 +++++++----
+ lib/arm/psci.c              |  35 +++++--
+ lib/arm/setup.c             | 177 +++++++++++++++++++++---------------
+ lib/arm64/asm/io.h          |   6 ++
+ lib/arm64/asm/mmu.h         |   1 +
+ lib/arm64/asm/page.h        |   2 +
+ lib/chr-testdev.c           |   5 +-
+ lib/pci-host-generic.c      |   5 +-
+ lib/pci-host-generic.h      |   4 +-
+ lib/pci-testdev.c           |   4 +
+ 20 files changed, 335 insertions(+), 180 deletions(-)
+
+-- 
+2.30.2
+
