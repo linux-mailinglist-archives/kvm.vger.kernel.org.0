@@ -2,101 +2,116 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 88AD636E819
-	for <lists+kvm@lfdr.de>; Thu, 29 Apr 2021 11:38:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CD5BE36E83C
+	for <lists+kvm@lfdr.de>; Thu, 29 Apr 2021 11:53:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237680AbhD2Jjd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 29 Apr 2021 05:39:33 -0400
-Received: from out30-57.freemail.mail.aliyun.com ([115.124.30.57]:47113 "EHLO
-        out30-57.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233046AbhD2Jj3 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 29 Apr 2021 05:39:29 -0400
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R191e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04426;MF=zelin.deng@linux.alibaba.com;NM=1;PH=DS;RN=7;SR=0;TI=SMTPD_---0UX9zyA9_1619689109;
-Received: from IT-FVFX909QHV2H.local(mailfrom:zelin.deng@linux.alibaba.com fp:SMTPD_---0UX9zyA9_1619689109)
-          by smtp.aliyun-inc.com(127.0.0.1);
-          Thu, 29 Apr 2021 17:38:29 +0800
-Subject: Re: [PATCH] Guest system time jumps when new vCPUs is hot-added
-To:     Thomas Gleixner <tglx@linutronix.de>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org, x86@kernel.org
-References: <1619576521-81399-1-git-send-email-zelin.deng@linux.alibaba.com>
- <87lf92n5r1.ffs@nanos.tec.linutronix.de>
- <e33920a0-24bc-fa40-0a23-c2eb5693f85d@linux.alibaba.com>
- <875z057a12.ffs@nanos.tec.linutronix.de>
-From:   Zelin Deng <zelin.deng@linux.alibaba.com>
-Message-ID: <2df3de0e-670a-ba28-fdd2-0002cebde545@linux.alibaba.com>
-Date:   Thu, 29 Apr 2021 17:38:29 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:78.0)
- Gecko/20100101 Thunderbird/78.10.0
+        id S237417AbhD2Jy0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 29 Apr 2021 05:54:26 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:45636 "EHLO
+        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231543AbhD2JyZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 29 Apr 2021 05:54:25 -0400
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+        by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 13T9XrGH131973;
+        Thu, 29 Apr 2021 09:53:35 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
+ : subject : message-id : mime-version : content-type; s=corp-2020-01-29;
+ bh=zMqah14+OFnOSJ6UHqaQtZjQ2w6PI4tm2fnCNKK/fi0=;
+ b=L5aJa2VqnQdAXIeIR4rtKZyFAcYavk8z8YWn2ggFvCR1cLxXOVyHE6cWJ/K2G64KBRBD
+ tcVlDcrAZBV5ewDDRak5TaBGM4NCnlDacWGHTCL/xia6vgNKOOjbH9pWqDudRfUK/rSK
+ 2d5xef05cNs09OHeKIoiAaUA4zsjdqC27m+v7ANII/MAR2l08CVXV76RifYdrOmUBmmo
+ ZFt34YoPA+B7bCtSFUk0ETxkuU0w2OizjNi3n9yG28sffJUC9S+9VYzfp8jHWQ6MTVHS
+ tv7DPLFmQyOc9Qx+MpLG2eeJBdm7a+L+vpc6R37WLaqBV81RoyRo2J/65mwZRSv/0ofy 9Q== 
+Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
+        by userp2120.oracle.com with ESMTP id 385aeq3spg-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 29 Apr 2021 09:53:35 +0000
+Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
+        by userp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 13T9UsFm180136;
+        Thu, 29 Apr 2021 09:53:35 GMT
+Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
+        by userp3030.oracle.com with ESMTP id 3848f0u8ak-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 29 Apr 2021 09:53:34 +0000
+Received: from abhmp0002.oracle.com (abhmp0002.oracle.com [141.146.116.8])
+        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 13T9rXB0004611;
+        Thu, 29 Apr 2021 09:53:33 GMT
+Received: from kadam (/102.36.221.92)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Thu, 29 Apr 2021 09:53:33 +0000
+Date:   Thu, 29 Apr 2021 12:53:27 +0300
+From:   Dan Carpenter <dan.carpenter@oracle.com>
+To:     Kirti Wankhede <kwankhede@nvidia.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>
+Cc:     Alex Williamson <alex.williamson@redhat.com>, kvm@vger.kernel.org,
+        kernel-janitors@vger.kernel.org
+Subject: [PATCH v2] vfio/mdev: remove unnecessary NULL check in
+ mbochs_create()
+Message-ID: <20210429095327.GY1981@kadam>
 MIME-Version: 1.0
-In-Reply-To: <875z057a12.ffs@nanos.tec.linutronix.de>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-Mailer: git-send-email haha only kidding
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=9968 signatures=668683
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 phishscore=0 spamscore=0
+ mlxlogscore=999 malwarescore=0 bulkscore=0 adultscore=0 mlxscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2104060000
+ definitions=main-2104290067
+X-Proofpoint-ORIG-GUID: cJHDy9ASvbS2L6ec5T_3l35qXnZXxmI1
+X-Proofpoint-GUID: cJHDy9ASvbS2L6ec5T_3l35qXnZXxmI1
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=9968 signatures=668683
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 impostorscore=0
+ phishscore=0 spamscore=0 bulkscore=0 mlxscore=0 lowpriorityscore=0
+ clxscore=1015 suspectscore=0 malwarescore=0 mlxlogscore=999
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2104060000 definitions=main-2104290067
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2021/4/29 下午4:46, Thomas Gleixner wrote:
-> On Thu, Apr 29 2021 at 07:24, Zelin Deng wrote:
->> On 2021/4/28 下午5:00, Thomas Gleixner wrote:
->>> On Wed, Apr 28 2021 at 10:22, Zelin Deng wrote:
->>>> [   85.101228] TSC ADJUST compensate: CPU1 observed 169175101528 warp. Adjust: 169175101528
->>>> [  141.513496] TSC ADJUST compensate: CPU1 observed 166 warp. Adjust: 169175101694
->>> Why is TSC_ADJUST on CPU1 different from CPU0 in the first place?
->> Per my understanding when vCPU is created by KVM, it's tsc_offset = 0 -
->> host rdtsc() meanwhile TSC_ADJUST is 0.
->>
->> Assume vCPU0 boots up with tsc_offset0, after 10000 tsc cycles, hotplug
->> via "virsh setvcpus" creates a new vCPU1 whose tsc_offset1 should be
->> about tsc_offset0 - 10000.  Therefore there's 10000 tsc warp between
->> rdtsc() in guest of vCPU0 and vCPU1, check_tsc_sync_target() when vCPU1
->> gets online will set TSC_ADJUST for vCPU1.
->>
->> Did I miss something?
-> Yes. The above is wrong.
->
-> The host has to ensure that the TSC of the vCPUs is in sync and if it
-> exposes TSC_ADJUST then that should be 0 and nothing else. The TSC
-> in a guest vCPU is
->
->    hostTSC + host_TSC_ADJUST + vcpu_TSC_OFFSET + vcpu_guest_TSC_ADJUST
->
-> The mechanism the host has to use to ensure that the guest vCPUs are
-> exposing the same time is vcpu_TSC_OFFSET and nothing else. And
-> vcpu_TSC_OFFSET is the same for all vCPUs of a guest.
-Yes, make sense.
->
-> Now there is another issue when vCPU0 and vCPU1 are on different
-> 'sockets' via the topology information provided by the hypervisor.
->
-> Because we had quite some issues in the past where TSCs on a single
-> socket were perfectly fine, but between sockets they were skewed, we
-> have a sanity check there. What it does is:
->
->       if (cpu_is_first_on_non_boot_socket(cpu))
->       	validate_synchronization_with_boot_socket()
->
-> And that validation expects that the CPUs involved run in a tight loop
-> concurrently so the TSC readouts which happen on both can be reliably
-> compared.
->
-> But this cannot be guaranteed on vCPUs at all, because the host can
-> schedule out one or both at any point during that synchronization check.
-Is there any plan to fix this?
->
-> A two socket guest setup needs to have information from the host that
-> TSC is usable and that the socket sync check can be skipped. Anything
-> else is just doomed to fail in hard to diagnose ways.
+Originally "type" could be NULL and these checks were required, but we
+recently changed how "type" is assigned and that's no longer the case.
+Now "type" points to an element in the middle of a non-NULL array.
 
-Yes, I had tried to add "tsc=unstable" to skip tsc sync.  However if a 
-user process which is not pined to vCPU is using rdtsc, it can get tsc 
-warp, because it can be scheduled among vCPUs.  Does it mean user 
-applications have to guarantee itself to use rdtsc only when TSC is 
-reliable?
+Removing the checks does not affect runtime at all, but it makes the
+code a little bit simpler to read.
 
->
-> Thanks,
->
->          tglx
+Fixes: 3d3a360e570616 ("vfio/mbochs: Use mdev_get_type_group_id()")
+Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
+---
+Update the commit message
+
+ samples/vfio-mdev/mbochs.c | 2 --
+ samples/vfio-mdev/mdpy.c | 3 +--
+ 2 files changed, 1 insertion(+), 4 deletions(-)
+
+diff --git a/samples/vfio-mdev/mbochs.c b/samples/vfio-mdev/mbochs.c
+index 861c76914e76..881ef9a7296f 100644
+--- a/samples/vfio-mdev/mbochs.c
++++ b/samples/vfio-mdev/mbochs.c
+@@ -513,8 +513,6 @@ static int mbochs_create(struct mdev_device *mdev)
+ 	struct device *dev = mdev_dev(mdev);
+ 	struct mdev_state *mdev_state;
+ 
+-	if (!type)
+-		type = &mbochs_types[0];
+ 	if (type->mbytes + mbochs_used_mbytes > max_mbytes)
+ 		return -ENOMEM;
+ 
+diff --git a/samples/vfio-mdev/mdpy.c b/samples/vfio-mdev/mdpy.c
+index f0c0e7209719..e889c1cf8fd1 100644
+--- a/samples/vfio-mdev/mdpy.c
++++ b/samples/vfio-mdev/mdpy.c
+@@ -667,8 +667,7 @@ static ssize_t description_show(struct mdev_type *mtype,
+ 		&mdpy_types[mtype_get_type_group_id(mtype)];
+ 
+ 	return sprintf(buf, "virtual display, %dx%d framebuffer\n",
+-		       type ? type->width  : 0,
+-		       type ? type->height : 0);
++		       type->width, type->height);
+ }
+ static MDEV_TYPE_ATTR_RO(description);
+ 
+-- 
+2.30.2
