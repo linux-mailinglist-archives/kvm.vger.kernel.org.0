@@ -2,205 +2,110 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6FBB336EC88
-	for <lists+kvm@lfdr.de>; Thu, 29 Apr 2021 16:41:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 87C3C36ED83
+	for <lists+kvm@lfdr.de>; Thu, 29 Apr 2021 17:39:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240111AbhD2OmU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 29 Apr 2021 10:42:20 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:24111 "EHLO
+        id S240703AbhD2PkB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 29 Apr 2021 11:40:01 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:50839 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S240062AbhD2OmU (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 29 Apr 2021 10:42:20 -0400
+        by vger.kernel.org with ESMTP id S233420AbhD2PkB (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 29 Apr 2021 11:40:01 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1619707293;
+        s=mimecast20190719; t=1619710753;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=xuXI8WbytCjzlShJ6hpRX4oLXXWI11SEtwQvo6ESyvo=;
-        b=TRSJMpwYsgVM3myrMidKLx44c/6Oxh6dob7raC2XG4aAMG2AwAEH/IG3Ebj76pdybvOqGZ
-        2p2eguB4PHGrkdK6/9B8IEObtefAFwvspPm8EsVzpwcvUOo2riINo4NfSQTx+r6aCRHRiO
-        +hSZdAdyfhmZx/BpMzUrvoY8mV1sDp8=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-421-7GxxX9H9Mp2GsvB6aarWyQ-1; Thu, 29 Apr 2021 10:41:31 -0400
-X-MC-Unique: 7GxxX9H9Mp2GsvB6aarWyQ-1
-Received: by mail-ed1-f69.google.com with SMTP id z12-20020aa7d40c0000b0290388179cc8bfso2678480edq.21
-        for <kvm@vger.kernel.org>; Thu, 29 Apr 2021 07:41:31 -0700 (PDT)
+        bh=rl0f9PRkVEDvRlQejGvRFrQLs2o8eTr8cTwBM5oiXWk=;
+        b=GqoijODNlqgjtKCaj72/5klTg06/6zs01k8MhYH6wI8oI6sLlcEtNSCmwTUIhWJj/pW119
+        QrWlEx6oRrDE4PWwwOMkW8Ox7/YMKsuTdi/zs8Ufh+0n7MzLir33kiuSlC67KoQ3b7aVzB
+        z8eVYLBH53n/Y7AnSgt7AckTS5+z0tk=
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
+ [209.85.218.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-172-EZEgM4omPtelTqKnxnbXhQ-1; Thu, 29 Apr 2021 11:39:11 -0400
+X-MC-Unique: EZEgM4omPtelTqKnxnbXhQ-1
+Received: by mail-ej1-f72.google.com with SMTP id 16-20020a1709063010b029037417ca2d43so13616049ejz.5
+        for <kvm@vger.kernel.org>; Thu, 29 Apr 2021 08:39:11 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=xuXI8WbytCjzlShJ6hpRX4oLXXWI11SEtwQvo6ESyvo=;
-        b=r6ftekbYjuZlFWWHrJDPwh2pBFjR6g3CZonEbQWjTN5VC8HlYEqpTqH3OEDLuelBHq
-         Tnd2hoczvXQ8avQyYhz4jT3/5ccyaX756JeaXltPxzRKYWmv652Fr18VHYKHazZejrsf
-         zvLxeEQ44ATLpZLKKFERNd4NncWOiP5NkI15ZNPAg4HrzVw7XoudSLyn+j6mBQSVLUIR
-         TD3TTJ4ug+vYBCGI1x2DdTl5wmnAiw0j++zJnl59kctoYcfUomXxS8iH4BFppytNI3cU
-         oGCmuLIjOUcRE3f9enRElgSECe9B7HuhXuU0NHV6xl5OkU3+nhvdMU0kNcsZf4+7edbb
-         dibA==
-X-Gm-Message-State: AOAM533jlLaaYs9fk+sSlR25JAfAtUAW9mc8SlQsIgpnsBXb8YyxVBud
-        iRa7uYDFwaMdFq8ggBOvkWl2MPKrhE2CdYNs+gk7YqfBzKMc+l9YxheXe4RottLsw/GlwDJX9Ze
-        X50to4iN2HpCx
-X-Received: by 2002:a05:6402:5203:: with SMTP id s3mr18501774edd.360.1619707290339;
-        Thu, 29 Apr 2021 07:41:30 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyrIL7coZCsSIfxJlhgbwG2Z8UKHVm79pl60hkgoMG718BNmVPQQZ8S+x3fVv7iMrnwUFgfzQ==
-X-Received: by 2002:a05:6402:5203:: with SMTP id s3mr18501753edd.360.1619707290118;
-        Thu, 29 Apr 2021 07:41:30 -0700 (PDT)
-Received: from gator (cst2-174-132.cust.vodafone.cz. [31.30.174.132])
-        by smtp.gmail.com with ESMTPSA id g22sm99240ejz.46.2021.04.29.07.41.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 29 Apr 2021 07:41:29 -0700 (PDT)
-Date:   Thu, 29 Apr 2021 16:41:27 +0200
-From:   Andrew Jones <drjones@redhat.com>
-To:     Alexandru Elisei <alexandru.elisei@arm.com>
-Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
-        pbonzini@redhat.com
-Subject: Re: [kvm-unit-tests PATCH v3] configure: arm: Replace --vmm with
- --target
-Message-ID: <20210429144127.anb26s7hrfpwarjf@gator>
-References: <20210429141204.51848-1-alexandru.elisei@arm.com>
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=rl0f9PRkVEDvRlQejGvRFrQLs2o8eTr8cTwBM5oiXWk=;
+        b=qz2Jc9EsV+Ydkl5n9hx7ZAA9sLmO6VyDZHJWD+q/xZCMaVGONcyeCG4nrIERX0+fr2
+         DJfnuoYcHU32dHV8Xj6sYw6FRo/mLa06AtjDCg2/PvbcamXzEtDE/P7IM9Y4o3O5JmAc
+         f8FEYejpHhmdBw0KMk31u7KgPk5u6L5RpbzQpuBewQa6iMH48chPnbv88ZN4dGwpelz2
+         E3QnG1ex2hloU0DKfKoiYotXrahWZoUpH0kCTawyf7lfvkcyE/BevDisdxU5Cc7SbWmw
+         6o8YiBNOmw7eCmc4cX3VpRhEh48wVz5d7IfiJhjMbvkXthTfnQiGBbDwffHkvF1lBn1/
+         xS9Q==
+X-Gm-Message-State: AOAM530Z12wVntSHIvJE4JO3Hkn/PoICjcgqDFW6pJ4hQ/lNPo+xiabt
+        UNtrUfCPVk+DzcSLV9ySB2cVzf4JdX5Mre5mjTBqZwMjY548tiQIXlSjDYt0rVwAm/MzKJ4dMYM
+        mkJFtu34IJwZe
+X-Received: by 2002:a17:906:2287:: with SMTP id p7mr436425eja.377.1619710750279;
+        Thu, 29 Apr 2021 08:39:10 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJx21A1YlMpANQCE1KAtbp+/8NxVNsvztzUMv7CV14C7LXxrq4+7wsAmPNPrSX2GIB7Ydmvr+w==
+X-Received: by 2002:a17:906:2287:: with SMTP id p7mr436412eja.377.1619710750060;
+        Thu, 29 Apr 2021 08:39:10 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id i19sm162439ejd.114.2021.04.29.08.39.09
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 29 Apr 2021 08:39:09 -0700 (PDT)
+Subject: Re: Subject: [RFC PATCH] kvm/x86: Fix 'lpages' kvm stat for TDM MMU
+To:     "Shahin, Md Shahadat Hossain" <shahinmd@amazon.de>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Cc:     "Szczepanek, Bartosz" <bsz@amazon.de>,
+        "seanjc@google.com" <seanjc@google.com>,
+        "bgardon@google.com" <bgardon@google.com>
+References: <1619700409955.15104@amazon.de>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <dae9be92-00ab-2a2d-822b-e15abea6aeb6@redhat.com>
+Date:   Thu, 29 Apr 2021 17:39:08 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210429141204.51848-1-alexandru.elisei@arm.com>
+In-Reply-To: <1619700409955.15104@amazon.de>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Apr 29, 2021 at 03:12:04PM +0100, Alexandru Elisei wrote:
-> The --vmm configure option was added to distinguish between the two virtual
-> machine managers that kvm-unit-tests supports for the arm and arm64
-> architectures, qemu or kvmtool. There are plans to make kvm-unit-tests work
-> as an EFI app, which will require changes to the way tests are compiled.
-> Instead of adding a new configure option specifically for EFI and have it
-> coexist with --vmm, or overloading the semantics of the existing --vmm
-> option, let's replace --vmm with the more generic name --target.
+On 29/04/21 14:46, Shahin, Md Shahadat Hossain wrote:
+> Large pages not being created properly may result in increased memory
+> access time. The 'lpages' kvm stat used to keep track of the current
+> number of large pages in the system, but with TDP MMU enabled the stat
+> is not showing the correct number.
 > 
-> Since --target is only valid for arm and arm64, reject the option when it's
-> specified for another architecture, which is how --vmm should have behaved
-> from the start.
+> This patch extends the lpages counter to cover the TDP case.
 > 
-> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> Signed-off-by: Md Shahadat Hossain Shahin <shahinmd@amazon.de>
+> Cc: Bartosz Szczepanek <bsz@amazon.de>
 > ---
-> Changes in v3:
+>   arch/x86/kvm/mmu/tdp_mmu.c | 6 ++++++
+>   1 file changed, 6 insertions(+)
 > 
-> * Using --target for any architecture other than arm and arm64 generates an
->   error.
-> * Don't generate the TARGET variable in config.mak for other architectures.
-> * Cosmetic changes to the commit message.
-> 
-> Changes in v2:
-> 
-> * Removed the RFC tag and cover letter.
-> * Removed --vmm entirely.
-> 
->  configure | 32 +++++++++++++++++++++++---------
->  1 file changed, 23 insertions(+), 9 deletions(-)
-> 
-> diff --git a/configure b/configure
-> index 01a0b262a9f2..d5d223fe3a90 100755
-> --- a/configure
-> +++ b/configure
-> @@ -21,7 +21,7 @@ pretty_print_stacks=yes
->  environ_default=yes
->  u32_long=
->  wa_divide=
-> -vmm="qemu"
-> +target=
->  errata_force=0
->  erratatxt="$srcdir/errata.txt"
->  host_key_document=
-> @@ -35,8 +35,8 @@ usage() {
->  	Options include:
->  	    --arch=ARCH            architecture to compile for ($arch)
->  	    --processor=PROCESSOR  processor to compile for ($arch)
-> -	    --vmm=VMM              virtual machine monitor to compile for (qemu
-> -	                           or kvmtool, default is qemu) (arm/arm64 only)
-> +	    --target=TARGET        target platform that the tests will be running on (qemu or
-> +	                           kvmtool, default is qemu) (arm/arm64 only)
->  	    --cross-prefix=PREFIX  cross compiler prefix
->  	    --cc=CC		   c compiler to use ($cc)
->  	    --ld=LD		   ld linker to use ($ld)
-> @@ -58,7 +58,7 @@ usage() {
->  	    --earlycon=EARLYCON
->  	                           Specify the UART name, type and address (optional, arm and
->  	                           arm64 only). The specified address will overwrite the UART
-> -	                           address set by the --vmm option. EARLYCON can be one of
-> +	                           address set by the --target option. EARLYCON can be one of
->  	                           (case sensitive):
->  	               uart[8250],mmio,ADDR
->  	                           Specify an 8250 compatible UART at address ADDR. Supported
-> @@ -88,8 +88,8 @@ while [[ "$1" = -* ]]; do
->          --processor)
->  	    processor="$arg"
->  	    ;;
-> -	--vmm)
-> -	    vmm="$arg"
-> +	--target)
-> +	    target="$arg"
->  	    ;;
->  	--cross-prefix)
->  	    cross_prefix="$arg"
-> @@ -146,6 +146,15 @@ arch_name=$arch
->  [ "$arch" = "aarch64" ] && arch="arm64"
->  [ "$arch_name" = "arm64" ] && arch_name="aarch64"
->  
-> +if [ -z "$target" ]; then
-> +    target="qemu"
-> +else
-> +    if [ "$arch" != "arm64" ] && [ "$arch" != "arm" ]; then
-> +        echo "--target is not supported for $arch"
-> +        usage
-> +    fi
-> +fi
-> +
->  if [ -z "$page_size" ]; then
->      [ "$arch" = "arm64" ] && page_size="65536"
->      [ "$arch" = "arm" ] && page_size="4096"
-> @@ -177,13 +186,13 @@ if [ "$arch" = "i386" ] || [ "$arch" = "x86_64" ]; then
->      testdir=x86
->  elif [ "$arch" = "arm" ] || [ "$arch" = "arm64" ]; then
->      testdir=arm
-> -    if [ "$vmm" = "qemu" ]; then
-> +    if [ "$target" = "qemu" ]; then
->          arm_uart_early_addr=0x09000000
-> -    elif [ "$vmm" = "kvmtool" ]; then
-> +    elif [ "$target" = "kvmtool" ]; then
->          arm_uart_early_addr=0x3f8
->          errata_force=1
->      else
-> -        echo '--vmm must be one of "qemu" or "kvmtool"!'
-> +        echo '--target must be one of "qemu" or "kvmtool"!'
-
-I switched the quotes from " to ', e.g. 'qemu'.
-
->          usage
->      fi
->  
-> @@ -318,6 +327,11 @@ WA_DIVIDE=$wa_divide
->  GENPROTIMG=${GENPROTIMG-genprotimg}
->  HOST_KEY_DOCUMENT=$host_key_document
->  EOF
-> +if [ "$arch" = "arm" ] || [ "$arch" = "arm64" ]; then
-> +cat <<EOF >> config.mak
-> +TARGET=$target
-> +EOF
-
-I changed this to
-
-    echo "TARGET=$target" >> config.mak
-
-> +fi
->  
->  cat <<EOF > lib/config.h
->  #ifndef CONFIG_H
-> -- 
-> 2.31.1
+> diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+> index 34207b874886..1e2a3cb33568 100644
+> --- a/arch/x86/kvm/mmu/tdp_mmu.c
+> +++ b/arch/x86/kvm/mmu/tdp_mmu.c
+> @@ -425,6 +425,12 @@ static void __handle_changed_spte(struct kvm *kvm, int as_id, gfn_t gfn,
+>   
+>   	if (old_spte == new_spte)
+>   		return;
+> +	
+> +	if (is_large_pte(old_spte))
+> +		--kvm->stat.lpages;
+> +	
+> +	if (is_large_pte(new_spte))
+> +		++kvm->stat.lpages;
+>   
+>   	trace_kvm_tdp_mmu_spte_changed(as_id, gfn, level, old_spte, new_spte);
+>   
 > 
 
-Applied to arm/queue
+Queued, thanks.
 
-https://gitlab.com/rhdrjones/kvm-unit-tests/-/commits/arm/queue
-
-Thanks,
-drew
+Paolo
 
