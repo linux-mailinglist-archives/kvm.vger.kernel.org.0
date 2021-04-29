@@ -2,217 +2,160 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 662FB36E988
-	for <lists+kvm@lfdr.de>; Thu, 29 Apr 2021 13:26:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C32C336E9E0
+	for <lists+kvm@lfdr.de>; Thu, 29 Apr 2021 13:59:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233184AbhD2L1L (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 29 Apr 2021 07:27:11 -0400
-Received: from mga03.intel.com ([134.134.136.65]:25966 "EHLO mga03.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230148AbhD2L1K (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 29 Apr 2021 07:27:10 -0400
-IronPort-SDR: bnyy8rVzjFI5xhK0bs8y4Km/MubCcK/VuLQlst4JM8XlCwgrirRcKaIx1E9CPKK5Oy1ksEqBiw
- 7uVPm8Yq7cAg==
-X-IronPort-AV: E=McAfee;i="6200,9189,9968"; a="197029050"
-X-IronPort-AV: E=Sophos;i="5.82,259,1613462400"; 
-   d="scan'208";a="197029050"
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Apr 2021 04:26:18 -0700
-IronPort-SDR: 6rR9y8kmfinDUbQKppRZ/uP7sAONhZL9QHkj0hsR2petOMhD4RcjAcsVG9avvMqHSm/TJ53V0B
- 2zgSBYfu6JHQ==
-X-IronPort-AV: E=Sophos;i="5.82,259,1613462400"; 
-   d="scan'208";a="526904265"
-Received: from xli56-mobl.ccr.corp.intel.com (HELO [10.254.211.239]) ([10.254.211.239])
-  by fmsmga001-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Apr 2021 04:26:16 -0700
-Subject: Re: [PATCH 2/2] vDPA/ifcvf: implement doorbell mapping for ifcvf
-To:     Jason Wang <jasowang@redhat.com>, mst@redhat.com
-Cc:     virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20210428082133.6766-1-lingshan.zhu@intel.com>
- <20210428082133.6766-3-lingshan.zhu@intel.com>
- <f6d9a424-9025-3eb5-1cb4-0ff22f7bec63@redhat.com>
- <5052fced-cd9a-e453-5cb2-39cdde60a208@intel.com>
- <1984491f-cd5e-d4bc-b328-41e2f2e935fd@redhat.com>
- <ef510c97-1f1c-a121-99db-b659a5f9518c@intel.com>
- <4e0eda74-04ac-a889-471b-03fe65c65606@redhat.com>
- <f4cb4619-5634-e42d-0629-5c40f6b0dcd1@intel.com>
- <bca66845-b16d-ee5e-807b-a3570e290813@redhat.com>
-From:   "Zhu, Lingshan" <lingshan.zhu@intel.com>
-Message-ID: <d3bb5231-47cc-86e6-a4b2-a05bd81140a5@intel.com>
-Date:   Thu, 29 Apr 2021 19:26:14 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.9.0
+        id S230148AbhD2L74 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 29 Apr 2021 07:59:56 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:44744 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S233643AbhD2L7z (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 29 Apr 2021 07:59:55 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1619697548;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=Qk+Z523FZXAJhd7+e1hz9bUYPc0iQ4gL6t75sH996V0=;
+        b=UIyI84YURfY24HWv/bwKx/Buc+swvwE0iZU12xbPhkn1GirMsqNFH8DhKPK+vZpJmWaKDU
+        u0FpqxMDeRd1YBhq9Jsjloz9iskB9u9WH3bP4gWP5shFP4+6N8tKZQ4b3wEZ9tahgoDbNa
+        fPs0pYSJGgQGIpuZ12LxEnxXI4j+xow=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-441-pGXuF9rLMbyZRC1IOhWJwg-1; Thu, 29 Apr 2021 07:59:04 -0400
+X-MC-Unique: pGXuF9rLMbyZRC1IOhWJwg-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A54E019253C5;
+        Thu, 29 Apr 2021 11:59:01 +0000 (UTC)
+Received: from gondolin.fritz.box (ovpn-113-129.ams2.redhat.com [10.36.113.129])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 0032710016FE;
+        Thu, 29 Apr 2021 11:58:57 +0000 (UTC)
+Date:   Thu, 29 Apr 2021 13:58:55 +0200
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>,
+        Eric Farman <farman@linux.ibm.com>
+Cc:     Christian Borntraeger <borntraeger@de.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org,
+        Peter Oberparleiter <oberpar@linux.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Vineeth Vijayan <vneethv@linux.ibm.com>,
+        "Raj, Ashok" <ashok.raj@intel.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Christoph Hellwig <hch@lst.de>,
+        Leon Romanovsky <leonro@nvidia.com>,
+        Max Gurtovoy <mgurtovoy@nvidia.com>,
+        Tarun Gupta <targupta@nvidia.com>
+Subject: Re: [PATCH v2 07/13] vfio/ccw: Convert to use
+ vfio_register_group_dev()
+Message-ID: <20210429135855.443b7a1b.cohuck@redhat.com>
+In-Reply-To: <20210428172008.GV1370958@nvidia.com>
+References: <0-v2-7667f42c9bad+935-vfio3_jgg@nvidia.com>
+        <7-v2-7667f42c9bad+935-vfio3_jgg@nvidia.com>
+        <20210428190949.4360afb7.cohuck@redhat.com>
+        <20210428172008.GV1370958@nvidia.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-In-Reply-To: <bca66845-b16d-ee5e-807b-a3570e290813@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Wed, 28 Apr 2021 14:20:08 -0300
+Jason Gunthorpe <jgg@nvidia.com> wrote:
 
+> On Wed, Apr 28, 2021 at 07:09:49PM +0200, Cornelia Huck wrote:
+> > On Mon, 26 Apr 2021 17:00:09 -0300
+> > Jason Gunthorpe <jgg@nvidia.com> wrote:
+> >   
+> > > This is more complicated because vfio_ccw is sharing the vfio_device
+> > > between both the mdev_device and its vfio_device and the css_driver.
+> > > 
+> > > The mdev is a singleton, and the reason for this sharing appears to be to
+> > > allow the extra css_driver function callbacks to be delivered to the
+> > > vfio_device.
+> > > 
+> > > This keeps things as they were, with the css_driver allocating the
+> > > singleton, not the mdev_driver, this is pretty confusing. I'm also
+> > > uncertain how the lifetime model for the mdev works in the css_driver
+> > > callbacks.
+> > > 
+> > > At this point embed the vfio_device in the vfio_ccw_private and
+> > > instantiate it as a vfio_device when the mdev probes. The drvdata of both
+> > > the css_device and the mdev_device point at the private, and container_of
+> > > is used to get it back from the vfio_device.  
+> > 
+> > I've been staring at this for some time, and I'm not sure whether this
+> > is a good approach.
+> > 
+> > We allow at most one mdev per subchannel (slicing it up does not make
+> > sense), so we can be sure that there's a 1:1 relationship between mdev
+> > and parent device, and we can track it via a single pointer.  
+> 
+> This seems like one of these cases where using the mdev GUID API was not a
+> great fit. The ccs_driver should have just directly created a
+> vfio_device and not gone into the mdev guid lifecycle world.
 
-On 4/28/2021 9:08 PM, Jason Wang wrote:
->
-> 在 2021/4/28 下午6:20, Zhu, Lingshan 写道:
->>
->>
->> On 4/28/2021 6:03 PM, Jason Wang wrote:
->>>
->>> 在 2021/4/28 下午5:56, Zhu, Lingshan 写道:
->>>>
->>>>
->>>> On 4/28/2021 5:21 PM, Jason Wang wrote:
->>>>>
->>>>> 在 2021/4/28 下午4:59, Zhu, Lingshan 写道:
->>>>>>
->>>>>>
->>>>>> On 4/28/2021 4:42 PM, Jason Wang wrote:
->>>>>>>
->>>>>>> 在 2021/4/28 下午4:21, Zhu Lingshan 写道:
->>>>>>>> This commit implements doorbell mapping feature for ifcvf.
->>>>>>>> This feature maps the notify page to userspace, to eliminate
->>>>>>>> vmexit when kick a vq.
->>>>>>>>
->>>>>>>> Signed-off-by: Zhu Lingshan <lingshan.zhu@intel.com>
->>>>>>>> ---
->>>>>>>>   drivers/vdpa/ifcvf/ifcvf_main.c | 18 ++++++++++++++++++
->>>>>>>>   1 file changed, 18 insertions(+)
->>>>>>>>
->>>>>>>> diff --git a/drivers/vdpa/ifcvf/ifcvf_main.c 
->>>>>>>> b/drivers/vdpa/ifcvf/ifcvf_main.c
->>>>>>>> index e48e6b74fe2e..afcb71bc0f51 100644
->>>>>>>> --- a/drivers/vdpa/ifcvf/ifcvf_main.c
->>>>>>>> +++ b/drivers/vdpa/ifcvf/ifcvf_main.c
->>>>>>>> @@ -413,6 +413,23 @@ static int ifcvf_vdpa_get_vq_irq(struct 
->>>>>>>> vdpa_device *vdpa_dev,
->>>>>>>>       return vf->vring[qid].irq;
->>>>>>>>   }
->>>>>>>>   +static struct vdpa_notification_area 
->>>>>>>> ifcvf_get_vq_notification(struct vdpa_device *vdpa_dev,
->>>>>>>> +                                   u16 idx)
->>>>>>>> +{
->>>>>>>> +    struct ifcvf_hw *vf = vdpa_to_vf(vdpa_dev);
->>>>>>>> +    struct vdpa_notification_area area;
->>>>>>>> +
->>>>>>>> +    if (vf->notify_pa % PAGE_SIZE) {
->>>>>>>> +        area.addr = 0;
->>>>>>>> +        area.size = 0;
->>>>>>>
->>>>>>>
->>>>>>> We don't need this since:
->>>>>>>
->>>>>>> 1) there's a check in the vhost vDPA
->>>>>> I think you mean this code block in vdpa.c
->>>>>>         notify = ops->get_vq_notification(vdpa, index);
->>>>>>         if (notify.addr & (PAGE_SIZE - 1))
->>>>>>                 return -EINVAL;
->>>>>>
->>>>>> This should work, however, I think the parent driver should 
->>>>>> ensure it passes a PAGE_SIZE aligned address to userspace, to be 
->>>>>> robust, to be reliable.
->>>>>
->>>>>
->>>>> The point is parent is unaware of whether or not there's a userspace.
->>>> when calling this, I think it targets a usersapce program, why 
->>>> kernel space need it, so IMHO no harm if we check this to keep the 
->>>> parent driver robust.
->>>
->>>
->>> Again, vDPA device is unaware of what driver that is bound. It could 
->>> be virtio-vpda, vhost-vdpa or other in the future. It's only the 
->>> vDPA bus driver know how it is actually used.
->>>
->>>
->>>>>
->>>>>
->>>>>>> 2) device is unaware of the bound driver, non page aligned 
->>>>>>> doorbell doesn't necessarily meant it can be used
->>>>>> Yes, non page aligned doorbell can not be used, so there is a check.
->>>>>
->>>>>
->>>>> Typo, what I meant is "it can't be used". That is to say, we 
->>>>> should let the vDPA bus driver to decide whether or not it can be 
->>>>> used.
->>>> If it is not page aligned, there would be extra complexities for 
->>>> vhost/qemu, I see it as a hardware defect, 
->>>
->>>
->>> It is allowed by the virtio spec, isn't it?
->> The spec does not require the doorbell to be page size aligned, 
->> however it still a hardware defect if non page size aligned notify 
->> base present, I will leave a warning message here instead of the 0 
->> value.
->>
->
-> Another note is that, using PAGE_SIZE is wrong here since it varies 
-> among archs (at most 64K on some one).
-For the page alignment checks, I think this is the point of using 
-PAGE_SIZE, we want the doorbell placed at the page boundary, PAGE_SIZE 
-depends on the arch,
-so I think we don't want to use hard code here. We will pass the 
-notify_pa to upper layer anyway, just print an warning if not PAGE_SIZE 
-aligned.
+I don't remember much of the discussion back then, but I don't think
+the explicit generation of devices was the part we needed, but rather
+some other kind of mediation -- probably iommu related, as subchannels
+don't have that concept on their own. Anyway, too late to change now.
 
-However I think this may refer to vdpa_notification_area.size, YES, I 
-think use PAGE_SIZE directly is wrong here, this size depends on the 
-device(bar layout) than the arch, so I will add more code to tell which 
-device is probed by the driver, then assign correct value.
+> 
+> > The vfio_ccw_private driver data is allocated during probe (same as for
+> > other css_drivers.) Embedding a vfio_device here means that we have a
+> > structure tied into it that is operating with different lifetime rules.
+> > 
+> > What about creating a second structure instead that can embed the
+> > vfio_device, is allocated during mdev probing, and is linked up with
+> > the vfio_ccw_private structure? That would follow the pattern of other
+> > drivers more closely.  
+> 
+> IIRC we still end up with pointers crossing between the two
+> structs. If you can't convince yourself that is correct (and I could
+> not) then it is already buggy today.
+> 
+> It is as I said to Eric, either there is no concurrency when there is
+> no mdev and everything is correct today, or there is concurrency and
+> it seems buggy today too.
+> 
+> The right answer it to move the allocations out of the css_driver
+> probe and put them only in the mdev driver probe because they can only
+> make sense when the mdev driver is instantiated. Then everything is
+> clear and very understandable how it should work.
+> 
+> I almost did this, but couldn't figure out how the lifetime of the
+> ccs_driver callbacks are working relative to the lifetime of the mdev
+> device since they also reach into these structs. Maybe they can't be
+> called for some css related reason?
 
-Thanks
->
-> Thanks
->
->
->> Thanks
->> Zhu Lingshan
->>>
->>> Thanks
->>>
->>>
->>>> why adapt to this kind of defects?
->>>>
->>>> Thanks
->>>> Zhu Lingshan
->>>>>
->>>>> Thanks
->>>>>
->>>>>
->>>>>>
->>>>>> Thanks
->>>>>> Zhu Lingshan
->>>>>>>
->>>>>>> Let's leave those polices to the driver.
->>>>>>>
->>>>>>> Thanks
->>>>>>>
->>>>>>>
->>>>>>>> +    } else {
->>>>>>>> +        area.addr = vf->notify_pa;
->>>>>>>> +        area.size = PAGE_SIZE;
->>>>>>>> +    }
->>>>>>>> +
->>>>>>>> +    return area;
->>>>>>>> +}
->>>>>>>> +
->>>>>>>>   /*
->>>>>>>>    * IFCVF currently does't have on-chip IOMMU, so not
->>>>>>>>    * implemented set_map()/dma_map()/dma_unmap()
->>>>>>>> @@ -440,6 +457,7 @@ static const struct vdpa_config_ops 
->>>>>>>> ifc_vdpa_ops ={
->>>>>>>>       .get_config    = ifcvf_vdpa_get_config,
->>>>>>>>       .set_config    = ifcvf_vdpa_set_config,
->>>>>>>>       .set_config_cb  = ifcvf_vdpa_set_config_cb,
->>>>>>>> +    .get_vq_notification = ifcvf_get_vq_notification,
->>>>>>>>   };
->>>>>>>>     static int ifcvf_probe(struct pci_dev *pdev, const struct 
->>>>>>>> pci_device_id *id)
->>>>>>>
->>>>>>
->>>>>
->>>>
->>>
->>
->
+Moving allocations to the mdev driver probe makes sense, I guess. We
+should also move enabling the subchannel to that point in time (I don't
+remember why we enable it in the css probe function, and can't think of
+a good reason for that; obviously needs to be paired with quiescing and
+disabling the subchannel in the mdev driver remove function); that
+leaves the uevent dance (which can hopefully also be removed, if some
+discussed changes are implemented in the common I/O layer) and fencing
+QDIO.
+
+Regarding the other callbacks,
+- vfio_ccw_sch_irq should not be invoked if the subchannel is not
+  enabled; maybe log a message before returning for !private.
+- vfio_ccw_sch_remove should be able to return 0 for !private (nothing
+  to quiesce, if the subchannel is not enabled).
+- vfio_ccw_sch_shutdown has nothing to do for !private (same reason.)
+- In vfio_ccw_sch_event, we should either skip the fsm_event and the
+  state change for !private, or return 0 in that case.
+- vfio_ccw_chp_event already checks for !private. Not sure whether we
+  should try to update some control blocks and return -ENODEV if the
+  subchannel is not operational, but it's probably not needed.
+
+Eric, what do you think?
 
