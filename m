@@ -2,128 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4A5A036ED85
-	for <lists+kvm@lfdr.de>; Thu, 29 Apr 2021 17:40:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 60EDC36EDC7
+	for <lists+kvm@lfdr.de>; Thu, 29 Apr 2021 18:02:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233770AbhD2PlN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 29 Apr 2021 11:41:13 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:45908 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233420AbhD2PlN (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 29 Apr 2021 11:41:13 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1619710825;
+        id S234144AbhD2QDf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 29 Apr 2021 12:03:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33164 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232004AbhD2QDf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 29 Apr 2021 12:03:35 -0400
+Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5651DC06138B;
+        Thu, 29 Apr 2021 09:02:48 -0700 (PDT)
+From:   Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020; t=1619712165;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=kK+PtjkelzcP148tYlX83T1qpvdgbT7Hd+zpcnCGKv4=;
-        b=ZQdQxdt7/QCjmt0PV0yQ+/ipaxGVFU7mP0vAbnMZpIHpqbjnSK29aXHzU+SrWLKEXC2PUq
-        m/gXuYE1ELYH9avNZnLUYjKBKSDYJfZT1CB9rj00ovWOeZbsaBCb1sjGQfSdbHkvFuto8S
-        jtZXYKwFeRJq58s7r+84g1vzYnhaUUg=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-478--4z-PWOMPHq4N8A89goKBA-1; Thu, 29 Apr 2021 11:40:23 -0400
-X-MC-Unique: -4z-PWOMPHq4N8A89goKBA-1
-Received: by mail-ed1-f69.google.com with SMTP id w14-20020aa7da4e0000b02903834aeed684so27185579eds.13
-        for <kvm@vger.kernel.org>; Thu, 29 Apr 2021 08:40:23 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=kK+PtjkelzcP148tYlX83T1qpvdgbT7Hd+zpcnCGKv4=;
-        b=l1fSwspmcXuFAFJfn0QphWztXIkSt7vj/P+3um6w2AacEtwfS8Neipd6VNO2O8C85r
-         vWXHPPW1g0gm6chhmjjlx9UaKFHW/OwZ3JhccZl1NWM5A5VCBAaxyRuR6m8pERxl/TDm
-         XjKyRrup7RQtV5R1/smZmn4dVbif0ZSF71IySjorNp3vOmhJIu/CK2v0uB6YprZyHp3m
-         3gA1GFKr//0cXghffNos9+5VTt5zA+SzpU/fNP0tQJI0vRB9RB6uThUiZisAAvBz518n
-         NC4lmBsPZrdEycybY1x3VDEfCMoPCHA07cZIgK2RIxkMPFjb2R1D7+6M1MTlGbCqpA/R
-         K3AA==
-X-Gm-Message-State: AOAM532kuHdDj14fhFo0CfaJ33MAV/8zxlg3Z99I/TZKzgCq4IORYgYi
-        1Uub2ubySnqBHQGcN8aO2GpHkU6UDVicTiFpJ8EmKfZsIQM0Nbh+kY2CX7aDXd0YVJJfT2Ny/wG
-        zXDiep+o513+u
-X-Received: by 2002:a50:ab1d:: with SMTP id s29mr156010edc.203.1619710822541;
-        Thu, 29 Apr 2021 08:40:22 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxvGDWWePXYARUeseM/SK8xtoNJZjNSvs627FSZovPJWIisAAmeLX5WcR7hzO/wxYVsh87DbQ==
-X-Received: by 2002:a50:ab1d:: with SMTP id s29mr155985edc.203.1619710822325;
-        Thu, 29 Apr 2021 08:40:22 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id lc1sm202408ejb.39.2021.04.29.08.40.21
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 29 Apr 2021 08:40:21 -0700 (PDT)
-Subject: Re: [PATCH] KVM: LAPIC: Accurately guarantee busy wait for timer to
- expire when using hv_timer
-To:     Sean Christopherson <seanjc@google.com>,
-        Wanpeng Li <kernellwp@gmail.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>
-References: <1619608082-4187-1-git-send-email-wanpengli@tencent.com>
- <YInoMjNJRgm3gUYX@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <7893b6e5-3a4a-1e79-bc7c-2c6368e92471@redhat.com>
-Date:   Thu, 29 Apr 2021 17:40:20 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.7.0
+        bh=8plJW1VXqdM/pu1ulaDOFaCnsDTuvu4fwYJsVAeb39E=;
+        b=tDCrPYi8epRqOfmXjzRVd+hbooSGl783ckl6sQX1A5heow2ufo0jVGFKEUwjXHcqxVH/u2
+        UEDVrPawKlRzU0u1CeXG3MZ5zw7lLsQBOasplVMnlEMkdIQ9luxXJqYbNP5lLTOPeObQPC
+        T8beFcOEQkHWSLIGJkuXPLvurVYfijBce/i4AElu/rvpMDGyRAy/63pdV/bmltVUUhBqeW
+        YsM5rPA1ksv03dHKMXgRe+SI4SfxX97eoIncb4TO/9UYcYzl28ZFpjVnUPIaYwk4Hlcrzi
+        Np7Jy14haEfQb1uDWblpVZHg7dkZwLkRdDKQT7syPiQ+ul4VMSPT18dzLoVPqA==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020e; t=1619712165;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=8plJW1VXqdM/pu1ulaDOFaCnsDTuvu4fwYJsVAeb39E=;
+        b=PTZIOGrGSXFPL5ab1UCrpZmd2Ah5VfdyMmMYN0nmPDQUhJGuf7ilDznRsamgSV3WP2R7n0
+        UFI1Xp9muTi41NDw==
+To:     Zelin Deng <zelin.deng@linux.alibaba.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org, x86@kernel.org
+Subject: Re: [PATCH] Guest system time jumps when new vCPUs is hot-added
+In-Reply-To: <2df3de0e-670a-ba28-fdd2-0002cebde545@linux.alibaba.com>
+References: <1619576521-81399-1-git-send-email-zelin.deng@linux.alibaba.com> <87lf92n5r1.ffs@nanos.tec.linutronix.de> <e33920a0-24bc-fa40-0a23-c2eb5693f85d@linux.alibaba.com> <875z057a12.ffs@nanos.tec.linutronix.de> <2df3de0e-670a-ba28-fdd2-0002cebde545@linux.alibaba.com>
+Date:   Thu, 29 Apr 2021 18:02:44 +0200
+Message-ID: <87o8dxf597.ffs@nanos.tec.linutronix.de>
 MIME-Version: 1.0
-In-Reply-To: <YInoMjNJRgm3gUYX@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 29/04/21 00:56, Sean Christopherson wrote:
-> On Wed, Apr 28, 2021, Wanpeng Li wrote:
->> From: Wanpeng Li <wanpengli@tencent.com>
+On Thu, Apr 29 2021 at 17:38, Zelin Deng wrote:
+> On 2021/4/29 =E4=B8=8B=E5=8D=884:46, Thomas Gleixner wrote:
+>> And that validation expects that the CPUs involved run in a tight loop
+>> concurrently so the TSC readouts which happen on both can be reliably
+>> compared.
 >>
->> Commit ee66e453db13d (KVM: lapic: Busy wait for timer to expire when
->> using hv_timer) tries to set ktime->expired_tscdeadline by checking
->> ktime->hv_timer_in_use since lapic timer oneshot/periodic modes which
->> are emulated by vmx preemption timer also get advanced, they leverage
->> the same vmx preemption timer logic with tsc-deadline mode. However,
->> ktime->hv_timer_in_use is cleared before apic_timer_expired() handling,
->> let's delay this clearing in preemption-disabled region.
->>
->> Fixes: ee66e453db13d (KVM: lapic: Busy wait for timer to expire when using hv_timer)
-> 
-> Well that's embarassing.  I suspect/hope I tested the case where start_hv_timer()
-> detects the timer already expired.  On the plus side, start_hv_timer() calls
-> cancel_hv_timer() after apic_timer_expired(), so there are unlikely to be hidden
-> side effects (and cancel_hv_timer() is tiny).
-> 
->> Cc: Sean Christopherson <seanjc@google.com>
->> Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
-> 
-> Reviewed-by: Sean Christopherson <seanjc@google.com>
-> 
->> ---
->>   arch/x86/kvm/lapic.c | 2 +-
->>   1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
->> index 152591f..c0ebef5 100644
->> --- a/arch/x86/kvm/lapic.c
->> +++ b/arch/x86/kvm/lapic.c
->> @@ -1913,8 +1913,8 @@ void kvm_lapic_expired_hv_timer(struct kvm_vcpu *vcpu)
->>   	if (!apic->lapic_timer.hv_timer_in_use)
->>   		goto out;
->>   	WARN_ON(rcuwait_active(&vcpu->wait));
->> -	cancel_hv_timer(apic);
->>   	apic_timer_expired(apic, false);
->> +	cancel_hv_timer(apic);
->>   
->>   	if (apic_lvtt_period(apic) && apic->lapic_timer.period) {
->>   		advance_periodic_target_expiration(apic);
->> -- 
->> 2.7.4
->>
-> 
+>> But this cannot be guaranteed on vCPUs at all, because the host can
+>> schedule out one or both at any point during that synchronization
+>> check.
+>
+> Is there any plan to fix this?
 
-Queued, thanks.
+The above cannot be fixed.
 
-Paolo
+As I said before the solution is:
+
+>> A two socket guest setup needs to have information from the host that
+>> TSC is usable and that the socket sync check can be skipped. Anything
+>> else is just doomed to fail in hard to diagnose ways.
+>
+> Yes, I had tried to add "tsc=3Dunstable" to skip tsc sync.=C2=A0 However =
+if a=20
+
+tsc=3Dunstable? Oh well.
+
+> user process which is not pined to vCPU is using rdtsc, it can get tsc=20
+> warp, because it can be scheduled among vCPUs.=C2=A0 Does it mean user
+
+Only if the hypervisor is not doing the right thing and makes sure that
+all vCPUs have the same tsc offset vs. the host TSC.
+
+> applications have to guarantee itself to use rdtsc only when TSC is=20
+> reliable?
+
+If the TSCs of CPUs are not in sync then the kernel does the right thing
+and uses some other clocksource for the various time interfaces, e.g.
+the kernel provides clock_getttime() which guarantees to be correct
+whether TSC is usable or not.
+
+Any application using RDTSC directly is own their own and it's not a
+kernel problem.
+
+The host kernel cannot make guarantees that the hardware is sane neither
+can a guest kernel make guarantees that the hypervisor is sane.
+
+Thanks,
+
+        tglx
+
+
+
 
